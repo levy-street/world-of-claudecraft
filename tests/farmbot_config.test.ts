@@ -22,6 +22,7 @@ describe('farmbot parseConfig', () => {
       grind: false,
       flee: 'never',
       fleeAboveLevelDelta: 3,
+      maxPullSize: 2,
     });
     expect(cfg.bags).toEqual({ fullPolicy: 'sell-junk', sellAllowlist: [], mailItems: 'all' });
     expect(cfg.maxRuntimeMinutes).toBe(0);
@@ -72,6 +73,7 @@ describe('farmbot parseConfig', () => {
       grind: false,
       flee: 'never',
       fleeAboveLevelDelta: 3,
+      maxPullSize: 2,
       eatItemId: 'item_bread',
       drinkItemId: 'item_water',
       eatBelowHpPct: 50,
@@ -79,6 +81,15 @@ describe('farmbot parseConfig', () => {
     });
     expect(cfg.bags).toEqual({ fullPolicy: 'stop', sellAllowlist: [], mailItems: 'all' });
     expect(cfg.maxRuntimeMinutes).toBe(120);
+  });
+
+  it('accepts the outnumbered/both flee values and a custom maxPullSize', () => {
+    expect(parseConfig({ ...VALID, combat: { flee: 'outnumbered' } }).combat.flee).toBe(
+      'outnumbered',
+    );
+    expect(parseConfig({ ...VALID, combat: { flee: 'both' } }).combat.flee).toBe('both');
+    expect(parseConfig({ ...VALID, combat: { maxPullSize: 1 } }).combat.maxPullSize).toBe(1);
+    expect(parseConfig({ ...VALID, combat: { maxPullSize: 4 } }).combat.maxPullSize).toBe(4);
   });
 
   it('parses every phase-1 field when fully specified', () => {
@@ -260,6 +271,15 @@ describe('farmbot parseConfig', () => {
     expect(() => parseConfig({ ...VALID, combat: { flee: 'always' } })).toThrow(/combat\.flee/);
     expect(() => parseConfig({ ...VALID, combat: { fleeAboveLevelDelta: -1 } })).toThrow(
       /combat\.fleeAboveLevelDelta/,
+    );
+    expect(() => parseConfig({ ...VALID, combat: { maxPullSize: 0 } })).toThrow(
+      /combat\.maxPullSize/,
+    );
+    expect(() => parseConfig({ ...VALID, combat: { maxPullSize: 1.5 } })).toThrow(
+      /combat\.maxPullSize/,
+    );
+    expect(() => parseConfig({ ...VALID, combat: { maxPullSize: '2' } })).toThrow(
+      /combat\.maxPullSize/,
     );
     expect(() => parseConfig({ ...VALID, bags: { sellAllowlist: [1] } })).toThrow(
       /bags\.sellAllowlist/,

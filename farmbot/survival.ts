@@ -11,7 +11,13 @@
 // simply never match them; the potion arm is class-agnostic.
 
 import type { ResolvedAbility } from '../src/sim/sim';
-import { type Entity, type InvSlot, type ItemDef, POTION_COOLDOWN } from '../src/sim/types';
+import {
+  type Entity,
+  type InvSlot,
+  type ItemDef,
+  MELEE_RANGE,
+  POTION_COOLDOWN,
+} from '../src/sim/types';
 
 export const DIVINE_PROTECTION_ID = 'divine_protection'; // Ward of Faith
 export const LAY_ON_HANDS_ID = 'lay_on_hands'; // Last Rite
@@ -71,6 +77,73 @@ export function pickEmergencyAction(
       }
     }
     if (best) return { kind: 'use', id: best, selfTarget: false };
+  }
+  return null;
+}
+
+// --- pack assessment (phase 13) ---------------------------------------------
+// Living hostile mobs within PACK_ASSESS_RANGE of a pull candidate, the
+// candidate included (a solo mob counts 1). Gold and level modes skip the
+// target when this exceeds combat.maxPullSize; combat.grind ignores the cap.
+
+export const PACK_ASSESS_RANGE = 10; // yards around the candidate
+
+export function countPackAround(entities: Iterable<Entity>, target: Entity): number {
+  const r2 = PACK_ASSESS_RANGE * PACK_ASSESS_RANGE;
+  let count = 0;
+  for (const e of entities) {
+    if (e.kind !== 'mob' || e.dead || !e.hostile) continue;
+    const dx = e.pos.x - target.pos.x;
+    const dz = e.pos.z - target.pos.z;
+    if (dx * dx + dz * dz <= r2) count += 1;
+  }
+  return count;
+}
+
+// --- interrupts (phase 13) ----------------------------------------------------
+// The class interrupt kit (ids verified against src/sim/content/classes.ts).
+// Membership in the known list implies the class, so the picker is
+// class-agnostic: the first known table entry is the bot's interrupt. Zone
+// trash rarely hardcasts; the value is on bosses and caster mobs.
+
+export const INTERRUPT_ABILITY_IDS = [
+  'rebuke', // paladin, Reproach (melee)
+  'kick', // rogue, Boot (melee)
+  'counterspell', // mage, Spellbreak (30)
+  'counter_shot', // hunter, Hushing Shot (35)
+  'skull_bash', // druid, Headbutt (8)
+  'spell_lock', // warlock, Gag Order (30)
+] as const;
+
+// Only interrupt a cast with this much left (seconds): earlier and the server
+// resolve races us, later and a near-done cast is not worth the cooldown.
+export const INTERRUPT_MIN_CAST_REMAINING = 0.4;
+
+export interface InterruptPick {
+  abilityId: string;
+  attackerId: number;
+  // What the attacker is casting (for the log line).
+  casting: string;
+}
+
+export function pickInterrupt(
+  known: readonly ResolvedAbility[],
+  player: Entity,
+  attackers: readonly Entity[],
+): InterruptPick | null {
+  const interrupt = known.find((k) =>
+    (INTERRUPT_ABILITY_IDS as readonly string[]).includes(k.def.id),
+  );
+  if (!interrupt) return null;
+  if ((player.cooldowns.get(interrupt.def.id) ?? 0) > 0) return null;
+  const range = interrupt.def.range > 0 ? interrupt.def.range : MELEE_RANGE;
+  const r2 = range * range;
+  for (const e of attackers) {
+    if (e.castingAbility === null || e.castRemaining <= INTERRUPT_MIN_CAST_REMAINING) continue;
+    const dx = e.pos.x - player.pos.x;
+    const dz = e.pos.z - player.pos.z;
+    if (dx * dx + dz * dz > r2) continue;
+    return { abilityId: interrupt.def.id, attackerId: e.id, casting: e.castingAbility };
   }
   return null;
 }

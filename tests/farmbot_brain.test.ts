@@ -2901,3 +2901,228 @@ describe('farmbot brain: level mode (phase 12)', () => {
     expect(logs.some((l) => l.includes('level: recharging'))).toBe(true);
   });
 });
+
+describe('farmbot brain: combat intelligence (phase 13)', () => {
+  const CRYPT = { x: 100300, z: -1250 }; // instanceOrigin(0, 0)
+  const insidePos = (lx: number, lz: number) => ({ x: CRYPT.x + lx, y: 0, z: CRYPT.z + lz });
+
+  function packMob(id: number, name: string, pos: { x: number; y: number; z: number }) {
+    return makeEntity({ id, name, pos });
+  }
+
+  function interruptAbility(id: string, range = 0): ResolvedAbility {
+    return {
+      def: {
+        id,
+        name: id,
+        class: 'paladin',
+        cost: 10,
+        castTime: 0,
+        cooldown: 12,
+        range,
+        school: 'physical',
+        requiresTarget: true,
+      },
+      rank: 1,
+      cost: 10,
+      castTime: 0,
+      cooldown: 12,
+      effects: [{ type: 'interrupt', lockout: 4 }],
+      threatFlat: 0,
+      threatMult: 1,
+    } as unknown as ResolvedAbility;
+  }
+
+  function addAttacker(world: FakeWorld, id: number, over: Partial<Entity> = {}) {
+    const mob = makeEntity({ id, aggroTargetId: 1, pos: { x: 3, y: 0, z: 0 }, ...over });
+    world.entities.set(id, mob);
+    return mob;
+  }
+
+  it('gold mode skips a packed pull target for 60s and takes the next mob', () => {
+    const { state, world } = makeBrain({ mode: 'gold' });
+    state.goldPhase = 'clear';
+    world.player.pos = insidePos(0, 30);
+    // a linked pack of three ahead, one straggler off to the side
+    world.entities.set(90, packMob(90, 'acolyte', insidePos(5, 32)));
+    world.entities.set(91, packMob(91, 'acolyte', insidePos(8, 32)));
+    world.entities.set(92, packMob(92, 'acolyte', insidePos(5, 35)));
+    world.entities.set(93, packMob(93, 'straggler', insidePos(20, 32)));
+
+    let logs = step(state, world, 0);
+    expect(logs.some((l) => l.includes('gold: skipping acolyte, pack of 3'))).toBe(true);
+    expect(state.pullSkipUntilMs.get(90)).toBe(60_000);
+    expect(world.abilityCasts).toEqual([]);
+    logs = step(state, world, 100);
+    expect(state.pullSkipUntilMs.get(92)).toBe(100 + 60_000); // next-nearest packed mob
+    logs = step(state, world, 200);
+    expect(state.pullSkipUntilMs.get(91)).toBe(200 + 60_000);
+    // every packed mob skipped: the straggler (solo) is the pull
+    logs = step(state, world, 700);
+    expect(logs.some((l) => l.includes('gold: pulling straggler'))).toBe(true);
+    expect(world.targets).toEqual([93]);
+    expect(world.abilityCasts).toEqual(['exorcism']);
+  });
+
+  it('level mode skips the packed mob, not the camp', () => {
+    const tables: GrindTables = {
+      camps: [{ mobId: 'wolf', center: { x: 50, z: 0 }, radius: 20, count: 4 }],
+      mobs: {
+        wolf: { id: 'wolf', name: 'wolf', minLevel: 5, maxLevel: 6 } as unknown as MobTemplate,
+      },
+      zoneIdAt: () => 'zone_a',
+      xpValue: mobXpValue,
+      zoneDefs: [{ id: 'zone_a', levelRange: [1, 7] }] as unknown as ZoneDef[],
+    };
+    const { state, world } = makeBrain({ mode: 'level' }, { grindTables: tables });
+    world.player.level = 5;
+    world.player.pos = { x: 45, y: 0, z: 0 };
+    world.entities.set(90, packMob(90, 'packwolf', { x: 48, y: 0, z: 0 }));
+    world.entities.set(91, packMob(91, 'packwolf', { x: 48, y: 0, z: 5 }));
+    world.entities.set(92, packMob(92, 'packwolf', { x: 48, y: 0, z: -5 }));
+    world.entities.set(93, packMob(93, 'loner', { x: 60, y: 0, z: 0 })); // 12 yd off the pack
+
+    let logs = step(state, world, 700);
+    expect(logs.some((l) => l.includes('level: skipping packwolf, pack of 3'))).toBe(true);
+    expect(state.levelCampKey).toBe('wolf@50,0'); // camp retained
+    // the other two pack members are skipped in turn (one assessment per tick)
+    step(state, world, 800);
+    step(state, world, 900);
+    logs = step(state, world, 1000);
+    expect(logs.some((l) => l.includes('level: engaging loner'))).toBe(true);
+    expect(world.targets).toEqual([93]);
+  });
+
+  it('grind mode ignores maxPullSize and pulls into the pack', () => {
+    const { state, world } = makeBrain({ combat: { grind: true } });
+    world.nodeReady.set('node_a', false);
+    world.nodeReady.set('node_b', false);
+    world.entities.set(90, packMob(90, 'boar', { x: 20, y: 0, z: 0 }));
+    world.entities.set(91, packMob(91, 'boar', { x: 23, y: 0, z: 0 }));
+    world.entities.set(92, packMob(92, 'boar', { x: 20, y: 0, z: 3 }));
+    const logs = step(state, world, 0);
+    expect(state.mode).toBe('COMBAT');
+    expect(logs.some((l) => l.includes('grind: pulling boar'))).toBe(true);
+    expect(world.targets).toEqual([90]);
+  });
+
+  it('flees 3+ attackers with flee outnumbered, exactly like the outleveled path', () => {
+    const { state, world } = makeBrain({ combat: { flee: 'outnumbered' } });
+    world.player.level = 3;
+    addAttacker(world, 80, { level: 3, pos: { x: 10, y: 0, z: 0 } });
+    addAttacker(world, 81, { level: 3, pos: { x: 12, y: 0, z: 0 } });
+    addAttacker(world, 82, { level: 3, pos: { x: 11, y: 0, z: 2 } });
+    const logs = step(state, world, 0);
+    expect(state.mode).toBe('FLEE');
+    expect(logs.some((l) => l.includes('outnumbered'))).toBe(true);
+    expect(world.autoAttackStarts).toBe(0);
+    expect(world.moveInput.forward).toBe(true);
+    expect(world.facing).toBeCloseTo(-Math.PI / 2); // away from the +x pack
+  });
+
+  it('flee both trips on either rule, outleveled still ignores a same-level pack', () => {
+    const both = makeBrain({ combat: { flee: 'both' } });
+    addAttacker(both.world, 80, { level: 3, pos: { x: 10, y: 0, z: 0 } });
+    addAttacker(both.world, 81, { level: 3, pos: { x: 12, y: 0, z: 0 } });
+    addAttacker(both.world, 82, { level: 3, pos: { x: 11, y: 0, z: 2 } });
+    const bothLogs = step(both.state, both.world, 0);
+    expect(both.state.mode).toBe('FLEE');
+    expect(bothLogs.some((l) => l.includes('outnumbered'))).toBe(true);
+
+    const outleveled = makeBrain({ combat: { flee: 'outleveled', fleeAboveLevelDelta: 3 } });
+    outleveled.world.player.level = 3;
+    addAttacker(outleveled.world, 80, { level: 3 });
+    addAttacker(outleveled.world, 81, { level: 3 });
+    addAttacker(outleveled.world, 82, { level: 3 });
+    step(outleveled.state, outleveled.world, 0);
+    expect(outleveled.state.mode).toBe('COMBAT'); // 3 same-level attackers: stands
+  });
+
+  it('does not flee 2 attackers with flee outnumbered', () => {
+    const { state, world } = makeBrain({ combat: { flee: 'outnumbered' } });
+    addAttacker(world, 80, { level: 3 });
+    addAttacker(world, 81, { level: 3 });
+    step(state, world, 0);
+    expect(state.mode).toBe('COMBAT');
+  });
+
+  it('interrupts a casting attacker when the class interrupt is known and in range', () => {
+    const { state, world } = makeBrain({ combat: { rotationMode: 'slots', abilitySlots: [0] } });
+    world.known = [interruptAbility('rebuke')];
+    world.player.inCombat = true;
+    addAttacker(world, 80, { castingAbility: 'fireball', castRemaining: 1.2 });
+    const logs = step(state, world, 0);
+    expect(world.onCasts).toEqual([{ id: 'rebuke', targetId: 80 }]);
+    expect(logs.some((l) => l.includes('interrupt: fireball'))).toBe(true);
+    expect(world.casts).toEqual([]); // the rotation slot yielded the tick
+  });
+
+  it('interrupts from range with a ranged interrupt', () => {
+    const { state, world } = makeBrain({ combat: { rotationMode: 'slots', abilitySlots: [0] } });
+    world.known = [interruptAbility('counterspell', 30)];
+    world.player.inCombat = true;
+    addAttacker(world, 80, {
+      castingAbility: 'fireball',
+      castRemaining: 2.0,
+      pos: { x: 20, y: 0, z: 0 },
+    });
+    step(state, world, 0);
+    expect(world.onCasts).toEqual([{ id: 'counterspell', targetId: 80 }]);
+  });
+
+  it('holds the interrupt when the cast is nearly done, on cooldown, or out of range', () => {
+    // nearly done: 0.3s left is under the 0.4s window
+    const late = makeBrain({ combat: { rotationMode: 'slots', abilitySlots: [0] } });
+    late.world.known = [interruptAbility('rebuke')];
+    late.world.player.inCombat = true;
+    addAttacker(late.world, 80, { castingAbility: 'fireball', castRemaining: 0.3 });
+    step(late.state, late.world, 0);
+    expect(late.world.onCasts).toEqual([]);
+    expect(late.world.casts).toEqual([0]); // rotation took the tick instead
+
+    // on cooldown
+    const cooling = makeBrain({ combat: { rotationMode: 'slots', abilitySlots: [0] } });
+    cooling.world.known = [interruptAbility('rebuke')];
+    cooling.world.player.inCombat = true;
+    cooling.world.player.cooldowns.set('rebuke', 5);
+    addAttacker(cooling.world, 80, { castingAbility: 'fireball', castRemaining: 1.2 });
+    step(cooling.state, cooling.world, 0);
+    expect(cooling.world.onCasts).toEqual([]);
+    expect(cooling.world.casts).toEqual([0]);
+
+    // out of range: melee rebuke cannot reach a caster 20 yd out
+    const far = makeBrain({ combat: { rotationMode: 'slots', abilitySlots: [0] } });
+    far.world.known = [interruptAbility('rebuke')];
+    far.world.player.inCombat = true;
+    addAttacker(far.world, 80, {
+      castingAbility: 'fireball',
+      castRemaining: 1.2,
+      pos: { x: 20, y: 0, z: 0 },
+    });
+    step(far.state, far.world, 0);
+    expect(far.world.onCasts).toEqual([]);
+    expect(far.world.casts).toEqual([0]);
+  });
+
+  it('emergency outranks the interrupt, the interrupt outranks the rotation', () => {
+    const { state, world } = makeBrain({ combat: { rotationMode: 'slots', abilitySlots: [0] } });
+    world.known = [
+      interruptAbility('divine_protection'), // Ward of Faith fixture (targetless)
+      interruptAbility('rebuke'),
+    ];
+    (world.known[0].def as { requiresTarget: boolean }).requiresTarget = false;
+    world.player.inCombat = true;
+    world.player.maxHp = 100;
+    world.player.hp = 30; // under the 40% Ward of Faith line
+    addAttacker(world, 80, { castingAbility: 'fireball', castRemaining: 1.2 });
+    step(state, world, 0);
+    expect(world.abilityCasts).toEqual(['divine_protection']); // emergency first
+    expect(world.onCasts).toEqual([]);
+
+    // topped up next tick: the interrupt takes the slot before the rotation
+    world.player.hp = 100;
+    step(state, world, 600);
+    expect(world.onCasts).toEqual([{ id: 'rebuke', targetId: 80 }]);
+    expect(world.casts).toEqual([]);
+  });
+});

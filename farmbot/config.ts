@@ -63,10 +63,14 @@ export interface CombatConfig {
   rotationMode: 'slots' | 'auto';
   // Kill hostile mobs near the route between node spawns (later phase).
   grind: boolean;
-  // 'outleveled' runs from attackers too far above the player's level.
-  flee: 'never' | 'outleveled';
+  // 'outleveled' runs from attackers too far above the player's level;
+  // 'outnumbered' runs from 3+ attackers; 'both' applies either rule.
+  flee: 'never' | 'outleveled' | 'outnumbered' | 'both';
   // Level gap that triggers an 'outleveled' flee.
   fleeAboveLevelDelta: number;
+  // Pull-size cap: skip a pull target when the living hostiles within 10 yd
+  // of it outnumber this (gold and level modes; combat.grind ignores it).
+  maxPullSize: number;
   eatItemId?: string;
   drinkItemId?: string;
   eatBelowHpPct?: number;
@@ -372,6 +376,7 @@ export function parseConfig(json: unknown): FarmBotConfig {
     grind: false,
     flee: 'never',
     fleeAboveLevelDelta: 3,
+    maxPullSize: 2,
   };
   if (json.combat !== undefined) {
     if (!isRecord(json.combat)) {
@@ -385,6 +390,7 @@ export function parseConfig(json: unknown): FarmBotConfig {
           'grind',
           'flee',
           'fleeAboveLevelDelta',
+          'maxPullSize',
           'eatItemId',
           'drinkItemId',
           'eatBelowHpPct',
@@ -415,16 +421,26 @@ export function parseConfig(json: unknown): FarmBotConfig {
         else errors.push('combat.grind: must be a boolean');
       }
       if (json.combat.flee !== undefined) {
-        if (json.combat.flee === 'never' || json.combat.flee === 'outleveled') {
+        if (
+          json.combat.flee === 'never' ||
+          json.combat.flee === 'outleveled' ||
+          json.combat.flee === 'outnumbered' ||
+          json.combat.flee === 'both'
+        ) {
           combat.flee = json.combat.flee;
         } else {
-          errors.push('combat.flee: must be never|outleveled');
+          errors.push('combat.flee: must be never|outleveled|outnumbered|both');
         }
       }
       if (json.combat.fleeAboveLevelDelta !== undefined) {
         const delta = json.combat.fleeAboveLevelDelta;
         if (isFiniteNumber(delta) && delta >= 0) combat.fleeAboveLevelDelta = delta;
         else errors.push('combat.fleeAboveLevelDelta: must be a number >= 0');
+      }
+      if (json.combat.maxPullSize !== undefined) {
+        const size = json.combat.maxPullSize;
+        if (isNonNegativeInt(size) && size >= 1) combat.maxPullSize = size;
+        else errors.push('combat.maxPullSize: must be an integer >= 1');
       }
       if (json.combat.eatItemId !== undefined) {
         if (isNonEmptyString(json.combat.eatItemId)) combat.eatItemId = json.combat.eatItemId;

@@ -105,7 +105,12 @@ import {
   pickGoldMaintainBuff,
   pickSelfHeal,
 } from './rotation';
-import { type EmergencyAction, pickEmergencyAction } from './survival';
+import {
+  countPackAround,
+  type EmergencyAction,
+  pickEmergencyAction,
+  pickInterrupt,
+} from './survival';
 import { routeViaGates, WALLED_HUBS } from './village_gates';
 import { buildZoneGraph, findZonePath, type ZoneGraph, type ZoneHop } from './zone_graph';
 
@@ -358,6 +363,8 @@ export interface BrainState {
   walkGateOffset: number;
   walkWaypoints: { x: number; z: number }[];
   walkGiveUpKey: string | null;
+  // Pack-assessment skips (gold/level pulls): entity id -> skip-until ms.
+  pullSkipUntilMs: Map<number, number>;
 }
 
 export function createBrain(config: FarmBotConfig, deps: BrainDeps = {}): BrainState {
@@ -465,6 +472,7 @@ export function createBrain(config: FarmBotConfig, deps: BrainDeps = {}): BrainS
     walkGateOffset: 0,
     walkWaypoints: [],
     walkGiveUpKey: null,
+    pullSkipUntilMs: new Map(),
   };
 }
 
@@ -517,9 +525,11 @@ const ACTION_JITTER_MIN_MS = 500;
 const ACTION_JITTER_MAX_MS = 2_000;
 // The pick spreads uniformly over this many top candidates when jittered.
 const JITTER_PICK_SPREAD = 3;
-// FLEE (combat.flee 'outleveled'): run for at most this long, then turn and
+// FLEE (combat.flee): run for at most this long, then turn and
 // fight rather than die running.
 const FLEE_TIMEOUT_MS = 15_000;
+// combat.flee 'outnumbered': this many attackers targeting us trips the flee.
+const OUTNUMBERED_ATTACKER_COUNT = 3;
 // Hub steering kicks in while farther than this from the zone hub.
 const FLEE_HUB_RANGE = 10;
 // Grind (combat.grind): pull a hostile within GRIND_MOB_RANGE when no ready
@@ -538,6 +548,9 @@ const GOLD_RESET_WAIT_MS = 305_000; // INSTANCE_EMPTY_TIMEOUT (300 s) plus slack
 const GOLD_WAIT_LOG_MS = 30_000;
 const GOLD_HEAL_GATE_MS = 2_800; // pace Mending Light attempts to its 2.5 s cast
 const FLASH_HEAL_GATE_MS = 1_800; // pace Lightmend attempts to its 1.5 s cast
+// Pack assessment (combat.maxPullSize): a skipped pull target stays off the
+// candidate list this long, then gets re-evaluated (the pack may have thinned).
+const PULL_SKIP_MS = 60_000;
 // Out-of-combat self-heal: enter the heal-hold below this hp percent, keep
 // casting until this one, then food/wait tops up the rest.
 const SELF_HEAL_ENTER_PCT = 50;
@@ -947,11 +960,24 @@ function goldBeginClear(state: BrainState, logs: string[]): void {
   logs.push('gold: inside, sweeping the nave');
 }
 
-function nearestLivingHostile(world: BotWorld): Entity | null {
+// Pack-assessment skip list (gold/level pulls): true while the entity is
+// skipped; expired entries drop out lazily so the map cannot grow unbounded.
+function pullSkipped(state: BrainState, id: number, nowMs: number): boolean {
+  const until = state.pullSkipUntilMs.get(id);
+  if (until === undefined) return false;
+  if (until <= nowMs) {
+    state.pullSkipUntilMs.delete(id);
+    return false;
+  }
+  return true;
+}
+
+function nearestLivingHostile(state: BrainState, world: BotWorld, nowMs: number): Entity | null {
   let best: Entity | null = null;
   let bestD2 = Number.POSITIVE_INFINITY;
   for (const e of world.entities.values()) {
     if (e.kind !== 'mob' || e.dead || !e.hostile) continue;
+    if (pullSkipped(state, e.id, nowMs)) continue;
     const d2 = distance2(pos2(world.player), pos2(e));
     if (d2 < bestD2) {
       bestD2 = d2;
@@ -1108,9 +1134,18 @@ function stepGold(state: BrainState, world: BotWorld, nowMs: number, logs: strin
       state.lastCastAtMs = nowMs;
       return;
     }
-    const mob = nearestLivingHostile(world);
+    const mob = nearestLivingHostile(state, world, nowMs);
     if (mob) {
       state.goldNoMobSinceMs = null;
+      // Pack assessment: a target buried in a pack bigger than maxPullSize is
+      // skipped for PULL_SKIP_MS; the next tick picks the next-nearest mob.
+      const pack = countPackAround(world.entities.values(), mob);
+      if (pack > state.config.combat.maxPullSize) {
+        state.pullSkipUntilMs.set(mob.id, nowMs + PULL_SKIP_MS);
+        stopMoving(world);
+        logs.push(`gold: skipping ${mob.name}, pack of ${pack}`);
+        return;
+      }
       if (distance(pos2(p), pos2(mob)) > GOLD_PULL_RANGE) {
         const steer = steerToward(pos2(p), p.facing, pos2(mob), GOLD_PULL_RANGE - 2);
         world.setMoveInput(steer.input, steer.facing);
@@ -1194,7 +1229,9 @@ function campKeyOf(camp: GrindCamp): string {
 }
 
 function nearestLivingHostileWithin(
+  state: BrainState,
   world: BotWorld,
+  nowMs: number,
   center: { x: number; z: number },
   radius: number,
 ): Entity | null {
@@ -1202,6 +1239,7 @@ function nearestLivingHostileWithin(
   let bestD2 = Number.POSITIVE_INFINITY;
   for (const e of world.entities.values()) {
     if (e.kind !== 'mob' || e.dead || !e.hostile) continue;
+    if (pullSkipped(state, e.id, nowMs)) continue;
     if (distance2(center, pos2(e)) > radius * radius) continue;
     const d2 = distance2(pos2(world.player), pos2(e));
     if (d2 < bestD2) {
@@ -1320,7 +1358,7 @@ function stepLevel(state: BrainState, world: BotWorld, nowMs: number, logs: stri
   // plus the discard sweep; 'all' rides the normal LOOT state instead).
   if (cfg.lootRule === 'money-blues' && goldLoot(state, world, logs)) return;
 
-  const mob = nearestLivingHostileWithin(world, camp.center, camp.radius + 10);
+  const mob = nearestLivingHostileWithin(state, world, nowMs, camp.center, camp.radius + 10);
   if (!mob) {
     if (state.levelNoMobSinceMs === null) state.levelNoMobSinceMs = nowMs;
     if (nowMs - state.levelNoMobSinceMs >= CAMP_CLEAR_QUIET_MS) {
@@ -1333,6 +1371,16 @@ function stepLevel(state: BrainState, world: BotWorld, nowMs: number, logs: stri
   }
   state.levelNoMobSinceMs = null;
   if (p.inCombat) return; // the fight is the COMBAT state's job
+
+  // Pack assessment: skip the mob, not the camp; the next tick picks the
+  // next-nearest mob inside the camp instead.
+  const pack = countPackAround(world.entities.values(), mob);
+  if (pack > state.config.combat.maxPullSize) {
+    state.pullSkipUntilMs.set(mob.id, nowMs + PULL_SKIP_MS);
+    stopMoving(world);
+    logs.push(`level: skipping ${mob.name}, pack of ${pack}`);
+    return;
+  }
 
   if (distance(pos2(p), pos2(mob)) > GOLD_PULL_RANGE) {
     const steer = steerToward(pos2(p), p.facing, pos2(mob), GOLD_PULL_RANGE - 2);
@@ -1792,8 +1840,15 @@ function stepCombat(state: BrainState, world: BotWorld, nowMs: number, logs: str
         state.lastPotionAtMs,
         nowMs,
       );
+      const interrupt = emergency ? null : pickInterrupt(world.known, p, attackers);
       if (emergency && issueEmergency(state, world, emergency, nowMs, logs)) {
         state.lastCastAtMs = nowMs;
+      } else if (interrupt) {
+        // Second priority: kick an attacker's cast. Takes the tick's cast
+        // slot like an emergency action; the rotation resumes next tick.
+        world.castAbilityOn(interrupt.abilityId, interrupt.attackerId);
+        state.lastCastAtMs = nowMs;
+        logs.push(`interrupt: ${interrupt.casting}`);
       } else if (state.config.mode === 'gold') {
         // Gold mode ignores combat.rotationMode / abilitySlots: mana-lean kit
         // only (Crusader Strike, Holy Ground on multi-pull, buffs when down).
@@ -1830,7 +1885,8 @@ function stepCombat(state: BrainState, world: BotWorld, nowMs: number, logs: str
   }
 }
 
-// FLEE (combat.flee 'outleveled'): run from the nearest threat, hub-ward when
+// FLEE (combat.flee 'outleveled' / 'outnumbered' / 'both'): run from the
+// nearest threat, hub-ward when
 // the zone hub is far enough to be worth it. Ends when the aggro drops (loot
 // pass as after a fight) or FLEE_TIMEOUT_MS expires, in which case the bot
 // turns and fights rather than dying on the run.
@@ -2419,12 +2475,18 @@ export function stepBrain(
     }
   }
 
-  // Combat pre-empts every other activity, with one out: an attacker too far
-  // above our level sends an 'outleveled' bot to FLEE instead of COMBAT.
-  const shouldFlee =
-    !state.fleeAttempted &&
-    state.config.combat.flee === 'outleveled' &&
+  // Combat pre-empts every other activity, with one out: a flee rule sends the
+  // bot to FLEE instead of COMBAT. 'outleveled' trips on an attacker too far
+  // above our level, 'outnumbered' on 3+ attackers, 'both' on either.
+  const fleeRule = state.config.combat.flee;
+  const outleveled =
+    (fleeRule === 'outleveled' || fleeRule === 'both') &&
     attackers.some((e) => e.level > p.level + state.config.combat.fleeAboveLevelDelta);
+  const outnumbered =
+    (fleeRule === 'outnumbered' || fleeRule === 'both') &&
+    attackers.length >= OUTNUMBERED_ATTACKER_COUNT;
+  const shouldFlee = !state.fleeAttempted && (outleveled || outnumbered);
+  const fleeReason = outleveled ? 'outleveled' : 'outnumbered';
   if ((attackers.length > 0 || p.inCombat) && state.mode !== 'COMBAT' && state.mode !== 'FLEE') {
     stopMoving(world);
     state.castIndex = 0;
@@ -2432,7 +2494,7 @@ export function stepBrain(
     state.playerClearSinceMs = null;
     if (shouldFlee) {
       state.fleeStartedAtMs = nowMs;
-      transition(state, 'FLEE', logs, 'outleveled');
+      transition(state, 'FLEE', logs, fleeReason);
     } else {
       transition(state, 'COMBAT', logs);
     }
@@ -2442,7 +2504,7 @@ export function stepBrain(
     state.combatTargetId = null;
     stopMoving(world);
     state.fleeStartedAtMs = nowMs;
-    transition(state, 'FLEE', logs, 'outleveled');
+    transition(state, 'FLEE', logs, fleeReason);
   } else if (state.mode === 'COMBAT' && attackers.length === 0 && !p.inCombat) {
     // Grind pulls keep a live target before the mob's aggro lands on the
     // mirror; only call the fight over when there is nothing left to swing at.

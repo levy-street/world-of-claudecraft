@@ -3,6 +3,7 @@ import {
   distance,
   distance2,
   pickNextNode,
+  pickStuckManeuver,
   StuckDetector,
   steerToward,
 } from '../farmbot/navigator';
@@ -195,6 +196,26 @@ describe('farmbot steerToward', () => {
   });
 });
 
+describe('farmbot pickStuckManeuver', () => {
+  it('cycles back / side / reverse experiments deterministically', () => {
+    const facing = Math.PI / 4;
+    expect(pickStuckManeuver(1, facing).label).toBe('back');
+    expect(pickStuckManeuver(1, facing).input.back).toBe(true);
+    expect(pickStuckManeuver(1, facing).input.forward).toBe(false);
+    expect(pickStuckManeuver(4, facing).label).toBe('strafe-left');
+    expect(pickStuckManeuver(6, facing).label).toBe('reverse');
+    expect(pickStuckManeuver(6, facing).facing).toBeCloseTo(facing + Math.PI);
+    expect(pickStuckManeuver(7, facing).facing).toBeCloseTo(facing + Math.PI / 2);
+  });
+
+  it('picks from the catalog when rng is supplied', () => {
+    const forced = () => 0.99; // last catalog entry
+    expect(pickStuckManeuver(1, 0, forced).label).toBe('back-diagonal');
+    const first = () => 0;
+    expect(pickStuckManeuver(1, 0, first).label).toBe('back');
+  });
+});
+
 describe('farmbot StuckDetector', () => {
   it('reports nothing while making progress', () => {
     const det = new StuckDetector({ windowMs: 1000, epsilon: 1 });
@@ -203,52 +224,89 @@ describe('farmbot StuckDetector', () => {
     expect(det.update({ x: 10, z: 0 }, 2500).stuck).toBe(false);
   });
 
-  it('reports stuck with a wiggle after a window without movement', () => {
-    const det = new StuckDetector({ windowMs: 1000, epsilon: 1 });
-    det.update({ x: 0, z: 0 }, 0);
-    expect(det.update({ x: 0.1, z: 0 }, 500).stuck).toBe(false);
-    const res = det.update({ x: 0.2, z: 0 }, 1500);
+  it('reports stuck with a held back maneuver after a quiet window', () => {
+    const det = new StuckDetector({ windowMs: 1000, epsilon: 1, recoveryMs: 500 });
+    det.update({ x: 0, z: 0 }, 0, { travelFacing: 0 });
+    expect(det.update({ x: 0.1, z: 0 }, 500, { travelFacing: 0 }).stuck).toBe(false);
+    // Quiet window ends at t=1000: first recovery is 'back'.
+    const res = det.update({ x: 0.2, z: 0 }, 1000, { travelFacing: 0 });
     expect(res.stuck).toBe(true);
     expect(res.escalation).toBe('wiggle');
-    expect(res.input).toEqual({ forward: true, jump: true, strafeLeft: true, strafeRight: false });
+    expect(res.started).toBe(true);
+    expect(res.label).toBe('back');
+    expect(res.input.back).toBe(true);
+    expect(res.input.forward).toBe(false);
+    // Hold the same maneuver across ticks until recoveryMs elapses.
+    const held = det.update({ x: 0.2, z: 0 }, 1400, { travelFacing: 0 });
+    expect(held.escalation).toBe('wiggle');
+    expect(held.started).toBe(false);
+    expect(held.label).toBe('back');
+    expect(held.input.back).toBe(true);
   });
 
   it('resets the window when movement resumes', () => {
-    const det = new StuckDetector({ windowMs: 1000, epsilon: 1 });
+    const det = new StuckDetector({ windowMs: 1000, epsilon: 1, recoveryMs: 500 });
     det.update({ x: 0, z: 0 }, 0);
-    expect(det.update({ x: 0, z: 0 }, 1500).stuck).toBe(true);
-    // the wiggle worked: progress clears the streak
-    expect(det.update({ x: 5, z: 0 }, 2000).stuck).toBe(false);
+    expect(det.update({ x: 0, z: 0 }, 1000).stuck).toBe(true);
+    // the recovery worked: progress clears the streak
+    expect(det.update({ x: 5, z: 0 }, 1100).stuck).toBe(false);
     expect(det.update({ x: 10, z: 0 }, 4000).stuck).toBe(false);
   });
 
-  it('escalates to blacklist after repeated stuck events', () => {
-    const det = new StuckDetector({ windowMs: 1000, epsilon: 1, blacklistAfter: 2 });
-    det.update({ x: 0, z: 0 }, 0);
-    const first = det.update({ x: 0, z: 0 }, 1500);
+  it('tries the next experiment after recovery fails, then blacklists', () => {
+    const det = new StuckDetector({
+      windowMs: 1000,
+      epsilon: 1,
+      blacklistAfter: 3,
+      recoveryMs: 400,
+    });
+    det.update({ x: 0, z: 0 }, 0, { travelFacing: 0 });
+    // stuckSince=1000: attempt 1 at [1000,1400), attempt 2 at [1400,1800), blacklist at 1800+
+    const first = det.update({ x: 0, z: 0 }, 1000, { travelFacing: 0 });
     expect(first.escalation).toBe('wiggle');
-    const second = det.update({ x: 0, z: 0 }, 3000);
-    expect(second.stuck).toBe(true);
-    expect(second.escalation).toBe('blacklist');
-    // and it keeps recommending blacklist while the caller keeps feeding it
-    expect(det.update({ x: 0, z: 0 }, 4500).escalation).toBe('blacklist');
+    expect(first.label).toBe('back');
+    const second = det.update({ x: 0, z: 0 }, 1400, { travelFacing: 0 });
+    expect(second.escalation).toBe('wiggle');
+    expect(second.started).toBe(true);
+    expect(second.label).toBe('back-left');
+    const third = det.update({ x: 0, z: 0 }, 1800, { travelFacing: 0 });
+    expect(third.stuck).toBe(true);
+    expect(third.escalation).toBe('blacklist');
   });
 
-  it('alternates the wiggle strafe side per stuck event', () => {
-    const det = new StuckDetector({ windowMs: 1000, epsilon: 1, blacklistAfter: 99 });
-    det.update({ x: 0, z: 0 }, 0);
-    expect(det.update({ x: 0, z: 0 }, 1500).input.strafeLeft).toBe(true);
-    expect(det.update({ x: 0, z: 0 }, 3000).input.strafeRight).toBe(true);
-    expect(det.update({ x: 0, z: 0 }, 4500).input.strafeLeft).toBe(true);
+  it('uses rng for open-world variety when supplied', () => {
+    const det = new StuckDetector({ windowMs: 1000, epsilon: 1, recoveryMs: 500 });
+    det.update({ x: 0, z: 0 }, 0, { travelFacing: 1 });
+    const res = det.update({ x: 0, z: 0 }, 1000, {
+      travelFacing: 1,
+      rng: () => 0.55,
+    });
+    expect(res.escalation).toBe('wiggle');
+    expect(res.label).toBeTruthy();
+    expect(res.input.jump).toBe(true);
   });
 
-  it('reset() clears the anchor and the escalation streak', () => {
-    const det = new StuckDetector({ windowMs: 1000, epsilon: 1 });
+  it('reset() clears the anchor, recovery, and escalation streak', () => {
+    const det = new StuckDetector({ windowMs: 1000, epsilon: 1, recoveryMs: 500 });
     det.update({ x: 0, z: 0 }, 0);
-    det.update({ x: 0, z: 0 }, 1500);
+    det.update({ x: 0, z: 0 }, 1000);
     det.reset();
     expect(det.update({ x: 0, z: 0 }, 2000).stuck).toBe(false);
     // a fresh window starts from the reset, so this is a first stuck again
-    expect(det.update({ x: 0, z: 0 }, 4000).escalation).toBe('wiggle');
+    const again = det.update({ x: 0, z: 0 }, 3000);
+    expect(again.escalation).toBe('wiggle');
+    expect(again.label).toBe('back');
+  });
+
+  it('catch-up jumps still count elapsed recoveries toward blacklist', () => {
+    const det = new StuckDetector({
+      windowMs: 1000,
+      epsilon: 1,
+      blacklistAfter: 3,
+      recoveryMs: 500,
+    });
+    det.update({ x: 0, z: 0 }, 0);
+    // stuckSince=1000; at t=2000 elapsed=1000 => attempt floor(1000/500)+1 = 3 => blacklist
+    expect(det.update({ x: 0, z: 0 }, 2000).escalation).toBe('blacklist');
   });
 });

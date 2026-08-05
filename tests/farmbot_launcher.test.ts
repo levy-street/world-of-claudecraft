@@ -5,6 +5,7 @@ import {
   buildZoneMeta,
   deriveZones,
   FbstatFilter,
+  formatCopper,
   parseFbstatLine,
   RingLog,
 } from '../farmbot/launcher_core';
@@ -84,6 +85,7 @@ describe('farmbot launcher assembleConfig', () => {
       grind: false,
       flee: 'never',
       fleeAboveLevelDelta: 3,
+      maxPullSize: 2,
     });
     const keys = Object.keys(assembleConfig(FORM));
     expect(keys).not.toContain('username');
@@ -137,7 +139,7 @@ describe('farmbot launcher FBSTAT parsing', () => {
     maxResource: 100,
     bagsUsed: 3,
     bagCapacity: 20,
-    stats: { harvests: 4, catches: 1, kills: 2, deaths: 0 },
+    stats: { harvests: 4, catches: 1, kills: 2, deaths: 0, copperGained: 12345 },
     inventory: [{ itemId: 'copper_ore', count: 5 }],
   };
 
@@ -147,6 +149,11 @@ describe('farmbot launcher FBSTAT parsing', () => {
     expect(parseFbstatLine('FBSTAT {not json')).toBeNull();
     expect(parseFbstatLine('FBSTAT {"pos":{"x":1}}')).toBeNull(); // missing zoneId/mode
     expect(parseFbstatLine('FBSTAT {}')).toBeNull();
+  });
+
+  it('keeps copperGained on the stats payload for the live panel', () => {
+    const parsed = parseFbstatLine(`FBSTAT ${JSON.stringify(STAT)}`);
+    expect(parsed?.stats.copperGained).toBe(12345);
   });
 
   it('skims FBSTAT lines out of the child stream, latest wins', () => {
@@ -161,6 +168,16 @@ describe('farmbot launcher FBSTAT parsing', () => {
     expect(third).toEqual(['log three']);
     expect(filter.latest?.mode).toBe('COMBAT');
     expect(filter.latest?.hp).toBe(12);
+  });
+});
+
+describe('farmbot launcher formatCopper', () => {
+  it('formats classic gold / silver / copper', () => {
+    expect(formatCopper(0)).toBe('0c');
+    expect(formatCopper(42)).toBe('42c');
+    expect(formatCopper(305)).toBe('3s 5c');
+    expect(formatCopper(12_345)).toBe('1g 23s 45c');
+    expect(formatCopper(-10)).toBe('0c');
   });
 });
 
