@@ -155,6 +155,9 @@ shape), `loot_master.ts`, `aura_classify.ts` (buff-vs-debuff, shared with the
 HUD), `material_taxonomy.ts` (the honest depositable/browsable material set, derived
 from the node-yield/grade/harvest/salvage/reagent content tables; consumed ONLY by
 `src/ui`, never by the sim itself, and no `src/sim` file may import it, see its header),
+`material_profession_affinity.ts` (item id to consuming-craft ids, derived from the
+recipe/enchant tables in CRAFT_RING order; same UI-only contract as the taxonomy: no
+`src/sim` file may import it, see its header),
 `resurrection.ts` (both sicknesses, The Keeper's Toll and the shorter Unstuck one,
 shared by every death site), and the combat
 leaves `spell_resist.ts`/`ranged_shot.ts`/`aura_stacking.ts`/`aura_cancel.ts`/

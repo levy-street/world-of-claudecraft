@@ -97,10 +97,11 @@ const FANOUT_ARMS: readonly string[] = [
   'this.targetAurasWindow.relocalize|',
   'this.questlogWindow.render|this.questlogWindow.isOpen',
   "this.renderBags|$('#bags').style.display !== 'none'",
-  "this.renderVendor|this.openVendorNpcId !== null && $('#vendor-window').style.display === 'block'",
-  "this.renderHeroicVendor|this.openHeroicVendorNpcId !== null && $('#vendor-window').style.display === 'block'",
-  "this.renderTrain|this.openTrainNpcId !== null && $('#train-window').style.display === 'block'",
-  "this.renderUnbind|this.openUnbindNpcId !== null && $('#unbind-window').style.display === 'block'",
+  // The four service windows (copper vendor, heroic quartermaster, train,
+  // unbind) repaint through the shared helper; its per-window open-plus-shown
+  // guards are pinned by tests/train_window_hud.test.ts, since this half only
+  // sees refreshLocalizedDynamicUi's OWN statement-position calls.
+  'this.repaintOpenServiceWindows|',
   'this.renderTownFocus|this.townFocusOpen',
   'this.marketWindow.render|this.marketWindow.isOpen',
   'this.bankWindow.render|this.bankWindow.isOpen',

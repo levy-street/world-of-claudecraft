@@ -8216,6 +8216,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.masterworkToast': '傑作！{name}',
   'hudChrome.crafting.masterworkZoneLine': '{crafter}製作出了傑作{name}！',
   'hudChrome.crafting.tierUpToast': '{craft}提升至階級 {tier}！',
+  'hudChrome.crafting.skillUpToast': '{skill}技能提升至 {level}！',
+  'hudChrome.crafting.skillUpSubtext': '技能提升至 {level}！',
   'hudChrome.crafting.makersMark': '製作者：{name}',
   'hudChrome.bags.itemAriaInstanced': '{item}，數量 {count}，帶工匠印記的物品',
   'hudChrome.bags.itemAriaMasterwork': '{item}，數量 {count}，傑作',

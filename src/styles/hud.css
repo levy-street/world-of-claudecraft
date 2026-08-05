@@ -4242,6 +4242,17 @@
     margin-top: 4px;
     font-size: 11.5px;
   }
+  /* Profession affinity on honest materials ("Used by Leatherworking, ...").
+     Soft craft-teal wash on the accent so multi-use reagents scan apart from
+     food/potion use lines without inventing a new rarity color. The color is
+     a theme-emitted token (src/ui/theme.ts), NOT a color-mix over
+     --color-accent: mixing a fixed light teal into the contrast-repaired
+     accent re-lightens it below the large-text floor on the light Parchment
+     panel, so the wash is repaired per preset like --color-quest-tag-text.
+     Always-on (no --fx gate; fairness). */
+  #tooltip .tt-desc.tt-material-use {
+    color: var(--color-material-use, #d6ce3b);
+  }
   #tooltip .tt-stat {
     color: #fff;
     font-size: 11.5px;
@@ -5280,6 +5291,22 @@
     object-fit: contain;
     filter: drop-shadow(var(--art-shadow-lg));
   }
+  /* Art AND subtext on one plate (hud.ts paintBanner's .banner-art-copy
+     wrapper): has-subtext alone stacks title over subtext; with art the
+     plate becomes a row and the title/detail column moves into the wrapper.
+     Variant-agnostic on purpose: any future art-plus-detail banner lays out
+     correctly without borrowing a variant's cosmetic class. */
+  #banner.banner-with-art.has-subtext {
+    flex-direction: row;
+    align-items: center;
+  }
+  #banner.banner-with-art.has-subtext .banner-art-copy {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+    min-width: 0;
+  }
   /* The Book of Deeds variant (hud.ts showBanner variant='deed'). A deed
      unlock used to fire this element with the level-up's exact colour, size
      and lifetime, and since an early character trips several deeds inside its
@@ -5303,6 +5330,40 @@
     text-shadow:
       0 0 10px #00000088,
       1px 1px 4px #000;
+  }
+  /* Gathering skill milestone plate (hud.ts showBanner variant='skill').
+     Framed copper craft card with the profession crest: distinct from the
+     bare gold character level-up AND the parchment deed plate, so a Mining
+     milestone never steals the "I leveled" reading. Layout comes from the
+     variant-agnostic banner-with-art rules above; this class is cosmetic. */
+  #banner.banner-skill {
+    color: var(--color-skill-banner-text);
+    font-size: 28px;
+    letter-spacing: 0.6px;
+    padding: 10px 26px 12px;
+    border: 1px solid var(--color-skill-banner-border);
+    border-radius: 10px;
+    background: var(--skill-banner-bg);
+    box-shadow:
+      0 0 0 1px var(--color-skill-banner-inset) inset,
+      0 4px calc(18px * var(--fx-shadow, 1)) var(--color-art-shadow);
+    text-shadow:
+      0 0 12px #00000099,
+      1px 1px 4px #000;
+  }
+  #banner.banner-skill .banner-subtext {
+    color: var(--color-skill-banner-subtext);
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    margin-top: 4px;
+  }
+  #banner.banner-skill.banner-with-art {
+    gap: 12px;
+  }
+  #banner.banner-skill .banner-art {
+    width: 52px;
+    height: 52px;
   }
   /* Reduced-motion celebrations (hud.ts showBanner motion=false): the banner
      appears and clears instantly, same text and duration, no fade. */

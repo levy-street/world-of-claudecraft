@@ -238,6 +238,7 @@ describe('active-world noticeboard service', () => {
         playerId: number;
         craftingIdentity: { synced: boolean };
         craftSkills: Record<string, number>;
+        gatheringProficiency: Record<string, number>;
       };
       renderer: { handleEvent: ReturnType<typeof vi.fn> };
       playEventSfx: ReturnType<typeof vi.fn>;
@@ -255,6 +256,7 @@ describe('active-world noticeboard service', () => {
       playerId: 17,
       craftingIdentity: { synced: false },
       craftSkills: {},
+      gatheringProficiency: {},
     };
     hud.renderer = { handleEvent: vi.fn() };
     hud.playEventSfx = vi.fn();

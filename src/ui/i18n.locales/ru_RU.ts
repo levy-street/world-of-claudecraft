@@ -8749,6 +8749,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.masterworkToast': 'Шедевр! {name}',
   'hudChrome.crafting.masterworkZoneLine': 'Шедевр от {crafter}: {name}!',
   'hudChrome.crafting.tierUpToast': '{craft}: достигнут ранг {tier}!',
+  'hudChrome.crafting.skillUpToast': '{skill}: навык повышен до {level}!',
+  'hudChrome.crafting.skillUpSubtext': 'Навык повышен до {level}!',
   'hudChrome.crafting.makersMark': 'Создатель: {name}',
   'hudChrome.bags.itemAriaInstanced': '{item}, количество {count}, копия с клеймом мастера',
   'hudChrome.bags.itemAriaMasterwork': '{item}, количество {count}, шедевр',

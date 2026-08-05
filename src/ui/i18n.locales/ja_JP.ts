@@ -8618,6 +8618,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.masterworkToast': '傑作！{name}',
   'hudChrome.crafting.masterworkZoneLine': '{crafter}が傑作{name}を作り上げました！',
   'hudChrome.crafting.tierUpToast': '{craft}がティア {tier} に到達しました！',
+  'hudChrome.crafting.skillUpToast': '{skill}の技能が {level} に上がりました！',
+  'hudChrome.crafting.skillUpSubtext': '技能が {level} に上がりました！',
   'hudChrome.crafting.makersMark': '製作者：{name}',
   'hudChrome.bags.itemAriaInstanced': '{item}、数量 {count}、銘入りの品',
   'hudChrome.bags.itemAriaMasterwork': '{item}、数量 {count}、傑作',

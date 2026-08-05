@@ -69,6 +69,7 @@ interface GrantLineHarness {
     playerId: number;
     craftingIdentity: { synced: boolean };
     craftSkills: Record<string, number>;
+    gatheringProficiency: Record<string, number>;
   };
   renderer: { handleEvent: ReturnType<typeof vi.fn> };
   playEventSfx: ReturnType<typeof vi.fn>;
@@ -92,7 +93,12 @@ interface GrantLineHarness {
 
 function makeHud(): GrantLineHarness {
   const hud = Object.create(Hud.prototype) as unknown as GrantLineHarness;
-  hud.sim = { playerId: PLAYER_ID, craftingIdentity: { synced: false }, craftSkills: {} };
+  hud.sim = {
+    playerId: PLAYER_ID,
+    craftingIdentity: { synced: false },
+    craftSkills: {},
+    gatheringProficiency: {},
+  };
   hud.renderer = { handleEvent: vi.fn() };
   hud.playEventSfx = vi.fn();
   hud.meters = { onEvent: vi.fn() };

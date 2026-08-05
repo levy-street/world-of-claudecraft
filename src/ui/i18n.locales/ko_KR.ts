@@ -8603,6 +8603,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.masterworkToast': '걸작! {name}',
   'hudChrome.crafting.masterworkZoneLine': '{crafter}님이 걸작 {name}을(를) 제작했습니다!',
   'hudChrome.crafting.tierUpToast': '{craft} 티어 {tier} 달성!',
+  'hudChrome.crafting.skillUpToast': '{skill} 기술 {level} 달성!',
+  'hudChrome.crafting.skillUpSubtext': '기술 {level} 달성!',
   'hudChrome.crafting.makersMark': '제작자: {name}',
   'hudChrome.bags.itemAriaInstanced': '{item}, 수량 {count}, 제작자 표식이 있는 사본',
   'hudChrome.bags.itemAriaMasterwork': '{item}, 수량 {count}, 걸작',

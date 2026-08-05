@@ -250,6 +250,22 @@ export function themeCssVars(knobs: ThemeKnobs): Record<string, string> {
     panelEdge,
     MIN_TEXT_CONTRAST,
   );
+  // The profession-affinity tooltip line ("Used by Leatherworking, ...", the
+  // tt-material-use class): a soft craft-teal wash over the repaired accent
+  // so multi-use reagents scan apart from the plain tt-desc use lines without
+  // inventing a new rarity color. The wash re-lightens the accent (28% of a
+  // fixed light teal), so it is repaired per preset exactly like --color-gold
+  // above, against BOTH the panel and its gradient edge: unrepaired, the
+  // Parchment mix lands below that floor on the gradient's bottom band. The
+  // 3:1 floor keeps PARITY with the --color-accent family this line derives
+  // from (the shared .tt-desc text ships at that repair today); if that
+  // family is ever raised to the 4.5:1 text tier, raise both together. The
+  // static tokens.css default is the classic-preset value.
+  const materialUseText = ensureReadable(
+    ensureReadable(mixHex(colorGold, '#6ec8d4', 0.28), panel, MIN_LARGE_CONTRAST),
+    panelEdge,
+    MIN_LARGE_CONTRAST,
+  );
   // Overlay text sits over the 3D world (quest tracker), NOT a panel, so it must
   // stay light regardless of preset and lean on its text-shadow for contrast.
   const overlayText = '#f4eede';
@@ -277,6 +293,7 @@ export function themeCssVars(knobs: ThemeKnobs): Record<string, string> {
     '--color-text-muted': textMuted,
     '--color-text-overlay': overlayText,
     '--color-quest-tag-text': questTagText,
+    '--color-material-use': materialUseText,
     '--text-outline-color': textOutline,
     '--scrollbar-thumb': mixHex(border, '#000000', 0.15),
     '--scrollbar-thumb-hover': border,
