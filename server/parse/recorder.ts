@@ -1,0 +1,239 @@
+// The parse recorder: a passive per-tick observer at the server's event drain.
+// Segmenters open fights BEFORE events route and close them AFTER, so a fight
+// always receives its own first and last tick of events (an arena killing blow
+// lands in the same drained batch as the 'over' transition). One O(events)
+// pass; everything not touching an open fight's participants drops on the
+// first Map lookup. A budget breaker disables capture rather than ever
+// degrading the tick loop.
+import type { SimEvent } from '../../src/sim/types';
+import { ArenaSegmenter } from './arena';
+import { BattlegroundSegmenter } from './battleground';
+import type { EventEnrichment, FightParticipant, Surface } from './contract';
+import type { ParseCounters } from './counters';
+import type { ParseFlags } from './flags';
+import type { OpenFight, PendingClose } from './fights';
+import type { RecorderSim, RecordSink, SegmenterHost } from './types';
+
+/** A single observe() pass above this cost is a budget strike. */
+const BUDGET_HARD_MS = 5;
+/** Consecutive strikes that trip the breaker and disable capture. */
+const BUDGET_STRIKES_TO_DISABLE = 3;
+/** Defensive bound on tracked hostile npcs per fight. */
+const MAX_TRACKED_MOBS_PER_FIGHT = 256;
+
+export interface ParseRecorderOptions {
+  flags: ParseFlags;
+  sim: RecorderSim;
+  sink: RecordSink;
+  counters: ParseCounters;
+  resolveParticipant: (pid: number) => FightParticipant | null;
+  /** Injectable for deterministic golden tests. */
+  idFactory?: () => string;
+  /** Injectable monotonic ms clock; defaults to performance.now. */
+  clock?: () => number;
+}
+
+export class ParseRecorder {
+  private readonly arena = new ArenaSegmenter();
+  private readonly battleground = new BattlegroundSegmenter();
+  private readonly fightsByEntity = new Map<number, OpenFight>();
+  private readonly openFights = new Set<OpenFight>();
+  private readonly host: SegmenterHost;
+  private readonly clock: () => number;
+  private disabled = false;
+  private strikes = 0;
+  private seq = 0;
+
+  constructor(private readonly opts: ParseRecorderOptions) {
+    this.clock = opts.clock ?? (() => performance.now());
+    const idFactory =
+      opts.idFactory ??
+      ((): string => `f-${Date.now().toString(36)}-${(this.seq++).toString(36)}`);
+    this.host = {
+      sim: opts.sim,
+      sink: opts.sink,
+      counters: opts.counters,
+      resolveParticipant: opts.resolveParticipant,
+      nextFightId: idFactory,
+      surfaceEnabled: (surface: Surface) => opts.flags.surfaces.has(surface),
+    };
+  }
+
+  get isDisabled(): boolean {
+    return this.disabled;
+  }
+
+  /** Called once per sim tick, strictly read-only over events and sim state. */
+  observe(events: readonly SimEvent[]): void {
+    if (!this.opts.flags.enabled || this.disabled) return;
+    const t0 = this.clock();
+    const tick = this.opts.sim.tickCount;
+    const opened: OpenFight[] = [];
+    const closing: PendingClose[] = [];
+
+    this.arena.observe(this.host, tick, opened, closing);
+    this.battleground.observe(this.host, tick, opened, closing);
+
+    for (const fight of opened) {
+      this.openFights.add(fight);
+      for (const entityId of fight.participantEntityIds()) {
+        this.fightsByEntity.set(entityId, fight);
+      }
+    }
+
+    if (this.openFights.size > 0 && events.length > 0) this.routeEvents(events, tick);
+
+    for (const { fight, outcome } of closing) {
+      fight.close(tick, outcome);
+      this.openFights.delete(fight);
+      for (const entityId of fight.participantEntityIds()) {
+        if (this.fightsByEntity.get(entityId) === fight) this.fightsByEntity.delete(entityId);
+      }
+    }
+    this.opts.counters.fightsOpen = this.openFights.size;
+
+    const ms = this.clock() - t0;
+    this.opts.counters.observeMsLast = ms;
+    if (ms > this.opts.counters.observeMsMax) this.opts.counters.observeMsMax = ms;
+    if (ms > BUDGET_HARD_MS) {
+      this.strikes++;
+      if (this.strikes >= BUDGET_STRIKES_TO_DISABLE) this.tripBreaker(tick);
+    } else {
+      this.strikes = 0;
+    }
+  }
+
+  /** Final flush is the shipper's job; the recorder just closes open fights. */
+  stop(): void {
+    const tick = this.opts.sim.tickCount;
+    for (const fight of this.openFights) fight.close(tick, 'reset');
+    this.openFights.clear();
+    this.fightsByEntity.clear();
+    this.opts.counters.fightsOpen = 0;
+  }
+
+  private tripBreaker(tick: number): void {
+    this.disabled = true;
+    this.opts.counters.captureDisabled = 1;
+    console.error(
+      `[parse] budget breaker tripped (${BUDGET_STRIKES_TO_DISABLE} ticks over ${BUDGET_HARD_MS}ms): capture disabled until restart`,
+    );
+    for (const fight of this.openFights) fight.close(tick, 'reset');
+    this.openFights.clear();
+    this.fightsByEntity.clear();
+  }
+
+  private routeEvents(events: readonly SimEvent[], tick: number): void {
+    for (const ev of events) {
+      switch (ev.type) {
+        case 'damage':
+          this.routeDamage(ev, tick);
+          break;
+        case 'heal2':
+          if (ev.cueOnly !== true) this.routeHeal2(ev, tick);
+          break;
+        case 'heal': {
+          const fight = this.fightsByEntity.get(ev.targetId);
+          if (fight !== undefined) fight.recordEvent(tick, ev as Record<string, unknown>);
+          break;
+        }
+        case 'aura':
+          this.routeAura(ev, tick);
+          break;
+        case 'castStart':
+        case 'castStop': {
+          const fight = this.fightsByEntity.get(ev.entityId);
+          if (fight !== undefined) fight.recordEvent(tick, ev as Record<string, unknown>);
+          break;
+        }
+        case 'death':
+          this.routeDeath(ev, tick);
+          break;
+        default:
+          break;
+      }
+    }
+  }
+
+  /** The fight an entity belongs to, resolving pets through their owner. */
+  private fightFor(entityId: number): { fight: OpenFight; ownerId: number | null } | null {
+    const direct = this.fightsByEntity.get(entityId);
+    if (direct !== undefined) return { fight: direct, ownerId: null };
+    const entity = this.opts.sim.entities.get(entityId);
+    const ownerId = entity?.ownerId;
+    if (ownerId !== undefined && ownerId !== null) {
+      const viaOwner = this.fightsByEntity.get(ownerId);
+      if (viaOwner !== undefined) return { fight: viaOwner, ownerId };
+    }
+    return null;
+  }
+
+  private routeDamage(ev: SimEvent & { type: 'damage' }, tick: number): void {
+    const bySource = this.fightFor(ev.sourceId);
+    const match = bySource ?? this.fightFor(ev.targetId);
+    if (match === null) return;
+    const { fight } = match;
+    const enrichment: EventEnrichment | undefined =
+      bySource !== null && bySource.ownerId !== null ? { ownerId: bySource.ownerId } : undefined;
+    fight.recordEvent(tick, ev as Record<string, unknown>, enrichment);
+    const creditSource = bySource !== null && bySource.ownerId !== null ? bySource.ownerId : ev.sourceId;
+    fight.noteDamage(tick, creditSource, ev.targetId, ev.amount, ev.absorbed ?? 0);
+    this.trackMob(fight, ev.sourceId);
+    this.trackMob(fight, ev.targetId);
+  }
+
+  private routeHeal2(ev: SimEvent & { type: 'heal2' }, tick: number): void {
+    const bySource = this.fightFor(ev.sourceId);
+    const match = bySource ?? this.fightFor(ev.targetId);
+    if (match === null) return;
+    const { fight } = match;
+    const enrichment: EventEnrichment | undefined =
+      bySource !== null && bySource.ownerId !== null ? { ownerId: bySource.ownerId } : undefined;
+    fight.recordEvent(tick, ev as Record<string, unknown>, enrichment);
+    const creditSource = bySource !== null && bySource.ownerId !== null ? bySource.ownerId : ev.sourceId;
+    const overheal = (ev as { overheal?: number }).overheal ?? 0;
+    fight.noteHeal(tick, creditSource, ev.amount, overheal);
+  }
+
+  private routeAura(ev: SimEvent & { type: 'aura' }, tick: number): void {
+    const fight = this.fightsByEntity.get(ev.targetId);
+    if (fight === undefined) return;
+    let enrichment: EventEnrichment | undefined;
+    if (ev.gained) {
+      // State-join attribution: the aura object on the live entity still has
+      // sourceId, id, and stacks that the event drops (fidelity gap 7.2).
+      const auras = this.opts.sim.entities.get(ev.targetId)?.auras;
+      if (auras !== undefined) {
+        for (let i = auras.length - 1; i >= 0; i--) {
+          const aura = auras[i];
+          if (aura !== undefined && aura.name === ev.name) {
+            enrichment = {
+              auraSourceId: aura.sourceId,
+              auraId: aura.id,
+              ...(aura.stacks !== undefined ? { auraStacks: aura.stacks } : {}),
+            };
+            break;
+          }
+        }
+      }
+    }
+    fight.recordEvent(tick, ev as Record<string, unknown>, enrichment);
+  }
+
+  private routeDeath(ev: SimEvent & { type: 'death' }, tick: number): void {
+    const match = this.fightFor(ev.entityId) ?? this.fightFor(ev.killerId);
+    if (match === null) return;
+    match.fight.recordEvent(tick, ev as Record<string, unknown>);
+    match.fight.noteDeath(ev.entityId);
+  }
+
+  /** Remember hostile npcs engaged with the fight (boss-cast tracking input). */
+  private trackMob(fight: OpenFight, entityId: number): void {
+    if (fight.hasEntity(entityId) || fight.mobIds.has(entityId)) return;
+    if (fight.mobIds.size >= MAX_TRACKED_MOBS_PER_FIGHT) return;
+    const entity = this.opts.sim.entities.get(entityId);
+    if (entity === undefined) return;
+    if (entity.ownerId !== undefined && entity.ownerId !== null) return;
+    fight.mobIds.add(entityId);
+  }
+}

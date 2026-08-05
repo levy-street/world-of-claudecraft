@@ -199,6 +199,7 @@ import { pruneDiscordOAuthStates, pruneDiscordPendingLogins } from './discord_db
 import { emailAccountCreated } from './email';
 import { stopEpicMirror } from './epic/mirror';
 import { GameServer } from './game';
+import { registerParseMetrics } from './parse';
 import {
   handleGitHubCallback,
   handleGitHubStart,
@@ -3142,6 +3143,7 @@ export async function startServer(): Promise<http.Server> {
     guildBankLogCache: () => guildBankLogCacheStats(),
   };
   setGameMetricsCounters(registerGameStateMetrics(httpMetrics.registry, gameStateSource));
+  registerParseMetrics(httpMetrics.registry, game.parseCapture.counters);
   // Hand the same live source to /livez, so a wedged loop answers 503 from outside
   // the process. Registered HERE rather than read from the route arm: the /livez arm
   // must never touch liveGame() (a health probe constructing a GameServer is the bug
@@ -3355,6 +3357,7 @@ export async function startServer(): Promise<http.Server> {
     await releaseAllCharacterLeases().catch((err) =>
       console.error('lease release-all failed:', err),
     );
+    await game.parseCapture.stop();
     await game.chatLog.stop();
     await pool.end();
     process.exit(0);

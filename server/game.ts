@@ -147,6 +147,12 @@ import {
 } from './chat_filter_commands';
 import { applyChatStrike, loadChatFilterState, recordChatViolation } from './chat_filter_db';
 import { ChatLogger } from './chat_log';
+import {
+  createParseSubsystem,
+  readBuildVersion,
+  type FightParticipant,
+  type ParseSubsystem,
+} from './parse';
 import { dailyRewardService } from './daily_rewards';
 import type { AccountChatMuteStatus, AccountCosmetics, RequestMetadata } from './db';
 import {
@@ -1598,6 +1604,8 @@ export class GameServer {
   private readonly accountCosmeticsByAccount = new Map<number, AccountCosmetics>();
   private readonly botDetector: BotDetector = createBotDetector();
   readonly chatLog = new ChatLogger(insertChatLogs);
+  // Combat parse capture; constructed in the constructor (needs this.sim).
+  readonly parseCapture: ParseSubsystem;
   // Admin-managed soft/hard word lists + escalation config. Loaded from the DB
   // at boot (loadChatFilter) and refreshed whenever an admin edits the lists.
   readonly chatFilter = new ChatFilter();
@@ -1891,6 +1899,37 @@ export class GameServer {
       suspend: (input) => moderateAccount({ ...input, action: 'suspend' }),
       forceRename: (input) => forceCharacterRename(input),
     });
+    // Combat parse capture (server/parse/): a read-only observer at the tick
+    // drain, inert unless PARSE_CAPTURE=1 and an ingest URL is configured.
+    this.parseCapture = createParseSubsystem({
+      sim: this.sim,
+      realm: REALM,
+      build: readBuildVersion(),
+      resolveParticipant: (pid) => this.resolveParseParticipant(pid),
+    });
+  }
+
+  // Full participant identity for the parse recorder: stable characterId,
+  // display name, class (a player entity's templateId is its class), spec, and
+  // the serializeCharacter snapshot (talents, gear, ratings; never account
+  // data). Null when the pid has no live session, which drops the participant.
+  private resolveParseParticipant(pid: number): FightParticipant | null {
+    const session = this.clients.get(pid);
+    if (session === undefined || session.left) return null;
+    const entity = this.sim.entities.get(pid);
+    if (entity === undefined) return null;
+    const state = this.sim.serializeCharacter(pid);
+    const spec = state?.talents?.spec;
+    return {
+      entityId: pid,
+      characterId: session.characterId,
+      name: session.name,
+      class: entity.templateId,
+      spec: typeof spec === 'string' && spec.length > 0 ? spec : null,
+      level: entity.level,
+      team: null,
+      snapshot: state,
+    };
   }
 
   // Returns the number of currently active WS sessions from the given IP.
@@ -2554,6 +2593,10 @@ export class GameServer {
             );
             this.recordBattlegroundOutcomes();
             this.enforceJailStates();
+            // Parse capture observes the full drained batch BEFORE routeEvents:
+            // routeEvents early-outs when no clients are connected, and the
+            // recorder must see every tick. Read-only; never mutates events.
+            this.parseCapture.observe(events);
             this.routeEvents(events);
             this.detectActivity(events);
             lap('events');
