@@ -1,4 +1,9 @@
-// The SELECTIVE gate (`npm run gate:select`).
+// The SELECTIVE gate (`node scripts/gate_select.mjs`).
+//
+// No npm alias: tests/fenbridge_town_assets.test.ts fingerprints the whole of
+// package.json as an input to a shipping GLB, so adding a script entry
+// invalidates that asset and demands a 63-file re-export. Not worth the churn in
+// a tooling change; adding the alias is a follow-up.
 //
 // Positioning, because this repo has several gate paths and the difference
 // between them is the whole point:

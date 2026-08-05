@@ -1,4 +1,4 @@
-// Shadow validator for the selective gate (`npm run gate:shadow`).
+// Shadow validator for the selective gate (`node scripts/gate_shadow.mjs`).
 //
 // The selective gate's one risk is silent: when selection is wrong it does not
 // error, it just runs fewer tests and still prints PASS. This script is how that

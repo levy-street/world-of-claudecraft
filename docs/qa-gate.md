@@ -11,7 +11,7 @@ Codex have different entry points and share the same deterministic scripts and c
 | Instant copy gate | `.claude/hooks/qa-stop.sh` through each runtime's Stop hook | End of an agent turn | Yes, on a hard-invariant hit |
 | Deterministic floor | `.githooks/pre-push` | Before a push | Yes |
 | Day-loop fast path | `npm run gate:fast` through `scripts/gate_fast.mjs` | While iterating (agents and mid/low-tier machines) | No (local only; not merge) |
-| Selective gate | `npm run gate:select` through `scripts/gate_select.mjs` | Same moment as the full gate, when you want it faster | Yes (opt-in; see below) |
+| Selective gate | `node scripts/gate_select.mjs` | Same moment as the full gate, when you want it faster | Yes (opt-in; see below) |
 | Full local gate | `npm run gate` through `scripts/gate.mjs` | Before implementation is called ready / pre-merge | Yes |
 | Judgment review | Claude `/qa` or Codex `$woc-qa`, plus scoped reviewers | End of a contribution | Advisory locally |
 
@@ -109,7 +109,7 @@ done.
 
 ### Selective gate (`gate:select`)
 
-`npm run gate:select` is the **fast merge bar**. The one-line difference from the three
+`node scripts/gate_select.mjs` is the **fast merge bar**. The one-line difference from the three
 paths above:
 
 | | Non-test steps | Tests | Merge bar? |
@@ -160,8 +160,16 @@ with a scheduled full `npm run gate` off everyone's critical path, which re-esta
 known-green baseline. **Do not adopt `gate:select` as the merge bar without that backstop
 running.**
 
-Pure planning logic: `scripts/lib/gate_select_plan.mjs` and
-`scripts/lib/test_visibility.mjs`, both pinned by `tests/gate_select_plan.test.ts`.
+**No `npm run` alias yet, deliberately.** `tests/fenbridge_town_assets.test.ts`
+fingerprints the whole of `package.json` as an input to a shipping GLB, so adding a
+script entry invalidates the asset and demands a full re-export (63 files: preview
+PNGs, raw and optimized GLBs). Rather than put that churn in a tooling change, this
+ships as a direct `node` invocation. Adding the alias is a follow-up that either
+re-exports the asset or narrows the fingerprint to the dependency fields, which is
+the toolchain-relevant part its own comment cites as the reason for the pin.
+
+Pure planning logic: `scripts/lib/gate_discovery.mjs`, `scripts/lib/gate_select_plan.mjs`
+and `scripts/lib/test_visibility.mjs`, all pinned by `tests/gate_select_plan.test.ts`.
 
 ### Judgment review
 
