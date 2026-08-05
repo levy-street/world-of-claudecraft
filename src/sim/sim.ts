@@ -6533,19 +6533,22 @@ export class Sim {
       replacementConflicts.some((index) => isUnbreakableControlAura(target.auras[index]))
     )
       return;
-    // A same-id same-name re-application is a REFRESH: the new aura object
-    // replaces the old one IN PLACE (stable buff-bar position, no fade) and
-    // the gained event below says so explicitly (parse fidelity 7.2). Only
-    // the single-conflict case can refresh in place; a multi-conflict
-    // replacement (one aura displacing several) keeps the splice-and-append.
+    // A same-id same-name re-application is a REFRESH: the old aura is
+    // displaced silently (no fade, exactly as before) and the gained event
+    // below carries refresh: true so parses read it as SPELL_AURA_REFRESH
+    // rather than a fresh application (parse fidelity 7.2). PLACEMENT IS
+    // DELIBERATELY UNCHANGED: splice then append, so the refreshed aura moves
+    // to the end exactly as it always has. Entity.auras array order is an rng
+    // draw-order input (the DoT tick walk draws per dot, breakable-fear
+    // chances draw per aura) and a gameplay-selection input (dispel targets,
+    // absorb consumption order), so refresh-vs-apply must never produce a
+    // different order than it did before this field existed.
     let refreshed = false;
-    let replacedInPlace = false;
     for (const existing of replacementConflicts) {
       const displaced = target.auras[existing];
       this.applyNonPlayerStatAura(target, displaced, -1);
-      if (displaced.name === aura.name) {
-        refreshed = true;
-      } else {
+      target.auras.splice(existing, 1);
+      if (displaced.name !== aura.name) {
         // A same-id replacement that swaps in a DIFFERENT display name (a
         // same-stat elixir overwriting another brand) would otherwise vanish
         // from the buff bar with no combat-log trace: emit the fade the client
@@ -6558,15 +6561,11 @@ export class Sim {
           sourceId: displaced.sourceId,
           abilityId: displaced.id,
         });
-      }
-      if (replacementConflicts.length === 1) {
-        target.auras[existing] = aura;
-        replacedInPlace = true;
       } else {
-        target.auras.splice(existing, 1);
+        refreshed = true;
       }
     }
-    if (!replacedInPlace) target.auras.push(aura);
+    target.auras.push(aura);
     if (aura.kind === 'stealth') target.stealthed = true; // keep the cache live without waiting for updateAuras
     this.applyNonPlayerStatAura(target, aura, 1);
     this.emit({

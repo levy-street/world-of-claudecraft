@@ -2708,7 +2708,19 @@ export function runEffects(
             : Math.min(eff.maxStacks, (existing.stacks ?? 1) + 1);
           existing.value = eff.armor;
           existing.remaining = existing.duration;
-          ctx.emit({ type: 'aura', targetId: target.id, name: ability.name, gained: true });
+          // A stack bump is a refresh of the existing aura: carry the count
+          // and attribution so parses can track Sunder/Expose stacks past the
+          // first application (parse fidelity 7.2).
+          ctx.emit({
+            type: 'aura',
+            targetId: target.id,
+            name: ability.name,
+            gained: true,
+            sourceId: existing.sourceId,
+            abilityId: existing.id,
+            stacks: existing.stacks,
+            refresh: true,
+          });
         } else {
           ctx.applyAura(target, {
             id: ability.id,

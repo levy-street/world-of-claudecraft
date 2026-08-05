@@ -3,6 +3,8 @@
 // their attribution (sourceId, abilityId, stacks) plus an explicit refresh
 // flag, with a same-id same-name refresh updating the aura IN PLACE (stable
 // buff-bar position) instead of a silent splice-and-readd.
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { applyHeal } from '../src/sim/combat/heal';
 import { Sim } from '../src/sim/sim';
@@ -112,11 +114,15 @@ describe('aura event attribution', () => {
     expect(ev.refresh).toBeUndefined();
   });
 
-  it('a same-id same-name refresh updates in place with a refresh flag and no fade', () => {
+  it('a same-id same-name refresh flags the gained event, emits no fade, and moves to the end like any application', () => {
     const sim = makeSim();
     const target = sim.player;
     sim.ctx.applyAura(target, { ...hotAura(target.id), remaining: 2 } as Aura);
-    // A marker aura AFTER it pins the array position question.
+    // A marker aura AFTER it pins the ordering question: a refresh must move
+    // the aura to the END exactly as a fresh application always has, because
+    // Entity.auras order feeds rng-drawing walks (DoT ticks, fear breaks) and
+    // gameplay selections (dispel, absorb consumption). Refresh-vs-apply may
+    // never produce different array orders.
     sim.ctx.applyAura(target, {
       id: 'marker',
       name: 'Marker',
@@ -127,7 +133,6 @@ describe('aura event attribution', () => {
       sourceId: target.id,
       school: 'physical',
     } as Aura);
-    const indexBefore = target.auras.findIndex((a) => a.id === 'test_renew');
     sim.drainEvents();
 
     sim.ctx.applyAura(target, { ...hotAura(target.id), remaining: 10 } as Aura);
@@ -138,9 +143,86 @@ describe('aura event attribution', () => {
     expect(gains).toHaveLength(1);
     expect(fades).toHaveLength(0);
     expect(gains[0]?.refresh).toBe(true);
-    const indexAfter = target.auras.findIndex((a) => a.id === 'test_renew');
-    expect(indexAfter).toBe(indexBefore);
-    expect(target.auras[indexAfter]?.remaining).toBe(10);
+    const renewIndex = target.auras.findIndex((a) => a.id === 'test_renew');
+    const markerIndex = target.auras.findIndex((a) => a.id === 'marker');
+    expect(renewIndex).toBeGreaterThan(markerIndex);
+    expect(target.auras[renewIndex]?.remaining).toBe(10);
+  });
+
+  it('a multi-conflict group-buff re-application collapses to one aura with a refresh flag', () => {
+    const sim = makeSim();
+    const target = sim.player;
+    const intellect = (sourceId: number): Aura =>
+      ({
+        id: 'arcane_intellect',
+        name: 'Arcane Intellect',
+        kind: 'attackspeed',
+        remaining: 60,
+        duration: 60,
+        value: 0,
+        sourceId,
+        school: 'arcane',
+      }) as Aura;
+    // Two casters' copies coexist only by direct array seeding (the sim
+    // itself dedupes on apply); this pins the multi-conflict splice arm.
+    target.auras.push(intellect(9001), intellect(9002));
+    sim.drainEvents();
+
+    sim.ctx.applyAura(target, intellect(target.id));
+
+    const auraEvents = sim.drainEvents().filter(isAura);
+    const gains = auraEvents.filter((e) => e.gained && e.name === 'Arcane Intellect');
+    expect(gains).toHaveLength(1);
+    expect(gains[0]?.refresh).toBe(true);
+    expect(auraEvents.filter((e) => !e.gained)).toHaveLength(0);
+    expect(target.auras.filter((a) => a.id === 'arcane_intellect')).toHaveLength(1);
+  });
+
+  it('a partly absorbed, partly clamped heal reports absorbed and overheal without double-counting', () => {
+    const sim = makeSim();
+    const target = sim.player;
+    target.maxHp = 10000;
+    target.hp = target.maxHp - 100;
+    target.stats.int = -1000;
+    target.auras.push({
+      id: 'necrotic_test',
+      name: 'Necrotic Test',
+      kind: 'heal_absorb',
+      remaining: 30,
+      duration: 30,
+      value: 300,
+      sourceId: 9001,
+      school: 'shadow',
+    } as Aura);
+    sim.drainEvents();
+
+    applyHeal(sim.ctx, target, target, 1000, 'Heal');
+
+    const ev = sim.drainEvents().find(isHeal2);
+    if (!ev) throw new Error('expected heal2 event');
+    expect(ev.absorbed).toBe(300);
+    expect(ev.amount).toBe(100);
+    expect(ev.overheal).toBe(600);
+    expect(ev.amount + (ev.absorbed ?? 0) + (ev.overheal ?? 0)).toBe(1000);
+  });
+
+  it('every clamped heal2 emit site carries the overheal field in its source', () => {
+    // The two hardest sites (applyHeal, the HoT tick) are pinned behaviorally
+    // above; the remaining clamped sites are pinned at the source so deleting
+    // any site's overheal emission fails here. Behavioral per-site coverage is
+    // a recorded follow-up.
+    const sites: [string, number][] = [
+      ['src/sim/combat/auras.ts', 2],
+      ['src/sim/combat/casting_lifecycle.ts', 1],
+      ['src/sim/combat/chronomancy.ts', 1],
+      ['src/sim/combat/temporal_hourglass.ts', 1],
+      ['src/sim/pet/pet_commands.ts', 1],
+    ];
+    for (const [file, minCount] of sites) {
+      const source = readFileSync(path.join(__dirname, '..', file), 'utf8');
+      const count = (source.match(/\{ overheal \}/g) ?? []).length;
+      expect(count, `${file} overheal emissions`).toBeGreaterThanOrEqual(minCount);
+    }
   });
 
   it('a same-id different-name swap fades the old brand without a refresh flag', () => {
@@ -170,7 +252,8 @@ describe('aura event attribution', () => {
     } as Aura);
 
     const auraEvents = sim.drainEvents().filter(isAura);
-    expect(auraEvents.find((e) => !e.gained && e.name === 'Elixir of Oxen')).toBeTruthy();
+    const fade = auraEvents.find((e) => !e.gained && e.name === 'Elixir of Oxen');
+    expect(fade).toMatchObject({ sourceId: target.id, abilityId: 'elixir_str' });
     const gained = auraEvents.find((e) => e.gained && e.name === 'Elixir of Bulls');
     expect(gained?.refresh).toBeUndefined();
   });

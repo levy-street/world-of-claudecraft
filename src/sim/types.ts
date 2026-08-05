@@ -4310,14 +4310,19 @@ export type SimEvent = { pid?: number } & (
       auraKind?: AuraKind;
       // Attribution the Aura object always had but the event used to drop
       // (parse fidelity 7.2): the caster's entity id, the stable aura/ability
-      // id, and the stack count at application. Set on every emit site that
-      // has the Aura object at hand; older consumers ignore them.
+      // id, and the stack count at application. Carried by the Sim.applyAura
+      // emit path (gained, refresh, and same-id brand-swap fades) and the
+      // stack-bump re-emit in effect_dispatch; the scattered fade sites
+      // elsewhere still emit bare, and consumers must treat every field here
+      // as optional.
       sourceId?: number;
       abilityId?: string;
       stacks?: number;
-      // True when a gained event re-applied a same-id same-name aura already
-      // on the target (updated in place, no fade emitted): parses and combat
-      // logs read this as SPELL_AURA_REFRESH rather than a fresh application.
+      // True when a gained event displaced a same-id same-name aura already on
+      // the target (a re-application; no fade is emitted, and the aura moves
+      // to the end of the array exactly as a fresh application always has):
+      // parses and combat logs read this as SPELL_AURA_REFRESH rather than a
+      // fresh application.
       refresh?: boolean;
     }
   | {
