@@ -11,8 +11,8 @@ Codex have different entry points and share the same deterministic scripts and c
 | Instant copy gate | `.claude/hooks/qa-stop.sh` through each runtime's Stop hook | End of an agent turn | Yes, on a hard-invariant hit |
 | Deterministic floor | `.githooks/pre-push` | Before a push | Yes |
 | Day-loop fast path | `npm run gate:fast` through `scripts/gate_fast.mjs` | While iterating (agents and mid/low-tier machines) | No (local only; not merge) |
-| Selective gate | `node scripts/gate_select.mjs` | Same moment as the full gate, when you want it faster | Yes (opt-in; see below) |
-| Full local gate | `npm run gate` through `scripts/gate.mjs` | Before implementation is called ready / pre-merge | Yes |
+| **Selective gate** | `node scripts/gate_select.mjs` | **Before implementation is called ready / pre-merge** | **Yes (the merge bar)** |
+| Full local gate | `npm run gate` through `scripts/gate.mjs` | When you want the whole suite locally, or the planner falls back | Yes (deeper check) |
 | Judgment review | Claude `/qa` or Codex `$woc-qa`, plus scoped reviewers | End of a contribution | Advisory locally |
 
 ### Instant copy gate
@@ -109,8 +109,9 @@ done.
 
 ### Selective gate (`gate:select`)
 
-`node scripts/gate_select.mjs` is the **fast merge bar**. The one-line difference from the three
-paths above:
+`node scripts/gate_select.mjs` is **the merge bar** (owner decision, 2026-08-05; recorded in
+`docs/local-gate-perf/state.md`). `npm run gate` remains the deeper check. The one-line
+difference from the other paths:
 
 | | Non-test steps | Tests | Merge bar? |
 |---|---|---|---|
@@ -161,11 +162,18 @@ INCONCLUSIVE on escapes rather than PASS. The *coverage delta* (files the full s
 ran that selection skipped) exists on every run: it is not a defect list, it is the
 surface where an escape could hide, and it is what to actually study.
 
-**What it still cannot prove.** The out-of-graph pattern list is a floor, not a proof, so
-this path is empirically complete rather than provably complete. That is why it is paired
-with a scheduled full `npm run gate` off everyone's critical path, which re-establishes a
-known-green baseline. **Do not adopt `gate:select` as the merge bar without that backstop
-running.**
+**What it still cannot prove, and why that is acceptable.** The out-of-graph pattern list is
+a floor, not a proof, so this path is empirically complete rather than provably complete.
+The backstop is CI: `.github/workflows/ci.yml` runs the FULL suite (8-shard matrix) on every
+`pull_request` AND on every push to `main` / `release/**`. A local selection miss therefore
+costs feedback latency, not correctness, because the full suite still runs on the PR before
+it merges. That is what makes this safe as the local bar.
+
+**Evidence it works.** Fault injection, 5/5 caught: a `Math.random()` in `src/sim`, a combat
+constant, a content record, a sim-emitted player string, and a deleted weapon `.glb`. In two
+of those (`Math.random` and the asset deletion) `vitest related` selected **nothing** and
+exited green; the always-run set caught both. That is the mechanism doing precisely the job
+it exists for.
 
 **No `npm run` alias yet, deliberately.** `tests/fenbridge_town_assets.test.ts`
 fingerprints the whole of `package.json` as an input to a shipping GLB, so adding a
