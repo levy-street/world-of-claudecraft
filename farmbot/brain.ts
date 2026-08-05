@@ -57,6 +57,7 @@ import {
   ITEMS,
   instanceOrigin,
   instanceSlotForZ,
+  NPCS,
   PORTALS,
   ZONES,
   zoneAt,
@@ -68,6 +69,7 @@ import { CORPSE_REZ_RANGE } from '../src/sim/spirit';
 import {
   type DungeonDef,
   type Entity,
+  type EquipSlot,
   FISHING_CAST_ID,
   FISHING_SESSION_CAP_SEC,
   GATHER_CAST_ID,
@@ -76,11 +78,13 @@ import {
   INTERACT_RANGE,
   type InvSlot,
   type ItemDef,
+  type ItemInstancePayload,
   type MoveInput,
   normAngle,
   type SimEvent,
 } from '../src/sim/types';
 import type { FarmBotConfig } from './config';
+import { findUpgrades } from './gear';
 import {
   defaultGrindTables,
   type GrindCamp,
@@ -94,7 +98,9 @@ import {
   distance2,
   type NavPos,
   pickNextNodeCandidates,
+  type SteerResult,
   StuckDetector,
+  type StuckResult,
   steerToward,
 } from './navigator';
 import {
@@ -129,6 +135,8 @@ export interface BotWorld {
   readonly xp: number;
   readonly lifetimeXp: number;
   readonly restedXp: number;
+  // Equipment mirror (gear upgrades): equip slot -> itemId.
+  readonly equipment: Partial<Record<EquipSlot, string>>;
   // Mirrored known-ability list (rotationMode 'auto'); slot is the index.
   readonly known: readonly ResolvedAbility[];
   nodeHarvestableByMe(nodeId: string): boolean;
@@ -157,6 +165,20 @@ export interface BotWorld {
   discardItem(itemId: string, count?: number): void;
   enterDungeon(dungeonId: string): void;
   leaveDungeon(): void;
+  // Gear upgrades: equipItem lets the server resolve the slot;
+  // equipItemToSlot aims the concrete ring1/ring2 for dual-slot items.
+  equipItem(itemId: string): void;
+  equipItemToSlot(itemId: string, slot: EquipSlot): void;
+  // World Market (bags.marketSell): fungible stack vs instanced copy (the
+  // instance payload is a selector the server re-resolves against our bags).
+  marketList(itemId: string, count: number, price: number): void;
+  marketListInstance(itemId: string, price: number, instance: ItemInstancePayload): void;
+  marketCollect(): void;
+  // Mount travel: riding skill mirror (snapshot mntRtd), summon via using the
+  // reins item, dismount/skill purchase through these.
+  ridingTrained(): boolean;
+  toggleMounted(): void;
+  learnRiding(npcId: number): void;
   sendLogout(): void;
 }
 
@@ -365,6 +387,16 @@ export interface BrainState {
   walkGiveUpKey: string | null;
   // Pack-assessment skips (gold/level pulls): entity id -> skip-until ms.
   pullSkipUntilMs: Map<number, number>;
+  // Gear upgrades (config.gearUpgrades): item ids an equip was already issued
+  // for, so a stale equipment mirror cannot re-issue every tick.
+  gearIssuedIds: Set<string>;
+  // Market selling (bags.marketSell): session listing count (cap), ids listed
+  // (mirror lag guard), and the collect-once-per-visit arm.
+  marketListedCount: number;
+  marketListedIds: Set<string>;
+  marketCollectedVisit: boolean;
+  // Mount training purchase (mount.buyTraining): fire learnRiding once.
+  mountTrainingDone: boolean;
 }
 
 export function createBrain(config: FarmBotConfig, deps: BrainDeps = {}): BrainState {
@@ -473,6 +505,11 @@ export function createBrain(config: FarmBotConfig, deps: BrainDeps = {}): BrainS
     walkWaypoints: [],
     walkGiveUpKey: null,
     pullSkipUntilMs: new Map(),
+    gearIssuedIds: new Set(),
+    marketListedCount: 0,
+    marketListedIds: new Set(),
+    marketCollectedVisit: false,
+    mountTrainingDone: false,
   };
 }
 
@@ -551,6 +588,27 @@ const FLASH_HEAL_GATE_MS = 1_800; // pace Lightmend attempts to its 1.5 s cast
 // Pack assessment (combat.maxPullSize): a skipped pull target stays off the
 // candidate list this long, then gets re-evaluated (the pack may have thinned).
 const PULL_SKIP_MS = 60_000;
+// Market selling (bags.marketSell): at most this many listings per session
+// (the market itself caps at 12), priced at max(sellValue * mult, floor).
+// v1 skips the marketSearch undercut check.
+const MARKET_LIST_CAP = 10;
+const MARKET_PRICE_MULT = 10;
+const MARKET_PRICE_FLOOR = 100;
+// You must stand at the merchant to deal (src/sim/market.ts MARKET_RANGE).
+const MARKET_RANGE = INTERACT_RANGE + 2;
+// Mount travel (mount.enabled): summon for legs longer than this, only at or
+// above the riding gate level. Training costs 80g at the stablemaster.
+const MOUNT_LEG_MIN_DIST = 60;
+const MOUNT_MIN_LEVEL = 20;
+const RIDING_COST_COPPER = 800_000;
+const STABLEMASTER_TEMPLATE_ID = 'stablemaster_marla';
+// Every auctioneer anchors the shared World Market (npcDef.market, see
+// src/sim/sim.ts): the_merchant in Eastbrook, Auctioneer Voss in Highwatch.
+const MARKET_MERCHANT_IDS: ReadonlySet<string> = new Set(
+  Object.values(NPCS)
+    .filter((n) => n.market === true)
+    .map((n) => n.id),
+);
 // Out-of-combat self-heal: enter the heal-hold below this hp percent, keep
 // casting until this one, then food/wait tops up the rest.
 const SELF_HEAL_ENTER_PCT = 50;
@@ -585,6 +643,24 @@ function stopMoving(world: BotWorld): void {
   // Explicit false on every bit: ClientWorld.setMoveInput Object.assigns, so
   // an omitted key would leave the old bit latched.
   world.setMoveInput({ ...NEUTRAL_INPUT });
+}
+
+// Apply travel steering, or a stuck-recovery maneuver when the detector is
+// holding one. Recovery replaces the steer input (and may override facing)
+// so a reverse/side step is not merged back into "keep walking into the wall".
+function applyTravelMove(world: BotWorld, steer: SteerResult, stuck: StuckResult): void {
+  if (stuck.escalation === 'wiggle') {
+    world.setMoveInput({ ...NEUTRAL_INPUT, ...stuck.input }, stuck.facing ?? steer.facing);
+    return;
+  }
+  world.setMoveInput({ ...NEUTRAL_INPUT, ...steer.input, ...stuck.input }, steer.facing);
+}
+
+// One log line per new recovery attempt, not every 10 Hz decision tick.
+function stuckLog(stuck: StuckResult, logs: string[]): void {
+  if (stuck.escalation === 'wiggle' && stuck.started) {
+    logs.push(stuck.label ? `stuck: trying ${stuck.label}` : 'stuck: wiggling');
+  }
 }
 
 function transition(state: BrainState, mode: BrainMode, logs: string[], why = ''): void {
@@ -944,6 +1020,97 @@ function advanceZone(state: BrainState, world: BotWorld, logs: string[], skipZon
   }
 }
 
+// --- economy intelligence (phase 14) -----------------------------------------
+
+// Equip strictly-better drops (config.gearUpgrades). Runs after loot passes;
+// gearIssuedIds absorbs the equipment-mirror lag so an equip is issued once.
+function equipUpgrades(state: BrainState, world: BotWorld, logs: string[]): void {
+  if (!state.config.gearUpgrades) return;
+  for (const up of findUpgrades(world.inventory, world.equipment, state.itemDef, world.player)) {
+    if (state.gearIssuedIds.has(up.itemId)) continue;
+    state.gearIssuedIds.add(up.itemId);
+    const def = state.itemDef(up.itemId);
+    if (def?.slot === 'ring') world.equipItemToSlot(up.itemId, up.slot);
+    else world.equipItem(up.itemId);
+    logs.push(`equipped ${def?.name ?? up.itemId} (upgrade)`);
+  }
+}
+
+function nearestMarketMerchant(world: BotWorld): Entity | null {
+  let best: Entity | null = null;
+  let bestD2 = Number.POSITIVE_INFINITY;
+  for (const e of world.entities.values()) {
+    if (e.kind !== 'npc' || e.dead || !MARKET_MERCHANT_IDS.has(e.templateId)) continue;
+    const d2 = distance2(pos2(world.player), pos2(e));
+    if (d2 < bestD2) {
+      bestD2 = d2;
+      best = e;
+    }
+  }
+  return best;
+}
+
+// One market action per call (bags.marketSell): collect proceeds first, then
+// list one kept-quality drop per tick. Returns true while a merchant visit is
+// in progress; false falls through to the normal vendor/stop flow.
+function marketSellStep(state: BrainState, world: BotWorld, logs: string[]): boolean {
+  const merchant = nearestMarketMerchant(world);
+  if (!merchant || distance(pos2(world.player), pos2(merchant)) > MARKET_RANGE) return false;
+  if (!state.marketCollectedVisit) {
+    state.marketCollectedVisit = true;
+    world.marketCollect(); // proceeds from earlier listings, every visit
+    logs.push('market: collecting proceeds');
+    return true;
+  }
+  if (state.marketListedCount >= MARKET_LIST_CAP) return false;
+  for (const slot of world.inventory) {
+    if (state.marketListedIds.has(slot.itemId)) continue;
+    const def = state.itemDef(slot.itemId);
+    if (!def) continue;
+    if (def.quality !== 'rare' && def.quality !== 'epic' && def.quality !== 'legendary') continue;
+    if (def.noMarketList || def.soulbound || slot.instance?.boundTo !== undefined) continue;
+    const price = Math.max(def.sellValue * MARKET_PRICE_MULT, MARKET_PRICE_FLOOR);
+    state.marketListedIds.add(slot.itemId);
+    state.marketListedCount += 1;
+    if (slot.instance) world.marketListInstance(slot.itemId, price, slot.instance);
+    else world.marketList(slot.itemId, slot.count, price);
+    logs.push(`market: listed ${def.name} for ${price}c`);
+    return true;
+  }
+  return false;
+}
+
+// Dismount (mount travel): no-op when already on foot or mid-transition.
+function maybeDismount(world: BotWorld, logs: string[]): void {
+  if (world.player.mountKey === '' || world.player.mountCastRemaining > 0) return;
+  world.toggleMounted();
+  logs.push('mount: dismounting');
+}
+
+// Summon for a long overworld leg, dismount as the leg shortens. Called by
+// the guided-walk and zone-leg drivers with the leg's final target. Summoning
+// is useItem on any bagged reins (the server re-validates riding training,
+// level, and ownership), so the gates below only save pointless clicks.
+function updateMountOnLeg(
+  state: BrainState,
+  world: BotWorld,
+  logs: string[],
+  target: NavPos,
+): void {
+  if (!state.config.mount.enabled) return;
+  const p = world.player;
+  if (distance2(pos2(p), target) <= MOUNT_LEG_MIN_DIST * MOUNT_LEG_MIN_DIST) {
+    maybeDismount(world, logs);
+    return;
+  }
+  if (p.level < MOUNT_MIN_LEVEL || p.mountKey !== '' || p.mountCastRemaining > 0) return;
+  if (!world.ridingTrained()) return;
+  const reins = world.inventory.find((s) => state.itemDef(s.itemId)?.kind === 'mount');
+  if (!reins) return;
+  world.useItem(reins.itemId);
+  logs.push('mount: summoning');
+}
+
 // --- gold-farm mode (mode 'gold') ------------------------------------------
 // The dungeon rotation: walk the overworld (phase-7 zone waypoints when the
 // door is in another zone) to the current dungeon's door, enter, sweep the
@@ -993,6 +1160,9 @@ function nearestLivingHostile(state: BrainState, world: BotWorld, nowMs: number)
 // waits a tick so the corpse mirror can settle).
 function goldLoot(state: BrainState, world: BotWorld, logs: string[]): boolean {
   const keep = new Set<string>(state.config.goldFarm.keepQualities);
+  // Upgrades first: a green upgrade is not keep-quality, so it must be marked
+  // (and protected from the discard sweep below) before any loot/discard run.
+  equipUpgrades(state, world, logs);
   let looted = false;
   for (const e of world.entities.values()) {
     if (!e.lootable || !e.loot || state.lootedIds.has(e.id)) continue;
@@ -1031,6 +1201,7 @@ function goldLoot(state: BrainState, world: BotWorld, logs: string[]): boolean {
     }
     if (def.use && (def.use.type === 'fishing' || def.use.type === 'gatherTool')) continue;
     if (keepIds.has(slot.itemId)) continue;
+    if (state.gearIssuedIds.has(slot.itemId)) continue; // marked as an upgrade
     world.discardItem(slot.itemId, slot.count);
     logs.push(`gold: discarded ${slot.count}x ${def.name}`);
   }
@@ -1408,6 +1579,26 @@ function stepLevel(state: BrainState, world: BotWorld, nowMs: number, logs: stri
 function stepTravel(state: BrainState, world: BotWorld, nowMs: number, logs: string[]): void {
   const p = world.player;
 
+  // Mount training (mount.buyTraining): an opportunistic 80g purchase when a
+  // travel leg passes the stablemaster. Fires once per session; the snapshot
+  // mntRtd delta confirms the grant server-side.
+  if (
+    state.config.mount.buyTraining &&
+    !state.mountTrainingDone &&
+    !world.ridingTrained() &&
+    p.level >= MOUNT_MIN_LEVEL &&
+    world.copper >= RIDING_COST_COPPER
+  ) {
+    for (const e of world.entities.values()) {
+      if (e.kind !== 'npc' || e.dead || e.templateId !== STABLEMASTER_TEMPLATE_ID) continue;
+      if (distance2(pos2(p), pos2(e)) > INTERACT_RANGE * INTERACT_RANGE) continue;
+      state.mountTrainingDone = true;
+      world.learnRiding(e.id);
+      logs.push('mount: learned riding');
+      break;
+    }
+  }
+
   const need = recoverNeed(state, world);
   if (need) {
     stopMoving(world);
@@ -1426,7 +1617,12 @@ function stepTravel(state: BrainState, world: BotWorld, nowMs: number, logs: str
       state.zonePath = null; // already inside the target zone
     } else {
       const hop = state.zonePath[0];
-      const stuckRes = state.stuck.update(pos2(p), nowMs);
+      updateMountOnLeg(state, world, logs, hop.waypoint);
+      const steer = steerToward(pos2(p), p.facing, hop.waypoint, 2);
+      const stuckRes = state.stuck.update(pos2(p), nowMs, {
+        travelFacing: steer.facing,
+        rng: state.rng,
+      });
       if (stuckRes.escalation === 'blacklist') {
         state.stuck.reset();
         state.zonePath = null;
@@ -1434,9 +1630,8 @@ function stepTravel(state: BrainState, world: BotWorld, nowMs: number, logs: str
         advanceZone(state, world, logs, hop.zoneId);
         return;
       }
-      if (stuckRes.escalation === 'wiggle') logs.push('stuck: wiggling');
-      const steer = steerToward(pos2(p), p.facing, hop.waypoint, 2);
-      world.setMoveInput({ ...steer.input, ...stuckRes.input }, steer.facing);
+      stuckLog(stuckRes, logs);
+      applyTravelMove(world, steer, stuckRes);
       if (state.zoneIdAt(p.pos.x, p.pos.z) === hop.zoneId) {
         state.zonePath.shift();
         if (state.zonePath.length === 0) state.zonePath = null;
@@ -1532,7 +1727,10 @@ function stepTravel(state: BrainState, world: BotWorld, nowMs: number, logs: str
       state.stuck.reset();
     }
     const steer = steerToward(pos2(p), p.facing, node.pos);
-    const stuckRes = state.stuck.update(pos2(p), nowMs);
+    const stuckRes = state.stuck.update(pos2(p), nowMs, {
+      travelFacing: steer.facing,
+      rng: state.rng,
+    });
     if (stuckRes.escalation === 'blacklist') {
       blacklistNode(state, node.id, STUCK_BLACKLIST_MS, nowMs);
       state.stuck.reset();
@@ -1541,8 +1739,8 @@ function stepTravel(state: BrainState, world: BotWorld, nowMs: number, logs: str
       logs.push(`stuck: blacklisting ${node.id}`);
       return;
     }
-    if (stuckRes.escalation === 'wiggle') logs.push('stuck: wiggling');
-    world.setMoveInput({ ...steer.input, ...stuckRes.input }, steer.facing);
+    stuckLog(stuckRes, logs);
+    applyTravelMove(world, steer, stuckRes);
     if (steer.arrived) {
       if (!actionGateOpen(state, nowMs)) return; // human jitter: brief pause first
       world.harvestNode(node.id);
@@ -1972,6 +2170,9 @@ function stepLoot(state: BrainState, world: BotWorld, nowMs: number, logs: strin
     const e = world.entities.get(id);
     return e?.dead === true && !state.lootedIds.has(id);
   });
+  // Gear upgrades ride the loot pass: the mirror settles a tick or two after
+  // autoLoot, and stepLoot keeps ticking until the pass is done.
+  equipUpgrades(state, world, logs);
   if (!remaining || nowMs - state.lootStartedAtMs >= LOOT_TIMEOUT_MS) {
     state.recentAttackers.clear();
     state.killLogged.clear();
@@ -2211,10 +2412,14 @@ function stepGuidedWalk(
   if (state.walkWaypoints.length === 0) {
     state.walkWaypoints = routeViaGates(pos2(p), target, WALLED_HUBS, state.walkGateOffset);
   }
+  updateMountOnLeg(state, world, logs, target);
   const hop = state.walkWaypoints[0];
   const arriveRange = state.walkWaypoints.length > 1 ? GATE_ARRIVE_RANGE : INTERACT_RANGE;
   const steer = steerToward(pos2(p), p.facing, hop, arriveRange);
-  const stuckRes = state.stuck.update(pos2(p), nowMs);
+  const stuckRes = state.stuck.update(pos2(p), nowMs, {
+    travelFacing: steer.facing,
+    rng: state.rng,
+  });
   if (stuckRes.escalation === 'blacklist') {
     state.stuck.reset();
     if (state.walkGateOffset === 0) {
@@ -2229,8 +2434,8 @@ function stepGuidedWalk(
     logs.push(`stuck reaching ${label}, giving up`);
     return 'gave-up';
   }
-  if (stuckRes.escalation === 'wiggle') logs.push('stuck: wiggling');
-  world.setMoveInput({ ...steer.input, ...stuckRes.input }, steer.facing);
+  stuckLog(stuckRes, logs);
+  applyTravelMove(world, steer, stuckRes);
   if (steer.arrived && state.walkWaypoints.length > 1) {
     state.walkWaypoints.shift();
   }
@@ -2317,6 +2522,11 @@ function stepBagsFull(
       }
     }
   }
+
+  // World Market offload (bags.marketSell): kept-quality drops list for real
+  // copper when a merchant is in range; everything not listed falls through
+  // to the mail/vendor/stop flow below.
+  if (state.config.bags.marketSell && marketSellStep(state, world, logs)) return;
 
   const vendor = nearestVendor(world);
   if (!vendor) {
@@ -2489,6 +2699,7 @@ export function stepBrain(
   const fleeReason = outleveled ? 'outleveled' : 'outnumbered';
   if ((attackers.length > 0 || p.inCombat) && state.mode !== 'COMBAT' && state.mode !== 'FLEE') {
     stopMoving(world);
+    maybeDismount(world, logs); // no mounted combat
     state.castIndex = 0;
     state.playerNearSinceMs = null; // pause/break timers restart after the fight
     state.playerClearSinceMs = null;
@@ -2621,6 +2832,7 @@ export function stepBrain(
     state.lastMailAtMs = 0;
     state.mailNoBoxLogged = false;
     state.sellEmptyLogged = false;
+    state.marketCollectedVisit = false; // collect proceeds once per visit
     state.walkGiveUpKey = null;
     state.walkKey = null;
     transition(state, 'BAGS_FULL', logs);

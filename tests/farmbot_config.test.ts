@@ -24,7 +24,12 @@ describe('farmbot parseConfig', () => {
       fleeAboveLevelDelta: 3,
       maxPullSize: 2,
     });
-    expect(cfg.bags).toEqual({ fullPolicy: 'sell-junk', sellAllowlist: [], mailItems: 'all' });
+    expect(cfg.bags).toEqual({
+      fullPolicy: 'sell-junk',
+      sellAllowlist: [],
+      mailItems: 'all',
+      marketSell: false,
+    });
     expect(cfg.maxRuntimeMinutes).toBe(0);
     // phase-1 schema defaults
     expect(cfg.mode).toBe('gather-fish');
@@ -40,6 +45,8 @@ describe('farmbot parseConfig', () => {
     });
     expect(cfg.safety.webhookUrl).toBeUndefined();
     expect(cfg.bags.mailTo).toBeUndefined();
+    expect(cfg.gearUpgrades).toBe(false);
+    expect(cfg.mount).toEqual({ enabled: false, buyTraining: false });
   });
 
   it('parses a fully specified config', () => {
@@ -79,8 +86,32 @@ describe('farmbot parseConfig', () => {
       eatBelowHpPct: 50,
       drinkBelowManaPct: 30,
     });
-    expect(cfg.bags).toEqual({ fullPolicy: 'stop', sellAllowlist: [], mailItems: 'all' });
+    expect(cfg.bags).toEqual({
+      fullPolicy: 'stop',
+      sellAllowlist: [],
+      mailItems: 'all',
+      marketSell: false,
+    });
     expect(cfg.maxRuntimeMinutes).toBe(120);
+  });
+
+  it('parses the economy fields (gearUpgrades, bags.marketSell, mount)', () => {
+    const cfg = parseConfig({
+      ...VALID,
+      gearUpgrades: true,
+      bags: { marketSell: true },
+      mount: { enabled: true, buyTraining: true },
+    });
+    expect(cfg.gearUpgrades).toBe(true);
+    expect(cfg.bags.marketSell).toBe(true);
+    expect(cfg.mount).toEqual({ enabled: true, buyTraining: true });
+    expect(() => parseConfig({ ...VALID, gearUpgrades: 'yes' })).toThrow(/gearUpgrades/);
+    expect(() => parseConfig({ ...VALID, bags: { marketSell: 1 } })).toThrow(/bags\.marketSell/);
+    expect(() => parseConfig({ ...VALID, mount: { enabled: 'on' } })).toThrow(/mount\.enabled/);
+    expect(() => parseConfig({ ...VALID, mount: { buyTraining: 1 } })).toThrow(
+      /mount\.buyTraining/,
+    );
+    expect(() => parseConfig({ ...VALID, mount: { speed: 2 } })).toThrow(/mount/);
   });
 
   it('accepts the outnumbered/both flee values and a custom maxPullSize', () => {

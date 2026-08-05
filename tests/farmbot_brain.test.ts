@@ -13,9 +13,11 @@ import type { GrindTables } from '../farmbot/grind_circuits';
 import type { ResolvedAbility } from '../src/sim/sim';
 import {
   type Entity,
+  type EquipSlot,
   type GatherNodeDef,
   type InvSlot,
   type ItemDef,
+  type ItemInstancePayload,
   type MobTemplate,
   type MoveInput,
   mobXpValue,
@@ -52,6 +54,8 @@ function makeEntity(over: Partial<Entity> & { id: number }): Entity {
     eating: null,
     drinking: null,
     corpsePos: null,
+    mountKey: '',
+    mountCastRemaining: 0,
     ...over,
   } as Entity;
 }
@@ -160,6 +164,42 @@ class FakeWorld implements BotWorld {
   dungeonLeaves = 0;
   leaveDungeon(): void {
     this.dungeonLeaves += 1;
+  }
+  equipment: Partial<Record<EquipSlot, string>> = {};
+  equips: { itemId: string; slot?: EquipSlot }[] = [];
+  equipItem(itemId: string): void {
+    this.equips.push({ itemId });
+  }
+  equipItemToSlot(itemId: string, slot: EquipSlot): void {
+    this.equips.push({ itemId, slot });
+  }
+  marketListings: {
+    itemId: string;
+    count?: number;
+    price: number;
+    instance?: ItemInstancePayload;
+  }[] = [];
+  marketList(itemId: string, count: number, price: number): void {
+    this.marketListings.push({ itemId, count, price });
+  }
+  marketListInstance(itemId: string, price: number, instance: ItemInstancePayload): void {
+    this.marketListings.push({ itemId, price, instance });
+  }
+  marketCollects = 0;
+  marketCollect(): void {
+    this.marketCollects += 1;
+  }
+  riding = false;
+  ridingTrained(): boolean {
+    return this.riding;
+  }
+  mountToggles = 0;
+  toggleMounted(): void {
+    this.mountToggles += 1;
+  }
+  ridingLessons: number[] = [];
+  learnRiding(npcId: number): void {
+    this.ridingLessons.push(npcId);
   }
   sellAllJunk(): void {
     this.sellJunks += 1;
@@ -3124,5 +3164,287 @@ describe('farmbot brain: combat intelligence (phase 13)', () => {
     step(state, world, 600);
     expect(world.onCasts).toEqual([{ id: 'rebuke', targetId: 80 }]);
     expect(world.casts).toEqual([]);
+  });
+});
+
+describe('farmbot brain: economy intelligence (phase 14)', () => {
+  function econDef(id: string, over: Partial<ItemDef> = {}): ItemDef {
+    return {
+      id,
+      name: id,
+      kind: 'armor',
+      slot: 'chest',
+      sellValue: 5,
+      quality: 'uncommon',
+      ...over,
+    } as ItemDef;
+  }
+
+  const ECON_DEFS: Record<string, ItemDef> = {
+    worn_chest: econDef('worn_chest', { stats: { armor: 10 } }),
+    drop_chest: econDef('drop_chest', { stats: { armor: 30 } }),
+    better_chest: econDef('better_chest', { stats: { armor: 50 } }),
+    weak_ring: econDef('weak_ring', { slot: 'ring', stats: { str: 2 } }),
+    strong_ring: econDef('strong_ring', { slot: 'ring', stats: { str: 20 } }),
+    drop_ring: econDef('drop_ring', { slot: 'ring', stats: { str: 10 } }),
+    blue_sword: econDef('blue_sword', {
+      kind: 'weapon',
+      slot: 'mainhand',
+      quality: 'rare',
+      sellValue: 50,
+    }),
+    blue_ring: econDef('blue_ring', { slot: 'ring', quality: 'rare', sellValue: 5 }),
+    grey_junk: econDef('grey_junk', { kind: 'junk', slot: undefined, quality: 'poor' }),
+    reins_valorsteed: econDef('reins_valorsteed', {
+      kind: 'mount',
+      slot: undefined,
+      quality: 'common',
+    }),
+  };
+  const econItemDef = (id: string): ItemDef | undefined => ECON_DEFS[id] ?? itemDef(id);
+
+  it('equips a strictly better drop after the loot pass, rings aimed at the weak slot', () => {
+    const { state, world } = makeBrain({ gearUpgrades: true }, { itemDef: econItemDef });
+    world.entities.set(
+      80,
+      makeEntity({ id: 80, name: 'wolf', aggroTargetId: 1, pos: { x: 3, y: 0, z: 0 } }),
+    );
+    world.player.inCombat = true;
+    step(state, world, 0);
+    expect(state.mode).toBe('COMBAT');
+    // the fight ends; the loot mirror settles with the drops already in bags
+    const wolf = world.entities.get(80);
+    if (wolf) wolf.dead = true;
+    world.player.inCombat = false;
+    world.equipment = { chest: 'worn_chest', ring1: 'strong_ring', ring2: 'weak_ring' };
+    world.inventory = [
+      { itemId: 'drop_chest', count: 1 },
+      { itemId: 'drop_ring', count: 1 },
+    ];
+    const logs = step(state, world, 100);
+    expect(world.equips).toEqual([
+      { itemId: 'drop_chest' },
+      { itemId: 'drop_ring', slot: 'ring2' },
+    ]);
+    expect(logs.some((l) => l.includes('equipped drop_chest (upgrade)'))).toBe(true);
+    expect(logs.some((l) => l.includes('equipped drop_ring (upgrade)'))).toBe(true);
+  });
+
+  it('never downgrades: a worse drop stays in the bags', () => {
+    const { state, world } = makeBrain({ gearUpgrades: true }, { itemDef: econItemDef });
+    const wolf = makeEntity({ id: 80, name: 'wolf', aggroTargetId: 1, pos: { x: 3, y: 0, z: 0 } });
+    world.entities.set(80, wolf);
+    world.player.inCombat = true;
+    step(state, world, 0);
+    wolf.dead = true;
+    world.player.inCombat = false;
+    world.equipment = { chest: 'better_chest' };
+    world.inventory = [{ itemId: 'drop_chest', count: 1 }];
+    step(state, world, 100);
+    expect(world.equips).toEqual([]);
+  });
+
+  it('gold loot marks upgrades before the discard sweep, and protects them', () => {
+    const { state, world } = makeBrain(
+      { mode: 'gold', gearUpgrades: true },
+      { itemDef: econItemDef },
+    );
+    state.goldPhase = 'clear';
+    world.player.pos = { x: 100300, y: 0, z: -1250 + 30 }; // inside the crypt claim
+    world.equipment = { chest: 'worn_chest' };
+    world.inventory = [{ itemId: 'drop_chest', count: 1 }];
+    world.entities.set(
+      90,
+      makeEntity({
+        id: 90,
+        name: 'shambler',
+        dead: true,
+        lootable: true,
+        loot: { copper: 12, items: [] },
+        pos: { x: 100301, y: 0, z: -1250 + 31 },
+      }),
+    );
+    const logs = step(state, world, 0);
+    expect(world.lootCorpses).toEqual([90]);
+    expect(world.equips).toEqual([{ itemId: 'drop_chest' }]);
+    expect(logs.some((l) => l.includes('equipped drop_chest (upgrade)'))).toBe(true);
+    // an uncommon upgrade is not keep-quality: the sweep must not discard it
+    expect(world.discards).toEqual([]);
+  });
+
+  it('market: collects proceeds once, then lists rares (fungible and instanced)', () => {
+    const { state, world } = makeBrain({ bags: { marketSell: true } }, { itemDef: econItemDef });
+    world.bagCapacity = 3;
+    world.inventory = [
+      { itemId: 'blue_sword', count: 1 },
+      { itemId: 'blue_ring', count: 1, instance: { signer: 'Crafty' } },
+      { itemId: 'grey_junk', count: 4 },
+    ];
+    world.entities.set(
+      70,
+      makeEntity({
+        id: 70,
+        name: 'merchant',
+        kind: 'npc',
+        templateId: 'the_merchant',
+        hostile: false,
+        pos: { x: 2, y: 0, z: 0 },
+      }),
+    );
+    let logs = step(state, world, 0);
+    expect(state.mode).toBe('BAGS_FULL');
+    expect(world.marketCollects).toBe(1); // collect first, every visit
+    expect(logs.some((l) => l.includes('market: collecting proceeds'))).toBe(true);
+    logs = step(state, world, 100);
+    expect(world.marketListings).toEqual([{ itemId: 'blue_sword', count: 1, price: 500 }]);
+    logs = step(state, world, 200);
+    expect(world.marketListings[1]).toEqual({
+      itemId: 'blue_ring',
+      price: 100, // sellValue 5 * 10 = 50, floored at 100
+      instance: { signer: 'Crafty' },
+    });
+    // commons are never listed; with nothing left the visit falls through
+    step(state, world, 300);
+    step(state, world, 400);
+    expect(world.marketListings.length).toBe(2);
+    expect(world.marketCollects).toBe(1); // once per visit, not per tick
+  });
+
+  it('market: the session listing cap stops posting and falls back', () => {
+    const { state, world } = makeBrain({ bags: { marketSell: true } }, { itemDef: econItemDef });
+    state.marketListedCount = 10; // cap reached in an earlier session stretch
+    world.bagCapacity = 1;
+    world.inventory = [{ itemId: 'blue_sword', count: 1 }];
+    world.entities.set(
+      70,
+      makeEntity({
+        id: 70,
+        name: 'merchant',
+        kind: 'npc',
+        templateId: 'the_merchant',
+        hostile: false,
+        pos: { x: 2, y: 0, z: 0 },
+      }),
+    );
+    step(state, world, 0);
+    step(state, world, 100);
+    expect(world.marketCollects).toBe(1);
+    expect(world.marketListings).toEqual([]);
+  });
+
+  it('market: no merchant nearby leaves the vendor flow untouched', () => {
+    const { state, world } = makeBrain({ bags: { marketSell: true } }, { itemDef: econItemDef });
+    world.bagCapacity = 1;
+    world.inventory = [{ itemId: 'grey_junk', count: 4 }];
+    world.entities.set(
+      60,
+      makeEntity({
+        id: 60,
+        name: 'vendor',
+        kind: 'npc',
+        hostile: false,
+        vendorItems: ['bread'],
+        pos: { x: 2, y: 0, z: 0 },
+      }),
+    );
+    step(state, world, 0);
+    step(state, world, 1100); // the sell rides the post-interact throttle
+    expect(world.marketCollects).toBe(0);
+    expect(world.sellJunks).toBe(1); // the normal sell-junk path ran
+  });
+
+  it('mount: summons for a long overworld leg when trained with reins in bags', () => {
+    const { state, world } = makeBrain(
+      { mode: 'gold', mount: { enabled: true } },
+      { itemDef: econItemDef },
+    );
+    world.player.level = 20;
+    world.riding = true;
+    world.inventory = [{ itemId: 'reins_valorsteed', count: 1 }];
+    world.player.pos = { x: 0, y: 0, z: 0 }; // the crypt door is ~120 yd out
+    const logs = step(state, world, 0);
+    expect(world.itemsUsed).toEqual(['reins_valorsteed']);
+    expect(logs.some((l) => l.includes('mount: summoning'))).toBe(true);
+  });
+
+  it('mount: no summon without training, reins, level, or a long leg', () => {
+    // untrained
+    const untrained = makeBrain(
+      { mode: 'gold', mount: { enabled: true } },
+      { itemDef: econItemDef },
+    );
+    untrained.world.player.level = 20;
+    untrained.world.riding = false;
+    untrained.world.inventory = [{ itemId: 'reins_valorsteed', count: 1 }];
+    step(untrained.state, untrained.world, 0);
+    expect(untrained.world.itemsUsed).toEqual([]);
+
+    // trained but no reins in bags
+    const noReins = makeBrain({ mode: 'gold', mount: { enabled: true } }, { itemDef: econItemDef });
+    noReins.world.player.level = 20;
+    noReins.world.riding = true;
+    step(noReins.state, noReins.world, 0);
+    expect(noReins.world.itemsUsed).toEqual([]);
+
+    // trained with reins but below the riding gate
+    const low = makeBrain({ mode: 'gold', mount: { enabled: true } }, { itemDef: econItemDef });
+    low.world.player.level = 19;
+    low.world.riding = true;
+    low.world.inventory = [{ itemId: 'reins_valorsteed', count: 1 }];
+    step(low.state, low.world, 0);
+    expect(low.world.itemsUsed).toEqual([]);
+  });
+
+  it('mount: dismounts on combat entry', () => {
+    const { state, world } = makeBrain({ mount: { enabled: true } });
+    world.player.mountKey = 'valorsteed';
+    world.entities.set(
+      80,
+      makeEntity({ id: 80, name: 'wolf', aggroTargetId: 1, pos: { x: 3, y: 0, z: 0 } }),
+    );
+    const logs = step(state, world, 0);
+    expect(state.mode).toBe('COMBAT');
+    expect(world.mountToggles).toBe(1);
+    expect(logs.some((l) => l.includes('mount: dismounting'))).toBe(true);
+  });
+
+  it('mount: buys riding training once when passing the stablemaster with 80g', () => {
+    const { state, world } = makeBrain({ mount: { enabled: true, buyTraining: true } });
+    world.player.level = 20;
+    world.copper = 800_000;
+    world.entities.set(
+      60,
+      makeEntity({
+        id: 60,
+        name: 'marla',
+        kind: 'npc',
+        templateId: 'stablemaster_marla',
+        hostile: false,
+        pos: { x: 2, y: 0, z: 0 },
+      }),
+    );
+    const logs = step(state, world, 0);
+    expect(world.ridingLessons).toEqual([60]);
+    expect(logs.some((l) => l.includes('mount: learned riding'))).toBe(true);
+    step(state, world, 100);
+    expect(world.ridingLessons).toEqual([60]); // once per session
+
+    // short on copper: no purchase
+    const poor = makeBrain({ mount: { enabled: true, buyTraining: true } });
+    poor.world.player.level = 20;
+    poor.world.copper = 100;
+    poor.world.entities.set(
+      60,
+      makeEntity({
+        id: 60,
+        name: 'marla',
+        kind: 'npc',
+        templateId: 'stablemaster_marla',
+        hostile: false,
+        pos: { x: 2, y: 0, z: 0 },
+      }),
+    );
+    step(poor.state, poor.world, 0);
+    expect(poor.world.ridingLessons).toEqual([]);
   });
 });

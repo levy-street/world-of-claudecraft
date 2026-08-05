@@ -87,6 +87,17 @@ export interface BagsConfig {
   mailTo?: string;
   // What to mail: 'all' gathered mats, or an explicit item-id list.
   mailItems: 'all' | string[];
+  // List kept-quality (rare+) drops on the World Market when a merchant is
+  // near during a BAGS_FULL trip, instead of vendoring them for scrap.
+  marketSell: boolean;
+}
+
+export interface MountConfig {
+  // Summon an owned mount for overworld travel legs over 60 yd (level 20+,
+  // riding trained, reins in bags). Dismounts on combat and on arrival.
+  enabled: boolean;
+  // Buy riding training (80g) when near the stablemaster and copper allows.
+  buyTraining: boolean;
 }
 
 export interface DeathConfig {
@@ -142,6 +153,10 @@ export interface FarmBotConfig {
   goldFarm: GoldFarmConfig;
   // Leveling grind settings (only read when mode is 'level').
   levelGrind: LevelGrindConfig;
+  // Auto-equip strictly-better drops after loot (never downgrades, never bags).
+  gearUpgrades: boolean;
+  // Mount travel for long overworld legs.
+  mount: MountConfig;
   // 0 means run until interrupted.
   maxRuntimeMinutes: number;
 }
@@ -252,6 +267,8 @@ export function parseConfig(json: unknown): FarmBotConfig {
       'safety',
       'goldFarm',
       'levelGrind',
+      'gearUpgrades',
+      'mount',
       'maxRuntimeMinutes',
     ],
     'config',
@@ -463,14 +480,19 @@ export function parseConfig(json: unknown): FarmBotConfig {
     }
   }
 
-  const bags: BagsConfig = { fullPolicy: 'sell-junk', sellAllowlist: [], mailItems: 'all' };
+  const bags: BagsConfig = {
+    fullPolicy: 'sell-junk',
+    sellAllowlist: [],
+    mailItems: 'all',
+    marketSell: false,
+  };
   if (json.bags !== undefined) {
     if (!isRecord(json.bags)) {
       errors.push('bags: must be an object');
     } else {
       checkNoUnknownKeys(
         json.bags,
-        ['fullPolicy', 'sellAllowlist', 'mailTo', 'mailItems'],
+        ['fullPolicy', 'sellAllowlist', 'mailTo', 'mailItems', 'marketSell'],
         'bags',
         errors,
       );
@@ -499,6 +521,10 @@ export function parseConfig(json: unknown): FarmBotConfig {
         } else {
           errors.push("bags.mailItems: must be 'all' or an array of item-id strings");
         }
+      }
+      if (json.bags.marketSell !== undefined) {
+        if (typeof json.bags.marketSell === 'boolean') bags.marketSell = json.bags.marketSell;
+        else errors.push('bags.marketSell: must be a boolean');
       }
     }
   }
@@ -726,6 +752,29 @@ export function parseConfig(json: unknown): FarmBotConfig {
     }
   }
 
+  let gearUpgrades = false;
+  if (json.gearUpgrades !== undefined) {
+    if (typeof json.gearUpgrades === 'boolean') gearUpgrades = json.gearUpgrades;
+    else errors.push('gearUpgrades: must be a boolean');
+  }
+
+  const mount: MountConfig = { enabled: false, buyTraining: false };
+  if (json.mount !== undefined) {
+    if (!isRecord(json.mount)) {
+      errors.push('mount: must be an object');
+    } else {
+      checkNoUnknownKeys(json.mount, ['enabled', 'buyTraining'], 'mount', errors);
+      if (json.mount.enabled !== undefined) {
+        if (typeof json.mount.enabled === 'boolean') mount.enabled = json.mount.enabled;
+        else errors.push('mount.enabled: must be a boolean');
+      }
+      if (json.mount.buyTraining !== undefined) {
+        if (typeof json.mount.buyTraining === 'boolean') mount.buyTraining = json.mount.buyTraining;
+        else errors.push('mount.buyTraining: must be a boolean');
+      }
+    }
+  }
+
   if (errors.length > 0) {
     throw new Error(`invalid farmbot config:\n- ${errors.join('\n- ')}`);
   }
@@ -748,6 +797,8 @@ export function parseConfig(json: unknown): FarmBotConfig {
     safety,
     goldFarm,
     levelGrind,
+    gearUpgrades,
+    mount,
     maxRuntimeMinutes,
   };
 }

@@ -151,8 +151,12 @@ export interface StuckResult {
 export interface StuckDetectorOptions {
   // How long displacement may stay under epsilon before stuck is reported.
   windowMs?: number;
-  // Horizontal yards of displacement that count as progress.
+  // Horizontal yards of displacement that count as progress while free.
   epsilon?: number;
+  // Once snagged, this much displacement from the snag origin is required to
+  // count as free. Micro-slides along a wall (0.5-2 yd) must not reset the
+  // recovery streak or the bot wiggles forever without blacklisting.
+  freeEpsilon?: number;
   // Consecutive failed recoveries before recommending a blacklist.
   blacklistAfter?: number;
   // How long each recovery maneuver is held before trying the next.
@@ -170,6 +174,8 @@ export interface StuckUpdateOptions {
 
 const DEFAULT_WINDOW_MS = 4000;
 const DEFAULT_EPSILON = 0.5;
+// Real "got free" distance once a snag is declared (see freeEpsilon above).
+const DEFAULT_FREE_EPSILON = 3;
 // Enough attempts to cycle back / sides / reverse before giving up on the target.
 const DEFAULT_BLACKLIST_AFTER = 6;
 const DEFAULT_RECOVERY_MS = 1800;
@@ -246,10 +252,13 @@ export function pickStuckManeuver(
 export class StuckDetector {
   private readonly windowMs: number;
   private readonly epsilon: number;
+  private readonly freeEpsilon: number;
   private readonly blacklistAfter: number;
   private readonly recoveryMs: number;
   private anchor: NavPos | null = null;
   private anchorMs = 0;
+  // Position where the snag was declared; freeEpsilon is measured from here.
+  private snagOrigin: NavPos | null = null;
   // When the quiet window first expired (null while free / not yet stuck).
   private stuckSinceMs: number | null = null;
   // Cached maneuver for the current attempt so rng does not re-roll every tick.
@@ -259,6 +268,7 @@ export class StuckDetector {
   constructor(opts: StuckDetectorOptions = {}) {
     this.windowMs = opts.windowMs ?? DEFAULT_WINDOW_MS;
     this.epsilon = opts.epsilon ?? DEFAULT_EPSILON;
+    this.freeEpsilon = opts.freeEpsilon ?? DEFAULT_FREE_EPSILON;
     this.blacklistAfter = opts.blacklistAfter ?? DEFAULT_BLACKLIST_AFTER;
     this.recoveryMs = opts.recoveryMs ?? DEFAULT_RECOVERY_MS;
   }
@@ -266,6 +276,7 @@ export class StuckDetector {
   reset(): void {
     this.anchor = null;
     this.anchorMs = 0;
+    this.snagOrigin = null;
     this.stuckSinceMs = null;
     this.activeAttempt = 0;
     this.active = null;
@@ -280,13 +291,22 @@ export class StuckDetector {
       return { stuck: false, escalation: 'none', input: {} };
     }
 
-    if (distance2(pos, this.anchor) >= this.epsilon * this.epsilon) {
-      // Progress: free of the snag. Re-anchor and clear recovery state.
+    // Already snagged: only real escape clears the streak. Sliding 1 yd along
+    // a wall must not restart attempt 1 forever (the live wiggle-spam bug).
+    if (this.stuckSinceMs !== null && this.snagOrigin) {
+      if (distance2(pos, this.snagOrigin) >= this.freeEpsilon * this.freeEpsilon) {
+        this.anchor = { x: pos.x, z: pos.z };
+        this.anchorMs = nowMs;
+        this.snagOrigin = null;
+        this.stuckSinceMs = null;
+        this.activeAttempt = 0;
+        this.active = null;
+        return { stuck: false, escalation: 'none', input: {} };
+      }
+    } else if (distance2(pos, this.anchor) >= this.epsilon * this.epsilon) {
+      // Free travel: normal progress re-anchors the quiet window.
       this.anchor = { x: pos.x, z: pos.z };
       this.anchorMs = nowMs;
-      this.stuckSinceMs = null;
-      this.activeAttempt = 0;
-      this.active = null;
       return { stuck: false, escalation: 'none', input: {} };
     }
 
@@ -294,9 +314,9 @@ export class StuckDetector {
       if (nowMs - this.anchorMs < this.windowMs) {
         return { stuck: false, escalation: 'none', input: {} };
       }
-      // Quiet window expired: snag clock starts at that edge so large time
-      // jumps still count the recoveries that "should" have run.
+      // Quiet window expired: declare the snag here.
       this.stuckSinceMs = this.anchorMs + this.windowMs;
+      this.snagOrigin = { x: pos.x, z: pos.z };
     }
 
     const elapsed = Math.max(0, nowMs - this.stuckSinceMs);
