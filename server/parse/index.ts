@@ -87,10 +87,23 @@ export function createParseSubsystem(opts: ParseSubsystemOptions): ParseSubsyste
   console.log(
     `[parse] capture enabled (contract v${CONTRACT_VERSION}, env ${flags.envLabel}, surfaces ${[...flags.surfaces].join(',')}, census ${flags.censusEnabled ? 'on' : 'off'})`,
   );
+  // A throw from the observer must never unwind into the tick loop (it would
+  // skip routeEvents and snapshots for the whole timer callback): first throw
+  // disables capture for the life of the process, like the budget breaker.
+  let observeDead = false;
   return {
     enabled: true,
     counters,
-    observe: (events) => recorder.observe(events),
+    observe: (events) => {
+      if (observeDead) return;
+      try {
+        recorder.observe(events);
+      } catch (e) {
+        observeDead = true;
+        counters.captureDisabled = 1;
+        console.error('[parse] observe threw; capture disabled until restart:', e);
+      }
+    },
     stop: async () => {
       census?.stop();
       recorder.stop();

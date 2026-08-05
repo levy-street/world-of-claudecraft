@@ -291,8 +291,7 @@ export class ParseRecorder {
       sourceOwnerId !== null ? { ownerId: sourceOwnerId } : undefined;
     fight.recordEvent(tick, ev as Record<string, unknown>, enrichment);
     const creditSource = sourceOwnerId ?? ev.sourceId;
-    const overheal = (ev as { overheal?: number }).overheal ?? 0;
-    fight.noteHeal(tick, creditSource, ev.amount, overheal);
+    fight.noteHeal(tick, creditSource, ev.amount, ev.overheal ?? 0);
   }
 
   private routeAura(ev: SimEvent & { type: 'aura' }, tick: number): void {
@@ -300,19 +299,31 @@ export class ParseRecorder {
     if (fight === undefined) return;
     let enrichment: EventEnrichment | undefined;
     if (ev.gained) {
-      // State-join attribution: the aura object on the live entity still has
-      // sourceId, id, and stacks that the event drops (fidelity gap 7.2).
-      const auras = this.opts.sim.entities.get(ev.targetId)?.auras;
-      if (auras !== undefined) {
-        for (let i = auras.length - 1; i >= 0; i--) {
-          const aura = auras[i];
-          if (aura !== undefined && aura.name === ev.name) {
-            enrichment = {
-              auraSourceId: aura.sourceId,
-              auraId: aura.id,
-              ...(aura.stacks !== undefined ? { auraStacks: aura.stacks } : {}),
-            };
-            break;
+      if (ev.sourceId !== undefined) {
+        // Fidelity round 1 landed: the event itself carries attribution.
+        enrichment = {
+          auraSourceId: ev.sourceId,
+          ...(ev.abilityId !== undefined ? { auraId: ev.abilityId } : {}),
+          ...(ev.stacks !== undefined ? { auraStacks: ev.stacks } : {}),
+        };
+      } else {
+        // Fallback state-join for un-widened emit sites: scan the live aura
+        // array by name. Best-effort only: with two same-named auras from
+        // different casters this can attribute the wrong one (refresh-in-place
+        // keeps a refreshed aura at its original index, so recency is not
+        // recoverable from position).
+        const auras = this.opts.sim.entities.get(ev.targetId)?.auras;
+        if (auras !== undefined) {
+          for (let i = auras.length - 1; i >= 0; i--) {
+            const aura = auras[i];
+            if (aura !== undefined && aura.name === ev.name) {
+              enrichment = {
+                auraSourceId: aura.sourceId,
+                auraId: aura.id,
+                ...(aura.stacks !== undefined ? { auraStacks: aura.stacks } : {}),
+              };
+              break;
+            }
           }
         }
       }

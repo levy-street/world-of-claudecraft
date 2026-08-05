@@ -23,7 +23,9 @@ section 14).
   a counter; the disk spool is bounded with oldest-batch eviction; ship
   failures degrade to the spool without throwing.
 - **`contract.ts` is a vendored copy** of woc-parse-service `contract/types.ts`.
-  Edit it THERE and re-copy; both boots assert `CONTRACT_VERSION`.
+  Edit it THERE and re-copy verbatim. Version safety is wire-enforced: every
+  batch header carries `v = CONTRACT_VERSION` and the service rejects unknown
+  majors, so a drifted copy fails on the first shipped batch, never silently.
 - **Identity is `(realm, characterId)`**, never pid (entity ids are per-login
   and reused). Pids appear only as intra-fight actor references.
 - **No PII.** Participant snapshots come from `serializeCharacter` (game state
@@ -43,6 +45,17 @@ budget breaker) - `arena.ts` / `battleground.ts` (match segmenters) -
 `shipper.ts` (batch + gzip + POST, ChatLogger discipline) - `spool.ts`
 (bounded disk WAL) - `flags.ts` - `counters.ts` (hot-path counters, prom
 export via collect()) - `contract.ts` (vendored wire contract).
+
+## Known capture limits (v1, deliberate)
+- Aura attribution: `Sim.applyAura` gained/displaced events carry
+  sourceId/abilityId/stacks; the many scattered FADE emit sites elsewhere in
+  the sim are not yet widened, so fades enrich only via the best-effort
+  state-join fallback in `recorder.ts`.
+- Overheal: a periodic tick that FULLY overheals emits no heal2 at all (those
+  sim sites gate on `healed > 0`, unchanged), so overheal totals undercount
+  the at-full-health case; direct heals report it exactly.
+- Rift fights are per-floor segments; rift boss pulls stay inside their floor's
+  fight (boss casts still synthesize via mob tracking).
 
 ## Testing
 Unit tests script a fake `RecorderSim` (see `tests/parse_recorder.test.ts`):

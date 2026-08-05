@@ -1911,8 +1911,10 @@ export class GameServer {
 
   // Full participant identity for the parse recorder: stable characterId,
   // display name, class (a player entity's templateId is its class), spec, and
-  // the serializeCharacter snapshot (talents, gear, ratings; never account
-  // data). Null when the pid has no live session, which drops the participant.
+  // a MINIMIZED snapshot. Data-minimization rule (security review): only the
+  // fields the parse product reads (build + ratings + progression) leave the
+  // process; bags, bank, money, quests, mail, and position never enter a
+  // telemetry record. Null when the pid has no live session.
   private resolveParseParticipant(pid: number): FightParticipant | null {
     const session = this.clients.get(pid);
     if (session === undefined || session.left) return null;
@@ -1920,6 +1922,18 @@ export class GameServer {
     if (entity === undefined) return null;
     const state = this.sim.serializeCharacter(pid);
     const spec = state?.talents?.spec;
+    const snapshot =
+      state === null
+        ? null
+        : {
+            level: state.level,
+            lifetimeXp: state.lifetimeXp ?? 0,
+            prestigeRank: state.prestigeRank ?? 0,
+            talents: state.talents ?? null,
+            equipment: state.equipment,
+            arena1v1Rating: state.arena1v1Rating ?? null,
+            arena2v2Rating: state.arena2v2Rating ?? null,
+          };
     return {
       entityId: pid,
       characterId: session.characterId,
@@ -1928,7 +1942,7 @@ export class GameServer {
       spec: typeof spec === 'string' && spec.length > 0 ? spec : null,
       level: entity.level,
       team: null,
-      snapshot: state,
+      snapshot,
     };
   }
 

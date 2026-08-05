@@ -10,6 +10,10 @@ import type { RecordSink } from './types';
 const CENSUS_INTERVAL_MS = 24 * 60 * 60 * 1000;
 /** First run waits out boot load; a restart mid-day still snapshots today. */
 const CENSUS_BOOT_DELAY_MS = 10 * 60 * 1000;
+/** Rows enqueued per event-loop turn: a large realm must never fan a whole
+ * snapshot into the shipper synchronously on the thread running the world
+ * loop (the buffer's overflow path is O(n) per drop). */
+const CENSUS_ENQUEUE_CHUNK = 500;
 
 export type CensusLoader = (snapshotDate: string) => Promise<CensusRecord[]>;
 
@@ -47,8 +51,11 @@ export class CensusExporter {
     try {
       const day = snapshotDate ?? new Date().toISOString().slice(0, 10);
       const rows = await this.load(day);
-      for (const row of rows) {
-        this.sink.enqueue(row as unknown as Record<string, unknown>);
+      for (let i = 0; i < rows.length; i++) {
+        this.sink.enqueue(rows[i] as unknown as Record<string, unknown>);
+        if ((i + 1) % CENSUS_ENQUEUE_CHUNK === 0) {
+          await new Promise<void>((resolve) => setImmediate(resolve));
+        }
       }
       this.counters.censusRuns++;
       this.counters.censusRows += rows.length;

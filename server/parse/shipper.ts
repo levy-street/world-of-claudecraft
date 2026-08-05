@@ -23,6 +23,13 @@ const MARSHAL_CAP = 1000;
 /** Hard buffer cap so an unreachable service cannot grow memory forever. */
 const MAX_BUFFER = 50_000;
 const SHIP_TIMEOUT_MS = 5000;
+/**
+ * Wall-clock budget for the shutdown drain, matching the deadline discipline
+ * of the neighbouring shutdown steps (stopSteamMirror(5000) and friends): past
+ * it, remaining batches spool WITHOUT a ship attempt, so a wedged ingest URL
+ * can never hold up the chat-log flush and pool drain behind it.
+ */
+const STOP_DEADLINE_MS = 5000;
 export const PARSE_SECRET_HEADER = 'x-woc-parse-secret';
 
 export interface ShipperIdentity {
@@ -34,7 +41,7 @@ export interface ShipperIdentity {
 export class BatchShipper {
   private buffer: Record<string, unknown>[] = [];
   private timer: ReturnType<typeof setTimeout> | null = null;
-  private flushing = false;
+  private inFlight: Promise<void> | null = null;
   private stopped = false;
   private seq = 0;
   private readonly bootId = randomBytes(6).toString('base64url');
@@ -46,6 +53,7 @@ export class BatchShipper {
     private readonly spool: BatchSpool,
     private readonly counters: ParseCounters,
     private readonly fetchImpl: typeof fetch = fetch,
+    private readonly now: () => number = () => Date.now(),
   ) {}
 
   /** Hot-path entry: O(1) push, flushing always happens on the timer. */
@@ -66,8 +74,47 @@ export class BatchShipper {
       clearTimeout(this.timer);
       this.timer = null;
     }
-    if (this.flushing || this.buffer.length === 0) return;
-    this.flushing = true;
+    if (this.inFlight !== null || this.buffer.length === 0) return;
+    // Track the in-flight cycle so stop() can await it: records spliced out by
+    // a running flush would otherwise be owned by no observable promise and a
+    // process exit could lose them, neither shipped nor spooled.
+    const run = this.flushCycle();
+    this.inFlight = run;
+    try {
+      await run;
+    } finally {
+      if (this.inFlight === run) this.inFlight = null;
+      if (this.buffer.length > 0 && !this.stopped) this.armTimer();
+    }
+  }
+
+  /** Final drain at shutdown: awaits any in-flight cycle, then ships until the
+   * deadline and spools everything after it. Bounded by construction. */
+  async stop(): Promise<void> {
+    this.stopped = true;
+    if (this.timer !== null) {
+      clearTimeout(this.timer);
+      this.timer = null;
+    }
+    const deadline = this.now() + STOP_DEADLINE_MS;
+    if (this.inFlight !== null) {
+      await this.inFlight.catch(() => undefined);
+    }
+    while (this.buffer.length > 0) {
+      const records = this.buffer.splice(0, MARSHAL_CAP);
+      try {
+        const gzipped = await this.marshal(records);
+        const shipped = this.now() < deadline ? await this.ship(gzipped) : false;
+        if (!shipped) await this.spool.append(gzipped);
+      } catch (e) {
+        console.error('[parse] shutdown flush failed:', e);
+        return;
+      }
+    }
+    this.counters.recordsBuffered = 0;
+  }
+
+  private async flushCycle(): Promise<void> {
     try {
       const records = this.buffer.splice(0, MARSHAL_CAP);
       this.counters.recordsBuffered = this.buffer.length;
@@ -77,27 +124,7 @@ export class BatchShipper {
       else await this.replayOneSpooled();
     } catch (e) {
       console.error('[parse] flush failed:', e);
-    } finally {
-      this.flushing = false;
-      if (this.buffer.length > 0) this.armTimer();
     }
-  }
-
-  /** Final flush at shutdown: one ship attempt, spool on failure. */
-  async stop(): Promise<void> {
-    this.stopped = true;
-    while (this.buffer.length > 0) {
-      const records = this.buffer.splice(0, MARSHAL_CAP);
-      try {
-        const gzipped = await this.marshal(records);
-        const shipped = await this.ship(gzipped);
-        if (!shipped) await this.spool.append(gzipped);
-      } catch (e) {
-        console.error('[parse] shutdown flush failed:', e);
-        return;
-      }
-    }
-    this.counters.recordsBuffered = 0;
   }
 
   private async marshal(records: Record<string, unknown>[]): Promise<Buffer> {
@@ -117,7 +144,12 @@ export class BatchShipper {
 
   private async ship(gzipped: Buffer): Promise<boolean> {
     try {
-      const headers: Record<string, string> = { 'content-type': 'application/x-ndjson' };
+      const headers: Record<string, string> = {
+        'content-type': 'application/x-ndjson',
+        // Self-describing body: a proxy or standards-compliant receiver can
+        // tell the payload is compressed without out-of-band agreement.
+        'content-encoding': 'gzip',
+      };
       if (this.ingestToken !== null) headers[PARSE_SECRET_HEADER] = this.ingestToken;
       const res = await this.fetchImpl(this.ingestUrl, {
         method: 'POST',

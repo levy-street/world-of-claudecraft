@@ -8,6 +8,30 @@ const DEFAULT_SPOOL_DIR = 'parse-spool';
 const ALL_SURFACES: readonly Surface[] = ['arena', 'raid', 'dungeon', 'rift', 'battleground'];
 const ENV_LABELS = new Set<ParseEnv>(['prod', 'qa', 'pbe', 'dev']);
 
+/**
+ * The shipper attaches the shared secret to every request, so the transport
+ * must be TLS: plain http is allowed only toward loopback (local dev). A
+ * non-loopback http URL is rejected at boot rather than silently leaking the
+ * token in the clear.
+ */
+function validatedIngestUrl(raw: string | null): string | null {
+  if (raw === null) return null;
+  try {
+    const url = new URL(raw);
+    if (url.protocol === 'https:') return raw;
+    const loopback =
+      url.hostname === 'localhost' || url.hostname === '127.0.0.1' || url.hostname === '::1';
+    if (url.protocol === 'http:' && loopback) return raw;
+    console.error(
+      `[parse] PARSE_INGEST_URL must be https (or http to loopback), got ${url.protocol}//${url.hostname}: capture stays off`,
+    );
+    return null;
+  } catch {
+    console.error('[parse] PARSE_INGEST_URL is not a valid URL: capture stays off');
+    return null;
+  }
+}
+
 export interface ParseFlags {
   enabled: boolean;
   ingestUrl: string | null;
@@ -21,10 +45,12 @@ export interface ParseFlags {
 }
 
 export function loadParseFlags(env: NodeJS.ProcessEnv = process.env): ParseFlags {
-  const ingestUrl = env.PARSE_INGEST_URL?.trim() || null;
+  const ingestUrl = validatedIngestUrl(env.PARSE_INGEST_URL?.trim() || null);
   const requested = env.PARSE_CAPTURE === '1';
   if (requested && ingestUrl === null) {
-    console.warn('[parse] PARSE_CAPTURE=1 but PARSE_INGEST_URL unset: capture stays off');
+    console.warn(
+      '[parse] PARSE_CAPTURE=1 but PARSE_INGEST_URL unset or invalid: capture stays off',
+    );
   }
   const surfaceRaw = env.PARSE_CAPTURE_SURFACES?.trim();
   const surfaces = new Set<Surface>();

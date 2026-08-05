@@ -1,6 +1,9 @@
 // VENDORED COPY of woc-parse-service contract/types.ts. Do not edit here:
 // edit the service repo's contract/, then re-copy this file verbatim below the
-// vendor banner. Both boots assert CONTRACT_VERSION matches.
+// vendor banner. Version safety is enforced at the wire, not at boot: every
+// batch header carries v = CONTRACT_VERSION and the service rejects unknown
+// majors with a stable error code, so a drifted copy fails loudly on the
+// first shipped batch.
 
 // The telemetry wire contract between the game repo's server/parse/ recorder and
 // woc-parse-service. NDJSON, gzip-compressed per batch, POSTed to
@@ -171,7 +174,10 @@ export interface ParticipantTotals {
   overheal: number;
   absorbed: number;
   deaths: number;
+  /** RESERVED: always 0 until sim fidelity round 2 lands castStop reasons;
+   * dashboards must render these as unavailable, never as measured zeros. */
   interrupts: number;
+  /** RESERVED: always 0 until dispel events carry attribution (round 2). */
   dispels: number;
   activeMs: number;
 }

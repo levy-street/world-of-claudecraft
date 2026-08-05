@@ -17,7 +17,7 @@ import type { ParseCounters } from './counters';
 import type { RecordSink } from './types';
 
 /** Raw event lines per fight; past this, rollups continue and lines stop. */
-const MAX_RAW_EVENTS_PER_FIGHT = 200_000;
+export const MAX_RAW_EVENTS_PER_FIGHT = 200_000;
 const TICK_MS = 50;
 
 interface ParticipantAccum {
@@ -116,7 +116,16 @@ export class OpenFight {
     this.counters.recordsEmitted++;
   }
 
-  /** Append one raw event line, respecting the per-fight cap. */
+  /**
+   * Append one raw event line, respecting the per-fight cap. The SimEvent is
+   * held BY REFERENCE until the shipper marshals it (up to one flush interval
+   * later); that is safe because nothing mutates a drained event after
+   * routeEvents' serializeEventFragments invariant, and the recorder observes
+   * before routeEvents. The one sanctioned mutation, routeEvents' chat-flair
+   * stamp, touches only chat events, which are never routed into a fight. A
+   * future in-place COMBAT event edit would corrupt shipped telemetry: copy
+   * here if that invariant ever softens.
+   */
   recordEvent(tick: number, ev: Record<string, unknown>, x?: EventEnrichment): void {
     if (this.eventCount >= MAX_RAW_EVENTS_PER_FIGHT) {
       if (!this.truncated) {

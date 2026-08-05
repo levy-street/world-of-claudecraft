@@ -5,8 +5,13 @@
 // (talents/equipment/prestige/arena/deedStats out of the state JSONB, vlevel
 // recomputed from lifetimeXp via the sim's own virtualLevel).
 import { virtualLevel } from '../../src/sim/types';
-import { pool } from '../db';
+import { runWithStatementTimeout } from '../db';
 import type { CensusRecord } from './contract';
+
+/** Known-long daily read: bounded by the db.ts heavy allowance, never the
+ * session default, so a bloated play_sessions table fails the census loudly
+ * instead of stalling the shared pool. */
+const CENSUS_STATEMENT_TIMEOUT_MS = 60_000;
 
 /** The lifetime counters worth carrying (the scout allowlist). */
 const COUNTER_KEYS = [
@@ -23,7 +28,7 @@ const COUNTER_KEYS = [
   'dummyDamage',
 ] as const;
 
-interface CensusRowRaw {
+export interface CensusRowRaw {
   id: string;
   name: string;
   class: string;
@@ -35,27 +40,38 @@ interface CensusRowRaw {
   sessions: number;
 }
 
-export async function loadCensusRows(realm: string, snapshotDate: string): Promise<CensusRecord[]> {
-  const res = await pool.query<CensusRowRaw>(
-    `SELECT c.id, c.name, c.class, c.level, c.state,
+/**
+ * The whole census read, exported so the PII test can pin its text: it may
+ * never join accounts, never select play_sessions ip/ua, and must exclude GM
+ * characters. Session durations are clamped to [0, 86400] per row so an
+ * open-ended or clock-skewed session cannot poison lifetime playtime.
+ */
+export const CENSUS_SQL = `SELECT c.id, c.name, c.class, c.level, c.state,
             c.created_at::text AS created_at, c.last_login::text AS last_login,
             COALESCE(p.playtime, 0)::text AS playtime, COALESCE(p.sessions, 0)::int AS sessions
      FROM characters c
      LEFT JOIN (
-       SELECT character_id,
-              SUM(LEAST(GREATEST(EXTRACT(EPOCH FROM (ended_at - started_at)), 0), 86400))::bigint AS playtime,
+       SELECT s.character_id,
+              SUM(LEAST(GREATEST(EXTRACT(EPOCH FROM (s.ended_at - s.started_at)), 0), 86400))::bigint AS playtime,
               COUNT(*) AS sessions
-       FROM play_sessions
-       WHERE ended_at IS NOT NULL
-       GROUP BY character_id
+       FROM play_sessions s
+       WHERE s.ended_at IS NOT NULL
+         AND EXISTS (
+           SELECT 1 FROM characters rc
+           WHERE rc.id = s.character_id AND rc.realm = $1 AND rc.is_gm = FALSE
+         )
+       GROUP BY s.character_id
      ) p ON p.character_id = c.id
-     WHERE c.realm = $1 AND c.is_gm = FALSE`,
-    [realm],
+     WHERE c.realm = $1 AND c.is_gm = FALSE`;
+
+export async function loadCensusRows(realm: string, snapshotDate: string): Promise<CensusRecord[]> {
+  const res = await runWithStatementTimeout(CENSUS_STATEMENT_TIMEOUT_MS, (query) =>
+    query(CENSUS_SQL, [realm]),
   );
-  return res.rows.map((row) => toCensusRecord(row, snapshotDate));
+  return (res.rows as CensusRowRaw[]).map((row) => toCensusRecord(row, snapshotDate));
 }
 
-function toCensusRecord(row: CensusRowRaw, snapshotDate: string): CensusRecord {
+export function toCensusRecord(row: CensusRowRaw, snapshotDate: string): CensusRecord {
   const state = row.state ?? {};
   const talents = asObj(state.talents);
   const deedStats = asObj(state.deedStats);
