@@ -30,7 +30,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 954,
-      "state": "82616263",
+      "state": "e9db22c5",
       "events": "92d8a327",
       "rng": {
         "draws": 0,
@@ -41,7 +41,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 954,
-      "state": "fa7bf0e9",
+      "state": "a3dd4bfb",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -52,7 +52,7 @@
       "tick": 54,
       "time": 2.7,
       "nextId": 954,
-      "state": "0522bcdc",
+      "state": "fb602482",
       "events": "19a73f82",
       "rng": {
         "draws": 109,
@@ -72,6 +72,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "priest",
           "companionUpgrades": {},
           "counters": {},
@@ -169,6 +170,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
@@ -258,6 +260,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "priest",
           "companionUpgrades": {},
           "counters": {},
@@ -355,6 +358,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
@@ -446,6 +450,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "priest",
           "companionUpgrades": {},
           "counters": {},
@@ -994,7 +999,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 954,
-      "state": "aefbf834",
+      "state": "0350da86",
       "events": "77e11a3a",
       "rng": {
         "draws": 155,
@@ -1005,7 +1010,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 954,
-      "state": "e23750d6",
+      "state": "e263e358",
       "events": "741638a5",
       "rng": {
         "draws": 325,
@@ -1016,7 +1021,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 954,
-      "state": "43c6f222",
+      "state": "e8c53b84",
       "events": "741638a5",
       "rng": {
         "draws": 507,
@@ -1027,7 +1032,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 954,
-      "state": "ab376037",
+      "state": "4099d699",
       "events": "f1c21b51",
       "rng": {
         "draws": 716,
@@ -1038,7 +1043,7 @@
       "tick": 140,
       "time": 7,
       "nextId": 954,
-      "state": "932c1b91",
+      "state": "08c57dd3",
       "events": "f530a5ac",
       "rng": {
         "draws": 935,
@@ -1049,7 +1054,7 @@
       "tick": 160,
       "time": 8,
       "nextId": 954,
-      "state": "f3c72cbb",
+      "state": "91589fdd",
       "events": "f0d62920",
       "rng": {
         "draws": 1156,
@@ -1060,7 +1065,7 @@
       "tick": 180,
       "time": 9,
       "nextId": 954,
-      "state": "fffc834b",
+      "state": "73f09b4d",
       "events": "741638a5",
       "rng": {
         "draws": 1400,
@@ -1071,7 +1076,7 @@
       "tick": 200,
       "time": 10,
       "nextId": 954,
-      "state": "14309ed4",
+      "state": "2fb4a16a",
       "events": "e01794ce",
       "rng": {
         "draws": 1709,
@@ -1082,7 +1087,7 @@
       "tick": 220,
       "time": 11,
       "nextId": 954,
-      "state": "9a47aab7",
+      "state": "dbe7b6e1",
       "events": "97d0b2da",
       "rng": {
         "draws": 1864,
@@ -1093,7 +1098,7 @@
       "tick": 240,
       "time": 12,
       "nextId": 954,
-      "state": "47044f5f",
+      "state": "6044d329",
       "events": "741638a5",
       "rng": {
         "draws": 2031,
@@ -1104,7 +1109,7 @@
       "tick": 260,
       "time": 13,
       "nextId": 954,
-      "state": "a331e9a8",
+      "state": "e6e9d9b6",
       "events": "d1513eb6",
       "rng": {
         "draws": 2179,
@@ -1115,7 +1120,7 @@
       "tick": 280,
       "time": 14,
       "nextId": 954,
-      "state": "7e6a2361",
+      "state": "1c8670f3",
       "events": "40d4b345",
       "rng": {
         "draws": 2333,
@@ -1126,7 +1131,7 @@
       "tick": 300,
       "time": 15,
       "nextId": 954,
-      "state": "c46a5c96",
+      "state": "29baaff4",
       "events": "741638a5",
       "rng": {
         "draws": 2500,
@@ -1137,7 +1142,7 @@
       "tick": 301,
       "time": 15.05,
       "nextId": 954,
-      "state": "557662c8",
+      "state": "f36e916e",
       "events": "741638a5",
       "rng": {
         "draws": 2511,
@@ -1157,6 +1162,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "priest",
           "companionUpgrades": {},
           "counters": {
@@ -1257,6 +1263,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
@@ -1346,6 +1353,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "priest",
           "companionUpgrades": {},
           "counters": {
@@ -1446,6 +1454,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
@@ -1537,6 +1546,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "priest",
           "companionUpgrades": {},
           "counters": {
@@ -2234,7 +2244,7 @@
       "tick": 320,
       "time": 16,
       "nextId": 955,
-      "state": "2225b25b",
+      "state": "86957175",
       "events": "e745b65b",
       "rng": {
         "draws": 2692,
@@ -2245,7 +2255,7 @@
       "tick": 340,
       "time": 17,
       "nextId": 955,
-      "state": "c26b3700",
+      "state": "fb1e1c86",
       "events": "196f1170",
       "rng": {
         "draws": 2862,
@@ -2256,7 +2266,7 @@
       "tick": 360,
       "time": 18,
       "nextId": 955,
-      "state": "31a36d94",
+      "state": "043d48da",
       "events": "e66e92e6",
       "rng": {
         "draws": 3083,
@@ -2267,7 +2277,7 @@
       "tick": 380,
       "time": 19,
       "nextId": 955,
-      "state": "7feb237b",
+      "state": "bd41341d",
       "events": "f2f58d11",
       "rng": {
         "draws": 3277,
@@ -2278,7 +2288,7 @@
       "tick": 393,
       "time": 19.65,
       "nextId": 955,
-      "state": "d275a09b",
+      "state": "2249e15d",
       "events": "fafb052a",
       "rng": {
         "draws": 3408,
@@ -2298,6 +2308,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "priest",
           "companionUpgrades": {},
           "counters": {
@@ -2398,6 +2409,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
@@ -2487,6 +2499,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "priest",
           "companionUpgrades": {},
           "counters": {
@@ -2587,6 +2600,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
@@ -2678,6 +2692,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "priest",
           "companionUpgrades": {},
           "counters": {
@@ -3360,7 +3375,7 @@
       "tick": 393,
       "time": 19.65,
       "nextId": 955,
-      "state": "d275a09b",
+      "state": "2249e15d",
       "events": "741638a5",
       "rng": {
         "draws": 3408,
@@ -3380,6 +3395,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "priest",
           "companionUpgrades": {},
           "counters": {
@@ -3480,6 +3496,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
@@ -3569,6 +3586,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "priest",
           "companionUpgrades": {},
           "counters": {
@@ -3669,6 +3687,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
@@ -3760,6 +3779,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "priest",
           "companionUpgrades": {},
           "counters": {
