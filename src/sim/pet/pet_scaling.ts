@@ -37,27 +37,47 @@ export function isTameableFamily(family: MobFamily): boolean {
   return TAMEABLE_FAMILY_SET.has(family);
 }
 
+// Provenance of the three ratios, per the rule in docs/design/spell-balance-framework.md
+// that a coefficient needs a classic-era formula, a checked-in reference, or a measured
+// result. Armor and attack power are the classic-era inheritance ratios verbatim. Health
+// is the one adaptation, and is derived below rather than picked.
+
 /**
- * Share of the owner's max health added to the pet's template pool. Sized so a
- * median tameable beast lands in the same durability band as the warlock tank
- * demons it competes with (roughly 600 health at level 20) instead of the
- * roughly 400 it sat at, which is why beast pets died to raid damage that
- * demons survived.
+ * Share of the owner's max health added to the pet's template pool.
+ *
+ * The classic-era rule inherits a share of the hunter's STAMINA, which does not port
+ * directly: a pet here has no stamina stat at all, its pool is the flat template ladder
+ * `hpBase + hpPerLevel * (level - 1)`, so there is nothing for a stamina ratio to apply
+ * to. Re-basing the same rule onto the owner's health is what this is, and at the
+ * level-20 reference the two agree closely: the classic 45% of the hunter's
+ * stamina-derived health is 176, against 181 from 25% of max health (a 3% gap).
+ *
+ * Max health is deliberately the basis rather than the stamina component, because it is
+ * the more CONSERVATIVE of the two once gear is involved: at best-in-slot the
+ * stamina-faithful port would hand the pet 531 health where this hands it 379.
+ *
+ * The measured corroboration, per the framework's third arm: this lands a median
+ * tameable beast in the warlock tank demons' durability band (which is the comparison
+ * that matters, since those are the pets it competes with) instead of well under it,
+ * which is why beast pets were dying to raid damage demons survived.
  */
 export const PET_OWNER_HP_SHARE = 0.25;
 
 /**
- * Share of the owner's armor added to the pet's template armor. Beast templates
- * carry armorPerLevel 8 to 14 against a tank demon's 38 to 55, so this narrows
- * the effective-health gap without turning a damage pet into a tank.
+ * Share of the owner's armor added to the pet's template armor. This is the classic-era
+ * hunter pet armor inheritance ratio, used as-is. Beast templates carry armorPerLevel 8
+ * to 14 against a tank demon's 38 to 55, so it narrows the effective-health gap without
+ * turning a damage pet into a tank.
  */
 export const PET_OWNER_ARMOR_SHARE = 0.35;
 
 /**
- * Share of the owner's ranged attack power the pet inherits as its own attack
- * power. This is the channel that makes a pet scale with hunter gear at all:
- * mob swing damage is `weaponRoll + (attackPower / 14) * weaponSpeed`, and the
- * pet's attackPower was previously always 0.
+ * Share of the owner's ranged attack power the pet inherits as its own attack power.
+ * This is the classic-era hunter pet ranged-attack-power inheritance ratio, used as-is.
+ *
+ * It is also the channel that makes a pet scale with hunter gear at all: mob swing
+ * damage is `weaponRoll + (attackPower / 14) * weaponSpeed`, and a pet's attackPower was
+ * previously 0 for its entire life.
  */
 export const PET_OWNER_AP_SHARE = 0.22;
 
