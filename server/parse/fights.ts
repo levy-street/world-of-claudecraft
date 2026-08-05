@@ -60,9 +60,14 @@ export interface FightOpenOptions {
 export class OpenFight {
   readonly fightId: string;
   readonly surface: Surface;
+  readonly segment: Segment;
   readonly startedTick: number;
   /** Hostile npc ids seen fighting the participants (for boss-cast tracking). */
   readonly mobIds = new Set<number>();
+  /** The encounter's boss entity, for kill/reset classification; null = trash. */
+  primaryBossId: number | null = null;
+  /** Tick of the last event routed here; drives trash-segment quiet closes. */
+  lastRoutedTick: number;
   truncated = false;
 
   private readonly byCharacter = new Map<number, ParticipantAccum>();
@@ -76,7 +81,9 @@ export class OpenFight {
   ) {
     this.fightId = opts.fightId;
     this.surface = opts.surface;
+    this.segment = opts.segment;
     this.startedTick = opts.startedTick;
+    this.lastRoutedTick = opts.startedTick;
     for (const p of opts.participants) this.track(p);
     this.sink.enqueue({
       t: 'fight_open',
@@ -119,6 +126,7 @@ export class OpenFight {
       return;
     }
     this.eventCount++;
+    this.lastRoutedTick = tick;
     this.sink.enqueue({
       t: 'ev',
       fightId: this.fightId,

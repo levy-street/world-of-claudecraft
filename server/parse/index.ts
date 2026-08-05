@@ -1,6 +1,7 @@
 // Public surface of the parse-capture subsystem. game.ts calls exactly three
 // things: createParseSubsystem at boot, subsystem.observe(events) at the tick
 // drain, and subsystem.stop() at shutdown; main.ts registers the metrics.
+import { MOBS } from '../../src/sim/data';
 import type { SimEvent } from '../../src/sim/types';
 import type { FightParticipant, ParseEnv } from './contract';
 import { CONTRACT_VERSION } from './contract';
@@ -67,6 +68,10 @@ export function createParseSubsystem(opts: ParseSubsystemOptions): ParseSubsyste
     sink: shipper,
     counters,
     resolveParticipant: opts.resolveParticipant,
+    // Boss detection for dungeon/raid segmentation. Named mid-bosses without
+    // the template flag (see morthen's neighbour in content/dungeons.ts)
+    // segment as trash; the content pack can refine labeling at read time.
+    isBossTemplate: (templateId) => MOBS[templateId]?.boss === true,
   });
   console.log(
     `[parse] capture enabled (contract v${CONTRACT_VERSION}, env ${flags.envLabel}, surfaces ${[...flags.surfaces].join(',')})`,

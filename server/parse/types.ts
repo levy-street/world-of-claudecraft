@@ -9,12 +9,16 @@ export interface RecorderEntityView {
   id: number;
   templateId: string;
   level: number;
+  hp?: number;
+  maxHp?: number;
   dead?: boolean;
-  ownerId?: number | null;
   inCombat?: boolean;
+  ownerId?: number | null;
   castingAbility?: string | null;
+  castRemaining?: number;
   castTotal?: number;
   castTargetId?: number | null;
+  threat?: ReadonlyMap<number, number>;
   auras?: readonly { id: string; name: string; sourceId: number; stacks?: number }[];
 }
 
@@ -44,12 +48,40 @@ export interface BgMatchView {
   ratingAvg: [number, number];
 }
 
+export interface InstanceSlotView {
+  dungeonId: string;
+  difficulty: string;
+  slot: number;
+  partyKey: string | null;
+  mobIds: readonly number[];
+}
+
+export interface RiftInstanceView {
+  instanceId: number;
+  tier: string | null;
+  baseLevel: number;
+  floorIndex: number;
+  floorCount: number;
+  bossId: number | null;
+  outcome: string;
+  memberIds: ReadonlySet<number>;
+  portalId: number | null;
+}
+
+export interface RiftPortalView {
+  id: number;
+  zoneName: string;
+}
+
 /** The slice of Sim the recorder observes each tick. */
 export interface RecorderSim {
   tickCount: number;
   entities: ReadonlyMap<number, RecorderEntityView>;
   arenaMatches: ReadonlyMap<number, ArenaMatchView>;
   bgMatches: ReadonlyMap<number, BgMatchView>;
+  instances: readonly InstanceSlotView[];
+  riftInstances: readonly RiftInstanceView[];
+  naturalRiftPortals: readonly RiftPortalView[];
 }
 
 /** Wire-record consumer; the production sink is the BatchShipper. */
@@ -66,4 +98,6 @@ export interface SegmenterHost {
   resolveParticipant(pid: number): FightParticipant | null;
   nextFightId(): string;
   surfaceEnabled(surface: Surface): boolean;
+  /** Boss detection by mob template (MOBS boss flag in production). */
+  isBossTemplate(templateId: string): boolean;
 }

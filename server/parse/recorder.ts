@@ -1,17 +1,22 @@
 // The parse recorder: a passive per-tick observer at the server's event drain.
-// Segmenters open fights BEFORE events route and close them AFTER, so a fight
-// always receives its own first and last tick of events (an arena killing blow
-// lands in the same drained batch as the 'over' transition). One O(events)
-// pass; everything not touching an open fight's participants drops on the
-// first Map lookup. A budget breaker disables capture rather than ever
-// degrading the tick loop.
+// Segmenters open fights BEFORE events route and close them AFTER (via
+// PendingClose intents), so a fight always receives its own first and last
+// tick of events: an arena killing blow lands in the same drained batch as the
+// 'over' transition, and a boss kill lands in the same batch as the death.
+// Dungeon/raid fights are additionally EVENT-opened: the first player-vs-
+// instance-mob damage with no claiming fight asks the dungeon segmenter to
+// open one mid-routing. One O(events) pass; everything not touching an open
+// fight drops on the first Map lookup. A budget breaker disables capture
+// rather than ever degrading the tick loop.
 import type { SimEvent } from '../../src/sim/types';
 import { ArenaSegmenter } from './arena';
 import { BattlegroundSegmenter } from './battleground';
+import { BossCastSynthesizer } from './boss_casts';
 import type { EventEnrichment, FightParticipant, Surface } from './contract';
-import type { ParseCounters } from './counters';
 import type { ParseFlags } from './flags';
 import type { OpenFight, PendingClose } from './fights';
+import { DungeonSegmenter } from './instances';
+import { RiftSegmenter } from './rifts';
 import type { RecorderSim, RecordSink, SegmenterHost } from './types';
 
 /** A single observe() pass above this cost is a budget strike. */
@@ -21,12 +26,16 @@ const BUDGET_STRIKES_TO_DISABLE = 3;
 /** Defensive bound on tracked hostile npcs per fight. */
 const MAX_TRACKED_MOBS_PER_FIGHT = 256;
 
+const PVE_SURFACES: ReadonlySet<Surface> = new Set(['raid', 'dungeon', 'rift']);
+
 export interface ParseRecorderOptions {
   flags: ParseFlags;
   sim: RecorderSim;
   sink: RecordSink;
-  counters: ParseCounters;
+  counters: SegmenterHost['counters'];
   resolveParticipant: (pid: number) => FightParticipant | null;
+  /** Boss detection by mob template; production wires the MOBS boss flag. */
+  isBossTemplate?: (templateId: string) => boolean;
   /** Injectable for deterministic golden tests. */
   idFactory?: () => string;
   /** Injectable monotonic ms clock; defaults to performance.now. */
@@ -36,7 +45,11 @@ export interface ParseRecorderOptions {
 export class ParseRecorder {
   private readonly arena = new ArenaSegmenter();
   private readonly battleground = new BattlegroundSegmenter();
+  private readonly dungeons = new DungeonSegmenter();
+  private readonly rifts = new RiftSegmenter();
+  private readonly bossCasts = new BossCastSynthesizer();
   private readonly fightsByEntity = new Map<number, OpenFight>();
+  private readonly fightsByMob = new Map<number, OpenFight>();
   private readonly openFights = new Set<OpenFight>();
   private readonly host: SegmenterHost;
   private readonly clock: () => number;
@@ -56,6 +69,7 @@ export class ParseRecorder {
       resolveParticipant: opts.resolveParticipant,
       nextFightId: idFactory,
       surfaceEnabled: (surface: Surface) => opts.flags.surfaces.has(surface),
+      isBossTemplate: opts.isBossTemplate ?? (() => false),
     };
   }
 
@@ -73,22 +87,17 @@ export class ParseRecorder {
 
     this.arena.observe(this.host, tick, opened, closing);
     this.battleground.observe(this.host, tick, opened, closing);
+    this.dungeons.observe(this.host, tick, opened, closing);
+    this.rifts.observe(this.host, tick, opened, closing);
+    for (const fight of opened) this.indexFight(fight);
 
-    for (const fight of opened) {
-      this.openFights.add(fight);
-      for (const entityId of fight.participantEntityIds()) {
-        this.fightsByEntity.set(entityId, fight);
-      }
-    }
-
-    if (this.openFights.size > 0 && events.length > 0) this.routeEvents(events, tick);
+    if (events.length > 0) this.routeEvents(events, tick, closing);
+    this.bossCasts.observe(this.host, tick, this.openFights);
 
     for (const { fight, outcome } of closing) {
+      if (!this.openFights.has(fight)) continue;
       fight.close(tick, outcome);
-      this.openFights.delete(fight);
-      for (const entityId of fight.participantEntityIds()) {
-        if (this.fightsByEntity.get(entityId) === fight) this.fightsByEntity.delete(entityId);
-      }
+      this.deindexFight(fight);
     }
     this.opts.counters.fightsOpen = this.openFights.size;
 
@@ -106,10 +115,33 @@ export class ParseRecorder {
   /** Final flush is the shipper's job; the recorder just closes open fights. */
   stop(): void {
     const tick = this.opts.sim.tickCount;
-    for (const fight of this.openFights) fight.close(tick, 'reset');
+    for (const fight of this.openFights) {
+      fight.close(tick, 'reset');
+      this.bossCasts.release(fight);
+    }
     this.openFights.clear();
     this.fightsByEntity.clear();
+    this.fightsByMob.clear();
     this.opts.counters.fightsOpen = 0;
+  }
+
+  private indexFight(fight: OpenFight): void {
+    this.openFights.add(fight);
+    for (const entityId of fight.participantEntityIds()) {
+      this.fightsByEntity.set(entityId, fight);
+    }
+    for (const mobId of fight.mobIds) this.fightsByMob.set(mobId, fight);
+  }
+
+  private deindexFight(fight: OpenFight): void {
+    this.openFights.delete(fight);
+    this.bossCasts.release(fight);
+    for (const entityId of fight.participantEntityIds()) {
+      if (this.fightsByEntity.get(entityId) === fight) this.fightsByEntity.delete(entityId);
+    }
+    for (const mobId of fight.mobIds) {
+      if (this.fightsByMob.get(mobId) === fight) this.fightsByMob.delete(mobId);
+    }
   }
 
   private tripBreaker(tick: number): void {
@@ -118,16 +150,20 @@ export class ParseRecorder {
     console.error(
       `[parse] budget breaker tripped (${BUDGET_STRIKES_TO_DISABLE} ticks over ${BUDGET_HARD_MS}ms): capture disabled until restart`,
     );
-    for (const fight of this.openFights) fight.close(tick, 'reset');
+    for (const fight of this.openFights) {
+      fight.close(tick, 'reset');
+      this.bossCasts.release(fight);
+    }
     this.openFights.clear();
     this.fightsByEntity.clear();
+    this.fightsByMob.clear();
   }
 
-  private routeEvents(events: readonly SimEvent[], tick: number): void {
+  private routeEvents(events: readonly SimEvent[], tick: number, closing: PendingClose[]): void {
     for (const ev of events) {
       switch (ev.type) {
         case 'damage':
-          this.routeDamage(ev, tick);
+          this.routeDamage(ev, tick, closing);
           break;
         case 'heal2':
           if (ev.cueOnly !== true) this.routeHeal2(ev, tick);
@@ -155,28 +191,89 @@ export class ParseRecorder {
     }
   }
 
-  /** The fight an entity belongs to, resolving pets through their owner. */
+  /** A pet's owner entity id, or the id itself for everything else. */
+  private ownerResolved(entityId: number): number {
+    const ownerId = this.opts.sim.entities.get(entityId)?.ownerId;
+    return ownerId !== undefined && ownerId !== null ? ownerId : entityId;
+  }
+
+  /** The fight an entity belongs to: participant, pet-of-participant, or
+   * tracked hostile mob, in that order. */
   private fightFor(entityId: number): { fight: OpenFight; ownerId: number | null } | null {
     const direct = this.fightsByEntity.get(entityId);
     if (direct !== undefined) return { fight: direct, ownerId: null };
-    const entity = this.opts.sim.entities.get(entityId);
-    const ownerId = entity?.ownerId;
+    const ownerId = this.opts.sim.entities.get(entityId)?.ownerId;
     if (ownerId !== undefined && ownerId !== null) {
       const viaOwner = this.fightsByEntity.get(ownerId);
       if (viaOwner !== undefined) return { fight: viaOwner, ownerId };
     }
+    const viaMob = this.fightsByMob.get(entityId);
+    if (viaMob !== undefined) return { fight: viaMob, ownerId: null };
     return null;
   }
 
-  private routeDamage(ev: SimEvent & { type: 'damage' }, tick: number): void {
+  /** PvE fights accept players discovered mid-fight as late joins. */
+  private ensureParticipant(fight: OpenFight, entityId: number, tick: number): void {
+    if (!PVE_SURFACES.has(fight.surface)) return;
+    const resolved = this.ownerResolved(entityId);
+    if (fight.hasEntity(resolved)) return;
+    const participant = this.host.resolveParticipant(resolved);
+    if (participant === null) return;
+    fight.addLateJoin(tick, participant);
+    this.fightsByEntity.set(resolved, fight);
+  }
+
+  private routeDamage(
+    ev: SimEvent & { type: 'damage' },
+    tick: number,
+    closing: PendingClose[],
+  ): void {
     const bySource = this.fightFor(ev.sourceId);
-    const match = bySource ?? this.fightFor(ev.targetId);
-    if (match === null) return;
-    const { fight } = match;
+    let match = bySource ?? this.fightFor(ev.targetId);
+    let sourceOwnerId = bySource?.ownerId ?? null;
+    if (match === null) {
+      const opened = this.dungeons.onUnroutedCombat(
+        this.host,
+        tick,
+        this.ownerResolved(ev.sourceId),
+        this.ownerResolved(ev.targetId),
+        closing,
+      );
+      if (opened === null) return;
+      this.indexFight(opened);
+      const sourceOwner = this.ownerResolved(ev.sourceId);
+      sourceOwnerId = sourceOwner !== ev.sourceId && opened.hasEntity(sourceOwner) ? sourceOwner : null;
+      match = { fight: opened, ownerId: sourceOwnerId };
+    }
+    let fight = match.fight;
+    // A boss pull during an open trash segment routes here via the participant
+    // index; escalate so the boss fight becomes its own segment.
+    if (fight.segment === 'trash') {
+      const src = this.opts.sim.entities.get(ev.sourceId);
+      const tgt = this.opts.sim.entities.get(ev.targetId);
+      const bossInvolved =
+        (src !== undefined && this.host.isBossTemplate(src.templateId)) ||
+        (tgt !== undefined && this.host.isBossTemplate(tgt.templateId));
+      if (bossInvolved) {
+        const escalated = this.dungeons.onUnroutedCombat(
+          this.host,
+          tick,
+          this.ownerResolved(ev.sourceId),
+          this.ownerResolved(ev.targetId),
+          closing,
+        );
+        if (escalated !== null && escalated !== fight) {
+          this.indexFight(escalated);
+          fight = escalated;
+        }
+      }
+    }
+    this.ensureParticipant(fight, ev.sourceId, tick);
+    this.ensureParticipant(fight, ev.targetId, tick);
     const enrichment: EventEnrichment | undefined =
-      bySource !== null && bySource.ownerId !== null ? { ownerId: bySource.ownerId } : undefined;
+      sourceOwnerId !== null ? { ownerId: sourceOwnerId } : undefined;
     fight.recordEvent(tick, ev as Record<string, unknown>, enrichment);
-    const creditSource = bySource !== null && bySource.ownerId !== null ? bySource.ownerId : ev.sourceId;
+    const creditSource = sourceOwnerId ?? ev.sourceId;
     fight.noteDamage(tick, creditSource, ev.targetId, ev.amount, ev.absorbed ?? 0);
     this.trackMob(fight, ev.sourceId);
     this.trackMob(fight, ev.targetId);
@@ -187,16 +284,19 @@ export class ParseRecorder {
     const match = bySource ?? this.fightFor(ev.targetId);
     if (match === null) return;
     const { fight } = match;
+    this.ensureParticipant(fight, ev.sourceId, tick);
+    this.ensureParticipant(fight, ev.targetId, tick);
+    const sourceOwnerId = bySource?.ownerId ?? null;
     const enrichment: EventEnrichment | undefined =
-      bySource !== null && bySource.ownerId !== null ? { ownerId: bySource.ownerId } : undefined;
+      sourceOwnerId !== null ? { ownerId: sourceOwnerId } : undefined;
     fight.recordEvent(tick, ev as Record<string, unknown>, enrichment);
-    const creditSource = bySource !== null && bySource.ownerId !== null ? bySource.ownerId : ev.sourceId;
+    const creditSource = sourceOwnerId ?? ev.sourceId;
     const overheal = (ev as { overheal?: number }).overheal ?? 0;
     fight.noteHeal(tick, creditSource, ev.amount, overheal);
   }
 
   private routeAura(ev: SimEvent & { type: 'aura' }, tick: number): void {
-    const fight = this.fightsByEntity.get(ev.targetId);
+    const fight = this.fightsByEntity.get(ev.targetId) ?? this.fightsByMob.get(ev.targetId);
     if (fight === undefined) return;
     let enrichment: EventEnrichment | undefined;
     if (ev.gained) {
@@ -234,6 +334,10 @@ export class ParseRecorder {
     const entity = this.opts.sim.entities.get(entityId);
     if (entity === undefined) return;
     if (entity.ownerId !== undefined && entity.ownerId !== null) return;
+    // Players in a PvE fight late-join as participants; anything else with no
+    // owner engaged here is a hostile npc.
+    if (this.host.resolveParticipant(entityId) !== null) return;
     fight.mobIds.add(entityId);
+    this.fightsByMob.set(entityId, fight);
   }
 }

@@ -5,8 +5,11 @@ import { ParseRecorder } from '../server/parse/recorder';
 import type {
   ArenaMatchView,
   BgMatchView,
+  InstanceSlotView,
   RecorderEntityView,
   RecorderSim,
+  RiftInstanceView,
+  RiftPortalView,
 } from '../server/parse/types';
 import type { FightParticipant } from '../server/parse/contract';
 import type { SimEvent } from '../src/sim/types';
@@ -16,6 +19,9 @@ interface FakeSim extends RecorderSim {
   entities: Map<number, RecorderEntityView>;
   arenaMatches: Map<number, ArenaMatchView>;
   bgMatches: Map<number, BgMatchView>;
+  instances: InstanceSlotView[];
+  riftInstances: RiftInstanceView[];
+  naturalRiftPortals: RiftPortalView[];
 }
 
 function fakeSim(): FakeSim {
@@ -24,6 +30,9 @@ function fakeSim(): FakeSim {
     entities: new Map(),
     arenaMatches: new Map(),
     bgMatches: new Map(),
+    instances: [],
+    riftInstances: [],
+    naturalRiftPortals: [],
   };
 }
 
@@ -74,7 +83,9 @@ function makeRecorder(sim: FakeSim, clock?: () => number) {
   return { recorder, records, counters };
 }
 
-function arenaMatch(overrides: Partial<ArenaMatchView> = {}): ArenaMatchView {
+type MutableArenaMatch = Omit<ArenaMatchView, 'defeated'> & { defeated: Set<number> };
+
+function arenaMatch(overrides: Partial<MutableArenaMatch> = {}): MutableArenaMatch {
   return {
     id: 1,
     format: '2v2',
@@ -88,7 +99,7 @@ function arenaMatch(overrides: Partial<ArenaMatchView> = {}): ArenaMatchView {
   };
 }
 
-function seedArena(sim: FakeSim, match: ArenaMatchView): void {
+function seedArena(sim: FakeSim, match: MutableArenaMatch): void {
   for (const pid of [...match.teamA, ...match.teamB]) sim.entities.set(pid, player(pid));
   // The live map is pid -> shared match object for every member.
   for (const pid of [...match.teamA, ...match.teamB]) sim.arenaMatches.set(pid, match);
