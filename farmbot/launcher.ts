@@ -164,8 +164,10 @@ function handleStart(res: ServerResponse, body: Record<string, unknown>): void {
     return;
   }
   let parsed: FarmBotConfig;
+  let assembled: Record<string, unknown>;
   try {
-    parsed = parseConfig(assembleConfig(config as LauncherFormConfig));
+    assembled = assembleConfig(config as LauncherFormConfig) as Record<string, unknown>;
+    parsed = parseConfig(assembled);
   } catch (err) {
     json(res, 400, { error: (err as Error).message });
     return;
@@ -175,8 +177,12 @@ function handleStart(res: ServerResponse, body: Record<string, unknown>): void {
     return;
   }
 
+  // Write the ASSEMBLED (pre-parse) config, never the parseConfig output:
+  // the output object always materializes defaults like target.itemId '',
+  // which the bot's own parseConfig pass rejects as present-but-empty
+  // (parseConfig output is not valid parseConfig input).
   childConfigPath = join(tmpdir(), `farmbot-config-${process.pid}-${Date.now()}.json`);
-  writeFileSync(childConfigPath, JSON.stringify(parsed, null, 2), 'utf8');
+  writeFileSync(childConfigPath, JSON.stringify(assembled, null, 2), 'utf8');
 
   const proc = spawn(process.execPath, [BOT_BUNDLE, '--config', childConfigPath], {
     env: { ...process.env, WOC_USERNAME: username, WOC_PASSWORD: password },

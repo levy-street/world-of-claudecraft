@@ -390,14 +390,19 @@ export function parseConfig(json: unknown): FarmBotConfig {
   if (fishing.spots.length === 0 && fishing.spot) fishing.spots = [fishing.spot];
   if (fishing.spot === undefined && fishing.spots.length > 0) fishing.spot = fishing.spots[0];
 
-  // mode supersedes the legacy fishing.enabled flag. When exactly one of the
-  // two is written, the other is derived from it; when both are written, mode
-  // wins; when neither is written, the legacy default (no fishing) holds.
+  // mode and the legacy fishing.enabled flag: when exactly one of the two is
+  // written, the other is derived from it; when both are written, BOTH are
+  // respected ('gather' still never fishes and 'fish' always fishes via the
+  // brain's mode gate; 'gather-fish' consults enabled). Respecting both keeps
+  // parseConfig output (which always carries the pair) re-parseable, and
+  // stops a serialized 'gather-fish' + enabled:false config from having
+  // fishing silently switched on. When neither is written, the legacy
+  // default (no fishing) holds.
   let mode: FarmMode;
   if (json.mode !== undefined) {
     if (typeof json.mode === 'string' && (FARM_MODES as readonly string[]).includes(json.mode)) {
       mode = json.mode as FarmMode;
-      fishing.enabled = mode !== 'gather';
+      if (!fishingEnabledExplicit) fishing.enabled = mode !== 'gather';
     } else {
       errors.push(`mode: must be ${FARM_MODES.join('|')}`);
       mode = fishing.enabled ? 'gather-fish' : 'gather';
@@ -776,8 +781,12 @@ export function parseConfig(json: unknown): FarmBotConfig {
         errors,
       );
       if (json.target.itemId !== undefined) {
+        // '' means unset (the value parseConfig itself emits as a default),
+        // so a serialized config round-trips; the mode-gate below catches
+        // target mode without a material.
         if (isNonEmptyString(json.target.itemId)) target.itemId = json.target.itemId;
-        else errors.push('target.itemId: must be a non-empty string');
+        else if (json.target.itemId !== '')
+          errors.push('target.itemId: must be a non-empty string');
       }
       if (json.target.goal !== undefined) {
         if (isNonNegativeInt(json.target.goal)) target.goal = json.target.goal;

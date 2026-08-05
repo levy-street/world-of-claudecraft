@@ -143,6 +143,21 @@ describe('farmbot parseConfig', () => {
     ).toThrow(/target\.mailToWhenDone/);
   });
 
+  it('round-trips: parseConfig output is valid parseConfig input', () => {
+    // The launcher serializes a parsed config for the bot process; a default
+    // target.itemId '' must read back as unset, not as a validation error.
+    for (const input of [
+      VALID,
+      { ...VALID, mode: 'gold' },
+      { ...VALID, mode: 'level' },
+      { ...VALID, mode: 'target', target: { itemId: 'raw_marsh_pike', goal: 5 } },
+    ]) {
+      const once = parseConfig(input);
+      const twice = parseConfig(JSON.parse(JSON.stringify(once)));
+      expect(twice).toEqual(once);
+    }
+  });
+
   it('accepts the outnumbered/both flee values and a custom maxPullSize', () => {
     expect(parseConfig({ ...VALID, combat: { flee: 'outnumbered' } }).combat.flee).toBe(
       'outnumbered',
@@ -211,10 +226,16 @@ describe('farmbot parseConfig', () => {
     const legacyOff = parseConfig({ ...VALID, fishing: { enabled: false } });
     expect(legacyOff.mode).toBe('gather');
     expect(legacyOff.fishing.enabled).toBe(false);
-    // mode written: it supersedes the flag entirely
-    const modeWins = parseConfig({ ...VALID, mode: 'gather', fishing: { enabled: true } });
-    expect(modeWins.mode).toBe('gather');
-    expect(modeWins.fishing.enabled).toBe(false);
+    // mode written alone: the flag is derived from it
+    const modeOnly = parseConfig({ ...VALID, mode: 'gather' });
+    expect(modeOnly.mode).toBe('gather');
+    expect(modeOnly.fishing.enabled).toBe(false);
+    // both written: both are respected (the brain's mode gate still makes
+    // 'gather' never fish); keeping the flag makes serialized configs
+    // re-parseable
+    const both = parseConfig({ ...VALID, mode: 'gather', fishing: { enabled: true } });
+    expect(both.mode).toBe('gather');
+    expect(both.fishing.enabled).toBe(true);
     // fish-only mode
     const fishOnly = parseConfig({ ...VALID, mode: 'fish' });
     expect(fishOnly.fishing.enabled).toBe(true);
