@@ -162,20 +162,22 @@ CAST = {
         ],
         "weapons": [
             {"url": "weapons/adv_sword_1handed.glb", "bone": "handslot.r",
-             # Carried on the PLAIN family grip, the same one every other sword in the
-             # cast uses and the same one the game gives a warrior: `VisualDef.attach`
-             # mounts a one-hander with a bare bone attach and no aiming rotation, so a
-             # bespoke rotation here made the book disagree with the thing it documents.
+             # CORRECTION (2026-08-05): the claim this comment used to make, that
+             # `VisualDef.attach` mounts a one-hander with a bare bone attach and
+             # no aiming rotation, is FALSE, and building the book's mounts on it
+             # shipped the whole cast holding swords by the blade root. The engine
+             # seats every held model through real grip transforms (`applyHandGrip`
+             # / `applyVariantGrip` in `src/render/characters/assets.ts`), and this
+             # model is itself misrouted there (`adv_sword_1handed` sits in the
+             # VAR_SWORD accessory row but is KayKit-family geometry, so the game
+             # seats it across the wrist).
              #
-             # An earlier pass aimed it instead (35 degrees below horizontal, swung
-             # outboard past his hip) to keep the point off the floor, because his hand
-             # sits 0.628 up and the blade is 1.28 long at this scale. That bought a
-             # clean tip at the cost of reading like a walking cane from every angle,
-             # which is the note that came back. The tip is the lesser problem: take the
-             # normal grip and let the carry match the class.
-             #
-             # Only the SIZE UP is kept from that pass (scale over the family 0.62), and
-             # it is characterisation rather than fit: see `why` below.
+             # The shipped book renders no longer come from this entry: they carry
+             # hand-authored seats, captured from a live Blender review pass and
+             # gated across all four clips. The seats, the failure catalog, and
+             # the authoring protocol live in
+             # `docs/design/last-bell-held-prop-workflow.md`. Regenerating the
+             # book from this entry WILL regress it until those seats are baked in.
              "grip": "blade", "tune": {"scale": 0.72},
              "why": "A big plain arming sword, town-forged: no fuller, no maker's mark, nothing on it a guild would sign. Carried a size up on the family grip so it reads heavier than the warden's, which is the one place his kit is not the poorer of the two."},
         ],
