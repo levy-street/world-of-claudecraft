@@ -2611,6 +2611,10 @@ async function startGame(
       ),
     prewarmRenderer: async (next) => {
       await next.prewarmInitialScene();
+      // Same law as the boot gate: the rebuilt renderer's far grid built
+      // eagerly behind this opaque curtain; hold (bounded) so the commit
+      // reveals a finished horizon instead of easing the fog out on screen.
+      await next.farVistaReady();
     },
     validateRenderer: (next) => {
       next.sync(1, 0, null, 0, null);
@@ -4558,6 +4562,17 @@ async function startGame(
       console.warn('Armory preview prewarm failed', err);
     }
   }
+  // The far vista has been building eagerly since the renderer was
+  // constructed, overlapping every asset wait above. Hold the curtain
+  // (bounded) until the grid can stand in for the fog, so the first visible
+  // frame carries the finished horizon; without this gate a loaded
+  // production boot starves the build and the fog lifts tens of seconds
+  // into play. On timeout the classic eased flip covers it, as before.
+  const farVistaReady = await renderer.farVistaReady();
+  entryDiagnostics.checkpoint('far-vista-ready', {
+    ...renderEntryDiagnostics(),
+    farVistaReady,
+  });
   setLoadingPercent(100, t('loading.enteringWorld'));
   await nextPaint();
   last = performance.now();

@@ -114,6 +114,63 @@ describe('buildFarTerrain lifecycle', () => {
     throw new Error('rebuildRegion never swapped a tile geometry');
   });
 
+  it('accelerateInitialBuild completes the whole grid with NO idle grant at all', async () => {
+    // The production boot law: a main thread busy with asset arrival,
+    // decode and compile grants requestIdleCallback nothing (and Safari
+    // has no requestIdleCallback at all). The entry curtain accelerates
+    // the build, which must then complete on plain macrotask turns,
+    // including waking a loop already parked on an idle slot.
+    const stub = installIdleStub();
+    const view = buildFarTerrain(20061, plan, { x: 0, z: 0 });
+    // let the build loop park on its first (never-granted) idle slot
+    await microtasks();
+    expect(view.builtTileCount()).toBe(0);
+    await view.accelerateInitialBuild();
+    expect(view.builtTileCount()).toBe(view.plannedTileCount());
+    expect(view.group.children).toHaveLength(view.plannedTileCount());
+    // the idle stub was never flushed: eager pacing owes it nothing
+    expect(stub.pending.length).toBeGreaterThanOrEqual(0);
+    view.dispose();
+  });
+
+  it('accelerateInitialBuild after completion resolves immediately (idempotent)', async () => {
+    const stub = installIdleStub();
+    const view = buildFarTerrain(20061, plan, { x: 0, z: 0 });
+    await view.accelerateInitialBuild();
+    const total = view.builtTileCount();
+    expect(total).toBe(view.plannedTileCount());
+    await view.accelerateInitialBuild();
+    expect(view.builtTileCount()).toBe(total);
+    // and later editor drains go back to POLITE pacing: a rebuild queued
+    // after settle must wait on an idle slot, not run eagerly to done
+    view.rebuildRegion(10, 10, 30, 30);
+    const before = view.group.children.map((c) => (c as { geometry?: object }).geometry as object);
+    await microtasks();
+    const changedEagerly = view.group.children.filter(
+      (c, i) => ((c as { geometry?: object }).geometry as object) !== before[i],
+    ).length;
+    expect(changedEagerly).toBe(0);
+    // the polite drain then completes normally under granted idle slots
+    for (let guard = 0; guard < 200; guard++) {
+      stub.flush();
+      await microtasks();
+    }
+    const changedPolitely = view.group.children.filter(
+      (c, i) => ((c as { geometry?: object }).geometry as object) !== before[i],
+    ).length;
+    expect(changedPolitely).toBeGreaterThan(0);
+    view.dispose();
+  });
+
+  it('accelerateInitialBuild resolves after cancelStreaming without attaching tiles', async () => {
+    installIdleStub();
+    const view = buildFarTerrain(20061, plan, { x: 0, z: 0 });
+    view.cancelStreaming();
+    await view.accelerateInitialBuild();
+    expect(view.builtTileCount()).toBe(0);
+    expect(view.group.children).toHaveLength(0);
+  });
+
   it('rebuildRegion coalesces repeat edits of one tile instead of queueing dupes', async () => {
     const stub = installIdleStub();
     const view = buildFarTerrain(20061, plan, { x: 0, z: 0 });

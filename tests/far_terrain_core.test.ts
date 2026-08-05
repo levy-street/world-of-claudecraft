@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
+  advanceWithinBudget,
   CLASSIC_CAMERA_FAR,
   createFarShortfallSampler,
   createFarTileBuilder,
@@ -455,6 +456,56 @@ describe('createFarShortfallSampler: session-scoped, never a stale surface', () 
     const freshB = createFarShortfallSampler(seed, 10, -1000, -1000).shortfall(at.x, at.z, baseY);
     expect(sb).toBeCloseTo(freshB, 10);
     expect(Math.abs(sa - sb)).toBeGreaterThan(1e-9);
+  });
+});
+
+describe('advanceWithinBudget: bounded time bites with guaranteed progress', () => {
+  it('completes when the work finishes inside the budget', () => {
+    let steps = 0;
+    const done = advanceWithinBudget(
+      () => {
+        steps++;
+        return steps >= 3;
+      },
+      100,
+      () => 0, // the clock never moves: only completion can stop the loop
+    );
+    expect(done).toBe(true);
+    expect(steps).toBe(3);
+  });
+
+  it('stops once the clock passes the budget, reporting incomplete', () => {
+    let steps = 0;
+    let clock = 0;
+    const done = advanceWithinBudget(
+      () => {
+        steps++;
+        clock += 4; // each step costs 4ms
+        return false;
+      },
+      10,
+      () => clock,
+    );
+    expect(done).toBe(false);
+    // 4ms, 8ms (under 10), then 12ms trips the budget after the third step
+    expect(steps).toBe(3);
+  });
+
+  it('a zero budget still advances exactly one step: progress NEVER depends on the host granting time', () => {
+    // The production law: a saturated main thread (or a scheduler that
+    // reports no idle budget at all) must still move the build forward,
+    // or the far grid parks behind the idle policy for tens of seconds.
+    let steps = 0;
+    const done = advanceWithinBudget(
+      () => {
+        steps++;
+        return false;
+      },
+      0,
+      () => 5, // clock already past any budget before the first step
+    );
+    expect(done).toBe(false);
+    expect(steps).toBe(1);
   });
 });
 
