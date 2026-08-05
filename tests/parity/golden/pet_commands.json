@@ -147,7 +147,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 948,
-      "state": "3580475d",
+      "state": "89c0260b",
       "events": "1c683304",
       "rng": {
         "draws": 0,
@@ -268,6 +268,7 @@
         },
         {
           "aiState": "idle",
+          "attackPower": 26,
           "combatTimer": 99,
           "comboUntil": -1,
           "critChance": 0.05,
@@ -275,17 +276,18 @@
           "dodgeChance": 0.05,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
-          "hp": 194,
+          "hp": 12694,
           "id": 947,
           "kind": "mob",
           "level": 12,
           "lootFfaTimer": "Infinity",
-          "maxHp": 194,
+          "maxHp": 12694,
           "moveSpeed": 8,
           "onGround": true,
           "overpowerUntil": -1,
           "ownerId": 941,
           "petMode": "passive",
+          "petOwnerHpBonus": 12500,
           "pos": {
             "x": 4,
             "y": 1.5,
@@ -298,7 +300,7 @@
             "z": -1
           },
           "stats": {
-            "armor": 110
+            "armor": 202
           },
           "templateId": "forest_wolf",
           "weapon": {
@@ -313,7 +315,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 948,
-      "state": "7a148a27",
+      "state": "dde3bdf1",
       "events": "c95608a6",
       "rng": {
         "draws": 0,
@@ -434,6 +436,7 @@
         },
         {
           "aiState": "idle",
+          "attackPower": 26,
           "auras": [
             {
               "duration": 5,
@@ -455,17 +458,18 @@
           "dodgeChance": 0.05,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
-          "hp": 97,
+          "hp": 6347,
           "id": 947,
           "kind": "mob",
           "level": 12,
           "lootFfaTimer": "Infinity",
-          "maxHp": 194,
+          "maxHp": 12694,
           "moveSpeed": 8,
           "onGround": true,
           "overpowerUntil": -1,
           "ownerId": 941,
           "petMode": "defensive",
+          "petOwnerHpBonus": 12500,
           "pos": {
             "x": 4,
             "y": 1.5,
@@ -478,7 +482,7 @@
             "z": -1
           },
           "stats": {
-            "armor": 110
+            "armor": 202
           },
           "templateId": "forest_wolf",
           "weapon": {
@@ -493,7 +497,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 948,
-      "state": "0f2c2480",
+      "state": "1f7ada89",
       "events": "4ea5dca7",
       "rng": {
         "draws": 0,
@@ -504,7 +508,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 948,
-      "state": "df1aa4fe",
+      "state": "a9596317",
       "events": "95fddaa3",
       "rng": {
         "draws": 0,
@@ -515,7 +519,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 949,
-      "state": "2b8ed5de",
+      "state": "d1d8b54f",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -655,6 +659,7 @@
         {
           "aggroTargetId": 948,
           "aiState": "idle",
+          "attackPower": 26,
           "auras": [
             {
               "duration": 5,
@@ -675,18 +680,19 @@
           "dodgeChance": 0.05,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
-          "hp": 127,
+          "hp": 6627,
           "id": 947,
           "inCombat": true,
           "kind": "mob",
           "level": 12,
           "lootFfaTimer": "Infinity",
-          "maxHp": 194,
+          "maxHp": 12694,
           "moveSpeed": 8,
           "onGround": true,
           "overpowerUntil": -1,
           "ownerId": 941,
           "petMode": "defensive",
+          "petOwnerHpBonus": 12500,
           "petTauntTimer": 10,
           "pos": {
             "x": 4,
@@ -700,7 +706,7 @@
             "z": -1
           },
           "stats": {
-            "armor": 110
+            "armor": 202
           },
           "templateId": "forest_wolf",
           "weapon": {
@@ -974,7 +980,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 951,
-      "state": "a78d878f",
+      "state": "cef690d5",
       "events": "f7115cd5",
       "rng": {
         "draws": 0,
@@ -1169,6 +1175,7 @@
         },
         {
           "aiState": "idle",
+          "attackPower": 26,
           "combatTimer": 99,
           "comboUntil": -1,
           "critChance": 0.05,
@@ -1181,12 +1188,13 @@
           "kind": "mob",
           "level": 12,
           "lootFfaTimer": "Infinity",
-          "maxHp": 194,
+          "maxHp": 12694,
           "moveSpeed": 8,
           "onGround": true,
           "overpowerUntil": -1,
           "ownerId": 941,
           "petMode": "defensive",
+          "petOwnerHpBonus": 12500,
           "pos": {
             "x": 4,
             "y": 1.5,
@@ -1199,7 +1207,7 @@
             "z": -1
           },
           "stats": {
-            "armor": 110
+            "armor": 202
           },
           "templateId": "forest_wolf",
           "weapon": {
@@ -1214,7 +1222,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 951,
-      "state": "570af68b",
+      "state": "a8ecabfa",
       "events": "2e74fa1c",
       "rng": {
         "draws": 0,
@@ -1409,6 +1417,7 @@
         },
         {
           "aiState": "idle",
+          "attackPower": 26,
           "combatTimer": 99,
           "comboUntil": -1,
           "critChance": 0.05,
@@ -1416,17 +1425,18 @@
           "dodgeChance": 0.05,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
-          "hp": 68,
+          "hp": 4443,
           "id": 950,
           "kind": "mob",
           "level": 12,
           "lootFfaTimer": "Infinity",
-          "maxHp": 194,
+          "maxHp": 12694,
           "moveSpeed": 8,
           "onGround": true,
           "overpowerUntil": -1,
           "ownerId": 941,
           "petMode": "defensive",
+          "petOwnerHpBonus": 12500,
           "pos": {
             "x": 4,
             "y": 1.5,
@@ -1439,7 +1449,7 @@
             "z": -1
           },
           "stats": {
-            "armor": 110
+            "armor": 202
           },
           "templateId": "forest_wolf",
           "weapon": {
