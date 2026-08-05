@@ -82,6 +82,14 @@ import {
 } from '../src/sim/types';
 import type { FarmBotConfig } from './config';
 import {
+  defaultGrindTables,
+  type GrindCamp,
+  type GrindTables,
+  nextLevelZoneId,
+  pickCamp,
+  zoneCampsFor,
+} from './grind_circuits';
+import {
   distance,
   distance2,
   type NavPos,
@@ -112,6 +120,10 @@ export interface BotWorld {
   readonly bagCapacity: number;
   // Copper mirror (gold-farm accounting).
   readonly copper: number;
+  // Progression mirrors for the leveling stats (xp accounting, rested log).
+  readonly xp: number;
+  readonly lifetimeXp: number;
+  readonly restedXp: number;
   // Mirrored known-ability list (rotationMode 'auto'); slot is the index.
   readonly known: readonly ResolvedAbility[];
   nodeHarvestableByMe(nodeId: string): boolean;
@@ -206,6 +218,8 @@ export interface BrainDeps {
   // rotation; both default to the real ZONES/PORTALS content.
   zoneIdAt?: (x: number, z: number) => string;
   zoneGraph?: ZoneGraph;
+  // Level-mode camp/zone tables; defaults to the real CAMPS/MOBS/ZONES.
+  grindTables?: GrindTables;
 }
 
 export interface BrainState {
@@ -287,6 +301,8 @@ export interface BrainState {
     deaths: number;
     copperGained: number;
     raresKept: number;
+    xpGained: number;
+    levelsGained: number;
   };
   // Gold-farm mode (config.mode 'gold'): phase machine. Gathering, fishing
   // and node logic are bypassed entirely; TRAVEL delegates to stepGold.
@@ -299,6 +315,16 @@ export interface BrainState {
   goldNoMobSinceMs: number | null;
   goldLastPullAtMs: number;
   goldResetAtMs: Record<string, number>;
+  // Leveling mode (config.mode 'level'): camp-circuit state and xp tracking.
+  readonly grindTables: GrindTables;
+  levelZoneId: string | null;
+  levelCampKey: string | null;
+  levelClearedAt: Record<string, number>;
+  levelNoMobSinceMs: number | null;
+  levelWaitLogAtMs: number;
+  levelLifetimeXpLast: number | null;
+  levelLastLevel: number | null;
+  levelRestedLogged: boolean;
   goldWaitLogAtMs: number;
   // Last mirrored purse copper (session earn tracking for any mode).
   lastCopper: number | null;
@@ -384,7 +410,16 @@ export function createBrain(config: FarmBotConfig, deps: BrainDeps = {}): BrainS
     breakUntilMs: null,
     nextActionAtMs: 0,
     rng: deps.rng,
-    stats: { harvests: 0, catches: 0, kills: 0, deaths: 0, copperGained: 0, raresKept: 0 },
+    stats: {
+      harvests: 0,
+      catches: 0,
+      kills: 0,
+      deaths: 0,
+      copperGained: 0,
+      raresKept: 0,
+      xpGained: 0,
+      levelsGained: 0,
+    },
     goldDungeons: config.goldFarm.dungeons
       .map((id) => DUNGEONS[id])
       .filter((d): d is DungeonDef => d !== undefined),
@@ -396,6 +431,15 @@ export function createBrain(config: FarmBotConfig, deps: BrainDeps = {}): BrainS
     goldNoMobSinceMs: null,
     goldLastPullAtMs: 0,
     goldResetAtMs: {},
+    grindTables: deps.grindTables ?? defaultGrindTables(),
+    levelZoneId: null,
+    levelCampKey: null,
+    levelClearedAt: {},
+    levelNoMobSinceMs: null,
+    levelWaitLogAtMs: 0,
+    levelLifetimeXpLast: null,
+    levelLastLevel: null,
+    levelRestedLogged: false,
     goldWaitLogAtMs: 0,
     lastCopper: null,
     zoneGraph: deps.zoneGraph ?? buildZoneGraph(ZONES, PORTALS),
@@ -500,6 +544,11 @@ const SELF_HEAL_ENTER_PCT = 50;
 const SELF_HEAL_TARGET_PCT = 90;
 // Guided walks: arrival range at an intermediate gate waypoint.
 const GATE_ARRIVE_RANGE = 3;
+// Level mode: camp respawn is 60 s of trash cadence plus slack; a camp with
+// no living hostile for this long counts as cleared.
+const CAMP_RESPAWN_MS = 65_000;
+const CAMP_CLEAR_QUIET_MS = 8_000;
+const LEVEL_WAIT_LOG_MS = 30_000;
 const BAGS_FULL_TIMEOUT_MS = 30_000;
 const VENDOR_SELL_INTERVAL_MS = 1_000;
 // How long a sent letter may go unanswered before the next one goes out (the
@@ -1131,6 +1180,183 @@ function stepGold(state: BrainState, world: BotWorld, nowMs: number, logs: strin
   }
 }
 
+// --- leveling mode (mode 'level') ------------------------------------------
+// The camp circuit: pick the best camp in the current zone band, walk to it
+// (zone-graph legs when the band moves cross-zone, village gates on the way),
+// pull mobs one at a time, fight through the normal COMBAT flow, loot per
+// levelGrind.lootRule, rest between pulls, mark the camp cleared when it runs
+// dry, and zone-up when the whole band is gray. Pre-empts (combat, death,
+// bags, safety, self-heal) all still apply; XP and level accounting runs on
+// the lifetimeXp mirror delta.
+
+function campKeyOf(camp: GrindCamp): string {
+  return `${camp.mobId}@${camp.center.x},${camp.center.z}`;
+}
+
+function nearestLivingHostileWithin(
+  world: BotWorld,
+  center: { x: number; z: number },
+  radius: number,
+): Entity | null {
+  let best: Entity | null = null;
+  let bestD2 = Number.POSITIVE_INFINITY;
+  for (const e of world.entities.values()) {
+    if (e.kind !== 'mob' || e.dead || !e.hostile) continue;
+    if (distance2(center, pos2(e)) > radius * radius) continue;
+    const d2 = distance2(pos2(world.player), pos2(e));
+    if (d2 < bestD2) {
+      bestD2 = d2;
+      best = e;
+    }
+  }
+  return best;
+}
+
+function stepLevel(state: BrainState, world: BotWorld, nowMs: number, logs: string[]): void {
+  const p = world.player;
+  const cfg = state.config.levelGrind;
+
+  // XP and level accounting rides lifetimeXp (monotonic across levels, so
+  // the delta needs no rollover handling).
+  if (state.levelLifetimeXpLast !== null && world.lifetimeXp > state.levelLifetimeXpLast) {
+    state.stats.xpGained += world.lifetimeXp - state.levelLifetimeXpLast;
+  }
+  state.levelLifetimeXpLast = world.lifetimeXp;
+  if (state.levelLastLevel === null) {
+    state.levelLastLevel = p.level; // first tick is the baseline, never a level-up
+  } else if (p.level > state.levelLastLevel) {
+    state.stats.levelsGained += p.level - state.levelLastLevel;
+    state.levelLastLevel = p.level;
+    logs.push(`level up: now level ${p.level}!`);
+    alert(state, 'level-up', `level up: now level ${p.level}!`, nowMs);
+  }
+  if (!state.levelRestedLogged && world.restedXp > 0) {
+    state.levelRestedLogged = true;
+    logs.push('rested bonus active');
+  }
+
+  if (p.level >= cfg.targetLevel) {
+    world.sendLogout();
+    state.done = true;
+    logs.push(`target level ${cfg.targetLevel} reached: logging out`);
+    alert(state, 'target-level', `target level ${cfg.targetLevel} reached`, nowMs);
+    return;
+  }
+
+  const zoneId = state.levelZoneId ?? state.grindTables.zoneIdAt(p.pos.x, p.pos.z);
+  state.levelZoneId = zoneId;
+  // Only camps we actually cleared carry a timestamp; an absent entry is a
+  // fresh camp (a `?? 0` default would read as "cleared at t=0" and lock
+  // every camp out for the first CAMP_RESPAWN_MS of the session).
+  const camps = zoneCampsFor(zoneId, state.grindTables).filter((camp) => {
+    const clearedAt = state.levelClearedAt[campKeyOf(camp)];
+    return clearedAt === undefined || clearedAt + CAMP_RESPAWN_MS <= nowMs;
+  });
+  const camp = pickCamp(p.level, camps, pos2(p), state.grindTables.xpValue);
+
+  if (!camp) {
+    if (cfg.zoneUp) {
+      const next = nextLevelZoneId(p.level, state.grindTables);
+      if (next && next !== zoneId) {
+        const from = state.zoneIdAt(p.pos.x, p.pos.z);
+        const path = from === next ? [] : findZonePath(state.zoneGraph, from, next);
+        if (path && path.length > 0) {
+          state.zonePath = path;
+          state.stuck.reset();
+        }
+        state.levelZoneId = next;
+        state.levelCampKey = null;
+        logs.push(`level: all camps here are gray or spent, moving to ${next}`);
+        return;
+      }
+    }
+    stopMoving(world);
+    if (nowMs - state.levelWaitLogAtMs >= LEVEL_WAIT_LOG_MS) {
+      state.levelWaitLogAtMs = nowMs;
+      logs.push('level: no fresh camp right now, waiting out respawns');
+    }
+    return;
+  }
+
+  const key = campKeyOf(camp);
+  if (state.levelCampKey !== key) {
+    state.levelCampKey = key;
+    state.levelNoMobSinceMs = null;
+    state.walkKey = null; // replan the guided walk for the new camp
+  }
+
+  // Travel to the camp.
+  if (distance(pos2(p), camp.center) > camp.radius + 2) {
+    const status = stepGuidedWalk(
+      state,
+      world,
+      nowMs,
+      logs,
+      `camp:${key}`,
+      camp.center,
+      `camp ${camp.mobId}`,
+    );
+    if (status === 'gave-up') {
+      state.walkGiveUpKey = null;
+      state.levelClearedAt[key] = nowMs; // treat it as spent for a while
+      state.levelCampKey = null;
+      logs.push(`level: cannot reach camp ${camp.mobId}, skipping it`);
+    }
+    return;
+  }
+
+  // Rest between pulls; the REST state owns self-heal and consumables.
+  if (
+    hpPct(p) < cfg.restBelowPct ||
+    (p.resourceType === 'mana' && resourcePct(p) < cfg.restBelowPct)
+  ) {
+    state.restLastItemAtMs = null;
+    state.restStartedAtMs = nowMs;
+    transition(state, 'REST', logs, 'level: recharging');
+    return;
+  }
+
+  // The loot rule runs between pulls ('money-blues': the gold corpse filter
+  // plus the discard sweep; 'all' rides the normal LOOT state instead).
+  if (cfg.lootRule === 'money-blues' && goldLoot(state, world, logs)) return;
+
+  const mob = nearestLivingHostileWithin(world, camp.center, camp.radius + 10);
+  if (!mob) {
+    if (state.levelNoMobSinceMs === null) state.levelNoMobSinceMs = nowMs;
+    if (nowMs - state.levelNoMobSinceMs >= CAMP_CLEAR_QUIET_MS) {
+      state.levelClearedAt[key] = nowMs;
+      state.levelCampKey = null;
+      logs.push(`level: camp ${camp.mobId} cleared`);
+    }
+    stopMoving(world);
+    return;
+  }
+  state.levelNoMobSinceMs = null;
+  if (p.inCombat) return; // the fight is the COMBAT state's job
+
+  if (distance(pos2(p), pos2(mob)) > GOLD_PULL_RANGE) {
+    const steer = steerToward(pos2(p), p.facing, pos2(mob), GOLD_PULL_RANGE - 2);
+    world.setMoveInput(steer.input, steer.facing);
+    return;
+  }
+  stopMoving(world);
+  if (nowMs - state.goldLastPullAtMs >= GOLD_PULL_CADENCE_MS) {
+    const pullId = state.config.goldFarm.pullAbility;
+    if (world.known.some((k) => k.def.id === pullId)) {
+      world.targetEntity(mob.id);
+      world.castAbility(pullId);
+      logs.push(`level: pulling ${mob.name}`);
+    } else {
+      // No ranged pull known: walk-aggro the edge mob (the grind pattern).
+      world.targetEntity(mob.id);
+      world.startAutoAttack();
+      state.combatTargetId = mob.id;
+      logs.push(`level: engaging ${mob.name}`);
+    }
+    state.goldLastPullAtMs = nowMs;
+  }
+}
+
 function stepTravel(state: BrainState, world: BotWorld, nowMs: number, logs: string[]): void {
   const p = world.player;
 
@@ -1177,6 +1403,13 @@ function stepTravel(state: BrainState, world: BotWorld, nowMs: number, logs: str
   // rotation driver. Zone-travel legs (armed by the door phase) run above.
   if (state.config.mode === 'gold') {
     stepGold(state, world, nowMs, logs);
+    return;
+  }
+
+  // Level mode: TRAVEL drives the camp circuit. Zone-up legs armed by
+  // stepLevel run through the zonePath branch above like any other leg.
+  if (state.config.mode === 'level') {
+    stepLevel(state, world, nowMs, logs);
     return;
   }
 
@@ -2223,7 +2456,15 @@ export function stepBrain(
       stopMoving(world);
       // Gold mode: corpses belong to goldLoot's copper/rare rule, not the
       // auto-loot pass, so return to the rotation hub instead of LOOT.
-      transition(state, state.config.mode === 'gold' ? 'TRAVEL' : 'LOOT', logs, 'fight over');
+      transition(
+        state,
+        state.config.mode === 'gold' ||
+          (state.config.mode === 'level' && state.config.levelGrind.lootRule === 'money-blues')
+          ? 'TRAVEL'
+          : 'LOOT',
+        logs,
+        'fight over',
+      );
     }
   }
 

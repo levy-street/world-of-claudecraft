@@ -9,15 +9,19 @@ import {
   stepBrain,
 } from '../farmbot/brain';
 import { parseConfig } from '../farmbot/config';
+import type { GrindTables } from '../farmbot/grind_circuits';
 import type { ResolvedAbility } from '../src/sim/sim';
 import {
   type Entity,
   type GatherNodeDef,
   type InvSlot,
   type ItemDef,
+  type MobTemplate,
   type MoveInput,
+  mobXpValue,
   normAngle,
   type SimEvent,
+  type ZoneDef,
 } from '../src/sim/types';
 
 // --- fakes ---------------------------------------------------------------
@@ -55,6 +59,9 @@ function makeEntity(over: Partial<Entity> & { id: number }): Entity {
 class FakeWorld implements BotWorld {
   known: ResolvedAbility[] = [];
   copper = 0;
+  xp = 0;
+  lifetimeXp = 0;
+  restedXp = 0;
   player: Entity = makeEntity({
     id: 1,
     kind: 'player',
@@ -232,6 +239,20 @@ const ITEM_DEFS: Record<string, ItemDef> = {
     name: 'Health Potion',
     kind: 'potion',
     quality: 'common',
+  } as unknown as ItemDef,
+  minor_health_potion: {
+    id: 'minor_health_potion',
+    name: 'Minor Health Potion',
+    kind: 'potion',
+    quality: 'common',
+    potionHp: 90,
+  } as unknown as ItemDef,
+  greater_health_potion: {
+    id: 'greater_health_potion',
+    name: 'Greater Health Potion',
+    kind: 'potion',
+    quality: 'common',
+    potionHp: 250,
   } as unknown as ItemDef,
 };
 const itemDef = (id: string): ItemDef | undefined => ITEM_DEFS[id];
@@ -1762,16 +1783,15 @@ describe('farmbot brain: zone rotation (phase 7)', () => {
       { nodes: ROT_NODES, zoneIdAt },
     );
     world.nodeReady.set('eb_node', false);
-    step(state, world, 0); // arms eastbrook -> mirefen
+    step(state, world, 0); // arms eastbrook -> mirefen (stuck not fed yet)
     expect(state.zonePath?.[0]?.zoneId).toBe('mirefen_marsh');
-    // never move: anchor tick, wiggle at the window, skip at the second
-    step(state, world, 4000);
-    step(state, world, 8000);
-    let logs = step(state, world, 12_000);
+    step(state, world, 100); // first walk tick: anchors the stuck detector
+    // Never move: quiet window (4s) + 5 held recoveries (1.8s) => blacklist.
+    let logs = step(state, world, 13_100);
     expect(logs.some((l) => l.includes('stuck en route to mirefen_marsh, skipping'))).toBe(true);
     // re-armed toward thornpeak (path via the mirefen border then the thornpeak pass)
     expect(state.zonePath?.[state.zonePath.length - 1]?.zoneId).toBe('thornpeak_heights');
-    logs = step(state, world, 12_100);
+    logs = step(state, world, 13_200);
     expect(world.moveInput.forward).toBe(true);
   });
 
@@ -2007,10 +2027,7 @@ describe('farmbot brain: gold mode (phase 10)', () => {
     world.player.resourceType = 'mana';
     world.player.gcdRemaining = 0;
     world.player.auras = [];
-    world.known = [
-      knownAbility('blessing_of_might', 25),
-      knownAbility('retribution_aura', 0),
-    ];
+    world.known = [knownAbility('blessing_of_might', 25), knownAbility('retribution_aura', 0)];
     const aura = world.known[1];
     (aura.def as { requiresTarget: boolean }).requiresTarget = false;
     state.goldPhase = 'clear';
@@ -2074,6 +2091,22 @@ describe('farmbot brain: gold mode (phase 10)', () => {
     world.entities.set(90, goldMob(90, 'crypt_shambler', CRYPT_ORIGIN.x + 2, CRYPT_ORIGIN.z + 30));
     step(state, world, 0);
     expect(state.mode).toBe('REST');
+  });
+
+  it('tracks session copper earned from purse increases in any mode', () => {
+    const { state, world } = makeBrain();
+    world.copper = 500;
+    step(state, world, 0); // baselines lastCopper
+    expect(state.stats.copperGained).toBe(0);
+    world.copper = 750;
+    step(state, world, 100);
+    expect(state.stats.copperGained).toBe(250);
+    world.copper = 700; // spend: re-baseline, do not erase earned
+    step(state, world, 200);
+    expect(state.stats.copperGained).toBe(250);
+    world.copper = 800;
+    step(state, world, 300);
+    expect(state.stats.copperGained).toBe(350);
   });
 
   it('loots copper and blues, skips junk corpses, and discards the rest', () => {
@@ -2248,21 +2281,20 @@ describe('farmbot brain: village gate routing (bugfix)', () => {
     step(state, world, 0); // anchors the walk and the stuck detector
     expect(state.mode).toBe('BAGS_FULL');
 
-    // never moves: first escalation replans through the next-best gate
-    step(state, world, 4000); // wiggle
-    let logs = step(state, world, 8000);
+    // Never moves. Default stuck kit: 4s quiet + 5 held recoveries (1.8s each)
+    // then blacklist (blacklistAfter=6). Catch-up advances on a large time jump.
+    let logs = step(state, world, 13_000);
     expect(logs.some((l) => l.includes('stuck reaching vendor, trying another gate'))).toBe(true);
     expect(state.walkWaypoints).toEqual([]); // replans next tick
-    logs = step(state, world, 8100);
+    logs = step(state, world, 13_100);
     expect(state.walkWaypoints.length).toBe(2); // a different gate leads now
     expect(state.walkWaypoints[0].x).not.toBeCloseTo(27.443, 2);
 
-    // still stuck: second escalation gives up, and the timeout owns the exit
-    step(state, world, 12000); // re-anchor after the reset
-    step(state, world, 16000); // wiggle
-    logs = step(state, world, 20000);
+    // Still stuck on the alternate gate: another full recovery cycle gives up.
+    // Fresh anchor at 13100 + 4s + 5*1.8s => blacklist around 26100.
+    logs = step(state, world, 26_100);
     expect(logs.some((l) => l.includes('stuck reaching vendor, giving up'))).toBe(true);
-    logs = step(state, world, 21000);
+    logs = step(state, world, 26_200);
     expect(world.moveInput.forward).toBe(false); // gave up: no more grinding
     logs = step(state, world, 31_000);
     expect(logs.some((l) => l.includes('bags full: vendor unreachable'))).toBe(true);
@@ -2291,6 +2323,86 @@ describe('farmbot brain: rest consumable auto-pick', () => {
     const logs = step(state, world, 100);
     expect(world.itemsUsed).toEqual(['conjured_water4']);
     expect(logs.some((l) => l.includes('resting: drinking conjured_water4'))).toBe(true);
+  });
+
+  it('waits out the drink channel until mana is full before heals or re-actions', () => {
+    const { state, world } = restBrain();
+    world.player.hp = 40; // would otherwise self-heal
+    world.player.resource = 40; // 20%
+    world.player.resourceType = 'mana';
+    world.player.gcdRemaining = 0;
+    world.known = [
+      {
+        def: {
+          id: 'holy_light',
+          name: 'holy_light',
+          class: 'paladin',
+          cost: 117,
+          castTime: 2.5,
+          cooldown: 0,
+          range: 0,
+          school: 'holy',
+          requiresTarget: false,
+        },
+        rank: 1,
+        cost: 117,
+        castTime: 2.5,
+        cooldown: 0,
+        effects: [{ type: 'heal', min: 100, max: 120 }],
+        threatFlat: 0,
+        threatMult: 1,
+      } as unknown as ResolvedAbility,
+      {
+        def: {
+          id: 'flash_of_light',
+          name: 'flash_of_light',
+          class: 'paladin',
+          cost: 46,
+          castTime: 1.5,
+          cooldown: 0,
+          range: 0,
+          school: 'holy',
+          requiresTarget: false,
+        },
+        rank: 1,
+        cost: 46,
+        castTime: 1.5,
+        cooldown: 0,
+        effects: [{ type: 'heal', min: 60, max: 80 }],
+        threatFlat: 0,
+        threatMult: 1,
+      } as unknown as ResolvedAbility,
+    ];
+    world.inventory = [{ itemId: 'conjured_water4', count: 5 }];
+
+    // First action: drink, never heal while mana is short.
+    let logs = step(state, world, 100);
+    expect(world.itemsUsed).toEqual(['conjured_water4']);
+    expect(world.onCasts).toEqual([]);
+    expect(logs.some((l) => l.includes('resting: drinking conjured_water4'))).toBe(true);
+
+    // Channel live: no re-drink, no heal, no food, even after the throttle.
+    world.player.drinking = {} as Entity['drinking'];
+    step(state, world, 2000);
+    step(state, world, 5000);
+    expect(world.itemsUsed).toEqual(['conjured_water4']);
+    expect(world.onCasts).toEqual([]);
+
+    // Channel ends but mana still short: drink again, still no heal.
+    world.player.drinking = null;
+    world.player.resource = 80; // still below 95%
+    logs = step(state, world, 6500);
+    expect(world.itemsUsed).toEqual(['conjured_water4', 'conjured_water4']);
+    expect(world.onCasts).toEqual([]);
+    expect(logs.some((l) => l.includes('resting: drinking'))).toBe(true);
+
+    // Mana full, HP still short: now the self-heal is allowed (past the
+    // drink throttle and the holy_light cast-window gate).
+    world.player.drinking = null;
+    world.player.resource = 200;
+    logs = step(state, world, 10_000);
+    expect(world.onCasts).toEqual([{ id: 'holy_light', targetId: 1 }]);
+    expect(logs.some((l) => l.includes('resting: casting holy_light'))).toBe(true);
   });
 
   it('lets the configured drinkItemId win when it is in the bags', () => {
@@ -2478,5 +2590,314 @@ describe('farmbot brain: general self-heal (out of combat)', () => {
     step(state, world, 0);
     expect(state.mode).toBe('REST'); // gold door approach yields to the heal
     expect(world.onCasts).toEqual([{ id: 'holy_light', targetId: 1 }]);
+  });
+});
+
+describe('farmbot brain: emergency buttons (survival)', () => {
+  function survivalPaladinAbility(id: string): ResolvedAbility {
+    return {
+      def: {
+        id,
+        name: id === 'divine_protection' ? 'Ward of Faith' : 'Last Rite',
+        class: 'paladin',
+        cost: 0,
+        castTime: 0,
+        cooldown: 0,
+        range: 0,
+        school: 'holy',
+        requiresTarget: id !== 'divine_protection',
+      },
+      rank: 1,
+      cost: 0,
+      castTime: 0,
+      cooldown: 0,
+      effects: [],
+      threatFlat: 0,
+      threatMult: 1,
+    } as unknown as ResolvedAbility;
+  }
+
+  function inCombatWithWolf(world: FakeWorld, hp: number) {
+    world.entities.set(
+      80,
+      makeEntity({ id: 80, name: 'wolf', aggroTargetId: 1, pos: { x: 3, y: 0, z: 0 } }),
+    );
+    world.player.inCombat = true;
+    world.player.maxHp = 100;
+    world.player.hp = hp;
+  }
+
+  it('fires Ward of Faith mid-COMBAT below 40% and skips the rotation cast', () => {
+    const { state, world } = makeBrain({ combat: { abilitySlots: [0] } });
+    world.known = [survivalPaladinAbility('divine_protection')];
+    inCombatWithWolf(world, 30);
+    const logs = step(state, world, 0);
+    expect(state.mode).toBe('COMBAT');
+    expect(world.abilityCasts).toEqual(['divine_protection']); // targetless cast
+    expect(world.casts).toEqual([]); // rotation cast replaced this tick
+    expect(logs.some((l) => l.includes('emergency: Ward of Faith'))).toBe(true);
+    expect(world.autoAttackStarts).toBe(1); // auto-attack continues
+  });
+
+  it('fires Last Rite on self below 20% when Ward of Faith is on cooldown', () => {
+    const { state, world } = makeBrain({ combat: { abilitySlots: [0] } });
+    world.known = [
+      survivalPaladinAbility('divine_protection'),
+      survivalPaladinAbility('lay_on_hands'),
+    ];
+    world.player.cooldowns = new Map([['divine_protection', 60]]);
+    inCombatWithWolf(world, 15);
+    const logs = step(state, world, 0);
+    expect(world.onCasts).toEqual([{ id: 'lay_on_hands', targetId: 1 }]); // friendly-targeted: cast on self
+    expect(logs.some((l) => l.includes('emergency: Last Rite'))).toBe(true);
+  });
+
+  it('uses the best potion below 35% and honors the 120s cooldown', () => {
+    const { state, world } = makeBrain({ combat: { abilitySlots: [0] } });
+    inCombatWithWolf(world, 30);
+    world.inventory = [
+      { itemId: 'minor_health_potion', count: 1 },
+      { itemId: 'greater_health_potion', count: 1 },
+    ];
+    let logs = step(state, world, 0);
+    expect(world.itemsUsed).toEqual(['greater_health_potion']);
+    expect(logs.some((l) => l.includes('emergency: Greater Health Potion'))).toBe(true);
+    expect(state.lastPotionAtMs).toBe(0);
+    logs = step(state, world, 600);
+    expect(world.itemsUsed).toEqual(['greater_health_potion']); // cooldown: no second potion
+    logs = step(state, world, 120_100);
+    expect(world.itemsUsed).toEqual(['greater_health_potion', 'greater_health_potion']);
+  });
+
+  it('does nothing out of combat', () => {
+    const { state, world } = makeBrain();
+    world.player.maxHp = 100;
+    world.player.hp = 10;
+    world.known = [survivalPaladinAbility('divine_protection')];
+    world.inventory = [{ itemId: 'greater_health_potion', count: 1 }];
+    step(state, world, 0);
+    expect(state.mode).toBe('TRAVEL'); // emergency buttons are combat/flee only
+    expect(world.abilityCasts).toEqual([]);
+    expect(world.itemsUsed).toEqual([]);
+  });
+
+  it('fires while fleeing too', () => {
+    const { state, world } = makeBrain({ combat: { flee: 'outleveled', fleeAboveLevelDelta: 3 } });
+    world.player.level = 3;
+    world.player.maxHp = 100;
+    world.player.hp = 30;
+    world.known = [survivalPaladinAbility('divine_protection')];
+    world.entities.set(
+      80,
+      makeEntity({ id: 80, name: 'wolf', level: 7, aggroTargetId: 1, pos: { x: 10, y: 0, z: 0 } }),
+    );
+    world.player.inCombat = true;
+    const logs = step(state, world, 0);
+    expect(state.mode).toBe('FLEE');
+    expect(world.abilityCasts).toEqual(['divine_protection']);
+    expect(logs.some((l) => l.includes('emergency: Ward of Faith'))).toBe(true);
+  });
+});
+
+describe('farmbot brain: level mode (phase 12)', () => {
+  function levelAbility(id: string): ResolvedAbility {
+    return {
+      def: {
+        id,
+        name: id,
+        class: 'paladin',
+        cost: 55,
+        castTime: 0,
+        cooldown: 15,
+        range: 30,
+        school: 'holy',
+        requiresTarget: true,
+      },
+      rank: 1,
+      cost: 55,
+      castTime: 0,
+      cooldown: 15,
+      effects: [{ type: 'directDamage', min: 50, max: 60 }],
+      threatFlat: 0,
+      threatMult: 1,
+    } as unknown as ResolvedAbility;
+  }
+
+  function levelTables(zoneId = 'zone_a'): GrindTables {
+    return {
+      camps: [
+        { mobId: 'wolf', center: { x: 50, z: 0 }, radius: 20, count: 4 },
+        { mobId: 'wolf', center: { x: 90, z: 0 }, radius: 20, count: 2 },
+      ],
+      mobs: {
+        wolf: { id: 'wolf', name: 'wolf', minLevel: 5, maxLevel: 6 } as unknown as MobTemplate,
+      },
+      zoneIdAt: () => zoneId,
+      xpValue: mobXpValue,
+      zoneDefs: [
+        { id: 'zone_a', levelRange: [1, 7] },
+        { id: 'zone_b', levelRange: [6, 13] },
+      ] as unknown as ZoneDef[],
+    };
+  }
+
+  function levelBrain(over: Record<string, unknown> = {}, tables?: GrindTables) {
+    const { state, world } = makeBrain(
+      { mode: 'level', ...over },
+      { grindTables: tables ?? levelTables() },
+    );
+    world.player.level = 5;
+    return { state, world };
+  }
+
+  function levelMob(id: number, name: string, x: number, z: number, over: Partial<Entity> = {}) {
+    return makeEntity({ id, name, kind: 'mob', level: 5, pos: { x, y: 0, z }, ...over });
+  }
+
+  it('travels to the best camp and pulls with the ranged ability when known', () => {
+    const { state, world } = levelBrain();
+    world.known = [levelAbility('exorcism')];
+    world.player.pos = { x: 0, y: 0, z: 0 };
+    let logs = step(state, world, 0);
+    expect(world.moveInput.forward).toBe(true); // walking to the wolf camp
+    // (0,0) sits inside the eastbrook wall, the camp is outside: the walk
+    // routes through the east gate crossing first, not straight at the camp
+    const gate = { x: 27.443, z: 7.31 }; // real exported crossing (scaled to the radius)
+    expect(world.facing).toBeCloseTo(Math.atan2(gate.x, gate.z), 2);
+    expect(state.levelCampKey).toBe('wolf@50,0');
+
+    // at the camp with a mob visible beyond the 30 yd pull reach: close in
+    world.player.pos = { x: 45, y: 0, z: 0 };
+    const wolf = levelMob(90, 'wolf', 80, 0);
+    world.entities.set(90, wolf);
+    step(state, world, 100);
+    expect(world.moveInput.forward).toBe(true); // 35 yd: closing in, not casting yet
+    expect(world.abilityCasts).toEqual([]);
+    // inside pull reach once the cadence gate has opened: stop and cast
+    wolf.pos = { x: 70, y: 0, z: 0 };
+    logs = step(state, world, 700);
+    expect(logs.some((l) => l.includes('level: pulling wolf'))).toBe(true);
+    expect(world.targets).toEqual([90]);
+    expect(world.abilityCasts).toEqual(['exorcism']);
+  });
+
+  it('walk-aggros when no pull ability is known', () => {
+    const { state, world } = levelBrain();
+    world.player.pos = { x: 45, y: 0, z: 0 };
+    world.entities.set(90, levelMob(90, 'wolf', 60, 0));
+    const logs = step(state, world, 700); // cadence: first pull allowed
+    expect(logs.some((l) => l.includes('level: engaging wolf'))).toBe(true);
+    expect(world.targets).toEqual([90]);
+    expect(world.autoAttackStarts).toBe(1);
+    expect(world.abilityCasts).toEqual([]);
+  });
+
+  it('marks a camp cleared after a quiet sweep and moves to the next one', () => {
+    const { state, world } = levelBrain();
+    world.player.pos = { x: 48, y: 0, z: 0 }; // inside camp 1
+    step(state, world, 0); // anchors the quiet timer
+    const logs = step(state, world, 9000);
+    expect(logs.some((l) => l.includes('level: camp wolf cleared'))).toBe(true);
+    expect(state.levelClearedAt['wolf@50,0']).toBe(9000);
+    // next tick picks the second camp (the cleared one is on respawn cooldown)
+    step(state, world, 9100);
+    expect(state.levelCampKey).toBe('wolf@90,0');
+  });
+
+  it('zones up when every camp in the band is gray for the player', () => {
+    // zone_a holds a level-2 camp (gray at 8); zone_b holds level-8 work.
+    const tables: GrindTables = {
+      camps: [
+        { mobId: 'boar', center: { x: 10, z: 0 }, radius: 20, count: 4 },
+        { mobId: 'bear', center: { x: 80, z: 0 }, radius: 20, count: 3 },
+      ],
+      mobs: {
+        boar: { id: 'boar', name: 'boar', minLevel: 1, maxLevel: 2 } as unknown as MobTemplate,
+        bear: { id: 'bear', name: 'bear', minLevel: 8, maxLevel: 8 } as unknown as MobTemplate,
+      },
+      zoneIdAt: (x) => (x >= 50 ? 'zone_b' : 'zone_a'),
+      xpValue: mobXpValue,
+      zoneDefs: [
+        { id: 'zone_a', levelRange: [1, 7] },
+        { id: 'zone_b', levelRange: [6, 13] },
+      ] as unknown as ZoneDef[],
+    };
+    const { state, world } = levelBrain({}, tables);
+    world.player.level = 8; // the zone_a boar camp is gray for 8
+    world.player.pos = { x: 0, y: 0, z: 0 };
+    const logs = step(state, world, 0);
+    expect(logs.some((l) => l.includes('moving to zone_b'))).toBe(true);
+    expect(state.levelZoneId).toBe('zone_b');
+  });
+
+  it('money-blues uses the gold loot rule and discard sweep', () => {
+    const { state, world } = levelBrain();
+    world.bagCapacity = 20;
+    world.player.pos = { x: 48, y: 0, z: 0 };
+    world.entities.set(
+      90,
+      levelMob(90, 'wolf', 49, 1, {
+        dead: true,
+        lootable: true,
+        loot: { copper: 12, items: [{ itemId: 'grey_a', count: 1 }] },
+      }),
+    );
+    const logs = step(state, world, 0);
+    expect(world.lootCorpses).toEqual([90]);
+    expect(logs.some((l) => l.includes('gold: looted 12c'))).toBe(true);
+  });
+
+  it('lootRule all rides the normal LOOT state instead of the gold filter', () => {
+    const { state, world } = levelBrain({ levelGrind: { lootRule: 'all' } });
+    const wolf = makeEntity({ id: 80, name: 'wolf', aggroTargetId: 1, pos: { x: 3, y: 0, z: 0 } });
+    world.entities.set(80, wolf);
+    world.player.inCombat = true;
+    step(state, world, 0);
+    expect(state.mode).toBe('COMBAT');
+    wolf.dead = true;
+    world.player.inCombat = false;
+    step(state, world, 100);
+    // the fight-end transition goes to LOOT (not the circuit), and the loot
+    // pass auto-loots in the same tick before settling back to TRAVEL
+    expect(world.autoLoots).toEqual([80]);
+    expect(state.mode).toBe('TRAVEL');
+  });
+
+  it('tracks xp and levels from lifetimeXp, logs and alerts on level-up', () => {
+    const { state, world } = levelBrain({ levelGrind: { targetLevel: 8 } });
+    step(state, world, 0); // baseline
+    expect(state.stats.levelsGained).toBe(0);
+    world.lifetimeXp = 500;
+    world.player.level = 6;
+    const logs = step(state, world, 100);
+    expect(state.stats.xpGained).toBe(500);
+    expect(state.stats.levelsGained).toBe(1);
+    expect(logs.some((l) => l.includes('level up: now level 6!'))).toBe(true);
+    expect(state.alerts.some((a) => a.kind === 'level-up')).toBe(true);
+  });
+
+  it('logs the rested line once and stops at targetLevel', () => {
+    const { state, world } = levelBrain({ levelGrind: { targetLevel: 6 } });
+    world.restedXp = 100;
+    let logs = step(state, world, 0);
+    expect(logs.some((l) => l.includes('rested bonus active'))).toBe(true);
+    logs = step(state, world, 100);
+    expect(logs.some((l) => l.includes('rested bonus active'))).toBe(false);
+    world.player.level = 6;
+    logs = step(state, world, 200);
+    expect(state.done).toBe(true);
+    expect(world.logouts).toBe(1);
+    expect(logs.some((l) => l.includes('target level 6 reached'))).toBe(true);
+    expect(state.alerts.some((a) => a.kind === 'target-level')).toBe(true);
+  });
+
+  it('rests between pulls when below the threshold', () => {
+    const { state, world } = levelBrain();
+    world.player.pos = { x: 48, y: 0, z: 0 };
+    world.player.maxHp = 100;
+    world.player.hp = 40; // below the 50% rest gate
+    const logs = step(state, world, 0);
+    expect(state.mode).toBe('REST');
+    expect(logs.some((l) => l.includes('level: recharging'))).toBe(true);
   });
 });

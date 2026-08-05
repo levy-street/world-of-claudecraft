@@ -84,7 +84,13 @@ export interface Fbstat {
     // older bots so a mixed build still parses.
     copperGained?: number;
     raresKept?: number;
+    xpGained?: number;
+    levelsGained?: number;
   };
+  // Progression mirrors for the leveling display; optional on older bots.
+  xp?: number;
+  level?: number;
+  xpGained?: number;
   inventory: { itemId: string; count: number }[];
 }
 

@@ -149,6 +149,45 @@ describe('farmbot parseConfig', () => {
     expect(fishOnly.fishing.enabled).toBe(true);
   });
 
+  it('parses levelGrind defaults and accepts mode level', () => {
+    const cfg = parseConfig({ ...VALID, mode: 'level' });
+    expect(cfg.mode).toBe('level');
+    expect(cfg.levelGrind).toEqual({
+      targetLevel: 20,
+      restBelowPct: 50,
+      lootRule: 'money-blues',
+      zoneUp: true,
+    });
+  });
+
+  it('parses a fully specified levelGrind and rejects bad values', () => {
+    const cfg = parseConfig({
+      ...VALID,
+      levelGrind: { targetLevel: 14, restBelowPct: 40, lootRule: 'all', zoneUp: false },
+    });
+    expect(cfg.levelGrind).toEqual({
+      targetLevel: 14,
+      restBelowPct: 40,
+      lootRule: 'all',
+      zoneUp: false,
+    });
+    expect(() => parseConfig({ ...VALID, levelGrind: { targetLevel: 0 } })).toThrow(
+      /levelGrind\.targetLevel/,
+    );
+    expect(() => parseConfig({ ...VALID, levelGrind: { restBelowPct: 0 } })).toThrow(
+      /levelGrind\.restBelowPct/,
+    );
+    expect(() => parseConfig({ ...VALID, levelGrind: { lootRule: 'blues' } })).toThrow(
+      /levelGrind\.lootRule/,
+    );
+    expect(() => parseConfig({ ...VALID, levelGrind: { zoneUp: 'yes' } })).toThrow(
+      /levelGrind\.zoneUp/,
+    );
+    expect(() => parseConfig({ ...VALID, levelGrind: { camp: 'wolves' } })).toThrow(
+      /levelGrind: unknown key 'camp'/,
+    );
+  });
+
   it('parses goldFarm defaults and accepts mode gold', () => {
     const cfg = parseConfig({ ...VALID, mode: 'gold' });
     expect(cfg.mode).toBe('gold');

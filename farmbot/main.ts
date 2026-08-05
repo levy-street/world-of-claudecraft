@@ -205,6 +205,9 @@ async function main(): Promise<void> {
             bagsUsed: world.inventory.length,
             bagCapacity: world.bagCapacity,
             stats: brain.stats,
+            xp: world.xp,
+            level: player.level,
+            xpGained: brain.stats.xpGained,
             inventory: world.inventory.map((s) => ({ itemId: s.itemId, count: s.count })),
           })}`,
         );

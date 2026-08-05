@@ -12,10 +12,23 @@ import type { GatherNodeType } from '../src/sim/types';
 
 // What the bot does when there is something to do. Supersedes the legacy
 // fishing.enabled flag (still accepted; see parseConfig). 'gold' is the
-// dungeon gold-farm mode: it bypasses gathering and fishing entirely.
-export type FarmMode = 'gather-fish' | 'gather' | 'fish' | 'gold';
+// dungeon gold-farm mode and 'level' is the camp-grind leveling mode: both
+// bypass gathering and fishing entirely.
+export type FarmMode = 'gather-fish' | 'gather' | 'fish' | 'gold' | 'level';
 
 export type KeepQuality = 'rare' | 'epic' | 'legendary';
+
+export interface LevelGrindConfig {
+  // Stop (done) when the player reaches this level.
+  targetLevel: number;
+  // Stop pulling and recharge below this hp/mana percent.
+  restBelowPct: number;
+  // 'money-blues' keeps only copper and rare+ loot (junk discarded after the
+  // loot); 'all' loots everything and sells via the bags-full vendor flow.
+  lootRule: 'money-blues' | 'all';
+  // Move to the next zone band when every camp in the current zone is gray.
+  zoneUp: boolean;
+}
 
 export interface GoldFarmConfig {
   // Dungeon ids to rotate between (DUNGEONS keys, src/sim/data.ts).
@@ -123,12 +136,14 @@ export interface FarmBotConfig {
   safety: SafetyConfig;
   // Dungeon gold-farm settings (only read when mode is 'gold').
   goldFarm: GoldFarmConfig;
+  // Leveling grind settings (only read when mode is 'level').
+  levelGrind: LevelGrindConfig;
   // 0 means run until interrupted.
   maxRuntimeMinutes: number;
 }
 
 const BAG_FULL_POLICIES: readonly BagFullPolicy[] = ['sell-junk', 'stop'];
-const FARM_MODES: readonly FarmMode[] = ['gather-fish', 'gather', 'fish', 'gold'];
+const FARM_MODES: readonly FarmMode[] = ['gather-fish', 'gather', 'fish', 'gold', 'level'];
 const KEEP_QUALITIES: readonly KeepQuality[] = ['rare', 'epic', 'legendary'];
 const WHISPER_ACTIONS: readonly SafetyConfig['whisperAction'][] = ['log', 'alarm', 'logout'];
 const BREAK_ACTIONS: readonly SafetyConfig['schedule']['breakAction'][] = ['idle', 'logout'];
@@ -232,6 +247,7 @@ export function parseConfig(json: unknown): FarmBotConfig {
       'death',
       'safety',
       'goldFarm',
+      'levelGrind',
       'maxRuntimeMinutes',
     ],
     'config',
@@ -643,6 +659,48 @@ export function parseConfig(json: unknown): FarmBotConfig {
     }
   }
 
+  const levelGrind: LevelGrindConfig = {
+    targetLevel: 20,
+    restBelowPct: 50,
+    lootRule: 'money-blues',
+    zoneUp: true,
+  };
+  if (json.levelGrind !== undefined) {
+    if (!isRecord(json.levelGrind)) {
+      errors.push('levelGrind: must be an object');
+    } else {
+      checkNoUnknownKeys(
+        json.levelGrind,
+        ['targetLevel', 'restBelowPct', 'lootRule', 'zoneUp'],
+        'levelGrind',
+        errors,
+      );
+      if (json.levelGrind.targetLevel !== undefined) {
+        if (isNonNegativeInt(json.levelGrind.targetLevel) && json.levelGrind.targetLevel >= 1) {
+          levelGrind.targetLevel = json.levelGrind.targetLevel;
+        } else {
+          errors.push('levelGrind.targetLevel: must be an integer >= 1');
+        }
+      }
+      if (json.levelGrind.restBelowPct !== undefined) {
+        const pct = json.levelGrind.restBelowPct;
+        if (isFiniteNumber(pct) && pct > 0 && pct <= 100) levelGrind.restBelowPct = pct;
+        else errors.push('levelGrind.restBelowPct: must be a number in (0, 100]');
+      }
+      if (json.levelGrind.lootRule !== undefined) {
+        if (json.levelGrind.lootRule === 'money-blues' || json.levelGrind.lootRule === 'all') {
+          levelGrind.lootRule = json.levelGrind.lootRule;
+        } else {
+          errors.push('levelGrind.lootRule: must be money-blues|all');
+        }
+      }
+      if (json.levelGrind.zoneUp !== undefined) {
+        if (typeof json.levelGrind.zoneUp === 'boolean') levelGrind.zoneUp = json.levelGrind.zoneUp;
+        else errors.push('levelGrind.zoneUp: must be a boolean');
+      }
+    }
+  }
+
   let maxRuntimeMinutes = 0;
   if (json.maxRuntimeMinutes !== undefined) {
     if (isFiniteNumber(json.maxRuntimeMinutes) && json.maxRuntimeMinutes >= 0) {
@@ -673,6 +731,7 @@ export function parseConfig(json: unknown): FarmBotConfig {
     death,
     safety,
     goldFarm,
+    levelGrind,
     maxRuntimeMinutes,
   };
 }
