@@ -8699,6 +8699,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.catchLine': 'Вы выуживаете: {name}',
   'hudChrome.gathering.biteLine': 'Что-то клюнуло!',
   'hudChrome.gathering.gotAwayLine': 'Добыча сорвалась.',
+  'hudChrome.gathering.earlyReelLine': 'Вы подсекли слишком рано. Рыба ещё не клюнула.',
   'hudChrome.gathering.nodeName.ore': 'Рудная жила',
   'hudChrome.gathering.nodeName.wood': 'Древостой',
   'hudChrome.gathering.nodeName.herb': 'Заросли трав',
@@ -11002,6 +11003,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.fish.biteHeading': 'Поклевка и подсечка',
   'guide.profPages.fish.biteBody':
     'Поклевка приходит через {min}-{max} секунд после заброса (хорошее удилище срезает до {rod} секунд ожидания), окно подсечки длится {reel} секунды плюс {reelRod} за каждую ступень удилища выше первой, а сессия не дольше {cap} секунд.',
+  'guide.profPages.fish.earlyReelNote':
+    'Предостережение нетерпеливым: нажмите на удочку до поклевки, и вы вытянете пустую леску, а заброс закончится (короткая передышка сразу после заброса прощает случайное двойное нажатие). Терпение и есть вся рыбалка: дождитесь поклевки, потом подсекайте.',
   'guide.profPages.fish.scheduleHeading': 'Рост мастерства',
   'guide.profPages.fish.scheduleNote':
     'Рост в рыбной ловле идет по жесткой шкале мастерства, а хлам с {cutoff} и дальше не учит ничему.',

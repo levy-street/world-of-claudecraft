@@ -8548,6 +8548,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.catchLine': '{name}을(를) 낚아 올렸습니다',
   'hudChrome.gathering.biteLine': '무언가 미끼를 물었습니다!',
   'hudChrome.gathering.gotAwayLine': '놓쳐 버렸습니다.',
+  'hudChrome.gathering.earlyReelLine':
+    '너무 일찍 줄을 감았습니다. 아직 아무것도 미끼를 물지 않았습니다.',
   'hudChrome.gathering.nodeName.ore': '광맥',
   'hudChrome.gathering.nodeName.wood': '벌목 나무',
   'hudChrome.gathering.nodeName.herb': '약초 군락',
@@ -10827,6 +10829,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.fish.biteHeading': '입질과 릴 감기',
   'guide.profPages.fish.biteBody':
     '던진 뒤 {min}에서 {max}초 사이에 입질이 온다(좋은 낚싯대는 기다림을 최대 {rod}초 줄인다). 릴 감기 시간은 {reel}초에 낚싯대 티어가 하나 오를 때마다 {reelRod}초가 더해지고, 한 번의 낚시는 최대 {cap}초다.',
+  'guide.profPages.fish.earlyReelNote':
+    '성급한 손끝을 위한 주의: 입질이 오기 전에 낚싯대를 다시 사용하면 빈 줄만 감아 올리고 낚시가 끝난다(던진 직후의 짧은 유예가 실수로 누른 연타는 용서해 준다). 낚시의 전부는 인내다. 입질을 기다렸다가 챔질하라.',
   'guide.profPages.fish.scheduleHeading': '숙련도 성장',
   'guide.profPages.fish.scheduleNote':
     '낚시 성장은 숙련도에 따른 고정 일정표를 따르며, {cutoff}부터는 잡동사니를 낚아도 아무것도 배우지 못한다.',

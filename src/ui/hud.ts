@@ -11653,6 +11653,14 @@ export class Hud {
           this.log(t('hudChrome.gathering.gotAwayLine'), '#a8a8a8');
           break;
         }
+        case 'fishingEarlyReel': {
+          // The angler reeled in before the bite (the spam-click fix): the
+          // line teaches the mechanic (wait for the bite), in the gotAwayLine
+          // register: grey, log only, NO cue (an early reel costs nothing,
+          // and a spammer would turn a cue into noise).
+          this.log(t('hudChrome.gathering.earlyReelLine'), '#a8a8a8');
+          break;
+        }
         case 'fishingEmptyHook': {
           // Empty-hook feedback (the UX pass): this reel was CORRECTLY
           // timed, so the press earns the reel cue (the timing

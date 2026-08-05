@@ -2553,6 +2553,7 @@ export const zh_TW: EnTranslations = {
       "catchLine": "你釣上了：{name}",
       "biteLine": "有東西上鉤了！",
       "gotAwayLine": "牠跑掉了。",
+      "earlyReelLine": "收線太早了，還沒有魚上鉤。",
       "nodeName": {
         "ore": "礦脈",
         "wood": "林木",
@@ -4573,6 +4574,7 @@ export const zh_TW: EnTranslations = {
         "startBody": "一根Simple Fishing Pole在Eastbrook的Fisherman Brandt處只賣20銅（他在鎮東緣望著Mirror Lake）；Tinker Gizzel、Fenbridge的Provisioner Hale和Highwatch的Quartermaster Bree也有存貨。面向前方約24碼內足夠深的水面使用魚竿即可拋竿。戰鬥中、游泳時或死亡時無法拋竿：站在岸上釣才是正途，任何區域的可釣水域都行。",
         "biteHeading": "咬鉤與收線",
         "biteBody": "拋竿後{min}到{max}秒之間魚會咬鉤（更好的魚竿最多縮短{rod}秒等待），收線視窗持續{reel}秒、魚竿每高一階再加{reelRod}秒，單次垂釣最長{cap}秒。",
+        "earlyReelNote": "心急的釣手注意：魚咬鉤之前再按魚竿，只會收回空線並結束這次垂釣（拋竿後的短暫寬限會原諒誤觸的連點）。耐心就是釣魚的全部：等咬鉤，再收線。",
         "scheduleHeading": "熟練度成長",
         "scheduleNote": "釣魚成長按熟練度遵循固定檔位，且從{cutoff}起，釣上雜物不再有任何成長。",
         "colProficiency": "熟練度",

@@ -12,12 +12,16 @@
 // static fee. And the empty-hook rate (the table's itemId:null row) is the
 // difference between "fishing is slow" and "fishing is broken" and cannot be
 // derived from a catch count alone. Casts are the denominator: casts minus
-// catches minus empty hooks minus got-aways is the sessions still in flight
-// PLUS every session that ended without an outcome event (cancelled by a
-// hit, a teleport, or the angler's own movement, plus the once-ever
-// codfather quest catch, which returns before any outcome event), so the
-// residual grows in steady state and is a cancellation gauge, never a
-// zero-check. One accepted band edge, unlike the zone (which the session
+// catches minus empty hooks minus got-aways minus early reels is the
+// sessions still in flight PLUS every session that ended without an outcome
+// event (cancelled by a hit, a teleport, or the angler's own movement, plus
+// the once-ever codfather quest catch, which returns before any outcome
+// event), so the residual grows in steady state and is a cancellation
+// gauge, never a zero-check. The early reel (a pre-bite re-press, the
+// anti-spam arm) has its OWN outcome event and series rather than joining
+// that residual or the got-aways: it is self-inflicted where a got-away is
+// the game costing the player, and its rate is how to tell whether the
+// spam fix burns legitimate anglers. One accepted band edge, unlike the zone (which the session
 // pins on fishCastZoneId): the cast samples the effective band at cast time
 // while the outcome events re-resolve it at completion, so a mid-session
 // rod change (discarding the rod during the bite wait has no casting guard)

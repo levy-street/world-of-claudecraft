@@ -488,8 +488,13 @@ class Bot {
       if (
         data.includes('"fishingResult"') ||
         data.includes('"fishingGotAway"') ||
+        data.includes('"fishingEarlyReel"') ||
         data.includes('"fishingEmptyHook"')
       ) {
+        // fishingEarlyReel: the watchdog re-cast can land on a live pre-bite
+        // session past the grace and consume it as an early reel; booking it
+        // as an outcome lets the driver recover on the next cast instead of
+        // waiting out another watchdog cycle.
         this.fishingOutcomes += 1;
         this.fishState = 'idle';
         this.nextCastAt = Date.now() + 800;

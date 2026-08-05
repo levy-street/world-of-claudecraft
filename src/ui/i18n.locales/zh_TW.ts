@@ -8178,6 +8178,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.catchLine': '你釣上了：{name}',
   'hudChrome.gathering.biteLine': '有東西上鉤了！',
   'hudChrome.gathering.gotAwayLine': '牠跑掉了。',
+  'hudChrome.gathering.earlyReelLine': '收線太早了，還沒有魚上鉤。',
   'hudChrome.gathering.nodeName.ore': '礦脈',
   'hudChrome.gathering.nodeName.wood': '林木',
   'hudChrome.gathering.nodeName.herb': '草藥叢',
@@ -10344,6 +10345,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.fish.biteHeading': '咬鉤與收線',
   'guide.profPages.fish.biteBody':
     '拋竿後{min}到{max}秒之間魚會咬鉤（更好的魚竿最多縮短{rod}秒等待），收線視窗持續{reel}秒、魚竿每高一階再加{reelRod}秒，單次垂釣最長{cap}秒。',
+  'guide.profPages.fish.earlyReelNote':
+    '心急的釣手注意：魚咬鉤之前再按魚竿，只會收回空線並結束這次垂釣（拋竿後的短暫寬限會原諒誤觸的連點）。耐心就是釣魚的全部：等咬鉤，再收線。',
   'guide.profPages.fish.scheduleHeading': '熟練度成長',
   'guide.profPages.fish.scheduleNote':
     '釣魚成長按熟練度遵循固定檔位，且從{cutoff}起，釣上雜物不再有任何成長。',
