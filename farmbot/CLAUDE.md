@@ -6,12 +6,15 @@
 A standalone Node process that logs into a WoC realm as a REAL client and farms
 autonomously: gathers herb/ore/wood nodes along a priority route, fishes between
 respawns (spot rotation), fights mobs that aggro it (or grinds them for XP),
-flees overleveled attackers, loots corpses, eats/drinks to recover, handles
-death (true corpse run via the mirrored corpsePos, spirit-healer fallback,
-rest-after-res), rotates across zones through road passes and portals, mails
-gathered mats to an alt or sells junk when bags fill, pauses when players are
-near, and takes scheduled breaks. Safety watch: whispers/nearby says can log,
-raise a webhook alarm, or log out.
+levels through camp circuits with zone-ups, runs dungeon gold rotations, flees
+overleveled or outnumbering attackers, interrupts enemy casts, pops emergency
+defensives and potions, auto-equips better drops, sells rares on the World
+Market, rides a mount on long legs, loots corpses, eats/drinks to recover,
+handles death (true corpse run via the mirrored corpsePos, spirit-healer
+fallback, rest-after-res), rotates across zones through road passes and
+portals, mails gathered mats to an alt or sells junk when bags fill, pauses
+when players are near, and takes scheduled breaks. Safety watch:
+whispers/nearby says can log, raise a webhook alarm, or log out.
 
 The server runs the authoritative sim; the bot is just a WebSocket client built
 on the game's own `ClientWorld` (`src/net/online.ts`). Only typed `ClientWorld`
@@ -55,7 +58,11 @@ zone map payload) live in `launcher_core.ts`, tested in
 `launcher_page.ts`.
 
 GUI extras: a Live panel (state, uptime, HP/resource bars, bags, items/hour,
-session copper earned + gold/hour, harvests/catches/kills/deaths), an
+session copper earned + gold/hour, harvests/catches/kills/deaths, and the
+level-mode progression boxes: level, xp, session xpGained, xp/hour), a mode
+dropdown with gold and level field rows (level: targetLevel, lootRule,
+zoneUp; gear upgrades auto-check for level mode), an Advanced: economy
+section (gearUpgrades / marketSell / mount toggles), an
 inline-SVG mini map of the current zone (rect, lakes, node dots by type, live
 position), a read-only inventory grid,
 named form profiles in localStorage (password never saved), and page-side
@@ -68,25 +75,29 @@ the FBSTAT channel), `GET /api/meta` (zones, nodeTypes, defaultServerUrl,
 ## FBSTAT channel
 
 main.ts prints one `FBSTAT {json}` line every 2 s: pos, live zoneId, brain
-mode, hp/resource pools, bags, the stats counters, and the inventory. The
+mode, hp/resource pools, bags, the stats counters (harvests/catches/kills/
+deaths/copperGained/raresKept/xpGained/levelsGained), the progression mirrors
+(xp, level), and the inventory. The
 launcher skims those lines off the child stream (they never reach the log
 pane) and serves the latest at `/api/live`. Alerts are a separate channel:
 the brain pushes `state.alerts` entries at the alert-worthy sites (death,
 circuit breaker, spirit-healer res, bags-full or max-runtime logout, whisper
-alarm, player-pause, schedule break, mail send); main.ts drains the queue
+alarm, player-pause, schedule break, mail send, level-up, target level
+reached); main.ts drains the queue
 each tick, prints `ALERT: <text>`, and POSTs `{content: text}` to
 `safety.webhookUrl` when configured (Discord/Slack-compatible,
 fire-and-forget).
 
 ## Config surface (parseConfig is strict; unknown keys fail)
 
-- `mode`: 'gather-fish' | 'gather' | 'fish' | 'gold'. Gate rule: 'gather' never
-  fishes; 'fish' never gathers; 'gather-fish' fishes only when the legacy
-  `fishing.enabled` is true (pre-mode minimal configs keep their behavior).
-  'gold' is the dungeon gold-farm: Rite of Expulsion (`exorcism`) pull only,
-  then auto-attack + Crusader Strike, Holy Ground (`consecration`) when 2+
-  attackers, and keep Oath of Iron + one paladin aura (Requital preferred;
-  Steadfast fallback) up. Ignores `combat.rotationMode` / `abilitySlots`.
+- `mode`: 'gather-fish' | 'gather' | 'fish' | 'gold' | 'level'. Gate rule:
+  'gather' never fishes; 'fish' never gathers; 'gather-fish' fishes only when
+  the legacy `fishing.enabled` is true (pre-mode minimal configs keep their
+  behavior). 'gold' is the dungeon gold-farm: Rite of Expulsion (`exorcism`)
+  pull only, then auto-attack + Crusader Strike, Holy Ground (`consecration`)
+  when 2+ attackers, and keep Oath of Iron + one paladin aura (Requital
+  preferred; Steadfast fallback) up. Ignores `combat.rotationMode` /
+  `abilitySlots`. 'level' is the camp-circuit leveling grind (see below).
 - `fishing.spots`: rotation list (legacy `spot` mirrors to `spots[0]` and
   back); `castsPerSpot` per spot before advancing. With the world seed,
   main.ts injects a `fishableAt` probe so dead spots are skipped locally.
@@ -96,11 +107,47 @@ fire-and-forget).
   character's spawn zone first**; the route graph (zone_graph.ts over ZONES +
   PORTALS) walks road passes and portals, skips unwalkable targets with a log
   line, and farshore_isle has no walkable route at all.
+- `levelGrind` (mode 'level'): `targetLevel` (logout + alert when reached),
+  `restBelowPct` (REST gate between pulls), `lootRule` ('money-blues' rides
+  the gold corpse filter + discard sweep; 'all' rides the normal LOOT state),
+  `zoneUp` (move to the next level band when every camp here is gray or
+  spent). The circuit (grind_circuits.ts over the real CAMPS/MOBS/ZONES
+  tables) picks the nearest non-gray camp in the [level-2, level+3] band,
+  walks to it (zone-graph legs cross-zone), pulls singly (ranged `exorcism`
+  when known, else walk-aggro), marks a camp cleared after 8 s quiet, and
+  waits out respawns (65 s) when all camps are spent. XP/level tracking rides
+  the `lifetimeXp` mirror; `xpGained`/`levelsGained` land in the FBSTAT stats.
+- `gearUpgrades`: after any loot pass, equip strictly-better drops by
+  `itemScore` (gear.ts; level/class gates use the same derivation the server
+  enforces; rings land in the weaker of ring1/ring2). Never downgrades, never
+  touches bags or reins. v1 notes: an equip is issued once per item per
+  session (a server-side reject is not retried), and the gold discard sweep
+  protects issued items.
+- `bags.marketSell`: on a BAGS_FULL trip with a World Market merchant in
+  range (the_merchant / Auctioneer Voss), collect proceeds once, then list
+  rare+ drops at `max(sellValue * 10, 100)` copper (v1: no marketSearch
+  undercut check, no pathing to the merchant, one listing per itemId, session
+  cap 10). Everything not listed falls through to the vendor/stop flow.
+- `mount`: `enabled` summons a bagged reins for overworld legs over 60 yd
+  (guided walks and zone legs; level 20+, riding trained; dismounts on combat
+  entry and when the leg shortens to 60 yd, not at the exact arrival point);
+  `buyTraining` fires `learnRiding` once when passing the stablemaster with
+  80g (level 20+). No mounted combat.
 - `combat`: `abilitySlots` round-robin ('slots') or `rotationMode: 'auto'`
   (first ready damage ability by cooldown/GCD/resource/range, rotation.ts);
-  `grind` pulls nearby hostiles between node spawns; `flee: 'outleveled'`
-  with `fleeAboveLevelDelta` runs from outleveled attackers (hub-ward) for up
-  to 15 s before turning to fight; `eatItemId`/`drinkItemId` + thresholds.
+  `grind` pulls nearby hostiles between node spawns; `flee`: 'never' |
+  'outleveled' | 'outnumbered' | 'both' ('outleveled' trips on
+  `fleeAboveLevelDelta`, 'outnumbered' on 3+ attackers; hub-ward for up to
+  15 s before turning to fight); `maxPullSize` (default 2) skips level-mode
+  pull targets whose 10 yd pack count exceeds it (60 s skip; gold and grind
+  ignore the cap because dungeon packs are authored at 2-3). Every COMBAT
+  tick, before the rotation: emergency buttons
+  (survival.ts: Ward of Faith under 40% hp, Last Rite under 20%, best hp
+  potion under 35%), then the class interrupt (survival.ts table: rebuke /
+  kick / counterspell / counter_shot / skull_bash / spell_lock) when an
+  attacker is casting with > 0.4 s left, then the rotation. Zone trash rarely
+  hardcasts; the interrupt's value is on bosses/casters.
+  `eatItemId`/`drinkItemId` + thresholds.
 - `death`: `waitUntilFull` (REST after a revive until both pools are 95%,
   3-minute cap), `maxDeaths` circuit breaker (0 = off), `avoidDeathSpotMinutes`
   danger memory (nodes and fish spots within 25 yd of a death spot are avoided).
@@ -174,6 +221,16 @@ Same doctrine as `bot/` (logic vs gateway) and `wallet_link.ts` vs `wallet.ts`:
 - `rotation.ts` (pure): 'auto' combat ability picking (cooldown/GCD/resource/
   range gates) plus the gold-mode mana-lean kit (`pickGoldCombatAbility`,
   `pickGoldMaintainBuff`). Tested in `tests/farmbot_rotation.test.ts`.
+- `survival.ts` (pure): emergency-button picking (Ward of Faith / Last Rite /
+  best hp potion, one defensive action per tick, combat and flee), the
+  10 yd pack counter, and the class-interrupt table + picker. Tested in
+  `tests/farmbot_survival.test.ts` (and via the brain suite).
+- `grind_circuits.ts` (pure): the level-mode camp tables (CAMPS/MOBS/ZONES
+  plus the xp curve), camp picking (gray-reject, level band, nearest), and
+  the next-zone band finder. Tested in `tests/farmbot_grind_circuits.test.ts`.
+- `gear.ts` (pure): `findUpgrades` (strictly-better-by-itemScore per slot,
+  level/class gates, weaker-of-two rings). Tested in
+  `tests/farmbot_gear.test.ts`.
 - `zone_graph.ts` (pure): zone walkability graph from ZONES + PORTALS and a
   BFS path finder. Tested in `tests/farmbot_zone_graph.test.ts`.
 - `main.ts` (IO shell): argv/env, login + character resolution (+ takeover on a
@@ -207,4 +264,6 @@ facing rides `{t:'input', ...}` frames, both of which `ClientWorld` owns.
 - `farmbot.config.example.json`: the profile shape, eastbrook_vale defaults.
 - Tests: `tests/farmbot_config.test.ts`, `tests/farmbot_navigator.test.ts`,
   `tests/farmbot_brain.test.ts`, `tests/farmbot_launcher.test.ts`,
-  `tests/farmbot_rotation.test.ts`, `tests/farmbot_zone_graph.test.ts`.
+  `tests/farmbot_rotation.test.ts`, `tests/farmbot_zone_graph.test.ts`,
+  `tests/farmbot_village_gates.test.ts`, `tests/farmbot_survival.test.ts`,
+  `tests/farmbot_grind_circuits.test.ts`, `tests/farmbot_gear.test.ts`.

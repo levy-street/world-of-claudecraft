@@ -309,4 +309,34 @@ describe('farmbot StuckDetector', () => {
     // stuckSince=1000; at t=2000 elapsed=1000 => attempt floor(1000/500)+1 = 3 => blacklist
     expect(det.update({ x: 0, z: 0 }, 2000).escalation).toBe('blacklist');
   });
+
+  it('ignores micro-slides along a wall so recovery can escalate', () => {
+    const det = new StuckDetector({
+      windowMs: 1000,
+      epsilon: 0.5,
+      freeEpsilon: 3,
+      blacklistAfter: 3,
+      recoveryMs: 500,
+    });
+    det.update({ x: 0, z: 0 }, 0);
+    expect(det.update({ x: 0, z: 0 }, 1000).label).toBe('back');
+    // 1 yd of wall-slide is not free: streak continues, next attempt lands.
+    expect(det.update({ x: 1, z: 0 }, 1200).escalation).toBe('wiggle');
+    expect(det.update({ x: 1.2, z: 0 }, 1500).label).toBe('back-left');
+    // Still trapped near the snag: blacklist instead of resetting forever.
+    expect(det.update({ x: 1.5, z: 0 }, 2000).escalation).toBe('blacklist');
+  });
+
+  it('clears only after real escape distance from the snag origin', () => {
+    const det = new StuckDetector({
+      windowMs: 1000,
+      epsilon: 0.5,
+      freeEpsilon: 3,
+      recoveryMs: 500,
+    });
+    det.update({ x: 0, z: 0 }, 0);
+    expect(det.update({ x: 0, z: 0 }, 1000).escalation).toBe('wiggle');
+    // 4 yd away: free
+    expect(det.update({ x: 4, z: 0 }, 1200).stuck).toBe(false);
+  });
 });

@@ -206,11 +206,20 @@ export interface LauncherFormConfig {
   drinkBelowManaPct: number | null;
   fullPolicy: string;
   maxRuntimeMinutes: number;
-  // Farm mode ('gather-fish' | 'gather' | 'fish' | 'gold'); '' means default.
+  // Farm mode ('gather-fish' | 'gather' | 'fish' | 'gold' | 'level'); '' means default.
   mode: string;
   // Gold mode: comma-separated dungeon ids and the recharge threshold.
   goldDungeons: string;
   goldRestBelowPct: number | null;
+  // Level mode: camp-circuit target and rules.
+  targetLevel: number | null;
+  lootRule: string;
+  zoneUp: boolean;
+  // Economy: auto-equip upgrades, World Market selling, mount travel.
+  gearUpgrades: boolean;
+  marketSell: boolean;
+  mountEnabled: boolean;
+  mountBuyTraining: boolean;
 }
 
 // Assemble the plain object that parseConfig validates. Omits optional keys
@@ -251,6 +260,18 @@ export function assembleConfig(f: LauncherFormConfig): Record<string, unknown> {
     if (dungeons.length > 0) goldFarm.dungeons = dungeons;
     if (f.goldRestBelowPct !== null) goldFarm.restBelowPct = f.goldRestBelowPct;
     out.goldFarm = goldFarm;
+  }
+  if (f.mode === 'level') {
+    const levelGrind: Record<string, unknown> = { zoneUp: f.zoneUp };
+    if (f.targetLevel !== null) levelGrind.targetLevel = f.targetLevel;
+    if (f.lootRule) levelGrind.lootRule = f.lootRule;
+    out.levelGrind = levelGrind;
+  }
+  // Economy: emitted only when enabled, so the defaults stay the defaults.
+  if (f.gearUpgrades) out.gearUpgrades = true;
+  if (f.marketSell) (out.bags as Record<string, unknown>).marketSell = true;
+  if (f.mountEnabled || f.mountBuyTraining) {
+    out.mount = { enabled: f.mountEnabled, buyTraining: f.mountBuyTraining };
   }
   return out;
 }

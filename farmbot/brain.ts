@@ -352,6 +352,9 @@ export interface BrainState {
   levelLifetimeXpLast: number | null;
   levelLastLevel: number | null;
   levelRestedLogged: boolean;
+  // Pull aiming (the cast-facing gate): last setMouselookFacing toward the
+  // pull target.
+  levelAimAtMs: number;
   goldWaitLogAtMs: number;
   // Last mirrored purse copper (session earn tracking for any mode).
   lastCopper: number | null;
@@ -479,6 +482,7 @@ export function createBrain(config: FarmBotConfig, deps: BrainDeps = {}): BrainS
     levelLifetimeXpLast: null,
     levelLastLevel: null,
     levelRestedLogged: false,
+    levelAimAtMs: 0,
     goldWaitLogAtMs: 0,
     lastCopper: null,
     zoneGraph: deps.zoneGraph ?? buildZoneGraph(ZONES, PORTALS),
@@ -585,6 +589,10 @@ const GOLD_RESET_WAIT_MS = 305_000; // INSTANCE_EMPTY_TIMEOUT (300 s) plus slack
 const GOLD_WAIT_LOG_MS = 30_000;
 const GOLD_HEAL_GATE_MS = 2_800; // pace Mending Light attempts to its 2.5 s cast
 const FLASH_HEAL_GATE_MS = 1_800; // pace Lightmend attempts to its 1.5 s cast
+// Level-mode pull aiming (see stepLevel): re-aim at the wanderer at most this
+// often; PULL_FACING_ARC sits far inside the server's MELEE_ARC cast gate.
+const PULL_AIM_MS = 300;
+const PULL_FACING_ARC = 0.4;
 // Pack assessment (combat.maxPullSize): a skipped pull target stays off the
 // candidate list this long, then gets re-evaluated (the pack may have thinned).
 const PULL_SKIP_MS = 60_000;
@@ -1308,15 +1316,10 @@ function stepGold(state: BrainState, world: BotWorld, nowMs: number, logs: strin
     const mob = nearestLivingHostile(state, world, nowMs);
     if (mob) {
       state.goldNoMobSinceMs = null;
-      // Pack assessment: a target buried in a pack bigger than maxPullSize is
-      // skipped for PULL_SKIP_MS; the next tick picks the next-nearest mob.
-      const pack = countPackAround(world.entities.values(), mob);
-      if (pack > state.config.combat.maxPullSize) {
-        state.pullSkipUntilMs.set(mob.id, nowMs + PULL_SKIP_MS);
-        stopMoving(world);
-        logs.push(`gold: skipping ${mob.name}, pack of ${pack}`);
-        return;
-      }
+      // Gold mode deliberately ignores combat.maxPullSize. Dungeon trash is
+      // authored in packs of 2-3 (boss dais = 3); skipping those walked the
+      // nave empty and logged "cleared" with zero kills. Level mode still
+      // uses the pack gate for open-world safety.
       if (distance(pos2(p), pos2(mob)) > GOLD_PULL_RANGE) {
         const steer = steerToward(pos2(p), p.facing, pos2(mob), GOLD_PULL_RANGE - 2);
         world.setMoveInput(steer.input, steer.facing);
@@ -1553,17 +1556,37 @@ function stepLevel(state: BrainState, world: BotWorld, nowMs: number, logs: stri
     return;
   }
 
-  if (distance(pos2(p), pos2(mob)) > GOLD_PULL_RANGE) {
-    const steer = steerToward(pos2(p), p.facing, pos2(mob), GOLD_PULL_RANGE - 2);
+  // Cast window: exorcism reaches 30, but the server hard-fails 'Out of
+  // range.' past it and camp mobs wander, so the bot closes to 24 and casts
+  // only inside 26 (the phase-15 smoke: borderline stops whiffed for minutes).
+  const castRange = GOLD_PULL_RANGE - 4;
+  if (distance(pos2(p), pos2(mob)) > castRange) {
+    const steer = steerToward(pos2(p), p.facing, pos2(mob), castRange - 2);
     world.setMoveInput(steer.input, steer.facing);
     return;
   }
   stopMoving(world);
-  if (nowMs - state.goldLastPullAtMs >= GOLD_PULL_CADENCE_MS) {
-    const pullId = state.config.goldFarm.pullAbility;
-    if (world.known.some((k) => k.def.id === pullId)) {
+  // The server rejects casts facing > MELEE_ARC off the target ('You must be
+  // facing your target.'): a standing bot keeps its arrival facing while camp
+  // mobs wander, so aim first (the facing rides the input stream, same lag as
+  // the fishing probe) and cast once the mirror shows it, re-aiming at most
+  // every PULL_AIM_MS (the phase-15 smoke: ~3% of pulls landed without this).
+  const aim = steerToward(pos2(p), p.facing, pos2(mob), castRange - 2).facing;
+  if (Math.abs(normAngle(aim - p.facing)) > PULL_FACING_ARC) {
+    if (nowMs - state.levelAimAtMs >= PULL_AIM_MS) {
+      state.levelAimAtMs = nowMs;
+      world.setMouselookFacing(aim);
+      return;
+    }
+  }
+  // The pull cooldown rides the mirror (exorcism cools down 15 s; the cadence
+  // alone would spam failing casts every 600 ms, the phase-15 smoke finding).
+  const pull = world.known.find((k) => k.def.id === state.config.goldFarm.pullAbility);
+  const pullOnCooldown = (p.cooldowns.get(state.config.goldFarm.pullAbility) ?? 0) > 0;
+  if (!pullOnCooldown && nowMs - state.goldLastPullAtMs >= GOLD_PULL_CADENCE_MS) {
+    if (pull) {
       world.targetEntity(mob.id);
-      world.castAbility(pullId);
+      world.castAbility(pull.def.id);
       logs.push(`level: pulling ${mob.name}`);
     } else {
       // No ranged pull known: walk-aggro the edge mob (the grind pattern).

@@ -83,8 +83,9 @@ export function pickEmergencyAction(
 
 // --- pack assessment (phase 13) ---------------------------------------------
 // Living hostile mobs within PACK_ASSESS_RANGE of a pull candidate, the
-// candidate included (a solo mob counts 1). Gold and level modes skip the
-// target when this exceeds combat.maxPullSize; combat.grind ignores the cap.
+// candidate included (a solo mob counts 1). Level mode skips the target when
+// this exceeds combat.maxPullSize. Gold and grind ignore the cap (dungeons
+// are fixed multi-packs; grind is intentional AOE).
 
 export const PACK_ASSESS_RANGE = 10; // yards around the candidate
 

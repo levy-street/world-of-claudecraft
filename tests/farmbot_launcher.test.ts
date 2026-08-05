@@ -32,6 +32,13 @@ const FORM = {
   mode: '',
   goldDungeons: '',
   goldRestBelowPct: null,
+  targetLevel: null,
+  lootRule: '',
+  zoneUp: true,
+  gearUpgrades: false,
+  marketSell: false,
+  mountEnabled: false,
+  mountBuyTraining: false,
 };
 
 describe('farmbot launcher RingLog', () => {
@@ -125,6 +132,43 @@ describe('farmbot launcher assembleConfig', () => {
     expect(() => parseConfig(assembleConfig({ ...FORM, nodeTypes: ['fish'] }))).toThrow(
       /nodeTypes/,
     );
+  });
+
+  it('wires level mode and the economy toggles into the document', () => {
+    const cfg = parseConfig(
+      assembleConfig({
+        ...FORM,
+        mode: 'level',
+        targetLevel: 20,
+        lootRule: 'money-blues',
+        zoneUp: true,
+        gearUpgrades: true,
+        marketSell: true,
+        mountEnabled: true,
+        mountBuyTraining: true,
+      }),
+    );
+    expect(cfg.mode).toBe('level');
+    expect(cfg.levelGrind).toEqual({
+      targetLevel: 20,
+      restBelowPct: 50,
+      lootRule: 'money-blues',
+      zoneUp: true,
+    });
+    expect(cfg.gearUpgrades).toBe(true);
+    expect(cfg.bags.marketSell).toBe(true);
+    expect(cfg.mount).toEqual({ enabled: true, buyTraining: true });
+  });
+
+  it('keeps the economy keys out of the document when the toggles are off', () => {
+    const out = assembleConfig({ ...FORM, mode: 'level', zoneUp: false });
+    expect(out.gearUpgrades).toBeUndefined();
+    expect((out.bags as Record<string, unknown>).marketSell).toBeUndefined();
+    expect(out.mount).toBeUndefined();
+    // zoneUp is a real checkbox state, so it travels even when false
+    expect((out.levelGrind as Record<string, unknown>).zoneUp).toBe(false);
+    expect((out.levelGrind as Record<string, unknown>).targetLevel).toBeUndefined();
+    expect((out.levelGrind as Record<string, unknown>).lootRule).toBeUndefined();
   });
 });
 

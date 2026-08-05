@@ -2815,15 +2815,49 @@ describe('farmbot brain: level mode (phase 12)', () => {
     expect(world.abilityCasts).toEqual([]);
     // inside pull reach once the cadence gate has opened: stop and cast
     wolf.pos = { x: 70, y: 0, z: 0 };
+    world.player.facing = Math.PI / 2; // the mirror echo of steering due +x
     logs = step(state, world, 700);
     expect(logs.some((l) => l.includes('level: pulling wolf'))).toBe(true);
     expect(world.targets).toEqual([90]);
     expect(world.abilityCasts).toEqual(['exorcism']);
   });
 
+  it('holds the ranged pull while the pull ability cools down', () => {
+    const { state, world } = levelBrain();
+    world.known = [levelAbility('exorcism')];
+    world.player.pos = { x: 45, y: 0, z: 0 };
+    world.player.facing = Math.PI / 2; // mob is due +x
+    world.player.cooldowns.set('exorcism', 10);
+    world.entities.set(90, levelMob(90, 'wolf', 60, 0));
+    const logs = step(state, world, 700); // cadence open, cooldown not
+    expect(world.abilityCasts).toEqual([]);
+    expect(logs.some((l) => l.includes('level: pulling'))).toBe(false);
+    // cooled down: the next eligible tick casts
+    world.player.cooldowns.set('exorcism', 0);
+    step(state, world, 1400);
+    expect(world.abilityCasts).toEqual(['exorcism']);
+  });
+
+  it('aims at the pull target before casting when facing is off', () => {
+    const { state, world } = levelBrain();
+    world.known = [levelAbility('exorcism')];
+    world.player.pos = { x: 45, y: 0, z: 0 };
+    world.player.facing = 0; // mob is due -x: bearing -PI/2, well off the arc
+    world.entities.set(90, levelMob(90, 'wolf', 40, 0));
+    const logs = step(state, world, 700);
+    expect(world.abilityCasts).toEqual([]); // aimed instead of casting
+    expect(logs.some((l) => l.includes('level: pulling'))).toBe(false);
+    expect(world.facing).toBeCloseTo(-Math.PI / 2);
+    // the facing echo lands on the mirror: the next tick casts
+    world.player.facing = -Math.PI / 2;
+    step(state, world, 800);
+    expect(world.abilityCasts).toEqual(['exorcism']);
+  });
+
   it('walk-aggros when no pull ability is known', () => {
     const { state, world } = levelBrain();
     world.player.pos = { x: 45, y: 0, z: 0 };
+    world.player.facing = Math.PI / 2; // mob is due +x
     world.entities.set(90, levelMob(90, 'wolf', 60, 0));
     const logs = step(state, world, 700); // cadence: first pull allowed
     expect(logs.some((l) => l.includes('level: engaging wolf'))).toBe(true);
@@ -2979,28 +3013,19 @@ describe('farmbot brain: combat intelligence (phase 13)', () => {
     return mob;
   }
 
-  it('gold mode skips a packed pull target for 60s and takes the next mob', () => {
+  it('gold mode pulls into a 3-pack (dungeon packs are the farm, not a skip)', () => {
     const { state, world } = makeBrain({ mode: 'gold' });
     state.goldPhase = 'clear';
     world.player.pos = insidePos(0, 30);
-    // a linked pack of three ahead, one straggler off to the side
+    // Crypt-style pack of three (maxPullSize default is 2; gold must ignore it).
     world.entities.set(90, packMob(90, 'acolyte', insidePos(5, 32)));
     world.entities.set(91, packMob(91, 'acolyte', insidePos(8, 32)));
     world.entities.set(92, packMob(92, 'acolyte', insidePos(5, 35)));
-    world.entities.set(93, packMob(93, 'straggler', insidePos(20, 32)));
 
-    let logs = step(state, world, 0);
-    expect(logs.some((l) => l.includes('gold: skipping acolyte, pack of 3'))).toBe(true);
-    expect(state.pullSkipUntilMs.get(90)).toBe(60_000);
-    expect(world.abilityCasts).toEqual([]);
-    logs = step(state, world, 100);
-    expect(state.pullSkipUntilMs.get(92)).toBe(100 + 60_000); // next-nearest packed mob
-    logs = step(state, world, 200);
-    expect(state.pullSkipUntilMs.get(91)).toBe(200 + 60_000);
-    // every packed mob skipped: the straggler (solo) is the pull
-    logs = step(state, world, 700);
-    expect(logs.some((l) => l.includes('gold: pulling straggler'))).toBe(true);
-    expect(world.targets).toEqual([93]);
+    const logs = step(state, world, 700);
+    expect(logs.some((l) => l.includes('gold: skipping'))).toBe(false);
+    expect(logs.some((l) => l.includes('gold: pulling acolyte'))).toBe(true);
+    expect(world.targets).toEqual([90]);
     expect(world.abilityCasts).toEqual(['exorcism']);
   });
 
@@ -3017,6 +3042,7 @@ describe('farmbot brain: combat intelligence (phase 13)', () => {
     const { state, world } = makeBrain({ mode: 'level' }, { grindTables: tables });
     world.player.level = 5;
     world.player.pos = { x: 45, y: 0, z: 0 };
+    world.player.facing = Math.PI / 2; // the loner is due +x
     world.entities.set(90, packMob(90, 'packwolf', { x: 48, y: 0, z: 0 }));
     world.entities.set(91, packMob(91, 'packwolf', { x: 48, y: 0, z: 5 }));
     world.entities.set(92, packMob(92, 'packwolf', { x: 48, y: 0, z: -5 }));

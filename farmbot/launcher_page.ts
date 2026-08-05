@@ -112,6 +112,7 @@ export const LAUNCHER_PAGE = `<!DOCTYPE html>
       <option value="gather">Gather only</option>
       <option value="fish">Fish only</option>
       <option value="gold">Gold (dungeons)</option>
+      <option value="level">Level (grind camps)</option>
     </select>
     <div id="goldRow" style="display:none">
       <label for="goldDungeons">Dungeons (comma separated)</label>
@@ -119,6 +120,19 @@ export const LAUNCHER_PAGE = `<!DOCTYPE html>
       <div class="row">
         <div><label for="goldRestBelowPct">Recharge below HP/mana %</label><input type="number" id="goldRestBelowPct" min="1" max="100" placeholder="50"></div>
       </div>
+    </div>
+    <div id="levelRow" style="display:none">
+      <div class="row">
+        <div><label for="targetLevel">Target level (logout when reached)</label><input type="number" id="targetLevel" min="1" value="20"></div>
+        <div><label for="lootRule">Loot rule</label><select id="lootRule">
+          <option value="money-blues">Money + blues (discard the rest)</option>
+          <option value="all">Loot everything</option>
+        </select></div>
+      </div>
+      <div class="checks">
+        <label><input type="checkbox" id="zoneUp" checked> Zone up when the band is gray</label>
+      </div>
+      <div class="note">Gear upgrades default on for level mode (Advanced: economy below).</div>
     </div>
     <label for="zone">Zone</label>
     <select id="zone"></select>
@@ -153,6 +167,15 @@ export const LAUNCHER_PAGE = `<!DOCTYPE html>
         <div><label for="drinkBelowManaPct">Drink below mana %</label><input type="number" id="drinkBelowManaPct" min="1" max="100"></div>
       </div>
     </details>
+    <details>
+      <summary>Advanced: economy (gear / market / mount)</summary>
+      <div class="checks">
+        <label><input type="checkbox" id="gearUpgrades"> Auto-equip better drops</label>
+        <label><input type="checkbox" id="marketSell"> Sell rares on the World Market</label>
+        <label><input type="checkbox" id="mountEnabled"> Mount for long travel legs (level 20+)</label>
+        <label><input type="checkbox" id="mountBuyTraining"> Buy riding training (80g) at the stablemaster</label>
+      </div>
+    </details>
     <div class="msg" id="farmMsg"></div>
   </section>
 
@@ -169,6 +192,10 @@ export const LAUNCHER_PAGE = `<!DOCTYPE html>
       <div class="stat"><div class="v" id="lvCatches">0</div><div class="k">catches</div></div>
       <div class="stat"><div class="v" id="lvKills">0</div><div class="k">kills</div></div>
       <div class="stat"><div class="v" id="lvDeaths">0</div><div class="k">deaths</div></div>
+      <div class="stat"><div class="v" id="lvLevel">-</div><div class="k">level</div></div>
+      <div class="stat"><div class="v" id="lvXp">-</div><div class="k">xp</div></div>
+      <div class="stat"><div class="v" id="lvXpGained">0</div><div class="k">xp gained</div></div>
+      <div class="stat"><div class="v" id="lvXpRate">-</div><div class="k">xp/hour</div></div>
     </div>
     <label>HP</label><div class="bar hp"><div id="hpFill" style="width:0"></div></div>
     <label>Mana / resource</label><div class="bar mana"><div id="manaFill" style="width:0"></div></div>
@@ -194,7 +221,8 @@ const PROFILES_KEY = 'farmbot-launcher-profiles';
 const ROTATION_KEY = 'farmbot-launcher-rotation';
 const PERSIST_IDS = ['serverUrl','username','character','mode','goldDungeons','goldRestBelowPct','zone','maxNodeTier','abilitySlots','maxRuntimeMinutes',
   'fishingEnabled','spotX','spotZ','castsPerSpot','fullPolicy','eatItemId','eatBelowHpPct',
-  'drinkItemId','drinkBelowManaPct'];
+  'drinkItemId','drinkBelowManaPct','targetLevel','lootRule','zoneUp',
+  'gearUpgrades','marketSell','mountEnabled','mountBuyTraining'];
 let nodeTypeValues = [];
 let zoneInfoById = {};
 let running = false;
@@ -233,6 +261,12 @@ function collectForm() {
   return data;
 }
 
+function updateModeRows() {
+  const m = $('mode').value;
+  $('goldRow').style.display = m === 'gold' ? '' : 'none';
+  $('levelRow').style.display = m === 'level' ? '' : 'none';
+}
+
 function applyForm(data) {
   for (const id of PERSIST_IDS) {
     if (!(id in data)) continue;
@@ -250,7 +284,7 @@ function applyForm(data) {
   }
   if (data.character) $('character').value = data.character;
   $('fishingRow').style.display = $('fishingEnabled').checked ? '' : 'none';
-  $('goldRow').style.display = $('mode').value === 'gold' ? '' : 'none';
+  updateModeRows();
 }
 
 function saveForm() {
@@ -402,6 +436,13 @@ function gatherConfig() {
     mode: $('mode').value,
     goldDungeons: $('goldDungeons').value,
     goldRestBelowPct: numOrNull('goldRestBelowPct'),
+    targetLevel: numOrNull('targetLevel'),
+    lootRule: $('lootRule').value,
+    zoneUp: $('zoneUp').checked,
+    gearUpgrades: $('gearUpgrades').checked,
+    marketSell: $('marketSell').checked,
+    mountEnabled: $('mountEnabled').checked,
+    mountBuyTraining: $('mountBuyTraining').checked,
   };
 }
 
@@ -497,6 +538,12 @@ async function pollLive() {
     $('lvCatches').textContent = stat.stats.catches;
     $('lvKills').textContent = stat.stats.kills;
     $('lvDeaths').textContent = stat.stats.deaths;
+    // Progression (level mode): mirrors are optional on older bots.
+    $('lvLevel').textContent = typeof stat.level === 'number' ? stat.level : '-';
+    $('lvXp').textContent = typeof stat.xp === 'number' ? stat.xp : '-';
+    const xpGained = Number(stat.stats && stat.stats.xpGained) || 0;
+    $('lvXpGained').textContent = xpGained;
+    $('lvXpRate').textContent = hours > 0.001 ? Math.round(xpGained / hours) : '-';
     $('hpFill').style.width = (stat.maxHp ? Math.round((100 * stat.hp) / stat.maxHp) : 0) + '%';
     $('manaFill').style.width = (stat.maxResource ? Math.round((100 * stat.resource) / stat.maxResource) : 0) + '%';
     renderMap(stat);
@@ -562,7 +609,10 @@ $('fishingEnabled').onchange = () => {
   $('fishingRow').style.display = $('fishingEnabled').checked ? '' : 'none';
 };
 $('mode').onchange = () => {
-  $('goldRow').style.display = $('mode').value === 'gold' ? '' : 'none';
+  // Level mode ships with gear upgrades on (fresh characters live off drops);
+  // the user can still uncheck it in Advanced: economy.
+  if ($('mode').value === 'level') $('gearUpgrades').checked = true;
+  updateModeRows();
   saveForm();
 };
 for (const id of PERSIST_IDS) $(id).addEventListener('change', saveForm);
