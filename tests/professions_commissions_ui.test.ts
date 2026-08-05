@@ -8,7 +8,7 @@
 
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { ALL_RECIPES } from '../src/sim/content/recipes';
 import { ITEMS } from '../src/sim/data';
 import type { InvSlot } from '../src/sim/types';
@@ -196,6 +196,12 @@ describe('buildUnbindView (the service rows mirror the resolver)', () => {
 });
 
 describe('renderUnbindWindow painter', () => {
+  // The focus test attaches to document.body; a mid-test failure must not
+  // leak a focused node into the shared document for later tests.
+  afterEach(() => {
+    document.body.innerHTML = '';
+  });
+
   it('paints an affordable row with the fee and reports the unbind click', () => {
     const el = document.createElement('div');
     const deps = unbindDeps();
@@ -241,5 +247,41 @@ describe('renderUnbindWindow painter', () => {
     );
     (el2.querySelector('[data-close]') as HTMLButtonElement).click();
     expect(deps.onClose).toHaveBeenCalled();
+  });
+
+  it('carries keyboard focus across a repaint (uninitiated rebuilds)', () => {
+    // Inventory and purse deltas repaint an open window uninitiated (#2931):
+    // the focus-across-a-REBUILD contract, train_window idiom. Attached to
+    // document.body because focus() is inert on a detached tree.
+    const el = document.createElement('div');
+    document.body.appendChild(el);
+    const deps = unbindDeps();
+    const twoBound: InvSlot[] = [
+      { itemId: SWORD, count: 1, instance: { bindOnTrade: true, boundTo: 5 } },
+      { itemId: VESTMENTS, count: 1, instance: { bindOnTrade: true, boundTo: 5 } },
+    ];
+    const view = buildUnbindView({ inventory: twoBound, copper: 50000, items: ITEMS });
+    renderUnbindWindow(el, 'Darva', view, deps);
+    el.querySelector<HTMLButtonElement>(`[data-focus-key="unbind:${SWORD}"]`)?.focus();
+    renderUnbindWindow(el, 'Darva', view, deps);
+    expect((document.activeElement as HTMLElement).dataset.focusKey).toBe(`unbind:${SWORD}`);
+    // ONLY the focused row coming back disabled (its fee now short) falls to
+    // the row neighbor, never to <body> and never straight to close: this is
+    // the rung the uninitiated purse repaint actually exercises.
+    const focusedShort = view.rows.map((row) =>
+      row.itemId === SWORD ? { ...row, affordable: false } : row,
+    );
+    renderUnbindWindow(el, 'Darva', { rows: focusedShort }, deps);
+    expect((document.activeElement as HTMLElement).dataset.focusKey).not.toBe(`unbind:${SWORD}`);
+    expect((document.activeElement as HTMLElement).dataset.focusKey).toMatch(/^unbind:/);
+    // Every row coming back disabled falls to the close button.
+    renderUnbindWindow(
+      el,
+      'Darva',
+      { rows: view.rows.map((row) => ({ ...row, affordable: false })) },
+      deps,
+    );
+    expect((document.activeElement as HTMLElement).dataset.focusKey).toBe('close');
+    el.remove();
   });
 });

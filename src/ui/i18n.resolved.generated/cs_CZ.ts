@@ -2092,6 +2092,7 @@ export const cs_CZ: EnTranslations = {
     "materialHint": {
       "fineGrade": "Jemná jakost. Sesbírána z naleziště plné úrovně nástrojem vyššího stupně, než je materiál, a počítá se jako běžná verze všude, kde je běžná verze potřeba.",
       "cookingCatch": "Kuchařská ingredience. Před snědením ji musíš uvařit.",
+      "usedBy": "Used by {crafts}.",
       "arcaneDust": "Reagencie k okouzlení. Získává se rozzačarováním běžné a neobvyklé výbavy.",
       "arcaneEssence": "Reagencie k okouzlení. Získává se rozzačarováním vzácné výbavy.",
       "arcaneShard": "Reagencie k okouzlení. Získává se rozzačarováním epické a legendární výbavy.",
@@ -2718,6 +2719,18 @@ export const cs_CZ: EnTranslations = {
         "artisansEye": "Řemeslníkovo oko",
         "quickeningCharm": "Odpružení"
       },
+      "toolEffectTooltip": {
+        "kind": "Tool charm",
+        "bonus": {
+          "gatherersCache": "+1 yield per harvest while charged.",
+          "artisansEye": "Raises the harvest grade by 1 tool tier while charged.",
+          "quickeningCharm": "Shortens the node respawn timer it triggers."
+        },
+        "howToSlot": "Slot onto a mining, logging, or herbalism tool from the Professions window. Consumed when slotted.",
+        "charges": "Starts with {base} charges on a common tool (+{bonus} per rarity rung).",
+        "landOnly": "Does not slot on fishing rods.",
+        "openProfessions": "Open Professions to slot this onto a gathering tool."
+      },
       "toolEffectSlotButton": "Vložit {effect}",
       "toolEffectRechargeButton": "Dobít",
       "toolEffectSlotted": "Efekt {effect} vložen do nástroje pro {profession}.",
@@ -2830,6 +2843,8 @@ export const cs_CZ: EnTranslations = {
       "masterworkToast": "Mistrovské dílo! {name}",
       "masterworkZoneLine": "{crafter} vytvořil mistrovské dílo {name}!",
       "tierUpToast": "{craft} postoupilo do úrovně {tier}!",
+      "skillUpToast": "{skill} skill increased to {level}!",
+      "skillUpSubtext": "Skill increased to {level}!",
       "trendNudge": "Tvoje ruce se klonívají k {archetype}. Jeho nalaďování tě čeká u {master}.",
       "trendNudgeNoMaster": "Tvoje ruce se klonívají k {archetype}. Vyhledej mistra řemesla a ujmi se ho.",
       "attunedZoneLine": "{name} se naladit jako {archetype}!",

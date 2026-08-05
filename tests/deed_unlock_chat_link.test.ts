@@ -51,7 +51,12 @@ interface DeedLinkHarness {
 
 function makeHud(): DeedLinkHarness {
   const hud = Object.create(Hud.prototype) as unknown as DeedLinkHarness;
-  hud.sim = { playerId: 7, craftingIdentity: { synced: false }, craftSkills: {} };
+  hud.sim = {
+    playerId: 7,
+    craftingIdentity: { synced: false },
+    craftSkills: {},
+    gatheringProficiency: {},
+  };
   hud.renderer = { handleEvent: vi.fn() };
   hud.playEventSfx = vi.fn();
   hud.meters = { onEvent: vi.fn() };

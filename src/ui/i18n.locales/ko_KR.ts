@@ -8685,6 +8685,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.masterworkToast': '걸작! {name}',
   'hudChrome.crafting.masterworkZoneLine': '{crafter}님이 걸작 {name}을(를) 제작했습니다!',
   'hudChrome.crafting.tierUpToast': '{craft} 티어 {tier} 달성!',
+  'hudChrome.crafting.skillUpToast': '{skill} 기술 {level} 달성!',
+  'hudChrome.crafting.skillUpSubtext': '기술 {level} 달성!',
   'hudChrome.crafting.makersMark': '제작자: {name}',
   'hudChrome.bags.itemAriaInstanced': '{item}, 수량 {count}, 제작자 표식이 있는 사본',
   'hudChrome.bags.itemAriaMasterwork': '{item}, 수량 {count}, 걸작',
@@ -10282,6 +10284,19 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectName.quickeningCharm': '회복의 부적',
   'hudChrome.professions.toolEffectName.artisansEye': '장인의 눈',
   'hudChrome.professions.toolEffectName.gatherersCache': '채집가의 주머니',
+  'hudChrome.professions.toolEffectTooltip.kind': '도구 부적',
+  'hudChrome.professions.toolEffectTooltip.bonus.gatherersCache': '충전된 동안 채집당 획득량 +1.',
+  'hudChrome.professions.toolEffectTooltip.bonus.artisansEye':
+    '충전된 동안 수확 등급이 도구 1단계만큼 올라갑니다.',
+  'hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm':
+    '발동한 자원 채집지의 재생성 시간을 단축합니다.',
+  'hudChrome.professions.toolEffectTooltip.howToSlot':
+    '전문 기술 창에서 채광, 벌목, 약초학 도구에 장착합니다. 장착 시 소모됩니다.',
+  'hudChrome.professions.toolEffectTooltip.charges':
+    '일반 등급 도구에서는 {base}회 충전으로 시작합니다(희귀도 한 단계마다 +{bonus}회).',
+  'hudChrome.professions.toolEffectTooltip.landOnly': '낚싯대에는 장착할 수 없습니다.',
+  'hudChrome.professions.toolEffectTooltip.openProfessions':
+    '전문 기술 창을 열어 채집 도구에 장착하세요.',
   'hudChrome.professions.toolEffectSlotButton': '{effect} 장착',
   'hudChrome.professions.toolEffectRechargeButton': '재충전',
   'hudChrome.professions.toolEffectNoGain': '{effect}은(는) 이미 장착되어 있고 충전도 가득합니다.',

@@ -23,6 +23,7 @@ import type { EquipSlot } from '../sim/types';
 import type { IWorld } from '../world_api';
 import { STAT_PANELS } from './char_stats_view';
 import { buildPaperdollView, type PaperdollSlot } from './char_view';
+import { craftNameText } from './craft_name_view';
 import { markDialogRoot } from './dialog_root';
 import { classDisplayName, itemDisplayName } from './entity_i18n';
 import { dropRequiredLevel, paperdollDropAction } from './equip_drop_core';
@@ -67,21 +68,12 @@ const ARCHETYPE_PAIR_TITLE_KEYS: Record<string, TranslationKey> = {
   'armorcrafting+engineering': 'hudChrome.archetypePair.armorcrafting+engineering',
 };
 
-// The ten per-craft display-name keys, one per craft id on the ring (see
-// src/sim/content/professions.ts CRAFT_RING). Used wherever a CRAFT (not a
-// title) is meant: the hobby line, skill rows, section headers, combo labels.
-const CRAFT_NAME_KEYS: Record<string, TranslationKey> = {
-  armorcrafting: 'hudChrome.craftName.armorcrafting',
-  weaponcrafting: 'hudChrome.craftName.weaponcrafting',
-  jewelcrafting: 'hudChrome.craftName.jewelcrafting',
-  alchemy: 'hudChrome.craftName.alchemy',
-  engineering: 'hudChrome.craftName.engineering',
-  cooking: 'hudChrome.craftName.cooking',
-  inscription: 'hudChrome.craftName.inscription',
-  enchanting: 'hudChrome.craftName.enchanting',
-  tailoring: 'hudChrome.craftName.tailoring',
-  leatherworking: 'hudChrome.craftName.leatherworking',
-};
+// The per-craft display-name table lives in the shared craft_name_view.ts
+// pure core (the material_profession_hint_view Used-by line reads it too, and
+// a pure core may not import a *_window module). Re-exported here so the
+// historical import sites (crafting window, identity card, quest dialog,
+// train window, professions window, hud) keep resolving unchanged.
+export { craftNameText };
 
 /** Localized text for the granted pair-archetype title (the input is the
  *  canonical pair id from IWorld `archetypeTitle`), or the "no title yet" copy
@@ -89,14 +81,6 @@ const CRAFT_NAME_KEYS: Record<string, TranslationKey> = {
  *  somehow unrecognized). Exported for the view-model test. */
 export function archetypeTitleText(pairId: string | null): string {
   const key = pairId !== null ? ARCHETYPE_PAIR_TITLE_KEYS[pairId] : undefined;
-  return t(key ?? 'hudChrome.archetypeTitle.none');
-}
-
-/** Localized display name for one craft on the ring, or the same "none" copy
- *  for null/unrecognized ids. Exported for the crafting window, identity card,
- *  and quest dialog (every surface that names a CRAFT rather than a title). */
-export function craftNameText(craftId: string | null): string {
-  const key = craftId !== null ? CRAFT_NAME_KEYS[craftId] : undefined;
   return t(key ?? 'hudChrome.archetypeTitle.none');
 }
 

@@ -2092,6 +2092,7 @@ export const id_ID: EnTranslations = {
     "materialHint": {
       "fineGrade": "Mutu halus. Dikumpulkan dari urat tingkat penuh dengan alat berperingkat di atas materialnya, dan dihitung sebagai versi biasa di mana pun versi biasa dibutuhkan.",
       "cookingCatch": "Bahan masakan. Harus dimasak sebelum dimakan.",
+      "usedBy": "Used by {crafts}.",
       "arcaneDust": "Reagen Pemantraan. Dihasilkan dari menghancurkan pemantraan perlengkapan umum dan tak biasa.",
       "arcaneEssence": "Reagen Pemantraan. Dihasilkan dari menghancurkan pemantraan perlengkapan langka.",
       "arcaneShard": "Reagen Pemantraan. Dihasilkan dari menghancurkan pemantraan perlengkapan epik dan legendaris.",
@@ -2718,6 +2719,18 @@ export const id_ID: EnTranslations = {
         "artisansEye": "Mata Perajin",
         "quickeningCharm": "Jimat Pegas Balik"
       },
+      "toolEffectTooltip": {
+        "kind": "Tool charm",
+        "bonus": {
+          "gatherersCache": "+1 yield per harvest while charged.",
+          "artisansEye": "Raises the harvest grade by 1 tool tier while charged.",
+          "quickeningCharm": "Shortens the node respawn timer it triggers."
+        },
+        "howToSlot": "Slot onto a mining, logging, or herbalism tool from the Professions window. Consumed when slotted.",
+        "charges": "Starts with {base} charges on a common tool (+{bonus} per rarity rung).",
+        "landOnly": "Does not slot on fishing rods.",
+        "openProfessions": "Open Professions to slot this onto a gathering tool."
+      },
       "toolEffectSlotButton": "Pasang {effect}",
       "toolEffectRechargeButton": "Isi Ulang",
       "toolEffectSlotted": "{effect} terpasang pada {profession}.",
@@ -2830,6 +2843,8 @@ export const id_ID: EnTranslations = {
       "masterworkToast": "Karya besar! {name}",
       "masterworkZoneLine": "{crafter} membuat karya besar {name}!",
       "tierUpToast": "{craft} maju ke tingkat {tier}!",
+      "skillUpToast": "{skill} skill increased to {level}!",
+      "skillUpSubtext": "Skill increased to {level}!",
       "trendNudge": "Tanganmu cenderung ke {archetype}. Penyelarasannya menunggumu dengan {master}.",
       "trendNudgeNoMaster": "Tanganmu cenderung ke {archetype}. Carilah seorang master kerajinan untuk mengambilnya.",
       "attunedZoneLine": "{name} telah selaras sebagai {archetype}!",

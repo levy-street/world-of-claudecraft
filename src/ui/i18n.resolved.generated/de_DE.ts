@@ -2092,6 +2092,7 @@ export const de_DE: EnTranslations = {
     "materialHint": {
       "fineGrade": "Feine Güte. An einer Ader voller Stufe mit einem Werkzeug über dem Rang des Materials gesammelt; zählt überall dort als die gewöhnliche Version, wo diese verlangt wird.",
       "cookingCatch": "Kochzutat. Muss vor dem Verzehr gekocht werden.",
+      "usedBy": "Used by {crafts}.",
       "arcaneDust": "Verzauberungsreagenz. Entzaubert aus gewöhnlicher und ungewöhnlicher Ausrüstung.",
       "arcaneEssence": "Verzauberungsreagenz. Entzaubert aus seltener Ausrüstung.",
       "arcaneShard": "Verzauberungsreagenz. Entzaubert aus epischer und legendärer Ausrüstung.",
@@ -2718,6 +2719,18 @@ export const de_DE: EnTranslations = {
         "artisansEye": "Auge des Handwerkers",
         "quickeningCharm": "Federkraft-Talisman"
       },
+      "toolEffectTooltip": {
+        "kind": "Tool charm",
+        "bonus": {
+          "gatherersCache": "+1 yield per harvest while charged.",
+          "artisansEye": "Raises the harvest grade by 1 tool tier while charged.",
+          "quickeningCharm": "Shortens the node respawn timer it triggers."
+        },
+        "howToSlot": "Slot onto a mining, logging, or herbalism tool from the Professions window. Consumed when slotted.",
+        "charges": "Starts with {base} charges on a common tool (+{bonus} per rarity rung).",
+        "landOnly": "Does not slot on fishing rods.",
+        "openProfessions": "Open Professions to slot this onto a gathering tool."
+      },
       "toolEffectSlotButton": "{effect} einsetzen",
       "toolEffectRechargeButton": "Aufladen",
       "toolEffectSlotted": "{effect} auf {profession} eingesetzt.",
@@ -2830,6 +2843,8 @@ export const de_DE: EnTranslations = {
       "masterworkToast": "Meisterwerk! {name}",
       "masterworkZoneLine": "{crafter} hat das Meisterwerk {name} hergestellt!",
       "tierUpToast": "{craft} auf Stufe {tier} aufgestiegen!",
+      "skillUpToast": "{skill} skill increased to {level}!",
+      "skillUpSubtext": "Skill increased to {level}!",
       "trendNudge": "Deine Hände neigen zum {archetype}. Seine Abstimmung wartet bei {master}.",
       "trendNudgeNoMaster": "Deine Hände neigen zum {archetype}. Suche einen Handwerksmeister, um es aufzunehmen.",
       "attunedZoneLine": "{name} hat sich als {archetype} abgestimmt!",

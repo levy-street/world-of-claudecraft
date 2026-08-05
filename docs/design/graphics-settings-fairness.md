@@ -24,9 +24,11 @@ ACTIONABLE (must be identical across every tier; never tiered):
 - The fishing bobber and its bite state. The reel window is a timed reaction; the bite
   affordance must read identically on every preset (splash richness may vary, the state
   may not).
-- The minimap gather-node markers: spotting, the per-viewer ready/cooldown state, and the
-  lock strike (the non-hue lock cue), plus the node tooltip's respawn countdown and
-  fine-grade preview lines.
+- The minimap and zone-map gather-node markers: spotting, the per-viewer ready/cooldown
+  state, and the lock strike (the non-hue lock cue), plus the node tooltip's respawn
+  countdown and fine-grade preview lines. Both surfaces (`minimap_markers` /
+  `minimap_painter` and `map_window_view` / `map_window_painter`) are pinned
+  profile-free by `tests/professions_graphics_fairness.test.ts`.
 - The node prop tier ladder in the 3D world (`nodeTierScale`): tier is actionable
   information expressed as SIZE, static on every preset.
 

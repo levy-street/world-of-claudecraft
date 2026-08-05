@@ -8299,6 +8299,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.masterworkToast': '傑作！{name}',
   'hudChrome.crafting.masterworkZoneLine': '{crafter}製作出了傑作{name}！',
   'hudChrome.crafting.tierUpToast': '{craft}提升至階級 {tier}！',
+  'hudChrome.crafting.skillUpToast': '{skill}技能提升至 {level}！',
+  'hudChrome.crafting.skillUpSubtext': '技能提升至 {level}！',
   'hudChrome.crafting.makersMark': '製作者：{name}',
   'hudChrome.bags.itemAriaInstanced': '{item}，數量 {count}，帶工匠印記的物品',
   'hudChrome.bags.itemAriaMasterwork': '{item}，數量 {count}，傑作',
@@ -9818,6 +9820,17 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectName.quickeningCharm': '回春符',
   'hudChrome.professions.toolEffectName.artisansEye': '匠人之眼',
   'hudChrome.professions.toolEffectName.gatherersCache': '採集者儲囊',
+  'hudChrome.professions.toolEffectTooltip.kind': '工具符咒',
+  'hudChrome.professions.toolEffectTooltip.bonus.gatherersCache': '充能期間每次採集產出+1。',
+  'hudChrome.professions.toolEffectTooltip.bonus.artisansEye':
+    '充能期間將收穫品級提升1個工具等級。',
+  'hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm': '縮短其觸發的資源節點重生計時。',
+  'hudChrome.professions.toolEffectTooltip.howToSlot':
+    '在專業視窗中將其鑲嵌到採礦、伐木或藥草學工具上。鑲嵌後即消耗。',
+  'hudChrome.professions.toolEffectTooltip.charges':
+    '普通品質工具初始有{base}次充能（稀有度每升一級+{bonus}次）。',
+  'hudChrome.professions.toolEffectTooltip.landOnly': '無法鑲嵌到釣竿上。',
+  'hudChrome.professions.toolEffectTooltip.openProfessions': '打開專業視窗，將其鑲嵌到採集工具上。',
   'hudChrome.professions.toolEffectSlotButton': '鑲嵌{effect}',
   'hudChrome.professions.toolEffectRechargeButton': '充能',
   'hudChrome.professions.toolEffectNoGain': '{effect}已鑲嵌且能量充盈。',

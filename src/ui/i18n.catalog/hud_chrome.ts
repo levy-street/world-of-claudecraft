@@ -2377,6 +2377,13 @@ export const hudChromeStrings = {
     // reagents only; never edible raw. Painted via createTooltipLine, not the
     // materialHintLine HTML-string path.
     cookingCatch: 'Cooking ingredient. Must be cooked before eating.',
+    // Profession affinity for honest materials (material_profession_hint_view.ts).
+    // {crafts} is a locale-aware conjunction list of localized craft names
+    // (Intl.ListFormat), e.g. "Leatherworking" or "Alchemy, Cooking, and Tailoring".
+    // Kind stays junk internally; the kind line already reads Material, and this
+    // line names which craft(s) consume the stack when an item can serve more
+    // than one role (WoW Crafting Reagent + multi-profession materials pattern).
+    usedBy: 'Used by {crafts}.',
     arcaneDust: 'Enchanting reagent. Disenchanted from common and uncommon gear.',
     arcaneEssence: 'Enchanting reagent. Disenchanted from rare gear.',
     arcaneShard: 'Enchanting reagent. Disenchanted from epic and legendary gear.',
@@ -3249,6 +3256,28 @@ export const hudChromeStrings = {
       artisansEye: "Artisan's Eye",
       quickeningCharm: 'Springback Charm',
     },
+    // Tool-effect charm tooltip copy (src/ui/tool_effect_tooltip.ts): what each
+    // charm does, how to slot it, and the charge ladder. Shared by item tooltips
+    // (bags / bank / crafting / market) and the Professions window hover card so
+    // a player never has to discover the system by trial and error. Bonus lines
+    // track applyEffectBonus kinds in professions/tools.ts; charge numbers come
+    // from TOOL_EFFECTS.startingDurability and RARITY_DURABILITY_BONUS.
+    toolEffectTooltip: {
+      kind: 'Tool charm',
+      bonus: {
+        gatherersCache: '+1 yield per harvest while charged.',
+        artisansEye: 'Raises the harvest grade by 1 tool tier while charged.',
+        // Catalog-only today: slotToolEffectRefused refuses every respawnSpeed
+        // effect until the arm is wired. The name still appears on hand-sent
+        // refusal lines, so the bonus copy stays honest about the catalog claim.
+        quickeningCharm: 'Shortens the node respawn timer it triggers.',
+      },
+      howToSlot:
+        'Slot onto a mining, logging, or herbalism tool from the Professions window. Consumed when slotted.',
+      charges: 'Starts with {base} charges on a common tool (+{bonus} per rarity rung).',
+      landOnly: 'Does not slot on fishing rods.',
+      openProfessions: 'Open Professions to slot this onto a gathering tool.',
+    },
     // The toolEffectResult event's chat lines (the acquisition craft): one
     // line per outcome, rendered off ids only (the event is text-free).
     // {effect} and {profession} splice localized names; {material} splices a
@@ -3441,6 +3470,15 @@ export const hudChromeStrings = {
     masterworkToast: 'Masterwork! {name}',
     masterworkZoneLine: '{crafter} crafted a masterwork {name}!',
     tierUpToast: '{craft} advanced to tier {tier}!',
+    // Profession skill level-up (skill_level_toast_view.ts). skillUpToast is
+    // the per-point chat line (and the polite announcer line) for every
+    // floored craft or gathering skill climb. skillUpSubtext is the copper
+    // milestone plate's detail line; the plate's title is the profession
+    // name itself (already localized), so it carries no key. Distinct
+    // presentation from character level-up and from craft tier-up (which
+    // names the tier bucket, not the skill counter).
+    skillUpToast: '{skill} skill increased to {level}!',
+    skillUpSubtext: 'Skill increased to {level}!',
     // Professions 2.0 attunement + trend events (profession_event_lines
     // _core.ts). Trend nudge: the soft in-world hint that an unattuned crafter's
     // skills lean toward a pair; {archetype} is the pair's archetype title,

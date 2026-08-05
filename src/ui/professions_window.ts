@@ -39,6 +39,7 @@ import {
   type RingLayout,
 } from './professions_view';
 import { toolEffectNameKey } from './tool_effect_name';
+import { hasToolEffectCard, toolEffectStandaloneTooltip } from './tool_effect_tooltip';
 import { svgIcon } from './ui_icons';
 
 // Ring node distance from the container center, in percent of the box
@@ -81,10 +82,11 @@ export interface ProfessionsWindowDeps extends PainterHostPresentation {
   world(): IWorld;
   closeOthers(): void;
   hideTooltip(): void;
-  /** The shared Hud TouchPeekGuard (the deeds/bank contract); wired but never
-   *  consumed: the slot/recharge controls are plain labeled buttons with no
-   *  tooltip peek state, outside the card-action family the guard exists
-   *  for, and the window has no peeking cards. */
+  /** The shared Hud TouchPeekGuard (the deeds/bank contract). Slot buttons and
+   *  live effect rows attach hover cards, so a long press that showed one arms
+   *  the guard; the slot and recharge click handlers consume it and swallow
+   *  that release click, so holding a control inspects it instead of spending
+   *  a charm or materials. A plain tap and every desktop click return false. */
   consumePeek(): boolean;
   captureFocus(): HTMLElement | null;
   restoreFocus(target: HTMLElement | null): void;
@@ -596,8 +598,22 @@ export class ProfessionsWindow {
           effect.confirmMode === 'prompt'
             ? `<span class="prof-effect-mode">${esc(t('hudChrome.professions.toolEffectModePrompt'))}</span>`
             : '';
+        // data-effect-tip marks the live row for the shared attachTooltip
+        // wiring below: the hover card explains the bonus and charge ladder
+        // the compact line cannot fit. Minted only when the id has a full
+        // card (hasToolEffectCard), so the marker, the cursor:help cue, the
+        // tab stop, and the attach can never disagree. tabindex puts the row
+        // in the tab order so the card is keyboard-reachable (attachTooltip's
+        // focusin path): once the charm is slotted and no spare is carried,
+        // this row is the only surface still explaining the bonus. The
+        // focus key is the restore ladder's "non-spending middle rung" (see
+        // render): without it a repaint under a focused row parks focus on
+        // Close and the next Enter closes the window.
+        const tipAttrs = hasToolEffectCard(effect.effectId)
+          ? ` data-effect-tip="${esc(effect.effectId)}" data-focus-key="effect:${esc(row.professionId)}" tabindex="0"`
+          : '';
         html +=
-          `<div class="prof-effect${effect.spent ? ' prof-effect-spent' : ''}">` +
+          `<div class="prof-effect${effect.spent ? ' prof-effect-spent' : ''}"${tipAttrs}>` +
           `<span class="prof-effect-name">${esc(t(nameKey))}</span>` +
           `<span class="prof-effect-charges">${esc(charges)}</span>${modeChip}${recharge}</div>`;
       }
@@ -665,21 +681,47 @@ export class ProfessionsWindow {
     // real answer then arrives late, a duplicate send is refused server-side
     // (no_gain or already_full), so the race costs nothing.
     for (const button of el.querySelectorAll<HTMLElement>('[data-slot-effect]')) {
+      const effectId = button.getAttribute('data-slot-effect');
+      // Hover card: what the charm does and how slotting works, so a player
+      // never has to burn a charm to learn the bonus. A retired id has no
+      // card, so skip the attach rather than show an empty box. The lazy
+      // closure is the attachTooltip family idiom (deeds/bank cells).
+      if (effectId !== null && hasToolEffectCard(effectId)) {
+        this.deps.attachTooltip(button, () => toolEffectStandaloneTooltip(effectId));
+      }
       button.addEventListener('click', () => {
+        // A long-press that showed the hover card peeks; its release click
+        // must inspect, never spend the charm (the bags cell contract:
+        // dismiss the card, fire nothing).
+        if (this.deps.consumePeek()) {
+          this.deps.hideTooltip();
+          return;
+        }
         if (button.dataset.sent !== undefined) return;
         const professionId = button.getAttribute('data-slot-profession');
-        const effectId = button.getAttribute('data-slot-effect');
-        if (professionId === null || effectId === null) return;
+        const slotEffectId = button.getAttribute('data-slot-effect');
+        if (professionId === null || slotEffectId === null) return;
         this.armSentGuard(button);
         // The R40 mode rides the mint: 'prompt' when the row's toggle is on,
         // OMITTED otherwise so the plain send stays byte-identical.
         if (this.slotModePrompt.has(professionId)) {
-          this.deps.world().slotToolEffect(professionId, effectId, 'prompt');
+          this.deps.world().slotToolEffect(professionId, slotEffectId, 'prompt');
         } else {
-          this.deps.world().slotToolEffect(professionId, effectId);
+          this.deps.world().slotToolEffect(professionId, slotEffectId);
         }
         audio.click();
       });
+    }
+    // Live effect rows: same hover card as the slot buttons, so an already-
+    // slotted charm still explains its bonus without forcing the player to
+    // open the bags and re-read the item. Every marked row has a card by
+    // construction: the painter mints data-effect-tip only when
+    // hasToolEffectCard says so (and skips retired-name rows entirely,
+    // pinned by the layout rig's retired-id case).
+    for (const row of el.querySelectorAll<HTMLElement>('[data-effect-tip]')) {
+      const effectId = row.getAttribute('data-effect-tip');
+      if (effectId === null) continue;
+      this.deps.attachTooltip(row, () => toolEffectStandaloneTooltip(effectId));
     }
     // The R40 mode toggles: flip the painter-local choice and repaint (the
     // slottable set asks the resolver with the sent mode, so the button set
@@ -697,6 +739,14 @@ export class ProfessionsWindow {
     }
     for (const button of el.querySelectorAll<HTMLElement>('[data-recharge-profession]')) {
       button.addEventListener('click', () => {
+        // The recharge button sits inside the live effect row, whose hover
+        // card arms the peek guard on a long press (the pointerdown bubbles
+        // to the row); the release click must dismiss the card and not
+        // spend materials.
+        if (this.deps.consumePeek()) {
+          this.deps.hideTooltip();
+          return;
+        }
         if (button.dataset.sent !== undefined) return;
         const professionId = button.getAttribute('data-recharge-profession');
         if (professionId === null) return;

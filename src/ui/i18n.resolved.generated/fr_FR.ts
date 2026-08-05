@@ -2092,6 +2092,7 @@ export const fr_FR: EnTranslations = {
     "materialHint": {
       "fineGrade": "Qualité fine. Récolté sur un filon de plein palier avec un outil de rang supérieur au matériau, et compte comme la version ordinaire partout où celle-ci est requise.",
       "cookingCatch": "Ingrédient de cuisine. Doit être cuit avant d'être consommé.",
+      "usedBy": "Used by {crafts}.",
       "arcaneDust": "Réactif d'enchantement. Obtenu en désenchantant de l'équipement commun et peu commun.",
       "arcaneEssence": "Réactif d'enchantement. Obtenu en désenchantant de l'équipement rare.",
       "arcaneShard": "Réactif d'enchantement. Obtenu en désenchantant de l'équipement épique et légendaire.",
@@ -2718,6 +2719,18 @@ export const fr_FR: EnTranslations = {
         "artisansEye": "Œil de l'artisan",
         "quickeningCharm": "Breloque à ressort"
       },
+      "toolEffectTooltip": {
+        "kind": "Tool charm",
+        "bonus": {
+          "gatherersCache": "+1 yield per harvest while charged.",
+          "artisansEye": "Raises the harvest grade by 1 tool tier while charged.",
+          "quickeningCharm": "Shortens the node respawn timer it triggers."
+        },
+        "howToSlot": "Slot onto a mining, logging, or herbalism tool from the Professions window. Consumed when slotted.",
+        "charges": "Starts with {base} charges on a common tool (+{bonus} per rarity rung).",
+        "landOnly": "Does not slot on fishing rods.",
+        "openProfessions": "Open Professions to slot this onto a gathering tool."
+      },
       "toolEffectSlotButton": "Sertir {effect}",
       "toolEffectRechargeButton": "Recharger",
       "toolEffectSlotted": "Vous sertissez {effect} sur {profession}.",
@@ -2830,6 +2843,8 @@ export const fr_FR: EnTranslations = {
       "masterworkToast": "Chef-d'œuvre ! {name}",
       "masterworkZoneLine": "{crafter} a créé un chef-d'œuvre {name} !",
       "tierUpToast": "{craft} a avancé au niveau {tier} !",
+      "skillUpToast": "{skill} skill increased to {level}!",
+      "skillUpSubtext": "Skill increased to {level}!",
       "trendNudge": "Vos mains se penchent vers {archetype}. Son harmonisation vous attend avec {master}.",
       "trendNudgeNoMaster": "Vos mains se penchent vers {archetype}. Cherchez un maître des métiers pour la prendre.",
       "attunedZoneLine": "{name} s'est harmonisé en tant que {archetype} !",

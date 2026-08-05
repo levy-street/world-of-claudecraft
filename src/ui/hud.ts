@@ -262,10 +262,12 @@ import {
   resetFramePositionsOnce,
   TARGET_FRAME_POS_KEY,
 } from './frame_pos_reset';
+import { gatherNodeTooltipHtml } from './gather_node_tooltip_controller';
 import { gatherToolTooltipLines } from './gather_tool_tooltip';
 import { gatheringProfessionNameKey } from './gathering_profession_name';
 import {
   buildGatheringProficiencyRows,
+  buildGatherNodeTooltip,
   gatherDeniedLineKey,
   gatherDowngradeLineKey,
   gatherRareTierFor,
@@ -459,6 +461,7 @@ import { mailIndicatorView } from './mailbox_view';
 import { MailboxWindow } from './mailbox_window';
 import { onMapArtReady } from './map_art';
 import { bakedMapBgEligible, loadBakedMapBg } from './map_bg';
+import { type MapGatherTipMemo, resolveGatherTipMemo } from './map_gather_tip_memo';
 import { bindMapPinchZoom, finishMapTap, mapTapReleaseFromPointer } from './map_pinch_zoom';
 import {
   MAP_TAP_MOVE_TOLERANCE_PX,
@@ -474,7 +477,9 @@ import {
 } from './map_terrain';
 import { MapWindowPainter } from './map_window_painter';
 import {
+  gatherNodeMarkerAt,
   MAP_OPEN_ZOOM,
+  type MapGatherNodeMarker,
   type MapNpcMarker,
   type MapQuestAreaMarker,
   mapWindowMode,
@@ -484,6 +489,7 @@ import {
 import { marketCollectIndicatorView } from './market_view';
 import { MarketWindow } from './market_window';
 import { materialHintLine } from './material_hint_view';
+import { materialProfessionHintText } from './material_profession_hint_view';
 import { Meters } from './meters';
 import { minimapMode } from './minimap_markers';
 import { MINIMAP_SIZE, MinimapPainter } from './minimap_painter';
@@ -545,7 +551,7 @@ import {
   procOverlayState,
 } from './proc_overlay_view';
 import { maskProfanity } from './profanity';
-import { MASTERWORK_SEAL_IMAGE_URL } from './profession_art';
+import { MASTERWORK_SEAL_IMAGE_URL, professionImageUrl } from './profession_art';
 import { type ProfessionEventInput, planProfessionEvent } from './profession_event_lines_core';
 import {
   buildProfessionIdentityView,
@@ -569,6 +575,12 @@ import { isTalentRowUnlockLevel } from './row_unlock_toast';
 import { localizeServerText } from './server_i18n';
 import { localizeSimText } from './sim_i18n';
 import { openSimpleMenu } from './simple_context_menu';
+import {
+  advanceSkillLevelObservation,
+  buildSkillLevelCelebrationPlan,
+  type SkillLevelUp,
+  skillLevelArtId,
+} from './skill_level_toast_view';
 import { SocialWindow } from './social_window';
 import { SpellbookWindow } from './spellbook_window';
 import { stanceBarView, WARRIOR_STANCE_GROUP } from './stance_bar_view';
@@ -600,6 +612,7 @@ import { targetPortraitUrl } from './target_portrait_view';
 import { targetRankView, targetUsesEliteFrame } from './target_rank_view';
 import type { PresetId, ThemeKnob, ThemeState } from './theme';
 import { toolEffectNameKey } from './tool_effect_name';
+import { toolEffectTooltipLines } from './tool_effect_tooltip';
 import { createTooltipLine } from './tooltip_line';
 import { SharedTooltipOwner } from './tooltip_owner';
 import { TOOLTIP_PEEK_MS, TouchPeekGuard } from './touch_peek';
@@ -990,8 +1003,10 @@ const PET_MODE_DESC_KEYS: Record<PetMode, TranslationKey> = {
  *  crossing, craft masterwork, duel result). 'deed' is the Book of Deeds
  *  plate: a framed, quieter parchment treatment, because a deed accomplishment
  *  firing an identical gold banner to a real level-up is a known cause of
- *  players reading routine gathering progress as leveling. */
-export type BannerVariant = 'default' | 'deed';
+ *  players reading routine gathering progress as leveling. 'skill' is the
+ *  gathering skill milestone plate: copper craft framing with the profession
+ *  crest, so a Mining 50 plate can never steal the character level-up reading. */
+export type BannerVariant = 'default' | 'deed' | 'skill';
 
 /** Everything one banner paint needs, held whole so a queued banner (R38)
  *  renders later exactly as it would have rendered immediately. */
@@ -1552,6 +1567,13 @@ export class Hud {
   // Drains left in the post-craftResult window during which the tier-up diff
   // runs (0 = disarmed; see the handleEvents tail).
   private craftTierUpDrains = 0;
+  // Profession skill level-up snapshots (craft + gathering): the last SYNCED
+  // observation handleEvents diffs for floored integer skill climbs. null
+  // until the first synced observation (silent login/join baseline). Separate
+  // from the tier-up snapshot so a fractional craft skill carry never desyncs
+  // either consumer, and so gathering proficiency has its own baseline.
+  private prevCraftSkillLevels: Record<string, number> | null = null;
+  private prevGatheringSkillLevels: Record<string, number> | null = null;
   // Signature of the in-range station-type set as of the last crafting-window
   // paint (stations.ts stationTypesSignature): the slow band compares the live
   // set against this to keep an OPEN window fresh without per-frame repaints
@@ -1690,6 +1712,14 @@ export class Hud {
   // The quest-giver glyphs of the last overworld map paint, for the hover
   // tooltip's hit-test (quest names + level requirements). Empty in delve mode.
   private mapNpcMarkers: MapNpcMarker[] = [];
+  // Gather-node icons of the last overworld map paint (zone map only), for the
+  // hover/tap tooltip hit-test. Empty in delve mode and on the continent.
+  private mapGatherNodes: MapGatherNodeMarker[] = [];
+  // Last gather-tip resolve, keyed by node id (map_gather_tip_memo.ts, the
+  // resolve-elision seam). Reset beside every mapGatherNodes rebuild, so a
+  // respawn or lock flip is at most one mediumHud repaint behind, the same
+  // freshness as the painted icon.
+  private mapGatherTipMemo: MapGatherTipMemo | null = null;
   // World-map level: the per-zone detail map, or the WoW-style continent overview
   // reached by right-click / the level-toggle button. Reset to 'zone' on open.
   private mapLevel: 'zone' | 'continent' = 'zone';
@@ -2531,10 +2561,12 @@ export class Hud {
     // the mouse (hover); on touch there is no hover, so a TAP on a marker shows it
     // (a press that moves beyond the tolerance is a pan, not a tap). Priority: a
     // quest-giver glyph ('!'/'?', quest names + level requirements) sits ON TOP of
-    // the blobs, so it wins; otherwise a quest-objective area shows its objectives
-    // with live tracker progress. Both hit-tests run against the markers of the
-    // last paint, scaled from CSS px to the canvas backing space the model projects
-    // into.
+    // gather icons and quest blobs, so it wins; then a gather node (precise
+    // resource target); otherwise a quest-objective area shows its objectives
+    // with live tracker progress. An arm that resolves no html falls through to
+    // the next (a glyph whose quests are all missing from content no longer
+    // blanks the tip). Hit-tests run against the markers of the last paint,
+    // scaled from CSS px to the canvas backing space the model projects into.
     let mapAreaTipShown = false;
     let mapTapStart: { x: number; y: number } | null = null;
     const hideMapAreaTip = (): void => {
@@ -2546,14 +2578,24 @@ export class Hud {
     // report whether one was shown (the attachTooltip idiom: map into author
     // space, then clamp the tooltip box against the viewport).
     const showMapTipAt = (clientX: number, clientY: number): boolean => {
-      if (this.mapQuestAreas.length === 0 && this.mapNpcMarkers.length === 0) return false;
+      if (
+        this.mapQuestAreas.length === 0 &&
+        this.mapNpcMarkers.length === 0 &&
+        this.mapGatherNodes.length === 0
+      )
+        return false;
       const rect = mapCanvas.getBoundingClientRect();
       const cx = ((clientX - rect.left) * mapCanvas.width) / rect.width;
       const cy = ((clientY - rect.top) * mapCanvas.height) / rect.height;
       const glyph = npcMarkerAt(this.mapNpcMarkers, cx, cy);
-      const html = glyph
-        ? this.questGiverTooltipHtml(glyph)
-        : this.questAreaTooltipHtml(questAreaObjectivesAt(this.mapQuestAreas, cx, cy));
+      let html = glyph ? this.questGiverTooltipHtml(glyph) : '';
+      if (!html) {
+        const gather = gatherNodeMarkerAt(this.mapGatherNodes, cx, cy);
+        html = gather ? this.gatherNodeMapTooltipHtml(gather) : '';
+      }
+      if (!html) {
+        html = this.questAreaTooltipHtml(questAreaObjectivesAt(this.mapQuestAreas, cx, cy));
+      }
       if (!html) return false;
       // Same as desktop hover: paint the tip at the pointer (a tap on touch, the
       // cursor on mouse). paintTooltipAt clamps the box on-screen either way.
@@ -5420,6 +5462,10 @@ export class Hud {
     // pole render their kind, requirement, use, and bonus lines from the
     // pure sibling module (the item_instance_tooltip.ts pattern).
     html += gatherToolTooltipLines(item);
+    // Tool-effect charms (Gatherer's Cache / Artisan's Eye): what the charm
+    // does, how to slot it from Professions, and the charge ladder. Bags,
+    // bank, crafting, and market all compose this through itemTooltip.
+    html += toolEffectTooltipLines(item);
     // Purpose hint for the eight enchanting materials (material_hint_view.ts
     // keys the table by item id): what the reagent is for and which gear
     // disenchants into it. Every other item id renders nothing here.
@@ -5430,6 +5476,15 @@ export class Hud {
     const cookingHintKey = cookingCatchHintKey(item.id);
     if (cookingHintKey) {
       html += createTooltipLine(t(cookingHintKey), 'tt-desc').outerHTML;
+    }
+    // Profession affinity for honest materials (material_profession_hint_view.ts):
+    // "Used by Leatherworking, ..." derived from live recipe/enchant consumers.
+    // Skips when a more specific purpose line above already covers a single
+    // craft. Painted like the cooking hint (createElement, no HTML-string
+    // growth); the tt-material-use modifier carries the theme-emitted tint.
+    const materialUseText = materialProfessionHintText(item.id);
+    if (materialUseText) {
+      html += createTooltipLine(materialUseText, 'tt-desc', 'tt-material-use').outerHTML;
     }
     if (item.potionHp)
       html += `<div class="tt-desc">${esc(t('itemUi.tooltip.useHealingPotion', { amount: itemNumber(item.potionHp) }))}</div>`;
@@ -5769,14 +5824,7 @@ export class Hud {
     this.targetAurasWindow.relocalize();
     if (this.questlogWindow.isOpen) this.questlogWindow.render();
     if ($('#bags').style.display !== 'none') this.renderBags();
-    if (this.openVendorNpcId !== null && $('#vendor-window').style.display === 'block')
-      this.renderVendor();
-    if (this.openHeroicVendorNpcId !== null && $('#vendor-window').style.display === 'block')
-      this.renderHeroicVendor();
-    if (this.openTrainNpcId !== null && $('#train-window').style.display === 'block')
-      this.renderTrain();
-    if (this.openUnbindNpcId !== null && $('#unbind-window').style.display === 'block')
-      this.renderUnbind();
+    this.repaintOpenServiceWindows();
     // The Town Focus signature is text-independent (the allocation, the budget
     // and the in-town flag), so a language switch alone never moves it and the
     // slow-band probe would leave the panel in the old locale until the player
@@ -9922,6 +9970,8 @@ export class Hud {
       // title is drawn on-canvas, since the world map has no DOM zone label).
       this.mapQuestAreas = [];
       this.mapNpcMarkers = [];
+      this.mapGatherNodes = [];
+      this.mapGatherTipMemo = null;
       this.continentRegions = [];
       this.delvePainter.paintWorldMapDelve(ctx, this.sim, S);
       const run = this.sim.delveRun;
@@ -9945,6 +9995,8 @@ export class Hud {
       // The continent overview: a painted world plate with clickable zone regions.
       this.mapQuestAreas = [];
       this.mapNpcMarkers = [];
+      this.mapGatherNodes = [];
+      this.mapGatherTipMemo = null;
       this.mapView = null; // panning/zoom belong to the per-zone level only
       const result = this.continentPainter.paintContinent(ctx, this.sim, {
         canvasSize: S,
@@ -9988,6 +10040,8 @@ export class Hud {
     this.mapView = result.view;
     this.mapQuestAreas = result.questAreas;
     this.mapNpcMarkers = result.npcs;
+    this.mapGatherNodes = result.gatherNodes;
+    this.mapGatherTipMemo = null;
     if (!this.mapDrag) canvas.style.cursor = result.cursor;
     this.setText(summaryEl, t('hud.core.mapSummary', { zone: zoneDisplayName(zone.id) }));
   }
@@ -10006,6 +10060,18 @@ export class Hud {
       )}</div>`;
     }
     return html;
+  }
+
+  // Tooltip body for a hovered gather node on the zone map: reuses the world
+  // hover's pure model + HTML (name, tool gate, ready/cooldown, fine preview)
+  // so the map and the 3D node tip never disagree. Memoized per node id (see
+  // mapGatherTipMemo) so a pointer sweeping across one icon resolves once.
+  private gatherNodeMapTooltipHtml(marker: MapGatherNodeMarker): string {
+    this.mapGatherTipMemo = resolveGatherTipMemo(this.mapGatherTipMemo, marker.nodeId, (nodeId) => {
+      const model = buildGatherNodeTooltip(this.sim, nodeId);
+      return model ? gatherNodeTooltipHtml(model) : '';
+    });
+    return this.mapGatherTipMemo.html;
   }
 
   // Tooltip body for a hovered quest-giver glyph on the world map: each quest
@@ -12497,16 +12563,105 @@ export class Hud {
     // event payload. The armed-window rules (bounded post-craftResult drains,
     // the synced guard, the silent first init, disarm-on-change) live in the
     // pure step observeCraftSkillsForTierUps (craft_celebration_view.ts).
+    // One craftingIdentity/craftSkills read per drain, shared by the tier-up
+    // and skill-level observations below: this tail runs every drain and the
+    // offline getters allocate a fresh copy per access.
+    const identitySynced = sim.craftingIdentity.synced;
+    const craftSkillsNow = sim.craftSkills;
     const obs = observeCraftSkillsForTierUps(
-      sim.craftingIdentity.synced,
+      identitySynced,
       this.prevCraftSkills,
-      sim.craftSkills,
+      craftSkillsNow,
       this.craftTierUpDrains,
     );
     this.prevCraftSkills = obs.prev;
     this.craftTierUpDrains = obs.drains;
     if (masterworkItemId !== null || obs.tierUps.length > 0)
       this.handleCraftCelebrations(masterworkItemId, obs.tierUps);
+    // Profession skill level-ups (floored craft skill + gathering proficiency):
+    // also STATE-driven. Always-on after a silent synced baseline so a quiet
+    // post-gather drain (proficiency applies the next tick) and enchant /
+    // battlefield trickle still land their chat lines without arming every
+    // event arm. Both families gate on the cprof identity sync flag: the
+    // server ships cprof and gprof unconditionally in the same self snapshot
+    // (server/game.ts selfWireJson), and offline both are always synced.
+    const craftSkillObs = advanceSkillLevelObservation(
+      identitySynced,
+      this.prevCraftSkillLevels,
+      craftSkillsNow,
+    );
+    this.prevCraftSkillLevels = craftSkillObs.prev;
+    const gatherSkillObs = advanceSkillLevelObservation(
+      identitySynced,
+      this.prevGatheringSkillLevels,
+      sim.gatheringProficiency,
+    );
+    this.prevGatheringSkillLevels = gatherSkillObs.prev;
+    if (craftSkillObs.skillUps.length > 0 || gatherSkillObs.skillUps.length > 0)
+      this.handleSkillLevelCelebrations(
+        craftSkillObs.skillUps,
+        gatherSkillObs.skillUps,
+        // One celebration chime per drain across the whole tail: stand down
+        // when a tier-up, masterwork, or deed celebration just chimed (a
+        // retro-only deed drain draws no chime; over-suppressing there only
+        // quiets a login catch-up, never a live earned moment).
+        masterworkItemId !== null || obs.tierUps.length > 0 || deedUnlocks.length > 0,
+      );
+  }
+
+  // Profession skill level-ups (gathering + craft counters): pure plan in
+  // skill_level_toast_view.ts. Chat log for EVERY floor climb (the classic
+  // per-point skill message); the copper skill plate, polite announce, and
+  // celebration chime only for a gathering milestone crossing (the plan's
+  // cadence rules; craft boundaries belong to the tier-up celebration).
+  // Presentation is deliberately NOT the bare gold level-up language
+  // (players used to misread gathering milestones as character levels).
+  private handleSkillLevelCelebrations(
+    craftUps: SkillLevelUp[],
+    gatherUps: SkillLevelUp[],
+    celebrationAlreadyChimed: boolean,
+  ): void {
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const plan = buildSkillLevelCelebrationPlan(
+      craftUps,
+      gatherUps,
+      reducedMotion,
+      celebrationAlreadyChimed,
+    );
+    const skillName = (skillId: string): string => {
+      const gatherKey = gatheringProfessionNameKey(skillId);
+      if (gatherKey) return t(gatherKey);
+      return craftNameText(skillId);
+    };
+    const toastText = (up: SkillLevelUp) =>
+      t('hudChrome.crafting.skillUpToast', {
+        skill: skillName(up.skillId),
+        level: formatNumber(up.toLevel, { maximumFractionDigits: 0 }),
+      });
+    for (const up of plan.skillUpLogs) this.log(toastText(up), '#ffd100');
+    if (plan.banner !== null) {
+      const artUrl = professionImageUrl(skillLevelArtId(plan.banner.skillId));
+      // Celebration class 'deed': queues behind level-ups, never ambient
+      // replace, so a milestone landing after a ding still plays in order.
+      // The skill VARIANT is the copper plate; class and variant are
+      // orthogonal. The title is the skill name, already localized through
+      // gatheringProfessionNameKey above, so no wrapper key is needed.
+      this.showCelebrationBanner(
+        skillName(plan.banner.skillId),
+        'deed',
+        'skill',
+        plan.motion,
+        artUrl ?? undefined,
+        t('hudChrome.crafting.skillUpSubtext', {
+          level: formatNumber(plan.banner.toLevel, { maximumFractionDigits: 0 }),
+        }),
+      );
+      // The banner div carries no live semantics, so the polite #combat-live
+      // region carries the combined line (skill name AND level in one string,
+      // the level the visual title omits).
+      this.combatAnnouncer.push(toastText(plan.banner), performance.now());
+    }
+    if (plan.playSound) audio.achievement();
   }
 
   // The crafted earned moment, planned purely (craft_celebration_view) so the
@@ -13489,18 +13644,21 @@ export class Hud {
   }
 
   /** The celebration form of showBanner (R38): full motion, the standard
-   *  2600ms duration, queued under the given class. Exists so the four
+   *  2600ms duration, queued under the given class. Exists so the
    *  celebration call sites stop threading five defaults positionally to
    *  reach the class argument (and so changing the default duration cannot
    *  strand them). `motion` stays a parameter for the reduced-motion
-   *  celebration plans (the attunement banner). */
+   *  celebration plans; `decorativeIconUrl` and `subtext` carry the art-plus-
+   *  detail plates (the gathering skill milestone). */
   showCelebrationBanner(
     text: string,
     bannerClass: 'levelup' | 'deed',
     variant: BannerVariant = 'default',
     motion = true,
+    decorativeIconUrl?: string,
+    subtext?: string,
   ): void {
-    this.showBanner(text, motion, undefined, variant, undefined, 2600, null, bannerClass);
+    this.showBanner(text, motion, decorativeIconUrl, variant, subtext, 2600, null, bannerClass);
   }
 
   /** The paint half of the banner slot: renders one payload and arms the
@@ -13521,7 +13679,20 @@ export class Hud {
         detail.textContent = line;
         return detail;
       });
-      this.bannerEl.replaceChildren(title, ...details);
+      if (decorativeIconUrl) {
+        // Art-plus-subtext plate (the gathering skill milestone, and any
+        // future variant): crest beside a title/detail column. The wrapper is
+        // variant-agnostic; #banner.banner-with-art.has-subtext styles it.
+        const copy = document.createElement('span');
+        copy.className = 'banner-art-copy';
+        copy.append(title, ...details);
+        this.bannerEl.replaceChildren(
+          decorativeArtImg(document, 'banner-art', decorativeIconUrl),
+          copy,
+        );
+      } else {
+        this.bannerEl.replaceChildren(title, ...details);
+      }
     } else {
       const copy = document.createElement('span');
       copy.className = 'banner-copy';
@@ -13535,11 +13706,12 @@ export class Hud {
         this.bannerEl.replaceChildren(copy);
       }
     }
-    this.bannerEl.classList.toggle('banner-with-art', Boolean(decorativeIconUrl) && !subtext);
+    this.bannerEl.classList.toggle('banner-with-art', Boolean(decorativeIconUrl));
     // The banner is ONE reused element, so every variant class must be
     // toggled off as well as on: the next unrelated banner through this slot
     // would otherwise inherit the previous one's visual language.
     this.bannerEl.classList.toggle('banner-deed', variant === 'deed');
+    this.bannerEl.classList.toggle('banner-skill', variant === 'skill');
     // Reduced-motion celebrations (craft plan.motion) show and hide the
     // banner without the fade transition: identical text and duration, no
     // animation. Motion-trimming only; information always survives.
@@ -14543,7 +14715,14 @@ export class Hud {
     // inventory deltas landed here, but every money-only credit now routes through
     // this hook (#2373), so a hidden window would be rebuilt on each one.
     if (bagsWindowShown($('#bags').style.display)) this.renderBags();
-    if (this.openVendorNpcId !== null) this.renderVendor();
+    // A trainer fee is a money-only self delta online (no inv echo), and the
+    // heroic shop prices rows off a mark COUNT in the bag: every service
+    // window's affordability flag can go stale on a purse or inventory move,
+    // so re-price the whole open family here, the same edge the vendor path
+    // already used (#2373). Offline this hook barely fires (the bank window's
+    // wiring); the train ladder converges there through the Learn click and
+    // trainResult repaints instead.
+    this.repaintOpenServiceWindows();
     this.renderCharIfOpen();
     // The crafting window rides this hook too (#2375): it is the online
     // host's instant edge for an authoritative delta, and offline it is what
@@ -14565,6 +14744,23 @@ export class Hud {
     )
       return;
     this.renderCrafting();
+  }
+
+  /** Repaint every OPEN service window (copper vendor, heroic quartermaster,
+   *  training ladder, unbind list) behind its own open-plus-shown guard. All
+   *  four price their rows against the purse or a bag count, so the language
+   *  switch and the authoritative inventory hook repaint the family through
+   *  this one method; the per-site copies of the guard pack earned the
+   *  extraction (rule of three). */
+  private repaintOpenServiceWindows(): void {
+    if (this.openVendorNpcId !== null && $('#vendor-window').style.display === 'block')
+      this.renderVendor();
+    if (this.openHeroicVendorNpcId !== null && $('#vendor-window').style.display === 'block')
+      this.renderHeroicVendor();
+    if (this.openTrainNpcId !== null && $('#train-window').style.display === 'block')
+      this.renderTrain();
+    if (this.openUnbindNpcId !== null && $('#unbind-window').style.display === 'block')
+      this.renderUnbind();
   }
 
   onCosmeticsChanged(): void {

@@ -2489,6 +2489,18 @@
     font-size: calc(19px * var(--mobile-chrome-scale, 1));
     padding: 6px 14px;
   }
+  body.mobile-touch #banner.banner-skill {
+    font-size: calc(20px * var(--mobile-chrome-scale, 1));
+    padding: 8px 16px 10px;
+    gap: 8px;
+  }
+  body.mobile-touch #banner.banner-skill .banner-subtext {
+    font-size: calc(13px * var(--mobile-chrome-scale, 1));
+  }
+  body.mobile-touch #banner.banner-skill .banner-art {
+    width: 40px;
+    height: 40px;
+  }
   body.mobile-touch #banner .banner-art {
     width: 34px;
     height: 34px;

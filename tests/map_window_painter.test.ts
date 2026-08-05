@@ -71,6 +71,16 @@ const MAP_COLOR_TOKENS = [
   '--color-map-graveyard',
   '--color-map-mudhut',
   '--color-map-campfire',
+  '--color-map-gather-ore-ready',
+  '--color-map-gather-ore-cooldown',
+  '--color-map-gather-ore-glow',
+  '--color-map-gather-wood-ready',
+  '--color-map-gather-wood-cooldown',
+  '--color-map-gather-wood-glow',
+  '--color-map-gather-herb-ready',
+  '--color-map-gather-herb-cooldown',
+  '--color-map-gather-herb-glow',
+  '--color-map-gather-locked',
 ];
 
 // The classColor resolver every MapWindowPainter call site now takes (issue 2652),
@@ -264,6 +274,9 @@ function mapWorld(): IWorld {
     cfg: { seed: 42, playerClass: 'warrior' },
     questState: () => 'unavailable',
     questLog: new Map(),
+    inventory: [],
+    gatheringProficiency: {},
+    nodeHarvestableByMe: () => true,
   } as unknown as IWorld;
 }
 
@@ -396,6 +409,30 @@ describe('map_window_painter: cadence + cached background preserved', () => {
     expect(hud).toContain('this.mapPainter.paintOverworld(ctx, this.sim, {');
   });
 
+  it('wires the gather markers: store, clears, memo resets, and tooltip priority', () => {
+    // The overworld paint stores this paint's hit-test markers; the delve and
+    // continent branches clear them so no stale zone icon answers a tap.
+    expect(hud).toContain('this.mapGatherNodes = result.gatherNodes;');
+    expect(hud.match(/this\.mapGatherNodes = \[\];/g)).toHaveLength(2);
+    // The gather-tip resolve memo resets beside every marker rebuild (two
+    // clears plus the overworld store), bounding its staleness at the same
+    // mediumHud repaint that refreshes the painted icon.
+    expect(hud.match(/this\.mapGatherTipMemo = null;/g)).toHaveLength(3);
+    // Hover/tap priority inside showMapTipAt: quest-giver glyph on top, then
+    // the gather node, then the quest-objective area.
+    const glyphAt = hud.indexOf('npcMarkerAt(this.mapNpcMarkers');
+    const gatherAt = hud.indexOf('gatherNodeMarkerAt(this.mapGatherNodes');
+    const areaAt = hud.indexOf('questAreaObjectivesAt(this.mapQuestAreas');
+    expect(glyphAt).toBeGreaterThan(-1);
+    expect(gatherAt).toBeGreaterThan(glyphAt);
+    expect(areaAt).toBeGreaterThan(gatherAt);
+    // The gather arm resolves through the shared world-hover pair (behind the
+    // tested memo seam), so the map tip and the 3D node tip cannot disagree.
+    expect(hud).toContain('resolveGatherTipMemo(this.mapGatherTipMemo, marker.nodeId');
+    expect(hud).toContain('buildGatherNodeTooltip(this.sim, nodeId)');
+    expect(hud).toContain('gatherNodeTooltipHtml(model)');
+  });
+
   it('accepts only the current Hud-owned zone background and never prewarms all zones', () => {
     // The painter receives one cached bg and only drawImages it (no terrain build).
     expect(code).toContain('ctx.drawImage(');
@@ -481,6 +518,9 @@ function labelWorld(): IWorld {
     // The quest-marker inputs both worlds expose (the phase 23 classifier).
     questsDone: new Set<string>(),
     craftingIdentity: { version: 1, synced: true, cadenceBlockedQuests: [] },
+    inventory: [],
+    gatheringProficiency: {},
+    nodeHarvestableByMe: () => true,
   } as unknown as IWorld;
 }
 
@@ -1167,6 +1207,160 @@ function partyWorld(): IWorld {
   };
   return world as unknown as IWorld;
 }
+
+// The three silhouette path signatures (the fake context records commands per
+// fill/stroke): ore = flat-top hex, wood = pine crown + trunk (one closed
+// path), herb = three moveTo+arc petals. A collapsed or swapped silhouette
+// changes its signature and fails the sequence pin below.
+const GATHER_SILHOUETTE: Record<string, string[]> = {
+  ore: ['moveTo', 'lineTo', 'lineTo', 'lineTo', 'lineTo', 'lineTo', 'closePath'],
+  wood: ['moveTo', 'lineTo', 'lineTo', 'lineTo', 'lineTo', 'lineTo', 'lineTo', 'closePath'],
+  herb: ['moveTo', 'arc', 'moveTo', 'arc', 'moveTo', 'arc'],
+};
+const GATHER_STRIKE_COMMANDS = ['moveTo', 'lineTo'];
+
+function paintGatherZone(world: IWorld) {
+  const trace = newTrace();
+  installMapStyleGlobals(trace);
+  setActiveWorldContent(BUILTIN_WORLD);
+  const result = new MapWindowPainter(classColor).paintOverworld(fakeMapContext(trace), world, {
+    zone: ZONES[0],
+    zoneBg: {
+      canvas: { width: 560, height: 560 } as HTMLCanvasElement,
+      region: {
+        minX: ZONES[0].xMin ?? STRIP_MIN_X,
+        maxX: ZONES[0].xMax ?? STRIP_MAX_X,
+        minZ: ZONES[0].zMin,
+        maxZ: ZONES[0].zMax,
+      },
+    },
+    canvasSize: 560,
+    zoom: 1,
+    center: null,
+  });
+  const gatherFills = trace.fills
+    .filter((fill) => fill.style.startsWith('paint:--color-map-gather-'))
+    .map(({ style, commands }) => ({ style, commands }));
+  const strikes = trace.strokes.filter(
+    (stroke) =>
+      stroke.style === 'paint:--color-map-outline' &&
+      stroke.lineWidth === 1.5 &&
+      stroke.commands.join(',') === GATHER_STRIKE_COMMANDS.join(','),
+  );
+  const silhouetteStrokes = trace.strokes.filter((stroke) =>
+    Object.values(GATHER_SILHOUETTE).some((sig) => stroke.commands.join(',') === sig.join(',')),
+  );
+  return { trace, result, gatherFills, strikes, silhouetteStrokes };
+}
+
+function toolWorld(): IWorld {
+  const world = mapWorld() as unknown as {
+    inventory: { itemId: string; count: number }[];
+    gatheringProficiency: Record<string, number>;
+  };
+  // Cover every gathering profession at tier 1 so ore/wood/herb all unlock.
+  world.inventory = [
+    { itemId: 'copper_mining_pick', count: 1 },
+    { itemId: 'handaxe', count: 1 },
+    { itemId: 'gathering_sickle', count: 1 },
+  ];
+  world.gatheringProficiency = { mining: 1, logging: 1, herbalism: 1 };
+  return world as unknown as IWorld;
+}
+
+describe('map_window_painter: zone-map gather nodes', () => {
+  it('locked viewer: locked fills + one strike per node, never a ready or glow token', () => {
+    // Empty inventory locks every node: fills use the locked token, never a
+    // ready profession color and never a glow halo.
+    const { result, gatherFills, strikes } = paintGatherZone(mapWorld());
+    expect(result.gatherNodes.length).toBeGreaterThan(0);
+    // Fixture guard: every node is locked AND ready here, so the no-glow
+    // assertion below genuinely exercises the `!node.locked` conjunct of the
+    // glow gate (a not-ready fixture would defuse it silently).
+    expect(result.gatherNodes.every((n) => n.locked && n.ready)).toBe(true);
+    const lockedFills = gatherFills.filter(
+      (fill) => fill.style === 'paint:--color-map-gather-locked',
+    );
+    expect(lockedFills.length).toBe(result.gatherNodes.length);
+    expect(gatherFills.length).toBe(result.gatherNodes.length); // locked fills are the ONLY gather fills
+    for (const tok of [
+      '--color-map-gather-ore-ready',
+      '--color-map-gather-wood-ready',
+      '--color-map-gather-herb-ready',
+      '--color-map-gather-ore-glow',
+      '--color-map-gather-wood-glow',
+      '--color-map-gather-herb-glow',
+    ]) {
+      expect(
+        gatherFills.some((f) => f.style === `paint:${tok}`),
+        `locked viewer must not fill ${tok}`,
+      ).toBe(false);
+    }
+    // The non-hue lock cue (DESIGN.md color independence): one diagonal
+    // outline strike through every locked icon.
+    expect(strikes.length).toBe(result.gatherNodes.length);
+  });
+
+  it('ready viewer: glow-under-silhouette per node, tokens matched to the node type', () => {
+    const { result, gatherFills, strikes, silhouetteStrokes } = paintGatherZone(toolWorld());
+    expect(result.gatherNodes.length).toBeGreaterThan(0);
+    expect(result.gatherNodes.every((n) => !n.locked && n.ready)).toBe(true);
+    // The full fill sequence in model order: glow halo (a plain arc) under the
+    // type silhouette, each carrying ITS OWN type's token. A permuted color
+    // resolver, a swapped silhouette, or a glow painted over the icon all
+    // break this exact sequence.
+    expect(gatherFills).toEqual(
+      result.gatherNodes.flatMap((n) => [
+        { style: `paint:--color-map-gather-${n.type}-glow`, commands: ['arc'] },
+        { style: `paint:--color-map-gather-${n.type}-ready`, commands: GATHER_SILHOUETTE[n.type] },
+      ]),
+    );
+    // Ready silhouettes carry the outline stroke; nothing is locked, so no
+    // strike strokes at all.
+    expect(silhouetteStrokes.length).toBe(result.gatherNodes.length);
+    expect(strikes.length).toBe(0);
+  });
+
+  it('the locked token references the minimap rust token (both surfaces retune together)', () => {
+    // The map side of the agreement is this var() reference; the minimap side
+    // (the declaration of --color-minimap-node-locked itself) is pinned by
+    // tests/minimap_painter.test.ts, so a rename of either end fails a suite.
+    expect(tokens).toContain('--color-map-gather-locked: var(--color-minimap-node-locked)');
+  });
+
+  it('cooldown viewer: desaturated type token, no glow, no outline, no strike', () => {
+    const world = toolWorld() as unknown as { nodeHarvestableByMe: (id: string) => boolean };
+    // Tools for everything, but every ore vein is on this viewer's respawn
+    // cooldown: the cooldown arm (smaller bare silhouette) paints for ore
+    // while wood/herb stay on the ready arm.
+    world.nodeHarvestableByMe = (id) => !id.startsWith('ore_');
+    const { trace, result, gatherFills, strikes } = paintGatherZone(world as unknown as IWorld);
+    const oreMarkers = result.gatherNodes.filter((n) => n.type === 'ore');
+    expect(oreMarkers.length).toBeGreaterThan(0);
+    expect(oreMarkers.every((n) => !n.ready && !n.locked)).toBe(true);
+    const oreCooldownFills = gatherFills.filter(
+      (fill) => fill.style === 'paint:--color-map-gather-ore-cooldown',
+    );
+    expect(oreCooldownFills.length).toBe(oreMarkers.length);
+    // Cooldown keeps the type silhouette (the hex), just desaturated.
+    for (const fill of oreCooldownFills) {
+      expect(fill.commands).toEqual(GATHER_SILHOUETTE.ore);
+    }
+    // No ore glow and no ore ready fill while cooling; wood/herb still glow.
+    expect(gatherFills.some((f) => f.style === 'paint:--color-map-gather-ore-glow')).toBe(false);
+    expect(gatherFills.some((f) => f.style === 'paint:--color-map-gather-ore-ready')).toBe(false);
+    expect(gatherFills.some((f) => f.style === 'paint:--color-map-gather-wood-glow')).toBe(true);
+    expect(gatherFills.some((f) => f.style === 'paint:--color-map-gather-herb-glow')).toBe(true);
+    // A cooldown silhouette takes no outline stroke (only ready ones do), and
+    // nothing here is locked, so no strikes either. The hex signature is
+    // unique to ore in this paint, so zero hex strokes pins the elided arm.
+    expect(strikes.length).toBe(0);
+    const hexStrokes = trace.strokes.filter(
+      (stroke) => stroke.commands.join(',') === GATHER_SILHOUETTE.ore.join(','),
+    );
+    expect(hexStrokes.length).toBe(0);
+  });
+});
 
 describe('map_window_painter: party markers', () => {
   it('draws a class-colored dot for an alive member and the dead token for a fallen one', () => {

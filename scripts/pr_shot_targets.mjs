@@ -6,6 +6,8 @@
 // Adding coverage is one entry here, not a new script. Keep recipes offline-only (they
 // drive window.__game directly: sim.addItem, hud.toggleBags/toggleMap, sim.player.pos).
 
+import { dismissEntryOverlays } from './enter_offline_game.mjs';
+
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 
 // Poll up to ~10s for `selector` to report a non-zero layout size, checking every
@@ -25,6 +27,17 @@ async function pollForSize(page, selector, attempts = 20, intervalMs = 500) {
   }
   return false;
 }
+
+// Seed the theme preset BEFORE the document loads (variant.beforeLoad), in string
+// form because this script runs under tsx (keepNames breaks nested functions inside
+// evaluate callbacks). Every themed variant seeds explicitly, never relies on a
+// clean default: the harness profile's localStorage outlives page.close, so a
+// prior variant's preset would silently leak into the next shot otherwise.
+const themeSeed = (preset) => async (page) => {
+  await page.evaluateOnNewDocument(
+    `try { localStorage.setItem('woc_theme', JSON.stringify({ preset: '${preset}', custom: {} })); } catch {}`,
+  );
+};
 
 // Teleport onto the Merchant's stall (zone1, {0, 11.5}) so marketOpen's proximity gate
 // passes, then open the Browse tab. Shared by the market filter-chrome targets below.
@@ -339,6 +352,87 @@ export const TARGETS = [
       }
       await wait(2600); // let the field build + banners settle
       return {};
+    },
+  },
+  {
+    key: 'skill-milestone-plate',
+    label: 'Banner: gathering skill milestone plate (#2934)',
+    when: ['ui/skill_level_toast_view'],
+    // Drives the REAL observation path: the handleEvents tail baselines the
+    // live meta proficiency on one drain, then a later mutation crosses 25 (a
+    // milestone, safely below the 100/200 deed bands so no deed plate
+    // contends for the slot) and the copper plate paints through the live
+    // 20 Hz drain with its crest, fade, and chime. On a base build without
+    // the feature nothing paints and the shot falls back to the whole HUD,
+    // which is the honest BEFORE frame.
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    async capture(page) {
+      // The camera choice, tutorial prompt, and GPU notice each appear on
+      // their own schedule after entry, so sweep the dismissals through the
+      // settle window instead of clicking once. The window also lets the
+      // zone-entry banner clear: a live ambient banner would hold the slot
+      // and queue the celebration plate past the shot.
+      for (let i = 0; i < 12; i++) {
+        await page.evaluate(() => {
+          document.querySelector('.camera-prompt-confirm')?.click();
+          document.querySelector('.tut-skip')?.click();
+          document.querySelector('.gpu-notice-dismiss')?.click();
+        });
+        await wait(500);
+      }
+      // The offline world can lag the page's load event by several seconds on
+      // a cold transform cache, so poll for the player meta instead of
+      // failing one probe.
+      let staged = { ok: false, reason: 'player meta is unavailable' };
+      for (let i = 0; i < 20 && !staged.ok; i++) {
+        staged = await page.evaluate(() => {
+          const sim = window.__game?.sim;
+          const meta = sim?.players?.get?.(sim?.playerId);
+          if (!meta?.gatheringProficiency)
+            return { ok: false, reason: 'player meta is unavailable' };
+          meta.gatheringProficiency.mining = 24.2;
+          return { ok: true };
+        });
+        if (!staged.ok) await wait(500);
+      }
+      if (!staged.ok) throw new Error(staged.reason);
+      // One drain observes 24.2 (a chat line, no plate), then the crossing
+      // below celebrates.
+      await wait(600);
+      const crossed = await page.evaluate(() => {
+        const sim = window.__game?.sim;
+        const meta = sim?.players?.get?.(sim?.playerId);
+        if (!meta?.gatheringProficiency) return { ok: false, reason: 'world went away' };
+        meta.gatheringProficiency.mining = 25.1;
+        return { ok: true };
+      });
+      if (!crossed.ok) throw new Error(crossed.reason);
+      // Poll for the SKILL plate at full opacity and shoot immediately: the
+      // class check keeps a live ambient banner (the Ravenpost mail line has
+      // raced this shot) from satisfying the poll while the celebration sits
+      // queued behind it, and the generous window covers that queued case
+      // (ambient hold plus advance gap plus the 1.2s fade). On a base build
+      // without the feature the poll exhausts and the frame is the honest
+      // BEFORE. Whole HUD, not a tight '#banner' crop: the plate reads in
+      // context and the BEFORE frame keeps identical framing.
+      for (let i = 0; i < 60; i++) {
+        const visible = await page.evaluate(() => {
+          // Overlays keep their own schedules (the tutorial re-prompts), so
+          // keep dismissing right up to the shot.
+          document.querySelector('.camera-prompt-confirm')?.click();
+          document.querySelector('.tut-skip')?.click();
+          document.querySelector('.gpu-notice-dismiss')?.click();
+          const el = document.querySelector('#banner');
+          return (
+            el !== null &&
+            el.classList.contains('banner-skill') &&
+            Number(getComputedStyle(el).opacity) > 0.95
+          );
+        });
+        if (visible) break;
+        await wait(100);
+      }
+      return { clip: '#ui' };
     },
   },
   {
@@ -802,6 +896,13 @@ export const TARGETS = [
           'minor_mana_potion',
           'boar_hide',
           'glade_pelt',
+          // Fine grades beside their base materials: the fine-grade rim/wash/
+          // seal (bag_fine_mark_view) must be visible against the unmarked
+          // base stack in the same grid.
+          'copper_ore',
+          'fine_copper_ore',
+          'silverleaf_herb',
+          'fine_silverleaf_herb',
         ];
         for (const id of ids) {
           try {
@@ -899,6 +1000,71 @@ export const TARGETS = [
     },
   },
   {
+    key: 'bank-instance-marks',
+    label: 'Bank grid corner marks: masterwork seal and per-copy glyphs on banked slots',
+    when: ['ui/bank_window', 'ui/guild_bank_window', 'ui/item_instance_glyph_mark'],
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    async capture(page) {
+      await page.evaluate(() => {
+        const game = window.__game;
+        const sim = game?.sim;
+        // One copy per corner-mark kind plus a plain control stack, so the
+        // vault shows the masterwork seal and the enchanted / signed / bound
+        // glyphs beside an unmarked cell. The personal bank has no transfer
+        // lock, so every copy deposits.
+        try {
+          sim?.addItemInstance?.('worn_sword', {
+            signer: 'Thorgar',
+            rolled: { masterwork: true, stats: { str: 2, sta: 1 } },
+          });
+          sim?.addItemInstance?.('wolf_fang', { enchant: 'enchant_chest_stamina' });
+          sim?.addItemInstance?.('wolf_fang', { signer: 'Toralin' });
+          // rough_hide, not a quest-kind hide: the bank refuses quest items,
+          // so a quest-flagged fixture would silently drop the bound cell.
+          sim?.addItemInstance?.('rough_hide', { bindOnTrade: true });
+          sim?.addItem?.('baked_bread', 3);
+        } catch {}
+        // Stand beside the banker so the proximity-gated bank snapshot is
+        // live (bankInfo is null out of reach; the bank-chips recipe idiom).
+        try {
+          for (const e of sim.entities.values()) {
+            if (e.kind === 'npc' && e.templateId === 'bursar_fernando') {
+              const p = sim.entities.get(sim.playerId);
+              p.pos = { ...e.pos };
+              p.prevPos = { ...p.pos };
+              sim.rebucket(p);
+              break;
+            }
+          }
+        } catch {}
+        game?.hud?.openBank?.();
+      });
+      if (!(await pollForSize(page, '#bank-window'))) {
+        throw new Error('bank window did not open');
+      }
+      // Deposit through the real world command. Indices shift as slots empty,
+      // so always re-find the first instanced slot; the plain stack follows as
+      // the unmarked contrast cell.
+      await page.evaluate(() => {
+        const world = window.__game?.sim;
+        for (let guard = 0; guard < 8; guard++) {
+          const idx = world.inventory.findIndex((s) => s?.instance);
+          if (idx < 0) break;
+          world.bankDeposit(idx);
+        }
+        const plain = world.inventory.findIndex((s) => s?.itemId === 'baked_bread');
+        if (plain >= 0) world.bankDeposit(plain);
+      });
+      // Poll for the deposited cells, not the marks: the same recipe shoots
+      // the BEFORE tree, where the bank paints no corner mark at all.
+      if (!(await pollForSize(page, '#bank-window .bank-item'))) {
+        throw new Error('bank grid never filled after deposits');
+      }
+      await wait(700);
+      return { clip: '#bank-window' };
+    },
+  },
+  {
     key: 'fishing-rod-ladder',
     label: 'The rod ladder in the bags, with the top rung hovered',
     when: ['professions/fishing', 'fishing_zones', 'gather_tool_tooltip', 'content/recipes'],
@@ -936,6 +1102,84 @@ export const TARGETS = [
           return (
             (bg && bg.includes('tidewrought_fishing_rod')) ||
             (img && img.getAttribute('src')?.includes('tidewrought_fishing_rod'))
+          );
+        });
+        if (!el) return;
+        const r = el.getBoundingClientRect();
+        for (const type of [
+          'pointerenter',
+          'pointerover',
+          'mouseenter',
+          'mouseover',
+          'pointermove',
+          'mousemove',
+        ]) {
+          el.dispatchEvent(
+            new MouseEvent(type, {
+              bubbles: true,
+              clientX: r.left + r.width / 2,
+              clientY: r.top + r.height / 2,
+            }),
+          );
+        }
+      });
+      await wait(600);
+      return { clip: '#ui' };
+    },
+  },
+  {
+    key: 'material-usedby-tooltip',
+    label: 'Rough Hide tooltip with the Used-by craft affinity line',
+    when: [
+      'material_profession_hint_view',
+      'material_profession_affinity',
+      'craft_name_view',
+      'ui/material_hint',
+    ],
+    // Classic AND Parchment presets: the line's craft tint is a theme-emitted
+    // token repaired per preset (src/ui/theme.ts --color-material-use), and the light
+    // Parchment panel is where an unrepaired accent mix fell below the
+    // large-text contrast floor, so it is the preset worth proving. Desktop
+    // only: the synthetic hover path does not raise #tooltip on the touch
+    // layout, and the tooltip content is byte-identical on mobile anyway.
+    variants: [
+      { key: 'classic', beforeLoad: themeSeed('classic') },
+      { key: 'parchment', beforeLoad: themeSeed('parchment') },
+    ],
+    async capture(page) {
+      // Under SwiftShader the offline world can outlast enterOfflineGame's
+      // default boot patience (the loading bar sits at "Entering the world"
+      // past its 30s waitForFunction), and that fallback is silent: staging
+      // against a world that never booted shoots the loading screen. Wait for
+      // the boot hook here with real patience, then clear the entry overlays
+      // that a LATE boot re-raises after the shared flow already tried.
+      await page.waitForFunction(() => window.__game?.sim?.player, { timeout: 90000 });
+      await dismissEntryOverlays(page);
+      await page.evaluate(() => {
+        const sim = window.__game?.sim;
+        // Rough Hide is the multi-craft exemplar; the neighbors cover the
+        // single-craft, fine-grade, and superseded-enchanting shapes so the
+        // bag itself documents the feature's range.
+        for (const id of ['rough_hide', 'game_meat', 'fine_iron_ore', 'arcane_dust']) {
+          try {
+            sim?.addItem(id, id === 'rough_hide' ? 5 : 1);
+          } catch {}
+        }
+        const el = document.querySelector('#bags');
+        if (el) el.style.display = 'none';
+        window.__game?.hud?.toggleBags?.();
+      });
+      await pollForSize(page, '#bags');
+      // Hover Rough Hide through the REAL pointer path so the tooltip is the
+      // one a player sees, not a hand-built string (the rod-ladder recipe).
+      await page.evaluate(() => {
+        const cells = [...document.querySelectorAll('#bags *')];
+        const el = cells.find((c) => {
+          const bg = c instanceof HTMLElement ? c.style.backgroundImage : '';
+          const img = c.querySelector?.('img');
+          return (
+            (bg && bg.includes('rough_hide')) ||
+            (img && img.getAttribute('src')?.includes('rough_hide'))
           );
         });
         if (!el) return;
@@ -4094,6 +4338,165 @@ export const TARGETS = [
         await wait(400);
       }
       return { clip: '#professions-window' };
+    },
+  },
+  {
+    key: 'tool-charm-cards',
+    label: 'Tool charm explainer cards: bag item tooltip and Professions live-row hover card',
+    when: ['src/ui/tool_effect_tooltip.ts'],
+    variants: [{ key: 'bag-tooltip' }, { key: 'professions-live-row' }],
+    async capture(page, variant) {
+      // The entry helper RETURNS false rather than throwing when the world
+      // boot outlasts its budget on a contended machine, and every step
+      // below silently no-ops without __game; gate on the hook so a slow
+      // boot reads as a retryable error, not a missing window.
+      let booted = false;
+      for (let attempt = 0; attempt < 60 && !booted; attempt++) {
+        booted = await page.evaluate(() =>
+          Boolean(window.__game?.hud && window.__game?.sim?.player),
+        );
+        if (!booted) await wait(1000);
+      }
+      if (!booted) throw new Error('world did not boot');
+      await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        document.querySelector('.gpu-notice-dismiss')?.click();
+      });
+      await wait(300);
+      if (variant?.key === 'bag-tooltip') {
+        // Grant the charm, open bags, hover its row: the tooltip card is the
+        // whole change, so the clip is the shared #tooltip box itself.
+        await page.evaluate(() => {
+          const game = window.__game;
+          if (!game) return;
+          try {
+            game.sim?.addItem('gatherers_cache', 1);
+          } catch {}
+          const el = document.querySelector('#bags');
+          if (el) el.style.display = 'none';
+          game.hud.toggleBags?.();
+        });
+        const bagsOpen = await pollForSize(page, '#bags');
+        if (!bagsOpen) throw new Error('bags window did not open');
+        // Poll for the granted charm's row: the grant and the bag paint can
+        // land a beat after the toggle on a cold contended run.
+        let hovered = false;
+        for (let attempt = 0; attempt < 10 && !hovered; attempt++) {
+          hovered = await page.evaluate(() => {
+            // The exact handle: bag rows key their focus by item id
+            // (bags_window.ts stackOrdinal mint), so the charm cannot be
+            // confused with any other rare the starter kit carries.
+            const row = document.querySelector('#bags [data-focus-key^="bag:gatherers_cache:"]');
+            if (!row) return false;
+            row.dispatchEvent(new MouseEvent('mouseenter'));
+            return true;
+          });
+          if (!hovered) await wait(500);
+        }
+        if (!hovered) {
+          const diag = await page.evaluate(() => ({
+            rows: document.querySelectorAll('#bags .bag-item').length,
+            classes: [...document.querySelectorAll('#bags .bag-item')]
+              .slice(0, 8)
+              .map((r) => r.className),
+          }));
+          throw new Error(`charm bag row not found to hover: ${JSON.stringify(diag)}`);
+        }
+        await wait(400);
+        return { clip: '#tooltip' };
+      }
+      // The live-row card: stage a slotted effect through the IWorld read (the
+      // professions target's renown-board precedent), open the window, hover
+      // the row the wiring marked with data-effect-tip.
+      await page.evaluate(() => {
+        const game = window.__game;
+        if (!game) return;
+        // Gathering (and its effect lines) renders only in FULL mode, and the
+        // sandbox character is unattuned (simplified), so stage an attuned
+        // identity plus a mining row (the professions target's stub precedent).
+        Object.defineProperty(game.world, 'craftingIdentity', {
+          value: {
+            version: 1,
+            synced: true,
+            craftSkills: {
+              weaponcrafting: 125,
+              armorcrafting: 87,
+              tailoring: 0,
+              leatherworking: 0,
+              cooking: 26,
+              alchemy: 0,
+              engineering: 0,
+              enchanting: 0,
+              jewelcrafting: 0,
+              inscription: 0,
+            },
+            activeArchetype: 'weaponcrafting',
+            pairedMajor: 'armorcrafting',
+            hobbyCraft: 'cooking',
+            attunedPairs: ['weaponcrafting+armorcrafting'],
+            switchCount: 1,
+            amendsProgress: 2,
+            amendsRequired: 8,
+            knownRecipes: [],
+          },
+          configurable: true,
+        });
+        Object.defineProperty(game.world, 'professionsState', {
+          value: { skills: [{ professionId: 'mining', skill: 88, maxSkill: 100 }] },
+          configurable: true,
+        });
+        Object.defineProperty(game.world, 'toolEffectSlots', {
+          value: [
+            {
+              professionId: 'mining',
+              effectId: 'gatherers_cache',
+              charges: 12,
+              maxCharges: 30,
+              confirmMode: 'always',
+            },
+          ],
+          configurable: true,
+        });
+        const el = document.querySelector('#professions-window');
+        if (el) el.style.display = 'none';
+        game.hud.toggleProfessions?.();
+      });
+      const open = await pollForSize(page, '#professions-window');
+      if (!open) throw new Error('professions window did not open');
+      // Repaint to pick the stubs up in case the first paint raced them, then
+      // poll for the marked row.
+      await page.evaluate(() => {
+        window.__game?.hud?.toggleProfessions?.();
+        window.__game?.hud?.toggleProfessions?.();
+      });
+      let hovered = false;
+      for (let attempt = 0; attempt < 10 && !hovered; attempt++) {
+        hovered = await page.evaluate(() => {
+          const row = document.querySelector('#professions-window [data-effect-tip]');
+          if (!row) return false;
+          row.scrollIntoView({ block: 'center' });
+          row.dispatchEvent(new MouseEvent('mouseenter'));
+          return true;
+        });
+        if (!hovered) await wait(500);
+      }
+      if (!hovered) {
+        const diag = await page.evaluate(() => ({
+          effects: document.querySelectorAll('#professions-window .prof-effect').length,
+          gatherRows: document.querySelectorAll('#professions-window .prof-gather-row').length,
+          slots: (() => {
+            try {
+              return JSON.stringify(window.__game?.world?.toolEffectSlots);
+            } catch (e) {
+              return String(e);
+            }
+          })(),
+        }));
+        throw new Error(`live effect row with data-effect-tip not found: ${JSON.stringify(diag)}`);
+      }
+      await wait(400);
+      return { clip: '#tooltip' };
     },
   },
   {

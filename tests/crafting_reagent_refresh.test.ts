@@ -332,9 +332,12 @@ describe('crafting window bag-freshness wiring (source pins)', () => {
   });
 
   it('the online authoritative inventory delta converges it on the same frame', () => {
-    expect(hud).toMatch(
-      /onInventoryChanged\(\): void \{[^}]*this\.refreshOpenCraftingIfReagentsChanged\(\);\s*\}/,
-    );
+    // Bounded at the METHOD's own two-space closing brace rather than a flat
+    // [^}]* reach from the opener (#2931 made that break this pin once) or
+    // the next definition (whose gap a future method could squat in): inner
+    // blocks close at deeper indents, so the slice is exactly the hook body.
+    const arm = region('onInventoryChanged(): void {', '\n  }');
+    expect(arm).toContain('this.refreshOpenCraftingIfReagentsChanged();');
   });
 
   it('the offline vendor buy converges it on the click', () => {

@@ -57,6 +57,7 @@ import { type ClientSession, GameServer } from '../server/game';
 import type { Entity } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
 import { bareClient } from './helpers/bare_client';
+import { methodBody } from './helpers/method_body';
 
 const PROCEEDS = 54321;
 
@@ -294,8 +295,11 @@ describe('bag purse-freshness wiring (source pins)', () => {
     // the cold-load-safe form too (issue #1538): every money-only credit now routes
     // through here, so the raw `!== 'none'` compare would rebuild a window the
     // player has never opened on each one.
-    expect(hud).toMatch(
-      /onInventoryChanged\(\): void \{[^}]*if \(bagsWindowShown\(\$\('#bags'\)\.style\.display\)\) this\.renderBags\(\);/,
+    // Sliced to the method body (the shared two-space-close bound) rather
+    // than a flat [^}]* reach from the opener: brace-bearing sibling arms
+    // inside onInventoryChanged broke that shape once (#2931).
+    expect(methodBody(hud, 'onInventoryChanged(): void {')).toContain(
+      "if (bagsWindowShown($('#bags').style.display)) this.renderBags();",
     );
   });
 

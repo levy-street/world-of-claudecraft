@@ -45,6 +45,14 @@ const ITEMS: Record<string, ItemDef> = {
   questItem: { kind: 'quest', name: 'Relic', quality: 'epic' } as ItemDef,
   bound: { kind: 'armor', name: 'Bound Plate', quality: 'uncommon', noMarketList: true } as ItemDef,
   rod: { kind: 'tool', name: 'Fishing Rod', use: { type: 'fishing' } } as ItemDef,
+  // Tool-effect charm: use.type 'toolEffect' is not bag-usable; the hover must
+  // point at the Professions window rather than advertising "Click to use".
+  charm: {
+    kind: 'tool',
+    name: "Gatherer's Cache",
+    quality: 'rare',
+    use: { type: 'toolEffect', effectId: 'gatherers_cache' },
+  } as ItemDef,
   soulbound: { kind: 'quest', name: 'Soulbound Key', quality: 'epic', noDiscard: true } as ItemDef,
   starterTool: {
     kind: 'tool',
@@ -491,6 +499,11 @@ describe('bagTooltipHintKey', () => {
     expect(bagTooltipHintKey(ITEMS.bread, NO_MODE)).toBe('itemUi.tooltip.clickConsume');
     expect(bagTooltipHintKey(ITEMS.potion, NO_MODE)).toBe('itemUi.tooltip.clickUseInstant');
     expect(bagTooltipHintKey(ITEMS.rod, NO_MODE)).toBe('itemUi.tooltip.clickUse');
+    // Charms refuse bag use (sim: "Open Professions to slot that."); the hint
+    // must not advertise click-to-use for a click that only errors.
+    expect(bagTooltipHintKey(ITEMS.charm, NO_MODE)).toBe(
+      'hudChrome.professions.toolEffectTooltip.openProfessions',
+    );
     expect(bagTooltipHintKey({ kind: 'junk' }, NO_MODE)).toBe('');
   });
 

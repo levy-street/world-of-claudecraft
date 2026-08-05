@@ -2092,6 +2092,7 @@ export const en: EnTranslations = {
     "materialHint": {
       "fineGrade": "Fine grade. Gathered from a full-tier vein with a tool ranked above the material, and counts as the ordinary version wherever one is required.",
       "cookingCatch": "Cooking ingredient. Must be cooked before eating.",
+      "usedBy": "Used by {crafts}.",
       "arcaneDust": "Enchanting reagent. Disenchanted from common and uncommon gear.",
       "arcaneEssence": "Enchanting reagent. Disenchanted from rare gear.",
       "arcaneShard": "Enchanting reagent. Disenchanted from epic and legendary gear.",
@@ -2718,6 +2719,18 @@ export const en: EnTranslations = {
         "artisansEye": "Artisan's Eye",
         "quickeningCharm": "Springback Charm"
       },
+      "toolEffectTooltip": {
+        "kind": "Tool charm",
+        "bonus": {
+          "gatherersCache": "+1 yield per harvest while charged.",
+          "artisansEye": "Raises the harvest grade by 1 tool tier while charged.",
+          "quickeningCharm": "Shortens the node respawn timer it triggers."
+        },
+        "howToSlot": "Slot onto a mining, logging, or herbalism tool from the Professions window. Consumed when slotted.",
+        "charges": "Starts with {base} charges on a common tool (+{bonus} per rarity rung).",
+        "landOnly": "Does not slot on fishing rods.",
+        "openProfessions": "Open Professions to slot this onto a gathering tool."
+      },
       "toolEffectSlotButton": "Slot {effect}",
       "toolEffectRechargeButton": "Recharge",
       "toolEffectSlotted": "{effect} slotted on {profession}.",
@@ -2830,6 +2843,8 @@ export const en: EnTranslations = {
       "masterworkToast": "Masterwork! {name}",
       "masterworkZoneLine": "{crafter} crafted a masterwork {name}!",
       "tierUpToast": "{craft} advanced to tier {tier}!",
+      "skillUpToast": "{skill} skill increased to {level}!",
+      "skillUpSubtext": "Skill increased to {level}!",
       "trendNudge": "Your hands are leaning toward the {archetype}. Its attunement waits with {master}.",
       "trendNudgeNoMaster": "Your hands are leaning toward the {archetype}. Seek a craft master to take it up.",
       "attunedZoneLine": "{name} has attuned as {archetype}!",

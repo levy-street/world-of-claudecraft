@@ -2092,6 +2092,7 @@ export const pt_BR: EnTranslations = {
     "materialHint": {
       "fineGrade": "Grau fino. Coletado de um veio de nível pleno com uma ferramenta de nível acima do material, e conta como a versão comum sempre que uma for exigida.",
       "cookingCatch": "Ingrediente de culinária. Deve ser cozido antes de comer.",
+      "usedBy": "Used by {crafts}.",
       "arcaneDust": "Reagente de encantamento. Desencantado de equipamento comum e incomum.",
       "arcaneEssence": "Reagente de encantamento. Desencantado de equipamento raro.",
       "arcaneShard": "Reagente de encantamento. Desencantado de equipamento épico e lendário.",
@@ -2718,6 +2719,18 @@ export const pt_BR: EnTranslations = {
         "artisansEye": "Olho do Artesão",
         "quickeningCharm": "Amuleto do Rebrote"
       },
+      "toolEffectTooltip": {
+        "kind": "Tool charm",
+        "bonus": {
+          "gatherersCache": "+1 yield per harvest while charged.",
+          "artisansEye": "Raises the harvest grade by 1 tool tier while charged.",
+          "quickeningCharm": "Shortens the node respawn timer it triggers."
+        },
+        "howToSlot": "Slot onto a mining, logging, or herbalism tool from the Professions window. Consumed when slotted.",
+        "charges": "Starts with {base} charges on a common tool (+{bonus} per rarity rung).",
+        "landOnly": "Does not slot on fishing rods.",
+        "openProfessions": "Open Professions to slot this onto a gathering tool."
+      },
       "toolEffectSlotButton": "Encaixar {effect}",
       "toolEffectRechargeButton": "Recarregar",
       "toolEffectSlotted": "{effect} encaixado em {profession}.",
@@ -2830,6 +2843,8 @@ export const pt_BR: EnTranslations = {
       "masterworkToast": "Obra-prima! {name}",
       "masterworkZoneLine": "{crafter} criou uma obra-prima {name}!",
       "tierUpToast": "{craft} avançou para o nível {tier}!",
+      "skillUpToast": "{skill} skill increased to {level}!",
+      "skillUpSubtext": "Skill increased to {level}!",
       "trendNudge": "Suas mãos estão se inclinando para {archetype}. Sua sintonização aguarda com {master}.",
       "trendNudgeNoMaster": "Suas mãos estão se inclinando para {archetype}. Procure um mestre de ofício para assumir.",
       "attunedZoneLine": "{name} se sintonizou como {archetype}!",

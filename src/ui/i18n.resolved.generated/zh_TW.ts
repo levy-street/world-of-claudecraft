@@ -2092,6 +2092,7 @@ export const zh_TW: EnTranslations = {
     "materialHint": {
       "fineGrade": "優質品級。以等級高於該材料的工具在滿級礦脈採集所得，在任何需要普通版本的地方均可替代使用。",
       "cookingCatch": "烹飪材料。必須先烹飪後才能食用。",
+      "usedBy": "Used by {crafts}.",
       "arcaneDust": "附魔材料。分解普通和優秀品質的裝備可得。",
       "arcaneEssence": "附魔材料。分解精良品質的裝備可得。",
       "arcaneShard": "附魔材料。分解史詩和傳說品質的裝備可得。",
@@ -2718,6 +2719,18 @@ export const zh_TW: EnTranslations = {
         "artisansEye": "匠人之眼",
         "quickeningCharm": "回春符"
       },
+      "toolEffectTooltip": {
+        "kind": "工具符咒",
+        "bonus": {
+          "gatherersCache": "充能期間每次採集產出+1。",
+          "artisansEye": "充能期間將收穫品級提升1個工具等級。",
+          "quickeningCharm": "縮短其觸發的資源節點重生計時。"
+        },
+        "howToSlot": "在專業視窗中將其鑲嵌到採礦、伐木或藥草學工具上。鑲嵌後即消耗。",
+        "charges": "普通品質工具初始有{base}次充能（稀有度每升一級+{bonus}次）。",
+        "landOnly": "無法鑲嵌到釣竿上。",
+        "openProfessions": "打開專業視窗，將其鑲嵌到採集工具上。"
+      },
       "toolEffectSlotButton": "鑲嵌{effect}",
       "toolEffectRechargeButton": "充能",
       "toolEffectSlotted": "{effect}已鑲嵌到{profession}。",
@@ -2830,6 +2843,8 @@ export const zh_TW: EnTranslations = {
       "masterworkToast": "傑作！{name}",
       "masterworkZoneLine": "{crafter}製作出了傑作{name}！",
       "tierUpToast": "{craft}提升至階級 {tier}！",
+      "skillUpToast": "{skill}技能提升至 {level}！",
+      "skillUpSubtext": "技能提升至 {level}！",
       "trendNudge": "你的雙手正傾向於{archetype}之道。其調諧任務在{master}處等候。",
       "trendNudgeNoMaster": "你的雙手正傾向於{archetype}之道。去尋找一位工藝大師來踏上此道吧。",
       "attunedZoneLine": "{name}已調諧為{archetype}！",

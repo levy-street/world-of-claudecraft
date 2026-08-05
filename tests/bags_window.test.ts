@@ -504,9 +504,11 @@ describe('bags_window: unknown-id stacks stay visible (stale-client guard, R34)'
     // The def-free corner glyph and its aria flag survive the missing def: a
     // bound or enchanted copy keeps its marker in both channels.
     expect(body).toContain('bagInstanceGlyphKind(s.instance)');
-    expect(body).toContain('t(UNKNOWN_GLYPH_ARIA_KEYS[glyphKind], {');
-    // Never the known cell's keys: those drop the UNKNOWN signal.
-    expect(body).not.toContain('BAG_GLYPH_ARIA_KEYS[glyphKind]');
+    expect(body).toContain('t(UNKNOWN_INSTANCE_GLYPH_ARIA_KEYS[glyphKind], {');
+    // Never the known cell's keys: those drop the UNKNOWN signal. The known
+    // map's name is a SUBSTRING of the unknown one, so the lookbehind keeps
+    // the legitimate UNKNOWN_INSTANCE_GLYPH_ARIA_KEYS use from matching.
+    expect(body).not.toMatch(/(?<!UNKNOWN_)INSTANCE_GLYPH_ARIA_KEYS/);
     expect(body).toContain('row.draggable = !this.deps.tradeOpen() && !this.deps.vendorOpen()');
     expect(body).toContain("row.addEventListener('dragstart'");
     expect(body).toContain("row.addEventListener('dragend'");

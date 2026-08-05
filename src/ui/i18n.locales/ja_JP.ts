@@ -8703,6 +8703,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.masterworkToast': '傑作！{name}',
   'hudChrome.crafting.masterworkZoneLine': '{crafter}が傑作{name}を作り上げました！',
   'hudChrome.crafting.tierUpToast': '{craft}がティア {tier} に到達しました！',
+  'hudChrome.crafting.skillUpToast': '{skill}の技能が {level} に上がりました！',
+  'hudChrome.crafting.skillUpSubtext': '技能が {level} に上がりました！',
   'hudChrome.crafting.makersMark': '製作者：{name}',
   'hudChrome.bags.itemAriaInstanced': '{item}、数量 {count}、銘入りの品',
   'hudChrome.bags.itemAriaMasterwork': '{item}、数量 {count}、傑作',
@@ -10294,6 +10296,19 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectName.quickeningCharm': '早戻りの護符',
   'hudChrome.professions.toolEffectName.artisansEye': '職人の眼',
   'hudChrome.professions.toolEffectName.gatherersCache': '採集者の貯蔵袋',
+  'hudChrome.professions.toolEffectTooltip.kind': '道具用の護符',
+  'hudChrome.professions.toolEffectTooltip.bonus.gatherersCache': '充填中は採集ごとに産出+1。',
+  'hudChrome.professions.toolEffectTooltip.bonus.artisansEye':
+    '充填中は収穫の品質がツール1段階ぶん上がる。',
+  'hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm':
+    '発動した資源ノードの再生タイマーを短縮する。',
+  'hudChrome.professions.toolEffectTooltip.howToSlot':
+    '専門技能ウィンドウから採掘・伐採・薬草学のツールに装着する。装着すると消費される。',
+  'hudChrome.professions.toolEffectTooltip.charges':
+    'コモン品質のツールでは{base}回の充填から始まる（レア度が1段階上がるごとに+{bonus}回）。',
+  'hudChrome.professions.toolEffectTooltip.landOnly': '釣り竿には装着できない。',
+  'hudChrome.professions.toolEffectTooltip.openProfessions':
+    '専門技能ウィンドウを開き、採集ツールに装着しよう。',
   'hudChrome.professions.toolEffectSlotButton': '{effect}を装着',
   'hudChrome.professions.toolEffectRechargeButton': '再充填',
   'hudChrome.professions.toolEffectNoGain': '{effect}はすでに装着され、充填も満タンだ。',
