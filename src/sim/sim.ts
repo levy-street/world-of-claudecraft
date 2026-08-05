@@ -235,6 +235,7 @@ import {
 } from './item_instance_load';
 import { canStackInstancePayloads, isMergeableInstancePayload } from './item_instance_merge';
 import { meetsLevelRequirement } from './item_level_req';
+import { hydrateInvSlotOnLoad } from './item_slot_load';
 import * as items from './items';
 import type { JailState } from './jail';
 import {
@@ -2857,39 +2858,33 @@ export class Sim {
         slot.count = Math.min(slot.count, instancedCountCap(ITEMS[slot.itemId], slot.instance));
         return slot;
       });
+      // The tool-only container, loaded BEFORE the bag sweep below so its
+      // spill is swept with everything else. Absent on a pre-toolbelt save,
+      // which loads as no belt worn and nothing stored. Anything the sanitizer
+      // cannot honor (a non-tool, a tool past the belt's slot count, contents
+      // with no belt worn) comes back as spill and returns to the inventory
+      // rather than being destroyed; the spill is stacked in unconditionally,
+      // since a load may legitimately land over capacity (the same tolerance
+      // pre-bag saves get below).
+      //
+      // Ordering is the fix for a real hole: the spill used to be stacked in
+      // AFTER the sweep had already run, so a rejected belt slot re-entered
+      // the backpack having skipped every bound the carried rows take. It runs
+      // ahead of the sweep now, and the sanitizer applies the same per-slot
+      // doctrine itself, so a belted slot is bounded whichever side it lands.
+      const belt = sanitizeToolbeltState(s.toolbelt, droppedInstanceJunk, player.id);
+      meta.toolbelt = belt.state;
+      for (const slot of belt.spill) {
+        addStacked(meta.inventory, slot.itemId, slot.count, slot.instance, slot.craftedRecipeId);
+      }
+      // The shared per-slot load doctrine (item_slot_load.ts): the count cap,
+      // the crafted-marker bound, the rift rebuild and the payload bound, in
+      // the one order two earlier review rounds settled. Lifted out of this
+      // loop verbatim so the toolbelt could call the same thing instead of
+      // re-deriving it; the ordering rationale now lives in that module's
+      // header.
       for (const slot of meta.inventory) {
-        // Rift rebuild FIRST, matching the equip arm above: the rebuild
-        // reduces a corrupt rift payload to its bounded keys, so an over-keyed
-        // row that still carries a VALID rift survives as the rebuilt payload
-        // instead of being destroyed by the key-count arm before the rebuild
-        // could salvage it (the fix-round review caught the two arms
-        // disagreeing on exactly that blob). A refusal drops silently, same
-        // as the equip arm's anti-tamper rule.
-        // The marker bound runs BEFORE the rift block: the refusal arm below
-        // continues past the rest of this iteration, and the fix-wave review
-        // proved a 100,000-char marker riding a refused-rift row through that
-        // skip while the diagnostic line silently named every drop but this
-        // one. Hoisting is the durable shape against the continue.
-        boundCraftedRecipeIdOnLoad(slot, droppedInstanceJunk, 'bag');
-        if (slot.instance?.rift) {
-          const rebuilt = sanitizeRiftGearInstance(slot.itemId, slot.instance, player.id);
-          if (rebuilt) slot.instance = rebuilt;
-          else {
-            delete slot.instance;
-            continue;
-          }
-        }
-        // The payload bound covers BAGS too (the review round: the mint sites
-        // put signed instances into bags in the common case, so an
-        // equipment-only clamp missed the container that carries most of
-        // them). Same shared rule as the equip arm above, on the clone
-        // cloneInvSlot just made (or the fresh rift rebuild).
-        if (slot.instance) {
-          const { payload, dropped } = sanitizeItemInstancePayloadOnLoad(slot.instance);
-          for (const d of dropped) droppedInstanceJunk.push(`bag.${slot.itemId}.${d}`);
-          if (payload) slot.instance = payload;
-          else delete slot.instance;
-        }
+        hydrateInvSlotOnLoad(slot, droppedInstanceJunk, 'bag', player.id);
       }
       if (s.bags === undefined) {
         // PRE-BAG save: the character earned this space under the infinite
@@ -2907,18 +2902,6 @@ export class Sim {
           const id = s.bags[i];
           meta.bags[i] = id && ITEMS[id]?.kind === 'bag' ? id : null;
         }
-      }
-      // The tool-only container. Absent on a pre-toolbelt save, which loads as
-      // no belt worn and nothing stored. Anything the sanitizer cannot honor (a
-      // non-tool, a tool past the belt's slot count, contents with no belt
-      // worn) comes back as spill and returns to the inventory rather than
-      // being destroyed; the
-      // spill is stacked in unconditionally, since a load may legitimately land
-      // over capacity (the same tolerance pre-bag saves get above).
-      const belt = sanitizeToolbeltState(s.toolbelt);
-      meta.toolbelt = belt.state;
-      for (const slot of belt.spill) {
-        addStacked(meta.inventory, slot.itemId, slot.count, slot.instance, slot.craftedRecipeId);
       }
       // Buyback rows deliberately skip the full instancedCountCap: byte-equal
       // merges past the stack cap are legitimate here (recordVendorBuyback

@@ -542,8 +542,18 @@ export interface ToolSlotModel {
 /** The toolbelt-bar model: whether a belt is worn at all, one entry per slot
  *  the worn belt grants, and the ONE carried tool a click on any empty slot
  *  stows next (null when nothing stowable is carried). Pure data; the painter
- *  renders it. */
+ *  renders it.
+ *
+ *  `visible` is what decides whether the bar exists in the DOM at all. The
+ *  belt is the top of a tailoring ladder gated at skill 25, so on release day
+ *  essentially the whole population has no belt and no way to get one yet:
+ *  painting the row unconditionally gave every one of those players a
+ *  permanent empty "no toolbelt worn" line (and its divider rule) advertising
+ *  something they cannot have. The bar appears once the belt is part of the
+ *  player's world: worn, or carried but not yet put on, which is exactly when
+ *  the "no toolbelt worn" hint becomes actionable rather than noise. */
 export interface ToolbeltBarModel {
+  visible: boolean;
   equipped: string | null;
   slots: ToolSlotModel[];
   stowCandidateId: string | null;
@@ -553,8 +563,10 @@ export function buildToolbeltBar(
   equipped: string | null,
   slotItemIds: readonly (string | null)[],
   stowCandidateId: string | null,
+  carriesBelt: boolean,
 ): ToolbeltBarModel {
   return {
+    visible: equipped !== null || carriesBelt,
     equipped,
     slots: slotItemIds.map((itemId, index) => ({ index, itemId })),
     stowCandidateId,

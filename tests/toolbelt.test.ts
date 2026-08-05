@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { BACKPACK_SLOTS, bagCapacity } from '../src/sim/bags';
 import { recipeById, TOOLBELT_RECIPES } from '../src/sim/content/recipes';
@@ -537,5 +538,152 @@ describe('sanitizeToolbeltState is the one load path', () => {
     const numeric = sanitizeToolbeltState({ equipped: 'basic_toolbelt', slots: 7 });
     expect(numeric.state.slots).toEqual([null, null]);
     expect(numeric.spill).toHaveLength(0);
+  });
+
+  it('rejects an empty itemId rather than spilling a phantom slot', () => {
+    // bank.ts rejects `''` outright for the same reason: it names no item, so
+    // keeping it only puts an unusable row in the player's bags.
+    const { state, spill } = sanitizeToolbeltState({
+      equipped: 'basic_toolbelt',
+      slots: [
+        { itemId: '', count: 1 },
+        { itemId: 'handaxe', count: 1 },
+      ],
+    });
+    expect(state.slots[0]).toBeNull();
+    expect(state.slots[1]?.itemId).toBe('handaxe');
+    expect(spill).toHaveLength(0);
+  });
+});
+
+describe('the belt takes the shared per-slot load doctrine', () => {
+  // The belt was the ONE item-bearing container that copied `craftedRecipeId`
+  // and `instance` verbatim out of untrusted JSONB while the other six ran the
+  // shared bounds. These pin the doctrine on BOTH sides of the sanitizer: the
+  // slot it keeps on the belt, and the slot it spills back to the bags.
+  const OVERLONG_MARKER = 'x'.repeat(100_000); // the documented round-4 finder
+
+  it('drops an oversized craftedRecipeId from a slot kept on the belt', () => {
+    const { state } = sanitizeToolbeltState({
+      equipped: 'basic_toolbelt',
+      slots: [{ itemId: 'copper_mining_pick', count: 1, craftedRecipeId: OVERLONG_MARKER }],
+    });
+    expect(state.slots[0]?.itemId).toBe('copper_mining_pick');
+    expect(state.slots[0]?.craftedRecipeId).toBeUndefined();
+  });
+
+  it('drops an oversized craftedRecipeId from a slot it spills back to the bags', () => {
+    // The spill arm is the one Rubsey's report reached through: a rejected
+    // slot used to re-enter the backpack having skipped every bound.
+    const { spill } = sanitizeToolbeltState({
+      equipped: 'basic_toolbelt',
+      slots: [
+        { itemId: 'copper_mining_pick', count: 1 },
+        { itemId: 'handaxe', count: 1 },
+        // past the 2-slot belt, so this one spills
+        { itemId: 'gathering_sickle', count: 1, craftedRecipeId: OVERLONG_MARKER },
+      ],
+    });
+    expect(spill.map((s) => s.itemId)).toEqual(['gathering_sickle']);
+    expect(spill[0]?.craftedRecipeId).toBeUndefined();
+  });
+
+  it('keeps a legal craftedRecipeId on both arms', () => {
+    // The negative case for the two above: the bound is a ceiling, not a purge.
+    const { state, spill } = sanitizeToolbeltState({
+      equipped: 'basic_toolbelt',
+      slots: [
+        { itemId: 'copper_mining_pick', count: 1, craftedRecipeId: 'copper_mining_pick' },
+        { itemId: 'handaxe', count: 1 },
+        { itemId: 'gathering_sickle', count: 1, craftedRecipeId: 'gathering_sickle' },
+      ],
+    });
+    expect(state.slots[0]?.craftedRecipeId).toBe('copper_mining_pick');
+    expect(spill[0]?.craftedRecipeId).toBe('gathering_sickle');
+  });
+
+  it('bounds an over-keyed instance payload on a belted slot', () => {
+    const overKeyed: Record<string, unknown> = {};
+    for (let i = 0; i < 40; i++) overKeyed[`k${i}`] = i;
+    const { state } = sanitizeToolbeltState({
+      equipped: 'basic_toolbelt',
+      slots: [{ itemId: 'copper_mining_pick', count: 1, instance: overKeyed }],
+    });
+    expect(state.slots[0]?.itemId).toBe('copper_mining_pick');
+    expect(state.slots[0]?.instance).toBeUndefined();
+  });
+
+  it('drops an oversized signer from a belted slot but keeps the legal payload around it', () => {
+    const { state } = sanitizeToolbeltState({
+      equipped: 'basic_toolbelt',
+      slots: [
+        {
+          itemId: 'copper_mining_pick',
+          count: 1,
+          instance: { signer: 'y'.repeat(5000), craftedRecipeId: 'copper_mining_pick' },
+        },
+      ],
+    });
+    // Drop-only and per-key: the junk key goes, its legal sibling stays.
+    expect(state.slots[0]?.instance?.signer).toBeUndefined();
+    expect(state.slots[0]?.instance?.craftedRecipeId).toBe('copper_mining_pick');
+  });
+
+  it('reports every drop through the caller-threaded sink', () => {
+    const dropped: string[] = [];
+    sanitizeToolbeltState(
+      {
+        equipped: 'basic_toolbelt',
+        slots: [{ itemId: 'copper_mining_pick', count: 1, craftedRecipeId: OVERLONG_MARKER }],
+      },
+      dropped,
+    );
+    // Named under the container, so the aggregate load diagnostic still says
+    // which container the corrupt row came from.
+    expect(dropped).toContain('toolbelt.copper_mining_pick.craftedRecipeId');
+  });
+
+  it('bounds a spilled slot end to end on the real character load path', () => {
+    // The sanitizer pins above run on the pure function; this drives the whole
+    // Sim.addPlayer load so the wiring is covered too: a corrupt belt row that
+    // spills has to arrive in the backpack already bounded.
+    const sim = makeSim();
+    const state = sim.serializeCharacter(sim.playerId)!;
+    const before = state.inventory.length;
+    (state as { toolbelt?: unknown }).toolbelt = {
+      equipped: 'basic_toolbelt',
+      slots: [
+        { itemId: 'copper_mining_pick', count: 1 },
+        { itemId: 'handaxe', count: 1 },
+        // past the belt, so this spills into the backpack on load
+        { itemId: 'gathering_sickle', count: 1, craftedRecipeId: OVERLONG_MARKER },
+      ],
+    };
+
+    const loaded = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    loaded.addPlayer('warrior', 'Spilled', { state });
+
+    const spilled = loaded.inventory.find((s) => s.itemId === 'gathering_sickle');
+    expect(spilled).toBeDefined();
+    expect(spilled?.craftedRecipeId).toBeUndefined();
+    expect(loaded.inventory.length).toBe(before + 1);
+    expect(loaded.toolbelt.slots.map((s) => s?.itemId)).toEqual(['copper_mining_pick', 'handaxe']);
+  });
+
+  it('stacks the belt spill into the bags BEFORE the bag sweep runs', () => {
+    // The ordering half of the fix, pinned as source text because behavior
+    // alone cannot see it: the sanitizer bounds the spill itself now, so the
+    // sweep is defense-in-depth and a wrong order still passes every
+    // assertion above. What must not silently come back is the SHAPE: the
+    // spill used to be stacked in after the sweep had already run, so a
+    // rejected belt slot re-entered the backpack having skipped every bound
+    // the carried rows take. Same idiom as the tool-gate suite's pin on the
+    // substituted toolSearchInventory expression.
+    const src = readFileSync(new URL('../src/sim/sim.ts', import.meta.url), 'utf8');
+    const spillAt = src.indexOf('for (const slot of belt.spill)');
+    const sweepAt = src.indexOf("hydrateInvSlotOnLoad(slot, droppedInstanceJunk, 'bag'");
+    expect(spillAt).toBeGreaterThan(-1);
+    expect(sweepAt).toBeGreaterThan(-1);
+    expect(spillAt).toBeLessThan(sweepAt);
   });
 });

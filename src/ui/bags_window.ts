@@ -21,7 +21,7 @@ import { audio } from '../game/audio';
 import { BACKPACK_SLOTS, bagSlotsOf } from '../sim/bags';
 import { ITEMS, QUESTS } from '../sim/data';
 import { FIREBOTTLE_COOLDOWN_SECS, FIREBOTTLE_ITEM_ID } from '../sim/interactions/firebottle_hut';
-import { bestStowCandidate } from '../sim/toolbelt';
+import { bestStowCandidate, isToolbeltItem } from '../sim/toolbelt';
 import type { EquipSlot, InvSlot, ItemDef, ItemInstancePayload } from '../sim/types';
 import type { IWorld } from '../world_api';
 import { bagCornerMark, bagRimClasses } from './bag_corner_mark_view';
@@ -423,7 +423,8 @@ export class BagsWindow {
     const prevScrollTop = el.querySelector('.bag-grid')?.scrollTop ?? 0;
     el.innerHTML = `<div class="panel-title"><span>${esc(t('itemUi.bags.title'))}</span><button type="button" class="x-btn" data-close data-focus-key="close" aria-label="${esc(t('itemUi.bags.close'))}">${svgIcon('close')}</button></div>`;
     el.appendChild(this.buildBagBar());
-    el.appendChild(this.buildToolbeltBar());
+    const toolbeltBar = this.buildToolbeltBar();
+    if (toolbeltBar) el.appendChild(toolbeltBar);
     // Skip the chip/search row entirely when the bag is empty: a full filter bar
     // above a grid of empty squares is just noise.
     if (world.inventory.length > 0) el.appendChild(this.buildFilterBar());
@@ -586,14 +587,19 @@ export class BagsWindow {
   // the best carried tool of a type not yet belted, so nobody has to hunt a
   // pick out of a full backpack. A belt is worn by clicking the toolbelt item
   // in the grid (bagItemAction 'equipToolbelt'), exactly like a bag.
-  private buildToolbeltBar(): HTMLElement {
+  private buildToolbeltBar(): HTMLElement | null {
     const world = this.deps.world();
     const belt = world.toolbelt;
     const model = buildToolbeltBar(
       belt.equipped,
       belt.slots.map((slot) => slot?.itemId ?? null),
       bestStowCandidate(world.inventory, belt, ITEMS) ?? null,
+      world.inventory.some((slot) => isToolbeltItem(ITEMS[slot.itemId])),
     );
+    // No belt worn and none carried: the whole row stays out of the DOM (see
+    // ToolbeltBarModel.visible), so a player who has not reached the ladder
+    // never sees an empty bar for it.
+    if (!model.visible) return null;
     const bar = document.createElement('div');
     bar.className = 'bag-bar toolbelt-bar';
     const fmt = (n: number): string => formatNumber(n, { maximumFractionDigits: 0 });

@@ -22,6 +22,7 @@
 import { addStacked, bagCapacity, canAddItem, fitsAll } from './bags';
 import type { GatheringProfessionId } from './content/professions';
 import { ITEMS } from './data';
+import { hydrateInvSlotOnLoad } from './item_slot_load';
 import type { SimContext } from './sim_context';
 import { cloneInvSlot, type InvSlot, type ItemDef } from './types';
 
@@ -146,10 +147,24 @@ export function toolSearchInventory(
  *  are never destroyed silently here: `spill` carries every rejected slot
  *  back so the caller can return it to the player's inventory. A legacy
  *  typed-map `slots` object (the pre-rework shape) spills its tools the same
- *  way, so an old save migrates with everything back in the backpack. */
-export function sanitizeToolbeltState(raw: unknown): { state: ToolbeltState; spill: InvSlot[] } {
+ *  way, so an old save migrates with everything back in the backpack.
+ *
+ *  Every surviving slot, KEPT or SPILLED, goes through the shared per-slot
+ *  load doctrine (item_slot_load.ts) exactly like the six older containers.
+ *  The first cut of this function copied `craftedRecipeId` and `instance`
+ *  verbatim out of untrusted JSONB, which made the belt the one container
+ *  where a hand-edited row could ride every autosave unbounded; the review
+ *  that caught it is what this delegation answers. `dropped` and `ownerId`
+ *  thread through to the same aggregate diagnostic and rift rebuild the bag
+ *  arm uses; both are optional so unit callers stay a one-argument call. */
+export function sanitizeToolbeltState(
+  raw: unknown,
+  dropped?: string[],
+  ownerId?: number,
+): { state: ToolbeltState; spill: InvSlot[] } {
   const state = emptyToolbelt();
   const spill: InvSlot[] = [];
+  const drops = dropped ?? [];
   if (!raw || typeof raw !== 'object') return { state, spill };
   const src = raw as { equipped?: unknown; slots?: unknown };
   const equipped = typeof src.equipped === 'string' ? src.equipped : null;
@@ -162,8 +177,12 @@ export function sanitizeToolbeltState(raw: unknown): { state: ToolbeltState; spi
   const entries: unknown[] = positional ? rawSlots : Object.values(rawSlots);
   for (let i = 0; i < entries.length; i++) {
     const slot = entries[i] as Partial<InvSlot> | null;
-    if (!slot || typeof slot.itemId !== 'string') continue;
+    // An empty itemId is rejected outright, the same guard bank.ts applies:
+    // it names no item, so keeping it would only spill a phantom slot into
+    // the backpack.
+    if (!slot || typeof slot.itemId !== 'string' || slot.itemId === '') continue;
     const kept = cloneInvSlot({ ...(slot as InvSlot), count: 1 });
+    hydrateInvSlotOnLoad(kept, drops, 'toolbelt', ownerId);
     // A non-tool, a tool past the belt's slot count, contents with no belt
     // worn, and every legacy typed-map entry are returned to the player
     // rather than kept in an unreachable slot.
@@ -211,7 +230,13 @@ export function equipToolbelt(ctx: SimContext, itemId: string, pid?: number): vo
     return;
   }
   const old = meta.toolbelt.equipped;
-  if (old === itemId) return;
+  if (old === itemId) {
+    // Re-equipping the belt already worn is a no-op, but it refuses OUT LOUD
+    // like every other arm in this module: a silent return leaves a player who
+    // clicked the wrong copy with no idea why nothing happened.
+    ctx.error(meta.entityId, 'You are already wearing that toolbelt.');
+    return;
+  }
   const capacity = toolSlotCount(def);
   const stored = storedTools(meta.toolbelt);
   const kept = stored.slice(0, capacity);

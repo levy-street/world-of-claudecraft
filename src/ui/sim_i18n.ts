@@ -41,6 +41,7 @@ const baseEnTable = {
   // unequipping reuse the shared log.equipped / log.unequipped rules, so only
   // the belt-specific refusals and the stow/take lines need their own keys.
   'error.noToolbelt': 'You are not wearing a toolbelt.',
+  'error.toolbeltAlreadyWorn': 'You are already wearing that toolbelt.',
   'error.toolbeltToolsOnly': 'Only tools fit in a toolbelt.',
   'error.toolbeltFull': 'Your toolbelt is full.',
   'error.toolbeltRemoveTooManyItems': 'You have too many items to remove that toolbelt.',
