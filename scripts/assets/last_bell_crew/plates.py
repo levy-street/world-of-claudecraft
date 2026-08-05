@@ -74,9 +74,16 @@ def render_member(member, out_dir, turn_frames=TURN_FRAMES):
 
     figure_objs = [o for o in bpy.data.objects if o.type == "MESH"]
 
-    # turntable, in bind pose, so the book can spin the figure
+    # Turntable. A figure that HOLDS something is turned in its idle pose, not in
+    # bind pose: the T-pose swings a rigidly gripped prop out along the arm, which
+    # is exactly how a halberd skewered sideways through Marsh's chest survived a
+    # whole review, in the book's own hero widget. Empty-handed figures keep the
+    # bind pose, which reads cleaner for a silhouette check.
     if rig is not None:
-        rig.data.pose_position = "REST"
+        if meta.get("weapons") and bpy.data.actions.get("Idle"):
+            preview.pose(rig, "Idle", 0)
+        else:
+            rig.data.pose_position = "REST"
     cam = preview.setup(res=TURN_RES, transparent=True)
     target, dist = preview.fit(figure_objs)
     turn = []
@@ -138,18 +145,40 @@ def render_member(member, out_dir, turn_frames=TURN_FRAMES):
                           "fps": ANIM_FPS, "width": ANIM_RES[0], "height": ANIM_RES[1]})
     entry["anims"] = anims
 
-    # a bust for the cast list (a portrait crop, or the whole thing if it has no head)
+    # A bust for the cast list (a portrait crop, or the whole thing if it has no head).
+    #
+    # HELD PROPS ARE HIDDEN for this one plate, and it is framed on the body alone. A
+    # portrait is about the face, and a carried polearm rides up beside the head in
+    # every idle: with the weapon in shot, Marsh's halberd blade sat against his cheek
+    # and the crop had to fight it.
+    #
+    # Still POSED, not bind: a T-pose runs the arm straight out through a close
+    # portrait crop as a bare horizontal bar. Bind pose is right for a full-figure
+    # silhouette and wrong for a headshot, so this plate keeps the idle whether or not
+    # the figure carries anything.
+    props = [o for o in figure_objs if o.name.startswith("Prop_")]
+    bare = [o for o in figure_objs if not o.name.startswith("Prop_")] or figure_objs
+    for o in props:
+        o.hide_render = True
     if rig is not None:
-        rig.data.pose_position = "REST"
+        if bpy.data.actions.get("Idle"):
+            preview.pose(rig, "Idle", 0)
+        else:
+            rig.data.pose_position = "REST"
     cam = preview.setup(res=(620, 620), transparent=True)
-    target, dist = preview.fit(figure_objs)
+    target, dist = preview.fit(bare)
     bust = f"{member}_bust.png"
     if meta.get("kind") in ("creature", "spawn"):
         preview.shoot(cam, os.path.join(out_dir, bust), target, dist * 0.92, 24, 8)
     else:
-        # humanoids get a real headshot: 72 percent up the figure, pulled in close
+        # humanoids get a real headshot: 72 percent up the figure, pulled in close.
+        # 0.56 rather than the old 0.46 because dropping the held prop from `fit`
+        # above shrank the measured extent it scales, and a helmet brim was landing
+        # clipped against the frame edge.
         preview.shoot(cam, os.path.join(out_dir, bust),
-                      (target[0], target[1], target[2] * 1.44), dist * 0.46, 24, 8)
+                      (target[0], target[1], target[2] * 1.44), dist * 0.56, 24, 8)
+    for o in props:
+        o.hide_render = False
     entry["bust"] = bust
 
     with open(os.path.join(out_dir, f"{member}.json"), "w") as fh:

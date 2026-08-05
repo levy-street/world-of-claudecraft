@@ -90,19 +90,18 @@ CAST = {
             "the militia cannot handle is what the squad is for."
         ),
         "signature": (
-            "The halberd, and everything around it being worse. A halberd was a "
-            "sergeant's literal badge of rank, so the one good thing he carries is "
-            "also the reason his line can hold a road. Around it: one pauldron on "
-            "his right and nothing on the other, rope lashings where straps should "
-            "be, a padded jack instead of plate, and a helm that came off a "
-            "different man."
+            "The sword, and everything around it being worse. He owns exactly "
+            "one good blade, and everything around it being worse. Around it: one "
+            "pauldron on his right and nothing on the other, rope lashings where "
+            "straps should be, a padded jack instead of plate, and a town kettle hat "
+            "rather than anything a knight would own."
         ),
         "palette": [
             ("Padded jack", "#cfc4a8", "Quilted cloth, not plate: what a town could actually afford, and his pale field."),
-            ("Issued helm", "#8a8f8b", "Cool iron, and the only real metal on him."),
+            ("Militia iron", "#76726a", "The kettle hat, and the only palette metal on him. Warm, so it reads as town iron beside the squad's cold salt-scoured steel, and kept well under the jack: the hat is his largest single surface and will win the read at any lighter value."),
             ("Dark leather", "#4a3826", "Edging and boots: his dark field."),
             ("Hemp rope", "#a98a5c", "Lashings where straps should be, made from what the docks had."),
-            ("Bell bronze", "#9c7437", "One rank badge."),
+            ("Bell bronze", "#9c7437", "The sergeant's sash, and nothing else. His one saturated note, and the marker that has to carry his rank."),
         ],
         "notes": [
             "Three values on purpose. The first pass painted iron, wool and rope at "
@@ -115,25 +114,75 @@ CAST = {
             "is repainted as quilted cloth. A jack grown from his torso faces was tried "
             "first and cut, because a colour boundary that follows triangle edges came "
             "out as a sawtooth reading as tearing.",
-            "The helm's own crown fins sample the trim cell, so bronze trim turned them "
-            "into a spiked coronet and the militia sergeant out-ornamented the warden. "
-            "Its faces are re-UV'd to plate; the body keeps its trim.",
+            "The helmet needed surgery, not a repaint. Re-UV'ing the knight's bascinet "
+            "fixed its colour and never its shape: a closed helm over a padded CLOTH "
+            "jack is a kit that contradicts itself, and its crown ribs read as a spiked "
+            "coronet whatever cell they sampled. So it is cut down to a town kettle "
+            "hat, with the brim extruded straight off the cut rim (the helmet's own "
+            "edge carried outward, with real thickness) and the ribs relaxed away. His "
+            "face reads now, which the campaign needs, since he is the one who tells "
+            "you what his line cannot kill.",
+            "The brim then had to be filtered, not just extruded. The cut is a "
+            "face-CENTRE test, so the rim it leaves steps by up to a whole face in both "
+            "radius and height, and a radial push moves each vertex along its own "
+            "direction: the brim did not merely inherit that sawtooth, it amplified it "
+            "into the one edge that holds the silhouette. The rim is now low-passed "
+            "around its own loop before anything is extruded and again per ring. A "
+            "filter and not a circle fit, because the dome is offset and slightly oval "
+            "and snapping it round would trade a sawtooth for a tin lid.",
+            "A polearm was tried first, at length, and cut. A halberd is the right "
+            "idea for a militia sergeant, since it was a literal badge of rank, and it "
+            "does not fit this body: the grip sits 28 percent up the haft, so the head "
+            "starts barely half a unit above the hand, while this figure's head and hat "
+            "are 48 percent of its total height. Held upright the blade is inside his "
+            "skull at every roll and scale; the only clearance is a hard lean outboard, "
+            "which reads as a flagpole. A sword is the honest answer at these "
+            "proportions, and the record of the attempt is in "
+            "`docs/design/last-bell-polearm-carry.md`.",
+            "The sword is carried a SIZE UP on the shared blade grip. At the bare "
+            "family scale it measured smaller than the warden's arming sword, which "
+            "inverts the one comparison that is supposed to run his way: everything "
+            "else on him is the poorer of the two, and the blade is not.",
             "Separated from Coalfast at every level, because they share a body and stand "
-            "two POIs apart: helmed against bare-headed, no cloak against warden rust, "
-            "warm town iron against cold salt-scoured steel, a two-handed halberd "
-            "against sword and heavy shield, and one pauldron on the RIGHT against a "
-            "three-lame stack on the LEFT.",
+            "two POIs apart: a town kettle hat against a bare head, no cloak against "
+            "warden rust, warm town iron against cold salt-scoured steel, a bare "
+            "off hand against a heavy square shield, and one pauldron on the RIGHT "
+            "against a three-lame stack on the LEFT.",
+            "Rank has to survive standing next to his own militia, who are built on the "
+            "same body: the kettle hat, the right pauldron and a bell "
+            "bronze sash. The sash takes over his diagonal lashing while the waist wrap "
+            "stays hemp, so he gains a rank marker without losing the improvised "
+            "repairs the character is built on.",
+            "The sash is built at SASH width, which is the whole reason it works. Left "
+            "at the rope width it inherited it was 0.6 percent of his surface area, and "
+            "recolouring something that small marks nothing: a rank badge has to be big "
+            "enough to survive a glance from across a road. Wide and thin now, ridden "
+            "out onto the real chest so its edges cannot cut into the torso the way a "
+            "flat ribbon does once it is wider than the curve it lies on.",
         ],
         "weapons": [
-            {"url": "weapons/halberd.glb", "bone": "handslot.r", "grip": "polearm",
-             "why": "A sergeant's halberd: his badge of rank and the reason a militia line holds a road. Carried grounded and vertical at his post."},
+            {"url": "weapons/adv_sword_1handed.glb", "bone": "handslot.r",
+             # Carried on the PLAIN family grip, the same one every other sword in the
+             # cast uses and the same one the game gives a warrior: `VisualDef.attach`
+             # mounts a one-hander with a bare bone attach and no aiming rotation, so a
+             # bespoke rotation here made the book disagree with the thing it documents.
+             #
+             # An earlier pass aimed it instead (35 degrees below horizontal, swung
+             # outboard past his hip) to keep the point off the floor, because his hand
+             # sits 0.628 up and the blade is 1.28 long at this scale. That bought a
+             # clean tip at the cost of reading like a walking cane from every angle,
+             # which is the note that came back. The tip is the lesser problem: take the
+             # normal grip and let the carry match the class.
+             #
+             # Only the SIZE UP is kept from that pass (scale over the family 0.62), and
+             # it is characterisation rather than fit: see `why` below.
+             "grip": "blade", "tune": {"scale": 0.72},
+             "why": "A big plain arming sword, town-forged: no fuller, no maker's mark, nothing on it a guild would sign. Carried a size up on the family grip so it reads heavier than the warden's, which is the one place his kit is not the poorer of the two."},
         ],
         "poses": [
             ("Idle", 7, "Holding the road"),
             ("Walking_A", 6, "Walking the line"),
-            # A polearm thrust points away from the camera at the book's default yaw,
-            # so this plate carries its own angle and the halberd reads along the frame.
-            ("2H_Melee_Attack_Chop", 14, "The thrust", 100),
+            ("1H_Melee_Attack_Chop", 17, "The strike"),
             ("Block", 8, "Bracing the line"),
         ],
     },
@@ -450,32 +499,56 @@ CAST = {
     # in a deliberate way: almost nothing that comes through is bigger than a person.
     "riftspawn": {
         "name": "Riftspawn", "title": "Break-spawned", "post": "The island's fringe",
-        "entity_color": "#7a3fb0", "base": "skeleton_minion.glb", "kind": "spawn",
+        "entity_color": "#7a3fb0", "base": "riftspawn_antler.glb", "kind": "spawn",
         "family": "demon", "levels": "3 to 4", "tint_strength": 0.35, "height_yards": 2.1 * 0.85,
         "role": "The common spill. Knows only the way it came and the thing in front of it.",
         "blurb": (
             "Whatever a rift is, it does not spill fishermen. Riftspawn are what "
             "already made it through and now roam away from the redoubt, and they "
-            "are the twelve you kill in Q0 while the militia watches."
+            "are the twelve you kill in Q0 while the militia watches. The first "
+            "enemy anyone fights on this island, which makes it the first thing "
+            "that has to say what a rift is."
         ),
         "signature": (
-            "Star-glass breaking out through the ribs. The island's own material, "
-            "coming back through the wound wrong, and the mark every break-spawned "
-            "thing in this book shares."
+            "It has no mouth. A narrow blank face, two cold eyes, and nothing else: "
+            "this is a thing that does not eat and does not speak, which is a "
+            "stranger idea than any set of teeth. Above it, antlers branch wider "
+            "than its own body."
         ),
         "palette": [
-            ("Void bone", "#c9bedc", "A frame bleached violet-grey by the wound."),
-            ("Void violet", "#7a3fb0", "Its sim entity colour, worn as the torn wrap."),
-            ("Star-glass", "#a9dcee", "Grown through the ribs. It should not be there."),
+            ("Rift violet", "#7a3fb0", "Its sim entity colour, and now the skin itself."),
+            ("Deep bruise", "#3b2450", "The shadow value. Purple, never black."),
+            ("Wound magenta", "#c2439a", "Edge accents where the body was cut wrong."),
+            ("Cold eye", "#9fe4ee", "The only bright thing on it, and the family mark."),
         ],
         "notes": [
-            "Rebuilt off the KayKit skeleton body. The Quaternius demon it used to "
-            "fall back on is a flat untextured blob at this size, and a cartoon devil "
-            "says nothing about what a rift is.",
-            "A body that is not finished being a body is the right read for "
-            "'unfinished rooms pressing into the waking world'.",
+            "No longer a repainted skeleton. A skeleton is a DEAD body and the lore "
+            "wants an unfinished one, so the whole approach changed: generated from a "
+            "concept, then rigged onto the KayKit skeleton locally rather than "
+            "retargeted, which is why it carries all 22 native clips.",
+            "Four arms, and they cost nothing. The lower pair is bound rigidly to the "
+            "chest bone, so it rides the torso through every clip: no new bones, no "
+            "per-clip posing. Only free-swinging extra limbs are expensive.",
+            "The arm bone chain sat at z 1.107 while all four arms lived between 0.69 "
+            "and 0.96, so Walking_A dragged the lower pair inward and tangled it. The "
+            "fix was to drop the chain onto the upper pair's real line: editing the "
+            "REST pose is safe, because rest is the bind, so the mesh does not move "
+            "but every clip now rotates the arm about a pivot inside the geometry.",
         ],
-        "weapons": [], "poses": [],
+        "weapons": [],
+        # The swipe is the plate that matters for this figure, so it is pinned rather
+        # than auto-picked: the diagonal slice is the widest reach its arms make, and
+        # the clip's own rotations were amplified so it reads as violent at gameplay
+        # distance instead of a polite human chop.
+        "poses": [
+            ("Idle", 7, "Waiting at the fringe"),
+            ("Walking_A", 6, "Coming through"),
+            # Both authored attacks, because they are different shapes and the point of
+            # authoring them was that four arms should read as one committed blow.
+            ("1H_Melee_Attack_Chop", None, "The rake, all four arms"),
+            ("1H_Melee_Attack_Slice_Diagonal", None, "The swipe, upper pair over the top"),
+            ("Hit_A", None, "Struck"),
+        ],
     },
     "breach_wretch": {
         "name": "Breach Wretch", "title": "Break-spawned", "post": "The island's fringe",
@@ -570,7 +643,7 @@ CAST = {
     "sundered_horror": {
         "name": "The Sundered Horror", "title": "World elite",
         "post": "The Sundered Cliffs",
-        "entity_color": "#8a2f6a", "base": "skeleton_golem.glb", "kind": "spawn",
+        "entity_color": "#8a2f6a", "base": "sundered_horror_thicket.glb", "kind": "spawn",
         "family": "ogre", "levels": "7, fixed", "tint_strength": 0.2, "height_yards": 2.8 * 1.45,
         "role": "The biggest thing the cliffs' break ever let through.",
         "blurb": (
@@ -580,19 +653,47 @@ CAST = {
             "measured against things like this arriving more often."
         ),
         "signature": (
-            "Scale, and what has grown through it. Four yards tall, with star-glass "
-            "driven right through the shoulders: walking evidence that this year is "
-            "the worst in living memory."
+            "The crown of horns. Not two horns but a thicket of them, uneven, growing "
+            "out of the skull in every direction and half burying the face underneath. "
+            "At four yards it is the only figure in this book that stands taller than "
+            "a person, and the horns are what you see first."
         ),
         "palette": [
-            ("Wound magenta", "#8a2f6a", "Its sim entity colour, staining the plate."),
-            ("Cold stone", "#7c6a74", "A construct's plate, not a creature's hide."),
-            ("Star-glass", "#a9dcee", "Six shards, the most of anything in the book."),
+            ("Wound magenta", "#8a2f6a", "Its sim entity colour, and the flush along its flanks."),
+            ("Brute violet", "#5c3474", "The hide. Heavy, saturated, never grey."),
+            ("Horn shadow", "#2e1c3c", "Deep purple in the horn thicket, holding the silhouette."),
+            ("Cold eye", "#9fe4ee", "The family mark, shared with the Riftspawn."),
         ],
         "notes": [
-            "Rebuilt off the KayKit skeleton golem: armoured, heavy, and the only "
-            "figure here that stands taller than a person. The flat Quaternius giant "
-            "it replaced was a mauve blob with none of that weight.",
+            "Off the KayKit skeleton golem, which read as forged, fitted, painted "
+            "armour and therefore implied a smith and a culture: exactly wrong for "
+            "something a break spat out. A horned brute implies nobody made it.",
+            "Rigged locally onto the KayKit skeleton like the Riftspawn, which "
+            "upgrades it from the golem's EIGHT clips to the full set: it has block, "
+            "cast, strafes and a jump for the first time.",
+            "Generated twice. The first pass posed its heavy arms hanging to the "
+            "ground, which is not a T-pose, so the local rig fitted its arm line to "
+            "the reference wrist line and scaled it 21x: Walking_A shredded the head. "
+            "Regenerating the same design in a T-pose cost 55 cents and tamed the "
+            "worst of it; the head and horns were only properly owned by the head "
+            "bone once the weight solver grew a real length scale (see "
+            "docs/design/sundered-horror-rig-audit.md).",
+            "Its blow is a SWEEP, never the two-handed overhead chop. Its arms are "
+            "stubby against a torso half as wide as the whole figure, so the arm bone "
+            "chain sits buried inside the body mass and there is no elbow in the open "
+            "to articulate: rotating the arm harder achieves nothing. The clips were "
+            "re-authored the other way round instead, damping the torso pitch and "
+            "amplifying the shoulders, so the mass leans into a low wide claw sweep "
+            "and keeps its eyes on the target rather than folding over its own head.",
+        ],
+        "poses": [
+            ("Idle", 7, "At the cliffs"),
+            ("Walking_A", 6, "Coming down the slope"),
+            # The haymaker first: it is the wide horizontal arc, and the whole reason the
+            # arm rig was rebuilt was that this creature could not swing from the shoulder.
+            ("1H_Melee_Attack_Chop", None, "The haymaker, shoulder through the arc"),
+            ("1H_Melee_Attack_Slice_Diagonal", None, "The sweep, over the top"),
+            ("Hit_A", None, "Struck"),
         ],
     },
 }

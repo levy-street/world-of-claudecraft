@@ -10079,8 +10079,8 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     ]
   },
   "mob_riftspawn": {
-    "url": "models/chars/npcs/riftspawn.glb",
-    "idle": "Idle_Combat",
+    "url": "models/chars/npcs/riftspawn_antler.glb",
+    "idle": "Idle",
     "height": 2.1
   },
   "mob_breach_wretch": {

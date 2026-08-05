@@ -808,7 +808,17 @@ def held(name, glb, rig, bone, rot=(90, 0, 0), offset=(0, 0, 0), scale=1.0,
         raise ValueError(f"no geometry in {glb}")
     prop = join(meshes, name) if len(meshes) > 1 else meshes[0]
     prop.name = name
+    return mount(prop, rig, bone, rot=rot, offset=offset, scale=scale, grip_at=grip_at)
 
+
+def mount(prop, rig, bone, rot=(90, 0, 0), offset=(0, 0, 0), scale=1.0,
+          grip_at="head"):
+    """Seat an already-built prop on a hand slot and rigid-bind it.
+
+    Split out of `held` so a BESPOKE weapon (built in-scene, sharing the figure's
+    palette atlas) mounts through exactly the same math as an imported one, and the
+    plates cannot show a different grip from the shipping model.
+    """
     # Placed in the BONE's own rest frame, not in world space. A world-space
     # placement only looks right in the bind pose: the moment a clip rolls the
     # forearm, the prop rolls with it about the wrong axis, which is what laid
@@ -829,6 +839,263 @@ def held(name, glb, rig, bone, rot=(90, 0, 0), offset=(0, 0, 0), scale=1.0,
     # and lay the prop flat (the same trap the memorial exporter documents).
     prop.matrix_world = basis @ prop.matrix_world
     return skin(prop, rig, bone)
+
+
+def bvh_of(obj):
+    """A BVH over an object's CURRENT bind geometry, for clearance queries."""
+    from mathutils.bvhtree import BVHTree
+    me = obj.data
+    verts = [obj.matrix_world @ v.co for v in me.vertices]
+    faces = []
+    for p in me.polygons:
+        vs = list(p.vertices)
+        for i in range(1, len(vs) - 1):
+            faces.append((vs[0], vs[i], vs[i + 1]))
+    return BVHTree.FromPolygons(verts, faces)
+
+
+def clear_of_host(obj, host, clear=0.026, above=None, iters=2):
+    """Push a shell's vertices off the surface it rides, measured on the real host.
+
+    Nearest-surface only: catches a shell sunk into the body. Pair it with
+    `radial_clear`, which catches the other failure, a spike passing BETWEEN two
+    vertices and piercing the face between them.
+    """
+    bvh = bvh_of(host)
+    me = obj.data
+    moved = 0
+    inv = obj.matrix_world.inverted()
+    for _ in range(iters):
+        for v in me.vertices:
+            p = obj.matrix_world @ v.co
+            if above is not None and p.z < above:
+                continue
+            loc, nor, idx, dist = bvh.find_nearest(p)
+            if loc is None:
+                continue
+            d = p - loc
+            inside = d.dot(nor) < 0.0
+            if (-d.length if inside else d.length) < clear:
+                push = nor if (inside or d.length < 1e-6) else d.normalized()
+                v.co = inv @ (loc + push * clear)
+                moved += 1
+    me.update()
+    return moved
+
+
+def radial_clear(obj, host, centre, clear=0.03, above=None):
+    """Ride a dome out along rays from a centre until it clears the host.
+
+    Cast from the skull centre THROUGH each dome vertex, so the host is measured
+    along the same ray the dome sits on. That is the direction a poke-through
+    actually happens in, and it is what nearest-surface alone keeps missing: the
+    kettle hat still had a lock of hair through its crown after two nearest passes.
+    """
+    bvh = bvh_of(host)
+    c = Vector(centre)
+    me = obj.data
+    inv = obj.matrix_world.inverted()
+    moved = 0
+    for v in me.vertices:
+        p = obj.matrix_world @ v.co
+        if above is not None and p.z < above:
+            continue
+        u = p - c
+        if u.length < 1e-6:
+            continue
+        u.normalize()
+        hit, nor, idx, dist = bvh.ray_cast(c, u, 4.0)
+        if hit is None:
+            continue
+        if (p - c).length < dist + clear:
+            v.co = inv @ (c + u * (dist + clear))
+            moved += 1
+    me.update()
+    return moved
+
+
+def pokes_through(shell, host, above):
+    """Host vertices sitting OUTSIDE the shell meant to cover them. Zero, or fix it."""
+    bvh = bvh_of(shell)
+    out = 0
+    for v in host.data.vertices:
+        p = host.matrix_world @ v.co
+        if p.z < above:
+            continue
+        loc, nor, idx, dist = bvh.find_nearest(p)
+        if loc is not None and (p - loc).dot(nor) > 0.0:
+            out += 1
+    return out
+
+
+def _boundary_loops(bm, only=None):
+    """Every boundary edge loop, as vertex lists ordered AROUND the loop.
+
+    Ordering is the whole point. A brim ring is an extruded boundary, and the two
+    things living on that boundary have to be told apart: the cut's per-face jitter
+    is high frequency along the loop, and the hat's real ovality is low frequency.
+    Nothing can separate them without walking the loop in order.
+    """
+    adj = {}
+    for e in bm.edges:
+        if not e.is_boundary:
+            continue
+        a, b = e.verts
+        if only is not None and (a not in only or b not in only):
+            continue
+        adj.setdefault(a, []).append(b)
+        adj.setdefault(b, []).append(a)
+    loops, closed = [], set()
+    for start in adj:
+        if start in closed:
+            continue
+        loop, cur, prev = [], start, None
+        while cur is not None and cur not in closed:
+            closed.add(cur)
+            loop.append(cur)
+            nxt = next((n for n in adj[cur] if n is not prev and n not in closed), None)
+            prev, cur = cur, nxt
+        if len(loop) >= 6:
+            loops.append(loop)
+    return loops
+
+
+def _relax_ring(loop, centre, amount, window=2, passes=2):
+    """Angular low-pass one boundary loop's radius and height, in place.
+
+    Why the brim came out zigzagged: the cut that makes it is a face-CENTRE test,
+    so the rim it leaves steps by up to a whole face in BOTH radius and z, and then
+    every ring is extruded off that rim. A radial push moves each vertex along its
+    OWN direction, so the sawtooth is not merely inherited, it is amplified, and a
+    uniform `dz` per ring preserves the height stagger exactly.
+
+    Averaging r and z ALONG the loop removes the per-face jitter and keeps the hat's
+    genuine low-frequency shape, which is why this is a filter and not a circle fit:
+    the dome is offset and slightly oval, and snapping it to a circle would trade a
+    sawtooth for a tin lid.
+    """
+    if amount <= 0.0 or len(loop) < 6:
+        return
+    cx, cy = centre
+    n = len(loop)
+    flat = [Vector((v.co.x - cx, v.co.y - cy, 0.0)) for v in loop]
+    rs = [f.length for f in flat]
+    zs = [v.co.z for v in loop]
+    span = range(-window, window + 1)
+    for _ in range(max(1, passes)):
+        rs = [sum(rs[(i + k) % n] for k in span) / (2 * window + 1) for i in range(n)]
+        zs = [sum(zs[(i + k) % n] for k in span) / (2 * window + 1) for i in range(n)]
+    for v, f, r, z in zip(loop, flat, rs, zs):
+        u = f.normalized() if f.length > 1e-6 else Vector((0.0, 1.0, 0.0))
+        v.co.x += (cx + u.x * r - v.co.x) * amount
+        v.co.y += (cy + u.y * r - v.co.y) * amount
+        v.co.z += (z - v.co.z) * amount
+
+
+def kettle_hat(helmet, z_cut=1.885, centre=(0.0, -0.025),
+               rings=((0.100, -0.034), (0.024, -0.046), (-0.118, -0.014)),
+               smooth_z=2.02, smooth_iters=2, smooth_a=0.5, uv=None,
+               rim_relax=0.85, ring_relax=(0.92, 1.0, 1.0),
+               relax_window=2, relax_passes=2):
+    """Cut a KayKit bascinet down into a militia kettle hat, IN PLACE.
+
+    Real surgery on the helmet's own mesh, not a hat fitted over it: the cheek and
+    neck wrap is deleted, and the brim is extruded straight off the cut rim in three
+    rings (top face, outer wall, underside) so it is the helmet's own edge carried
+    outward, with genuine thickness. The four fore-and-aft crown ribs are relaxed
+    away by a local Laplacian pass; they were the "spiked coronet" the review kept
+    flagging, and re-UV'ing them only ever changed their colour, never their
+    silhouette.
+
+    The rim is RELAXED before anything is extruded off it, and each ring again after
+    (`_relax_ring`). Without that the brim reads as a sawtooth: the cut is a
+    face-centre test, so the rim it leaves is ragged in radius and in height, and the
+    rings carry that jitter outward into the one edge of the hat that actually holds
+    the silhouette. Relaxing at the source and letting the correction go to full
+    strength by the outer ring keeps the brim welded to the helmet's own edge while
+    the outline it presents to camera is clean.
+
+    Why a kettle hat at all: a closed knight's helm over a padded cloth jack is a
+    kit that contradicts itself, and it read as the brightest, coldest, largest mass
+    on a figure whose whole point is that his gear is cheap. The chapel-de-fer is the
+    town-watch helmet, it agrees with the jack, and it leaves his face readable,
+    which the campaign needs because he is the one who tells you what his line
+    cannot kill.
+
+    The piece rides ONE bone (`head`) and samples ONE atlas cell, so extruded loops
+    only need that cell's UV and a weight of 1 to be indistinguishable from the rest.
+    """
+    me = helmet.data
+    gi = helmet.vertex_groups["head"].index
+    if uv is None:
+        uv = me.uv_layers.active.data[0].uv.copy()
+    if "custom_normal" in me.attributes:
+        me.attributes.remove(me.attributes["custom_normal"])
+
+    cx, cy = centre
+    bm = bmesh.new()
+    bm.from_mesh(me)
+    # the glTF import splits vertices at every normal seam, so the shell arrives as
+    # 50-odd loose shards; weld first or nothing has a boundary to extrude from
+    bmesh.ops.remove_doubles(bm, verts=list(bm.verts), dist=1e-4)
+    bmesh.ops.delete(
+        bm, geom=[f for f in bm.faces if f.calc_center_median().z < z_cut],
+        context="FACES")
+    bm.verts.ensure_lookup_table()
+
+    uvl = bm.loops.layers.uv.active
+    dfm = bm.verts.layers.deform.active or bm.verts.layers.deform.new()
+
+    # FIRST, relax the cut rim itself. Every ring below is extruded from this loop,
+    # so a jag fixed here never reaches the silhouette at all, and fixing it here
+    # costs nothing: these vertices are shared with the dome faces above, and an
+    # angular filter slides them along their own rim without unwelding anything.
+    for loop in _boundary_loops(bm):
+        _relax_ring(loop, (cx, cy), rim_relax, relax_window, relax_passes)
+
+    fresh = []
+    edges = [e for e in bm.edges if e.is_boundary]
+    for ri, (dr, dz) in enumerate(rings):
+        ret = bmesh.ops.extrude_edge_only(bm, edges=edges)
+        vs = [g for g in ret["geom"] if isinstance(g, bmesh.types.BMVert)]
+        seen = set(vs)
+        for v in vs:
+            flat = Vector((v.co.x - cx, v.co.y - cy, 0.0))
+            u = flat.normalized() if flat.length > 1e-6 else Vector((0, 1, 0))
+            v.co.x += u.x * dr
+            v.co.y += u.y * dr
+            v.co.z += dz
+            v[dfm][gi] = 1.0
+        # and again per ring, ramping to full by the outer ones: the radial push
+        # above moves each vertex along its own direction, which re-introduces
+        # angular jitter every time however clean the loop it started from was.
+        amount = ring_relax[ri] if ri < len(ring_relax) else 1.0
+        for loop in _boundary_loops(bm, only=seen):
+            _relax_ring(loop, (cx, cy), amount, relax_window, relax_passes)
+        fresh.extend(g for g in ret["geom"] if isinstance(g, bmesh.types.BMFace))
+        edges = [e for e in bm.edges
+                 if e.is_boundary and e.verts[0] in seen and e.verts[1] in seen]
+    for f in fresh:
+        for loop in f.loops:
+            loop[uvl].uv = uv
+
+    crown = [v for v in bm.verts if v.co.z > smooth_z]
+    for _ in range(smooth_iters):
+        moves = {}
+        for v in crown:
+            nb = [e.other_vert(v) for e in v.link_edges]
+            if nb:
+                moves[v] = v.co.lerp(sum((n.co for n in nb), Vector()) / len(nb), smooth_a)
+        for v, co in moves.items():
+            v.co = co
+
+    bm.normal_update()
+    bm.to_mesh(me)
+    bm.free()
+    me.update()
+    for p in me.polygons:
+        p.use_smooth = False
+    return helmet
 
 
 def join(objs, name):

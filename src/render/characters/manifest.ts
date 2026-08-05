@@ -158,20 +158,6 @@ const kaykit = (attack: string[], idle = 'Idle'): ClipMap => ({
   emote: KAYKIT_EMOTES,
 });
 
-// The Sundered Horror's body (the KayKit skeleton golem) ships only EIGHT clips: no
-// block, no cast, no strafes, no sit, no jump, no backwards walk. Declaring the full
-// kaykit() set on it would name clips that are not in the GLB, which
-// `tests/character_clipmaps.test.ts` rightly fails on, so it gets an honest map.
-const GOLEM_SPAWN: ClipMap = {
-  idle: 'Idle',
-  walk: 'Walking_A',
-  run: 'Running_A',
-  attack: ['1H_Melee_Attack_Chop', '2H_Melee_Attack_Chop'],
-  attackByHand: { twohand: '2H_Melee_Attack_Chop', dualwield: 'Dualwield_Melee_Attack_Chop' },
-  hit: ['Hit_A'],
-  death: 'Death_A',
-};
-
 const skeletonClips = (attack: string[], flourish = 'Skeletons_Awaken_Standing'): ClipMap => ({
   ...kaykit(attack, 'Idle_Combat'),
   flourish,
@@ -1526,14 +1512,19 @@ export const VISUALS: Record<string, VisualDef> = {
     clips: kaykit(['1H_Melee_Attack_Chop']),
     attach: [{ url: `${WEAPONS}/spear_a.glb`, bone: 'handslot.r' }],
   },
-  // A sergeant's halberd is two-handed, so his swing is the 2H clip and his off hand
-  // is empty. It is also his badge of rank, which is why the militia sergeant's one
-  // good possession is the polearm and everything else on him is patched.
+  // A militia sergeant with a sword and NO shield, which is the whole separation from
+  // Coalfast: they share this body and stand two POIs apart, so the warden keeps the
+  // heavy square shield and the front-line stance, and Marsh reads as the town's own,
+  // in a padded jack under an issued kettle hat with one good blade and nothing else.
+  //
+  // Carried a size up on the family grip (see the `tune` in the crew factory's cast
+  // table): the sword is the one place his kit is not the poorer of the two, and at the
+  // bare family scale it read smaller than the warden's.
   npc_marsh: {
     url: `${NPCS_DIR}/marsh.glb`,
     height: HUMANOID_H,
-    clips: kaykit(['2H_Melee_Attack_Chop']),
-    attach: [{ url: `${WEAPONS}/halberd.glb`, bone: 'handslot.r' }],
+    clips: kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
+    attach: [{ url: `${WEAPONS}/adv_sword_1handed.glb`, bone: 'handslot.r' }],
   },
 
   // -- The break-spawned -----------------------------------------------------
@@ -1542,20 +1533,37 @@ export const VISUALS: Record<string, VisualDef> = {
   // a frame that is not finished being a body is also the better read for
   // "unfinished rooms pressing into the waking world". No entity tint: the palette
   // is authored per mob, so a wash would only muddy it.
+  // The Riftspawn is no longer a repainted skeleton. A skeleton is a DEAD body and
+  // the lore wants an unfinished one, so it is now a four-armed antlered thing with
+  // no mouth, generated and then rigged onto the KayKit skeleton locally, which is
+  // why it carries the FULL kaykit() vocabulary rather than the reduced set a
+  // retargeted body would. Its lower arm pair is bound rigidly to the chest bone:
+  // extra limbs cost nothing to animate as long as they ride the torso.
   mob_riftspawn: {
-    url: `${NPCS_DIR}/riftspawn.glb`,
+    url: `${NPCS_DIR}/riftspawn_antler.glb`,
     height: 2.1,
-    clips: skeletonClips(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
+    clips: kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
   },
   mob_breach_wretch: {
     url: `${NPCS_DIR}/breach_wretch.glb`,
     height: 2.1,
     clips: skeletonClips(['1H_Melee_Attack_Chop']),
   },
+  // Off the skeleton golem, which read as forged, fitted, painted armour and so
+  // implied a smith and a culture: exactly wrong for something a break spat out.
+  // Now a horn-crowned brute. Rigged locally like the Riftspawn, so it upgrades from
+  // the golem body's EIGHT clips (no block, cast, strafes, sit, jump or walk-back,
+  // which is why that body needed its own reduced map) to the full KayKit set.
+  // Attacks are the two SWEEPS, deliberately not the two-handed overhead chop. That
+  // clip pitches a human torso deep forward, and on a body this wide with a head this
+  // large it reads as face-planting rather than slamming (the un-amplified original
+  // folds the same way, so it is the clip meeting this silhouette, not the retarget).
+  // The clips themselves are re-authored: torso damped, shoulders amplified, so the
+  // blow is a low wide claw sweep that keeps its eyes on the target.
   mob_sundered_horror: {
-    url: `${NPCS_DIR}/sundered_horror.glb`,
+    url: `${NPCS_DIR}/sundered_horror_thicket.glb`,
     height: 2.8,
-    clips: GOLEM_SPAWN,
+    clips: kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
   },
 
   // -- NPCs ------------------------------------------------------------------

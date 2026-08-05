@@ -26,6 +26,7 @@ import cast  # noqa: E402
 import crew  # noqa: E402
 import figures  # noqa: E402
 import plates  # noqa: E402
+import weapons  # noqa: E402
 
 MEMBER = os.environ.get("CREW_MEMBER", "all")
 OUT = os.environ.get("CREW_OUT")
@@ -53,6 +54,28 @@ for member in members:
     # baked-texture bodies (`kind: creature`) keep their existing models and are
     # re-coloured at runtime by the entity tint the sim already gives them.
     if OUT and cast.CAST[member].get("kind") in (None, "spawn"):
+        # A figure whose weapon is BESPOKE ships that weapon as its own GLB, exported
+        # BEFORE the body: `crew.export` drops every `Prop_` object, because the game
+        # mounts held props through `VisualDef.attach` so a defender's weapon stays
+        # swappable.
+        for spec in cast.CAST[member].get("weapons", []):
+            if not spec.get("built_in"):
+                continue
+            prop = next((o for o in bpy.data.objects
+                         if o.name.startswith("Prop_")
+                         and o.name.endswith(os.path.basename(spec["url"])[:-4])), None)
+            if prop is None:
+                raise SystemExit(f"{member}: built-in weapon {spec['url']} was never mounted")
+            # Keep the spec's OWN subpath (`weapons/marsh_halberd.glb`) rather than
+            # flattening to the basename. A weapon and a body do not ship to the same
+            # place, and flattening quietly put the halberd in the NPC body directory,
+            # from where it was never copied into `public/models/weapons/`: the game
+            # went on attaching the SHARED halberd, star-glass petals and all, to the
+            # one man whose whole characterisation is that his kit is cheap.
+            wpath = os.path.join(OUT, *spec["url"].split("/"))
+            weapons.export(prop, wpath)
+            report[member].setdefault("weapons", []).append(wpath)
+
         path = os.path.join(OUT, f"{member}.glb")
         crew.export(path)
         report[member]["out"] = path

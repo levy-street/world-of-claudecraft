@@ -7,7 +7,8 @@ import { existsSync, readdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { jobCost } from './cost.mjs';
 import { CATEGORY_SPECS, KAYKIT_REQUIRED_CLIPS, weaponFamilyFor } from './families.mjs';
-import { inspectGlb, openGlb } from './glb.mjs';
+import { inspectGlb, mat4ApplyPoint, openGlb, readSkinnedGlb } from './glb.mjs';
+import { weightStats, worstEdgeStretch } from './skin_metrics.mjs';
 import { validateCreature, validateProp, validateWeapon } from './validate.mjs';
 
 const pass = (name, detail) => ({ name, status: 'pass', detail });
@@ -30,6 +31,90 @@ async function nodeNames(glbPath) {
       .listNodes()
       .map((n) => n.getName()),
   );
+}
+
+/** Thresholds for the deformation check, calibrated against real assets rather
+ *  than picked: the hand-authored KayKit knight sits at 0.83x worst edge stretch
+ *  and 0.000% torn edges across its 22 clips, and the manual-rig lane's Sundered
+ *  Horror sat at 3.50x and 0.054% before its solver was fixed (3.18x and 0.045%
+ *  after). So WARN is set just above the control, where "not hand-authored
+ *  quality" begins, and FAIL where deformation is destroying the silhouette
+ *  rather than denting it. */
+const STRETCH_WARN = 1.5;
+const STRETCH_FAIL = 6;
+const DOMINANT_WARN = 0.6;
+
+/** Does the rig's SKINNING work, or does the mesh tear when the clips play?
+ *
+ *  Every other check in this file passes on a rig whose weights are garbage: the
+ *  skeleton is present, the clips are named right, the previews render. The
+ *  Sundered Horror shipped with the arms driving the torso flank, the face and
+ *  the horn crown, and nothing mechanical caught it, because the REST POSE looks
+ *  perfect no matter how bad the weights are. This is the check that looks at a
+ *  posed frame.
+ *
+ *  Both readings are reported because they fail independently: a mesh can tear
+ *  without swimming (a sharp weight gradient across one seam) and swim without
+ *  tearing (nothing owns anything, so the whole body follows the average). */
+async function deformationChecks(built) {
+  const checks = [];
+  let model;
+  try {
+    model = await readSkinnedGlb(built);
+  } catch (e) {
+    return [warn('deformation', `could not read skin: ${e.message}`)];
+  }
+  if (!model.prims.length) return [warn('deformation', 'no skinned primitive to measure')];
+  if (!model.clips.length) return [warn('deformation', 'no clips to measure deformation over')];
+
+  // The absolute-gap half of the test. Tripo meshes carry sliver edges a few
+  // thousandths long that hit 5x while moving a distance nobody can see, so a
+  // pure ratio reading is dominated by noise: measured on the Horror, the worst
+  // stretch reads 16.5x with no gap floor and 3.5x with one, and only the
+  // second number tracks what the renders show. Scaled off the model's own
+  // height so it means the same thing on any asset.
+  //
+  // Height is measured through each primitive's dequantization frame, the same
+  // space worstEdgeStretch measures rest lengths in. Raw positions live in the
+  // primitive's own (possibly quantized) frame, and a floor computed in one
+  // space applied to lengths in another silently rescales the gate on any
+  // quantized input.
+  let yMin = Infinity;
+  let yMax = -Infinity;
+  for (const p of model.prims) {
+    for (const v of p.verts) {
+      const y = p.dequant ? mat4ApplyPoint(p.dequant, v.p)[1] : v.p[1];
+      if (y < yMin) yMin = y;
+      if (y > yMax) yMax = y;
+    }
+  }
+  const height = yMax - yMin || 1;
+  const stretch = worstEdgeStretch(model, { samples: 12, minRestLength: 0.02 * height });
+  const stats = weightStats(model);
+
+  const detail =
+    `worst edge stretch ${stretch.worst.toFixed(2)}x on ${stretch.worstClip}, ` +
+    `${(stretch.overRatioFrac * 100).toFixed(3)}% of sampled edges over 2x ` +
+    `(${stretch.perClip.length} clips, ${stretch.samples} frames each)`;
+  checks.push(
+    stretch.worst > STRETCH_FAIL
+      ? fail('deformation', `${detail}; the clips are destroying the mesh`)
+      : stretch.worst > STRETCH_WARN
+        ? warn('deformation', `${detail}; hand-authored weights hold under 1.1x`)
+        : pass('deformation', detail),
+  );
+
+  const dead = stats.deadBones.filter((b) => !/^root$/i.test(b) && !b.startsWith('handslot'));
+  const owner =
+    `mean dominant weight ${stats.meanDominant.toFixed(3)}, ` +
+    `${(stats.unownedFrac * 100).toFixed(1)}% of vertices with no bone above 0.5` +
+    (dead.length ? `, dominating nothing: ${dead.join(', ')}` : '');
+  checks.push(
+    stats.meanDominant < DOMINANT_WARN
+      ? warn('weight ownership', `${owner}; no bone owns any region (control: 0.82)`)
+      : pass('weight ownership', owner),
+  );
+  return checks;
 }
 
 export async function runJobQa(job) {
@@ -104,6 +189,11 @@ export async function runJobQa(job) {
           ? pass('held proof', 'held_attack.png rendered (weapon rides the swing)')
           : warn('held proof', 'held_attack.png not rendered'),
       );
+    }
+
+    // Rigged lanes only: a weapon or a prop has no skin to deform.
+    if (kind === 'creature' || kind === 'skinmodel') {
+      checks.push(...(await deformationChecks(built)));
     }
 
     // Preview coverage: hero + one frame per animation clip.

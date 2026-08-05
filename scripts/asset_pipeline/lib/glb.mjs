@@ -119,6 +119,174 @@ export const mat4RotY = (t) => [
 ];
 export const mat4Scale = (s) => [s, 0, 0, 0, 0, s, 0, 0, 0, 0, s, 0, 0, 0, 0, 1];
 export const mat4Translate = (x, y, z) => [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, x, y, z, 1];
+export const MAT4_IDENTITY = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
+
+/** A node's local matrix from its glTF translation / rotation (xyzw) / scale. */
+export function mat4FromTRS(t, q, s) {
+  const [x, y, z, w] = q;
+  const x2 = x + x;
+  const y2 = y + y;
+  const z2 = z + z;
+  const xx = x * x2;
+  const xy = x * y2;
+  const xz = x * z2;
+  const yy = y * y2;
+  const yz = y * z2;
+  const zz = z * z2;
+  const wx = w * x2;
+  const wy = w * y2;
+  const wz = w * z2;
+  return [
+    (1 - (yy + zz)) * s[0],
+    (xy + wz) * s[0],
+    (xz - wy) * s[0],
+    0,
+    (xy - wz) * s[1],
+    (1 - (xx + zz)) * s[1],
+    (yz + wx) * s[1],
+    0,
+    (xz + wy) * s[2],
+    (yz - wx) * s[2],
+    (1 - (xx + yy)) * s[2],
+    0,
+    t[0],
+    t[1],
+    t[2],
+    1,
+  ];
+}
+
+/** Transform a point (implicit w=1) by a column-major mat4. */
+export function mat4ApplyPoint(m, p) {
+  return [
+    m[0] * p[0] + m[4] * p[1] + m[8] * p[2] + m[12],
+    m[1] * p[0] + m[5] * p[1] + m[9] * p[2] + m[13],
+    m[2] * p[0] + m[6] * p[1] + m[10] * p[2] + m[14],
+  ];
+}
+
+/** General 4x4 inverse. Needed for inverse bind matrices, which are the only
+ *  place a rig's BIND pose is recorded, and for recovering quantize()'s
+ *  per-primitive dequantization frame. Throws on a singular matrix rather than
+ *  returning NaNs that would silently poison every downstream measurement. */
+export function mat4Invert(m) {
+  const inv = new Array(16);
+  inv[0] =
+    m[5] * m[10] * m[15] -
+    m[5] * m[11] * m[14] -
+    m[9] * m[6] * m[15] +
+    m[9] * m[7] * m[14] +
+    m[13] * m[6] * m[11] -
+    m[13] * m[7] * m[10];
+  inv[4] =
+    -m[4] * m[10] * m[15] +
+    m[4] * m[11] * m[14] +
+    m[8] * m[6] * m[15] -
+    m[8] * m[7] * m[14] -
+    m[12] * m[6] * m[11] +
+    m[12] * m[7] * m[10];
+  inv[8] =
+    m[4] * m[9] * m[15] -
+    m[4] * m[11] * m[13] -
+    m[8] * m[5] * m[15] +
+    m[8] * m[7] * m[13] +
+    m[12] * m[5] * m[11] -
+    m[12] * m[7] * m[9];
+  inv[12] =
+    -m[4] * m[9] * m[14] +
+    m[4] * m[10] * m[13] +
+    m[8] * m[5] * m[14] -
+    m[8] * m[6] * m[13] -
+    m[12] * m[5] * m[10] +
+    m[12] * m[6] * m[9];
+  inv[1] =
+    -m[1] * m[10] * m[15] +
+    m[1] * m[11] * m[14] +
+    m[9] * m[2] * m[15] -
+    m[9] * m[3] * m[14] -
+    m[13] * m[2] * m[11] +
+    m[13] * m[3] * m[10];
+  inv[5] =
+    m[0] * m[10] * m[15] -
+    m[0] * m[11] * m[14] -
+    m[8] * m[2] * m[15] +
+    m[8] * m[3] * m[14] +
+    m[12] * m[2] * m[11] -
+    m[12] * m[3] * m[10];
+  inv[9] =
+    -m[0] * m[9] * m[15] +
+    m[0] * m[11] * m[13] +
+    m[8] * m[1] * m[15] -
+    m[8] * m[3] * m[13] -
+    m[12] * m[1] * m[11] +
+    m[12] * m[3] * m[9];
+  inv[13] =
+    m[0] * m[9] * m[14] -
+    m[0] * m[10] * m[13] -
+    m[8] * m[1] * m[14] +
+    m[8] * m[2] * m[13] +
+    m[12] * m[1] * m[10] -
+    m[12] * m[2] * m[9];
+  inv[2] =
+    m[1] * m[6] * m[15] -
+    m[1] * m[7] * m[14] -
+    m[5] * m[2] * m[15] +
+    m[5] * m[3] * m[14] +
+    m[13] * m[2] * m[7] -
+    m[13] * m[3] * m[6];
+  inv[6] =
+    -m[0] * m[6] * m[15] +
+    m[0] * m[7] * m[14] +
+    m[4] * m[2] * m[15] -
+    m[4] * m[3] * m[14] -
+    m[12] * m[2] * m[7] +
+    m[12] * m[3] * m[6];
+  inv[10] =
+    m[0] * m[5] * m[15] -
+    m[0] * m[7] * m[13] -
+    m[4] * m[1] * m[15] +
+    m[4] * m[3] * m[13] +
+    m[12] * m[1] * m[7] -
+    m[12] * m[3] * m[5];
+  inv[14] =
+    -m[0] * m[5] * m[14] +
+    m[0] * m[6] * m[13] +
+    m[4] * m[1] * m[14] -
+    m[4] * m[2] * m[13] -
+    m[12] * m[1] * m[6] +
+    m[12] * m[2] * m[5];
+  inv[3] =
+    -m[1] * m[6] * m[11] +
+    m[1] * m[7] * m[10] +
+    m[5] * m[2] * m[11] -
+    m[5] * m[3] * m[10] -
+    m[9] * m[2] * m[7] +
+    m[9] * m[3] * m[6];
+  inv[7] =
+    m[0] * m[6] * m[11] -
+    m[0] * m[7] * m[10] -
+    m[4] * m[2] * m[11] +
+    m[4] * m[3] * m[10] +
+    m[8] * m[2] * m[7] -
+    m[8] * m[3] * m[6];
+  inv[11] =
+    -m[0] * m[5] * m[11] +
+    m[0] * m[7] * m[9] +
+    m[4] * m[1] * m[11] -
+    m[4] * m[3] * m[9] -
+    m[8] * m[1] * m[7] +
+    m[8] * m[3] * m[5];
+  inv[15] =
+    m[0] * m[5] * m[10] -
+    m[0] * m[6] * m[9] -
+    m[4] * m[1] * m[10] +
+    m[4] * m[2] * m[9] +
+    m[8] * m[1] * m[6] -
+    m[8] * m[2] * m[5];
+  const det = m[0] * inv[0] + m[1] * inv[4] + m[2] * inv[8] + m[3] * inv[12];
+  if (Math.abs(det) < 1e-12) throw new Error('mat4Invert: singular matrix');
+  return inv.map((v) => v / det);
+}
 
 // ---------------------------------------------------------------------------
 // Inspection
@@ -825,4 +993,133 @@ export async function checkInPlace(path, { limit } = {}) {
     if (range > effLimit) offenders.push({ clip: anim.getName(), range: +range.toFixed(3) });
   }
   return offenders;
+}
+
+/** Read a skinned GLB into the plain-array shape lib/skin_metrics.mjs measures.
+ *
+ *  Two things here are easy to get wrong and silently poison every reading:
+ *
+ *  QUANTIZATION. A quantized file carries one skin CLONE PER PRIMITIVE, each
+ *  with that primitive's dequantization matrix folded into its inverse bind
+ *  matrices (the knight ships nine). Vertex positions are in that primitive's
+ *  own quantized space, so rest and posed positions have to be brought back
+ *  through it or a distance in one primitive is not comparable with a distance
+ *  in another. `dequant` is recovered per skin from inverse(IBM) against the
+ *  rest-pose world matrix, which is valid because bind IS rest on these rigs
+ *  (verified to 5e-5 across all 23 joints of the knight).
+ *
+ *  NORMALIZED OUTPUT. Animation samplers may store normalized integers; read
+ *  raw and a rotation channel comes out as a 32767-scale quaternion that poses
+ *  the skeleton into nonsense. */
+export async function readSkinnedGlb(path) {
+  const doc = await openGlb(path);
+  const root = doc.getRoot();
+
+  // Node tree, flattened with child indices, plus the rest-pose world matrices.
+  const allNodes = root.listNodes();
+  const indexOf = new Map(allNodes.map((n, i) => [n, i]));
+  const nodes = allNodes.map((n) => ({
+    name: n.getName(),
+    translation: [...n.getTranslation()],
+    rotation: [...n.getRotation()],
+    scale: [...n.getScale()],
+    children: n
+      .listChildren()
+      .map((c) => indexOf.get(c))
+      .filter((i) => i !== undefined),
+  }));
+  const childSet = new Set(nodes.flatMap((n) => n.children));
+  const sceneRoots = new Set(
+    root
+      .listScenes()
+      .flatMap((s) => s.listChildren())
+      .map((n) => indexOf.get(n)),
+  );
+  const roots = nodes
+    .map((_, i) => i)
+    .filter((i) => sceneRoots.has(i) || (!childSet.has(i) && sceneRoots.size === 0));
+
+  const restWorld = new Map();
+  const walkRest = (i, parent) => {
+    const n = nodes[i];
+    const m = mat4Multiply(parent, mat4FromTRS(n.translation, n.rotation, n.scale));
+    restWorld.set(n.name, m);
+    for (const c of n.children) walkRest(c, m);
+  };
+  for (const r of roots) walkRest(r, MAT4_IDENTITY);
+
+  const { edgesFromIndices } = await import('./skin_metrics.mjs');
+
+  const prims = [];
+  for (const node of root.listNodes()) {
+    const mesh = node.getMesh();
+    const skin = node.getSkin();
+    if (!mesh || !skin) continue;
+    const jointNames = skin.listJoints().map((j) => j.getName());
+    const ibmArr = skin.getInverseBindMatrices().getArray();
+    const ibms = jointNames.map((_, i) => Array.from(ibmArr.slice(i * 16, (i + 1) * 16)));
+    // dequant = inverse(inverse(IBM_stored) * inverse(restWorld)) for any joint;
+    // identical for every joint of a skin when bind equals rest, so joint 0 is
+    // representative.
+    let dequant = null;
+    const rest0 = restWorld.get(jointNames[0]);
+    if (rest0) {
+      try {
+        dequant = mat4Invert(mat4Multiply(mat4Invert(ibms[0]), mat4Invert(rest0)));
+      } catch {
+        dequant = null;
+      }
+    }
+    for (const prim of mesh.listPrimitives()) {
+      const pos = prim.getAttribute('POSITION');
+      const jj = prim.getAttribute('JOINTS_0');
+      const ww = prim.getAttribute('WEIGHTS_0');
+      if (!pos || !jj || !ww) continue;
+      const verts = [];
+      const el = [0, 0, 0];
+      const je = [0, 0, 0, 0];
+      const we = [0, 0, 0, 0];
+      for (let v = 0; v < pos.getCount(); v++) {
+        pos.getElement(v, el);
+        jj.getElement(v, je);
+        ww.getElement(v, we);
+        verts.push({ p: [...el], j: [...je], w: [...we] });
+      }
+      const ind = prim.getIndices()?.getArray() ?? [];
+      prims.push({ jointNames, ibms, dequant, verts, edges: edgesFromIndices(ind) });
+    }
+  }
+
+  const clips = root.listAnimations().map((anim) => {
+    let duration = 0;
+    const channels = [];
+    for (const ch of anim.listChannels()) {
+      const sampler = ch.getSampler();
+      const input = sampler.getInput();
+      const output = sampler.getOutput();
+      const target = ch.getTargetNode();
+      if (!input || !output || !target) continue;
+      const times = Array.from(input.getArray());
+      const stride = output.getElementSize();
+      let values = Array.from(output.getArray());
+      // Normalized integer output has to be scaled back to its real range.
+      if (output.getNormalized()) {
+        const denom =
+          { 5120: 127, 5121: 255, 5122: 32767, 5123: 65535 }[output.getComponentType()] ?? 1;
+        values = values.map((v) => Math.max(-1, v / denom));
+      }
+      channels.push({
+        node: target.getName(),
+        path: ch.getTargetPath(),
+        times,
+        values,
+        stride,
+        interpolation: sampler.getInterpolation(),
+      });
+      duration = Math.max(duration, times[times.length - 1] ?? 0);
+    }
+    return { name: anim.getName(), duration, channels };
+  });
+
+  return { skeleton: { nodes, roots }, prims, clips };
 }

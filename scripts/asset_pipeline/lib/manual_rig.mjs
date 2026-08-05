@@ -11,157 +11,32 @@
 // clips for the knight), plus the real handslot.r/.l bones, with zero
 // animation cost and perfect style coherence.
 //
-// Weight solver: classic distance-to-bone-segment. Each joint owns the
-// segments from itself to its children (leaf joints get a short synthetic
-// segment: head up, toes forward); a vertex takes the K nearest segments
-// weighted 1/d^4, with a laterality guard so .l bones never grab -X vertices
-// and vice versa. Chibi bodies are blobby and forgiving, which is exactly why
-// this simple solver has a chance of looking decent.
+// Weight solver: distance-to-bone-segment with a per-segment RADIUS measured
+// from the mesh, in lib/skin_solver.mjs (pure, unit-tested). Each joint owns the
+// segments from itself to its children; leaf joints get a synthetic segment
+// (head up to the top of the mesh, toes forward). This file owns the glTF I/O
+// and the bind-space transform and nothing else.
 import { getBounds } from '@gltf-transform/core';
 import { dedup, prune, textureCompress } from '@gltf-transform/functions';
-import { openGlb, saveGlb } from './glb.mjs';
+import { mat4Invert, openGlb, saveGlb } from './glb.mjs';
+import {
+  buildAdjacency,
+  connectedComponents,
+  rigidifyShells,
+  segmentRadii,
+  smoothWeights,
+  solveSkinWeights,
+  weldPositions,
+} from './skin_solver.mjs';
 
 const ROT = ([x, y, z]) => [-z, y, x]; // -90deg about Y: +X facing -> +Z facing
-
-// General 4x4 inverse (column-major). Needed because the BIND pose lives in
-// the inverse bind matrices: a rig's REST node pose is NOT necessarily its
-// bind pose (true for the KayKit rigs, verified: jointWorld*IBM deviates by
-// >1.0 on the legs), and skinned vertices must be authored in BIND space.
-function inverse4(m) {
-  const inv = new Array(16);
-  inv[0] =
-    m[5] * m[10] * m[15] -
-    m[5] * m[11] * m[14] -
-    m[9] * m[6] * m[15] +
-    m[9] * m[7] * m[14] +
-    m[13] * m[6] * m[11] -
-    m[13] * m[7] * m[10];
-  inv[4] =
-    -m[4] * m[10] * m[15] +
-    m[4] * m[11] * m[14] +
-    m[8] * m[6] * m[15] -
-    m[8] * m[7] * m[14] -
-    m[12] * m[6] * m[11] +
-    m[12] * m[7] * m[10];
-  inv[8] =
-    m[4] * m[9] * m[15] -
-    m[4] * m[11] * m[13] -
-    m[8] * m[5] * m[15] +
-    m[8] * m[7] * m[13] +
-    m[12] * m[5] * m[11] -
-    m[12] * m[7] * m[9];
-  inv[12] =
-    -m[4] * m[9] * m[14] +
-    m[4] * m[10] * m[13] +
-    m[8] * m[5] * m[14] -
-    m[8] * m[6] * m[13] -
-    m[12] * m[5] * m[10] +
-    m[12] * m[6] * m[9];
-  inv[1] =
-    -m[1] * m[10] * m[15] +
-    m[1] * m[11] * m[14] +
-    m[9] * m[2] * m[15] -
-    m[9] * m[3] * m[14] -
-    m[13] * m[2] * m[11] +
-    m[13] * m[3] * m[10];
-  inv[5] =
-    m[0] * m[10] * m[15] -
-    m[0] * m[11] * m[14] -
-    m[8] * m[2] * m[15] +
-    m[8] * m[3] * m[14] +
-    m[12] * m[2] * m[11] -
-    m[12] * m[3] * m[10];
-  inv[9] =
-    -m[0] * m[9] * m[15] +
-    m[0] * m[11] * m[13] +
-    m[8] * m[1] * m[15] -
-    m[8] * m[3] * m[13] -
-    m[12] * m[1] * m[11] +
-    m[12] * m[3] * m[9];
-  inv[13] =
-    m[0] * m[9] * m[14] -
-    m[0] * m[10] * m[13] -
-    m[8] * m[1] * m[14] +
-    m[8] * m[2] * m[13] +
-    m[12] * m[1] * m[10] -
-    m[12] * m[2] * m[9];
-  inv[2] =
-    m[1] * m[6] * m[15] -
-    m[1] * m[7] * m[14] -
-    m[5] * m[2] * m[15] +
-    m[5] * m[3] * m[14] +
-    m[13] * m[2] * m[7] -
-    m[13] * m[3] * m[6];
-  inv[6] =
-    -m[0] * m[6] * m[15] +
-    m[0] * m[7] * m[14] +
-    m[4] * m[2] * m[15] -
-    m[4] * m[3] * m[14] -
-    m[12] * m[2] * m[7] +
-    m[12] * m[3] * m[6];
-  inv[10] =
-    m[0] * m[5] * m[15] -
-    m[0] * m[7] * m[13] -
-    m[4] * m[1] * m[15] +
-    m[4] * m[3] * m[13] +
-    m[12] * m[1] * m[7] -
-    m[12] * m[3] * m[5];
-  inv[14] =
-    -m[0] * m[5] * m[14] +
-    m[0] * m[6] * m[13] +
-    m[4] * m[1] * m[14] -
-    m[4] * m[2] * m[13] -
-    m[12] * m[1] * m[6] +
-    m[12] * m[2] * m[5];
-  inv[3] =
-    -m[1] * m[6] * m[11] +
-    m[1] * m[7] * m[10] +
-    m[5] * m[2] * m[11] -
-    m[5] * m[3] * m[10] -
-    m[9] * m[2] * m[7] +
-    m[9] * m[3] * m[6];
-  inv[7] =
-    m[0] * m[6] * m[11] -
-    m[0] * m[7] * m[10] -
-    m[4] * m[2] * m[11] +
-    m[4] * m[3] * m[10] +
-    m[8] * m[2] * m[7] -
-    m[8] * m[3] * m[6];
-  inv[11] =
-    -m[0] * m[5] * m[11] +
-    m[0] * m[7] * m[9] +
-    m[4] * m[1] * m[11] -
-    m[4] * m[3] * m[9] -
-    m[8] * m[1] * m[7] +
-    m[8] * m[3] * m[5];
-  inv[15] =
-    m[0] * m[5] * m[10] -
-    m[0] * m[6] * m[9] -
-    m[4] * m[1] * m[10] +
-    m[4] * m[2] * m[9] +
-    m[8] * m[1] * m[6] -
-    m[8] * m[2] * m[5];
-  const det = m[0] * inv[0] + m[1] * inv[4] + m[2] * inv[8] + m[3] * inv[12];
-  if (Math.abs(det) < 1e-12) throw new Error('singular IBM');
-  return inv.map((v) => v / det);
-}
-
-function distToSegment(p, a, b) {
-  const ab = [b[0] - a[0], b[1] - a[1], b[2] - a[2]];
-  const ap = [p[0] - a[0], p[1] - a[1], p[2] - a[2]];
-  const len2 = ab[0] ** 2 + ab[1] ** 2 + ab[2] ** 2;
-  let t = len2 > 1e-12 ? (ap[0] * ab[0] + ap[1] * ab[1] + ap[2] * ab[2]) / len2 : 0;
-  t = Math.max(0, Math.min(1, t));
-  const q = [a[0] + ab[0] * t, a[1] + ab[1] * t, a[2] + ab[2] * t];
-  return Math.hypot(p[0] - q[0], p[1] - q[1], p[2] - q[2]);
-}
 
 /** Rig `rawGlbPath` onto `referenceGlbPath`'s skeleton; write to `outPath`.
  *  Options: yaw ('auto' -90deg default via preRotated=false), armY override.
  *  Returns a fit report. */
 export async function manualRigOntoReference(rawGlbPath, referenceGlbPath, outPath, opts = {}) {
-  const K = opts.influences ?? 4;
-  const POW = opts.falloff ?? 4;
+  // glTF JOINTS_0/WEIGHTS_0 are VEC4, so 4 influences is the hard ceiling.
+  const K = Math.max(1, Math.min(4, opts.influences ?? 4));
 
   // --- Reference rig: joints, bind-pose world positions, mesh bounds -------
   const doc = await openGlb(referenceGlbPath); // mutated in place, saved to outPath
@@ -169,11 +44,22 @@ export async function manualRigOntoReference(rawGlbPath, referenceGlbPath, outPa
   const skin = root.listSkins()[0];
   if (!skin) throw new Error('reference model has no skin');
   const joints = skin.listJoints();
-  // BIND-pose joint positions from the inverse bind matrices: this is the
-  // space skinned vertices must live in, NOT the rest-pose world space.
+  // Skinned vertices must be authored in the space the inverse bind matrices
+  // define, so take the joint positions from inverse(IBM) rather than from the
+  // node hierarchy.
+  //
+  // For the KayKit rigs bind IS rest (they agree to 5e-5 across all 23 joints),
+  // so this is not a correction of the rest pose. What it IS load-bearing for is
+  // quantization: the reference carries one skin CLONE PER PRIMITIVE, each with
+  // that primitive's dequantization matrix folded into its inverse bind
+  // matrices, and listSkins()[0] is an arbitrary one of them (the knight's is
+  // ~2.18x with the body axis at x=-1.113). Every anchor below is measured in
+  // that same frame, so the fit stays self-consistent whichever clone comes
+  // first, but note the fragility: a reference whose primitive order or
+  // quantization changed would shift the whole fit with no error raised.
   const ibmArr = skin.getInverseBindMatrices().getArray();
   const jointPos = joints.map((_, i) => {
-    const inv = inverse4(Array.from(ibmArr.slice(i * 16, (i + 1) * 16)));
+    const inv = mat4Invert(Array.from(ibmArr.slice(i * 16, (i + 1) * 16)));
     return [inv[12], inv[13], inv[14]];
   });
   const byName = new Map(joints.map((j, i) => [j.getName(), i]));
@@ -188,30 +74,44 @@ export async function manualRigOntoReference(rawGlbPath, referenceGlbPath, outPa
   const centerZ = P('hips')?.[2] ?? 0;
   const wristAbove = (P('wrist.r')?.[1] ?? 1.11) - groundY;
 
-  // Bone segments, attributed to the PROXIMAL joint. Skip root (whole-body
-  // mover, no direct weights) and handslots (attachment-only).
-  const segments = [];
-  for (let i = 0; i < joints.length; i++) {
-    const name = joints[i].getName();
-    if (/^root$/i.test(name) || name.startsWith('handslot')) continue;
-    const kids = joints[i].listChildren().filter((c) => byName.has(c.getName()));
-    let any = false;
-    for (const c of kids) {
-      segments.push({ joint: i, a: jointPos[i], b: jointPos[byName.get(c.getName())] });
-      any = true;
-    }
-    if (!any) {
-      // Synthetic leaf segments, sized relative to the bind frame: the chibi
-      // head is a big rigid blob above its joint; toes extend forward (+Z).
-      const p = jointPos[i];
-      const dir = name === 'head' ? [0, 0.4 * wristAbove, 0] : [0, 0, 0.05 * wristAbove];
-      segments.push({ joint: i, a: p, b: [p[0] + dir[0], p[1] + dir[1], p[2] + dir[2]] });
-    }
-  }
   const sideGuard = 0.02 * wristAbove;
   const side = (i) => {
     const n = joints[i].getName();
     return n.endsWith('.l') ? 1 : n.endsWith('.r') ? -1 : 0;
+  };
+
+  /** Bone segments, attributed to the PROXIMAL joint. Skip root (whole-body
+   *  mover, no direct weights) and handslots (attachment-only).
+   *
+   *  `headTipY` is where the head's synthetic leaf segment ends, and it is
+   *  measured from the MESH rather than from the rig. Sizing it off the rig
+   *  (it was `0.4 * wristAbove`) assumes the head is a certain fraction of a
+   *  reference-shaped body, and the moment a silhouette breaks that assumption
+   *  the signature feature leaves the skeleton entirely: on the Sundered Horror
+   *  the leaf ended at y=1.492 while the horn crown reaches y=2.145, so the top
+   *  30% of the figure, the thing you see first, sat beyond the end of every
+   *  bone in the rig. */
+  const buildSegments = (headTipY) => {
+    const segs = [];
+    for (let i = 0; i < joints.length; i++) {
+      const name = joints[i].getName();
+      if (/^root$/i.test(name) || name.startsWith('handslot')) continue;
+      const s = side(i);
+      const kids = joints[i].listChildren().filter((c) => byName.has(c.getName()));
+      for (const c of kids) {
+        segs.push({ joint: i, side: s, a: jointPos[i], b: jointPos[byName.get(c.getName())] });
+      }
+      if (kids.length) continue;
+      // Synthetic leaf segments: the head runs up to cover the mesh above it,
+      // toes extend forward (+Z) by a fixed slice of the bind frame.
+      const p = jointPos[i];
+      const b =
+        name === 'head'
+          ? [p[0], Math.max(headTipY, p[1] + 0.05 * wristAbove), p[2]]
+          : [p[0], p[1], p[2] + 0.05 * wristAbove];
+      segs.push({ joint: i, side: s, a: p, b });
+    }
+    return segs;
   };
 
   // --- Raw mesh: read arrays, transform into reference bind space ----------
@@ -258,7 +158,7 @@ export async function manualRigOntoReference(rawGlbPath, referenceGlbPath, outPa
   const midX = (min[0] + max[0]) / 2;
   const midZ = (min[2] + max[2]) / 2;
 
-  // Pass 2: final positions (feet at y=0, centered XZ) + weights.
+  // Pass 2: final positions (feet at y=0, centered XZ), then weights.
   const report = {
     scale: +scale.toFixed(3),
     rawArmY: +rawArmY.toFixed(3),
@@ -269,48 +169,110 @@ export async function manualRigOntoReference(rawGlbPath, referenceGlbPath, outPa
     refHeight: +(refBounds.max[1] - refBounds.min[1]).toFixed(2),
     verts: 0,
   };
-  const built = rawPrims.map((prim, pi) => {
+  const bindTopY = (max[1] - min[1]) * scale + groundY;
+  const segments = buildSegments(bindTopY);
+  report.headTipY = +bindTopY.toFixed(3);
+
+  // Bind-space positions for every primitive, plus one flat point list the
+  // solver works over. The whole mesh is solved TOGETHER, not per primitive: the
+  // weld and the shell pass both need to see geometry that a primitive split
+  // would otherwise hide from them.
+  const posPerPrim = rawPrims.map((_, pi) => {
     const rot = rotatedPerPrim[pi];
-    const n = rot.length / 3;
-    report.verts += n;
-    const pos = new Float32Array(rot.length);
+    const out = new Float32Array(rot.length);
+    for (let v = 0; v < rot.length; v += 3) {
+      out[v] = (rot[v] - midX) * scale + centerX;
+      out[v + 1] = (rot[v + 1] - min[1]) * scale + groundY;
+      out[v + 2] = (rot[v + 2] - midZ) * scale + centerZ;
+    }
+    return out;
+  });
+  const primOffset = [];
+  const points = [];
+  for (const arr of posPerPrim) {
+    primOffset.push(points.length);
+    for (let v = 0; v < arr.length; v += 3) points.push([arr[v], arr[v + 1], arr[v + 2]]);
+  }
+  report.verts = points.length;
+
+  // Solve per WELDED POSITION, not per vertex. Tripo ships a triangle soup with
+  // co-located duplicates at every seam; weighting them independently lets two
+  // vertices at one point disagree and pull apart, which cracks the mesh open
+  // along the seam under animation.
+  const { nodeOf, nodePos } = weldPositions(points, 1e-5);
+  const solveOpts = {
+    influences: K,
+    sideGuard,
+    centerX,
+    radiusPercentile: opts.radiusPercentile ?? 0.8,
+    minWeightFrac: opts.minWeightFrac ?? 0.05,
+    falloff: opts.falloff ?? 2,
+    ...(opts.radiusBand ? { radiusBand: opts.radiusBand } : {}),
+  };
+  const radii = segmentRadii(nodePos, segments, solveOpts);
+  const solved = solveSkinWeights(nodePos, segments, { ...solveOpts, radii });
+  report.weldedNodes = nodePos.length;
+  report.rigidPoints = solved.rigid;
+  // The measured influence radius per bone, which is the number to look at first
+  // when a bone turns out to own nothing: a radius far below its neighbours'
+  // starves it even on its own geometry.
+  report.radii = {};
+  segments.forEach((seg, i) => {
+    const n = joints[seg.joint].getName();
+    report.radii[n] = Math.max(report.radii[n] ?? 0, +radii[i].toFixed(3));
+  });
+
+  const globalIndices = [];
+  rawPrims.forEach((prim, pi) => {
+    const ind = prim.getIndices()?.getArray();
+    if (!ind) return;
+    const off = primOffset[pi];
+    for (let i = 0; i < ind.length; i++) globalIndices.push(ind[i] + off);
+  });
+  if (globalIndices.length) {
+    const adj = buildAdjacency(nodePos.length, globalIndices, nodeOf);
+    // Relax the field against the neighbour graph. Per-vertex candidate picking
+    // cannot stop two nodes 5mm apart from landing on very different blends, and
+    // that gradient is what actually opens the mesh under a swing.
+    // 4 iterations, measured on the Horror through the full shipping chain as
+    // torn edges (over 2x stretch AND over a 4cm absolute gap, since this mesh
+    // is full of slivers that hit 5x while moving nothing anyone can see) summed
+    // over Chop, Walking_A and Death_A: 0 iters 244, 4 iters 217, 8 iters 215
+    // but with ownership down from 0.754 to 0.742 and Death_A drifting worse.
+    // Past about 4 the smoothing is buying tenths of a torn edge with real
+    // ownership, which is the trade that made the naive heat-diffusion re-solve
+    // in the audit worse than what it replaced.
+    smoothWeights(solved.joints, solved.weights, adj, {
+      iters: opts.smoothIters ?? 4,
+      mix: opts.smoothMix ?? 0.5,
+      influences: K,
+    });
+    // Loose shells ride one bone as a piece, AFTER smoothing so the rigid
+    // assignment is the final word on them. The horn thicket has no topological
+    // path to the head, so per-vertex weights shear it apart and a diffusion
+    // solver orphans it outright.
+    const { label, count } = connectedComponents(nodePos.length, globalIndices, nodeOf, adj);
+    report.shells = count;
+    report.rigidShells = rigidifyShells(solved.joints, solved.weights, label, count, K, {
+      // A large component is real articulated body, not a decoration: freezing
+      // it would kill a limb. Only small loose pieces are rigidified.
+      maxShellNodes: Math.max(24, Math.round(nodePos.length * 0.02)),
+      nodePos,
+    });
+  }
+
+  const built = rawPrims.map((prim, pi) => {
+    const pos = posPerPrim[pi];
+    const n = pos.length / 3;
     const jointsAttr = new Uint16Array(n * 4);
     const weightsAttr = new Float32Array(n * 4);
     for (let v = 0; v < n; v++) {
-      const p = [
-        (rot[v * 3] - midX) * scale + centerX,
-        (rot[v * 3 + 1] - min[1]) * scale + groundY,
-        (rot[v * 3 + 2] - midZ) * scale + centerZ,
-      ];
-      pos[v * 3] = p[0];
-      pos[v * 3 + 1] = p[1];
-      pos[v * 3 + 2] = p[2];
-      // Nearest segments with laterality guard (relative to the body axis).
-      const lx = p[0] - centerX;
-      const best = []; // {joint, w}
-      for (const seg of segments) {
-        const s = side(seg.joint);
-        if (s === 1 && lx < -sideGuard) continue;
-        if (s === -1 && lx > sideGuard) continue;
-        const d = distToSegment(p, seg.a, seg.b);
-        const w = 1 / (d ** POW + 1e-8);
-        best.push({ joint: seg.joint, w });
-      }
-      best.sort((a, b) => b.w - a.w);
-      // Merge duplicate joints among the top hits, then take K.
-      const merged = [];
-      for (const c of best) {
-        const hit = merged.find((m) => m.joint === c.joint);
-        if (hit) hit.w += c.w;
-        else merged.push({ ...c });
-        if (merged.length >= K && merged.length > 8) break;
-      }
-      merged.sort((a, b) => b.w - a.w);
-      const top = merged.slice(0, K);
-      const sum = top.reduce((s2, c) => s2 + c.w, 0) || 1;
-      for (let k = 0; k < 4; k++) {
-        jointsAttr[v * 4 + k] = top[k]?.joint ?? 0;
-        weightsAttr[v * 4 + k] = (top[k]?.w ?? 0) / sum;
+      const node = nodeOf[primOffset[pi] + v];
+      // JOINTS_0/WEIGHTS_0 are VEC4; K is clamped to 4 above, so any slot past
+      // K stays zero rather than reading into the next node's weights.
+      for (let k = 0; k < K; k++) {
+        jointsAttr[v * 4 + k] = solved.joints[node * K + k];
+        weightsAttr[v * 4 + k] = solved.weights[node * K + k];
       }
     }
     // Normals: rotate only (uniform scale + translation preserve direction).
