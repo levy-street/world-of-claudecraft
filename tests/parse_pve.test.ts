@@ -1,55 +1,20 @@
 import { describe, expect, test } from 'vitest';
 import { createParseCounters } from '../server/parse/counters';
-import type { ParseFlags } from '../server/parse/flags';
 import { ParseRecorder } from '../server/parse/recorder';
 import type {
-  ArenaMatchView,
-  BgMatchView,
   InstanceSlotView,
   RecorderEntityView,
-  RecorderSim,
   RiftInstanceView,
-  RiftPortalView,
 } from '../server/parse/types';
 import type { FightParticipant } from '../server/parse/contract';
 import type { SimEvent } from '../src/sim/types';
-
-interface FakeSim extends RecorderSim {
-  tickCount: number;
-  entities: Map<number, RecorderEntityView>;
-  arenaMatches: Map<number, ArenaMatchView>;
-  bgMatches: Map<number, BgMatchView>;
-  instances: InstanceSlotView[];
-  riftInstances: RiftInstanceView[];
-  naturalRiftPortals: RiftPortalView[];
-}
-
-function fakeSim(): FakeSim {
-  return {
-    tickCount: 0,
-    entities: new Map(),
-    arenaMatches: new Map(),
-    bgMatches: new Map(),
-    instances: [],
-    riftInstances: [],
-    naturalRiftPortals: [],
-  };
-}
+import { FAKE_PARSE_FLAGS, fakeSim, type FakeSim } from './helpers/parse_fake_sim';
 
 function player(id: number): RecorderEntityView {
   return { id, templateId: 'mage', level: 20, dead: false };
 }
 
-const FLAGS: ParseFlags = {
-  enabled: true,
-  ingestUrl: 'http://unused',
-  ingestToken: null,
-  surfaces: new Set(['arena', 'battleground', 'raid', 'dungeon', 'rift']),
-  spoolDir: 'unused',
-  spoolMaxBytes: 1,
-  envLabel: 'dev',
-  censusEnabled: false,
-};
+const FLAGS = FAKE_PARSE_FLAGS;
 
 /** Players are ids under 100 (they have sessions); mobs never resolve. */
 function makeRecorder(sim: FakeSim) {
