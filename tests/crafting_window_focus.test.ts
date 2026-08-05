@@ -53,6 +53,7 @@ function craftingDeps(): CraftingWindowDeps {
     hideTooltip: () => {},
     onCraft: () => {},
     onClose: () => {},
+    onOpenOrders: () => {},
     itemIcon: () => '',
     moneyHtml: () => '',
     itemTooltip: () => '',
