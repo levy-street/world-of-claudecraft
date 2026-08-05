@@ -55,6 +55,8 @@
     "test:bun": "node scripts/test_bun_experimental.mjs",
     "gate": "node scripts/gate.mjs",
     "gate:fast": "node scripts/gate_fast.mjs",
+    "gate:select": "node scripts/gate_select.mjs",
+    "gate:shadow": "node scripts/gate_shadow.mjs",
     "security:scan": "node scripts/malware_scan.mjs",
     "security:gate": "node scripts/malware_scan.mjs --gate",
     "new:endpoint": "node scripts/new_endpoint.mjs",

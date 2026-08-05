@@ -106,6 +106,55 @@ unconstrained full-suite parallelism can make healthy heavy sim tests flake. Day
 iteration may use `npm run gate:fast`; a green fast path alone is never enough to claim
 done.
 
+### Selective gate (`gate:select`)
+
+`npm run gate:select` is the **fast merge bar**. The one-line difference from the three
+paths above:
+
+| | Non-test steps | Tests | Merge bar? |
+|---|---|---|---|
+| `gate:fast` | **5 of 13.** No builds, no admin/bot typecheck, no i18n or wiki freshness, no sfx, no browser. | `related` only, plus two guard files | **No** |
+| `gate` | **All.** | **All** ~2200 files | Yes (provably complete) |
+| `gate:select` | **All, byte-identical to `gate`.** | always-run set + `related` | Yes (empirically complete) |
+
+The distinction that matters: **`gate:fast` is weaker because it drops ten checks;
+`gate:select` drops none of them.** A change that breaks the client bundle, the admin
+Svelte types, the bot build, i18n freshness, or SFX conformance fails `gate:select`
+exactly as it fails `gate`. Only the test step is narrowed, so the question "is this
+enough to ship a PR" reduces to one question: does the narrowed test step still catch
+what the full one would?
+
+**Why the narrowed test step is sufficient.** `vitest related` selects on the static
+import graph, which models most of this suite correctly and misses the rest *silently*
+(a skipped test does not error, so the gate still prints PASS). So selection is never
+trusted alone. `scripts/lib/test_visibility.mjs` classifies every test file first:
+
+- **blind**: reaches outside the graph (disk scan, subprocess, dynamic import) and imports
+  no source. `related` can never select it. `tests/architecture.test.ts`, the determinism
+  and sim-purity guard, is one of these.
+- **partial**: reaches outside the graph *and* imports source, so `related` selects it
+  only sometimes, which hides better than never.
+- **graph**: pure imports, modelled correctly.
+
+Every blind and partial file runs on **every** selective gate regardless of the diff.
+Only the graph-visible remainder is left to `related`. The set is recomputed from source
+on each run rather than read from a committed list, so it cannot go stale: a new test that
+scans from disk joins it the moment it lands.
+
+**Safety fallback.** Any change the planner cannot reason about (a lockfile, `package.json`,
+a vite/vitest/tsconfig edit, the shared test helpers or global setup) drops the whole run
+to the full suite. Selection is an optimization for changes we understand; everything else
+gets the old bar. Failing toward *more* tests is the only safe direction.
+
+**What it still cannot prove.** The out-of-graph pattern list is a floor, not a proof, so
+this path is empirically complete rather than provably complete. That is why it is paired
+with a scheduled full `npm run gate` off everyone's critical path, which re-establishes a
+known-green baseline. **Do not adopt `gate:select` as the merge bar without that backstop
+running.**
+
+Pure planning logic: `scripts/lib/gate_select_plan.mjs` and
+`scripts/lib/test_visibility.mjs`, both pinned by `tests/gate_select_plan.test.ts`.
+
 ### Judgment review
 
 Reasoning is required for determinism, host parity, server authority, persistence,
