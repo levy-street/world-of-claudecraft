@@ -2,9 +2,13 @@
 // dictionary woc-parse-service uses to label ability ids, mob keys, zones,
 // dungeons, classes, and specs without importing game code. Mirrors the
 // esbuild-bundle pattern of scripts/wiki/build_content.mjs (never import raw
-// .ts). Run via `npm run parse:content`; writes dist/parse-content-pack.json.
-// With --ship (PARSE_INGEST_URL + PARSE_INGEST_TOKEN set) it also POSTs the
-// pack to the service as a one-record batch.
+// .ts). Run DIRECTLY: `node scripts/parse/build_content_pack.mjs`; writes
+// dist/parse-content-pack.json. NO npm alias, deliberately: the Fenbridge
+// asset family fingerprints all of package.json as a shipping-GLB input
+// (tests/fenbridge_town_assets.test.ts), so a script entry demands a 63-file
+// re-export; same ruling as scripts/gate_select.mjs. With --ship
+// (PARSE_INGEST_URL + PARSE_INGEST_TOKEN set) it also POSTs the pack to the
+// service as a one-record batch.
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { gzipSync } from 'node:zlib';
