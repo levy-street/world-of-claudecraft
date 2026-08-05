@@ -43,7 +43,12 @@ import { groundHeight, waterLevelAt, zoneBiomeAt } from '../sim/world';
 import type { ChatBubbleStyle } from '../ui/chat_bubble_style';
 import { tEntity } from '../ui/entity_i18n';
 import type { IWorld } from '../world_api';
-import { AbilityVfx, AbilityVfxFx } from './ability_vfx';
+import {
+  AbilityVfx,
+  AbilityVfxFx,
+  abilityVfxTexturePrewarmSteps,
+  collectAbilityVfxCompileTargets,
+} from './ability_vfx';
 import { ABILITY_VFX_FULL_SPECS } from './ability_vfx_full_specs';
 import { ABILITY_VFX_SPECS } from './ability_vfx_specs';
 import { type AmberFeaturesView, buildAmberFeatures } from './amber_features';
@@ -335,6 +340,7 @@ import {
   type PrewarmPolicy,
   partitionMandatoryLandmarkCandidates,
   prewarmBuildDeadline,
+  prewarmEntryResumesAfterSkip,
   prewarmEntryRuns,
   prewarmEntryShouldDefer,
   remainingPrewarmViewBudget,
@@ -5863,16 +5869,38 @@ export class Renderer {
       {
         // Spawn one of every pooled ability-VFX primitive (rings, decals,
         // pillar, shell, slash ribbon, overlay sprite). The pools build their
-        // meshes visible=false, so neither the render passes nor
-        // programs.compile ever see their ShaderMaterials, the first spec'd
-        // cast in the open world used to link them synchronously. The spawns
-        // also bind the per-style decal textures, so the texture re-walk below
-        // uploads the whole canvas set now. abilityVfxFx.clear() in the
-        // finally block hides everything again.
+        // meshes visible=false, so no render pass ever draws them: their
+        // textures and geometry stay un-uploaded, and the first spec'd cast in
+        // the open world used to pay for both synchronously. The spawns bind
+        // the per-style decal textures and the six impact sheets, so the
+        // texture re-walk below uploads the whole canvas set now.
+        // abilityVfxFx.clear() in the finally block hides everything again.
+        //
+        // resumeUnits deliberately does NOT replay the spawn: run live it
+        // would pop a white ring/decal/flipbook burst at the player's feet
+        // (the same reason vfx.atlas retains nothing). It carries the
+        // invisible half instead, one impact sheet per unit plus one program
+        // link per distinct pooled material. That is also the MINIMAL variant
+        // constrained devices get in place of this entry
+        // (CONSTRAINED_PREWARM_RESUME): there the whole entry is skipped, so
+        // each 512px sheet is otherwise drawn on the first impact of its
+        // school, i.e. mid-combat.
         id: 'vfx.ability-primitives',
         category: 'vfx',
         priority: 62,
         required: false,
+        resumeUnits: () => [
+          ...abilityVfxTexturePrewarmSteps().map((step) => ({
+            id: `texture:${step.id}`,
+            run: () => {
+              for (const texture of step.build()) this.prewarmTexture(texture);
+            },
+          })),
+          ...collectAbilityVfxCompileTargets(this.scene).map((target) => ({
+            id: `program:${target.id}`,
+            run: () => this.compilePrewarmColorPrograms(target.object, false),
+          })),
+        ],
         run: () => {
           this.abilityVfxFx.prewarmSpawn(p.pos.x, p.pos.y, p.pos.z - 5, p.id);
           this.scene.traverse((child) => {
@@ -6014,9 +6042,16 @@ export class Renderer {
       for (const entry of orderedManifest) {
         // Skip everything outside the minimal keep-list (prewarm_policy.ts),
         // recording the skip so the prewarm summary stays honest about what was
-        // deliberately not warmed. The skipped warms happen lazily in-world.
+        // deliberately not warmed. The skipped warms happen lazily in-world,
+        // except for the few entries that opt into the background resume lane
+        // (CONSTRAINED_PREWARM_RESUME): those hand over their explicit small
+        // units, which run after entry instead of never.
         if (!prewarmEntryRuns(entry.id, policy)) {
           const counts = this.prewarmCounts();
+          const skipUnits = prewarmEntryResumesAfterSkip(entry.id, policy)
+            ? (entry.resumeUnits?.() ?? [])
+            : [];
+          if (skipUnits.length > 0) droppedEntries.push({ id: entry.id, units: skipUnits });
           manifestEntries.push({
             id: entry.id,
             category: entry.category,
@@ -6032,7 +6067,10 @@ export class Renderer {
             texturesBefore: counts.textures,
             texturesAfter: counts.textures,
             textureDelta: 0,
-            detail: 'constrained-minimal',
+            detail:
+              skipUnits.length > 0
+                ? `constrained-minimal;resume=${skipUnits.length}`
+                : 'constrained-minimal',
           });
           continue;
         }
