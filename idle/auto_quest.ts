@@ -23,6 +23,15 @@ export interface QuestStepResult {
   readonly didQuestAction: boolean;
   readonly log: string[];
   readonly blocked: boolean;
+  /**
+   * World-space goal the quest layer is navigating the character toward this
+   * step (the NPC it must reach/turn to), or null when the quest action is a
+   * stationary one (interact in place, or no quest activity). The IdleEngine
+   * drives movement PER TICK toward this goal because the once-per-step
+   * action surface cannot steer (a held TURN rotates PI rad/step and never
+   * converges). Mutually exclusive with didQuestAction == true.
+   */
+  readonly goalPos: Vec3 | null;
 }
 
 // ---------------------------------------------------------------------------
@@ -109,13 +118,19 @@ export function evaluateQuest(sim: Sim, _events: SimEvent[]): QuestStepResult {
     if (d <= INTERACT_RANGE) {
       sim.turnInQuest(qDef.id, pid);
       log.push(`Turned in: ${qDef.name}`);
-      return { action: NOOP, didQuestAction: true, log, blocked: false };
+      return { action: NOOP, didQuestAction: true, log, blocked: false, goalPos: null };
     }
 
     // Navigate toward the turn-in NPC.
     const steer = steerToward(p.pos, p.facing, npcEntity.pos);
     log.push(`Going to turn in ${qDef.name} (${Math.round(d)} yd)`);
-    return { action: steer.action, didQuestAction: false, log, blocked: !steer.arrived };
+    return {
+      action: steer.action,
+      didQuestAction: false,
+      log,
+      blocked: !steer.arrived,
+      goalPos: { ...npcEntity.pos },
+    };
   }
 
   // Phase 2: navigate toward active quest objectives.
@@ -158,13 +173,13 @@ export function evaluateQuest(sim: Sim, _events: SimEvent[]): QuestStepResult {
             if (targetMob && dist2d(p.pos, targetMob.pos) <= 30) {
               // Found a quest target mob nearby — let combat handle it.
               log.push(`In objective area, hunting ${targetMob.name}`);
-              return { action: NOOP, didQuestAction: false, log, blocked: false };
+              return { action: NOOP, didQuestAction: false, log, blocked: false, goalPos: null };
             }
           }
         }
         // In area but no specific target visible — wander to find mobs.
         log.push(`In objective area, searching for targets`);
-        return { action: NOOP, didQuestAction: false, log, blocked: false };
+        return { action: NOOP, didQuestAction: false, log, blocked: false, goalPos: null };
       }
 
       // Not in the area yet — navigate toward the center.
@@ -174,7 +189,13 @@ export function evaluateQuest(sim: Sim, _events: SimEvent[]): QuestStepResult {
         z: bestArea.center.z,
       });
       log.push(`Heading to objective area (${Math.round(bestDist)} yd, r=${bestArea.radius})`);
-      return { action: steer.action, didQuestAction: false, log, blocked: !steer.arrived };
+      return {
+        action: steer.action,
+        didQuestAction: false,
+        log,
+        blocked: !steer.arrived,
+        goalPos: { x: bestArea.center.x, y: 0, z: bestArea.center.z },
+      };
     }
   }
 
@@ -200,7 +221,7 @@ export function evaluateQuest(sim: Sim, _events: SimEvent[]): QuestStepResult {
     if (d <= INTERACT_RANGE) {
       sim.acceptQuest(qDef.id, undefined, pid);
       log.push(`Accepted: ${qDef.name}`);
-      return { action: NOOP, didQuestAction: true, log, blocked: false };
+      return { action: NOOP, didQuestAction: true, log, blocked: false, goalPos: null };
     }
   }
   // Navigate toward the closest giver NPC.
@@ -209,9 +230,15 @@ export function evaluateQuest(sim: Sim, _events: SimEvent[]): QuestStepResult {
     const best = candidates[0];
     const steer = steerToward(p.pos, p.facing, best.npc.pos);
     log.push(`Going to accept ${best.qDef.name} (${Math.round(best.dist)} yd)`);
-    return { action: steer.action, didQuestAction: false, log, blocked: !steer.arrived };
+    return {
+      action: steer.action,
+      didQuestAction: false,
+      log,
+      blocked: !steer.arrived,
+      goalPos: { ...best.npc.pos },
+    };
   }
 
   // No quest goal — fall through to combat.
-  return { action: NOOP, didQuestAction: false, log, blocked: false };
+  return { action: NOOP, didQuestAction: false, log, blocked: false, goalPos: null };
 }

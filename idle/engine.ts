@@ -9,13 +9,23 @@
 
 import { applyAction } from '../src/sim/obs';
 import { Sim } from '../src/sim/sim';
-import { dist2d, type PlayerClass, type SimEvent } from '../src/sim/types';
+import {
+  angleTo,
+  dist2d,
+  MELEE_ARC,
+  MELEE_RANGE,
+  normAngle,
+  type PlayerClass,
+  type SimEvent,
+  type Vec3,
+} from '../src/sim/types';
 import { AntiStuck } from './anti_stuck';
 import { pickAction } from './auto_combat';
 import type { QuestStepResult } from './auto_quest';
 import { evaluateQuest } from './auto_quest';
-import { steerToward } from './movement';
-import { findBestCampTarget } from './progression_target';
+import { isTooDangerous } from './difficulty';
+import { type CampTarget, findBestCampTarget } from './progression_target';
+import { steerTick } from './steer';
 import { type IdleSaveData, readSave, writeSave } from './storage';
 import { assessThreat } from './threat_map';
 
@@ -175,6 +185,7 @@ export class IdleEngine {
     const questResult: QuestStepResult = evaluateQuest(sim, events);
     let action = questResult.action;
     if (questResult.didQuestAction) action = 0;
+    let camp: CampTarget | null = null;
     if (action === 0 && !questResult.didQuestAction) {
       action = pickAction(sim);
       // When combat returns FORWARD with no active target, the player has
@@ -182,15 +193,11 @@ export class IdleEngine {
       // of wandering randomly. This is the progression navigator: it makes
       // the character migrate to the right hunting grounds for its level.
       if (action === 1 && !sim.player.targetId && assessThreat(sim).level !== 'lethal') {
-        const camp = findBestCampTarget(sim.player.pos, sim.player.level);
+        camp = findBestCampTarget(sim.player.pos, sim.player.level);
         if (camp) {
-          const d = dist2d(sim.player.pos, camp.pos);
-          // Only steer if we're not already in a reasonable camp distance.
+          // Only navigate if we're not already in a reasonable camp distance.
           // If we are, stay put — auto_combat will pick targets as they spawn.
-          if (d > 15) {
-            const steer = steerToward(sim.player.pos, sim.player.facing, camp.pos);
-            action = steer.action;
-          }
+          if (dist2d(sim.player.pos, camp.pos) <= 15) camp = null;
         }
       }
     }
@@ -199,25 +206,82 @@ export class IdleEngine {
       action = stuckAction;
     }
 
-    // 2. Apply action ONCE (clears previous moveInput, sets the new one).
-    applyAction(sim, action);
+    // 2. Execution. The once-per-step action surface cannot steer: a single
+    //    TURN held for the whole frameSkip batch rotates the player exactly
+    //    PI radians (1 sim-second at TURN_SPEED), so the facing can only ever
+    //    land on one of two antipodal angles and the steering loop never
+    //    converges — the character spins and never reaches a camp or a mob.
+    //    Movement is therefore driven PER TICK (the sim's normal input
+    //    cadence) toward a resolved world-space goal; the once-per-step
+    //    `action` is kept for the stationary cases (in-melee combat, ability
+    //    casts, eat/drink, anti-stuck escape).
+    const p0 = sim.player;
+    const engagedTarget = p0.targetId !== null ? (sim.entities.get(p0.targetId) ?? null) : null;
+    const threat = assessThreat(sim);
+    let steerGoal: Vec3 | null = null;
 
-    // If the action was a turn (3/4), undo the forward movement that
-    // applyAction auto-sets so the player turns in place instead of walking.
-    // This prevents the player from walking out of melee range while turning
-    // to face a mob that is behind them.
-    if (action === 3 || action === 4) {
-      sim.moveInput.forward = false;
+    if (!p0.dead) {
+      if (threat.level === 'lethal' && threat.fleeFrom) {
+        // Lethal pack: run directly away from the flee centroid (highest
+        // priority over every other goal).
+        const dx = p0.pos.x - threat.fleeFrom.x;
+        const dz = p0.pos.z - threat.fleeFrom.z;
+        const len = Math.hypot(dx, dz) || 1;
+        steerGoal = {
+          x: p0.pos.x + (dx / len) * 40,
+          y: p0.pos.y,
+          z: p0.pos.z + (dz / len) * 40,
+        };
+      } else if (questResult.goalPos && !questResult.didQuestAction) {
+        // The quest layer resolved a world-space objective (giver/turn-in/objective
+        // area) it wants the character to reach this step. Steer per tick to it;
+        // once the character is in range, evaluateQuest next step will issue the
+        // stationary accept/turn-in action (didQuestAction) instead.
+        steerGoal = { ...questResult.goalPos };
+      } else if (engagedTarget && !engagedTarget.dead && !isTooDangerous(p0.level, engagedTarget)) {
+        // Not yet in melee -> close the gap by steering to the target. Once
+        // in melee (steerTick arrives within MELEE_RANGE) the next step's
+        // once-per-step action starts auto-attack.
+        const rel = normAngle(angleTo(p0.pos, engagedTarget.pos) - p0.facing);
+        const closeEnough = dist2d(p0.pos, engagedTarget.pos) <= MELEE_RANGE + 2;
+        if (!closeEnough || Math.abs(rel) > MELEE_ARC / 2) {
+          steerGoal = { ...engagedTarget.pos };
+        }
+      } else if (camp) {
+        steerGoal = { ...camp.pos };
+      }
     }
+    // Anti-stuck escape takes priority over navigation when the character is
+    // genuinely wedged (its own sequence frees it, steering cannot).
+    if (stuckAction !== null) steerGoal = null;
 
-    // 3. Run frameSkip ticks, collecting events.
-    //    Save player position BEFORE ticks so we can set prevPos afterward
-    //    for smooth render interpolation (prevents teleporting).
+    // Save player position BEFORE ticks so we can set prevPos afterward for
+    // smooth render interpolation (prevents teleporting).
     const prevPlayerPos = { ...sim.player.pos };
     const prevPlayerFacing = sim.player.facing;
-    for (let i = 0; i < frameSkip; i++) {
-      const batch = sim.tick();
-      for (const ev of batch) events.push(ev);
+
+    if (steerGoal) {
+      // 3a. Per-tick steering toward the goal.
+      for (let i = 0; i < frameSkip; i++) {
+        steerTick(sim, steerGoal);
+        const batch = sim.tick();
+        for (const ev of batch) events.push(ev);
+      }
+    } else {
+      // 3b. Apply the once-per-step action (clears previous moveInput).
+      applyAction(sim, action);
+      // If the action was a turn (3/4), undo the forward movement that
+      // applyAction auto-sets so the player turns in place instead of walking.
+      // This prevents the player from walking out of melee range while turning
+      // to face a mob that is behind them.
+      if (action === 3 || action === 4) {
+        sim.moveInput.forward = false;
+      }
+      // 3c. Run frameSkip ticks, collecting events.
+      for (let i = 0; i < frameSkip; i++) {
+        const batch = sim.tick();
+        for (const ev of batch) events.push(ev);
+      }
     }
     // Set prevPos to the position before the tick batch so the renderer
     // interpolates smoothly from old to new position over the frame.
