@@ -411,7 +411,19 @@ describe('Interface & Comfort settings pack', () => {
     expect(s.get('showDailyRewardsChest')).toBe(true);
     expect(s.get('showSecondaryActionBar')).toBe(false);
     expect(s.get('showThirdActionBar')).toBe(false);
+    expect(s.get('hideUnusedActionSlots')).toBe(false);
     expect(s.get('invertLookY')).toBe(false);
+  });
+
+  // Issue 2429: hide the empty-slot chrome (background/border/keybind label) on
+  // desktop action-bar slots with no ability or item bound. Off by default (the
+  // classic look, unchanged out of the box).
+  it('defaults hideUnusedActionSlots off and persists enabling it across instances', () => {
+    const a = new Settings();
+    expect(a.get('hideUnusedActionSlots')).toBe(false);
+    a.set('hideUnusedActionSlots', true);
+    const b = new Settings();
+    expect(b.get('hideUnusedActionSlots')).toBe(true);
   });
 
   it('clamps the comfort sliders to their documented bounds', () => {

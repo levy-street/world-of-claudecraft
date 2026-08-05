@@ -848,11 +848,12 @@ export function craftItem(
   const result = resolveCraft(ctx, r.meta.entityId, recipeId, commission);
   if (result.ok) {
     ctx.bumpDeedStat(r.meta, 'craftsPerformed', 1);
+    const recipe = recipeById(recipeId);
     // A station-bound success already proved station presence in the
     // resolve's station gate, so stationType alone identifies one. The
     // persisted stat key stays 'hubCraftsPerformed' for save back-compat: it
     // now means station-bound crafts (the gate was renamed, not the key).
-    if (recipeById(recipeId)?.stationType) {
+    if (recipe?.stationType) {
       ctx.bumpDeedStat(r.meta, 'hubCraftsPerformed', 1);
     }
     // A masterwork proc feeds the Masterwright counter
@@ -862,6 +863,18 @@ export function craftItem(
     // counter simply earns it on the next proc.
     if (result.masterwork) {
       ctx.bumpDeedStat(r.meta, 'masterworksCrafted', 1);
+    }
+    // Per-craft rare-tier milestone (issue #2055): the first rare-or-better
+    // output a player crafts in ONE craft marks that craft's milestone deed
+    // (prog_<craftId>_rare). Output quality is a deterministic fact of
+    // the recipe's result def (Professions 2.0 retired the output roll), so
+    // this is never luck-based: it lands the same way on every craft of the
+    // same recipe, gated only by knowing it and holding the reagents. Keyed
+    // on the recipe's craft, not the item, so a craft with no rare-tier
+    // recipe today (enchanting, jewelcrafting, inscription) simply never
+    // writes the mark and carries no deed reading it.
+    if (result.quality !== undefined && isSignableMaterialRarity(result.quality) && recipe) {
+      ctx.markVisited(r.meta, `craft_rare:${recipe.professionId}`);
     }
     // The dirty mark also covers the craft-skill gain the resolve applied.
     ctx.markDeedsDirty(r.meta.entityId);

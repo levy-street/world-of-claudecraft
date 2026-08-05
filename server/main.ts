@@ -71,11 +71,12 @@ import {
 import { pruneApplePendingLogins } from './apple_auth_db';
 import {
   hashPassword,
+  MAX_PASSWORD_LENGTH,
+  MIN_PASSWORD_LENGTH,
   newToken,
   normalizeCharName,
   normalizeEmail,
   offensiveName,
-  validPassword,
   validUsernameShape,
   verifyPassword,
 } from './auth';
@@ -1373,10 +1374,15 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
           error: 'username is not allowed',
           code: 'account.username_not_allowed',
         });
-      if (!validPassword(body.password))
+      if (typeof body.password !== 'string' || body.password.length < MIN_PASSWORD_LENGTH)
         return json(res, 400, {
-          error: 'password must be at least 6 chars',
+          error: `password must be at least ${MIN_PASSWORD_LENGTH} chars`,
           code: 'account.password_too_short',
+        });
+      if (body.password.length > MAX_PASSWORD_LENGTH)
+        return json(res, 400, {
+          error: `password must be at most ${MAX_PASSWORD_LENGTH} chars`,
+          code: 'account.password_too_long',
         });
       // Email is mandatory at signup: it is the recovery address that later proves
       // account ownership on a password reset, so we capture it up front.

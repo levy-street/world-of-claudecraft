@@ -628,10 +628,14 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(
 // at the same captured view, and only its swept provenance bytes follow the
 // merged rendererIntegration and layout inputs.
 // Re-minted with scripts/assets/eastbrook_grand_armoury/remint_polish_provenance.mjs.
+// Re-pinned again for the mobile-disconnect fix: src/render/renderer.ts gains the
+// bounded ground-object reuse pool (storePooledObject/takePooledObject cap), the
+// rendererIntegration leaf, so the composite (and the metadata file's second-order
+// digest that embeds it) re-mint once more.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '7e360a0508250c6a2ef7b8fe2af82417e46ab4dff791e1ce84668f849d3dbb80';
+  '90d5ab49680e3e2bf8be49f35acdc0d964275a51a337715fc57497acfeaf95a6';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '689949a0bc0e3d1e93749c88fe57780efa7f13049c83ee2293c2cf2b6e484d9a';
+  '628f66e2ba22fb456ca64603dfee7311bf766ee5d9ebe71d5e2b2109b01f1d3b';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1499,8 +1503,10 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // every measured value (frame timings, draw stats, triangle and scenario
     // numbers) is adopted verbatim from the base tip; no parent's literal
     // matched the merged tree, and no capture was retaken here.
+    // Re-pinned again for the mobile-disconnect fix's src/render/renderer.ts change
+    // (bounded ground-object reuse pool), recomputed by remint_polish_provenance.mjs.
     expect(fingerprint.digest('hex')).toBe(
-      'e9fa5d129bef83c763b06c2113f18468b2fa2fac59bd7b8e910a71c4221e5e82',
+      'd26892a5c5ea31b30370b477a5eb610a21b1267e7556b1efcdb6a6b96beb9d62',
     );
   });
 

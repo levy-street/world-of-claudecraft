@@ -459,6 +459,7 @@ describe('every professions grant site is accounted for (#2430)', () => {
   // widens which FILES are read, not which call shapes are recognized.
   const EXPECTED_GRANT_SITES: Record<string, number> = {
     'commission.ts': 1,
+    'commission_order.ts': 1,
     'crafting.ts': 6,
     'enchanting.ts': 4,
     'fishing.ts': 2,
@@ -474,6 +475,16 @@ describe('every professions grant site is accounted for (#2430)', () => {
     // fishing.ts: the once-ever Codfather quest catch returns before the
     // fishingResult emit, so the hub line and ding are its only feedback.
     'THE_CODFATHER_ITEM_ID',
+    // commission_order.ts deliverCommissionOrder: the recipient of this grant
+    // is the ORDER'S REQUESTER, a different player from the crafter who fired
+    // the command. The action's own commissionOrderResult event is personal to
+    // the ACTOR (pid: the crafter), never to the requester, so eliding the hub
+    // line here would leave the requester with no feedback at all when the
+    // commissioned piece lands in their bags: the ordinary "You receive:" loot
+    // line and cue are the requester's ONLY notification, exactly like a
+    // completed trade (trade.ts's grantOffer, outside this directory, stays
+    // loud for the identical reason).
+    'order.requesterId',
   ];
 
   // Source with comments removed (`://` protocol slashes preserved), the repo's

@@ -316,8 +316,27 @@ report "Kept N bound copies."). Mail and market carry instanced copies
 `isTransferLockedInstance` (`src/sim/item_instance_transfer.ts`) refuses
 `boundTo`-bound and armed (`bindOnTrade`) copies on both pipes. Vendor and
 bank refusal of bound copies stays emergent from fungible-only escrow;
-`tests/professions_bind_on_trade_surfaces.test.ts` remains the wall. The
-commission ORDER workflow stays wave 2 (#1298).
+`tests/professions_bind_on_trade_surfaces.test.ts` remains the wall.
+
+The commission ORDER workflow (#1298) is a first slice on top of the
+primitive above: `src/sim/professions/commission_order.ts` owns an
+in-memory (not persisted across a restart, the trade/duel precedent) order
+board a requester opens (`open` scope admits any crafter, `crafter` scope
+names one by character name, resolved the whisper way) with NO escrow (a
+later extension needs order-time material escrow, still unbuilt); a crafter
+`accept`s, crafts the recipe with the existing commission opt-in exactly as
+before, then `deliver`s the still-unbound commissioned copy face to face
+(the same bind-on-first-trade stamp trade.ts's `grantOffer` applies, in
+range like a trade), which is what makes the recipient the ORDER's
+recipient rather than whoever happens to receive the first trade. The
+requester can `cancel` only before acceptance. A retention sweep
+(`updateCommissionOrders`) expires a stale open order after 24 sim-hours
+and prunes a terminal one after a short retain window. Client UI: a header
+button in the crafting window opens the order board window
+(`src/ui/commission_order_view.ts` + `commission_order_window.ts`).
+Deliberately out of scope for this slice: guild/friends-scoped orders (the
+sim has no offline notion of either, both being account/server-only),
+cross-restart persistence, and recipient-tied required-material escrow.
 
 ### Stations, masters, training
 Stations are master NPCs. Six station types (forge, kitchens, loom,
@@ -781,9 +800,11 @@ must be re-derived if either number is ever tuned on its own.
   (`server/http/game_signals.ts`).
 
 ### Deferred follow-ups (recorded, not scheduled)
-- Wave 2 on #1866/#1298: the commission ORDER workflow, market/mail
-  carriage for instanced goods (must re-enforce the boundTo lock
-  explicitly), batch salvage UI.
+- Wave 2 on #1866: market/mail carriage for instanced goods (must
+  re-enforce the boundTo lock explicitly; #1146), batch salvage UI. The
+  commission ORDER workflow itself shipped a first slice on #1298 (see
+  above); guild/friends-scoped orders, cross-restart persistence, and
+  recipient-tied material escrow remain unbuilt follow-ups on that slice.
 - Two-procs-one-drain masterwork toast coalescing (celebration plan-contract
   change; banner and sound coalescing are by design).
 - Windfall per-instance loot-line burst batching polish.

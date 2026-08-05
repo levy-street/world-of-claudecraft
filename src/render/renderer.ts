@@ -229,6 +229,11 @@ import {
 import { GlacialFrontVisual } from './glacial_front_visual';
 import { buildGreatTreePrewarmGroup } from './great_tree_prewarm';
 import { GroundAimReticleVisual } from './ground_aim_reticle_visual';
+import {
+  type PooledObjectView,
+  storePooledObject as storeGroundObjectInPool,
+  takeOrBuildGroundObject,
+} from './ground_object_pool';
 import { createGroundTilt, type GroundTiltState, stepGroundTilt } from './ground_tilt_core';
 import { buildHauntFeatures, type HauntFeaturesView } from './haunt_features';
 import { buildHollowGates } from './hollow_gates';
@@ -856,11 +861,6 @@ export interface RendererPrewarmStats {
   timedOutEntryIds: string[];
   failedEntryIds: string[];
   diagnosticsBaseline: RendererPrewarmDiagnosticsBaselineStats | null;
-}
-
-interface PooledObjectView {
-  group: THREE.Group;
-  height: number;
 }
 
 interface ClickMarkerSlot {
@@ -1774,6 +1774,7 @@ export class Renderer {
   private visualPool = new Map<string, CharacterVisual[]>();
   private pooledVisualCount = 0;
   private objectPool = new Map<string, PooledObjectView[]>();
+  private pooledObjectCount = 0;
   private prewarmDepthMaterials = new Map<string, THREE.MeshDepthMaterial>();
   private readonly canvas: HTMLCanvasElement;
   private unregisterWebGLContext: (() => void) | null = null;
@@ -2820,6 +2821,7 @@ export class Renderer {
     this.visualPool.clear();
     this.pooledVisualCount = 0;
     this.objectPool.clear();
+    this.pooledObjectCount = 0;
     this.clickTargets.length = 0;
     this.gatherNodeMeshes = [];
     this.viewLights.length = 0;
@@ -4591,30 +4593,17 @@ export class Renderer {
     return `object:${e.objectItemId}`;
   }
 
-  private takePooledObject(key: string): PooledObjectView | null {
-    const pool = this.objectPool.get(key);
-    const object = pool?.pop() ?? null;
-    if (!object) return null;
-    object.group.removeFromParent();
-    object.group.visible = true;
-    object.group.position.set(0, 0, 0);
-    object.group.rotation.set(0, 0, 0);
-    object.group.scale.set(1, 1, 1);
-    return object;
-  }
-
   private storePooledObject(key: string, object: PooledObjectView): void {
-    object.group.removeFromParent();
-    object.group.visible = false;
-    object.group.position.set(0, 0, 0);
-    object.group.rotation.set(0, 0, 0);
-    object.group.scale.set(1, 1, 1);
-    let pool = this.objectPool.get(key);
-    if (!pool) {
-      pool = [];
-      this.objectPool.set(key, pool);
-    }
-    pool.push(object);
+    // Unlike the character-visual pool, an overflow view has nothing to .dispose(): its
+    // geometry/materials are shared per-item-template references (owned elsewhere), so
+    // simply not pooling it drops the only reference to its Group/Object3D graph and lets
+    // GC reclaim it. Without this cap every distinct harvest node/loot pile/quest pickup a
+    // player interacted with stayed retained for the rest of the session on every platform.
+    // shouldRetainPooledCharacterVisual is a generic bounded-retention check (currentCount
+    // < maxCount, Infinity-safe); reused here rather than duplicating it under a second name.
+    if (!shouldRetainPooledCharacterVisual(this.pooledObjectCount, GFX.maxPooledObjects)) return;
+    storeGroundObjectInPool(this.objectPool, key, object);
+    this.pooledObjectCount++;
   }
 
   private templateIdsInZone(zone: ZoneDef, kind: 'mob' | 'npc'): string[] {
@@ -6864,18 +6853,22 @@ export class Renderer {
       // Ward shard orbit, and no flag carrier ring or lean.
       group.userData.bg = built.group.userData.bg;
     } else if (e.kind === 'object') {
-      objectPoolKey = this.objectPoolKeyFor(e);
-      const pooled = objectPoolKey ? this.takePooledObject(objectPoolKey) : null;
-      if (pooled) {
-        body = pooled.group;
-        height = pooled.height;
-        body.rotation.y = (e.id % 7) * 0.45;
-      } else {
-        const built = buildGroundQuestObject(e.objectItemId ?? '', e.id);
-        body = built.group;
-        height = built.height;
-        objectPoolKey = null;
-      }
+      // Pool MISS keeps its pool key (mirrors the character-visual pool's
+      // "Pool MISS: build a fresh visual but KEEP its pool key" above): see
+      // ground_object_pool.ts for why nulling it here used to corrupt the
+      // forever-cached, geometry-sharing template every ground object clones.
+      const result = takeOrBuildGroundObject(this.objectPool, this.objectPoolKeyFor(e), () =>
+        buildGroundQuestObject(e.objectItemId ?? '', e.id),
+      );
+      // takeOrBuildGroundObject pops through its own internal takePooledObject,
+      // not this class's storePooledObject counterpart, so a HIT here must mirror
+      // storePooledObject's increment by decrementing pooledObjectCount itself;
+      // otherwise the retention cap (GFX.maxPooledObjects) only ever counts up.
+      if (result.reused) this.pooledObjectCount = Math.max(0, this.pooledObjectCount - 1);
+      objectPoolKey = result.poolKey;
+      body = result.object.group;
+      height = result.object.height;
+      if (result.reused) body.rotation.y = (e.id % 7) * 0.45;
       objectMesh = body;
       if (!this.sparkleMat) {
         this.sparkleMat = new THREE.SpriteMaterial({

@@ -329,6 +329,7 @@ export const editorStrings = {
     terrainCapReached: 'Terrain edit limit reached ({max}). Extra sculpt stamps were not added.',
     placementCapReached: 'Placement limit reached ({max}). Extra assets were not added.',
     blockerCapReached: 'Blocker wall limit reached ({max}). The new wall was not added.',
+    campCapReached: 'Camp limit reached ({max}). The new camp was not added.',
     autosaveOff: 'Autosave turned off: {reason} Save manually, then turn it back on.',
   },
 

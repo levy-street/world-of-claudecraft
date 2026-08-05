@@ -6865,6 +6865,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.partyGroup': 'Grupp {n}',
   'hudChrome.unitFrame.partyLabel': 'Ditt följe',
   'hudChrome.unitFrame.playerLabel': 'Din hjälte',
+  'hudChrome.unitFrame.petLabel': 'Ditt djur',
   'hudChrome.unitFrame.targetAnnounce': 'Markera {name}',
   'hudChrome.unitFrame.targetLabel': 'Ditt mål',
   'hudChrome.widgets.clockTitle': 'Lokal tid - klicka för att växla mellan 12/24-timmar',
@@ -7861,6 +7862,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.event.hint': 'Annonsera en raid, träff eller ett evenemang',
   'hudChrome.discord.relay.help.label': 'Behöver hjälp',
   'hudChrome.discord.relay.help.hint': 'Be gemenskapen om hjälp',
+  'hudChrome.options.hideUnusedActionSlots': 'Dölj oanvända åtgärdsrutor',
   'hudChrome.options.showSecondaryActionBar': 'Visa sekundärt handlingsfält',
   'errors.api.desktopCodeInvalid':
     'Inloggningskoden för skrivbordsappen är ogiltig eller har gått ut. Försök igen.',
@@ -9103,6 +9105,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.keybinds.petAttack': 'Djur: Anfall',
   'hudChrome.keybinds.petDefensive': 'Djur: Defensivt',
   'hudChrome.keybinds.petStop': 'Djur: Stanna',
+  'hudChrome.keybinds.targetPet': 'Djur: Måltavla',
   'hudChrome.keybinds.petTaunt': 'Djur: Provocera',
   'hudChrome.keybinds.mount': 'Sitt upp / Stig av',
   'hudChrome.mailbox.parcelQtyDecreaseAria': 'Skicka en {item} mindre',
@@ -10076,6 +10079,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hud.combat.evaded': '{target} undkommer din {ability}.',
   'hudChrome.options.mouseoverCast': 'Kasta via muspekaren på gruppramarna',
   'hudChrome.options.showTargetOfTarget': 'Visa målets mål',
+  'hudChrome.options.showPetFrame': 'Visa ditt djur',
   'hudChrome.unitFrame.targetOfTargetLabel': 'Målets mål',
   'itemUi.market.rarityLegendary': 'Legendarisk',
   'loading.reconnectingAttempt':

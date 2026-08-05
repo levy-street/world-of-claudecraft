@@ -778,6 +778,10 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
     reflowAllow: { '.scrollTop': 6, '.scrollLeft': 2 },
     driverAllow: {},
   },
+  // Same scroll pair as the vendor family's cold windows above: read the
+  // position before the rebuild, write it back after, so the order list
+  // does not jump under the player on their own action's repaint.
+  { file: 'commission_order_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },
   // Two polls that repaint an OPEN window only: a 15s refresh of the reward state and a 30s
   // countdown tick. Page cadence rather than frame cadence, and both no-op while closed.
   {

@@ -28,6 +28,7 @@
 // tests/architecture.test.ts.
 
 import { isDispellableAura } from '../aura_classify';
+import { nearestAttackerId } from '../auto_acquire_target';
 import { ITEMS, isDelvePos, MOBS, zoneAt } from '../data';
 import { recalcPlayerStats } from '../entity';
 import { isShieldItem } from '../equipment_rules';
@@ -39,6 +40,7 @@ import { scheduleProjectile } from '../projectile_travel';
 import type { PlayerMeta, ResolvedAbility } from '../sim';
 import type { SimContext } from '../sim_context';
 import { abilityScalingPower, channelTickBonus } from '../spell_scaling';
+import { resolveTalentHitMult } from '../talent_hit_mult';
 import { hasEscapeStealth } from '../threat';
 import type { AbilityDef, AbilityEffect, Entity, Vec3 } from '../types';
 import {
@@ -355,7 +357,7 @@ export function updateCasting(ctx: SimContext, p: Entity, meta: PlayerMeta): voi
         ctx.applyDemonHealTick(p);
       } else {
         const res = ctx.resolvedAbility(abilityId, p.id);
-        if (res) applyChannelTick(ctx, p, res);
+        if (res) applyChannelTick(ctx, p, meta, res);
       }
     };
     p.channelTickTimer -= DT;
@@ -609,6 +611,27 @@ function vanishedLowBlowFallbackTarget(
   return nearest;
 }
 
+// Auto-acquire on cast with no target (issue #2787): the nearest live,
+// hostile mob currently attacking (Entity.aggroTargetId) the caster. Called
+// only from castAbility's target-resolution branches below, and only when
+// the caster has no current target at all (p.targetId === null); it never
+// overrides an existing (even stale) selection.
+function nearestAttackingMob(ctx: SimContext, p: Entity): Entity | null {
+  const candidates: { id: number; d: number; facingDiff: number }[] = [];
+  for (const entity of ctx.entities.values()) {
+    if (entity.kind !== 'mob' || entity.dead) continue;
+    if (entity.aggroTargetId !== p.id) continue;
+    if (!ctx.isHostileTo(p, entity)) continue;
+    candidates.push({
+      id: entity.id,
+      d: dist2d(p.pos, entity.pos),
+      facingDiff: Math.abs(normAngle(angleTo(p.pos, entity.pos) - p.facing)),
+    });
+  }
+  const id = nearestAttackerId(candidates);
+  return id !== null ? (ctx.entities.get(id) ?? null) : null;
+}
+
 export function castAbility(
   ctx: SimContext,
   abilityId: string,
@@ -830,6 +853,12 @@ export function castAbility(
     }
   } else if (ability.requiresTarget && ability.targetType === 'any') {
     target = p.targetId !== null ? (ctx.entities.get(p.targetId) ?? null) : null;
+    // Auto-acquire (issue #2787): only when nothing is targeted at all, never
+    // overriding an existing (even stale/invalid) selection.
+    if (!target && p.targetId === null) {
+      target = nearestAttackingMob(ctx, p);
+      if (target) p.targetId = target.id;
+    }
     if (
       !target ||
       target.dead ||
@@ -853,10 +882,18 @@ export function castAbility(
       return;
     }
   } else if (ability.requiresTarget) {
-    target =
-      p.targetId !== null
-        ? (ctx.entities.get(p.targetId) ?? null)
-        : vanishedLowBlowFallbackTarget(ctx, p, ability);
+    if (p.targetId !== null) {
+      target = ctx.entities.get(p.targetId) ?? null;
+    } else {
+      // The stealth ambush fallback (Kidney Shot) takes priority when it
+      // applies; it deliberately never becomes the current target. Auto-
+      // acquire (issue #2787) only kicks in when that yields nothing either.
+      target = vanishedLowBlowFallbackTarget(ctx, p, ability);
+      if (!target) {
+        target = nearestAttackingMob(ctx, p);
+        if (target) p.targetId = target.id;
+      }
+    }
     // Vanish (hasEscapeStealth) makes the target fully undetectable, same gate
     // the mob AI already applies (mob/targeting.ts): a hostile cast against it
     // is refused exactly like an out-of-range or dead target (issue #2426).
@@ -1345,7 +1382,19 @@ function armAbilityCooldown(
   p.cooldowns.set(abilityId, cooldown);
 }
 
-function applyChannelTick(ctx: SimContext, p: Entity, res: ResolvedAbility): void {
+function applyChannelTick(
+  ctx: SimContext,
+  p: Entity,
+  meta: PlayerMeta,
+  res: ResolvedAbility,
+): void {
+  // The resolved talent/mastery multiplier for this channel (talent_hit_mult.ts):
+  // reused across every branch below so a per-tick SP/AP rider scales with the
+  // same percentage already baked into the tick's base min/max (issue #1803).
+  const { dmgMult: talentDmgMult, healMult: talentHealMult } = resolveTalentHitMult(
+    res.def,
+    ctx.playerMods(meta),
+  );
   // Ground-targeted channels (Rain of Fire / Volley / Hurricane): each tick pulses
   // the ability's aoeDamage at the aimed point (clamped at cast start, held in
   // castAim for the channel's life), independent of any entity target.
@@ -1362,7 +1411,7 @@ function applyChannelTick(ctx: SimContext, p: Entity, res: ResolvedAbility): voi
       radius,
       ability: res.def.id,
     });
-    const channelSp = channelTickBonus(abilityScalingPower(p, res.def), res.def);
+    const channelSp = channelTickBonus(abilityScalingPower(p, res.def), res.def, talentDmgMult);
     // How many enemies this pulse actually struck: Blizzard's Frozen Orb
     // refund (frostMageChannelPulse below) scales with it.
     let struck = 0;
@@ -1409,7 +1458,7 @@ function applyChannelTick(ctx: SimContext, p: Entity, res: ResolvedAbility): voi
   // ground point) and from the single-target channel below.
   if (!res.def.requiresTarget && res.effects.some((eff) => eff.type === 'aoeDamage')) {
     const isSpell = res.def.school !== 'physical';
-    const channelSp = channelTickBonus(abilityScalingPower(p, res.def), res.def);
+    const channelSp = channelTickBonus(abilityScalingPower(p, res.def), res.def, talentDmgMult);
     for (const eff of res.effects) {
       if (eff.type !== 'aoeDamage') continue;
       ctx.emit({
@@ -1478,7 +1527,7 @@ function applyChannelTick(ctx: SimContext, p: Entity, res: ResolvedAbility): voi
   // Self-centered healing channels pulse around the caster's live position on
   // every tick. Instant aoeHeal effects still resolve once through effect_dispatch.
   if (!res.def.requiresTarget && res.effects.some((eff) => eff.type === 'aoeHeal')) {
-    const channelSp = channelTickBonus(abilityScalingPower(p, res.def), res.def);
+    const channelSp = channelTickBonus(abilityScalingPower(p, res.def), res.def, talentHealMult);
     for (const eff of res.effects) {
       if (eff.type !== 'aoeHeal') continue;
       ctx.emit({
@@ -1532,7 +1581,7 @@ function applyChannelTick(ctx: SimContext, p: Entity, res: ResolvedAbility): voi
   // Each channel bolt (e.g. Arcane Missiles) deals its damage on arrival, not on the
   // tick it is fired; a target that dies mid-flight fizzles it (the drain's guard).
   scheduleProjectile(ctx, p, target, (src, tgt) => {
-    const channelSp = channelTickBonus(abilityScalingPower(src, res.def), res.def);
+    const channelSp = channelTickBonus(abilityScalingPower(src, res.def), res.def, talentDmgMult);
     // Aether Darts: the FIRST landed missile consumes the caster's Arcane Charges
     // and locks a flat per-missile Arcane bonus (combat/chronomancy.ts); later
     // missiles reuse it. It is plain Arcane damage, so Temporal Echo heals from it

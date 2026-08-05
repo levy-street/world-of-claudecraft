@@ -2,7 +2,7 @@
   "scenario": "professions_fishing_session",
   "seed": 1,
   "sampleEvery": 100,
-  "ticks": 99,
+  "ticks": 94,
   "coverage": [
     "class:warrior (angler)",
     "startFishing cast start: water probe + bite-delay rng draw",
@@ -12,13 +12,13 @@
     "post-completion re-press: a fresh cast begins (no stale session state)"
   ],
   "draws": 3,
-  "drawDigest": "1e79975d",
+  "drawDigest": "5f12ed66",
   "frames": [
     {
       "tick": 0,
       "time": 0,
-      "nextId": 946,
-      "state": "bcf448e3",
+      "nextId": 964,
+      "state": "79743a94",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -57,7 +57,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 941,
+          "entityId": 959,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -93,7 +93,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 941
+              "sourceId": 959
             }
           ],
           "blockChance": 0.05,
@@ -106,7 +106,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 100,
-          "id": 941,
+          "id": 959,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -150,12 +150,12 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 946,
-      "state": "a180c1bf",
-      "events": "6bb2c537",
+      "nextId": 964,
+      "state": "d1ba7d18",
+      "events": "9988cb27",
       "rng": {
         "draws": 1,
-        "digest": "acd1c827"
+        "digest": "635aa48c"
       },
       "label": "cast-start",
       "players": [
@@ -191,7 +191,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 941,
+          "entityId": 959,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -231,7 +231,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 941
+              "sourceId": 959
             }
           ],
           "blockChance": 0.05,
@@ -245,11 +245,11 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
           "fallStartY": -2.981028,
-          "fishBiteAtTick": 91,
+          "fishBiteAtTick": 86,
           "fishCastZoneId": "eastbrook_vale",
           "fiveSecondRule": 99,
           "hp": 100,
-          "id": 941,
+          "id": 959,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -291,14 +291,14 @@
       ]
     },
     {
-      "tick": 91,
-      "time": 4.55,
-      "nextId": 946,
-      "state": "06d92704",
-      "events": "29353770",
+      "tick": 86,
+      "time": 4.3,
+      "nextId": 964,
+      "state": "cc63a8ff",
+      "events": "affa4108",
       "rng": {
         "draws": 1,
-        "digest": "acd1c827"
+        "digest": "635aa48c"
       },
       "label": "bite-armed",
       "players": [
@@ -334,7 +334,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 941,
+          "entityId": 959,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -372,27 +372,27 @@
               "id": "battle_stance",
               "kind": "battle_stance",
               "name": "Battle Stance",
-              "remaining": 3595.45,
+              "remaining": 3595.7,
               "school": "physical",
-              "sourceId": 941
+              "sourceId": 959
             }
           ],
           "blockChance": 0.05,
           "blockValue": 6,
-          "castRemaining": 10.45,
+          "castRemaining": 10.7,
           "castTotal": 15,
           "castingAbility": "fishing",
-          "combatTimer": 103.55,
+          "combatTimer": 103.3,
           "comboUntil": -1,
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
           "fallStartY": -2.981028,
           "fishCastZoneId": "eastbrook_vale",
-          "fishReelDeadlineTick": 141,
-          "fiveSecondRule": 103.55,
+          "fishReelDeadlineTick": 136,
+          "fiveSecondRule": 103.3,
           "hp": 100,
-          "id": 941,
+          "id": 959,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -434,14 +434,14 @@
       ]
     },
     {
-      "tick": 91,
-      "time": 4.55,
-      "nextId": 946,
-      "state": "d2dbf5a0",
-      "events": "4a98924d",
+      "tick": 86,
+      "time": 4.3,
+      "nextId": 964,
+      "state": "d57ebf45",
+      "events": "e279fb5a",
       "rng": {
         "draws": 2,
-        "digest": "00a2a78c"
+        "digest": "d9dab85a"
       },
       "label": "reel-landed",
       "players": [
@@ -470,7 +470,7 @@
             "itemsDiscovered": [
               "baked_bread",
               "eastbrook_buckler",
-              "raw_river_perch",
+              "raw_mirror_trout",
               "recruit_tunic",
               "simple_fishing_pole",
               "worn_sword"
@@ -481,7 +481,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 941,
+          "entityId": 959,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -501,7 +501,7 @@
             },
             {
               "count": 1,
-              "itemId": "raw_river_perch"
+              "itemId": "raw_mirror_trout"
             }
           ],
           "mailWelcomed": true,
@@ -529,23 +529,23 @@
               "id": "battle_stance",
               "kind": "battle_stance",
               "name": "Battle Stance",
-              "remaining": 3595.45,
+              "remaining": 3595.7,
               "school": "physical",
-              "sourceId": 941
+              "sourceId": 959
             }
           ],
           "blockChance": 0.05,
           "blockValue": 6,
           "castTotal": 15,
-          "combatTimer": 103.55,
+          "combatTimer": 103.3,
           "comboUntil": -1,
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
           "fallStartY": -2.981028,
-          "fiveSecondRule": 103.55,
+          "fiveSecondRule": 103.3,
           "hp": 100,
-          "id": 941,
+          "id": 959,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -587,14 +587,14 @@
       ]
     },
     {
-      "tick": 99,
-      "time": 4.95,
-      "nextId": 946,
-      "state": "105ceff1",
-      "events": "d4b09adb",
+      "tick": 94,
+      "time": 4.7,
+      "nextId": 964,
+      "state": "c67e7775",
+      "events": "943b953c",
       "rng": {
         "draws": 3,
-        "digest": "1e79975d"
+        "digest": "5f12ed66"
       },
       "label": "final",
       "players": [
@@ -623,7 +623,7 @@
             "itemsDiscovered": [
               "baked_bread",
               "eastbrook_buckler",
-              "raw_river_perch",
+              "raw_mirror_trout",
               "recruit_tunic",
               "simple_fishing_pole",
               "worn_sword"
@@ -644,7 +644,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 941,
+          "entityId": 959,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -666,7 +666,7 @@
             },
             {
               "count": 1,
-              "itemId": "raw_river_perch"
+              "itemId": "raw_mirror_trout"
             }
           ],
           "mailWelcomed": true,
@@ -689,9 +689,9 @@
               "id": "battle_stance",
               "kind": "battle_stance",
               "name": "Battle Stance",
-              "remaining": 3595.05,
+              "remaining": 3595.3,
               "school": "physical",
-              "sourceId": 941
+              "sourceId": 959
             }
           ],
           "blockChance": 0.05,
@@ -699,17 +699,17 @@
           "castRemaining": 14.6,
           "castTotal": 15,
           "castingAbility": "fishing",
-          "combatTimer": 103.95,
+          "combatTimer": 103.7,
           "comboUntil": -1,
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
           "fallStartY": -2.981028,
-          "fishBiteAtTick": 234,
+          "fishBiteAtTick": 219,
           "fishCastZoneId": "eastbrook_vale",
-          "fiveSecondRule": 103.95,
+          "fiveSecondRule": 103.7,
           "hp": 100,
-          "id": 941,
+          "id": 959,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",

@@ -388,6 +388,8 @@ export const vi_VN: AdminTranslations = {
   "moderationHistory.actionKill": "Đã tiêu diệt",
   "moderationHistory.actionJail": "Đã bỏ tù",
   "moderationHistory.actionUnjail": "Đã thả khỏi tù",
+  "moderationHistory.actionSpectate": "Spectated",
+  "moderationHistory.actionUnspectate": "Stopped spectating",
   "moderationHistory.actionNote": "Ghi chú",
   "moderationHistory.actionResetPassword": "Đã đặt lại mật khẩu",
   "moderationHistory.actionDailyRewardsBan": "Đã cấm tham gia Phần Thưởng Hằng Ngày",

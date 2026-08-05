@@ -3586,6 +3586,10 @@ export interface Entity extends ClientMirroredEntityFields {
   petManualTauntPending?: boolean; // manual Growl command waiting until the pet reaches range
   petPath: Vec3[]; // controlled pet heel route around obstacles; consumed front-to-back (like chargePath)
   petPathCooldown: number; // seconds until this pet may recompute its heel path again
+  // Health this pet currently inherits from its owner (pet/pet_scaling.ts). Tracked
+  // separately from maxHp because the raid stat auras add to maxHp too: re-deriving
+  // the share means swapping THIS delta, never recomputing maxHp from the template.
+  petOwnerHpBonus: number;
   pulseTimer: number; // boss aoe pulse countdown
   stompTimer: number; // boss War Stomp stun-pulse countdown
   bigCastTimer: number; // boss telegraphed-hardcast (bigCast) cadence countdown
@@ -4993,6 +4997,45 @@ export type SimEvent = { pid?: number } & (
         | 'unbind_cannot_afford';
       fee: number;
     }
+  // Commission order board outcome (issue #1298): mirrors one of
+  // professions/commission_order.ts's four result shapes (OpenOrderResult/
+  // CancelOrderResult/AcceptOrderResult/DeliverOrderResult), discriminated by
+  // `action`. Personal (emitted with pid = the acting player's entity id, the
+  // requester for 'open'/'cancel', the crafter for 'accept'/'deliver').
+  // Text-free on purpose (the trainResult precedent): the client derives
+  // recipe/item/player names from ids plus static content, so the event
+  // carries NO display text. `orderId` is absent only on 'open' failing
+  // before an order exists (unknown-recipe, ineligible output, unknown
+  // crafter, self-target, or the open-order cap); every other action always
+  // names the order id, even on a deny. `reason` is absent on success.
+  | {
+      type: 'commissionOrderResult';
+      action: 'open' | 'cancel' | 'accept' | 'deliver';
+      ok: boolean;
+      orderId?: number;
+      itemId?: string;
+      // The requester's display name, resolved off the still-retained order
+      // record (issue #1298 follow-up): 'deliver' is the crafter's own
+      // action, so ev.pid names the crafter, not the requester the client
+      // needs to greet in the success line.
+      requesterName?: string;
+      reason?:
+        | 'unknown_recipe'
+        | 'not_commission_eligible'
+        | 'unknown_crafter'
+        | 'self_crafter'
+        | 'too_many_open'
+        | 'unknown_order'
+        | 'order_not_open'
+        | 'self_order'
+        | 'not_eligible_crafter'
+        | 'not_your_order'
+        | 'order_not_accepted'
+        | 'not_your_acceptance'
+        | 'not_crafted'
+        | 'deliver_out_of_range'
+        | 'no_space';
+    }
   // Masterwork proc (Professions 2.0): a successful craft's single
   // output-side rng draw procced, minting a masterwork instance with baked
   // bonus stats. Personal (emitted with pid = the crafter's entity id, which
@@ -5890,7 +5933,9 @@ export type DeedStatKey =
   | 'hubCraftsPerformed'
   | 'attunementsCompleted'
   | 'masterworksCrafted'
-  | 'salvagesPerformed';
+  | 'salvagesPerformed'
+  | 'riftClears'
+  | 'riftSRankClears';
 
 // The canonical counter key list (init/serialize iterate it in this fixed
 // order so equal states always serialize byte-equal).
@@ -5919,6 +5964,8 @@ export const DEED_STAT_KEYS: readonly DeedStatKey[] = [
   'attunementsCompleted',
   'masterworksCrafted',
   'salvagesPerformed',
+  'riftClears',
+  'riftSRankClears',
 ];
 
 // Numeric readings computed from already-persisted PlayerMeta state (never new

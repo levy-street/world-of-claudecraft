@@ -297,6 +297,33 @@ describe('applyEnchant', () => {
     expect(sim.ctx.countFungibleItem('eastbrook_arming_sword', pid)).toBe(0);
   });
 
+  // Regression for issue #2825: every shipped offhand item (eastbrook_buckler
+  // is a shield, ItemDef.slot 'offhand') was refused wrong_slot by every
+  // enchant, since enchants.ts defined a base enchant for every equip slot
+  // EXCEPT 'offhand'. Exercises the real content item end to end: apply,
+  // then equip, and check the stat lands.
+  it('applies to a real shipped offhand item (a shield), the slot every enchant used to refuse', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    expect(ITEMS.eastbrook_buckler.slot).toBe('offhand');
+    const baseSta = sim.player.stats.sta;
+    sim.addItem('eastbrook_buckler', 1, pid);
+    sim.addItem('arcane_dust', 5, pid);
+    const result = resolveApplyEnchant(
+      sim.ctx,
+      pid,
+      'eastbrook_buckler',
+      'enchant_offhand_stamina',
+    );
+    expect(result.ok).toBe(true);
+    expect(sim.countItem('arcane_dust', pid)).toBe(0);
+    expect(sim.ctx.countFungibleItem('eastbrook_buckler', pid)).toBe(0);
+
+    expect(ENCHANTS.enchant_offhand_stamina.statBonus.sta).toBe(3);
+    sim.equipItem('eastbrook_buckler');
+    expect(sim.player.stats.sta).toBe(baseSta + 3);
+  });
+
   it('equipping the enchanted copy boosts the matching stat; unequipping preserves it in bags', () => {
     const sim = makeSim();
     const pid = sim.playerId;
@@ -696,6 +723,7 @@ describe('ENCHANTS table integrity', () => {
   // itemSlot fails here rather than silently making the enchant unusable.
   const VALID_ITEM_SLOTS = new Set([
     'mainhand',
+    'offhand',
     'helmet',
     'neck',
     'shoulder',

@@ -21,6 +21,7 @@ import type { GuildBankState } from './guild_bank';
 import type { PendingLootRoll } from './loot/loot_roll';
 import type { MarketListing } from './market';
 import type { MobScanCounters } from './mob/scan_counters';
+import type { CommissionOrder } from './professions/commission_order';
 import type { PendingProjectile } from './projectile_travel';
 import type { NaturalRiftPortal } from './rift/portals';
 import type { RiftEvent, RiftInstance } from './rift/types';
@@ -302,6 +303,16 @@ export interface SimContextPrimitives {
   // reassigned), so a read-only live view; the fields themselves stay writable so
   // the hot paths can increment them. Feeds no gameplay branch and draws no rng.
   readonly mobScanCounters: MobScanCounters;
+  // Commission order board (Professions 2.0, issue #1298): the live order
+  // list, mutated in place by professions/commission_order.ts (push on open,
+  // field updates on accept/deliver, splice on the retention sweep), like
+  // groundAoEs/marketListings above. Named `commissionOrderBoard` (not
+  // `commissionOrders`) so it never collides with the IWorldProfessions
+  // per-viewer PROJECTION of the same name (Sim.commissionOrders): two
+  // different shapes, the raw shared list versus one viewer's filtered rows.
+  // `nextCommissionOrderId` is the id counter, read-write like nextLootRollId.
+  readonly commissionOrderBoard: CommissionOrder[];
+  nextCommissionOrderId: number;
 }
 
 // Cross-system callbacks. Each signature mirrors the still-on-`Sim` method it
@@ -1283,6 +1294,15 @@ export function createSimContext(host: SimContextHost): SimContext {
     },
     get mobScanCounters() {
       return host.mobScanCounters;
+    },
+    get commissionOrderBoard() {
+      return host.commissionOrderBoard;
+    },
+    get nextCommissionOrderId() {
+      return host.nextCommissionOrderId;
+    },
+    set nextCommissionOrderId(v) {
+      host.nextCommissionOrderId = v;
     },
     emit: host.emit,
     error: host.error,

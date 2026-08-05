@@ -7096,6 +7096,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.partyGroup': 'Grupa {n}',
   'hudChrome.unitFrame.partyLabel': 'Twoja drużyna',
   'hudChrome.unitFrame.playerLabel': 'Twój bohater',
+  'hudChrome.unitFrame.petLabel': 'Twoje zwierzę',
   'hudChrome.unitFrame.targetAnnounce': 'Oznacz {name}',
   'hudChrome.unitFrame.targetLabel': 'Twój cel',
   'hudChrome.widgets.clockTitle': 'Czas lokalny - kliknij, aby przełączyć format 12/24-godzinny',
@@ -8104,6 +8105,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.event.hint': 'Ogłoś rajd, spotkanie lub wydarzenie',
   'hudChrome.discord.relay.help.label': 'Potrzebuję pomocy',
   'hudChrome.discord.relay.help.hint': 'Poproś społeczność o pomoc',
+  'hudChrome.options.hideUnusedActionSlots': 'Ukryj nieużywane pola akcji',
   'hudChrome.options.showSecondaryActionBar': 'Pokaż dodatkowy pasek akcji',
   'errors.api.desktopCodeInvalid':
     'Kod logowania do aplikacji jest nieprawidłowy lub wygasł. Spróbuj ponownie.',
@@ -9299,6 +9301,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.keybinds.petAttack': 'Zwierzę: Atak',
   'hudChrome.keybinds.petDefensive': 'Zwierzę: Obronne',
   'hudChrome.keybinds.petStop': 'Zwierzę: Zatrzymaj',
+  'hudChrome.keybinds.targetPet': 'Zwierzę: Obierz',
   'hudChrome.keybinds.petTaunt': 'Zwierzę: Prowokacja',
   'hudChrome.keybinds.mount': 'Dosiądź / Zsiądź',
   'hudChrome.mailbox.parcelQtyDecreaseAria': 'Wyślij o jedną sztukę {item} mniej',
@@ -10275,6 +10278,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hud.combat.evaded': '{target} unika twojego {ability}.',
   'hudChrome.options.mouseoverCast': 'Rzucanie po najechaniu na ramki drużyny',
   'hudChrome.options.showTargetOfTarget': 'Pokaż cel celu',
+  'hudChrome.options.showPetFrame': 'Pokaż swoje zwierzę',
   'hudChrome.unitFrame.targetOfTargetLabel': 'Cel celu',
   'itemUi.market.rarityLegendary': 'Legendarny',
   'loading.reconnectingAttempt':

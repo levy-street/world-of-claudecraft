@@ -185,6 +185,28 @@ describe('DelveBoardController', () => {
     expect(test.delveBuyShopItem).not.toHaveBeenCalled();
   });
 
+  it('marks the panel a labeled dialog (accessible name, #2808)', () => {
+    const test = makeHarness();
+
+    test.controller.open(7);
+
+    expect(test.panel.getAttribute('role')).toBe('dialog');
+    expect(test.panel.getAttribute('aria-modal')).toBe('false');
+    expect(test.panel.getAttribute('tabindex')).toBe('-1');
+    expect(test.panel.getAttribute('aria-label')).toBe('Delve Board');
+    expect(test.panel.hasAttribute('aria-labelledby')).toBe(false);
+  });
+
+  it('keeps the same dialog name across a tab-switch rebuild', () => {
+    const test = makeHarness();
+    test.controller.open(7);
+
+    test.panel.querySelector<HTMLButtonElement>('[data-board-tab="shop"]')?.click();
+
+    expect(test.panel.getAttribute('role')).toBe('dialog');
+    expect(test.panel.getAttribute('aria-label')).toBe('Delve Board');
+  });
+
   it('closes and restores focus if the authoritative NPC disappears', () => {
     const test = makeHarness();
     test.controller.open(7);

@@ -737,4 +737,32 @@ export const table: DeedLocaleTable = {
     name: 'カモメは知っている',
     desc: '遠つ岸の水辺で魚を釣り上げる。',
   },
+  prog_engineering_rare: {
+    name: '精密工作',
+    desc: '工作で初めてのレア級アイテムを作る。',
+  },
+  prog_alchemy_rare: {
+    name: '稀少な逸品',
+    desc: '錬金術で初めてのレア級アイテムを作る。',
+  },
+  prog_cooking_rare: {
+    name: '忘れられぬ一皿',
+    desc: '料理で初めてのレア級アイテムを作る。',
+  },
+  prog_leatherworking_rare: {
+    name: '上質ななめし',
+    desc: '皮革加工で初めてのレア級アイテムを作る。',
+  },
+  prog_tailoring_rare: {
+    name: '名匠の一針',
+    desc: '裁縫で初めてのレア級アイテムを作る。',
+  },
+  prog_weaponcrafting_rare: {
+    name: '磨き上げた輝き',
+    desc: '武器鍛冶で初めてのレア級アイテムを作る。',
+  },
+  prog_armorcrafting_rare: {
+    name: '完璧な装甲',
+    desc: '防具鍛冶で初めてのレア級アイテムを作る。',
+  },
 };

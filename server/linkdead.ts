@@ -7,6 +7,12 @@
 // grace; they tear down through GameServer.leave() directly. This module is
 // the pure decision core so the join rules are unit-testable without a
 // GameServer.
+//
+// This is also the reconnect policy for a dropped dungeon run (issue #1351):
+// keeping the linkdead player's entity live and in place is what stops a
+// claimed instance's empty-timeout reaper (updateInstances,
+// src/sim/instances/dungeons.ts) from ever seeing it as empty during the
+// grace window. See that file's updateInstances comment for the full chain.
 
 export const LINKDEAD_GRACE_MS = 5 * 60 * 1000;
 

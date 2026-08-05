@@ -1,7 +1,13 @@
+import type {
+  CommissionOrderScope,
+  CommissionOrderStatus,
+} from '../sim/professions/commission_order';
 import type { MaterialRarity } from '../sim/professions/gathering';
 import type { PlayerProfessionSkill, ProfessionRecipeRecord } from '../sim/professions/types';
 import type { EquipSlot, StationDef } from '../sim/types';
 import type { WorldInteractionOutcome } from './interaction';
+
+export type { CommissionOrderScope, CommissionOrderStatus };
 
 // Render-safe projection of a player's professions standing. Stub as of
 // #1164, now real for the gathering professions (#1119): `skills` carries one
@@ -152,6 +158,26 @@ export interface ApplyEnchantResultView {
     // re-apply whose accept would be pure reagent loss.
     | 'already_enchanted'
     | 'same_enchant';
+}
+
+// Commission order board (Professions 2.0, issue #1298): the viewer's own
+// projection of one order, mirrored from src/sim/professions/commission_order.ts
+// CommissionOrderRow. String-free per the seam rule aside from names (requester/
+// crafter display names, exactly like MarketListingView's sellerName above).
+export interface CommissionOrderView {
+  id: number;
+  requesterName: string;
+  recipeId: string;
+  itemId: string;
+  scope: CommissionOrderScope;
+  crafterName?: string;
+  status: CommissionOrderStatus;
+  acceptedByName?: string;
+  /** The viewer is the requester who opened this order. */
+  mine: boolean;
+  /** The viewer is the crafter who accepted this order, or (while it is
+   *  still open) the specific crafter a 'crafter'-scope order names. */
+  mineToCraft: boolean;
 }
 
 // One gathering profession's slotted tool effect, as the HUD reads it.
@@ -324,6 +350,27 @@ export interface IWorldProfessions {
   // `unbindResult` event; the cleared payload converges via the self
   // inventory mirror.
   unbindItem(itemId: string): void;
+  // Commission order board (Professions 2.0, issue #1298): a lightweight
+  // job board layered on the Maker's Bond bind-on-trade primitive above.
+  // Opening/cancelling carries NO escrow (see src/sim/professions/
+  // commission_order.ts); accepting commits a crafter; delivering hands the
+  // freshly commissioned, still-unbound copy straight to the requester face
+  // to face (mail and the World Market already refuse an instanced payload,
+  // so delivery is the one direct channel a commissioned piece can travel
+  // through to its second owner). All four commands answer through the
+  // personal, text-free `commissionOrderResult` event (the unbindResult
+  // precedent): the client renders localized copy off action/reason, never
+  // display text off the wire. `commissionOrders` is the viewer's own
+  // projection (their own requests at any status, any order they accepted,
+  // and the open board plus any order a 'crafter' scope names them for),
+  // newest first, diffed every tick like `professionsState`.
+  commissionOrders: readonly CommissionOrderView[];
+  /** `scope: 'crafter'` requires `crafterName`, resolved the same way a
+   *  whisper resolves a player name; `scope: 'open'` ignores it. */
+  openCommissionOrder(recipeId: string, scope: CommissionOrderScope, crafterName?: string): void;
+  cancelCommissionOrder(orderId: number): void;
+  acceptCommissionOrder(orderId: number): void;
+  deliverCommissionOrder(orderId: number): void;
   // The local viewer's most recent enchanting-action outcomes, mirrored from the
   // pid-scoped disenchantResult/enchantResult/salvageResult event and the
   // denc/ench/salv self-delta (both feed the same field: the event is the

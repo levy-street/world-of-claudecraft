@@ -421,6 +421,124 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     sim.entities.delete(mob.id);
   });
 
+  // Basic universal profession deeds (issue #2055): one rare-or-better craft
+  // per craft on the ring lands that craft's milestone. Output quality is a
+  // static fact of the recipe's result def (the Professions 2.0 output roll
+  // is retired), so every craft below succeeds on the first attempt: no
+  // hunt needed, unlike the masterwork proc beat. Four recipes are
+  // grandfathered (TOOL_RECIPES/CASTER_HUB_RECIPES, no acquisition list):
+  // materials and station presence alone unlock them. The other three ship
+  // only trainer-taught rare recipes, so this beat trains each for real
+  // through sim.trainRecipe before crafting it; the copper grant and the
+  // direct craft-skill bumps are preconditions only (exactly the beats-3-to-5
+  // idiom above), never the deed's own trigger.
+  it('beat 16: every craft with a rare-tier recipe lands its per-craft rare-tier milestone', () => {
+    const rareDeedIds = [
+      'prog_engineering_rare',
+      'prog_alchemy_rare',
+      'prog_cooking_rare',
+      'prog_leatherworking_rare',
+      'prog_tailoring_rare',
+      'prog_weaponcrafting_rare',
+      'prog_armorcrafting_rare',
+    ];
+    for (const id of rareDeedIds) expect(meta.deedsEarned.has(id), id).toBe(false);
+    // Free the bags: the earlier gather/fishing/harvest beats leave a full
+    // hold, and this beat needs room for seven crafted outputs plus reagents.
+    meta.inventory.length = 0;
+
+    moveToNpc('tinker_gizzel'); // engineering: station_eastbrook_toolworks
+    meta.craftThrottle.count = 0;
+    sim.addItem('fine_iron_ore', 4, pid);
+    sim.addItem('mithril_mining_pick', 1, pid);
+    sim.craftItem('recipe_thorium_mining_pick', false, pid);
+    expect(sim.lastCraftResult?.ok, 'engineering craft').toBe(true);
+    expect(sim.lastCraftResult?.quality, 'engineering craft').toBe('rare');
+
+    moveToNpc('weaver_ottilie'); // tailoring: station_eastbrook_loom
+    meta.craftThrottle.count = 0;
+    sim.addItem('sunpetal_herb', 2, pid);
+    sim.addItem('goldleaf_herb', 2, pid);
+    sim.addItem('pristine_silk', 2, pid);
+    sim.addItem('spider_silk', 4, pid);
+    sim.addItem('spool_of_thread', 2, pid);
+    sim.craftItem('recipe_wardweave_cowl', false, pid);
+    expect(sim.lastCraftResult?.ok, 'tailoring craft').toBe(true);
+    expect(sim.lastCraftResult?.quality, 'tailoring craft').toBe('rare');
+
+    moveToNpc('tanner_hesk'); // leatherworking: station_fenbridge_tannery
+    meta.craftThrottle.count = 0;
+    sim.addItem('thorium_ore', 6, pid);
+    sim.addItem('pristine_hide', 3, pid);
+    sim.addItem('rough_hide', 2, pid);
+    sim.addItem('tanning_agent', 1, pid);
+    sim.craftItem('recipe_duskhide_wraps', false, pid);
+    expect(sim.lastCraftResult?.ok, 'leatherworking craft').toBe(true);
+    expect(sim.lastCraftResult?.quality, 'leatherworking craft').toBe('rare');
+
+    moveToNpc(SMITH_MASTER); // armorcrafting: station_eastbrook_forge
+    meta.craftThrottle.count = 0;
+    sim.addItem('thorium_ore', 7, pid);
+    sim.addItem('smithing_flux', 5, pid);
+    sim.craftItem('recipe_sootscale_mantle', false, pid);
+    expect(sim.lastCraftResult?.ok, 'armorcrafting craft').toBe(true);
+    expect(sim.lastCraftResult?.quality, 'armorcrafting craft').toBe('rare');
+
+    // The remaining three crafts ship only trainer-taught rare recipes
+    // (skillReq 50, so teachTierMet needs tier 2). A flat copper grant funds
+    // every training fee (a pure gold-sink precondition; trainRecipe itself
+    // still charges it for real).
+    meta.copper += 100000;
+
+    sim.gainCraftSkill(pid, 'weaponcrafting', 50);
+    moveToNpc(SMITH_MASTER); // weaponcrafting is also taught at the forge
+    sim.trainRecipe('recipe_thorium_warblade', pid);
+    expect(meta.lastTrainResult?.ok, 'weaponcrafting train').toBe(true);
+    meta.craftThrottle.count = 0;
+    sim.addItem('thorium_ore', 4, pid);
+    sim.addItem('iron_ore', 2, pid);
+    sim.addItem('smithing_flux', 2, pid);
+    sim.craftItem('recipe_thorium_warblade', false, pid);
+    expect(sim.lastCraftResult?.ok, 'weaponcrafting craft').toBe(true);
+    expect(sim.lastCraftResult?.quality, 'weaponcrafting craft').toBe('rare');
+
+    sim.gainCraftSkill(pid, 'cooking', 50);
+    moveToNpc('cook_marlow'); // cooking: station_eastbrook_kitchens
+    sim.trainRecipe('recipe_silvered_carp_supper', pid);
+    expect(meta.lastTrainResult?.ok, 'cooking train').toBe(true);
+    meta.craftThrottle.count = 0;
+    sim.addItem('raw_stonescale_carp', 3, pid);
+    sim.addItem('raw_mirror_trout', 1, pid);
+    sim.addItem('goldleaf_herb', 1, pid);
+    sim.addItem('cooking_salt', 1, pid);
+    sim.craftItem('recipe_silvered_carp_supper', false, pid);
+    expect(sim.lastCraftResult?.ok, 'cooking craft').toBe(true);
+    expect(sim.lastCraftResult?.quality, 'cooking craft').toBe('rare');
+
+    sim.gainCraftSkill(pid, 'alchemy', 50);
+    moveToNpc('alchemist_verane'); // alchemy: station_highwatch_apothecary
+    sim.trainRecipe('recipe_sunpetal_mana_draught', pid);
+    expect(meta.lastTrainResult?.ok, 'alchemy train').toBe(true);
+    meta.craftThrottle.count = 0;
+    sim.addItem('sunpetal_herb', 2, pid);
+    sim.addItem('goldleaf_herb', 1, pid);
+    sim.addItem('glass_vial', 1, pid);
+    sim.craftItem('recipe_sunpetal_mana_draught', false, pid);
+    expect(sim.lastCraftResult?.ok, 'alchemy craft').toBe(true);
+    expect(sim.lastCraftResult?.quality, 'alchemy craft').toBe('rare');
+
+    // Every mark sweeps at the tick tail, all seven in one grant pass.
+    for (const id of rareDeedIds) expect(meta.deedsEarned.has(id), id).toBe(false);
+    const evs = sim.tick();
+    const firedIds = deedEvents(evs).map((ev) => ev.deedId);
+    for (const id of rareDeedIds) {
+      expect(firedIds, id).toContain(id);
+      expect(meta.deedsEarned.has(id), id).toBe(true);
+      expect(DEEDS[id].renown, id).toBe(10);
+      expect(DEEDS[id].reward, id).toBeUndefined();
+    }
+  });
+
   it('epilogue: the whole playthrough earned every beat deed exactly once', () => {
     const earned = [
       'prog_first_craft',
@@ -437,6 +555,13 @@ describe('scripted playthrough (one sim, live sites only)', () => {
       'col_ancient_heartwood',
       'col_moonlit_bloom',
       'col_perfect_specimen',
+      'prog_engineering_rare',
+      'prog_alchemy_rare',
+      'prog_cooking_rare',
+      'prog_leatherworking_rare',
+      'prog_tailoring_rare',
+      'prog_weaponcrafting_rare',
+      'prog_armorcrafting_rare',
     ];
     for (const id of earned) expect(meta.deedsEarned.has(id), id).toBe(true);
     // deedsEarned is a Map, so "exactly once" is structural; the renown total

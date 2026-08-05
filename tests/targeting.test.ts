@@ -37,6 +37,10 @@ function makeCtx() {
   const entities = new Map<number, Entity>();
   const grid = new SpatialGrid();
   const parties = new Map<number, { id: number }>(); // pid -> party
+  // pid -> meta, kept STABLE across resolve() calls (mirrors the real Sim,
+  // where PlayerMeta is a long-lived per-player record), so a mutation one
+  // call makes (e.g. setStopAutoAttackOnTargetSwitch) is visible on the next.
+  const metas = new Map<number, { entityId: number; stopAutoAttackOnTargetSwitch?: boolean }>();
   const error = vi.fn();
   const stopFollow = vi.fn();
   const ctx = {
@@ -47,7 +51,13 @@ function makeCtx() {
     partyOf: (pid: number) => parties.get(pid) ?? null,
     resolve: (pid?: number) => {
       const e = entities.get(pid as number);
-      return e ? { e, meta: { entityId: pid as number } } : null;
+      if (!e) return null;
+      let meta = metas.get(pid as number);
+      if (!meta) {
+        meta = { entityId: pid as number };
+        metas.set(pid as number, meta);
+      }
+      return { e, meta };
     },
     error,
     stopFollow,
@@ -242,5 +252,112 @@ describe('Targeting: target selection', () => {
     expect(t.stopFollow).toHaveBeenCalledWith(actor, 'You stop following.');
     expect(actor.targetId).toBe(2);
     expect(actor.autoAttack).toBe(false); // ally is not hostile -> auto-attack off
+  });
+});
+
+// "Stop Auto-Attack on Target Switch" (issue #1358): off by default, the classic
+// carry-over stays. Covers every selector the issue names: targetEntity, tabTarget,
+// targetNearestEnemy, targetNearestFriendly, friendlyTabTarget. /assist is not
+// exercised separately, since it resolves through targetEntity.
+describe('Targeting: stopAutoAttackOnTargetSwitch preference (issue #1358)', () => {
+  it('setStopAutoAttackOnTargetSwitch is a no-op for an unresolvable player', () => {
+    const t = makeCtx();
+    const targeting = new Targeting(t.ctx);
+    expect(() => targeting.setStopAutoAttackOnTargetSwitch(true, 999)).not.toThrow();
+  });
+
+  it('default (off): targetEntity carries auto-attack over to a new hostile target', () => {
+    const t = makeCtx();
+    const actor = t.add(
+      ent({ id: 1, kind: 'player', targetId: 10, autoAttack: true, pos: { x: 0, y: 0, z: 0 } }),
+    );
+    t.add(ent({ id: 10, hostile: true }));
+    t.add(ent({ id: 11, hostile: true }));
+    const targeting = new Targeting(t.ctx);
+    targeting.targetEntity(11, 1);
+    expect(actor.targetId).toBe(11);
+    expect(actor.autoAttack).toBe(true); // classic default: keeps swinging
+  });
+
+  it('enabled: targetEntity disengages auto-attack on a switch to a different hostile target', () => {
+    const t = makeCtx();
+    const actor = t.add(
+      ent({ id: 1, kind: 'player', targetId: 10, autoAttack: true, pos: { x: 0, y: 0, z: 0 } }),
+    );
+    t.add(ent({ id: 10, hostile: true }));
+    t.add(ent({ id: 11, hostile: true }));
+    const targeting = new Targeting(t.ctx);
+    targeting.setStopAutoAttackOnTargetSwitch(true, 1);
+    targeting.targetEntity(11, 1);
+    expect(actor.targetId).toBe(11);
+    expect(actor.autoAttack).toBe(false);
+  });
+
+  it('enabled: re-selecting the SAME target is not a switch, auto-attack stays on', () => {
+    const t = makeCtx();
+    const actor = t.add(
+      ent({ id: 1, kind: 'player', targetId: 10, autoAttack: true, pos: { x: 0, y: 0, z: 0 } }),
+    );
+    t.add(ent({ id: 10, hostile: true }));
+    const targeting = new Targeting(t.ctx);
+    targeting.setStopAutoAttackOnTargetSwitch(true, 1);
+    targeting.targetEntity(10, 1);
+    expect(actor.targetId).toBe(10);
+    expect(actor.autoAttack).toBe(true);
+  });
+
+  it('enabled: tabTarget cycling to a new enemy disengages auto-attack', () => {
+    const t = makeCtx();
+    const actor = t.add(
+      ent({ id: 1, kind: 'player', pos: { x: 0, y: 0, z: 0 }, autoAttack: true }),
+    );
+    const m1 = t.add(ent({ id: 10, hostile: true, pos: { x: 3, y: 0, z: 0 } }));
+    t.add(ent({ id: 11, hostile: true, pos: { x: 5, y: 0, z: 0 } }));
+    actor.targetId = m1.id;
+    const targeting = new Targeting(t.ctx);
+    targeting.setStopAutoAttackOnTargetSwitch(true, 1);
+    targeting.tabTarget(1);
+    expect(actor.targetId).not.toBe(m1.id);
+    expect(actor.autoAttack).toBe(false);
+  });
+
+  it('enabled: targetNearestEnemy switching targets disengages auto-attack', () => {
+    const t = makeCtx();
+    const actor = t.add(
+      ent({ id: 1, kind: 'player', pos: { x: 0, y: 0, z: 0 }, targetId: 99, autoAttack: true }),
+    );
+    t.add(ent({ id: 10, hostile: true, pos: { x: 5, y: 0, z: 0 } }));
+    const targeting = new Targeting(t.ctx);
+    targeting.setStopAutoAttackOnTargetSwitch(true, 1);
+    targeting.targetNearestEnemy(1);
+    expect(actor.targetId).toBe(10);
+    expect(actor.autoAttack).toBe(false);
+  });
+
+  it('enabled: targetNearestFriendly switching targets disengages auto-attack', () => {
+    const t = makeCtx();
+    const actor = t.add(
+      ent({ id: 1, kind: 'player', pos: { x: 0, y: 0, z: 0 }, targetId: 99, autoAttack: true }),
+    );
+    t.add(ent({ id: 2, kind: 'player', pos: { x: 2, y: 0, z: 0 } }));
+    const targeting = new Targeting(t.ctx);
+    targeting.setStopAutoAttackOnTargetSwitch(true, 1);
+    targeting.targetNearestFriendly(1);
+    expect(actor.targetId).toBe(2);
+    expect(actor.autoAttack).toBe(false);
+  });
+
+  it('enabled: friendlyTabTarget switching targets disengages auto-attack', () => {
+    const t = makeCtx();
+    const actor = t.add(
+      ent({ id: 1, kind: 'player', pos: { x: 0, y: 0, z: 0 }, autoAttack: true }),
+    );
+    t.add(ent({ id: 2, kind: 'player', pos: { x: 2, y: 0, z: 0 } }));
+    t.add(ent({ id: 3, kind: 'player', pos: { x: 6, y: 0, z: 0 } }));
+    const targeting = new Targeting(t.ctx);
+    targeting.setStopAutoAttackOnTargetSwitch(true, 1);
+    targeting.friendlyTabTarget(1); // no current target -> first pick still counts as a switch
+    expect(actor.targetId).toBe(2);
+    expect(actor.autoAttack).toBe(false);
   });
 });

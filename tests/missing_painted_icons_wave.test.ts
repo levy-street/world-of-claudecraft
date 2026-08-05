@@ -510,22 +510,23 @@ describe('missing painted item integration', () => {
 });
 
 describe('missing painted deed and Heroic weapon integration', () => {
-  it('leaves every deed it painted art-backed and records generated crest ownership', () => {
+  it('leaves only the pinned art-pending deeds without painted art, and records generated crest ownership', () => {
     const accepted = manifest();
     expect(accepted.targetSets.deeds).toEqual([
       'dgn_wildheart_basin',
       'dgn_wildheart_basin_heroic',
       'pvp_card_duel_first_win',
     ]);
-    // The Drakelands brood merge appended two deeds after this wave, so the live catalog
-    // is 234 and the wave's own claim is unchanged: every deed that existed when it landed
-    // is painted. The only artless ids are those two appended later, which ride the
-    // category-crest fallback the Icons authoring rule in docs/design/deeds.md sanctions,
-    // until their 512px sources are commissioned (flagged in
-    // docs/achievements/icon-brief.md). Read from DEED_ART_PENDING, the one enumeration of
-    // that debt (src/ui/icons.ts), so this file cannot end up naming a different pending
-    // set than the other two art suites. Exhaustive: a third artless deed still reds here.
-    expect(DEED_ORDER).toHaveLength(238);
+    // The Drakelands brood merge, the Rift coverage pair, and the seven per-craft rare-tier
+    // profession deeds all appended after this wave, so the live catalog is 247 and the
+    // wave's own claim is unchanged: every deed that existed when it landed is painted. The
+    // only artless ids are those appended later, which ride the category-crest fallback the
+    // Icons authoring rule in docs/design/deeds.md sanctions, until their 512px sources are
+    // commissioned (flagged in docs/achievements/icon-brief.md). Read from DEED_ART_PENDING,
+    // the one enumeration of that debt (src/ui/icons.ts), so this file cannot end up naming a
+    // different pending set than the other two art suites. Exhaustive: a third artless deed
+    // still reds here.
+    expect(DEED_ORDER).toHaveLength(247);
     expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([...DEED_ART_PENDING]);
     const credits = readFileSync(path.join(repoRoot, 'CREDITS.md'), 'utf8');
     const provenance = readFileSync(

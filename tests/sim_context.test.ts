@@ -328,6 +328,8 @@ function makeFakeHost() {
     nextLootRollId: 1,
     devCommands: false,
     marketListings: [],
+    commissionOrderBoard: [],
+    nextCommissionOrderId: 1,
     bankerIds: [],
     guildBanks: new Map(),
     vcup: createVcState(),

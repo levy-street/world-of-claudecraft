@@ -1311,6 +1311,22 @@ function completeLosingRun(ctx: SimContext, inst: RiftInstance): void {
   }
 }
 
+/** Book of Deeds credit for a completed Rift run (the floor boss is dead),
+ * regardless of the first-clear race outcome: a race loser still genuinely
+ * cleared their own instance, and rule 6 (docs/design/deeds.md) counts
+ * outcomes, not race placement. S-rank credit reads the rank the descriptor's
+ * baseLevel actually encodes (riftRankForBaseLevel), not inst.tier, which is
+ * null for dev portals that can still open at an S baseLevel. */
+function creditRiftClearDeeds(ctx: SimContext, inst: RiftInstance, participants: number[]): void {
+  const sRank = riftRankForBaseLevel(inst.baseLevel) === 'S';
+  for (const pid of participants) {
+    const meta = ctx.players.get(pid);
+    if (!meta) continue;
+    ctx.bumpDeedStat(meta, 'riftClears', 1);
+    if (sRank) ctx.bumpDeedStat(meta, 'riftSRankClears', 1);
+  }
+}
+
 /** Resolve the authoritative first-clear claim. Every finishing instance stays
  * open for loot and egress; losing the race only forfeits the first-clear
  * extras, never the run. Returns true when this run is decided and should get
@@ -1319,6 +1335,7 @@ function completeRiftClear(ctx: SimContext, inst: RiftInstance, boss: Entity | n
   if (inst.rewarded) return inst.outcome !== 'active';
   const present = instancePlayerIds(ctx, inst);
   const participants = present.length > 0 ? present : [...inst.memberIds];
+  creditRiftClearDeeds(ctx, inst, participants);
   const claim = claimRiftFirstClear(ctx, inst, participants);
   if (!claim.won) {
     completeLosingRun(ctx, inst);

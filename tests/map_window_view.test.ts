@@ -694,6 +694,44 @@ describe('buildOverworldMapModel (pure draw model)', () => {
   });
 });
 
+// The World Map never showed the active Rift's floor name: OverworldMapModel
+// carried no rift field at all, unlike MinimapModel, which already threads
+// world.riftFloor through (minimap_markers.ts). These pin the same threading
+// here, both shapes, ranked and dev-portal (null-tier) runs.
+describe('rift floor title override (model.rift, mirrors MinimapModel.rift)', () => {
+  function withRiftFloor(world: IWorld, riftFloor: { name: string; tier: string | null } | null) {
+    return { ...(world as unknown as Record<string, unknown>), riftFloor } as unknown as IWorld;
+  }
+
+  it('is null outside a rift, for both world shapes', () => {
+    const sim = buildOverworldMapModel(input(makeOverworldWorld('sim'), LABELS_ZOOM));
+    const client = buildOverworldMapModel(input(makeOverworldWorld('client'), LABELS_ZOOM));
+    expect(sim.rift).toBeNull();
+    expect(client.rift).toBeNull();
+  });
+
+  it('carries the generated floor name with a null rank for a dev-portal run', () => {
+    const world = withRiftFloor(makeOverworldWorld('sim'), {
+      name: 'The Sunken Vault',
+      tier: null,
+    });
+    const model = buildOverworldMapModel(input(world, LABELS_ZOOM));
+    expect(model.rift).toEqual({ name: 'The Sunken Vault', rank: null });
+  });
+
+  it('carries the C/B/A/S rank for a ranked run, identically for both world shapes', () => {
+    const riftFloor = { name: 'The Shattered Archive', tier: 'B' };
+    const sim = buildOverworldMapModel(
+      input(withRiftFloor(makeOverworldWorld('sim'), riftFloor), LABELS_ZOOM),
+    );
+    const client = buildOverworldMapModel(
+      input(withRiftFloor(makeOverworldWorld('client'), riftFloor), LABELS_ZOOM),
+    );
+    expect(sim.rift).toEqual({ name: 'The Shattered Archive', rank: 'B' });
+    expect(client.rift).toEqual(sim.rift);
+  });
+});
+
 describe('active-quest objective areas (the classic POI blobs)', () => {
   // A kill quest whose target mob camps inside the committed zone band, so the
   // quest-area branch exercises real content rather than a synthetic fixture.

@@ -19,6 +19,7 @@ import {
   heartbeatIntervalMs,
   identifyPayload,
   indexSpecialRoleIds,
+  interactionFailureFallback,
   isSlashCommand,
   levelNickSuffix,
   MEMBERS_META_BATCH,
@@ -349,11 +350,35 @@ describe('slash commands + messages', () => {
     expect(
       buildWhoamiContent({ linked: false, statusTier: 0, points: 0, lifetimePoints: 0 }),
     ).toContain('/link');
-    expect(
-      buildWhoamiContent({ linked: true, statusTier: 5, points: 100, lifetimePoints: 5000 }),
-    ).toContain('Champion');
+    const linked = buildWhoamiContent({
+      linked: true,
+      statusTier: 5,
+      points: 100,
+      lifetimePoints: 5000,
+    });
+    expect(linked).toContain('Champion');
+    expect(linked).not.toContain('/flex'); // /flex was removed
     expect(buildLinkContent('https://woc')).toContain('https://woc');
     expect(buildWelcomeMessage({ userMention: '<@1>', gameUrl: 'https://woc' })).toContain('<@1>');
+  });
+
+  it('falls back to editing the deferred reply once the interaction is acknowledged', () => {
+    // A failure AFTER a successful defer (e.g. the game-server call or the
+    // final edit itself throws) has already spent the interaction's one
+    // initial-response slot, so the only way left to reach the player is
+    // editing that response.
+    const fallback = interactionFailureFallback(true);
+    expect(fallback.via).toBe('edit');
+    expect(fallback.content.length).toBeGreaterThan(0);
+  });
+
+  it('falls back to a fresh response when the interaction was never acknowledged', () => {
+    // A failure BEFORE any ack lands (e.g. respondInteraction/deferInteraction
+    // itself throws) leaves the initial-response slot open, so the fallback
+    // becomes that response instead of an edit with nothing to edit.
+    const fallback = interactionFailureFallback(false);
+    expect(fallback.via).toBe('respond');
+    expect(fallback.content.length).toBeGreaterThan(0);
   });
 });
 

@@ -2634,6 +2634,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.partyGroup': 'Gruppo {n}',
   'hudChrome.unitFrame.partyLabel': 'Il tuo gruppo',
   'hudChrome.unitFrame.playerLabel': 'Il tuo personaggio',
+  'hudChrome.unitFrame.petLabel': 'Il tuo famiglio',
   'hudChrome.unitFrame.targetAnnounce': 'Bersaglio: {name}',
   'hudChrome.unitFrame.targetLabel': 'Il tuo bersaglio',
   'seo.officialLabel': 'Sito ufficiale di World of ClaudeCraft',
@@ -8126,6 +8127,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.event.hint': "Annuncia un'incursione, un raduno o un evento",
   'hudChrome.discord.relay.help.label': 'Serve aiuto',
   'hudChrome.discord.relay.help.hint': 'Chiedi aiuto alla comunita',
+  'hudChrome.options.hideUnusedActionSlots': 'Nascondi gli slot azione inutilizzati',
   'hudChrome.options.showSecondaryActionBar': 'Mostra la barra delle azioni secondaria',
   'errors.api.desktopCodeInvalid':
     'Il codice di accesso desktop non è valido o è scaduto. Riprova.',
@@ -9490,6 +9492,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.keybinds.petAttack': 'Famiglio: attacca',
   'hudChrome.keybinds.petDefensive': 'Famiglio: difensivo',
   'hudChrome.keybinds.petStop': 'Famiglio: fermo',
+  'hudChrome.keybinds.targetPet': 'Famiglio: bersaglia',
   'hudChrome.keybinds.petTaunt': 'Famiglio: provoca',
   'hudChrome.mailbox.parcelQtyDecreaseAria': 'Invia un {item} in meno',
   'hudChrome.mailbox.parcelQtyIncreaseAria': 'Invia un {item} in più',
@@ -10360,6 +10363,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'La tua probabilità di parare completamente un attacco in mischia frontale, senza subire danni. Un colpo alle spalle non può essere parato.',
   'hudChrome.options.mouseoverCast': 'Lancio al passaggio del mouse sui riquadri del gruppo',
   'hudChrome.options.showTargetOfTarget': 'Mostra il bersaglio del bersaglio',
+  'hudChrome.options.showPetFrame': 'Mostra il tuo famiglio',
   'hudChrome.unitFrame.targetOfTargetLabel': 'Il bersaglio del bersaglio',
   'itemUi.market.rarityLegendary': 'Leggendario',
   'loading.reconnectingAttempt':

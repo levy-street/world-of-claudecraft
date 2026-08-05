@@ -10,25 +10,85 @@
 // and `pretest`). Reproducibility is checked by tests/i18n_admin_catalog.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "moderationHistory.actionSpectate",
+    "moderationHistory.actionUnspectate"
+  ],
+  "es_ES": [
+    "moderationHistory.actionSpectate",
+    "moderationHistory.actionUnspectate"
+  ],
+  "fr_FR": [
+    "moderationHistory.actionSpectate",
+    "moderationHistory.actionUnspectate"
+  ],
+  "fr_CA": [
+    "moderationHistory.actionSpectate",
+    "moderationHistory.actionUnspectate"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
-  "pt_BR": [],
-  "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "it_IT": [
+    "moderationHistory.actionSpectate",
+    "moderationHistory.actionUnspectate"
+  ],
+  "de_DE": [
+    "moderationHistory.actionSpectate",
+    "moderationHistory.actionUnspectate"
+  ],
+  "zh_CN": [
+    "moderationHistory.actionSpectate",
+    "moderationHistory.actionUnspectate"
+  ],
+  "zh_TW": [
+    "moderationHistory.actionSpectate",
+    "moderationHistory.actionUnspectate"
+  ],
+  "ko_KR": [
+    "moderationHistory.actionSpectate",
+    "moderationHistory.actionUnspectate"
+  ],
+  "ja_JP": [
+    "moderationHistory.actionSpectate",
+    "moderationHistory.actionUnspectate"
+  ],
+  "pt_BR": [
+    "moderationHistory.actionSpectate",
+    "moderationHistory.actionUnspectate"
+  ],
+  "ru_RU": [
+    "moderationHistory.actionSpectate",
+    "moderationHistory.actionUnspectate"
+  ],
+  "cs_CZ": [
+    "moderationHistory.actionSpectate",
+    "moderationHistory.actionUnspectate"
+  ],
+  "nl_NL": [
+    "moderationHistory.actionSpectate",
+    "moderationHistory.actionUnspectate"
+  ],
+  "pl_PL": [
+    "moderationHistory.actionSpectate",
+    "moderationHistory.actionUnspectate"
+  ],
+  "id_ID": [
+    "moderationHistory.actionSpectate",
+    "moderationHistory.actionUnspectate"
+  ],
+  "tr_TR": [
+    "moderationHistory.actionSpectate",
+    "moderationHistory.actionUnspectate"
+  ],
+  "sv_SE": [
+    "moderationHistory.actionSpectate",
+    "moderationHistory.actionUnspectate"
+  ],
+  "vi_VN": [
+    "moderationHistory.actionSpectate",
+    "moderationHistory.actionUnspectate"
+  ],
+  "da_DK": [
+    "moderationHistory.actionSpectate",
+    "moderationHistory.actionUnspectate"
+  ]
 };

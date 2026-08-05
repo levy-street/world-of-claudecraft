@@ -286,8 +286,34 @@ describe('moderation report helpers', () => {
       'tone it down',
       new Date(expiresAt),
     ]);
-    expect(client.query.mock.calls[3][0]).toBe('COMMIT');
+    // Mirrors moderateAccount's ban/suspend arm: a chat mute is punitive, so it
+    // resolves whatever open report led to it in the same transaction.
+    expect(client.query.mock.calls[3][0]).toMatch(/UPDATE player_reports/);
+    expect(client.query.mock.calls[3][1]).toEqual([2, 1, 'tone it down']);
+    expect(client.query.mock.calls[4][0]).toBe('COMMIT');
+    expect(client.query.mock.calls).toHaveLength(5);
     expect(client.release).toHaveBeenCalledTimes(1);
+  });
+
+  it('resolves the reported account open reports when muting its chat', async () => {
+    const client = clientStub();
+    connect.mockResolvedValue(client as unknown as PoolClient);
+    const expiresAt = new Date(Date.now() + 3600_000).toISOString();
+
+    await muteAccountChat({
+      accountId: 2,
+      adminAccountId: 1,
+      reason: 'chat abuse',
+      expiresAt,
+    });
+
+    const reportUpdateCall = client.query.mock.calls.find((call) =>
+      /UPDATE player_reports/.test(String(call[0])),
+    );
+    if (!reportUpdateCall) throw new Error('player_reports update query not found');
+    expect(reportUpdateCall[0]).toMatch(/status = 'actioned'/);
+    expect(reportUpdateCall[0]).toMatch(/reported_account_id = \$1 AND status = 'open'/);
+    expect(reportUpdateCall[1]).toEqual([2, 1, 'chat abuse']);
   });
 
   it('lifts an active chat mute and writes a dedicated audit action', async () => {

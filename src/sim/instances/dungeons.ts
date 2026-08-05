@@ -929,6 +929,25 @@ export function awardHeroicMarks(ctx: SimContext, mob: Entity, recipients: Playe
   }
 }
 
+// Reconnect policy for a dropped connection (issue #1351): this reaper only
+// ever sees a player as "gone" once their entity is actually removed from
+// `ctx.players`/`ctx.entities`, and a dropped socket alone never does that.
+// `server/linkdead.ts` holds a disconnected session (and its live entity, in
+// place, un-despawned) in the world for LINKDEAD_GRACE_MS before it calls
+// `Sim.removePlayer`, so a claimed instance's occupancy check below keeps
+// finding the linkdead player right where they stood and resets `emptyFor`
+// to 0 every second, the whole grace window through: the empty-timeout
+// countdown never even starts while a reconnect is still possible. Only a
+// deliberate `/dev` teardown, a full logout, or the grace window itself
+// lapsing removes the entity and lets this reaper start counting. Should the
+// owner relog before the countdown finishes, the durable per-character key
+// (`instanceKeyFor`, issue #1600) rebinds their new entity to this SAME
+// still-alive claim instead of minting a fresh one, so progress survives
+// even a full session teardown as long as nobody else has claimed the slot
+// first. Walking out through the exit portal (`leaveDungeon`) is the one
+// path that is meant to start this countdown immediately: it steps the
+// player's entity outside the claim footprint on purpose. Covered end to end
+// by tests/dungeon_instance_disconnect_reset.test.ts.
 export function updateInstances(ctx: SimContext): void {
   if (ctx.tickCount % 20 !== 0) return; // once a second
   for (const inst of ctx.instances) {

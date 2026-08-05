@@ -7069,6 +7069,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.partyGroup': 'Groep {n}',
   'hudChrome.unitFrame.partyLabel': 'Je Bende',
   'hudChrome.unitFrame.playerLabel': 'Je Held',
+  'hudChrome.unitFrame.petLabel': 'Je Huisdier',
   'hudChrome.unitFrame.targetAnnounce': 'Markeer {name}',
   'hudChrome.unitFrame.targetLabel': 'Je Doelwit',
   'hudChrome.widgets.clockTitle': 'Lokale tijd - klik om te wisselen tussen 12/24-uurs',
@@ -8023,6 +8024,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.event.hint': 'Kondig een raid, meetup of evenement aan',
   'hudChrome.discord.relay.help.label': 'Hulp nodig',
   'hudChrome.discord.relay.help.hint': 'Vraag de gemeenschap om hulp',
+  'hudChrome.options.hideUnusedActionSlots': 'Ongebruikte actievakjes verbergen',
   'hudChrome.options.showSecondaryActionBar': 'Secundaire actiebalk tonen',
   'errors.api.desktopCodeInvalid':
     'Desktop-inlogcode is ongeldig of verlopen. Probeer het opnieuw.',
@@ -9233,6 +9235,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.keybinds.petAttack': 'Huisdier: Aanvallen',
   'hudChrome.keybinds.petDefensive': 'Huisdier: Verdedigend',
   'hudChrome.keybinds.petStop': 'Huisdier: Stoppen',
+  'hudChrome.keybinds.targetPet': 'Huisdier: Aanwijzen',
   'hudChrome.keybinds.petTaunt': 'Huisdier: Uitdagen',
   'hudChrome.keybinds.mount': 'Opstijgen / Afstijgen',
   'hudChrome.mailbox.parcelQtyDecreaseAria': 'Eén {item} minder versturen',
@@ -10151,6 +10154,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hud.combat.evaded': '{target} ontloopt je {ability}.',
   'hudChrome.options.mouseoverCast': 'Mouseover-bezwering op groepsframes',
   'hudChrome.options.showTargetOfTarget': 'Doelwit van doelwit tonen',
+  'hudChrome.options.showPetFrame': 'Je huisdier tonen',
   'hudChrome.unitFrame.targetOfTargetLabel': 'Doelwit van het doelwit',
   'itemUi.market.rarityLegendary': 'Legendarisch',
   'loading.reconnectingAttempt':

@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { beforeEach, describe, expect, it } from 'vitest';
 import {
   ACTION_BAR_SLOTS,
@@ -823,5 +824,37 @@ describe('mouse buttons as bindable keys', () => {
     const reloaded = new Keybinds();
     expect(reloaded.codeAt('slot3', 0)).toBe(null);
     expect(reloaded.edgeActionForCombo('Mouse1')).toBe(null);
+  });
+});
+
+// Every bindable action's Key Bindings row must localize. actionDisplayName
+// (src/ui/options_window.ts) resolves a row's label through BIND_ACTION_LABEL_KEYS
+// and falls back to the RAW ENGLISH BindAction.label when the id is absent, so a
+// missing entry ships hard-coded English in all 22 locales and silently orphans the
+// catalog key someone added for it. Nothing else catches that: the i18n gates check
+// that keys EXIST, not that a key is reachable, and every keybind test before this
+// one asserted on codes rather than labels. Scanned from source because the map is
+// module-private in a DOM window module this Node suite cannot import.
+describe('every bind action has a localized label key', () => {
+  const optionsWindowSrc = readFileSync(
+    new URL('../src/ui/options_window.ts', import.meta.url),
+    'utf8',
+  );
+  const mapBody = optionsWindowSrc.slice(
+    optionsWindowSrc.indexOf('const BIND_ACTION_LABEL_KEYS'),
+    optionsWindowSrc.indexOf('};', optionsWindowSrc.indexOf('const BIND_ACTION_LABEL_KEYS')),
+  );
+
+  it('reads a non-empty map (the scan would pass vacuously on a rename)', () => {
+    expect(mapBody).toContain('BIND_ACTION_LABEL_KEYS');
+    expect(mapBody.split('\n').filter((l) => /^\s+\w+:\s+'/.test(l)).length).toBeGreaterThan(30);
+  });
+
+  // Action-bar slots resolve through their own numeric branch in actionDisplayName,
+  // never the map, so they are the one exempt family.
+  const mapped = BIND_ACTIONS.filter((a) => !a.id.startsWith('slot'));
+
+  it.each(mapped.map((a) => [a.id] as const))('%s is in BIND_ACTION_LABEL_KEYS', (id) => {
+    expect(new RegExp(`^\\s+${id}:\\s+'`, 'm').test(mapBody)).toBe(true);
   });
 });

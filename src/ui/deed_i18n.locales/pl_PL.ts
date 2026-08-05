@@ -862,4 +862,32 @@ export const table: DeedLocaleTable = {
     name: 'Co wiedzą mewy',
     desc: 'Złów rybę w wodach Dalekiego Wybrzeża.',
   },
+  prog_engineering_rare: {
+    name: 'Precyzyjna inżynieria',
+    desc: 'Wykonaj swój pierwszy przedmiot rzadkiej jakości w Inżynierii.',
+  },
+  prog_alchemy_rare: {
+    name: 'Rzadki rocznik',
+    desc: 'Wykonaj swój pierwszy przedmiot rzadkiej jakości w Alchemii.',
+  },
+  prog_cooking_rare: {
+    name: 'Danie do zapamiętania',
+    desc: 'Wykonaj swój pierwszy przedmiot rzadkiej jakości w Gotowaniu.',
+  },
+  prog_leatherworking_rare: {
+    name: 'Precyzyjne garbowanie',
+    desc: 'Wykonaj swój pierwszy przedmiot rzadkiej jakości w Garbarstwie.',
+  },
+  prog_tailoring_rare: {
+    name: 'Mistrzowski ścieg',
+    desc: 'Wykonaj swój pierwszy przedmiot rzadkiej jakości w Krawiectwie.',
+  },
+  prog_weaponcrafting_rare: {
+    name: 'Hartowane na połysk',
+    desc: 'Wykonaj swój pierwszy przedmiot rzadkiej jakości w Wytwarzaniu Broni.',
+  },
+  prog_armorcrafting_rare: {
+    name: 'Opancerzone do perfekcji',
+    desc: 'Wykonaj swój pierwszy przedmiot rzadkiej jakości w Wytwarzaniu Pancerzy.',
+  },
 };

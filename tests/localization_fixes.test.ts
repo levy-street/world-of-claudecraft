@@ -945,6 +945,10 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/mob/mob_swing.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/mob/lifecycle.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/pet/pet_commands.ts'), 'utf8'),
+    // The arena-shaped-match pet round trip: its one emit is the same
+    // "<name> returns to your side." line Revive Pet uses, so it is matched by
+    // the existing rule; scanning keeps any future literal here under the guard.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/pet/pet_match_return.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/instances/dungeons.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/instances/heroic_vendor.ts'), 'utf8'),
     // Overworld portal transitions (the Veiled Hollow cave). The live flavor
@@ -1087,6 +1091,13 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     // Scanned so any future inline emit lands under the drift guard from day
     // one.
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/professions/commission.ts'), 'utf8'),
+    // Commission order board (issue #1298): the open/cancel/accept/deliver
+    // resolvers. It emits no player text itself (the Sim facade in sim.ts
+    // owns the single text-free commissionOrderResult emit, the unbindItem
+    // precedent), but every new sim module joins the scan list in the same
+    // change so any future emit added here lands under the drift guard from
+    // day one.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/professions/commission_order.ts'), 'utf8'),
     // #2033 (PR 2039): the quest command bodies (accept/share/abandon/turn-in guards +
     // the accepted/abandoned/completed logs). The two profession-choice denials
     // ("That profession choice is not available." / "... no longer available.") have

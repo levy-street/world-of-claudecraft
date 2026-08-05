@@ -24,6 +24,7 @@ import { ARENA_SLOT_COUNT, arenaOrigin, DUNGEON_X_THRESHOLD } from '../data';
 import * as deedsMod from '../deeds';
 import { arenaMapForSlot } from '../dungeon_layout';
 import { recalcPlayerStats } from '../entity';
+import { type MatchPetSnapshot, restoreMatchPet, snapshotMatchPet } from '../pet/pet_match_return';
 import { awardFiestaCompletionHonor, awardRankedArenaWinHonor, honorTeamIdentity } from '../pvp';
 import { SICKNESS_AURA_IDS, UNSTUCK_SICKNESS_ID } from '../resurrection';
 import type { ArenaMatch, ArenaQueueUnit, ArenaReturnPools, PlayerMeta } from '../sim';
@@ -858,10 +859,15 @@ export function startArenaMatch(
   // below, so returnFromArena restores what they walked in with instead of a free
   // full restore (issue #1600). Fiesta captures the pre-standardization pools.
   const preMatchPools = new Map<number, ArenaReturnPools>();
+  // Same idea for the fighter's pet: a beast that walks in alive walks back out
+  // alive, so a normalized bout never costs a hunter their companion.
+  const preMatchPets = new Map<number, MatchPetSnapshot>();
   for (let i = 0; i < allPids.length; i++) {
     const e = entities[i]!;
     returns.set(allPids[i], { x: e.pos.x, z: e.pos.z, facing: e.facing });
     preMatchPools.set(allPids[i], snapshotArenaReturnPools(e));
+    const pet = snapshotMatchPet(ctx, allPids[i]);
+    if (pet) preMatchPets.set(allPids[i], pet);
   }
   const isFiesta = format === 'fiesta';
   const countdown = isFiesta ? FIESTA_COUNTDOWN : ARENA_COUNTDOWN;
@@ -875,6 +881,7 @@ export function startArenaMatch(
     timer: countdown,
     returns,
     preMatchPools,
+    preMatchPets,
     ratingA: arenaTeamRating(ctx, teamA, format),
     ratingB: arenaTeamRating(ctx, teamB, format),
     defeated: new Set(),
@@ -1203,6 +1210,11 @@ export function returnFromArena(ctx: SimContext, match: ArenaMatch): void {
     e.facing = ret.facing;
     e.dead = false;
     ctx.rebucket(e);
+    // The fighter is standing at their queue spot now, so the pet the bout killed
+    // is stood back up HERE, beside them in the world (never back on the sands).
+    // Runs after the Fiesta restore above so the revived pet's owner is already
+    // back at their real level and stats.
+    restoreMatchPet(ctx, e, match.preMatchPets?.get(pid));
     ctx.emit({ type: 'respawn', pid: e.id });
   }
 }

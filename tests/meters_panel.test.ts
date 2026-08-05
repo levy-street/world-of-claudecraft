@@ -32,9 +32,31 @@ const MARKUP = `
 // carrying a live hate table.
 function fakeWorld(): IWorld {
   const entities = new Map<number, any>();
-  entities.set(1, { id: 1, kind: 'player', name: 'Hero', templateId: 'hunter' });
-  entities.set(2, { id: 2, kind: 'player', name: 'Pal', templateId: 'priest' });
-  entities.set(3, { id: 3, kind: 'mob', name: 'Wolf Pet', templateId: 'forest_wolf', ownerId: 1 });
+  entities.set(1, {
+    id: 1,
+    kind: 'player',
+    name: 'Hero',
+    templateId: 'hunter',
+    targetId: null,
+    threat: new Map<number, number>(),
+  });
+  entities.set(2, {
+    id: 2,
+    kind: 'player',
+    name: 'Pal',
+    templateId: 'priest',
+    threat: new Map<number, number>(),
+  });
+  entities.set(3, {
+    id: 3,
+    kind: 'mob',
+    name: 'Wolf Pet',
+    templateId: 'forest_wolf',
+    ownerId: 1,
+    dead: false,
+    maxHp: 100,
+    threat: new Map<number, number>(),
+  });
   entities.set(51, {
     id: 51,
     kind: 'mob',
@@ -76,6 +98,22 @@ const dmg = (
     ability,
     kind: 'hit',
   }) as SimEvent;
+
+/** Labels of the contributor SUBTOTAL rows only. */
+function headRows(html: string): string[] {
+  const doc = new DOMParser().parseFromString(`<div>${html}</div>`, 'text/html');
+  return [...doc.querySelectorAll('.mt-tip-head')].map(
+    (el) => el.querySelector('.mt-tip-name')?.textContent ?? '',
+  );
+}
+
+/** Labels of the ability rows nested under a subtotal. */
+function nestedRows(html: string): string[] {
+  const doc = new DOMParser().parseFromString(`<div>${html}</div>`, 'text/html');
+  return [...doc.querySelectorAll('.mt-tip-group .mt-tip-row')].map(
+    (el) => el.querySelector('.mt-tip-name')?.textContent ?? '',
+  );
+}
 
 /** [label, value] of every row in a breakdown tooltip's HTML. */
 function tipRows(html: string): [string, string][] {
@@ -122,7 +160,7 @@ describe('meters panel', () => {
     expect(rows[0].querySelector('.mt-num')?.textContent).toContain('500');
   });
 
-  it('breaks the hovered bar down per ability and names the pet that acted', () => {
+  it('groups the hovered bar by contributor, with a subtotal per actor', () => {
     const { meters, visibleRows, tooltipFor } = setup();
     meters.onEvent(dmg(1, 51, 300, 'Aimed Shot'));
     meters.onEvent(dmg(3, 51, 200, 'Claw'));
@@ -131,12 +169,31 @@ describe('meters panel', () => {
 
     const html = tooltipFor(visibleRows()[0]);
     expect(html).toContain('<div class="tt-title">Hero</div>');
-    // the pet's damage is its own row, labeled with the pet, and the shares are
-    // taken against the OWNER's folded total (300 + 200)
+    // A subtotal per actor with its abilities under it, so a hunter can read the
+    // pet's contribution instead of adding interleaved rows up by hand. Shares
+    // are against the owner's folded total (300 + 200), so they sum to 100%.
     expect(tipRows(html)).toEqual([
+      ['Hero', '300 (60%)'],
       ['Aimed Shot', '300 (60%)'],
-      ['Wolf Pet: Claw', '200 (40%)'],
+      ['Wolf Pet', '200 (40%)'],
+      ['Claw', '200 (40%)'],
     ]);
+    // the subtotals are headings; the abilities are nested under them
+    expect(headRows(html)).toEqual(['Hero', 'Wolf Pet']);
+    expect(nestedRows(html)).toEqual(['Aimed Shot', 'Claw']);
+    // a nested ability drops the pet prefix, since its heading already names it
+    expect(html).not.toContain('Wolf Pet: Claw');
+  });
+
+  it('omits a pet that did nothing rather than showing it as a zero group', () => {
+    const { meters, visibleRows, tooltipFor } = setup();
+    meters.onEvent(dmg(1, 51, 300, 'Aimed Shot')); // the pet never acts
+    meters.update();
+    meters.render(true);
+
+    const html = tooltipFor(visibleRows()[0]);
+    expect(headRows(html)).toEqual(['Hero']);
+    expect(html).not.toContain('Wolf Pet');
   });
 
   it('reuses the pooled bars across renders so a hovered row keeps its tooltip', () => {
@@ -155,28 +212,111 @@ describe('meters panel', () => {
     expect(tooltipFor(first)).toContain('Arcane Shot');
   });
 
-  it('adds a pet threat to its owner column and marks the owner when the pet holds aggro', () => {
+  it('gives the pet its own threat bar and marks the pet the mob is on', () => {
     const { meters, visibleRows, tooltipFor } = setup();
     meters.onEvent(dmg(1, 51, 300, 'Aimed Shot'));
+    meters.onEvent(dmg(3, 51, 200, 'Claw'));
     meters.onEvent(dmg(2, 51, 100, 'Smite'));
     meters.update();
     (document.querySelector('.mt-tab[data-tab="threat"]') as HTMLElement).click();
 
     const rows = visibleRows();
-    expect(rows.map((el) => el.querySelector('.mt-label')?.textContent)).toEqual(['Hero', 'Pal']);
-    // 100 own hate + the pet's 50, not the bare 100
-    expect(rows[0].querySelector('.mt-num')?.textContent).toBe('150');
-    expect(rows[1].querySelector('.mt-num')?.textContent).toBe('40');
-    // the mob is chewing on the PET, which no longer has a row of its own
-    expect(rows[0].classList.contains('aggro')).toBe(true);
-    expect(rows[1].classList.contains('aggro')).toBe(false);
+    // three hate-table entries, three bars, each the number the mob compares
+    expect(rows.map((el) => el.querySelector('.mt-label')?.textContent)).toEqual([
+      'Hero',
+      'Wolf Pet',
+      'Pal',
+    ]);
+    expect(rows.map((el) => el.querySelector('.mt-num')?.textContent)).toEqual(['100', '50', '40']);
+    // the mob is chewing on the PET, so the PET's bar carries the marker
+    expect(rows.map((el) => el.classList.contains('aggro'))).toEqual([false, true, false]);
 
-    // the hover panel splits that column back into its contributors: the member
-    // and one row per pet, NOT the per-ability split the damage tab shows
-    const html = tooltipFor(rows[0]);
-    expect(tipRows(html)).toEqual([
-      ['Hero', '100 (67%)'],
-      ['Wolf Pet', '50 (33%)'],
+    // the hover panel behind a pet bar is that pet's own damage, not the owner's
+    expect(tipRows(tooltipFor(rows[1]))).toEqual([['Wolf Pet: Claw', '200 (100%)']]);
+    expect(tipRows(tooltipFor(rows[0]))).toEqual([['Aimed Shot', '300 (100%)']]);
+  });
+
+  it('follows the live mob when the latched one dies, instead of freezing', () => {
+    // The "it stops updating" report. Wolf A and Wolf B are the same size, so
+    // the old strictly-greater latch never moved off A; once A died the tab
+    // showed damage-dealt-to-a-corpse, which could never change again.
+    const { meters, world, visibleRows } = setup();
+    const entities = world.entities as Map<number, any>;
+    const wolfB = {
+      id: 52,
+      kind: 'mob',
+      name: 'Gorrak',
+      templateId: 'gorrak',
+      maxHp: 400,
+      dead: false,
+      aggroTargetId: 1,
+      threat: new Map<number, number>([
+        [1, 900],
+        [2, 300],
+      ]),
+    };
+    entities.set(52, wolfB);
+
+    meters.onEvent(dmg(1, 51, 300, 'Aimed Shot'));
+    meters.onEvent(dmg(2, 51, 100, 'Smite'));
+    meters.update();
+    (document.querySelector('.mt-tab[data-tab="threat"]') as HTMLElement).click();
+
+    // the first mob dies mid-fight and the server stops sending its hate table
+    const wolfA = entities.get(51);
+    wolfA.dead = true;
+    wolfA.threat.clear();
+    meters.render(true);
+
+    // the tab moved to the live mob and shows ITS hate, not frozen damage
+    const rows = visibleRows();
+    expect(rows.map((el) => el.querySelector('.mt-num')?.textContent)).toEqual(['900', '300']);
+    expect(rows[0].classList.contains('aggro')).toBe(true);
+  });
+
+  it('says so when it has fallen back to damage, so bars never pose as hate', () => {
+    const { meters, world, visibleRows } = setup();
+    const entities = world.entities as Map<number, any>;
+    meters.onEvent(dmg(1, 51, 300, 'Aimed Shot'));
+    meters.update();
+    (document.querySelector('.mt-tab[data-tab="threat"]') as HTMLElement).click();
+
+    // nothing live is left: the only mob is dead and its table is gone
+    const wolfA = entities.get(51);
+    wolfA.dead = true;
+    wolfA.threat.clear();
+    meters.render(true);
+
+    expect(visibleRows()).toHaveLength(1);
+    const sub = document.querySelector('.mt-sub')?.textContent ?? '';
+    expect(sub).toContain('showing damage');
+    expect(sub).toContain('Gorrak');
+  });
+
+  it('tracks the mob the player targeted, even beside a bigger one', () => {
+    const { meters, world, visibleRows } = setup();
+    const entities = world.entities as Map<number, any>;
+    entities.set(52, {
+      id: 52,
+      kind: 'mob',
+      name: 'Gorrak',
+      templateId: 'gorrak',
+      maxHp: 9000, // bigger, so the size rule alone would pick this one
+      dead: false,
+      aggroTargetId: 2,
+      threat: new Map<number, number>([[2, 700]]),
+    });
+    entities.get(1).targetId = 51;
+
+    meters.onEvent(dmg(1, 51, 300, 'Aimed Shot'));
+    meters.update();
+    (document.querySelector('.mt-tab[data-tab="threat"]') as HTMLElement).click();
+
+    // Gorrak-the-big is engaged too, but the meter follows the player's target:
+    // these are wolf 51's hate values (Hero 100, pet 50), not the big one's 700
+    expect(visibleRows().map((el) => el.querySelector('.mt-num')?.textContent)).toEqual([
+      '100',
+      '50',
     ]);
   });
 

@@ -143,13 +143,16 @@ describe('gfx override application', () => {
       ]),
     );
 
+    // Regenerated for the new maxPooledObjects field (mobile-disconnect fix: bounds the
+    // ground-object reuse pool on constrained-memory devices, mirroring maxPooledCharacterVisuals).
+    // New field, same shape otherwise; every profile's byte pin shifts because the key exists now.
     expect(hashes).toEqual({
-      low: '42ed799774110700ab92986f9c91ca11eddf4dec10f283c840c8dceaa193678f',
-      medium: 'c050b1dcd93c42a1e3bb889d09d111a01843d40f3c2e6b18246fa29fa72df5f2',
-      high: '2c9f07d64a9bc6de9bef133b0fda15b78cf5b3caea3c1b663e2581acc4cb64a7',
-      ultra: 'a4d06e8812fb3d633004e6e0b7b0476d09fcea35bf5e4867a41c298844451345',
-      insane: 'f958af0c8455eb70663b7eb7298fc20d2508d1250897aa340eb57152b142e960',
-      advanced: 'a46ab9ada9e851a87cc5c54ce48650fbce8c704368b22d87bb6f1f21c4b8467e',
+      low: 'edbafff9b716f0cd2ee525390025a8f10b474b4ed19ed67c22d56b16d3e8b840',
+      medium: '63569868f1845852334269e5547b67a389099306ef90b835916c3c393568d770',
+      high: '6ff17afbf9ac4bf36a64c9cc4ec501143f0572506fcf1aad1fd603a0d0c15a19',
+      ultra: 'd496bf434d20782e7c0a63feaf5097305c47dae4615a81cb8019faf1cf61a8fb',
+      insane: 'd4498dbaa24f061443c527ca4ce5a331bdaf36c68c9fc847208a34d5892e97a8',
+      advanced: 'cb2710197cf5ad2be0f8e2917a3bb223aefcea29149d45eff9bb65df3d45f1e9',
     });
   });
 

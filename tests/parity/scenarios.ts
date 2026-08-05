@@ -1590,14 +1590,20 @@ function masterLoot(): Scenario {
       'resolveLootRoll tie-break rng.int over tied need rolls',
     ],
     // Seed re-hunted 1091 -> 1326 by the release/v0.32.0 base merge, then
-    // 1326 -> 1383 by the zones 1 to 3 quest-dedupe content. This branch never
-    // touches master-loot logic (src/sim/loot/loot_roll.ts has no commits
-    // here); its extra content just moves the shared rng before the rolls, and
-    // at the old seed the need rolls stopped TYING. The tie is the whole point
-    // of the scenario's last coverage line (resolveLootRoll's tie-break
-    // rng.int), so the seed is re-hunted to keep two rollers level rather than
-    // re-recorded to whatever the new draw happens to be.
-    build: () => new Sim({ seed: 1383, playerClass: 'warrior', noPlayer: true }),
+    // 1326 -> 1383 by the zones 1 to 3 quest-dedupe content, then 1383 -> 247 by
+    // the Galecrest unspawnable-quest camp fix (shoal_scuttler/gale_wisp). This
+    // branch never touches master-loot logic (src/sim/loot/loot_roll.ts has no
+    // commits here); its extra content just moves the shared rng before the
+    // rolls, and at the old seed the need rolls stopped TYING. The tie is the
+    // whole point of the scenario's last coverage line (resolveLootRoll's
+    // tie-break rng.int), so the seed is re-hunted to keep two rollers level
+    // rather than re-recorded to whatever the new draw happens to be.
+    build: () =>
+      new Sim({
+        seed: 247,
+        playerClass: 'warrior',
+        noPlayer: true,
+      }),
     drive(rec: Recorder) {
       const sim = rec.sim as AnySim;
       const a = sim.addPlayer('warrior', 'Aaa');
@@ -2826,7 +2832,12 @@ function delveProgression(): Scenario {
         rec.tick(3); // walk into the tombstone -> advanceDelveModule to the finale
       }
       rec.snapshot('advanced-to-finale');
-      // Marks shop: an 'available'-gated piece + a companion rank bump.
+      // Marks shop: an 'available'-gated piece + a companion rank bump. Both
+      // are gated to Brother Halven's board at the delve door (12 yards),
+      // like enter_delve, so step back to the door before spending.
+      p.pos = { x: def.doorPos.x, y: p.pos.y, z: def.doorPos.z };
+      p.prevPos = { ...p.pos };
+      sim.rebucket(p);
       const meta = sim.players.get(sim.playerId) as any;
       meta.delveMarks = 100;
       meta.copper = 100000;
@@ -3309,10 +3320,19 @@ function c3AuraRunner(): Scenario {
       // every 40 ticks (the 2s classic tick): the food heal runs ctx.healingTakenMult +
       // the 'heal' emit, the drink restores mana, and the short buff_ap expires inside
       // updateAuras -> statsDirty -> recalcPlayerStats (+ applyNonPlayerStatAura).
+      // The hp deficit is a FRACTION of the beefed maxHp (50000, see `beef` above), not
+      // an absolute amount: recalcPlayerStats preserves the hp/maxHp FRACTION across a
+      // maxHp change (entity.ts `hpFrac`), so once the buff_ap expiry below shrinks
+      // maxHp back down to the real (unbeefed) paladin value, an absolute deficit like
+      // "600 short of 50000" collapses to a tiny few points of the real pool, small
+      // enough that a single stacked natural-regen tick (#1608: eating no longer blocks
+      // it) closes the whole gap before the food tick's own check runs, and the food
+      // heal this phase exists to cover never fires. A fractional deficit survives the
+      // rescale untouched, so the food heal still has real work left to do afterward.
       p.inCombat = false;
       p.combatTimer = 99;
       p.fiveSecondRule = 99;
-      p.hp = Math.max(1, p.maxHp - 600);
+      p.hp = Math.max(1, Math.round(p.maxHp * 0.4));
       p.resource = Math.max(0, p.maxResource - 300);
       p.eating = {
         itemId: 'parity_food',
@@ -4528,10 +4548,11 @@ function cardDuel(): Scenario {
 // literal is pinned here. Re-hunted after the new-realm quest pass shifted the
 // construction-time draw stream (quest camps + escort NPC spawns across the new
 // realms), again after the Eastbrook camp respacing thinned the zone-1 camp
-// counts, and again (10 -> 5) after the zones 1 to 3 quest-dedupe content (egg
-// clutch camps, the new elites) moved the shared stream once more. Spare seeds
-// 14 and 27 were also verified to fire the proc for this drive.
-function professionsCraft(seed = 5): Scenario {
+// counts, again (10 -> 5) after the zones 1 to 3 quest-dedupe content (egg
+// clutch camps, the new elites) moved the shared stream once more, and again
+// (5 -> 2) after the Galecrest unspawnable-quest camp fix (shoal_scuttler/
+// gale_wisp) moved it again.
+function professionsCraft(seed = 2): Scenario {
   return {
     name: 'professions_craft',
     coverage: [

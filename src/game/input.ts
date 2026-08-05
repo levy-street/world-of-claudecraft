@@ -63,6 +63,9 @@ export interface InputCallbacks {
   // Pet-bar command (bound to Ctrl+1..5 by default): attack the current target,
   // stop (passive stance), taunt, or set the defensive/aggressive stance.
   onPet(action: 'attack' | 'stop' | 'taunt' | 'defensive' | 'aggressive'): void;
+  // Select your own pet (Ctrl+6 by default). Separate from onPet: this targets the
+  // pet rather than commanding it, so it belongs with the targeting callbacks above.
+  onTargetPet(): void;
   onAbility(slot: number): void;
   // Action-bar slot key DOWN / UP, so a slot can HOLD to charge (the Vale Cup
   // shoot) and release to fire. A tap is a down immediately followed by an up.
@@ -250,7 +253,8 @@ export class Input {
   // mouselook do, instead of only ever orbiting the free camera.
   private gamepadLookActive = false;
   private touchLookVector = { x: 0, y: 0 };
-  // multiplier on the touch look (camera joystick) rate; setTouchLookSpeed
+  // multiplier on the touch look rate, both the camera joystick (updateTouchLook)
+  // and the default one-finger swipe-drag (applyTouchLookDelta); setTouchLookSpeed
   // drives it from the settings menu. Mouselook uses lookSensitivity instead.
   private touchLookSpeed = 1;
   // +1 normal, -1 when the player inverts the touch camera's vertical axis
@@ -636,7 +640,7 @@ export class Input {
   }
 
   applyTouchLookDelta(dx: number, dy: number): void {
-    const dragSens = this.lookSensitivity * TOUCH_DRAG_SENS_MULT;
+    const dragSens = this.lookSensitivity * TOUCH_DRAG_SENS_MULT * this.touchLookSpeed;
     this.camYaw -= dx * dragSens;
     this.camPitch = Math.min(
       1.35,
@@ -1044,6 +1048,9 @@ export class Input {
         return;
       case 'petAggressive':
         this.cb.onPet('aggressive');
+        return;
+      case 'targetPet':
+        this.cb.onTargetPet();
         return;
       case 'interact':
         this.cb.onUiKey('interact');

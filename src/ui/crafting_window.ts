@@ -17,6 +17,7 @@ import {
   craftingTabs,
   resolveSelectedCraft,
 } from './crafting_view';
+import { markDialogRoot } from './dialog_root';
 import { itemDisplayName, tEntity } from './entity_i18n';
 import { esc } from './esc';
 import { formatNumber, type TranslationKey, t } from './i18n';
@@ -64,6 +65,9 @@ export interface CraftingWindowDeps extends PainterHostPresentation {
   hideTooltip(): void;
   onCraft(recipeId: string): void;
   onClose(): void;
+  /** Opens the commission order board (issue #1298), the crafting window's
+   *  one entry point to it: a header button beside the close button. */
+  onOpenOrders(): void;
   /** Commission opt-in state (Professions 2.0), held by the HUD so
    *  it survives the window's staleness repaints: whether `recipeId` is
    *  currently opted in, and the toggle callback the per-row checkbox fires.
@@ -89,6 +93,10 @@ export function renderCraftingWindow(
   learnHints: ReadonlyMap<string, CraftLearnHint> = new Map(),
 ): void {
   deps.hideTooltip();
+  // A standalone trapping window (the train/professions shape), not the
+  // vendor's docked bags pairing: announce it as a labeled dialog for the
+  // focus contract (src/ui/CLAUDE.md).
+  markDialogRoot(el, { label: t('hudChrome.crafting.title') });
   const scrollTop = el.querySelector('.crafting-body')?.scrollTop ?? 0;
   // The tab strip is its own horizontal scroller on mobile (hud.mobile.css
   // `.crafting-tabs { overflow-x: auto }`) and is rebuilt with everything
@@ -106,7 +114,8 @@ export function renderCraftingWindow(
   const skillListScrollTop = oldSkillList?.scrollTop ?? 0;
   const skillListHadFocus = oldSkillList !== null && document.activeElement === oldSkillList;
   const cardScrollTop = el.querySelector('.profession-identity-card')?.scrollTop ?? 0;
-  el.innerHTML = `<div class="panel-title"><span>${esc(t('hudChrome.crafting.title'))}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('hudChrome.crafting.close'))}">${svgIcon('close')}</button></div>`;
+  el.innerHTML = `<div class="panel-title"><span>${esc(t('hudChrome.crafting.title'))}</span><button type="button" class="crafting-orders-btn" data-open-orders aria-label="${esc(t('hudChrome.commissionBoard.openButtonAria'))}">${esc(t('hudChrome.commissionBoard.openButton'))}</button><button type="button" class="x-btn" data-close aria-label="${esc(t('hudChrome.crafting.close'))}">${svgIcon('close')}</button></div>`;
+  el.querySelector('[data-open-orders]')?.addEventListener('click', () => deps.onOpenOrders());
 
   if (identity) renderProfessionIdentityCard(el, identity);
 

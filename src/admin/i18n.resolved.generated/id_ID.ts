@@ -388,6 +388,8 @@ export const id_ID: AdminTranslations = {
   "moderationHistory.actionKill": "Dibunuh",
   "moderationHistory.actionJail": "Dipenjara",
   "moderationHistory.actionUnjail": "Dibebaskan dari penjara",
+  "moderationHistory.actionSpectate": "Spectated",
+  "moderationHistory.actionUnspectate": "Stopped spectating",
   "moderationHistory.actionNote": "Catatan",
   "moderationHistory.actionResetPassword": "Kata sandi diatur ulang",
   "moderationHistory.actionDailyRewardsBan": "Dilarang mengikuti Hadiah Harian",

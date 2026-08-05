@@ -296,6 +296,19 @@
     <div id="bottom-bar">
       <div id="actionbar-row">
         <div id="actionbar-stack">
+          <div id="pet-cluster">
+            <div id="petbar" class="panel"></div>
+            <div id="pet-frame" class="unitframe petframe" role="button" tabindex="0" data-i18n-aria="hudChrome.unitFrame.petLabel" aria-label="Your Pet" style="display: none">
+              <div class="portrait-wrap">
+                <div class="portrait"><canvas id="petf-portrait" width="54" height="54"></canvas></div>
+                <div class="level-chip" id="petf-level"></div>
+              </div>
+              <div class="uf-bars">
+                <div class="uf-name" id="petf-name"></div>
+                <div class="bar hp"><div class="bar-fill" id="petf-hp"></div><div class="bar-text" id="petf-hp-text"></div></div>
+              </div>
+            </div>
+          </div>
           <div id="player-frame" class="unitframe" role="group" tabindex="0" aria-haspopup="menu" data-i18n-aria="hudChrome.unitFrame.playerLabel" aria-label="Your Hero">
             <div class="portrait-wrap">
               <div class="portrait"><canvas id="pf-portrait" width="54" height="54"></canvas></div>
@@ -310,7 +323,6 @@
               <div class="bar mana" id="pf-resource"><div class="bar-fill" id="pf-res"></div><div class="bar-text" id="pf-res-text"></div><div class="low-resource-label" id="pf-low-resource"></div></div>
             </div>
           </div>
-          <div id="petbar" class="panel"></div>
           <div id="stancebar"></div>
           <div id="actionbar3" class="panel"></div>
           <div id="actionbar2" class="panel"></div>
@@ -431,6 +443,7 @@
     <div id="vendor-window" class="window panel"></div>
     <div id="train-window" class="window panel"></div>
     <div id="unbind-window" class="window panel"></div>
+    <div id="commission-board-window" class="window panel"></div>
     <div id="card-duel-window" class="window panel"></div>
     <div id="town-focus-window" class="window panel"></div>
     <div id="map-window" class="window panel">

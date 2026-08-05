@@ -1448,6 +1448,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.keybinds.petAttack': 'Yoldaş: Saldır',
   'hudChrome.keybinds.petDefensive': 'Yoldaş: Savunmacı',
   'hudChrome.keybinds.petStop': 'Yoldaş: Dur',
+  'hudChrome.keybinds.targetPet': 'Yoldaş: Hedefle',
   'hudChrome.keybinds.petTaunt': 'Yoldaş: Kışkırt',
   'hudChrome.mailbox.parcelQtyDecreaseAria': 'Bir adet daha az {item} gönder',
   'hudChrome.mailbox.parcelQtyIncreaseAria': 'Bir adet daha fazla {item} gönder',
@@ -7596,6 +7597,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.partyGroup': 'Grup {n}',
   'hudChrome.unitFrame.partyLabel': 'Takımın',
   'hudChrome.unitFrame.playerLabel': 'Kahramanın',
+  'hudChrome.unitFrame.petLabel': 'Yoldaşın',
   'hudChrome.unitFrame.targetAnnounce': '{name} hedefini işaretle',
   'hudChrome.unitFrame.targetLabel': 'Hedefin',
   'hudChrome.widgets.clockTitle': 'Yerel saat - 12/24 saat biçimi arasında geçiş için tıkla',
@@ -8592,6 +8594,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.event.hint': 'Bir akın, buluşma veya etkinlik duyur',
   'hudChrome.discord.relay.help.label': 'Yardım Lazım',
   'hudChrome.discord.relay.help.hint': 'Topluluktan yardım iste',
+  'hudChrome.options.hideUnusedActionSlots': 'Kullanılmayan Eylem Alanlarını Gizle',
   'hudChrome.options.showSecondaryActionBar': 'İkincil Eylem Çubuğunu Göster',
   'errors.api.desktopCodeInvalid':
     'Masaüstü giriş kodu geçersiz veya süresi dolmuş. Lütfen tekrar deneyin.',
@@ -10055,6 +10058,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hud.combat.evaded': '{target}, {ability} yeteneğinden kaçındı.',
   'hudChrome.options.mouseoverCast': 'Grup Çerçevelerinde İmleçle Büyü Yapma',
   'hudChrome.options.showTargetOfTarget': 'Hedefin Hedefini Göster',
+  'hudChrome.options.showPetFrame': 'Yoldaşını Göster',
   'hudChrome.unitFrame.targetOfTargetLabel': 'Hedefin Hedefi',
   'itemUi.market.rarityLegendary': 'Efsanevi',
   'loading.reconnectingAttempt':

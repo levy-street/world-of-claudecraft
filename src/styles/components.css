@@ -5924,6 +5924,153 @@
     opacity: 0.7;
   }
 
+  /* ---------- commission order board (issue #1298) ---------- */
+  /* The crafting window's header button that opens the board, sized like the
+     adjacent .x-btn close button but text-bearing (a pill, not a glyph). */
+  .crafting-orders-btn {
+    display: inline-flex;
+    align-items: center;
+    margin-left: auto;
+    margin-right: 8px;
+    padding: 4px 12px;
+    min-height: 26px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.3);
+    color: var(--color-text-muted);
+    font-family: var(--title-font);
+    font-size: 11px;
+    cursor: var(--cursor-point);
+  }
+  .crafting-orders-btn:hover {
+    color: var(--gold);
+    border-color: var(--gold-dim);
+  }
+  @media (pointer: coarse) {
+    .crafting-orders-btn {
+      min-height: 40px;
+    }
+  }
+  #commission-board-window {
+    width: 460px;
+  }
+  .commission-board-intro {
+    display: block;
+    padding: 4px 6px 6px;
+    color: var(--color-text-muted);
+    font-size: 10.5px;
+    line-height: 1.4;
+  }
+  /* The "open a new order" form: the mail-send form's field layout (label
+     stacked over control), a new class family since this is a distinct
+     surface, never a second edit of .mail-field. */
+  .commission-board-form {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 6px;
+    margin: 0 6px 10px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.2);
+  }
+  .commission-form-title {
+    font-family: var(--title-font);
+    font-size: 12px;
+    color: var(--gold);
+  }
+  .commission-field {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .commission-field label {
+    font-size: 11px;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .commission-field input[type="text"] {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 7px 10px;
+    font-size: 16px;
+    background: #120d07;
+    border: 1px solid #5a4a2a;
+    border-radius: 6px;
+    color: #ffe6a8;
+    font-family: Georgia, serif;
+  }
+  .commission-field input[type="text"]:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 1px;
+    border-color: var(--color-border-focus);
+  }
+  .commission-radio-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .commission-radio-row label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--color-text);
+    text-transform: none;
+    letter-spacing: normal;
+    cursor: var(--cursor-point);
+  }
+  .commission-submit-btn {
+    padding: 10px;
+    min-height: 40px;
+    font-family: var(--title-font);
+    font-size: 13px;
+    color: #1c1206;
+    background: linear-gradient(180deg, #e9c064, #b98a2e);
+    border: 1px solid #7a5a1e;
+    border-radius: 6px;
+    cursor: var(--cursor-point);
+  }
+  .commission-submit-btn:hover {
+    filter: brightness(1.08);
+  }
+  .commission-submit-btn:focus-visible,
+  .commission-order-btn:focus-visible,
+  .crafting-orders-btn:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  .commission-board-sections {
+    display: flex;
+    flex-direction: column;
+  }
+  /* One order row: the vendor-item card, non-button (several actions may
+     apply to one row), so the action chips live in their own trailing
+     cluster instead of the card itself being clickable. */
+  .commission-order-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .commission-order-actions {
+    display: flex;
+    gap: 6px;
+    margin-left: auto;
+  }
+  .commission-order-btn {
+    cursor: var(--cursor-point);
+    border: none;
+  }
+  @media (pointer: coarse) {
+    .commission-order-btn {
+      min-height: 40px;
+      padding-left: 14px;
+      padding-right: 14px;
+    }
+  }
+
   /* ---------- bags ---------- */
   /* bags, centred in the bottom gap between the action cluster and micro-menu */
   #bags {

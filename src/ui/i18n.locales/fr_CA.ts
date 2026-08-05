@@ -169,10 +169,6 @@ export const fr_CA: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.summon_water_elemental.description':
     "Invoque un élémentaire d'eau qui se bat à tes côtés, lance des Éclairs d'eau sur ta cible et canalise Jet d'eau. (Givre)",
   'entities.items.conjured_water4.name': 'Eau de source conjurée',
-  'entities.items.direfang_quiver.name': 'Carquois de Direfang',
-  'entities.items.gravewyrm_bone_quiver.name': 'Carquois en os du Gravewyrm',
-  'entities.items.cragmaw_huntquiver.name': 'Carquois de chasse de Cragmaw',
-  'entities.items.moggers_hide_quiver.name': 'Carquois en cuir de Mogger',
   'entities.items.conjured_bread4.name': 'Miche de festin conjurée',
   'entities.mobs.reliquary_gravecall_acolyte.name': "Acolyte de l'appel des tombes",
   'entities.mobs.water_elemental.name': 'Élémentaire des eaux',
@@ -304,4 +300,5 @@ export const fr_CA: Partial<Record<TranslationKey, string>> = {
   'hud.prompts.guildInviteCancelled':
     'Une invitation de guilde en attente a été annulée parce que la guilde a été renommée.',
   'hud.prompts.guildRenamed': "Votre guilde a été renommée en {name} par l'équipe de modération.",
+  'hudChrome.options.hideUnusedActionSlots': "Masquer les emplacements d'action inutilisés",
 };

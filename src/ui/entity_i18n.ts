@@ -416,6 +416,17 @@ export function dungeonDisplayName(dungeonId: string): string {
   return tEntity({ kind: 'dungeon', id: dungeonId, field: 'name' });
 }
 
+/** The label a live rift floor (IWorld.riftFloor) shows wherever a surface needs
+ *  display text for it: the generated floor name, plus its C/B/A/S rank in
+ *  parens (omitted for a dev-portal run, whose tier is null). Not a tEntity
+ *  wrapper (the name/rank come from the generated RiftFloorView, not a content
+ *  id lookup); the single shared home so the minimap, the world map, and the
+ *  map-window summary format it identically instead of each re-declaring the
+ *  same rank ? label ternary. */
+export function riftFloorLabel(name: string, rank: string | null): string {
+  return rank ? t('hud.core.riftLabelRanked', { name, rank }) : t('hud.core.riftLabel', { name });
+}
+
 export function resetEntityTranslationFallbackLog(): void {
   fallbackLog.clear();
 }

@@ -778,6 +778,13 @@ const HEAVY_SELF_EVENTS = new Set<string>([
   // offer an enchant the player can no longer afford. The bagged arm's loot
   // event already covered it; this makes both arms explicit.
   'enchantResult',
+  // Commission order board delivery (issue #1298): the crafter's arm
+  // removes the delivered copy directly from PlayerMeta.inventory (no
+  // addItem/removeItem call, so no loot event fires on that side), so the
+  // result event itself must re-diff the crafter's heavy self keys or their
+  // inv mirror goes stale until the staggered refresh. The requester's side
+  // already gets a loot event from the ordinary addItemInstance grant.
+  'commissionOrderResult',
 ]);
 
 // How often to re-broadcast online players' $WOC holder-tier flair. Each wallet
@@ -6071,6 +6078,9 @@ export class GameServer {
       case 'targetNearestFriendly':
         sim.targetNearestFriendly(pid);
         break;
+      case 'stopAutoAttackOnTargetSwitch':
+        sim.setStopAutoAttackOnTargetSwitch(!!msg.enabled, pid);
+        break;
       case 'attack':
         sim.startAutoAttack(pid);
         break;
@@ -6297,6 +6307,34 @@ export class GameServer {
         // member so the cleared payload and the fee debit re-diff the self
         // inv/purse mirrors on the next snapshot.
         if (typeof msg.item === 'string') sim.unbindItem(msg.item, pid);
+        break;
+      // Commission order board (Professions 2.0, issue #1298): the sim
+      // resolvers re-validate every field (recipe/eligibility/scope/state/
+      // range/space, nothing trusted from the client); the outcome reaches
+      // this client as the pid-scoped text-free commissionOrderResult event,
+      // a HEAVY_SELF_EVENTS member so a delivery's bag change re-diffs the
+      // crafter's own inv mirror on the next snapshot (the requester's side
+      // rides the ordinary addItemInstance loot event). The durable order
+      // list itself converges through the per-tick `corder` self-delta for
+      // every affected viewer, not through this event.
+      case 'open_commission_order':
+        if (typeof msg.recipe === 'string' && (msg.scope === 'open' || msg.scope === 'crafter')) {
+          sim.openCommissionOrder(
+            msg.recipe,
+            msg.scope,
+            typeof msg.crafter === 'string' ? msg.crafter : undefined,
+            pid,
+          );
+        }
+        break;
+      case 'cancel_commission_order':
+        if (typeof msg.order === 'number') sim.cancelCommissionOrder(msg.order, pid);
+        break;
+      case 'accept_commission_order':
+        if (typeof msg.order === 'number') sim.acceptCommissionOrder(msg.order, pid);
+        break;
+      case 'deliver_commission_order':
+        if (typeof msg.order === 'number') sim.deliverCommissionOrder(msg.order, pid);
         break;
       case 'rift_upgrade_item':
         if (typeof msg.item === 'string') sim.upgradeRiftItem(msg.item, pid);
@@ -8298,6 +8336,11 @@ export class GameServer {
     // naturally flips to null the tick a station lapses and the client never
     // reasons about tick domains. Small scalar, diffed per tick like atitle.
     maybe('mst', this.sim.activeMobileStationCraftFor(anchorSession.pid));
+    // Commission order board (issue #1298): the viewer's own projection
+    // (their requests, any order they accepted, and the open board), small
+    // and diffed per tick like `prof`/`cprof` above; this is how BOTH sides
+    // of an accept/deliver converge, not the commissionOrderResult event.
+    maybe('corder', this.sim.commissionOrdersFor(anchorSession.pid));
     // The viewer's own most recent enchanting-action outcomes (Professions
     // 2.0), or null. Small per-player reads diffed per tick like the other
     // scalars above (a successful action already refreshed the self inventory via

@@ -877,4 +877,32 @@ export const table: DeedLocaleTable = {
     name: 'Wat de Meeuwen Weten',
     desc: 'Vang een vis in de wateren van de Verrekust.',
   },
+  prog_engineering_rare: {
+    name: 'Precisie-ingenieurswerk',
+    desc: 'Vervaardig je eerste zeldzame stuk in Knutselwerk.',
+  },
+  prog_alchemy_rare: {
+    name: 'Een zeldzame jaargang',
+    desc: 'Vervaardig je eerste zeldzame stuk in Alchemie.',
+  },
+  prog_cooking_rare: {
+    name: 'Een onvergetelijk gerecht',
+    desc: 'Vervaardig je eerste zeldzame stuk in Koken.',
+  },
+  prog_leatherworking_rare: {
+    name: 'Fijn looien',
+    desc: 'Vervaardig je eerste zeldzame stuk in Leerbewerken.',
+  },
+  prog_tailoring_rare: {
+    name: 'Een meesterlijke steek',
+    desc: 'Vervaardig je eerste zeldzame stuk in Kleermaken.',
+  },
+  prog_weaponcrafting_rare: {
+    name: 'Gehard tot glans',
+    desc: 'Vervaardig je eerste zeldzame stuk in Wapensmeden.',
+  },
+  prog_armorcrafting_rare: {
+    name: 'Geplaat tot perfectie',
+    desc: 'Vervaardig je eerste zeldzame stuk in Harnasmaken.',
+  },
 };

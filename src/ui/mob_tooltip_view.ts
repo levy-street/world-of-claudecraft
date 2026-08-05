@@ -7,6 +7,7 @@
 // MobTooltipModel into the tooltip's HTML.
 // ---------------------------------------------------------------------------
 import { esc } from './esc';
+import type { TargetRank } from './target_rank_view';
 
 /** One Questie-style quest line pair: the quest's already-localized title
  *  (green) over its objective progress line (gold), e.g.
@@ -26,6 +27,11 @@ export interface MobTooltipModel {
   color: string;
   /** Whether the mob will attack the viewer (Entity.hostile), for the reaction line. */
   hostile: boolean;
+  /** Elite/boss rank, mirroring the target frame's rank chrome
+   *  (target_rank_view.ts, driven by the same MobTemplate.elite/.boss flags).
+   *  Drives an Elite/Boss badge line under the level/family line; 'normal'
+   *  renders no badge. */
+  rank: TargetRank;
   /** Active-quest objectives this mob advances (Questie-style), rendered
    *  between the level/family line and the reaction line. Empty = no lines. */
   quests: MobTooltipQuestLine[];
@@ -44,6 +50,14 @@ export function mobTooltipHtml(m: MobTooltipModel, deps: MobTooltipI18n): string
   const sub = `<div class="tt-sub" style="color:${m.color}">${esc(
     deps.t('hudChrome.mobTooltip.levelFamily', { level, family: m.familyLabel }),
   )}</div>`;
+  // Elite/boss rank badge, between the level/family line and any quest lines
+  // (mirrors the target frame's rank chrome, #tf-elite-tag). Normal rank
+  // renders nothing.
+  let rank = '';
+  if (m.rank !== 'normal') {
+    const rankKey = m.rank === 'boss' ? 'hudChrome.mobTooltip.boss' : 'hudChrome.mobTooltip.elite';
+    rank = `<div class="tt-rank">${esc(deps.t(rankKey))}</div>`;
+  }
   // Questie-style quest lines: quest title (green) over its progress (gold),
   // one pair per active objective this mob advances.
   let quests = '';
@@ -55,5 +69,5 @@ export function mobTooltipHtml(m: MobTooltipModel, deps: MobTooltipI18n): string
   const reactionClass = m.hostile ? 'tt-red' : 'tt-green';
   const reactionKey = m.hostile ? 'hudChrome.mobTooltip.hostile' : 'hudChrome.mobTooltip.friendly';
   const reaction = `<div class="${reactionClass}">${esc(deps.t(reactionKey))}</div>`;
-  return title + sub + quests + reaction;
+  return title + sub + rank + quests + reaction;
 }

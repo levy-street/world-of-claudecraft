@@ -3,7 +3,6 @@ import {
   buildMeterRows,
   type MeterRowsInput,
   type MeterRowTally,
-  threatOf,
 } from '../src/ui/meters_rows_view';
 
 const tally = (pid: number, name: string, over: Partial<MeterRowTally> = {}): MeterRowTally => ({
@@ -61,7 +60,12 @@ describe('meter bar rows', () => {
     expect(rows.map((r) => r.tally.name)).toEqual(['Hero']);
   });
 
-  it('adds a pet hate to its owner column', () => {
+  // The mob's pull-over rule compares each hate-table ENTRY on its own (110% in
+  // melee, 130% at range, src/sim/mob/targeting.ts). A bar that adds an owner
+  // and their pet together is measured against a threshold the mob never
+  // applies to that sum, so a hunter doing little damage personally rode the top
+  // of the meter and never pulled. Each entry gets its own bar instead.
+  it('gives a pet its own hate bar instead of folding it into its owner', () => {
     const rows = buildMeterRows(
       input({
         tallies: [tally(1, 'Hero'), tally(2, 'Pal')],
@@ -74,28 +78,47 @@ describe('meter bar rows', () => {
         petsByOwner: new Map([[1, [{ pid: 3, name: 'Emberkin' }]]]),
       }),
     );
-    expect(rows.map((r) => [r.tally.name, r.value])).toEqual([
-      ['Hero', 150],
+    expect(rows.map((r) => [r.petName ?? r.tally.name, r.value])).toEqual([
+      ['Hero', 100],
+      ['Emberkin', 50],
       ['Pal', 40],
     ]);
-    expect(threatOf(1, new Map([[1, 10]]), undefined)).toBe(10);
+    // never the folded 150: no entity on the mob's table holds that much
+    expect(rows.map((r) => r.value)).not.toContain(150);
+    // each bar names the entity whose hate it is, which is what the marker keys on
+    expect(rows.map((r) => r.threatPid)).toEqual([1, 3, 2]);
   });
 
-  it('marks the owner when the mob is chewing on their pet', () => {
+  it('keeps folding pets into the owner on the damage and healing tabs', () => {
+    // The damage-meter convention is right there and must not change: only the
+    // threat tab splits, because only threat is compared per entity.
+    const rows = buildMeterRows(
+      input({
+        tallies: [tally(1, 'Hero', { dmg: 300 })],
+        tab: 'dmg',
+        petsByOwner: new Map([[1, [{ pid: 3, name: 'Emberkin' }]]]),
+      }),
+    );
+    expect(rows.map((r) => [r.tally.name, r.value, r.petName])).toEqual([['Hero', 300, null]]);
+  });
+
+  it('marks the pet itself, not its owner, when the mob is chewing on the pet', () => {
     const rows = buildMeterRows(
       input({
         tallies: [tally(1, 'Hero'), tally(2, 'Pal')],
         tab: 'threat',
         liveThreat: new Map([
           [1, 100],
+          [3, 60],
           [2, 40],
         ]),
         petsByOwner: new Map([[1, [{ pid: 3, name: 'Emberkin' }]]]),
         aggroPid: 3,
       }),
     );
-    expect(rows.map((r) => [r.tally.name, r.hasAggro])).toEqual([
-      ['Hero', true],
+    expect(rows.map((r) => [r.petName ?? r.tally.name, r.hasAggro])).toEqual([
+      ['Hero', false],
+      ['Emberkin', true],
       ['Pal', false],
     ]);
   });

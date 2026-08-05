@@ -211,6 +211,36 @@ describe('content referential integrity', () => {
     expect(problems).toEqual([]);
   });
 
+  it('every kill-quest target mob actually spawns somewhere', () => {
+    // v0.34.0 shipped q_gc_scuttlers_in_the_pots (shoal_scuttler) and
+    // q_gc_wind_against_the_wick (gale_wisp) with kill targets that resolved
+    // fine in MOBS but had zero camp or dungeon spawn entry: unfinishable,
+    // and blocking the downstream Galecrest chain via requiresQuest. The
+    // "every quest reference resolves" test above only checks the mob id
+    // exists, never that anything spawns it, so this closes that gap.
+    // bound_guardian is a Nythraxis raid-encounter add spawned by the
+    // encounter script itself (src/sim/encounters/nythraxis.ts), not a
+    // world camp or a dungeon spawn list, so it is a documented exception.
+    const RAID_ENCOUNTER_SPAWNED = new Set(['bound_guardian']);
+    const spawning = new Set<string>();
+    for (const c of CAMPS) spawning.add(c.mobId);
+    for (const d of DUNGEON_LIST) for (const s of d.spawns) spawning.add(s.mobId);
+    const problems: string[] = [];
+    for (const q of Object.values(QUESTS)) {
+      for (const obj of q.objectives) {
+        if (
+          obj.type === 'kill' &&
+          obj.targetMobId &&
+          !spawning.has(obj.targetMobId) &&
+          !RAID_ENCOUNTER_SPAWNED.has(obj.targetMobId)
+        ) {
+          problems.push(`${q.id}: kill target ${obj.targetMobId} has no camp/dungeon spawn source`);
+        }
+      }
+    }
+    expect(problems).toEqual([]);
+  });
+
   it('zones tile the grid and content sits inside its zone band', () => {
     // the strip column tiles south to north exactly as it always did
     const strip = ZONES.filter((zn) => (zn.xMin ?? -180) <= -180 && (zn.xMax ?? 180) >= 180);
