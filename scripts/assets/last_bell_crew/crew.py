@@ -252,6 +252,13 @@ def flat_material(name, color, metallic=0.0, roughness=0.72, emission=None):
 # looking, not by reasoning about axes: see the Block-pose and Idle-pose grids in
 # the review pass. Because the frame is the bone's own, one tuning holds across all
 # 22 clips instead of only in the bind pose.
+#
+# WARNING (2026-08-05): these values no longer match the shipped book renders.
+# The committed plates carry hand-authored seats (full world matrices; the
+# square shield rides `lowerarm.l`, not the hand slot), captured from a live
+# Blender review and gated across all four clips. The seats and the protocol
+# live in `docs/design/last-bell-held-prop-workflow.md`. Regenerating the book
+# through this table will resurrect the fist-on-blade bug documented there.
 GRIPS = {
     "blade": {"rot": (0, 0, 0), "offset": (0, 0, 0), "scale": 0.62},
     "shield": {"rot": (90, 0, 0), "offset": (0, 0.02, 0), "scale": 0.62},

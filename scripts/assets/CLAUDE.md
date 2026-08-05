@@ -49,6 +49,14 @@ For reference-image reconstruction and procedural GLB authoring, read the living
   operation into the factory and re-render the HEADLESS output to confirm the two agree.
   Revolve-and-loft builders stay right for hard, genuinely separate props (a bronze
   circlet, a helm crest, an oilskin hat), and wrong for anything organic.
+  **Held props (weapons, shields) have their own protocol:**
+  `docs/design/last-bell-held-prop-workflow.md`. Read it before mounting or
+  verifying anything a character carries; it catalogs the five failure modes
+  that let a wrong sword grip survive multiple "verified" claims, and the
+  authoring/capture/gate workflow that replaced them (human authors seats in
+  the live session and scrubs every clip; the agent captures every prop
+  transform and gates renders on contact-point crops across all clips before
+  deploying).
 - **Source fingerprints are load-bearing.** Eastbrook-era exporters stamp a sha256 over a
   pinned input list (factory/entry/exporter/spec, `build_assets.mjs`, reference
   turnarounds, the shared atlas, and `package-lock.json`) into the GLB extras, and tests
