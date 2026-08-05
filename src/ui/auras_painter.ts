@@ -196,12 +196,7 @@ export class AurasPainter {
       // aura whose icon IS the affordance is not, and the carried-flag buff is
       // applied at the pickup so it sorts LAST and a flat first-N cap would shed
       // it first.
-      if (
-        !s.isDebuff &&
-        !s.alwaysRender &&
-        rendered >= cap &&
-        !ALWAYS_VISIBLE_AURA_IDS.has(s.key)
-      )
+      if (!s.isDebuff && !s.alwaysRender && rendered >= cap && !ALWAYS_VISIBLE_AURA_IDS.has(s.key))
         continue;
       rendered++;
       // Resolve the pool key. The common case (a unique aura id this frame) takes the

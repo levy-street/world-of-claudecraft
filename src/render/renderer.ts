@@ -9587,9 +9587,7 @@ export class Renderer {
       // Gated per form root: the resolved visibility AND the compile-pending
       // token both drive it, so a still-linking form pops in a frame or two
       // late instead of stalling the frame it is entered on.
-      v.sheepVisual?.setActive(
-        formVisibility.sheep && v.formCompilePending !== v.sheepVisual.root,
-      );
+      v.sheepVisual?.setActive(formVisibility.sheep && v.formCompilePending !== v.sheepVisual.root);
       v.bearVisual?.setActive(formVisibility.bear && v.formCompilePending !== v.bearVisual.root);
       v.catVisual?.setActive(formVisibility.cat && v.formCompilePending !== v.catVisual.root);
       v.travelVisual?.setActive(

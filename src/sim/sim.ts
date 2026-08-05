@@ -89,8 +89,8 @@ import { runEffects as runEffectsImpl } from './combat/effect_dispatch';
 import { applyIgnite } from './combat/fire_mage';
 import { frostMageChannelPulse } from './combat/frost_mage';
 import { type FrozenOrbState, tickFrozenOrbs } from './combat/frozen_orb';
-import { updateGuardian } from './combat/guardians';
 import { applyGreaterInvisibilityAftereffect } from './combat/greater_invisibility';
+import { updateGuardian } from './combat/guardians';
 import {
   applyHeal as applyHealImpl,
   consumeHealAbsorb as consumeHealAbsorbImpl,
@@ -109,6 +109,7 @@ import {
   resolveHunterSharedAbility,
 } from './combat/hunter_shared';
 import { tickNaturesFury } from './combat/natures_fury';
+import { clearOssuaryMarks, despawnTemporaryNecromancyUndead } from './combat/necromancy';
 import { radiantResonanceCastTime } from './combat/paladin_radiant_resonance';
 import { tryGrantSolarReprisal } from './combat/paladin_solar_reprisal';
 import {
@@ -124,7 +125,6 @@ import {
 import { isVeilboundMarchActive } from './combat/paladin_veilbound_state';
 import { cleanupPriestState } from './combat/priest/lifecycle';
 import { resolveVespersAbility } from './combat/priest/vespers';
-import { clearOssuaryMarks, despawnTemporaryNecromancyUndead } from './combat/necromancy';
 import * as resurrectionOfferMod from './combat/resurrection_offer';
 import { rewindHealAmount } from './combat/rewind';
 import { duskLingerOnStealthBreak } from './combat/rogue_talents';

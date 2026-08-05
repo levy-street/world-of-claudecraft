@@ -36,6 +36,7 @@ import {
 } from './assets';
 import { buildHalo } from './halo';
 import type { EmoteClipSpec, VisualDef, WeaponLayoutOverride } from './manifest';
+import { createMetamorphWingPose, metamorphWingPoseInto } from './metamorph_wing_motion_core';
 import {
   PALADIN_BASTION_SWEEP_CLIP,
   PALADIN_BASTION_SWEEP_DURATION,
@@ -46,7 +47,6 @@ import {
   PALADIN_TEMPLARS_VERDICT_DURATION,
 } from './paladin_templars_verdict_clip';
 import { PaladinTemplarsVerdictFx } from './paladin_templars_verdict_fx';
-import { createMetamorphWingPose, metamorphWingPoseInto } from './metamorph_wing_motion_core';
 import { SkeletonUpdateCache, type SkeletonUpdateStats } from './skeleton_update_cache';
 import { SKIN_ATTACK_CLIP_NAMES, weaponSkinAttackClips, weaponSkinOrientPin } from './skin_attack';
 import { configureTightBoneTextures } from './skin_gpu_layout';

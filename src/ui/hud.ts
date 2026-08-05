@@ -291,8 +291,8 @@ import {
   shouldFloatHealLanding,
   shouldShowHealLanding,
 } from './heal_landing_feedback_core';
-import { abilityRequirementKeys } from './hud/action_bar/ability_requirement_keys';
 import { honorFloatText } from './honor_float_view';
+import { abilityRequirementKeys } from './hud/action_bar/ability_requirement_keys';
 import {
   type ActionBarBindState,
   actionBarBindEnter,
