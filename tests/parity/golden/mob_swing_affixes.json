@@ -150,7 +150,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 952,
-      "state": "96e22d9c",
+      "state": "6f07fb42",
       "events": "cdd22232",
       "rng": {
         "draws": 56,
@@ -161,7 +161,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 952,
-      "state": "5e6a298a",
+      "state": "745085b2",
       "events": "b6171b51",
       "rng": {
         "draws": 92,
@@ -172,7 +172,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 952,
-      "state": "ec1fbf22",
+      "state": "7d6cceb6",
       "events": "2565a360",
       "rng": {
         "draws": 326,
@@ -183,7 +183,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 952,
-      "state": "9a702264",
+      "state": "b3f8bb40",
       "events": "741638a5",
       "rng": {
         "draws": 326,
@@ -287,27 +287,6 @@
             },
             {
               "duration": 10,
-              "id": "venom_webwood_spider",
-              "kind": "dot",
-              "name": "Spider Venom",
-              "remaining": 9.5,
-              "school": "nature",
-              "sourceId": 947,
-              "tickInterval": 2,
-              "tickTimer": 1.5,
-              "value": 2
-            },
-            {
-              "duration": 4,
-              "id": "silence_gravecaller_summoner",
-              "kind": "silence",
-              "name": "Silencing Shriek",
-              "remaining": 3.5,
-              "school": "shadow",
-              "sourceId": 948
-            },
-            {
-              "duration": 10,
               "id": "heal_absorb_gravecaller_summoner",
               "kind": "heal_absorb",
               "name": "Grave Blight",
@@ -333,6 +312,27 @@
               "remaining": 0.5,
               "school": "physical",
               "sourceId": 946
+            },
+            {
+              "duration": 10,
+              "id": "venom_webwood_spider",
+              "kind": "dot",
+              "name": "Spider Venom",
+              "remaining": 9.5,
+              "school": "nature",
+              "sourceId": 947,
+              "tickInterval": 2,
+              "tickTimer": 1.5,
+              "value": 2
+            },
+            {
+              "duration": 4,
+              "id": "silence_gravecaller_summoner",
+              "kind": "silence",
+              "name": "Silencing Shriek",
+              "remaining": 3.5,
+              "school": "shadow",
+              "sourceId": 948
             }
           ],
           "blockChance": 0.05,
@@ -702,7 +702,7 @@
       "tick": 64,
       "time": 3.2,
       "nextId": 952,
-      "state": "75fb3079",
+      "state": "71766d0d",
       "events": "741638a5",
       "rng": {
         "draws": 364,
@@ -806,27 +806,6 @@
             },
             {
               "duration": 10,
-              "id": "venom_webwood_spider",
-              "kind": "dot",
-              "name": "Spider Venom",
-              "remaining": 9.3,
-              "school": "nature",
-              "sourceId": 947,
-              "tickInterval": 2,
-              "tickTimer": 1.3,
-              "value": 2
-            },
-            {
-              "duration": 4,
-              "id": "silence_gravecaller_summoner",
-              "kind": "silence",
-              "name": "Silencing Shriek",
-              "remaining": 3.3,
-              "school": "shadow",
-              "sourceId": 948
-            },
-            {
-              "duration": 10,
               "id": "heal_absorb_gravecaller_summoner",
               "kind": "heal_absorb",
               "name": "Grave Blight",
@@ -852,6 +831,27 @@
               "remaining": 0.3,
               "school": "physical",
               "sourceId": 946
+            },
+            {
+              "duration": 10,
+              "id": "venom_webwood_spider",
+              "kind": "dot",
+              "name": "Spider Venom",
+              "remaining": 9.3,
+              "school": "nature",
+              "sourceId": 947,
+              "tickInterval": 2,
+              "tickTimer": 1.3,
+              "value": 2
+            },
+            {
+              "duration": 4,
+              "id": "silence_gravecaller_summoner",
+              "kind": "silence",
+              "name": "Silencing Shriek",
+              "remaining": 3.3,
+              "school": "shadow",
+              "sourceId": 948
             }
           ],
           "blockChance": 0.05,
