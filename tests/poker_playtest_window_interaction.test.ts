@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { PokerAction } from '../src/sim/poker/engine';
 import type { PokerClientPort, PokerClientState } from '../src/sim/poker/protocol';
 import { PokerPlaytestWindow } from '../src/ui/poker_playtest_window';
@@ -69,7 +69,47 @@ function state(): PokerClientState {
 }
 
 describe('poker playtest window interaction', () => {
-  it('forwards Call and Raise clicks through the live DOM binding', () => {
+  beforeEach(() => {
+    vi.stubGlobal('CSS', { escape: (value: string) => value });
+  });
+
+  it('shows two card backs for an opponent who remains in the hand', () => {
+    document.body.innerHTML = '<button id=launcher></button><section id=poker></section>';
+    const current = state();
+    const client: PokerClientPort = {
+      pokerState: () => current,
+      subscribe: () => () => {},
+      requestTables: vi.fn(),
+      join: vi.fn(),
+      watch: vi.fn(),
+      stopWatching: vi.fn(),
+      rebuy: vi.fn(),
+      leave: vi.fn(),
+      act: vi.fn(),
+    };
+    const root = document.querySelector<HTMLElement>('#poker');
+    const launcher = document.querySelector<HTMLElement>('#launcher');
+    if (!root || !launcher) throw new Error('Poker test DOM is missing');
+    const pokerWindow = new PokerPlaytestWindow({
+      root: () => root,
+      launcher: () => launcher,
+      client,
+      closeOthers: () => {},
+      captureFocus: () => null,
+      restoreFocus: () => {},
+      sound: { deal: () => {}, turn: () => {} },
+      now: () => 0,
+      schedule: () => 1,
+      cancelSchedule: () => {},
+    });
+
+    pokerWindow.toggle();
+
+    expect(root.querySelectorAll('.seat-1 .poker-card.back')).toHaveLength(2);
+    expect(root.querySelector('.seat-1 .poker-seat-cards')?.textContent).not.toContain('??');
+  });
+
+  it('forwards Call and a 1 BB stepped Raise through the live DOM binding', () => {
     document.body.innerHTML = '<button id=launcher></button><section id=poker></section>';
     const current = state();
     const act = vi.fn<(action: PokerAction) => void>();
@@ -102,16 +142,16 @@ describe('poker playtest window interaction', () => {
 
     pokerWindow.toggle();
     root.querySelector<HTMLButtonElement>('[data-focus-key=action-call]')?.click();
-    const wager = root.querySelector<HTMLInputElement>(`[data-wager='2']`);
-    if (wager) wager.value = '80';
+    root.querySelector<HTMLButtonElement>(`[data-wager-step='increase'][data-wager='2']`)?.click();
+    root.querySelector<HTMLButtonElement>(`[data-wager-step='increase'][data-wager='2']`)?.click();
     root.querySelector<HTMLButtonElement>('[data-focus-key=action-raise]')?.click();
 
+    expect(root.querySelector(`input[data-wager='2']`)).toBeNull();
     expect(act).toHaveBeenNthCalledWith(1, { type: 'call' });
     expect(act).toHaveBeenNthCalledWith(2, { type: 'raise', to: 80 });
   });
 
   it('preserves an in-progress Raise amount across the turn timer repaint', () => {
-    vi.stubGlobal('CSS', { escape: (value: string) => value });
     document.body.innerHTML = '<button id=launcher></button><section id=poker></section>';
     const current = state();
     if (!current.snapshot) throw new Error('Poker test snapshot is missing');
@@ -148,17 +188,23 @@ describe('poker playtest window interaction', () => {
     });
 
     pokerWindow.toggle();
-    const wager = root.querySelector<HTMLInputElement>(`[data-focus-key='wager-raise']`);
-    if (!wager) throw new Error('Raise wager input is missing');
-    wager.focus();
-    wager.value = '80';
-    wager.dispatchEvent(new Event('input', { bubbles: true }));
+    const increase = root.querySelector<HTMLButtonElement>(
+      `[data-focus-key='wager-raise-increase']`,
+    );
+    if (!increase) throw new Error('Raise increase button is missing');
+    increase.focus();
+    increase.click();
+    increase.click();
     const timerCallback = scheduled as (() => void) | null;
     if (!timerCallback) throw new Error('Turn timer was not scheduled');
     timerCallback();
 
-    const repainted = root.querySelector<HTMLInputElement>(`[data-focus-key='wager-raise']`);
-    expect(repainted?.value).toBe('80');
-    expect(document.activeElement).toBe(repainted);
+    const repainted = root.querySelector<HTMLOutputElement>(`output[data-wager-kind='raise']`);
+    expect(repainted?.dataset.wagerValue).toBe('80');
+    expect(repainted?.textContent).toBe('80');
+    const focused = root.querySelector<HTMLButtonElement>(
+      `[data-focus-key='wager-raise-increase']`,
+    );
+    expect(document.activeElement).toBe(focused);
   });
 });

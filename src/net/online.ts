@@ -2448,6 +2448,9 @@ export class ClientWorld implements IWorld, PokerClientPort {
 
   stopWatching(tableId: string): void {
     this.sendPoker({ t: 'poker_stop_watch', tableId });
+    this.pokerSnapshot = null;
+    this.pokerNames = {};
+    this.notifyPoker();
   }
 
   rebuy(tableId: string): void {
@@ -2456,6 +2459,9 @@ export class ClientWorld implements IWorld, PokerClientPort {
 
   leave(tableId: string): void {
     this.sendPoker({ t: 'poker_leave', tableId });
+    this.pokerSnapshot = null;
+    this.pokerNames = {};
+    this.notifyPoker();
   }
 
   act(action: PokerAction): void {
@@ -2564,9 +2570,11 @@ export class ClientWorld implements IWorld, PokerClientPort {
       return;
     }
     if (msg.t === 'poker_snapshot' && isPokerClientSnapshot(msg.snapshot)) {
-      this.pokerSnapshot = msg.snapshot;
-      this.pokerNames =
-        msg.names && typeof msg.names === 'object' && !Array.isArray(msg.names)
+      const detached = msg.snapshot.viewerSeat === null && !msg.snapshot.watching;
+      this.pokerSnapshot = detached ? null : msg.snapshot;
+      this.pokerNames = detached
+        ? {}
+        : msg.names && typeof msg.names === 'object' && !Array.isArray(msg.names)
           ? (msg.names as Record<number, string>)
           : {};
       this.pokerError = null;

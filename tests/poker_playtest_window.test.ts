@@ -23,7 +23,7 @@ describe('poker playtest window contract', () => {
 
   it('keeps every poker button at least 40 by 40 pixels', () => {
     expect(componentCss).toMatch(
-      /\.poker-action,[^{]*\.poker-control \{[^}]*min-width:\s*40px;[^}]*min-height:\s*40px;/s,
+      /\.poker-action,[^{]*\.poker-control,[^{]*\.poker-wager-step \{[^}]*min-width:\s*40px;[^}]*min-height:\s*40px;/s,
     );
   });
 

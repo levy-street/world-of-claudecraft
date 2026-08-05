@@ -87,6 +87,55 @@ describe('online poker wire', () => {
     });
   });
 
+  it('clears a stale table snapshot after the server confirms the viewer is detached', () => {
+    const { client, sent } = bareClient();
+    const snapshot = {
+      tableId: 'low-stakes-1',
+      handNumber: 1,
+      actionSequence: 0,
+      revision: 2,
+      viewerSeat: null,
+      watching: false,
+      turnDeadlineMs: null,
+      config: {
+        id: 'low-stakes-1',
+        numSeats: 2,
+        smallBlind: 10,
+        bigBlind: 20,
+        minBuyIn: 2000,
+        maxBuyIn: 2000,
+      },
+      button: null,
+      street: null,
+      actorSeat: null,
+      communityCards: [],
+      pots: [],
+      seats: [null, null],
+      legalActions: null,
+      lastResult: null,
+    };
+
+    client.onMessage(JSON.stringify({ t: 'poker_snapshot', snapshot, names: {} }));
+
+    expect(client.pokerState().snapshot).toBeNull();
+    expect(client.pokerState().names).toEqual({});
+
+    const seatedSnapshot = { ...snapshot, viewerSeat: 0 };
+    client.onMessage(
+      JSON.stringify({ t: 'poker_snapshot', snapshot: seatedSnapshot, names: { 1: 'Player' } }),
+    );
+    client.stopWatching('low-stakes-1');
+    expect(client.pokerState().snapshot).toBeNull();
+    expect(sent.at(-1)).toEqual({ t: 'poker_stop_watch', tableId: 'low-stakes-1' });
+
+    client.onMessage(
+      JSON.stringify({ t: 'poker_snapshot', snapshot: seatedSnapshot, names: { 1: 'Player' } }),
+    );
+    client.leave('low-stakes-1');
+    expect(client.pokerState().snapshot).toBeNull();
+    expect(sent.at(-1)).toEqual({ t: 'poker_leave', tableId: 'low-stakes-1' });
+  });
+
   it('ignores malformed poker frames instead of installing unsafe UI state', () => {
     const { client } = bareClient();
     client.onMessage(

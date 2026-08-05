@@ -5537,7 +5537,8 @@
   }
   .poker-action,
   .poker-reset,
-  .poker-control {
+  .poker-control,
+  .poker-wager-step {
     min-width: 40px;
     min-height: 40px;
     padding: 6px 12px;
@@ -5550,7 +5551,8 @@
   }
   .poker-action:hover,
   .poker-reset:hover,
-  .poker-control:hover:not(:disabled) {
+  .poker-control:hover:not(:disabled),
+  .poker-wager-step:hover:not(:disabled) {
     border-color: var(--gold);
   }
   .poker-action.primary {
@@ -5608,7 +5610,7 @@
     padding: 8px 0 0;
   }
   .poker-table-controls select,
-  .poker-wager input {
+  .poker-wager-value {
     min-height: 40px;
     border: 1px solid var(--border);
     background: var(--color-bg-input);
@@ -5616,13 +5618,26 @@
   }
   .poker-wager {
     display: grid;
-    grid-template-columns: auto minmax(80px, 130px) auto;
+    grid-template-columns: auto auto auto;
     align-items: center;
     gap: 6px;
   }
+  .poker-wager-stepper {
+    display: grid;
+    grid-template-columns: 40px minmax(64px, 96px) 40px;
+    align-items: center;
+    gap: 4px;
+  }
+  .poker-wager-value {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 8px;
+    font-variant-numeric: tabular-nums;
+  }
   .poker-action:focus-visible,
   .poker-control:focus-visible,
-  .poker-wager input:focus-visible,
+  .poker-wager-step:focus-visible,
   .poker-table-controls select:focus-visible {
     outline: 2px solid var(--focus-ring);
     outline-offset: 2px;

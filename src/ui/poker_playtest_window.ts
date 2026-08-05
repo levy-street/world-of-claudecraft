@@ -7,6 +7,7 @@ import {
   buildPokerPlaytestView,
   type PokerPlaytestView,
   pokerActionFromInput,
+  stepPokerWager,
 } from './poker_playtest_view';
 import { svgIcon } from './ui_icons';
 
@@ -290,10 +291,7 @@ export class PokerPlaytestWindow {
   ): string {
     const label = t(`hudChrome.pokerPlaytest.action.${action.kind}` as const);
     if (action.kind === 'bet' || action.kind === 'raise') {
-      const min = action.minTo ?? 1;
-      const max = action.maxTo === null ? '' : ` max=${action.maxTo}`;
-      const value = this.wagerDraft.get(action.kind) ?? String(min);
-      return `<label class=poker-wager><span>${esc(label)}</span><input type=number inputmode=numeric step=1 min=${min}${max} value='${esc(value)}' data-wager=${index} data-wager-kind=${action.kind} data-focus-key=wager-${action.kind}${connected ? '' : ' disabled'}><button type=button class=poker-action data-action=${index} data-focus-key=action-${action.kind}${connected ? '' : ' disabled'}>${esc(label)}</button></label>`;
+      return this.wagerMarkup(action, index, connected, label);
     }
     const text =
       action.amount === null
@@ -305,8 +303,54 @@ export class PokerPlaytestWindow {
     return `<button type=button class=poker-action data-action=${index} data-focus-key=action-${action.kind}${connected ? '' : ' disabled'}>${esc(text)}</button>`;
   }
 
+  private wagerMarkup(
+    action: PokerPlaytestView['actions'][number],
+    index: number,
+    connected: boolean,
+    label: string,
+  ): string {
+    if (action.kind !== 'bet' && action.kind !== 'raise') return '';
+    const min = action.minTo ?? 1;
+    const max = action.maxTo ?? min;
+    const value = Number(this.wagerDraft.get(action.kind) ?? min);
+    const amountLabel = t('hudChrome.pokerPlaytest.wagerAmount', { action: label });
+    const blindMarker = t('hudChrome.pokerPlaytest.bigBlindMarker');
+    const decrease = this.wagerStepButton(
+      action.kind,
+      index,
+      'decrease',
+      `- 1 ${blindMarker}`,
+      connected && value > min,
+    );
+    const increase = this.wagerStepButton(
+      action.kind,
+      index,
+      'increase',
+      `+ 1 ${blindMarker}`,
+      connected && value < max,
+    );
+    const output = `<output class=poker-wager-value data-wager=${index} data-wager-kind=${action.kind} data-wager-value=${value} aria-live=polite>${esc(formatNumber(value))}</output>`;
+    const submit = `<button type=button class=poker-action data-action=${index} data-focus-key=action-${action.kind}${connected ? '' : ' disabled'}>${esc(label)}</button>`;
+    return `<div class=poker-wager><span>${esc(label)}</span><div class=poker-wager-stepper role=group aria-label='${esc(amountLabel)}'>${decrease}${output}${increase}</div>${submit}</div>`;
+  }
+
+  private wagerStepButton(
+    kind: 'bet' | 'raise',
+    index: number,
+    direction: 'decrease' | 'increase',
+    ariaLabel: string,
+    enabled: boolean,
+  ): string {
+    const symbol = direction === 'increase' ? '+' : '-';
+    return `<button type=button class=poker-wager-step data-wager=${index} data-wager-kind=${kind} data-wager-step=${direction} data-focus-key=wager-${kind}-${direction} aria-label='${esc(ariaLabel)}'${enabled ? '' : ' disabled'}>${symbol}</button>`;
+  }
+
   private cards(values: string[], hidden = false): string {
-    if (!values.length) return hidden ? '??' : esc(t('hudChrome.pokerPlaytest.noCards'));
+    if (!values.length) {
+      return hidden
+        ? `<span class='poker-card back' aria-hidden=true></span><span class='poker-card back' aria-hidden=true></span>`
+        : esc(t('hudChrome.pokerPlaytest.noCards'));
+    }
     return values.map((value) => `<span class=poker-card>${esc(value)}</span>`).join('');
   }
 
@@ -390,6 +434,9 @@ export class PokerPlaytestWindow {
   }
 
   private bindPokerActions(root: HTMLElement): void {
+    root.querySelectorAll<HTMLElement>('[data-wager-step]').forEach((button) => {
+      button.addEventListener('click', () => this.stepWager(root, button));
+    });
     root.querySelectorAll<HTMLElement>('[data-action]').forEach((button) => {
       button.addEventListener('click', () => {
         const state = this.deps.client.pokerState();
@@ -400,7 +447,8 @@ export class PokerPlaytestWindow {
         if (!actionView) return;
         const raw =
           actionView.kind === 'bet' || actionView.kind === 'raise'
-            ? root.querySelector<HTMLInputElement>(`[data-wager='${index}']`)?.value
+            ? root.querySelector<HTMLOutputElement>(`output[data-wager='${index}']`)?.dataset
+                .wagerValue
             : undefined;
         const action = pokerActionFromInput(actionView, raw);
         if (!action) {
@@ -418,10 +466,30 @@ export class PokerPlaytestWindow {
     });
   }
 
+  private stepWager(root: HTMLElement, button: HTMLElement): void {
+    const state = this.deps.client.pokerState();
+    if (!state.connected || !state.snapshot) return;
+    const index = Number(button.dataset.wager);
+    const action = buildPokerPlaytestView(state.snapshot, state.snapshot.viewerSeat).actions[index];
+    if (!action || (action.kind !== 'bet' && action.kind !== 'raise')) return;
+    const output = root.querySelector<HTMLOutputElement>(`output[data-wager='${index}']`);
+    const current = Number(output?.dataset.wagerValue);
+    const direction = button.dataset.wagerStep === 'increase' ? 1 : -1;
+    const next = stepPokerWager(action, current, state.snapshot.config.bigBlind, direction);
+    if (next === null) return;
+    this.invalidAmount = false;
+    if (output) output.dataset.wagerValue = String(next);
+    this.wagerDraft.set(action.kind, String(next));
+    this.render();
+  }
+
   private captureWagerDraft(root: HTMLElement): void {
-    root.querySelectorAll<HTMLInputElement>('[data-wager-kind]').forEach((input) => {
-      const kind = input.dataset.wagerKind;
-      if (kind === 'bet' || kind === 'raise') this.wagerDraft.set(kind, input.value);
+    root.querySelectorAll<HTMLOutputElement>('output[data-wager-kind]').forEach((output) => {
+      const kind = output.dataset.wagerKind;
+      const value = output.dataset.wagerValue;
+      if ((kind === 'bet' || kind === 'raise') && value !== undefined) {
+        this.wagerDraft.set(kind, value);
+      }
     });
   }
 

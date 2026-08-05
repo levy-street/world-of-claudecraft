@@ -134,3 +134,33 @@ export function pokerActionFromInput(
   if (action.maxTo !== null && to > action.maxTo) return null;
   return { type: action.kind, to };
 }
+
+export function stepPokerWager(
+  action: PokerPlaytestActionView,
+  current: number,
+  bigBlind: number,
+  direction: -1 | 1,
+): number | null {
+  if (
+    (action.kind !== 'bet' && action.kind !== 'raise') ||
+    action.minTo === null ||
+    action.maxTo === null ||
+    !Number.isSafeInteger(bigBlind) ||
+    bigBlind <= 0
+  ) {
+    return null;
+  }
+  const min = action.minTo;
+  const max = action.maxTo;
+  const value = Number.isSafeInteger(current) ? Math.min(max, Math.max(min, current)) : min;
+  const regularMax = min + Math.floor((max - min) / bigBlind) * bigBlind;
+  if (direction > 0) {
+    if (value >= max) return max;
+    const next = min + (Math.floor((value - min) / bigBlind) + 1) * bigBlind;
+    return Math.min(max, next);
+  }
+  if (value <= min) return min;
+  if (value > regularMax) return regularMax;
+  const previous = min + (Math.ceil((value - min) / bigBlind) - 1) * bigBlind;
+  return Math.max(min, previous);
+}

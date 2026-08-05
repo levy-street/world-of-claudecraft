@@ -1,7 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { PokerTable } from '../src/sim/poker/engine';
 import { Rng } from '../src/sim/rng';
-import { buildPokerPlaytestView, pokerActionFromInput } from '../src/ui/poker_playtest_view';
+import {
+  buildPokerPlaytestView,
+  pokerActionFromInput,
+  stepPokerWager,
+} from '../src/ui/poker_playtest_view';
 
 function activeTable(): PokerTable {
   const table = PokerTable.create(
@@ -40,5 +44,14 @@ describe('poker playtest view', () => {
     expect(pokerActionFromInput({ kind: 'fold', amount: null, minTo: null, maxTo: null })).toEqual({
       type: 'fold',
     });
+  });
+
+  it('steps wager totals by one big blind and clamps to the legal range', () => {
+    const wager = { kind: 'raise' as const, amount: null, minTo: 40, maxTo: 95 };
+    expect(stepPokerWager(wager, 40, 20, 1)).toBe(60);
+    expect(stepPokerWager(wager, 60, 20, 1)).toBe(80);
+    expect(stepPokerWager(wager, 80, 20, 1)).toBe(95);
+    expect(stepPokerWager(wager, 95, 20, -1)).toBe(80);
+    expect(stepPokerWager(wager, 40, 20, -1)).toBe(40);
   });
 });
