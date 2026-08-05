@@ -832,24 +832,20 @@ describe('daily rewards winner cards', () => {
       finalizedAt: '2026-07-01T00:00:00.000Z',
       payouts: [
         {
-          day: '2026-06-30',
           rank: 1,
           username: 'titoisking',
           points: 12345,
           prizePercent: 0.2,
           prizeUsd: 30,
           status: 'pending',
-          txSignature: null,
         },
         {
-          day: '2026-06-30',
           rank: 2,
           username: 'alice',
           points: 1000,
           prizePercent: 0.15,
           prizeUsd: 22.5,
           status: 'pending',
-          txSignature: null,
         },
       ],
     }) as {

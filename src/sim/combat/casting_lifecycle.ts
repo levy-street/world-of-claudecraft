@@ -50,9 +50,12 @@ import {
   CAST_PUSHBACK_SEC,
   CAST_QUEUE_WINDOW_SEC,
   CHANNEL_PUSHBACK_FRACTION,
+  CRAFT_CAST_ID,
   DEMON_HEAL_CAST_ID,
+  DISENCHANT_CAST_ID,
   DT,
   dist2d,
+  ENCHANT_CAST_ID,
   FACING_HOLD_DIST,
   FISHING_CAST_ID,
   GATHER_CAST_ID,
@@ -62,6 +65,8 @@ import {
   MELEE_RANGE,
   MIN_GCD,
   normAngle,
+  SALVAGE_CAST_ID,
+  TOOL_RECHARGE_CAST_ID,
 } from '../types';
 import { drawWeapon } from '../weapon_stow';
 import {
@@ -425,6 +430,31 @@ export function updateCasting(ctx: SimContext, p: Entity, meta: PlayerMeta): voi
       ctx.completeGatherCast(p, meta);
       return;
     }
+    // Craft cast completion: same non-spell route as gather. castStop success
+    // means the cast finished, not that the craft grant succeeded; a complete
+    // denial re-emits via craftResult with its own reason.
+    if (castId === CRAFT_CAST_ID) {
+      ctx.completeCraftCast(p, meta);
+      return;
+    }
+    // Enchant-family cast completion (Craft Cast System Phase 4): same
+    // non-spell route; result events own the outcome surface.
+    if (castId === DISENCHANT_CAST_ID) {
+      ctx.completeDisenchantCast(p, meta);
+      return;
+    }
+    if (castId === ENCHANT_CAST_ID) {
+      ctx.completeApplyEnchantCast(p, meta);
+      return;
+    }
+    if (castId === SALVAGE_CAST_ID) {
+      ctx.completeSalvageCast(p, meta);
+      return;
+    }
+    if (castId === TOOL_RECHARGE_CAST_ID) {
+      ctx.completeRechargeCast(p, meta);
+      return;
+    }
     // Ice Floes (mage choice row): a COMPLETED hard cast spends one protected
     // use whether or not the caster actually moved (the buff is a banked
     // window, not a refund). Fishing above never spends one. Draws no rng.
@@ -518,14 +548,25 @@ export function cancelCast(ctx: SimContext, p: Entity): void {
   // an interrupted cast never completed, so its queued follow-up is dropped too
   p.queuedCastAbility = null;
   p.queuedCastAim = null;
-  // Hidden per-cast fishing/gather state: unconditional inert writes (all five
-  // are already '' / 0 on every non-fishing/gather cancel path), so every
-  // existing cancel stays byte-identical while a cancelled gather or fishing
-  // cast can never leak a stale node id, start-time tool rarity, bite
+  // Hidden per-cast fishing/gather/craft state: unconditional inert writes
+  // (already '' / 0 / false on every non-profession cancel path), so every
+  // existing cancel stays byte-identical while a cancelled profession cast
+  // can never leak a stale node id, recipe id, start-time tool rarity, bite
   // deadline, or pinned zone into a later cast.
   p.gatherCastNodeId = '';
   p.gatherCastToolRarity = '';
   p.gatherCastEffectConfirmed = false;
+  p.craftCastRecipeId = '';
+  p.craftCastCommission = false;
+  p.craftCastBatchRemaining = 0;
+  p.craftCastBatchTotal = 0;
+  p.enchantCastItemId = '';
+  p.enchantCastBagSlot = 0;
+  p.enchantCastEnchantId = '';
+  p.enchantCastEquipSlot = '';
+  p.enchantCastConfirmReplace = false;
+  p.enchantCastTargetPin = '';
+  p.toolRechargeCastProfessionId = '';
   p.fishBiteAtTick = 0;
   p.fishReelDeadlineTick = 0;
   p.fishCastZoneId = '';

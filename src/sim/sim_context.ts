@@ -815,6 +815,15 @@ export interface SimContextCallbacks {
   // Gather cast completion (Professions 2.0): updateCasting routes a
   // finished GATHER_CAST_ID cast here, exactly like completeFishing above.
   completeGatherCast(p: Entity, meta: PlayerMeta): void;
+  // Craft cast completion (Craft Cast System Phase 1): updateCasting routes a
+  // finished CRAFT_CAST_ID cast here, same shape as completeGatherCast.
+  completeCraftCast(p: Entity, meta: PlayerMeta): void;
+  // Enchant-family cast completions (Craft Cast System Phase 4).
+  completeDisenchantCast(p: Entity, meta: PlayerMeta): void;
+  completeApplyEnchantCast(p: Entity, meta: PlayerMeta): void;
+  completeSalvageCast(p: Entity, meta: PlayerMeta): void;
+  // Tool-effect recharge cast completion (Craft Cast System Phase 5).
+  completeRechargeCast(p: Entity, meta: PlayerMeta): void;
   applyDemonHealTick(owner: Entity): void;
 
   // C4b effect dispatch (src/sim/combat/effect_dispatch.ts) consumes these; all stay
@@ -1491,6 +1500,11 @@ export function createSimContext(host: SimContextHost): SimContext {
     revivePet: host.revivePet,
     completeFishing: host.completeFishing,
     completeGatherCast: host.completeGatherCast,
+    completeCraftCast: host.completeCraftCast,
+    completeDisenchantCast: host.completeDisenchantCast,
+    completeApplyEnchantCast: host.completeApplyEnchantCast,
+    completeSalvageCast: host.completeSalvageCast,
+    completeRechargeCast: host.completeRechargeCast,
     applyDemonHealTick: host.applyDemonHealTick,
     awardCombo: host.awardCombo,
     meleeSwing: host.meleeSwing,

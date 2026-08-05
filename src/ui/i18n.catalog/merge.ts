@@ -496,6 +496,11 @@ const mergeStringsEn = {
     cast: {
       fishing: 'Fishing',
       gathering: 'Gathering',
+      crafting: 'Crafting',
+      disenchanting: 'Disenchanting',
+      enchanting_apply: 'Enchanting',
+      salvaging: 'Salvaging',
+      tool_recharge: 'Recharging',
       demonHeal: 'Demon Heal',
       thunzharrStormcall: 'Stormcall',
       rift_frost_execution: 'Glacial Grave',

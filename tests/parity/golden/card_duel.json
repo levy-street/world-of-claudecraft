@@ -29,7 +29,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 965,
-      "state": "b5c2eb4b",
+      "state": "b8be1093",
       "events": "941c1d3b",
       "rng": {
         "draws": 38,
@@ -40,7 +40,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 965,
-      "state": "5d71dd34",
+      "state": "02a9e014",
       "events": "741638a5",
       "rng": {
         "draws": 38,
@@ -51,7 +51,7 @@
       "tick": 15,
       "time": 0.75,
       "nextId": 965,
-      "state": "350a6422",
+      "state": "612d6daa",
       "events": "741638a5",
       "rng": {
         "draws": 38,
@@ -62,7 +62,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 965,
-      "state": "35d911ff",
+      "state": "0b363f15",
       "events": "15c901ba",
       "rng": {
         "draws": 38,
@@ -73,7 +73,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 965,
-      "state": "17a42024",
+      "state": "0e6d146e",
       "events": "741638a5",
       "rng": {
         "draws": 38,
@@ -84,7 +84,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 965,
-      "state": "21a8914d",
+      "state": "0793716b",
       "events": "741638a5",
       "rng": {
         "draws": 38,
@@ -95,7 +95,7 @@
       "tick": 35,
       "time": 1.75,
       "nextId": 965,
-      "state": "db20112d",
+      "state": "3b5fe34b",
       "events": "741638a5",
       "rng": {
         "draws": 38,
@@ -106,7 +106,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 965,
-      "state": "6b449910",
+      "state": "92f8c29a",
       "events": "741638a5",
       "rng": {
         "draws": 38,
@@ -117,7 +117,7 @@
       "tick": 41,
       "time": 2.05,
       "nextId": 965,
-      "state": "48b4b06d",
+      "state": "77c6fe8b",
       "events": "741638a5",
       "rng": {
         "draws": 44,
@@ -142,7 +142,6 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -198,7 +197,6 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},

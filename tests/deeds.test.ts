@@ -30,6 +30,7 @@ import { turnInQuestCore } from '../src/sim/quests/quest_commands';
 import { type ArenaMatch, type CharacterState, Sim } from '../src/sim/sim';
 import * as duelMod from '../src/sim/social/duel';
 import { type Entity, MAX_LEVEL, MILESTONES, type SimEvent } from '../src/sim/types';
+import { runSalvage } from './helpers/enchant_family_cast';
 
 function makeSim(seed = 42): Sim {
   return new Sim({ seed, playerClass: 'warrior', autoEquip: false });
@@ -2223,7 +2224,7 @@ describe('profession deed families (threshold-exact, live sites)', () => {
     const sim = makeSim();
     const { meta } = primary(sim);
     sim.addItem('eastbrook_arming_sword', 1, meta.entityId);
-    sim.salvageItem('eastbrook_arming_sword', meta.entityId);
+    runSalvage(sim, 'eastbrook_arming_sword', meta.entityId);
     expect(meta.deedStats.counters.salvagesPerformed).toBe(1);
     sim.tick();
     expect(meta.deedsEarned.has('soc_first_salvage')).toBe(true);

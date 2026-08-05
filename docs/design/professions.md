@@ -293,10 +293,27 @@ agi 25, sta 24 for +240 HP, int 24, spi 12, armor 35, roughly 13 to 21
 percent of the recomputed level-20 BiS budget per axis), the
 Greater-beats-base-by-3 step, and runed strict betweenness are all pinned in
 `tests/enchants_magnitude_invariants.test.ts`. Salvage rides the same seam,
-confirm machinery, and shared throttle as disenchant; it grants no craft
-skill (maintainer-accepted). Crafting, disenchant, enchant-apply, and
-salvage share ONE action window (`CRAFT_THROTTLE_MAX_PER_WINDOW` per
-`CRAFT_THROTTLE_WINDOW_SECONDS`).
+confirm machinery as disenchant; it grants no craft skill
+(maintainer-accepted). Crafting, disenchant, enchant-apply, salvage, and
+tool-effect recharge are cast-paced (recipe-band craft durations; fixed
+1.5 s for enchant-family and recharge). Economy brakes are cast time,
+materials, the gold sink, stations, and skill ceilings, not a shared
+action quota. Rate ruling, stated for the record: the retired quota
+allowed 10 actions per minute across the family; cast pacing allows one
+player roughly 15 to 40 per minute depending on band, and that faster
+ceiling is ACCEPTED because every craft still pays materials and the
+copper fee, and the enchant-family faucets stay bounded by the items a
+player actually holds.
+
+Craft cast band rationale (the ladder in `src/sim/content/professions.ts`,
+`CRAFT_CAST_DURATION_*`): skill bands rather than a flat cast so field
+recipes stay snappy while ladder-top and combo recipes read as deliberate
+work; the floor and ceiling clamp every band into the UX range where a
+cast bar is legible but never tedious. Locked starting numbers from the
+implementation plan; retune with evidence (market volume, session
+telemetry), not feel. The enchant family and tool recharge take the flat
+floor-length cast because their pacing brake is the consumed item or
+charge, not the recipe ladder.
 
 ### Commissions and the Maker's Bond
 Opt-in at craft time, equipment only (weapon, armor, held_offhand). The
@@ -453,7 +470,7 @@ guards.
 | maxSkill (crafts / gathering / fishing) | src/sim/content/professions.ts | 125 / 100 / 200 |
 | specializedSkillThreshold / materialDiscountPct | src/sim/content/professions.ts | 75 / 0.2 |
 | CRAFT_GOLD_SINK_COPPER_PER_BUDGET | src/sim/content/professions.ts | 2 |
-| CRAFT_THROTTLE_MAX_PER_WINDOW / WINDOW_SECONDS | src/sim/content/professions.ts | 10 / 60 |
+| CRAFT_CAST_DURATION_* / ENCHANT_FAMILY / TOOL_RECHARGE (sec) | src/sim/content/professions.ts | field 1.75 to ladder 4.0; floor 1.5 / ceiling 5.0; family+recharge 1.5 |
 | TRAINING_FEE_BY_TIER | src/sim/professions/training.ts | [0, 2500, 10000, 40000, 160000] copper, clamp to last |
 | UNBIND_FEE_BY_QUALITY_TIER | src/sim/professions/commission.ts | [2500, 10000, 40000] copper, clamp both ends |
 | GATHER_CAST_BASE / FLOOR / TOOL_TIER / BAND (sec) | src/sim/professions/gathering.ts | 2.5 / 1.5 / 0.4 / 0.15 |
@@ -492,7 +509,7 @@ top-rung materials from ten more zones (the all-zones supply arm in
 about 2.8 gather hours under the deliberately conservative model, floored
 at 2 as its trivially-short alarm), and predated the #2387 Battlefield
 Experience attribution fix; the measured all-levers climb lands nearer 1
-to 3 gathering hours plus the cast, throttle, and travel time, which is
+to 3 gathering hours plus the cast and travel time, which is
 where the band's low end comes from. One access assumption the figures
 rest on, stated: the expansion's thorium faucets are TIER-1 nodes, so
 under R22 they need only the tier-1 pick at any proficiency; only the
@@ -594,8 +611,9 @@ must be re-derived if either number is ever tuned on its own.
   `vendorItems` row anywhere, and priced with the same 4x `buyValue` for the
   same reason.
 - Market: gold buys MATERIALS, never skill. Fungible materials stay
-  listable; the curve, the shared throttle, and material volume are the
-  sanctioned brake on purchased progress.
+  listable; the curve, cast pacing, and material volume are the sanctioned
+  brake on purchased progress (the shared action throttle retired with the
+  Craft Cast System; cast time is the pacing brake now).
 - Unbind fees: never free, monotonic in quality, clamp both ends (the
   clamp-to-first-below reading is maintainer-ratified).
 - Enchant magnitudes are frozen post-launch; tune reagent costs instead.

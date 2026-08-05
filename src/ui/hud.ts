@@ -94,8 +94,11 @@ import {
   ALL_CLASSES,
   type AuraKind,
   CONSUME_DURATION,
+  CRAFT_CAST_ID,
   canPrestige,
+  DISENCHANT_CAST_ID,
   dist2d,
+  ENCHANT_CAST_ID,
   type Entity,
   FAERIE_FIRE_ARMOR_PCT,
   FISHING_CAST_ID,
@@ -105,9 +108,11 @@ import {
   MELEE_RANGE,
   MILESTONES,
   questObjectiveRequired,
+  SALVAGE_CAST_ID,
   type SimEvent,
   SUNDER_ARMOR_PCT_PER_STACK,
   TICK_RATE,
+  TOOL_RECHARGE_CAST_ID,
   virtualLevel,
   xpUntilNextPrestige,
 } from '../sim/types';
@@ -197,6 +202,11 @@ import { type ContinentZoneRegion, continentZoneAt } from './continent_map_view'
 import { cookingCatchHintKey } from './cooking_catch_hint_view';
 import { formatMinimapCoords } from './coords';
 import {
+  buildCraftCastSession,
+  type CraftCastSessionView,
+  craftCastActivitySig,
+} from './craft_cast_view';
+import {
   buildCraftCelebrationPlan,
   CRAFT_TIER_UP_DRAIN_WINDOW,
   type CraftTierUp,
@@ -209,7 +219,7 @@ import {
   craftLearnHints,
   craftOwnsTab,
 } from './crafting_view';
-import { renderCraftingWindow, stationNameText } from './crafting_window';
+import { craftCastStripElements, renderCraftingWindow, stationNameText } from './crafting_window';
 import { shouldRefreshDailyRewardsLauncher } from './daily_rewards_launcher_core';
 import { DailyRewardsWindow } from './daily_rewards_window';
 import { deathRecapFeedback } from './death_recap_feedback';
@@ -900,6 +910,11 @@ const PLAYER_TOOLTIP_VIEW_DEPS: PlayerTooltipI18n = {
 const castDisplayName = (id: string): string => {
   if (id === FISHING_CAST_ID) return t('abilityUi.cast.fishing');
   if (id === GATHER_CAST_ID) return t('abilityUi.cast.gathering');
+  if (id === CRAFT_CAST_ID) return t('abilityUi.cast.crafting');
+  if (id === DISENCHANT_CAST_ID) return t('abilityUi.cast.disenchanting');
+  if (id === ENCHANT_CAST_ID) return t('abilityUi.cast.enchanting_apply');
+  if (id === SALVAGE_CAST_ID) return t('abilityUi.cast.salvaging');
+  if (id === TOOL_RECHARGE_CAST_ID) return t('abilityUi.cast.tool_recharge');
   if (id === 'demon_heal') return t('abilityUi.cast.demonHeal');
   if (id === 'thunzharr_stormcall') return t('abilityUi.cast.thunzharrStormcall');
   const riftKey = `abilityUi.cast.${id}` as TranslationKey;
@@ -1614,6 +1629,39 @@ export class Hud {
   // repaints only on a real move. Same cold-painter posture as the station
   // signature above: never a per-frame repaint.
   private lastCraftingReagentSig = '';
+  // Craft-cast activity signature (active + recipe + batch counters) as of
+  // the last full crafting-window paint. Frame-band
+  // paintOpenCraftingCastProgress rebuilds only when this moves (cast start /
+  // cancel / complete / batch item boundary); fill ticks ride the strip
+  // painter alone. The entity cast/session fields are authoritative on BOTH
+  // hosts (offline direct, online via the self-only `ccast` wire fragment),
+  // so no click-time fallback state exists.
+  private lastCraftingCastSig = '';
+  // True while a craft-cast session is live (re-armed each active frame),
+  // cleared by every craftResult. A session that drops with this still set
+  // produced no result: a movement cancel, announced as cancelled.
+  private craftCastExpectingResult = false;
+  // The static #crafting-live region (index.html/play.html): a polite live
+  // region inside the rebuilt window subtree would be wiped by the same task
+  // that writes it, so announcements ride this never-rebuilt node instead.
+  // Nullable on purpose: test rigs construct Hud over minimal DOMs that
+  // carry neither node, so every consumer guards (the play.html ?. rule).
+  private readonly craftingLiveEl: HTMLElement | null = $('#crafting-live') ?? null;
+  private readonly craftCastReannounce = new ReannounceMarker();
+  // #crafting-window, cached once: paintOpenCraftingCastProgress runs on the
+  // frame band, and a per-frame $() query is barred there (src/ui/CLAUDE.md).
+  private readonly craftingWindowEl: HTMLElement | null = $('#crafting-window') ?? null;
+  // Per-frame strip painter over the CURRENT strip nodes, rebuilt after every
+  // full crafting-window paint (the rebuild replaces the elements). Writes go
+  // through the PainterHost elided writers (CastBarPainter), so identical
+  // frames cost zero DOM mutations and the perf tour's hudHotDomWrites
+  // accounting sees this path.
+  private craftCastStripPainter: CastBarPainter | null = null;
+  // The localized label the strip painter resolves (the active recipe's
+  // display name), refreshed on each full paint.
+  private craftCastStripLabel = '';
+  // Per-recipe qty stepper values (HUD-held so window repaints keep the pick).
+  private readonly craftQtyByRecipe = new Map<string, number>();
   // Character and Crafting are cold painters. Diff the local crafting
   // identity plus the gathering proficiency rows on the slow band so a late
   // online cprof or professions snapshot replaces stale archetype art/title
@@ -8598,6 +8646,19 @@ export class Hud {
     // overlay (consumeBarState), and clears on hide. Priority: spell cast > mount
     // summon > eat/drink (you cannot cast while mounting, but the painter guards it).
     const playerCast = castBarState(p);
+    // Craft-cast single-surface rule: while the crafting window is open its
+    // strip is the ONE progress surface for a craft cast, so the overlay bar
+    // hides for CRAFT_CAST_ID only (closing the window hands the cast back to
+    // this bar, never invisible). Self-only presentation, no other cast and
+    // no other viewer affected; the strip carries the same fill/timer plus
+    // the batch counter, so no actionable information is lost (fairness).
+    if (
+      playerCast.visible &&
+      playerCast.label === CRAFT_CAST_ID &&
+      this.craftingWindowEl?.style.display === 'flex'
+    ) {
+      playerCast.visible = false;
+    }
     const playerMountSummon = mountSummonBarState(p.mountCastRemaining, p.mountCastKey);
     const playerConsume = consumeBarState(p.eating, p.drinking);
     let playerCastInput = this.playerCastBarInput;
@@ -8616,6 +8677,9 @@ export class Hud {
       this.playerCastBarInput = playerCastInput;
     }
     this.playerCastBarPainter.paint(playerCastInput);
+    // Crafting window cast strip: real entity cast fields, fill-only when the
+    // activity signature is stable (no full rebuild per tick).
+    this.paintOpenCraftingCastProgress();
 
     // swing timer: fills between melee/ranged auto-attack swings. swingTimer
     // counts DOWN to 0 (ready); swing_timer.ts recovers the full interval from the
@@ -11015,6 +11079,22 @@ export class Hud {
           break;
         }
         case 'craftResult': {
+          // A result (grant or denial) means the in-flight cast RESOLVED:
+          // a session that later drops without one was cancelled. The paint
+          // band re-arms the flag while a session stays active (mid-batch).
+          this.craftCastExpectingResult = false;
+          if (ev.ok && ev.itemId && this.craftingWindowEl?.style.display === 'flex') {
+            const craftedItem = ITEMS[ev.itemId];
+            // No display name resolves: say nothing (a raw internal id read
+            // aloud is worse than silence).
+            if (craftedItem) {
+              this.announceCraftCast(
+                t('hudChrome.crafting.announceComplete', {
+                  name: itemDisplayName(craftedItem),
+                }),
+              );
+            }
+          }
           // Arm the tier-up state check below: skills only ever change on a
           // craft, and online the cprof mirror can land a few snapshots after
           // this event, so the diff stays armed for a bounded drain window
@@ -11059,8 +11139,8 @@ export class Hud {
                       ? 'hudChrome.crafting.unknownRecipe'
                       : ev.reason === 'combo_requirement_unmet'
                         ? 'hudChrome.crafting.comboRequirementUnmet'
-                        : ev.reason === 'throttled'
-                          ? 'hudChrome.crafting.throttled'
+                        : ev.reason === 'busy' || ev.reason === 'throttled'
+                          ? 'hudChrome.crafting.busy'
                           : ev.reason === 'recipe_not_learned'
                             ? 'hudChrome.crafting.recipeNotLearned'
                             : ev.reason === 'no_bag_space'
@@ -11318,8 +11398,11 @@ export class Hud {
                                 material: materialToken,
                                 count: countText,
                               })
-                            : ev.reason === 'throttled'
-                              ? t('hudChrome.crafting.throttled')
+                            : ev.reason === 'busy' || ev.reason === 'throttled'
+                              ? // 'throttled' is the old-server wire reason
+                                // (retired emit): render the busy copy, never
+                                // the wrong slot-invalid line.
+                                t('hudChrome.crafting.busy')
                               : t('hudChrome.professions.toolEffectSlotInvalid', {
                                   effect: effectName,
                                 }),
@@ -12778,9 +12861,21 @@ export class Hud {
           // feedback-gated like other notification cues. Gathering's cue
           // branches by node type (a pickaxe/axe/knife tool-out sound);
           // ev.gatherNodeType is only set on a gather cast (see gathering.ts).
+          // Craft-family non-spell casts (craft / enchant-family / recharge)
+          // share one workbench wind-up (audio.craftCast); completion still
+          // uses craftSuccess / disenchant / enchant / salvage.
           if (ev.entityId === sim.playerId) {
             if (ev.ability === GATHER_CAST_ID) audio.gatherCast(ev.gatherNodeType);
             else if (ev.ability === FISHING_CAST_ID) audio.fishCast();
+            else if (
+              ev.ability === CRAFT_CAST_ID ||
+              ev.ability === DISENCHANT_CAST_ID ||
+              ev.ability === ENCHANT_CAST_ID ||
+              ev.ability === SALVAGE_CAST_ID ||
+              ev.ability === TOOL_RECHARGE_CAST_ID
+            ) {
+              audio.craftCast();
+            }
           }
           break;
         case 'castStop':
@@ -14639,7 +14734,79 @@ export class Hud {
     }
   }
 
-  private renderCrafting(): void {
+  /** Live craft-cast session for the open crafting window: the entity cast
+   *  and session fields, authoritative on BOTH hosts (offline direct, online
+   *  via the self-only `ccast` wire fragment). */
+  private craftCastSessionForPlayer(): CraftCastSessionView {
+    const p = this.sim.player;
+    return buildCraftCastSession({
+      castingAbility: p.castingAbility,
+      castRemaining: p.castRemaining,
+      castTotal: p.castTotal,
+      craftCastRecipeId: p.craftCastRecipeId,
+      craftCastBatchRemaining: p.craftCastBatchRemaining,
+      craftCastBatchTotal: p.craftCastBatchTotal,
+    });
+  }
+
+  /** Write one polite line into the static #crafting-live region. The
+   *  ReannounceMarker forces a byte-different string when the same line
+   *  repeats (two cancels in a row must both announce). */
+  private announceCraftCast(text: string): void {
+    if (this.craftingLiveEl) {
+      this.craftingLiveEl.textContent = this.craftCastReannounce.mark(text);
+    }
+  }
+
+  /**
+   * Frame-band craft-cast strip for an OPEN crafting window. Full rebuild only
+   * when the activity signature moves (start / cancel / complete / batch item
+   * boundary); otherwise the CastBarPainter instance writes fill/label/timer
+   * through the elided writers. A session that drops without a craftResult
+   * was cancelled: announce it.
+   */
+  private paintOpenCraftingCastProgress(): void {
+    // Closed window: never read cast fields or touch the painter (the
+    // cold-window rule; activity signature is latched only while open).
+    if (this.craftingWindowEl?.style.display !== 'flex') return;
+    const session = this.craftCastSessionForPlayer();
+    if (craftCastActivitySig(session) !== this.lastCraftingCastSig) {
+      const prevSig = this.lastCraftingCastSig;
+      const wasActive = prevSig.startsWith('1:');
+      this.lastCraftingCastSig = craftCastActivitySig(session);
+      let focusReturnRecipeId = '';
+      if (wasActive && !session.active) {
+        // The recipe of the session that just ended (sig 1:<recipe>:rem:tot):
+        // the focus ladder hands keyboard focus back to its row button.
+        focusReturnRecipeId = prevSig.split(':')[1] ?? '';
+        if (this.craftCastExpectingResult) {
+          // Session dropped with no craftResult: a movement cancel or other
+          // cast abort. Nothing was consumed.
+          this.craftCastExpectingResult = false;
+          this.announceCraftCast(t('hudChrome.crafting.announceCancel'));
+        }
+      }
+      // Button states + strip visibility need a full paint on activity edges.
+      this.renderCrafting(focusReturnRecipeId);
+      return;
+    }
+    if (!session.active) return;
+    // Re-arm the cancel detector while the session is live: every craftResult
+    // clears it, so a drop with it set means the last cast never resolved.
+    this.craftCastExpectingResult = true;
+    this.craftCastStripPainter?.paint({
+      cast: {
+        visible: true,
+        channel: false,
+        fill: session.progress,
+        label: session.recipeId,
+        fishing: false,
+      },
+      castRemaining: session.remainingSec,
+    });
+  }
+
+  private renderCrafting(focusReturnRecipeId = ''): void {
     // Station range for station-bound rows: the same pure in-range
     // set the sim's station_required deny composes (physical stations plus
     // the own active mobile station), computed once per repaint, so the row
@@ -14653,6 +14820,8 @@ export class Hud {
     // Re-arm the bag diff on EVERY paint, whatever caused it, so a repaint
     // from one edge never leaves another edge owing a second one (#2375).
     this.lastCraftingReagentSig = craftingReagentSig(this.sim.inventory, this.sim.player.name);
+    const session = this.craftCastSessionForPlayer();
+    this.lastCraftingCastSig = craftCastActivitySig(session);
     // The window lists only KNOWN recipes, so an unlearned trainer
     // recipe never renders as a craftable row (it surfaces in the Train
     // ladder instead). The SAME viewer-side predicate the ladder's known
@@ -14676,13 +14845,16 @@ export class Hud {
       {
         ...this.presentationBag,
         hideTooltip: () => this.hideTooltip(),
-        onCraft: (recipeId) => {
+        onCraft: (recipeId, count) => {
           // Commission opt-in: per-craft semantics, the checkbox
-          // arms exactly ONE craft. Consume the opt-in before sending so the
-          // repaint below renders it cleared; the server re-validates
-          // eligibility either way.
+          // arms exactly ONE craft session (every item in a Phase 3 batch
+          // reuses the commission captured at start). Consume the opt-in
+          // before sending so the repaint below renders it cleared; the
+          // server re-validates eligibility either way. The session state
+          // itself (recipe, batch counters) is entity-field truth on both
+          // hosts, so no click-time bookkeeping is kept here.
           const commission = this.craftCommissionOptIn.delete(recipeId);
-          this.sim.craftItem(recipeId, commission);
+          this.sim.craftItem(recipeId, commission, Math.max(1, Math.floor(count)));
           this.renderCrafting();
           if ($('#bags').style.display !== 'none') this.renderBags();
         },
@@ -14693,6 +14865,12 @@ export class Hud {
           if (on) this.craftCommissionOptIn.add(recipeId);
           else this.craftCommissionOptIn.delete(recipeId);
         },
+        craftQty: (recipeId) => this.craftQtyByRecipe.get(recipeId) ?? 1,
+        onCraftQty: (recipeId, qty) => {
+          this.craftQtyByRecipe.set(recipeId, Math.max(1, Math.floor(qty)));
+          this.renderCrafting();
+        },
+        announce: (text) => this.announceCraftCast(text),
         selectedCraft: () => this.selectedCraftTab,
         onSelectCraft: (professionId) => {
           this.selectedCraftTab = professionId;
@@ -14712,11 +14890,49 @@ export class Hud {
       // Per-section "learnable at a master" hints: crafts with unlearned
       // trainer recipes, off the same mirrored knownRecipes set (both hosts).
       craftLearnHints(this.sim.craftingIdentity.knownRecipes, this.sim.stationPlacements),
+      session,
+      focusReturnRecipeId,
     );
+    // Rebuild the strip painter over the fresh nodes (the rebuild replaced
+    // them) and paint the current frame immediately, so an active cast never
+    // flashes an empty strip between this paint and the next frame. The label
+    // is the active recipe's RESULT display name; the generic localized
+    // "Crafting" covers a recipe the mirror cannot resolve (never a raw id).
+    const activeRecipe = session.active
+      ? knownRecipes.find((r) => r.id === session.recipeId)
+      : undefined;
+    const resultDef = activeRecipe ? ITEMS[activeRecipe.resultItemId] : undefined;
+    this.craftCastStripLabel = resultDef
+      ? itemDisplayName(resultDef)
+      : castDisplayName(CRAFT_CAST_ID);
+    const strip = this.craftingWindowEl ? craftCastStripElements(this.craftingWindowEl) : null;
+    this.craftCastStripPainter = strip
+      ? new CastBarPainter(this.writerFacet, strip, {
+          resolveCastLabel: () => this.craftCastStripLabel,
+          clearOnHide: true,
+          shownDisplay: 'flex',
+        })
+      : null;
+    this.craftCastStripPainter?.paint({
+      cast: {
+        visible: session.active,
+        channel: false,
+        fill: session.progress,
+        label: session.recipeId,
+        fishing: false,
+      },
+      castRemaining: session.remainingSec,
+    });
   }
 
   closeCrafting(): void {
-    $('#crafting-window').style.display = 'none';
+    if (this.craftingWindowEl) this.craftingWindowEl.style.display = 'none';
+    // The paint latch only: the cast session itself lives on the entity
+    // fields (both hosts), so a mid-cast close/reopen loses nothing, and the
+    // overlay cast bar takes over the moment this window stops being the
+    // craft cast's single progress surface.
+    this.craftCastExpectingResult = false;
+    this.lastCraftingCastSig = '';
     this.hideTooltip();
     this.craftingWindowFocus.restoreFocus(this.craftingOpenerFocus);
     this.craftingOpenerFocus = null;

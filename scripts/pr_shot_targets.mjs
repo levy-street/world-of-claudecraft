@@ -1867,6 +1867,13 @@ export const TARGETS = [
       // granted AFTERWARDS (the shopkeeper handing it over). The shot is taken
       // a slow band later. Before the fix the row is still disabled and the
       // reagent still reads 0/2; after it, the row is live.
+      // Craft Cast System: the mid-cast scene, the PR's whole point: the
+      // in-window strip (gold fill, recipe label in the bar, timer, batch
+      // counter) as the SINGLE craft-cast progress surface. The desktop
+      // framing shoots the FULL viewport so the suppressed overlay #castbar
+      // is provably absent; mobile clips the window with its 40px controls.
+      { key: 'desktop-mid-cast', midCast: true },
+      { key: 'mobile-mid-cast', midCast: true, mobile: true },
       { key: 'desktop-bag-freshness', bagFreshness: true, selectTab: 'alchemy' },
       { key: 'mobile-bag-freshness', bagFreshness: true, mobile: true, selectTab: 'alchemy' },
       // Phase 22 (crafting identity table legibility): the identity card at
@@ -2016,6 +2023,30 @@ export const TARGETS = [
         });
         await wait(900);
       }
+      if (open && variant?.midCast) {
+        // Start a real batch through the REAL control: walk the tabs until a
+        // row's Create All is enabled (the granted reagents feed several
+        // crafts; the persisted-tab localStorage can point anywhere), click
+        // it, then shoot mid-cast so the fill, timer, and batch counter are
+        // live entity-field truth, never a staged style.
+        await page.evaluate(() => {
+          const win = document.querySelector('#crafting-window');
+          if (!win) return;
+          const enabledCreateAll = () =>
+            [...win.querySelectorAll('.crafting-create-all-btn')].find((b) => !b.disabled);
+          let btn = enabledCreateAll();
+          if (!btn) {
+            for (const tab of win.querySelectorAll('.crafting-tab')) {
+              tab.click();
+              btn = enabledCreateAll();
+              if (btn) break;
+            }
+          }
+          btn?.click();
+        });
+        // Field casts run 1.75s: 900ms in, the strip reads about half full.
+        await wait(900);
+      }
       if (open && variant?.identity && variant?.mobile) {
         // The stacked mobile card caps its height and scrolls internally
         // (hud.mobile.css), which leaves the skill rows below the fold; the
@@ -2045,6 +2076,11 @@ export const TARGETS = [
             ?.scrollIntoView({ block: 'start' });
         });
         await wait(300);
+      }
+      if (open && variant?.midCast && !variant?.mobile) {
+        // Full viewport on purpose: the shot must also prove the overlay
+        // #castbar stays hidden while the window owns the craft cast.
+        return {};
       }
       return open ? { clip: '#crafting-window' } : {};
     },

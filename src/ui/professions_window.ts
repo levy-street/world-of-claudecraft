@@ -659,7 +659,7 @@ export class ProfessionsWindow {
     // threads the same live slot, provenance boolean, and slotter name the
     // server resolver reads, so a rendered slot button is an action the
     // server accepts barring a race the event then reports). RECHARGEABLE
-    // means the resolver accepts; affordability and the shared throttle live
+    // means the resolver accepts; affordability and cast pacing live
     // in the command body. The PRICE surface is now split (the UX pass): the
     // .prof-effect-price line previews the resolver's material and count
     // before the click, while R46's deny line stays the AFFORDABILITY

@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { completeCraftCast } from './helpers/enchant_family_cast';
 
 // Mock the db layer so no Postgres is needed; snapshot logic is under test.
 vi.mock('../server/db', () => ({
@@ -3772,6 +3773,7 @@ describe('full self-state snapshot delta fixture', () => {
       session,
       JSON.stringify({ t: 'cmd', cmd: 'craft_item', recipe: recipe.id }),
     );
+    completeCraftCast(server.sim as never, session.pid);
     expect(server.sim.countItem(recipe.resultItemId, session.pid)).toBe(1);
   });
 

@@ -5,11 +5,7 @@
 // - #1301 gold sink + output throttle on crafting.
 
 import { describe, expect, it } from 'vitest';
-import {
-  CRAFT_GOLD_SINK_COPPER_PER_BUDGET,
-  CRAFT_THROTTLE_MAX_PER_WINDOW,
-  CRAFT_THROTTLE_WINDOW_SECONDS,
-} from '../src/sim/content/professions';
+import { CRAFT_GOLD_SINK_COPPER_PER_BUDGET } from '../src/sim/content/professions';
 import { COMMON_RECIPES } from '../src/sim/content/recipes';
 import {
   acquireRecipeForRecipe,
@@ -224,10 +220,9 @@ describe('#1301 gold sink and output throttle', () => {
     expect(meta.copper).toBe(0);
   });
 
-  it('throttles a maxed specialist to CRAFT_THROTTLE_MAX_PER_WINDOW crafts per window', () => {
-    // Pinned to literals so a re-tune of either constant cannot pass silently.
-    expect(CRAFT_THROTTLE_MAX_PER_WINDOW).toBe(10);
-    expect(CRAFT_THROTTLE_WINDOW_SECONDS).toBe(60);
+  it('craft is not limited by a shared action quota (cast pacing + gold sink)', () => {
+    // Craft Cast System Phase 5: throttle constants retired; many sequential
+    // crafts succeed and still pay the gold sink each time.
     const sim = makeSim();
     const pid = sim.playerId;
     const meta = (sim as any).players.get(pid);
@@ -235,33 +230,16 @@ describe('#1301 gold sink and output throttle', () => {
     meta.copper = 1_000_000;
     const recipe = COMMON_RECIPES[0];
     let successCount = 0;
-    for (let i = 0; i < CRAFT_THROTTLE_MAX_PER_WINDOW + 5; i++) {
+    const attempts = 15;
+    for (let i = 0; i < attempts; i++) {
       for (const reagent of recipe.reagents) grantItem(sim, reagent.itemId, reagent.count, pid);
       const result = resolveCraftForRecipe(sim.ctx, pid, recipe);
-      if (result.ok) successCount++;
-      else expect(result.reason).toBe('throttled');
+      expect(result.ok).toBe(true);
+      expect(result.reason).not.toBe('throttled');
+      successCount++;
     }
-    expect(successCount).toBe(CRAFT_THROTTLE_MAX_PER_WINDOW);
-    // The gold sink charges SUCCESSFUL crafts only: the 5 throttled denials
-    // above must not have drained a copper (fee = budget 10 * rate 2 = 20).
-    expect(meta.copper).toBe(1_000_000 - CRAFT_THROTTLE_MAX_PER_WINDOW * 20);
-  });
-
-  it('the throttle window resets after CRAFT_THROTTLE_WINDOW_SECONDS of sim time', () => {
-    const sim = makeSim();
-    const pid = sim.playerId;
-    const meta = (sim as any).players.get(pid);
-    if (!meta) throw new Error('no meta');
-    meta.copper = 1_000_000;
-    const recipe = COMMON_RECIPES[0];
-    for (let i = 0; i < CRAFT_THROTTLE_MAX_PER_WINDOW; i++) {
-      for (const reagent of recipe.reagents) grantItem(sim, reagent.itemId, reagent.count, pid);
-      expect(resolveCraftForRecipe(sim.ctx, pid, recipe).ok).toBe(true);
-    }
-    for (const reagent of recipe.reagents) grantItem(sim, reagent.itemId, reagent.count, pid);
-    expect(resolveCraftForRecipe(sim.ctx, pid, recipe).reason).toBe('throttled');
-    meta.craftThrottle.windowStart -= CRAFT_THROTTLE_WINDOW_SECONDS;
-    for (const reagent of recipe.reagents) grantItem(sim, reagent.itemId, reagent.count, pid);
-    expect(resolveCraftForRecipe(sim.ctx, pid, recipe).ok).toBe(true);
+    expect(successCount).toBe(attempts);
+    // Gold sink still charges every successful craft (budget 10 * rate 2 = 20).
+    expect(meta.copper).toBe(1_000_000 - attempts * 20);
   });
 });

@@ -7584,7 +7584,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.dialogOption': '제작',
   'hudChrome.crafting.dialogOptionAria': '{craft} 제작 창 열기',
   'hudChrome.crafting.close': '제작 닫기',
-  'hudChrome.crafting.craft': '제작',
   'hudChrome.crafting.reagentsNeeded': '필요 재료:',
   'hudChrome.crafting.empty': '알려진 제작법이 없습니다.',
   'hudChrome.crafting.resultAria': '{name} 제작',
@@ -8664,7 +8663,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'yumi.end.loss': '패배! 아군 Yumi가 쓰러졌습니다.',
   'hudChrome.crafting.comboRequirementUnmet':
     '이 조합 제작법에 필요한 두 제작 기술의 숙련도에 도달하지 못했습니다.',
-  'hudChrome.crafting.throttled': '너무 빨리 제작하고 있습니다. 잠시 후 다시 시도하세요.',
   'hudChrome.crafting.recipeNotLearned': '아직 그 제작법을 배우지 않았습니다.',
   'hudChrome.crafting.noBagSpace': '가방에 제작한 아이템을 넣을 공간이 없습니다.',
   // Professions 2.0 (M16 non-Latin fills).
@@ -10406,12 +10404,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.notHeld': '해당 아이템을 가지고 있지 않습니다.',
   'hudChrome.enchanting.notDisenchantable': '해당 아이템은 마력을 추출할 수 없습니다.',
   'hudChrome.enchanting.notSalvageable': '해당 아이템은 분해할 수 없습니다.',
-  'hudChrome.enchanting.disenchantThrottled':
-    '너무 빠르게 마력을 추출하고 있습니다. 잠시 후 다시 시도하세요.',
-  'hudChrome.enchanting.salvageThrottled':
-    '너무 빠르게 분해하고 있습니다. 잠시 후 다시 시도하세요.',
-  'hudChrome.enchanting.enchantThrottled':
-    '너무 빠르게 마법부여하고 있습니다. 잠시 후 다시 시도하세요.',
   'hudChrome.enchanting.enchantWrongSlot': '그 마법부여는 해당 아이템에 적용할 수 없습니다.',
   'hudChrome.enchanting.enchantUnknown': '해당 마법부여가 존재하지 않습니다.',
   'hudChrome.enchanting.enchantInsufficient': '해당 마법부여에 필요한 재료가 없습니다.',
@@ -10874,9 +10866,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.provenanceHeading': '서명된 작품',
   'guide.profPages.econ.provenanceBody':
     '희귀 이상의 제작품과 발견물에는 제작자의 서명이 남고, 서명이 완전히 같은 물건은 여전히 겹쳐 쌓인다.',
-  'guide.profPages.econ.throttleHeading': '행동 제한',
-  'guide.profPages.econ.throttleBody':
-    '제작, 마력 추출, 마법부여, 해체는 하나의 제한을 나눠 쓴다. {seconds}초당 최대 {actions}회다.',
   'guide.profPages.econ.doctrineHeading': '플레이어끼리의 거래',
   'guide.profPages.econ.doctrineBody':
     '제작 장비의 힘은 언제나 공격대 하한 아래에 머물고, 위의 비용들은 물건을 상점 순환이 아니라 플레이어 간 거래로 밀어낸다.',
@@ -11158,4 +11147,40 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraOverlay.procs.aetherRush': '에테르 쇄도',
   'itemUi.vendor.buyStack': '{count}개 구매',
   'itemUi.vendor.buyStackAria': '{price}에 {item} {count}개 구매',
+  // Craft Cast System Phase 6 M16 non-Latin fills
+  'abilityUi.cast.crafting': '제작',
+  'abilityUi.cast.disenchanting': '마력 추출',
+  'abilityUi.cast.enchanting_apply': '마법부여',
+  'abilityUi.cast.salvaging': '분해',
+  'abilityUi.cast.tool_recharge': '충전',
+  'hudChrome.crafting.crafting': '제작 중',
+  'hudChrome.crafting.create': '제작',
+  'hudChrome.crafting.createAll': '모두 제작',
+  'hudChrome.crafting.createAllAria': '보유 재료로 만들 수 있는 최대 개수만큼 이 제작법을 만듭니다',
+  'hudChrome.crafting.qtyRowAria': '제작 수량',
+  'hudChrome.crafting.qtyDecreaseAria': '제작 수량 줄이기 (현재 {count})',
+  'hudChrome.crafting.qtyIncreaseAria': '제작 수량 늘리기 (현재 {count})',
+  'hudChrome.crafting.qtyValueAria': '제작 수량, {count}',
+  'hudChrome.crafting.batchRemaining': '남은 수 {remaining}/{total}',
+  'hudChrome.crafting.batchRemainingAria': '{total}개 중 {remaining}개 남음',
+  'hudChrome.crafting.durationAria': '시전 시간: {seconds}초',
+  'hudChrome.crafting.progressAria': '제작 진행',
+  'hudChrome.crafting.announceStart': '{name} 제작 중',
+  'hudChrome.crafting.announceComplete': '{name} 제작 완료',
+  'hudChrome.crafting.announceCancel': '제작이 취소됨',
+  'hudChrome.crafting.busy': '지금은 바쁩니다.',
+  'hudChrome.enchanting.disenchantBusy': '지금은 바쁩니다.',
+  'hudChrome.enchanting.salvageBusy': '지금은 바쁩니다.',
+  'hudChrome.enchanting.enchantBusy': '지금은 바쁩니다.',
+  'guide.profPages.econ.castPaceHeading': '시전 시간과 골드 소모',
+  'guide.profPages.econ.castPaceBody':
+    '전문 기술 행동은 실제 시전 시간이 걸립니다. 간단한 야외 제작법은 2초 남짓, 상위 사다리 제작법은 몇 초, 마력 추출·마법부여·분해·도구 효과 충전은 각각 짧은 고정 시전입니다. 시전 중 취소해도 재료를 잃지 않습니다. 성공한 제작마다 아이템 예산에 비례한 구리 수수료도 지불합니다. 재료, 작업대, 숙련도 상한과 함께 이 속도는 별도의 행동 한도 없이도 시장을 건전하게 유지합니다. 숙련도 구간별 정확한 시전 시간은 아래에 있습니다.',
+  'guide.profPages.econ.castPaceField': '필드 제작법(숙련도 요구 없음): {seconds}초 시전',
+  'guide.profPages.econ.castPaceSkill25': '숙련도 25까지의 제작법: {seconds}초 시전',
+  'guide.profPages.econ.castPaceSkill50': '숙련도 50까지의 제작법: {seconds}초 시전',
+  'guide.profPages.econ.castPaceSkill75': '숙련도 75까지의 제작법: {seconds}초 시전',
+  'guide.profPages.econ.castPaceCombo': '최상위 및 조합 제작법: {seconds}초 시전',
+  'guide.profPages.econ.castPaceEnchantFamily': '마력 추출·마법부여·분해: {seconds}초 시전',
+  'guide.profPages.econ.castPaceRecharge': '도구 효과 충전: {seconds}초 시전',
+  'guide.profPages.econ.castPaceBatch': '일괄 제작: 한 번에 최대 {count}개, 각각 시전',
 };

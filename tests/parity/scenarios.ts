@@ -52,6 +52,7 @@ import {
   xpForLevel,
 } from '../../src/sim/types';
 import { terrainHeight } from '../../src/sim/world';
+import { runCraft } from '../helpers/enchant_family_cast';
 import { OPEN_FIELD } from '../helpers/open_field';
 import type { Recorder, Scenario } from './record';
 
@@ -4573,7 +4574,7 @@ function professionsCraft(seed = 2): Scenario {
 
       // Step 1: DENIAL. No materials held -> insufficient_materials; the denial
       // path returns before the proc draw, so it draws zero rng.
-      sim.craftItem('recipe_minor_healing_potion', false, pid);
+      runCraft(sim, 'recipe_minor_healing_potion', false, pid);
       rec.snapshot('craft-denied');
 
       // Step 2: plain deterministic craft. The single proc draw happens on the
@@ -4585,7 +4586,7 @@ function professionsCraft(seed = 2): Scenario {
       sim.addItem('linen_scrap', 1, pid);
       sim.addItem('spider_leg', 1, pid);
       sim.addItem('silverleaf_herb', 2, pid);
-      sim.craftItem('recipe_minor_healing_potion', false, pid);
+      runCraft(sim, 'recipe_minor_healing_potion', false, pid);
       rec.snapshot('craft-plain');
 
       // Step 3: masterwork PROC. Tailoring as the active archetype (a MAJOR craft,
@@ -4607,7 +4608,7 @@ function professionsCraft(seed = 2): Scenario {
       // thread volume (grants draw no rng; only golden state rows move).
       sim.addItem('homespun_cloth', 3, pid);
       sim.addItem('spool_of_thread', 5, pid);
-      sim.craftItem('recipe_eastbrook_ritual_vestments', false, pid);
+      runCraft(sim, 'recipe_eastbrook_ritual_vestments', false, pid);
       rec.snapshot('craft-masterwork');
 
       // Step 4: one more plain craft so the golden shows the draw stream continuing
@@ -4615,8 +4616,23 @@ function professionsCraft(seed = 2): Scenario {
       sim.addItem('linen_scrap', 1, pid);
       sim.addItem('spider_leg', 1, pid);
       sim.addItem('silverleaf_herb', 2, pid);
-      sim.craftItem('recipe_minor_healing_potion', false, pid);
+      runCraft(sim, 'recipe_minor_healing_potion', false, pid);
       rec.snapshot('craft-plain-2');
+
+      // Step 5: the ARMED craft-cast frame (Craft Cast System). Start a real
+      // batch through Sim.craftItem (the three-arg count form the offline HUD
+      // uses) and snapshot WITHOUT ticking: the sampler pins the live session
+      // shape itself (castingAbility, castTotal/castRemaining, the 1-based
+      // craftCastRecipeId capture, and the batch counters at 2 of 2) instead
+      // of only the at-rest zeros. Deliberately no ticks: this scenario's
+      // coverage pin is draw-PRECISE (each craft draws exactly once, the
+      // denial zero), and a cast start draws nothing, so the stream stays at
+      // three draws and the armed cast simply never completes in-scenario.
+      sim.addItem('linen_scrap', 2, pid);
+      sim.addItem('spider_leg', 2, pid);
+      sim.addItem('silverleaf_herb', 4, pid);
+      sim.craftItem('recipe_minor_healing_potion', false, 2);
+      rec.snapshot('craft-cast-armed');
     },
   };
 }

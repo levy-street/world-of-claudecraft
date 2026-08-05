@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "0cfda9ca",
+      "state": "56ea11a2",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -42,7 +42,6 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -144,7 +143,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 974,
-      "state": "20801e92",
+      "state": "3769053c",
       "events": "16ac6f59",
       "rng": {
         "draws": 7,
@@ -155,7 +154,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 974,
-      "state": "df1daeb2",
+      "state": "4b60ae1c",
       "events": "cc147418",
       "rng": {
         "draws": 7,
@@ -166,7 +165,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 974,
-      "state": "afe0b4e7",
+      "state": "9948e1af",
       "events": "a7d6b368",
       "rng": {
         "draws": 10,
@@ -177,7 +176,7 @@
       "tick": 38,
       "time": 1.9,
       "nextId": 976,
-      "state": "a906f641",
+      "state": "7eb7a0f9",
       "events": "f83a7208",
       "rng": {
         "draws": 13,
@@ -208,7 +207,6 @@
             "xpGained": 898
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "damageDealt": 1635,
@@ -487,7 +485,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 976,
-      "state": "c2bf7007",
+      "state": "3f9aa957",
       "events": "741638a5",
       "rng": {
         "draws": 13,
@@ -498,7 +496,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 976,
-      "state": "c2bf7007",
+      "state": "3f9aa957",
       "events": "741638a5",
       "rng": {
         "draws": 13,
@@ -529,7 +527,6 @@
             "xpGained": 898
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "damageDealt": 1635,

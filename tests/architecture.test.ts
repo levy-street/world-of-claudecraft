@@ -291,6 +291,7 @@ const UI_PURE_CORES = [
   'src/ui/grant_line_view.ts',
   'src/ui/crafting_view.ts',
   'src/ui/commission_order_view.ts',
+  'src/ui/craft_cast_view.ts',
   'src/ui/profession_event_lines_core.ts',
   'src/ui/profession_identity_view.ts',
   'src/ui/profession_tutorial_view.ts',

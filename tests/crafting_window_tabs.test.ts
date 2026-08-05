@@ -53,6 +53,9 @@ function craftingDeps() {
     attachTooltip: vi.fn(),
     commissionChecked: vi.fn((_recipeId: string) => false),
     onToggleCommission: vi.fn(),
+    craftQty: () => 1,
+    onCraftQty: vi.fn(),
+    announce: vi.fn(),
     selectedCraft: () => null as string | null,
     onSelectCraft: vi.fn(),
   };
@@ -71,6 +74,7 @@ function rowFor(professionId: string, recipeId: string): CraftingRecipeRow {
     difficulty: 'full',
     station: null,
     commissionEligible: false,
+    durationSec: 1.75,
     craftable: false,
   };
 }

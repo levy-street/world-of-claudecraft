@@ -7593,7 +7593,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.dialogOption': '製作',
   'hudChrome.crafting.dialogOptionAria': '{craft}の製作ウィンドウを開く',
   'hudChrome.crafting.close': '製作を閉じる',
-  'hudChrome.crafting.craft': '製作',
   'hudChrome.crafting.reagentsNeeded': '必要素材:',
   'hudChrome.crafting.empty': '既知のレシピはありません。',
   'hudChrome.crafting.resultAria': '{name}を製作',
@@ -8682,7 +8681,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'yumi.end.loss': '敗北！Yumiが倒れてしまった。',
   'hudChrome.crafting.comboRequirementUnmet':
     'その組み合わせレシピに必要な両方の生産スキルの熟練度に達していません。',
-  'hudChrome.crafting.throttled': '製作が速すぎます。少し待ってからもう一度お試しください。',
   'hudChrome.crafting.recipeNotLearned': 'そのレシピはまだ習得していません。',
   'hudChrome.crafting.noBagSpace': 'バッグに製作したアイテムを入れる空きがありません。',
   // Professions 2.0 (M16 non-Latin fills).
@@ -10415,12 +10413,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.notHeld': 'そのアイテムを所持していません。',
   'hudChrome.enchanting.notDisenchantable': 'それは魔力分解できません。',
   'hudChrome.enchanting.notSalvageable': 'それは解体できません。',
-  'hudChrome.enchanting.disenchantThrottled':
-    '魔力分解が速すぎます。少し待ってからもう一度お試しください。',
-  'hudChrome.enchanting.salvageThrottled':
-    '解体が速すぎます。少し待ってからもう一度お試しください。',
-  'hudChrome.enchanting.enchantThrottled':
-    'エンチャントが速すぎます。少し待ってからもう一度お試しください。',
   'hudChrome.enchanting.enchantWrongSlot': 'そのエンチャントはそのアイテムには付与できません。',
   'hudChrome.enchanting.enchantUnknown': 'そのエンチャントは存在しません。',
   'hudChrome.enchanting.enchantInsufficient': 'そのエンチャントに必要な素材がありません。',
@@ -10883,9 +10875,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.provenanceHeading': '署名入りの品',
   'guide.profPages.econ.provenanceBody':
     'レア以上の製作品と発見には作り手の署名が入り、署名が完全に一致する品は今でもスタックできます。',
-  'guide.profPages.econ.throttleHeading': '行動の制限',
-  'guide.profPages.econ.throttleBody':
-    '製作・分解・エンチャント・サルベージはひとつの制限を共有します。{seconds}秒あたり最大{actions}回です。',
   'guide.profPages.econ.doctrineHeading': 'プレイヤー同士の取引',
   'guide.profPages.econ.doctrineBody':
     '製作装備の強さは常にレイドの下限を下回り、上記の費用は品物を商店の循環ではなくプレイヤー間の取引へと押し出します。',
@@ -11170,4 +11159,40 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraOverlay.procs.aetherRush': 'エーテルラッシュ',
   'itemUi.vendor.buyStack': '{count}個購入',
   'itemUi.vendor.buyStackAria': '{item}を{count}個、{price}で購入',
+  // Craft Cast System Phase 6 M16 non-Latin fills
+  'abilityUi.cast.crafting': '製作',
+  'abilityUi.cast.disenchanting': '分解',
+  'abilityUi.cast.enchanting_apply': '付魔',
+  'abilityUi.cast.salvaging': '解体',
+  'abilityUi.cast.tool_recharge': '充填',
+  'hudChrome.crafting.crafting': '製作中',
+  'hudChrome.crafting.create': '作成',
+  'hudChrome.crafting.createAll': 'すべて作成',
+  'hudChrome.crafting.createAllAria': '所持材料で作れる最大数までこのレシピを作成する',
+  'hudChrome.crafting.qtyRowAria': '作成数',
+  'hudChrome.crafting.qtyDecreaseAria': '作成数を減らす（現在 {count}）',
+  'hudChrome.crafting.qtyIncreaseAria': '作成数を増やす（現在 {count}）',
+  'hudChrome.crafting.qtyValueAria': '作成数、{count}',
+  'hudChrome.crafting.batchRemaining': '残り {remaining}/{total}',
+  'hudChrome.crafting.batchRemainingAria': '残り {remaining} 個、合計 {total} 個',
+  'hudChrome.crafting.durationAria': '詠唱時間: {seconds} 秒',
+  'hudChrome.crafting.progressAria': '製作の進行',
+  'hudChrome.crafting.announceStart': '{name} を製作中',
+  'hudChrome.crafting.announceComplete': '{name} の製作が完了',
+  'hudChrome.crafting.announceCancel': '製作をキャンセルした',
+  'hudChrome.crafting.busy': '手が離せません。',
+  'hudChrome.enchanting.disenchantBusy': '手が離せません。',
+  'hudChrome.enchanting.salvageBusy': '手が離せません。',
+  'hudChrome.enchanting.enchantBusy': '手が離せません。',
+  'guide.profPages.econ.castPaceHeading': '詠唱時間とゴールドの消費',
+  'guide.profPages.econ.castPaceBody':
+    '専門職の行動には実際の詠唱時間がかかります。簡単な野外レシピは2秒弱、梯子の上位レシピは数秒、分解・付魔・解体・道具効果の充填はそれぞれ固定の短い詠唱です。詠唱中にキャンセルしても損失はありません。成功した製作にはアイテム予算に応じた銅貨の手数料もかかります。材料・作業台・技能上限と合わせて、別枠の行動上限がなくても市場を健全に保てます。スキル帯ごとの正確な詠唱時間は下記のとおりです。',
+  'guide.profPages.econ.castPaceField': 'フィールドレシピ（スキル要件なし）: 詠唱 {seconds} 秒',
+  'guide.profPages.econ.castPaceSkill25': 'スキル25までのレシピ: 詠唱 {seconds} 秒',
+  'guide.profPages.econ.castPaceSkill50': 'スキル50までのレシピ: 詠唱 {seconds} 秒',
+  'guide.profPages.econ.castPaceSkill75': 'スキル75までのレシピ: 詠唱 {seconds} 秒',
+  'guide.profPages.econ.castPaceCombo': '最上位およびコンボレシピ: 詠唱 {seconds} 秒',
+  'guide.profPages.econ.castPaceEnchantFamily': '分解・付魔・解体: 詠唱 {seconds} 秒',
+  'guide.profPages.econ.castPaceRecharge': '道具効果の充填: 詠唱 {seconds} 秒',
+  'guide.profPages.econ.castPaceBatch': 'まとめて作成: 一度の注文で最大 {count} 個、1個ずつ詠唱',
 };

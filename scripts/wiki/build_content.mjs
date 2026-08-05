@@ -33,8 +33,11 @@ const entrySource = `
   export { VISUALS, visualKeyFor } from './src/render/characters/manifest.ts';
   export {
     CRAFT_RING, STATIONS, STATION_TYPE_BY_CRAFT, STATION_RADIUS, PERK_THRESHOLDS,
-    CRAFT_GOLD_SINK_COPPER_PER_BUDGET, CRAFT_THROTTLE_WINDOW_SECONDS,
-    CRAFT_THROTTLE_MAX_PER_WINDOW, GATHERING_PROFESSIONS, GATHERING_PROFESSION_IDS,
+    CRAFT_GOLD_SINK_COPPER_PER_BUDGET, CRAFT_CAST_DURATION_FIELD_SEC,
+    CRAFT_CAST_DURATION_SKILL_25_SEC, CRAFT_CAST_DURATION_SKILL_50_SEC,
+    CRAFT_CAST_DURATION_SKILL_75_SEC, CRAFT_CAST_DURATION_SKILL_100_OR_COMBO_SEC,
+    ENCHANT_FAMILY_CAST_DURATION_SEC, TOOL_RECHARGE_CAST_DURATION_SEC,
+    CRAFT_BATCH_MAX, GATHERING_PROFESSIONS, GATHERING_PROFESSION_IDS,
   } from './src/sim/content/professions.ts';
   export { ALL_RECIPES } from './src/sim/content/recipes.ts';
   export { ENCHANTS } from './src/sim/content/enchants.ts';
@@ -119,8 +122,14 @@ const {
   STATION_RADIUS,
   PERK_THRESHOLDS,
   CRAFT_GOLD_SINK_COPPER_PER_BUDGET,
-  CRAFT_THROTTLE_WINDOW_SECONDS,
-  CRAFT_THROTTLE_MAX_PER_WINDOW,
+  CRAFT_CAST_DURATION_FIELD_SEC,
+  CRAFT_CAST_DURATION_SKILL_25_SEC,
+  CRAFT_CAST_DURATION_SKILL_50_SEC,
+  CRAFT_CAST_DURATION_SKILL_75_SEC,
+  CRAFT_CAST_DURATION_SKILL_100_OR_COMBO_SEC,
+  ENCHANT_FAMILY_CAST_DURATION_SEC,
+  TOOL_RECHARGE_CAST_DURATION_SEC,
+  CRAFT_BATCH_MAX,
   GATHERING_PROFESSIONS,
   GATHERING_PROFESSION_IDS,
   ALL_RECIPES,
@@ -880,9 +889,17 @@ const workOrders = Object.values(QUESTS)
   });
 const profEconomy = {
   craftFeeCopperPerBudgetPoint: CRAFT_GOLD_SINK_COPPER_PER_BUDGET,
-  actionThrottle: {
-    windowSeconds: CRAFT_THROTTLE_WINDOW_SECONDS,
-    maxActions: CRAFT_THROTTLE_MAX_PER_WINDOW,
+  // Craft Cast System: the exact cast-pace numbers the transparency policy
+  // publishes (the retired actionThrottle block's successor).
+  castPace: {
+    fieldSec: CRAFT_CAST_DURATION_FIELD_SEC,
+    skill25Sec: CRAFT_CAST_DURATION_SKILL_25_SEC,
+    skill50Sec: CRAFT_CAST_DURATION_SKILL_50_SEC,
+    skill75Sec: CRAFT_CAST_DURATION_SKILL_75_SEC,
+    comboSec: CRAFT_CAST_DURATION_SKILL_100_OR_COMBO_SEC,
+    enchantFamilySec: ENCHANT_FAMILY_CAST_DURATION_SEC,
+    rechargeSec: TOOL_RECHARGE_CAST_DURATION_SEC,
+    batchMax: CRAFT_BATCH_MAX,
   },
   marketCutPct: pct(MARKET_CUT),
   listingDepositCopper: MARKET_LISTING_DEPOSIT_COPPER,
@@ -1180,7 +1197,16 @@ export interface GuideProfWorkOrder {
 
 export interface GuideProfEconomy {
   craftFeeCopperPerBudgetPoint: number;
-  actionThrottle: { windowSeconds: number; maxActions: number };
+  castPace: {
+    fieldSec: number;
+    skill25Sec: number;
+    skill50Sec: number;
+    skill75Sec: number;
+    comboSec: number;
+    enchantFamilySec: number;
+    rechargeSec: number;
+    batchMax: number;
+  };
   marketCutPct: number;
   listingDepositCopper: number;
   trainingFeeCopperByTier: number[];

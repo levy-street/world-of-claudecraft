@@ -28,7 +28,7 @@
       "tick": 3,
       "time": 0.15,
       "nextId": 966,
-      "state": "cd2bef48",
+      "state": "60b8c3e6",
       "events": "4a8f3918",
       "rng": {
         "draws": 2,
@@ -53,7 +53,6 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "partiesJoined": 1
@@ -115,7 +114,6 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "partiesJoined": 1
