@@ -55,8 +55,9 @@ zone map payload) live in `launcher_core.ts`, tested in
 `launcher_page.ts`.
 
 GUI extras: a Live panel (state, uptime, HP/resource bars, bags, items/hour,
-harvests/catches/kills/deaths), an inline-SVG mini map of the current zone
-(rect, lakes, node dots by type, live position), a read-only inventory grid,
+session copper earned + gold/hour, harvests/catches/kills/deaths), an
+inline-SVG mini map of the current zone (rect, lakes, node dots by type, live
+position), a read-only inventory grid,
 named form profiles in localStorage (password never saved), and page-side
 character rotation (checked profiles + interval, driven through stop/start;
 the rotation uses the credentials typed in the page, which are gone on
@@ -161,8 +162,9 @@ Same doctrine as `bot/` (logic vs gateway) and `wallet_link.ts` vs `wallet.ts`:
   every problem listed in one throw. Tested in `tests/farmbot_config.test.ts`.
 - `navigator.ts` (pure): `pickNextNode` (nearest ready node by zone/type/tier,
   blacklist-aware), `steerToward` (absolute facing + forward, arrived inside
-  `INTERACT_RANGE`), `StuckDetector` (wiggle, then blacklist recommendation).
-  Tested in `tests/farmbot_navigator.test.ts`.
+  `INTERACT_RANGE`), `StuckDetector` (held recovery maneuvers: back, sides,
+  reverse with optional rng, then blacklist). Tested in
+  `tests/farmbot_navigator.test.ts`.
 - `brain.ts` (pure): the state machine (`stepBrain(state, world, events,
   nowMs)` over a narrow `BotWorld` interface) covering TRAVEL, HARVEST,
   FISH_CAST/FISH_WAIT_BITE, COMBAT, FLEE, LOOT, RECOVER, REST, PAUSED, BREAK,

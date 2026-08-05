@@ -135,10 +135,17 @@ export type StuckEscalation = 'none' | 'wiggle' | 'blacklist';
 export interface StuckResult {
   stuck: boolean;
   escalation: StuckEscalation;
-  // Wiggle suggestion when escalation is 'wiggle': keep moving, hop, and
-  // strafe. The strafe side alternates per consecutive stuck event (tracked
-  // internally) so repeated wiggles do not grind the same wall edge.
+  // Recovery maneuver when escalation is 'wiggle'. The brain applies this
+  // input (and optional facing) instead of the steer-toward-target input for
+  // the hold window so a reverse/side step is not immediately overwritten.
   input: Partial<MoveInput>;
+  // Absolute facing override for the recovery step (radians). When set the
+  // brain aims this way instead of toward the travel target.
+  facing?: number;
+  // Short label for logs ('back', 'strafe-left', 'reverse', ...).
+  label?: string;
+  // True only on the tick a new recovery maneuver begins (for one-shot logs).
+  started?: boolean;
 }
 
 export interface StuckDetectorOptions {
@@ -146,73 +153,174 @@ export interface StuckDetectorOptions {
   windowMs?: number;
   // Horizontal yards of displacement that count as progress.
   epsilon?: number;
-  // Consecutive stuck events before recommending a blacklist.
+  // Consecutive failed recoveries before recommending a blacklist.
   blacklistAfter?: number;
+  // How long each recovery maneuver is held before trying the next.
+  recoveryMs?: number;
+}
+
+export interface StuckUpdateOptions {
+  // Facing the bot was aiming while traveling (steerToward result). Recovery
+  // maneuvers that reverse or side-step are built relative to this.
+  travelFacing?: number;
+  // Optional [0,1) source. When set, maneuvers are chosen randomly among the
+  // catalog instead of cycling deterministically by attempt index.
+  rng?: () => number;
 }
 
 const DEFAULT_WINDOW_MS = 4000;
 const DEFAULT_EPSILON = 0.5;
-const DEFAULT_BLACKLIST_AFTER = 2;
+// Enough attempts to cycle back / sides / reverse before giving up on the target.
+const DEFAULT_BLACKLIST_AFTER = 6;
+const DEFAULT_RECOVERY_MS = 1800;
+
+export interface StuckManeuver {
+  input: Partial<MoveInput>;
+  facing?: number;
+  label: string;
+}
+
+// Catalog of unstick experiments relative to the intended travel facing.
+// Pure so tests can pin the cycle without standing up the detector.
+export function pickStuckManeuver(
+  attempt: number,
+  travelFacing: number,
+  rng?: () => number,
+): StuckManeuver {
+  const catalog: StuckManeuver[] = [
+    { label: 'back', input: { forward: false, back: true, jump: true } },
+    {
+      label: 'back-left',
+      input: { forward: false, back: true, strafeLeft: true, jump: true },
+    },
+    {
+      label: 'back-right',
+      input: { forward: false, back: true, strafeRight: true, jump: true },
+    },
+    {
+      label: 'strafe-left',
+      input: { forward: true, strafeLeft: true, jump: true },
+    },
+    {
+      label: 'strafe-right',
+      input: { forward: true, strafeRight: true, jump: true },
+    },
+    {
+      label: 'reverse',
+      input: { forward: true, jump: true },
+      facing: travelFacing + Math.PI,
+    },
+    {
+      label: 'side-left',
+      input: { forward: true, jump: true },
+      facing: travelFacing + Math.PI / 2,
+    },
+    {
+      label: 'side-right',
+      input: { forward: true, jump: true },
+      facing: travelFacing - Math.PI / 2,
+    },
+    {
+      label: 'back-diagonal',
+      input: { forward: false, back: true, strafeLeft: true, jump: true },
+      facing: travelFacing + (Math.PI * 3) / 4,
+    },
+  ];
+  if (rng) {
+    const i = Math.min(catalog.length - 1, Math.floor(rng() * catalog.length));
+    return catalog[i]!;
+  }
+  // attempt is 1-based (first recovery = 1).
+  const idx = Math.max(0, attempt - 1) % catalog.length;
+  return catalog[idx]!;
+}
 
 // Feed (pos, nowMs) each decision tick while traveling toward a target. If
 // the horizontal displacement over a rolling window stays under epsilon, the
-// bot is presumed snagged: the first report suggests a wiggle, and after
-// `blacklistAfter` consecutive reports with no progress the detector
-// recommends blacklisting the current target. Call reset() whenever the
-// target changes, and do not feed it while intentionally stationary
-// (harvesting, fishing, fighting): stillness is only meaningful while
-// traveling.
+// bot is presumed snagged: recovery holds a back/side/reverse maneuver for
+// recoveryMs, then tries another (deterministic cycle, or random when rng is
+// given). After `blacklistAfter` failed recoveries the detector recommends
+// blacklisting the current target. Call reset() whenever the target changes,
+// and do not feed it while intentionally stationary (harvesting, fishing,
+// fighting): stillness is only meaningful while traveling.
 export class StuckDetector {
   private readonly windowMs: number;
   private readonly epsilon: number;
   private readonly blacklistAfter: number;
+  private readonly recoveryMs: number;
   private anchor: NavPos | null = null;
   private anchorMs = 0;
-  private stuckCount = 0;
+  // When the quiet window first expired (null while free / not yet stuck).
+  private stuckSinceMs: number | null = null;
+  // Cached maneuver for the current attempt so rng does not re-roll every tick.
+  private activeAttempt = 0;
+  private active: StuckManeuver | null = null;
 
   constructor(opts: StuckDetectorOptions = {}) {
     this.windowMs = opts.windowMs ?? DEFAULT_WINDOW_MS;
     this.epsilon = opts.epsilon ?? DEFAULT_EPSILON;
     this.blacklistAfter = opts.blacklistAfter ?? DEFAULT_BLACKLIST_AFTER;
+    this.recoveryMs = opts.recoveryMs ?? DEFAULT_RECOVERY_MS;
   }
 
   reset(): void {
     this.anchor = null;
-    this.stuckCount = 0;
+    this.anchorMs = 0;
+    this.stuckSinceMs = null;
+    this.activeAttempt = 0;
+    this.active = null;
   }
 
-  update(pos: NavPos, nowMs: number): StuckResult {
+  update(pos: NavPos, nowMs: number, opts: StuckUpdateOptions = {}): StuckResult {
+    const travelFacing = opts.travelFacing ?? 0;
+
     if (this.anchor === null) {
       this.anchor = { x: pos.x, z: pos.z };
       this.anchorMs = nowMs;
       return { stuck: false, escalation: 'none', input: {} };
     }
+
     if (distance2(pos, this.anchor) >= this.epsilon * this.epsilon) {
-      // Progress: re-anchor the window and clear the escalation streak.
+      // Progress: free of the snag. Re-anchor and clear recovery state.
       this.anchor = { x: pos.x, z: pos.z };
       this.anchorMs = nowMs;
-      this.stuckCount = 0;
+      this.stuckSinceMs = null;
+      this.activeAttempt = 0;
+      this.active = null;
       return { stuck: false, escalation: 'none', input: {} };
     }
-    if (nowMs - this.anchorMs < this.windowMs) {
-      return { stuck: false, escalation: 'none', input: {} };
+
+    if (this.stuckSinceMs === null) {
+      if (nowMs - this.anchorMs < this.windowMs) {
+        return { stuck: false, escalation: 'none', input: {} };
+      }
+      // Quiet window expired: snag clock starts at that edge so large time
+      // jumps still count the recoveries that "should" have run.
+      this.stuckSinceMs = this.anchorMs + this.windowMs;
     }
-    // Stuck. Re-anchor so the next window measures whether the wiggle worked.
-    this.stuckCount += 1;
-    this.anchor = { x: pos.x, z: pos.z };
-    this.anchorMs = nowMs;
-    if (this.stuckCount >= this.blacklistAfter) {
+
+    const elapsed = Math.max(0, nowMs - this.stuckSinceMs);
+    const attempt = Math.floor(elapsed / this.recoveryMs) + 1;
+
+    if (attempt >= this.blacklistAfter) {
+      this.active = null;
+      this.activeAttempt = 0;
       return { stuck: true, escalation: 'blacklist', input: {} };
     }
+
+    const started = attempt !== this.activeAttempt || this.active === null;
+    if (started) {
+      this.active = pickStuckManeuver(attempt, travelFacing, opts.rng);
+      this.activeAttempt = attempt;
+    }
+    const maneuver = this.active!;
     return {
       stuck: true,
       escalation: 'wiggle',
-      input: {
-        forward: true,
-        jump: true,
-        strafeLeft: this.stuckCount % 2 === 1,
-        strafeRight: this.stuckCount % 2 === 0,
-      },
+      input: maneuver.input,
+      facing: maneuver.facing,
+      label: maneuver.label,
+      started,
     };
   }
 }

@@ -163,6 +163,8 @@ export const LAUNCHER_PAGE = `<!DOCTYPE html>
       <div class="stat"><div class="v" id="lvUptime">-</div><div class="k">uptime</div></div>
       <div class="stat"><div class="v" id="lvBags">-</div><div class="k">bags</div></div>
       <div class="stat"><div class="v" id="lvRate">-</div><div class="k">items/hour</div></div>
+      <div class="stat"><div class="v" id="lvEarned" style="color:#e8c547">0c</div><div class="k">earned</div></div>
+      <div class="stat"><div class="v" id="lvGoldRate">-</div><div class="k">gold/hour</div></div>
       <div class="stat"><div class="v" id="lvHarvests">0</div><div class="k">harvests</div></div>
       <div class="stat"><div class="v" id="lvCatches">0</div><div class="k">catches</div></div>
       <div class="stat"><div class="v" id="lvKills">0</div><div class="k">kills</div></div>
@@ -440,6 +442,17 @@ function fmtUptime(ms) {
   return (h ? h + 'h ' : '') + m + 'm ' + (s % 60) + 's';
 }
 
+// Classic purse display from a copper integer (matches launcher_core.formatCopper).
+function fmtCopper(copper) {
+  const c = Math.max(0, Math.floor(Number(copper) || 0));
+  const g = Math.floor(c / 10000);
+  const s = Math.floor((c % 10000) / 100);
+  const cop = c % 100;
+  if (g > 0) return g + 'g ' + s + 's ' + cop + 'c';
+  if (s > 0) return s + 's ' + cop + 'c';
+  return cop + 'c';
+}
+
 const NODE_COLORS = { herb: '#4caf50', ore: '#9e9e9e', wood: '#8d6e63' };
 
 function renderMap(stat) {
@@ -474,6 +487,12 @@ async function pollLive() {
     $('lvBags').textContent = stat.bagsUsed + ' / ' + stat.bagCapacity;
     const hours = live.running && live.startedAt ? (Date.now() - live.startedAt) / 3600000 : 0;
     $('lvRate').textContent = hours > 0.001 ? Math.round((stat.stats.harvests + stat.stats.catches) / hours) : '-';
+    const earned = Number(stat.stats && stat.stats.copperGained) || 0;
+    $('lvEarned').textContent = fmtCopper(earned);
+    // gold/hour as fractional gold (10000 copper = 1g) for a readable rate
+    $('lvGoldRate').textContent = hours > 0.001
+      ? (earned / 10000 / hours).toFixed(2) + 'g/h'
+      : '-';
     $('lvHarvests').textContent = stat.stats.harvests;
     $('lvCatches').textContent = stat.stats.catches;
     $('lvKills').textContent = stat.stats.kills;

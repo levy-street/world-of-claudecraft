@@ -75,8 +75,28 @@ export interface Fbstat {
   maxResource: number;
   bagsUsed: number;
   bagCapacity: number;
-  stats: { harvests: number; catches: number; kills: number; deaths: number };
+  stats: {
+    harvests: number;
+    catches: number;
+    kills: number;
+    deaths: number;
+    // Total copper earned this run (positive purse deltas only). Optional on
+    // older bots so a mixed build still parses.
+    copperGained?: number;
+    raresKept?: number;
+  };
   inventory: { itemId: string; count: number }[];
+}
+
+// Classic WoC purse display: copper integer -> "Ng Ns Nc".
+export function formatCopper(copper: number): string {
+  const c = Math.max(0, Math.floor(Number.isFinite(copper) ? copper : 0));
+  const g = Math.floor(c / 10_000);
+  const s = Math.floor((c % 10_000) / 100);
+  const cop = c % 100;
+  if (g > 0) return `${g}g ${s}s ${cop}c`;
+  if (s > 0) return `${s}s ${cop}c`;
+  return `${cop}c`;
 }
 
 export const FBSTAT_PREFIX = 'FBSTAT ';

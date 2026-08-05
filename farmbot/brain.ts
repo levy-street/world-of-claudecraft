@@ -90,13 +90,14 @@ import {
   steerToward,
 } from './navigator';
 import {
-  HOLY_LIGHT_ID,
   type GoldCast,
+  HOLY_LIGHT_ID,
   pickAbility,
   pickGoldCombatAbility,
   pickGoldMaintainBuff,
   pickSelfHeal,
 } from './rotation';
+import { type EmergencyAction, pickEmergencyAction } from './survival';
 import { routeViaGates, WALLED_HUBS } from './village_gates';
 import { buildZoneGraph, findZonePath, type ZoneGraph, type ZoneHop } from './zone_graph';
 
@@ -252,6 +253,8 @@ export interface BrainState {
   combatTargetId: number | null;
   castIndex: number;
   lastCastAtMs: number | null;
+  // Emergency potion cooldown tracker (negative so the first potion is ready).
+  lastPotionAtMs: number;
   // FLEE (combat.flee 'outleveled'): when the run started, for the timeout.
   fleeStartedAtMs: number;
   // Set when a flee timed out and the bot turned to fight: no second flee
@@ -297,7 +300,8 @@ export interface BrainState {
   goldLastPullAtMs: number;
   goldResetAtMs: Record<string, number>;
   goldWaitLogAtMs: number;
-  goldLastCopper: number | null;
+  // Last mirrored purse copper (session earn tracking for any mode).
+  lastCopper: number | null;
   // Multi-zone rotation (config.zones non-empty).
   readonly zoneGraph: ZoneGraph;
   readonly zoneIdAt: (x: number, z: number) => string;
@@ -365,6 +369,7 @@ export function createBrain(config: FarmBotConfig, deps: BrainDeps = {}): BrainS
     combatTargetId: null,
     castIndex: 0,
     lastCastAtMs: null,
+    lastPotionAtMs: -120_000,
     fleeStartedAtMs: 0,
     fleeAttempted: false,
     recoverItemId: null,
@@ -392,7 +397,7 @@ export function createBrain(config: FarmBotConfig, deps: BrainDeps = {}): BrainS
     goldLastPullAtMs: 0,
     goldResetAtMs: {},
     goldWaitLogAtMs: 0,
-    goldLastCopper: null,
+    lastCopper: null,
     zoneGraph: deps.zoneGraph ?? buildZoneGraph(ZONES, PORTALS),
     zoneIdAt: deps.zoneIdAt ?? ((x, z) => zoneAt(x, z).id),
     zoneIndex: 0,
@@ -971,12 +976,6 @@ function stepGold(state: BrainState, world: BotWorld, nowMs: number, logs: strin
   const def = defs[state.goldIndex % defs.length];
   const inside = p.pos.x > DUNGEON_X_THRESHOLD;
 
-  // Copper accounting rides the mirror delta, whatever phase we are in.
-  if (state.goldLastCopper !== null && world.copper > state.goldLastCopper) {
-    state.stats.copperGained += world.copper - state.goldLastCopper;
-  }
-  state.goldLastCopper = world.copper;
-
   if (state.goldPhase === 'door') {
     if (inside) {
       goldBeginClear(state, logs); // rejoined a live claim (e.g. after a death)
@@ -1494,7 +1493,29 @@ function stepFishWaitBite(
   }
 }
 
-function stepCombat(state: BrainState, world: BotWorld, nowMs: number): void {
+// One defensive action per tick, replacing only that tick's rotation cast
+// (auto-attack and movement continue). Returns true when it acted.
+function issueEmergency(
+  state: BrainState,
+  world: BotWorld,
+  action: EmergencyAction,
+  nowMs: number,
+  logs: string[],
+): boolean {
+  if (action.kind === 'cast') {
+    if (action.selfTarget) world.castAbilityOn(action.id, world.player.id);
+    else world.castAbility(action.id);
+    const name = world.known.find((k) => k.def.id === action.id)?.def.name ?? action.id;
+    logs.push(`emergency: ${name}`);
+  } else {
+    world.useItem(action.id);
+    state.lastPotionAtMs = nowMs;
+    logs.push(`emergency: ${state.itemDef(action.id)?.name ?? action.id}`);
+  }
+  return true;
+}
+
+function stepCombat(state: BrainState, world: BotWorld, nowMs: number, logs: string[]): void {
   const p = world.player;
   const attackers = findAttackers(world);
   let target: Entity | null = null;
@@ -1528,10 +1549,22 @@ function stepCombat(state: BrainState, world: BotWorld, nowMs: number): void {
       stopMoving(world);
     }
     if (state.lastCastAtMs === null || nowMs - state.lastCastAtMs >= CAST_ATTEMPT_INTERVAL_MS) {
-      // Gold mode ignores combat.rotationMode / abilitySlots: mana-lean kit
-      // only (Crusader Strike, Holy Ground on multi-pull, buffs when down).
-      // Rite of Expulsion stays pull-only in stepGold.
-      if (state.config.mode === 'gold') {
+      // Emergency buttons first: one defensive action replaces this tick's
+      // rotation cast; the normal rotation resumes next tick.
+      const emergency = pickEmergencyAction(
+        world.known,
+        p,
+        world.inventory,
+        state.itemDef,
+        state.lastPotionAtMs,
+        nowMs,
+      );
+      if (emergency && issueEmergency(state, world, emergency, nowMs, logs)) {
+        state.lastCastAtMs = nowMs;
+      } else if (state.config.mode === 'gold') {
+        // Gold mode ignores combat.rotationMode / abilitySlots: mana-lean kit
+        // only (Crusader Strike, Holy Ground on multi-pull, buffs when down).
+        // Rite of Expulsion stays pull-only in stepGold.
         if (tryGoldMaintainBuff(world, nowMs, null)) {
           state.lastCastAtMs = nowMs;
         } else {
@@ -1583,6 +1616,16 @@ function stepFlee(state: BrainState, world: BotWorld, nowMs: number, logs: strin
     transition(state, 'COMBAT', logs);
     return;
   }
+  // Emergency buttons fire while running too.
+  const emergency = pickEmergencyAction(
+    world.known,
+    p,
+    world.inventory,
+    state.itemDef,
+    state.lastPotionAtMs,
+    nowMs,
+  );
+  if (emergency) issueEmergency(state, world, emergency, nowMs, logs);
   let threat: Entity | null = null;
   let bestD2 = Number.POSITIVE_INFINITY;
   for (const e of attackers) {
@@ -1669,6 +1712,11 @@ function stepRecover(state: BrainState, world: BotWorld, nowMs: number, logs: st
 // command-to-mirror latency); with no items configured this is a plain wait
 // for natural regen. Exits at REST_FULL_PCT on hp and, for mana classes only,
 // on mana.
+//
+// Priority is deliberate: never interrupt a live eat/drink channel (casts
+// cancel them server-side), and top mana fully via drink before any self-heal.
+// Healing while thirsty burns the mana the drink is restoring and thrashing
+// (drink -> flash -> drink) is the live bug this ordering pins.
 function stepRest(state: BrainState, world: BotWorld, nowMs: number, logs: string[]): void {
   const p = world.player;
   stopMoving(world);
@@ -1682,14 +1730,26 @@ function stepRest(state: BrainState, world: BotWorld, nowMs: number, logs: strin
     transition(state, 'TRAVEL', logs);
     return;
   }
+  // Live channel: sit still until it finishes. Any cast here would cancel it.
+  if (p.eating || p.drinking) return;
   if (state.restLastItemAtMs !== null && nowMs - state.restLastItemAtMs < REST_ITEM_THROTTLE_MS) {
     return;
   }
   const { combat } = state.config;
-  // Self-heal first when castable (faster than food): Mending Light
-  // preferred, Lightmend when mana only covers that. Every mode, not just
-  // gold: pickSelfHeal is null for non-paladins, who fall through to the
-  // configured-food / plain-wait behavior exactly as before.
+  // Mana first when short and a drink is available: commit to a full bar
+  // before spending mana on heals or starting food.
+  if (p.resourceType === 'mana' && resourcePct(p) < REST_FULL_PCT) {
+    const itemId = restConsumable(state, world, combat.drinkItemId, 'drink');
+    if (itemId) {
+      world.useItem(itemId);
+      state.restLastItemAtMs = nowMs;
+      logs.push(`resting: drinking ${itemId}`);
+      return;
+    }
+  }
+  // Self-heal when castable (faster than food): Mending Light preferred,
+  // Lightmend when mana only covers that. Only after mana is full (or no
+  // drink is available). pickSelfHeal is null for non-paladins.
   const heal = pickSelfHeal(world.known, p);
   if (heal && hpPct(p) < SELF_HEAL_TARGET_PCT) {
     if (
@@ -1703,21 +1763,12 @@ function stepRest(state: BrainState, world: BotWorld, nowMs: number, logs: strin
     }
     return; // hold still through the cast window either way
   }
-  if (hpPct(p) < REST_FULL_PCT && !p.eating) {
+  if (hpPct(p) < REST_FULL_PCT) {
     const itemId = restConsumable(state, world, combat.eatItemId, 'food');
     if (itemId) {
       world.useItem(itemId);
       state.restLastItemAtMs = nowMs;
       logs.push(`resting: eating ${itemId}`);
-      return;
-    }
-  }
-  if (p.resourceType === 'mana' && !p.drinking && resourcePct(p) < REST_FULL_PCT) {
-    const itemId = restConsumable(state, world, combat.drinkItemId, 'drink');
-    if (itemId) {
-      world.useItem(itemId);
-      state.restLastItemAtMs = nowMs;
-      logs.push(`resting: drinking ${itemId}`);
     }
   }
 }
@@ -2046,6 +2097,18 @@ export function stepBrain(
   if (state.sessionStartedAtMs === null) state.sessionStartedAtMs = nowMs;
   if (state.done) return logs;
 
+  // Session copper earned (any mode): count only positive purse deltas so
+  // vendor sells and dungeon loot add up, while spends re-baseline without
+  // erasing the earned total. Exposed via FBSTAT stats.copperGained.
+  if (state.lastCopper === null) {
+    state.lastCopper = world.copper;
+  } else {
+    if (world.copper > state.lastCopper) {
+      state.stats.copperGained += world.copper - state.lastCopper;
+    }
+    state.lastCopper = world.copper;
+  }
+
   if (
     state.config.maxRuntimeMinutes > 0 &&
     nowMs - state.startedAtMs >= state.config.maxRuntimeMinutes * 60_000
@@ -2294,7 +2357,7 @@ export function stepBrain(
       stepFishWaitBite(state, world, tick, nowMs, logs);
       break;
     case 'COMBAT':
-      stepCombat(state, world, nowMs);
+      stepCombat(state, world, nowMs, logs);
       break;
     case 'FLEE':
       stepFlee(state, world, nowMs, logs);
