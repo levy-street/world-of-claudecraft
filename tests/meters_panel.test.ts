@@ -99,6 +99,22 @@ const dmg = (
     kind: 'hit',
   }) as SimEvent;
 
+/** Labels of the contributor SUBTOTAL rows only. */
+function headRows(html: string): string[] {
+  const doc = new DOMParser().parseFromString(`<div>${html}</div>`, 'text/html');
+  return [...doc.querySelectorAll('.mt-tip-head')].map(
+    (el) => el.querySelector('.mt-tip-name')?.textContent ?? '',
+  );
+}
+
+/** Labels of the ability rows nested under a subtotal. */
+function nestedRows(html: string): string[] {
+  const doc = new DOMParser().parseFromString(`<div>${html}</div>`, 'text/html');
+  return [...doc.querySelectorAll('.mt-tip-group .mt-tip-row')].map(
+    (el) => el.querySelector('.mt-tip-name')?.textContent ?? '',
+  );
+}
+
 /** [label, value] of every row in a breakdown tooltip's HTML. */
 function tipRows(html: string): [string, string][] {
   const doc = new DOMParser().parseFromString(`<div>${html}</div>`, 'text/html');
@@ -144,7 +160,7 @@ describe('meters panel', () => {
     expect(rows[0].querySelector('.mt-num')?.textContent).toContain('500');
   });
 
-  it('breaks the hovered bar down per ability and names the pet that acted', () => {
+  it('groups the hovered bar by contributor, with a subtotal per actor', () => {
     const { meters, visibleRows, tooltipFor } = setup();
     meters.onEvent(dmg(1, 51, 300, 'Aimed Shot'));
     meters.onEvent(dmg(3, 51, 200, 'Claw'));
@@ -153,12 +169,31 @@ describe('meters panel', () => {
 
     const html = tooltipFor(visibleRows()[0]);
     expect(html).toContain('<div class="tt-title">Hero</div>');
-    // the pet's damage is its own row, labeled with the pet, and the shares are
-    // taken against the OWNER's folded total (300 + 200)
+    // A subtotal per actor with its abilities under it, so a hunter can read the
+    // pet's contribution instead of adding interleaved rows up by hand. Shares
+    // are against the owner's folded total (300 + 200), so they sum to 100%.
     expect(tipRows(html)).toEqual([
+      ['Hero', '300 (60%)'],
       ['Aimed Shot', '300 (60%)'],
-      ['Wolf Pet: Claw', '200 (40%)'],
+      ['Wolf Pet', '200 (40%)'],
+      ['Claw', '200 (40%)'],
     ]);
+    // the subtotals are headings; the abilities are nested under them
+    expect(headRows(html)).toEqual(['Hero', 'Wolf Pet']);
+    expect(nestedRows(html)).toEqual(['Aimed Shot', 'Claw']);
+    // a nested ability drops the pet prefix, since its heading already names it
+    expect(html).not.toContain('Wolf Pet: Claw');
+  });
+
+  it('omits a pet that did nothing rather than showing it as a zero group', () => {
+    const { meters, visibleRows, tooltipFor } = setup();
+    meters.onEvent(dmg(1, 51, 300, 'Aimed Shot')); // the pet never acts
+    meters.update();
+    meters.render(true);
+
+    const html = tooltipFor(visibleRows()[0]);
+    expect(headRows(html)).toEqual(['Hero']);
+    expect(html).not.toContain('Wolf Pet');
   });
 
   it('reuses the pooled bars across renders so a hovered row keeps its tooltip', () => {

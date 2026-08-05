@@ -3567,6 +3567,29 @@
     color: var(--color-text-muted);
     white-space: nowrap;
   }
+  /* Contributor subtotal on the damage/healing breakdown: the member, then each
+     pet that acted. It reads as a heading over the abilities nested beneath it,
+     which is what lets a hunter separate their own output from the pet's. */
+  #tooltip .mt-tip-head {
+    color: var(--color-text);
+    font-weight: 600;
+    margin-top: 3px;
+  }
+  #tooltip .mt-tip-head:first-child {
+    margin-top: 0;
+  }
+  #tooltip .mt-tip-head .mt-tip-val {
+    color: var(--color-text);
+  }
+  /* The abilities belonging to the subtotal directly above. Indented rather than
+     boxed: the tooltip is narrow, and a border would compete with the mini bars
+     already drawn behind every row. */
+  #tooltip .mt-tip-group {
+    padding-left: 10px;
+  }
+  #tooltip .mt-tip-group .mt-tip-name {
+    color: var(--color-text-muted);
+  }
   body.mobile-touch #meters-window .mt-rows {
     max-height: 82px;
     overflow-y: auto;

@@ -30,8 +30,10 @@ import { esc } from './esc';
 import { formatNumber, type TranslationKey, t } from './i18n';
 import {
   type BreakdownEntry,
+  type BreakdownGroup,
   type BreakdownRow,
   breakdownKey,
+  buildGroupedMeterBreakdown,
   buildMeterBreakdown,
 } from './meters_breakdown_view';
 import { MeterFrame } from './meters_frame';
@@ -691,19 +693,61 @@ export class MetersPanel {
       isThreat ? (e.petName ?? null) === row.petName : true,
     );
 
-    const model = buildMeterBreakdown(entries, enc.duration);
-    // Always the DAMAGE label on the threat tab: these entries are the damage
-    // that generated the hate, not the hate value on the bar.
+    // Threat rows are already per-contributor (one bar each), so their panel
+    // stays flat. Damage and healing fold a pet into its owner's bar, so THEIR
+    // panel groups by contributor: a subtotal per actor with its abilities under
+    // it, which is the only place a hunter can read what the pet actually did.
+    if (isThreat) {
+      const model = buildMeterBreakdown(entries, enc.duration);
+      // Always the DAMAGE label here: these entries are the damage that
+      // generated the hate, not the hate value on the bar.
+      const summary = t('hudChrome.meters.breakdownSummary', {
+        tab: t(TAB_LABEL_KEY.dmg),
+        value: fmtNum(model.total),
+      });
+      const body = model.rows.map((r) => this.breakdownRowHtml(r, false)).join('');
+      return `${title}<div class="mt-tip-sub">${esc(summary)}</div><div class="mt-tip-rows">${body}</div>`;
+    }
+
+    const grouped = buildGroupedMeterBreakdown(entries, enc.duration);
     const summary = t('hudChrome.meters.breakdownSummary', {
-      tab: t(TAB_LABEL_KEY[isThreat ? 'dmg' : this.tab]),
-      value: isThreat ? fmtNum(model.total) : fmtPerSecondRow(model.total, model.perSecond),
+      tab: t(TAB_LABEL_KEY[this.tab]),
+      value: fmtPerSecondRow(grouped.total, grouped.perSecond),
     });
-    const body = model.rows.map((r) => this.breakdownRowHtml(r, tally.name, false)).join('');
+    const body = grouped.groups
+      .map((g) => {
+        const head = this.breakdownGroupHtml(g, tally.name);
+        // Nested under their own subtotal, so the ability rows never carry the
+        // pet's name a second time.
+        const rows = g.rows.map((r) => this.breakdownRowHtml(r, true)).join('');
+        return `${head}<div class="mt-tip-group">${rows}</div>`;
+      })
+      .join('');
     return `${title}<div class="mt-tip-sub">${esc(summary)}</div><div class="mt-tip-rows">${body}</div>`;
   }
 
-  private breakdownRowHtml(row: BreakdownRow, memberName: string, byContributor: boolean): string {
-    const label = breakdownRowLabel(row, memberName, byContributor);
+  /** A contributor's subtotal line: the member or one of their pets. */
+  private breakdownGroupHtml(group: BreakdownGroup, memberName: string): string {
+    const value = t('hudChrome.meters.breakdownRow', {
+      value: fmtNum(group.amount),
+      percent: t('hudChrome.meters.percent', {
+        value: formatNumber(Math.round(group.share * 100), {
+          maximumFractionDigits: 0,
+          useGrouping: false,
+        }),
+      }),
+    });
+    return (
+      `<div class="mt-tip-row mt-tip-head">` +
+      `<span class="mt-tip-bar" style="width:${Math.max(2, group.fill * 100)}%"></span>` +
+      `<span class="mt-tip-name">${esc(group.petName ?? memberName)}</span>` +
+      `<span class="mt-tip-val">${esc(value)}</span>` +
+      `</div>`
+    );
+  }
+
+  private breakdownRowHtml(row: BreakdownRow, nested: boolean): string {
+    const label = breakdownRowLabel(row, nested);
     const value = t('hudChrome.meters.breakdownRow', {
       value: fmtNum(row.amount),
       percent: t('hudChrome.meters.percent', {
@@ -927,18 +971,20 @@ export class Meters {
   }
 }
 
-// Row label: the folded tail, a threat contributor (the member or one of their
-// pets), or an ability, prefixed with the pet's name when a pet cast it.
-function breakdownRowLabel(row: BreakdownRow, memberName: string, byContributor: boolean): string {
+// Row label: the folded tail, or an ability. A row NESTED under a contributor's
+// subtotal drops the pet prefix, because the group header above it already names
+// the actor; a flat row keeps the "Pet: Ability" form so it stays attributable
+// on its own.
+function breakdownRowLabel(row: BreakdownRow, nested: boolean): string {
   if (row.folded > 0) {
     return t('hudChrome.meters.breakdownOther', {
       count: formatNumber(row.folded, { maximumFractionDigits: 0, useGrouping: false }),
     });
   }
-  if (byContributor) return row.petName ?? memberName;
   const ability = row.ability
     ? abilityDisplayNameFromSource(row.ability)
     : t('hudChrome.meters.melee');
+  if (nested) return ability;
   return row.petName ? t('hudChrome.meters.petAbility', { pet: row.petName, ability }) : ability;
 }
 
