@@ -204,6 +204,13 @@ function spiritModelsByClass(): Map<string, string[]> {
 const scratch = new THREE.Vector3();
 const bbScratch = new THREE.Box3();
 
+/**
+ * Runs one puppet build. The host supplies a scheduler that spends a browser
+ * idle slot and the shared GPU arbiter on it; hosts without one (tests, the
+ * editor viewport) keep the historical inline build.
+ */
+export type SpiritBuildScheduler = (build: () => void) => void;
+
 export class SpiritApparitions {
   private slots: SpiritSlot[] = [];
   private puppets = new Map<string, SpiritPuppet>();
@@ -213,6 +220,7 @@ export class SpiritApparitions {
   private compileGroup: THREE.Group;
   private compileQueue: SpiritPuppet[] = [];
   private compiling: SpiritPuppet | null = null;
+  private buildScheduler: SpiritBuildScheduler | null = null;
   private time = 0;
 
   constructor(
@@ -254,6 +262,18 @@ export class SpiritApparitions {
     scene.add(this.compileGroup);
   }
 
+  /**
+   * Route puppet construction (a SkeletonUtils rig clone, a material rebind
+   * traverse, and a per-vertex skinned-bounds measure) off the GLB resolve's
+   * synchronous continuation. Without this the whole build lands in whatever
+   * frame the loader happens to resolve in, which is a live combat frame:
+   * warmForClass fires on first SIGHTING of a class, so a player walking into
+   * a fight resolves several models at once.
+   */
+  setBuildScheduler(schedule: SpiritBuildScheduler | null): void {
+    this.buildScheduler = schedule;
+  }
+
   // Kick the async loads for every spirit model this class's kit authors.
   // Called on first sighting of a player of that class; misses are harmless
   // (an unwarmed model's first cast just skips its spirit).
@@ -270,8 +290,15 @@ export class SpiritApparitions {
     this.loading.add(model);
     loadGltf(url).then(
       (g) => {
-        this.loading.delete(model);
-        this.buildPuppet(model, g.scene, g.animations);
+        // The model stays marked loading until the build actually runs, so a
+        // deferred build cannot be queued twice by a second ensureLoaded.
+        const build = (): void => {
+          this.loading.delete(model);
+          if (this.puppets.has(model)) return;
+          this.buildPuppet(model, g.scene, g.animations);
+        };
+        if (this.buildScheduler) this.buildScheduler(build);
+        else build();
       },
       (err: unknown) => {
         // stays in `loading` forever on failure: never retried at frame rate

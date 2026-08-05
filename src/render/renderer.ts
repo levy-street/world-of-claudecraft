@@ -1641,6 +1641,10 @@ export class Renderer {
   // One shared lane for background work that touches WebGL. Idle callbacks from
   // independent zone/sky/archetype tasks can otherwise all start in one frame.
   private backgroundGpuWork = createBackgroundGpuQueue();
+  // Serial tail for spirit-puppet construction: several models resolve at once
+  // when a class is first sighted, so the builds queue behind one another and
+  // each spends its own idle slot instead of stacking into one combat frame.
+  private spiritBuildLane: Promise<unknown> = Promise.resolve();
   // Static terrain/water/features just beyond the current zone are built in a
   // single background lane when their rectangles enter the relaxed fog
   // horizon, so a walked boundary crossing lands on already-resident ground.
@@ -2714,6 +2718,7 @@ export class Renderer {
       this.webgl.domElement.clientHeight * this.webgl.getPixelRatio(),
       60,
     );
+    this.abilityVfxFx.setSpiritBuildScheduler((build) => this.queueSpiritPuppetBuild(build));
     this.abilityVfx = new AbilityVfx({
       vfx: this.vfx,
       fx: this.abilityVfxFx,
@@ -4917,6 +4922,19 @@ export class Renderer {
     if (!texture) return;
     this.webgl.initTexture(texture);
     this.gpuReadyTextures.add(texture);
+  }
+
+  /** One spirit-puppet build per idle slot, arbitrated with every other lane
+   *  that reaches WebGL. A rejected unit (renderer shut down mid-build) is a
+   *  dev-channel warning: an unbuilt puppet only means its next cast skips its
+   *  spirit, exactly like a model still in flight. */
+  private queueSpiritPuppetBuild(build: () => void): void {
+    this.spiritBuildLane = this.spiritBuildLane
+      .then(() => idleSlot(IDLE_PREWARM_TIMEOUT_MS))
+      .then(() => this.backgroundGpuWork.run(build, GPU_WORK_PRIORITY.BACKGROUND))
+      .catch((err: unknown) => {
+        console.warn('[spirits] deferred puppet build failed', err);
+      });
   }
 
   private readonly gpuReadyTextures = new WeakSet<THREE.Texture>();

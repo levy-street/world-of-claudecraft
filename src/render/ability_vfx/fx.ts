@@ -16,7 +16,12 @@ import { ShockRings } from './rings';
 import { ArchetypeSequencer, type SequencerHost } from './sequencer';
 import { BuffShells } from './shells';
 import { isCrescendoArchetype, SPECTACLE } from './spectacle';
-import { asSpiritPath, SpiritApparitions, type SpiritAtKind } from './spirits';
+import {
+  asSpiritPath,
+  SpiritApparitions,
+  type SpiritAtKind,
+  type SpiritBuildScheduler,
+} from './spirits';
 
 export type { DecalStyle } from './decals';
 
@@ -405,6 +410,12 @@ export class AbilityVfxFx implements SequencerHost {
   // model is warm before its first cast - an unwarmed cast skips its spirit.
   warmSpiritsForClass(cls: string): void {
     this.spirits.warmForClass(cls);
+  }
+
+  // Hand the spirit puppets a host scheduler so their construction rides idle
+  // slots instead of the GLB resolve's own (live, in-combat) frame.
+  setSpiritBuildScheduler(schedule: SpiritBuildScheduler | null): void {
+    this.spirits.setBuildScheduler(schedule);
   }
 
   // Wired once by the painter: particle bursts ride the pooled Vfx cloud,
