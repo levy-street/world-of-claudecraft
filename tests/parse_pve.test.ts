@@ -391,3 +391,215 @@ describe('BossCastSynthesizer via ParseRecorder', () => {
     expect(casts[0]).toMatchObject({ bossId: 500, ability: 'grave_bolt', castTotal: 2.5 });
   });
 });
+
+describe('DungeonSegmenter remaining arms', () => {
+  test('slot vacancy closes an open trash segment as abandon', () => {
+    const sim = fakeSim();
+    const slot = seedDungeon(sim);
+    const { recorder, records } = makeRecorder(sim);
+
+    sim.tickCount = 10;
+    recorder.observe([]);
+    sim.tickCount = 11;
+    recorder.observe([dmg(5, 501, 60)]);
+    (slot as { partyKey: string | null }).partyKey = null;
+    sim.tickCount = 20;
+    recorder.observe([]);
+
+    expect(records.find((r) => r.t === 'fight_close')).toMatchObject({ outcome: 'abandon' });
+  });
+
+  test('a closed boss fight is deindexed: the next pull opens a fresh fight', () => {
+    const sim = fakeSim();
+    seedDungeon(sim);
+    const { recorder, records } = makeRecorder(sim);
+
+    sim.tickCount = 10;
+    recorder.observe([]);
+    sim.tickCount = 11;
+    recorder.observe([dmg(5, 500, 120)]);
+    const boss = sim.entities.get(500);
+    if (boss !== undefined) boss.dead = true;
+    sim.tickCount = 30;
+    recorder.observe([]);
+    const firstFightId = (records.find((r) => r.t === 'fight_open') as { fightId: string }).fightId;
+
+    if (boss !== undefined) boss.dead = false;
+    sim.tickCount = 40;
+    recorder.observe([dmg(5, 500, 50)]);
+
+    const evsToClosed = records.filter(
+      (r) => r.t === 'ev' && r.fightId === firstFightId && r.tick === 40,
+    );
+    expect(evsToClosed).toHaveLength(0);
+    const opens = records.filter((r) => r.t === 'fight_open');
+    expect(opens).toHaveLength(2);
+  });
+
+  test('a disabled dungeon surface records nothing for instance combat', () => {
+    const sim = fakeSim();
+    seedDungeon(sim);
+    const records: Record<string, unknown>[] = [];
+    const recorder = new ParseRecorder({
+      flags: { ...FLAGS, surfaces: new Set(['arena', 'battleground', 'raid', 'rift']) },
+      sim,
+      sink: { enqueue: (r) => records.push(r) },
+      counters: createParseCounters(),
+      resolveParticipant: (pid): FightParticipant | null =>
+        pid >= 100
+          ? null
+          : {
+              entityId: pid,
+              characterId: pid + 1000,
+              name: `Char${pid}`,
+              class: 'mage',
+              spec: null,
+              level: 20,
+              team: null,
+              snapshot: null,
+            },
+      isBossTemplate: (t) => t === 'morthen',
+      idFactory: () => 'x',
+      clock: () => 0,
+    });
+
+    sim.tickCount = 10;
+    recorder.observe([]);
+    sim.tickCount = 11;
+    recorder.observe([dmg(5, 500, 120)]);
+
+    expect(records).toHaveLength(0);
+  });
+});
+
+describe('RiftSegmenter remaining arms', () => {
+  function seedRift2(sim: FakeSim, overrides: Partial<RiftInstanceView> = {}): RiftInstanceView {
+    sim.entities.set(5, player(5));
+    sim.entities.set(6, player(6));
+    const inst: RiftInstanceView = {
+      instanceId: 42,
+      tier: 'A',
+      baseLevel: 52,
+      floorIndex: 0,
+      floorCount: 3,
+      bossId: 600,
+      outcome: 'active',
+      memberIds: new Set([5]),
+      portalId: 9,
+      ...overrides,
+    };
+    sim.riftInstances = [inst];
+    sim.naturalRiftPortals = [{ id: 9, zoneName: 'Galecrest' }];
+    return inst;
+  }
+
+  test('a vanished rift instance closes as abandon', () => {
+    const sim = fakeSim();
+    seedRift2(sim);
+    const { recorder, records } = makeRecorder(sim);
+
+    sim.tickCount = 10;
+    recorder.observe([]);
+    sim.riftInstances = [];
+    sim.tickCount = 20;
+    recorder.observe([]);
+
+    expect(records.find((r) => r.t === 'fight_close')).toMatchObject({ outcome: 'abandon' });
+  });
+
+  test('membership growth late-joins the new member', () => {
+    const sim = fakeSim();
+    const inst = seedRift2(sim);
+    const { recorder, records } = makeRecorder(sim);
+
+    sim.tickCount = 10;
+    recorder.observe([]);
+    (inst.memberIds as Set<number>).add(6);
+    sim.tickCount = 20;
+    recorder.observe([]);
+
+    const join = records.find((r) => r.t === 'join');
+    expect(join).toBeDefined();
+    expect((join as { participant: FightParticipant }).participant.entityId).toBe(6);
+  });
+
+  test('a portal-less dev rift frames with empty zone and dev rank', () => {
+    const sim = fakeSim();
+    seedRift2(sim, { portalId: null, tier: null });
+    const { recorder, records } = makeRecorder(sim);
+
+    sim.tickCount = 10;
+    recorder.observe([]);
+
+    expect(records.find((r) => r.t === 'fight_open')).toMatchObject({
+      rift: { rank: 'dev', portalZone: '' },
+    });
+  });
+
+  test('a disabled rift surface opens nothing for an active instance', () => {
+    const sim = fakeSim();
+    seedRift2(sim);
+    const records: Record<string, unknown>[] = [];
+    const recorder = new ParseRecorder({
+      flags: { ...FLAGS, surfaces: new Set(['arena', 'battleground', 'raid', 'dungeon']) },
+      sim,
+      sink: { enqueue: (r) => records.push(r) },
+      counters: createParseCounters(),
+      resolveParticipant: (pid): FightParticipant | null =>
+        pid >= 100
+          ? null
+          : {
+              entityId: pid,
+              characterId: pid + 1000,
+              name: `Char${pid}`,
+              class: 'mage',
+              spec: null,
+              level: 20,
+              team: null,
+              snapshot: null,
+            },
+      idFactory: () => 'x',
+      clock: () => 0,
+    });
+
+    sim.tickCount = 10;
+    recorder.observe([]);
+
+    expect(records).toHaveLength(0);
+  });
+});
+
+describe('BossCastSynthesizer ability change', () => {
+  test('switching casts mid-cast emits the interrupted end and the new start in one tick', () => {
+    const sim = fakeSim();
+    seedDungeon(sim);
+    const boss = sim.entities.get(500);
+    const { recorder, records } = makeRecorder(sim);
+
+    sim.tickCount = 10;
+    recorder.observe([]);
+    sim.tickCount = 11;
+    recorder.observe([dmg(5, 500, 100)]);
+    if (boss !== undefined) {
+      boss.castingAbility = 'grave_bolt';
+      boss.castTotal = 2.5;
+      boss.castRemaining = 2.5;
+    }
+    sim.tickCount = 12;
+    recorder.observe([]);
+    if (boss !== undefined) {
+      boss.castingAbility = 'bone_shield';
+      boss.castTotal = 1.5;
+      boss.castRemaining = 1.5;
+    }
+    sim.tickCount = 13;
+    recorder.observe([]);
+
+    const casts = records.filter((r) => r.t === 'bosscast');
+    expect(casts.map((c) => [c.ability, c.action])).toEqual([
+      ['grave_bolt', 'start'],
+      ['grave_bolt', 'interrupted'],
+      ['bone_shield', 'start'],
+    ]);
+  });
+});

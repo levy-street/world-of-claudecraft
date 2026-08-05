@@ -6,7 +6,7 @@
 // woc-parse-service (contract/fixtures/, copied verbatim; both suites assert
 // their own copy). Regenerate deliberately: UPDATE_PARSE_GOLDEN=1 npx vitest
 // run tests/parse_golden.test.ts, then re-copy the fixture to the service.
-import { existsSync, readFileSync, writeFileSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { describe, expect, test } from 'vitest';
 import type { FightParticipant } from '../server/parse/contract';
@@ -218,7 +218,9 @@ function runScenario(): string {
 describe('parse capture golden', () => {
   test('the scripted scenario serializes byte-identically to the fixture', () => {
     const produced = runScenario();
-    if (process.env.UPDATE_PARSE_GOLDEN === '1' || !existsSync(FIXTURE)) {
+    // Deliberate re-mints only: a MISSING fixture fails loudly instead of
+    // self-healing, so the pin cannot silently evaporate.
+    if (process.env.UPDATE_PARSE_GOLDEN === '1') {
       writeFileSync(FIXTURE, produced);
     }
     const golden = readFileSync(FIXTURE, 'utf8');

@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'vitest';
 import type { FightParticipant } from '../server/parse/contract';
 import { createParseCounters } from '../server/parse/counters';
+import { MAX_RAW_EVENTS_PER_FIGHT } from '../server/parse/fights';
 import { ParseRecorder } from '../server/parse/recorder';
 import type { ArenaMatchView, BgMatchView, RecorderEntityView } from '../server/parse/types';
 import type { SimEvent } from '../src/sim/types';
@@ -378,5 +379,212 @@ describe('ParseRecorder budget breaker', () => {
     expect(records.find((r) => r.t === 'fight_close')).toMatchObject({ outcome: 'reset' });
     // Nothing recorded after the breaker tripped.
     expect(records.filter((r) => r.t === 'ev')).toHaveLength(0);
+  });
+});
+
+describe('ParseRecorder outcome arms', () => {
+  test('teamA fully defeated closes win_b, neither team fully defeated closes draw', () => {
+    for (const [defeated, expected] of [
+      [[5, 6], 'win_b'],
+      [[5], 'draw'],
+    ] as const) {
+      const sim = fakeSim();
+      const match = arenaMatch();
+      seedArena(sim, match);
+      const { recorder, records } = makeRecorder(sim);
+
+      sim.tickCount = 10;
+      recorder.observe([]);
+      for (const pid of defeated) match.defeated.add(pid);
+      (match as { state: string }).state = 'over';
+      sim.tickCount = 60;
+      recorder.observe([]);
+
+      expect(records.find((r) => r.t === 'fight_close')).toMatchObject({ outcome: expected });
+    }
+  });
+
+  test('practice and yumi matches are flagged like fiesta ones', () => {
+    for (const overrides of [{ practice: true }, { yumi: { mode: 'duo' } }]) {
+      const sim = fakeSim();
+      seedArena(sim, arenaMatch(overrides));
+      const { recorder, records } = makeRecorder(sim);
+
+      sim.tickCount = 10;
+      recorder.observe([]);
+
+      const open = records.find((r) => r.t === 'fight_open') as { arena: { practice: boolean } };
+      expect(open.arena.practice).toBe(true);
+    }
+  });
+});
+
+describe('ParseRecorder surface gating', () => {
+  test('a disabled arena surface opens no fight for an active match', () => {
+    const sim = fakeSim();
+    seedArena(sim, arenaMatch());
+    const records: Record<string, unknown>[] = [];
+    const recorder = new ParseRecorder({
+      flags: { ...FLAGS, surfaces: new Set(['battleground', 'raid', 'dungeon', 'rift']) },
+      sim,
+      sink: { enqueue: (r) => records.push(r) },
+      counters: createParseCounters(),
+      resolveParticipant: participantResolver(sim),
+      idFactory: () => 'x',
+      clock: () => 0,
+    });
+
+    sim.tickCount = 10;
+    recorder.observe([]);
+    sim.tickCount = 11;
+    recorder.observe([dmg(5, 7, 100)]);
+
+    expect(records).toHaveLength(0);
+  });
+
+  test('a disabled battleground surface opens no fight for an active match', () => {
+    const sim = fakeSim();
+    const match = {
+      id: 3,
+      teams: [
+        [11, 12],
+        [13, 14],
+      ] as [number[], number[]],
+      state: 'active',
+      winner: null,
+      scores: [0, 0] as [number, number],
+      rated: true,
+      devEnded: false,
+      grouped: false,
+      ratingAvg: [1500, 1500] as [number, number],
+    };
+    for (const pid of [11, 12, 13, 14]) {
+      sim.entities.set(pid, player(pid));
+      sim.bgMatches.set(pid, match);
+    }
+    const records: Record<string, unknown>[] = [];
+    const recorder = new ParseRecorder({
+      flags: { ...FLAGS, surfaces: new Set(['arena', 'raid', 'dungeon', 'rift']) },
+      sim,
+      sink: { enqueue: (r) => records.push(r) },
+      counters: createParseCounters(),
+      resolveParticipant: participantResolver(sim),
+      idFactory: () => 'x',
+      clock: () => 0,
+    });
+
+    sim.tickCount = 10;
+    recorder.observe([]);
+
+    expect(records).toHaveLength(0);
+  });
+});
+
+describe('ParseRecorder lifecycle bookkeeping', () => {
+  test('a closed fight is deindexed: later events between its members record nothing', () => {
+    const sim = fakeSim();
+    const match = arenaMatch();
+    seedArena(sim, match);
+    const { recorder, records } = makeRecorder(sim);
+
+    sim.tickCount = 10;
+    recorder.observe([]);
+    match.defeated.add(7);
+    match.defeated.add(8);
+    (match as { state: string }).state = 'over';
+    sim.tickCount = 50;
+    recorder.observe([]);
+    sim.arenaMatches.clear();
+    const closedCount = records.length;
+
+    sim.tickCount = 60;
+    recorder.observe([dmg(5, 7, 999)]);
+
+    expect(records).toHaveLength(closedCount);
+  });
+
+  test('stop() closes open fights as reset and empties the open gauge', () => {
+    const sim = fakeSim();
+    seedArena(sim, arenaMatch());
+    const { recorder, records, counters } = makeRecorder(sim);
+
+    sim.tickCount = 10;
+    recorder.observe([]);
+    recorder.stop();
+
+    expect(records.find((r) => r.t === 'fight_close')).toMatchObject({ outcome: 'reset' });
+    expect(counters.fightsOpen).toBe(0);
+  });
+
+  test('arena fights never accept late joins from uninvolved players', () => {
+    const sim = fakeSim();
+    seedArena(sim, arenaMatch());
+    sim.entities.set(9, player(9));
+    const { recorder, records } = makeRecorder(sim);
+
+    sim.tickCount = 10;
+    recorder.observe([]);
+    sim.tickCount = 11;
+    recorder.observe([dmg(9, 7, 100)]);
+
+    expect(records.filter((r) => r.t === 'join')).toHaveLength(0);
+  });
+
+  test('a non-consecutive slow tick never trips the breaker', () => {
+    const sim = fakeSim();
+    seedArena(sim, arenaMatch());
+    // Durations per observe: over, over, under, over, over.
+    const durations = [10, 10, 1, 10, 10];
+    let call = 0;
+    const clock = () => {
+      const observeIndex = Math.floor(call / 2);
+      const isEnd = call % 2 === 1;
+      call++;
+      return isEnd ? (durations[observeIndex] ?? 0) : 0;
+    };
+    const { recorder } = makeRecorder(sim, clock);
+
+    for (let tick = 10; tick < 15; tick++) {
+      sim.tickCount = tick;
+      recorder.observe([]);
+    }
+
+    expect(recorder.isDisabled).toBe(false);
+  });
+});
+
+describe('ParseRecorder truncation cap', () => {
+  test('past the raw-line cap, lines stop but rollup totals stay complete', () => {
+    const sim = fakeSim();
+    const match = arenaMatch();
+    seedArena(sim, match);
+    const { recorder, records, counters } = makeRecorder(sim);
+
+    sim.tickCount = 10;
+    recorder.observe([]);
+    const overCap = MAX_RAW_EVENTS_PER_FIGHT + 5;
+    const batch: SimEvent[] = [];
+    for (let i = 0; i < 500; i++) batch.push(dmg(5, 7, 1));
+    let sent = 0;
+    let tick = 11;
+    while (sent < overCap) {
+      sim.tickCount = tick++;
+      const remaining = overCap - sent;
+      recorder.observe(remaining >= 500 ? batch : batch.slice(0, remaining));
+      sent += Math.min(500, remaining);
+    }
+    match.defeated.add(7);
+    match.defeated.add(8);
+    (match as { state: string }).state = 'over';
+    sim.tickCount = tick;
+    recorder.observe([]);
+
+    expect(records.filter((r) => r.t === 'ev')).toHaveLength(MAX_RAW_EVENTS_PER_FIGHT);
+    expect(counters.fightsTruncated).toBe(1);
+    const close = records.find((r) => r.t === 'fight_close') as Record<string, unknown>;
+    expect(close.truncated).toBe(true);
+    const rollup = (close.rollup as { perParticipant: Record<string, { damage: number }> })
+      .perParticipant;
+    expect(rollup['1005']?.damage).toBe(overCap);
   });
 });
