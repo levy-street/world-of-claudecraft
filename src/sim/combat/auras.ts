@@ -289,9 +289,11 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
           if (a.leechPct !== undefined) {
             const src = ctx.entities.get(a.sourceId);
             if (src && !src.dead) {
-              const healed = Math.min(Math.round(tickDamage * a.leechPct), src.maxHp - src.hp);
+              const intended = Math.round(tickDamage * a.leechPct);
+              const healed = Math.min(intended, src.maxHp - src.hp);
               if (healed > 0) {
                 src.hp += healed;
+                const overheal = intended - healed;
                 ctx.emit({
                   type: 'heal2',
                   sourceId: src.id,
@@ -299,6 +301,7 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
                   amount: healed,
                   crit: false,
                   ability: a.name,
+                  ...(overheal > 0 ? { overheal } : {}),
                 });
                 ctx.healingThreat(src, src, healed);
               }
@@ -306,9 +309,11 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
           }
           if (e.dead) return;
         } else if (a.kind === 'hot') {
-          const healed = Math.min(Math.round(a.value * ctx.healingTakenMult(e)), e.maxHp - e.hp);
+          const intended = Math.round(a.value * ctx.healingTakenMult(e));
+          const healed = Math.min(intended, e.maxHp - e.hp);
           if (healed > 0) {
             e.hp += healed;
+            const overheal = intended - healed;
             ctx.emit({
               type: 'heal2',
               sourceId: a.sourceId,
@@ -318,6 +323,7 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
               ability: a.name,
               hot: true,
               abilityId: a.id,
+              ...(overheal > 0 ? { overheal } : {}),
             });
             const src = ctx.entities.get(a.sourceId);
             if (src) ctx.healingThreat(src, e, healed);

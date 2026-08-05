@@ -46,6 +46,7 @@ export function tickTemporalHourglassHealing(
   if (healed <= 0) return;
 
   target.hp += healed;
+  const overheal = planned - healed;
   ctx.emit({
     type: 'heal2',
     sourceId: aura.sourceId,
@@ -53,6 +54,7 @@ export function tickTemporalHourglassHealing(
     amount: healed,
     crit: false,
     ability: aura.name,
+    ...(overheal > 0 ? { overheal } : {}),
   });
   const source = ctx.entities.get(aura.sourceId);
   if (source) ctx.healingThreat(source, target, healed);
