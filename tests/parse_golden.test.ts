@@ -9,11 +9,11 @@
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { describe, expect, test } from 'vitest';
+import type { FightParticipant } from '../server/parse/contract';
 import { createParseCounters } from '../server/parse/counters';
 import { ParseRecorder } from '../server/parse/recorder';
-import type { FightParticipant } from '../server/parse/contract';
 import type { SimEvent } from '../src/sim/types';
-import { FAKE_PARSE_FLAGS, fakePlayer, fakeSim, type FakeSim } from './helpers/parse_fake_sim';
+import { FAKE_PARSE_FLAGS, type FakeSim, fakePlayer, fakeSim } from './helpers/parse_fake_sim';
 
 const FIXTURE = path.join(__dirname, 'fixtures', 'parse_golden.ndjson');
 
@@ -79,25 +79,87 @@ function runScenario(): string {
 
   observe(100);
   observe(101, [
-    { type: 'damage', sourceId: 5, targetId: 7, amount: 210, crit: false, school: 'frost', ability: 'Frostbolt', abilityId: 'frostbolt', kind: 'hit' },
-    { type: 'damage', sourceId: 105, targetId: 7, amount: 40, crit: false, school: 'physical', ability: 'Bite', kind: 'hit' },
-    { type: 'aura', targetId: 7, name: 'Rend', gained: true, sourceId: 6, abilityId: 'rend', stacks: 2 },
+    {
+      type: 'damage',
+      sourceId: 5,
+      targetId: 7,
+      amount: 210,
+      crit: false,
+      school: 'frost',
+      ability: 'Frostbolt',
+      abilityId: 'frostbolt',
+      kind: 'hit',
+    },
+    {
+      type: 'damage',
+      sourceId: 105,
+      targetId: 7,
+      amount: 40,
+      crit: false,
+      school: 'physical',
+      ability: 'Bite',
+      kind: 'hit',
+    },
+    {
+      type: 'aura',
+      targetId: 7,
+      name: 'Rend',
+      gained: true,
+      sourceId: 6,
+      abilityId: 'rend',
+      stacks: 2,
+    },
   ]);
   observe(102, [
-    { type: 'heal2', sourceId: 8, targetId: 7, amount: 120, crit: false, ability: 'Renew', hot: true, abilityId: 'renew', overheal: 55 },
-    { type: 'damage', sourceId: 6, targetId: 8, amount: 480, crit: true, school: 'physical', ability: 'Gravebreaker', kind: 'hit', absorbed: 60 },
+    {
+      type: 'heal2',
+      sourceId: 8,
+      targetId: 7,
+      amount: 120,
+      crit: false,
+      ability: 'Renew',
+      hot: true,
+      abilityId: 'renew',
+      overheal: 55,
+    },
+    {
+      type: 'damage',
+      sourceId: 6,
+      targetId: 8,
+      amount: 480,
+      crit: true,
+      school: 'physical',
+      ability: 'Gravebreaker',
+      kind: 'hit',
+      absorbed: 60,
+    },
   ]);
   match.defeated.add(7).add(8);
   (match as { state: string }).state = 'over';
   observe(140, [
-    { type: 'damage', sourceId: 5, targetId: 7, amount: 900, crit: false, school: 'frost', ability: 'Ice Lance', kind: 'hit' },
+    {
+      type: 'damage',
+      sourceId: 5,
+      targetId: 7,
+      amount: 900,
+      crit: false,
+      school: 'frost',
+      ability: 'Ice Lance',
+      kind: 'hit',
+    },
     { type: 'death', entityId: 7, killerId: 5 },
     { type: 'death', entityId: 8, killerId: 6 },
   ]);
 
   // Dungeon boss pull with a synthesized interrupted cast, then the kill.
   sim.instances = [
-    { dungeonId: 'hollow_crypt', difficulty: 'heroic', slot: 0, partyKey: 'party:9', mobIds: [500] },
+    {
+      dungeonId: 'hollow_crypt',
+      difficulty: 'heroic',
+      slot: 0,
+      partyKey: 'party:9',
+      mobIds: [500],
+    },
   ];
   sim.entities.set(500, {
     id: 500,
@@ -111,7 +173,17 @@ function runScenario(): string {
   });
   observe(200);
   observe(201, [
-    { type: 'damage', sourceId: 5, targetId: 500, amount: 300, crit: false, school: 'frost', ability: 'Frostbolt', abilityId: 'frostbolt', kind: 'hit' },
+    {
+      type: 'damage',
+      sourceId: 5,
+      targetId: 500,
+      amount: 300,
+      crit: false,
+      school: 'frost',
+      ability: 'Frostbolt',
+      abilityId: 'frostbolt',
+      kind: 'hit',
+    },
   ]);
   const boss = sim.entities.get(500);
   if (boss !== undefined) {
@@ -127,7 +199,16 @@ function runScenario(): string {
   observe(203);
   if (boss !== undefined) boss.dead = true;
   observe(240, [
-    { type: 'damage', sourceId: 5, targetId: 500, amount: 4700, crit: true, school: 'frost', ability: 'Ice Lance', kind: 'hit' },
+    {
+      type: 'damage',
+      sourceId: 5,
+      targetId: 500,
+      amount: 4700,
+      crit: true,
+      school: 'frost',
+      ability: 'Ice Lance',
+      kind: 'hit',
+    },
     { type: 'death', entityId: 500, killerId: 5 },
   ]);
 

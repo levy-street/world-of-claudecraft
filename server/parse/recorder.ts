@@ -13,8 +13,8 @@ import { ArenaSegmenter } from './arena';
 import { BattlegroundSegmenter } from './battleground';
 import { BossCastSynthesizer } from './boss_casts';
 import type { EventEnrichment, FightParticipant, Surface } from './contract';
-import type { ParseFlags } from './flags';
 import type { OpenFight, PendingClose } from './fights';
+import type { ParseFlags } from './flags';
 import { DungeonSegmenter } from './instances';
 import { RiftSegmenter } from './rifts';
 import type { RecorderSim, RecordSink, SegmenterHost } from './types';
@@ -60,8 +60,7 @@ export class ParseRecorder {
   constructor(private readonly opts: ParseRecorderOptions) {
     this.clock = opts.clock ?? (() => performance.now());
     const idFactory =
-      opts.idFactory ??
-      ((): string => `f-${Date.now().toString(36)}-${(this.seq++).toString(36)}`);
+      opts.idFactory ?? ((): string => `f-${Date.now().toString(36)}-${(this.seq++).toString(36)}`);
     this.host = {
       sim: opts.sim,
       sink: opts.sink,
@@ -242,7 +241,8 @@ export class ParseRecorder {
       if (opened === null) return;
       this.indexFight(opened);
       const sourceOwner = this.ownerResolved(ev.sourceId);
-      sourceOwnerId = sourceOwner !== ev.sourceId && opened.hasEntity(sourceOwner) ? sourceOwner : null;
+      sourceOwnerId =
+        sourceOwner !== ev.sourceId && opened.hasEntity(sourceOwner) ? sourceOwner : null;
       match = { fight: opened, ownerId: sourceOwnerId };
     }
     let fight = match.fight;

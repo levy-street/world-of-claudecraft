@@ -1,14 +1,10 @@
 import { describe, expect, test } from 'vitest';
+import type { FightParticipant } from '../server/parse/contract';
 import { createParseCounters } from '../server/parse/counters';
 import { ParseRecorder } from '../server/parse/recorder';
-import type {
-  InstanceSlotView,
-  RecorderEntityView,
-  RiftInstanceView,
-} from '../server/parse/types';
-import type { FightParticipant } from '../server/parse/contract';
+import type { InstanceSlotView, RecorderEntityView, RiftInstanceView } from '../server/parse/types';
 import type { SimEvent } from '../src/sim/types';
-import { FAKE_PARSE_FLAGS, fakeSim, type FakeSim } from './helpers/parse_fake_sim';
+import { FAKE_PARSE_FLAGS, type FakeSim, fakeSim } from './helpers/parse_fake_sim';
 
 function player(id: number): RecorderEntityView {
   return { id, templateId: 'mage', level: 20, dead: false };
@@ -134,10 +130,7 @@ describe('DungeonSegmenter via ParseRecorder', () => {
     const boss = sim.entities.get(500);
     if (boss !== undefined) boss.dead = true;
     sim.tickCount = 30;
-    recorder.observe([
-      dmg(5, 500, 5000),
-      { type: 'death', entityId: 500, killerId: 5 },
-    ]);
+    recorder.observe([dmg(5, 500, 5000), { type: 'death', entityId: 500, killerId: 5 }]);
 
     const close = records.find((r) => r.t === 'fight_close');
     expect(close).toMatchObject({ outcome: 'kill', endedTick: 30 });

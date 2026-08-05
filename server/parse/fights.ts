@@ -169,7 +169,13 @@ export class OpenFight {
   // Rollup accumulation. The recorder calls these for every routed event even
   // past the raw-line cap, so fight_close totals stay complete.
 
-  noteDamage(tick: number, sourceEntityId: number, targetEntityId: number, amount: number, absorbed: number): void {
+  noteDamage(
+    tick: number,
+    sourceEntityId: number,
+    targetEntityId: number,
+    amount: number,
+    absorbed: number,
+  ): void {
     const source = this.accumByEntity(sourceEntityId);
     if (source !== undefined) {
       source.damage += amount;

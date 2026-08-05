@@ -140,7 +140,8 @@ export class DungeonSegmenter {
     const fight = state.activeFight;
     if (fight === null) return;
     if (fight.segment === 'boss') {
-      const boss = fight.primaryBossId === null ? undefined : host.sim.entities.get(fight.primaryBossId);
+      const boss =
+        fight.primaryBossId === null ? undefined : host.sim.entities.get(fight.primaryBossId);
       if (boss === undefined || boss.dead === true) {
         closing.push({ fight, outcome: 'kill' });
         state.activeFight = null;

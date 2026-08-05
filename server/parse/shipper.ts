@@ -4,9 +4,10 @@
 // non-throwing degradation). Failures fall to the disk spool; each successful
 // cycle also replays one spooled batch, so backlogs drain gradually without
 // ever bursting. The ChatLogger flush discipline throughout.
-import { gzip } from 'node:zlib';
-import { promisify } from 'node:util';
+
 import { randomBytes } from 'node:crypto';
+import { promisify } from 'node:util';
+import { gzip } from 'node:zlib';
 import type { BatchHeader, ParseEnv } from './contract';
 import { CONTRACT_VERSION } from './contract';
 import type { ParseCounters } from './counters';

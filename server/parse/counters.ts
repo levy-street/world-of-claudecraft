@@ -59,21 +59,77 @@ export function registerParseMetrics(registry: Registry, counters: ParseCounters
       },
     });
   };
-  gauge('woc_parse_records_buffered', 'Parse records awaiting ship', () => counters.recordsBuffered);
-  gauge('woc_parse_records_emitted_total', 'Parse records emitted since boot', () => counters.recordsEmitted);
-  gauge('woc_parse_records_dropped_total', 'Parse records dropped to buffer overflow', () => counters.recordsDroppedOverflow);
-  gauge('woc_parse_batches_shipped_total', 'Parse batches shipped ok', () => counters.batchesShipped);
-  gauge('woc_parse_batches_failed_total', 'Parse batch ship failures', () => counters.batchesShipFailed);
-  gauge('woc_parse_batches_spooled_total', 'Parse batches written to the disk spool', () => counters.batchesSpooled);
-  gauge('woc_parse_batches_spool_dropped_total', 'Spooled batches evicted unsent', () => counters.batchesSpoolDropped);
-  gauge('woc_parse_batches_replayed_total', 'Spooled batches replayed to the service', () => counters.batchesReplayed);
+  gauge(
+    'woc_parse_records_buffered',
+    'Parse records awaiting ship',
+    () => counters.recordsBuffered,
+  );
+  gauge(
+    'woc_parse_records_emitted_total',
+    'Parse records emitted since boot',
+    () => counters.recordsEmitted,
+  );
+  gauge(
+    'woc_parse_records_dropped_total',
+    'Parse records dropped to buffer overflow',
+    () => counters.recordsDroppedOverflow,
+  );
+  gauge(
+    'woc_parse_batches_shipped_total',
+    'Parse batches shipped ok',
+    () => counters.batchesShipped,
+  );
+  gauge(
+    'woc_parse_batches_failed_total',
+    'Parse batch ship failures',
+    () => counters.batchesShipFailed,
+  );
+  gauge(
+    'woc_parse_batches_spooled_total',
+    'Parse batches written to the disk spool',
+    () => counters.batchesSpooled,
+  );
+  gauge(
+    'woc_parse_batches_spool_dropped_total',
+    'Spooled batches evicted unsent',
+    () => counters.batchesSpoolDropped,
+  );
+  gauge(
+    'woc_parse_batches_replayed_total',
+    'Spooled batches replayed to the service',
+    () => counters.batchesReplayed,
+  );
   gauge('woc_parse_spool_bytes', 'Bytes currently in the disk spool', () => counters.spoolBytes);
-  gauge('woc_parse_fights_open', 'Fights currently open in the recorder', () => counters.fightsOpen);
+  gauge(
+    'woc_parse_fights_open',
+    'Fights currently open in the recorder',
+    () => counters.fightsOpen,
+  );
   gauge('woc_parse_fights_closed_total', 'Fights closed since boot', () => counters.fightsClosed);
-  gauge('woc_parse_fights_truncated_total', 'Fights that hit the raw event cap', () => counters.fightsTruncated);
-  gauge('woc_parse_observe_ms_max', 'Worst single-tick recorder cost in ms', () => counters.observeMsMax);
-  gauge('woc_parse_capture_disabled', 'Budget breaker tripped (1 = capture off)', () => counters.captureDisabled);
+  gauge(
+    'woc_parse_fights_truncated_total',
+    'Fights that hit the raw event cap',
+    () => counters.fightsTruncated,
+  );
+  gauge(
+    'woc_parse_observe_ms_max',
+    'Worst single-tick recorder cost in ms',
+    () => counters.observeMsMax,
+  );
+  gauge(
+    'woc_parse_capture_disabled',
+    'Budget breaker tripped (1 = capture off)',
+    () => counters.captureDisabled,
+  );
   gauge('woc_parse_census_runs_total', 'Census exports since boot', () => counters.censusRuns);
-  gauge('woc_parse_census_rows_total', 'Census character rows exported since boot', () => counters.censusRows);
-  gauge('woc_parse_census_failures_total', 'Census export failures since boot', () => counters.censusFailures);
+  gauge(
+    'woc_parse_census_rows_total',
+    'Census character rows exported since boot',
+    () => counters.censusRows,
+  );
+  gauge(
+    'woc_parse_census_failures_total',
+    'Census export failures since boot',
+    () => counters.censusFailures,
+  );
 }

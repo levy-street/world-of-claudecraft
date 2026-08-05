@@ -71,9 +71,7 @@ export class BatchSpool {
 
   private async sortedNames(): Promise<string[]> {
     const entries = await fs.readdir(this.dir);
-    return entries
-      .filter((n) => n.startsWith(SPOOL_PREFIX) && n.endsWith(SPOOL_SUFFIX))
-      .sort();
+    return entries.filter((n) => n.startsWith(SPOOL_PREFIX) && n.endsWith(SPOOL_SUFFIX)).sort();
   }
 
   private async recomputeBytes(): Promise<void> {

@@ -46,7 +46,14 @@ describe('BatchShipper', () => {
     const counters = createParseCounters();
     const spool = new BatchSpool(tempSpoolDir(), 1024 * 1024, counters);
     const { calls, fetch } = fakeFetch([200]);
-    const shipper = new BatchShipper(IDENTITY, 'http://svc/ingest/v1/batch', 's3cret', spool, counters, fetch);
+    const shipper = new BatchShipper(
+      IDENTITY,
+      'http://svc/ingest/v1/batch',
+      's3cret',
+      spool,
+      counters,
+      fetch,
+    );
 
     shipper.enqueue({ t: 'ev', fightId: 'f1', tick: 5, ev: { type: 'damage' } });
     shipper.enqueue({ t: 'fight_close', fightId: 'f1', tick: 6 });
@@ -55,7 +62,13 @@ describe('BatchShipper', () => {
     expect(calls).toHaveLength(1);
     expect(calls[0]?.headers[PARSE_SECRET_HEADER]).toBe('s3cret');
     const lines = batchLines(calls[0]?.body as Uint8Array);
-    expect(lines[0]).toMatchObject({ t: 'batch', v: 1, realm: 'Claudemoon', env: 'qa', build: '0.35.0' });
+    expect(lines[0]).toMatchObject({
+      t: 'batch',
+      v: 1,
+      realm: 'Claudemoon',
+      env: 'qa',
+      build: '0.35.0',
+    });
     expect(lines[1]).toMatchObject({ t: 'ev', fightId: 'f1' });
     expect(lines[2]).toMatchObject({ t: 'fight_close' });
     expect(counters.batchesShipped).toBe(1);

@@ -199,7 +199,6 @@ import { pruneDiscordOAuthStates, pruneDiscordPendingLogins } from './discord_db
 import { emailAccountCreated } from './email';
 import { stopEpicMirror } from './epic/mirror';
 import { GameServer } from './game';
-import { registerParseMetrics } from './parse';
 import {
   handleGitHubCallback,
   handleGitHubStart,
@@ -274,6 +273,7 @@ import {
 import { createNativeAttestationChallenge } from './native_attestation';
 import { handleOAuth, seedOAuthClients } from './oauth';
 import { pruneExpiredOAuthGrants } from './oauth_db';
+import { registerParseMetrics } from './parse';
 import { handlePerfReport } from './perf_report';
 import {
   pruneAccountIpAssociationsBatch,

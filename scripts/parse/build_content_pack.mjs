@@ -109,7 +109,9 @@ if (process.argv.includes('--ship')) {
     sentAtMs: Date.now(),
   };
   const record = { t: 'content_pack', build, payload };
-  const body = gzipSync(Buffer.from(`${JSON.stringify(header)}\n${JSON.stringify(record)}`, 'utf8'));
+  const body = gzipSync(
+    Buffer.from(`${JSON.stringify(header)}\n${JSON.stringify(record)}`, 'utf8'),
+  );
   const res = await fetch(url, {
     method: 'POST',
     headers: { 'content-type': 'application/x-ndjson', 'x-woc-parse-secret': token },

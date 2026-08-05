@@ -147,12 +147,6 @@ import {
 } from './chat_filter_commands';
 import { applyChatStrike, loadChatFilterState, recordChatViolation } from './chat_filter_db';
 import { ChatLogger } from './chat_log';
-import {
-  createParseSubsystem,
-  readBuildVersion,
-  type FightParticipant,
-  type ParseSubsystem,
-} from './parse';
 import { dailyRewardService } from './daily_rewards';
 import type { AccountChatMuteStatus, AccountCosmetics, RequestMetadata } from './db';
 import {
@@ -285,6 +279,12 @@ import {
   type MsgRateBucketState,
   tallyDrop,
 } from './msg_rate_limit';
+import {
+  createParseSubsystem,
+  type FightParticipant,
+  type ParseSubsystem,
+  readBuildVersion,
+} from './parse';
 import { PartyFrameProjectionCache } from './party_frame_projection';
 import { applyBoostKitToPlayer, pbeBoostEnabled } from './pbe_boost';
 import { nextRaidResetMs } from './raid_reset';

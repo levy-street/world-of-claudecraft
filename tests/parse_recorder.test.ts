@@ -1,10 +1,10 @@
 import { describe, expect, test } from 'vitest';
+import type { FightParticipant } from '../server/parse/contract';
 import { createParseCounters } from '../server/parse/counters';
 import { ParseRecorder } from '../server/parse/recorder';
 import type { ArenaMatchView, BgMatchView, RecorderEntityView } from '../server/parse/types';
-import type { FightParticipant } from '../server/parse/contract';
 import type { SimEvent } from '../src/sim/types';
-import { FAKE_PARSE_FLAGS, fakeSim, type FakeSim } from './helpers/parse_fake_sim';
+import { FAKE_PARSE_FLAGS, type FakeSim, fakeSim } from './helpers/parse_fake_sim';
 
 function player(id: number): RecorderEntityView {
   return { id, templateId: 'mage', level: 20 };
@@ -144,8 +144,9 @@ describe('ParseRecorder arena lifecycle', () => {
 
     const close = records.find((r) => r.t === 'fight_close') as Record<string, unknown>;
     expect(close).toMatchObject({ fightId: 'fight-0', outcome: 'win_a', endedTick: 50 });
-    const rollup = (close.rollup as { perParticipant: Record<string, { damage: number; deaths: number }> })
-      .perParticipant;
+    const rollup = (
+      close.rollup as { perParticipant: Record<string, { damage: number; deaths: number }> }
+    ).perParticipant;
     expect(rollup['1005']?.damage).toBe(900);
     expect(rollup['1007']?.deaths).toBe(1);
     // The kill events themselves were recorded before the close.
@@ -215,18 +216,14 @@ describe('ParseRecorder enrichment', () => {
     seedArena(sim, arenaMatch());
     const target = sim.entities.get(7);
     if (target !== undefined) {
-      (target as { auras: unknown }).auras = [
-        { id: 'rend', name: 'Rend', sourceId: 5, stacks: 3 },
-      ];
+      (target as { auras: unknown }).auras = [{ id: 'rend', name: 'Rend', sourceId: 5, stacks: 3 }];
     }
     const { recorder, records } = makeRecorder(sim);
 
     sim.tickCount = 10;
     recorder.observe([]);
     sim.tickCount = 11;
-    recorder.observe([
-      { type: 'aura', targetId: 7, name: 'Rend', gained: true },
-    ]);
+    recorder.observe([{ type: 'aura', targetId: 7, name: 'Rend', gained: true }]);
 
     const ev = records.find((r) => r.t === 'ev') as Record<string, unknown>;
     expect(ev.x).toMatchObject({ auraSourceId: 5, auraId: 'rend', auraStacks: 3 });
