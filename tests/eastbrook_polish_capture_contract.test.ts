@@ -49,8 +49,10 @@ interface AttributionTargetFixture {
 // fence-removal layout evidence, the v0.34.0 Bear Form rig (#2842), the live
 // graphics rebuild (#2799), far-field impostors and fog-free vista (#2793),
 // brood shout/flourish wiring, the worldObjectBurning fire-burst cue, the
-// Thornhollow renderer sync, and the release/v0.35.0 into AAA-enhancements
-// merge, each of which moved a runtimeRender leaf (usually
+// Thornhollow renderer sync, the release/v0.35.0 into AAA-enhancements
+// merge, and the weapon-skin VFX connection-freeze fix (the budgeted
+// weapon-skin apply queue plus the vfx.weapon-skins boot prewarm entry),
+// each of which moved a runtimeRender leaf (usually
 // src/render/renderer.ts); every mint used
 // scripts/assets/eastbrook_grand_armoury/remint_polish_provenance.mjs.
 // Across all of those mints no GLB pipeline input or geometry value changed
@@ -62,7 +64,7 @@ interface AttributionTargetFixture {
 // diff; see provenance_diagnostics.mjs for the 2026-08-05 stale-mint root
 // cause this legibility exists to prevent.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'f748c054b28d4e30f80dbb41b52a47e590d24f6bd262cf800b4febe0535c83d9';
+  '214d84f280403acce49fb2513648ef6605870f1228f8008cf98194f44367bdef';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

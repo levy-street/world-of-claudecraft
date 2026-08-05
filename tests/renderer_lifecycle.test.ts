@@ -129,6 +129,9 @@ describe('Renderer lifecycle wiring', () => {
     };
     renderer.visualPool = new Map([['player', [{ dispose: () => events.push('pool:dispose') }]]]);
     renderer.objectPool = new Map();
+    // The deferred weapon-skin apply queue is a teardown participant too: a
+    // pending application must never survive into the next context.
+    renderer.weaponSkinApplies = { clear: () => events.push('weaponskins:clear') };
     renderer.clickTargets = [];
     renderer.gatherNodeMeshes = [];
     renderer.viewLights = [];
@@ -146,6 +149,7 @@ describe('Renderer lifecycle wiring', () => {
       'queue:shutdown',
       'view:dispose',
       'pool:dispose',
+      'weaponskins:clear',
       'nameplates:dispose',
       'nameplates:clear',
       'travel:dispose',

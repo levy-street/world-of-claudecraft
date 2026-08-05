@@ -1,5 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { CONSTRAINED_PREWARM_KEEP } from '../src/render/prewarm_policy';
 import {
   buildPrewarmCompileUnits,
   type PrewarmResumeEntry,
@@ -256,5 +257,42 @@ describe('resumeDroppedPrewarmEntries', () => {
     expect(scene).toContain("textureResumeUnits('scene', this.collectInitialSceneTextures())");
     expect(surface).not.toContain('renderPrewarmPass');
     expect(scene).not.toContain('renderPrewarmPass');
+  });
+
+  // Weapon-skin rigs are worn by OTHER players, so nothing at boot draws one
+  // and their programs otherwise link on the first sighting, mid-gameplay.
+  it('warms the weapon-skin VFX programs as small resumable units', () => {
+    const source = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    const start = source.indexOf("id: 'vfx.weapon-skins'");
+    const end = source.indexOf("id: 'vfx.ability-primitives'", start);
+    const entry = source.slice(start, end);
+
+    expect(start).toBeGreaterThan(-1);
+    expect(end).toBeGreaterThan(start);
+    expect(entry).toContain("category: 'vfx'");
+    expect(entry).toContain('required: false');
+    // Three explicitly bounded units, never a whole-entry rerun.
+    expect(entry).toContain("id: 'weapon-skins:group'");
+    expect(entry).toContain("id: 'weapon-skins:textures'");
+    expect(entry).toContain("id: 'weapon-skins:compile'");
+    expect(entry).toContain('await this.compilePrewarmColorPrograms(weaponVfxPrewarmGroup, false)');
+    expect(entry.match(/buildWeaponVfxPrewarmGroup\(\)/g)).toHaveLength(2); // run + resume unit
+    expect(entry).toContain('for (const texture of weaponVfxPrewarmTextures()) ');
+    // The sky dome is not warmed: the world path builds none any more.
+    expect(entry).not.toContain('skyTex');
+
+    // The staged group is torn out of the scene by both cleanup paths and
+    // hidden between resumed entries, exactly like every other prewarm group.
+    expect(source).toContain('if (weaponVfxPrewarmGroup) this.scene.remove(weaponVfxPrewarmGroup)');
+    expect(source).toContain('weaponVfxPrewarmGroup = null;');
+    const hideStart = source.indexOf('const hidePrewarmArtifacts = ');
+    const hideEnd = source.indexOf('const cleanupPrewarmArtifacts = ', hideStart);
+    expect(source.slice(hideStart, hideEnd)).toContain('weaponVfxPrewarmGroup,');
+    // A dropped programs.compile still links it from its own bounded unit.
+    expect(source).toContain("['weapon-vfx', weaponVfxPrewarmGroup],");
+  });
+
+  it('leaves the weapon-skin warm off the constrained keep-list', () => {
+    expect(CONSTRAINED_PREWARM_KEEP).not.toContain('vfx.weapon-skins');
   });
 });

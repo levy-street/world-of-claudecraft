@@ -429,6 +429,17 @@ import {
 import { RecklessSkullPainter } from './warrior_cast_fx_painter';
 import { buildWater, setWaterDayNight, setWaterSunDirection, type WaterView } from './water';
 import { buildWaterFlora } from './water_flora';
+import {
+  buildWeaponVfxPrewarmGroup,
+  disposeWeaponEmissiveCache,
+  weaponVfxPrewarmTextures,
+} from './weapon_vfx';
+import {
+  resolveQueuedSkinLookup,
+  WEAPON_SKIN_APPLIES_PER_FRAME,
+  type WeaponSkinApplyDecision,
+  WeaponSkinApplyQueue,
+} from './weapon_vfx_apply_queue_core';
 import { Weather } from './weather';
 import { precipForBiome } from './weather_field_core';
 import { buildWorldAmbientSources, crowdAmbienceAt, footstepSurfaceAt } from './world_audio';
@@ -2923,6 +2934,15 @@ export class Renderer {
     this.pooledVisualCount = 0;
     this.objectPool.clear();
     this.pooledObjectCount = 0;
+    // The memoized weapon-skin emissive derivations are renderer-lifetime, not
+    // page-lifetime: they are shared across wearers, so no individual rig may
+    // release them, and a megabyte-class texture pair per skin would otherwise
+    // ride a WebGL context recycle into the next context. Safe here and only
+    // here, after every view (and every rig that borrowed them) is torn down
+    // above. Best-effort like its neighbours: nothing in terminal cleanup may
+    // abort the WebGL disposal below.
+    bestEffort(() => this.weaponSkinApplies.clear());
+    bestEffort(() => disposeWeaponEmissiveCache());
     this.clickTargets.length = 0;
     this.gatherNodeMeshes = [];
     this.viewLights.length = 0;
@@ -5361,6 +5381,7 @@ export class Renderer {
     let propMaterialPrewarmGroup: THREE.Group | null = null;
     let foliagePrewarmGroup: THREE.Group | null = null;
     let greatTreePrewarmGroup: THREE.Group | null = null;
+    let weaponVfxPrewarmGroup: THREE.Group | null = null;
     let landmarkPrewarmGroup: THREE.Group | null = null;
     let weatherPrewarmActive = false;
     let surfaceDetailTexturesWarmed = 0;
@@ -5489,6 +5510,7 @@ export class Renderer {
         objectPrewarmGroup,
         propMaterialPrewarmGroup,
         foliagePrewarmGroup,
+        weaponVfxPrewarmGroup,
         landmarkPrewarmGroup,
       ]) {
         if (group) group.visible = false;
@@ -5527,6 +5549,9 @@ export class Renderer {
       if (propMaterialPrewarmGroup) this.scene.remove(propMaterialPrewarmGroup);
       if (foliagePrewarmGroup) this.scene.remove(foliagePrewarmGroup);
       if (greatTreePrewarmGroup) this.scene.remove(greatTreePrewarmGroup);
+      // Removed, never disposed: disposing a material releases its linked
+      // program, which is exactly what this group exists to warm.
+      if (weaponVfxPrewarmGroup) this.scene.remove(weaponVfxPrewarmGroup);
       if (landmarkPrewarmGroup) this.scene.remove(landmarkPrewarmGroup);
       if (weatherPrewarmActive) this.weather.endPrewarm();
       doorPrewarmGroup = null;
@@ -5542,6 +5567,7 @@ export class Renderer {
       propMaterialPrewarmGroup = null;
       foliagePrewarmGroup = null;
       greatTreePrewarmGroup = null;
+      weaponVfxPrewarmGroup = null;
       landmarkPrewarmGroup = null;
       weatherPrewarmActive = false;
     };
@@ -5860,6 +5886,54 @@ export class Renderer {
         detail: () => `bursts=${vfxPrewarmBursts}`,
       },
       {
+        // Weapon-skin rarity VFX: the rigs are worn by OTHER players, so their
+        // programs otherwise link the first time a skinned player walks into
+        // view, mid-gameplay, on top of the rig build itself (the reported
+        // connection freeze). One hidden synthetic rig covers every component
+        // family, and the shader sources carry no authored values, so it
+        // compiles the exact keys the live rigs ask for later. The sky dome is
+        // deliberately not warmed: the world path builds none.
+        id: 'vfx.weapon-skins',
+        category: 'vfx',
+        priority: 61,
+        required: false,
+        // Small explicit units: build the rig, upload its shared sprite
+        // textures, link its programs. Each is one bounded piece of work, so a
+        // deadline drop resumes them in idle time instead of rerunning the
+        // whole entry.
+        resumeUnits: () => [
+          {
+            id: 'weapon-skins:group',
+            run: () => {
+              weaponVfxPrewarmGroup = buildWeaponVfxPrewarmGroup();
+              setRenderCategory(weaponVfxPrewarmGroup, 'prewarm');
+              this.scene.add(weaponVfxPrewarmGroup);
+            },
+          },
+          {
+            id: 'weapon-skins:textures',
+            run: () => {
+              for (const texture of weaponVfxPrewarmTextures()) this.prewarmTexture(texture);
+            },
+          },
+          {
+            id: 'weapon-skins:compile',
+            run: async () => {
+              if (weaponVfxPrewarmGroup) {
+                await this.compilePrewarmColorPrograms(weaponVfxPrewarmGroup, false);
+              }
+            },
+          },
+        ],
+        run: () => {
+          weaponVfxPrewarmGroup = buildWeaponVfxPrewarmGroup();
+          setRenderCategory(weaponVfxPrewarmGroup, 'prewarm');
+          this.scene.add(weaponVfxPrewarmGroup);
+          for (const texture of weaponVfxPrewarmTextures()) this.prewarmTexture(texture);
+        },
+        detail: () => `objects=${weaponVfxPrewarmGroup?.children.length ?? 0}`,
+      },
+      {
         // Spawn one of every pooled ability-VFX primitive (rings, decals,
         // pillar, shell, slash ribbon, overlay sprite). The pools build their
         // meshes visible=false, so neither the render passes nor
@@ -5915,6 +5989,7 @@ export class Renderer {
             ['props', propMaterialPrewarmGroup],
             ['foliage', foliagePrewarmGroup],
             ['great-tree', greatTreePrewarmGroup],
+            ['weapon-vfx', weaponVfxPrewarmGroup],
             ['landmark', landmarkPrewarmGroup],
           ];
           return buildPrewarmCompileUnits(
@@ -7393,6 +7468,59 @@ export class Renderer {
     });
   }
 
+  // Weapon-skin cosmetics waiting to be applied to a live view, at most one
+  // application per frame. All the queue decisions (coalescing, cancellation,
+  // the stale-guard) live in the pure core; this class only does the Three work
+  // the drain hands back.
+  private readonly weaponSkinApplies = new WeaponSkinApplyQueue();
+  private readonly weaponSkinApplyScratch: WeaponSkinApplyDecision[] = [];
+
+  // Bound once, never per frame: the drain's two callbacks would otherwise mint
+  // a closure pair on every drained frame.
+  private readonly weaponSkinLookup = (viewId: number): string | undefined => {
+    // A view that is gone, pooled, or has no character rig has nothing to apply
+    // to; everything else is the live entity's own answer.
+    if (!this.views.get(viewId)?.visual) return undefined;
+    return resolveQueuedSkinLookup(this.sim.entities.get(viewId));
+  };
+
+  // Nearest first: in a crowd of arrivals the wearer beside the player must not
+  // wait out thirty distant rigs at one application per frame. Squared XZ
+  // distance to the player, the same measure the view create/destroy bands use.
+  private readonly weaponSkinRank = (viewId: number): number | undefined => {
+    const entity = this.sim.entities.get(viewId);
+    return entity ? distSqXZ(entity, this.sim.player) : undefined;
+  };
+
+  /** Apply (or clear) a weapon-skin cosmetic on one view and latch it. The
+   *  latch is written HERE, never at enqueue time, so a queued application
+   *  that never ran is retried by the next frame's diff. */
+  private applyWeaponSkin(v: EntityView, skinId: string | null): void {
+    if (!v.visual) return;
+    v.weaponSkinId = skinId;
+    const changed = v.visual.setWeaponSkin(skinId);
+    if (changed) for (const node of changed) this.gateSwapOnCompile(node);
+    this.reconcileViewLights(v);
+  }
+
+  /** Spend this frame's weapon-skin application budget, nearest wearer first.
+   *  Entries whose view is gone, or whose entity has moved on to another skin,
+   *  are dropped without spending it (the diff re-enqueues if the view still
+   *  needs one). */
+  private drainWeaponSkinApplies(): void {
+    if (this.weaponSkinApplies.size === 0) return;
+    const due = this.weaponSkinApplies.take(
+      WEAPON_SKIN_APPLIES_PER_FRAME,
+      this.weaponSkinLookup,
+      this.weaponSkinApplyScratch,
+      this.weaponSkinRank,
+    );
+    for (const entry of due) {
+      const view = this.views.get(entry.viewId);
+      if (view) this.applyWeaponSkin(view, entry.skinId);
+    }
+  }
+
   private reconcileViewLights(v: EntityView): void {
     const reconciled = reconcileViewPointLights(v.group, v.viewLights, this.viewLights);
     if (!reconciled.changed) return;
@@ -8550,6 +8678,9 @@ export class Renderer {
   private removeView(id: number, terminal = false): void {
     const v = this.views.get(id);
     if (!v) return;
+    // A pending weapon-skin application must never land on a dropped (or
+    // pooled and reused) view.
+    this.weaponSkinApplies.cancel(id);
     this.scene.remove(v.group);
     this.lightOwnerGroups.delete(v.group);
     if (v.viewLights.length > 0) {
@@ -9191,12 +9322,23 @@ export class Renderer {
       }
 
       // live weapon-skin swap: a Season 1 Armory cosmetic applied/detached (self
-      // or a peer, via the identity wire); replaces the held model + rarity VFX
+      // or a peer, via the identity wire); replaces the held model + rarity VFX.
+      // APPLYING one is the expensive direction (model swap, derived emissive
+      // materials, the whole VFX rig), so it goes through the per-frame budgeted
+      // queue instead of running here: a crowd of skinned players arriving at
+      // once used to build every rig inside this one frame. Clearing a skin
+      // builds no rig, so it stays synchronous and instant, and cancels any
+      // queued apply so a stale entry cannot put the skin back on.
+      // The latch is written by the application itself (see applyWeaponSkin),
+      // so this diff keeps re-enqueueing (idempotent: one entry per view) until
+      // the queued work actually lands.
       if (e.weaponSkinId !== v.weaponSkinId) {
-        v.weaponSkinId = e.weaponSkinId;
-        const changed = v.visual.setWeaponSkin(e.weaponSkinId);
-        if (changed) for (const node of changed) this.gateSwapOnCompile(node);
-        this.reconcileViewLights(v);
+        if (e.weaponSkinId === null) {
+          this.weaponSkinApplies.cancel(id);
+          this.applyWeaponSkin(v, null);
+        } else {
+          this.weaponSkinApplies.enqueue(id, e.weaponSkinId);
+        }
       }
       const weaponAura = characterWeaponAuraInto(e, this.weaponAuraScratch);
       v.visual.setWeaponAura(weaponAura ? weaponAura.color : null, weaponAura?.tip ?? false);
@@ -9888,6 +10030,7 @@ export class Renderer {
       if (!charOnScreen) v.group.visible = false;
     }
     this.lastVisibleRigCount = visibleRigCount;
+    this.drainWeaponSkinApplies();
 
     // Night mob glow: a warm pool of light on the ground under every nearby body
     // once it is properly dark, so a mob out in an unlit field still reads as a

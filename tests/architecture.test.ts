@@ -493,6 +493,8 @@ const RENDER_PURE_CORES = [
   'src/render/resident_scenery_core.ts',
   'src/render/player_aura_rings_core.ts',
   'src/render/warrior_cast_fx_core.ts',
+  'src/render/weapon_vfx_apply_queue_core.ts',
+  'src/render/weapon_vfx_emissive_core.ts',
   'src/render/zone_feature_visibility_core.ts',
   'src/render/characters/skeleton_update_core.ts',
   'src/render/characters/weapon_attack_style_core.ts',

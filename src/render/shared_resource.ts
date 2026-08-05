@@ -24,3 +24,18 @@ export function isSharedGeometry(geometry: THREE.BufferGeometry): boolean {
 export function isSharedMaterial(material: THREE.Material): boolean {
   return material.userData.sharedRendererResource === true;
 }
+
+// Textures follow the same rule, and one case makes it load-bearing: the
+// weapon-skin emissive derivation is memoized per (source map, emissive spec),
+// so one derived texture pair is handed to every wearer of that skin. The
+// first wearer's rig tearing down must not dispose it out from under the
+// others (or under the next wearer), so the cache marks what it owns here and
+// every dispose path asks before releasing.
+export function markSharedTexture<T extends THREE.Texture>(texture: T): T {
+  texture.userData.sharedRendererResource = true;
+  return texture;
+}
+
+export function isSharedTexture(texture: THREE.Texture): boolean {
+  return texture.userData.sharedRendererResource === true;
+}
