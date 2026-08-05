@@ -34,7 +34,7 @@ const STOP_DISTANCE = 5;
  * Decide what movement action to take this step to steer the player from
  * `fromPos` (usually `sim.player.pos`) toward `targetPos`.
  *
- * This is stateless — every step re-evaluates the relative angle and
+ * This is stateless, every step re-evaluates the relative angle and
  * distance. Call `steerToward` once per step, issue `result.action` via
  * `applyAction`, then check `result.arrived` for the next decision.
  */
@@ -57,7 +57,7 @@ export function steerToward(fromPos: Vec3, facing: number, targetPos: Vec3): Ste
   if (rel < -TURN_THRESHOLD) {
     return { action: TURN_RIGHT, arrived: false };
   }
-  // Facing roughly toward target — push forward.
+  // Facing roughly toward target, push forward.
   return { action: FORWARD, arrived: false };
 }
 

@@ -2,7 +2,7 @@
 // Run: `node dist-idle/idle.cjs --class warrior --seed 20061 --speed 20`
 //
 // Prints a one-line summary per step plus colored SimEvent highlights.
-// No top-level await (esbuild CJS output constraint — mirrors headless/).
+// No top-level await (esbuild CJS output constraint, mirrors headless/).
 
 import type { SimEvent } from '../src/sim/types';
 import { ALL_CLASSES } from '../src/sim/types';
@@ -71,7 +71,7 @@ function parseArgs(): CliArgs {
 
 function printHelp(): void {
   console.log(`
-Idle Classic — terminal-first idle game mode for World of ClaudeCraft
+Idle Classic, terminal-first idle game mode for World of ClaudeCraft
 
 Usage:  node dist-idle/idle.cjs [options]
 
@@ -217,7 +217,7 @@ function main(): void {
     }
   }
   const msg = [
-    `Idle Classic started — ${opts.playerClass} @ seed ${opts.seed}`,
+    `Idle Classic started, ${opts.playerClass} @ seed ${opts.seed}`,
     `  speed: ${opts.frameSkip} ticks/step (${(opts.frameSkip! * 0.05).toFixed(1)} sim-sec/step)`,
     `  saves: ${opts.saveDir}`,
     `  world: ${mobCount} mobs, ${npcCount} NPCs, ${engine.sim.entities.size} total`,

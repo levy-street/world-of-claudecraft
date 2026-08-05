@@ -54,7 +54,7 @@ export class AntiStuck {
     this._lastX = x;
     this._lastZ = z;
 
-    // Player moved — clear stuck state.
+    // Player moved, clear stuck state.
     if (moved > MOVE_THRESHOLD) {
       this._reset();
       return null;
@@ -63,16 +63,16 @@ export class AntiStuck {
     this._stepsSinceMove++;
     // Give extra grace period: don't trigger anti-stuck until we've been
     // still for a while. Also don't trigger if the player is in combat
-    // (targetId set) — let combat handle that.
+    // (targetId set), let combat handle that.
     if (this._stepsSinceMove < STUCK_THRESHOLD + 4) return null;
 
-    // === STUCK — escape logic ===
+    // === STUCK, escape logic ===
 
     // 1. If we have waypoints from pathfinding, follow them.
     if (this._waypoints.length > 0 && this._waypointIdx < this._waypoints.length) {
       this._waypointSteps++;
       if (this._waypointSteps > WAYPOINT_FOLLOW_STEPS) {
-        // Took too long on this waypoint — recompute.
+        // Took too long on this waypoint, recompute.
         this._waypoints = [];
         this._waypointIdx = 0;
         this._waypointSteps = 0;
@@ -80,7 +80,7 @@ export class AntiStuck {
         const wp = this._waypoints[this._waypointIdx];
         const d = dist2d({ x, y: 0, z }, { x: wp.x, y: 0, z: wp.z });
         if (d < 2) {
-          // Reached waypoint — advance to next.
+          // Reached waypoint, advance to next.
           this._waypointIdx++;
           this._waypointSteps = 0;
           return FORWARD;
@@ -99,7 +99,7 @@ export class AntiStuck {
 
     const path = findPlayerPath(sim.cfg.seed, { x, z }, { x: targetX, z: targetZ }, 32);
     if (path.length > 1) {
-      // Found a path — follow its waypoints (skip the first which is near us).
+      // Found a path, follow its waypoints (skip the first which is near us).
       this._waypoints = path.slice(1);
       this._waypointIdx = 0;
       this._waypointSteps = 0;
@@ -107,7 +107,7 @@ export class AntiStuck {
       return this._steerToward(sim, this._waypoints[0]);
     }
 
-    // 3. No path found — try basic escape: back up, then turn.
+    // 3. No path found, try basic escape: back up, then turn.
     this._escapeIndex++;
     const phase = this._escapeIndex % 6;
     if (phase === 0) return BACK;

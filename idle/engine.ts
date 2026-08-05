@@ -152,7 +152,7 @@ export class IdleEngine {
     const data = readSave(savePath);
     if (!data) return null;
     // Create the engine with `noPlayer: true` so the Sim ctor does NOT
-    // auto-create a throwaway primary — we add the saved one below.
+    // auto-create a throwaway primary, we add the saved one below.
     const engine = new IdleEngine({
       seed: data.seed,
       playerClass: data.playerClass,
@@ -196,7 +196,7 @@ export class IdleEngine {
         camp = findBestCampTarget(sim.player.pos, sim.player.level);
         if (camp) {
           // Only navigate if we're not already in a reasonable camp distance.
-          // If we are, stay put — auto_combat will pick targets as they spawn.
+          // If we are, stay put, auto_combat will pick targets as they spawn.
           if (dist2d(sim.player.pos, camp.pos) <= 15) camp = null;
         }
       }
@@ -210,7 +210,7 @@ export class IdleEngine {
     //    TURN held for the whole frameSkip batch rotates the player exactly
     //    PI radians (1 sim-second at TURN_SPEED), so the facing can only ever
     //    land on one of two antipodal angles and the steering loop never
-    //    converges — the character spins and never reaches a camp or a mob.
+    //    converges, the character spins and never reaches a camp or a mob.
     //    Movement is therefore driven PER TICK (the sim's normal input
     //    cadence) toward a resolved world-space goal; the once-per-step
     //    `action` is kept for the stationary cases (in-melee combat, ability

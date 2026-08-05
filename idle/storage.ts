@@ -1,6 +1,6 @@
 // Per-character JSON save/load for the Idle Classic engine.
 //
-// REUSES the canonical sim `serializeCharacter`/`addPlayer` path — never
+// REUSES the canonical sim `serializeCharacter`/`addPlayer` path, never
 // hand-rolls a subset of CharacterState. The save file bundles seed +
 // playerClass + the full CharacterState + a counters snapshot so the next
 // session can compute step deltas without replaying history.

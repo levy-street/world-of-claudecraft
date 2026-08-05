@@ -74,13 +74,13 @@ export function findBestCampTarget(playerPos: Vec3, playerLevel: number): CampTa
 
 /**
  * True when the player is within a camp that is appropriate for its level.
- * Used by the navigator to stop steering when the destination is reached —
+ * Used by the navigator to stop steering when the destination is reached :
  * combat takes over from here.
  */
 export function isInAppropriateCamp(
   playerPos: Vec3,
   playerLevel: number,
-  campRadius: number = 24, // yd — slightly larger than most camp radii to cover wander
+  campRadius: number = 24, // yd, slightly larger than most camp radii to cover wander
 ): boolean {
   const gap = safeLevelGap(playerLevel);
   const maxAllowedLevel = playerLevel + gap;

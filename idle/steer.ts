@@ -4,7 +4,7 @@
 // TURN action held for a whole step (frameSkip ticks = 1 sim-second) rotates
 // the player exactly PI radians (TURN_SPEED rad/sec over 1 sec), so the facing
 // can only ever land on one of two antipodal angles and a once-per-step
-// steering loop never converges — the player spins forever and never reaches
+// steering loop never converges, the player spins forever and never reaches
 // the camp or a mob. Driving the decision PER TICK (the sim's normal input
 // cadence) keeps each correction at TURN_SPEED * DT ~ 0.157 rad, well inside
 // the steering threshold, so the facing converges between steps and the
@@ -37,7 +37,7 @@ export function steerTick(sim: Sim, goal: Vec3): boolean {
     return false;
   }
   // Within stop distance: don't walk into the goal, but still turn to face it
-  // if not aligned — melee needs the target in front to connect. Turn in
+  // if not aligned, melee needs the target in front to connect. Turn in
   // place (cancel the forward applyAction auto-sets for turns) so the player
   // does not walk past the goal while correcting facing.
   const rel = normAngle(angleTo(p.pos, goal) - p.facing);

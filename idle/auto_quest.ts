@@ -7,7 +7,7 @@
 //
 // Priority: turn-in > objectives > accept > idle (combat takes over).
 //
-// Deterministic: no Math.random, no wall clock — reads only sim state.
+// Deterministic: no Math.random, no wall clock, reads only sim state.
 
 import { QUESTS } from '../src/sim/data';
 import { questObjectiveAreas } from '../src/sim/quest_targets';
@@ -162,7 +162,7 @@ export function evaluateQuest(sim: Sim, _events: SimEvent[]): QuestStepResult {
 
       // Check if we're close enough to the area center to start fighting.
       if (bestDist <= bestArea.radius + 5) {
-        // We're in the objective area — let auto_combat handle it.
+        // We're in the objective area, let auto_combat handle it.
         // But first, try to find a specific quest target mob to prioritize.
         for (const ref of bestArea.objectives) {
           const qDef = QUESTS[ref.questId];
@@ -171,18 +171,18 @@ export function evaluateQuest(sim: Sim, _events: SimEvent[]): QuestStepResult {
           if (obj.type === 'kill' && obj.targetMobId) {
             const targetMob = findNearestMob(sim, obj.targetMobId, p.pos);
             if (targetMob && dist2d(p.pos, targetMob.pos) <= 30) {
-              // Found a quest target mob nearby — let combat handle it.
+              // Found a quest target mob nearby, let combat handle it.
               log.push(`In objective area, hunting ${targetMob.name}`);
               return { action: NOOP, didQuestAction: false, log, blocked: false, goalPos: null };
             }
           }
         }
-        // In area but no specific target visible — wander to find mobs.
+        // In area but no specific target visible, wander to find mobs.
         log.push(`In objective area, searching for targets`);
         return { action: NOOP, didQuestAction: false, log, blocked: false, goalPos: null };
       }
 
-      // Not in the area yet — navigate toward the center.
+      // Not in the area yet, navigate toward the center.
       const steer = steerToward(p.pos, p.facing, {
         x: bestArea.center.x,
         y: 0,
@@ -205,7 +205,7 @@ export function evaluateQuest(sim: Sim, _events: SimEvent[]): QuestStepResult {
   // Sorting is critical: without it, Object.values() iteration order dictates
   // which quest is picked, causing the character to walk past a nearby giver
   // (e.g. marshal at 8 yd) to accept a quest from a distant one (e.g. foreman
-  // at 23 yd) — the character then spends steps walking to the wrong NPC while
+  // at 23 yd), the character then spends steps walking to the wrong NPC while
   // the nearby one sits ignored.
   const candidates: { qDef: (typeof QUESTS)[string]; npc: Entity; dist: number }[] = [];
   for (const qDef of Object.values(QUESTS)) {
@@ -239,6 +239,6 @@ export function evaluateQuest(sim: Sim, _events: SimEvent[]): QuestStepResult {
     };
   }
 
-  // No quest goal — fall through to combat.
+  // No quest goal, fall through to combat.
   return { action: NOOP, didQuestAction: false, log, blocked: false, goalPos: null };
 }

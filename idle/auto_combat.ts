@@ -27,7 +27,7 @@ const MELEE_FACING_THRESHOLD = MELEE_ARC / 2;
 
 // Per-Sim idle-scan throttle. Keyed by Sim instance (not a bare module
 // global) so two IdleEngine instances stepping in the same process cannot
-// perturb each other's "scan for a target every 2 idle steps" cadence — the
+// perturb each other's "scan for a target every 2 idle steps" cadence, the
 // determinism test's two engines stay independent even if interleaved.
 const _idleSteps = new WeakMap<Sim, number>();
 const idleSteps = (sim: Sim): number => _idleSteps.get(sim) ?? 0;
@@ -60,7 +60,7 @@ function resolveTarget(sim: Sim): TargetResult {
 
   const targetId = p.targetId;
   if (targetId === null) {
-    // No target — scan for one with difficulty filtering.
+    // No target, scan for one with difficulty filtering.
     setIdleSteps(sim, idleSteps(sim) + 1);
 
     if (idleSteps(sim) >= 2) {
@@ -70,7 +70,7 @@ function resolveTarget(sim: Sim): TargetResult {
         p.targetId = best.id;
         return { target: best };
       }
-      // No suitable target — walk forward (the engine/navigation layer
+      // No suitable target, walk forward (the engine/navigation layer
       // will steer toward a level-appropriate camp when idle).
       return { action: FORWARD };
     }
@@ -92,21 +92,21 @@ function resolveTarget(sim: Sim): TargetResult {
     return { action: FORWARD };
   }
 
-  // Corpse — move on.
+  // Corpse, move on.
   if (current.dead) {
     p.targetId = null;
     setIdleSteps(sim, 0);
     return { action: FORWARD };
   }
 
-  // Current target is too dangerous (by adaptive gap or affix) — flee.
+  // Current target is too dangerous (by adaptive gap or affix), flee.
   if (isTooDangerous(p.level, current)) {
     p.targetId = null;
     setIdleSteps(sim, 0);
     return { action: fleeAction(p, current) };
   }
 
-  // Non-hostile mob > 25 yd away — abandon.
+  // Non-hostile mob > 25 yd away, abandon.
   if (!current.hostile && dist2d(p.pos, current.pos) > 25) {
     p.targetId = null;
     setIdleSteps(sim, idleSteps(sim) + 1);
@@ -136,7 +136,7 @@ function findDanger(sim: Sim): { action: number } | null {
 
 /**
  * Find the best target: nearest level-appropriate hostile mob within the
- * adaptive safe gap. NO filterless fallback — if there is no suitable
+ * adaptive safe gap. NO filterless fallback, if there is no suitable
  * target, returns null and the engine navigates toward a camp instead.
  *
  * Uses isTooDangerous which accounts for both the level gap AND the
@@ -147,7 +147,7 @@ function findBestTarget(sim: Sim): Entity | null {
   const p = sim.player;
   let best: Entity | null = null;
   let bestDist = Infinity;
-  const SEARCH_RADIUS = 55; // yards — wide enough to find the next camp, not infinite
+  const SEARCH_RADIUS = 55; // yards, wide enough to find the next camp, not infinite
 
   for (const e of sim.entities.values()) {
     if (e.kind !== 'mob' || e.dead || !e.hostile) continue;
@@ -180,7 +180,7 @@ function fleeAction(p: Entity, threat: Entity): number {
   if (Math.abs(rel) > Math.PI / 4) {
     return rel > 0 ? TURN_LEFT : TURN_RIGHT;
   }
-  // Facing roughly away — run!
+  // Facing roughly away, run!
   return FORWARD;
 }
 
@@ -203,7 +203,7 @@ function closeGap(p: Entity, target: Entity): number {
     return steer.arrived ? FORWARD : steer.action;
   }
 
-  // Close but target is behind — walk forward to bring it in front.
+  // Close but target is behind, walk forward to bring it in front.
   if (Math.abs(rawRel) > Math.PI / 2) {
     return FORWARD;
   }

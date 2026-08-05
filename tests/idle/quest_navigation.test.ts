@@ -75,13 +75,13 @@ describe('quest navigation', () => {
       if (qDef.retired) continue;
       const state = sim.questState(qDef.id, pid);
       if (state === 'ready') {
-        // Quest is already ready — evaluateQuest should steer toward turn-in.
+        // Quest is already ready, evaluateQuest should steer toward turn-in.
         const result = evaluateQuest(sim, []);
         expect(result.log.some((l) => l.includes('turn in') || l.includes('Turned in'))).toBe(true);
         return;
       }
     }
-    // No ready quests — that's fine, just verify no crash.
+    // No ready quests, that's fine, just verify no crash.
   });
 
   it('handles multiple active quests by picking the closest objective', () => {
@@ -134,7 +134,7 @@ describe('quest acceptance integration (end-to-end)', () => {
     const anyActive = stateWolves === 'active' || stateProf === 'active';
     expect(anyActive).toBe(true);
     // Postcondition: the character should also have progressed toward marshal.
-    // We don't assert which quest — differing steer approach may accept either.
+    // We don't assert which quest, differing steer approach may accept either.
   });
 
   it('accepts quest near giver NPC after forced teleport', () => {
@@ -161,7 +161,7 @@ describe('quest acceptance integration (end-to-end)', () => {
         break;
       }
     }
-    // Marshal is always the same static NPC for a default seed — fail if missing.
+    // Marshal is always the same static NPC for a default seed, fail if missing.
     expect(marshal).not.toBeNull();
     if (!marshal) return; // type-guard
 

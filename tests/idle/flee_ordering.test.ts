@@ -100,7 +100,7 @@ describe('idle flee-before-camp-resume ordering (GDD Part A.2)', () => {
     engine.step(1000);
 
     // After the step, the player must still have no target (the flee gate
-    // cleared it) — camp-resume does NOT attempt to engage new targets
+    // cleared it), camp-resume does NOT attempt to engage new targets
     // while lethal. With the fix, camp-refer is skipped entirely; the repair
     // is that the step's flee action advances unharmed.
     expect(sim.player.targetId).toBeNull();

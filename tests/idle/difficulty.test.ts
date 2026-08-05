@@ -2,7 +2,7 @@
 // level-appropriate camp navigation.
 //
 // Pure determinism: creates lightweight Sim instances (same pattern as
-// engine.test.ts) and asserts against content tables — no Math.random,
+// engine.test.ts) and asserts against content tables, no Math.random,
 // no Date.now, no live server.
 
 import { describe, expect, it } from 'vitest';
@@ -145,7 +145,7 @@ describe('assessThreat', () => {
     expect(threat.fleeFrom).toBeNull();
   });
 
-  it('classifies a single above-gap mob as lethal (flee it — it kills a solo)', () => {
+  it('classifies a single above-gap mob as lethal (flee it, it kills a solo)', () => {
     const engine = new IdleEngine({
       seed: 20061,
       playerClass: 'warrior',
@@ -176,7 +176,7 @@ describe('findBestCampTarget', () => {
     const target = findBestCampTarget({ x: 0, y: 0, z: -2 }, 1);
     expect(target).not.toBeNull();
     if (target) {
-      // Wolves are at ~{-15,55} — should be within 80yd.
+      // Wolves are at ~{-15,55}, should be within 80yd.
       expect(target.dist).toBeLessThan(80);
       expect(target.mobMaxLevel).toBeLessThanOrEqual(2); // maxLevel of forest_wolf
     }
