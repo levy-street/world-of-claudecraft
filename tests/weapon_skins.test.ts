@@ -119,6 +119,11 @@ describe('weapon type classification', () => {
       if (/^(adv_)?axe/.test(variant)) return 'axe';
       if (/^(adv_)?wand/.test(variant)) return 'wand';
       if (/^spear|^scythe/.test(variant)) return 'polearm';
+      // Generated per-item models (the Source Cave epics) carry the family as a
+      // SUFFIX of the model basename (commit_blade_sword, bug_squasher_hammer),
+      // unlike the variant-pack names above where it is the prefix.
+      if (/sword$/.test(variant)) return 'sword';
+      if (/hammer$/.test(variant)) return 'mace';
       return null;
     };
     for (const id of weaponIds) {

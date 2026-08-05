@@ -10,6 +10,9 @@
 import { armoryCollectionStrings, armorySkinStrings } from './armory';
 
 export const hudChromeStrings = {
+  sourceCave: {
+    progressPercent: '{label}: {percent}%',
+  },
   spectate: {
     banner: 'Spectating {name}',
   },

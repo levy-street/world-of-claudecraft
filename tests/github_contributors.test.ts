@@ -52,6 +52,17 @@ describe('parseMergedPrLogins', () => {
     ).toEqual([]);
     expect(parseMergedPrLogins('not an array' as unknown)).toEqual([]);
   });
+
+  it('rejects logins outside the bounded GitHub username shape', () => {
+    expect(
+      parseMergedPrLogins([
+        pr('valid-user-39'),
+        pr('contains space'),
+        pr('<script>'),
+        pr('a'.repeat(40)),
+      ]),
+    ).toEqual(['valid-user-39']);
+  });
 });
 
 describe('parseNextPageUrl', () => {
@@ -238,6 +249,54 @@ describe('getContributors / topContributors / mergedPrsForLogin (cached fetch)',
     const snapshot = await getContributors();
     expect(snapshot.stats).toEqual([]);
     expect(snapshot.byLogin.size).toBe(0);
+  });
+
+  it('surfaces the GitHub error message (not just the bare status) for a non-OK response', async () => {
+    // A 403 with no reason logged is nearly useless to diagnose (rate limit vs
+    // bad credentials vs something else): the thrown error must carry GitHub's
+    // own message, not just the status code.
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => ({
+        ok: false,
+        status: 403,
+        headers: { get: () => null },
+        json: async () => ({
+          message: 'API rate limit exceeded for 1.2.3.4.',
+          documentation_url: 'https://docs.github.com/rest/overview/rate-limits-for-the-rest-api',
+        }),
+      })),
+    );
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    await getContributors();
+    expect(errSpy).toHaveBeenCalledWith(
+      'github contributors refresh failed:',
+      expect.objectContaining({
+        message: 'github pulls 403: API rate limit exceeded for 1.2.3.4.',
+      }),
+    );
+    errSpy.mockRestore();
+  });
+
+  it('falls back to the bare status when the error body is not valid JSON', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => ({
+        ok: false,
+        status: 503,
+        headers: { get: () => null },
+        json: async () => {
+          throw new Error('not json');
+        },
+      })),
+    );
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    await getContributors();
+    expect(errSpy).toHaveBeenCalledWith(
+      'github contributors refresh failed:',
+      expect.objectContaining({ message: 'github pulls 503' }),
+    );
+    errSpy.mockRestore();
   });
 
   it('backs off after a failure: a second call inside the cooldown does not re-fetch', async () => {

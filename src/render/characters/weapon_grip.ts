@@ -122,6 +122,12 @@ export const WEAPON_GRIP_OVERRIDES: Record<string, WeaponGripOverride> = {
   lacquered_rod: { pos: [0.0606, 0.1259, -0.0094], rot: [0, 0, -46.2693] },
   fletcher_s_guild_bow: { pos: [-0.2237, 0, 0.0851] },
   shard_of_everwinter: { pos: [0, 0.0687, 0.1538], rot: [35.7041, 0, 0] },
+  // Source Cave generated weapons (origin-at-grip via their root-node offset,
+  // kept by flattenWeaponScene): seat the palm mid-handle instead of at the
+  // guard. Tune pos live with vite hot reload: y runs along the blade axis,
+  // z pushes out of the palm, x is lateral.
+  commit_blade_sword: { pos: [-0.06, -0.01, 0.32] },
+  keyboard_sword: { pos: [0, 0.18, 0] },
 };
 
 export interface GripTransform {

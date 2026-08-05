@@ -139,6 +139,9 @@ describe('the real catalog', () => {
       'col_true_colors',
       'hid_bountiful_coffer',
       'hid_roll_hundred',
+      // The Open Source's weapon collection: the three tools drop on an 8% roll,
+      // so rule 2 keeps it outside the scoring set.
+      'hid_source_cave_arsenal',
     ]);
   });
 });

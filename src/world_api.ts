@@ -189,7 +189,13 @@ export type {
   DungeonFinderProposalView,
   DungeonFinderQueueView,
 } from './world_api/dungeon_finder';
-export type { RaidLockout, RiftFloorView } from './world_api/dungeons';
+export type {
+  RaidLockout,
+  RiftFloorView,
+  SourceCaveInfo,
+  SourceCaveMobDisplay,
+  SourceCaveSealState,
+} from './world_api/dungeons';
 export {
   GUILD_BANK_LOG_LIMIT,
   type GuildBankInfo,

@@ -9,6 +9,7 @@ import {
   isAttackHoverTarget,
   shouldApproachPickedEntity,
 } from '../src/game/interactions';
+import { isSourceCaveGatedObject, sourceCaveOrigin } from '../src/sim/source_cave';
 import { type Entity, INTERACT_RANGE } from '../src/sim/types';
 
 function stubEntity(partial: Partial<Entity> & Pick<Entity, 'id' | 'kind'>): Entity {
@@ -80,6 +81,36 @@ function stubEntity(partial: Partial<Entity> & Pick<Entity, 'id' | 'kind'>): Ent
     ...partial,
   } as Entity;
 }
+
+describe('isSourceCaveGatedObject', () => {
+  it('covers the cave door, reboot button, and both reward-chest states', () => {
+    expect(
+      isSourceCaveGatedObject(
+        stubEntity({ id: 1, kind: 'object', templateId: 'source_cave_reboot' }),
+      ),
+    ).toBe(true);
+    expect(
+      isSourceCaveGatedObject(
+        stubEntity({ id: 2, kind: 'object', templateId: 'source_cave_chest' }),
+      ),
+    ).toBe(true);
+    expect(
+      isSourceCaveGatedObject(
+        stubEntity({ id: 3, kind: 'object', templateId: 'source_cave_chest_sealed' }),
+      ),
+    ).toBe(true);
+    expect(
+      isSourceCaveGatedObject(
+        stubEntity({ id: 4, kind: 'object', templateId: 'dungeon_door', dungeonId: 'source_cave' }),
+      ),
+    ).toBe(true);
+    expect(
+      isSourceCaveGatedObject(
+        stubEntity({ id: 5, kind: 'object', templateId: 'dungeon_door', dungeonId: 'deadmines' }),
+      ),
+    ).toBe(false);
+  });
+});
 
 describe('hoverCursorKind', () => {
   it('returns attack for living hostile mobs', () => {
@@ -610,6 +641,113 @@ describe('handlePickedEntity', () => {
   });
 });
 
+describe('handlePickedEntity: dungeon door click routing', () => {
+  // Regression: a player could click straight through the Source Cave well's
+  // banter gate (well_banter.ts) because this client handler used to call
+  // enterDungeon() directly for every dungeon door, bypassing the server-side
+  // interact() dispatch entirely. Only source_cave must route through the
+  // generic interact() command; every other dungeon door keeps entering
+  // immediately on click.
+  function doorRig(dungeonId: string) {
+    const player = stubEntity({ id: 1, kind: 'player' });
+    const door = stubEntity({
+      id: 2,
+      kind: 'object',
+      templateId: 'dungeon_door',
+      dungeonId,
+      lootable: true,
+      pos: { x: 1, y: 0, z: 0 },
+    });
+    const calls: string[] = [];
+    const world: any = {
+      playerId: 1,
+      player,
+      entities: new Map([
+        [1, player],
+        [2, door],
+      ]),
+      duelInfo: null,
+      arenaInfo: null,
+      targetEntity: () => {},
+      enterDungeon: (id: string) => calls.push(`enterDungeon:${id}`),
+      interact: () => calls.push('interact'),
+      leaveDungeon: () => {},
+      pickUpObject: () => {},
+      startAutoAttack: () => {},
+    };
+    const hud = {
+      openLoot: () => {},
+      openQuestDialog: () => {},
+      openDelveBoard: () => {},
+      openMailbox: () => {},
+      showError: () => {},
+      closeContextMenu: () => {},
+      requestSpiritHealerResurrect: () => {},
+    };
+    return { world, hud, calls };
+  }
+
+  it('the Source Cave well sends the generic interact command, on both click buttons', () => {
+    const { world, hud, calls } = doorRig('source_cave');
+    handlePickedEntity(world, hud, 2, 2, 10, 20); // right-click
+    handlePickedEntity(world, hud, 2, 0, 10, 20); // left-click
+    expect(calls).toEqual(['interact', 'interact']);
+  });
+
+  it('the Source Cave reboot button sends the generic interact command on both click buttons', () => {
+    const { world, hud, calls } = doorRig('source_cave');
+    world.entities.get(2).templateId = 'source_cave_reboot';
+    world.entities.get(2).dungeonId = null;
+    handlePickedEntity(world, hud, 2, 2, 10, 20);
+    handlePickedEntity(world, hud, 2, 0, 10, 20);
+    expect(calls).toEqual(['interact', 'interact']);
+  });
+
+  it('the Source Cave reward chest (sealed AND armed) sends the generic interact command', () => {
+    // Regression: the chest used to fall into pickUpObject (a silent no-op, it
+    // has no objectItemId), so a sealed-chest click never produced the server's
+    // "Access denied." toast.
+    for (const templateId of ['source_cave_chest_sealed', 'source_cave_chest']) {
+      const { world, hud, calls } = doorRig('source_cave');
+      world.entities.get(2).templateId = templateId;
+      world.entities.get(2).dungeonId = null;
+      handlePickedEntity(world, hud, 2, 2, 10, 20);
+      handlePickedEntity(world, hud, 2, 0, 10, 20);
+      expect(calls, templateId).toEqual(['interact', 'interact']);
+    }
+  });
+
+  it('a friendly Source Cave contributor answers to both click buttons via interact', () => {
+    // A live friendly mob standing in the cave x-band: both clicks route to the
+    // generic interact command, which banters server-side. The x comes from the
+    // cave's own origin, never a literal: the instance plane has moved twice.
+    const caveX = sourceCaveOrigin(0).x;
+    const { world, hud, calls } = doorRig('source_cave');
+    const mob = world.entities.get(2);
+    mob.kind = 'mob';
+    mob.templateId = 'source_cave_octocat';
+    mob.dungeonId = null;
+    mob.lootable = false;
+    mob.hostile = false;
+    mob.pos = { x: caveX, y: 0, z: 0 };
+    world.player.pos = { x: caveX - 1, y: 0, z: 0 };
+    handlePickedEntity(world, hud, 2, 2, 10, 20);
+    handlePickedEntity(world, hud, 2, 0, 10, 20);
+    expect(calls).toEqual(['interact', 'interact']);
+    // Once hostile (post-reboot), clicks stop routing to interact.
+    mob.hostile = true;
+    handlePickedEntity(world, hud, 2, 0, 10, 20);
+    expect(calls).toEqual(['interact', 'interact']);
+  });
+
+  it('every other dungeon door still enters immediately on click', () => {
+    const { world, hud, calls } = doorRig('nythraxis_crypt');
+    handlePickedEntity(world, hud, 2, 2, 10, 20);
+    handlePickedEntity(world, hud, 2, 0, 10, 20);
+    expect(calls).toEqual(['enterDungeon:nythraxis_crypt', 'enterDungeon:nythraxis_crypt']);
+  });
+});
+
 describe('handlePickedEntity while dead (the ghost/death loop)', () => {
   // Shared rig: a player stub, a nearby entity, and call-recording world + hud.
   function rig(playerPartial: Partial<Entity>, target: Entity) {
@@ -635,6 +773,10 @@ describe('handlePickedEntity while dead (the ghost/death loop)', () => {
         return true;
       },
       startAutoAttack: () => {},
+      interact: () => {
+        calls.push('interact');
+        return true;
+      },
       resurrectAtSpiritHealer: () => {
         calls.push('resurrectAtSpiritHealer');
         return true;
@@ -689,6 +831,63 @@ describe('handlePickedEntity while dead (the ghost/death loop)', () => {
     expect(calls).not.toContain('enterDungeon');
     expect(calls).toContain('showError');
   });
+
+  // The Source Cave's well is the one INTERACT-ONLY dungeon entrance: alive, the
+  // walk-in trigger deliberately skips it (its banter gate is a server decision,
+  // src/sim/instances/dungeons.ts). The sim already routes a released spirit's
+  // well interact through to re-entry (the ghost/portal arm of interact() in
+  // src/sim/interaction.ts, whose own comment says that without it the well
+  // "strands a corpse-running ghost outside"), so the client must let that one
+  // click reach the server instead of answering with the generic dead toast.
+  // Everything else the cave gates stays refused here: the sim refuses it too.
+  const caveWell = () =>
+    stubEntity({
+      id: 2,
+      kind: 'object',
+      templateId: 'dungeon_door',
+      dungeonId: 'source_cave',
+      lootable: true,
+      pos: { x: 1, y: 0, z: 0 },
+    });
+
+  for (const [label, button] of [
+    ['right', 2],
+    ['left', 0],
+  ] as const) {
+    it(`a ghost ${label}-clicking the Source Cave well still reaches the server`, () => {
+      const { world, hud, calls } = rig({ dead: true, ghost: true }, caveWell());
+      expect(handlePickedEntity(world, hud, 2, button, 10, 20)).toBe(true);
+      expect(calls).toEqual(['interact']);
+    });
+  }
+
+  it('a dead but unreleased player clicking the Source Cave well is still refused', () => {
+    // Only a released spirit gets the exemption: a fresh corpse cannot act at
+    // all, and the sim's dead branch refuses it too.
+    const { world, hud, calls } = rig({ dead: true, ghost: false }, caveWell());
+    expect(handlePickedEntity(world, hud, 2, 2, 10, 20)).toBe(false);
+    expect(calls).not.toContain('interact');
+    expect(calls).toContain('showError');
+  });
+
+  for (const templateId of [
+    'source_cave_reboot',
+    'source_cave_chest_sealed',
+    'source_cave_chest',
+  ]) {
+    it(`a ghost clicking the cave's ${templateId} is still refused`, () => {
+      // The exemption is the WELL, not everything isSourceCaveGatedObject covers:
+      // the sim's dead branch honours portals only, so a ghost pressing the reboot
+      // button or looting the chest would just earn a server refusal.
+      const target = caveWell();
+      target.templateId = templateId;
+      target.dungeonId = null;
+      const { world, hud, calls } = rig({ dead: true, ghost: true }, target);
+      expect(handlePickedEntity(world, hud, 2, 2, 10, 20)).toBe(false);
+      expect(calls).not.toContain('interact');
+      expect(calls).toContain('showError');
+    });
+  }
 
   it('a dead player clicking visible corpse loot does not open it', () => {
     const corpse = stubEntity({

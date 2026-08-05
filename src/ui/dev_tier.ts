@@ -370,6 +370,16 @@ export function devTierByIndex(index: number): DevTier | undefined {
 }
 
 /**
+ * The presentation rung for a machine key, or undefined for null/unknown. The
+ * Source Cave nameplate needs this arm because its roster projection crosses the
+ * wire carrying the rung KEY, not the index the player path uses (the cave's mobs
+ * are not players and carry no `dvt` field).
+ */
+export function devTierByKey(key: string | null | undefined): DevTier | undefined {
+  return key ? DEV_TIERS.find((tier) => tier.key === key) : undefined;
+}
+
+/**
  * The glowing nameplate-outline colour for a 1-based rung index, or null when the
  * rung is not a "significant contributor" (or out of range). Drives the distinct
  * name outline that composes on top of the existing name colour (Discord

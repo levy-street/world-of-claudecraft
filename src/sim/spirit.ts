@@ -50,6 +50,7 @@ import {
 } from './resurrection';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
+import { isSourceCavePos, SOURCE_CAVE_DOOR_POS } from './source_cave/runtime';
 import { dist2d, type Entity, emptyMoveInput, type Vec3 } from './types';
 
 // --- tuning -----------------------------------------------------------------
@@ -108,6 +109,16 @@ function ghostGraveyard(
   graveyards: readonly { x: number; z: number }[] = OVERWORLD_GRAVEYARDS,
   fallback: { x: number; z: number } = PLAYER_START,
 ): { x: number; z: number } {
+  // The Source Cave is a runtime dungeon in the delve x-band, invisible to dungeonAt,
+  // so route its deaths to the overworld graveyard nearest the cave door (dungeon model).
+  if (isSourceCavePos(p.pos.x)) {
+    return nearestOverworldGraveyard(
+      SOURCE_CAVE_DOOR_POS.x,
+      SOURCE_CAVE_DOOR_POS.z,
+      graveyards,
+      fallback,
+    );
+  }
   const dungeon = dungeonAt(p.pos.x);
   if (dungeon) {
     return nearestOverworldGraveyard(dungeon.doorPos.x, dungeon.doorPos.z, graveyards, fallback);
@@ -151,8 +162,10 @@ export function releasePlayerSpirit(
   const { meta, e: p } = r;
   if (!p.dead || p.ghost) return; // not dead, or already a spirit
   if (ctx.arenaMatches.has(p.id)) return; // arena/fiesta run their own respawn
-  if (isDelvePos(p.pos.x)) {
+  if (isDelvePos(p.pos.x) && !isSourceCavePos(p.pos.x)) {
     // Delves keep their own bounded respawn rules (see entity_roster), no ghost run.
+    // The Source Cave shares the delve x-band but is a dungeon: it falls through to the
+    // ghost-run path below (ghost releases at the graveyard nearest the cave door).
     releaseSpiritInDelve(ctx, meta.entityId);
     return;
   }

@@ -360,23 +360,18 @@ describe('Eastbrook polish capture contract', () => {
       mode: 'composite-sha256',
       algorithm: 'sha256',
       baselineRevision: EASTBROOK_POLISH_BASELINE_REVISION,
-      // Deliberately re-pinned, and this mint stacks every leaf move on both sides
-      // of the merge onto src/render/renderer.ts, the rendererIntegration leaf of
-      // this composite: the pnpm-lock migration (a hashed input to every GLB source
-      // fingerprint), PR #2720's fence-removal layout evidence, release/v0.34.0's
-      // Bear Form quadruped rig (PR #2842), live graphics rebuild (context recycle
-      // plus profile-aware Eastbrook runtime inputs, PR #2799), far-field sprite
-      // impostors and fog-free vista (PR #2793), and brood shout/flourish wiring;
-      // and from this branch the worldObjectBurning fire-burst cue (torched murloc
-      // huts, q_deepfen_purge). The release also retook the polish captures and
-      // re-swept their metadata and performance JSONs, and those files are adopted
-      // verbatim here. Each move shifts the leaf's own sha256 and with it the
-      // composite, so the merged tree mints one fingerprint matching neither
-      // parent's literal. No GLB source fingerprint moved, not one pipeline input
-      // or geometry value changed, and no capture was retaken: Eastbrook itself is
-      // untouched by all of it. Re-minted with
-      // scripts/assets/eastbrook_grand_armoury/remint_polish_provenance.mjs.
-      fingerprint: '6b02ff15264e961e2a91ecfecc67f547382c77d76dcce9cedf6218405b94c71d',
+      // Deliberately re-pinned for this branch's rebase onto v0.34.0: this
+      // composite is derived LIVE from the tree, and the seal fingerprints
+      // src/render/renderer.ts, so it re-mints whenever the renderer coordinator
+      // moves. This branch hooks the Source Cave into that coordinator over three
+      // commits (interior, mains-lighting extraction, cleared-room state), and the
+      // seal is pinned once, so this literal is the value at the branch tip, the
+      // one the gate reads. Exactly one component leaf moves,
+      // runtimeRender.renderer.sha256. Every Eastbrook line in renderer.ts is
+      // byte-identical across that delta and the town group is added straight to
+      // the scene. The committed capture evidence is frozen as historical since
+      // v0.34.0 and no longer tracks this composite, so nothing was recaptured.
+      fingerprint: 'c1464c3efbc2b7741c197eca97cffb0177584b023589141428b906dea5db3743',
       components: {
         captureContract: {
           id: 'polish-v2',

@@ -316,6 +316,9 @@ export const ja_JP: EnTranslations = {
     }
   },
   "hudChrome": {
+    "sourceCave": {
+      "progressPercent": "{label}: {percent}%"
+    },
     "spectate": {
       "banner": "{name}を観戦中"
     },
@@ -5572,6 +5575,29 @@ export const ja_JP: EnTranslations = {
       "toolSlips": "その道具はこの錠から滑り落ちる。",
       "lockJammed": "錠は開けられないほど固まっている。もう一度デルヴを踏破すれば再挑戦できる。",
       "lastPickSnaps": "最後のピックが折れる。錠が固まった。もう一度デルヴを踏破しない限り、この宝箱は失われる。"
+    },
+    "dungeon": {
+      "levelRequired": "{name}に入るにはレベル{level}に達している必要がある。"
+    },
+    "sourceCave": {
+      "locked": "{name}への立ち入りがロックされている。",
+      "enter": "あなたは開かれた源に足を踏み入れる。",
+      "leave": "あなたは開かれた源を後にする。",
+      "rebootConfirm": "本当に続行しますか？押す前に、必要なリソースを集めておいてください。",
+      "killProgress": "{name}はソースコードへ還った。",
+      "bossDefeated": "{name}で致命的な例外が発生した。",
+      "cleared": "開かれた源は閉じられた。おめでとう？",
+      "accessDenied": "アクセスが拒否されました。",
+      "wellBanter1": "ただの井戸だよ。水を溜めてるだけ。行きな。",
+      "wellBanter2": "なんでそんな目でレンガを見てるんだ？",
+      "wellBanter3": "私はただの普通の井戸だ！ほら、バケツだってあるだろう！",
+      "wellBanter4": "やっぱりただの井戸さ。魔法なんて何もないよ。",
+      "wellBanter5": "源のことを誰に聞いたんだ？Claudeか？",
+      "wellBanter6": "ああ、そこには絶対に降りたくないはずだ。",
+      "wellBanter7": "警備員！プレイヤーがソースコードに侵入しようとしているぞ！",
+      "wellBanter8": "あの下は争いの種なんだよ。",
+      "wellBanter9": "開けたら、もう放っておいてくれるか？",
+      "wellBanter10": "よし、中へどうぞ。先にブーツを拭いてくれ。"
     }
   },
   "lockpickUi": {
@@ -10439,6 +10465,27 @@ export const ja_JP: EnTranslations = {
       "wyrmshadow_talongrips": {
         "name": "ナイトファングの鉤爪握り"
       },
+      "source_cave_mantle": {
+        "name": "根源のマント"
+      },
+      "conflictbreaker_breastplate": {
+        "name": "コンフリクトブレイカーの胸当て"
+      },
+      "cherry_pickers_gauntlets": {
+        "name": "チェリーピッカーの篭手"
+      },
+      "maintainers_crown": {
+        "name": "メンテナーの冠"
+      },
+      "commit_blade": {
+        "name": "コミットの刃"
+      },
+      "bug_squasher": {
+        "name": "バグ潰しの鎚"
+      },
+      "mech_keyboard": {
+        "name": "キーストローク"
+      },
       "reliquary_plate_chest": {
         "name": "聖遺物庫衛兵のホーバーク"
       },
@@ -14547,6 +14594,11 @@ export const ja_JP: EnTranslations = {
         "enterText": "最後の砦の冷たく静まり返った広間へ足を踏み入れた。",
         "leaveText": "砦の扉を閉め、ドレイクランドの風の中へ戻った。"
       },
+      "source_cave": {
+        "name": "開かれた源",
+        "enterText": "あなたは開かれた源に足を踏み入れる。",
+        "leaveText": "あなたは開かれた源を後にする。"
+      },
       "drowned_temple": {
         "name": "溺れし神殿",
         "enterText": "月の門をくぐり抜けると——大気は冷たい水と蒼白の光に変わり、歌声が頭上で閉ざされていく。",
@@ -14818,6 +14870,19 @@ export const ja_JP: EnTranslations = {
     "delveRiteShrineReedInteract": "葦の祠：Fで触れる",
     "delveRiteShrineSkullInteract": "髑髏の祠：Fで触れる",
     "mailboxName": "メールボックス",
-    "noticeboardName": "掲示板"
+    "noticeboardName": "掲示板",
+    "sourceCaveWellName": "開かれた源",
+    "sourceCaveExitDenied": "ACCESS DENIED",
+    "sourceCaveReboot": "このボタンを押さないでください",
+    "sourceCaveRebootYell": "なんてことをしたんだ？！",
+    "sourceCaveRebootYellWhatsGoingOn": "おい、どうなってるんだ？",
+    "sourceCaveRebootYellServerDown": "みんな、サーバーが落ちたぞ！",
+    "sourceCaveBanterIssue": "お願いだから、issue を立ててくれ。",
+    "sourceCaveBanterPullRequest": "遠慮せずプルリクエストを送ってね。",
+    "sourceCaveBanterConflicts": "コンフリクトは大嫌いだ……",
+    "sourceCaveBanterContribute": "もちろん、このプロジェクトに貢献できるよ！",
+    "sourceCaveBanterFocused": "ごめん、今は集中してるんだ",
+    "sourceCaveBanterNextRelease": "次のリリースはすごいことになるよ！",
+    "sourceCaveBanterRefresh": "ん？リロードしてみて"
   }
 };

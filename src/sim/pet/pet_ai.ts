@@ -33,10 +33,12 @@
 import { lineOfSightClear } from '../colliders';
 import { MOBS } from '../data';
 import { pctValue } from '../entity';
+import { mobTemplateOf } from '../mob/mob_template';
 import { isTrivialTo } from '../mob/targeting';
 import { findPlayerPath, PLAYER_BODY_RADIUS } from '../pathfind';
 import { scheduleProjectile } from '../projectile_travel';
 import type { SimContext } from '../sim_context';
+import { isSourceCaveRebootSafeTarget } from '../source_cave/reboot';
 import { canDetectStealthedTarget } from '../threat';
 import {
   type Aura,
@@ -86,7 +88,7 @@ export function updatePet(ctx: SimContext, pet: Entity): void {
     pet.hp = Math.min(pet.maxHp, pet.hp + Math.max(1, Math.round(pet.maxHp * 0.02)));
   }
 
-  pullNearbyMobs(ctx, pet);
+  pullNearbyMobs(ctx, pet, owner);
 
   let target = pet.aggroTargetId !== null ? (ctx.entities.get(pet.aggroTargetId) ?? null) : null;
   if (target && (target.dead || !ctx.isHostileTo(pet, target) || !petCanSeeTarget(pet, target)))
@@ -199,16 +201,15 @@ function updateWaterJetChannel(ctx: SimContext, pet: Entity): boolean {
 // owner would: the mob notices the pet sent in ahead instead of waiting for the pet's
 // first strike. This mirrors the player proximity-aggro pass (mob/locomotion) but runs
 // from the pet side so a pet-free region costs nothing.
-function pullNearbyMobs(ctx: SimContext, pet: Entity): void {
+function pullNearbyMobs(ctx: SimContext, pet: Entity, owner: Entity): void {
   ctx.grid.forEachInRadius(pet.pos.x, pet.pos.z, PET_PULL_SCAN, (m, d2) => {
     // wild, live, idle mobs only (skip pets/adds, corpses, already-engaged, visions)
     if (m.ownerId !== null || m.kind !== 'mob' || m.dead) return;
     if (m.aiState !== 'idle' || !m.hostile || m.templateId.startsWith('vision_')) return;
-    if (isTrivialTo(m, pet)) return;
-    const radius = Math.max(
-      4,
-      Math.min(20, (MOBS[m.templateId]?.aggroRadius ?? 0) + (m.level - pet.level) * 1.5),
-    );
+    if (isSourceCaveRebootSafeTarget(ctx, m, owner)) return;
+    if (isTrivialTo(ctx, m, pet)) return;
+    const aggroRadius = mobTemplateOf(ctx, m)?.aggroRadius ?? 0;
+    const radius = Math.max(4, Math.min(20, aggroRadius + (m.level - pet.level) * 1.5));
     if (Math.sqrt(d2) < radius) ctx.aggroMob(m, pet, true);
   });
 }
@@ -422,7 +423,10 @@ export function petPickTarget(ctx: SimContext, pet: Entity, owner: Entity): Enti
     const ownerOffense =
       owner.targetId === m.id && (owner.autoAttack || (m.kind === 'mob' && m.threat.has(owner.id)));
     const aggressive =
-      pet.petMode === 'aggressive' && !ownerIdle && dist2d(pet.pos, m.pos) <= PET_AGGRESSIVE_RANGE;
+      pet.petMode === 'aggressive' &&
+      !ownerIdle &&
+      dist2d(pet.pos, m.pos) <= PET_AGGRESSIVE_RANGE &&
+      !(m.kind === 'mob' && isSourceCaveRebootSafeTarget(ctx, m, owner));
     if (!engagingUs && !ownerOffense && !aggressive) return;
     const d = dist2d(pet.pos, m.pos);
     if (d < bestD) {

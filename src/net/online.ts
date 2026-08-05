@@ -126,6 +126,7 @@ import {
   type RecipeDef,
   type RiftFloorView,
   type SocialInfo,
+  type SourceCaveInfo,
   type ToolEffectSlotView,
   type TradeInfo,
   type VcSharedCupInfo,
@@ -1383,6 +1384,7 @@ function blankEntity(id: number): Entity {
     corpseInstanceId: null,
     scale: 1,
     color: 0xffffff,
+    visualKey: null,
     skinCatalog: 'class',
     skin: 0,
     mountKey: '',
@@ -1538,6 +1540,12 @@ export class ClientWorld implements IWorld {
   // it has NO snapshot field and is rebuilt from the lockpick* events by the private
   // applyLockpickEvent. delveClears is a NON-IWorld mirror behind delveShopOffers. ---
   delveRun: DelveRunInfo | null = null;
+  // IWorldDungeons: the Source Cave roster + local progress, mirrored from the snapshot
+  // self (`s.scave`, delta-omitted). Absent key means unchanged; explicit null clears.
+  // A raw passthrough of the server's sourceCaveInfoWire projection, so SourceCaveInfo's
+  // `modules` field (the ordered module-type sequence render stacks interiors from)
+  // rides for free once the wire projection includes it: no per-field decode here.
+  private mirroredSourceCaveInfo: SourceCaveInfo | null = null;
   companionState: DelveCompanionInfo | null = null;
   // Active procedural Rift floor, rebuilt from the riftState event (no snapshot
   // field). The renderer regenerates geometry/style from this descriptor.
@@ -2737,6 +2745,7 @@ export class ClientWorld implements IWorld {
         if (e.kind === 'player') this.rememberFlair(e.name, e.aiAccount, streamerLinks);
         e.scale = w.sc ?? 1;
         e.color = w.c ?? 0xffffff;
+        e.visualKey = typeof w.vk === 'string' ? w.vk : null; // per-Sim mob model override (render-only)
         e.dungeonId = w.dgn ?? null;
         e.riftTier = typeof w.rt === 'string' ? (w.rt as RiftTier) : undefined; // rift rank badge
         e.objectItemId = w.obj ?? null;
@@ -3369,6 +3378,7 @@ export class ClientWorld implements IWorld {
       if (s.lrollg !== undefined) this.lootRollGroup = s.lrollg ?? [];
       if (s.mloot !== undefined) this.masterLootPrompts = s.mloot ?? [];
       if (s.drun !== undefined) this.delveRun = s.drun;
+      if (s.scave !== undefined) this.mirroredSourceCaveInfo = s.scave;
       if (s.dcompanion !== undefined) this.companionState = s.dcompanion;
       if (s.dmarks !== undefined) this.delveMarks = s.dmarks ?? 0;
       if (s.dcomp !== undefined) this.companionUpgrades = s.dcomp ?? {};
@@ -4806,6 +4816,9 @@ export class ClientWorld implements IWorld {
       if (msRemaining > 0) out.push({ id, msRemaining });
     }
     return out;
+  }
+  sourceCaveInfo(): SourceCaveInfo | null {
+    return this.mirroredSourceCaveInfo;
   }
   // --- IWorldDelves: delve enter/leave + interact + companion-upgrade + Marks-vendor
   // buy + lockpick lifecycle + chest collect. delveShopOffers is a pure client read

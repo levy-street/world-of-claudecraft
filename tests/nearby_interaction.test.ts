@@ -309,6 +309,58 @@ describe('tryNearbyInteraction', () => {
     expect(dead.calls).toEqual(['error:nothing']);
   });
 
+  it('lets a ghost press interact at the Source Cave well to run its corpse', () => {
+    // The well is the one INTERACT-ONLY dungeon entrance (its banter gate makes
+    // the walk-in trigger skip it while alive), and the sim routes a released
+    // spirit's well interact straight through to re-entry. The interact KEY must
+    // therefore see it as a candidate, the same narrow exception the spirit
+    // healer already gets on the npc arm just below the object arm.
+    const well = entity({
+      id: 2,
+      kind: 'object',
+      templateId: 'dungeon_door',
+      dungeonId: 'source_cave',
+      lootable: true,
+    });
+    const r = rig([well]);
+    r.player.dead = true;
+    r.player.ghost = true;
+    expect(interact(r)).toBe(true);
+    expect(r.calls).toEqual(['interact']);
+  });
+
+  it('keeps the well shut to a dead but unreleased player', () => {
+    const well = entity({
+      id: 2,
+      kind: 'object',
+      templateId: 'dungeon_door',
+      dungeonId: 'source_cave',
+      lootable: true,
+    });
+    const r = rig([well]);
+    r.player.dead = true;
+    expect(interact(r)).toBe(false);
+    expect(r.calls).toEqual(['error:nothing']);
+  });
+
+  it("ignores the cave's other gated objects for a ghost", () => {
+    // Only the well: the sim's dead branch honours portals and refuses the
+    // reboot button and the reward chest, so surfacing them here would just buy
+    // a server refusal.
+    for (const templateId of [
+      'source_cave_reboot',
+      'source_cave_chest_sealed',
+      'source_cave_chest',
+    ]) {
+      const object = entity({ id: 2, kind: 'object', templateId, lootable: true });
+      const r = rig([object]);
+      r.player.dead = true;
+      r.player.ghost = true;
+      expect(interact(r), templateId).toBe(false);
+      expect(r.calls, templateId).toEqual(['error:nothing']);
+    }
+  });
+
   it('returns false and shows feedback when there is no eligible target', () => {
     const r = rig();
 

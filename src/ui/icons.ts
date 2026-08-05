@@ -2934,6 +2934,21 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
 };
 
 const ITEM_RECIPES: Record<string, IconRecipe> = {
+  // The Source Cave guaranteed rares. Maintainer's Crown needs an explicit
+  // cloth recipe because its agreed name carries no material keyword for the
+  // generic armor fallback.
+  conflictbreaker_breastplate: r('steel', 'steel', [
+    { p: 'chestplate', pal: 'steel' },
+    { p: 'bolt', ...BR },
+  ]),
+  cherry_pickers_gauntlets: r('leather', 'leafGreen', [
+    { p: 'gauntlet', pal: 'leather' },
+    { p: 'leaf', ...TR },
+  ]),
+  maintainers_crown: r('cloth', 'gold', [
+    { p: 'helm', pal: 'gold' },
+    { p: 'sigil_rune', ...BR },
+  ]),
   // Bags (+ the implicit backpack the bag bar shows). All six now ship painted art
   // (ITEM_IMAGE_IDS / UI_ITEM_IMAGE_IDS below), which iconDataUrl prefers; these recipes
   // stay as the drawn fallback. Palettes step up with the quality tier so the bag reads
@@ -4527,6 +4542,11 @@ export const DEED_ART_PENDING: ReadonlySet<string> = new Set([
   // the deed_cat_chronicle crest until their commissioned art lands.
   'chr_drakemaw_broodlord',
   'chr_maw_matriarch',
+  // The Open Source's three hidden deeds: 'hidden' has no painted crest of its own
+  // either, so all three fall back to their procedural category crest until art lands.
+  'hid_source_cave_cleared',
+  'hid_source_cave_unbroken',
+  'hid_source_cave_arsenal',
 ]);
 /** Static URL of a deed crest's painted art, or null when the crest id has no committed image. */
 export function deedImageUrl(crestId: string): string | null {

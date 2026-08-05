@@ -28,7 +28,7 @@ function fakeCtx(rollResult: boolean, nearby: any[] = []) {
 }
 
 function ent(id: number, mainhandItemId: string | null, level = 20): any {
-  return { id, dead: false, mainhandItemId, level, pos: { x: 0, y: 0, z: 0 } };
+  return { id, kind: 'player', dead: false, mainhandItemId, level, pos: { x: 0, y: 0, z: 0 } };
 }
 
 const fire = (ctx: any, wielder: any, target: any, trigger: WeaponProcTrigger) =>
@@ -46,6 +46,14 @@ describe('runWeaponProcs: determinism / parity safety', () => {
     const { ctx, rolls } = fakeCtx(true);
     fire(ctx, ent(1, null), ent(2, null), 'weaponHit');
     expect(rolls()).toBe(0);
+  });
+
+  it('draws NO rng for non-player wielders with a rendered weapon', () => {
+    const { ctx, rolls, calls } = fakeCtx(true);
+    const mob = { ...ent(1, 'kingsbane_last_oath'), kind: 'mob' };
+    fire(ctx, mob, ent(2, null), 'weaponHit');
+    expect(rolls()).toBe(0);
+    expect(calls.length).toBe(0);
   });
 
   it('draws NO rng when the target is already dead', () => {

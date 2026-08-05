@@ -887,7 +887,10 @@ function isPidResolvable(ctx: SimContext, pid: number): boolean {
 
 function returnLootRollItemToCorpse(ctx: SimContext, roll: PendingLootRoll): void {
   const mob = ctx.entities.get(roll.mobId);
-  if (!mob?.dead) return;
+  // A roll can also hang off a lootable ground object (the Source Cave reward
+  // chest, the one object that reaches awardSharedLootItem): a live object is a
+  // valid return target, unlike a live mob.
+  if (!mob || (!mob.dead && mob.kind !== 'object')) return;
   if (!mob.loot) mob.loot = { copper: 0, items: [] };
   const existing = mob.loot.items.find(
     (slot) => slot.openToAll && slot.itemId === roll.itemId && !slot.personalFor,

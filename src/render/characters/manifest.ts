@@ -169,6 +169,25 @@ const kaykit = (attack: string[], idle = 'Idle'): ClipMap => ({
   emote: KAYKIT_EMOTES,
 });
 
+// The Source Cave's contributor rigs ship a TRIMMED KayKit clip set (15 of the
+// 25 the full player rigs carry): no Walking_Backwards, no Block, no
+// Spellcast_Raise, no strafe or diagonal-slice clips. Naming a clip the GLB does
+// not carry fails silently (baseAction falls back, one-shots return early), so
+// spell out the two differences instead of inheriting them: drop walkBack, and
+// re-source the only two emote chains whose every clip is missing here.
+// tests/character_clipmaps.test.ts is the gate that proves this against the GLB.
+const kaykitTrimmed = (attack: string[]): ClipMap => {
+  const { walkBack: _walkBack, ...base } = kaykit(attack);
+  return {
+    ...base,
+    emote: {
+      ...KAYKIT_EMOTES,
+      question: { clips: ['Spellcasting', 'Spellcast_Shoot'], timeScale: 1.15 },
+      salute: { clips: ['Spellcast_Shoot', 'Cheer'], timeScale: 1.18 },
+    },
+  };
+};
+
 const skeletonClips = (attack: string[], flourish = 'Skeletons_Awaken_Standing'): ClipMap => ({
   ...kaykit(attack, 'Idle_Combat'),
   flourish,
@@ -435,6 +454,17 @@ const TOLLING_BELL: ClipMap = {
   run: 'Roll',
   attack: [],
   death: 'Idle',
+};
+
+const DEV_MOBS: ClipMap = {
+  idle: 'Idle',
+  walk: 'Walk',
+  run: 'Run',
+  attack: ['Attack'],
+  hit: ['Hit'],
+  cast: 'Cast',
+  jump: 'Jump',
+  death: 'Death',
 };
 
 // ---------------------------------------------------------------------------
@@ -1721,6 +1751,44 @@ export const VISUALS: Record<string, VisualDef> = {
     tint: 'entity',
     tintStrength: 0.3,
   },
+  dev_noob: {
+    url: `${ENEMIES}/dev_noob.glb`,
+    height: HUMANOID_H,
+    clips: DEV_MOBS,
+    tint: 0xff23d3,
+    tintStrength: 0.25,
+    yaw: -Math.PI / 2,
+  },
+  dev_gamer: {
+    url: `${ENEMIES}/dev_gamer.glb`,
+    height: HUMANOID_H,
+    clips: DEV_MOBS,
+    tint: 'entity',
+    tintStrength: 0.25,
+    yaw: -Math.PI / 2,
+  },
+  dev_hacker: {
+    url: `${ENEMIES}/dev_hacker.glb`,
+    height: HUMANOID_H,
+    clips: DEV_MOBS,
+    yaw: -Math.PI / 2,
+  },
+  coder_hunter: {
+    url: `${ENEMIES}/coder_hunter.glb`,
+    height: HUMANOID_H,
+    clips: kaykitTrimmed(['1H_Melee_Attack_Chop']),
+    attach: [{ url: `${WEAPONS}/commit_blade_sword.glb`, bone: 'handslot.r' }],
+    weaponSlots: [0],
+    yaw: -Math.PI / 2,
+  },
+  hacker_druid: {
+    url: `${ENEMIES}/hacker_druid.glb`,
+    height: HUMANOID_H,
+    clips: kaykitTrimmed(['1H_Melee_Attack_Chop']),
+    attach: [{ url: `${WEAPONS}/bug_squasher_hammer.glb`, bone: 'handslot.r' }],
+    weaponSlots: [0],
+    yaw: -Math.PI / 2,
+  },
 
   // -- NPCs ------------------------------------------------------------------
   npc_knight: {
@@ -2106,6 +2174,9 @@ export function visualKeyFor(e: Entity): string {
     return VISUALS[`player_${e.templateId}`] ? `player_${e.templateId}` : 'player_warrior';
   }
   if (e.kind === 'mob') {
+    // Per-Sim synthesized mobs (e.g. Source Cave contributor mobs) have no static
+    // MOBS/MOB_KEYS entry to dispatch on; their template pins the key directly.
+    if (e.visualKey) return e.visualKey;
     const override = MOB_KEYS[e.templateId];
     if (override) return override;
     const family = MOBS[e.templateId]?.family;

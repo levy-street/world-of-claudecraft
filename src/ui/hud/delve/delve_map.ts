@@ -137,7 +137,11 @@ export function delveCanvasScales(
   const polyMaxAbsX = polyPoints?.length
     ? polyPoints.reduce((m, p) => Math.max(m, Math.abs(p.x)), 0)
     : null;
-  const halfWidth = polyMaxAbsX ?? litany?.wallX ?? 23;
+  // layout.wallX is a general DungeonLayout override for oversized rooms (e.g. the
+  // Source Cave's square arena at 70, vs the classic crypt width the 23 default
+  // targets); a non-litany layout that sets it must not fall through to 23, or
+  // anything wider than the classic width (pillars, walls, dais) maps off-canvas.
+  const halfWidth = polyMaxAbsX ?? litany?.wallX ?? layout.wallX ?? 23;
   return {
     sx: (canvasSize - pad * 2) / (halfWidth * 2),
     sz: (canvasSize - pad * 2) / (layout.zMax - layout.zMin),
@@ -249,9 +253,14 @@ export function delveSchematicStatic(
     return prims;
   }
 
-  // Floor background rect (the full room footprint)
-  const topLeft = delveLocalToCanvas(-23, layout.zMin, layout, canvasSize, pad);
-  const botRight = delveLocalToCanvas(23, layout.zMax, layout, canvasSize, pad);
+  // Floor background rect (the full room footprint). floorHalfX (when authored)
+  // is the floor's own inset extent; otherwise fall back to the same halfWidth
+  // the canvas scale itself resolved to, so the floor always matches the room
+  // width pillars/walls/dais are drawn at (see delveCanvasScales).
+  const { halfWidth, sx } = delveCanvasScales(layout, canvasSize, pad);
+  const floorHalfX = layout.floorHalfX ?? halfWidth;
+  const topLeft = delveLocalToCanvas(-floorHalfX, layout.zMin, layout, canvasSize, pad);
+  const botRight = delveLocalToCanvas(floorHalfX, layout.zMax, layout, canvasSize, pad);
   prims.push({
     kind: 'rect',
     x: Math.min(topLeft.cx, botRight.cx),
@@ -297,7 +306,7 @@ export function delveSchematicStatic(
   // Wall stubs
   for (const s of layout.stubs) {
     const { cx, cy } = delveLocalToCanvas(s.x, s.z, layout, canvasSize, pad);
-    const sw = ((s.hw * 2) / 46) * (canvasSize - pad * 2);
+    const sw = s.hw * 2 * sx;
     const sh = ((s.hd * 2) / (layout.zMax - layout.zMin)) * (canvasSize - pad * 2);
     prims.push({
       kind: 'rect',

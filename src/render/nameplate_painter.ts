@@ -11,9 +11,21 @@ import {
   type QuestMarkerKind,
   strongerQuestMarker,
 } from '../sim/quests/quest_marker_kind';
+import {
+  isSourceCaveMobEntity,
+  SOURCE_CAVE_REBOOT_TEMPLATE,
+  type SourceCaveMobRankEntry,
+  sourceCaveMobRankForTemplate,
+} from '../sim/source_cave';
 import { type Entity, GATHER_CAST_ID } from '../sim/types';
 import { deedTitleText } from '../ui/deed_i18n';
-import { devTierBadgeDataUrl, devTierByIndex, devTierNameOutlineColor } from '../ui/dev_tier';
+import {
+  devTierBadgeDataUrl,
+  devTierByIndex,
+  devTierByKey,
+  devTierDisplayName,
+  devTierNameOutlineColor,
+} from '../ui/dev_tier';
 import { discordRoleTagLabel } from '../ui/discord_role_tag';
 import { tEntity } from '../ui/entity_i18n';
 import { holderTierBadgeDataUrl, holderTierByIndex } from '../ui/holder_tier';
@@ -38,10 +50,25 @@ import {
 import { type NameplatePlan, nameplatePlanInto, newNameplatePlan } from './nameplate_view';
 import { FRIENDLY, isFriendlyPet, mobNameColor } from './reaction';
 import type { EntityView } from './renderer';
+import {
+  type SourceCaveMarkerRole,
+  type SourceCaveNameplateRows,
+  sourceCaveNameplateRows,
+} from './source_cave_nameplate_core';
 
 const NAMEPLATE_LEVEL_NUMBER_OPTIONS = { maximumFractionDigits: 0 } as const;
 const HOLDER_BADGE_URLS = new Map<number, string>();
 const DEV_BADGE_URLS = new Map<number, string>();
+
+// The cave core stays DOM-free and names the marker's owner; the canvas tone
+// (and with it the bronze/silver/gold tint) is resolved here.
+const CAVE_MARKER_TONES: Record<SourceCaveMarkerRole, NameplateMarkerTone> = {
+  '': 'none',
+  loot: 'loot',
+  runesmith: 'sc-runesmith',
+  architect: 'sc-architect',
+  worldwright: 'sc-worldwright',
+};
 
 const emoteIconUrl = (id: string): string => `/ui/emotes/emote-${id}.png`;
 
@@ -138,6 +165,11 @@ export class NameplatePainter {
     questsDone: ReadonlySet<string>;
     cadenceBlocked: ReadonlySet<string> | undefined;
   } | null = null;
+  // The Source Cave roster, resolved lazily only when a visible cave mob needs
+  // it and retained for the rest of the pass (sourceCaveInfo() rebuilds the
+  // roster on the offline Sim). Dropped at every full pass like the quest
+  // markers above, so a cave reboot's re-ranked roster reaches the plates.
+  private sourceCaveMobsCtx: { mobs: readonly SourceCaveMobRankEntry[] | undefined } | null = null;
 
   constructor(deps: NameplatePainterDeps) {
     this.views = deps.views;
@@ -171,10 +203,17 @@ export class NameplatePainter {
     const showNameplates = this.showNameplates();
     const showDevBadges = this.showDevBadges();
     const showOwnNameplate = this.showOwnNameplate();
+    // Resolve the roster lazily only if a visible cave mob needs it, then retain
+    // it for the rest of this pass. Offline sourceCaveInfo() rebuilds the roster.
+    let sourceCaveMobs: readonly SourceCaveMobRankEntry[] | undefined;
+    const sourceCaveMobsRead = false;
     const showPlayerNameplates = this.showPlayerNameplates();
     // Drop the quest-marker snapshot at every full pass so it re-resolves
     // lazily below; throttled passes reuse it (see the field's rationale).
-    if (fullPass) this.questMarkerCtx = null;
+    if (fullPass) {
+      this.questMarkerCtx = null;
+      this.sourceCaveMobsCtx = null;
+    }
 
     for (const [id, view] of this.views) {
       const entity = world.entities.get(id);
@@ -311,6 +350,7 @@ export class NameplatePainter {
     state.emoteIconUrl = '';
     state.emoteLabel = '';
     state.friendlyPet = false;
+    state.warning = false;
 
     const raidMark = this.world.markerFor(entity.id);
     if (raidMark !== null) state.raidMarkerUrl = raidMarkerDataUrl(raidMark);
@@ -332,7 +372,19 @@ export class NameplatePainter {
     if (entity.kind === 'object') {
       state.badges.length = 0;
       state.name = objectDisplayName(entity);
-      state.nameColor = '#c084ff';
+      // Dungeon doorways announce themselves in the object purple. The Source
+      // Cave reboot button reads in the hostile red (reaction.ts's
+      // 3+-levels-above con color) and takes the oversized outlined warning
+      // treatment instead, so the call-out is legible at interaction range
+      // (user report: unreadable at 12px). The cave's sealed exit portal
+      // (nameplate_view unhides it only while sealed) carries the same.
+      const isRebootButton = entity.templateId === SOURCE_CAVE_REBOOT_TEMPLATE;
+      const isSealedCaveExit =
+        entity.templateId === 'dungeon_exit' &&
+        entity.dungeonId === 'source_cave' &&
+        !entity.lootable;
+      state.warning = isRebootButton || isSealedCaveExit;
+      state.nameColor = state.warning ? '#ff4444' : '#c084ff';
       return;
     }
 
@@ -413,20 +465,58 @@ export class NameplatePainter {
       return;
     }
 
-    const template = MOBS[entity.templateId];
-    const elite = !!template?.elite;
-    const boss = !!template?.boss;
+    // Source Cave contributor mobs can carry custom display names, but their
+    // synthetic template id still anchors the GitHub login. The shared resolver
+    // correlates it against the same roster the cave HUD reads.
+    let elite: boolean;
+    let boss: boolean;
+    let mobName: string;
+    let caveRows: SourceCaveNameplateRows | null = null;
+    if (isSourceCaveMobEntity(entity)) {
+      if (!this.sourceCaveMobsCtx) {
+        this.sourceCaveMobsCtx = { mobs: this.world.sourceCaveInfo()?.mobs };
+      }
+      const rank = sourceCaveMobRankForTemplate(entity.templateId, this.sourceCaveMobsCtx.mobs);
+      elite = rank.elite;
+      boss = rank.boss;
+      mobName = entity.name;
+      caveRows = sourceCaveNameplateRows({
+        hostile: entity.hostile,
+        dead: entity.dead,
+        lootable: entity.lootable,
+        combatant: rank.combatant,
+        elite: rank.elite,
+        boss: rank.boss,
+        combatTier: rank.combatTier,
+      });
+      // The tribute-phase subtitle rides the same row as a player's deed title:
+      // the contributor's own merged-PR rung, resolved here because the core
+      // stays i18n-free. An unranked or unknown rung yields '' and stays hidden.
+      const tierRung = caveRows.showTitle ? devTierByKey(rank.tier) : null;
+      state.title = tierRung ? devTierDisplayName(tierRung) : '';
+    } else {
+      const template = MOBS[entity.templateId];
+      elite = !!template?.elite;
+      boss = !!template?.boss;
+      mobName = entity.ownerId !== null ? entity.name : mobDisplayName(entity.templateId);
+    }
     state.friendlyPet = isFriendlyPet(entity, this.world.entities, this.isHostilePlayer);
-    const mobName = entity.ownerId !== null ? entity.name : mobDisplayName(entity.templateId);
     state.name = entity.dead ? t('worldContent.corpseName', { name: mobName }) : mobName;
     state.nameColor = '#fff';
-    state.level = entity.dead
-      ? ''
-      : t(elite ? 'hudChrome.nameplate.mobEliteLevel' : 'hudChrome.nameplate.mobLevel', {
+    const showLevel = caveRows ? caveRows.showLevel : !entity.dead;
+    state.level = showLevel
+      ? t(elite ? 'hudChrome.nameplate.mobEliteLevel' : 'hudChrome.nameplate.mobLevel', {
           level: formatNumber(entity.level, NAMEPLATE_LEVEL_NUMBER_OPTIONS),
-        });
+        })
+      : '';
     state.levelColor = mobNameColor(entity.level - player.level, entity.dead, state.friendlyPet);
     state.hpVisible = !entity.dead;
+    if (caveRows) {
+      state.marker = caveRows.marker;
+      state.markerTone = CAVE_MARKER_TONES[caveRows.markerRole];
+      state.frame = caveRows.frame;
+      return;
+    }
     state.marker = entity.lootable ? '$' : elite && !entity.dead ? '◆' : '';
     state.markerTone = state.marker ? 'loot' : 'none';
     state.frame = entity.dead ? '' : boss ? 'boss' : elite ? 'elite' : '';

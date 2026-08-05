@@ -51,6 +51,9 @@ import { instancePlayerIds } from '../rift/runs';
 // The helper that CONSTRUCTS one lives in mob/idle_rng.ts.
 import type { Rng } from '../rng';
 import type { SimContext } from '../sim_context';
+import { isSourceCaveRebootSafeTarget } from '../source_cave/reboot';
+import { isSourceCaveMobEntity } from '../source_cave/runtime';
+import { updateSourceCaveIdleWander } from '../source_cave/wander';
 import { clearThreat, hasEscapeStealth, stealthDetectionRadius } from '../threat';
 import {
   type Aura,
@@ -89,6 +92,7 @@ import {
   resetMechanicSpacing,
   tickMechanicSpacing,
 } from './mechanic_spacing';
+import { mobTemplateOf } from './mob_template';
 import {
   impairedZoneFuseMult,
   openRiftEscapeWindow,
@@ -278,6 +282,27 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
     return;
   }
 
+  const isSourceCaveMob = isSourceCaveMobEntity(mob);
+  // Source Cave contributors deliberately start friendly. While the centre
+  // reboot button is still active they cannot enter the normal proximity-aggro
+  // path; they amble a short leash around their own ring seat so the roster
+  // reads as alive without dissolving the rings. This branch must precede the
+  // generic non-hostile safety net.
+  if (isSourceCaveMob && !mob.hostile) {
+    mob.aiState = 'idle';
+    mob.inCombat = false;
+    mob.aggroTargetId = null;
+    clearThreat(mob);
+    updateSourceCaveIdleWander(ctx, mob);
+    return;
+  }
+  // Rebooted-but-dormant contributors: the encounter driver has already marched
+  // them toward the encirclement ring this tick (source_cave/encounter.ts, runs
+  // before mob AI), and acquisition belongs to the seal, breach, and cohort-wake
+  // rules, so they skip the generic idle wander and proximity-aggro scan. Active
+  // cave mobs are never idle here: the driver re-engages them each tick.
+  if (isSourceCaveMob && mob.aiState === 'idle') return;
+
   // Self-healing safety net (#113/#99): every mob spawns hostile and only
   // taming clears that (which always assigns an owner). A live, owner-less,
   // non-hostile mob is therefore a leak — exactly the "immortal, invalid
@@ -386,7 +411,9 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
         if (detected) ctx.aggroMob(mob, detected, true);
         return;
       }
-      const template = MOBS[mob.templateId];
+      // Source Cave mobs use a synthetic templateId never merged into MOBS (state.md
+      // D2); the shared mobTemplateOf fallback (mob/mob_template.ts) resolves them.
+      const template = mobTemplateOf(ctx, mob);
       let detected: Entity | null = null;
       let detectedD = Infinity;
       // Resolved once per scan, not per candidate (same reason as the boss branch).
@@ -394,7 +421,9 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
       ctx.playerGrid.forEachInRadius(mob.pos.x, mob.pos.z, MAX_AGGRO_RADIUS, (e, d2) => {
         counters.aggroScanPlayerVisits++;
         if (e.dead) return;
-        if (isTrivialTo(mob, e)) return;
+        if (!template) return;
+        if (isSourceCaveMob && isSourceCaveRebootSafeTarget(ctx, mob, e)) return;
+        if (isTrivialTo(ctx, mob, e)) return;
         let radius = Math.max(
           4,
           Math.min(MAX_AGGRO_RADIUS, template.aggroRadius + (mob.level - e.level) * 1.5),
@@ -412,6 +441,13 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
       });
       if (detected) {
         ctx.aggroMob(mob, detected, true);
+        break;
+      }
+      // Rebooted contributors keep ambling their tight ring leash while
+      // unengaged (user decision: they never freeze); the 1-3u leash keeps the
+      // encirclement readable, unlike the generic 2-9u wander below.
+      if (isSourceCaveMob) {
+        updateSourceCaveIdleWander(ctx, mob);
         break;
       }
       mob.wanderTimer -= DT;

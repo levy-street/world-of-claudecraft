@@ -19,7 +19,6 @@
 // (enforced by tests/architecture.test.ts). threat.ts/types.ts/data are imported
 // directly (already pure); only `entities` + the Nythraxis helpers route via the seam.
 
-import { MOBS } from '../data';
 import { combatProfileForMob } from '../mob_combat';
 import type { SimContext } from '../sim_context';
 import {
@@ -30,6 +29,7 @@ import {
 } from '../threat';
 import type { Entity } from '../types';
 import { DT, dist2d, MELEE_RANGE } from '../types';
+import { mobTemplateOf } from './mob_template';
 
 // Classic "trivial con" gap: a wild mob this far below the player's level stops
 // auto-aggroing from proximity. Moved with isTrivialTo (its only reader).
@@ -41,7 +41,9 @@ const MAX_AGGRO_RADIUS = 20;
 
 function mobCanSeeTarget(ctx: SimContext, mob: Entity, target: Entity): boolean {
   if (target.kind !== 'player') return true;
-  const template = MOBS[mob.templateId];
+  // Resolved through mobTemplateOf so a Source Cave synthetic template (never
+  // merged into the static MOBS table) keeps its authored aggro radius here.
+  const template = mobTemplateOf(ctx, mob);
   const baseRadius =
     Math.max(
       4,
@@ -202,8 +204,13 @@ export function updateVossTarget(ctx: SimContext, mob: Entity): void {
 
 // Classic "trivial con": a wild mob far below the player's level stops
 // auto-aggroing from proximity. Elites, rares, and bosses are never trivial.
-export function isTrivialTo(mob: Entity, player: Entity): boolean {
-  const template = MOBS[mob.templateId];
+//
+// Source Cave mobs carry a synthetic, per-Sim templateId (`source_cave_<login>`)
+// deliberately never merged into the static MOBS table (state.md D2/Phase 2), so
+// they resolve through the shared mobTemplateOf fallback (mob/mob_template.ts).
+export function isTrivialTo(ctx: SimContext, mob: Entity, player: Entity): boolean {
+  const template = mobTemplateOf(ctx, mob);
+  if (!template) return false;
   if (template.elite || template.rare || template.boss) return false;
   return player.level - mob.level >= TRIVIAL_LEVEL_GAP;
 }

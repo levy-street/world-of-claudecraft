@@ -43,6 +43,7 @@ import type {
 import type { CardDuelMatch } from './social/card_duel';
 import type { FinderFormationUnit } from './social/party';
 import type { VcState } from './social/vale_cup';
+import type { SourceCaveRuntime } from './source_cave/runtime';
 import type { SpatialGrid } from './spatial';
 import type {
   AbilityDef,
@@ -134,6 +135,10 @@ export interface SimContextPrimitives {
   // reads/finds/iterates it and mutates slot fields in place; the array identity
   // stays Sim-owned (like delayedEvents/groundAoEs), so this is a live read-only view.
   readonly instances: InstanceSlot[];
+  // The runtime Source Cave dungeon (Phase 2), generated once in the Sim ctor from
+  // the injected roster (or the placeholder). A live read-only view; the cave engine
+  // (source_cave/dungeon.ts) reads the spec/templates/def through it.
+  readonly sourceCave: SourceCaveRuntime | null;
   // Session-only manual-reset cooldowns keyed by durable character identity and
   // dungeon id. Unlike party instance keys, these survive relogs and party reforming.
   readonly dungeonResetLocks: Map<string, { availableAt: number; claimId: number }>;
@@ -174,7 +179,11 @@ export interface SimContextPrimitives {
   // temporary host-owned tick profiler probe), and `respawnSeconds` stays
   // possibly-undefined so respawn_policy.ts can tell an explicit host-pinned
   // global base from "fall through to the zone tier"; the rest defaulted.
-  readonly cfg: Required<Omit<SimConfig, 'noPlayer' | 'world' | 'perfLap' | 'respawnSeconds'>> &
+  // `sourceCaveRoster` is dropped entirely: the ctor reads it once off the raw
+  // SimConfig to build the runtime cave, and nothing reads it per tick.
+  readonly cfg: Required<
+    Omit<SimConfig, 'noPlayer' | 'world' | 'perfLap' | 'respawnSeconds' | 'sourceCaveRoster'>
+  > &
     Pick<SimConfig, 'world' | 'perfLap' | 'respawnSeconds'>;
   // Per-Sim key for the rift collision registry in colliders.ts (rift/runs.ts
   // registers regions under it, rift-aware collision reads pass it). Per INSTANCE,
@@ -1059,6 +1068,9 @@ export function createSimContext(host: SimContextHost): SimContext {
     },
     get instances() {
       return host.instances;
+    },
+    get sourceCave() {
+      return host.sourceCave;
     },
     get dungeonResetLocks() {
       return host.dungeonResetLocks;

@@ -3365,6 +3365,7 @@ const ALL_DELTA_KEYS = [
   'qlog',
   'renown',
   'salv',
+  'scave',
   'sport',
   'stats',
   'tal',
@@ -3442,6 +3443,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   rtype: 'resourceType',
   rxp: 'restedXp',
   salv: 'lastSalvageResult',
+  scave: 'sourceCaveInfo',
   sport: 'sportRole',
   tfocus: 'townFocus',
   tslot: 'toolEffectSlots',
@@ -4202,9 +4204,9 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 64 unique keys in sorted order', () => {
-    expect(ALL_DELTA_KEYS).toHaveLength(64); // +1: guildBank (Guild Bank Phase 2)
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(64);
+  it('ALL_DELTA_KEYS contains exactly 65 unique keys in sorted order', () => {
+    expect(ALL_DELTA_KEYS).toHaveLength(65); // +1: guildBank, +1: scave (Source Cave)
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(65);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -4226,8 +4228,9 @@ describe('delta-key contract pins (anti-drift)', () => {
     // The base-merge union: v0.31's 56 (incl. the market-collect key mktU) plus
     // the Rift + mounts and worn-instance keys (einst, mntRtd and the rift
     // snapshot fragments) for 61, then v0.32's master-loot key mloot for 62,
-    // plus the packet's slotted-tool-effects key tslot for 63.
-    expect(scraped.size).toBe(64); // +1: guildBank (Guild Bank Phase 2)
+    // plus the packet's slotted-tool-effects key tslot for 63, guildBank for 64,
+    // and this branch's Source Cave fragment (scave) for 65.
+    expect(scraped.size).toBe(65);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

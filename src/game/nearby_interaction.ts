@@ -1,4 +1,9 @@
 import {
+  isSourceCaveBanterTarget,
+  isSourceCaveGatedObject,
+  isSourceCaveWell,
+} from '../sim/source_cave';
+import {
   dist2d,
   type Entity,
   type GatherNodeDef,
@@ -35,6 +40,7 @@ export interface NearbyInteractionWorld {
   harvestCorpse(id: number): void;
   delveInteract(id: number): InteractionOutcome;
   enterDungeon(dungeonId: string): InteractionOutcome;
+  interact(): void;
   leaveDungeon(): InteractionOutcome;
   pickUpObject(id: number): InteractionOutcome;
   nodeHarvestableByMe(nodeId: string): boolean;
@@ -84,6 +90,8 @@ export function tryNearbyInteraction(
   let bestDelveDistance = INTERACT_RANGE + 1;
   let bestNode: NearbyGatherNode | null = null;
   let bestNodeDistance = INTERACT_RANGE;
+  let bestBanterMob: number | null = null;
+  let bestBanterDistance = INTERACT_RANGE;
 
   if (!player.dead) {
     for (const node of gatherNodes) {
@@ -117,11 +125,27 @@ export function tryNearbyInteraction(
         bestDelve = entity.id;
         bestDelveDistance = distance;
       }
-    } else if (!player.dead && entity.kind === 'object' && entity.lootable) {
+    } else if (
+      entity.kind === 'object' &&
+      entity.lootable &&
+      // A released spirit keeps one object: the Source Cave's well. Every other
+      // dungeon door has a walk-in trigger, so the well is the only entrance a
+      // ghost cannot reach without this, which strands it outside its own corpse.
+      // The npc arm below carries the same shape for the spirit healer.
+      (!player.dead || (player.ghost && isSourceCaveWell(entity)))
+    ) {
       if (distance <= objectInteractionRange(entity) && distance < bestObjectDistance) {
         bestObject = entity.id;
         bestObjectDistance = distance;
       }
+    }
+    if (
+      entity.kind === 'mob' &&
+      isSourceCaveBanterTarget(entity) &&
+      distance < bestBanterDistance
+    ) {
+      bestBanterMob = entity.id;
+      bestBanterDistance = distance;
     }
     if (entity.kind === 'npc' && distance < bestNpcDistance) {
       const isGhostHealer = entity.templateId === 'spirit_healer' && player.ghost;
@@ -152,6 +176,13 @@ export function tryNearbyInteraction(
   if (bestObject !== null) {
     const object = world.entities.get(bestObject);
     if (!object) return false;
+    // The Source Cave's well entry and its chest/button are server-gated:
+    // send the generic interact command and let the sim's dispatch decide
+    // (banter gate, sealed-chest deny), never a direct enter/pickup.
+    if (isSourceCaveGatedObject(object)) {
+      world.interact();
+      return true;
+    }
     if (object.templateId === 'dungeon_door' && object.dungeonId) {
       return world.enterDungeon(object.dungeonId);
     } else if (object.templateId === 'dungeon_exit') {
@@ -198,6 +229,12 @@ export function tryNearbyInteraction(
       nodeToolGateFor?.(bestNode),
       effectConfirm,
     );
+  }
+  if (bestBanterMob !== null) {
+    // Friendly Source Cave contributor: the generic interact command answers
+    // with a random banter line (source_cave/mob_banter.ts).
+    world.interact();
+    return true;
   }
   // The away line is a LAST resort that only replaces the generic
   // nothing-to-interact message: an absent escortee must never eat a press that

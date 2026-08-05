@@ -1,5 +1,10 @@
 import { isQuestGatedEntityHidden } from '../sim/quest_gated_entity';
 import {
+  isSourceCaveBanterTarget,
+  isSourceCaveGatedObject,
+  isSourceCaveWell,
+} from '../sim/source_cave';
+import {
   dist2d,
   EASTBROOK_NOTICEBOARD_INTERACTION_RADIUS,
   EASTBROOK_NOTICEBOARD_TEMPLATE_ID,
@@ -29,6 +34,7 @@ export interface PickInteractionWorld {
   targetEntity(id: number | null): void;
   interact(): void;
   enterDungeon(dungeonId: string): InteractionOutcome;
+  interact(): void;
   leaveDungeon(): InteractionOutcome;
   pickUpObject(id: number): InteractionOutcome;
   startAutoAttack(): void;
@@ -201,13 +207,29 @@ export function handlePickedEntity(
     // players: right-click only targets — the interaction menu lives on the
     // target portrait (right-click it), like classic-MMO unit frames
     if (e.kind === 'object') {
-      if (world.player.dead) {
+      // A released spirit keeps exactly one object interaction: the Source Cave's
+      // well. It is the only interact-only dungeon entrance (every other door has
+      // a walk-in trigger), so refusing the click here is what strands a ghost
+      // outside its own corpse. The sim's dead branch honours the same one case
+      // and refuses the rest of the cave's gated objects, so nothing else moves.
+      if (world.player.dead && !(world.player.ghost && isSourceCaveWell(e))) {
         hud.showError(tSim('error.cantWhileDead'));
         return false;
       }
       if (d > objectInteractionRange(e)) {
         hud.showError(t('questUi.errors.tooFar'));
         return false;
+      }
+      // The Source Cave's well gates entry behind a banter sequence
+      // (source_cave/well_banter.ts), a server decision: send the generic
+      // interact command and let interaction.ts's dispatch decide, rather than
+      // assuming "click the well -> enter" here. Every other dungeon door keeps
+      // entering immediately on click.
+      // The reward chest is server-gated too: sealed denies with a toast, while
+      // armed loots. pickUpObject would silently no-op on either form.
+      if (isSourceCaveGatedObject(e)) {
+        world.interact();
+        return true;
       }
       if (e.templateId === 'dungeon_door' && e.dungeonId) return world.enterDungeon(e.dungeonId);
       if (e.templateId === 'dungeon_exit') return world.leaveDungeon();
@@ -277,6 +299,15 @@ export function handlePickedEntity(
       const verdict = decideEscortPress(world.player.pos, world.entities, world.questLog);
       if (verdict.kind === 'none') return false;
       return handleEscortPress(world, hud, verdict, t('questUi.errors.escortAway'));
+    } else if (e.kind === 'mob' && isSourceCaveBanterTarget(e)) {
+      // Friendly Source Cave contributors chat back when spoken to; the sim
+      // command resolves the actual line (source_cave/mob_banter.ts).
+      if (d <= INTERACT_RANGE + 1) {
+        world.interact();
+        return true;
+      }
+      hud.showError(t('questUi.errors.tooFar'));
+      return false;
     } else if (
       isAttackableEntity(e, world.playerId ?? world.player.id, activePvpOpponentIds(world))
     ) {
@@ -291,12 +322,23 @@ export function handlePickedEntity(
   } else if (button === 0) {
     hud.closeContextMenu();
     if (e.kind === 'object') {
-      if (world.player.dead) {
+      // A released spirit keeps exactly one object interaction: the Source Cave's
+      // well. It is the only interact-only dungeon entrance (every other door has
+      // a walk-in trigger), so refusing the click here is what strands a ghost
+      // outside its own corpse. The sim's dead branch honours the same one case
+      // and refuses the rest of the cave's gated objects, so nothing else moves.
+      if (world.player.dead && !(world.player.ghost && isSourceCaveWell(e))) {
         hud.showError(tSim('error.cantWhileDead'));
         return false;
       }
       const d = dist2d(world.player.pos, e.pos);
       if (d > objectInteractionRange(e)) return false;
+      // See the right-click branch above: the well's entry and the cave
+      // chest/button are server-gated interactions.
+      if (isSourceCaveGatedObject(e)) {
+        world.interact();
+        return true;
+      }
       if (e.templateId === 'dungeon_door' && e.dungeonId) return world.enterDungeon(e.dungeonId);
       if (e.templateId === 'dungeon_exit') return world.leaveDungeon();
       if (e.templateId === 'mailbox') {
@@ -321,6 +363,14 @@ export function handlePickedEntity(
         )
           return false;
         hud.openLoot(id, screenX, screenY);
+        return true;
+      }
+    } else if (e.kind === 'mob' && isSourceCaveBanterTarget(e)) {
+      // Left-click talks to a friendly contributor too (mirrors the NPC arm:
+      // out of range it just targets, no error spam while exploring).
+      const d = dist2d(world.player.pos, e.pos);
+      if (d <= INTERACT_RANGE + 1) {
+        world.interact();
         return true;
       }
     } else if (e.kind === 'npc') {

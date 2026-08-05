@@ -3,9 +3,10 @@
 // A purely cosmetic honor ladder derived from how many pull requests a
 // contributor has had MERGED into the open-source game repo (the count comes
 // from GitHub's pulls API, filtered to merged, resolved server-side from a
-// verified GitHub-OAuth link). It grants NO gameplay power (the sim never
-// reads it, like holder/Discord tiers); it is flair for the player card,
-// nameplate, and inspect screen.
+// verified GitHub-OAuth link). It grants NO player gameplay power, like
+// holder/Discord tiers; it is flair for the player card, nameplate, and inspect
+// screen. The Source Cave separately reuses the same contributor tiers for its
+// tribute-mob profiles, without changing contributor player power.
 //
 // Merged PRs, not raw commits: a raw commit count (e.g. from GitHub's
 // /contributors stats) is gameable by splitting one contribution into many

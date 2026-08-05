@@ -75,6 +75,7 @@ import { inRangeStationTypes, stationTypesSignature } from '../sim/professions/s
 import { TIER_SKILL_STEP, tierForSkill } from '../sim/professions/wheel';
 import { type QuestObjectiveRef, questObjectivesForMob } from '../sim/quest_targets';
 import type { ResolvedAbility } from '../sim/sim';
+import { SOURCE_CAVE_WELL_BANTER_LINES } from '../sim/source_cave';
 import type {
   AbilityDef,
   CalendarResultCode,
@@ -554,6 +555,9 @@ import { localizeServerText } from './server_i18n';
 import { localizeSimText } from './sim_i18n';
 import { openSimpleMenu } from './simple_context_menu';
 import { SocialWindow } from './social_window';
+import { isSourceCaveMobEntity, sourceCaveMobRank } from './source_cave_mob_core';
+import { type SourceCaveProgressSeen, sourceCaveProgressEvent } from './source_cave_progress_view';
+import { localizeSourceCaveRebootYell } from './source_cave_reboot_yell';
 import { SpellbookWindow } from './spellbook_window';
 import { stanceBarView, WARRIOR_STANCE_GROUP } from './stance_bar_view';
 import {
@@ -581,7 +585,7 @@ import { targetAuraSourceName } from './target_auras_view';
 import { TargetAurasWindow } from './target_auras_window';
 import { targetOfTargetId } from './target_of_target';
 import { targetPortraitUrl } from './target_portrait_view';
-import { targetRankView, targetUsesEliteFrame } from './target_rank_view';
+import { type TargetRank, targetRankView, targetUsesEliteFrame } from './target_rank_view';
 import type { PresetId, ThemeKnob, ThemeState } from './theme';
 import { toolEffectNameKey } from './tool_effect_name';
 import { createTooltipLine } from './tooltip_line';
@@ -1262,6 +1266,11 @@ export class Hud {
   // top-center lines fed by the questProgress event, aria-hidden decoration
   // (the chat log + live region carry the announced copy).
   private readonly questBanner = new QuestProgressBanner($('#quest-banner'));
+  // The Source Cave kill-progress flash reuses the SAME generic banner instance
+  // (no cave-specific coupling in QuestProgressBanner itself); lastCaveProgressSeen
+  // is the change-detection baseline sourceCaveProgressEvent diffs against
+  // (source_cave_progress_view.ts), polled on the slowHud band.
+  private lastCaveProgressSeen: SourceCaveProgressSeen | null = null;
   private subzoneEl = $('#subzone-banner');
   private tooltipEl = $('#tooltip');
   // Which element last painted the shared #tooltip box, so a hovered slot can
@@ -8010,6 +8019,7 @@ export class Hud {
     this.lootRolls.update(now);
     if (slowHud) this.updateRaidLockoutBadge();
     if (slowHud) this.refreshDailyRewardsLauncher();
+    if (slowHud) this.updateSourceCaveProgressBanner(sim);
     this.maybeRestoreActionBarLayout();
     this.syncActiveHotbarForm();
     this.syncSlotMap(); // picks up newly learned abilities mid-session
@@ -8130,8 +8140,20 @@ export class Hud {
     // target instance. (Targeting a world object hides the frame, like no target.)
     const target = p.targetId !== null ? sim.entities.get(p.targetId) : null;
     if (target && target.kind !== 'object') {
+      // Source Cave contributor mobs carry no static MOBS template (their
+      // templateId is synthesized, D7), so MOBS[templateId]?.boss/.elite always
+      // read false for them; resolve their rank from the roster projection
+      // instead (source_cave_mob_core.ts), the SAME mechanism the nameplate
+      // painter uses so the two surfaces never disagree.
+      const caveRank = isSourceCaveMobEntity(target) ? sourceCaveMobRank(target, sim) : null;
       const targetTemplate = MOBS[target.templateId];
-      const targetRank = targetRankView(targetTemplate);
+      const targetRank: TargetRank = caveRank
+        ? caveRank.boss
+          ? 'boss'
+          : caveRank.elite
+            ? 'elite'
+            : 'normal'
+        : targetRankView(targetTemplate);
       // The portrait gate fires inside paint(); hand it the subject to redraw.
       this.targetPortraitSubject = target;
       // The target is a NON-SELF frame; on low throttle its HP/level/
@@ -8878,6 +8900,28 @@ export class Hud {
     if (locked === this.raidLockoutLocked) return;
     this.raidLockoutLocked = locked;
     this.raidLockoutEl.classList.toggle('locked', locked);
+  }
+
+  // The Source Cave kill-progress flash: polls world.sourceCaveInfo() on the
+  // slow HUD tick (state changes only on a cave kill / clear, never per-frame)
+  // and, when sourceCaveProgressEvent finds new progress, pushes a localized
+  // percentage line onto the same generic quest-progress banner (no
+  // cave-specific DOM/painter needed).
+  private updateSourceCaveProgressBanner(sim: IWorld): void {
+    const info = sim.sourceCaveInfo();
+    const ev = sourceCaveProgressEvent(this.lastCaveProgressSeen, info);
+    if (info) this.lastCaveProgressSeen = { killed: info.killed, cleared: info.cleared };
+    if (!ev) return;
+    if (ev.kind === 'cleared') {
+      this.questBanner.show(t('sim.sourceCave.cleared'));
+      return;
+    }
+    this.questBanner.show(
+      t('hudChrome.sourceCave.progressPercent', {
+        label: dungeonDisplayName('source_cave'),
+        percent: formatNumber(ev.percent, { maximumFractionDigits: 0 }),
+      }),
+    );
   }
 
   // Tooltip/panel HTML for the raid-lockout badge: localized title + a row per
@@ -11293,11 +11337,16 @@ export class Hud {
           // consulting the local list here as well would resurrect stale ignores
           // the player has since cleared from their account.
           if (this.sim.socialInfo === null && this.localIgnoredNames.has(ignoreKey(ev.from))) break;
+          const source = this.sim.entities.get(ev.fromPid);
+          const displayText = localizeSourceCaveRebootYell(
+            ev.text,
+            source !== undefined && isSourceCaveMobEntity(source),
+          );
           switch (ev.channel) {
             case 'party':
               this.chatLogFrom(
                 ev.from,
-                ev.text,
+                displayText,
                 CHAT_TEMPLATE_KEYS.party,
                 'party',
                 ev.fromPid,
@@ -11309,7 +11358,7 @@ export class Hud {
             case 'yell':
               this.chatLogFrom(
                 ev.from,
-                ev.text,
+                displayText,
                 CHAT_TEMPLATE_KEYS.yell,
                 'yell',
                 ev.fromPid,
@@ -11323,11 +11372,12 @@ export class Hud {
               // SENDER's per-sender marks (fromTitle, flair, fromPid, classId)
               // may decorate it: an untitled/uncolored/unbadged line beats one
               // mislabeled with the sender's own title, class color, or badge.
-              if (ev.to) this.chatLogFrom(ev.to, ev.text, CHAT_TEMPLATE_KEYS.toWhisper, 'whisper');
+              if (ev.to)
+                this.chatLogFrom(ev.to, displayText, CHAT_TEMPLATE_KEYS.toWhisper, 'whisper');
               else {
                 this.chatLogFrom(
                   ev.from,
-                  ev.text,
+                  displayText,
                   CHAT_TEMPLATE_KEYS.whisper,
                   'whisper',
                   ev.fromPid,
@@ -11341,7 +11391,7 @@ export class Hud {
             case 'general':
               this.chatLogFrom(
                 ev.from,
-                ev.text,
+                displayText,
                 CHAT_TEMPLATE_KEYS.general,
                 'general',
                 ev.fromPid,
@@ -11353,7 +11403,7 @@ export class Hud {
             case 'world':
               this.chatLogFrom(
                 ev.from,
-                ev.text,
+                displayText,
                 CHAT_TEMPLATE_KEYS.world,
                 'world',
                 ev.fromPid,
@@ -11365,7 +11415,7 @@ export class Hud {
             case 'lfg':
               this.chatLogFrom(
                 ev.from,
-                ev.text,
+                displayText,
                 CHAT_TEMPLATE_KEYS.lfg,
                 'lfg',
                 ev.fromPid,
@@ -11377,7 +11427,7 @@ export class Hud {
             case 'guild':
               this.chatLogFrom(
                 ev.from,
-                ev.text,
+                displayText,
                 CHAT_TEMPLATE_KEYS.guild,
                 'guild',
                 ev.fromPid,
@@ -11389,7 +11439,7 @@ export class Hud {
             case 'officer':
               this.chatLogFrom(
                 ev.from,
-                ev.text,
+                displayText,
                 CHAT_TEMPLATE_KEYS.officer,
                 'officer',
                 ev.fromPid,
@@ -11401,7 +11451,7 @@ export class Hud {
             case 'emote':
               this.chatLogFrom(
                 ev.from,
-                ev.text,
+                displayText,
                 CHAT_TEMPLATE_KEYS.emote,
                 'emote',
                 ev.fromPid,
@@ -11413,7 +11463,7 @@ export class Hud {
             case 'roll':
               this.chatLogFrom(
                 ev.from,
-                ev.text,
+                displayText,
                 CHAT_TEMPLATE_KEYS.roll,
                 'roll',
                 ev.fromPid,
@@ -11425,7 +11475,7 @@ export class Hud {
             default:
               this.chatLogFrom(
                 ev.from,
-                ev.text,
+                displayText,
                 CHAT_TEMPLATE_KEYS.say,
                 'say',
                 ev.fromPid,
@@ -11445,7 +11495,7 @@ export class Hud {
           const bubbleStyle = ev.channel === undefined ? null : chatBubbleStyle(ev.channel);
           const bubbleSpeakerId = ev.entityId ?? ev.fromPid;
           if (bubbleStyle && typeof bubbleSpeakerId === 'number') {
-            const masked = this.maskChat(this.chatLinkPlainText(ev.text));
+            const masked = this.maskChat(this.chatLinkPlainText(displayText));
             const bubble = ev.channel === 'emote' ? `${ev.from} ${masked}` : masked;
             this.renderer.showChatBubble(bubbleSpeakerId, bubble, bubbleStyle);
           }
@@ -12165,9 +12215,14 @@ export class Hud {
             'We should have let him rest.',
             'If you find the crypt... end this.',
           ].includes(ev.text);
+          // The Source Cave well's banter (source_cave/well_banter.ts): same
+          // personal-log-to-bubble precedent as the Nythraxis vision lines
+          // above, so the reply reads as the well speaking, not a yell overheard
+          // by nearby players, with no "X yells, ..." wrapper.
+          const isSourceCaveWellLine = SOURCE_CAVE_WELL_BANTER_LINES.includes(ev.text);
           if (
             ev.entityId !== undefined &&
-            (isNythraxisVisionLine || ev.text.includes(' yells, "'))
+            (isNythraxisVisionLine || isSourceCaveWellLine || ev.text.includes(' yells, "'))
           ) {
             this.renderer.showChatBubble(ev.entityId, text, ev.text.includes(' yells, "'));
           }
@@ -16661,13 +16716,18 @@ function delveText(delveId: string, field: 'enterText' | 'leaveText'): string {
 }
 
 function dungeonDisplayNameFromSource(name: string): string {
+  if (name === 'The Open Source') return dungeonDisplayName('source_cave');
   const dungeon = DUNGEON_LIST.find((candidate) => candidate.name === name);
   return dungeon ? dungeonDisplayName(dungeon.id) : name;
 }
 
 function entityDisplayName(entity: Entity): string {
   if (entity.kind === 'mob')
-    return entity.ownerId !== null ? entity.name : mobDisplayName(entity.templateId);
+    // Source Cave contributor mobs have per-Sim synthetic template ids, so their
+    // display name rides Entity.name like owned pets and never resolves through MOBS.
+    return entity.ownerId !== null || isSourceCaveMobEntity(entity)
+      ? entity.name
+      : mobDisplayName(entity.templateId);
   if (entity.kind === 'npc') return npcDisplayName(entity.templateId);
   return entity.name;
 }

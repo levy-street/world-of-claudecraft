@@ -61,6 +61,13 @@ Everything else is a sibling module in one of these families:
 - `voxel_terrain.ts`: verification-only prototype (proposal #1611, driven by
   `scripts/`, NOT the live path); live terrain is `terrain.ts` sampling sim heights.
 
+- **The Source Cave pair:** `source_cave_interior.ts` builds the cave's module
+  stack near the local player's claimed instance over the SAME
+  `delve_interiors.ts` builder (the cave has no `DelveRun`; it drives off
+  `world.sourceCaveInfo()?.modules` instead); `source_cave_reboot.ts` is the
+  cave's centre reboot button, reusing and recoloring the preloaded
+  red-mushroom prop while the sim owns interaction state.
+
 ## Module-first: pure core + thin painter (where NEW render logic lands)
 New per-frame decision logic (visibility, anchors, interpolation, region/LOD
 selection) is its own Three/DOM/i18n-free `*_core.ts` or `*_view.ts` module,
@@ -155,7 +162,19 @@ keeps only `tEntity` for its remaining label writes. Keep it keyed:
 - **Templated labels** (corpse, dungeon-exit, emote, fishing cast) use `t()` keys.
   The keys live in `src/ui/`, so add a new key there, not inline here.
 - **Verbatim by design:** player names and owned-pet names (`e.name` when
-  `e.ownerId !== null`) are proper nouns: splice them as-is, do not localize.
+  `e.ownerId !== null`) are proper nouns: splice them as-is, do not localize. The
+  Source Cave's contributor mobs are another narrow case: when
+  `isSourceCaveMobEntity(e)` is true (import from `../sim/source_cave`, a pure
+  mob-kind + unowned + numeric-range check with no sim state), `e.name` is a
+  runtime display name that may be either the GitHub login or a custom override,
+  so splice it as-is too. Outside this exact condition, keep localizing via
+  `mobDisplayName`/`tEntity` as usual. Their elite/boss flags don't come from
+  `MOBS[e.templateId]` either (the cave's per-Sim synthetic `MobTemplate` is
+  deliberately never merged into the static `MOBS` table): extract the login from
+  `source_cave_<login>` and correlate against `world.sourceCaveInfo()?.mobs` via
+  `sourceCaveMobRankForTemplate` from `src/sim/source_cave`. The detection predicate
+  and rank resolver both live on that shared sim edge so the nameplate and target
+  frame cannot drift.
 - **Deed titles** (the subtitle under a player's name): the entity `title`
   field is a deed id; `nameplate_painter.ts` resolves it via `deedTitleText`
   (`../ui/deed_i18n`), diffed per language + deed id; an unknown id hides the

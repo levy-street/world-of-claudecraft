@@ -191,10 +191,11 @@ describe('combat-rating tier ladder', () => {
     }
 
     // The 8 Nythraxis set pieces plus the 4 offhand-slot / two-hander epics
-    // (bonewrought_greatsword/bulwark, direfang_greatblade, wraithfire_orb) and
-    // the feral ladder's raid capstone (maul_of_the_scourged_wilds).
+    // (bonewrought_greatsword/bulwark, direfang_greatblade, wraithfire_orb),
+    // the feral ladder's raid capstone (maul_of_the_scourged_wilds), and the 3
+    // Source Cave epic weapons (commit_blade, bug_squasher, mech_keyboard).
     const ilvl29 = allGear.filter((item) => itemLevel(item) === 29);
-    expect(ilvl29).toHaveLength(13);
+    expect(ilvl29).toHaveLength(16);
     for (const item of ilvl29) expect(ratingValues(item), item.id).toEqual([20]);
 
     // ilvl-31: heroic five-man boss pieces (40 rating) + rift clear-time epics

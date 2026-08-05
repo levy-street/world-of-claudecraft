@@ -261,6 +261,7 @@ import { MARKET_HOUSE_STOCK } from './sim/market';
 import { bagOwnedMounts } from './sim/mounts';
 import { findPlayerPath, resolvePlayerDestination } from './sim/pathfind';
 import { Sim } from './sim/sim';
+import { isSourceCaveBanterTarget, isSourceCaveGatedObject } from './sim/source_cave';
 import { TAB_NEAR_RADIUS, TAB_QUERY_RADIUS, tabConeHalfAt } from './sim/tab_target';
 import {
   ALL_CLASSES,

@@ -9,6 +9,7 @@ import { describe, expect, it } from 'vitest';
 import { CLASSES, MOBS } from '../src/sim/data';
 import { createMob, createPlayer } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
+import { SOURCE_CAVE_DUNGEON_ID } from '../src/sim/source_cave';
 import type { Aura, Entity } from '../src/sim/types';
 
 function rigWarrior() {
@@ -120,6 +121,38 @@ describe('Avatar breaks enemy control (usableWhileControlled + source-scoped bre
     expect(hasAvatarBuff(p)).toBe(true);
     expect(hasAura(p, 'boss_fear')).toBe(true);
     expect(hasAura(p, 'boss_stun')).toBe(true);
+  });
+
+  it('does NOT break control from the Source Cave runtime boss', () => {
+    const { sim, p } = rigWarrior();
+    const bossTemplate = sim.sourceCave?.templates.find((template) => template.boss === true);
+    expect(bossTemplate).toBeDefined();
+    if (!bossTemplate) throw new Error('Source Cave boss template missing');
+    // Runtime cave templates deliberately live outside the static content table.
+    expect(MOBS[bossTemplate.id]).toBeUndefined();
+
+    sim.enterDungeon(SOURCE_CAVE_DUNGEON_ID);
+    const boss = [...sim.entities.values()].find(
+      (entity) => entity.kind === 'mob' && entity.templateId === bossTemplate.id,
+    );
+    const runtimeTrash = [...sim.entities.values()].find(
+      (entity) =>
+        entity.kind === 'mob' &&
+        entity.templateId.startsWith('source_cave_') &&
+        entity.templateId !== bossTemplate.id,
+    );
+    expect(boss).toBeDefined();
+    expect(runtimeTrash).toBeDefined();
+    if (!boss) throw new Error('Source Cave boss entity missing');
+    if (!runtimeTrash) throw new Error('Source Cave non-boss entity missing');
+    p.auras.push(control('source_cave_boss_stun', 'stun', boss.id));
+    p.auras.push(control('source_cave_trash_root', 'root', runtimeTrash.id));
+
+    sim.castAbility('avatar');
+
+    expect(hasAvatarBuff(p)).toBe(true);
+    expect(hasAura(p, 'source_cave_boss_stun')).toBe(true);
+    expect(hasAura(p, 'source_cave_trash_root')).toBe(false);
   });
 
   it('breaks trash control while leaving boss control from the same fight', () => {

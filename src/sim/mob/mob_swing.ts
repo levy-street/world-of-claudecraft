@@ -21,7 +21,6 @@
 
 import { isDisarmed } from '../combat/cc';
 import { applyThornsReaction } from '../combat/thorns_charge';
-import { MOBS } from '../data';
 import * as deedsMod from '../deeds';
 import { nythraxisGravebreakerOnMobSwing } from '../encounters/nythraxis';
 import type { SimContext } from '../sim_context';
@@ -35,6 +34,7 @@ import {
   normAngle,
 } from '../types';
 import { applyBroodBurn } from './dragonkin_brood';
+import { mobTemplateOf } from './mob_template';
 import { RIFT_CLEAVE_HALF_ARC, riftEscapeWindowActive } from './rift_escape_window';
 
 // A "Devour Magic"-strippable beneficial enhancement: a positive buff_* stat
@@ -68,7 +68,7 @@ export function runMobSwingAffixes(
   // just dealt. Hostile mobs only, so a friendly pet (mobSwing's other caller)
   // never drains for its owner; skip if the mob is already topped off or died
   // to the defender's thorns/reflect earlier this swing.
-  const leech = MOBS[mob.templateId]?.lifeleech;
+  const leech = mobTemplateOf(ctx, mob)?.lifeleech;
   if (
     leech &&
     mob.hostile &&
@@ -92,7 +92,7 @@ export function runMobSwingAffixes(
   // single shared aura slot is bumped and refreshed each hit; left alone it falls
   // off after `duration`s, so burning the mob down or kiting it out of melee both
   // reset the ramp.
-  const rampage = MOBS[mob.templateId]?.rampage;
+  const rampage = mobTemplateOf(ctx, mob)?.rampage;
   if (rampage && mob.hostile && !mob.dead) {
     const existing = mob.auras.find(
       (a) => a.id === `rampage_${mob.templateId}` && a.sourceId === mob.id,
@@ -117,7 +117,7 @@ export function runMobSwingAffixes(
   // facing (the Nythraxis Gravebreaker arc, so melee standing behind the boss
   // can play the fight: the 2026-08-04 Warlord Grask feedback); every unstamped
   // carrier keeps the shipped radial splash (mob_cleave.test.ts pins it).
-  const cleave = MOBS[mob.templateId]?.cleave;
+  const cleave = mobTemplateOf(ctx, mob)?.cleave;
   if (cleave && mob.hostile && !mob.dead) {
     const frontalOnly = (mob.riftMechanicSpacing ?? 0) > 0;
     for (const meta of ctx.players.values()) {
@@ -156,7 +156,7 @@ export function runMobSwingAffixes(
   }
   // venom: a landed swing may inflict a refreshing poison DoT (hostile mobs only,
   // never a friendly pet — mobSwing is also the pet attack path).
-  const venom = MOBS[mob.templateId]?.venom;
+  const venom = mobTemplateOf(ctx, mob)?.venom;
   if (venom && mob.hostile && !target.dead && ctx.rng.chance(venom.chance)) {
     ctx.applyAura(target, {
       id: `venom_${mob.templateId}`,
@@ -175,7 +175,7 @@ export function runMobSwingAffixes(
   // Same on-hit DoT seam as venom, but shadow-school — the undead/necrotic
   // flavour. Hostile mobs only (mobSwing is also the pet attack path, so a
   // friendly pet must never rot the party).
-  const soulrot = MOBS[mob.templateId]?.soulrot;
+  const soulrot = mobTemplateOf(ctx, mob)?.soulrot;
   if (soulrot && mob.hostile && !target.dead && ctx.rng.chance(soulrot.chance)) {
     ctx.applyAura(target, {
       id: `soulrot_${mob.templateId}`,
@@ -194,7 +194,7 @@ export function runMobSwingAffixes(
   // Same on-hit DoT seam as venom, but physical-school — the predator/beast
   // flavour (raking claws, gore). Hostile mobs only (mobSwing is also the pet
   // attack path, so a friendly pet must never bleed the party).
-  const bleed = MOBS[mob.templateId]?.bleed;
+  const bleed = mobTemplateOf(ctx, mob)?.bleed;
   if (bleed && mob.hostile && !target.dead && ctx.rng.chance(bleed.chance)) {
     ctx.applyAura(target, {
       id: `bleed_${mob.templateId}`,
@@ -213,7 +213,7 @@ export function runMobSwingAffixes(
   // frostbite: a landed swing may sear the victim with a refreshing frost DoT
   // (the frost twin of venom — chilling elementals). Hostile mobs only, never a
   // friendly pet (mobSwing is also the pet attack path).
-  const frostbite = MOBS[mob.templateId]?.frostbite;
+  const frostbite = mobTemplateOf(ctx, mob)?.frostbite;
   if (frostbite && mob.hostile && !target.dead && ctx.rng.chance(frostbite.chance)) {
     ctx.applyAura(target, {
       id: `frostbite_${mob.templateId}`,
@@ -231,7 +231,7 @@ export function runMobSwingAffixes(
 
   // smoldering fuse: a landed swing may ignite a refreshing fire DoT — the
   // fire-school sibling of venom (same guards: hostile mobs only, never a pet).
-  const smolder = MOBS[mob.templateId]?.smolder;
+  const smolder = mobTemplateOf(ctx, mob)?.smolder;
   if (smolder && mob.hostile && !target.dead && ctx.rng.chance(smolder.chance)) {
     ctx.applyAura(target, {
       id: `smolder_${mob.templateId}`,
@@ -250,7 +250,7 @@ export function runMobSwingAffixes(
   // cinder: the fire-school twin of venom — a landed swing may set a refreshing
   // burning DoT (hostile mobs only, never a friendly pet — mobSwing is also the
   // pet attack path). Reuses the same dot aura seam; school defaults 'fire'.
-  const cinder = MOBS[mob.templateId]?.cinder;
+  const cinder = mobTemplateOf(ctx, mob)?.cinder;
   if (cinder && mob.hostile && !target.dead && ctx.rng.chance(cinder.chance)) {
     ctx.applyAura(target, {
       id: `cinder_${mob.templateId}`,
@@ -269,7 +269,7 @@ export function runMobSwingAffixes(
   // that festers as a refreshing DoT. The arcane-school twin of venom; reuses
   // the `dot` aura. Guarded on hostile + alive so a friendly pet (the other
   // mobSwing caller) never debuffs an ally.
-  const arcaneRot = MOBS[mob.templateId]?.arcaneRot;
+  const arcaneRot = mobTemplateOf(ctx, mob)?.arcaneRot;
   if (arcaneRot && mob.hostile && !target.dead && ctx.rng.chance(arcaneRot.chance)) {
     ctx.applyAura(target, {
       id: `arcaneRot_${mob.templateId}`,
@@ -288,20 +288,20 @@ export function runMobSwingAffixes(
   // deadly poison: a landed swing may apply (or add a stack to) a ramping DoT.
   // Guarded on hostile so a friendly pet (the other mobSwing caller) never
   // poisons an ally. Per-tick damage scales with the stack count.
-  const stackPoison = MOBS[mob.templateId]?.stackPoison;
+  const stackPoison = mobTemplateOf(ctx, mob)?.stackPoison;
   if (stackPoison && mob.hostile && !target.dead && ctx.rng.chance(stackPoison.chance)) {
     applyStackPoison(ctx, mob, target, stackPoison);
   }
   // corrosive bite: a landed hit may shred the victim's armor (stacking sunder).
   // Guarded on hostile so a friendly pet (the other mobSwing caller) never debuffs an ally.
-  const corrode = MOBS[mob.templateId]?.corrode;
+  const corrode = mobTemplateOf(ctx, mob)?.corrode;
   if (corrode && mob.hostile && !target.dead && ctx.rng.chance(corrode.chance)) {
     applyCorrosion(ctx, mob, target, corrode);
   }
   // silencing shriek: anti-caster mobs can lock the victim's spells on a hit.
   // Guard on hostile + alive so a friendly pet (the other mobSwing caller)
   // never silences the party. updateCasting interrupts any live spell next tick.
-  const silence = MOBS[mob.templateId]?.silence;
+  const silence = mobTemplateOf(ctx, mob)?.silence;
   if (silence && mob.hostile && !target.dead && ctx.rng.chance(silence.chance)) {
     ctx.applyAura(target, {
       id: `silence_${mob.templateId}`,
@@ -318,7 +318,7 @@ export function runMobSwingAffixes(
   // weapon swings whiffing. Guarded on hostile + alive so a friendly pet
   // (mobSwing's other caller) never blinds the party. Carries the added miss
   // chance in the aura value, read back in melee/ranged swings via blindMissBonus.
-  const blind = MOBS[mob.templateId]?.blind;
+  const blind = mobTemplateOf(ctx, mob)?.blind;
   if (blind && mob.hostile && !target.dead && ctx.rng.chance(blind.chance)) {
     ctx.applyAura(target, {
       id: `blind_${mob.templateId}`,
@@ -341,7 +341,9 @@ export function runMobSwingAffixes(
   // duration. The already-disarmed check sits AFTER the rng roll so a swing at an
   // already-disarmed target still draws its proc roll, keeping every downstream draw
   // at its documented stream position.
-  const disarm = MOBS[mob.templateId]?.disarm;
+  // Resolved via mobTemplateOf, not MOBS[]: the Source Cave's synthesized
+  // templates never merge into the static table.
+  const disarm = mobTemplateOf(ctx, mob)?.disarm;
   if (
     disarm &&
     mob.hostile &&
@@ -364,7 +366,7 @@ export function runMobSwingAffixes(
 
   // school lockout: a counterspell-on-hit that seals a single spell school. Same
   // hostile + alive guard as silence so a friendly pet never locks out the party.
-  const lockout = MOBS[mob.templateId]?.lockout;
+  const lockout = mobTemplateOf(ctx, mob)?.lockout;
   if (lockout && mob.hostile && !target.dead && ctx.rng.chance(lockout.chance)) {
     ctx.applyAura(target, {
       id: `lockout_${mob.templateId}`,
@@ -380,7 +382,7 @@ export function runMobSwingAffixes(
   // draining curse: a landed hit can leave a cost-tax debuff that inflates the
   // victim's ability costs. Guarded on hostile + alive so a friendly pet (the
   // other mobSwing caller) never debuffs the party.
-  const costTax = MOBS[mob.templateId]?.costTax;
+  const costTax = mobTemplateOf(ctx, mob)?.costTax;
   if (costTax && mob.hostile && !target.dead && ctx.rng.chance(costTax.chance)) {
     ctx.applyAura(target, {
       id: `cost_tax_${mob.templateId}`,
@@ -398,7 +400,7 @@ export function runMobSwingAffixes(
   // next critical hits against them bite deeper. Hostile + player-only, like the
   // other on-hit debuffs, so a friendly pet (mobSwing's other caller) never marks
   // the party.
-  const cv = MOBS[mob.templateId]?.critVuln;
+  const cv = mobTemplateOf(ctx, mob)?.critVuln;
   if (cv && mob.hostile && target.kind === 'player' && !target.dead && ctx.rng.chance(cv.chance)) {
     ctx.applyAura(target, {
       id: `critvuln_${mob.templateId}`,
@@ -418,7 +420,7 @@ export function runMobSwingAffixes(
   }
   // Mortal Strike: a landed hit can leave a healing-reduction debuff. Guarded on
   // `hostile` so a friendly pet (mobSwing's other caller) never debuffs the party.
-  const ms = MOBS[mob.templateId]?.mortalStrike;
+  const ms = mobTemplateOf(ctx, mob)?.mortalStrike;
   if (ms && mob.hostile && !target.dead && ctx.rng.chance(ms.chance)) {
     ctx.applyAura(target, {
       id: `mortal_wound_${mob.templateId}`,
@@ -435,7 +437,7 @@ export function runMobSwingAffixes(
   // magic damage from everyone (the arcane twin of corrode's armor shred).
   // Hostile mobs only, so a friendly pet (mobSwing's other caller) never curses
   // the party. A single refreshing slot keyed by template, like mortal_wound.
-  const sv = MOBS[mob.templateId]?.spellVuln;
+  const sv = mobTemplateOf(ctx, mob)?.spellVuln;
   if (sv && mob.hostile && !target.dead && ctx.rng.chance(sv.chance)) {
     ctx.applyAura(target, {
       id: `spellvuln_${mob.templateId}`,
@@ -455,7 +457,7 @@ export function runMobSwingAffixes(
   // chance. Rides buff_dodge with a NEGATIVE value — recalcPlayerStats already
   // folds buff_dodge into e.dodgeChance and it recalcs on expiry (buff* kind), so
   // no new aura kind is needed.
-  const stagger = MOBS[mob.templateId]?.staggerHit;
+  const stagger = mobTemplateOf(ctx, mob)?.staggerHit;
   if (
     stagger &&
     mob.hostile &&
@@ -480,7 +482,7 @@ export function runMobSwingAffixes(
   // where Mortal Strike scales every heal down, this eats a fixed pool then
   // fades. Guarded on `hostile` so a friendly pet (mobSwing's other caller)
   // never blights an ally.
-  const ha = MOBS[mob.templateId]?.healAbsorb;
+  const ha = mobTemplateOf(ctx, mob)?.healAbsorb;
   if (ha && mob.hostile && !target.dead && ctx.rng.chance(ha.chance)) {
     ctx.applyAura(target, {
       id: `heal_absorb_${mob.templateId}`,
@@ -503,7 +505,7 @@ export function runMobSwingAffixes(
   // still DRAWN before the window check, so the stream position of every
   // downstream draw is untouched (the mechanicDamageMult after-the-draw
   // precedent); only the effect is skipped, and only on stamped bosses.
-  const ensnare = MOBS[mob.templateId]?.ensnare;
+  const ensnare = mobTemplateOf(ctx, mob)?.ensnare;
   if (
     ensnare &&
     mob.hostile &&
@@ -525,7 +527,7 @@ export function runMobSwingAffixes(
   // only (a friendly pet shares this swing path) and only stuns players. Reuses
   // the `stun` aura the AoE stomp already applies, so isStunned()/the HUD handle
   // it with no new wiring. Kept low-chance/short so it threatens without locking.
-  const stunOnHit = MOBS[mob.templateId]?.stunOnHit;
+  const stunOnHit = mobTemplateOf(ctx, mob)?.stunOnHit;
   if (
     stunOnHit &&
     mob.hostile &&
@@ -551,7 +553,7 @@ export function runMobSwingAffixes(
   // shoving a fellow mob is meaningless. Pure positional displacement (no aura),
   // terrain-clamped so it never strands the victim off the world; surfaced via a
   // spellfx nova + the same "unleashes" log line War Stomp uses.
-  const knockback = MOBS[mob.templateId]?.knockback;
+  const knockback = mobTemplateOf(ctx, mob)?.knockback;
   if (
     knockback &&
     mob.hostile &&
@@ -566,7 +568,7 @@ export function runMobSwingAffixes(
     if (ctx.applyKnockback(mob, target, knockback.distance) > 0) {
       const school = (knockback.school ?? 'physical') as Aura['school'];
       ctx.emit({ type: 'spellfx', sourceId: mob.id, targetId: target.id, school, fx: 'nova' });
-      if (!MOBS[mob.templateId]?.quietMechanics)
+      if (!mobTemplateOf(ctx, mob)?.quietMechanics)
         ctx.emit({
           type: 'log',
           text: `${mob.name} unleashes ${knockback.name}!`,
@@ -579,7 +581,7 @@ export function runMobSwingAffixes(
   // Rides the existing `attackspeed` aura (swingIntervalMult: value > 1 = slower);
   // refreshes by id and never stacks. Guarded on `hostile` so a friendly pet
   // (mobSwing's other caller) never debuffs the party.
-  const slowStrike = MOBS[mob.templateId]?.slowStrike;
+  const slowStrike = mobTemplateOf(ctx, mob)?.slowStrike;
   if (slowStrike && mob.hostile && !target.dead && ctx.rng.chance(slowStrike.chance)) {
     ctx.applyAura(target, {
       id: `slowstrike_${mob.templateId}`,
@@ -596,7 +598,7 @@ export function runMobSwingAffixes(
   // their spell cast times (`tonguesMult` reads this at cast-start). Refreshes by id
   // and never stacks. Guarded on `hostile` so a friendly pet (mobSwing's other
   // caller) never curses an ally; players only, since only players hard-cast here.
-  const tongues = MOBS[mob.templateId]?.tongues;
+  const tongues = mobTemplateOf(ctx, mob)?.tongues;
   if (
     tongues &&
     mob.hostile &&
@@ -619,7 +621,7 @@ export function runMobSwingAffixes(
   // victim (casters). No effect on rage/energy users. Guarded on `hostile` so
   // a friendly pet (mobSwing's other caller) never drains an ally's mana. The
   // mana bar visibly drops and the affix is surfaced via an `aura` log line.
-  const burn = MOBS[mob.templateId]?.manaBurn;
+  const burn = mobTemplateOf(ctx, mob)?.manaBurn;
   if (
     burn &&
     mob.hostile &&
@@ -636,7 +638,7 @@ export function runMobSwingAffixes(
   // use. Mana users are unaffected (it does nothing to casters); hostile mobs
   // only, so a friendly pet (mobSwing's other caller) never saps an ally. The
   // resource bar visibly drops and the affix is surfaced via an `aura` log line.
-  const sap = MOBS[mob.templateId]?.sapVigor;
+  const sap = mobTemplateOf(ctx, mob)?.sapVigor;
   if (
     sap &&
     mob.hostile &&
@@ -653,7 +655,7 @@ export function runMobSwingAffixes(
   // rage/energy users); hostile mobs only, so a friendly pet (mobSwing's other
   // caller) never debuffs the party. Rides buff_int with a negative value, so
   // recalcPlayerStats folds it through to maxResource with no new math.
-  const enfeeble = MOBS[mob.templateId]?.enfeeble;
+  const enfeeble = mobTemplateOf(ctx, mob)?.enfeeble;
   if (
     enfeeble &&
     mob.hostile &&
@@ -677,7 +679,7 @@ export function runMobSwingAffixes(
   // the mana-only enfeeble. Hostile mobs only, so a friendly pet (mobSwing's
   // other caller) never drains the party. Rides buff_sta with a negative value,
   // so recalcPlayerStats folds it through to maxHp with no new HP math.
-  const enervate = MOBS[mob.templateId]?.enervate;
+  const enervate = mobTemplateOf(ctx, mob)?.enervate;
   if (
     enervate &&
     mob.hostile &&
@@ -703,7 +705,7 @@ export function runMobSwingAffixes(
   // Players only; hostile mobs only, so a friendly pet (mobSwing's other
   // caller) never debuffs the party. Rides buff_sta with a negative value, so
   // there is no new HP math. Refreshes by id and never stacks.
-  const plague = MOBS[mob.templateId]?.plague;
+  const plague = mobTemplateOf(ctx, mob)?.plague;
   if (
     plague &&
     mob.hostile &&
@@ -728,7 +730,7 @@ export function runMobSwingAffixes(
   // friendly pet (mobSwing's other caller) never debuffs the party; player targets
   // only (mobs derive no stats from auras). Rides buff_agi with a negative value, so
   // recalcPlayerStats folds it through with no new stat math.
-  const wither = MOBS[mob.templateId]?.wither;
+  const wither = mobTemplateOf(ctx, mob)?.wither;
   if (
     wither &&
     mob.hostile &&
@@ -754,7 +756,7 @@ export function runMobSwingAffixes(
   // friendly pet (mobSwing's other caller) never debuffs the party. Rides
   // buff_spi with a negative value, so recalcPlayerStats folds it through with
   // no new regen math; it expires like any buff* aura.
-  const siphon = MOBS[mob.templateId]?.siphonSpirit;
+  const siphon = mobTemplateOf(ctx, mob)?.siphonSpirit;
   if (
     siphon &&
     mob.hostile &&
@@ -776,7 +778,7 @@ export function runMobSwingAffixes(
   // On-hit chill: frost-touched mobs numb the victim, slowing their movement.
   // A movement slow eats an escape window as hard as a root, so it takes the
   // same roll-then-skip suppression as ensnare above.
-  const chill = MOBS[mob.templateId]?.chillOnHit;
+  const chill = mobTemplateOf(ctx, mob)?.chillOnHit;
   if (
     chill &&
     !mob.dead &&
@@ -797,7 +799,7 @@ export function runMobSwingAffixes(
   }
   // Demoralizing affix: a successful hit saps the player victim's attack
   // power for a few seconds, weakening the damage they deal back.
-  const demo = MOBS[mob.templateId]?.demoralize;
+  const demo = mobTemplateOf(ctx, mob)?.demoralize;
   if (demo && !mob.dead && target.kind === 'player' && ctx.rng.chance(demo.chance ?? 1)) {
     ctx.applyAura(target, {
       id: 'mob_demoralize',
@@ -817,7 +819,7 @@ export function runMobSwingAffixes(
   // target (mobs can't flee via this path). `diminishedCrowdControlDuration`
   // returns the full duration for a mob source (DR is PvP-only), so the victim
   // gets the authored fear length.
-  const dread = MOBS[mob.templateId]?.dread;
+  const dread = mobTemplateOf(ctx, mob)?.dread;
   if (
     dread &&
     mob.hostile &&
@@ -855,7 +857,7 @@ export function runMobSwingAffixes(
   // but keep the aura's inherent regen tick. Guarded on `hostile` + a player
   // target; `diminishedCrowdControlDuration` returns the full duration for a
   // mob source (DR is PvP-only).
-  const hex = MOBS[mob.templateId]?.polymorphHex;
+  const hex = mobTemplateOf(ctx, mob)?.polymorphHex;
   if (
     hex &&
     mob.hostile &&
@@ -885,7 +887,7 @@ export function runMobSwingAffixes(
   // Concussive Blow: a landed hit can briefly STUN the victim (single-target,
   // distinct from War Stomp's AoE slam). Hostile mobs only so a friendly pet
   // never stuns an ally; CC DR is PvP-only so a mob source always lands full.
-  const concuss = MOBS[mob.templateId]?.concuss;
+  const concuss = mobTemplateOf(ctx, mob)?.concuss;
   if (
     concuss &&
     mob.hostile &&
@@ -910,7 +912,7 @@ export function runMobSwingAffixes(
   // Expose: a landed hit can crack the victim's guard, raising the physical
   // damage they take for a duration. Guarded on `hostile` so a friendly pet
   // (mobSwing's other caller) never debuffs the party.
-  const expose = MOBS[mob.templateId]?.expose;
+  const expose = mobTemplateOf(ctx, mob)?.expose;
   if (expose && mob.hostile && !target.dead && ctx.rng.chance(expose.chance)) {
     ctx.applyAura(target, {
       id: `expose_${mob.templateId}`,
@@ -928,7 +930,7 @@ export function runMobSwingAffixes(
   // damage from every source (a `vulnerability` aura read in dealDamage).
   // Players only, hostile mobs only, so a friendly pet (mobSwing's other
   // caller) never softens an ally. Refreshes by id, never stacks past one.
-  const vuln = MOBS[mob.templateId]?.vulnerability;
+  const vuln = mobTemplateOf(ctx, mob)?.vulnerability;
   if (
     vuln &&
     mob.hostile &&
@@ -952,7 +954,7 @@ export function runMobSwingAffixes(
   // AND healing they deal by (1 - reductionPct) for a while. Guarded on
   // `hostile` so a friendly pet (mobSwing's other caller) never hexes the party,
   // and on a player target. Rides a dedicated `hex` aura read by hexOutputMult.
-  const weakHex = MOBS[mob.templateId]?.hex;
+  const weakHex = mobTemplateOf(ctx, mob)?.hex;
   if (
     weakHex &&
     mob.hostile &&
@@ -975,7 +977,7 @@ export function runMobSwingAffixes(
   // the player victim (classic warlock/demon Devour Magic). Hostile mobs only
   // (a friendly pet — mobSwing's other caller — must never purge its owner's
   // party) and players only. No-op when the victim carries no devourable buff.
-  const purge = MOBS[mob.templateId]?.purgeOnHit;
+  const purge = mobTemplateOf(ctx, mob)?.purgeOnHit;
   if (
     purge &&
     mob.hostile &&
@@ -989,7 +991,7 @@ export function runMobSwingAffixes(
   // guaranteed burn, paid by the first landed swing (the leap "landing").
   // Deterministic (no chance roll) and appended after every existing arm, so
   // no proc above moves its rng stream position.
-  const whelp = MOBS[mob.templateId]?.broodWhelp;
+  const whelp = mobTemplateOf(ctx, mob)?.broodWhelp;
   if (whelp && mob.hostile && mob.leapBurnPending && !target.dead) {
     mob.leapBurnPending = false;
     applyBroodBurn(ctx, mob, target, whelp.burn);
@@ -999,7 +1001,7 @@ export function runMobSwingAffixes(
   // (armor-reduced per victim) and sets the burn on everyone struck, primary
   // included. Deterministic cadence: draws no rng, so the arms above keep
   // their stream positions for any template mix.
-  const arc = MOBS[mob.templateId]?.arcCleave;
+  const arc = mobTemplateOf(ctx, mob)?.arcCleave;
   if (arc && mob.hostile && !mob.dead) {
     mob.swingCleaveCount = (mob.swingCleaveCount ?? 0) + 1;
     if (mob.swingCleaveCount >= arc.every) {
@@ -1014,7 +1016,7 @@ export function runMobSwingAffixes(
         fx: 'windup',
         ability: 'brood_cleave',
       });
-      if (!MOBS[mob.templateId]?.quietMechanics)
+      if (!mobTemplateOf(ctx, mob)?.quietMechanics)
         ctx.emit({
           type: 'log',
           text: `${mob.name} unleashes ${arc.name}!`,

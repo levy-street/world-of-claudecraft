@@ -31,6 +31,7 @@ feature spec), or its program's dir; the top level is only for a living runbook.
 | `release-notes/` | Per-version release notes. |
 | `screenshots/` | README hero images, asset-pipeline evidence, and PR before/after shots (see below). |
 | `api-pipeline/` | Server REST pipeline program packet (spec, progress, rollback runbook). |
+| `the-source-cave/` | The contributor-leaderboard dungeon. `state.md` (decisions D1 to D10, constraints, open items, gotchas) is **cited by identifier from code comments and tests**, so keep that numbering stable; `encirclement-waves.md` + `friendly-reboot.md` are the encounter and room contracts. Living, except `final-report.md` (history). Balance numbers live in `src/sim/source_cave/`, never here. |
 | `architecture/`, `refactor/`, `hud-ux-and-accessibility/`, `ui-architecture-hud-modularization/` | Historical program records (the v0.15.0-era refactor doc, workstream hand-offs, completed phased UX/HUD programs): history, not source of truth. |
 | other top-level `*.md` | One-off reports (`hud-program-roadmap.md`, `performance-feel-audit.md`, `online-movement-latency.md`, ...). |
 

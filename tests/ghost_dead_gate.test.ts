@@ -19,6 +19,7 @@ import { DUNGEON_X_THRESHOLD, QUESTS, SPIRIT_HEALER_NPC_ID } from '../src/sim/da
 import { placeMobileStationForPlayer } from '../src/sim/professions/mobile_station';
 import { createRiftGearInstance } from '../src/sim/rift/progression';
 import { Sim } from '../src/sim/sim';
+import { isSourceCavePos, SOURCE_CAVE_DUNGEON_ID } from '../src/sim/source_cave';
 import { SPIRIT_HEALER_RANGE } from '../src/sim/spirit';
 import { dist2d, type Entity, INTERACT_RANGE, type SimEvent } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
@@ -561,6 +562,42 @@ describe('auto-release-on-logout: save/load of a dead-unreleased character', () 
     expect(e2.ghost).toBe(true);
     expect(e2.corpsePos).toBeTruthy();
     expect(e2.corpseInstanceId).toBe(inst.exitId);
+  });
+
+  it('a source cave dead-unreleased save auto-releases too, not reviving in place (Phase 5 QA)', () => {
+    // The cave shares the delve x-band (isDelvePos is also true there), and the
+    // bare `!isDelvePos(...)` guard this branch used to have would SKIP auto-release
+    // for a cave position exactly like it correctly skips it for a real delve. But
+    // the cave is a dungeon (spirit.ts routes its deaths through the ghost/graveyard
+    // loop, not a delve's bounded respawn), so skipping here would let a dead-in-cave
+    // logout revive in place at 1 hp on relog, bypassing the death loop this
+    // mechanism exists to enforce.
+    const sim = makeSim();
+    sim.setPlayerLevel(20);
+    sim.enterDungeon(SOURCE_CAVE_DUNGEON_ID);
+    const p = sim.player as AnyEntity;
+    expect(isSourceCavePos(p.pos.x)).toBe(true);
+    const deathSpot = { x: p.pos.x, z: p.pos.z };
+    p.hp = 0;
+    p.dead = true; // died, logged out WITHOUT releasing
+    const state = sim.serializeCharacter(sim.playerId)!;
+    expect(state.dead).toBe(true);
+    expect(state.ghost).toBe(false);
+
+    const sim2 = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true }) as AnySim;
+    const pid2 = sim2.addPlayer('warrior', 'Reloger', { state });
+    const e2 = sim2.entities.get(pid2) as AnyEntity;
+    // Auto-released: a ghost at the graveyard, NOT a live revive in place.
+    expect(e2.dead).toBe(true);
+    expect(e2.ghost).toBe(true);
+    expect(e2.hp).toBe(e2.maxHp); // ghost display pool, not a real 1hp revive
+    // Corpse stays marked inside the cave, at the death spot.
+    expect(e2.corpsePos).toBeTruthy();
+    expect(isSourceCavePos(e2.corpsePos!.x)).toBe(true);
+    expect(dist2d(e2.corpsePos!, { x: deathSpot.x, y: 0, z: deathSpot.z })).toBeLessThan(1);
+    // The spirit rises OUTSIDE, at the overworld graveyard nearest the cave door.
+    expect(isSourceCavePos(e2.pos.x)).toBe(false);
+    expect(healerInRange(sim2, e2.pos, SPIRIT_HEALER_RANGE)).toBe(true);
   });
 
   it('an alive save still loads alive and unchanged', () => {

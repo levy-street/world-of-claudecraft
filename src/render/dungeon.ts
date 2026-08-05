@@ -61,7 +61,9 @@ import { EMISSIVE_LIGHT, GFX, sharedUniforms } from './gfx';
 import { buildLastKeepDressing, ensureLastKeepDressing } from './lastkeep_dressing';
 import { applyOccluderFade, type OccluderFadeMat, occluderFadeMat } from './occluder_fade';
 import { occluderFadeSettled, stepOccluderFade } from './occluder_fade_core';
+import { propAsset } from './props';
 import { buildInfernalDecor, ensureInfernalDecorAssets } from './rift_decor';
+import { markSharedGeometry, markSharedMaterial } from './shared_resource';
 import { radialGlowTexture } from './textures';
 import { buildWildheartFieldInterior } from './wildheart_props';
 import { applySurfaceDetail } from './worn_stone';
@@ -98,6 +100,7 @@ export type DungeonInteriorVariant =
   | 'delve_bell'
   | 'delve_hall'
   | 'delve_finale'
+  | 'source_cave_library'
   // Drowned Litany marsh delve sub-themes (share the delve crypt-stone base via
   // isDelveVariant, but light with a sickly bog-green torch tint; the trash
   // rooms route through the ossuary dressing path, the apse through the finale).
@@ -111,6 +114,7 @@ export function isDelveVariant(variant: DungeonInteriorVariant): boolean {
     variant === 'delve_bell' ||
     variant === 'delve_hall' ||
     variant === 'delve_finale' ||
+    variant === 'source_cave_library' ||
     variant === 'delve_marsh' ||
     variant === 'delve_marsh_apse'
   );
@@ -132,6 +136,10 @@ export function dungeonDaisHasRaisedPlatform(variant: DungeonInteriorVariant): b
   // marsh trash rooms are flat fighting floors like the other delve trash; the
   // marsh apse keeps a raised boss stage like delve_finale.
   if (variant === 'delve_marsh') return false;
+  // The Source Cave server hall: the sim walks a flat floor, so a raised slab
+  // only made characters and the centre props read as sunk into it (user
+  // report); the button, chest and mains racks all stand at y=0.
+  if (variant === 'source_cave_library') return false;
   return true;
 }
 
@@ -162,6 +170,7 @@ const TORCH_COLORS: Record<Variant, TorchColors> = {
   delve_hall: { flame: 0xff7a3c, emissive: 0xcc3a14, light: 0xff6a3c },
   // the bell-buried boss chamber burns hotter: brighter ember over the arena
   delve_finale: { flame: 0xffa24a, emissive: 0xe04a18, light: 0xff7a3c },
+  source_cave_library: { flame: 0xffb86a, emissive: 0xe06220, light: 0xff8a4a },
   // the Drowned Litany burns with sickly bog-light: cold green marsh-gas flames
   // over wet stone, clearly distinct from the reliquary ember-orange.
   delve_marsh: { flame: 0x6abf6a, emissive: 0x2f6f2f, light: 0x6aff8c },
@@ -298,6 +307,12 @@ const KIT_MODELS = [
   'crates_stacked',
   'box_stacked',
   'box_small',
+  'bookcase_double',
+  'bookcase_double_decorateda',
+  'bookcase_double_decoratedb',
+  'bookcase_single',
+  'bookcase_single_decorateda',
+  'bookcase_single_decoratedb',
   'table_long_broken',
   'sword_shield',
   'sword_shield_broken',
@@ -439,6 +454,104 @@ function pickKind(kinds: WeightedKinds, t: number): string {
   return kinds[kinds.length - 1][0];
 }
 
+/**
+ * Weighted floor-tile mix per interior variant. Module scope (it reads no
+ * renderer state) so tests can sweep the whole t range for a variant.
+ */
+export function floorKindFor(variant: Variant, t: number): string {
+  // The Drowned Court dresses as the temple (flooded flagstones, pale walls,
+  // faded banners); structural placement keys on the real variant elsewhere.
+  if (variant === 'arena_drowned') return floorKindFor('temple', t);
+  if (variant === 'bastion') {
+    return pickKind(
+      [
+        ['floor_tile_large', 56],
+        ['floor_tile_large_rocks', 5],
+        ['floor_dirt_large', 4],
+        ['floor_dirt_large_rocky', 4],
+        ['grate', 8],
+        ['quad', 23],
+      ],
+      t,
+    );
+  }
+  if (variant === 'sanctum') {
+    return pickKind(
+      [
+        ['floor_tile_large', 68],
+        ['floor_tile_large_rocks', 7],
+        ['floor_dirt_large', 4],
+        ['floor_dirt_large_rocky', 4],
+        ['quad', 17],
+      ],
+      t,
+    );
+  }
+  if (variant === 'temple') {
+    // flooded flagstones: more broken/weeded subdivisions, grate pits draining
+    return pickKind(
+      [
+        ['floor_tile_large', 52],
+        ['floor_tile_large_rocks', 6],
+        ['floor_dirt_large', 4],
+        ['floor_dirt_large_rocky', 4],
+        ['grate', 9],
+        ['quad', 25],
+      ],
+      t,
+    );
+  }
+  if (variant === 'lastkeep') {
+    // a KEPT castle floor: whole flags with decorated insets, no dirt, no
+    // weeds, no grates (the undercroft cells re-key to the crypt mix)
+    return pickKind(
+      [
+        ['floor_tile_large', 72],
+        ['floor_tile_large_rocks', 3],
+        ['quad', 25],
+      ],
+      t,
+    );
+  }
+  // The Source Cave is a working server hall (racks, desks, bookcases), not a
+  // collapsed ruin, and its centre seal is a flat disc laid over these tiles:
+  // the kit's rock-bearing tiles pushed their modelled stones straight through
+  // it (user report). Same crypt kit and dirt patches, no loose rock.
+  if (variant === 'source_cave_library') {
+    return pickKind(
+      [
+        ['floor_tile_large', 64],
+        ['floor_dirt_large', 10],
+        ['quad', 26],
+      ],
+      t,
+    );
+  }
+  if (isDelveVariant(variant)) {
+    // collapsed reliquary: grave-dust over cracked flags, more dirt and rubble
+    return pickKind(
+      [
+        ['floor_tile_large', 54],
+        ['floor_tile_large_rocks', 10],
+        ['floor_dirt_large', 10],
+        ['floor_dirt_large_rocky', 8],
+        ['quad', 18],
+      ],
+      t,
+    );
+  }
+  return pickKind(
+    [
+      ['floor_tile_large', 70],
+      ['floor_tile_large_rocks', 6],
+      ['floor_dirt_large', 6],
+      ['floor_dirt_large_rocky', 5],
+      ['quad', 13],
+    ],
+    t,
+  );
+}
+
 /** Accumulates instance transforms per module kind, then emits InstancedMeshes. */
 class Placements {
   readonly byKind = new Map<string, THREE.Matrix4[]>();
@@ -465,6 +578,19 @@ class Placements {
     if (list) list.push(m);
     else this.byKind.set(kind, [m]);
   }
+}
+
+interface ToggleMat {
+  mat: THREE.Material;
+  depthWrite: boolean;
+}
+
+/** One instanced placement of a Source Cave generated prop (desk / rack). */
+interface SourceCavePropSpot {
+  x: number;
+  z: number;
+  rot: number;
+  scale: number;
 }
 
 interface ArenaWallFootprint {
@@ -515,6 +641,12 @@ const CASTER_KINDS = new Set([
   'gravestone',
   'table_long_broken',
   'trunk_large_A',
+  'bookcase_double',
+  'bookcase_double_decorateda',
+  'bookcase_double_decoratedb',
+  'bookcase_single',
+  'bookcase_single_decorateda',
+  'bookcase_single_decoratedb',
   'arch',
   'barrel_small_stack',
 ]);
@@ -861,6 +993,7 @@ export class DungeonInteriors {
     this.placeDais(group, p, layout, variant, torch, daisRaised);
     this.placeAisleClutter(p, layout, variant);
     this.placeWallDressing(p, layout, variant, arenaWalls);
+    if (variant === 'source_cave_library') this.placeSourceCavePropDressing(group, layout);
     if (variant === 'temple') {
       this.placeFloodwater(group, layout);
       this.placeAquaticDressing(group, layout);
@@ -1507,86 +1640,6 @@ export class DungeonInteriors {
   // Structure
   // -------------------------------------------------------------------------
 
-  private floorKind(variant: Variant, t: number): string {
-    // The Drowned Court dresses as the temple (flooded flagstones, pale walls,
-    // faded banners); structural placement keys on the real variant elsewhere.
-    if (variant === 'arena_drowned') return this.floorKind('temple', t);
-    if (variant === 'bastion') {
-      return pickKind(
-        [
-          ['floor_tile_large', 56],
-          ['floor_tile_large_rocks', 5],
-          ['floor_dirt_large', 4],
-          ['floor_dirt_large_rocky', 4],
-          ['grate', 8],
-          ['quad', 23],
-        ],
-        t,
-      );
-    }
-    if (variant === 'sanctum') {
-      return pickKind(
-        [
-          ['floor_tile_large', 68],
-          ['floor_tile_large_rocks', 7],
-          ['floor_dirt_large', 4],
-          ['floor_dirt_large_rocky', 4],
-          ['quad', 17],
-        ],
-        t,
-      );
-    }
-    if (variant === 'temple') {
-      // flooded flagstones: more broken/weeded subdivisions, grate pits draining
-      return pickKind(
-        [
-          ['floor_tile_large', 52],
-          ['floor_tile_large_rocks', 6],
-          ['floor_dirt_large', 4],
-          ['floor_dirt_large_rocky', 4],
-          ['grate', 9],
-          ['quad', 25],
-        ],
-        t,
-      );
-    }
-    if (variant === 'lastkeep') {
-      // a KEPT castle floor: whole flags with decorated insets, no dirt, no
-      // weeds, no grates (the undercroft cells re-key to the crypt mix)
-      return pickKind(
-        [
-          ['floor_tile_large', 72],
-          ['floor_tile_large_rocks', 3],
-          ['quad', 25],
-        ],
-        t,
-      );
-    }
-    if (isDelveVariant(variant)) {
-      // collapsed reliquary: grave-dust over cracked flags, more dirt and rubble
-      return pickKind(
-        [
-          ['floor_tile_large', 54],
-          ['floor_tile_large_rocks', 10],
-          ['floor_dirt_large', 10],
-          ['floor_dirt_large_rocky', 8],
-          ['quad', 18],
-        ],
-        t,
-      );
-    }
-    return pickKind(
-      [
-        ['floor_tile_large', 70],
-        ['floor_tile_large_rocks', 6],
-        ['floor_dirt_large', 6],
-        ['floor_dirt_large_rocky', 5],
-        ['quad', 13],
-      ],
-      t,
-    );
-  }
-
   private floorQuadKind(variant: Variant, t: number): string {
     if (variant === 'arena_drowned') return this.floorQuadKind('temple', t);
     if (variant === 'bastion') {
@@ -1670,7 +1723,7 @@ export class DungeonInteriors {
         // whose own center falls outside the polygon). Boundary tiles will
         // stair-step; accepted for this kit.
         if (poly && !polygonContainsPoint(poly, x, z)) continue;
-        let kind = this.floorKind(variant, hash2(x * 1.31, z));
+        let kind = floorKindFor(variant, hash2(x * 1.31, z));
         if (kind === 'grate' && Math.abs(x) < 4) kind = 'floor_tile_large'; // keep pits off the walk aisle
         if (kind === 'grate') {
           // floor_tile_grate is 4x2: a pair fills the cell, test each half's own center
@@ -1727,7 +1780,7 @@ export class DungeonInteriors {
       for (let x = minX; x <= maxX; x += FLOOR_CELL) {
         if (!inside(x, z) || inRampBand(x, z)) continue;
         const y = FLOOR_Y + roomLift(x, z);
-        let kind = this.floorKind(cellVariant(x, z), hash2(x * 1.31, z));
+        let kind = floorKindFor(cellVariant(x, z), hash2(x * 1.31, z));
         if (kind === 'grate') kind = 'floor_tile_large'; // no pits in an authored floor
         if (kind === 'quad') {
           for (const dx of [-1, 1]) {
@@ -2179,6 +2232,183 @@ export class DungeonInteriors {
     this.fireLights.push(light);
   }
 
+  private sourceCaveBookcaseKind(x: number, z: number): string {
+    return pickKind(
+      [
+        ['bookcase_double_decorateda', 32],
+        ['bookcase_double_decoratedb', 28],
+        ['bookcase_double', 20],
+        ['bookcase_single_decorateda', 8],
+        ['bookcase_single_decoratedb', 8],
+        ['bookcase_single', 4],
+      ],
+      hash2(x * 1.7, z * 2.3),
+    );
+  }
+
+  // The cave's generated one-off props (PROP_ASSET_DEFS, own full textures):
+  // they cannot join the kit-atlas Placements merge, so they mount as
+  // InstancedMeshes of their own on the interior group (many identical desks;
+  // instancing keeps the draw count flat). propAsset geometries/materials are
+  // process-lifetime caches shared with the outdoor prop pass; the shared tags
+  // keep interior teardown from disposing them. Dressing only, no collider,
+  // like every placement in placeSourceCaveLibraryDressing.
+  //
+  // Scale calibration: characters stand HUMANOID_H = 2.6 world units (see
+  // src/render/characters/manifest.ts). The desk GLB is 1.19w x 1.30h native,
+  // so x1.35 puts the desktop+monitor at ~1.75u (chest height); the rack GLB
+  // is 1.49w x 2.20h native, so x2.0 makes the four mains racks 4.4u monoliths.
+  private placeSourceCavePropDressing(group: THREE.Group, layout: DungeonLayout): void {
+    const DESK_SCALE = 2.4;
+    const RACK_SCALE = 2.0;
+
+    const desks: SourceCavePropSpot[] = [];
+    // Office rows against the wall halves the bookcases LEFT FREE (the zone
+    // split in placeSourceCaveLibraryDressing; keep the two in lockstep): east
+    // wall north half, west wall south half, north end east of the chest
+    // alcove, south end west of the door. Desks face the room, so the
+    // openspace reads from anywhere, and no shelf ever sits behind a desk.
+    // Every desk stays outside the worst-case outer contributor ring (38).
+    const rowInset = 43.7;
+    for (let i = 0; i < 6; i++) {
+      const along = 8 + i * 4.4;
+      desks.push({ x: rowInset, z: along, rot: -Math.PI / 2, scale: DESK_SCALE });
+      desks.push({ x: -rowInset, z: -along, rot: Math.PI / 2, scale: DESK_SCALE });
+      const ax = 11.5 + i * 4.4;
+      desks.push({ x: ax, z: 43.6, rot: Math.PI, scale: DESK_SCALE });
+      desks.push({ x: -ax, z: -43.6, rot: 0, scale: DESK_SCALE });
+    }
+
+    // The four mains racks framing the centre dais on its diagonals: radius
+    // 12.5 sits inside the inner contributor ring (14) and just outside the
+    // muster bubble (SOURCE_CAVE_REBOOT_SAFE_RADIUS 10), each facing the
+    // button. Authored front is +Z, hence the face-the-centre yaw.
+    const racks: SourceCavePropSpot[] = [];
+    for (const [sx, sz] of [
+      [1, 1],
+      [1, -1],
+      [-1, 1],
+      [-1, -1],
+    ]) {
+      const x = sx * 12.5 * Math.SQRT1_2;
+      const z = sz * 12.5 * Math.SQRT1_2;
+      racks.push({ x, z, rot: Math.atan2(-x, -z), scale: RACK_SCALE });
+    }
+
+    this.mountSourceCaveProps(group, 'devCodeDesk', desks);
+    this.mountSourceCaveProps(group, 'sourceServerRack', racks);
+  }
+
+  private mountSourceCaveProps(
+    group: THREE.Group,
+    key: 'sourceServerRack' | 'devCodeDesk',
+    spots: SourceCavePropSpot[],
+  ): void {
+    const asset = propAsset(key);
+    const m = new THREE.Matrix4();
+    const pos = new THREE.Vector3();
+    const quat = new THREE.Quaternion();
+    const scl = new THREE.Vector3();
+    const euler = new THREE.Euler();
+    for (const part of asset.parts) {
+      const mesh = new THREE.InstancedMesh(
+        markSharedGeometry(part.geo),
+        markSharedMaterial(part.mat),
+        spots.length,
+      );
+      spots.forEach((s, i) => {
+        pos.set(s.x, 0, s.z);
+        quat.setFromEuler(euler.set(0, s.rot, 0));
+        scl.setScalar(s.scale);
+        m.compose(pos, quat, scl);
+        mesh.setMatrixAt(i, m);
+      });
+      mesh.instanceMatrix.needsUpdate = true;
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+      group.add(mesh);
+    }
+  }
+
+  private placeSourceCaveLibraryDressing(p: Placements, layout: DungeonLayout): void {
+    const wallX = layout.wallX ?? DUNGEON_WALL_X;
+    const endWallHw = layout.endWallHw ?? DUNGEON_END_WALL_HW;
+    const sideX = wallX - 2.2;
+    const frontZ = layout.zMin + 2.4;
+    const backZ = layout.zMax - 2.4;
+    const sideStart = layout.zMin + 8;
+    const sideEnd = layout.zMax - 8;
+    const endStart = -endWallHw + 7;
+    const endEnd = endWallHw - 7;
+    const endDoorGapHalf = 9;
+    const pitch = 5.9;
+
+    // Wall zoning (user decision): every wall hosts ONE bookcase run and ONE
+    // desk run, never a desk parked in front of shelves (books must stay
+    // reachable). East wall: books on the south half; west wall: books on the
+    // north half; north end: books west of the chest alcove; south end: books
+    // east of the door. The complementary desk runs live in
+    // placeSourceCavePropDressing; keep the two zone splits in lockstep.
+    for (const side of [-1, 1] as const) {
+      const rot = side < 0 ? Math.PI / 2 : -Math.PI / 2;
+      for (let z = sideStart; z <= sideEnd; z += pitch) {
+        if (side > 0 && z > -4) continue; // east: desks own the north half
+        if (side < 0 && z < 4) continue; // west: desks own the south half
+        const x = side * sideX;
+        const kind = this.sourceCaveBookcaseKind(x, z);
+        const scale = kind.includes('single') ? 1.9 : 2.0;
+        p.add(kind, x, 0, z, rot, scale);
+      }
+    }
+
+    for (const end of [
+      { z: frontZ, rot: 0 },
+      { z: backZ, rot: Math.PI },
+    ]) {
+      for (let x = endStart; x <= endEnd; x += pitch) {
+        if (Math.abs(x) < endDoorGapHalf) continue;
+        if (end.z === backZ && x > -11) continue; // north: desks east of the alcove
+        if (end.z === frontZ && x < 11) continue; // south: desks west of the door
+        const kind = this.sourceCaveBookcaseKind(x, end.z);
+        const scale = kind.includes('single') ? 1.9 : 2.0;
+        p.add(kind, x, 0, end.z, end.rot, scale);
+      }
+    }
+
+    // The corners belong to the open-plan desk benches now
+    // (placeSourceCavePropDressing); no extra nook clutter competing with them.
+
+    // Repository banners over the two end-wall bookcase gaps (green, the one
+    // merged-PR color this kit has), and votive light down the pillar rings so
+    // the stacks read lit instead of pitch-black between the torch pillars.
+    for (const bx of [-6.5, 6.5]) {
+      p.add('banner_triple_green', bx, 4.6, frontZ + 0.4, 0, 1.5);
+      p.add('banner_green', bx, 4.6, backZ - 0.4, Math.PI, 1.5);
+    }
+    for (const pt of layout.pillars) {
+      const r = hash2(pt.x, pt.z * 1.3);
+      if (Math.hypot(pt.x, pt.z) < 30) {
+        // Inner ring: candle clusters at some pillar bases (delve_hall idiom).
+        if (r < 0.45) continue;
+        const dir = pt.x < 0 ? 1 : -1;
+        p.add('candle_triple', pt.x + dir * 1.9, 0, pt.z + 1.7, hash2(pt.z, pt.x) * Math.PI, 1.35);
+      } else if (r > 0.55) {
+        p.add('candle_lit', pt.x, 0, pt.z + 1.7, hash2(pt.z, pt.x) * Math.PI, 1.5);
+      }
+    }
+
+    // Unshelved archives stacked in the north gap (the far end, behind the boss
+    // rings). Deliberately crates and barrels only: the one chest-shaped object
+    // in this room is the real reward chest at the dais, so the dressing never
+    // baits a player toward a prop (no trunk_large_A / chest / chest_gold here).
+    p.add('crates_stacked', -3.2, 0, backZ - 3.4, 0.35, 1.1);
+    p.add('box_stacked', 3.4, 0, backZ - 3.6, -0.3, 0.7);
+    p.add('barrel_small_stack', 0.4, 0, backZ - 2.9, 1.2, 1.0);
+    // Candle shrines flanking the entrance gap greet the walk-in.
+    p.add('shrine_candles', -7.6, 0, frontZ + 2.4, Math.PI / 4, 1.45);
+    p.add('shrine_candles', 7.6, 0, frontZ + 2.4, -Math.PI / 4, 1.45);
+  }
+
   // Wall-side obstacles at +-19 (OBB 2.2 x 4.2): sarcophagi in the crypt and
   // sanctum-free; the drowned bastion stacks cargo in the same footprints.
   private placeTombs(p: Placements, layout: DungeonLayout, variant: Variant): void {
@@ -2338,6 +2568,10 @@ export class DungeonInteriors {
     // style can force either shape (daisRaisedOverride) independent of the kit.
     const raised = daisRaisedOverride ?? dungeonDaisHasRaisedPlatform(variant);
     if (!raised) {
+      // The Source Cave owns a dedicated PBR seal at this exact location. The
+      // legacy orange torch decal would sit above it and wash every gameplay
+      // state red, so the seal replaces that decal completely.
+      if (variant === 'source_cave_library') return;
       this.addTorchGlow(group, d.x, d.z, glow, 0.07, 2.4);
       return;
     }
@@ -2498,41 +2732,49 @@ export class DungeonInteriors {
       }
       return;
     }
-    // collapsed masonry in the legacy rubble corners
+    // collapsed masonry in the legacy rubble corners. The Source Cave skips
+    // them for the same reason it skips the rocky tiles: nothing in a live
+    // server hall has caved in yet.
     const rubble: [number, number][] =
-      variant === 'sanctum'
-        ? [
-            [-19, 4],
-            [19, 48],
-            [-19, 95],
-            [18, 150],
-          ]
-        : variant === 'temple'
+      variant === 'source_cave_library'
+        ? []
+        : variant === 'sanctum'
           ? [
-              [-19, -10],
-              [19, 24],
-              [-19, 88],
-              [18, 124],
+              [-19, 4],
+              [19, 48],
+              [-19, 95],
+              [18, 150],
             ]
-          : isDelveVariant(variant)
+          : variant === 'temple'
             ? [
-                [-19, -8],
-                [19, 18],
-                [-19, 58],
-                [18, 84],
-              ] // within the 110u delve room
-            : [
-                [-19, -13],
-                [19, 6],
-                [-18, 70],
-                [19, 108],
-              ];
+                [-19, -10],
+                [19, 24],
+                [-19, 88],
+                [18, 124],
+              ]
+            : isDelveVariant(variant)
+              ? [
+                  [-19, -8],
+                  [19, 18],
+                  [-19, 58],
+                  [18, 84],
+                ] // within the 110u delve room
+              : [
+                  [-19, -13],
+                  [19, 6],
+                  [-18, 70],
+                  [19, 108],
+                ];
     for (const [x, z] of rubble) {
       p.add('rubble_half', x < 0 ? -22 : 22, 0, z, x < 0 ? 0 : Math.PI, 1.1);
     }
 
     if (isDelveVariant(variant)) {
       const edge = (layout.wallX ?? DUNGEON_WALL_X) - 1.6;
+      if (variant === 'source_cave_library') {
+        this.placeSourceCaveLibraryDressing(p, layout);
+        return;
+      }
       if (variant === 'delve_ossuary') {
         // ossuary shelves: rows of graves and bone reliquaries hugging the walls
         for (let z = layout.zMin + 22; z < layout.zMax - 10; z += 17) {

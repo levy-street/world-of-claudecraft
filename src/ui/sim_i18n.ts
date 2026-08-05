@@ -11,9 +11,9 @@
 // The S3 guard in tests/localization_fixes.test.ts parses src/sim/sim.ts, enumerates
 // every player-facing emit site, and fails if any is no longer recognized by a client
 // matcher — so a new unhandled sim string cannot ship silently.
-import { ABILITIES, DELVES, ITEMS, MOBS, ZONES } from '../sim/data';
+import { ABILITIES, DELVES, DUNGEONS, ITEMS, MOBS, ZONES } from '../sim/data';
 import { DELVE_MODULE_NAMES } from '../sim/sim';
-import { tEntity } from './entity_i18n';
+import { dungeonDisplayName, tEntity } from './entity_i18n';
 import {
   formatNumber,
   getLanguage,
@@ -463,6 +463,9 @@ const baseEnTable = {
   'aura.disarmingSmash': 'Disarming Smash',
   'aura.staticCharge': 'Static Charge',
   'aura.frostbite': 'Winterbite',
+  // Source Cave contributor-mob on-hit DoTs (templates.ts tier affixes).
+  'aura.mergeConflict': 'Merge Conflict',
+  'aura.techDebt': 'Tech Debt',
   'aura.maddeningWhisper': 'Maddening Whisper',
   'aura.wyrmwardSigil': 'Wyrmward Sigil',
   'aura.soulSiphon': 'Soul Siphon',
@@ -8002,6 +8005,11 @@ function locDelve(name: string): string {
   const id = delveNameToId.get(name);
   return id ? tEntity({ kind: 'delve', id, field: 'name' }) : name;
 }
+function locDungeon(name: string): string {
+  if (name === 'The Open Source') return dungeonDisplayName('source_cave');
+  const dungeon = Object.values(DUNGEONS).find((entry) => entry.name === name);
+  return dungeon ? dungeonDisplayName(dungeon.id) : name;
+}
 function locDelveModule(name: string): string {
   const id = delveModuleNameToId.get(name);
   return id ? t(`delveUi.moduleName.${id}` as TranslationKey) : name;
@@ -8118,6 +8126,8 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   'Disarming Smash': 'aura.disarmingSmash',
   'Static Charge': 'aura.staticCharge',
   Winterbite: 'aura.frostbite',
+  'Merge Conflict': 'aura.mergeConflict',
+  'Tech Debt': 'aura.techDebt',
   'Maddening Whisper': 'aura.maddeningWhisper',
   'Wyrmward Sigil': 'aura.wyrmwardSigil',
   'Soul Siphon': 'aura.soulSiphon',
@@ -10003,6 +10013,86 @@ const RULES: Rule[] = [
   },
   // "All instances of X are busy" is handled by the hud-local localizeErrorText
   // arm (it runs first and resolves the dungeon-or-delve name), so no rule here.
+  // Generic dungeon-door level gate (DungeonDef.minLevel), shared by every dungeon
+  // that sets it, not just the Source Cave.
+  {
+    re: /^You must reach level (\d+) to enter (.+)\.$/,
+    build: (m) => t('sim.dungeon.levelRequired', { level: m[1], name: locDungeon(m[2]) }),
+  },
+  // Source Cave (Phase 3 access rules): daily lockout + enter/leave. The runtime
+  // dungeon is registered in the shared entity-name dictionary.
+  {
+    re: /^You are locked out of (.+)\.$/,
+    build: (m) => t('sim.sourceCave.locked', { name: locDungeon(m[1]) }),
+  },
+  { re: /^You step into The Open Source\.$/, build: () => t('sim.sourceCave.enter') },
+  { re: /^You leave The Open Source\.$/, build: () => t('sim.sourceCave.leave') },
+  {
+    re: /^Are you sure you want to proceed\? Ensure you gather your resources before you push\.$/,
+    build: () => t('sim.sourceCave.rebootConfirm'),
+  },
+  // Source Cave (Phase 4 clear): per-contributor kill feedback + the clear line. The
+  // {name} is a contributor login, spliced verbatim (partyLeaves precedent: m[1]
+  // directly, never through locMob).
+  {
+    re: /^(.+) has returned to the source\.$/,
+    build: (m) => t('sim.sourceCave.killProgress', { name: m[1] }),
+  },
+  {
+    re: /^(.+) encountered a fatal exception\.$/,
+    build: (m) => t('sim.sourceCave.bossDefeated', { name: m[1] }),
+  },
+  {
+    re: /^The Open Source is now closed\. Congratulations\?$/,
+    build: () => t('sim.sourceCave.cleared'),
+  },
+  // The sealed reward chest's interaction deny (source_cave/clear.ts).
+  { re: /^Access denied\.$/, build: () => t('sim.sourceCave.accessDenied') },
+  // The well's banter gate (source_cave/well_banter.ts): emitted via ctx.emit with
+  // `text: line` pulled from an array, a variable-routed emit the S3 guard's
+  // literal-only scan cannot see (root CLAUDE.md's documented blind spot), so
+  // these 10 rules are the only thing that actually localizes them - added by
+  // hand, not caught by any automated check.
+  {
+    re: /^It's a well\. It holds water\. Move along\.$/,
+    build: () => t('sim.sourceCave.wellBanter1'),
+  },
+  {
+    re: /^Why are you looking at my bricks like that\?$/,
+    build: () => t('sim.sourceCave.wellBanter2'),
+  },
+  {
+    re: /^I'm an ordinary well! Look, I even have a bucket!$/,
+    build: () => t('sim.sourceCave.wellBanter3'),
+  },
+  {
+    re: /^Still just a well\. Nothing magical to see\.$/,
+    build: () => t('sim.sourceCave.wellBanter4'),
+  },
+  {
+    re: /^Who told you about the source\? Was it Claude\?$/,
+    build: () => t('sim.sourceCave.wellBanter5'),
+  },
+  {
+    re: /^Oh, you definitely don't want to go down there\.$/,
+    build: () => t('sim.sourceCave.wellBanter6'),
+  },
+  {
+    re: /^Security! The player is trying to break into the source code!$/,
+    build: () => t('sim.sourceCave.wellBanter7'),
+  },
+  {
+    re: /^That's a source of conflict down there, you know\.$/,
+    build: () => t('sim.sourceCave.wellBanter8'),
+  },
+  {
+    re: /^If I open, will you finally leave me alone\?$/,
+    build: () => t('sim.sourceCave.wellBanter9'),
+  },
+  {
+    re: /^Alright, step inside\. Wipe your boots first\.$/,
+    build: () => t('sim.sourceCave.wellBanter10'),
+  },
   { re: /^(.+) run failed\.$/, build: (m) => t('sim.delve.runFailed', { name: locDelve(m[1]) }) },
   {
     re: /^(.+) begins Raise Dead\.$/,

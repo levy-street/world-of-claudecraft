@@ -1,7 +1,26 @@
 import { TextSpriteCache, type TextSpriteStyle } from '../ui/text_sprite_cache';
 
 export type NameplateFrame = '' | 'elite' | 'boss';
-export type NameplateMarkerTone = 'none' | 'quest' | 'active' | 'loot' | 'repeat' | 'cooldown';
+// The three sc-* tones are the Source Cave's role-tinted elite diamond (bronze
+// Runesmith, silver Architect, gold Worldwright): combat information, so it is
+// never gated behind a graphics preset or a cosmetic toggle
+// (docs/design/graphics-settings-fairness.md).
+export type NameplateMarkerTone =
+  | 'none'
+  | 'quest'
+  | 'active'
+  | 'loot'
+  | 'repeat'
+  | 'cooldown'
+  | 'sc-runesmith'
+  | 'sc-architect'
+  | 'sc-worldwright';
+
+const SOURCE_CAVE_ROLE_MARKER_COLORS: Record<string, string> = {
+  'sc-runesmith': '#c98a4b',
+  'sc-architect': '#cdd3da',
+  'sc-worldwright': '#f2c84b',
+};
 
 export interface NameplateBadge {
   url: string;
@@ -23,6 +42,7 @@ export interface NameplateCanvasState {
   markerTone: NameplateMarkerTone;
   hpVisible: boolean;
   hpFill: number;
+  warning: boolean;
   castVisible: boolean;
   castFill: number;
   castChannel: boolean;
@@ -58,6 +78,7 @@ export function createNameplateCanvasState(): NameplateCanvasState {
     markerTone: 'none',
     hpVisible: false,
     hpFill: 1,
+    warning: false,
     castVisible: false,
     castFill: 0,
     castChannel: false,
@@ -108,6 +129,15 @@ const TARGET_NAME_STYLE: TextSpriteStyle = {
   fill: '#fff',
   stroke: '#000',
   lineWidth: 3,
+};
+// The Source Cave call-out plates (reboot button, sealed exit): oversized and
+// heavily outlined so the red warning reads at interaction range, where the
+// 12px name did not. Outranks the target size, since the warning is the point.
+const WARNING_NAME_STYLE: TextSpriteStyle = {
+  font: `700 18px ${TITLE_FONT}`,
+  fill: '#fff',
+  stroke: '#000',
+  lineWidth: 5,
 };
 const LEVEL_STYLE: TextSpriteStyle = {
   font: `700 19px ${TITLE_FONT}`,
@@ -270,6 +300,7 @@ export class NameplateCanvasSurface {
   private readonly targetNameStyle: TextSpriteStyle = { ...TARGET_NAME_STYLE };
   private readonly devNameStyle: TextSpriteStyle = { ...NAME_STYLE };
   private readonly targetDevNameStyle: TextSpriteStyle = { ...TARGET_NAME_STYLE };
+  private readonly warningNameStyle: TextSpriteStyle = { ...WARNING_NAME_STYLE };
   private readonly levelStyle: TextSpriteStyle = { ...LEVEL_STYLE };
   private readonly aiStyle: TextSpriteStyle = { ...AI_STYLE };
   private readonly titleStyle: TextSpriteStyle = { ...TITLE_STYLE };
@@ -381,11 +412,12 @@ export class NameplateCanvasSurface {
       // repeatable arms, with the cooldown mark dimmed at the shared 0.55.
       this.configureTextStyle(
         style,
-        state.markerTone === 'active'
-          ? '#b9b9b9'
-          : state.markerTone === 'repeat' || state.markerTone === 'cooldown'
-            ? '#0070dd'
-            : '#f2c84b',
+        SOURCE_CAVE_ROLE_MARKER_COLORS[state.markerTone] ??
+          (state.markerTone === 'active'
+            ? '#b9b9b9'
+            : state.markerTone === 'repeat' || state.markerTone === 'cooldown'
+              ? '#0070dd'
+              : '#f2c84b'),
       );
       const dimmed = state.markerTone === 'cooldown';
       if (dimmed) ctx.globalAlpha = state.opacity * 0.55;
@@ -471,14 +503,18 @@ export class NameplateCanvasSurface {
   };
 
   private nameRowHeight(state: NameplateCanvasState): number {
-    let height = state.currentTarget ? 18 : 16;
+    let height = state.warning ? 22 : state.currentTarget ? 18 : 16;
     for (const badge of state.badges) height = Math.max(height, badge.size);
     return height;
   }
 
   private drawNameRow(state: NameplateCanvasState, screenX: number, bottomY: number): number {
     const rowHeight = this.nameRowHeight(state);
-    const nameStyle = state.currentTarget ? this.targetNameStyle : this.nameStyle;
+    const nameStyle = state.warning
+      ? this.warningNameStyle
+      : state.currentTarget
+        ? this.targetNameStyle
+        : this.nameStyle;
     const nameColor = state.deadEnemy ? '#bbb' : state.hostile ? '#ff5555' : state.nameColor;
     this.configureTextStyle(nameStyle, nameColor);
     this.configureTextStyle(this.levelStyle, state.levelColor);

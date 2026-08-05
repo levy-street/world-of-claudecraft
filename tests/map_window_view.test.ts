@@ -13,6 +13,7 @@ import { describe, expect, it } from 'vitest';
 import {
   CAMPS,
   DELVE_X_MIN,
+  DUNGEON_LIST,
   GATHER_NODES,
   PROPS,
   QUESTS,
@@ -28,6 +29,7 @@ import {
   type ZonePropsDef,
 } from '../src/sim/types';
 import type { Decoration } from '../src/sim/world';
+import { overworldDungeonPortals } from '../src/ui/map_dungeon_portals';
 import {
   buildOverworldMapModel,
   MAP_MAX_ZOOM,
@@ -527,6 +529,57 @@ describe('buildOverworldMapModel (pure draw model)', () => {
     expect(model.pois[0].my).toBeCloseTo(((r.maxZ - poi0.z) / (r.maxZ - r.minZ)) * CANVAS, 6);
     // dungeon portals in view are finite-projected (portals show at every zoom)
     expect(model.portals.every((p) => Number.isFinite(p.mx) && Number.isFinite(p.my))).toBe(true);
+  });
+
+  it('surfaces a RUNTIME dungeon door (the Source Cave) even though it is never in the static DUNGEONS/DUNGEON_LIST registry', () => {
+    // The cave's door is a normal 'dungeon_door' ground object spawned at Sim ctor
+    // time (src/sim/source_cave/runtime.ts), same shape as any static dungeon's
+    // door entity, just never added to the frozen registry. It must still show as
+    // a world-map portal, discovered generically from world.entities (no IWorld
+    // widening, no static allowlist), and must not require the viewer to have
+    // entered the cave first (this world carries no sourceCaveInfo/progress at all).
+    const world = makeOverworldWorld('sim') as unknown as {
+      entities: Map<number, unknown>;
+    };
+    world.entities.set(1_000_000_001, {
+      id: 1_000_000_001,
+      kind: 'object',
+      templateId: 'dungeon_door',
+      dungeonId: 'source_cave',
+      name: 'The Source Cave',
+      pos: { x: 165, z: ZONE_CZ },
+    });
+    const model = buildOverworldMapModel(input(world as unknown as IWorld, 1));
+    const cavePortal = model.portals.find((p) => p.dungeonId === 'source_cave');
+    expect(cavePortal).toBeDefined();
+    expect(cavePortal && Number.isFinite(cavePortal.mx) && Number.isFinite(cavePortal.my)).toBe(
+      true,
+    );
+    // The static portals are untouched: still exactly the DUNGEON_LIST projection,
+    // plus this one extra runtime entry.
+    const staticPortals = overworldDungeonPortals(DUNGEON_LIST, ZONE.zMin, ZONE.zMax);
+    expect(model.portals.length).toBe(staticPortals.length + 1);
+  });
+
+  it('does not duplicate a static dungeon door found generically in world.entities', () => {
+    // Every static dungeon ALSO spawns a real 'dungeon_door' entity (sim.ts ctor);
+    // the generic runtime-dungeon scan must not double-count it (it is filtered
+    // out by DUNGEONS[e.dungeonId] already being present).
+    const world = makeOverworldWorld('sim') as unknown as {
+      entities: Map<number, unknown>;
+    };
+    const staticPortal = overworldDungeonPortals(DUNGEON_LIST, ZONE.zMin, ZONE.zMax)[0];
+    world.entities.set(999_999_999, {
+      id: 999_999_999,
+      kind: 'object',
+      templateId: 'dungeon_door',
+      dungeonId: staticPortal.id,
+      name: 'dup door',
+      pos: { x: staticPortal.x, z: staticPortal.z },
+    });
+    const model = buildOverworldMapModel(input(world as unknown as IWorld, 1));
+    const staticPortals = overworldDungeonPortals(DUNGEON_LIST, ZONE.zMin, ZONE.zMax);
+    expect(model.portals.length).toBe(staticPortals.length);
   });
 
   it('dedups allies by id (friend wins ties) and orders friends before guild (zoomed in)', () => {

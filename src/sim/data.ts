@@ -1087,7 +1087,7 @@ export const DELVE_SLOT_COUNT = 24;
 export const DELVE_MODULE_GAP = 16;
 export const DELVE_MODULE_Z_START = 8;
 const DELVE_Z0 = -1250;
-const DELVE_SLOT_SPACING = 620; // covers 110u×4 rooms + 16u×3 gaps + 40u margin ≈ 536u
+export const DELVE_SLOT_SPACING = 620; // covers 110u×4 rooms + 16u×3 gaps + 40u margin ≈ 536u
 
 export function delveOrigin(delveIndex: number, slot: number): { x: number; z: number } {
   return { x: DELVE_X_MIN + delveIndex * 600, z: DELVE_Z0 + slot * DELVE_SLOT_SPACING };
@@ -1104,9 +1104,12 @@ export function delveOrigin(delveIndex: number, slot: number): { x: number; z: n
 // INSTANCE_X_BASE, so this had to move with it (it was a bare x=30000 before,
 // which is real-terrain ground now that the grid delve band sits far higher).
 // ---------------------------------------------------------------------------
-// Band lower edge: delve rooms (which reach ~INSTANCE_X_BASE + 5400) end below
-// this, and the rift band begins above VC_PRACTICE_X.
-export const VC_PRACTICE_BAND_X_MIN = INSTANCE_X_BASE + 6000;
+// Band lower edge: delve rooms end below this, and the rift band begins above
+// VC_PRACTICE_X. Real delves reach ~INSTANCE_X_BASE + 5400; the Source Cave
+// reserves the next lane at +6000 (source_cave/runtime.ts's
+// SOURCE_CAVE_DELVE_INDEX) and needs its side walls (+-26u) inside isDelvePos to
+// keep collider resolution, so this edge sits a full lane past the cave.
+export const VC_PRACTICE_BAND_X_MIN = INSTANCE_X_BASE + 6600;
 export const VC_PRACTICE_X = INSTANCE_X_BASE + 7000;
 
 export function isDelvePos(x: number): boolean {

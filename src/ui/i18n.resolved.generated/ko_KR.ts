@@ -316,6 +316,9 @@ export const ko_KR: EnTranslations = {
     }
   },
   "hudChrome": {
+    "sourceCave": {
+      "progressPercent": "{label}: {percent}%"
+    },
     "spectate": {
       "banner": "{name} 관전 중"
     },
@@ -5572,6 +5575,29 @@ export const ko_KR: EnTranslations = {
       "toolSlips": "도구가 이 자물쇠에서 미끄러집니다.",
       "lockJammed": "자물쇠가 더는 딸 수 없게 걸려 버렸습니다. 다시 시도하려면 탐굴을 다시 정리하세요.",
       "lastPickSnaps": "마지막 도구가 부러집니다. 자물쇠가 걸려 버립니다. 탐굴을 다시 정리하지 않으면 상자를 잃습니다."
+    },
+    "dungeon": {
+      "levelRequired": "{name}에 들어가려면 레벨 {level}에 도달해야 합니다."
+    },
+    "sourceCave": {
+      "locked": "{name}에 대한 입장이 잠겨 있습니다.",
+      "enter": "당신은 열린 근원으로 발을 들입니다.",
+      "leave": "당신은 열린 근원을 떠납니다.",
+      "rebootConfirm": "정말 계속하시겠습니까? 누르기 전에 필요한 자원을 모두 모아 두세요.",
+      "killProgress": "{name}이(가) 소스 코드로 돌아갔습니다.",
+      "bossDefeated": "{name}에게 치명적인 예외가 발생했습니다.",
+      "cleared": "열린 근원은 이제 닫혔습니다. 축하할 일인가요?",
+      "accessDenied": "접근이 거부되었습니다.",
+      "wellBanter1": "그냥 우물이야. 물을 담아두는 곳이지. 가던 길이나 가.",
+      "wellBanter2": "왜 그렇게 내 벽돌을 쳐다보는 거야?",
+      "wellBanter3": "난 그냥 평범한 우물이라고! 봐, 두레박도 있잖아!",
+      "wellBanter4": "여전히 그냥 우물일 뿐이야. 마법 같은 건 없다고.",
+      "wellBanter5": "근원에 대해 누가 알려줬어? 클로드였어?",
+      "wellBanter6": "오, 넌 절대 저 아래로 내려가고 싶지 않을걸.",
+      "wellBanter7": "경비원! 플레이어가 소스 코드에 침입하려 하고 있어!",
+      "wellBanter8": "있잖아, 저 아래는 갈등의 근원이거든.",
+      "wellBanter9": "내가 열어주면, 이제 좀 날 내버려둘 거야?",
+      "wellBanter10": "좋아, 들어와. 먼저 부츠부터 닦고."
     }
   },
   "lockpickUi": {
@@ -10439,6 +10465,27 @@ export const ko_KR: EnTranslations = {
       "wyrmshadow_talongrips": {
         "name": "밤송곳니 갈퀴손아귀"
       },
+      "source_cave_mantle": {
+        "name": "근원의 망토"
+      },
+      "conflictbreaker_breastplate": {
+        "name": "충돌파괴자 흉갑"
+      },
+      "cherry_pickers_gauntlets": {
+        "name": "체리피커 건틀릿"
+      },
+      "maintainers_crown": {
+        "name": "메인테이너의 왕관"
+      },
+      "commit_blade": {
+        "name": "커밋의 검"
+      },
+      "bug_squasher": {
+        "name": "버그 분쇄기"
+      },
+      "mech_keyboard": {
+        "name": "키스트로크"
+      },
       "reliquary_plate_chest": {
         "name": "성물실 수호 갑옷"
       },
@@ -14547,6 +14594,11 @@ export const ko_KR: EnTranslations = {
         "enterText": "마지막 요새의 차갑고 고요한 회랑에 발을 들입니다.",
         "leaveText": "요새의 문을 닫고 드레이크랜드의 바람 속으로 돌아갑니다."
       },
+      "source_cave": {
+        "name": "열린 근원",
+        "enterText": "당신은 열린 근원으로 발을 들입니다.",
+        "leaveText": "당신은 열린 근원을 떠납니다."
+      },
       "drowned_temple": {
         "name": "익사한 신전",
         "enterText": "당신은 달의 관문을 지나갑니다 — 공기가 차가운 물과 창백한 빛으로 변하고, 노랫소리가 당신의 머리 위로 닫혀 옵니다.",
@@ -14818,6 +14870,19 @@ export const ko_KR: EnTranslations = {
     "delveRiteShrineReedInteract": "갈대 제단: F를 눌러 만지기",
     "delveRiteShrineSkullInteract": "해골 제단: F를 눌러 만지기",
     "mailboxName": "우편함",
-    "noticeboardName": "게시판"
+    "noticeboardName": "게시판",
+    "sourceCaveWellName": "열린 근원",
+    "sourceCaveExitDenied": "ACCESS DENIED",
+    "sourceCaveReboot": "이 버튼을 누르지 마시오",
+    "sourceCaveRebootYell": "대체 무슨 짓을 한 거야?!",
+    "sourceCaveRebootYellWhatsGoingOn": "이봐, 무슨 일이야?",
+    "sourceCaveRebootYellServerDown": "얘들아, 서버가 다운됐어!",
+    "sourceCaveBanterIssue": "제발 이슈를 하나 만들어 주세요.",
+    "sourceCaveBanterPullRequest": "주저하지 말고 풀 리퀘스트를 보내 주세요.",
+    "sourceCaveBanterConflicts": "충돌은 정말 싫어...",
+    "sourceCaveBanterContribute": "물론이죠, 이 프로젝트에 기여할 수 있어요!",
+    "sourceCaveBanterFocused": "미안하지만 지금은 집중하고 있어요",
+    "sourceCaveBanterNextRelease": "다음 릴리스는 끝내줄 거예요!",
+    "sourceCaveBanterRefresh": "음? 새로고침해 보세요"
   }
 };

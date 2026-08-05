@@ -49,6 +49,7 @@ const CONTRIBUTORS_TTL_MS = 30 * 60_000; // 30 min; merged-PR counts change slow
 const CONTRIBUTORS_PER_PAGE = 100;
 const CONTRIBUTORS_MAX_PAGES = 30; // 3000 closed PRs cap; well past the repo's current history
 const FAILURE_COOLDOWN_MS = 5 * 60_000; // after a failed fetch, wait before retrying
+const GITHUB_LOGIN_RE = /^[A-Za-z0-9-]{1,39}$/;
 
 setUsageCacheSize('github.contributors', 0, LEADERBOARD_MAX);
 
@@ -75,7 +76,7 @@ export function parseMergedPrLogins(value: unknown): string[] {
     const u = user as Record<string, unknown>;
     if (u.type !== 'User') continue;
     const login = typeof u.login === 'string' ? u.login : '';
-    if (login) out.push(login);
+    if (GITHUB_LOGIN_RE.test(login)) out.push(login);
   }
   return out;
 }
@@ -161,6 +162,23 @@ function githubHeaders(): Record<string, string> {
   };
 }
 
+// GitHub's error body is normally `{"message": "...", "documentation_url": "..."}`
+// (e.g. "API rate limit exceeded for x.x.x.x." or "Bad credentials"). Best-effort:
+// a malformed/empty body (or one already consumed) just yields no detail, never a
+// second thrown error, so a non-OK status is never itself hidden by a body-read
+// failure.
+async function githubErrorDetail(res: Response): Promise<string> {
+  try {
+    const body: unknown = await res.json();
+    if (body && typeof body === 'object' && 'message' in body) {
+      return `: ${(body as { message: unknown }).message}`;
+    }
+  } catch {
+    // Not JSON, or the body was already consumed: no detail to add.
+  }
+  return '';
+}
+
 // Fetch every page of closed pull requests, tally the merged ones by author,
 // sorted rank-descending. Throws on a non-OK status or network error so
 // getContributors() can serve the last cache.
@@ -175,7 +193,7 @@ async function fetchAllContributors(): Promise<ContributorStat[]> {
       headers: githubHeaders(),
       signal: AbortSignal.timeout(8000),
     });
-    if (!res.ok) throw new Error(`github pulls ${res.status}`);
+    if (!res.ok) throw new Error(`github pulls ${res.status}${await githubErrorDetail(res)}`);
     const body: unknown = await res.json();
     logins.push(...parseMergedPrLogins(body));
     const next = parseNextPageUrl(res.headers.get('link'));
