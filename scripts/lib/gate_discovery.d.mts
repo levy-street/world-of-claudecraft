@@ -27,4 +27,10 @@ export function listChangedPaths(io: {
 
 export function filterExisting(opts: { files: string[]; exists: (p: string) => boolean }): string[];
 
+export function compareSelection(opts: {
+  selected: Set<string>;
+  fullRan: Set<string>;
+  fullFailed: Set<string>;
+}): { escapes: string[]; unselected: string[]; selectedCount: number; fullCount: number };
+
 export function chunkFileArgs(opts: { files: string[]; limit?: number }): string[][];

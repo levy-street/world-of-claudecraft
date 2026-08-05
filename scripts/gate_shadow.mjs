@@ -29,6 +29,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   chunkFileArgs,
+  compareSelection,
   filterExisting,
   listChangedPaths,
   listTestFiles,
@@ -184,23 +185,40 @@ try {
     throw new Error('full suite leg collected 0 test files: cannot compare');
   }
 
-  const escapes = [...full.failed].filter((f) => !selected.has(f)).sort();
+  const { escapes, unselected, selectedCount, fullCount } = compareSelection({
+    selected,
+    fullRan: full.ran,
+    fullFailed: full.failed,
+  });
   const record = {
     branch: git('git', ['branch', '--show-current']).stdout?.trim() ?? '',
     head: git('git', ['rev-parse', '--short', 'HEAD']).stdout?.trim() ?? '',
     base,
     planMode: plan.mode,
-    selectedCount: selected.size,
-    fullCount: full.ran.size,
+    selectedCount,
+    fullCount,
+    unselectedCount: unselected.length,
     fullFailures: [...full.failed].sort(),
     escapes,
+    unselected,
   };
   mkdirSync(path.dirname(LOG), { recursive: true });
   appendFileSync(LOG, `${JSON.stringify(record)}\n`);
 
-  console.log(`\n[gate:shadow] selected ${selected.size} of ${full.ran.size} test files`);
+  console.log(`\n[gate:shadow] selected ${selectedCount} of ${fullCount} test files`);
+  console.log(
+    `[gate:shadow] coverage delta: ${unselected.length} file(s) the full suite ran and ` +
+      'selection skipped (this is the surface where an escape could hide, not a defect list)',
+  );
+  console.log(`[gate:shadow] full-suite failures this run: ${full.failed.size}`);
+  if (full.failed.size === 0) {
+    console.log(
+      '[gate:shadow] INCONCLUSIVE on escapes: the full suite was green, so "no escapes" is ' +
+        'vacuous here. Escape evidence needs a run where the full suite actually fails.',
+    );
+  }
   if (escapes.length === 0) {
-    console.log('[gate:shadow] PASS: no escapes (every full-suite failure was also selected)');
+    console.log('[gate:shadow] no escapes (every full-suite failure was also selected)');
     process.exit(0);
   }
   console.error(

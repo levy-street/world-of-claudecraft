@@ -182,6 +182,30 @@ export function filterExisting({ files, exists }) {
 }
 
 /**
+ * Compare what selection ran against what the full suite ran.
+ *
+ * Two numbers, and the distinction matters. `escapes` is the strict signal: a
+ * file the full suite FAILED that selection would not have run, i.e. a real
+ * change that would have shipped green. But `escapes` is EMPTY on any green
+ * branch regardless of how bad selection is, and a branch is usually green at
+ * the moment you gate it, so a shadow run reporting "no escapes" is mostly
+ * saying "nothing was broken", not "selection is sound".
+ *
+ * `unselected` is the always-available signal: every file the full suite ran
+ * that selection skipped. It is not a defect list (skipping tests is the entire
+ * point), it is the surface where an escape COULD hide, so it is what a reviewer
+ * actually studies when deciding whether to trust selection.
+ *
+ * @param {{ selected: Set<string>, fullRan: Set<string>, fullFailed: Set<string> }} opts
+ * @returns {{ escapes: string[], unselected: string[], selectedCount: number, fullCount: number }}
+ */
+export function compareSelection({ selected, fullRan, fullFailed }) {
+  const escapes = [...fullFailed].filter((f) => !selected.has(f)).sort();
+  const unselected = [...fullRan].filter((f) => !selected.has(f)).sort();
+  return { escapes, unselected, selectedCount: selected.size, fullCount: fullRan.size };
+}
+
+/**
  * Split a file list into argv chunks that stay under a command-line limit.
  *
  * cmd.exe caps a command line at 8191 characters and gate.mjs spawns with

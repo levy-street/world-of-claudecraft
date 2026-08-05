@@ -3,6 +3,7 @@ import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
   chunkFileArgs,
+  compareSelection,
   filterExisting,
   isCollectedTestFile,
   listChangedPaths,
@@ -358,6 +359,44 @@ describe('branch diff resolution', () => {
 
 // cmd.exe caps a command line at 8191 chars and the gate spawns with shell:true
 // on win32, so ~500 paths in one argv cannot launch there.
+// A shadow run that only counts escapes prints PASS on any green branch no
+// matter how bad selection is, and branches are usually green when gated. The
+// coverage delta is the signal that exists on every run.
+describe('shadow comparison distinguishes escapes from coverage delta', () => {
+  it('reports the unselected surface even when nothing failed', () => {
+    const r = compareSelection({
+      selected: new Set(['tests/a.test.ts']),
+      fullRan: new Set(['tests/a.test.ts', 'tests/b.test.ts', 'tests/c.test.ts']),
+      fullFailed: new Set(),
+    });
+    expect(r.escapes).toEqual([]);
+    // The point: escapes is empty but selection skipped two files, and that is
+    // the number a reviewer has to look at.
+    expect(r.unselected).toEqual(['tests/b.test.ts', 'tests/c.test.ts']);
+    expect(r.selectedCount).toBe(1);
+    expect(r.fullCount).toBe(3);
+  });
+
+  it('flags a failure that selection would have skipped as an escape', () => {
+    const r = compareSelection({
+      selected: new Set(['tests/a.test.ts']),
+      fullRan: new Set(['tests/a.test.ts', 'tests/b.test.ts']),
+      fullFailed: new Set(['tests/b.test.ts']),
+    });
+    expect(r.escapes).toEqual(['tests/b.test.ts']);
+  });
+
+  it('does not count a failure selection DID run as an escape', () => {
+    const r = compareSelection({
+      selected: new Set(['tests/a.test.ts']),
+      fullRan: new Set(['tests/a.test.ts']),
+      fullFailed: new Set(['tests/a.test.ts']),
+    });
+    expect(r.escapes).toEqual([]);
+    expect(r.unselected).toEqual([]);
+  });
+});
+
 describe('deleted test files never reach the argv', () => {
   it('drops paths that no longer exist', () => {
     const kept = filterExisting({

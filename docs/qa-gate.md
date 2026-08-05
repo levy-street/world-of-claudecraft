@@ -154,6 +154,13 @@ an unresolvable diff base or a failing `git diff` is a hard stop rather than an 
 changed set. The diff is taken against the BRANCH base, not just the dirty working tree:
 `GATE_SELECT_BASE` overrides it, otherwise the tracking branch is used.
 
+**Reading a shadow run.** It reports two numbers. *Escapes* (a file the full suite
+failed that selection skipped) is the strict signal, but it is empty on any green
+branch regardless of how sound selection is, so a green run is explicitly labelled
+INCONCLUSIVE on escapes rather than PASS. The *coverage delta* (files the full suite
+ran that selection skipped) exists on every run: it is not a defect list, it is the
+surface where an escape could hide, and it is what to actually study.
+
 **What it still cannot prove.** The out-of-graph pattern list is a floor, not a proof, so
 this path is empirically complete rather than provably complete. That is why it is paired
 with a scheduled full `npm run gate` off everyone's critical path, which re-establishes a
