@@ -10092,16 +10092,16 @@ export const vi_VN: EnTranslations = {
         "name": "Dây Cương Cuồng Long Drakemaw"
       },
       "moggers_hide_quiver": {
-        "name": "Mogger's Hide Quiver"
+        "name": "Ống Tên Da Của Mogger"
       },
       "cragmaw_huntquiver": {
-        "name": "Cragmaw Huntquiver"
+        "name": "Ống Tên Săn Của Cragmaw"
       },
       "gravewyrm_bone_quiver": {
-        "name": "Gravewyrm Bone Quiver"
+        "name": "Ống Tên Xương Mộ Long"
       },
       "direfang_quiver": {
-        "name": "Direfang Quiver"
+        "name": "Ống Tên Direfang"
       },
       "conjured_water4": {
         "name": "Nước Suối Được Tạo Phép"

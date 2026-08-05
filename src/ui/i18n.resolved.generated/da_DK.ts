@@ -10092,16 +10092,16 @@ export const da_DK: EnTranslations = {
         "name": "Tøjler til Dragegabets Raptor"
       },
       "moggers_hide_quiver": {
-        "name": "Mogger's Hide Quiver"
+        "name": "Moggers Skindkogger"
       },
       "cragmaw_huntquiver": {
-        "name": "Cragmaw Huntquiver"
+        "name": "Klippegabs Jagtkogger"
       },
       "gravewyrm_bone_quiver": {
-        "name": "Gravewyrm Bone Quiver"
+        "name": "Gravorm-Benkogger"
       },
       "direfang_quiver": {
-        "name": "Direfang Quiver"
+        "name": "Direfang-Kogger"
       },
       "conjured_water4": {
         "name": "Fremmanet kildevand"

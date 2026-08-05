@@ -9,100 +9,25 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [
-    "entities.items.cragmaw_huntquiver.name",
-    "entities.items.direfang_quiver.name",
-    "entities.items.gravewyrm_bone_quiver.name",
-    "entities.items.moggers_hide_quiver.name"
-  ],
-  "es_ES": [
-    "entities.items.cragmaw_huntquiver.name",
-    "entities.items.direfang_quiver.name",
-    "entities.items.gravewyrm_bone_quiver.name",
-    "entities.items.moggers_hide_quiver.name"
-  ],
-  "fr_FR": [
-    "entities.items.cragmaw_huntquiver.name",
-    "entities.items.direfang_quiver.name",
-    "entities.items.gravewyrm_bone_quiver.name",
-    "entities.items.moggers_hide_quiver.name"
-  ],
-  "fr_CA": [
-    "entities.items.cragmaw_huntquiver.name",
-    "entities.items.direfang_quiver.name",
-    "entities.items.gravewyrm_bone_quiver.name",
-    "entities.items.moggers_hide_quiver.name"
-  ],
+  "es": [],
+  "es_ES": [],
+  "fr_FR": [],
+  "fr_CA": [],
   "en_CA": [],
-  "it_IT": [
-    "entities.items.cragmaw_huntquiver.name",
-    "entities.items.direfang_quiver.name",
-    "entities.items.gravewyrm_bone_quiver.name",
-    "entities.items.moggers_hide_quiver.name"
-  ],
-  "de_DE": [
-    "entities.items.cragmaw_huntquiver.name",
-    "entities.items.direfang_quiver.name",
-    "entities.items.gravewyrm_bone_quiver.name",
-    "entities.items.moggers_hide_quiver.name"
-  ],
+  "it_IT": [],
+  "de_DE": [],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [
-    "entities.items.cragmaw_huntquiver.name",
-    "entities.items.direfang_quiver.name",
-    "entities.items.gravewyrm_bone_quiver.name",
-    "entities.items.moggers_hide_quiver.name"
-  ],
+  "pt_BR": [],
   "ru_RU": [],
-  "cs_CZ": [
-    "entities.items.cragmaw_huntquiver.name",
-    "entities.items.direfang_quiver.name",
-    "entities.items.gravewyrm_bone_quiver.name",
-    "entities.items.moggers_hide_quiver.name"
-  ],
-  "nl_NL": [
-    "entities.items.cragmaw_huntquiver.name",
-    "entities.items.direfang_quiver.name",
-    "entities.items.gravewyrm_bone_quiver.name",
-    "entities.items.moggers_hide_quiver.name"
-  ],
-  "pl_PL": [
-    "entities.items.cragmaw_huntquiver.name",
-    "entities.items.direfang_quiver.name",
-    "entities.items.gravewyrm_bone_quiver.name",
-    "entities.items.moggers_hide_quiver.name"
-  ],
-  "id_ID": [
-    "entities.items.cragmaw_huntquiver.name",
-    "entities.items.direfang_quiver.name",
-    "entities.items.gravewyrm_bone_quiver.name",
-    "entities.items.moggers_hide_quiver.name"
-  ],
-  "tr_TR": [
-    "entities.items.cragmaw_huntquiver.name",
-    "entities.items.direfang_quiver.name",
-    "entities.items.gravewyrm_bone_quiver.name",
-    "entities.items.moggers_hide_quiver.name"
-  ],
-  "sv_SE": [
-    "entities.items.cragmaw_huntquiver.name",
-    "entities.items.direfang_quiver.name",
-    "entities.items.gravewyrm_bone_quiver.name",
-    "entities.items.moggers_hide_quiver.name"
-  ],
-  "vi_VN": [
-    "entities.items.cragmaw_huntquiver.name",
-    "entities.items.direfang_quiver.name",
-    "entities.items.gravewyrm_bone_quiver.name",
-    "entities.items.moggers_hide_quiver.name"
-  ],
-  "da_DK": [
-    "entities.items.cragmaw_huntquiver.name",
-    "entities.items.direfang_quiver.name",
-    "entities.items.gravewyrm_bone_quiver.name",
-    "entities.items.moggers_hide_quiver.name"
-  ]
+  "cs_CZ": [],
+  "nl_NL": [],
+  "pl_PL": [],
+  "id_ID": [],
+  "tr_TR": [],
+  "sv_SE": [],
+  "vi_VN": [],
+  "da_DK": []
 };

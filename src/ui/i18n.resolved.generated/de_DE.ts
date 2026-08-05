@@ -10092,16 +10092,16 @@ export const de_DE: EnTranslations = {
         "name": "Zügel des Drakenrachen-Raptors"
       },
       "moggers_hide_quiver": {
-        "name": "Mogger's Hide Quiver"
+        "name": "Moggers Fellköcher"
       },
       "cragmaw_huntquiver": {
-        "name": "Cragmaw Huntquiver"
+        "name": "Jagdköcher von Cragmaw"
       },
       "gravewyrm_bone_quiver": {
-        "name": "Gravewyrm Bone Quiver"
+        "name": "Gravewyrm-Knochenköcher"
       },
       "direfang_quiver": {
-        "name": "Direfang Quiver"
+        "name": "Direfang-Köcher"
       },
       "conjured_water4": {
         "name": "Herbeigezaubertes Quellwasser"

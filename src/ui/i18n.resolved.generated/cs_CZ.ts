@@ -10092,16 +10092,16 @@ export const cs_CZ: EnTranslations = {
         "name": "Otěže raptora z Dračí tlamy"
       },
       "moggers_hide_quiver": {
-        "name": "Mogger's Hide Quiver"
+        "name": "Moggerův kožený toulec"
       },
       "cragmaw_huntquiver": {
-        "name": "Cragmaw Huntquiver"
+        "name": "Lovecký toulec Cragmawa"
       },
       "gravewyrm_bone_quiver": {
-        "name": "Gravewyrm Bone Quiver"
+        "name": "Kostěný toulec Hrobodraka"
       },
       "direfang_quiver": {
-        "name": "Direfang Quiver"
+        "name": "Toulec děsivého tesáku"
       },
       "conjured_water4": {
         "name": "Vyčarovaná pramenitá voda"

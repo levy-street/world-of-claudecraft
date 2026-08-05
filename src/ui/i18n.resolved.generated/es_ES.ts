@@ -10092,16 +10092,16 @@ export const es_ES: EnTranslations = {
         "name": "Riendas del Raptor de Drakemaw"
       },
       "moggers_hide_quiver": {
-        "name": "Mogger's Hide Quiver"
+        "name": "Carcaj de cuero de Mogger"
       },
       "cragmaw_huntquiver": {
-        "name": "Cragmaw Huntquiver"
+        "name": "Carcaj de caza de Cragmaw"
       },
       "gravewyrm_bone_quiver": {
-        "name": "Gravewyrm Bone Quiver"
+        "name": "Carcaj de hueso del Gravewyrm"
       },
       "direfang_quiver": {
-        "name": "Direfang Quiver"
+        "name": "Carcaj Direfang"
       },
       "conjured_water4": {
         "name": "Agua de Manantial Invocada"

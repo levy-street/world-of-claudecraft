@@ -10092,16 +10092,16 @@ export const pl_PL: EnTranslations = {
         "name": "Wodze Raptora Smoczej Paszczy"
       },
       "moggers_hide_quiver": {
-        "name": "Mogger's Hide Quiver"
+        "name": "Skórzany kołczan Moggera"
       },
       "cragmaw_huntquiver": {
-        "name": "Cragmaw Huntquiver"
+        "name": "Łowiecki kołczan Cragmawa"
       },
       "gravewyrm_bone_quiver": {
-        "name": "Gravewyrm Bone Quiver"
+        "name": "Kostny kołczan Grobowego Żmija"
       },
       "direfang_quiver": {
-        "name": "Direfang Quiver"
+        "name": "Kołczan Direfang"
       },
       "conjured_water4": {
         "name": "Wyczarowana woda źródlana"

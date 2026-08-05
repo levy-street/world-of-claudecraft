@@ -10092,16 +10092,16 @@ export const it_IT: EnTranslations = {
         "name": "Redini del Raptor di Drakemaw"
       },
       "moggers_hide_quiver": {
-        "name": "Mogger's Hide Quiver"
+        "name": "Faretra di cuoio di Mogger"
       },
       "cragmaw_huntquiver": {
-        "name": "Cragmaw Huntquiver"
+        "name": "Faretra da caccia di Cragmaw"
       },
       "gravewyrm_bone_quiver": {
-        "name": "Gravewyrm Bone Quiver"
+        "name": "Faretra d'osso del Gravewyrm"
       },
       "direfang_quiver": {
-        "name": "Direfang Quiver"
+        "name": "Faretra Direfang"
       },
       "conjured_water4": {
         "name": "Acqua sorgiva evocata"

@@ -10092,16 +10092,16 @@ export const id_ID: EnTranslations = {
         "name": "Tali Kekang Raptor Drakemaw"
       },
       "moggers_hide_quiver": {
-        "name": "Mogger's Hide Quiver"
+        "name": "Tabung Panah Kulit Mogger"
       },
       "cragmaw_huntquiver": {
-        "name": "Cragmaw Huntquiver"
+        "name": "Tabung Panah Buru Cragmaw"
       },
       "gravewyrm_bone_quiver": {
-        "name": "Gravewyrm Bone Quiver"
+        "name": "Tabung Panah Tulang Gravewyrm"
       },
       "direfang_quiver": {
-        "name": "Direfang Quiver"
+        "name": "Tabung Panah Direfang"
       },
       "conjured_water4": {
         "name": "Air Mata Air Sihir"
