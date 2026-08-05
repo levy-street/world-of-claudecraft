@@ -629,9 +629,9 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(
 // merged rendererIntegration and layout inputs.
 // Re-minted with scripts/assets/eastbrook_grand_armoury/remint_polish_provenance.mjs.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '4d5caf960bc78af2406349fccecb41e0b6518edcf0f40563f07bcef605902602';
+  '7e360a0508250c6a2ef7b8fe2af82417e46ab4dff791e1ce84668f849d3dbb80';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '8f0520f1819f9de43e9c6449d997391a746806af1c042825fc051ac63ae88049';
+  '689949a0bc0e3d1e93749c88fe57780efa7f13049c83ee2293c2cf2b6e484d9a';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1500,7 +1500,7 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // numbers) is adopted verbatim from the base tip; no parent's literal
     // matched the merged tree, and no capture was retaken here.
     expect(fingerprint.digest('hex')).toBe(
-      'c09c3a3fbf09b6b0390f9ad8e2b3b274abfe77dda939887bdb03d152d5045cc8',
+      'e9fa5d129bef83c763b06c2113f18468b2fa2fac59bd7b8e910a71c4221e5e82',
     );
   });
 

@@ -229,18 +229,25 @@ never depends on the host's idle policy. Two lanes:
   are watched. Timer-paced rather than message-paced on purpose, so it
   interleaves fairly with the loading pipeline instead of outranking it.
 
-Renderer construction only happens behind an opaque curtain (boot, the
-graphics-settings rebuild), so it always accelerates its initial build;
-the whole grid completes while the curtain is still waiting on the
-network. Both curtain paths then gate the reveal on
-`Renderer.farVistaReady` (bounded by `FAR_VISTA_ENTRY_MAX_WAIT_MS`, with
-the classic eased flip as the timeout fallback and an entry-diagnostics
-checkpoint recording which way it went), and on success the next outdoor
-environment update settles scene fog and the detail horizon at their
-vista targets, still behind the curtain: the first visible frame carries
-the finished horizon instead of easing the fog out on screen. An
-interior login discards the settle and keeps its normal eased
-transition; editor terrain rebuilds keep polite pacing and the existing
+The curtained construction paths (boot, the graphics-settings rebuild)
+accelerate the initial build, and the whole grid completes while the
+curtain is still waiting on the network; the editor viewport, which
+constructs live Renderers against running frames on every document load,
+opts out via `RendererCreateOptions.eagerFarVista` and stays on polite
+pacing. Both curtain paths then gate the reveal on
+`Renderer.farVistaReady` (a thin consumer of `farVistaGate`, bounded by
+`FAR_VISTA_ENTRY_MAX_WAIT_MS`, with the classic eased flip as the
+timeout fallback, the losing timer cleared, and an entry-diagnostics
+checkpoint recording which way it went; both gate arms are pinned by
+`tests/far_terrain_view.test.ts`), and on success the next outdoor
+environment update settles scene fog at the horizon haze band, still
+behind the curtain: the first visible frame carries the finished horizon
+instead of easing the fog out on screen. The settle is fog only: the
+DETAIL horizon stays residency-governed and expands as chunks land,
+exactly as streaming always behaved, with the far mesh standing beneath
+it so no fog wall and no hole is ever visible. An interior login
+discards the settle and keeps its normal eased transition; editor
+terrain rebuilds keep polite pacing and the existing
 fog-closes-over-the-void behavior.
 
 ## Known tradeoffs

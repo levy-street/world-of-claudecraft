@@ -168,7 +168,12 @@ import {
   ZONE_ENVIRONMENT_RESPONSE,
 } from './environment_transition_core';
 import { advanceSelfFacing, releaseSelfFacing } from './facing_smooth';
-import { buildFarTerrain, FAR_VISTA_ENTRY_MAX_WAIT_MS, type FarTerrainView } from './far_terrain';
+import {
+  buildFarTerrain,
+  FAR_VISTA_ENTRY_MAX_WAIT_MS,
+  type FarTerrainView,
+  farVistaGate,
+} from './far_terrain';
 import {
   detailCullFar,
   type FarVistaPlan,
@@ -1171,6 +1176,12 @@ function canvasDataUrlAsync(
 export interface RendererCreateOptions {
   context?: WebGL2RenderingContext;
   initializeGfx?: boolean;
+  /** Build the far-vista grid eagerly during construction (macrotask bites,
+   *  accelerateInitialBuild). Correct only behind an opaque curtain: the
+   *  boot and graphics-rebuild paths keep the default; the editor viewport,
+   *  which rebuilds a live Renderer against running frames on every document
+   *  load, passes false to stay on polite idle pacing. */
+  eagerFarVista?: boolean;
 }
 
 export class Renderer {
@@ -1585,8 +1596,9 @@ export class Renderer {
    *  new view but deliberately keep polite pacing and never re-arm this. */
   private farVistaInitialBuild: Promise<void> = Promise.resolve();
   /** Set by farVistaReady once the grid stands pre-reveal: the next outdoor
-   *  environment update settles fog and the detail horizon at their vista
-   *  targets instead of easing them out on screen. */
+   *  environment update settles scene fog at the horizon haze band instead
+   *  of easing it out on screen (fog only; the detail horizon stays
+   *  residency-governed). */
   private vistaEntrySettlePending = false;
   /** Fired whenever a zone becomes resident (any prepare path). Wired by
    *  main.ts so presentation caches outside the renderer (the HUD's world-map
@@ -2153,11 +2165,16 @@ export class Renderer {
     });
     setRenderCategory(this.farTerrainView.group, 'terrain');
     this.scene.add(this.farTerrainView.group);
-    // Renderer construction only happens behind an opaque curtain (boot,
-    // graphics rebuild), so build the far grid eagerly there: it overlaps
-    // the curtain's own asset waits and the vista stands before the reveal
-    // instead of tens of seconds into play on a loaded production client.
-    this.farVistaInitialBuild = this.farTerrainView.accelerateInitialBuild();
+    // The curtained construction paths (boot, graphics rebuild) build the
+    // far grid eagerly: it overlaps the curtain's own asset waits and the
+    // vista stands before the reveal instead of tens of seconds into play
+    // on a loaded production client. The editor viewport constructs live
+    // Renderers with frames running and opts out (eagerFarVista false),
+    // keeping its rebuilds on polite idle pacing.
+    this.farVistaInitialBuild =
+      options.eagerFarVista === false
+        ? Promise.resolve()
+        : this.farTerrainView.accelerateInitialBuild();
     bd('terrain');
     this.waterView = buildWater(this.sim.cfg.seed, this.webgl);
     setRenderCategory(this.waterView.group, 'water');
@@ -7542,19 +7559,15 @@ export class Renderer {
    * the vista can stand in for the fog, or false after `maxWaitMs` so a
    * pathological device never holds the player at the loading screen (the
    * classic eased flip then covers the remainder, exactly as before). On
-   * success the next outdoor environment update settles the atmosphere at
-   * its vista targets, still behind the curtain, so the first visible frame
+   * success the next outdoor environment update settles scene fog at the
+   * horizon haze band, still behind the curtain, so the first visible frame
    * carries the finished horizon rather than easing the fog out on screen.
-   * A no-op true on profiles with the vista off.
+   * A no-op true on profiles with the vista off. Thin consumer: both gate
+   * arms live in farVistaGate (far_terrain.ts), pinned by its tests.
    */
   async farVistaReady(maxWaitMs: number = FAR_VISTA_ENTRY_MAX_WAIT_MS): Promise<boolean> {
     if (!this.farVista.enabled) return true;
-    const ready = await Promise.race([
-      this.farVistaInitialBuild.then(() => true),
-      new Promise<boolean>((resolve) => {
-        window.setTimeout(() => resolve(false), maxWaitMs);
-      }),
-    ]);
+    const ready = await farVistaGate(this.farVistaInitialBuild, maxWaitMs);
     if (ready && this.vistaLive()) this.vistaEntrySettlePending = true;
     return ready;
   }
@@ -8022,15 +8035,15 @@ export class Renderer {
       );
       if (vista) {
         // Entry settle (one-shot, armed by farVistaReady behind the opaque
-        // curtain): start fog and the detail horizon AT their vista targets
-        // instead of easing them out over the first seconds on screen. The
-        // residency clamp still applies verbatim; the eased laws right
-        // below then simply hold the settled values.
+        // curtain): start scene fog AT the horizon haze band instead of
+        // easing it out over the first seconds on screen. Fog only: the
+        // detail horizon stays residency-governed below and expands as
+        // chunks land, exactly as streaming always behaved; the far mesh
+        // stands beneath it, so no fog wall and no hole is ever visible.
         if (settleVistaEntry) {
           const entryHaze = horizonHazePlan(this.farVista.envelopeFar);
           fog.far = entryHaze.far;
           fog.near = entryHaze.near;
-          this.detailFogFar = Math.min(requestedFar, residencyFar);
         }
         this.detailFogFar = easedFogFar(this.detailFogFar, requestedFar, residencyFar, dt);
         // Fog itself eases out to the horizon haze band: zero effect across

@@ -77,6 +77,45 @@ export const FAR_VISTA_ENTRY_MAX_WAIT_MS = 4000;
  *  pipeline's own timer chains; timer-paced turns interleave fairly. */
 const nextMacrotask = (): Promise<void> => new Promise((resolve) => setTimeout(resolve, 0));
 
+/** Injectable timer pair so the gate's timeout arm is Node-testable. */
+export interface FarVistaGateTimers {
+  set(callback: () => void, ms: number): ReturnType<typeof setTimeout>;
+  clear(handle: ReturnType<typeof setTimeout>): void;
+}
+
+/**
+ * The bounded entry gate over an initial-build promise: true when the build
+ * settles first, false when `maxWaitMs` elapses first (the caller falls back
+ * to the classic eased flip). The losing timer is always cleared, so a
+ * resolved gate leaves no armed timeout behind. Both arms are pinned by
+ * far_terrain_view.test.ts; Renderer.farVistaReady is a thin consumer.
+ */
+export function farVistaGate(
+  build: Promise<void>,
+  maxWaitMs: number,
+  // Wrapped, not extracted: a bare setTimeout reference invoked as a method
+  // carries the wrong receiver and throws Illegal invocation in browsers.
+  timers: FarVistaGateTimers = {
+    set: (callback, ms) => setTimeout(callback, ms),
+    clear: (handle) => clearTimeout(handle),
+  },
+): Promise<boolean> {
+  return new Promise((resolve) => {
+    let settled = false;
+    const handle = timers.set(() => {
+      if (settled) return;
+      settled = true;
+      resolve(false);
+    }, maxWaitMs);
+    void build.then(() => {
+      if (settled) return;
+      settled = true;
+      timers.clear(handle);
+      resolve(true);
+    });
+  });
+}
+
 // Fragments closer than (detailFar - margin) are discarded: inside the
 // detail envelope the real terrain owns every pixel, and on steep ridges
 // the coarse mesh's chord error is far larger than any fixed vertical drop

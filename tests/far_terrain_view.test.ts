@@ -7,7 +7,12 @@
 // that must invalidate the static far snapshot.
 
 import { afterEach, describe, expect, it } from 'vitest';
-import { buildFarTerrain, type FarTerrainView } from '../src/render/far_terrain';
+import {
+  buildFarTerrain,
+  type FarTerrainView,
+  type FarVistaGateTimers,
+  farVistaGate,
+} from '../src/render/far_terrain';
 import type { FarVistaPlan } from '../src/render/far_terrain_core';
 
 // A coarse plan keeps each tile a couple of idle slots: the LAW under test
@@ -55,6 +60,64 @@ async function driveToComplete(view: FarTerrainView, stub: IdleStub): Promise<vo
 
 afterEach(() => {
   (globalThis as { requestIdleCallback?: unknown }).requestIdleCallback = undefined;
+});
+
+describe('farVistaGate: the bounded entry gate over the initial build', () => {
+  // Deterministic timers: capture the callback, fire it by hand, count clears.
+  interface FakeTimers {
+    timers: { set(cb: () => void, ms: number): number; clear(handle: number): void };
+    fire(): void;
+    setCalls: number[];
+    clearCalls: number[];
+  }
+  function fakeTimers(): FakeTimers {
+    const state: FakeTimers = {
+      setCalls: [],
+      clearCalls: [],
+      fire: () => {},
+      timers: {
+        set(cb, ms) {
+          state.setCalls.push(ms);
+          state.fire = cb;
+          return 7;
+        },
+        clear(handle) {
+          state.clearCalls.push(handle);
+        },
+      },
+    };
+    return state;
+  }
+
+  it('resolves true when the build settles first, and clears the losing timer', async () => {
+    const ft = fakeTimers();
+    let settle = () => {};
+    const build = new Promise<void>((r) => {
+      settle = r;
+    });
+    const gate = farVistaGate(build, 4000, ft.timers as unknown as FarVistaGateTimers);
+    settle();
+    await expect(gate).resolves.toBe(true);
+    // No armed timeout may outlive a resolved gate (each boot would
+    // otherwise leave a timer and its closure alive for the full wait).
+    expect(ft.setCalls).toEqual([4000]);
+    expect(ft.clearCalls).toEqual([7]);
+  });
+
+  it('resolves false when the timeout fires first (the pathological-device arm)', async () => {
+    const ft = fakeTimers();
+    let settle = () => {};
+    const build = new Promise<void>((r) => {
+      settle = r;
+    });
+    const gate = farVistaGate(build, 4000, ft.timers as unknown as FarVistaGateTimers);
+    ft.fire();
+    await expect(gate).resolves.toBe(false);
+    // The build settling AFTER the timeout must not double-resolve or clear.
+    settle();
+    await new Promise((r) => setTimeout(r, 0));
+    expect(ft.clearCalls).toEqual([]);
+  });
 });
 
 describe('buildFarTerrain lifecycle', () => {
