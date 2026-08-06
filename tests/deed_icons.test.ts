@@ -369,17 +369,19 @@ describe('Book of Deeds webp icons', () => {
   it('an artless deed card resolves to a procedural crest (no committed image)', () => {
     // Any live deed awaiting art must land on its category base crest, which carries no
     // image URL and falls through to the procedural canvas path. The pending set is pinned
-    // exhaustively (DEED_ART_PENDING, src/ui/icons.ts) and the two counts below are literal, so a third
-    // artless deed, a dropped webp, or a silent catalog append all red here. The Rift coverage
-    // pair (dgn_rift, dgn_rift_s_rank) ships artless per docs/design/deeds.md step 6 ("art can
-    // trail the deed"), enumerated in DEED_ART_PENDING like the other pending debt rather than
-    // a bespoke exception here.
+    // exhaustively (DEED_ART_PENDING, src/ui/icons.ts) and the two counts below are literal, so a
+    // third artless deed, a dropped webp, or a silent catalog append all red here. The Rift
+    // coverage pair (dgn_rift, dgn_rift_s_rank) ships artless per docs/design/deeds.md step 6
+    // ("art can trail the deed"), and the twelve zone chronicle deeds added for
+    // frostveil/amberfall/nightbloom/wraithwood/palmreach/evergarden ship art-trailing per the
+    // same rule; both join the pending set alongside the Thornhollow Fields battleground quartet,
+    // the Drakelands brood pair, and the seven per-craft rare-tier profession deeds (issue #2055).
     const artless = DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id));
     expect(artless, 'only the pinned art-pending deeds may lack painted art').toEqual([
       ...DEED_ART_PENDING_IDS,
     ]);
-    expect(DEED_ORDER, 'the merged live deed catalog').toHaveLength(247);
-    expect(DEED_IMAGE_IDS.size, 'every live deed but the pending set is painted').toBe(232);
+    expect(DEED_ORDER, 'the merged live deed catalog').toHaveLength(259);
+    expect(DEED_IMAGE_IDS.size, 'the committed art set is unchanged by this PR').toBe(232);
     for (const id of artless) {
       const crestId = deedCrestId(id, DEEDS[id].category);
       expect(crestId, `${id} must fall back to a category base crest`).toMatch(/^deed_cat_/);

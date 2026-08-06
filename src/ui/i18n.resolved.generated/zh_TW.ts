@@ -396,7 +396,8 @@ export const zh_TW: EnTranslations = {
     },
     "emoteEditor": {
       "title": "表情",
-      "done": "完成"
+      "done": "完成",
+      "close": "關閉表情"
     },
     "dailyRewards": {
       "title": "每日獎勵",
@@ -1354,6 +1355,8 @@ export const zh_TW: EnTranslations = {
       "buttons": "按鍵配置",
       "resetButtons": "重設按鍵配置",
       "menuAction": "遊戲選單",
+      "zoomIn": "Zoom In",
+      "zoomOut": "Zoom Out",
       "help": "左搖桿移動，右搖桿控制鏡頭。開啟視窗即可使用螢幕指標。"
     },
     "perf": {
@@ -3152,7 +3155,8 @@ export const zh_TW: EnTranslations = {
         "raise_fallen": "亡者復生（週期性召喚小怪）",
         "soul_rend": "靈魂撕裂（被標記者需分散並接受治療）",
         "deathless_rage": "不死之怒（需在護符石處打斷）",
-        "wardstones": "護符石引導（階段轉換）"
+        "wardstones": "護符石引導（階段轉換）",
+        "dread_curse": "恐懼詛咒（僅英雄難度，累加坦克輪換減益）"
       }
     },
     "deeds": {
@@ -3593,16 +3597,21 @@ export const zh_TW: EnTranslations = {
       "groupInterface": "介面",
       "groupCamera": "鏡頭",
       "talents": "天賦",
+      "professions": "專業",
       "arena": "競技場",
       "leaderboard": "排行榜",
       "deeds": "功績之書",
+      "sheathe": "收起/拔出武器",
       "crafting": "製作",
       "valeCup": "溪谷盃",
+      "mount": "騎乘 / 下騎",
       "calendar": "活動日曆",
+      "dungeonFinder": "地城搜尋器",
       "discord": "Discord",
       "abilities": "使用動作列技能（數字鍵列；第二條動作列位於數字鍵盤上）",
       "targetFriendly": "鎖定最近的友方",
       "cycleFriendly": "切換友方目標",
+      "targetAuras": "目標增益與減益效果",
       "gameMenu": "開啟遊戲選單與設定",
       "bothMouse": "滑鼠左右鍵",
       "runForward": "向前奔跑",
@@ -3613,7 +3622,7 @@ export const zh_TW: EnTranslations = {
       "mobileHeading": "行動裝置上",
       "mobileBody": "在手機與平板上會自動顯示觸控操作：左側為移動搖桿，在其他任意處拖曳即可環顧，用兩指捏合來縮放鏡頭，並有螢幕上的按鈕供你使用技能與選單。左上角的一個小箭頭可以顯示或隱藏選單按鈕，而那裡的「更多」按鈕則收納了你其餘的視窗。",
       "controllerHeading": "使用手把時",
-      "controllerBody": "手把同樣可用，且預設即開啟手把支援。左搖桿負責移動，右搖桿控制鏡頭，正面按鍵與肩鍵則涵蓋你的技能、跳躍與互動。開啟像是背包這樣的視窗會喚出畫面上的指標，而遊戲選單則可用十字鍵與正面按鍵直接操作。你可以在選項中的手把設定裡重新配置按鍵，並調整搖桿盲區、鏡頭速度、震動以及反轉視角。"
+      "controllerBody": "手把同樣可用，且預設即開啟手把支援。左搖桿負責移動，右搖桿控制鏡頭，正面按鍵與肩鍵則涵蓋你的技能、跳躍與互動。開啟像是背包這樣的視窗會喚出畫面上的指標，而遊戲選單則可用十字鍵與正面按鍵直接操作。你可以在選項中的手把設定裡重新配置按鍵，並調整搖桿盲區、鏡頭速度、震動以及反轉視角，也可以將某個按鍵綁定為拉近或拉遠鏡頭（預設未綁定）。"
     },
     "settingsPage": {
       "heading": "設定與效能",

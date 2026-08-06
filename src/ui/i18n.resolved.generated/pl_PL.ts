@@ -396,7 +396,8 @@ export const pl_PL: EnTranslations = {
     },
     "emoteEditor": {
       "title": "Emotki",
-      "done": "Gotowe"
+      "done": "Gotowe",
+      "close": "Close emotes"
     },
     "dailyRewards": {
       "title": "Codzienne nagrody",
@@ -1354,6 +1355,8 @@ export const pl_PL: EnTranslations = {
       "buttons": "Układ przycisków",
       "resetButtons": "Resetuj układ przycisków",
       "menuAction": "Menu gry",
+      "zoomIn": "Zoom In",
+      "zoomOut": "Zoom Out",
       "help": "Lewa gałka porusza, prawa gałka rozgląda. Otwórz okno, aby użyć wskaźnika ekranowego."
     },
     "perf": {
@@ -3152,7 +3155,8 @@ export const pl_PL: EnTranslations = {
         "raise_fallen": "Wskrzeszenie Poległych (okresowe fale wrogów)",
         "soul_rend": "Rozdarcie Duszy (oznaczeni gracze muszą się rozprószyć i być leczeni)",
         "deathless_rage": "Nieśmiertelna Furia (przerywana przy kamieniach wardowych)",
-        "wardstones": "Kanały kamieni wardowych (przejście fazy)"
+        "wardstones": "Kanały kamieni wardowych (przejście fazy)",
+        "dread_curse": "Dread Curse (heroic only, stacking tank-swap debuff)"
       }
     },
     "deeds": {
@@ -3593,16 +3597,21 @@ export const pl_PL: EnTranslations = {
       "groupInterface": "Interfejs",
       "groupCamera": "Kamera",
       "talents": "Talenty",
+      "professions": "Professions",
       "arena": "Arena",
       "leaderboard": "Tabela wyników",
       "deeds": "Księga Czynów",
+      "sheathe": "Sheathe/Unsheathe Weapon",
       "crafting": "Wytwarzanie",
       "valeCup": "Puchar Doliny",
+      "mount": "Mount / Dismount",
       "calendar": "Kalendarz wydarzeń",
+      "dungeonFinder": "Dungeon Finder",
       "discord": "Discord",
       "abilities": "Używaj zdolności z paska akcji (rząd cyfr; drugi pasek znajduje się na klawiaturze numerycznej)",
       "targetFriendly": "Namierz najbliższy przyjazny cel",
       "cycleFriendly": "Przełączaj przyjazny cel",
+      "targetAuras": "Target buffs and debuffs",
       "gameMenu": "Otwórz menu gry i opcje",
       "bothMouse": "Oba przyciski myszy",
       "runForward": "Biegnij naprzód",

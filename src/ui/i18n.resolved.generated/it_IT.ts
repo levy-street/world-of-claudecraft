@@ -396,7 +396,8 @@ export const it_IT: EnTranslations = {
     },
     "emoteEditor": {
       "title": "Emote",
-      "done": "Fine"
+      "done": "Fine",
+      "close": "Close emotes"
     },
     "dailyRewards": {
       "title": "Ricompense giornaliere",
@@ -1354,6 +1355,8 @@ export const it_IT: EnTranslations = {
       "buttons": "Disposizione dei pulsanti",
       "resetButtons": "Ripristina disposizione dei pulsanti",
       "menuAction": "Menu di gioco",
+      "zoomIn": "Zoom In",
+      "zoomOut": "Zoom Out",
       "help": "Lo stick sinistro muove, quello destro orienta la telecamera. Apri una finestra per usare il puntatore a schermo."
     },
     "perf": {
@@ -3152,7 +3155,8 @@ export const it_IT: EnTranslations = {
         "raise_fallen": "Richiama i Caduti (ondate periodiche di rinforzi)",
         "soul_rend": "Squarcio dell'Anima (i giocatori segnati devono disperdersi ed essere curati)",
         "deathless_rage": "Furia Immortale (interrotta alle pietre di guardia)",
-        "wardstones": "Canalizzazione delle pietre di guardia (transizione di fase)"
+        "wardstones": "Canalizzazione delle pietre di guardia (transizione di fase)",
+        "dread_curse": "Dread Curse (heroic only, stacking tank-swap debuff)"
       }
     },
     "deeds": {
@@ -3593,16 +3597,21 @@ export const it_IT: EnTranslations = {
       "groupInterface": "Interfaccia",
       "groupCamera": "Telecamera",
       "talents": "Talenti",
+      "professions": "Professions",
       "arena": "Arena",
       "leaderboard": "Classifica",
       "deeds": "Libro delle Imprese",
+      "sheathe": "Sheathe/Unsheathe Weapon",
       "crafting": "Creazione",
       "valeCup": "Coppa della Valle",
+      "mount": "Mount / Dismount",
       "calendar": "Calendario degli eventi",
+      "dungeonFinder": "Dungeon Finder",
       "discord": "Discord",
       "abilities": "Usa le abilità della barra delle azioni (la fila dei numeri; una seconda barra è sul tastierino numerico)",
       "targetFriendly": "Bersaglia l'amico più vicino",
       "cycleFriendly": "Scorri i bersagli amici",
+      "targetAuras": "Target buffs and debuffs",
       "gameMenu": "Apri il menu di gioco e le opzioni",
       "bothMouse": "Entrambi i pulsanti del mouse",
       "runForward": "Corri in avanti",

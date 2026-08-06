@@ -396,7 +396,8 @@ export const tr_TR: EnTranslations = {
     },
     "emoteEditor": {
       "title": "İfadeler",
-      "done": "Tamam"
+      "done": "Tamam",
+      "close": "Close emotes"
     },
     "dailyRewards": {
       "title": "Günlük Ödüller",
@@ -1354,6 +1355,8 @@ export const tr_TR: EnTranslations = {
       "buttons": "Tuş Düzeni",
       "resetButtons": "Tuş Düzenini Sıfırla",
       "menuAction": "Oyun Menüsü",
+      "zoomIn": "Zoom In",
+      "zoomOut": "Zoom Out",
       "help": "Sol çubuk hareket ettirir, sağ çubuk bakışı yönlendirir. Ekran üzeri işaretçiyi kullanmak için bir pencere açın."
     },
     "perf": {
@@ -3152,7 +3155,8 @@ export const tr_TR: EnTranslations = {
         "raise_fallen": "Düşenleri Kaldır (periyodik yardımcı dalgaları)",
         "soul_rend": "Ruh Yırtılması (işaretlenen oyuncular yayılmalı ve iyileştirilmeli)",
         "deathless_rage": "Ölümsüz Öfke (koruma taşlarında kesilir)",
-        "wardstones": "Koruma taşı kanalları (faz geçişi)"
+        "wardstones": "Koruma taşı kanalları (faz geçişi)",
+        "dread_curse": "Dread Curse (heroic only, stacking tank-swap debuff)"
       }
     },
     "deeds": {
@@ -3593,16 +3597,21 @@ export const tr_TR: EnTranslations = {
       "groupInterface": "Arayüz",
       "groupCamera": "Kamera",
       "talents": "Yetenekler",
+      "professions": "Professions",
       "arena": "Arena",
       "leaderboard": "Lider Tablosu",
       "deeds": "Yiğitlikler Kitabı",
+      "sheathe": "Sheathe/Unsheathe Weapon",
       "crafting": "Üretim",
       "valeCup": "Vadi Kupası",
+      "mount": "Mount / Dismount",
       "calendar": "Etkinlik Takvimi",
+      "dungeonFinder": "Dungeon Finder",
       "discord": "Discord",
       "abilities": "Eylem çubuğu yeteneklerini kullan (rakam sırası; ikinci bir çubuk sayı tuş takımında yer alır)",
       "targetFriendly": "En yakın dostu hedefle",
       "cycleFriendly": "Dost hedefler arasında geç",
+      "targetAuras": "Target buffs and debuffs",
       "gameMenu": "Oyun menüsünü ve seçenekleri aç",
       "bothMouse": "Her İki Fare Düğmesi",
       "runForward": "İleri koş",

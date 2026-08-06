@@ -396,7 +396,8 @@ export const nl_NL: EnTranslations = {
     },
     "emoteEditor": {
       "title": "Emotes",
-      "done": "Klaar"
+      "done": "Klaar",
+      "close": "Close emotes"
     },
     "dailyRewards": {
       "title": "Dagelijkse beloningen",
@@ -1354,6 +1355,8 @@ export const nl_NL: EnTranslations = {
       "buttons": "Knopindeling",
       "resetButtons": "Knopindeling resetten",
       "menuAction": "Spelmenu",
+      "zoomIn": "Zoom In",
+      "zoomOut": "Zoom Out",
       "help": "Linkerstick beweegt, rechterstick kijkt rond. Open een venster om de aanwijzer op het scherm te gebruiken."
     },
     "perf": {
@@ -3152,7 +3155,8 @@ export const nl_NL: EnTranslations = {
         "raise_fallen": "Gevallenen Herrijzen (periodieke golven van toevoegingen)",
         "soul_rend": "Zielenscheur (gemarkeerde spelers moeten spreiden en worden genezen)",
         "deathless_rage": "Doodloze Razernij (onderbroken bij de wardstones)",
-        "wardstones": "Wardstone-kanalen (faseovergang)"
+        "wardstones": "Wardstone-kanalen (faseovergang)",
+        "dread_curse": "Dread Curse (heroic only, stacking tank-swap debuff)"
       }
     },
     "deeds": {
@@ -3593,16 +3597,21 @@ export const nl_NL: EnTranslations = {
       "groupInterface": "Interface",
       "groupCamera": "Camera",
       "talents": "Talenten",
+      "professions": "Professions",
       "arena": "Arena",
       "leaderboard": "Ranglijst",
       "deeds": "Boek der Daden",
+      "sheathe": "Sheathe/Unsheathe Weapon",
       "crafting": "Vervaardigen",
       "valeCup": "De Dalbeker",
+      "mount": "Mount / Dismount",
       "calendar": "Evenementenkalender",
+      "dungeonFinder": "Dungeon Finder",
       "discord": "Discord",
       "abilities": "Actiebalkvaardigheden gebruiken (de cijferrij; een tweede balk staat op het numerieke toetsenblok)",
       "targetFriendly": "Dichtstbijzijnde bondgenoot aanwijzen",
       "cycleFriendly": "Door bondgenoten bladeren",
+      "targetAuras": "Target buffs and debuffs",
       "gameMenu": "Spelmenu en opties openen",
       "bothMouse": "Beide muisknoppen",
       "runForward": "Vooruit rennen",

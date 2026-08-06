@@ -396,7 +396,8 @@ export const pt_BR: EnTranslations = {
     },
     "emoteEditor": {
       "title": "Emotes",
-      "done": "Concluído"
+      "done": "Concluído",
+      "close": "Close emotes"
     },
     "dailyRewards": {
       "title": "Recompensas Diárias",
@@ -1354,6 +1355,8 @@ export const pt_BR: EnTranslations = {
       "buttons": "Disposição dos Botões",
       "resetButtons": "Redefinir Disposição dos Botões",
       "menuAction": "Menu do Jogo",
+      "zoomIn": "Zoom In",
+      "zoomOut": "Zoom Out",
       "help": "O analógico esquerdo move, o direito controla a câmera. Abra uma janela para usar o ponteiro na tela."
     },
     "perf": {
@@ -3152,7 +3155,8 @@ export const pt_BR: EnTranslations = {
         "raise_fallen": "Erguer os Caídos (ondas periódicas de reforços)",
         "soul_rend": "Rasgão de Alma (jogadores marcados devem se dispersar e ser curados)",
         "deathless_rage": "Fúria Imortal (interrompida nas pedras de guarda)",
-        "wardstones": "Canalizações das pedras de guarda (transição de fase)"
+        "wardstones": "Canalizações das pedras de guarda (transição de fase)",
+        "dread_curse": "Dread Curse (heroic only, stacking tank-swap debuff)"
       }
     },
     "deeds": {
@@ -3593,16 +3597,21 @@ export const pt_BR: EnTranslations = {
       "groupInterface": "Interface",
       "groupCamera": "Câmera",
       "talents": "Talentos",
+      "professions": "Professions",
       "arena": "Arena",
       "leaderboard": "Placar de líderes",
       "deeds": "Livro dos Feitos",
+      "sheathe": "Sheathe/Unsheathe Weapon",
       "crafting": "Criação",
       "valeCup": "Copa do Vale",
+      "mount": "Mount / Dismount",
       "calendar": "Calendário de eventos",
+      "dungeonFinder": "Dungeon Finder",
       "discord": "Discord",
       "abilities": "Usar habilidades da barra de ação (a fileira de números; uma segunda barra fica no teclado numérico)",
       "targetFriendly": "Mirar o aliado mais próximo",
       "cycleFriendly": "Alternar alvo aliado",
+      "targetAuras": "Target buffs and debuffs",
       "gameMenu": "Abrir o menu do jogo e as opções",
       "bothMouse": "Ambos os botões do mouse",
       "runForward": "Correr para frente",

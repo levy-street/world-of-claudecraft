@@ -18,9 +18,13 @@ export const pending: Record<string, readonly string[]> = {
     "auth.useAuthenticatorCode",
     "auth.useRecoveryCode",
     "auth.verify",
+    "charts.loadFailed",
     "error.invalidAuthenticationCode",
     "moderationHistory.actionSpectate",
-    "moderationHistory.actionUnspectate"
+    "moderationHistory.actionUnspectate",
+    "stats.loadFailed",
+    "tickPerf.loadFailed",
+    "usage.loadFailed"
   ],
   "es_ES": [
     "auth.authenticatorCode",
@@ -30,9 +34,13 @@ export const pending: Record<string, readonly string[]> = {
     "auth.useAuthenticatorCode",
     "auth.useRecoveryCode",
     "auth.verify",
+    "charts.loadFailed",
     "error.invalidAuthenticationCode",
     "moderationHistory.actionSpectate",
-    "moderationHistory.actionUnspectate"
+    "moderationHistory.actionUnspectate",
+    "stats.loadFailed",
+    "tickPerf.loadFailed",
+    "usage.loadFailed"
   ],
   "fr_FR": [
     "auth.authenticatorCode",
@@ -42,9 +50,13 @@ export const pending: Record<string, readonly string[]> = {
     "auth.useAuthenticatorCode",
     "auth.useRecoveryCode",
     "auth.verify",
+    "charts.loadFailed",
     "error.invalidAuthenticationCode",
     "moderationHistory.actionSpectate",
-    "moderationHistory.actionUnspectate"
+    "moderationHistory.actionUnspectate",
+    "stats.loadFailed",
+    "tickPerf.loadFailed",
+    "usage.loadFailed"
   ],
   "fr_CA": [
     "auth.authenticatorCode",
@@ -54,9 +66,13 @@ export const pending: Record<string, readonly string[]> = {
     "auth.useAuthenticatorCode",
     "auth.useRecoveryCode",
     "auth.verify",
+    "charts.loadFailed",
     "error.invalidAuthenticationCode",
     "moderationHistory.actionSpectate",
-    "moderationHistory.actionUnspectate"
+    "moderationHistory.actionUnspectate",
+    "stats.loadFailed",
+    "tickPerf.loadFailed",
+    "usage.loadFailed"
   ],
   "en_CA": [],
   "it_IT": [
@@ -67,9 +83,13 @@ export const pending: Record<string, readonly string[]> = {
     "auth.useAuthenticatorCode",
     "auth.useRecoveryCode",
     "auth.verify",
+    "charts.loadFailed",
     "error.invalidAuthenticationCode",
     "moderationHistory.actionSpectate",
-    "moderationHistory.actionUnspectate"
+    "moderationHistory.actionUnspectate",
+    "stats.loadFailed",
+    "tickPerf.loadFailed",
+    "usage.loadFailed"
   ],
   "de_DE": [
     "auth.authenticatorCode",
@@ -79,9 +99,13 @@ export const pending: Record<string, readonly string[]> = {
     "auth.useAuthenticatorCode",
     "auth.useRecoveryCode",
     "auth.verify",
+    "charts.loadFailed",
     "error.invalidAuthenticationCode",
     "moderationHistory.actionSpectate",
-    "moderationHistory.actionUnspectate"
+    "moderationHistory.actionUnspectate",
+    "stats.loadFailed",
+    "tickPerf.loadFailed",
+    "usage.loadFailed"
   ],
   "zh_CN": [
     "auth.authenticatorCode",
@@ -91,9 +115,13 @@ export const pending: Record<string, readonly string[]> = {
     "auth.useAuthenticatorCode",
     "auth.useRecoveryCode",
     "auth.verify",
+    "charts.loadFailed",
     "error.invalidAuthenticationCode",
     "moderationHistory.actionSpectate",
-    "moderationHistory.actionUnspectate"
+    "moderationHistory.actionUnspectate",
+    "stats.loadFailed",
+    "tickPerf.loadFailed",
+    "usage.loadFailed"
   ],
   "zh_TW": [
     "auth.authenticatorCode",
@@ -103,9 +131,13 @@ export const pending: Record<string, readonly string[]> = {
     "auth.useAuthenticatorCode",
     "auth.useRecoveryCode",
     "auth.verify",
+    "charts.loadFailed",
     "error.invalidAuthenticationCode",
     "moderationHistory.actionSpectate",
-    "moderationHistory.actionUnspectate"
+    "moderationHistory.actionUnspectate",
+    "stats.loadFailed",
+    "tickPerf.loadFailed",
+    "usage.loadFailed"
   ],
   "ko_KR": [
     "auth.authenticatorCode",
@@ -115,9 +147,13 @@ export const pending: Record<string, readonly string[]> = {
     "auth.useAuthenticatorCode",
     "auth.useRecoveryCode",
     "auth.verify",
+    "charts.loadFailed",
     "error.invalidAuthenticationCode",
     "moderationHistory.actionSpectate",
-    "moderationHistory.actionUnspectate"
+    "moderationHistory.actionUnspectate",
+    "stats.loadFailed",
+    "tickPerf.loadFailed",
+    "usage.loadFailed"
   ],
   "ja_JP": [
     "auth.authenticatorCode",
@@ -127,9 +163,13 @@ export const pending: Record<string, readonly string[]> = {
     "auth.useAuthenticatorCode",
     "auth.useRecoveryCode",
     "auth.verify",
+    "charts.loadFailed",
     "error.invalidAuthenticationCode",
     "moderationHistory.actionSpectate",
-    "moderationHistory.actionUnspectate"
+    "moderationHistory.actionUnspectate",
+    "stats.loadFailed",
+    "tickPerf.loadFailed",
+    "usage.loadFailed"
   ],
   "pt_BR": [
     "auth.authenticatorCode",
@@ -139,9 +179,13 @@ export const pending: Record<string, readonly string[]> = {
     "auth.useAuthenticatorCode",
     "auth.useRecoveryCode",
     "auth.verify",
+    "charts.loadFailed",
     "error.invalidAuthenticationCode",
     "moderationHistory.actionSpectate",
-    "moderationHistory.actionUnspectate"
+    "moderationHistory.actionUnspectate",
+    "stats.loadFailed",
+    "tickPerf.loadFailed",
+    "usage.loadFailed"
   ],
   "ru_RU": [
     "auth.authenticatorCode",
@@ -151,9 +195,13 @@ export const pending: Record<string, readonly string[]> = {
     "auth.useAuthenticatorCode",
     "auth.useRecoveryCode",
     "auth.verify",
+    "charts.loadFailed",
     "error.invalidAuthenticationCode",
     "moderationHistory.actionSpectate",
-    "moderationHistory.actionUnspectate"
+    "moderationHistory.actionUnspectate",
+    "stats.loadFailed",
+    "tickPerf.loadFailed",
+    "usage.loadFailed"
   ],
   "cs_CZ": [
     "auth.authenticatorCode",
@@ -163,9 +211,13 @@ export const pending: Record<string, readonly string[]> = {
     "auth.useAuthenticatorCode",
     "auth.useRecoveryCode",
     "auth.verify",
+    "charts.loadFailed",
     "error.invalidAuthenticationCode",
     "moderationHistory.actionSpectate",
-    "moderationHistory.actionUnspectate"
+    "moderationHistory.actionUnspectate",
+    "stats.loadFailed",
+    "tickPerf.loadFailed",
+    "usage.loadFailed"
   ],
   "nl_NL": [
     "auth.authenticatorCode",
@@ -175,9 +227,13 @@ export const pending: Record<string, readonly string[]> = {
     "auth.useAuthenticatorCode",
     "auth.useRecoveryCode",
     "auth.verify",
+    "charts.loadFailed",
     "error.invalidAuthenticationCode",
     "moderationHistory.actionSpectate",
-    "moderationHistory.actionUnspectate"
+    "moderationHistory.actionUnspectate",
+    "stats.loadFailed",
+    "tickPerf.loadFailed",
+    "usage.loadFailed"
   ],
   "pl_PL": [
     "auth.authenticatorCode",
@@ -187,9 +243,13 @@ export const pending: Record<string, readonly string[]> = {
     "auth.useAuthenticatorCode",
     "auth.useRecoveryCode",
     "auth.verify",
+    "charts.loadFailed",
     "error.invalidAuthenticationCode",
     "moderationHistory.actionSpectate",
-    "moderationHistory.actionUnspectate"
+    "moderationHistory.actionUnspectate",
+    "stats.loadFailed",
+    "tickPerf.loadFailed",
+    "usage.loadFailed"
   ],
   "id_ID": [
     "auth.authenticatorCode",
@@ -199,9 +259,13 @@ export const pending: Record<string, readonly string[]> = {
     "auth.useAuthenticatorCode",
     "auth.useRecoveryCode",
     "auth.verify",
+    "charts.loadFailed",
     "error.invalidAuthenticationCode",
     "moderationHistory.actionSpectate",
-    "moderationHistory.actionUnspectate"
+    "moderationHistory.actionUnspectate",
+    "stats.loadFailed",
+    "tickPerf.loadFailed",
+    "usage.loadFailed"
   ],
   "tr_TR": [
     "auth.authenticatorCode",
@@ -211,9 +275,13 @@ export const pending: Record<string, readonly string[]> = {
     "auth.useAuthenticatorCode",
     "auth.useRecoveryCode",
     "auth.verify",
+    "charts.loadFailed",
     "error.invalidAuthenticationCode",
     "moderationHistory.actionSpectate",
-    "moderationHistory.actionUnspectate"
+    "moderationHistory.actionUnspectate",
+    "stats.loadFailed",
+    "tickPerf.loadFailed",
+    "usage.loadFailed"
   ],
   "sv_SE": [
     "auth.authenticatorCode",
@@ -223,9 +291,13 @@ export const pending: Record<string, readonly string[]> = {
     "auth.useAuthenticatorCode",
     "auth.useRecoveryCode",
     "auth.verify",
+    "charts.loadFailed",
     "error.invalidAuthenticationCode",
     "moderationHistory.actionSpectate",
-    "moderationHistory.actionUnspectate"
+    "moderationHistory.actionUnspectate",
+    "stats.loadFailed",
+    "tickPerf.loadFailed",
+    "usage.loadFailed"
   ],
   "vi_VN": [
     "auth.authenticatorCode",
@@ -235,9 +307,13 @@ export const pending: Record<string, readonly string[]> = {
     "auth.useAuthenticatorCode",
     "auth.useRecoveryCode",
     "auth.verify",
+    "charts.loadFailed",
     "error.invalidAuthenticationCode",
     "moderationHistory.actionSpectate",
-    "moderationHistory.actionUnspectate"
+    "moderationHistory.actionUnspectate",
+    "stats.loadFailed",
+    "tickPerf.loadFailed",
+    "usage.loadFailed"
   ],
   "da_DK": [
     "auth.authenticatorCode",
@@ -247,8 +323,12 @@ export const pending: Record<string, readonly string[]> = {
     "auth.useAuthenticatorCode",
     "auth.useRecoveryCode",
     "auth.verify",
+    "charts.loadFailed",
     "error.invalidAuthenticationCode",
     "moderationHistory.actionSpectate",
-    "moderationHistory.actionUnspectate"
+    "moderationHistory.actionUnspectate",
+    "stats.loadFailed",
+    "tickPerf.loadFailed",
+    "usage.loadFailed"
   ]
 };

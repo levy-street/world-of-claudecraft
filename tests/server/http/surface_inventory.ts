@@ -1411,7 +1411,7 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     handler: 'assetIdMatch',
     contentType: PROBLEM_JSON,
     authScope: AUTH_SCOPE.full,
-    limiter: null,
+    limiter: 'assetUploadRateLimited',
     requireOwnedExpected: REQUIRE_OWNED.bola404,
     match: /^\/api\/assets\/(\d+)$/,
   },

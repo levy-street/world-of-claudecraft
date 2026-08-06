@@ -396,7 +396,8 @@ export const ko_KR: EnTranslations = {
     },
     "emoteEditor": {
       "title": "감정 표현",
-      "done": "완료"
+      "done": "완료",
+      "close": "감정 표현 닫기"
     },
     "dailyRewards": {
       "title": "일일 보상",
@@ -1354,6 +1355,8 @@ export const ko_KR: EnTranslations = {
       "buttons": "버튼 배치",
       "resetButtons": "버튼 배치 초기화",
       "menuAction": "게임 메뉴",
+      "zoomIn": "Zoom In",
+      "zoomOut": "Zoom Out",
       "help": "왼쪽 스틱으로 이동, 오른쪽 스틱으로 시점 조작. 창을 열면 화면 포인터를 사용할 수 있습니다."
     },
     "perf": {
@@ -3152,7 +3155,8 @@ export const ko_KR: EnTranslations = {
         "raise_fallen": "망자 소생(주기적 증원)",
         "soul_rend": "영혼 가르기(표식 대상은 산개 후 치유 필요)",
         "deathless_rage": "불사의 격노(수호석에서 저지)",
-        "wardstones": "수호석 정신집중(단계 전환)"
+        "wardstones": "수호석 정신집중(단계 전환)",
+        "dread_curse": "공포의 저주(영웅 전용, 누적되는 탱커 교대 디버프)"
       }
     },
     "deeds": {
@@ -3593,16 +3597,21 @@ export const ko_KR: EnTranslations = {
       "groupInterface": "인터페이스",
       "groupCamera": "카메라",
       "talents": "특성",
+      "professions": "생산 전문직",
       "arena": "투기장",
       "leaderboard": "순위표",
       "deeds": "업적의 서",
+      "sheathe": "무기 넣기/빼기",
       "crafting": "제작",
       "valeCup": "베일 컵",
+      "mount": "탑승 / 하차",
       "calendar": "이벤트 달력",
+      "dungeonFinder": "던전 찾기",
       "discord": "Discord",
       "abilities": "행동 단축바 능력 사용 (숫자 키 줄, 두 번째 단축바는 숫자 키패드에 있음)",
       "targetFriendly": "가장 가까운 아군 대상 지정",
       "cycleFriendly": "아군 대상 순환",
+      "targetAuras": "대상 강화 및 약화 효과",
       "gameMenu": "게임 메뉴와 옵션 열기",
       "bothMouse": "마우스 양쪽 버튼",
       "runForward": "앞으로 달리기",
@@ -3613,7 +3622,7 @@ export const ko_KR: EnTranslations = {
       "mobileHeading": "모바일에서",
       "mobileBody": "휴대전화와 태블릿에서는 터치 조작이 자동으로 나타납니다. 왼쪽에는 이동 스틱, 그 밖의 아무 곳이나 끌면 시점 전환, 두 손가락으로 오므리면 카메라 확대, 그리고 능력과 메뉴를 위한 화면 버튼이 표시됩니다. 왼쪽 위 구석의 작은 화살표로 메뉴 버튼을 보이거나 숨길 수 있고, 그곳의 더 보기 버튼에 나머지 창들이 담겨 있습니다.",
       "controllerHeading": "컨트롤러에서",
-      "controllerBody": "게임패드도 사용할 수 있으며, 컨트롤러 지원은 기본으로 켜져 있습니다. 왼쪽 스틱으로 이동하고, 오른쪽 스틱으로 카메라를 조준하며, 얼굴 버튼과 어깨 버튼으로 능력 사용, 점프, 상호작용을 처리합니다. 가방 같은 창을 열면 화면 포인터가 나타나고, 게임 메뉴는 방향 패드와 얼굴 버튼으로 곧바로 조작할 수 있습니다. 옵션의 컨트롤러 설정에서 버튼을 재배치하고 스틱 데드존, 카메라 속도, 진동, 시점 반전을 조정할 수 있습니다."
+      "controllerBody": "게임패드도 사용할 수 있으며, 컨트롤러 지원은 기본으로 켜져 있습니다. 왼쪽 스틱으로 이동하고, 오른쪽 스틱으로 카메라를 조준하며, 얼굴 버튼과 어깨 버튼으로 능력 사용, 점프, 상호작용을 처리합니다. 가방 같은 창을 열면 화면 포인터가 나타나고, 게임 메뉴는 방향 패드와 얼굴 버튼으로 곧바로 조작할 수 있습니다. 옵션의 컨트롤러 설정에서 버튼을 재배치하고 스틱 데드존, 카메라 속도, 진동, 시점 반전을 조정할 수 있으며, 버튼 하나를 카메라 확대/축소에 배정할 수도 있습니다(기본값은 미배정)."
     },
     "settingsPage": {
       "heading": "설정 및 성능",

@@ -212,8 +212,9 @@ by hand or finish the drill with a green dispatch at the same ref.
 
 Deliberate exclusions: the release-i18n 21-locale lane (expected red mid-cycle, issue
 #2820) and the release version gate (cannot rot without a push, which ci.yml covers).
-The cron arms only once the workflow file reaches `main` (GitHub reads schedules from
-the default branch); until then, dispatch it manually on the branch that carries it.
+GitHub registers a workflow's cron AND its `workflow_dispatch` surface from the default
+branch, so neither can fire until the file reaches `main` with a release merge; the
+first drill and the first manual pass both come after that.
 Planning logic: `scripts/lib/nightly_plan.mjs`, pinned by `tests/nightly_plan.test.ts`;
 the workflow shape is pinned by `tests/nightly_workflow.test.ts`.
 
