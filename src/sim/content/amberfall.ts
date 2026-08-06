@@ -573,3 +573,5 @@ export const AMBERFALL_PROPS: ZonePropsDef = {
     [-364, 1838],
   ],
 };
+
+// Phase 2 selective-CI measurement drill: content-only comment-level change.
