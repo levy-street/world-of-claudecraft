@@ -9702,6 +9702,14 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.freeCast': 'Следующее заклинание ничего не стоит',
   'hudChrome.auraEffect.instantCast': 'Следующее заклинание с временем чтения станет мгновенным',
   'hudChrome.auraEffect.cheapCast': 'Следующее заклинание стоит на {pct}% меньше',
+  'hudChrome.auraEffect.arcaneCharges':
+    'Заряды тайной магии (до 4). Каждый заряд усиливает урон вашего следующего Эфирного всплеска и ускоряет его чтение на 5%, но резко повышает его расход маны. Стрелы эфира расходуют все заряды.',
+  'hudChrome.auraEffect.aetherRush':
+    'Ваш следующий Эфирный всплеск бесплатен и читается вдвое быстрее',
+  'hudChrome.auraEffect.perfectMoment':
+    'Удерживает 4 заряда тайной магии. Стрелы эфира больше не расходуют их, позволяя раз за разом выпускать полный залп из пяти снарядов',
+  'hudChrome.auraEffect.temporalEcho':
+    'Отмечены эхом более здорового мгновения: часть тайного урона заклинателя возвращается, исцеляя вас',
   'hudChrome.auraEffect.increase.sp': 'Повышает силу заклинаний на {value}',
   'hudChrome.specPanel.specUnlockBanner': 'Специализация открыта!',
   'hudChrome.specPanel.specUnlockHint': 'Нажмите N, чтобы выбрать специализацию.',

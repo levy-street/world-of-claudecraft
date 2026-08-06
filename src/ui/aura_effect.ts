@@ -75,6 +75,12 @@ export function auraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor |
   if (a.id === 'convergence_mark' && a.kind === 'internal_cd') {
     return { key: `${KEY}.elementalConvergencePrimed`, nums: {} };
   }
+  // Aether Rush (Chronomancy): the free-cast proc rides the generic next_cast_free
+  // kind, but it is SCOPED to Aether Surge and also halves that cast, so its own
+  // line beats the generic "your next cast costs nothing".
+  if (a.id === 'aether_surge_free' && a.kind === 'next_cast_free') {
+    return { key: `${KEY}.aetherRush`, nums: {} };
+  }
   switch (a.kind) {
     case 'dot':
       return {
@@ -126,6 +132,15 @@ export function auraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor |
       return { key: `${KEY}.iceFloesCasts`, nums: { n: round(a.value) } };
     case 'next_cast_free':
       return { key: `${KEY}.freeCast`, nums: {} };
+    // Chronomancy (Arcane) signature auras. Each describes its mechanic (the icon
+    // badge already shows the live charge/stack count); no dynamic numbers, so the
+    // line reads identically offline and from the sparse online mirror.
+    case 'arcane_charge':
+      return { key: `${KEY}.arcaneCharges`, nums: {} };
+    case 'perfect_moment':
+      return { key: `${KEY}.perfectMoment`, nums: {} };
+    case 'temporal_echo':
+      return { key: `${KEY}.temporalEcho`, nums: {} };
     case 'next_cast_instant':
       return { key: `${KEY}.instantCast`, nums: {} };
     case 'next_cast_cheap':

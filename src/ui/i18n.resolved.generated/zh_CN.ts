@@ -1828,6 +1828,10 @@ export const zh_CN: EnTranslations = {
       "freeCast": "下一次施法不消耗任何资源",
       "instantCast": "下一个有施法时间的法术变为瞬发",
       "cheapCast": "下一个法术消耗降低{pct}%",
+      "arcaneCharges": "奥术充能（最多4层）。每层充能提高你下一次以太涌动的伤害并使其施法速度加快5%，但大幅提高其法力消耗。以太飞镖会消耗所有充能。",
+      "aetherRush": "你的下一次以太涌动无消耗，且施法速度加快一倍",
+      "perfectMoment": "维持在4层奥术充能。以太飞镖不再消耗充能，从而连续释放五连飞镖齐射",
+      "temporalEcho": "被更健康时刻的回响标记：施法者造成的部分奥术伤害会被引导回来治疗你",
       "increase": {
         "ap": "攻击强度提高 {value}",
         "sp": "法术强度提高 {value}",

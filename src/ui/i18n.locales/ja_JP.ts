@@ -9548,6 +9548,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.freeCast': '次の詠唱のコストがゼロになる',
   'hudChrome.auraEffect.instantCast': '次の詠唱時間のある呪文が即時発動になる',
   'hudChrome.auraEffect.cheapCast': '次の呪文のコストが{pct}%減少する',
+  'hudChrome.auraEffect.arcaneCharges':
+    '秘術チャージ（最大4）。チャージごとに次のエーテルサージのダメージが上昇し詠唱が5%速くなるが、マナコストが大きく増加する。エーテルダートは全チャージを消費する。',
+  'hudChrome.auraEffect.aetherRush': '次のエーテルサージはコストがゼロになり、詠唱速度が2倍になる',
+  'hudChrome.auraEffect.perfectMoment':
+    '秘術チャージが4に固定される。エーテルダートはチャージを消費しなくなり、5連射のフルバラージュを連続で放てる',
+  'hudChrome.auraEffect.temporalEcho':
+    'より健やかな瞬間の残響を刻まれる：術者が与える秘術ダメージの一部が引き戻され、あなたを回復する',
   'hudChrome.auraEffect.increase.sp': '呪文の威力を{value}上昇させる',
   'hudChrome.specPanel.specUnlockBanner': 'スペシャライゼーション解放！',
   'hudChrome.specPanel.specUnlockHint': 'Nキーを押してスペシャライゼーションを選択してください。',

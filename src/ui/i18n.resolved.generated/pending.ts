@@ -9,25 +9,100 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.auraEffect.aetherRush",
+    "hudChrome.auraEffect.arcaneCharges",
+    "hudChrome.auraEffect.perfectMoment",
+    "hudChrome.auraEffect.temporalEcho"
+  ],
+  "es_ES": [
+    "hudChrome.auraEffect.aetherRush",
+    "hudChrome.auraEffect.arcaneCharges",
+    "hudChrome.auraEffect.perfectMoment",
+    "hudChrome.auraEffect.temporalEcho"
+  ],
+  "fr_FR": [
+    "hudChrome.auraEffect.aetherRush",
+    "hudChrome.auraEffect.arcaneCharges",
+    "hudChrome.auraEffect.perfectMoment",
+    "hudChrome.auraEffect.temporalEcho"
+  ],
+  "fr_CA": [
+    "hudChrome.auraEffect.aetherRush",
+    "hudChrome.auraEffect.arcaneCharges",
+    "hudChrome.auraEffect.perfectMoment",
+    "hudChrome.auraEffect.temporalEcho"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "hudChrome.auraEffect.aetherRush",
+    "hudChrome.auraEffect.arcaneCharges",
+    "hudChrome.auraEffect.perfectMoment",
+    "hudChrome.auraEffect.temporalEcho"
+  ],
+  "de_DE": [
+    "hudChrome.auraEffect.aetherRush",
+    "hudChrome.auraEffect.arcaneCharges",
+    "hudChrome.auraEffect.perfectMoment",
+    "hudChrome.auraEffect.temporalEcho"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "hudChrome.auraEffect.aetherRush",
+    "hudChrome.auraEffect.arcaneCharges",
+    "hudChrome.auraEffect.perfectMoment",
+    "hudChrome.auraEffect.temporalEcho"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "hudChrome.auraEffect.aetherRush",
+    "hudChrome.auraEffect.arcaneCharges",
+    "hudChrome.auraEffect.perfectMoment",
+    "hudChrome.auraEffect.temporalEcho"
+  ],
+  "nl_NL": [
+    "hudChrome.auraEffect.aetherRush",
+    "hudChrome.auraEffect.arcaneCharges",
+    "hudChrome.auraEffect.perfectMoment",
+    "hudChrome.auraEffect.temporalEcho"
+  ],
+  "pl_PL": [
+    "hudChrome.auraEffect.aetherRush",
+    "hudChrome.auraEffect.arcaneCharges",
+    "hudChrome.auraEffect.perfectMoment",
+    "hudChrome.auraEffect.temporalEcho"
+  ],
+  "id_ID": [
+    "hudChrome.auraEffect.aetherRush",
+    "hudChrome.auraEffect.arcaneCharges",
+    "hudChrome.auraEffect.perfectMoment",
+    "hudChrome.auraEffect.temporalEcho"
+  ],
+  "tr_TR": [
+    "hudChrome.auraEffect.aetherRush",
+    "hudChrome.auraEffect.arcaneCharges",
+    "hudChrome.auraEffect.perfectMoment",
+    "hudChrome.auraEffect.temporalEcho"
+  ],
+  "sv_SE": [
+    "hudChrome.auraEffect.aetherRush",
+    "hudChrome.auraEffect.arcaneCharges",
+    "hudChrome.auraEffect.perfectMoment",
+    "hudChrome.auraEffect.temporalEcho"
+  ],
+  "vi_VN": [
+    "hudChrome.auraEffect.aetherRush",
+    "hudChrome.auraEffect.arcaneCharges",
+    "hudChrome.auraEffect.perfectMoment",
+    "hudChrome.auraEffect.temporalEcho"
+  ],
+  "da_DK": [
+    "hudChrome.auraEffect.aetherRush",
+    "hudChrome.auraEffect.arcaneCharges",
+    "hudChrome.auraEffect.perfectMoment",
+    "hudChrome.auraEffect.temporalEcho"
+  ]
 };

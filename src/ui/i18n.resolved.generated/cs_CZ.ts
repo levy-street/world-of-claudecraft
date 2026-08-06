@@ -1828,6 +1828,10 @@ export const cs_CZ: EnTranslations = {
       "freeCast": "Tvoje příští seslání nestojí nic",
       "instantCast": "Tvoje příští kouzlo s dobou sesílání je okamžité",
       "cheapCast": "Tvoje příští kouzlo stojí o {pct} % méně",
+      "arcaneCharges": "Arcane Charges (up to 4). Each charge increases your next Aether Surge damage and casts it 5% faster, but sharply raises its mana cost. Aether Darts consumes all charges.",
+      "aetherRush": "Your next Aether Surge is free and casts twice as fast",
+      "perfectMoment": "Held at 4 Arcane Charges. Aether Darts no longer consumes them, chaining full five-missile barrages",
+      "temporalEcho": "Marked with an echo of a healthier moment: part of the Arcane damage the caster deals is drawn back to heal you",
       "increase": {
         "ap": "Zvyšuje sílu útoku o {value}",
         "sp": "Zvyšuje sílu kouzel o {value}",

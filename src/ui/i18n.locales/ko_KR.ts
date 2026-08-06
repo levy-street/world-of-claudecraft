@@ -9534,6 +9534,14 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.freeCast': '다음 시전에 자원이 들지 않습니다',
   'hudChrome.auraEffect.instantCast': '시전 시간이 있는 다음 주문이 즉시 시전됩니다',
   'hudChrome.auraEffect.cheapCast': '다음 주문의 소모량이 {pct}% 감소합니다',
+  'hudChrome.auraEffect.arcaneCharges':
+    '비전 충전(최대 4). 충전마다 다음 에테르 쇄도의 피해가 증가하고 시전 속도가 5% 빨라지지만 마나 소모가 크게 늘어납니다. 에테르 화살은 모든 충전을 소모합니다.',
+  'hudChrome.auraEffect.aetherRush':
+    '다음 에테르 쇄도가 자원을 소모하지 않고 시전 속도가 2배가 됩니다',
+  'hudChrome.auraEffect.perfectMoment':
+    '비전 충전이 4로 유지됩니다. 에테르 화살이 더 이상 충전을 소모하지 않아 5발 일제사격을 연이어 퍼붓습니다',
+  'hudChrome.auraEffect.temporalEcho':
+    '더 건강했던 순간의 메아리로 표시됩니다: 시전자가 입히는 비전 피해의 일부가 되돌아와 당신을 치유합니다',
   'hudChrome.auraEffect.increase.sp': '주문력을 {value} 증가시킵니다',
   'hudChrome.specPanel.specUnlockBanner': '전문화 해제!',
   'hudChrome.specPanel.specUnlockHint': 'N을 눌러 전문화를 선택하세요.',

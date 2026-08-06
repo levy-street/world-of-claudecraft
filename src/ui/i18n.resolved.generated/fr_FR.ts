@@ -1828,6 +1828,10 @@ export const fr_FR: EnTranslations = {
       "freeCast": "Votre prochaine incantation ne coûte rien",
       "instantCast": "Votre prochain sort avec un temps d'incantation est instantané",
       "cheapCast": "Votre prochain sort coûte {pct} % de mana en moins",
+      "arcaneCharges": "Arcane Charges (up to 4). Each charge increases your next Aether Surge damage and casts it 5% faster, but sharply raises its mana cost. Aether Darts consumes all charges.",
+      "aetherRush": "Your next Aether Surge is free and casts twice as fast",
+      "perfectMoment": "Held at 4 Arcane Charges. Aether Darts no longer consumes them, chaining full five-missile barrages",
+      "temporalEcho": "Marked with an echo of a healthier moment: part of the Arcane damage the caster deals is drawn back to heal you",
       "increase": {
         "ap": "Augmente la puissance d'attaque de {value}",
         "sp": "Augmente la puissance des sorts de {value}",

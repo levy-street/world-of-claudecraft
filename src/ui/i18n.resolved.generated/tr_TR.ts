@@ -1828,6 +1828,10 @@ export const tr_TR: EnTranslations = {
       "freeCast": "Bir sonraki büyün hiçbir şeye mal olmaz",
       "instantCast": "Çeviri süresi olan bir sonraki büyün anlık olur",
       "cheapCast": "Bir sonraki büyün {pct}% daha az mana harcar",
+      "arcaneCharges": "Arcane Charges (up to 4). Each charge increases your next Aether Surge damage and casts it 5% faster, but sharply raises its mana cost. Aether Darts consumes all charges.",
+      "aetherRush": "Your next Aether Surge is free and casts twice as fast",
+      "perfectMoment": "Held at 4 Arcane Charges. Aether Darts no longer consumes them, chaining full five-missile barrages",
+      "temporalEcho": "Marked with an echo of a healthier moment: part of the Arcane damage the caster deals is drawn back to heal you",
       "increase": {
         "ap": "Aumenta el poder de ataque en {value}",
         "sp": "Büyü gücünü {value} artırır",

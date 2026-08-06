@@ -9105,6 +9105,13 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.freeCast': '下一次施法不消耗任何資源',
   'hudChrome.auraEffect.instantCast': '下一個有施法時間的法術變為瞬發',
   'hudChrome.auraEffect.cheapCast': '下一個法術消耗降低{pct}%',
+  'hudChrome.auraEffect.arcaneCharges':
+    '奧術充能（最多4層）。每層充能提高你下一次以太湧動的傷害並使其施法速度加快5%，但大幅提高其法力消耗。乙太飛鏢會消耗所有充能。',
+  'hudChrome.auraEffect.aetherRush': '你的下一次以太湧動無消耗，且施法速度加快一倍',
+  'hudChrome.auraEffect.perfectMoment':
+    '維持在4層奧術充能。乙太飛鏢不再消耗充能，從而連續釋放五連飛鏢齊射',
+  'hudChrome.auraEffect.temporalEcho':
+    '被更健康時刻的迴響標記：施法者造成的部分奧術傷害會被引導回來治療你',
   'hudChrome.auraEffect.increase.sp': '法術強度提高 {value}',
   'hudChrome.specPanel.specUnlockBanner': '專精已解鎖！',
   'hudChrome.specPanel.specUnlockHint': '按 N 選擇你的專精。',

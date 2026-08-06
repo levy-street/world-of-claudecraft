@@ -222,4 +222,40 @@ describe('auraEffectDescriptor', () => {
       nums: {},
     });
   });
+
+  it('describes the Chronomancy Aether Surge charges (stacks to 4)', () => {
+    // The Arcane Charge buff used to fall through to null (name + timer only). It now
+    // explains what the charges do; the count is on the icon badge, so no dynamic num.
+    expect(desc({ id: 'arcane_surge', kind: 'arcane_charge', value: 4, stacks: 4 })).toEqual({
+      key: 'hudChrome.auraEffect.arcaneCharges',
+      nums: {},
+    });
+    // Robust when the sparse online mirror drops value/stacks (charge count from the badge).
+    expect(desc({ id: 'arcane_surge', kind: 'arcane_charge', value: 0 })).toEqual({
+      key: 'hudChrome.auraEffect.arcaneCharges',
+      nums: {},
+    });
+  });
+
+  it('describes Aether Rush by its own scoped line, not the generic free cast', () => {
+    expect(desc({ id: 'aether_surge_free', kind: 'next_cast_free', value: 0 })).toEqual({
+      key: 'hudChrome.auraEffect.aetherRush',
+      nums: {},
+    });
+    // A different next_cast_free aura still gets the generic line.
+    expect(desc({ id: 'clearcasting', kind: 'next_cast_free', value: 0 })?.key).toBe(
+      'hudChrome.auraEffect.freeCast',
+    );
+  });
+
+  it('describes the Perfect Moment cooldown and the Temporal Echo mark', () => {
+    expect(desc({ id: 'perfect_moment', kind: 'perfect_moment', value: 0 })).toEqual({
+      key: 'hudChrome.auraEffect.perfectMoment',
+      nums: {},
+    });
+    expect(desc({ id: 'temporal_echo', kind: 'temporal_echo', value: 1 })).toEqual({
+      key: 'hudChrome.auraEffect.temporalEcho',
+      nums: {},
+    });
+  });
 });
