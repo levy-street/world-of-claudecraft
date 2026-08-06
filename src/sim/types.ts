@@ -4407,9 +4407,10 @@ export type SimEvent = { pid?: number } & (
       // (parse fidelity 7.2): the caster's entity id, the stable aura/ability
       // id, and the stack count at application. Carried by the Sim.applyAura
       // emit path (gained, refresh, and same-id brand-swap fades) and the
-      // stack-bump re-emit in effect_dispatch; the scattered fade sites
-      // elsewhere still emit bare, and consumers must treat every field here
-      // as optional.
+      // stack-bump re-emit in effect_dispatch; the scattered gained AND fade
+      // sites elsewhere (mob_swing, Blood Frenzy, Pack Frenzy, pet buffs,
+      // empower_next, expiries, dispels, ...) still emit bare, and consumers
+      // must treat every field here as optional.
       sourceId?: number;
       abilityId?: string;
       stacks?: number;

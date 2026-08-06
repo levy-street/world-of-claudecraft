@@ -424,12 +424,16 @@ describe('unstuck graveyard move while alive', () => {
       (event): event is Extract<SimEvent, { type: 'aura' }> => event.type === 'aura',
     );
 
-    expect(auraEvents).toContainEqual({
-      type: 'aura',
-      targetId: player.id,
-      name: 'Resurrection Sickness',
-      gained: false,
-    });
+    // objectContaining: fade sites may gain attribution fields over time and
+    // this assertion cares only about the fade itself.
+    expect(auraEvents).toContainEqual(
+      expect.objectContaining({
+        type: 'aura',
+        targetId: player.id,
+        name: 'Resurrection Sickness',
+        gained: false,
+      }),
+    );
     expect(auraEvents).toContainEqual(
       expect.objectContaining({ name: 'Unstuck Sickness', gained: true }),
     );

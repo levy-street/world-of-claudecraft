@@ -1,12 +1,16 @@
 // Sim event-fidelity round 1 (the parse-service plan, section 7): heal2 gains
 // an overheal field at every clamped emission site, and aura events carry
 // their attribution (sourceId, abilityId, stacks) plus an explicit refresh
-// flag, with a same-id same-name refresh updating the aura IN PLACE (stable
-// buff-bar position) instead of a silent splice-and-readd.
+// flag. Aura ARRAY placement is deliberately unchanged (a refresh splices
+// then appends exactly like a fresh apply): array order feeds rng draw order
+// and gameplay selections, so only the EVENT says refresh, never the
+// position.
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { applyHeal } from '../src/sim/combat/heal';
+import { MOBS } from '../src/sim/data';
+import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
 import type { Aura, SimEvent } from '../src/sim/types';
 
@@ -206,23 +210,87 @@ describe('aura event attribution', () => {
     expect(ev.amount + (ev.absorbed ?? 0) + (ev.overheal ?? 0)).toBe(1000);
   });
 
-  it('every clamped heal2 emit site carries the overheal field in its source', () => {
+  it('every heal2 emit block in the sim carries overheal or is the cue-only emit', () => {
     // The two hardest sites (applyHeal, the HoT tick) are pinned behaviorally
-    // above; the remaining clamped sites are pinned at the source so deleting
-    // any site's overheal emission fails here. Behavioral per-site coverage is
-    // a recorded follow-up.
-    const sites: [string, number][] = [
-      ['src/sim/combat/auras.ts', 2],
-      ['src/sim/combat/casting_lifecycle.ts', 1],
-      ['src/sim/combat/chronomancy.ts', 1],
-      ['src/sim/combat/temporal_hourglass.ts', 1],
-      ['src/sim/pet/pet_commands.ts', 1],
+    // above. This source pin walks EVERY `type: 'heal2'` emit object across
+    // the sim and requires each block to carry the overheal spread or the
+    // cueOnly marker, so a future clamped emit site added without the field
+    // fails here rather than silently undercounting.
+    const files = [
+      'src/sim/combat/heal.ts',
+      'src/sim/combat/auras.ts',
+      'src/sim/combat/casting_lifecycle.ts',
+      'src/sim/combat/chronomancy.ts',
+      'src/sim/combat/temporal_hourglass.ts',
+      'src/sim/pet/pet_commands.ts',
+      'src/sim/sim.ts',
     ];
-    for (const [file, minCount] of sites) {
+    let blocksSeen = 0;
+    for (const file of files) {
       const source = readFileSync(path.join(__dirname, '..', file), 'utf8');
-      const count = (source.match(/\{ overheal \}/g) ?? []).length;
-      expect(count, `${file} overheal emissions`).toBeGreaterThanOrEqual(minCount);
+      let from = 0;
+      for (;;) {
+        const at = source.indexOf("type: 'heal2'", from);
+        if (at === -1) break;
+        from = at + 1;
+        blocksSeen++;
+        const end = source.indexOf('});', at);
+        const block = source.slice(at, end === -1 ? at + 600 : end);
+        expect(
+          /overheal|cueOnly/.test(block),
+          `${file} heal2 emit at offset ${at} lacks overheal (or cueOnly)`,
+        ).toBe(true);
+      }
     }
+    // Vacuity floor: the walk must actually be finding the known emit sites.
+    expect(blocksSeen).toBeGreaterThanOrEqual(7);
+  });
+
+  it('a stack bump credits the current caster and cast, not the pre-existing aura', () => {
+    const sim = new Sim({ seed: 77, playerClass: 'warrior', autoEquip: true });
+    sim.setPlayerLevel(20);
+    // Armor Shear is Protection-only since the 2026-07-08 restructure, and a
+    // settle tick populates the known-ability list (the imbue harness does
+    // the same).
+    expect(sim.setSpec('prot')).toBe(true);
+    sim.tick();
+    const p = sim.player;
+    const mob = createMob(sim.nextId++, MOBS.forest_wolf, 10, {
+      x: p.pos.x + 1,
+      y: p.pos.y,
+      z: p.pos.z,
+    });
+    mob.hostile = true;
+    sim.addEntity(mob);
+    p.facing = Math.atan2(mob.pos.x - p.pos.x, mob.pos.z - p.pos.z);
+    // A pre-existing sunder-kind aura from ANOTHER caster and cast (the rogue
+    // Expose case): the warrior's bump must not inherit its identity.
+    mob.auras.push({
+      id: 'expose_armor',
+      name: 'Armor Breach',
+      kind: 'sunder',
+      remaining: 30,
+      duration: 30,
+      value: 25,
+      sourceId: 9001,
+      school: 'physical',
+    } as Aura);
+    p.targetId = mob.id;
+    p.gcdRemaining = 0;
+    p.resource = p.maxResource;
+    sim.drainEvents();
+
+    sim.castAbility('sunder_armor', p.id);
+    const events = sim.tick();
+
+    const bump = events.find((ev) => isAura(ev) && ev.gained && ev.refresh === true) as
+      | AuraEvent
+      | undefined;
+    if (!bump) throw new Error('expected the stack-bump aura event');
+    expect(bump.name).toBe('Armor Shear');
+    expect(bump.sourceId).toBe(p.id);
+    expect(bump.abilityId).toBe('sunder_armor');
+    expect(bump.stacks).toBe(2);
   });
 
   it('a same-id different-name swap fades the old brand without a refresh flag', () => {
