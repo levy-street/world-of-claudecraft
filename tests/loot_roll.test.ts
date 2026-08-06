@@ -623,27 +623,37 @@ describe('loot_roll: corpse-loot helpers (module entry)', () => {
 
   it('pruneCorpseLoot collapses an emptied corpse whose every family is unmapped (#2513)', () => {
     // The fourth arm, and the reason the harvest half is isHarvestableCorpse
-    // here and not a tag COUNT. fen_troll carries claw and tusk, neither
-    // mapped, so the command boundary refuses a harvest and the claim can never
-    // be spent. Counting tags held the 30s grace window open forever waiting on
-    // it, which is worse than the pre-#2513 world where a player could at least
-    // burn the claim to collapse the corpse.
-    expect(MOBS.fen_troll.componentTags).toEqual(['claw', 'tusk']);
-    expect(isHarvestableCorpse(MOBS.fen_troll.componentTags)).toBe(false);
+    // here and not a tag COUNT. fen_troll carried claw and tusk, neither
+    // mapped at the time, so the command boundary refused a harvest and the
+    // claim could never be spent. Both are mapped now (this branch's own
+    // fix), so no shipped template is left in that shape: gills and horn are
+    // still waiting on theirs, so this retags a real, otherwise-untagged
+    // template (warlock_imp) for the duration of the case, restored in a
+    // finally. Counting tags held the 30s grace window open forever waiting
+    // on it, which is worse than the pre-#2513 world where a player could at
+    // least burn the claim to collapse the corpse.
+    const template = MOBS.warlock_imp;
+    const priorTags = template.componentTags;
+    template.componentTags = ['gills', 'horn'];
     const sim = makeSim();
-    const mob = createMob(sim.nextId++, MOBS.fen_troll, 12, { x: 0, y: 0, z: 0 });
-    mob.dead = true;
-    mob.lootable = true;
-    mob.corpseTimer = 60;
-    // The claim is UNSPENT, which is the state the grace arm used to key on:
-    // the arm is chosen by the corpse's families, not by the claim.
-    expect(mob.harvestClaimedBy).toBeNull();
-    mob.loot = { copper: 0, items: [{ itemId: 'x', count: 0 }] };
-    sim.entities.set(mob.id, mob);
-    pruneCorpseLoot(sim.ctx, mob);
-    expect(mob.loot).toBeNull();
-    expect(mob.lootable).toBe(false);
-    expect(mob.corpseTimer).toBe(4);
+    try {
+      expect(isHarvestableCorpse(template.componentTags)).toBe(false);
+      const mob = createMob(sim.nextId++, template, 12, { x: 0, y: 0, z: 0 });
+      mob.dead = true;
+      mob.lootable = true;
+      mob.corpseTimer = 60;
+      // The claim is UNSPENT, which is the state the grace arm used to key on:
+      // the arm is chosen by the corpse's families, not by the claim.
+      expect(mob.harvestClaimedBy).toBeNull();
+      mob.loot = { copper: 0, items: [{ itemId: 'x', count: 0 }] };
+      sim.entities.set(mob.id, mob);
+      pruneCorpseLoot(sim.ctx, mob);
+      expect(mob.loot).toBeNull();
+      expect(mob.lootable).toBe(false);
+      expect(mob.corpseTimer).toBe(4);
+    } finally {
+      template.componentTags = priorTags;
+    }
     // The discriminator, identical rig and identical unspent claim: a corpse
     // with a MAPPED family still takes the grace arm, so this is the predicate
     // narrowing and not the grace arm being deleted.

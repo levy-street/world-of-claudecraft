@@ -255,6 +255,15 @@ export const ZONE_FISH: Record<string, readonly string[]> = {
   willowfen: ['raw_mirror_trout', 'raw_river_perch', 'glimmerfin_koi'],
   galecrest: ['raw_mirror_trout', 'raw_river_perch', 'glimmerfin_koi'],
   farshore_isle: ['raw_mirror_trout', 'raw_river_perch', 'glimmerfin_koi'],
+  // The remaining starter-tier zones (content/deeds.ts extends the same
+  // chronicle pair to them; drakelands skipped, see the comment there) draw
+  // the same Vale fallback table, so their rows list the same fish.
+  frostveil: ['raw_mirror_trout', 'raw_river_perch', 'glimmerfin_koi'],
+  amberfall: ['raw_mirror_trout', 'raw_river_perch', 'glimmerfin_koi'],
+  nightbloom: ['raw_mirror_trout', 'raw_river_perch', 'glimmerfin_koi'],
+  wraithwood: ['raw_mirror_trout', 'raw_river_perch', 'glimmerfin_koi'],
+  palmreach: ['raw_mirror_trout', 'raw_river_perch', 'glimmerfin_koi'],
+  evergarden: ['raw_mirror_trout', 'raw_river_perch', 'glimmerfin_koi'],
 };
 
 // The three Chronicler NPCs (interaction-only). Talking to one feeds an

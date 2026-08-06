@@ -2405,6 +2405,9 @@ const ITEM_ENTITY_IDS = [
   'cragmaw_huntquiver',
   'gravewyrm_bone_quiver',
   'direfang_quiver',
+  'sharp_claw',
+  'curved_tusk',
+  'pristine_claw',
 ] as const;
 
 type ItemEntityId = (typeof ITEM_ENTITY_IDS)[number];
@@ -2517,6 +2520,9 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   cragmaw_huntquiver: 'Cragmaw Huntquiver',
   gravewyrm_bone_quiver: 'Gravewyrm Bone Quiver',
   direfang_quiver: 'Direfang Quiver',
+  sharp_claw: 'Sharp Claw',
+  curved_tusk: 'Curved Tusk',
+  pristine_claw: 'Pristine Claw',
 };
 
 function itemTranslations(names: readonly string[]): ItemEntityTranslations {

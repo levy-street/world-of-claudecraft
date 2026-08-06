@@ -391,7 +391,8 @@ export const da_DK: EnTranslations = {
     },
     "emoteEditor": {
       "title": "Følelsesudtryk",
-      "done": "Færdig"
+      "done": "Færdig",
+      "close": "Close emotes"
     },
     "dailyRewards": {
       "title": "Daglige belønninger",
@@ -1348,6 +1349,8 @@ export const da_DK: EnTranslations = {
       "buttons": "Knaplayout",
       "resetButtons": "Nulstil knaplayout",
       "menuAction": "Spilmenu",
+      "zoomIn": "Zoom In",
+      "zoomOut": "Zoom Out",
       "help": "Venstre stik bevæger, højre stik kigger. Åbn et vindue for at bruge skærmmarkøren."
     },
     "perf": {
@@ -1576,6 +1579,7 @@ export const da_DK: EnTranslations = {
     },
     "itemHeroicTag": "[HEROISK]",
     "itemSoulbound": "Sjælebundet",
+    "itemUniqueEquipped": "Unique-Equipped",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -3146,7 +3150,8 @@ export const da_DK: EnTranslations = {
         "raise_fallen": "Rejse de Faldne (periodiske bølger af tilkaldelser)",
         "soul_rend": "Sjælerivning (markerede spillere skal sprede sig og heles)",
         "deathless_rage": "Udødelig Raseri (afbrydes ved vardstene)",
-        "wardstones": "Vardstenskanaler (faseovergang)"
+        "wardstones": "Vardstenskanaler (faseovergang)",
+        "dread_curse": "Dread Curse (heroic only, stacking tank-swap debuff)"
       }
     },
     "deeds": {
@@ -3554,16 +3559,21 @@ export const da_DK: EnTranslations = {
       "groupInterface": "Brugerflade",
       "groupCamera": "Kamera",
       "talents": "Talenter",
+      "professions": "Professions",
       "arena": "Arena",
       "leaderboard": "Resultattavle",
       "deeds": "Bedrifternes Bog",
+      "sheathe": "Sheathe/Unsheathe Weapon",
       "crafting": "Håndværk",
       "valeCup": "Dalpokalen",
+      "mount": "Mount / Dismount",
       "calendar": "Begivenhedskalender",
+      "dungeonFinder": "Dungeon Finder",
       "discord": "Discord",
       "abilities": "Brug handlingsbjælkens evner (talrækken; en anden bjælke sidder på det numeriske tastatur)",
       "targetFriendly": "Vælg nærmeste venlige",
       "cycleFriendly": "Skift venligt mål",
+      "targetAuras": "Target buffs and debuffs",
       "gameMenu": "Åbn spilmenu og indstillinger",
       "bothMouse": "Begge museknapper",
       "runForward": "Løb fremad",
@@ -4315,6 +4325,8 @@ export const da_DK: EnTranslations = {
       "sourcesBody": "De fleste af dine tidlige opgraderinger er opgavebelønninger, så det betaler sig at gøre opgaver færdige frem for at grinde. Fjender taber udstyr, når du besejrer dem, handlende i byen sælger solide basisvarer, håndværkere forvandler indsamlede materialer til bærbare stykker, og spillermarkedet lader dig købe fra andre eventyrere. På toppen af bakken køber to mærkevalutaer udstyr, som ikke findes andre steder: Delve-Mærker hos delve-vogteren og Heroiske Mærker hos den heroiske kvartermester.",
       "soulboundTitle": "Sjælebundet: din og din alene",
       "soulboundBody": "Nogle få særlige belønninger er sjælebundne, bundet til din karakter fra det øjeblik, du optjener dem. En sjælebunden genstand kan ikke byttes, sendes med posten, sælges til en handlende eller lægges op på markedet; den er din og din alene. I dag beskytter det præmietokens som Heroiske Mærker, mens det udstyr, du vinder, er dit at bytte, sælge eller dele frit.",
+      "uniqueTitle": "Unique-Equipped: one legendary of a kind",
+      "uniqueBody": "Legendary items are unique-equipped: your character can wear only one copy of a given legendary at a time, and its heroic version counts as the same item. A second copy can ride in your bags, in the bank, or on the market, but trying to wear both at once is refused, and the tooltip carries a gold Unique-Equipped tag so you can see the rule before you plan a build around two of them.",
       "setsTitle": "Sæt og sætbonusser",
       "setsBody": "Noget rustning kommer i matchede familier, flere stykker skåret til at se ud og kæmpe som ét. Bær nok af en familie på én gang, og sættet vågner og giver bonusser oven i hvert stykkes egne statistikker, og jo flere stykker du bærer, jo stærkere bliver det. Nogle få sådanne familier dukker op som eftertragtet bytte, mens du leveler; de største af dem kommer fra det sejeste gruppeindhold nær niveauloftet, så at jagte et fuldt sæt er et klassisk slutspilsmål.",
       "consumablesTitle": "Forbrugsvarer",
@@ -10307,6 +10319,15 @@ export const da_DK: EnTranslations = {
       },
       "direfang_quiver": {
         "name": "Direfang-Kogger"
+      },
+      "sharp_claw": {
+        "name": "Sharp Claw"
+      },
+      "curved_tusk": {
+        "name": "Curved Tusk"
+      },
+      "pristine_claw": {
+        "name": "Pristine Claw"
       },
       "conjured_water4": {
         "name": "Fremmanet kildevand"

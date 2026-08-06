@@ -4328,6 +4328,12 @@
   #tooltip .tt-row .tt-armor.tt-armor-bad {
     color: #ff5040;
   }
+  /* Unique-equipped tag (legendaries): sits in the same right-aligned seat as
+     the armor weight, in the soulbound gold. A rule cue, not a warning, so it
+     never takes the red bad-class treatment. */
+  #tooltip .tt-row .tt-unique {
+    color: var(--gold);
+  }
   /* Weapon type (Sword/Dagger/Mace/...): its own plain line under the quality/kind
      line, above the slot. Keeps the muted tt-sub color, deliberately NOT brightened
      or class-colored like armor weight: any class can equip most weapon types, so

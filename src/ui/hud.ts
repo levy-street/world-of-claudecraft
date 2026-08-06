@@ -65,7 +65,7 @@ import {
   zoneAt,
 } from '../sim/data';
 import { specialRoleColor } from '../sim/discord_roles';
-import { canEquipItem, weaponHand } from '../sim/equipment_rules';
+import { canEquipItem, isUniqueEquipped, weaponHand } from '../sim/equipment_rules';
 import { isItemLevelEligible, itemLevel, itemScore } from '../sim/item_level';
 import { requiredLevelFor } from '../sim/item_level_req';
 import type { Ante, PickAction } from '../sim/lockpick';
@@ -3789,7 +3789,7 @@ export class Hud {
 
   private renderEmoteEditor(): void {
     const el = $('#emote-editor');
-    el.innerHTML = `<div class="panel-title"><span>${esc(t('hudChrome.emoteEditor.title'))}</span><span class="x-btn" data-close>${svgIcon('close')}</span></div>`;
+    el.innerHTML = `<div class="panel-title"><span>${esc(t('hudChrome.emoteEditor.title'))}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('hudChrome.emoteEditor.close'))}">${svgIcon('close')}</button></div>`;
     const count = document.createElement('div');
     count.className = 'emote-editor-count';
     const grid = document.createElement('div');
@@ -5501,11 +5501,22 @@ export class Hud {
           ? t('itemUi.slots.twoHand')
           : itemSlotName(item.slot);
       const armorTypeKey = itemArmorTypeLabelKey(item);
+      // Unique-equipped tag (every legendary with a slot; one worn copy per
+      // item family): rendered like the armor-weight indicator, right-aligned
+      // in the slot row's type seat, in the soulbound gold. With an armor
+      // weight already in that seat (a future legendary armor piece) the tag
+      // falls back to its own gold line so neither indicator is lost.
+      const uniqueTag = isUniqueEquipped(item) ? t('hudChrome.itemUniqueEquipped') : null;
       if (armorTypeKey) {
         // Red armor type = the viewing player's class cannot wear this armor weight
         // (e.g. a mage hovering Mail), so they know it is not for them at a glance.
         const badClass = canEquipItem(this.sim.cfg.playerClass, item) ? '' : ' tt-armor-bad';
         html += `<div class="tt-sub tt-row"><span>${esc(slotName)}</span><span class="tt-armor${badClass}">${esc(t(armorTypeKey))}</span></div>`;
+        if (uniqueTag) {
+          html += `<div class="tt-sub" style="color:var(--gold)">${esc(uniqueTag)}</div>`;
+        }
+      } else if (uniqueTag) {
+        html += `<div class="tt-sub tt-row"><span>${esc(slotName)}</span><span class="tt-unique">${esc(uniqueTag)}</span></div>`;
       } else {
         html += `<div class="tt-sub">${esc(slotName)}</div>`;
       }
@@ -15914,7 +15925,7 @@ export class Hud {
       ? `<textarea class="cd-input" rows="3" ${opts.readOnly ? 'readonly' : ''} placeholder="${esc(opts.placeholder ?? '')}">${esc(opts.value ?? '')}</textarea>`
       : `<input class="cd-input" type="text" ${opts.readOnly ? 'readonly' : ''} placeholder="${esc(opts.placeholder ?? '')}" value="${esc(opts.value ?? '')}">`;
     el.innerHTML =
-      `<div class="panel-title"><span id="confirm-dialog-title">${esc(opts.title)}</span><span class="x-btn" data-cancel>${svgIcon('close')}</span></div>` +
+      `<div class="panel-title"><span id="confirm-dialog-title">${esc(opts.title)}</span><button type="button" class="x-btn" data-cancel aria-label="${esc(opts.cancelText ?? t('game.talents.cancel'))}">${svgIcon('close')}</button></div>` +
       (opts.label ? `<div class="cd-body">${esc(opts.label)}</div>` : '') +
       `<div class="cd-field">${field}</div>` +
       `<div class="cd-actions"><button class="btn" data-cancel>${esc(opts.cancelText ?? t('game.talents.cancel'))}</button>` +

@@ -391,7 +391,8 @@ export const de_DE: EnTranslations = {
     },
     "emoteEditor": {
       "title": "Emotes",
-      "done": "Fertig"
+      "done": "Fertig",
+      "close": "Close emotes"
     },
     "dailyRewards": {
       "title": "Tägliche Belohnungen",
@@ -1348,6 +1349,8 @@ export const de_DE: EnTranslations = {
       "buttons": "Tastenbelegung",
       "resetButtons": "Tastenbelegung zurücksetzen",
       "menuAction": "Spielmenü",
+      "zoomIn": "Zoom In",
+      "zoomOut": "Zoom Out",
       "help": "Linker Stick bewegt, rechter Stick steuert die Kamera. Öffne ein Fenster, um den Bildschirmzeiger zu verwenden."
     },
     "perf": {
@@ -1576,6 +1579,7 @@ export const de_DE: EnTranslations = {
     },
     "itemHeroicTag": "[HEROISCH]",
     "itemSoulbound": "Seelengebunden",
+    "itemUniqueEquipped": "Unique-Equipped",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -3146,7 +3150,8 @@ export const de_DE: EnTranslations = {
         "raise_fallen": "Gefallene erheben (periodische Verstarkungswellen)",
         "soul_rend": "Seelenzerfetzung (markierte Spieler mussen sich verteilen und geheilt werden)",
         "deathless_rage": "Unsterbliche Raserei (an den Schutzsteinen unterbrochen)",
-        "wardstones": "Schutzstein-Kanale (Phasenubergang)"
+        "wardstones": "Schutzstein-Kanale (Phasenubergang)",
+        "dread_curse": "Dread Curse (heroic only, stacking tank-swap debuff)"
       }
     },
     "deeds": {
@@ -3554,16 +3559,21 @@ export const de_DE: EnTranslations = {
       "groupInterface": "Interface",
       "groupCamera": "Kamera",
       "talents": "Talente",
+      "professions": "Professions",
       "arena": "Arena",
       "leaderboard": "Bestenliste",
       "deeds": "Buch der Taten",
+      "sheathe": "Sheathe/Unsheathe Weapon",
       "crafting": "Handwerk",
       "valeCup": "Talpokal",
+      "mount": "Mount / Dismount",
       "calendar": "Ereigniskalender",
+      "dungeonFinder": "Dungeon Finder",
       "discord": "Discord",
       "abilities": "Aktionsleisten-Fähigkeiten einsetzen (die Zahlenreihe; eine zweite Leiste liegt auf dem Nummernblock)",
       "targetFriendly": "Nächstes freundliches Ziel anvisieren",
       "cycleFriendly": "Freundliches Ziel durchschalten",
+      "targetAuras": "Target buffs and debuffs",
       "gameMenu": "Spielmenü und Optionen öffnen",
       "bothMouse": "Beide Maustasten",
       "runForward": "Vorwärtslaufen",
@@ -4315,6 +4325,8 @@ export const de_DE: EnTranslations = {
       "sourcesBody": "Die meisten deiner frühen Verbesserungen sind Questbelohnungen, es zahlt sich also aus, Quests abzuschließen, statt zu grinden. Feinde lassen Ausrüstung fallen, wenn du sie bezwingst, Händler in der Stadt verkaufen solide Grundausstattung, Handwerker verwandeln gesammelte Materialien in tragbare Stücke, und der Spielermarkt lässt dich von anderen Abenteurern kaufen. Ganz oben auf dem Berg kaufen zwei Marken-Währungen Ausrüstung, die es sonst nirgends gibt: Tiefgang-Marken beim Tiefgang-Hüter und Heroische Marken beim heroischen Quartiermeister.",
       "soulboundTitle": "Seelengebunden: dein und nur dein",
       "soulboundBody": "Einige besondere Belohnungen sind seelengebunden, von dem Moment an, in dem du sie erringst, an deinen Charakter gebunden. Ein seelengebundener Gegenstand lässt sich nicht handeln, verschicken, an einen Händler verkaufen oder auf dem Markt einstellen; er gehört dir und dir allein. Heute schützt das Preis-Tokens wie Heroische Marken, während die Ausrüstung, die du gewinnst, dir gehört und frei gehandelt, verkauft oder geteilt werden kann.",
+      "uniqueTitle": "Unique-Equipped: one legendary of a kind",
+      "uniqueBody": "Legendary items are unique-equipped: your character can wear only one copy of a given legendary at a time, and its heroic version counts as the same item. A second copy can ride in your bags, in the bank, or on the market, but trying to wear both at once is refused, and the tooltip carries a gold Unique-Equipped tag so you can see the rule before you plan a build around two of them.",
       "setsTitle": "Sets und Set-Boni",
       "setsBody": "Manche Rüstung kommt in zusammengehörigen Familien, mehreren Teilen, die darauf zugeschnitten sind, als Einheit auszusehen und zu kämpfen. Trage genug Teile einer Familie gleichzeitig, und das Set erwacht und gewährt Boni zusätzlich zu den eigenen Werten jedes Teils, und je mehr Teile du trägst, desto stärker wird es. Einige wenige solcher Familien tauchen als begehrte Beute auf, während du aufsteigst; die größten von ihnen stammen aus dem härtesten Gruppeninhalt nahe der Höchststufe, weshalb die Jagd nach einem vollständigen Set ein klassisches Endgame-Ziel ist.",
       "consumablesTitle": "Verbrauchsgüter",
@@ -10307,6 +10319,15 @@ export const de_DE: EnTranslations = {
       },
       "direfang_quiver": {
         "name": "Direfang-Köcher"
+      },
+      "sharp_claw": {
+        "name": "Sharp Claw"
+      },
+      "curved_tusk": {
+        "name": "Curved Tusk"
+      },
+      "pristine_claw": {
+        "name": "Pristine Claw"
       },
       "conjured_water4": {
         "name": "Herbeigezaubertes Quellwasser"

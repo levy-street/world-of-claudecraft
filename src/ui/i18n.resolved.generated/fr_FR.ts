@@ -391,7 +391,8 @@ export const fr_FR: EnTranslations = {
     },
     "emoteEditor": {
       "title": "Emotes",
-      "done": "Terminé"
+      "done": "Terminé",
+      "close": "Close emotes"
     },
     "dailyRewards": {
       "title": "Récompenses quotidiennes",
@@ -1348,6 +1349,8 @@ export const fr_FR: EnTranslations = {
       "buttons": "Disposition des boutons",
       "resetButtons": "Réinitialiser la disposition des boutons",
       "menuAction": "Menu du jeu",
+      "zoomIn": "Zoom In",
+      "zoomOut": "Zoom Out",
       "help": "Le stick gauche déplace, le droit oriente la caméra. Ouvrez une fenêtre pour utiliser le pointeur à l'écran."
     },
     "perf": {
@@ -1576,6 +1579,7 @@ export const fr_FR: EnTranslations = {
     },
     "itemHeroicTag": "[HÉROÏQUE]",
     "itemSoulbound": "Lié à l’âme",
+    "itemUniqueEquipped": "Unique-Equipped",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -3146,7 +3150,8 @@ export const fr_FR: EnTranslations = {
         "raise_fallen": "Relever les morts (vagues périodiques de renforts)",
         "soul_rend": "Déchirement de l'âme (les joueurs marqués doivent s'écarter et être soignés)",
         "deathless_rage": "Fureur immortelle (interrompue aux pierres de garde)",
-        "wardstones": "Canaux des pierres de garde (transition de phase)"
+        "wardstones": "Canaux des pierres de garde (transition de phase)",
+        "dread_curse": "Dread Curse (heroic only, stacking tank-swap debuff)"
       }
     },
     "deeds": {
@@ -3554,16 +3559,21 @@ export const fr_FR: EnTranslations = {
       "groupInterface": "Interface",
       "groupCamera": "Caméra",
       "talents": "Talents",
+      "professions": "Professions",
       "arena": "Arène",
       "leaderboard": "Classement",
       "deeds": "Livre des hauts faits",
+      "sheathe": "Sheathe/Unsheathe Weapon",
       "crafting": "Artisanat",
       "valeCup": "Coupe du Val",
+      "mount": "Mount / Dismount",
       "calendar": "Calendrier des événements",
+      "dungeonFinder": "Dungeon Finder",
       "discord": "Discord",
       "abilities": "Utiliser les capacités de la barre d'action (la rangée de chiffres ; une seconde barre se trouve sur le pavé numérique)",
       "targetFriendly": "Cibler l'allié le plus proche",
       "cycleFriendly": "Cibler l'allié suivant",
+      "targetAuras": "Target buffs and debuffs",
       "gameMenu": "Ouvrir le menu et les options",
       "bothMouse": "Les deux boutons de la souris",
       "runForward": "Avancer",
@@ -4315,6 +4325,8 @@ export const fr_FR: EnTranslations = {
       "sourcesBody": "La plupart de vos premières améliorations sont des récompenses de quête, alors mieux vaut terminer les quêtes que de farmer. Les ennemis lâchent de l'équipement quand vous les vainquez, les marchands en ville vendent de bonnes bases, les artisans transforment les matériaux récoltés en pièces à porter, et le marché des joueurs vous permet d'acheter auprès d'autres aventuriers. Au sommet de la progression, deux monnaies de marques achètent un équipement introuvable ailleurs : les Marques de plongée auprès du gardien de plongée, et les Marques héroïques auprès de l'intendant héroïque.",
       "soulboundTitle": "Lié à l'âme : à vous et à vous seul",
       "soulboundBody": "Quelques récompenses spéciales sont liées à l'âme, attachées à votre personnage dès l'instant où vous les obtenez. Un objet lié à l'âme ne peut être échangé, envoyé par courrier, vendu à un marchand ni mis en vente sur le marché ; il est à vous et à vous seul. Aujourd'hui, cette protection couvre les jetons de récompense comme les Marques héroïques, tandis que l'équipement que vous remportez est à vous, libre à vous de l'échanger, de le vendre ou de le partager.",
+      "uniqueTitle": "Unique-Equipped: one legendary of a kind",
+      "uniqueBody": "Legendary items are unique-equipped: your character can wear only one copy of a given legendary at a time, and its heroic version counts as the same item. A second copy can ride in your bags, in the bank, or on the market, but trying to wear both at once is refused, and the tooltip carries a gold Unique-Equipped tag so you can see the rule before you plan a build around two of them.",
       "setsTitle": "Tenues et bonus de tenue",
       "setsBody": "Certaines armures se présentent en familles assorties, plusieurs pièces taillées pour s'accorder et combattre comme un tout. Portez-en assez d'une même famille à la fois et la tenue s'éveille, accordant des bonus qui s'ajoutent aux caractéristiques propres de chaque pièce, et plus vous en portez, plus elle se renforce. Quelques-unes de ces familles apparaissent comme des butins convoités au fil de votre montée en niveau ; les plus belles proviennent du contenu de groupe le plus exigeant près du niveau maximum, si bien que courir après une tenue complète est un objectif de fin de jeu classique.",
       "consumablesTitle": "Consommables",
@@ -10307,6 +10319,15 @@ export const fr_FR: EnTranslations = {
       },
       "direfang_quiver": {
         "name": "Carquois de Direfang"
+      },
+      "sharp_claw": {
+        "name": "Sharp Claw"
+      },
+      "curved_tusk": {
+        "name": "Curved Tusk"
+      },
+      "pristine_claw": {
+        "name": "Pristine Claw"
       },
       "conjured_water4": {
         "name": "Eau de source invoquée"

@@ -241,6 +241,11 @@ describe('escort run lifecycle', () => {
     expect(sim.escortRuns.get(ESCORT_ID)?.run ?? null).toBeNull();
   });
 
+  // 60s budget: drives up to 4800 real ticks of NPC pathing to the final
+  // waypoint (terrain movement, not a jumpable deadline), and has been
+  // measured at ~5.3s standalone, only ~3.8x headroom under the 20s default
+  // (see tests/stable_yard.test.ts and tests/emerald_deck_escape.test.ts for
+  // the same long-tick-loop-walker convention).
   it('credits the quest for the nearby escorting player at the final waypoint', () => {
     const sim = makeSim();
     const def = ESCORTS[ESCORT_ID];
@@ -281,7 +286,7 @@ describe('escort run lifecycle', () => {
     if (!npcEntity) return;
     sim.talkToNpc(npcEntity.id);
     expect(sim.questLog.get(QUEST_ID)?.state ?? 'done').toBe('done');
-  });
+  }, 60_000);
 });
 
 describe('escort run guards', () => {
@@ -329,6 +334,11 @@ describe('escort run guards', () => {
     expect(state.run?.waypointIndex ?? before + 1).toBeGreaterThan(before);
   });
 
+  // 60s budget: four sequential real-tick loops (walk to ambush, evade past
+  // the leash, re-engage, resume the attack) with a cumulative worst case of
+  // 6600 ticks of mob AI/leash simulation that cannot be jumped ahead, the
+  // same long-tick-loop-walker convention as tests/stable_yard.test.ts and
+  // tests/emerald_deck_escape.test.ts.
   it('re-engages an evaded ambush wave onto the escortee instead of wedging the run', () => {
     const sim = makeSim();
     const def = ESCORTS[ESCORT_ID];
@@ -398,7 +408,7 @@ describe('escort run guards', () => {
     expect(wren.dead).toBe(false);
     expect(state.run).not.toBeNull();
     expect(state.run?.waypointIndex ?? before).toBeGreaterThan(before);
-  });
+  }, 60_000);
 
   it('never re-seeds a wave mob a player is actively fighting', () => {
     const sim = makeSim();
@@ -443,9 +453,22 @@ describe('escort run guards', () => {
     // Pre-fix, the generic in-place camp respawn (cfg default 25s, deferred by
     // the corpse window) revived the wave into ambushIds and wedged or
     // re-attacked any run still walking. Now the summoned-add arm drops the
-    // corpse once its loot window (60s) lapses, and the mob NEVER comes back:
-    // watch well past corpse decay plus the old respawn delay.
-    for (let i = 0; i < 100 * 20; i++) {
+    // corpse once its loot window (60s) lapses, and the mob NEVER comes back.
+    // corpseTimer is a plain DT countdown checked per tick (mob/locomotion.ts),
+    // not something the assertions need 2000 real ticks to observe: jump it to
+    // the edge of its window, the same way tests/loot_master_sim.test.ts jumps
+    // its own per-roll expiresAt deadline instead of ticking through the full
+    // 5-minute curate window (da4441ffa4). Ticking the whole 100 sim-seconds
+    // one tick at a time pushed this file past the 20s default under any CPU
+    // contention with zero extra coverage: every intermediate tick can only
+    // ever observe "still dead" or "gone", the same two states a 2-tick jump
+    // proves.
+    for (const id of waveIds) {
+      const mob = sim.entities.get(id);
+      expect(mob).toBeTruthy();
+      if (mob) mob.corpseTimer = 0.1;
+    }
+    for (let i = 0; i < 10; i++) {
       sim.tick();
       for (const id of waveIds) {
         const mob = sim.entities.get(id);
@@ -462,6 +485,12 @@ describe('escort run guards', () => {
 // timeout). Drives each def's full walk with waves auto-culled.
 describe('every escort route completes in the real world', () => {
   for (const def of Object.values(ESCORTS)) {
+    // 90s budget: drives up to 6000 real ticks of NPC pathing across authored
+    // terrain per def (not a jumpable deadline). Measured 4.66s to 8.66s
+    // standalone per def, only ~2.3x to 4.3x headroom under the 20s default,
+    // the same long-tick-loop-walker convention as
+    // tests/emerald_deck_escape.test.ts's walkRoute tests and
+    // tests/stable_yard.test.ts's long real-world tick run.
     it(`${def.id} walks its full route to credit`, () => {
       const sim = makeSim();
       teleportTo(sim, def.start.x, def.start.z);
@@ -489,6 +518,6 @@ describe('every escort route completes in the real world', () => {
         credited = events.some((e) => e.type === 'questReady' && e.questId === def.questId);
       }
       expect(credited, `${def.id} reached its destination`).toBe(true);
-    });
+    }, 90_000);
   }
 });

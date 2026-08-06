@@ -21,7 +21,12 @@
 
 import { syncAppViewport } from '../game/app_viewport';
 import { audio } from '../game/audio';
-import { GAMEPAD_NONE, gamepadButtonLabel } from '../game/gamepad_map';
+import {
+  GAMEPAD_NONE,
+  GAMEPAD_ZOOM_IN,
+  GAMEPAD_ZOOM_OUT,
+  gamepadButtonLabel,
+} from '../game/gamepad_map';
 import {
   GRAPHICS_REBUILD_KEYS,
   type GraphicsSettingsSnapshot,
@@ -115,6 +120,22 @@ interface NumericChoiceBinding {
   get(key: NumericSettingKey): number;
   set(key: NumericSettingKey, value: number): void;
 }
+
+// The seven GameSettings the Key Bindings panel renders alongside the
+// rebindable keys (the settingToggleKeybind + clickMoveMouseButtonRow calls in
+// renderKeybinds below). Its Reset to Defaults must restore these too, not just
+// the key-code map: without this list, a player's custom mouse-camera,
+// click-to-move (and its mouse button), attack-move, left-handed-touch, or
+// profanity-filter choice silently survived a "reset everything" click.
+const KEYBIND_PANEL_SETTING_KEYS: (keyof GameSettings)[] = [
+  'mouseCamera',
+  'lockCursorOnRotate',
+  'clickToMove',
+  'clickToMoveButton',
+  'attackMove',
+  'leftHandedTouch',
+  'filterProfanity',
+];
 
 // Endonyms for the in-game language picker; never localized (they render
 // identically in every locale, matching the homepage footer picker), keyed by
@@ -1251,6 +1272,11 @@ export class OptionsWindow {
     const el = this.deps.root();
     const hooks = this.deps.options();
     const tab = this.interfaceTab;
+    // The full, untagged control list across all four tabs (~40 settings): the
+    // footer's Reset to Defaults must restore every Interface setting the panel
+    // governs, not just whichever tab happens to be open when the player clicks
+    // it, so switching tabs never changes what the shared button resets.
+    const controls = hooks ? buildInterfaceControls(this.settingsSource(hooks)) : [];
 
     const stripHost = document.createElement('div');
     stripHost.innerHTML = tabStripHtml(
@@ -1281,19 +1307,11 @@ export class OptionsWindow {
     }
 
     if (hooks)
-      this.applyControls(
-        body,
-        interfaceControlsForTab(buildInterfaceControls(this.settingsSource(hooks)), tab),
-        hooks,
-        (focusKey) => {
-          this.renderInterface();
-          if (focusKey)
-            this.deps
-              .root()
-              .querySelector<HTMLElement>(`[data-setting-key="${focusKey}"]`)
-              ?.focus();
-        },
-      );
+      this.applyControls(body, interfaceControlsForTab(controls, tab), hooks, (focusKey) => {
+        this.renderInterface();
+        if (focusKey)
+          this.deps.root().querySelector<HTMLElement>(`[data-setting-key="${focusKey}"]`)?.focus();
+      });
 
     // Frames closes with the unit-frames reset row.
     if (tab === 'frames') this.unitFramesResetRow(body);
@@ -1320,12 +1338,7 @@ export class OptionsWindow {
       }
     }
 
-    const back = document.createElement('button');
-    back.className = 'btn';
-    back.textContent = t('hud.options.back');
-    back.addEventListener('click', () => this.goBack());
-    el.appendChild(back);
-    el.querySelector('[data-close]')?.addEventListener('click', () => this.close());
+    this.settingsViewFooter(controls);
   }
 
   // The chat-timestamp on/off toggle plus the 12/24-hour clock-format pair (the
@@ -1651,12 +1664,16 @@ export class OptionsWindow {
   }
 
   // Action ids a gamepad button may be bound to: explicit unbind, the game menu,
-  // plus every one-shot (edge) keybind action and Jump. Movement-axis actions
-  // (forward/strafe/turn) are excluded, they live on the analog stick.
+  // the two pad-only camera zoom steps, plus every one-shot (edge) keybind action
+  // and Jump. Movement-axis actions (forward/strafe/turn) are excluded, they live
+  // on the analog stick. Zoom ships unbound by default (no free default slot
+  // remains among the 13 bindable buttons), so it is opt-in only from here.
   private gamepadActionOptions(): { value: string; label: string }[] {
     const opts: { value: string; label: string }[] = [
       { value: GAMEPAD_NONE, label: t('hud.options.unbound') },
       { value: 'escape', label: t('hudChrome.controller.menuAction') },
+      { value: GAMEPAD_ZOOM_IN, label: t('hudChrome.controller.zoomIn') },
+      { value: GAMEPAD_ZOOM_OUT, label: t('hudChrome.controller.zoomOut') },
     ];
     for (const a of BIND_ACTIONS) {
       if (a.id === 'attackMove') continue; // mode-gated; not a useful pad default
@@ -1942,6 +1959,12 @@ export class OptionsWindow {
     reset.addEventListener('click', () => {
       audio.click();
       this.deps.keybinds().reset();
+      // The panel also renders seven GameSettings toggles alongside the
+      // rebindable keys (mouse camera, click-to-move and its mouse button,
+      // attack move, left-handed touch, profanity filter); Reset to Defaults
+      // must restore those too, not just the key-code map.
+      hooks?.settings.reset(KEYBIND_PANEL_SETTING_KEYS);
+      for (const k of KEYBIND_PANEL_SETTING_KEYS) hooks?.onSettingChange(k, hooks.settings.get(k));
       this.capturingKey = null;
       this.keybindNote = t('hud.options.keybindReset');
       this.deps.refreshKeybindLabels();

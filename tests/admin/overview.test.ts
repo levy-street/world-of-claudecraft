@@ -109,4 +109,36 @@ describe('Overview', () => {
       mocks.apiGet.mock.calls.map(([path]) => path).filter((path) => path === '/admin/api/online'),
     ).toEqual([]);
   });
+
+  // A rejected live-stats fetch must not swallow the error into console.error alone:
+  // the stats section renders a failed state instead of staying blank forever.
+  it('shows a failed state when the live stats fetch rejects', async () => {
+    mocks.apiGet.mockImplementation(async (path: string) => {
+      if (path.startsWith('/admin/api/overview')) throw new Error('network error');
+      if (path.startsWith('/admin/api/online-history')) return onlineHistoryData;
+      if (path.startsWith('/admin/api/activity')) return activityData;
+      throw new Error(`unexpected path ${path}`);
+    });
+
+    render(Overview);
+
+    expect(await screen.findByText(t('stats.loadFailed'))).toBeInTheDocument();
+    expect(screen.queryByText(t('stats.onlineNow'))).not.toBeInTheDocument();
+  });
+
+  // Same contract for the activity/online-history request pair driving the charts
+  // section: a rejection shows a failed state rather than blank charts.
+  it('shows a failed state when the activity charts fetch rejects', async () => {
+    mocks.apiGet.mockImplementation(async (path: string) => {
+      if (path.startsWith('/admin/api/overview')) return overviewData;
+      if (path.startsWith('/admin/api/online-history')) throw new Error('network error');
+      if (path.startsWith('/admin/api/activity')) return activityData;
+      throw new Error(`unexpected path ${path}`);
+    });
+
+    render(Overview);
+
+    expect(await screen.findByText(t('charts.loadFailed'))).toBeInTheDocument();
+    expect(screen.queryByText(t('charts.classDistribution'))).not.toBeInTheDocument();
+  });
 });

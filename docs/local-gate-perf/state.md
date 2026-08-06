@@ -158,8 +158,13 @@ Fill as phases ship:
 3. Owner sign-off if `gate:fast` is ever allowed as pre-push instead of full gate
    (default: no; pre-push floor stays as today).
 4. ~~Cold empty-store install and second-worktree install timings (deferred to Phase 7).~~ **Closed: see baselines.**
-5. Low/medium tier **local** machine baselines still empty (only M1 high-tier
-   filled; CI-L1 is a Linux proxy from GHA specs, not a timed unsharded gate).
+5. ~~Low/medium tier **local** machine baselines still empty (only M1 high-tier
+   filled; CI-L1 is a Linux proxy from GHA specs, not a timed unsharded gate).~~
+   **Partially closed 2026-08-06:** first real local Linux (medium-tier, L1)
+   unsharded full-gate wall filled, see `baselines.md` "first real local Linux
+   (medium-tier) full-gate wall". Measured under heavy contention (a second
+   concurrent vitest process on the same host), so a QUIET L1 re-run and any
+   macOS low/medium-tier host remain open.
 6. Windows host (W1) still untested for full gate / gate:fast wall (smoke only).
 7. ~~Dockerfile still on package-lock / npm ci after pnpm migration.~~ **Closed Phase 12.**
 8. ~~Optional: refresh non-English `docs/i18n/CONTRIBUTING.*` install wording.~~ **Closed:** all 20 locales updated to pnpm.

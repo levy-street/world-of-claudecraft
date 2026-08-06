@@ -15,7 +15,7 @@ import { CLASSES } from '../sim/data';
 import type { LeaderboardEntry } from '../world_api';
 import { classDisplayName } from './entity_i18n';
 import { esc } from './esc';
-import { t } from './i18n';
+import { formatNumber, t } from './i18n';
 import { formatXp } from './xp_bar';
 
 /** The board header row (hidden on the mobile stacked layout). */
@@ -50,15 +50,15 @@ export function highscoreRowHtml(r: LeaderboardEntry): string {
   const known = Boolean(CLASSES[r.cls]);
   const star =
     r.prestigeRank > 0
-      ? `<span class="hs-prestige" title="${esc(`${t('game.prestige.rank')} ${r.prestigeRank}`)}">&starf;${r.prestigeRank}</span>`
+      ? `<span class="hs-prestige" title="${esc(`${t('game.prestige.rank')} ${formatNumber(r.prestigeRank, { maximumFractionDigits: 0 })}`)}">&starf;${formatNumber(r.prestigeRank, { maximumFractionDigits: 0 })}</span>`
       : '';
   return (
     `<div class="hs-row${r.rank <= 3 ? ' hs-top' : ''}">` +
-    `<span class="hs-rank">${r.rank}</span>` +
+    `<span class="hs-rank">${formatNumber(r.rank, { maximumFractionDigits: 0 })}</span>` +
     `<span class="hs-name"${known ? ` title="${esc(classDisplayName(r.cls))}"` : ''}>${star}${esc(r.name)}${guildTagHtml(r.guild)}</span>` +
     `<span class="hs-realm" data-label="${esc(realmLabel)}">${esc(r.realm ?? '')}</span>` +
-    `<span class="hs-lvl" data-label="${esc(levelLabel)}">${r.level}</span>` +
-    `<span class="hs-vlvl" data-label="${esc(virtualLevelLabel)}">${r.virtualLevel}</span>` +
+    `<span class="hs-lvl" data-label="${esc(levelLabel)}">${formatNumber(r.level, { maximumFractionDigits: 0 })}</span>` +
+    `<span class="hs-vlvl" data-label="${esc(virtualLevelLabel)}">${formatNumber(r.virtualLevel, { maximumFractionDigits: 0 })}</span>` +
     `<span class="hs-xp" data-label="${esc(lifetimeXpLabel)}">${formatXp(r.lifetimeXp)}</span></div>`
   );
 }

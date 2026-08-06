@@ -391,7 +391,8 @@ export const es: EnTranslations = {
     },
     "emoteEditor": {
       "title": "Emotes",
-      "done": "Listo"
+      "done": "Listo",
+      "close": "Close emotes"
     },
     "dailyRewards": {
       "title": "Recompensas diarias",
@@ -1348,6 +1349,8 @@ export const es: EnTranslations = {
       "buttons": "Distribución de botones",
       "resetButtons": "Restablecer distribución de botones",
       "menuAction": "Menú del juego",
+      "zoomIn": "Zoom In",
+      "zoomOut": "Zoom Out",
       "help": "El stick izquierdo mueve, el derecho controla la cámara. Abre una ventana para usar el puntero en pantalla."
     },
     "perf": {
@@ -1576,6 +1579,7 @@ export const es: EnTranslations = {
     },
     "itemHeroicTag": "[HEROICO]",
     "itemSoulbound": "Ligado al alma",
+    "itemUniqueEquipped": "Unique-Equipped",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -3146,7 +3150,8 @@ export const es: EnTranslations = {
         "raise_fallen": "Despertar a los Caidos (oleadas periodicas de refuerzos)",
         "soul_rend": "Desgarro de Alma (los jugadores marcados deben dispersarse y recibir curacion)",
         "deathless_rage": "Furia Inmortal (se interrumpe en las piedras de guardia)",
-        "wardstones": "Canalizacion de piedras de guardia (transicion de fase)"
+        "wardstones": "Canalizacion de piedras de guardia (transicion de fase)",
+        "dread_curse": "Dread Curse (heroic only, stacking tank-swap debuff)"
       }
     },
     "deeds": {
@@ -3554,16 +3559,21 @@ export const es: EnTranslations = {
       "groupInterface": "Interfaz",
       "groupCamera": "Cámara",
       "talents": "Talentos",
+      "professions": "Professions",
       "arena": "Arena",
       "leaderboard": "Clasificación",
       "deeds": "Libro de Gestas",
+      "sheathe": "Sheathe/Unsheathe Weapon",
       "crafting": "Artesanía",
       "valeCup": "Copa del Valle",
+      "mount": "Mount / Dismount",
       "calendar": "Calendario de eventos",
+      "dungeonFinder": "Dungeon Finder",
       "discord": "Discord",
       "abilities": "Usar las habilidades de la barra de acción (la fila de números; una segunda barra está en el teclado numérico)",
       "targetFriendly": "Objetivo amistoso más cercano",
       "cycleFriendly": "Objetivo amistoso siguiente",
+      "targetAuras": "Target buffs and debuffs",
       "gameMenu": "Abrir el menú del juego y las opciones",
       "bothMouse": "Ambos botones del ratón",
       "runForward": "Correr hacia adelante",
@@ -4315,6 +4325,8 @@ export const es: EnTranslations = {
       "sourcesBody": "La mayoría de tus mejoras tempranas son recompensas de misiones, así que conviene completar misiones en lugar de farmear. Los enemigos sueltan equipo cuando los derrotas, los vendedores del pueblo venden buenas piezas básicas, los artesanos convierten materiales recolectados en piezas que puedes vestir y el mercado de jugadores te permite comprar a otros aventureros. En lo más alto, dos monedas de marcas compran equipo que no se encuentra en ningún otro sitio: las Marcas de Expedición con el guardián de expediciones, y las Marcas Heroicas con el intendente heroico.",
       "soulboundTitle": "Ligado al alma: tuyo y de nadie más",
       "soulboundBody": "Unas pocas recompensas especiales están ligadas al alma, atadas a tu personaje desde el momento en que las consigues. Un objeto ligado al alma no se puede intercambiar, enviar por correo, vender a un vendedor ni publicar en el mercado; es tuyo y de nadie más. Hoy esa protección resguarda fichas de premio como las Marcas Heroicas, mientras que el equipo que ganas es tuyo para intercambiarlo, venderlo o compartirlo con libertad.",
+      "uniqueTitle": "Unique-Equipped: one legendary of a kind",
+      "uniqueBody": "Legendary items are unique-equipped: your character can wear only one copy of a given legendary at a time, and its heroic version counts as the same item. A second copy can ride in your bags, in the bank, or on the market, but trying to wear both at once is refused, and the tooltip carries a gold Unique-Equipped tag so you can see the rule before you plan a build around two of them.",
       "setsTitle": "Conjuntos y bonificaciones de conjunto",
       "setsBody": "Parte de la armadura viene en familias a juego, varias piezas talladas para verse y combatir como una sola. Lleva suficientes piezas de una familia a la vez y el conjunto despierta, otorgando bonificaciones por encima de las características propias de cada pieza, y cuantas más lleves, más fuerte se vuelve. Unas pocas de estas familias aparecen como codiciados botines mientras subes de nivel; las mejores vienen del contenido en grupo más duro cerca del nivel máximo, así que perseguir un conjunto completo es un objetivo clásico del final del juego.",
       "consumablesTitle": "Consumibles",
@@ -10307,6 +10319,15 @@ export const es: EnTranslations = {
       },
       "direfang_quiver": {
         "name": "Carcaj Direfang"
+      },
+      "sharp_claw": {
+        "name": "Sharp Claw"
+      },
+      "curved_tusk": {
+        "name": "Curved Tusk"
+      },
+      "pristine_claw": {
+        "name": "Pristine Claw"
       },
       "conjured_water4": {
         "name": "Agua de Manantial Conjurada"

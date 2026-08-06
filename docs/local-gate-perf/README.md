@@ -39,7 +39,9 @@ Record walls in `baselines.md` and keep/drop rows in `experiment-log.md`.
 
 ## Locked product outcomes (do not re-litigate casually)
 
-1. Full `pnpm run gate` remains the merge bar; `gate:fast` is day-loop only.
+1. `node scripts/gate_select.mjs` is the merge bar (owner decision, 2026-08-05; see
+   `state.md`); full `pnpm run gate` remains the deeper local check. `gate:fast` stays
+   day-loop only, never a merge bar.
 2. pnpm is the package manager (`pnpm-lock.yaml` only; CI and Dockerfile frozen install).
 3. Free-mem worker clamp stays; tier presets cap after the clamp.
 4. turbo-test / Bun / Deno stay **not default** (optional `test:turbo` / `test:bun` only).

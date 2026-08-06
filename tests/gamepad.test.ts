@@ -1,7 +1,13 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { type GamepadCallbacks, GamepadManager } from '../src/game/gamepad';
 import { GamepadBindings } from '../src/game/gamepad_bindings';
-import { GP, STANDARD_BUTTON_COUNT } from '../src/game/gamepad_map';
+import {
+  GAMEPAD_ZOOM_IN,
+  GAMEPAD_ZOOM_OUT,
+  GAMEPAD_ZOOM_STEP,
+  GP,
+  STANDARD_BUTTON_COUNT,
+} from '../src/game/gamepad_map';
 import { Input, type InputCallbacks } from '../src/game/input';
 import { Keybinds } from '../src/game/keybinds';
 
@@ -65,6 +71,64 @@ describe('GamepadManager', () => {
     manager.poll(1 / 60);
 
     expect(onInputEdge).toHaveBeenCalledTimes(2);
+  });
+});
+
+// Camera zoom has no free default slot (all 13 bindable buttons are already
+// claimed), so it is a pad-only, opt-in action a player rebinds explicitly.
+// GamepadManager.dispatch() must resolve it straight against Input.zoomBy
+// rather than the host's onAction callback (there is no keybind for zoom).
+describe('GamepadManager zoom dispatch', () => {
+  function setupZoom(action: string) {
+    let pad = gamepadWithPressed();
+    Object.defineProperty(globalThis, 'navigator', {
+      configurable: true,
+      value: { getGamepads: () => [pad] },
+    });
+    const zoomBy = vi.fn();
+    const onAction = vi.fn();
+    const input = {
+      applyGamepadLook: vi.fn(),
+      setGamepadLookActive: vi.fn(),
+      setGamepadMove: vi.fn(),
+      triggerGamepadJump: vi.fn(),
+      zoomBy,
+    } as unknown as Input;
+    const bindings = new GamepadBindings();
+    bindings.bind(GP.A, action);
+    const callbacks = {
+      onAction,
+      onInputEdge: vi.fn(),
+      isPointerMode: () => false,
+    } satisfies GamepadCallbacks;
+    const manager = new GamepadManager(input, bindings, callbacks);
+    (manager as unknown as { index: number | null }).index = 0;
+    return {
+      manager,
+      zoomBy,
+      onAction,
+      setPad: (p: Gamepad) => {
+        pad = p;
+      },
+    };
+  }
+
+  it('zoomIn pulls the camera closer by the wheel step, never reaching onAction', () => {
+    const { manager, zoomBy, onAction, setPad } = setupZoom(GAMEPAD_ZOOM_IN);
+    manager.poll(1 / 60);
+    setPad(gamepadWithPressed(GP.A));
+    manager.poll(1 / 60);
+    expect(zoomBy).toHaveBeenCalledExactlyOnceWith(-GAMEPAD_ZOOM_STEP);
+    expect(onAction).not.toHaveBeenCalled();
+  });
+
+  it('zoomOut pushes the camera away by the same magnitude', () => {
+    const { manager, zoomBy, onAction, setPad } = setupZoom(GAMEPAD_ZOOM_OUT);
+    manager.poll(1 / 60);
+    setPad(gamepadWithPressed(GP.A));
+    manager.poll(1 / 60);
+    expect(zoomBy).toHaveBeenCalledExactlyOnceWith(GAMEPAD_ZOOM_STEP);
+    expect(onAction).not.toHaveBeenCalled();
   });
 });
 

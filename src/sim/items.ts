@@ -25,8 +25,12 @@ import {
   canDualWieldTwoHand,
   canEquipItem,
   canEquipItemInSlot,
+  displacedSlotForEquip,
+  isUniqueEquipped,
   resolveEquipSlot,
   slotAcceptsItem,
+  uniqueEquipConflictSlot,
+  uniqueEquipFamily,
   weaponHand,
 } from './equipment_rules';
 import { formatMoney } from './format_money';
@@ -41,6 +45,7 @@ import { useGatherToolItem } from './professions/gathering';
 import type { ItemUseResult, PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import {
+  ALL_EQUIP_SLOTS,
   CONSUME_DURATION,
   CONSUME_TICKS,
   cloneItemInstancePayload,
@@ -414,17 +419,31 @@ export function equipItem(
   const oldInstance = meta.equipmentInstance?.[slot];
   // A two-hander and a shield cannot coexist. Fury's Titan Grip exemption is
   // weapon-only: a valid Fury weapon pair may contain one or two two-handers.
-  let displacedSlot: EquipSlot | null = null;
-  if (slot === 'offhand') {
-    const mainhand = meta.equipment.mainhand ? ITEMS[meta.equipment.mainhand] : undefined;
-    const titanPair = def.kind === 'weapon' && canDualWieldTwoHand(meta.cls, spec);
-    if (mainhand?.kind === 'weapon' && weaponHand(mainhand) === 'twohand' && !titanPair) {
-      displacedSlot = 'mainhand';
-    }
-  } else if (slot === 'mainhand' && def.kind === 'weapon' && weaponHand(def) === 'twohand') {
-    const offhand = meta.equipment.offhand ? ITEMS[meta.equipment.offhand] : undefined;
-    const titanPair = offhand?.kind === 'weapon' && canDualWieldTwoHand(meta.cls, spec);
-    if (meta.equipment.offhand && !titanPair) displacedSlot = 'offhand';
+  // The rule body lives in equipment_rules.ts so the paperdoll drop feedback
+  // shares it verbatim.
+  const displacedSlot = displacedSlotForEquip(
+    def,
+    slot,
+    meta.equipment,
+    (id) => ITEMS[id],
+    meta.cls,
+    spec,
+  );
+  // Legendary items are unique-equipped: refuse when another worn slot already
+  // holds this item's family (the heroic variant of a legendary counts as the
+  // same item). The target slot and a displaced slot are exempt: both are
+  // emptied by this swap, so the copy they hold never coexists with the
+  // incoming one (the Titan Grip same-id NON-legendary pair stays legal).
+  if (
+    uniqueEquipConflictSlot(
+      def,
+      meta.equipment,
+      (id) => ITEMS[id],
+      displacedSlot ? [slot, displacedSlot] : [slot],
+    )
+  ) {
+    ctx.error(meta.entityId, 'You can only equip one of those.');
+    return;
   }
   const displacedId = displacedSlot ? meta.equipment[displacedSlot] : undefined;
   const displacedInstance = displacedSlot ? meta.equipmentInstance?.[displacedSlot] : undefined;
@@ -498,6 +517,37 @@ export function revalidateOffhandForSpec(ctx: SimContext, pid?: number): void {
     color: '#8f8',
     pid: meta.entityId,
   });
+}
+
+// A character persisted before legendaries became unique-equipped can still
+// wear two copies of one (the dual-wield Thronebane build). The load path runs
+// this after equipment and inventory are restored: the first worn copy in
+// ALL_EQUIP_SLOTS order stays (mainhand before offhand, ring1 before ring2),
+// every later copy is benched into the bags with its instance payload intact.
+// Uncapacitated like the respec offhand bench above: a rule change can never
+// destroy gear. Returns the benched item ids so the caller can notice the
+// player (the load path emits the same Unequipped line the respec bench does)
+// and recalc stats afterward, as with every load.
+export function benchDuplicateUniqueEquipped(meta: PlayerMeta): string[] {
+  const worn = new Set<string>();
+  const benched: string[] = [];
+  for (const slot of ALL_EQUIP_SLOTS) {
+    const itemId = meta.equipment[slot];
+    if (!itemId) continue;
+    const def = ITEMS[itemId];
+    if (!def || !isUniqueEquipped(def)) continue;
+    const family = uniqueEquipFamily(def);
+    if (!worn.has(family)) {
+      worn.add(family);
+      continue;
+    }
+    const instance = meta.equipmentInstance?.[slot];
+    delete meta.equipment[slot];
+    if (meta.equipmentInstance) delete meta.equipmentInstance[slot];
+    returnEquippedItemToBags(meta, itemId, instance);
+    benched.push(itemId);
+  }
+  return benched;
 }
 
 // Remove the piece in `slot` back to the bags, leaving the slot empty. Unlike
@@ -841,11 +891,15 @@ export function buyItem(
   // ctrl/cmd-click (desktop) or the vendor row's Buy Stack control (touch).
   // Restricted to plain copper-priced stackable goods: Honor is authored as a
   // per-purchase price, never stack-multiplied (see VendorPrice in
-  // vendor_view.ts), and a mount purchase must always stay exactly one (buying
+  // vendor_view.ts), a mount purchase must always stay exactly one (buying
   // several copies of the same reins would only waste gold, and mountOwned only
-  // guards against a SECOND purchase, not a bulk quantity within this one). The
-  // result is floored at 1 so an unaffordable bulk request still hits the normal
-  // "Not enough money" check below instead of silently buying zero.
+  // guards against a SECOND purchase, not a bulk quantity within this one), and
+  // a soulbound row mirrors vendorCountForced's Q23 force-1 rule (a future
+  // soulbound stackable, e.g. a bind-on-pickup consumable, must stay
+  // one-at-a-time on both the count AND the bulk path, never multiply on one
+  // and force-1 on the other). The result is floored at 1 so an unaffordable
+  // bulk request still hits the normal "Not enough money" check below instead
+  // of silently buying zero.
   //
   // Count purchase (the 1x/5x/10x/custom control row): count N is N ordinary
   // row-unit purchases resolved atomically, refuse-whole on any shortfall
@@ -855,7 +909,8 @@ export function buyItem(
   // the riding delegation and the mount gates (a hostile count denies on
   // every row; a valid one is force-1 there), so `count` here is always a
   // safe integer >= 1.
-  const bulkEligible = bulk && hasCopperPrice && !hasHonorPrice && def.kind !== 'mount';
+  const bulkEligible =
+    bulk && hasCopperPrice && !hasHonorPrice && def.kind !== 'mount' && !def.soulbound;
   let qty: number;
   let copperCost: number;
   let honorCost: number;

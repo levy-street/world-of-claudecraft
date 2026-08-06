@@ -58,7 +58,10 @@ Quiet-host full gate historically ~5-6 min on M1 (Phase 1 336 s / Phase 2 compos
 
 ## Remaining OPEN
 
-1. Low/medium-tier **local** machine baselines still empty (only M1 + CI-L1 proxy).
+1. ~~Low/medium-tier **local** machine baselines still empty (only M1 + CI-L1 proxy).~~
+   **Partially closed 2026-08-06:** first real local Linux (medium-tier, L1) wall
+   filled, under heavy contention; see `baselines.md`. Quiet L1 re-run and any
+   macOS low/medium-tier host still open.
 2. Windows host (W1) full gate / gate:fast wall untested (smoke only).
 3. Whether local multi-shard full gate is worth supporting on high-tier only.
 4. Owner sign-off if `gate:fast` is ever allowed as pre-push (default: no).

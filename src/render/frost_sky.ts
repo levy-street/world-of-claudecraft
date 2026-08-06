@@ -6,6 +6,7 @@ import * as THREE from 'three';
 import { FROSTVEIL_ROADS } from '../sim/content/frostveil';
 import { hash2 } from '../sim/rng';
 import { terrainHeight } from '../sim/world';
+import { auroraFadeBand } from './frost_sky_fade_core';
 
 export interface FrostSkyView {
   group: THREE.Group;
@@ -274,12 +275,10 @@ export function buildFrostSky(seed = 0): FrostSkyView {
       // frost rect's edges: its z band, and (now that the Reach is the
       // center strip with realms on both sides) both x borders, so the
       // aurora never shows over the Drakelands east of x 180 nor the
-      // Amberfall west of x -180.
-      const fadeIn = Math.min(1, Math.max(0, (camZ - 1400) / 80));
-      const fadeOut = 1 - Math.min(1, Math.max(0, (camZ - 1920) / 80));
-      const fadeW = Math.min(1, Math.max(0, (camX + 220) / 80));
-      const fadeE = Math.min(1, Math.max(0, (220 - camX) / 80));
-      const band = Math.min(fadeIn, fadeOut, fadeW, fadeE);
+      // Amberfall west of x -180. The boundary math is the pure core
+      // frost_sky_fade_core.ts, so its zone-edge value stays testable
+      // without a canvas/document.
+      const band = auroraFadeBand(camX, camZ);
       for (const r of ribbons) {
         r.mesh.visible = band > 0.001;
         if (!r.mesh.visible) continue;

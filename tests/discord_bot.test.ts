@@ -357,7 +357,7 @@ describe('slash commands + messages', () => {
       lifetimePoints: 5000,
     });
     expect(linked).toContain('Champion');
-    expect(linked).not.toContain('/flex'); // /flex was removed
+    expect(linked).not.toContain('/flex'); // removed command, must not be referenced in the reply
     expect(buildLinkContent('https://woc')).toContain('https://woc');
     expect(buildWelcomeMessage({ userMention: '<@1>', gameUrl: 'https://woc' })).toContain('<@1>');
   });

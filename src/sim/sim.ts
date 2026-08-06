@@ -222,7 +222,7 @@ import {
   runDespawnDecay,
   tickGroundAoEs,
 } from './entity_roster';
-import { canEquipItem, resolveEquipSlot } from './equipment_rules';
+import { canEquipItem, resolveEquipSlot, uniqueEquipConflictSlot } from './equipment_rules';
 import * as escortMod from './escort';
 import { initEscorts as initEscortsImpl, updateEscorts as updateEscortsImpl } from './escort';
 import { fleeSpeed } from './flee_speed';
@@ -2981,6 +2981,15 @@ export class Sim {
           const id = s.bags[i];
           meta.bags[i] = id && ITEMS[id]?.kind === 'bag' ? id : null;
         }
+      }
+      // Legendary items are unique-equipped; a save from before that rule (or
+      // a tampered one) can still wear duplicates. Bench every later copy into
+      // the bags before stats derive from the worn set below, and say so: a
+      // silently changed worn set reads as lost gear (the respec bench and the
+      // bag migration both notice too).
+      for (const benchedId of items.benchDuplicateUniqueEquipped(meta)) {
+        const benchedDef = ITEMS[benchedId];
+        if (benchedDef) this.notice(player.id, `Unequipped ${benchedDef.name}.`);
       }
       // Buyback rows deliberately skip the full instancedCountCap: byte-equal
       // merges past the stack cap are legitimate here (recordVendorBuyback
@@ -6598,21 +6607,51 @@ export class Sim {
       replacementConflicts.some((index) => isUnbreakableControlAura(target.auras[index]))
     )
       return;
+    // A same-id same-name re-application is a REFRESH: the old aura is
+    // displaced silently (no fade, exactly as before) and the gained event
+    // below carries refresh: true so parses read it as SPELL_AURA_REFRESH
+    // rather than a fresh application (parse fidelity 7.2). PLACEMENT IS
+    // DELIBERATELY UNCHANGED: splice then append, so the refreshed aura moves
+    // to the end exactly as it always has. Entity.auras array order is an rng
+    // draw-order input (the DoT tick walk draws per dot, breakable-fear
+    // chances draw per aura) and a gameplay-selection input (dispel targets,
+    // absorb consumption order), so refresh-vs-apply must never produce a
+    // different order than it did before this field existed.
+    let refreshed = false;
     for (const existing of replacementConflicts) {
       const displaced = target.auras[existing];
       this.applyNonPlayerStatAura(target, displaced, -1);
       target.auras.splice(existing, 1);
-      // A same-id replacement that swaps in a DIFFERENT display name (a
-      // same-stat elixir overwriting another brand) would otherwise vanish
-      // from the buff bar with no combat-log trace: emit the fade the client
-      // cannot infer. Same-name refreshes stay silent, exactly as before.
-      if (displaced.name !== aura.name)
-        this.emit({ type: 'aura', targetId: target.id, name: displaced.name, gained: false });
+      if (displaced.name !== aura.name) {
+        // A same-id replacement that swaps in a DIFFERENT display name (a
+        // same-stat elixir overwriting another brand) would otherwise vanish
+        // from the buff bar with no combat-log trace: emit the fade the client
+        // cannot infer. Same-name refreshes stay silent, exactly as before.
+        this.emit({
+          type: 'aura',
+          targetId: target.id,
+          name: displaced.name,
+          gained: false,
+          sourceId: displaced.sourceId,
+          abilityId: displaced.id,
+        });
+      } else {
+        refreshed = true;
+      }
     }
     target.auras.push(aura);
     if (aura.kind === 'stealth') target.stealthed = true; // keep the cache live without waiting for updateAuras
     this.applyNonPlayerStatAura(target, aura, 1);
-    this.emit({ type: 'aura', targetId: target.id, name: aura.name, gained: true });
+    this.emit({
+      type: 'aura',
+      targetId: target.id,
+      name: aura.name,
+      gained: true,
+      sourceId: aura.sourceId,
+      abilityId: aura.id,
+      ...(aura.stacks !== undefined ? { stacks: aura.stacks } : {}),
+      ...(refreshed ? { refresh: true } : {}),
+    });
     if (aura.kind === 'hot') {
       // A HoT's periodic ticks (combat/auras.ts) no longer carry the sound: the
       // client plays a single heal_impact right here, at the moment it lands,
@@ -8899,6 +8938,10 @@ export class Sim {
     // "must be level N" message belongs.
     const e = this.entities.get(meta.entityId);
     if (e && !meetsLevelRequirement(e.level, def)) return;
+    // Skip silently when a copy of a unique-equipped (legendary) family is
+    // already worn anywhere: equipping the duplicate would be refused, and the
+    // explicit equip path is where that refusal toast belongs.
+    if (uniqueEquipConflictSlot(def, meta.equipment, (id) => ITEMS[id], [])) return;
     if (def.kind === 'weapon') {
       const cur = meta.equipment.mainhand ? ITEMS[meta.equipment.mainhand]?.weapon : null;
       const next = def.weapon;

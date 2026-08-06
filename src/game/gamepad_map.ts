@@ -191,12 +191,21 @@ export function gamepadButtonLabel(button: number, kind: GamepadKind): string {
 }
 
 // Action ids reuse the keyboard Keybinds registry ids (so the gamepad dispatches
-// through the same InputCallbacks) plus two specials Keybinds doesn't model:
-//   'escape': open/close the game menu (Escape is never a keyboard bind)
-//   'none':   explicitly unbound
+// through the same InputCallbacks) plus four specials Keybinds doesn't model:
+//   'escape':          open/close the game menu (Escape is never a keyboard bind)
+//   'zoomIn'/'zoomOut': step the camera distance, gamepad-only (camera zoom has no
+//                       keyboard bind, only mouse wheel and touch pinch); handled
+//                       in GamepadManager.dispatch() straight against Input.zoomBy,
+//                       so they never reach the host's onAction callback.
+//   'none':            explicitly unbound
 // 'jump' and 'autorun' are real Keybinds ids and handled by Input directly.
 export type GamepadActionId = string;
 export const GAMEPAD_NONE = 'none';
+export const GAMEPAD_ZOOM_IN = 'zoomIn';
+export const GAMEPAD_ZOOM_OUT = 'zoomOut';
+// Matches the step Input's mouse-wheel handler applies per notch (input.ts), so
+// gamepad zoom feels identical in speed to wheel and touch pinch-to-zoom.
+export const GAMEPAD_ZOOM_STEP = 1.4;
 
 // Console-MMO default layout: left stick moves (camera-relative), right stick
 // looks, face/shoulder/d-pad reach the first nine action-bar slots plus the

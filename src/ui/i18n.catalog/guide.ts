@@ -270,16 +270,21 @@ export const guideStrings = {
     groupInterface: 'Interface',
     groupCamera: 'Camera',
     talents: 'Talents',
+    professions: 'Professions',
     arena: 'Arena',
     leaderboard: 'Leaderboard',
     deeds: 'Book of Deeds',
+    sheathe: 'Sheathe/Unsheathe Weapon',
     crafting: 'Crafting',
     valeCup: 'Vale Cup',
+    mount: 'Mount / Dismount',
     calendar: 'Event Calendar',
+    dungeonFinder: 'Dungeon Finder',
     discord: 'Discord',
     abilities: 'Use action bar abilities (the number row; a second bar sits on the numpad)',
     targetFriendly: 'Target nearest friendly',
     cycleFriendly: 'Cycle friendly target',
+    targetAuras: 'Target buffs and debuffs',
     gameMenu: 'Open game menu and options',
     bothMouse: 'Both Mouse Buttons',
     runForward: 'Run forward',
@@ -294,7 +299,7 @@ export const guideStrings = {
       'Touch controls appear automatically on phones and tablets: a movement stick on the left, drag anywhere else to look, pinch with two fingers to zoom the camera, and on-screen buttons for your abilities and menus. A small arrow in the top left corner shows or hides the menu buttons, and the More button there holds the rest of your windows.',
     controllerHeading: 'On a controller',
     controllerBody:
-      'Gamepads work too, and controller support is on by default. The left stick moves, the right stick aims the camera, and the face and shoulder buttons cover your abilities, jumping, and interacting. Open a window like your bags to bring up an on-screen pointer, and the game menu navigates directly with the D-pad and face buttons. You can remap the buttons and adjust stick deadzone, camera speed, vibration, and inverted look from the controller settings in the options.',
+      'Gamepads work too, and controller support is on by default. The left stick moves, the right stick aims the camera, and the face and shoulder buttons cover your abilities, jumping, and interacting. Open a window like your bags to bring up an on-screen pointer, and the game menu navigates directly with the D-pad and face buttons. You can remap the buttons and adjust stick deadzone, camera speed, vibration, and inverted look from the controller settings in the options, where a button can also be bound to zoom the camera in or out (unbound by default).',
   },
 
   // Settings & Performance reference. Option and value NAMES reuse the game's own
@@ -1400,6 +1405,11 @@ export const guideStrings = {
     soulboundBody:
       'A few special rewards are soulbound, bound to your character from the moment you earn them. A soulbound item cannot be traded, mailed, sold to a vendor, or listed on the market; it is yours and yours alone. Today that protection guards prize tokens such as Heroic Marks, while the gear you win is yours to trade, sell, or share freely.',
 
+    // Unique-equipped legendaries. Rule-level only: no item names or drop sources.
+    uniqueTitle: 'Unique-Equipped: one legendary of a kind',
+    uniqueBody:
+      'Legendary items are unique-equipped: your character can wear only one copy of a given legendary at a time, and its heroic version counts as the same item. A second copy can ride in your bags, in the bank, or on the market, but trying to wear both at once is refused, and the tooltip carries a gold Unique-Equipped tag so you can see the rule before you plan a build around two of them.',
+
     // Tier sets and set bonuses. Concept only: no set names, bonus numbers, or the raid boss.
     setsTitle: 'Sets and set bonuses',
     setsBody:
@@ -1789,13 +1799,13 @@ export const guideStrings = {
     gatherDeedsHeading: 'Deeds along the way',
     gatherDeeds: {
       mining:
-        "Your first node of any trade earns Fruits of the Field, and the 100 cap in Mining inscribes Ore in the Blood. Reaching 100 in any three of Mining, Logging, Herbalism, and Fishing adds Master Gatherer at 25 Renown, and cracking a pristine vein records its own collector's mark. Six zones keep a gatherer's chronicle page apiece too, filled by harvesting an ore vein, a wood stand, and an herb patch within the zone's bounds. None of these grant power: deeds are titles and Renown, a record of the roads you have walked.",
+        "Your first node of any trade earns Fruits of the Field, and the 100 cap in Mining inscribes Ore in the Blood. Reaching 100 in any three of Mining, Logging, Herbalism, and Fishing adds Master Gatherer at 25 Renown, and cracking a pristine vein records its own collector's mark. Twelve zones keep a gatherer's chronicle page apiece too, filled by harvesting an ore vein, a wood stand, and an herb patch within the zone's bounds. None of these grant power: deeds are titles and Renown, a record of the roads you have walked.",
       logging:
-        "Your first node of any trade earns Fruits of the Field, and the 100 cap in Logging inscribes Heartwood Hewer. Reaching 100 in any three of Mining, Logging, Herbalism, and Fishing adds Master Gatherer at 25 Renown, and a strike of ancient heartwood records its own collector's mark. Six zones keep a gatherer's chronicle page apiece too, filled by harvesting an ore vein, a wood stand, and an herb patch within the zone's bounds. Deeds are titles and Renown only, never power.",
+        "Your first node of any trade earns Fruits of the Field, and the 100 cap in Logging inscribes Heartwood Hewer. Reaching 100 in any three of Mining, Logging, Herbalism, and Fishing adds Master Gatherer at 25 Renown, and a strike of ancient heartwood records its own collector's mark. Twelve zones keep a gatherer's chronicle page apiece too, filled by harvesting an ore vein, a wood stand, and an herb patch within the zone's bounds. Deeds are titles and Renown only, never power.",
       herbalism:
-        "Your first node of any trade earns Fruits of the Field, and the 100 cap in Herbalism inscribes Master of the Meadow. Reaching 100 in any three of Mining, Logging, Herbalism, and Fishing adds Master Gatherer at 25 Renown, and a moonlit bloom records its own collector's mark. Six zones keep a gatherer's chronicle page apiece too, filled by harvesting an ore vein, a wood stand, and an herb patch within the zone's bounds. Deeds are titles and Renown only, never power.",
+        "Your first node of any trade earns Fruits of the Field, and the 100 cap in Herbalism inscribes Master of the Meadow. Reaching 100 in any three of Mining, Logging, Herbalism, and Fishing adds Master Gatherer at 25 Renown, and a moonlit bloom records its own collector's mark. Twelve zones keep a gatherer's chronicle page apiece too, filled by harvesting an ore vein, a wood stand, and an herb patch within the zone's bounds. Deeds are titles and Renown only, never power.",
       fishing:
-        "The 100 milestone inscribes Old Salt and 200 inscribes Master Angler with its title, the very top of the angler's art; Fishing also counts toward Master Gatherer, earned at 100 in any three gathering trades. A first fish from each of six zones' waters fills its own page, the three heartland zones and the Willowfen, the Galecrest, and the Farshore beyond them, and the Sunglint Koi records Glimmer of Hope, so travelers with a pole in their pack fill their book faster than they expect.",
+        "The 100 milestone inscribes Old Salt and 200 inscribes Master Angler with its title, the very top of the angler's art; Fishing also counts toward Master Gatherer, earned at 100 in any three gathering trades. A first fish from each of twelve zones' waters fills its own page, the three heartland zones and the Willowfen, the Galecrest, the Farshore, the Frostveil, the Amberfall, the Nightbloom, the Wraithwood, the Palmreach, and the Evergarden beyond them, and the Sunglint Koi records Glimmer of Hope, so travelers with a pole in their pack fill their book faster than they expect.",
     },
     fish: {
       startHeading: 'Getting started',

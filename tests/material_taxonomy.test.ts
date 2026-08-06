@@ -2,12 +2,13 @@
 // membership pins for the derived source-or-reagent junk set behind the bank
 // "Deposit materials" sweep and the bags/bank Materials chip. The set is pinned
 // by EXACT-set equality against a literal id list (staples from the 2026-08-01
-// settlement plus raw fishing catches as junk cooking reagents), swept for
-// class exclusions by KIND against the live catalog (never by use type:
-// simple_fishing_pole is use-type 'fishing' and several tools carry no use at
-// all), and closed by a completeness tripwire that enumerates the ONLY
-// non-poor junk allowed to stay unclassified, so a future junk item must be
-// classified here explicitly instead of drifting in or out silently.
+// settlement plus raw fishing catches as junk cooking reagents, plus the claw
+// and tusk corpse-harvest materials), swept for class exclusions by KIND
+// against the live catalog (never by use type: simple_fishing_pole is
+// use-type 'fishing' and several tools carry no use at all), and closed by a
+// completeness tripwire that enumerates the ONLY non-poor junk allowed to
+// stay unclassified, so a future junk item must be classified here explicitly
+// instead of drifting in or out silently.
 import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -47,6 +48,7 @@ const HONEST_MATERIALS = [
   'bone_fragments',
   'cooking_salt',
   'copper_ore',
+  'curved_tusk',
   'elderwood_log',
   'fine_ashwood_log',
   'fine_copper_ore',
@@ -66,6 +68,7 @@ const HONEST_MATERIALS = [
   'ironbark_log',
   'linen_scrap',
   'prime_cut',
+  'pristine_claw',
   'pristine_hide',
   'pristine_silk',
   'pristine_venom_gland',
@@ -81,6 +84,7 @@ const HONEST_MATERIALS = [
   'resonant_thread',
   'resonant_timber',
   'rough_hide',
+  'sharp_claw',
   'silverleaf_herb',
   'smithing_flux',
   'spider_leg',

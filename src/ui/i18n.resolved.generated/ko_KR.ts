@@ -391,7 +391,8 @@ export const ko_KR: EnTranslations = {
     },
     "emoteEditor": {
       "title": "감정 표현",
-      "done": "완료"
+      "done": "완료",
+      "close": "감정 표현 닫기"
     },
     "dailyRewards": {
       "title": "일일 보상",
@@ -1348,6 +1349,8 @@ export const ko_KR: EnTranslations = {
       "buttons": "버튼 배치",
       "resetButtons": "버튼 배치 초기화",
       "menuAction": "게임 메뉴",
+      "zoomIn": "Zoom In",
+      "zoomOut": "Zoom Out",
       "help": "왼쪽 스틱으로 이동, 오른쪽 스틱으로 시점 조작. 창을 열면 화면 포인터를 사용할 수 있습니다."
     },
     "perf": {
@@ -1576,6 +1579,7 @@ export const ko_KR: EnTranslations = {
     },
     "itemHeroicTag": "[영웅]",
     "itemSoulbound": "귀속",
+    "itemUniqueEquipped": "착용 시 고유",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -3146,7 +3150,8 @@ export const ko_KR: EnTranslations = {
         "raise_fallen": "망자 소생(주기적 증원)",
         "soul_rend": "영혼 가르기(표식 대상은 산개 후 치유 필요)",
         "deathless_rage": "불사의 격노(수호석에서 저지)",
-        "wardstones": "수호석 정신집중(단계 전환)"
+        "wardstones": "수호석 정신집중(단계 전환)",
+        "dread_curse": "공포의 저주(영웅 전용, 누적되는 탱커 교대 디버프)"
       }
     },
     "deeds": {
@@ -3554,16 +3559,21 @@ export const ko_KR: EnTranslations = {
       "groupInterface": "인터페이스",
       "groupCamera": "카메라",
       "talents": "특성",
+      "professions": "생산 전문직",
       "arena": "투기장",
       "leaderboard": "순위표",
       "deeds": "업적의 서",
+      "sheathe": "무기 넣기/빼기",
       "crafting": "제작",
       "valeCup": "베일 컵",
+      "mount": "탑승 / 하차",
       "calendar": "이벤트 달력",
+      "dungeonFinder": "던전 찾기",
       "discord": "Discord",
       "abilities": "행동 단축바 능력 사용 (숫자 키 줄, 두 번째 단축바는 숫자 키패드에 있음)",
       "targetFriendly": "가장 가까운 아군 대상 지정",
       "cycleFriendly": "아군 대상 순환",
+      "targetAuras": "대상 강화 및 약화 효과",
       "gameMenu": "게임 메뉴와 옵션 열기",
       "bothMouse": "마우스 양쪽 버튼",
       "runForward": "앞으로 달리기",
@@ -3574,7 +3584,7 @@ export const ko_KR: EnTranslations = {
       "mobileHeading": "모바일에서",
       "mobileBody": "휴대전화와 태블릿에서는 터치 조작이 자동으로 나타납니다. 왼쪽에는 이동 스틱, 그 밖의 아무 곳이나 끌면 시점 전환, 두 손가락으로 오므리면 카메라 확대, 그리고 능력과 메뉴를 위한 화면 버튼이 표시됩니다. 왼쪽 위 구석의 작은 화살표로 메뉴 버튼을 보이거나 숨길 수 있고, 그곳의 더 보기 버튼에 나머지 창들이 담겨 있습니다.",
       "controllerHeading": "컨트롤러에서",
-      "controllerBody": "게임패드도 사용할 수 있으며, 컨트롤러 지원은 기본으로 켜져 있습니다. 왼쪽 스틱으로 이동하고, 오른쪽 스틱으로 카메라를 조준하며, 얼굴 버튼과 어깨 버튼으로 능력 사용, 점프, 상호작용을 처리합니다. 가방 같은 창을 열면 화면 포인터가 나타나고, 게임 메뉴는 방향 패드와 얼굴 버튼으로 곧바로 조작할 수 있습니다. 옵션의 컨트롤러 설정에서 버튼을 재배치하고 스틱 데드존, 카메라 속도, 진동, 시점 반전을 조정할 수 있습니다."
+      "controllerBody": "게임패드도 사용할 수 있으며, 컨트롤러 지원은 기본으로 켜져 있습니다. 왼쪽 스틱으로 이동하고, 오른쪽 스틱으로 카메라를 조준하며, 얼굴 버튼과 어깨 버튼으로 능력 사용, 점프, 상호작용을 처리합니다. 가방 같은 창을 열면 화면 포인터가 나타나고, 게임 메뉴는 방향 패드와 얼굴 버튼으로 곧바로 조작할 수 있습니다. 옵션의 컨트롤러 설정에서 버튼을 재배치하고 스틱 데드존, 카메라 속도, 진동, 시점 반전을 조정할 수 있으며, 버튼 하나를 카메라 확대/축소에 배정할 수도 있습니다(기본값은 미배정)."
     },
     "settingsPage": {
       "heading": "설정 및 성능",
@@ -4315,6 +4325,8 @@ export const ko_KR: EnTranslations = {
       "sourcesBody": "초반 업그레이드 대부분은 퀘스트 보상이므로, 사냥을 반복하기보다 퀘스트를 끝내는 편이 이득입니다. 적은 처치하면 장비를 떨어뜨리고, 마을 상인은 든든한 기본 장비를 팔며, 제작자는 채집한 재료를 착용할 수 있는 장비로 바꾸고, 플레이어 시장에서는 다른 모험가에게서 살 수 있습니다. 그리고 성장의 정점에 이르면, 다른 어디에서도 구할 수 없는 장비를 파는 두 가지 증표 화폐가 기다립니다. 탐굴 증표는 탐굴 관리인에게, 영웅의 징표는 영웅 병참장교에게 씁니다.",
       "soulboundTitle": "귀속: 오직 당신의 것",
       "soulboundBody": "값진 장비 가운데 상당수는 귀속되어, 손에 넣는 순간부터 당신의 캐릭터에게 묶입니다. 귀속된 아이템은 거래하거나, 우편으로 보내거나, 상인에게 팔거나, 시장에 올릴 수 없습니다. 이제 그것은 당신 이야기의 일부이며, 누구도 대신 지녀 줄 수 없습니다.",
+      "uniqueTitle": "착용 시 고유: 같은 전설은 하나만",
+      "uniqueBody": "전설 아이템은 착용 시 고유입니다. 캐릭터는 같은 전설 아이템을 동시에 하나만 착용할 수 있으며, 영웅 버전도 같은 아이템으로 취급됩니다. 두 번째 사본은 가방, 은행, 시장에 둘 수 있지만 둘을 동시에 착용하려 하면 거부됩니다. 툴팁에는 금색 \"착용 시 고유\" 표시가 있어 두 개를 중심으로 빌드를 계획하기 전에 이 규칙을 확인할 수 있습니다.",
       "setsTitle": "세트와 세트 효과",
       "setsBody": "어떤 방어구는 서로 어울리는 한 벌로 나옵니다. 여러 부위가 하나처럼 보이고 또 하나처럼 싸우도록 지어진 것입니다. 같은 세트를 한 번에 충분히 갖춰 입으면 세트 효과가 깨어나 각 부위 고유의 능력치 위에 추가 효과를 더하고, 더 많은 부위를 입을수록 더 강해집니다. 이런 세트 몇몇은 레벨을 올리는 동안 귀한 드롭으로 모습을 드러내고, 가장 위대한 것들은 최고 레벨 부근의 가장 어려운 단체 콘텐츠에서 나오므로, 세트 한 벌을 완성하는 것은 전형적인 최종 단계 목표입니다.",
       "consumablesTitle": "소모품",
@@ -10307,6 +10319,15 @@ export const ko_KR: EnTranslations = {
       },
       "direfang_quiver": {
         "name": "흉포송곳니 화살통"
+      },
+      "sharp_claw": {
+        "name": "날카로운 발톱"
+      },
+      "curved_tusk": {
+        "name": "휘어진 엄니"
+      },
+      "pristine_claw": {
+        "name": "온전한 발톱"
       },
       "conjured_water4": {
         "name": "창조된 샘물"

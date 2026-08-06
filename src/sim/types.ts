@@ -4397,7 +4397,30 @@ export type SimEvent = { pid?: number } & (
     }
   | { type: 'questReady'; questId: string }
   | { type: 'questDone'; questId: string }
-  | { type: 'aura'; targetId: number; name: string; gained: boolean; auraKind?: AuraKind }
+  | {
+      type: 'aura';
+      targetId: number;
+      name: string;
+      gained: boolean;
+      auraKind?: AuraKind;
+      // Attribution the Aura object always had but the event used to drop
+      // (parse fidelity 7.2): the caster's entity id, the stable aura/ability
+      // id, and the stack count at application. Carried by the Sim.applyAura
+      // emit path (gained, refresh, and same-id brand-swap fades) and the
+      // stack-bump re-emit in effect_dispatch; the scattered gained AND fade
+      // sites elsewhere (mob_swing, Blood Frenzy, Pack Frenzy, pet buffs,
+      // empower_next, expiries, dispels, ...) still emit bare, and consumers
+      // must treat every field here as optional.
+      sourceId?: number;
+      abilityId?: string;
+      stacks?: number;
+      // True when a gained event displaced a same-id same-name aura already on
+      // the target (a re-application; no fade is emitted, and the aura moves
+      // to the end of the array exactly as a fresh application always has):
+      // parses and combat logs read this as SPELL_AURA_REFRESH rather than a
+      // fresh application.
+      refresh?: boolean;
+    }
   | {
       type: 'castStart';
       entityId: number;
@@ -4740,6 +4763,12 @@ export type SimEvent = { pid?: number } & (
       // same thing from amount === 0, since a genuine direct heal (applyHeal)
       // can also legitimately land at amount 0 (full HP, fully absorbed).
       cueOnly?: boolean;
+      // Healing lost to the missing-hp clamp (parse fidelity 7.1), omitted
+      // when zero. Computed AFTER heal-absorb consumption, so absorbed and
+      // overheal never double-count the same lost healing. Set at every
+      // clamped heal2 emit site; a tick whose heal fully overheals still
+      // emits nothing (those sites gate on healed > 0, unchanged).
+      overheal?: number;
     }
   // visual-only cue for the renderer: spell projectiles, channel beams, dot
   // ticks, aoe novas, and the ranged-mob windup telegraph ('windup' fires at
