@@ -508,7 +508,11 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // amberfall, nightbloom, wraithwood, palmreach, and evergarden (drakelands
   // already covered by the brood rework above). No shipped trigger or renown
   // changed on either side.
-  const FROZEN_CATALOG_SHA256 = 'PLACEHOLDER';
+  // Re-baselined after the remaining starter-zone chronicle pair extension
+  // (#2902) landed with this literal left at its PLACEHOLDER, which failed the
+  // suite on every branch carrying that base. Appended deeds only; no shipped
+  // trigger or renown changed.
+  const FROZEN_CATALOG_SHA256 = 'edaa9bd88929ab1cb7c586e162577c41f2f52240d615ecbd4d308e5daec95a25';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
