@@ -193,7 +193,7 @@ describe('Nythraxis raid encounter', () => {
     ).toBe(true);
     // The crypt's interactables are the three attunement relics that summon the
     // guardian undead. The Royal Graves belong to the overworld q_nythraxis_graves
-    // quest (ZONE3_OBJECTS) — they must not be duplicated inside the crypt.
+    // quest (ZONE3_OBJECTS); they must not be duplicated inside the crypt.
     expect(crypt.objects?.map((o) => o.itemId)).toEqual(
       expect.arrayContaining(['captains_crest', 'priests_sigil', 'royal_seal']),
     );
@@ -2516,7 +2516,7 @@ describe('Nythraxis raid encounter', () => {
     expect(sim.pickUpObject(ward.id, pid)).toBe(false);
   });
 
-  it('never leashes/resets when kited — keeps chasing instead of evading home', () => {
+  it('never leashes/resets when kited and keeps chasing instead of evading home', () => {
     const sim = makeWorld();
     const tankPid = sim.addPlayer('warrior', 'Tank');
     const origin = enterRaid(sim, tankPid);
@@ -2527,7 +2527,7 @@ describe('Nythraxis raid encounter', () => {
     engage(boss, tank);
     sim.tick(); // init the encounter
     // drag the boss far from its home (further than any leash) but keep the tank
-    // alive in the room; a normal mob would evade — Nythraxis must not.
+    // alive in the room; a normal mob would evade, but Nythraxis must not.
     teleport(sim, tankPid, origin.x + 150, origin.z + 96);
     boss.pos.x = origin.x + 140;
     boss.pos.z = origin.z + 96;

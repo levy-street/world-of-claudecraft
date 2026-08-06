@@ -615,7 +615,7 @@ function convertMaterial(
   const s = src as THREE.MeshStandardMaterial; // basic (unlit) shares the fields we read
   const ov = MAT_OVERRIDES[`${kit}:${s.name}`] ?? MAT_OVERRIDES[s.name];
   // hasVertexColors must key the cache: kits share material names between
-  // COLOR_0 meshes (trim 'Vertex' props) and colorless ones — a shared
+  // COLOR_0 meshes (trim 'Vertex' props) and colorless ones; a shared
   // vertexColors:true material would render the colorless meshes black
   // The alpha cutout and sidedness the asset authored (glTF alphaMode MASK +
   // alphaCutoff + doubleSided, already resolved by GLTFLoader) must survive the
