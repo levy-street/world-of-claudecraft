@@ -251,6 +251,7 @@ import {
   ITEMS,
   isDelvePos,
   isRiftPos,
+  MOBS,
   QUESTS,
   questRewardItem,
   setActiveWorldContent,
@@ -4680,6 +4681,11 @@ async function startGame(
           perf,
           gamepad,
           music,
+          // The live content table, for E2E rigs that stage a template state
+          // shipped content cannot reach (scripts/shot_2513_unmapped_corpse.mjs
+          // retags a template all-unmapped, the tests' withUnmappedTemplate
+          // idiom). Debug surface only; never written by game code.
+          MOBS,
           /** Opens the board and drains queued sim events. Do not call sim.lockpickEngage directly offline. */
           lockpickEngage: (objectId: number, ante: number) =>
             hud.submitLockpickEngage(objectId, ante as 1 | 2 | 3),
