@@ -72,11 +72,13 @@ describe('ladder recipe execution sweep (all 54)', () => {
     }
   });
 
-  it('the four specimen consumers consume the signed instance slot itself', () => {
+  it('the five specimen consumers consume the signed instance slot itself', () => {
     // One recipe per specimen family (pinned literally in
-    // tests/recipe_economy.test.ts's demand block); the assert above already
-    // proves count 0, this pins that no UNSIGNED grant would have satisfied
-    // the sweep: the granted reagent was a signed instance slot.
+    // tests/recipe_economy.test.ts's demand block; pristine_claw joined via
+    // mirewarden_treads when #2905's claw family got its consumers); the
+    // assert above already proves count 0, this pins that no UNSIGNED grant
+    // would have satisfied the sweep: the granted reagent was a signed
+    // instance slot.
     const consumers = LADDER_RECIPES.filter((r) =>
       r.reagents.some((reagent) => SPECIMEN_IDS.has(reagent.itemId)),
     );
@@ -84,6 +86,7 @@ describe('ladder recipe execution sweep (all 54)', () => {
       'recipe_elixir_of_the_serpent',
       'recipe_marlows_grand_roast',
       'recipe_mirewarden_jerkin',
+      'recipe_mirewarden_treads',
       'recipe_silkbinders_raiment',
     ]);
     for (const recipe of consumers) {

@@ -71,6 +71,15 @@ concurrency:
 # Release/** pushes and release-to-main PRs never consult the filter:
 # release-gate, release-checks, and release-version-gate stay always-full
 # (no path skip on those jobs).
+#
+# Selective PR tier (the CI/CD performance packet's Phase 2): the same
+# changes job also emits test_mode/changed_files from the same listing, and the
+# pr-gate shards run scripts/ci_shard_test.mjs, which either replays the full
+# `npm test -- --shard` step (mode=full, the fail-closed default for anything
+# unprovable) or runs the always-run floor + `vitest related`, sharded. The
+# reference semantics and the audit contract live in docs/qa-gate.md
+# ("Selective PR-tier CI"). Selection NEVER applies to release-gate or the
+# nightly workflow: those are the unconditional full-suite backstops.
 
 jobs:
   release-version-gate:
@@ -124,6 +133,14 @@ jobs:
       pull-requests: read
     outputs:
       code: ${{ steps.filter.outputs.code }}
+      # Phase 2 selection decision (docs/qa-gate.md, "Selective PR-tier CI"): the
+      # same fetched listing also decides whether pr-gate may run the selective
+      # test plan. Fail closed: anything unprovable is test_mode=full, and full
+      # mode is byte-identical to the pre-selection shard step. Release jobs
+      # never read these.
+      test_mode: ${{ steps.filter.outputs.test_mode }}
+      test_mode_reason: ${{ steps.filter.outputs.test_mode_reason }}
+      changed_files: ${{ steps.filter.outputs.changed_files }}
     steps:
       - name: Check out classifier script
         uses: actions/checkout@v6
@@ -295,15 +312,26 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      # `npm test` regenerates the i18n artifacts itself (pretest) in EVERY
-      # shard BY DESIGN (the S3 guard, guide freshness, and the git-subprocess
-      # suites need the generated artifacts no matter which shard the balanced
-      # sequencer assigns them to), so this job needs no explicit i18n:gen step;
-      # the freshness diff lives in pr-checks.
-      # Full Sim suites are CPU-heavy. Keep each shard at half the runner's
-      # available cores, matching the bounded local gate.
+      # The shard runner spawns `npm test` itself, so pretest still regenerates
+      # the i18n artifacts in EVERY shard BY DESIGN (the S3 guard, guide
+      # freshness, and the git-subprocess suites need the generated artifacts no
+      # matter which shard they hash into); the freshness diff lives in
+      # pr-checks. Workers stay at half the runner's cores inside the script.
+      #
+      # Phase 2 (docs/qa-gate.md, "Selective PR-tier CI"): the runner reads the
+      # changes job's selection decision. test_mode=full spawns exactly the old
+      # step (`npm test -- --shard=i/8`); test_mode=selective runs the
+      # always-run floor (blind/partial tests + invariant guard suites + changed
+      # tests, recomputed in this tree) plus `vitest related` over the changed
+      # sources, both sharded. Decisions and skip counts print in the job log.
+      # Release-gate below keeps the unconditional full run line; the nightly
+      # workflow re-proves the full suite daily (docs/qa-gate.md).
       - name: Run tests (PR tier, shard ${{ matrix.shard }} of 8)
-        run: npm test -- --shard=${{ matrix.shard }}/8 --maxWorkers="$(node -p 'Math.max(1, Math.floor(require("node:os").availableParallelism() / 2))')"
+        env:
+          TEST_MODE: ${{ needs.changes.outputs.test_mode }}
+          TEST_MODE_REASON: ${{ needs.changes.outputs.test_mode_reason }}
+          CHANGED_FILES: ${{ needs.changes.outputs.changed_files }}
+        run: node scripts/ci_shard_test.mjs --shard=${{ matrix.shard }}/8
 
   # Runs in parallel with pr-gate: same if-condition, no needs edge in either
   # direction. The default pull_request merge-ref checkout MUST be preserved

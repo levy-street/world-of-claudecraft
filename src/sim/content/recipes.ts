@@ -680,7 +680,12 @@ export const LADDER_RECIPES: ProfessionRecipeRecord[] = [
     professionId: 'weaponcrafting',
     resultItemId: 'ironbark_boar_spear',
     resultCount: 1,
+    // Tusk-crested boar spear: the first curved_tusk consumer, closing the
+    // zero-consumer harvest family #2905 shipped the same way Phase 15 closed
+    // wolf_fang (the fang-hilted arming sword above). wild_boar itself drops
+    // the tusks, so the rung-0 recipe stays zone-1 legal. Input 50 vs output 36.
     reagents: [
+      { itemId: 'curved_tusk', count: 2 },
       { itemId: 'ironbark_log', count: 3 },
       { itemId: 'copper_ore', count: 2 },
       { itemId: 'smithing_flux', count: 1 },
@@ -1217,7 +1222,15 @@ export const LADDER_RECIPES: ProfessionRecipeRecord[] = [
     professionId: 'leatherworking',
     resultItemId: 'mirewarden_treads',
     resultCount: 1,
+    // Claw-spiked treads: the first sharp_claw and pristine_claw consumers,
+    // closing the two remaining zero-consumer harvest families #2905 shipped
+    // (the wolf_fang precedent), with the specimen riding count-1 beside its
+    // base material like the serpent elixir's pristine_venom_gland. The mire
+    // prowlers this line is named for are claw carriers themselves. Input 125
+    // vs output 78.
     reagents: [
+      { itemId: 'pristine_claw', count: 1 },
+      { itemId: 'sharp_claw', count: 2 },
       { itemId: 'rough_hide', count: 4 },
       { itemId: 'spider_silk', count: 2 },
       { itemId: 'thorium_ore', count: 1 },

@@ -6695,6 +6695,14 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 10000,
         "materials": [
           {
+            "name": "Pristine Claw",
+            "count": 1
+          },
+          {
+            "name": "Sharp Claw",
+            "count": 2
+          },
+          {
             "name": "Rough Hide",
             "count": 4
           },
@@ -7412,6 +7420,10 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "acquisition": "trainer",
         "feeCopper": 0,
         "materials": [
+          {
+            "name": "Curved Tusk",
+            "count": 2
+          },
           {
             "name": "Ironbark Log",
             "count": 3

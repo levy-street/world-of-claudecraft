@@ -82,7 +82,8 @@ export interface CorpseHarvestViewModel {
  * same predicate, so the dead-end submit is not offered in the first place.
  *
  * Mirrored EXACTLY, including where it does not fire: on a corpse whose tags all
- * map to nothing (fen_troll: claw, tusk) NO pick forfeits anything, because no
+ * map to nothing (gills, horn on a retagged fixture; fen_troll was the shipped
+ * case until #2905 mapped claw and tusk) NO pick forfeits anything, because no
  * pick could have paid out, so `forfeitsEveryYield` stays false there. What
  * disables that corpse is the OTHER term, isHarvestableCorpse (#2513): the sim
  * refuses the command outright, so the button must not submit. The two terms are

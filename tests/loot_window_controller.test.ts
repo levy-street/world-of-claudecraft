@@ -21,14 +21,34 @@ import type { IWorld } from '../src/world_api';
 
 const itemIds = Object.keys(ITEMS);
 // isHarvestableCorpse, not a tag COUNT (#2513): a template can carry tags whose
-// every family is unmapped (fen_troll: claw, tusk), and the sim refuses a
-// harvest there. A count-based selector could pick such a template under a
-// future content reorder and silently invert every harvest case in this file.
+// every family is unmapped (the retagged fixture below: gills, horn), and the
+// sim refuses a harvest there. A count-based selector could pick such a template
+// under a future content reorder and silently invert every harvest case in this file.
 const harvestMob = Object.values(MOBS).find((mob) => isHarvestableCorpse(mob.componentTags));
 if (itemIds.length < 2) throw new Error('loot item fixtures not found');
 if (!harvestMob?.componentTags?.length) throw new Error('harvestable mob fixture not found');
 const harvestMobId = harvestMob.id;
 const harvestMobTags = harvestMob.componentTags;
+
+// No shipped template is all-unmapped since #2905 wired claw and tusk (that
+// retired fen_troll, the old all-unmapped fixture here), so the #2513 cases
+// below drive a real template retagged for the duration of a callback: the
+// shared UNMAPPED fixture idiom of the sim suites
+// (tests/corpse_harvest_sim.test.ts). warlock_imp carries no tags of its own
+// (this file's untagged fixture elsewhere), so retagging it borrows no other
+// case's premise, and the mutation is always restored in a `finally`.
+const UNMAPPED_TEMPLATE_ID = 'warlock_imp';
+const UNMAPPED_TEMPLATE_TAGS = ['gills', 'horn'];
+function withUnmappedTemplate<T>(body: () => T): T {
+  const template = MOBS[UNMAPPED_TEMPLATE_ID];
+  const prior = template.componentTags;
+  template.componentTags = [...UNMAPPED_TEMPLATE_TAGS];
+  try {
+    return body();
+  } finally {
+    template.componentTags = prior;
+  }
+}
 
 function entity(
   id: number,
@@ -267,50 +287,58 @@ describe('LootWindowController', () => {
 
   it('opens for the coin but draws NO harvest picker on an all-unmapped corpse (#2513)', () => {
     // The gate the whole "no reason line is owed" argument rests on, pinned
-    // instead of asserted in prose. fen_troll carries claw and tusk, neither
-    // mapped, so `harvestable` is false and openCorpse must skip the picker; it
-    // must still open, because the corpse holds copper the player can take.
-    // Driven through the REAL corpseLootAvailability against a real template, so
-    // loosening `if (harvestable && componentTags)` back to `if (componentTags)`
-    // reds here rather than passing with every other gate green.
-    expect(MOBS.fen_troll.componentTags).toEqual(['claw', 'tusk']);
-    const troll = entity(20, {
-      kind: 'mob',
-      templateId: 'fen_troll',
-      loot: { copper: 50, items: [] },
+    // instead of asserted in prose. The retagged fixture carries gills and
+    // horn, neither mapped, so `harvestable` is false and openCorpse must skip
+    // the picker; it must still open, because the corpse holds copper the
+    // player can take. Driven through the REAL corpseLootAvailability against
+    // a real (retagged) template, so loosening `if (harvestable &&
+    // componentTags)` back to `if (componentTags)` reds here rather than
+    // passing with every other gate green. The premise pin goes red the day
+    // gills or horn gets its harvest item, which is the cue to move this
+    // fixture again (as #2905 mapping claw and tusk retired fen_troll here).
+    expect(isHarvestableCorpse(UNMAPPED_TEMPLATE_TAGS)).toBe(false);
+    withUnmappedTemplate(() => {
+      const imp = entity(20, {
+        kind: 'mob',
+        templateId: UNMAPPED_TEMPLATE_ID,
+        loot: { copper: 50, items: [] },
+      });
+      const test = harness([imp], (entry) => corpseLootAvailability(entry, 7));
+
+      test.controller.openCorpse(20, 0, 0);
+
+      expect(test.element.style.display).toBe('block');
+      expect(test.element.innerHTML).toContain('money:50');
+      expect(test.element.querySelector('.corpse-harvest')).toBeNull();
+      expect(test.element.querySelector('.corpse-harvest-btn')).toBeNull();
+      expect(test.element.querySelectorAll('.corpse-harvest-check')).toHaveLength(0);
+      // No dead control anywhere: nothing disabled, and nothing to click.
+      expect(test.element.querySelectorAll('button[disabled]')).toHaveLength(0);
+      // ...and no sentence promising a harvest half this corpse does not have. The
+      // unified-press hint says the interact key "loots and harvests"; on a
+      // loot-only corpse that is simply false, so it is not rendered.
+      expect(test.element.querySelector('.town-focus-hint')).toBeNull();
     });
-    const test = harness([troll], (entry) => corpseLootAvailability(entry, 7));
-
-    test.controller.openCorpse(20, 0, 0);
-
-    expect(test.element.style.display).toBe('block');
-    expect(test.element.innerHTML).toContain('money:50');
-    expect(test.element.querySelector('.corpse-harvest')).toBeNull();
-    expect(test.element.querySelector('.corpse-harvest-btn')).toBeNull();
-    expect(test.element.querySelectorAll('.corpse-harvest-check')).toHaveLength(0);
-    // No dead control anywhere: nothing disabled, and nothing to click.
-    expect(test.element.querySelectorAll('button[disabled]')).toHaveLength(0);
-    // ...and no sentence promising a harvest half this corpse does not have. The
-    // unified-press hint says the interact key "loots and harvests"; on a
-    // loot-only corpse that is simply false, so it is not rendered.
-    expect(test.element.querySelector('.town-focus-hint')).toBeNull();
     // The discriminator on the identical rig: a MIXED template carrying the same
-    // unmapped `tusk` beside two mapped families still draws its picker, so this
-    // is the predicate and not the controller refusing every corpse.
-    expect(MOBS.wild_boar.componentTags).toEqual(['hide', 'tusk', 'meat']);
-    const boar = entity(21, {
+    // unmapped `horn` beside two mapped families still draws its picker, so this
+    // is the predicate and not the controller refusing every corpse. Both
+    // halves of "mixed" are pinned: horn alone is unharvestable (so it is
+    // genuinely unmapped), and the tag list is palecoil's real shipped one.
+    expect(isHarvestableCorpse(['horn'])).toBe(false);
+    expect(MOBS.sethrael_palecoil.componentTags).toEqual(['hide', 'claw', 'horn']);
+    const palecoil = entity(21, {
       kind: 'mob',
-      templateId: 'wild_boar',
+      templateId: 'sethrael_palecoil',
       loot: { copper: 50, items: [] },
     });
-    const boarTest = harness([boar], (entry) => corpseLootAvailability(entry, 7));
-    boarTest.controller.openCorpse(21, 0, 0);
-    expect(boarTest.element.querySelector('.corpse-harvest')).not.toBeNull();
-    expect(boarTest.element.querySelectorAll('.corpse-harvest-check')).toHaveLength(3);
+    const mixedTest = harness([palecoil], (entry) => corpseLootAvailability(entry, 7));
+    mixedTest.controller.openCorpse(21, 0, 0);
+    expect(mixedTest.element.querySelector('.corpse-harvest')).not.toBeNull();
+    expect(mixedTest.element.querySelectorAll('.corpse-harvest-check')).toHaveLength(3);
     // The hint's other arm, on the same rig: where a harvest really is on offer
     // the sentence is true and still rendered, so the gate is not a blanket
     // removal.
-    expect(boarTest.element.querySelector('.town-focus-hint')?.textContent).toBe(
+    expect(mixedTest.element.querySelector('.town-focus-hint')?.textContent).toBe(
       'The interact key loots and harvests in one press, using your town focus.',
     );
   });
@@ -339,13 +367,15 @@ describe('LootWindowController', () => {
     // Once the coin is gone there is no reason to open: `canOpen` is
     // `hasLoot || harvestable` and both are now false, so the popup stays shut
     // instead of presenting an empty body with a dead Harvest button.
-    const troll = entity(22, { kind: 'mob', templateId: 'fen_troll', loot: null });
-    const test = harness([troll], (entry) => corpseLootAvailability(entry, 7));
+    withUnmappedTemplate(() => {
+      const imp = entity(22, { kind: 'mob', templateId: UNMAPPED_TEMPLATE_ID, loot: null });
+      const test = harness([imp], (entry) => corpseLootAvailability(entry, 7));
 
-    test.controller.openCorpse(22, 0, 0);
+      test.controller.openCorpse(22, 0, 0);
 
-    expect(test.element.style.display).not.toBe('block');
-    expect(test.closeTransient).not.toHaveBeenCalled();
+      expect(test.element.style.display).not.toBe('block');
+      expect(test.closeTransient).not.toHaveBeenCalled();
+    });
     // The discriminator: a depleted corpse WITH a mapped family still opens for
     // its harvest half, which is the behavior this must not have broken.
     const wolf = entity(23, { kind: 'mob', templateId: harvestMobId, loot: null });
