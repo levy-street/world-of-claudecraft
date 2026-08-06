@@ -12,6 +12,7 @@ import {
   buildingTerrainEnvelope,
   isEastbrookGrandArmoury,
 } from './building_layout';
+import { GULLHAVEN_WALL } from './content/gullhaven';
 import { MOUNT_RACE_JUMP_FIXTURES, raceGateSegment } from './content/mounts';
 import { STATIONS } from './content/professions';
 import {
@@ -689,6 +690,62 @@ function staticWorldColliders(seed: number): Collider[] {
       cameraTopY: topY(seed, box.x, box.z, 2.9),
       camGhost: true,
     });
+  }
+
+  // Gullhaven's redoubt curtain: one oriented box per piece (panels, the piers
+  // that terminate each run, and the gate jambs), from the SAME record the
+  // renderer places its props from, and sized to each piece's MEASURED asset
+  // footprint. The gate openings carry no piece and so no collider, which is
+  // what makes them walkable.
+  //
+  // Deliberately NOT routed through PROPS.walls: that loop is hard-wired to
+  // Eastbrook's parapet wing and would mint a standable parapet top plus two
+  // phantom pillar colliders per panel, none of which a plain kcas curtain
+  // panel has.
+  for (const piece of GULLHAVEN_WALL) {
+    out.push({
+      type: 'obb',
+      x: piece.x,
+      z: piece.z,
+      hw: piece.w / 2,
+      hd: piece.d / 2,
+      rot: piece.rot,
+      cameraTopY: topY(seed, piece.x, piece.z, piece.height),
+      camGhost: piece.camGhost ?? true,
+    });
+  }
+
+  // Memorial rails: one oriented box per post and per panel, derived from the
+  // SAME `def.rail` record the renderer places its props from, so the fence you
+  // see and the fence that stops you are the same geometry. A decorProp can
+  // only carry a circle, which is why the rail had no usable collision at all
+  // before this: a 4.0 long panel has no honest circle.
+  for (const memorial of content.services?.memorials ?? []) {
+    const { rail } = memorial;
+    for (const post of rail.posts) {
+      out.push({
+        type: 'obb',
+        x: post.x,
+        z: post.z,
+        hw: rail.postHalf,
+        hd: rail.postHalf,
+        rot: 0,
+        cameraTopY: topY(seed, post.x, post.z, rail.height),
+        camGhost: true,
+      });
+    }
+    for (const panel of rail.panels) {
+      out.push({
+        type: 'obb',
+        x: panel.x,
+        z: panel.z,
+        hw: rail.panelHalfLength,
+        hd: rail.panelHalfDepth,
+        rot: panel.rot ?? 0,
+        cameraTopY: topY(seed, panel.x, panel.z, rail.height),
+        camGhost: true,
+      });
+    }
   }
 
   // Gather nodes: the renderer draws every node's GLB at a fixed spot whether

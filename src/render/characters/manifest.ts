@@ -634,9 +634,27 @@ const SEAT_MARSH_SWORD: AttachSeat = {
   scale: 0.8876,
 };
 const SEAT_OLLUN_STAFF: AttachSeat = {
-  position: [-0.049252, 0.096088, 0.070311],
-  quaternion: [0.492365, -0.507519, -0.706769, 0.021865],
+  position: [-0.114482, 0.124619, 0.070311],
+  quaternion: [0.529003, -0.469207, -0.703145, 0.074751],
   scale: 0.66,
+};
+// Edda and Saul were never hand-authored; these are their BOOK carries (a GRIPS family
+// plus its per-spec tune) read back off the same factory that renders the plates, so the
+// game reproduces the page rather than deriving its own fit from the weapon tables.
+const SEAT_EDDA_HAMMER: AttachSeat = {
+  position: [0, 0.24968, 0],
+  quaternion: [-0.707107, 0, 0, 0.707107],
+  scale: 0.4785,
+};
+const SEAT_EDDA_TONGS: AttachSeat = {
+  position: [-0.025414, -0.056441, 0],
+  quaternion: [-0.707107, 0, 0, 0.707107],
+  scale: 0.450174,
+};
+const SEAT_SAUL_LANTERN: AttachSeat = {
+  position: [0, 0.02, 0.28681],
+  quaternion: [0, 0, 0, 1],
+  scale: 0.286809,
 };
 
 export const VISUALS: Record<string, VisualDef> = {
@@ -1548,15 +1566,15 @@ export const VISUALS: Record<string, VisualDef> = {
     height: HUMANOID_H,
     clips: kaykit(['1H_Melee_Attack_Chop']),
     attach: [
-      { url: `${WEAPONS}/iron_field_hammer.glb`, bone: 'handslot.r' },
-      { url: `${TOOLS}/tongs.glb`, bone: 'handslot.l' },
+      { url: `${WEAPONS}/iron_field_hammer.glb`, bone: 'handslot.r', seat: SEAT_EDDA_HAMMER },
+      { url: `${TOOLS}/tongs.glb`, bone: 'handslot.l', seat: SEAT_EDDA_TONGS },
     ],
   },
   npc_saul: {
     url: `${NPCS_DIR}/saul.glb`,
     height: HUMANOID_H,
     clips: kaykit(['1H_Melee_Attack_Chop']),
-    attach: [{ url: `${TOOLS}/lantern.glb`, bone: 'handslot.l' }],
+    attach: [{ url: `${TOOLS}/lantern.glb`, bone: 'handslot.l', seat: SEAT_SAUL_LANTERN }],
   },
   // Tam's bell-striker is bespoke GEOMETRY on the body, not an attach: no shipped
   // weapon reads as one, and the campaign hands you that exact object afterwards.
@@ -1572,11 +1590,14 @@ export const VISUALS: Record<string, VisualDef> = {
     height: HUMANOID_H * 0.865,
     clips: kaykit(['1H_Melee_Attack_Chop']),
   },
+  // NO weapon. He is a declared non-combatant, and the spear he used to carry was
+  // `spear_a.glb`, the tribal one with the tassels: in the concept book's Cheer plate
+  // the shaft crossed his face and he read as biting it. His outfit carries him.
+  // `cast.py` cut it from the book; this is the game catching up.
   npc_ewald: {
     url: `${NPCS_DIR}/ewald.glb`,
     height: HUMANOID_H,
     clips: kaykit(['1H_Melee_Attack_Chop']),
-    attach: [{ url: `${WEAPONS}/spear_a.glb`, bone: 'handslot.r' }],
   },
   // A militia sergeant with a sword and NO shield, which is the whole separation from
   // Coalfast: they share this body and stand two POIs apart, so the warden keeps the

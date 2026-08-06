@@ -259,7 +259,7 @@ non-commercial. For commercial use, arrange your own licence with the author.
 | Generated prop model (wildheart_ancestor_ruin) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
 | Generated prop model (wildheart_jungle_canopy_tree) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
 | Procedural prop model (grand_ferry_ship) | World of ClaudeCraft | Project-authored deterministic procedural reconstruction of the retired Tripo reference | Project asset | With the project only |
-| Generated prop model (wardenHaleStatue) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
+| Procedural prop model (wardenHaleStatue) | World of ClaudeCraft + Kay Lousberg (KayKit) | Project-authored deterministic Blender reconstruction (scripts/assets/warden_hale_statue), replacing the retired Tripo generation; the bronze figure is the KayKit knight re-posed and the planted sword is KayKit sword_b, both CC0 (see the KayKit rows above) | Project asset (CC0 source geometry) | With the project only |
 Assets were optimized for shipping (animation clip pruning, meshopt compression,
 texture resizing) via `scripts/assets/build_assets.mjs`; raw packs are not
 committed.

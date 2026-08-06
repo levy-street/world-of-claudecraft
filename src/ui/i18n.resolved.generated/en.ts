@@ -2113,6 +2113,13 @@ export const en: EnTranslations = {
     "noticeboard": {
       "empty": "Nothing seems posted."
     },
+    "memorial": {
+      "title": "Memorial",
+      "dedication": "To the wardens of Gullhaven who carried a seal into the Breach and did not come out again. The town keeps the bell for them.",
+      "rollHeading": "Roll of Honour ({count})",
+      "roomRemaining": "The stone below the last name has been left bare.",
+      "close": "Close memorial"
+    },
     "bank": {
       "title": "Bank",
       "subtitle": "The Gilded Strongbox",

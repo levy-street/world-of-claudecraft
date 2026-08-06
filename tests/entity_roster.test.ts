@@ -236,6 +236,8 @@ function makeCtx() {
     rebucket: vi.fn(),
     resolve: vi.fn(() => null),
     groundPos: vi.fn(() => ({ x: 0, y: 0, z: 0 })),
+    memorialIdForEntity: vi.fn(() => null),
+    memorialInteractionRadius: vi.fn(() => null),
     playerMods: vi.fn(),
     delveRunForPlayer: vi.fn(() => null),
     delveModuleEntry: vi.fn(() => ({ x: 0, y: 0, z: 0 })),

@@ -68,6 +68,15 @@ For reference-image reconstruction and procedural GLB authoring, read the living
   (the loader requires meshopt), and `build_assets.mjs` optimizes every GLB in its
   spec's `srcDir`, so stage one figure in its own directory or you will re-optimize
   stale raws over shipped models.
+- **Both Blender exporters share the browser archetype's SHAPE**, and only the factory
+  differs: deterministic factory -> `tmp/asset_src` raw -> spec -> `build_assets.mjs` ->
+  `public/`, except the factory is `model.py` run under `blender --background` (the
+  `warden_hale_statue` driver resolves the binary via `BLENDER_PATH`). Run by hand, never
+  from `npm run build`, so the toolchain stays off the contributor critical path. The
+  exception is earned in both cases by needing an armature evaluator the browser/three
+  path does not have: `warden_hale_statue` re-poses and skin-bakes the rigged KayKit
+  knight, `last_bell_crew` re-skins and repaints rigged bodies. Prefer the browser
+  archetype for anything that is neither.
 - **Source fingerprints are load-bearing.** Eastbrook-era exporters stamp a sha256 over a
   pinned input list (factory/entry/exporter/spec, `build_assets.mjs`, reference
   turnarounds, the shared atlas, and `package-lock.json`) into the GLB extras, and tests

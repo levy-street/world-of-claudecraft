@@ -711,10 +711,13 @@ export function pickUpObject(
   const obj = ctx.entities.get(objId);
   if (obj?.kind !== 'object' || !obj.lootable) return false;
   const noticeboardDef = noticeboardDefByEntityId(noticeboardDefinitions, obj.id);
+  const memorialId = ctx.memorialIdForEntity(obj.id);
   // Preserve the historical no-op for malformed/non-pickup objects. The board
-  // is the one intentional lootable object without an item payload.
-  if (!noticeboardDef && !obj.objectItemId) return false;
-  const interactionRange = noticeboardDef?.interactionRadius ?? INTERACT_RANGE;
+  // and a memorial are the intentional lootable objects without an item
+  // payload: both are read rather than taken.
+  if (!noticeboardDef && !memorialId && !obj.objectItemId) return false;
+  const interactionRange =
+    noticeboardDef?.interactionRadius ?? ctx.memorialInteractionRadius(obj.id) ?? INTERACT_RANGE;
   if (dist2d(p.pos, obj.pos) > interactionRange) {
     ctx.error(meta.entityId, 'Too far away.');
     return false;
@@ -726,6 +729,12 @@ export function pickUpObject(
       state: 'empty',
       pid: meta.entityId,
     });
+    return true;
+  }
+  // A memorial is read, not taken. The event carries only the def id: both
+  // hosts already hold the roll as content, so the names never cross the wire.
+  if (memorialId) {
+    ctx.emit({ type: 'memorial', memorialId, pid: meta.entityId });
     return true;
   }
   const objectItemId = obj.objectItemId;
