@@ -10386,6 +10386,15 @@ export const zh_CN: EnTranslations = {
       "direfang_quiver": {
         "name": "恐牙箭袋"
       },
+      "sharp_claw": {
+        "name": "锋利的爪"
+      },
+      "curved_tusk": {
+        "name": "弯曲的獠牙"
+      },
+      "pristine_claw": {
+        "name": "完美的爪"
+      },
       "conjured_water4": {
         "name": "魔法泉水"
       },

@@ -10386,6 +10386,15 @@ export const cs_CZ: EnTranslations = {
       "direfang_quiver": {
         "name": "Toulec děsivého tesáku"
       },
+      "sharp_claw": {
+        "name": "Sharp Claw"
+      },
+      "curved_tusk": {
+        "name": "Curved Tusk"
+      },
+      "pristine_claw": {
+        "name": "Pristine Claw"
+      },
       "conjured_water4": {
         "name": "Vyčarovaná pramenitá voda"
       },

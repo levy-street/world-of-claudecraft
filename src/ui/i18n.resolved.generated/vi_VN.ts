@@ -10386,6 +10386,15 @@ export const vi_VN: EnTranslations = {
       "direfang_quiver": {
         "name": "Ống Tên Direfang"
       },
+      "sharp_claw": {
+        "name": "Sharp Claw"
+      },
+      "curved_tusk": {
+        "name": "Curved Tusk"
+      },
+      "pristine_claw": {
+        "name": "Pristine Claw"
+      },
       "conjured_water4": {
         "name": "Nước Suối Được Tạo Phép"
       },

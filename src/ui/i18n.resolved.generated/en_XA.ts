@@ -10386,6 +10386,15 @@ export const en_XA: EnTranslations = {
       "direfang_quiver": {
         "name": "[Ðíŕéƒáñĝ Ɋúíʋéŕ]"
       },
+      "sharp_claw": {
+        "name": "[Šĥáŕþ Çļáŵ]"
+      },
+      "curved_tusk": {
+        "name": "[Çúŕʋéð Ţúšķ]"
+      },
+      "pristine_claw": {
+        "name": "[Þŕíšţíñé Çļáŵ]"
+      },
       "conjured_water4": {
         "name": "[Çóñĵúŕéð Šþŕíñĝŵáţéŕ]"
       },

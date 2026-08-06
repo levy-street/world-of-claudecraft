@@ -303,6 +303,7 @@ function applyEchoHeal(
   recordCascadeConversion(source, healed, preClamp - healed);
   if (healed <= 0) return;
   ally.hp += healed;
+  const overheal = preClamp - healed;
   ctx.emit({
     type: 'heal2',
     sourceId: source.id,
@@ -310,6 +311,7 @@ function applyEchoHeal(
     amount: healed,
     crit: false,
     ability: TEMPORAL_ECHO_NAME,
+    ...(overheal > 0 ? { overheal } : {}),
   });
   healingThreat(ctx, source, ally, healed);
 }

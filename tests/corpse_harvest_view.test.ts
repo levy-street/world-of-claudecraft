@@ -2,12 +2,12 @@
 // Node: corpseHarvestView is a UI_PURE_CORES member, so it imports nothing that
 // needs a browser and a Vitest can assert its shape directly.
 //
-// The subject here is #2509. Four component families are tagged on shipped
-// corpses but have no harvest item behind them yet (claw, tusk, gills, horn),
-// and the picker renders a row per tag with no mapping filter, so on a mixed
-// corpse a player could check only those and submit. The sim refuses that
-// command pre-claim (src/sim/interaction.ts harvestCorpse); this core is the
-// client mirror of the SAME predicate, so the dead-end submit is never offered.
+// The subject here is #2509. Two component families are tagged on shipped
+// corpses but have no harvest item behind them yet (gills, horn), and the
+// picker renders a row per tag with no mapping filter, so on a mixed corpse a
+// player could check only those and submit. The sim refuses that command
+// pre-claim (src/sim/interaction.ts harvestCorpse); this core is the client
+// mirror of the SAME predicate, so the dead-end submit is never offered.
 // Every case below therefore states what the sim would do with the same pick.
 
 import { describe, expect, it } from 'vitest';
@@ -20,15 +20,15 @@ const pick = (...tags: string[]) => new Set(tags);
 
 describe('corpseHarvestView: rows and the concentrate flag', () => {
   it('renders one row per tag, in order, with the checked state from the selection', () => {
-    const view = corpseHarvestView(['hide', 'fang', 'claw'], pick('fang'));
+    const view = corpseHarvestView(['hide', 'fang', 'horn'], pick('fang'));
     expect(view.rows).toEqual([
       { tag: 'hide', checked: false, yieldsItem: true },
       { tag: 'fang', checked: true, yieldsItem: true },
-      // #2514: the row is still OFFERED (the corpse really does carry claw) and
+      // #2514: the row is still OFFERED (the corpse really does carry horn) and
       // still checkable, and it carries the flag the painter marks it by. Rows
       // are not filtered: filtering would hide a component the corpse has, and
       // would put the #2509 refusal out of reach of the shipped picker.
-      { tag: 'claw', checked: false, yieldsItem: false },
+      { tag: 'horn', checked: false, yieldsItem: false },
     ]);
     expect(view.concentrated).toBe(true);
     expect(view.harvestDisabled).toBe(false);
@@ -68,36 +68,36 @@ describe('corpseHarvestView: rows and the concentrate flag', () => {
     expect(corpseHarvestView(murloc, pick('hide')).concentrated).toBe(false);
     expect(corpseHarvestView(murloc, pick('gills', 'hide')).concentrated).toBe(false);
     // On the 3-tag mixed shape the choice is real again, and the unmapped box
-    // is transparent to it: hide beside claw concentrates exactly as hide alone
+    // is transparent to it: hide beside horn concentrates exactly as hide alone
     // does, and naming both mapped families does not.
-    const greyjaw = ['hide', 'fang', 'claw'];
-    expect(corpseHarvestView(greyjaw, pick()).concentrated).toBe(false);
-    expect(corpseHarvestView(greyjaw, pick('hide')).concentrated).toBe(true);
-    expect(corpseHarvestView(greyjaw, pick('hide', 'claw')).concentrated).toBe(true);
-    expect(corpseHarvestView(greyjaw, pick('hide', 'fang')).concentrated).toBe(false);
-    expect(corpseHarvestView(greyjaw, pick('hide', 'fang', 'claw')).concentrated).toBe(false);
+    const palecoil = ['hide', 'fang', 'horn'];
+    expect(corpseHarvestView(palecoil, pick()).concentrated).toBe(false);
+    expect(corpseHarvestView(palecoil, pick('hide')).concentrated).toBe(true);
+    expect(corpseHarvestView(palecoil, pick('hide', 'horn')).concentrated).toBe(true);
+    expect(corpseHarvestView(palecoil, pick('hide', 'fang')).concentrated).toBe(false);
+    expect(corpseHarvestView(palecoil, pick('hide', 'fang', 'horn')).concentrated).toBe(false);
     // A pick the sim refuses is never "concentrated", though its raw bonus is
     // the whole tag count: the field describes the harvest the button would
     // run, and that button is dead.
-    expect(corpseHarvestView(greyjaw, pick('claw')).harvestDisabled).toBe(true);
-    expect(corpseHarvestView(greyjaw, pick('claw')).concentrated).toBe(false);
-    // Same for a corpse no pick can harvest (fen_troll).
-    expect(corpseHarvestView(['claw', 'tusk'], pick()).concentrated).toBe(false);
+    expect(corpseHarvestView(palecoil, pick('horn')).harvestDisabled).toBe(true);
+    expect(corpseHarvestView(palecoil, pick('horn')).concentrated).toBe(false);
+    // Same for a corpse no pick can harvest.
+    expect(corpseHarvestView(['gills', 'horn'], pick()).concentrated).toBe(false);
   });
 
   it('marks the rows with no item behind them, and only those (#2514)', () => {
     const rows = (tags: string[]) =>
       Object.fromEntries(corpseHarvestView(tags, pick()).rows.map((r) => [r.tag, r.yieldsItem]));
-    expect(rows(['hide', 'fang', 'claw'])).toEqual({ hide: true, fang: true, claw: false });
+    expect(rows(['hide', 'fang', 'horn'])).toEqual({ hide: true, fang: true, horn: false });
     expect(rows(['gills', 'hide'])).toEqual({ gills: false, hide: true });
-    expect(rows(['claw', 'tusk'])).toEqual({ claw: false, tusk: false });
+    expect(rows(['gills', 'horn'])).toEqual({ gills: false, horn: false });
     // Reads the real yield table, both directions, so it cannot be measuring
     // the table against itself: every mapped family marks true and every
     // carried-but-unmapped one marks false.
-    for (const mapped of ['cloth', 'fang', 'hide', 'meat', 'silk', 'venomSac']) {
+    for (const mapped of ['claw', 'cloth', 'fang', 'hide', 'meat', 'silk', 'tusk', 'venomSac']) {
       expect(rows([mapped])[mapped], mapped).toBe(true);
     }
-    for (const unmapped of ['claw', 'gills', 'horn', 'tusk']) {
+    for (const unmapped of ['gills', 'horn']) {
       expect(rows([unmapped])[unmapped], unmapped).toBe(false);
     }
   });
@@ -106,31 +106,29 @@ describe('corpseHarvestView: rows and the concentrate flag', () => {
 describe('corpseHarvestView: a selection that forfeits every yield (#2509)', () => {
   it('is about families the content really leaves unmapped', () => {
     // Literal on both sides, so the cases below cannot be measuring the table
-    // against itself: claw/tusk/gills/horn are tagged on corpses and map to
-    // nothing, and the six mapped families are the ones that do.
+    // against itself: gills/horn are tagged on corpses and map to nothing, and
+    // the eight mapped families are the ones that do.
     const tagged = new Set(Object.values(MOBS).flatMap((m) => m.componentTags ?? []));
     expect([...tagged].filter((t) => !HARVEST_COMPONENT_ITEMS[t]).sort()).toEqual([
-      'claw',
       'gills',
       'horn',
-      'tusk',
     ]);
   });
 
   it('disables Harvest when every checked family maps to no item', () => {
-    // old_greyjaw's real tag list. Checking only Claw is the exact command the
-    // sim refuses, so the picker must not offer it.
-    const view = corpseHarvestView(['hide', 'fang', 'claw'], pick('claw'));
+    // sethrael_palecoil's real tag list. Checking only Horn is the exact
+    // command the sim refuses, so the picker must not offer it.
+    const view = corpseHarvestView(['hide', 'claw', 'horn'], pick('horn'));
     expect(view.forfeitsEveryYield).toBe(true);
     expect(view.harvestDisabled).toBe(true);
-    // Rows are NOT filtered: Claw is still shown, because hiding it would
+    // Rows are NOT filtered: Horn is still shown, because hiding it would
     // change what "check every box" submits and so would move the sim's
-    // concentration bonus on nine shipped mobs.
-    expect(view.rows.map((r) => r.tag)).toEqual(['hide', 'fang', 'claw']);
+    // concentration bonus on the mixed shipped mobs.
+    expect(view.rows.map((r) => r.tag)).toEqual(['hide', 'claw', 'horn']);
   });
 
   it('stays live as soon as one checked family maps to something', () => {
-    const mixed = corpseHarvestView(['hide', 'fang', 'claw'], pick('claw', 'hide'));
+    const mixed = corpseHarvestView(['hide', 'claw', 'horn'], pick('horn', 'hide'));
     expect(mixed.forfeitsEveryYield).toBe(false);
     expect(mixed.harvestDisabled).toBe(false);
   });
@@ -141,27 +139,31 @@ describe('corpseHarvestView: a selection that forfeits every yield (#2509)', () 
     expect(corpseHarvestView(['gills', 'hide'], pick('hide')).harvestDisabled).toBe(false);
   });
 
-  it('covers the worst shipped case, where two of three boxes are traps', () => {
+  it('covers the worst shipped case, where one of three boxes is a trap', () => {
+    // claw is mapped now, so only horn traps the picker; hide and claw both
+    // still keep the button live.
     expect(MOBS.sethrael_palecoil.componentTags).toEqual(['hide', 'claw', 'horn']);
     const tags = ['hide', 'claw', 'horn'];
-    expect(corpseHarvestView(tags, pick('claw')).harvestDisabled).toBe(true);
+    expect(corpseHarvestView(tags, pick('claw')).harvestDisabled).toBe(false);
     expect(corpseHarvestView(tags, pick('horn')).harvestDisabled).toBe(true);
-    expect(corpseHarvestView(tags, pick('claw', 'horn')).harvestDisabled).toBe(true);
+    expect(corpseHarvestView(tags, pick('claw', 'horn')).harvestDisabled).toBe(false);
     expect(corpseHarvestView(tags, pick('hide', 'claw', 'horn')).harvestDisabled).toBe(false);
   });
 
   it('disables an all-unmapped corpse on the OTHER term, exactly as the sim does (#2513)', () => {
-    // The two terms of harvestDisabled, pinned apart. fen_troll forfeits
-    // nothing whatever the player checks, because no pick could have paid out,
-    // so the #2509 mirror (forfeitsEveryYield) stays FALSE here and must: a
-    // mirror written as "no checked family maps" without its third term would
-    // make this corpse report a forfeit that is not happening, and would move
-    // the concentration bonus on nine mixed mobs. What disables the button is
-    // isHarvestableCorpse (#2513), which the sim's own command gate reads
-    // first. A fixture where both terms fired would let either one rot.
-    expect(MOBS.fen_troll.componentTags).toEqual(['claw', 'tusk']);
-    for (const selected of [pick(), pick('claw'), pick('tusk'), pick('claw', 'tusk')]) {
-      const view = corpseHarvestView(['claw', 'tusk'], selected);
+    // The two terms of harvestDisabled, pinned apart. An all-unmapped corpse
+    // forfeits nothing whatever the player checks, because no pick could have
+    // paid out, so the #2509 mirror (forfeitsEveryYield) stays FALSE here and
+    // must: a mirror written as "no checked family maps" without its third
+    // term would make this corpse report a forfeit that is not happening, and
+    // would move the concentration bonus on the mixed shipped mobs. What
+    // disables the button is isHarvestableCorpse (#2513), which the sim's own
+    // command gate reads first. A fixture where both terms fired would let
+    // either one rot. gills and horn are the two families still waiting on
+    // their item (fen_troll's claw and tusk are mapped now, this branch's own
+    // fix).
+    for (const selected of [pick(), pick('gills'), pick('horn'), pick('gills', 'horn')]) {
+      const view = corpseHarvestView(['gills', 'horn'], selected);
       expect(view.forfeitsEveryYield, JSON.stringify([...selected])).toBe(false);
       expect(view.harvestDisabled, JSON.stringify([...selected])).toBe(true);
     }
@@ -178,16 +180,16 @@ describe('corpseHarvestView: a selection that forfeits every yield (#2509)', () 
     // The new field is the discriminator the painter reads, so it is asserted
     // separately from harvestDisabled: on a MIXED corpse it is true even when the
     // pick disables the button, which is exactly the pair that must not coincide.
-    const forfeited = corpseHarvestView(['hide', 'claw'], pick('claw'));
+    const forfeited = corpseHarvestView(['hide', 'horn'], pick('horn'));
     expect(forfeited.corpseHarvestable).toBe(true);
     expect(forfeited.harvestDisabled).toBe(true);
-    for (const selected of [pick(), pick('claw'), pick('tusk'), pick('claw', 'tusk')]) {
-      expect(corpseHarvestView(['claw', 'tusk'], selected).corpseHarvestable).toBe(false);
+    for (const selected of [pick(), pick('gills'), pick('horn'), pick('gills', 'horn')]) {
+      expect(corpseHarvestView(['gills', 'horn'], selected).corpseHarvestable).toBe(false);
     }
     // ...and the discriminating contrast: one mapped family among the same
     // unmapped ones re-enables the button, so the term reads the yield table
     // rather than the tag count.
-    expect(corpseHarvestView(['claw', 'hide', 'tusk'], pick()).harvestDisabled).toBe(false);
+    expect(corpseHarvestView(['gills', 'hide', 'horn'], pick()).harvestDisabled).toBe(false);
   });
 
   it('never fires on a full cover, because a full cover spreads', () => {
@@ -219,33 +221,48 @@ describe('corpseHarvestView: a selection that forfeits every yield (#2509)', () 
     // The oracle has BOTH of the sim's gates, in the order harvestCorpse runs
     // them (#2513 first, #2509 second), and counts them separately so a change
     // that moved every refusal onto one gate could not pass the total.
+    //
+    // No shipped template is fully unmapped any more (claw and tusk are
+    // mapped now), so warlock_imp (this file's plain "no tags" fixture
+    // elsewhere) is retagged for the duration of the sweep to keep the
+    // corpse-level gate (#2513) actually visited, restored in a finally.
+    const warlockTemplate = MOBS.warlock_imp;
+    const priorWarlockTags = warlockTemplate.componentTags;
+    warlockTemplate.componentTags = ['gills', 'horn'];
     let disabledSeen = 0;
     let byCorpseGate = 0;
     let byPickGate = 0;
-    for (const m of Object.values(MOBS)) {
-      const tags = m.componentTags;
-      if (!tags?.length) continue;
-      const mappedOnCorpse = tags.some((t) => HARVEST_COMPONENT_ITEMS[t]);
-      for (let mask = 0; mask < 1 << tags.length; mask++) {
-        const selected = tags.filter((_, i) => mask & (1 << i));
-        const effective = effectiveFocusComponents(tags, selected);
-        // Gate 1 (#2513): the corpse itself has no mapped family.
-        const corpseGate = !mappedOnCorpse;
-        // Gate 2 (#2509): the pick throws away everything the corpse had.
-        const pickGate = !corpseGate && !effective.some((t) => HARVEST_COMPONENT_ITEMS[t]);
-        const simWouldRefuse = corpseGate || pickGate;
-        const view = corpseHarvestView(tags, new Set(selected));
-        expect(view.harvestDisabled, `${m.id} ${JSON.stringify(selected)}`).toBe(simWouldRefuse);
-        if (simWouldRefuse) disabledSeen++;
-        if (corpseGate) byCorpseGate++;
-        if (pickGate) byPickGate++;
+    try {
+      for (const m of Object.values(MOBS)) {
+        const tags = m.componentTags;
+        if (!tags?.length) continue;
+        const mappedOnCorpse = tags.some((t) => HARVEST_COMPONENT_ITEMS[t]);
+        for (let mask = 0; mask < 1 << tags.length; mask++) {
+          const selected = tags.filter((_, i) => mask & (1 << i));
+          const effective = effectiveFocusComponents(tags, selected);
+          // Gate 1 (#2513): the corpse itself has no mapped family.
+          const corpseGate = !mappedOnCorpse;
+          // Gate 2 (#2509): the pick throws away everything the corpse had.
+          const pickGate = !corpseGate && !effective.some((t) => HARVEST_COMPONENT_ITEMS[t]);
+          const simWouldRefuse = corpseGate || pickGate;
+          const view = corpseHarvestView(tags, new Set(selected));
+          expect(view.harvestDisabled, `${m.id} ${JSON.stringify(selected)}`).toBe(simWouldRefuse);
+          if (simWouldRefuse) disabledSeen++;
+          if (corpseGate) byCorpseGate++;
+          if (pickGate) byPickGate++;
+        }
       }
+    } finally {
+      warlockTemplate.componentTags = priorWarlockTags;
     }
     // The sweep has to actually VISIT both disabled arms. A content retag that
     // left no mixed template would otherwise pass it all-false with the mirror
-    // never exercised at all.
-    expect(disabledSeen).toBe(16);
-    expect(byPickGate).toBe(12);
+    // never exercised at all. claw and tusk joining the yield table folded
+    // five of the ten former mixed templates into fully-mapped, leaving five
+    // (byPickGate); the retagged warlock_imp above contributes its four
+    // subsets to byCorpseGate.
+    expect(disabledSeen).toBe(9);
+    expect(byPickGate).toBe(5);
     expect(byCorpseGate).toBe(4);
   });
 });

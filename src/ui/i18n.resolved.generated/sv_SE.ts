@@ -10386,6 +10386,15 @@ export const sv_SE: EnTranslations = {
       "direfang_quiver": {
         "name": "Direfang-koger"
       },
+      "sharp_claw": {
+        "name": "Sharp Claw"
+      },
+      "curved_tusk": {
+        "name": "Curved Tusk"
+      },
+      "pristine_claw": {
+        "name": "Pristine Claw"
+      },
       "conjured_water4": {
         "name": "Frambesvärjt källvatten"
       },

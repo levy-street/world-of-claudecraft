@@ -10386,6 +10386,15 @@ export const ja_JP: EnTranslations = {
       "direfang_quiver": {
         "name": "ダイアファングの矢筒"
       },
+      "sharp_claw": {
+        "name": "鋭い鉤爪"
+      },
+      "curved_tusk": {
+        "name": "曲がった牙"
+      },
+      "pristine_claw": {
+        "name": "無傷の鉤爪"
+      },
       "conjured_water4": {
         "name": "魔法の湧き水"
       },

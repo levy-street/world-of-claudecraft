@@ -121,6 +121,22 @@ interface NumericChoiceBinding {
   set(key: NumericSettingKey, value: number): void;
 }
 
+// The seven GameSettings the Key Bindings panel renders alongside the
+// rebindable keys (the settingToggleKeybind + clickMoveMouseButtonRow calls in
+// renderKeybinds below). Its Reset to Defaults must restore these too, not just
+// the key-code map: without this list, a player's custom mouse-camera,
+// click-to-move (and its mouse button), attack-move, left-handed-touch, or
+// profanity-filter choice silently survived a "reset everything" click.
+const KEYBIND_PANEL_SETTING_KEYS: (keyof GameSettings)[] = [
+  'mouseCamera',
+  'lockCursorOnRotate',
+  'clickToMove',
+  'clickToMoveButton',
+  'attackMove',
+  'leftHandedTouch',
+  'filterProfanity',
+];
+
 // Endonyms for the in-game language picker; never localized (they render
 // identically in every locale, matching the homepage footer picker), keyed by
 // SupportedLanguage so a new locale appears once its label is added here.
@@ -1256,6 +1272,11 @@ export class OptionsWindow {
     const el = this.deps.root();
     const hooks = this.deps.options();
     const tab = this.interfaceTab;
+    // The full, untagged control list across all four tabs (~40 settings): the
+    // footer's Reset to Defaults must restore every Interface setting the panel
+    // governs, not just whichever tab happens to be open when the player clicks
+    // it, so switching tabs never changes what the shared button resets.
+    const controls = hooks ? buildInterfaceControls(this.settingsSource(hooks)) : [];
 
     const stripHost = document.createElement('div');
     stripHost.innerHTML = tabStripHtml(
@@ -1286,19 +1307,11 @@ export class OptionsWindow {
     }
 
     if (hooks)
-      this.applyControls(
-        body,
-        interfaceControlsForTab(buildInterfaceControls(this.settingsSource(hooks)), tab),
-        hooks,
-        (focusKey) => {
-          this.renderInterface();
-          if (focusKey)
-            this.deps
-              .root()
-              .querySelector<HTMLElement>(`[data-setting-key="${focusKey}"]`)
-              ?.focus();
-        },
-      );
+      this.applyControls(body, interfaceControlsForTab(controls, tab), hooks, (focusKey) => {
+        this.renderInterface();
+        if (focusKey)
+          this.deps.root().querySelector<HTMLElement>(`[data-setting-key="${focusKey}"]`)?.focus();
+      });
 
     // Frames closes with the unit-frames reset row.
     if (tab === 'frames') this.unitFramesResetRow(body);
@@ -1325,12 +1338,7 @@ export class OptionsWindow {
       }
     }
 
-    const back = document.createElement('button');
-    back.className = 'btn';
-    back.textContent = t('hud.options.back');
-    back.addEventListener('click', () => this.goBack());
-    el.appendChild(back);
-    el.querySelector('[data-close]')?.addEventListener('click', () => this.close());
+    this.settingsViewFooter(controls);
   }
 
   // The chat-timestamp on/off toggle plus the 12/24-hour clock-format pair (the
@@ -1951,6 +1959,12 @@ export class OptionsWindow {
     reset.addEventListener('click', () => {
       audio.click();
       this.deps.keybinds().reset();
+      // The panel also renders seven GameSettings toggles alongside the
+      // rebindable keys (mouse camera, click-to-move and its mouse button,
+      // attack move, left-handed touch, profanity filter); Reset to Defaults
+      // must restore those too, not just the key-code map.
+      hooks?.settings.reset(KEYBIND_PANEL_SETTING_KEYS);
+      for (const k of KEYBIND_PANEL_SETTING_KEYS) hooks?.onSettingChange(k, hooks.settings.get(k));
       this.capturingKey = null;
       this.keybindNote = t('hud.options.keybindReset');
       this.deps.refreshKeybindLabels();

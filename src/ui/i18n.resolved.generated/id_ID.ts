@@ -10386,6 +10386,15 @@ export const id_ID: EnTranslations = {
       "direfang_quiver": {
         "name": "Tabung Panah Direfang"
       },
+      "sharp_claw": {
+        "name": "Sharp Claw"
+      },
+      "curved_tusk": {
+        "name": "Curved Tusk"
+      },
+      "pristine_claw": {
+        "name": "Pristine Claw"
+      },
       "conjured_water4": {
         "name": "Air Mata Air Sihir"
       },

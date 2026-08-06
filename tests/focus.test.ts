@@ -151,12 +151,14 @@ describe('setTownFocus rejects a key that is not a real component family (#2511)
   });
 
   it('refuses a real tag vocabulary word that no harvest item maps', () => {
-    // claw/tusk/gills/horn are carried by shipped mobs but map to no item. They
-    // are the narrow-vs-wide allowlist call: allowed here, a persisted
+    // gills/horn are carried by shipped mobs but map to no item (claw and
+    // tusk joined HARVEST_COMPONENT_ITEMS, this branch's own fix). They are
+    // the narrow-vs-wide allowlist call: allowed here, a persisted
     // `{ gills: 1 }` would make the omitted-components harvest default derive
     // an all-unmapped pick and take the #2509 refusal on every plain interact
-    // press (tests/corpse_harvest_sim.test.ts measures that on old_greyjaw).
-    for (const tag of ['claw', 'tusk', 'gills', 'horn']) rejects({ [tag]: 3 });
+    // press (tests/corpse_harvest_sim.test.ts measures that on
+    // sethrael_palecoil).
+    for (const tag of ['gills', 'horn']) rejects({ [tag]: 3 });
   });
 
   it('refuses an unknown key sitting beside a perfectly good one', () => {
@@ -231,7 +233,7 @@ describe('setTownFocus rejects a key that is not a real component family (#2511)
     expect(result.allocation).toEqual(PREVIOUS);
   });
 
-  it('is exactly the six item-mapped families, and the panel exports that same binding', () => {
+  it('is exactly the eight item-mapped families, and the panel exports that same binding', () => {
     // Pinned to LITERALS, not re-derived. `Object.keys(HARVEST_COMPONENT_ITEMS)`
     // compared against a constant DEFINED as that expression is a constant
     // self-comparison: it holds however the item map changes, so it cannot
@@ -244,6 +246,8 @@ describe('setTownFocus rejects a key that is not a real component family (#2511)
       'venomSac',
       'meat',
       'cloth',
+      'claw',
+      'tusk',
     ]);
     // And each really is a mapped family, pinned by item id rather than by
     // truthiness, so widening the item map cannot quietly widen the allowlist
@@ -255,6 +259,8 @@ describe('setTownFocus rejects a key that is not a real component family (#2511)
       venomSac: 'venom_gland',
       meat: 'game_meat',
       cloth: 'homespun_cloth',
+      claw: 'sharp_claw',
+      tusk: 'curved_tusk',
     });
     // ONE definition, stated as the identity it is: the panel re-exports the
     // sim's binding (src/ui/town_focus_view.ts), so this reds the moment the UI
@@ -290,7 +296,9 @@ describe('normalizeTownFocusOnLoad: an older save self-heals (#2511)', () => {
   });
 
   it('drops every key when the whole saved allocation is junk', () => {
-    expect(normalizeTownFocusOnLoad({ eastbrook: 4, claw: 1 })).toEqual({});
+    // claw is a real, mapped family now (this branch's own fix); horn is
+    // still waiting on its item.
+    expect(normalizeTownFocusOnLoad({ eastbrook: 4, horn: 1 })).toEqual({});
   });
 
   it('returns a fresh empty allocation for a missing or empty save', () => {

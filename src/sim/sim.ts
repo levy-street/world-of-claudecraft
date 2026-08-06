@@ -6702,21 +6702,51 @@ export class Sim {
       replacementConflicts.some((index) => isUnbreakableControlAura(target.auras[index]))
     )
       return;
+    // A same-id same-name re-application is a REFRESH: the old aura is
+    // displaced silently (no fade, exactly as before) and the gained event
+    // below carries refresh: true so parses read it as SPELL_AURA_REFRESH
+    // rather than a fresh application (parse fidelity 7.2). PLACEMENT IS
+    // DELIBERATELY UNCHANGED: splice then append, so the refreshed aura moves
+    // to the end exactly as it always has. Entity.auras array order is an rng
+    // draw-order input (the DoT tick walk draws per dot, breakable-fear
+    // chances draw per aura) and a gameplay-selection input (dispel targets,
+    // absorb consumption order), so refresh-vs-apply must never produce a
+    // different order than it did before this field existed.
+    let refreshed = false;
     for (const existing of replacementConflicts) {
       const displaced = target.auras[existing];
       this.applyNonPlayerStatAura(target, displaced, -1);
       target.auras.splice(existing, 1);
-      // A same-id replacement that swaps in a DIFFERENT display name (a
-      // same-stat elixir overwriting another brand) would otherwise vanish
-      // from the buff bar with no combat-log trace: emit the fade the client
-      // cannot infer. Same-name refreshes stay silent, exactly as before.
-      if (displaced.name !== aura.name)
-        this.emit({ type: 'aura', targetId: target.id, name: displaced.name, gained: false });
+      if (displaced.name !== aura.name) {
+        // A same-id replacement that swaps in a DIFFERENT display name (a
+        // same-stat elixir overwriting another brand) would otherwise vanish
+        // from the buff bar with no combat-log trace: emit the fade the client
+        // cannot infer. Same-name refreshes stay silent, exactly as before.
+        this.emit({
+          type: 'aura',
+          targetId: target.id,
+          name: displaced.name,
+          gained: false,
+          sourceId: displaced.sourceId,
+          abilityId: displaced.id,
+        });
+      } else {
+        refreshed = true;
+      }
     }
     target.auras.push(aura);
     if (aura.kind === 'stealth') target.stealthed = true; // keep the cache live without waiting for updateAuras
     this.applyNonPlayerStatAura(target, aura, 1);
-    this.emit({ type: 'aura', targetId: target.id, name: aura.name, gained: true });
+    this.emit({
+      type: 'aura',
+      targetId: target.id,
+      name: aura.name,
+      gained: true,
+      sourceId: aura.sourceId,
+      abilityId: aura.id,
+      ...(aura.stacks !== undefined ? { stacks: aura.stacks } : {}),
+      ...(refreshed ? { refresh: true } : {}),
+    });
     if (aura.kind === 'hot') {
       // A HoT's periodic ticks (combat/auras.ts) no longer carry the sound: the
       // client plays a single heal_impact right here, at the moment it lands,

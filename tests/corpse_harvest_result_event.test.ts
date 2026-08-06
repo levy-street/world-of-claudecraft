@@ -377,66 +377,84 @@ describe('the four grant arms each report themselves (#2457)', () => {
 });
 
 describe('the worst case in shipped content (#2457)', () => {
-  it('a Mire Prowler double proc is four entries, one per distinct item, in one event', () => {
-    // The case the issue names: hide and meat both have specimens, so a
-    // rare-or-better roll on both used to print four "You receive:" lines and
-    // four dings. It is still four ITEMS, so still four lines, but now one
-    // event, one cue, and every line carries its rarity, count and link.
+  it('a Mire Prowler triple proc is six entries, one per distinct item, in one event', () => {
+    // The case the issue names, now worse: hide, claw and meat all have
+    // specimens (claw joined HARVEST_COMPONENT_ITEMS and
+    // HARVEST_COMPONENT_SPECIMENS in the same change that closed #2513 for
+    // fen_troll), so a rare-or-better roll on all three used to print six
+    // "You receive:" lines and six dings. It is still six ITEMS, so still six
+    // lines, but now one event, one cue, and every line carries its rarity,
+    // count and link.
     expect(MOBS.mire_prowler.componentTags).toEqual(['hide', 'claw', 'meat']);
     // Re-seeded 1 -> 11 (#2514) -> 104 (the v0.32.0 base merge) -> 211 (the
     // zones 1-3 quest-dedupe content pass) -> 277 (the Galecrest quest-camp fix,
-    // #2887). mire_prowler is a
-    // MIXED corpse and claw no longer costs a tier roll, so every draw after the
-    // first shifts whenever either branch touches the harvest sequence, and the
-    // old seed stops rolling the double proc entirely. This is the only fixture in
-    // shipped content that reaches the four-entry ledger through the real command,
-    // so the seed is re-HUNTED to keep the double proc, never re-recorded to
-    // whatever the new seed happens to yield: a seed that does not proc leaves the
-    // merge/append path untested rather than merely re-numbered. The expected
-    // yields below are unchanged from #2514 precisely because 277 was picked to
-    // reproduce them.
-    const { sim, a, mob } = setup(277, 'mire_prowler');
+    // #2887) -> 152 (claw joining
+    // HARVEST_COMPONENT_ITEMS/HARVEST_COMPONENT_SPECIMENS, this branch) -> 129
+    // (re-hunted again for the final rebase onto release/v0.35.0, which
+    // shifted the shared content catalog and with it the world-gen draw
+    // sequence once more). mire_prowler is a MIXED corpse and claw no longer
+    // costs a tier roll, so every draw after the first shifts whenever either
+    // branch touches the harvest sequence, and the old seed stops rolling the
+    // double proc entirely. This is the only fixture in shipped content that
+    // reaches the four-entry ledger through the real command, so the seed is
+    // re-HUNTED to keep the double proc, never re-recorded to whatever the new
+    // seed happens to yield: a seed that does not proc leaves the merge/append
+    // path untested rather than merely re-numbered.
+    const { sim, a, mob } = setup(129, 'mire_prowler');
     const { results, loots } = harvest(sim, mob.id, undefined, a);
     expect(results).toHaveLength(1);
     expect(results[0].yields).toEqual([
-      { itemId: 'rough_hide', qty: 3, rarity: 'rare', kind: 'plain' },
-      { itemId: 'game_meat', qty: 3, rarity: 'rare', kind: 'plain' },
+      { itemId: 'rough_hide', qty: 2, rarity: 'rare', kind: 'plain' },
+      { itemId: 'sharp_claw', qty: 2, rarity: 'rare', kind: 'plain' },
+      { itemId: 'game_meat', qty: 2, rarity: 'rare', kind: 'plain' },
       { itemId: 'pristine_hide', qty: 1, rarity: 'rare', kind: 'specimen' },
+      { itemId: 'pristine_claw', qty: 1, rarity: 'rare', kind: 'specimen' },
       { itemId: 'prime_cut', qty: 1, rarity: 'rare', kind: 'specimen' },
     ]);
-    // Both specimens really rolled, which is what makes this the double-proc
-    // case rather than four entries reached some other way.
-    expect(results[0].yields.filter((y) => y.kind === 'specimen')).toHaveLength(2);
-    // The 'claw' tag maps to no item, so it contributes neither a grant nor an
-    // entry: four grants, four entries, never a phantom fifth line.
-    expect(loots).toHaveLength(4);
+    // All three specimens really rolled, which is what makes this the
+    // triple-proc case rather than six entries reached some other way.
+    expect(results[0].yields.filter((y) => y.kind === 'specimen')).toHaveLength(3);
+    // Every mapped family contributes exactly its own plain grant plus its own
+    // specimen: six grants, six entries, never a phantom seventh line.
+    expect(loots).toHaveLength(6);
   });
 });
 
 describe('a harvest that lands nothing never gets that far (#2457, #2513)', () => {
   it('a corpse whose every tag maps to no item is refused, so there is nothing to report', () => {
-    // fen_troll carries claw and tusk, neither of which is in
-    // HARVEST_COMPONENT_ITEMS. The "no result event, no loot line" half of this
+    // fen_troll carried claw and tusk, neither of which was in
+    // HARVEST_COMPONENT_ITEMS; both are mapped now (this branch's own fix), so
+    // no shipped template is left in this shape. gills and horn are still
+    // waiting on theirs, so this drives the gate through a real, otherwise-
+    // untagged template (warlock_imp) retagged for the duration of the case,
+    // restored in a finally. The "no result event, no loot line" half of this
     // pin is the #2457 contract and still holds; what changed is WHY. Pre-#2513
     // the claim was spent and the ledger was skipped, so the client got a
     // no-op it could not distinguish from a lost keypress. Now the command is
     // refused at the corpse-level gate before the claim, and the one thing the
     // player gets is the refusal.
-    expect(MOBS.fen_troll.componentTags).toEqual(['claw', 'tusk']);
-    const { sim, a, mob } = setup(24, 'fen_troll');
-    const { results, loots, events } = harvest(sim, mob.id, undefined, a);
-    expect(mob.harvestClaimedBy).toBeNull();
-    expect(results).toHaveLength(0);
-    expect(loots).toHaveLength(0);
-    // Exactly one event, and it is the refusal: no cue is ever cued for a no-op.
-    expect(events).toEqual([
-      { type: 'error', pid: a, text: 'That corpse has nothing to harvest.' },
-    ]);
+    const template = MOBS.warlock_imp;
+    const priorTags = template.componentTags;
+    template.componentTags = ['gills', 'horn'];
+    try {
+      expect(template.componentTags).toEqual(['gills', 'horn']);
+      const { sim, a, mob } = setup(60, 'warlock_imp');
+      const { results, loots, events } = harvest(sim, mob.id, undefined, a);
+      expect(mob.harvestClaimedBy).toBeNull();
+      expect(results).toHaveLength(0);
+      expect(loots).toHaveLength(0);
+      // Exactly one event, and it is the refusal: no cue is ever cued for a no-op.
+      expect(events).toEqual([
+        { type: 'error', pid: a, text: 'That corpse has nothing to harvest.' },
+      ]);
+    } finally {
+      template.componentTags = priorTags;
+    }
   });
 
   it('still emits the ledger on the mixed corpse next door, so the gate is not a mute button', () => {
-    // The discriminator on the same rig: mire_prowler also carries the unmapped
-    // `claw`, but it carries hide and meat too, so it harvests and reports.
+    // The discriminator on the same rig: mire_prowler carries hide, claw and
+    // meat, all mapped, so it harvests and reports.
     expect(MOBS.mire_prowler.componentTags).toEqual(['hide', 'claw', 'meat']);
     const { sim, a, mob } = setup(24, 'mire_prowler');
     const { results, loots } = harvest(sim, mob.id, undefined, a);

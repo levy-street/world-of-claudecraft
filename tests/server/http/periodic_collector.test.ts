@@ -133,12 +133,19 @@ describe('PeriodicCollector', () => {
     await collector.stop();
 
     collector.start();
-    // start() kicks an immediate (async) refresh; let it settle.
-    await Promise.resolve();
-    await Promise.resolve();
-    expect(query).toHaveBeenCalled();
+    try {
+      // start() kicks an immediate (async) refresh; let it settle.
+      await Promise.resolve();
+      await Promise.resolve();
+      expect(query).toHaveBeenCalled();
+    } finally {
+      // Guarantee the real 60s interval armed by start() is cleared even if
+      // the assertion above throws, so a failure here never leaves a live
+      // setInterval running past this test (matches the try/finally +
+      // collector.stop() convention in metrics_single_registry.test.ts).
+      await collector.stop();
+    }
 
-    await collector.stop();
     await collector.stop();
   });
 

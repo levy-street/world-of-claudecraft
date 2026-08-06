@@ -82,18 +82,24 @@ describe('the dedicated harvest-material map (pinned)', () => {
       venomSac: 'venom_gland',
       meat: 'game_meat',
       cloth: 'homespun_cloth',
+      claw: 'sharp_claw',
+      tusk: 'curved_tusk',
     });
   });
 
-  it('the specimen map carries exactly the four jackpot families (fang and cloth have none)', () => {
+  it('the specimen map carries exactly the five jackpot families (fang, cloth and tusk have none)', () => {
     // Literal sibling pin: a dropped or mistargeted specimen row would break
     // a family's jackpot grant while every behavioral suite stays green on
-    // the remaining families.
+    // the remaining families. claw carries one (pristine_claw) so no shipped
+    // corpse ever carries two specimen-less families at once (fen_troll:
+    // claw+tusk; old_greyjaw: fang+claw); tusk stays specimen-less like
+    // fang/cloth, since no template pairs it with either.
     expect({ ...HARVEST_COMPONENT_SPECIMENS }).toEqual({
       hide: 'pristine_hide',
       silk: 'pristine_silk',
       venomSac: 'pristine_venom_gland',
       meat: 'prime_cut',
+      claw: 'pristine_claw',
     });
   });
 });
@@ -173,7 +179,7 @@ describe('every mapped tag yields its dedicated material', () => {
   // Real templates covering each mapped tag: wild_boar (hide/tusk/meat),
   // webwood_spider (venomSac/silk), vale_bandit (cloth), forest_wolf (fang).
   const CASES: [string, string[]][] = [
-    ['wild_boar', ['rough_hide', 'game_meat']],
+    ['wild_boar', ['rough_hide', 'game_meat', 'curved_tusk']],
     ['webwood_spider', ['venom_gland', 'spider_silk']],
     ['vale_bandit', ['homespun_cloth']],
     ['forest_wolf', ['wolf_fang']],

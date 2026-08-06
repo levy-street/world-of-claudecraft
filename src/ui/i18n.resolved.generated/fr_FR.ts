@@ -10386,6 +10386,15 @@ export const fr_FR: EnTranslations = {
       "direfang_quiver": {
         "name": "Carquois de Direfang"
       },
+      "sharp_claw": {
+        "name": "Sharp Claw"
+      },
+      "curved_tusk": {
+        "name": "Curved Tusk"
+      },
+      "pristine_claw": {
+        "name": "Pristine Claw"
+      },
       "conjured_water4": {
         "name": "Eau de source invoquée"
       },

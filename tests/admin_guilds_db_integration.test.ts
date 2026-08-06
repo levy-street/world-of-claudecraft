@@ -576,18 +576,36 @@ describeDb('admin guild production SQL (real Postgres)', () => {
   });
 
   it('surfaces guild renames in the realm-wide moderation history', async () => {
+    // Self-contained fixture: seed and rename a guild owned by this test alone,
+    // instead of reading the renames left behind by earlier tests in this block.
+    // That keeps the assertions correct under -t filtering, .only, or reordering.
+    const client = await bootstrap.connect();
+    try {
+      await seedGuild(client, 'History Target', QUERY_REALM, []);
+    } finally {
+      client.release();
+    }
+    const target = guildId('History Target');
+    const renamed = await guildsDb.renameAdminGuild(
+      target,
+      'History Renamed',
+      'audit trail proof',
+      adminAccountId,
+    );
+    expect('result' in renamed).toBe(true);
+
     const history = await adminDb.listModerationActions('all', adminAccountId, 1, 50);
 
-    const renames = history.rows.filter((row) => row.source === 'guild');
-    expect(renames.length).toBeGreaterThanOrEqual(2);
+    const renames = history.rows.filter((row) => row.source === 'guild' && row.guildId === target);
+    expect(renames.length).toBeGreaterThanOrEqual(1);
     expect(renames.every((row) => row.action === adminDb.GUILD_RENAME_ACTION)).toBe(true);
     expect(renames.every((row) => row.adminUsername === 'moderator')).toBe(true);
     // guild_name resolves to the guild's CURRENT name, not the audited one.
-    expect(renames.map((row) => row.guildName)).toContain('Renamed Guild');
+    expect(renames.map((row) => row.guildName)).toContain('History Renamed');
     expect(renames.every((row) => row.accountId === null && row.ip === null)).toBe(true);
 
     const mine = await adminDb.listModerationActions('mine', adminAccountId, 1, 50);
-    expect(mine.rows.some((row) => row.source === 'guild')).toBe(true);
+    expect(mine.rows.some((row) => row.source === 'guild' && row.guildId === target)).toBe(true);
 
     // A rename is never a note, so the notes tab must not carry the guild arm.
     const notes = await adminDb.listModerationActions('notes', adminAccountId, 1, 50);

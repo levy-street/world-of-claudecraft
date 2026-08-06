@@ -52,7 +52,7 @@ Record:
 | M1 | darwin | arm64 | 16 | 128 GiB (137 GB decimal) | high | Fernando local; free RAM at Phase 1 start ~8.8 GiB under multi-session load; Phase 11 recheck freemem ~18-20 GiB |
 | CI-L1 | linux (GHA ubuntu-latest) | x64 | 4 | 16 GB | low | Proxy only: public GitHub-hosted runner specs; CI uses 8 vitest shards + half-core maxWorkers per job, not unsharded local gate |
 | W1 | win32 | n/a | n/a | n/a | n/a | No Windows baseline host this packet (smoke only; see platform-matrix.md) |
-| M2 | | | | | | reserved for a future medium-tier local host |
+| L1 | linux (cachyos) | x64 | 16 | 30.5 GiB | medium | First real LOCAL Linux unsharded full-gate wall (previously CI-L1 proxy only); AMD Ryzen AI 7 350, Node v26.4.0; see 2026-08-06 entry below |
 | M3 | | | | | | reserved for a future low-tier local host |
 
 Tier guide: low (4-8 CPUs, 8-16 GB), medium (8-12 CPUs, 16-32 GB), high (12+ CPUs, 32+ GB).
@@ -535,4 +535,140 @@ No large platform script rewrite. Small biome format fix on
 | Windows | smoke | win32 shell spawn policy in gate scripts; no local host |
 
 Contributor matrix: `docs/local-gate-perf/platform-matrix.md`.
+
+## 2026-08-06 - first real local Linux (medium-tier) full-gate wall (L1)
+
+The local-gate-perf packet above (Phases 0-12) closed with only M1 (macOS, high
+tier) and CI-L1 (a GHA-spec proxy, not a timed local unsharded run) filled; OPEN
+item "low/medium-tier local baselines still empty" stood unaddressed. This fills
+the medium-tier Linux gap with a real `node scripts/gate_profile.mjs
+--vitest-slow --top 20` run, plus two follow-on changes it motivated.
+
+### L1 machine facts
+
+`node scripts/gate_profile.mjs --facts`: linux x64, 16 CPUs, 30.5 GiB RAM (13.5
+GiB available at start), tier **medium**, Node v26.4.0, npm 12.0.2, SHA
+`41f551f550`.
+
+### L1 step breakdown (pre-change step list, before the multi-task combine below)
+
+| Step | Seconds | Status |
+|---|---:|---|
+| dependency sync | 0.5 | ok |
+| ffmpeg/ffprobe probe | 0.1 | ok |
+| i18n artifacts | 6.2 | ok |
+| i18n freshness | 1.0 | ok |
+| wiki content | 0.6 | ok |
+| malware scan | 7.1 | ok |
+| biome (changed files) | 2.9 | ok |
+| sfx check | 10.7 | ok |
+| vitest (full suite) | 1180.9 | **fail** (1 timeout, see below) |
+| **TOTAL** | **1210.0** | |
+
+**This run was NOT quiet.** A second, unrelated agent session on the same host
+was running its own `vitest` fork workers throughout (confirmed via `ps aux`:
+a separate `.claude/worktrees/agent-*` checkout pinned at 100%+ CPU for the
+whole duration), on top of this session's own earlier benchmark runs. The
+1180.9s vitest wall is roughly 2.5-4x the M1 quiet baseline (277.5s) and even
+M1's own worst measured "under load" case (Phase 12, 418.7s), and the top slow
+files below are inflated to match (contrast `tests/audit_conservation_property.test.ts`
+at 228.9s here vs no Phase-1-M1 file exceeding 57s quiet). Treat these as a
+genuine medium-tier-under-heavy-contention data point (same spirit as Phase 12's
+labeled M1 505.3s "under load" row), not a quiet best-case comparable to Phase 1.
+A quiet L1 re-run is a follow-up (OPEN item below), not blocking: the one
+failure it produced is explained and not a regression (next paragraph).
+
+**The one failure is a contention timeout, not a code defect.**
+`tests/escort_quest.test.ts > escort run guards > a slain wave unravels after
+its loot window instead of respawning into the run` hit vitest's default
+20000ms test timeout. This is exactly the flake mode `scripts/gate.mjs`'s own
+header comment warns about ("an unbounded full run ... flakes the heavy sim
+suites when other work shares the machine"), reproduced here for real under a
+second concurrent vitest process. Re-running `tests/escort_quest.test.ts` alone
+passes.
+
+### L1 top slow files (heavily load-inflated, informational only)
+
+| Rank | File | Duration ms |
+|---|---|---:|
+| 1 | tests/audit_conservation_property.test.ts | 228947 |
+| 2 | tests/battleground.test.ts | 213411 |
+| 3 | tests/chronomancy_balance.test.ts | 116561 |
+| 4 | tests/parity/parity_g.test.ts | 97402 |
+| 5 | tests/eastbrook_gameplay_integration.test.ts | 91230 |
+
+Full top-20: `tmp/gate-profile-medium-linux.json` (gitignored).
+
+### Change 1: combine the 3 independent pre-vitest turbo tasks into one call
+
+`i18n:gen`, `wiki:content`, and `sfx:check` are independent leaf tasks in
+`turbo.json` (none `dependsOn` another) but ran as 3 separate `npx turbo run`
+invocations, so each paid its own process-spawn cost and none overlapped with
+the others. `typecheck + env/server/bot builds` already gets this treatment
+(one multi-task `npx turbo run check:types build:env build:server build:bot`
+so turbo's own scheduler overlaps independent work); this extends the same,
+already-proven pattern to the pre-vitest trio:
+`npx turbo run i18n:gen wiki:content sfx:check`.
+Sequential sum from the L1 run above: 6.2 + 0.6 + 10.7 = 17.5s. Measured after
+the change with `npx turbo run i18n:gen wiki:content sfx:check --force` (forced
+cold, 0 cached / 3 total, so this is real overlapped work, not a cache hit):
+**10.129s** wall, a genuine 7.4s (42%) win, matching the `max(6.2, 0.6, 10.7) =
+10.7` prediction closely. Real whenever these inputs are NOT already warm in
+the shared turbo cache (see Change 2). Changed:
+`scripts/lib/gate_steps.mjs` (`buildFullGateSteps`, one step named
+`'i18n + wiki + sfx artifacts'` replaces the three), `PRE_VITEST_STEP_NAME`
+moved to `'biome (changed files)'` (still the last pre-vitest step,
+`gate_select.mjs`'s splice anchor is unaffected since it reads the constant).
+Tests updated: `tests/gate_task_cache.test.ts`, `tests/gate_profile.test.ts`.
+
+### Change 2: verified (not implemented) Turborepo's git-worktree cache auto-sharing
+
+This repo's own default task workflow mandates a fresh `git worktree add` per
+task, so every gate run's FIRST pass through the turbo-cached steps looked, on
+paper, like it should always be cold (the Phase 8 "warm turbo" 24s -> 0.3s win
+was measured on the SAME checkout run twice, never across a fresh worktree).
+Turborepo >= 2.8 closes this gap automatically: it detects a linked worktree
+and redirects local-cache reads/writes to the MAIN checkout's `.turbo/cache`,
+no config (https://turborepo.dev/blog/2-8). Verified empirically on this
+machine: running the gate's turbo steps from `.worktrees/gate-speedup` wrote
+NEW cache entries into the MAIN repo root's `.turbo/cache/` (confirmed by file
+mtime, matching the run's own timestamp), while the worktree's own `.turbo/`
+held only per-task log files, no `cache/` subdirectory at all. This repo pins
+`turbo@2.10.8` (well past the 2.8 floor) and sets no `cacheDir` override in
+`turbo.json` (an override disables the auto-detection), so the sharing is
+already active for every contributor and always has been since the pnpm/turbo
+migration. No code change; added a regression guard
+(`tests/gate_task_cache.test.ts`, "git worktree cache sharing") pinning the
+turbo version floor and the absence of a `cacheDir` override, so a future
+downgrade or an added override fails loudly instead of silently reintroducing
+a cold cache in every fresh worktree.
+
+### Change 3 (measured MISS, not implemented): `NODE_COMPILE_CACHE`
+
+Node's built-in V8 bytecode compile cache (`NODE_COMPILE_CACHE`, stable since
+Node 22.8) looked promising on paper: `gate.mjs` spawns many independent `node`
+processes (i18n gen, wiki content, malware scan, the vitest CLI itself), each
+paying its own module-load/compile cost from scratch. Measured on L1 with a
+14-file/592-test vitest subset (`tests/gate_*`, `architecture`,
+`localization_fixes`, `ci_workflow`, `world_api_parity`, `test_visibility`,
+etc.), comparing **user CPU time** (immune to the wall-clock noise from the
+concurrent second vitest process above) across 6 runs: no-cache 17.78s /
+17.10s / 18.52s vs `NODE_COMPILE_CACHE` warm (3rd+ run against the same cache
+dir) 17.93s / 17.63s / 18.34s. Flat; no consistent reduction, and the warm
+runs were if anything slightly higher, well inside run-to-run variance. Likely
+explanation: Vitest's own TypeScript transform runs through Vite's in-process
+module-runner (already cached separately via `experimental.fsModuleCache`,
+Phase 4), not through Node's native module loader, so the V8 bytecode cache
+only covers the comparatively small, already-fast CLI/dependency-loading slice
+of the work. Not implemented in `gate.mjs`/`gate_select.mjs`/`gate_fast.mjs`.
+Logged here so it is not re-tried blind.
+
+### OPEN (updates state.md / HANDOFF.md item 1)
+
+- Filled: a real local Linux medium-tier full-gate wall exists now (L1, this
+  entry), even if under heavy contention.
+- Still open: a QUIET L1 re-run (for a wall number comparable to M1's Phase 1
+  336.3s quiet baseline, not the 1210.0s contended one here); macOS/Linux
+  low-tier and macOS medium-tier hosts (M2/M3 in the machine inventory above)
+  remain unfilled; Windows remains smoke-only.
 

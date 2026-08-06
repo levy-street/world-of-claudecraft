@@ -10386,6 +10386,15 @@ export const da_DK: EnTranslations = {
       "direfang_quiver": {
         "name": "Direfang-Kogger"
       },
+      "sharp_claw": {
+        "name": "Sharp Claw"
+      },
+      "curved_tusk": {
+        "name": "Curved Tusk"
+      },
+      "pristine_claw": {
+        "name": "Pristine Claw"
+      },
       "conjured_water4": {
         "name": "Fremmanet kildevand"
       },

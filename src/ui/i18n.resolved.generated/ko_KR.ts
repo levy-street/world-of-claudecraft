@@ -10386,6 +10386,15 @@ export const ko_KR: EnTranslations = {
       "direfang_quiver": {
         "name": "흉포송곳니 화살통"
       },
+      "sharp_claw": {
+        "name": "날카로운 발톱"
+      },
+      "curved_tusk": {
+        "name": "휘어진 엄니"
+      },
+      "pristine_claw": {
+        "name": "온전한 발톱"
+      },
       "conjured_water4": {
         "name": "창조된 샘물"
       },
