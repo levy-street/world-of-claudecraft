@@ -891,11 +891,15 @@ export function buyItem(
   // ctrl/cmd-click (desktop) or the vendor row's Buy Stack control (touch).
   // Restricted to plain copper-priced stackable goods: Honor is authored as a
   // per-purchase price, never stack-multiplied (see VendorPrice in
-  // vendor_view.ts), and a mount purchase must always stay exactly one (buying
+  // vendor_view.ts), a mount purchase must always stay exactly one (buying
   // several copies of the same reins would only waste gold, and mountOwned only
-  // guards against a SECOND purchase, not a bulk quantity within this one). The
-  // result is floored at 1 so an unaffordable bulk request still hits the normal
-  // "Not enough money" check below instead of silently buying zero.
+  // guards against a SECOND purchase, not a bulk quantity within this one), and
+  // a soulbound row mirrors vendorCountForced's Q23 force-1 rule (a future
+  // soulbound stackable, e.g. a bind-on-pickup consumable, must stay
+  // one-at-a-time on both the count AND the bulk path, never multiply on one
+  // and force-1 on the other). The result is floored at 1 so an unaffordable
+  // bulk request still hits the normal "Not enough money" check below instead
+  // of silently buying zero.
   //
   // Count purchase (the 1x/5x/10x/custom control row): count N is N ordinary
   // row-unit purchases resolved atomically, refuse-whole on any shortfall
@@ -905,7 +909,8 @@ export function buyItem(
   // the riding delegation and the mount gates (a hostile count denies on
   // every row; a valid one is force-1 there), so `count` here is always a
   // safe integer >= 1.
-  const bulkEligible = bulk && hasCopperPrice && !hasHonorPrice && def.kind !== 'mount';
+  const bulkEligible =
+    bulk && hasCopperPrice && !hasHonorPrice && def.kind !== 'mount' && !def.soulbound;
   let qty: number;
   let copperCost: number;
   let honorCost: number;

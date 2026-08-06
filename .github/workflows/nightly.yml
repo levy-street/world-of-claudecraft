@@ -1,0 +1,276 @@
+name: Nightly gate
+
+# Scheduled full run over the tips of the default branch and the active
+# release/** branch, with same-day alerting. Motivated by the 2026-08-05
+# incident: a release tip carried 67 broken tests for days because the push
+# runs that showed it were red with nobody watching, so every open PR
+# inherited failures its author could not explain. This workflow re-proves the
+# tips nightly and routes a red verdict to a single tracking issue (created on
+# first failure, updated on repeat failures, closed with a comment on
+# recovery) via scripts/nightly_report.mjs.
+#
+# Kept OUT of ci.yml for the same reason audit.yml is: adding `schedule` there
+# would newly fire its PR-shaped jobs on every cron tick. This file is also
+# deliberately NOT triggered by pull_request or push: it must never add a
+# second of latency to PR feedback.
+#
+# What runs per ref: the full unsharded test suite (the same one the local
+# gate runs, at PR tier), the serialized checks (i18n artifacts + freshness,
+# malware gate, typecheck, all four builds), and the Chromium browser
+# regressions. The release-i18n 21-locale lane is deliberately absent: it is
+# legitimately red for most of a cycle until the release-time locale fill
+# (issue #2820), so alerting on it nightly would keep the tracking issue
+# permanently open and train everyone to ignore it. The release push run in
+# ci.yml still carries that lane.
+#
+# GitHub registers a workflow (its cron AND its workflow_dispatch surface)
+# from the DEFAULT branch, so nothing here can fire until this file reaches
+# main with a release merge: before that, dispatching by name or file 404s
+# (verified 2026-08-05). Once registered, workflow_dispatch has two modes:
+# with the ref input EMPTY it is a manual production pass (gates main plus
+# the release tip and reports under the production issue identity); with a
+# ref it gates exactly that one ref and reports under the separate
+# nightly-gate-drill identity, so an acceptance drill against a scratch
+# branch with a deliberately broken test never touches the production
+# tracking issue. A red drill's issue has nothing scheduled to drain it:
+# close it by hand, or finish the drill with a green dispatch at the same
+# ref.
+on:
+  schedule:
+    # Daily, 04:47 UTC. Off the hour so this does not pile into the
+    # top-of-hour spike in GitHub's shared cron scheduler.
+    - cron: '47 4 * * *'
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: 'Gate exactly this ref instead of main plus the active release branch'
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+# A dispatch must never cancel a running scheduled pass (or vice versa): the
+# event name and ref keep the groups apart, and nothing here cancels. The
+# flip side (a dispatch report racing the scheduled report on the SAME issue
+# identity) is accepted rather than serialized with a job-level concurrency
+# group, because a queued-then-superseded report job would be cancelled
+# outright, losing that run's alert; the planner's oldest-wins update rule
+# bounds the damage to a duplicate issue that drains on green runs.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ inputs.ref || github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  # Resolve which refs to gate: the default branch plus the highest
+  # release/vX.Y.Z, or the dispatch ref alone. On an API failure the script
+  # falls back to the default branch loudly rather than silencing the night's
+  # run; the failure still surfaces through the report job if the job itself
+  # dies.
+  targets:
+    name: Resolve nightly refs
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      refs: ${{ steps.resolve.outputs.refs }}
+    steps:
+      - name: Check out resolver script
+        uses: actions/checkout@v6
+        with:
+          # Blob-less shallow sparse checkout: this job needs only the
+          # scripts, never the tree or the history.
+          filter: blob:none
+          sparse-checkout: |
+            scripts
+          persist-credentials: false
+
+      - name: Resolve refs
+        id: resolve
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          NIGHTLY_REF: ${{ inputs.ref }}
+          NIGHTLY_DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        # Stdlib-only script on the runner's preinstalled Node: no toolchain
+        # setup for a single API call.
+        run: node scripts/nightly_targets.mjs
+
+  # The full test suite, unsharded, exactly like the local `npm run gate`
+  # vitest step (bounded workers, PR tier): wall clock does not matter at
+  # 04:47, and one job per ref keeps the tracking issue's failed-job list
+  # legible. `npm test` regenerates the i18n artifacts itself (pretest), which
+  # the S3 guard and guide freshness suites need.
+  tests:
+    name: Nightly tests (${{ matrix.ref }})
+    needs: targets
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    strategy:
+      fail-fast: false
+      matrix:
+        ref: ${{ fromJSON(needs.targets.outputs.refs) }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ matrix.ref }}
+          persist-credentials: false
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.34.5
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 26
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run tests (full suite, PR tier)
+        run: npm test -- --maxWorkers="$(node -p 'Math.max(1, Math.floor(require("node:os").availableParallelism() / 2))')"
+
+  # The serialized checks, mirroring the release-checks job in ci.yml (same
+  # run-step list, pinned to it by tests/nightly_workflow.test.ts; the one
+  # omission is the tsc incremental cache step, which is a uses: cache keyed
+  # to a moving tip and not worth carrying here).
+  checks:
+    name: Nightly checks (${{ matrix.ref }})
+    needs: targets
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        ref: ${{ fromJSON(needs.targets.outputs.refs) }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ matrix.ref }}
+          persist-credentials: false
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.34.5
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 26
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate i18n artifacts
+        run: npm run i18n:gen
+
+      - name: Post i18n coverage summary
+        run: node scripts/i18n_coverage_summary.mjs
+
+      - name: Verify committed i18n artifacts are fresh
+        run: git diff --exit-code -- src/ui/i18n.resolved.generated src/admin/i18n.resolved.generated src/ui/i18n.catalog/translation_keys.generated.ts
+
+      - name: Malicious-code gate
+        run: npm run security:gate
+
+      - name: Typecheck
+        run: npm run check:types
+
+      - name: Build headless environment
+        run: npm run build:env
+
+      - name: Build server
+        run: npm run build:server
+
+      - name: Build Discord bot
+        run: npm run build:bot
+
+      - name: Build client
+        run: npm run build
+
+  # The Chromium browser regressions, mirroring the browser-gate job in ci.yml.
+  browser:
+    name: Nightly browser (${{ matrix.ref }})
+    needs: targets
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        ref: ${{ fromJSON(needs.targets.outputs.refs) }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ matrix.ref }}
+          persist-credentials: false
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.34.5
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 26
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Resolve Playwright version for cache key
+        id: playwright-version
+        run: echo "version=$(node -p "require('playwright/package.json').version")" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Playwright Chromium browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-chromium-${{ runner.os }}-${{ steps.playwright-version.outputs.version }}
+          restore-keys: |
+            playwright-chromium-${{ runner.os }}-
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Run browser regressions
+        run: npm run test:browser
+
+  # The alerting deliverable: runs on every outcome (if: always()), judges the
+  # completed jobs above through scripts/lib/nightly_plan.mjs, and upserts the
+  # single nightly-gate tracking issue. A targets failure counts as red here
+  # too, so a night whose refs could not even be resolved still pages.
+  report:
+    name: Report nightly verdict
+    needs: [targets, tests, checks, browser]
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    # The one write scope in this workflow, job-scoped: the report job files,
+    # updates, and closes the tracking issue. Never widen the workflow level.
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - name: Check out report script
+        uses: actions/checkout@v6
+        with:
+          # No ref input here EVER: the write-scoped job runs only the
+          # workflow's own script, never code from a resolved ref.
+          filter: blob:none
+          sparse-checkout: |
+            scripts
+          persist-credentials: false
+
+      - name: File, update, or close the tracking issue
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          NIGHTLY_TARGETS: ${{ needs.targets.outputs.refs }}
+          NIGHTLY_REF: ${{ inputs.ref }}
+        run: node scripts/nightly_report.mjs

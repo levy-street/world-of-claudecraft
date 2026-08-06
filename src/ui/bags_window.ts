@@ -61,6 +61,7 @@ import {
   resolveDepositSubmit,
 } from './bags_view';
 import { showQuantityPrompt } from './bank_quantity_prompt';
+import { markDialogRoot } from './dialog_root';
 import { itemDisplayName } from './entity_i18n';
 import { isPaperdollDraggable } from './equip_drop_core';
 import { esc } from './esc';
@@ -390,6 +391,12 @@ export class BagsWindow {
     // rebuild, so capture its scroll offset and reapply it to the fresh grid:
     // otherwise using an item (e.g. a potion) snaps the list back to the top.
     const prevScrollTop = el.querySelector('.bag-grid')?.scrollTop ?? 0;
+    // Bags is a non-modal companion window (vendor / trade / market can be open
+    // alongside it), so it gets the accessible name and role=dialog like every
+    // other window in the family, but NO focus trap: markDialogRoot never installs
+    // one on its own (that is a separate opt-in, see prompt_dialog.ts for the modal
+    // recipe this window's own prompts use).
+    markDialogRoot(el, { label: t('itemUi.bags.title') });
     el.innerHTML = `<div class="panel-title"><span>${esc(t('itemUi.bags.title'))}</span><button type="button" class="x-btn" data-close data-focus-key="close" aria-label="${esc(t('itemUi.bags.close'))}">${svgIcon('close')}</button></div>`;
     el.appendChild(this.buildBagBar());
     // Skip the chip/search row entirely when the bag is empty: a full filter bar

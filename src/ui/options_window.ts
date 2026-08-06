@@ -21,7 +21,12 @@
 
 import { syncAppViewport } from '../game/app_viewport';
 import { audio } from '../game/audio';
-import { GAMEPAD_NONE, gamepadButtonLabel } from '../game/gamepad_map';
+import {
+  GAMEPAD_NONE,
+  GAMEPAD_ZOOM_IN,
+  GAMEPAD_ZOOM_OUT,
+  gamepadButtonLabel,
+} from '../game/gamepad_map';
 import {
   GRAPHICS_REBUILD_KEYS,
   type GraphicsSettingsSnapshot,
@@ -1651,12 +1656,16 @@ export class OptionsWindow {
   }
 
   // Action ids a gamepad button may be bound to: explicit unbind, the game menu,
-  // plus every one-shot (edge) keybind action and Jump. Movement-axis actions
-  // (forward/strafe/turn) are excluded, they live on the analog stick.
+  // the two pad-only camera zoom steps, plus every one-shot (edge) keybind action
+  // and Jump. Movement-axis actions (forward/strafe/turn) are excluded, they live
+  // on the analog stick. Zoom ships unbound by default (no free default slot
+  // remains among the 13 bindable buttons), so it is opt-in only from here.
   private gamepadActionOptions(): { value: string; label: string }[] {
     const opts: { value: string; label: string }[] = [
       { value: GAMEPAD_NONE, label: t('hud.options.unbound') },
       { value: 'escape', label: t('hudChrome.controller.menuAction') },
+      { value: GAMEPAD_ZOOM_IN, label: t('hudChrome.controller.zoomIn') },
+      { value: GAMEPAD_ZOOM_OUT, label: t('hudChrome.controller.zoomOut') },
     ];
     for (const a of BIND_ACTIONS) {
       if (a.id === 'attackMove') continue; // mode-gated; not a useful pad default

@@ -391,7 +391,8 @@ export const id_ID: EnTranslations = {
     },
     "emoteEditor": {
       "title": "Emote",
-      "done": "Selesai"
+      "done": "Selesai",
+      "close": "Close emotes"
     },
     "dailyRewards": {
       "title": "Hadiah Harian",
@@ -1348,6 +1349,8 @@ export const id_ID: EnTranslations = {
       "buttons": "Tata Letak Tombol",
       "resetButtons": "Atur Ulang Tata Letak Tombol",
       "menuAction": "Menu Game",
+      "zoomIn": "Zoom In",
+      "zoomOut": "Zoom Out",
       "help": "Tuas kiri untuk bergerak, tuas kanan untuk melihat. Buka jendela untuk memakai penunjuk di layar."
     },
     "perf": {
@@ -3147,7 +3150,8 @@ export const id_ID: EnTranslations = {
         "raise_fallen": "Bangkitkan Yang Gugur (gelombang bala bantuan berkala)",
         "soul_rend": "Robek Jiwa (pemain yang ditandai harus menyebar dan disembuhkan)",
         "deathless_rage": "Murka Abadi (diputus di wardstone)",
-        "wardstones": "Saluran Wardstone (transisi fase)"
+        "wardstones": "Saluran Wardstone (transisi fase)",
+        "dread_curse": "Dread Curse (heroic only, stacking tank-swap debuff)"
       }
     },
     "deeds": {
@@ -3555,16 +3559,21 @@ export const id_ID: EnTranslations = {
       "groupInterface": "Antarmuka",
       "groupCamera": "Kamera",
       "talents": "Bakat",
+      "professions": "Professions",
       "arena": "Arena",
       "leaderboard": "Papan Peringkat",
       "deeds": "Kitab Jasa",
+      "sheathe": "Sheathe/Unsheathe Weapon",
       "crafting": "Kriya",
       "valeCup": "Piala Lembah",
+      "mount": "Mount / Dismount",
       "calendar": "Kalender Acara",
+      "dungeonFinder": "Dungeon Finder",
       "discord": "Discord",
       "abilities": "Gunakan kemampuan action bar (deretan angka; bilah kedua ada di numpad)",
       "targetFriendly": "Targetkan kawan terdekat",
       "cycleFriendly": "Putar target kawan",
+      "targetAuras": "Target buffs and debuffs",
       "gameMenu": "Buka menu permainan dan opsi",
       "bothMouse": "Kedua Tombol Mouse",
       "runForward": "Lari maju",

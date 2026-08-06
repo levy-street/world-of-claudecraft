@@ -13,6 +13,7 @@ Codex have different entry points and share the same deterministic scripts and c
 | Day-loop fast path | `npm run gate:fast` through `scripts/gate_fast.mjs` | While iterating (agents and mid/low-tier machines) | No (local only; not merge) |
 | **Selective gate** | `node scripts/gate_select.mjs` | **Before implementation is called ready / pre-merge** | **Yes (the merge bar)** |
 | Full local gate | `npm run gate` through `scripts/gate.mjs` | When you want the whole suite locally, or the planner falls back | Yes (deeper check) |
+| Nightly full gate | `.github/workflows/nightly.yml`: full suite + checks + browser over the tips of main and the active `release/**` branch | Scheduled nightly (04:47 UTC) | No (alerting: files and closes one tracking issue) |
 | Judgment review | Claude `/qa` or Codex `$woc-qa`, plus scoped reviewers | End of a contribution | Advisory locally |
 
 ### Instant copy gate
@@ -165,9 +166,10 @@ surface where an escape could hide, and it is what to actually study.
 **What it still cannot prove, and why that is acceptable.** The out-of-graph pattern list is
 a floor, not a proof, so this path is empirically complete rather than provably complete.
 The backstop is CI: `.github/workflows/ci.yml` runs the FULL suite (8-shard matrix) on every
-`pull_request` AND on every push to `main` / `release/**`. A local selection miss therefore
-costs feedback latency, not correctness, because the full suite still runs on the PR before
-it merges. That is what makes this safe as the local bar.
+`pull_request` AND on every push to `main` / `release/**`, and the scheduled nightly full
+gate (next section) re-proves the tips daily with same-day alerting. A local selection miss
+therefore costs feedback latency, not correctness, because the full suite still runs on the
+PR before it merges. That is what makes this safe as the local bar.
 
 **Evidence it works.** Fault injection, 5/5 caught: a `Math.random()` in `src/sim`, a combat
 constant, a content record, a sim-emitted player string, and a deleted weapon `.glb`. In two
@@ -185,6 +187,31 @@ the toolchain-relevant part its own comment cites as the reason for the pin.
 
 Pure planning logic: `scripts/lib/gate_discovery.mjs`, `scripts/lib/gate_select_plan.mjs`
 and `scripts/lib/test_visibility.mjs`, all pinned by `tests/gate_select_plan.test.ts`.
+
+### Nightly full gate (scheduled backstop)
+
+`.github/workflows/nightly.yml` re-proves the tips of `main` and the highest
+`release/vX.Y.Z` branch (the `v` is optional) every night: the full unsharded test suite, the serialized
+checks lane (mirroring ci.yml's release-checks run steps), and the Chromium browser
+lane, per ref. It exists because a red release tip once sat unwatched for days while
+every open PR inherited its failures; push runs show rot, but only to someone looking.
+
+The verdict lands in exactly one tracking issue (label `nightly-gate`, title "Nightly
+full gate is red"): created on the first red run, updated with the failed-job list on
+repeat failures, closed with a recovery comment on the first green run. A run that
+reports no failures but did not actually complete its lanes counts as red ("unproven"),
+never as recovery. A `workflow_dispatch` with the `ref` input gates exactly that ref and
+reports under the separate `nightly-gate-drill` identity, so acceptance drills never
+touch the production issue; nothing scheduled drains a red drill's issue, so close it
+by hand or finish the drill with a green dispatch at the same ref.
+
+Deliberate exclusions: the release-i18n 21-locale lane (expected red mid-cycle, issue
+#2820) and the release version gate (cannot rot without a push, which ci.yml covers).
+GitHub registers a workflow's cron AND its `workflow_dispatch` surface from the default
+branch, so neither can fire until the file reaches `main` with a release merge; the
+first drill and the first manual pass both come after that.
+Planning logic: `scripts/lib/nightly_plan.mjs`, pinned by `tests/nightly_plan.test.ts`;
+the workflow shape is pinned by `tests/nightly_workflow.test.ts`.
 
 ### Judgment review
 

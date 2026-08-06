@@ -391,7 +391,8 @@ export const fr_FR: EnTranslations = {
     },
     "emoteEditor": {
       "title": "Emotes",
-      "done": "Terminé"
+      "done": "Terminé",
+      "close": "Close emotes"
     },
     "dailyRewards": {
       "title": "Récompenses quotidiennes",
@@ -1348,6 +1349,8 @@ export const fr_FR: EnTranslations = {
       "buttons": "Disposition des boutons",
       "resetButtons": "Réinitialiser la disposition des boutons",
       "menuAction": "Menu du jeu",
+      "zoomIn": "Zoom In",
+      "zoomOut": "Zoom Out",
       "help": "Le stick gauche déplace, le droit oriente la caméra. Ouvrez une fenêtre pour utiliser le pointeur à l'écran."
     },
     "perf": {
@@ -3147,7 +3150,8 @@ export const fr_FR: EnTranslations = {
         "raise_fallen": "Relever les morts (vagues périodiques de renforts)",
         "soul_rend": "Déchirement de l'âme (les joueurs marqués doivent s'écarter et être soignés)",
         "deathless_rage": "Fureur immortelle (interrompue aux pierres de garde)",
-        "wardstones": "Canaux des pierres de garde (transition de phase)"
+        "wardstones": "Canaux des pierres de garde (transition de phase)",
+        "dread_curse": "Dread Curse (heroic only, stacking tank-swap debuff)"
       }
     },
     "deeds": {
@@ -3555,16 +3559,21 @@ export const fr_FR: EnTranslations = {
       "groupInterface": "Interface",
       "groupCamera": "Caméra",
       "talents": "Talents",
+      "professions": "Professions",
       "arena": "Arène",
       "leaderboard": "Classement",
       "deeds": "Livre des hauts faits",
+      "sheathe": "Sheathe/Unsheathe Weapon",
       "crafting": "Artisanat",
       "valeCup": "Coupe du Val",
+      "mount": "Mount / Dismount",
       "calendar": "Calendrier des événements",
+      "dungeonFinder": "Dungeon Finder",
       "discord": "Discord",
       "abilities": "Utiliser les capacités de la barre d'action (la rangée de chiffres ; une seconde barre se trouve sur le pavé numérique)",
       "targetFriendly": "Cibler l'allié le plus proche",
       "cycleFriendly": "Cibler l'allié suivant",
+      "targetAuras": "Target buffs and debuffs",
       "gameMenu": "Ouvrir le menu et les options",
       "bothMouse": "Les deux boutons de la souris",
       "runForward": "Avancer",

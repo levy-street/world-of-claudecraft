@@ -391,7 +391,8 @@ export const sv_SE: EnTranslations = {
     },
     "emoteEditor": {
       "title": "Gester",
-      "done": "Klar"
+      "done": "Klar",
+      "close": "Close emotes"
     },
     "dailyRewards": {
       "title": "Dagliga belöningar",
@@ -1348,6 +1349,8 @@ export const sv_SE: EnTranslations = {
       "buttons": "Knapplayout",
       "resetButtons": "Återställ knapplayout",
       "menuAction": "Spelmeny",
+      "zoomIn": "Zoom In",
+      "zoomOut": "Zoom Out",
       "help": "Vänster spak rör sig, höger spak siktar. Öppna ett fönster för att använda skärmpekaren."
     },
     "perf": {
@@ -3147,7 +3150,8 @@ export const sv_SE: EnTranslations = {
         "raise_fallen": "Res de fallna (periodiska vågor av tillskott)",
         "soul_rend": "Själsrift (märkta spelare måste sprida sig och bli helade)",
         "deathless_rage": "Dödsfri vrede (avbryts vid väktarstenarna)",
-        "wardstones": "Väktarstenarnas kanaler (fasövergång)"
+        "wardstones": "Väktarstenarnas kanaler (fasövergång)",
+        "dread_curse": "Dread Curse (heroic only, stacking tank-swap debuff)"
       }
     },
     "deeds": {
@@ -3555,16 +3559,21 @@ export const sv_SE: EnTranslations = {
       "groupInterface": "Gränssnitt",
       "groupCamera": "Kamera",
       "talents": "Talanger",
+      "professions": "Professions",
       "arena": "Arena",
       "leaderboard": "Topplista",
       "deeds": "Bedrifternas bok",
+      "sheathe": "Sheathe/Unsheathe Weapon",
       "crafting": "Hantverk",
       "valeCup": "Dalcupen",
+      "mount": "Mount / Dismount",
       "calendar": "Händelsekalender",
+      "dungeonFinder": "Dungeon Finder",
       "discord": "Discord",
       "abilities": "Använd förmågor i handlingsfältet (sifferraden; ett andra fält ligger på det numeriska tangentbordet)",
       "targetFriendly": "Måla in närmaste vänliga",
       "cycleFriendly": "Växla mellan vänliga mål",
+      "targetAuras": "Target buffs and debuffs",
       "gameMenu": "Öppna spelmeny och alternativ",
       "bothMouse": "Båda musknapparna",
       "runForward": "Spring framåt",

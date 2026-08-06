@@ -168,6 +168,22 @@ describe('finder catalogue metadata', () => {
       expect(a.lockout, a.id).toBe(daily ? 'daily' : 'none');
     }
   });
+
+  it('the heroic Nythraxis raid preview carries Dread Curse; the normal tier does not', () => {
+    // Regression: NYTHRAXIS_RAID_ENCOUNTERS used to be shared between the
+    // normal and heroic FinderActivity entries, so the heroic-only Dread
+    // Curse tank-swap mechanic (src/sim/encounters/nythraxis.ts
+    // updateNythraxisDreadCurse) never appeared in the finder's mechanics
+    // preview. The heroic entry now carries its own encounter array.
+    const normal = finderActivity('nythraxis_boss_arena_normal');
+    const heroic = finderActivity('nythraxis_boss_arena_heroic');
+    expect(normal?.encounters.flatMap((e) => e.mechanics)).not.toContain('dread_curse');
+    expect(heroic?.encounters.flatMap((e) => e.mechanics)).toContain('dread_curse');
+    // Heroic keeps every normal-tier mechanic on top of the addition.
+    const normalMechanics = normal?.encounters.flatMap((e) => e.mechanics) ?? [];
+    const heroicMechanics = heroic?.encounters.flatMap((e) => e.mechanics) ?? [];
+    for (const m of normalMechanics) expect(heroicMechanics).toContain(m);
+  });
 });
 
 // ---------------------------------------------------------------------------

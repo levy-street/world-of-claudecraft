@@ -391,7 +391,8 @@ export const vi_VN: EnTranslations = {
     },
     "emoteEditor": {
       "title": "Biểu Cảm",
-      "done": "Xong"
+      "done": "Xong",
+      "close": "Close emotes"
     },
     "dailyRewards": {
       "title": "Phần Thưởng Hằng Ngày",
@@ -1348,6 +1349,8 @@ export const vi_VN: EnTranslations = {
       "buttons": "Bố Cục Nút",
       "resetButtons": "Đặt Lại Bố Cục Nút",
       "menuAction": "Menu Trò Chơi",
+      "zoomIn": "Zoom In",
+      "zoomOut": "Zoom Out",
       "help": "Cần trái để di chuyển, cần phải để quan sát. Mở một cửa sổ để dùng con trỏ trên màn hình."
     },
     "perf": {
@@ -3147,7 +3150,8 @@ export const vi_VN: EnTranslations = {
         "raise_fallen": "Triệu Hồi Tử Giả (các đợt quân tiếp viện theo chu kỳ)",
         "soul_rend": "Xé Hồn (người chơi bị đánh dấu phải tản ra và được hồi máu)",
         "deathless_rage": "Thịnh Nộ Bất Tử (bị gián đoạn tại các đá hộ mệnh)",
-        "wardstones": "Kênh đá hộ mệnh (chuyển giai đoạn)"
+        "wardstones": "Kênh đá hộ mệnh (chuyển giai đoạn)",
+        "dread_curse": "Dread Curse (heroic only, stacking tank-swap debuff)"
       }
     },
     "deeds": {
@@ -3555,16 +3559,21 @@ export const vi_VN: EnTranslations = {
       "groupInterface": "Giao diện",
       "groupCamera": "Máy quay",
       "talents": "Thiên Phú",
+      "professions": "Professions",
       "arena": "Đấu Trường",
       "leaderboard": "Bảng xếp hạng",
       "deeds": "Sách Kỳ Công",
+      "sheathe": "Sheathe/Unsheathe Weapon",
       "crafting": "Chế Tác",
       "valeCup": "Cúp Thung Lũng",
+      "mount": "Mount / Dismount",
       "calendar": "Lịch Sự Kiện",
+      "dungeonFinder": "Dungeon Finder",
       "discord": "Discord",
       "abilities": "Dùng kỹ năng trên thanh hành động (hàng số; một thanh thứ hai nằm trên bàn phím số)",
       "targetFriendly": "Chọn mục tiêu thân thiện gần nhất",
       "cycleFriendly": "Lần lượt chọn mục tiêu thân thiện",
+      "targetAuras": "Target buffs and debuffs",
       "gameMenu": "Mở menu trò chơi và tùy chọn",
       "bothMouse": "Cả Hai Nút Chuột",
       "runForward": "Chạy tới trước",

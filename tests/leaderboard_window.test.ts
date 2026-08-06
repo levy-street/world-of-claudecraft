@@ -340,6 +340,53 @@ describe('leaderboard_window: Renown (deeds) board tab', () => {
   });
 });
 
+describe('leaderboard_window: rank/level/virtual level/prestige render through formatNumber', () => {
+  // Every other numeric column on these rows (memberCount, mergedPrs, renown,
+  // points, the pager) already routes through formatNumber; rank, level,
+  // virtual level (including the guild board's top-member level, which reuses
+  // the same vlvl column) and prestige rank must match, not render raw.
+  it('formats the rank in every row builder (players, guilds, devs, deeds, daily)', () => {
+    expect(code).toMatch(
+      /class="lb-rank">\$\{formatNumber\(r\.rank, \{ maximumFractionDigits: 0 \}\)\}/,
+    );
+    const matches = code.match(
+      /class="lb-rank">\$\{formatNumber\(r\.rank, \{ maximumFractionDigits: 0 \}\)\}/g,
+    );
+    expect(matches?.length).toBe(5);
+    expect(code).not.toMatch(/class="lb-rank">\$\{r\.rank\}</);
+  });
+
+  it('formats the players-tab level and virtual level (row and sticky standing)', () => {
+    expect(code).toContain(
+      '<span class="lb-lvl">${formatNumber(r.level, { maximumFractionDigits: 0 })}</span>' +
+        '<span class="lb-vlvl">${formatNumber(r.virtualLevel, { maximumFractionDigits: 0 })}</span>',
+    );
+    expect(code).toContain(
+      '<span class="lb-lvl">${formatNumber(standing.level, { maximumFractionDigits: 0 })}</span>' +
+        '<span class="lb-vlvl">${formatNumber(standing.virtualLevel, { maximumFractionDigits: 0 })}</span>',
+    );
+    expect(code).not.toMatch(/\$\{r\.level\}|\$\{r\.virtualLevel\}/);
+    expect(code).not.toMatch(/\$\{standing\.level\}|\$\{standing\.virtualLevel\}/);
+  });
+
+  it('formats the guild board top-member level (the reused vlvl column)', () => {
+    expect(code).toContain(
+      '<span class="lb-vlvl">${formatNumber(r.topLevel, { maximumFractionDigits: 0 })}</span>',
+    );
+    expect(code).not.toMatch(/\$\{r\.topLevel\}/);
+  });
+
+  it('formats the prestige rank badge and its tooltip', () => {
+    expect(code).toMatch(
+      /&starf;\$\{formatNumber\(r\.prestigeRank, \{ maximumFractionDigits: 0 \}\)\}<\/span>/,
+    );
+    expect(code).toMatch(
+      /t\('game\.prestige\.rank'\)\} \$\{formatNumber\(r\.prestigeRank, \{ maximumFractionDigits: 0 \}\)\}/,
+    );
+    expect(code).not.toMatch(/&starf;\$\{r\.prestigeRank\}/);
+  });
+});
+
 describe('players (lifetime-XP) board: the Book of Deeds title column', () => {
   // The view-model carries the deed ID (leaderboard_view.test.ts); these pins
   // hold the players-tab RENDER arm added alongside the Renown tab's: the id
