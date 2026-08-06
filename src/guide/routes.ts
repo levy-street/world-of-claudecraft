@@ -162,6 +162,13 @@ export const GUIDE_ROUTES: GuideRoute[] = [
     descKey: 'guide.valeCupPage.intro',
   },
   {
+    id: 'thornhollow-fields',
+    sub: 'thornhollow-fields',
+    navKey: 'guide.nav.thornhollow',
+    group: 'compendium',
+    descKey: 'guide.thornhollowPage.intro',
+  },
+  {
     id: 'deeds',
     sub: 'deeds',
     navKey: 'guide.nav.deeds',

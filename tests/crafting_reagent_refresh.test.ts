@@ -306,7 +306,10 @@ describe('crafting window bag-freshness wiring (source pins)', () => {
     // Scoped to the method: moving the latch into the probe would leave every
     // other paint cause (the station edge, a craft, a tab switch, the open
     // itself) un-armed, and a whole-file pin would not notice.
-    const renderCrafting = region('private renderCrafting(): void {', 'closeCrafting(): void {');
+    const renderCrafting = region(
+      'private renderCrafting(focusReturnRecipeId = ',
+      'closeCrafting(): void {',
+    );
     expect(renderCrafting).toContain(
       'this.lastCraftingReagentSig = craftingReagentSig(this.sim.inventory, this.sim.player.name);',
     );
@@ -357,12 +360,16 @@ function craftingDeps() {
     hideTooltip: vi.fn(),
     onCraft: vi.fn(),
     onClose: vi.fn(),
+    onOpenOrders: vi.fn(),
     itemIcon: vi.fn(() => ''),
     moneyHtml: vi.fn(() => ''),
     itemTooltip: vi.fn(() => ''),
     attachTooltip: vi.fn(),
     commissionChecked: vi.fn((_recipeId: string) => false),
     onToggleCommission: vi.fn(),
+    craftQty: () => 1,
+    onCraftQty: vi.fn(),
+    announce: vi.fn(),
     selectedCraft: () => null as string | null,
     onSelectCraft: vi.fn(),
   };

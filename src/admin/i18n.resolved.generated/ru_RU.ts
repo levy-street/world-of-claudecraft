@@ -395,6 +395,8 @@ export const ru_RU: AdminTranslations = {
   "moderationHistory.actionKill": "Убит",
   "moderationHistory.actionJail": "Заключён под стражу",
   "moderationHistory.actionUnjail": "Освобождён из заключения",
+  "moderationHistory.actionSpectate": "Spectated",
+  "moderationHistory.actionUnspectate": "Stopped spectating",
   "moderationHistory.actionNote": "Примечание",
   "moderationHistory.actionResetPassword": "Сброс пароля",
   "moderationHistory.actionDailyRewardsBan": "Доступ к ежедневным наградам запрещён",

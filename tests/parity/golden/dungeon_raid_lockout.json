@@ -13,7 +13,7 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 968,
+      "nextId": 986,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -27,9 +27,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 973,
-      "state": "efff026e",
-      "events": "e242c77d",
+      "nextId": 991,
+      "state": "7abe2d30",
+      "events": "7c7e0f34",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -48,11 +48,11 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "partiesJoined": 1
@@ -67,7 +67,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 968,
+          "entityId": 986,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -111,11 +111,11 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "priest",
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "partiesJoined": 1
@@ -130,7 +130,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 969,
+          "entityId": 987,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -168,11 +168,11 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "priest",
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "partiesJoined": 1
@@ -187,7 +187,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 970,
+          "entityId": 988,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -225,11 +225,11 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "priest",
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "partiesJoined": 1
@@ -244,7 +244,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 971,
+          "entityId": 989,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -282,11 +282,11 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "priest",
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "partiesJoined": 1
@@ -301,7 +301,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 972,
+          "entityId": 990,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -340,7 +340,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 968
+              "sourceId": 986
             }
           ],
           "blockChance": 0.05,
@@ -353,7 +353,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 100,
-          "id": 968,
+          "id": 986,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -403,7 +403,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 51,
-          "id": 969,
+          "id": 987,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -453,7 +453,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 51,
-          "id": 970,
+          "id": 988,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -503,7 +503,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 51,
-          "id": 971,
+          "id": 989,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -553,7 +553,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 51,
-          "id": 972,
+          "id": 990,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -597,9 +597,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 973,
-      "state": "efff026e",
-      "events": "8a4b87b3",
+      "nextId": 991,
+      "state": "7abe2d30",
+      "events": "fad099f3",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -618,11 +618,11 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "partiesJoined": 1
@@ -637,7 +637,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 968,
+          "entityId": 986,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -681,11 +681,11 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "priest",
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "partiesJoined": 1
@@ -700,7 +700,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 969,
+          "entityId": 987,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -738,11 +738,11 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "priest",
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "partiesJoined": 1
@@ -757,7 +757,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 970,
+          "entityId": 988,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -795,11 +795,11 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "priest",
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "partiesJoined": 1
@@ -814,7 +814,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 971,
+          "entityId": 989,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -852,11 +852,11 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "priest",
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "partiesJoined": 1
@@ -871,7 +871,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 972,
+          "entityId": 990,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -910,7 +910,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 968
+              "sourceId": 986
             }
           ],
           "blockChance": 0.05,
@@ -923,7 +923,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 100,
-          "id": 968,
+          "id": 986,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -973,7 +973,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 51,
-          "id": 969,
+          "id": 987,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1023,7 +1023,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 51,
-          "id": 970,
+          "id": 988,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1073,7 +1073,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 51,
-          "id": 971,
+          "id": 989,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1123,7 +1123,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 51,
-          "id": 972,
+          "id": 990,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1167,9 +1167,9 @@
     {
       "tick": 1,
       "time": 0.05,
-      "nextId": 973,
-      "state": "5a8cd6be",
-      "events": "d70d4f63",
+      "nextId": 991,
+      "state": "840893ca",
+      "events": "6406f8e1",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1188,11 +1188,11 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "partiesJoined": 1
@@ -1213,7 +1213,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 968,
+          "entityId": 986,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1258,11 +1258,11 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "priest",
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "partiesJoined": 1
@@ -1283,7 +1283,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 969,
+          "entityId": 987,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -1322,11 +1322,11 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "priest",
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "partiesJoined": 1
@@ -1347,7 +1347,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 970,
+          "entityId": 988,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -1386,11 +1386,11 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "priest",
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "partiesJoined": 1
@@ -1411,7 +1411,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 971,
+          "entityId": 989,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -1450,11 +1450,11 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "priest",
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "partiesJoined": 1
@@ -1475,7 +1475,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 972,
+          "entityId": 990,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -1515,7 +1515,7 @@
               "name": "Battle Stance",
               "remaining": 3599.95,
               "school": "physical",
-              "sourceId": 968
+              "sourceId": 986
             }
           ],
           "blockChance": 0.05,
@@ -1528,7 +1528,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99.05,
           "hp": 100,
-          "id": 968,
+          "id": 986,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1578,7 +1578,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99.05,
           "hp": 51,
-          "id": 969,
+          "id": 987,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1628,7 +1628,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99.05,
           "hp": 51,
-          "id": 970,
+          "id": 988,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1678,7 +1678,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99.05,
           "hp": 51,
-          "id": 971,
+          "id": 989,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1728,7 +1728,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99.05,
           "hp": 51,
-          "id": 972,
+          "id": 990,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",

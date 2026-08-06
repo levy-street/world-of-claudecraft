@@ -641,7 +641,7 @@ describe('in-game moderation actions', () => {
 });
 
 describe('moderator spectate integration', () => {
-  it('re-scopes snapshots and events, gates gameplay, and restores the moderator', () => {
+  it('re-scopes snapshots and events, gates gameplay, and restores the moderator', async () => {
     const server = new GameServer();
     const moderatorWs = fakeWs();
     const suspectWs = fakeWs();
@@ -663,6 +663,10 @@ describe('moderator spectate integration', () => {
     server.sim.partyAccept(suspect.pid);
 
     command(server, moderator, '/spectate "Suspect"');
+    // The audit write (recordInGameAction) is awaited before the live effect
+    // applies, mirroring kick/kill/jail/unjail: the mocked audit resolves on
+    // the next microtask, so wait for it rather than asserting synchronously.
+    await vi.waitFor(() => expect(moderator.spectating).not.toBeNull());
 
     expect(moderator.spectating?.characterId).toBe(suspect.characterId);
     expect(moderatorEntity.pos.x).toBe(-10_000);
@@ -726,7 +730,7 @@ describe('moderator spectate integration', () => {
     expect(eventTexts(moderatorWs)).toContain('Local chat is unavailable while spectating.');
 
     command(server, moderator, '/unspectate');
-    expect(moderator.spectating).toBeNull();
+    await vi.waitFor(() => expect(moderator.spectating).toBeNull());
     expect(moderatorEntity.pos).toEqual(originalPos);
     expect(!!moderatorEntity.gm).toBe(originalGm);
     expect(frames(moderatorWs)).toContainEqual({
@@ -739,7 +743,7 @@ describe('moderator spectate integration', () => {
     });
   });
 
-  it('converges represented scene and choice state on spectate enter and exit', () => {
+  it('converges represented scene and choice state on spectate enter and exit', async () => {
     registerScene({
       id: 'scn_test_spectate_lock_convergence',
       duration: 10,
@@ -777,6 +781,9 @@ describe('moderator spectate integration', () => {
     moderatorWs.send.mockClear();
 
     command(server, moderator, '/spectate Suspect');
+    await vi.waitFor(() =>
+      expect(frames(moderatorWs).some((frame) => frame.t === 'spectate')).toBe(true),
+    );
 
     const entered = frames(moderatorWs).find((frame) => frame.t === 'spectate');
     expect(entered).toMatchObject({
@@ -803,6 +810,7 @@ describe('moderator spectate integration', () => {
 
     moderatorWs.send.mockClear();
     command(server, moderator, '/unspectate');
+    await vi.waitFor(() => expect(moderator.spectating).toBeNull());
 
     expect(frames(moderatorWs)).toContainEqual({
       t: 'spectate',
@@ -814,7 +822,7 @@ describe('moderator spectate integration', () => {
     });
   });
 
-  it('switches targets without moving the saved return point', () => {
+  it('switches targets without moving the saved return point', async () => {
     registerScene({
       id: 'scn_test_spectate_switch_first',
       duration: 10,
@@ -862,6 +870,7 @@ describe('moderator spectate integration', () => {
     moderatorWs.send.mockClear();
 
     command(server, moderator, '/spectate First');
+    await vi.waitFor(() => expect(moderator.spectating).not.toBeNull());
     if (!moderator.spectating) throw new Error('spectate did not start');
     const saved = { ...moderator.spectating.savedPos };
     expect(frames(moderatorWs).find((frame) => frame.t === 'spectate')).toMatchObject({
@@ -873,6 +882,7 @@ describe('moderator spectate integration', () => {
     moderatorWs.send.mockClear();
 
     command(server, moderator, '/spectate Second');
+    await vi.waitFor(() => expect(moderator.spectating?.characterId).toBe(second.characterId));
 
     expect(moderator.spectating?.characterId).toBe(second.characterId);
     expect(moderator.spectating?.savedPos).toEqual(saved);
@@ -883,6 +893,7 @@ describe('moderator spectate integration', () => {
       sceneChoiceState: { choiceId: 'ch_test_spectate_switch_second' },
     });
     command(server, moderator, '/unspectate');
+    await vi.waitFor(() => expect(moderator.spectating).toBeNull());
     expect(server.sim.entities.get(moderator.pid)?.pos).toEqual(original);
   });
 
@@ -948,7 +959,7 @@ describe('moderator spectate integration', () => {
     expect(server.sim.petOf(moderator.pid, true)?.name).toBe('Tracker');
 
     command(server, moderator, '/spectate Pettarget');
-    expect(server.sim.petOf(moderator.pid, true)).toBeNull();
+    await vi.waitFor(() => expect(server.sim.petOf(moderator.pid, true)).toBeNull());
     await server.saveCharacter(moderator);
 
     const saved = vi
@@ -959,7 +970,7 @@ describe('moderator spectate integration', () => {
     expect(server.sim.entities.get(moderator.pid)?.pos.x).toBe(-10_000);
 
     command(server, moderator, '/unspectate');
-    expect(server.sim.petOf(moderator.pid, true)?.name).toBe('Tracker');
+    await vi.waitFor(() => expect(server.sim.petOf(moderator.pid, true)?.name).toBe('Tracker'));
   });
 
   // Regression for the /spectate talent-reset bug: the heavy self block
@@ -969,7 +980,7 @@ describe('moderator spectate integration', () => {
   // default, 0), so without forcing selfHeavyDirty on enter/exit, the
   // moderator's own 'tal' field silently fails to resend after /unspectate
   // and the client stays mirrored on the spectated target's talents.
-  it('resends the moderator own talents (not the spectated target) after /unspectate', () => {
+  it('resends the moderator own talents (not the spectated target) after /unspectate', async () => {
     const server = new GameServer();
     const moderatorWs = fakeWs();
     const moderator = joined(
@@ -990,12 +1001,14 @@ describe('moderator spectate integration', () => {
     internals(server).broadcastSnapshots();
 
     command(server, moderator, '/spectate Suspect');
+    await vi.waitFor(() => expect(moderator.spectating).not.toBeNull());
     moderatorWs.send.mockClear();
     internals(server).broadcastSnapshots();
     const spectateSnap = frames(moderatorWs).find((frame) => frame.t === 'snap');
     expect(spectateSnap?.self?.tal?.alloc).toEqual(suspectMeta.talents);
 
     command(server, moderator, '/unspectate');
+    await vi.waitFor(() => expect(moderator.spectating).toBeNull());
     moderatorWs.send.mockClear();
     internals(server).broadcastSnapshots();
     const restoredSnap = frames(moderatorWs).find((frame) => frame.t === 'snap');

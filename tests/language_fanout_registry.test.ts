@@ -83,6 +83,7 @@ function stripComments(source: string): string {
 
 /** `call|gate`, the same key `hud_update_drive.test.ts` uses. */
 const FANOUT_ARMS: readonly string[] = [
+  'this.bgScoreboard.relocalize|',
   'this.syncDailyRewardsSurfaceLabels|',
   'this.storePromoCard.relocalize|',
   'this.refreshKeybindLabels|',
@@ -91,6 +92,7 @@ const FANOUT_ARMS: readonly string[] = [
   'this.riftTracker.relocalize|',
   'this.partyFramesPainter.relocalize|',
   'this.mapPainter.relocalize|',
+  'this.delvePainter.relocalize|',
   'this.targetFrameMover.relocalize|',
   'this.playerFrameMover.relocalize|',
   'this.partyFrameMover.relocalize|',
@@ -191,6 +193,12 @@ interface AnsweredSurface extends GatedModule {
 }
 
 const ANSWERED: readonly AnsweredSurface[] = [
+  {
+    file: 'hud/battleground/battleground_scoreboard_painter.ts',
+    memos: ['lastSig'],
+    answer: 'this.bgScoreboard.relocalize',
+    why: 'one signature over the whole match strip (score, timer, roster), so every localized label on it would sit in the old locale until the next score or tick moved the signature',
+  },
   {
     file: 'mount_race_controls.ts',
     memos: ['lastButtonVisible', 'lastCountdownMode', 'lastCountdownNumber'],

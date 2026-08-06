@@ -95,6 +95,9 @@ const baseEnTable = {
   // mount or select a mount without having purchased the riding skill from Marla.
   // Placeholder-free, so it registers in the EXACT matcher automatically.
   'error.ridingUntrained': 'You must learn to ride first. Find a riding trainer.',
+  // (The narrower "You can't ride while carrying the flag." row lived here
+  // until the mount ban widened to the whole battleground; its replacement is
+  // the BG_EXTRA errMountInBg RULE below, beside the mode's other refusals.)
   // Riding skill purchase (learnRiding in src/sim/mounts_training.ts).
   'error.ridingAlreadyLearned': 'You have already learned Riding.',
   'error.ridingTrainLevel': 'You must be level 20 to learn Riding.',
@@ -410,6 +413,12 @@ const baseEnTable = {
   'aura.temporalExhaustion': 'Temporal Exhaustion',
   // Cauterize's 5 min lockout debuff (combat/fire_mage.ts); survives death.
   'aura.cauterizeFatigue': 'Cauterize Fatigue',
+  'aura.carrierFatigue': 'Carrier Fatigue',
+  // The always-worn carried-flag buff; right-clicking it drops the flag on purpose.
+  'aura.carriedFlag': 'Carrying the Flag',
+  'aura.sprintRune': 'Sprint',
+  'aura.battleRune': 'Battle Rune',
+  'aura.wardRune': 'Ward Rune',
   'mechanic.warStomp': 'Shuddering Stomp',
   // Heroic warrior-mob anti-kite charge (MobTemplate.charge, src/sim/mob/charge.ts):
   // the stun debuff on the player and the {mechanic} in the "unleashes" line.
@@ -4150,6 +4159,11 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.recentKillRequired': '你需要最近完成一次击杀。',
     'aura.temporalExhaustion': '时光疲惫',
     'aura.cauterizeFatigue': '烧灼疲乏',
+    'aura.carrierFatigue': '旗手疲劳',
+    'aura.carriedFlag': '携带旗帜',
+    'aura.sprintRune': '疾跑',
+    'aura.battleRune': '战斗符文',
+    'aura.wardRune': '守护符文',
     'mechanic.charge': '突进',
     'aura.bladedEcho': '利刃回响',
     'aura.emboldened': '鼓舞',
@@ -4571,6 +4585,11 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.recentKillRequired': '你需要最近完成一次擊殺。',
     'aura.temporalExhaustion': '時光疲憊',
     'aura.cauterizeFatigue': '燒灼疲乏',
+    'aura.carrierFatigue': '旗手疲勞',
+    'aura.carriedFlag': '攜帶旗幟',
+    'aura.sprintRune': '疾跑',
+    'aura.battleRune': '戰鬥符文',
+    'aura.wardRune': '守護符文',
     'mechanic.charge': '猛衝',
     'aura.bladedEcho': '利刃迴響',
     'aura.emboldened': '壯膽',
@@ -5001,6 +5020,11 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.recentKillRequired': '최근에 처치한 적이 필요합니다.',
     'aura.temporalExhaustion': '시간의 탈진',
     'aura.cauterizeFatigue': '소작의 피로',
+    'aura.carrierFatigue': '기수 피로',
+    'aura.carriedFlag': '깃발 운반 중',
+    'aura.sprintRune': '질주',
+    'aura.battleRune': '전투 룬',
+    'aura.wardRune': '수호 룬',
     'mechanic.charge': '쇄도',
     'aura.bladedEcho': '칼날의 메아리',
     'aura.emboldened': '대담함',
@@ -5440,6 +5464,11 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.recentKillRequired': '直前に敵を倒している必要があります。',
     'aura.temporalExhaustion': '時の疲弊',
     'aura.cauterizeFatigue': '焼灼の疲労',
+    'aura.carrierFatigue': '旗手の疲弊',
+    'aura.carriedFlag': '旗を運搬中',
+    'aura.sprintRune': 'スプリント',
+    'aura.battleRune': 'バトルルーン',
+    'aura.wardRune': 'ウォードルーン',
     'mechanic.charge': '突撃',
     'aura.bladedEcho': '刃の残響',
     'aura.emboldened': '奮起',
@@ -6316,6 +6345,11 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.recentKillRequired': 'Нужно недавнее убийство.',
     'aura.temporalExhaustion': 'Временное истощение',
     'aura.cauterizeFatigue': 'Усталость от прижигания',
+    'aura.carrierFatigue': 'Усталость знаменосца',
+    'aura.carriedFlag': 'Несет флаг',
+    'aura.sprintRune': 'Спринт',
+    'aura.battleRune': 'Руна битвы',
+    'aura.wardRune': 'Руна защиты',
     'mechanic.charge': 'Натиск',
     'aura.bladedEcho': 'Клинковое эхо',
     'aura.emboldened': 'Ободрение',
@@ -8065,6 +8099,14 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   Tamed: 'aura.tamed',
   'Temporal Exhaustion': 'aura.temporalExhaustion',
   'Cauterize Fatigue': 'aura.cauterizeFatigue',
+  // Thornhollow Fields battleground auras (src/sim/social/battleground.ts): spawn
+  // protection, the carrier-fatigue vulnerability, the carried-flag buff, and the
+  // sprint-rune haste.
+  'Carrier Fatigue': 'aura.carrierFatigue',
+  'Carrying the Flag': 'aura.carriedFlag',
+  Sprint: 'aura.sprintRune',
+  'Battle Rune': 'aura.battleRune',
+  'Ward Rune': 'aura.wardRune',
   'Might of the Bear': 'aura.elixirBear',
   // Crafted alchemy elixir auras (content/profession_items.ts): the
   // buff_sta aura display name each crafted elixir pushes on use.
@@ -8497,6 +8539,687 @@ export const ARENA_EXTRA: Record<SupportedLanguage, Record<ArenaExtraKey, string
 function tArenaExtra(key: ArenaExtraKey, params?: InterpolationValues): string {
   const table = ARENA_EXTRA[getLanguage()] ?? ARENA_EXTRA.en;
   return interpolate(table[key] ?? ARENA_EXTRA.en[key], params);
+}
+
+// Thornhollow Fields 5v5 capture-the-flag emit strings (src/sim/social/battleground.ts).
+// English is authoritative; the non-Latin surfaces ship real fills (the M16
+// spirit) and the remaining locales fall back to English here until the
+// release-tier locale fill (the PR-tier S3 guard requires recognition only).
+type BgExtraKey =
+  | 'joinQueue'
+  | 'partyJoinQueue'
+  | 'leaveQueue'
+  | 'battleBegins'
+  | 'fightFor'
+  | 'seizeRune'
+  | 'seizeBattleRune'
+  | 'seizeWardRune'
+  | 'teamCrimson'
+  | 'teamAzure'
+  | 'errInBattleground'
+  | 'errQueueDead'
+  | 'errQueueInMatch'
+  | 'errMemberQueued'
+  | 'errNoFlag'
+  | 'errPartyTooLarge'
+  | 'errPartyLeaderOnly'
+  | 'errDelveDuringBg'
+  | 'errTalentsDuringBg'
+  | 'errLevelTooLow'
+  | 'errMemberLevelTooLow'
+  | 'heldAtGate'
+  // The whole-match mount ban (src/sim/mounts.ts). It lives in THIS table, not
+  // the mount rows in baseEnTable, because the rule and its wording belong to
+  // the battleground: every locale reuses the mode's own glossary for it.
+  | 'errMountInBg';
+
+const BG_EXTRA_EN: Record<BgExtraKey, string> = {
+  joinQueue: 'You join the Thornhollow Fields queue. Need {count} champions to start a match.',
+  partyJoinQueue: 'Your party of {count} joins the Thornhollow Fields queue.',
+  leaveQueue: 'You leave the Thornhollow Fields queue.',
+  battleBegins: 'The Thornhollow Fields battle begins: take their flag!',
+  fightFor: 'Thornhollow Fields: you fight for the {team}. First to {caps} captures wins.',
+  seizeRune: 'You seize a Sprint Rune!',
+  seizeBattleRune: 'You seize a Battle Rune!',
+  seizeWardRune: 'You seize a Ward Rune!',
+  teamCrimson: 'Crimson',
+  teamAzure: 'Azure',
+  errInBattleground: 'You are already in a battleground.',
+  errQueueDead: 'You cannot queue for Thornhollow Fields while dead.',
+  errQueueInMatch: 'You cannot queue for Thornhollow Fields while in another match.',
+  errMemberQueued: 'A party member is already queued or in a match.',
+  errNoFlag: 'There is no flag within reach.',
+  errPartyTooLarge: 'Your party is too large for Thornhollow Fields. It queues parties of up to 5.',
+  errPartyLeaderOnly: 'Only the party leader may queue your team for Thornhollow Fields.',
+  errDelveDuringBg: 'You cannot enter a delve during a battleground.',
+  errTalentsDuringBg: 'You cannot change talents during a battleground.',
+  errLevelTooLow: 'Thornhollow Fields requires level {level}.',
+  errMemberLevelTooLow: 'Every party member must be level {level} to queue for Thornhollow Fields.',
+  heldAtGate: 'The gates open when the battle begins.',
+  errMountInBg: "You can't ride in a battleground.",
+};
+
+export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
+  en: BG_EXTRA_EN,
+  zh_CN: {
+    joinQueue: '你加入了荆谷原野队列。需要{count}名勇士才能开始比赛。',
+    partyJoinQueue: '你的{count}人小队加入了荆谷原野队列。',
+    leaveQueue: '你离开了荆谷原野队列。',
+    battleBegins: '荆谷原野之战开始了:夺取他们的旗帜!',
+    fightFor: '荆谷原野:你为{team}而战。先夺得{caps}次旗帜者获胜。',
+    seizeRune: '你夺得了疾行符文!',
+    teamCrimson: '赤红队',
+    teamAzure: '蔚蓝队',
+    errInBattleground: '你已经在战场中了。',
+    errQueueDead: '死亡状态下无法排队进入荆谷原野。',
+    errQueueInMatch: '比赛进行中无法排队进入荆谷原野。',
+    errMemberQueued: '有队友已在队列或比赛中。',
+    errNoFlag: '附近没有可夺取的旗帜。',
+    errPartyTooLarge: '你的队伍人数超出荆谷原野上限。最多5人小队可排队。',
+    errPartyLeaderOnly: '只有队长才能让小队排入荆谷原野队列。',
+    errDelveDuringBg: '战场进行中无法进入探秘。',
+    errTalentsDuringBg: '战场进行中无法更改天赋。',
+    errLevelTooLow: '荆谷原野需要等级{level}。',
+    errMemberLevelTooLow: '所有小队成员必须达到等级{level}才能加入荆谷原野队列。',
+    seizeBattleRune: '你夺得了战斗符文!',
+    seizeWardRune: '你夺得了守护符文!',
+    heldAtGate: '战斗开始时城门才会打开。',
+    errMountInBg: '战场中无法骑乘坐骑。',
+  },
+  zh_TW: {
+    joinQueue: '你加入了荊谷原野佇列。需要{count}名勇士才能開始比賽。',
+    partyJoinQueue: '你的{count}人隊伍加入了荊谷原野佇列。',
+    leaveQueue: '你離開了荊谷原野佇列。',
+    battleBegins: '荊谷原野之戰開始了:奪取他們的旗幟!',
+    fightFor: '荊谷原野:你為{team}而戰。先奪得{caps}次旗幟者獲勝。',
+    seizeRune: '你奪得了疾行符文!',
+    teamCrimson: '赤紅隊',
+    teamAzure: '蔚藍隊',
+    errInBattleground: '你已經在戰場中了。',
+    errQueueDead: '死亡狀態下無法排隊進入荊谷原野。',
+    errQueueInMatch: '比賽進行中無法排隊進入荊谷原野。',
+    errMemberQueued: '有隊友已在佇列或比賽中。',
+    errNoFlag: '附近沒有可奪取的旗幟。',
+    errPartyTooLarge: '你的隊伍人數超出荊谷原野上限。最多5人隊伍可排隊。',
+    errPartyLeaderOnly: '只有隊長才能讓隊伍排入荊谷原野佇列。',
+    errDelveDuringBg: '戰場進行中無法進入探祕。',
+    errTalentsDuringBg: '戰場進行中無法更改天賦。',
+    errLevelTooLow: '荊谷原野需要等級{level}。',
+    errMemberLevelTooLow: '所有隊伍成員必須達到等級{level}才能加入荊谷原野佇列。',
+    seizeBattleRune: '你奪得了戰鬥符文!',
+    seizeWardRune: '你奪得了守護符文!',
+    heldAtGate: '戰鬥開始時城門才會打開。',
+    errMountInBg: '戰場中無法騎乘坐騎。',
+  },
+  ja_JP: {
+    joinQueue: 'ソーンホロウ平原のキューに参加しました。試合開始には{count}人の勇者が必要です。',
+    partyJoinQueue: '{count}人のパーティがソーンホロウ平原のキューに参加しました。',
+    leaveQueue: 'ソーンホロウ平原のキューから離脱しました。',
+    battleBegins: 'ソーンホロウ平原の戦いが始まった:敵の旗を奪え!',
+    fightFor:
+      'ソーンホロウ平原:あなたは{team}として戦います。先に{caps}回旗を奪取したチームの勝利です。',
+    seizeRune: 'スプリントルーンを手に入れた!',
+    teamCrimson: 'クリムゾン',
+    teamAzure: 'アズール',
+    errInBattleground: 'すでに戦場にいます。',
+    errQueueDead: '死亡中はソーンホロウ平原のキューに参加できません。',
+    errQueueInMatch: '別の試合中はソーンホロウ平原のキューに参加できません。',
+    errMemberQueued: 'パーティメンバーがすでにキューまたは試合に参加しています。',
+    errNoFlag: '手の届く範囲に旗がありません。',
+    errPartyTooLarge:
+      'パーティの人数がソーンホロウ平原の上限を超えています。参加できるのは最大5人です。',
+    errPartyLeaderOnly:
+      'ソーンホロウ平原のキューにパーティを登録できるのはパーティリーダーだけです。',
+    errDelveDuringBg: '戦場の最中はディレルヴに入れません。',
+    errTalentsDuringBg: '戦場の最中はタレントを変更できません。',
+    errLevelTooLow: 'ソーンホロウ平原にはレベル{level}が必要です。',
+    errMemberLevelTooLow:
+      'ソーンホロウ平原のキューに参加するには、パーティ全員がレベル{level}である必要があります。',
+    heldAtGate: '門は戦闘開始とともに開かれます。',
+    errMountInBg: '戦場では騎乗できません。',
+    seizeBattleRune: 'バトルルーンを手に入れた!',
+    seizeWardRune: 'ウォードルーンを手に入れた!',
+  },
+  ko_KR: {
+    joinQueue:
+      '쏜할로우 평원 대기열에 참가했습니다. 경기를 시작하려면 {count}명의 용사가 필요합니다.',
+    partyJoinQueue: '{count}명의 파티가 쏜할로우 평원 대기열에 참가했습니다.',
+    leaveQueue: '쏜할로우 평원 대기열에서 나왔습니다.',
+    battleBegins: '쏜할로우 평원 전투가 시작되었습니다. 적의 깃발을 빼앗으세요!',
+    fightFor:
+      '쏜할로우 평원: 당신은 {team} 소속으로 싸웁니다. 먼저 {caps}회 깃발을 탈취한 팀이 승리합니다.',
+    seizeRune: '질주 룬을 차지했습니다!',
+    teamCrimson: '진홍팀',
+    teamAzure: '청람팀',
+    errInBattleground: '이미 전장에 있습니다.',
+    errQueueDead: '죽은 상태로는 쏜할로우 평원 대기열에 참가할 수 없습니다.',
+    errQueueInMatch: '다른 경기 중에는 쏜할로우 평원 대기열에 참가할 수 없습니다.',
+    errMemberQueued: '파티원이 이미 대기열이나 경기에 참가 중입니다.',
+    errNoFlag: '근처에 잡을 수 있는 깃발이 없습니다.',
+    errPartyTooLarge:
+      '파티 인원이 쏜할로우 평원 제한을 초과합니다. 최대 5인 파티만 참가할 수 있습니다.',
+    errPartyLeaderOnly: '쏜할로우 평원 대기열에는 파티장만 파티를 등록할 수 있습니다.',
+    errDelveDuringBg: '전장 중에는 탐사에 들어갈 수 없습니다.',
+    errTalentsDuringBg: '전장 중에는 특성을 변경할 수 없습니다.',
+    errLevelTooLow: '쏜할로우 평원은 레벨 {level}부터 참가할 수 있습니다.',
+    errMemberLevelTooLow:
+      '쏜할로우 평원 대기열에 참가하려면 모든 파티원이 레벨 {level} 이상이어야 합니다.',
+    heldAtGate: '전투가 시작되면 성문이 열립니다.',
+    errMountInBg: '전장에서는 탈것을 탈 수 없습니다.',
+    seizeBattleRune: '전투 룬을 차지했습니다!',
+    seizeWardRune: '수호 룬을 차지했습니다!',
+  },
+  ru_RU: {
+    joinQueue: 'Вы встали в очередь Терновой Лощины. Для начала матча нужно {count} бойцов.',
+    partyJoinQueue: 'Ваша группа из {count} бойцов встала в очередь Терновой Лощины.',
+    leaveQueue: 'Вы покинули очередь Терновой Лощины.',
+    battleBegins: 'Битва за Терновую Лощину началась: захватите их флаг!',
+    fightFor:
+      'Терновая Лощина: вы сражаетесь за {team}. Побеждает команда, первой захватившая флаг {caps} раз.',
+    seizeRune: 'Вы подобрали руну спринта!',
+    teamCrimson: 'Багровых',
+    teamAzure: 'Лазурных',
+    errInBattleground: 'Вы уже находитесь на поле боя.',
+    errQueueDead: 'Нельзя встать в очередь Терновой Лощины, будучи мертвым.',
+    errQueueInMatch: 'Нельзя встать в очередь Терновой Лощины во время другого матча.',
+    errMemberQueued: 'Кто-то из группы уже в очереди или в матче.',
+    errNoFlag: 'Поблизости нет флага, который можно взять.',
+    errPartyTooLarge:
+      'Ваша группа слишком велика для Терновой Лощины. В очередь встают группы до 5 бойцов.',
+    errPartyLeaderOnly: 'Записать группу в очередь Терновой Лощины может только лидер группы.',
+    errDelveDuringBg: 'Нельзя войти в вылазку во время боя на поле боя.',
+    errTalentsDuringBg: 'Нельзя менять таланты во время боя на поле боя.',
+    errLevelTooLow: 'Для Терновой Лощины требуется уровень {level}.',
+    errMemberLevelTooLow:
+      'Чтобы встать в очередь Терновой Лощины, каждый в группе должен иметь уровень {level}.',
+    heldAtGate: 'Ворота откроются с началом битвы.',
+    errMountInBg: 'На поле боя нельзя ездить верхом.',
+    seizeBattleRune: 'Вы подобрали руну битвы!',
+    seizeWardRune: 'Вы подобрали руну защиты!',
+  },
+  en_CA: {
+    joinQueue: 'You join the Thornhollow Fields queue. Need {count} champions to start a match.',
+    partyJoinQueue: 'Your party of {count} joins the Thornhollow Fields queue.',
+    leaveQueue: 'You leave the Thornhollow Fields queue.',
+    battleBegins: 'The Thornhollow Fields battle begins: take their flag!',
+    fightFor: 'Thornhollow Fields: you fight for the {team}. First to {caps} captures wins.',
+    seizeRune: 'You seize a Sprint Rune!',
+    seizeBattleRune: 'You seize a Battle Rune!',
+    seizeWardRune: 'You seize a Ward Rune!',
+    teamCrimson: 'Crimson',
+    teamAzure: 'Azure',
+    errInBattleground: 'You are already in a battleground.',
+    errQueueDead: 'You cannot queue for Thornhollow Fields while dead.',
+    errQueueInMatch: 'You cannot queue for Thornhollow Fields while in another match.',
+    errMemberQueued: 'A party member is already queued or in a match.',
+    errNoFlag: 'There is no flag within reach.',
+    errPartyTooLarge:
+      'Your party is too large for Thornhollow Fields. It queues parties of up to 5.',
+    errPartyLeaderOnly: 'Only the party leader may queue your team for Thornhollow Fields.',
+    errDelveDuringBg: 'You cannot enter a delve during a battleground.',
+    errTalentsDuringBg: 'You cannot change talents during a battleground.',
+    errLevelTooLow: 'Thornhollow Fields requires level {level}.',
+    errMemberLevelTooLow:
+      'Every party member must be level {level} to queue for Thornhollow Fields.',
+    heldAtGate: 'The gates open when the battle begins.',
+    errMountInBg: "You can't ride in a battleground.",
+  },
+  es: {
+    joinQueue:
+      'Te unes a la cola de los Campos de Thornhollow. Se necesitan {count} campeones para iniciar el combate.',
+    partyJoinQueue: 'Tu grupo de {count} se une a la cola de los Campos de Thornhollow.',
+    leaveQueue: 'Sales de la cola de los Campos de Thornhollow.',
+    battleBegins: 'Comienza la batalla de los Campos de Thornhollow: ¡toma su bandera!',
+    fightFor:
+      'Campos de Thornhollow: luchas por el bando {team}. Gana el primer equipo que logre {caps} capturas.',
+    seizeRune: '¡Te apoderas de una Runa de Velocidad!',
+    seizeBattleRune: '¡Te apoderas de una Runa de Batalla!',
+    seizeWardRune: '¡Te apoderas de una Runa de Protección!',
+    teamCrimson: 'Carmesí',
+    teamAzure: 'Azur',
+    errInBattleground: 'Ya estás en un campo de batalla.',
+    errQueueDead: 'No puedes entrar en la cola de los Campos de Thornhollow estando muerto.',
+    errQueueInMatch:
+      'No puedes entrar en la cola de los Campos de Thornhollow mientras estás en otro combate.',
+    errMemberQueued: 'Un miembro del grupo ya está en cola o en un combate.',
+    errNoFlag: 'No hay ninguna bandera al alcance.',
+    errPartyTooLarge:
+      'Tu grupo es demasiado grande para los Campos de Thornhollow. La cola admite grupos de hasta 5.',
+    errPartyLeaderOnly:
+      'Solo el líder del grupo puede meter al grupo en la cola de los Campos de Thornhollow.',
+    errDelveDuringBg: 'No puedes entrar en una expedición durante un campo de batalla.',
+    errTalentsDuringBg: 'No puedes cambiar de talentos durante un campo de batalla.',
+    errLevelTooLow: 'Los Campos de Thornhollow requieren el nivel {level}.',
+    errMemberLevelTooLow:
+      'Todos los miembros del grupo deben ser de nivel {level} para entrar en la cola de los Campos de Thornhollow.',
+    heldAtGate: 'Las puertas se abren cuando comienza la batalla.',
+    errMountInBg: 'No puedes montar en un campo de batalla.',
+  },
+  es_ES: {
+    joinQueue:
+      'Te unes a la cola de los Campos de Thornhollow. Se necesitan {count} campeones para iniciar el combate.',
+    partyJoinQueue: 'Tu grupo de {count} se une a la cola de los Campos de Thornhollow.',
+    leaveQueue: 'Sales de la cola de los Campos de Thornhollow.',
+    battleBegins: 'Comienza la batalla de los Campos de Thornhollow: ¡toma su bandera!',
+    fightFor:
+      'Campos de Thornhollow: luchas por el bando {team}. Gana el primer equipo que logre {caps} capturas.',
+    seizeRune: '¡Te apoderas de una Runa de Velocidad!',
+    seizeBattleRune: '¡Te apoderas de una Runa de Batalla!',
+    seizeWardRune: '¡Te apoderas de una Runa de Protección!',
+    teamCrimson: 'Carmesí',
+    teamAzure: 'Azur',
+    errInBattleground: 'Ya estás en un campo de batalla.',
+    errQueueDead: 'No puedes entrar en la cola de los Campos de Thornhollow estando muerto.',
+    errQueueInMatch:
+      'No puedes entrar en la cola de los Campos de Thornhollow mientras estás en otro combate.',
+    errMemberQueued: 'Un miembro del grupo ya está en cola o en un combate.',
+    errNoFlag: 'No hay ninguna bandera al alcance.',
+    errPartyTooLarge:
+      'Tu grupo es demasiado grande para los Campos de Thornhollow. La cola admite grupos de hasta 5.',
+    errPartyLeaderOnly:
+      'Solo el líder del grupo puede meter al grupo en la cola de los Campos de Thornhollow.',
+    errDelveDuringBg: 'No puedes entrar en una expedición durante un campo de batalla.',
+    errTalentsDuringBg: 'No puedes cambiar de talentos durante un campo de batalla.',
+    errLevelTooLow: 'Los Campos de Thornhollow requieren el nivel {level}.',
+    errMemberLevelTooLow:
+      'Todos los miembros del grupo deben ser de nivel {level} para entrar en la cola de los Campos de Thornhollow.',
+    heldAtGate: 'Las puertas se abren cuando comienza la batalla.',
+    errMountInBg: 'No puedes montar en un campo de batalla.',
+  },
+  fr_FR: {
+    joinQueue:
+      'Vous rejoignez la file des Champs de Thornhollow. Il faut {count} champions pour lancer un combat.',
+    partyJoinQueue: 'Votre groupe de {count} rejoint la file des Champs de Thornhollow.',
+    leaveQueue: 'Vous quittez la file des Champs de Thornhollow.',
+    battleBegins: 'La bataille des Champs de Thornhollow commence : prenez leur drapeau !',
+    fightFor:
+      'Champs de Thornhollow : vous combattez pour {team}. La première équipe à {caps} captures l’emporte.',
+    seizeRune: 'Vous vous emparez d’une Rune de course !',
+    seizeBattleRune: 'Vous vous emparez d’une Rune de bataille !',
+    seizeWardRune: 'Vous vous emparez d’une Rune de protection !',
+    teamCrimson: 'les Cramoisis',
+    teamAzure: 'les Azurs',
+    errInBattleground: 'Vous êtes déjà sur un champ de bataille.',
+    errQueueDead: 'Vous ne pouvez pas rejoindre la file des Champs de Thornhollow en étant mort.',
+    errQueueInMatch:
+      'Vous ne pouvez pas rejoindre la file des Champs de Thornhollow pendant un autre combat.',
+    errMemberQueued: 'Un membre du groupe est déjà en file ou en combat.',
+    errNoFlag: 'Aucun drapeau à portée.',
+    errPartyTooLarge:
+      'Votre groupe est trop nombreux pour les Champs de Thornhollow. La file accepte les groupes jusqu’à 5.',
+    errPartyLeaderOnly:
+      'Seul le chef de groupe peut inscrire le groupe dans la file des Champs de Thornhollow.',
+    errDelveDuringBg: 'Vous ne pouvez pas entrer dans une plongée pendant un champ de bataille.',
+    errTalentsDuringBg: 'Vous ne pouvez pas changer de talents pendant un champ de bataille.',
+    errLevelTooLow: 'Les Champs de Thornhollow requièrent le niveau {level}.',
+    errMemberLevelTooLow:
+      'Chaque membre du groupe doit être de niveau {level} pour rejoindre la file des Champs de Thornhollow.',
+    heldAtGate: 'Les portes s’ouvrent au début de la bataille.',
+    errMountInBg: 'Vous ne pouvez pas monter en selle sur un champ de bataille.',
+  },
+  fr_CA: {
+    joinQueue:
+      'Vous rejoignez la file des Champs de Thornhollow. Il faut {count} champions pour lancer un combat.',
+    partyJoinQueue: 'Votre groupe de {count} rejoint la file des Champs de Thornhollow.',
+    leaveQueue: 'Vous quittez la file des Champs de Thornhollow.',
+    battleBegins: 'La bataille des Champs de Thornhollow commence : prenez leur drapeau !',
+    fightFor:
+      'Champs de Thornhollow : vous combattez pour {team}. La première équipe à {caps} captures l’emporte.',
+    seizeRune: 'Vous vous emparez d’une Rune de course !',
+    seizeBattleRune: 'Vous vous emparez d’une Rune de bataille !',
+    seizeWardRune: 'Vous vous emparez d’une Rune de protection !',
+    teamCrimson: 'les Cramoisis',
+    teamAzure: 'les Azurs',
+    errInBattleground: 'Vous êtes déjà sur un champ de bataille.',
+    errQueueDead: 'Vous ne pouvez pas rejoindre la file des Champs de Thornhollow en étant mort.',
+    errQueueInMatch:
+      'Vous ne pouvez pas rejoindre la file des Champs de Thornhollow pendant un autre combat.',
+    errMemberQueued: 'Un membre du groupe est déjà en file ou en combat.',
+    errNoFlag: 'Aucun drapeau à portée.',
+    errPartyTooLarge:
+      'Votre groupe est trop nombreux pour les Champs de Thornhollow. La file accepte les groupes jusqu’à 5.',
+    errPartyLeaderOnly:
+      'Seul le chef de groupe peut inscrire le groupe dans la file des Champs de Thornhollow.',
+    errDelveDuringBg: 'Vous ne pouvez pas entrer dans une plongée pendant un champ de bataille.',
+    errTalentsDuringBg: 'Vous ne pouvez pas changer de talents pendant un champ de bataille.',
+    errLevelTooLow: 'Les Champs de Thornhollow requièrent le niveau {level}.',
+    errMemberLevelTooLow:
+      'Chaque membre du groupe doit être de niveau {level} pour rejoindre la file des Champs de Thornhollow.',
+    heldAtGate: 'Les portes s’ouvrent au début de la bataille.',
+    errMountInBg: 'Vous ne pouvez pas monter en selle sur un champ de bataille.',
+  },
+  it_IT: {
+    joinQueue:
+      'Ti unisci alla coda dei Campi di Thornhollow. Servono {count} campioni per iniziare una partita.',
+    partyJoinQueue: 'Il tuo gruppo di {count} si unisce alla coda dei Campi di Thornhollow.',
+    leaveQueue: 'Esci dalla coda dei Campi di Thornhollow.',
+    battleBegins: 'La battaglia dei Campi di Thornhollow ha inizio: prendete la loro bandiera!',
+    fightFor:
+      'Campi di Thornhollow: combatti per {team}. Vince la prima squadra ad arrivare a {caps} catture.',
+    seizeRune: 'Ti impossessi di una Runa di Scatto!',
+    seizeBattleRune: 'Ti impossessi di una Runa di Battaglia!',
+    seizeWardRune: 'Ti impossessi di una Runa di Protezione!',
+    teamCrimson: 'i Cremisi',
+    teamAzure: 'gli Azzurri',
+    errInBattleground: 'Sei già in un campo di battaglia.',
+    errQueueDead: 'Non puoi entrare in coda per i Campi di Thornhollow da morto.',
+    errQueueInMatch:
+      'Non puoi entrare in coda per i Campi di Thornhollow mentre sei in un’altra partita.',
+    errMemberQueued: 'Un membro del gruppo è già in coda o in partita.',
+    errNoFlag: 'Non c’è nessuna bandiera a portata.',
+    errPartyTooLarge:
+      'Il tuo gruppo è troppo numeroso per i Campi di Thornhollow. La coda accetta gruppi fino a 5.',
+    errPartyLeaderOnly:
+      'Solo il capogruppo può mettere il gruppo in coda per i Campi di Thornhollow.',
+    errDelveDuringBg: 'Non puoi entrare in un’incursione durante un campo di battaglia.',
+    errTalentsDuringBg: 'Non puoi cambiare talenti durante un campo di battaglia.',
+    errLevelTooLow: 'I Campi di Thornhollow richiedono il livello {level}.',
+    errMemberLevelTooLow:
+      'Ogni membro del gruppo deve essere di livello {level} per entrare in coda per i Campi di Thornhollow.',
+    heldAtGate: 'I cancelli si aprono quando inizia la battaglia.',
+    errMountInBg: 'Non puoi cavalcare in un campo di battaglia.',
+  },
+  de_DE: {
+    joinQueue:
+      'Du reihst dich in die Warteschlange der Thornhollow-Felder ein. Für ein Match werden {count} Recken benötigt.',
+    partyJoinQueue:
+      'Deine Gruppe aus {count} reiht sich in die Warteschlange der Thornhollow-Felder ein.',
+    leaveQueue: 'Du verlässt die Warteschlange der Thornhollow-Felder.',
+    battleBegins: 'Die Schlacht um die Thornhollow-Felder beginnt: Erobert ihre Flagge!',
+    fightFor:
+      'Thornhollow-Felder: Du kämpfst für {team}. Wer zuerst {caps} Eroberungen schafft, gewinnt.',
+    seizeRune: 'Du schnappst dir eine Sprintrune!',
+    seizeBattleRune: 'Du schnappst dir eine Kampfrune!',
+    seizeWardRune: 'Du schnappst dir eine Schutzrune!',
+    teamCrimson: 'die Karmesinroten',
+    teamAzure: 'die Azurblauen',
+    errInBattleground: 'Du bist bereits auf einem Schlachtfeld.',
+    errQueueDead: 'Du kannst dich nicht für die Thornhollow-Felder anmelden, solange du tot bist.',
+    errQueueInMatch:
+      'Du kannst dich nicht für die Thornhollow-Felder anmelden, während du in einem anderen Match bist.',
+    errMemberQueued: 'Ein Gruppenmitglied ist bereits angemeldet oder in einem Match.',
+    errNoFlag: 'Keine Flagge in Reichweite.',
+    errPartyTooLarge:
+      'Deine Gruppe ist zu groß für die Thornhollow-Felder. Angemeldet werden Gruppen bis zu 5 Spielern.',
+    errPartyLeaderOnly:
+      'Nur der Gruppenleiter darf die Gruppe für die Thornhollow-Felder anmelden.',
+    errDelveDuringBg: 'Du kannst während eines Schlachtfelds keinen Tiefgang betreten.',
+    errTalentsDuringBg: 'Du kannst während eines Schlachtfelds keine Talente ändern.',
+    errLevelTooLow: 'Die Thornhollow-Felder erfordern Stufe {level}.',
+    errMemberLevelTooLow:
+      'Jedes Gruppenmitglied muss Stufe {level} sein, um sich für die Thornhollow-Felder anzumelden.',
+    heldAtGate: 'Die Tore öffnen sich, wenn die Schlacht beginnt.',
+    errMountInBg: 'Auf einem Schlachtfeld kannst du nicht reiten.',
+  },
+  pt_BR: {
+    joinQueue:
+      'Você entra na fila dos Campos de Thornhollow. São necessários {count} campeões para iniciar a partida.',
+    partyJoinQueue: 'Seu grupo de {count} entra na fila dos Campos de Thornhollow.',
+    leaveQueue: 'Você sai da fila dos Campos de Thornhollow.',
+    battleBegins: 'A batalha dos Campos de Thornhollow começa: tomem a bandeira deles!',
+    fightFor:
+      'Campos de Thornhollow: você luta pelos {team}. Vence a primeira equipe a chegar a {caps} capturas.',
+    seizeRune: 'Você toma uma Runa de Corrida!',
+    seizeBattleRune: 'Você toma uma Runa de Batalha!',
+    seizeWardRune: 'Você toma uma Runa de Proteção!',
+    teamCrimson: 'Carmesins',
+    teamAzure: 'Azuis',
+    errInBattleground: 'Você já está em um campo de batalha.',
+    errQueueDead: 'Você não pode entrar na fila dos Campos de Thornhollow enquanto estiver morto.',
+    errQueueInMatch:
+      'Você não pode entrar na fila dos Campos de Thornhollow durante outra partida.',
+    errMemberQueued: 'Um membro do grupo já está na fila ou em uma partida.',
+    errNoFlag: 'Não há nenhuma bandeira ao alcance.',
+    errPartyTooLarge:
+      'Seu grupo é grande demais para os Campos de Thornhollow. A fila aceita grupos de até 5.',
+    errPartyLeaderOnly:
+      'Apenas o líder do grupo pode inscrever o grupo na fila dos Campos de Thornhollow.',
+    errDelveDuringBg: 'Você não pode entrar em uma incursão durante um campo de batalha.',
+    errTalentsDuringBg: 'Você não pode mudar talentos durante um campo de batalha.',
+    errLevelTooLow: 'Os Campos de Thornhollow exigem nível {level}.',
+    errMemberLevelTooLow:
+      'Todos os membros do grupo precisam ser nível {level} para entrar na fila dos Campos de Thornhollow.',
+    heldAtGate: 'Os portões se abrem quando a batalha começa.',
+    errMountInBg: 'Você não pode montar em um campo de batalha.',
+  },
+  cs_CZ: {
+    joinQueue:
+      'Zařadil(a) ses do fronty na Thornhollowská pole. K zahájení zápasu je potřeba {count} šampionů.',
+    partyJoinQueue: 'Tvá skupina o {count} hráčích se zařadila do fronty na Thornhollowská pole.',
+    leaveQueue: 'Opustil(a) jsi frontu na Thornhollowská pole.',
+    battleBegins: 'Bitva o Thornhollowská pole začíná: seberte jim vlajku!',
+    fightFor:
+      'Thornhollowská pole: bojuješ za {team}. Vítězí tým, který první získá vlajku {caps}krát.',
+    seizeRune: 'Zmocnil(a) ses Runy sprintu!',
+    seizeBattleRune: 'Zmocnil(a) ses Runy boje!',
+    seizeWardRune: 'Zmocnil(a) ses Runy ochrany!',
+    teamCrimson: 'Rudé',
+    teamAzure: 'Azurové',
+    errInBattleground: 'Už jsi na bojišti.',
+    errQueueDead: 'Do fronty na Thornhollowská pole se nemůžeš zařadit mrtvý.',
+    errQueueInMatch: 'Do fronty na Thornhollowská pole se nemůžeš zařadit během jiného zápasu.',
+    errMemberQueued: 'Někdo ze skupiny už je ve frontě nebo v zápase.',
+    errNoFlag: 'V dosahu není žádná vlajka.',
+    errPartyTooLarge:
+      'Tvá skupina je na Thornhollowská pole příliš velká. Do fronty se řadí skupiny až po 5 hráčích.',
+    errPartyLeaderOnly: 'Do fronty na Thornhollowská pole může skupinu zařadit jen vůdce skupiny.',
+    errDelveDuringBg: 'Během bojiště nemůžeš vstoupit do výpravy.',
+    errTalentsDuringBg: 'Během bojiště nemůžeš měnit talenty.',
+    errLevelTooLow: 'Thornhollowská pole vyžadují úroveň {level}.',
+    errMemberLevelTooLow:
+      'Každý ve skupině musí mít úroveň {level}, aby se mohl zařadit do fronty na Thornhollowská pole.',
+    heldAtGate: 'Brány se otevřou, až začne bitva.',
+    errMountInBg: 'Na bojišti nemůžeš používat jezdecké zvíře.',
+  },
+  nl_NL: {
+    joinQueue:
+      'Je sluit je aan bij de wachtrij van de Doornholte-Velden. Er zijn {count} kampioenen nodig om een wedstrijd te starten.',
+    partyJoinQueue: 'Je groep van {count} sluit zich aan bij de wachtrij van de Doornholte-Velden.',
+    leaveQueue: 'Je verlaat de wachtrij van de Doornholte-Velden.',
+    battleBegins: 'De slag om de Doornholte-Velden begint: pak hun vlag!',
+    fightFor:
+      'Doornholte-Velden: je vecht voor {team}. Het eerste team met {caps} veroveringen wint.',
+    seizeRune: 'Je bemachtigt een Sprintrune!',
+    seizeBattleRune: 'Je bemachtigt een Strijdrune!',
+    seizeWardRune: 'Je bemachtigt een Wachtrune!',
+    teamCrimson: 'de Karmozijnen',
+    teamAzure: 'de Azuren',
+    errInBattleground: 'Je bent al op een slagveld.',
+    errQueueDead: 'Je kunt je niet aanmelden voor de Doornholte-Velden terwijl je dood bent.',
+    errQueueInMatch:
+      'Je kunt je niet aanmelden voor de Doornholte-Velden tijdens een andere wedstrijd.',
+    errMemberQueued: 'Een groepslid staat al in de wachtrij of zit in een wedstrijd.',
+    errNoFlag: 'Er is geen vlag binnen bereik.',
+    errPartyTooLarge:
+      'Je groep is te groot voor de Doornholte-Velden. De wachtrij neemt groepen tot 5 spelers.',
+    errPartyLeaderOnly:
+      'Alleen de groepsleider mag de groep in de wachtrij zetten voor de Doornholte-Velden.',
+    errDelveDuringBg: 'Je kunt tijdens een slagveld geen delve betreden.',
+    errTalentsDuringBg: 'Je kunt tijdens een slagveld geen talenten wijzigen.',
+    errLevelTooLow: 'De Doornholte-Velden vereisen niveau {level}.',
+    errMemberLevelTooLow:
+      'Elk groepslid moet niveau {level} zijn om zich aan te melden voor de Doornholte-Velden.',
+    heldAtGate: 'De poorten gaan open zodra de slag begint.',
+    errMountInBg: 'Je kunt niet rijden op een slagveld.',
+  },
+  pl_PL: {
+    joinQueue:
+      'Dołączasz do kolejki na Pola Ciernistej Kotliny. Do rozpoczęcia meczu potrzeba {count} mistrzów.',
+    partyJoinQueue: 'Twoja {count}-osobowa drużyna dołącza do kolejki na Pola Ciernistej Kotliny.',
+    leaveQueue: 'Opuszczasz kolejkę na Pola Ciernistej Kotliny.',
+    battleBegins: 'Bitwa o Pola Ciernistej Kotliny się zaczyna: zabierzcie im flagę!',
+    fightFor:
+      'Pola Ciernistej Kotliny: walczysz po stronie {team}. Wygrywa drużyna, która pierwsza zdobędzie flagę {caps} razy.',
+    seizeRune: 'Zdobywasz Runę Sprintu!',
+    seizeBattleRune: 'Zdobywasz Runę Bitwy!',
+    seizeWardRune: 'Zdobywasz Runę Ochrony!',
+    teamCrimson: 'Szkarłatnych',
+    teamAzure: 'Lazurowych',
+    errInBattleground: 'Jesteś już na polu bitwy.',
+    errQueueDead: 'Nie możesz dołączyć do kolejki na Pola Ciernistej Kotliny, będąc martwym.',
+    errQueueInMatch:
+      'Nie możesz dołączyć do kolejki na Pola Ciernistej Kotliny w trakcie innego meczu.',
+    errMemberQueued: 'Ktoś z drużyny jest już w kolejce lub w meczu.',
+    errNoFlag: 'W zasięgu nie ma żadnej flagi.',
+    errPartyTooLarge:
+      'Twoja drużyna jest za duża na Pola Ciernistej Kotliny. Do kolejki wchodzą drużyny do 5 osób.',
+    errPartyLeaderOnly: 'Tylko przywódca drużyny może zapisać drużynę na Pola Ciernistej Kotliny.',
+    errDelveDuringBg: 'Nie możesz wejść do wyprawy w trakcie pola bitwy.',
+    errTalentsDuringBg: 'Nie możesz zmieniać talentów w trakcie pola bitwy.',
+    errLevelTooLow: 'Pola Ciernistej Kotliny wymagają poziomu {level}.',
+    errMemberLevelTooLow:
+      'Każdy członek drużyny musi mieć poziom {level}, aby dołączyć do kolejki na Pola Ciernistej Kotliny.',
+    heldAtGate: 'Bramy otwierają się wraz z początkiem bitwy.',
+    errMountInBg: 'Na polu bitwy nie możesz dosiadać wierzchowca.',
+  },
+  id_ID: {
+    joinQueue:
+      'Kamu masuk antrean Padang Thornhollow. Butuh {count} juara untuk memulai pertandingan.',
+    partyJoinQueue: 'Kelompokmu yang berisi {count} orang masuk antrean Padang Thornhollow.',
+    leaveQueue: 'Kamu keluar dari antrean Padang Thornhollow.',
+    battleBegins: 'Pertempuran Padang Thornhollow dimulai: rebut bendera mereka!',
+    fightFor:
+      'Padang Thornhollow: kamu bertarung untuk {team}. Tim pertama yang meraih {caps} tangkapan menang.',
+    seizeRune: 'Kamu merebut Rune Lari Cepat!',
+    seizeBattleRune: 'Kamu merebut Rune Pertempuran!',
+    seizeWardRune: 'Kamu merebut Rune Pelindung!',
+    teamCrimson: 'Merah Tua',
+    teamAzure: 'Biru Langit',
+    errInBattleground: 'Kamu sudah berada di medan perang.',
+    errQueueDead: 'Kamu tidak bisa mengantre Padang Thornhollow saat tewas.',
+    errQueueInMatch:
+      'Kamu tidak bisa mengantre Padang Thornhollow saat sedang dalam pertandingan lain.',
+    errMemberQueued: 'Seorang anggota kelompok sudah mengantre atau sedang bertanding.',
+    errNoFlag: 'Tidak ada bendera dalam jangkauan.',
+    errPartyTooLarge:
+      'Kelompokmu terlalu besar untuk Padang Thornhollow. Antrean menerima kelompok hingga 5 orang.',
+    errPartyLeaderOnly:
+      'Hanya pemimpin kelompok yang boleh mendaftarkan kelompok ke antrean Padang Thornhollow.',
+    errDelveDuringBg: 'Kamu tidak bisa memasuki delve selama medan perang berlangsung.',
+    errTalentsDuringBg: 'Kamu tidak bisa mengubah talenta selama medan perang berlangsung.',
+    errLevelTooLow: 'Padang Thornhollow membutuhkan level {level}.',
+    errMemberLevelTooLow:
+      'Setiap anggota kelompok harus level {level} untuk mengantre Padang Thornhollow.',
+    heldAtGate: 'Gerbang terbuka saat pertempuran dimulai.',
+    errMountInBg: 'Kamu tidak bisa menunggang tunggangan di medan perang.',
+  },
+  tr_TR: {
+    joinQueue:
+      'Dikenvadi Ovaları sırasına katıldın. Maçın başlaması için {count} şampiyon gerekiyor.',
+    partyJoinQueue: '{count} kişilik grubun Dikenvadi Ovaları sırasına katıldı.',
+    leaveQueue: 'Dikenvadi Ovaları sırasından ayrıldın.',
+    battleBegins: 'Dikenvadi Ovaları savaşı başlıyor: bayraklarını kapın!',
+    fightFor: 'Dikenvadi Ovaları: {team} için savaşıyorsun. {caps} bayrak kapan ilk takım kazanır.',
+    seizeRune: 'Bir Koşu Rünü ele geçirdin!',
+    seizeBattleRune: 'Bir Savaş Rünü ele geçirdin!',
+    seizeWardRune: 'Bir Koruma Rünü ele geçirdin!',
+    teamCrimson: 'Kızıllar',
+    teamAzure: 'Gökmaviler',
+    errInBattleground: 'Zaten bir savaş alanındasın.',
+    errQueueDead: 'Ölüyken Dikenvadi Ovaları sırasına giremezsin.',
+    errQueueInMatch: 'Başka bir maçtayken Dikenvadi Ovaları sırasına giremezsin.',
+    errMemberQueued: 'Grup üyelerinden biri zaten sırada ya da bir maçta.',
+    errNoFlag: 'Menzilde bayrak yok.',
+    errPartyTooLarge:
+      'Grubun Dikenvadi Ovaları için fazla kalabalık. Sıraya en fazla 5 kişilik gruplar girebilir.',
+    errPartyLeaderOnly: 'Grubu Dikenvadi Ovaları sırasına yalnızca grup lideri sokabilir.',
+    errDelveDuringBg: 'Savaş alanı sürerken Mağara Seferine giremezsin.',
+    errTalentsDuringBg: 'Savaş alanı sürerken yetenek değiştiremezsin.',
+    errLevelTooLow: 'Dikenvadi Ovaları için {level}. seviye gerekir.',
+    errMemberLevelTooLow:
+      'Dikenvadi Ovaları sırasına girmek için grubun her üyesi {level}. seviye olmalı.',
+    heldAtGate: 'Savaş başlayınca kapılar açılır.',
+    errMountInBg: 'Savaş alanında binek kullanamazsın.',
+  },
+  sv_SE: {
+    joinQueue:
+      'Du ställer dig i kön till Törnhålefälten. Det behövs {count} mästare för att starta en match.',
+    partyJoinQueue: 'Din grupp på {count} ställer sig i kön till Törnhålefälten.',
+    leaveQueue: 'Du lämnar kön till Törnhålefälten.',
+    battleBegins: 'Slaget om Törnhålefälten börjar: ta deras flagga!',
+    fightFor: 'Törnhålefälten: du strider för {team}. Först till {caps} erövringar vinner.',
+    seizeRune: 'Du lägger beslag på en Spurtruna!',
+    seizeBattleRune: 'Du lägger beslag på en Stridsruna!',
+    seizeWardRune: 'Du lägger beslag på en Skyddsruna!',
+    teamCrimson: 'de Karmosinröda',
+    teamAzure: 'de Azurblå',
+    errInBattleground: 'Du är redan på ett slagfält.',
+    errQueueDead: 'Du kan inte köa till Törnhålefälten medan du är död.',
+    errQueueInMatch: 'Du kan inte köa till Törnhålefälten under en annan match.',
+    errMemberQueued: 'En gruppmedlem står redan i kö eller är i en match.',
+    errNoFlag: 'Det finns ingen flagga inom räckhåll.',
+    errPartyTooLarge: 'Din grupp är för stor för Törnhålefälten. Kön tar grupper på upp till 5.',
+    errPartyLeaderOnly: 'Endast gruppledaren får ställa gruppen i kö till Törnhålefälten.',
+    errDelveDuringBg: 'Du kan inte gå in i en delve under ett slagfält.',
+    errTalentsDuringBg: 'Du kan inte byta talanger under ett slagfält.',
+    errLevelTooLow: 'Törnhålefälten kräver nivå {level}.',
+    errMemberLevelTooLow:
+      'Varje gruppmedlem måste vara nivå {level} för att köa till Törnhålefälten.',
+    heldAtGate: 'Portarna öppnas när slaget börjar.',
+    errMountInBg: 'Du kan inte rida på ett slagfält.',
+  },
+  vi_VN: {
+    joinQueue: 'Bạn vào hàng chờ Cánh Đồng Thung Gai. Cần {count} nhà vô địch để bắt đầu trận đấu.',
+    partyJoinQueue: 'Tổ đội {count} người của bạn vào hàng chờ Cánh Đồng Thung Gai.',
+    leaveQueue: 'Bạn rời hàng chờ Cánh Đồng Thung Gai.',
+    battleBegins: 'Trận chiến Cánh Đồng Thung Gai bắt đầu: hãy cướp cờ của chúng!',
+    fightFor:
+      'Cánh Đồng Thung Gai: bạn chiến đấu cho {team}. Đội đầu tiên đạt {caps} lần cướp cờ sẽ thắng.',
+    seizeRune: 'Bạn giành được Rune Nước Rút!',
+    seizeBattleRune: 'Bạn giành được Rune Chiến Trận!',
+    seizeWardRune: 'Bạn giành được Rune Hộ Vệ!',
+    teamCrimson: 'phe Đỏ Thẫm',
+    teamAzure: 'phe Xanh Biếc',
+    errInBattleground: 'Bạn đã ở trong một chiến trường rồi.',
+    errQueueDead: 'Bạn không thể vào hàng chờ Cánh Đồng Thung Gai khi đã chết.',
+    errQueueInMatch: 'Bạn không thể vào hàng chờ Cánh Đồng Thung Gai khi đang ở trận đấu khác.',
+    errMemberQueued: 'Một thành viên tổ đội đã ở trong hàng chờ hoặc đang thi đấu.',
+    errNoFlag: 'Không có lá cờ nào trong tầm với.',
+    errPartyTooLarge:
+      'Tổ đội của bạn quá đông cho Cánh Đồng Thung Gai. Hàng chờ chỉ nhận tổ đội tối đa 5 người.',
+    errPartyLeaderOnly: 'Chỉ nhóm trưởng mới có thể đưa tổ đội vào hàng chờ Cánh Đồng Thung Gai.',
+    errDelveDuringBg: 'Bạn không thể vào Hang Sâu trong lúc đang ở chiến trường.',
+    errTalentsDuringBg: 'Bạn không thể đổi thiên phú trong lúc đang ở chiến trường.',
+    errLevelTooLow: 'Cánh Đồng Thung Gai yêu cầu cấp {level}.',
+    errMemberLevelTooLow:
+      'Mọi thành viên tổ đội phải đạt cấp {level} để vào hàng chờ Cánh Đồng Thung Gai.',
+    heldAtGate: 'Cổng sẽ mở khi trận chiến bắt đầu.',
+    errMountInBg: 'Bạn không thể cưỡi thú cưỡi ở chiến trường.',
+  },
+  da_DK: {
+    joinQueue:
+      'Du stiller dig i køen til Tornehule Sletter. Der mangler {count} mestre for at starte en kamp.',
+    partyJoinQueue: 'Din gruppe på {count} stiller sig i køen til Tornehule Sletter.',
+    leaveQueue: 'Du forlader køen til Tornehule Sletter.',
+    battleBegins: 'Slaget om Tornehule Sletter begynder: tag deres flag!',
+    fightFor:
+      'Tornehule Sletter: du kæmper for {team}. Det første hold med {caps} erobringer vinder.',
+    seizeRune: 'Du snupper en Spurtrune!',
+    seizeBattleRune: 'Du snupper en Kamprune!',
+    seizeWardRune: 'Du snupper en Værnerune!',
+    teamCrimson: 'de Karmosinrøde',
+    teamAzure: 'de Azurblå',
+    errInBattleground: 'Du er allerede på en slagmark.',
+    errQueueDead: 'Du kan ikke stille dig i kø til Tornehule Sletter, mens du er død.',
+    errQueueInMatch: 'Du kan ikke stille dig i kø til Tornehule Sletter under en anden kamp.',
+    errMemberQueued: 'Et gruppemedlem står allerede i kø eller er i en kamp.',
+    errNoFlag: 'Der er intet flag inden for rækkevidde.',
+    errPartyTooLarge:
+      'Din gruppe er for stor til Tornehule Sletter. Køen tager grupper på op til 5.',
+    errPartyLeaderOnly: 'Kun gruppelederen kan stille gruppen i kø til Tornehule Sletter.',
+    errDelveDuringBg: 'Du kan ikke gå ind i en delve under en slagmark.',
+    errTalentsDuringBg: 'Du kan ikke skifte talenter under en slagmark.',
+    errLevelTooLow: 'Tornehule Sletter kræver niveau {level}.',
+    errMemberLevelTooLow:
+      'Hvert gruppemedlem skal være niveau {level} for at stille sig i kø til Tornehule Sletter.',
+    heldAtGate: 'Portene åbner, når slaget begynder.',
+    errMountInBg: 'Du kan ikke ride på en slagmark.',
+  },
+};
+
+function tBg(key: BgExtraKey, params?: InterpolationValues): string {
+  const table = BG_EXTRA[getLanguage()] ?? BG_EXTRA.en;
+  return interpolate(table[key] ?? BG_EXTRA_EN[key], params);
 }
 
 type QuestExtraKey =
@@ -9693,6 +10416,83 @@ const RULES: Rule[] = [
   {
     re: /^(.+) cannot queue from inside an instance\.$/,
     build: (m) => tArenaExtra('memberInstance', { name: m[1] }),
+  },
+  // Thornhollow Fields 5v5 capture-the-flag (src/sim/social/battleground.ts emits).
+  {
+    re: /^You join the Thornhollow Fields queue\. Need (.+?) champions to start a match\.$/,
+    build: (m) => tBg('joinQueue', { count: m[1] }),
+  },
+  {
+    re: /^Your party of (.+?) joins the Thornhollow Fields queue\.$/,
+    build: (m) => tBg('partyJoinQueue', { count: m[1] }),
+  },
+  { re: /^You leave the Thornhollow Fields queue\.$/, build: () => tBg('leaveQueue') },
+  {
+    re: /^The Thornhollow Fields battle begins: take their flag!$/,
+    build: () => tBg('battleBegins'),
+  },
+  {
+    re: /^Thornhollow Fields: you fight for the (.+?)\. First to (.+?) captures wins\.$/,
+    build: (m) =>
+      tBg('fightFor', {
+        team: m[1] === 'Crimson' ? tBg('teamCrimson') : m[1] === 'Azure' ? tBg('teamAzure') : m[1],
+        caps: m[2],
+      }),
+  },
+  { re: /^You seize a Sprint Rune!$/, build: () => tBg('seizeRune') },
+  { re: /^You seize a Battle Rune!$/, build: () => tBg('seizeBattleRune') },
+  { re: /^You seize a Ward Rune!$/, build: () => tBg('seizeWardRune') },
+  { re: /^You are already in a battleground\.$/, build: () => tBg('errInBattleground') },
+  {
+    re: /^You cannot queue for Thornhollow Fields while dead\.$/,
+    build: () => tBg('errQueueDead'),
+  },
+  {
+    re: /^You cannot queue for Thornhollow Fields while in another match\.$/,
+    build: () => tBg('errQueueInMatch'),
+  },
+  {
+    re: /^A party member is already queued or in a match\.$/,
+    build: () => tBg('errMemberQueued'),
+  },
+  { re: /^There is no flag within reach\.$/, build: () => tBg('errNoFlag') },
+  {
+    re: /^Your party is too large for Thornhollow Fields\. It queues parties of up to (.+?)\.$/,
+    build: () => tBg('errPartyTooLarge'),
+  },
+  // Ahead of the broad `Only the party leader may queue your team for (.+)\.`
+  // fiesta rule below, which would otherwise splice the English venue name into
+  // an otherwise localized sentence.
+  {
+    re: /^Only the party leader may queue your team for Thornhollow Fields\.$/,
+    build: () => tBg('errPartyLeaderOnly'),
+  },
+  {
+    re: /^You cannot enter a delve during a battleground\.$/,
+    build: () => tBg('errDelveDuringBg'),
+  },
+  {
+    re: /^You cannot change talents during a battleground\.$/,
+    build: () => tBg('errTalentsDuringBg'),
+  },
+  {
+    re: /^Thornhollow Fields requires level (\d+)\.$/,
+    build: (m) => tBg('errLevelTooLow', { level: m[1] }),
+  },
+  {
+    re: /^Every party member must be level (\d+) to queue for Thornhollow Fields\.$/,
+    build: (m) => tBg('errMemberLevelTooLow', { level: m[1] }),
+  },
+  {
+    re: /^The gates open when the battle begins\.$/,
+    build: () => tBg('heldAtGate'),
+  },
+  // The whole-match mount ban (src/sim/mounts.ts summonMountItem + the
+  // toggleMount lesson branch). It replaced the narrower carrying-the-flag
+  // refusal, whose baseEnTable row went in the same change.
+  {
+    re: /^You can't ride in a battleground\.$/,
+    build: () => tBg('errMountInBg'),
   },
   // Delve / lockpicking sim text. Re-localized through t() against the sim.delve.* /
   // sim.lockpick.* keys (src/ui/i18n.catalog/index.ts). The module-enter banner is two

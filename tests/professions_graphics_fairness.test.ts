@@ -67,6 +67,14 @@ describe('professions graphics fairness (actionable surfaces stay preset-identic
     expectProfileFree('src/ui/gather_node_tooltip_controller.ts');
   });
 
+  it('the zone-map gather markers (spotting + lock) read no profile and no governor', () => {
+    // The same actionable surface as the minimap markers, on the world map
+    // (PR 2933): spotting plus per-viewer ready/cooldown/lock. The model and
+    // the painter both stay preset- and governor-free.
+    expectProfileFree('src/ui/map_window_view.ts');
+    expectProfileFree('src/ui/map_window_painter.ts');
+  });
+
   it('the node prop tier ladder is static and profile-free', () => {
     expectProfileFree('src/render/gather_nodes.ts');
     expectProfileFree('src/render/gather_nodes_lookup.ts');

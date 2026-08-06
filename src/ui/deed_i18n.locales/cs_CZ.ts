@@ -840,4 +840,32 @@ export const table: DeedLocaleTable = {
     name: 'Co vědí rackové',
     desc: 'Chyť rybu ve vodách Vzdáleného pobřeží.',
   },
+  prog_engineering_rare: {
+    name: 'Přesné strojírenství',
+    desc: 'Vytvoř svůj první vzácný předmět ve strojírenství.',
+  },
+  prog_alchemy_rare: {
+    name: 'Vzácný ročník',
+    desc: 'Vytvoř svůj první vzácný předmět v alchymii.',
+  },
+  prog_cooking_rare: {
+    name: 'Nezapomenutelný pokrm',
+    desc: 'Vytvoř svůj první vzácný předmět ve vaření.',
+  },
+  prog_leatherworking_rare: {
+    name: 'Jemné vydělávání',
+    desc: 'Vytvoř svůj první vzácný předmět v kožedělnictví.',
+  },
+  prog_tailoring_rare: {
+    name: 'Mistrovský steh',
+    desc: 'Vytvoř svůj první vzácný předmět v krejčovství.',
+  },
+  prog_weaponcrafting_rare: {
+    name: 'Kalený k lesku',
+    desc: 'Vytvoř svůj první vzácný předmět v kovářství zbraní.',
+  },
+  prog_armorcrafting_rare: {
+    name: 'Zbroj k dokonalosti',
+    desc: 'Vytvoř svůj první vzácný předmět ve zbrojnictví.',
+  },
 };

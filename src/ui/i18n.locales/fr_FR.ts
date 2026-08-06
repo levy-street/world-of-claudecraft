@@ -333,8 +333,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Un forfait unique par échelon de recette, prélevé une seule fois quand un maître vous l'enseigne ; chaque échelon du tableau ci-dessous est bel et bien en service aujourd'hui, des recettes de départ gratuites jusqu'aux leçons de canne du fabricant d'outils tout en haut.",
   'guide.profPages.econ.provenanceBody':
     "Certains objets portent un nom. Survolez-en un et l'infobulle indique Collecté par untel sur un matériau brut, ou Fabriqué par untel sur une pièce finie : la même marque, formulée selon la manière dont l'objet est né. Une signature fait partie de l'objet lui-même, elle voyage avec lui à travers les échanges, la banque, le courrier, le Marché mondial, et même un rachat chez un marchand, et elle ne s'efface jamais.\n\nLa récolte signe automatiquement son meilleur travail : toute récolte qui tire rare ou mieux arrive signée, et les trouvailles rares signent la totalité de leur aubaine au quintuple. Le jet chanceux d'une récolte sur cadavre signe son rendement là où la famille n'a pas de spécimen à donner, et là où elle en a un, garde le rendement ordinaire et frappe le spécimen immaculé signé à côté. L'artisanat signe selon la même ligne : chaque exemplaire d'un résultat rare ou mieux est frappé signé, et un chef-d'oeuvre signe toujours quelle que soit sa qualité, si bien que la plus belle version d'une pièce nomme toujours son créateur. La seule chose qui puisse vous coûter une signature, c'est un sac plein : une unité signée a besoin d'une place à elle, ou d'une pile signée identique, pour se poser.\n\nUne pile d'objets partage une seule identité : deux exemplaires ne fusionnent donc que si chaque marque correspond exactement, même objet, même signataire, mêmes caractéristiques de chef-d'oeuvre, même enchantement, même lien. Une bûche signée ne rejoint jamais un tas ordinaire, ni dans un sens ni dans l'autre (fusionner effacerait le nom de quelqu'un), mais des contenus identiques fusionnent volontiers : vingt minerais signés par le même collecteur tiennent donc dans une seule pile, et une aubaine ne met pas vos sacs en pièces.\n\nLes signatures rendent la pareille aux artisans : détenir à l'établi un exemplaire signé d'un réactif nécessaire, quel qu'en soit le signataire, ajoute 2 points de pourcentage à la chance de chef-d'oeuvre, et détenir un réactif signé de votre propre main réduit d'un la quantité requise de ce réactif (jamais en dessous d'un). Votre propre travail signé de qualité rare ou mieux continue même de vous enseigner, aujourd'hui par le seul flacon : buvez une potion que vous avez signée et un mince filet de compétence revient au métier qui l'a préparée, tant que ce métier fait partie de vos majeures actives.",
-  'guide.profPages.econ.throttleBody':
-    "La production a un plafond : l'artisanat, le désenchantement, l'enchantement, la récupération et les recharges d'effet d'outil partagent un même budget de {actions} actions réussies par fenêtre de {seconds} secondes. Une tentative refusée ne coûte rien et n'entame aucun budget. Vous ne le sentirez jamais en jeu normal ; il existe pour qu'un spécialiste au plafond disposant d'une banque pleine ne puisse pas inonder le Marché, quels que soient sa compétence et son stock.",
   'guide.profPages.faq.a4':
     "Vous avez décroché une aubaine. Environ 1 récolte sur 90 déclenche un événement de récolte rare (du bois de cœur ancien sur un arbre, une veine vierge dans le minerai, une floraison au clair de lune parmi les herbes) : il multiplie le rendement par cinq, signe chaque unité à votre nom, et annonce la trouvaille à la zone entière. Un jet de rareté rare ou mieux sur une récolte ordinaire signe lui aussi le rendement.\n\nLes matériaux signés méritent d'être gardés ou vendus cher : détenir à l'établi n'importe quel exemplaire signé d'un réactif requis ajoute 2 points de pourcentage à la chance de chef-d'oeuvre. Rappelez-vous seulement qu'ils ne se pilent qu'avec des exemplaires signés à l'identique, et qu'ils occupent donc leur propre emplacement de sac.",
   'guide.profPages.faq.a6':
@@ -713,7 +711,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.collectorsHeading': "Collectionneurs, trophées et le prix d'une histoire",
   'guide.profPages.econ.collectorsBody':
     "Les marchands sont aveugles à la provenance : un objet signé se vend à un PNJ exactement au même prix que sa version ordinaire. La prime sur une signature n'existe qu'entre joueurs, ce qui en fait précisément tout l'intérêt : une pile de minerai d'aubaine signé par un collecteur célèbre, une Coupe privilégiée issue d'une heureuse récolte, une lame chef-d'oeuvre portant le nom d'un artisan depuis retraité, tout cela vaut ce que la mémoire de quelqu'un dit qu'ils valent.\n\nLe Livre des hauts faits puise dans le même instinct : Veine vierge, Bois de cœur ancien, Floraison au clair de lune, Un spécimen parfait et Lueur d'espoir sont des marques de collection à Renom zéro qui existent uniquement pour prouver qu'un moment vous est arrivé. Gardez l'objet qui a valu le haut fait et vous en tenez la preuve. Rien de tout cela n'est de la puissance ; la provenance n'achète aucune caractéristique et ne gagne aucun combat, c'est la trace écrite du jeu sur les belles journées.",
-  'guide.profPages.econ.throttleHeading': "Le régulateur d'actions",
   'guide.profPages.econ.doctrineHeading': 'Les joueurs commercent entre eux',
   'guide.profPages.econ.doctrineBody':
     "L'économie de l'artisanat repose sur une idée : les joueurs approvisionnent les joueurs. Les collecteurs alimentent les artisans, les artisans alimentent les quêteurs et les pillards, et les démanteleurs alimentent les enchanteurs, les marchands et maîtres d'atelier se tenant en périphérie pour absorber les rebuts et les pièces plutôt que vous concurrencer. Si vous voulez gagner de l'argent avec un métier, votre client est une personne : apprenez ce que les autres joueurs consomment, fixez vos prix face au Marché mondial, et traitez les systèmes de PNJ comme un plancher sous vos prix, non comme le marché lui-même.\n\nL'équipement fabriqué est calibré pour se situer en dessous du plancher de raid : même un chef-d'oeuvre n'est jamais qu'un palier de qualité au-dessus de sa recette, jamais au-delà du légendaire, et son budget de caractéristiques reste sous la tranche de butin de raid. La forge vous prépare pour le contenu le plus difficile ; elle ne le remplace pas. Cela maintient les artisans, les pillards et le marché dans un triangle stable : les butins de raid restent aspirationnels, et les pièces fabriquées restent le meilleur équipement qu'on puisse réellement acheter.",
@@ -2790,9 +2787,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.calendar.events.delveDay.note':
     "Frère Halven l'inscrit sur ses cartes : un beau jour pour braver le Reliquaire effondré.",
   'hudChrome.calendar.events.delveDay.title': 'Jour de plongée',
-  'hudChrome.calendar.events.fiestaNight.note':
-    'Le ring de la Fiesta 2c2 attire ce soir ses foules les plus bruyantes.',
-  'hudChrome.calendar.events.fiestaNight.title': 'Nuit de la Fiesta',
   'hudChrome.calendar.events.fishingDerby.note':
     'Les pêcheurs bordent les lacs. Apportez une canne et échangez des histoires de pêche.',
   'hudChrome.calendar.events.fishingDerby.title': 'Concours de pêche',
@@ -3069,6 +3063,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.partyGroup': 'Groupe {n}',
   'hudChrome.unitFrame.partyLabel': 'Votre groupe',
   'hudChrome.unitFrame.playerLabel': 'Votre personnage',
+  'hudChrome.unitFrame.petLabel': 'Votre familier',
   'hudChrome.unitFrame.targetAnnounce': 'Cible : {name}',
   'hudChrome.unitFrame.targetLabel': 'Votre cible',
   'seo.officialLabel': 'Site officiel de World of ClaudeCraft',
@@ -3902,7 +3897,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hud.core.mobileMore': 'Plus',
   'hud.core.mobileMoreAria': 'Afficher plus de menus',
   'hud.core.mobileSocial': 'Relations',
-  'hud.core.mobileArena': 'Arène',
   'hud.core.mobileMenu': 'Menu',
   'hud.core.mobileSettings': 'Paramètres',
   'hud.core.mobileUse': 'Utiliser',
@@ -4012,7 +4006,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hud.keybinds.actions.nameplates': 'Afficher les barres de nom',
   'hud.keybinds.actions.meters': 'Compteurs de dégâts',
   'hud.keybinds.actions.social': 'Amis et guilde',
-  'hud.keybinds.actions.arena': 'Arène (Colisée cendré)',
   'hud.keybinds.actions.chat': 'Ouvrir la discussion',
   'hud.keybinds.actions.attack': 'Attaquer',
   'hud.keybinds.actions.actionBarSlot': "Barre d'action {slot}",
@@ -5385,6 +5378,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.items.ridge_stalker_pelt.name': 'Peau de rôdeur de la crête',
   'entities.items.old_cragmaws_pelt.name': 'Peau du vieux Cragmaw',
   'entities.items.cragmaw_huntcord.name': 'Ceinturon de chasse de Cragmaw',
+  'entities.items.cragmaw_huntquiver.name': 'Carquois de chasse de Cragmaw',
   'entities.items.glowing_wax.name': 'Cire luisante',
   'entities.items.ogre_war_totem.name': 'Totem de guerre ogre',
   'entities.items.storm_core.name': 'Noyau de tempête',
@@ -5461,6 +5455,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.items.mirejaw_scale_vest.name': "Gilet d'écailles de Mirejaw",
   'entities.items.moggers_copper_cudgel.name': 'Gourdin de cuivre de Mogger',
   'entities.items.moggers_shiv.name': 'Surin de Mogger',
+  'entities.items.moggers_hide_quiver.name': 'Carquois en cuir de Mogger',
   'entities.items.moggers_stomper_boots.name': 'Bottes piétineuses de Mogger',
   'entities.items.necromancers_legwraps.name': 'Jambières de Mournweave',
   'entities.items.necromancers_soulsteps.name': 'Soulsteps de Mournweave',
@@ -5485,6 +5480,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.items.cryptbone_pauldrons.name': "Espauliers d'os de crypte",
   'entities.items.deathlords_dread_visage.name': "Visage d'effroi de Barrowlord",
   'entities.items.gravewyrm_gauntlets.name': 'Gantelets du Gravewyrm',
+  'entities.items.gravewyrm_bone_quiver.name': 'Carquois en os du Gravewyrm',
   'entities.items.gravewyrm_mantle.name': 'Mantelet du Gravewyrm',
   'entities.items.mistveil_cord.name': 'Corde Voilebrume',
   'entities.items.mistveil_grips.name': 'Poignes Voilebrume',
@@ -6517,7 +6513,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'fiesta.end.draw': 'FIESTA À ÉGALITÉ ! Trop serré pour départager !',
   'fiesta.end.loss': 'FIESTA PERDUE ! On remet ça !',
   'fiesta.end.win': 'FIESTA GAGNÉE ! 🎉 Quelle fête !',
-  'fiesta.enterQueue': 'Rejoignez la Fiesta !',
   'fiesta.error.leaderOnly': 'Seul le chef de groupe peut inscrire votre équipe pour {label}.',
   'fiesta.error.noAugment': "Vous n'avez aucune augmentation à choisir pour le moment.",
   'fiesta.error.notOnOffer': "Cette augmentation n'est pas proposée.",
@@ -6535,9 +6530,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'fiesta.powerup.pow_colossus.name': 'Colosse',
   'fiesta.powerup.pow_moon_boots.name': 'Bottes lunaires',
   'fiesta.powerup.pow_speed_demon.name': 'Démon de vitesse',
-  'fiesta.practice': '🎉 Entraînement contre des bots',
-  'fiesta.practiceNote':
-    'Entraînement hors ligne : fait apparaître 3 bots IA et vous inscrit pour une Fiesta 2c2. Cliquez à nouveau pour arrêter.',
   'fiesta.queue.join':
     "Vous rejoignez la file d'attente de la Fiesta 2c2. Préparez-vous à FAIRE LA FÊTE…",
   'fiesta.queue.leave': "Vous quittez la file d'attente de la Fiesta 2c2.",
@@ -6693,14 +6685,10 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.disenchantConfirmBodySpecial':
     'Cela détruit une copie spéciale de {item} (signée, de maître ou enchantée) et donne des matériaux arcaniques. Cette action est irréversible.',
   'hudChrome.enchanting.disenchantConfirmTitle': 'Désenchanter {item} ?',
-  'hudChrome.enchanting.disenchantThrottled':
-    'Vous désenchantez trop vite. Attendez un instant et réessayez.',
   'hudChrome.enchanting.disenchantedLine': 'Vous désenchantez {item}.',
   'hudChrome.enchanting.enchantAppliedLine': 'Vous enchantez {item} avec {enchant}.',
   'hudChrome.enchanting.enchantInsufficient':
     "Vous n'avez pas les matériaux pour cet enchantement.",
-  'hudChrome.enchanting.enchantThrottled':
-    'Vous enchantez trop vite. Attendez un instant et réessayez.',
   'hudChrome.enchanting.enchantUnknown': "Cet enchantement n'existe pas.",
   'hudChrome.enchanting.enchantWrongSlot':
     'Cet enchantement ne peut pas être appliqué à cet objet.',
@@ -6715,8 +6703,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.salvageConfirmBodySpecial':
     "Cela détruit une copie spéciale de {item} (signée, de maître ou enchantée) et donne des matériaux d'artisanat. Cette action est irréversible.",
   'hudChrome.enchanting.salvageConfirmTitle': 'Récupérer {item} ?',
-  'hudChrome.enchanting.salvageThrottled':
-    'Vous récupérez trop vite. Attendez un instant et réessayez.',
   'hudChrome.enchanting.salvagedLine': 'Vous récupérez {item}.',
   'hudChrome.enchanting.targetTitle': 'Choisissez un objet à enchanter',
   'hudChrome.meters.move': 'Faites glisser pour déplacer ce compteur',
@@ -6828,6 +6814,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.items.stormcallers_spaulders.name': 'Spallières de Galecall',
   'entities.items.bonewrought_greatsword.name': 'Espadon Bonewrought',
   'entities.items.direfang_greatblade.name': 'Grande lame de Direfang',
+  'entities.items.direfang_quiver.name': 'Carquois de Direfang',
   'entities.items.bonewrought_bulwark.name': 'Rempart Bonewrought',
   'entities.items.wraithfire_orb.name': 'Orbe Wraithfire',
   'hud.chat.context.convertToRaid': 'Convertir en raid',
@@ -7475,17 +7462,12 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Frappe tout autour de vous et ralentit les attaques des ennemis.',
   'guide.abilityHook.wrath':
     'Un trait de nature lancé sur une cible à distance, votre frappe de prédilection.',
-  'guide.arenaPage.augmentsNote':
-    "Les augmentations et bonus ne durent que le temps de la partie. Ils servent à des compositions ludiques et improvisées, pas à une puissance durable, pour que personne n'achète sa victoire.",
   'guide.arenaPage.coliseumBody':
     "Le Colisée est l'arène du royaume, où vous affrontez d'autres joueurs en matchs classés, en un contre un ou en deux contre deux. Chaque catégorie conserve son propre classement, si bien qu'une victoire vous fait grimper dans cette échelle, à la vue de tout le royaume. Ouvrez la fenêtre d'Arène pour vous inscrire à une catégorie, seul ou avec votre partenaire.",
   'guide.arenaPage.coliseumHeading': 'Le Colisée de cendres',
   'guide.arenaPage.duelsBody':
     "Défiez en duel amical n'importe quel joueur que vous croisez. Rien n'est en jeu, sinon la fierté: c'est donc le moyen le plus simple d'apprendre un affrontement ou de régler un différend bon enfant.",
   'guide.arenaPage.duelsHeading': 'Duels',
-  'guide.arenaPage.fiestaBody':
-    "Fiesta est une bagarre rapide à deux contre deux qui se joue en un seul match continu, où chaque combattant est mis sur un pied d'égalité. À mesure que le combat avance, vous draftez des augmentations, des bonus instantanés qui remodèlent votre panoplie à la volée, si bien qu'aucune partie ne se ressemble vraiment.",
-  'guide.arenaPage.fiestaHeading': 'Fiesta deux contre deux',
   'guide.arenaPage.heading': 'Arène et JcJ',
   'guide.arenaPage.intro':
     "Envie de vous mesurer aux autres joueurs? Le joueur contre joueur est intégré, et c'est toujours un choix, jamais quelque chose qu'on vous impose.",
@@ -7644,21 +7626,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Trois zones, du sud au nord, chacune un cran plus haut en niveau. Suivez le fil des quêtes et la contrée vous porte de la vallée jusqu'aux sommets.",
   'guide.worldPage.places': 'Lieux notables',
   'guide.worldPage.residents': 'Qui vous croiserez',
-  'guide.arenaPage.powerupsBody':
-    "Des orbes lumineux tombent aussi dans l'arène en pleine bataille, libres pour celui qui les atteint en premier. Ils sont volontairement démesurés et ne durent qu'un court instant : Démon de vitesse pour un éclair de cadence aveuglante, Colosse pour enfler en géant pataud, Bottes lunaires pour un bond rebondissant en gravité réduite, et Berserker pour un soudain accès de furie.",
-  'guide.arenaPage.powerupsTitle': "Les bonus de l'arène",
-  'guide.arenaPage.waveGoldBody':
-    'La manche intermédiaire : des combos à double tranchant où votre panoplie commence à prendre forme et à chanter.',
-  'guide.arenaPage.waveGoldTitle': 'Or',
-  'guide.arenaPage.wavePrismaticBody':
-    'La dernière manche : des pics dévastateurs qui définissent votre panoplie, faits pour paraître ridicules dans le meilleur sens du terme.',
-  'guide.arenaPage.wavePrismaticTitle': 'Prismatique',
-  'guide.arenaPage.waveSilverBody':
-    "La manche d'ouverture : des bonus simples sur une seule caractéristique qui affinent les bases de votre classe.",
-  'guide.arenaPage.waveSilverTitle': 'Argent',
-  'guide.arenaPage.wavesBody':
-    "Un match de Fiesta vous distribue de nouveaux choix au fil du jeu, et les choix se font plus audacieux à mesure que le combat se prolonge. Vous construisez d'une vague à l'autre, en retenant à chaque fois l'une des quelques options proposées et en la gardant pour le reste du match.",
-  'guide.arenaPage.wavesTitle': 'Les augmentations arrivent par vagues',
   'guide.bestiary.flavor.gravecaller_cultist':
     "Des serviteurs en robe du culte de la mort dont l'œuvre souille les tombes, du Val jusqu'aux sommets. Là où ils se réunissent, les morts ne reposent pas.",
   'guide.bestiary.flavor.grubjaw':
@@ -8632,6 +8599,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.event.hint': 'Annoncer un raid, une rencontre ou un événement',
   'hudChrome.discord.relay.help.label': "Besoin d'aide",
   'hudChrome.discord.relay.help.hint': "Demander de l'aide à la communauté",
+  'hudChrome.options.hideUnusedActionSlots': "Masquer les emplacements d'action inutilisés",
   'hudChrome.options.showSecondaryActionBar': "Afficher la barre d'action secondaire",
   'errors.api.desktopCodeInvalid':
     "Le code de connexion de l'application de bureau est invalide ou expiré. Veuillez réessayer.",
@@ -8893,7 +8861,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Tout ce qui figure sur cette page vit dans le jeu : appuyez sur Échap pour ouvrir les options. Le menu s'ouvre sur un Aperçu des essentiels épinglés, les catégories rangées sur un rail à côté : les réglages ci-dessous se trouvent sous Graphiques, Interface et Accessibilité dans le groupe Affichage, et la Superposition de performances sous Système. Plus rapide encore, tapez un nom dans la barre de recherche en haut pour y accéder directement.",
   'guide.settingsPage.whyLabel': 'Pourquoi ça marche$1',
   'hudChrome.crafting.close': 'Fermer la fabrication',
-  'hudChrome.crafting.craft': 'Artisanat',
   'hudChrome.crafting.craftedToast': 'Fabriqué$1 {name}',
   'hudChrome.crafting.empty': "Aucune recette connue pour l'instant.",
   'hudChrome.crafting.insufficientMaterials': "Vous n'avez pas le matériel pour cela.",
@@ -9081,9 +9048,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.willow_sprite.name': 'Lutin du saule',
   'entities.mobs.wood_wraith.name': 'Spectre des bois',
   'entities.mobs.wreck_thief.name': "Voleur des champs d'épaves",
-  'guide.arenaPage.yumiBody':
-    "Protégez Yumi est un mode d'objectif en équipe qui se joue dans un labyrinthe : chaque camp garde son propre familier félin tout en traquant celui de l'adversaire. De temps à autre, les deux chats se téléportent vers de nouveaux recoins du labyrinthe, si bien que le combat oscille entre défense, chasse et course pour les retrouver. Mettez-vous en file en trois contre trois ou cinq contre cinq ; tomber au combat ne vous met sur la touche qu'un instant.",
-  'guide.arenaPage.yumiHeading': 'Protégez Yumi',
   'hudChrome.archetypeTitle.hobbyLabel': 'Loisir',
   'hudChrome.auraEffect.armorPct': "Réduit l'armure de {pct}%",
   'hudChrome.auraEffect.armorPctStacks': "Réduit l'armure de {pct}% ({stacks} charges)",
@@ -9093,7 +9057,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.increasePct.int': "Augmente l'intelligence de {pct}%",
   'hudChrome.auraEffect.increasePct.sta': "Augmente l'endurance de {pct}%",
   'hudChrome.crafting.recipeNotLearned': "Vous n'avez pas encore appris cette recette.",
-  'hudChrome.crafting.throttled': 'Vous fabriquez trop vite. Patientez un instant et réessayez.',
   'hudChrome.mobile.chatPlaceholder': 'Dites quelque chose…',
   'hudChrome.mobile.hideKeyboard': 'Masquer le clavier',
   'hudChrome.unitFrame.partyChip': 'Groupe',
@@ -9103,7 +9066,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'yumi.bracket5': 'Yumi 5c5',
   'yumi.end.loss': 'DÉFAITE ! Votre Yumi est tombé.',
   'yumi.end.win': 'VICTOIRE ! Yumi est sain et sauf !',
-  'yumi.enterQueue': 'Rejoignez Protégez Yumi !',
   'yumi.error.partyTooBig3': 'Protégez Yumi 3c3 autorise un groupe de trois joueurs maximum.',
   'yumi.error.partyTooBig5': 'Protégez Yumi 5c5 autorise un groupe de cinq joueurs maximum.',
   'yumi.hud.aria': 'Votre Yumi à {mine} points de vie sur {max}, Yumi ennemi à {theirs}.',
@@ -9969,6 +9931,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.keybinds.petAttack': 'Familier : attaquer',
   'hudChrome.keybinds.petDefensive': 'Familier : défensif',
   'hudChrome.keybinds.petStop': 'Familier : arrêter',
+  'hudChrome.keybinds.targetPet': 'Familier : cibler',
   'hudChrome.keybinds.petTaunt': 'Familier : provoquer',
   'hudChrome.mailbox.parcelQtyDecreaseAria': 'Envoyer un {item} de moins',
   'hudChrome.mailbox.parcelQtyIncreaseAria': 'Envoyer un {item} de plus',
@@ -10514,6 +10477,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Vos chances de parer entièrement une attaque de mêlée frontale, sans subir de dégâts. Un coup porté dans le dos ne peut pas être paré.',
   'hudChrome.options.mouseoverCast': 'Incantation au survol sur les cadres de groupe',
   'hudChrome.options.showTargetOfTarget': 'Afficher la cible de la cible',
+  'hudChrome.options.showPetFrame': 'Afficher votre familier',
   'hudChrome.unitFrame.targetOfTargetLabel': 'Cible de la cible',
   'itemUi.market.rarityLegendary': 'Légendaire',
   'loading.reconnectingAttempt':

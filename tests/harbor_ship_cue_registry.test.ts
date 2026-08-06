@@ -125,6 +125,25 @@ describe('HarborShipCueRegistry', () => {
     expect(rebuilt.cueStartSec).toBeNull();
   });
 
+  it('rebinds a live cue at its original start time across a graphics rebuild', () => {
+    const { registry, setNow } = harness();
+    const original = parked('mainland');
+    registry.register('mainland', original);
+    setNow(10);
+    registry.cue('mainland', 'castOff');
+
+    setNow(12);
+    registry.preserveForRebuild();
+    expect(registry.get('mainland')).toBeUndefined();
+    expect(registry.hasLiveCue()).toBe(false);
+
+    const rebuilt = parked('mainland');
+    registry.register('mainland', rebuilt);
+    expect(rebuilt.segment).toEqual({ id: 'castOff' });
+    expect(rebuilt.cueStartSec).toBe(10);
+    expect(registry.elapsedSec(rebuilt)).toBe(2);
+  });
+
   it('keeps unknown cues parked before or after registration', () => {
     const { registry, reset } = harness();
     const pending = parked('pending');

@@ -32,6 +32,19 @@ import * as tradeMod from '../src/sim/social/trade';
 import type { Entity, InvSlot, SimEvent } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
 import { bareClient } from './helpers/bare_client';
+import {
+  completeEnchantFamilyCast,
+  runApplyEnchant,
+  runCraft,
+  runDisenchant,
+  runSalvage,
+} from './helpers/enchant_family_cast';
+
+/** Complete a running enchant-family cast on the server sim and route events. */
+function flushEnchantFamilyCast(server: GameServer, pid: number): void {
+  completeEnchantFamilyCast(server.sim as unknown as import('../src/sim/sim').Sim, pid);
+  routeTick(server);
+}
 
 const RARE_WEAPON = 'moggers_copper_cudgel'; // rare mace -> resonant_steel
 const COMMON_WEAPON = 'eastbrook_arming_sword';
@@ -176,26 +189,26 @@ describe('offline Sim end-to-end (IWorld surface)', () => {
     const meta = metaFor(sim, pid);
 
     grantVestMaterials(sim, pid);
-    sim.craftItem(CRAFTED_COMMON_ARMOR_RECIPE, false, pid);
+    runCraft(sim, CRAFTED_COMMON_ARMOR_RECIPE, false, pid);
     expect(sim.lastCraftResult?.ok).toBe(true);
     const firstSlotIndex = craftedVestSlotIndex(sim, pid);
     expect(firstSlotIndex).toBeGreaterThanOrEqual(0);
     expect(simInv(sim, pid)[firstSlotIndex].instance).toBeUndefined();
 
     const dustBefore = sim.countItem(DUST, pid);
-    sim.disenchantItem(CRAFTED_COMMON_ARMOR, pid, firstSlotIndex);
+    runDisenchant(sim, CRAFTED_COMMON_ARMOR, pid, firstSlotIndex);
     expect(sim.lastDisenchantResult?.ok).toBe(true);
     expect(sim.countItem(DUST, pid)).toBeGreaterThan(dustBefore);
     expect(sim.countItem(CRAFTED_COMMON_ARMOR, pid)).toBe(0);
     expect(meta.craftSkills.enchanting).toBe(0);
 
     grantVestMaterials(sim, pid);
-    sim.craftItem(CRAFTED_COMMON_ARMOR_RECIPE, false, pid);
+    runCraft(sim, CRAFTED_COMMON_ARMOR_RECIPE, false, pid);
     expect(sim.lastCraftResult?.ok).toBe(true);
     const secondSlotIndex = craftedVestSlotIndex(sim, pid);
     expect(secondSlotIndex).toBeGreaterThanOrEqual(0);
 
-    sim.disenchantItem(CRAFTED_COMMON_ARMOR, pid, secondSlotIndex);
+    runDisenchant(sim, CRAFTED_COMMON_ARMOR, pid, secondSlotIndex);
     expect(sim.lastDisenchantResult?.ok).toBe(true);
     expect(sim.countItem(CRAFTED_COMMON_ARMOR, pid)).toBe(0);
     expect(meta.craftSkills.enchanting).toBe(0);
@@ -207,7 +220,7 @@ describe('offline Sim end-to-end (IWorld surface)', () => {
     const meta = metaFor(sim, pid);
 
     grantVestMaterials(sim, pid);
-    sim.craftItem(CRAFTED_COMMON_ARMOR_RECIPE, false, pid);
+    runCraft(sim, CRAFTED_COMMON_ARMOR_RECIPE, false, pid);
     expect(sim.lastCraftResult?.ok).toBe(true);
     const craftedSlotIndex = craftedVestSlotIndex(sim, pid);
     expect(craftedSlotIndex).toBeGreaterThanOrEqual(0);
@@ -223,7 +236,7 @@ describe('offline Sim end-to-end (IWorld surface)', () => {
     expect(returnedSlotIndex).toBeGreaterThanOrEqual(0);
 
     const dustBefore = sim.countItem(DUST, pid);
-    sim.disenchantItem(CRAFTED_COMMON_ARMOR, pid, returnedSlotIndex);
+    runDisenchant(sim, CRAFTED_COMMON_ARMOR, pid, returnedSlotIndex);
     expect(sim.lastDisenchantResult?.ok).toBe(true);
     expect(sim.countItem(DUST, pid)).toBeGreaterThan(dustBefore);
     expect(sim.countItem(CRAFTED_COMMON_ARMOR, pid)).toBe(0);
@@ -236,7 +249,7 @@ describe('offline Sim end-to-end (IWorld surface)', () => {
     const meta = metaFor(sim, pid);
 
     grantVestMaterials(sim, pid);
-    sim.craftItem(CRAFTED_COMMON_ARMOR_RECIPE, false, pid);
+    runCraft(sim, CRAFTED_COMMON_ARMOR_RECIPE, false, pid);
     expect(sim.lastCraftResult?.ok).toBe(true);
 
     sim.equipItem(CRAFTED_COMMON_ARMOR, pid);
@@ -245,7 +258,7 @@ describe('offline Sim end-to-end (IWorld surface)', () => {
     const returnedSlotIndex = craftedVestSlotIndex(sim, pid);
     expect(returnedSlotIndex).toBeGreaterThanOrEqual(0);
 
-    sim.disenchantItem(CRAFTED_COMMON_ARMOR, pid, returnedSlotIndex);
+    runDisenchant(sim, CRAFTED_COMMON_ARMOR, pid, returnedSlotIndex);
     expect(sim.lastDisenchantResult?.ok).toBe(true);
     expect(meta.craftSkills.enchanting).toBe(0);
   });
@@ -257,7 +270,7 @@ describe('offline Sim end-to-end (IWorld surface)', () => {
     moveToVendor(sim);
 
     grantVestMaterials(sim, pid);
-    sim.craftItem(CRAFTED_COMMON_ARMOR_RECIPE, false, pid);
+    runCraft(sim, CRAFTED_COMMON_ARMOR_RECIPE, false, pid);
     expect(sim.lastCraftResult?.ok).toBe(true);
     const craftedSlotIndex = craftedVestSlotIndex(sim, pid);
     expect(craftedSlotIndex).toBeGreaterThanOrEqual(0);
@@ -276,7 +289,7 @@ describe('offline Sim end-to-end (IWorld surface)', () => {
     expect(boughtBackSlotIndex).toBeGreaterThanOrEqual(0);
 
     const dustBefore = sim.countItem(DUST, pid);
-    sim.disenchantItem(CRAFTED_COMMON_ARMOR, pid, boughtBackSlotIndex);
+    runDisenchant(sim, CRAFTED_COMMON_ARMOR, pid, boughtBackSlotIndex);
     expect(sim.lastDisenchantResult?.ok).toBe(true);
     expect(sim.countItem(DUST, pid)).toBeGreaterThan(dustBefore);
     expect(sim.countItem(CRAFTED_COMMON_ARMOR, pid)).toBe(0);
@@ -303,7 +316,7 @@ describe('offline Sim end-to-end (IWorld surface)', () => {
     buyerEntity.pos.z = sellerEntity.pos.z;
 
     grantVestMaterials(sim, seller);
-    sim.craftItem(CRAFTED_COMMON_ARMOR_RECIPE, false, seller);
+    runCraft(sim, CRAFTED_COMMON_ARMOR_RECIPE, false, seller);
     expect(metaFor(sim, seller).lastCraftResult?.ok).toBe(true);
     expect(craftedVestSlotIndex(sim, seller)).toBeGreaterThanOrEqual(0);
 
@@ -318,7 +331,7 @@ describe('offline Sim end-to-end (IWorld surface)', () => {
     const buyerSlotIndex = craftedVestSlotIndex(sim, buyer);
     expect(buyerSlotIndex).toBeGreaterThanOrEqual(0);
 
-    sim.disenchantItem(CRAFTED_COMMON_ARMOR, buyer, buyerSlotIndex);
+    runDisenchant(sim, CRAFTED_COMMON_ARMOR, buyer, buyerSlotIndex);
     expect(sim.lastDisenchantResultFor(buyer)?.ok).toBe(true);
     expect(metaFor(sim, buyer).craftSkills.enchanting).toBe(0);
   });
@@ -340,7 +353,7 @@ describe('offline Sim end-to-end (IWorld surface)', () => {
     metaFor(sim, buyer).copper = 1000;
 
     grantVestMaterials(sim, seller);
-    sim.craftItem(CRAFTED_COMMON_ARMOR_RECIPE, false, seller);
+    runCraft(sim, CRAFTED_COMMON_ARMOR_RECIPE, false, seller);
     expect(metaFor(sim, seller).lastCraftResult?.ok).toBe(true);
     expect(craftedVestSlotIndex(sim, seller)).toBeGreaterThanOrEqual(0);
 
@@ -355,7 +368,7 @@ describe('offline Sim end-to-end (IWorld surface)', () => {
     const buyerSlotIndex = craftedVestSlotIndex(sim, buyer);
     expect(buyerSlotIndex).toBeGreaterThanOrEqual(0);
 
-    sim.disenchantItem(CRAFTED_COMMON_ARMOR, buyer, buyerSlotIndex);
+    runDisenchant(sim, CRAFTED_COMMON_ARMOR, buyer, buyerSlotIndex);
     expect(sim.lastDisenchantResultFor(buyer)?.ok).toBe(true);
     expect(metaFor(sim, buyer).craftSkills.enchanting).toBe(0);
   });
@@ -474,7 +487,7 @@ describe('offline Sim end-to-end (IWorld surface)', () => {
     const meta = metaFor(sim, pid);
 
     sim.addItem(COMMON_WEAPON, 1, pid);
-    sim.disenchantItem(COMMON_WEAPON, pid);
+    runDisenchant(sim, COMMON_WEAPON, pid);
 
     expect(sim.lastDisenchantResult?.ok).toBe(true);
     expect(sim.countItem(COMMON_WEAPON, pid)).toBe(0);
@@ -488,7 +501,7 @@ describe('offline Sim end-to-end (IWorld surface)', () => {
     // 1. Rare disenchant: fixed 1 essence + exactly 1 armed resonant_steel.
     const essenceBefore = sim.countItem(ESSENCE);
     sim.addItem(RARE_WEAPON, 1);
-    sim.disenchantItem(RARE_WEAPON);
+    runDisenchant(sim, RARE_WEAPON);
     const denc = sim.lastDisenchantResult;
     expect(denc?.ok).toBe(true);
     expect(denc?.materialItemId).toBe(ESSENCE);
@@ -502,7 +515,7 @@ describe('offline Sim end-to-end (IWorld surface)', () => {
     expect(sim.countItem(RARE_WEAPON)).toBe(0);
 
     // Replay of the same action cannot double-grant: item is gone -> not_held.
-    sim.disenchantItem(RARE_WEAPON);
+    runDisenchant(sim, RARE_WEAPON);
     expect(sim.lastDisenchantResult?.ok).toBe(false);
     expect(sim.lastDisenchantResult?.reason).toBe('not_held');
     expect(sim.countItem(ESSENCE)).toBe(essenceBefore + 1);
@@ -512,7 +525,7 @@ describe('offline Sim end-to-end (IWorld surface)', () => {
     sim.addItem(RARE_WEAPON, 1);
     sim.addItem(ESSENCE, 2);
     const essencePre = sim.countItem(ESSENCE);
-    sim.applyEnchant(RARE_WEAPON, ENCHANT);
+    runApplyEnchant(sim, RARE_WEAPON, ENCHANT);
     const ench = sim.lastEnchantResult;
     expect(ench?.ok).toBe(true);
     expect(ench?.enchantId).toBe(ENCHANT);
@@ -526,7 +539,7 @@ describe('offline Sim end-to-end (IWorld surface)', () => {
 
     // 3. Salvage a common weapon: materials granted, item consumed.
     sim.addItem(COMMON_WEAPON, 1);
-    sim.salvageItem(COMMON_WEAPON);
+    runSalvage(sim, COMMON_WEAPON);
     const salv = sim.lastSalvageResult;
     expect(salv?.ok).toBe(true);
     expect(salv?.materialItemId).toBeTruthy();
@@ -557,7 +570,7 @@ describe('online end-to-end (live GameServer, wire commands + self-deltas)', () 
       (slot) => slot.itemId === COMMON_WEAPON && slot.instance?.signer,
     );
 
-    sim.disenchantItem(COMMON_WEAPON, pid, selectedIndex);
+    runDisenchant(sim, COMMON_WEAPON, pid, selectedIndex);
 
     expect(sim.lastDisenchantResult?.ok).toBe(true);
     const remaining = simInv(sim, pid).filter((slot) => slot.itemId === COMMON_WEAPON);
@@ -581,7 +594,7 @@ describe('online end-to-end (live GameServer, wire commands + self-deltas)', () 
     );
 
     cmd(server, st, { cmd: 'disenchant_item', item: COMMON_WEAPON, slot: selectedIndex });
-    routeTick(server);
+    flushEnchantFamilyCast(server, st.pid);
 
     const dencEvents = eventsFor(fc.sent, 'disenchantResult');
     expect(dencEvents).toHaveLength(1);
@@ -601,7 +614,7 @@ describe('online end-to-end (live GameServer, wire commands + self-deltas)', () 
     server.sim.addItem(RARE_WEAPON, 1, st.pid);
     const essenceBefore = server.sim.countItem(ESSENCE, st.pid);
     cmd(server, st, { cmd: 'disenchant_item', item: RARE_WEAPON });
-    routeTick(server);
+    flushEnchantFamilyCast(server, st.pid);
     const dencEvents = eventsFor(fc.sent, 'disenchantResult');
     expect(dencEvents.length).toBe(1);
     const dev = dencEvents[0];
@@ -614,7 +627,7 @@ describe('online end-to-end (live GameServer, wire commands + self-deltas)', () 
     // Duplicated command: denied server-side, no double grant.
     const mark = fc.sent.length;
     cmd(server, st, { cmd: 'disenchant_item', item: RARE_WEAPON });
-    routeTick(server);
+    flushEnchantFamilyCast(server, st.pid);
     const dup = eventsFor(fc.sent, 'disenchantResult', mark);
     expect(dup.length).toBe(1);
     if (dup[0].type !== 'disenchantResult') throw new Error('expected disenchantResult');
@@ -627,7 +640,7 @@ describe('online end-to-end (live GameServer, wire commands + self-deltas)', () 
     server.sim.addItem(RARE_WEAPON, 1, st.pid);
     server.sim.addItem(ESSENCE, 2, st.pid);
     cmd(server, st, { cmd: 'apply_enchant', item: RARE_WEAPON, enchant: ENCHANT });
-    routeTick(server);
+    flushEnchantFamilyCast(server, st.pid);
     const enchEvents = eventsFor(fc.sent, 'enchantResult');
     expect(enchEvents.length).toBe(1);
     if (enchEvents[0].type !== 'enchantResult') throw new Error('expected enchantResult');
@@ -641,7 +654,7 @@ describe('online end-to-end (live GameServer, wire commands + self-deltas)', () 
     // Salvage over the wire.
     server.sim.addItem(COMMON_WEAPON, 1, st.pid);
     cmd(server, st, { cmd: 'salvage_item', item: COMMON_WEAPON });
-    routeTick(server);
+    flushEnchantFamilyCast(server, st.pid);
     const salvEvents = eventsFor(fc.sent, 'salvageResult');
     expect(salvEvents.length).toBe(1);
     if (salvEvents[0].type !== 'salvageResult') throw new Error('expected salvageResult');
@@ -683,11 +696,11 @@ describe('apply-enchant keeps the crafted-provenance marker (the anti-farm gate)
     const sim = new Sim({ seed: 20260901, playerClass: 'warrior', autoEquip: false });
     const pid = sim.playerId;
     grantVestMaterials(sim, pid);
-    sim.craftItem(CRAFTED_COMMON_ARMOR_RECIPE, false, pid);
+    runCraft(sim, CRAFTED_COMMON_ARMOR_RECIPE, false, pid);
     expect(sim.lastCraftResult?.ok).toBe(true);
     reagentsFor(sim, pid);
 
-    sim.applyEnchant(CRAFTED_COMMON_ARMOR, CHEST_ENCHANT, undefined, undefined, pid);
+    runApplyEnchant(sim, CRAFTED_COMMON_ARMOR, CHEST_ENCHANT, undefined, undefined, pid);
     expect(sim.lastEnchantResultFor(pid)?.ok).toBe(true);
     const after = vest(sim, pid);
     expect(after?.instance?.enchant).toBe(CHEST_ENCHANT);
@@ -701,12 +714,13 @@ describe('apply-enchant keeps the crafted-provenance marker (the anti-farm gate)
     const pid = sim.playerId;
     const meta = metaFor(sim, pid);
     grantVestMaterials(sim, pid);
-    sim.craftItem(CRAFTED_COMMON_ARMOR_RECIPE, false, pid);
+    runCraft(sim, CRAFTED_COMMON_ARMOR_RECIPE, false, pid);
     reagentsFor(sim, pid);
-    sim.applyEnchant(CRAFTED_COMMON_ARMOR, CHEST_ENCHANT, undefined, undefined, pid);
+    runApplyEnchant(sim, CRAFTED_COMMON_ARMOR, CHEST_ENCHANT, undefined, undefined, pid);
     const afterApply = meta.craftSkills.enchanting;
 
-    sim.disenchantItem(
+    runDisenchant(
+      sim,
       CRAFTED_COMMON_ARMOR,
       pid,
       simInv(sim, pid).findIndex((s) => s.itemId === CRAFTED_COMMON_ARMOR),
@@ -723,10 +737,11 @@ describe('apply-enchant keeps the crafted-provenance marker (the anti-farm gate)
     const meta = metaFor(sim, pid);
     sim.addItem(CRAFTED_COMMON_ARMOR, 1, pid); // granted, never crafted: no marker
     reagentsFor(sim, pid);
-    sim.applyEnchant(CRAFTED_COMMON_ARMOR, CHEST_ENCHANT, undefined, undefined, pid);
+    runApplyEnchant(sim, CRAFTED_COMMON_ARMOR, CHEST_ENCHANT, undefined, undefined, pid);
     const afterApply = meta.craftSkills.enchanting;
 
-    sim.disenchantItem(
+    runDisenchant(
+      sim,
       CRAFTED_COMMON_ARMOR,
       pid,
       simInv(sim, pid).findIndex((s) => s.itemId === CRAFTED_COMMON_ARMOR),
@@ -747,7 +762,7 @@ describe('apply-enchant keeps the crafted-provenance marker (the anti-farm gate)
     );
     reagentsFor(sim, pid);
 
-    sim.applyEnchant(CRAFTED_COMMON_ARMOR, CHEST_ENCHANT, undefined, undefined, pid);
+    runApplyEnchant(sim, CRAFTED_COMMON_ARMOR, CHEST_ENCHANT, undefined, undefined, pid);
     const after = vest(sim, pid);
     expect(after?.instance?.signer).toBe('Ana');
     expect(after?.instance?.rolled?.masterwork).toBe(true);
@@ -760,13 +775,13 @@ describe('apply-enchant keeps the crafted-provenance marker (the anti-farm gate)
     const sim = new Sim({ seed: 20260905, playerClass: 'warrior', autoEquip: false });
     const pid = sim.playerId;
     grantVestMaterials(sim, pid);
-    sim.craftItem(CRAFTED_COMMON_ARMOR_RECIPE, false, pid);
+    runCraft(sim, CRAFTED_COMMON_ARMOR_RECIPE, false, pid);
     reagentsFor(sim, pid);
-    sim.applyEnchant(CRAFTED_COMMON_ARMOR, CHEST_ENCHANT, undefined, undefined, pid);
+    runApplyEnchant(sim, CRAFTED_COMMON_ARMOR, CHEST_ENCHANT, undefined, undefined, pid);
     reagentsFor(sim, pid);
 
     // Replacing with a different chest enchant, explicitly confirmed.
-    sim.applyEnchant(CRAFTED_COMMON_ARMOR, 'enchant_chest_spirit', undefined, true, pid);
+    runApplyEnchant(sim, CRAFTED_COMMON_ARMOR, 'enchant_chest_spirit', undefined, true, pid);
     expect(sim.lastEnchantResultFor(pid)?.ok).toBe(true);
     const after = vest(sim, pid);
     expect(after?.instance?.enchant).toBe('enchant_chest_spirit');

@@ -232,10 +232,25 @@ describe('delveSchematicPlayer', () => {
     expect(arrow.cy).toBeLessThanOrEqual(162);
   });
 
-  it('passes facing as negated angle (matches hud.ts -p.facing convention)', () => {
+  it('rotates the arrow by facing + PI (this schematic maps localZ to canvas Y unflipped, unlike the overworld -facing convention)', () => {
     const layout = DELVE_MODULE_LAYOUTS.reliquary_sunken_ossuary;
     const facing = Math.PI / 4;
     const arrow = delveSchematicPlayer(0, 20, facing, layout, 162, 8);
-    expect(arrow.angle).toBeCloseTo(-facing, 5);
+    expect(arrow.angle).toBeCloseTo(facing + Math.PI, 5);
+  });
+
+  it('points north (canvas -Y, up) when facing 0 = world +Z, matching delveLocalToCanvas', () => {
+    // facing 0 means the player moves toward +Z (world north), and this
+    // schematic's Z maps DIRECTLY to canvas Y (localZ - zMin, unflipped), so
+    // +Z is canvas-DOWN. The arrow tip (drawn at local (0, -size) before
+    // rotation) must therefore point canvas-down at facing 0, the opposite of
+    // the overworld's -facing convention (which would point it canvas-up).
+    const layout = DELVE_MODULE_LAYOUTS.reliquary_sunken_ossuary;
+    const arrow = delveSchematicPlayer(0, 20, 0, layout, 162, 8);
+    // Tip after rotation: (size*sin(angle), -size*cos(angle)).
+    const tipX = Math.sin(arrow.angle);
+    const tipY = -Math.cos(arrow.angle);
+    expect(tipX).toBeCloseTo(0, 5);
+    expect(tipY).toBeCloseTo(1, 5); // +Y = canvas-down = world +Z here
   });
 });

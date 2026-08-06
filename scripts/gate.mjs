@@ -22,14 +22,9 @@
 import { spawnSync } from 'node:child_process';
 import os from 'node:os';
 import { resolveAvailableMemoryBytes } from './lib/gate_memory.mjs';
+import { runGatePreflights } from './lib/gate_preflight.mjs';
 import { buildFullGateSteps } from './lib/gate_steps.mjs';
 import { computeGateWorkers, resolveGateWorkerTierCap } from './lib/gate_workers.mjs';
-import {
-  formatInstallSyncFailure,
-  parseInstallProblems,
-  shouldCheckInstallSync,
-} from './lib/npm_install_sync.mjs';
-import { FFMPEG_PATH, FFPROBE_PATH } from './sfx/ffmpeg_paths.mjs';
 
 // Halving the core count only protects a gate run from ITSELF; it does nothing when a
 // second `npm run gate` (or any other heavy vitest run) is happening in a sibling
@@ -66,49 +61,9 @@ const shell = process.platform === 'win32';
 // and other preflights that need to test their OWN failure mode in isolation
 // (tests/sfx_gate_preflight.test.ts) set it explicitly rather than relying on the
 // side effect of an empty PATH also making `npm` itself unspawnable.
-if (process.env.WOC_SKIP_DEP_SYNC !== '1') {
-  const npmLs = spawnSync('npm', ['ls', '--depth=0', '--json'], { encoding: 'utf8', shell });
-  if (shouldCheckInstallSync(npmLs)) {
-    try {
-      const installProblems = parseInstallProblems(npmLs.stdout);
-      if (installProblems.length > 0) {
-        console.error(
-          `[gate] FAIL at "dependency sync"\n${formatInstallSyncFailure(installProblems)}`,
-        );
-        process.exit(1);
-      }
-    } catch (err) {
-      // npm ran but did not produce parseable JSON: a problem with the check
-      // itself, not evidence of drift, so warn and let the gate continue rather
-      // than fail on output we cannot interpret.
-      console.error(`[gate] WARN: dependency sync check skipped: ${err.message}`);
-    }
-  }
-}
-
-// Probe the resolved binaries BY EXECUTION: the ffmpeg-static/ffprobe-static
-// packages download their binary via an allowlisted install script, so a
-// scripts-skipped install leaves a missing file behind the import, and the PATH
-// fallback may not exist either. Failing here is cheaper and clearer than
-// failing mid-suite.
-const missingAudioTools = [
-  ['ffmpeg', FFMPEG_PATH],
-  ['ffprobe', FFPROBE_PATH],
-].filter(([, toolPath]) => {
-  const probe = spawnSync(toolPath, ['-version'], { stdio: 'ignore', shell });
-  return probe.error !== undefined || probe.status !== 0;
-});
-if (missingAudioTools.length > 0) {
-  console.error(
-    `[gate] missing required SFX audio tooling: ${missingAudioTools.map(([name]) => name).join(', ')}\n` +
-      '[gate] the bundled ffmpeg-static/ffprobe-static binaries are absent or broken (a\n' +
-      '[gate] scripts-skipped install leaves them missing): reinstall with\n' +
-      '[gate] pnpm install --frozen-lockfile (ensure onlyBuiltDependencies allows\n' +
-      '[gate] ffmpeg-static/ffprobe-static), or install FFmpeg (including ffprobe) on PATH,\n' +
-      '[gate] then re-run pnpm run gate',
-  );
-  process.exit(1);
-}
+// Both preflights now live in lib/gate_preflight.mjs so gate:select shares them
+// rather than silently losing the early, clear failure they exist to produce.
+runGatePreflights({ label: 'gate', shell });
 
 const branch =
   spawnSync('git', ['branch', '--show-current'], { encoding: 'utf8', shell }).stdout?.trim() ?? '';

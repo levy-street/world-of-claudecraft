@@ -48,6 +48,8 @@ export const MODERATION_ACTION_LABEL_KEYS: Record<string, string> = {
   kill: 'moderationHistory.actionKill',
   jail: 'moderationHistory.actionJail',
   unjail: 'moderationHistory.actionUnjail',
+  spectate: 'moderationHistory.actionSpectate',
+  unspectate: 'moderationHistory.actionUnspectate',
   suspend: 'moderationHistory.actionSuspend',
   unsuspend: 'moderationHistory.actionUnsuspend',
   ban: 'moderationHistory.actionBan',

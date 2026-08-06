@@ -380,6 +380,7 @@ describe('Nythraxis raid encounter', () => {
       'direfang_greatblade',
       'bonewrought_bulwark',
       'wraithfire_orb',
+      'direfang_quiver',
     ]) {
       const item = ITEMS[id];
       expect(item.quality, id).toBe('epic');
@@ -409,11 +410,18 @@ describe('Nythraxis raid encounter', () => {
       blockValue: 30,
     });
     expect(ITEMS.wraithfire_orb).toMatchObject({ kind: 'held_offhand', slot: 'offhand' });
+    // The quiver is the hunter's arm of the same idiom, and carries the same
+    // bespoke hunter lock as the agi 2H above for the same reason: rogues
+    // already reach the offhand by dual wielding, hunters reach it no other way.
+    expect(ITEMS.direfang_quiver).toMatchObject({ kind: 'held_offhand', slot: 'offhand' });
+    expect(ITEMS.direfang_quiver.requiredClass).toEqual(['hunter']);
     // The ilvl-29 raid seed rating (one rating at 20): Hit for the physical
     // pieces, crit (never Hit) for the healer-inclusive caster orb.
     expect(ITEMS.bonewrought_greatsword.hitRating).toBe(20);
     expect(ITEMS.direfang_greatblade.hitRating).toBe(20);
     expect(ITEMS.bonewrought_bulwark.hitRating).toBe(20);
+    expect(ITEMS.direfang_quiver.hitRating).toBe(20);
+    expect(ITEMS.direfang_quiver.critRating ?? 0).toBe(0);
     expect(ITEMS.wraithfire_orb.critRating).toBe(20);
     expect(ITEMS.wraithfire_orb.hitRating ?? 0).toBe(0);
   });

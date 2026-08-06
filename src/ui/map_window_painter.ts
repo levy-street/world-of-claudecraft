@@ -41,13 +41,15 @@
 // line width, label offset, triangle geometry) is a named constant.
 
 import { getActiveWorldContent, type ZoneDef } from '../sim/data';
+import type { GatherNodeType } from '../sim/types';
 import { type Decoration, generateDecorationsInBounds } from '../sim/world';
 import type { IWorld } from '../world_api';
-import { dungeonDisplayName, zoneDisplayName, zonePoiLabel } from './entity_i18n';
+import { dungeonDisplayName, riftFloorLabel, zoneDisplayName, zonePoiLabel } from './entity_i18n';
 import { formatNumber } from './i18n';
 import {
   buildOverworldMapModel,
   type MapDetail,
+  type MapGatherNodeMarker,
   type MapNpcMarker,
   type MapQuestAreaMarker,
   type MapViewRect,
@@ -95,6 +97,28 @@ const QUEST_BADGE_FONT = 'bold 12px Georgia';
 const QUEST_BADGE_GAP = 2; // px between badges when one area serves two quests
 const QUEST_BADGE_LINE_WIDTH = 1.5;
 const QUEST_BADGE_TEXT_LIFT = 4; // px above the arc center to optically center digits
+// Zone-map gather nodes: type-distinct silhouettes (ore hex, wood pine, herb
+// clover) larger than the minimap disc so they read at the full-zone frame,
+// with a soft ready glow under unlocked harvestable icons (classic resource
+// map cue). Cooldown keeps the same silhouette at a smaller radius without
+// the glow. Locked reuses the minimap's diagonal strike through the icon.
+const GATHER_READY_RADIUS = 5.5;
+const GATHER_COOLDOWN_RADIUS = 4;
+const GATHER_GLOW_EXTRA = 4;
+const GATHER_LINE_WIDTH = 1.5;
+const GATHER_LOCK_OVERREACH = 1.75;
+// Herb clover: three petal offsets as fractions of radius (equilateral).
+const HERB_PETAL_OFFSET = 0.55;
+const HERB_PETAL_SCALE = 0.55;
+// Wood pine: tip / base / trunk proportions of the ready radius. The trunk
+// hangs from the crown base line on both sides (symmetric outline).
+const WOOD_TIP_Y = -1;
+const WOOD_BASE_Y = 0.55;
+const WOOD_HALF_WIDTH = 0.85;
+const WOOD_TRUNK_HALF = 0.22;
+const WOOD_TRUNK_BOTTOM = 1.05;
+// Ore hexagon: flat-top, radius is the vertex distance from center.
+const ORE_HEX_SIDES = 6;
 
 // The `--color-map-*` design tokens the painter resolves once per redraw. These
 // mirror the colors the inline overworld-map render used verbatim. Exported so the
@@ -132,6 +156,16 @@ export const MAP_COLOR_TOKENS = {
   graveyard: '--color-map-graveyard',
   mudhut: '--color-map-mudhut',
   campfire: '--color-map-campfire',
+  gatherOreReady: '--color-map-gather-ore-ready',
+  gatherOreCooldown: '--color-map-gather-ore-cooldown',
+  gatherOreGlow: '--color-map-gather-ore-glow',
+  gatherWoodReady: '--color-map-gather-wood-ready',
+  gatherWoodCooldown: '--color-map-gather-wood-cooldown',
+  gatherWoodGlow: '--color-map-gather-wood-glow',
+  gatherHerbReady: '--color-map-gather-herb-ready',
+  gatherHerbCooldown: '--color-map-gather-herb-cooldown',
+  gatherHerbGlow: '--color-map-gather-herb-glow',
+  gatherLocked: '--color-map-gather-locked',
 } as const;
 
 type MapColors = Record<keyof typeof MAP_COLOR_TOKENS, string>;
@@ -164,6 +198,8 @@ export interface MapPaintResult {
   questAreas: MapQuestAreaMarker[];
   /** The quest-giver glyphs of this paint, for the hover tooltip's hit-test. */
   npcs: MapNpcMarker[];
+  /** The gather-node icons of this paint, for the hover tooltip's hit-test. */
+  gatherNodes: MapGatherNodeMarker[];
 }
 
 /**
@@ -231,6 +267,7 @@ export class MapWindowPainter {
       cursor: model.cursor,
       questAreas: model.questAreas,
       npcs: model.npcs,
+      gatherNodes: model.gatherNodes,
     };
   }
 
@@ -310,8 +347,22 @@ export class MapWindowPainter {
       }
     }
 
-    // Zone title (drawn on-canvas; the world map has no DOM zone label).
-    this.labels.draw(ctx, zoneDisplayName(model.zoneId), S / 2, TITLE_BASELINE_Y, {
+    // Gather nodes: profession-colored type silhouettes over the quest-area
+    // blobs (a resource field still reads inside a blue objective region) but
+    // under the zone title, POI labels, portals, and quest glyphs, so label
+    // text and quest / dungeon chrome stay readable on top.
+    // Tier-identical (fairness): never preset- or governor-gated.
+    if (model.gatherNodes.length > 0) {
+      this.drawGatherNodes(ctx, model.gatherNodes, colors);
+    }
+
+    // Zone title (drawn on-canvas; the world map has no DOM zone label). Inside
+    // a rift, show the generated floor name + rank instead of the overworld
+    // zone, mirroring minimap_painter's zone-label override.
+    const title = model.rift
+      ? riftFloorLabel(model.rift.name, model.rift.rank)
+      : zoneDisplayName(model.zoneId);
+    this.labels.draw(ctx, title, S / 2, TITLE_BASELINE_Y, {
       font: TITLE_FONT,
       fill: colors.label,
       stroke: colors.outline,
@@ -471,6 +522,48 @@ export class MapWindowPainter {
     }
   }
 
+  /** Profession-colored gather icons: ready glow + type silhouette + lock strike.
+   *  Colors come from the once-per-redraw token table; geometry is named
+   *  constants (no magic values). */
+  private drawGatherNodes(
+    ctx: CanvasRenderingContext2D,
+    nodes: readonly MapGatherNodeMarker[],
+    colors: MapColors,
+  ): void {
+    ctx.lineWidth = GATHER_LINE_WIDTH;
+    ctx.strokeStyle = colors.outline;
+    for (const node of nodes) {
+      const radius = node.ready ? GATHER_READY_RADIUS : GATHER_COOLDOWN_RADIUS;
+      const fill = node.locked
+        ? colors.gatherLocked
+        : node.ready
+          ? gatherReadyColor(colors, node.type)
+          : gatherCooldownColor(colors, node.type);
+      // Soft halo under unlocked ready nodes only (the classic "this is up"
+      // cue); cooldown and locked forgo the glow. Ready vs cooldown reads
+      // through size, outline, and glow, never hue alone; a locked-but-ready
+      // node keeps its outline stroke under the diagonal strike below
+      // (DESIGN.md color independence).
+      if (node.ready && !node.locked) {
+        ctx.fillStyle = gatherGlowColor(colors, node.type);
+        ctx.beginPath();
+        ctx.arc(node.mx, node.my, radius + GATHER_GLOW_EXTRA, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.fillStyle = fill;
+      pathGatherSilhouette(ctx, node.mx, node.my, radius, node.type);
+      ctx.fill();
+      if (node.ready) ctx.stroke();
+      if (node.locked) {
+        const reach = radius + GATHER_LOCK_OVERREACH;
+        ctx.beginPath();
+        ctx.moveTo(node.mx - reach, node.my + reach);
+        ctx.lineTo(node.mx + reach, node.my - reach);
+        ctx.stroke();
+      }
+    }
+  }
+
   // Buildings + vegetation overlay for the zoomed-in map, drawn in the same order
   // as the inline site (vegetation, then building footprints, then prop dots).
   private drawDetail(ctx: CanvasRenderingContext2D, detail: MapDetail, colors: MapColors): void {
@@ -507,5 +600,74 @@ export class MapWindowPainter {
       ctx.arc(prop.mx, prop.my, prop.radius, 0, Math.PI * 2);
       ctx.fill();
     }
+  }
+}
+
+function gatherReadyColor(colors: MapColors, type: GatherNodeType): string {
+  if (type === 'ore') return colors.gatherOreReady;
+  if (type === 'wood') return colors.gatherWoodReady;
+  return colors.gatherHerbReady;
+}
+
+function gatherCooldownColor(colors: MapColors, type: GatherNodeType): string {
+  if (type === 'ore') return colors.gatherOreCooldown;
+  if (type === 'wood') return colors.gatherWoodCooldown;
+  return colors.gatherHerbCooldown;
+}
+
+function gatherGlowColor(colors: MapColors, type: GatherNodeType): string {
+  if (type === 'ore') return colors.gatherOreGlow;
+  if (type === 'wood') return colors.gatherWoodGlow;
+  return colors.gatherHerbGlow;
+}
+
+/** Type-distinct silhouette path (fill + optional stroke by the caller).
+ *  Ore = flat-top hexagon (mineral facet), wood = pine + trunk, herb = three
+ *  petal clover. All closed paths centred on (mx, my). */
+function pathGatherSilhouette(
+  ctx: CanvasRenderingContext2D,
+  mx: number,
+  my: number,
+  radius: number,
+  type: GatherNodeType,
+): void {
+  ctx.beginPath();
+  if (type === 'ore') {
+    // Flat-top hex: start at the right vertex, step 60 degrees.
+    for (let i = 0; i < ORE_HEX_SIDES; i++) {
+      const a = (Math.PI / 3) * i;
+      const x = mx + radius * Math.cos(a);
+      const y = my + radius * Math.sin(a);
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+    return;
+  }
+  if (type === 'wood') {
+    // Pine crown triangle + short trunk (reads as a tree at 5px radius).
+    // One closed path (no ctx.rect): the fake 2D context in the painter suite
+    // only stubs path primitives the rest of the map uses.
+    const trunkHalf = radius * WOOD_TRUNK_HALF;
+    const crownBase = my + radius * WOOD_BASE_Y;
+    const trunkBottom = my + radius * WOOD_TRUNK_BOTTOM;
+    ctx.moveTo(mx, my + radius * WOOD_TIP_Y);
+    ctx.lineTo(mx + radius * WOOD_HALF_WIDTH, crownBase);
+    ctx.lineTo(mx + trunkHalf, crownBase);
+    ctx.lineTo(mx + trunkHalf, trunkBottom);
+    ctx.lineTo(mx - trunkHalf, trunkBottom);
+    ctx.lineTo(mx - trunkHalf, crownBase);
+    ctx.lineTo(mx - radius * WOOD_HALF_WIDTH, crownBase);
+    ctx.closePath();
+    return;
+  }
+  // Herb: three petals around the center (clover), classic herbalism mark.
+  const petalR = radius * HERB_PETAL_SCALE;
+  for (let i = 0; i < 3; i++) {
+    const a = -Math.PI / 2 + (i * 2 * Math.PI) / 3;
+    const cx = mx + radius * HERB_PETAL_OFFSET * Math.cos(a);
+    const cy = my + radius * HERB_PETAL_OFFSET * Math.sin(a);
+    ctx.moveTo(cx + petalR, cy);
+    ctx.arc(cx, cy, petalR, 0, Math.PI * 2);
   }
 }

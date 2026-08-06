@@ -3222,7 +3222,23 @@ const AURA_RECIPES: Record<string, IconRecipe> = {
   // Breachmaker's source-scoped vulnerability debuff (kind 'vuln_source'), shown
   // on the target's debuff frame: a cracked guard struck by a blade
   aura_vuln_source: r('blood', 'earthBrown', ['sword', { p: 'sunburst', ...BR }], ['crack']),
+  // Thornhollow Fields rune buffs, keyed by AURA id (the hud iconId resolver passes
+  // ids with a recipe through): identity beyond hue, per the owner direction:
+  // boots for Sprint, a sword for Battle, a shield for Ward.
+  bg_sprint_rune: r('fire', 'ember', ['boot'], ['motion', 'glow']),
+  bg_battle_rune: r('blood', 'blood', ['sword'], ['glow']),
+  bg_ward_rune: r('frost', 'ice', ['shield'], ['glow']),
+  // The carried-flag buff, worn for the whole carry: a banner on its pole (the
+  // red_banner ability's staff-plus-sunburst language) on the objective gold, so
+  // it reads as the flag itself and not as another rune.
+  bg_carried_flag: r('fury', 'gold', ['staff', { p: 'sunburst', ...TR, pal: 'gold' }], ['motion']),
 };
+
+/** True when `id` has a dedicated aura recipe (the hud iconId resolver lets
+ *  such ids through instead of collapsing them to the aura_<kind> generic). */
+export function hasAuraRecipe(id: string): boolean {
+  return id in AURA_RECIPES;
+}
 
 // Crests: class / mob-family / status glyphs, painted with the same primitive
 // vocabulary so unit-frame portraits and party rows match the spellbook art
@@ -4496,6 +4512,7 @@ export const UI_ITEM_IMAGE_IDS = new Set<string>(['backpack']);
 // future development-only item may still use it temporarily. tests/item_icons.test.ts holds
 // the line from both sides: it rejects stale entries after art lands and unenumerated art
 // debt. Do not add to this list merely to silence that failure; commission the art.
+// Empty again after the hunter quiver art landed in the same branch that enumerated it.
 export const ITEM_ART_PENDING = new Set<string>();
 
 /** Static URL of an item's (or a UI pseudo-item's) image icon, or null if it uses a recipe. */
@@ -4523,10 +4540,31 @@ const DEED_CREST_PREFIX = 'deed_';
 // unenumerated debt. Do not add an id here merely to silence that failure; commission the art and
 // file it in docs/achievements/icon-brief.md.
 export const DEED_ART_PENDING: ReadonlySet<string> = new Set([
+  // Catalog order (the art tests compare in DEED_ORDER order).
+  // Thornhollow Fields battleground deeds: all four are 'pvp', so they fall
+  // back to the deed_cat_pvp crest until their commissioned art lands
+  // (docs/achievements/icon-brief.md).
+  'pvp_bg_first_capture',
+  'pvp_bg_first_win',
+  'pvp_bg_wins_25',
+  'pvp_bg_captures_100',
   // The Drakelands dragonkin brood rework (v0.35): both are 'chronicle', so both fall back to
   // the deed_cat_chronicle crest until their commissioned art lands.
   'chr_drakemaw_broodlord',
   'chr_maw_matriarch',
+  // Rift coverage (procedural infinite-dungeon system, v0.35): both are 'dungeon', so both
+  // fall back to the deed_cat_dungeon crest until their commissioned art lands.
+  'dgn_rift',
+  'dgn_rift_s_rank',
+  // Basic universal profession deeds (issue #2055): all seven are 'progression', so all
+  // fall back to the deed_cat_progression crest until their commissioned art lands.
+  'prog_engineering_rare',
+  'prog_alchemy_rare',
+  'prog_cooking_rare',
+  'prog_leatherworking_rare',
+  'prog_tailoring_rare',
+  'prog_weaponcrafting_rare',
+  'prog_armorcrafting_rare',
 ]);
 /** Static URL of a deed crest's painted art, or null when the crest id has no committed image. */
 export function deedImageUrl(crestId: string): string | null {

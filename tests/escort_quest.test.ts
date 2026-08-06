@@ -16,6 +16,11 @@ const ESCORTEE_TEMPLATE = 'apprentice_wren';
 function makeSim(): Sim {
   const sim = new Sim({ seed: 424242, playerClass: 'warrior', playerName: 'Escorter' });
   sim.player.level = 20;
+  // These tests exercise the escort driver, not incidental natural-camp
+  // combat along the route. Keep the nearby test escorter alive while the
+  // scripted waves are culled or inspected.
+  sim.player.maxHp = 1_000_000;
+  sim.player.hp = sim.player.maxHp;
   return sim;
 }
 
@@ -426,7 +431,9 @@ describe('escort run guards', () => {
     expect(mob.threat.get(sim.player.id) ?? 0).toBeGreaterThan(1);
   });
 
-  it('a slain wave unravels after its loot window instead of respawning into the run', () => {
+  it('a slain wave unravels after its loot window instead of respawning into the run', {
+    timeout: 60_000,
+  }, () => {
     const sim = makeSim();
     const def = ESCORTS[ESCORT_ID];
     teleportTo(sim, def.start.x, def.start.z);

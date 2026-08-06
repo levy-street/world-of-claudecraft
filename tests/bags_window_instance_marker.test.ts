@@ -497,9 +497,11 @@ describe('marker stylesheet contract (source pins)', () => {
     // One shared corner-mark BOX carries the geometry for the per-copy glyphs
     // and the quest / fine seals (rule of three); each kind's own rule holds
     // only its color. The grouped selector is the pin that every member is in
-    // the family.
+    // the family, the bank glyph twin included (a banked masterwork keeps the
+    // same seal art; tests/bank_window_instance_marker.test.ts pins the bank
+    // half from its side, keep the pair in sync).
     const boxStart = components.search(
-      /\.bag-item \.bi-glyph,\s*\.bag-item \.bi-quest-seal,\s*\.bag-item \.bi-fine-seal \{/,
+      /\.bag-item \.bi-glyph,\s*\.bank-item \.bi-glyph,\s*\.bag-item \.bi-quest-seal,\s*\.bag-item \.bi-fine-seal \{/,
     );
     expect(boxStart).toBeGreaterThan(-1);
     const glyphBlock = components.slice(boxStart, components.indexOf('}', boxStart));

@@ -76,6 +76,7 @@ function makeInput(userAgent?: string) {
     onTargetFriendly: vi.fn(),
     onCycleFriendly: vi.fn(),
     onPet: vi.fn(),
+    onTargetPet: vi.fn(),
     onAbility: vi.fn(),
     onAbilityDown: vi.fn(),
     onAbilityUp: vi.fn(),
@@ -1546,6 +1547,20 @@ describe('Input touch invert-look', () => {
     const rawYawDelta = 100 * 0.0045; // BASE_LOOK_SENS, mirrored here since it is not exported
 
     expect(dragYawDelta).toBeGreaterThan(rawYawDelta * 1.5);
+  });
+
+  it('honors the Touch Look Speed setting on the default one-finger swipe-drag path', () => {
+    const { input } = makeInput();
+    const baseYaw = input.camYaw;
+    input.applyTouchLookDelta(100, 0);
+    const defaultDelta = Math.abs(input.camYaw - baseYaw);
+
+    input.camYaw = baseYaw;
+    input.setTouchLookSpeed(2);
+    input.applyTouchLookDelta(100, 0);
+    const doubledDelta = Math.abs(input.camYaw - baseYaw);
+
+    expect(doubledDelta).toBeCloseTo(defaultDelta * 2);
   });
 });
 

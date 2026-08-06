@@ -28,6 +28,7 @@
 import { audio } from '../game/audio';
 import { ITEMS } from '../sim/data';
 import type { IWorld } from '../world_api';
+import { bagInstanceGlyphKind } from './bag_instance_glyph_view';
 import { showQuantityPrompt } from './bank_quantity_prompt';
 import { itemDisplayName } from './entity_i18n';
 import { esc } from './esc';
@@ -47,6 +48,7 @@ import {
 } from './guild_bank_view';
 import { formatMoney, formatNumber, t } from './i18n';
 import { QUALITY_COLOR } from './icons';
+import { INSTANCE_GLYPH_ARIA_KEYS, instanceGlyphMarkHtml } from './item_instance_glyph_mark';
 import { knownItemDef } from './known_item';
 import type { PainterHostPresentation } from './painter_host';
 import { tSim } from './sim_i18n';
@@ -401,12 +403,17 @@ export class GuildBankTab {
     const dormantClass = slot.dormant ? ' gbank-dormant' : '';
     const itemName = item ? itemDisplayName(item) : t('hudChrome.bank.guildUnknownItem');
     const count = this.fmt(slot.count);
+    // Per-copy corner marks share the bags/personal-bank helper so a guild-banked
+    // masterwork keeps its seal. Dormant lock mark sits top-right; instance glyphs
+    // sit top-left, so both can coexist without colliding.
+    const glyphKind = bagInstanceGlyphKind(slot.instance);
+    const instanceMark = instanceGlyphMarkHtml(glyphKind);
     if (slot.known && item) {
       cell.className = `bank-item q-${slot.qualityKey}${dormantClass}`;
       const qColor = QUALITY_COLOR[slot.qualityKey] ?? QUALITY_DEFAULT_COLOR;
       cell.style.setProperty('--bank-slot-quality', qColor);
       const mark = slot.dormant ? `<span class="gbank-dormant-mark">${svgIcon('lock')}</span>` : '';
-      cell.innerHTML = `${this.deps.itemIcon(item)}<span class="bank-count">${
+      cell.innerHTML = `${this.deps.itemIcon(item)}${instanceMark}<span class="bank-count">${
         slot.showCount ? esc(t('itemUi.bags.stackCount', { count })) : ''
       }</span>${mark}`;
       this.deps.attachTooltip(cell, () => {
@@ -426,7 +433,7 @@ export class GuildBankTab {
       cell.className = `bank-item gbank-unknown${dormantClass}`;
       cell.innerHTML = `<span class="gbank-unknown-label">${esc(
         t('hudChrome.bank.guildUnknownItem'),
-      )}</span><span class="bank-count">${
+      )}</span>${instanceMark}<span class="bank-count">${
         slot.showCount ? esc(t('itemUi.bags.stackCount', { count })) : ''
       }</span>`;
       this.deps.attachTooltip(cell, () => {
@@ -436,11 +443,21 @@ export class GuildBankTab {
         return `<div class="tt-title">${esc(t('hudChrome.bank.guildUnknownItem'))}</div><div class="tt-sub">${esc(slot.itemId)}</div><div class="tt-sub">${esc(hint)}</div>`;
       });
     }
+    // Dormant wording outranks the per-copy flag (the lock is the action fact);
+    // otherwise a masterwork / signed / enchanted copy announces itself. The
+    // guild pane keeps the KNOWN key family even for an unknown id: itemName is
+    // already the localized unknown-item label here (the label carries the
+    // unknown fact, the raw id lives in the tooltip), where the personal bank
+    // announces the raw id via the UNKNOWN_ siblings instead. Deliberate; the
+    // guild marker suite pins the exact strings.
     cell.setAttribute(
       'aria-label',
       slot.dormant
         ? t('hudChrome.bank.guildDormantAria', { item: itemName, count })
-        : t('itemUi.bags.itemAria', { item: itemName, count }),
+        : t(glyphKind ? INSTANCE_GLYPH_ARIA_KEYS[glyphKind] : 'itemUi.bags.itemAria', {
+            item: itemName,
+            count,
+          }),
     );
     cell.addEventListener('click', (ev) => {
       if (this.deps.consumePeek()) {

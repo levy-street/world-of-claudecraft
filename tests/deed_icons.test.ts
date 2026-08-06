@@ -370,13 +370,16 @@ describe('Book of Deeds webp icons', () => {
     // Any live deed awaiting art must land on its category base crest, which carries no
     // image URL and falls through to the procedural canvas path. The pending set is pinned
     // exhaustively (DEED_ART_PENDING, src/ui/icons.ts) and the two counts below are literal, so a third
-    // artless deed, a dropped webp, or a silent catalog append all red here.
+    // artless deed, a dropped webp, or a silent catalog append all red here. The Rift coverage
+    // pair (dgn_rift, dgn_rift_s_rank) ships artless per docs/design/deeds.md step 6 ("art can
+    // trail the deed"), enumerated in DEED_ART_PENDING like the other pending debt rather than
+    // a bespoke exception here.
     const artless = DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id));
     expect(artless, 'only the pinned art-pending deeds may lack painted art').toEqual([
       ...DEED_ART_PENDING_IDS,
     ]);
-    expect(DEED_ORDER, 'the merged live deed catalog').toHaveLength(234);
-    expect(DEED_IMAGE_IDS.size, 'every live deed but the pending pair is painted').toBe(232);
+    expect(DEED_ORDER, 'the merged live deed catalog').toHaveLength(247);
+    expect(DEED_IMAGE_IDS.size, 'every live deed but the pending set is painted').toBe(232);
     for (const id of artless) {
       const crestId = deedCrestId(id, DEEDS[id].category);
       expect(crestId, `${id} must fall back to a category base crest`).toMatch(/^deed_cat_/);

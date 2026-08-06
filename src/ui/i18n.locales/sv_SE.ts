@@ -314,8 +314,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'En fast avgift per receptsteg, uttagen en gång när en mästare lär ut det; varje steg i tabellen nedan är i bruk idag, från de gratis startrecepten till verktygsmakarens spölektioner högst upp.',
   'guide.profPages.econ.provenanceBody':
     'Vissa föremål bär ett namn. För muspekaren över ett så säger verktygstipset Samlat av den och den på ett råmaterial, eller Skapad av den och den på en färdig pjäs: samma märke, formulerat efter hur föremålet blev till. En signatur är en del av föremålet självt, följer med det genom handel, banken, posten, Världsmarknaden och till och med ett återköp hos en handlare, och bleknar aldrig.\n\nInsamling signerar sitt bästa arbete automatiskt: varje skörd som rullar sällsynt eller bättre anländer signerad, och sällsynta fynd signerar hela sitt femfaldiga vindfall. En lycklig rullning vid en kroppsskörd signerar sitt utbyte där familjen inte har något exemplar att ge, och där den har det hålls utbytet enkelt och det signerade orörda exemplaret präglas bredvid. Hantverk signerar längs samma linje: varje kopia av ett resultat på sällsynt eller bättre präglas signerad, och ett mästerverk signerar alltid, oavsett kvalitet, så den finaste versionen av vilken pjäs som helst namnger alltid sin tillverkare. Det enda som kan kosta dig en signatur är en full väska: en signerad enhet behöver en egen plats att landa på, eller en signerad stapel som matchar.\n\nEn stapel föremål delar en enda identitet, så två kopior slås samman bara när varje märke matchar exakt: samma föremål, samma signerare, samma mästerverksegenskaper, samma förtrollning, samma band. En signerad stock går aldrig in i en enkel hög åt något håll (en sammanslagning skulle sudda ut någons namn), men identiska laster slås samman med glädje, så tjugo malm signerade av samma samlare sitter i en enda stapel och ett vindfall trasar inte sönder dina väskor.\n\nSignaturer betalar tillbaka till hantverkare: att hålla vilken signerad kopia som helst av ett reagens som krävs vid bänken, oavsett vem som signerat den, lägger till 2 procentenheters mästerverkschans, och att hålla ett reagens signerat av din egen hand skär ner det reagensets krävda antal med ett (aldrig under ett). Ditt eget signerade arbete på sällsynt eller bättre fortsätter till och med lära dig, i dag enbart genom flaskan: drick en dryck du signerat och ett litet sipprande av färdighet flyter tillbaka till hantverket som bryggde den, så länge det hantverket är ett av dina aktiva huvudyrken.',
-  'guide.profPages.econ.throttleBody':
-    'Produktionen har ett tak: hantverkande, avförtrollning, förtrollning, bärgning och uppladdningar av verktygseffekter delar på en enda budget om {actions} lyckade åtgärder i varje {seconds} sekunder långt fönster. Ett nekat försök kostar ingenting och drar ingen budget. Du kommer aldrig att känna av den i normalt spel; den finns för att en maxad specialist med full bank inte ska kunna översvämma Marknaden, oavsett skicklighet eller lager.',
   'guide.profPages.faq.a4':
     'Du fick ett vindfall. Ungefär 1 skörd av 90 utlöser en sällsynt insamlingshändelse (urgammalt hjärtved på ett träd, en oskadd åder i malm, en månlyst blomma bland örter): den femdubblar utbytet, signerar varje enhet med ditt namn och kungör fyndet för hela zonen. Ett sällsynt eller bättre kvalitetsslag på en vanlig skörd signerar också utbytet.\n\nSignerade material är värda att spara eller sälja dyrt: att hålla vilken signerad kopia som helst av ett nödvändigt reagens vid bänken lägger till 2 procentenheter på mästerverkschansen. Kom bara ihåg att de bara staplas med identiskt signerade kopior, så de tar en egen väskplats.',
   'guide.profPages.faq.a6':
@@ -692,7 +690,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.collectorsHeading': 'Samlare, trofeer, och priset pa en historia',
   'guide.profPages.econ.collectorsBody':
     'Handlare är blinda för ursprung: ett signerat föremål säljs till ett NPC för exakt sitt ordinarie pris. Premiumet på en signatur finns bara mellan spelare, vilket är precis vad som gör det intressant: en stapel vindfallsmalm signerad av en berömd samlare, ett Primärsnitt från en lycklig insamling, ett mästerverk-svärd som namnger en hantverkare som sedan gått i pension, alla kostar vad någons minne säger att de är värda.\n\nBedrifternas bok lutar sig mot samma instinkt: Oskadd åder, Urgammalt hjärtved, Månlyst blomma, Ett perfekt exemplar och Glimmer av hopp är noll-ryktbarhetens samlarmärken som finns enbart för att bevisa att ett ögonblick hände dig. Behåll föremålet som förtjänade bedriften och du har kvittot. Inget av detta är styrka; ursprung köper inga egenskaper och vinner inga strider, det är spelets pappersspår av goda dagar.',
-  'guide.profPages.econ.throttleHeading': 'Atgärdsbegränsningen',
   'guide.profPages.econ.doctrineHeading': 'Spelare handlar med spelare',
   'guide.profPages.econ.doctrineBody':
     'Hantverksekonomin är byggd på en idé: spelare försörjer spelare. Samlare matar hantverkare, hantverkare matar korsfarare och raidare, och avbrytare matar förtrollare, med handlare och stationsmästare på kanterna för att ta in skräp och mynt snarare än att konkurrera med dig. Om du vill tjäna pengar på ett yrke är din kund en person: lär dig vad andra spelare bränner igenom, prissätt mot Världsmarknaden, och behandla NPC-systemen som ett golv under dina priser, inte som marknaden själv.\n\nTillverkad utrustning är inställd för att ligga under raidgolvet: även ett mästerverk är alltid bara en kvalitetsnivå över sitt recept, aldrig förbi legendarisk, och dess statbudget stannar under raidlootbandet. Smedjan gör dig redo för det svåraste innehållet; den ersätter det inte. Det håller hantverkare, raidare och marknaden i en stabil triangel: raidfynd förblir aspirationsbaserade, och tillverkade pjäser förblir den bästa utrustning pengar faktiskt kan köpa.',
@@ -2265,9 +2262,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.calendar.events.delveDay.note':
     'Broder Halven markerar i sina tabeller: en fin dag att trotsa Det rasade relikvariet.',
   'hudChrome.calendar.events.delveDay.title': 'Delve-dag',
-  'hudChrome.calendar.events.fiestaNight.note':
-    '2v2-fiestans ring drar sin högljuddaste publik i kväll.',
-  'hudChrome.calendar.events.fiestaNight.title': 'Fiestanatt',
   'hudChrome.calendar.events.fishingDerby.note':
     'Metare kantar sjöarna. Ta med ett spö och byt fiskehistorier.',
   'hudChrome.calendar.events.fishingDerby.title': 'Fisketävling',
@@ -3452,6 +3446,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.items.cragthorn_greatstaff.name': 'Klipptörnets storstav',
   'entities.items.cragward_pauldrons.name': 'Klippvärnets axelplåtar',
   'entities.items.cragmaw_huntcord.name': 'Klippkäftens jaktlina',
+  'entities.items.cragmaw_huntquiver.name': 'Klippkäftens jaktkoger',
   'entities.items.cragmaw_prowlboots.name': 'Klippkäftens smygstövlar',
   'entities.items.cragwalker_boots.name': 'Klippvandrarstövlar',
   'entities.items.crimson_amber_armor_plate.name': 'Karmosinbärnsten',
@@ -3537,6 +3532,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.items.gravewardens_shiv.name': 'Gravväktarens stickkniv',
   'entities.items.gravewoven_raiment.name': 'Gravvävd skrud',
   'entities.items.gravewyrm_gauntlets.name': 'Gravlindormens pansarhandskar',
+  'entities.items.gravewyrm_bone_quiver.name': 'Gravlindormens benkoger',
   'entities.items.gravewyrm_thornmaul.name': 'Gravlindormens törnklubba',
   'entities.items.gravewyrm_mantle.name': 'Gravlindormsmantel',
   'entities.items.gravewyrm_sabatons.name': 'Gravlindormssabatoner',
@@ -3603,6 +3599,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.items.mistveil_grips.name': 'Dimslöjehandskar',
   'entities.items.moggers_copper_cudgel.name': 'Moggers kopparklubba',
   'entities.items.moggers_shiv.name': 'Moggers dolk',
+  'entities.items.moggers_hide_quiver.name': 'Moggers skinnkoger',
   'entities.items.moggers_stomper_boots.name': 'Moggers stampstövlar',
   'entities.items.monarch_crown_helm.name': 'Monarkens krona',
   'entities.items.moonbark_vestments.name': 'Månbarksklädsel',
@@ -3743,6 +3740,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.items.stormcallers_spaulders.name': 'Galecall-axelskydd',
   'entities.items.bonewrought_greatsword.name': 'Bonewrought storsvärd',
   'entities.items.direfang_greatblade.name': 'Direfang-storklinga',
+  'entities.items.direfang_quiver.name': 'Direfang-koger',
   'entities.items.bonewrought_bulwark.name': 'Bonewrought bålverk',
   'entities.items.wraithfire_orb.name': 'Wraithfire-sfär',
   'entities.items.stormshard_leggings.name': 'Stormskärvebenkläder',
@@ -4741,7 +4739,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'fiesta.end.draw': 'FIESTA OAVGJORT! För jämnt för att avgöra!',
   'fiesta.end.loss': 'FIESTA FÖRLORAD! Kör igen!',
   'fiesta.end.win': 'FIESTA VUNNEN! 🎉 Vilket kalas!',
-  'fiesta.enterQueue': 'Gå med i Fiestan!',
   'fiesta.error.leaderOnly': 'Endast gruppledaren får ställa ditt lag i kö för {label}.',
   'fiesta.error.noAugment': 'Du har ingen förstärkning att välja just nu.',
   'fiesta.error.notOnOffer': 'Den förstärkningen erbjuds inte.',
@@ -4758,9 +4755,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'fiesta.powerup.pow_colossus.name': 'Koloss',
   'fiesta.powerup.pow_moon_boots.name': 'Månstövlar',
   'fiesta.powerup.pow_speed_demon.name': 'Fartdemon',
-  'fiesta.practice': '🎉 Öva mot bottar',
-  'fiesta.practiceNote':
-    'Offlineträning: skapar 3 AI-bottar och ställer dig i kö för en 2v2-Fiesta. Klicka igen för att sluta.',
   'fiesta.queue.join': 'Du går med i 2v2-Fiestans kö. Gör dig redo att FESTA…',
   'fiesta.queue.leave': 'Du lämnar 2v2-Fiestans kö.',
   'fiesta.queue.teamLeave': 'Ditt lag lämnar 2v2-Fiestans kö.',
@@ -4999,38 +4993,18 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Skyddar en allierad så att närstridsangripare skadar sig själva när de slår.',
   'guide.abilityHook.thunder_clap': 'Slår allt runt omkring dig och saktar ner deras attacker.',
   'guide.abilityHook.wrath': 'En naturpil kastad mot ett mål från avstånd, din förstavalskanon.',
-  'guide.arenaPage.augmentsNote':
-    'Förstärkningar och kraftuppladdningar håller bara under matchen. De handlar om lekfulla, improviserade byggen, inte varaktig makt, så ingen köper sig till en seger.',
   'guide.arenaPage.coliseumBody':
     'Coliseum är rikets arena, där du möter andra spelare i rankade matcher, en mot en eller två mot två. Varje division håller sin egen ställning, så en seger lyfter dig uppför den stegen för hela riket att se. Öppna Arena-fönstret för att anmäla dig till en division, ensam eller med din partner.',
   'guide.arenaPage.coliseumHeading': 'Det askgråa colosseumet',
   'guide.arenaPage.duelsBody':
     'Utmana vilken spelare du än möter till en vänskaplig duell. Inget står på spel utom stoltheten, så det är det enklaste sättet att lära sig en matchning eller göra upp en vänskaplig tvist.',
   'guide.arenaPage.duelsHeading': 'Dueller',
-  'guide.arenaPage.fiestaBody':
-    'Fiesta är ett snabbt slagsmål två mot två som utkämpas som en enda sammanhängande drabbning, med varje kämpe ställd på jämn fot. Medan striden pågår draftar du förstärkningar, snabba boostar som omformar din uppsättning i farten, så att inga två matcher spelas riktigt likadant.',
-  'guide.arenaPage.fiestaHeading': 'Två-mot-två-fiesta',
   'guide.arenaPage.heading': 'Arena och PvP',
   'guide.arenaPage.intro':
     'Vill du testa dig själv mot andra spelare? Spelare mot spelare är inbyggt, och det är alltid något du väljer, aldrig något som påtvingas dig.',
   'guide.arenaPage.ladderBody':
     'Rankat spel följer din ställning över tid. Kolla topplistan för att se var du befinner dig och vem som håller rikets topp.',
   'guide.arenaPage.ladderHeading': 'Klättra på rankingstegen',
-  'guide.arenaPage.powerupsBody':
-    'Glödande klot faller också ner i arenan mitt i striden, fria för den som når dem först. De är medvetet överdrivna och håller bara en kort stund: Fartdemon för en blinkning av bländande fart, Koloss för att svälla upp till en lufsande jätte, Månstövlar för ett studsande hopp med låg gravitation, och Bärsärk för en plötslig våg av ursinne.',
-  'guide.arenaPage.powerupsTitle': 'Kraftuppladdningar i ringen',
-  'guide.arenaPage.waveGoldBody':
-    'Den mellersta vågen: tveeggade kombinationer där ditt bygge börjar ta form och sjunga.',
-  'guide.arenaPage.waveGoldTitle': 'Guld',
-  'guide.arenaPage.wavePrismaticBody':
-    'Den sista vågen: byggesdefinierande, skärmsmältande toppar avsedda att kännas löjliga på bästa sätt.',
-  'guide.arenaPage.wavePrismaticTitle': 'Prismatisk',
-  'guide.arenaPage.waveSilverBody':
-    'Den inledande vågen: rena boostar för en enda egenskap som skärper grunderna i din klass.',
-  'guide.arenaPage.waveSilverTitle': 'Silver',
-  'guide.arenaPage.wavesBody':
-    'En Fiesta-drabbning ger dig färska val efter hand, och valen blir djärvare ju längre striden pågår. Du bygger från en våg till nästa, väljer ett av några få alternativ varje gång och behåller det resten av drabbningen.',
-  'guide.arenaPage.wavesTitle': 'Förstärkningar kommer i vågor',
   'guide.bestiary.flavor.gravecaller_cultist':
     'Kåpklädda tjänare till dödskulten vars verk besudlar gravarna från dalen till topparna. Där de samlas vilar inte de döda.',
   'guide.bestiary.flavor.grubjaw':
@@ -6035,7 +6009,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hud.core.mapCanvasLabel': 'Karta',
   'hud.core.mapSummary': 'Karta över {zone}.',
   'hud.core.maxLevel': 'MAXNIVÅ',
-  'hud.core.mobileArena': 'Arena',
   'hud.core.mobileAttack': 'Anfall',
   'hud.core.mobileCamera': 'Kamera — dubbeltryck för att centrera',
   'hud.core.mobileChat': 'Chatt',
@@ -6131,7 +6104,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hud.errors.whisperMissing': "Det finns ingen spelare vid namn '{name}' uppkopplad.",
   'hud.errors.whisperSelf': 'Du muttrar för dig själv. Ingen hör det.',
   'hud.keybinds.actions.actionBarSlot': 'Handlingsfält {slot}',
-  'hud.keybinds.actions.arena': 'Arena (Askgrå kolosseum)',
   'hud.keybinds.actions.attack': 'Anfall',
   'hud.keybinds.actions.attackMove': 'Anfallsförflyttning',
   'hud.keybinds.actions.autorun': 'Växla automatisk löpning',
@@ -6890,6 +6862,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.partyGroup': 'Grupp {n}',
   'hudChrome.unitFrame.partyLabel': 'Ditt följe',
   'hudChrome.unitFrame.playerLabel': 'Din hjälte',
+  'hudChrome.unitFrame.petLabel': 'Ditt djur',
   'hudChrome.unitFrame.targetAnnounce': 'Markera {name}',
   'hudChrome.unitFrame.targetLabel': 'Ditt mål',
   'hudChrome.widgets.clockTitle': 'Lokal tid - klicka för att växla mellan 12/24-timmar',
@@ -7886,6 +7859,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.event.hint': 'Annonsera en raid, träff eller ett evenemang',
   'hudChrome.discord.relay.help.label': 'Behöver hjälp',
   'hudChrome.discord.relay.help.hint': 'Be gemenskapen om hjälp',
+  'hudChrome.options.hideUnusedActionSlots': 'Dölj oanvända åtgärdsrutor',
   'hudChrome.options.showSecondaryActionBar': 'Visa sekundärt handlingsfält',
   'errors.api.desktopCodeInvalid':
     'Inloggningskoden för skrivbordsappen är ogiltig eller har gått ut. Försök igen.',
@@ -8154,7 +8128,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Allt på den här sidan lever i spelet: tryck på Esc för att öppna alternativen. Menyn öppnas på en Översikt av fästa väsentligheter, med kategorierna på en rad bredvid: inställningarna nedan finns under Grafik, Gränssnitt och Tillgänglighet i Skärm-gruppen, och Prestandaöverlägget under System. Ännu snabbare: skriv in ett namn i sökrutan högst upp och hoppa direkt dit.',
   'guide.settingsPage.whyLabel': 'Varför det fungerar:',
   'hudChrome.crafting.close': 'Nära hantverk',
-  'hudChrome.crafting.craft': 'Hantverk',
   'hudChrome.crafting.craftedToast': 'Tillverkad: {name}',
   'hudChrome.crafting.empty': 'Inga recept kända än.',
   'hudChrome.crafting.insufficientMaterials': 'Du har inte materialet för det.',
@@ -8239,9 +8212,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Klyver målets rustning och sänker den med {damage}% per applicering. Stackas upp till 5 gånger. Vållar en stor mängd hot.',
   'entities.mobs.training_dummy.name': 'Träningsdocka',
   'entities.mobs.yumi_cat.name': 'Yumi',
-  'guide.arenaPage.yumiBody':
-    'Skydda Yumi är ett lagbaserat målläge som spelas i en labyrint: varje sida vaktar sin egen kattföljeslagare samtidigt som den jagar den andra. Med jämna mellanrum blinkar båda katterna till nya hörn av labyrinten, så striden pendlar mellan att försvara, jaga och kappas om att hitta dem igen. Köa som tre mot tre eller fem mot fem; att falla i strid sätter dig bara på bänken en kort stund.',
-  'guide.arenaPage.yumiHeading': 'Skydda Yumi',
   'hudChrome.archetypeTitle.hobbyLabel': 'Fritidssyssla',
   'hudChrome.auraEffect.armorPct': 'Minskar rustningen med {pct}%',
   'hudChrome.auraEffect.armorPctStacks': 'Minskar rustningen med {pct}% ({stacks} stackar)',
@@ -8251,7 +8221,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.increasePct.int': 'Ökar Intellekt med {pct}%',
   'hudChrome.auraEffect.increasePct.sta': 'Ökar Uthållighet med {pct}%',
   'hudChrome.crafting.recipeNotLearned': 'Du har inte lärt dig det receptet än.',
-  'hudChrome.crafting.throttled': 'Du tillverkar för snabbt. Vänta ett ögonblick och försök igen.',
   'hudChrome.mobile.chatPlaceholder': 'Säg något...',
   'hudChrome.mobile.hideKeyboard': 'Dölj tangentbordet',
   'hudChrome.unitFrame.partyChip': 'Grupp',
@@ -8261,7 +8230,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'yumi.bracket5': 'Yumi 5 mot 5',
   'yumi.end.loss': 'NEDERLAG! Din Yumi har fallit.',
   'yumi.end.win': 'SEGER! Yumi är trygg!',
-  'yumi.enterQueue': 'Gå med i Skydda Yumi!',
   'yumi.error.partyTooBig3': 'Skydda Yumi 3 mot 3 tillåter ett sällskap på upp till tre.',
   'yumi.error.partyTooBig5': 'Skydda Yumi 5 mot 5 tillåter ett sällskap på upp till fem.',
   'yumi.hud.aria': 'Din Yumi på {mine} av {max} hälsa, fiendens Yumi på {theirs}.',
@@ -9132,6 +9100,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.keybinds.petAttack': 'Djur: Anfall',
   'hudChrome.keybinds.petDefensive': 'Djur: Defensivt',
   'hudChrome.keybinds.petStop': 'Djur: Stanna',
+  'hudChrome.keybinds.targetPet': 'Djur: Måltavla',
   'hudChrome.keybinds.petTaunt': 'Djur: Provocera',
   'hudChrome.keybinds.mount': 'Sitt upp / Stig av',
   'hudChrome.mailbox.parcelQtyDecreaseAria': 'Skicka en {item} mindre',
@@ -10105,6 +10074,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hud.combat.evaded': '{target} undkommer din {ability}.',
   'hudChrome.options.mouseoverCast': 'Kasta via muspekaren på gruppramarna',
   'hudChrome.options.showTargetOfTarget': 'Visa målets mål',
+  'hudChrome.options.showPetFrame': 'Visa ditt djur',
   'hudChrome.unitFrame.targetOfTargetLabel': 'Målets mål',
   'itemUi.market.rarityLegendary': 'Legendarisk',
   'loading.reconnectingAttempt':
@@ -10790,13 +10760,9 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.disenchantConfirmBodySpecial':
     'Detta förstör en särskild kopia av {item} (signerad, mästerverk eller förtrollad) och ger arkanmaterial. Det kan inte ångras.',
   'hudChrome.enchanting.disenchantConfirmTitle': 'Avförtrylla {item}?',
-  'hudChrome.enchanting.disenchantThrottled':
-    'Du avförtrollar för snabbt. Vänta en stund och försök igen.',
   'hudChrome.enchanting.disenchantedLine': 'Du avförtrollar {item}.',
   'hudChrome.enchanting.enchantAppliedLine': 'Du förtrollar {item} med {enchant}.',
   'hudChrome.enchanting.enchantInsufficient': 'Du har inte materialet för den förtrollningen.',
-  'hudChrome.enchanting.enchantThrottled':
-    'Du förtrollar för snabbt. Vänta en stund och försök igen.',
   'hudChrome.enchanting.enchantUnknown': 'Den förtrollningen finns inte.',
   'hudChrome.enchanting.enchantWrongSlot':
     'Den förtrollningen kan inte appliceras på det föremålet.',
@@ -10811,7 +10777,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.salvageConfirmBodySpecial':
     'Detta förstör en särskild kopia av {item} (signerad, mästerverk eller förtrollad) och ger hantverksmaterial. Det kan inte ångras.',
   'hudChrome.enchanting.salvageConfirmTitle': 'Bärga {item}?',
-  'hudChrome.enchanting.salvageThrottled': 'Du bärgar för snabbt. Vänta en stund och försök igen.',
   'hudChrome.enchanting.salvagedLine': 'Du bärgar {item}.',
   'hudChrome.enchanting.targetTitle': 'Välj ett föremål att förtrylla',
   'hudChrome.gathering.biteLine': 'Något nappar på betet!',

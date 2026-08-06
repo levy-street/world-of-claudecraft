@@ -961,6 +961,14 @@ export function dealDamage(
   // below, plus encounter participant tracking for the roster tasks.
   if (source) deedsMod.onDamageDealtForDeeds(ctx, source, target, amount, crit, kind);
 
+  // Thornhollow Fields assists: remember who softened a player before the blow
+  // that finishes them. Only real damage on a live player counts, and the
+  // battleground module owns every other rule (same match, opposing teams, the
+  // assist window); this hub only reports the hit.
+  if (source && amount > 0 && target.kind === 'player' && !target.dead) {
+    ctx.bgOnPlayerDamaged(target, source);
+  }
+
   if (source && source.kind === 'player' && source.id !== target.id) {
     const meta = ctx.players.get(source.id);
     if (meta) meta.counters.damageDealt += amount;
@@ -1171,6 +1179,17 @@ export function handleDeath(
   e.gatherCastNodeId = '';
   e.gatherCastToolRarity = '';
   e.gatherCastEffectConfirmed = false;
+  e.craftCastRecipeId = '';
+  e.craftCastCommission = false;
+  e.craftCastBatchRemaining = 0;
+  e.craftCastBatchTotal = 0;
+  e.enchantCastItemId = '';
+  e.enchantCastBagSlot = 0;
+  e.enchantCastEnchantId = '';
+  e.enchantCastEquipSlot = '';
+  e.enchantCastConfirmReplace = false;
+  e.enchantCastTargetPin = '';
+  e.toolRechargeCastProfessionId = '';
   e.fishBiteAtTick = 0;
   e.fishReelDeadlineTick = 0;
   e.fishCastZoneId = '';
@@ -1250,6 +1269,10 @@ export function handleDeath(
       killerId: killer && killer.id !== e.id ? killer.id : undefined,
       killerAbility: killerAbility ?? undefined,
     });
+    // Thornhollow Fields: carrier death drops the flag in place. The corpse
+    // lies where it fell and the player's own Release press sends the spirit to
+    // the warded keep graveyard, where the team wave clock raises it.
+    ctx.bgOnPlayerDeath(e, killer);
     for (const m of ctx.entities.values()) {
       if (m.kind === 'mob' && !m.dead && m.aggroTargetId === e.id && m.aiState !== 'dead') {
         // turn on the next nearby attacker; go home only if nobody is left

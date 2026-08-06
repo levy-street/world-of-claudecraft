@@ -315,8 +315,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Eén vast bedrag per receptentrede, eenmalig in rekening gebracht wanneer een meester het je leert; elke trede van de tabel hieronder is vandaag in gebruik, van de gratis startrecepten tot de hengellessen van de gereedschapsmaker bovenaan.',
   'guide.profPages.econ.provenanceBody':
     'Sommige voorwerpen dragen een naam. Zweef eroverheen en de tooltip zegt Verzameld door die-en-die op een grondstof, of Gemaakt door die-en-die op een afgewerkt stuk: hetzelfde merk, geformuleerd naar hoe het voorwerp is ontstaan. Een handtekening is onderdeel van het voorwerp zelf, reist ermee mee door ruilen, de bank, de post, de Wereldmarkt en zelfs een terugkoop bij een handelaar, en vervaagt nooit.\n\nVerzamelen signeert zijn beste werk vanzelf: elke oogst die zeldzaam of beter rolt komt gesigneerd binnen, en zeldzame vondsten signeren hun hele vijfvoudige buitenkans. De gelukkige rol van een lijkoogst signeert de opbrengst waar de familie geen exemplaar te geven heeft, en waar dat wel zo is, houdt hij de opbrengst gewoon en slaat er het gesigneerde ongeschonden exemplaar naast. Vervaardigen signeert langs dezelfde lijn: elke kopie van een zeldzame of betere uitkomst wordt gesigneerd geslagen, en een meesterwerk signeert altijd, welke kwaliteit het ook heeft, zodat de fijnste versie van elk stuk altijd zijn maker noemt. Het enige dat je een handtekening kan kosten is een volle tas: een gesigneerde eenheid heeft eigen ruimte nodig, of een bijpassende gesigneerde stapel om in te landen.\n\nEen stapel voorwerpen deelt één identiteit, dus twee kopieën smelten alleen samen wanneer elk merk exact overeenkomt: hetzelfde voorwerp, dezelfde ondertekenaar, dezelfde meesterwerkstatistieken, dezelfde betovering, dezelfde band. Een gesigneerd blok voegt zich nooit bij een gewone hoop, in geen van beide richtingen (samenvoegen zou iemands naam wissen), maar identieke inhoud smelt vrolijk samen, dus twintig erts gesigneerd door dezelfde verzamelaar zitten in één stapel en een buitenkans versnippert je tassen niet.\n\nHandtekeningen betalen makers terug: een gesigneerde kopie van een benodigd reagens aan de werkbank hebben, door wie dan ook gesigneerd, voegt 2 procentpunt meesterwerkkans toe, en een reagens in handen hebben dat je met eigen hand hebt gesigneerd verlaagt de vereiste hoeveelheid van dat reagens met één (nooit tot onder één). Je eigen gesigneerde werk van zeldzaam of beter blijft je zelfs leren, vandaag alleen nog via het flesje: drink een drank die je zelf hebt gesigneerd en er sijpelt een beetje vaardigheid terug naar het ambacht dat hem brouwde, zolang dat ambacht een van je actieve hoofdambachten is.',
-  'guide.profPages.econ.throttleBody':
-    'Productie heeft een plafond: vervaardigen, onbetoveren, betoveren, salvagen en het opladen van gereedschapseffecten delen één budget van {actions} geslaagde acties per venster van {seconds} seconden. Een geweigerde poging kost niets en verbruikt geen budget. In normaal spel zul je het nooit merken; het bestaat zodat een afgetopte specialist met een volle bank de Markt niet kan overspoelen, wat zijn vaardigheid of voorraad ook is.',
   'guide.profPages.faq.a4':
     'Je hebt een meevaller te pakken. Ruwweg 1 op de 90 oogsten zet een zeldzame verzamelgebeurtenis in gang (oud kernhout bij een boom, een ongerepte ader bij erts, een maanverlichte bloem tussen de kruiden): die vermenigvuldigt de opbrengst vijf keer, signeert elke eenheid met jouw naam, en kondigt de vondst aan de hele zone aan. Een zeldzame of betere kwaliteitsrol bij een gewone oogst signeert de opbrengst ook.\n\nGesigneerde materialen zijn het waard om te bewaren of duur te verkopen: een gesigneerde kopie van een benodigd reagens bij de werkbank in handen hebben voegt 2 procentpunten toe aan de meesterwerkkans. Onthoud alleen dat ze uitsluitend stapelen met identiek gesigneerde kopieën, dus ze houden hun eigen tasslot.',
   'guide.profPages.faq.a6':
@@ -698,7 +696,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.collectorsHeading': 'Verzamelaars, trofees en de prijs van een verhaal',
   'guide.profPages.econ.collectorsBody':
     'Handelaren zijn blind voor herkomst: een gesigneerd voorwerp verkoopt aan een NPC voor precies zijn gewone prijs. De premie op een handtekening bestaat alleen tussen spelers, en dat is precies wat het interessant maakt: een stapel windfall-erts gesigneerd door een beroemde verzamelaar, een Prime Cut van een gelukkige oogst, een meesterwerkling met de naam van een ambachtsman die inmiddels gestopt is, ze kosten wat iemands geheugen zegt dat ze waard zijn.\n\nHet Boek der Daden speelt op hetzelfde instinct in: Ongerept Ader, Oud Hardhout, Maanbloesem, Een Perfect Exemplaar en Glinstering van Hoop zijn nul-Roem verzamelaarsdaden die puur bestaan om te bewijzen dat een moment jou is overkomen. Bewaar het voorwerp dat de daad verdiende en je hebt het bewijs. Niets hiervan is macht; herkomst koopt geen statistieken en wint geen gevechten, het is het papieren spoor van het spel van goede dagen.',
-  'guide.profPages.econ.throttleHeading': 'De actiebegrenzing',
   'guide.profPages.econ.doctrineHeading': 'Spelers handelen met spelers',
   'guide.profPages.econ.doctrineBody':
     'De ambachteconomie is gebouwd op één idee: spelers beleveren spelers. Verzamelaars voeden ambachtslieden, ambachtslieden voeden questers en raiders, en brekers voeden betoveraars, met handelaren en stationneesters aan de randen om rommel en munt op te nemen in plaats van met je te concurreren. Als je geld wilt verdienen aan een ambacht, is jouw klant een persoon: leer wat andere spelers doorheen branden, prijs je waar ten opzichte van de Wereldmarkt, en behandel de NPC-systemen als een vloer onder je prijzen, niet als de markt zelf.\n\nGevaardigde uitrusting is afgestemd om net onder de raidgrens te zitten: zelfs een meesterwerk is altijd slechts één kwaliteitstrede boven zijn recept, nooit voorbij legendarisch, en zijn statistiekenbudget blijft onder het raidlootband. De smidse maakt je klaar voor de zwaarste inhoud; hij vervangt die niet. Dat houdt ambachtslieden, raiders en de markt in een stabiele driehoek: raid-drops blijven iets om naar te streven, en ambachtswerk blijft de beste uitrusting die geld daadwerkelijk kan kopen.',
@@ -1877,13 +1874,9 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.disenchantConfirmBodySpecial':
     'Dit vernietigt een speciaal exemplaar van {item} (gesigneerd, meesterwerk of betoverd) en levert arcanematerialen op. Dit kan niet ongedaan worden gemaakt.',
   'hudChrome.enchanting.disenchantConfirmTitle': '{item} onbetoveren?',
-  'hudChrome.enchanting.disenchantThrottled':
-    'Je onbetoverd te snel. Wacht even en probeer het opnieuw.',
   'hudChrome.enchanting.disenchantedLine': 'Je onbetoverd {item}.',
   'hudChrome.enchanting.enchantAppliedLine': 'Je betoverd {item} met {enchant}.',
   'hudChrome.enchanting.enchantInsufficient': 'Je hebt de materialen niet voor die betovering.',
-  'hudChrome.enchanting.enchantThrottled':
-    'Je betoverd te snel. Wacht even en probeer het opnieuw.',
   'hudChrome.enchanting.enchantUnknown': 'Die betovering bestaat niet.',
   'hudChrome.enchanting.enchantWrongSlot':
     'Die betovering kan niet op dat voorwerp worden aangebracht.',
@@ -1898,8 +1891,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.salvageConfirmBodySpecial':
     'Dit vernietigt een speciaal exemplaar van {item} (gesigneerd, meesterwerk of betoverd) en levert knutselmaterialen op. Dit kan niet ongedaan worden gemaakt.',
   'hudChrome.enchanting.salvageConfirmTitle': '{item} salvagen?',
-  'hudChrome.enchanting.salvageThrottled':
-    'Je salvaged te snel. Wacht even en probeer het opnieuw.',
   'hudChrome.enchanting.salvagedLine': 'Je salvaged {item}.',
   'hudChrome.enchanting.targetTitle': 'Kies een voorwerp om te betoveren',
   'hudChrome.itemProc.attackSlow':
@@ -2502,9 +2493,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.calendar.events.delveDay.note':
     'Broeder Halven markeert zijn kaarten: een mooie dag om het Ingestorte Reliekschrijn te trotseren.',
   'hudChrome.calendar.events.delveDay.title': 'Delvedag',
-  'hudChrome.calendar.events.fiestaNight.note':
-    'De 2v2 Fiesta-ring trekt vanavond zijn luidruchtigste publiek.',
-  'hudChrome.calendar.events.fiestaNight.title': 'Fiesta-avond',
   'hudChrome.calendar.events.fishingDerby.note':
     'Hengelaars staan langs de meren. Neem een hengel mee en wissel visverhalen uit.',
   'hudChrome.calendar.events.fishingDerby.title': 'Visderby',
@@ -3711,6 +3699,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.items.crag_warden_cudgel.name': 'Knuppel van de Rotswachter',
   'entities.items.craghorn_staff.name': 'Rotshoorn-Staf',
   'entities.items.cragmaw_huntcord.name': 'Cragmaws Jachtkoord',
+  'entities.items.cragmaw_huntquiver.name': 'Cragmaws Jachtpijlkoker',
   'entities.items.cragmaw_prowlboots.name': 'Cragmaw-Sluiplaarzen',
   'entities.items.cragwalker_boots.name': 'Rotsloperlaarzen',
   'entities.items.crimson_amber_armor_plate.name': 'Karmijnen Amber',
@@ -3790,6 +3779,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.items.gravewardens_shiv.name': 'Grafwachters Steekmes',
   'entities.items.gravewoven_raiment.name': 'Grafgeweven Gewaad',
   'entities.items.gravewyrm_gauntlets.name': 'Grafwurm-Handschoenen',
+  'entities.items.gravewyrm_bone_quiver.name': 'Grafwurm-Beenpijlkoker',
   'entities.items.gravewyrm_mantle.name': 'Grafwurm-Mantel',
   'entities.items.gravewyrm_sabatons.name': 'Grafwurm-Sabatons',
   'entities.items.gravewyrm_scale_hauberk.name': 'Grafwurm-Schubmaliënkolder',
@@ -3850,6 +3840,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.items.mistveil_grips.name': 'Nevelsluier-Grepen',
   'entities.items.moggers_copper_cudgel.name': 'Moggers Koperen Knuppel',
   'entities.items.moggers_shiv.name': 'Moggers Steekmes',
+  'entities.items.moggers_hide_quiver.name': 'Moggers Leren Pijlkoker',
   'entities.items.moggers_stomper_boots.name': 'Moggers Stamplaarzen',
   'entities.items.monarch_crown_helm.name': 'Monarchenkroon',
   'entities.items.copper_mining_pick.name': 'Koperen Mijnpik',
@@ -3973,6 +3964,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.items.stormcallers_spaulders.name': 'Galecall-Schouderstukken',
   'entities.items.bonewrought_greatsword.name': 'Bonewrought-Grootzwaard',
   'entities.items.direfang_greatblade.name': 'Direfang-Grootkling',
+  'entities.items.direfang_quiver.name': 'Direfang-Pijlkoker',
   'entities.items.bonewrought_bulwark.name': 'Bonewrought-Bolwerk',
   'entities.items.wraithfire_orb.name': 'Wraithfire-Orb',
   'entities.items.stormshard_leggings.name': 'Stormscherf-Beenbescherming',
@@ -4855,7 +4847,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'fiesta.end.draw': 'FIESTA GELIJKSPEL! Te dichtbij om te zeggen!',
   'fiesta.end.loss': 'FIESTA VERLOREN! Op naar de revanche!',
   'fiesta.end.win': 'FIESTA GEWONNEN! 🎉 Wat een feest!',
-  'fiesta.enterQueue': 'Doe mee aan de Fiesta!',
   'fiesta.error.leaderOnly':
     'Alleen de groepsleider mag je team in de wachtrij zetten voor {label}.',
   'fiesta.error.noAugment': 'Je hebt op dit moment geen versterking om te kiezen.',
@@ -4873,9 +4864,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'fiesta.powerup.pow_colossus.name': 'Kolos',
   'fiesta.powerup.pow_moon_boots.name': 'Maanlaarzen',
   'fiesta.powerup.pow_speed_demon.name': 'Snelheidsduivel',
-  'fiesta.practice': '🎉 Oefenen tegen Bots',
-  'fiesta.practiceNote':
-    'Offline oefenen: brengt 3 AI-bots voort en zet je in de wachtrij voor een 2v2-Fiesta. Klik nogmaals om te stoppen.',
   'fiesta.queue.join': 'Je sluit je aan bij de 2v2-Fiesta-wachtrij. Maak je klaar om te FEESTEN…',
   'fiesta.queue.leave': 'Je verlaat de 2v2-Fiesta-wachtrij.',
   'fiesta.queue.teamLeave': 'Je team verlaat de 2v2-Fiesta-wachtrij.',
@@ -5124,38 +5112,18 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.thunder_clap': 'Raakt alles om je heen en vertraagt hun aanvallen.',
   'guide.abilityHook.wrath':
     'Een natuurbout die van afstand op een doelwit wordt geworpen, je vertrouwde nuke.',
-  'guide.arenaPage.augmentsNote':
-    'Augments en power-ups gelden alleen voor de wedstrijd. Ze draaien om speelse, ter plekke bedachte builds, niet om blijvende macht, zodat niemand zich een weg naar de winst koopt.',
   'guide.arenaPage.coliseumBody':
     'Het Coliseum is de arena van het rijk, waar je andere spelers tegemoet treedt in ranglijstwedstrijden, één tegen één of twee tegen twee. Elke categorie heeft zijn eigen ranglijst, dus een overwinning tilt je hoger op die ladder, zichtbaar voor het hele rijk. Open het Arenavenster om je in te schrijven voor een categorie, alleen of met je partner.',
   'guide.arenaPage.coliseumHeading': 'Het Asgrauwe Colosseum',
   'guide.arenaPage.duelsBody':
     'Daag elke speler die je tegenkomt uit voor een vriendschappelijk duel. Er staat niets op het spel behalve trots, dus het is de makkelijkste manier om een matchup te leren of een vriendschappelijk meningsverschil te beslechten.',
   'guide.arenaPage.duelsHeading': 'Duels',
-  'guide.arenaPage.fiestaBody':
-    'Fiesta is een snel, twee-tegen-twee gevecht dat als één doorlopende partij wordt uitgevochten, waarbij elke strijder op gelijke voet wordt gebracht. Terwijl het gevecht loopt, draft je augments, snelle boosts die je kit gaandeweg hervormen, zodat geen twee wedstrijden helemaal hetzelfde spelen.',
-  'guide.arenaPage.fiestaHeading': 'Twee tegen twee Fiesta',
   'guide.arenaPage.heading': 'Arena en PvP',
   'guide.arenaPage.intro':
     'Wil je jezelf meten met andere spelers? Speler tegen speler is ingebouwd, en het is altijd iets wat je kiest, nooit iets wat je opgedrongen wordt.',
   'guide.arenaPage.ladderBody':
     'Ranglijstspel volgt je positie over de tijd. Bekijk het scorebord om te zien waar je staat en wie de top van het rijk bezit.',
   'guide.arenaPage.ladderHeading': 'De ladder beklimmen',
-  'guide.arenaPage.powerupsBody':
-    'Gloeiende bollen vallen ook middenin het gevecht in de arena, gratis voor wie ze als eerste bereikt. Ze zijn opzettelijk over de top en duren maar even: Speed Demon voor een flits van verblindend tempo, Colossus om uit te dijen tot een logge reus, Moon Boots voor een stuiterende sprong met lage zwaartekracht, en Berserker voor een plotselinge golf van razernij.',
-  'guide.arenaPage.powerupsTitle': 'Power-ups in de ring',
-  'guide.arenaPage.waveGoldBody':
-    "De middelste golf: tweesnijdende combo's waar je build vorm begint te krijgen en gaat zingen.",
-  'guide.arenaPage.waveGoldTitle': 'Goud',
-  'guide.arenaPage.wavePrismaticBody':
-    'De laatste golf: build-bepalende, schermversmeltende pieken bedoeld om belachelijk aan te voelen op de beste manier.',
-  'guide.arenaPage.wavePrismaticTitle': 'Prismatisch',
-  'guide.arenaPage.waveSilverBody':
-    'De openingsgolf: schone, enkelvoudige statboosts die de basis van je klasse aanscherpen.',
-  'guide.arenaPage.waveSilverTitle': 'Zilver',
-  'guide.arenaPage.wavesBody':
-    'Een Fiesta-partij reikt je gaandeweg verse keuzes aan, en de keuzes worden gewaagder naarmate het gevecht langer duurt. Je bouwt van de ene golf naar de volgende, kiest elke keer een van een paar opties en houdt het voor de rest van de partij.',
-  'guide.arenaPage.wavesTitle': 'Augments komen in golven',
   'guide.bestiary.flavor.gravecaller_cultist':
     'Gewaden dragende dienaren van de doodscultus wier werk de graven bezoedelt van het Dal tot de toppen. Waar ze samenkomen, rusten de doden niet.',
   'guide.bestiary.flavor.grubjaw':
@@ -6232,7 +6200,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hud.core.mapCanvasLabel': 'Kaart',
   'hud.core.mapSummary': 'Kaart van {zone}.',
   'hud.core.maxLevel': 'MAX NIVEAU',
-  'hud.core.mobileArena': 'Arena',
   'hud.core.mobileAttack': 'Aanvallen',
   'hud.core.mobileCamera': 'Camera — dubbeltik om te centreren',
   'hud.core.mobileChat': 'Chat',
@@ -6330,7 +6297,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hud.errors.whisperMissing': "Er is geen speler met de naam '{name}' online.",
   'hud.errors.whisperSelf': 'Je mompelt in jezelf. Niemand hoort het.',
   'hud.keybinds.actions.actionBarSlot': 'Actiebalk {slot}',
-  'hud.keybinds.actions.arena': 'Arena (Ashen Coliseum)',
   'hud.keybinds.actions.attack': 'Aanvallen',
   'hud.keybinds.actions.attackMove': 'Aanvalsverplaatsing',
   'hud.keybinds.actions.autorun': 'Automatisch rennen aan/uit',
@@ -7094,6 +7060,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.partyGroup': 'Groep {n}',
   'hudChrome.unitFrame.partyLabel': 'Je Bende',
   'hudChrome.unitFrame.playerLabel': 'Je Held',
+  'hudChrome.unitFrame.petLabel': 'Je Huisdier',
   'hudChrome.unitFrame.targetAnnounce': 'Markeer {name}',
   'hudChrome.unitFrame.targetLabel': 'Je Doelwit',
   'hudChrome.widgets.clockTitle': 'Lokale tijd - klik om te wisselen tussen 12/24-uurs',
@@ -8048,6 +8015,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.event.hint': 'Kondig een raid, meetup of evenement aan',
   'hudChrome.discord.relay.help.label': 'Hulp nodig',
   'hudChrome.discord.relay.help.hint': 'Vraag de gemeenschap om hulp',
+  'hudChrome.options.hideUnusedActionSlots': 'Ongebruikte actievakjes verbergen',
   'hudChrome.options.showSecondaryActionBar': 'Secundaire actiebalk tonen',
   'errors.api.desktopCodeInvalid':
     'Desktop-inlogcode is ongeldig of verlopen. Probeer het opnieuw.',
@@ -8318,7 +8286,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Alles op deze pagina leeft in het spel: druk op Esc om de opties te openen. Het menu opent op een Overview met vastgezette essentiële instellingen, met de categorieën op een balk ernaast: de onderstaande instellingen vind je onder Graphics, Interface en Accessibility in de groep Display, en de Performance Overlay onder System. Nog sneller: typ een naam in het zoekvak bovenaan en spring er meteen naartoe.',
   'guide.settingsPage.whyLabel': 'Waarom het werkt:',
   'hudChrome.crafting.close': 'Sluit het maken',
-  'hudChrome.crafting.craft': 'Ambacht',
   'hudChrome.crafting.craftedToast': 'Gemaakt: {name}',
   'hudChrome.crafting.empty': 'Nog geen recepten bekend.',
   'hudChrome.crafting.insufficientMaterials': 'Daar heb je de materialen niet voor.',
@@ -8403,9 +8370,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Scheurt het pantser van het doelwit open en verlaagt het met {damage}% per toepassing. Stapelt tot 5 keer. Genereert veel dreiging.',
   'entities.mobs.training_dummy.name': 'Oefenpop',
   'entities.mobs.yumi_cat.name': 'Yumi',
-  'guide.arenaPage.yumiBody':
-    'Bescherm Yumi is een teamdoelspel dat in een doolhof wordt gespeeld: elke kant bewaakt zijn eigen kattenmetgezel terwijl hij die van de ander bejaagt. Zo nu en dan flitsen beide katten naar nieuwe hoeken van het doolhof, zodat het gevecht heen en weer gaat tussen verdedigen, jagen en de race om ze opnieuw te vinden. Sluit aan als drie tegen drie of vijf tegen vijf; sneuvelen in de strijd zet je maar even op de bank.',
-  'guide.arenaPage.yumiHeading': 'Bescherm Yumi',
   'hudChrome.archetypeTitle.hobbyLabel': 'Liefhebberij',
   'hudChrome.auraEffect.armorPct': 'Vermindert pantser met {pct}%',
   'hudChrome.auraEffect.armorPctStacks': 'Vermindert pantser met {pct}% ({stacks} stapels)',
@@ -8415,7 +8379,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.increasePct.int': 'Verhoogt Intellect met {pct}%',
   'hudChrome.auraEffect.increasePct.sta': 'Verhoogt Uithoudingsvermogen met {pct}%',
   'hudChrome.crafting.recipeNotLearned': 'Je hebt dat recept nog niet geleerd.',
-  'hudChrome.crafting.throttled': 'Je maakt te snel. Wacht even en probeer het opnieuw.',
   'hudChrome.mobile.chatPlaceholder': 'Zeg iets...',
   'hudChrome.mobile.hideKeyboard': 'Toetsenbord verbergen',
   'hudChrome.unitFrame.partyChip': 'Groep',
@@ -8425,7 +8388,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'yumi.bracket5': 'Bescherm Yumi 5v5',
   'yumi.end.loss': 'NEDERLAAG! Jouw Yumi is gevallen.',
   'yumi.end.win': 'OVERWINNING! Yumi is veilig!',
-  'yumi.enterQueue': 'Doe mee met Bescherm Yumi!',
   'yumi.error.partyTooBig3': 'Bescherm Yumi 3v3 staat een groep van maximaal drie toe.',
   'yumi.error.partyTooBig5': 'Bescherm Yumi 5v5 staat een groep van maximaal vijf toe.',
   'yumi.hud.aria': 'Jouw Yumi op {mine} van {max} gezondheid, vijandige Yumi op {theirs}.',
@@ -9262,6 +9224,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.keybinds.petAttack': 'Huisdier: Aanvallen',
   'hudChrome.keybinds.petDefensive': 'Huisdier: Verdedigend',
   'hudChrome.keybinds.petStop': 'Huisdier: Stoppen',
+  'hudChrome.keybinds.targetPet': 'Huisdier: Aanwijzen',
   'hudChrome.keybinds.petTaunt': 'Huisdier: Uitdagen',
   'hudChrome.keybinds.mount': 'Opstijgen / Afstijgen',
   'hudChrome.mailbox.parcelQtyDecreaseAria': 'Eén {item} minder versturen',
@@ -10180,6 +10143,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hud.combat.evaded': '{target} ontloopt je {ability}.',
   'hudChrome.options.mouseoverCast': 'Mouseover-bezwering op groepsframes',
   'hudChrome.options.showTargetOfTarget': 'Doelwit van doelwit tonen',
+  'hudChrome.options.showPetFrame': 'Je huisdier tonen',
   'hudChrome.unitFrame.targetOfTargetLabel': 'Doelwit van het doelwit',
   'itemUi.market.rarityLegendary': 'Legendarisch',
   'loading.reconnectingAttempt':

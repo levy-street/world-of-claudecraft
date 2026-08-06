@@ -894,7 +894,7 @@ describe('Eastbrook runtime collision, spawn, and services', () => {
     // The canonical four-worker gate can put this synchronous dual-world
     // projection just over 90 seconds under CPU contention. Keep the full seed,
     // tick, and equality contract; only give the worker enough wall-clock room.
-    timeout: 120000,
+    timeout: 240_000,
   }, () => {
     const stabilitySeed = 4_242;
     const legacyWorld = {

@@ -30,6 +30,7 @@ import {
   parseBagFilter,
   serializeBagFilter,
 } from './bag_filter';
+import { bagInstanceGlyphKind } from './bag_instance_glyph_view';
 import { filterBankSlots } from './bank_filter';
 import { showQuantityPrompt } from './bank_quantity_prompt';
 import {
@@ -56,6 +57,11 @@ import {
 } from './guild_bank_window';
 import { formatMoney, formatNumber, type TranslationKey, t } from './i18n';
 import { QUALITY_COLOR } from './icons';
+import {
+  INSTANCE_GLYPH_ARIA_KEYS,
+  instanceGlyphMarkHtml,
+  UNKNOWN_INSTANCE_GLYPH_ARIA_KEYS,
+} from './item_instance_glyph_mark';
 import { knownItemDef } from './known_item';
 import type { PainterHostPresentation } from './painter_host';
 import {
@@ -703,18 +709,34 @@ export class BankWindow {
       cell.className = `bank-item q-${slot.qualityKey}`;
       const qColor = QUALITY_COLOR[slot.qualityKey] ?? QUALITY_DEFAULT_COLOR;
       cell.style.setProperty('--bank-slot-quality', qColor);
+      // Per-copy corner marks (masterwork seal, enchanted / signed / bound glyph,
+      // or the generic wedge): same shared helper bags use so a banked masterwork
+      // keeps its seal visible at a glance. Aria-hidden mark; the cell name
+      // carries the per-copy fact. Quest items cannot enter the bank, so no
+      // quest seal composes here.
+      const glyphKind = bagInstanceGlyphKind(slot.instance);
+      const instanceMark = instanceGlyphMarkHtml(glyphKind);
       // Stale-client guard (R34): an id this bundle predates still holds a
       // real, counted bank slot, so it renders (fallback icon, raw id as the
       // label) instead of vanishing. The withdraw click stays live because the
       // server resolves it by slotIndex, no def needed; only the def-derived
       // tooltip body is replaced.
+      const countLabel = this.fmt(slot.count);
       cell.setAttribute(
         'aria-label',
         item
-          ? t('itemUi.bags.itemAria', { item: itemDisplayName(item), count: this.fmt(slot.count) })
-          : t('itemUi.bags.unknownItemAria', { id: slot.itemId, count: this.fmt(slot.count) }),
+          ? t(glyphKind ? INSTANCE_GLYPH_ARIA_KEYS[glyphKind] : 'itemUi.bags.itemAria', {
+              item: itemDisplayName(item),
+              count: countLabel,
+            })
+          : t(
+              glyphKind
+                ? UNKNOWN_INSTANCE_GLYPH_ARIA_KEYS[glyphKind]
+                : 'itemUi.bags.unknownItemAria',
+              { id: slot.itemId, count: countLabel },
+            ),
       );
-      cell.innerHTML = `${item ? this.deps.itemIcon(item) : unknownItemIconHtml(slot.itemId)}<span class="bank-count">${slot.showCount ? esc(t('itemUi.bags.stackCount', { count: this.fmt(slot.count) })) : ''}</span>`;
+      cell.innerHTML = `${item ? this.deps.itemIcon(item) : unknownItemIconHtml(slot.itemId)}${instanceMark}<span class="bank-count">${slot.showCount ? esc(t('itemUi.bags.stackCount', { count: countLabel })) : ''}</span>`;
       cell.addEventListener('click', (ev) => {
         // On touch, the click that ends a long-press peek inspects the slot (its
         // tooltip is already shown) instead of withdrawing: the release dismisses

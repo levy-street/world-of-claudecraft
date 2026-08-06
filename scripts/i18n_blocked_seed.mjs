@@ -427,6 +427,13 @@ export const V07_SLASH = [
   // leak) and the gather cast readout joined the same /cast backstop surface.
   'You are fishing. Waiting for a bite.',
   'You are gathering: Akis of Akis remaining.',
+  // Craft-family cast readouts (Craft Cast System): same /cast backstop surface
+  // as gather. S3 substituter fills remaining/total with "Aki" + "s" units.
+  'You are crafting: Akis of Akis remaining.',
+  'You are disenchanting: Akis of Akis remaining.',
+  'You are enchanting: Akis of Akis remaining.',
+  'You are salvaging: Akis of Akis remaining.',
+  'You are recharging a tool effect: Akis of Akis remaining.',
   'You are in Aki (levels Aki–Aki) at (5, 5).',
   'You are in Aki.',
   'You are in combat (enemies still engaged).',

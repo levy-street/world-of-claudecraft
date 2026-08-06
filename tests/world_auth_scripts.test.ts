@@ -103,14 +103,13 @@ const AUTHENTICATED_NODE_CLIENTS = [
     authSend: 'this.ws.send(JSON.stringify(worldAuthMessage(token, characterId)))',
   },
 ] as const;
-// Scripts that import the Node WebSocket client without authenticating to a
-// world socket, on purpose. The production CPU profiler connects to the local
-// Chrome DevTools endpoint, while the OTA layout preflight sends an empty token
-// deliberately: it only wants to learn whether the server accepts this
-// checkout's layout discriminator, and reaching the token rejection is the
-// proof that it did.
+// Scripts that open a world socket WITHOUT authenticating, on purpose. The OTA
+// layout preflight sends an empty token deliberately: it only wants to learn
+// whether the server accepts this checkout's layout discriminator, and reaching
+// the token rejection is the proof that it did.
 const NON_AUTHENTICATING_NODE_WS_SCRIPTS = [
   'scripts/ota/check_server_layout.mjs',
+  // Chrome DevTools Protocol socket, not the authenticated game world socket.
   'scripts/prod_cpu_profile_client.mjs',
   'scripts/ws_security_e2e.mjs',
 ] as const;
@@ -138,9 +137,9 @@ function nodeWebSocketSources(dir = SCRIPTS_ROOT): Array<[string, string]> {
 
 describe('standalone world WebSocket auth', () => {
   it('keeps the Node discriminator fresh with the authoritative world layout epoch', () => {
-    expect(ONLINE_WORLD_LAYOUT_VERSION).toBe(4);
+    expect(ONLINE_WORLD_LAYOUT_VERSION).toBe(5);
     expect(ONLINE_WORLD_AUTH_TYPE).toBe(`auth-world-${ONLINE_WORLD_LAYOUT_VERSION}`);
-    expect(SCRIPT_WORLD_AUTH_TYPE).toBe('auth-world-4');
+    expect(SCRIPT_WORLD_AUTH_TYPE).toBe('auth-world-5');
     expect(SCRIPT_WORLD_AUTH_TYPE).toBe(ONLINE_WORLD_AUTH_TYPE);
     expect(readFileSync(join(ROOT, 'scripts/lib/world_auth.d.mts'), 'utf8')).toContain(
       `export const ONLINE_WORLD_AUTH_TYPE: '${ONLINE_WORLD_AUTH_TYPE}';`,
@@ -160,7 +159,7 @@ describe('standalone world WebSocket auth', () => {
     });
   });
 
-  it('pins every Node WebSocket client and each explicit non-world-auth client', () => {
+  it('pins every Node WebSocket client and the explicit non-auth security probe', () => {
     const nodeWsScripts = nodeWebSocketSources()
       .map(([path]) => path)
       .sort();

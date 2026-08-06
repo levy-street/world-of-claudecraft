@@ -174,6 +174,9 @@ interface DriveRow {
 
 const SIG_RETURN = 'if (sig === this.lastSig) return;';
 const VIEW_SIG_RETURN = 'if (view.sig === this.lastSig) return;';
+// The merged PvP window guards its two tab arms with the same shape against the same
+// field, so the Thornhollow Fields arm names its signature apart to stay pinnable.
+const RAVENRIFT_SIG_RETURN = 'if (ravenriftSig === this.lastSig) return;';
 const VIEW_SIG_BLOCK = 'if (view.sig !== this.lastSig) {';
 
 /**
@@ -247,6 +250,17 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
       proof: 'if (lockpickRenderSig(view) !== this.lastSig) this.renderBoard();',
     },
     why: 'the delve lockpick panel; a per-frame safety net behind a display check and a sig diff',
+  },
+  {
+    call: 'this.sceneController.update',
+    band: 'frame',
+    gate: '',
+    surface: 'window',
+    guard: {
+      kind: 'none',
+      why: 'the scene overlay uses PainterHost write elision, while the choice window cold-renders only when its choice or leader role changes; the countdown is intentionally live',
+    },
+    why: 'the cinematic overlay and Last Bell dialogue-choice window',
   },
   {
     call: 'this.tutorial.update',
@@ -343,6 +357,17 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
         'if (craftingReagentSig(this.sim.inventory, this.sim.player.name) === this.lastCraftingReagentSig) return;',
     },
     why: 'the other half of the Craft gate: rebuilds the crafting window when the bags move',
+  },
+  {
+    call: 'this.paintOpenCraftingCastProgress',
+    band: 'frame',
+    gate: '',
+    surface: 'window',
+    guard: {
+      kind: 'hud',
+      proof: 'if (craftCastActivitySig(session) !== this.lastCraftingCastSig) {',
+    },
+    why: 'in-window craft-cast progress strip: full rebuild only when the activity signature moves, fill-only ticks while casting',
   },
   {
     call: 'this.playerFramePainter.paint',
@@ -506,6 +531,20 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     gate: "!(target && target.kind !== 'object')",
     surface: 'chrome',
     why: 'hides the target frame when there is no target',
+  },
+  {
+    call: 'this.ownPet',
+    band: 'frame',
+    gate: '',
+    surface: 'none',
+    why: 'resolves the player-owned pet out of the entity roster ONCE per frame (findOwnPet, pet_frame_view.ts, early-returning), shared by the pet frame here and renderPetBar below, which takes it as a parameter; ungated on purpose because the pet BAR needs it whatever showPetFrame says, and it replaces the scan renderPetBar previously did itself, so the frame costs no extra walk',
+  },
+  {
+    call: 'this.petFramePainter.paint',
+    band: 'frame',
+    gate: '',
+    surface: 'chrome',
+    why: 'the pet health frame under the player frame, deliberately UNTIERED and on the frame band (pet health is information the owner acts on, so a tier knob may not delay it); every write is elided, so a pet at steady health costs nothing, and a null pet paints it hidden',
   },
   {
     call: 'this.targetAurasWindow.clear',
@@ -688,17 +727,17 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
   {
     call: 'this.setDisplay',
     band: 'frame',
-    gate: 'ghost',
+    gate: 'ghost && !ghostInBgMatch',
     sites: 3,
     surface: 'chrome',
-    why: 'the ghost prompt and its two resurrect buttons',
+    why: 'the ghost prompt and its two resurrect buttons; a battleground spirit is exempt because the respawn wave is its only way back',
   },
   {
     call: 'this.setDisplay',
     band: 'frame',
-    gate: '!(ghost)',
+    gate: '!(ghost && !ghostInBgMatch)',
     surface: 'chrome',
-    why: 'hides the ghost prompt while not a ghost',
+    why: 'hides the ghost prompt while not a corpse-running ghost',
   },
   {
     call: 'this.showBanner',
@@ -840,6 +879,20 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the fiesta score, respawn, offer and augment overlays',
   },
   {
+    call: 'this.bgScoreboard.update',
+    band: 'medium',
+    gate: '',
+    surface: 'chrome',
+    why: 'the Thornhollow Fields in-match strip, the wave-respawn overlay and the spawn-protection line; the view core short-circuits an inactive match',
+  },
+  {
+    call: 'this.bgKillFeed.update',
+    band: 'medium',
+    gate: '',
+    surface: 'chrome',
+    why: 'ages out the Thornhollow Fields banner kill feed on its own clock, so an entry expires with no new event to drive it',
+  },
+  {
     call: 'this.yumiPainter.update',
     band: 'medium',
     gate: '',
@@ -899,8 +952,8 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     band: 'medium',
     gate: "$('#arena-window').style.display === 'block'",
     surface: 'window',
-    guard: { kind: 'module', module: 'arena_window.ts', proof: VIEW_SIG_RETURN },
-    why: 'the arena queue window',
+    guard: { kind: 'module', module: 'arena_window.ts', proof: RAVENRIFT_SIG_RETURN },
+    why: 'the merged PvP window (Thornhollow Fields and arena tabs); each tab arm builds its\n      own signature and returns on an unchanged one',
   },
   {
     call: 'this.dungeonFinderWindow.render',
@@ -1011,6 +1064,14 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     surface: 'window',
     guard: { kind: 'callsite' },
     why: 'gets the arena queue window out of the way when a bout starts; the seen latch makes it an edge',
+  },
+  {
+    call: 'this.arenaWindow.close',
+    band: 'frame',
+    gate: "inBgMatch && !this.bgMatchSeen && $('#arena-window').style.display === 'block'",
+    surface: 'window',
+    guard: { kind: 'callsite' },
+    why: "the same edge close when a Thornhollow Fields match seats: the queue lives on that window's Thornhollow Fields tab",
   },
   {
     call: 'this.valeCupWindow.close',
@@ -1422,7 +1483,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
     expect(
       bySurface,
       "the surface split moved. A new call needs its surface decided; a CHANGED one means a repaint was reclassified, which is the one edit that can quietly drop a window row's invalidation guard.",
-    ).toEqual({ window: 41, chrome: 72, none: 15 });
+    ).toEqual({ window: 44, chrome: 75, none: 16 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');
@@ -1435,9 +1496,9 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       if (row.guard) byKind[row.guard.kind] = (byKind[row.guard.kind] ?? 0) + 1;
     expect(byKind, 'a guard kind changed: say why in the PR, not only in the table').toEqual({
       module: 22,
-      hud: 5,
-      callsite: 10,
-      none: 4,
+      hud: 6,
+      callsite: 11,
+      none: 5,
     });
     // ...and the honest-exception list by NAME, because that is the one that should never
     // grow quietly: every entry is a window this repo knows has no invalidation guard.
@@ -1449,6 +1510,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       'this.lootRolls.update',
       'this.lootWindow.updateProximity',
       'this.questDialog.updateProximity',
+      'this.sceneController.update',
       'this.updateMapWindow',
     ]);
   });
@@ -1467,7 +1529,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       'the resolved guard list moved. A row changed which module it points at, which line it looks for, or dropped to a guard kind that names no source at all.',
     ).toEqual(
       [
-        'arena_window.ts: if (view.sig === this.lastSig) return;',
+        'arena_window.ts: if (ravenriftSig === this.lastSig) return;',
         'bags_window.ts: if (!bagsMoneyRowStale(el.style.display, this.deps.world().copper, this.lastMoneyCopper)) return;',
         'bank_window.ts: if (sig === this.lastSig) return;',
         'calendar_window.ts: if (sig === this.lastSig) return;',
@@ -1475,6 +1537,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
         'deeds_window.ts: if (sig === this.lastSig) return;',
         'dungeon_finder_proposal_popup.ts: if (view.sig !== this.lastSig) {',
         'dungeon_finder_window.ts: if (sig === this.lastSig) {',
+        'hud.ts: if (craftCastActivitySig(session) !== this.lastCraftingCastSig) {',
         'hud.ts: if (craftingReagentSig(this.sim.inventory, this.sim.player.name) === this.lastCraftingReagentSig) return;',
         'hud.ts: if (sig !== this.lastLootSettingsSig) {',
         'hud.ts: if (sig === this.lastProfessionSurfaceSig) return;',

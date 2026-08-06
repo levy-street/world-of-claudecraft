@@ -1,11 +1,13 @@
 // Pure, host-agnostic core for the gathering HUD (issue 1124): per-viewer node
 // ready/cooldown classification plus the gathering-proficiency display rows.
 //
-// DOM/Three-free so tests/gathering_view.test.ts can drive it directly. Two
+// DOM/Three-free so tests/gathering_view.test.ts can drive it directly. Three
 // consumers read this core's output:
 //   - minimap_markers.ts projects nearby node positions to canvas pixels and
 //     asks classifyGatherNode for each one's ready/cooldown state (the
 //     world-space indicator, see IWorldProfessions#nodeHarvestableByMe).
+//   - map_window_view.ts projects every in-zone node for the zone map, sharing
+//     viewerUsableToolTier so the map and minimap lock dimension agree.
 //   - char_window.ts renders buildGatheringProficiencyRows as the "Gathering"
 //     section of the character sheet (the proficiency read surface, see
 //     IWorldProfessions#professionsState).

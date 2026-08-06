@@ -31,7 +31,7 @@
 // to a color, never the resolved color.
 
 import type { GatheringProfessionId } from '../sim/content/professions';
-import { GATHER_NODES, isDelvePos, isYumiMazePos, QUESTS, zoneAt } from '../sim/data';
+import { GATHER_NODES, isBgPos, isDelvePos, isYumiMazePos, QUESTS, zoneAt } from '../sim/data';
 import { NODE_HARVEST_TABLE } from '../sim/professions/gathering';
 import { canGatherTier } from '../sim/professions/tools';
 import {
@@ -52,9 +52,11 @@ const PARTY_DISC_RADIUS_RANGE = 3;
 
 /** Which minimap surface a world renders: the delve schematic (owned by
  *  delve_map_painter), the Protect Yumi maze (the overworld marker set over a
- *  cached maze-wall background, minimap_painter.paintYumiMaze), or the
+ *  cached maze-wall background, minimap_painter.paintYumiMaze), the Thornhollow Fields
+ *  battleground (the same marker set over a cached wall raster; Hud routes it
+ *  through paintOverworld, which branches to paintBattleground), or the
  *  overworld minimap (this core). */
-export type MinimapMode = 'delve' | 'yumiMaze' | 'overworld';
+export type MinimapMode = 'delve' | 'yumiMaze' | 'battleground' | 'overworld';
 
 /** The NPC quest glyph: turn-in ready ('?') wins over available ('!'), else neutral. */
 export type NpcGlyph = '?' | '!' | '•';
@@ -69,7 +71,8 @@ export type NpcMarkerVariant = Exclude<QuestMarkerKind, 'active'>;
  *  flat struct): each variant carries exactly the fields its draw branch needs. */
 export type MinimapMarker =
   // An online friend/guild ally who is NOT in the party (party members are the
-  // party-disc/arrow variants). Strangers get no marker.
+  // party-disc/arrow variants). Strangers get no marker, and neither does a
+  // friend/guildmate sitting on the ENEMY roster of a live battleground match.
   | { kind: 'ally'; mx: number; my: number; ally: 'friend' | 'guild' }
   // A quest-giver NPC glyph. `marker` is the folded quest-marker state behind
   // the glyph: the painter resolves gold for 'ready'/'available' (and the
@@ -139,6 +142,7 @@ export interface MinimapMarkers {
  *  branch is delve_map_painter's; the overworld branch is this core's. */
 export function minimapMode(world: IWorld): MinimapMode {
   if (isYumiMazePos(world.player.pos.x)) return 'yumiMaze';
+  if (isBgPos(world.player.pos.x)) return 'battleground';
   return isDelvePos(world.player.pos.x) && world.delveRun ? 'delve' : 'overworld';
 }
 
@@ -176,6 +180,18 @@ export function createMinimapMarkers(): MinimapMarkers {
         : null;
       const guildNames = social?.guild ? new Set(social.guild.members.map((m) => m.name)) : null;
       const partyPids = world.partyInfo ? new Set(world.partyInfo.members.map((m) => m.pid)) : null;
+      // Thornhollow Fields fairness: inside a live match the friend/guild dot is a
+      // through-wall tracker, so a guildmate seated on the ENEMY roster would hand one
+      // side a live position feed the other side cannot have. Suppress every marker
+      // this core would otherwise emit for an enemy-team pid (the ally dot, and the
+      // party disc/arrow for the party path, which a cross-team queue could reach).
+      // Matched BY PID (match.players[].pid is the player entity id, the same identity
+      // partyPids compares against), never by name, so a rename or an impostor name
+      // cannot re-open it. Same-team friends and guildmates keep their dots.
+      const bgMatch = world.bgInfo?.match ?? null;
+      const bgEnemyPids = bgMatch
+        ? new Set(bgMatch.players.filter((bp) => bp.team !== bgMatch.myTeam).map((bp) => bp.pid))
+        : null;
 
       // Quest-marker inputs (the shared quest_marker_kind rule), resolved
       // lazily ONCE per build on the first in-rim NPC: craftingIdentity is a
@@ -193,7 +209,7 @@ export function createMinimapMarkers(): MinimapMarkers {
         if (dx * dx + dz * dz > rim2) continue; // cull markers outside the rim
         const mx = half + dx;
         const my = half + dz;
-        if (e.kind === 'player' && !partyPids?.has(e.id)) {
+        if (e.kind === 'player' && !partyPids?.has(e.id) && !bgEnemyPids?.has(e.id)) {
           const isFriend = friendNames?.has(e.name) ?? false;
           const isGuild = !isFriend && (guildNames?.has(e.name) ?? false);
           if (isFriend || isGuild) {
@@ -272,6 +288,7 @@ export function createMinimapMarkers(): MinimapMarkers {
       if (party) {
         for (const m of party.members) {
           if (m.pid === p.id) continue;
+          if (bgEnemyPids?.has(m.pid)) continue; // enemy-team pid: never tracked (see above)
           const dx = -(m.x - p.pos.x) * pxPerYard;
           const dz = -(m.z - p.pos.z) * pxPerYard;
           const dist = Math.hypot(dx, dz);

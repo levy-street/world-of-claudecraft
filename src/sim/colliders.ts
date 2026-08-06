@@ -7,6 +7,7 @@ import {
   bankerChestCenterWorld,
   resolveSolidBankerChestPlacement,
 } from './banker_chest_layout';
+import { battlegroundColliders } from './battleground_layout';
 import {
   buildingCameraHeight,
   buildingTerrainEnvelope,
@@ -15,7 +16,9 @@ import {
 import { MOUNT_RACE_JUMP_FIXTURES, raceGateSegment } from './content/mounts';
 import {
   arenaOriginAt,
+  BG_SLOT_COUNT,
   BUILTIN_WORLD,
+  battlegroundOrigin,
   DUNGEON_FLOOR_Y,
   DUNGEON_LIST,
   DUNGEON_X_THRESHOLD,
@@ -28,6 +31,7 @@ import {
   INSTANCE_SLOT_COUNT,
   instanceOrigin,
   isArenaPos,
+  isBgPos,
   isDelvePos,
   isRiftPos,
   isYumiMazePos,
@@ -1264,6 +1268,27 @@ export const colliderInternalsForTest = { staticWorldColliders };
 // its elevation is FLOOR, not obstacle (world.ts groundHeight lifts it).
 const ARENA_COLLIDERS: Collider[] = layoutColliders(ARENA_LAYOUT);
 const DROWNED_COURT_COLLIDERS: Collider[] = layoutColliders(DROWNED_COURT_LAYOUT);
+// Thornhollow Fields battleground (the Thornhollow field): compiled per-asset baked
+// collision, far too many colliders for the old linear per-slot scan. Every
+// slot's copy is registered into the open-world spatial GRID instead (see
+// gridFor), so movement, sight, camera and support all reach the field
+// through the same cell reads the open world uses. Fresh copies per grid
+// build: gridFor stamps its own gridIndex onto every collider, so two grids
+// (content/seed pairs) must never share collider objects.
+function bandSlotColliders(): Collider[] {
+  const out: Collider[] = [];
+  const base = battlegroundColliders();
+  for (let slot = 0; slot < BG_SLOT_COUNT; slot++) {
+    const o = battlegroundOrigin(slot);
+    for (const c of base) {
+      // Y values (cameraTopY/moveTopY/topSlope) stay as-is: the band's ground
+      // IS the field heightfield, so field-local Y is absolute world Y.
+      out.push({ ...c, x: c.x + o.x, z: c.z + o.z });
+    }
+  }
+  return out;
+}
+
 // The Last Keep: an authored room-graph interior, so its walls (minus
 // doorways) and decor footprints all derive from the one shared layout,
 // exactly like the rift citadel floors (layoutColliders routes through
@@ -1419,6 +1444,11 @@ const CELL_KEY_SPAN = 65536;
 function cellKey(gx: number, gz: number): number {
   return (gx + CELL_KEY_BIAS) * CELL_KEY_SPAN + (gz + CELL_KEY_BIAS);
 }
+/** The grid key covering a WORLD position, for the reads that start from one
+ *  (the battleground band's sight test) rather than from a cell range. */
+function cellKeyAt(x: number, z: number): number {
+  return cellKey(Math.floor(x / GRID_CELL), Math.floor(z / GRID_CELL));
+}
 
 // Grids are cached per (active world content, seed). The WeakMap keeps the
 // built-in world's grid warm forever and lets swapped-out custom maps be
@@ -1449,6 +1479,12 @@ function gridFor(seed: number): ColliderGrid {
   let grid = perContent.get(seed);
   if (grid) return grid;
   const built = staticWorldColliders(seed);
+  // The battleground band rides the same grid: its cells are far past the
+  // overworld rect, so the hash map simply grows by the field's cells. Pushed
+  // in a loop, never spread as arguments: the field times BG_SLOT_COUNT is
+  // already five figures of colliders, and an argument-count limit that scales
+  // with both the field and the slot count is not a limit worth having.
+  for (const c of bandSlotColliders()) built.push(c);
   // Index every collider once so queries can dedupe against a flat stamp
   // buffer (a collider spanning cells appears in each of them).
   for (let i = 0; i < built.length; i++) built[i].gridIndex = i;
@@ -1733,6 +1769,10 @@ export function resolvePosition(
   mover?: MoverHeight,
   riftToken = 0,
 ): { x: number; z: number } {
+  // The battleground band deliberately has NO branch here: its colliders live
+  // in the spatial grid at absolute coordinates and its ground is real terrain
+  // (groundHeight's band arm), so the grid fall-through below serves it with
+  // the full mover contract (pass-over, standable decks) like the open world.
   if (isYumiMazePos(x)) {
     const o = yumiMazeOriginAt(z);
     const local = resolveAgainst(yumiMazeColliders(), x - o.x, z - o.z, r);
@@ -1757,7 +1797,7 @@ export function resolvePosition(
     const local = resolveAgainst(region.colliders, x - region.ox, z - region.oz, r, ignoreFences);
     return { x: local.x + region.ox, z: local.z + region.oz };
   }
-  if (x > DUNGEON_X_THRESHOLD) {
+  if (x > DUNGEON_X_THRESHOLD && !isBgPos(x)) {
     const { ox, oz, interior, dungeonId } = instanceLocal(x, z);
     const colliders = interiorCollidersFor(dungeonId, interior);
     // `mover` rides through so a jumping body passes over (and lands on) the
@@ -1786,7 +1826,13 @@ export function resolvePosition(
  * physics broadphase does not apply to them.
  */
 export function isInstancedRegion(x: number): boolean {
-  return isYumiMazePos(x) || isDelvePos(x) || isArenaPos(x) || x > DUNGEON_X_THRESHOLD;
+  // The battleground band is EXCLUDED although it sits past the dungeon
+  // threshold: the Thornhollow field has sculpted terrain and standable decks,
+  // so its movement runs the open-world character physics solver over the
+  // grid, not the flat instanced kernel.
+  return (
+    isYumiMazePos(x) || isDelvePos(x) || isArenaPos(x) || (x > DUNGEON_X_THRESHOLD && !isBgPos(x))
+  );
 }
 
 /**
@@ -1864,9 +1910,11 @@ export function supportHeightAt(
   // threshold, so the specific bands must be ruled out FIRST (the same
   // routing resolvePosition uses).
   if (isYumiMazePos(x) || isDelvePos(x) || isArenaPos(x)) return -Infinity;
-  if (x > DUNGEON_X_THRESHOLD) {
+  if (x > DUNGEON_X_THRESHOLD && !isBgPos(x)) {
     // Dungeon interiors: the furniture tops (coffin lids, cargo stacks) are
     // standable surfaces exactly like the open world's crates and canopies.
+    // (The battleground band falls through to the grid read below: its
+    // rampart and stair decks are ordinary standable colliders there.)
     const { ox, oz, interior, dungeonId } = instanceLocal(x, z);
     return bestStandableTop(interiorCollidersFor(dungeonId, interior), x - ox, z - oz, r, maxY);
   }
@@ -1880,6 +1928,29 @@ export function supportHeightAt(
   const list = collidersInCell(grid, seed, Math.floor(x / GRID_CELL), Math.floor(z / GRID_CELL));
   if (list.length === 0) return -Infinity;
   return bestStandableTop(list, x, z, r, maxY);
+}
+
+/** How far above the terrain an authored deck still counts as the FLOOR for
+ *  object placement. Covers the battleground's flag podiums and stair landings
+ *  (2.5yd) while leaving the ramparts (5.7yd) obstacles overhead, so a body
+ *  seated under one lands beneath it rather than on top of it. */
+const DECK_FLOOR_REACH = 3;
+
+/**
+ * The surface an OBJECT placed at (x, z) rests on: the terrain, or an authored
+ * walkable deck close above it. The Thornhollow battleground field is the one
+ * region whose FLOOR is partly authored (flag podiums, stair landings), so a
+ * flag, rune or teleported body seated there must land on the deck instead of
+ * sinking to the terrain beneath it.
+ *
+ * Deliberately NOT used by the movement kernel: that keeps terrain height and
+ * standable prop tops separate (`supportHeightAt`) so walking UNDER a deck
+ * never lifts the body onto it.
+ */
+export function placementFloorHeight(seed: number, x: number, z: number): number {
+  const ground = groundHeight(x, z, seed);
+  if (!isBgPos(x)) return ground;
+  return Math.max(ground, supportHeightAt(seed, x, z, 0.5, ground + DECK_FLOOR_REACH));
 }
 
 /**
@@ -1904,7 +1975,7 @@ export function slopeGlueHeight(
   let ox = 0;
   let oz = 0;
   if (isYumiMazePos(x) || isDelvePos(x) || isArenaPos(x)) return -Infinity;
-  if (x > DUNGEON_X_THRESHOLD) {
+  if (x > DUNGEON_X_THRESHOLD && !isBgPos(x)) {
     const inst = instanceLocal(x, z);
     list = interiorCollidersFor(inst.dungeonId, inst.interior);
     ox = inst.ox;
@@ -1963,7 +2034,7 @@ export function interiorColliderFrame(
   z: number,
 ): { list: Collider[]; ox: number; oz: number } | null {
   if (x <= DUNGEON_X_THRESHOLD) return null;
-  if (isYumiMazePos(x) || isDelvePos(x) || isArenaPos(x)) return null;
+  if (isYumiMazePos(x) || isDelvePos(x) || isArenaPos(x) || isBgPos(x)) return null;
   const { ox, oz, interior, dungeonId } = instanceLocal(x, z);
   return { list: interiorCollidersFor(dungeonId, interior), ox, oz };
 }
@@ -2011,7 +2082,8 @@ export function seatGroundedAt(
   const ground = groundHeight(x, z, seed);
   // Instanced regions have no prop tops and their own bounds/door clamps
   // (applied by the caller's sweep): plain terrain seat there, untouched.
-  if (isYumiMazePos(x) || isDelvePos(x) || isArenaPos(x) || x > DUNGEON_X_THRESHOLD) {
+  // The battleground band is NOT one of them: its decks are grid props.
+  if (isInstancedRegion(x)) {
     return { x, z, y: ground };
   }
   const support = supportHeightAt(seed, x, z, r, prevFeetY + MOVE_TOP_EPS);
@@ -2206,6 +2278,29 @@ function sightBlockedAt(
     }
     return false;
   };
+  if (isBgPos(x)) {
+    // The field's terrain is honest cover: the ravine slopes, the keep mounds
+    // and the pit rim block casts wherever the ground itself crosses the eye
+    // line (the band arm of groundHeight serves the sculpted heightfield).
+    if (groundHeight(x, z, seed) > sightY) return true;
+    // Colliders live in the grid at absolute coordinates with known tops, so
+    // the low-obstacle skip applies exactly like the open world's.
+    //
+    // R-BOUND ASSUMPTION, mirror it if you widen the sample. This reads the ONE
+    // cell holding the sample point, not the cell RANGE the point's radius
+    // spans. That is exact only while `r` stays within the padding gridFor()
+    // indexes with (`MAX_BODY_RADIUS`, 0.8 yd): a collider is filed into every
+    // cell its bounds plus that padding touch, so anything whose surface is
+    // within 0.8 yd of the sample is already in this list. The live callers
+    // reach here through lineOfSightClear's default `r = 0.05`, an order of
+    // magnitude inside the pad. A caller passing r > MAX_BODY_RADIUS would
+    // start MISSING colliders parked in a neighbouring cell (permissive: sight
+    // reported clear through a surface), and must read the range instead, the
+    // way queryOpenWorldColliders does over its stamp dedupe.
+    const grid = gridFor(seed);
+    const list = grid.cells.get(cellKeyAt(x, z));
+    return list ? overlapsAny(list, x, z, true) : false;
+  }
   if (isYumiMazePos(x)) {
     const o = yumiMazeOriginAt(z);
     return overlapsAny(yumiMazeColliders(), x - o.x, z - o.z, false);
@@ -2240,8 +2335,8 @@ function sightBlockedAt(
 
 export function lineOfSightClear(
   seed: number,
-  from: { x: number; z: number },
-  to: { x: number; z: number },
+  from: { x: number; y?: number; z: number },
+  to: { x: number; y?: number; z: number },
   r = 0.05,
   delveModules?: readonly string[],
   riftToken = 0,
@@ -2252,8 +2347,24 @@ export function lineOfSightClear(
   if (d < 1e-6) return true;
   // The sight line runs eye-to-eye: lerp the endpoint eye heights per sample so
   // a low prop only blocks when its top actually crosses the line.
-  const eyeFrom = groundHeight(from.x, from.z, seed) + SIGHT_HEIGHT;
-  const eyeTo = groundHeight(to.x, to.z, seed) + SIGHT_HEIGHT;
+  //
+  // Eye height is TERRAIN-DERIVED everywhere except the battleground band, and
+  // that scoping is deliberate. Taking the caller's own `y` is the honest rule
+  // ("what you stand on, you see over"), and the band needs it: its field is
+  // the one instanced region with real sculpted terrain and standable decks,
+  // and its cover was authored against tops measured from the body's real
+  // height. But BOTH live callers pass an Entity.pos, which always carries a
+  // y, so applying it everywhere would silently retune open-world spell line
+  // of sight for every player: a caster standing on a knee-high standable prop
+  // (or mid-jump) would start seeing over cover that blocks them today. That
+  // is a global combat change, not a battleground one, so it stays scoped here
+  // and the open world keeps its historical behavior byte for byte. Widening
+  // it is a deliberate change of its own, with its own tests.
+  const eyeAt = (p: { x: number; y?: number; z: number }): number =>
+    (isBgPos(p.x) ? (p.y ?? groundHeight(p.x, p.z, seed)) : groundHeight(p.x, p.z, seed)) +
+    SIGHT_HEIGHT;
+  const eyeFrom = eyeAt(from);
+  const eyeTo = eyeAt(to);
   const steps = Math.max(2, Math.ceil(d / 0.5));
   if (isDelvePos(from.x)) {
     const delve = delveAt(from.x);

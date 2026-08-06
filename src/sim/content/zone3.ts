@@ -14,7 +14,7 @@ import type {
   ZoneDef,
   ZonePropsDef,
 } from '../types';
-import { FERAL } from './items';
+import { FERAL, HUNTER_ONLY } from './items';
 import { MOUNT_RACE_COURSE, STABLE_HORSE_TEMPLATE_ID, STABLE_PADDOCK } from './mounts';
 
 export const ZONE3_ZONE: ZoneDef = {
@@ -168,6 +168,9 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
       { itemId: 'cragmaw_prowlboots', chance: 0.3 },
       { itemId: 'cragward_pauldrons', chance: 0.25 },
       { itemId: 'cragthorn_greatstaff', chance: 0.2 },
+      // Independent roll like every other piece on this table, so the quiver
+      // costs the existing drops nothing.
+      { itemId: 'cragmaw_huntquiver', chance: 0.25 },
     ],
     scale: 1.3,
     color: 0x6e6453,
@@ -2478,6 +2481,20 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     stats: { armor: 44, agi: 5, sta: 3 },
     sellValue: 340,
   },
+  cragmaw_huntquiver: {
+    id: 'cragmaw_huntquiver',
+    name: 'Cragmaw Huntquiver',
+    kind: 'held_offhand',
+    slot: 'offhand',
+    quality: 'rare',
+    // The quiver ladder's early-Thornpeak rung, off the same beast that already
+    // anchors the zone's agi-leather line (Huntcord above, Prowlboots): Old
+    // Cragmaw (level 14) -> item level 17, offhand budget 7. Fills the long
+    // stretch between Mogger's uncommon (item level 7) and Korzul's rare (23).
+    stats: { agi: 4, sta: 3 },
+    sellValue: 240,
+    requiredClass: HUNTER_ONLY,
+  },
   // --- Level-20 endgame loot: Korzul (5-player Gravewyrm Sanctum) and Nythraxis
   // (10-player raid). Every piece below is NORMALIZED to the stat budget its item
   // level earns (see src/sim/item_level.ts): item level = level 20 + quality bonus,
@@ -3409,6 +3426,38 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     // The caster weapon-proficiency group list (CASTER_WEAPON_CLASSES); kind
     // held_offhand equips by the literal requiredClass.
     requiredClass: ['mage', 'priest', 'warlock', 'shaman', 'paladin', 'druid'],
+  },
+  gravewyrm_bone_quiver: {
+    id: 'gravewyrm_bone_quiver',
+    name: 'Gravewyrm Bone Quiver',
+    kind: 'held_offhand',
+    slot: 'offhand',
+    quality: 'rare',
+    // Korzul the Gravewyrm (level 20) -> item level 23, stats on the exact
+    // offhand budget, primaryStatBudget(23, rare, offhand) = 10. The mid rung of
+    // the quiver ladder, between Mogger's uncommon and the raid epic; agi/sta is
+    // the hunter identity the nighttalon leather set already carries.
+    stats: { agi: 6, sta: 4 },
+    sellValue: 360,
+    requiredClass: HUNTER_ONLY,
+  },
+  direfang_quiver: {
+    id: 'direfang_quiver',
+    name: 'Direfang Quiver',
+    kind: 'held_offhand',
+    slot: 'offhand',
+    quality: 'epic',
+    // The hunter counterpart to wraithfire_orb, off the same raid boss and on
+    // the same line: primaryStatBudget(29, epic, offhand) = 15. Setless, despite
+    // sharing the Direfang display name with the nighttalon set pieces, so it
+    // cannot shift that set's bonus thresholds.
+    stats: { agi: 9, sta: 6 },
+    // Physical ranged DPS identity: Hit, matching the nighttalon leather set
+    // (attacks miss, so Hit is the throughput rating); never crit-first like the
+    // caster orb, whose heals are not resisted.
+    hitRating: 20,
+    sellValue: 12000,
+    requiredClass: HUNTER_ONLY,
   },
   // --- vendor food & drink (Quartermaster Bree) ---
   trail_hardtack: {

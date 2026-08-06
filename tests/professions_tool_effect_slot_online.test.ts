@@ -11,6 +11,7 @@
 //
 // Harness copied from tests/professions_training_online.test.ts.
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { completeRechargeCast } from './helpers/enchant_family_cast';
 
 // Mock the db layer so the live GameServer suite needs no Postgres (the
 // vi.mock hoisting caveat from #2088 applies: this block cannot reference
@@ -241,11 +242,13 @@ describe('recharge_tool_effect over the wire', () => {
     slot.durability = 0;
     server.sim.addItem('arcane_dust', 10, pid);
     cmd(server, session, { cmd: 'recharge_tool_effect', profession: 'mining' });
+    routeTick(server);
+    completeRechargeCast(server.sim as never, pid);
+    routeTick(server);
     // Common pick, 20-charge fill, original crafter: ceil((20/10) * 0.5) = 1.
     expect(slot.durability).toBe(20);
     expect(slot.maxDurability).toBe(20);
     expect(server.sim.countItem('arcane_dust', pid)).toBe(9);
-    routeTick(server);
     expect(toolEffectResultsOf(fc.sent).at(-1)).toMatchObject({
       action: 'recharge',
       ok: true,

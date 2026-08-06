@@ -828,4 +828,32 @@ export const table: DeedLocaleTable = {
     name: 'Martıların Bildiği',
     desc: "Uzak Kıyı'nın sularından bir balık tut.",
   },
+  prog_engineering_rare: {
+    name: 'Hassas Mühendislik',
+    desc: 'Mühendislikte ilk ender eşyanı işle.',
+  },
+  prog_alchemy_rare: {
+    name: 'Ender Bir Yıllık',
+    desc: 'Simyada ilk ender eşyanı işle.',
+  },
+  prog_cooking_rare: {
+    name: 'Unutulmaz Bir Yemek',
+    desc: 'Yemek Pişirmede ilk ender eşyanı işle.',
+  },
+  prog_leatherworking_rare: {
+    name: 'İnce Tabaklama',
+    desc: 'Deri İşlemede ilk ender eşyanı işle.',
+  },
+  prog_tailoring_rare: {
+    name: 'Bir Usta Dikişi',
+    desc: 'Terzilikte ilk ender eşyanı işle.',
+  },
+  prog_weaponcrafting_rare: {
+    name: 'Parlayana Kadar Tavlandı',
+    desc: 'Silah Yapımında ilk ender eşyanı işle.',
+  },
+  prog_armorcrafting_rare: {
+    name: 'Kusursuza Kaplandı',
+    desc: 'Zırh Yapımında ilk ender eşyanı işle.',
+  },
 };

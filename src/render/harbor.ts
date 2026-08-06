@@ -790,12 +790,19 @@ function buildShip(parent: THREE.Group, harbor: HarborDef): void {
 }
 
 /** Build every authored harbor of the active world into one static group. */
-export function buildHarbors(seed: number, deps: HarborSceneDeps): { group: THREE.Group } {
+export function buildHarbors(
+  seed: number,
+  deps: HarborSceneDeps,
+  preserveLiveCues = false,
+): { group: THREE.Group } {
   harborSceneNowSec = deps.nowSec;
   const group = new THREE.Group();
   group.name = 'harbors';
-  // World rebuilds must discard cues recorded against the prior harbor handles.
-  SHIP_CUES.clear();
+  // Live graphics rebuilds replace renderer-owned handles but preserve the
+  // authoritative cue and its original presentation time. Initial/new-world
+  // builds discard all module state so a prior session cannot leak through.
+  if (preserveLiveCues) SHIP_CUES.preserveForRebuild();
+  else SHIP_CUES.clear();
   const harbors = getActiveWorldContent().props.harbors ?? [];
   activeHarbors = harbors;
   if (import.meta.env.DEV) {

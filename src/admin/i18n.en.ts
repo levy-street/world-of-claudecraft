@@ -402,6 +402,8 @@ export const en = {
   'moderationHistory.actionKill': 'Killed',
   'moderationHistory.actionJail': 'Jailed',
   'moderationHistory.actionUnjail': 'Released from jail',
+  'moderationHistory.actionSpectate': 'Spectated',
+  'moderationHistory.actionUnspectate': 'Stopped spectating',
   'moderationHistory.actionNote': 'Note',
   'moderationHistory.actionResetPassword': 'Password reset',
   'moderationHistory.actionDailyRewardsBan': 'Daily Rewards banned',

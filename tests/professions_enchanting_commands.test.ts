@@ -36,10 +36,15 @@ vi.mock('../server/db', () => ({
 
 import { type ClientSession, GameServer } from '../server/game';
 import { ClientWorld } from '../src/net/online';
-import { CRAFT_THROTTLE_MAX_PER_WINDOW } from '../src/sim/professions/action_throttle';
 import { type PlayerMeta, Sim } from '../src/sim/sim';
 import type { SimEvent } from '../src/sim/types';
 import { bareClient } from './helpers/bare_client';
+import {
+  completeEnchantFamilyCast,
+  runApplyEnchant,
+  runDisenchant,
+  runSalvage,
+} from './helpers/enchant_family_cast';
 
 // A common-quality one-hand weapon: disenchants to arcane_dust with NO typed
 // secondary, salvages to bone_fragments, and takes the mainhand Might enchant.
@@ -77,6 +82,9 @@ describe('offline Sim enchanting commands: stash + single pid-scoped emit', () =
     sim.addItem(COMMON_WEAPON, 1, pid);
     sim.drainEvents();
     sim.salvageItem(COMMON_WEAPON, pid);
+    // Phase 4: start emits castStart; result lands on complete.
+    expect(eventsOfType(sim.drainEvents(), 'salvageResult')).toHaveLength(0);
+    completeEnchantFamilyCast(sim, pid);
     const salv = eventsOfType(sim.drainEvents(), 'salvageResult');
     expect(salv).toHaveLength(1);
     if (salv[0].type !== 'salvageResult') throw new Error('expected salvageResult');
@@ -100,7 +108,7 @@ describe('offline Sim enchanting commands: stash + single pid-scoped emit', () =
     const pid = sim.playerId;
     sim.addItem(RARE_WEAPON, 1, pid);
     sim.drainEvents();
-    sim.disenchantItem(RARE_WEAPON, pid);
+    runDisenchant(sim, RARE_WEAPON, pid);
     const denc = eventsOfType(sim.drainEvents(), 'disenchantResult');
     expect(denc).toHaveLength(1);
     if (denc[0].type !== 'disenchantResult') throw new Error('expected disenchantResult');
@@ -129,7 +137,7 @@ describe('offline Sim enchanting commands: stash + single pid-scoped emit', () =
     const pid = sim.playerId;
     sim.addItem(COMMON_WEAPON, 1, pid);
     sim.drainEvents();
-    sim.disenchantItem(COMMON_WEAPON, pid);
+    runDisenchant(sim, COMMON_WEAPON, pid);
     const denc = eventsOfType(sim.drainEvents(), 'disenchantResult')[0];
     if (denc?.type !== 'disenchantResult') throw new Error('expected disenchantResult');
     expect(denc.ok).toBe(true);
@@ -144,7 +152,7 @@ describe('offline Sim enchanting commands: stash + single pid-scoped emit', () =
     sim.addItem(COMMON_WEAPON, 1, pid);
     sim.addItem(DUST, 5, pid);
     sim.drainEvents();
-    sim.applyEnchant(COMMON_WEAPON, WEAPON_ENCHANT, undefined, undefined, pid);
+    runApplyEnchant(sim, COMMON_WEAPON, WEAPON_ENCHANT, undefined, undefined, pid);
     const ench = eventsOfType(sim.drainEvents(), 'enchantResult');
     expect(ench).toHaveLength(1);
     if (ench[0].type !== 'enchantResult') throw new Error('expected enchantResult');
@@ -164,7 +172,7 @@ describe('offline Sim enchanting commands: stash + single pid-scoped emit', () =
     const sim = makeSim();
     const pid = sim.playerId;
 
-    // salvage of a not-held item.
+    // salvage of a not-held item (start-gate deny emits immediately).
     sim.drainEvents();
     sim.salvageItem(COMMON_WEAPON, pid);
     const salvDeny = eventsOfType(sim.drainEvents(), 'salvageResult')[0];
@@ -201,9 +209,9 @@ describe('offline Sim enchanting commands: stash + single pid-scoped emit', () =
 });
 
 // ---------------------------------------------------------------------------
-// Replay / dup safety + the shared-window throttle boundary.
+// Replay / dup safety + cast busy gate (Phase 4 retired the 10/60 throttle).
 // ---------------------------------------------------------------------------
-describe('offline Sim enchanting commands: replay + throttle safety', () => {
+describe('offline Sim enchanting commands: replay + cast pace', () => {
   it('running the same command twice with one held copy destroys once, second is not_held', () => {
     for (const kind of ['salvage', 'disenchant', 'enchant'] as const) {
       const sim = makeSim();
@@ -211,13 +219,10 @@ describe('offline Sim enchanting commands: replay + throttle safety', () => {
       sim.addItem(COMMON_WEAPON, 1, pid);
       if (kind === 'enchant') sim.addItem(DUST, 10, pid); // enough for two applies if it re-granted
 
-      const run = () => {
-        if (kind === 'salvage') sim.salvageItem(COMMON_WEAPON, pid);
-        else if (kind === 'disenchant') sim.disenchantItem(COMMON_WEAPON, pid);
-        else sim.applyEnchant(COMMON_WEAPON, WEAPON_ENCHANT, undefined, undefined, pid);
-      };
+      if (kind === 'salvage') runSalvage(sim, COMMON_WEAPON, pid);
+      else if (kind === 'disenchant') runDisenchant(sim, COMMON_WEAPON, pid);
+      else runApplyEnchant(sim, COMMON_WEAPON, WEAPON_ENCHANT, undefined, undefined, pid);
 
-      run();
       // The one held copy was consumed exactly once. salvage/disenchant destroy
       // the piece outright (0 left); enchant transforms it into an enchanted
       // instance of the SAME itemId (total stays 1, but it is no longer eligible),
@@ -237,7 +242,9 @@ describe('offline Sim enchanting commands: replay + throttle safety', () => {
       expect(first?.ok, kind).toBe(true);
 
       sim.drainEvents();
-      run();
+      if (kind === 'salvage') sim.salvageItem(COMMON_WEAPON, pid);
+      else if (kind === 'disenchant') sim.disenchantItem(COMMON_WEAPON, pid);
+      else sim.applyEnchant(COMMON_WEAPON, WEAPON_ENCHANT, undefined, undefined, pid);
       // The second command finds nothing to act on: exactly one deny, no
       // second destruction or grant. salvage/disenchant destroyed the copy, so
       // theirs is not_held; the enchant replay finds the copy still present
@@ -253,28 +260,25 @@ describe('offline Sim enchanting commands: replay + throttle safety', () => {
     }
   });
 
-  it('the (MAX+1)th action in the 60s window denies throttled BEFORE any inventory change', () => {
+  it('Phase 4: more than 10 sequential salvages succeed; concurrent start is busy', () => {
     const sim = makeSim();
     const pid = sim.playerId;
-    // One more copy than the shared window allows, all held at once (no sim.tick,
-    // so sim.time never advances the window).
-    const copies = CRAFT_THROTTLE_MAX_PER_WINDOW + 1;
-    sim.addItem(COMMON_WEAPON, copies, pid);
+    sim.addItem(COMMON_WEAPON, 12, pid);
 
-    for (let i = 0; i < CRAFT_THROTTLE_MAX_PER_WINDOW; i++) {
-      sim.salvageItem(COMMON_WEAPON, pid);
+    for (let i = 0; i < 11; i++) {
+      runSalvage(sim, COMMON_WEAPON, pid);
       expect(sim.lastSalvageResult?.ok, `salvage #${i + 1}`).toBe(true);
     }
-    // Exactly at the boundary (the 12b lesson: assert AT the boundary): the
-    // budget is spent, so the next action denies with no consumption.
     expect(sim.countItem(COMMON_WEAPON, pid)).toBe(1);
+    // Start one more cast without completing; a second start is busy.
+    sim.salvageItem(COMMON_WEAPON, pid);
     sim.drainEvents();
     sim.salvageItem(COMMON_WEAPON, pid);
-    const throttled = eventsOfType(sim.drainEvents(), 'salvageResult')[0];
-    if (throttled?.type !== 'salvageResult') throw new Error('expected salvageResult');
-    expect(throttled.ok).toBe(false);
-    expect(throttled.reason).toBe('throttled');
-    // The throttled action consumed nothing: the last copy is still held.
+    const busy = eventsOfType(sim.drainEvents(), 'salvageResult')[0];
+    if (busy?.type !== 'salvageResult') throw new Error('expected salvageResult');
+    expect(busy.ok).toBe(false);
+    expect(busy.reason).toBe('busy');
+    // The in-flight cast has not consumed yet.
     expect(sim.countItem(COMMON_WEAPON, pid)).toBe(1);
   });
 });
@@ -318,6 +322,12 @@ function routeTick(server: GameServer): void {
   (server as unknown as { routeEvents(e: SimEvent[]): void }).routeEvents(server.sim.tick());
 }
 
+/** Complete a running enchant-family cast on the server sim and route its events. */
+function flushEnchantFamilyCast(server: GameServer, pid: number): void {
+  completeEnchantFamilyCast(server.sim as any, pid);
+  routeTick(server);
+}
+
 function broadcast(server: GameServer): void {
   (server as unknown as { broadcastSnapshots(): void }).broadcastSnapshots();
 }
@@ -355,7 +365,7 @@ describe('enchanting commands over the live GameServer wire (event + delta routi
     server.sim.addItem(COMMON_WEAPON, 1, st.pid);
 
     cmd(server, st, { cmd: 'disenchant_item', item: COMMON_WEAPON });
-    routeTick(server);
+    flushEnchantFamilyCast(server, st.pid);
 
     // Immediacy arm: exactly one pid-scoped disenchantResult, owner only.
     const denc = eventsFor(fc.sent, 'disenchantResult');
@@ -386,7 +396,7 @@ describe('enchanting commands over the live GameServer wire (event + delta routi
     server.sim.addItem(DUST, 5, st.pid);
 
     cmd(server, st, { cmd: 'apply_enchant', item: COMMON_WEAPON, enchant: WEAPON_ENCHANT });
-    routeTick(server);
+    flushEnchantFamilyCast(server, st.pid);
 
     const ench = eventsFor(fc.sent, 'enchantResult');
     expect(ench).toHaveLength(1);
@@ -424,7 +434,7 @@ describe('enchanting commands over the live GameServer wire (event + delta routi
       enchant: AGILITY,
       confirm: true,
     });
-    routeTick(server);
+    flushEnchantFamilyCast(server, st.pid);
 
     const ench = eventsFor(fc.sent, 'enchantResult');
     expect(ench).toHaveLength(1);
@@ -474,7 +484,7 @@ describe('enchanting commands over the live GameServer wire (event + delta routi
         enchant: 'enchant_weapon_agility',
         confirm,
       });
-      routeTick(server);
+      flushEnchantFamilyCast(server, st.pid);
     }
     const ench = eventsFor(fc.sent, 'enchantResult');
     expect(ench).toHaveLength(2);
@@ -514,7 +524,7 @@ describe('enchanting commands over the live GameServer wire (event + delta routi
       slot: 'mainhand',
       confirm: true,
     });
-    routeTick(server);
+    flushEnchantFamilyCast(server, st.pid);
 
     const ench = eventsFor(fc.sent, 'enchantResult');
     expect(ench).toHaveLength(1);
@@ -566,7 +576,7 @@ describe('enchanting commands over the live GameServer wire (event + delta routi
       enchant: WEAPON_ENCHANT,
       slot: 'mainhand',
     });
-    routeTick(server);
+    flushEnchantFamilyCast(server, st.pid);
 
     const ench = eventsFor(fc.sent, 'enchantResult');
     expect(ench).toHaveLength(1);
@@ -612,7 +622,7 @@ describe('enchanting commands over the live GameServer wire (event + delta routi
     server.sim.addItem(COMMON_WEAPON, 1, st.pid);
     server.sim.addItem(DUST, 5, st.pid);
     cmd(server, st, { cmd: 'apply_enchant', item: COMMON_WEAPON, enchant: WEAPON_ENCHANT });
-    routeTick(server);
+    flushEnchantFamilyCast(server, st.pid);
     expect(server.sim.lastEnchantResultFor(st.pid)?.ok).toBe(true);
 
     // Now the real subject: a plain WORN piece plus fresh reagents.
@@ -658,7 +668,7 @@ describe('enchanting commands over the live GameServer wire (event + delta routi
       enchant: WEAPON_ENCHANT,
       slot: 'mainhand',
     });
-    routeTick(server);
+    flushEnchantFamilyCast(server, st.pid);
     const ench = eventsFor(fc.sent, 'enchantResult').slice(-1);
     if (ench[0]?.type !== 'enchantResult') throw new Error('expected enchantResult');
     expect(ench[0].ok).toBe(true);
@@ -708,7 +718,7 @@ describe('enchanting commands over the live GameServer wire (event + delta routi
         enchant: WEAPON_ENCHANT,
         slot: bogus,
       });
-      routeTick(server);
+      flushEnchantFamilyCast(server, st.pid);
 
       // Anything that is not a real equipment key reads as undefined, which IS
       // the bagged arm: the mint landed in the inventory and no worn slot was
@@ -762,7 +772,7 @@ describe('enchanting commands over the live GameServer wire (event + delta routi
     server.sim.addItem(COMMON_WEAPON, 1, st.pid);
 
     cmd(server, st, { cmd: 'salvage_item', item: COMMON_WEAPON });
-    routeTick(server);
+    flushEnchantFamilyCast(server, st.pid);
 
     const salv = eventsFor(fc.sent, 'salvageResult');
     expect(salv).toHaveLength(1);
@@ -807,7 +817,7 @@ describe('enchanting commands over the live GameServer wire (event + delta routi
     server.sim.addItem(RARE_WEAPON, 1, st.pid);
 
     cmd(server, st, { cmd: 'disenchant_item', item: RARE_WEAPON });
-    routeTick(server);
+    flushEnchantFamilyCast(server, st.pid);
 
     const denc = eventsFor(fc.sent, 'disenchantResult')[0];
     if (denc?.type !== 'disenchantResult') throw new Error('expected disenchantResult');

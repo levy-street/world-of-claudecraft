@@ -395,6 +395,8 @@ export const ja_JP: AdminTranslations = {
   "moderationHistory.actionKill": "死亡処理",
   "moderationHistory.actionJail": "収監",
   "moderationHistory.actionUnjail": "収監を解除",
+  "moderationHistory.actionSpectate": "Spectated",
+  "moderationHistory.actionUnspectate": "Stopped spectating",
   "moderationHistory.actionNote": "注記",
   "moderationHistory.actionResetPassword": "パスワードリセット",
   "moderationHistory.actionDailyRewardsBan": "デイリー報酬から除外",

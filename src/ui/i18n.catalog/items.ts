@@ -2401,6 +2401,10 @@ const ITEM_ENTITY_IDS = [
   'artisans_eye',
   'reins_terrorspark_groundshaker',
   'reins_drakemaw_raptor',
+  'moggers_hide_quiver',
+  'cragmaw_huntquiver',
+  'gravewyrm_bone_quiver',
+  'direfang_quiver',
 ] as const;
 
 type ItemEntityId = (typeof ITEM_ENTITY_IDS)[number];
@@ -2507,6 +2511,12 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   reins_drakemaw_raptor: 'Reins of the Drakemaw Raptor',
   restless_skull: 'Restless Skull',
   vanguard_bone: 'Vanguard Bone',
+  // Hunter quivers, the class's first held-offhand ladder; same English-appended
+  // treatment until the release fill folds them into the per-locale arrays.
+  moggers_hide_quiver: "Mogger's Hide Quiver",
+  cragmaw_huntquiver: 'Cragmaw Huntquiver',
+  gravewyrm_bone_quiver: 'Gravewyrm Bone Quiver',
+  direfang_quiver: 'Direfang Quiver',
 };
 
 function itemTranslations(names: readonly string[]): ItemEntityTranslations {

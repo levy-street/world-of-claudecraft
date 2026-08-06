@@ -199,6 +199,11 @@ const CALLBACK_KEYS = [
   'revivePet',
   'completeFishing',
   'completeGatherCast',
+  'completeCraftCast',
+  'completeDisenchantCast',
+  'completeApplyEnchantCast',
+  'completeSalvageCast',
+  'completeRechargeCast',
   'applyDemonHealTick',
   'awardCombo',
   'meleeSwing',
@@ -244,6 +249,8 @@ const CALLBACK_KEYS = [
   'vcupShoot',
   'vcupSportDash',
   'vcupSportShove',
+  // Thornhollow Fields battleground hooks (social/battleground.ts).
+  'bgOnPlayerDeath',
 ] as const;
 
 // A fully-spied fake host. `clock` is mutable so a test can prove the context reads
@@ -310,6 +317,11 @@ function makeFakeHost() {
     yumiCatDamaged: vi.fn(),
     cleanupYumiMatch: vi.fn(),
     nextArenaMatchId: 1,
+    bgQueue: [],
+    bgMatches: new Map(),
+    bgBusySlots: new Set(),
+    bgOutcomes: [],
+    nextBgMatchId: 1,
     delveRuns: [],
     delvePetStash: new Map(),
     utcDay: '',
@@ -323,6 +335,8 @@ function makeFakeHost() {
     nextLootRollId: 1,
     devCommands: false,
     marketListings: [],
+    commissionOrderBoard: [],
+    nextCommissionOrderId: 1,
     bankerIds: [],
     guildBanks: new Map(),
     vcup: createVcState(),
@@ -525,6 +539,11 @@ function makeFakeHost() {
     revivePet: vi.fn(),
     completeFishing: vi.fn(),
     completeGatherCast: vi.fn(),
+    completeCraftCast: vi.fn(),
+    completeDisenchantCast: vi.fn(),
+    completeApplyEnchantCast: vi.fn(),
+    completeSalvageCast: vi.fn(),
+    completeRechargeCast: vi.fn(),
     applyDemonHealTick: vi.fn(),
     awardCombo: vi.fn(),
     meleeSwing: vi.fn(() => false),
@@ -569,6 +588,11 @@ function makeFakeHost() {
     vcupShoot: vi.fn(),
     vcupSportDash: vi.fn(),
     vcupSportShove: vi.fn(),
+    // Thornhollow Fields battleground hooks.
+    bgOnPlayerDeath: vi.fn(),
+    bgOnPlayerDamaged: vi.fn(),
+    bgOnPlayerHealed: vi.fn(),
+    bgCancelFlagAura: vi.fn(() => false),
   };
   return { host, rng, entities, clock };
 }

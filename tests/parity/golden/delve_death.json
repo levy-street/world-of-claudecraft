@@ -9,13 +9,13 @@
     "rebucket after delve respawn teleport"
   ],
   "draws": 1,
-  "drawDigest": "368503ad",
+  "drawDigest": "e99fd045",
   "frames": [
     {
       "tick": 0,
       "time": 0,
-      "nextId": 969,
-      "state": "7813e308",
+      "nextId": 987,
+      "state": "69808784",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -36,11 +36,11 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "rogue",
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -52,7 +52,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 960,
+          "entityId": 978,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
@@ -89,7 +89,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 62,
-          "id": 960,
+          "id": 978,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -141,12 +141,12 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 979,
-      "state": "3fd124aa",
-      "events": "7e11bbdc",
+      "nextId": 997,
+      "state": "0efce7be",
+      "events": "520a0515",
       "rng": {
         "draws": 1,
-        "digest": "368503ad"
+        "digest": "e99fd045"
       },
       "label": "delve-first-release",
       "players": [
@@ -163,11 +163,11 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "rogue",
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -179,7 +179,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 960,
+          "entityId": 978,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
@@ -217,7 +217,7 @@
           "fallStartY": 2.077747,
           "fiveSecondRule": 99,
           "hp": 93,
-          "id": 960,
+          "id": 978,
           "kind": "player",
           "level": 7,
           "lootFfaTimer": "Infinity",
@@ -268,12 +268,12 @@
     {
       "tick": 2,
       "time": 0.1,
-      "nextId": 979,
-      "state": "ae2d14a2",
-      "events": "51e2a64e",
+      "nextId": 997,
+      "state": "7572ba6c",
+      "events": "6206b656",
       "rng": {
         "draws": 1,
-        "digest": "368503ad"
+        "digest": "e99fd045"
       },
       "label": "delve-fail",
       "players": [
@@ -290,11 +290,11 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "rogue",
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -316,7 +316,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 960,
+          "entityId": 978,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
@@ -355,7 +355,7 @@
           "fallStartY": 2.266438,
           "fiveSecondRule": 99.1,
           "hp": 185,
-          "id": 960,
+          "id": 978,
           "kind": "player",
           "level": 7,
           "lootFfaTimer": "Infinity",
@@ -407,12 +407,12 @@
     {
       "tick": 2,
       "time": 0.1,
-      "nextId": 979,
-      "state": "ae2d14a2",
+      "nextId": 997,
+      "state": "7572ba6c",
       "events": "741638a5",
       "rng": {
         "draws": 1,
-        "digest": "368503ad"
+        "digest": "e99fd045"
       },
       "label": "final",
       "players": [
@@ -429,11 +429,11 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "rogue",
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -455,7 +455,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 960,
+          "entityId": 978,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
@@ -494,7 +494,7 @@
           "fallStartY": 2.266438,
           "fiveSecondRule": 99.1,
           "hp": 185,
-          "id": 960,
+          "id": 978,
           "kind": "player",
           "level": 7,
           "lootFfaTimer": "Infinity",

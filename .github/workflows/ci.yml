@@ -99,77 +99,49 @@ jobs:
       - name: Verify release version surfaces
         run: npm run release:check
 
-  # Classify whether this run touches the code path set (D10). Prefer native
-  # git-diff + job if over third-party path-filter actions. Default code=true
-  # (fail closed toward the full suite); only a confirmed docs-only PR sets
-  # code=false. Release jobs never need this job and never read its output.
+  # Classify whether this run touches the code path set (D10). The classifier
+  # reads the PR's changed files from the GitHub API (the pull request files
+  # endpoint, paginated) instead of a checkout + git diff: the old full-history
+  # checkout of this binary-heavy repo cost about 10 serial minutes on every PR
+  # before any test could start, and twice wedged for 90+ minutes with no
+  # timeout to kill it. Default code=true (fail closed toward the full suite):
+  # any API error, pagination overflow, payload mismatch, or non-PR event
+  # yields code=true; only a provably docs-only PR sets code=false. The rules
+  # and the fail-closed decision live in scripts/lib/ci_change_classify.mjs
+  # (unit-tested by tests/ci_change_classify.test.ts). Release jobs never need
+  # this job and never read its output.
   changes:
     name: Detect code path changes
     runs-on: ubuntu-latest
+    # Every PR-tier job waits on this one, so a wedged runner must fail fast
+    # and be retried, never hang for an hour and a half.
+    timeout-minutes: 5
+    # Job-scoped read-only widen: once workflow-level permissions are declared,
+    # unlisted scopes are none, and the PR files endpoint needs
+    # pull-requests: read. Nothing here may ever be a write scope.
+    permissions:
+      contents: read
+      pull-requests: read
     outputs:
       code: ${{ steps.filter.outputs.code }}
     steps:
-      - name: Check out repository
+      - name: Check out classifier script
         uses: actions/checkout@v6
         with:
-          # Full history so the PR base and head SHAs resolve for git diff.
-          # This job is cheap (no npm install); depth is not a wall concern.
-          fetch-depth: 0
+          # Blob-less shallow sparse checkout: this job needs only the
+          # classifier script, never the tree or the history.
+          filter: blob:none
+          sparse-checkout: |
+            scripts
 
       - name: Classify changed paths
         id: filter
         env:
-          EVENT_NAME: ${{ github.event_name }}
-          BASE_SHA: ${{ github.event.pull_request.base.sha }}
-          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-        run: |
-          set -euo pipefail
-          # Single write at the end. Default true = full PR tier (fail closed).
-          code=true
-          if [ "$EVENT_NAME" != "pull_request" ]; then
-            echo "non-PR event: full PR tier (code=true)"
-            echo "code=$code" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-          if [ -z "${BASE_SHA:-}" ] || [ -z "${HEAD_SHA:-}" ]; then
-            echo "missing PR base/head SHAs: full PR tier (code=true)"
-            echo "code=$code" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-          # Ensure both ends exist (shallow edge cases / force-push races).
-          git cat-file -e "${BASE_SHA}^{commit}" 2>/dev/null || git fetch --no-tags --depth=1 origin "$BASE_SHA"
-          git cat-file -e "${HEAD_SHA}^{commit}" 2>/dev/null || git fetch --no-tags --depth=1 origin "$HEAD_SHA"
-          # Triple-dot: commits reachable from HEAD but not from the merge base
-          # with BASE (the PR's own changes). ACMRD covers add/copy/mod/rename/delete.
-          mapfile -t files < <(git diff --name-only --diff-filter=ACMRD "$BASE_SHA"..."$HEAD_SHA")
-          if [ "${#files[@]}" -eq 0 ]; then
-            echo "empty file list: full PR tier (code=true)"
-            echo "code=$code" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-          code=false
-          for f in "${files[@]}"; do
-            case "$f" in
-              src/*|server/*|tests/*|headless/*|bot/*|scripts/*|\
-              package.json|pnpm-lock.yaml|\
-              tsconfig.json|tsconfig.admin.json|\
-              vite.config.ts|vitest.browser.config.ts|\
-              biome.json|\
-              .github/workflows/*|\
-              electron/*|android/*|ios/*|public/*|\
-              deploy/*|mediawiki/*|\
-              Dockerfile|Dockerfile.*|docker-compose.yml|docker-compose.yaml)
-                code=true
-                break
-                ;;
-            esac
-          done
-          if [ "$code" = "true" ]; then
-            echo "code path change detected: full PR tier"
-          else
-            echo "docs-only (or non-code) change: skip pr-gate, pr-checks, browser-gate"
-          fi
-          echo "code=$code" >> "$GITHUB_OUTPUT"
+          GITHUB_TOKEN: ${{ github.token }}
+        # The classifier is stdlib-only (global fetch), so it runs on the
+        # runner's preinstalled Node: no setup-node, no dependency install on
+        # this serial critical path.
+        run: node scripts/detect_code_changes.mjs
 
   # Biome formatter + linter, adopted as a forward ratchet: only files actually
   # changed by this push/PR are checked (`--changed`), so the large existing tree

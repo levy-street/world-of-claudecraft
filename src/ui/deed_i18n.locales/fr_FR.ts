@@ -907,6 +907,34 @@ export const table: DeedLocaleTable = {
     name: 'Ce que savent les mouettes',
     desc: 'Pêcher un poisson dans les eaux du Rivage Lointain.',
   },
+  prog_engineering_rare: {
+    name: 'Ingénierie de précision',
+    desc: 'Fabriquez votre premier objet de qualité rare en Ingénierie.',
+  },
+  prog_alchemy_rare: {
+    name: 'Un millésime rare',
+    desc: 'Fabriquez votre premier objet de qualité rare en Alchimie.',
+  },
+  prog_cooking_rare: {
+    name: 'Un plat inoubliable',
+    desc: 'Fabriquez votre premier objet de qualité rare en Cuisine.',
+  },
+  prog_leatherworking_rare: {
+    name: 'Tannage fin',
+    desc: 'Fabriquez votre premier objet de qualité rare en Travail du cuir.',
+  },
+  prog_tailoring_rare: {
+    name: 'Un point de maître',
+    desc: 'Fabriquez votre premier objet de qualité rare en Couture.',
+  },
+  prog_weaponcrafting_rare: {
+    name: "Trempé jusqu'à l'éclat",
+    desc: "Fabriquez votre premier objet de qualité rare en Fabrication d'armes.",
+  },
+  prog_armorcrafting_rare: {
+    name: 'Blindé à la perfection',
+    desc: "Fabriquez votre premier objet de qualité rare en Fabrication d'armures.",
+  },
 };
 
 // fr_CA rides this base table plus the delve-vocabulary override layer

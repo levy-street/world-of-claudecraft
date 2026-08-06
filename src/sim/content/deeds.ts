@@ -2217,6 +2217,7 @@ export const DEEDS: Record<string, DeedDef> = {
     renown: 10,
     trigger: { kind: 'stat', stat: 'salvagesPerformed', count: 50 },
   },
+
   // Wildheart Basin (Palmreach). New records stay at the append-only tail.
   dgn_wildheart_basin: {
     id: 'dgn_wildheart_basin',
@@ -2304,6 +2305,53 @@ export const DEEDS: Record<string, DeedDef> = {
     renown: 10,
     trigger: { kind: 'visits', markIds: ['slain:old_marrowshell', 'slain:aurelhorn'] },
   },
+
+  // --- Thornhollow Fields, the 5v5 capture-the-flag battleground (src/sim/social/
+  // battleground.ts). Meters read the persisted PlayerMeta standing (bgWins /
+  // bgCaptures), so they count OUTCOMES, never attendance (rule 6), and
+  // retro-grant on load like every meter.
+  //
+  // The career-100 captures deed paces off BG_CAPS_TO_WIN, which was retuned
+  // from 5 to 3: a dominant winner now banks at most 3 captures per match
+  // rather than 5, so that deed's tail lengthens by roughly the same ratio.
+  // Left AS IS deliberately. The meter is career-cumulative with no time
+  // window, deeds are cosmetic-only (a title and Renown, never power), and
+  // re-cutting the threshold every time the match target moves would keep
+  // re-basing a number players are already partway through.
+  pvp_bg_first_capture: {
+    id: 'pvp_bg_first_capture',
+    name: 'Banner in Hand',
+    desc: 'Capture a flag in Thornhollow Fields.',
+    category: 'pvp',
+    renown: 5,
+    trigger: { kind: 'meter', meter: 'bgCaptures', amount: 1 },
+  },
+  pvp_bg_first_win: {
+    id: 'pvp_bg_first_win',
+    name: 'The Hollow Holds',
+    desc: 'Win a Thornhollow Fields battleground.',
+    category: 'pvp',
+    renown: 5,
+    trigger: { kind: 'meter', meter: 'bgWins', amount: 1 },
+  },
+  pvp_bg_wins_25: {
+    id: 'pvp_bg_wins_25',
+    name: 'Warden of the Hollow',
+    desc: 'Win 25 Thornhollow Fields battlegrounds.',
+    category: 'pvp',
+    renown: 25,
+    trigger: { kind: 'meter', meter: 'bgWins', amount: 25 },
+    reward: { kind: 'title', text: 'Flagbearer' },
+  },
+  pvp_bg_captures_100: {
+    id: 'pvp_bg_captures_100',
+    name: 'A Hundred Banners',
+    desc: 'Capture 100 flags in Thornhollow Fields across your career.',
+    category: 'pvp',
+    renown: 50,
+    trigger: { kind: 'meter', meter: 'bgCaptures', amount: 100 },
+  },
+
   // The phase 20 density pass brought the three bottom-map zones to the
   // strip's own gathering density (Q26 in
   // docs/design/professions-tuning-packet-review.md): each gets the zone
@@ -2398,6 +2446,96 @@ export const DEEDS: Record<string, DeedDef> = {
     // Rides the shipped kill quest (retro-grantable for every veteran who
     // already finished the chain), so the boss template needs no rare flag.
     trigger: { kind: 'quest', questId: 'q_dk_matriarch_of_the_maw' },
+  },
+
+  // Rifts (src/sim/rift/): the procedural infinite-dungeon system, ranked C
+  // through S. No single dungeonId exists to key a dungeonClears trigger
+  // against (every rift regenerates from a seed), so both deeds read a
+  // lifetime counter instead, bumped in rift/runs.ts on run completion.
+  dgn_rift: {
+    id: 'dgn_rift',
+    name: 'Riftwalker',
+    desc: 'Clear a Rift by defeating its floor boss.',
+    category: 'dungeon',
+    renown: 5,
+    trigger: { kind: 'stat', stat: 'riftClears', count: 1 },
+  },
+  dgn_rift_s_rank: {
+    id: 'dgn_rift_s_rank',
+    name: 'Rift Sovereign',
+    desc: 'Clear an S-rank Rift, the hardest tier a Rift portal can spawn.',
+    category: 'dungeon',
+    renown: 25,
+    trigger: { kind: 'stat', stat: 'riftSRankClears', count: 1 },
+  },
+
+  // Basic universal profession deeds, issue #2055: per-craft rare-tier
+  // milestones. Each fires off the craft_rare:<craftId> mark
+  // (professions/crafting.ts craftItem) the first time a player crafts a
+  // rare-or-better output IN THAT CRAFT. Output quality is a static fact of
+  // the recipe's result def (the Professions 2.0 output roll is retired), so
+  // this is never luck-based, only whether the player knows the recipe and
+  // holds the reagents: standard renown, no title, same tier as the other
+  // moderate profession-depth milestones (prog_fishing_100). Covers exactly
+  // the seven crafts that ship a rare-or-better recipe today (see
+  // tests/deeds_content.test.ts for the derivation): enchanting has no
+  // item-def output to grade, and jewelcrafting/inscription stay deferred
+  // with prog_ringwright (docs/design/deeds.md, no live recipes yet).
+  prog_engineering_rare: {
+    id: 'prog_engineering_rare',
+    name: 'Precision Engineering',
+    desc: 'Craft your first rare-tier item in Engineering.',
+    category: 'progression',
+    renown: 10,
+    trigger: { kind: 'visit', markId: 'craft_rare:engineering' },
+  },
+  prog_alchemy_rare: {
+    id: 'prog_alchemy_rare',
+    name: 'A Rare Vintage',
+    desc: 'Craft your first rare-tier item in Alchemy.',
+    category: 'progression',
+    renown: 10,
+    trigger: { kind: 'visit', markId: 'craft_rare:alchemy' },
+  },
+  prog_cooking_rare: {
+    id: 'prog_cooking_rare',
+    name: 'A Dish to Remember',
+    desc: 'Craft your first rare-tier item in Cooking.',
+    category: 'progression',
+    renown: 10,
+    trigger: { kind: 'visit', markId: 'craft_rare:cooking' },
+  },
+  prog_leatherworking_rare: {
+    id: 'prog_leatherworking_rare',
+    name: 'Fine Tanning',
+    desc: 'Craft your first rare-tier item in Leatherworking.',
+    category: 'progression',
+    renown: 10,
+    trigger: { kind: 'visit', markId: 'craft_rare:leatherworking' },
+  },
+  prog_tailoring_rare: {
+    id: 'prog_tailoring_rare',
+    name: "A Master's Stitch",
+    desc: 'Craft your first rare-tier item in Tailoring.',
+    category: 'progression',
+    renown: 10,
+    trigger: { kind: 'visit', markId: 'craft_rare:tailoring' },
+  },
+  prog_weaponcrafting_rare: {
+    id: 'prog_weaponcrafting_rare',
+    name: 'Tempered to a Shine',
+    desc: 'Craft your first rare-tier item in Weaponcrafting.',
+    category: 'progression',
+    renown: 10,
+    trigger: { kind: 'visit', markId: 'craft_rare:weaponcrafting' },
+  },
+  prog_armorcrafting_rare: {
+    id: 'prog_armorcrafting_rare',
+    name: 'Plated to Perfection',
+    desc: 'Craft your first rare-tier item in Armorcrafting.',
+    category: 'progression',
+    renown: 10,
+    trigger: { kind: 'visit', markId: 'craft_rare:armorcrafting' },
   },
 };
 

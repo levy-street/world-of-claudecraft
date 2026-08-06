@@ -16,8 +16,6 @@ import {
   accountForDiscord,
   type DiscordMemberMetaRecord,
   type DiscordOutboxLinkRow,
-  discordForAccount,
-  discordForAccounts,
   discordIdsWithGuildFlair,
   discordLinksForAccounts,
   grantRewardPoints,
@@ -171,56 +169,10 @@ async function handleDiscordInternal(
     return ok(res, { updated: true });
   }
 
-  // GET /internal/discord/relay -> drain queued "!" community posts, each enriched
-  // with the issuer's Discord identity so the bot can mention them + show avatar.
-  if (req.method === 'GET' && url.pathname === '/internal/discord/relay') {
-    const items = drainRelay();
-    const enriched = await Promise.all(
-      items.map(async (it) => {
-        const link = await discordForAccount(pool, it.accountId);
-        return {
-          ...it,
-          discordUserId: link?.discord_user_id ?? null,
-          discordUsername: link?.discord_username ?? null,
-          discordAvatar: link?.discord_avatar ?? null,
-        };
-      }),
-    );
-    return ok(res, { items: enriched });
-  }
-
-  // GET /internal/discord/activity -> drain the significant-activity feed, each
-  // item enriched with its participants' Discord identities (to mention + show
-  // avatar). Items with NO linked participant are dropped (the feed only
-  // celebrates players who linked Discord).
-  if (req.method === 'GET' && url.pathname === '/internal/discord/activity') {
-    const items = drainActivity();
-    // ONE batched links read per drain (the RouteDef twin's exact shape).
-    const links = await discordForAccounts(
-      pool,
-      items.flatMap((it) => it.accountIds),
-    );
-    const out: unknown[] = [];
-    for (const it of items) {
-      const participants = it.accountIds.map((accountId, i) => {
-        const link = links.get(accountId);
-        return {
-          name: it.names[i] ?? '',
-          discordUserId: link?.discord_user_id ?? null,
-          discordAvatar: link?.discord_avatar ?? null,
-        };
-      });
-      if (!participants.some((p) => p.discordUserId)) continue; // nobody linked
-      const { accountIds: _a, names: _n, ...rest } = it;
-      out.push({ ...rest, participants });
-    }
-    return ok(res, { items: out });
-  }
-
-  if (req.method === 'GET' && url.pathname === '/internal/discord/daily-rewards-winners') {
-    const limit = clampInt(Number(url.searchParams.get('limit')) || 1, 1, 5);
-    return ok(res, await dailyRewardService.discordWinnerAnnouncements(limit));
-  }
+  // The per-endpoint GET pickups this ladder used to serve (relay, activity,
+  // daily-rewards-winners) were RETIRED with their RouteDef twins once the bot
+  // moved to the single GET /internal/discord/outbox poll (#2791): both arms
+  // answer the terminal 404 below, in both dispatch modes.
 
   if (req.method === 'POST' && url.pathname === '/internal/discord/daily-rewards-winners/mark') {
     const result = await dailyRewardService.markDiscordWinnersAnnounced(
@@ -392,23 +344,11 @@ export const flexBatchHandler: RouteHandler = async (ctx) => {
   return ok(ctx.res, { requested: ids.length, members: await discordFlexForAccounts(ids) });
 };
 
-// How many reward days one outbox drain carries. ONE, matching the bot's actual
-// consumption: it announces a day and then marks it, one per poll, so days two
-// through five of a ceiling ask are read, serialized and shipped without ever
-// being acted on. Every day carries its winners' usernames AND wallet pubkeys, so
-// the ask is the routine per-poll exposure of that data and is minimized to what
-// the caller uses. The standalone GET /internal/discord/daily-rewards-winners
-// keeps serving up to 5 until its D11 retirement (a backlog is drained there, or
-// across successive polls here), and the service still CACHES at its own ceiling,
-// so a wider ask stays a warm-cache slice rather than a second read.
-// DELIBERATE DEFERRAL (Phase 5 QA): the minimization here is to the number of
-// DAYS, not the per-day FIELDS. A winner row still carries tx_signature and the
-// voided_by_* operator identity, which announcing does not need, because the
-// stream's item shape is pinned byte-for-byte to the standalone GET (the D11
-// parity that lets Phase 6 reuse the bot handler unchanged). Narrowing the
-// fields is the D11-retirement follow-up's work, alongside dropping the
-// standalone routes.
-const OUTBOX_WINNER_DAY_LIMIT = 1;
+// How many winner days one outbox drain carries: ONE, the ask the winners
+// service itself now fixes (DAILY_REWARD_WINNER_DAY_LIMIT, server/daily_rewards.ts).
+// The D11 retirement (#2791) removed the standalone winners GET whose limit
+// param was the one wider ask, so discordWinnerAnnouncements takes no limit and
+// a backlog drains across successive polls, one announce-and-mark per poll.
 
 // How many link changes one outbox drain carries. Tied to FLEX_BATCH_CAP: a page
 // larger than the bot's flex-batch cap is more than it can act on in one cycle
@@ -428,7 +368,9 @@ export const OUTBOX_LINK_CHANGE_PAGE = 1000;
  * The bot used to poll four endpoints on their own timers (relay, activity,
  * daily-rewards-winners, and a full re-read of every online member to notice
  * flex changes). This answers all of them together, so the bot's steady-state
- * cost is one request per interval rather than four plus a sweep.
+ * cost is one request per interval rather than four plus a sweep. Those three
+ * per-endpoint GET pickups are now RETIRED from both dispatch arms (#2791):
+ * this poll is the only pickup surface.
  *
  * RouteDef-ONLY by design, like flex-batch: a route born after the pipeline
  * migration never gets a legacy handleDiscordInternal arm (server/http/CLAUDE.md),
@@ -449,9 +391,9 @@ export const OUTBOX_LINK_CHANGE_PAGE = 1000;
  *  3. Collect the account ids every drained item mentions. An EMPTY set issues no
  *     identity query at all.
  *  4. Otherwise resolve the whole union with ONE discordLinksForAccounts call.
- *     The per-item discordForAccount the relay GET still runs once per item
- *     never appears here (the activity GET already batches its own read via
- *     discordForAccounts): that N+1 is what invariant D1 forbids on this path.
+ *     The per-item discordForAccount lookup the retired relay GET ran once per
+ *     item never appears here: that N+1 is what invariant D1 forbids on this
+ *     path.
  *
  * RETRY CONTRACT (Phase 6's retry logic is written against this):
  *  - `winners` is an IDEMPOTENT READ. It stays unannounced until the bot calls
@@ -468,12 +410,14 @@ export const OUTBOX_LINK_CHANGE_PAGE = 1000;
  *    resync, not to this endpoint.
  *
  * The envelope field order is relay, activity, winners, linkChanges, and each
- * stream keeps its queue's FIFO order. The three existing streams keep their
- * per-endpoint item shapes byte-for-byte (invariant D11) so the Phase 6 bot
- * reuses its current handlers unchanged; only linkChanges is a new shape.
+ * stream keeps its queue's FIFO order. The relay and activity streams keep the
+ * item shapes their retired per-endpoint GETs served (invariant D11, now this
+ * poll's own contract with the bot); the winners stream dropped the fields
+ * announcing never used when the standalone GET's byte-parity pin retired with
+ * it (#2791); linkChanges was born here.
  */
 export const outboxHandler: RouteHandler = async (ctx) => {
-  const winners = await dailyRewardService.discordWinnerAnnouncements(OUTBOX_WINNER_DAY_LIMIT);
+  const winners = await dailyRewardService.discordWinnerAnnouncements();
   // The drains live INSIDE the try so the requeue guarantee is enforced by
   // structure rather than by the accident that a splice cannot throw: anything
   // that fails after the first item leaves a queue puts every drained item back.
@@ -645,13 +589,15 @@ function sanitizeVoiceMember(m: unknown): {
 }
 
 // ── Route table ────────────────────────────
-// All 12 handleInternalApi endpoints as RouteDefs for the shared dispatcher,
+// Every live handleInternalApi endpoint as a RouteDef for the shared dispatcher,
 // plus flex-batch and outbox, which are RouteDef-ONLY (born after the migration,
-// so they have no legacy ladder arm by design and nothing below to keep in lockstep):
-// the deploy-gated restart-countdown plus the 11 Discord-bot-gated routes
-// (including the two daily-rewards-winners routes added after the original
-// count of 9, and flaired-ids, added after the migration on BOTH arms per the
-// dual-edit rule). PARITY-FIRST: each thin handler REPRODUCES its frozen
+// so they have no legacy ladder arm by design and nothing below to keep in
+// lockstep): the deploy-gated restart-countdown plus the Discord-bot-gated
+// routes (flaired-ids was added after the migration on BOTH arms per the
+// dual-edit rule). The three per-endpoint GET pickups the outbox replaced
+// (relay, activity, daily-rewards-winners) were RETIRED from BOTH arms in the
+// same change (#2791), so both dispatch modes answer their legacy terminal 404.
+// PARITY-FIRST: each thin handler REPRODUCES its frozen
 // legacy branch above byte-for-byte (same imported data cores, same clamps and
 // truncations, same ok()/fail() envelope bodies), and the secret gates move to
 // the requireInternalSecret middleware, which writes the SAME legacy bodies
@@ -826,70 +772,6 @@ export const routes: RouteDef[] = [
         await grantRewardPoints(pool, accountId, g.points, g.reason, `${g.reason}:${accountId}`);
       }
       return ok(ctx.res, { updated: true });
-    },
-  },
-  {
-    method: 'GET',
-    path: '/internal/discord/relay',
-    surface: 'internal',
-    meta: INTERNAL_META,
-    middleware: [discordGate],
-    handler: async (ctx) => {
-      const items = drainRelay();
-      const enriched = await Promise.all(
-        items.map(async (it) => {
-          const link = await discordForAccount(pool, it.accountId);
-          return {
-            ...it,
-            discordUserId: link?.discord_user_id ?? null,
-            discordUsername: link?.discord_username ?? null,
-            discordAvatar: link?.discord_avatar ?? null,
-          };
-        }),
-      );
-      return ok(ctx.res, { items: enriched });
-    },
-  },
-  {
-    method: 'GET',
-    path: '/internal/discord/activity',
-    surface: 'internal',
-    meta: INTERNAL_META,
-    middleware: [discordGate],
-    handler: async (ctx) => {
-      const items = drainActivity();
-      // ONE batched links read per drain (most players are unlinked, so the
-      // old per-participant lookup mostly fetched nulls sequentially).
-      const links = await discordForAccounts(
-        pool,
-        items.flatMap((it) => it.accountIds),
-      );
-      const out: unknown[] = [];
-      for (const it of items) {
-        const participants = it.accountIds.map((accountId, i) => {
-          const link = links.get(accountId);
-          return {
-            name: it.names[i] ?? '',
-            discordUserId: link?.discord_user_id ?? null,
-            discordAvatar: link?.discord_avatar ?? null,
-          };
-        });
-        if (!participants.some((p) => p.discordUserId)) continue; // nobody linked
-        const { accountIds: _a, names: _n, ...rest } = it;
-        out.push({ ...rest, participants });
-      }
-      return ok(ctx.res, { items: out });
-    },
-  },
-  {
-    method: 'GET',
-    path: '/internal/discord/daily-rewards-winners',
-    surface: 'internal',
-    meta: INTERNAL_META,
-    middleware: [discordGate],
-    handler: async (ctx) => {
-      const limit = clampInt(Number(ctx.url.searchParams.get('limit')) || 1, 1, 5);
-      return ok(ctx.res, await dailyRewardService.discordWinnerAnnouncements(limit));
     },
   },
   {

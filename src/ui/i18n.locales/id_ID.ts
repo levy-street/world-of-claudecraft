@@ -315,8 +315,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Satu biaya tetap per anak tangga resep, ditagih sekali saat seorang master mengajarkannya; setiap anak tangga pada tabel di bawah benar-benar dipakai hari ini, dari resep pemula yang gratis hingga pelajaran joran sang pembuat alat di puncaknya.',
   'guide.profPages.econ.provenanceBody':
     'Sebagian item membawa sebuah nama. Arahkan kursor padanya dan tooltipnya berkata Dikumpulkan oleh si anu pada material mentah, atau Dibuat oleh si anu pada potongan jadi: tanda yang sama, dirumuskan sesuai bagaimana item itu terwujud. Tanda tangan adalah bagian dari item itu sendiri, ikut berkelana bersamanya melewati perdagangan, bank, surat, Pasar Dunia, dan bahkan pembelian kembali oleh penjaja, dan tidak pernah memudar.\n\nPengumpulan menandatangani karya terbaiknya secara otomatis: setiap panen yang melempar langka atau lebih baik datang bertanda tangan, dan temuan langka menandatangani seluruh rejeki lima kali lipatnya. Lemparan beruntung pada panen bangkai menandatangani hasilnya jika keluarga itu tidak punya spesimen untuk diberikan, dan jika punya, hasilnya dibiarkan polos dan spesimen murni bertanda tangan dicetak di sampingnya. Pembuatan menandatangani menurut garis yang sama: setiap salinan keluaran langka atau lebih baik dicetak bertanda tangan, dan karya besar selalu bertanda tangan apa pun mutunya, sehingga versi terhalus dari potongan mana pun selalu menyebut nama pembuatnya. Satu-satunya hal yang bisa merenggut tanda tanganmu adalah tas yang penuh: satu unit bertanda tangan membutuhkan ruang tersendiri, atau tumpukan bertanda tangan yang cocok, untuk mendarat.\n\nSetumpuk item berbagi satu identitas, sehingga dua salinan menyatu hanya bila setiap tandanya cocok persis: item yang sama, penanda tangan yang sama, statistik karya besar yang sama, mantra yang sama, ikatan yang sama. Kayu gelondongan bertanda tangan tidak pernah bergabung dengan tumpukan polos ke arah mana pun (menyatukannya akan menghapus nama seseorang), tetapi muatan yang identik menyatu dengan senang hati, sehingga dua puluh bijih yang ditandatangani pengumpul yang sama duduk dalam satu tumpukan dan sebuah rejeki tidak mencabik-cabik tasmu.\n\nTanda tangan membayar balik para perajin: memegang salinan bertanda tangan mana pun dari reagen yang dibutuhkan di bangku kerja, siapa pun yang menandatanganinya, menambah 2 poin persentase peluang karya besar, dan memegang reagen yang ditandatangani tanganmu sendiri memangkas kuantitas yang diperlukan reagen itu sebanyak satu (tidak pernah di bawah satu). Karyamu sendiri yang bertanda tangan dan bermutu langka atau lebih baik bahkan terus mengajarimu, hari ini hanya lewat labu ramuan: minum ramuan yang kamu tandatangani dan setetes kecil keahlian mengalir kembali ke kerajinan yang menyeduhnya, selama kerajinan itu adalah salah satu kerajinan utamamu yang aktif.',
-  'guide.profPages.econ.throttleBody':
-    'Keluaran punya langit-langit: pembuatan, penghancuran mantra, pemantraan, salvasi, dan pengisian ulang efek alat berbagi satu anggaran sebesar {actions} tindakan berhasil dalam setiap jendela {seconds} detik. Percobaan yang ditolak tidak memakan biaya dan tidak menghabiskan anggaran. Kamu tidak akan pernah merasakannya dalam permainan normal; ini ada agar seorang spesialis mentok dengan bank penuh tidak bisa membanjiri Pasar, seberapa pun keahlian atau timbunannya.',
   'guide.profPages.faq.a4':
     'Kamu mendapat rejeki nomplok. Kira-kira 1 dari 90 panen memicu peristiwa pengumpulan langka (kayu inti kuno pada pohon, urat bijih pilihan pada bijih, mekar yang bersinar di bawah sinar bulan pada herba): peristiwa itu melipatgandakan hasil lima kali, menandatangani setiap unit dengan namamu, dan mengumumkan temuan itu ke seluruh zona. Gulungan kelangkaan langka atau lebih baik pada panen biasa juga menandatangani hasilnya.\n\nMaterial bertanda tangan layak disimpan atau dijual mahal: memegang salinan bertanda tangan mana pun dari reagen yang dibutuhkan di bangku kerja menambah 2 poin persentase pada peluang karya master. Ingat saja bahwa material itu hanya menumpuk dengan salinan yang ditandatangani secara identik, jadi masing-masing memakai slot tasnya sendiri.',
   'guide.profPages.faq.a6':
@@ -695,7 +693,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.collectorsHeading': 'Kolektor, piala, dan harga sebuah cerita',
   'guide.profPages.econ.collectorsBody':
     'Pedagang NPC buta terhadap asal-usul: item bertanda tangan dijual ke NPC dengan harga biasanya. Premium pada tanda tangan hanya ada di antara pemain, dan itulah yang membuatnya menarik: setumpuk bijih rejeki yang ditandatangani oleh pengumpul terkenal, Potongan Utama dari panen yang beruntung, sebuah bilah karya besar yang mencantumkan nama pembuat yang sudah pensiun, semuanya berharga sebanyak yang dikatakan ingatan seseorang.\n\nKitab Jasa bersandar pada naluri yang sama: Urat Murni, Kayu Hati Kuno, Mekar Bulan Purnama, Spesimen Sempurna, dan Kilau Harapan adalah tanda kolektor tanpa Kemasyhuran yang ada semata-mata untuk membuktikan bahwa sebuah momen pernah terjadi padamu. Simpan item yang mendapat jasa tersebut dan kamu memegang kuitansinya. Tidak ada daya di sini; asal-usul tidak membeli stat dan tidak memenangkan pertarungan, itu adalah jejak kertas permainan tentang hari-hari yang baik.',
-  'guide.profPages.econ.throttleHeading': 'Batas tindakan',
   'guide.profPages.econ.doctrineHeading': 'Pemain berdagang dengan pemain',
   'guide.profPages.econ.doctrineBody':
     'Ekonomi kerajinan dibangun di atas satu gagasan: pemain memasok pemain. Pengumpul memberi makan pembuat, pembuat memberi makan pencari misi dan raider, dan pemecah memberi makan pemantrai, dengan pedagang dan master stasiun berdiri di tepi untuk menyerap sampah dan koin alih-alih bersaing dengan kamu. Jika ingin menghasilkan uang dari profesi, pelangganmu adalah manusia: pelajari apa yang dihabiskan pemain lain, tetapkan harga berdasarkan Pasar Dunia, dan perlakukan sistem NPC sebagai lantai di bawah hargamu, bukan pasar itu sendiri.\n\nPerlengkapan buatan disetel untuk berada di bawah batas raid: bahkan karya besar hanya satu tingkat kualitas di atas resepnya, tidak pernah melewati legendaris, dan anggaran statnya tetap di bawah pita jarahan raid. Bengkel mempersiapkanmu untuk konten tersulit; ia tidak menggantikannya. Hal itu menjaga pembuat, raider, dan pasar dalam segitiga yang stabil: item raid tetap menjadi tujuan yang diimpikan, dan item buatan tetap menjadi perlengkapan terbaik yang benar-benar bisa dibeli dengan uang.',
@@ -1451,6 +1448,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.keybinds.petAttack': 'Peliharaan: Serang',
   'hudChrome.keybinds.petDefensive': 'Peliharaan: Defensif',
   'hudChrome.keybinds.petStop': 'Peliharaan: Berhenti',
+  'hudChrome.keybinds.targetPet': 'Peliharaan: Bidik',
   'hudChrome.keybinds.petTaunt': 'Peliharaan: Ejek',
   'hudChrome.mailbox.parcelQtyDecreaseAria': 'Kirim satu {item} lebih sedikit',
   'hudChrome.mailbox.parcelQtyIncreaseAria': 'Kirim satu {item} lebih banyak',
@@ -2375,9 +2373,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.calendar.events.delveDay.note':
     'Bruder Halven menandai petanya: hari yang baik untuk menantang Relikuari Runtuh.',
   'hudChrome.calendar.events.delveDay.title': 'Hari Delve',
-  'hudChrome.calendar.events.fiestaNight.note':
-    'Gelanggang Fiesta 2v2 menarik penonton paling riuh malam ini.',
-  'hudChrome.calendar.events.fiestaNight.title': 'Malam Fiesta',
   'hudChrome.calendar.events.fishingDerby.note':
     'Para pemancing berjajar di tepi danau. Bawalah joran dan saling bertukar kisah memancing.',
   'hudChrome.calendar.events.fishingDerby.title': 'Lomba Memancing',
@@ -3615,6 +3610,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.items.crag_warden_cudgel.name': 'Pentungan Crag Warden',
   'entities.items.craghorn_staff.name': 'Tongkat Craghorn',
   'entities.items.cragmaw_huntcord.name': 'Tali Buru Cragmaw',
+  'entities.items.cragmaw_huntquiver.name': 'Tabung Panah Buru Cragmaw',
   'entities.items.cragmaw_prowlboots.name': 'Bot Endap Cragmaw',
   'entities.items.cragwalker_boots.name': 'Bot Cragwalker',
   'entities.items.crimson_amber_armor_plate.name': 'Ambar Merah Tua',
@@ -3694,6 +3690,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.items.gravewardens_shiv.name': 'Belati Penjaga Makam',
   'entities.items.gravewoven_raiment.name': 'Busana Tenun Makam',
   'entities.items.gravewyrm_gauntlets.name': 'Sarung Tangan Gravewyrm',
+  'entities.items.gravewyrm_bone_quiver.name': 'Tabung Panah Tulang Gravewyrm',
   'entities.items.gravewyrm_mantle.name': 'Mantel Gravewyrm',
   'entities.items.gravewyrm_sabatons.name': 'Sabaton Gravewyrm',
   'entities.items.gravewyrm_scale_hauberk.name': 'Baju Zirah Sisik Gravewyrm',
@@ -3754,6 +3751,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.items.mistveil_grips.name': 'Sarung Tangan Tabir Kabut',
   'entities.items.moggers_copper_cudgel.name': 'Pentungan Tembaga Mogger',
   'entities.items.moggers_shiv.name': 'Belati Mogger',
+  'entities.items.moggers_hide_quiver.name': 'Tabung Panah Kulit Mogger',
   'entities.items.moggers_stomper_boots.name': 'Bot Penginjak Mogger',
   'entities.items.monarch_crown_helm.name': 'Mahkota Sang Raja',
   'entities.items.copper_mining_pick.name': 'Beliung Tambang Tembaga',
@@ -3877,6 +3875,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.items.stormcallers_spaulders.name': 'Pelindung Bahu Galecall',
   'entities.items.bonewrought_greatsword.name': 'Pedang Besar Bonewrought',
   'entities.items.direfang_greatblade.name': 'Bilah Besar Direfang',
+  'entities.items.direfang_quiver.name': 'Tabung Panah Direfang',
   'entities.items.bonewrought_bulwark.name': 'Perisai Benteng Bonewrought',
   'entities.items.wraithfire_orb.name': 'Orb Wraithfire',
   'entities.items.stormshard_leggings.name': 'Legging Serpihan Badai',
@@ -5528,7 +5527,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'fiesta.end.draw': 'FIESTA SERI! Terlalu ketat untuk diputuskan!',
   'fiesta.end.loss': 'FIESTA KALAH! Coba lagi!',
   'fiesta.end.win': 'FIESTA MENANG! 🎉 Pesta yang luar biasa!',
-  'fiesta.enterQueue': 'Gabung Fiesta!',
   'fiesta.error.leaderOnly': 'Hanya pemimpin party yang boleh mendaftarkan timmu untuk {label}.',
   'fiesta.error.noAugment': 'Kau tak punya augment untuk dipilih saat ini.',
   'fiesta.error.notOnOffer': 'Augment itu tidak tersedia.',
@@ -5545,9 +5543,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'fiesta.powerup.pow_colossus.name': 'Kolosus',
   'fiesta.powerup.pow_moon_boots.name': 'Sepatu Bulan',
   'fiesta.powerup.pow_speed_demon.name': 'Iblis Kecepatan',
-  'fiesta.practice': '🎉 Latihan vs Bot',
-  'fiesta.practiceNote':
-    'Latihan offline: memunculkan 3 bot AI dan mendaftarkanmu untuk Fiesta 2v2. Klik lagi untuk berhenti.',
   'fiesta.queue.join': 'Kau bergabung ke antrean Fiesta 2v2. Bersiaplah untuk PESTA…',
   'fiesta.queue.leave': 'Kau meninggalkan antrean Fiesta 2v2.',
   'fiesta.queue.teamLeave': 'Timmu meninggalkan antrean Fiesta 2v2.',
@@ -5794,38 +5789,18 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Menghantam segala sesuatu di sekitarmu dan melambatkan serangan mereka.',
   'guide.abilityHook.wrath':
     'Anak panah alam yang dilontarkan ke sasaran dari kejauhan, serangan andalanmu.',
-  'guide.arenaPage.augmentsNote':
-    'Augmen dan penguat hanya bertahan selama pertandingan. Semuanya tentang rakitan jenaka dan dadakan, bukan kekuatan abadi, sehingga tak seorang pun bisa membeli kemenangan.',
   'guide.arenaPage.coliseumBody':
     'Coliseum adalah arena realm, tempat kamu menghadapi pemain lain dalam pertandingan berperingkat, satu lawan satu atau dua lawan dua. Setiap bracket menyimpan peringkatnya sendiri, jadi sebuah kemenangan mengangkatmu di tangga itu untuk dilihat seluruh realm. Buka jendela Arena untuk mendaftar ke sebuah bracket, sendiri atau bersama pasanganmu.',
   'guide.arenaPage.coliseumHeading': 'Coliseum Abu',
   'guide.arenaPage.duelsBody':
     'Tantang pemain mana pun yang kamu temui untuk duel persahabatan. Tak ada yang dipertaruhkan selain harga diri, jadi inilah cara termudah mempelajari sebuah pertandingan atau menyelesaikan perselisihan ramah.',
   'guide.arenaPage.duelsHeading': 'Duel',
-  'guide.arenaPage.fiestaBody':
-    'Fiesta adalah perkelahian dua lawan dua yang cepat, dimainkan sebagai satu pertarungan tanpa jeda, dengan tiap petarung dibawa ke titik pijak yang setara. Seiring pertarungan berjalan kamu memilih augmen, dorongan cepat yang membentuk ulang perlengkapanmu secara spontan, sehingga tak ada dua pertandingan yang sama persis.',
-  'guide.arenaPage.fiestaHeading': 'Fiesta dua lawan dua',
   'guide.arenaPage.heading': 'Arena dan PvP',
   'guide.arenaPage.intro':
     'Ingin menguji dirimu melawan pemain lain? Pemain lawan pemain sudah tersedia, dan ini selalu pilihanmu, tak pernah dipaksakan padamu.',
   'guide.arenaPage.ladderBody':
     'Permainan berperingkat melacak kedudukanmu dari waktu ke waktu. Lihat papan peringkat untuk mengetahui posisimu dan siapa yang memuncaki realm.',
   'guide.arenaPage.ladderHeading': 'Menaiki tangga peringkat',
-  'guide.arenaPage.powerupsBody':
-    'Bola bercahaya juga jatuh ke arena di tengah pertarungan, bebas bagi siapa pun yang meraihnya lebih dulu. Sengaja dibuat berlebihan dan hanya bertahan sebentar: Speed Demon untuk laju membutakan sekejap, Colossus untuk membengkak menjadi raksasa lamban, Moon Boots untuk lompatan memantul gravitasi rendah, dan Berserker untuk lonjakan amarah mendadak.',
-  'guide.arenaPage.powerupsTitle': 'Penguat di dalam arena',
-  'guide.arenaPage.waveGoldBody':
-    'Gelombang tengah: kombo bermata dua tempat rakitanmu mulai terbentuk dan berpadu.',
-  'guide.arenaPage.waveGoldTitle': 'Emas',
-  'guide.arenaPage.wavePrismaticBody':
-    'Gelombang terakhir: lonjakan penentu-rakitan yang melelehkan layar, dirancang terasa konyol dengan cara terbaik.',
-  'guide.arenaPage.wavePrismaticTitle': 'Prismatik',
-  'guide.arenaPage.waveSilverBody':
-    'Gelombang pembuka: penguatan satu-statistik yang bersih, mempertajam dasar-dasar kelasmu.',
-  'guide.arenaPage.waveSilverTitle': 'Perak',
-  'guide.arenaPage.wavesBody':
-    'Sebuah pertarungan Fiesta memberimu pilihan baru seiring jalannya, dan pilihannya makin berani makin lama pertarungan berlangsung. Kamu membangun dari satu gelombang ke berikutnya, memilih salah satu dari beberapa opsi tiap kali dan menyimpannya sampai sisa pertarungan.',
-  'guide.arenaPage.wavesTitle': 'Augmen datang bergelombang',
   'guide.bestiary.flavor.gravecaller_cultist':
     'Pelayan berjubah dari pemuja kematian yang ulahnya mencemari kuburan dari Lembah sampai puncak. Di mana mereka berkumpul, yang mati tak beristirahat.',
   'guide.bestiary.flavor.grubjaw':
@@ -6839,7 +6814,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hud.core.mapCanvasLabel': 'Peta',
   'hud.core.mapSummary': 'Peta {zone}.',
   'hud.core.maxLevel': 'LEVEL MAKS',
-  'hud.core.mobileArena': 'Arena',
   'hud.core.mobileAttack': 'Serang',
   'hud.core.mobileCamera': 'Kamera — ketuk dua kali untuk memusatkan ulang',
   'hud.core.mobileChat': 'Obrolan',
@@ -6935,7 +6909,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hud.errors.whisperMissing': "Tidak ada pemain bernama '{name}' yang sedang daring.",
   'hud.errors.whisperSelf': 'Kamu menggumam kepada dirimu sendiri. Tak seorang pun mendengarnya.',
   'hud.keybinds.actions.actionBarSlot': 'Bilah Aksi {slot}',
-  'hud.keybinds.actions.arena': 'Arena (Ashen Coliseum)',
   'hud.keybinds.actions.attack': 'Serang',
   'hud.keybinds.actions.attackMove': 'Serang Bergerak',
   'hud.keybinds.actions.autorun': 'Alihkan Lari Otomatis',
@@ -7712,6 +7685,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.partyGroup': 'Grup {n}',
   'hudChrome.unitFrame.partyLabel': 'Kelompok Anda',
   'hudChrome.unitFrame.playerLabel': 'Pahlawan Anda',
+  'hudChrome.unitFrame.petLabel': 'Peliharaan Anda',
   'hudChrome.unitFrame.targetAnnounce': 'Tandai {name}',
   'hudChrome.unitFrame.targetLabel': 'Sasaran Anda',
   'hudChrome.widgets.clockTitle': 'Waktu lokal - klik untuk beralih 12/24 jam',
@@ -8670,6 +8644,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.event.hint': 'Umumkan raid, pertemuan, atau acara',
   'hudChrome.discord.relay.help.label': 'Butuh Bantuan',
   'hudChrome.discord.relay.help.hint': 'Minta bantuan dari komunitas',
+  'hudChrome.options.hideUnusedActionSlots': 'Sembunyikan Slot Aksi yang Tidak Terpakai',
   'hudChrome.options.showSecondaryActionBar': 'Tampilkan Bilah Aksi Sekunder',
   'errors.api.desktopCodeInvalid':
     'Kode masuk desktop tidak valid atau kedaluwarsa. Silakan coba lagi.',
@@ -8801,13 +8776,9 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.disenchantConfirmBodySpecial':
     'Ini menghancurkan salinan khusus dari {item} (bertanda tangan, karya besar, atau terpesonan) dan menghasilkan bahan arkan. Tindakan ini tidak dapat dibatalkan.',
   'hudChrome.enchanting.disenchantConfirmTitle': 'Hancurkan pemantraan {item}?',
-  'hudChrome.enchanting.disenchantThrottled':
-    'Kamu menghancurkan pemantraan terlalu cepat. Tunggu sebentar dan coba lagi.',
   'hudChrome.enchanting.disenchantedLine': 'Kamu menghancurkan pemantraan {item}.',
   'hudChrome.enchanting.enchantAppliedLine': 'Kamu memantrai {item} dengan {enchant}.',
   'hudChrome.enchanting.enchantInsufficient': 'Kamu tidak memiliki bahan untuk mantrai itu.',
-  'hudChrome.enchanting.enchantThrottled':
-    'Kamu memantrai terlalu cepat. Tunggu sebentar dan coba lagi.',
   'hudChrome.enchanting.enchantUnknown': 'Mantrai itu tidak ada.',
   'hudChrome.enchanting.enchantWrongSlot': 'Mantrai itu tidak bisa diterapkan pada barang itu.',
   'hudChrome.enchanting.noEnchants': 'Tidak ada mantrai yang menggunakan reagen ini.',
@@ -8821,8 +8792,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.salvageConfirmBodySpecial':
     'Ini menghancurkan salinan khusus dari {item} (bertanda tangan, karya besar, atau terpesonan) dan menghasilkan bahan kerajinan. Tindakan ini tidak dapat dibatalkan.',
   'hudChrome.enchanting.salvageConfirmTitle': 'Salvasi {item}?',
-  'hudChrome.enchanting.salvageThrottled':
-    'Kamu menyalvasi terlalu cepat. Tunggu sebentar dan coba lagi.',
   'hudChrome.enchanting.salvagedLine': 'Kamu menyalvasi {item}.',
   'hudChrome.enchanting.targetTitle': 'Pilih barang untuk dimantrai',
   'hudChrome.gathering.herbalism': 'Herbalisme',
@@ -8991,7 +8960,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Segala sesuatu di halaman ini ada di dalam game: tekan Esc untuk membuka opsi. Menu terbuka pada Ikhtisar berisi hal-hal penting yang disematkan, dengan kategori-kategori di rel di sampingnya: pengaturan di bawah ini ada di bawah Grafik, Antarmuka, dan Aksesibilitas dalam grup Tampilan, dan Hamparan Kinerja di bawah Sistem. Lebih cepat lagi, ketik sebuah nama di kotak pencarian di puncak dan langsung melompat ke sana.',
   'guide.settingsPage.whyLabel': 'Mengapa ini berhasil:',
   'hudChrome.crafting.close': 'Tutup kerajinan',
-  'hudChrome.crafting.craft': 'Keahlian',
   'hudChrome.crafting.craftedToast': 'Dibuat: {name}',
   'hudChrome.crafting.empty': 'Belum ada resep yang diketahui.',
   'hudChrome.crafting.insufficientMaterials': 'Anda tidak memiliki bahan untuk itu.',
@@ -9076,9 +9044,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Merobek zirah target, menguranginya sebesar {damage}% per penerapan. Menumpuk hingga 5 kali. Menghasilkan ancaman dalam jumlah besar.',
   'entities.mobs.training_dummy.name': 'Boneka Latihan',
   'entities.mobs.yumi_cat.name': 'Yumi',
-  'guide.arenaPage.yumiBody':
-    'Lindungi Yumi adalah mode objektif tim yang dimainkan di dalam labirin: masing-masing pihak menjaga peliharaan kucingnya sendiri sambil memburu milik lawan. Sesekali kedua kucing berkelebat ke sudut-sudut baru labirin, sehingga pertarungan berayun antara bertahan, memburu, dan berpacu untuk menemukannya lagi. Masuk antrean sebagai tiga lawan tiga atau lima lawan lima; tumbang dalam pertempuran hanya membuatmu absen sejenak.',
-  'guide.arenaPage.yumiHeading': 'Lindungi Yumi',
   'hudChrome.archetypeTitle.hobbyLabel': 'Hobi',
   'hudChrome.auraEffect.armorPct': 'Mengurangi zirah sebesar {pct}%',
   'hudChrome.auraEffect.armorPctStacks': 'Mengurangi zirah sebesar {pct}% ({stacks} tumpukan)',
@@ -9088,7 +9053,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.increasePct.int': 'Meningkatkan Kecerdasan sebesar {pct}%',
   'hudChrome.auraEffect.increasePct.sta': 'Meningkatkan Stamina sebesar {pct}%',
   'hudChrome.crafting.recipeNotLearned': 'Kamu belum mempelajari resep itu.',
-  'hudChrome.crafting.throttled': 'Kamu membuat terlalu cepat. Tunggu sejenak dan coba lagi.',
   'hudChrome.mobile.chatPlaceholder': 'Katakan sesuatu...',
   'hudChrome.mobile.hideKeyboard': 'Sembunyikan papan ketik',
   'hudChrome.unitFrame.partyChip': 'Kelompok',
@@ -9098,7 +9062,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'yumi.bracket5': 'Yumi 5 lawan 5',
   'yumi.end.loss': 'KEKALAHAN! Yumi-mu telah tumbang.',
   'yumi.end.win': 'KEMENANGAN! Yumi selamat!',
-  'yumi.enterQueue': 'Ikut Lindungi Yumi!',
   'yumi.error.partyTooBig3': 'Lindungi Yumi 3 lawan 3 hanya membolehkan party hingga tiga orang.',
   'yumi.error.partyTooBig5': 'Lindungi Yumi 5 lawan 5 hanya membolehkan party hingga lima orang.',
   'yumi.hud.aria': 'Yumi-mu pada {mine} dari {max} kesehatan, Yumi musuh pada {theirs}.',
@@ -10207,6 +10170,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hud.combat.evaded': '{ability}-mu dihindari oleh {target}.',
   'hudChrome.options.mouseoverCast': 'Rapal Saat Menyorot Bingkai Kelompok',
   'hudChrome.options.showTargetOfTarget': 'Tampilkan Sasaran dari Sasaran',
+  'hudChrome.options.showPetFrame': 'Tampilkan Peliharaan Anda',
   'hudChrome.unitFrame.targetOfTargetLabel': 'Sasaran dari Sasaran',
   'itemUi.market.rarityLegendary': 'Legendaris',
   'loading.reconnectingAttempt':

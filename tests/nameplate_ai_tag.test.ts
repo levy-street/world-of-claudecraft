@@ -85,6 +85,7 @@ function view(): EntityView {
 
 interface PainterStateAccess {
   states: Map<number, NameplateCanvasState>;
+  anchorCount: number;
 }
 
 function stateOf(painter: NameplatePainter, id: number): NameplateCanvasState {
@@ -136,7 +137,7 @@ function harness(
     showPlayerNameplates: () => true,
     isHostilePlayer: options.isHostilePlayer ?? (() => false),
   });
-  return { painter, layer };
+  return { painter, layer, views };
 }
 
 describe('batched canvas nameplate state', () => {
@@ -169,6 +170,21 @@ describe('batched canvas nameplate state', () => {
     target.aiAccount = false;
     painter.update(true);
     expect(state.aiLabel).toBe('');
+  });
+
+  it('does not submit a canvas anchor for a renderer-hidden voyage rig', () => {
+    const target = entity({ id: 2 });
+    const { painter, views } = harness([target]);
+    const access = painter as unknown as PainterStateAccess;
+    painter.update(true);
+    expect(access.anchorCount).toBe(1);
+
+    const targetView = views.get(target.id);
+    if (!targetView) throw new Error('target view missing');
+    targetView.group.visible = false;
+    painter.update(true);
+
+    expect(access.anchorCount).toBe(0);
   });
 
   it('keeps target, hostile, dead, pet, threat, and hp state in canvas paint data', () => {

@@ -1151,6 +1151,20 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     limiter: null,
     requireOwnedExpected: null,
   },
+  // Thornhollow Fields (server/battleground.ts): a registry-only RouteDef born after
+  // the migration, per the same new-route rule as the deeds family. Public
+  // anonymous ladder read, rate-limited in-handler with publicReadRateLimited
+  // (the deeds-rarity row shape).
+  {
+    dispatcher: DISPATCH.mainApi,
+    method: 'GET',
+    path: '/api/battleground/leaderboard',
+    handler: 'server/battleground.ts bgLeaderboardHandler (registry-only RouteDef)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.public,
+    limiter: 'publicReadRateLimited',
+    requireOwnedExpected: null,
+  },
   // OTA update check (server/ota_updates.ts): registry-only RouteDef, same
   // new-route rule as the deeds trio. The Capgo capacitor-updater plugin in
   // the native mobile shells POSTs its device/version check-in here; the
@@ -2272,41 +2286,15 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     limiter: null,
     requireOwnedExpected: null,
   },
-  {
-    dispatcher: DISPATCH.internal,
-    method: 'GET',
-    path: '/internal/discord/relay',
-    handler: 'handleDiscordInternal arm: /internal/discord/relay',
-    contentType: PROBLEM_JSON,
-    authScope: AUTH_SCOPE.secretDiscord,
-    limiter: null,
-    requireOwnedExpected: null,
-  },
-  {
-    dispatcher: DISPATCH.internal,
-    method: 'GET',
-    path: '/internal/discord/activity',
-    handler: 'handleDiscordInternal arm: /internal/discord/activity',
-    contentType: PROBLEM_JSON,
-    authScope: AUTH_SCOPE.secretDiscord,
-    limiter: null,
-    requireOwnedExpected: null,
-  },
+  // The retired per-endpoint GET pickups (relay, activity, and the standalone
+  // daily-rewards-winners read) have NO rows here: the bot's consolidated
+  // outbox poll replaced them and both their arms were removed together
+  // (#2791), so a request to those paths answers the ladder's terminal 404.
   {
     dispatcher: DISPATCH.internal,
     method: 'POST',
     path: '/internal/discord/members-meta',
     handler: 'handleDiscordInternal arm: /internal/discord/members-meta',
-    contentType: PROBLEM_JSON,
-    authScope: AUTH_SCOPE.secretDiscord,
-    limiter: null,
-    requireOwnedExpected: null,
-  },
-  {
-    dispatcher: DISPATCH.internal,
-    method: 'GET',
-    path: '/internal/discord/daily-rewards-winners',
-    handler: 'handleDiscordInternal arm: /internal/discord/daily-rewards-winners',
     contentType: PROBLEM_JSON,
     authScope: AUTH_SCOPE.secretDiscord,
     limiter: null,
@@ -2350,10 +2338,12 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
   },
   // The consolidated bot poll: the relay, activity and linked-member change
   // feeds drained together with the winner-day announcements, so the bot makes
-  // one request per interval instead of three plus a full member sweep. The
-  // second REGISTRY-ONLY internal route, same reason as flex-batch above (born
-  // after the migration, no handleDiscordInternal arm, so the handler anchors on
-  // the exported RouteDef symbol).
+  // one request per interval instead of three plus a full member sweep. Since
+  // #2791 this is the ONLY pickup surface: the per-endpoint GETs it replaced
+  // are retired from both arms. The second REGISTRY-ONLY internal route, same
+  // reason as flex-batch above (born after the migration, no
+  // handleDiscordInternal arm, so the handler anchors on the exported RouteDef
+  // symbol).
   {
     dispatcher: DISPATCH.internal,
     method: 'GET',

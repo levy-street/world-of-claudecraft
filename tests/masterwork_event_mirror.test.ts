@@ -8,16 +8,18 @@ import { describe, expect, it } from 'vitest';
 import { ClientWorld } from '../src/net/online';
 import { Sim } from '../src/sim/sim';
 import type { SimEvent } from '../src/sim/types';
+import { runCraft } from './helpers/enchant_family_cast';
 
-// Hunted proc seed, pinned (re-recorded after the zones 1-3 quest-dedupe
-// content pass added camps, mobs, and items, shifting the construction-time
-// world-gen draw sequence): with a fresh warrior (tailoring 0, no archetype,
-// no self-signed reagent, not specialized) the first craft of
-// recipe_eastbrook_ritual_vestments draws under the 3 percent base masterwork
-// chance at this seed. Pre-verified against this exact grant order (3x
-// linen_scrap then 1x spider_leg, then the craft); seeds 107, 111, 118, and
-// 123 also land, kept on record here as spares.
-const PROC_SEED = 53;
+// Hunted proc seed, pinned (re-recorded whenever a content commit shifts the
+// construction-time world-gen draw sequence: after the zones 1-3 quest-dedupe
+// pass, then 53 -> 70 after the v0.35.0 release content commits, which added
+// the enchant and hunter offhands and the deeds catalog): with a fresh warrior
+// (tailoring 0, no archetype, no self-signed reagent, not specialized) the
+// first craft of recipe_eastbrook_ritual_vestments draws under the 3 percent
+// base masterwork chance at this seed. Pre-verified against this exact grant
+// order (3x linen_scrap then 1x spider_leg, then the craft); seeds 94, 128,
+// 130, 131, and 153 also land, kept on record here as spares.
+const PROC_SEED = 70;
 const RECIPE_ID = 'recipe_eastbrook_ritual_vestments';
 const ITEM_ID = 'eastbrook_ritual_vestments';
 
@@ -30,7 +32,7 @@ function craftMasterwork() {
   sim.addItem('spider_leg', 1, pid);
   sim.addItem('homespun_cloth', 3, pid);
   sim.addItem('spool_of_thread', 5, pid);
-  sim.craftItem(RECIPE_ID, false, pid);
+  runCraft(sim, RECIPE_ID, false, pid);
   const events = sim.drainEvents().filter((ev) => ev.type === 'masterwork');
   return { sim, pid, events };
 }

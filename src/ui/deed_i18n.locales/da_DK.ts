@@ -804,4 +804,32 @@ export const table: DeedLocaleTable = {
     name: 'Hvad Mågerne Ved',
     desc: 'Fang en fisk i Fjernkystens vande.',
   },
+  prog_engineering_rare: {
+    name: 'Præcisionsingeniørkunst',
+    desc: 'Skab dit første sjældne udstyrsstykke i Ingeniørkunst.',
+  },
+  prog_alchemy_rare: {
+    name: 'En sjælden årgang',
+    desc: 'Skab dit første sjældne udstyrsstykke i Alkymi.',
+  },
+  prog_cooking_rare: {
+    name: 'En ret at huske',
+    desc: 'Skab dit første sjældne udstyrsstykke i Madlavning.',
+  },
+  prog_leatherworking_rare: {
+    name: 'Fin garvning',
+    desc: 'Skab dit første sjældne udstyrsstykke i Læderhåndværk.',
+  },
+  prog_tailoring_rare: {
+    name: 'Et mesterligt sting',
+    desc: 'Skab dit første sjældne udstyrsstykke i Skræderi.',
+  },
+  prog_weaponcrafting_rare: {
+    name: 'Hærdet til glans',
+    desc: 'Skab dit første sjældne udstyrsstykke i Våbenfremstilling.',
+  },
+  prog_armorcrafting_rare: {
+    name: 'Pladet til perfektion',
+    desc: 'Skab dit første sjældne udstyrsstykke i Rustningsfremstilling.',
+  },
 };

@@ -713,6 +713,31 @@ export function createFarShortfallSampler(
   };
 }
 
+/**
+ * Advance an incremental builder inside one cooperative slice: repeat single
+ * steps until the work completes or the caller's clock passes `budgetMs`.
+ * At least one step ALWAYS runs, whatever the budget or clock reports, so a
+ * saturated host still makes forward progress. This is the law that retired
+ * the production vista stall: the old row-count slices only ran when the
+ * browser granted idle time, and a boot busy with asset arrival, decode and
+ * compile grants none, so the far grid took its timeout ceiling times its
+ * slice count (tens of seconds of fogged horizon) while the same build
+ * finished in a blink on an idle dev machine. Progress per slice is now a
+ * bounded TIME bite that never depends on the host's idle policy.
+ * Returns true once the builder reports complete.
+ */
+export function advanceWithinBudget(
+  step: () => boolean,
+  budgetMs: number,
+  now: () => number,
+): boolean {
+  const start = now();
+  for (;;) {
+    if (step()) return true;
+    if (now() - start >= budgetMs) return false;
+  }
+}
+
 export function createFarTileBuilder(tile: FarTile, spacing: number, seed: number): FarTileBuilder {
   const side = farGridSide(tile.size, spacing);
   const padded = side + 2;

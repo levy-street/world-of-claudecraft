@@ -10,13 +10,13 @@
     "companionUpgrade rank bump + refreshDelveDaily day rollover"
   ],
   "draws": 3,
-  "drawDigest": "392af441",
+  "drawDigest": "aec42e04",
   "frames": [
     {
       "tick": 0,
       "time": 0,
-      "nextId": 969,
-      "state": "35694f82",
+      "nextId": 987,
+      "state": "bf7478eb",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -37,11 +37,11 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -54,7 +54,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 960,
+          "entityId": 978,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -90,7 +90,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 960
+              "sourceId": 978
             }
           ],
           "blockChance": 0.05,
@@ -103,7 +103,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 100,
-          "id": 960,
+          "id": 978,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -147,23 +147,23 @@
     {
       "tick": 5,
       "time": 0.25,
-      "nextId": 990,
-      "state": "cbf94d23",
-      "events": "29175199",
+      "nextId": 1004,
+      "state": "c37dacfa",
+      "events": "22985465",
       "rng": {
         "draws": 1,
-        "digest": "38457ea8"
+        "digest": "a7714531"
       }
     },
     {
       "tick": 7,
       "time": 0.35,
-      "nextId": 990,
-      "state": "7325b640",
+      "nextId": 1004,
+      "state": "d6684dcf",
       "events": "741638a5",
       "rng": {
         "draws": 3,
-        "digest": "392af441"
+        "digest": "aec42e04"
       },
       "label": "advanced-to-finale",
       "players": [
@@ -180,11 +180,11 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -207,7 +207,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 960,
+          "entityId": 978,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -245,7 +245,7 @@
               "name": "Battle Stance",
               "remaining": 3599.65,
               "school": "physical",
-              "sourceId": 960
+              "sourceId": 978
             }
           ],
           "blockChance": 0.05,
@@ -257,7 +257,7 @@
           "dodgeChance": 0.063,
           "fiveSecondRule": 99.35,
           "hp": 50000,
-          "id": 960,
+          "id": 978,
           "kind": "player",
           "level": 7,
           "lootFfaTimer": "Infinity",
@@ -300,12 +300,12 @@
     {
       "tick": 7,
       "time": 0.35,
-      "nextId": 990,
-      "state": "87de9421",
-      "events": "e7756371",
+      "nextId": 1004,
+      "state": "ddc7f771",
+      "events": "d0702183",
       "rng": {
         "draws": 3,
-        "digest": "392af441"
+        "digest": "aec42e04"
       },
       "label": "shop-daily",
       "players": [
@@ -322,6 +322,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {
             "companion_tessa": 2
@@ -329,7 +330,6 @@
           "copper": 100000,
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -356,7 +356,7 @@
             "date": "2099-06-25"
           },
           "delveMarks": 89,
-          "entityId": 960,
+          "entityId": 978,
           "equipment": {
             "chest": "recruit_tunic",
             "legs": "reliquary_legs",
@@ -395,7 +395,7 @@
               "name": "Battle Stance",
               "remaining": 3599.65,
               "school": "physical",
-              "sourceId": 960
+              "sourceId": 978
             }
           ],
           "blockChance": 0.05,
@@ -407,7 +407,7 @@
           "dodgeChance": 0.063,
           "fiveSecondRule": 99.35,
           "hp": 348,
-          "id": 960,
+          "id": 978,
           "kind": "player",
           "level": 7,
           "lootFfaTimer": "Infinity",
@@ -419,8 +419,8 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 104200,
-            "z": -1127
+            "x": -5,
+            "z": -52
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
@@ -450,12 +450,12 @@
     {
       "tick": 9,
       "time": 0.45,
-      "nextId": 990,
-      "state": "8d3ee85e",
+      "nextId": 1004,
+      "state": "be86a8be",
       "events": "741638a5",
       "rng": {
         "draws": 3,
-        "digest": "392af441"
+        "digest": "aec42e04"
       },
       "label": "final",
       "players": [
@@ -472,6 +472,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {
             "companion_tessa": 2
@@ -479,7 +480,6 @@
           "copper": 100000,
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -506,7 +506,7 @@
             "date": "2099-06-25"
           },
           "delveMarks": 89,
-          "entityId": 960,
+          "entityId": 978,
           "equipment": {
             "chest": "recruit_tunic",
             "legs": "reliquary_legs",
@@ -545,7 +545,7 @@
               "name": "Battle Stance",
               "remaining": 3599.55,
               "school": "physical",
-              "sourceId": 960
+              "sourceId": 978
             }
           ],
           "blockChance": 0.05,
@@ -557,7 +557,7 @@
           "dodgeChance": 0.063,
           "fiveSecondRule": 99.45,
           "hp": 348,
-          "id": 960,
+          "id": 978,
           "kind": "player",
           "level": 7,
           "lootFfaTimer": "Infinity",
@@ -565,12 +565,12 @@
           "maxResource": 100,
           "moveSpeed": 7,
           "offhandItemId": "eastbrook_buckler",
-          "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 104200,
-            "z": -1127
+            "x": -5,
+            "y": -0.04,
+            "z": -52
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",

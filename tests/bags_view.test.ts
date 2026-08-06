@@ -45,6 +45,13 @@ const ITEMS: Record<string, ItemDef> = {
   questItem: { kind: 'quest', name: 'Relic', quality: 'epic' } as ItemDef,
   bound: { kind: 'armor', name: 'Bound Plate', quality: 'uncommon', noMarketList: true } as ItemDef,
   rod: { kind: 'tool', name: 'Fishing Rod', use: { type: 'fishing' } } as ItemDef,
+  reins: {
+    id: 'reins_grag_bear',
+    kind: 'mount',
+    mount: 'grag_bear',
+    name: 'Reins of the Goliath Grag-Bear',
+    quality: 'rare',
+  } as ItemDef,
   // Tool-effect charm: use.type 'toolEffect' is not bag-usable; the hover must
   // point at the Professions window rather than advertising "Click to use".
   charm: {
@@ -499,6 +506,9 @@ describe('bagTooltipHintKey', () => {
     expect(bagTooltipHintKey(ITEMS.bread, NO_MODE)).toBe('itemUi.tooltip.clickConsume');
     expect(bagTooltipHintKey(ITEMS.potion, NO_MODE)).toBe('itemUi.tooltip.clickUseInstant');
     expect(bagTooltipHintKey(ITEMS.rod, NO_MODE)).toBe('itemUi.tooltip.clickUse');
+    // The base reins tooltip already carries the use-to-summon line; bags must
+    // not append a duplicate action hint.
+    expect(bagTooltipHintKey(ITEMS.reins, NO_MODE)).toBe('');
     // Charms refuse bag use (sim: "Open Professions to slot that."); the hint
     // must not advertise click-to-use for a click that only errors.
     expect(bagTooltipHintKey(ITEMS.charm, NO_MODE)).toBe(

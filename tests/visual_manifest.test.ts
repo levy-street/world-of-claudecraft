@@ -346,6 +346,35 @@ describe('character visual manifest', () => {
     }
   });
 
+  it('keeps the model-sharing player skins at a subtle tint, not a full-body wash (#2678)', () => {
+    // player_priest and player_warlock share mage.glb, player_shaman shares
+    // barbarian.glb; each carries a small tint so it reads apart from the
+    // class it shares a model with. At their pre-fix strengths (0.5 / 0.4 /
+    // 0.45) the tint color dominated the authored texture and the default
+    // (skin 0) appearance read as a solid-color, corrupted model on the
+    // character-create screen. Pinned to the exact 0.12 the manifest ships
+    // (the same "faint wash" strength used elsewhere for model-sharing
+    // differentiation, see mob_troll's 0.12 above), not just an upper bound,
+    // so a future bump toward the wash can't silently pass this test.
+    for (const key of ['player_priest', 'player_shaman', 'player_warlock'] as const) {
+      const visual = VISUALS[key];
+      expect(typeof visual.tint, key).toBe('number');
+      expect(visual.tintStrength, key).toBe(0.12);
+    }
+    // The classes that own their model outright (no sharing) stay tint-free:
+    // a wash there would be pure regression, never intentional.
+    for (const key of [
+      'player_warrior',
+      'player_paladin',
+      'player_hunter',
+      'player_rogue',
+      'player_mage',
+      'player_druid',
+    ] as const) {
+      expect(VISUALS[key].tint, key).toBeUndefined();
+    }
+  });
+
   it('keeps deepfen_spearjaw on its raptor model despite its reptile family retag', () => {
     // Prose-only claim otherwise (FAMILY_KEYS.reptile comment): the explicit MOB_KEYS
     // override this pins is what actually keeps the model, and nothing else does.

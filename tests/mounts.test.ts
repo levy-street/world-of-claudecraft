@@ -424,6 +424,12 @@ describe('mount reins items (the collection: owning the item is owning the mount
     expect(bagOwnedMounts(meta.inventory)).toEqual(['valorsteed']);
   });
 
+  it('reports no free mount for a headless world or an unknown player id', () => {
+    const sim = makeWorld();
+    expect(sim.ownedMounts()).toEqual([]);
+    expect(sim.ownedMountsFor(999_999)).toEqual([]);
+  });
+
   it('exposes the collection on the IWorld facade (ownedMounts), empty for a fresh player', () => {
     const sim = makeWorld();
     const pid = join(sim, 20);

@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { NATIVE_APP } from '../client_origin';
-import { tightMemoryDeviceHint } from '../device_memory_hint';
+import { TIGHT_MEMORY_MAX_GB, tightMemoryDeviceHint } from '../device_memory_hint';
 import {
   type GraphicsSettingsSnapshot,
   normalizeGraphicsSettingsSnapshot,
@@ -203,6 +203,8 @@ export interface GfxSettings {
   readonly nativeIosMemoryProfile: boolean;
   /** Global cap for inactive skinned character rigs retained for reuse. */
   readonly maxPooledCharacterVisuals: number;
+  /** Global cap for inactive ground-object views (harvest nodes, loot, quest pickups) retained for reuse. */
+  readonly maxPooledObjects: number;
   /**
    * Linear range multiplier for the animated far character band (`crowd_lod.ts`):
    * how much further than the articulated band a rig keeps animating at a low
@@ -1023,11 +1025,39 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
     constrainedMemory,
     nativeIosMemoryProfile,
     tightMemory: tightMemoryProfile,
+    // Every OTHER budget in this function falls back through constrainedMemory (the
+    // cross-platform touch/coarse-pointer/narrow-viewport/deviceMemory detector, see
+    // maxPointLights above) before reaching its desktop default; this one used to jump
+    // straight from the two narrow iOS profiles to POSITIVE_INFINITY, so any Android
+    // browser or native shell, and any iOS session that never stamped tightMemory, kept
+    // every despawned mob/NPC CharacterVisual (and its per-instance Skeleton + GPU
+    // bone-matrix DataTexture) forever: visualPool is keyed per template+color+scale, so
+    // roaming through a zone with any per-mob variance mints new keys continuously and
+    // never reuses, never shrinks. Bounded to a working set a bit above the crowd_lod
+    // "soft" articulated-rig band (CROWD_LOD_SOFT_RIGS) so ordinary reuse still avoids the
+    // GPU skeleton re-upload hitch pooling exists for, without growing without bound.
     maxPooledCharacterVisuals: tightMemoryProfile
       ? 4
       : nativeIosMemoryProfile
         ? 6
-        : Number.POSITIVE_INFINITY,
+        : constrainedMemory
+          ? 24
+          : Number.POSITIVE_INFINITY,
+    // The ground-object reuse pool (harvest nodes, loot piles, quest pickups) had NO cap at
+    // all on any platform, not even the two narrow iOS memory profiles: every distinct item
+    // template a player interacted with stayed retained (Group/Object3D graph, never GPU
+    // geometry/material, those are shared per-item template references) for the rest of the
+    // session. Professions gathering in particular streams through many distinct nodes in a
+    // few minutes, so this was unbounded, progressive growth on exactly the cadence the
+    // mobile-disconnect reports described. Bounded on the same constrained-device tiers as
+    // maxPooledCharacterVisuals above; desktop keeps the historical unbounded pool.
+    maxPooledObjects: tightMemoryProfile
+      ? 4
+      : nativeIosMemoryProfile
+        ? 6
+        : constrainedMemory
+          ? 24
+          : Number.POSITIVE_INFINITY,
     // Extra articulated rigs are skinning + draw-call cost, so the phone-class
     // memory profiles and the low tier (which includes software GL) opt out and
     // keep the straight-to-frozen far LOD.
@@ -1347,17 +1377,30 @@ export function classifyGpuRenderer(name: string | undefined): GpuClass {
  *
  * Grounded in the standard adaptive-quality practice (detect-gpu name tiering + web.dev adaptive
  * loading), first-match-wins. CRITICAL: deviceMemory + hardwareConcurrency may only RAISE a tier
- * or break a tie, NEVER pull one down. Safari caps hardwareConcurrency (2 on iOS, 8 on macOS) and
- * Safari + Firefox omit deviceMemory entirely (Chromium-only, clamped, max ~8), so a flagship
- * iPhone reports cores=2 / mem=undefined: a low-count down-rank would wrongly bucket it low. The
- * recognized GPU class sets the floor; a masked/unknown name lands on MEDIUM. Ultra is gated
- * behind a recognized strong-desktop GPU (a masked name cannot reach it).
+ * or break a tie, NEVER pull one down FOR THIS CAPABILITY LADDER. Safari caps hardwareConcurrency
+ * (2 on iOS, 8 on macOS) and Safari + Firefox omit deviceMemory entirely (Chromium-only, clamped,
+ * max ~8), so a flagship iPhone reports cores=2 / mem=undefined: a low-count down-rank would
+ * wrongly bucket it low. The recognized GPU class sets the floor; a masked/unknown name lands on
+ * MEDIUM. Ultra is gated behind a recognized strong-desktop GPU (a masked name cannot reach it).
+ *
+ * A confirmed low deviceMemory is a SEPARATE axis from GPU capability, though: a mobile GPU
+ * capable of pushing HIGH-tier pixels can still sit behind a genuinely small total RAM budget (a
+ * common mid-range Android configuration pairs a decent GPU with 3-4 GB total system RAM), and
+ * the world's baseline texture/geometry residency alone is large enough that a HIGH-tier session
+ * on one of these phones can cross the OS's per-tab memory ceiling during ordinary play, reported
+ * upstream as "randomly disconnects / dumped back to login no matter the network." This floor
+ * fires ONLY on a REPORTED (never inferred) deviceMemory, so it can never false-positive an
+ * iPhone the way a thin core-count check would (Safari never reports deviceMemory, so mem stays
+ * undefined there and this never fires): it reuses the exact TIGHT_MEMORY_MAX_GB threshold
+ * entry_crash_guard's reactive tight profile already applies to this device class, just proactively
+ * instead of only after a confirmed crash.
  */
 export function resolveDefaultGraphicsPreset(hints: GfxRuntimeHints): number {
   const gpu = classifyGpuRenderer(hints.gpuRenderer);
   const mem = hints.deviceMemory; // GiB, Chromium-only (clamped, max ~8); undefined elsewhere
   const cores = hints.hardwareConcurrency; // logical cores, or undefined
   const isMobile = hints.maxTouchPoints > 0 && (hints.coarsePointer || hints.narrowViewport);
+  if (isMobile && mem !== undefined && mem <= TIGHT_MEMORY_MAX_GB) return PRESET_LOW;
   // Corroborating RAM/core signal (or deviceMemory simply unreported, as on Firefox): only ever
   // used to RAISE the strong-desktop tier to ultra, never to demote.
   const ampleOrUnknownMem =

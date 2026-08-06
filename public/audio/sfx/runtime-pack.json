@@ -1,8 +1,8 @@
 {
   "format": "woc-sfx-runtime-pack",
   "version": 1,
-  "bundleId": "9511e28f18b13885203f10562cd19f1469b4d558b8a4da5fce9d7d4b6b850f0a",
-  "catalogHash": "e5cac852b9919578baa8b84cbeec46109cd0474318bf86eda9624962b86f9067",
+  "bundleId": "5c01e188b6fef83e1cfc5127c54a38deaf64acb1dd33432175c72404c2c10f16",
+  "catalogHash": "3d61a26bcfc357b062c1b4d2e8c1981637fdb8fb5e80ddf335b92ed6b8fbe65f",
   "clips": {
     "amb_birds": {
       "variants": [
@@ -3545,6 +3545,18 @@
           "url": "/audio/sfx/ui_craft_armorcrafting.mp3?v=30373b170373",
           "bytes": 16970,
           "sha256": "30373b1703734fafca9d71b310f9dea83d5e55b4fd385c72bdc2fdca10f248d5"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "ui_craft_cast": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/ui_craft_cast.mp3?v=c74f65b69505",
+          "bytes": 13835,
+          "sha256": "c74f65b695054e7bd43d005cf473d12872571ff901cce33ce59bc0bdf8ba7eb9"
         }
       ],
       "gain": 1,

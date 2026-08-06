@@ -343,6 +343,7 @@ export function canEnterDelve(ctx: SimContext, pid: number): string | null {
   if (ctx.tradeFor(pid)) return 'You cannot enter a delve while trading.';
   if (ctx.duelFor(pid)) return 'You cannot enter a delve during a duel.';
   if (ctx.arenaMatches.has(pid)) return 'You cannot enter a delve during an arena match.';
+  if (ctx.bgMatches.has(pid)) return 'You cannot enter a delve during a battleground.';
   return null;
 }
 
@@ -1544,12 +1545,33 @@ export function delveRiteChoose(ctx: SimContext, intensity: RiteIntensity, pid?:
 
 // ----- companion economy + shop + wire getters -------------------------------
 
+// Reach for Brother Halven's Marks shop and the companion upgrade board: the
+// same 12-yard radius around the delve door the WS dispatch handler already
+// pre-gates on (server/game.ts 'delve_buy' / 'companion_upgrade'), enforced
+// here too as defense-in-depth, matching every other location-gated spend in
+// the sim (market.ts nearMerchant, bank.ts nearBanker, mail/post_office.ts
+// nearMailbox, items.ts buyItem's dist2d check, instances/heroic_vendor.ts
+// heroicVendorInRange, professions/training.ts isAtStation).
+const DELVE_SHOP_RANGE = 12;
+
+function nearDelveDoor(pos: Pick<Vec3, 'x' | 'z'>, delve: DelveDef): boolean {
+  return Math.hypot(pos.x - delve.doorPos.x, pos.z - delve.doorPos.z) <= DELVE_SHOP_RANGE;
+}
+
 export function companionUpgrade(ctx: SimContext, companionId: string, pid?: number): void {
   const r = ctx.resolve(pid);
   if (!r) return;
   const def = DELVE_COMPANIONS[companionId];
   if (!def) {
     ctx.error(r.meta.entityId, 'Unknown companion.');
+    return;
+  }
+  // The companion is ranked up at Brother Halven, not from anywhere in the
+  // world: find the delve this companion belongs to and require the player
+  // stand at its door.
+  const delve = Object.values(DELVES).find((d) => d.autoCompanionId === companionId);
+  if (!delve || !nearDelveDoor(r.e.pos, delve)) {
+    ctx.error(r.meta.entityId, 'Too far away.');
     return;
   }
   const rank = r.meta.companionUpgrades[companionId] ?? 1;
@@ -1607,10 +1629,11 @@ export function delveClearsFor(ctx: SimContext, pid: number): Record<string, num
   return { ...(ctx.players.get(pid)?.delveClears ?? {}) };
 }
 
-// Server-authoritative Marks-vendor purchase. Re-validates the gate + balance
-// here regardless of what the client shows; the client only sends intent. The
-// server geo-gates this to the board NPC (see the `delve_buy` command) so a
-// player must be standing at Brother Halven, mirroring `enter_delve`.
+// Server-authoritative Marks-vendor purchase. Re-validates the door range, the
+// gate, and the balance here regardless of what the client shows; the client
+// only sends intent. The WS dispatch (see the `delve_buy` command) pre-gates
+// the same 12-yard door range so a player must be standing at Brother Halven,
+// mirroring `enter_delve`; the check below is defense-in-depth.
 export function delveBuyShopItem(
   ctx: SimContext,
   delveId: string,
@@ -1628,6 +1651,11 @@ export function delveBuyShopItem(
   const def = ITEMS[itemId];
   if (!def) {
     ctx.error(meta.entityId, 'That item is not for sale.');
+    return;
+  }
+  const delve = DELVES[delveId];
+  if (!delve || !nearDelveDoor(r.e.pos, delve)) {
+    ctx.error(meta.entityId, 'Too far away.');
     return;
   }
   if (!delveShopGateMet(meta, delveId, entry.gate)) {

@@ -45,6 +45,7 @@ export const guideStrings = {
     talents: 'Talents',
     arena: 'Arena & PvP',
     valeCup: 'Vale Cup',
+    thornhollow: 'Thornhollow Fields',
     deeds: 'Book of Deeds',
     glossary: 'Glossary',
     wishIKnew: 'Things I Wish I Knew',
@@ -1144,38 +1145,41 @@ export const guideStrings = {
     coliseumHeading: 'The Ashen Coliseum',
     coliseumBody:
       "The Coliseum is the realm's arena, where you face other players in ranked matches, one on one or two on two. Each bracket keeps its own standing, so a win lifts you up that ladder for the whole realm to see. Open the Arena window to sign up for a bracket, alone or with your partner.",
-    fiestaHeading: 'Two versus two Fiesta',
-    fiestaBody:
-      'Fiesta is a fast, two-on-two brawl fought as one continuous bout, with every fighter brought to an even footing. As the fight runs you draft augments, quick boosts that reshape your kit on the fly, so no two matches play quite the same.',
-    augmentsNote:
-      'Augments and power-ups last only for the match. They are about playful, on-the-spot builds, not lasting power, so nobody buys their way to a win.',
 
-    // The three escalating augment waves, named as flavor. No numbers, no exact effects.
-    wavesTitle: 'Augments arrive in waves',
-    wavesBody:
-      'A Fiesta bout hands you fresh picks as it goes, and the picks grow bolder the longer the fight runs. You build from one wave to the next, choosing one of a few options each time and keeping it for the rest of the bout.',
-    waveSilverTitle: 'Silver',
-    waveSilverBody:
-      'The opening wave: clean, single-stat boosts that sharpen the basics of your class.',
-    waveGoldTitle: 'Gold',
-    waveGoldBody:
-      'The middle wave: two-edged combos where your build starts to take shape and sing.',
-    wavePrismaticTitle: 'Prismatic',
-    wavePrismaticBody:
-      'The final wave: build-defining, screen-melting spikes meant to feel ridiculous in the best way.',
-
-    // The grab-in-the-ring power-ups, named as playful flavor.
-    yumiHeading: 'Protect Yumi',
-    yumiBody:
-      'Protect Yumi is a team objective mode played in a maze: each side guards its own cat familiar while hunting the other. Every so often both cats blink to new corners of the maze, so the fight swings between defending, hunting, and racing to find them again. Queue as three versus three or five versus five; falling in battle only benches you for a moment.',
-    powerupsTitle: 'Power-ups in the ring',
-    powerupsBody:
-      'Glowing orbs also drop into the arena mid-fight, free for whoever reaches them first. They are deliberately over the top and last only a short while: Speed Demon for a blink of blinding pace, Colossus to swell up into a lumbering giant, Moon Boots for a bouncing, low-gravity leap, and Berserker for a sudden surge of fury.',
     ladderHeading: 'Climbing the ladder',
     ladderBody:
       'Ranked play tracks your standing over time. Check the leaderboard to see where you sit and who holds the top of the realm.',
   },
 
+  // The Thornhollow Fields 5v5 capture-the-flag battleground page
+  // (docs/design/thornhollow-fields-lore.md). Spoiler-safe: the mode, the field,
+  // flags, wave respawns, runes, the ladder; no honor amounts, rating math, or
+  // tuning constants.
+  thornhollowPage: {
+    heading: 'Thornhollow Fields',
+    intro:
+      'A ranked 5v5 capture-the-flag battleground fought in a walled hollow in the old growth below Thornpeak, where two ruined keeps face each other down the length of a ravine and an older courtyard sits between them that neither has ever held. Two teams of five, two keeps, one goal: steal the enemy banner and run it home before they run yours.',
+    queueHeading: 'Queueing up',
+    queueBody:
+      'Open the Thornhollow Fields panel and enter the queue solo, or bring a party of up to five and queue together: parties are always kept on one team, and the remaining seats fill with solo champions. When ten stand ready, the match seats both teams at their keeps for a short form-up before the flags go live.',
+    fieldHeading: 'The field',
+    fieldBody:
+      "A walled, open-air field carved into three chambers: each team has its own field before its keep, and the walled Ruin Courtyard sits between them. Two curtain walls span the full width, and every move between chambers passes a contested crossing: the wide main gate, or the gatehouse, a small room straddling the wall whose offset doors force a jog past an ambush corner. Each keep is sealed except its mouth, so every flag run starts and ends through the same opening, and a low barricade breaks the straight charge into it. The courtyard holds the hollow heart ruin and the two flank Sprint Runes; the other two wait on the flag approaches. A Battle or Ward Rune (more damage dealt, or less damage taken, for a few seconds) waits at each main gate's courtyard mouth: both pads open the match on the same face and flip with every claim.",
+    flagsHeading: 'Flags',
+    flagsBody:
+      'Each keep holds its team flag. Take the enemy flag and carry it to your own stand to score; the first team to three captures wins, and a timed-out battle resolves on score. A slain carrier drops the flag where they fell: an enemy can take it up again, while its own team returns it home instantly just by reaching it. The flag also refuses to hide: picking it up breaks stealth, and a carrier who turns invisible by any means drops it on the spot.',
+    pickupNote:
+      'Picking a flag up is always a deliberate press of the battleground action key: nobody ever becomes the carrier by strafing through the wrong spot.',
+    respawnHeading: 'Falling in battle',
+    respawnBody:
+      "Death keeps the classic rite: your corpse lies where it fell until YOU release, and the spirit rises in the fenced graveyard beside your keep, warded there until your team's next respawn wave. The wave raises every waiting spirit together, and the two team waves are deliberately staggered, so the fight never fully resets at once. There is no corpse run and no Spirit Healer bargain: release, wait out the wave, fight.",
+    carrierHeading: 'Carrying the flag',
+    carrierBody:
+      'A carrier who holds the enemy flag too long grows more and more vulnerable, taking ever-increasing damage until the flag is captured, dropped, or returned. Hiding with the flag is a losing plan; running it home is the winning one.',
+    ladderHeading: 'The ladder',
+    ladderBody:
+      'Every match moves a persistent per-character battleground rating, win or lose, and the all-time board ranks the realm champions. Wins and hard-fought losses also pay Honor through the Warfare system.',
+  },
   // The Vale Cup boarball minigame page (docs/prd/vale-cup.md). Spoiler-safe:
   // lore, how to play, nations, roles; no kick powers, timers, or matchmaker
   // internals. Nation/role NAMES render from the shared hudChrome.vcup.* keys.
@@ -1588,7 +1592,7 @@ export const guideStrings = {
           'One field recipe, the Eastbrook Arming Sword, is known to everyone from the start and crafts anywhere from hunt drops (a couple of wolf fangs and bone fragments) plus six Smithing Flux off the forge counter. The real ladder is nine trainer recipes in three rungs, all forge-bound: the copper rung (bearded axe, flanged mace, boar spear) is free to learn at skill 0, the iron rung (longsword, maul, dirk) opens at skill 25 for 25 silver a recipe, and the osmium rung (warblade, war axe, battle staff) opens at skill 50 for 1 gold each. Darva teaches a recipe the moment your tier in the craft reaches its own, so each rung unlocks exactly when its skill band begins.\n\nOne more recipe rides the pair: the Gravewyrm Gauntlets, a trainer-taught combination piece that only an attuned Smith with both Weaponcrafting and Armorcrafting at skill 25 can work, and it needs no station at all.',
         routeHeading: 'Masterworks, and a working route to 125',
         routeBody:
-          "Any piece with a real stat line, which on this ladder means the iron rung and up, can come off the anvil as a masterwork so long as the finer quality fits inside your tier ceiling; the statless copper commons never proc, because there is nothing in them to improve. Iron and osmium count as tier 1 materials for the masterwork bonus, highpine and glyphsteel as tier 2, and skill sitting above a recipe's own tier adds its own point per tier, so among the osmium three it is the war axe and the battle staff that carry the material edge, and a rung keeps proccing better after you have outgrown it.\n\nRide the copper rung to 25, train the iron rung the day it opens and ride it to 50, then the osmium rung to 75. Past 75 nothing higher ships yet, so the osmium recipes fade to half and then quarter gain: budget roughly 150 more crafts to reach the 125 cap, and remember the shared throttle of ten craft actions per minute when you sit down to batch.\n\nFund the climb as you go: Darva's forge work order takes eight copper ore off your hands every 30 minutes for a little coin and XP, and the iron and osmium rungs sell honestly to leveling melee. The Book of Deeds marks Edge and Temper at skill 50 and crowns Grandmaster Weaponcrafting at 125.",
+          "Any piece with a real stat line, which on this ladder means the iron rung and up, can come off the anvil as a masterwork so long as the finer quality fits inside your tier ceiling; the statless copper commons never proc, because there is nothing in them to improve. Iron and osmium count as tier 1 materials for the masterwork bonus, highpine and glyphsteel as tier 2, and skill sitting above a recipe's own tier adds its own point per tier, so among the osmium three it is the war axe and the battle staff that carry the material edge, and a rung keeps proccing better after you have outgrown it.\n\nRide the copper rung to 25, train the iron rung the day it opens and ride it to 50, then the osmium rung to 75. Past 75 nothing higher ships yet, so the osmium recipes fade to half and then quarter gain: budget roughly 150 more crafts to reach the 125 cap, and each craft takes real cast time, so a long batch is paced by duration rather than a quota.\n\nFund the climb as you go: Darva's forge work order takes eight copper ore off your hands every 30 minutes for a little coin and XP, and the iron and osmium rungs sell honestly to leveling melee. The Book of Deeds marks Edge and Temper at skill 50 and crowns Grandmaster Weaponcrafting at 125.",
       },
       armorcrafting: {
         identityHeading: 'Mail for the front line',
@@ -1688,7 +1692,7 @@ export const guideStrings = {
     },
     howHeading: 'How crafting works',
     howBody:
-      "Open the crafting window (default key T) and every recipe you know is listed with what it needs and what you have on hand. Station-bound recipes ask you to stand within 20 yards of the right station in town, field recipes craft anywhere, and Enchanting's breaking and enchanting need no station at all (only its two charm recipes are station work, at the toolworks). There is no failure roll: a craft with the materials in hand always succeeds.\n\nTwo small frictions keep the economy honest. Every successful craft pays a fee of 2 copper per point of the item's stat budget, and craft-type actions share one pace: at most 10 crafts, disenchants, enchants, salvages, or tool recharges in each 60-second window. Neither will trouble a normal session; both stop a maxed specialist from flooding the market.",
+      "Open the crafting window (default key T) and every recipe you know is listed with what it needs and what you have on hand. Station-bound recipes ask you to stand within 20 yards of the right station in town, field recipes craft anywhere, and Enchanting's breaking and enchanting need no station at all (only its two charm recipes are station work, at the toolworks). There is no failure roll: a craft with the materials in hand always succeeds.\n\nTwo small frictions keep the economy honest. Every successful craft pays a fee of 2 copper per point of the item's stat budget, and every craft-family action takes real cast time (field crafts near two seconds, harder ladder crafts longer, and disenchant, enchant, salvage, and tool recharge each about a second and a half). Materials, the gold fee, stations, and skill ceilings do the rest; nothing scolds you for working too quickly.",
     recipesHeading: 'Recipes',
     recipesNote:
       'Every recipe of the craft: its exact skill requirement and materials, where it is learned and for what fee, and the three skill values where its gain fades to half, a quarter, and nothing.',
@@ -1800,6 +1804,11 @@ export const guideStrings = {
       biteHeading: 'Bite and reel',
       biteBody:
         'After the cast, a bite comes at a hidden moment between {min} and {max} seconds; the delay is decided when the line lands, so no two casts feel quite alike. When the bobber bites you have a {reel} second window to press the pole again and reel in: reel inside it and the catch lands, hesitate past it and the fish gets away with nothing to show. A whole session caps at {cap} seconds, so even a quiet cast resolves quickly.\n\nBetter rods sharpen both ends of the minigame: each rod tier above the first trims {rod} seconds off the longest possible wait, never below the three-second floor the top rod already grazes, and adds {reelRod} seconds to the reel window, so the Ironreel pulls the worst wait down to 6.5 seconds with a 3.25 second window, and the Silverstream to 5 with a window past 4, its rarity widening the reel a little beyond what the tier alone pays. The quickest bites never change whatever you hold, and a rod only needs to be in your bags to count.',
+      // The early reel (the spam-click fix): its own key rather than a
+      // biteBody reword, so the shipped translations of the paragraphs
+      // above stay live while locales catch up on this one.
+      earlyReelNote:
+        'One caution for eager thumbs: press the pole again before anything bites and you reel in an empty line, ending the cast (a moment of grace right after casting forgives an accidental double-press). Patience is the whole game: wait for the bite, then strike.',
       scheduleHeading: 'Proficiency gain',
       scheduleNote:
         "Fishing gain follows a fixed schedule with no dice: a full point per catch below 50 proficiency, half a point below 100, a tenth below 150, and a slow 0.02 trickle from 150 to 200. That last stretch is a thousands-of-catches journey on purpose: 200 is a statement, not a stop on the way to something else.\n\nJunk stops teaching entirely at {cutoff}: from there on, weeds and boots are just weeds and boots. The water itself caps the lesson too: the Vale's tier 1 waters (and every young shore beyond the heartland) teach nothing past 100, the marsh's stop at 150, and only Thornpeak's school an angler the whole way to 200. Every landed catch otherwise gains at the scheduled rate, so when the counter stalls, the schedule is telling you to seek deeper water.",
@@ -1860,9 +1869,22 @@ export const guideStrings = {
       collectorsHeading: 'Collectors, trophies, and the price of a story',
       collectorsBody:
         "Vendors are blind to provenance: a signed item sells to an NPC for exactly its plain price. The premium on a signature exists only between players, which is precisely what makes it interesting: a stack of windfall ore signed by a famous gatherer, a Prime Cut from a lucky harvest, a masterwork blade naming a crafter who has since retired, all cost whatever someone's memory says they are worth.\n\nThe Book of Deeds leans into the same instinct: Pristine Vein, Ancient Heartwood, Moonlit Bloom, A Perfect Specimen, and Glimmer of Hope are zero-Renown collector's marks that exist purely to prove a moment happened to you. Keep the item that earned the deed and you hold the receipt. None of this is power; provenance buys no stats and wins no fights, it is the game's paper trail of good days.",
-      throttleHeading: 'The action throttle',
-      throttleBody:
-        'Output has a ceiling: crafting, disenchanting, enchanting, salvaging, and tool-effect recharges share one budget of {actions} successful actions in each {seconds}-second window. A denied attempt costs nothing and spends no budget. You will never feel it in normal play; it exists so a maxed specialist with a full bank cannot flood the Market, whatever their skill or stockpile.',
+      // Renamed off throttleHeading/Body so filled locale overlays that still
+      // carry the old {actions}/{seconds} quota copy do not fail token parity
+      // against the cast-time prose (Craft Cast System Phase 5/6).
+      castPaceHeading: 'Cast time and the gold sink',
+      castPaceBody:
+        'Profession actions take real cast time: recipes scale from just under two seconds for simple field work up to a few seconds at the top of the ladder, and disenchant, enchant, salvage, and tool-effect recharge each take a fixed short cast. Cancel mid-cast and you lose nothing. Every successful craft also pays a copper fee proportional to the item budget. Together with materials, stations, and skill ceilings, that pace keeps the Market honest without a separate action quota. The exact durations by skill band are listed below.',
+      // The exact cast-pace bands ({seconds}/{count} localized numbers from
+      // content constants; the transparency policy's number-bearing lines).
+      castPaceField: 'Field recipes (no skill requirement): {seconds}s cast',
+      castPaceSkill25: 'Recipes up to skill 25: {seconds}s cast',
+      castPaceSkill50: 'Recipes up to skill 50: {seconds}s cast',
+      castPaceSkill75: 'Recipes up to skill 75: {seconds}s cast',
+      castPaceCombo: 'Top-of-ladder and combo recipes: {seconds}s cast',
+      castPaceEnchantFamily: 'Disenchant, enchant, and salvage: {seconds}s cast',
+      castPaceRecharge: 'Tool-effect recharge: {seconds}s cast',
+      castPaceBatch: 'Batch crafting: up to {count} in one order, one cast each',
       doctrineHeading: 'Players trade with players',
       doctrineBody:
         'The crafting economy is built on one idea: players supply players. Gatherers feed crafters, crafters feed questers and raiders, and breakers feed enchanters, with vendors and station masters standing at the edges to absorb junk and coin rather than to compete with you. If you want to make money from a profession, your customer is a person: learn what other players burn through, price against the World Market, and treat the NPC systems as a floor under your prices, not as the market itself.\n\nCrafted gear is tuned to sit below the raid floor: even a masterwork is only ever one quality tier above its recipe, never past legendary, and its stat budget stays under the raid loot band. The forge gets you ready for the hardest content; it does not replace it. That keeps crafters, raiders, and the market in a stable triangle: raid drops stay aspirational, and crafted pieces stay the best gear money can actually buy.',

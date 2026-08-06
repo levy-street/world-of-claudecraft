@@ -18,7 +18,9 @@ export const pending: Record<string, readonly string[]> = {
     "auth.useAuthenticatorCode",
     "auth.useRecoveryCode",
     "auth.verify",
-    "error.invalidAuthenticationCode"
+    "error.invalidAuthenticationCode",
+    "moderationHistory.actionSpectate",
+    "moderationHistory.actionUnspectate"
   ],
   "es_ES": [
     "auth.authenticatorCode",
@@ -28,7 +30,9 @@ export const pending: Record<string, readonly string[]> = {
     "auth.useAuthenticatorCode",
     "auth.useRecoveryCode",
     "auth.verify",
-    "error.invalidAuthenticationCode"
+    "error.invalidAuthenticationCode",
+    "moderationHistory.actionSpectate",
+    "moderationHistory.actionUnspectate"
   ],
   "fr_FR": [
     "auth.authenticatorCode",
@@ -38,7 +42,9 @@ export const pending: Record<string, readonly string[]> = {
     "auth.useAuthenticatorCode",
     "auth.useRecoveryCode",
     "auth.verify",
-    "error.invalidAuthenticationCode"
+    "error.invalidAuthenticationCode",
+    "moderationHistory.actionSpectate",
+    "moderationHistory.actionUnspectate"
   ],
   "fr_CA": [
     "auth.authenticatorCode",
@@ -48,7 +54,9 @@ export const pending: Record<string, readonly string[]> = {
     "auth.useAuthenticatorCode",
     "auth.useRecoveryCode",
     "auth.verify",
-    "error.invalidAuthenticationCode"
+    "error.invalidAuthenticationCode",
+    "moderationHistory.actionSpectate",
+    "moderationHistory.actionUnspectate"
   ],
   "en_CA": [],
   "it_IT": [
@@ -59,7 +67,9 @@ export const pending: Record<string, readonly string[]> = {
     "auth.useAuthenticatorCode",
     "auth.useRecoveryCode",
     "auth.verify",
-    "error.invalidAuthenticationCode"
+    "error.invalidAuthenticationCode",
+    "moderationHistory.actionSpectate",
+    "moderationHistory.actionUnspectate"
   ],
   "de_DE": [
     "auth.authenticatorCode",
@@ -69,7 +79,9 @@ export const pending: Record<string, readonly string[]> = {
     "auth.useAuthenticatorCode",
     "auth.useRecoveryCode",
     "auth.verify",
-    "error.invalidAuthenticationCode"
+    "error.invalidAuthenticationCode",
+    "moderationHistory.actionSpectate",
+    "moderationHistory.actionUnspectate"
   ],
   "zh_CN": [
     "auth.authenticatorCode",
@@ -79,7 +91,9 @@ export const pending: Record<string, readonly string[]> = {
     "auth.useAuthenticatorCode",
     "auth.useRecoveryCode",
     "auth.verify",
-    "error.invalidAuthenticationCode"
+    "error.invalidAuthenticationCode",
+    "moderationHistory.actionSpectate",
+    "moderationHistory.actionUnspectate"
   ],
   "zh_TW": [
     "auth.authenticatorCode",
@@ -89,7 +103,9 @@ export const pending: Record<string, readonly string[]> = {
     "auth.useAuthenticatorCode",
     "auth.useRecoveryCode",
     "auth.verify",
-    "error.invalidAuthenticationCode"
+    "error.invalidAuthenticationCode",
+    "moderationHistory.actionSpectate",
+    "moderationHistory.actionUnspectate"
   ],
   "ko_KR": [
     "auth.authenticatorCode",
@@ -99,7 +115,9 @@ export const pending: Record<string, readonly string[]> = {
     "auth.useAuthenticatorCode",
     "auth.useRecoveryCode",
     "auth.verify",
-    "error.invalidAuthenticationCode"
+    "error.invalidAuthenticationCode",
+    "moderationHistory.actionSpectate",
+    "moderationHistory.actionUnspectate"
   ],
   "ja_JP": [
     "auth.authenticatorCode",
@@ -109,7 +127,9 @@ export const pending: Record<string, readonly string[]> = {
     "auth.useAuthenticatorCode",
     "auth.useRecoveryCode",
     "auth.verify",
-    "error.invalidAuthenticationCode"
+    "error.invalidAuthenticationCode",
+    "moderationHistory.actionSpectate",
+    "moderationHistory.actionUnspectate"
   ],
   "pt_BR": [
     "auth.authenticatorCode",
@@ -119,7 +139,9 @@ export const pending: Record<string, readonly string[]> = {
     "auth.useAuthenticatorCode",
     "auth.useRecoveryCode",
     "auth.verify",
-    "error.invalidAuthenticationCode"
+    "error.invalidAuthenticationCode",
+    "moderationHistory.actionSpectate",
+    "moderationHistory.actionUnspectate"
   ],
   "ru_RU": [
     "auth.authenticatorCode",
@@ -129,7 +151,9 @@ export const pending: Record<string, readonly string[]> = {
     "auth.useAuthenticatorCode",
     "auth.useRecoveryCode",
     "auth.verify",
-    "error.invalidAuthenticationCode"
+    "error.invalidAuthenticationCode",
+    "moderationHistory.actionSpectate",
+    "moderationHistory.actionUnspectate"
   ],
   "cs_CZ": [
     "auth.authenticatorCode",
@@ -139,7 +163,9 @@ export const pending: Record<string, readonly string[]> = {
     "auth.useAuthenticatorCode",
     "auth.useRecoveryCode",
     "auth.verify",
-    "error.invalidAuthenticationCode"
+    "error.invalidAuthenticationCode",
+    "moderationHistory.actionSpectate",
+    "moderationHistory.actionUnspectate"
   ],
   "nl_NL": [
     "auth.authenticatorCode",
@@ -149,7 +175,9 @@ export const pending: Record<string, readonly string[]> = {
     "auth.useAuthenticatorCode",
     "auth.useRecoveryCode",
     "auth.verify",
-    "error.invalidAuthenticationCode"
+    "error.invalidAuthenticationCode",
+    "moderationHistory.actionSpectate",
+    "moderationHistory.actionUnspectate"
   ],
   "pl_PL": [
     "auth.authenticatorCode",
@@ -159,7 +187,9 @@ export const pending: Record<string, readonly string[]> = {
     "auth.useAuthenticatorCode",
     "auth.useRecoveryCode",
     "auth.verify",
-    "error.invalidAuthenticationCode"
+    "error.invalidAuthenticationCode",
+    "moderationHistory.actionSpectate",
+    "moderationHistory.actionUnspectate"
   ],
   "id_ID": [
     "auth.authenticatorCode",
@@ -169,7 +199,9 @@ export const pending: Record<string, readonly string[]> = {
     "auth.useAuthenticatorCode",
     "auth.useRecoveryCode",
     "auth.verify",
-    "error.invalidAuthenticationCode"
+    "error.invalidAuthenticationCode",
+    "moderationHistory.actionSpectate",
+    "moderationHistory.actionUnspectate"
   ],
   "tr_TR": [
     "auth.authenticatorCode",
@@ -179,7 +211,9 @@ export const pending: Record<string, readonly string[]> = {
     "auth.useAuthenticatorCode",
     "auth.useRecoveryCode",
     "auth.verify",
-    "error.invalidAuthenticationCode"
+    "error.invalidAuthenticationCode",
+    "moderationHistory.actionSpectate",
+    "moderationHistory.actionUnspectate"
   ],
   "sv_SE": [
     "auth.authenticatorCode",
@@ -189,7 +223,9 @@ export const pending: Record<string, readonly string[]> = {
     "auth.useAuthenticatorCode",
     "auth.useRecoveryCode",
     "auth.verify",
-    "error.invalidAuthenticationCode"
+    "error.invalidAuthenticationCode",
+    "moderationHistory.actionSpectate",
+    "moderationHistory.actionUnspectate"
   ],
   "vi_VN": [
     "auth.authenticatorCode",
@@ -199,7 +235,9 @@ export const pending: Record<string, readonly string[]> = {
     "auth.useAuthenticatorCode",
     "auth.useRecoveryCode",
     "auth.verify",
-    "error.invalidAuthenticationCode"
+    "error.invalidAuthenticationCode",
+    "moderationHistory.actionSpectate",
+    "moderationHistory.actionUnspectate"
   ],
   "da_DK": [
     "auth.authenticatorCode",
@@ -209,6 +247,8 @@ export const pending: Record<string, readonly string[]> = {
     "auth.useAuthenticatorCode",
     "auth.useRecoveryCode",
     "auth.verify",
-    "error.invalidAuthenticationCode"
+    "error.invalidAuthenticationCode",
+    "moderationHistory.actionSpectate",
+    "moderationHistory.actionUnspectate"
   ]
 };

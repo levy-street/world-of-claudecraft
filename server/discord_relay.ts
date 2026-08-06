@@ -3,7 +3,8 @@
 // webhook, so the message can carry the requester's Discord identity (mention +
 // avatar) and an interactive "I'm keen to join" button that pings them back in
 // game. This module is just the server-side hand-off: the game loop enqueues a
-// structured item here; the bot drains the queue via /internal/discord/relay.
+// structured item here; the bot drains the queue through the consolidated
+// GET /internal/discord/outbox poll (server/internal.ts outboxHandler).
 //
 // Pure + dependency-free (no Discord IO), so it is trivially testable.
 

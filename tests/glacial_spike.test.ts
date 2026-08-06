@@ -122,21 +122,25 @@ describe('Glacial Spike content def', () => {
 
 describe('Icicles build-up', () => {
   it('a Rimelance impact banks one Icicle, capped at ICICLE_MAX', () => {
-    // Seed hunted (post-merge camp order) so the first 10 Rimelance casts all
-    // LAND (a resisted bolt never impacts, so it banks nothing); the loop only
-    // needs 7, the extra landed casts are margin. Under seed 90210 the merged
-    // stream resists cast 5. Re-hunted from seed 11 after the Eastbrook camp
-    // respacing merged in: world-gen draws 5 rng values per camp mob, so
-    // thinning the zone-1 camps shifted every seed's stream and seed 11 now
-    // resists cast 3. Seed 12 lands all 10 again, so the loop below is
-    // unchanged.
+    // Count actual impacts rather than pinning the shared world RNG to a lucky
+    // no-resist streak. A resisted bolt never impacts and must bank nothing;
+    // every landed Rimelance banks exactly one, capped at ICICLE_MAX.
     const { sim, p } = makeSim({ seed: 12 });
     spawnTarget(sim, p);
     expect(frostIcicleCharges(p.auras)).toBe(0);
-    for (let n = 1; n <= ICICLE_MAX + 2; n++) {
-      castAndResolve(sim, p, 'frostbolt', 'Rimelance');
-      expect(frostIcicleCharges(p.auras)).toBe(Math.min(n, ICICLE_MAX));
+    let impacts = 0;
+    for (let attempts = 0; attempts < 40 && impacts < ICICLE_MAX + 2; attempts++) {
+      const before = frostIcicleCharges(p.auras);
+      const events = castAndResolve(sim, p, 'frostbolt', 'Rimelance');
+      const landed = damageEvents(events, 'Rimelance').some((event) => event.kind !== 'resist');
+      if (!landed) {
+        expect(frostIcicleCharges(p.auras)).toBe(before);
+        continue;
+      }
+      impacts++;
+      expect(frostIcicleCharges(p.auras)).toBe(Math.min(impacts, ICICLE_MAX));
     }
+    expect(impacts).toBe(ICICLE_MAX + 2);
   });
 });
 

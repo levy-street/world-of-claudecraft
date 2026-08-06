@@ -14,6 +14,7 @@ import {
   type AuraSlotState,
   type AurasDeps,
   type AurasState,
+  CARRIED_FLAG_AURA_ID,
   createAurasView,
 } from '../src/ui/auras_view';
 import type { PainterHostWriters } from '../src/ui/painter_host';
@@ -157,6 +158,8 @@ function slot(over: Partial<AuraSlotState> & { key: string }): AuraSlotState {
     remaining: 0,
     cancelable: false,
     effectHtml: '',
+    toggle: false,
+    alwaysRender: false,
     ...over,
   };
 }
@@ -452,6 +455,46 @@ describe('AurasPainter: static-preset visible-count cap', () => {
     expect(nodes()).toHaveLength(AURA_VISIBLE_CAP_LOW + 3);
   });
 
+  it('FAIRNESS: low NEVER culls an ACTIONABLE buff -- the carried flag renders past the cap', () => {
+    // The carried-flag buff is the ONLY way to drop the flag on purpose, and the sim
+    // applies it at the pickup, so it sorts LAST in application order: a flat first-N
+    // buff cap would shed exactly it, on exactly the low tier, from exactly the player
+    // who needs it. That is hiding an ACTION, which the gameplay-neutral-graphics
+    // invariant forbids. 12 buffs (cap 8 + 4) with the flag dead last, worst case.
+    const slots = Array.from({ length: AURA_VISIBLE_CAP_LOW + 3 }, (_, i) =>
+      slot({ key: `raidbuff${i}` }),
+    );
+    slots.push(
+      slot({
+        key: CARRIED_FLAG_AURA_ID,
+        name: 'Carrying the Flag',
+        cancelable: true,
+        alwaysRender: true,
+        toggle: true,
+      }),
+    );
+    expect(slots).toHaveLength(12);
+    const painter = tierPainter('low');
+    painter.paint(state(slots));
+
+    // The flag node is ATTACHED (cap buffs + the never-shed flag), not shed.
+    expect(nodes()).toHaveLength(AURA_VISIBLE_CAP_LOW + 1);
+    // ...and it is the flag specifically, proven through the live tooltip closure
+    // (the painter writes no id attribute), plus its cancelable class write.
+    expect(tooltips.attached.map((a) => a.html())).toContain('Carrying the Flag|0');
+    expect(
+      calls.some((c) => c.m === 'toggleClass' && c.args[0] === 'cancelable' && c.args[1] === true),
+    ).toBe(true);
+    // Sanity: without the exemption this same shape sheds the last buff, so the
+    // assertion above is not vacuous.
+    container = fakeEl('div');
+    const plain = tierPainter('low');
+    plain.paint(
+      state(slots.map((s, i) => (i === slots.length - 1 ? { ...s, alwaysRender: false } : s))),
+    );
+    expect(nodes()).toHaveLength(AURA_VISIBLE_CAP_LOW);
+  });
+
   it('the tiered painter is deterministic: identical painted output by value for the same state', () => {
     // The painter consumes AurasState (the already-normalized, parity-identical view
     // output), so cross-world SHAPE parity (Sim {stacks:1} vs ClientWorld {stacks:undefined},
@@ -541,5 +584,84 @@ describe('AurasPainter: a wire-faithful buff_* stat-sap survives the low cap (vi
         (c) => c.m === 'toggleClass' && c.args[0] === 'debuff' && c.args[1] === true,
       ),
     ).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// MODE auras print no seconds-remaining line in the tooltip either. The sim backs
+// a form / stance / stealth / Ghost Wolf / the carried flag with a long finite
+// duration (3600s, or a whole match) purely so nothing can expire it; surfacing
+// that number is the same lie the suppressed countdown label already avoids, and
+// on the carried flag it reads as "the flag leaves me in 12 minutes".
+// ---------------------------------------------------------------------------
+describe('AurasPainter: a toggle aura suppresses the tooltip countdown', () => {
+  it('passes the LIVE toggle flag to renderTooltip, and re-reads it on recycle', () => {
+    const container = fakeEl('div');
+    const facet = recordingFacet();
+    const tooltips = recordingTooltips();
+    const seen: Array<{ name: string; toggle: boolean }> = [];
+    const deps: AurasPainterDeps = {
+      resolveIconUrl: (key) => `url(${key})`,
+      // Mirrors the host's shape: the seconds line rides ONLY the non-toggle arm.
+      renderTooltip: (name, remaining, _effectHtml, toggle) => {
+        seen.push({ name, toggle });
+        return toggle ? `${name}` : `${name}|${Math.ceil(remaining)}s remaining`;
+      },
+      attachTooltip: tooltips.attachTooltip,
+      attachCancel: () => {},
+    };
+    const painter = new AurasPainter(
+      facet.writers,
+      container as unknown as HTMLElement,
+      deps,
+      fakeDoc,
+    );
+
+    painter.paint(
+      state([
+        slot({
+          key: CARRIED_FLAG_AURA_ID,
+          name: 'Carrying the Flag',
+          remaining: 720,
+          toggle: true,
+        }),
+        slot({ key: 'ghost_wolf', name: 'Ghost Wolf', remaining: 3600, toggle: true }),
+        slot({ key: 'bg_sprint_rune', name: 'Sprint', remaining: 15, toggle: false }),
+      ]),
+    );
+    const html = tooltips.attached.map((a) => a.html());
+    // Neither mode aura leaks its scaffolding duration...
+    expect(html[0]).toBe('Carrying the Flag');
+    expect(html[0]).not.toMatch(/remaining/);
+    expect(html[0]).not.toMatch(/720/);
+    expect(html[1]).toBe('Ghost Wolf');
+    expect(html[1]).not.toMatch(/3600/);
+    // ...while a genuinely timed buff still shows its countdown.
+    expect(html[2]).toBe('Sprint|15s remaining');
+    expect(seen.map((s) => s.toggle)).toEqual([true, true, false]);
+
+    // The pooled node is recycled to a TIMED aura: the closure must re-read the live
+    // record, never keep the toggle answer of the aura it used to show.
+    // (the free list is LIFO, so which of the three pooled nodes is reused is an
+    // implementation detail; assert on the recycled node's OUTPUT, not its index)
+    painter.paint(
+      state([slot({ key: 'moonfire', name: 'Moonfire', remaining: 8, toggle: false })]),
+    );
+    const after = tooltips.attached.map((a) => a.html());
+    expect(after).toContain('Moonfire|8s remaining');
+    expect(after.filter((h) => h === 'Moonfire|8s remaining')).toHaveLength(1);
+  });
+
+  it('the HOST builds the seconds line ONLY on the non-toggle arm', () => {
+    // The painter threads the flag through (above); this pins that hud.ts actually
+    // branches on it, so the two halves cannot drift into a tooltip that renders
+    // "720 seconds remaining" under an aura whose label deliberately shows nothing.
+    const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
+    const start = hud.indexOf('renderTooltip: (name, remaining, effectHtml, toggle) =>');
+    expect(start).toBeGreaterThan(-1);
+    const dep = hud.slice(start, hud.indexOf('attachTooltip:', start));
+    expect(dep).toContain('toggle');
+    expect(dep).toContain("? ''");
+    expect(dep).toContain("tPlural('hudChrome.plurals.secondsRemaining'");
   });
 });

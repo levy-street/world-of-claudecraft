@@ -629,8 +629,8 @@ describe('admin scope sweep: every non-login admin route rejects a read token', 
 // A negative control proves the sweep detects a route that forgot the gate.
 // -------------------------------------------------------------------------
 
-// Every registered internal-surface route (all 14 are secret-gated; there is no
-// anonymous internal route).
+// Every registered internal-surface route (every one is secret-gated; there is
+// no anonymous internal route).
 const internalSurfaceRoutes: RouteDef[] = apiRoutes.filter((route) => route.surface === 'internal');
 
 // The legacy fail() bodies the gates write (byte-parity with server/internal.ts
@@ -705,11 +705,12 @@ describe('internal secret-gate mounting sweep: every /internal route is gated', 
     vi.restoreAllMocks();
   });
 
-  it('selects the full 21-route internal surface (handleInternalApi 12 + 7 ops + flex-batch + outbox)', () => {
+  it('selects the full 18-route internal surface (handleInternalApi 9 + 7 ops + flex-batch + outbox)', () => {
     // The ops family includes finalization, four payout-service routes, and two moderation mutations.
     // flex-batch and outbox are registry-only (no legacy arm) but still ride the same Discord secret
     // gate, so the sweep below generates their unset-env and wrong-secret cases like every other route.
-    expect(internalSurfaceRoutes.length).toBe(21);
+    // The retired relay/activity/winners GETs (#2791) are absent from the registry entirely.
+    expect(internalSurfaceRoutes.length).toBe(18);
   });
 
   for (const route of internalSurfaceRoutes) {

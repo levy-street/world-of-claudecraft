@@ -4,11 +4,13 @@
 // fog removed this layer IS the draw distance: every ridge to the world
 // rim renders from anywhere. All decisions live in far_terrain_core.ts
 // (pure, Node-tested); this file only owns the Three objects and the
-// idle-paced build loop.
+// cooperative build loop.
 //
 // Cost model: the tiles are static world-space geometry built once per
-// session (about 100-200ms of terrainHeight sampling, spread across idle
-// slots, nearest tiles first). Per frame the layer costs one visibility
+// session (well under a second of terrainHeight sampling, spread across
+// bounded time-budgeted slices, nearest tiles first; the entry curtain
+// accelerates the whole grid so the vista stands before the first visible
+// frame, see accelerateInitialBuild). Per frame the layer costs one visibility
 // loop over ~12 tiles plus the draw of whatever survives the frustum and
 // the view envelope. Fragments inside the detail envelope are discarded
 // in the shader; that overlap band is where the real terrain owns every
@@ -23,6 +25,7 @@ import {
   hasBiomeHazeField,
 } from './biome_haze_field';
 import {
+  advanceWithinBudget,
   createFarTileBuilder,
   type FarTile,
   type FarVistaPlan,
@@ -33,7 +36,7 @@ import {
   planFarTiles,
 } from './far_terrain_core';
 import { getGrassGroundBake } from './grass_ground_bake';
-import { idleSlot } from './idle_queue';
+import { type IdleSlotResult, idleSlot } from './idle_queue';
 import { GRASS_BAKE_PATCH_YARDS, GRASS_PAINT_GAIN } from './meadow_tuning';
 import { renderLayerDisabled } from './render_dev_flags';
 
@@ -50,12 +53,77 @@ function sharedIndexFor(tileSize: number, spacing: number): THREE.BufferAttribut
   return index;
 }
 
-// An idle-paced build slice: about the same per-slice budget the near
-// terrain's streamed chunk builds use (IDLE_GEOMETRY_SLICE_MS scale). A
-// 960u tile row is ~100 terrainHeight samples, roughly half a millisecond.
-const FAR_BUILD_ROWS_PER_SLICE = 40;
-const FAR_BUILD_TIMEOUT_MS = 200;
-const FAR_BUILD_TIMEOUT_DEFERRALS = 2;
+// Build pacing: every slice is a bounded TIME bite (advanceWithinBudget in
+// the core holds the law), never a row count. A row costs microseconds on
+// most ground but up to ~8ms where the color recipe stacks (measured), so a
+// fixed 12-row slice could block a frame for tens of milliseconds; a clock
+// budget cannot.
+//
+// Two modes:
+// - Polite (default; editor rebuilds, any leftover after entry): waits for
+//   real idle time but forces a small bite every FAR_BUILD_TIMEOUT_MS under
+//   sustained load, so a busy client still finishes the whole grid in
+//   seconds instead of parking behind an idle policy that never fires
+//   (Safari has no requestIdleCallback at all, and a loaded production
+//   boot grants Chrome none either).
+// - Eager (accelerateInitialBuild, the opaque-curtain boot and graphics
+//   rebuild paths): plain macrotask turns with a bigger bite. Nobody is
+//   watching frames behind the curtain, and the whole grid is well under a
+//   second of CPU, so it completes while the loading screen is still
+//   waiting on the network.
+const FAR_BUILD_SLICE_BUDGET_MS = 3;
+const FAR_BUILD_EAGER_SLICE_BUDGET_MS = 12;
+const FAR_BUILD_TIMEOUT_MS = 50;
+
+/** How long an entry curtain may hold for the far grid before giving up and
+ *  falling back to the classic eased fog flip (a pathological device must
+ *  never hold the player at the loading screen for the horizon). */
+export const FAR_VISTA_ENTRY_MAX_WAIT_MS = 4000;
+
+/** One macrotask turn: the eager lane's yield. setTimeout, not a
+ *  MessageChannel ping, on purpose: message tasks outrank timer tasks in
+ *  Chrome's scheduler, so a message-paced pump could starve the loading
+ *  pipeline's own timer chains; timer-paced turns interleave fairly. */
+const nextMacrotask = (): Promise<void> => new Promise((resolve) => setTimeout(resolve, 0));
+
+/** Injectable timer pair so the gate's timeout arm is Node-testable. */
+export interface FarVistaGateTimers {
+  set(callback: () => void, ms: number): ReturnType<typeof setTimeout>;
+  clear(handle: ReturnType<typeof setTimeout>): void;
+}
+
+/**
+ * The bounded entry gate over an initial-build promise: true when the build
+ * settles first, false when `maxWaitMs` elapses first (the caller falls back
+ * to the classic eased flip). The losing timer is always cleared, so a
+ * resolved gate leaves no armed timeout behind. Both arms are pinned by
+ * far_terrain_view.test.ts; Renderer.farVistaReady is a thin consumer.
+ */
+export function farVistaGate(
+  build: Promise<void>,
+  maxWaitMs: number,
+  // Wrapped, not extracted: a bare setTimeout reference invoked as a method
+  // carries the wrong receiver and throws Illegal invocation in browsers.
+  timers: FarVistaGateTimers = {
+    set: (callback, ms) => setTimeout(callback, ms),
+    clear: (handle) => clearTimeout(handle),
+  },
+): Promise<boolean> {
+  return new Promise((resolve) => {
+    let settled = false;
+    const handle = timers.set(() => {
+      if (settled) return;
+      settled = true;
+      resolve(false);
+    }, maxWaitMs);
+    void build.then(() => {
+      if (settled) return;
+      settled = true;
+      timers.clear(handle);
+      resolve(true);
+    });
+  });
+}
 
 // Fragments closer than (detailFar - margin) are discarded: inside the
 // detail envelope the real terrain owns every pixel, and on steep ridges
@@ -93,6 +161,12 @@ export interface FarTerrainView {
    *  biome paint), idle-paced and coalesced: repeated calls for one tile
    *  queue it once. Call at stroke END, never per drag sample. */
   rebuildRegion(minX: number, minZ: number, maxX: number, maxZ: number): void;
+  /** Switch the in-flight initial build to eager macrotask pacing (the
+   *  opaque-curtain entry paths call this; it never applies to later editor
+   *  rebuilds) and resolve once every planned tile is attached. Resolves
+   *  immediately when the plan is disabled, the build is already complete,
+   *  or streaming was cancelled; idempotent. */
+  accelerateInitialBuild(): Promise<void>;
   /** Stops the in-flight background build (call before discarding). */
   cancelStreaming(): void;
   /** Dispose every built tile geometry and the one shared material. */
@@ -120,6 +194,7 @@ export function buildFarTerrain(
       group,
       update: () => {},
       rebuildRegion: () => {},
+      accelerateInitialBuild: () => Promise.resolve(),
       cancelStreaming: () => {
         cancelled = true;
       },
@@ -128,6 +203,27 @@ export function buildFarTerrain(
       plannedTileCount: () => 0,
     };
   }
+
+  // Eager-lane state: accelerateInitialBuild flips the mode AND wakes a
+  // build loop parked on an idle slot (the race below), so acceleration
+  // takes effect immediately rather than after whatever grant the idle
+  // scheduler still owes. Waiters resolve when the initial build settles
+  // (complete or cancelled), never per tile.
+  let eagerInitialBuild = false;
+  let signalEagerKick: () => void = () => {};
+  const eagerKick = new Promise<void>((resolve) => {
+    signalEagerKick = resolve;
+  });
+  let initialBuildSettled = false;
+  const initialBuildWaiters: Array<() => void> = [];
+  const settleInitialBuild = (): void => {
+    if (initialBuildSettled) return;
+    initialBuildSettled = true;
+    // The eager lane is boot-only: once the grid stands, later editor
+    // rebuilds pace politely whatever the entry path requested.
+    eagerInitialBuild = false;
+    for (const waiter of initialBuildWaiters.splice(0)) waiter();
+  };
 
   const tiles = planFarTiles(WORLD_MIN_X, WORLD_MAX_X, WORLD_MIN_Z, WORLD_MAX_Z);
   // Standard, not Lambert: the detail terrain lights with the realm's IBL
@@ -200,7 +296,7 @@ export function buildFarTerrain(
 
   const sharedIndex = sharedIndexFor(tiles[0].size, plan.spacing);
 
-  // A tile's geometry data, built in idle-paced slices.
+  // A tile's geometry data, built in time-budgeted cooperative slices.
   const buildTileData = async (
     tile: FarTile,
   ): Promise<{
@@ -210,11 +306,40 @@ export function buildFarTerrain(
   } | null> => {
     const builder = createFarTileBuilder(tile, plan.spacing, seed);
     for (;;) {
-      await idleSlot(FAR_BUILD_TIMEOUT_MS, {
-        maxTimeoutDeferrals: FAR_BUILD_TIMEOUT_DEFERRALS,
-      });
+      let budgetMs = FAR_BUILD_EAGER_SLICE_BUDGET_MS;
+      if (eagerInitialBuild) {
+        await nextMacrotask();
+      } else {
+        // Race the idle wait against the eager kick so an entry curtain
+        // that accelerates mid-wait is not held to the pending grant. Once
+        // the initial build has settled the kick promise stays resolved, so
+        // post-settle work (editor drains) must NOT race it: a resolved
+        // kick would turn every polite wait into a hot microtask spin.
+        const slot: IdleSlotResult | null = initialBuildSettled
+          ? await idleSlot(FAR_BUILD_TIMEOUT_MS, {})
+          : await Promise.race([idleSlot(FAR_BUILD_TIMEOUT_MS, {}), eagerKick.then(() => null)]);
+        if (slot !== null) {
+          // Real idle time is free, take what the browser granted (capped
+          // at the eager bite); a forced timeout slot means the host is
+          // busy, so take only the small polite bite.
+          budgetMs =
+            slot.source === 'idle'
+              ? Math.min(
+                  FAR_BUILD_EAGER_SLICE_BUDGET_MS,
+                  Math.max(FAR_BUILD_SLICE_BUDGET_MS, slot.timeRemainingMs),
+                )
+              : FAR_BUILD_SLICE_BUDGET_MS;
+        }
+      }
       if (cancelled) return null;
-      if (builder.step(FAR_BUILD_ROWS_PER_SLICE)) break;
+      if (
+        advanceWithinBudget(
+          () => builder.step(1),
+          budgetMs,
+          () => performance.now(),
+        )
+      )
+        break;
     }
     const data = builder.result();
     const geo = new THREE.BufferGeometry();
@@ -302,7 +427,7 @@ export function buildFarTerrain(
     buildingIndex = -1;
     if (pendingRebuild.size > 0) void drainRebuilds();
   };
-  void buildAll();
+  void buildAll().finally(settleInitialBuild);
 
   const tileIntersects = (tile: FarTile, minX: number, minZ: number, maxX: number, maxZ: number) =>
     tile.x0 <= maxX &&
@@ -335,6 +460,12 @@ export function buildFarTerrain(
         if (isBuilt || i === buildingIndex) pendingRebuild.add(i);
       }
       if (pendingRebuild.size > 0) void drainRebuilds();
+    },
+    accelerateInitialBuild(): Promise<void> {
+      if (initialBuildSettled || cancelled) return Promise.resolve();
+      eagerInitialBuild = true;
+      signalEagerKick();
+      return new Promise((resolve) => initialBuildWaiters.push(resolve));
     },
     cancelStreaming(): void {
       cancelled = true;

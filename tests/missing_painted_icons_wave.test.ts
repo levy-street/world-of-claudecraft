@@ -453,7 +453,12 @@ describe('missing painted item integration', () => {
   it('empties ITEM_ART_PENDING and serves all 101 targets as painted item art', () => {
     const accepted = manifest();
     expect(accepted.targetSets.items).toHaveLength(101);
-    expect(ITEM_ART_PENDING.size).toBe(0);
+    // This wave's own debt must be fully discharged. Scoped to the wave's target
+    // set rather than asserting the list is globally empty: a later change may
+    // legitimately enumerate NEW art debt (the hunter quivers do), and that must
+    // not read as this wave regressing. tests/item_icons.test.ts guard A3 owns
+    // the global count.
+    expect(accepted.targetSets.items.filter((id) => ITEM_ART_PENDING.has(id))).toEqual([]);
     for (const id of accepted.targetSets.items) {
       expect(ITEMS[id], `${id} must remain a live item`).toBeDefined();
       expect(ITEMS[id].kind, `${id} must not enter the weapon icon lane`).not.toBe('weapon');
@@ -505,22 +510,23 @@ describe('missing painted item integration', () => {
 });
 
 describe('missing painted deed and Heroic weapon integration', () => {
-  it('leaves every deed it painted art-backed and records generated crest ownership', () => {
+  it('leaves only the pinned art-pending deeds without painted art, and records generated crest ownership', () => {
     const accepted = manifest();
     expect(accepted.targetSets.deeds).toEqual([
       'dgn_wildheart_basin',
       'dgn_wildheart_basin_heroic',
       'pvp_card_duel_first_win',
     ]);
-    // The Drakelands brood merge appended two deeds after this wave, so the live catalog
-    // is 234 and the wave's own claim is unchanged: every deed that existed when it landed
-    // is painted. The only artless ids are those two appended later, which ride the
-    // category-crest fallback the Icons authoring rule in docs/design/deeds.md sanctions,
-    // until their 512px sources are commissioned (flagged in
-    // docs/achievements/icon-brief.md). Read from DEED_ART_PENDING, the one enumeration of
-    // that debt (src/ui/icons.ts), so this file cannot end up naming a different pending
-    // set than the other two art suites. Exhaustive: a third artless deed still reds here.
-    expect(DEED_ORDER).toHaveLength(234);
+    // The Drakelands brood merge, the Rift coverage pair, and the seven per-craft rare-tier
+    // profession deeds all appended after this wave, so the live catalog is 247 and the
+    // wave's own claim is unchanged: every deed that existed when it landed is painted. The
+    // only artless ids are those appended later, which ride the category-crest fallback the
+    // Icons authoring rule in docs/design/deeds.md sanctions, until their 512px sources are
+    // commissioned (flagged in docs/achievements/icon-brief.md). Read from DEED_ART_PENDING,
+    // the one enumeration of that debt (src/ui/icons.ts), so this file cannot end up naming a
+    // different pending set than the other two art suites. Exhaustive: a third artless deed
+    // still reds here.
+    expect(DEED_ORDER).toHaveLength(247);
     expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([...DEED_ART_PENDING]);
     const credits = readFileSync(path.join(repoRoot, 'CREDITS.md'), 'utf8');
     const provenance = readFileSync(

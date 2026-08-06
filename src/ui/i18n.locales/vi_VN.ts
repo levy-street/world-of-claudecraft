@@ -231,7 +231,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.fish.koiBody': 'Mọi vùng nước trong trò chơi đều giấu cùng một phần thưởng: Cá Koi Ánh Nắng, một tia lấp lánh khác thường trên dây câu đáng 75 đồng với người bán và đáng hơn thế nhiều với lòng tự hào của bạn. Xác suất của nó chỉ đáp lại ngưỡng câu của bạn chứ không gì khác, giống nhau ở mọi khu vực: một dòng 1 phần trăm của bảng cá ở ngưỡng 0, 3 ở ngưỡng 1, và 6 ở ngưỡng 2, được tung mỗi lần giật cần thành công, nên con koi tìm đến người câu đã kiếm được những bảng sâu. Bắt được một con sẽ ghi Tia Hy Vọng vào Sách Kỳ Công của bạn, một dấu ấn sưu tập không Danh Vọng. Khi điều đó xảy ra, nhật ký sẽ đảm bảo bạn biết.',
   'guide.profPages.econ.trainingNote': 'Một khoản phí cố định cho mỗi nấc công thức, thu một lần khi bậc thầy dạy nó; mọi nấc trong bảng dưới đây đều đang được dùng thật hôm nay, từ các công thức khởi đầu miễn phí đến những bài học cần câu của người chế tạo công cụ ở trên cùng.',
   'guide.profPages.econ.provenanceBody': 'Một số vật phẩm mang theo một cái tên. Di chuột lên nó và phần chú giải sẽ ghi Được thu thập bởi ai đó trên một nguyên liệu thô, hoặc Chế tạo bởi ai đó trên một món hoàn thiện: cùng một dấu, chỉ diễn đạt theo cách món đồ ấy ra đời. Chữ ký là một phần của chính vật phẩm, đi theo nó qua các lần giao dịch, qua ngân hàng, qua thư từ, qua Chợ Thế Giới, và cả qua một lần người bán mua lại, và không bao giờ phai.\n\nThu thập tự động ký lên tác phẩm tốt nhất của nó: bất kỳ lần thu hoạch nào tung ra hiếm trở lên đều đến kèm dấu thợ, và những phát hiện hiếm thì ký lên toàn bộ khoản trời cho gấp năm lần của chúng. Lần tung may mắn của một lần thu hoạch xác sẽ ký lên sản lượng ở những họ sinh vật không có mẫu vật để cho, còn ở nơi có, nó giữ sản lượng ở dạng thường và đúc thêm mẫu vật nguyên vẹn có dấu thợ bên cạnh. Chế tác cũng ký theo cùng lối: mọi bản của một sản phẩm hiếm trở lên đều được đúc kèm dấu thợ, và một kiệt tác thì luôn được ký dù phẩm chất của nó là gì, nên phiên bản đẹp nhất của bất kỳ món nào cũng luôn nêu tên người làm ra nó. Thứ duy nhất có thể khiến bạn mất một chữ ký là một cái túi đầy: một đơn vị có dấu thợ cần chỗ riêng của nó, hoặc một chồng có dấu thợ khớp hoàn toàn, để rơi vào.\n\nMột chồng vật phẩm dùng chung một danh tính, nên hai bản chỉ gộp lại khi mọi dấu đều khớp chính xác: cùng vật phẩm, cùng người ký, cùng chỉ số kiệt tác, cùng pháp khắc, cùng giao kèo. Một khúc gỗ có dấu thợ không bao giờ nhập vào một đống hàng thường theo chiều nào cả (gộp lại sẽ xóa mất tên của ai đó), nhưng những kiện hàng giống hệt nhau thì gộp rất vui vẻ, nên hai mươi quặng do cùng một người thu thập ký nằm chung một chồng và một khoản trời cho không xé nát túi của bạn.\n\nChữ ký trả công lại cho người thợ: cầm bất kỳ bản có dấu thợ nào của một nguyên liệu cần dùng tại bàn chế tác, dù ai ký đi nữa, cũng cộng thêm 2 điểm phần trăm cơ hội kiệt tác, và cầm một nguyên liệu do chính tay bạn ký sẽ cắt bớt một đơn vị khỏi số lượng nguyên liệu đó (không bao giờ xuống dưới một). Tác phẩm hiếm trở lên có dấu thợ của chính bạn thậm chí còn tiếp tục dạy lại bạn, hôm nay chỉ qua duy nhất cái lọ: hãy uống một bình thuốc do bạn ký và một dòng kỹ năng nhỏ chảy ngược về nghề đã pha ra nó, miễn là nghề đó là một trong các nghề chuyên ngành đang hoạt động của bạn.',
-  'guide.profPages.econ.throttleBody': 'Sản lượng có trần: chế tác, hủy pháp khắc, pháp khắc, tháo dỡ, và nạp lại hiệu ứng công cụ dùng chung một hạn mức {actions} hành động thành công trong mỗi khung {seconds} giây. Một lần thử bị từ chối không tốn gì và không tiêu hạn mức nào. Bạn sẽ không bao giờ cảm thấy nó trong lối chơi bình thường; nó tồn tại để một chuyên gia đã đạt trần với kho đầy ắp không thể làm ngập Chợ, dù kỹ năng hay kho dự trữ của họ đến đâu.',
   'guide.profPages.faq.a4': 'Bạn vừa trúng một vụ hời. Khoảng 1 trong 90 lần thu hoạch kích hoạt một sự kiện thu thập hiếm (lõi cây cổ đại trên cây, mạch nguyên sơ trong quặng, bông hoa nở dưới ánh trăng trong thảo dược): nó nhân sản lượng lên năm lần, đóng dấu tên bạn lên từng đơn vị, và loan báo phát hiện đó cho cả khu vực. Một lần tung phẩm chất hiếm trở lên ở lần thu hoạch thường cũng đóng dấu vào sản lượng.\n\nNguyên liệu có dấu thợ đáng giữ lại hoặc bán đắt: cầm bất kỳ bản có dấu thợ nào của một nguyên liệu đang cần khi đứng ở bàn chế tác sẽ cộng thêm 2 điểm phần trăm vào tỉ lệ kiệt tác. Chỉ cần nhớ rằng chúng chỉ xếp chồng với những bản có dấu thợ giống hệt, nên chúng giữ ô túi riêng của mình.',
   'guide.profPages.faq.a6': 'Chín công thức dã chiến phổ thông và sáu công thức công cụ trên cạn chế tạo được thì ai cũng biết từ đầu, và ba đỉnh điểm gắn trạm cũng vậy (Áo Choàng Vai Vảy Lò, Mũ Trùm Dệt Hộ Mệnh, và Băng Cuốn Da Hoàng Hôn), chúng không cần huấn luyện viên, chỉ cần đúng trạm của mình. Mọi thứ khác đều do các bậc thầy thường trú dạy tại trạm của họ khắp ba thị trấn trung tâm: phần lớn đứng ở Eastbrook, thợ thuộc da giữ xưởng thuộc da ở Fenbridge, và nhà giả kim giữ nhà bào chế ở Highwatch.\n\nCông thức từ huấn luyện viên chạy theo nấc: kỹ năng 0, 25, và 50 cho các nghề trang bị và đồ tiêu hao, giá lần lượt là miễn phí, 25 bạc, và 1 vàng dưới dạng phí một lần; hai công thức bùa của Pháp Khắc nằm ở nấc 25, còn người chế tạo công cụ dạy hai cần câu chế tạo được ở 75 và 125 với giá 4 và 16 vàng. Một bậc thầy dạy công thức ngay khi dải của bạn trong nghề đó đạt tới dải của chính công thức, và bạn phải đứng tại trạm của họ mới học được: trạm di động không tính.',
   'guide.profPages.faq.a7': 'Thao tác niệm thu thập bắt đầu ở 2,5 giây và được gọt xuống theo hai cách: 0,4 giây cho mỗi bậc công cụ bạn mang theo và đủ sức sử dụng cao hơn bậc của chính điểm tài nguyên, và 0,15 giây một khi bộ đếm của nghề đó vượt qua dải 100 của nó, với sàn là 1,5 giây. Chuyển từ điểm tài nguyên bậc 1 lên điểm tài nguyên bậc 3 thì phần dôi ra của bạn biến mất, nên cùng cây cuốc ấy lại vung chậm đi. Cầm đúng bậc yêu cầu không mua được tốc độ; nó chỉ mở điểm tài nguyên mà thôi.\n\nTích lũy kỹ năng mờ dần y như bên chế tác: một điểm tài nguyên chuyển xám khi thành thạo của bạn leo vượt bậc của nó (điểm tài nguyên bậc 1 không dạy gì nữa từ thành thạo 75 trở đi), nên câu trả lời cho việc tích lũy chậm là những điểm tài nguyên bậc cao hơn. Những điểm đó cần một công cụ ít nhất bằng bậc của chúng nằm trong túi bạn (không điểm tài nguyên nào làm được bằng tay không, kể cả bậc 1), và một công cụ trên cạn cao hơn bậc 1 còn đòi mốc sử dụng của nó trước, 40/70/85/100 trong chính nghề của nó cho các bậc 2 đến 5. Câu Cá theo đường thoải riêng: tích lũy đầy đủ dưới 50 thành thạo, một nửa dưới 100, rỉ giọt 0,1 dưới 150 và 0,02 dưới 200, cá rác không dạy gì cả từ 100 trở lên, và bản thân vùng nước cũng chặn trần bài học (vùng nước bậc 1 ngừng dạy ở 100, đầm lầy ở 150), nên một bộ đếm đứng yên cũng có thể có nghĩa là bạn đã lớn hơn vùng nước ấy.',
@@ -602,7 +601,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.collectorsHeading': 'Người sưu tầm, chiến tích, và giá của một câu chuyện',
   'guide.profPages.econ.collectorsBody':
     'Người bán NPC không quan tâm xuất xứ: một vật phẩm có dấu thợ bán cho NPC vẫn đúng giá thông thường. Phần giá trị tăng thêm của dấu thợ chỉ tồn tại giữa các người chơi, và đó chính xác là điều làm nó thú vị: một đống quặng may mắn được ký bởi một thợ thu hoạch nổi tiếng, một Miếng Ngon từ vụ thu hoạch may mắn, một lưỡi kiệt tác ghi tên thợ rèn đã nghỉ hưu từ lâu, tất cả đều có giá là bao nhiêu ký ức của ai đó nói lên.\n\nSách Kỳ Công cũng dựa vào cùng cảm giác đó: Mạch Nguyên Sơ, Lõi Cây Cổ Đại, Bông Trăng, Mẫu Vật Hoàn Hảo, và Tia Hy Vọng là những dấu ấn sưu tầm không có Danh Vọng tồn tại thuần túy để chứng minh một khoảnh khắc đã xảy ra với bạn. Giữ lại vật phẩm đã kiếm được kỳ công và bạn nắm giữ biên lai. Tất cả những thứ này không phải sức mạnh; xuất xứ không mua được chỉ số và không thắng được trận chiến, đó là dấu vết giấy tờ của những ngày tốt lành trong trò chơi.',
-  'guide.profPages.econ.throttleHeading': 'Giới hạn hành động',
   'guide.profPages.econ.doctrineHeading': 'Người chơi giao dịch với người chơi',
   'guide.profPages.econ.doctrineBody':
     'Nền kinh tế chế tác được xây dựng trên một ý tưởng: người chơi cung cấp cho người chơi. Thợ thu hoạch nuôi thợ chế tác, thợ chế tác nuôi người làm nhiệm vụ và raider, còn thợ phá đồ nuôi thợ pháp khắc, với người bán NPC và chủ bàn đứng ở rìa để hấp thụ đồ rác và tiền vàng thay vì cạnh tranh với bạn. Nếu bạn muốn kiếm tiền từ một nghề, khách hàng của bạn là con người: hãy tìm hiểu những gì người chơi khác tiêu hao, định giá so với Chợ Thế Giới, và xem hệ thống NPC là sàn giá dưới mức giá của bạn, không phải là thị trường thực sự.\n\nTrang bị chế tác được cân bằng để nằm dưới ngưỡng raid: ngay cả kiệt tác cũng chỉ một bậc phẩm chất cao hơn công thức của nó, không bao giờ vượt huyền thoại, và ngân sách chỉ số của nó nằm dưới dải loot raid. Lò rèn giúp bạn sẵn sàng cho nội dung khó nhất; nó không thay thế nội dung đó. Điều này giữ thợ chế tác, raider, và thị trường trong tam giác ổn định: đồ rơi raid vẫn là mục tiêu khát khao, và đồ chế tác vẫn là trang bị tốt nhất tiền có thể mua.',
@@ -1376,6 +1374,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.keybinds.petAttack': 'Thú Cưng: Tấn Công',
   'hudChrome.keybinds.petDefensive': 'Thú Cưng: Phòng Thủ',
   'hudChrome.keybinds.petStop': 'Thú Cưng: Dừng',
+  'hudChrome.keybinds.targetPet': 'Thú Cưng: Chọn',
   'hudChrome.keybinds.petTaunt': 'Thú Cưng: Khiêu Khích',
   'hudChrome.mailbox.parcelQtyDecreaseAria': 'Gửi bớt một {item}',
   'hudChrome.mailbox.parcelQtyIncreaseAria': 'Gửi thêm một {item}',
@@ -2293,9 +2292,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.calendar.events.delveDay.note':
     'Tu Huynh Halven đánh dấu vào những tấm bản đồ của mình: một ngày lành để thử sức Thánh Tích Sụp Đổ.',
   'hudChrome.calendar.events.delveDay.title': 'Ngày Hang Sâu',
-  'hudChrome.calendar.events.fiestaNight.note':
-    'Võ đài Fiesta 2v2 đón đám đông cuồng nhiệt nhất vào tối nay.',
-  'hudChrome.calendar.events.fiestaNight.title': 'Đêm Fiesta',
   'hudChrome.calendar.events.fishingDerby.note':
     'Cần thủ xếp hàng quanh các hồ nước. Hãy mang theo cần câu và trao đổi chuyện câu cá.',
   'hudChrome.calendar.events.fishingDerby.title': 'Hội Thi Câu Cá',
@@ -2410,13 +2406,9 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.disenchantConfirmBodySpecial':
     'Thao tác này phá hủy một bản đặc biệt của {item} (có chữ ký, kiệt tác hoặc đã pháp khắc) và thu được nguyên liệu huyền bí. Không thể hoàn tác.',
   'hudChrome.enchanting.disenchantConfirmTitle': 'Hủy Pháp Khắc {item}?',
-  'hudChrome.enchanting.disenchantThrottled':
-    'Bạn đang hủy pháp khắc quá nhanh. Hãy đợi một lát rồi thử lại.',
   'hudChrome.enchanting.disenchantedLine': 'Bạn hủy pháp khắc {item}.',
   'hudChrome.enchanting.enchantAppliedLine': 'Bạn pháp khắc {item} với {enchant}.',
   'hudChrome.enchanting.enchantInsufficient': 'Bạn không có đủ nguyên liệu cho phép khắc đó.',
-  'hudChrome.enchanting.enchantThrottled':
-    'Bạn đang pháp khắc quá nhanh. Hãy đợi một lát rồi thử lại.',
   'hudChrome.enchanting.enchantUnknown': 'Phép khắc đó không tồn tại.',
   'hudChrome.enchanting.enchantWrongSlot': 'Phép khắc đó không thể áp dụng cho vật phẩm đó.',
   'hudChrome.enchanting.noEnchants': 'Không có phép khắc nào dùng nguyên liệu này.',
@@ -2430,8 +2422,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.salvageConfirmBodySpecial':
     'Thao tác này phá hủy một bản đặc biệt của {item} (có chữ ký, kiệt tác hoặc đã pháp khắc) và thu được nguyên liệu chế tác. Không thể hoàn tác.',
   'hudChrome.enchanting.salvageConfirmTitle': 'Tháo Dỡ {item}?',
-  'hudChrome.enchanting.salvageThrottled':
-    'Bạn đang tháo dỡ quá nhanh. Hãy đợi một lát rồi thử lại.',
   'hudChrome.enchanting.salvagedLine': 'Bạn tháo dỡ {item}.',
   'hudChrome.enchanting.targetTitle': 'Chọn vật phẩm để pháp khắc',
   'hudChrome.frameReset.label': 'Đặt Lại Vị Trí Các Khung',
@@ -3583,6 +3573,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.items.crag_warden_cudgel.name': 'Dùi Cui Vệ Binh Vách Đá',
   'entities.items.craghorn_staff.name': 'Trượng Sừng Vách Đá',
   'entities.items.cragmaw_huntcord.name': 'Dây Săn Của Cragmaw',
+  'entities.items.cragmaw_huntquiver.name': 'Ống Tên Săn Của Cragmaw',
   'entities.items.cragmaw_prowlboots.name': 'Giày Rình Mò Cragmaw',
   'entities.items.cragwalker_boots.name': 'Ủng Bộ Hành Vách Đá',
   'entities.items.crimson_amber_armor_plate.name': 'Hổ Phách Đỏ Thẫm',
@@ -3662,6 +3653,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.items.gravewardens_shiv.name': 'Dao Nhọn Của Vệ Mộ',
   'entities.items.gravewoven_raiment.name': 'Y Phục Dệt Mộ',
   'entities.items.gravewyrm_gauntlets.name': 'Găng Tay Mộ Long',
+  'entities.items.gravewyrm_bone_quiver.name': 'Ống Tên Xương Mộ Long',
   'entities.items.gravewyrm_mantle.name': 'Áo Choàng Mộ Long',
   'entities.items.gravewyrm_sabatons.name': 'Giày Sắt Mộ Long',
   'entities.items.gravewyrm_scale_hauberk.name': 'Áo Giáp Vảy Mộ Long',
@@ -3722,6 +3714,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.items.mistveil_grips.name': 'Găng Tay Màn Sương',
   'entities.items.moggers_copper_cudgel.name': 'Chùy Đồng Của Mogger',
   'entities.items.moggers_shiv.name': 'Dao Nhọn Của Mogger',
+  'entities.items.moggers_hide_quiver.name': 'Ống Tên Da Của Mogger',
   'entities.items.moggers_stomper_boots.name': 'Giày Giẫm Đạp Của Mogger',
   'entities.items.monarch_crown_helm.name': 'Vương Miện Quân Vương',
   'entities.items.copper_mining_pick.name': 'Cuốc Khai Khoáng Đồng',
@@ -3845,6 +3838,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.items.stormcallers_spaulders.name': 'Giáp Vai Galecall',
   'entities.items.bonewrought_greatsword.name': 'Đại Kiếm Bonewrought',
   'entities.items.direfang_greatblade.name': 'Đại Đao Direfang',
+  'entities.items.direfang_quiver.name': 'Ống Tên Direfang',
   'entities.items.bonewrought_bulwark.name': 'Khiên Lũy Bonewrought',
   'entities.items.wraithfire_orb.name': 'Quả Cầu Wraithfire',
   'entities.items.stormshard_leggings.name': 'Quần Giáp Mảnh Bão',
@@ -5502,7 +5496,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'fiesta.end.draw': 'FIESTA HÒA! Quá sít sao để phân thắng bại!',
   'fiesta.end.loss': 'FIESTA THUA! Chơi lại nào!',
   'fiesta.end.win': 'FIESTA THẮNG! 🎉 Một bữa tiệc tuyệt vời!',
-  'fiesta.enterQueue': 'Tham gia Fiesta!',
   'fiesta.error.leaderOnly': 'Chỉ trưởng nhóm mới có thể xếp hàng cho đội của ngươi vào {label}.',
   'fiesta.error.noAugment': 'Ngươi không có cường hóa nào để chọn lúc này.',
   'fiesta.error.notOnOffer': 'Cường hóa đó không được đề nghị.',
@@ -5519,9 +5512,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'fiesta.powerup.pow_colossus.name': 'Khổng Tượng',
   'fiesta.powerup.pow_moon_boots.name': 'Giày Mặt Trăng',
   'fiesta.powerup.pow_speed_demon.name': 'Quỷ Tốc Độ',
-  'fiesta.practice': '🎉 Luyện Tập với Bot',
-  'fiesta.practiceNote':
-    'Luyện tập ngoại tuyến: triệu hồi 3 bot AI và xếp hàng cho ngươi vào Fiesta 2v2. Bấm lần nữa để dừng.',
   'fiesta.queue.join': 'Ngươi vào hàng chờ Fiesta 2v2. Sẵn sàng QUẨY nào…',
   'fiesta.queue.leave': 'Ngươi rời hàng chờ Fiesta 2v2.',
   'fiesta.queue.teamLeave': 'Đội của ngươi rời hàng chờ Fiesta 2v2.',
@@ -5761,38 +5751,18 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Đánh trúng mọi thứ quanh bạn và làm chậm đòn tấn công của chúng.',
   'guide.abilityHook.wrath':
     'Một tia tự nhiên ném vào mục tiêu từ xa, đòn chủ lực quen thuộc của bạn.',
-  'guide.arenaPage.augmentsNote':
-    'Cường hóa và tăng lực chỉ kéo dài trong trận đấu. Chúng là về những lối chơi ngẫu hứng, vui nhộn ngay tại chỗ, chứ không phải sức mạnh lâu dài, nên không ai mua được chiến thắng.',
   'guide.arenaPage.coliseumBody':
     'Coliseum là đấu trường của vương quốc, nơi bạn đối đầu với những người chơi khác trong các trận xếp hạng, một đấu một hoặc hai đấu hai. Mỗi hạng đấu giữ bảng xếp hạng riêng, nên một chiến thắng đưa bạn leo cao trên thang đó cho cả vương quốc cùng chiêm ngưỡng. Mở cửa sổ Đấu Trường để đăng ký một hạng đấu, một mình hay cùng người đồng đội của bạn.',
   'guide.arenaPage.coliseumHeading': 'Đấu Trường Tro Tàn',
   'guide.arenaPage.duelsBody':
     'Thách đấu giao hữu bất kỳ người chơi nào bạn gặp. Chẳng có gì đặt cược ngoài lòng tự tôn, nên đây là cách dễ nhất để học một thế đối đầu hay phân định một cuộc tranh luận thân tình.',
   'guide.arenaPage.duelsHeading': 'Đấu Tay Đôi',
-  'guide.arenaPage.fiestaBody':
-    'Fiesta là một trận ẩu đả nhanh, hai đấu hai diễn ra như một hiệp liền mạch, với mọi đấu thủ được đưa về cùng một vạch xuất phát. Khi trận đấu diễn ra bạn chọn cường hóa, những đòn tăng lực nhanh tái định hình bộ kỹ năng của bạn ngay tức thì, nên không trận nào giống trận nào.',
-  'guide.arenaPage.fiestaHeading': 'Fiesta Hai Đấu Hai',
   'guide.arenaPage.heading': 'Đấu Trường và PvP',
   'guide.arenaPage.intro':
     'Muốn thử sức với những người chơi khác? Chế độ người chơi đấu người chơi có sẵn, và đó luôn là lựa chọn của bạn, không bao giờ bị ép buộc.',
   'guide.arenaPage.ladderBody':
     'Chế độ xếp hạng theo dõi thứ hạng của bạn theo thời gian. Xem bảng xếp hạng để biết bạn đang ở đâu và ai đang đứng đầu vương quốc.',
   'guide.arenaPage.ladderHeading': 'Leo Bảng Xếp Hạng',
-  'guide.arenaPage.powerupsBody':
-    'Những quả cầu phát sáng cũng rơi vào đấu trường giữa trận, miễn phí cho ai chạm tới đầu tiên. Chúng được thiết kế phóng đại có chủ đích và chỉ kéo dài trong chốc lát: Quỷ Tốc cho một thoáng vận tốc chói lóa, Khổng Lồ để phình to thành gã khổng lồ nặng nề, Giày Mặt Trăng cho một cú nhảy nảy bật trọng lực thấp, và Cuồng Bạo cho một đợt phẫn nộ dâng trào đột ngột.',
-  'guide.arenaPage.powerupsTitle': 'Tăng lực trong vòng đấu',
-  'guide.arenaPage.waveGoldBody':
-    'Đợt giữa: những tổ hợp hai mặt nơi lối xây dựng của bạn bắt đầu thành hình và phát huy.',
-  'guide.arenaPage.waveGoldTitle': 'Vàng',
-  'guide.arenaPage.wavePrismaticBody':
-    'Đợt cuối cùng: những đòn bùng phát định hình lối chơi, làm tan chảy màn hình, được tạo ra để cảm thấy lố bịch theo cách tuyệt vời nhất.',
-  'guide.arenaPage.wavePrismaticTitle': 'Lăng Kính',
-  'guide.arenaPage.waveSilverBody':
-    'Đợt mở màn: những đòn tăng lực đơn chỉ số gọn gàng giúp mài giũa nền tảng cơ bản của lớp nhân vật bạn.',
-  'guide.arenaPage.waveSilverTitle': 'Bạc',
-  'guide.arenaPage.wavesBody':
-    'Một trận Fiesta trao cho bạn những lượt chọn mới khi nó diễn ra, và các lựa chọn càng táo bạo hơn khi trận đấu kéo dài. Bạn xây dựng từ đợt này sang đợt khác, mỗi lần chọn một trong vài tùy chọn và giữ nó cho hết phần còn lại của trận.',
-  'guide.arenaPage.wavesTitle': 'Cường hóa ập đến theo từng đợt',
   'guide.bestiary.flavor.gravecaller_cultist':
     'Những kẻ phục dịch khoác áo choàng của giáo phái tử thần, kẻ mà công việc làm ô uế những nấm mồ từ Thung Lũng đến những đỉnh núi. Nơi chúng tụ họp, người chết không được yên nghỉ.',
   'guide.bestiary.flavor.grubjaw':
@@ -6806,7 +6776,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hud.core.mapCanvasLabel': 'Bản Đồ',
   'hud.core.mapSummary': 'Bản đồ của {zone}.',
   'hud.core.maxLevel': 'CẤP TỐI ĐA',
-  'hud.core.mobileArena': 'Đấu Trường',
   'hud.core.mobileAttack': 'Tấn Công',
   'hud.core.mobileCamera': 'Máy quay — chạm hai lần để căn giữa lại',
   'hud.core.mobileChat': 'Trò Chuyện',
@@ -6900,7 +6869,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hud.errors.whisperMissing': "Không có người chơi nào tên '{name}' đang trực tuyến.",
   'hud.errors.whisperSelf': 'Bạn lẩm bẩm một mình. Không ai nghe thấy cả.',
   'hud.keybinds.actions.actionBarSlot': 'Thanh Kỹ Năng {slot}',
-  'hud.keybinds.actions.arena': 'Đấu Trường (Ashen Coliseum)',
   'hud.keybinds.actions.attack': 'Tấn Công',
   'hud.keybinds.actions.attackMove': 'Di Chuyển Tấn Công',
   'hud.keybinds.actions.autorun': 'Bật/Tắt Tự Chạy',
@@ -7657,6 +7625,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.partyGroup': 'Nhóm {n}',
   'hudChrome.unitFrame.partyLabel': 'Đội Của Bạn',
   'hudChrome.unitFrame.playerLabel': 'Anh Hùng Của Bạn',
+  'hudChrome.unitFrame.petLabel': 'Thú Cưng Của Bạn',
   'hudChrome.unitFrame.targetAnnounce': 'Đánh Dấu {name}',
   'hudChrome.unitFrame.targetLabel': 'Mục Tiêu Của Bạn',
   'hudChrome.widgets.clockTitle': 'Giờ địa phương - nhấp để chuyển 12/24 giờ',
@@ -8599,6 +8568,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.event.hint': 'Thông báo một trận raid, buổi gặp mặt hoặc sự kiện',
   'hudChrome.discord.relay.help.label': 'Cần Trợ Giúp',
   'hudChrome.discord.relay.help.hint': 'Nhờ cộng đồng giúp đỡ',
+  'hudChrome.options.hideUnusedActionSlots': 'Ẩn Ô Hành Động Chưa Sử Dụng',
   'hudChrome.options.showSecondaryActionBar': 'Hiện Thanh Hành Động Phụ',
   'desktop.crash.body': 'Khung trò chơi đã ngừng hoạt động. Tải lại chứ?',
   'desktop.crash.fatalBody': 'World of ClaudeCraft gặp lỗi không mong muốn và cần đóng lại.',
@@ -8844,7 +8814,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Mọi thứ trên trang này đều tồn tại trong trò chơi: nhấn Esc để mở phần tùy chọn. Menu mở ra ở một Tổng Quan gồm những mục thiết yếu được ghim, với các hạng mục trên một thanh bên cạnh: các cài đặt dưới đây nằm trong Đồ Họa, Giao Diện, và Trợ Năng thuộc nhóm Hiển Thị, còn Lớp Phủ Hiệu Suất nằm trong Hệ Thống. Nhanh hơn nữa, gõ một cái tên vào ô tìm kiếm ở phía trên và nhảy thẳng tới nó.',
   'guide.settingsPage.whyLabel': 'Tại sao nó hoạt động:',
   'hudChrome.crafting.close': 'Đóng chế tạo',
-  'hudChrome.crafting.craft': 'thủ công',
   'hudChrome.crafting.craftedToast': 'Đã chế tác: {name}',
   'hudChrome.crafting.empty': 'Chưa có công thức nấu ăn nào được biết đến.',
   'hudChrome.crafting.insufficientMaterials': 'Bạn không có tài liệu cho việc đó.',
@@ -8929,9 +8898,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Xẻ toạc giáp của mục tiêu, giảm {damage}% mỗi lần áp dụng. Cộng dồn tối đa 5 lần. Tạo ra lượng đe dọa lớn.',
   'entities.mobs.training_dummy.name': 'Hình Nộm Tập Luyện',
   'entities.mobs.yumi_cat.name': 'Yumi',
-  'guide.arenaPage.yumiBody':
-    'Bảo Vệ Yumi là chế độ tranh mục tiêu theo đội chơi trong một mê cung: mỗi bên canh giữ linh thú mèo của mình trong khi săn lùng con của đối phương. Thỉnh thoảng cả hai chú mèo lại chớp dịch tới những góc mới của mê cung, nên trận đấu xoay vần giữa việc phòng thủ, săn lùng và chạy đua đi tìm lại chúng. Xếp hàng chờ theo dạng ba đấu ba hoặc năm đấu năm; gục ngã trong trận chỉ khiến bạn phải ngồi ngoài trong chốc lát.',
-  'guide.arenaPage.yumiHeading': 'Bảo Vệ Yumi',
   'hudChrome.archetypeTitle.hobbyLabel': 'Sở Thích',
   'hudChrome.auraEffect.armorPct': 'Giảm giáp đi {pct}%',
   'hudChrome.auraEffect.armorPctStacks': 'Giảm giáp đi {pct}% ({stacks} tích trữ)',
@@ -8941,7 +8907,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.increasePct.int': 'Tăng Trí Tuệ thêm {pct}%',
   'hudChrome.auraEffect.increasePct.sta': 'Tăng Thể Lực thêm {pct}%',
   'hudChrome.crafting.recipeNotLearned': 'Bạn chưa học công thức đó.',
-  'hudChrome.crafting.throttled': 'Bạn đang chế tạo quá nhanh. Hãy chờ một lát rồi thử lại.',
   'hudChrome.mobile.chatPlaceholder': 'Nói gì đó...',
   'hudChrome.mobile.hideKeyboard': 'Ẩn bàn phím',
   'hudChrome.unitFrame.partyChip': 'Tổ Đội',
@@ -8951,7 +8916,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'yumi.bracket5': 'Yumi 5 đấu 5',
   'yumi.end.loss': 'THẤT BẠI! Yumi của bạn đã gục ngã.',
   'yumi.end.win': 'CHIẾN THẮNG! Yumi đã an toàn!',
-  'yumi.enterQueue': 'Tham Gia Bảo Vệ Yumi!',
   'yumi.error.partyTooBig3': 'Bảo Vệ Yumi 3 đấu 3 chỉ cho phép tổ đội tối đa ba người.',
   'yumi.error.partyTooBig5': 'Bảo Vệ Yumi 5 đấu 5 chỉ cho phép tổ đội tối đa năm người.',
   'yumi.hud.aria': 'Yumi của bạn còn {mine} trên {max} máu, Yumi địch còn {theirs}.',
@@ -10058,6 +10022,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hud.combat.evaded': '{target} lẩn tránh {ability} của bạn.',
   'hudChrome.options.mouseoverCast': 'Thi Triển Khi Rê Chuột Trên Khung Tổ Đội',
   'hudChrome.options.showTargetOfTarget': 'Hiện Mục Tiêu Của Mục Tiêu',
+  'hudChrome.options.showPetFrame': 'Hiện Thú Cưng Của Bạn',
   'hudChrome.unitFrame.targetOfTargetLabel': 'Mục Tiêu Của Mục Tiêu',
   'itemUi.market.rarityLegendary': 'Huyền thoại',
   'loading.reconnectingAttempt':

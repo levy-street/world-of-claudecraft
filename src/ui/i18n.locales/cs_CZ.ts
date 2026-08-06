@@ -308,8 +308,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Jeden pevný poplatek za každý příčel receptů, účtovaný jednou v okamžiku, kdy tě ho mistr naučí; každý příčel tabulky níže je dnes v živém provozu, od bezplatných začátečnických receptů až po lekce prutů u výrobce nástrojů na jejím vrcholu.',
   'guide.profPages.econ.provenanceBody':
     'Některé předměty nesou jméno. Najeď na takový kurzorem a popisek u suroviny řekne Sesbíráno a čí jméno, u hotového kusu Vytvořil a čí jméno: tatáž značka, jen formulovaná podle toho, jak předmět vznikl. Podpis je součástí samotného předmětu, putuje s ním přes výměny, banku, poštu, Světový trh i zpětný odkup u prodejce, a nikdy nevybledne.\n\nSběr podepisuje svou nejlepší práci automaticky: každá sklizeň, která padne vzácná nebo lepší, přichází podepsaná a vzácné nálezy podepíšou celý svůj pětinásobný výnos. Šťastný hod při sklizni z těla podepíše výnos tam, kde rodina nemá co dát jako exemplář, a tam, kde má, nechá výnos prostý a vedle něj vyrazí podepsaný nepoškozený exemplář. Výroba podepisuje po téže linii: každá kopie vzácného nebo lepšího výrobku se razí podepsaná a mistrovské dílo podepisuje vždy, ať má jakoukoli kvalitu, takže nejjemnější verze každého kusu vždy jmenuje svého tvůrce. Jediné, co tě může připravit o podpis, je plná brašna: podepsaný kus potřebuje vlastní místo nebo odpovídající podepsaný stack, kam dopadne.\n\nStack předmětů sdílí jednu identitu, takže dvě kopie se sloučí jen tehdy, když se každá značka přesně shoduje: stejný předmět, stejný podepisující, stejné statistiky mistrovského díla, stejné okouzlení, stejné pouto. Podepsaná kláda se nikdy nepřidá k prosté hromadě ani v jednom směru (sloučení by smazalo něčí jméno), ale shodné náklady se slučují s radostí, takže dvacet rud podepsaných týmž sběračem sedí v jednom stacku a nečekaný nález ti nerozseká brašny.\n\nPodpisy se řemeslníkům vracejí: držet u pracovního stolu jakoukoli podepsanou kopii potřebného reagentu, ať ji podepsal kdokoli, přidá 2 procentní body k šanci na mistrovské dílo, a držet reagent podepsaný vlastní rukou sníží požadované množství toho reagentu o jeden kus (nikdy ne pod jeden). Tvá vlastní podepsaná vzácná nebo lepší práce tě dokonce dál učí, dnes jedině skrze lahvičku: vypij lektvar, který jsi podepsal, a malá kapka dovednosti odteče zpět do řemesla, které ho uvařilo, pokud je to řemeslo jedním z tvých aktivních hlavních oborů.',
-  'guide.profPages.econ.throttleBody':
-    'Výstup má svůj strop: výroba, rozzačarování, okouzlování, rozebírání a dobíjení účinků nástrojů sdílejí jeden rozpočet {actions} úspěšných akcí v každém okně o délce {seconds} sekund. Odmítnutý pokus nic nestojí a z rozpočtu neubere nic. Při běžném hraní ho nikdy nepocítíš; existuje proto, aby vymaxovaný specialista s plnou bankou nemohl zaplavit Trh, ať už má jakoukoli dovednost nebo zásoby.',
   'guide.profPages.faq.a4':
     'Narazil jsi na nečekaný nález. Zhruba 1 sklizeň z 90 spustí vzácný sběratelský nález (prastaré jádrové dřevo na stromě, nedotčená žíla v rudě, měsíční květ mezi bylinami): pětinásobí výnos, podepíše každou jednotku tvým jménem a ohlásí nález celé zóně. Podpis přinese i vzácný nebo lepší hod na kvalitu při obyčejné sklizni.\n\nPodepsané materiály stojí za to si nechat nebo draze prodat: držení jakékoli podepsané kopie potřebné suroviny u pracovního stolu přidá 2 procentní body k šanci na mistrovské dílo. Jen pamatuj, že se skládají pouze se shodně podepsanými kopiemi, takže si drží vlastní místo v brašně.',
   'guide.profPages.faq.a6':
@@ -687,7 +685,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.collectorsHeading': 'Sběratelé, trofeje a cena příběhu',
   'guide.profPages.econ.collectorsBody':
     'Prodejci jsou slepí k původu: podepsaný předmět prodáš NPC přesně za jeho základní cenu. Příplatek za podpis existuje pouze mezi hráči, a právě to je zajímavé: hromada rudy z nečekaného nálezu podepsaná slavným sběračem, Prvotřídní výřez ze šťastné sklizně, mistrovská čepel nesoucí jméno kováře, který od té doby odešel do ústraní, všechno stojí tolik, co si paměť lidí řekne, že jsou hodné.\n\nKniha skutků vychází vstříc témuž instinktu: Nedotčená rudná žíla, Prastaré jádrové dřevo, Měsíční květ, Dokonalý exemplář a Záblesk naděje jsou sběratelské záznamy bez Věhlasu, které existují výhradně jako důkaz, že se ti něco přihodilo. Uchovej předmět, který získání skutku vynesl, a máš v rukou potvrzení. Nic z toho není výkon; původ nekupuje statistiky ani nevyhrává souboje, je to papírová stopa hry o povedených dnech.',
-  'guide.profPages.econ.throttleHeading': 'Omezení akcí',
   'guide.profPages.econ.doctrineHeading': 'Hráči obchodují s hráči',
   'guide.profPages.econ.doctrineBody':
     'Řemeslná ekonomika stojí na jediné myšlence: hráči zásobují hráče. Sběrači živí řemeslníky, řemeslníci živí hráče plnící úkoly a nájezdníky a rozebíratelé živí okouzlovatele, přičemž prodejci a správci stanic stojí na okraji, aby pohlcovali smetí a mince, nikoli aby s tebou soutěžili. Chceš-li vydělávat mince z profese, tvůj zákazník je osoba: zjisti, co ostatní hráči rychle spotřebují, porovnej ceny se Světovým trhem a chovej se k NPC systémům jako k podlaze pod svými cenami, ne jako k trhu samotnému.\n\nVybavení z řemesel je laděno tak, aby zůstávalo pod úrovní nájezdové hranice: i mistrovské dílo je vždy jen o jeden stupeň kvality nad svým receptem, nikdy ne přes legendární, a jeho rozpočet statistik zůstává pod pásmem nájezdové kořisti. Kovárna tě připraví na nejtěžší obsah; nenahrazuje ho. To udržuje řemeslníky, nájezdníky a trh ve stabilním trojúhelníku: nájezdové kusy zůstávají aspiračním cílem a řemeslné kusy nejlepším vybavením, které lze skutečně koupit za mince.',
@@ -2953,7 +2950,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'fiesta.end.draw': 'FIESTA REMÍZA! Příliš těsné na rozhodnutí!',
   'fiesta.end.loss': 'FIESTA PROHRÁNA! Dej si odvetu!',
   'fiesta.end.win': 'FIESTA VYHRÁNA! To byla párty!',
-  'fiesta.enterQueue': 'Připojit se k Fiestě!',
   'fiesta.error.leaderOnly': 'Do fronty na {label} může tým zařadit jen vůdce skupiny.',
   'fiesta.error.noAugment': 'Teď nemáš žádné vylepšení k výběru.',
   'fiesta.error.notOnOffer': 'Toto vylepšení není v nabídce.',
@@ -2969,9 +2965,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'fiesta.powerup.pow_colossus.name': 'Kolos',
   'fiesta.powerup.pow_moon_boots.name': 'Měsíční boty',
   'fiesta.powerup.pow_speed_demon.name': 'Démon rychlosti',
-  'fiesta.practice': 'Trénink proti botům',
-  'fiesta.practiceNote':
-    'Offline trénink: vytvoří 3 AI boty a zařadí tě do 2v2 Fiesty. Klikni znovu pro zastavení.',
   'fiesta.queue.join': 'Připojuješ se do fronty 2v2 Fiesty. Připrav se na PÁRTY...',
   'fiesta.queue.leave': 'Opouštíš frontu 2v2 Fiesty.',
   'fiesta.queue.teamLeave': 'Tvůj tým opouští frontu 2v2 Fiesty.',
@@ -3399,7 +3392,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hud.core.mapCanvasLabel': 'Mapa',
   'hud.core.mapSummary': 'Mapa oblasti {zone}.',
   'hud.core.maxLevel': 'MAX. ÚROVEŇ',
-  'hud.core.mobileArena': 'Aréna',
   'hud.core.mobileAttack': 'Útok',
   'hud.core.mobileCamera': 'Kamera - dvojitým klepnutím vycentruješ',
   'hud.core.mobileChat': 'Chat',
@@ -3491,7 +3483,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hud.errors.whisperMissing': 'Žádný hráč jménem {name} není online.',
   'hud.errors.whisperSelf': 'Mumláš si pro sebe. Nikdo to neslyší.',
   'hud.keybinds.actions.actionBarSlot': 'Akční lišta {slot}',
-  'hud.keybinds.actions.arena': 'Aréna (Popelavé koloseum)',
   'hud.keybinds.actions.attack': 'Útok',
   'hud.keybinds.actions.attackMove': 'Útok pohybem',
   'hud.keybinds.actions.autorun': 'Přepnout automatický běh',
@@ -4299,9 +4290,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.calendar.events.delveDay.note':
     'Bratr Halven značí mapy: skvělý den pro odvahu ve Zhrouceném relikviáři.',
   'hudChrome.calendar.events.delveDay.title': 'Den výprav',
-  'hudChrome.calendar.events.fiestaNight.note':
-    'Kruh 2v2 Fiesty dnes večer přitahuje nejhlasitější davy.',
-  'hudChrome.calendar.events.fiestaNight.title': 'Fiesta noc',
   'hudChrome.calendar.events.fishingDerby.note':
     'Rybáři lemují jezera. Přines prut a vyměň si rybářské historky.',
   'hudChrome.calendar.events.fishingDerby.title': 'Rybářské derby',
@@ -4414,6 +4402,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showItemLevel': 'Zobrazit úroveň předmětu',
   'hudChrome.options.showOwnNameplate': 'Zobrazit mou jmenovku',
   'hudChrome.options.showPlayerNameplates': 'Zobrazit jmenovky hráčů',
+  'hudChrome.options.hideUnusedActionSlots': 'Skrýt nepoužitá políčka akcí',
   'hudChrome.options.showSecondaryActionBar': 'Zobrazit sekundární akční lištu',
   'hudChrome.options.showWalletOnCharacterScreen': 'Zobrazit peněženku na obrazovce postavy',
   'hudChrome.options.showWalletOnPlayerCard': 'Zobrazit peněženku na kartě hráče',
@@ -4572,7 +4561,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.commissionToggleHint': 'Váže se na první postavu, která ho přijme v obchodu.',
   'hudChrome.crafting.commissionUnbound': 'Zakázkový předmět: váže se na prvního příjemce',
   'hudChrome.crafting.close': 'Zavřít výrobu',
-  'hudChrome.crafting.craft': 'Vyrobit',
   'hudChrome.crafting.craftedToast': 'Vyrobeno: {name}',
   'hudChrome.crafting.difficultyMinimal': 'Minimální zisk dovednosti',
   'hudChrome.crafting.empty': 'Zatím nejsou známy žádné recepty.',
@@ -4625,6 +4613,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.partyGroup': 'Skupina {n}',
   'hudChrome.unitFrame.partyLabel': 'Tvoje družina',
   'hudChrome.unitFrame.playerLabel': 'Tvůj hrdina',
+  'hudChrome.unitFrame.petLabel': 'Tvůj mazlíček',
   'hudChrome.unitFrame.targetAnnounce': 'Označit {name}',
   'hudChrome.unitFrame.targetLabel': 'Tvoje značka',
   'hudChrome.compass.E': 'V',
@@ -5683,6 +5672,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.items.crag_warden_cudgel.name': 'Kyj strážce útesů',
   'entities.items.craghorn_staff.name': 'Hůl útesorohů',
   'entities.items.cragmaw_huntcord.name': 'Lovecká šňůra Cragmawa',
+  'entities.items.cragmaw_huntquiver.name': 'Lovecký toulec Cragmawa',
   'entities.items.cragmaw_prowlboots.name': 'Plíživé boty Cragmawa',
   'entities.items.cragwalker_boots.name': 'Boty útesochodce',
   'entities.items.crimson_amber_armor_plate.name': 'Karmínový jantar',
@@ -5769,6 +5759,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.items.gravewoven_bag.name': 'Hrobově tkaná brašna',
   'entities.items.gravewoven_raiment.name': 'Hrobově tkaný oděv',
   'entities.items.gravewyrm_gauntlets.name': 'Rukavice Hrobodraka',
+  'entities.items.gravewyrm_bone_quiver.name': 'Kostěný toulec Hrobodraka',
   'entities.items.gravewyrm_mantle.name': 'Plášť Hrobodraka',
   'entities.items.gravewyrm_sabatons.name': 'Sabatony Hrobodraka',
   'entities.items.gravewyrm_scale_hauberk.name': 'Hauberk ze šupin Hrobodraka',
@@ -5842,6 +5833,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.items.mistveil_grips.name': 'Rukavice mlžného závoje',
   'entities.items.moggers_copper_cudgel.name': 'Moggerův měděný kyj',
   'entities.items.moggers_shiv.name': 'Moggerovo šídlo',
+  'entities.items.moggers_hide_quiver.name': 'Moggerův kožený toulec',
   'entities.items.moggers_stomper_boots.name': 'Moggerovy dupací boty',
   'entities.items.monarch_crown_helm.name': 'Koruna monarchy',
   'entities.items.moongate_rubbing.name': 'Opis ochranných run',
@@ -5955,6 +5947,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.items.stormcallers_spaulders.name': 'Nárameníky volání vichru',
   'entities.items.bonewrought_greatsword.name': 'Obouruční meč z kosti',
   'entities.items.direfang_greatblade.name': 'Velká čepel děsivého tesáku',
+  'entities.items.direfang_quiver.name': 'Toulec děsivého tesáku',
   'entities.items.bonewrought_bulwark.name': 'Hradba z kosti',
   'entities.items.wraithfire_orb.name': 'Koule přízračného ohně',
   'entities.items.stormcallers_waistguard.name': 'Pás volajícího bouři',
@@ -7840,26 +7833,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'guide.arenaPage.coliseumHeading': 'Popelavé koloseum',
   'guide.arenaPage.coliseumBody':
     'Koloseum je aréna světa, kde čelíš ostatním hráčům v hodnocených zápasech jeden na jednoho nebo dva na dva. Každý bracket má vlastní pořadí, takže výhra tě v jeho žebříku posune pro celý svět. Otevři okno Arény a přihlas se do bracketu, sám nebo se svým partnerem.',
-  'guide.arenaPage.fiestaHeading': 'Fiesta dva na dva',
-  'guide.arenaPage.fiestaBody':
-    'Fiesta je rychlá řež dva na dva hraná jako jeden souvislý souboj, kde jsou všichni bojovníci postaveni na stejnou startovní čáru. Jak boj běží, draftuješ augmenty, rychlá posílení, která za běhu přetvarují tvůj kit, takže žádné dva zápasy nehrají stejně.',
-  'guide.arenaPage.augmentsNote':
-    'Augmenty a power-upy trvají jen pro zápas. Jsou o hravých, okamžitých buildech, ne o trvalé síle, takže si nikdo nekoupí cestu k výhře.',
-  'guide.arenaPage.wavesTitle': 'Augmenty přicházejí ve vlnách',
-  'guide.arenaPage.wavesBody':
-    'Souboj Fiesty ti podává čerstvé volby, jak běží, a volby jsou s délkou boje odvážnější. Stavíš od jedné vlny k další, pokaždé vybíráš jednu z několika možností a necháváš si ji do konce souboje.',
-  'guide.arenaPage.waveSilverTitle': 'Stříbrná',
-  'guide.arenaPage.waveSilverBody':
-    'Úvodní vlna: čistá posílení jedné statistiky, která zostří základy třídy.',
-  'guide.arenaPage.waveGoldTitle': 'Zlatá',
-  'guide.arenaPage.waveGoldBody':
-    'Prostřední vlna: dvousečné kombinace, kde se build začíná tvarovat a zpívat.',
-  'guide.arenaPage.wavePrismaticTitle': 'Prizmatická',
-  'guide.arenaPage.wavePrismaticBody':
-    'Závěrečná vlna: build určující, obrazovku tavící špičky, které mají působit směšně tím nejlepším způsobem.',
-  'guide.arenaPage.powerupsTitle': 'Power-upy v ringu',
-  'guide.arenaPage.powerupsBody':
-    'Do arény během boje padají také zářící orby, volné pro toho, kdo k nim doběhne první. Záměrně přehánějí a trvají jen krátce: Rychlostní démon pro záblesk oslepujícího tempa, Kolos pro nabobtnání v těžkopádného obra, Měsíční boty pro skákavý skok s nízkou gravitací a Berserker pro náhlý příval zuřivosti.',
   'guide.arenaPage.ladderHeading': 'Stoupání po žebříku',
   'guide.arenaPage.ladderBody':
     'Hodnocené hraní sleduje tvoje postavení v čase. Podívej se na žebříček, kde sedíš a kdo drží vrchol světa.',
@@ -8206,9 +8179,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.items.sunpetal_herb.name': 'Sluncokvět',
   'entities.mobs.training_dummy.name': 'Cvičný panák',
   'entities.mobs.yumi_cat.name': 'Yumi',
-  'guide.arenaPage.yumiBody':
-    'Ochraňte Yumi je týmový objektivní režim, který se hraje v bludišti: každá strana hlídá svého vlastního kočičího společníka a zároveň loví toho druhého. Čas od času se obě kočky přenesou do nových koutů bludiště, takže se boj přelévá mezi obranou, lovem a závodem o to, kdo je najde dřív. Zařaď se do fronty jako tři na tři nebo pět na pět; pád v boji tě odstaví jen na okamžik.',
-  'guide.arenaPage.yumiHeading': 'Ochraňte Yumi',
   'hudChrome.archetypeTitle.hobbyLabel': 'Koníček',
   'hudChrome.auraEffect.armorPct': 'Snižuje brnění o {pct} %',
   'hudChrome.auraEffect.armorPctStacks': 'Snižuje brnění o {pct} % ({stacks} stacků)',
@@ -8218,7 +8188,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.increasePct.int': 'Zvyšuje Intelekt o {pct} %',
   'hudChrome.auraEffect.increasePct.sta': 'Zvyšuje Výdrž o {pct} %',
   'hudChrome.crafting.recipeNotLearned': 'Tento recept ses ještě nenaučil.',
-  'hudChrome.crafting.throttled': 'Vyrábíš příliš rychle. Chvíli počkej a zkus to znovu.',
   'hudChrome.mobile.chatPlaceholder': 'Něco napiš...',
   'hudChrome.mobile.hideKeyboard': 'Skrýt klávesnici',
   'hudChrome.unitFrame.partyChip': 'Skupina',
@@ -8228,7 +8197,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'yumi.bracket5': 'Yumi 5 na 5',
   'yumi.end.loss': 'PORÁŽKA! Tvoje Yumi padla.',
   'yumi.end.win': 'VÍTĚZSTVÍ! Yumi je v bezpečí!',
-  'yumi.enterQueue': 'Zapoj se do Ochraňte Yumi!',
   'yumi.error.partyTooBig3': 'Ochraňte Yumi 3 na 3 umožňuje skupinu až o třech členech.',
   'yumi.error.partyTooBig5': 'Ochraňte Yumi 5 na 5 umožňuje skupinu až o pěti členech.',
   'yumi.hud.aria': 'Tvoje Yumi má {mine} z {max} zdraví, nepřátelská Yumi {theirs}.',
@@ -9222,6 +9190,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.keybinds.petAttack': 'Mazlíček: Útok',
   'hudChrome.keybinds.petDefensive': 'Mazlíček: Obranný',
   'hudChrome.keybinds.petStop': 'Mazlíček: Zastavit',
+  'hudChrome.keybinds.targetPet': 'Mazlíček: Zacílit',
   'hudChrome.keybinds.petTaunt': 'Mazlíček: Provokace',
   'hudChrome.keybinds.mount': 'Nasednout / Sesednout',
   'hudChrome.readyCheck.notReady': 'Nepřipraven(a)',
@@ -10081,6 +10050,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hud.combat.evaded': '{target} uniká tvé schopnosti {ability}.',
   'hudChrome.options.mouseoverCast': 'Sesílání najetím myší na rámech skupiny',
   'hudChrome.options.showTargetOfTarget': 'Zobrazit cíl cíle',
+  'hudChrome.options.showPetFrame': 'Zobrazit tvého mazlíčka',
   'hudChrome.unitFrame.targetOfTargetLabel': 'Značka tvé značky',
   'itemUi.market.rarityLegendary': 'Legendární',
   'loading.reconnectingAttempt':
@@ -10747,13 +10717,9 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.disenchantConfirmBodySpecial':
     'Tímto se zvláštní kopie {item} (podepsaná, mistrovská nebo okouzlená) zničí a získáš arcanové materiály. Tuto akci nelze vrátit.',
   'hudChrome.enchanting.disenchantConfirmTitle': 'Rozzačarovat {item}?',
-  'hudChrome.enchanting.disenchantThrottled':
-    'Rozzačaruješ příliš rychle. Chvíli počkej a zkus to znovu.',
   'hudChrome.enchanting.disenchantedLine': 'Rozzačaruješ {item}.',
   'hudChrome.enchanting.enchantAppliedLine': 'Okouzlíš {item} pomocí {enchant}.',
   'hudChrome.enchanting.enchantInsufficient': 'Na toto okouzlení nemáš materiály.',
-  'hudChrome.enchanting.enchantThrottled':
-    'Okouzluješ příliš rychle. Chvíli počkej a zkus to znovu.',
   'hudChrome.enchanting.enchantUnknown': 'Toto okouzlení neexistuje.',
   'hudChrome.enchanting.enchantWrongSlot': 'Toto okouzlení nelze aplikovat na tento předmět.',
   'hudChrome.enchanting.noEnchants': 'Žádné okouzlení nepoužívá tuto reagencii.',
@@ -10767,8 +10733,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.salvageConfirmBodySpecial':
     'Tímto se zvláštní kopie {item} (podepsaná, mistrovská nebo okouzlená) zničí a získáš řemeslné materiály. Tuto akci nelze vrátit.',
   'hudChrome.enchanting.salvageConfirmTitle': 'Rozebrat {item}?',
-  'hudChrome.enchanting.salvageThrottled':
-    'Rozebíráš příliš rychle. Chvíli počkej a zkus to znovu.',
   'hudChrome.enchanting.salvagedLine': 'Rozebereš {item}.',
   'hudChrome.enchanting.targetTitle': 'Vybrat předmět',
   'hudChrome.unbind.cannotAfford': 'Na odpoutání nemáš dostatek prostředků.',

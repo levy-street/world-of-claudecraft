@@ -25,6 +25,7 @@
 import { YUMI_TEMPLATE_ID } from '../content/yumi';
 import { DUNGEON_X_THRESHOLD, MOBS, YUMI_MAZE_SLOT_COUNT, yumiMazeOrigin } from '../data';
 import { createMob } from '../entity';
+import { type MatchPetSnapshot, snapshotMatchPet } from '../pet/pet_match_return';
 import { Rng } from '../rng';
 import type { ArenaMatch, ArenaQueueUnit, ArenaReturnPools } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -111,11 +112,16 @@ export function pruneYumiQueue(ctx: SimContext, fmt: YumiFormat): void {
       // Also drop the unit if a member slipped into a Vale Cup match/queue
       // after joining here (arenaQueueJoin blocks this at entry, and so does
       // startValeCupPractice in the other direction; this mirrors the
-      // 1v1/2v2/fiesta prunes as defense in depth).
+      // 1v1/2v2/fiesta prunes as defense in depth). A Thornhollow Fields member
+      // is likewise never seated into a yumi maze mid-match (the cross-queue
+      // hole behind the stale-arenaMatches release bug): the band's x already
+      // fails the threshold test, and the explicit membership check keeps the
+      // rule true even if a match ever seats a fighter outside the band.
       return (
         !!e &&
         !e.dead &&
         !ctx.arenaMatches.has(id) &&
+        !ctx.bgMatches.has(id) &&
         e.pos.x <= DUNGEON_X_THRESHOLD &&
         !ctx.vcupSeatedOrQueued(id)
       );
@@ -198,8 +204,12 @@ export function startYumiMatch(
   const metas = allPids.map((pid) => ctx.players.get(pid));
   if (slot === null || entities.some((e) => !e) || metas.some((m) => !m)) {
     const queue = yumiQueue(ctx, format);
-    const okA = teamA.every((pid) => ctx.entities.get(pid) && !ctx.arenaMatches.has(pid));
-    const okB = teamB.every((pid) => ctx.entities.get(pid) && !ctx.arenaMatches.has(pid));
+    const okA = teamA.every(
+      (pid) => ctx.entities.get(pid) && !ctx.arenaMatches.has(pid) && !ctx.bgMatches.has(pid),
+    );
+    const okB = teamB.every(
+      (pid) => ctx.entities.get(pid) && !ctx.arenaMatches.has(pid) && !ctx.bgMatches.has(pid),
+    );
     if (okB) queue.unshift({ pids: teamB, rating: arenaMod.arenaTeamRating(ctx, teamB, '2v2') });
     if (okA) queue.unshift({ pids: teamA, rating: arenaMod.arenaTeamRating(ctx, teamA, '2v2') });
     return;
@@ -207,11 +217,16 @@ export function startYumiMatch(
   ctx.yumiBusySlots.add(slot);
   const returns = new Map<number, { x: number; z: number; facing: number }>();
   const preMatchPools = new Map<number, ArenaReturnPools>();
+  // The maze runs the shared arena return path, so it snapshots the fighter's
+  // living pet the same way: a familiar hunt must not cost a hunter their beast.
+  const preMatchPets = new Map<number, MatchPetSnapshot>();
   for (let i = 0; i < allPids.length; i++) {
     const e = entities[i];
     if (!e) throw new Error(`Yumi participant ${allPids[i]} is missing`);
     returns.set(allPids[i], { x: e.pos.x, z: e.pos.z, facing: e.facing });
     preMatchPools.set(allPids[i], arenaMod.snapshotArenaReturnPools(e));
+    const pet = snapshotMatchPet(ctx, allPids[i]);
+    if (pet) preMatchPets.set(allPids[i], pet);
   }
   const matchId = ctx.nextArenaMatchId++;
   const layout = yumiMazeLayout();
@@ -252,6 +267,7 @@ export function startYumiMatch(
     timer: YUMI_COUNTDOWN,
     returns,
     preMatchPools,
+    preMatchPets,
     ratingA: arenaMod.arenaTeamRating(ctx, teamA, '2v2'),
     ratingB: arenaMod.arenaTeamRating(ctx, teamB, '2v2'),
     defeated: new Set(),

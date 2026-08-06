@@ -143,11 +143,11 @@ describe('harbor ship attachment wiring', () => {
     expect(functionSource('resetHarborShipCues')).toContain('SHIP_CUES.resetAll();');
   });
 
-  it('discards handles and pending cues when the harbor world rebuilds', () => {
+  it('distinguishes live graphics cue preservation from a new-world reset', () => {
     // functionSource cannot walk buildHarbors (its return type carries braces),
     // so pin the rebuild discard directly on the module source.
     expect(HARBOR_SOURCE).toContain(
-      '// World rebuilds must discard cues recorded against the prior harbor handles.\n  SHIP_CUES.clear();',
+      'if (preserveLiveCues) SHIP_CUES.preserveForRebuild();\n  else SHIP_CUES.clear();',
     );
   });
 });

@@ -1,10 +1,12 @@
 // Delve Marks vendor (Brother Halven's shop): gate unlock logic + the
-// server-authoritative buy path (gate + balance re-validated in the Sim).
+// server-authoritative buy path (gate, door range, and balance re-validated
+// in the Sim).
 import { describe, expect, it } from 'vitest';
 import { bagCapacity } from '../src/sim/bags';
-import { DELVE_SHOPS, ITEMS } from '../src/sim/data';
+import { DELVE_SHOPS, DELVES, ITEMS } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import type { PlayerClass } from '../src/sim/types';
+import { terrainHeight } from '../src/sim/world';
 
 // autoEquip:false so a bought wearable stays in the bags where we can count it
 // (mirrors the chest-loot test in delves.test.ts).
@@ -13,6 +15,19 @@ const makeSim = (cls: PlayerClass = 'warrior', seed = 7) =>
 const metaOf = (sim: Sim) => (sim as any).players.get(sim.playerId);
 const countOf = (sim: Sim, id: string) =>
   sim.inventory.filter((s) => s.itemId === id).reduce((n, s) => n + s.count, 0);
+
+function teleport(sim: Sim, x: number, z: number) {
+  const p = sim.player;
+  p.pos.x = x;
+  p.pos.z = z;
+  p.pos.y = terrainHeight(x, z, sim.cfg.seed);
+  p.prevPos = { ...p.pos };
+}
+
+// Brother Halven's shop is gated to the delve door, like enter_delve; every
+// buying test below must stand the player there first.
+const reliquaryDoor = DELVES.collapsed_reliquary.doorPos;
+const teleportToReliquaryDoor = (sim: Sim) => teleport(sim, reliquaryDoor.x, reliquaryDoor.z);
 
 const shop = DELVE_SHOPS.collapsed_reliquary;
 const availableEntry = shop.find((e) => e.gate === 'available')!;
@@ -52,6 +67,7 @@ describe('delve shop, gate logic', () => {
 describe('delve shop, buying', () => {
   it('grants the item and debits Marks on a valid purchase', () => {
     const sim = makeSim();
+    teleportToReliquaryDoor(sim);
     metaOf(sim).delveMarks = 100;
     const before = countOf(sim, availableEntry.itemId);
     sim.delveBuyShopItem('collapsed_reliquary', availableEntry.itemId);
@@ -61,11 +77,25 @@ describe('delve shop, buying', () => {
 
   it('rejects when Marks are insufficient, no item, no debit', () => {
     const sim = makeSim();
+    teleportToReliquaryDoor(sim);
     metaOf(sim).delveMarks = availableEntry.marks - 1;
     const before = countOf(sim, availableEntry.itemId);
     sim.delveBuyShopItem('collapsed_reliquary', availableEntry.itemId);
     expect(countOf(sim, availableEntry.itemId)).toBe(before);
     expect(sim.delveMarks).toBe(availableEntry.marks - 1);
+  });
+
+  it('rejects a purchase made far from the delve door, no debit (defense-in-depth: the WS dispatch already geo-gates this, but the sim must refuse it too)', () => {
+    const sim = makeSim();
+    teleport(sim, reliquaryDoor.x + 200, reliquaryDoor.z + 200);
+    const meta = metaOf(sim);
+    meta.delveMarks = 100;
+    sim.drainEvents();
+    sim.delveBuyShopItem('collapsed_reliquary', availableEntry.itemId);
+    expect(countOf(sim, availableEntry.itemId)).toBe(0);
+    expect(sim.delveMarks, 'the Marks must survive the refusal').toBe(100);
+    const ev = sim.drainEvents();
+    expect(ev.some((e) => e.type === 'error' && e.text === 'Too far away.')).toBe(true);
   });
 
   it('rejects a full-bag purchase BEFORE the spend: no Marks debit, no overflow grant', () => {
@@ -74,6 +104,7 @@ describe('delve shop, buying', () => {
     // without the gate the purchase landed past capacity and the counter was
     // an overflow loophole.
     const sim = makeSim();
+    teleportToReliquaryDoor(sim);
     const meta = metaOf(sim);
     meta.delveMarks = 100;
     const capacity = bagCapacity(meta.bags);
@@ -97,6 +128,7 @@ describe('delve shop, buying', () => {
 
   it('rejects a locked clears:3 item until the clears requirement is met', () => {
     const sim = makeSim();
+    teleportToReliquaryDoor(sim);
     const meta = metaOf(sim);
     meta.delveMarks = 100;
     sim.delveBuyShopItem('collapsed_reliquary', clearsEntry.itemId);
@@ -111,6 +143,7 @@ describe('delve shop, buying', () => {
 
   it('rejects a Heroic-gated rare until a heroic clear is recorded', () => {
     const sim = makeSim();
+    teleportToReliquaryDoor(sim);
     const meta = metaOf(sim);
     meta.delveMarks = 100;
     sim.delveBuyShopItem('collapsed_reliquary', heroicEntry.itemId);
@@ -125,6 +158,7 @@ describe('delve shop, buying', () => {
 
   it('rejects an item that is not in the shop / wrong delve, no debit', () => {
     const sim = makeSim();
+    teleportToReliquaryDoor(sim);
     metaOf(sim).delveMarks = 100;
     sim.delveBuyShopItem('collapsed_reliquary', 'worn_sword');
     sim.delveBuyShopItem('no_such_delve', availableEntry.itemId);

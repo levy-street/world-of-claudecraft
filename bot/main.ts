@@ -27,6 +27,7 @@ import {
   type DailyActiveState,
   GUILD_LARGE_THRESHOLD,
   indexSpecialRoleIds,
+  interactionFailureFallback,
   isSlashCommand,
   type MemberMetaRecord,
   memberRolesFromPayload,
@@ -254,27 +255,53 @@ async function main(): Promise<void> {
     const user = (member.user ?? {}) as Record<string, unknown>;
     const userId = String(user.id ?? '');
 
-    // /link needs no server round-trip, so reply immediately (ephemeral).
-    if (name === 'link') {
-      await discord.respondInteraction(interactionId, token, {
-        content: buildLinkContent(cfg.gameUrl),
-        flags: 64, // ephemeral
-      });
-      return;
-    }
-    // /whoami hits the game server, which can be slow, so DEFER first (acks within
-    // Discord's 3s deadline) then edit the deferred reply.
-    await discord.deferInteraction(interactionId, token, true /* ephemeral */);
-    if (name === 'whoami') {
-      const roles = (await server.roles(userId)) ?? {
-        linked: false,
-        statusTier: 0,
-        points: 0,
-        lifetimePoints: 0,
-      };
-      await discord.editOriginalResponse(cfg.clientId, token, {
-        content: buildWhoamiContent(roles),
-      });
+    // `acknowledged` tracks whether the interaction's ONE allowed initial
+    // response has actually landed, so a failure below knows which of the two
+    // fallback shapes still reaches the player (interactionFailureFallback).
+    let acknowledged = false;
+    try {
+      // /link needs no server round-trip, so reply immediately (ephemeral).
+      if (name === 'link') {
+        await discord.respondInteraction(interactionId, token, {
+          content: buildLinkContent(cfg.gameUrl),
+          flags: 64, // ephemeral
+        });
+        return;
+      }
+      // /whoami hits the game server, which can be slow, so DEFER first (acks
+      // within Discord's 3s deadline) then edit the deferred reply.
+      await discord.deferInteraction(interactionId, token, true /* ephemeral */);
+      acknowledged = true;
+      if (name === 'whoami') {
+        const roles = (await server.roles(userId)) ?? {
+          linked: false,
+          statusTier: 0,
+          points: 0,
+          lifetimePoints: 0,
+        };
+        await discord.editOriginalResponse(cfg.clientId, token, {
+          content: buildWhoamiContent(roles),
+        });
+      }
+    } catch (e) {
+      console.error('[bot] interaction error', e);
+      // Best-effort: tell the player something broke rather than leaving
+      // Discord's "Bot is thinking..." placeholder (or a bare failure) up
+      // until Discord's own webhook-token timeout. A second failure here is
+      // only logged; there is no further fallback to reach for.
+      const fallback = interactionFailureFallback(acknowledged);
+      try {
+        if (fallback.via === 'respond') {
+          await discord.respondInteraction(interactionId, token, {
+            content: fallback.content,
+            flags: 64, // ephemeral
+          });
+        } else {
+          await discord.editOriginalResponse(cfg.clientId, token, { content: fallback.content });
+        }
+      } catch (e2) {
+        console.error('[bot] interaction fallback failed', e2);
+      }
     }
   };
 

@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { completeCraftCast } from './helpers/enchant_family_cast';
 
 // Mock the db layer so no Postgres is needed; snapshot logic is under test.
 vi.mock('../server/db', () => ({
@@ -3465,9 +3466,11 @@ const ALL_DELTA_KEYS = [
   'atitle',
   'bags',
   'bank',
+  'bg',
   'buyback',
   'cardDuel',
   'cds',
+  'corder',
   'corpse',
   'cosmetics',
   'cprof',
@@ -3545,6 +3548,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   buyback: 'vendorBuyback',
   bval: 'blockValue',
   cds: 'cooldowns',
+  corder: 'commissionOrders',
   cosmetics: 'accountCosmetics',
   cprof: 'craftingIdentity',
   dclears: 'delveClears',
@@ -3918,6 +3922,7 @@ describe('full self-state snapshot delta fixture', () => {
       session,
       JSON.stringify({ t: 'cmd', cmd: 'craft_item', recipe: recipe.id }),
     );
+    completeCraftCast(server.sim as never, session.pid);
     expect(server.sim.countItem(recipe.resultItemId, session.pid)).toBe(1);
   });
 
@@ -4056,6 +4061,7 @@ describe('full self-state snapshot delta fixture', () => {
     expect((client.tradeInfo as any)?.otherPid).toBe(memberPid); // trade -> tradeInfo
     expect((client.duelInfo as any)?.state).toBe('countdown'); // duel -> duelInfo
     expect(client.arenaInfo).not.toBeNull(); // arena -> arenaInfo
+    expect(client.bgInfo).not.toBeNull(); // bg -> bgInfo (queue/standing readout)
     expect(client.marketInfo).not.toBeNull(); // market -> marketInfo
     expect(client.marketCollectPending).toBe(true); // mktU -> marketCollectPending (truthy bit)
     expect(client.bankInfo).not.toBeNull(); // bank -> bankInfo
@@ -4351,9 +4357,11 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 64 unique keys in sorted order', () => {
-    expect(ALL_DELTA_KEYS).toHaveLength(64); // +1: guildBank (Guild Bank Phase 2)
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(64);
+  it('ALL_DELTA_KEYS contains exactly 66 unique keys in sorted order', () => {
+    // +1: guildBank (Guild Bank Phase 2), +1: the battleground bg key, +1: the
+    // commission order board's corder key (issue #1298).
+    expect(ALL_DELTA_KEYS).toHaveLength(66);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(66);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -4375,8 +4383,11 @@ describe('delta-key contract pins (anti-drift)', () => {
     // The base-merge union: v0.31's 56 (incl. the market-collect key mktU) plus
     // the Rift + mounts and worn-instance keys (einst, mntRtd and the rift
     // snapshot fragments) for 61, then v0.32's master-loot key mloot for 62,
-    // plus the packet's slotted-tool-effects key tslot for 63.
-    expect(scraped.size).toBe(64); // +1: guildBank (Guild Bank Phase 2)
+    // plus the packet's slotted-tool-effects key tslot for 63, the
+    // battleground's bg self key for 64, guildBank (Guild Bank Phase 2)
+    // for 65, and this branch's commission order board key corder
+    // (issue #1298) for 66.
+    expect(scraped.size).toBe(66);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

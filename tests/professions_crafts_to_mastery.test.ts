@@ -85,10 +85,9 @@
 // - The gathering-proficiency climb needed to work the later zones is not
 //   priced. The design record tracks that separately (gathering 100 in 8 to
 //   12 hours), and double-counting it here would conflate two targets.
-// - The craft throttle (CRAFT_THROTTLE_MAX_PER_WINDOW per window) is a rate
-//   cap on crafting, not a material cost: with materials in hand it adds
-//   about fifteen minutes to 150 crafts. Excluded so the total stays the
-//   gather figure the target is about.
+// - Craft cast duration paces crafting but is not a material cost; the
+//   gather figure below is materials-only so the total stays about the
+//   gather target.
 //
 // MEASURED, at the time of writing: 150 crafts to the 125 cap (the design
 // record's own figure, now derived rather than asserted), over four recipes

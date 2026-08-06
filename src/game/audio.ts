@@ -90,6 +90,12 @@ export const UI_CUES = {
     epic: 'ui_gather_epic',
     legendary: 'ui_gather_legendary',
   },
+  // Craft-family cast start (Craft Cast System Phase 6): one shared wind-up
+  // for craft, disenchant, apply-enchant, salvage, and tool recharge. Mirrors
+  // gatherCast / fishCast: personal feedback at castStart, distinct from the
+  // completion cues below. Procedural placeholder in scripts/sfx/ui_sfx.mjs
+  // until a custom recording lands.
+  craftCast: 'ui_craft_cast',
   // Crafting completion: one cue per CRAFT_RING craft family, keyed by the
   // recipe's professionId (src/sim/content/professions.ts).
   craftByFamily: {
@@ -162,8 +168,13 @@ export class GameAudio {
     sfx.init();
   }
 
-  private play(key: UiCue, opts?: { cooldown?: number }): void {
-    sfx.playUi(key, { jitter: false, cooldown: opts?.cooldown });
+  private play(key: UiCue, opts?: { cooldown?: number; rate?: number; gain?: number }): void {
+    sfx.playUi(key, {
+      jitter: false,
+      cooldown: opts?.cooldown,
+      rate: opts?.rate,
+      gain: opts?.gain,
+    });
   }
 
   /** Play a cue only when interface/feedback sounds are enabled. The notification
@@ -319,6 +330,23 @@ export class GameAudio {
     this.play(UI_CUES.fiestaRevive);
   }
 
+  // Thornhollow Fields flag moments want WEIGHT. No dedicated recordings yet (the SFX
+  // asset flow is a follow-up), so each layers two existing cues into one
+  // bigger hit: a WAR-HORN stack for a take (the challenge horn doubled with
+  // a deep detuned layer carrying the weight and the fight-starts hit on the
+  // front edge; the old down-sting layer read as a boop, owner note), and the
+  // fanfare over the fight-starts hit for a capture.
+  bgFlagTaken(): void {
+    this.play(UI_CUES.duelChallenge, { rate: 0.58 });
+    this.play(UI_CUES.duelChallenge, { rate: 0.87, gain: 0.7 });
+    this.play(UI_CUES.duelStart, { gain: 0.85 });
+  }
+
+  bgCapture(): void {
+    this.play(UI_CUES.achievement);
+    this.play(UI_CUES.duelStart);
+  }
+
   // Card Duel: live in-match feedback, same ungated category as the Fiesta
   // cues above (match win/lose reuse duelEnd()/arenaLoss() directly, no
   // dedicated methods needed for those).
@@ -367,6 +395,13 @@ export class GameAudio {
   // additional tiered stinger on top of the plain impact.
   gatherRareTier(tier: 'rare' | 'epic' | 'legendary'): void {
     this.playFeedback(UI_CUES.gatherRareTier[tier]);
+  }
+
+  // Craft-family cast start (craft / disenchant / apply-enchant / salvage /
+  // tool recharge). Feedback-gated like gatherCast; completion uses the
+  // family-specific cues below.
+  craftCast(): void {
+    this.playFeedback(UI_CUES.craftCast);
   }
 
   // recipeFamily is the recipe's professionId (a CRAFT_RING id); an unknown

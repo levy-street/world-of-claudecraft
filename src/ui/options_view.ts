@@ -538,6 +538,7 @@ export function buildInterfaceControls(s: OptionsSettingsSource): OptionsControl
       boolToggle(s, 'partyFrameShowSelf', 'hudChrome.partyFrames.showSelf'),
       boolToggle(s, 'aurasOnPlayerFrame', 'hudChrome.options.aurasOnPlayerFrame'),
       boolToggle(s, 'showTargetOfTarget', 'hudChrome.options.showTargetOfTarget'),
+      boolToggle(s, 'showPetFrame', 'hudChrome.options.showPetFrame'),
     ]),
     ...tag('chat', [
       slider(s, 'chatFontScale', 'hud.options.chatFontScale'),
@@ -546,6 +547,11 @@ export function buildInterfaceControls(s: OptionsSettingsSource): OptionsControl
     ]),
     ...tag('combat', [
       boolToggle(s, 'startAttackOnAbilityUse', 'hudChrome.options.startAttackOnAbility'),
+      boolToggle(
+        s,
+        'stopAutoAttackOnTargetSwitch',
+        'hudChrome.options.stopAutoAttackOnTargetSwitch',
+      ),
       boolToggle(s, 'showAttackButton', 'hudChrome.options.showAttackButton'),
       boolToggle(s, 'walkByAutoloot', 'hudChrome.options.walkByAutoloot'),
       boolToggle(s, 'groundReticle', 'hudChrome.options.groundReticle'),
@@ -558,6 +564,7 @@ export function buildInterfaceControls(s: OptionsSettingsSource): OptionsControl
       boolToggle(s, 'showThirdActionBar', 'hudChrome.options.showThirdActionBar', {
         disabled: !s.bool('showSecondaryActionBar'),
       }),
+      boolToggle(s, 'hideUnusedActionSlots', 'hudChrome.options.hideUnusedActionSlots'),
       boolToggle(s, 'lockActionBars', 'hudChrome.options.lockActionBars'),
     ]),
   ];

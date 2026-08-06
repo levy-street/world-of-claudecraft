@@ -27,6 +27,7 @@ import {
 } from '../src/sim/data';
 import { canEquipItem } from '../src/sim/equipment_rules';
 import { HARVEST_COMPONENT_ITEMS, NODE_MATERIAL_TABLE } from '../src/sim/professions/gathering';
+import { scenarioById } from '../src/sim/scenarios/registry';
 import { Sim } from '../src/sim/sim';
 import { ALL_CLASSES, MAX_LEVEL, XP_TABLE, type ZoneDef } from '../src/sim/types';
 import { terrainHeight, WATER_LEVEL } from '../src/sim/world';
@@ -209,6 +210,47 @@ describe('content referential integrity', () => {
     for (const d of DUNGEON_LIST) {
       for (const s of d.spawns) {
         if (!MOBS[s.mobId]) problems.push(`${d.id}: spawn ${s.mobId} missing`);
+      }
+    }
+    expect(problems).toEqual([]);
+  });
+
+  it('every kill-quest target mob actually spawns somewhere', () => {
+    // v0.34.0 shipped q_gc_scuttlers_in_the_pots (shoal_scuttler) and
+    // q_gc_wind_against_the_wick (gale_wisp) with kill targets that resolved
+    // fine in MOBS but had zero camp or dungeon spawn entry: unfinishable,
+    // and blocking the downstream Galecrest chain via requiresQuest. The
+    // "every quest reference resolves" test above only checks the mob id
+    // exists, never that anything spawns it, so this closes that gap.
+    // bound_guardian is a Nythraxis raid-encounter add spawned by the
+    // encounter script itself (src/sim/encounters/nythraxis.ts), not a
+    // world camp or a dungeon spawn list, so it is a documented exception.
+    const RAID_ENCOUNTER_SPAWNED = new Set(['bound_guardian']);
+    const spawning = new Set<string>();
+    for (const c of CAMPS) spawning.add(c.mobId);
+    for (const d of DUNGEON_LIST) for (const s of d.spawns) spawning.add(s.mobId);
+    // Last Bell's Tidemill boss is spawned by the story scenario rather than
+    // ambient world/dungeon tables. Read the registered scenario itself so a
+    // renamed or removed scripted spawn still fails this obtainability check.
+    const tidemill = scenarioById('sc_lb_q0_tidemill');
+    expect(tidemill).toBeTruthy();
+    for (const stage of tidemill?.stages ?? []) {
+      for (const spawn of stage.spawns ?? []) spawning.add(spawn.mobId);
+      for (const wave of stage.timedSpawns ?? []) {
+        for (const spawn of wave.spawns) spawning.add(spawn.mobId);
+      }
+    }
+    const problems: string[] = [];
+    for (const q of Object.values(QUESTS)) {
+      for (const obj of q.objectives) {
+        if (
+          obj.type === 'kill' &&
+          obj.targetMobId &&
+          !spawning.has(obj.targetMobId) &&
+          !RAID_ENCOUNTER_SPAWNED.has(obj.targetMobId)
+        ) {
+          problems.push(`${q.id}: kill target ${obj.targetMobId} has no camp/dungeon spawn source`);
+        }
       }
     }
     expect(problems).toEqual([]);

@@ -117,20 +117,30 @@ describe('the Glacier Tarn bowl is leavable on foot', () => {
     // start on the bench above the ramp top and walk down to the water
     const top = { x: r.bx - 4, z: r.bz };
     const { sim, p, meta } = makeWalker(top);
-    const startHp = p.hp;
     let airborneTicks = 0;
+    const fallDamage: number[] = [];
     for (let i = 0; i < 20 * 10; i++) {
       meta.moveInput.forward = true;
       p.facing = DOWN_THE_RAMP;
-      sim.tick();
+      // Heal through the Rime Elementals camped in the bowl, the idiom the sweep
+      // walkers above use: their swings land on the way down and must never be
+      // read as the terrain hurting the walker (nor stop him by killing him).
+      p.hp = p.maxHp;
+      (p as unknown as { dead: boolean }).dead = false;
+      for (const e of sim.tick()) {
+        if (e.type === 'damage' && e.targetId === p.id && e.ability === 'Falling') {
+          fallDamage.push(e.amount);
+        }
+      }
       if (!p.onGround) airborneTicks++;
     }
     meta.moveInput.forward = false;
     // a slope no steeper than the climb gate is snapped down, never fallen
     // off (player_motion maxStepDown), so the descent must never go airborne
     expect(airborneTicks, 'the descent must never enter free fall').toBe(0);
-    expect(p.hp, 'the descent must cost no health').toBe(startHp);
-    expect((p as unknown as { dead: boolean }).dead).toBe(false);
+    // and the drop must never be billed to the walker: 'Falling' is the label
+    // player_motion puts on the environmental fall hit it deals on landing
+    expect(fallDamage, 'the descent must cost no health').toEqual([]);
     // and it must actually arrive in the bowl, at the pond
     expect(isInWaterBody(p.pos.x, p.pos.z), `ended at (${p.pos.x}, ${p.pos.z})`).toBe(true);
     expect(p.pos.y, 'the walker must end down at the pond, not on the rim').toBeLessThan(

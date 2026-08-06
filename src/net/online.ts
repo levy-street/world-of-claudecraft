@@ -242,6 +242,8 @@ import {
 } from '../world_api/action_bar';
 import type {
   ApplyEnchantResultView,
+  CommissionOrderScope,
+  CommissionOrderView,
   DisenchantResultView,
   MasterworkView,
   SalvageResultView,
@@ -1325,6 +1327,7 @@ function blankEntity(id: number): Entity {
     warcryTimer: 0,
     petPath: [],
     petPathCooldown: 0,
+    petOwnerHpBonus: 0,
     castPushbackReduction: 0,
     knockbackResistance: 0,
     pos: { x: 0, y: 0, z: 0 },
@@ -1401,6 +1404,17 @@ function blankEntity(id: number): Entity {
     gatherCastNodeId: '',
     gatherCastToolRarity: '',
     gatherCastEffectConfirmed: false,
+    craftCastRecipeId: '',
+    craftCastCommission: false,
+    craftCastBatchRemaining: 0,
+    craftCastBatchTotal: 0,
+    enchantCastItemId: '',
+    enchantCastBagSlot: 0,
+    enchantCastEnchantId: '',
+    enchantCastEquipSlot: '',
+    enchantCastConfirmReplace: false,
+    enchantCastTargetPin: '',
+    toolRechargeCastProfessionId: '',
     fishBiteAtTick: 0,
     fishReelDeadlineTick: 0,
     fishCastZoneId: '',
@@ -1570,6 +1584,10 @@ export class ClientWorld implements IWorld {
   // arenaInfo.match.fiesta and its dynamics flow over the events queue. ---
   duelInfo: DuelInfo | null = null;
   arenaInfo: ArenaInfo | null = null;
+  // --- IWorldBattleground: Thornhollow Fields queue + live-match state, mirrored from
+  // the snapshot self (`s.bg`, delta-omitted); flag/score dynamics also ride
+  // the events queue for banners and the combat log. ---
+  bgInfo: import('../world_api').BgInfo | null = null;
   // --- IWorldDungeonFinder: group-finder state, mirrored from the snapshot
   // self (`s.df` personal blob + `s.dfb` shared board, both delta-omitted: a
   // missing key keeps the prior mirror, an explicit null clears it). ---
@@ -1791,6 +1809,10 @@ export class ClientWorld implements IWorld {
   // locally (net/ optimism rules), the delta lands after the server accepts
   // the specialization-gated command, and it flips back to null on expiry.
   activeMobileStationCraft: string | null = null;
+  // Commission order board (Professions 2.0, issue #1298), mirrored from the
+  // server's `corder` self-delta below: the viewer's own projection, small
+  // and diffed per tick like professionsState/craftingIdentity above.
+  commissionOrders: readonly CommissionOrderView[] = [];
   // Title granted by the active pair attunement (#1130, pair-named under
   // Professions 2.0): the canonical pair id, derived live from the cprof
   // mirror (applySnapshot replaces craftingIdentity wholesale on every cprof
@@ -1862,6 +1884,10 @@ export class ClientWorld implements IWorld {
   // mandatory snapshot frames. Independent of stable timer-wire negotiation.
   presentationTime = 0;
   private sceneInputLockedBeforeDrain = false;
+  // Last value passed to setStopAutoAttackOnTargetSwitch, re-pushed once the
+  // client is genuinely able to send commands again (see the hello handler):
+  // null means "never set this session", so nothing is re-sent on reconnect.
+  private lastStopAutoAttackOnTargetSwitch: boolean | null = null;
   private reconnectAttempts = 0;
   // consecutive 'character already in world' rejections during a reconnect;
   // see src/net/reconnect_policy.ts for why these are tolerated (bounded)
@@ -2422,6 +2448,13 @@ export class ClientWorld implements IWorld {
         this.onReconnected?.();
       }
       this.connected = true;
+      // onReconnected() above (and the join-time push in main.ts) can only
+      // queue session preferences before this point: canSendCommand() requires
+      // this.connected, so any cmd() sent from onReconnected is silently
+      // dropped (issue caught in review of #2723). Re-push the last-known
+      // value of every such preference here, now that sends genuinely reach
+      // the socket, rather than relying on callers to race this flag.
+      this.resendSessionPreferences();
       return;
     }
     if (msg.t === 'spectate') {
@@ -2443,6 +2476,10 @@ export class ClientWorld implements IWorld {
       } else if (typeof this.spectating !== 'string') {
         this.playerId = this.ownPlayerId;
         this.cfg.playerClass = this.ownPlayerClass;
+        // cmd() drops every non-chat command while spectating (see below), so
+        // a preference toggled mid-spectate never reached the server; now
+        // that spectate has ended, re-push it the same way a reconnect does.
+        this.resendSessionPreferences();
       }
       Object.assign(this.moveInput, emptyMoveInput());
       this.mouselookFacing = null;
@@ -3378,6 +3415,13 @@ export class ClientWorld implements IWorld {
             ticksElapsed: 0,
           }
         : null;
+      // Craft-cast session mirror (self-only `ccast`, the eat/drk shape): the
+      // crafting window reads the SAME entity fields offline and online, so
+      // the recipe highlight and batch counter survive a mid-cast window
+      // close/reopen and always show the server's clamped batch numbers.
+      e.craftCastRecipeId = s.ccast?.r ?? '';
+      e.craftCastBatchRemaining = s.ccast?.rem ?? 0;
+      e.craftCastBatchTotal = s.ccast?.tot ?? 0;
       // IWorldProgressionXp facet (W7) self-decode: xp/lxp/rxp/prk ride every
       // self-frame (?? 0); milestones is delta-guarded (omitted keeps the prior
       // mirror). Terse keys (lxp->lifetimeXp, rxp->restedXp, prk->prestigeRank,
@@ -3503,6 +3547,7 @@ export class ClientWorld implements IWorld {
       if (s.trade !== undefined) this.tradeInfo = s.trade;
       if (s.duel !== undefined) this.duelInfo = s.duel;
       if (s.arena !== undefined) this.arenaInfo = s.arena;
+      if (s.bg !== undefined) this.bgInfo = s.bg;
       if (s.df !== undefined) this.dungeonFinderInfo = s.df;
       if (s.dfb !== undefined) this.dungeonFinderBoard = s.dfb;
       if (s.cardDuel !== undefined) this.cardMinigameInfo = s.cardDuel;
@@ -3567,6 +3612,11 @@ export class ClientWorld implements IWorld {
       // mst -> activeMobileStationCraft: a nullable scalar, so the delta's
       // explicit null (station expired or never placed) must overwrite.
       if (s.mst !== undefined) this.activeMobileStationCraft = (s.mst as string | null) ?? null;
+      // Commission order board (issue #1298): server-diffed per tick like
+      // prof/cprof above, so this is how BOTH sides of an accept/deliver
+      // converge (not the commissionOrderResult event, which is deny-toast
+      // only).
+      if (s.corder !== undefined) this.commissionOrders = s.corder ?? [];
       // Enchanting-action outcome mirrors (Professions 2.0): the
       // convergence arm for lastDisenchantResult/lastEnchantResult/lastSalvageResult
       // (the event mirror above is the immediacy arm; both feed the same field).
@@ -3907,6 +3957,27 @@ export class ClientWorld implements IWorld {
     this.pendingTargetEcho = null; // server-resolved retarget, as tabTarget
     this.cmd({ cmd: 'tabFriendly' });
   }
+  setStopAutoAttackOnTargetSwitch(enabled: boolean): void {
+    this.lastStopAutoAttackOnTargetSwitch = enabled;
+    this.cmd({ cmd: 'stopAutoAttackOnTargetSwitch', enabled });
+  }
+
+  // Re-sends every session preference this class remembers, called once the
+  // client is actually able to send commands again: right after `connected`
+  // flips true on reconnect, and right after spectate ends. Both moments sit
+  // behind cmd()'s own guards (canSendCommand / the spectate drop), so this
+  // is a plain re-push through the normal setter, not a raw send.
+  private resendSessionPreferences(): void {
+    // typeof, not `!== null`: a bareClient built via Object.create(ClientWorld.prototype)
+    // (the pattern this suite's tests use) skips class field initializers entirely, so
+    // this field reads as undefined rather than its declared null default there.
+    if (typeof this.lastStopAutoAttackOnTargetSwitch === 'boolean') {
+      this.cmd({
+        cmd: 'stopAutoAttackOnTargetSwitch',
+        enabled: this.lastStopAutoAttackOnTargetSwitch,
+      });
+    }
+  }
 
   // --- IWorldTelemetry: fire-and-forget metrics sink ---
   reportTelemetry(kind: string, data: Record<string, number>): void {
@@ -4045,9 +4116,19 @@ export class ClientWorld implements IWorld {
   // opt-in, sent ONLY when true so a non-commission craft's wire message
   // stays byte-identical to the pre-phase form. The server mints the
   // bindOnTrade arm itself; no payload ever rides the command.
-  craftItem(recipeId: string, commission?: boolean): void {
-    if (commission === true) {
+  craftItem(recipeId: string, commission?: boolean, count?: number): void {
+    // Optional count (Phase 3): omit when default/1 so a single craft stays
+    // byte-identical to the pre-batch wire form. Server re-clamps.
+    const batchCount =
+      typeof count === 'number' && Number.isFinite(count) && Math.floor(count) !== 1
+        ? Math.floor(count)
+        : undefined;
+    if (commission === true && batchCount !== undefined) {
+      this.cmd({ cmd: 'craft_item', recipe: recipeId, commission: true, count: batchCount });
+    } else if (commission === true) {
       this.cmd({ cmd: 'craft_item', recipe: recipeId, commission: true });
+    } else if (batchCount !== undefined) {
+      this.cmd({ cmd: 'craft_item', recipe: recipeId, count: batchCount });
     } else {
       this.cmd({ cmd: 'craft_item', recipe: recipeId });
     }
@@ -4134,6 +4215,28 @@ export class ClientWorld implements IWorld {
   // self inv delta.
   unbindItem(itemId: string): void {
     this.cmd({ cmd: 'unbind_item', item: itemId });
+  }
+  // Commission order board (Professions 2.0, issue #1298): command only,
+  // never predicted. The server re-validates every field in
+  // src/sim/professions/commission_order.ts and answers with the personal
+  // commissionOrderResult event; the durable order list itself mirrors back
+  // via the corder self-delta (applySnapshot above), for every affected
+  // viewer, not just the caller.
+  openCommissionOrder(recipeId: string, scope: CommissionOrderScope, crafterName?: string): void {
+    if (scope === 'crafter') {
+      this.cmd({ cmd: 'open_commission_order', recipe: recipeId, scope, crafter: crafterName });
+    } else {
+      this.cmd({ cmd: 'open_commission_order', recipe: recipeId, scope });
+    }
+  }
+  cancelCommissionOrder(orderId: number): void {
+    this.cmd({ cmd: 'cancel_commission_order', order: orderId });
+  }
+  acceptCommissionOrder(orderId: number): void {
+    this.cmd({ cmd: 'accept_commission_order', order: orderId });
+  }
+  deliverCommissionOrder(orderId: number): void {
+    this.cmd({ cmd: 'deliver_commission_order', order: orderId });
   }
   sellItem(itemId: string, count?: number): void {
     this.cmd({ cmd: 'sell', item: itemId, count });
@@ -4517,6 +4620,17 @@ export class ClientWorld implements IWorld {
   }
   arenaAugmentPick(augmentId: string): void {
     this.cmd({ cmd: 'arena_augment', augment: augmentId });
+  }
+  // --- IWorldBattleground: Thornhollow Fields queue + flag-action sends (bgInfo is a
+  // snapshot read, decoded in applySnapshot). ---
+  bgQueueJoin(): void {
+    this.cmd({ cmd: 'bg_queue' });
+  }
+  bgQueueLeave(): void {
+    this.cmd({ cmd: 'bg_leave' });
+  }
+  bgFlagAction(): void {
+    this.cmd({ cmd: 'bg_flag' });
   }
   // --- IWorldDungeonFinder: group-finder sends (dungeonFinderInfo and
   // dungeonFinderBoard are snapshot reads, decoded in applySnapshot). ---

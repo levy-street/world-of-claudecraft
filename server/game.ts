@@ -19,12 +19,14 @@ import { SPORT_ROLES, VALE_CUP_BALL_TEMPLATE_ID, VC_NATION_IDS } from '../src/si
 import { withWeaponSkinApplied } from '../src/sim/content/weapon_skin_rules';
 import { isWeaponSkinType, WEAPON_SKINS } from '../src/sim/content/weapon_skins';
 import {
+  bgOriginAt,
   DELVES,
   DUNGEON_X_THRESHOLD,
   DUNGEONS,
   delveAt,
   dungeonAt,
   ITEMS,
+  isBgPos,
   isDelvePos,
   MOBS,
   ZONES,
@@ -66,6 +68,7 @@ import { questProgressForWire } from '../src/sim/quests/interact_object_credit';
 import { loadRiftWorldState, serializeRiftWorldState } from '../src/sim/rift/persistence';
 import type { CharacterState, PetState, PlayerMeta } from '../src/sim/sim';
 import { MAX_CHAT_MESSAGE_LEN, Sim } from '../src/sim/sim';
+import { drainBgOutcomes } from '../src/sim/social/battleground_outcomes';
 import { RAID_MAX } from '../src/sim/social/party';
 import type { VcMatch } from '../src/sim/social/vale_cup';
 import {
@@ -99,6 +102,7 @@ import { isAtSowfield } from '../src/sim/vale_cup_layout';
 import { WORLD_SEED } from '../src/sim/world_seed';
 import {
   type BankBonusSource,
+  type BgLadderEntry,
   COMMAND_NAMES,
   type CommandName,
   type DungeonFinderBoard,
@@ -122,6 +126,7 @@ import {
   recordGuildBankDeltas,
   recordGuildBankEscrowRollback,
 } from './bank_ledger';
+import { reportBgOutcomes } from './battleground_telemetry';
 import type {
   BotDetector,
   BotTrackingContext,
@@ -310,8 +315,26 @@ export const INTEREST_DROP_RADIUS = 100;
 // radius; once known they cost a handful of bytes per snapshot anyway.
 const NPC_INTEREST_RADIUS = 120;
 const NPC_DROP_RADIUS = 130;
-// the widest radius any entity kind can be relevant at
+// the widest OPEN-WORLD radius any entity kind can be relevant at (the
+// battleground band widens past this: BG_MATCH_DROP_RADIUS below)
 const INTEREST_QUERY_RADIUS = NPC_DROP_RADIUS;
+// Thornhollow Fields: the 100x280 field (diagonal ~297yd) fits inside this
+// raised radius, so a fighter's OWN SIDE and the field's furniture stay
+// tracked across the whole field. It is deliberately NOT a blanket same-slot
+// widening (see bgWideInterestApplies): it applies to
+//   (a) SAME-TEAM player pairs of one match, which the M map plots as teammate
+//       positions and the party frames read, and
+//   (b) the slot's non-player entities (flags, runes, props), which both sides
+//       are meant to track.
+// An ENEMY player falls back to the open-world radii above, so their position,
+// facing, health, resource, cast bar and auras are never SHIPPED past normal
+// interest. Hiding enemies is the server's job here, not the client's: fog is
+// presentation, and a client that ignores it must learn nothing extra.
+// Same-slot only in every arm: slot spacing (BG_SLOT_SPACING in
+// src/sim/data.ts) puts cross-slot pairs beyond BG_MATCH_DROP_RADIUS, pinned by
+// the cross-slot corner check in tests/battleground_band.test.ts.
+export const BG_MATCH_INTEREST_RADIUS = 300;
+export const BG_MATCH_DROP_RADIUS = 320;
 // Distance-tiered update rates: full snapshot rate inside nameplate range
 // (55yd, beyond every ability range), half rate out to the 80yd draw range,
 // quarter rate beyond. The viewer's target and anything attacking the
@@ -440,6 +463,7 @@ export const SIM_LAP_PHASES = [
   'instances',
   'delves',
   'valecup',
+  'battleground',
   'dfinder',
   'market',
   'postOffice',
@@ -481,6 +505,31 @@ export function mobZonePhase(mob: Entity): string {
 
 const ARENA_WIRE_HZ = 0.1;
 const ARENA_WIRE_INTERVAL_TICKS = Math.max(1, Math.round(1 / (DT * ARENA_WIRE_HZ)));
+// Thornhollow Fields `bg` self key: 1 Hz covers the in-match clocks (wave respawn,
+// match cap, carrier vulnerability) that tick by whole seconds; queue and match
+// transitions force a fresh readout via lastBgWireTick resets (the arena
+// staleness fix), and the flag/score events ride the event queue instantly.
+const BG_WIRE_HZ = 1;
+const BG_WIRE_INTERVAL_TICKS = Math.max(1, Math.round(1 / (DT * BG_WIRE_HZ)));
+// Personal battleground events that change the throttled `bg` readout the
+// moment they land (found/start/flag plays/result/queue churn).
+const BG_WIRE_RESET_EVENTS = new Set([
+  'bgQueued',
+  'bgUnqueued',
+  'bgFound',
+  'bgStart',
+  'bgFlag',
+  'bgKill', // the board tallies moved: refresh them with the feed line
+  'bgEnd',
+]);
+// A respawn is NOT in that set: the sim emits it pid-scoped for the RESPAWNER
+// only, while the readout it invalidates (the match-wide `dead` column) is read
+// by every member. A per-recipient reset would leave the other nine scoreboards
+// showing bodies for up to one BG_WIRE_HZ period, which the offline host, which
+// recomputes the view every frame, never does. So a respawn fans out to the
+// whole match instead (bgRespawnRefreshPids), the shape the bgKill events
+// already have because the sim emits one copy per member.
+const BG_RESPAWN_EVENT = 'respawn';
 // Vale Cup readout cadence: the CupInfo payload carries whole-second clocks and
 // queue sizes, so 2 Hz keeps the window/indicator live without re-serializing
 // the rosters at 20 Hz. Instant transitions ride the pid-scoped vcup* events.
@@ -614,6 +663,7 @@ const LANE_DROP_CAUSE = {
 } as const satisfies Record<MsgLane, WsDropCause>;
 const JAILED_BLOCKED_COMMANDS = new Set<string>([
   'arena_queue',
+  'bg_queue',
   'vcup_queue',
   'vcup_ready',
   'vcup_practice',
@@ -629,7 +679,10 @@ const HEAVY_SELF_CMDS = new Set<string>([
   'equip',
   'inv_move', // rewrites the inventory array order: the self snapshot must resend it
   'unequip_item',
-  'salvage_item',
+  // salvage_item is deliberately ABSENT since the Craft Cast System: the
+  // command only starts a cast (nothing mutates on receipt), and the
+  // complete-time loot event is a HEAVY_SELF_EVENTS member, so listing it
+  // here would buy a wasted heavy re-serialize per cast start.
   'rift_upgrade_item',
   'rift_enchant_item',
   'rift_socket_gem',
@@ -730,6 +783,13 @@ const HEAVY_SELF_EVENTS = new Set<string>([
   // offer an enchant the player can no longer afford. The bagged arm's loot
   // event already covered it; this makes both arms explicit.
   'enchantResult',
+  // Commission order board delivery (issue #1298): the crafter's arm
+  // removes the delivered copy directly from PlayerMeta.inventory (no
+  // addItem/removeItem call, so no loot event fires on that side), so the
+  // result event itself must re-diff the crafter's heavy self keys or their
+  // inv mirror goes stale until the staggered refresh. The requester's side
+  // already gets a loot event from the ordinary addItemInstance grant.
+  'commissionOrderResult',
 ]);
 
 // How often to re-broadcast online players' $WOC holder-tier flair. Each wallet
@@ -843,6 +903,8 @@ export interface ClientSession {
   timerWireCache: StableSelfTimerWireCache;
   // arena readout is reconciled at UI cadence instead of snapshot cadence
   lastArenaWireTick: number;
+  // Thornhollow Fields battleground readout, same idea at its own cadence (BG_WIRE_HZ)
+  lastBgWireTick: number;
   // Dungeon Finder readout, same idea at its own cadence (DF_WIRE_HZ)
   lastDfWireTick: number;
   // set when a command or sim event that can change a heavy self field (bags,
@@ -1339,6 +1401,32 @@ function isStealthed(e: Entity): boolean {
   return e.stealthed; // cached in the sim's updateAuras; see Entity.stealthed
 }
 
+// Both endpoints inside the SAME battleground slot: the necessary condition for
+// the raised match-wide interest (never across slots, never to the open world).
+function inSameBgSlot(a: Entity, b: Entity): boolean {
+  if (!isBgPos(a.pos.x) || !isBgPos(b.pos.x)) return false;
+  return bgOriginAt(a.pos.z).slot === bgOriginAt(b.pos.z).slot;
+}
+
+// The raised battleground interest, narrowed to what the mode actually needs a
+// client to hold (see BG_MATCH_INTEREST_RADIUS): a same-slot TEAMMATE, or a
+// same-slot non-player entity (flag, rune, prop). `viewerBgTeam` is the pid
+// list of the viewer's own team, or null when the viewer is not in a match.
+// An enemy player, and anything an enemy owns, returns false and falls back to
+// the open-world radii in interestLimitSq.
+function bgWideInterestApplies(
+  viewer: Entity,
+  e: Entity,
+  viewerBgTeam: readonly number[] | null,
+): boolean {
+  if (!inSameBgSlot(viewer, e)) return false;
+  // A summoned mob (pet, guardian, totem) inherits its OWNER's arm: an enemy's
+  // pet trails the enemy, so widening it would leak the same position by proxy.
+  const subjectId = e.kind === 'player' ? e.id : e.ownerId;
+  if (subjectId === null) return true; // flags, runes, props, npcs, wild mobs
+  return viewerBgTeam !== null && viewerBgTeam.includes(subjectId);
+}
+
 // full rate close up and for anything the viewer is fighting; mid range
 // updates every other tick, far entities every fourth. Measured against
 // the per-session last-sent tick rather than a tick-parity stagger: when
@@ -1574,6 +1662,14 @@ export class GameServer {
   // above there is no realm-global dueness tracker: each session keeps its own
   // lastDfWireTick gate, and the memo only collapses same-tick evaluations.
   private readonly dfBoardReadout = createRealmReadoutMemo<DungeonFinderBoard>();
+  // Live Thornhollow Fields online ladder, the memo's third tenant. It rides
+  // INSIDE each viewer's own `bg` key (so no shared JSON fragment of its own,
+  // hence realmReadoutObject and never realmReadoutJson), but the ROWS are
+  // viewer-identical and scanning every online player once per session per
+  // BG_WIRE_HZ tick is exactly the uncached viewer-identical read the hot-path
+  // rules call a defect. Built once per broadcast pass and handed to every
+  // bgInfoFor call in that pass instead.
+  private readonly bgLadderReadout = createRealmReadoutMemo<BgLadderEntry[]>();
   // When the realm-wide Vale Cup readout is next due, tracked realm-global (not
   // per session) so every viewer still gates together in one pass and the memo
   // above builds once. `>=` against this, never `tickCount % interval`:
@@ -2019,9 +2115,18 @@ export class GameServer {
     // JAILED_BLOCKED_COMMANDS). A live Vale Cup match resolves as a desertion,
     // same as leave(); idempotent when they are in neither.
     this.sim.arenaQueueLeave(target.pid);
+    // A live arena/fiesta match resolves as a desertion too: leaving the
+    // arenaMatches entry behind silently gated releaseSpirit for the rest of
+    // the mode's duration (and let the arena timeout teleport a prisoner).
+    this.sim.arenaResolveDesertion(target.pid);
     this.sim.vcupQueueLeave(target.pid);
     this.sim.vcupResolveDesertion(target.pid);
     this.sim.leaveCardMinigameEntirely(target.pid);
+    // Thornhollow Fields: leave the queue and desert any live match (the deserter takes
+    // the rating loss; the team fights on) so the jail sweep never fights the
+    // battleground for control of the prisoner's entity.
+    this.sim.bgQueueLeave(target.pid);
+    this.sim.bgResolveDesertion(target.pid);
     this.teleportJailedSession(target);
     // System notice (chat log), not the fading error toast: the prisoner must be
     // able to read the sentence after alt-tabbing back, like other moderation
@@ -2487,6 +2592,7 @@ export class GameServer {
               scan.threatEntryVisits,
               this.perfCaptureDeadlineNs !== null,
             );
+            this.recordBattlegroundOutcomes();
             this.enforceJailStates();
             this.routeEvents(events);
             this.detectActivity(events);
@@ -2566,6 +2672,20 @@ export class GameServer {
       void this.saveRifts();
       void heartbeatCharacterLeases().catch((err) => console.error('lease heartbeat failed:', err));
     }
+  }
+
+  /**
+   * Drain this tick's resolved rated Thornhollow Fields matches onto the
+   * /metrics counters (server/battleground_telemetry.ts).
+   *
+   * Off the sim's own drained record rather than the `bgEnd` events, and that is
+   * the load-bearing choice: `bgEnd` is PERSONAL (one copy per fighter), so a
+   * counter driven from the event stream would book every match ten times and
+   * quietly overstate every rate built on it. The sim writes exactly one record
+   * per resolve, and only for a rated match.
+   */
+  private recordBattlegroundOutcomes(): void {
+    reportBgOutcomes(drainBgOutcomes(this.sim.bgOutcomes), gameMetricsCounters());
   }
 
   private enforceJailStates(): void {
@@ -3365,6 +3485,7 @@ export class GameServer {
         meta.timerWireVersion === STABLE_TIMER_WIRE_VERSION ? STABLE_TIMER_WIRE_VERSION : 1,
       timerWireCache: new StableSelfTimerWireCache(),
       lastArenaWireTick: -ARENA_WIRE_INTERVAL_TICKS,
+      lastBgWireTick: -BG_WIRE_INTERVAL_TICKS,
       lastDfWireTick: -DF_WIRE_INTERVAL_TICKS,
       selfHeavyDirty: true,
       lastWireRev: -1,
@@ -3712,6 +3833,10 @@ export class GameServer {
     // Card Duel: drop the queue slot and forfeit any live match on disconnect,
     // same idempotent-before-persistence shape as the two lines above.
     this.sim.leaveCardMinigameEntirely(session.pid);
+    // Thornhollow Fields desertion also resolves before the leave save so the leaver's
+    // recorded loss and rating delta are in the persisted state (idempotent;
+    // removePlayer repeats it harmlessly).
+    this.sim.bgResolveDesertion(session.pid);
     // Freeze reward eligibility and reconcile pending loot before the leave
     // snapshot. saveCharacterOnLeave awaits the database; without this
     // synchronous prefix, a roll or boss death can mutate the character after
@@ -5994,6 +6119,9 @@ export class GameServer {
       case 'targetNearestFriendly':
         sim.targetNearestFriendly(pid);
         break;
+      case 'stopAutoAttackOnTargetSwitch':
+        sim.setStopAutoAttackOnTargetSwitch(!!msg.enabled, pid);
+        break;
       case 'attack':
         sim.startAutoAttack(pid);
         break;
@@ -6182,7 +6310,13 @@ export class GameServer {
         // check (the dispatch type-guard rule); anything else reads as false.
         // The sim honors it only for eligible equipment outputs and mints the
         // bindOnTrade arm itself, so nothing here trusts client data.
-        if (typeof msg.recipe === 'string') sim.craftItem(msg.recipe, msg.commission === true, pid);
+        // Phase 3 optional `count`: finite numbers only; sim clamps to batch
+        // max and mats-fit (default 1 when omitted or non-numeric).
+        if (typeof msg.recipe === 'string') {
+          const count =
+            typeof msg.count === 'number' && Number.isFinite(msg.count) ? Math.floor(msg.count) : 1;
+          sim.craftItem(msg.recipe, msg.commission === true, pid, count);
+        }
         break;
       // Enchanting profession commands (Professions 2.0): the sim
       // resolvers re-validate ownership/eligibility/throttle (nothing trusted
@@ -6236,6 +6370,34 @@ export class GameServer {
         // member so the cleared payload and the fee debit re-diff the self
         // inv/purse mirrors on the next snapshot.
         if (typeof msg.item === 'string') sim.unbindItem(msg.item, pid);
+        break;
+      // Commission order board (Professions 2.0, issue #1298): the sim
+      // resolvers re-validate every field (recipe/eligibility/scope/state/
+      // range/space, nothing trusted from the client); the outcome reaches
+      // this client as the pid-scoped text-free commissionOrderResult event,
+      // a HEAVY_SELF_EVENTS member so a delivery's bag change re-diffs the
+      // crafter's own inv mirror on the next snapshot (the requester's side
+      // rides the ordinary addItemInstance loot event). The durable order
+      // list itself converges through the per-tick `corder` self-delta for
+      // every affected viewer, not through this event.
+      case 'open_commission_order':
+        if (typeof msg.recipe === 'string' && (msg.scope === 'open' || msg.scope === 'crafter')) {
+          sim.openCommissionOrder(
+            msg.recipe,
+            msg.scope,
+            typeof msg.crafter === 'string' ? msg.crafter : undefined,
+            pid,
+          );
+        }
+        break;
+      case 'cancel_commission_order':
+        if (typeof msg.order === 'number') sim.cancelCommissionOrder(msg.order, pid);
+        break;
+      case 'accept_commission_order':
+        if (typeof msg.order === 'number') sim.acceptCommissionOrder(msg.order, pid);
+        break;
+      case 'deliver_commission_order':
+        if (typeof msg.order === 'number') sim.deliverCommissionOrder(msg.order, pid);
         break;
       case 'rift_upgrade_item':
         if (typeof msg.item === 'string') sim.upgradeRiftItem(msg.item, pid);
@@ -6858,6 +7020,26 @@ export class GameServer {
       case 'arena_augment': {
         if (typeof msg.augment === 'string' && msg.augment.length <= 64)
           sim.arenaAugmentPick(msg.augment, pid);
+        break;
+      }
+
+      // Thornhollow Fields (5v5 capture-the-flag). The sim owns every rule; the resets
+      // surface the changed queue/match state on the next snapshot instead of
+      // the throttled BG_WIRE_HZ tick (the arena staleness fix).
+      case 'bg_queue':
+        sim.bgQueueJoin(pid);
+        session.lastBgWireTick = -BG_WIRE_INTERVAL_TICKS;
+        break;
+      case 'bg_leave':
+        sim.bgQueueLeave(pid);
+        session.lastBgWireTick = -BG_WIRE_INTERVAL_TICKS;
+        break;
+      case 'bg_flag':
+        sim.bgFlagAction(pid);
+        session.lastBgWireTick = -BG_WIRE_INTERVAL_TICKS;
+        break;
+      case 'dev_bg_start': {
+        if (process.env.ALLOW_DEV_COMMANDS === '1') sim.devStartBg();
         break;
       }
 
@@ -7588,9 +7770,18 @@ export class GameServer {
     // cutoff. Timed into bcastGridNs (the shared build once), the same counter
     // that brackets the per-session lookup+filter work below.
     const sharedStart = this.perfDetailActive ? process.hrtime.bigint() : 0n;
-    const candidates = buildSharedInterestCandidates(this.sim.grid, anchors, INTEREST_QUERY_RADIUS);
+    const candidates = buildSharedInterestCandidates(
+      this.sim.grid,
+      anchors,
+      INTEREST_QUERY_RADIUS,
+      {
+        radius: BG_MATCH_DROP_RADIUS,
+        covers: isBgPos,
+      },
+    );
     if (this.perfDetailActive) this.bcastGridNs += process.hrtime.bigint() - sharedStart;
     const queryLimitSq = INTEREST_QUERY_RADIUS * INTEREST_QUERY_RADIUS;
+    const bgQueryLimitSq = BG_MATCH_DROP_RADIUS * BG_MATCH_DROP_RADIUS;
 
     // Build each session's snapshot from its shared candidate list, still guarded
     // per session so one throw cannot starve the rest.
@@ -7600,6 +7791,10 @@ export class GameServer {
         const ents: string[] = [];
         const keep: number[] = [];
         const present = new Set<number>();
+        // Resolved ONCE per viewer per pass (a map lookup, no allocation): the
+        // pid list of this viewer's own battleground team, which decides who
+        // rides the raised match radius below.
+        const bgTeam = this.bgTeamPidsFor(anchorEntity);
         const gridStart = this.perfDetailActive ? process.hrtime.bigint() : 0n;
         for (const e of candidates.forSession(session.pid)) {
           // Re-apply the exact viewer-relative cutoff the single grid query used
@@ -7610,10 +7805,11 @@ export class GameServer {
           const dx = e.pos.x - anchorEntity.pos.x;
           const dz = e.pos.z - anchorEntity.pos.z;
           const d2 = dx * dx + dz * dz;
-          if (d2 > queryLimitSq) continue;
-          // bcVisits counts the exact per-viewer in-range set (self included),
-          // byte-identical to the old scan: increment only AFTER the exact-d2
-          // cutoff, never on the padded per-cell candidate list.
+          if (d2 > (isBgPos(anchorEntity.pos.x) ? bgQueryLimitSq : queryLimitSq)) continue;
+          // bcVisits counts the exact per-viewer in-range set (self included):
+          // increment only AFTER the exact-d2 cutoff, never on the padded
+          // per-cell candidate list. Band viewers use the wider battleground
+          // cutoff, so their counts are larger than an open-world viewer's.
           if (this.perfDetailActive) this.bcVisits++;
           if (e.id === anchorEntity.id) continue;
           if (!this.canObserveEntity(anchorEntity, e, d2)) continue;
@@ -7623,7 +7819,11 @@ export class GameServer {
           const limitSq =
             anchorEntity.targetId === e.id
               ? NPC_DROP_RADIUS * NPC_DROP_RADIUS
-              : interestLimitSq(e, known !== undefined);
+              : bgWideInterestApplies(anchorEntity, e, bgTeam)
+                ? known !== undefined
+                  ? BG_MATCH_DROP_RADIUS * BG_MATCH_DROP_RADIUS
+                  : BG_MATCH_INTEREST_RADIUS * BG_MATCH_INTEREST_RADIUS
+                : interestLimitSq(e, known !== undefined);
           if (d2 > limitSq) continue;
           present.add(e.id);
           const cache = this.wireCacheFor(e, stableTimerWire);
@@ -7681,11 +7881,18 @@ export class GameServer {
         );
         if (this.perfDetailActive) this.bcastSelfNs += process.hrtime.bigint() - selfStart;
         const keepJson = keep.length > 0 ? `,"keep":[${keep.join(',')}]` : '';
+        // Ground-AoE warnings (frost rings, temporal hourglasses) are anonymous
+        // ground effects, not entities: they carry a position, radius and timer
+        // and no caster identity or team, and a player must be able to react to
+        // one wherever it lands. They therefore keep the widened match horizon
+        // inside the band, unlike the enemy PLAYERS above, whose records the
+        // narrowed rule holds to the open-world radii.
+        const aoeBase = isBgPos(anchorEntity.pos.x) ? BG_MATCH_DROP_RADIUS : INTEREST_QUERY_RADIUS;
         const frostRings = activeFrostRings
           .filter((ring) => {
             const dx = ring.x - anchorEntity.pos.x;
             const dz = ring.z - anchorEntity.pos.z;
-            const limit = INTEREST_QUERY_RADIUS + ring.radius;
+            const limit = aoeBase + ring.radius;
             return dx * dx + dz * dz <= limit * limit;
           })
           .map(
@@ -7697,7 +7904,7 @@ export class GameServer {
           .filter((hourglass) => {
             const dx = hourglass.x - anchorEntity.pos.x;
             const dz = hourglass.z - anchorEntity.pos.z;
-            const limit = INTEREST_QUERY_RADIUS + hourglass.radius;
+            const limit = aoeBase + hourglass.radius;
             return dx * dx + dz * dz <= limit * limit;
           })
           .map(
@@ -7723,6 +7930,16 @@ export class GameServer {
       this.lastWireSweepTick = tick;
       this.sweepWireCache();
     }
+  }
+
+  // The pid list of the viewer's OWN battleground team, or null when the viewer
+  // is not a player in a live match. Returns the sim's own array by reference:
+  // read-only here, and this runs once per viewer per broadcast pass.
+  private bgTeamPidsFor(viewer: Entity): readonly number[] | null {
+    if (viewer.kind !== 'player' || !isBgPos(viewer.pos.x)) return null;
+    const match = this.sim.bgMatchFor(viewer.id);
+    if (!match) return null;
+    return match.teams[1].includes(viewer.id) ? match.teams[1] : match.teams[0];
   }
 
   private canObserveEntity(viewer: Entity, e: Entity, d2: number): boolean {
@@ -7877,6 +8094,17 @@ export class GameServer {
       hirat: p.hitRating,
       eat: p.eating ? { remaining: round2(p.eating.remaining) } : null,
       drk: p.drinking ? { remaining: round2(p.drinking.remaining) } : null,
+      // Craft-cast session mirror (self-only, the eat/drk shape): the crafting
+      // window's recipe highlight and batch counter read these authoritatively
+      // online instead of click-time guesses, so the server's batch clamp and
+      // a mid-cast window close/reopen both stay truthful. Null at rest.
+      ccast: p.craftCastRecipeId
+        ? {
+            r: p.craftCastRecipeId,
+            rem: p.craftCastBatchRemaining,
+            tot: p.craftCastBatchTotal,
+          }
+        : null,
       opUntil: p.overpowerUntil > this.sim.time ? 1 : 0,
       opRem: round2(Math.max(0, p.overpowerUntil - this.sim.time)),
       ack: session.spectating ? 0 : anchorSession.lastInputSeq,
@@ -8037,6 +8265,19 @@ export class GameServer {
       session.lastArenaWireTick = this.sim.tickCount;
       maybe('arena', this.sim.arenaInfoFor(anchorSession.pid));
     }
+    // Thornhollow Fields readout at its own UI cadence (BG_WIRE_HZ). The viewer-identical
+    // match core is memoized per tick inside the sim (sharedMatchView), so ten
+    // in-match viewers share one build; only the per-viewer scalars differ.
+    if (this.sim.tickCount - session.lastBgWireTick >= BG_WIRE_INTERVAL_TICKS) {
+      session.lastBgWireTick = this.sim.tickCount;
+      // The live online ladder inside that readout is realm-wide and identical
+      // for every viewer, so it is built once per broadcast pass through the
+      // realm-readout memo and reused (the dfb/vcupb precedent).
+      const ladder = realmReadoutObject(this.bgLadderReadout, this.sim.tickCount, () =>
+        this.sim.bgLadder(),
+      );
+      maybe('bg', this.sim.bgInfoFor(anchorSession.pid, ladder));
+    }
     // Vale Cup readout at its own UI cadence (VC_WIRE_HZ). Dueness (`vcupDue`) is
     // decided once per broadcast pass in broadcastSnapshots and realm-global, so the
     // shared bundle is built once per due pass rather than on each session's own
@@ -8169,6 +8410,11 @@ export class GameServer {
     // naturally flips to null the tick a station lapses and the client never
     // reasons about tick domains. Small scalar, diffed per tick like atitle.
     maybe('mst', this.sim.activeMobileStationCraftFor(anchorSession.pid));
+    // Commission order board (issue #1298): the viewer's own projection
+    // (their requests, any order they accepted, and the open board), small
+    // and diffed per tick like `prof`/`cprof` above; this is how BOTH sides
+    // of an accept/deliver converge, not the commissionOrderResult event.
+    maybe('corder', this.sim.commissionOrdersFor(anchorSession.pid));
     // The viewer's own most recent enchanting-action outcomes (Professions
     // 2.0), or null. Small per-player reads diffed per tick like the other
     // scalars above (a successful action already refreshed the self inventory via
@@ -8492,6 +8738,9 @@ export class GameServer {
       if (ev.type === 'fishingGotAway') {
         gameMetricsCounters().fishingGotAway(ev.zoneId, fishingBandLabel(ev.band));
       }
+      if (ev.type === 'fishingEarlyReel') {
+        gameMetricsCounters().fishingEarlyReel(ev.zoneId, fishingBandLabel(ev.band));
+      }
       if (ev.type === 'fishingEmptyHook') {
         gameMetricsCounters().fishingEmptyHook(ev.zoneId, fishingBandLabel(ev.band));
       }
@@ -8773,6 +9022,24 @@ export class GameServer {
     }
   }
 
+  // Every pid whose throttled `bg` readout a respawn in this batch invalidated:
+  // the full membership of each respawning fighter's match, since the readout
+  // carries the match-wide `dead` column (see BG_RESPAWN_EVENT). Returns null
+  // when no respawn in the batch belongs to a match, so the ordinary batch pays
+  // one type comparison per event and allocates nothing.
+  private bgRespawnRefreshPids(events: SimEvent[]): Set<number> | null {
+    let pids: Set<number> | null = null;
+    for (const ev of events) {
+      if (ev.type !== BG_RESPAWN_EVENT || ev.pid === undefined) continue;
+      const match = this.sim.bgMatchFor(ev.pid);
+      if (!match) continue;
+      pids ??= new Set<number>();
+      for (const p of match.teams[0]) pids.add(p);
+      for (const p of match.teams[1]) pids.add(p);
+    }
+    return pids;
+  }
+
   private routeEvents(events: SimEvent[]): void {
     if (events.length === 0 || this.clients.size === 0) return;
     const eventTime = Date.now();
@@ -8814,6 +9081,9 @@ export class GameServer {
     // only event mutation and correctly precedes this serialization.
     const fragments = serializeEventFragments(events);
     const presentationTime = round2(this.sim.time);
+    // Resolved once per batch, applied per session below against that session's
+    // ANCHOR pid (so a spectator watching a fighter refreshes with them).
+    const bgRespawnRefresh = this.bgRespawnRefreshPids(events);
     // Guard each session: a throw while routing events to one player must not
     // drop this tick's events for every other session (server/CLAUDE.md).
     forEachGuarded(
@@ -8830,6 +9100,9 @@ export class GameServer {
           anchorPid = target.pid;
           anchorPos = targetEntity.pos;
         }
+        // A wave raised somebody in this session's match: the match-wide `dead`
+        // column just changed for everyone, not only the fighter who stood up.
+        if (bgRespawnRefresh?.has(anchorPid)) session.lastBgWireTick = -BG_WIRE_INTERVAL_TICKS;
         const anchorParty = this.sim.partyOf(anchorPid);
         const mine: string[] = [];
         for (let i = 0; i < events.length; i++) {
@@ -8889,6 +9162,10 @@ export class GameServer {
               // force it fresh next snapshot instead of leaving the Arena
               // window showing the pre-match rating for up to 10s.
               if (ev.type === 'arenaEnd') session.lastArenaWireTick = -ARENA_WIRE_INTERVAL_TICKS;
+              // Same staleness fix for the Thornhollow Fields readout: queue churn,
+              // match lifecycle, and flag plays refresh `bg` next snapshot.
+              if (BG_WIRE_RESET_EVENTS.has(ev.type))
+                session.lastBgWireTick = -BG_WIRE_INTERVAL_TICKS;
               // remember the last person to whisper us, for /r reply (the
               // recipient copy of a whisper has no `to`; the sender echo does)
               if (

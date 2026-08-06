@@ -84,6 +84,7 @@ Each module owns the FUNCTIONS for one system; the backing STATE stays on `Sim` 
 | `spirit.ts` | death/release/resurrection: graveyards + spirit healers, the ghost run, `releasePlayerSpirit`/`resurrectAtCorpse`/`resurrectAtSpiritHealer`, plus the two `/unstuck` outcomes `moveToGraveyardForUnstuck`/`reviveAtGraveyardForUnstuck` (sickness rules live in the `resurrection.ts` leaf) |
 | `pet/pet_ai.ts` | `updatePet`, follow, ranged attack, target pick |
 | `pet/pet_commands.ts` | the pet command surface + `petOf`/`summonPet`/tame/despawn/`syncPetLevel`/`serializePet`/`restorePet` and the delve pet-park round-trip (`stowPetForDelve`/`restorePetFromDelveStash`) |
+| `pet/pet_match_return.ts` | the arena-shaped-match pet round trip (`snapshotMatchPet` at match formation, `noteMatchPetUnravelled` at the corpse-decay unravel in `mob/locomotion.ts`, `restoreMatchPet` at the end of `returnFromArena`): a pet that walks in alive walks back out alive, at the hp it carried. Two arms because a corpse means different things per class: a hunter beast / mage elemental keeps its corpse and is revived IN PLACE by entity id, a warlock demon unravels (`corpseTimer` 3) and is REBUILT from the payload. The rebuild keys on the UNRAVEL, never on the death, because `abandonPet` drops a dead pet's entity too; plus "owner has no pet now", so a deliberate part or a re-summon is never overwritten. The pools half of the same doctrine (issue #1600) is `ArenaReturnPools`; draws NO rng |
 | `items.ts` | equip/use/discard + vendor buy/sell/buyback command bodies (W2 move out of `sim.ts`) |
 | `item_instance_transfer.ts` | shared instanced-transfer rules for the anonymous exchange pipes (market listings + mail parcels, issue 1165): the transfer-lock predicate, the public display trim, payload-matching escrow removal, escrow-slot sanitizing; consumed by `market.ts`, `mail/post_office.ts`, and the ui staging gates (the `removePreferFungible` cross-import precedent) |
 | `interaction.ts` | `lootCorpse`/`pickUpObject`/`interact` + corpse harvest and party auto-loot (W3) |
@@ -106,6 +107,7 @@ Each module owns the FUNCTIONS for one system; the backing STATE stays on `Sim` 
 | `social/fiesta.ts` + `social/fiesta_bots.ts` | fiesta match logic + offline bots |
 | `social/vale_cup.ts` + `social/vale_cup_bots.ts` | Vale Cup boarball: brackets, the one match slot, the `vcup*` seam arms (pure ball math in the `vale_cup_ball.ts`/`vale_cup_layout.ts` leaves); its tick phase draws ZERO shared rng |
 | `social/yumi.ts` | Protect Yumi 3v3/5v5 maze mode (layout leaf `yumi_maze_layout.ts`) |
+| `social/battleground.ts` | Thornhollow Fields 5v5 capture-the-flag (layout leaf `battleground_layout.ts`; resolved-match records in the `battleground_outcomes.ts` leaf) |
 | `social/ready_check.ts` | `/ready`: the `readyChecks` primitive + the `updateReadyChecks` phase |
 | `unstuck.ts` | `/unstuck` recovery countdown, the graveyard move (alive) or graveyard revive (dead), cancellation, and cooldown. Charges Unstuck Sickness, never a death |
 | `social/card_duel.ts` | the Card Duel minigame (Card Master NPC): queue/match state, the `updateCardDuelQueue` (pairing) and `updateCardDuelDeadlines` (AFK forfeit/void) phases |
@@ -141,6 +143,11 @@ recovery timer across competitive resets), `tab_target.ts`/`assist.ts`/
 `professions/node_persist.ts` (per-player node-readiness save/load, the
 `cooldown_persist.ts` scheme applied to gather nodes),
 `mob/scan_counters.ts` (the per-tick mob scan-visit tally the server reads post-tick),
+`social/battleground_outcomes.ts` (the capped, drainable log of resolved RATED
+battleground results the authoritative host reads post-tick to feed the
+`BG_CAPS_TO_WIN` tuning metrics; the same read-after-tick shape as
+`scan_counters.ts`, and written once per match rather than once per fighter
+because `bgEnd` is a personal event),
 `mob/mechanic_spacing.ts` (the rift boss shared mechanic spacing lock and its
 oldest-due drain; stamped per-spawn by `rift/runs.ts`, consumed by the
 `runMobAttackMechanics` drivers),

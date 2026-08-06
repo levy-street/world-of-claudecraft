@@ -71,18 +71,16 @@ describe('learning-coupled craft XP: taught-nothing crafts pay nothing', () => {
     grantMantleMats(sim, pid);
     const before = meta.lifetimeXp;
 
-    const throttleBefore = meta.craftThrottle.count;
-
     const first = resolveCraft((sim as any).ctx, pid, MANTLE.id);
 
-    // The craft itself still works: item granted, materials consumed, the
-    // shared action throttle still spent (at skill 125 the specialization
-    // discount reduces the listed 7 ore + 5 flux to 5 + 4).
+    // The craft itself still works: item granted, materials consumed (at skill
+    // 125 the specialization discount reduces the listed 7 ore + 5 flux to 5 + 4).
+    // Craft Cast System: action throttle is retired; pacing is cast duration.
     expect(first.ok).toBe(true);
     expect(sim.countItem('sootscale_mantle', pid)).toBe(1);
     expect(sim.countItem('thorium_ore', pid)).toBe(2);
     expect(sim.countItem('smithing_flux', pid)).toBe(1);
-    expect(meta.craftThrottle.count).toBe(throttleBefore + 1);
+    expect(meta.craftThrottle).toEqual({ windowStart: 0, count: 0 });
     // But it taught nothing, so it pays nothing: no lifetime XP, no skill.
     expect(meta.lifetimeXp).toBe(before);
     expect(meta.craftSkills.armorcrafting).toBe(125);

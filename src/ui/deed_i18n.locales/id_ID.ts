@@ -871,4 +871,32 @@ export const table: DeedLocaleTable = {
     name: 'Yang Diketahui Para Camar',
     desc: 'Pancing seekor ikan dari perairan Pesisir Jauh.',
   },
+  prog_engineering_rare: {
+    name: 'Rekayasa Presisi',
+    desc: 'Buat barang bertingkat langka pertamamu dalam Rekayasa.',
+  },
+  prog_alchemy_rare: {
+    name: 'Vintage Langka',
+    desc: 'Buat barang bertingkat langka pertamamu dalam Alkimia.',
+  },
+  prog_cooking_rare: {
+    name: 'Hidangan yang Tak Terlupakan',
+    desc: 'Buat barang bertingkat langka pertamamu dalam Memasak.',
+  },
+  prog_leatherworking_rare: {
+    name: 'Penyamakan Halus',
+    desc: 'Buat barang bertingkat langka pertamamu dalam Pengolahan Kulit.',
+  },
+  prog_tailoring_rare: {
+    name: 'Jahitan Sang Maestro',
+    desc: 'Buat barang bertingkat langka pertamamu dalam Menjahit.',
+  },
+  prog_weaponcrafting_rare: {
+    name: 'Ditempa hingga Berkilau',
+    desc: 'Buat barang bertingkat langka pertamamu dalam Penempaan Senjata.',
+  },
+  prog_armorcrafting_rare: {
+    name: 'Dilapisi hingga Sempurna',
+    desc: 'Buat barang bertingkat langka pertamamu dalam Penempaan Zirah.',
+  },
 };

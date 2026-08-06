@@ -877,6 +877,34 @@ export const table: DeedLocaleTable = {
     name: 'Lo que saben las gaviotas',
     desc: 'Pesca un pez en las aguas de la Costa Lejana.',
   },
+  prog_engineering_rare: {
+    name: 'Ingeniería de precisión',
+    desc: 'Fabrica tu primer objeto de calidad rara en Ingeniería.',
+  },
+  prog_alchemy_rare: {
+    name: 'Una cosecha excepcional',
+    desc: 'Fabrica tu primer objeto de calidad rara en Alquimia.',
+  },
+  prog_cooking_rare: {
+    name: 'Un plato para el recuerdo',
+    desc: 'Fabrica tu primer objeto de calidad rara en Cocina.',
+  },
+  prog_leatherworking_rare: {
+    name: 'Curtido fino',
+    desc: 'Fabrica tu primer objeto de calidad rara en Peletería.',
+  },
+  prog_tailoring_rare: {
+    name: 'Una puntada magistral',
+    desc: 'Fabrica tu primer objeto de calidad rara en Sastrería.',
+  },
+  prog_weaponcrafting_rare: {
+    name: 'Templado hasta brillar',
+    desc: 'Fabrica tu primer objeto de calidad rara en Fabricación de armas.',
+  },
+  prog_armorcrafting_rare: {
+    name: 'Blindado a la perfección',
+    desc: 'Fabrica tu primer objeto de calidad rara en Fabricación de armaduras.',
+  },
 };
 
 // es_ES rides this base table plus the delve-vocabulary override layer

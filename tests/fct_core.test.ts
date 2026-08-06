@@ -11,6 +11,7 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import {
+  blockFctAmountText,
   DAMAGE_FCT_KINDS,
   describeFct,
   FCT_ANCHOR_HEAD_OFFSET,
@@ -74,7 +75,9 @@ describe('describeFct: color token by kind + flags', () => {
     evade: { self: 'miss-self', other: 'miss-other' },
     'damage-done-ability': { self: 'damage-done-ability', other: 'damage-done-ability' },
     'damage-done-auto': { self: 'damage-done-auto', other: 'damage-done-auto' },
+    'damage-done-block': { self: 'damage-done-block', other: 'damage-done-block' },
     'damage-taken': { self: 'damage-taken', other: 'damage-taken' },
+    'damage-taken-block': { self: 'damage-taken-block', other: 'damage-taken-block' },
     absorb: { self: 'absorb', other: 'absorb' },
     heal: { self: 'heal', other: 'heal' },
     xp: { self: 'xp', other: 'xp' },
@@ -126,7 +129,9 @@ describe('describeFct: ttl is a pure function of kind (constant across kinds, ex
       'dodge',
       'damage-done-ability',
       'damage-done-auto',
+      'damage-done-block',
       'damage-taken',
+      'damage-taken-block',
       'absorb',
       'heal',
       'honor',
@@ -214,11 +219,13 @@ describe('describeFct: ClientWorld-vs-Sim parity', () => {
 });
 
 describe('isDamageFctKind: the combat-damage taxonomy (damage-number classifier)', () => {
-  it('classifies exactly the three damage-number kinds as damage', () => {
+  it('classifies exactly the five damage-number kinds as damage', () => {
     expect([...DAMAGE_FCT_KINDS].sort()).toEqual([
       'damage-done-ability',
       'damage-done-auto',
+      'damage-done-block',
       'damage-taken',
+      'damage-taken-block',
     ]);
     for (const kind of DAMAGE_FCT_KINDS) expect(isDamageFctKind(kind)).toBe(true);
   });
@@ -238,5 +245,17 @@ describe('isDamageFctKind: the combat-damage taxonomy (damage-number classifier)
       'self-note',
     ];
     for (const kind of nonDamage) expect(isDamageFctKind(kind)).toBe(false);
+  });
+});
+
+describe('blockFctAmountText: the shield-block floater keeps the incoming/outgoing sign convention', () => {
+  it('signs an incoming block negative, matching the damage-taken floater convention', () => {
+    expect(blockFctAmountText(12, false, true)).toBe('-12');
+    expect(blockFctAmountText(12, true, true)).toBe('-12!');
+  });
+
+  it('leaves an outgoing block unsigned, matching the damage-done floater convention', () => {
+    expect(blockFctAmountText(12, false, false)).toBe('12');
+    expect(blockFctAmountText(12, true, false)).toBe('12!');
   });
 });

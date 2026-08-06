@@ -313,8 +313,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Her tarif basamağı için tek bir sabit ücret, bir usta onu öğrettiğinde bir kez alınır; aşağıdaki tablonun her basamağı bugün fiilen kullanımdadır, ücretsiz başlangıç tariflerinden en tepedeki alet yapımcısının olta derslerine kadar.',
   'guide.profPages.econ.provenanceBody':
     "Bazı eşyalar bir ad taşır. Üzerine gelin; ipucu kutusu bir hammaddede filanca tarafından toplandı, bitmiş bir parçada ise filanca tarafından hazırlanmıştır der: aynı işaret, eşyanın nasıl var olduğuna göre sözcüklenmiştir. İmza eşyanın kendisinin bir parçasıdır; ticaretlerde, bankada, postada, Dünya Pazarı'nda ve hatta bir satıcıdan geri alımda bile onunla birlikte yol alır ve asla solmaz.\n\nToplama en iyi işini kendiliğinden imzalar: nadir ya da daha iyi atan her hasat imzalı gelir ve nadir bulgular beş katlık beklenmedik kazancının tamamını imzalar. Bir ceset hasadının şanslı atışı, ailenin verecek bir örneği olmadığı yerde verimi imzalar; örneği olduğu yerde ise verimi düz bırakır ve yanına imzalı bozulmamış örneği basar. Üretim de aynı çizgide imzalar: nadir ya da daha iyi bir çıktının her kopyası imzalı basılır ve bir şaheser, kalitesi ne olursa olsun her zaman imzalanır; böylece herhangi bir parçanın en iyi sürümü her zaman ustasının adını taşır. Size bir imzaya mal olabilecek tek şey dolu bir çantadır: imzalı bir birimin ineceği kendi yerine ya da eşleşen imzalı bir yığına ihtiyacı vardır.\n\nBir eşya yığını tek bir kimliği paylaşır; bu yüzden iki kopya ancak her işaret tam olarak eşleştiğinde birleşir: aynı eşya, aynı imzalayan, aynı şaheser istatistikleri, aynı büyü, aynı bağ. İmzalı bir kütük hiçbir yönde düz bir yığına katılmaz (birleşme birinin adını silerdi), ama birebir aynı içerikler seve seve birleşir; böylece aynı toplayıcının imzaladığı yirmi cevher tek bir yığında durur ve beklenmedik bir kazanç çantalarınızı param parça etmez.\n\nİmzalar ustalara geri öder: tezgahta gereken bir bileşenin imzalı herhangi bir kopyasını elde tutmak, kim imzalamış olursa olsun, şaheser şansına 2 yüzde puanı ekler; kendi elinizle imzaladığınız bir bileşeni tutmak ise o bileşenin gereken miktarını bir azaltır (asla birin altına inmez). Kendi imzalı nadir ya da daha iyi işiniz size ders vermeyi bile sürdürür, bugün yalnızca şişe üzerinden: imzaladığınız bir iksiri içtiğinizde, o iksiri karıştıran zanaat etkin ana dallarınızdan biri olduğu sürece küçük bir beceri sızıntısı o zanaata geri akar.",
-  'guide.profPages.econ.throttleBody':
-    "Üretimin bir tavanı vardır: zanaat, büyü bozumu, büyüleme, hurda toplama ve alet etkisi yeniden dolumları, her {seconds} saniyelik pencerede {actions} başarılı eylemlik tek bir bütçeyi paylaşır. Reddedilen bir deneme hiçbir şeye mal olmaz ve bütçeden harcamaz. Normal oyunda bunu asla hissetmezsiniz; bu sınır, kasası dolu ve becerisi tavan yapmış bir uzmanın, becerisi ya da stoku ne olursa olsun Pazar'ı boğamaması için vardır.",
   'guide.profPages.faq.a4':
     "Talihinize denk geldi. Kabaca 90 hasattan 1'i nadir bir toplama olayını tetikler (ağaçta antik kalp odunu, cevherde bozulmamış bir damar, otlarda mehtaplı bir çiçek): verimi beş katına çıkarır, her birimi adınızla imzalar ve bulguyu tüm bölgeye duyurur. Sıradan bir hasatta çıkan nadir veya üzeri bir kalite çekimi de verimi imzalar.\n\nİmzalı malzemeler saklamaya ya da pahalıya satmaya değer: tezgahta, gereken bir bileşenin imzalı herhangi bir kopyasını elde tutmak şaheser şansına 2 yüzde puanı ekler. Yalnızca şunu unutmayın, bunlar sadece aynı şekilde imzalanmış kopyalarla yığın oluşturur, yani kendi çanta yuvalarını işgal ederler.",
   'guide.profPages.faq.a6':
@@ -691,7 +689,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.collectorsHeading': 'Koleksiyoncular, kupalar ve bir hikayenin bedeli',
   'guide.profPages.econ.collectorsBody':
     "Satıcılar kaynağa kördür: imzalı bir eşya NPC'ye tam fiyatına satılır. İmzanın getirdiği prim yalnızca oyuncular arasında mevcuttur; bu da onu ilginç kılan şeydir: ünlü bir toplayıcı tarafından imzalanmış bir yığın beklenmedik cevher, şanslı bir hasattan gelen Prime Cut, o zamandan beri emekli olmuş bir ustanın adını taşıyan şaheser bir bıçak, bunların hepsi birinin belleğinin değer biçtiği kadar değerlidir.\n\nDeeds Kitabı da aynı içgüdüye yaslanır: Bozulmamış Damar, Kadim Kalp Ağacı, Ay Işığı Çiçeği, Mükemmel Numune ve Umut Işıltısı, tamamen bir anın sizinle gerçekleştiğini kanıtlamak için var olan sıfır Şöhretli koleksiyoncu işaretleridir. Görevi kazandıran eşyayı elinizde tutun, elinizde makbuzu tutarsınız. Bunların hiçbiri güç değildir; köken istatistik satın almaz ve savaş kazanmaz, sadece iyi günlerin oyunun kağıt izi olur.",
-  'guide.profPages.econ.throttleHeading': 'Eylem kısıtlaması',
   'guide.profPages.econ.doctrineHeading': 'Oyuncular oyuncularla alışveriş yapar',
   'guide.profPages.econ.doctrineBody':
     "Zanaat ekonomisi tek bir fikir üzerine inşa edilmiştir: oyuncular oyunculara tedarik eder. Toplayıcılar ustaları besler, ustalar görev yapan ve baskın düzenleyenleri besler, bozucular büyücüleri besler; satıcılar ve tezgah ustaları ise kenar bölgede çöp ve madeni para emmek için durur, sizinle rekabet etmek için değil. Bir meslekten para kazanmak istiyorsanız, müşteriniz bir insandır: diğer oyuncuların ne tükettiğini öğrenin, Dünya Pazarı'na göre fiyat belirleyin ve NPC sistemlerini fiyatlarınızın tabanı olarak değerlendirin, pazar olarak değil.\n\nZanaatla yapılan teçhizat baskın tabanının altına oturacak şekilde ayarlanmıştır: bir şaheser bile tarifinin yalnızca bir kalite katı üzerindedir, asla efsanevi ötesine geçemez ve istatistik bütçesi baskın ganimet bandının altında kalır. Demirhanesi sizi en zorlu içeriklere hazırlar; onun yerini almaz. Bu, ustalar, baskın düzenleyenler ve pazar arasındaki istikrarlı üçgeni korur: baskın düşen ganimet hep çekici kalır ve zanaatla yapılan parçalar gerçekten parayla satın alınabilecek en iyi teçhizat olur.",
@@ -1448,6 +1445,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.keybinds.petAttack': 'Yoldaş: Saldır',
   'hudChrome.keybinds.petDefensive': 'Yoldaş: Savunmacı',
   'hudChrome.keybinds.petStop': 'Yoldaş: Dur',
+  'hudChrome.keybinds.targetPet': 'Yoldaş: Hedefle',
   'hudChrome.keybinds.petTaunt': 'Yoldaş: Kışkırt',
   'hudChrome.mailbox.parcelQtyDecreaseAria': 'Bir adet daha az {item} gönder',
   'hudChrome.mailbox.parcelQtyIncreaseAria': 'Bir adet daha fazla {item} gönder',
@@ -2362,9 +2360,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.calendar.events.delveDay.note':
     "Birader Halven haritalarını işaretliyor: Çökmüş Emanetlik'e meydan okumak için güzel bir gün.",
   'hudChrome.calendar.events.delveDay.title': 'Mağara Günü',
-  'hudChrome.calendar.events.fiestaNight.note':
-    'İkiye iki Fiesta ringi bu gece en gürültülü kalabalığını topluyor.',
-  'hudChrome.calendar.events.fiestaNight.title': 'Fiesta Gecesi',
   'hudChrome.calendar.events.fishingDerby.note':
     'Oltacılar göl kıyılarını doldurdu. Bir olta kap ve balıkçı hikayeleri paylaş.',
   'hudChrome.calendar.events.fishingDerby.title': 'Balık Tutma Yarışması',
@@ -3576,6 +3571,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.items.crag_warden_cudgel.name': 'Kayalık Bekçisi Topuzu',
   'entities.items.craghorn_staff.name': 'Kayaboynuz Asası',
   'entities.items.cragmaw_huntcord.name': "Cragmaw'un Av Kuşağı",
+  'entities.items.cragmaw_huntquiver.name': "Cragmaw'un Av Sadağı",
   'entities.items.cragmaw_prowlboots.name': 'Cragmaw Sinsi Çizmeleri',
   'entities.items.cragwalker_boots.name': 'Kayayürüyen Çizmeleri',
   'entities.items.crimson_amber_armor_plate.name': 'Koyu Kırmızı Kehribar',
@@ -3655,6 +3651,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.items.gravewardens_shiv.name': 'Mezar Bekçisi Şişi',
   'entities.items.gravewoven_raiment.name': 'Mezardokuma Kıyafeti',
   'entities.items.gravewyrm_gauntlets.name': 'Mezarejderi Eldivenleri',
+  'entities.items.gravewyrm_bone_quiver.name': 'Mezarejderi Kemik Sadağı',
   'entities.items.gravewyrm_mantle.name': 'Mezarejderi Pelerini',
   'entities.items.gravewyrm_sabatons.name': 'Mezarejderi Demir Çizmeleri',
   'entities.items.gravewyrm_scale_hauberk.name': 'Mezarejderi Pul Zırhı',
@@ -3715,6 +3712,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.items.mistveil_grips.name': 'Sis Tülü Eldivenleri',
   'entities.items.moggers_copper_cudgel.name': "Mogger'ın Bakır Topuzu",
   'entities.items.moggers_shiv.name': "Mogger'ın Şişi",
+  'entities.items.moggers_hide_quiver.name': "Mogger'ın Deri Sadağı",
   'entities.items.moggers_stomper_boots.name': "Mogger'ın Ezici Çizmeleri",
   'entities.items.monarch_crown_helm.name': "Hükümdar'ın Tacı",
   'entities.items.copper_mining_pick.name': 'Bakır Maden Kazması',
@@ -3838,6 +3836,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.items.stormcallers_spaulders.name': 'Galecall Omuzlukları',
   'entities.items.bonewrought_greatsword.name': 'Bonewrought Büyük Kılıcı',
   'entities.items.direfang_greatblade.name': 'Direfang Palası',
+  'entities.items.direfang_quiver.name': 'Direfang Sadağı',
   'entities.items.bonewrought_bulwark.name': 'Bonewrought Siperi',
   'entities.items.wraithfire_orb.name': 'Wraithfire Küresi',
   'entities.items.stormshard_leggings.name': 'Fırtınaparçası Tozlukları',
@@ -5476,7 +5475,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'fiesta.end.draw': 'FIESTA BERABERE! Sonuç çok yakın!',
   'fiesta.end.loss': 'FIESTA KAYBEDİLDİ! Tekrar dene!',
   'fiesta.end.win': 'FIESTA KAZANILDI! 🎉 Ne parti ama!',
-  'fiesta.enterQueue': "Fiesta'ya Katıl!",
   'fiesta.error.leaderOnly': 'Takımını {label} için kuyruğa yalnızca grup lideri sokabilir.',
   'fiesta.error.noAugment': 'Şu anda seçebileceğin bir güçlendirme yok.',
   'fiesta.error.notOnOffer': 'O güçlendirme sunulmuyor.',
@@ -5492,9 +5490,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'fiesta.powerup.pow_colossus.name': 'Dev Heykel',
   'fiesta.powerup.pow_moon_boots.name': 'Ay Çizmeleri',
   'fiesta.powerup.pow_speed_demon.name': 'Hız Şeytanı',
-  'fiesta.practice': '🎉 Botlara Karşı Antrenman',
-  'fiesta.practiceNote':
-    'Çevrimdışı antrenman: 3 yapay zeka botu doğurur ve seni bir 2v2 Fiesta için kuyruğa sokar. Durdurmak için tekrar tıkla.',
   'fiesta.queue.join': '2v2 Fiesta kuyruğuna katılıyorsun. PARTİYE hazır ol…',
   'fiesta.queue.leave': '2v2 Fiesta kuyruğundan ayrılıyorsun.',
   'fiesta.queue.teamLeave': 'Takımın 2v2 Fiesta kuyruğundan ayrılıyor.',
@@ -5725,38 +5720,18 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Bir dostu korur, böylece yakın dövüş saldırganları vurdukları için kendilerine zarar verir.',
   'guide.abilityHook.thunder_clap': 'Çevrendeki her şeye vurur ve saldırılarını yavaşlatır.',
   'guide.abilityHook.wrath': 'Bir hedefe menzilden fırlatılan bir doğa oku; başvuru bomban.',
-  'guide.arenaPage.augmentsNote':
-    'Güçlendirmeler ve takviyeler yalnızca maç boyunca sürer. Kalıcı güçle değil, eğlenceli, anında kurgularla ilgilidirler, yani kimse parayla zafer satın alamaz.',
   'guide.arenaPage.coliseumBody':
     'Coliseum, diyarın arenasıdır; burada dereceli maçlarda diğer oyuncularla, bire bir ya da ikiye iki karşı karşıya gelirsin. Her kademe kendi sıralamasını tutar, bu yüzden bir galibiyet seni o merdivende, tüm diyarın görmesi için yukarı taşır. Bir kademeye tek başına ya da eşinle kaydolmak için Arena penceresini aç.',
   'guide.arenaPage.coliseumHeading': 'Kül Kolezyumu',
   'guide.arenaPage.duelsBody':
     'Karşılaştığın herhangi bir oyuncuyu dostane bir düelloya davet et. Gururdan başka kaybedilecek bir şey yok, bu yüzden bir eşleşmeyi öğrenmenin ya da dostça bir tartışmayı çözmenin en kolay yoludur.',
   'guide.arenaPage.duelsHeading': 'Düellolar',
-  'guide.arenaPage.fiestaBody':
-    'Fiesta, tek bir kesintisiz müsabaka olarak oynanan hızlı, ikiye iki bir kapışmadır; her dövüşçü eşit bir zemine getirilir. Dövüş ilerledikçe güçlendirmeler seçersin; bunlar kitini anında yeniden şekillendiren hızlı takviyelerdir, böylece hiçbir maç tam olarak aynı oynanmaz.',
-  'guide.arenaPage.fiestaHeading': 'İkiye iki Fiesta',
   'guide.arenaPage.heading': 'Arena ve PvP',
   'guide.arenaPage.intro':
     'Kendini diğer oyunculara karşı sınamak ister misin? Oyuncuya karşı oyuncu içeride hazır, ve bu her zaman senin seçtiğin bir şeydir, asla sana dayatılan bir şey değil.',
   'guide.arenaPage.ladderBody':
     'Dereceli oyun, konumunu zaman içinde takip eder. Nerede durduğunu ve diyarın zirvesini kimin tuttuğunu görmek için lider tablosuna bak.',
   'guide.arenaPage.ladderHeading': 'Merdiveni tırmanmak',
-  'guide.arenaPage.powerupsBody':
-    'Parlayan küreler de dövüşün ortasında arenaya düşer, kim önce ulaşırsa onun olur. Bilerek abartılıdırlar ve yalnızca kısa bir süre dayanırlar: bir göz kırpımlık göz kamaştırıcı hız için Hız İblisi, hantal bir deve dönüşmek için Devasa, zıplayan, düşük yerçekimli bir sıçrama için Ay Botları, ve ani bir öfke dalgası için Cinnet.',
-  'guide.arenaPage.powerupsTitle': 'Ringdeki takviyeler',
-  'guide.arenaPage.waveGoldBody':
-    'Orta dalga: kurgunun şekillenmeye ve uyum tutturmaya başladığı iki yönlü kombolar.',
-  'guide.arenaPage.waveGoldTitle': 'Altın',
-  'guide.arenaPage.wavePrismaticBody':
-    'Son dalga: kurguyu belirleyen, ekran eriten, en güzel anlamda saçma hissettirmesi amaçlanan sıçramalar.',
-  'guide.arenaPage.wavePrismaticTitle': 'Prizmatik',
-  'guide.arenaPage.waveSilverBody':
-    'Açılış dalgası: sınıfının temellerini keskinleştiren temiz, tek istatistikli takviyeler.',
-  'guide.arenaPage.waveSilverTitle': 'Gümüş',
-  'guide.arenaPage.wavesBody':
-    'Bir Fiesta müsabakası ilerledikçe sana taze seçimler sunar ve dövüş uzadıkça seçimler cüretkarlaşır. Bir dalgadan diğerine kurgunu inşa edersin, her seferinde birkaç seçenekten birini seçer ve müsabakanın geri kalanı için onu elinde tutarsın.',
-  'guide.arenaPage.wavesTitle': 'Güçlendirmeler dalgalar halinde gelir',
   'guide.bestiary.flavor.gravecaller_cultist':
     'Vadiden zirvelere kadar mezarları kirleten ölüm tarikatının cüppeli hizmetkarları. Toplandıkları yerde, ölüler huzur bulmaz.',
   'guide.bestiary.flavor.grubjaw':
@@ -6766,7 +6741,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hud.core.mapCanvasLabel': 'Harita',
   'hud.core.mapSummary': '{zone} haritası.',
   'hud.core.maxLevel': 'AZAMİ SEVİYE',
-  'hud.core.mobileArena': 'Arena',
   'hud.core.mobileAttack': 'Saldır',
   'hud.core.mobileCamera': 'Kamera — yeniden ortalamak için çift dokun',
   'hud.core.mobileChat': 'Sohbet',
@@ -6863,7 +6837,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hud.errors.whisperMissing': "Çevrimiçi olan '{name}' adlı bir oyuncu yok.",
   'hud.errors.whisperSelf': 'Kendi kendine mırıldanıyorsun. Kimse duymuyor.',
   'hud.keybinds.actions.actionBarSlot': 'Eylem Çubuğu {slot}',
-  'hud.keybinds.actions.arena': 'Arena (Kül Koliseumu)',
   'hud.keybinds.actions.attack': 'Saldır',
   'hud.keybinds.actions.attackMove': 'Saldırarak Hareket',
   'hud.keybinds.actions.autorun': 'Otomatik Koşmayı Aç/Kapat',
@@ -7621,6 +7594,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.partyGroup': 'Grup {n}',
   'hudChrome.unitFrame.partyLabel': 'Takımın',
   'hudChrome.unitFrame.playerLabel': 'Kahramanın',
+  'hudChrome.unitFrame.petLabel': 'Yoldaşın',
   'hudChrome.unitFrame.targetAnnounce': '{name} hedefini işaretle',
   'hudChrome.unitFrame.targetLabel': 'Hedefin',
   'hudChrome.widgets.clockTitle': 'Yerel saat - 12/24 saat biçimi arasında geçiş için tıkla',
@@ -8617,6 +8591,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.event.hint': 'Bir akın, buluşma veya etkinlik duyur',
   'hudChrome.discord.relay.help.label': 'Yardım Lazım',
   'hudChrome.discord.relay.help.hint': 'Topluluktan yardım iste',
+  'hudChrome.options.hideUnusedActionSlots': 'Kullanılmayan Eylem Alanlarını Gizle',
   'hudChrome.options.showSecondaryActionBar': 'İkincil Eylem Çubuğunu Göster',
   'errors.api.desktopCodeInvalid':
     'Masaüstü giriş kodu geçersiz veya süresi dolmuş. Lütfen tekrar deneyin.',
@@ -8868,7 +8843,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Bu sayfadaki her şey oyunun içindedir: seçenekleri açmak için Esc tuşuna basın. Menü, sabitlenmiş temel ayarların bir Genel Bakış ekranıyla açılır ve kategoriler onun yanındaki bir rayda yer alır: aşağıdaki ayarlar Ekran grubundaki Grafikler, Arayüz ve Erişilebilirlik başlıkları altında, Performans Arayüzü ise Sistem altında bulunur. Daha da hızlısı, üstteki arama kutusuna bir ad yazıp doğrudan ona atlayın.',
   'guide.settingsPage.whyLabel': 'Neden işe yarıyor:',
   'hudChrome.crafting.close': 'İşçiliği kapat',
-  'hudChrome.crafting.craft': 'Zanaat',
   'hudChrome.crafting.craftedToast': 'Hazırlanma Tarihi: {name}',
   'hudChrome.crafting.empty': 'Henüz bilinen bir tarif yok.',
   'hudChrome.crafting.insufficientMaterials': 'Bunun için malzemeleriniz yok.',
@@ -8953,9 +8927,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Hedefin zırhını parçalar, her uygulamada %{damage} azaltır. 5 kez istiflenir. Yüksek miktarda tehdit üretir.',
   'entities.mobs.training_dummy.name': 'Antrenman Kuklası',
   'entities.mobs.yumi_cat.name': 'Yumi',
-  'guide.arenaPage.yumiBody':
-    "Yumi'yi Koru, bir labirentte oynanan bir takım hedef modudur: her taraf kendi kedi yoldaşını korurken diğerininkini avlar. Ara sıra her iki kedi de labirentin yeni köşelerine ışınlanır, bu yüzden dövüş savunma, avlanma ve onları yeniden bulmak için yarışma arasında gidip gelir. Üçe üç ya da beşe beş olarak kuyruğa gir; dövüşte düşmek seni yalnızca kısa bir süre kenara çeker.",
-  'guide.arenaPage.yumiHeading': "Yumi'yi Koru",
   'hudChrome.archetypeTitle.hobbyLabel': 'Hobi',
   'hudChrome.auraEffect.armorPct': 'Zırhı %{pct} azaltır',
   'hudChrome.auraEffect.armorPctStacks': 'Zırhı %{pct} azaltır ({stacks} istif)',
@@ -8965,7 +8936,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.increasePct.int': 'Zekayı %{pct} artırır',
   'hudChrome.auraEffect.increasePct.sta': 'Dayanıklılığı %{pct} artırır',
   'hudChrome.crafting.recipeNotLearned': 'Bu tarifi henüz öğrenmedin.',
-  'hudChrome.crafting.throttled': 'Çok hızlı üretiyorsun. Bir an bekle ve tekrar dene.',
   'hudChrome.mobile.chatPlaceholder': 'Bir şey söyle...',
   'hudChrome.mobile.hideKeyboard': 'Klavyeyi gizle',
   'hudChrome.unitFrame.partyChip': 'Grup',
@@ -8975,7 +8945,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'yumi.bracket5': "Yumi'yi Koru 5v5",
   'yumi.end.loss': "YENİLGİ! Yumi'n düştü.",
   'yumi.end.win': 'ZAFER! Yumi güvende!',
-  'yumi.enterQueue': "Yumi'yi Koru'ya Katıl!",
   'yumi.error.partyTooBig3': "Yumi'yi Koru 3v3 en fazla üç kişilik bir gruba izin verir.",
   'yumi.error.partyTooBig5': "Yumi'yi Koru 5v5 en fazla beş kişilik bir gruba izin verir.",
   'yumi.hud.aria': "Senin Yumi'n {max} candan {mine} canda, düşman Yumi'si {theirs} canda.",
@@ -10084,6 +10053,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hud.combat.evaded': '{target}, {ability} yeteneğinden kaçındı.',
   'hudChrome.options.mouseoverCast': 'Grup Çerçevelerinde İmleçle Büyü Yapma',
   'hudChrome.options.showTargetOfTarget': 'Hedefin Hedefini Göster',
+  'hudChrome.options.showPetFrame': 'Yoldaşını Göster',
   'hudChrome.unitFrame.targetOfTargetLabel': 'Hedefin Hedefi',
   'itemUi.market.rarityLegendary': 'Efsanevi',
   'loading.reconnectingAttempt':
@@ -10839,13 +10809,9 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.disenchantConfirmBodySpecial':
     "{item}'nin özel bir kopyası (imzalı, şaheser veya büyülü) yok edilir ve arkanik malzeme verir. Bu geri alınamaz.",
   'hudChrome.enchanting.disenchantConfirmTitle': '{item} büyüsü bozulsun mu?',
-  'hudChrome.enchanting.disenchantThrottled':
-    'Çok hızlı büyü bozuyorsunuz. Bir an bekleyin ve tekrar deneyin.',
   'hudChrome.enchanting.disenchantedLine': '{item} büyüsünü bozdunuz.',
   'hudChrome.enchanting.enchantAppliedLine': '{item} üzerine {enchant} büyüsü uyguladınız.',
   'hudChrome.enchanting.enchantInsufficient': 'O büyü için malzemeniz yok.',
-  'hudChrome.enchanting.enchantThrottled':
-    'Çok hızlı büyü yapıyorsunuz. Bir an bekleyin ve tekrar deneyin.',
   'hudChrome.enchanting.enchantUnknown': 'O büyü mevcut değil.',
   'hudChrome.enchanting.enchantWrongSlot': 'Bu büyü o eşyaya uygulanamaz.',
   'hudChrome.enchanting.noEnchants': 'Hiçbir büyü bu malzemeyi kullanmıyor.',
@@ -10859,8 +10825,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.salvageConfirmBodySpecial':
     "{item}'nin özel bir kopyası (imzalı, şaheser veya büyülü) yok edilir ve zanaat malzemesi verir. Bu geri alınamaz.",
   'hudChrome.enchanting.salvageConfirmTitle': '{item} parçalansın mı?',
-  'hudChrome.enchanting.salvageThrottled':
-    'Çok hızlı parçalıyorsunuz. Bir an bekleyin ve tekrar deneyin.',
   'hudChrome.enchanting.salvagedLine': '{item} parçaladınız.',
   'hudChrome.enchanting.targetTitle': 'Büyülenecek eşya seçin',
   'hudChrome.unbind.cannotAfford': 'Çözüm ücretini karşılayamazsınız.',

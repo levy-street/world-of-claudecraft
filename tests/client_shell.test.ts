@@ -2161,14 +2161,36 @@ describe('client HTML shell', () => {
     expect(hudMobileCss).toContain(
       'body.mobile-touch.hud-mobile-compact #player-frame {\n    left: calc(50% - 15px);\n  }',
     );
+    // The pet frame joins the same nudge: it shares the bottom-centre column with
+    // the player frame and the two bars, so it has to travel with them.
     expect(hudMobileCss).toContain(
-      'body.mobile-touch.hud-mobile-compact #castbar,\n  body.mobile-touch.hud-mobile-compact #swingbar {\n    left: calc(50% - 15px);\n  }',
+      'body.mobile-touch.hud-mobile-compact #castbar,\n  body.mobile-touch.hud-mobile-compact #swingbar,\n  body.mobile-touch.hud-mobile-compact #pet-frame {\n    left: calc(50% - 15px);\n  }',
     );
     // Left-handed mode mirrors the floating capture zone; the autorun target is
     // a child of the move joystick, so it follows that mirror without its own
     // satellite placement rules.
     expect(hudMobileCss).toContain(
-      'body.mobile-touch.mobile-left-handed #mobile-move-zone {\n    left: auto;\n    right: 0;\n  }',
+      'body.mobile-touch.mobile-left-handed #mobile-move-zone {\n    left: auto;\n    right: max(18px, env(safe-area-inset-right));\n  }',
+    );
+  });
+
+  // #mobile-move-zone is the floating capture zone the joystick above rests
+  // in; every other touch control anchors off env(safe-area-inset-*), but
+  // this one was still pinned to the literal device corner (left: 0; bottom:
+  // 0), so on a notched/rounded-corner phone it could sit under the home
+  // indicator gesture strip. Mirror the same left/bottom offsets the
+  // adjacent .mobile-joystick rule uses, without touching the zone's own
+  // width/height (it must not shrink the capture area).
+  it('anchors the move-zone capture area off the safe-area insets like its sibling joystick', () => {
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch #mobile-move-zone {\n' +
+        '    position: absolute;\n' +
+        '    left: max(18px, env(safe-area-inset-left));\n' +
+        '    bottom: calc(26px + env(safe-area-inset-bottom));\n' +
+        '    width: min(30vw, 132px);',
+    );
+    expect(hudMobileCss).toContain(
+      'min-width: 112px;\n    max-width: 132px;\n    height: min(36vh, 172px);',
     );
   });
 
@@ -2544,5 +2566,85 @@ describe('client HTML shell', () => {
     // On mobile Bags is a full-screen modal sheet. !important intentionally
     // beats the inline managed-window value without changing desktop stacking.
     expect(hudMobileCss).toMatch(/body\.mobile-touch #bags \{[\s\S]*?z-index:\s*95 !important;/);
+  });
+});
+
+// The pet cluster: the pet command bar and the pet health frame share ONE row above
+// the player frame on desktop, and are deliberately SPLIT again on mobile (command bar
+// under the thumb at the top, health strip in the bottom-centre column). Both halves
+// are pinned because either one alone silently changes the layout: the markup that
+// puts the two in one wrapper, and the mobile rule that dissolves it.
+describe('pet cluster layout', () => {
+  const hudCssSrc = readFileSync(new URL('../src/styles/hud.css', import.meta.url), 'utf8');
+  const hudMobileSrc = readFileSync(
+    new URL('../src/styles/hud.mobile.css', import.meta.url),
+    'utf8',
+  );
+
+  it.each([['index.html'], ['play.html']])(
+    '%s wraps the pet bar and pet frame in one cluster above the player frame',
+    (file) => {
+      const src = readFileSync(new URL(`../${file}`, import.meta.url), 'utf8');
+      const cluster = src.indexOf('id="pet-cluster"');
+      const petbar = src.indexOf('id="petbar"');
+      const petFrame = src.indexOf('id="pet-frame"');
+      const player = src.indexOf('id="player-frame"');
+      expect(cluster).toBeGreaterThan(-1);
+      // Bar on the left, health on the right, and the whole row above the player.
+      expect(cluster).toBeLessThan(petbar);
+      expect(petbar).toBeLessThan(petFrame);
+      expect(petFrame).toBeLessThan(player);
+    },
+  );
+
+  it('lays the cluster out as one row and un-anchors the pet bar from the stack edge', () => {
+    expect(hudCssSrc).toMatch(/#pet-cluster \{[^}]*display: flex/);
+    // The bar keeps its own absolute top:-52px seat for the mobile sheet, so the
+    // desktop cluster has to override it or the two halves overlap.
+    expect(hudCssSrc).toMatch(/#pet-cluster > #petbar \{[^}]*position: static/);
+  });
+
+  it('shares one content inset with the player frame so the row lines up with it', () => {
+    expect(hudCssSrc).toContain('--unit-frame-content-inset: 18px;');
+    expect(hudCssSrc).toMatch(
+      /#pet-cluster \{[^}]*padding-left: var\(--unit-frame-content-inset\)/,
+    );
+  });
+
+  // The bottom-centre column (player frame, cast bar, swing bar, pet strip) is nudged
+  // sideways by FOUR separate rules: compact, compact+left-handed, and a narrow-phone
+  // variant of each. A rule that moves the bars but forgets the pet strip leaves it
+  // horizontally detached from the column it belongs to, and the left-handed rule's
+  // extra class means it WINS over the narrow rule, so the omission does not even fall
+  // back to a sane value. Pinned as an invariant over every such rule rather than as
+  // four string literals: only one of the four was pinned before, which is how the
+  // narrow left-handed variant shipped without the strip twice.
+  it('nudges the pet strip in EVERY rule that nudges the cast bar', () => {
+    const rules = hudMobileSrc.split('}');
+    const nudges = rules
+      .map((block) => {
+        const open = block.lastIndexOf('{');
+        if (open === -1) return null;
+        return { selector: block.slice(0, open), body: block.slice(open + 1) };
+      })
+      .filter(
+        (r): r is { selector: string; body: string } =>
+          r !== null && /left:\s*calc\(50%/.test(r.body) && r.selector.includes('#castbar'),
+      );
+    // Vacuity floor: the five known column nudges must actually be found (compact,
+    // compact left-handed, their two narrow-phone variants, and the tablet tier).
+    expect(nudges.length).toBeGreaterThanOrEqual(5);
+    for (const rule of nudges) {
+      expect(rule.selector).toContain('#pet-frame');
+    }
+  });
+
+  // display:contents dissolves the wrapper so each child keeps its own fixed seat.
+  // Without it the mobile layout inherits the desktop row and the command bar is
+  // dragged down out of thumb reach into the bottom-centre column.
+  it('dissolves the cluster on mobile so the two halves keep separate seats', () => {
+    expect(hudMobileSrc).toMatch(/body\.mobile-touch #pet-cluster \{\s*display: contents;\s*\}/);
+    expect(hudMobileSrc).toMatch(/body\.mobile-touch #petbar \{[^}]*position: fixed/);
+    expect(hudMobileSrc).toMatch(/body\.mobile-touch #pet-frame \{[^}]*position: fixed/);
   });
 });

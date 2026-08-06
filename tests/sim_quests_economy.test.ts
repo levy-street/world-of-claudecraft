@@ -121,7 +121,7 @@ describe('food, drink, vendor', () => {
     sim.player.combatTimer = 99;
 
     sim.useItem('minor_mana_potion');
-    expect(sim.player.resource).toBe(10 + 120); // instant, no sitting
+    expect(sim.player.resource).toBe(10 + (ITEMS.minor_mana_potion.potionMana ?? 0)); // instant, no sitting
     expect(sim.player.sitting).toBe(false);
     expect(sim.countItem('minor_mana_potion')).toBe(1);
 

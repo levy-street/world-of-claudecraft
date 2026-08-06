@@ -19,6 +19,7 @@ import { registeredSceneIds } from './scenes/registry';
 import { playSceneForPlayer, requestSceneSkip } from './scenes/scenes';
 import type { SentChat } from './sim';
 import type { SimContext } from './sim_context';
+import { bgQueueJoin, bgQueueSize, devEndBg, devStartBg } from './social/battleground';
 import { revivePlayerAt } from './spirit';
 import { MAX_LEVEL, type RiftTier } from './types';
 
@@ -373,6 +374,58 @@ export function handleDevChat(
     return null;
   }
 
+  if (/^\/(?:dev\s+bg|devbg)\s+end\s*$/i.test(raw)) {
+    // End the caller's live match early, resolving on the current score (ties
+    // draw) through the normal result screen + release flow.
+    if (devEndBg(ctx, pid))
+      emitDevLog(ctx, pid, '[dev] Thornhollow Fields resolved early on score.');
+    else ctx.error(pid, '[dev] You are not in an unresolved battleground.');
+    return null;
+  }
+
+  if (/^\/(?:dev\s+bg|devbg)\s*$/i.test(raw)) {
+    if (ctx.bgMatches.has(pid)) {
+      ctx.error(pid, '[dev] You are already in a battleground.');
+      return null;
+    }
+    bgQueueJoin(ctx, pid, { bypassLevel: true });
+    // The join can refuse (dead, inside an instance, oversize party); it
+    // already told the caller why, so bail before padding leaks a bot.
+    if (!ctx.bgQueue.some((g) => g.pids.includes(pid))) return null;
+    if (bgQueueSize(ctx) < 2) {
+      // Solo walk-around: pad the queue with one stationary dev bot (reusing an
+      // idle one if a previous /dev bg left it behind) so the force-start below
+      // has an opposing side. Partied bots stay untouched: queueing one would
+      // drag its whole party in.
+      let botPid = -1;
+      for (const meta of ctx.players.values()) {
+        const id = meta.entityId;
+        const e = ctx.entities.get(id);
+        if (meta.isDevBot && e && !e.dead && !ctx.bgMatches.has(id) && !ctx.partyOf(id)) {
+          botPid = id;
+          break;
+        }
+      }
+      // The suffix loop only exists to step past name collisions with
+      // player-spawned "/dev bot" dummies; nine tries is plenty.
+      for (let i = 1; i <= 9 && botPid < 0; i++)
+        botPid = ctx.spawnDevBot(i === 1 ? 'Riftbot' : `Riftbot${i}`);
+      if (botPid >= 0) bgQueueJoin(ctx, botPid, { bypassLevel: true });
+    }
+    devStartBg(ctx);
+    const match = ctx.bgMatches.get(pid);
+    if (match) {
+      const count = match.teams[0].length + match.teams[1].length;
+      emitDevLog(ctx, pid, `[dev] Thornhollow Fields force-started with ${count} champions.`);
+    } else {
+      ctx.error(
+        pid,
+        '[dev] Could not force-start Thornhollow Fields (needs 2 queued players and a free slot).',
+      );
+    }
+    return null;
+  }
+
   if (/^\/(?:dev\s+vendor|devvendor)\s*$/i.test(raw)) {
     const vendorId = ctx.spawnDevVendor(pid);
     if (vendorId < 0) ctx.error(pid, '[dev] Could not spawn the test vendor.');
@@ -696,7 +749,7 @@ export function handleDevChat(
   if (/^\/dev(?:\s|$)/i.test(raw)) {
     ctx.error(
       pid,
-      'Dev commands: /dev gui, /dev level, /dev tp, /dev spawn, /dev despawn, /dev killtarget, /dev give, /dev kit, /dev mounts, /dev mountquest, /dev gold, /dev quest, /dev quests, /dev attune, /dev mobilestation, /dev gather, /dev bot, /dev vendor, /dev lfg, /dev portal [seed] [level] [C|B|A|S] [infernal|random], /dev cascade, /dev sandbox, /dev smite, /dev god, /dev heal, /dev resource, /dev cooldowns, /dev revive, /dev combatreset, /dev dungeon, /dev raid, /dev kill',
+      'Dev commands: /dev gui, /dev level, /dev tp, /dev spawn, /dev despawn, /dev killtarget, /dev give, /dev kit, /dev mounts, /dev mountquest, /dev gold, /dev quest, /dev quests, /dev attune, /dev mobilestation, /dev gather, /dev bot, /dev vendor, /dev bg, /dev lfg, /dev portal [seed] [level] [C|B|A|S] [infernal|random], /dev cascade, /dev sandbox, /dev smite, /dev god, /dev heal, /dev resource, /dev cooldowns, /dev revive, /dev combatreset, /dev dungeon, /dev raid, /dev kill',
     );
     return null;
   }

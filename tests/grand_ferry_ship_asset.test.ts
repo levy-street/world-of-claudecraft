@@ -41,7 +41,7 @@ const EXPORTER = path.join(
 // the art or the build intent changes. A surprise diff here means the shipped
 // boat is not the one this repo builds.
 const ASSET_BYTES = 389540;
-const ASSET_SHA256 = '812b748a462069608a739d421c2ee0f17ca68de1f662c0fbde291e90145a505c';
+const ASSET_SHA256 = '498225bd957e4500275f1c5e9430222c0c999b149a4fbaad169ecc9329c72184';
 const ART_SHA256 = '9bfe1c2d385ce636488f01e0b4c31691e3aacbc5ef5b11e25e65e54d5fcf08d6';
 
 async function shippedTriangles(): Promise<number[][][]> {

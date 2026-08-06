@@ -41,14 +41,20 @@ export interface DisenchantResultEvent {
   /** The typed bind-on-trade secondary a rare+ yield adds (absent otherwise). */
   secondaryItemId?: string;
   secondaryCount?: number;
-  reason?: 'unknown_item' | 'not_disenchantable' | 'not_held' | 'throttled' | 'no_bag_space';
+  reason?:
+    | 'unknown_item'
+    | 'not_disenchantable'
+    | 'not_held'
+    | 'throttled'
+    | 'no_bag_space'
+    | 'busy';
 }
 export interface SalvageResultEvent {
   ok: boolean;
   /** The reclaimed material and its rolled count (present on ok). */
   materialItemId?: string;
   count?: number;
-  reason?: 'unknown_item' | 'not_salvageable' | 'not_held' | 'throttled' | 'no_bag_space';
+  reason?: 'unknown_item' | 'not_salvageable' | 'not_held' | 'throttled' | 'no_bag_space' | 'busy';
 }
 export interface ApplyEnchantResultEvent {
   ok: boolean;
@@ -63,7 +69,8 @@ export interface ApplyEnchantResultEvent {
     // #2415: the honest already-enchanted deny (no confirm flag), and the
     // identical-enchant-id re-apply denied on every arm.
     | 'already_enchanted'
-    | 'same_enchant';
+    | 'same_enchant'
+    | 'busy';
 }
 
 /** The toast for one disenchantResult event. Success is a chat line naming the
@@ -86,7 +93,8 @@ export function disenchantResultToast(ev: DisenchantResultEvent): EnchantingToas
     };
   switch (ev.reason) {
     case 'throttled':
-      return { key: 'hudChrome.enchanting.disenchantThrottled', sink: 'error' };
+    case 'busy':
+      return { key: 'hudChrome.enchanting.disenchantBusy', sink: 'error' };
     case 'not_disenchantable':
       return { key: 'hudChrome.enchanting.notDisenchantable', sink: 'error' };
     case 'no_bag_space':
@@ -110,7 +118,8 @@ export function salvageResultToast(ev: SalvageResultEvent): EnchantingToast {
     };
   switch (ev.reason) {
     case 'throttled':
-      return { key: 'hudChrome.enchanting.salvageThrottled', sink: 'error' };
+    case 'busy':
+      return { key: 'hudChrome.enchanting.salvageBusy', sink: 'error' };
     case 'not_salvageable':
       return { key: 'hudChrome.enchanting.notSalvageable', sink: 'error' };
     case 'no_bag_space':
@@ -142,7 +151,8 @@ export function applyEnchantResultToast(ev: ApplyEnchantResultEvent): Enchanting
   if (ev.ok) return { key: 'hudChrome.enchanting.enchantAppliedLine', sink: 'log' };
   switch (ev.reason) {
     case 'throttled':
-      return { key: 'hudChrome.enchanting.enchantThrottled', sink: 'error' };
+    case 'busy':
+      return { key: 'hudChrome.enchanting.enchantBusy', sink: 'error' };
     case 'wrong_slot':
       return { key: 'hudChrome.enchanting.enchantWrongSlot', sink: 'error' };
     case 'unknown_enchant':

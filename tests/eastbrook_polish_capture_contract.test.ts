@@ -376,7 +376,15 @@ describe('Eastbrook polish capture contract', () => {
       // or geometry value changed, and no capture was retaken: Eastbrook itself is
       // untouched by all of it. Re-minted with
       // scripts/assets/eastbrook_grand_armoury/remint_polish_provenance.mjs.
-      fingerprint: '110e06843c14ade2a20530a1770ee82a1a0f86ae49ebad601b560fe2184fb5a1',
+      // Re-pinned at the Thornhollow branch sync: that branch edits
+      // src/render/renderer.ts (battleground occluder fade and ward state),
+      // the renderer-integration leaf, so the composite re-mints. Re-derive
+      // whenever renderer.ts changes.
+      // Re-pinned for the mobile-disconnect fix: src/render/renderer.ts gains the
+      // bounded ground-object reuse pool (storePooledObject/takePooledObject cap),
+      // the renderer-integration leaf, so the composite re-mints again. Regenerated
+      // via scripts/assets/eastbrook_grand_armoury/remint_polish_provenance.mjs.
+      fingerprint: '87ea454d8d2e8f7be3a2f9c4e47d42331b98dd1aa53d100efe06d4cd904b1604',
       components: {
         captureContract: {
           id: 'polish-v2',

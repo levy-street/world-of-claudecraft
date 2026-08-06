@@ -126,6 +126,9 @@ const PROVEN_SAFE_BASES: ProvenSafeBase[] = [
  *  SET with counts, not as a floor: a floor sitting under the real total is what
  *  lets a whole directory leave the scan while the guard stays green. */
 const POW_SITES_PER_FILE: Record<string, number> = {
+  'src/render/battleground_lantern_fx.ts': 1,
+  'src/render/battleground_rune_vfx.ts': 3,
+  'src/render/battleground_ward.ts': 1,
   'scripts/asset_pipeline/weapon_vfx.js': 4,
   'src/render/ability_vfx/rings.ts': 1,
   'src/render/ability_vfx/shells.ts': 1,

@@ -164,7 +164,9 @@ describe('harbor deck rider core', () => {
   });
 
   it('pins far-rider retention, mutation, and the independent runtime audit', () => {
-    expect(RENDERER_SOURCE).toContain('this.createHarborDeckRiderViews(\n      runtimeViewBudget,');
+    expect(RENDERER_SOURCE).toMatch(
+      /this\.createHarborDeckRiderViews\(\s*runtimeViewBudget,\s*createdViewTypes\s*\)/,
+    );
     expect(RENDERER_SOURCE).toContain('if (max === 0 || !harborShipCueActive()) return 0;');
     expect(RENDERER_SOURCE).toContain('if (created >= max) break;');
     expect(RENDERER_SOURCE).toContain('runtimeViewBudget - deckRiderViews');

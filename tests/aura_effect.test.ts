@@ -222,4 +222,15 @@ describe('auraEffectDescriptor', () => {
       nums: {},
     });
   });
+
+  it('teaches the carried-flag buff its right-click-to-drop affordance', () => {
+    // The one row that describes an ACTION rather than a stat: without it the
+    // voluntary drop is undiscoverable, since nothing else on screen says it.
+    expect(desc({ id: 'bg_carried_flag', kind: 'flag_carried', value: 0 })).toEqual({
+      key: 'hudChrome.auraEffect.carriedFlag',
+      nums: {},
+    });
+    // The kind alone describes nothing: the id is what earns the line.
+    expect(desc({ id: 'some_other_marker', kind: 'flag_carried', value: 0 })).toBeNull();
+  });
 });

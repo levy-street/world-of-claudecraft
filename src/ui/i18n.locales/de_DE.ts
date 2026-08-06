@@ -329,8 +329,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Eine einheitliche Gebühr pro Rezeptsprosse, einmalig fällig, wenn ein Meister sie lehrt; jede Sprosse der Tabelle unten ist heute im Einsatz, von den kostenlosen Anfängerrezepten bis zu den Rutenlektionen des Werkzeugmachers ganz oben.',
   'guide.profPages.econ.provenanceBody':
     'Manche Gegenstände tragen einen Namen. Fahre mit dem Zeiger darüber, und der Tooltip sagt bei einem Rohstoff Gesammelt von Soundso oder bei einem fertigen Stück Hergestellt von Soundso: dieselbe Marke, nur danach formuliert, wie der Gegenstand entstanden ist. Eine Signatur ist Teil des Gegenstands selbst, reist mit ihm durch Handel, Bank, Post, den Weltmarkt und sogar einen Händler-Rückkauf und verblasst nie.\n\nSammeln signiert seine beste Arbeit von selbst: Jede Ernte, die selten oder besser würfelt, kommt signiert an, und seltene Funde signieren ihren gesamten fünffachen Segen. Der Glückswurf einer Leichenernte signiert den Ertrag dort, wo die Familie kein Exemplar zu geben hat, und wo sie eines hat, bleibt der Ertrag schlicht und daneben entsteht das signierte makellose Exemplar. Handwerk signiert nach derselben Regel: Jede Kopie einer seltenen oder besseren Ausgabe entsteht signiert, und ein Meisterwerk signiert immer, welche Qualität es auch hat, sodass die feinste Fassung jedes Stücks stets seinen Hersteller nennt. Das Einzige, was dich eine Signatur kosten kann, ist eine volle Tasche: Eine signierte Einheit braucht einen eigenen Platz oder einen passenden signierten Stapel, in dem sie landen kann.\n\nEin Stapel Gegenstände teilt sich eine Identität, also verschmelzen zwei Kopien nur dann, wenn jede Marke exakt übereinstimmt: gleicher Gegenstand, gleicher Unterzeichner, gleiche Meisterwerk-Attribute, gleiche Verzauberung, gleiche Bindung. Ein signiertes Scheit gesellt sich in keine Richtung zu einem schlichten Haufen (das Verschmelzen würde jemandes Namen auslöschen), doch identische Ladungen verschmelzen bereitwillig, sodass zwanzig vom selben Sammler signierte Erze in einem Stapel sitzen und ein Segensfund deine Taschen nicht zerfetzt.\n\nSignaturen zahlen sich für Handwerker aus: Hältst du an der Werkbank irgendeine signierte Kopie eines benötigten Reagenzes, gleich wer sie signiert hat, steigt die Meisterwerk-Chance um 2 Prozentpunkte, und hältst du ein von eigener Hand signiertes Reagenz, sinkt die benötigte Menge dieses Reagenzes um eins (nie unter eins). Deine eigene signierte seltene oder bessere Arbeit lehrt dich sogar weiter, heute allein über die Flasche: Trink einen Trank, den du signiert hast, und ein kleines Rinnsal Fertigkeit fließt zurück in das Handwerk, das ihn gebraut hat, solange dieses Handwerk einer deiner aktiven Hauptberufe ist.',
-  'guide.profPages.econ.throttleBody':
-    'Der Ausstoß hat eine Obergrenze: Herstellen, Entzaubern, Verzaubern, Zerlegen und das Aufladen von Werkzeugeffekten teilen sich ein Budget von {actions} erfolgreichen Aktionen in jedem Fenster von {seconds} Sekunden. Ein abgewiesener Versuch kostet nichts und verbraucht kein Budget. Im normalen Spiel wirst du sie nie spüren; es gibt sie nur, damit ein Spezialist am Maximum mit vollem Lager den Markt nicht überschwemmen kann, wie hoch seine Fertigkeit oder sein Vorrat auch sein mag.',
   'guide.profPages.faq.a4':
     'Du hattest einen Glücksfund. Etwa 1 von 90 Ernten löst ein seltenes Sammelereignis aus (uraltes Kernholz an einem Baum, eine makellose Ader beim Erz, eine mondscheinbeleuchtete Blüte bei Kräutern): Es verfünffacht den Ertrag, signiert jede Einheit mit deinem Namen und verkündet den Fund der ganzen Zone. Auch ein Seltenheitswurf von Selten oder besser bei einer gewöhnlichen Ernte signiert den Ertrag.\n\nSignierte Materialien lohnt es sich aufzuheben oder teuer zu verkaufen: Wer an der Werkbank irgendeine signierte Kopie eines benötigten Reagenz hält, erhält 2 Prozentpunkte mehr Meisterwerkchance. Denk nur daran, dass sie sich nur mit identisch signierten Kopien stapeln und deshalb einen eigenen Taschenplatz belegen.',
   'guide.profPages.faq.a6':
@@ -708,7 +706,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.collectorsHeading': 'Sammler, Trophäen und der Preis einer Geschichte',
   'guide.profPages.econ.collectorsBody':
     'Händler sind blind für Provenienz: Ein signierter Gegenstand verkauft sich an einen NSC für genau seinen schlichten Preis. Der Aufpreis für eine Signatur besteht nur zwischen Spielern, und genau das macht ihn interessant: ein Stapel Glückserz, signiert von einem berühmten Sammler, ein Erstklassiges Stück aus einer glücklichen Ernte, eine Meisterwerksklinge mit dem Namen eines längst zurückgezogenen Schmieds, all das kostet, was jemandes Erinnerung sagt, dass es wert ist.\n\nDas Buch der Taten spielt mit demselben Instinkt: Makellose Ader, Altes Herzholz, Mondlichtblüte, Ein Makelloses Exemplar und Schimmer der Hoffnung sind Sammlertaten mit null Ansehen, die einzig dazu da sind, zu beweisen, dass dir ein Moment passiert ist. Behalte den Gegenstand, der die Tat verdient hat, und du hältst den Beleg. Das ist keine Macht; Provenienz kauft keine Attributpunkte und gewinnt keine Kämpfe, sie ist die Papierspur der Welt an guten Tagen.',
-  'guide.profPages.econ.throttleHeading': 'Die Aktionsdrosselung',
   'guide.profPages.econ.doctrineHeading': 'Spieler handeln mit Spielern',
   'guide.profPages.econ.doctrineBody':
     'Die Handwerkswirtschaft beruht auf einem Gedanken: Spieler versorgen Spieler. Sammler beliefern Handwerker, Handwerker versorgen Quester und Schlachtzügler, und Zerbrecher beliefern Verzauberer, während Händler und Stationsmeister an den Rändern stehen, um Plunder und Münzen aufzunehmen, anstatt mit dir zu konkurrieren. Wenn du mit einem Beruf Geld verdienen willst, ist dein Kunde ein Mensch: Lerne, was andere Spieler verbrauchen, richte deine Preise am Weltmarkt aus und behandle die NSC-Systeme als Boden unter deinen Preisen, nicht als den Markt selbst.\n\nGefertigte Ausrüstung ist so ausgewogen, dass sie unterhalb des Schlachtzugbodens liegt: Selbst ein Meisterwerk ist immer nur eine Qualitätsstufe über seinem Rezept, nie jenseits von Legendär, und sein Attributbudget bleibt unter dem Schlachtzugsbeute-Band. Die Schmiede macht dich bereit für den härtesten Inhalt; sie ersetzt ihn nicht. Das hält Handwerker, Schlachtzügler und den Markt in einem stabilen Dreieck: Schlachtzugsbeute bleibt erstrebenswert, und gefertigte Stücke bleiben die beste Ausrüstung, die man für Geld kaufen kann.',
@@ -2403,9 +2400,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.calendar.events.delveDay.note':
     'Bruder Halven markiert seine Karten: ein guter Tag, um das Eingestürzte Reliquiar zu wagen.',
   'hudChrome.calendar.events.delveDay.title': 'Tiefgang-Tag',
-  'hudChrome.calendar.events.fiestaNight.note':
-    'Der 2v2-Fiesta-Ring zieht heute Nacht sein lautestes Publikum an.',
-  'hudChrome.calendar.events.fiestaNight.title': 'Fiesta-Nacht',
   'hudChrome.calendar.events.fishingDerby.note':
     'Angler säumen die Seen. Bring eine Rute mit und tausche Anglergeschichten aus.',
   'hudChrome.calendar.events.fishingDerby.title': 'Angelderby',
@@ -2663,6 +2657,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.partyGroup': 'Gruppe {n}',
   'hudChrome.unitFrame.partyLabel': 'Eure Gruppe',
   'hudChrome.unitFrame.playerLabel': 'Euer Charakter',
+  'hudChrome.unitFrame.petLabel': 'Euer Begleiter',
   'hudChrome.unitFrame.targetAnnounce': 'Ziel: {name}',
   'hudChrome.unitFrame.targetLabel': 'Euer Ziel',
   'seo.officialLabel': 'Offizielle Website von World of ClaudeCraft',
@@ -3482,7 +3477,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hud.core.mobileMore': 'Mehr',
   'hud.core.mobileMoreAria': 'Weitere Menüs anzeigen',
   'hud.core.mobileSocial': 'Soziales',
-  'hud.core.mobileArena': 'Arena',
   'hud.core.mobileMenu': 'Menü',
   'hud.core.mobileSettings': 'Einstellungen',
   'hud.core.mobileUse': 'Benutzen',
@@ -3592,7 +3586,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hud.keybinds.actions.nameplates': 'Namensplaketten umschalten',
   'hud.keybinds.actions.meters': 'Schadensanzeigen',
   'hud.keybinds.actions.social': 'Freunde & Gilde',
-  'hud.keybinds.actions.arena': 'Arena (Aschenes Kolosseum)',
   'hud.keybinds.actions.chat': 'Chat öffnen',
   'hud.keybinds.actions.attack': 'Angreifen',
   'hud.keybinds.actions.actionBarSlot': 'Aktionsleiste {slot}',
@@ -4941,6 +4934,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.ridge_stalker_pelt.name': 'Balg eines Gratpirschers',
   'entities.items.old_cragmaws_pelt.name': 'Balg des alten Cragmaw',
   'entities.items.cragmaw_huntcord.name': 'Jagdgurt von Cragmaw',
+  'entities.items.cragmaw_huntquiver.name': 'Jagdköcher von Cragmaw',
   'entities.items.glowing_wax.name': 'Glühendes Wachs',
   'entities.items.ogre_war_totem.name': 'Ogerkriegstotem',
   'entities.items.storm_core.name': 'Sturmkern',
@@ -5017,6 +5011,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.mirejaw_scale_vest.name': 'Mirejaw-Schuppenweste',
   'entities.items.moggers_copper_cudgel.name': 'Moggers Kupferknüppel',
   'entities.items.moggers_shiv.name': 'Moggers Messer',
+  'entities.items.moggers_hide_quiver.name': 'Moggers Fellköcher',
   'entities.items.moggers_stomper_boots.name': 'Moggers Stampfstiefel',
   'entities.items.necromancers_legwraps.name': 'Mournweave-Beinwickel',
   'entities.items.necromancers_soulsteps.name': 'Mournweave-Seelenschritte',
@@ -5041,6 +5036,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.cryptbone_pauldrons.name': 'Gruftknochenschulterstücke',
   'entities.items.deathlords_dread_visage.name': 'Barrowlords Schreckensantlitz',
   'entities.items.gravewyrm_gauntlets.name': 'Gravewyrm-Stulpen',
+  'entities.items.gravewyrm_bone_quiver.name': 'Gravewyrm-Knochenköcher',
   'entities.items.gravewyrm_mantle.name': 'Gravewyrm-Mantel',
   'entities.items.mistveil_cord.name': 'Nebelschleierkordel',
   'entities.items.mistveil_grips.name': 'Nebelschleiergriffe',
@@ -5966,7 +5962,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'fiesta.end.draw': 'FIESTA-UNENTSCHIEDEN! Zu knapp, um zu entscheiden!',
   'fiesta.end.loss': 'FIESTA VERLOREN! Versucht es erneut!',
   'fiesta.end.win': 'FIESTA GEWONNEN! 🎉 Was für ein Fest!',
-  'fiesta.enterQueue': 'Tretet der Fiesta bei!',
   'fiesta.error.leaderOnly': 'Nur der Gruppenleiter darf Euer Team für {label} anmelden.',
   'fiesta.error.noAugment': 'Ihr habt im Moment keine Augmentierung zur Wahl.',
   'fiesta.error.notOnOffer': 'Diese Augmentierung wird nicht angeboten.',
@@ -5983,9 +5978,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'fiesta.powerup.pow_colossus.name': 'Koloss',
   'fiesta.powerup.pow_moon_boots.name': 'Mondstiefel',
   'fiesta.powerup.pow_speed_demon.name': 'Geschwindigkeitsdämon',
-  'fiesta.practice': '🎉 Übung gegen Bots',
-  'fiesta.practiceNote':
-    'Offline-Übung: erzeugt 3 KI-Bots und meldet Euch für eine 2-gegen-2-Fiesta an. Klickt erneut zum Beenden.',
   'fiesta.queue.join':
     'Ihr tretet der Warteschlange für die 2-gegen-2-Fiesta bei. Macht Euch bereit zum FEIERN…',
   'fiesta.queue.leave': 'Ihr verlasst die Warteschlange für die 2-gegen-2-Fiesta.',
@@ -6180,6 +6172,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.stormcallers_spaulders.name': 'Galecall-Schulterplatten',
   'entities.items.bonewrought_greatsword.name': 'Bonewrought-Großschwert',
   'entities.items.direfang_greatblade.name': 'Direfang-Großklinge',
+  'entities.items.direfang_quiver.name': 'Direfang-Köcher',
   'entities.items.bonewrought_bulwark.name': 'Bonewrought-Bollwerk',
   'entities.items.wraithfire_orb.name': 'Wraithfire-Kugel',
   'hud.chat.context.convertToRaid': 'In Schlachtzug umwandeln',
@@ -6809,17 +6802,12 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.thunder_clap': 'Trifft alles um dich herum und verlangsamt deren Angriffe.',
   'guide.abilityHook.wrath':
     'Ein Naturblitz, den du aus der Distanz auf ein Ziel schleuderst, dein erster Schadenszauber.',
-  'guide.arenaPage.augmentsNote':
-    'Augmentierungen und Verstärkungen halten nur für das Match. Es geht um verspielte Builds aus dem Moment heraus, nicht um anhaltende Macht, sodass sich niemand den Sieg erkaufen kann.',
   'guide.arenaPage.coliseumBody':
     'Das Kolosseum ist die Arena des Reichs, wo du in gewerteten Matches gegen andere Spieler antrittst, eins gegen eins oder zwei gegen zwei. Jede Wertungsklasse hat ihre eigene Rangliste, ein Sieg hebt dich also auf dieser Leiter empor, für das ganze Reich sichtbar. Öffne das Arenafenster, um dich für eine Wertungsklasse anzumelden, allein oder mit deinem Partner.',
   'guide.arenaPage.coliseumHeading': 'Das Aschene Kolosseum',
   'guide.arenaPage.duelsBody':
     'Fordere jeden Spieler, dem du begegnest, zu einem freundschaftlichen Duell heraus. Es steht nichts auf dem Spiel außer dem Stolz, also ist es der einfachste Weg, eine Paarung zu lernen oder eine freundschaftliche Wette zu klären.',
   'guide.arenaPage.duelsHeading': 'Duelle',
-  'guide.arenaPage.fiestaBody':
-    'Fiesta ist ein schneller Zwei-gegen-Zwei-Kampf, als ein durchgehendes Gefecht ausgetragen, bei dem jeder Kämpfer auf gleiche Ausgangslage gebracht wird. Während der Kampf läuft, draftest du Augmentierungen, schnelle Boosts, die dein Repertoire spontan umformen, sodass kein Match dem anderen gleicht.',
-  'guide.arenaPage.fiestaHeading': 'Zwei gegen Zwei Fiesta',
   'guide.arenaPage.heading': 'Arena und PvP',
   'guide.arenaPage.intro':
     'Willst du dich mit anderen Spielern messen? Spieler gegen Spieler ist eingebaut, und es ist immer deine Wahl, niemals etwas, das dir aufgezwungen wird.',
@@ -6978,21 +6966,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Drei Gebiete, von Süden nach Norden, jedes eine Stufe höher im Level. Folge der Questspur, und das Land trägt dich vom Tal bis zu den Gipfeln.',
   'guide.worldPage.places': 'Bemerkenswerte Orte',
   'guide.worldPage.residents': 'Wem du begegnen wirst',
-  'guide.arenaPage.powerupsBody':
-    'Mitten im Kampf fallen außerdem leuchtende Kugeln in die Arena, frei für den, der sie zuerst erreicht. Sie sind absichtlich völlig übertrieben und halten nur kurz an: Geschwindigkeitsdämon für einen Wimpernschlag blendenden Tempos, Koloss, um dich zu einem schwerfälligen Riesen anschwellen zu lassen, Mondstiefel für einen federnden Sprung bei niedriger Schwerkraft und Berserker für einen plötzlichen Schub an Raserei.',
-  'guide.arenaPage.powerupsTitle': 'Powerups im Ring',
-  'guide.arenaPage.waveGoldBody':
-    'Die mittlere Welle: zweischneidige Kombinationen, in denen dein Build allmählich Gestalt annimmt und zu glänzen beginnt.',
-  'guide.arenaPage.waveGoldTitle': 'Gold',
-  'guide.arenaPage.wavePrismaticBody':
-    'Die letzte Welle: build-prägende, bildschirmschmelzende Ausschläge, die sich auf die beste Art lächerlich anfühlen sollen.',
-  'guide.arenaPage.wavePrismaticTitle': 'Prismatisch',
-  'guide.arenaPage.waveSilverBody':
-    'Die Eröffnungswelle: klare Boosts auf einen einzelnen Wert, die die Grundlagen deiner Klasse schärfen.',
-  'guide.arenaPage.waveSilverTitle': 'Silber',
-  'guide.arenaPage.wavesBody':
-    'Ein Fiesta-Gefecht reicht dir im Verlauf frische Auswahlmöglichkeiten, und sie werden mutiger, je länger der Kampf dauert. Du baust von einer Welle zur nächsten auf, wählst jedes Mal eine von wenigen Optionen und behältst sie für den Rest des Gefechts.',
-  'guide.arenaPage.wavesTitle': 'Augmentierungen kommen in Wellen',
   'guide.bestiary.flavor.gravecaller_cultist':
     'Gewandete Diener des Todeskults, deren Treiben die Gräber vom Tal bis zu den Gipfeln schändet. Wo sie sich versammeln, ruhen die Toten nicht.',
   'guide.bestiary.flavor.grubjaw':
@@ -7917,6 +7890,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.event.hint': 'Kündige einen Schlachtzug, ein Treffen oder ein Event an',
   'hudChrome.discord.relay.help.label': 'Hilfe benötigt',
   'hudChrome.discord.relay.help.hint': 'Bitte die Gemeinschaft um Hilfe',
+  'hudChrome.options.hideUnusedActionSlots': 'Ungenutzte Aktionsfelder ausblenden',
   'hudChrome.options.showSecondaryActionBar': 'Zweite Aktionsleiste anzeigen',
   'errors.api.desktopCodeInvalid':
     'Der Desktop-Anmeldecode ist ungültig oder abgelaufen. Bitte versuche es erneut.',
@@ -8171,7 +8145,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Alles auf dieser Seite lebt im Spiel: Drücke Esc, um die Optionen zu öffnen. Das Menü öffnet mit einer Übersicht angehefteter Grundlagen, mit den Kategorien auf einer Leiste daneben: Die Einstellungen weiter unten liegen unter Grafik, Benutzeroberfläche und Barrierefreiheit in der Gruppe Anzeige, und die Leistungsüberlagerung unter System. Noch schneller: Tippe einen Namen in das Suchfeld oben und spring direkt dorthin.',
   'guide.settingsPage.whyLabel': 'Warum es funktioniert:',
   'hudChrome.crafting.close': 'Enges Basteln',
-  'hudChrome.crafting.craft': 'Handwerk',
   'hudChrome.crafting.craftedToast': 'Hergestellt: {name}',
   'hudChrome.crafting.empty': 'Noch keine Rezepte bekannt.',
   'hudChrome.crafting.insufficientMaterials': 'Dafür fehlen Ihnen die Materialien.',
@@ -8257,9 +8230,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.training_dummy.name': 'Trainingspuppe',
   'entities.mobs.yumi_cat.name': 'Yumi',
   'entities.mobs.water_elemental.name': 'Wasserelementar',
-  'guide.arenaPage.yumiBody':
-    'Yumi beschützen ist ein Team-Zielmodus, der in einem Labyrinth ausgetragen wird: Jede Seite bewacht ihren eigenen Katzenbegleiter und jagt zugleich den der Gegner. Immer wieder blinzeln beide Katzen in neue Ecken des Labyrinths, sodass der Kampf zwischen Verteidigen, Jagen und dem Wettlauf, sie erneut aufzuspüren, hin und her schwingt. Melde dich als drei gegen drei oder fünf gegen fünf an; wer im Kampf fällt, muss nur einen Moment pausieren.',
-  'guide.arenaPage.yumiHeading': 'Yumi beschützen',
   'hudChrome.archetypeTitle.hobbyLabel': 'Freizeit',
   'hudChrome.auraEffect.armorPct': 'Verringert Rüstung um {pct}%',
   'hudChrome.auraEffect.armorPctStacks': 'Verringert Rüstung um {pct}% ({stacks} Stapel)',
@@ -8269,8 +8239,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.increasePct.int': 'Erhöht Intelligenz um {pct}%',
   'hudChrome.auraEffect.increasePct.sta': 'Erhöht Ausdauer um {pct}%',
   'hudChrome.crafting.recipeNotLearned': 'Ihr habt dieses Rezept noch nicht erlernt.',
-  'hudChrome.crafting.throttled':
-    'Ihr stellt zu schnell her. Wartet einen Moment und versucht es erneut.',
   'hudChrome.mobile.chatPlaceholder': 'Sag etwas...',
   'hudChrome.mobile.hideKeyboard': 'Tastatur ausblenden',
   'hudChrome.unitFrame.partyChip': 'Gruppe',
@@ -8280,7 +8248,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'yumi.bracket5': 'Yumi 5 gegen 5',
   'yumi.end.loss': 'NIEDERLAGE! Eure Yumi ist gefallen.',
   'yumi.end.win': 'SIEG! Yumi ist in Sicherheit!',
-  'yumi.enterQueue': 'Yumi beschützen beitreten!',
   'yumi.error.partyTooBig3':
     'Bei Yumi beschützen 3 gegen 3 ist eine Gruppe von bis zu drei Spielern erlaubt.',
   'yumi.error.partyTooBig5':
@@ -8469,6 +8436,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.keybinds.petAttack': 'Begleiter: Angreifen',
   'hudChrome.keybinds.petDefensive': 'Begleiter: Defensiv',
   'hudChrome.keybinds.petStop': 'Begleiter: Stopp',
+  'hudChrome.keybinds.targetPet': 'Begleiter: Anvisieren',
   'hudChrome.keybinds.petTaunt': 'Begleiter: Verspotten',
   'hudChrome.mailbox.parcelQtyDecreaseAria': 'Ein Stück weniger von {item} senden',
   'hudChrome.mailbox.parcelQtyIncreaseAria': 'Ein Stück mehr von {item} senden',
@@ -9268,6 +9236,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Deine Chance, einen frontalen Nahkampfangriff vollständig zu parieren und keinen Schaden zu erleiden. Ein Schlag von hinten kann nicht pariert werden.',
   'hudChrome.options.mouseoverCast': 'Mouseover-Wirken auf Gruppenfenstern',
   'hudChrome.options.showTargetOfTarget': 'Ziel des Ziels anzeigen',
+  'hudChrome.options.showPetFrame': 'Euren Begleiter anzeigen',
   'hudChrome.unitFrame.targetOfTargetLabel': 'Ziel des Ziels',
   'itemUi.market.rarityLegendary': 'Legendär',
   'loading.reconnectingAttempt':
@@ -9688,14 +9657,10 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.disenchantConfirmBodySpecial':
     'Dies zerstört eine besondere Kopie von {item} (signiert, Meisterwerk oder verzaubert) und ergibt arkane Materialien. Dies kann nicht rückgängig gemacht werden.',
   'hudChrome.enchanting.disenchantConfirmTitle': '{item} entzaubern?',
-  'hudChrome.enchanting.disenchantThrottled':
-    'Du entzauberst zu schnell. Warte einen Moment und versuche es erneut.',
   'hudChrome.enchanting.disenchantedLine': 'Du entzauberst {item}.',
   'hudChrome.enchanting.enchantAppliedLine': 'Du verzauberst {item} mit {enchant}.',
   'hudChrome.enchanting.enchantInsufficient':
     'Du hast nicht die Materialien für diese Verzauberung.',
-  'hudChrome.enchanting.enchantThrottled':
-    'Du verzauberst zu schnell. Warte einen Moment und versuche es erneut.',
   'hudChrome.enchanting.enchantUnknown': 'Diese Verzauberung existiert nicht.',
   'hudChrome.enchanting.enchantWrongSlot':
     'Diese Verzauberung kann nicht auf diesen Gegenstand angewendet werden.',
@@ -9710,8 +9675,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.salvageConfirmBodySpecial':
     'Dies zerstört eine besondere Kopie von {item} (signiert, Meisterwerk oder verzaubert) und ergibt Handwerksmaterialien. Dies kann nicht rückgängig gemacht werden.',
   'hudChrome.enchanting.salvageConfirmTitle': '{item} zerlegen?',
-  'hudChrome.enchanting.salvageThrottled':
-    'Du zerlegst zu schnell. Warte einen Moment und versuche es erneut.',
   'hudChrome.enchanting.salvagedLine': 'Du zerlegst {item}.',
   'hudChrome.enchanting.targetTitle': 'Wähle einen Gegenstand zum Verzaubern',
   'hudChrome.gathering.biteLine': 'Etwas nimmt den Köder!',

@@ -223,6 +223,7 @@ function stripOrphanedFormAuras(ctx: SimContext, meta: PlayerMeta, e: Entity | u
 function talentLockReason(ctx: SimContext, p: Entity): string | null {
   if (p.inCombat) return 'You cannot change talents in combat.';
   if (ctx.arenaMatches.has(p.id)) return 'You cannot change talents during an arena match.';
+  if (ctx.bgMatches.has(p.id)) return 'You cannot change talents during a battleground.';
   return null;
 }
 

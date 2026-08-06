@@ -22,11 +22,11 @@ describe('gather node rendering', () => {
 
     // 120 nodes in 57 batches through v0.33.0; the phase 20 density pass
     // (the +36 bottom-three set) took the content to 156 nodes. Relocating
-    // Farshore across a regional band boundary takes the final batch count to
-    // 69 (12 new zone:type:band combos across the three expanded realms).
+    // Farshore across a regional band boundary took the batch count to 69;
+    // the Last Bell Watch Meadow node adds one new zone:type:band combination.
     expect(GATHER_NODES).toHaveLength(156);
-    expect(expectedBatches.size).toBe(69);
-    expect(meshes).toHaveLength(69);
+    expect(expectedBatches.size).toBe(70);
+    expect(meshes).toHaveLength(70);
     expect(meshes.reduce((sum, mesh) => sum + mesh.count, 0)).toBe(GATHER_NODES.length);
     expect(new Set(meshes.map((mesh) => mesh.geometry)).size).toBe(3);
     expect(new Set(meshes.map((mesh) => mesh.material)).size).toBe(3);

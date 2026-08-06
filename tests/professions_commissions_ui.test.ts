@@ -31,12 +31,16 @@ function craftingDeps() {
     hideTooltip: vi.fn(),
     onCraft: vi.fn(),
     onClose: vi.fn(),
+    onOpenOrders: vi.fn(),
     itemIcon: vi.fn(() => ''),
     moneyHtml: vi.fn(() => ''),
     itemTooltip: vi.fn(() => ''),
     attachTooltip: vi.fn(),
     commissionChecked: vi.fn((_recipeId: string) => false),
     onToggleCommission: vi.fn(),
+    craftQty: () => 1,
+    onCraftQty: vi.fn(),
+    announce: vi.fn(),
     selectedCraft: () => null as string | null,
     onSelectCraft: vi.fn(),
   };
@@ -147,7 +151,11 @@ describe('renderCraftingWindow commission toggle-chip', () => {
     const card = el.querySelector('.crafting-recipe-item') as HTMLElement;
     const classes = [...card.children].map((child) => child.className);
     expect(classes[0]).toContain('crafting-recipe-btn');
-    expect(classes[1]).toBe('crafting-commission-row');
+    // Phase 3 batch row sits after the craft controls; commission chip follows.
+    expect(classes).toContain('crafting-commission-row');
+    expect(classes.indexOf('crafting-batch-row')).toBeLessThan(
+      classes.indexOf('crafting-commission-row'),
+    );
     const chip = card.querySelector('.crafting-commission-chip');
     expect(deps.attachTooltip.mock.calls.some((call) => call[0] === chip)).toBe(true);
   });

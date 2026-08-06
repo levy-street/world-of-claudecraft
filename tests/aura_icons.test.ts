@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import { ABILITIES } from '../src/sim/data';
-import { iconDataUrl } from '../src/ui/icons';
+import {
+  BATTLE_RUNE_AURA_ID,
+  CARRIED_FLAG_AURA_ID,
+  SPRINT_RUNE_AURA_ID,
+  WARD_RUNE_AURA_ID,
+} from '../src/sim/social/battleground';
+import { hasAuraRecipe, iconDataUrl } from '../src/ui/icons';
 
 // Buff/debuff aura frames (the player buff bar and a mob's DoT debuffs, both via
 // Hud.renderAuras) request their icon with kind 'aura'. When the aura carries a
@@ -49,5 +55,23 @@ describe('aura icons reuse image-based ability art', () => {
       // and it matches what the action bar shows for the same ability
       expect(iconDataUrl('aura', id)).toBe(iconDataUrl('ability', id));
     }
+  });
+
+  it('the Thornhollow Fields rune buffs carry dedicated identity recipes (boots/sword/shield)', () => {
+    // The hud iconId resolver passes an aura id through ONLY when it has a
+    // recipe (or is an ability); without these rows the rune buffs collapse to
+    // the aura_<kind> generic and read as color-only, the playtest complaint.
+    for (const id of [SPRINT_RUNE_AURA_ID, BATTLE_RUNE_AURA_ID, WARD_RUNE_AURA_ID]) {
+      expect(hasAuraRecipe(id), `${id} needs its identity recipe`).toBe(true);
+    }
+  });
+
+  it('the carried-flag buff carries its own banner recipe', () => {
+    // Its kind ('flag_carried') is deliberately read by nothing, so it has no
+    // aura_<kind> generic to fall back to: without this row the one buff the
+    // carrier must recognize at a glance paints the unknown icon.
+    expect(hasAuraRecipe(CARRIED_FLAG_AURA_ID), 'the carried-flag buff needs its recipe').toBe(
+      true,
+    );
   });
 });

@@ -317,8 +317,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Jedna stała opłata za szczebel przepisów, pobierana raz, gdy mistrz go naucza; każdy szczebel z poniższej tabeli jest dziś w żywym użyciu, od darmowych przepisów startowych po lekcje wędek u wytwórcy narzędzi na samej górze.',
   'guide.profPages.econ.provenanceBody':
     'Niektóre przedmioty noszą imię. Najedź na taki, a dymek powie Zebrane przez kogoś tam na surowym materiale albo Stworzone przez kogoś tam na gotowym wyrobie: ten sam znak, ubrany w słowa zależnie od tego, jak przedmiot powstał. Podpis jest częścią samego przedmiotu, jedzie z nim przez wymiany, bank, pocztę, Rynek Świata, a nawet odkup u sprzedawcy, i nigdy nie blednie.\n\nZbieractwo podpisuje swoją najlepszą pracę automatycznie: każdy zbiór, który wylosuje rzadki lub lepszy, przychodzi podpisany, a rzadkie znaleziska podpisują cały swój pięciokrotny urobek. Szczęśliwy rzut przy zbiorze ze zwłok podpisuje plon tam, gdzie dana rodzina nie ma okazu do oddania, a tam, gdzie ma, zostawia plon zwykły i wybija obok niego podpisany nieskazitelny okaz. Wytwarzanie podpisuje wedle tej samej linii: każda kopia wyniku rzadkiego lub lepszego wybija się podpisana, a arcydzieło podpisuje się zawsze, niezależnie od swojej jakości, więc najlepsza wersja każdego elementu zawsze wymienia swojego twórcę. Jedyne, co może kosztować cię podpis, to pełna torba: podpisana sztuka potrzebuje własnego miejsca albo pasującego podpisanego stosu, w którym może wylądować.\n\nStos przedmiotów dzieli jedną tożsamość, więc dwie kopie łączą się tylko wtedy, gdy każdy znak zgadza się dokładnie: ten sam przedmiot, ten sam podpisujący, te same statystyki arcydzieła, to samo zaklęcie, ta sama więź. Podpisana kłoda nigdy nie dołącza do zwykłej sterty w żadną stronę (łączenie wymazałoby czyjeś imię), ale identyczne ładunki łączą się chętnie, więc dwadzieścia rud podpisanych przez tego samego zbieracza siedzi w jednym stosie, a urobek nie szatkuje ci toreb.\n\nPodpisy oddają rzemieślnikom z nawiązką: trzymanie przy stole dowolnej podpisanej kopii potrzebnego reagentu, obojętne kto ją podpisał, dodaje 2 punkty procentowe szansy na arcydzieło, a trzymanie reagentu podpisanego twoją własną ręką obniża wymaganą ilość tego reagentu o jeden (nigdy poniżej jednego). Twoja własna podpisana praca rzadka lub lepsza nawet dalej cię uczy, dziś wyłącznie przez butelkę: wypij miksturę, którą podpisałeś, a mały strumyczek umiejętności popłynie z powrotem do rzemiosła, które ją uwarzyło, o ile to rzemiosło jest jedną z twoich aktywnych głównych specjalizacji.',
-  'guide.profPages.econ.throttleBody':
-    'Produkcja ma sufit: wytwarzanie, rozkładanie zaklęć, zaklinanie, odzyskiwanie i ładowanie efektów narzędzi dzielą jeden budżet {actions} udanych akcji w każdym oknie o długości {seconds} sekund. Odrzucona próba nic nie kosztuje i nie zużywa budżetu. W normalnej grze nigdy tego nie poczujesz; istnieje po to, by wyspecjalizowany rzemieślnik z pełnym bankiem nie zalał Rynku, niezależnie od swojej umiejętności i zapasów.',
   'guide.profPages.faq.a4':
     'Trafiła ci się gratka. Mniej więcej 1 zbiór na 90 wyzwala rzadkie zdarzenie zbierackie (starożytne twarde drewno na drzewie, pierwotna żyła w rudzie, rozkwitły w blasku księżyca kwiat wśród ziół): mnoży plon pięć razy, podpisuje każdą jednostkę twoim imieniem i ogłasza znalezisko całej strefie. Rzut na rzadką lub lepszą jakość przy zwykłym zbiorze również podpisuje plon.\n\nPodpisane materiały warto zachować albo sprzedać drogo: trzymanie przy warsztacie dowolnej podpisanej kopii potrzebnego reagentu dodaje 2 punkty procentowe do szansy na arcydzieło. Pamiętaj tylko, że łączą się w stos wyłącznie z identycznie podpisanymi kopiami, więc zajmują własny slot w torbie.',
   'guide.profPages.faq.a6':
@@ -692,7 +690,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.collectorsHeading': 'Kolekcjonerzy, trofea i cena historii',
   'guide.profPages.econ.collectorsBody':
     'Sprzedawcy są ślepi na pochodzenie: podpisany przedmiot sprzedaje się NPC za dokładnie jego zwykłą cenę. Premia za podpis istnieje wyłącznie między graczami, co sprawia, że jest właśnie interesująca: stos przypadkowo znalezionej rudy podpisany przez sławnego zbieracza, Najlepszy Kawałek ze szczęśliwego zbioru, mistrzowskie ostrze z imieniem kowala, który już dawno skończył grę, wszystko kosztuje tyle, ile czyjś sentyment mówi, że jest warte.\n\nKsięga Czynów opiera się na tym samym instynkcie: Nieskażona Żyła, Pradawne Drzewo Serca, Księżycowy Kwiat, Doskonały Okaz i Przebłysk Nadziei to znaki kolekcjonerskie bez Renomy, które istnieją wyłącznie po to, by udowodnić, że pewien moment ci się przydarzył. Zachowaj przedmiot, który przyniósł czyn, a będziesz mieć pokwitowanie. Żadna z tych rzeczy nie daje mocy; proweniencja nie kupuje statystyk i nie wygrywa walk, to papierowy ślad gry po dobrych dniach.',
-  'guide.profPages.econ.throttleHeading': 'Ogranicznik akcji',
   'guide.profPages.econ.doctrineHeading': 'Gracze handlują z graczami',
   'guide.profPages.econ.doctrineBody':
     'Gospodarka wytwarzania opiera się na jednej idei: gracze zaopatrują graczy. Zbieracze karmią rzemieślników, rzemieślnicy karmią poszukiwaczy zadań i rajdowców, a rozkładacze karmią zaklinaczy, a sprzedawcy i mistrzowie stacji stoją na krawędziach, by pochłaniać rupiecie i monety, a nie konkurować z tobą. Jeśli chcesz zarabiać na profesji, twoim klientem jest człowiek: dowiedz się, co inni gracze zużywają, wyceniaj względem Rynku Świata i traktuj systemy NPC jako dolną granicę twoich cen, a nie jako sam rynek.\n\nWytwarzany ekwipunek jest dostrojony, by pozostawać poniżej progu rajdowego: nawet arcydzieło jest zawsze tylko o jeden poziom jakości powyżej swojego przepisu, nigdy nie osiągając legendarnego, a jego budżet statystyk pozostaje poniżej pasma łupów rajdowych. Kuźnia przygotowuje cię na najtrudniejszą zawartość; nie zastępuje jej. To utrzymuje rzemieślników, rajdowców i rynek w stabilnym trójkącie: łupy rajdowe pozostają aspiracyjne, a wyroby rzemieślnicze pozostają najlepszym ekwipunkiem, jaki można realnie kupić za pieniądze.',
@@ -2425,9 +2422,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.calendar.events.delveDay.note':
     'Brat Halven zaznacza na swoich mapach: dobry dzień, by stawić czoła Zawalonemu Relikwiarzowi.',
   'hudChrome.calendar.events.delveDay.title': 'Dzień Wyprawy',
-  'hudChrome.calendar.events.fiestaNight.note':
-    'Ring Fiesty 2v2 przyciąga dziś wieczorem najgłośniejsze tłumy.',
-  'hudChrome.calendar.events.fiestaNight.title': 'Noc Fiesty',
   'hudChrome.calendar.events.fishingDerby.note':
     'Wędkarze obstawiają jeziora. Weź wędkę i powymieniaj się rybackimi opowieściami.',
   'hudChrome.calendar.events.fishingDerby.title': 'Zawody Wędkarskie',
@@ -3621,6 +3615,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.items.crag_warden_cudgel.name': 'Maczuga strażnika urwiska',
   'entities.items.craghorn_staff.name': 'Kostur Skalnego Rogu',
   'entities.items.cragmaw_huntcord.name': 'Łowiecki pas Cragmawa',
+  'entities.items.cragmaw_huntquiver.name': 'Łowiecki kołczan Cragmawa',
   'entities.items.cragmaw_prowlboots.name': 'Skradające buty Cragmawa',
   'entities.items.cragwalker_boots.name': 'Buty skalnego wędrowca',
   'entities.items.crimson_amber_armor_plate.name': 'Karmazynowy bursztyn',
@@ -3700,6 +3695,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.items.gravewardens_shiv.name': 'Zaostrzony nóż grobowego strażnika',
   'entities.items.gravewoven_raiment.name': 'Grobowo tkane szaty',
   'entities.items.gravewyrm_gauntlets.name': 'Rękawice Grobowego Żmija',
+  'entities.items.gravewyrm_bone_quiver.name': 'Kostny kołczan Grobowego Żmija',
   'entities.items.gravewyrm_mantle.name': 'Peleryna Grobowego Żmija',
   'entities.items.gravewyrm_sabatons.name': 'Buty płytowe Grobowego Żmija',
   'entities.items.gravewyrm_scale_hauberk.name': 'Łuskowy kaftan Grobowego Żmija',
@@ -3760,6 +3756,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.items.mistveil_grips.name': 'Rękawice mglistej zasłony',
   'entities.items.moggers_copper_cudgel.name': 'Miedziana maczuga Moggera',
   'entities.items.moggers_shiv.name': 'Nóż Moggera',
+  'entities.items.moggers_hide_quiver.name': 'Skórzany kołczan Moggera',
   'entities.items.moggers_stomper_boots.name': 'Tupiące buty Moggera',
   'entities.items.monarch_crown_helm.name': 'Korona monarchy',
   'entities.items.copper_mining_pick.name': 'Miedziany Kilof Górniczy',
@@ -3883,6 +3880,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.items.stormcallers_spaulders.name': 'Naramienniki Galecall',
   'entities.items.bonewrought_greatsword.name': 'Wielki miecz Bonewrought',
   'entities.items.direfang_greatblade.name': 'Wielkie ostrze Direfang',
+  'entities.items.direfang_quiver.name': 'Kołczan Direfang',
   'entities.items.bonewrought_bulwark.name': 'Bastion Bonewrought',
   'entities.items.wraithfire_orb.name': 'Kula Wraithfire',
   'entities.items.stormshard_leggings.name': 'Nogawice burzowego odłamka',
@@ -4870,7 +4868,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'fiesta.end.draw': 'REMIS W FIESCIE! Zbyt wyrównane!',
   'fiesta.end.loss': 'FIESTA PRZEGRANA! Zagraj jeszcze raz!',
   'fiesta.end.win': 'FIESTA WYGRANA! 🎉 Co za zabawa!',
-  'fiesta.enterQueue': 'Dołącz do Fiesty!',
   'fiesta.error.leaderOnly': 'Tylko przywódca drużyny może zapisać waszą drużynę do {label}.',
   'fiesta.error.noAugment': 'Nie masz teraz żadnego wzmocnienia do wyboru.',
   'fiesta.error.notOnOffer': 'Tego wzmocnienia nie ma w ofercie.',
@@ -4887,9 +4884,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'fiesta.powerup.pow_colossus.name': 'Kolos',
   'fiesta.powerup.pow_moon_boots.name': 'Księżycowe Buty',
   'fiesta.powerup.pow_speed_demon.name': 'Demon Prędkości',
-  'fiesta.practice': '🎉 Trening z botami',
-  'fiesta.practiceNote':
-    'Trening offline: przyzywa 3 boty SI i zapisuje cię do Fiesty 2v2. Kliknij ponownie, by przerwać.',
   'fiesta.queue.join': 'Dołączasz do kolejki Fiesty 2v2. Szykuj się na ZABAWĘ…',
   'fiesta.queue.leave': 'Opuszczasz kolejkę Fiesty 2v2.',
   'fiesta.queue.teamLeave': 'Twoja drużyna opuszcza kolejkę Fiesty 2v2.',
@@ -5125,38 +5119,18 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.thorns': 'Chroni sojusznika tak, że atakujący wręcz ranią się przy uderzeniu.',
   'guide.abilityHook.thunder_clap': 'Uderza we wszystko wokół ciebie i spowalnia ataki wrogów.',
   'guide.abilityHook.wrath': 'Pocisk natury ciskany w cel z dystansu, twój podstawowy atak.',
-  'guide.arenaPage.augmentsNote':
-    'Ulepszenia i wzmocnienia działają tylko podczas meczu. Chodzi w nich o swobodne, doraźne buildy, a nie o trwałą potęgę, więc nikt nie kupi sobie zwycięstwa.',
   'guide.arenaPage.coliseumBody':
     'Koloseum to arena królestwa, gdzie stajesz naprzeciw innych graczy w meczach rankingowych, jeden na jednego lub dwóch na dwóch. Każdy przedział ma własny ranking, więc zwycięstwo wynosi cię po tej drabinie na oczach całego królestwa. Otwórz okno Areny, aby zapisać się do przedziału, samotnie lub ze swoim partnerem.',
   'guide.arenaPage.coliseumHeading': 'Popielne Koloseum',
   'guide.arenaPage.duelsBody':
     'Wyzwij dowolnego napotkanego gracza na przyjacielski pojedynek. Stawką jest tylko duma, więc to najprostszy sposób, by poznać starcie lub rozstrzygnąć przyjacielski spór.',
   'guide.arenaPage.duelsHeading': 'Pojedynki',
-  'guide.arenaPage.fiestaBody':
-    'Fiesta to szybka bijatyka dwóch na dwóch, toczona jako jedno nieprzerwane starcie, w którym każdy walczący zostaje sprowadzony do równych szans. W trakcie walki dobierasz ulepszenia, szybkie wzmocnienia, które w locie przekształcają twój zestaw, więc żaden mecz nie jest taki sam.',
-  'guide.arenaPage.fiestaHeading': 'Fiesta dwóch na dwóch',
   'guide.arenaPage.heading': 'Arena i PvP',
   'guide.arenaPage.intro':
     'Chcesz sprawdzić się przeciwko innym graczom? Tryb gracz kontra gracz jest wbudowany i zawsze sam go wybierasz, nigdy nie jest ci narzucony.',
   'guide.arenaPage.ladderBody':
     'Rozgrywka rankingowa śledzi twoją pozycję w czasie. Sprawdź ranking, by zobaczyć, gdzie jesteś i kto dzierży szczyt królestwa.',
   'guide.arenaPage.ladderHeading': 'Wspinaczka po drabinie rankingowej',
-  'guide.arenaPage.powerupsBody':
-    'Na arenę w trakcie walki spadają też świecące kule, dostępne dla tego, kto pierwszy do nich dotrze. Są celowo przesadne i działają tylko przez chwilę: Demon Prędkości dla mgnienia oślepiającego tempa, Kolos, by rozrosnąć się w ociężałego giganta, Księżycowe Buty dla skocznego susu w niskiej grawitacji oraz Berserker dla nagłego przypływu furii.',
-  'guide.arenaPage.powerupsTitle': 'Wzmocnienia na ringu',
-  'guide.arenaPage.waveGoldBody':
-    'Środkowa fala: obosieczne kombinacje, w których twój build zaczyna nabierać kształtu i rozbrzmiewać.',
-  'guide.arenaPage.waveGoldTitle': 'Złoto',
-  'guide.arenaPage.wavePrismaticBody':
-    'Ostatnia fala: definiujące build, rozsadzające ekran skoki mocy, które mają wydawać się absurdalne w najlepszym tego słowa znaczeniu.',
-  'guide.arenaPage.wavePrismaticTitle': 'Pryzmatyczny',
-  'guide.arenaPage.waveSilverBody':
-    'Pierwsza fala: czyste wzmocnienia pojedynczej cechy, które wyostrzają podstawy twojej klasy.',
-  'guide.arenaPage.waveSilverTitle': 'Srebro',
-  'guide.arenaPage.wavesBody':
-    'Starcie Fiesty podsuwa ci nowe wybory w miarę trwania, a stają się one coraz śmielsze, im dłużej toczy się walka. Budujesz od fali do fali, za każdym razem wybierając jedną z kilku opcji i zachowując ją do końca starcia.',
-  'guide.arenaPage.wavesTitle': 'Ulepszenia napływają falami',
   'guide.bestiary.flavor.gravecaller_cultist':
     'Odziani w szaty słudzy kultu śmierci, których dzieło plugawi groby od Doliny po szczyty. Gdzie się gromadzą, zmarli nie zaznają spoczynku.',
   'guide.bestiary.flavor.grubjaw':
@@ -6171,7 +6145,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hud.core.mapCanvasLabel': 'Mapa',
   'hud.core.mapSummary': 'Mapa {zone}.',
   'hud.core.maxLevel': 'MAKS. POZIOM',
-  'hud.core.mobileArena': 'Arena',
   'hud.core.mobileAttack': 'Atak',
   'hud.core.mobileCamera': 'Kamera — dotknij dwukrotnie, aby wyśrodkować',
   'hud.core.mobileChat': 'Czat',
@@ -6267,7 +6240,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hud.errors.whisperMissing': "Nie ma w sieci gracza o imieniu '{name}'.",
   'hud.errors.whisperSelf': 'Mamroczesz do siebie. Nikt tego nie słyszy.',
   'hud.keybinds.actions.actionBarSlot': 'Pasek akcji {slot}',
-  'hud.keybinds.actions.arena': 'Arena (Popielne Koloseum)',
   'hud.keybinds.actions.attack': 'Atak',
   'hud.keybinds.actions.attackMove': 'Atak w ruchu',
   'hud.keybinds.actions.autorun': 'Przełącz autobieg',
@@ -6849,13 +6821,9 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.disenchantConfirmBodySpecial':
     'To niszczy specjalną kopię {item} (podpisaną, mistrzowską lub zaklinowaną) i daje materiały arkaniczne. Nie można tego cofnąć.',
   'hudChrome.enchanting.disenchantConfirmTitle': 'Rozbroić {item}?',
-  'hudChrome.enchanting.disenchantThrottled':
-    'Rozbrajasz zbyt szybko. Poczekaj chwilę i spróbuj ponownie.',
   'hudChrome.enchanting.disenchantedLine': 'Rozbrajasz {item}.',
   'hudChrome.enchanting.enchantAppliedLine': 'Zaklinasz {item} za pomocą {enchant}.',
   'hudChrome.enchanting.enchantInsufficient': 'Nie masz materiałów na to zaklinanie.',
-  'hudChrome.enchanting.enchantThrottled':
-    'Zaklinasz zbyt szybko. Poczekaj chwilę i spróbuj ponownie.',
   'hudChrome.enchanting.enchantUnknown': 'To zaklinanie nie istnieje.',
   'hudChrome.enchanting.enchantWrongSlot':
     'To zaklinanie nie może być zastosowane do tego przedmiotu.',
@@ -6870,8 +6838,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.salvageConfirmBodySpecial':
     'To niszczy specjalną kopię {item} (podpisaną, mistrzowską lub zaklinowaną) i daje materiały rzemieślnicze. Nie można tego cofnąć.',
   'hudChrome.enchanting.salvageConfirmTitle': 'Odzyskać {item}?',
-  'hudChrome.enchanting.salvageThrottled':
-    'Odzyskujesz zbyt szybko. Poczekaj chwilę i spróbuj ponownie.',
   'hudChrome.enchanting.salvagedLine': 'Odzyskujesz {item}.',
   'hudChrome.enchanting.targetTitle': 'Wybierz przedmiot do zaklinania',
   'hudChrome.keybinds.emoteWheel': 'Koło emotek',
@@ -7121,6 +7087,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.partyGroup': 'Grupa {n}',
   'hudChrome.unitFrame.partyLabel': 'Twoja drużyna',
   'hudChrome.unitFrame.playerLabel': 'Twój bohater',
+  'hudChrome.unitFrame.petLabel': 'Twoje zwierzę',
   'hudChrome.unitFrame.targetAnnounce': 'Oznacz {name}',
   'hudChrome.unitFrame.targetLabel': 'Twój cel',
   'hudChrome.widgets.clockTitle': 'Czas lokalny - kliknij, aby przełączyć format 12/24-godzinny',
@@ -8129,6 +8096,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.event.hint': 'Ogłoś rajd, spotkanie lub wydarzenie',
   'hudChrome.discord.relay.help.label': 'Potrzebuję pomocy',
   'hudChrome.discord.relay.help.hint': 'Poproś społeczność o pomoc',
+  'hudChrome.options.hideUnusedActionSlots': 'Ukryj nieużywane pola akcji',
   'hudChrome.options.showSecondaryActionBar': 'Pokaż dodatkowy pasek akcji',
   'errors.api.desktopCodeInvalid':
     'Kod logowania do aplikacji jest nieprawidłowy lub wygasł. Spróbuj ponownie.',
@@ -8378,7 +8346,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Wszystko na tej stronie jest obecne w grze: naciśnij Esc, aby otworzyć opcje. Menu otwiera się na Przeglądzie przypiętych najważniejszych ustawień, z kategoriami na listwie obok: opisane niżej ustawienia znajdziesz w grupie Ekran, pod Grafiką, Interfejsem i Dostępnością, a Nakładkę wydajności pod Systemem. Jeszcze szybciej: wpisz nazwę w pole wyszukiwania na górze i przejdź prosto do niej.',
   'guide.settingsPage.whyLabel': 'Dlaczego to działa:',
   'hudChrome.crafting.close': 'Zamknij rzemiosło',
-  'hudChrome.crafting.craft': 'Rzemiosło',
   'hudChrome.crafting.craftedToast': 'Wykonane: {name}',
   'hudChrome.crafting.empty': 'Nie są jeszcze znane żadne przepisy.',
   'hudChrome.crafting.insufficientMaterials': 'Nie masz na to materiałów.',
@@ -8463,9 +8430,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Rozdziera pancerz celu, zmniejszając go o {damage}% za każde nałożenie. Kumuluje się do 5 razy. Generuje dużą ilość zagrożenia.',
   'entities.mobs.training_dummy.name': 'Manekin treningowy',
   'entities.mobs.yumi_cat.name': 'Yumi',
-  'guide.arenaPage.yumiBody':
-    'Ochrona Yumi to drużynowy tryb z zadaniem, rozgrywany w labiryncie: każda strona strzeże własnego kociego chowańca, jednocześnie polując na cudzego. Co jakiś czas oba koty przeskakują w nowe zakątki labiryntu, więc walka waha się między obroną, polowaniem i wyścigiem, by znaleźć je na nowo. Zapisuj się w trybie trzech na trzech lub pięciu na pięciu; upadek w boju odstawia cię jedynie na chwilę.',
-  'guide.arenaPage.yumiHeading': 'Ochrona Yumi',
   'hudChrome.archetypeTitle.hobbyLabel': 'Pasja',
   'hudChrome.auraEffect.armorPct': 'Zmniejsza pancerz o {pct}%',
   'hudChrome.auraEffect.armorPctStacks': 'Zmniejsza pancerz o {pct}% ({stacks} nałożeń)',
@@ -8475,7 +8439,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.increasePct.int': 'Zwiększa Intelekt o {pct}%',
   'hudChrome.auraEffect.increasePct.sta': 'Zwiększa Wytrzymałość o {pct}%',
   'hudChrome.crafting.recipeNotLearned': 'Nie nauczyłeś się jeszcze tego przepisu.',
-  'hudChrome.crafting.throttled': 'Wytwarzasz zbyt szybko. Zaczekaj chwilę i spróbuj ponownie.',
   'hudChrome.mobile.chatPlaceholder': 'Powiedz coś...',
   'hudChrome.mobile.hideKeyboard': 'Ukryj klawiaturę',
   'hudChrome.unitFrame.partyChip': 'Drużyna',
@@ -8485,7 +8448,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'yumi.bracket5': 'Yumi 5 na 5',
   'yumi.end.loss': 'PORAŻKA! Twoja Yumi padła.',
   'yumi.end.win': 'ZWYCIĘSTWO! Yumi jest bezpieczna!',
-  'yumi.enterQueue': 'Dołącz do Ochrony Yumi!',
   'yumi.error.partyTooBig3': 'Ochrona Yumi 3 na 3 pozwala na drużynę liczącą do trzech osób.',
   'yumi.error.partyTooBig5': 'Ochrona Yumi 5 na 5 pozwala na drużynę liczącą do pięciu osób.',
   'yumi.hud.aria': 'Twoja Yumi ma {mine} z {max} zdrowia, wroga Yumi ma {theirs}.',
@@ -9328,6 +9290,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.keybinds.petAttack': 'Zwierzę: Atak',
   'hudChrome.keybinds.petDefensive': 'Zwierzę: Obronne',
   'hudChrome.keybinds.petStop': 'Zwierzę: Zatrzymaj',
+  'hudChrome.keybinds.targetPet': 'Zwierzę: Obierz',
   'hudChrome.keybinds.petTaunt': 'Zwierzę: Prowokacja',
   'hudChrome.keybinds.mount': 'Dosiądź / Zsiądź',
   'hudChrome.mailbox.parcelQtyDecreaseAria': 'Wyślij o jedną sztukę {item} mniej',
@@ -10304,6 +10267,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hud.combat.evaded': '{target} unika twojego {ability}.',
   'hudChrome.options.mouseoverCast': 'Rzucanie po najechaniu na ramki drużyny',
   'hudChrome.options.showTargetOfTarget': 'Pokaż cel celu',
+  'hudChrome.options.showPetFrame': 'Pokaż swoje zwierzę',
   'hudChrome.unitFrame.targetOfTargetLabel': 'Cel celu',
   'itemUi.market.rarityLegendary': 'Legendarny',
   'loading.reconnectingAttempt':

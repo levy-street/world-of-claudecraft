@@ -489,7 +489,49 @@ describe('graphics tier resolution', () => {
     expect(mobileWeb.standardMaterials).toBe(true);
     expect(nativeAndroid.nativeIosMemoryProfile).toBe(false);
     expect(nativeAndroid.standardMaterials).toBe(true);
-    expect(nativeAndroid.maxPooledCharacterVisuals).toBe(Number.POSITIVE_INFINITY);
+    // A touch/coarse-pointer device is `constrainedMemory` regardless of platform (see
+    // isConstrainedBrowser), so it must fall onto the SAME bounded reuse-pool tier every
+    // other mobile budget in this function already uses (maxPointLights above), not the
+    // desktop-only POSITIVE_INFINITY. Previously it stayed unbounded on Android (any
+    // browser or the native shell) and on iOS Safari/native without a stamped tightMemory
+    // marker, so every despawned mob/NPC's Skeleton + GPU bone texture piled up for the
+    // rest of the session with nothing capping it.
+    expect(nativeAndroid.maxPooledCharacterVisuals).toBe(24);
+    expect(nativeAndroid.maxPooledObjects).toBe(24);
+    // mobileWeb is iOS Safari (platform 'ios') but NOT the native shell, so it was never
+    // nativeIosMemoryProfile either; it falls to the same constrainedMemory tier.
+    expect(mobileWeb.maxPooledCharacterVisuals).toBe(24);
+    expect(mobileWeb.maxPooledObjects).toBe(24);
+  });
+
+  it('bounds the pooled-visual and pooled-object reuse caps on every constrained-memory device, never just the two narrow iOS profiles', () => {
+    const desktop = gfxInternalsForTest.settingsFor('high');
+    const androidBrowser = gfxInternalsForTest.settingsFor('high', {
+      maxTouchPoints: 5,
+      coarsePointer: true,
+      narrowViewport: true,
+      nativeApp: false,
+      platform: 'android' as const,
+    });
+    const androidNative = gfxInternalsForTest.settingsFor('high', {
+      maxTouchPoints: 5,
+      coarsePointer: true,
+      narrowViewport: true,
+      nativeApp: true,
+      platform: 'android' as const,
+    });
+
+    expect(desktop.constrainedMemory).toBe(false);
+    expect(desktop.maxPooledCharacterVisuals).toBe(Number.POSITIVE_INFINITY);
+    expect(desktop.maxPooledObjects).toBe(Number.POSITIVE_INFINITY);
+
+    for (const constrained of [androidBrowser, androidNative]) {
+      expect(constrained.constrainedMemory).toBe(true);
+      expect(constrained.maxPooledCharacterVisuals).toBe(24);
+      expect(Number.isFinite(constrained.maxPooledCharacterVisuals)).toBe(true);
+      expect(constrained.maxPooledObjects).toBe(24);
+      expect(Number.isFinite(constrained.maxPooledObjects)).toBe(true);
+    }
   });
 
   it('applies the 4 GB-class tight-memory rung to native iOS and recovered iOS web', () => {
@@ -816,6 +858,41 @@ describe('graphics tier resolution', () => {
         }),
       ).toBe(1); // old phone
       expect(resolveDefaultGraphicsPreset(phone)).toBe(2); // typical/unknown phone -> medium
+    });
+
+    it('caps a REPORTED tight-memory mobile device at LOW regardless of GPU class (memory safety is a separate axis from GPU capability)', () => {
+      // A flagship-class mobile GPU paired with a genuine 3-4 GB total RAM budget is a
+      // common real Android configuration; without this cap it would default to HIGH (the
+      // branch just above), and the world's baseline texture/geometry residency alone is
+      // large enough on that tier to cross the OS's per-tab memory ceiling during ordinary
+      // play, reported upstream as "randomly disconnects no matter the network."
+      expect(
+        resolveDefaultGraphicsPreset({
+          ...phone,
+          gpuRenderer: 'Adreno (TM) 740', // flagship: HIGH without the memory floor
+          deviceMemory: 3,
+        }),
+      ).toBe(1);
+      expect(
+        resolveDefaultGraphicsPreset({
+          ...phone,
+          gpuRenderer: 'ANGLE (NVIDIA, NVIDIA GeForce RTX 4080)', // strongDesktop-on-touch: HIGH otherwise
+          deviceMemory: 4,
+        }),
+      ).toBe(1);
+      // exactly at the TIGHT_MEMORY_MAX_GB threshold still floors; one above does not.
+      expect(
+        resolveDefaultGraphicsPreset({ ...phone, gpuRenderer: 'Adreno (TM) 740', deviceMemory: 4 }),
+      ).toBe(1);
+      expect(
+        resolveDefaultGraphicsPreset({ ...phone, gpuRenderer: 'Adreno (TM) 740', deviceMemory: 5 }),
+      ).toBe(3);
+      // Never fires on desktop (not mobile) even at the same low deviceMemory: PITFALL 1's
+      // "thin RAM never pulls a tier down" rule still holds for the GPU-capability ladder.
+      expect(resolveDefaultGraphicsPreset({ ...desktop, deviceMemory: 3 })).toBe(2);
+      // Never fires when mem is unreported (Safari/Firefox never expose deviceMemory, so a
+      // flagship iPhone must not be misread as tight): the flagship-mobile HIGH default holds.
+      expect(resolveDefaultGraphicsPreset({ ...phone, gpuRenderer: 'Apple A17 Pro GPU' })).toBe(3);
     });
 
     it('defaults Apple Silicon Macs to MEDIUM, not ultra (thermally constrained laptops, issue 1676)', () => {

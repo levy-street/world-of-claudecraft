@@ -307,6 +307,17 @@ export function fiestaDownEntity(ctx: SimContext, e: Entity, killer: Entity | nu
   e.gatherCastNodeId = '';
   e.gatherCastToolRarity = '';
   e.gatherCastEffectConfirmed = false;
+  e.craftCastRecipeId = '';
+  e.craftCastCommission = false;
+  e.craftCastBatchRemaining = 0;
+  e.craftCastBatchTotal = 0;
+  e.enchantCastItemId = '';
+  e.enchantCastBagSlot = 0;
+  e.enchantCastEnchantId = '';
+  e.enchantCastEquipSlot = '';
+  e.enchantCastConfirmReplace = false;
+  e.enchantCastTargetPin = '';
+  e.toolRechargeCastProfessionId = '';
   e.fishBiteAtTick = 0;
   e.fishReelDeadlineTick = 0;
   e.fishCastZoneId = '';

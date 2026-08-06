@@ -904,4 +904,32 @@ export const table: DeedLocaleTable = {
     name: 'Ciò che Sanno i Gabbiani',
     desc: 'Pesca un pesce nelle acque del Farshore.',
   },
+  prog_engineering_rare: {
+    name: 'Ingegneria di precisione',
+    desc: 'Forgia il tuo primo oggetto di qualità rara in Ingegneria.',
+  },
+  prog_alchemy_rare: {
+    name: "Un'annata rara",
+    desc: 'Forgia il tuo primo oggetto di qualità rara in Alchimia.',
+  },
+  prog_cooking_rare: {
+    name: 'Un piatto da ricordare',
+    desc: 'Forgia il tuo primo oggetto di qualità rara in Cucina.',
+  },
+  prog_leatherworking_rare: {
+    name: 'Concia raffinata',
+    desc: 'Forgia il tuo primo oggetto di qualità rara in Lavorazione del Cuoio.',
+  },
+  prog_tailoring_rare: {
+    name: 'Un punto da maestro',
+    desc: 'Forgia il tuo primo oggetto di qualità rara in Sartoria.',
+  },
+  prog_weaponcrafting_rare: {
+    name: 'Temprato fino a brillare',
+    desc: 'Forgia il tuo primo oggetto di qualità rara in Forgiatura di Armi.',
+  },
+  prog_armorcrafting_rare: {
+    name: 'Placcato alla perfezione',
+    desc: 'Forgia il tuo primo oggetto di qualità rara in Forgiatura di Armature.',
+  },
 };

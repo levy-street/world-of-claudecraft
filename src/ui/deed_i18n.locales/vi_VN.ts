@@ -874,4 +874,32 @@ export const table: DeedLocaleTable = {
     name: 'Điều Lũ Mòng Biển Biết',
     desc: 'Câu một con cá từ vùng nước của Bờ Biển Xa Xôi.',
   },
+  prog_engineering_rare: {
+    name: 'Cơ Khí Chính Xác',
+    desc: 'Chế tạo vật phẩm hiếm đầu tiên trong Cơ Khí.',
+  },
+  prog_alchemy_rare: {
+    name: 'Rượu Vang Quý Hiếm',
+    desc: 'Chế tạo vật phẩm hiếm đầu tiên trong Giả Kim.',
+  },
+  prog_cooking_rare: {
+    name: 'Món Ăn Đáng Nhớ',
+    desc: 'Chế tạo vật phẩm hiếm đầu tiên trong Nấu Ăn.',
+  },
+  prog_leatherworking_rare: {
+    name: 'Thuộc Da Tinh Xảo',
+    desc: 'Chế tạo vật phẩm hiếm đầu tiên trong Thuộc Da.',
+  },
+  prog_tailoring_rare: {
+    name: 'Đường Kim Bậc Thầy',
+    desc: 'Chế tạo vật phẩm hiếm đầu tiên trong May Vá.',
+  },
+  prog_weaponcrafting_rare: {
+    name: 'Tôi Luyện Đến Sáng Bóng',
+    desc: 'Chế tạo vật phẩm hiếm đầu tiên trong Rèn Vũ Khí.',
+  },
+  prog_armorcrafting_rare: {
+    name: 'Mạ Đến Hoàn Hảo',
+    desc: 'Chế tạo vật phẩm hiếm đầu tiên trong Rèn Giáp.',
+  },
 };

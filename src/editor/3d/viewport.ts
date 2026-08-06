@@ -233,7 +233,12 @@ export class Editor3DViewport {
       playerClass: 'warrior',
       world: { ...world, placements: undefined },
     });
-    this.renderer = new Renderer(this.sim, this.canvas, this.nameplates);
+    // Polite far-vista pacing: this construction happens against live editor
+    // frames on every document load, never behind an opaque curtain, so the
+    // eager macrotask build lane must stay off (see RendererCreateOptions).
+    this.renderer = new Renderer(this.sim, this.canvas, this.nameplates, {
+      eagerFarVista: false,
+    });
     this.cinematicGizmos = new CinematicGizmoLayer(this.renderer.scene);
     this.renderer.placedAssets.rebuildAll(placementsToRenderAssets(this.map.placements), true);
     // A fresh build reflects the whole document: drop any hidden-time debts

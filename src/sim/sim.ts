@@ -36,6 +36,7 @@ import {
   allocRiftCollisionToken,
   lineOfSightClear,
   moverHeight,
+  placementFloorHeight,
   resolveMovement,
   resolvePosition,
   seatGroundedAt,
@@ -169,6 +170,7 @@ import {
   INSTANCE_SLOT_COUNT,
   ITEMS,
   isArenaPos,
+  isBgPos,
   isDelvePos,
   isRiftPos,
   MOBS,
@@ -321,6 +323,7 @@ import {
 } from './pathfind';
 import * as petAi from './pet/pet_ai';
 import * as petCommands from './pet/pet_commands';
+import type { MatchPetSnapshot } from './pet/pet_match_return';
 import {
   isSwimming as isSwimmingImpl,
   moveSpeedMult as moveSpeedMultImpl,
@@ -351,21 +354,34 @@ import {
 } from './professions/cadence';
 import { unbindItem as unbindItemImpl } from './professions/commission';
 import {
+  acceptCommissionOrder as acceptCommissionOrderImpl,
+  type CommissionOrder,
+  type CommissionOrderRow,
+  type CommissionOrderScope,
+  cancelCommissionOrder as cancelCommissionOrderImpl,
+  commissionOrdersFor as commissionOrderRowsFor,
+  deliverCommissionOrder as deliverCommissionOrderImpl,
+  openCommissionOrder as openCommissionOrderImpl,
+  updateCommissionOrders,
+} from './professions/commission_order';
+import {
   type AcquireRecipeResult,
   acquireRecipe as acquireRecipeImpl,
   type CraftResult,
+  completeCraftCast as completeCraftCastImpl,
   craftItem as craftItemImpl,
 } from './professions/crafting';
 import {
   type ApplyEnchantResult,
   applyEnchant as applyEnchantImpl,
+  completeApplyEnchantCast as completeApplyEnchantCastImpl,
+  completeDisenchantCast as completeDisenchantCastImpl,
   type DisenchantResult,
   disenchantItem as disenchantItemImpl,
   isEnchantedInstance,
 } from './professions/enchanting';
 import * as fishing from './professions/fishing';
 import * as professionsFocus from './professions/focus';
-import { announceMasterworkZone } from './professions/gather_events';
 import {
   completeGatherCast as completeGatherCastImpl,
   drainGatheringGrants,
@@ -396,7 +412,11 @@ import {
 } from './professions/node_persist';
 import { updateProfNudges } from './professions/prof_nudges';
 import { healDisplayRoundedProficiency } from './professions/proficiency_display_heal';
-import { type SalvageResult, salvageItem as salvageItemImpl } from './professions/salvage';
+import {
+  completeSalvageCast as completeSalvageCastImpl,
+  type SalvageResult,
+  salvageItem as salvageItemImpl,
+} from './professions/salvage';
 import { cancelProfessionSessionOnDisplacement } from './professions/session_teardown';
 import {
   applyPairTransitionTierMail,
@@ -404,7 +424,11 @@ import {
   pruneTierMailToActiveMajors,
   updateTierMail,
 } from './professions/tier_mail';
-import { rechargeToolEffectAction, slotToolEffectAction } from './professions/tool_effect_actions';
+import {
+  completeRechargeCast as completeRechargeCastImpl,
+  rechargeToolEffectAction,
+  slotToolEffectAction,
+} from './professions/tool_effect_actions';
 import {
   EMPTY_TOOL_EFFECT_SLOT_VIEWS,
   normalizeToolEffectSlots,
@@ -566,6 +590,8 @@ export { computeQuestState } from './quests/quest_commands';
 import { completeCurrentQuestsForDev, completeQuestForDev } from './quests/dev_quest_commands';
 import * as arenaMod from './social/arena';
 import { clearAfkOnMove } from './social/away';
+import * as bgMod from './social/battleground';
+import * as bgOutcomesMod from './social/battleground_outcomes';
 import type { CardDuelMatch } from './social/card_duel';
 import * as cardDuelMod from './social/card_duel';
 import * as duelMod from './social/duel';
@@ -947,6 +973,12 @@ export interface ArenaMatch {
   // so no arena format can be farmed as a free full-restore (issue #1600).
   // Optional only for compatibility with synthetic/legacy ArenaMatch fixtures.
   preMatchPools?: Map<number, ArenaReturnPools>;
+  // The LIVING pet each fighter walked in with (absent pid = none), so the return
+  // path can stand a beast the bout killed back up instead of sending its owner
+  // home with a corpse. Kept beside the pools rather than inside them because it is
+  // applied LATER: the pet is placed only after its owner is back at their queue
+  // spot. Optional for the same synthetic-fixture reason as preMatchPools.
+  preMatchPets?: Map<number, MatchPetSnapshot>;
   ratingA: number; // team avg at start
   ratingB: number;
   defeated: Set<number>;
@@ -1155,6 +1187,14 @@ export interface PlayerMeta {
   // persisted: src/sim/mount_race.ts owns the rules. Strictly per-player, so
   // simultaneous racers never share or contend on anything.
   mountRace?: MountRaceSession | null;
+  // Optional QoL preference (issue #1358): when true, every target-switch
+  // selector in targeting.ts (targetEntity, tabTarget, targetNearestEnemy,
+  // targetNearestFriendly, friendlyTabTarget) disengages auto-attack instead of
+  // carrying it over to the new target. Session-only, mirrored from the client's
+  // `stopAutoAttackOnTargetSwitch` setting via setStopAutoAttackOnTargetSwitch;
+  // never persisted, and absent/false preserves the classic follow-through
+  // default.
+  stopAutoAttackOnTargetSwitch?: boolean;
   // One-time riding-lesson fee (100g), charged when the first lesson race starts
   // (or through the legacy mount_train_begin command). Optional so absent === false (pre-feature saves and a
   // fresh character stay byte-equal): never explicitly set to false, only ever
@@ -1316,6 +1356,13 @@ export interface PlayerMeta {
   arena2v2Rating: number;
   arena2v2Wins: number;
   arena2v2Losses: number;
+  // Thornhollow Fields 5v5 battleground standing (rated, not matched); bgCaptures is
+  // the career flag-capture count feeding the Book of Deeds meters. All
+  // persisted in CharacterState, absent until the first result.
+  bgRating: number;
+  bgWins: number;
+  bgLosses: number;
+  bgCaptures: number;
   // The Vale Cup (docs/prd/vale-cup.md). `sportRole` is the temporary sport-kit
   // role while seated in a Sowfield match: SESSION-ONLY, never serialized
   // (known is derived on load, so persistence is naturally safe with no restore
@@ -1391,14 +1438,13 @@ export interface PlayerMeta {
   // knownRecipes exactly once (professions/training.ts
   // grandfatherKnownRecipes), then persists true. Persisted in CharacterState.
   recipesGrandfathered: boolean;
-  // Craft output throttle (#1301): a FIXED tumbling window of successful
-  // actions (five consumer families; see professions/action_throttle.ts,
-  // which states the tumbling semantics and their accepted straddle).
-  // Session-only (like lastActiveTick above), never persisted,
-  // and deliberately so: a fresh login gets a fresh 60-second window rather
-  // than carrying a logout-time throttle across sessions. (This used to cite
-  // nodeHarvestReadyAt as its session-only exemplar; that field persists as
-  // remaining deltas now, while this one stays session-only on purpose.)
+  // INERT after Craft Cast System Phase 5: the shared 10-per-60s action
+  // throttle is retired; cast duration paces craft-family actions. This
+  // field was SESSION-ONLY from birth (never persisted, never wired), so no
+  // save shape depends on it; it survives only as the inert shape the
+  // retirement suite pins (tests/professions_action_throttle.test.ts stamps
+  // it and proves gameplay ignores it). The parity sampler excludes it
+  // (tests/parity/trace.ts META_EXCLUDE). Never read or written by gameplay.
   craftThrottle: { windowStart: number; count: number };
   // One-time mastery reset notice pending (Professions 2.0): set by
   // the load-time masteryResetApplied branch, consumed by the tick mail phase
@@ -1579,6 +1625,13 @@ export interface CharacterState {
   arena2v2Rating?: number;
   arena2v2Wins?: number;
   arena2v2Losses?: number;
+  // Thornhollow Fields battleground standing (JSONB; optional and written only once a
+  // result or capture exists, so pre-Thornhollow Fields saves load cleanly and
+  // unchanged saves stay byte-equal).
+  bgRating?: number;
+  bgWins?: number;
+  bgLosses?: number;
+  bgCaptures?: number;
   // The Vale Cup standing (JSONB; optional and written only once a result
   // exists, so pre-cup saves load cleanly and unchanged saves stay byte-equal).
   vcupWins?: number;
@@ -1891,6 +1944,18 @@ export class Sim {
   private yumiBusySlots = new Set<number>();
   private yumiCatMatches = new Map<number, ArenaMatch>();
   private nextArenaMatchId = 1;
+  // Thornhollow Fields battleground: queued party-groups, live matches keyed by every
+  // member pid, and the band's own busy-slot pool (slot numbers collide across
+  // pools, so it must never share the arena's). social/battleground.ts owns
+  // the behavior; these are its ctx live views.
+  bgQueue: bgMod.BgQueueGroup[] = [];
+  bgMatches = new Map<number, bgMod.BgMatch>(); // pid -> shared match (all members)
+  private bgBusySlots = new Set<number>();
+  private nextBgMatchId = 1;
+  // Resolved rated-match records, drained post-tick by the authoritative host
+  // (server/game.ts) and by nobody else; the log caps itself, so the offline
+  // and headless hosts that never drain hold a fixed, trivial tail.
+  readonly bgOutcomes: bgOutcomesMod.BgOutcomeRecord[] = bgOutcomesMod.createBgOutcomeLog();
   // The Vale Cup boarball state (social/vale_cup.ts): ONE holder object (the
   // per-bracket queues, the single Sowfield match slot, the Groundskeeper's
   // deserter book, and the live bot pids), exposed as the live ctx.vcup view.
@@ -1957,6 +2022,15 @@ export class Sim {
   // sim needs, and any banker is a valid place to stand and use the bank. Exposed
   // as a live SimContext view so bank.ts gates deposit/withdraw/buy on proximity.
   bankerIds: number[] = [];
+  // Commission order board (Professions 2.0, issue #1298): the live order
+  // list and its id counter, exposed as a live SimContext view (like trades
+  // above); professions/commission_order.ts owns every mutation. Named
+  // `commissionOrderBoard`, not `commissionOrders`, so it never collides with
+  // the IWorldProfessions per-viewer projection below of the same name.
+  // In-memory only, like trades/duels, swept by updateCommissionOrders in
+  // the end-of-tick block.
+  commissionOrderBoard: CommissionOrder[] = [];
+  private nextCommissionOrderId = 1;
   // Guild Bank books: guild id -> live GuildBankState, loaded by the server per
   // realm through loadGuildBank (guild_bank.ts owns the shape; Phase 3 wires the
   // DB) and exposed as a live SimContext view. Always empty offline: guilds are
@@ -2627,7 +2701,12 @@ export class Sim {
         legacyInstanceExit = true;
       }
     }
-    if (savedPos && isDelvePos(savedPos.x)) {
+    if (savedPos && isBgPos(savedPos.x)) {
+      // A save inside the Thornhollow Fields band (a crash mid-match) has no match to
+      // rejoin: resume at the world start (dungeonAt() knows nothing about
+      // this band, so the dungeon-door fallback below must never see it).
+      savedPos = null;
+    } else if (savedPos && isDelvePos(savedPos.x)) {
       const delve = delveAt(savedPos.x) ?? DELVE_LIST[0];
       savedPos = { x: delve.doorPos.x, z: delve.doorPos.z - 4 };
     } else if (savedPos && savedPos.x > DUNGEON_X_THRESHOLD) {
@@ -2715,6 +2794,18 @@ export class Sim {
       arena2v2Rating: savedArena2v2.rating,
       arena2v2Wins: savedArena2v2.wins,
       arena2v2Losses: savedArena2v2.losses,
+      // Finite-clamped like the arena standings above: bgRating feeds Elo
+      // math, so a corrupt row must never flow NaN through a match result.
+      bgRating: Number.isFinite(savedState?.bgRating)
+        ? (savedState?.bgRating as number)
+        : bgMod.BG_BASE_RATING,
+      bgWins: Number.isFinite(savedState?.bgWins) ? Math.max(0, savedState?.bgWins as number) : 0,
+      bgLosses: Number.isFinite(savedState?.bgLosses)
+        ? Math.max(0, savedState?.bgLosses as number)
+        : 0,
+      bgCaptures: Number.isFinite(savedState?.bgCaptures)
+        ? Math.max(0, savedState?.bgCaptures as number)
+        : 0,
       sportRole: null,
       vcupWins: savedState?.vcupWins ?? 0,
       vcupLosses: savedState?.vcupLosses ?? 0,
@@ -3421,9 +3512,10 @@ export class Sim {
       e.hp = Math.max(1, Math.round(e.maxHp * CASCADE_SCENARIO.allyHpFraction));
       // Freeze out-of-combat regen so ONLY the Chronomancer's Echo/initial healing
       // moves these bars (the owner wants to isolate the conversion, not watch the
-      // allies self-heal). A zero-value "food" trips the `!p.eating` regen guard in
-      // updateRegen and heals nothing; an idle, unsitting bot never trips standUp,
-      // and the non-damaging dummy never clears it. Dev scenario only.
+      // allies self-heal). A zero-hpPer2s "food" trips the natural-regen freeze
+      // in updateRegen (auras.ts: `p.eating?.hpPer2s !== 0`) and heals nothing
+      // itself; an idle, unsitting bot never trips standUp, and the
+      // non-damaging dummy never clears it. Dev scenario only.
       e.eating = {
         itemId: 'dev_cascade_freeze',
         kind: 'food',
@@ -3572,6 +3664,11 @@ export class Sim {
     // arena: leaving the queue is free; disconnecting mid-bout forfeits it
     this.arenaDequeue(pid);
     this.arenaResolveDesertion(pid);
+    // battleground: drop out of the queue; leaving a live match drops any
+    // carried flag and the team fights on a player down (a fully vacated
+    // side forfeits). social/battleground.ts owns the rule.
+    bgMod.bgDequeue(this.ctx, pid);
+    bgMod.bgResolveDesertion(this.ctx, pid);
     // Card Duel: leaving the queue is free; a live match is forfeited to the
     // opponent (mirrors the disconnect/jail paths in server/game.ts, and keeps
     // the offline Sim / headless env from leaking cardDuels/cardDuelQueue
@@ -3727,6 +3824,16 @@ export class Sim {
               fiestaCompletionsByOpponent: {
                 ...meta.honorArenaDaily.fiestaCompletionsByOpponent,
               },
+              // Optional Thornhollow Fields DR window: omitted when empty so pre-Thornhollow Fields
+              // saves stay byte-equal (mirrors normalizeHonorDailyState).
+              ...(meta.honorArenaDaily.bgResultsByOpponent &&
+              Object.keys(meta.honorArenaDaily.bgResultsByOpponent).length > 0
+                ? { bgResultsByOpponent: { ...meta.honorArenaDaily.bgResultsByOpponent } }
+                : {}),
+              // Same absent-until-claimed rule as the DR window above: a day that
+              // has not paid the first-win bonus writes nothing (back-compat +
+              // parity-stable saves).
+              ...(meta.honorArenaDaily.bgFirstWinClaimed ? { bgFirstWinClaimed: true } : {}),
               totalWins: meta.honorArenaDaily.totalWins,
             },
           }
@@ -3810,6 +3917,16 @@ export class Sim {
       arena2v2Rating: meta.arena2v2Rating,
       arena2v2Wins: meta.arena2v2Wins,
       arena2v2Losses: meta.arena2v2Losses,
+      // Absent until the first Thornhollow Fields result or capture moves something
+      // (back-compat + parity-stable saves).
+      ...(meta.bgWins || meta.bgLosses || meta.bgCaptures || meta.bgRating !== bgMod.BG_BASE_RATING
+        ? {
+            bgRating: meta.bgRating,
+            bgWins: meta.bgWins,
+            bgLosses: meta.bgLosses,
+            bgCaptures: meta.bgCaptures,
+          }
+        : {}),
       // Absent until sheathed (back-compat + parity-stable saves).
       ...(e.weaponStowed ? { weaponStowed: true } : {}),
       // Absent until the first cup result (back-compat + parity-stable saves).
@@ -4525,7 +4642,9 @@ export class Sim {
   }
 
   groundPos(x: number, z: number): Vec3 {
-    return { x, y: groundHeight(x, z, this.cfg.seed), z };
+    // The floor, not the terrain: on the battleground field an authored deck
+    // (a flag podium, a stair landing) IS the ground a flag or a body rests on.
+    return { x, y: placementFloorHeight(this.cfg.seed, x, z), z };
   }
 
   /** The private scatter stream for an `offStream` camp (see CampDef.offStream).
@@ -4800,6 +4919,28 @@ export class Sim {
       set nextArenaMatchId(v) {
         sim.nextArenaMatchId = v;
       },
+      // Thornhollow Fields battleground live views (social/battleground.ts).
+      get bgQueue() {
+        return sim.bgQueue;
+      },
+      set bgQueue(v) {
+        sim.bgQueue = v;
+      },
+      get bgMatches() {
+        return sim.bgMatches;
+      },
+      get bgBusySlots() {
+        return sim.bgBusySlots;
+      },
+      get bgOutcomes() {
+        return sim.bgOutcomes;
+      },
+      get nextBgMatchId() {
+        return sim.nextBgMatchId;
+      },
+      set nextBgMatchId(v) {
+        sim.nextBgMatchId = v;
+      },
       get delveRuns() {
         return sim.delveRuns;
       },
@@ -4854,6 +4995,17 @@ export class Sim {
       // NPC id, read by bank.ts's proximity gate. Sim-owned, never reassigned.
       get bankerIds() {
         return sim.bankerIds;
+      },
+      // Commission order board (issue #1298): the live order list (mutated
+      // in place by professions/commission_order.ts) and its id counter.
+      get commissionOrderBoard() {
+        return sim.commissionOrderBoard;
+      },
+      get nextCommissionOrderId() {
+        return sim.nextCommissionOrderId;
+      },
+      set nextCommissionOrderId(v) {
+        sim.nextCommissionOrderId = v;
       },
       // Guild Bank book map: guild id -> live book, read and written only
       // through the guild_bank.ts helpers. Sim-owned, never reassigned.
@@ -5196,6 +5348,11 @@ export class Sim {
       // Gather cast completion: module-bound with the live ctx,
       // exactly like completeFishing above; no Sim method exists for it.
       completeGatherCast: (p, meta) => completeGatherCastImpl(sim.ctx, p, meta),
+      completeCraftCast: (p, meta) => completeCraftCastImpl(sim.ctx, p, meta),
+      completeDisenchantCast: (p, meta) => completeDisenchantCastImpl(sim.ctx, p, meta),
+      completeApplyEnchantCast: (p, meta) => completeApplyEnchantCastImpl(sim.ctx, p, meta),
+      completeSalvageCast: (p, meta) => completeSalvageCastImpl(sim.ctx, p, meta),
+      completeRechargeCast: (p, meta) => completeRechargeCastImpl(sim.ctx, p, meta),
       applyDemonHealTick: sim.applyDemonHealTick.bind(sim),
       // C4b effect-dispatch surface: the per-effect switch the cast lifecycle hands
       // off to. awardCombo, the stat/LoS helpers, and meleeSwing STAY on Sim
@@ -5285,6 +5442,11 @@ export class Sim {
         valeCupMod.vcupSportDash(sim.ctx, caster, distance, catchBall),
       vcupSportShove: (caster, target, distance) =>
         valeCupMod.vcupSportShove(sim.ctx, caster, target, distance),
+      // Thornhollow Fields battleground hooks (social/battleground.ts).
+      bgOnPlayerDeath: (e, killer) => bgMod.bgOnPlayerDeath(sim.ctx, e, killer),
+      bgOnPlayerDamaged: (victim, source) => bgMod.bgOnPlayerDamaged(sim.ctx, victim, source),
+      bgOnPlayerHealed: (target, source) => bgMod.bgOnPlayerHealed(sim.ctx, target, source),
+      bgCancelFlagAura: (e, auraId) => bgMod.bgCancelCarriedFlagAura(sim.ctx, e, auraId),
     };
     return createSimContext(host);
   }
@@ -5665,6 +5827,10 @@ export class Sim {
     this.updateTradesAndInvites();
     this.updateReadyChecks();
     resurrectionOfferMod.updateResurrectionOffers(this.ctx);
+    // Commission order board retention sweep (issue #1298): draws no rng, so
+    // appending here is safe (the Vale Cup zero-rng-phase precedent); expires
+    // stale open orders and prunes terminal ones past their retain window.
+    updateCommissionOrders(this.ctx);
     lap?.('trades');
     this.updateLootRolls();
     lap?.('lootRolls');
@@ -5698,6 +5864,12 @@ export class Sim {
     // tick-staggered bots), so appending it here cannot fork the draw order.
     this.updateValeCup();
     lap?.('valecup');
+    // Thornhollow Fields' ACTIVE phase draws ZERO rng (queue-order matchmaking,
+    // tick-math wave and rune clocks; the one seeded draw is the power-rune
+    // face at match START), so its tick position cannot fork the draw order
+    // mid-match.
+    bgMod.updateBattleground(this.ctx);
+    lap?.('battleground');
     // The Dungeon Finder phase draws ZERO rng (queue bookkeeping + role
     // matching on the sim clock), so appending it here cannot fork the draw order.
     this.updateDungeonFinder();
@@ -6389,6 +6561,12 @@ export class Sim {
     const r = this.resolve(pid);
     if (!r) return;
     const { e, meta } = r;
+    // The battleground's carried-flag buff is a DROP affordance wearing a buff's
+    // clothes, so it is offered to its owner FIRST: cancelling it must route
+    // through the authoritative flag drop (flag at the runner's feet, catchable,
+    // the bgFlag 'dropped' call to all ten), never the generic splice below,
+    // which would strip the buff and leave the flag carried.
+    if (this.ctx.bgCancelFlagAura(e, auraId)) return;
     const removed = removeCancelableAura(e.auras, auraId);
     if (!removed) return;
     this.emit({ type: 'aura', targetId: e.id, name: removed.name, gained: false });
@@ -7982,6 +8160,10 @@ export class Sim {
     this.targeting.friendlyTabTarget(pid);
   }
 
+  setStopAutoAttackOnTargetSwitch(enabled: boolean, pid?: number): void {
+    this.targeting.setStopAutoAttackOnTargetSwitch(enabled, pid);
+  }
+
   // -------------------------------------------------------------------------
   // Inventory, items, vendor
   // -------------------------------------------------------------------------
@@ -8421,7 +8603,22 @@ export class Sim {
   // boolean opt-in off the craft command; the resolve honors it
   // only for eligible equipment outputs and mints the bindOnTrade arm
   // server-side (professions/commission.ts), never off client data.
-  craftItem(recipeId: string, commission?: boolean, pid?: number): void {
+  // IWorld: craftItem(recipeId, commission?, count?), the third argument is
+  // ALWAYS the batch count. Crafting for another player (server dispatch,
+  // multi-player tests) REQUIRES the explicit four-arg form
+  // craftItem(recipeId, commission, pid, count): a bare third-arg pid is not
+  // supported, because batch counts and player entity ids share one integer
+  // space and a membership guess (the retired players.has() heuristic) made
+  // "craft N" and "craft as player N" collide silently.
+  craftItem(recipeId: string, commission?: boolean, countOrPid?: number, count?: number): void {
+    let pid: number | undefined;
+    let batchCount = 1;
+    if (count !== undefined) {
+      pid = countOrPid;
+      batchCount = count;
+    } else if (countOrPid !== undefined) {
+      batchCount = countOrPid;
+    }
     // Dead gate for the profession-action family (this wrapper plus
     // trainRecipe/unbindItem/salvageItem/disenchantItem/applyEnchant below):
     // refuse BEFORE the resolver, so no result event is emitted and the
@@ -8430,7 +8627,12 @@ export class Sim {
     // result unconditionally; mobile-station placement and the rift forge
     // emit no wrapper-side event, so their gates live in their own modules.
     if (refusedWhileDead(this.ctx, pid)) return;
-    const result = craftItemImpl(this.ctx, recipeId, commission === true, pid);
+    // Craft Cast System: craftItemImpl starts a cast or returns a start-gate
+    // denial. On casting:true the castStart event is the surface; craftResult
+    // / masterwork / lastCraftResult land only from completeCraftCast.
+    // Phase 3: optional count (default 1) is clamped to batch max + mats-fit.
+    const result = craftItemImpl(this.ctx, recipeId, commission === true, pid, batchCount);
+    if (result.casting) return;
     const meta = this.players.get(pid ?? this.primaryId);
     if (meta) meta.lastCraftResult = result;
     this.emit({
@@ -8444,22 +8646,6 @@ export class Sim {
       reason: result.reason,
       pid: meta?.entityId,
     });
-    // Masterwork proc surface (Professions 2.0): stash the per-player
-    // view (session-only, like lastCraftResult above) and emit the personal
-    // masterwork event, in addition to the craftResult emit.
-    if (result.masterwork && result.itemId && meta) {
-      const proc: MasterworkProc = {
-        recipeId: result.recipeId,
-        itemId: result.itemId,
-        crafter: meta.entityId,
-      };
-      meta.lastMasterwork = proc;
-      this.emit({ type: 'masterwork', ...proc, pid: meta.entityId });
-      // Zone-wide celebration copy: the professions module owns the
-      // fanout and the instance-space exclusion; draws no rng, runs after the
-      // personal emit.
-      announceMasterworkZone(this.ctx, meta.entityId, meta.name, proc);
-    }
   }
 
   // IWorld read surface (IWorldProfessions, #1127): the local viewer's most
@@ -8538,6 +8724,116 @@ export class Sim {
     });
   }
 
+  // Commission order board (Professions 2.0, issue #1298): four thin
+  // entries beside unbindItem above, one per verb (open/cancel/accept/
+  // deliver). Each resolves through professions/commission_order.ts (the
+  // pure validator + mutator) and emits ONE personal, text-free
+  // commissionOrderResult event; the client renders localized copy off
+  // action/reason. The durable order state itself converges through the
+  // per-viewer commissionOrders read below, which re-diffs for every
+  // affected player on the very next snapshot (no extra fan-out needed).
+  // The item id of a still-tracked order (open/accepted/or a terminal order
+  // still inside its retention window), for the open/cancel/accept success
+  // lines below: those three result shapes carry only orderId (deliver's
+  // own DeliverOrderResult is the one that already returns itemId), so this
+  // resolves it off the live board the same tick the mutation applied.
+  private commissionOrderItemId(orderId: number | undefined): string | undefined {
+    if (orderId === undefined) return undefined;
+    return this.commissionOrderBoard.find((o) => o.id === orderId)?.itemId;
+  }
+
+  // The requester's display name off the same still-retained board entry, for
+  // the 'deliver' success line (the acting pid is the CRAFTER there, not the
+  // requester the "You deliver X to {name}" copy needs to name).
+  private commissionOrderRequesterName(orderId: number | undefined): string | undefined {
+    if (orderId === undefined) return undefined;
+    return this.commissionOrderBoard.find((o) => o.id === orderId)?.requesterName;
+  }
+
+  openCommissionOrder(
+    recipeId: string,
+    scope: CommissionOrderScope,
+    crafterName?: string,
+    pid?: number,
+  ): void {
+    const result = openCommissionOrderImpl(this.ctx, recipeId, scope, crafterName, pid);
+    const meta = this.players.get(pid ?? this.primaryId);
+    this.emit({
+      type: 'commissionOrderResult',
+      action: 'open',
+      ok: result.ok,
+      orderId: result.orderId,
+      itemId: result.ok ? this.commissionOrderItemId(result.orderId) : undefined,
+      reason: result.reason,
+      pid: meta?.entityId,
+    });
+  }
+
+  cancelCommissionOrder(orderId: number, pid?: number): void {
+    const itemId = this.commissionOrderItemId(orderId);
+    const result = cancelCommissionOrderImpl(this.ctx, orderId, pid);
+    const meta = this.players.get(pid ?? this.primaryId);
+    this.emit({
+      type: 'commissionOrderResult',
+      action: 'cancel',
+      ok: result.ok,
+      orderId: result.orderId,
+      itemId: result.ok ? itemId : undefined,
+      reason: result.reason,
+      pid: meta?.entityId,
+    });
+  }
+
+  acceptCommissionOrder(orderId: number, pid?: number): void {
+    const itemId = this.commissionOrderItemId(orderId);
+    const result = acceptCommissionOrderImpl(this.ctx, orderId, pid);
+    const meta = this.players.get(pid ?? this.primaryId);
+    this.emit({
+      type: 'commissionOrderResult',
+      action: 'accept',
+      ok: result.ok,
+      orderId: result.orderId,
+      itemId: result.ok ? itemId : undefined,
+      reason: result.reason,
+      pid: meta?.entityId,
+    });
+  }
+
+  deliverCommissionOrder(orderId: number, pid?: number): void {
+    // Resolve the requester's name off the board BEFORE the mutation (deliver
+    // moves the order to 'delivered', so a post-mutation lookup would still
+    // find it inside its retention window, but resolve pre-mutation to match
+    // the itemId precedent above and stay correct if retention ever shrinks).
+    const requesterName = this.commissionOrderRequesterName(orderId);
+    const result = deliverCommissionOrderImpl(this.ctx, orderId, pid);
+    const meta = this.players.get(pid ?? this.primaryId);
+    this.emit({
+      type: 'commissionOrderResult',
+      action: 'deliver',
+      ok: result.ok,
+      orderId: result.orderId,
+      itemId: result.itemId,
+      requesterName: result.ok ? requesterName : undefined,
+      reason: result.reason,
+      pid: meta?.entityId,
+    });
+  }
+
+  // IWorld read surface (IWorldProfessions): the local viewer's projection of
+  // the order board (their own requests at any status, any order they
+  // accepted, and every currently open order the open board or a 'crafter'
+  // scope names them for), newest first.
+  get commissionOrders(): readonly CommissionOrderRow[] {
+    return commissionOrderRowsFor(this.ctx, this.primaryId);
+  }
+
+  /** Per-player form of `commissionOrders`, for the server's `corder`
+   *  self-delta (server/game.ts): a small per-player read, diffed per tick
+   *  like `prof`/`cprof`. */
+  commissionOrdersFor(pid: number): readonly CommissionOrderRow[] {
+    return commissionOrderRowsFor(this.ctx, pid);
+  }
+
   // IWorld read surface (IWorldProfessions): the craft id of the
   // local viewer's own ACTIVE mobile station, or null when none is placed or
   // the placed one has expired (tick-domain expiry, checked live).
@@ -8575,7 +8871,11 @@ export class Sim {
   // on the resolved player's PlayerMeta so lastSalvageResult reflects it.
   salvageItem(itemId: string, pid?: number): void {
     if (refusedWhileDead(this.ctx, pid)) return;
+    // Phase 4: salvageItemImpl starts a cast or returns a start-gate denial.
+    // On casting:true castStart is the surface; salvageResult lands only from
+    // completeSalvageCast.
     const result = salvageItemImpl(this.ctx, itemId, pid);
+    if (result.casting) return;
     const meta = this.players.get(pid ?? this.primaryId);
     if (meta) meta.lastSalvageResult = result;
     // Emit the pid-scoped, text-free outcome, same immediacy arm as
@@ -8627,7 +8927,9 @@ export class Sim {
     const pid = typeof pidOrTarget === 'number' ? pidOrTarget : undefined;
     const targetSlotIndex = typeof pidOrTarget === 'object' ? pidOrTarget.slotIndex : slotIndex;
     if (refusedWhileDead(this.ctx, pid)) return;
+    // Phase 4: start cast or deny; result event only on complete or start deny.
     const result = disenchantItemImpl(this.ctx, itemId, pid, targetSlotIndex);
+    if (result.casting) return;
     const meta = this.players.get(pid ?? this.primaryId);
     if (meta) meta.lastDisenchantResult = result;
     this.emit({
@@ -8665,7 +8967,9 @@ export class Sim {
     pid?: number,
   ): void {
     if (refusedWhileDead(this.ctx, pid)) return;
+    // Phase 4: start cast or deny; result event only on complete or start deny.
     const result = applyEnchantImpl(this.ctx, itemId, enchantId, pid, slot, confirmReplace);
+    if (result.casting) return;
     const meta = this.players.get(pid ?? this.primaryId);
     if (meta) meta.lastEnchantResult = result;
     this.emit({
@@ -9017,6 +9321,13 @@ export class Sim {
         this.isArenaCrossTeam(match, attackerPlayer.id, target.id)
       ) {
         return true;
+      }
+      // Thornhollow Fields: hostile to the other team while the battle is live,
+      // friendly to your own (isFriendlyTo derives from this arm, so
+      // cross-team heals are refused too).
+      const bg = this.bgMatches.get(attackerPlayer.id);
+      if (bg && bg.state === 'active' && this.bgMatches.get(target.id) === bg) {
+        return bgMod.bgTeamOf(bg, attackerPlayer.id) !== bgMod.bgTeamOf(bg, target.id);
       }
       // The jail brawl: prisoners are hostile to each other, always (pets
       // resolve to their owner via pvpController above, so a prisoner's pet
@@ -9591,6 +9902,59 @@ export class Sim {
 
   arenaMatchFor(pid: number): ArenaMatch | null {
     return arenaMod.arenaMatchFor(this.ctx, pid);
+  }
+
+  // -------------------------------------------------------------------------
+  // Thornhollow Fields, the 5v5 capture-the-flag battleground. Thin delegates onto
+  // social/battleground.ts (the arena-slice pattern): the wire command path,
+  // tests, and the server resolve these on the facade.
+  // -------------------------------------------------------------------------
+
+  bgQueueJoin(pid?: number): void {
+    bgMod.bgQueueJoin(this.ctx, pid);
+  }
+
+  bgQueueLeave(pid?: number): void {
+    bgMod.bgQueueLeave(this.ctx, pid);
+  }
+
+  bgFlagAction(pid?: number): void {
+    bgMod.bgFlagAction(this.ctx, pid);
+  }
+
+  bgMatchFor(pid: number): bgMod.BgMatch | null {
+    return bgMod.bgMatchFor(this.ctx, pid);
+  }
+
+  // The live online battleground ladder (the arenaLadder twin). Viewer-
+  // identical, so the server builds ONE per broadcast pass and hands it to
+  // every bgInfoFor call in that pass.
+  bgLadder(): import('../world_api').BgLadderEntry[] {
+    return bgMod.bgLadder(this.ctx);
+  }
+
+  bgInfoFor(
+    pid: number,
+    ladder?: import('../world_api').BgLadderEntry[],
+  ): import('../world_api').BgInfo | null {
+    return bgMod.bgInfoFor(this.ctx, pid, ladder);
+  }
+
+  // Resolve a mid-match leave/jail/disconnect before the server's leave save:
+  // the deserter takes the rating loss, drops any carried flag, and leaves the
+  // roster (idempotent; removePlayer repeats it harmlessly).
+  bgResolveDesertion(pid: number): void {
+    bgMod.bgResolveDesertion(this.ctx, pid);
+  }
+
+  // Dev/test only: force-start a match from whoever is queued (server-gated
+  // behind ALLOW_DEV_COMMANDS; see social/battleground.ts).
+  devStartBg(): void {
+    bgMod.devStartBg(this.ctx);
+  }
+
+  get bgInfo(): import('../world_api').BgInfo | null {
+    return this.primaryId === -1 ? null : this.bgInfoFor(this.primaryId);
   }
 
   // -------------------------------------------------------------------------

@@ -57,14 +57,43 @@ const TOGGLE_KINDS: ReadonlySet<AuraKind> = new Set([
   'berserker_stance',
   'defensive_stance',
 ]);
+/** Thornhollow Fields' carried-flag buff (src/sim/social/battleground.ts
+ *  `CARRIED_FLAG_AURA_ID`, named here as a literal the same way icons.ts names
+ *  the rune ids). Exported because the buff bar's cancel affordance has to
+ *  recognize it: cancelling THIS buff is a gameplay action (it drops the flag),
+ *  not a cosmetic un-buff. */
+export const CARRIED_FLAG_AURA_ID = 'bg_carried_flag';
 // Ghost Wolf toggles too, but its aura rides the generic buff_speed kind (which
 // Sprint also uses, 15s and very much worth a countdown), so it hides by id.
-const TOGGLE_IDS: ReadonlySet<string> = new Set(['ghost_wolf']);
+// The carried-flag buff is a MODE for the same reason: you have the flag until
+// you do not, and the sim only backs it with a longer-than-any-match duration so
+// nothing can expire it out from under the carry. A countdown under either would
+// be a lie the player reads as "this is about to leave me".
+const TOGGLE_IDS: ReadonlySet<string> = new Set(['ghost_wolf', CARRIED_FLAG_AURA_ID]);
+// Auras the low graphics tier's buff cap may NEVER shed (auras_painter.ts).
+// The cap's fairness rule is "spend the budget on buffs, a debuff always
+// renders", which rests on buffs being cosmetic. That is false for an aura whose
+// icon IS an affordance: the carried-flag buff is the only way to drop the flag
+// on purpose, it is applied at the pickup so it sits LAST in application order,
+// and a flat first-N cap would therefore shed it first, on the one tier, from
+// the one player who needs it. Hiding it is hiding an action, which the
+// gameplay-neutral-graphics invariant forbids (docs/design/graphics-settings-fairness.md).
+const NEVER_SHED_IDS: ReadonlySet<string> = new Set([CARRIED_FLAG_AURA_ID]);
 // The inverse override: an aura that rides a TOGGLE_KIND but is a genuine timed
 // buff worth a countdown. Greater Invisibility reuses the rogue-stealth machinery
 // for its vanish (kind 'stealth' with full move speed), but it is a fixed 20s
 // buff, not a toggle, so it must show its remaining time like any other buff.
 const TIMED_IDS: ReadonlySet<string> = new Set(['greater_invisibility']);
+
+/** Whether cancelling this aura performs a GAMEPLAY action rather than merely
+ *  dropping a buff, so a touch host must confirm it before it fires. Today that
+ *  is exactly the carried-flag buff: on a touch device the cancel gesture is a
+ *  long press, which is also the tooltip-peek gesture, so an unconfirmed cancel
+ *  would drop the flag mid-run by accident. Desktop right-click is deliberate
+ *  and stays instant. */
+export function auraCancelNeedsConfirm(auraId: string): boolean {
+  return auraId === CARRIED_FLAG_AURA_ID;
+}
 
 /** The localized single-letter unit suffixes the compact duration label uses. */
 export interface DurationUnits {
@@ -211,6 +240,17 @@ export interface AuraSlotState {
   /** Whether the aura is about to run out (drives the `expiring` blink class). Always
    *  false for toggles/permanents, which show no countdown either. */
   expiring: boolean;
+  /** Whether this aura reads as a MODE rather than a timed effect (a form, a
+   *  stance, stealth, Ghost Wolf, the carried flag). It already suppresses the
+   *  countdown label; the painter also suppresses the tooltip's
+   *  seconds-remaining line for it, because the sim backs every one of these
+   *  with a long finite duration (3600s, or a whole match) that is scaffolding,
+   *  not information. Printing it is the same lie `durationText` avoids. */
+  toggle: boolean;
+  /** Whether the low graphics tier's buff cap may never shed this aura, because
+   *  its icon is an ACTIONABLE affordance rather than cosmetic upkeep
+   *  (`NEVER_SHED_IDS`). Debuffs already have this property via `isDebuff`. */
+  alwaysRender: boolean;
 }
 
 /** The whole strip's derived state: the reused slot pool plus the active count. Both
@@ -286,6 +326,8 @@ function makeSlotState(): AuraSlotState {
     effectHtml: '',
     own: false,
     expiring: false,
+    toggle: false,
+    alwaysRender: false,
   };
 }
 
@@ -352,6 +394,8 @@ export function createAurasView(
         slot.durationText = toggle ? '' : compactAuraDuration(a.remaining, units);
         // Toggles show no countdown, so they never blink either.
         slot.expiring = !toggle && isAuraExpiring(a.remaining, a.duration);
+        slot.toggle = toggle;
+        slot.alwaysRender = NEVER_SHED_IDS.has(a.id);
         // A charge-limited aura badges its remaining charges (shown even at 1); otherwise the
         // badge shows a stack count, and only when it stacks past 1.
         slot.stacksText =

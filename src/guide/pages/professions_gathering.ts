@@ -263,6 +263,7 @@ function fishingSections(g: GuideProfGathering): string {
         reelRod: formatNumber(f.reelRodBonusSec),
         cap: formatNumber(f.sessionCapSec),
       })}
+      ${paras('guide.profPages.fish.earlyReelNote')}
     </section>
     <section class="guide-block" id="prof-fish-schedule">
       <h2>${esc(t('guide.profPages.fish.scheduleHeading'))}</h2>

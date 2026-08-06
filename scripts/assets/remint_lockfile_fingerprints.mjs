@@ -11,7 +11,7 @@
 // Then re-pin test SOURCE_FINGERPRINT / ASSET_SHA256 literals from the printed
 // table, run remint_polish_provenance.mjs, and regenerate the media manifest.
 import { createHash } from 'node:crypto';
-import { readFileSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { eastbrookGrandArmourySourceFingerprint } from './eastbrook_grand_armoury/source_fingerprint.mjs';
@@ -19,9 +19,23 @@ import { eastbrookMailboxSourceFingerprint } from './eastbrook_mailbox/source_fi
 import { eastbrookNoticeboardSourceFingerprint } from './eastbrook_noticeboard/source_fingerprint.mjs';
 import { eastbrookTownSourceFingerprint } from './eastbrook_town/source_fingerprint.mjs';
 import { eastbrookSurfaceAtlasFingerprint } from './eastbrook_town/surface_atlas.mjs';
+import { FENBRIDGE_TOWN_ASSET_IDS, FENBRIDGE_TOWN_CONTRACTS } from './fenbridge_town/model.js';
+import { fenbridgeTownSourceFingerprint } from './fenbridge_town/source_fingerprint.mjs';
 import { tankSourceFingerprint } from './terrorspark_groundshaker/source_fingerprint.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
+
+// Fenbridge ships one stamped GLB per contract and its output path is already
+// declared there, so deriving the list keeps a newly authored asset covered
+// instead of silently dropping out of the re-mint.
+const FENBRIDGE_ASSETS = FENBRIDGE_TOWN_ASSET_IDS.map((id) => ({
+  rel: path.posix.join(
+    'public',
+    FENBRIDGE_TOWN_CONTRACTS[id].outputDirectory,
+    FENBRIDGE_TOWN_CONTRACTS[id].outputName,
+  ),
+  kind: 'fenbridge',
+}));
 
 const ASSETS = [
   { rel: 'public/models/props/eastbrook_bank.glb', kind: 'town' },
@@ -37,6 +51,7 @@ const ASSETS = [
   { rel: 'public/models/props/eastbrook_noticeboard.glb', kind: 'notice' },
   { rel: 'public/models/props/mailbox_pillar.glb', kind: 'mailbox' },
   { rel: 'public/models/mounts/terrorspark_groundshaker.glb', kind: 'tank' },
+  ...FENBRIDGE_ASSETS,
 ];
 
 function findSourceFingerprint(buf) {
@@ -70,6 +85,7 @@ const fps = {
   armoury: eastbrookGrandArmourySourceFingerprint(ROOT),
   tank: tankSourceFingerprint(ROOT),
   atlas: eastbrookSurfaceAtlasFingerprint(ROOT),
+  fenbridge: fenbridgeTownSourceFingerprint(ROOT),
 };
 
 console.log('live source fingerprints:');
@@ -109,7 +125,11 @@ for (const asset of ASSETS) {
   console.log(`${asset.rel}: hits=${hits} bytes=${after.byteLength} sha256=${sha}`);
 }
 
+// tmp/ is gitignored, so a fresh clone does not have it. Without this the script
+// throws ENOENT here, AFTER every GLB has already been rewritten and verified,
+// which reads as a failed re-mint when the work actually succeeded.
 const outPath = path.join(ROOT, 'tmp/lockfile-fingerprint-remint.json');
+mkdirSync(path.dirname(outPath), { recursive: true });
 writeFileSync(outPath, `${JSON.stringify({ fps, results }, null, 2)}\n`);
 console.log(`wrote ${outPath}`);
 console.log(

@@ -405,10 +405,16 @@ describe('corpse harvest: single-use, first-come (#1141)', () => {
 // to land on each side of the rarity floor; the rare-or-better seed was
 // re-recorded from 10 to 2 after the Eastbrook camp respacing thinned the
 // zone-1 camp counts, then from 2 to 30 after the zones 1-3 quest-dedupe
-// content pass shifted the camp-driven world-gen draw sequence again.
+// content pass shifted the camp-driven world-gen draw sequence again, then
+// from 30 to 9 after the Galecrest quest-camp pass (#2887) added four camps
+// and shifted it once more. The below-rare seed has never had to move: its
+// roll stayed under the floor through all three passes, only its quantity
+// changed. Every re-hunt reproduces the same rig profile (a one-unit base
+// tier roll that reads 2 on the wolf's fang at bonus 1 and 1 on the bandit's
+// cloth at bonus 0), so every literal in this block is unchanged.
 describe('signed Pristine specimens (#1145)', () => {
-  it('a rare-or-better harvest grants the signed specimen PLUS the plain component (seed 30)', () => {
-    const { sim, internals, a, mob } = setup(30);
+  it('a rare-or-better harvest grants the signed specimen PLUS the plain component (seed 9)', () => {
+    const { sim, internals, a, mob } = setup(9);
     sim.drainEvents();
     sim.harvestCorpse(mob.id, ['hide'], a);
     // The signed jackpot landed signed: no downgrade notice fires.
@@ -439,33 +445,35 @@ describe('signed Pristine specimens (#1145)', () => {
     // grant is more than a single unit (harvestTierQuantity(tier), #1142).
     // Quantity re-recorded after the Eastbrook camp respacing (2 to 3), then
     // again after the zones 1-3 quest-dedupe content pass shifted the shared
-    // stream (back to 2); the below-rare property held both times.
-    expect(sim.countItem('rough_hide', a)).toBe(2);
+    // stream (back to 2), then to 4 after the Galecrest quest-camp pass
+    // (#2887) shifted it once more; the below-rare property held every time,
+    // so the seed itself never had to move.
+    expect(sim.countItem('rough_hide', a)).toBe(4);
     expect(sim.countItem('pristine_hide', a)).toBe(0);
   });
 
-  it('a specimen-less family (fang) keeps the signed-component behavior at rare-or-better (seed 30)', () => {
-    const { sim, internals, a, mob } = setup(30);
+  it('a specimen-less family (fang) keeps the signed-component behavior at rare-or-better (seed 9)', () => {
+    const { sim, internals, a, mob } = setup(9);
     sim.harvestCorpse(mob.id, ['fang'], a);
     const meta = internals.players.get(a)!;
     const slot = meta.inventory.find((s) => s.itemId === 'wolf_fang');
     expect(slot).toBeDefined();
     expect(slot?.instance?.signer).toBe('Alpha');
-    // Seed 30's fang roll lands a two-unit tier (harvestTierQuantity), and
+    // Seed 9's fang roll lands a two-unit tier (harvestTierQuantity), and
     // roomy bags fit the whole thing: the signature truncates only when the
     // bags force it to, never the rolled quantity itself (#2139's own
     // contract).
     expect(sim.countItem('wolf_fang', a)).toBe(2);
   });
 
-  it('an empty-bag signed grant lands the FULL rolled quantity, never truncated to one (seed 115)', () => {
+  it('an empty-bag signed grant lands the FULL rolled quantity, never truncated to one (seed 114)', () => {
     // Regression pin: the unfixed code called addItemInstance with no count
     // argument (defaulting to 1) even though grant.plainQty (the rolled tier
     // quantity, harvestTierQuantity) sat right there, silently discarding the
     // rest of a multi-unit signable roll. Empty bags have room for the whole
     // roll, so the fixed grant must land as one signed stack at the full
     // rolled count, not a single unit.
-    const { sim, internals, a, mob } = setup(115);
+    const { sim, internals, a, mob } = setup(114);
     const meta = internals.players.get(a)!;
     // A fresh character's starting kit leaves the bags nearly empty (roomy,
     // not necessarily zero items): plenty of free slots for a 3-unit roll.
@@ -480,11 +488,11 @@ describe('signed Pristine specimens (#1145)', () => {
     expect(sim.countItem('wolf_fang', a)).toBe(3);
   });
 
-  it('every other specimen family grants its own jackpot beside the plain component (seed 30)', () => {
+  it('every other specimen family grants its own jackpot beside the plain component (seed 9)', () => {
     // The hide row is exercised above; this sweeps the remaining three
     // specimen rows behaviorally (silk and venomSac via webwood_spider, meat
     // via wild_boar), so a mistargeted HARVEST_COMPONENT_SPECIMENS row cannot
-    // hide behind hide-only coverage. Seed 30's rarity roll clears the
+    // hide behind hide-only coverage. Seed 9's rarity roll clears the
     // signable floor for a single focused component regardless of family
     // (the roll's draw position is identical).
     const families: { templateId: string; focus: string; plain: string; specimen: string }[] = [
@@ -503,7 +511,7 @@ describe('signed Pristine specimens (#1145)', () => {
       { templateId: 'wild_boar', focus: 'meat', plain: 'game_meat', specimen: 'prime_cut' },
     ];
     for (const f of families) {
-      const { sim, internals, a } = setup(30);
+      const { sim, internals, a } = setup(9);
       const template = MOBS[f.templateId];
       const corpse = createMob(7776, template, template.maxLevel, { x: 0, y: 0, z: 0 });
       corpse.dead = true;
@@ -522,8 +530,8 @@ describe('signed Pristine specimens (#1145)', () => {
     }
   });
 
-  it('the cloth family (no specimen) grants the signed component at rare-or-better (seed 30)', () => {
-    const { sim, internals, a } = setup(30);
+  it('the cloth family (no specimen) grants the signed component at rare-or-better (seed 9)', () => {
+    const { sim, internals, a } = setup(9);
     const template = MOBS.vale_bandit;
     const corpse = createMob(7775, template, template.maxLevel, { x: 0, y: 0, z: 0 });
     corpse.dead = true;
@@ -543,13 +551,13 @@ describe('signed Pristine specimens (#1145)', () => {
     expect(sim.countItem('homespun_cloth', a)).toBe(1);
   });
 
-  it('a slot-full signed-family harvest falls back to the plain stack, never over capacity (seed 30)', () => {
+  it('a slot-full signed-family harvest falls back to the plain stack, never over capacity (seed 9)', () => {
     // The pre-gate reserves plain-stack room only, so a partial stack lets it
     // pass while a signed instance would still need a fresh slot. The rare+
     // arm must then fall back to the plain fungible top-up (the signature
     // truncates, the yield does not), same free-slot contract as the
     // specimen arm.
-    const { sim, internals, a, mob } = setup(30);
+    const { sim, internals, a, mob } = setup(9);
     fillBags(sim, internals, a);
     const m = internals.players.get(a)!;
     const cap = bagCapacity(m.bags);
@@ -561,7 +569,7 @@ describe('signed Pristine specimens (#1145)', () => {
     expect(m.inventory.length).toBeLessThanOrEqual(cap);
     const signed = m.inventory.find((s) => s.itemId === 'wolf_fang' && s.instance?.signer);
     expect(signed).toBeUndefined();
-    // Seed 30's rarity roll clears the signable floor with this exact draw
+    // Seed 9's rarity roll clears the signable floor with this exact draw
     // sequence (proven by the unfixed code overflowing here), so the count
     // above the seeded 1 proves the plain fallback delivered the yield.
     expect(sim.countItem('wolf_fang', a)).toBeGreaterThan(1);
@@ -572,11 +580,11 @@ describe('signed Pristine specimens (#1145)', () => {
     ]);
   });
 
-  it('a slot-full specimen harvest truncates the specimen and keeps the plain yield (seed 30)', () => {
+  it('a slot-full specimen harvest truncates the specimen and keeps the plain yield (seed 9)', () => {
     // Plain grant tops up the partial stack without opening a slot, so the
     // specimen guard sees a full bag: the jackpot truncates rather than
     // overflowing, and the plain component still arrives.
-    const { sim, internals, a, mob } = setup(30);
+    const { sim, internals, a, mob } = setup(9);
     fillBags(sim, internals, a);
     const m = internals.players.get(a)!;
     const cap = bagCapacity(m.bags);
@@ -595,7 +603,9 @@ describe('signed Pristine specimens (#1145)', () => {
     ]);
   });
 
-  it('one command losing a mark AND a find emits ONE downgrade, reporting the mark', () => {
+  it('one command losing a mark AND a find emits ONE downgrade, reporting the mark', {
+    timeout: 60_000,
+  }, () => {
     // The dedupe pin (the toolDeniedEmitted idiom): a spread wolf harvest
     // whose fang (no specimen: signed-or-plain) AND hide (specimen jackpot)
     // rolls both clear the signable floor, against slot-full bags with
@@ -772,15 +782,15 @@ describe('corpse signed-guard capacity vs merge room (#2139)', () => {
     throw new Error('no seed with a signable fang roll within 200');
   });
 
-  it('a slot-full bag with a same-signer stack WITH room keeps the signature: the grant merges (seed 115)', () => {
-    // Seed 115's fang roll clears the signable floor at tier 3 (pre-verified
+  it('a slot-full bag with a same-signer stack WITH room keeps the signature: the grant merges (seed 114)', () => {
+    // Seed 114's fang roll clears the signable floor at tier 3 (pre-verified
     // above: harvestTierQuantity rolls a 3-unit yield). Slot 0 is the plain
     // partial stack the pre-gate reserves against (and the would-be fallback
     // target); slot 1 is the byte-equal same-signer stack whose room the
     // merge-aware guard must accept with zero free slots, and which has room
     // for the FULL rolled quantity (stackSizeOf(wolf_fang) - 3 existing is
     // far more than the 3-unit roll).
-    const { sim, internals, a, mob } = setup(115);
+    const { sim, internals, a, mob } = setup(114);
     fillBags(sim, internals, a);
     const m = internals.players.get(a)!;
     const cap = bagCapacity(m.bags);
@@ -804,11 +814,11 @@ describe('corpse signed-guard capacity vs merge room (#2139)', () => {
     expect(sim.drainEvents().filter((e) => e.type === 'gatherDowngrade')).toHaveLength(0);
   });
 
-  it('a slot-full bag with the same-signer stack AT its cap still falls back plain, at the boundary (seed 30)', () => {
+  it('a slot-full bag with the same-signer stack AT its cap still falls back plain, at the boundary (seed 9)', () => {
     // The boundary tick: the same-signer stack sits EXACTLY at stackSizeOf,
     // so it offers zero merge room and the guard must refuse, top up the
     // plain stack, and emit the mark-lost downgrade, never overflow.
-    const { sim, internals, a, mob } = setup(30);
+    const { sim, internals, a, mob } = setup(9);
     fillBags(sim, internals, a);
     const m = internals.players.get(a)!;
     const cap = bagCapacity(m.bags);
@@ -829,12 +839,12 @@ describe('corpse signed-guard capacity vs merge room (#2139)', () => {
     ]);
   });
 
-  it('a slot-full specimen jackpot merges into a same-signer specimen stack instead of truncating (seed 30)', () => {
+  it('a slot-full specimen jackpot merges into a same-signer specimen stack instead of truncating (seed 9)', () => {
     // The specimen arm shares the merge-aware guard: with the plain component
     // topping up its own partial stack, the jackpot's only room is the
     // byte-equal same-signer specimen stack, and it must land there signed
     // (the pre-merge contract truncated it outright, lost: 'find').
-    const { sim, internals, a, mob } = setup(30);
+    const { sim, internals, a, mob } = setup(9);
     fillBags(sim, internals, a);
     const m = internals.players.get(a)!;
     const cap = bagCapacity(m.bags);
@@ -863,7 +873,8 @@ describe('corpse signed-guard capacity vs merge room (#2139)', () => {
 //
 // The two rig seeds here were re-hunted (45 to 153, 63 to 104) after the
 // Eastbrook camp respacing merged into this branch, then again (153 to 115,
-// 104 to 211) after the zones 1-3 quest-dedupe content pass: any content add
+// 104 to 211) after the zones 1-3 quest-dedupe content pass, and again (115 to
+// 114, 211 to 50) after the Galecrest quest-camp pass (#2887): any content add
 // shifts the shared world-gen draw sequence, and each time the old seed's fang
 // roll stopped clearing the signable floor. Every replacement reproduces the
 // ORIGINAL rig profile exactly (a signed 3-unit epic fang roll, a signed
@@ -875,7 +886,7 @@ describe('a signed specimen-less grant carries its rolled quantity (#2473)', () 
     // tests/corpse_harvest_result_event.test.ts cover the plain and specimen
     // paths; a counted grant that re-rolled anything per unit would show up
     // here as more than the one tier roll plus one rarity roll.
-    const { sim, a, mob } = setup(115);
+    const { sim, a, mob } = setup(114);
     let draws = 0;
     sim.rng.setObserver(() => draws++);
     try {
@@ -888,11 +899,11 @@ describe('a signed specimen-less grant carries its rolled quantity (#2473)', () 
     expect(draws).toBe(2);
   });
 
-  it('grants exactly the units its own downgrade fallback would, signed (seed 115, fang)', () => {
+  it('grants exactly the units its own downgrade fallback would, signed (seed 114, fang)', () => {
     // Same seed, same corpse, same roll: the ONLY difference between the two
     // runs is whether the bags can hold the instance. Rolling rare must not
     // cost the player units, so the two counts have to agree.
-    const roomy = setup(115);
+    const roomy = setup(114);
     roomy.sim.harvestCorpse(roomy.mob.id, ['fang'], roomy.a);
     const signedSlot = roomy.internals.players
       .get(roomy.a)
@@ -901,7 +912,7 @@ describe('a signed specimen-less grant carries its rolled quantity (#2473)', () 
     expect(signedSlot?.instance?.signer).toBe('Alpha');
     const signedQty = roomy.sim.countItem('wolf_fang', roomy.a);
 
-    const full = setup(115);
+    const full = setup(114);
     fillBags(full.sim, full.internals, full.a);
     const m = full.internals.players.get(full.a)!;
     m.inventory[0] = { itemId: 'wolf_fang', count: 1 };
@@ -917,11 +928,11 @@ describe('a signed specimen-less grant carries its rolled quantity (#2473)', () 
     expect(downgradedQty).toBe(3);
   });
 
-  it('grants the whole rolled quantity into ONE signed slot, never a unit per slot (seed 115)', () => {
+  it('grants the whole rolled quantity into ONE signed slot, never a unit per slot (seed 114)', () => {
     // A mergeable signer payload stacks (#1165), so three units are one slot,
     // not three: the counted grant must not cost the player bag space that a
     // plain grant of the same size would not.
-    const { sim, internals, a, mob } = setup(115);
+    const { sim, internals, a, mob } = setup(114);
     const m = internals.players.get(a)!;
     const before = m.inventory.length;
     sim.drainEvents();
@@ -941,11 +952,11 @@ describe('a signed specimen-less grant carries its rolled quantity (#2473)', () 
     ]);
   });
 
-  it('the cloth family carries its rolled quantity the same way (seed 115)', () => {
+  it('the cloth family carries its rolled quantity the same way (seed 114)', () => {
     // The second specimen-less family, so the fix is the ARM's behavior and not
     // a fang-shaped special case. Its roll is TWO where the fang above is
     // three, which is what proves the count is read off the roll.
-    const { sim, internals, a } = setup(115);
+    const { sim, internals, a } = setup(114);
     const template = MOBS.vale_bandit;
     const corpse = createMob(7775, template, template.maxLevel, { x: 0, y: 0, z: 0 });
     corpse.dead = true;
@@ -959,7 +970,7 @@ describe('a signed specimen-less grant carries its rolled quantity (#2473)', () 
     expect(slot?.count).toBe(2);
     // The two families really do land on different counts, so neither literal
     // can be a constant the arm hardcoded.
-    const fang = setup(115);
+    const fang = setup(114);
     fang.sim.harvestCorpse(fang.mob.id, ['fang'], fang.a);
     expect(fang.sim.countItem('wolf_fang', fang.a)).not.toBe(slot?.count);
   });
@@ -979,7 +990,7 @@ describe('a signed specimen-less grant carries its rolled quantity (#2473)', () 
     // plainQty - 1 that guard accepts, merges two, opens a slot, and overflows
     // the bag to 17 of 16. The accept side of the same boundary is the case
     // below.
-    const { sim, internals, a, mob } = setup(115);
+    const { sim, internals, a, mob } = setup(114);
     fillBags(sim, internals, a);
     const m = internals.players.get(a)!;
     const cap = bagCapacity(m.bags);
@@ -1000,12 +1011,12 @@ describe('a signed specimen-less grant carries its rolled quantity (#2473)', () 
     ]);
   });
 
-  it('takes the signature when the merge room EXACTLY covers the roll (seed 115)', () => {
+  it('takes the signature when the merge room EXACTLY covers the roll (seed 114)', () => {
     // The accept side of the same boundary, one unit up from the case above:
     // room for exactly three against a three-unit roll. A guard that asked for
     // one unit more than the roll would refuse here and quietly cost players
     // signatures they earned, which no other case in the suite can see.
-    const { sim, internals, a, mob } = setup(115);
+    const { sim, internals, a, mob } = setup(114);
     fillBags(sim, internals, a);
     const m = internals.players.get(a)!;
     const cap = bagCapacity(m.bags);
@@ -1024,7 +1035,7 @@ describe('a signed specimen-less grant carries its rolled quantity (#2473)', () 
     expect(sim.drainEvents().filter((e) => e.type === 'gatherDowngrade')).toHaveLength(0);
   });
 
-  it('a partial-merge spill can cost a pending specimen its slot, deliberately (seed 211)', () => {
+  it('a partial-merge spill can cost a pending specimen its slot, deliberately (seed 50)', () => {
     // The one behavior #2473 trades away, pinned so it stays a decision. With
     // partial same-signer merge room the counted grant needs a fresh slot
     // where the one-unit grant it replaced merged for free, so on a corpse
@@ -1037,7 +1048,7 @@ describe('a signed specimen-less grant carries its rolled quantity (#2473)', () 
     // for nothing. The sibling case below is the other half, where refusing
     // WOULD have saved the jackpot and the trade is still taken.
     const stack = stackSizeOf(ITEMS.wolf_fang);
-    const { sim, internals, a, mob } = setup(211);
+    const { sim, internals, a, mob } = setup(50);
     const m = internals.players.get(a)!;
     const cap = bagCapacity(m.bags);
     // Exactly ONE free slot, and a same-signer fang stack one unit short of
@@ -1071,7 +1082,7 @@ describe('a signed specimen-less grant carries its rolled quantity (#2473)', () 
     // is pending costs tens of signatures for each specimen it saves. Pinning
     // the losing side too, so the trade cannot be mistaken for an oversight.
     const stack = stackSizeOf(ITEMS.wolf_fang);
-    const { sim, internals, a, mob } = setup(211);
+    const { sim, internals, a, mob } = setup(50);
     const m = internals.players.get(a)!;
     const cap = bagCapacity(m.bags);
     fillBags(sim, internals, a);
@@ -1188,7 +1199,7 @@ describe('a repeated component tag harvests the family once (#2474)', () => {
     }
   });
 
-  it('never mints a second signed Pristine Hide off one claim (seed 23, the issue case)', () => {
+  it('never mints a second signed Pristine Hide off one claim (seed 277, the issue case)', () => {
     // The headline harm the issue reports, at the one state that actually
     // reaches it. Pre-fix, this seed rolls rare-or-better on BOTH of the
     // duplicate's rarity rolls and hands out two Pristine Hides off a
@@ -1197,17 +1208,19 @@ describe('a repeated component tag harvests the family once (#2474)', () => {
     // signer-stamped item, minted twice from one claim). Post-fix the repeat
     // lands the single tag's world exactly: no specimen, 4 hides, one claim.
     // Re-hunted from seed 11 after the Eastbrook camp respacing (to 128), then
-    // again after the zones 1-3 quest-dedupe content pass shifted the
-    // camp-driven world-gen draw sequence: each time the old seed stopped
-    // clearing the signable floor on both duplicate rolls, so it no longer
-    // reached the doubled arm at all. Seed 23 does, and lands the same
+    // again after the zones 1-3 quest-dedupe content pass (to 23), then again
+    // after the Galecrest quest-camp pass (#2887) shifted the camp-driven
+    // world-gen draw sequence: each time the old seed stopped clearing the
+    // signable floor on both duplicate rolls, or started clearing it on the
+    // deduped single roll, so it no longer reached the doubled arm at all.
+    // Seed 277 does, and lands the same
     // post-fix world, so every literal below is unchanged. The doubled arm is
     // verified through ['hide','meat'] on this same corpse, which spends the
     // duplicate's exact draw positions at its exact concentration bonus (2
     // chosen of 3 tags) and comes back with BOTH specimens;
     // rollCorpseMaterialRarity is family-independent (a fixed baseline, one
     // draw), so the two rarity rolls are the duplicate's own.
-    const { sim, internals, a } = setup(23);
+    const { sim, internals, a } = setup(277);
     const template = MOBS.wild_boar;
     const corpse = createMob(7769, template, template.maxLevel, { x: 0, y: 0, z: 0 });
     corpse.dead = true;
@@ -1225,7 +1238,7 @@ describe('a repeated component tag harvests the family once (#2474)', () => {
     ).toHaveLength(0);
   });
 
-  it('rolls and grants the family ONE time, not once per repeat (seed 115, absolute counts)', () => {
+  it('rolls and grants the family ONE time, not once per repeat (seed 114, absolute counts)', () => {
     // The equality above would also pass if both sides were wrong together, so
     // the quantities are pinned to literals here. At this seed the deduped
     // single roll clears the signable floor, so the specimen below is the
@@ -1234,7 +1247,7 @@ describe('a repeated component tag harvests the family once (#2474)', () => {
     // hides and no specimen at all. Both numbers move under a revert, which is
     // what makes them decisive. The doubled-specimen state has its own case
     // above, at the seed that actually reaches it.
-    const { sim, internals, a } = setup(115);
+    const { sim, internals, a } = setup(114);
     const template = MOBS.wild_boar;
     const corpse = createMob(7773, template, template.maxLevel, { x: 0, y: 0, z: 0 });
     corpse.dead = true;
@@ -1266,12 +1279,12 @@ describe('a repeated component tag harvests the family once (#2474)', () => {
     expect(sim.countItem('game_meat', a)).toBe(0);
   });
 
-  it('a repeat cannot pull in a tag the caller never asked for (spread threshold, seed 115)', () => {
+  it('a repeat cannot pull in a tag the caller never asked for (spread threshold, seed 114)', () => {
     // forest_wolf tags hide and fang, so ['hide','hide'] used to clear
     // `chosen.length >= tagged.length` and spread across BOTH families at the
     // zero concentration bonus a real two-tag pick earns. The fang line is the
     // decisive one: a dedupe that ran after the length test would still grant it.
-    const { sim, mob, a } = setup(115);
+    const { sim, mob, a } = setup(114);
     expect(MOBS.forest_wolf.componentTags).toEqual(['hide', 'fang']);
     sim.harvestCorpse(mob.id, ['hide', 'hide'], a);
     expect(sim.countItem('rough_hide', a)).toBeGreaterThan(0);
@@ -1282,7 +1295,7 @@ describe('a repeated component tag harvests the family once (#2474)', () => {
     // The mixed case: the other tags in the same frame must still be harvested,
     // in the order they were named. wild_boar's tusk maps to no item, so hide
     // and meat are the two that land.
-    const { sim, internals, a } = setup(115);
+    const { sim, internals, a } = setup(114);
     const template = MOBS.wild_boar;
     const corpse = createMob(7772, template, template.maxLevel, { x: 0, y: 0, z: 0 });
     corpse.dead = true;
@@ -1341,7 +1354,7 @@ describe('a repeated component tag harvests the family once (#2474)', () => {
     // the same, which is the whole contract.
     const stack = stackSizeOf(ITEMS.rough_hide);
     const rig = (components: string[]) => {
-      const { sim, internals, a } = setup(115);
+      const { sim, internals, a } = setup(114);
       const template = MOBS.wild_boar;
       const corpse = createMob(7771, template, template.maxLevel, { x: 0, y: 0, z: 0 });
       corpse.dead = true;
@@ -1466,7 +1479,7 @@ describe('a repeated component tag harvests the family once (#2474)', () => {
     ];
     for (const arm of refusals) {
       for (const components of [['hide', 'hide'], ['hide']]) {
-        const rig = setup(115);
+        const rig = setup(114);
         const mobId = arm.arrange(rig);
         let draws = 0;
         const rng = (
@@ -1673,7 +1686,7 @@ describe('an invalid component tag is ignored entirely (#2504)', () => {
     // draws, byte-identical to the empty pick; the fang line is the harm (a
     // family the caller never named) and the specimen line is the cost (the
     // concentration bonus a one-family pick earns, spent on spreading instead).
-    const { sim, internals, a } = setup(115);
+    const { sim, internals, a } = setup(114);
     expect(MOBS.forest_wolf.componentTags).toEqual(['hide', 'fang']);
     const corpse = createMob(7753, MOBS.forest_wolf, MOBS.forest_wolf.maxLevel, {
       x: 0,
@@ -1728,14 +1741,16 @@ describe('an invalid component tag is ignored entirely (#2504)', () => {
     // Absolutes under the equality, so two identically-empty harvests cannot
     // pass it: the wolf spread costs 4 draws (two mapped families, a tier roll
     // and a rarity roll each) and really lands both families. Pre-fix the same
-    // command drew 0 and granted 0. Hide quantity re-recorded (3 to 1) after
-    // the zones 1-3 quest-dedupe content pass shifted the shared stream.
+    // command drew 0 and granted 0. Both quantities re-recorded (3 to 1) after
+    // the zones 1-3 quest-dedupe content pass shifted the shared stream, then
+    // (1 to 2) after the Galecrest quest-camp pass (#2887) shifted it again;
+    // the spread property the row is about is what stayed put.
     const junk = harvestWith('forest_wolf', ['junk'], 5);
     expect(junk.draws).toBe(4);
     expect(junk.claimedBy).not.toBeNull();
     const inv = junk.inventory as { itemId: string; count: number }[];
-    expect(inv.filter((s) => s.itemId === 'rough_hide').reduce((n, s) => n + s.count, 0)).toBe(1);
-    expect(inv.filter((s) => s.itemId === 'wolf_fang').reduce((n, s) => n + s.count, 0)).toBe(1);
+    expect(inv.filter((s) => s.itemId === 'rough_hide').reduce((n, s) => n + s.count, 0)).toBe(2);
+    expect(inv.filter((s) => s.itemId === 'wolf_fang').reduce((n, s) => n + s.count, 0)).toBe(2);
   });
 
   const HIDE_STACK = stackSizeOf(ITEMS.rough_hide);
@@ -1750,7 +1765,7 @@ describe('an invalid component tag is ignored entirely (#2504)', () => {
   // "reserves one family" and "reserves the whole spread" can be told apart,
   // since a second family (wolf_fang) needs a free slot and there is none.
   const gateRig = (components: string[], room: number) => {
-    const { sim, internals, a, mob } = setup(115);
+    const { sim, internals, a, mob } = setup(114);
     const m = internals.players.get(a)!;
     fillBags(sim, internals, a);
     m.inventory[0] = { itemId: 'rough_hide', count: HIDE_STACK - room };
@@ -1964,7 +1979,7 @@ describe('an invalid component tag is ignored entirely (#2504)', () => {
     ];
     for (const arm of refusals) {
       for (const components of arm.picks ?? [['hide', 'junk'], ['junk'], ['junk', 'zzz']]) {
-        const rig = setup(115);
+        const rig = setup(114);
         const mobId = arm.arrange(rig);
         let draws = 0;
         const rng = (
@@ -1996,7 +2011,7 @@ describe('an invalid component tag is ignored entirely (#2504)', () => {
     // zero, so a mis-wired setObserver would make the whole sweep vacuous. The
     // SAME wiring on an accepted command has to read a nonzero count, and the
     // accepted command has to actually land (claim spent, corpse consumed).
-    const ok = setup(115);
+    const ok = setup(114);
     let okDraws = 0;
     const okRng = (ok.sim as unknown as { rng: { setObserver: (o: (() => void) | null) => void } })
       .rng;
@@ -2083,8 +2098,8 @@ describe('corpse premium-arm tool gating (Professions 2.0)', () => {
     expect(canHarvestMonsterMaterial(2, 2)).toBe(true);
   });
 
-  it('bare hands still earn the signed specimen on real content: tier-1 families never gate (seed 30)', () => {
-    const { sim, internals, a, mob } = setup(30);
+  it('bare hands still earn the signed specimen on real content: tier-1 families never gate (seed 9)', () => {
+    const { sim, internals, a, mob } = setup(9);
     const meta = internals.players.get(a)!;
     // Genuinely bare-handed: the starting kit resolves to the tier-1 floor.
     expect(bestOwnedAnyGatherToolTier(meta.inventory, ITEMS)).toBe(1);
@@ -2096,13 +2111,15 @@ describe('corpse premium-arm tool gating (Professions 2.0)', () => {
     expect(sim.countItem('rough_hide', a)).toBeGreaterThanOrEqual(1);
   });
 
-  it('a denied premium pull downgrades to the plain grant: same qty, same claim, same draws (seed 31)', () => {
-    // Baseline arm, unmutated: seed 31's rarity roll clears the signable floor,
+  it('a denied premium pull downgrades to the plain grant: same qty, same claim, same draws (seed 21)', () => {
+    // Baseline arm, unmutated: seed 21's rarity roll clears the signable floor,
     // so the specimen jackpot lands beside the plain component. Re-recorded
     // from seed 45 after the Eastbrook camp respacing (to 4), then from 4 to
     // 31 after the zones 1-3 quest-dedupe content pass shifted the camp-driven
-    // world-gen draw sequence again.
-    const base = soloRig(31);
+    // world-gen draw sequence again, then from 31 to 21 after the Galecrest
+    // quest-camp pass (#2887) shifted it once more. Every re-hunt reproduces
+    // the same 3-unit signable hide roll, so the literals below are unchanged.
+    const base = soloRig(21);
     let baseDraws = 0;
     base.sim.rng.setObserver(() => baseDraws++);
     try {
@@ -2115,7 +2132,7 @@ describe('corpse premium-arm tool gating (Professions 2.0)', () => {
     expect(base.sim.countItem('pristine_hide', base.a)).toBe(1);
 
     // Denied arm: hide raised to tier 2, same seed, same rig, same draws.
-    const { sim, internals, a, mob } = soloRig(31);
+    const { sim, internals, a, mob } = soloRig(21);
     sim.drainEvents();
     let draws = 0;
     withTier('hide', 2, () => {
@@ -2145,11 +2162,11 @@ describe('corpse premium-arm tool gating (Professions 2.0)', () => {
     ]);
   });
 
-  it('an owned tier-2 tool restores the premium pull at a raised family tier (seed 31)', () => {
+  it('an owned tier-2 tool restores the premium pull at a raised family tier (seed 21)', () => {
     // The canHarvestMonsterMaterial SUCCESS branch with a real tool: the
     // deny/downgrade arms above never prove a tool actually re-opens the
     // premium pull once a family tier rises.
-    const { sim, internals, a, mob } = soloRig(31);
+    const { sim, internals, a, mob } = soloRig(21);
     sim.addItem('mithril_mining_pick', 1, a); // any-profession owned-best covers tier 2
     // The tier-3 pick must wield (R22): the corpse arm scans the wield-aware
     // any-profession best, so an unearned pick would contribute nothing.
@@ -2174,14 +2191,14 @@ describe('corpse premium-arm tool gating (Professions 2.0)', () => {
     expect(mob.harvestClaimedBy).toBe(a);
   });
 
-  it('R50: the same tool BELOW its wield requirement restores nothing, and names the rung (seed 31)', () => {
+  it('R50: the same tool BELOW its wield requirement restores nothing, and names the rung (seed 21)', () => {
     // The R22 negative of the arm above, and the reason the corpse scan reads
     // WIELDABLE rather than owned: ownership alone must not re-open the premium
     // pull. One point short of the pick's requirement the scan floats back at
     // bare hands, the pull downgrades exactly as the toolless arm does, and the
     // denial NAMES the smallest proficiency at which something already carried
     // would work the family.
-    const { sim, internals, a, mob } = soloRig(31);
+    const { sim, internals, a, mob } = soloRig(21);
     sim.addItem('mithril_mining_pick', 1, a);
     internals.players.get(a)!.gatheringProficiency.mining = TIER3_TOOL_WIELD_PROFICIENCY - 1;
     sim.drainEvents();
@@ -2218,15 +2235,16 @@ describe('corpse premium-arm tool gating (Professions 2.0)', () => {
     ]);
   });
 
-  it('at most ONE gatherDenied per harvest command, even with several denied families (seed 26)', () => {
-    // Seed 26 pre-verified against soloRig: BOTH wolf families (hide and
+  it('at most ONE gatherDenied per harvest command, even with several denied families (seed 138)', () => {
+    // Seed 138 pre-verified against soloRig: BOTH wolf families (hide and
     // fang) roll signable on an untagged harvest, so raising both tiers
     // denies two yields in one command; the dedupe flag must emit exactly one
     // event, tiered off the FIRST failing family. Re-recorded from seed 23
     // after the Eastbrook camp respacing (to 31), then from 31 to 26 after
     // the zones 1-3 quest-dedupe content pass shifted the camp-driven
-    // world-gen draw sequence again.
-    const base = soloRig(26);
+    // world-gen draw sequence again, then from 26 to 138 after the Galecrest
+    // quest-camp pass (#2887) shifted it once more.
+    const base = soloRig(138);
     base.sim.harvestCorpse(base.mob.id, undefined, base.a);
     const baseMeta = base.internals.players.get(base.a)!;
     expect(base.sim.countItem('pristine_hide', base.a)).toBe(1);
@@ -2234,7 +2252,7 @@ describe('corpse premium-arm tool gating (Professions 2.0)', () => {
       baseMeta.inventory.some((s) => s.itemId === 'wolf_fang' && s.instance?.signer === 'Alpha'),
     ).toBe(true);
 
-    const { sim, internals, a, mob } = soloRig(26);
+    const { sim, internals, a, mob } = soloRig(138);
     sim.drainEvents();
     withTier('hide', 2, () => {
       withTier('fang', 2, () => {
@@ -2252,15 +2270,16 @@ describe('corpse premium-arm tool gating (Professions 2.0)', () => {
     expect(mob.harvestClaimedBy).toBe(a);
   });
 
-  it('the single event is tiered off the FIRST failing family in yield order (seed 62)', () => {
+  it('the single event is tiered off the FIRST failing family in yield order (seed 280)', () => {
     // hide precedes fang in the wolf's yield order, so asymmetric raised
     // tiers discriminate FIRST from min/max/last: (hide 2, fang 3) emits 2
     // (ruling out max and last), the mirror (hide 3, fang 2) emits 3 (ruling
     // out min). Same pre-hunted both-families-signable soloRig shape as the
     // dedupe arm above. Re-recorded from seed 63 after the Eastbrook camp
     // respacing (to 42), then from 42 to 62 after the zones 1-3 quest-dedupe
-    // content pass shifted the camp-driven world-gen draw sequence again.
-    const first = soloRig(62);
+    // content pass shifted the camp-driven world-gen draw sequence again, then
+    // from 62 to 280 after the Galecrest quest-camp pass (#2887).
+    const first = soloRig(280);
     first.sim.drainEvents();
     withTier('hide', 2, () => {
       withTier('fang', 3, () => {
@@ -2270,7 +2289,7 @@ describe('corpse premium-arm tool gating (Professions 2.0)', () => {
     expect(first.sim.drainEvents().filter((e) => e.type === 'gatherDenied')).toEqual([
       { type: 'gatherDenied', pid: first.a, surface: 'corpse', requiredTier: 2 },
     ]);
-    const mirror = soloRig(62);
+    const mirror = soloRig(280);
     mirror.sim.drainEvents();
     withTier('hide', 3, () => {
       withTier('fang', 2, () => {
@@ -2677,10 +2696,11 @@ describe('an invalid component tag over the wire, through a real GameServer (#25
     // WORLD_SEED and neither run ticks, so this value is knowable and a
     // regression that changed the yield would still clear a > 0 floor.
     // Re-recorded 4 to 2 after the Eastbrook camp respacing merged into this
-    // branch: WORLD_SEED is fixed, so the only way to re-record this row is the
+    // branch, then 2 to 3 after the Galecrest quest-camp pass (#2887):
+    // WORLD_SEED is fixed, so the only way to re-record this row is the
     // literal. The fang line below is what makes the pair decisive (a spread
     // would put wolf_fang in the bags), not the size of the hide yield.
-    expect(once.hides).toBe(2);
+    expect(once.hides).toBe(3);
     expect(once.fangs).toBe(0);
     expect(padded.hides).toBe(once.hides);
     expect(padded.fangs).toBe(0);
@@ -2793,7 +2813,7 @@ describe('a pick of nothing but unmapped families is refused, claim intact (#250
   it('leaves the corpse harvestable, so the player recovers the yield they nearly threw away', () => {
     // The whole point of refusing rather than reporting: the single-use claim
     // survives the mistake. Same corpse, second command, full yield.
-    const { sim, internals, a } = setup(115);
+    const { sim, internals, a } = setup(114);
     const template = MOBS.old_greyjaw;
     const corpse = createMob(7510, template, template.maxLevel, { x: 0, y: 0, z: 0 });
     corpse.dead = true;
@@ -3251,9 +3271,13 @@ describe('a corpse whose EVERY family is unmapped is never offered a harvest (#2
     // (2 mapped families means no selection can forfeit every yield) and none
     // to refused, exactly +12/+0. Then 164 to 166 with this branch's zones 1-3
     // quest-dedupe pass, whose tagged threnos_first_voice adds its two subsets.
-    expect(spent).toBe(166);
+    // Then 166 to 168 with the Galecrest quest-camp pass (#2887), which gave
+    // the newly reachable shoal_scuttler the meat tag its tide_scuttler twin
+    // already carried: one mapped family, so both of its subsets spend and
+    // neither can forfeit every yield, exactly +2/+0.
+    expect(spent).toBe(168);
     expect(refused).toBe(16);
-    expect(spent + refused).toBe(182);
+    expect(spent + refused).toBe(184);
   });
 
   // The six mapped families and their item ids, spelled out. Deriving them from
@@ -3343,7 +3367,10 @@ describe('a corpse whose EVERY family is unmapped is never offered a harvest (#2
     // here while unmappedOffered above stays put, since neither tag is unmapped.
     // Then 235 to 237 with this branch's quest-dedupe pass: the tagged
     // threnos_first_voice adds one cloth extraction on each of its two subsets.
-    expect(extracted).toBe(237);
+    // Then 237 to 239 with the Galecrest quest-camp pass (#2887): the newly
+    // tagged shoal_scuttler extracts its one meat family on each of its two
+    // subsets, and unmappedOffered above stays put because meat is mapped.
+    expect(extracted).toBe(239);
   });
 
   it('keeps every mixed template harvestable, so the gate is not a blanket refusal', () => {
@@ -3374,7 +3401,7 @@ describe('a corpse whose EVERY family is unmapped is never offered a harvest (#2
 });
 
 // The concentration bonus on a mixed corpse, before and after #2514 moved it,
-// as literals measured against a real Sim at seed 115.
+// as literals measured against a real Sim at seed 114.
 //
 // This block used to be titled "untouched (#2509)" and existed to prove the
 // opposite of what it now pins, so it is re-argued rather than renumbered. Its
@@ -3397,7 +3424,7 @@ describe('a corpse whose EVERY family is unmapped is never offered a harvest (#2
 // between an explicit full cover and an empty pick.
 describe('the concentration bonus on a mixed corpse, moved on purpose (#2514)', () => {
   function yieldOf(components: string[] | undefined) {
-    const { sim, internals, a } = setup(115);
+    const { sim, internals, a } = setup(114);
     const template = MOBS.old_greyjaw;
     const corpse = createMob(7511, template, template.maxLevel, { x: 0, y: 0, z: 0 });
     corpse.dead = true;
@@ -3423,7 +3450,7 @@ describe('the concentration bonus on a mixed corpse, moved on purpose (#2514)', 
     };
   }
 
-  // old_greyjaw, tags hide/fang/claw, seed 115. Every pick shape that yields
+  // old_greyjaw, tags hide/fang/claw, seed 114. Every pick shape that yields
   // something, BEFORE and AFTER, so the size and direction of the move are on
   // the record rather than only its endpoint. `bonus` is not asserted directly
   // (the roll is internal); the tier-driven quantities and the draw counts are
@@ -3431,8 +3458,9 @@ describe('the concentration bonus on a mixed corpse, moved on purpose (#2514)', 
   // measured on the pre-#2514 build and are prose, not assertions: what is
   // asserted is `after`, plus the equalities below.
   // v0.32.0 authored these rows against its own content; the seed was then
-  // re-hunted for the zones 1-3 quest-dedupe content pass (any content add
-  // moves the shared rng position) to a stream reproducing every row literally,
+  // re-hunted for the zones 1-3 quest-dedupe content pass and again (115 to
+  // 114) for the Galecrest quest-camp pass (#2887), since any content add
+  // moves the shared rng position, to a stream reproducing every row literally,
   // and the four spread rows stay identical to each other. That last property
   // is what #2514 actually claims, and it is asserted separately as equalities
   // below, which is what makes re-pinning a quantity here safe.
@@ -3532,7 +3560,7 @@ describe('the concentration bonus on a mixed corpse, moved on purpose (#2514)', 
     // denominator is 2 rather than 3, so a change scoped to one width would
     // slip past every row above. Literals, measured the same way.
     const boar = (components: string[] | undefined) => {
-      const { sim, internals, a } = setup(115);
+      const { sim, internals, a } = setup(114);
       const template = MOBS.mudfin_murloc;
       const corpse = createMob(7512, template, template.maxLevel, { x: 0, y: 0, z: 0 });
       corpse.dead = true;

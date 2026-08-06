@@ -331,8 +331,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Una tarifa fija por peldaño de receta, cobrada una sola vez cuando un maestro la enseña; cada peldaño de la tabla de abajo está en uso hoy, desde las recetas iniciales gratuitas hasta las lecciones de caña del fabricante de herramientas en lo más alto.',
   'guide.profPages.econ.provenanceBody':
     'Algunos objetos llevan un nombre. Pasa el cursor por encima y la descripción emergente dice Recolectado por fulano en un material en bruto, o Elaborado por fulano en una pieza terminada: la misma marca, redactada según cómo llegó a existir el objeto. Una firma es parte del objeto en sí, viaja con él por los intercambios, el banco, el correo, el Mercado Mundial e incluso una recompra al vendedor, y nunca se desvanece.\n\nLa recolección firma su mejor trabajo automáticamente: toda cosecha que saque raro o mejor llega firmada, y los hallazgos raros firman su ganancia quíntuple entera. La tirada afortunada de una cosecha de cadáver firma su rendimiento cuando la familia no tiene ejemplar que dar, y cuando sí lo tiene, deja el rendimiento simple y acuña a su lado el ejemplar prístino firmado. La artesanía firma en la misma línea: toda copia de un resultado raro o mejor se acuña firmada, y una obra maestra firma siempre, sea cual sea su calidad, así que la mejor versión de cualquier pieza nombra siempre a su creador. Lo único que puede costarte una firma es una bolsa llena: una unidad firmada necesita un hueco propio, o una pila firmada que le encaje, donde aterrizar.\n\nUna pila de objetos comparte una sola identidad, así que dos copias se fusionan solo cuando todas las marcas coinciden exactamente: mismo objeto, mismo firmante, mismas estadísticas de obra maestra, mismo encantamiento, mismo vínculo. Un tronco firmado nunca se une a un montón simple en ninguna de las dos direcciones (fusionarlos borraría el nombre de alguien), pero las cargas idénticas se fusionan sin problema, así que veinte minerales firmados por el mismo recolector ocupan una sola pila y un golpe de suerte no te destroza las bolsas.\n\nLas firmas les devuelven algo a los artesanos: tener en la mesa cualquier copia firmada de un reactivo necesario, la firme quien la firme, suma 2 puntos porcentuales de probabilidad de obra maestra, y tener un reactivo firmado por tu propia mano recorta en uno la cantidad exigida de ese reactivo (nunca por debajo de uno). Tu propio trabajo firmado de raro o mejor incluso te sigue enseñando, hoy solo a través del frasco: bebe una poción que hayas firmado y un pequeño goteo de habilidad vuelve al oficio que la preparó, siempre que ese oficio sea una de tus especializaciones principales activas.',
-  'guide.profPages.econ.throttleBody':
-    'La producción tiene un techo: elaborar, desencantar, encantar, desguazar y recargar efectos de herramienta comparten un mismo presupuesto de {actions} acciones exitosas en cada ventana de {seconds} segundos. Un intento denegado no cuesta nada y no gasta presupuesto. Nunca lo notarás en una sesión normal; existe para que un especialista al tope con el banco lleno no pueda inundar el Mercado, sea cual sea su habilidad o su reserva.',
   'guide.profPages.faq.a4':
     'Te tocó un golpe de suerte. Aproximadamente 1 de cada 90 cosechas activa un evento de recolección raro (duramen antiguo en un árbol, una veta prístina en el mineral, una flor iluminada por la luna entre las hierbas): multiplica el rendimiento por cinco, firma cada unidad con tu nombre y anuncia el hallazgo a toda la zona. Una tirada de rareza rara o mejor en una cosecha corriente también firma el rendimiento.\n\nLos materiales firmados vale la pena guardarlos o venderlos caros: tener en el banco de trabajo cualquier copia firmada de un reactivo necesario añade 2 puntos porcentuales a la probabilidad de obra maestra. Solo recuerda que únicamente se apilan con copias firmadas de forma idéntica, así que ocupan su propia ranura de bolsa.',
   'guide.profPages.faq.a6':
@@ -708,7 +706,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.collectorsHeading': 'Coleccionistas, trofeos y el precio de una historia',
   'guide.profPages.econ.collectorsBody':
     'Los vendedores son ciegos a la procedencia: un objeto firmado se vende a un PNJ exactamente por su precio base. La prima de una firma existe solo entre jugadores, que es precisamente lo que la hace interesante: una pila de mineral inesperado firmada por un recolector famoso, un Corte Primo de una cosecha afortunada, una hoja de obra maestra que nombra a un artesano que ya se retiró; todo vale lo que la memoria de alguien diga que vale.\n\nEl Libro de Gestas se inclina hacia el mismo instinto: Veta Prístina, Duramen Antiguo, Flor Iluminada por la Luna, Espécimen Perfecto y Destello de Esperanza son marcas de coleccionista con Renombre cero que existen únicamente para demostrar que un momento te sucedió a ti. Conserva el objeto que ganó la gesta y tienes el recibo. Nada de esto da poder; la procedencia no compra estadísticas ni gana combates, es el rastro en papel del juego de los buenos días.',
-  'guide.profPages.econ.throttleHeading': 'El límite de acciones',
   'guide.profPages.econ.doctrineHeading': 'Los jugadores comercian con jugadores',
   'guide.profPages.econ.doctrineBody':
     'La economía de artesanía se construye sobre una idea: los jugadores abastecen a los jugadores. Los recolectores alimentan a los artesanos, los artesanos alimentan a los jugadores de misiones y bandas, y los desencantadores alimentan a los encantadores, con vendedores y maestros de estación en los bordes para absorber chatarra y monedas en lugar de competir contigo. Si quieres ganar dinero con un oficio, tu cliente es una persona: aprende lo que otros jugadores consumen, pon precio frente al Mercado Mundial y trata los sistemas de PNJ como un suelo bajo tus precios, no como el mercado en sí.\n\nEl equipo artesanal está ajustado para quedar por debajo del suelo de la banda: incluso una obra maestra siempre está solo un nivel de calidad por encima de su receta, nunca más allá de legendario, y su presupuesto de estadísticas se mantiene por debajo de la banda de botín de la banda. La forja te prepara para el contenido más difícil; no lo reemplaza. Eso mantiene a artesanos, bandas y el mercado en un triángulo estable: el botín de banda sigue siendo aspiracional, y las piezas artesanales siguen siendo el mejor equipo que el dinero puede comprar.',
@@ -2253,9 +2250,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.calendar.events.delveDay.note':
     'El Hermano Halven marca sus cartas: un buen día para atreverse con el Relicario Hundido.',
   'hudChrome.calendar.events.delveDay.title': 'Día de Expedición',
-  'hudChrome.calendar.events.fiestaNight.note':
-    'El anillo de la Fiesta 2c2 reúne esta noche a su público más ruidoso.',
-  'hudChrome.calendar.events.fiestaNight.title': 'Noche de Fiesta',
   'hudChrome.calendar.events.fishingDerby.note':
     'Los pescadores bordean los lagos. Trae una caña y comparte anécdotas de pesca.',
   'hudChrome.calendar.events.fishingDerby.title': 'Torneo de Pesca',
@@ -2499,6 +2493,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.partyGroup': 'Grupo {n}',
   'hudChrome.unitFrame.partyLabel': 'Tu grupo',
   'hudChrome.unitFrame.playerLabel': 'Tu personaje',
+  'hudChrome.unitFrame.petLabel': 'Tu mascota',
   'hudChrome.unitFrame.targetAnnounce': 'Objetivo: {name}',
   'hudChrome.unitFrame.targetLabel': 'Tu objetivo',
   'seo.officialLabel': 'Sitio web oficial de World of ClaudeCraft',
@@ -3327,7 +3322,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hud.core.mobileMore': 'Más',
   'hud.core.mobileMoreAria': 'Mostrar más menús',
   'hud.core.mobileSocial': 'Comunidad',
-  'hud.core.mobileArena': 'Arena',
   'hud.core.mobileMenu': 'Menú',
   'hud.core.mobileSettings': 'Ajustes',
   'hud.core.mobileUse': 'Usar',
@@ -3437,7 +3431,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hud.keybinds.actions.nameplates': 'Alternar placas de nombre',
   'hud.keybinds.actions.meters': 'Medidores de daño',
   'hud.keybinds.actions.social': 'Amigos y hermandad',
-  'hud.keybinds.actions.arena': 'Arena (Coliseo Cinéreo)',
   'hud.keybinds.actions.chat': 'Abrir chat',
   'hud.keybinds.actions.attack': 'Atacar',
   'hud.keybinds.actions.actionBarSlot': 'Barra de acción {slot}',
@@ -4803,6 +4796,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.items.ridge_stalker_pelt.name': 'Piel de acechador de la cresta',
   'entities.items.old_cragmaws_pelt.name': 'Piel del Viejo Cragmaw',
   'entities.items.cragmaw_huntcord.name': 'Cinto de caza de Cragmaw',
+  'entities.items.cragmaw_huntquiver.name': 'Carcaj de caza de Cragmaw',
   'entities.items.glowing_wax.name': 'Cera resplandeciente',
   'entities.items.ogre_war_totem.name': 'Tótem de guerra ogro',
   'entities.items.storm_core.name': 'Núcleo de tormenta',
@@ -4879,6 +4873,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.items.mirejaw_scale_vest.name': 'Chaleco de escamas de Mirejaw',
   'entities.items.moggers_copper_cudgel.name': 'Garrote de cobre de Mogger',
   'entities.items.moggers_shiv.name': 'Navaja de Mogger',
+  'entities.items.moggers_hide_quiver.name': 'Carcaj de cuero de Mogger',
   'entities.items.moggers_stomper_boots.name': 'Botas pisoteadoras de Mogger',
   'entities.items.necromancers_legwraps.name': 'Envolturas de piernas de Mournweave',
   'entities.items.necromancers_soulsteps.name': 'Pisadas de alma de Mournweave',
@@ -4903,6 +4898,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.items.cryptbone_pauldrons.name': 'Hombreras Huesocripta',
   'entities.items.deathlords_dread_visage.name': 'Visaje aterrador de Barrowlord',
   'entities.items.gravewyrm_gauntlets.name': 'Guanteletes del Gravewyrm',
+  'entities.items.gravewyrm_bone_quiver.name': 'Carcaj de hueso del Gravewyrm',
   'entities.items.gravewyrm_mantle.name': 'Manto del Gravewyrm',
   'entities.items.mistveil_cord.name': 'Cordón Veloniebla',
   'entities.items.mistveil_grips.name': 'Agarraderas Veloniebla',
@@ -5909,7 +5905,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'fiesta.end.draw': '¡FIESTA EN EMPATE! ¡Demasiado reñido!',
   'fiesta.end.loss': '¡FIESTA PERDIDA! ¡A la revancha!',
   'fiesta.end.win': '¡FIESTA GANADA! 🎉 ¡Vaya fiesta!',
-  'fiesta.enterQueue': '¡Únete a la Fiesta!',
   'fiesta.error.leaderOnly':
     'Solo el líder del grupo puede poner a tu equipo en cola para {label}.',
   'fiesta.error.noAugment': 'No tienes ninguna mejora que elegir ahora mismo.',
@@ -5927,9 +5922,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'fiesta.powerup.pow_colossus.name': 'Coloso',
   'fiesta.powerup.pow_moon_boots.name': 'Botas lunares',
   'fiesta.powerup.pow_speed_demon.name': 'Demonio veloz',
-  'fiesta.practice': '🎉 Práctica contra bots',
-  'fiesta.practiceNote':
-    'Práctica sin conexión: genera 3 bots con IA y te pone en cola para una Fiesta 2c2. Haz clic de nuevo para detener.',
   'fiesta.queue.join': 'Entras a la cola de la Fiesta 2c2. Prepárate para LA FIESTA…',
   'fiesta.queue.leave': 'Sales de la cola de la Fiesta 2c2.',
   'fiesta.queue.teamLeave': 'Tu equipo sale de la cola de la Fiesta 2c2.',
@@ -6125,6 +6117,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.items.stormcallers_spaulders.name': 'Bufas de Galecall',
   'entities.items.bonewrought_greatsword.name': 'Espadón Bonewrought',
   'entities.items.direfang_greatblade.name': 'Gran hoja Direfang',
+  'entities.items.direfang_quiver.name': 'Carcaj Direfang',
   'entities.items.bonewrought_bulwark.name': 'Baluarte Bonewrought',
   'entities.items.wraithfire_orb.name': 'Orbe Wraithfire',
   'hud.chat.context.convertToRaid': 'Convertir en banda',
@@ -6766,17 +6759,12 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.thunder_clap': 'Golpea a los enemigos a tu alrededor y ralentiza sus ataques.',
   'guide.abilityHook.wrath':
     'Una descarga de naturaleza lanzada a un objetivo a distancia, tu hechizo de ataque habitual.',
-  'guide.arenaPage.augmentsNote':
-    'Las mejoras y potenciadores duran solo lo que dura la partida. Buscan combinaciones divertidas e improvisadas, no un poder duradero, así que nadie compra su camino a la victoria.',
   'guide.arenaPage.coliseumBody':
     'El Coliseo es la arena del reino, donde te enfrentas a otros jugadores en partidas clasificatorias, uno contra uno o dos contra dos. Cada categoría conserva su propia clasificación, así que una victoria te hace subir por esa escala a la vista del reino entero. Abre la ventana de Arena para inscribirte en una categoría, solo o con tu compañero.',
   'guide.arenaPage.coliseumHeading': 'El Coliseo Ceniciento',
   'guide.arenaPage.duelsBody':
     'Reta a un duelo amistoso a cualquier jugador que encuentres. No hay nada en juego salvo el orgullo, así que es la forma más sencilla de aprender un enfrentamiento o zanjar una discusión amistosa.',
   'guide.arenaPage.duelsHeading': 'Duelos',
-  'guide.arenaPage.fiestaBody':
-    'Fiesta es una reyerta rápida de dos contra dos que se disputa como un único combate continuo, con cada luchador puesto en igualdad de condiciones. Conforme avanza la pelea eliges mejoras, refuerzos rápidos que reconfiguran tu repertorio sobre la marcha, así que no hay dos partidas iguales.',
-  'guide.arenaPage.fiestaHeading': 'Fiesta dos contra dos',
   'guide.arenaPage.heading': 'Arena y JcJ',
   'guide.arenaPage.intro':
     '¿Quieres ponerte a prueba contra otros jugadores? El combate jugador contra jugador está integrado, y siempre es algo que tú eliges, nunca algo que se te impone.',
@@ -6933,21 +6921,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Tres zonas, de sur a norte, cada una un escalón más alta en nivel. Sigue el rastro de las misiones y la tierra te lleva del valle a los picos.',
   'guide.worldPage.places': 'Lugares destacados',
   'guide.worldPage.residents': 'A quién te encontrarás',
-  'guide.arenaPage.powerupsBody':
-    'Esferas brillantes también caen en la arena en mitad del combate, libres para quien las alcance primero. Son deliberadamente exageradas y duran solo un instante: Demonio de Velocidad para un parpadeo de paso cegador, Coloso para hincharte hasta volverte un gigante torpe, Botas Lunares para un salto rebotante de baja gravedad y Berserker para una repentina oleada de furia.',
-  'guide.arenaPage.powerupsTitle': 'Potenciadores en el ruedo',
-  'guide.arenaPage.waveGoldBody':
-    'La oleada intermedia: combinaciones de doble filo donde tu construcción empieza a tomar forma y a lucirse.',
-  'guide.arenaPage.waveGoldTitle': 'Oro',
-  'guide.arenaPage.wavePrismaticBody':
-    'La oleada final: picos que definen tu construcción y derriten la pantalla, pensados para sentirse ridículos en el mejor de los sentidos.',
-  'guide.arenaPage.wavePrismaticTitle': 'Prismático',
-  'guide.arenaPage.waveSilverBody':
-    'La oleada inicial: mejoras limpias de una sola característica que afinan lo esencial de tu clase.',
-  'guide.arenaPage.waveSilverTitle': 'Plata',
-  'guide.arenaPage.wavesBody':
-    'Un combate de Fiesta te entrega nuevas elecciones sobre la marcha, y las elecciones se vuelven más audaces cuanto más se alarga la pelea. Construyes de una oleada a la siguiente, eligiendo una de unas pocas opciones cada vez y conservándola durante el resto del combate.',
-  'guide.arenaPage.wavesTitle': 'Las mejoras llegan en oleadas',
   'guide.bestiary.flavor.gravecaller_cultist':
     'Sirvientes encapuchados del culto de la muerte cuya obra mancilla las tumbas desde el Valle hasta los picos. Donde se reúnen, los muertos no descansan.',
   'guide.bestiary.flavor.grubjaw':
@@ -8027,6 +8000,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.event.hint': 'Anuncia una banda, quedada o evento',
   'hudChrome.discord.relay.help.label': 'Necesito ayuda',
   'hudChrome.discord.relay.help.hint': 'Pide ayuda a la comunidad',
+  'hudChrome.options.hideUnusedActionSlots': 'Ocultar espacios de acción no utilizados',
   'hudChrome.options.showSecondaryActionBar': 'Mostrar barra de acción secundaria',
   'errors.api.desktopCodeInvalid':
     'El código de inicio de sesión de escritorio no es válido o expiró. Inténtalo de nuevo.',
@@ -8304,7 +8278,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Cuanto aparece en esta página se encuentra en el juego: presiona Esc para abrir las opciones. El menú se abre en un Resumen de aspectos esenciales fijados, con las categorías en una barra al lado: los ajustes de abajo viven en Gráficos, Interfaz y Accesibilidad dentro del grupo Pantalla, y la Superposición de rendimiento en Sistema. Más rápido todavía, escribe un nombre en el cuadro de búsqueda de arriba y salta directo a él.',
   'guide.settingsPage.whyLabel': 'Por qué funciona:',
   'hudChrome.crafting.close': 'Cerrar elaboración',
-  'hudChrome.crafting.craft': 'Artesanía',
   'hudChrome.crafting.craftedToast': 'Elaborado: {name}',
   'hudChrome.crafting.empty': 'Aún no se conocen recetas.',
   'hudChrome.crafting.insufficientMaterials': 'No tienes los materiales para eso.',
@@ -8491,9 +8464,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.willow_sprite.name': 'Duende del Sauce',
   'entities.mobs.wood_wraith.name': 'Aparecido del Bosque',
   'entities.mobs.wreck_thief.name': 'Ladrón de Wreckfield',
-  'guide.arenaPage.yumiBody':
-    'Protege a Yumi es un modo de objetivos por equipos que se juega en un laberinto: cada bando protege a su propio familiar felino mientras da caza al del rival. Cada cierto tiempo ambos gatos se teletransportan a nuevos rincones del laberinto, así que el combate oscila entre defender, cazar y correr para volver a encontrarlos. Entra en cola como tres contra tres o cinco contra cinco; caer en batalla solo te deja en el banquillo un instante.',
-  'guide.arenaPage.yumiHeading': 'Protege a Yumi',
   'hudChrome.archetypeTitle.hobbyLabel': 'Pasatiempo',
   'hudChrome.auraEffect.armorPct': 'Reduce la armadura un {pct}%',
   'hudChrome.auraEffect.armorPctStacks': 'Reduce la armadura un {pct}% ({stacks} acumulaciones)',
@@ -8503,8 +8473,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.increasePct.int': 'Aumenta el Intelecto un {pct}%',
   'hudChrome.auraEffect.increasePct.sta': 'Aumenta el Aguante un {pct}%',
   'hudChrome.crafting.recipeNotLearned': 'Aún no has aprendido esa receta.',
-  'hudChrome.crafting.throttled':
-    'Estás elaborando demasiado rápido. Espera un momento e inténtalo de nuevo.',
   'hudChrome.mobile.chatPlaceholder': 'Di algo...',
   'hudChrome.mobile.hideKeyboard': 'Ocultar teclado',
   'hudChrome.unitFrame.partyChip': 'Grupo',
@@ -8514,7 +8482,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'yumi.bracket5': 'Yumi 5c5',
   'yumi.end.loss': '¡DERROTA! Tu Yumi ha caído.',
   'yumi.end.win': '¡VICTORIA! ¡Yumi está a salvo!',
-  'yumi.enterQueue': '¡Únete a Protege a Yumi!',
   'yumi.error.partyTooBig3': 'Protege a Yumi 3c3 permite un grupo de hasta tres.',
   'yumi.error.partyTooBig5': 'Protege a Yumi 5c5 permite un grupo de hasta cinco.',
   'yumi.hud.aria': 'Tu Yumi con {mine} de {max} de salud; Yumi enemigo con {theirs}.',
@@ -9379,6 +9346,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.keybinds.petAttack': 'Mascota: atacar',
   'hudChrome.keybinds.petDefensive': 'Mascota: defensiva',
   'hudChrome.keybinds.petStop': 'Mascota: detenerse',
+  'hudChrome.keybinds.targetPet': 'Mascota: seleccionar',
   'hudChrome.keybinds.petTaunt': 'Mascota: provocar',
   'hudChrome.mailbox.parcelQtyDecreaseAria': 'Enviar un {item} menos',
   'hudChrome.mailbox.parcelQtyIncreaseAria': 'Enviar un {item} más',
@@ -10303,6 +10271,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Tu probabilidad de parar por completo un ataque cuerpo a cuerpo frontal, sin recibir daño. Un golpe por la espalda no se puede parar.',
   'hudChrome.options.mouseoverCast': 'Lanzar al pasar el cursor sobre los marcos de grupo',
   'hudChrome.options.showTargetOfTarget': 'Mostrar el objetivo del objetivo',
+  'hudChrome.options.showPetFrame': 'Mostrar tu mascota',
   'hudChrome.unitFrame.targetOfTargetLabel': 'Objetivo del objetivo',
   'itemUi.market.rarityLegendary': 'Legendario',
   'loading.reconnectingAttempt':
@@ -11080,13 +11049,9 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.disenchantConfirmBodySpecial':
     'Esto destruye una copia especial de {item} (firmada, obra maestra o encantada) y produce materiales arcanos. No se puede deshacer.',
   'hudChrome.enchanting.disenchantConfirmTitle': '¿Desencatar {item}?',
-  'hudChrome.enchanting.disenchantThrottled':
-    'Estás desencantando demasiado rápido. Espera un momento e inténtalo de nuevo.',
   'hudChrome.enchanting.disenchantedLine': 'Desencatas {item}.',
   'hudChrome.enchanting.enchantAppliedLine': 'Encantas {item} con {enchant}.',
   'hudChrome.enchanting.enchantInsufficient': 'No tienes los materiales para ese encantamiento.',
-  'hudChrome.enchanting.enchantThrottled':
-    'Estás encantando demasiado rápido. Espera un momento e inténtalo de nuevo.',
   'hudChrome.enchanting.enchantUnknown': 'Ese encantamiento no existe.',
   'hudChrome.enchanting.enchantWrongSlot': 'Ese encantamiento no se puede aplicar a ese objeto.',
   'hudChrome.enchanting.noEnchants': 'Ningún encantamiento usa este reactivo.',
@@ -11100,8 +11065,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.salvageConfirmBodySpecial':
     'Esto destruye una copia especial de {item} (firmada, obra maestra o encantada) y produce materiales de artesanía. No se puede deshacer.',
   'hudChrome.enchanting.salvageConfirmTitle': '¿Desguazar {item}?',
-  'hudChrome.enchanting.salvageThrottled':
-    'Estás desguazando demasiado rápido. Espera un momento e inténtalo de nuevo.',
   'hudChrome.enchanting.salvagedLine': 'Desguazas {item}.',
   'hudChrome.enchanting.targetTitle': 'Elige un objeto para encantar',
   'hudChrome.gathering.biteLine': '¡Algo muerde el anzuelo!',
