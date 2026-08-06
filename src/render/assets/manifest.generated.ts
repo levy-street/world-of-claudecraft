@@ -258,7 +258,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/chars/npcs/ewald.glb": "/media/models/chars/npcs/ewald.e4851db6729f.glb",
   "models/chars/npcs/marsh.glb": "/media/models/chars/npcs/marsh.db5372ad6f5b.glb",
   "models/chars/npcs/nell.glb": "/media/models/chars/npcs/nell.f1b1d1b6f2ae.glb",
-  "models/chars/npcs/ollun.glb": "/media/models/chars/npcs/ollun.387a546c7b1e.glb",
+  "models/chars/npcs/ollun.glb": "/media/models/chars/npcs/ollun.511930988de4.glb",
   "models/chars/npcs/riftspawn.glb": "/media/models/chars/npcs/riftspawn.29b94cd72c35.glb",
   "models/chars/npcs/riftspawn_antler.glb": "/media/models/chars/npcs/riftspawn_antler.6e8e2dae3e78.glb",
   "models/chars/npcs/saul.glb": "/media/models/chars/npcs/saul.cb921df0fcd2.glb",

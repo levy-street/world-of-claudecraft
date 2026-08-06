@@ -47,6 +47,28 @@ export interface ClipMap {
   emote?: Partial<Record<OverheadEmoteId, EmoteClipSpec>>;
 }
 
+/** A HAND-AUTHORED prop seat, in the carrying bone's own local space.
+ *
+ *  The per-weapon tables (`KAYKIT_WEAPON_ACCESSORY` + `WEAPON_GRIP_OVERRIDES`) tune a
+ *  weapon MODEL globally, so they cannot express "this character holds this weapon
+ *  this way": Coalfast's shield is strapped to his forearm while every other shield
+ *  in the game sits in a hand slot. A `seat` is per-ATTACHMENT and therefore per
+ *  character, it wins over every derived grip, and it is used verbatim.
+ *
+ *  Authored by positioning the prop in a live Blender session against the shipped
+ *  rig, then capturing its transform relative to the carrying bone: see
+ *  `docs/design/last-bell-held-prop-workflow.md`. Bone-LOCAL on purpose, so the
+ *  number is independent of the pose it was authored in and holds across every clip.
+ *  Do not re-derive one of these from a grip table, and do not hand-tune the digits. */
+export interface AttachSeat {
+  /** Bone-local position [x, y, z]. */
+  position: [number, number, number];
+  /** Bone-local orientation as a quaternion [x, y, z, w]. */
+  quaternion: [number, number, number, number];
+  /** Uniform scale. Carries the authored size; there is no family clamp on a seat. */
+  scale: number;
+}
+
 export interface AttachDef {
   url: string;
   bone: string;
@@ -54,6 +76,8 @@ export interface AttachDef {
   rotationY?: number;
   /** Copy grip from a built-in accessory node on the character rig (e.g. Spellbook_open). */
   gripRef?: string;
+  /** Hand-authored per-character seat. Beats every derived grip; see AttachSeat. */
+  seat?: AttachSeat;
 }
 
 export interface VisualDef {
@@ -579,6 +603,41 @@ const VELOCIRAPTOR: ClipMap = {
 // ---------------------------------------------------------------------------
 // The manifest
 // ---------------------------------------------------------------------------
+
+// Hand-authored prop seats for the Last Bell cast, captured 2026-08-06 from the live
+// review session (`tmp/asset_src/last_bell_crew/Untitled.blend`) as transforms in the
+// CARRYING BONE's own rest space, which is why they hold across all 22 clips. The same
+// arrangements drive the concept book's plates through `seat` rows in
+// `scripts/assets/last_bell_crew/cast.py`, so the book and the game agree by
+// construction instead of each deriving its own grip.
+//
+// These exist because the per-weapon tables cannot express them. Coalfast's shield is
+// STRAPPED to his forearm (`lowerarm.l`), not held in a hand slot, because a hand-slot
+// shield swung out beside him in Walking_A and Block like a tray; and Marsh's
+// `adv_sword_1handed` is the model the engine misroutes through the `VAR_SWORD`
+// variant-pack row, seating it across the wrist. A seat bypasses both paths.
+// Provenance and the gate every one of them passed:
+// `docs/design/last-bell-held-prop-workflow.md`.
+const SEAT_COALFAST_SWORD: AttachSeat = {
+  position: [-0.008671, 0.494415, -0.069869],
+  quaternion: [-0.046277, -0.777339, -0.626985, 0.022205],
+  scale: 0.8876,
+};
+const SEAT_COALFAST_SHIELD: AttachSeat = {
+  position: [0.01183, 0.413644, 0.088205],
+  quaternion: [-0.784539, -0.113153, -0.291103, 0.535681],
+  scale: 0.369795,
+};
+const SEAT_MARSH_SWORD: AttachSeat = {
+  position: [0, 0.017141, 0.052543],
+  quaternion: [0.02562, 0.781471, 0.623404, 0.00363],
+  scale: 0.8876,
+};
+const SEAT_OLLUN_STAFF: AttachSeat = {
+  position: [-0.049252, 0.096088, 0.070311],
+  quaternion: [0.492365, -0.507519, -0.706769, 0.021865],
+  scale: 0.66,
+};
 
 export const VISUALS: Record<string, VisualDef> = {
   // -- player classes ------------------------------------------------------
@@ -1451,8 +1510,8 @@ export const VISUALS: Record<string, VisualDef> = {
     height: HUMANOID_H,
     clips: kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
     attach: [
-      { url: `${WEAPONS}/sword_1handed.glb`, bone: 'handslot.r' },
-      { url: `${WEAPONS}/shield_square.glb`, bone: 'handslot.l' },
+      { url: `${WEAPONS}/sword_1handed.glb`, bone: 'handslot.r', seat: SEAT_COALFAST_SWORD },
+      { url: `${WEAPONS}/shield_square.glb`, bone: 'lowerarm.l', seat: SEAT_COALFAST_SHIELD },
     ],
   },
   // His finale form: the same body and clips with the helm closed and the crest
@@ -1464,17 +1523,24 @@ export const VISUALS: Record<string, VisualDef> = {
     clips: kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
     lazyPreload: true,
     attach: [
-      { url: `${WEAPONS}/sword_1handed.glb`, bone: 'handslot.r' },
-      { url: `${WEAPONS}/shield_square.glb`, bone: 'handslot.l' },
+      { url: `${WEAPONS}/sword_1handed.glb`, bone: 'handslot.r', seat: SEAT_COALFAST_SWORD },
+      { url: `${WEAPONS}/shield_square.glb`, bone: 'lowerarm.l', seat: SEAT_COALFAST_SHIELD },
     ],
   },
+  // The open journal is gone from his off hand on purpose: carried out in front it
+  // read as a shield (cast review 1.5). The staff carries a hand-authored `grip`,
+  // captured from the same live-session arrangement the concept book renders, so the
+  // game and the book show the same carry rather than each deriving its own.
   npc_ollun: {
     url: `${NPCS_DIR}/ollun.glb`,
     height: HUMANOID_H,
     clips: kaykit(['2H_Melee_Attack_Chop']),
     attach: [
-      { url: `${WEAPONS}/brasscrown_walking_staff.glb`, bone: 'handslot.r' },
-      { url: `${TOOLS}/journal_open.glb`, bone: 'handslot.l' },
+      {
+        url: `${WEAPONS}/brasscrown_walking_staff.glb`,
+        bone: 'handslot.r',
+        seat: SEAT_OLLUN_STAFF,
+      },
     ],
   },
   npc_edda: {
@@ -1524,7 +1590,9 @@ export const VISUALS: Record<string, VisualDef> = {
     url: `${NPCS_DIR}/marsh.glb`,
     height: HUMANOID_H,
     clips: kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
-    attach: [{ url: `${WEAPONS}/adv_sword_1handed.glb`, bone: 'handslot.r' }],
+    attach: [
+      { url: `${WEAPONS}/adv_sword_1handed.glb`, bone: 'handslot.r', seat: SEAT_MARSH_SWORD },
+    ],
   },
 
   // -- The break-spawned -----------------------------------------------------

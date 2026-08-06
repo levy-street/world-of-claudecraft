@@ -354,8 +354,14 @@ function attachProp(
     payload.userData.heldSlot = 1;
   }
   payload.userData[HELD_PROP_TAG] = true;
-  const variantGrip = isHandslotBone(att.bone) ? variantGripFor(att.url) : null;
-  if (variantGrip) {
+  // A hand-authored seat wins outright, including over the variant-pack grip: it was
+  // authored against this character on this bone, so nothing derived should refine it.
+  const variantGrip = att.seat || !isHandslotBone(att.bone) ? null : variantGripFor(att.url);
+  if (att.seat) {
+    payload.position.set(...att.seat.position);
+    payload.quaternion.set(...att.seat.quaternion);
+    payload.scale.setScalar(att.seat.scale);
+  } else if (variantGrip) {
     applyVariantGrip(payload, att.bone, variantGrip, att.url);
   } else if (att.position || att.rotationY !== undefined) {
     if (att.position) payload.position.set(...att.position);

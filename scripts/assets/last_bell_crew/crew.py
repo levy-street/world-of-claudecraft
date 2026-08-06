@@ -21,6 +21,59 @@ Lore anchors: `docs/design/last-bell-campaign.html` (source of truth),
 in `src/sim/content/farshore.ts` / `last_bell_campaign.ts`.
 
 Deterministic: same inputs -> same GLB. No randomness, no time.
+
+BASE BODY ROSTER
+----------------
+"Which base for this NPC" is the first question every figure asks, and the answer is
+in the MESH LIST, because a mesh is what `load_base(hide=...)` can remove and a welded
+part is not. Measured off the shipped GLBs, not assumed.
+
+  base              hideable extras            gotcha
+  ranger.glb        Cape, Quiver               Ewald.
+  knight.glb        Cape, Helmet, HelmetVisor  Marsh, Coalfast. ONE cell covers
+                                               cuirass + arms + legs + helmet, so
+                                               nothing separates without a re-UV.
+  rogue.glb         Cape                       Tam, Nell, Edda.
+  rogue_hooded.glb  Cape, Mask                 Ollun. Carries a REAL cowl: half the
+                                               head samples the CAPE's cell (r1c1),
+                                               so a two-tone costs two palette
+                                               entries and no re-UV. Mask is its own
+                                               mesh, so it hides or re-cells alone.
+  mage.glb          Cape, Hat                  Long loose hair, which reads female at
+                                               a glance and hangs past any hood.
+  mage_classic.glb  (Cube.NNN names only)      Saul. Reuses MAGE_SLOTS. Meshes are
+                                               unnamed primitives, so `hide` is
+                                               near-useless; a belt book sits on a
+                                               default cell (review 2.15).
+  druid.glb         Backpack                   Antlers and leaves are WELDED into
+                                               Druid_Head: removing them is a mesh
+                                               edit, not a hide. Edda was moved off
+                                               this body for exactly that reason.
+  barbarian.glb     (none)                     Edda's first pass.
+  paladin.glb       Cape, Helmet               Unused. Full plate; no bare head mesh.
+
+Enemy bodies (`chars/enemies`) share the rig and the grid, so the same rules hold.
+A base with no `atlas.SLOT_MAPS` entry needs one SURVEYED first: never guess a layout,
+and validate a new survey by reproducing a base whose map is already known.
+
+SHIPPING A FIGURE INTO THE GAME
+-------------------------------
+The concept book is a review surface, not the deliverable. A figure is only IN THE GAME
+after all of this, in order:
+
+  1. CREW_OUT=tmp/asset_src/<isolated dir> blender --background --python model.py
+     Use an ISOLATED staging dir. The committed spec's `srcDir` optimizes every GLB it
+     finds, and `tmp/asset_src/last_bell_crew/` still holds stale raw exports that
+     would be re-optimized over shipped models.
+  2. node scripts/assets/build_assets.mjs <spec>        (meshopt; a RAW export will
+     not load at runtime, the loader requires the compression)
+  3. node scripts/build_media_manifest.mjs generate     (or it never reaches prod)
+  4. Wire/verify the `VisualDef` in `src/render/characters/manifest.ts`: the model url,
+     the `attach` entries (with any authored `seat`), and the NPC_KEYS mapping.
+  5. npx vitest run tests/visual_manifest.test.ts tests/character_clipmaps.test.ts \\
+       tests/render_glb_replacement_assets.test.ts tests/render_asset_preload.test.ts
+     The clip gate is the one that bites after a base swap: a new base must still ship
+     every clip name the figure's ClipMap asks for.
 """
 
 import bpy
@@ -117,6 +170,15 @@ def seed_context():
 def load_base(glb, hide=()):
     """Import a KayKit body, drop its stray helper and the hidden accessories,
     and make that rig's palette layout the active one."""
+    if glb not in atlas.SLOT_MAPS:
+        raise SystemExit(
+            f"{glb} has no atlas.SLOT_MAPS entry, so its palette cells are unknown.\n"
+            f"  Survey them first (polygon-centroid cell histogram per mesh), and\n"
+            f"  VALIDATE the survey by reproducing a base whose map is already known\n"
+            f"  before trusting it: the glTF v axis is top-origin and Blender's is not,\n"
+            f"  so a flipped row convention looks plausible and is wrong.\n"
+            f"  See the base roster in this module's docstring. Mapped: "
+            f"{', '.join(sorted(atlas.SLOT_MAPS))}")
     atlas.use_slots(atlas.SLOT_MAPS[glb])
     before = set(bpy.data.objects)
     bpy.ops.import_scene.gltf(filepath=base_path(glb))
