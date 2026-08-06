@@ -209,7 +209,7 @@ describe('Eastbrook polish capture contract', () => {
       sourceComparison: 'feature-worktree',
       views: EASTBROOK_TOWN_CAPTURE_VIEWS,
       placementInventory: EASTBROOK_TOWN_REBUILD_PLACEMENT_INVENTORY,
-      townTriangles: 29_644,
+      townTriangles: 29_436,
       attributionTargets: [
         {
           key: 'town-root',
@@ -233,7 +233,7 @@ describe('Eastbrook polish capture contract', () => {
       sourceComparison: 'polish-baseline-worktree',
       views: EASTBROOK_TOWN_POLISH_MATCHED_CAPTURE_VIEWS,
       placementInventory: EASTBROOK_TOWN_REBUILD_PLACEMENT_INVENTORY,
-      townTriangles: 29_644,
+      townTriangles: 29_436,
       attributionTargets: [
         {
           key: 'town-root',
@@ -255,7 +255,7 @@ describe('Eastbrook polish capture contract', () => {
       layoutId: 'eastbrook_civic_layout_v2',
       sourceComparison: 'polish-v2-worktree',
       placementInventory: EASTBROOK_TOWN_POLISH_V2_PLACEMENT_INVENTORY,
-      townTriangles: 29_110,
+      townTriangles: 28_902,
       attributionTargets: [
         {
           key: 'town-root',
@@ -360,15 +360,23 @@ describe('Eastbrook polish capture contract', () => {
       mode: 'composite-sha256',
       algorithm: 'sha256',
       baselineRevision: EASTBROOK_POLISH_BASELINE_REVISION,
-      // Deliberately re-pinned at the release/v0.34.0 merge: both parents had
-      // legitimately re-pinned this composite (the env-combined branch for the
-      // pnpm lockfile leaf plus the far-field renderer-integration work, the
-      // release branch for the #2571 shapeshift async-compile gate in
-      // renderer.ts), so the merged renderer-integration leaf hashes fresh and
-      // the composite takes a third value. Not one Eastbrook pipeline input or
-      // geometry value changed, and no capture was retaken (the per-asset seal
-      // suites stay green untouched).
-      fingerprint: 'e09f80e7b79910523636384ebfcc4ec6566b924118bc59934cc496db3cf22248',
+      // Deliberately re-pinned, and this mint stacks every leaf move on both sides
+      // of the merge onto src/render/renderer.ts, the rendererIntegration leaf of
+      // this composite: the pnpm-lock migration (a hashed input to every GLB source
+      // fingerprint), PR #2720's fence-removal layout evidence, release/v0.34.0's
+      // Bear Form quadruped rig (PR #2842), live graphics rebuild (context recycle
+      // plus profile-aware Eastbrook runtime inputs, PR #2799), far-field sprite
+      // impostors and fog-free vista (PR #2793), and brood shout/flourish wiring;
+      // and from this branch the worldObjectBurning fire-burst cue (torched murloc
+      // huts, q_deepfen_purge). The release also retook the polish captures and
+      // re-swept their metadata and performance JSONs, and those files are adopted
+      // verbatim here. Each move shifts the leaf's own sha256 and with it the
+      // composite, so the merged tree mints one fingerprint matching neither
+      // parent's literal. No GLB source fingerprint moved, not one pipeline input
+      // or geometry value changed, and no capture was retaken: Eastbrook itself is
+      // untouched by all of it. Re-minted with
+      // scripts/assets/eastbrook_grand_armoury/remint_polish_provenance.mjs.
+      fingerprint: '110e06843c14ade2a20530a1770ee82a1a0f86ae49ebad601b560fe2184fb5a1',
       components: {
         captureContract: {
           id: 'polish-v2',
@@ -579,10 +587,10 @@ describe('Eastbrook polish capture contract', () => {
         shadowEnabled: true,
         ...(contractId ? { contractId } : {}),
       });
-    expect(() => assertPerf(29_644)).not.toThrow();
-    expect(() => assertPerf(29_644, 'rebuild-v1')).not.toThrow();
-    expect(() => assertPerf(29_644, 'polish-baseline')).not.toThrow();
-    expect(() => assertPerf(29_110, 'polish-v2')).not.toThrow();
+    expect(() => assertPerf(29_436)).not.toThrow();
+    expect(() => assertPerf(29_436, 'rebuild-v1')).not.toThrow();
+    expect(() => assertPerf(29_436, 'polish-baseline')).not.toThrow();
+    expect(() => assertPerf(28_902, 'polish-v2')).not.toThrow();
     expect(() => assertPerf(29_644, 'polish-v2')).toThrow('draw stats');
   });
 

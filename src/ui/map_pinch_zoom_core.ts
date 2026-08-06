@@ -63,6 +63,20 @@ export function nextMapZoom(currentZoom: number, factor: number): number {
   return Math.max(MAP_MIN_ZOOM, Math.min(MAP_MAX_ZOOM, currentZoom * factor));
 }
 
+/**
+ * True when a zoom-out applied at the zone map's full extent should leave the
+ * zone level entirely and open the continent overview, instead of clamping at
+ * MAP_MIN_ZOOM and doing nothing visible.
+ *
+ * The zone map is already showing the whole zone at MAP_MIN_ZOOM, so every
+ * further zoom-out (the minus button, a wheel-down, a pinch-out) was a no-op: the
+ * one thing left to zoom out TO is the world. Zoom-IN is never a level change,
+ * and a factor of exactly 1 (a pinch inside its deadzone) is not a zoom-out.
+ */
+export function zoomOutExitsZoneLevel(currentZoom: number, factor: number): boolean {
+  return factor < 1 && Number.isFinite(currentZoom) && currentZoom <= MAP_MIN_ZOOM;
+}
+
 export class MapPinchZoomCore {
   private readonly pointers = new Map<number, MapTapPoint>();
   private readonly suppressedTaps = new Set<number>();

@@ -7,12 +7,10 @@
 // InstancedMesh of camera-facing quads per (bucket, category): each instance
 // picks the two atlas views bracketing its camera bearing (offset by its own
 // placement yaw, so a forest never shows one repeated silhouette) and blends
-// them, so orbiting the camera never snaps. Lighting is the live Lambert
-// pipeline over a shading normal that leans off vertical toward the camera
-// and fans across the card (IMPOSTOR_NORMAL_GLSL in foliage_impostor_core.ts),
-// so a sprite keeps the terrain's response to day-night grades, biome light
-// and fog while still lighting one side and shading the other the way the
-// real tree it replaces does.
+// them, so orbiting the camera never snaps. Lighting is the live standard
+// pipeline over the quad's up normal, the exact response the ground plane
+// has, so day-night grades, biome light and fog all land on the sprite the
+// way they land on the terrain under it.
 //
 // The handoff against the real meshes is per instance and jittered: the real
 // side collapses each tree at swap - fade * jitter (foliage_collapse.ts) and
@@ -30,13 +28,20 @@
 import * as THREE from 'three';
 import { WORLD_MIN_X, WORLD_MIN_Z } from '../sim/data';
 import { terrainHeight } from '../sim/world';
-import { FAR_MESH_DROP, FAR_WORLD_MARGIN, farVertexHeight, farVistaPlan } from './far_terrain_core';
+import {
+  createFarShortfallSampler,
+  FAR_WORLD_MARGIN,
+  type FarFieldPolicy,
+  farFieldPolicy,
+} from './far_terrain_core';
 import { collapseWindowUniforms } from './foliage_collapse';
 import {
-  CANOPY_EMISSIVE_FLOOR,
-  IMPOSTOR_ATLAS_MAX,
+  IMPOSTOR_ATLAS_BUDGET,
+  IMPOSTOR_CATEGORY_VIEWS,
+  IMPOSTOR_CATEGORY_WIND,
+  IMPOSTOR_CELL_PX,
   IMPOSTOR_JITTER_GLSL,
-  IMPOSTOR_NORMAL_GLSL,
+  IMPOSTOR_ROW_BUDGET,
   type ImpostorArchetypeSpec,
   type ImpostorCellRect,
   packImpostorAtlas,
@@ -45,18 +50,10 @@ import { GFX, sharedUniforms } from './gfx';
 
 export type ImpostorCategory = 'tree' | 'rock' | 'dress' | 'building';
 
-const CATEGORY_VIEWS: Record<ImpostorCategory, number> = {
-  tree: 12,
-  rock: 6,
-  dress: 8,
-  building: 6,
-};
-
-function categoryCellPx(category: ImpostorCategory): number {
-  const scale = GFX.constrainedMemory ? 0.5 : 1;
-  const base = category === 'tree' ? 128 : category === 'building' ? 96 : 64;
-  return Math.max(32, Math.round(base * scale));
-}
+const CATEGORY_VIEWS = IMPOSTOR_CATEGORY_VIEWS;
+// The per-category sway policy lives in the core (IMPOSTOR_CATEGORY_WIND,
+// pinned by its test): rigid categories at hard zero, sway parity elsewhere.
+const CATEGORY_WIND = IMPOSTOR_CATEGORY_WIND;
 
 interface BakePart {
   geometry: THREE.BufferGeometry;
@@ -71,6 +68,8 @@ interface Archetype {
   minY: number;
   height: number;
   width: number;
+  /** per-archetype sway multiplier over the category amplitude (dead trees 0) */
+  windMul: number;
 }
 
 interface SpriteInstance {
@@ -119,14 +118,30 @@ export interface ImpostorRegistration {
 }
 
 export interface ImpostorSession {
-  registerArchetype(category: ImpostorCategory, key: string, parts: BakePart[]): number;
+  registerArchetype(
+    category: ImpostorCategory,
+    key: string,
+    parts: BakePart[],
+    windMul?: number,
+  ): number;
   bucket(category: ImpostorCategory, x: number, z: number, radius: number): ImpostorBucketHandle;
   finalize(webgl: THREE.WebGLRenderer, parent: THREE.Group, seed: number): ImpostorRegistration[];
 }
 
-/** Sprites ship on the same arm the cone impostors did. */
+/**
+ * The live far-field capability read: the one policy the sprite session,
+ * the renderer's vista arm, the water apron and the shortfall sampler all
+ * share (farFieldPolicy in far_terrain_core.ts holds the laws and the
+ * profile tests).
+ */
+export function activeFarFieldPolicy(): FarFieldPolicy {
+  return farFieldPolicy(GFX.tier, GFX);
+}
+
+/** Sprites ship per the shared far-field policy (never on lean or
+ *  constrained-memory profiles; the vista additionally requires them). */
 export function impostorsActive(): boolean {
-  return GFX.standardMaterials && !GFX.leanFoliage;
+  return activeFarFieldPolicy().sprites;
 }
 
 // ---------------------------------------------------------------------------
@@ -136,12 +151,10 @@ export function impostorsActive(): boolean {
 // Neutral, yaw-agnostic studio rig: a hemisphere gives the bake its top-down
 // volume (canopy crowns brighter than skirts) without stamping a sun
 // direction into a sprite that must read correctly from every bearing at
-// every hour. The PI factor cancels Lambert's 1/PI: the bake material writes
-// albedo x irradiance / PI, and the atlas is then bound as a MAP and lit
-// again by the live shading, so without the cancellation the sprite pays the
-// 1/PI twice and lands about 3x darker than the real tree it replaces.
-const BAKE_SKY = 1.15 * Math.PI;
-const BAKE_GROUND = 0.62 * Math.PI;
+// every hour. Absolute level is close to 1 so the live standard-material lighting
+// supplies the actual brightness.
+const BAKE_SKY = 1.15;
+const BAKE_GROUND = 0.62;
 
 const bakeMaterialCache = new Map<THREE.Material, THREE.Material>();
 
@@ -197,11 +210,17 @@ function bakeAtlas(
 ): { target: THREE.WebGLRenderTarget; rects: ImpostorCellRect[]; size: number } {
   const placement = packImpostorAtlas(
     archetypes.map((a) => a.spec),
-    GFX.constrainedMemory ? 2048 : IMPOSTOR_ATLAS_MAX,
+    IMPOSTOR_ATLAS_BUDGET,
   );
   const size = placement.size;
 
-  const bakeTarget = new THREE.WebGLRenderTarget(size, size, {
+  // Transient GPU memory is the budget here, not passes: a full-atlas MSAA
+  // bake target held a size^2 4x color + depth pair (over half a GiB at
+  // 4096) alongside the final chain. Instead every view renders into ONE
+  // small reusable cell-sized MSAA scratch (under a MiB) and blits into its
+  // final rect, so peak use is the final chain plus that scratch.
+  const maxCellPx = archetypes.reduce((m, a) => Math.max(m, a.spec.cellPx), 32);
+  const scratch = new THREE.WebGLRenderTarget(maxCellPx, maxCellPx, {
     depthBuffer: true,
     samples: 4,
     generateMipmaps: false,
@@ -222,29 +241,60 @@ function bakeAtlas(
   const prevClearAlpha = webgl.getClearAlpha();
   const prevAutoClear = webgl.autoClear;
 
-  // The mip-mapped resolve the sprites sample; created up front so the
-  // finally arm can dispose it on a mid-bake throw.
+  // The mip-mapped atlas the sprites sample; created up front so the
+  // finally arm can dispose it on a mid-bake throw. generateMipmaps stays
+  // OFF until every cell has landed: three regenerates a target's whole
+  // mip chain at the end of every render() into it, so leaving it on would
+  // rebuild the 2048 chain a few hundred times during the bake.
   const finalTarget = new THREE.WebGLRenderTarget(size, size, {
     depthBuffer: false,
-    generateMipmaps: true,
+    generateMipmaps: false,
     minFilter: THREE.LinearMipmapLinearFilter,
     magFilter: THREE.LinearFilter,
   });
+  finalTarget.texture.generateMipmaps = false;
   finalTarget.texture.anisotropy = Math.min(4, webgl.capabilities.getMaxAnisotropy());
 
   let done = false;
+  // transparent + NoBlending: a straight RGBA copy. A default opaque
+  // material compiles with the OPAQUE define and force-writes alpha 1 over
+  // the whole atlas, which turns every sprite into a full rectangle
+  // downstream (the alpha test has nothing left to cut).
+  const blitMat = new THREE.MeshBasicMaterial({
+    map: scratch.texture,
+    toneMapped: false,
+    transparent: true,
+    blending: THREE.NoBlending,
+    depthTest: false,
+    depthWrite: false,
+  });
+  const blitQuad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), blitMat);
+  const blitScene = new THREE.Scene();
+  blitScene.add(blitQuad);
+  const blitCam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+
   try {
     // Cell addressing goes through the TARGET's viewport/scissor: with a
-    // render target bound, three ignores the renderer-level setViewport (that
-    // state belongs to the canvas) and reads renderTarget.viewport each
-    // render call. The clear alpha is 0 (the alpha test carves sprites from
-    // it) but the clear RGB is a mid-canopy green: the MSAA resolve and the
-    // mip chain average edge texels toward the clear color, so distant
-    // sprites (deep mips are mostly such averages) tint toward foliage
-    // instead of collapsing to near-black silhouettes.
-    bakeTarget.scissorTest = true;
+    // render target bound, three ignores the renderer-level setViewport
+    // (that state belongs to the canvas) and reads renderTarget.viewport
+    // each render call. The clear alpha is 0 (the alpha test carves sprites
+    // from it) but the clear RGB is a mid-canopy green: the MSAA resolve
+    // and the mip chain average edge texels toward the clear color, so
+    // distant sprites (deep mips are mostly such averages) tint toward
+    // foliage instead of collapsing to near-black silhouettes.
+    // The scratch clears FULL-SIZE every view (no scissor): a smaller cell
+    // reusing it after a larger one must not leave the larger bake's texels
+    // standing where the blit's edge taps can reach them.
+    finalTarget.scissorTest = true;
     webgl.setClearColor(0x86a868, 0);
     webgl.autoClear = false;
+
+    // Seed the whole atlas with the clear color once, so gutter texels
+    // between packed cells average the same way the in-cell background does.
+    finalTarget.viewport.set(0, 0, size, size);
+    finalTarget.scissor.set(0, 0, size, size);
+    webgl.setRenderTarget(finalTarget);
+    webgl.clear(true, false, false);
 
     archetypes.forEach((arch, ai) => {
       while (holder.children.length > 0) holder.remove(holder.children[0]);
@@ -267,6 +317,13 @@ function bakeAtlas(
       const rect = placement.origin[ai];
       const cellPx = Math.round((rect.u1 - rect.u0) * size);
       const y0 = Math.round(rect.v0 * size);
+      // the blit quad samples exactly the cell's corner of the scratch
+      const uvScale = cellPx / maxCellPx;
+      const uv = blitQuad.geometry.getAttribute('uv') as THREE.BufferAttribute;
+      for (let i = 0; i < uv.count; i++) {
+        uv.setXY(i, (i % 2) * uvScale, i < 2 ? uvScale : 0);
+      }
+      uv.needsUpdate = true;
       for (let view = 0; view < arch.spec.views; view++) {
         // Bake convention: view k shows the model spun by +k/views turns,
         // i.e. the picture of the model seen from bearing -k. The draw
@@ -275,38 +332,27 @@ function bakeAtlas(
         // captures.
         holder.rotation.y = (view / arch.spec.views) * Math.PI * 2;
         holder.updateMatrixWorld(true);
-        const x0 = Math.round(rect.u0 * size) + view * cellPx;
-        bakeTarget.viewport.set(x0, y0, cellPx, cellPx);
-        bakeTarget.scissor.set(x0, y0, cellPx, cellPx);
-        webgl.setRenderTarget(bakeTarget);
+        scratch.viewport.set(0, 0, cellPx, cellPx);
+        webgl.setRenderTarget(scratch);
         webgl.clear(true, true, false);
         webgl.render(scene, camera);
+        const x0 = Math.round(rect.u0 * size) + view * cellPx;
+        finalTarget.viewport.set(x0, y0, cellPx, cellPx);
+        finalTarget.scissor.set(x0, y0, cellPx, cellPx);
+        webgl.setRenderTarget(finalTarget);
+        webgl.render(blitScene, blitCam);
       }
     });
 
-    // Resolve the multisampled bake into the plain mip-mapped texture and
-    // drop the bake target (its depth buffer alone is size^2 * 4 bytes).
-    const blitScene = new THREE.Scene();
-    // transparent + NoBlending: a straight RGBA copy. A default opaque
-    // material compiles with the OPAQUE define and force-writes alpha 1 over
-    // the whole atlas, which turns every sprite into a full rectangle
-    // downstream (the alpha test has nothing left to cut).
-    const blitMat = new THREE.MeshBasicMaterial({
-      map: bakeTarget.texture,
-      toneMapped: false,
-      transparent: true,
-      blending: THREE.NoBlending,
-      depthTest: false,
-      depthWrite: false,
-    });
-    const blitQuad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), blitMat);
-    blitScene.add(blitQuad);
-    const blitCam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+    // Every cell is in place: build the mip chain exactly once. Three
+    // regenerates mips for a bound target at the end of render(), gated on
+    // texture.generateMipmaps, so flip it on and run one empty pass.
+    finalTarget.texture.generateMipmaps = true;
+    finalTarget.viewport.set(0, 0, size, size);
+    finalTarget.scissor.set(0, 0, size, size);
+    finalTarget.scissorTest = false;
     webgl.setRenderTarget(finalTarget);
-    webgl.clear(true, false, false);
-    webgl.render(blitScene, blitCam);
-    blitQuad.geometry.dispose();
-    blitMat.dispose();
+    webgl.render(new THREE.Scene(), blitCam);
     done = true;
   } finally {
     // Restore the live renderer whatever happened: a mid-bake throw must not
@@ -314,7 +360,9 @@ function bakeAtlas(
     webgl.setRenderTarget(prevTarget);
     webgl.setClearColor(prevClearColor, prevClearAlpha);
     webgl.autoClear = prevAutoClear;
-    bakeTarget.dispose();
+    blitQuad.geometry.dispose();
+    blitMat.dispose();
+    scratch.dispose();
     for (const mat of bakeMaterialCache.values()) mat.dispose();
     bakeMaterialCache.clear();
     if (!done) finalTarget.dispose();
@@ -327,10 +375,9 @@ function bakeAtlas(
 // Draw material
 // ---------------------------------------------------------------------------
 
-// One unit quad shared by every impostor mesh: x centered, base at y 0. The
-// stored normals are placeholders the vertex stage overwrites per instance
-// (IMPOSTOR_NORMAL_GLSL), since the shading normal depends on where the
-// camera stands, not on the quad.
+// One unit quad shared by every impostor mesh: x centered, base at y 0, up
+// normals so the live standard-material lighting gives the sprite the ground plane's
+// response (see the module header).
 let quadGeo: THREE.BufferGeometry | null = null;
 function impostorQuadGeo(): THREE.BufferGeometry {
   if (quadGeo) return quadGeo;
@@ -385,21 +432,6 @@ function impostorMaterial(category: ImpostorCategory, atlas: THREE.Texture): THR
   // Standard, matching the real foliage materials: the sprites must take
   // the same realm IBL irradiance their 3D twins take, or their shaded
   // sides read darker than the trees they replace.
-  //
-  // vertexColors STAYS OFF, and the per-instance tint still applies. three
-  // derives USE_INSTANCING_COLOR from the mesh owning an instanceColor (see
-  // instancingColor in WebGLPrograms), never from this flag, and its fragment
-  // side defines USE_COLOR from that same instancing path, so setColorAt
-  // reaches diffuseColor either way. Turning the flag ON is what broke: it
-  // defines USE_COLOR in the VERTEX prefix too, and there `color_vertex` runs
-  // `vColor *= color` against a `color` attribute the impostor quad does not
-  // have. An unbound attribute reads (0, 0, 0), which zeroed vColor and with
-  // it every sprite's whole diffuse term. What was left to draw was the
-  // canopy emissive floor plus a specular lobe, neither of which is
-  // multiplied by diffuseColor: a flat cutout, one colour, unable to react to
-  // the sun at any hour, warm and washed out under a low sun because the
-  // specular alone carried the light's colour. Pinned by
-  // tests/foliage_impostor_core.test.ts.
   const mat = new THREE.MeshStandardMaterial({
     map: atlas,
     alphaTest: 0.35,
@@ -409,21 +441,12 @@ function impostorMaterial(category: ImpostorCategory, atlas: THREE.Texture): THR
     metalness: 0,
   });
   mat.name = `foliage:impostor-${category}`;
-  // The canopy ambient floor the real trees carry (foliage.ts), shaped by
-  // the same atlas texel in the fragment patch below. Without it a sprite is
-  // the only tree in the scene with no floor and crushes to a pure black
-  // silhouette at night. Foliage categories only: rocks and buildings do not
-  // carry the floor in their real form either.
-  if (category === 'tree' || category === 'dress') {
-    mat.emissive.setRGB(...CANOPY_EMISSIVE_FLOOR);
-  }
-  // Amplitude parity with addWind in foliage.ts: TREE_WIND_STRENGTH 0.08
-  // times the kit's windMul (1.0 leaves, 1.2 bushes). The sway direction is
-  // world-fixed here where the real mesh sways in its rotated model frame:
-  // an accepted approximation, sub-pixel at every sprite distance. Rocks do
-  // not wave in the real kit and take none.
-  const windStrength =
-    category === 'rock' || !GFX.windSway ? 0 : category === 'tree' ? 0.08 : 0.096;
+  // Amplitude policy per category (CATEGORY_WIND): sway parity for the
+  // things that sway, hard zero for the rigid kit (rocks, buildings). The
+  // sway direction is world-fixed here where the real mesh sways in its
+  // rotated model frame: an accepted approximation, sub-pixel at every
+  // sprite distance.
+  const windStrength = GFX.windSway ? CATEGORY_WIND[category] : 0;
   mat.onBeforeCompile = (shader) => {
     shader.uniforms.uTime = sharedUniforms.uTime;
     shader.uniforms.uImpSwap = swap;
@@ -451,50 +474,22 @@ function impostorMaterial(category: ImpostorCategory, atlas: THREE.Texture): THR
         varying float vImpBlend;`,
       )
       .replace(
-        // The billboard basis is built HERE, a chunk earlier than the offsets
-        // that consume it: three resolves the shading normal before
-        // <begin_vertex> runs, so a normal written down there would never
-        // reach the fragment stage. Culled instances now pay the basis before
-        // <begin_vertex> drops them, a few ALU on a 2-triangle quad against
-        // the fragment work the cull is actually there to save.
-        '#include <beginnormal_vertex>',
+        '#include <begin_vertex>',
         `vec3 impOrigin = vec3(instanceMatrix[3][0], instanceMatrix[3][1], instanceMatrix[3][2]);
         vec2 collapseOrigin = impOrigin.xz;
         float impDist = distance(collapseOrigin, cameraPosition.xz);
-        float impSx = length(instanceMatrix[0].xyz);
-        float impSy = length(instanceMatrix[1].xyz);
-        float impSz = max(length(instanceMatrix[2].xyz), 1e-6);
-        float impYaw = atan(-instanceMatrix[0].z, instanceMatrix[0].x);
-        // The yaw's cosine and sine come straight off the normalized first
-        // column, which a Y rotation stores as (cos, 0, -sin) times the x
-        // scale. Exact, one divide cheaper than a cos and a sin, and immune
-        // to the half turn SwiftShader returns from atan(-0.0, positive):
-        // that lands an axis-aligned instance's normal facing backwards.
-        float impC = instanceMatrix[0].x / impSx;
-        float impS = -instanceMatrix[0].z / impSx;
-        vec2 impToCam = cameraPosition.xz - collapseOrigin;
-        vec3 impFwd = vec3(impToCam.x, 0.0, impToCam.y) / max(impDist, 1e-4);
-        vec3 impRight = normalize(cross(vec3(0.0, 1.0, 0.0), impFwd));
-        ${IMPOSTOR_NORMAL_GLSL}
-        // The offsets below un-rotate and DIVIDE by the instance scale so the
-        // stock instancing chunk lands them where the billboard math put
-        // them. A normal takes the mirror of that: the stock chunk divides
-        // each component by its column length squared before applying
-        // mat3(instanceMatrix), which nets out to dividing a normal by the
-        // scale where a position is multiplied by it. So un-rotate the same
-        // way and MULTIPLY, and impNormal survives into world space intact.
-        vec3 objectNormal = vec3(impC * impNormal.x - impS * impNormal.z, impNormal.y,
-          impS * impNormal.x + impC * impNormal.z) * vec3(impSx, impSy, impSz);`,
-      )
-      .replace(
-        '#include <begin_vertex>',
-        `float impJitter = ${IMPOSTOR_JITTER_GLSL};
+        float impJitter = ${IMPOSTOR_JITTER_GLSL};
         float impBegin = uImpSwap - uImpFade * impJitter;
         float impKeep = step(impBegin, impDist) * (1.0 - step(uImpSpriteFar, impDist));
         if (impKeep == 0.0) {
           gl_Position = vec4(2.0, 2.0, 2.0, 1.0);
           return;
         }
+        float impSx = length(instanceMatrix[0].xyz);
+        float impSy = length(instanceMatrix[1].xyz);
+        float impSz = max(length(instanceMatrix[2].xyz), 1e-6);
+        float impYaw = atan(-instanceMatrix[0].z, instanceMatrix[0].x);
+        vec2 impToCam = cameraPosition.xz - collapseOrigin;
         // bearing of the camera as seen from the instance, same wrap as the bake
         float impViewAng = atan(impToCam.x, impToCam.y);
         float impRel = fract((impYaw - impViewAng) / 6.2831853 + 1.0);
@@ -507,6 +502,8 @@ function impostorMaterial(category: ImpostorCategory, atlas: THREE.Texture): THR
         float impCellH = aImpostorCell.w;
         vImpUvA = vec2(aImpostorCell.x + (impV0 + uv.x) * impCellW, aImpostorCell.y + uv.y * impCellH);
         vImpUvB = vec2(aImpostorCell.x + (impV1 + uv.x) * impCellW, aImpostorCell.y + uv.y * impCellH);
+        vec3 impFwd = vec3(impToCam.x, 0.0, impToCam.y) / max(impDist, 1e-4);
+        vec3 impRight = normalize(cross(vec3(0.0, 1.0, 0.0), impFwd));
         vec3 impOff = impRight * (position.x * impSx) + vec3(0.0, 1.0, 0.0) * (position.y * impSy);
         // Past the detail envelope the ground under a sprite is the coarse
         // far-tile mesh, which can sit below the true heightfield, so far
@@ -522,6 +519,8 @@ function impostorMaterial(category: ImpostorCategory, atlas: THREE.Texture): THR
         // undo the instance rotation and scale so the stock instancing chunk
         // (project_vertex applies instanceMatrix) lands the quad exactly on
         // the billboarded world offsets computed above
+        float impC = cos(impYaw);
+        float impS = sin(impYaw);
         vec3 transformed = vec3(impC * impOff.x - impS * impOff.z, impOff.y, impS * impOff.x + impC * impOff.z)
           / vec3(impSx, impSy, impSz);`,
       );
@@ -531,53 +530,15 @@ function impostorMaterial(category: ImpostorCategory, atlas: THREE.Texture): THR
         `#include <common>
         varying vec2 vImpUvA;
         varying vec2 vImpUvB;
-        varying float vImpBlend;
-        vec4 impTexel;`,
-      )
-      .replace(
-        '#include <normal_fragment_begin>',
-        `#include <normal_fragment_begin>
-        #ifdef DOUBLE_SIDED
-          // The vertex stage authors this normal in camera terms, so it is
-          // already correct for whichever face the rasterizer keeps; the
-          // double-sided chunk's flip would aim it away from the camera and
-          // invert the lit and shaded sides. faceDirection squared undoes it.
-          normal *= faceDirection;
-        #endif`,
+        varying float vImpBlend;`,
       )
       .replace(
         '#include <map_fragment>',
         `{
           vec4 impA = texture2D( map, vImpUvA );
           vec4 impB = texture2D( map, vImpUvB );
-          impTexel = mix( impA, impB, vImpBlend );
-          diffuseColor *= impTexel;
+          diffuseColor *= mix( impA, impB, vImpBlend );
         }`,
-      )
-      .replace(
-        // Drop the specular lobe. It is the one term here that never
-        // multiplies the atlas texel, so on a flat card carrying a single
-        // smooth synthetic normal it lands as a uniform sheet of the light's
-        // own colour and no sprite texture survives it. A real canopy spreads
-        // the same energy over thousands of leaf orientations, so it never
-        // forms a card-sized highlight. Measured against a real twin: under a
-        // high sun with the camera facing it the lobe was 38 percent of the
-        // sprite's pixel and left the sprite 2.2x brighter than the tree it
-        // replaces; dropping it brings that to 1.6x. At a low sun it is under
-        // 5 percent, so dawn and dusk barely move, and the sprite layer (the
-        // most pixels in the far field) saves a PMREM sample per fragment.
-        '#include <lights_fragment_end>',
-        `#include <lights_fragment_end>
-        reflectedLight.directSpecular = vec3( 0.0 );
-        reflectedLight.indirectSpecular = vec3( 0.0 );`,
-      )
-      .replace(
-        // Shape the canopy ambient floor by the blended atlas texel, the
-        // impostor equivalent of the real canopy's emissiveMap = leaf map
-        // (the stock chunk would sample flat uv, not the per-view cells).
-        // Categories with no floor have emissive = black, so this is free.
-        '#include <emissivemap_fragment>',
-        'totalEmissiveRadiance *= impTexel.rgb;',
       );
   };
   mat.customProgramCacheKey = () => `foliage-impostor-${CATEGORY_VIEWS[category]}`;
@@ -588,39 +549,6 @@ function impostorMaterial(category: ImpostorCategory, atlas: THREE.Texture): THR
 // ---------------------------------------------------------------------------
 // Session
 // ---------------------------------------------------------------------------
-
-// How far the coarse far-tile surface sits BELOW a sprite's true base: its
-// safety drop plus the crest chord error of the tier's sampling grid,
-// bilinearly reconstructed the way the far mesh itself samples. Sprites past
-// the detail envelope ease down by this much so their bases stay planted on
-// the vista instead of floating over shaved ridge crests.
-const farCornerCache = new Map<string, number>();
-function farCornerHeight(x: number, z: number, spacing: number, seed: number): number {
-  const key = `${x}:${z}`;
-  const cached = farCornerCache.get(key);
-  if (cached !== undefined) return cached;
-  const y = farVertexHeight(x, z, spacing, seed);
-  farCornerCache.set(key, y);
-  return y;
-}
-
-function farMeshShortfall(x: number, z: number, baseY: number, seed: number): number {
-  const vista = farVistaPlan(GFX.tier, GFX.constrainedMemory);
-  if (!vista.enabled) return 0;
-  const spacing = vista.spacing;
-  const originX = WORLD_MIN_X - FAR_WORLD_MARGIN;
-  const originZ = WORLD_MIN_Z - FAR_WORLD_MARGIN;
-  const x0 = originX + Math.floor((x - originX) / spacing) * spacing;
-  const z0 = originZ + Math.floor((z - originZ) / spacing) * spacing;
-  const tx = (x - x0) / spacing;
-  const tz = (z - z0) / spacing;
-  const h00 = farCornerHeight(x0, z0, spacing, seed);
-  const h10 = farCornerHeight(x0 + spacing, z0, spacing, seed);
-  const h01 = farCornerHeight(x0, z0 + spacing, spacing, seed);
-  const h11 = farCornerHeight(x0 + spacing, z0 + spacing, spacing, seed);
-  const farY = (h00 * (1 - tx) + h10 * tx) * (1 - tz) + (h01 * (1 - tx) + h11 * tx) * tz;
-  return Math.max(0, baseY - (farY - FAR_MESH_DROP));
-}
 
 const scratchMatrix = new THREE.Matrix4();
 const scratchQuat = new THREE.Quaternion();
@@ -635,11 +563,28 @@ export function createImpostorSession(): ImpostorSession | null {
   const archetypeIndex = new Map<string, number>();
   const buckets: BucketAcc[] = [];
 
+  const categoryRows: Record<ImpostorCategory, number> = {
+    tree: 0,
+    rock: 0,
+    dress: 0,
+    building: 0,
+  };
+
   return {
-    registerArchetype(category, key, parts) {
+    registerArchetype(category, key, parts, windMul = 1) {
       const cacheKey = `${category}:${key}`;
       const existing = archetypeIndex.get(cacheKey);
       if (existing !== undefined) return existing;
+      // The row budget is what the atlas capacity test packs
+      // (shippedImpostorInventory): a kit outgrowing it must fail HERE,
+      // loudly at world build, never by silently outgrowing the verified
+      // 2048 atlas into a runtime pack throw.
+      if (categoryRows[category] >= IMPOSTOR_ROW_BUDGET[category]) {
+        throw new Error(
+          `impostor ${category} rows exceed IMPOSTOR_ROW_BUDGET (${IMPOSTOR_ROW_BUDGET[category]}); raise the budget and re-verify the atlas fits IMPOSTOR_ATLAS_BUDGET`,
+        );
+      }
+      categoryRows[category]++;
       const { minY, height, radius } = archetypeBounds(parts);
       const index = archetypes.length;
       archetypes.push({
@@ -649,12 +594,13 @@ export function createImpostorSession(): ImpostorSession | null {
           worldHeight: height,
           worldBaseY: minY,
           views: CATEGORY_VIEWS[category],
-          cellPx: categoryCellPx(category),
+          cellPx: IMPOSTOR_CELL_PX[category],
         },
         parts,
         minY,
         height,
         width: radius * 2,
+        windMul,
       });
       archetypeIndex.set(cacheKey, index);
       return index;
@@ -689,6 +635,18 @@ export function createImpostorSession(): ImpostorSession | null {
       adoptAtlas(target);
       const texture = target.texture;
       const registrations: ImpostorRegistration[] = [];
+      // Session-scoped shortfall sampler: seed, spacing and origin fix at
+      // finalize, so a world rebuild or tier change can never reuse a stale
+      // corner surface (createFarShortfallSampler holds the cache law).
+      const vista = activeFarFieldPolicy().vista;
+      const shortfall = vista.enabled
+        ? createFarShortfallSampler(
+            seed,
+            vista.spacing,
+            WORLD_MIN_X - FAR_WORLD_MARGIN,
+            WORLD_MIN_Z - FAR_WORLD_MARGIN,
+          )
+        : null;
       // One mesh per CATEGORY for the whole world, not per bucket: sprites
       // run to the view horizon now (the outdoor fog is gone), so nearly
       // every bucket row would be live anyway and the merge turns ~90 draws
@@ -746,8 +704,8 @@ export function createImpostorSession(): ImpostorSession | null {
           cell[i * 4 + 1] = rect.v0;
           cell[i * 4 + 2] = rect.u1 - rect.u0;
           cell[i * 4 + 3] = rect.v1 - rect.v0;
-          wind[i] = item.windScale;
-          sink[i] = farMeshShortfall(item.x, item.z, item.y, seed);
+          wind[i] = item.windScale * arch.windMul;
+          sink[i] = shortfall ? shortfall.shortfall(item.x, item.z, item.y) : 0;
           maxHeight = Math.max(maxHeight, item.height, arch.width * 0.5);
         });
         geo.setAttribute('aImpostorCell', new THREE.InstancedBufferAttribute(cell, 4));

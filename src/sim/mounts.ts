@@ -1,10 +1,12 @@
 // Rideable ground mounts: collection + mount/dismount rules, a sibling sim
 // system behind the SimContext seam (module-first; sim.ts keeps thin delegates).
 //
-// Collection model: EVERY catalog mount is owned while its soulbound reins item
-// (ItemDef kind 'mount') sits in the player's bags or bank. The horse is no
-// longer free: it has its own reins item too, sold by the
-// stablemaster, so a fresh player owns nothing until they buy or loot a mount.
+// Collection model: EVERY catalog mount is owned while its reins item (ItemDef
+// kind 'mount') sits in the player's bags or bank. Player reins are NOT
+// soulbound: ownership travels with the item, so a reins can be traded,
+// mailed, or listed away (and the mount with it). The horse (DEFAULT_MOUNT)
+// is no longer free: it has its own reins item too, sold by the stablemaster,
+// so a fresh player owns nothing until they buy or loot a mount.
 // There is NO persisted "selected mount": reins are usable items, so you ride by
 // using the reins (summonMountItem, reached through items.ts useItem) and the
 // item you clicked IS the choice. The live "riding X right now" state is
@@ -35,6 +37,14 @@ import { DT, type Entity, FORM_AURA_KINDS, isNonSpellCast } from './types';
 // instant from every path (forceDismount), so there is no matching constant.
 export const MOUNT_SUMMON_SECONDS = 1.5;
 
+// Cadence (in ticks) of the while-mounted ownership re-validation in
+// updateMountTransition. The check is two container scans per mounted player,
+// so it runs on an id-staggered cadence instead of every tick; the worst-case
+// dismount delay (MOUNT_OWNERSHIP_REVALIDATE_TICKS ticks, 200ms) is
+// unobservable next to the 1.5s summon channel. tickCount and entity ids are
+// identical on every host, so the stagger is deterministic.
+export const MOUNT_OWNERSHIP_REVALIDATE_TICKS = 4;
+
 // The reins itemId per catalog mount, derived once from the merged ITEMS table
 // (single source: the item record declares `mount`, nothing re-lists the map).
 // Static content, so the lazy module-level cache is multi-Sim safe.
@@ -54,8 +64,10 @@ export function mountItemId(key: string): string | null {
 }
 
 /** Whether the player owns the mount: any catalog mount (the horse included)
- *  while its reins item sits in bags or bank (soulbound, so ownership never
- *  transfers). Unknown keys are never owned. A fresh player owns nothing. */
+ *  while its reins item sits in bags or bank. Reins are not soulbound, so
+ *  ownership travels with the item (a traded-away reins is a lost mount, and
+ *  a summon channel re-validates ownership at completion). Unknown keys are
+ *  never owned. A fresh player owns nothing. */
 export function mountOwned(meta: PlayerMeta, key: string): boolean {
   if (!mountDef(key)) return false;
   const itemId = mountItemId(key);
@@ -278,8 +290,10 @@ export function toggleMount(ctx: SimContext, pid: number): boolean {
 /** Per-tick driver for the mount summon channel (called from the
  *  coordinator's per-player loop). `swimming` is whether the entity is in
  *  fishable/deep water this tick. Water and death force an instant dismount;
- *  a summon channel cancels on entering combat or water; a finished channel
- *  applies the mount after re-validating ownership. */
+ *  losing the reins dismounts too (ownership is re-validated while mounted,
+ *  on a short deterministic stagger); a summon channel cancels on entering
+ *  combat or water; a finished channel applies the mount (re-validating
+ *  ownership) or the dismount. */
 export function updateMountTransition(ctx: SimContext, e: Entity, swimming: boolean): void {
   const meta = ctx.players.get(e.id);
   // (a) Water force-dismounts instantly: no ground mount swims. Also clears any
@@ -289,6 +303,22 @@ export function updateMountTransition(ctx: SimContext, e: Entity, swimming: bool
     e.mountCastRemaining = 0;
     e.mountCastKey = '';
     if (meta) recalcFor(ctx, e, meta);
+    return;
+  }
+  // (a2) Ownership re-validation while mounted. Reins are transferable items,
+  // so the ridden mount can leave the player's possession mid-ride (traded,
+  // mailed, listed, deposited): the ride must follow the item, or one reins
+  // could keep a chain of players mounted. The lent training steed is the one
+  // sanctioned unowned ride. Draws no rng (a pure bags+bank scan), and the
+  // id-staggered cadence keeps the per-tick cost flat across mounted players.
+  if (
+    e.mountKey &&
+    meta &&
+    ctx.tickCount % MOUNT_OWNERSHIP_REVALIDATE_TICKS === e.id % MOUNT_OWNERSHIP_REVALIDATE_TICKS &&
+    !mountOwned(meta, e.mountKey) &&
+    !trainingSummon(meta, e.mountKey)
+  ) {
+    forceDismount(ctx, e);
     return;
   }
   // (b) Advance an in-flight transition. Current code only creates keyed summon

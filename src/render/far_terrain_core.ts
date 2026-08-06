@@ -85,19 +85,8 @@ export const FOGLESS_DETAIL_FAR = 700;
  * world, so distant water, the rim silhouettes and the sky dome's
  * fog-colored horizon band all converge on one realm-tinted atmosphere right
  * where sea meets sky. Fractions of the tier envelope so medium's shorter
- * world melts proportionally.
- *
- * The band sits well inside the envelope rather than hugging the rim: parked
- * at the old 0.62 to 1.6 it only ever softened the last sliver of world, so
- * ridges and sprite towns two thirds of the way out stayed as crisp as the
- * ground underfoot and the vista read flat, with no aerial perspective to
- * separate the far ranges from the near ones. Starting at 0.42 gives real
- * depth cueing across the outer half of the view while leaving a wide clear
- * margin over the detail horizon (FOGLESS_DETAIL_FAR): the closest the haze
- * ever begins is medium's 924 units, still a third again past the 700 unit
- * horizon where every detail subsystem stops drawing, so no mid-range
- * content is ever repainted by it (which is what the day/night fog grade
- * would otherwise flatten at dawn).
+ * world melts proportionally. Starting at 0.42 gives the outer world real
+ * depth while leaving a wide clear margin past the 700-unit detail horizon.
  */
 export function horizonHazePlan(envelopeFar: number): { near: number; far: number } {
   return { near: envelopeFar * 0.42, far: envelopeFar * 1.35 };
@@ -107,7 +96,7 @@ export function horizonHazePlan(envelopeFar: number): { near: number; far: numbe
  * Per-tier vista plan. Low and constrained-memory devices keep the classic
  * renderer byte-for-byte (fog wall at the biome preset, camera far 950, no
  * far mesh); medium opens a shorter vista; high and above see the whole
- * world (the expanded zone map's diagonal is about 3.25k units).
+ * world (the zone map's diagonal is about 2.9k units).
  */
 export function farVistaPlan(
   tier: 'low' | 'medium' | 'high' | 'ultra' | 'insane',
@@ -138,6 +127,49 @@ export function farVistaPlan(
  *  never widens their workload. */
 export function detailCullFar(detailFar: number, maxOutdoorFar: number): number {
   return Math.min(detailFar, maxOutdoorFar);
+}
+
+/** The capability flags the far-field decision reads (a GFX subset). */
+export interface FarFieldCapabilities {
+  standardMaterials: boolean;
+  leanFoliage: boolean;
+  constrainedMemory: boolean;
+}
+
+export interface FarFieldPolicy {
+  /** bake the atlas and draw sprite impostors (the fogged stage-1 arm too) */
+  sprites: boolean;
+  /** the whole-world fog-free vista; never enabled without sprites */
+  vista: FarVistaPlan;
+}
+
+/**
+ * THE one far-field capability decision: every consumer (the impostor
+ * session, the renderer's vista arm, the water apron, the shortfall
+ * sampler) reads this, never farVistaPlan or the GFX flags directly, so
+ * the sprite and vista arms can never diverge per profile.
+ *
+ * Laws, in force together:
+ * - Sprites require the standard-material pipeline, the full foliage kit,
+ *   and an unconstrained memory ceiling: the lean arm (low tier, weak-iGPU
+ *   medium) and every phone-class memory profile keep the classic fogged
+ *   renderer byte-for-byte and never allocate the atlas.
+ * - The vista requires sprites: a fog-free horizon with no far foliage
+ *   would read as a bare-ground world, so any profile that sheds the atlas
+ *   keeps its fog wall too.
+ */
+export function farFieldPolicy(
+  tier: 'low' | 'medium' | 'high' | 'ultra' | 'insane',
+  caps: FarFieldCapabilities,
+): FarFieldPolicy {
+  const sprites = caps.standardMaterials && !caps.leanFoliage && !caps.constrainedMemory;
+  if (!sprites) {
+    return {
+      sprites: false,
+      vista: { enabled: false, spacing: 0, envelopeFar: 0, cameraFar: CLASSIC_CAMERA_FAR },
+    };
+  }
+  return { sprites: true, vista: farVistaPlan(tier, caps.constrainedMemory) };
 }
 
 export interface FarTile {
@@ -250,41 +282,14 @@ const clamp01 = (v: number): number => Math.max(0, Math.min(1, v));
 
 type Triple = [number, number, number];
 
-/**
- * How many far-mesh cells of change a colour ramp is widened to span. One
- * cell on each side of the midpoint is the least that leaves a whole
- * interpolated triangle inside the transition instead of straddling it.
- */
+/** How many far-mesh cells of change a colour ramp is widened to span. */
 const RAMP_CELL_SPAN = 2;
 
 /**
- * A colour ramp over `v`, widened by how far `v` itself moves across ONE
- * far-mesh cell. Every threshold in the recipe below runs through this, keyed
- * on whichever quantity it tests: the height ramps widen by the height a
- * vertex climbs per cell, the slope ramp by the slope it gains per cell.
- *
- * This is the whole fix for the faceted mountainside. The near terrain sizes
- * its ramps against its OWN step: the 26 unit snow ramp in
- * terrain_chunk_build.ts is deliberately wide because that heightfield
- * terraces 6 units at a time, and a ramp comparable to the step paints
- * alternate treads fully white and fully bare. The far mesh re-reads those
- * same thresholds but samples on an 8 to 16 unit grid, where a mountainside
- * climbs 25 units between NEIGHBOURING vertices. The 26 unit ramp then
- * resolves inside a single cell: one vertex takes full pale snow while its
- * neighbour takes bare rock, and interpolated across the two triangles they
- * share, that is the pale-against-black sawtooth a coarse mountainside shows
- * at range. The slope ramp aliases the same way and for the same reason (a
- * two-cell central difference on a cliff scatters by more than the 0.5 the
- * rock threshold spans), which is what streaked the snowbound realms with
- * dark rock facets.
- *
- * Widening about the ramp's MIDPOINT is what keeps this honest. A vertex on
- * ground the mesh CAN resolve has no per-cell change and keeps the shipped
- * colour exactly; ground it cannot resolve spreads the same transition over
- * the cells it needs, without moving the snow line or the rock line up or
- * down. It is the CPU-side twin of widening a shader threshold by its own
- * screen-space derivative, and like that, it converges on the shipped recipe
- * as the mesh gets finer.
+ * Widen a colour ramp by the amount its sampled quantity moves across one
+ * far-mesh cell. This keeps coarse mountain triangles from alternating
+ * between whole palette endpoints while converging to the original recipe
+ * when the mesh already resolves the surface.
  */
 function softRamp(v: number, lo: number, hi: number, cellChange: number): number {
   const half = (hi - lo) / 2 + cellChange * RAMP_CELL_SPAN;
@@ -435,18 +440,9 @@ const FAR_FOREST_DENSITY: Partial<Record<BiomeId, number>> = {
 /**
  * One far vertex's ground color, written into `out` as a linear-srgb triple.
  * `slope` is height units per world unit, from the caller's sampled grid.
- * `cellRise` and `cellSlopeRise` are how much the height and the slope change
- * across ONE cell of that grid: they are what every threshold below widens
- * against, so the recipe never paints a transition the mesh is too coarse to
- * resolve (see softRamp). Both are zero for a caller sampling a surface it
- * resolves fully, which reproduces the thresholds verbatim.
- *
- * Returns the vertex's GRASS PAINT weight for the meadow-continuum ground
- * texture: 1 where the colour above is meadow, feathering to 0 through the
- * same mixes that remove the meadow from the colour (shore, rock, snow,
- * scorch, rim). The near terrain's splat grass weight is the same idea
- * (sampleVertex's lerpSplat calls); keeping the two recipes side by side is
- * what keeps the painted grass gate from drifting between the tiers.
+ * `cellRise` and `cellSlopeRise` describe how much the sampled height and
+ * slope change across one cell, so transitions can be widened to the mesh's
+ * actual resolution. Returns the meadow-continuum grass-paint weight.
  */
 export function farGroundColor(
   x: number,
@@ -477,7 +473,6 @@ export function farGroundColor(
     const scorch = clamp01((z - 2260) / 100) * (1 - valley);
     if (scorch > 0) lerp3(out, TONE.emberScorch, scorch * 0.55);
     if (valley > 0) lerp3(out, TONE.emberForest, valley * 0.8);
-    // the volcanic belt sheds its meadow (near tier: the sand/scorch splat)
     grassW *= 1 - clamp01((z - 1925) / 145) * 0.75;
     grassW *= 1 - scorch * 0.5;
     grassW = grassW + (1 - grassW) * valley * 0.6;
@@ -507,10 +502,7 @@ export function farGroundColor(
     }
   }
 
-  // shoreline band: sand at the waterline (wet rock in the stone biomes).
-  // The band is 1.6 units tall, well under one far cell on anything but a
-  // flat strand, so widening it is what turns a dashed aliased line of beach
-  // into a continuous coast that thins out as the shore steepens.
+  // shoreline band: sand at the waterline (wet rock in the stone biomes)
   const shore = 1 - softRamp(h, WATER_LEVEL, WATER_LEVEL + 1.6, cellRise);
   if (shore > 0) {
     const wetStone = biome === 'peaks' || biome === 'volcano' || biome === 'cave';
@@ -519,10 +511,7 @@ export function farGroundColor(
   }
 
   // steep faces shed their cover; the rock itself carries ridge-scale
-  // variation (gully shadows, warm strata) so far mountains read as stone.
-  // Widened by the slope the surface gains per cell: at far spacing a cliff's
-  // central-difference slope scatters by more than the 0.5 this ramp spans,
-  // which cut dark rock facets into the snowbound realms' white hillsides.
+  // variation (gully shadows, warm strata) so far mountains read as stone
   const slopeRock = softRamp(slope, rockStart, rockStart + 0.5, cellSlopeRise);
   if (slopeRock > 0) {
     grassW *= 1 - slopeRock;
@@ -550,11 +539,6 @@ export function farGroundColor(
       lerp3(out, TONE.rock, highRock * 0.6);
       grassW *= 1 - highRock * 0.8;
     }
-    // Snow is the pale end of the whole recipe, so it is the term that made
-    // the coarse mountainside read as sawtooth facets: the patch noise shifts
-    // the line per vertex, and on a steep face the 26 unit ramp is crossed
-    // whole inside one cell. The widened ramp is what keeps a summit white
-    // and its cliffs stone without a hard edge between them.
     const snowPatch = fbm2(x * 0.05, z * 0.05, seed + 61, 2);
     const snowShift = (snowPatch - 0.5) * 14;
     const snow = softRamp(h, 34 - snowShift, 60 - snowShift, cellRise) * 0.85;
@@ -606,7 +590,7 @@ export interface FarTileData {
   positions: Float32Array;
   normals: Float32Array;
   colors: Float32Array;
-  /** Meadow-continuum grass paint weight per vertex (see farGroundColor). */
+  /** Meadow-continuum grass paint weight per vertex. */
   grassW: Float32Array;
   minY: number;
   maxY: number;
@@ -657,11 +641,9 @@ export function farVertexHeight(x: number, z: number, spacing: number, seed: num
     const t = outside / 90;
     const fall = t * t * (3 - 2 * t);
     y = y * (1 - fall) + BEYOND_RIM_SEABED * fall;
-    // OPEN COASTS stay open: where the world-edge terrain itself is under
-    // the waterline, the unauthored noise outside it must never blend in as
-    // land standing offshore (measured live: a 38 yard noise plateau held a
-    // dark slab 3.5 yards above the sea on the west horizon). Rim mountains
-    // keep their far side: their edge sample is high, so no cap applies.
+    // Keep open coasts open: unauthored noise outside a submerged world edge
+    // must not blend in as a plateau standing above the sea. High rim edges
+    // retain their far side because the cap only applies to submerged edges.
     const edgeY = terrainHeight(
       Math.min(WORLD_MAX_X, Math.max(WORLD_MIN_X, x)),
       Math.min(WORLD_MAX_Z, Math.max(WORLD_MIN_Z, z)),
@@ -682,6 +664,53 @@ export function farVertexHeight(x: number, z: number, spacing: number, seed: num
     y += crag * (ridge * 7 + fine * 2.5);
   }
   return y;
+}
+
+/**
+ * How far the coarse far-tile surface sits BELOW a base height at (x, z):
+ * the safety drop plus the crest chord error of the tier's sampling grid,
+ * bilinearly reconstructed the way the far mesh itself samples. Sprites
+ * past the detail envelope ease down by this much so their bases stay
+ * planted on the vista instead of floating over shaved ridge crests.
+ *
+ * A sampler is a SESSION object: its corner cache is keyed by grid corner
+ * only because seed, spacing and the grid origin are fixed at creation, so
+ * a world rebuild or tier change mints a new sampler and can never reuse
+ * the previous world's surface (the module-level-cache staleness class).
+ */
+export interface FarShortfallSampler {
+  shortfall(x: number, z: number, baseY: number): number;
+}
+
+export function createFarShortfallSampler(
+  seed: number,
+  spacing: number,
+  originX: number,
+  originZ: number,
+): FarShortfallSampler {
+  const corners = new Map<string, number>();
+  const corner = (x: number, z: number): number => {
+    const key = `${x}:${z}`;
+    const cached = corners.get(key);
+    if (cached !== undefined) return cached;
+    const y = farVertexHeight(x, z, spacing, seed);
+    corners.set(key, y);
+    return y;
+  };
+  return {
+    shortfall(x, z, baseY) {
+      const x0 = originX + Math.floor((x - originX) / spacing) * spacing;
+      const z0 = originZ + Math.floor((z - originZ) / spacing) * spacing;
+      const tx = (x - x0) / spacing;
+      const tz = (z - z0) / spacing;
+      const h00 = corner(x0, z0);
+      const h10 = corner(x0 + spacing, z0);
+      const h01 = corner(x0, z0 + spacing);
+      const h11 = corner(x0 + spacing, z0 + spacing);
+      const farY = (h00 * (1 - tx) + h10 * tx) * (1 - tz) + (h01 * (1 - tx) + h11 * tx) * tz;
+      return Math.max(0, baseY - (farY - FAR_MESH_DROP));
+    },
+  };
 }
 
 export function createFarTileBuilder(tile: FarTile, spacing: number, seed: number): FarTileBuilder {
@@ -723,12 +752,6 @@ export function createFarTileBuilder(tile: FarTile, spacing: number, seed: numbe
       const hz = heights[hi + padded] - heights[hi - padded];
       const slope = Math.sqrt(hx * hx + hz * hz) / (2 * spacing);
       const invLen = 1 / Math.hypot(hx / (2 * spacing), 1, hz / (2 * spacing));
-      // What the colour recipe cannot resolve at this spacing: the height the
-      // surface climbs across one cell (first difference) and the slope it
-      // gains across one cell (second difference, which is the curvature
-      // times the cell). Both come out of the padded row the builder already
-      // sampled, so widening every threshold against them costs no extra
-      // terrainHeight taps. See softRamp.
       const cellRise = slope * spacing;
       const hxx = heights[hi + 1] - 2 * h + heights[hi - 1];
       const hzz = heights[hi + padded] - 2 * h + heights[hi - padded];

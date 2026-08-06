@@ -7,6 +7,14 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  chr_drakemaw_broodlord: {
+    name: 'Kẻ Phá Vỡ Ổ Trứng',
+    desc: 'Hạ gục một Lãnh Chúa Bầy Drakemaw giữa bầy trứng của nó, vượt qua tiếng gầm, đòn chém bổ, và ngọn lửa.',
+  },
+  chr_maw_matriarch: {
+    name: 'Bầu Trời Lặng Yên',
+    desc: 'Hạ gục Cindraleth Mẫu Chúa Hàm trong tổ miệng núi lửa của nó, phía trên Drakemaw.',
+  },
   pvp_card_duel_first_win: {
     name: 'Luật Của Ta',
     desc: 'Thắng một ván Đấu Bài tại Bậc Thầy Bài.',
@@ -822,6 +830,10 @@ export const table: DeedLocaleTable = {
     name: 'Anh Hùng: Lòng Chảo Trái Tim Hoang Dã',
     desc: 'Đánh bại Zulgar, Tiếng Nói Của Vùng Trũng, trong Lòng Chảo Trái Tim Hoang Dã ở độ khó Anh Hùng.',
   },
+  chr_peaks_gatherer: {
+    name: 'Mùa Gặt Chốn Non Cao',
+    desc: 'Thu hoạch một mạch quặng, một cụm gỗ và một khóm thảo dược tại Cao Nguyên Đỉnh Gai.',
+  },
   chr_marsh_rares_ii: {
     name: 'Kẻ Phàm Ăn, Được Ghi Sổ',
     desc: 'Hạ Grubjaw Phàm Ăn, nỗi kinh hoàng hữu danh thứ tư của Đầm Lầy Bùn Sâu bị bỏ sót trong lần điểm danh đầu tiên.',
@@ -837,5 +849,29 @@ export const table: DeedLocaleTable = {
   chr_hollow_rares: {
     name: 'Bầy Đàn Ghi Nhớ',
     desc: 'Hạ Marrowshell Già và Aurelhorn, Kẻ Đầu Đàn, hai trùm hiếm lang thang của Thung Lũng Sương Phủ.',
+  },
+  chr_willowfen_gatherer: {
+    name: 'Lộc Trời Đầm Liễu',
+    desc: 'Thu hoạch một mạch quặng, một cụm gỗ và một khóm thảo dược tại Đầm Liễu.',
+  },
+  chr_willowfen_first_cast: {
+    name: 'Gợn Sóng Nơi Lilymoors',
+    desc: 'Câu một con cá từ vùng nước của Đầm Liễu.',
+  },
+  chr_galecrest_gatherer: {
+    name: 'Mùa Gặt Trên Mũi Đất',
+    desc: 'Thu hoạch một mạch quặng, một cụm gỗ và một khóm thảo dược tại Đỉnh Gió Lộng.',
+  },
+  chr_galecrest_first_cast: {
+    name: 'Buông Câu Xuống Hồ Gương',
+    desc: 'Câu một con cá từ vùng nước của Đỉnh Gió Lộng.',
+  },
+  chr_farshore_gatherer: {
+    name: 'Lương Thảo Hải Đảo',
+    desc: 'Thu hoạch một mạch quặng, một cụm gỗ và một khóm thảo dược tại Bờ Biển Xa Xôi.',
+  },
+  chr_farshore_first_cast: {
+    name: 'Điều Lũ Mòng Biển Biết',
+    desc: 'Câu một con cá từ vùng nước của Bờ Biển Xa Xôi.',
   },
 };

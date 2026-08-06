@@ -7,7 +7,7 @@ import { describe, expect, it } from 'vitest';
 import { DEED_ORDER, DEEDS } from '../src/sim/content/deeds';
 import { DEED_IMAGE_IDS } from '../src/ui/deed_image_ids';
 import { DEED_BESPOKE_CRESTS, deedCrestId } from '../src/ui/deeds_view';
-import { deedImageUrl, iconDataUrl } from '../src/ui/icons';
+import { DEED_ART_PENDING, deedImageUrl, hasCrestRecipe, iconDataUrl } from '../src/ui/icons';
 
 // Gate for the committed Book of Deeds WebP icons (mirror of tests/skill_icons.test.ts and
 // tests/item_icons.test.ts). Art under public/ui/deeds/<deed_id>.webp is the source of truth
@@ -139,6 +139,17 @@ const MISSING_PAINTED_DEED_IDS = [
   'dgn_wildheart_basin_heroic',
   'pvp_card_duel_first_win',
 ] as const;
+
+// The two Drakelands brood deeds this branch appends (src/sim/content/deeds.ts tail).
+// Their 512px sources are not commissioned yet, so they ride the sanctioned fallback in the
+// Icons authoring rule in docs/design/deeds.md ("an artless deed falls back to its procedural
+// category crest, so art can trail the deed") and are flagged for the commissioned set in
+// docs/achievements/icon-brief.md. The debt is enumerated ONCE, as DEED_ART_PENDING beside
+// ITEM_ART_PENDING in src/ui/icons.ts, and every art test reads that one name so no two of them
+// can end up stating a different pending set. It is EXHAUSTIVE in both directions: a third
+// artless deed reds the suite, and so does a stale entry the moment `npm run assets:deeds`
+// ingests a crest.
+const DEED_ART_PENDING_IDS = [...DEED_ART_PENDING];
 
 describe('Book of Deeds webp icons', () => {
   it('has art-backed deed ids wired (guards the fixture)', () => {
@@ -356,14 +367,23 @@ describe('Book of Deeds webp icons', () => {
   });
 
   it('an artless deed card resolves to a procedural crest (no committed image)', () => {
-    // Any live deeds awaiting art must land on their category base crest, which carries no
-    // image URL and falls through to the procedural canvas path. A fully commissioned live
-    // catalog makes this loop empty, so the synthetic id below keeps the branch pinned.
+    // Any live deed awaiting art must land on its category base crest, which carries no
+    // image URL and falls through to the procedural canvas path. The pending set is pinned
+    // exhaustively (DEED_ART_PENDING, src/ui/icons.ts) and the two counts below are literal, so a third
+    // artless deed, a dropped webp, or a silent catalog append all red here.
     const artless = DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id));
-    expect(artless, 'all live deeds must now resolve to painted art').toEqual([]);
-    expect(DEED_IMAGE_IDS.size, 'the complete live deed catalog is painted').toBe(232);
+    expect(artless, 'only the pinned art-pending deeds may lack painted art').toEqual([
+      ...DEED_ART_PENDING_IDS,
+    ]);
+    expect(DEED_ORDER, 'the merged live deed catalog').toHaveLength(234);
+    expect(DEED_IMAGE_IDS.size, 'every live deed but the pending pair is painted').toBe(232);
     for (const id of artless) {
       const crestId = deedCrestId(id, DEEDS[id].category);
+      expect(crestId, `${id} must fall back to a category base crest`).toMatch(/^deed_cat_/);
+      expect(
+        hasCrestRecipe(crestId),
+        `${id} -> ${crestId} must be a real procedural recipe, not the generic fallback`,
+      ).toBe(true);
       expect(deedImageUrl(crestId), `${id} -> ${crestId} must have no committed image`).toBeNull();
       expect(deedImageUrl(`deed_${id}`), `${id} itself must have no committed image`).toBeNull();
     }

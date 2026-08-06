@@ -740,20 +740,21 @@ describe("R3: the flood-kick reason maps to the client matcher's exact bytes", (
     // and must update this pin, the matcher arm, and the frame pins together.
     expect(exported?.[1]).toBe('message rate exceeded');
 
-    // All three flood kick arms (the pre-parse gate in handleMessage, the
-    // post-parse lane path in consumeLane, and the list-read guard path in
-    // consumeListRead per the phase 06 maintainer ruling) pass the CONSTANT,
-    // never an inline literal, with the grep-ability 'message flood'
-    // leaveReason label; the anti-bot kick keeps its deliberately vague
-    // literal pair, byte-untouched. The exact count keeps this pin selective:
-    // a NEW kick site must consciously join it.
+    // All four flood kick arms (the pre-parse gate in handleMessage, the
+    // post-parse lane path in consumeLane, the list-read guard path in
+    // consumeListRead per the phase 06 maintainer ruling, and the guild-bank
+    // op guard path in consumeGuildBankOp per the Guild Bank Phase 3 QA
+    // database ruling) pass the CONSTANT, never an inline literal, with the
+    // grep-ability 'message flood' leaveReason label; the anti-bot kick keeps
+    // its deliberately vague literal pair, byte-untouched. The exact count
+    // keeps this pin selective: a NEW kick site must consciously join it.
     const gameSrc = stripComments(
       fs.readFileSync(path.resolve(process.cwd(), 'server/game.ts'), 'utf8'),
     );
     const kickArms = gameSrc.match(
       /kickSession\(session, MSG_RATE_KICK_REASON, 'message flood'\)/g,
     );
-    expect(kickArms, 'all three flood kick arms must pass MSG_RATE_KICK_REASON').toHaveLength(3);
+    expect(kickArms, 'all four flood kick arms must pass MSG_RATE_KICK_REASON').toHaveLength(4);
     expect(gameSrc).toContain("kickSession(session, 'rejected by server', 'disconnected')");
 
     // The matcher arm recognizes the same bytes and returns the loading key. A
@@ -1098,6 +1099,13 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     // Bank system: the pooled bank deposit/withdraw/buy-slots command bodies
     // emit the quest-item/full/afford/max-slots refusals + the purchase notice.
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/bank.ts'), 'utf8'),
+    // Guild Bank: the officer-plus shared treasury + item store op bodies emit
+    // the rank/full/treasury-cap/short/carry-cap/afford/max-slots refusals plus
+    // the four money/item success notices (sim_i18n error.guildBank* /
+    // log.guildBank* rows); too-far, quest-item, no-guild, and "Not enough
+    // money." reuse literals already matched from other scanned files, but the
+    // ONLY emitter occurrences of the new strings live here.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/guild_bank.ts'), 'utf8'),
     // Riding lesson: the mount_train_begin guard refusals and the driver's
     // notices (level/range/quest/in-progress/success/left-yard literals).
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/mounts_training.ts'), 'utf8'),
@@ -1118,6 +1126,10 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     // name doubles as the mob_charge_stun debuff, localized via AURA_NAME_KEY's
     // 'Charge' row like the other boss mechanics).
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/mob/charge.ts'), 'utf8'),
+    // Dragonkin brood: the counter-stun "unleashes" announce line (same shape as charge.ts
+    // above, resolved by the sim_i18n log.bossUnleashes RULE). Scanned so any FUTURE literal
+    // emit added to this module lands under the drift guard from day one.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/mob/dragonkin_brood.ts'), 'utf8'),
     socialSrc,
     // Whole-directory sweep (the phase 18 whole-branch review): EVERY
     // src/sim/professions module is scanned, the same directory-glob treatment
@@ -1130,6 +1142,11 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     // Quest-item presence probe (SimContext-holding, text-free today): the
     // fourth module the whole-branch parity audit found outside the corpus.
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/quests/quest_item_presence.ts'), 'utf8'),
+    // Whole-directory sweep for src/sim/interactions (the firebottle hut module
+    // and any interaction module that lands beside it), the same directory-glob
+    // treatment src/sim/social and src/sim/professions get above, so a new
+    // emit there sits under the drift guard from day one.
+    socialSourceUnder(path.resolve(process.cwd(), 'src/sim/interactions')),
   ].join('\n');
   // Hardened S3: also scan the authoritative server's player-facing emits. The
   // server (server/game.ts) is language-agnostic like the sim and re-localized
@@ -1194,7 +1211,7 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     if (tern) return tern[1] || tern[2];
     if (/\?[^:]*:/.test(expr)) return '';
     if (
-      /rank|level|count|players|roll|prestige|amount|seconds|percent|\bN\b|MAX_|FIRST_|threshold|number|\.length|Math|round|parseInt|\*\s*100|suggested/i.test(
+      /rank|level|count|players|roll|prestige|amount|seconds|percent|\bN\b|MAX_|FIRST_|threshold|number|\.length|Math|round|parseInt|\*\s*100|suggested|FEE_GOLD/i.test(
         expr,
       )
     )

@@ -104,6 +104,14 @@ function sourceOver(server: GameServer): GameStateSource {
     dbPool: () => ({ total: 0, idle: 0, waiting: 0 }),
     lastTickAt: () => server.lastTickAt(),
     loopStartedAt: () => server.loopStartedAt(),
+    guildBankLogCache: () => ({
+      reads: 0,
+      refreshes: 0,
+      evictions: 0,
+      busts: 0,
+      entries: 0,
+      dirtyGuilds: 0,
+    }),
   };
 }
 
@@ -418,6 +426,7 @@ function recordingSink() {
       chats++;
     },
     characterCreated() {},
+    guildBankIncident() {},
     copperCredited(source, amount) {
       credited.push([source, amount]);
     },

@@ -7,6 +7,14 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  chr_drakemaw_broodlord: {
+    name: '둥지 파괴자',
+    desc: '화산구의 둥지군주를 알 무더기 한복판에서, 포효와 가르기와 불길을 뚫고 처치하십시오.',
+  },
+  chr_maw_matriarch: {
+    name: '하늘의 침묵',
+    desc: '화산구의 어미 신드랄레스를 드레이크모 위 분화구 둥지에서 처치하십시오.',
+  },
   pvp_card_duel_first_win: {
     name: '패를 보여줘',
     desc: '카드 마스터에게서 카드 대결에 승리하십시오.',
@@ -736,6 +744,10 @@ export const table: DeedLocaleTable = {
     name: '영웅: 야생심장 분지',
     desc: '영웅 난이도의 야생심장 분지에서 분지의 목소리 줄가르를 처치하십시오.',
   },
+  chr_peaks_gatherer: {
+    name: '고지의 수확',
+    desc: '쏜피크 고지에서 광맥, 나무 군락, 약초밭을 하나씩 채집하십시오.',
+  },
   chr_marsh_rares_ii: {
     name: '폭식가, 셈에 오르다',
     desc: '첫 셈에서 빠졌던 마이어펜 습지의 네 번째 이름난 공포, 폭식가 그럽조를 처치하십시오.',
@@ -751,5 +763,29 @@ export const table: DeedLocaleTable = {
   chr_hollow_rares: {
     name: '무리는 기억한다',
     desc: '장막의 골짜기를 떠도는 희귀 우두머리 둘, 늙은 매로우셸과 무리의 첫째 아우렐혼을 처치하십시오.',
+  },
+  chr_willowfen_gatherer: {
+    name: '버들늪의 결실',
+    desc: '버들늪에서 광맥, 나무 군락, 약초밭을 하나씩 채집하십시오.',
+  },
+  chr_willowfen_first_cast: {
+    name: '수련 습지에 이는 물결',
+    desc: '버들늪의 물에서 물고기 한 마리를 낚으십시오.',
+  },
+  chr_galecrest_gatherer: {
+    name: '곶에서 거둔 것',
+    desc: '게일크레스트에서 광맥, 나무 군락, 약초밭을 하나씩 채집하십시오.',
+  },
+  chr_galecrest_first_cast: {
+    name: '거울 호수에 드리운 낚싯줄',
+    desc: '게일크레스트의 물에서 물고기 한 마리를 낚으십시오.',
+  },
+  chr_farshore_gatherer: {
+    name: '섬살이 채비',
+    desc: '먼바다 해안에서 광맥, 나무 군락, 약초밭을 하나씩 채집하십시오.',
+  },
+  chr_farshore_first_cast: {
+    name: '갈매기는 알고 있다',
+    desc: '먼바다 해안의 물에서 물고기 한 마리를 낚으십시오.',
   },
 };

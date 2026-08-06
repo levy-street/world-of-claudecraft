@@ -7,6 +7,14 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  chr_drakemaw_broodlord: {
+    name: 'Lamač líhně',
+    desc: 'Zab Pána líhně Dračí tlamy uprostřed jeho vajec, skrz řev, sek i oheň.',
+  },
+  chr_maw_matriarch: {
+    name: 'Obloha zmlkla',
+    desc: 'Zab Cindraleth, matriarchu Tlamy, v jejím kráterovém hnízdišti nad Dračí tlamou.',
+  },
   pvp_card_duel_first_win: {
     name: 'Vlastní pravidla',
     desc: 'Vyhraj Karetní souboj u Karetního mistra.',
@@ -788,6 +796,10 @@ export const table: DeedLocaleTable = {
     name: 'Hrdinská: Kotlina Divokého srdce',
     desc: 'Poraz Zulgara, hlas Kotliny, v Kotlině Divokého srdce na hrdinské obtížnosti.',
   },
+  chr_peaks_gatherer: {
+    name: 'Sklizeň z výšin',
+    desc: 'Vytěž v Thornpeakských výšinách rudnou žílu, porost dřeva i záhon bylin.',
+  },
   chr_marsh_rares_ii: {
     name: 'Žrout, dopočítán',
     desc: 'Zab Hltavou Červočelist, čtvrtou pojmenovanou hrůzu Mirefenského močálu, která zůstala mimo první sčítání.',
@@ -803,5 +815,29 @@ export const table: DeedLocaleTable = {
   chr_hollow_rares: {
     name: 'Stádo nezapomíná',
     desc: 'Zab Starou Morkoskořápku a Aurelhorna, Prvního ze stáda, dva putující vzácné bosse Zahalené kotliny.',
+  },
+  chr_willowfen_gatherer: {
+    name: 'Štědrost bažin',
+    desc: 'Vytěž ve Vrbové bažině rudnou žílu, porost dřeva i záhon bylin.',
+  },
+  chr_willowfen_first_cast: {
+    name: 'Vlnky na Liliovém vřesovišti',
+    desc: 'Chyť rybu ve vodách Vrbové bažiny.',
+  },
+  chr_galecrest_gatherer: {
+    name: 'Sklizeň na hřebeni',
+    desc: 'Vytěž na Vichrném hřebeni rudnou žílu, porost dřeva i záhon bylin.',
+  },
+  chr_galecrest_first_cast: {
+    name: 'Vlasec v Zrcadlovém jezírku',
+    desc: 'Chyť rybu ve vodách Vichrného hřebene.',
+  },
+  chr_farshore_gatherer: {
+    name: 'Ostrovní zásoby',
+    desc: 'Vytěž na Vzdáleném pobřeží rudnou žílu, porost dřeva i záhon bylin.',
+  },
+  chr_farshore_first_cast: {
+    name: 'Co vědí rackové',
+    desc: 'Chyť rybu ve vodách Vzdáleného pobřeží.',
   },
 };

@@ -615,6 +615,13 @@
       "confidence": "medium"
     },
     {
+      "itemId": "firebottle",
+      "name": "Firebottle",
+      "sourcePack": "alchemist",
+      "sourceFile": "1.png",
+      "confidence": "high"
+    },
+    {
       "itemId": "footpad_jerkin",
       "name": "Cutpurse Jerkin",
       "sourcePack": "armor",
@@ -1486,6 +1493,14 @@
       "name": "Reins of the Valorsteed",
       "sourcePack": "woc_mount_models",
       "sourceFile": "valorsteed.glb",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned render of a project-owned mount model)"
+    },
+    {
+      "itemId": "reins_drakemaw_raptor",
+      "name": "Reins of the Drakemaw Raptor",
+      "sourcePack": "woc_mount_models",
+      "sourceFile": "drakemaw_raptor.glb",
       "confidence": "high",
       "license": "World of ClaudeCraft original art (project-owned render of a project-owned mount model)"
     },
@@ -7430,6 +7445,36 @@
         "wisplight_globe",
         "wreckfield_flotsam_crate",
         "wyrmwatch_warning_banner"
+      ]
+    },
+    {
+      "batchId": "quest-objective-dedupe-zone-quest-items-2026-08-04",
+      "source": "OpenAI gpt-image-2 (images/generations)",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleReference": "None. Text-to-image only: no repository or third-party image was supplied as a reference, so no external art is in the lineage of these three icons. The house look is carried entirely by the written style language in commonPrompt, which restates the direction used by the 2026-08-01 missing-painted-icons waves.",
+      "commonPrompt": "Fresh, physically distinct premium hand-painted dark-fantasy MMORPG inventory art of one tangible centered object on an opaque blue-black or charcoal atmospheric vignette. Top-left key light, restrained rim accents, crisp readable silhouette, intentional safe margins, and visual-mass centering. Uncluttered composition and a plain unbusy backdrop so the object reads instantly at small size. No UI border, rarity frame, circular halo, text, watermark, mannequin, character, scenic diorama, crop, or giant external aura.",
+      "itemDirections": {
+        "restless_skull": {
+          "canonicalDisplayName": "Restless Skull",
+          "canonicalGameplayMeaningOrAcquisition": "Quest collect item in Eastbrook: the restless dead in the old chapel yard each drop one for The Restless Dead (q_bones), carried back so the rites can be spoken over them.",
+          "intendedVisualSubject": "A single weathered human skull taken from a disturbed chapel graveyard: bone yellowed and earth-stained, a hairline crack across the crown, a few clinging strands of grave soil and moss. A grave relic carried back for last rites, not a monster trophy, not a helmet, and not a candle holder."
+        },
+        "vanguard_bone": {
+          "canonicalDisplayName": "Vanguard Bone",
+          "canonicalGameplayMeaningOrAcquisition": "Quest collect item in Thornpeak: the revenant vanguard drop them for Bones of the Vanguard (q_revenant_vanguard), taken to Highwatch so the smiths can read how the dead were bound.",
+          "intendedVisualSubject": "One heavy pale revenant limb bone from a bound undead shield-line: dense weathered bone, a dull iron binding band and a scored rune notch near the shaft, cold highland grey-blue cast. Battlefield evidence a smith would study to read the binding, not a weapon, not a club, and not a whole skeleton."
+        },
+        "murloc_hut": {
+          "canonicalDisplayName": "Mudfin Hut",
+          "canonicalGameplayMeaningOrAcquisition": "Name and label entry for the burnable Mudfin hut world objects in Mirefen, torched with a thrown firebottle for Back to the Shallows (q_deepfen_purge). It is never carried in bags, so the icon only ever backs the objective and interaction copy.",
+          "intendedVisualSubject": "One small marsh-dweller hut built of lashed river reeds and packed grey mud over a bent driftwood frame, with a low dark doorway and a ragged thatched dome roof. A complete tiny standing structure shown as a single centered object, damp swamp greens and browns, no fire and no water base, not a tent, not a boat, and not a village scene."
+        }
+      },
+      "itemIds": [
+        "murloc_hut",
+        "restless_skull",
+        "vanguard_bone"
       ]
     }
   ]

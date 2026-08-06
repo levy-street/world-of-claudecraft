@@ -10,8 +10,8 @@ import {
   biomeHazeUniforms,
   hasBiomeHazeField,
 } from './biome_haze_field';
-import { farVistaPlan } from './far_terrain_core';
-import { GFX, SUN_DIR } from './gfx';
+import { activeFarFieldPolicy } from './foliage_impostor';
+import { GFX, type GfxSettings, SUN_DIR, sharedUniforms } from './gfx';
 import { idleSlot, runIdleQueue } from './idle_queue';
 import { waterNormalish, waterNormalMaps } from './textures';
 import {
@@ -161,20 +161,35 @@ const APRON_TERRAIN_FADE_YARDS = 240;
 // preload only for the shader tier. Low/mobile uses generated canvas water
 // so it does not pay network/decode/upload cost for water detail.
 const WATER_TEX: Record<string, THREE.Texture> = {};
-function kickWaterTex(key: string, file: string): void {
-  registerDeferredPreload(() =>
-    loadTexture(`/textures/water/${file}`, { repeat: true }).then((tex) => {
+const waterTexTasks = new Map<string, Promise<void>>();
+function prepareWaterTex(key: string, file: string): Promise<void> {
+  if (WATER_TEX[key]) return Promise.resolve();
+  const existing = waterTexTasks.get(key);
+  if (existing) return existing;
+  const task = loadTexture(`/textures/water/${file}`, { repeat: true })
+    .then((tex) => {
       tex.anisotropy = 4;
       WATER_TEX[key] = tex;
-      return tex;
-    }),
-  );
+    })
+    .catch((err) => {
+      waterTexTasks.delete(key);
+      throw err;
+    });
+  waterTexTasks.set(key, task);
+  return task;
 }
-if (GFX.standardMaterials) {
-  kickWaterTex('n1', 'water_1_normal.jpg');
-  kickWaterTex('n2', 'water_2_normal.jpg');
-  kickWaterTex('broad', 'waternormals.jpg');
+
+/** Prepare the water texture channel selected by an explicit target profile. */
+export function prepareWaterProfileAssets(target: Readonly<GfxSettings>): Promise<void> {
+  if (!target.standardMaterials) return Promise.resolve();
+  return Promise.all([
+    prepareWaterTex('n1', 'water_1_normal.jpg'),
+    prepareWaterTex('n2', 'water_2_normal.jpg'),
+    prepareWaterTex('broad', 'waternormals.jpg'),
+  ]).then(() => undefined);
 }
+
+registerDeferredPreload(() => prepareWaterProfileAssets(GFX));
 
 export function hasWaterShaderAssets(): boolean {
   return Boolean(WATER_TEX.n1 && WATER_TEX.n2 && WATER_TEX.broad);
@@ -528,8 +543,8 @@ ${BIOME_HAZE_DECLARATIONS}
     // ~97 degree cone overhead, IOR 1.333) the ceiling opens to sky light;
     // outside it closes into the deep, the total-internal-reflection look.
     // Around the sun's column light wells down and refracted glints dance.
-    float upDot = abs(dot(N, V));
-    float tir = pow(1.0 - upDot, 2.0);
+    float upDot = clamp(abs(dot(N, V)), 0.0, 1.0);
+    float tir = pow(max(1.0 - upDot, 0.0), 2.0);
     float snellW = smoothstep(0.655, 0.70, upDot);
     float sunWell = pow(max(dot(uSunDir, N), 0.0), 4.0);
     vec3 ceiling = mix(uDeep * 0.5, mix(uShallow * 0.75, uSkyColor * 0.9, 0.45), snellW);
@@ -538,7 +553,10 @@ ${BIOME_HAZE_DECLARATIONS}
     vec3 col = mix(ceiling, uDeep * 0.35, tir * (1.0 - snellW) * 0.8);
     float alpha = clamp(0.88 + tir * 0.12, 0.0, 1.0);
   #else
-    float fresnel = 0.05 + 0.95 * pow(1.0 - max(dot(N, V), 0.0), 4.0);
+    // clamp(), not max(): max() leaves the upper bound open, and a normalized
+    // dot product that overshoots 1.0 by an ulp makes the pow() base negative,
+    // which is NaN. One NaN pixel becomes a black rectangle after the bloom blur.
+    float fresnel = 0.05 + 0.95 * pow(1.0 - clamp(dot(N, V), 0.0, 1.0), 4.0);
     // The seabed is hard clamped at ${WATER_SEABED_CLAMP_YARDS} yards. A linear ramp spends the
     // whole palette in the shallows, and an exponential is still climbing when
     // it reaches the clamp, which creases the colour field along the clamp
@@ -792,7 +810,7 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
   // that envelope well past the classic view, so the apron grows with the
   // tier plan, with extra segments so coastal cells stay fade-band sized.
   {
-    const vista = farVistaPlan(GFX.tier, GFX.constrainedMemory);
+    const vista = activeFarFieldPolicy().vista;
     const reach = vista.enabled ? WORLD_MAX_X + vista.envelopeFar + 400 : 0;
     const width = vista.enabled ? reach * 2 : 3000;
     const span = WORLD_MAX_Z - WORLD_MIN_Z + (vista.enabled ? reach * 2 : 2400);

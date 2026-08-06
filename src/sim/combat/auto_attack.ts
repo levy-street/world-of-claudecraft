@@ -424,6 +424,14 @@ export function meleeSwing(
     critBonus?: number;
     onDealt?: (amount: number) => void;
     whiteDualWieldPenalty?: boolean;
+    // The casting ability's stable content id, threaded onto the landed-hit
+    // damage event's abilityId field (the weaponStrike path only; a plain
+    // auto-attack swing has no ability and leaves this unset). abilityName
+    // above stays the display label, so a client-side impact-cue lookup
+    // keyed off it silently breaks on the next rename (review finding, PR
+    // #2861: this is what left Ambush/Backstab/Sinister Strike's dedicated
+    // impact cues unreachable).
+    abilityId?: string | null;
   },
 ): boolean {
   const missChance =
@@ -529,6 +537,12 @@ export function meleeSwing(
       flat: opts.threatFlat ?? 0,
       mult: opts.threatMult ?? 1,
     },
+    true,
+    false,
+    false,
+    // Cue-presentation only on this path: onSpellCrit skips the physical
+    // school, so the id can never newly arm an ability-filtered proc here.
+    opts.abilityId ?? null,
   );
   opts.onDealt?.(resolvedAmount);
   // 4-piece set procs keyed to weapon crits (melee arm; covers auto-attack AND

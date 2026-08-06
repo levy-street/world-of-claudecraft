@@ -47,6 +47,21 @@ export function bagOrderIsManual(filter: BagFilterState): boolean {
   return filter.sort === 'recent' && bagFilterIsDefault(filter);
 }
 
+// Total stack count of quest items in the bag: sum of slot.count for every
+// stack whose def is kind==='quest'. Prefer stack count (how many quest pieces
+// the player holds) over unique-stack count so a "Boar Hide x5" chip reads 5,
+// matching the bag cell badge and tracker progress. Unknown/missing defs and
+// non-quest kinds contribute 0. Used by the Quest filter chip count badge.
+export function bagQuestItemCount(inventory: readonly InvSlot[], lookup: ItemLookup): number {
+  let total = 0;
+  for (const slot of inventory) {
+    const item = lookup(slot.itemId);
+    if (item?.kind !== 'quest') continue;
+    total += Math.max(0, Math.floor(slot.count));
+  }
+  return total;
+}
+
 // Look up an item definition by id. Injected for the kind/name/quality arms so
 // tests can supply a synthetic table; the 'material' arm is the one exception,
 // answering from content-derived set membership on the def's id

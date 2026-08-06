@@ -57,7 +57,19 @@ or pure leaves, never a `Sim` import, randomness only via `ctx.rng` (guarded by
 - `archetype.ts`: the active-archetype state machine (`ArchetypeState`,
   `archetypeCeilingFor`/`craftCeiling`, `getHobbyCraft`, amends-gated
   switching via `requiredAmendsProgress`). The sim-side ceiling arm is
-  `archetypeCeilingFor` ALONE, never `craftCeiling`.
+  `archetypeCeilingFor` ALONE, never `craftCeiling`. Also owns Jack of All
+  Trades (`isEligibleForJackOfAllTrades`, `attuneJackOfAllTrades`,
+  `JACK_CEILING_TIER`, #1296): the breadth attunement, mutually exclusive
+  with an active archetype (`ArchetypeState.isJackOfAllTrades`), reusing
+  `archetypeCeilingFor`'s existing null-`activeArchetype` branch as its
+  breadth ceiling rather than a second number. Attunement QUEST content and
+  any switching flow between Jack and an archetype are still out of scope
+  (open design questions per the issue's own Notes); `acceptArchetypeQuest`/
+  `attuneArchetypePair`/`canAttuneArchetypePair` refuse outright while a
+  character is Jack so no free transition can slip through either path.
+- `jack_variance.ts`: the Jack of All Trades improviser output-variance roll
+  (`rollCraftVariance`, #1296), a pure leaf `crafting.ts` draws ONE extra rng
+  roll for at the masterwork-proc site, only for a Jack-attuned crafter.
 - `hobby_memory.ts`: the per-pair record of hobbies chosen through the
   hobby-switch quest (`normalizeHobbyMemoryOnLoad`, `recordQuestedHobby`,
   `applyPairTransitionHobbyMemory`), so a make-amends RETURN restores the
@@ -65,7 +77,9 @@ or pure leaves, never a `Sim` import, randomness only via `ctx.rng` (guarded by
   pair-transition entry points beside `applyPairTransitionTierMail`; it reads
   `archetype.ts`'s pair vocabulary, so `archetype.ts` must never read it back.
 - `combo_eligibility.ts`: the shared attunement gate combo recipes consult in
-  both hosts (deny not_attuned / wrong_pair / tier_unmet).
+  both hosts (deny not_attuned / wrong_pair / tier_unmet). A Jack denies here
+  too, for free: its `activeArchetype`/`pairedMajor` are always null, the
+  same shape `not_attuned` already covers.
 - `enchanting.ts` / `disenchant_reagents.ts` / `salvage.ts`: disenchant
   (universal ladder + typed rare+ secondaries, bindOnTrade-armed), apply an
   enchant onto a SPECIFIC instanced copy (`ItemInstancePayload`), break items

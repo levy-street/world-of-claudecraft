@@ -20,6 +20,7 @@ import {
   WATER_LEVEL,
   waterLevelAt,
 } from '../src/sim/world';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 // The production seed: the report is seed-pinned world geometry.
 const SEED = 20061;
@@ -39,7 +40,14 @@ function onRim(x: number, z: number): boolean {
 }
 
 function makeWalker(spot: { x: number; z: number }) {
-  const sim = new Sim({ seed: SEED, playerClass: 'warrior', autoEquip: true });
+  const sim = new Sim({
+    seed: SEED,
+    playerClass: 'warrior',
+    autoEquip: true,
+    // This is a geometry/walking contract. Local wildlife must not turn its
+    // no-fall health assertion into a combat assertion as the campaign grows.
+    world: EMPTY_TEST_WORLD,
+  });
   sim.setPlayerLevel(20);
   const p = sim.player;
   const meta = (

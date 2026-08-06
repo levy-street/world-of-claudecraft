@@ -124,6 +124,12 @@ export const SFX = [
     custom: true,
   },
   {
+    // The Drakemaw Raptor's sprint: the gobbler's two-legged gallop donor,
+    // pitched down in sfx_speed_map.json so the heavier raptor reads deeper.
+    key: 'mount_run_drakemaw_raptor',
+    custom: true,
+  },
+  {
     key: 'move_jump',
     custom: true,
     duration: 0.5,
@@ -411,6 +417,111 @@ export const SFX = [
     duration: 0.9,
     prompt:
       'An expanding magical nova shockwave bursting outward in all directions. Single burst, no music.',
+  },
+  {
+    key: 'fear_shout',
+    custom: true,
+  },
+  {
+    key: 'fear',
+    custom: true,
+  },
+  {
+    key: 'ice_block',
+    custom: true,
+  },
+  {
+    key: 'frost_nova',
+    custom: true,
+  },
+  {
+    key: 'hammer_of_justice',
+    custom: true,
+  },
+  {
+    key: 'entangling_roots',
+    custom: true,
+  },
+  {
+    key: 'blind',
+    custom: true,
+  },
+  {
+    key: 'cloak_of_shadows',
+    custom: true,
+  },
+  {
+    key: 'scorch',
+    custom: true,
+  },
+  {
+    key: 'pyroblast',
+    custom: true,
+  },
+  {
+    key: 'flamestrike',
+    custom: true,
+  },
+  {
+    key: 'frozen_orb',
+    custom: true,
+  },
+  {
+    key: 'glacial_spike',
+    custom: true,
+  },
+  {
+    key: 'blizzard',
+    custom: true,
+    loop: true,
+  },
+  {
+    key: 'blink',
+    custom: true,
+  },
+  {
+    key: 'arcane_blast',
+    custom: true,
+  },
+  {
+    key: 'shadowstep',
+    custom: true,
+  },
+  {
+    key: 'cheap_shot',
+    custom: true,
+  },
+  {
+    key: 'ambush',
+    custom: true,
+  },
+  {
+    key: 'backstab',
+    custom: true,
+  },
+  {
+    key: 'garrote',
+    custom: true,
+  },
+  {
+    key: 'sap',
+    custom: true,
+  },
+  {
+    key: 'sinister_strike',
+    custom: true,
+  },
+  {
+    key: 'eviscerate',
+    custom: true,
+  },
+  {
+    key: 'stealth',
+    custom: true,
+  },
+  {
+    key: 'vanish',
+    custom: true,
   },
 
   // --- Heals & auras --------------------------------------------------------

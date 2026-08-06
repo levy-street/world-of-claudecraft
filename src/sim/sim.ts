@@ -179,6 +179,7 @@ import {
   SPIRIT_HEALER_NPC_ID,
   zoneAt,
 } from './data';
+import { refusedWhileDead } from './dead_gate';
 import * as deedsMod from './deeds';
 import {
   createDeedRuntime,
@@ -226,6 +227,8 @@ import * as escortMod from './escort';
 import { initEscorts as initEscortsImpl, updateEscorts as updateEscortsImpl } from './escort';
 import { fleeSpeed } from './flee_speed';
 import { formatMoney } from './format_money';
+import type { GuildBankState, GuildMembership } from './guild_bank';
+import * as guildBankMod from './guild_bank';
 import * as interaction from './interaction';
 import {
   boundCraftedRecipeIdOnLoad,
@@ -273,7 +276,9 @@ import {
   mobEffectiveMeleeRange as mobEffectiveMeleeRangeImpl,
   tryMobMeleeSwingInRange as tryMobMeleeSwingInRangeImpl,
 } from './mob/combat_profile';
+import { updateDragonkinBrood } from './mob/dragonkin_brood';
 import { NYTHRAXIS_SPIRIT_MENDING_CAST_ID } from './mob/healer_channel';
+import { wanderPause } from './mob/idle_rng';
 import * as lifecycle from './mob/lifecycle';
 import { resetEvadingMob as resetEvadingMobFn, updateMob as updateMobFn } from './mob/locomotion';
 import { runMobSwingAffixes } from './mob/mob_swing';
@@ -334,6 +339,7 @@ import {
   hobbyCraftFor,
   normalizeArchetypeState,
   requiredAmendsProgress,
+  serializeArchetypeState,
   switchArchetype as switchArchetypeImpl,
 } from './professions/archetype';
 import {
@@ -433,6 +439,7 @@ import {
 import { prestige as prestigeImpl, updateRested } from './progression/xp';
 import { advancePendingProjectiles, type PendingProjectile } from './projectile_travel';
 import * as honorMod from './pvp';
+import { sanitizeCreditedObjects } from './quests/interact_object_credit';
 import { sanitizeRemovedZone1Content } from './removed_zone1_content';
 import { rideSteepnessAt, shoreStepOut, stepWaterLevel } from './ride_height';
 import { Rng } from './rng';
@@ -519,6 +526,7 @@ import {
   onNodeGatheredForQuests,
   onRecipeCraftedForQuests,
 } from './quests/quest_credit';
+import { migrateRestoredQuestProgress } from './quests/quest_progress_migration';
 import { type NaturalRiftPortal, updateRiftPortals as updateRiftPortalsImpl } from './rift/portals';
 import {
   enchantRiftItem as enchantRiftItemImpl,
@@ -615,6 +623,7 @@ import {
   type AuraKind,
   angleTo,
   assertCanonicalEastbrookNoticeboardDef,
+  type CampDef,
   type CrowdControlDrCategory,
   type CrowdControlDrState,
   cloneInvSlot,
@@ -636,6 +645,7 @@ import {
   FAERIE_FIRE_ARMOR_PCT,
   GCD,
   type HonorArenaDailyState,
+  type InventoryUnit,
   type InvSlot,
   type ItemInstancePayload,
   isConsuming,
@@ -917,6 +927,11 @@ export interface ArenaReturnPools {
   cooldowns: Map<string, number>;
   abilityCharges: Record<string, AbilityChargeState>;
   ccDr: Map<CrowdControlDrCategory, CrowdControlDrState>;
+  // The recovery sickness the fighter owed on the way in, by id and remaining
+  // seconds. The bout runs on the arena clean slate, but the debt follows them out
+  // (restoreArenaReturnPools), so queueing is not a way to shed the penalty.
+  // Absent when they entered healthy.
+  sickness?: { id: string; remaining: number };
 }
 
 export interface ArenaMatch {
@@ -1120,6 +1135,9 @@ export interface PlayerMeta {
   isDevBot?: boolean;
   // Offline Fiesta practice opponent. Session-only and never serialized.
   isFiestaBot?: boolean;
+  // Firebottle throw cooldown (q_deepfen_purge): sim time the player's next hut
+  // torch is ready. Session-only, never serialized.
+  firebottleReadyAt?: number;
   skin: number; // appearance index into the render SKINS[player_<cls>]; persisted, synced
   skinCatalog: SkinCatalog;
   // Cosmetic skin-select event: the rank rolled when the event token was used,
@@ -1171,6 +1189,14 @@ export interface PlayerMeta {
   // never persisted, never sim-mutated, always [] offline; capacity itself rides
   // bank.bonusSlots. Excluded from the parity meta sample (tests/parity/trace.ts).
   bankBonusSources: BankBonusSource[];
+  // Server-stamped guild membership (guild id + rank), the authorization input
+  // the Guild Bank's officer-plus gate reads; written only through
+  // setPlayerGuildMembership (guild_bank.ts). Session-only exactly like
+  // bankBonusSources: guilds live in the server social DB, so this is never
+  // serialized into CharacterState (the server re-stamps at join and on every
+  // membership or rank change), never sim-mutated, always null offline.
+  // Excluded from the parity meta sample (tests/parity/trace.ts).
+  guildMembership: GuildMembership | null;
   vendorBuyback: InvSlot[];
   copper: number;
   equipment: PlayerEquipment;
@@ -1749,6 +1775,16 @@ function freshCounters(): RewardCounters {
   };
 }
 
+// The offline guild bank log answer: a FROZEN empty ready view. Offline play
+// never has a guild (guilds live in the server social DB) and there is no
+// bank_ledger to read, so the log is empty rather than loading or refused. One
+// shared frozen instance so the inert facet arm can never be mutated by a
+// caller into a per-Sim divergence.
+const OFFLINE_GUILD_BANK_LOG: import('../world_api').GuildBankLogView = Object.freeze({
+  state: 'ready' as const,
+  entries: Object.freeze([]) as readonly import('../world_api').GuildBankLogEntry[],
+});
+
 // isPetClass relocated to types.ts (P1b; imported in the './types' block above). The
 // cast-toggle predicates (isFormToggle/isToggleBuff/isStealthToggle/preservesStealth/
 // isShamanShock/ignoresDamagePushback) live in combat/casting_lifecycle.ts (C4a).
@@ -1921,6 +1957,11 @@ export class Sim {
   // sim needs, and any banker is a valid place to stand and use the bank. Exposed
   // as a live SimContext view so bank.ts gates deposit/withdraw/buy on proximity.
   bankerIds: number[] = [];
+  // Guild Bank books: guild id -> live GuildBankState, loaded by the server per
+  // realm through loadGuildBank (guild_bank.ts owns the shape; Phase 3 wires the
+  // DB) and exposed as a live SimContext view. Always empty offline: guilds are
+  // a server social system, so the offline sim never creates a book.
+  guildBanks: Map<number, GuildBankState> = new Map();
   /** When true, /dev level|tp|give chat commands are accepted (local dev only). */
   readonly devCommands: boolean;
   // Entities spawned by the last /dev sandbox (dummy + practice bots), so re-running
@@ -2130,7 +2171,17 @@ export class Sim {
           this.addEntity(mob);
           continue;
         }
-        const spawnRng = rngForSpawn(i);
+        // An offStream camp scatters off a PRIVATE sub-stream, so it draws no
+        // shared rng at all and adding it leaves every later world draw (and
+        // therefore every seeded gameplay roll) bit-identical. Same principle
+        // as the dummy/ambient branch above, but it still gets real scatter.
+        // Seeded from the world seed plus the camp's AUTHORED identity (never
+        // its array index, so reordering the list cannot move it), and never
+        // from wall-clock, so all three hosts agree.
+        // sharedRngCount is the narrower Last Bell compatibility contract: it
+        // leaves an established prefix on the shared stream and moves only a
+        // camp's expansion tail private. A fully off-stream camp wins over it.
+        const spawnRng = camp.offStream ? this.campPrivateRng(camp, i) : rngForSpawn(i);
         // Spread the camp's mobs with even nearest-neighbor spacing (a sunflower
         // spiral) instead of independent uniform sampling, which let mobs stack.
         // The two draws below feed campSpawnOffset as jitter and are consumed in the
@@ -2156,7 +2207,13 @@ export class Sim {
         const mob = createMob(this.nextId++, template, level, pos);
         mob.facing = spawnRng.range(-Math.PI, Math.PI);
         mob.prevFacing = mob.facing;
-        mob.wanderTimer = spawnRng.range(2, 10);
+        mob.wanderTimer = wanderPause(spawnRng, mob, 2, 10);
+        // Carry the off-stream contract onto the spawn: its passive idle draws
+        // must stay private too, or the herd drifts the shared stream anyway
+        // (see Entity.offStreamRng). This is the CAMP arm only; the TEMPLATE arm
+        // (MobTemplate.offStreamIdle, which also covers a shared-stream camp slot)
+        // is stamped for every spawn path in createMob.
+        if (camp.offStream) mob.offStreamRng = true;
         this.addEntity(mob);
       }
     }
@@ -2617,6 +2674,7 @@ export class Sim {
       bags: Array<string | null>(BAG_SOCKETS).fill(null),
       bank: { inventory: [], purchasedSlots: 0, bonusSlots: 0 },
       bankBonusSources: [],
+      guildMembership: null,
       vendorBuyback: [],
       copper: 0,
       equipment: {
@@ -2917,6 +2975,7 @@ export class Sim {
       // field and sanitizes to an empty bank). See bank.ts sanitizeBankState.
       meta.bank = sanitizeBankState(s.bank, meta.name, droppedInstanceJunk, player.id);
       warnDroppedInstanceKeys(meta.name, droppedInstanceJunk);
+      let questRevReset = false;
       for (const q of s.questLog) {
         // Prune unknown quest ids at load (normalize on load, never crash): a save
         // mid a since-deleted quest (e.g. the retirement of
@@ -2925,17 +2984,45 @@ export class Sim {
         // tick op dereferences QUESTS[qp.questId].objectives and TypeErrors inside
         // the server tick (quest_credit.ts + interactNpcForQuests). questsDone is
         // membership-only (never dereferenced), so it is preserved as history below.
-        if (q.state !== 'done' && QUESTS[q.questId])
-          meta.questLog.set(q.questId, {
+        // Untrusted JSONB: normalize on load. Absent on any save written before
+        // the per-object interact ledger existed, which grants that player their
+        // remaining interacts rather than dead-ending a part-way-done quest.
+        const creditedObjects = sanitizeCreditedObjects(q.creditedObjects);
+        if (q.state !== 'done' && QUESTS[q.questId]) {
+          // migrateRestoredQuestProgress resets an in-flight run whose QuestDef.rev
+          // moved under it (the objective rework migration); a reset drops the
+          // per-run scratch (burnedObjects, creditedObjects) with the counts. The
+          // burnedObjects filter drops pre-stable-key rows (a legacy {id, at}
+          // save) so they can never alias a live hut key.
+          const restored = {
             questId: q.questId,
             counts: [...q.counts],
             state: q.state,
             ...(q.selection === undefined ? {} : { selection: q.selection }),
             ...(q.resolvedCounts === undefined ? {} : { resolvedCounts: [...q.resolvedCounts] }),
-          });
+            ...(q.burnedObjects === undefined
+              ? {}
+              : {
+                  burnedObjects: q.burnedObjects
+                    .filter((b) => typeof b.key === 'string')
+                    .map((b) => ({ key: b.key, at: b.at })),
+                }),
+            ...(creditedObjects === undefined ? {} : { creditedObjects }),
+            ...(q.rev === undefined ? {} : { rev: q.rev }),
+          };
+          const migrated = migrateRestoredQuestProgress(QUESTS[q.questId], restored);
+          if (migrated !== restored) questRevReset = true;
+          meta.questLog.set(q.questId, migrated);
+        }
       }
       for (const q of s.questsDone) meta.questsDone.add(q);
       for (const [flag, value] of s.campaignFlags ?? []) meta.campaignFlags.set(flag, value);
+      // A rev reset zeroes COLLECT counts too, and those are derived state only
+      // onInventoryChangedForQuests re-credits: re-sync once (inventory is already
+      // restored above) so a migrated character holding the collect items is not
+      // stuck at 0 of N until an unrelated inventory change. Non-migrated quests
+      // are already in sync, so this emits nothing for them.
+      if (questRevReset) this.ctx.onInventoryChangedForQuests(meta);
       if (s.talents)
         // Revalidate the persisted build against the current rules + level budget
         // before it is baked into the flat mods below. A stored allocation replays
@@ -3705,6 +3792,12 @@ export class Sim {
         state: q.state,
         ...(q.selection === undefined ? {} : { selection: q.selection }),
         ...(q.resolvedCounts === undefined ? {} : { resolvedCounts: [...q.resolvedCounts] }),
+        ...(q.burnedObjects === undefined
+          ? {}
+          : { burnedObjects: q.burnedObjects.map((b) => ({ key: b.key, at: b.at })) }),
+        // Absent until the first interact credit (parity-stable saves).
+        ...(q.creditedObjects === undefined ? {} : { creditedObjects: [...q.creditedObjects] }),
+        ...(q.rev === undefined ? {} : { rev: q.rev }),
       })),
       questsDone: [...meta.questsDone],
       campaignFlags: [...meta.campaignFlags],
@@ -3783,7 +3876,7 @@ export class Sim {
       // floored display makes the heal unrepeatable by design. No PlayerMeta
       // mirror here either.
       proficiencyDisplayHealApplied: true,
-      archetype: { ...meta.archetype, attunedPairs: [...meta.archetype.attunedPairs] },
+      archetype: serializeArchetypeState(meta.archetype),
       delveMarks: meta.delveMarks,
       delveClears: { ...meta.delveClears },
       companionUpgrades: { ...meta.companionUpgrades },
@@ -4067,6 +4160,16 @@ export class Sim {
     if (!e || e.guild !== oldName) return;
     valeCupMod.vcupRenameGuild(this.ctx, pid, oldName, newName);
     e.guild = newName;
+  }
+
+  /** Server-callable session stamp of a player's guild membership (id + rank),
+   *  the authorization input the Guild Bank gates on; the id/rank contract and
+   *  the session-only rationale live on PlayerMeta.guildMembership. Called at
+   *  join and on every membership or rank change; pass null on leave, kick, or
+   *  disband. Offline/headless never call it, so the stamp stays null there.
+   *  Thin delegate into guild_bank.ts. */
+  setPlayerGuildMembership(pid: number, membership: GuildMembership | null): void {
+    guildBankMod.stampGuildMembership(this.ctx, pid, membership);
   }
 
   /** Cosmetic skin-select event: rolls a rarity rank (once) and emits the
@@ -4366,6 +4469,14 @@ export class Sim {
   deedsRarity(): Promise<import('../world_api').DeedsRarity | null> {
     return Promise.resolve(null);
   }
+  // Newest-first unlock ids from the live grant order: Map insertion order is
+  // chronological within a session, and the offline save round-trips through
+  // JSON (which preserves key order), so the offline Book keeps true recency
+  // without any clock. Deterministic, no fetch (the deedsRarity doctrine).
+  deedsRecent(): Promise<readonly string[] | null> {
+    const ids = [...this.primary.deedsEarned.keys()];
+    return Promise.resolve(ids.slice(-deedsMod.DEEDS_RECENT_CAP).reverse());
+  }
   raidLockouts(): import('../world_api').RaidLockout[] {
     const now = this.lockoutNowMs();
     const out: import('../world_api').RaidLockout[] = [];
@@ -4415,6 +4526,28 @@ export class Sim {
 
   groundPos(x: number, z: number): Vec3 {
     return { x, y: groundHeight(x, z, this.cfg.seed), z };
+  }
+
+  /** The private scatter stream for an `offStream` camp (see CampDef.offStream).
+   *  Seeded from the world seed plus the camp's AUTHORED identity (mob id,
+   *  centre, radius, count) and the index WITHIN that camp, never the camp's
+   *  position in the CAMPS array, so reordering or inserting camps cannot move
+   *  an existing one. Pure and wall-clock-free, so offline, server and headless
+   *  all place these spawns identically. */
+  private campPrivateRng(camp: CampDef, index: number): Rng {
+    let h = 0x811c9dc5 ^ (this.cfg.seed >>> 0);
+    const mix = (n: number): void => {
+      h = (h ^ (n >>> 0)) >>> 0;
+      h = Math.imul(h, 0x01000193) >>> 0;
+    };
+    for (let i = 0; i < camp.mobId.length; i++) mix(camp.mobId.charCodeAt(i));
+    // Quantized so a float re-authored to the same place cannot drift the seed.
+    mix(Math.round(camp.center.x * 100));
+    mix(Math.round(camp.center.z * 100));
+    mix(Math.round(camp.radius * 100));
+    mix(camp.count);
+    mix(index);
+    return new Rng(h >>> 0);
   }
 
   // Deterministic outward spiral to the nearest spot that is on dry-enough
@@ -4721,6 +4854,11 @@ export class Sim {
       // NPC id, read by bank.ts's proximity gate. Sim-owned, never reassigned.
       get bankerIds() {
         return sim.bankerIds;
+      },
+      // Guild Bank book map: guild id -> live book, read and written only
+      // through the guild_bank.ts helpers. Sim-owned, never reassigned.
+      get guildBanks() {
+        return sim.guildBanks;
       },
       // The Vale Cup holder (queues/deserters/botPids mutated in place; the
       // match slot reassigned inside the holder, so no setter is needed).
@@ -5477,6 +5615,15 @@ export class Sim {
       }
     }
     lap?.('ent.misc');
+
+    // The dragonkin brood pass (mob/dragonkin_brood.ts): egg proximity
+    // ambushes, due chain ripples, hatches off freshly-cracked eggs, whelp
+    // pounce/ward upkeep, and the broodlord counter-stun. Runs AFTER the
+    // per-entity loop so eggs cracked by this tick's swings hatch here, and
+    // BEFORE the engaged pass so a fresh hatchling's victim is flagged
+    // in-combat the same tick. Draws rng only when an egg hatches.
+    updateDragonkinBrood(this.ctx);
+    lap?.('dragonkinBrood');
 
     // one pass over the entities collects every player a mob is engaged
     // with, instead of one full scan per player
@@ -6849,10 +6996,10 @@ export class Sim {
     }
   }
 
-  private handleDeath(e: Entity, killer: Entity | null): void {
+  private handleDeath(e: Entity, killer: Entity | null, killerAbility?: string | null): void {
     // Body moved to combat/damage.ts (C1). The moved copy routes its quest-credit
     // call through ctx.onMobKilledForQuests (points-at quest_credit, Q1).
-    handleDeathImpl(this.ctx, e, killer);
+    handleDeathImpl(this.ctx, e, killer, killerAbility);
   }
 
   grantXp(amount: number, meta: PlayerMeta = this.primary, opts?: { fromKill?: boolean }): void {
@@ -8064,22 +8211,29 @@ export class Sim {
   // Removal counterpart to countEnchantableItem above: prefers plain fungible
   // stacks (matching removeFungibleItem's ordering within that subset) and only
   // reaches for an instanced-but-unenchanted copy once no fungible copy is left.
-  // Never removes an already-enchanted copy (isEnchantedInstance). Returns the
-  // `instance` payload of every instanced unit actually consumed (matching
-  // removeItem's return contract) so a caller applying an enchant can merge a
-  // crafted copy's signer/masterwork/legacy rolled.quality into the
-  // freshly-enchanted instance instead of silently dropping them (#1712
-  // round-3 review).
-  removeEnchantableItem(itemId: string, count: number, pid?: number): ItemInstancePayload[] {
-    const consumedInstances: ItemInstancePayload[] = [];
+  // Never removes an already-enchanted copy (isEnchantedInstance). Returns one
+  // InventoryUnit per unit actually consumed, from BOTH passes, so a caller
+  // applying an enchant can merge a crafted copy's signer/masterwork/legacy
+  // rolled.quality into the freshly-enchanted instance instead of silently
+  // dropping them (#1712 round-3 review) AND can re-stamp the plain-stack
+  // craftedRecipeId marker on the copy it mints. Pass 1 (plain stacks) used to
+  // report nothing at all, which is precisely how enchanting a common crafted
+  // item laundered its disenchant-gate provenance: a plain crafted stack keeps
+  // its marker on the SLOT, not in an `instance`, so a payload-only return had
+  // nowhere to put it.
+  removeEnchantableItem(itemId: string, count: number, pid?: number): InventoryUnit[] {
+    const consumed: InventoryUnit[] = [];
     const r = this.resolve(pid);
-    if (!r) return consumedInstances;
+    if (!r) return consumed;
     const { meta } = r;
     // Pass 1: plain fungible stacks only, same order removeFungibleItem uses.
     for (let i = meta.inventory.length - 1; i >= 0 && count > 0; i--) {
       const s = meta.inventory[i];
       if (s.itemId !== itemId || s.instance) continue;
       const take = Math.min(s.count, count);
+      for (let unit = 0; unit < take; unit++) {
+        consumed.push({ instance: undefined, craftedRecipeId: s.craftedRecipeId });
+      }
       s.count -= take;
       count -= take;
       if (s.count <= 0) meta.inventory.splice(i, 1);
@@ -8094,14 +8248,17 @@ export class Sim {
       const take = Math.min(s.count, count);
       for (let unit = 0; unit < take; unit++) {
         const finalUnitOfSlot = take >= s.count && unit === take - 1;
-        consumedInstances.push(finalUnitOfSlot ? s.instance : cloneItemInstancePayload(s.instance));
+        consumed.push({
+          instance: finalUnitOfSlot ? s.instance : cloneItemInstancePayload(s.instance),
+          craftedRecipeId: s.craftedRecipeId,
+        });
       }
       s.count -= take;
       count -= take;
       if (s.count <= 0) meta.inventory.splice(i, 1);
     }
     this.ctx.onInventoryChangedForQuests(meta);
-    return consumedInstances;
+    return consumed;
   }
 
   // True when `count` copies of the item fit the player's pooled bag budget
@@ -8265,6 +8422,14 @@ export class Sim {
   // only for eligible equipment outputs and mints the bindOnTrade arm
   // server-side (professions/commission.ts), never off client data.
   craftItem(recipeId: string, commission?: boolean, pid?: number): void {
+    // Dead gate for the profession-action family (this wrapper plus
+    // trainRecipe/unbindItem/salvageItem/disenchantItem/applyEnchant below):
+    // refuse BEFORE the resolver, so no result event is emitted and the
+    // shared error line is the single surface (see dead_gate.ts). It sits on
+    // the wrapper, not in the impl, because these wrappers emit the impl's
+    // result unconditionally; mobile-station placement and the rift forge
+    // emit no wrapper-side event, so their gates live in their own modules.
+    if (refusedWhileDead(this.ctx, pid)) return;
     const result = craftItemImpl(this.ctx, recipeId, commission === true, pid);
     const meta = this.players.get(pid ?? this.primaryId);
     if (meta) meta.lastCraftResult = result;
@@ -8316,6 +8481,8 @@ export class Sim {
   // silent no-op (the crafting window's station row already communicates
   // range, and the server re-validates the gate on every craft).
   placeMobileStation(craftId: string, pid?: number): void {
+    // Dead-gated inside placeMobileStationForPlayer itself, so the `/dev
+    // mobilestation` cheat's direct call shares the gate.
     placeMobileStationForPlayer(this.ctx, craftId, pid);
   }
 
@@ -8329,6 +8496,7 @@ export class Sim {
   // the event plus the lastTrainResult probe (the craftItem single-surface
   // doctrine: no ctx.error toast, or the deny would print twice).
   trainRecipe(recipeId: string, pid?: number): void {
+    if (refusedWhileDead(this.ctx, pid)) return;
     const r = this.ctx.resolve(pid);
     if (!r) return;
     const result = resolveTrain(this.stationPlacements, r.meta, r.e.pos, recipeId);
@@ -8357,6 +8525,7 @@ export class Sim {
   // twice); the payload change itself converges through the self inventory
   // mirror in both hosts.
   unbindItem(itemId: string, pid?: number): void {
+    if (refusedWhileDead(this.ctx, pid)) return;
     const result = unbindItemImpl(this.ctx, itemId, pid);
     const meta = this.players.get(pid ?? this.primaryId);
     this.emit({
@@ -8405,6 +8574,7 @@ export class Sim {
   // command arrives on, same shape as craftItem above. Stashes the outcome
   // on the resolved player's PlayerMeta so lastSalvageResult reflects it.
   salvageItem(itemId: string, pid?: number): void {
+    if (refusedWhileDead(this.ctx, pid)) return;
     const result = salvageItemImpl(this.ctx, itemId, pid);
     const meta = this.players.get(pid ?? this.primaryId);
     if (meta) meta.lastSalvageResult = result;
@@ -8456,6 +8626,7 @@ export class Sim {
   ): void {
     const pid = typeof pidOrTarget === 'number' ? pidOrTarget : undefined;
     const targetSlotIndex = typeof pidOrTarget === 'object' ? pidOrTarget.slotIndex : slotIndex;
+    if (refusedWhileDead(this.ctx, pid)) return;
     const result = disenchantItemImpl(this.ctx, itemId, pid, targetSlotIndex);
     const meta = this.players.get(pid ?? this.primaryId);
     if (meta) meta.lastDisenchantResult = result;
@@ -8493,6 +8664,7 @@ export class Sim {
     confirmReplace?: boolean,
     pid?: number,
   ): void {
+    if (refusedWhileDead(this.ctx, pid)) return;
     const result = applyEnchantImpl(this.ctx, itemId, enchantId, pid, slot, confirmReplace);
     const meta = this.players.get(pid ?? this.primaryId);
     if (meta) meta.lastEnchantResult = result;
@@ -8654,6 +8826,10 @@ export class Sim {
 
   private interactNpcForQuests(npc: Entity, meta: PlayerMeta): boolean {
     let progressed = false;
+    // Talking to the giver of an active quest re-grants a lost required item
+    // (quests/quest_commands.ts regrantMissingQuestItems, the accept grant's
+    // in-progress twin, on the same recoverable-stores predicate).
+    questCommands.regrantMissingQuestItems(this.ctx, meta, npc.templateId);
     for (const qp of meta.questLog.values()) {
       if (qp.state !== 'active') continue;
       const quest = QUESTS[qp.questId];
@@ -9190,6 +9366,24 @@ export class Sim {
   guildEventCreate(_day: string, _hour: number | null, _title: string, _note: string): void {}
   guildEventRemove(_eventId: number): void {}
   guildSetMotd(_text: string): void {}
+  // The Guild Bank is a guild feature, and guilds live in the server social DB,
+  // so offline play never has one: the read is null and the commands are inert
+  // (the socialInfo idiom), forever. The online path is live: ClientWorld sends
+  // the guild_bank_* tokens and the server acts for an explicit pid through the
+  // guildBank*For entry points (see the Guild Bank facade section below).
+  guildBankInfo: null = null;
+  guildBankDepositGold(_amount: number): void {}
+  guildBankWithdrawGold(_amount: number): void {}
+  guildBankDeposit(_slotIndex: number, _count?: number): void {}
+  guildBankWithdraw(_slotIndex: number, _count?: number): void {}
+  guildBankBuySlots(): void {}
+  /** Offline has no guild and no bank_ledger, so the log is EMPTY and READY,
+   *  never 'loading' (nothing is ever in flight) and never 'refused' (nothing
+   *  declined it). The Guild pane never renders offline anyway, so this is the
+   *  inert-arm answer that keeps the facet total: no request, no wire send. */
+  guildBankLog(): import('../world_api').GuildBankLogView {
+    return OFFLINE_GUILD_BANK_LOG;
+  }
   searchCharacters(_query: string): Promise<import('../world_api').CharacterSearchResult[]> {
     return Promise.resolve([]);
   }
@@ -9791,6 +9985,103 @@ export class Sim {
 
   bankInfoFor(pid: number): import('../world_api').BankInfo | null {
     return bankMod.bankInfoFor(this.ctx, pid);
+  }
+
+  // -------------------------------------------------------------------------
+  // The Guild Bank: the shared guild treasury + item store (Phase 1 foundation)
+  // -------------------------------------------------------------------------
+
+  // Thin delegates to the guild bank free functions (guild_bank.ts). The books
+  // live on Sim (guildBanks, a SimContext view keyed by guild id); the server
+  // feeds and drains them through this pure shape-in/shape-out seam in Phase 3
+  // (it owns the SQL).
+
+  loadGuildBank(guildId: number, raw: unknown): void {
+    guildBankMod.loadGuildBank(this.ctx, guildId, raw);
+  }
+
+  serializeGuildBank(guildId: number): GuildBankState | null {
+    return guildBankMod.serializeGuildBank(this.ctx, guildId);
+  }
+
+  // The sanctioned evict (disband, or the first half of an evict-then-load
+  // reload). The server's guild_banks row cascades away with the guilds DELETE.
+  evictGuildBank(guildId: number): void {
+    guildBankMod.evictGuildBank(this.ctx, guildId);
+  }
+
+  // The disband guard's read: what the LIVE book holds, or null when no book
+  // is loaded (callers fail closed on null; an unloaded book proves nothing).
+  guildBankHoldings(guildId: number): { copper: number; items: number } | null {
+    return guildBankMod.guildBankHoldings(this.ctx, guildId);
+  }
+
+  // Reserve-at-gate (state.md, revised by Phase 3 QA): the server charges this
+  // synchronously at the guild_create dispatch gate, before any DB work, and
+  // refunds on every refusal arm. Returns the copper actually charged.
+  chargeGuildCreationFeeFor(pid: number): number {
+    return guildBankMod.chargeGuildCreationFee(this.ctx, pid);
+  }
+
+  // The refusal arm of the reserve-at-gate flow: return a reserved creation
+  // fee to the purse. Returns the copper actually refunded.
+  refundGuildCreationFeeFor(pid: number, amount: number): number {
+    return guildBankMod.refundGuildCreationFee(this.ctx, pid, amount);
+  }
+
+  // Surgically undo a dead session's unflushed guild bank ops on the live book
+  // (the fence-out arm where another session's legitimate unflushed ops make
+  // an evict-and-reload destructive). See guild_bank.ts revertGuildBankDeltas.
+  revertGuildBankDeltas(guildId: number, deltas: readonly guildBankMod.GuildBankOpDelta[]): void {
+    guildBankMod.revertGuildBankDeltas(this.ctx, guildId, deltas);
+  }
+
+  // The five op bodies + the gated info read, as pid-first SERVER entry points
+  // (the bankInfoFor pattern). These are deliberately distinct from the IWorld
+  // facet members (guildBankDeposit etc. in the social no-op block above): the
+  // offline facet arm is inert forever because offline play never has a guild,
+  // while the authoritative server acts for an explicit pid through these. All
+  // gameplay rules (proximity, rank, quest-bind, caps, capacity) live in
+  // guild_bank.ts; the server validates shape only.
+
+  guildBankDepositGoldFor(pid: number, amount: number): void {
+    guildBankMod.guildBankDepositGold(this.ctx, amount, pid);
+  }
+
+  guildBankWithdrawGoldFor(pid: number, amount: number): void {
+    guildBankMod.guildBankWithdrawGold(this.ctx, amount, pid);
+  }
+
+  guildBankDepositFor(pid: number, slotIndex: number, count?: number): void {
+    guildBankMod.guildBankDeposit(this.ctx, slotIndex, count, pid);
+  }
+
+  guildBankWithdrawFor(pid: number, slotIndex: number, count?: number): void {
+    guildBankMod.guildBankWithdraw(this.ctx, slotIndex, count, pid);
+  }
+
+  guildBankBuySlotsFor(pid: number): void {
+    guildBankMod.guildBankBuySlots(this.ctx, pid);
+  }
+
+  guildBankInfoFor(pid: number): import('../world_api').GuildBankInfo | null {
+    return guildBankMod.guildBankInfoFor(this.ctx, pid);
+  }
+
+  // The OPERATOR pair (server-only, never IWorld): the ungated guild-id-scoped
+  // book read the admin escape hatch diffs around its mutation, and the hatch
+  // itself, which removes exactly one DORMANT (pipe-refused) slot and returns
+  // the removed copy as evidence. See guild_bank.ts for the scope contract.
+  guildBankInfoForGuild(guildId: number): import('../world_api').GuildBankInfo | null {
+    return guildBankMod.guildBankInfoForGuild(this.ctx, guildId);
+  }
+
+  purgeDormantGuildBankSlot(
+    guildId: number,
+    slotIndex: number,
+    expectItemId: string,
+  ): InvSlot | null {
+    return guildBankMod.purgeDormantGuildBankSlot(this.ctx, guildId, slotIndex, expectItemId);
   }
 
   // -------------------------------------------------------------------------

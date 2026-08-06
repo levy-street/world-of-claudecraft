@@ -962,19 +962,20 @@ export const pt_BR: EnTranslations = {
       "petTaunt": "Mascote: provocar",
       "petDefensive": "Mascote: defensivo",
       "petAggressive": "Mascote: agressivo",
-      "mount": "Montar / Desmontar"
+      "mount": "Montar / Desmontar",
+      "mouseHint": "Os botões do mouse também funcionam: pressione o botão do meio (M3) ou um botão lateral (M4, M5) ao atribuir a tecla. Os botões esquerdo e direito continuam reservados para a câmera, o clique para mover e cliques em objetos no mundo."
     },
     "actionBar": {
-      "editKeys": "Edit action bar keys",
-      "editKeysHint": "Click a slot on the action bar, then press a key to bind it.",
-      "bannerHint": "Click a slot, then press a key to bind it. Click Done when finished.",
-      "bannerCapturing": "Press a key to bind this slot...",
-      "boundToKey": "Bound to {key}.",
-      "reset": "Reset",
-      "done": "Done",
-      "cancel": "Cancel",
-      "resetConfirmTitle": "Reset action bar keys?",
-      "resetConfirmBody": "The first bar returns to its default keys. The second and third bars become unbound. This cannot be undone."
+      "editKeys": "Editar teclas da barra de ação",
+      "editKeysHint": "Clique em um espaço da barra de ação e pressione uma tecla para atribuí-la.",
+      "bannerHint": "Clique em um espaço e pressione uma tecla para atribuí-la. Clique em Concluir ao terminar.",
+      "bannerCapturing": "Pressione uma tecla para atribuir este espaço...",
+      "boundToKey": "Atribuído a {key}.",
+      "reset": "Redefinir",
+      "done": "Concluir",
+      "cancel": "Cancelar",
+      "resetConfirmTitle": "Redefinir as teclas da barra de ação?",
+      "resetConfirmBody": "A primeira barra volta às teclas padrão. A segunda e a terceira ficam sem atribuição. Isso não pode ser desfeito."
     },
     "mounts": {
       "title": "Montarias",
@@ -1001,6 +1002,7 @@ export const pt_BR: EnTranslations = {
       "name_stormfeather_griffin": "Pluma-Tormenta Alcança-Céu",
       "name_thunderstrut_gobbler": "Pavoneia-Trovões, o Grande Peru",
       "name_terrorspark_groundshaker": "Faíscaterror, Abala-Terra",
+      "name_drakemaw_raptor": "Raptor de Drakemaw",
       "desc_valorsteed": "Um corcel resistente e de passo firme que aumenta a velocidade de viagem.",
       "desc_grag_bear": "Um urso resistente e de passo firme que aumenta a velocidade de viagem.",
       "desc_stalkglider_snail": "Um caracol valente e de queima lenta que aumenta a velocidade de viagem.",
@@ -1008,7 +1010,8 @@ export const pt_BR: EnTranslations = {
       "desc_shadowjump_toad": "Um sapo gigante, maciço e de passo firme, treinado em saltos sombrios relâmpago por qualquer terreno.",
       "desc_stormfeather_griffin": "Um grifo da tempestade majestoso que ronda o chão sobre garras rúnicas, asas recolhidas.",
       "desc_thunderstrut_gobbler": "Um peru colossal nascido da tempestade que desce do Pico Desperto se pavoneando, com a cauda aberta como uma frente de tempestade.",
-      "desc_terrorspark_groundshaker": "Uma máquina blindada compacta com esteiras pesadas, um canhão de grande calibre e uma sela feita para pilotos destemidos."
+      "desc_terrorspark_groundshaker": "Uma máquina blindada compacta com esteiras pesadas, um canhão de grande calibre e uma sela feita para pilotos destemidos.",
+      "desc_drakemaw_raptor": "Um raptor da ninhada domado na sela, vindo da Caldeira de Drakemaw, puro músculo e velocidade, ainda com um leve cheiro de cinzas."
     },
     "mountTraining": {
       "mountPrompt": "Pressione {key} para montar no Valorsteed de treinamento.",
@@ -1052,7 +1055,7 @@ export const pt_BR: EnTranslations = {
       },
       "awayNote": "Se os dois lados hasteiam o mesmo estandarte, o time visitante joga com a paleta invertida.",
       "rolesHeading": "Função esportiva",
-      "rolesSmallBracketNote": "In the 1v1 and 2v2 brackets every fighter plays the All-Rounder kit. Deeds that call for the 3v3 bracket or larger cannot be earned here.",
+      "rolesSmallBracketNote": "Nas chaves 1x1 e 2x2, todo combatente joga com o kit Polivalente. Feitos que exigem a chave 3x3 ou maior não podem ser conquistados aqui.",
       "role": {
         "allrounder": {
           "name": "Polivalente",
@@ -1094,7 +1097,7 @@ export const pt_BR: EnTranslations = {
       "guildBoardWl": "{wins} V, {losses} D",
       "practice": "Treino contra Bots",
       "practiceNote": "Inicia na hora uma partida privada contra bots no seu próprio campo de treino.",
-      "practiceUnratedNote": "Practice bouts are unrated: standings and Book of Deeds progress do not count.",
+      "practiceUnratedNote": "Partidas de treino não são ranqueadas: a classificação e o progresso no Livro dos Feitos não contam.",
       "practicingNow": "Treinando agora ({count}):",
       "clock": "{minutes}:{seconds}",
       "indicatorQueued": "Fila da Copa do Vale: {bracket}, posição {position} de {count}",
@@ -1137,8 +1140,8 @@ export const pt_BR: EnTranslations = {
         "rule5": "Qualquer um pode chegar e torcer por você das arquibancadas.",
         "kitHeading": "Seu kit",
         "kitNote": "Estes movimentos substituem as habilidades da sua classe durante a partida.",
-        "unratedNote": "Bots are on the pitch, so this bout is unrated: standings do not move, and deeds for goals, saves, and clean sheets do not count.",
-        "practiceUnratedNote": "This is a practice bout, so it is unrated: standings do not move, and Book of Deeds progress does not count.",
+        "unratedNote": "Há bots em campo, portanto esta partida não é ranqueada: a classificação não muda e os feitos de gols, defesas e jogos sem sofrer gols não contam.",
+        "practiceUnratedNote": "Esta é uma partida de treino, portanto não é ranqueada: a classificação não muda e o progresso no Livro dos Feitos não conta.",
         "rosterHeading": "A escalação",
         "you": "Você",
         "bot": "Bot",
@@ -1180,6 +1183,15 @@ export const pt_BR: EnTranslations = {
       "browserEffectsReduced": "Reduzidos",
       "browserEffectsMinimal": "Mínimos",
       "browserEffectsNote": "O modo automático suaviza os efeitos CSS pesados (desfoque, brilho, movimento de fundo) com base no seu navegador e dispositivo. Reduza-o manualmente se a interface parecer lenta.",
+      "graphicsApply": "Aplicar gráficos",
+      "graphicsApplying": "Aplicando configurações gráficas...",
+      "graphicsApplied": "Configurações gráficas aplicadas.",
+      "graphicsSaved": "Configurações gráficas salvas. O renderizador ativo já corresponde a elas.",
+      "graphicsFailed": "Não foi possível aplicar os gráficos. Suas configurações anteriores continuam ativas.",
+      "graphicsRetry": "Tentar gráficos novamente",
+      "graphicsFatal": "Falha na recuperação dos gráficos. Recarregue o jogo para continuar.",
+      "graphicsReload": "Recarregar jogo",
+      "graphicsDraftChanged": "As alterações gráficas estão prontas para aplicar.",
       "interfaceMode": "Modo de interface",
       "interfaceModeAuto": "Auto",
       "interfaceModeDesktop": "Desktop",
@@ -1210,6 +1222,7 @@ export const pt_BR: EnTranslations = {
       "itemScoreLine": "Pontuação {score}",
       "showSecondaryActionBar": "Mostrar Barra de Ação Secundária",
       "showThirdActionBar": "Mostrar terceira barra de ação",
+      "lockActionBars": "Travar barras de ação",
       "showTargetOfTarget": "Mostrar Alvo do Alvo",
       "showAttackButton": "Exibir Botão de Ataque",
       "showDailyRewardsChest": "Mostrar Baú de Recompensas Diárias",
@@ -1371,7 +1384,14 @@ export const pt_BR: EnTranslations = {
     },
     "landing": {
       "highContrast": "Alto contraste",
-      "highContrastAria": "Alternar o fundo de alto contraste: desativa o trailer em movimento para que o texto da tela inicial permaneça legível"
+      "highContrastAria": "Alternar o fundo de alto contraste: desativa o trailer em movimento para que o texto da tela inicial permaneça legível",
+      "browserSupport": {
+        "title": "Atenção: navegador não compatível",
+        "body": "Você pode notar desempenho reduzido neste navegador. Para a melhor experiência, baixe o aplicativo para Windows, macOS ou Linux. Prefere jogar no navegador? O Chrome tem o melhor desempenho, e o Firefox e o Safari também são compatíveis.",
+        "getDesktopApp": "Baixar o aplicativo para desktop",
+        "continueInBrowser": "Continuar no navegador",
+        "dismissAria": "Dispensar o aviso de navegador não compatível"
+      }
     },
     "warfare": {
       "honorAmount": "{amount} de Honra",
@@ -1740,14 +1760,16 @@ export const pt_BR: EnTranslations = {
       "itemAriaEnchanted": "{item}, quantidade {count}, cópia encantada",
       "itemAriaBound": "{item}, quantidade {count}, cópia vinculada",
       "itemAriaMasterwork": "{item}, quantidade {count}, obra-prima",
+      "itemAriaQuest": "{item}, quantidade {count}, item de missão",
       "filterGroupAria": "Filtrar bolsas por categoria",
       "filterAll": "Todos",
       "filterWeapon": "Armas",
       "filterArmor": "Armadura",
       "filterConsumable": "Consumíveis",
       "filterMaterial": "Materiais",
-      "filterTool": "Tools",
+      "filterTool": "Ferramentas",
       "filterQuest": "Missão",
+      "filterQuestCountAria": "Missão, {count} itens",
       "filterMount": "Montarias",
       "sortAria": "Ordenar itens da bolsa",
       "sortRecent": "Recentes",
@@ -1756,6 +1778,7 @@ export const pt_BR: EnTranslations = {
       "searchPlaceholder": "Pesquisar itens",
       "searchAria": "Pesquisar itens da bolsa por nome",
       "noMatch": "Nenhum item corresponde aos seus filtros.",
+      "noQuestItems": "Nenhum item de missão em suas bolsas.",
       "capacity": "{used}/{total}",
       "capacityAria": "Espaços de bolsa usados: {used} de {total}",
       "backpack": "Mochila",
@@ -1973,7 +1996,9 @@ export const pt_BR: EnTranslations = {
       "enchantedFallback": "Encantado"
     },
     "materialHint": {
-      "fineGrade": "Fine grade. Gathered from a full-tier vein with a tool ranked above the material, and counts as the ordinary version wherever one is required.",
+      "fineGrade": "Grau fino. Coletado de um veio de nível pleno com uma ferramenta de nível acima do material, e conta como a versão comum sempre que uma for exigida.",
+      "cookingCatch": "Ingrediente de culinária. Deve ser cozido antes de comer.",
+      "usedBy": "Used by {crafts}.",
       "arcaneDust": "Reagente de encantamento. Desencantado de equipamento comum e incomum.",
       "arcaneEssence": "Reagente de encantamento. Desencantado de equipamento raro.",
       "arcaneShard": "Reagente de encantamento. Desencantado de equipamento épico e lendário.",
@@ -2255,6 +2280,7 @@ export const pt_BR: EnTranslations = {
       "depositHint": "Clique para depositar",
       "depositPartialHint": "Shift-clique para depositar uma quantidade parcial",
       "cannotDeposit": "Não pode ir para o banco",
+      "cannotDepositNow": "Não pode ser depositado agora",
       "depositQuantityTitle": "Depositar {item}",
       "depositQuantityInput": "Quantidade a depositar",
       "depositQuantityConfirm": "Depositar",
@@ -2265,6 +2291,7 @@ export const pt_BR: EnTranslations = {
       "sortAria": "Ordenar itens do banco",
       "searchAria": "Buscar itens do banco pelo nome",
       "depositAll": "Depositar todos os materiais",
+      "depositAllTooltip": "Envia todos os reagentes de criação e itens cinza das suas bolsas para o banco em uma única viagem. Ferramentas de coleta, itens equipados, itens de missão e consumíveis nunca são tocados.",
       "depositAllDone": "Materiais depositados: {count}.",
       "depositAllFull": "Materiais depositados: {count}. O banco agora está cheio.",
       "depositAllNone": "Banco cheio: nada foi depositado.",
@@ -2280,7 +2307,50 @@ export const pt_BR: EnTranslations = {
       "bonusAdvertWallet": "Vincule uma carteira para ganhar 2 espaços.",
       "bonusReferralProgress": "{count}/{cap}",
       "bonusReferralExplainer": "Convide um amigo: quando ele alcançar o nível 10, cada um de vocês ganha 2 espaços, até 5 amigos.",
-      "bonusSectionAria": "Espaços bônus do banco e como ganhar mais"
+      "bonusSectionAria": "Espaços bônus do banco e como ganhar mais",
+      "tabsAria": "Abas do banco",
+      "personalTab": "Pessoal",
+      "guildTab": "Guilda",
+      "guildCapacityAria": "Espaços do banco da guilda usados: {used} de {total}",
+      "guildEmpty": "O banco da guilda está vazio.",
+      "guildTreasury": "Tesouraria da guilda",
+      "guildDepositGold": "Depositar dinheiro",
+      "guildWithdrawGold": "Retirar dinheiro",
+      "guildDepositGoldTitle": "Depositar dinheiro na tesouraria da guilda",
+      "guildWithdrawGoldTitle": "Retirar dinheiro da tesouraria da guilda",
+      "guildGoldAvailable": "Disponível: {amount}",
+      "guildBuyConfirm": "Comprar {count} espaços adicionais do banco da guilda por {price} da tesouraria da guilda?",
+      "guildBuyNote": "Pago pela tesouraria da guilda",
+      "guildTreasuryShort": "Tesouraria insuficiente",
+      "guildOpenBank": "Abrir o banco da guilda",
+      "guildOpenConfirm": "Abrir o banco da guilda por {price}? Isso é pago com seu próprio dinheiro.",
+      "guildOpenAccept": "Abrir",
+      "guildOpenNote": "Pago com seu próprio dinheiro, não da tesouraria da guilda",
+      "guildPurseShort": "Dinheiro insuficiente",
+      "guildDormantNote": "Itens bloqueados não podem ser retirados e impedem a dissolução da guilda.",
+      "guildDormantHint": "Este item está bloqueado no banco da guilda e não pode ser retirado.",
+      "guildDormantAria": "{item}, quantidade {count}, não pode ser retirado",
+      "guildUnknownItem": "Item desconhecido",
+      "guildDepositHint": "Clique para depositar no banco da guilda",
+      "guildCannotDeposit": "Não pode ir para o banco da guilda",
+      "guildGoldCannotMove": "Esse valor não pode ser movimentado agora.",
+      "guildViewsAria": "Visualizações do banco da guilda",
+      "guildContentsTab": "Conteúdo",
+      "guildLogTab": "Registro",
+      "logAria": "Registro de atividades do banco da guilda",
+      "logNote": "As {count} ações mais recentes do banco da guilda.",
+      "logLoading": "Carregando o registro do banco da guilda...",
+      "logEmpty": "Nada ainda entrou ou saiu do banco da guilda.",
+      "logRefused": "Somente oficiais da guilda podem ler o registro do banco da guilda.",
+      "logFormerMember": "Um ex-membro da guilda",
+      "logDepositItem": "{actor} depositou {count} {item}",
+      "logWithdrawItem": "{actor} retirou {count} {item}",
+      "logDepositMoney": "{actor} depositou {amount}",
+      "logWithdrawMoney": "{actor} retirou {amount}",
+      "logBuySlots": "{actor} comprou uma expansão do banco por {amount}",
+      "logOpenBank": "{actor} abriu o banco da guilda por {amount}",
+      "logCharterFee": "{actor} pagou a taxa de fundação da guilda de {amount}",
+      "logAdminPurge": "Um administrador removeu {count} {item}"
     },
     "calendar": {
       "title": "Calendário de Eventos",
@@ -2358,6 +2428,7 @@ export const pt_BR: EnTranslations = {
       "billboard": {
         "label": "Mural da Guilda",
         "empty": "Ainda não há nada no mural.",
+        "loginLine": "Mural da Guilda: {text}",
         "setBy": "Definido por {name}",
         "save": "Salvar",
         "placeholder": "Escreva uma mensagem para a guilda",
@@ -2402,7 +2473,7 @@ export const pt_BR: EnTranslations = {
         "mining": "Você precisa de uma picareta de mineração de nível {tier} para extrair este veio.",
         "logging": "Você precisa de um machado de lenharia de nível {tier} para derrubar este arvoredo.",
         "herbalism": "Você precisa de uma foice de herborismo de nível {tier} para colher este canteiro.",
-        "fishing": "You need a tier {tier} fishing rod to fish these waters."
+        "fishing": "Você precisa de uma vara de pesca de nível {tier} para pescar nestas águas."
       },
       "toolRequired": {
         "mining": "Você precisa de uma picareta de mineração para extrair este veio.",
@@ -2416,11 +2487,11 @@ export const pt_BR: EnTranslations = {
         "herbalism": "Não há nenhum canteiro de ervas ao alcance."
       },
       "wieldUnmet": {
-        "mining": "You need Mining {skill} to swing the pick already in your bags.",
-        "logging": "You need Logging {skill} to swing the axe already in your bags.",
-        "herbalism": "You need Herbalism {skill} to work the sickle already in your bags."
+        "mining": "Você precisa de Mineração {skill} para brandir a picareta que já está nas suas bolsas.",
+        "logging": "Você precisa de Lenharia {skill} para brandir o machado que já está nas suas bolsas.",
+        "herbalism": "Você precisa de Herborismo {skill} para usar a foice que já está nas suas bolsas."
       },
-      "wieldUnmetCorpse": "You need gathering skill {skill} to put your finest tool to work.",
+      "wieldUnmetCorpse": "Você precisa de {skill} de habilidade em coleta para pôr sua melhor ferramenta para trabalhar.",
       "toolTierUnmetCorpse": "Você precisa de uma ferramenta de coleta de nível {tier} para recuperar os melhores materiais.",
       "toolTooltip": {
         "kind": {
@@ -2433,7 +2504,7 @@ export const pt_BR: EnTranslations = {
           "mining": "Necessária para extrair veios de minério até o nível {tier}.",
           "logging": "Necessário para derrubar arvoredos até o nível {tier}.",
           "herbalism": "Necessária para colher canteiros de ervas até o nível {tier}.",
-          "fishing": "Required to fish waters up to tier {tier}."
+          "fishing": "Necessária para pescar em águas até o nível {tier}."
         },
         "use": {
           "mining": "Uso: extrai um veio de minério próximo.",
@@ -2448,12 +2519,12 @@ export const pt_BR: EnTranslations = {
       },
       "downgradeMark": "Bolsas cheias: a descoberta foi armazenada sem a marca do coletor.",
       "downgradeFind": "Bolsas cheias: uma descoberta imaculada escapou.",
-      "emptyHookNote": "Nothing on the hook",
+      "emptyHookNote": "Nada no anzol",
       "stateReady": "Disponível",
       "stateCooldown": "Regenerando",
-      "stateCooldownTimed": "Respawns in {time}",
+      "stateCooldownTimed": "Regenera em {time}",
       "respawnClock": "{minutes}:{seconds}",
-      "fineGradePreview": "Your tool refines this yield to fine grade."
+      "fineGradePreview": "Sua ferramenta refina esta coleta para o grau fino."
     },
     "archetypeTitle": {
       "label": "Título",
@@ -2543,33 +2614,45 @@ export const pt_BR: EnTranslations = {
       "ceilingRare": "Boné raro",
       "ceilingCommon": "Limite comum",
       "skillValue": "{skill} / {max}",
-      "toolEffectCharges": "{charges} of {max} charges",
-      "toolEffectSpent": "Spent, needs recharging",
-      "toolEffectDepleted": "Tool effect spent",
-      "toolEffectRechargePrice": "Recharge: {count} x {material}",
-      "toolEffectModeAsk": "Ask each use",
-      "toolEffectModePrompt": "Asks each use",
-      "toolEffectConfirmTitle": "Use {effect}?",
-      "toolEffectConfirmBody": "Spend a charge on this harvest? Declining still gathers, without the bonus. Charges left: {charges}.",
-      "toolEffectConfirmAccept": "Use a Charge",
-      "toolEffectConfirmDecline": "Gather Without",
+      "toolEffectCharges": "{charges} de {max} cargas",
+      "toolEffectSpent": "Gasto, precisa recarregar",
+      "toolEffectDepleted": "Efeito da ferramenta gasto",
+      "toolEffectRechargePrice": "Recarga: {count} x {material}",
+      "toolEffectModeAsk": "Perguntar a cada uso",
+      "toolEffectModePrompt": "Pergunta a cada uso",
+      "toolEffectConfirmTitle": "Usar {effect}?",
+      "toolEffectConfirmBody": "Gastar uma carga nesta coleta? Recusar ainda assim coleta, sem o bônus. Cargas restantes: {charges}.",
+      "toolEffectConfirmAccept": "Usar uma carga",
+      "toolEffectConfirmDecline": "Coletar sem usar",
       "toolEffectName": {
-        "gatherersCache": "Gatherer's Cache",
-        "artisansEye": "Artisan's Eye",
-        "quickeningCharm": "Springback Charm"
+        "gatherersCache": "Estoque do Coletor",
+        "artisansEye": "Olho do Artesão",
+        "quickeningCharm": "Amuleto do Rebrote"
       },
-      "toolEffectSlotButton": "Slot {effect}",
-      "toolEffectRechargeButton": "Recharge",
-      "toolEffectSlotted": "{effect} slotted on {profession}.",
-      "toolEffectSlotInvalid": "{effect} cannot be slotted there.",
-      "toolEffectNoTool": "You need a real {profession} tool first.",
-      "toolEffectNoCharm": "You need a crafted {effect} charm in your bags.",
-      "toolEffectNoGain": "{effect} is already slotted and fully charged.",
-      "toolEffectRecharged": "{effect} recharged: {material} x{count} consumed.",
-      "toolEffectRechargeNoSlot": "No effect is slotted on {profession}.",
-      "toolEffectRechargeFull": "{effect} is already fully charged.",
-      "toolEffectRechargeToolCapped": "Carry a better {profession} tool to charge {effect} further.",
-      "toolEffectRechargeMaterials": "Recharging {effect} needs {material} x{count}.",
+      "toolEffectTooltip": {
+        "kind": "Tool charm",
+        "bonus": {
+          "gatherersCache": "+1 yield per harvest while charged.",
+          "artisansEye": "Raises the harvest grade by 1 tool tier while charged.",
+          "quickeningCharm": "Shortens the node respawn timer it triggers."
+        },
+        "howToSlot": "Slot onto a mining, logging, or herbalism tool from the Professions window. Consumed when slotted.",
+        "charges": "Starts with {base} charges on a common tool (+{bonus} per rarity rung).",
+        "landOnly": "Does not slot on fishing rods.",
+        "openProfessions": "Open Professions to slot this onto a gathering tool."
+      },
+      "toolEffectSlotButton": "Encaixar {effect}",
+      "toolEffectRechargeButton": "Recarregar",
+      "toolEffectSlotted": "{effect} encaixado em {profession}.",
+      "toolEffectSlotInvalid": "{effect} não pode ser encaixado aí.",
+      "toolEffectNoTool": "Você precisa antes de uma ferramenta de {profession} de verdade.",
+      "toolEffectNoCharm": "Você precisa de um amuleto de {effect} criado nas suas bolsas.",
+      "toolEffectNoGain": "{effect} já está encaixado e totalmente carregado.",
+      "toolEffectRecharged": "{effect} recarregado: {material} x{count} consumidos.",
+      "toolEffectRechargeNoSlot": "Nenhum efeito está encaixado em {profession}.",
+      "toolEffectRechargeFull": "{effect} já está totalmente carregado.",
+      "toolEffectRechargeToolCapped": "Leve uma ferramenta de {profession} melhor para carregar {effect} ainda mais.",
+      "toolEffectRechargeMaterials": "Recarregar {effect} exige {material} x{count}.",
       "tierPipAria": "Camada {tier}",
       "nextUnlockTier": "{points} aponta para o próximo nível: as probabilidades de obra-prima melhoram",
       "nextUnlockSpecialized": "{points} aponta para Specialized: queda nos custos de materiais",
@@ -2594,10 +2677,12 @@ export const pt_BR: EnTranslations = {
     "crafting": {
       "title": "Artesanato",
       "close": "Fechar elaboração",
+      "dialogOption": "Criação",
+      "dialogOptionAria": "Abrir a janela de criação de {craft}",
       "craft": "Arte",
       "reagentsNeeded": "Requer:",
       "reagentLine": "{name}x{have}/{required}",
-      "reagentFineSub": "(spends {count} fine-grade)",
+      "reagentFineSub": "(gasta {count} de grau fino)",
       "empty": "Nenhuma receita conhecida ainda.",
       "resultAria": "Artesanato {name}",
       "craftedToast": "Feito: {name}",
@@ -2639,8 +2724,8 @@ export const pt_BR: EnTranslations = {
         "colSkill": "Habilidade",
         "colRole": "Papel",
         "colCap": "Limite",
-        "allCrafts": "All crafts",
-        "skillListAria": "Craft skills",
+        "allCrafts": "Todos os ofícios",
+        "skillListAria": "Habilidades artesanais",
         "tutorial": "Primeiro nível: alcance a habilidade {skill} em um ofício. Receitas bem-sucedidas avançam naquele ofício sem apagar o conhecimento em outros.",
         "nearTier": "{craft} está a {points} de habilidade do próximo nível.",
         "dormantKnowledge": "O conhecimento de {craft} é retido, mas permanece inativo até que seu par ou passatempo esteja ativo."
@@ -2668,6 +2753,8 @@ export const pt_BR: EnTranslations = {
       "masterworkToast": "Obra-prima! {name}",
       "masterworkZoneLine": "{crafter} criou uma obra-prima {name}!",
       "tierUpToast": "{craft} avançou para o nível {tier}!",
+      "skillUpToast": "{skill} skill increased to {level}!",
+      "skillUpSubtext": "Skill increased to {level}!",
       "trendNudge": "Suas mãos estão se inclinando para {archetype}. Sua sintonização aguarda com {master}.",
       "trendNudgeNoMaster": "Suas mãos estão se inclinando para {archetype}. Procure um mestre de ofício para assumir.",
       "attunedZoneLine": "{name} se sintonizou como {archetype}!",
@@ -2903,6 +2990,7 @@ export const pt_BR: EnTranslations = {
       "countLabel": "{earned}/{total} feitos",
       "completionAria": "Feitos conquistados: {earned} de {total}",
       "recentLabel": "Recentes:",
+      "recentJumpAria": "Ir para {name}",
       "nearestLabel": "Quase lá:",
       "filterGroupAria": "Filtrar feitos",
       "filterAll": "Todos",
@@ -2956,7 +3044,7 @@ export const pt_BR: EnTranslations = {
       "lbSelfAccount": "Sua conta: posição {rank}, top {percent} por cento, {renown} de Renome",
       "lbSelfRank": "Sua conta: posição {rank}, top {percent} por cento",
       "lbEmpty": "Ainda não há cronistas na classificação.",
-      "broadcastsLabel": "Share deed unlocks with guildmates and followers, and deed and masterwork cards with the Discord feed",
+      "broadcastsLabel": "Compartilhar feitos desbloqueados com companheiros de guilda e seguidores, e cartões de feito e de obra-prima com o feed do Discord",
       "titledName": "{name} [{title}]"
     },
     "continentMap": {
@@ -3120,14 +3208,14 @@ export const pt_BR: EnTranslations = {
       "invalid_input": "Entrada inválida."
     },
     "seeker": {
-      "native_only": "Seeker entitlement is available only in the native app.",
-      "attestation_failed": "Device verification failed. Please try again.",
-      "solana_artifact_required": "Use the Solana Store app to continue.",
-      "wallet_required": "Link and verify a wallet first.",
-      "genesis_token_required": "A verified Seeker Genesis Token is required.",
-      "genesis_token_claimed": "That Seeker Genesis Token has already been claimed.",
-      "entitlement_required": "Verified Seeker entitlement is required.",
-      "current_ownership_required": "Current Seeker Genesis Token ownership is required."
+      "native_only": "O benefício Seeker está disponível apenas no aplicativo nativo.",
+      "attestation_failed": "A verificação do dispositivo falhou. Tente novamente.",
+      "solana_artifact_required": "Use o app da Solana Store para continuar.",
+      "wallet_required": "Vincule e verifique uma carteira primeiro.",
+      "genesis_token_required": "É necessário um Seeker Genesis Token verificado.",
+      "genesis_token_claimed": "Esse Seeker Genesis Token já foi resgatado.",
+      "entitlement_required": "É necessário ter o benefício Seeker verificado.",
+      "current_ownership_required": "É necessário possuir atualmente o Seeker Genesis Token."
     }
   },
   "guide": {
@@ -4118,9 +4206,9 @@ export const pt_BR: EnTranslations = {
       "craftMasteryBody": "Expectativas honestas: a escalada até o limite de 125 de um ofício exige pelo menos 125 criações bem-sucedidas, pois cada criação com ganho total move você exatamente um ponto, e na prática um pouco mais, já que as receitas perdem ganho entre os degraus do treinador. A criação em si é rápida; abastecê-la é a jornada de verdade, então reserve algumas noites dedicadas de coleta e criação por ofício.\n\nOs ofícios de coleta chegam ao limite de 100 ao longo de uma jornada de nivelamento normal se você colher enquanto viaja, embora a reta final queira os nós do nível mais alto do extremo norte. A Pesca é o caminho longo por design: pelo seu próprio ritmo de ganho, 200 de proficiência corresponde a mais de três mil capturas. Pescador Mestre é um título conquistado ao longo de uma temporada de noites tranquilas, não de um fim de semana.",
       "archetypeChooseTitle": "A carta da Guilda, e mudar de ideia",
       "archetypeChooseBody": "Você não precisa ir atrás de nada disso. Trabalhe seus ofícios, e assim que suas habilidades de artesanato mostrarem uma clara inclinação para um par, a Guilda de Artesanato percebe e envia uma carta por Corvo-Mensageiro nomeando o mestre a procurar e a missão a aceitar. Ela chega uma vez por personagem, e apenas se você ainda não tiver jurado a um par.",
-      "archetypeSwitchBody": "A declaration is not a life sentence, either. A pair you have never held is simply a fresh attunement quest, while returning to a pair you walked away from asks you to make amends first: five tasks the first time, and three more added for every return you have already made (taking up a brand-new pair never raises the count). The choice stays meaningful without ever locking a door for good.",
+      "archetypeSwitchBody": "Uma declaração também não é sentença perpétua. Um par que você nunca teve é simplesmente uma nova missão de sintonização, enquanto voltar a um par do qual você se afastou pede que você faça reparações antes: cinco tarefas na primeira vez, e mais três somadas a cada retorno que você já tenha feito (assumir um par inédito nunca aumenta a conta). A escolha continua significativa sem jamais trancar uma porta para sempre.",
       "whatHeading": "Um ofício ao lado da espada",
-      "whatBody": "Professions are the working life of the world: four gathering trades that pull raw material straight out of the land, and a ring of ten crafts that turn it into gear, meals, potions, and tools. Everything feeds something else here. The ore you mine becomes a blade, the blade takes an enchant, and the enchant needs dust broken out of old gear, so a gatherer, a crafter, and a tinkerer are all links in one chain.\n\nThere is no profession limit to agonize over. Every character can raise seven of the eight crafts that have content today and all four gathering professions side by side (Engineering is the one holdout: its recipes all start above the free ceiling, so its ladder waits for the Bombardier's oath); the only exclusive choice is your archetype, the identity you eventually swear to, though once you attune the crafts that fall dormant behind it climb only on their common recipes, and past skill 75 not at all. Skill never goes down, and nothing you learn is ever taken away.",
+      "whatBody": "As profissões são a vida de trabalho do mundo: quatro ofícios de coleta que arrancam matéria-prima direto da terra, e um anel de dez ofícios que a transformam em equipamento, refeições, poções e ferramentas. Aqui tudo alimenta outra coisa. O minério que você extrai vira uma lâmina, a lâmina recebe um encantamento, e o encantamento precisa de pó desfeito de equipamento velho, então um coletor, um artesão e um engenhoqueiro são todos elos de uma mesma corrente.\n\nNão há limite de profissões para agonizar. Todo personagem pode subir sete dos oito ofícios que têm conteúdo hoje e as quatro profissões de coleta lado a lado (a Engenharia é a única resistente: todas as receitas dela começam acima do teto livre, então a escada dela aguarda o juramento do Bombardeiro); a única escolha exclusiva é o seu arquétipo, a identidade a que você acaba jurando, embora, uma vez sintonizado, os ofícios que ficam inativos atrás dela subam apenas pelas suas receitas comuns, e acima da habilidade 75 não subam de jeito nenhum. A habilidade nunca cai, e nada do que você aprende é jamais tirado de você.",
       "ringHeading": "O anel de ofícios",
       "ringBody": "Todo ofício com conteúdo hoje tem limite de 125 de habilidade: Fabricação de Armas, Fabricação de Armaduras, Alfaiataria, Couraria, Culinária, Alquimia, Engenharia e Encantamento. No limite, o ofício continua funcionando, as coletas ainda rendem, as criações ainda se resolvem e as obras-primas ainda podem acontecer; apenas o número para de subir. Escolha uma carta abaixo para as tabelas completas de receitas e números de um ofício.",
       "ringWaveNote": "Dois ofícios na roda, Joalheria e Inscrição, mantêm seus assentos mas ainda não têm receitas. É deliberado, não uma omissão: seu conteúdo chega com zonas futuras, e os limites acima sobem da mesma forma, então um ofício no limite hoje é uma vantagem para aquela expansão, não uma linha de chegada.",
@@ -4129,7 +4217,7 @@ export const pt_BR: EnTranslations = {
       "gatherHubHeading": "Coleta",
       "gatherHubBody": "Quatro ofícios de coleta alimentam o anel a partir do campo: Mineração, Lenharia e Herborismo extraem minério, madeira e ervas da terra com limite de 100 de proficiência, enquanto a Pesca segue seu próprio ritmo de fisgar e puxar até 200. Cada página abaixo traz os mapas exatos de nós, as escadas de ferramentas e as probabilidades.",
       "archetypesHeading": "A roda e seus arquétipos",
-      "archetypesBody": "The ten crafts sit on a fixed wheel, and geography on that wheel matters. Every two neighbors form a named pair: Smith for Weaponcrafting and Armorcrafting, Outfitter for Leatherworking and Tailoring, Apothecary for Alchemy and Cooking, Bombardier for Engineering and Alchemy, and six more around the ring.\n\nAttuning to a pair is a quest, not a menu click. Four pairs can be joined today (Smith, Outfitter, Apothecary, and Bombardier), each anchored by a resident master in Eastbrook whose acceptance quest states the whole bargain up front before you take it. Until you declare, every craft advances freely on recipes up through the rare tier (any recipe asking skill 74 or less), so you can try nearly everything before you choose (Engineering alone has no recipe that low, so its number waits).\n\nOnce you attune, your two pair crafts become your majors, with no ceiling short of the cap. The rest of the wheel does not go dark: one craft opposite your majors stays on as a hobby that keeps climbing through the rare tier (a repeatable quest at Smith Haldren's forge lets you swap which one), and every other craft goes dormant. A dormant craft keeps its skill and its common recipes, which keep teaching it on the normal curve until they gray at 75; everything above common stops paying at once, and a dormant craft never turns out a masterwork while it rests.",
+      "archetypesBody": "Os dez ofícios ficam em uma roda fixa, e a geografia dessa roda importa. Cada dois vizinhos formam um par com nome próprio: Ferreiro para Forja de Armas e Forja de Armaduras, Equipador para Couraria e Alfaiataria, Apotecário para Alquimia e Culinária, Bombardeiro para Engenharia e Alquimia, e mais seis ao redor do anel.\n\nSintonizar-se com um par é uma missão, não um clique de menu. Quatro pares podem ser assumidos hoje (Ferreiro, Equipador, Apotecário e Bombardeiro), cada um ancorado por um mestre residente em Eastbrook cuja missão de aceitação declara todo o acordo de antemão, antes de você aceitá-la. Até você se declarar, todo ofício avança livremente em receitas até o nível raro (qualquer receita que peça habilidade 74 ou menos), então você pode experimentar quase tudo antes de escolher (só a Engenharia não tem nenhuma receita tão baixa, então o número dela espera).\n\nUma vez sintonizado, os dois ofícios do seu par viram os seus principais, sem nenhum teto aquém do limite. O resto da roda não apaga: um ofício oposto aos seus principais continua aceso como passatempo e segue subindo até o nível raro (uma missão repetível na forja do Ferreiro Haldren permite trocar qual deles é), e todo ofício restante fica inativo. Um ofício inativo mantém a sua habilidade e as suas receitas comuns, que continuam a ensiná-lo pela curva normal até ficarem cinzas em 75; tudo acima do comum para de pagar de imediato, e um ofício inativo nunca produz uma obra-prima enquanto descansa.",
       "pairFmt": "{a} e {b}",
       "curveHeading": "A Curva de Maestria",
       "curveBody": "O ganho de habilidade segue uma regra em todo lugar, a Curva de Maestria de quatro estados. Cada {step} pontos de habilidade é um nível, e cada receita é avaliada em relação ao seu: no seu nível ou acima concede ganho total, um nível abaixo concede metade, dois abaixo um quarto, e três ou mais abaixo nada.\n\nA janela de criação pinta isso diretamente na lista de receitas nas cores clássicas: laranja para ganho total, amarelo para reduzido, verde para um fio, cinza para nenhum. Os ganhos são determinísticos, nunca uma rolagem de aumento de habilidade, então o mesmo ofício no mesmo nível sempre move sua habilidade exatamente a mesma quantidade, e uma receita virando amarelo é seu sinal para treinar o próximo degrau.\n\nA coleta funciona pela mesma curva com o mesmo passo de nível, avaliada contra o nó em vez de uma receita: nós fáceis ficam cinza conforme você os supera, e os nós mais ricos das zonas posteriores são o que termina uma escalada. A Pesca mantém sua própria tabela: um ponto inteiro por captura abaixo de 50 de proficiência, metade até 100, um décimo até 150, e uma cauda lenta até 200, com capturas de tralha sem ensinar nada a partir de 100.",
@@ -4140,7 +4228,7 @@ export const pt_BR: EnTranslations = {
       "deedsHeading": "Feitos que lembram a jornada",
       "deedsBody": "O Livro dos Feitos caminha ao lado de cada passo disso. Sua primeira sintonização conquista Jurado do Ofício e sua primeira obra-prima conquista Mestre Artesão, ambos usáveis como títulos. Cada um dos oito ofícios que podem ser conquistados marca um feito de marco nos 50 de habilidade e coroa seu limite com um título de Grão-Mestre, enquanto a Pesca recebe Sal Velho aos 100 de proficiência e o título de Pescador Mestre aos 200.\n\nHá páginas mais discretas também: feitos para sua primeira coleta e primeira criação, pelos achados raros que a sorte traz no campo, e por começar a desmontar. Tudo é cosmético, apenas títulos e Renome. Um feito nunca concede poder; ele apenas prova que você esteve lá.",
       "startHeading": "Por onde começar",
-      "startBody": "Fresh off the road in Eastbrook? Find Foreman Odell and take A Trade for Every Hand: he will point you at the ore veins around the Copper Dig southeast of town and hand you your first calluses. Mind the dig itself: the Deeprock Diggers camped on it stand a few levels above a fresh arrival, so work the outlying veins first and save the camp's heart for when you have leveled a little. From then on, harvest every vein, timber stand, and herb patch you pass while questing; proficiency comes naturally to travelers.\n\nBack in town, press T to open the crafting window and work the common recipes every character knows from the start. Visit the masters at the forge, kitchens, loom, and toolworks to see what they teach, and take their work orders for steady coin. By the time the Guild's letter finds you, you will already know which pair feels like home.",
+      "startBody": "Recém-chegado de estrada em Eastbrook? Procure o Capataz Odell e aceite Um ofício para cada mão: ele vai apontar você para os veios de minério ao redor da Escavação de Cobre, a sudeste da cidade, e te entregar os seus primeiros calos. Cuidado com a escavação em si: os Escavadores de Deeprock acampados nela estão alguns níveis acima de um recém-chegado, então trabalhe primeiro os veios das bordas e deixe o coração do acampamento para quando você tiver subido um pouco de nível. Dali em diante, colha todo veio, arvoredo e canteiro de ervas por que passar enquanto faz missões; a proficiência vem naturalmente para quem viaja.\n\nDe volta à cidade, aperte T para abrir a janela de criação e trabalhe as receitas comuns que todo personagem conhece desde o início. Visite os mestres na forja, nas cozinhas, no tear e na oficina de ferramentas para ver o que eles ensinam, e aceite as encomendas de trabalho deles para uma renda constante. Quando a carta da Guilda te encontrar, você já vai saber qual par parece ser a sua casa.",
       "colStation": "Bancada",
       "colHub": "Centro",
       "colMaster": "Mestre",
@@ -4185,27 +4273,27 @@ export const pt_BR: EnTranslations = {
         "leatherworking": "A Couraria curtimenta equipamentos de Agilidade e Vigor para as classes que esquivam em vez de bloquearem, das básicas de couro de Fenbridge ao raro conjunto do guardião do brejo, e é o único ofício profundo treinado lá no pântano.",
         "cooking": "A Culinária transforma a pescaria do dia em refeições que curam ao longo de 18 segundos de descanso, a cura mais barata do jogo, do Carne Seca Salgada até o Grande Assado de Marlow. Todo mundo come, então nenhum ofício é mais universalmente bem-vindo em um grupo.",
         "alchemy": "A Alquimia transforma ervas, glândulas e vidro em garrafas que viram batalhas: poções de cura e mana para quando as coisas dão errado, e elixires de vigor que permanecem na sua barra de bônus por uma masmorra inteira.",
-        "engineering": "Engineering builds the tools every serious gatherer ends up wanting: the tier 4 and tier 5 picks, axes, sickles, and fishing rods that no counter will ever sell for coin, each one consuming the tool below it.",
-        "enchanting": "Enchanting takes gear apart and puts the power back in: break unwanted pieces into arcane materials, then spend them on a permanent stat bonus for a piece you mean to keep. Breaking and enchanting need no station and no trainer, and anyone can start on day one; only the two charm recipes ask more, taught at the toolworks."
+        "engineering": "A Engenharia constrói as ferramentas que todo coletor sério acaba querendo: as picaretas, machados, foices e varas de pesca de nível 4 e nível 5 que nenhum balcão jamais venderá por moedas, cada uma consumindo a ferramenta abaixo dela.",
+        "enchanting": "O Encantamento desmonta o equipamento e devolve o poder a ele: desfaça as peças indesejadas em materiais arcanos e gaste-os em um bônus permanente de atributo para uma peça que você pretende guardar. Desfazer e encantar não pedem bancada nem treinador, e qualquer um pode começar no primeiro dia; só as duas receitas de amuleto exigem mais, ensinadas na oficina de ferramentas."
       },
       "craftProse": {
         "weaponcrafting": {
           "identityHeading": "O fio que todo combatente procura",
           "identityBody": "Alguém em todo grupo quer o trabalho deste ofício, pois somente o degrau raro cobre os três gostos: a Lâmina de Guerra de Ósmio para corpo a corpo de Força, o Machado de Guerra de Glifaço para combatentes de Agilidade e o Cajado de Batalha de Pinheiro Alto, um cajado de Intelecto e Espírito para a turma dos mantos.\n\nNa roda de ofícios fica entre Forja de Armaduras e Joalheria. Sua identidade ativa é o Ferreiro, o par de Forja de Armas e Forja de Armaduras, jurado diante da Mestra da Forja Darva na forja ao trabalhar três veios de minério com suas próprias mãos; o par Mestre das Lâminas com Joalheria também existe na roda, mas ainda não pode ser jurado, pois a Joalheria não terá receitas até uma expansão de zona futura.",
           "materialsHeading": "O que a forja consome",
-          "materialsBody": "Mining is the backbone. Copper ore comes off the tier 1 veins of Eastbrook Vale, iron ore from Mirefen Marsh, and osmium ore from Thornpeak Heights, and each rung of the ladder steps up the same way. Logging matters more than you might expect: ironbark hafts the boar spear, ashwood shoulders the maul, and a single highpine log forms the battle staff.\n\nThe rest comes from the hunt and the counter. Rough hide for grips is harvested straight off wolf and boar corpses, bone fragments come off the restless dead or out of salvaged common gear, and the forge ladder burns Smithing Flux, 20 copper a jar from Darva herself. If your own mining lags behind, no counter will save you on the ore itself: osmium comes off the Thornpeak veins, off the starter veins of every younger zone but the Farshore (whose veins dig iron), or out of another player's stack, by trade or the World Market. Only the Glyphsteel Bar is bought for coin, from Tinker Gizzel at the toolworks or Quartermaster Bree in Highwatch.",
+          "materialsBody": "A Mineração é a espinha dorsal. O minério de cobre sai dos veios de nível 1 do Vale de Eastbrook, o minério de ferro do Pântano de Mirefen e o minério de ósmio das Alturas de Thornpeak, e cada degrau da escada sobe do mesmo jeito. A Lenharia importa mais do que você imagina: a casca de ferro dá o cabo da lança de javali, o freixo cinza sustenta o malho, e uma única tora de pinheiro alto forma o cajado de batalha.\n\nO resto vem da caçada e do balcão. A pele áspera para os punhos é colhida direto de cadáveres de lobos e javalis, os fragmentos de osso saem dos mortos inquietos ou de equipamento comum salvado, e a escada da forja queima Flux de Ferreiro, 20 cobre o pote com a própria Darva. Se a sua mineração ficar para trás, nenhum balcão o salvará quanto ao minério em si: o ósmio sai dos veios de Thornpeak, dos veios iniciais de toda zona mais nova exceto a Farshore (cujos veios extraem ferro), ou da pilha de outro jogador, por negociação ou pelo Mercado Mundial. Só a Barra de Glifaço se compra por moedas, com o Engenhoqueiro Gizzel na oficina de ferramentas ou com a Intendente Bree em Highwatch.",
           "ladderHeading": "A escada, degrau por degrau",
           "ladderBody": "Uma receita de campo, a Espada de Armar de Eastbrook, é conhecida por todos desde o início e pode ser criada em qualquer lugar a partir de restos de caça (algumas presas de lobo e fragmentos de osso) mais seis Flux de Ferreiro do balcão da forja. A escada de verdade são nove receitas de treinador em três degraus, todas vinculadas à forja: o degrau de cobre (machado barbado, maça com flanges, lança de javali) é gratuito na habilidade 0, o degrau de ferro (espada longa, maça de guerra, adaga) abre na habilidade 25 por 25 prata por receita, e o degrau de ósmio (lâmina de guerra, machado de guerra, cajado de batalha) abre na habilidade 50 por 1 ouro cada. Darva ensina uma receita assim que seu nível no ofício alcança o degrau dela, então cada degrau desbloqueia exatamente quando sua faixa de habilidade começa.\n\nMais uma receita carrega o par: as Manoplas do Gravewyrm, uma peça combinada ensinada pelo treinador que só um Ferreiro sintonizado com Forja de Armas e Forja de Armaduras ambos na habilidade 25 pode trabalhar, e não precisa de bancada alguma.",
           "routeHeading": "Obras-primas e um roteiro funcional até 125",
-          "routeBody": "Any piece with a real stat line, which on this ladder means the iron rung and up, can come off the anvil as a masterwork so long as the finer quality fits inside your tier ceiling; the statless copper commons never proc, because there is nothing in them to improve. Iron and osmium count as tier 1 materials for the masterwork bonus, highpine and glyphsteel as tier 2, and skill sitting above a recipe's own tier adds its own point per tier, so among the osmium three it is the war axe and the battle staff that carry the material edge, and a rung keeps proccing better after you have outgrown it.\n\nRide the copper rung to 25, train the iron rung the day it opens and ride it to 50, then the osmium rung to 75. Past 75 nothing higher ships yet, so the osmium recipes fade to half and then quarter gain: budget roughly 150 more crafts to reach the 125 cap, and remember the shared throttle of ten craft actions per minute when you sit down to batch.\n\nFund the climb as you go: Darva's forge work order takes eight copper ore off your hands every 30 minutes for a little coin and XP, and the iron and osmium rungs sell honestly to leveling melee. The Book of Deeds marks Edge and Temper at skill 50 and crowns Grandmaster Weaponcrafting at 125."
+          "routeBody": "Qualquer peça com uma linha de atributo de verdade, o que nesta escada significa do degrau de ferro para cima, pode sair da bigorna como obra-prima, desde que a qualidade superior caiba dentro do teto do seu nível; os campos comuns de cobre sem atributos nunca geram proc, porque não há nada neles para melhorar. Ferro e ósmio contam como materiais de nível 1 para o bônus de obra-prima, pinheiro alto e glifaço como nível 2, e a habilidade acima do nível da própria receita acrescenta seu próprio ponto por nível, então, entre os três de ósmio, são o machado de guerra e o cajado de batalha que carregam a vantagem de material, e um degrau continua gerando proc melhor depois que você já o superou.\n\nCavalgue o degrau de cobre até 25, treine o degrau de ferro no dia em que ele abrir e siga nele até 50, depois o degrau de ósmio até 75. Passado o 75 nada mais alto existe ainda, então as receitas de ósmio desvanecem para metade e depois um quarto do ganho: reserve aproximadamente 150 criações a mais para alcançar o limite de 125, e lembre do limitador compartilhado de dez ações de criação por minuto quando sentar para produzir em lote.\n\nFinancie a escalada pelo caminho: a ordem de serviço da forja de Darva tira oito minérios de cobre das suas mãos a cada 30 minutos por umas moedas e EXP, e os degraus de ferro e ósmio vendem honestamente para o corpo a corpo em nivelamento. O Livro dos Feitos marca Fio e Têmpera na habilidade 50 e coroa o Grão-Mestre em Forja de Armas no 125."
         },
         "armorcrafting": {
           "identityHeading": "Malha para a linha de frente",
-          "identityBody": "Armorcrafting's ladder reads like a soldier's career: the plain riveted copper girdle, sabatons, and gauntlets to start, the ironlink hauberk, legguards, and spaulders with their first real stat lines, and the rare osmiumscale greathelm, cuirass, and leggings, Strength and Stamina pieces with armor numbers at the very top of a crafter's art.\n\nIt has a quieter side too: the Eastbrook Warded Leggings, a caster-statted field common, and the Kilnscale Mantle, a rare Intellect and Spirit mail shoulder at skill 75, keep the spell-minded mail wearers on the customer list. On the ring it sits between Weaponcrafting and Engineering; the Smith pair with Weaponcrafting is sworn before Forgemistress Darva, while the Gearwright pair with Engineering is named but has no oath quest yet.",
+          "identityBody": "A escada da Forja de Armaduras se lê como a carreira de um soldado: o simples cinturão de cobre rebitado, os escarpes e as manoplas para começar, a cota, as grevas e as espaldeiras de elos de ferro com suas primeiras linhas de atributo de verdade, e o raro grande elmo, a couraça e as perneiras de escama de ósmio, peças de Força e Vigor com números de armadura no ponto mais alto da arte de um artesão.\n\nEla tem um lado mais discreto também: as Calças Protegidas de Eastbrook, um campo comum com atributos de conjurador, e o Manto de Escamas de Forno, uma ombreira de malha rara de Intelecto e Espírito na habilidade 75, mantêm os usuários de malha de vocação mágica na lista de clientes. Na roda ela fica entre Forja de Armas e Engenharia; o par Ferreiro com Forja de Armas é jurado diante da Forjadora Darva, enquanto o par Mestre das Engrenagens com Engenharia existe na roda mas ainda não tem missão de juramento.",
           "materialsHeading": "Minério aos sacos",
-          "materialsBody": "No craft eats ore faster. The ironlink hauberk alone takes five iron ore, and every osmiumscale piece wants three or four osmium plus a glyphsteel bar, so a serious armorcrafter mines Mirefen Marsh and Thornpeak Heights or pays someone who does. Copper feeds the first rung, straight from the veins by the Copper Dig.\n\nAround the metal go the soft parts: rough hide harvested off wolf and boar corpses, bone fragments off the restless dead (or salvaged out of common gear), and Smithing Flux jars (20 copper each at the forge) in nearly every recipe. No counter sells osmium: the impatient buy it off other players or mine it themselves, on Thornpeak or the starter veins of ten of the eleven younger zones (the Farshore alone digs iron).",
+          "materialsBody": "Nenhum ofício devora minério mais rápido. Só a cota de elos de ferro consome cinco minérios de ferro, e cada peça de escama de ósmio quer três ou quatro de ósmio mais uma barra de glifaço, então um forjador de armaduras sério minera o Pântano de Mirefen e as Alturas de Thornpeak ou paga quem o faça. O cobre alimenta o primeiro degrau, direto dos veios junto à Escavação de Cobre.\n\nEm volta do metal vão as partes moles: pele áspera colhida de cadáveres de lobos e javalis, fragmentos de osso dos mortos inquietos (ou salvados de equipamento comum), e potes de Flux de Ferreiro (20 cobre cada na forja) em quase toda receita. Nenhum balcão vende ósmio: os impacientes compram de outros jogadores ou mineram eles mesmos, em Thornpeak ou nos veios iniciais de dez das onze zonas mais novas (só a Farshore extrai ferro).",
           "ladderHeading": "Aprendendo na forja de Darva",
-          "ladderBody": "Two field commons, the Eastbrook Chainmail Vest and the Warded Leggings, are known from the start and craft anywhere. The trainer ladder is nine recipes in three rungs at the Eastbrook forge: the copper rung is free at skill 0, the ironlink rung costs 25 silver a recipe at skill 25, and the osmiumscale rung costs 1 gold each at skill 50, with each rung teachable the moment your tier reaches it.\n\nBeyond the ladder sit two specials. The Boundstone Helm is one of the two Smith combination recipes (the Gravewyrm Gauntlets are its sibling on the weaponcrafting side), trainer-taught, station-free, and workable only by an attuned Smith with both crafts at skill 25. The Kilnscale Mantle needs no teacher at all: everyone knows it from the start, and nothing but the forge and the materials gates working it. Its listed skill of 75 is about gain, not permission: with Armorcrafting as a major it pays full skill gain from the very first hammer stroke to 99, so a Smith with osmium to spare can lean on it early. Below a major's ceiling the tier 3 recipe teaches nothing, so an undeclared or hobby armorcrafter works it for the piece, not the points.",
+          "ladderBody": "Dois campos comuns, o Colete de cota de Eastbrook e as Calças Protegidas, são conhecidos desde o início e podem ser criados em qualquer lugar. A escada do treinador são nove receitas em três degraus na forja de Eastbrook: o degrau de cobre é gratuito na habilidade 0, o degrau de elos de ferro custa 25 prata por receita na habilidade 25, e o degrau de escama de ósmio custa 1 ouro cada na habilidade 50, com cada degrau ensinável no instante em que seu nível o alcança.\n\nAlém da escada ficam duas peças especiais. O Elmo Pedra-vínculo é uma das duas receitas combinadas do Ferreiro (as Manoplas do Gravewyrm são sua irmã do lado da Forja de Armas), ensinada pelo treinador, sem bancada, e trabalhável somente por um Ferreiro sintonizado com os dois ofícios na habilidade 25. O Manto de Escamas de Forno não precisa de professor nenhum: todos o conhecem desde o início, e nada além da forja e dos materiais barra o seu trabalho. Sua habilidade listada de 75 é sobre ganho, não sobre permissão: com a Forja de Armaduras como ofício principal, ele paga ganho total de habilidade desde a primeira martelada até 99, então um Ferreiro com ósmio de sobra pode se apoiar nele cedo. Abaixo do teto de um ofício principal a receita de nível 3 não ensina nada, então um forjador de armaduras não declarado ou de passatempo a trabalha pela peça, não pelos pontos.",
           "routeHeading": "Obras-primas e um caminho funcional até o 125",
           "routeBody": "Do degrau de elos de ferro para cima, toda criação tem chance de gerar obra-prima; os campos comuns de cobre exclusivos de armadura não podem gerar, pois uma obra-prima melhora atributos e eles não têm nenhum. O ferro conta como material de nível 1 para o proc e o glifaço como nível 2.\n\nA escalada é a clássica de três degraus: cobre até 25, elos de ferro até 50, escama de ósmio até 75, treinando cada degrau no dia em que abre. Onde a Forja de Armaduras tem sorte é no trecho após o 75: o Manto de Escamas de Forno é uma receita de nível 3, então paga ganho total até 99 e metade depois, o que significa que os últimos cinquenta pontos levam cerca de 75 criações em vez das 150 que um ofício sem obra máxima precisaria. Cada manto custa sete minérios de ósmio e cinco Flux de Ferreiro, então estoque em Thornpeak e no balcão da forja antes de começar.\n\nA ordem de serviço de Darva compra oito minérios de cobre a cada 30 minutos por moedas e EXP, um bom destino para o minério de baixo nível que você supera. O Livro de Feitos marca Martelo e Placa na habilidade 50, e Grão-Mestre em Forja de Armaduras espera no limite de 125."
         },
@@ -4223,17 +4311,17 @@ export const pt_BR: EnTranslations = {
           "identityHeading": "Couro para os ágeis",
           "identityBody": "A escada sobe das simples perneiras, botas e cinto de couro de Fenbridge pelos incomuns gibão, capuz e espaldeira do espreitador do brejo até o raro conjunto do guardião do brejo, o melhor couro que um artesão pode cortar. Duas peças para conjuradores completam o conjunto: o campo comum Couro de Druida de Eastbrook e as Faixas de Couro do Crepúsculo na habilidade 75.\n\nNa roda fica entre Culinária e Alfaiataria. Seu par ativo é o Equipador, Couraria e Alfaiataria, jurado diante da Tecelã Ottilie em Eastbrook; o par Caçador com Culinária existe na roda mas ainda não tem missão de juramento.",
           "materialsHeading": "A caçada é a colheita",
-          "materialsBody": "Leatherworking is the craft where your leveling route and your supply line are the same thing: rough hide is harvested straight off hide-bearing corpses, wolves and boars above all, and each corpse serves one harvester only, first come first served. A rare or better harvest roll also grants a Pristine Hide, a signed specimen the Mirewarden Jerkin calls for, so bank every one you find.\n\nThe supporting cast is small: spider legs and silk, homespun cloth off humanoids, a single osmium ore in each mirewarden rare piece (six in the Duskhide Wraps capstone), and a Tanning Agent at 16 copper from the tannery counter. Osmium itself is never counter-bought: mine it yourself, on Thornpeak or nearly any younger zone's starter veins (the Farshore alone digs iron), or buy it off another player.",
+          "materialsBody": "A Couraria é o ofício em que sua rota de nivelamento e sua linha de suprimento são a mesma coisa: a pele áspera é colhida direto de cadáveres que carregam couro, lobos e javalis acima de tudo, e cada cadáver serve a um único coletor, por ordem de chegada. Uma rolagem de colheita rara ou melhor também concede um Couro Imaculado, o espécime assinado que o Gibão do Guardião do Brejo exige, então guarde no banco cada um que encontrar.\n\nO elenco de apoio é pequeno: pernas e seda de aranha, pano feito em casa de humanoides, um único minério de ósmio em cada peça rara do guardião do brejo (seis nas Faixas de Couro do Crepúsculo, a obra máxima), e um Agente de curtimento a 16 cobre no balcão do curtume. O ósmio em si nunca se compra no balcão: minere você mesmo, em Thornpeak ou nos veios iniciais de quase qualquer zona mais nova (só a Farshore extrai ferro), ou compre de outro jogador.",
           "ladderHeading": "Treinado em Fenbridge",
-          "ladderBody": "Here is the wrinkle: the tannery stands in Fenbridge, on the Mirefen Marsh road, making Leatherworking the one deep craft trained out in the marsh. Tanner Hesk teaches the ladder at his vats: the Fenbridge hide rung free at skill 0, the marshstalker rung at 25 silver a recipe from skill 25, and the mirewarden rung at 1 gold each from skill 50, each rung opening as your tier reaches it.\n\nThree recipes skip the trainer: the field commons (the Tanned Leather Jerkin and Eastbrook Druid's Hide) craft anywhere from the start, and the Duskhide Wraps are known to everyone but sit at skill 75, tannery-bound. Note that the Outfitter oath itself is sworn back in Eastbrook with Ottilie; only the teaching happens in the marsh.",
+          "ladderBody": "Aqui está a peculiaridade: o curtume fica em Fenbridge, na estrada do Pântano de Mirefen, o que faz da Couraria o único ofício profundo treinado lá no pântano. O Curtidor Hesk ensina a escada junto aos seus tanques: o degrau de couro de Fenbridge, gratuito na habilidade 0, o degrau do espreitador do pântano a 25 prata por receita a partir da habilidade 25, e o degrau do guardião do brejo a 1 ouro cada a partir da habilidade 50, cada degrau abrindo conforme seu nível o alcança.\n\nTrês receitas pulam o treinador: os campos comuns (o Gibão de couro curtido e o Couro do Druida de Eastbrook) são criados em qualquer lugar desde o início, e as Faixas de Couro do Crepúsculo são conhecidas por todos, mas ficam na habilidade 75, presas ao curtume. Note que o juramento de Equipador em si é feito de volta em Eastbrook, com Ottilie; só o ensino acontece no pântano.",
           "routeHeading": "Obras-primas e um caminho funcional até o 125",
-          "routeBody": "Any piece with real stats rolls the masterwork chance so long as the finer quality fits inside your tier ceiling, the statted Eastbrook Druid's Hide included, and a signed Pristine Hide in a Mirewarden Jerkin provides the signed-reagent bonus automatically; osmium counts as a tier 1 material for the proc. The statless hide commons cannot proc.\n\nLevel it the natural way: harvest every wolf and boar you kill from level one, let the two field commons carry you to 25 wherever you stand, then train the hide rung at the vats when the quests pull you into the marsh anyway. Marshstalker carries you to 50 and mirewarden to 75; past that the Duskhide Wraps, a tier 3 recipe at six osmium ore, three Pristine Hide, two rough hide, and a Tanning Agent, pays an attuned Outfitter full gain to 99 and half after, about 75 crafts for the final fifty points to the 125 cap; below a major's ceiling the tier 3 recipe teaches nothing.\n\nThe mobile tannery matters more for this craft than any other: specialize at 75 and a saddlebag of hides becomes finished gear at the campfire instead of a walk back to Fenbridge. Hesk's tannery work order buys eight rough hides every 30 minutes, a tidy return on skins you were collecting regardless, and the Book of Deeds marks Tanner's Trade at skill 50 with Grandmaster Leatherworking at the cap."
+          "routeBody": "Qualquer peça com atributos de verdade rola a chance de obra-prima, desde que a qualidade superior caiba dentro do teto do seu nível, incluído o Couro do Druida de Eastbrook com atributos, e um Couro Imaculado assinado em um Gibão do Guardião do Brejo já garante o bônus de reagente assinado automaticamente; o ósmio conta como material de nível 1 para o proc. Os couros comuns sem atributos não podem gerar proc.\n\nSuba pelo caminho natural: colha cada lobo e cada javali que você abater desde o nível um, deixe os dois campos comuns o levarem até 25 onde quer que você esteja, e então treine o degrau de couro junto aos tanques quando as missões o puxarem para o pântano de qualquer jeito. O espreitador do pântano o leva a 50 e o guardião do brejo a 75; passado isso, as Faixas de Couro do Crepúsculo, uma receita de nível 3 a seis minérios de ósmio, três Couros Imaculados, duas peles ásperas e um Agente de curtimento, pagam a um Equipador sintonizado ganho total até 99 e metade depois, cerca de 75 criações para os cinquenta pontos finais até o limite de 125; abaixo do teto de um ofício principal a receita de nível 3 não ensina nada.\n\nO curtume móvel importa mais para este ofício do que para qualquer outro: especialize-se aos 75 e um alforje de peles vira equipamento acabado na fogueira em vez de uma caminhada de volta a Fenbridge. A ordem de serviço do curtume de Hesk compra oito peles ásperas a cada 30 minutos, um retorno bonito sobre couros que você estava recolhendo de qualquer forma, e o Livro dos Feitos marca O Ofício do Curtidor na habilidade 50, com Grão-Mestre em Couraria no limite."
         },
         "cooking": {
           "identityHeading": "A panela que alimenta o grupo",
-          "identityBody": "Eat a cooked meal and it heals you over 18 seconds of rest, which between pulls is the cheapest healing in the game. The ladder runs from a 90-health Pan-Seared River Perch all the way to Marlow's Grand Roast at 980, a sit-heal nothing in the game beats.\n\nOn the ring Cooking sits between Alchemy and Leatherworking. Its living pair is the Apothecary, Alchemy and Cooking, sworn before Cook Marlow at the Eastbrook kitchens after hunting four wild boars for the pot; the Trapper pair with Leatherworking is named on the ring but has no oath quest yet.",
+          "identityBody": "Coma uma refeição preparada e ela cura você ao longo de 18 segundos de descanso, o que entre uma puxada e outra é a cura mais barata do jogo. A escada vai da Perca do rio grelhada na frigideira, com 90 de vida, até o Grande Assado de Marlow, com 980, uma cura sentada que nada no jogo supera.\n\nNa roda, a Culinária fica entre Alquimia e Couraria. Seu par ativo é o Apotecário, Alquimia e Culinária, jurado diante do Cozinheiro Marlow nas cozinhas de Eastbrook depois de caçar quatro javalis selvagens para a panela; o par Caçador com Couraria existe na roda mas ainda não tem missão de juramento.",
           "materialsHeading": "Uma despensa abastecida por vara e faca",
-          "materialsBody": "Fishing stocks the signature ingredients, zone by zone: mirror trout and river perch from the waters of Eastbrook Vale, marsh pike and bog eel from Mirefen Marsh, frostgill trout and slatefin carp from Thornpeak Heights. The rungs mix the zones freely (the free rung already wants marsh pike, the mid rung Thornpeak's frostgill, and the rare supper folds the Vale's mirror trout back in), so a cook who fishes wherever the road goes never runs dry.\n\nThe butcher's side comes off harvested corpses: game meat from boars and their kin, and, on a rare or better harvest roll, a signed Prime Cut, the centerpiece of the grand roast. Herbs season the better dishes, one ashwood log smokes the eel, and Cooking Salt runs 8 copper a pouch from Marlow's own stall.",
+          "materialsBody": "A Pesca abastece os ingredientes marcantes, zona por zona: truta-espelho e perca de rio das águas do Vale de Eastbrook, lúcio de pântano e enguia de brejo do Pântano de Mirefen, truta de guelras gélidas e carpa de barbatana de ardósia das Alturas de Thornpeak. Os degraus misturam as zonas à vontade (o degrau gratuito já pede lúcio de pântano, o degrau do meio a guelra gélida de Thornpeak, e a ceia rara traz de volta a truta-espelho do Vale), então um cozinheiro que pesca onde quer que a estrada vá nunca fica sem.\n\nO lado do açougue vem dos cadáveres colhidos: carne de caça de javalis e seus parentes e, numa rolagem de colheita rara ou melhor, um Corte Principal assinado, a peça central do grande assado. Ervas temperam os pratos melhores, uma tora de freixo cinza defuma a enguia, e o Sal de cozinha sai a 8 cobre o saquinho na própria banca de Marlow.",
           "ladderHeading": "Da carne seca ao grande assado",
           "ladderBody": "Carne Seca Salgada é a receita de campo: conhecida desde o início, uma perna de aranha, preparável em qualquer lugar, o alimento de trilha de todo aventureiro recente. A escada do treinador cozinha nas cozinhas de Eastbrook no lado leste da praça: o degrau gratuito na habilidade 0 (o peixe, o Espeto de Caça do Caçador, o Pique do Pântano Temperado com Ervas), o degrau do meio na habilidade 25 por 25 prata por receita (Enguia Defumada de Freixo, Ensopado de Caça com Folha Dourada, Chowder Geladinha), e o degrau raro na habilidade 50 por 1 ouro cada (Jantar de Carpa Prateada, Prato de Festa do Pescador, Grande Assado de Marlow).\n\nOs pratos em lote esticam seus ingredientes: a enguia defumada e o ensopado servem dois por criação, e o prato de festa serve três. Marlow ensina cada degrau assim que seu nível em Culinária o alcança.",
           "routeHeading": "Especialização, não obras-primas, e o caminho até o 125",
@@ -4241,43 +4329,43 @@ export const pt_BR: EnTranslations = {
         },
         "alchemy": {
           "identityHeading": "Garrafas que viram batalhas",
-          "identityBody": "The craft is worked at the apothecary in Highwatch, home of Alchemist Verane, Master of the Apothecary, who teaches the recipe ladder, sells Glass Vials at 12 copper, and pays coin for herbs through her work order.\n\nOn the craft ring, Alchemy sits with the trial-and-error trades, next to Engineering on one side and Cooking on the other. That gives it two pair identities: the Bombardier (Engineering and Alchemy, taken up before Tinker Gizzel in Eastbrook) and the Apothecary (Alchemy and Cooking, sworn before Cook Marlow). Attune to either pair to make Alchemy a major and let your own signed work teach you back; the Bombardier pair also opens its combination brew, the Elixir of the Bear, while the Apothecary pair ships no combination recipe yet. The ladder itself never waits, though, because every Alchemy recipe sits inside the rare tier that undeclared crafts work under, so the whole climb to the cap is open before any oath.",
+          "identityBody": "O ofício é trabalhado no boticário de Highwatch, casa da Alquimista Verane, Mestre do Boticário, que ensina a escada de receitas, vende Frascos de Vidro a 12 cobre e paga moedas por ervas através da sua ordem de serviço.\n\nNo anel de ofícios, a Alquimia fica com os ofícios de tentativa e erro, ao lado da Engenharia de um lado e da Culinária do outro. Isso lhe dá duas identidades de par: o Bombardeiro (Engenharia e Alquimia, assumido diante do Engenhoqueiro Gizzel em Eastbrook) e o Apotecário (Alquimia e Culinária, jurado diante do Cozinheiro Marlow). Sintonize-se com qualquer um dos pares para tornar a Alquimia um ofício principal e deixar que seu próprio trabalho assinado lhe ensine de volta; o par Bombardeiro também abre sua beberagem combinada, o Elixir do Urso, enquanto o par Apotecário ainda não traz receita combinada nenhuma. A escada em si nunca espera, porém, porque toda receita de Alquimia fica dentro do nível raro sob o qual os ofícios não declarados trabalham, então toda a escalada até o limite está aberta antes de qualquer juramento.",
           "materialsHeading": "Ervas, glândulas e vidro",
           "materialsBody": "Cada poção precisa de um Frasco de Vidro mais ervas compatíveis com o seu degrau: folha reluzente cresce em Eastbrook Vale, folha dourada no Pântano Mirefen e pétala solar nos Picos de Thornpeak, uma erva por zona, então suas garrafas sobem pelo mundo junto com você. Herbalismo é a habilidade parceira natural, embora comprar de coletores ou no mercado funcione igualmente bem; zonas mais profundas têm canteiros de nível superior que exigem uma foice melhor, então mantenha sua ferramenta atualizada se você mesmo colher.\n\nA linha de elixires acrescenta um ingrediente de caçador: Glândulas de Veneno colhidas de cadáveres venenosos, e o elixir topo de linha pede uma Glândula de Veneno Imaculada, o raro espécime assinado que uma colheita de sorte pode entregar. Se você não faz sua própria colheita, esses são exatamente os itens que vale a pena pedir a um amigo caçador para trazer.",
           "ladderHeading": "A escada de receitas",
-          "ladderBody": "Everyone knows the Minor Healing Potion from the start and can mix it anywhere, no station needed. The real ladder is nine recipes taught by Verane at the apothecary, three at each rung: the skill 0 recipes are free, the skill 25 rung costs 25 silver per recipe, and the skill 50 rung costs 1 gold per recipe. Each rung is a healing draught, a mana draught, and a stamina elixir, stepping from common sheenleaf bottles (120 health, 160 mana) through uncommon goldleaf (200 health, 260 mana) to rare sunpetal (280 health, 360 mana).\n\nThe elixirs climb the same way: the Elixir of the Boar grants 6 Stamina for 10 minutes, the Vipersear Elixir 9 for 15 minutes, and the Elixir of the Serpent 12 for 15 minutes, the Serpent alone brewing two bottles per craft. One more recipe sits off to the side: the Elixir of the Bear, a combination brew Verane teaches for 25 silver once your Alchemy reaches 25, mixable anywhere, but only by an attuned Bombardier with both Alchemy and Engineering at 25.",
+          "ladderBody": "Todo mundo conhece a Poção menor de cura desde o início e pode misturá-la em qualquer lugar, sem bancada nenhuma. A escada de verdade são nove receitas ensinadas por Verane no boticário, três em cada degrau: as receitas de habilidade 0 são gratuitas, o degrau de habilidade 25 custa 25 prata por receita, e o degrau de habilidade 50 custa 1 ouro por receita. Cada degrau traz uma poção de cura, uma poção de mana e um elixir de vigor, subindo das garrafas comuns de folha reluzente (120 de vida, 160 de mana) pelas incomuns de folha dourada (200 de vida, 260 de mana) até as raras de pétala solar (280 de vida, 360 de mana).\n\nOs elixires sobem do mesmo jeito: o Elixir do Javali concede 6 de Vigor por 10 minutos, o Elixir de Venofogo 9 por 15 minutos, e o Elixir da Serpente 12 por 15 minutos, sendo a Serpente o único a render duas garrafas por criação. Mais uma receita fica à parte: o Elixir do Urso, uma beberagem combinada que Verane ensina por 25 prata assim que sua Alquimia chega a 25, misturável em qualquer lugar, mas só por um Bombardeiro sintonizado com Alquimia e Engenharia ambas em 25.",
           "routeHeading": "O caminho de um alquimista até o 125",
-          "routeBody": "Draughts and elixirs never roll masterworks; that proc belongs to stat-bearing gear. Your name still travels, though: the rare sunpetal draughts arrive signed with a maker's mark, and so does every bottle of the double-batch Elixir of the Serpent, so nothing rare in this craft leaves the bench unsigned. At skill 75 you specialize, and every Alchemy recipe costs 20 percent fewer materials from then on.\n\nTake Herbalism early and pick as you level: sheenleaf is everywhere in the Vale, and once you reach Verane's bench the free rung will carry you cleanly to skill 25 on herbs you would have picked anyway. Learn the 25 rung the moment it turns on, move your picking to the marsh for goldleaf, and let Verane's work order (six Goldleaf Herbs for 45 copper, repeatable every 30 minutes) hand a little coin back as you go.\n\nFrom 50 on, brew sunpetal draughts and Serpent batches out of Thornpeak sunpetal, with a little Vale and marsh greenery still in the mix. The last stretch from 100 to 125 is a deliberate trickle, so brew what actually sells rather than burning herbs for the number, and remember that consumables are the one crafted good everyone re-buys forever. The Book of Deeds marks Strange Brews at skill 50 and Grandmaster Alchemy at the cap."
+          "routeBody": "Poções e elixires nunca geram obras-primas; esse proc pertence ao equipamento com atributos. Seu nome viaja mesmo assim: as poções raras de pétala solar chegam assinadas com a marca do criador, e cada garrafa do Elixir da Serpente de lote duplo também, então nada de raro neste ofício sai da bancada sem assinatura. Na habilidade 75 você se especializa, e toda receita de Alquimia passa a custar 20 por cento menos materiais dali em diante.\n\nPegue Herborismo cedo e colha enquanto sobe de nível: folha reluzente está por toda parte no Vale, e assim que você chegar à bancada de Verane o degrau gratuito o levará limpo até a habilidade 25 com ervas que você teria colhido de qualquer jeito. Aprenda o degrau 25 no instante em que ele abrir, leve sua colheita para o pântano atrás de folha dourada, e deixe a ordem de serviço de Verane (seis Ervas Folha Dourada por 45 cobre, repetível a cada 30 minutos) devolver umas moedas pelo caminho.\n\nDo 50 em diante, prepare poções de pétala solar e lotes de Serpente com pétala solar de Thornpeak, ainda com um pouco de verde do Vale e do pântano na mistura. O último trecho, de 100 a 125, é um gotejar deliberado, então prepare o que de fato vende em vez de queimar ervas pelo número, e lembre que os consumíveis são o único bem criado que todo mundo recompra para sempre. O Livro dos Feitos marca Beberagens Estranhas na habilidade 50 e Grão-Mestre em Alquimia no limite."
         },
         "engineering": {
           "identityHeading": "O monopólio do fabricante de ferramentas",
-          "identityBody": "The craft is worked at the toolworks in the southwest corner of Eastbrook Square, home of Tinker Gizzel, Master of the Toolworks. Tiers 1 through 3 of every tool line are ordinary vendor stock; tiers 4 and 5 come off an engineer's bench, or out of the Drowned Litany's delve counter for Delve Marks behind its clears gates, and never out of any till for coin.\n\nOn the ring it sits with the trial-and-error trades, next to Alchemy and Armorcrafting, giving it two pair identities: the Bombardier (Engineering and Alchemy, taken up before Gizzel himself) and the Gearwright (Armorcrafting and Engineering, named but not yet swearable). One warning matters more here than anywhere else: every one of Engineering's recipe rungs sits above the rare-tier ceiling that hobbies and undeclared crafters work under, so the skill number only moves for a crafter whose majors include Engineering, which today means the Bombardier. Anyone can still build the land tools; an unattuned crafter just learns nothing from doing it, and the two rod recipes ask for Gizzel's teaching besides.",
+          "identityBody": "O ofício é trabalhado na oficina de ferramentas, no canto sudoeste da praça de Eastbrook, casa do Engenhoqueiro Gizzel, Mestre das Ferramentas. Os níveis 1 a 3 de toda linha de ferramentas são estoque comum de vendedor; os níveis 4 e 5 saem da bancada de um engenheiro, ou do balcão de incursão da Ladainha Afogada por Selos de Incursão atrás de suas exigências de conclusão, e nunca de caixa nenhum por moedas.\n\nNa roda ela fica com os ofícios de tentativa e erro, ao lado de Alquimia e Forja de Armaduras, o que lhe dá duas identidades de par: o Bombardeiro (Engenharia e Alquimia, assumido diante do próprio Gizzel) e o Mestre das Engrenagens (Forja de Armaduras e Engenharia, nomeado mas ainda não jurável). Um aviso importa mais aqui do que em qualquer outro lugar: cada um dos degraus de receita da Engenharia fica acima do teto de nível raro sob o qual passatempos e artesãos não declarados trabalham, então o número da habilidade só se move para um artesão cujos ofícios principais incluam Engenharia, o que hoje significa o Bombardeiro. Qualquer um ainda pode construir as ferramentas de terra; um artesão não sintonizado apenas não aprende nada ao fazê-lo, e as duas receitas de vara pedem, além disso, o ensino de Gizzel.",
           "materialsHeading": "Reagentes e ferramentas anteriores",
-          "materialsBody": "Every land tool recipe consumes the tool one tier below it plus a FINE material, and that pairing is the whole land ladder: four Fine Iron Ore and a Skysilver Mining Pick become the Osmium Mining Pick, then two Glyphsteel Bars, two Fine Osmium Ore and that osmium pick become the Glyphsteel Mining Pick. The axe and sickle lines mirror the fine-plus-prior-tool shape with Fine Ashwood and Fine Highpine Logs, Fine Goldleaf and Fine Sunpetal Herbs, though their tier 5 rungs ask no Glyphsteel Bars: the pick is the one line that gets dearer at the top. The two rod recipes break the pattern on purpose: the Stormreel takes four Sunglint Koi and a Silverstream rod, the Tidewrought two Koi, eight Raw Slatefin Carp and that Stormreel, so the top of the angler's ladder is paid for on the water rather than at a vein.\n\nA fine material is not sold anywhere and does not drop from an ordinary harvest: you get it by working one of a zone's full-grade veins with a tool ranked above the material itself, which in practice means the tool one rung below the one you are trying to build (the easier veins a zone keeps for travellers yield the plain material whatever you swing). That is deliberate. On the craft route, a tier 5 tool comes from actually swinging the tier 4 one, not from a shopping trip; the Delve Marks counter is the one way around it. The single exception is the Glyphsteel Bar, refined and vendor-only, 1 silver 60 copper a bar from Quartermaster Bree in Highwatch or from Gizzel's own counter, so the Glyphsteel Mining Pick alone carries a fixed coin floor built into its cost.",
+          "materialsBody": "Toda receita de ferramenta de terra consome a ferramenta um nível abaixo dela mais um material FINO, e esse par é a escada de terra inteira: quatro Minérios de Ferro Finos e uma Picareta de Prata-Celeste viram a Picareta de Ósmio, depois duas Barras de Glifaço, dois Minérios de Ósmio Finos e aquela picareta de ósmio viram a Picareta de Glifaço. As linhas do machado e da foice espelham o formato de fino mais ferramenta anterior com Toras de Freixo Cinza e de Pinheiro Alto Finas, Ervas Folha Dourada e Pétala Solar Finas, embora seus degraus de nível 5 não peçam Barras de Glifaço: a picareta é a única linha que fica mais cara no topo. As duas receitas de vara quebram o padrão de propósito: a Vara com molinete de tempestade pede quatro Koi do Brilho Solar e uma Vara do riacho prateado, e a Vara forjada pela maré, dois Koi, oito Carpas Cruas de Barbatana de Ardósia e aquela Vara com molinete de tempestade, então o topo da escada do pescador é pago na água em vez de num veio.\n\nUm material fino não é vendido em lugar nenhum e não cai de uma colheita comum: você o consegue trabalhando um dos veios de grau pleno de uma zona com uma ferramenta de patente acima do próprio material, o que na prática significa a ferramenta um degrau abaixo daquela que você está tentando construir (os veios mais fáceis que uma zona guarda para os viajantes rendem o material simples, seja lá o que você empunhe). Isso é deliberado. No caminho do ofício, uma ferramenta de nível 5 vem de realmente empunhar a de nível 4, não de uma ida às compras; o balcão de Selos de Incursão é o único atalho. A única exceção é a Barra de Glifaço, refinada e só de vendedor, 1 prata e 60 cobre a barra com a Intendente Bree em Highwatch ou no próprio balcão de Gizzel, então só a Picareta de Glifaço carrega um piso fixo de moedas embutido no seu custo.",
           "ladderHeading": "A escada de ferramentas",
-          "ladderBody": "The ladder is eight recipes, all bound to the toolworks station. The six land-tool recipes are known automatically, no trainer fee ever: the tier 4 pick, axe, and sickle at skill 75, and the tier 5 versions at skill 150. That second number is not a typo, and it sits above the current 125 cap on purpose: skill requirements never gate a craft here, they only shape skill gain, so you can build a tier 5 tool the day you hold its reagents and its tier 4 predecessor. The two crafted rods are the taught exception: Gizzel teaches the Stormreel at skill 75 for 4 gold and the Tidewrought at skill 125 for 16 gold, each the moment your tier in the craft reaches its own.\n\nEvery finished tool is rare or epic quality and comes out signed, so your name rides the zones on other players' toolbelts. Engineering also holds up half of one combination recipe: the Elixir of the Bear, brewed by an attuned Bombardier with both Engineering and Alchemy at 25.",
+          "ladderBody": "A escada são oito receitas, todas vinculadas à bancada da oficina de ferramentas. As seis receitas de ferramentas de terra são conhecidas automaticamente, sem taxa de treinador jamais: a picareta, o machado e a foice de nível 4 na habilidade 75, e as versões de nível 5 na habilidade 150. Esse segundo número não é erro de digitação, e fica acima do limite atual de 125 de propósito: aqui os requisitos de habilidade nunca barram uma criação, eles só moldam o ganho de habilidade, então você pode construir uma ferramenta de nível 5 no dia em que tiver seus reagentes e sua antecessora de nível 4. As duas varas criadas são a exceção ensinada: Gizzel ensina a Vara com molinete de tempestade na habilidade 75 por 4 ouro e a Vara forjada pela maré na habilidade 125 por 16 ouro, cada uma no instante em que seu nível no ofício alcança o dela.\n\nToda ferramenta acabada é de qualidade rara ou épica e sai assinada, então seu nome corre as zonas nos cintos de ferramenta de outros jogadores. A Engenharia também sustenta metade de uma receita combinada: o Elixir do Urso, preparado por um Bombardeiro sintonizado com Engenharia e Alquimia ambas em 25.",
           "routeHeading": "O caminho de um engenheiro até o 125",
           "routeBody": "Ferramentas não têm atributos de combate, então nunca geram obras-primas; esse proc pertence a equipamentos com atributos. A especialização ainda chega na habilidade 75: 20% menos materiais por criação, e uma oficina de campo temporária que transforma qualquer viagem de coleta em uma oficina. O cálculo de ganho mal desvanece aqui: as receitas de habilidade 75 pagam ganho total até 100 e metade depois, e as de habilidade 150 pagam ganho total até o limite de 125, então a restrição real são reagentes e moedas, nunca receitas cinzas.\n\nEscolha seu par primeiro, pois nada avança sem ele: pegue a sintonização de Bombardeiro com o Inventor Gizzel. Depois alimente a escada: suba Mineração, Lenharia ou Herbalismo você mesmo ou faça amizade com coletores, compre as ferramentas de nível 3 dos vendedores, e trate a ordem de serviço de Gizzel (oito Toros de Casca de Ferro por 16 cobre, repetível a cada 30 minutos) como dinheiro de bolso.\n\nEngenharia é um ofício de prestígio de baixo volume, aproximadamente um ponto de habilidade por ferramenta finalizada, então trate cada criação como estoque para venda. O argumento para seus clientes se escreve sozinho: cada nível de ferramenta acima do nível de um nó reduz 0,4 segundos do tempo de coleta de 2,5 segundos (até um mínimo de 1,5 segundos), então uma ferramenta de nível 5 é uma melhoria de velocidade em todo nó do mundo, e só você pode fazer uma. O Livro de Feitos marca Engrenagens e Molas na habilidade 50 e Grão-Mestre em Engenharia no 125."
         },
         "enchanting": {
           "identityHeading": "Equipamento desmontado, poder de volta",
-          "identityBody": "Every enchant is known from the start, anyone can disenchant from day one, and neither ever needs a station; the skill caps at 125 like every craft. The one taught corner of the trade is its pair of charm recipes: Tinker Gizzel teaches the Gatherer's Cache and the Artisan's Eye at the toolworks in the southwest corner of Eastbrook Square, for the ordinary tier fee once your Enchanting reaches 25, and the charms themselves are worked at his station.\n\nOn the ring it sits between Inscription and Jewelcrafting, so its two pair identities are the Arcanist (Inscription and Enchanting) and the Gembinder (Enchanting and Jewelcrafting). Neither can be sworn yet, since both neighbors await their first recipes, so today Enchanting climbs as everyone's craft: free to the rare tier before any oath, and a natural hobby pick for a Bombardier or an Apothecary. Enchanters also keep the gathering world running: the two slottable tool effects are Enchanter work, and an original crafter recharges their own effects at a discount, deeper still once specialized.",
+          "identityBody": "Todo encantamento é conhecido desde o início, qualquer um pode desencantar desde o primeiro dia, e nenhum dos dois jamais precisa de bancada; a habilidade tem limite de 125 como todo ofício. O único canto ensinado do ofício é seu par de receitas de amuleto: o Engenhoqueiro Gizzel ensina o Alforje do Coletor e o Olhar do Artesão na oficina de ferramentas, no canto sudoeste da praça de Eastbrook, pela taxa comum do nível assim que seu Encantamento chega a 25, e os próprios amuletos são trabalhados na bancada dele.\n\nNa roda ele fica entre Escrivania e Joalheria, então suas duas identidades de par são o Arcanista (Escrivania e Encantamento) e o Lapidador de Gemas (Encantamento e Joalheria). Nenhum dos dois pode ser jurado ainda, pois os dois vizinhos aguardam suas primeiras receitas, então hoje o Encantamento sobe como o ofício de todo mundo: livre até o nível raro antes de qualquer juramento, e uma escolha natural de passatempo para um Bombardeiro ou um Apotecário. Os encantadores também mantêm o mundo da coleta girando: os dois efeitos de ferramenta encaixáveis são obra de Encantador, e o criador original recarrega os próprios efeitos com desconto, ainda maior depois de especializado.",
           "levelingHeading": "Como o encantamento sobe de nível",
-          "levelingBody": "Three actions move the skill: disenchanting a piece, applying an enchant, and crafting the two charms, which climb the ordinary crafting curve. Each success is worth up to one point, scaled by how serious the work is: the rarity of the piece you break, or the reagent tier of the enchant you apply. Common disenchants and dust-only enchants score as common work; uncommon disenchants and essence enchants as uncommon; rare disenchants and every Runed or Greater enchant as rare; epic and legendary disenchants rank higher still on the table, though no enchanting identity today reaches past the rare rung, so they pay the same as rare work in practice. One honesty rules the breaking bench: a piece that came off a player bench (crafted, signed, or masterworked) still mills into materials but teaches nothing, so a craft-and-break loop levels no one, and the lessons are in world-found gear.\n\nThe familiar mastery fade applies on 25-point tiers, so common-grade work goes gray at skill 75, uncommon work at 100, and rare-tier work exactly at the 125 cap. Enchanting also has one kindness of its own: input above your archetype ceiling is rounded down to that ceiling instead of zeroed, so before you attune, an epic disenchant simply scores as rare rather than teaching nothing. If Enchanting ends up dormant behind another identity, breaking and applying score as common work and the climb stalls at 75, while the two charms, riding the crafting curve above the common ceiling, teach a dormant enchanter nothing at all; keep it as your hobby and rare-tier work still pays, just slower past 75.",
+          "levelingBody": "Três ações movem a habilidade: desencantar uma peça, aplicar um encantamento e criar os dois amuletos, que sobem pela curva de criação comum. Cada sucesso vale até um ponto, escalado por quão séria é a obra: a raridade da peça que você desfaz, ou o nível de reagente do encantamento que você aplica. Desencantamentos comuns e encantamentos só de pó contam como trabalho comum; desencantamentos incomuns e encantamentos de essência como incomum; desencantamentos raros e todo encantamento Rúnico ou Superior como raro; desencantamentos épicos e lendários figuram ainda mais alto na tabela, embora nenhuma identidade de encantamento chegue hoje além do degrau raro, então na prática eles pagam o mesmo que o trabalho raro. Uma honestidade rege a bancada de desmonte: uma peça que saiu da bancada de um jogador (criada, assinada ou obra-prima) ainda se desfaz em materiais, mas não ensina nada, então um ciclo de criar e desfazer não sobe o nível de ninguém, e as lições estão no equipamento achado no mundo.\n\nO conhecido desvanecer da maestria se aplica em níveis de 25 pontos, então o trabalho de grau comum fica cinza na habilidade 75, o incomum aos 100, e o de nível raro exatamente no limite de 125. O Encantamento ainda tem uma gentileza própria: a entrada acima do teto do seu arquétipo é arredondada para baixo até esse teto em vez de ser zerada, então, antes de você se sintonizar, um desencantamento épico simplesmente conta como raro em vez de não ensinar nada. Se o Encantamento acabar adormecido atrás de outra identidade, desfazer e aplicar contam como trabalho comum e a escalada empaca aos 75, enquanto os dois amuletos, correndo pela curva de criação acima do teto comum, não ensinam absolutamente nada a um encantador adormecido; mantenha-o como seu passatempo e o trabalho de nível raro ainda paga, só que mais devagar depois dos 75.",
           "marketHeading": "Cópias encantadas, proveniência e o mercado",
-          "marketBody": "Applying an enchant spends the reagents and marks one specific copy of the item. Point it at a bagged copy and you get back a distinct enchanted copy; point it at a piece you are already wearing and it is enchanted in place, right where it sits, with no unequip and re-equip dance. Either way the bonus follows that piece forever, through unequips, bank trips, and trades. One enchant per piece: applying a different enchant to an enchanted copy asks for confirmation, then replaces the old enchant outright, destroying it with no refund of its materials. Selling, discarding, and disenchanting all prefer plain copies first, so your finished piece does not get eaten by accident.\n\nMasterwork gear and enchanting are friends: a masterwork piece stays fully enchantable, and the enchant adds on top of the masterwork bonus without disturbing it or the maker's signature. Stacking every source, a signed masterwork carrying a Greater enchant is the best a crafted piece gets, and it still sits below raid loot by design.\n\nOn the market, an enchanted or signed piece lists like anything else: it goes up as its own single-copy listing, the tooltip shows the enchant and the maker's mark, and the Ravenpost carries it just as faithfully. The materials remain the steady half of the craft: Dust, Essence, and Shards list freely, listing costs nothing, and the Merchant takes 5 percent of a completed sale only. That makes the two classic enchanter incomes selling materials, and selling finished work: over the market, by raven, or face to face in a trade window."
+          "marketBody": "Aplicar um encantamento gasta os reagentes e marca uma cópia específica do item. Aponte-o para uma cópia nas bolsas e você recebe de volta uma cópia encantada distinta; aponte-o para uma peça que você já está usando e ela é encantada no lugar, exatamente onde está, sem aquela dança de desequipar e reequipar. De um jeito ou de outro o bônus acompanha aquela peça para sempre, por desequipamentos, idas ao banco e negociações. Um encantamento por peça: aplicar um encantamento diferente a uma cópia encantada pede confirmação e então substitui o antigo por completo, destruindo-o sem devolver seus materiais. Vender, descartar e desencantar preferem sempre as cópias simples primeiro, para que sua peça acabada não seja devorada por acidente.\n\nEquipamento obra-prima e encantamento são amigos: uma peça obra-prima continua totalmente encantável, e o encantamento soma por cima do bônus de obra-prima sem perturbá-lo nem à assinatura do criador. Somando todas as fontes, uma obra-prima assinada carregando um encantamento Superior é o melhor que uma peça criada alcança, e ainda assim fica abaixo do saque de raide por design.\n\nNo mercado, uma peça encantada ou assinada é listada como qualquer outra: sobe como sua própria listagem de cópia única, a dica de item mostra o encantamento e a marca do criador, e o Correio dos Corvos a leva com a mesma fidelidade. Os materiais seguem sendo a metade estável do ofício: Pó, Essência e Fragmentos são listados livremente, listar não custa nada, e o Mercador fica com 5 por cento apenas de uma venda concluída. Isso faz das duas rendas clássicas do encantador vender materiais e vender trabalho acabado: pelo mercado, por corvo ou cara a cara em uma janela de negociação."
         }
       },
       "howHeading": "Como funciona a criação",
-      "howBody": "Open the crafting window (default key T) and every recipe you know is listed with what it needs and what you have on hand. Station-bound recipes ask you to stand within 20 yards of the right station in town, field recipes craft anywhere, and Enchanting's breaking and enchanting need no station at all (only its two charm recipes are station work, at the toolworks). There is no failure roll: a craft with the materials in hand always succeeds.\n\nTwo small frictions keep the economy honest. Every successful craft pays a fee of 2 copper per point of the item's stat budget, and craft-type actions share one pace: at most 10 crafts, disenchants, enchants, salvages, or tool recharges in each 60-second window. Neither will trouble a normal session; both stop a maxed specialist from flooding the market.",
+      "howBody": "Abra a janela de criação (tecla padrão T) e toda receita que você conhece aparece listada com o que ela exige e o que você tem à mão. As receitas vinculadas a bancada pedem que você esteja a menos de 20 jardas da bancada certa na cidade, as receitas de campo podem ser criadas em qualquer lugar, e desfazer e encantar do Encantamento não precisam de bancada alguma (só as suas duas receitas de amuleto são trabalho de bancada, na oficina de ferramentas). Não existe rolagem de falha: uma criação com os materiais em mãos sempre dá certo.\n\nDuas pequenas fricções mantêm a economia honesta. Toda criação bem-sucedida paga uma taxa de 2 cobre por ponto do orçamento de atributos do item, e as ações do tipo criação dividem um mesmo ritmo: no máximo 10 criações, desencantamentos, encantamentos, salvamentos ou recargas de ferramenta a cada janela de 60 segundos. Nenhuma das duas vai atrapalhar uma sessão normal; ambas impedem que um especialista no limite inunde o mercado.",
       "recipesHeading": "Receitas",
       "recipesNote": "Cada receita do ofício: seu requisito exato de habilidade e materiais, onde é aprendida e por qual taxa, e os três valores de habilidade onde seu ganho cai para metade, um quarto e nada.",
       "masteryHeading": "Ganho de habilidade",
       "masteryBody": "Cada receita na janela exibe seu estado de ganho nas cores clássicas: laranja significa ganho total, amarelo metade, verde um quarto, cinza nada. Os limites são exatos, cada {step} de habilidade é um nível, e uma receita perde uma cor para cada nível que cai abaixo do seu.\n\nComo os ganhos são determinísticos (uma criação com ganho total sempre avança exatamente um ponto), você pode planejar toda a escalada pela lista: trabalhe um degrau enquanto está laranja, treine o próximo degrau quando virar amarelo, e nunca gaste materiais em uma criação cinza esperando progresso. No limite de {cap} o número para, mas as receitas, a chance de obra-prima e os lucros continuam funcionando.",
       "masterworkHeading": "Obras-primas",
-      "masterworkBody": "Every successful craft is exactly what the recipe promises, and sometimes a little more: a masterwork finishes the same piece one quality tier finer, with the bonus stats baked in at craft time. It is add-only, never a downgrade, and it stays below the raid floor, so crafted gear can be excellent without replacing a raid drop.\n\nThe chance is published, not mystical: {base}% base, plus {perTier}% per tier your skill sits above the recipe, plus {signed}% when any signed reagent goes in, plus {spec}% once you are specialized, with higher-tier materials adding 1 to 2% more, all capped at {cap}%. Only a piece with real stats can improve, so statless commons, tools, and consumables never proc; a dormant craft never produces one, and a hobby craft cannot masterwork past its rare ceiling.\n\nFine work carries its maker. Rare and better outputs are signed, every copy (Crafted by; gathered materials carry Gathered by), a masterwork is always signed whatever its quality. A signature is provenance, not a lock: signed goods trade, mail, and list on the World Market freely.",
+      "masterworkBody": "Toda criação bem-sucedida é exatamente o que a receita promete, e às vezes um pouco mais: uma obra-prima termina a mesma peça um nível de qualidade acima, com os atributos de bônus já embutidos no momento da criação. Ela só soma, nunca rebaixa, e permanece abaixo do patamar de raide, então o equipamento criado pode ser excelente sem substituir um drop de raide.\n\nA chance é publicada, não mística: {base}% de base, mais {perTier}% por nível que a sua habilidade estiver acima da receita, mais {signed}% quando entra qualquer reagente assinado, mais {spec}% depois que você está especializado, com materiais de nível mais alto somando de 1 a 2% a mais, tudo limitado a {cap}%. Só uma peça com atributos de verdade pode melhorar, então comuns sem atributos, ferramentas e consumíveis nunca geram o proc; um ofício inativo nunca produz uma, e um ofício de passatempo não pode fazer obra-prima acima do seu teto raro.\n\nUm trabalho fino carrega quem o fez. Os resultados raros ou melhores saem assinados, cada cópia (Feito por; materiais coletados levam Coletado por), e uma obra-prima é sempre assinada, qualquer que seja a sua qualidade. Uma assinatura é proveniência, não uma tranca: bens assinados são negociados, enviados pelo correio e listados no Mercado Mundial livremente.",
       "trainingHeading": "Treinamento",
-      "trainingBody": "Trainer recipes come from the resident masters, taught at their stations. The rule is one line: a master teaches a recipe once your tier in the craft has reached the recipe's own tier, and nothing else gates it, not your level, not your archetype. The gear and consumable ladders run their rungs at skill 0, 25, and 50; Engineering's two rod lessons continue the ladder at 75 and 125, and Enchanting's two charm recipes sit on the 25 rung, so a fresh rung opens as your tiers climb.\n\nFees are one-time and flat by rung: the starting rung is free, the skill 25 rung costs {tier1} a recipe, the skill 50 rung {tier2}, and the rod lessons above them carry their own fees, listed beside each recipe in the table. You must stand at the master's actual station to train, and a mobile station never counts. The common field recipes and the six crafted land-tool recipes need no training at all; every character knows them from the start.",
+      "trainingBody": "As receitas de treinador vêm dos mestres residentes, ensinadas nas bancadas deles. A regra cabe em uma linha: um mestre ensina uma receita assim que o seu nível no ofício alcança o nível da própria receita, e nada mais a restringe, nem o seu nível de personagem, nem o seu arquétipo. As escadas de equipamento e de consumíveis correm seus degraus em habilidade 0, 25 e 50; as duas lições de vara da Engenharia continuam a escada em 75 e 125, e as duas receitas de amuleto do Encantamento ficam no degrau 25, então um degrau novo se abre conforme os seus níveis sobem.\n\nAs taxas são únicas e fixas por degrau: o degrau inicial é gratuito, o degrau de habilidade 25 custa {tier1} por receita, o degrau de habilidade 50 custa {tier2}, e as lições de vara acima deles carregam as suas próprias taxas, listadas ao lado de cada receita na tabela. Você precisa estar na bancada real do mestre para treinar, e uma bancada móvel nunca conta. As receitas comuns de campo e as seis receitas de ferramentas de terra criadas não pedem treinamento nenhum; todo personagem as conhece desde o início.",
       "specializationHeading": "Especialização",
       "specializationBody": "Na habilidade {at}, este ofício especializa você, sem missão necessária: receitas custam {pct}% menos materiais a partir daí, e a especialização adiciona seu próprio bônus à chance de obra-prima.\n\nEspecialistas também aprendem a levar a oficina consigo: um artesão especializado pode montar uma bancada móvel no campo por dez minutos de cada vez, então receitas vinculadas a bancada podem ser trabalhadas na boca da mina em vez de voltar à cidade. Seus limites são deliberados: nunca conta como treinamento com um mestre ou para desvincular uma peça por encomenda, e expira no seu temporizador quer você a tenha usado ou não.",
       "ench": {
@@ -4289,7 +4377,7 @@ export const pt_BR: EnTranslations = {
         "meleeWeapons": "Armas corpo a corpo",
         "timberWeapons": "Cajados, varinhas, arcos e bestas",
         "enchantsHeading": "Encantamentos",
-        "enchantsNote": "Enchants come in three tiers. The base tier runs on Chime Dust (with a little Essence at the high end) and covers the weapon slot plus every armor slot except the off hand, with enough stat-axis options that every build finds something for each slot. The Greater tier costs one Chime Shard plus Essence: stronger bonuses on the highest-impact slots. Shards feed two more sinks besides, the two charm recipes at five apiece and the top rung of tool-effect recharges, so bank a few before you spend.\n\nBetween them sit the five Runed enchants, one consumer per typed secondary, so nothing you mill is ever a dead end: Runed Edge (weapon, Strength, consumes Resonant Steel), Runed Sigil (weapon, Intellect, Resonant Timber), Runed Weave (chest, Spirit, Resonant Thread), Runed Hide (legs, Agility, Resonant Hide), and Runed Links (helmet, Stamina, Resonant Links). Each also takes two Chime Essence; where a slot and stat have both a base and a Greater enchant, the Runed bonus lands between them, while Runed Weave is the strongest chest Spirit enchant outright and Runed Hide is the only legs Agility enchant at all. The exact bonuses are all in the table below.",
+        "enchantsNote": "Os encantamentos vêm em três níveis. O nível base funciona com Pó de Toque (com um pouco de Essência na ponta mais alta) e cobre o encaixe de arma mais todos os encaixes de armadura, exceto a mão secundária, com opções de eixo de atributo suficientes para que toda construção encontre algo para cada encaixe. O nível Superior custa um Fragmento de Toque mais Essência: bônus mais fortes nos encaixes de maior impacto. Os Fragmentos ainda alimentam outros dois sumidouros, as duas receitas de amuleto a cinco cada e o degrau mais alto das recargas de efeito de ferramenta, então guarde alguns antes de gastar.\n\nEntre eles ficam os cinco encantamentos Rúnicos, um consumidor para cada secundário tipado, de modo que nada do que você desfaz vira beco sem saída: Fio Runado (arma, Força, consome Aço Ressonante), Sigilo Runado (arma, Intelecto, Madeira Ressonante), Trama de Runas (torso, Espírito, Fio Ressonante), Couro Runado (pernas, Agilidade, Couro Ressonante) e Elos Runados (elmo, Vigor, Elos Ressonantes). Cada um leva também duas Essências de Toque; onde um encaixe e um atributo têm tanto um encantamento base quanto um Superior, o bônus Runado cai entre os dois, enquanto a Trama de Runas é disparado o encantamento de Espírito de torso mais forte e o Couro Runado é o único encantamento de Agilidade para pernas que existe. Os bônus exatos estão todos na tabela abaixo.",
         "colEnchant": "Encantamento",
         "colSlot": "Encaixe",
         "colTier": "Nível",
@@ -4304,61 +4392,61 @@ export const pt_BR: EnTranslations = {
         "bonusFmt": "+{value} {stat}"
       },
       "gatherIntro": {
-        "mining": "Mining pulls ore straight out of the world's rock: copper in Eastbrook Vale, iron in Mirefen Marsh, and osmium up in Thornpeak Heights, with starter veins scattered through every younger zone beyond them, feeding the forge crafts. Open to everyone from level 1: a 20 copper mining pick from an Eastbrook, Fenbridge, or Highwatch counter opens every starter vein, and the higher rungs of the pick ladder wake as your own counter earns them. Tracked on its own counter to a cap of 100.",
-        "logging": "Logging fells timber from stands of trees across the whole world: ironbark in Eastbrook Vale, ashwood in Mirefen Marsh, highpine in Thornpeak Heights, and starter stands in every younger zone, the raw stock for hafts, staves, and the engineer's bench. Open to everyone from level 1 with a logging axe in your bags (20 copper at the Eastbrook, Fenbridge, and Highwatch counters), tracked on its own counter to a cap of 100.",
-        "herbalism": "Herbalism gathers what grows wild: sheenleaf in Eastbrook Vale, goldleaf in Mirefen Marsh, sunpetal in Thornpeak Heights, and starter patches in every younger zone, the leaf and stem that keep the apothecary trades brewing. Open to everyone from level 1 with a herbalism sickle in your bags (20 copper at the Eastbrook, Fenbridge, and Highwatch counters), tracked on its own counter to a cap of 100.",
-        "fishing": "Fishing is the odd one out among the gathering trades, and the deepest: a real bite-and-reel minigame, its own catch tables in each of the three heartland zones (the young waters beyond them all serve the Vale's table for now), and a proficiency cap of 200, twice the others. Buy a pole, face open water, and cast."
+        "mining": "A Mineração arranca minério direto da rocha do mundo: cobre no Vale de Eastbrook, ferro no Pântano de Mirefen e ósmio lá em cima nas Alturas de Thornpeak, com veios iniciais espalhados por toda zona mais jovem além delas, alimentando os ofícios da forja. Aberta a todos a partir do nível 1: uma picareta de mineração de 20 cobre de um balcão de Eastbrook, Fenbridge ou Highwatch abre todos os veios iniciais, e os degraus mais altos da escada de picaretas despertam conforme o seu próprio contador os conquista. Acompanhada em seu próprio contador até um limite de 100.",
+        "logging": "A Lenharia derruba madeira de arvoredos por todo o mundo: casca de ferro no Vale de Eastbrook, freixo no Pântano de Mirefen, pinheiro alto nas Alturas de Thornpeak, e arvoredos iniciais em toda zona mais jovem, a matéria-prima para cabos, cajados e a bancada do engenheiro. Aberta a todos a partir do nível 1 com um machado de lenharia nas bolsas (20 cobre nos balcões de Eastbrook, Fenbridge e Highwatch), acompanhada em seu próprio contador até um limite de 100.",
+        "herbalism": "O Herborismo colhe o que cresce livre: folha reluzente no Vale de Eastbrook, folha dourada no Pântano de Mirefen, pétala solar nas Alturas de Thornpeak, e canteiros iniciais em toda zona mais jovem, a folha e o caule que mantêm os ofícios do boticário fervendo. Aberto a todos a partir do nível 1 com uma foice de herborismo nas bolsas (20 cobre nos balcões de Eastbrook, Fenbridge e Highwatch), acompanhado em seu próprio contador até um limite de 100.",
+        "fishing": "A Pesca é a estranha no ninho entre os ofícios de coleta, e a mais profunda: um minijogo de verdade de fisgar e recolher, tabelas de captura próprias em cada uma das três zonas centrais (as águas jovens além delas servem a tabela do Vale por enquanto) e um limite de proficiência de 200, o dobro dos outros. Compre uma vara, fique de frente para a água aberta e lance."
       },
       "rhythmHeading": "O ritmo da coleta",
-      "rhythmBody": "A harvest is a short visible cast, not an instant grab: {base} seconds base, never below a {floor} second floor. Carrying a tool above the node's tier, one your proficiency lets you wield, speeds you up by {tool} seconds per tier above it, and each proficiency band you cross trims another {band} seconds; merely matching the node's tier gets you in the door, it is the tiers above it that make you fast.\n\nA full bag politely refuses the cast before it starts, so nothing is wasted mid-swing, and every harvest pays a small slice of character XP, scaled by the node's level against your own the way kill XP scales: a trivial gray node teaches a capped character nothing.",
-      "gainBody": "Gain is deterministic, never a skill-up roll: a node at or above your gain tier teaches a full point per harvest, and every {step} proficiency is one tier scored against the node. Tier 1 nodes pay in full below 25, half to 49, a quarter to 74, and nothing from 75 on; tier 2 nodes pay in full to 49; the two tier 3 nodes of each trade pay in full to 74 and half right up to the cap of {cap}.\n\nThe intended route is plain: learn on the starter nodes of the Vale, move to the marsh, and finish the climb on the high ground of Thornpeak Heights. At the cap the learning stops but the yields do not: a capped gatherer keeps rolling the best odds the trade offers forever.",
+      "rhythmBody": "Uma coleta é um lançamento curto e visível, não um agarrão instantâneo: {base} segundos de base, nunca abaixo de um piso de {floor} segundos. Carregar uma ferramenta acima do nível do nó, uma que a sua proficiência permita manejar, te acelera em {tool} segundos por nível acima dele, e cada faixa de proficiência que você cruza corta mais {band} segundos; apenas igualar o nível do nó só abre a porta, são os níveis acima dele que deixam você rápido.\n\nUma bolsa cheia recusa educadamente o lançamento antes que ele comece, então nada se perde no meio do golpe, e toda coleta paga uma pequena fatia de EXP de personagem, escalada pelo nível do nó contra o seu do mesmo jeito que a EXP de abate escala: um nó cinza trivial não ensina nada a um personagem no limite.",
+      "gainBody": "O ganho é determinístico, nunca uma rolagem de aumento de habilidade: um nó no seu nível de ganho ou acima ensina um ponto inteiro por coleta, e cada {step} de proficiência é um nível contado contra o nó. Nós de nível 1 pagam integralmente abaixo de 25, metade até 49, um quarto até 74, e nada a partir de 75; nós de nível 2 pagam integralmente até 49; os dois nós de nível 3 de cada ofício pagam integralmente até 74 e metade direto até o limite de {cap}.\n\nO caminho pretendido é simples: aprenda nos nós iniciais do Vale, siga para o pântano e termine a escalada no terreno alto das Alturas de Thornpeak. No limite o aprendizado para, mas os rendimentos não: um coletor no limite continua rolando para sempre as melhores probabilidades que o ofício oferece.",
       "nodesHeading": "Nós por zona",
       "nodesNote": "Onde estão os nós, seu nível, a ferramenta que exigem e o que rendem. Cada nó se regenera para você {respawn} segundos após sua própria coleta, e esse temporizador é só seu: outro coletor trabalhando o mesmo nó nunca atrasa o seu, então não há corrida nem campismo por nó. Cada zona acima na escala traz um material melhor de um terreno mais resistente.",
       "toolsHeading": "Ferramentas",
-      "toolsNote": "Every node needs its trade's tool in your bags, tier 1 included: no pick, no ore, and no pole, no fish. The vendor ladder covers tiers 1 to 3 across the three heartland hubs: the tier-1 tool is sold at all three, the rungs above it where the ground that uses them begins (Fenbridge adds tier 2, Highwatch tier 3), and the younger settlements beyond them stock no tools at all, so kit up before you travel. Every counter sells every rung it stocks freely, and any tool passes by direct trade; every rung also lists on the Market and travels by mail except the three 20-copper land starters: those are bought at a counter or passed hand to hand, and never sold back, mailed, or listed. What is gated is the wielding. A land tool above tier 1 works only once your proficiency in its own trade has earned it, {tier2Prof} for tier 2, {tier3Prof} for tier 3, and 85 and 100 for the two crafted rungs, and the vendor row, the tooltip, and the table below all name the requirement up front. Until then a tool bought ahead simply waits in your bags, opening no ground, buying no speed, and minting no fine grades, then wields the moment your counter touches its number. Fishing rods are the one exception: no rod carries a wield requirement, and Trader Wilkes in Eastbrook deliberately stocks the tier 2 and tier 3 rods for anglers buying ahead. A tool never occupies an equip slot and never wears out, so each is a one-time purchase, and only the tier matters to the gate: a rarer tool of the same tier opens nothing extra. Rarity is not only colour, though. It makes a slotted tool effect last longer, and on a rod it widens the reel window.\n\nA better tool buys three things, not two. It opens higher-tier ground, it shortens the cast, and it improves what comes out: work a vein with a tool ranked ABOVE the zone's own material and the harvest yields the fine grade of it instead of the plain one. The vein has to be one of the zone's full-grade ones, so the easier veins a zone keeps for travellers still yield the ordinary material. Fine materials are what the crafted tool recipes consume, and a fine grade counts as its ordinary version anywhere a recipe or a work order asks for one, so upgrading never strands you: it just means your copper ore arrives as Fine Copper Ore.\n\nAbove the vendor ladder each trade has two crafted tools, tier 4 and tier 5, made at the toolworks (every character knows the land recipes; the skill that climbs for the work is Engineering's), or bought with Delve Marks at the Drowned Litany counter once its clears gates are met: the table below carries the Marks price and the clears each rung asks. No merchant ever sells them for coin. Fishing has its own pair, and they are learned from the toolmaker rather than known from the start. No node and no water today needs more than tier 3, so the top two rungs buy speed, grade and a kinder reel window rather than access, and they will be the entry ticket when higher-tier ground arrives.",
+      "toolsNote": "Todo nó exige nas suas bolsas a ferramenta do ofício dele, nível 1 incluído: sem picareta, sem minério; sem vara, sem peixe. A escada de vendedores cobre os níveis 1 a 3 nos três centros das terras centrais: a ferramenta de nível 1 é vendida nos três, os degraus acima dela onde começa o terreno que os usa (Fenbridge acrescenta o nível 2, Highwatch o nível 3), e os assentamentos mais jovens além deles não têm ferramenta alguma em estoque, então equipe-se antes de viajar. Cada balcão vende livremente todo degrau que mantém em estoque, e qualquer ferramenta passa por negociação direta; todo degrau também entra no Mercado e viaja pelo correio, exceto as três ferramentas de terra iniciais de 20 cobre: essas são compradas em um balcão ou passadas de mão em mão, e nunca revendidas, enviadas pelo correio ou listadas. O que é restrito é o manejo. Uma ferramenta de terra acima do nível 1 só funciona depois que a sua proficiência no próprio ofício dela a conquistou, {tier2Prof} para o nível 2, {tier3Prof} para o nível 3, e 85 e 100 para os dois degraus criados, e a linha do vendedor, a dica de ferramenta e a tabela abaixo nomeiam o requisito de antemão. Até lá, uma ferramenta comprada adiantada simplesmente espera nas suas bolsas, sem abrir terreno, sem comprar velocidade e sem cunhar graus finos, e passa a ser manejada no instante em que o seu contador toca o número dela. As varas de pesca são a única exceção: nenhuma vara carrega requisito de manejo, e o Comerciante Wilkes em Eastbrook mantém de propósito as varas de nível 2 e de nível 3 em estoque para pescadores que compram adiantado. Uma ferramenta nunca ocupa um encaixe de equipamento e nunca se desgasta, então cada uma é uma compra única, e só o nível importa para a restrição: uma ferramenta mais rara do mesmo nível não abre nada a mais. A raridade não é só cor, porém. Ela faz um efeito encaixado na ferramenta durar mais tempo, e em uma vara ela alarga a janela de recolha.\n\nUma ferramenta melhor compra três coisas, não duas. Ela abre terreno de nível mais alto, encurta o lançamento e melhora o que sai: trabalhe um veio com uma ferramenta classificada ACIMA do material da própria zona e a coleta rende o grau fino dele em vez do simples. O veio precisa ser um dos de grau pleno da zona, então os veios mais fáceis que uma zona guarda para viajantes continuam rendendo o material comum. Os materiais finos são o que as receitas de ferramenta criada consomem, e um grau fino conta como a sua versão comum em qualquer lugar onde uma receita ou uma encomenda de trabalho peça uma, então melhorar de ferramenta nunca te deixa na mão: significa apenas que o seu minério de cobre chega como Minério de Cobre Fino.\n\nAcima da escada de vendedores, cada ofício tem duas ferramentas criadas, nível 4 e nível 5, feitas na oficina de ferramentas (todo personagem conhece as receitas de terra; a habilidade que sobe com o trabalho é a de Engenharia), ou compradas com Selos de Incursão no balcão da Ladainha Afogada depois que seus requisitos de conclusão são cumpridos: a tabela abaixo traz o preço em Selos e as conclusões que cada degrau pede. Nenhum mercador jamais as vende por moedas. A Pesca tem o seu próprio par, e essas são aprendidas com o fabricante de ferramentas em vez de conhecidas desde o início. Nenhum nó e nenhuma água hoje exigem mais do que o nível 3, então os dois degraus do topo compram velocidade, grau e uma janela de recolha mais generosa em vez de acesso, e serão o ingresso de entrada quando chegar terreno de nível mais alto.",
       "toolCrafted": "Criada ({craft})",
-      "toolCraftedOrMarks": "Crafted ({craft}) or {marks} Delve Marks after three Drowned Litany clears",
-      "toolCraftedOrMarksHeroic": "Crafted ({craft}) or {marks} Delve Marks after a Heroic Drowned Litany clear",
+      "toolCraftedOrMarks": "Criada ({craft}) ou {marks} Selos de Incursão após três conclusões da Ladainha Afogada",
+      "toolCraftedOrMarksHeroic": "Criada ({craft}) ou {marks} Selos de Incursão após uma conclusão Heroica da Ladainha Afogada",
       "toolVendor": "{name} ({hub})",
       "toolUnavailable": "Não vendido",
-      "priceNone": "Not sold for coin",
+      "priceNone": "Não vendido por moedas",
       "toolTierReq": "Ferramenta de nível {tier}",
-      "colWield": "Use at",
-      "wieldNone": "Any",
+      "colWield": "Uso a partir de",
+      "wieldNone": "Qualquer",
       "yieldsHeading": "O que uma coleta rende",
       "yieldsBody": "Cada coleta rola uma qualidade para o que concede, e sua proficiência é toda a história dessa rolagem. Um coletor novato sempre extrai material comum; cada ponto de habilidade desloca o peso de forma constante do comum para os graus superiores e nunca para trás, até que no limite de 100 o grau comum desaparece completamente: 60 por cento incomum, 30 por cento raro, 8 por cento épico e 2 por cento lendário, sempre.\n\nQualidade também significa quantidade: uma rolagem comum rende 1 unidade, incomum e raro rendem 2, épico 3 e lendário 4. Qualquer extração rara, épica ou lendária chega como uma instância assinada carimbada Coletado por você: no limite são quatro coletas em dez carregando seu nome, e as regras de proveniência na página de Economia de Criação explicam por que artesãos pagam a mais exatamente por essas pilhas.",
       "bandsHeading": "Faixas de proficiência",
-      "bandsBody": "Proficiency bands are the shared 0/100/200 ladder over a trade's counter. For the land trades the band crossed at 100 shaves the gather cast, and their cap makes band 1 the ceiling. Fishing's bands shave nothing: they select the catch tables (with a rod to match), only fishing reaches band 2, and the climb itself is what pulls an angler to deeper water, where the better tables and the further lessons both live.",
+      "bandsBody": "As faixas de proficiência são a escada compartilhada de 0/100/200 sobre o contador de um ofício. Para os ofícios de terra, a faixa cruzada aos 100 reduz o tempo de coleta, e o limite deles faz da faixa 1 o teto. As faixas da Pesca não reduzem nada: elas selecionam as tabelas de captura (com uma vara à altura), só a Pesca alcança a faixa 2, e a própria escalada é o que puxa o pescador para águas mais fundas, onde vivem tanto as melhores tabelas quanto as lições seguintes.",
       "bandFmt": "Faixa {band}: a partir de {at} de proficiência",
       "rareHeading": "Achados raros",
       "rareBody": "A cada coleta, independentemente de sua habilidade, há 1 chance em {oneIn} de um achado raro: uma veia imaculada no minério, cerne antigo na madeira, uma flor ao luar entre as ervas. O achado multiplica o rendimento daquela coleta {mult} vezes, cada unidade chega assinada com seu nome independentemente da qualidade obtida, e toda a zona fica sabendo pelo nome. Cada tipo também inscreve sua própria marca de colecionador de Renome zero no seu Livro dos Feitos, uma marca que existe apenas para provar que aconteceu com você.",
-      "specimenBody": "Keep a little bag room spare when you farm: a signed windfall needs room of its own or a matching signed stack to land in, and if nothing fits the yield still arrives but the signature is lost. Corpse harvesting has its own jackpot arm too: about {pct}% of each harvested component comes up rare or better. A family with a perfect specimen to give (hide, silk, venom, meat) keeps its ordinary yield plain and mints the signed specimen beside it; every other family signs the yield itself.",
+      "specimenBody": "Guarde um pouco de espaço livre nas bolsas quando for farmar: um golpe de sorte assinado precisa de um encaixe só dele ou de uma pilha assinada compatível para cair, e se nada couber o rendimento ainda chega, mas a assinatura se perde. A colheita de cadáveres também tem o seu próprio braço de sorte grande: cerca de {pct}% de cada componente colhido sai raro ou melhor. Uma família que tem um espécime perfeito a oferecer (couro, seda, veneno, carne) mantém o seu rendimento comum simples e cunha o espécime assinado ao lado dele; toda outra família assina o próprio rendimento.",
       "gatherDeedsHeading": "Feitos ao longo do caminho",
       "gatherDeeds": {
         "mining": "Seu primeiro nó de qualquer ofício conquista Frutos do Campo, e o limite de 100 em Mineração inscreve Minério no Sangue. Atingir 100 em quaisquer três dentre Mineração, Lenharia, Herborismo e Pesca adiciona Mestre Coletor com 25 de Renome, e quebrar uma veia imaculada registra sua própria marca de colecionador. Nenhum desses concede poder: feitos são títulos e Renome, um registro dos caminhos que você percorreu.",
         "logging": "Seu primeiro nó de qualquer ofício conquista Frutos do Campo, e o limite de 100 em Lenharia inscreve Cortador de Cerne. Atingir 100 em quaisquer três dentre Mineração, Lenharia, Herborismo e Pesca adiciona Mestre Coletor com 25 de Renome, e uma batida de cerne antigo registra sua própria marca de colecionador. Feitos são apenas títulos e Renome, nunca poder.",
         "herbalism": "Seu primeiro nó de qualquer ofício conquista Frutos do Campo, e o limite de 100 em Herborismo inscreve Mestre da Campina. Atingir 100 em quaisquer três dentre Mineração, Lenharia, Herborismo e Pesca adiciona Mestre Coletor com 25 de Renome, e uma flor ao luar registra sua própria marca de colecionador. Feitos são apenas títulos e Renome, nunca poder.",
-        "fishing": "The 100 milestone inscribes Old Salt and 200 inscribes Master Angler with its title, the very top of the angler's art; Fishing also counts toward Master Gatherer, earned at 100 in any three gathering trades. A first fish from each of six zones' waters fills its own page, the three heartland zones and the Willowfen, the Galecrest, and the Farshore beyond them, and the Sunglint Koi records Glimmer of Hope, so travelers with a pole in their pack fill their book faster than they expect."
+        "fishing": "O marco de 100 inscreve Sal Velho e o de 200 inscreve Pescador Mestre com seu título, o ponto mais alto da arte do pescador; a Pesca também conta para Mestre Coletor, conquistado com 100 em quaisquer três ofícios de coleta. Um primeiro peixe das águas de cada uma de seis zonas preenche a sua própria página, as três zonas centrais mais Willowfen, Galecrest e Farshore além delas, e o Koi do Brilho Solar registra Lampejo de Esperança, então viajantes com uma vara na mochila enchem o seu livro mais rápido do que esperam."
       },
       "fish": {
         "startHeading": "Primeiros passos",
-        "startBody": "A Simple Fishing Pole costs 20 copper from Fisherman Brandt in Eastbrook (look for the Old Salt at the town's east edge, by the road to Mirror Lake); Tinker Gizzel, Provisioner Hale in Fenbridge, and Quartermaster Bree in Highwatch stock poles too. Use the pole while facing water deep enough to hold fish, up to about 24 yards ahead of you, and your bobber sails out.\n\nYou cannot cast while in combat, while swimming, or while dead: casting from shore is the intended posture. Water gets harder as the land does, though: the marsh wants at least the tier 2 Ironreel and the peaks the tier 3 Silverstream, and a line cast without the rod that water takes never leaves your hand. Two rods sit above those, the Stormreel and the Tidewrought: engineers craft them at the toolworks out of what a line pulls up, and the Drowned Litany's delve counter sells them for Delve Marks behind its clears gates, though never for coin. No water asks for them, so they buy a shorter wait and a wider reel window instead of access, which at the top rung means a bite in a flat three seconds.",
+        "startBody": "Uma Vara de Pesca Simples custa 20 cobre com o Pescador Brandt em Eastbrook (procure o Sal Velho na borda leste da cidade, junto à estrada para o Lago Espelho); o Engenhoqueiro Gizzel, o Fornecedor Hale em Fenbridge e a Intendente Bree em Highwatch também mantêm varas em estoque. Use a vara de frente para uma água funda o bastante para abrigar peixes, até cerca de 24 jardas à sua frente, e a sua boia voa para longe.\n\nVocê não pode lançar em combate, nadando ou morto: lançar da margem é a postura pretendida. A água, porém, fica mais dura conforme a terra fica: o pântano quer pelo menos a Vara com Molinete de Ferro de nível 2 e os picos a Vara do Riacho Prateado de nível 3, e uma linha lançada sem a vara que aquela água exige nunca sai da sua mão. Duas varas ficam acima dessas, a Vara com Molinete de Tempestade e a Vara Forjada pela Maré: engenheiros as criam na oficina de ferramentas com aquilo que a linha traz da água, e o balcão de incursão da Ladainha Afogada as vende por Selos de Incursão atrás de seus requisitos de conclusão, embora nunca por moedas. Nenhuma água as pede, então elas compram uma espera mais curta e uma janela de recolha mais larga em vez de acesso, o que no degrau mais alto significa uma fisgada em exatos três segundos.",
         "biteHeading": "Mordida e recolha",
-        "biteBody": "After the cast, a bite comes at a hidden moment between {min} and {max} seconds; the delay is decided when the line lands, so no two casts feel quite alike. When the bobber bites you have a {reel} second window to press the pole again and reel in: reel inside it and the catch lands, hesitate past it and the fish gets away with nothing to show. A whole session caps at {cap} seconds, so even a quiet cast resolves quickly.\n\nBetter rods sharpen both ends of the minigame: each rod tier above the first trims {rod} seconds off the longest possible wait, never below the three-second floor the top rod already grazes, and adds {reelRod} seconds to the reel window, so the Ironreel pulls the worst wait down to 6.5 seconds with a 3.25 second window, and the Silverstream to 5 with a window past 4, its rarity widening the reel a little beyond what the tier alone pays. The quickest bites never change whatever you hold, and a rod only needs to be in your bags to count.",
+        "biteBody": "Depois do lançamento, a fisgada vem em um instante oculto entre {min} e {max} segundos; o atraso é decidido quando a linha toca a água, então dois lançamentos nunca são exatamente iguais. Quando a boia afunda, você tem uma janela de {reel} segundos para apertar a vara de novo e recolher: recolha dentro dela e a captura é sua, hesite além dela e o peixe escapa sem deixar nada. Uma sessão inteira termina em no máximo {cap} segundos, então até um lançamento tranquilo se resolve rápido.\n\nVaras melhores afiam as duas pontas do minijogo: cada nível de vara acima do primeiro corta {rod} segundos da espera máxima possível, nunca abaixo do piso de três segundos que a vara do topo já roça, e acrescenta {reelRod} segundos à janela de recolha, então a Vara com Molinete de Ferro puxa a pior espera para 6,5 segundos com uma janela de 3,25 segundos, e a Vara do Riacho Prateado para 5 com uma janela acima de 4, sua raridade alargando a recolha um pouco além do que o nível sozinho paga. As fisgadas mais rápidas nunca mudam, seja qual for a vara que você segure, e basta a vara estar nas suas bolsas para contar.",
         "scheduleHeading": "Ganho de proficiência",
-        "scheduleNote": "Fishing gain follows a fixed schedule with no dice: a full point per catch below 50 proficiency, half a point below 100, a tenth below 150, and a slow 0.02 trickle from 150 to 200. That last stretch is a thousands-of-catches journey on purpose: 200 is a statement, not a stop on the way to something else.\n\nJunk stops teaching entirely at {cutoff}: from there on, weeds and boots are just weeds and boots. The water itself caps the lesson too: the Vale's tier 1 waters (and every young shore beyond the heartland) teach nothing past 100, the marsh's stop at 150, and only Thornpeak's school an angler the whole way to 200. Every landed catch otherwise gains at the scheduled rate, so when the counter stalls, the schedule is telling you to seek deeper water.",
+        "scheduleNote": "O ganho de Pesca segue uma tabela fixa, sem dados: um ponto inteiro por captura abaixo de 50 de proficiência, meio ponto abaixo de 100, um décimo abaixo de 150, e um fio lento de 0,02 de 150 a 200. Esse último trecho é uma jornada de milhares de capturas de propósito: 200 é uma declaração, não uma parada no caminho para outra coisa.\n\nA tralha para de ensinar por completo em {cutoff}: dali em diante, ervas daninhas e botas são apenas ervas daninhas e botas. A própria água também limita a lição: as águas de nível 1 do Vale (e toda margem jovem além das terras centrais) não ensinam nada acima de 100, as do pântano param em 150, e só as de Thornpeak instruem um pescador por todo o caminho até 200. Fora isso, toda captura fisgada rende no ritmo previsto, então quando o contador empaca, é a tabela dizendo a você para procurar águas mais profundas.",
         "colProficiency": "Perícia",
         "colGain": "Ganho por captura",
         "belowFmt": "Abaixo de {below}",
         "tablesHeading": "Tabelas de captura",
-        "tablesNote": "Your proficiency selects one of three catch bands: band 0 from the start, band 1 at 100, band 2 at 200, each shifting weight out of junk and empty hooks into real fish, zone by zone. Each band above the first also demands a rod: band 1 wants the tier 2 Ironreel, band 2 the tier 3 Silverstream. Your effective band is the lower of what your skill has earned and what your rod supports, and the cap is silent: with a lesser rod you still catch, just off the lower band's table, so if your catches feel stuck while your skill climbs, check your rod first.\n\nEach zone's waters hold their own pair of food fish, healing more the deeper the zone, all of them cooking inputs and perfectly good sit-and-eat food raw off the line. The rest of the table is the angler's tax: weed, the occasional boot, and the empty hook, which never fully disappears. How much you pay depends on the water your bobber lands in, not where you stand: a cast reaches up to 24 yards, and the rod the water demands, the table it draws from, the deed it credits, and how far it teaches all answer to the zone that water belongs to, decided the moment the line lands. Each zone's water is written for a band of its own, the Vale for band 0, the marsh for band 1, the peaks for band 2, and fishing one band under that turns roughly a third of your casts into empty hooks, two bands under it more than half. The rod gets you to the water; the skill is what makes it pay, and the climb is what pulls an angler deeper, because better bands are not just better pay: past the Vale they are the only waters that keep teaching. The {rare} is the one row that answers to your catch band and nothing else: the same odds in every zone, and six times likelier at band 2 than at band 0, so the rarest thing on the dock is the one a Master Angler really is better at.",
+        "tablesNote": "Sua proficiência seleciona uma de três faixas de captura: faixa 0 desde o início, faixa 1 em 100, faixa 2 em 200, cada uma deslocando peso da tralha e dos anzóis vazios para peixes de verdade, zona por zona. Cada faixa acima da primeira também exige uma vara: a faixa 1 quer a Vara com Molinete de Ferro de nível 2, a faixa 2 a Vara do Riacho Prateado de nível 3. Sua faixa efetiva é a menor entre a que a sua habilidade conquistou e a que a sua vara sustenta, e o limite é silencioso: com uma vara inferior você ainda pesca, só que pela tabela da faixa mais baixa, então se as suas capturas parecem estagnadas enquanto a sua habilidade sobe, confira a vara primeiro.\n\nAs águas de cada zona guardam o seu próprio par de peixes comestíveis, que curam mais quanto mais profunda for a zona, todos eles ingredientes de culinária e comida de sentar e comer perfeitamente boa crua, direto da linha. O resto da tabela é o imposto do pescador: erva daninha, uma bota de vez em quando e o anzol vazio, que nunca desaparece de todo. Quanto você paga depende da água em que a sua boia cai, não de onde você está de pé: um lançamento alcança até 24 jardas, e a vara que a água exige, a tabela de onde ela sorteia, o feito que ela credita e até onde ela ensina respondem todos à zona a que aquela água pertence, decidido no instante em que a linha toca a superfície. A água de cada zona foi escrita para uma faixa própria, o Vale para a faixa 0, o pântano para a faixa 1, os picos para a faixa 2, e pescar uma faixa abaixo disso transforma cerca de um terço dos seus lançamentos em anzóis vazios, duas faixas abaixo, mais da metade. A vara te leva até a água; a habilidade é o que faz a água pagar, e a escalada é o que puxa um pescador para mais fundo, porque faixas melhores não são só pagamento melhor: passado o Vale, elas são as únicas águas que continuam ensinando. O {rare} é a única linha que responde à sua faixa de captura e a mais nada: as mesmas probabilidades em todas as zonas, e seis vezes mais provável na faixa 2 do que na faixa 0, então a coisa mais rara do cais é justamente aquela em que um Pescador Mestre é de fato melhor.",
         "bandHeading": "Faixa {band}: perícia {at} ou mais, nível de vara {rod}",
         "colCatch": "Captura",
         "colOdds": "Chance",
         "pctFmt": "{pct}%",
         "emptyHook": "Nada mordendo",
         "koiHeading": "O Koi do Brilho Solar",
-        "koiBody": "Every body of water in the game hides the same prize: the Sunglint Koi, an uncommon gleam on the line worth 75 copper to a vendor and rather more to your pride. Its odds answer to your catch band and to nothing else, the same in every zone: a 1 percent row of the catch table at band 0, 3 at band 1, and 6 at band 2, drawn on every reeled-in cast, so the koi comes to the angler who earned the deep tables. Landing one records Glimmer of Hope in your Book of Deeds, a zero-Renown collector's mark. When it happens, the log makes sure you know."
+        "koiBody": "Todo corpo d'água do jogo esconde o mesmo prêmio: o Koi do Brilho Solar, um lampejo incomum na linha que vale 75 cobre para um vendedor e bem mais para o seu orgulho. Suas probabilidades respondem à sua faixa de captura e a mais nada, iguais em todas as zonas: uma linha de 1 por cento da tabela de captura na faixa 0, 3 na faixa 1 e 6 na faixa 2, sorteada em todo lançamento recolhido, então o koi vem para o pescador que conquistou as tabelas profundas. Fisgar um registra Lampejo de Esperança no seu Livro dos Feitos, uma marca de colecionador de Renome zero. Quando acontecer, o registro faz questão de te avisar."
       },
       "econ": {
         "title": "Economia de Criação",
@@ -4374,7 +4462,7 @@ export const pt_BR: EnTranslations = {
         "feeUnbind": "Taxa de desvinculação",
         "feeUnbindValue": "{uncommon} incomum, {rare} raro, {epic} épico",
         "trainingHeading": "Taxas de treinamento",
-        "trainingNote": "One flat fee per recipe rung, charged once when a master teaches it; every rung of the table below is in live use today, from the free starter recipes to the toolmaker's rod lessons at the top.",
+        "trainingNote": "Uma taxa fixa por degrau de receita, cobrada uma única vez quando um mestre a ensina; todo degrau da tabela abaixo está em uso de verdade hoje, das receitas iniciais gratuitas até as lições de vara do fabricante de ferramentas no topo.",
         "trainingTierFmt": "Nível {tier}: {fee}",
         "free": "Grátis",
         "sellsHeading": "O que vende e por quê",
@@ -4390,11 +4478,11 @@ export const pt_BR: EnTranslations = {
         "commissionsHeading": "Encomendas e o Vínculo do Artesão",
         "commissionsBody": "Uma encomenda é uma criação feita para alguém. Ao criar uma arma, uma peça de armadura ou um item secundário sustentado (uma poção não pode carregar um vínculo), o artesão pode marcar a criação como encomenda: a peça acabada se comporta normalmente nas mãos de quem a fez, mas no momento em que troca de mãos em uma negociação ela se vincula à pessoa que a recebeu. É o Vínculo do Artesão: o comprador recebe sua peça, e a peça não pode ser repassada nem revendida.\n\nOs vínculos não são eternos, apenas caros. Qualquer mestre de posto desvincular uma peça vinculada enquanto você estiver na estação (uma estação móvel nunca oferece o serviço), por uma taxa definida pela qualidade do item: 25 pratas para incomum, 1 ouro para raro, 4 ouros para épico, com um lendário pagando a taxa épica e uma peça comum encomendada a taxa de incomum.\n\nA taxa compra uma lousa limpa, não uma cura: a peça ainda é uma encomenda, então ela se vincula novamente a quem a receber na próxima negociação, e todo o resto, assinatura, obra-prima e encantamentos, permanece intacto.",
         "provenanceHeading": "Trabalho assinado",
-        "provenanceBody": "Some items carry a name. Hover one and the tooltip says Gathered by so-and-so on a raw material, or Crafted by so-and-so on a finished piece: the same mark, worded for how the item came to be. A signature is part of the item itself, travels with it through trades, the bank, the mail, the World Market, and even a vendor buyback, and never fades.\n\nGathering signs its best work automatically: any harvest that rolls rare or better arrives signed, and rare finds sign their entire five-fold windfall. A corpse harvest's lucky roll signs its yield where the family has no specimen to give, and where it does, keeps the yield plain and mints the signed pristine specimen beside it. Crafting signs along the same line: every copy of a rare or better output mints signed, and a masterwork always signs whatever its quality, so the finest version of any piece always names its maker. The one thing that can cost you a signature is a full bag: a signed unit needs room of its own, or a matching signed stack, to land in.\n\nA stack of items shares one identity, so two copies merge only when every mark matches exactly: same item, same signer, same masterwork stats, same enchant, same bond. A signed log never joins a plain pile in either direction (merging would erase somebody's name), but identical payloads merge happily, so twenty ore signed by the same gatherer sit in one stack and a windfall does not shred your bags.\n\nSignatures pay crafters back: holding any signed copy of a needed reagent at the bench, whoever signed it, adds 2 percentage points of masterwork chance, and holding a reagent signed by your own hand cuts that reagent's required quantity by one (never below one). Your own signed rare-or-better work even keeps teaching you, today through the flask alone: drink a potion you signed and a small trickle of skill flows back to the craft that brewed it, as long as that craft is one of your active majors.",
+        "provenanceBody": "Alguns itens carregam um nome. Passe o cursor sobre um e a dica de item diz Coletado por fulano num material bruto, ou Feito por fulano numa peça acabada: a mesma marca, redigida conforme o item veio a existir. Uma assinatura é parte do próprio item, viaja com ele por negociações, pelo banco, pelo correio, pelo Mercado Mundial e até por uma recompra de vendedor, e nunca desaparece.\n\nA coleta assina seu melhor trabalho automaticamente: toda extração que rola raro ou melhor chega assinada, e os achados raros assinam todo o seu rendimento quíntuplo. A rolagem de sorte de uma colheita de cadáver assina o rendimento quando a família não tem espécime a oferecer, e quando tem, mantém o rendimento simples e cunha o espécime perfeito assinado ao lado dele. A criação assina pela mesma linha: toda cópia de um resultado raro ou melhor é cunhada assinada, e uma obra-prima sempre assina, qualquer que seja sua qualidade, então a versão mais fina de qualquer peça sempre nomeia seu criador. A única coisa que pode lhe custar uma assinatura é uma bolsa cheia: uma unidade assinada precisa de espaço próprio, ou de uma pilha assinada compatível, para pousar.\n\nUma pilha de itens compartilha uma identidade, então duas cópias só se fundem quando cada marca coincide exatamente: mesmo item, mesmo signatário, mesmos atributos de obra-prima, mesmo encantamento, mesmo vínculo. Uma tora assinada nunca se junta a um monte simples em nenhuma das direções (fundi-los apagaria o nome de alguém), mas cargas idênticas se fundem sem problema, então vinte minérios assinados pelo mesmo coletor ficam em uma pilha só e um achado farto não estraçalha suas bolsas.\n\nAs assinaturas recompensam os artesãos: ter na bancada qualquer cópia assinada de um reagente necessário, seja quem for que a assinou, acrescenta 2 pontos percentuais de chance de obra-prima, e ter um reagente assinado pela sua própria mão corta em um a quantidade exigida daquele reagente (nunca abaixo de um). Seu próprio trabalho assinado de qualidade rara ou melhor ainda continua lhe ensinando, hoje só através do frasco: beba uma poção que você assinou e um pequeno fio de habilidade volta para o ofício que a preparou, contanto que esse ofício seja um dos seus principais ativos.",
         "collectorsHeading": "Colecionadores, troféus e o preço de uma história",
         "collectorsBody": "Os vendedores são cegos à proveniência: um item assinado é vendido a um PNJ exatamente pelo seu preço comum. O prêmio de uma assinatura existe apenas entre jogadores, o que é precisamente o que o torna interessante: uma pilha de minério inesperado assinada por um coletor famoso, um Corte Principal de uma colheita sortuda, uma lâmina obra-prima com o nome de um artesão aposentado, todos custam o que a memória de alguém diz que valem.\n\nO Livro dos Feitos apoia o mesmo instinto: Veia Imaculada, Cerne Ancião, Flor ao Luar, Um Espécime Perfeito e Lampejo de Esperança são marcas de colecionador com zero de Renome que existem apenas para provar que um momento aconteceu com você. Guarde o item que conquistou o feito e você tem o recibo. Nada disso é poder; a proveniência não compra atributos nem vence batalhas, é o rastro de papel do jogo para dias felizes.",
         "throttleHeading": "O limitador de ações",
-        "throttleBody": "Output has a ceiling: crafting, disenchanting, enchanting, salvaging, and tool-effect recharges share one budget of {actions} successful actions in each {seconds}-second window. A denied attempt costs nothing and spends no budget. You will never feel it in normal play; it exists so a maxed specialist with a full bank cannot flood the Market, whatever their skill or stockpile.",
+        "throttleBody": "A produção tem um teto: criação, desencantamento, encantamento, salvamento e recargas de efeito de ferramenta dividem um único orçamento de {actions} ações bem-sucedidas a cada janela de {seconds} segundos. Uma tentativa recusada não custa nada e não gasta orçamento. Você nunca vai sentir isso em uma sessão normal; a regra existe para que um especialista no limite com o banco cheio não consiga inundar o Mercado, por maior que seja sua habilidade ou seu estoque.",
         "doctrineHeading": "Jogadores negociam com jogadores",
         "doctrineBody": "A economia de criação é construída sobre uma ideia: jogadores abastecem jogadores. Coletores alimentam artesãos, artesãos alimentam aventureiros e raideiros, e demolidores alimentam encantadores, com vendedores e mestres de posto nas bordas para absorver itens indesejados e moedas em vez de competir com você. Se quiser ganhar dinheiro com uma profissão, seu cliente é uma pessoa: aprenda o que outros jogadores consomem, precifique em relação ao Mercado Mundial e trate os sistemas de PNJ como um piso para seus preços, não como o mercado em si.\n\nO equipamento criado é ajustado para ficar abaixo do patamar de raide: mesmo uma obra-prima está apenas um nível de qualidade acima da receita, nunca além de lendário, e seu orçamento de atributos fica abaixo da faixa do saque de raide. A forja te prepara para o conteúdo mais difícil; ela não o substitui. Isso mantém artesãos, raideiros e o mercado em um triângulo estável: os drops de raide permanecem aspiracionais, e as peças criadas permanecem o melhor equipamento que o dinheiro pode de fato comprar."
       },
@@ -4408,15 +4496,15 @@ export const pt_BR: EnTranslations = {
         "q3": "Qual é a diferença entre saquear e colher um cadáver?",
         "a3": "Um clique cobre os dois. Tudo que um cadáver contém, moedas e drops mais quaisquer componentes coletáveis, abre na mesma janela: o saque segue as regras normais de saque, e a colheita é o lado das profissões, extraindo materiais do próprio cadáver.\n\nA colheita é por ordem de chegada e de uso único: cada cadáver pode ser colhido exatamente uma vez, por quem o reivindicar primeiro, inclusive online. O Foco do Vilarejo molda o que você obtém: enquanto estiver em um centro de vilarejo, você pode distribuir 10 pontos de foco pelos tipos de componente que lhe interessam, e cada componente focado rola um nível melhor (a cada 5 pontos sobe um degrau, no máximo dois degraus) e rende mais (10 por cento por ponto). Componentes sem foco nunca são piorados.",
         "q4": "Por que meu Tronco de Ironbark está assinado?",
-        "a4": "You hit a windfall. Roughly 1 harvest in 90 triggers a rare gather event (ancient heartwood on a tree, a pristine vein on ore, a moonlit bloom on herbs): it multiplies the yield five times, signs every unit with your name, and announces the find to the whole zone. A rare or better rarity roll on an ordinary harvest signs the yield too.\n\nSigned materials are worth keeping or selling dear: holding any signed copy of a needed reagent at the bench adds 2 percentage points to the masterwork chance. Just remember they only stack with identically signed copies, so they keep their own bag slot.",
+        "a4": "Você teve um golpe de sorte. Aproximadamente 1 coleta em 90 dispara um evento de coleta raro (cerne antigo em uma árvore, uma veia imaculada no minério, uma flor ao luar entre as ervas): ele multiplica o rendimento por cinco, assina cada unidade com o seu nome e anuncia o achado para a zona inteira. Uma rolagem de raridade rara ou melhor em uma coleta comum também assina o rendimento.\n\nMateriais assinados valem a pena guardar ou vender caro: ter na bancada qualquer cópia assinada de um reagente exigido soma 2 pontos percentuais à chance de obra-prima. Só lembre que eles se empilham apenas com cópias assinadas de forma idêntica, então ficam em um encaixe de bolsa só deles.",
         "q5": "Como desvincular uma peça encomendada e quanto custa?",
         "a5": "Vá a qualquer posto de criação com a peça nas bolsas e pague o mestre. A taxa segue a qualidade do item: 25 pratas para uma peça incomum, 1 ouro para uma rara, 4 ouros para uma épica; uma lendária paga a taxa épica, e uma peça comum encomendada paga a taxa de incomum. Deve ser um posto real: uma estação móvel nunca oferece o serviço.\n\nA taxa compra uma lousa limpa, não uma cura: a peça continua sendo uma encomenda, então ela se vincula novamente a quem a receber na próxima negociação. Se várias cópias vinculadas compartilharem uma pilha, uma cópia é separada e desvinculada por pagamento.",
         "q6": "Onde aprender receitas e quanto custam?",
-        "a6": "The nine common field recipes and the six crafted land-tool recipes are known to everyone from the start, and so are three station-bound capstones (the Kilnscale Mantle, the Wardweave Cowl, and the Duskhide Wraps), which need no trainer, only their station. Everything else is taught by the resident masters at their stations across the three hub towns: most stand in Eastbrook, the tanner keeps the tannery in Fenbridge, and the alchemist keeps the apothecary in Highwatch.\n\nTrainer recipes run in rungs: skill 0, 25, and 50 for the gear and consumable crafts, priced free, 25 silver, and 1 gold as one-time fees; Enchanting's two charm recipes sit on the 25 rung, and the toolmaker teaches the two crafted fishing rods at 75 and 125 for 4 and 16 gold. A master teaches a recipe once your bracket in that craft has reached the recipe's own bracket, and you must be standing at their station to learn: a mobile station does not count.",
+        "a6": "As nove receitas comuns de campo e as seis receitas de ferramentas de terra criadas são conhecidas por todos desde o início, e o mesmo vale para três obras máximas vinculadas a bancada (o Manto de Escamas de Forno, o Capuz de Trama Protetora e as Faixas de Couro do Crepúsculo), que não pedem treinador algum, apenas sua bancada. Todo o resto é ensinado pelos mestres residentes em suas bancadas nas três cidades-centro: a maioria fica em Eastbrook, o curtidor mantém o curtume em Fenbridge, e o alquimista mantém o boticário em Highwatch.\n\nAs receitas de treinador correm em degraus: habilidade 0, 25 e 50 para os ofícios de equipamento e de consumíveis, com preços de graça, 25 prata e 1 ouro como taxas únicas; as duas receitas de amuleto do Encantamento ficam no degrau 25, e o fabricante de ferramentas ensina as duas varas de pesca criadas em 75 e 125 por 4 e 16 ouro. Um mestre ensina uma receita assim que a sua faixa naquele ofício alcança a faixa da própria receita, e você precisa estar de pé na bancada dele para aprender: uma bancada móvel não conta.",
         "q7": "Por que minha coleta ficou de repente mais lenta?",
-        "a7": "The gather cast starts at 2.5 seconds and is shaved down two ways: 0.4 seconds for every tool tier you carry and can wield above the node's own tier, and 0.15 seconds once your trade's counter crosses its 100 band, with a floor of 1.5 seconds. Move from tier 1 nodes up to tier 3 nodes and your surplus vanishes, so the same pick swings slower again. Holding exactly the required tier buys no speed; it only opens the node.\n\nSkill gain fades the same way crafting does: a node grays out as your proficiency climbs past its tier (tier 1 nodes teach nothing from proficiency 75 on), so the answer to slow gains is higher tier nodes. Those need a tool of at least their tier in your bags (no node is ever worked bare-handed, tier 1 included), and a land tool above tier 1 also wants its wield mark first, 40/70/85/100 in its own trade for tiers 2 through 5. Fishing follows its own taper: full gain below 50 proficiency, half below 100, a trickle of 0.1 below 150 and 0.02 below 200, junk catches teach nothing at all from 100 on, and the water itself caps the lesson (tier 1 waters stop teaching at 100, the marsh at 150), so a stalled counter can also mean you have outgrown the water.",
+        "a7": "O lançamento de coleta começa em 2,5 segundos e é encurtado de duas formas: 0,4 segundos para cada nível de ferramenta que você carrega e consegue manejar acima do nível do próprio nó, e 0,15 segundos assim que o contador do seu ofício cruza a faixa de 100, com um piso de 1,5 segundos. Passe dos nós de nível 1 para os nós de nível 3 e a sua vantagem desaparece, então a mesma picareta volta a golpear mais devagar. Carregar exatamente o nível exigido não compra velocidade nenhuma; ele apenas abre o nó.\n\nO ganho de habilidade desvanece do mesmo jeito que na criação: um nó fica cinza conforme a sua proficiência sobe acima do nível dele (nós de nível 1 não ensinam nada a partir de 75 de proficiência), então a resposta para ganhos lentos são nós de nível mais alto. Esses exigem nas suas bolsas uma ferramenta de pelo menos o nível deles (nenhum nó jamais é trabalhado com as mãos nuas, nível 1 incluído), e uma ferramenta de terra acima do nível 1 ainda pede antes a sua marca de manejo, 40/70/85/100 no próprio ofício dela para os níveis 2 a 5. A Pesca segue a sua própria queda: ganho total abaixo de 50 de proficiência, metade abaixo de 100, um fio de 0,1 abaixo de 150 e 0,02 abaixo de 200, capturas de tralha não ensinam mais nada a partir de 100, e a própria água limita a lição (as águas de nível 1 param de ensinar em 100, as do pântano em 150), então um contador parado também pode significar que você superou aquela água.",
         "q8": "Posso criar longe da cidade?",
-        "a8": "Partly. The nine common field recipes (the starter weapon, armor, food, and potion staples) craft anywhere, any time, and so do the three combination recipes of the sworn pairs. Everything else above them is bound to a station type: forge, kitchens, apothecary, tannery, loom, or toolworks, and you must be within 20 yards of the station for the craft to go through.\n\nAt 75 skill in a craft you specialize, and along with a 20 percent material discount you gain a mobile station: place it in the field and it stands for 10 minutes, serving that craft's recipes as if you were at the real thing. The mobile station is for crafting only: learning recipes and unbinding commissions always require the true station in town."
+        "a8": "Em parte. As nove receitas comuns de campo (os básicos iniciais de arma, armadura, comida e poção) podem ser criadas em qualquer lugar, a qualquer hora, e o mesmo vale para as três receitas combinadas dos pares jurados. Tudo o mais acima delas está preso a um tipo de bancada: forja, cozinhas, boticário, curtume, tear ou oficina de ferramentas, e você precisa estar a menos de 20 jardas da bancada para a criação se concretizar.\n\nCom 75 de habilidade em um ofício você se especializa e, junto com um desconto de 20 por cento em materiais, ganha uma bancada móvel: monte-a no campo e ela fica de pé por 10 minutos, atendendo as receitas daquele ofício como se você estivesse na bancada de verdade. A bancada móvel serve só para criar: aprender receitas e desvincular encomendas sempre exigem a bancada verdadeira na cidade."
       }
     },
     "economy": {
@@ -5234,7 +5322,7 @@ export const pt_BR: EnTranslations = {
     "helpLinkedDisconnectedWithBalance": "As vantagens de titular estão ativas. Conecte o app quando precisar assinar ou gastar.",
     "extensionHelp": "Para ver uma carteira aqui, mantenha ativa uma extensão de carteira do navegador, como a Solflare Wallet.",
     "mobileAppHelp": "Escolha Phantom ou Solflare. Seu app de carteira pedirá aprovação. Mantenha o jogo aberto e retorne a ele quando terminar.",
-    "seekerAppHelp": "Continue with Seed Vault Wallet. Review the connection and verification requests in Seed Vault, then return to the game.",
+    "seekerAppHelp": "Continue com a Seed Vault Wallet. Revise as solicitações de conexão e de verificação no Seed Vault e depois retorne ao jogo.",
     "standaloneAppHelp": "As conexões de carteira ainda não estão disponíveis no aplicativo da Tela Inicial. Abra o World of ClaudeCraft no Safari ou Chrome para usar Phantom ou Solflare.",
     "openAppTitle": "Continuar em {wallet}",
     "openAppHelp": "Abra {wallet} para revisar esta solicitação. Mantenha esta aba do jogo aberta enquanto o app da carteira estiver ativo.",
@@ -6159,10 +6247,16 @@ export const pt_BR: EnTranslations = {
   },
   "desktop": {
     "update": {
-      "downloading": "Baixando atualização {version}...",
-      "ready": "A atualização {version} está pronta. Ela será instalada ao sair, ou reinicie agora.",
+      "checkingTitle": "Procurando atualizações...",
+      "checkingBody": "Novas versões são baixadas enquanto você joga.",
+      "uptodateTitle": "Você está atualizado",
+      "downloadingTitle": "Baixando atualização {version}...",
+      "downloadingBody": "Você pode continuar jogando. A instalação ocorre quando você sair.",
+      "readyTitle": "A atualização {version} está pronta",
+      "readyBody": "Ela será instalada ao sair, ou reinicie agora.",
       "restart": "Reiniciar agora",
-      "later": "Depois"
+      "later": "Depois",
+      "dismiss": "Dispensar"
     },
     "crash": {
       "title": "World of ClaudeCraft",
@@ -6629,6 +6723,11 @@ export const pt_BR: EnTranslations = {
     },
     "system": {
       "playerDeath": "Você morreu.",
+      "deathRecapKillerAbility": "Você morreu. Morto por {ability} de {killer}.",
+      "deathRecapKiller": "Você morreu. Morto por {killer}.",
+      "deathRecapAbility": "Você morreu. Morto por {ability}.",
+      "deathRecapFalling": "Você morreu. Você caiu e morreu.",
+      "deathRecapDrowned": "Você morreu. Você se afogou.",
       "respawn": "Você se sente descansado e inteiro novamente.",
       "ignoringChat": "Ignorando chat de {name}.",
       "noLongerIgnoring": "Você não ignora mais {name}.",
@@ -6874,6 +6973,10 @@ export const pt_BR: EnTranslations = {
         "officer": "Oficial",
         "member": "Membro"
       },
+      "tenure": {
+        "recruit": "Recruta",
+        "veteran": "Veterano"
+      },
       "guildHeadOne": "você é {rank}, {count} membro",
       "guildHeadMany": "você é {rank}, {count} membros"
     },
@@ -7006,7 +7109,7 @@ export const pt_BR: EnTranslations = {
       "complete": "Concluída",
       "showOnMap": "Mostrar {name} no mapa",
       "hideFromMap": "Ocultar {name} do mapa",
-      "unknownQuest": "Unknown quest ({id})"
+      "unknownQuest": "Missão desconhecida ({id})"
     },
     "log": {
       "title": "Registro de missões",
@@ -7018,8 +7121,8 @@ export const pt_BR: EnTranslations = {
       "activeStatus": "Ativa",
       "readyStatus": "Concluída",
       "completedStatus": "Concluída",
-      "repeatableStatus": "Repeatable",
-      "cooldownStatus": "Available again soon",
+      "repeatableStatus": "Repetível",
+      "cooldownStatus": "Disponível novamente em breve",
       "returnTo": "Volte até {name}",
       "abandon": "Abandonar missão",
       "abandonConfirmTitle": "Abandonar missão",
@@ -7033,7 +7136,7 @@ export const pt_BR: EnTranslations = {
       "greetingFallback": "Saudações.",
       "availableQuestAria": "Missão disponível: {name}",
       "readyQuestAria": "Missão pronta para entrega: {name}",
-      "repeatableQuestAria": "Repeatable quest: {name}",
+      "repeatableQuestAria": "Missão repetível: {name}",
       "discussQuest": "Discutir {name}.",
       "discussQuestAria": "Discutir missão: {name}",
       "profIntroHint": "Fale com {name} para \"{quest}\".",
@@ -7114,7 +7217,8 @@ export const pt_BR: EnTranslations = {
       "armor": "Armadura",
       "quest": "Item de missão",
       "junk": "Sucata",
-      "fineMaterial": "Fine Material",
+      "fineMaterial": "Material Fino",
+      "material": "Matéria-prima",
       "food": "Comida",
       "drink": "Bebida",
       "tool": "Ferramenta",
@@ -7147,6 +7251,9 @@ export const pt_BR: EnTranslations = {
       "useFood": "Usar: restaura {amount} de vida ao longo de {seconds} s. É preciso permanecer sentado enquanto come.",
       "useDrink": "Usar: restaura {amount} de mana ao longo de {seconds} s. É preciso permanecer sentado enquanto bebe.",
       "questItem": "Item de missão",
+      "questRelated": "Missão: {quest}",
+      "questRules": "Não pode ser vendido, guardado no banco ou negociado.",
+      "questOrphaned": "Não é necessário para nenhuma missão ativa.",
       "classes": "Classes: {classes}",
       "sellPrice": "Preço de venda: {money}",
       "clickBuy": "Clique para comprar",
@@ -7175,12 +7282,12 @@ export const pt_BR: EnTranslations = {
       "destroyTitle": "Destruir {item}",
       "destroyConfirm": "Destruir",
       "destroyCancel": "Cancelar",
-      "unknownItem": "Unknown item",
-      "unknownItemAria": "Unknown item {id}, quantity {count}",
-      "unknownItemAriaMasterwork": "Unknown item {id}, quantity {count}, masterwork",
-      "unknownItemAriaEnchanted": "Unknown item {id}, quantity {count}, enchanted copy",
-      "unknownItemAriaBound": "Unknown item {id}, quantity {count}, bound copy",
-      "unknownItemAriaInstanced": "Unknown item {id}, quantity {count}, maker-marked copy"
+      "unknownItem": "Item desconhecido",
+      "unknownItemAria": "Item desconhecido {id}, quantidade {count}",
+      "unknownItemAriaMasterwork": "Item desconhecido {id}, quantidade {count}, obra-prima",
+      "unknownItemAriaEnchanted": "Item desconhecido {id}, quantidade {count}, cópia encantada",
+      "unknownItemAriaBound": "Item desconhecido {id}, quantidade {count}, cópia vinculada",
+      "unknownItemAriaInstanced": "Item desconhecido {id}, quantidade {count}, cópia marcada pelo criador"
     },
     "equipment": {
       "empty": "Vazio",
@@ -7194,16 +7301,16 @@ export const pt_BR: EnTranslations = {
       "buyAriaWithRequirement": "Comprar {item} por {price}. {requirement}",
       "buyStack": "Comprar {count}",
       "buyStackAria": "Comprar {count} {item} por {price}",
-      "qtyRowAria": "Purchase quantity",
+      "qtyRowAria": "Quantidade de compra",
       "qtyMultiple": "{count}x",
-      "qtyMultipleAria": "Buy {count} at a time",
-      "qtyCustom": "Custom",
-      "qtyCustomAria": "Choose a custom amount to buy",
-      "buyCountAria": "Buy {count} of {item} for {price}",
-      "buyCountAriaWithRequirement": "Buy {count} of {item} for {price}. {requirement}",
-      "buyQuantityTitle": "Buy how many {item}? Up to {max}.",
-      "buyQuantityInput": "Quantity to buy",
-      "buyQuantityConfirm": "Buy",
+      "qtyMultipleAria": "Comprar {count} por vez",
+      "qtyCustom": "Personalizado",
+      "qtyCustomAria": "Escolher uma quantidade personalizada para comprar",
+      "buyCountAria": "Comprar {count} de {item} por {price}",
+      "buyCountAriaWithRequirement": "Comprar {count} de {item} por {price}. {requirement}",
+      "buyQuantityTitle": "Comprar quantos {item}? Até {max}.",
+      "buyQuantityInput": "Quantidade para comprar",
+      "buyQuantityConfirm": "Comprar",
       "buybackTitle": "Recompra",
       "buybackEmpty": "Sem itens",
       "buybackAria": "Recomprar {item} por {price}",
@@ -7282,6 +7389,12 @@ export const pt_BR: EnTranslations = {
       "reclaim": "Recuperar",
       "buyAria": "Comprar {item} por {price}",
       "reclaimAria": "Recuperar {item}",
+      "buyConfirmTitle": "Confirmar compra",
+      "buyConfirmBody": "Comprar {item} por {price}?",
+      "buyConfirmBodyStack": "Comprar {item} x{count} por {price} ({each} cada)?",
+      "buyConfirmAccept": "Comprar",
+      "buyConfirmCancel": "Cancelar",
+      "buyChanged": "Esse anúncio mudou antes que você confirmasse. Verifique o preço e tente novamente.",
       "sellNote": "Liste mercadorias das suas bolsas. O Mercador fica com {cut}% quando um item é vendido. Você usa {used}/{max} espaços.",
       "sellPickEmpty": "Clique em um item nas suas bolsas para escolher o que vender.",
       "quantity": "Quantidade",
@@ -8769,6 +8882,18 @@ export const pt_BR: EnTranslations = {
       "fen_muster_order": {
         "name": "Ordem de convocação de Fenbridge"
       },
+      "firebottle": {
+        "name": "Garrafa de Fogo"
+      },
+      "murloc_hut": {
+        "name": "Cabana de Mudfin"
+      },
+      "restless_skull": {
+        "name": "Crânio Inquieto"
+      },
+      "vanguard_bone": {
+        "name": "Osso da Vanguarda"
+      },
       "mire_prowler_pelt": {
         "name": "Pele de espreitador do brejo"
       },
@@ -9685,37 +9810,37 @@ export const pt_BR: EnTranslations = {
         "name": "Madeira Ressonante"
       },
       "fine_copper_ore": {
-        "name": "Fine Copper Ore"
+        "name": "Minério de Cobre Fino"
       },
       "fine_iron_ore": {
-        "name": "Fine Iron Ore"
+        "name": "Minério de Ferro Fino"
       },
       "fine_thorium_ore": {
-        "name": "Fine Osmium Ore"
+        "name": "Minério de Tório Fino"
       },
       "fine_ironbark_log": {
-        "name": "Fine Ironbark Log"
+        "name": "Tora de Casca de Ferro Fina"
       },
       "fine_ashwood_log": {
-        "name": "Fine Ashwood Log"
+        "name": "Tora de Freixo Cinza Fina"
       },
       "fine_elderwood_log": {
-        "name": "Fine Highpine Log"
+        "name": "Tora de Madeira Antiga Fina"
       },
       "fine_silverleaf_herb": {
-        "name": "Fine Sheenleaf Herb"
+        "name": "Erva Folha de Prata Fina"
       },
       "fine_goldleaf_herb": {
-        "name": "Fine Goldleaf Herb"
+        "name": "Erva Folha Dourada Fina"
       },
       "fine_sunpetal_herb": {
-        "name": "Fine Sunpetal Herb"
+        "name": "Erva Pétala Solar Fina"
       },
       "stormreel_fishing_rod": {
-        "name": "Stormreel Fishing Rod"
+        "name": "Vara com molinete de tempestade"
       },
       "tidewrought_fishing_rod": {
-        "name": "Tidewrought Fishing Rod"
+        "name": "Vara forjada pela maré"
       },
       "duskwisp_essence": {
         "name": "Essência de fogo-fátuo do crepúsculo"
@@ -10036,13 +10161,16 @@ export const pt_BR: EnTranslations = {
         "name": "Sinete do Último Reduto"
       },
       "gatherers_cache": {
-        "name": "Gatherer's Cache"
+        "name": "Alforje do Coletor"
       },
       "artisans_eye": {
-        "name": "Artisan's Eye"
+        "name": "Olhar do Artesão"
       },
       "reins_terrorspark_groundshaker": {
         "name": "Chave de ignição: Faíscaterror, Abala-Terra"
+      },
+      "reins_drakemaw_raptor": {
+        "name": "Rédeas do Raptor de Drakemaw"
       },
       "conjured_water4": {
         "name": "Água de Nascente Conjurada"
@@ -11039,6 +11167,21 @@ export const pt_BR: EnTranslations = {
       "spider_egg_sac": {
         "name": "Saco de Ovos de Aranha"
       },
+      "spider_egg": {
+        "name": "Ovo da Mãe da Ninhada"
+      },
+      "widow_hatchling": {
+        "name": "Filhote de Viúva"
+      },
+      "drowned_warlord": {
+        "name": "O Senhor da Guerra Afogado"
+      },
+      "brakka_wallbreaker": {
+        "name": "Brakka o Quebra-Muralhas"
+      },
+      "threnos_first_voice": {
+        "name": "Threnos a Primeira Voz"
+      },
       "grave_silt_bulwark": {
         "name": "Baluarte do Lodo Sepulcral"
       },
@@ -11218,6 +11361,18 @@ export const pt_BR: EnTranslations = {
       },
       "cindraleth_maw_matriarch": {
         "name": "Cindraleth, a Matriarca das Fauces"
+      },
+      "dragonkin_egg": {
+        "name": "Ovo Dracônico"
+      },
+      "dragonkin_whelp": {
+        "name": "Filhote Dracônico"
+      },
+      "dragonkin_broodguard": {
+        "name": "Guardião da Ninhada Dracônico"
+      },
+      "drakemaw_broodlord": {
+        "name": "Senhor da Ninhada de Drakemaw"
       },
       "gilded_stag": {
         "name": "Cervo Dourado"
@@ -12284,7 +12439,7 @@ export const pt_BR: EnTranslations = {
       },
       "q_no_rest": {
         "title": "Sem descanso nos juncos",
-        "text": "Esse rito ergue os afogados onde quer que o pântano os toque. Ainda não podemos desfazê-lo; tire 14 soldados de seus mestres.",
+        "text": "O rito nesses incensários prende os afogados e os obriga a se erguer, e agora ergueu um forte o bastante para liderá-los. Os guardiões o chamam de Senhor da Guerra Afogado, e enquanto ele mantiver a Capela Afogada, os mortos guardam suas fileiras. Derrote-o, {playerName}, e o resto se espalhará de volta para o brejo.",
         "completion": "Você dá aos mortos mais misericórdia que os mestres deles. Pegue isto, você mereceu.",
         "objectives": {
           "0": {
@@ -12562,9 +12717,6 @@ export const pt_BR: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Zelote do Culto do Wyrm abatido"
-          },
-          "1": {
-            "label": "Ordens do Culto do Wyrm"
           }
         }
       },
@@ -12575,9 +12727,6 @@ export const pt_BR: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Necromante do Culto do Wyrm abatido"
-          },
-          "1": {
-            "label": "Filactério ritual"
           }
         }
       },
@@ -12676,7 +12825,7 @@ export const pt_BR: EnTranslations = {
       },
       "q_the_codfather": {
         "title": "O Bacalhau-Padrinho",
-        "text": "The Codfather isn't just a fish, {playerName}, he's a cold-blooded killer. Old-timers swear he eats Mire Prowlers for breakfast, and even the Mirefen Widows won't spin their webs near the Deepfen Shallows out of sheer terror. He rules those waters, and marsh water takes an Ironreel Fishing Rod, no less; my counter sells them. Get one in hand, drag that old devil out of his waters, and I will admit you have joined the family.",
+        "text": "O Bacalhau-Padrinho não é só um peixe, {playerName}, é um assassino de sangue frio. Os mais velhos juram que ele come Espreitadores do brejo no café da manhã, e nem as Viúvas de Mirefen tecem suas teias perto dos Baixios de Deepfen, de puro terror. Ele reina naquelas águas, e água de pântano exige uma Vara com molinete de ferro, nada menos; meu balcão as vende. Arranje uma, arraste aquele velho demônio para fora das águas dele, e eu admitirei que você entrou para a família.",
         "completion": "Pelos santos encharcados... O Bacalhau-Padrinho em pessoa. Veja esses bigodes. Fenbridge vai viver um ano inteiro de histórias com essa pescaria, {playerName}.",
         "objectives": {
           "0": {
@@ -12696,7 +12845,7 @@ export const pt_BR: EnTranslations = {
       },
       "q_nythraxis_graves": {
         "title": "Túmulos dos esquecidos",
-        "text": "I have seen these marks before, on three old graves around the northern battlefield. Captain Aldren lies on the western rise, High Priest Malric further south along the western edge, and Royal Assassin Voss by the eastern cliff. Touch each grave and listen, {playerName}. The dead may remember what the living forgot.",
+        "text": "Já vi essas marcas antes, em três túmulos antigos ao redor do campo de batalha ao norte. O capitão Aldren jaz na elevação a oeste, o sumo sacerdote Malric mais ao sul pela borda oeste, e o assassino real Voss junto ao penhasco leste. Toque cada túmulo e escute, {playerName}. Os mortos talvez lembrem o que os vivos esqueceram.",
         "completion": "Aldren permaneceu leal, Malric se recusou a aceitar a morte e Voss viu o perigo antes de todos. Os três serviram ao mesmo rei esquecido.",
         "objectives": {
           "0": {

@@ -541,6 +541,52 @@ describe('the World Market: the Merchant', () => {
     expect(sim.marketInfoFor(seller)?.collectionCopper).toBe(95);
   });
 
+  it('the rename sweep re-keys the SIGNER inside the renamer OWN escrowed rows', () => {
+    // The owner rekey renames who OWNS a row. Since #2507 an instanced copy can
+    // be escrowed IN the row, and its signer is a separate string: cancelling
+    // the listing after a rename would otherwise hand back a copy signed by a
+    // name that no longer exists. Shipped untested, so pinned here.
+    const sim = makeWorld();
+    const seller = sim.addPlayer('warrior', 'Seller');
+    standAtMerchant(sim, seller);
+    sim.addItemInstance('wolf_fang', { signer: 'Seller' }, seller, 1);
+    sim.marketListInstance('wolf_fang', 500, { signer: 'Seller' }, seller);
+    const listing = listingBy(sim, (l) => !!l.instance, 'instanced listing');
+    listing.sellerKey = 'Seller';
+    listing.sellerName = 'Seller';
+    const internals = sim.market as unknown as {
+      marketCollections: Map<
+        string,
+        { copper: number; items: { instance?: { signer?: string } }[] }
+      >;
+    };
+    internals.marketCollections.set('77', {
+      copper: 0,
+      items: [{ itemId: 'wolf_fang', count: 1, instance: { signer: 'Seller' } } as never],
+    });
+
+    expect(sim.rekeyMarketSeller(77, 'Seller', 'Renamed')).toBe(true);
+    expect(listing.instance?.signer).toBe('Renamed');
+    expect(internals.marketCollections.get('77')?.items[0].instance?.signer).toBe('Renamed');
+  });
+
+  it('the rename sweep leaves a STRANGER escrowed row alone (the accepted limitation)', () => {
+    // The deliberate scope boundary, pinned so a later widening is a conscious
+    // choice rather than a drift: a copy this character signed but that now
+    // sits in someone else's listing is foreign-held and stays on the old name.
+    const sim = makeWorld();
+    const seller = sim.addPlayer('warrior', 'Seller');
+    standAtMerchant(sim, seller);
+    sim.addItemInstance('wolf_fang', { signer: 'Seller' }, seller, 1);
+    sim.marketListInstance('wolf_fang', 500, { signer: 'Seller' }, seller);
+    const listing = listingBy(sim, (l) => !!l.instance, 'instanced listing');
+    listing.sellerKey = 'somebody-else';
+    listing.sellerName = 'Somebody Else';
+
+    sim.rekeyMarketSeller(77, 'Seller', 'Renamed');
+    expect(listing.instance?.signer).toBe('Seller');
+  });
+
   it('rejects a purchase the buyer cannot afford', () => {
     const sim = makeWorld();
     const seller = sim.addPlayer('warrior', 'Seller');

@@ -11,7 +11,7 @@ import {
   eastbrookMailboxSourceFingerprint,
 } from '../scripts/assets/eastbrook_mailbox/source_fingerprint.mjs';
 import { MEDIA_ASSETS } from '../src/render/assets/manifest.generated';
-import { GFX } from '../src/render/gfx';
+import { GFX, gfxInternalsForTest } from '../src/render/gfx';
 import {
   buildMailboxFromSource,
   buildMailboxPillar,
@@ -24,7 +24,12 @@ const ASSET_PATH = path.join(REPO_ROOT, 'public/models/props/mailbox_pillar.glb'
 const ASSET_BYTES = 32_884;
 const ASSET_SHA256 = '599f931cebcee4652e2fff788947cc34bedacad7a5bf8a168f04e44f1bfcdc95';
 const SOURCE_FINGERPRINT = '2d63ac194e8e21ac618c5cb6405e2e4aef2c19a0f63a8a29d92489275e53cba6';
-const ORIGINAL_STANDARD_MATERIALS = GFX.standardMaterials;
+let restoreGfx: (() => void) | null = null;
+
+function setStandardMaterials(value: boolean): void {
+  restoreGfx?.();
+  restoreGfx = gfxInternalsForTest.overrideSettings({ standardMaterials: value });
+}
 
 function sourceModel(material: THREE.MeshStandardMaterial): THREE.Group {
   const geometry = new THREE.BoxGeometry(2, 4, 1);
@@ -48,8 +53,8 @@ function sourceModel(material: THREE.MeshStandardMaterial): THREE.Group {
 }
 
 afterEach(() => {
-  (GFX as unknown as { standardMaterials: boolean }).standardMaterials =
-    ORIGINAL_STANDARD_MATERIALS;
+  restoreGfx?.();
+  restoreGfx = null;
 });
 
 describe('Eastbrook Ravenpost mailbox pipeline', () => {
@@ -329,7 +334,7 @@ describe('Ravenpost mailbox renderer adapter', () => {
   });
 
   it('retains vertex color and the shared atlas on the Lambert-compatible Low path', () => {
-    (GFX as unknown as { standardMaterials: boolean }).standardMaterials = false;
+    setStandardMaterials(false);
     const atlas = new THREE.Texture();
     const sourceMaterial = new THREE.MeshStandardMaterial({
       color: 0xffffff,

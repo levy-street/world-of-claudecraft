@@ -97,10 +97,11 @@ const FANOUT_ARMS: readonly string[] = [
   'this.targetAurasWindow.relocalize|',
   'this.questlogWindow.render|this.questlogWindow.isOpen',
   "this.renderBags|$('#bags').style.display !== 'none'",
-  "this.renderVendor|this.openVendorNpcId !== null && $('#vendor-window').style.display === 'block'",
-  "this.renderHeroicVendor|this.openHeroicVendorNpcId !== null && $('#vendor-window').style.display === 'block'",
-  "this.renderTrain|this.openTrainNpcId !== null && $('#train-window').style.display === 'block'",
-  "this.renderUnbind|this.openUnbindNpcId !== null && $('#unbind-window').style.display === 'block'",
+  // The four service windows (copper vendor, heroic quartermaster, train,
+  // unbind) repaint through the shared helper; its per-window open-plus-shown
+  // guards are pinned by tests/train_window_hud.test.ts, since this half only
+  // sees refreshLocalizedDynamicUi's OWN statement-position calls.
+  'this.repaintOpenServiceWindows|',
   'this.renderTownFocus|this.townFocusOpen',
   'this.marketWindow.render|this.marketWindow.isOpen',
   'this.bankWindow.render|this.bankWindow.isOpen',
@@ -210,9 +211,9 @@ const ANSWERED: readonly AnsweredSurface[] = [
   },
   {
     file: 'bank_window.ts',
-    memos: ['lastSig'],
+    memos: ['lastRenderedGuildView', 'lastRenderedTab', 'lastSig'],
     answer: 'this.bankWindow.render',
-    why: 'capacity, purchased and bonus slot counts, the next expansion cost and the stored slots. render() carries no self-gate, so the arm rebuilds',
+    why: 'capacity, purchased and bonus slot counts, the next expansion cost, the stored slots (both panes ride ONE sig, the guild arm and the activity log key appended), plus lastRenderedTab and lastRenderedGuildView, two text-independent pane latches that only scope the scroll restore. render() carries no self-gate, so the arm rebuilds',
   },
   {
     file: 'calendar_window.ts',
@@ -367,6 +368,18 @@ const NOT_A_LANGUAGE_GATE: ReadonlyArray<{
       'paintedStoreBody / paintedStoreMarkup retain the RESOLVED store markup and the element it was written into, compared against freshly built markup in replaceStoreBody, so a locale change produces different markup and repaints. Same write-elision shape as claudium_window.',
   },
   {
+    file: 'guild_bank_log_window.ts',
+    memos: ['lastAnnounced'],
+    reason:
+      'lastAnnounced gates nothing that is drawn: it decides only whether the refusal line RE-ANNOUNCES to assistive tech (a live region inserted already-populated is not announced, so the pane re-writes the same text one task later). The visible text is rebuilt unconditionally on every paint, and the pane is repainted wholesale by BankWindow.render(), which the language fan-out already drives. A locale switch therefore relocalizes the log by itself; at worst the refusal is not re-announced in the new locale, which is the correct behaviour anyway (the refusal did not change).',
+  },
+  {
+    file: 'hud/scene/scene_overlay_window.ts',
+    memos: ['lastFadeOpacity'],
+    reason:
+      'lastFadeOpacity gates only the numeric CSS opacity write for the full-screen fade layer and never gates a string. Subtitle strings have their own language-plus-key cache, while construction-time skip text is refreshed by SceneHudController.relocalize through the registered fan-out arm.',
+  },
+  {
     file: 'deed_tracker_painter.ts',
     memos: ['lastChip'],
     reason:
@@ -377,12 +390,6 @@ const NOT_A_LANGUAGE_GATE: ReadonlyArray<{
     memos: 'coordinator',
     reason:
       'the coordinator itself. Its own signature-gated arms are individually answered inside refreshLocalizedDynamicUi, which half 1 above pins EXACTLY, so pinning its two dozen unrelated memos here as well would only mean every hud.ts edit had to be re-approved in two places.',
-  },
-  {
-    file: 'hud/scene/scene_overlay_window.ts',
-    memos: ['lastFadeOpacity'],
-    reason:
-      'lastFadeOpacity gates only the numeric fade-layer opacity. Subtitle caching includes getLanguage() in its comparison, while sceneController.relocalize refreshes the construction-time skip and choice chrome.',
   },
 ];
 
@@ -572,15 +579,13 @@ describe('language fan-out: half 2, every signature-gated src/ui surface is clas
     expect(
       NOT_A_LANGUAGE_GATE.length,
       'the exemption list grew. Every entry is a memo this repo has decided cannot hold player text; adding one should be argued in review, not absorbed by a floor.',
-    ).toBe(5);
+      // 6 after the Last Bell scene overlay: its only matched `last*` memo is
+      // the numeric fade opacity, while its actual text cache is explicitly
+      // locale-keyed and the controller has a registered relocalize arm.
+    ).toBe(6);
   });
 
-  it('gives every relocalize() in src/ui a caller in the fan-out', {
-    // This contract reads the full UI source inventory and can exceed Vitest's
-    // 20-second default when four gate workers contend for disk and CPU. Keep
-    // the complete sweep, matcher floors, and caller assertions unchanged.
-    timeout: 60_000,
-  }, () => {
+  it('gives every relocalize() in src/ui a caller in the fan-out', () => {
     // The bug that started #2529: card_duel_window.ts already HAD a correct
     // relocalize() and nothing in the repo ever called it. A relocalize with no
     // caller is dead code that reads like a working feature.

@@ -4,12 +4,17 @@
 // (the sibling of tests/map_window_painter.test.ts) enforces the decentralized
 // no-magic-values contract for this canvas painter and drives the real painter
 // through a narrow fake 2D context so token selection is a behavior assertion,
-// not a source-text guess. The art plate never decodes here (Image is stubbed to
-// stay pending), so the painter takes its ocean + region-overlay fallback path.
+// not a source-text guess. In most suites here the art plate never decodes (Image
+// is stubbed to stay pending), so the painter takes its flat-rectangle fallback
+// wash; the land-masked wash proper has its own suite below, on a fresh module
+// graph, since the decoded plate is cached at continent_art module scope.
 
 import { readFileSync } from 'node:fs';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { ZONES } from '../src/sim/data';
 import { ContinentMapPainter } from '../src/ui/continent_map_painter';
+import { zoneDisplayName } from '../src/ui/entity_i18n';
+import { t } from '../src/ui/i18n';
 import type { IWorld } from '../src/world_api';
 
 const painter = readFileSync(
@@ -27,10 +32,9 @@ const CONTINENT_COLOR_TOKENS = [
   '--color-map-outline',
   '--color-map-player',
   '--color-map-party-dead',
-  '--color-map-region-stroke',
   '--color-map-region-hover-fill',
-  '--color-map-region-hover-stroke',
-  '--color-map-region-current-stroke',
+  '--color-map-region-current-fill',
+  '--color-map-region-current-label',
 ];
 
 // The classColor resolver every ContinentMapPainter call site now takes (issue
@@ -39,15 +43,30 @@ const CONTINENT_COLOR_TOKENS = [
 const classColor = (cls: string): string => `color:${cls}`;
 
 interface PaintTrace {
-  fillRects: string[]; // fillStyle at each fillRect (ocean flood + hover fill)
-  strokeRects: string[]; // strokeStyle at each strokeRect (region borders)
+  fillRects: string[]; // fillStyle at each fillRect (ocean flood + fallback wash)
+  // Every gradient minted on the map canvas (the letterbox depth grades), with
+  // the endpoints and stops each was built from.
+  gradients: Array<{ from: number[]; stops: Array<[number, string]> }>;
+  strokeRects: string[]; // strokeStyle at each strokeRect (nothing draws one now)
   arcFills: string[]; // fillStyle at each arc fill (the you-are-here dot)
+  labels: Array<{ text: string; color: string }>; // fillText + the fillStyle it used
   styleReads: string[];
+}
+
+function newTrace(): PaintTrace {
+  return {
+    fillRects: [],
+    strokeRects: [],
+    arcFills: [],
+    labels: [],
+    gradients: [],
+    styleReads: [],
+  };
 }
 
 function fakeContinentContext(trace: PaintTrace): CanvasRenderingContext2D {
   const ctx = {
-    fillStyle: '',
+    fillStyle: '' as string | object,
     strokeStyle: '',
     lineWidth: 1,
     font: '',
@@ -56,7 +75,18 @@ function fakeContinentContext(trace: PaintTrace): CanvasRenderingContext2D {
     imageSmoothingEnabled: false,
     drawImage(): void {},
     fillRect(): void {
-      trace.fillRects.push(String(ctx.fillStyle));
+      trace.fillRects.push(typeof ctx.fillStyle === 'string' ? ctx.fillStyle : 'gradient');
+    },
+    createLinearGradient(x0: number, y0: number, x1: number, y1: number): unknown {
+      const grad = {
+        from: [x0, y0, x1, y1] as number[],
+        stops: [] as Array<[number, string]>,
+        addColorStop(offset: number, color: string): void {
+          grad.stops.push([offset, color]);
+        },
+      };
+      trace.gradients.push(grad);
+      return grad;
     },
     strokeRect(): void {
       trace.strokeRects.push(String(ctx.strokeStyle));
@@ -67,7 +97,9 @@ function fakeContinentContext(trace: PaintTrace): CanvasRenderingContext2D {
       trace.arcFills.push(String(ctx.fillStyle));
     },
     stroke(): void {},
-    fillText(): void {},
+    fillText(text: string): void {
+      trace.labels.push({ text, color: String(ctx.fillStyle) });
+    },
     strokeText(): void {},
   };
   return ctx as unknown as CanvasRenderingContext2D;
@@ -167,8 +199,8 @@ describe('continent_map_painter: no magic values', () => {
 });
 
 describe('continent_map_painter: token-driven draw behavior', () => {
-  it('floods the ocean, borders every region, and highlights the hovered + current zones', () => {
-    const trace: PaintTrace = { fillRects: [], strokeRects: [], arcFills: [], styleReads: [] };
+  it('floods the ocean, washes the hovered and current zones, and draws NO region borders', () => {
+    const trace = newTrace();
     installStyleGlobals(trace);
     const ctx = fakeContinentContext(trace);
     new ContinentMapPainter(classColor).paintContinent(ctx, continentWorld(), {
@@ -179,43 +211,69 @@ describe('continent_map_painter: token-driven draw behavior', () => {
     // Every token is resolved once up front (never per-region).
     for (const tok of CONTINENT_COLOR_TOKENS) expect(trace.styleReads).toContain(tok);
 
-    // Ocean floods under everything, and the hovered zone gets a translucent fill.
-    expect(trace.fillRects).toContain('paint:--color-map-continent-ocean');
-    expect(trace.fillRects).toContain('paint:--color-map-region-hover-fill');
+    // Ocean floods under everything. With no plate decoded there is no land mask,
+    // so both washes take the flat-rectangle fallback: one for the hovered zone,
+    // one for the zone the player is standing in.
+    expect(trace.fillRects).toEqual([
+      'paint:--color-map-continent-ocean',
+      'paint:--color-map-region-current-fill',
+      'paint:--color-map-region-hover-fill',
+    ]);
 
-    // Region borders: idle on most, the hovered one brighter, the current one distinct.
-    expect(trace.strokeRects).toContain('paint:--color-map-region-stroke');
-    expect(trace.strokeRects).toContain('paint:--color-map-region-hover-stroke');
-    expect(trace.strokeRects).toContain('paint:--color-map-region-current-stroke');
-    // Exactly one hovered + one current border (the flags are single-zone).
-    expect(
-      trace.strokeRects.filter((s) => s === 'paint:--color-map-region-hover-stroke'),
-    ).toHaveLength(1);
-    expect(
-      trace.strokeRects.filter((s) => s === 'paint:--color-map-region-current-stroke'),
-    ).toHaveLength(1);
+    // The grid of zone rectangles is GONE. This is the whole point of the change:
+    // a single strokeRect anywhere reds it.
+    expect(trace.strokeRects).toEqual([]);
+
+    // The zone the player stands in is called out by its label color instead,
+    // exactly once (the flag is single-zone).
+    const current = trace.labels.filter(
+      (l) => l.color === 'paint:--color-map-region-current-label',
+    );
+    expect(current.map((l) => l.text)).toEqual([zoneDisplayName('eastbrook_vale')]);
+    // Every other zone name draws in the plain label color (as does the on-canvas
+    // overview title, which is not a zone).
+    const plain = trace.labels.filter(
+      (l) => l.color === 'paint:--color-map-label' && l.text !== t('hudChrome.continentMap.title'),
+    );
+    expect(plain).toHaveLength(ZONES.length - 1);
 
     // The you-are-here dot fills in the player token (player is on-plate at 0,0).
     expect(trace.arcFills).toContain('paint:--color-map-player');
   });
 
-  it('draws no region highlight fill when nothing is hovered', () => {
-    const trace: PaintTrace = { fillRects: [], strokeRects: [], arcFills: [], styleReads: [] };
+  it('washes only the current zone when nothing is hovered', () => {
+    const trace = newTrace();
     installStyleGlobals(trace);
     const ctx = fakeContinentContext(trace);
     new ContinentMapPainter(classColor).paintContinent(ctx, continentWorld(), {
       canvasSize: 560,
       hoveredZoneId: null,
     });
-    expect(trace.fillRects).toContain('paint:--color-map-continent-ocean');
-    expect(trace.fillRects).not.toContain('paint:--color-map-region-hover-fill');
-    expect(trace.strokeRects).not.toContain('paint:--color-map-region-hover-stroke');
+    expect(trace.fillRects).toEqual([
+      'paint:--color-map-continent-ocean',
+      'paint:--color-map-region-current-fill',
+    ]);
+    expect(trace.strokeRects).toEqual([]);
+  });
+
+  it('hovering your own zone draws the hover wash alone, not both stacked', () => {
+    const trace = newTrace();
+    installStyleGlobals(trace);
+    const ctx = fakeContinentContext(trace);
+    new ContinentMapPainter(classColor).paintContinent(ctx, continentWorld(), {
+      canvasSize: 560,
+      hoveredZoneId: 'eastbrook_vale', // the zone the player is standing in
+    });
+    expect(trace.fillRects).toEqual([
+      'paint:--color-map-continent-ocean',
+      'paint:--color-map-region-hover-fill',
+    ]);
   });
 });
 
 describe('continent_map_painter: party markers', () => {
   it('fills a class color per living member, the dead token for a fallen one, and self last', () => {
-    const trace: PaintTrace = { fillRects: [], strokeRects: [], arcFills: [], styleReads: [] };
+    const trace = newTrace();
     installStyleGlobals(trace);
     const ctx = fakeContinentContext(trace);
     new ContinentMapPainter(classColor).paintContinent(ctx, continentPartyWorld(), {
@@ -233,7 +291,7 @@ describe('continent_map_painter: party markers', () => {
   });
 
   it('draws no party dot for a solo player', () => {
-    const trace: PaintTrace = { fillRects: [], strokeRects: [], arcFills: [], styleReads: [] };
+    const trace = newTrace();
     installStyleGlobals(trace);
     const ctx = fakeContinentContext(trace);
     new ContinentMapPainter(classColor).paintContinent(ctx, continentWorld(), {
@@ -243,6 +301,253 @@ describe('continent_map_painter: party markers', () => {
 
     // Only the you-are-here dot: no class color and no dead token anywhere.
     expect(trace.arcFills).toEqual(['paint:--color-map-player']);
+  });
+});
+
+// The wash path proper: with a decoded plate the painter builds a land mask and
+// composites the highlight through it, so the highlight follows the coastline
+// instead of painting the zone's rectangle over the sea. Driven on a FRESH module
+// graph (vi.resetModules) because continent_art caches the decoded plate at module
+// scope: the suites above deliberately leave that load pending.
+describe('continent_map_painter: land-masked zone wash', () => {
+  interface Op {
+    kind: string;
+    detail?: string;
+  }
+  interface FakeGradient {
+    from: [number, number, number, number];
+    stops: Array<[number, string]>;
+    addColorStop(offset: number, color: string): void;
+  }
+  interface Surface {
+    tag: string;
+    width: number;
+    height: number;
+    ops: Op[];
+    gradients: FakeGradient[];
+    getContext(kind: string): unknown;
+  }
+
+  function fakeSurface(tag: string): Surface {
+    const surface: Surface = {
+      tag,
+      width: 0,
+      height: 0,
+      ops: [],
+      gradients: [],
+      getContext: () => ctx,
+    };
+    const ctx = {
+      fillStyle: '' as string | FakeGradient,
+      globalCompositeOperation: 'source-over',
+      imageSmoothingEnabled: false,
+      clearRect(): void {
+        surface.ops.push({ kind: 'clearRect' });
+      },
+      drawImage(src: { tag?: string }): void {
+        surface.ops.push({ kind: 'drawImage', detail: src.tag ?? 'unknown' });
+      },
+      fillRect(): void {
+        const style = ctx.fillStyle;
+        surface.ops.push({
+          kind: 'fillRect',
+          detail: `${ctx.globalCompositeOperation}|${
+            typeof style === 'string' ? style : 'gradient'
+          }`,
+        });
+      },
+      createLinearGradient(x0: number, y0: number, x1: number, y1: number): FakeGradient {
+        const grad: FakeGradient = {
+          from: [x0, y0, x1, y1],
+          stops: [],
+          addColorStop(offset: number, color: string): void {
+            grad.stops.push([offset, color]);
+          },
+        };
+        surface.gradients.push(grad);
+        return grad;
+      },
+      getImageData(_x: number, _y: number, w: number, h: number): { data: Uint8ClampedArray } {
+        // Half sea, half land, so the mask carries both extremes and a coastline.
+        const data = new Uint8ClampedArray(w * h * 4);
+        for (let i = 0; i < w * h; i++) {
+          const sea = i % w < w / 2;
+          data[i * 4] = sea ? 23 : 97;
+          data[i * 4 + 1] = sea ? 90 : 108;
+          data[i * 4 + 2] = sea ? 129 : 40;
+          data[i * 4 + 3] = 255;
+        }
+        return { data };
+      },
+      createImageData(w: number, h: number): { data: Uint8ClampedArray } {
+        return { data: new Uint8ClampedArray(w * h * 4) };
+      },
+      putImageData(): void {
+        surface.ops.push({ kind: 'putImageData' });
+      },
+    };
+    return surface;
+  }
+
+  /** The map canvas's own context, recording what actually lands on the map. */
+  function fakeTargetContext(trace: PaintTrace, blits: string[]): CanvasRenderingContext2D {
+    const ctx = fakeContinentContext(trace) as unknown as {
+      drawImage: (src: { tag?: string }) => void;
+    };
+    ctx.drawImage = (src) => blits.push(src.tag ?? 'unknown');
+    return ctx as unknown as CanvasRenderingContext2D;
+  }
+
+  it('masks the wash to the land and never fills the zone rectangle on the map', async () => {
+    const trace = newTrace();
+    const surfaces: Surface[] = [];
+    vi.stubGlobal('document', {
+      documentElement: {},
+      createElement: (): Surface => {
+        const surface = fakeSurface(`surface#${surfaces.length}`);
+        surfaces.push(surface);
+        return surface;
+      },
+    });
+    vi.stubGlobal('getComputedStyle', () => ({
+      getPropertyValue: (token: string) => `paint:${token}`,
+    }));
+    // A plate that decodes immediately, so the painter reaches the mask path.
+    class LoadedImage {
+      onload: (() => void) | null = null;
+      onerror: (() => void) | null = null;
+      naturalWidth = 543;
+      naturalHeight = 1100;
+      tag = 'plate';
+      set src(_v: string) {
+        this.onload?.();
+      }
+    }
+    vi.stubGlobal('Image', LoadedImage);
+    vi.stubGlobal('HTMLImageElement', LoadedImage);
+
+    vi.resetModules();
+    const { ContinentMapPainter: FreshPainter } = await import('../src/ui/continent_map_painter');
+    const blits: string[] = [];
+    const ctx = fakeTargetContext(trace, blits);
+    const painterUnderTest = new FreshPainter(classColor);
+    // Hover the player's own zone so exactly ONE wash composites, which makes the
+    // op sequence below the whole story rather than an interleaving of two.
+    const result = painterUnderTest.paintContinent(ctx, continentWorld(), {
+      canvasSize: 560,
+      hoveredZoneId: 'eastbrook_vale',
+    });
+
+    // Two surfaces, minted once each: the land mask and the composite scratch.
+    expect(surfaces.map((s) => s.tag)).toEqual(['surface#0', 'surface#1']);
+    const [mask, scratch] = surfaces;
+    expect(mask.ops.map((o) => o.kind)).toEqual(['drawImage', 'putImageData']);
+    expect(scratch.width).toBe(560);
+    expect(scratch.height).toBe(560);
+
+    // The map canvas itself: the ocean flood, then the two letterbox depth grades
+    // that darken the open water toward the window edge (the plate is a tall
+    // portrait crop, so only the left/right bands exist). NO rectangle wash
+    // reaches it, which is the regression this pins (the fallback would fillRect
+    // the zone box, and a flat token fill would show as a named color here).
+    expect(trace.fillRects).toEqual(['paint:--color-map-continent-ocean', 'gradient', 'gradient']);
+
+    // Those two grades are the open water beside the plate: each runs from the
+    // window edge (fully darkened) to the plate edge (clear, so it lands on the
+    // ocean token unchanged and leaves no seam where the painted sea begins).
+    // A grade running the other way would vignette the plate instead of the sea.
+    expect(trace.gradients).toHaveLength(2);
+    const [westward, eastward] = trace.gradients;
+    const plateLeft = westward.from[2];
+    const plateRight = eastward.from[0];
+    expect(westward.from).toEqual([0, 0, plateLeft, 0]);
+    expect(plateLeft).toBeGreaterThan(0);
+    expect(westward.stops).toEqual([
+      [0, 'paint:--color-map-continent-backdrop-dim'],
+      [1, 'transparent'],
+    ]);
+    expect(eastward.from).toEqual([plateRight, 0, 560, 0]);
+    expect(plateRight).toBeLessThan(560);
+    expect(eastward.stops).toEqual([
+      [0, 'transparent'],
+      [1, 'paint:--color-map-continent-backdrop-dim'],
+    ]);
+    // The plate is centered in the square canvas, so the two bands are equal.
+    expect(560 - plateRight).toBeCloseTo(plateLeft, 6);
+    // It receives the plate, then the finished wash as a single blit.
+    expect(blits).toEqual(['plate', 'surface#1']);
+
+    // The composite: mask in, tint through it, then the two feather ramps that
+    // confine it to this zone and soften the border it shares with the next.
+    expect(scratch.ops).toEqual([
+      { kind: 'drawImage', detail: 'surface#0' },
+      { kind: 'fillRect', detail: 'source-in|paint:--color-map-region-hover-fill' },
+      { kind: 'fillRect', detail: 'destination-in|gradient' },
+      { kind: 'fillRect', detail: 'destination-in|gradient' },
+    ]);
+
+    // Each ramp spans the hovered zone's own bounds on its axis, clear at both
+    // edges and opaque between: that fade is what keeps a zone border from
+    // reading as a drawn straight line.
+    const rect = result.regions.find((r) => r.zoneId === 'eastbrook_vale')?.rect;
+    if (!rect) throw new Error('hovered zone has no region');
+    const [xRamp, yRamp] = scratch.gradients;
+    expect(xRamp.from).toEqual([rect.mx, 0, rect.mx + rect.w, 0]);
+    expect(yRamp.from).toEqual([0, rect.my, 0, rect.my + rect.h]);
+    for (const ramp of [xRamp, yRamp]) {
+      expect(ramp.stops).toHaveLength(4);
+      expect(ramp.stops[0]).toEqual([0, 'transparent']);
+      expect(ramp.stops[3]).toEqual([1, 'transparent']);
+      expect(ramp.stops[1][1]).toBe('white');
+      expect(ramp.stops[2][1]).toBe('white');
+      expect(ramp.stops[1][0]).toBeGreaterThan(0);
+      expect(ramp.stops[1][0]).toBeLessThanOrEqual(0.5);
+      expect(ramp.stops[2][0]).toBe(1 - ramp.stops[1][0]);
+    }
+
+    // A second redraw with the same hover state COMPOSITES NOTHING: the mask is
+    // built once per session and the finished wash is cached and re-blitted, which
+    // is what keeps the mediumHud cadence cheap.
+    const opsAfterFirst = scratch.ops.length;
+    painterUnderTest.paintContinent(ctx, continentWorld(), {
+      canvasSize: 560,
+      hoveredZoneId: 'eastbrook_vale',
+    });
+    expect(surfaces).toHaveLength(2);
+    expect(scratch.ops).toHaveLength(opsAfterFirst);
+    expect(mask.ops.filter((o) => o.kind === 'putImageData')).toHaveLength(1);
+    expect(blits).toEqual(['plate', 'surface#1', 'plate', 'surface#1']);
+
+    // Hovering a DIFFERENT zone composites two more washes: that zone's hover, and
+    // the quiet one on the zone the player is standing in (which the hover-on-self
+    // frames above folded into a single wash). Both are then cached, so coming
+    // back to the first hover composites nothing.
+    painterUnderTest.paintContinent(ctx, continentWorld(), {
+      canvasSize: 560,
+      hoveredZoneId: 'frostveil',
+    });
+    expect(surfaces).toHaveLength(4);
+    painterUnderTest.paintContinent(ctx, continentWorld(), {
+      canvasSize: 560,
+      hoveredZoneId: 'eastbrook_vale',
+    });
+    expect(surfaces).toHaveLength(4);
+
+    // The cache is CAPPED, so a sweep across the map cannot grow it without
+    // bound: after enough distinct hovers the oldest wash is evicted and has to
+    // be composited again.
+    const before = surfaces.length;
+    for (const zoneId of ['wraithwood', 'amberfall', 'drakelands', 'palmreach']) {
+      painterUnderTest.paintContinent(ctx, continentWorld(), {
+        canvasSize: 560,
+        hoveredZoneId: zoneId,
+      });
+    }
+    painterUnderTest.paintContinent(ctx, continentWorld(), {
+      canvasSize: 560,
+      hoveredZoneId: 'eastbrook_vale',
+    });
+    expect(surfaces.length).toBeGreaterThan(before + 4);
   });
 });
 

@@ -4,6 +4,14 @@ import * as THREE from 'three';
 import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
+import {
+  FENBRIDGE_SURFACE_NORMAL_SCALE,
+  fenbridgeSemanticForColor,
+  fenbridgeSurfaceAtlasTexture,
+  fenbridgeSurfaceGeometry,
+  fenbridgeSurfaceNormalTexture,
+  fenbridgeSurfaceRoughnessTexture,
+} from './fenbridge_surface_atlas';
 import { GFX, surfaceMat } from './gfx';
 import { applySurfaceDetail, wornFamilyFor } from './worn_stone';
 
@@ -17,7 +25,7 @@ const QUEST_OBJECT_URLS: Record<string, string> = {
   gravecaller_sigil: '/models/quest/gravecaller_sigil.glb',
   gravewyrm_sigil: '/models/quest/gravewyrm_sigil.glb',
   weathered_ledger_page: '/models/quest/weathered_ledger_page.glb',
-  fen_muster_order: '/models/quest/weathered_ledger_page.glb',
+  fen_muster_order: '/models/quest/fenbridge_muster_order.glb',
   highwatch_summons: '/models/quest/weathered_ledger_page.glb',
   morthen_grimoire: '/models/quest/morthen_grimoire.glb',
   rusted_censer: '/models/quest/rusted_censer.glb',
@@ -45,6 +53,10 @@ const QUEST_OBJECT_HEIGHTS: Record<string, number> = {
 };
 
 const SCROLL_ITEM_IDS = new Set(['weathered_ledger_page', 'fen_muster_order', 'highwatch_summons']);
+// Fenbridge's dedicated replacement GLB already contains its teal binding,
+// wax seal, and three ink/metal lines. Legacy scroll garnish would duplicate
+// that geometry and incorrectly turn the reference-accurate binding gold.
+const AUTHORED_SCROLL_CUE_IDS = new Set(['fen_muster_order']);
 
 interface ScrollStyle {
   parchmentTint?: number;
@@ -88,8 +100,19 @@ const gltfByUrl = new Map<string, GLTF>();
 const preparedByItem = new Map<string, THREE.Group>();
 const proceduralByItem = new Map<string, THREE.Group>();
 
+function castsDynamicShadow(itemId: string): boolean {
+  return !AUTHORED_SCROLL_CUE_IDS.has(itemId);
+}
+
 /** Test-only window into the preload asset set (mirrors delve_props.ts). */
-export const questObjectPreloadInternalsForTest = { questObjectUrl: QUEST_OBJECT_URLS };
+export const questObjectPreloadInternalsForTest = {
+  questObjectUrl: QUEST_OBJECT_URLS,
+  usesLegacyScrollDecoration: (itemId: string) =>
+    SCROLL_ITEM_IDS.has(itemId) && !AUTHORED_SCROLL_CUE_IDS.has(itemId),
+  usesSharedSurfaceDetail: (itemId: string) => !AUTHORED_SCROLL_CUE_IDS.has(itemId),
+  castsDynamicShadow,
+  convertMaterial,
+};
 
 /** Test-only cache reset, so a determinism test can force two independent builds. */
 export const questObjectCacheInternalsForTest = {
@@ -181,27 +204,53 @@ function decorateScroll(root: THREE.Object3D, itemId: string): void {
 // itemId, so this stays a handful of materials for the whole session.
 const surfaceDetailCache = new Map<string, THREE.Material>();
 
+export function resetQuestObjectProfileCaches(): void {
+  preparedByItem.clear();
+  proceduralByItem.clear();
+  surfaceDetailCache.clear();
+}
+
 function convertMaterial(src: THREE.Material, itemId: string): THREE.Material {
   const s = src as THREE.MeshStandardMaterial;
   const ov = ITEM_MAT_OVERRIDES[itemId];
-  const scrollTint = SCROLL_STYLES[itemId]?.parchmentTint;
+  const scrollTint = AUTHORED_SCROLL_CUE_IDS.has(itemId)
+    ? undefined
+    : SCROLL_STYLES[itemId]?.parchmentTint;
   const baseColor = ov?.color ?? scrollTint ?? s.color?.getHex() ?? 0xffffff;
   const color = new THREE.Color(baseColor);
   if (scrollTint !== undefined && s.map) {
     color.lerp(new THREE.Color(scrollTint), 0.35);
   }
+  const fenbridgeAtlas = itemId === 'fen_muster_order' ? fenbridgeSurfaceAtlasTexture() : undefined;
+  const fenbridgePbr =
+    itemId === 'fen_muster_order' && GFX.standardMaterials
+      ? {
+          normalMap: fenbridgeSurfaceNormalTexture(),
+          roughnessMap: fenbridgeSurfaceRoughnessTexture(),
+        }
+      : { normalMap: undefined, roughnessMap: undefined };
   const mat = surfaceMat({
     color: color.getHex(),
-    map: s.map ?? undefined,
-    normalMap: s.normalMap ?? undefined,
-    roughnessMap: s.roughnessMap ?? undefined,
+    map: fenbridgeAtlas ?? s.map ?? undefined,
+    vertexColors: fenbridgeAtlas ? false : s.vertexColors,
+    normalMap: fenbridgePbr.normalMap ?? s.normalMap ?? undefined,
+    roughnessMap: fenbridgePbr.roughnessMap ?? s.roughnessMap ?? undefined,
     roughness: s.roughness ?? 0.88,
     metalness: Math.min(s.metalness ?? 0, 0.75),
     emissive: ov?.emissive,
     emissiveIntensity: ov?.emissiveIntensity,
     flatShading: !GFX.standardMaterials,
   });
-  if (GFX.standardMaterials && (mat as THREE.MeshStandardMaterial).isMeshStandardMaterial) {
+  if (itemId === 'fen_muster_order' && mat instanceof THREE.MeshStandardMaterial && mat.normalMap) {
+    mat.normalScale.setScalar(FENBRIDGE_SURFACE_NORMAL_SCALE);
+    mat.metalness = 1;
+    mat.metalnessMap = mat.roughnessMap;
+  }
+  if (
+    !AUTHORED_SCROLL_CUE_IDS.has(itemId) &&
+    GFX.standardMaterials &&
+    (mat as THREE.MeshStandardMaterial).isMeshStandardMaterial
+  ) {
     const worn = wornFamilyFor('qprops', s.name, {
       emissive: (ov?.emissive ?? 0) !== 0,
       transparent: s.transparent === true,
@@ -530,16 +579,32 @@ function prepareItem(itemId: string): THREE.Group | null {
   root.traverse((o) => {
     const mesh = o as THREE.Mesh;
     if (!mesh.isMesh) return;
+    if (itemId === 'fen_muster_order') {
+      const sourceColor = mesh.geometry.getAttribute('color');
+      const materialColor = (mesh.material as THREE.MeshStandardMaterial).color;
+      mesh.geometry = fenbridgeSurfaceGeometry(mesh.geometry, (index) => {
+        const red = sourceColor?.getX(index) ?? materialColor?.r ?? 1;
+        const green = sourceColor?.getY(index) ?? materialColor?.g ?? 1;
+        const blue = sourceColor?.getZ(index) ?? materialColor?.b ?? 1;
+        return fenbridgeSemanticForColor(red, green, blue);
+      });
+    }
     mesh.material = convertMaterial(mesh.material as THREE.Material, itemId);
-    mesh.castShadow = true;
+    // The two authored muster packets are tiny ground pickups in an already
+    // shadowed gate composition. Keeping them receive-only preserves contact
+    // while avoiding two extra town shadow draws beyond the 10-caster cap.
+    mesh.castShadow = castsDynamicShadow(itemId);
     mesh.receiveShadow = true;
   });
   if (itemId === 'crypt_ritual_circle') {
     normalizeRootByFootprint(root, RITUAL_CIRCLE_FOOTPRINT);
   } else {
-    normalizeRoot(root, QUEST_OBJECT_HEIGHTS[itemId] ?? TARGET_HEIGHT);
+    const measuredHeight = normalizeRoot(root, QUEST_OBJECT_HEIGHTS[itemId] ?? TARGET_HEIGHT);
+    measuredHeightByItem.set(itemId, measuredHeight);
   }
-  if (SCROLL_ITEM_IDS.has(itemId)) decorateScroll(root, itemId);
+  if (SCROLL_ITEM_IDS.has(itemId) && !AUTHORED_SCROLL_CUE_IDS.has(itemId)) {
+    decorateScroll(root, itemId);
+  }
   preparedByItem.set(itemId, root);
   return root;
 }

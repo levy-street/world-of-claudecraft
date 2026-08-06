@@ -14,6 +14,7 @@
 import { markDialogRoot } from '../../dialog_root';
 import { itemDisplayName } from '../../entity_i18n';
 import { esc } from '../../esc';
+import { focusedWithin, restoreFirstEnabled } from '../../focus_restore';
 import { formatMoney, formatNumber, t } from '../../i18n';
 import { QUALITY_COLOR } from '../../icons';
 import type { PainterHostPresentation } from '../../painter_host';
@@ -44,8 +45,19 @@ export function renderUnbindWindow(
   // A standalone trapping window (the train/mailbox shape): announce it as a
   // labeled dialog for the focus contract.
   markDialogRoot(el, { label: t('hudChrome.unbind.title', { name: masterName }) });
+  // Inventory and purse deltas repaint this window uninitiated (#2931), so
+  // carry keyboard focus across the wipe per the focus-across-a-REBUILD
+  // contract (the train_window idiom): the exact control when it survived
+  // enabled, else outward row neighbors, else the close button.
+  const focused = focusedWithin(el);
+  const focusKey = focused?.dataset.focusKey ?? null;
+  const focusedSlot = focused?.classList.contains('unbind-row')
+    ? [...el.querySelectorAll<HTMLButtonElement>('button.unbind-row')].indexOf(
+        focused as HTMLButtonElement,
+      )
+    : -1;
   const scrollTop = el.scrollTop;
-  el.innerHTML = `<div class="panel-title"><span>${esc(t('hudChrome.unbind.title', { name: masterName }))}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('hudChrome.unbind.close'))}">${svgIcon('close')}</button></div>`;
+  el.innerHTML = `<div class="panel-title"><span>${esc(t('hudChrome.unbind.title', { name: masterName }))}</span><button type="button" class="x-btn" data-close data-focus-key="close" aria-label="${esc(t('hudChrome.unbind.close'))}">${svgIcon('close')}</button></div>`;
 
   const intro = document.createElement('div');
   intro.className = 'vi-sub unbind-intro';
@@ -66,6 +78,9 @@ export function renderUnbindWindow(
     button.type = 'button';
     button.className = 'vendor-item unbind-row';
     button.disabled = !row.affordable;
+    // Its own focus key so the restore ladder can find the same item row
+    // across a rebuild (one row per bound item id, so the id is the identity).
+    button.dataset.focusKey = `unbind:${row.itemId}`;
     button.setAttribute('aria-label', t('hudChrome.unbind.unbindAria', { name, fee }));
     const countSuffix =
       row.boundCount > 1 ? ` x${formatNumber(row.boundCount, { maximumFractionDigits: 0 })}` : '';
@@ -88,4 +103,26 @@ export function renderUnbindWindow(
   el.querySelector('[data-close]')?.addEventListener('click', () => deps.onClose());
   el.style.display = 'block';
   el.scrollTop = scrollTop;
+  // Restore focus LAST (a bare focus() may scroll the row into view, which
+  // must win over the raw scroll restore for a keyboard player; with no
+  // captured key, mouse users keep their exact scroll). Dataset equality
+  // rather than an attribute selector: the keys embed item ids and this
+  // needs no CSS.escape (the vendor_window precedent).
+  if (focusKey) {
+    const keyed = [...el.querySelectorAll<HTMLButtonElement>('[data-focus-key]')];
+    const exact = keyed.find((b) => b.dataset.focusKey === focusKey);
+    // The same-slot ladder: the row's own slot first (after an unbind the
+    // list shifts and it holds the next item), then outward neighbors,
+    // before the close fallback.
+    const ladder = [...el.querySelectorAll<HTMLButtonElement>('button.unbind-row')];
+    const slot = focusedSlot >= 0 ? Math.min(focusedSlot, ladder.length - 1) : -1;
+    const neighbors: (HTMLButtonElement | undefined)[] = [];
+    if (slot >= 0) {
+      for (let step = 0; step < ladder.length; step++) {
+        if (ladder[slot + step]) neighbors.push(ladder[slot + step]);
+        if (step > 0 && ladder[slot - step]) neighbors.push(ladder[slot - step]);
+      }
+    }
+    restoreFirstEnabled([exact, ...neighbors, keyed.find((b) => b.dataset.focusKey === 'close')]);
+  }
 }

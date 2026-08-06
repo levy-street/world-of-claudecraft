@@ -25,10 +25,11 @@ Each instance:
   position) run unchanged;
 - carries the exact placement, scale, height jitter and softened biome tint
   of its real twin, so the handoff moves nothing and recolors nothing;
-- lights through the live Lambert pipeline over an up normal, the ground
-  plane's response, so day-night grades, realm light levels and fog land on
-  the sprite exactly as they land on the terrain under it (verified in the
-  Nightbloom's dimmed violet grade);
+- lights through the live standard-material pipeline over an up normal, the
+  ground plane's response including the realm IBL irradiance, so day-night
+  grades, realm light levels and fog land on the sprite exactly as they
+  land on the terrain under it (verified in the Nightbloom's dimmed violet
+  grade);
 - sways with the same travelling gust, phase and amplitude the real
   canopies ride (the sway direction is world-fixed where the real mesh sways
   in its rotated model frame: sub-pixel at every sprite distance).
@@ -77,9 +78,11 @@ Rocks and bushes take the same treatment at their own swaps (`rockFar` and
 instance, with the bucket rows culled radius-aware against the same swap so
 a slab crossing its cap no longer drops its still-near members).
 Ferns and mushrooms are sub-pixel long before their cull and keep the plain
-window. The lean arm (no `GFX.standardMaterials`, or `GFX.leanFoliage`)
-ships NO impostors, exactly as before, and keeps the old fog-blend law
-(`treeDetailDistance`), whose pins remain in `tests/foliage_lod.test.ts`.
+window. The sprite arm is decided by `farFieldPolicy` (far_terrain_core):
+no standard materials, `GFX.leanFoliage`, or a constrained memory ceiling
+ships NO impostors, exactly as the cone era's lean arm did, and keeps the
+old fog-blend law (`treeDetailDistance`), whose pins remain in
+`tests/foliage_lod.test.ts`.
 
 ## Cost model
 
@@ -96,44 +99,69 @@ and the fog wall. Measured at the fixed probe spots
   2.94M to 1.74M), with the vertex shader additionally collapsing every
   instance past its swap before raster;
 - the atlas bakes once per world build (a few hundred cell renders during
-  the loading screen) into one mip-mapped texture, 2048px on desktop tiers,
-  halved cells under `GFX.constrainedMemory`.
+  the loading screen) into ONE mip-mapped 2048px texture, an enforced
+  budget: `packImpostorAtlas(shippedImpostorInventory())` is pinned to
+  exactly 2048 (a ~21 MiB resident chain where 4096 would hold 85 MiB),
+  `registerArchetype` throws past its category's row budget, and every
+  view renders through a small reusable cell-sized MSAA scratch target, so
+  peak transient GPU memory is the final chain plus under a MiB (never a
+  full-size multisampled color/depth pair). Constrained-memory profiles do
+  not bake at all (`farFieldPolicy`).
 
 ## The fog-free vista (second stage)
 
 The outdoor fog is REMOVED on the vista tiers (medium and up, memory
-permitting): scene fog parks past the camera far plane where it occludes
-nothing (its color still feeds the sky tint), and the whole world renders
-from anywhere. What makes that affordable:
+permitting): the whole world renders from anywhere, and scene fog is
+repurposed as the horizon-only haze band (`horizonHazePlan`, third stage
+below) that occludes nothing a player interacts with while its color keeps
+feeding the sky tint. What makes that affordable:
 
 - a whole-world far-terrain layer (`src/render/far_terrain.ts` +
-  `far_terrain_core.ts`, ported from the shelved far-render branch): about a
-  dozen static Lambert vertex-color tiles, built once across idle slots from
-  the same heightfield and the shared `terrain_palette.ts`, with
-  crest-preserving sampling (`farVertexHeight`, a half-cell max) so ridge
-  silhouettes stay truthful and trees behind a crest stay hidden;
-- the sprites run to the whole-world envelope, merged into ONE InstancedMesh
-  per category (3 draws, ~5.8k quads world-wide): per-instance windows do
-  the culling, and past the detail envelope each sprite eases down by its
-  precomputed shortfall against the far-mesh surface (plus a small settle)
-  so bases stay planted on the coarse ground;
+  `far_terrain_core.ts`, ported from the shelved far-render branch): about
+  a dozen static standard-material vertex-color tiles (IBL-lit like the
+  near terrain), built once across idle slots from the same heightfield
+  and the shared `terrain_palette.ts`, with crest-preserving sampling
+  (`farVertexHeight`, a half-cell max) so ridge silhouettes stay truthful
+  and trees behind a crest stay hidden. The vista arms hold the CLASSIC
+  fogged renderer until every planned tile is attached
+  (`Renderer.vistaLive`): an unbuilt direction past the detail horizon
+  would otherwise read as void, and Safari's timer-paced idle fallback can
+  take seconds per tile;
+- the sprites run to the whole-world envelope, merged into ONE
+  InstancedMesh per category (4 draws with the buildings, ~6k quads
+  world-wide): per-instance windows do the culling, and past the detail
+  envelope each sprite eases down by its precomputed shortfall against the
+  far-mesh surface (plus a small settle) so bases stay planted on the
+  coarse ground;
 - every detail subsystem culls at `FOGLESS_DETAIL_FAR` (700, exactly the
-  widest cull the fogged clear realms ever ran, residency-eased as before),
-  so no subsystem draws farther than it ever did; the camera far plane and
-  the water apron grow with the tier plan (`farVistaPlan`).
+  widest cull the fogged clear realms ever ran, residency-eased as
+  before), so no subsystem draws farther than it ever did; the camera far
+  plane and the water apron grow with the tier plan.
 
-The lean arm (low tier, weak iGPU, constrained memory) keeps classic fog
-byte-for-byte: its render model needs the wall, and it ships no vista and no
-sprites. Interior and rift fogs are untouched everywhere (enclosed-space
-mood, no draw distance behind them). The murk realms lose their fog walls by
-design here: realm mood now lives in light grades and sky alone.
+One capability decision drives all of it: `farFieldPolicy` in
+`far_terrain_core.ts` (sprites require standard materials, the full
+foliage kit and an unconstrained memory ceiling; the vista requires
+sprites), consumed by the session, the renderer, the water apron and the
+shortfall sampler alike. The lean arm (low tier, weak-iGPU medium) and
+every constrained-memory profile keep classic fog byte-for-byte with no
+vista and no atlas. Interior and rift fogs are untouched everywhere
+(enclosed-space mood, no draw distance behind them). The murk realms lose
+their fog walls by design here: realm mood now lives in light grades and
+sky alone.
 
-Measured (fixed probe spots, high tier): the light coastal vantages sit
-within a few percent of the fogged game; the densest mid-strip vantage (the
-old marsh wall at 165u) now draws the whole strip at about 1070 calls and
-15M submitted triangles, holding 90 to 115 fps on an Apple-silicon high
-tier. The far layer itself costs about 12 tile draws plus 3 sprite draws
-and 11.5k sprite triangles for the entire world.
+Measured (fixed probe spots, high tier, draw calls and submitted
+triangles from `renderer.info`; the timed record with real rAF
+frame-interval percentiles, raw samples, GPU/browser/SHA provenance is
+`docs/screenshots/far-foliage-impostors/stats-review-round.json`, an
+Apple M4 Pro under headless Chromium at 1600x900: frame p50 spans 8.3 to
+11.9 ms across the 11 vantages, worst p95 16.8 ms): the light coastal
+vantages sit within a few percent of the fogged game; the densest
+mid-strip vantage (the old marsh wall at 165u) draws the whole strip at
+about 660 calls and 5.7M submitted triangles at 11.7 ms p50. The far
+layer itself costs about 12 tile draws plus 4 sprite draws and ~12k
+sprite triangles for the entire world. The earlier stats-*.json records
+carry draw/triangle data only (their frame-time fields were never validly
+captured and are removed).
 
 ## The aesthetic pass (third stage)
 

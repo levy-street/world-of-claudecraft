@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { GUILD_CREATION_FEE_COPPER } from '../src/sim/guild_bank';
 import { ensureLocaleLoaded, setLanguage, supportedLanguages } from '../src/ui/i18n';
 import { localizeServerText, tServer } from '../src/ui/server_i18n';
 
@@ -42,6 +43,16 @@ describe('server-sent message localization', () => {
     'Bob is now Officer.',
     'Bob is already Guild Master.',
     'You found the guild <Knights>! You are its Guild Master.',
+    // Guild Bank Phase 3 refusals, emitted from server/game.ts (the creation
+    // fee gate) and server/social.ts (the disband guard): byte-bound pins,
+    // because both files are S3 blind spots and a drift between the emit
+    // literal and these matchers ships English to every locale.
+    'You need 1 gold to found a guild.',
+    'The guild bank must be emptied before the guild can be disbanded.',
+    // guildCreate's screened-name refusal (guild.nameNotAllowed): emitted from
+    // server/social.ts, which the S3 guard does not scan, so the emit literal
+    // is pinned to the EXACT matcher here like the tiers above.
+    'That guild name is not allowed.',
     'You have been removed from <Knights>.',
     'Mira has been removed from the guild by Bob.',
     'Mira has entered World of ClaudeCraft.',
@@ -167,6 +178,25 @@ describe('server-sent message localization', () => {
         expect(found, `${lang}.${key} placeholders`).toBe(expected[key]);
       }
     }
+    setLanguage('en');
+  });
+});
+
+describe('the guild creation fee line stays matchable', () => {
+  it('the fee is whole gold, so the integer-splicing RULE keeps matching it', async () => {
+    // The matcher splices `(\d+)`: a fee that stopped being whole gold would
+    // emit "You need 1.5 gold..." and ship raw English to every locale with
+    // nothing else reddening. Driven from the REAL content constant, not a
+    // literal, so changing the price is what fails this.
+    const gold = GUILD_CREATION_FEE_COPPER / 10_000;
+    expect(Number.isInteger(gold), `fee must be whole gold, got ${gold}`).toBe(true);
+    expect(gold).toBeGreaterThan(0);
+    await ensureLocaleLoaded('es');
+    setLanguage('es');
+    const line = `You need ${gold} gold to found a guild.`;
+    const localized = localizeServerText(line);
+    expect(localized).not.toBe(line); // it really matched
+    expect(localized).toContain(String(gold)); // ...and kept the amount
     setLanguage('en');
   });
 });

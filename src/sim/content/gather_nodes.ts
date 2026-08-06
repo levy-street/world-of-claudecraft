@@ -307,11 +307,13 @@ export const GATHER_NODES: GatherNodeDef[] = [
     tier: 1,
   },
 
+  // Outside the Fenbridge wall, north-east tree line (was inside the
+  // palisade on the north ring and blocked the town).
   {
     id: 'wood_mirefen_1',
     zoneId: 'mirefen_marsh',
     type: 'wood',
-    pos: { x: 10, z: 330 },
+    pos: { x: 20, z: 375 },
     level: 10,
     tier: 1,
   },
@@ -323,11 +325,13 @@ export const GATHER_NODES: GatherNodeDef[] = [
     level: 10,
     tier: 1,
   },
+  // Outside the wall on the north-west tree line near wood_mirefen_2
+  // (was inside near the inn apron).
   {
     id: 'wood_mirefen_3',
     zoneId: 'mirefen_marsh',
     type: 'wood',
-    pos: { x: -20, z: 315 },
+    pos: { x: -42, z: 355 },
     level: 10,
     tier: 1,
   },

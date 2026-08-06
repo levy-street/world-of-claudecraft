@@ -62,7 +62,7 @@ await page.waitForFunction(
 await page.evaluate(() => window.__game.sim.chat('/dev mounts'));
 await page.waitForFunction(() => {
   const sim = window.__game.sim;
-  return sim.ridingTrained() && sim.ownedMounts().length === 8;
+  return sim.ridingTrained() && sim.ownedMounts().length === 9;
 });
 await sleep(300);
 

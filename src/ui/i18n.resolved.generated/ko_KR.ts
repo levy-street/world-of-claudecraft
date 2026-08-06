@@ -962,7 +962,8 @@ export const ko_KR: EnTranslations = {
       "petTaunt": "펫: 도발",
       "petDefensive": "펫: 방어",
       "petAggressive": "펫: 공격적",
-      "mount": "탑승 / 하차"
+      "mount": "탑승 / 하차",
+      "mouseHint": "마우스 버튼도 사용할 수 있습니다. 지정하는 동안 가운데 버튼 (M3) 또는 엄지 버튼 (M4, M5) 을 누르세요. 왼쪽과 오른쪽 버튼은 카메라 조작, 클릭 이동, 월드 클릭용으로 예약되어 있습니다."
     },
     "actionBar": {
       "editKeys": "액션 바 키 편집",
@@ -971,7 +972,7 @@ export const ko_KR: EnTranslations = {
       "bannerCapturing": "키를 눌러 이 슬롯에 지정하세요...",
       "boundToKey": "{key}(으)로 지정되었습니다.",
       "reset": "초기화",
-      "done": "Done",
+      "done": "완료",
       "cancel": "취소",
       "resetConfirmTitle": "액션 바 키를 초기화하시겠습니까?",
       "resetConfirmBody": "첫 번째 바는 기본 키로 되돌아가고, 두 번째와 세 번째 바는 지정 해제됩니다. 이 작업은 되돌릴 수 없습니다."
@@ -1001,6 +1002,7 @@ export const ko_KR: EnTranslations = {
       "name_stormfeather_griffin": "하늘닿이 폭풍깃",
       "name_thunderstrut_gobbler": "천둥활보 대왕 칠면조",
       "name_terrorspark_groundshaker": "대지를 뒤흔드는 테러스파크",
+      "name_drakemaw_raptor": "화산구 랩터",
       "desc_valorsteed": "여행 속도를 높여 주는 튼튼하고 발이 안정된 군마입니다.",
       "desc_grag_bear": "여행 속도를 높여 주는 튼튼하고 발이 안정된 곰입니다.",
       "desc_stalkglider_snail": "여행 속도를 높여 주는 끈질기고 느긋한 달팽이입니다.",
@@ -1008,7 +1010,8 @@ export const ko_KR: EnTranslations = {
       "desc_shadowjump_toad": "어떤 지형이든 번개 같은 그림자 도약으로 누비도록 훈련된 거대한 두꺼비입니다.",
       "desc_stormfeather_griffin": "룬 발톱으로 땅을 누비는 위엄 있는 폭풍 그리핀입니다. 날개는 접혀 있습니다.",
       "desc_thunderstrut_gobbler": "깨어나는 봉우리에서 꼬리깃을 뇌운처럼 펼친 채 활보하며 내려오는, 폭풍이 낳은 거대한 칠면조입니다.",
-      "desc_terrorspark_groundshaker": "묵직한 궤도와 대구경 포, 겁 없는 조종사를 위한 안장을 갖춘 소형 장갑 기계입니다."
+      "desc_terrorspark_groundshaker": "묵직한 궤도와 대구경 포, 겁 없는 조종사를 위한 안장을 갖춘 소형 장갑 기계입니다.",
+      "desc_drakemaw_raptor": "화산구 칼데라에서 길들여진 둥지 태생 랩터. 온몸이 힘줄과 질주로 이루어졌으며, 아직도 희미한 재 냄새가 난다."
     },
     "mountTraining": {
       "mountPrompt": "{key} 키를 눌러 훈련용 발러스티드에 탑승한다.",
@@ -1180,6 +1183,15 @@ export const ko_KR: EnTranslations = {
       "browserEffectsReduced": "감소",
       "browserEffectsMinimal": "최소",
       "browserEffectsNote": "자동은 브라우저와 기기에 맞춰 무거운 CSS 효과(흐림, 글로우, 배경 모션)를 낮춥니다. 인터페이스가 느리게 느껴지면 수동으로 낮추세요.",
+      "graphicsApply": "그래픽 적용",
+      "graphicsApplying": "그래픽 설정 적용 중...",
+      "graphicsApplied": "그래픽 설정이 적용되었습니다.",
+      "graphicsSaved": "그래픽 설정이 저장되었습니다. 현재 렌더러가 이미 같은 설정을 사용 중입니다.",
+      "graphicsFailed": "그래픽 설정을 적용하지 못했습니다. 이전 설정이 계속 활성화되어 있습니다.",
+      "graphicsRetry": "그래픽 다시 시도",
+      "graphicsFatal": "그래픽 복구에 실패했습니다. 계속하려면 게임을 다시 불러오세요.",
+      "graphicsReload": "게임 다시 불러오기",
+      "graphicsDraftChanged": "그래픽 변경 사항을 적용할 수 있습니다.",
       "interfaceMode": "인터페이스 모드",
       "interfaceModeAuto": "자동",
       "interfaceModeDesktop": "데스크톱",
@@ -1210,6 +1222,7 @@ export const ko_KR: EnTranslations = {
       "itemScoreLine": "점수 {score}",
       "showSecondaryActionBar": "보조 액션 바 표시",
       "showThirdActionBar": "세 번째 액션 바 표시",
+      "lockActionBars": "액션 바 잠금",
       "showTargetOfTarget": "대상의 대상 표시",
       "showAttackButton": "공격 버튼 표시",
       "showDailyRewardsChest": "일일 보상 보물상자 표시",
@@ -1371,7 +1384,14 @@ export const ko_KR: EnTranslations = {
     },
     "landing": {
       "highContrast": "고대비",
-      "highContrastAria": "고대비 배경 전환: 움직이는 예고편을 꺼서 시작 화면 텍스트를 읽기 쉽게 유지합니다"
+      "highContrastAria": "고대비 배경 전환: 움직이는 예고편을 꺼서 시작 화면 텍스트를 읽기 쉽게 유지합니다",
+      "browserSupport": {
+        "title": "알림: 지원되지 않는 브라우저",
+        "body": "이 브라우저에서는 성능이 저하될 수 있습니다. 최상의 경험을 위해 Windows, macOS 또는 Linux용 데스크톱 앱을 받아보세요. 브라우저에서 계속 플레이하시겠습니까? Chrome이 가장 성능이 좋으며 Firefox와 Safari도 지원됩니다.",
+        "getDesktopApp": "데스크톱 앱 받기",
+        "continueInBrowser": "브라우저에서 계속하기",
+        "dismissAria": "지원되지 않는 브라우저 알림 닫기"
+      }
     },
     "warfare": {
       "honorAmount": "명예 {amount}",
@@ -1740,6 +1760,7 @@ export const ko_KR: EnTranslations = {
       "itemAriaEnchanted": "{item}, 수량 {count}, 마법부여된 사본",
       "itemAriaBound": "{item}, 수량 {count}, 귀속된 사본",
       "itemAriaMasterwork": "{item}, 수량 {count}, 걸작",
+      "itemAriaQuest": "{item}, 수량 {count}, 퀘스트 아이템",
       "filterGroupAria": "가방을 분류별로 필터링",
       "filterAll": "전체",
       "filterWeapon": "무기",
@@ -1748,6 +1769,7 @@ export const ko_KR: EnTranslations = {
       "filterMaterial": "재료",
       "filterTool": "도구",
       "filterQuest": "퀘스트",
+      "filterQuestCountAria": "퀘스트, 아이템 {count}개",
       "filterMount": "탈것",
       "sortAria": "가방 아이템 정렬",
       "sortRecent": "최근",
@@ -1756,6 +1778,7 @@ export const ko_KR: EnTranslations = {
       "searchPlaceholder": "아이템 검색",
       "searchAria": "이름으로 가방 아이템 검색",
       "noMatch": "필터와 일치하는 아이템이 없습니다.",
+      "noQuestItems": "가방에 퀘스트 아이템이 없습니다.",
       "capacity": "{used}/{total}",
       "capacityAria": "사용 중인 가방 칸: {total}칸 중 {used}칸",
       "backpack": "배낭",
@@ -1974,6 +1997,8 @@ export const ko_KR: EnTranslations = {
     },
     "materialHint": {
       "fineGrade": "상급 등급입니다. 해당 재료보다 높은 등급의 도구로 만렙 채집지에서 캐낸 것이며, 일반 등급이 필요한 곳 어디에서나 대신 사용됩니다.",
+      "cookingCatch": "요리 재료. 먹기 전에 먼저 요리해야 합니다.",
+      "usedBy": "Used by {crafts}.",
       "arcaneDust": "마법부여 재료. 일반과 고급 장비의 마력을 추출해 얻습니다.",
       "arcaneEssence": "마법부여 재료. 희귀 장비의 마력을 추출해 얻습니다.",
       "arcaneShard": "마법부여 재료. 영웅과 전설 장비의 마력을 추출해 얻습니다.",
@@ -2255,6 +2280,7 @@ export const ko_KR: EnTranslations = {
       "depositHint": "클릭하여 넣기",
       "depositPartialHint": "Shift+클릭하여 일부만 넣기",
       "cannotDeposit": "은행에 보관할 수 없음",
+      "cannotDepositNow": "지금은 보관할 수 없음",
       "depositQuantityTitle": "{item} 넣기",
       "depositQuantityInput": "넣을 수량",
       "depositQuantityConfirm": "넣기",
@@ -2265,6 +2291,7 @@ export const ko_KR: EnTranslations = {
       "sortAria": "은행 아이템 정렬",
       "searchAria": "이름으로 은행 아이템 검색",
       "depositAll": "모든 재료 보관",
+      "depositAllTooltip": "가방에 있는 모든 제작 재료와 잡동사니를 한 번에 은행에 보관합니다. 채집 도구, 장착한 장비, 퀘스트 아이템, 소모품은 영향을 받지 않습니다.",
       "depositAllDone": "보관한 재료: {count}.",
       "depositAllFull": "보관한 재료: {count}. 은행이 가득 찼습니다.",
       "depositAllNone": "은행이 가득 참: 아무것도 보관하지 못했습니다.",
@@ -2280,7 +2307,50 @@ export const ko_KR: EnTranslations = {
       "bonusAdvertWallet": "지갑을 연동하면 2칸을 얻습니다.",
       "bonusReferralProgress": "{count}/{cap}",
       "bonusReferralExplainer": "친구를 초대하세요: 친구가 10레벨에 도달하면 서로 2칸씩 얻으며, 최대 5명까지 가능합니다.",
-      "bonusSectionAria": "보너스 은행 칸과 획득 방법"
+      "bonusSectionAria": "보너스 은행 칸과 획득 방법",
+      "tabsAria": "은행 탭",
+      "personalTab": "개인",
+      "guildTab": "길드",
+      "guildCapacityAria": "사용 중인 길드 은행 칸: {total}칸 중 {used}칸",
+      "guildEmpty": "길드 은행이 비어 있습니다.",
+      "guildTreasury": "길드 금고",
+      "guildDepositGold": "돈 넣기",
+      "guildWithdrawGold": "돈 꺼내기",
+      "guildDepositGoldTitle": "길드 금고에 돈 넣기",
+      "guildWithdrawGoldTitle": "길드 금고에서 돈 꺼내기",
+      "guildGoldAvailable": "사용 가능: {amount}",
+      "guildBuyConfirm": "길드 금고에서 {price}(으)로 길드 은행 칸 {count}칸을 추가로 구매하시겠습니까?",
+      "guildBuyNote": "길드 금고에서 지불됩니다",
+      "guildTreasuryShort": "금고 부족",
+      "guildOpenBank": "길드 은행 개설",
+      "guildOpenConfirm": "{price}(으)로 길드 은행을 개설하시겠습니까? 이 비용은 본인의 소지금에서 지불됩니다.",
+      "guildOpenAccept": "개설",
+      "guildOpenNote": "길드 금고가 아닌 본인의 소지금에서 지불됩니다",
+      "guildPurseShort": "소지금 부족",
+      "guildDormantNote": "잠긴 아이템은 꺼낼 수 없으며 길드 해산을 막습니다.",
+      "guildDormantHint": "이 아이템은 길드 은행에 잠겨 있어 꺼낼 수 없습니다.",
+      "guildDormantAria": "{item}, 수량 {count}, 꺼낼 수 없음",
+      "guildUnknownItem": "알 수 없는 아이템",
+      "guildDepositHint": "클릭하여 길드 은행에 넣기",
+      "guildCannotDeposit": "길드 은행에 넣을 수 없음",
+      "guildGoldCannotMove": "지금은 해당 금액을 옮길 수 없습니다.",
+      "guildViewsAria": "길드 은행 보기",
+      "guildContentsTab": "내용물",
+      "guildLogTab": "기록",
+      "logAria": "길드 은행 활동 기록",
+      "logNote": "최근 길드 은행 활동 {count}건입니다.",
+      "logLoading": "길드 은행 기록을 불러오는 중...",
+      "logEmpty": "아직 길드 은행에 넣거나 뺀 것이 없습니다.",
+      "logRefused": "길드 장교만 길드 은행 기록을 볼 수 있습니다.",
+      "logFormerMember": "탈퇴한 길드원",
+      "logDepositItem": "{actor}님이 {item} {count}개를 넣었습니다",
+      "logWithdrawItem": "{actor}님이 {item} {count}개를 꺼냈습니다",
+      "logDepositMoney": "{actor}님이 {amount}을(를) 넣었습니다",
+      "logWithdrawMoney": "{actor}님이 {amount}을(를) 꺼냈습니다",
+      "logBuySlots": "{actor}님이 {amount}을(를) 들여 은행을 확장했습니다",
+      "logOpenBank": "{actor}님이 {amount}을(를) 들여 길드 은행을 열었습니다",
+      "logCharterFee": "{actor}님이 길드 창설 비용 {amount}을(를) 지불했습니다",
+      "logAdminPurge": "관리자가 {item} {count}개를 삭제했습니다"
     },
     "calendar": {
       "title": "이벤트 달력",
@@ -2358,6 +2428,7 @@ export const ko_KR: EnTranslations = {
       "billboard": {
         "label": "길드 게시판",
         "empty": "게시판에 아직 아무 내용도 없습니다.",
+        "loginLine": "길드 게시판: {text}",
         "setBy": "{name} 설정",
         "save": "저장",
         "placeholder": "길드에 전할 메시지를 작성하세요",
@@ -2558,6 +2629,18 @@ export const ko_KR: EnTranslations = {
         "artisansEye": "장인의 눈",
         "quickeningCharm": "회복의 부적"
       },
+      "toolEffectTooltip": {
+        "kind": "도구 부적",
+        "bonus": {
+          "gatherersCache": "충전된 동안 채집당 획득량 +1.",
+          "artisansEye": "충전된 동안 수확 등급이 도구 1단계만큼 올라갑니다.",
+          "quickeningCharm": "발동한 자원 채집지의 재생성 시간을 단축합니다."
+        },
+        "howToSlot": "전문 기술 창에서 채광, 벌목, 약초학 도구에 장착합니다. 장착 시 소모됩니다.",
+        "charges": "일반 등급 도구에서는 {base}회 충전으로 시작합니다(희귀도 한 단계마다 +{bonus}회).",
+        "landOnly": "낚싯대에는 장착할 수 없습니다.",
+        "openProfessions": "전문 기술 창을 열어 채집 도구에 장착하세요."
+      },
       "toolEffectSlotButton": "{effect} 장착",
       "toolEffectRechargeButton": "재충전",
       "toolEffectSlotted": "{effect}이(가) {profession}에 장착되었습니다.",
@@ -2594,6 +2677,8 @@ export const ko_KR: EnTranslations = {
     "crafting": {
       "title": "제작",
       "close": "제작 닫기",
+      "dialogOption": "제작",
+      "dialogOptionAria": "{craft} 제작 창 열기",
       "craft": "제작",
       "reagentsNeeded": "필요 재료:",
       "reagentLine": "{name}: {have}/{required}",
@@ -2668,6 +2753,8 @@ export const ko_KR: EnTranslations = {
       "masterworkToast": "걸작! {name}",
       "masterworkZoneLine": "{crafter}님이 걸작 {name}을(를) 제작했습니다!",
       "tierUpToast": "{craft} 티어 {tier} 달성!",
+      "skillUpToast": "{skill} 기술 {level} 달성!",
+      "skillUpSubtext": "기술 {level} 달성!",
       "trendNudge": "당신의 솜씨가 {archetype} 쪽으로 기울고 있습니다. 그 조율 임무는 {master}에게 있습니다.",
       "trendNudgeNoMaster": "당신의 솜씨가 {archetype} 쪽으로 기울고 있습니다. 그 길을 택하려면 공예 명인을 찾으세요.",
       "attunedZoneLine": "{name}님이 {archetype}(으)로 조율했습니다!",
@@ -2903,6 +2990,7 @@ export const ko_KR: EnTranslations = {
       "countLabel": "업적 {earned}/{total}",
       "completionAria": "획득한 업적: {earned}/{total}",
       "recentLabel": "최근:",
+      "recentJumpAria": "{name}(으)로 이동",
       "nearestLabel": "달성 임박:",
       "filterGroupAria": "업적 필터",
       "filterAll": "전체",
@@ -4323,8 +4411,8 @@ export const ko_KR: EnTranslations = {
       "toolUnavailable": "판매 없음",
       "priceNone": "판매 없음",
       "toolTierReq": "{tier}티어 도구",
-      "colWield": "Use at",
-      "wieldNone": "Any",
+      "colWield": "사용 숙련도",
+      "wieldNone": "제한 없음",
       "yieldsHeading": "채집의 수확물",
       "yieldsBody": "채집마다 품질을 굴리는데, 그 확률은 숙련도가 전부다. 갓 시작한 채집가는 언제나 일반 등급을 얻지만, 숙련이 오를수록 무게가 높은 등급으로 옮겨 가며 절대 후퇴하지 않는다. 상한 100에서는 일반이 완전히 사라져 60% 고급, 30% 희귀, 8% 영웅, 2% 전설이 된다. 품질은 곧 수량이다. 일반 1개, 고급과 희귀 2개, 영웅 3개, 전설 4개. 희귀 이상은 서명이 새겨져(Gathered by) 도착하며, 상한에서는 열 번 중 네 번에 이름이 남는다.",
       "bandsHeading": "숙련도 구간",
@@ -6159,10 +6247,16 @@ export const ko_KR: EnTranslations = {
   },
   "desktop": {
     "update": {
-      "downloading": "업데이트 {version} 다운로드 중...",
-      "ready": "업데이트 {version} 준비 완료. 게임을 종료하면 자동으로 설치되며, 지금 다시 시작할 수도 있습니다.",
+      "checkingTitle": "업데이트 확인 중...",
+      "checkingBody": "게임은 자동으로 최신 상태로 유지됩니다.",
+      "uptodateTitle": "현재 최신 버전입니다.",
+      "downloadingTitle": "업데이트 {version} 다운로드 중...",
+      "downloadingBody": "계속 플레이할 수 있습니다. 업데이트는 게임 종료 시 설치됩니다.",
+      "readyTitle": "업데이트 {version} 준비 완료",
+      "readyBody": "게임을 종료하면 자동으로 설치되며, 지금 다시 시작할 수도 있습니다.",
       "restart": "지금 다시 시작",
-      "later": "나중에"
+      "later": "나중에",
+      "dismiss": "닫기"
     },
     "crash": {
       "title": "World of ClaudeCraft",
@@ -6629,6 +6723,11 @@ export const ko_KR: EnTranslations = {
     },
     "system": {
       "playerDeath": "사망했습니다.",
+      "deathRecapKillerAbility": "사망했습니다. {killer}의 {ability}에 쓰러졌습니다.",
+      "deathRecapKiller": "사망했습니다. {killer}에게 쓰러졌습니다.",
+      "deathRecapAbility": "사망했습니다. {ability}(으)로 사망했습니다.",
+      "deathRecapFalling": "사망했습니다. 추락사했습니다.",
+      "deathRecapDrowned": "사망했습니다. 익사했습니다.",
       "respawn": "다시 온전하고 편안한 상태가 되었습니다.",
       "ignoringChat": "{name}의 채팅을 차단합니다.",
       "noLongerIgnoring": "{name}을 더 이상 차단하지 않습니다.",
@@ -6874,6 +6973,10 @@ export const ko_KR: EnTranslations = {
         "officer": "장교",
         "member": "회원"
       },
+      "tenure": {
+        "recruit": "신병",
+        "veteran": "베테랑"
+      },
       "guildHeadOne": "당신은 {rank}, {count}명 회원",
       "guildHeadMany": "당신은 {rank}, {count}명 회원"
     },
@@ -7115,6 +7218,7 @@ export const ko_KR: EnTranslations = {
       "quest": "퀘스트 아이템",
       "junk": "잡동사니",
       "fineMaterial": "상급 재료",
+      "material": "재료",
       "food": "음식",
       "drink": "음료",
       "tool": "도구",
@@ -7147,6 +7251,9 @@ export const ko_KR: EnTranslations = {
       "useFood": "사용 효과: {seconds}초에 걸쳐 생명력 {amount} 회복. 먹는 동안 앉아 있어야 합니다.",
       "useDrink": "사용 효과: {seconds}초에 걸쳐 마나 {amount} 회복. 마시는 동안 앉아 있어야 합니다.",
       "questItem": "퀘스트 아이템",
+      "questRelated": "퀘스트: {quest}",
+      "questRules": "판매, 은행에 보관, 거래할 수 없습니다.",
+      "questOrphaned": "진행 중인 퀘스트에 필요하지 않습니다.",
       "classes": "직업: {classes}",
       "sellPrice": "판매 가격: {money}",
       "clickBuy": "클릭하여 구매",
@@ -7195,15 +7302,15 @@ export const ko_KR: EnTranslations = {
       "buyStack": "{count}개 구매",
       "buyStackAria": "{price}에 {item} {count}개 구매",
       "qtyRowAria": "구매 수량",
-      "qtyMultiple": "{count}x",
+      "qtyMultiple": "{count}개",
       "qtyMultipleAria": "한 번에 {count}개씩 구매",
       "qtyCustom": "직접 입력",
       "qtyCustomAria": "구매 수량 직접 입력",
-      "buyCountAria": "Buy {count} of {item} for {price}",
-      "buyCountAriaWithRequirement": "Buy {count} of {item} for {price}. {requirement}",
+      "buyCountAria": "{price}에 {item} {count}개 구매",
+      "buyCountAriaWithRequirement": "{price}에 {item} {count}개 구매. {requirement}",
       "buyQuantityTitle": "{item}을(를) 몇 개 구매하시겠습니까? 최대 {max}개.",
       "buyQuantityInput": "구매할 수량",
-      "buyQuantityConfirm": "Buy",
+      "buyQuantityConfirm": "구매",
       "buybackTitle": "되사기",
       "buybackEmpty": "물품 없음",
       "buybackAria": "{item}을(를) {price}에 되사기",
@@ -7282,6 +7389,12 @@ export const ko_KR: EnTranslations = {
       "reclaim": "회수",
       "buyAria": "{price}에 {item} 구매",
       "reclaimAria": "{item} 회수",
+      "buyConfirmTitle": "구매 확인",
+      "buyConfirmBody": "{price}에 {item}을(를) 구매할까요?",
+      "buyConfirmBodyStack": "{price}에 {item} x{count}(개당 {each})를 구매할까요?",
+      "buyConfirmAccept": "구매",
+      "buyConfirmCancel": "취소",
+      "buyChanged": "확인하기 전에 등록이 변경되었습니다. 가격을 확인한 후 다시 시도하세요.",
       "sellNote": "가방의 상품을 올립니다. 아이템이 팔리면 상인이 {cut}%를 가져갑니다. 등록 칸 {used}/{max}개 사용 중입니다.",
       "sellPickEmpty": "판매할 아이템을 선택하려면 가방에서 클릭하세요.",
       "quantity": "수량",
@@ -8769,6 +8882,18 @@ export const ko_KR: EnTranslations = {
       "fen_muster_order": {
         "name": "펜브리지 소집 명령서"
       },
+      "firebottle": {
+        "name": "화염병"
+      },
+      "murloc_hut": {
+        "name": "진흙지느러미 오두막"
+      },
+      "restless_skull": {
+        "name": "불안한 두개골"
+      },
+      "vanguard_bone": {
+        "name": "선봉대의 뼈"
+      },
       "mire_prowler_pelt": {
         "name": "수렁 배회자 가죽"
       },
@@ -10044,6 +10169,9 @@ export const ko_KR: EnTranslations = {
       "reins_terrorspark_groundshaker": {
         "name": "테러스파크 시동 열쇠"
       },
+      "reins_drakemaw_raptor": {
+        "name": "화산구 랩터의 고삐"
+      },
       "conjured_water4": {
         "name": "창조된 샘물"
       },
@@ -11039,6 +11167,21 @@ export const ko_KR: EnTranslations = {
       "spider_egg_sac": {
         "name": "거미 알집"
       },
+      "spider_egg": {
+        "name": "거미어미의 알"
+      },
+      "widow_hatchling": {
+        "name": "과부거미 새끼"
+      },
+      "drowned_warlord": {
+        "name": "익사한 전쟁군주"
+      },
+      "brakka_wallbreaker": {
+        "name": "성벽파괴자 브라카"
+      },
+      "threnos_first_voice": {
+        "name": "첫 번째 목소리 스레노스"
+      },
       "grave_silt_bulwark": {
         "name": "무덤진흙 방벽"
       },
@@ -11218,6 +11361,18 @@ export const ko_KR: EnTranslations = {
       },
       "cindraleth_maw_matriarch": {
         "name": "화산구의 어미 신드랄레스"
+      },
+      "dragonkin_egg": {
+        "name": "용족 알"
+      },
+      "dragonkin_whelp": {
+        "name": "용족 새끼"
+      },
+      "dragonkin_broodguard": {
+        "name": "용족 둥지 수호병"
+      },
+      "drakemaw_broodlord": {
+        "name": "화산구의 둥지군주"
       },
       "gilded_stag": {
         "name": "금빛 수사슴"
@@ -12284,7 +12439,7 @@ export const ko_KR: EnTranslations = {
       },
       "q_no_rest": {
         "title": "갈대밭에 안식은 없다",
-        "text": "그 의식은 습지가 닿는 곳마다 익사자를 일으킵니다. 아직 풀 수 없지만, 병사 14구를 주인에게서 빼앗을 수 있습니다.",
+        "text": "그 향로의 의식은 익사자를 일으키고, 이제 그들을 이끌 만큼 강한 자까지 일으켰습니다. 파수꾼들은 그를 익사한 전쟁군주라 부릅니다. 그가 잠긴 예배당을 차지하고 있는 한 망자들은 대열을 지킵니다. {playerName}이여, 그를 쓰러뜨리십시오. 남은 것들은 진창으로 흩어져 돌아갈 것입니다.",
         "completion": "당신은 죽은 자들에게 주인들보다 큰 자비를 베풀었습니다. 받으십시오.",
         "objectives": {
           "0": {
@@ -12562,9 +12717,6 @@ export const ko_KR: EnTranslations = {
         "objectives": {
           "0": {
             "label": "고룡교단 광신도 처치"
-          },
-          "1": {
-            "label": "고룡교단 명령서"
           }
         }
       },
@@ -12575,9 +12727,6 @@ export const ko_KR: EnTranslations = {
         "objectives": {
           "0": {
             "label": "고룡교단 강령술사 처치"
-          },
-          "1": {
-            "label": "의식 성물함"
           }
         }
       },

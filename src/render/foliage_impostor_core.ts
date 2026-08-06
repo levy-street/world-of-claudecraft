@@ -128,6 +128,13 @@ export const IMPOSTOR_MIN_BAND = 48;
  */
 export const IMPOSTOR_SWAP_FADE = 24;
 
+/**
+ * Shared albedo-shaped ambient floor for real and impostor canopies at deep
+ * night. Keeping one constant on both sides prevents the swap from changing
+ * a readable moonlit tree into a black silhouette.
+ */
+export const CANOPY_EMISSIVE_FLOOR: readonly [number, number, number] = [0.155, 0.175, 0.135];
+
 /** The closest swap the blend law allows for this fog pair. */
 export function spriteSwapFloor(fogNear: number, fogFar: number): number {
   if (!(fogFar > fogNear)) return SPRITE_SWAP_MIN;
@@ -184,90 +191,98 @@ export const IMPOSTOR_JITTER_GLSL =
 export const IMPOSTOR_ATLAS_MAX = 4096;
 
 // ---------------------------------------------------------------------------
-// Sprite shading normal
+// The shipped inventory budget (what the atlas is allowed to hold)
 // ---------------------------------------------------------------------------
 
-/**
- * How far the sprite's shading normal leans off vertical, 0 (the old
- * straight-up quad normal) to 1 (a pure camera-facing cylinder).
- *
- * A quad carrying up normals takes the GROUND PLANE's light response, which
- * reads as a canopy only while the sun is high. This world's sun never passes
- * 41 degrees (CELESTIAL_ARC_HEIGHT in day_night_core.ts) and sits under 3
- * degrees around dawn and dusk, where dot(up, sunDir) is about 0.05: every
- * sprite loses its directional term in the same frame and flattens into one
- * ambient-lit cutout while the real trees beside it still show a warm lit
- * side and a dark back. Leaning the normal toward the camera restores the
- * directional term at a low sun; keeping most of the vertical component is
- * what preserves the midday response the sprite-to-tree parity was tuned
- * against. At this value the bearing-averaged noon term holds about 83
- * percent of the up-normal response while the dawn lit edge gains roughly a
- * factor of 11, which is the trade this constant exists to make.
- */
-export const IMPOSTOR_NORMAL_TILT = 0.4;
+export type ImpostorCategoryName = 'tree' | 'rock' | 'dress' | 'building';
+
+/** Yaw views per category: enough that the two-view blend never smears. */
+export const IMPOSTOR_CATEGORY_VIEWS: Record<ImpostorCategoryName, number> = {
+  tree: 12,
+  rock: 6,
+  dress: 8,
+  building: 6,
+};
 
 /**
- * Half-width of the horizontal normal fan across the card, in radians. The
- * leaning normal alone would light a whole sprite uniformly from its own
- * bearing; fanning it from one edge to the other makes the card shade like a
- * standing cylinder instead, so a single sprite carries a lit side and a
- * shaded side the way its real twin's canopy does. A canopy is a soft mass,
- * not a mirror-finish tube, so the fan stops short of the full 90 degrees a
- * true cylinder silhouette would take.
+ * World-fixed sway amplitude per category: amplitude parity with the real
+ * canopies (TREE_WIND_STRENGTH 0.08, bush windMul 1.2) for the things that
+ * sway, HARD ZERO for the rigid kit. A building or boulder billboard
+ * riding the bush gust reads broken from any distance. Dead trees share
+ * the tree category and zero out per archetype instead (registerArchetype
+ * windMul).
  */
-export const IMPOSTOR_NORMAL_FAN = 1.05;
+export const IMPOSTOR_CATEGORY_WIND: Record<ImpostorCategoryName, number> = {
+  tree: 0.08,
+  dress: 0.096,
+  rock: 0,
+  building: 0,
+};
 
 /**
- * Shared GLSL for the sprite shading normal. Declares `impNormal` in WORLD
- * space from the billboard basis the vertex stage has already built
- * (`impFwd`, the horizontal direction from the instance toward the camera,
- * and `impRight`, across the card) plus the vertex's own place across the
- * card (`position.x`, -0.5 at the left edge to 0.5 at the right). The caller
- * un-rotates it into the instance frame; see foliage_impostor.ts.
+ * Cell edge per category, sized for the DISPLAY distance, not the model: a
+ * 14u tree at its ~300u swap subtends ~45 screen pixels at 1080p, and a
+ * village house past the 700u detail horizon under 20, so these cells stay
+ * oversampled at every distance a sprite can be seen while the whole
+ * inventory packs into IMPOSTOR_ATLAS_BUDGET. Tree and building share one
+ * 80px height class on purpose: same-height rows share shelves in the
+ * packer, which is what lets the REAL building inventory (44 rows of
+ * houses, bell towers and skyline decor, measured live) fit beside the 15
+ * tree rows inside 2048.
  */
-export const IMPOSTOR_NORMAL_GLSL = `
-        float impFan = position.x * ${(2 * IMPOSTOR_NORMAL_FAN).toFixed(5)};
-        vec3 impNormal = normalize(mix(vec3(0.0, 1.0, 0.0),
-          impFwd * cos(impFan) + impRight * sin(impFan), ${IMPOSTOR_NORMAL_TILT.toFixed(3)}));`;
+export const IMPOSTOR_CELL_PX: Record<ImpostorCategoryName, number> = {
+  tree: 80,
+  rock: 64,
+  dress: 64,
+  building: 80,
+};
 
 /**
- * The world-space shading normal IMPOSTOR_NORMAL_GLSL builds, in plain TS so
- * the light response can be pinned in Node. `faceX` is the vertex's
- * position.x (-0.5 to 0.5) and (`fwdX`, `fwdZ`) the horizontal direction from
- * the instance toward the camera. Mirrors the GLSL step for step: the two
- * only stay honest because the core test evaluates this one against the
- * numbers the shader constants above interpolate.
+ * Row budget per category. Tree, rock and dress counts are exact (the
+ * foliage kit's variant lists are fixed); the building count is a cap with
+ * headroom over the MEASURED live inventory (44 unique assets: pools,
+ * per-kind entries, the bell tower, and every skyline decor prop 7u+).
+ * registerArchetype throws past its category's budget, so a grown kit
+ * fails the world build loudly instead of silently outgrowing the atlas
+ * the capacity test verified. The fail-soft in buildFoliage turns that
+ * throw into a sprite-less far field for the player, so treat ANY
+ * budget change as unverified until a live boot shows the four impostor
+ * meshes standing.
  */
-export function impostorSpriteNormal(
-  faceX: number,
-  fwdX: number,
-  fwdZ: number,
-  tilt: number = IMPOSTOR_NORMAL_TILT,
-  fan: number = IMPOSTOR_NORMAL_FAN,
-): [number, number, number] {
-  const len = Math.hypot(fwdX, fwdZ) || 1;
-  const fx = fwdX / len;
-  const fz = fwdZ / len;
-  // impRight = cross(up, impFwd)
-  const rx = fz;
-  const rz = -fx;
-  const ang = faceX * 2 * fan;
-  const c = Math.cos(ang);
-  const s = Math.sin(ang);
-  const nx = (fx * c + rx * s) * tilt;
-  const ny = 1 - tilt;
-  const nz = (fz * c + rz * s) * tilt;
-  const n = Math.hypot(nx, ny, nz) || 1;
-  return [nx / n, ny / n, nz / n];
+export const IMPOSTOR_ROW_BUDGET: Record<ImpostorCategoryName, number> = {
+  tree: 15,
+  rock: 8,
+  dress: 2,
+  building: 48,
+};
+
+/**
+ * The atlas edge the WHOLE shipped inventory must fit: 2048 keeps the
+ * resident mip chain near 21 MiB where 4096 costs 85 MiB, on every desktop
+ * tier that bakes at all (constrained-memory profiles never bake, see
+ * farFieldPolicy). Pinned exactly in the core test via
+ * shippedImpostorInventory().
+ */
+export const IMPOSTOR_ATLAS_BUDGET = 2048;
+
+/**
+ * The worst-case inventory the budget must hold: every category at its full
+ * row budget. World dimensions do not affect packing (only views * cellPx
+ * does), so the specs carry nominal sizes.
+ */
+export function shippedImpostorInventory(): ImpostorArchetypeSpec[] {
+  const specs: ImpostorArchetypeSpec[] = [];
+  for (const category of ['tree', 'rock', 'dress', 'building'] as const) {
+    for (let i = 0; i < IMPOSTOR_ROW_BUDGET[category]; i++) {
+      specs.push({
+        id: `${category}:${i}`,
+        worldWidth: 10,
+        worldHeight: 10,
+        worldBaseY: 0,
+        views: IMPOSTOR_CATEGORY_VIEWS[category],
+        cellPx: IMPOSTOR_CELL_PX[category],
+      });
+    }
+  }
+  return specs;
 }
-
-/**
- * The texture-shaped canopy ambient floor, shared by the real canopy
- * materials (foliage.ts, where its rationale lives: a dense canopy
- * shadow-maps itself into darkness) and the sprite impostors. Emissive is
- * added after all light attenuation, so it is the one term that survives the
- * deep-night light scale: an impostor without it reads as a pure black
- * silhouette at night while its real twin stays readable. One constant so
- * the two sides of the swap line can never drift apart.
- */
-export const CANOPY_EMISSIVE_FLOOR: readonly [number, number, number] = [0.155, 0.175, 0.135];

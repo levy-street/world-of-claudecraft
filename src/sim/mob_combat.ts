@@ -68,6 +68,31 @@ export function combatProfileForMob(templateId: string, scale: number): MobComba
       meleeRange: scaledDefaultMobMeleeRange(2),
       desiredRange: 5,
     };
+  // The grown dragonkin (the broodlords at scale 2.25, Cindraleth at 2.85):
+  // reach follows the body per the wildheart lesson (a big model on stock
+  // reach swings through thin air), while desiredRange stays close so the
+  // trade reads as contact, not ranged pawing.
+  if (templateId === 'drakemaw_broodlord')
+    return {
+      ...DEFAULT_MOB_COMBAT_PROFILE,
+      meleeRange: scaledDefaultMobMeleeRange(2.25),
+      desiredRange: 5,
+    };
+  if (templateId === 'cindraleth_maw_matriarch')
+    return {
+      ...DEFAULT_MOB_COMBAT_PROFILE,
+      meleeRange: scaledDefaultMobMeleeRange(2.85),
+      desiredRange: 5.5,
+    };
+  // Grubjaw the Glutton at scale 2.275: same treatment as the grown
+  // dragonkin, so the big body's swings land at visual contact instead of
+  // pawing from stock humanoid reach.
+  if (templateId === 'grubjaw')
+    return {
+      ...DEFAULT_MOB_COMBAT_PROFILE,
+      meleeRange: scaledDefaultMobMeleeRange(2.275),
+      desiredRange: 5,
+    };
   if (templateId === 'wildheart_beastmaster')
     return {
       ...DEFAULT_MOB_COMBAT_PROFILE,

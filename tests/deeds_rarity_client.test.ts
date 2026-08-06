@@ -1,7 +1,7 @@
-// ClientWorld.deedsRarity + ClientWorld.deedsLeaderboard: the online facet
-// arms are lazy REST reads with hard soft-fail contracts (null for rarity,
-// the empty page for the board), so every failure arm gets its own pin:
-// non-ok status, malformed payload, and a rejecting fetch.
+// ClientWorld.deedsRarity + deedsRecent + deedsLeaderboard: the online facet
+// arms are lazy REST reads with hard soft-fail contracts (null for rarity and
+// the recent order, the empty page for the board), so every failure arm gets
+// its own pin: non-ok status, malformed payload, and a rejecting fetch.
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { ClientWorld } from '../src/net/online';
 
@@ -55,6 +55,52 @@ describe('ClientWorld.deedsRarity', () => {
       }),
     );
     await expect(bareClient().deedsRarity()).resolves.toBeNull();
+  });
+});
+
+describe('ClientWorld.deedsRecent', () => {
+  const withCharacter = (): ClientWorld => {
+    const c = bareClient();
+    (c as unknown as { characterId: number }).characterId = 7;
+    return c;
+  };
+
+  it('resolves the newest-first ids, hitting the owner route with the bearer', async () => {
+    const mock = stubFetch({
+      ok: true,
+      json: async () => ({ deeds: ['cmb_first_blood', 'prog_first_steps'] }),
+    });
+    await expect(withCharacter().deedsRecent()).resolves.toEqual([
+      'cmb_first_blood',
+      'prog_first_steps',
+    ]);
+    expect(mock).toHaveBeenCalledWith('/api/characters/7/deeds-recent', {
+      headers: { Authorization: `Bearer ${'a'.repeat(64)}` },
+    });
+  });
+
+  it('keeps only string entries, and resolves null when deeds is not an array', async () => {
+    stubFetch({ ok: true, json: async () => ({ deeds: ['ok_id', 7, null, 'other'] }) });
+    await expect(withCharacter().deedsRecent()).resolves.toEqual(['ok_id', 'other']);
+    stubFetch({ ok: true, json: async () => ({ deeds: 'nope' }) });
+    await expect(withCharacter().deedsRecent()).resolves.toBeNull();
+    stubFetch({ ok: true, json: async () => ({}) });
+    await expect(withCharacter().deedsRecent()).resolves.toBeNull();
+  });
+
+  it('resolves null on a non-ok status', async () => {
+    stubFetch({ ok: false, status: 404, json: async () => ({ error: 'character not found' }) });
+    await expect(withCharacter().deedsRecent()).resolves.toBeNull();
+  });
+
+  it('resolves null (never rejects) when the fetch itself throws', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => {
+        throw new Error('offline');
+      }),
+    );
+    await expect(withCharacter().deedsRecent()).resolves.toBeNull();
   });
 });
 

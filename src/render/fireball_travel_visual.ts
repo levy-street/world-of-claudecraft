@@ -15,6 +15,10 @@ interface FireballMaterials {
 
 let materials: FireballMaterials | null = null;
 
+export function resetFireballTravelProfileCaches(): void {
+  materials = null;
+}
+
 function fireballMaterials(): FireballMaterials {
   if (materials) return materials;
   const core = surfaceMat({

@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
   attributeFreezes,
@@ -5,6 +6,12 @@ import {
   frameStats,
   normalizeReport,
 } from '../scripts/profiler/metrics.mjs';
+
+const profileSource = readFileSync(new URL('../scripts/profile.mjs', import.meta.url), 'utf8');
+const crowdBenchSource = readFileSync(
+  new URL('../scripts/crowd_fps_bench.mjs', import.meta.url),
+  'utf8',
+);
 
 describe('frameStats', () => {
   it('returns null for empty input', () => {
@@ -99,7 +106,12 @@ describe('normalizeReport', () => {
         programs: 179,
         views: 63,
         autoGovernor: true,
-        phaseMs: { entities: { avg: 1 }, submit: { avg: 9.3 }, total: { avg: 10 } },
+        phaseMs: {
+          entities: { avg: 1 },
+          nameplates: { avg: 1.27 },
+          submit: { avg: 9.3 },
+          total: { avg: 10 },
+        },
         foliage: {
           grassVisibleTufts: 2700,
           modelVisibleDraws: 170,
@@ -116,6 +128,7 @@ describe('normalizeReport', () => {
     expect(m.fps).toBe(72.4);
     expect(m.tier).toBe('high');
     expect(m.calls).toBe(1189);
+    expect(m.phaseNameplatesMs).toBe(1.27);
     expect(m.phaseSubmitMs).toBe(9.3);
     expect(m.mainRendererMs).toBe(7);
     expect(m.heapUsedMb).toBe(300);
@@ -135,8 +148,44 @@ describe('diffMetrics', () => {
   });
 
   it('marks regressions as worse', () => {
-    const d = diffMetrics({ fps: 80 }, { fps: 60 });
+    const d = diffMetrics(
+      { fps: 80, phaseNameplatesMs: 0.25 },
+      { fps: 60, phaseNameplatesMs: 0.7 },
+    );
     expect(d.fps.better).toBe('worse');
     expect(d.fps.delta).toBe(-20);
+    expect(d.phaseNameplatesMs).toEqual({
+      before: 0.25,
+      after: 0.7,
+      delta: 0.45,
+      pct: 180,
+      better: 'worse',
+    });
+  });
+});
+
+describe('nameplate profiler presentation', () => {
+  it('prints the renderer phase in both profiling entry points', () => {
+    expect(profileSource).toContain(
+      ['`np $', '{String(s.phaseNameplatesMs).padStart(5)}ms`'].join(''),
+    );
+    expect(crowdBenchSource).toContain(
+      'nameplatesMs: rr.phaseMs?.nameplates?.avg ?? rr.phaseMs?.nameplates',
+    );
+    expect(crowdBenchSource).toContain(['npMs=$', '{f(s.nameplatesMs, 5)}'].join(''));
+  });
+
+  it('records reproducible crowd benchmark provenance with the real default curve', () => {
+    expect(crowdBenchSource).toContain(
+      "const BATCHES = (process.env.CROWD_BATCHES ?? '10,20,35,50')",
+    );
+    expect(crowdBenchSource).toContain('CROWD_BASE_SHA=<base-sha> CROWD_HEAD_SHA=<head-sha>');
+    expect(crowdBenchSource).toContain('baseSha: evidenceBaseSha');
+    expect(crowdBenchSource).toContain('headSha: evidenceHeadSha');
+    expect(crowdBenchSource).toContain('cpu: os.cpus()[0]?.model ?? null');
+    expect(crowdBenchSource).toContain('product: await browser.version()');
+    expect(profileSource).toContain(
+      'node scripts/profile.mjs crowd --crowd 40 --tier ultra --dpr 1 --ms 4000',
+    );
   });
 });

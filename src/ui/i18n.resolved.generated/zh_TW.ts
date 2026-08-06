@@ -962,7 +962,8 @@ export const zh_TW: EnTranslations = {
       "petTaunt": "寵物：嘲諷",
       "petDefensive": "寵物：防禦",
       "petAggressive": "寵物：攻擊性",
-      "mount": "騎乘 / 下騎"
+      "mount": "騎乘 / 下騎",
+      "mouseHint": "滑鼠按鍵同樣可用：綁定時按下中鍵 (M3) 或拇指鍵 (M4、M5)。左鍵與右鍵保留給鏡頭、點擊移動與點擊世界中的目標使用。"
     },
     "actionBar": {
       "editKeys": "編輯動作列按鍵",
@@ -971,7 +972,7 @@ export const zh_TW: EnTranslations = {
       "bannerCapturing": "按下按鍵以綁定該欄位……",
       "boundToKey": "已綁定至 {key}。",
       "reset": "重設",
-      "done": "Done",
+      "done": "完成",
       "cancel": "取消",
       "resetConfirmTitle": "重設動作列按鍵？",
       "resetConfirmBody": "第一列動作列將恢復為預設按鍵，第二列與第三列將變為未綁定狀態。此操作無法復原。"
@@ -1001,6 +1002,7 @@ export const zh_TW: EnTranslations = {
       "name_stormfeather_griffin": "凌天風暴之羽",
       "name_thunderstrut_gobbler": "雷霆闊步大火雞",
       "name_terrorspark_groundshaker": "驚雷撼地者",
+      "name_drakemaw_raptor": "龍喉迅猛龍",
       "desc_valorsteed": "一匹堅韌穩健的駿馬，可提升旅行速度。",
       "desc_grag_bear": "一頭堅韌穩健的巨熊，可提升旅行速度。",
       "desc_stalkglider_snail": "一隻堅毅耐久的蝸牛，可提升旅行速度。",
@@ -1008,7 +1010,8 @@ export const zh_TW: EnTranslations = {
       "desc_shadowjump_toad": "一隻體型龐大、步伐穩健的巨蟾，受訓於閃電般的暗影跳躍，可跨越任何地形。",
       "desc_stormfeather_griffin": "一頭威嚴的風暴獅鷲，收攏雙翼，以符文利爪行走於大地。",
       "desc_thunderstrut_gobbler": "一隻風暴所生的龐然大火雞，從覺醒之峰昂首闊步而下，尾羽如雷雲般展開。",
-      "desc_terrorspark_groundshaker": "一台緊湊的裝甲機械，配備重型履帶、大口徑火炮，以及為無畏駕駛員打造的鞍座。"
+      "desc_terrorspark_groundshaker": "一台緊湊的裝甲機械，配備重型履帶、大口徑火炮，以及為無畏駕駛員打造的鞍座。",
+      "desc_drakemaw_raptor": "來自龍喉火山口的馴服巢生迅猛龍，渾身筋肉、疾若奔雷，身上仍帶著淡淡的灰燼氣味。"
     },
     "mountTraining": {
       "mountPrompt": "按 {key} 鍵騎上訓練用英勇戰馬。",
@@ -1180,6 +1183,15 @@ export const zh_TW: EnTranslations = {
       "browserEffectsReduced": "精簡",
       "browserEffectsMinimal": "最低",
       "browserEffectsNote": "自動模式會根據你的瀏覽器與裝置調低高負擔的 CSS 特效（模糊、光暈、背景動畫）。若介面感覺卡頓，可手動降低。",
+      "graphicsApply": "套用圖形設定",
+      "graphicsApplying": "正在套用圖形設定...",
+      "graphicsApplied": "圖形設定已套用。",
+      "graphicsSaved": "圖形設定已儲存。目前的渲染器已符合這些設定。",
+      "graphicsFailed": "無法套用圖形設定。先前的圖形設定仍然有效。",
+      "graphicsRetry": "重試圖形設定",
+      "graphicsFatal": "圖形復原失敗。請重新載入遊戲以繼續。",
+      "graphicsReload": "重新載入遊戲",
+      "graphicsDraftChanged": "圖形變更已準備好套用。",
       "interfaceMode": "介面模式",
       "interfaceModeAuto": "自動",
       "interfaceModeDesktop": "桌面",
@@ -1210,6 +1222,7 @@ export const zh_TW: EnTranslations = {
       "itemScoreLine": "評分 {score}",
       "showSecondaryActionBar": "顯示副動作列",
       "showThirdActionBar": "顯示第三動作列",
+      "lockActionBars": "鎖定動作列",
       "showTargetOfTarget": "顯示目標的目標",
       "showAttackButton": "顯示攻擊按鈕",
       "showDailyRewardsChest": "顯示每日獎勵寶箱",
@@ -1371,7 +1384,14 @@ export const zh_TW: EnTranslations = {
     },
     "landing": {
       "highContrast": "高對比度",
-      "highContrastAria": "切換高對比度背景：關閉動態預告片，使開始畫面文字保持清晰"
+      "highContrastAria": "切換高對比度背景：關閉動態預告片，使開始畫面文字保持清晰",
+      "browserSupport": {
+        "title": "提示：不受支援的瀏覽器",
+        "body": "此瀏覽器中效能可能會下降。為獲得最佳體驗，請下載適用於 Windows、macOS 或 Linux 的桌面應用程式。想在瀏覽器中遊玩？Chrome 效能最佳，Firefox 和 Safari 也受支援。",
+        "getDesktopApp": "取得桌面應用程式",
+        "continueInBrowser": "繼續在瀏覽器中遊玩",
+        "dismissAria": "關閉不受支援瀏覽器的提示"
+      }
     },
     "warfare": {
       "honorAmount": "{amount} 點榮譽",
@@ -1740,6 +1760,7 @@ export const zh_TW: EnTranslations = {
       "itemAriaEnchanted": "{item}，數量 {count}，已附魔的副本",
       "itemAriaBound": "{item}，數量 {count}，已綁定的副本",
       "itemAriaMasterwork": "{item}，數量 {count}，傑作",
+      "itemAriaQuest": "{item}，數量 {count}，任務物品",
       "filterGroupAria": "依類別篩選背包",
       "filterAll": "全部",
       "filterWeapon": "武器",
@@ -1748,6 +1769,7 @@ export const zh_TW: EnTranslations = {
       "filterMaterial": "材料",
       "filterTool": "工具",
       "filterQuest": "任務",
+      "filterQuestCountAria": "任務，{count} 件物品",
       "filterMount": "坐騎",
       "sortAria": "排序背包物品",
       "sortRecent": "最近",
@@ -1756,6 +1778,7 @@ export const zh_TW: EnTranslations = {
       "searchPlaceholder": "搜尋物品",
       "searchAria": "依名稱搜尋背包物品",
       "noMatch": "沒有符合篩選條件的物品。",
+      "noQuestItems": "背包中沒有任務物品。",
       "capacity": "{used}/{total}",
       "capacityAria": "背包格已用：{used}/{total}",
       "backpack": "背包",
@@ -1974,6 +1997,8 @@ export const zh_TW: EnTranslations = {
     },
     "materialHint": {
       "fineGrade": "優質品級。以等級高於該材料的工具在滿級礦脈採集所得，在任何需要普通版本的地方均可替代使用。",
+      "cookingCatch": "烹飪材料。必須先烹飪後才能食用。",
+      "usedBy": "Used by {crafts}.",
       "arcaneDust": "附魔材料。分解普通和優秀品質的裝備可得。",
       "arcaneEssence": "附魔材料。分解精良品質的裝備可得。",
       "arcaneShard": "附魔材料。分解史詩和傳說品質的裝備可得。",
@@ -2255,6 +2280,7 @@ export const zh_TW: EnTranslations = {
       "depositHint": "點擊存入",
       "depositPartialHint": "Shift+點擊存入部分數量",
       "cannotDeposit": "無法存入銀行",
+      "cannotDepositNow": "暫時無法存入",
       "depositQuantityTitle": "存入 {item}",
       "depositQuantityInput": "要存入的數量",
       "depositQuantityConfirm": "存入",
@@ -2265,6 +2291,7 @@ export const zh_TW: EnTranslations = {
       "sortAria": "排序銀行物品",
       "searchAria": "依名稱搜尋銀行物品",
       "depositAll": "存入所有材料",
+      "depositAllTooltip": "將背包中的所有製作材料和廢品一次性存入銀行。採集工具、已裝備的裝備、任務物品和消耗品不會受到影響。",
       "depositAllDone": "已存入材料：{count}。",
       "depositAllFull": "已存入材料：{count}。銀行已滿。",
       "depositAllNone": "銀行已滿：未存入任何物品。",
@@ -2280,7 +2307,50 @@ export const zh_TW: EnTranslations = {
       "bonusAdvertWallet": "連結錢包可獲得 2 個格子。",
       "bonusReferralProgress": "{count}/{cap}",
       "bonusReferralExplainer": "邀請好友：當好友升到 10 級，你們各獲得 2 個格子，最多 5 位好友。",
-      "bonusSectionAria": "獎勵銀行格子及獲取方式"
+      "bonusSectionAria": "獎勵銀行格子及獲取方式",
+      "tabsAria": "銀行標籤頁",
+      "personalTab": "個人",
+      "guildTab": "公會",
+      "guildCapacityAria": "公會銀行格已用：{used}/{total}",
+      "guildEmpty": "公會銀行是空的。",
+      "guildTreasury": "公會金庫",
+      "guildDepositGold": "存入金錢",
+      "guildWithdrawGold": "取出金錢",
+      "guildDepositGoldTitle": "向公會金庫存入金錢",
+      "guildWithdrawGoldTitle": "從公會金庫取出金錢",
+      "guildGoldAvailable": "可用：{amount}",
+      "guildBuyConfirm": "花費公會金庫的 {price} 購買 {count} 個額外的公會銀行格子嗎？",
+      "guildBuyNote": "由公會金庫支付",
+      "guildTreasuryShort": "金庫不足",
+      "guildOpenBank": "開啟公會銀行",
+      "guildOpenConfirm": "花費 {price} 開啟公會銀行嗎？這筆費用由你自己支付。",
+      "guildOpenAccept": "開啟",
+      "guildOpenNote": "由你自己支付，而非公會金庫",
+      "guildPurseShort": "金錢不足",
+      "guildDormantNote": "鎖定的物品無法取出，並會阻止解散公會。",
+      "guildDormantHint": "該物品已鎖定在公會銀行中，無法取出。",
+      "guildDormantAria": "{item}，數量 {count}，無法取出",
+      "guildUnknownItem": "未知物品",
+      "guildDepositHint": "點擊存入公會銀行",
+      "guildCannotDeposit": "無法放入公會銀行",
+      "guildGoldCannotMove": "目前無法轉移該金額。",
+      "guildViewsAria": "公會銀行檢視",
+      "guildContentsTab": "內容",
+      "guildLogTab": "日誌",
+      "logAria": "公會銀行活動日誌",
+      "logNote": "最近 {count} 筆公會銀行操作。",
+      "logLoading": "正在載入公會銀行日誌...",
+      "logEmpty": "公會銀行中尚未存入或取出任何物品。",
+      "logRefused": "只有公會幹部才能查看公會銀行日誌。",
+      "logFormerMember": "一位已離開的公會成員",
+      "logDepositItem": "{actor} 存入了 {count} 個 {item}",
+      "logWithdrawItem": "{actor} 取出了 {count} 個 {item}",
+      "logDepositMoney": "{actor} 存入了 {amount}",
+      "logWithdrawMoney": "{actor} 取出了 {amount}",
+      "logBuySlots": "{actor} 花費 {amount} 購買了銀行擴充",
+      "logOpenBank": "{actor} 花費 {amount} 開啟了公會銀行",
+      "logCharterFee": "{actor} 支付了 {amount} 的公會創建費用",
+      "logAdminPurge": "管理員移除了 {count} 個 {item}"
     },
     "calendar": {
       "title": "活動日曆",
@@ -2358,6 +2428,7 @@ export const zh_TW: EnTranslations = {
       "billboard": {
         "label": "公會公告板",
         "empty": "公告板上還沒有內容。",
+        "loginLine": "公會公告板：{text}",
         "setBy": "由 {name} 設定",
         "save": "儲存",
         "placeholder": "給公會寫一則訊息",
@@ -2558,6 +2629,18 @@ export const zh_TW: EnTranslations = {
         "artisansEye": "匠人之眼",
         "quickeningCharm": "回春符"
       },
+      "toolEffectTooltip": {
+        "kind": "工具符咒",
+        "bonus": {
+          "gatherersCache": "充能期間每次採集產出+1。",
+          "artisansEye": "充能期間將收穫品級提升1個工具等級。",
+          "quickeningCharm": "縮短其觸發的資源節點重生計時。"
+        },
+        "howToSlot": "在專業視窗中將其鑲嵌到採礦、伐木或藥草學工具上。鑲嵌後即消耗。",
+        "charges": "普通品質工具初始有{base}次充能（稀有度每升一級+{bonus}次）。",
+        "landOnly": "無法鑲嵌到釣竿上。",
+        "openProfessions": "打開專業視窗，將其鑲嵌到採集工具上。"
+      },
       "toolEffectSlotButton": "鑲嵌{effect}",
       "toolEffectRechargeButton": "充能",
       "toolEffectSlotted": "{effect}已鑲嵌到{profession}。",
@@ -2594,6 +2677,8 @@ export const zh_TW: EnTranslations = {
     "crafting": {
       "title": "製作",
       "close": "關閉製作",
+      "dialogOption": "製作",
+      "dialogOptionAria": "開啟{craft}製作視窗",
       "craft": "製作",
       "reagentsNeeded": "需要:",
       "reagentLine": "{name}: {have}/{required}",
@@ -2668,6 +2753,8 @@ export const zh_TW: EnTranslations = {
       "masterworkToast": "傑作！{name}",
       "masterworkZoneLine": "{crafter}製作出了傑作{name}！",
       "tierUpToast": "{craft}提升至階級 {tier}！",
+      "skillUpToast": "{skill}技能提升至 {level}！",
+      "skillUpSubtext": "技能提升至 {level}！",
       "trendNudge": "你的雙手正傾向於{archetype}之道。其調諧任務在{master}處等候。",
       "trendNudgeNoMaster": "你的雙手正傾向於{archetype}之道。去尋找一位工藝大師來踏上此道吧。",
       "attunedZoneLine": "{name}已調諧為{archetype}！",
@@ -2903,6 +2990,7 @@ export const zh_TW: EnTranslations = {
       "countLabel": "{earned}/{total} 項功績",
       "completionAria": "已獲得功績：{earned}/{total}",
       "recentLabel": "最近：",
+      "recentJumpAria": "跳至 {name}",
       "nearestLabel": "即將達成：",
       "filterGroupAria": "篩選功績",
       "filterAll": "全部",
@@ -4323,8 +4411,8 @@ export const zh_TW: EnTranslations = {
       "toolUnavailable": "無販售",
       "priceNone": "無販售",
       "toolTierReq": "{tier}階工具",
-      "colWield": "Use at",
-      "wieldNone": "Any",
+      "colWield": "使用熟練度",
+      "wieldNone": "不限",
       "yieldsHeading": "一次採集的收穫",
       "yieldsBody": "每次採集都會擲出品質，而熟練度決定一切：新手永遠採到普通品，熟練度越高，權重越向高品質移動，絕不倒退。到100上限時普通品完全消失：60%優秀、30%精良、8%史詩、2%傳說。品質也意味著數量：普通1個，優秀與精良2個，史詩3個，傳說4個。精良及以上的收穫都會以你的名字署名（Gathered by），封頂時十次採集有四次帶著你的名字。",
       "bandsHeading": "熟練度區間",
@@ -6159,10 +6247,16 @@ export const zh_TW: EnTranslations = {
   },
   "desktop": {
     "update": {
-      "downloading": "正在下載更新 {version}...",
-      "ready": "更新 {version} 已就緒。離開遊戲時將自動安裝，也可立即重新啟動。",
+      "checkingTitle": "正在檢查更新...",
+      "checkingBody": "遊戲會自動保持最新版本。",
+      "uptodateTitle": "目前已是最新版本。",
+      "downloadingTitle": "正在下載更新 {version}...",
+      "downloadingBody": "可以繼續遊戲，更新將在離開遊戲時安裝。",
+      "readyTitle": "更新 {version} 已就緒",
+      "readyBody": "離開遊戲時將自動安裝，也可立即重新啟動。",
       "restart": "立即重新啟動",
-      "later": "稍後"
+      "later": "稍後",
+      "dismiss": "關閉"
     },
     "crash": {
       "title": "World of ClaudeCraft",
@@ -6629,6 +6723,11 @@ export const zh_TW: EnTranslations = {
     },
     "system": {
       "playerDeath": "你已經死亡。",
+      "deathRecapKillerAbility": "你已經死亡。被{killer}的{ability}擊殺。",
+      "deathRecapKiller": "你已經死亡。被{killer}擊殺。",
+      "deathRecapAbility": "你已經死亡。死於{ability}。",
+      "deathRecapFalling": "你已經死亡。你摔死了。",
+      "deathRecapDrowned": "你已經死亡。你溺死了。",
       "respawn": "你再次感到精力恢復、身體完整。",
       "ignoringChat": "已封鎖來自 {name} 的聊天。",
       "noLongerIgnoring": "不再封鎖 {name}。",
@@ -6874,6 +6973,10 @@ export const zh_TW: EnTranslations = {
         "officer": "幹部",
         "member": "成員"
       },
+      "tenure": {
+        "recruit": "新兵",
+        "veteran": "老兵"
+      },
       "guildHeadOne": "你是{rank}，{count}名成員",
       "guildHeadMany": "你是{rank}，{count}名成員"
     },
@@ -7115,6 +7218,7 @@ export const zh_TW: EnTranslations = {
       "quest": "任務物品",
       "junk": "雜物",
       "fineMaterial": "優質材料",
+      "material": "材料",
       "food": "食物",
       "drink": "飲料",
       "tool": "工具",
@@ -7147,6 +7251,9 @@ export const zh_TW: EnTranslations = {
       "useFood": "使用：在 {seconds} 秒內恢復 {amount} 點生命值。進食時必須保持坐下。",
       "useDrink": "使用：在 {seconds} 秒內恢復 {amount} 點法力值。飲水時必須保持坐下。",
       "questItem": "任務物品",
+      "questRelated": "任務：{quest}",
+      "questRules": "無法出售、存入銀行或交易。",
+      "questOrphaned": "目前沒有進行中的任務需要此物品。",
       "classes": "職業：{classes}",
       "sellPrice": "出售價格：{money}",
       "clickBuy": "點擊購買",
@@ -7195,15 +7302,15 @@ export const zh_TW: EnTranslations = {
       "buyStack": "購買 {count} 個",
       "buyStackAria": "以 {price} 購買 {count} 個 {item}",
       "qtyRowAria": "購買數量",
-      "qtyMultiple": "{count}x",
+      "qtyMultiple": "{count} 個",
       "qtyMultipleAria": "每次購買 {count} 份",
       "qtyCustom": "自訂",
       "qtyCustomAria": "選擇自訂購買數量",
-      "buyCountAria": "Buy {count} of {item} for {price}",
-      "buyCountAriaWithRequirement": "Buy {count} of {item} for {price}. {requirement}",
+      "buyCountAria": "以 {price} 購買 {count} 個 {item}",
+      "buyCountAriaWithRequirement": "以 {price} 購買 {count} 個 {item}。{requirement}",
       "buyQuantityTitle": "購買多少 {item}？最多 {max}。",
       "buyQuantityInput": "要購買的數量",
-      "buyQuantityConfirm": "Buy",
+      "buyQuantityConfirm": "購買",
       "buybackTitle": "買回",
       "buybackEmpty": "沒有物品",
       "buybackAria": "以 {price} 買回 {item}",
@@ -7282,6 +7389,12 @@ export const zh_TW: EnTranslations = {
       "reclaim": "取回",
       "buyAria": "以 {price} 購買 {item}",
       "reclaimAria": "取回 {item}",
+      "buyConfirmTitle": "確認購買",
+      "buyConfirmBody": "以 {price} 購買 {item}？",
+      "buyConfirmBodyStack": "以 {price} 購買 {item} x{count}（每個 {each}）？",
+      "buyConfirmAccept": "購買",
+      "buyConfirmCancel": "取消",
+      "buyChanged": "該上架在你確認前已變更。請核對價格後再試一次。",
       "sellNote": "從背包上架貨物。物品售出時商人抽取 {cut}%。你正在使用 {used}/{max} 個上架位。",
       "sellPickEmpty": "點擊背包中的物品來選擇要出售的貨物。",
       "quantity": "數量",
@@ -8769,6 +8882,18 @@ export const zh_TW: EnTranslations = {
       "fen_muster_order": {
         "name": "芬橋集結令"
       },
+      "firebottle": {
+        "name": "火油瓶"
+      },
+      "murloc_hut": {
+        "name": "泥鰭茅屋"
+      },
+      "restless_skull": {
+        "name": "不寧顱骨"
+      },
+      "vanguard_bone": {
+        "name": "先鋒之骨"
+      },
       "mire_prowler_pelt": {
         "name": "泥沼潛伏者毛皮"
       },
@@ -10044,6 +10169,9 @@ export const zh_TW: EnTranslations = {
       "reins_terrorspark_groundshaker": {
         "name": "驚雷撼地者點火鑰匙"
       },
+      "reins_drakemaw_raptor": {
+        "name": "龍喉迅猛龍的韁繩"
+      },
       "conjured_water4": {
         "name": "魔法泉水"
       },
@@ -11039,6 +11167,21 @@ export const zh_TW: EnTranslations = {
       "spider_egg_sac": {
         "name": "蜘蛛卵囊"
       },
+      "spider_egg": {
+        "name": "蛛母之卵"
+      },
+      "widow_hatchling": {
+        "name": "寡婦蛛幼體"
+      },
+      "drowned_warlord": {
+        "name": "溺亡督軍"
+      },
+      "brakka_wallbreaker": {
+        "name": "破牆者布拉卡"
+      },
+      "threnos_first_voice": {
+        "name": "初聲瑟雷諾斯"
+      },
       "grave_silt_bulwark": {
         "name": "墓淤壁壘"
       },
@@ -11218,6 +11361,18 @@ export const zh_TW: EnTranslations = {
       },
       "cindraleth_maw_matriarch": {
         "name": "辛卓蕾絲，龍喉之母"
+      },
+      "dragonkin_egg": {
+        "name": "龍裔卵"
+      },
+      "dragonkin_whelp": {
+        "name": "龍裔幼崽"
+      },
+      "dragonkin_broodguard": {
+        "name": "龍裔巢衛"
+      },
+      "drakemaw_broodlord": {
+        "name": "龍喉巢主"
       },
       "gilded_stag": {
         "name": "鎏金雄鹿"
@@ -12284,7 +12439,7 @@ export const zh_TW: EnTranslations = {
       },
       "q_no_rest": {
         "title": "蘆葦中不得安息",
-        "text": "香爐上的儀式會讓溺亡者在濕地觸及之處復起。我們還無法破除它，只能先少給敵人14名士兵。",
+        "text": "香爐上的儀式會讓溺亡者復起，如今它已喚起一個強大到足以統領他們的存在。守望者稱他為溺亡督軍，只要他還占據沉沒的禮拜堂，死者便陣列不散。打倒他，{playerName}，其餘的自會潰散回泥沼。",
         "completion": "你給了死者比他們主人更多的憐憫。拿著，你早已應得。",
         "objectives": {
           "0": {
@@ -12562,9 +12717,6 @@ export const zh_TW: EnTranslations = {
         "objectives": {
           "0": {
             "label": "擊敗龍教狂熱者"
-          },
-          "1": {
-            "label": "龍教命令"
           }
         }
       },
@@ -12575,9 +12727,6 @@ export const zh_TW: EnTranslations = {
         "objectives": {
           "0": {
             "label": "擊敗龍教死靈法師"
-          },
-          "1": {
-            "label": "儀式護命匣"
           }
         }
       },

@@ -4,6 +4,7 @@ import {
   blockRows,
   friendRows,
   type GuildRosterItem,
+  guildDisplayedRole,
   guildRosterItems,
   guildView,
   ignoreRows,
@@ -11,6 +12,9 @@ import {
   type SocialTab,
   socialDot,
   socialStructSig,
+  TENURE_RECRUIT_MS,
+  TENURE_VETERAN_MS,
+  tenureTier,
 } from '../src/ui/social_view';
 import type {
   FriendInfo,
@@ -41,7 +45,12 @@ function friend(over: Partial<FriendInfo> & { name: string }): FriendInfo {
 }
 
 function guildMember(over: Partial<GuildMemberInfo> & { name: string }): GuildMemberInfo {
-  return { ...friend(over), rank: over.rank ?? 'member', lastLogin: over.lastLogin ?? null };
+  return {
+    ...friend(over),
+    rank: over.rank ?? 'member',
+    lastLogin: over.lastLogin ?? null,
+    joinedAt: over.joinedAt ?? null,
+  };
 }
 
 function partyMember(
@@ -225,6 +234,95 @@ describe('per-tab row models', () => {
     const rows = guildView(social, 'Me').guild!.rows;
     expect(rows.find((r) => r.name === 'Seen')?.lastLogin).toBe(iso);
     expect(rows.find((r) => r.name === 'NeverSeen')?.lastLogin).toBeNull();
+  });
+
+  it('maps each member joinedAt into the guild row (null when unknown)', () => {
+    const joined = Date.UTC(2026, 0, 2, 3, 4, 5);
+    const social: SocialInfo = {
+      ...SOCIAL,
+      guild: {
+        ...(SOCIAL.guild as GuildInfo),
+        members: [
+          guildMember({ name: 'Dated', rank: 'member', joinedAt: joined }),
+          guildMember({ name: 'Undated', rank: 'member' }),
+        ],
+      },
+    };
+    const rows = guildView(social, 'Me').guild!.rows;
+    expect(rows.find((r) => r.name === 'Dated')?.joinedAt).toBe(joined);
+    expect(rows.find((r) => r.name === 'Undated')?.joinedAt).toBeNull();
+  });
+});
+
+describe('tenureTier', () => {
+  const DAY = 24 * 60 * 60 * 1000;
+  const NOW = Date.UTC(2026, 7, 1); // any fixed clock; the helper is pure
+
+  it('pins the locked thresholds: 7 days recruit, 30 days veteran', () => {
+    expect(TENURE_RECRUIT_MS).toBe(7 * DAY);
+    expect(TENURE_VETERAN_MS).toBe(30 * DAY);
+  });
+
+  it('marks a member a recruit strictly under 7 days (6d23h boundary)', () => {
+    expect(tenureTier(NOW - (6 * DAY + 23 * 60 * 60 * 1000), NOW)).toBe('recruit');
+  });
+
+  it('drops the recruit role at exactly 7 days', () => {
+    expect(tenureTier(NOW - 7 * DAY, NOW)).toBeNull();
+  });
+
+  it('shows the plain tier through 29 days', () => {
+    expect(tenureTier(NOW - 29 * DAY, NOW)).toBeNull();
+  });
+
+  it('marks a member veteran at exactly 30 days and beyond', () => {
+    expect(tenureTier(NOW - 30 * DAY, NOW)).toBe('veteran');
+    expect(tenureTier(NOW - 400 * DAY, NOW)).toBe('veteran');
+  });
+
+  it('treats a just-joined and a future (clock-skewed) joinedAt as a recruit', () => {
+    expect(tenureTier(NOW, NOW)).toBe('recruit');
+    expect(tenureTier(NOW + DAY, NOW)).toBe('recruit');
+  });
+
+  it('shows no badge when joinedAt is unknown', () => {
+    expect(tenureTier(null, NOW)).toBeNull();
+  });
+});
+
+describe('guildDisplayedRole (the one role chip per roster row)', () => {
+  const DAY = 24 * 60 * 60 * 1000;
+  const NOW = Date.UTC(2026, 7, 1); // any fixed clock; the helpers are pure
+  const roleAt = (rank: string, joinedAgoMs: number | null) =>
+    guildDisplayedRole(rank, tenureTier(joinedAgoMs === null ? null : NOW - joinedAgoMs, NOW));
+
+  it('a member shows the tenure tier AS the role across the locked boundaries', () => {
+    expect(roleAt('member', 6 * DAY + 23 * 60 * 60 * 1000)).toBe('recruit'); // 6d23h
+    expect(roleAt('member', 7 * DAY)).toBe('member'); // exactly 7d drops Recruit
+    expect(roleAt('member', 29 * DAY)).toBe('member');
+    expect(roleAt('member', 30 * DAY)).toBe('veteran'); // exactly 30d gains Veteran
+  });
+
+  it('a member with an unknown joinedAt shows the plain member role', () => {
+    expect(roleAt('member', null)).toBe('member');
+    expect(guildDisplayedRole('member', null)).toBe('member');
+  });
+
+  it('officers and the leader pass their rank through and NEVER a tenure role', () => {
+    // Regression teeth: an officer/leader must keep the rank label even when
+    // their tenure would resolve to a tier (fresh recruit or long veteran).
+    for (const rank of ['leader', 'officer'] as const) {
+      expect(roleAt(rank, 3 * DAY)).toBe(rank);
+      expect(roleAt(rank, 400 * DAY)).toBe(rank);
+      expect(roleAt(rank, null)).toBe(rank);
+      expect(guildDisplayedRole(rank, 'recruit')).toBe(rank);
+      expect(guildDisplayedRole(rank, 'veteran')).toBe(rank);
+    }
+  });
+
+  it('an unrecognized rank falls back to the member arm (rankLabel parity)', () => {
+    expect(guildDisplayedRole('somefuturerank', 'recruit')).toBe('recruit');
+    expect(guildDisplayedRole('somefuturerank', null)).toBe('member');
   });
 });
 

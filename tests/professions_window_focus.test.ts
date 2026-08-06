@@ -18,6 +18,17 @@ vi.mock('../src/ui/icons', () => ({
   // Echo the requested id into the URL so painter tests catch a wrong or
   // hardcoded profession/gathering resolver argument.
   professionIconUrl: (id: string) => `/test-professions/${id}.webp`,
+  // The tool-effect hover card (tool_effect_tooltip.ts) colors its title by
+  // item quality; mirror the full record so wiring the card does not crash
+  // here and a partial-mock miss cannot bite a later quality.
+  QUALITY_COLOR: {
+    poor: '#9d9d9d',
+    common: '#ffffff',
+    uncommon: '#1eff00',
+    rare: '#0070dd',
+    epic: '#a335ee',
+    legendary: '#ff8000',
+  },
 }));
 
 interface WorldState {
@@ -197,6 +208,35 @@ describe('ProfessionsWindow: focus and scroll survive rebuilds', () => {
     w.render();
     const after = document.activeElement as HTMLElement | null;
     expect(after?.getAttribute('data-slot-effect')).toBe('artisans_eye');
+    expect(after?.hasAttribute('data-close')).toBe(false);
+  });
+
+  it('carries focus across a rebuild to the SAME live effect row by its key', () => {
+    // The live effect row is the restore ladder's sanctioned non-spending
+    // middle rung: it is tabbable only so its hover card is keyboard
+    // reachable, so a repaint under a focused row must land back on the
+    // fresh row. Without the row's data-focus-key the ladder parks focus on
+    // Close and the next Enter shuts the window (the #2377 family).
+    const state = baseState();
+    state.toolEffects = [
+      {
+        professionId: 'mining',
+        effectId: 'gatherers_cache',
+        charges: 12,
+        maxCharges: 30,
+        confirmMode: 'always',
+      },
+    ];
+    const { w, el } = makeWindow(state);
+    w.refreshIfChanged(); // settle the post-open catch-up repaint
+    const row = el.querySelector<HTMLElement>('[data-effect-tip]');
+    if (!row) throw new Error('live effect row rendered');
+    expect(row.getAttribute('data-focus-key')).toBe('effect:mining');
+    row.focus();
+    expect(document.activeElement).toBe(row);
+    w.render();
+    const after = document.activeElement as HTMLElement | null;
+    expect(after?.getAttribute('data-effect-tip')).toBe('gatherers_cache');
     expect(after?.hasAttribute('data-close')).toBe(false);
   });
 

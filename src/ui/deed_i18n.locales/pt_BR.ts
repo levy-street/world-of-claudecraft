@@ -7,6 +7,14 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  chr_drakemaw_broodlord: {
+    name: 'Quebra-Ninhada',
+    desc: 'Derrote um Senhor da Ninhada de Drakemaw em meio aos seus ovos, enfrentando o brado, o golpe em arco e o fogo.',
+  },
+  chr_maw_matriarch: {
+    name: 'O Céu Se Cala',
+    desc: 'Derrote Cindraleth, a Matriarca das Fauces, em seu poleiro na cratera acima do Drakemaw.',
+  },
   pvp_card_duel_first_win: {
     name: 'Regras da Casa',
     desc: 'Vença um Duelo de Cartas no Mestre das Cartas.',
@@ -822,6 +830,10 @@ export const table: DeedLocaleTable = {
     name: 'Heroico: A Bacia de Wildheart',
     desc: 'Derrote Zulgar, Voz da Bacia, na Bacia de Wildheart na dificuldade Heroica.',
   },
+  chr_peaks_gatherer: {
+    name: 'Colheita das Alturas',
+    desc: 'Colha um veio de minério, um bosque de madeira e um canteiro de ervas nas Alturas de Thornpeak.',
+  },
   chr_marsh_rares_ii: {
     name: 'O Glutão, Ajustado nas Contas',
     desc: 'Mate Grubjaw, o Glutão, um quarto terror nomeado do Pântano de Mirefen que ficou fora da primeira contagem.',
@@ -837,5 +849,29 @@ export const table: DeedLocaleTable = {
   chr_hollow_rares: {
     name: 'A Manada Lembra',
     desc: 'Mate o Velho Marrowshell e Aurelhorn, Primeiro da Manada, os dois chefes raros errantes do Vale.',
+  },
+  chr_willowfen_gatherer: {
+    name: 'Fartura do Brejo',
+    desc: 'Colha um veio de minério, um bosque de madeira e um canteiro de ervas em Willowfen.',
+  },
+  chr_willowfen_first_cast: {
+    name: 'Marolas nas Lilymoors',
+    desc: 'Pesque um peixe nas águas de Willowfen.',
+  },
+  chr_galecrest_gatherer: {
+    name: 'Colheita no Promontório',
+    desc: 'Colha um veio de minério, um bosque de madeira e um canteiro de ervas em Galecrest.',
+  },
+  chr_galecrest_first_cast: {
+    name: 'Uma Linha no Lago Espelho',
+    desc: 'Pesque um peixe nas águas de Galecrest.',
+  },
+  chr_farshore_gatherer: {
+    name: 'Provisões da Ilha',
+    desc: 'Colha um veio de minério, um bosque de madeira e um canteiro de ervas na Farshore.',
+  },
+  chr_farshore_first_cast: {
+    name: 'O Que as Gaivotas Sabem',
+    desc: 'Pesque um peixe nas águas da Farshore.',
   },
 };

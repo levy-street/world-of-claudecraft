@@ -16,6 +16,7 @@ import {
   cssEffectsTier,
   readBrowserEnv,
 } from './game/browser_env';
+import { hideBrowserSupportNotice, initBrowserSupportNotice } from './game/browser_support_notice';
 import { isCameraDrivenFacingActive } from './game/camera_driven_facing';
 import {
   cameraFollowShouldSettle,
@@ -61,6 +62,19 @@ import { GamepadBindings } from './game/gamepad_bindings';
 import { shouldUseGamepadPointerMode } from './game/gamepad_pointer_mode';
 import { handleGatherNodeInteract } from './game/gather_node_interact';
 import { gatherToolProfessionFor, nearestGatherNodeForProfession } from './game/gather_tool_use';
+import { GraphicsRebuildCoordinator } from './game/graphics_rebuild_coordinator';
+import {
+  type GraphicsSettingsSnapshot,
+  graphicsApplyMode,
+  graphicsSettingsSnapshotsEqual,
+  normalizeGraphicsSettingsSnapshot,
+} from './game/graphics_rebuild_core';
+import {
+  clearGraphicsRebuildProbe,
+  consumeGraphicsRebuildCrashProbe,
+  stampGraphicsRebuildProbe,
+  updateGraphicsRebuildProbePhase,
+} from './game/graphics_rebuild_crash_guard';
 import { Input } from './game/input';
 import { InputActivityMeter, installInputActivityTracking } from './game/input_activity';
 import { stopAutorunForInteraction } from './game/interaction_autorun';
@@ -130,7 +144,7 @@ import {
 } from './game/spawn_cinematic';
 import { safeStartupGraphicsPreset } from './game/startup_graphics_safety';
 import { shouldClearTargetOnGroundClick } from './game/target_click';
-import { resolveUiEffectsProfile } from './game/ui_effects_profile';
+import { loadingCurtainFadeMs, resolveUiEffectsProfile } from './game/ui_effects_profile';
 import { currentUtcDay } from './game/utc_day';
 import { voice } from './game/voice';
 import { telemetryZoneId } from './game/world_telemetry';
@@ -197,6 +211,10 @@ import { openStripeCheckout } from './net/stripe_checkout';
 import type { WalletOption, WalletPickerMode, WalletPickerResult } from './net/wallet';
 import { resolveWalletCapability } from './net/wallet_capability';
 import { installWalletResumeHandlers } from './net/wallet_resume';
+import {
+  prepareGraphicsProfileAssets,
+  resetGraphicsProfileDerivedCaches,
+} from './render/assets/graphics_profile';
 import { assetsReady, beginDeferredPreloads } from './render/assets/preload';
 import { CharacterPreview, type PreviewAppearance } from './render/characters';
 import {
@@ -210,10 +228,20 @@ import {
   onPortraitsReady,
   onPortraitUpdate,
   playerPortraitDataUrl,
+  resetPortraitRendererForGraphicsRebuild,
 } from './render/characters/portrait';
+import { type RecycledRendererContext, recycleWebGL2Context } from './render/context_recycle';
 import { installWebGLContextRelease } from './render/context_release';
 import { setDayNightPhaseOverride, setLunarPhaseOverride } from './render/day_night_clock';
-import { firstRunGraphicsPreset, GFX, graphicsPresetLabel } from './render/gfx';
+import {
+  activateGfxProfile,
+  captureGfxCapabilities,
+  firstRunGraphicsPreset,
+  GFX,
+  getActiveGfxProfile,
+  graphicsPresetLabel,
+  resolveGfxProfile,
+} from './render/gfx';
 import { cueHarborShip, harborShipAttachFrame, resetHarborShipCues } from './render/harbor';
 import { Renderer } from './render/renderer';
 import {
@@ -893,12 +921,18 @@ function requestPreferredFullscreen(): void {
 // Loading screen (shown from "enter world" until the first frame renders)
 // ---------------------------------------------------------------------------
 
-const LOADING_FADE_MS = 350; // keep in sync with the #loading-screen CSS transition
 const LOADING_TIP_ROTATE_MS = 5000;
 
 let loadingHideTimer: number | null = null;
 let loadingTipRotation: LoadingTipRotation | null = null;
 let loadingTipTimer: number | null = null;
+
+function loadingCurtainFadeDelayMs(): number {
+  const osReducedMotion =
+    typeof window.matchMedia === 'function' &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  return loadingCurtainFadeMs(new Settings().get('reduceMotion') || osReducedMotion);
+}
 
 function showLoadingScreen(statusText: string): void {
   const el = $('#loading-screen');
@@ -969,7 +1003,7 @@ function hideLoadingScreen(): void {
   loadingHideTimer = window.setTimeout(() => {
     el.classList.remove('visible', 'fade');
     loadingHideTimer = null;
-  }, LOADING_FADE_MS);
+  }, loadingCurtainFadeDelayMs());
 }
 
 // Resolve only after the browser has actually painted. The scene build
@@ -1000,6 +1034,9 @@ function enterLoadingState(statusText: string): void {
   showLoadingScreen(statusText);
   $('#start-screen').style.display = 'none';
   releaseStartScreenPreview();
+  // Landing-only advisory: never let it survive into the world on top of
+  // in-world HUD chrome (it shares the chat frame's bottom-left corner).
+  hideBrowserSupportNotice();
 }
 
 async function prepareWorldEntry(): Promise<boolean> {
@@ -1105,6 +1142,9 @@ async function startGame(
   }
   let renderer!: Renderer;
   let rendererReady = false;
+  // The world and socket stay live, but every client-frame owner pauses while
+  // the renderer is recycled. The frame loop also clears its offline backlog.
+  let graphicsRebuildPaused = false;
   let hud!: Hud;
   const baseEntryDiagnostics = (): EntryDiagnostics => {
     const memory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory;
@@ -1669,6 +1709,7 @@ async function startGame(
   const sceneInputLockedNow = () =>
     sceneDirector.inputLocked() || (online?.sceneInputLockPending() ?? false);
   const gameplayInputBlocked = () =>
+    graphicsRebuildPaused ||
     hud.isModalOpen() ||
     hud.promptModalOpen() ||
     cameraPromptOpen() ||
@@ -2545,6 +2586,192 @@ async function startGame(
   const saved = settings.all();
   for (const k of Object.keys(saved) as (keyof GameSettings)[]) applySetting(k, saved[k]);
 
+  const captureGraphicsSettings = (): GraphicsSettingsSnapshot =>
+    normalizeGraphicsSettingsSnapshot({
+      graphicsPreset: settings.get('graphicsPreset'),
+      terrainDetail: settings.get('terrainDetail'),
+      foliageDensity: settings.get('foliageDensity'),
+      surfaceDetail: settings.get('surfaceDetail'),
+      effectsQuality: settings.get('effectsQuality'),
+      shadowQuality: settings.get('shadowQuality'),
+    });
+  let appliedGraphicsSettings = captureGraphicsSettings();
+  const graphicsCapabilities = captureGfxCapabilities(renderer.webgl);
+
+  const configureRebuiltRenderer = (next: Renderer): void => {
+    next.showNameplates = renderer.showNameplates;
+    next.showDevBadges = settings.get('showDevBadges');
+    next.showOwnNameplate = settings.get('showOwnNameplate');
+    next.showPlayerNameplates = settings.get('showPlayerNameplates');
+    next.reduceMotionSetting = settings.get('reduceMotion');
+    next.setBrightness(settings.get('brightness'));
+    next.setCameraFov(settings.get('cameraFov'));
+    next.setRenderScale(settings.get('renderScale'));
+    next.setWeatherEnabled(settings.get('weather') >= 0.5);
+    next.camYaw = input.camYaw;
+    next.camPitch = input.camPitch;
+    next.camDist = input.camDist;
+    next.onZonePrepared = (zoneId) => hud.queueMapBgPrewarm(zoneId);
+    if (import.meta.env.DEV && new URLSearchParams(location.search).get('targetcone') === '1') {
+      next.enableTargetConeDebug(tabConeHalfAt, TAB_NEAR_RADIUS, TAB_QUERY_RADIUS);
+    }
+  };
+
+  const graphicsRebuild = new GraphicsRebuildCoordinator<
+    GraphicsSettingsSnapshot,
+    Renderer,
+    RecycledRendererContext
+  >({
+    currentRenderer: () => renderer,
+    captureSettings: () => appliedGraphicsSettings,
+    settingsEqual: graphicsSettingsSnapshotsEqual,
+    preflightContext: (current) => current.preflightContextRecycle(),
+    setClientPaused: (paused) => {
+      graphicsRebuildPaused = paused;
+      if (!paused) {
+        last = performance.now();
+        acc = 0;
+      }
+    },
+    resetInput: () => {
+      input.resetForClientTransition();
+      resetSceneFacingInputState(sceneFacingInput);
+      hud.cancelGroundAim();
+      mobileControls.syncAutorun(false);
+    },
+    neutralizeOnlineInput: () => {
+      online?.neutralizeInputForClientPause();
+    },
+    showOpaqueCurtain: () => showLoadingScreen(t('hudChrome.options.graphicsApplying')),
+    awaitCurtainPaint: nextPaint,
+    hideOpaqueCurtain: hideLoadingScreen,
+    prepareTargetAssets: async (target, onProgress) => {
+      const profile = resolveGfxProfile(graphicsCapabilities, target, location.search);
+      await prepareGraphicsProfileAssets(profile.settings, world.player.pos, onProgress);
+    },
+    resetAuxiliaryRenderers: () => {
+      const resetErrors: unknown[] = [];
+      try {
+        hud.resetGraphicsPreviewContexts();
+      } catch (error) {
+        resetErrors.push(error);
+      }
+      try {
+        resetPortraitRendererForGraphicsRebuild();
+      } catch (error) {
+        resetErrors.push(error);
+      }
+      if (resetErrors.length > 0) {
+        throw new AggregateError(resetErrors, 'Graphics preview teardown failed');
+      }
+    },
+    captureRendererContext: (current) => ({
+      canvas: current.webgl.domElement,
+      context: current.webgl.getContext() as WebGL2RenderingContext,
+    }),
+    shutdownRenderer: async (current) => {
+      perf.setRenderer(null);
+      current.onZonePrepared = null;
+      current.setAudioSink(null);
+      rendererReady = false;
+      const recycled = await current.shutdown();
+      return recycled;
+    },
+    recycleContext: recycleWebGL2Context,
+    activateProfile: (target) =>
+      activateGfxProfile(resolveGfxProfile(graphicsCapabilities, target, location.search)).epoch,
+    resetProfileResources: () => resetGraphicsProfileDerivedCaches(),
+    buildRenderer: (target, recycled) => {
+      const next = new Renderer(world, recycled.canvas, nameplates, {
+        context: recycled.context,
+        initializeGfx: false,
+      });
+      configureRebuiltRenderer(next);
+      return next;
+    },
+    prepareCurrentZone: (next) =>
+      next.prepareZoneAt(world.player.pos.x, world.player.pos.z, (done, total) =>
+        setLoadingProgressRange(done, total, 35, 65),
+      ),
+    prepareNeighborZones: (next) =>
+      next.prepareZonesAround(
+        world.player.pos.x,
+        world.player.pos.z,
+        ARRIVAL_NEIGHBOR_STREAM_RADIUS,
+        (done, total) => setLoadingProgressRange(done, total, 65, 88),
+      ),
+    prewarmRenderer: async (next) => {
+      await next.prewarmInitialScene();
+    },
+    validateRenderer: (next) => {
+      next.sync(1, 0, null, 0, null);
+      if (next.webgl.getContext().isContextLost()) {
+        throw new Error('WebGL2 context was lost while validating the rebuilt renderer');
+      }
+    },
+    commit: (next, target) => {
+      settings.patch(target);
+      configureRebuiltRenderer(next);
+      next.setAudioSink(sfx);
+      renderer = next;
+      rendererReady = true;
+      hud.replaceRenderer(next);
+      perf.setRenderer(next);
+      perf.reset();
+      appliedGraphicsSettings = normalizeGraphicsSettingsSnapshot(target);
+      uiEffectsApplier.applyNow();
+      applyBrowserEffects(settings.get('browserEffects'));
+      const devGame = (window as unknown as { __game?: { renderer?: Renderer } }).__game;
+      if (devGame) devGame.renderer = next;
+      try {
+        hud.restoreGraphicsPreviewContexts();
+      } catch (error) {
+        console.warn('Graphics preview restoration failed after renderer rebuild', error);
+      }
+    },
+    onProgress: ({ stage, done, total }) => {
+      if (stage === 'assets' && done !== undefined && total !== undefined) {
+        setLoadingProgressRange(done, total, 0, 35);
+      } else if (stage === 'current-zone') {
+        setLoadingPercent(35, t('hudChrome.options.graphicsApplying'));
+      } else if (stage === 'neighbor-zones') {
+        setLoadingPercent(65, t('hudChrome.options.graphicsApplying'));
+      } else if (stage === 'prewarm') {
+        setLoadingPercent(90, t('hudChrome.options.graphicsApplying'));
+      } else if (stage === 'validation') {
+        setLoadingPercent(98, t('hudChrome.options.graphicsApplying'));
+      }
+    },
+    suspendEntryDiagnostics: () => entryDiagnostics.suspend(),
+    resumeEntryDiagnostics: (target) => entryDiagnostics.resume(target.graphicsPreset),
+    markCrashPhase: (phase, from, target, generation) => {
+      if (phase === 'starting') {
+        stampGraphicsRebuildProbe({
+          generation,
+          at: Date.now(),
+          phase,
+          from: { ...from },
+          target: { ...target },
+        });
+      } else {
+        updateGraphicsRebuildProbePhase(phase);
+      }
+    },
+    clearCrashMarker: clearGraphicsRebuildProbe,
+    isContextFailure: (error) => {
+      const message = error instanceof Error ? error.message : String(error);
+      return /WebGL(?:2)? context|WEBGL_lose_context|context (?:lost|recycle|restored|replaced)/i.test(
+        message,
+      );
+    },
+    showFatalReload: (error) => {
+      console.error('Live graphics renderer rebuild failed fatally', error);
+      fatalOverlay(t('hudChrome.options.graphicsFatal'), {
+        buttonLabel: t('hudChrome.options.graphicsReload'),
+      });
+    },
+  });
+
   // the options menu drives logout + key-capture + settings, all of which need
   // refs that only exist now (input/renderer) or are page-level (reload)
   hud.attachOptions({
@@ -2559,6 +2786,27 @@ async function startGame(
     captureKey: (cb) => input.captureNextKey(cb),
     settings,
     onSettingChange: (key, value) => applySetting(key, value),
+    graphicsApplied: () => appliedGraphicsSettings,
+    applyGraphics: async (draft) => {
+      const target = normalizeGraphicsSettingsSnapshot(draft);
+      const targetProfile = resolveGfxProfile(graphicsCapabilities, target, location.search);
+      const mode = graphicsApplyMode(
+        appliedGraphicsSettings,
+        target,
+        getActiveGfxProfile().fingerprint,
+        targetProfile.fingerprint,
+      );
+      if (mode === 'unchanged') return 'applied';
+      if (mode === 'saved') {
+        settings.patch(target);
+        appliedGraphicsSettings = target;
+        uiEffectsApplier.applyNow();
+        return 'saved';
+      }
+      const outcome = await graphicsRebuild.rebuild(target);
+      if (outcome.status === 'applied' || outcome.status === 'unchanged') return 'applied';
+      return outcome.status === 'fatal' ? 'fatal' : 'failed';
+    },
     theme: {
       get: () => themeStore.get(),
       setPreset: (id: PresetId) => {
@@ -3735,6 +3983,7 @@ async function startGame(
   // perf_metrics_sampler.ts; here we inject the live sources.
   const sampleMetrics = createMetricsSampler({
     renderer,
+    getRenderer: () => renderer,
     meter: perfMeter,
     getOnline: () => online,
     getEntityCount: () => world.entities.size,
@@ -3765,6 +4014,11 @@ async function startGame(
 
   function frame(now: number): void {
     requestAnimationFrame(frame);
+    if (graphicsRebuildPaused) {
+      last = now;
+      acc = 0;
+      return;
+    }
     // maybeWarmCurrentZone() deliberately does NOT run here. It reads the
     // player's position AND the scene director, and at the top of the frame
     // those two disagree: a synchronous world command (the ferry fare answers
@@ -3935,7 +4189,12 @@ async function startGame(
         acc -= DT;
       }
       // Offline: the tick above drained this frame's events, so the scene
-      // director now agrees with the entity's position.
+      // director now agrees with the entity's position. Re-check before
+      // renderer.sync() reads it: a tick can teleport through a resurrection,
+      // dungeon door, portal, or campaign transition, and rendering first would
+      // expose one frame of an unprepared destination. This post-event location
+      // also avoids opening a warmup curtain between a ferry teleport and the
+      // scene-start event that presents the voyage.
       maybeWarmCurrentZone();
       const pp = offlineSim.player;
       traceStart = perf.startTrace();
@@ -4547,7 +4806,7 @@ async function startGame(
             },
           );
         }
-      }, LOADING_FADE_MS);
+      }, loadingCurtainFadeDelayMs());
     }),
   );
   // Now in-game: fade the home-page theme out (it kept playing through loading).
@@ -5990,7 +6249,10 @@ async function refreshCharacters(): Promise<void> {
   }
 }
 
-function fatalOverlay(message: string, opts?: { keepResumeMarker?: boolean }): void {
+function fatalOverlay(
+  message: string,
+  opts?: { keepResumeMarker?: boolean; buttonLabel?: string },
+): void {
   // A fatal overlay is a terminal client state whose only exit is a reload, so
   // clearing the resume marker HERE covers every present and future caller: the
   // reload lands on the normal boot path instead of auto-resuming into the same
@@ -6008,7 +6270,7 @@ function fatalOverlay(message: string, opts?: { keepResumeMarker?: boolean }): v
   el.appendChild(messageEl);
   const btn = document.createElement('button');
   btn.className = 'btn';
-  btn.textContent = t('errors.returnToLogin');
+  btn.textContent = opts?.buttonLabel ?? t('errors.returnToLogin');
   btn.addEventListener('click', () => location.reload());
   el.appendChild(btn);
   document.body.appendChild(el);
@@ -9670,6 +9932,7 @@ function wireStartScreens(): void {
   });
   setupNavBtn(navBtnDownload, '#download-view');
   initDesktopDownload();
+  initBrowserSupportNotice();
   setupNavBtn(navBtnLogin, '#hero-view', () => {
     show('#login-panel');
   });
@@ -9954,7 +10217,21 @@ function wireStartScreens(): void {
   // runtimes, the environments where the OS reload makes the crash otherwise invisible;
   // elsewhere the probe is only logged (and cleared: it is a one-shot signal).
   const entryRecoveryAt = Date.now();
-  const entryRecovery = planEntryCrashRecovery(readEntryProbeRaw(), entryRecoveryAt);
+  const interruptedGraphicsRebuild = consumeGraphicsRebuildCrashProbe(entryRecoveryAt);
+  if (interruptedGraphicsRebuild) {
+    // Settings are committed only after a candidate validates, so the persisted
+    // old profile is already the safe boot choice. Clear the generic probe too:
+    // this was a named live rebuild, not a failed initial world entry, and must
+    // never cost the player an unrelated automatic downgrade.
+    clearEntryProbe();
+    console.warn(
+      `[graphics-rebuild] previous live rebuild ended at phase=${interruptedGraphicsRebuild.phase} ` +
+        `generation=${interruptedGraphicsRebuild.generation}; retained saved graphics settings`,
+    );
+  }
+  const entryRecovery = interruptedGraphicsRebuild
+    ? null
+    : planEntryCrashRecovery(readEntryProbeRaw(), entryRecoveryAt);
   if (entryRecovery) persistEntryRecoveryLog(entryRecovery, entryRecoveryAt);
   clearEntryProbe();
   if (entryRecovery) {

@@ -13,8 +13,6 @@
     "n": 436,
     "calls": 347,
     "tris": 2590128,
-    "frameP50": 0,
-    "frameP95": 0,
     "foliage": {
       "visibleBuckets": 144,
       "visibleDraws": 144,
@@ -59,8 +57,6 @@
     "n": 436,
     "calls": 658,
     "tris": 6546416,
-    "frameP50": 0,
-    "frameP95": 0,
     "foliage": {
       "visibleBuckets": 123,
       "visibleDraws": 123,
@@ -105,8 +101,6 @@
     "n": 339,
     "calls": 831,
     "tris": 4832347,
-    "frameP50": 0,
-    "frameP95": 0,
     "foliage": {
       "visibleBuckets": 141,
       "visibleDraws": 141,
@@ -151,8 +145,6 @@
     "n": 316,
     "calls": 745,
     "tris": 10217207,
-    "frameP50": 0,
-    "frameP95": 0,
     "foliage": {
       "visibleBuckets": 162,
       "visibleDraws": 162,
@@ -194,8 +186,6 @@
     "n": 293,
     "calls": 829,
     "tris": 7717410,
-    "frameP50": 0,
-    "frameP95": 0,
     "foliage": {
       "visibleBuckets": 156,
       "visibleDraws": 156,
@@ -237,8 +227,6 @@
     "n": 310,
     "calls": 926,
     "tris": 10674868,
-    "frameP50": 0,
-    "frameP95": 0,
     "foliage": {
       "visibleBuckets": 155,
       "visibleDraws": 155,
@@ -277,8 +265,6 @@
     "n": 414,
     "calls": 420,
     "tris": 3878359,
-    "frameP50": 0,
-    "frameP95": 0,
     "foliage": {
       "visibleBuckets": 107,
       "visibleDraws": 107,
@@ -320,8 +306,6 @@
     "n": 431,
     "calls": 351,
     "tris": 2241585,
-    "frameP50": 0,
-    "frameP95": 0,
     "foliage": {
       "visibleBuckets": 147,
       "visibleDraws": 147,
@@ -366,8 +350,6 @@
     "n": 362,
     "calls": 898,
     "tris": 4758489,
-    "frameP50": 0,
-    "frameP95": 0,
     "foliage": {
       "visibleBuckets": 122,
       "visibleDraws": 122,
@@ -409,8 +391,6 @@
     "n": 423,
     "calls": 611,
     "tris": 6201760,
-    "frameP50": 0,
-    "frameP95": 0,
     "foliage": {
       "visibleBuckets": 145,
       "visibleDraws": 145,
@@ -455,8 +435,6 @@
     "n": 367,
     "calls": 669,
     "tris": 7049575,
-    "frameP50": 0,
-    "frameP95": 0,
     "foliage": {
       "visibleBuckets": 153,
       "visibleDraws": 153,

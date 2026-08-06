@@ -9,14 +9,14 @@
     "normal quest kill credit advances q_lb_q0_ashore",
     "doorway scene start/ops/end + squad spawn/despawn"
   ],
-  "draws": 2876,
-  "drawDigest": "04ef73de",
+  "draws": 2887,
+  "drawDigest": "d3dfed8c",
   "frames": [
     {
       "tick": 0,
       "time": 0,
-      "nextId": 855,
-      "state": "4a86f113",
+      "nextId": 969,
+      "state": "35694f82",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -54,7 +54,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 846,
+          "entityId": 960,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -90,7 +90,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 846
+              "sourceId": 960
             }
           ],
           "blockChance": 0.05,
@@ -103,7 +103,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 100,
-          "id": 846,
+          "id": 960,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -147,9 +147,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 856,
-      "state": "a460b63f",
-      "events": "88ca9339",
+      "nextId": 970,
+      "state": "2bc05016",
+      "events": "cb6adb52",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -186,7 +186,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 846,
+          "entityId": 960,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -237,7 +237,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 846
+              "sourceId": 960
             }
           ],
           "blockChance": 0.05,
@@ -250,7 +250,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 822,
-          "id": 846,
+          "id": 960,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -293,9 +293,9 @@
     {
       "tick": 1,
       "time": 0.05,
-      "nextId": 857,
-      "state": "95b9e8e5",
-      "events": "353055b7",
+      "nextId": 971,
+      "state": "825d2905",
+      "events": "7455c5cb",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -358,7 +358,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 846,
+          "entityId": 960,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -410,7 +410,7 @@
               "name": "Battle Stance",
               "remaining": 3599.95,
               "school": "physical",
-              "sourceId": 846
+              "sourceId": 960
             }
           ],
           "blockChance": 0.05,
@@ -422,7 +422,7 @@
           "dodgeChance": 0.0695,
           "fiveSecondRule": 99.05,
           "hp": 822,
-          "id": 846,
+          "id": 960,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -461,7 +461,7 @@
           }
         },
         {
-          "aggroTargetId": 846,
+          "aggroTargetId": 960,
           "aiState": "chase",
           "combatTimer": 99,
           "comboUntil": -1,
@@ -471,7 +471,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 685,
-          "id": 856,
+          "id": 970,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -500,7 +500,7 @@
           "templateId": "tidemill_stalker",
           "threat": [
             [
-              846,
+              960,
               1
             ]
           ],
@@ -515,9 +515,9 @@
     {
       "tick": 3,
       "time": 0.15,
-      "nextId": 859,
-      "state": "c0c69485",
-      "events": "4a90e6d4",
+      "nextId": 973,
+      "state": "7960e74f",
+      "events": "9dda18f3",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -591,7 +591,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 846,
+          "entityId": 960,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -643,7 +643,7 @@
               "name": "Battle Stance",
               "remaining": 3599.85,
               "school": "physical",
-              "sourceId": 846
+              "sourceId": 960
             }
           ],
           "blockChance": 0.05,
@@ -655,7 +655,7 @@
           "dodgeChance": 0.0695,
           "fiveSecondRule": 99.15,
           "hp": 822,
-          "id": 846,
+          "id": 960,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -704,7 +704,7 @@
           "dodgeChance": 0.05,
           "fiveSecondRule": 99,
           "hostile": true,
-          "id": 856,
+          "id": 970,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -714,7 +714,7 @@
           "level": 5,
           "lootFfaTimer": "Infinity",
           "lootRecipientIds": [
-            846
+            960
           ],
           "maxHp": 685,
           "moveSpeed": 8.5,
@@ -734,7 +734,7 @@
           "stats": {
             "armor": 48
           },
-          "tappedById": 846,
+          "tappedById": 960,
           "templateId": "tidemill_stalker",
           "weapon": {
             "max": 36,
@@ -751,7 +751,7 @@
           "dodgeChance": 0.05,
           "fiveSecondRule": 99,
           "hp": 1518,
-          "id": 857,
+          "id": 971,
           "kind": "mob",
           "level": 9,
           "lootFfaTimer": "Infinity",
@@ -769,7 +769,7 @@
             "z": -1272.897777
           },
           "squadActorId": "coalfast",
-          "squadClaimId": 855,
+          "squadClaimId": 969,
           "squadDamageMult": 1,
           "squadFloor": true,
           "stats": {
@@ -791,7 +791,7 @@
           "dodgeChance": 0.05,
           "fiveSecondRule": 99,
           "hp": 1214,
-          "id": 858,
+          "id": 972,
           "kind": "mob",
           "level": 9,
           "lootFfaTimer": "Infinity",
@@ -809,7 +809,7 @@
             "z": -1272.897777
           },
           "squadActorId": "tam",
-          "squadClaimId": 855,
+          "squadClaimId": 969,
           "squadDamageMult": 1,
           "squadFloor": true,
           "stats": {
@@ -827,9 +827,9 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 859,
-      "state": "641b21e1",
-      "events": "e694eafb",
+      "nextId": 973,
+      "state": "6fdf0b01",
+      "events": "6ee017d8",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -838,8 +838,8 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 859,
-      "state": "5c2778d0",
+      "nextId": 973,
+      "state": "897ac212",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -849,166 +849,166 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 859,
-      "state": "07102f4f",
+      "nextId": 973,
+      "state": "e86f1889",
       "events": "741638a5",
       "rng": {
-        "draws": 161,
-        "digest": "dfeebd93"
+        "draws": 164,
+        "digest": "954e25d2"
       }
     },
     {
       "tick": 80,
       "time": 4,
-      "nextId": 859,
-      "state": "4df39ccd",
+      "nextId": 973,
+      "state": "2e70da6f",
       "events": "741638a5",
       "rng": {
-        "draws": 346,
-        "digest": "163f717d"
+        "draws": 359,
+        "digest": "23861fe4"
       }
     },
     {
       "tick": 100,
       "time": 5,
-      "nextId": 859,
-      "state": "00561876",
-      "events": "603ee180",
+      "nextId": 973,
+      "state": "c1dea500",
+      "events": "2fcb637e",
       "rng": {
-        "draws": 564,
-        "digest": "0810f3db"
+        "draws": 576,
+        "digest": "990d0a85"
       }
     },
     {
       "tick": 120,
       "time": 6,
-      "nextId": 859,
-      "state": "1c7efe61",
+      "nextId": 973,
+      "state": "b902eb7b",
       "events": "741638a5",
       "rng": {
-        "draws": 752,
-        "digest": "e8c5fb1a"
+        "draws": 782,
+        "digest": "6bf69853"
       }
     },
     {
       "tick": 140,
       "time": 7,
-      "nextId": 859,
-      "state": "30fbc522",
+      "nextId": 973,
+      "state": "909ff584",
       "events": "741638a5",
       "rng": {
-        "draws": 977,
-        "digest": "3f3bc882"
+        "draws": 984,
+        "digest": "850abd98"
       }
     },
     {
       "tick": 160,
       "time": 8,
-      "nextId": 859,
-      "state": "278b3873",
+      "nextId": 973,
+      "state": "75c428cd",
       "events": "741638a5",
       "rng": {
-        "draws": 1221,
-        "digest": "17cce8ba"
+        "draws": 1232,
+        "digest": "7a330c9b"
       }
     },
     {
       "tick": 180,
       "time": 9,
-      "nextId": 859,
-      "state": "30fdb7fc",
+      "nextId": 973,
+      "state": "14cc8f66",
       "events": "741638a5",
       "rng": {
-        "draws": 1459,
-        "digest": "ebbac9d4"
+        "draws": 1471,
+        "digest": "b58a185f"
       }
     },
     {
       "tick": 200,
       "time": 10,
-      "nextId": 859,
-      "state": "0498a9bd",
-      "events": "3c375d57",
+      "nextId": 973,
+      "state": "47563edf",
+      "events": "7879272e",
       "rng": {
-        "draws": 1732,
-        "digest": "35e977ed"
+        "draws": 1756,
+        "digest": "6e4040a3"
       }
     },
     {
       "tick": 220,
       "time": 11,
-      "nextId": 859,
-      "state": "272d7c0a",
+      "nextId": 973,
+      "state": "c67a7c14",
       "events": "741638a5",
       "rng": {
-        "draws": 1927,
-        "digest": "5f62ad60"
+        "draws": 1929,
+        "digest": "a6628d71"
       }
     },
     {
       "tick": 240,
       "time": 12,
-      "nextId": 859,
-      "state": "61b4cac9",
+      "nextId": 973,
+      "state": "39170007",
       "events": "741638a5",
       "rng": {
-        "draws": 2064,
-        "digest": "2bfb738f"
+        "draws": 2062,
+        "digest": "910f652a"
       }
     },
     {
       "tick": 260,
       "time": 13,
-      "nextId": 859,
-      "state": "423cce58",
+      "nextId": 973,
+      "state": "abef1482",
       "events": "741638a5",
       "rng": {
-        "draws": 2239,
-        "digest": "2c8549b7"
+        "draws": 2260,
+        "digest": "b08897f1"
       }
     },
     {
       "tick": 280,
       "time": 14,
-      "nextId": 859,
-      "state": "4e117177",
+      "nextId": 973,
+      "state": "b4a46aa1",
       "events": "741638a5",
       "rng": {
-        "draws": 2420,
-        "digest": "d6ade52a"
+        "draws": 2463,
+        "digest": "a3ed2a2d"
       }
     },
     {
       "tick": 300,
       "time": 15,
-      "nextId": 859,
-      "state": "2ba80966",
+      "nextId": 973,
+      "state": "8ef612ec",
       "events": "741638a5",
       "rng": {
-        "draws": 2621,
-        "digest": "b9a88956"
+        "draws": 2666,
+        "digest": "ce67f873"
       }
     },
     {
       "tick": 320,
       "time": 16,
-      "nextId": 859,
-      "state": "11a4122f",
-      "events": "6a4db87c",
+      "nextId": 973,
+      "state": "6b946079",
+      "events": "15a19a69",
       "rng": {
-        "draws": 2837,
-        "digest": "5ed55f73"
+        "draws": 2858,
+        "digest": "3c6120b7"
       }
     },
     {
       "tick": 323,
       "time": 16.15,
-      "nextId": 859,
-      "state": "cd49948f",
+      "nextId": 973,
+      "state": "9fb9911d",
       "events": "741638a5",
       "rng": {
-        "draws": 2876,
-        "digest": "04ef73de"
+        "draws": 2887,
+        "digest": "d3dfed8c"
       },
       "label": "tidemill-complete",
       "players": [
@@ -1079,7 +1079,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 846,
+          "entityId": 960,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1131,7 +1131,7 @@
               "name": "Battle Stance",
               "remaining": 3583.85,
               "school": "physical",
-              "sourceId": 846
+              "sourceId": 960
             }
           ],
           "blockChance": 0.05,
@@ -1143,7 +1143,7 @@
           "dodgeChance": 0.0695,
           "fiveSecondRule": 115.15,
           "hp": 822,
-          "id": 846,
+          "id": 960,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -1191,7 +1191,7 @@
           "dodgeChance": 0.05,
           "fiveSecondRule": 99,
           "hostile": true,
-          "id": 856,
+          "id": 970,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -1201,7 +1201,7 @@
           "level": 5,
           "lootFfaTimer": "Infinity",
           "lootRecipientIds": [
-            846
+            960
           ],
           "maxHp": 685,
           "moveSpeed": 8.5,
@@ -1221,7 +1221,7 @@
           "stats": {
             "armor": 48
           },
-          "tappedById": 846,
+          "tappedById": 960,
           "templateId": "tidemill_stalker",
           "weapon": {
             "max": 36,
@@ -1234,12 +1234,12 @@
     {
       "tick": 323,
       "time": 16.15,
-      "nextId": 859,
-      "state": "cd49948f",
+      "nextId": 973,
+      "state": "9fb9911d",
       "events": "741638a5",
       "rng": {
-        "draws": 2876,
-        "digest": "04ef73de"
+        "draws": 2887,
+        "digest": "d3dfed8c"
       },
       "label": "final",
       "players": [
@@ -1310,7 +1310,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 846,
+          "entityId": 960,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1362,7 +1362,7 @@
               "name": "Battle Stance",
               "remaining": 3583.85,
               "school": "physical",
-              "sourceId": 846
+              "sourceId": 960
             }
           ],
           "blockChance": 0.05,
@@ -1374,7 +1374,7 @@
           "dodgeChance": 0.0695,
           "fiveSecondRule": 115.15,
           "hp": 822,
-          "id": 846,
+          "id": 960,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -1422,7 +1422,7 @@
           "dodgeChance": 0.05,
           "fiveSecondRule": 99,
           "hostile": true,
-          "id": 856,
+          "id": 970,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -1432,7 +1432,7 @@
           "level": 5,
           "lootFfaTimer": "Infinity",
           "lootRecipientIds": [
-            846
+            960
           ],
           "maxHp": 685,
           "moveSpeed": 8.5,
@@ -1452,7 +1452,7 @@
           "stats": {
             "armor": 48
           },
-          "tappedById": 846,
+          "tappedById": 960,
           "templateId": "tidemill_stalker",
           "weapon": {
             "max": 36,

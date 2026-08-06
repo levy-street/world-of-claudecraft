@@ -17,6 +17,7 @@
 // resolve, proc, and yield, only skill gain stops.
 
 import { EASTBROOK_STATIONS_BY_ID } from '../eastbrook_layout';
+import { FENBRIDGE_STATIONS_BY_ID } from '../fenbridge_layout';
 import type { ProfessionRecord } from '../professions/types';
 import type { StationDef, StationType } from '../types';
 import { ZONE1_ZONE } from './zone1';
@@ -414,6 +415,11 @@ export const STATION_RADIUS = 20;
 // Which station type serves each craft. Crafts absent from this table
 // (jewelcrafting, inscription, enchanting) have no physical station and no
 // station-bound recipes today.
+// Key ORDER is load-bearing: professions/stations.ts craftsForStationType
+// returns keys in this order and the gossip Crafting shortcut
+// (src/ui/hud/quest/master_craft_core.ts) takes the first as its tie-break
+// (weaponcrafting before armorcrafting at the forge); pinned in
+// tests/professions_crafting_hub.test.ts.
 export const STATION_TYPE_BY_CRAFT: Readonly<Record<string, StationType>> = {
   weaponcrafting: 'forge',
   armorcrafting: 'forge',
@@ -464,8 +470,7 @@ export const STATIONS: readonly StationDef[] = [
     id: 'station_fenbridge_tannery',
     type: 'tannery',
     zoneId: ZONE2_ZONE.id,
-    // Northwest edge of Fenbridge, downwind of the square.
-    pos: { x: -13, z: 314 },
+    pos: { ...FENBRIDGE_STATIONS_BY_ID.station_fenbridge_tannery.position },
     masterNpcId: 'tanner_hesk',
   },
   {

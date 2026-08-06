@@ -2476,6 +2476,18 @@
     font-size: calc(19px * var(--mobile-chrome-scale, 1));
     padding: 6px 14px;
   }
+  body.mobile-touch #banner.banner-skill {
+    font-size: calc(20px * var(--mobile-chrome-scale, 1));
+    padding: 8px 16px 10px;
+    gap: 8px;
+  }
+  body.mobile-touch #banner.banner-skill .banner-subtext {
+    font-size: calc(13px * var(--mobile-chrome-scale, 1));
+  }
+  body.mobile-touch #banner.banner-skill .banner-art {
+    width: 40px;
+    height: 40px;
+  }
   body.mobile-touch #banner .banner-art {
     width: 34px;
     height: 34px;
@@ -3838,6 +3850,51 @@
   body.mobile-touch.market-open #bags .bag-chip {
     flex: 0 0 auto;
   }
+  /* Guild tab controls hold the 40px touch floor: the Personal/Guild tabs and
+     the treasury gold buttons are primary tap targets on the phone pairing. */
+  body.mobile-touch #bank-window .bank-tab,
+  body.mobile-touch #bank-window .gbank-view-tab,
+  body.mobile-touch #bank-window .gbank-gold-btn {
+    min-height: 40px;
+  }
+  /* The gold prompt's three coin fields hold the same touch floor as the
+     market's price row (its skin source): 40px tap height and the 16px
+     anti-zoom font (base.css floors it too; declared here so the intent is
+     explicit beside its siblings). */
+  body.mobile-touch .gbank-coin-row .coininput {
+    min-height: 40px;
+    font-size: 16px;
+    box-sizing: border-box;
+  }
+  /* Short landscape phones: the Guild pane adds fixed chrome the personal
+     pane does not have (tab strip, treasury row, dormant legend, buy note),
+     so compress its margins under the same grid-floor carve-out the buy row
+     already relies on, keeping the transactional row inside the window. */
+  @media (max-height: 480px) {
+    body.mobile-touch #bank-window .bank-tabs {
+      margin: 3px 0 1px;
+    }
+    body.mobile-touch #bank-window .gbank-treasury {
+      margin: 2px 0 3px;
+      gap: 6px;
+    }
+    body.mobile-touch #bank-window .gbank-dormant-note {
+      margin: 0 0 2px;
+      font-size: 10px;
+    }
+    body.mobile-touch #bank-window .gbank-buy-note {
+      font-size: 10px;
+    }
+    /* The log's own fixed chrome: the sub-strip and the scope line. The rows
+       themselves scroll, so only the chrome above them is compressed. */
+    body.mobile-touch #bank-window .gbank-view-tabs {
+      margin: 1px 0 2px;
+    }
+    body.mobile-touch #bank-window .gbank-log-note {
+      margin: 0 0 2px;
+      font-size: 10px;
+    }
+  }
   /* Short landscape phones: the 50/50 pairing box (viewport minus the 10px top
      inset and the 72px tray reservation) cannot hold the full-toolbar chrome, the
      two-row grid floor (components.css .bank-scroll), AND the buy row, so the buy
@@ -3915,6 +3972,15 @@
   }
   body.mobile-touch #deeds-window .deeds-cat-titles.active {
     border-top-color: #6a5320;
+  }
+  /* The recent-strip jump buttons keep the 40px touch floor on EVERY touch
+     device (unconditional, not just short-landscape phones: a landscape
+     tablet is body.mobile-touch too). The strip wraps horizontally, and on
+     short viewports the entry list is the flex arm that yields, so the
+     taller row cannot push the filter bar out. */
+  body.mobile-touch #deeds-window .deeds-recent-item {
+    min-width: 40px;
+    min-height: 40px;
   }
   /* Short landscape phones: the pinned chrome (title bar, summary, recent and
      nearest strips, chip row, filter bar) can eat the whole panel height and
@@ -4061,6 +4127,13 @@
   }
   body.mobile-touch .set-toggle {
     flex: 0 0 auto;
+    min-height: 40px;
+  }
+  body.mobile-touch .graphics-apply {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  body.mobile-touch .graphics-apply-btn {
+    width: 100%;
     min-height: 40px;
   }
   /* The master header stays centered + prominent on touch too. */

@@ -20,6 +20,7 @@ import { buildAttunementPreview } from '../../profession_identity_view';
 import { svgIcon } from '../../ui_icons';
 import { isStationMasterNpc } from '../vendor/train_view';
 import { gossipMenuIsEmpty } from './gossip_menu';
+import { masterCraftTarget } from './master_craft_core';
 import { PROF_INTRO_QUEST_ID, professionIntroHintVisible } from './prof_intro_hint_core';
 
 /** One string per offerable-row set, for cheap open-dialog change detection
@@ -66,6 +67,9 @@ export interface QuestDialogControllerDeps {
   openHeroicVendor(npcId: number, opener?: HTMLElement | null): void;
   openTrain(npcId: number): void;
   openUnbind(npcId: number): void;
+  /** Open the crafting window straight to `craftId`'s tab (the station
+   *  master's Crafting shortcut; master_craft_core.ts resolves the craft). */
+  openCrafting(craftId: string): void;
   openMarket(): void;
   openDelveBoard(npcId: number): void;
   openValeCup(): void;
@@ -410,8 +414,27 @@ export class QuestDialogController {
     if (hasVendor) {
       html += `<button type="button" class="qd-list-item" data-vendor="1" aria-label="${esc(t('questUi.dialog.browseGoodsAria', { name: npcName }))}"><span class="quest-complete">$</span> ${esc(t('questUi.dialog.browseGoods'))}</button>`;
     }
+    // Crafting shortcut: the master's Crafting option opens the crafting
+    // window straight to their own craft's tab (the viewer's stronger craft
+    // when the station serves two), skipping the keybind-then-find-the-tab
+    // hop. Same isStationMasterNpc gate as Train/Unbind, so the empty-menu
+    // check needs no new arm. The pick binds at render and is deliberately
+    // NOT in the staleness signature: online, a dialog opened before the
+    // first cprof mirror lands defaults to declaration order, which is
+    // cosmetic (the row label never changes, and resolveSelectedCraft plus
+    // the craftOwnsTab persist gate still guard the open).
+    const masterCraft = hasTraining
+      ? masterCraftTarget(
+          npc.templateId,
+          world.stationPlacements,
+          world.craftingIdentity.craftSkills,
+        )
+      : null;
     if (hasTraining) {
       html += `<button type="button" class="qd-list-item" data-train="1" aria-label="${esc(t('hudChrome.training.dialogOptionAria', { name: npcName }))}"><span class="gold">${svgIcon('crafting')}</span> ${esc(t('hudChrome.training.dialogOption'))}</button>`;
+      if (masterCraft !== null) {
+        html += `<button type="button" class="qd-list-item" data-crafting="1" aria-label="${esc(t('hudChrome.crafting.dialogOptionAria', { craft: craftNameText(masterCraft) }))}"><span class="gold">${svgIcon('crafting')}</span> ${esc(t('hudChrome.crafting.dialogOption'))}</button>`;
+      }
       // Maker's Bond unbind service (Professions 2.0): every
       // station master offers it beside training (the same isStationMasterNpc
       // gate, so the empty-menu check needs no new arm).
@@ -468,6 +491,9 @@ export class QuestDialogController {
     this.bindRoute('[data-vendor]', (opener) => this.deps.openVendor(npc.id, opener));
     this.bindRoute('[data-heroic-shop]', (opener) => this.deps.openHeroicVendor(npc.id, opener));
     this.bindRoute('[data-train]', () => this.deps.openTrain(npc.id));
+    if (masterCraft !== null) {
+      this.bindRoute('[data-crafting]', () => this.deps.openCrafting(masterCraft));
+    }
     this.bindRoute('[data-unbind]', () => this.deps.openUnbind(npc.id));
     this.bindRoute('[data-market]', this.deps.openMarket);
     this.bindRoute('[data-delve-board]', () => this.deps.openDelveBoard(npc.id));
@@ -523,6 +549,9 @@ export class QuestDialogController {
         attunedPairs: [...identity.attunedPairs],
         switchCount: identity.switchCount,
         amendsProgress: identity.amendsProgress,
+        // Jack of All Trades (#1296) does not ride CraftingIdentityView yet:
+        // there is no live quest path to become Jack, so this is always false.
+        isJackOfAllTrades: false,
       });
       const options = professionTargets
         .map((target) => {

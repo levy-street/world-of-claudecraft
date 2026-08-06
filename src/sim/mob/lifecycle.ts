@@ -18,7 +18,11 @@
 // rng.range(min,max) per in-radius player, in this.players iteration order) are
 // preserved exactly so the parity gate's full-state trace AND rng draw-order log stay
 // byte-identical. The in-place Entity mutation is intentional (the refactor's
-// immutability waiver).
+// immutability waiver). One deliberate post-move exception: respawnMob's wanderTimer
+// re-roll goes through the shared idleRng helper (mob/idle_rng.ts) rather than ctx.rng
+// directly, so an off-stream mob's PASSIVE draws stay private; the helper's fallback
+// returns ctx.rng ITSELF, so every shared-stream mob's draw position is byte-identical
+// (pinned by tests/off_stream_rng.test.ts).
 //
 // `src/sim`-pure: no DOM/Three/render/ui/game/net imports, no Math.random/Date.now
 // (enforced by tests/architecture.test.ts). data/types/world/threat are imported
@@ -34,7 +38,9 @@ import { clearThreat } from '../threat';
 import { dist2d, type Entity, NYTHRAXIS_BOSS_ID } from '../types';
 import { groundHeight } from '../world';
 import { resetMobCharge } from './charge';
+import { idleRng, wanderPause } from './idle_rng';
 import { resetMechanicSpacing } from './mechanic_spacing';
+import { resetRiftMechanicWindups } from './rift_escape_window';
 
 const PACK_FRENZY_AURA_ID = 'pack_frenzy'; // attack-speed buff granted to surviving packmates
 
@@ -92,6 +98,8 @@ export function respawnMob(ctx: SimContext, mob: Entity): void {
   mob.terrifyTimer = MOBS[mob.templateId]?.terrify?.every ?? 0;
   // The shared spacing lock dies with the life like the timers around it.
   resetMechanicSpacing(mob);
+  // An in-flight instant-mechanic windup dies with the life too.
+  resetRiftMechanicWindups(mob);
   // A mid-flight inferno channel dies with the life; the cadence reseeds and
   // the hp gates re-arm alongside firedSummons above.
   mob.infernoTimer = MOBS[mob.templateId]?.infernoChannel?.every ?? 0;
@@ -118,7 +126,33 @@ export function respawnMob(ctx: SimContext, mob: Entity): void {
     mob.castTargetId = null;
   }
   mob.yelledEngage = false;
-  mob.wanderTimer = ctx.rng.range(2, 8);
+  // Dragonkin brood pull-state resets with the respawn (the resetEvadingMob
+  // twin): breath cadence reseeds lazily, cleave cadence and counter-stun
+  // re-arm, the fresh spawn shouts again on its first pull, and a respawned
+  // egg is whole again (unhatched, no pending ripple, no ward tag).
+  mob.breathTimer = undefined;
+  mob.swingCleaveCount = undefined;
+  mob.counterStunReadyAt = undefined;
+  mob.shoutFired = undefined;
+  mob.shoutIntroUntil = undefined;
+  mob.broodCracked = undefined;
+  mob.broodHatched = undefined;
+  mob.broodChainAt = undefined;
+  mob.broodWardOnHatch = undefined;
+  // Same ordering contract as the resetEvadingMob twin: the authored speed comes
+  // back BEFORE leapUntil clears, because the brood pass only restores it while
+  // leapUntil is still live. A whelp killed mid-pounce would otherwise respawn
+  // stuck at its leap-burst speed for the rest of its life.
+  if (mob.leapUntil !== undefined) {
+    mob.moveSpeed = MOBS[mob.templateId]?.moveSpeed ?? mob.moveSpeed;
+  }
+  mob.leapUntil = undefined;
+  mob.leapReadyAt = undefined;
+  mob.leapBurnPending = undefined;
+  mob.wardOneHit = undefined;
+  // A fresh life re-seeds the idle timer, so an off-stream mob rolls it off-stream
+  // too (idleRng's fallback IS ctx.rng, so every other mob's draw is unmoved).
+  mob.wanderTimer = wanderPause(idleRng(ctx, mob), mob, 2, 8);
   if (mob.templateId === NYTHRAXIS_BOSS_ID) ctx.resetNythraxisEncounter(mob);
   for (const meta of ctx.players.values()) {
     const e = ctx.entities.get(meta.entityId);

@@ -9,6 +9,11 @@ import { describe, expect, it } from 'vitest';
 // (never wired into the per-frame Hud.update path).
 const painter = readFileSync(new URL('../src/ui/options_window.ts', import.meta.url), 'utf8');
 const hudTs = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
+const componentsCss = readFileSync(
+  new URL('../src/styles/components.css', import.meta.url),
+  'utf8',
+);
+const mobileCss = readFileSync(new URL('../src/styles/hud.mobile.css', import.meta.url), 'utf8');
 
 describe('options_window: no magic values', () => {
   it('carries no literal color in TS (colors live in the extracted stylesheet)', () => {
@@ -54,6 +59,71 @@ describe('options_window: tier boundary', () => {
   });
 });
 
+describe('options_window: staged graphics apply', () => {
+  it('exposes one complete snapshot action and result outcome through OptionsHooks', () => {
+    expect(hudTs).toContain('graphicsApplied(): GraphicsSettingsSnapshot;');
+    expect(hudTs).toContain(
+      'applyGraphics(draft: GraphicsSettingsSnapshot): Promise<GraphicsApplyOutcome>;',
+    );
+    expect(hudTs).toContain("'applied' | 'saved' | 'failed' | 'fatal'");
+  });
+
+  it('uses the shared six-key inventory and stages only those choice writes', () => {
+    expect(painter).toContain('GRAPHICS_REBUILD_KEYS');
+    expect(painter).toContain('withGraphicsDraft(');
+    expect(painter).toContain('this.graphicsChoiceBinding(hooks)');
+    expect(painter).toContain('if (!GRAPHICS_REBUILD_KEY_SET.has(key))');
+    expect(painter).toContain('hooks.onSettingChange(key, value);');
+    expect(painter).toContain(
+      'this.graphicsDraft = copyGraphicsDraft({ ...draft, [key]: value });',
+    );
+  });
+
+  it('discards an unapplied draft on close and ignores stale async settlement', () => {
+    const close = painter.slice(painter.indexOf('close(): void {'));
+    const body = close.slice(0, close.indexOf('\n  }\n'));
+    expect(body).toContain('if (this.graphicsBusy) return;');
+    expect(body).toContain('this.graphicsDraft = null;');
+    expect(body).toContain('this.graphicsApplied = null;');
+    expect(body).toContain('this.graphicsOutcome = null;');
+    expect(body).toContain('this.graphicsApplyGeneration += 1;');
+    expect(painter).toContain('if (generation !== this.graphicsApplyGeneration) return;');
+  });
+
+  it('tracks raw dirty state and delegates effective no-op detection to applyGraphics', () => {
+    expect(painter).toContain(
+      'graphicsDraftDirty(GRAPHICS_REBUILD_KEYS, this.graphicsDraft, this.graphicsApplied)',
+    );
+    const apply = painter.slice(painter.indexOf('private applyGraphicsDraft(): void {'));
+    const body = apply.slice(0, apply.indexOf('\n  }\n'));
+    expect(body).toContain('hooks.applyGraphics(submitted)');
+    expect(body).not.toContain('graphicsSettingsSnapshotsEqual');
+  });
+
+  it('resets all six draft values while resetting and applying other visible keys live', () => {
+    const reset = painter.slice(painter.indexOf('private resetGraphicsDraft('));
+    const body = reset.slice(0, reset.indexOf('\n  }\n'));
+    expect(body).toContain(
+      'const liveKeys = renderedKeys.filter((key) => !GRAPHICS_REBUILD_KEY_SET.has(key));',
+    );
+    expect(body).toContain('hooks.settings.reset(liveKeys);');
+    expect(body).toContain('hooks.onSettingChange(key, hooks.settings.get(key))');
+    expect(body).toContain('normalizeGraphicsSettingsSnapshot({})');
+  });
+
+  it('has no normal reload prompt and allows location.reload only in the fatal outcome arm', () => {
+    const graphics = painter.slice(
+      painter.indexOf('private graphicsApplyRegion(): HTMLElement {'),
+      painter.indexOf('private renderAudio(): void {'),
+    );
+    expect(graphics).not.toContain("t('hud.options.graphicsReloadNote')");
+    expect(graphics).not.toContain("t('hud.options.reloadNow')");
+    expect(graphics.match(/location\.reload\(\)/g) ?? []).toHaveLength(1);
+    const fatal = graphics.slice(graphics.indexOf("if (outcome === 'fatal')"));
+    expect(fatal).toContain('location.reload()');
+  });
+});
+
 describe('options_window: WCAG 2.2 AA', () => {
   it('returns focus to the opener on every close path', () => {
     expect(painter).toContain('captureFocus');
@@ -74,6 +144,30 @@ describe('options_window: WCAG 2.2 AA', () => {
     // the async status + error nodes are live regions
     expect(painter).toContain("status.setAttribute('role', 'status')");
     expect(painter).toContain("error.setAttribute('role', 'alert')");
+  });
+
+  it('announces graphics progress and outcomes, and disables edits while busy or fatal', () => {
+    const graphics = painter.slice(
+      painter.indexOf('private graphicsApplyRegion(): HTMLElement {'),
+      painter.indexOf('private renderAudio(): void {'),
+    );
+    expect(graphics).toContain("region.setAttribute('aria-busy', String(this.graphicsBusy))");
+    expect(graphics).toContain("status.setAttribute('role', alert ? 'alert' : 'status')");
+    expect(graphics).toContain('action.disabled = this.graphicsBusy || !this.graphicsDirty()');
+    expect(graphics).toContain('body.inert = unavailable;');
+    expect(graphics).toContain("el.setAttribute('aria-busy', 'true')");
+    expect(graphics).toContain("action.dataset.graphicsApply = ''");
+    expect(painter).toContain("'[data-graphics-apply]' : undefined");
+    expect(painter).toContain('this.deps.focusFirstInteractive(this.deps.root())');
+  });
+
+  it('keeps a stable, touch-friendly apply region without motion', () => {
+    expect(componentsCss).toMatch(/\.graphics-apply \{[\s\S]*min-height: 40px;/);
+    expect(componentsCss).toMatch(/\.graphics-apply-status \{[\s\S]*min-height: 1\.4em;/);
+    expect(mobileCss).toMatch(/body\.mobile-touch \.graphics-apply-btn \{[\s\S]*min-height: 40px;/);
+    const rule = componentsCss.match(/\.graphics-apply \{([\s\S]*?)\n {2}\}/)?.[1] ?? '';
+    expect(rule).not.toContain('transition');
+    expect(rule).not.toContain('animation');
   });
 
   it('names the gamepad remap listboxes (the language picker already is named)', () => {
@@ -195,8 +289,8 @@ describe('options_window: control-primitive dispatch wiring', () => {
     expect(painter).toContain('this.settingSlider(parent, c, hooks)');
     expect(painter).toContain('this.settingToggle(parent, c, hooks)');
     expect(painter).toContain('c.rerender ? (key) => rerender(key) : undefined');
-    expect(painter).toContain(
-      'this.settingChoice(parent, c, hooks, c.rerender ? rerender : undefined)',
+    expect(painter).toMatch(
+      /this\.settingChoice\([\s\S]*c\.rerender \? rerender : undefined,[\s\S]*choiceBinding/,
     );
   });
 
@@ -295,6 +389,19 @@ describe('options_window: keybind rebind dispatch (cluster 5)', () => {
     expect(painter).toContain('hooks.captureKey((code)');
     expect(painter).toContain('this.deps.keybinds().bind(actionId, index, code)');
     expect(painter).toContain('this.deps.refreshKeybindLabels()');
+  });
+
+  it('notes the bindable mouse buttons through t(), on pointer devices only', () => {
+    // The hint is the one place the panel tells the player a mouse button binds
+    // like a key; it must be localized and hidden on touch, which has no mouse.
+    const keybinds = painter.slice(
+      painter.indexOf('private renderKeybinds(): void {'),
+      painter.indexOf('private beginCapture('),
+    );
+    expect(keybinds).toContain("t('hudChrome.keybinds.mouseHint')");
+    const hintIdx = keybinds.indexOf("t('hudChrome.keybinds.mouseHint')");
+    const gateIdx = keybinds.lastIndexOf('if (!useTouchInterface()) {', hintIdx);
+    expect(gateIdx).toBeGreaterThan(-1);
   });
 });
 
@@ -474,13 +581,11 @@ describe('options_window: settings shows the running version (#1541)', () => {
 // settings.reset()) fails a test instead of shipping silently.
 describe('options_window: Reset to Defaults is scoped per sub-view (#2341)', () => {
   it('settingsViewFooter derives keys from its controls param and resets/re-applies only those', () => {
-    const footer = painter.slice(
-      painter.indexOf('settingsViewFooter(controls: OptionsControl[]): void {'),
-    );
+    const footer = painter.slice(painter.indexOf('private settingsViewFooter('));
     const body = footer.slice(0, footer.indexOf('\n  }\n'));
     expect(body).toContain('const keys = optionsControlKeys(controls)');
     // the reset call is scoped, never the bare no-arg full reset
-    expect(body).toContain('hooks?.settings.reset(keys)');
+    expect(body).toContain('hooks.settings.reset(keys)');
     expect(body).not.toMatch(/settings\.reset\(\)/);
     // re-apply loop walks only the scoped keys, never settings.all()
     expect(body).toContain('for (const k of keys)');
@@ -488,7 +593,6 @@ describe('options_window: Reset to Defaults is scoped per sub-view (#2341)', () 
   });
 
   it.each([
-    ['renderGraphics', 'buildGraphicsControls'],
     ['renderAudio', 'buildAudioControls'],
     ['renderController', 'buildControllerControls'],
   ])(
@@ -502,4 +606,14 @@ describe('options_window: Reset to Defaults is scoped per sub-view (#2341)', () 
       expect(body).toContain('this.settingsViewFooter(controls)');
     },
   );
+
+  it('renderGraphics passes its controls into the staged reset footer', () => {
+    const start = painter.indexOf('private renderGraphics(): void {');
+    const rest = painter.slice(start);
+    const body = rest.slice(0, rest.indexOf('\n  }\n'));
+    expect(body).toContain('buildGraphicsControls');
+    expect(body).toContain('this.settingsViewFooter(');
+    expect(body).toContain('controls,');
+    expect(body).toContain('this.resetGraphicsDraft(optionsHooks, keys)');
+  });
 });

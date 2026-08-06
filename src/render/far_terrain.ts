@@ -1,4 +1,4 @@
-// The far-vista terrain painter: a whole-world coarse mesh (one Lambert
+// The far-vista terrain painter: a whole-world coarse mesh (one standard
 // material, about a dozen frustum-culled tiles) drawn beyond the classic
 // detail envelope so the horizon shows the real world. With the outdoor
 // fog removed this layer IS the draw distance: every ridge to the world
@@ -50,16 +50,11 @@ function sharedIndexFor(tileSize: number, spacing: number): THREE.BufferAttribut
   return index;
 }
 
-// An idle-paced build slice. A 960u tile row is ~100 terrainHeight samples,
-// roughly half a millisecond, so 40 rows stays around 3ms per slice. The
-// budget matters less than the SLOT COUNT: this build takes an idle slot per
-// slice for its whole run and competes with near-terrain zone prepares for
-// the same idle time, so fewer, chunkier, more deferential slices (see the
-// timeout deferrals below) keep the vista from starving the detail horizon.
+// An idle-paced build slice: about the same per-slice budget the near
+// terrain's streamed chunk builds use (IDLE_GEOMETRY_SLICE_MS scale). A
+// 960u tile row is ~100 terrainHeight samples, roughly half a millisecond.
 const FAR_BUILD_ROWS_PER_SLICE = 40;
 const FAR_BUILD_TIMEOUT_MS = 200;
-/** Timed-out slots deferred before forcing progress: the far vista is the
- *  politest consumer of idle time, the near detail always outranks it. */
 const FAR_BUILD_TIMEOUT_DEFERRALS = 2;
 
 // Fragments closer than (detailFar - margin) are discarded: inside the
@@ -72,24 +67,15 @@ const FAR_DISCARD_MARGIN = 60;
 
 interface BuiltFarTile {
   tile: FarTile;
+  index: number;
   mesh: THREE.Mesh;
 }
 
-/**
- * Albedo-shaped ambient floor for deep night, shared by every far tile
- * (one uniform object, the farCut pattern). The vista is the first layer
- * this renderer draws with large arbitrarily oriented rock faces at scale;
- * under the night rig (light scale 0.36, ~88 percent of what remains in one
- * hard directional) a face angled off the moon crushes to black while the
- * horizontal near meadow stays readable. Emissive lands after all light
- * attenuation, so this floor survives the night scale exactly like the real
- * canopies' emissive floor does. Zero by day: the day frame is byte-identical.
- */
-const FAR_NIGHT_FLOOR: [number, number, number] = [0.026, 0.03, 0.044];
+/** Albedo-shaped deep-night floor shared by every far tile. */
+const FAR_NIGHT_FLOOR: readonly [number, number, number] = [0.026, 0.03, 0.044];
 const farNightFloor = { value: new THREE.Color(0, 0, 0) };
 
-/** Per-frame, from the renderer's day/night update: scales the moonlit
- *  ambient floor with how deep into night the cycle sits (0 by day). */
+/** Scale the moonlit ambient floor with the current night depth. */
 export function setFarTerrainNightFloor(nightAmt: number): void {
   farNightFloor.value.setRGB(
     FAR_NIGHT_FLOOR[0] * nightAmt,
@@ -103,11 +89,18 @@ export interface FarTerrainView {
   /** Per-frame visibility: the layer shows only outdoors; tiles beyond the
    *  view envelope hide; near-field fragments discard against detailFar. */
   update(camX: number, camZ: number, detailFar: number, viewFar: number, outdoor: boolean): void;
+  /** Re-sample the tiles intersecting an edited region (editor sculpt /
+   *  biome paint), idle-paced and coalesced: repeated calls for one tile
+   *  queue it once. Call at stroke END, never per drag sample. */
+  rebuildRegion(minX: number, minZ: number, maxX: number, maxZ: number): void;
   /** Stops the in-flight background build (call before discarding). */
   cancelStreaming(): void;
   /** Dispose every built tile geometry and the one shared material. */
   dispose(): void;
-  /** Build progress for diagnostics: built tiles / planned tiles. */
+  /** Build progress for the renderer's readiness gate and diagnostics:
+   *  built tiles / planned tiles. A queued region rebuild does NOT drop a
+   *  tile from the built count (the stale mesh stands until its
+   *  replacement geometry is ready, never a hole). */
   builtTileCount(): number;
   plannedTileCount(): number;
 }
@@ -126,6 +119,7 @@ export function buildFarTerrain(
     return {
       group,
       update: () => {},
+      rebuildRegion: () => {},
       cancelStreaming: () => {
         cancelled = true;
       },
@@ -149,16 +143,7 @@ export function buildFarTerrain(
   // The near-field discard (see FAR_DISCARD_MARGIN). uTime-style shared
   // uniforms are overkill here: one vec3 (camera xz + cutoff) per frame.
   const farCut = { value: new THREE.Vector3(0, 0, 0) };
-  // Meadow-continuum ground paint: the far tiles multiply the SAME baked
-  // blade texture the near splat terrain paints with, at the same true
-  // world scale and the same constructed gain, gated by the per-vertex
-  // grass weight (aGrassW). No distance term anywhere: the mip chain does
-  // the averaging, so the tiles' meadow converges on the identical colour
-  // the near ground shows, and the handoff at the detail horizon is
-  // invisible by construction. ?grassbake=off keeps the legacy flat tint.
   const grassBake = renderLayerDisabled('grassbake') ? null : getGrassGroundBake();
-  // Distant-zone atmosphere: whether the biome haze field exists is decided
-  // once, before the material compiles, so a tier without one is byte-identical.
   const zoneHaze = hasBiomeHazeField();
   material.onBeforeCompile = (shader) => {
     shader.uniforms.uFarCut = farCut;
@@ -189,8 +174,6 @@ export function buildFarTerrain(
         'void main() {\n\tif (distance(vFarXZ, uFarCut.xy) < uFarCut.z) discard;',
       )
       .replace(
-        // The deep-night ambient floor (see FAR_NIGHT_FLOOR): albedo-shaped,
-        // added where emissive lands so it survives the night light scale.
         '#include <emissivemap_fragment>',
         '#include <emissivemap_fragment>\n\ttotalEmissiveRadiance += uFarNightFloor * diffuseColor.rgb;',
       );
@@ -204,12 +187,6 @@ export function buildFarTerrain(
           vGrassW);`,
       );
     }
-    // Per-zone aerial perspective (biome_haze_field.ts). Self-contained and
-    // additive on purpose: its own uniforms, its own two replaces, and it
-    // lands immediately before <fog_fragment> so the horizon haze band still
-    // owns the rim. The near splat terrain splices the identical snippet on
-    // the identical uniforms, which is what keeps the detail-horizon handoff
-    // seamless.
     if (zoneHaze) {
       Object.assign(shader.uniforms, biomeHazeUniforms());
       shader.fragmentShader = shader.fragmentShader
@@ -223,50 +200,115 @@ export function buildFarTerrain(
 
   const sharedIndex = sharedIndexFor(tiles[0].size, plan.spacing);
 
-  const attachTile = (
+  // A tile's geometry data, built in idle-paced slices.
+  const buildTileData = async (
     tile: FarTile,
-    minY: number,
-    maxY: number,
-    geo: THREE.BufferGeometry,
-  ): void => {
+  ): Promise<{
+    geo: THREE.BufferGeometry;
+    minY: number;
+    maxY: number;
+  } | null> => {
+    const builder = createFarTileBuilder(tile, plan.spacing, seed);
+    for (;;) {
+      await idleSlot(FAR_BUILD_TIMEOUT_MS, {
+        maxTimeoutDeferrals: FAR_BUILD_TIMEOUT_DEFERRALS,
+      });
+      if (cancelled) return null;
+      if (builder.step(FAR_BUILD_ROWS_PER_SLICE)) break;
+    }
+    const data = builder.result();
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(data.positions, 3));
+    geo.setAttribute('normal', new THREE.BufferAttribute(data.normals, 3));
+    geo.setAttribute('color', new THREE.BufferAttribute(data.colors, 3));
+    geo.setAttribute('aGrassW', new THREE.BufferAttribute(data.grassW, 1));
+    geo.setIndex(sharedIndex);
+    return { geo, minY: data.minY, maxY: data.maxY };
+  };
+
+  const frameTileGeo = (tile: FarTile, minY: number, maxY: number, geo: THREE.BufferGeometry) => {
     geo.boundingBox = new THREE.Box3(
       new THREE.Vector3(tile.x0, minY, tile.z0),
       new THREE.Vector3(tile.x0 + tile.size, maxY, tile.z0 + tile.size),
     );
     geo.boundingSphere = geo.boundingBox.getBoundingSphere(new THREE.Sphere());
+  };
+
+  const attachTile = (
+    tile: FarTile,
+    index: number,
+    minY: number,
+    maxY: number,
+    geo: THREE.BufferGeometry,
+  ): void => {
+    frameTileGeo(tile, minY, maxY, geo);
     const mesh = new THREE.Mesh(geo, material);
     mesh.receiveShadow = false;
     mesh.castShadow = false;
     mesh.updateMatrixWorld(true);
     mesh.matrixAutoUpdate = false;
     group.add(mesh);
-    built.push({ tile, mesh });
+    built.push({ tile, index, mesh });
   };
 
+  // Editor invalidation: tiles queued for a re-sample after a region edit.
+  // A Set coalesces repeat edits of one tile; the drain loop runs one tile
+  // at a time on the same idle pacing as the initial build. The stale mesh
+  // stays attached until its replacement geometry is complete, so the far
+  // field never opens a hole (and the renderer's readiness gate never
+  // drops for a region rebuild).
+  const pendingRebuild = new Set<number>();
+  let draining = false;
+  const drainRebuilds = async (): Promise<void> => {
+    if (draining) return;
+    draining = true;
+    try {
+      for (;;) {
+        if (cancelled) return;
+        // Only tiles the built list can see are drainable NOW. A queued
+        // tile still mid-initial-build must stay queued (deleting it here
+        // would race the attach and strand a torn tile); the attach check
+        // in buildAll re-kicks the drain once it lands.
+        const next = [...pendingRebuild].find((i) => built.some((b) => b.index === i));
+        if (next === undefined) return;
+        pendingRebuild.delete(next);
+        const entry = built.find((b) => b.index === next);
+        if (!entry) continue;
+        const data = await buildTileData(entry.tile);
+        if (!data) return;
+        entry.mesh.geometry.dispose();
+        entry.mesh.geometry = data.geo;
+        frameTileGeo(entry.tile, data.minY, data.maxY, data.geo);
+      }
+    } finally {
+      draining = false;
+    }
+  };
+
+  let buildingIndex = -1;
   const buildAll = async (): Promise<void> => {
     const order = farTileBuildOrder(tiles, priorityPoint?.x ?? 0, priorityPoint?.z ?? 0);
     for (const idx of order) {
       if (cancelled) return;
-      const tile = tiles[idx];
-      const builder = createFarTileBuilder(tile, plan.spacing, seed);
-      for (;;) {
-        await idleSlot(FAR_BUILD_TIMEOUT_MS, {
-          maxTimeoutDeferrals: FAR_BUILD_TIMEOUT_DEFERRALS,
-        });
-        if (cancelled) return;
-        if (builder.step(FAR_BUILD_ROWS_PER_SLICE)) break;
-      }
-      const data = builder.result();
-      const geo = new THREE.BufferGeometry();
-      geo.setAttribute('position', new THREE.BufferAttribute(data.positions, 3));
-      geo.setAttribute('normal', new THREE.BufferAttribute(data.normals, 3));
-      geo.setAttribute('color', new THREE.BufferAttribute(data.colors, 3));
-      geo.setAttribute('aGrassW', new THREE.BufferAttribute(data.grassW, 1));
-      geo.setIndex(sharedIndex);
-      attachTile(tile, data.minY, data.maxY, geo);
+      buildingIndex = idx;
+      const data = await buildTileData(tiles[idx]);
+      if (!data) return;
+      attachTile(tiles[idx], idx, data.minY, data.maxY, data.geo);
+      // An edit that landed while this tile was mid-slice sampled a torn
+      // mix of old and new heights; its queued entry re-samples it now
+      // that the built list can see it.
+      if (pendingRebuild.has(idx)) void drainRebuilds();
     }
+    buildingIndex = -1;
+    if (pendingRebuild.size > 0) void drainRebuilds();
   };
   void buildAll();
+
+  const tileIntersects = (tile: FarTile, minX: number, minZ: number, maxX: number, maxZ: number) =>
+    tile.x0 <= maxX &&
+    tile.x0 + tile.size >= minX &&
+    tile.z0 <= maxZ &&
+    tile.z0 + tile.size >= minZ;
 
   return {
     group,
@@ -277,6 +319,22 @@ export function buildFarTerrain(
       for (const b of built) {
         b.mesh.visible = farTileVisible(b.tile, camX, camZ, viewFar);
       }
+    },
+    rebuildRegion(minX, minZ, maxX, maxZ): void {
+      // The crest-preserving sampler reaches half a cell around a vertex
+      // and the normals one more cell, so pad the edit by two spacings to
+      // catch every tile whose surface the edit can influence.
+      const pad = plan.spacing * 2;
+      for (let i = 0; i < tiles.length; i++) {
+        if (!tileIntersects(tiles[i], minX - pad, minZ - pad, maxX + pad, maxZ + pad)) continue;
+        const isBuilt = built.some((b) => b.index === i);
+        // Queue built tiles, and the one currently mid-build (its slices
+        // may have sampled a torn mix; buildAll re-drains it on attach).
+        // Skip tiles the initial build has not reached: they will sample
+        // the edited heightfield when their turn comes.
+        if (isBuilt || i === buildingIndex) pendingRebuild.add(i);
+      }
+      if (pendingRebuild.size > 0) void drainRebuilds();
     },
     cancelStreaming(): void {
       cancelled = true;

@@ -114,6 +114,7 @@ export interface PostPipeline {
   setSize(width: number, height: number, pixelRatio?: number): void;
   setRenderRegion(region: DynamicResolutionRect): void;
   render(): void;
+  dispose(): void;
   /** Queue a world-anchored screen distortion ripple (finisher/big-nova
    *  impacts). Capped at 4 concurrent; a saturated pool steals the oldest. */
   screenRipple(x: number, y: number, z: number, strength: number): void;
@@ -233,6 +234,7 @@ export function buildComposer(
   let flash = 0;
   let aspect = width / Math.max(1, height);
   let screenFxWarm = screenFx ? 2 : 0; // main-loop frames to keep the pass compiled at boot
+  let disposed = false;
 
   // Edge AA, after the grade so it works on the display-space image (SMAA's
   // edge detector expects the gamma-encoded color OutputGradePass produces).
@@ -270,6 +272,12 @@ export function buildComposer(
     },
     render(): void {
       composer.render();
+    },
+    dispose(): void {
+      if (disposed) return;
+      disposed = true;
+      for (const pass of composer.passes) pass.dispose();
+      composer.dispose();
     },
     screenRipple(x: number, y: number, z: number, strength: number): void {
       if (!screenFx) return;

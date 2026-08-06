@@ -975,6 +975,12 @@ describe('node tool gating over the live server', () => {
 
     meta.nodeHarvestReadyAt.ore_mirefen_t2 = server.sim.time;
     driveFrame({});
+    // Re-hunted for the release/v0.34.0 merge: both parents re-pinned these two
+    // literals independently (the release to 2 and 3 in a456bb5150, this branch
+    // via the dedupe re-hunt in 955d33d032), and the merged content stream lands
+    // on neither. Both unconfirmed mints draw common rarity (1 unit each) under
+    // the merged rng, so the cumulative counts are 1 then 2. Only the rarity
+    // draw moved: the prompt still does not fire, so the charge is kept in both.
     expect(server.sim.countItem('iron_ore', s.pid)).toBe(1);
     expect(slot.durability).toBe(charges - 1);
 
@@ -1296,7 +1302,10 @@ describe('fine material grades on the live harvest path', () => {
     sim.tick();
     // And COMPLETES: the completion re-gate reserved the same base grade,
     // the grant minted it, and the unfired prompt effect kept its charge.
-    expect(sim.countItem('iron_ore', pid)).toBe(2);
+    // 4 = the 1-ore partial stack plus a 3-unit epic-rarity mint: the zones
+    // 1-3 quest-dedupe content pass shifted the shared rng stream, moving the
+    // seed-42 rarity draw from common (1 unit) to epic (3 units).
+    expect(sim.countItem('iron_ore', pid)).toBe(4);
     expect(sim.countItem('fine_iron_ore', pid)).toBe(0);
     expect(
       sim.drainEvents().some((e) => e.type === 'error' && e.text === 'Your bags are full.'),
@@ -1333,8 +1342,9 @@ describe('fine material grades on the live harvest path', () => {
     sim.tick();
 
     // The confirmed mining use survived the herbalism mint: fine grade
-    // minted, mining charge spent.
-    expect(sim.countItem('fine_iron_ore', pid)).toBe(1);
+    // minted, mining charge spent. 3 units since the zones 1-3 quest-dedupe
+    // content pass moved the seed-42 rarity draw to epic (3 per mint).
+    expect(sim.countItem('fine_iron_ore', pid)).toBe(3);
     expect(slot.durability).toBe(chargesBefore - 1);
   });
 
@@ -1365,9 +1375,11 @@ describe('fine material grades on the live harvest path', () => {
     sim.tick();
 
     // Consent retired with the old slot: the new prompt slot did not fire,
-    // the harvest minted base grade, and the fresh charge is intact.
+    // the harvest minted base grade, and the fresh charge is intact. 3 units
+    // since the zones 1-3 quest-dedupe content pass moved the seed-42 rarity
+    // draw to epic (3 per mint).
     expect(sim.countItem('fine_iron_ore', pid)).toBe(0);
-    expect(sim.countItem('iron_ore', pid)).toBe(1);
+    expect(sim.countItem('iron_ore', pid)).toBe(3);
     expect(minted?.durability).toBe(mintedCharges);
   });
 

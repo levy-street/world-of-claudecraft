@@ -9,7 +9,7 @@
 // has no rows.
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 import type { ItemDef } from '../src/sim/types';
 import type { VendorBuyOptions } from '../src/sim/vendor_buy_stack';
 import { dismissBuyQuantityPrompts } from '../src/ui/hud/vendor/buy_quantity_prompt_window';
@@ -577,6 +577,47 @@ describe('renderHeroicVendorWindow: goods grid wrapping', () => {
     renderHeroicVendorWindow(el, 'Quartermaster', view, heroicDeps());
 
     expect(el.querySelectorAll('.vendor-goods-grid').length).toBe(0);
+  });
+
+  it('carries keyboard focus across a repaint (uninitiated rebuilds, #2931)', () => {
+    // Marks are a bag count, so ANY inventory delta repaints this window
+    // uninitiated through Hud.repaintOpenServiceWindows; the
+    // focus-across-a-REBUILD contract applies (the train/unbind idiom).
+    // Attached to document.body: focus() is inert on a detached tree.
+    const rows: HeroicShopRow[] = [
+      { itemId: 'trinket', item: item('trinket'), marks: 10, affordable: true },
+      { itemId: 'charm', item: item('charm'), marks: 10, affordable: true },
+    ];
+    const el = document.createElement('div');
+    document.body.appendChild(el);
+    renderHeroicVendorWindow(el, 'Quartermaster', { rows, balance: 20 }, heroicDeps());
+    el.querySelector<HTMLButtonElement>('[data-focus-key="buy:trinket"]')?.focus();
+    renderHeroicVendorWindow(el, 'Quartermaster', { rows, balance: 20 }, heroicDeps());
+    expect((document.activeElement as HTMLElement).dataset.focusKey).toBe('buy:trinket');
+    // The focused tile going disabled falls to the grid neighbor, never to
+    // <body>: the rung an uninitiated marks repaint actually exercises.
+    renderHeroicVendorWindow(
+      el,
+      'Quartermaster',
+      { rows: [{ ...rows[0], affordable: false }, rows[1]], balance: 5 },
+      heroicDeps(),
+    );
+    expect((document.activeElement as HTMLElement).dataset.focusKey).toBe('buy:charm');
+    // Every tile disabled falls to the close button.
+    renderHeroicVendorWindow(
+      el,
+      'Quartermaster',
+      { rows: rows.map((r) => ({ ...r, affordable: false })), balance: 0 },
+      heroicDeps(),
+    );
+    expect((document.activeElement as HTMLElement).dataset.focusKey).toBe('close');
+    el.remove();
+  });
+
+  // The focus test attaches to document.body; a mid-test failure must not
+  // leak a focused node into the shared document for later tests.
+  afterEach(() => {
+    document.body.innerHTML = '';
   });
 });
 

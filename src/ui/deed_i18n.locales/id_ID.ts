@@ -7,6 +7,14 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  chr_drakemaw_broodlord: {
+    name: 'Pemusnah Tetasan',
+    desc: 'Tumpaskan seekor Penguasa Sarang Drakemaw di tengah telur-telurnya, menembus raungan, tebasan, dan apinya.',
+  },
+  chr_maw_matriarch: {
+    name: 'Langit Membisu',
+    desc: 'Tumpaskan Cindraleth Sang Matriark Rahang di sarang kawahnya di atas Drakemaw.',
+  },
   pvp_card_duel_first_win: {
     name: 'Aturan Sendiri',
     desc: 'Menangkan Duel Kartu di hadapan Ahli Kartu.',
@@ -819,6 +827,10 @@ export const table: DeedLocaleTable = {
     name: 'Heroik: Cekungan Hati Liar',
     desc: 'Kalahkan Zulgar, Suara Cekungan, di Cekungan Hati Liar pada tingkat kesulitan Heroik.',
   },
+  chr_peaks_gatherer: {
+    name: 'Tuaian dari Dataran Tinggi',
+    desc: 'Panen satu urat bijih, satu tegakan kayu, dan satu petak herba di Dataran Tinggi Thornpeak.',
+  },
   chr_marsh_rares_ii: {
     name: 'Sang Pelahap, Diperhitungkan',
     desc: 'Bantai Grubjaw sang Pelahap, teror bernama keempat di Rawa Mirefen yang luput dari perhitungan pertama.',
@@ -834,5 +846,29 @@ export const table: DeedLocaleTable = {
   chr_hollow_rares: {
     name: 'Kawanan Itu Ingat',
     desc: 'Bantai Marrowshell Tua dan Aurelhorn, yang Pertama dari Kawanan, dua bos langka pengembara di Ceruk Terselubung.',
+  },
+  chr_willowfen_gatherer: {
+    name: 'Limpahan Tanah Paya',
+    desc: 'Panen satu urat bijih, satu tegakan kayu, dan satu petak herba di Paya Willow.',
+  },
+  chr_willowfen_first_cast: {
+    name: 'Riak di Paya Lili',
+    desc: 'Pancing seekor ikan dari perairan Paya Willow.',
+  },
+  chr_galecrest_gatherer: {
+    name: 'Tuaian di Ujung Tanjung',
+    desc: 'Panen satu urat bijih, satu tegakan kayu, dan satu petak herba di Puncak Angin.',
+  },
+  chr_galecrest_first_cast: {
+    name: 'Seutas Kail di Danau Cermin',
+    desc: 'Pancing seekor ikan dari perairan Puncak Angin.',
+  },
+  chr_farshore_gatherer: {
+    name: 'Perbekalan dari Pulau',
+    desc: 'Panen satu urat bijih, satu tegakan kayu, dan satu petak herba di Pesisir Jauh.',
+  },
+  chr_farshore_first_cast: {
+    name: 'Yang Diketahui Para Camar',
+    desc: 'Pancing seekor ikan dari perairan Pesisir Jauh.',
   },
 };

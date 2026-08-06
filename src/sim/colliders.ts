@@ -13,9 +13,9 @@ import {
   isEastbrookGrandArmoury,
 } from './building_layout';
 import { MOUNT_RACE_JUMP_FIXTURES, raceGateSegment } from './content/mounts';
-import { STATIONS } from './content/professions';
 import {
   arenaOriginAt,
+  BUILTIN_WORLD,
   DUNGEON_FLOOR_Y,
   DUNGEON_LIST,
   DUNGEON_X_THRESHOLD,
@@ -31,8 +31,6 @@ import {
   isDelvePos,
   isRiftPos,
   isYumiMazePos,
-  NPCS,
-  OVERWORLD_GRAVEYARDS,
   PORTALS,
   RIFT_REGION_HALF_X,
   RIFT_REGION_HALF_Z,
@@ -56,6 +54,7 @@ import {
 } from './dungeon_layout';
 import { emberLilySpots } from './ember_lilies';
 import { fenWillowSpots, hollowWillowSpots } from './fen_willows';
+import { FENBRIDGE_LAYOUT } from './fenbridge_layout';
 import { HARBOR_RAIL_HALF_THICK, HARBOR_RAIL_HEIGHT, harborDressingRadius } from './harbor_layout';
 import { LAST_BELL_AREAS } from './last_bell_field';
 import {
@@ -574,14 +573,24 @@ function staticWorldColliders(seed: number): Collider[] {
       standable: true,
     });
   }
-  // Town wall segments: the drawn wing is a stone PARAPET with an open iron
-  // railing above it, not a solid curtain, so the slab is a standable top a
-  // jump vaults onto or clean over (the railing is see-through iron: the
-  // fence rule). The wing's two pillars ride each segment: the short capped
-  // one is a standable step above the parapet, and only the tall lantern
-  // pylon (gate-side on `mirrored` wings) blocks full-height. Mob pathing is
-  // untouched: grounded movers without a jump still treat the slab as a wall.
+  // Eastbrook's town wall is a stone parapet with an open iron railing and
+  // two modeled pillars. Fenbridge's palisade is instead a solid log curtain:
+  // its one authored OBB stays full-height and carries no synthetic pillars.
   for (const wall of PROPS.walls ?? []) {
+    const cameraTopY = topY(seed, wall.x, wall.z, wall.height);
+    if (wall.assetId === FENBRIDGE_LAYOUT.wall.assetId) {
+      out.push({
+        type: 'obb',
+        x: wall.x,
+        z: wall.z,
+        hw: wall.w / 2,
+        hd: wall.d / 2,
+        rot: wall.rot,
+        cameraTopY,
+      });
+      continue;
+    }
+
     const parapet = topY(seed, wall.x, wall.z, wall.height * TOWN_WALL_PARAPET_FRAC);
     out.push({
       type: 'obb',
@@ -590,7 +599,7 @@ function staticWorldColliders(seed: number): Collider[] {
       hw: wall.w / 2,
       hd: wall.d / 2,
       rot: wall.rot,
-      cameraTopY: topY(seed, wall.x, wall.z, wall.height),
+      cameraTopY,
       moveTopY: parapet,
       standable: true,
     });
@@ -619,6 +628,27 @@ function staticWorldColliders(seed: number): Collider[] {
     }
   }
 
+  // Fenbridge's gate arch is a compound obstacle: the overhead beam never
+  // closes the route, while its two authored jamb OBBs remain solid. The
+  // stable wall ids gate this projection so custom worlds that remove the
+  // Fenbridge palisade do not inherit invisible builtin collision.
+  const wallIds = new Set((PROPS.walls ?? []).map((wall) => wall.id));
+  if (FENBRIDGE_LAYOUT.wall.segments.every((segment) => wallIds.has(segment.id))) {
+    for (const gate of FENBRIDGE_LAYOUT.wall.gates) {
+      for (const jamb of gate.arch.jambs) {
+        out.push({
+          type: 'obb',
+          x: jamb.center.x,
+          z: jamb.center.z,
+          hw: jamb.halfWidth,
+          hd: jamb.halfDepth,
+          rot: jamb.rotation,
+          cameraTopY: topY(seed, jamb.center.x, jamb.center.z, gate.arch.nativeDimensions.height),
+        });
+      }
+    }
+  }
+
   // Interactable town boards are authored through active WorldContent rather
   // than PROPS. The same service record drives their spawn and exact OBB, and
   // custom worlds that omit the service inherit no Eastbrook collision.
@@ -632,6 +662,22 @@ function staticWorldColliders(seed: number): Collider[] {
       rot: board.rotation,
       cameraTopY: topY(seed, board.x, board.z, board.height),
     });
+  }
+  // The dedicated Fenbridge renderer is built-in-only. Keep this specialized
+  // service collision under the same authority so a programmatic custom world
+  // cannot create an invisible solid board by supplying musterBoards data.
+  if (content === BUILTIN_WORLD) {
+    for (const board of content.services?.musterBoards ?? []) {
+      out.push({
+        type: 'obb',
+        x: board.x,
+        z: board.z,
+        hw: board.width / 2,
+        hd: board.depth / 2,
+        rot: board.rotation,
+        cameraTopY: topY(seed, board.x, board.z, board.height),
+      });
+    }
   }
 
   // hand-placed GLB decor: circle collider matched to the model footprint;

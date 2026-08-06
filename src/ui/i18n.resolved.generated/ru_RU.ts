@@ -962,7 +962,8 @@ export const ru_RU: EnTranslations = {
       "petTaunt": "Питомец: провокация",
       "petDefensive": "Питомец: защита",
       "petAggressive": "Питомец: агрессия",
-      "mount": "Сесть / Спешиться"
+      "mount": "Сесть / Спешиться",
+      "mouseHint": "Кнопки мыши тоже работают: во время назначения нажмите среднюю кнопку (M3) или боковую (M4, M5). Левая и правая остаются зарезервированы для камеры, перемещения кликом и кликов по миру."
     },
     "actionBar": {
       "editKeys": "Настроить клавиши панели действий",
@@ -971,7 +972,7 @@ export const ru_RU: EnTranslations = {
       "bannerCapturing": "Нажмите клавишу, чтобы назначить её этой ячейке...",
       "boundToKey": "Назначено на {key}.",
       "reset": "Сбросить",
-      "done": "Done",
+      "done": "Готово",
       "cancel": "Отмена",
       "resetConfirmTitle": "Сбросить клавиши панели действий?",
       "resetConfirmBody": "Первая панель вернётся к клавишам по умолчанию, а вторая и третья панели останутся без назначенных клавиш. Это действие нельзя отменить."
@@ -1001,6 +1002,7 @@ export const ru_RU: EnTranslations = {
       "name_stormfeather_griffin": "Штормокрыл Поднебесный",
       "name_thunderstrut_gobbler": "Громоступ, великий индюк",
       "name_terrorspark_groundshaker": "Страхоискр, сотрясатель земли",
+      "name_drakemaw_raptor": "Раптор Дрейкмо",
       "desc_valorsteed": "Выносливый и твердо стоящий на ногах скакун, повышающий скорость передвижения.",
       "desc_grag_bear": "Выносливый и твердо стоящий на лапах медведь, повышающий скорость передвижения.",
       "desc_stalkglider_snail": "Стойкая неторопливая улитка, повышающая скорость передвижения.",
@@ -1008,7 +1010,8 @@ export const ru_RU: EnTranslations = {
       "desc_shadowjump_toad": "Огромная устойчивая жаба, обученная молниеносным теневым прыжкам по любой местности.",
       "desc_stormfeather_griffin": "Величавый штормовой грифон, ступающий по земле на рунных когтях со сложенными крыльями.",
       "desc_thunderstrut_gobbler": "Исполинский индюк, рожденный бурей: он важно спускается с Пробуждающегося пика, распустив хвост, словно грозовой фронт.",
-      "desc_terrorspark_groundshaker": "Компактная бронированная машина с тяжёлыми гусеницами, крупнокалиберной пушкой и седлом для бесстрашных пилотов."
+      "desc_terrorspark_groundshaker": "Компактная бронированная машина с тяжёлыми гусеницами, крупнокалиберной пушкой и седлом для бесстрашных пилотов.",
+      "desc_drakemaw_raptor": "Приученный к седлу выводковый раптор из кальдеры Дрейкмо: сплошные жилы и бег, и от него всё ещё едва пахнет пеплом."
     },
     "mountTraining": {
       "mountPrompt": "Нажми {key}, чтобы оседлать учебного Доблестного скакуна.",
@@ -1180,6 +1183,15 @@ export const ru_RU: EnTranslations = {
       "browserEffectsReduced": "Сниженные",
       "browserEffectsMinimal": "Минимальные",
       "browserEffectsNote": "Авто снижает тяжёлые CSS-эффекты (размытие, свечение, движение фона) в зависимости от браузера и устройства. Если интерфейс тормозит, понизьте вручную.",
+      "graphicsApply": "Применить графику",
+      "graphicsApplying": "Применение настроек графики...",
+      "graphicsApplied": "Настройки графики применены.",
+      "graphicsSaved": "Настройки графики сохранены. Активный рендерер уже им соответствует.",
+      "graphicsFailed": "Не удалось применить настройки графики. Предыдущие настройки остаются активными.",
+      "graphicsRetry": "Повторить применение",
+      "graphicsFatal": "Не удалось восстановить графику. Перезагрузите игру, чтобы продолжить.",
+      "graphicsReload": "Перезагрузить игру",
+      "graphicsDraftChanged": "Изменения графики готовы к применению.",
       "interfaceMode": "Режим интерфейса",
       "interfaceModeAuto": "Авто",
       "interfaceModeDesktop": "Компьютер",
@@ -1210,6 +1222,7 @@ export const ru_RU: EnTranslations = {
       "itemScoreLine": "Оценка {score}",
       "showSecondaryActionBar": "Показывать вторичную панель действий",
       "showThirdActionBar": "Показывать третью панель действий",
+      "lockActionBars": "Заблокировать панели действий",
       "showTargetOfTarget": "Показывать цель цели",
       "showAttackButton": "Показывать кнопку атаки",
       "showDailyRewardsChest": "Показывать сундук ежедневных наград",
@@ -1371,7 +1384,14 @@ export const ru_RU: EnTranslations = {
     },
     "landing": {
       "highContrast": "Высокая контрастность",
-      "highContrastAria": "Переключить фон высокой контрастности: отключает движущийся ролик, чтобы текст начального экрана оставался читаемым"
+      "highContrastAria": "Переключить фон высокой контрастности: отключает движущийся ролик, чтобы текст начального экрана оставался читаемым",
+      "browserSupport": {
+        "title": "Внимание: неподдерживаемый браузер",
+        "body": "В этом браузере производительность может быть снижена. Для наилучшего результата установите настольное приложение для Windows, macOS или Linux. Предпочитаете играть в браузере? Chrome обеспечивает наилучшую производительность, также поддерживаются Firefox и Safari.",
+        "getDesktopApp": "Получить настольное приложение",
+        "continueInBrowser": "Продолжить в браузере",
+        "dismissAria": "Закрыть уведомление о неподдерживаемом браузере"
+      }
     },
     "warfare": {
       "honorAmount": "{amount} очк. чести",
@@ -1740,6 +1760,7 @@ export const ru_RU: EnTranslations = {
       "itemAriaEnchanted": "{item}, количество {count}, зачарованный экземпляр",
       "itemAriaBound": "{item}, количество {count}, привязанный экземпляр",
       "itemAriaMasterwork": "{item}, количество {count}, шедевр",
+      "itemAriaQuest": "{item}, количество {count}, предмет задания",
       "filterGroupAria": "Фильтровать сумки по категории",
       "filterAll": "Все",
       "filterWeapon": "Оружие",
@@ -1748,6 +1769,7 @@ export const ru_RU: EnTranslations = {
       "filterMaterial": "Материалы",
       "filterTool": "Инструменты",
       "filterQuest": "Задания",
+      "filterQuestCountAria": "Задания, предметов: {count}",
       "filterMount": "Транспорт",
       "sortAria": "Сортировать предметы в сумках",
       "sortRecent": "Недавние",
@@ -1756,6 +1778,7 @@ export const ru_RU: EnTranslations = {
       "searchPlaceholder": "Поиск предметов",
       "searchAria": "Поиск предметов в сумках по названию",
       "noMatch": "Нет предметов, соответствующих фильтрам.",
+      "noQuestItems": "В сумках нет предметов заданий.",
       "capacity": "{used}/{total}",
       "capacityAria": "Занято ячеек сумок: {used} из {total}",
       "backpack": "Рюкзак",
@@ -1974,6 +1997,8 @@ export const ru_RU: EnTranslations = {
     },
     "materialHint": {
       "fineGrade": "Отборный сорт. Добывается на жиле полного уровня инструментом выше самого материала и засчитывается вместо обычной версии везде, где она требуется.",
+      "cookingCatch": "Ингредиент для готовки. Сначала нужно приготовить.",
+      "usedBy": "Used by {crafts}.",
       "arcaneDust": "Реагент для наложения чар. Выпадает при распылении обычного и необычного снаряжения.",
       "arcaneEssence": "Реагент для наложения чар. Выпадает при распылении редкого снаряжения.",
       "arcaneShard": "Реагент для наложения чар. Выпадает при распылении эпического и легендарного снаряжения.",
@@ -2255,6 +2280,7 @@ export const ru_RU: EnTranslations = {
       "depositHint": "Нажмите, чтобы положить",
       "depositPartialHint": "Shift+клик, чтобы положить часть",
       "cannotDeposit": "Нельзя хранить в банке",
+      "cannotDepositNow": "Сейчас положить нельзя",
       "depositQuantityTitle": "Положить {item}",
       "depositQuantityInput": "Количество для внесения",
       "depositQuantityConfirm": "Положить",
@@ -2265,6 +2291,7 @@ export const ru_RU: EnTranslations = {
       "sortAria": "Сортировать предметы в банке",
       "searchAria": "Поиск предметов в банке по названию",
       "depositAll": "Положить все материалы",
+      "depositAllTooltip": "Отправляет в банк все материалы для крафта и хлам из ваших сумок за один раз. Инструменты для добычи, надетое снаряжение, квестовые предметы и расходники не затрагиваются.",
       "depositAllDone": "Материалов положено: {count}.",
       "depositAllFull": "Материалов положено: {count}. Банк заполнен.",
       "depositAllNone": "Банк заполнен: ничего не положено.",
@@ -2280,7 +2307,50 @@ export const ru_RU: EnTranslations = {
       "bonusAdvertWallet": "Привяжите кошелёк, чтобы получить 2 ячейки.",
       "bonusReferralProgress": "{count}/{cap}",
       "bonusReferralExplainer": "Пригласите друга: когда он достигнет 10 уровня, вы оба получите по 2 ячейки, до 5 друзей.",
-      "bonusSectionAria": "Бонусные ячейки банка и способы их получить"
+      "bonusSectionAria": "Бонусные ячейки банка и способы их получить",
+      "tabsAria": "Вкладки банка",
+      "personalTab": "Личный",
+      "guildTab": "Гильдия",
+      "guildCapacityAria": "Занято ячеек банка гильдии: {used} из {total}",
+      "guildEmpty": "Банк гильдии пуст.",
+      "guildTreasury": "Казна гильдии",
+      "guildDepositGold": "Положить деньги",
+      "guildWithdrawGold": "Забрать деньги",
+      "guildDepositGoldTitle": "Положить деньги в казну гильдии",
+      "guildWithdrawGoldTitle": "Забрать деньги из казны гильдии",
+      "guildGoldAvailable": "Доступно: {amount}",
+      "guildBuyConfirm": "Купить {count} дополнительных ячеек банка гильдии за {price} из казны гильдии?",
+      "guildBuyNote": "Оплачивается из казны гильдии",
+      "guildTreasuryShort": "В казне не хватает",
+      "guildOpenBank": "Открыть гильдейский банк",
+      "guildOpenConfirm": "Открыть гильдейский банк за {price}? Оплата спишется из ваших собственных денег.",
+      "guildOpenAccept": "Открыть",
+      "guildOpenNote": "Оплачивается из ваших собственных денег, а не из казны гильдии",
+      "guildPurseShort": "Недостаточно денег",
+      "guildDormantNote": "Заблокированные предметы нельзя забрать, и они не дают распустить гильдию.",
+      "guildDormantHint": "Этот предмет заблокирован в банке гильдии, его нельзя забрать.",
+      "guildDormantAria": "{item}, количество {count}, нельзя забрать",
+      "guildUnknownItem": "Неизвестный предмет",
+      "guildDepositHint": "Нажмите, чтобы положить в банк гильдии",
+      "guildCannotDeposit": "Нельзя положить в банк гильдии",
+      "guildGoldCannotMove": "Сейчас эту сумму переместить нельзя.",
+      "guildViewsAria": "Виды банка гильдии",
+      "guildContentsTab": "Содержимое",
+      "guildLogTab": "Журнал",
+      "logAria": "Журнал операций банка гильдии",
+      "logNote": "{count} последних операций банка гильдии.",
+      "logLoading": "Загрузка журнала банка гильдии...",
+      "logEmpty": "В банк гильдии пока ничего не клали и ничего из него не брали.",
+      "logRefused": "Читать журнал банка гильдии могут только офицеры гильдии.",
+      "logFormerMember": "Бывший член гильдии",
+      "logDepositItem": "{actor} положил(а) {count} шт. {item}",
+      "logWithdrawItem": "{actor} взял(а) {count} шт. {item}",
+      "logDepositMoney": "{actor} положил(а) {amount}",
+      "logWithdrawMoney": "{actor} взял(а) {amount}",
+      "logBuySlots": "{actor} купил(а) расширение банка за {amount}",
+      "logOpenBank": "{actor} открыл(а) банк гильдии за {amount}",
+      "logCharterFee": "{actor} оплатил(а) устав гильдии: {amount}",
+      "logAdminPurge": "Администратор удалил {count} шт. {item}"
     },
     "calendar": {
       "title": "Календарь событий",
@@ -2358,6 +2428,7 @@ export const ru_RU: EnTranslations = {
       "billboard": {
         "label": "Доска объявлений гильдии",
         "empty": "На доске объявлений пока пусто.",
+        "loginLine": "Доска объявлений гильдии: {text}",
         "setBy": "Разместил(а): {name}",
         "save": "Сохранить",
         "placeholder": "Напишите сообщение для гильдии",
@@ -2558,6 +2629,18 @@ export const ru_RU: EnTranslations = {
         "artisansEye": "Глаз ремесленника",
         "quickeningCharm": "Оберег возрождения"
       },
+      "toolEffectTooltip": {
+        "kind": "Талисман для инструмента",
+        "bonus": {
+          "gatherersCache": "Пока есть заряды, каждый сбор приносит +1 к добыче.",
+          "artisansEye": "Пока есть заряды, повышает класс добычи на 1 уровень инструмента.",
+          "quickeningCharm": "Сокращает таймер возрождения источника, на котором сработал."
+        },
+        "howToSlot": "Устанавливается на инструмент для горного дела, лесозаготовки или травничества в окне профессий. Расходуется при установке.",
+        "charges": "На обычном инструменте изначально {base} зарядов (+{bonus} за каждую ступень редкости).",
+        "landOnly": "На удочку не устанавливается.",
+        "openProfessions": "Откройте окно профессий, чтобы установить талисман на инструмент для сбора."
+      },
       "toolEffectSlotButton": "Установить {effect}",
       "toolEffectRechargeButton": "Перезарядить",
       "toolEffectSlotted": "{effect} установлен: {profession}.",
@@ -2594,6 +2677,8 @@ export const ru_RU: EnTranslations = {
     "crafting": {
       "title": "Крафт",
       "close": "Закрыть крафт",
+      "dialogOption": "Крафт",
+      "dialogOptionAria": "Открыть окно крафта: {craft}",
       "craft": "Создать",
       "reagentsNeeded": "Требуется:",
       "reagentLine": "{name}: {have}/{required}",
@@ -2668,6 +2753,8 @@ export const ru_RU: EnTranslations = {
       "masterworkToast": "Шедевр! {name}",
       "masterworkZoneLine": "Шедевр от {crafter}: {name}!",
       "tierUpToast": "{craft}: достигнут ранг {tier}!",
+      "skillUpToast": "{skill}: навык повышен до {level}!",
+      "skillUpSubtext": "Навык повышен до {level}!",
       "trendNudge": "Ваши руки склоняются к пути «{archetype}». Настройка на него ждёт у {master}.",
       "trendNudgeNoMaster": "Ваши руки склоняются к пути «{archetype}». Найдите мастера ремесла, чтобы встать на него.",
       "attunedZoneLine": "{name} настроился как «{archetype}»!",
@@ -2903,6 +2990,7 @@ export const ru_RU: EnTranslations = {
       "countLabel": "Деяния: {earned}/{total}",
       "completionAria": "Получено деяний: {earned} из {total}",
       "recentLabel": "Недавние:",
+      "recentJumpAria": "Перейти к {name}",
       "nearestLabel": "Почти готово:",
       "filterGroupAria": "Фильтр деяний",
       "filterAll": "Все",
@@ -4323,8 +4411,8 @@ export const ru_RU: EnTranslations = {
       "toolUnavailable": "Не продается",
       "priceNone": "Не продается",
       "toolTierReq": "Инструмент {tier} уровня",
-      "colWield": "Use at",
-      "wieldNone": "Any",
+      "colWield": "Нужно мастерство",
+      "wieldNone": "Любое",
       "yieldsHeading": "Что дает сбор",
       "yieldsBody": "Каждый сбор катит качество для того, что он дает, и ваше мастерство, это вся история этого броска. Совсем новый собиратель всегда тянет обычный материал; каждое очко навыка стабильно переносит вес из обычного в высшие сорта и никогда назад, пока на пределе в 100 обычный сорт не исчезнет совсем: 60 процентов необычного, 30 процентов редкого, 8 процентов эпического и 2 процента легендарного, каждый раз.\n\nКачество означает и количество: обычный бросок дает 1 единицу, необычный и редкий дают 2, эпический 3, а легендарный 4. Любая редкая, эпическая или легендарная добыча приходит подписанным экземпляром с клеймом Gathered by you: на пределе это четыре сбора из десяти несут ваше имя, а правила происхождения на странице Crafting Economy объясняют, почему ремесленники платят сверху ровно за такие стопки.",
       "bandsHeading": "Разряды мастерства",
@@ -6159,10 +6247,16 @@ export const ru_RU: EnTranslations = {
   },
   "desktop": {
     "update": {
-      "downloading": "Загрузка обновления {version}...",
-      "ready": "Обновление {version} готово. Оно установится при выходе из игры, либо перезапустите сейчас.",
+      "checkingTitle": "Проверка обновлений...",
+      "checkingBody": "Игра обновляется автоматически.",
+      "uptodateTitle": "У вас последняя версия игры.",
+      "downloadingTitle": "Загрузка обновления {version}...",
+      "downloadingBody": "Можно продолжать играть. Обновление установится при выходе из игры.",
+      "readyTitle": "Обновление {version} готово",
+      "readyBody": "Оно установится при выходе из игры, либо перезапустите сейчас.",
       "restart": "Перезапустить сейчас",
-      "later": "Позже"
+      "later": "Позже",
+      "dismiss": "Закрыть"
     },
     "crash": {
       "title": "World of ClaudeCraft",
@@ -6629,6 +6723,11 @@ export const ru_RU: EnTranslations = {
     },
     "system": {
       "playerDeath": "Вы погибли.",
+      "deathRecapKillerAbility": "Вы погибли. Убиты: {killer} ({ability}).",
+      "deathRecapKiller": "Вы погибли. Убиты: {killer}.",
+      "deathRecapAbility": "Вы погибли. Причина: {ability}.",
+      "deathRecapFalling": "Вы погибли. Вы разбились насмерть.",
+      "deathRecapDrowned": "Вы погибли. Вы утонули.",
       "respawn": "Вы снова чувствуете себя отдохнувшим и целым.",
       "ignoringChat": "Чат от {name} игнорируется.",
       "noLongerIgnoring": "{name} больше не игнорируется.",
@@ -6874,6 +6973,10 @@ export const ru_RU: EnTranslations = {
         "officer": "Офицер",
         "member": "Участник"
       },
+      "tenure": {
+        "recruit": "Новобранец",
+        "veteran": "Ветеран"
+      },
       "guildHeadOne": "вы {rank}, {count} участник",
       "guildHeadMany": "вы {rank}, {count} участников"
     },
@@ -7115,6 +7218,7 @@ export const ru_RU: EnTranslations = {
       "quest": "Задание",
       "junk": "Хлам",
       "fineMaterial": "Отборный материал",
+      "material": "Материал",
       "food": "Еда",
       "drink": "Напиток",
       "tool": "Инструмент",
@@ -7147,6 +7251,9 @@ export const ru_RU: EnTranslations = {
       "useFood": "Использование: восстанавливает {amount} здоровья за {seconds} сек. Нужно оставаться сидя во время еды.",
       "useDrink": "Использование: восстанавливает {amount} маны за {seconds} сек. Нужно оставаться сидя во время питья.",
       "questItem": "Предмет задания",
+      "questRelated": "Задание: {quest}",
+      "questRules": "Нельзя продать, положить в банк или обменять.",
+      "questOrphaned": "Не нужен ни для одного активного задания.",
       "classes": "Классы: {classes}",
       "sellPrice": "Цена продажи: {money}",
       "clickBuy": "Нажмите, чтобы купить",
@@ -7195,15 +7302,15 @@ export const ru_RU: EnTranslations = {
       "buyStack": "Купить {count}",
       "buyStackAria": "Купить {count} {item} за {price}",
       "qtyRowAria": "Количество покупки",
-      "qtyMultiple": "{count}x",
+      "qtyMultiple": "x{count}",
       "qtyMultipleAria": "Покупать по {count} за раз",
       "qtyCustom": "Другое",
       "qtyCustomAria": "Указать своё количество",
-      "buyCountAria": "Buy {count} of {item} for {price}",
-      "buyCountAriaWithRequirement": "Buy {count} of {item} for {price}. {requirement}",
+      "buyCountAria": "Купить {count} {item} за {price}",
+      "buyCountAriaWithRequirement": "Купить {count} {item} за {price}. {requirement}",
       "buyQuantityTitle": "Сколько купить: {item}? Не более {max}.",
       "buyQuantityInput": "Количество для покупки",
-      "buyQuantityConfirm": "Buy",
+      "buyQuantityConfirm": "Купить",
       "buybackTitle": "Выкуп",
       "buybackEmpty": "Нет предметов",
       "buybackAria": "Выкупить {item} за {price}",
@@ -7282,6 +7389,12 @@ export const ru_RU: EnTranslations = {
       "reclaim": "Вернуть",
       "buyAria": "Купить {item} за {price}",
       "reclaimAria": "Вернуть {item}",
+      "buyConfirmTitle": "Подтвердите покупку",
+      "buyConfirmBody": "Купить {item} за {price}?",
+      "buyConfirmBodyStack": "Купить {item} x{count} за {price} ({each} за штуку)?",
+      "buyConfirmAccept": "Купить",
+      "buyConfirmCancel": "Отмена",
+      "buyChanged": "Этот лот изменился до вашего подтверждения. Проверьте цену и попробуйте снова.",
       "sellNote": "Выставляйте товары из сумок. Торговец берет {cut}% при продаже. Использовано мест: {used}/{max}.",
       "sellPickEmpty": "Нажмите на предмет в сумках, чтобы выбрать товар для продажи.",
       "quantity": "Количество",
@@ -8769,6 +8882,18 @@ export const ru_RU: EnTranslations = {
       "fen_muster_order": {
         "name": "Приказ о сборе в Фенбридже"
       },
+      "firebottle": {
+        "name": "Зажигательная бутыль"
+      },
+      "murloc_hut": {
+        "name": "Хижина илогривов"
+      },
+      "restless_skull": {
+        "name": "Беспокойный череп"
+      },
+      "vanguard_bone": {
+        "name": "Кость авангарда"
+      },
       "mire_prowler_pelt": {
         "name": "Шкура болотного хищника"
       },
@@ -10044,6 +10169,9 @@ export const ru_RU: EnTranslations = {
       "reins_terrorspark_groundshaker": {
         "name": "Ключ зажигания Страхоискра"
       },
+      "reins_drakemaw_raptor": {
+        "name": "Поводья раптора Дрейкмо"
+      },
       "conjured_water4": {
         "name": "Сотворённая родниковая вода"
       },
@@ -11039,6 +11167,21 @@ export const ru_RU: EnTranslations = {
       "spider_egg_sac": {
         "name": "Паучий Яйцевой Кокон"
       },
+      "spider_egg": {
+        "name": "Яйцо Матки выводка"
+      },
+      "widow_hatchling": {
+        "name": "Детеныш вдовы"
+      },
+      "drowned_warlord": {
+        "name": "Утопший военачальник"
+      },
+      "brakka_wallbreaker": {
+        "name": "Бракка Стенолом"
+      },
+      "threnos_first_voice": {
+        "name": "Тренос Первый Голос"
+      },
       "grave_silt_bulwark": {
         "name": "Могильно-илистый Бастион"
       },
@@ -11218,6 +11361,18 @@ export const ru_RU: EnTranslations = {
       },
       "cindraleth_maw_matriarch": {
         "name": "Синдралет, Матриарх Дрейкмо"
+      },
+      "dragonkin_egg": {
+        "name": "Яйцо драконида"
+      },
+      "dragonkin_whelp": {
+        "name": "Драконид-детёныш"
+      },
+      "dragonkin_broodguard": {
+        "name": "Выводковый страж драконидов"
+      },
+      "drakemaw_broodlord": {
+        "name": "Выводковый лорд Дрейкмо"
       },
       "gilded_stag": {
         "name": "Золочёный олень"
@@ -12284,7 +12439,7 @@ export const ru_RU: EnTranslations = {
       },
       "q_no_rest": {
         "title": "Нет покоя в камышах",
-        "text": "Этот обряд поднимает утопших всюду, где топь их коснется. Мы еще не можем разрушить его, но можем лишить хозяев 14 солдат.",
+        "text": "Этот обряд на курильницах поднимает утопших, а теперь он поднял того, кто способен их возглавить. Смотрители зовут его Утопшим военачальником, и, пока он держит Затонувшую часовню, мертвецы не покидают строя. Сразите его, {playerName}, и остальные разбегутся обратно в топь.",
         "completion": "Вы дали мертвым больше милости, чем их господа. Возьмите это.",
         "objectives": {
           "0": {
@@ -12562,9 +12717,6 @@ export const ru_RU: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Фанатик Культа Вирма: убито"
-          },
-          "1": {
-            "label": "Приказы Культа Вирма"
           }
         }
       },
@@ -12575,9 +12727,6 @@ export const ru_RU: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Некромант Культа Вирма: убито"
-          },
-          "1": {
-            "label": "Ритуальная филактерия"
           }
         }
       },

@@ -65,11 +65,12 @@ function engage(boss: Entity, tank: Entity) {
   boss.threat.set(tank.id, 1000);
 }
 
-function collect(sim: Sim, seconds: number): TimedEvent[] {
+function collect(sim: Sim, seconds: number, watch?: (at: number) => void): TimedEvent[] {
   const rows: TimedEvent[] = [];
   for (let i = 0; i < seconds * 20; i++) {
     const at = (sim as unknown as { time: number }).time;
     for (const event of sim.tick()) rows.push({ at, event });
+    watch?.(at);
   }
   return rows;
 }
@@ -82,6 +83,20 @@ function gravebreakerHits(rows: TimedEvent[], bossId: number): TimedEvent[] {
       row.event.ability === 'Gravebreaker' &&
       row.event.kind === 'hit',
   );
+}
+
+// Every tick on which a boss melee swing LANDED: the only ticks a charge can
+// release on.
+function landedSwingTimes(rows: TimedEvent[], bossId: number): number[] {
+  return rows
+    .filter(
+      (row) =>
+        isDamage(row.event) &&
+        row.event.sourceId === bossId &&
+        row.event.ability === null &&
+        row.event.kind === 'hit',
+    )
+    .map((row) => row.at);
 }
 
 // Hand-initialized state that isolates Gravebreaker: intro done, every other
@@ -137,10 +152,14 @@ describe('Nythraxis Gravebreaker as a charged auto-attack', () => {
   });
 
   it('releases on a landed swing: splash on the front bystander only, same tick, 1.5x, charge consumed', () => {
-    // Seed hunted (post-merge camp order) so no avoided swing delays a
-    // release inside the 45s window: a held charge compresses the next
-    // release gap below the >=9s cadence floor. Spares: 3, 5.
-    const sim = makeWorld(1);
+    // No seed hunt: nothing below rides the tank's hit-table luck. The release
+    // schedule is asserted against the ARM beat plus the swings this run
+    // actually landed, so any seed satisfies it (verified over seeds 1 to 16
+    // and 42 on both v0.34.0 merge parents and on the merge). This supersedes
+    // the hunted seed this branch carried: a seed-independent assertion needs no
+    // re-hunt when a content merge shifts the shared rng stream, which is
+    // exactly what kept re-breaking it.
+    const sim = makeWorld();
     const tankPid = sim.addPlayer('warrior', 'Tank');
     const origin = enterRaid(sim, tankPid);
     const tank = sim.entities.get(tankPid)!;
@@ -164,7 +183,18 @@ describe('Nythraxis Gravebreaker as a charged auto-attack', () => {
     boss.prevFacing = boss.facing;
     engage(boss, tank);
 
-    const rows = collect(sim, 45);
+    // The 12s cadence only ARMS the charge; the release is a separate,
+    // swing-quantized event. Record every arm (the tick the cadence timer
+    // rewinds) so each release can be checked against its OWN charge instead of
+    // against the previous release. Watching the timer rather than the charged
+    // flag catches an arm even on a tick that also releases it.
+    const armTimes: number[] = [];
+    let prevTimer = Number.POSITIVE_INFINITY;
+    const rows = collect(sim, 45, (at) => {
+      const timer = boss.nythraxis!.gravebreakerTimer;
+      if (timer > prevTimer) armTimes.push(at);
+      prevTimer = timer;
+    });
     const splashes = gravebreakerHits(rows, boss.id);
     expect(splashes.length).toBeGreaterThanOrEqual(2);
 
@@ -196,12 +226,39 @@ describe('Nythraxis Gravebreaker as a charged auto-attack', () => {
       expect(splash.amount / swing.amount).toBeCloseTo(swing.crit ? 0.75 : 1.5, 1);
     }
 
-    // Consumed on release: consecutive releases are a full cadence apart
-    // (12s timer, quantized to the next landed swing), never back to back.
+    // Consumed on release, and quantized FORWARD ONLY. The cadence lives on the
+    // ARM beat: a full 12s apart, every time.
+    //
+    // Wall-clock gaps BETWEEN RELEASES are deliberately not asserted, because
+    // they are not the cadence. The timer keeps its own 12s beat while a charge
+    // waits for a swing, so every avoided swing that delays release N shortens
+    // the N to N+1 gap by one 2.65s swing interval. Measured over a 45s window
+    // (arms at 3/15/27/39): release gaps 10.6/13.25/10.6 with nothing avoided,
+    // 7.95 after one dodge inside a charged window, 5.3 after two. That spread
+    // is not new and is not this branch's: sweeping seeds 1 to 16, the old >=9s
+    // floor already failed on the pre-merge head (seeds 10, 11, 16), on the
+    // release parent (seed 6) and on the merge (seeds 1, 11). It only ever
+    // pinned the tank's dodge luck rather than the mechanic, and passed because
+    // the hunted seed happened to avoid nothing while charged. The release
+    // schedule is pinned exactly instead, against the arm beat.
     const fireTimes = [...new Set(splashes.map((row) => row.at))];
-    for (let i = 1; i < fireTimes.length; i++) {
-      expect(fireTimes[i] - fireTimes[i - 1]).toBeGreaterThanOrEqual(9);
+    expect(armTimes.length).toBeGreaterThanOrEqual(2);
+    for (let i = 1; i < armTimes.length; i++) {
+      expect(armTimes[i] - armTimes[i - 1], 'arm cadence').toBeCloseTo(12, 5);
     }
+    // One arm, one release, on the FIRST swing that lands at or after it: never
+    // early (no free-standing cast), never two releases off one charge, never a
+    // landed swing skipped while charged, and never an extra release the cadence
+    // did not pay for. Independent of which swings the hit table avoided.
+    const landed = landedSwingTimes(rows, boss.id);
+    const expectedFires = armTimes
+      .map((arm) => landed.find((at) => at >= arm))
+      .filter((at): at is number => at !== undefined);
+    expect(fireTimes).toEqual(expectedFires);
+    // fireTimes dedups by tick, so the row count is what actually rules out two
+    // releases off one charge: exactly one bystander is eligible, so one splash
+    // ROW per release, not merely one tick per release.
+    expect(splashes).toHaveLength(expectedFires.length);
     expect(origin).toBeTruthy();
   });
 

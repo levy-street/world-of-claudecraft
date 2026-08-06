@@ -1,6 +1,7 @@
 import { audio } from '../game/audio';
 import { corpseLootAvailability, localPartyMemberIds } from '../game/corpse_loot_availability';
 import type { GamepadKind } from '../game/gamepad_map';
+import type { GraphicsSettingsSnapshot } from '../game/graphics_rebuild_core';
 import { InstanceMusicController } from '../game/instance_music';
 import { type Keybinds, keyCapLabel, keyLabel } from '../game/keybinds';
 import { music } from '../game/music';
@@ -175,6 +176,7 @@ import {
   mobVoiceActionForDamage,
   mobVoiceCue,
   mobVoiceCueWithFallback,
+  novaAbilityCue,
   playerSwingCueForDamage,
   shouldPlayCombatImpactForTarget,
   shouldPlayCritSfxForTarget,
@@ -184,6 +186,7 @@ import {
 import { type CardinalId, compassView } from './compass';
 import { ContinentMapPainter } from './continent_map_painter';
 import { type ContinentZoneRegion, continentZoneAt } from './continent_map_view';
+import { cookingCatchHintKey } from './cooking_catch_hint_view';
 import { formatMinimapCoords } from './coords';
 import {
   buildCraftCelebrationPlan,
@@ -192,13 +195,19 @@ import {
   observeCraftSkillsForTierUps,
 } from './craft_celebration_view';
 import { parseCraftingTab, serializeCraftingTab } from './crafting_tab_pref';
-import { buildCraftingView, craftingReagentSig, craftLearnHints } from './crafting_view';
+import {
+  buildCraftingView,
+  craftingReagentSig,
+  craftLearnHints,
+  craftOwnsTab,
+} from './crafting_view';
 import { renderCraftingWindow, stationNameText } from './crafting_window';
 import { shouldRefreshDailyRewardsLauncher } from './daily_rewards_launcher_core';
 import { DailyRewardsWindow } from './daily_rewards_window';
+import { deathRecapFeedback } from './death_recap_feedback';
 import { decorativeArtImg } from './decorative_art';
 import {
-  deedBroadcastLine,
+  deedBroadcastRendered,
   deedName,
   deedTitleText,
   type TitledNameDecoration,
@@ -264,6 +273,7 @@ import {
   grantQtyText,
   harvestLineKey,
 } from './grant_line_view';
+import { decideGuildMotdLine } from './guild_motd_login';
 import {
   healLandingFloatTextKey,
   healLandingLogKey,
@@ -293,6 +303,7 @@ import {
   captureActionBarLayout,
   planActionBarRestore,
 } from './hud/action_bar/action_bar_layout_sync';
+import { isActionBarEditAllowed } from './hud/action_bar/action_bar_lock';
 import { ActionBarPainter, type ActionBarSlotElements } from './hud/action_bar/action_bar_painter';
 import {
   ABILITY_ICON_PREFIX,
@@ -359,6 +370,7 @@ import {
 } from './hud/chat/chat_line';
 import { type ChatClock, clampChatClock, formatChatTimestamp } from './hud/chat/chat_timestamp';
 import { ChatWindowController } from './hud/chat/chat_window_controller';
+import { DEED_NAME_TOKEN, deedChatLinkEl, deedLineNodes } from './hud/chat/deed_chat_line';
 import { SkinEventController } from './hud/cosmetics/skin_event_controller';
 import { DelveBoardController } from './hud/delve/delve_board_controller';
 import { DelveMapPainter } from './hud/delve/delve_map_painter';
@@ -419,6 +431,7 @@ import {
   itemStatName,
 } from './item_instance_tooltip';
 import { itemKindLabel, itemQualityLabel } from './item_kind_label';
+import { itemNameColor } from './item_name_color';
 import { itemSetMemberCounts, itemSetTooltipModel } from './item_set_tooltip_view';
 import { itemSlotLabel as itemSlotName } from './item_slot_labels';
 import { knownItemDef, ownEntry } from './known_item';
@@ -432,7 +445,11 @@ import { MailboxWindow } from './mailbox_window';
 import { onMapArtReady } from './map_art';
 import { bakedMapBgEligible, loadBakedMapBg } from './map_bg';
 import { bindMapPinchZoom, finishMapTap, mapTapReleaseFromPointer } from './map_pinch_zoom';
-import { MAP_TAP_MOVE_TOLERANCE_PX, nextMapZoom } from './map_pinch_zoom_core';
+import {
+  MAP_TAP_MOVE_TOLERANCE_PX,
+  nextMapZoom,
+  zoomOutExitsZoneLevel,
+} from './map_pinch_zoom_core';
 import {
   type MapRegion,
   mapCanvasHeight,
@@ -452,6 +469,7 @@ import {
 import { marketCollectIndicatorView } from './market_view';
 import { MarketWindow } from './market_window';
 import { materialHintLine } from './material_hint_view';
+import { materialProfessionHintText } from './material_profession_hint_view';
 import { Meters } from './meters';
 import { minimapMode } from './minimap_markers';
 import { MINIMAP_SIZE, MinimapPainter } from './minimap_painter';
@@ -513,7 +531,7 @@ import {
   procOverlayState,
 } from './proc_overlay_view';
 import { maskProfanity } from './profanity';
-import { MASTERWORK_SEAL_IMAGE_URL } from './profession_art';
+import { MASTERWORK_SEAL_IMAGE_URL, professionImageUrl } from './profession_art';
 import { type ProfessionEventInput, planProfessionEvent } from './profession_event_lines_core';
 import {
   buildProfessionIdentityView,
@@ -522,6 +540,12 @@ import {
 import { buildProfessionTutorialModel } from './profession_tutorial_view';
 import { renderProfessionTutorial } from './profession_tutorial_window';
 import { ProfessionsWindow } from './professions_window';
+import {
+  QUEST_ITEM_TOOLTIP_COLOR,
+  type QuestItemTooltipModel,
+  questItemTooltipModel,
+  questItemTooltipRelatedKey,
+} from './quest_item_tooltip_view';
 import { questMarkerTooltipTag } from './quest_marker_tags';
 import { questProgressEventText } from './quest_progress_text';
 import { lockoutParts, lockoutShape } from './raid_lockout';
@@ -531,6 +555,12 @@ import { isTalentRowUnlockLevel } from './row_unlock_toast';
 import { localizeServerText } from './server_i18n';
 import { localizeSimText } from './sim_i18n';
 import { openSimpleMenu } from './simple_context_menu';
+import {
+  advanceSkillLevelObservation,
+  buildSkillLevelCelebrationPlan,
+  type SkillLevelUp,
+  skillLevelArtId,
+} from './skill_level_toast_view';
 import { SocialWindow } from './social_window';
 import { SpellbookWindow } from './spellbook_window';
 import { stanceBarView, WARRIOR_STANCE_GROUP } from './stance_bar_view';
@@ -562,6 +592,8 @@ import { targetPortraitUrl } from './target_portrait_view';
 import { targetRankView, targetUsesEliteFrame } from './target_rank_view';
 import type { PresetId, ThemeKnob, ThemeState } from './theme';
 import { toolEffectNameKey } from './tool_effect_name';
+import { toolEffectTooltipLines } from './tool_effect_tooltip';
+import { createTooltipLine } from './tooltip_line';
 import { SharedTooltipOwner } from './tooltip_owner';
 import { TOOLTIP_PEEK_MS, TouchPeekGuard } from './touch_peek';
 import { bindTouchDoubleTap, bindTouchTap, CLICK_SUPPRESS_MS, TAP_SLOP_PX } from './touch_tap';
@@ -622,6 +654,10 @@ export interface OptionsHooks {
   captureKey(cb: ((code: string | null) => void) | null): void;
   settings: Settings;
   onSettingChange(key: keyof GameSettings, value: GameSettings[keyof GameSettings]): void;
+  /** Current renderer-bound profile. Options clones this into a disposable local draft. */
+  graphicsApplied(): GraphicsSettingsSnapshot;
+  /** Apply one complete six-setting draft. The window owns localized progress/results. */
+  applyGraphics(draft: GraphicsSettingsSnapshot): Promise<GraphicsApplyOutcome>;
   // Switch the active locale at runtime (loads the locale chunk, relocalizes the page,
   // fans out woc:languagechange). onStatus receives localized progress/error text for an
   // aria-live element. Resolves false if the locale failed to load (active locale kept).
@@ -648,6 +684,8 @@ export interface OptionsHooks {
   // without the HUD importing the manager.
   gamepad: GamepadBindingsHooks;
 }
+
+export type GraphicsApplyOutcome = 'applied' | 'saved' | 'failed' | 'fatal';
 
 export interface ThemeHooks {
   get(): ThemeState;
@@ -926,8 +964,10 @@ const PET_MODE_DESC_KEYS: Record<PetMode, TranslationKey> = {
  *  crossing, craft masterwork, duel result). 'deed' is the Book of Deeds
  *  plate: a framed, quieter parchment treatment, because a deed accomplishment
  *  firing an identical gold banner to a real level-up is a known cause of
- *  players reading routine gathering progress as leveling. */
-export type BannerVariant = 'default' | 'deed';
+ *  players reading routine gathering progress as leveling. 'skill' is the
+ *  gathering skill milestone plate: copper craft framing with the profession
+ *  crest, so a Mining 50 plate can never steal the character level-up reading. */
+export type BannerVariant = 'default' | 'deed' | 'skill';
 
 /** Everything one banner paint needs, held whole so a queued banner (R38)
  *  renders later exactly as it would have rendered immediately. */
@@ -1483,6 +1523,13 @@ export class Hud {
   // Drains left in the post-craftResult window during which the tier-up diff
   // runs (0 = disarmed; see the handleEvents tail).
   private craftTierUpDrains = 0;
+  // Profession skill level-up snapshots (craft + gathering): the last SYNCED
+  // observation handleEvents diffs for floored integer skill climbs. null
+  // until the first synced observation (silent login/join baseline). Separate
+  // from the tier-up snapshot so a fractional craft skill carry never desyncs
+  // either consumer, and so gathering proficiency has its own baseline.
+  private prevCraftSkillLevels: Record<string, number> | null = null;
+  private prevGatheringSkillLevels: Record<string, number> | null = null;
   // Signature of the in-range station-type set as of the last crafting-window
   // paint (stations.ts stationTypesSignature): the slow band compares the live
   // set against this to keep an OPEN window fresh without per-frame repaints
@@ -1674,6 +1721,7 @@ export class Hud {
   private targetTitleDecoration: TitledNameDecoration = { pre: '', post: '' };
   private charPreview: CharacterPreview | null = null;
   private charPreviewCanvas: HTMLCanvasElement | null = null;
+  private restoreCharPreviewAfterGraphicsRebuild = false;
   private readonly skinEvent: SkinEventController;
   // Pending lazy-load of the mech GLB + chromas; the reveal waits on it.
   private mechAssetsPromise: Promise<void> | null = null;
@@ -1705,6 +1753,9 @@ export class Hud {
   // Ravenpost envelope indicator (slow-band, value-diffed; see updateMailIndicator).
   private mailIndicatorEl: HTMLElement | null = null;
   private lastMailUnread = -1;
+  // Last guild billboard text echoed to the chat log (slow-band, value-diffed;
+  // see decideGuildMotdLine). Survives linkdead resume, so no re-show there.
+  private lastShownGuildMotd: string | null = null;
   // World Market collect indicator (slow-band, value-diffed; see updateMarketIndicator).
   private marketIndicatorEl: HTMLElement | null = null;
   private lastMarketCollectPending: boolean | null = null;
@@ -1904,6 +1955,7 @@ export class Hud {
       openHeroicVendor: (npcId, opener) => this.openHeroicVendor(npcId, opener),
       openTrain: (npcId) => this.openTrain(npcId),
       openUnbind: (npcId) => this.openUnbind(npcId),
+      openCrafting: (craftId) => this.openCrafting(craftId),
       openMarket: () => this.openMarket(),
       openDelveBoard: (npcId) => this.openDelveBoard(npcId),
       openValeCup: () => this.toggleValeCup(),
@@ -4129,6 +4181,8 @@ export class Hud {
     isMarketSell: () => this.marketWindow.isSellTab,
     isMailAttach: () => this.mailboxWindow.isSendTab,
     isBankOpen: () => this.bankWindow.isOpen,
+    isPersonalBankTab: () => this.bankWindow.personalTabActive,
+    isGuildBankTab: () => this.bankWindow.guildTabActive,
     pendingPetFeed: () => this.pendingPetFeed,
     closeVendor: () => this.closeVendor(),
     closeBank: () => this.closeBank(),
@@ -4210,6 +4264,8 @@ export class Hud {
         this.renderBags();
       }
     },
+    confirmDialog: (title, body, okText, cancelText, onOk) =>
+      this.confirmDialog(title, body, okText, cancelText, onOk),
   });
   // Ravenpost mailbox window painter (mailbox_view.ts core + mailbox_window.ts
   // painter). It owns the mailbox view-state (tab, opened letter, staged
@@ -5014,9 +5070,15 @@ export class Hud {
   // sizing onto one of these. Returns the measured author-space box size so the
   // caller can cache it (attachTooltip's mousemove clamp reuses it instead of
   // re-reading offsetWidth/Height, which would force a reflow per mousemove).
-  private paintTooltipAt(html: string, x: number, y: number): { w: number; h: number } {
+  // Accepts a legacy HTML string or a prebuilt Node / DocumentFragment so
+  // createElement painters can mount without forcing every caller onto strings.
+  private paintTooltipAt(content: string | Node, x: number, y: number): { w: number; h: number } {
     this.tooltipEl.classList.remove('mob-tooltip');
-    this.tooltipEl.innerHTML = html;
+    if (typeof content === 'string') {
+      this.tooltipEl.innerHTML = content;
+    } else {
+      this.tooltipEl.replaceChildren(content);
+    }
     this.tooltipEl.style.display = 'block';
     // offsetWidth/Height are author-space (zoom-immune) layout sizes, but x/y
     // arrive in visual (zoomed) space, so map x/y into author space (÷ scale)
@@ -5138,21 +5200,35 @@ export class Hud {
   // fungible stacks and def-only surfaces (the crafting window's result rows),
   // so those render exactly as before.
   private itemTooltip(item: ItemDef, compare = true, instance?: ItemInstancePayload): string {
-    const qColor = QUALITY_COLOR[item.quality ?? 'common'] ?? '#fff';
+    // Quest items are a purpose class, not a quality tier: title and kind use
+    // quest gold, and the kind line is "Quest Item" alone (never "Common Quest
+    // Item"). Story lines (related quest, progress, rules, orphaned) come from
+    // the pure model; escape and tEntity stay in this host.
+    const questModel = this.questItemTooltipFor(item);
+    // Shared helper: quest kind paints quest gold; all other kinds use quality.
+    const qColor = itemNameColor(item);
     let html = `<div class="tt-title" style="color:${qColor}">${esc(itemDisplayName(item))}</div>`;
     // Quality/kind line, e.g. "Epic Armor". Heroic items (dungeon upgraded variants
     // via heroicOf, bespoke heroic-tier raid gear via heroic) append a gold
     // "[HEROIC]" tag here (never in the name) so the drop reads "Epic Armor [HEROIC]".
-    let qualityKindHtml = esc(
-      t('itemUi.tooltip.qualityKind', {
-        quality: itemQualityLabel(item.quality),
-        kind: itemKindLabel(item.kind, item.id),
-      }),
-    );
-    if (item.heroicOf || item.heroic) {
-      qualityKindHtml += ` <span style="color:#e5cc80">${esc(t('hudChrome.itemHeroicTag'))}</span>`;
+    // Quest kinds skip the quality half so the line is a single quest-gold
+    // "Quest Item" (no redundant Common + second Quest Item desc).
+    if (questModel && !questModel.showQuality) {
+      html += `<div class="tt-sub" style="color:${QUEST_ITEM_TOOLTIP_COLOR}">${esc(
+        t(questModel.kindLineKey),
+      )}</div>`;
+    } else {
+      let qualityKindHtml = esc(
+        t('itemUi.tooltip.qualityKind', {
+          quality: itemQualityLabel(item.quality),
+          kind: itemKindLabel(item.kind, item.id),
+        }),
+      );
+      if (item.heroicOf || item.heroic) {
+        qualityKindHtml += ` <span style="color:#e5cc80">${esc(t('hudChrome.itemHeroicTag'))}</span>`;
+      }
+      html += `<div class="tt-sub">${qualityKindHtml}</div>`;
     }
-    html += `<div class="tt-sub">${qualityKindHtml}</div>`;
     // Weapon type (Sword/Dagger/Mace/...) as its own plain line under the
     // quality/kind line and above the slot/handedness line, classic-style, so a
     // player can tell a dagger from a sword at a glance (rogues need daggers). It
@@ -5291,16 +5367,37 @@ export class Hud {
     // pole render their kind, requirement, use, and bonus lines from the
     // pure sibling module (the item_instance_tooltip.ts pattern).
     html += gatherToolTooltipLines(item);
+    // Tool-effect charms (Gatherer's Cache / Artisan's Eye): what the charm
+    // does, how to slot it from Professions, and the charge ladder. Bags,
+    // bank, crafting, and market all compose this through itemTooltip.
+    html += toolEffectTooltipLines(item);
     // Purpose hint for the eight enchanting materials (material_hint_view.ts
     // keys the table by item id): what the reagent is for and which gear
     // disenchants into it. Every other item id renders nothing here.
     html += materialHintLine(item.id);
+    // Raw cooking catches: pure key table + createElement line (no foodHp /
+    // restore-health line; no materialHintLine HTML growth). outerHTML bridges
+    // the node into the legacy string tooltip stack.
+    const cookingHintKey = cookingCatchHintKey(item.id);
+    if (cookingHintKey) {
+      html += createTooltipLine(t(cookingHintKey), 'tt-desc').outerHTML;
+    }
+    // Profession affinity for honest materials (material_profession_hint_view.ts):
+    // "Used by Leatherworking, ..." derived from live recipe/enchant consumers.
+    // Skips when a more specific purpose line above already covers a single
+    // craft. Painted like the cooking hint (createElement, no HTML-string
+    // growth); the tt-material-use modifier carries the theme-emitted tint.
+    const materialUseText = materialProfessionHintText(item.id);
+    if (materialUseText) {
+      html += createTooltipLine(materialUseText, 'tt-desc', 'tt-material-use').outerHTML;
+    }
     if (item.potionHp)
       html += `<div class="tt-desc">${esc(t('itemUi.tooltip.useHealingPotion', { amount: itemNumber(item.potionHp) }))}</div>`;
     if (item.potionMana)
       html += `<div class="tt-desc">${esc(t('itemUi.tooltip.useManaPotion', { amount: itemNumber(item.potionMana) }))}</div>`;
-    if (item.kind === 'quest')
-      html += `<div class="tt-desc">${esc(t('itemUi.tooltip.questItem'))}</div>`;
+    // Quest story block (related quest, progress, rules, orphaned). Replaces the
+    // old plain "Quest Item" desc that doubled the kind line.
+    if (questModel) html += this.questItemTooltipStoryHtml(questModel);
     if (item.kind === 'bag' && item.bagSlots)
       html += `<div class="tt-stat">${esc(t('itemUi.tooltip.bagSlots', { slots: itemNumber(item.bagSlots) }))}</div>`;
     // Collectible mount reins: the mount's flavor, speed, and item-use hint.
@@ -5525,6 +5622,56 @@ export class Hud {
     });
   }
 
+  /** Pure quest-item tooltip model for one def, or null for non-quest kinds. */
+  private questItemTooltipFor(item: ItemDef): QuestItemTooltipModel | null {
+    if (item.kind !== 'quest') return null;
+    const questId = item.questId;
+    const quest = questId ? QUESTS[questId] : undefined;
+    const log = questId ? this.sim.questLog.get(questId) : undefined;
+    return questItemTooltipModel({
+      kind: item.kind,
+      itemId: item.id,
+      questId,
+      questKnown: !!quest,
+      log: log
+        ? {
+            counts: log.counts,
+            state: log.state,
+            resolvedCounts: log.resolvedCounts,
+          }
+        : null,
+      objectives: quest?.objectives.map((objective) => ({
+        type: objective.type,
+        itemId: 'itemId' in objective ? objective.itemId : undefined,
+        count: objective.count,
+      })),
+    });
+  }
+
+  /** Story lines under the quest kind row: related quest, progress, rules, orphaned. */
+  private questItemTooltipStoryHtml(model: QuestItemTooltipModel): string {
+    let html = '';
+    if (model.relatedQuestId) {
+      html += `<div class="tt-sub" style="color:${QUEST_ITEM_TOOLTIP_COLOR}">${esc(
+        t(questItemTooltipRelatedKey(), { quest: questTitle(model.relatedQuestId) }),
+      )}</div>`;
+    }
+    if (model.progress && model.relatedQuestId) {
+      html += `<div class="tt-sub">${esc(
+        this.questProgressText(
+          questObjectiveLabel(model.relatedQuestId, model.progress.objectiveIndex),
+          model.progress.current,
+          model.progress.required,
+        ),
+      )}</div>`;
+    }
+    html += `<div class="tt-desc">${esc(t(model.rulesKey))}</div>`;
+    if (model.orphaned) {
+      html += `<div class="tt-desc">${esc(t(model.orphanedKey))}</div>`;
+    }
+    return html;
+  }
+
   private questSuggestedPlayersHtml(count?: number): string {
     if (!count) return '';
     return ` <span class="quest-suggested">${esc(t('questUi.log.suggestedPlayers', { count: this.questNumber(count) }))}</span>`;
@@ -5581,14 +5728,7 @@ export class Hud {
     this.targetAurasWindow.relocalize();
     if (this.questlogWindow.isOpen) this.questlogWindow.render();
     if ($('#bags').style.display !== 'none') this.renderBags();
-    if (this.openVendorNpcId !== null && $('#vendor-window').style.display === 'block')
-      this.renderVendor();
-    if (this.openHeroicVendorNpcId !== null && $('#vendor-window').style.display === 'block')
-      this.renderHeroicVendor();
-    if (this.openTrainNpcId !== null && $('#train-window').style.display === 'block')
-      this.renderTrain();
-    if (this.openUnbindNpcId !== null && $('#unbind-window').style.display === 'block')
-      this.renderUnbind();
+    this.repaintOpenServiceWindows();
     // The Town Focus signature is text-independent (the allocation, the budget
     // and the in-town flag), so a language switch alone never moves it and the
     // slow-band probe would leave the panel in the old locale until the player
@@ -6305,6 +6445,10 @@ export class Hud {
     return true;
   }
 
+  private actionBarsLocked(): boolean {
+    return Boolean(this.optionsHooks?.settings.get('lockActionBars'));
+  }
+
   private buildActionBar(): void {
     const bar = $('#actionbar');
     const bar2 = $('#actionbar2');
@@ -6397,6 +6541,7 @@ export class Hud {
         // slot 0 (Attack) stays fixed
         btn.draggable = true;
         const clearSlot = () => {
+          if (!isActionBarEditAllowed(this.actionBarsLocked(), 'clear')) return;
           this.hotbarActions = clearHotbarSlot(this.hotbarActions, slot - 1);
           this.saveSlotMap();
           btn.classList.add('empty');
@@ -6410,6 +6555,10 @@ export class Hud {
           handleShiftClearKeydown(e, clearSlot);
         });
         btn.addEventListener('dragstart', (e) => {
+          if (!isActionBarEditAllowed(this.actionBarsLocked(), 'drag')) {
+            e.preventDefault();
+            return;
+          }
           const action = this.actionForSlot(slot);
           if (!action) {
             e.preventDefault();
@@ -6421,6 +6570,7 @@ export class Hud {
           this.hideTooltip();
         });
         btn.addEventListener('dragover', (e) => {
+          if (!isActionBarEditAllowed(this.actionBarsLocked(), 'drop')) return;
           if (this.tryAcceptAttackDrag(e, btn, slot, 'over')) return;
           const dragged = this.dragAction?.action ?? this.readDraggedAction(e.dataTransfer);
           if (!dragged) return;
@@ -6438,6 +6588,7 @@ export class Hud {
         });
         btn.addEventListener('dragleave', () => btn.classList.remove('drop-target'));
         btn.addEventListener('drop', (e) => {
+          if (!isActionBarEditAllowed(this.actionBarsLocked(), 'drop')) return;
           if (this.tryAcceptAttackDrag(e, btn, slot, 'drop')) return;
           e.preventDefault();
           btn.classList.remove('drop-target');
@@ -6482,12 +6633,14 @@ export class Hud {
         // for a normal action. The Options toggle restores Attack at any time.
         btn.draggable = true;
         const clearAttackSlotAction = () => {
+          if (!isActionBarEditAllowed(this.actionBarsLocked(), 'clear')) return;
           if (this.attackSlotAction === null) return;
           this.attackSlotAction = null;
           this.saveAttackSlotAction();
           this.hideTooltip();
         };
         btn.addEventListener('contextmenu', (e) => {
+          if (!isActionBarEditAllowed(this.actionBarsLocked(), 'clear')) return;
           if (this.attackSlotIsAttack()) {
             e.preventDefault();
             this.optionsHooks?.settings.set('showAttackButton', false);
@@ -6501,6 +6654,10 @@ export class Hud {
           handleShiftClearKeydown(e, clearAttackSlotAction);
         });
         btn.addEventListener('dragstart', (e) => {
+          if (!isActionBarEditAllowed(this.actionBarsLocked(), 'drag')) {
+            e.preventDefault();
+            return;
+          }
           const action = this.actionForSlot(0);
           if (!action) {
             e.preventDefault();
@@ -6513,6 +6670,7 @@ export class Hud {
         });
         // With Attack removed, the freed slot accepts a drag like any other slot.
         btn.addEventListener('dragover', (e) => {
+          if (!isActionBarEditAllowed(this.actionBarsLocked(), 'drop')) return;
           if (this.tryAcceptAttackDrag(e, btn, slot, 'over')) return;
           if (this.attackSlotIsAttack()) return;
           if (this.dragAction?.sourceAttackSlot) return;
@@ -6524,6 +6682,7 @@ export class Hud {
         });
         btn.addEventListener('dragleave', () => btn.classList.remove('drop-target'));
         btn.addEventListener('drop', (e) => {
+          if (!isActionBarEditAllowed(this.actionBarsLocked(), 'drop')) return;
           if (this.tryAcceptAttackDrag(e, btn, slot, 'drop')) return;
           e.preventDefault();
           btn.classList.remove('drop-target');
@@ -6954,6 +7113,7 @@ export class Hud {
 
   private bindMobileActionDrag(btn: HTMLButtonElement, slot: number): void {
     btn.addEventListener('pointerdown', (e) => {
+      if (!isActionBarEditAllowed(this.actionBarsLocked(), 'drag')) return;
       if (!document.body.classList.contains('mobile-touch') || e.pointerType !== 'touch') return;
       if (this.empoweredAbilityIdForSlot(slot)) return;
       // Any populated slot (ability or item) can be picked up and swapped by
@@ -7047,6 +7207,7 @@ export class Hud {
   // position's underlying bar slot depends on the current paged page.
   private bindMobileRingDrag(btn: HTMLButtonElement, ringIndex: number): void {
     btn.addEventListener('pointerdown', (e) => {
+      if (!isActionBarEditAllowed(this.actionBarsLocked(), 'drag')) return;
       if (!document.body.classList.contains('mobile-touch') || e.pointerType !== 'touch') return;
       const sourceSlot = this.mobileSourceSlotForButton(ringIndex);
       if (this.empoweredAbilityIdForSlot(sourceSlot)) return;
@@ -8565,6 +8726,7 @@ export class Hud {
     // Social repaints only on the slow divider, behind the painter's struct/content
     // diff-gate; a content tick swaps the body innerHTML without re-wiring rows.
     if (slowHud) this.socialWindow.refreshIfChanged();
+    if (slowHud) this.updateGuildBillboardEcho();
     if (slowHud && this.marketWindow.isOpen) {
       if (!this.nearbyMarketNpc()) this.marketWindow.close();
       else this.marketWindow.refreshIfChanged();
@@ -8607,6 +8769,36 @@ export class Hud {
       ev.stopPropagation();
       this.openMailbox();
     });
+  }
+
+  // Guild billboard echo into the chat log: latched on the MOTD VALUE (not on
+  // social-frame arrival), so it fires once at login and once per mid-session
+  // text change, and never on unrelated social snapshot re-pushes. The MOTD text
+  // is player-authored: spliced into the template untranslated, but run through
+  // the same profanity mask as every other player-authored body in this pane
+  // (guild chat masks, so the echo one line below it must too; the chat-bubble
+  // path is the whole-string precedent). The latch keys on the RAW text, so
+  // toggling the filter mid-session never re-triggers the line. Tagged to the
+  // guild channel so the Guild filter tab shows it and the color derives from
+  // the channel's single source of truth.
+  private updateGuildBillboardEcho(): void {
+    const motdLine = decideGuildMotdLine(this.lastShownGuildMotd, this.sim.socialInfo);
+    this.lastShownGuildMotd = motdLine.nextShown;
+    if (motdLine.emit !== null) {
+      // plainText: the billboard's home rendering (social_window.ts) is
+      // esc()'d plain text, so the echo must not linkify [[i:...]] tokens
+      // from guild-controlled text into trusted clickable item links; the
+      // line renders verbatim, exactly as the billboard panel shows it.
+      this.appendLog(
+        this.chatLogEl,
+        t('hudChrome.social.billboard.loginLine', { text: this.maskChat(motdLine.emit) }),
+        chatChannelColor('guild'),
+        true,
+        'guild',
+        undefined,
+        true,
+      );
+    }
   }
 
   // The envelope indicator by the minimap: visible while unread letters wait.
@@ -9613,6 +9805,17 @@ export class Hud {
 
   // scroll-wheel / button zoom for the world map (clamped to [1, MAP_MAX_ZOOM])
   private zoomMap(factor: number): void {
+    // One more zoom-out at the zone map's full extent leaves the zone and opens
+    // the continent overview (the level toggle's other half), instead of clamping
+    // at the minimum and doing nothing. A delve has no overview to go to.
+    if (
+      this.mapLevel === 'zone' &&
+      zoomOutExitsZoneLevel(this.mapZoom, factor) &&
+      mapWindowMode(this.sim) !== 'delve'
+    ) {
+      this.setMapLevel('continent');
+      return;
+    }
     const prev = this.mapZoom;
     this.mapZoom = nextMapZoom(this.mapZoom, factor);
     // zooming back to 1 resumes following the player; a fresh zoom-in from the
@@ -9972,6 +10175,14 @@ export class Hud {
         // on the same floor, so the player's own y is the right height anchor.
         if (ev.fx !== 'nova') return;
         const y = sim.player.pos.y;
+        // A per-ability nova recording (Flamestrike) is the whole read on the
+        // aimed path too, at the same 1.0 the entity-anchored spellfx path
+        // plays it; the generic burst keeps its school-flavored layer.
+        const novaKey = novaAbilityCue(ev.ability);
+        if (novaKey !== 'spell_nova') {
+          this.combat(novaKey, ev.x, y, ev.z, 1.0, { cooldown: 0.08 });
+          return;
+        }
         this.combat('spell_nova', ev.x, y, ev.z, 0.6, { cooldown: 0.08 });
         this.combat(`impact_${ev.school}`, ev.x, y, ev.z, 0.5, { rate: 0.8, cooldown: 0.08 });
         return;
@@ -11076,8 +11287,16 @@ export class Hud {
           // A guildmate's or followed friend's marquee unlock. Id-based on
           // the wire (server sends the deed id, never English); the visible
           // line composes in deed_i18n (Node-pinned there), in the guild-chat
-          // green so it reads as social news.
-          this.log(deedBroadcastLine(ev.characterName, ev.deedId), '#40d264');
+          // green so it reads as social news. The deed name is spliced in as
+          // a clickable jump to that deed's card in the viewer's own Book.
+          this.logNodes(
+            deedLineNodes(document, deedBroadcastRendered(ev.characterName, DEED_NAME_TOKEN), () =>
+              deedChatLinkEl(document, deedName(ev.deedId), () =>
+                this.deedsWindow.openWithDeed(ev.deedId),
+              ),
+            ),
+            '#40d264',
+          );
           break;
         }
         case 'error':
@@ -12008,7 +12227,13 @@ export class Hud {
           break;
         }
         case 'playerDeath': {
-          this.log(t('hud.system.playerDeath'), '#ff4444');
+          const killer = ev.killerId !== undefined ? sim.entities.get(ev.killerId) : undefined;
+          const killerName = killer ? entityDisplayName(killer) : undefined;
+          const abilityName = ev.killerAbility
+            ? abilityDisplayNameFromSource(ev.killerAbility)
+            : undefined;
+          const feedback = deathRecapFeedback(killerName, ev.killerAbility, abilityName);
+          this.log(t(feedback.key, feedback.values), '#ff4444');
           audio.playerDeath();
           break;
         }
@@ -12101,16 +12326,105 @@ export class Hud {
     // event payload. The armed-window rules (bounded post-craftResult drains,
     // the synced guard, the silent first init, disarm-on-change) live in the
     // pure step observeCraftSkillsForTierUps (craft_celebration_view.ts).
+    // One craftingIdentity/craftSkills read per drain, shared by the tier-up
+    // and skill-level observations below: this tail runs every drain and the
+    // offline getters allocate a fresh copy per access.
+    const identitySynced = sim.craftingIdentity.synced;
+    const craftSkillsNow = sim.craftSkills;
     const obs = observeCraftSkillsForTierUps(
-      sim.craftingIdentity.synced,
+      identitySynced,
       this.prevCraftSkills,
-      sim.craftSkills,
+      craftSkillsNow,
       this.craftTierUpDrains,
     );
     this.prevCraftSkills = obs.prev;
     this.craftTierUpDrains = obs.drains;
     if (masterworkItemId !== null || obs.tierUps.length > 0)
       this.handleCraftCelebrations(masterworkItemId, obs.tierUps);
+    // Profession skill level-ups (floored craft skill + gathering proficiency):
+    // also STATE-driven. Always-on after a silent synced baseline so a quiet
+    // post-gather drain (proficiency applies the next tick) and enchant /
+    // battlefield trickle still land their chat lines without arming every
+    // event arm. Both families gate on the cprof identity sync flag: the
+    // server ships cprof and gprof unconditionally in the same self snapshot
+    // (server/game.ts selfWireJson), and offline both are always synced.
+    const craftSkillObs = advanceSkillLevelObservation(
+      identitySynced,
+      this.prevCraftSkillLevels,
+      craftSkillsNow,
+    );
+    this.prevCraftSkillLevels = craftSkillObs.prev;
+    const gatherSkillObs = advanceSkillLevelObservation(
+      identitySynced,
+      this.prevGatheringSkillLevels,
+      sim.gatheringProficiency,
+    );
+    this.prevGatheringSkillLevels = gatherSkillObs.prev;
+    if (craftSkillObs.skillUps.length > 0 || gatherSkillObs.skillUps.length > 0)
+      this.handleSkillLevelCelebrations(
+        craftSkillObs.skillUps,
+        gatherSkillObs.skillUps,
+        // One celebration chime per drain across the whole tail: stand down
+        // when a tier-up, masterwork, or deed celebration just chimed (a
+        // retro-only deed drain draws no chime; over-suppressing there only
+        // quiets a login catch-up, never a live earned moment).
+        masterworkItemId !== null || obs.tierUps.length > 0 || deedUnlocks.length > 0,
+      );
+  }
+
+  // Profession skill level-ups (gathering + craft counters): pure plan in
+  // skill_level_toast_view.ts. Chat log for EVERY floor climb (the classic
+  // per-point skill message); the copper skill plate, polite announce, and
+  // celebration chime only for a gathering milestone crossing (the plan's
+  // cadence rules; craft boundaries belong to the tier-up celebration).
+  // Presentation is deliberately NOT the bare gold level-up language
+  // (players used to misread gathering milestones as character levels).
+  private handleSkillLevelCelebrations(
+    craftUps: SkillLevelUp[],
+    gatherUps: SkillLevelUp[],
+    celebrationAlreadyChimed: boolean,
+  ): void {
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const plan = buildSkillLevelCelebrationPlan(
+      craftUps,
+      gatherUps,
+      reducedMotion,
+      celebrationAlreadyChimed,
+    );
+    const skillName = (skillId: string): string => {
+      const gatherKey = gatheringProfessionNameKey(skillId);
+      if (gatherKey) return t(gatherKey);
+      return craftNameText(skillId);
+    };
+    const toastText = (up: SkillLevelUp) =>
+      t('hudChrome.crafting.skillUpToast', {
+        skill: skillName(up.skillId),
+        level: formatNumber(up.toLevel, { maximumFractionDigits: 0 }),
+      });
+    for (const up of plan.skillUpLogs) this.log(toastText(up), '#ffd100');
+    if (plan.banner !== null) {
+      const artUrl = professionImageUrl(skillLevelArtId(plan.banner.skillId));
+      // Celebration class 'deed': queues behind level-ups, never ambient
+      // replace, so a milestone landing after a ding still plays in order.
+      // The skill VARIANT is the copper plate; class and variant are
+      // orthogonal. The title is the skill name, already localized through
+      // gatheringProfessionNameKey above, so no wrapper key is needed.
+      this.showCelebrationBanner(
+        skillName(plan.banner.skillId),
+        'deed',
+        'skill',
+        plan.motion,
+        artUrl ?? undefined,
+        t('hudChrome.crafting.skillUpSubtext', {
+          level: formatNumber(plan.banner.toLevel, { maximumFractionDigits: 0 }),
+        }),
+      );
+      // The banner div carries no live semantics, so the polite #combat-live
+      // region carries the combined line (skill name AND level in one string,
+      // the level the visual title omits).
+      this.combatAnnouncer.push(toastText(plan.banner), performance.now());
+    }
+    if (plan.playSound) audio.achievement();
   }
 
   // The crafted earned moment, planned purely (craft_celebration_view) so the
@@ -12249,8 +12563,20 @@ export class Hud {
   // localized summary count.
   private handleDeedUnlocks(events: { deedId: string; retro?: boolean }[]): void {
     const plan = buildDeedUnlockPlan(events, DEEDS);
+    // Feed the Book's recent strip the exact session order (the drain order),
+    // ahead of the server record that may still be catching up.
+    this.deedsWindow.noteUnlocks(plan.logIds);
     for (const id of plan.logIds) {
-      this.log(t('hudChrome.deeds.unlockedBanner', { name: deedName(id) }), '#ffd100');
+      // The durable gold log line, with the deed name spliced in as a
+      // clickable jump to its card in the Book of Deeds.
+      this.logNodes(
+        deedLineNodes(
+          document,
+          t('hudChrome.deeds.unlockedBanner', { name: DEED_NAME_TOKEN }),
+          () => deedChatLinkEl(document, deedName(id), () => this.deedsWindow.openWithDeed(id)),
+        ),
+        '#ffd100',
+      );
     }
     for (const id of plan.titleHintIds) {
       this.log(t('hudChrome.deeds.unlockedTitleHint', { title: deedTitleText(id) }), '#ffd100');
@@ -12282,6 +12608,14 @@ export class Hud {
 
   log(text: string, color = '#ccc', decorativeIconUrl?: string): void {
     this.appendLog(this.chatLogEl, text, color, true, 'system', decorativeIconUrl);
+  }
+
+  /** A chat-pane system line whose body is pre-built NODES (the deed-link
+   *  splice): the same chrome as log() (timestamp, filter, announce, trim,
+   *  autoscroll), with the body landing as the given nodes instead of one
+   *  text node. */
+  private logNodes(nodes: readonly Node[], color: string): void {
+    this.appendLog(this.chatLogEl, '', color, true, 'system', undefined, false, nodes);
   }
 
   private noteProcAuraGain(name: string): void {
@@ -12454,8 +12788,10 @@ export class Hud {
   }
 
   // Render a [[i:id]] chat segment as a quality-colored, inspectable item link.
-  // Hover/focus shows the same item tooltip the bags window uses; an unknown id
-  // (e.g. content drift between players) degrades to a plain [?].
+  // Quest kinds use quest gold (purpose class) via itemNameColor so chat matches
+  // bag / tooltip / loot name language. Hover/focus shows the same item tooltip
+  // the bags window uses; an unknown id (e.g. content drift between players)
+  // degrades to a plain [?].
   private appendChatItemLink(parent: HTMLElement, itemId: string): void {
     // knownItemDef, not bare truthiness: the token charset admits prototype
     // keys ([[i:constructor]] is peer-typed text), and the bare read sent
@@ -12467,7 +12803,7 @@ export class Hud {
     }
     const link = document.createElement('span');
     link.className = 'chat-item-link';
-    link.style.color = QUALITY_COLOR[item.quality ?? 'common'] ?? '#fff';
+    link.style.color = itemNameColor(item);
     link.textContent = `[${itemDisplayName(item)}]`;
     link.tabIndex = 0;
     this.attachTooltip(link, () => this.itemTooltip(item));
@@ -12930,6 +13266,14 @@ export class Hud {
     timestamp = false,
     chan = 'system',
     decorativeIconUrl?: string,
+    // True forces the single-text-node path even on the chat pane: the line
+    // renders VERBATIM and [[i:...]]/[[q:...]] tokens are never turned into
+    // links. For player-authored surfaces whose home rendering is plain
+    // escaped text (the guild billboard echo: the social pane shows the MOTD
+    // via esc(), so guild-controlled text must not mint trusted clickable
+    // item links in chat either).
+    plainText = false,
+    bodyNodes?: readonly Node[],
   ): void {
     const wasNearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 24;
     const div = document.createElement('div');
@@ -12943,10 +13287,14 @@ export class Hud {
     if (decorativeIconUrl) {
       div.append(decorativeArtImg(document, 'chat-masterwork-seal', decorativeIconUrl));
     }
+    // A caller-assembled node body (the deed-link splice) lands verbatim.
     // Loot lines carry name-free item tokens ([[i:id]]); render those as clickable
     // links via the shared chat item-link renderer. Plain system/combat lines keep
-    // the fast text-node path (the substring test never fires for tokenless lines).
-    if (el === this.chatLogEl && text.includes('[[i:')) {
+    // the fast text-node path (the substring test never fires for tokenless lines),
+    // and a plainText caller opts out entirely (see the parameter note above).
+    if (bodyNodes) {
+      for (const node of bodyNodes) div.append(node);
+    } else if (!plainText && el === this.chatLogEl && text.includes('[[i:')) {
       for (const seg of parseChatSegments(text)) {
         if (seg.kind === 'item') this.appendChatItemLink(div, seg.itemId);
         else if (seg.kind === 'quest')
@@ -13056,18 +13404,21 @@ export class Hud {
   }
 
   /** The celebration form of showBanner (R38): full motion, the standard
-   *  2600ms duration, queued under the given class. Exists so the four
+   *  2600ms duration, queued under the given class. Exists so the
    *  celebration call sites stop threading five defaults positionally to
    *  reach the class argument (and so changing the default duration cannot
    *  strand them). `motion` stays a parameter for the reduced-motion
-   *  celebration plans (the attunement banner). */
+   *  celebration plans; `decorativeIconUrl` and `subtext` carry the art-plus-
+   *  detail plates (the gathering skill milestone). */
   showCelebrationBanner(
     text: string,
     bannerClass: 'levelup' | 'deed',
     variant: BannerVariant = 'default',
     motion = true,
+    decorativeIconUrl?: string,
+    subtext?: string,
   ): void {
-    this.showBanner(text, motion, undefined, variant, undefined, 2600, null, bannerClass);
+    this.showBanner(text, motion, decorativeIconUrl, variant, subtext, 2600, null, bannerClass);
   }
 
   /** The paint half of the banner slot: renders one payload and arms the
@@ -13084,7 +13435,20 @@ export class Hud {
       const detail = document.createElement('span');
       detail.className = 'banner-subtext';
       detail.textContent = subtext;
-      this.bannerEl.replaceChildren(title, detail);
+      if (decorativeIconUrl) {
+        // Art-plus-subtext plate (the gathering skill milestone, and any
+        // future variant): crest beside a title/detail column. The wrapper is
+        // variant-agnostic; #banner.banner-with-art.has-subtext styles it.
+        const copy = document.createElement('span');
+        copy.className = 'banner-art-copy';
+        copy.append(title, detail);
+        this.bannerEl.replaceChildren(
+          decorativeArtImg(document, 'banner-art', decorativeIconUrl),
+          copy,
+        );
+      } else {
+        this.bannerEl.replaceChildren(title, detail);
+      }
     } else {
       const copy = document.createElement('span');
       copy.className = 'banner-copy';
@@ -13098,11 +13462,12 @@ export class Hud {
         this.bannerEl.replaceChildren(copy);
       }
     }
-    this.bannerEl.classList.toggle('banner-with-art', Boolean(decorativeIconUrl) && !subtext);
+    this.bannerEl.classList.toggle('banner-with-art', Boolean(decorativeIconUrl));
     // The banner is ONE reused element, so every variant class must be
     // toggled off as well as on: the next unrelated banner through this slot
     // would otherwise inherit the previous one's visual language.
     this.bannerEl.classList.toggle('banner-deed', variant === 'deed');
+    this.bannerEl.classList.toggle('banner-skill', variant === 'skill');
     // Reduced-motion celebrations (craft plan.motion) show and hide the
     // banner without the fade transition: identical text and duration, no
     // animation. Motion-trimming only; information always survives.
@@ -13495,6 +13860,13 @@ export class Hud {
   // flight closes when the trainResult event resolves it, or by TTL if the
   // answer is lost to a disconnect.
   private trainRecipeClicked(recipeId: string): void {
+    // While dead, send without opening a flight: the sim's dead gate
+    // (src/sim/dead_gate.ts) refuses with the shared error line and emits NO
+    // trainResult, so an opened flight would only sit disabled until its TTL.
+    if (this.sim.player.dead) {
+      this.sim.trainRecipe(recipeId);
+      return;
+    }
     if (!this.trainLearns.begin(recipeId, performance.now())) return;
     this.sim.trainRecipe(recipeId);
     this.renderTrain();
@@ -13720,9 +14092,36 @@ export class Hud {
     this.openCrafting();
   }
 
-  openCrafting(): void {
+  // `craftId` (the gossip dialog's Crafting shortcut on a station master)
+  // pre-selects that craft's tab exactly like a tab click would: same field,
+  // same persistence, same fresh-tab scroll reset. The assign-and-persist is
+  // gated on the craft actually owning a tab for this viewer (craftOwnsTab),
+  // so the shortcut never clobbers the saved tab preference (issue #2347)
+  // with a craft the window cannot show; resolveSelectedCraft still guards
+  // the render either way.
+  openCrafting(craftId?: string): void {
+    if (
+      craftId !== undefined &&
+      craftId !== this.selectedCraftTab &&
+      craftOwnsTab(this.sim.recipeList, this.sim.craftingIdentity.knownRecipes, craftId)
+    ) {
+      this.selectedCraftTab = craftId;
+      this.persistCraftingTab();
+    }
     this.closeOtherWindows('#crafting-window');
     this.renderCrafting();
+    if (craftId !== undefined) {
+      const scroller = $('#crafting-window').querySelector('.crafting-body');
+      if (scroller) scroller.scrollTop = 0;
+      // The gossip route reaches here after the dialog released its focus
+      // trap WITHOUT restoring (the successor-window premise), and
+      // #crafting-window installs no trap of its own: land keyboard focus on
+      // the selected tab (onSelectCraft's refocus target) so the handoff
+      // never strands focus on body. Promoting this window into the
+      // windowFocus system proper is the #2525 town-focus precedent, a
+      // separate ruling, not this change.
+      ($('#crafting-window').querySelector('.crafting-tab.sel') as HTMLElement | null)?.focus();
+    }
   }
 
   private renderCrafting(): void {
@@ -14076,7 +14475,14 @@ export class Hud {
     // inventory deltas landed here, but every money-only credit now routes through
     // this hook (#2373), so a hidden window would be rebuilt on each one.
     if (bagsWindowShown($('#bags').style.display)) this.renderBags();
-    if (this.openVendorNpcId !== null) this.renderVendor();
+    // A trainer fee is a money-only self delta online (no inv echo), and the
+    // heroic shop prices rows off a mark COUNT in the bag: every service
+    // window's affordability flag can go stale on a purse or inventory move,
+    // so re-price the whole open family here, the same edge the vendor path
+    // already used (#2373). Offline this hook barely fires (the bank window's
+    // wiring); the train ladder converges there through the Learn click and
+    // trainResult repaints instead.
+    this.repaintOpenServiceWindows();
     this.renderCharIfOpen();
     // The crafting window rides this hook too (#2375): it is the online
     // host's instant edge for an authoritative delta, and offline it is what
@@ -14098,6 +14504,23 @@ export class Hud {
     )
       return;
     this.renderCrafting();
+  }
+
+  /** Repaint every OPEN service window (copper vendor, heroic quartermaster,
+   *  training ladder, unbind list) behind its own open-plus-shown guard. All
+   *  four price their rows against the purse or a bag count, so the language
+   *  switch and the authoritative inventory hook repaint the family through
+   *  this one method; the per-site copies of the guard pack earned the
+   *  extraction (rule of three). */
+  private repaintOpenServiceWindows(): void {
+    if (this.openVendorNpcId !== null && $('#vendor-window').style.display === 'block')
+      this.renderVendor();
+    if (this.openHeroicVendorNpcId !== null && $('#vendor-window').style.display === 'block')
+      this.renderHeroicVendor();
+    if (this.openTrainNpcId !== null && $('#train-window').style.display === 'block')
+      this.renderTrain();
+    if (this.openUnbindNpcId !== null && $('#unbind-window').style.display === 'block')
+      this.renderUnbind();
   }
 
   onCosmeticsChanged(): void {
@@ -14147,6 +14570,30 @@ export class Hud {
   async prewarmArmoryPreview(): Promise<void> {
     if (!this.claudiumHooks) return;
     await this.dailyRewardsWindow.prewarmArmoryPreview();
+  }
+
+  /** Rebind every HUD callback to the newly committed world renderer. */
+  replaceRenderer(renderer: Renderer): void {
+    this.renderer = renderer;
+  }
+
+  /**
+   * Dispose secondary WebGL contexts after target assets are ready but before
+   * the active graphics epoch changes. Their owning windows stay intact.
+   */
+  resetGraphicsPreviewContexts(): void {
+    this.restoreCharPreviewAfterGraphicsRebuild = this.charWindow.isOpen;
+    this.charPreview?.destroy();
+    this.charPreview = null;
+    this.charPreviewCanvas = null;
+    this.dailyRewardsWindow.resetArmoryPreviewForGraphicsRebuild();
+  }
+
+  /** Restore preview surfaces that were visible across the renderer swap. */
+  restoreGraphicsPreviewContexts(): void {
+    if (this.restoreCharPreviewAfterGraphicsRebuild) this.charWindow.renderIfOpen();
+    this.restoreCharPreviewAfterGraphicsRebuild = false;
+    this.dailyRewardsWindow.restoreArmoryPreviewAfterGraphicsRebuild();
   }
 
   /** Populate the small synchronous Canvas caches used by contextual HUD

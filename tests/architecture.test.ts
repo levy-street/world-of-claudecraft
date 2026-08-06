@@ -76,11 +76,22 @@ function stripComments(src: string): string {
 }
 
 // A specifier a host-agnostic sim file must never import. Returns the offending
-// layer/package, or null when the import is allowed.
+// layer/package, or null when the import is allowed. `server/` is banned like the
+// browser host layers (even type-only): server modules drag Node-only deps (pg,
+// node:*) that would break the sim in the browser, and shared server contracts are
+// REDECLARED in the sim with a test-side lockstep pin instead (the GuildRank
+// precedent: src/sim/guild_bank.ts GUILD_RANKS pinned by tests/guild_bank.test.ts).
 function forbiddenImport(spec: string): string | null {
   if (spec === 'three' || spec.startsWith('three/')) return 'three';
-  const layer = spec.match(/(?:^|\/)(render|ui|game|net)\//);
-  return layer ? layer[1] : null;
+  // The trailing slash is not required: `../server` and `../../server.js` are
+  // the same ban, and the slash-only form let both through. A layer name must
+  // therefore END the specifier, take a `/` (a file inside it), or take a `.js`
+  // extension. The leading `(?:^|\/)` still anchors the name to a path segment,
+  // so `my_server_helper` and `src/uiverse/x` are not matches.
+  const layer = spec.match(
+    /(?:^|\/)(render|ui|game|net|server)(?:\/|\.js)?$|(?:^|\/)(render|ui|game|net|server)\//,
+  );
+  return layer ? (layer[1] ?? layer[2]) : null;
 }
 
 // Same idea for a src/ui pure core: it lives in ui and may lean on sibling pure
@@ -150,6 +161,54 @@ const SCENE_PRESENTATION_CLOCK_FILES = [
 
 const simFiles = walk(simRoot);
 
+describe('live graphics profile architecture', () => {
+  it('resolves renderer-bound layout and deferred preload choices from live GFX', () => {
+    const renderSource = (relativePath: string): string =>
+      readFileSync(join(repoRoot, 'src', 'render', relativePath), 'utf8');
+    const props = renderSource('props.ts');
+    const foliage = renderSource('foliage.ts');
+
+    expect(props).not.toMatch(/\bconst\s+MERGE_BAND_DEPTH\s*=\s*GFX\b/);
+    expect(props).toContain('const mergeBandDepth = ():');
+    expect(props).toContain('deferredPropKeys ??= preloadPropKeys(GFX.standardMaterials)');
+    expect(foliage).not.toMatch(/\bconst\s+MODEL_URLS\s*=\s*GFX\b/);
+    expect(foliage).toContain('const foliageModelUrls = ():');
+    expect(foliage).toContain('foliageModelUrlsFor(GFX)');
+
+    const directDeferredProfiles = [
+      ['terrain.ts', 'prepareTerrainProfileAssets'],
+      ['water.ts', 'prepareWaterProfileAssets'],
+      ['detail_normals.ts', 'prepareStoneDetailProfileAssets'],
+      ['worn_stone.ts', 'prepareSurfaceDetailProfileAssets'],
+      ['canopy_detail.ts', 'prepareCanopyDetailProfileAssets'],
+      ['great_tree_prewarm.ts', 'prepareGreatTreeProfileAssets'],
+    ] as const;
+    for (const [relativePath, prepare] of directDeferredProfiles) {
+      expect(renderSource(relativePath)).toContain(
+        `registerDeferredPreload(() => ${prepare}(GFX))`,
+      );
+    }
+  });
+
+  it('registers every exported profile cache reset in the central invalidator', () => {
+    const renderFiles = walk(join(repoRoot, 'src', 'render'));
+    const resetNames = new Set<string>();
+    for (const file of renderFiles) {
+      const source = stripComments(readFileSync(file, 'utf8'));
+      for (const match of source.matchAll(/\bexport function (reset\w+ProfileCaches?)\s*\(/g)) {
+        resetNames.add(match[1]);
+      }
+    }
+
+    const coordinator = stripComments(
+      readFileSync(join(repoRoot, 'src', 'render', 'assets', 'graphics_profile.ts'), 'utf8'),
+    );
+    const resetTable = coordinator.slice(coordinator.indexOf('const RESETTERS'));
+    expect(resetNames.size).toBeGreaterThan(20);
+    for (const resetName of resetNames) expect(resetTable).toContain(resetName);
+  });
+});
+
 // Curated src/ui pure cores: host-agnostic view models hud.ts imports, each
 // paired with a DOM painter that is deliberately NOT registered here. Seeded with
 // the cores that already exist on v0.16.0; extend as new pure cores land (later
@@ -179,6 +238,7 @@ const UI_PURE_CORES = [
   'src/ui/party_below_target_core.ts',
   'src/ui/party_collapse.ts',
   'src/ui/guild_hide_offline.ts',
+  'src/ui/guild_motd_login.ts',
   'src/ui/rest_indicator.ts',
   'src/ui/low_health.ts',
   'src/ui/low_resource.ts',
@@ -187,6 +247,7 @@ const UI_PURE_CORES = [
   'src/ui/coords.ts',
   'src/ui/hud/quest/quest_tracker.ts',
   'src/ui/hud/quest/prof_intro_hint_core.ts',
+  'src/ui/hud/quest/master_craft_core.ts',
   'src/ui/quest_marker_tags.ts',
   'src/ui/hud/delve/delve_map.ts',
   'src/ui/hud/scene/scene_overlay_view.ts',
@@ -211,9 +272,20 @@ const UI_PURE_CORES = [
   'src/ui/enchanting_view.ts',
   'src/ui/disenchant_yield_view.ts',
   'src/ui/material_hint_view.ts',
+  'src/ui/material_profession_hint_view.ts',
+  'src/ui/craft_name_view.ts',
+  'src/ui/cooking_catch_hint_view.ts',
   'src/ui/bag_instance_glyph_view.ts',
+  'src/ui/bag_corner_mark_view.ts',
+  'src/ui/bag_fine_mark_view.ts',
+  'src/ui/bag_quest_mark_view.ts',
+  'src/ui/bag_quest_tracker_highlight_view.ts',
+  'src/ui/quest_item_tooltip_view.ts',
+  'src/ui/item_name_color.ts',
   'src/ui/item_slot_labels.ts',
   'src/ui/bank_view.ts',
+  'src/ui/guild_bank_log_view.ts',
+  'src/ui/guild_bank_view.ts',
   'src/ui/item_set_tooltip_view.ts',
   'src/ui/weapon_proc_view.ts',
   'src/ui/options_view.ts',
@@ -230,6 +302,7 @@ const UI_PURE_CORES = [
   'src/ui/hud/loot/loot_roll_status_view.ts',
   'src/ui/hud/loot/loot_settings_view.ts',
   'src/ui/craft_celebration_view.ts',
+  'src/ui/skill_level_toast_view.ts',
   'src/ui/grant_line_view.ts',
   'src/ui/crafting_view.ts',
   'src/ui/profession_event_lines_core.ts',
@@ -237,6 +310,7 @@ const UI_PURE_CORES = [
   'src/ui/profession_tutorial_view.ts',
   'src/ui/professions_view.ts',
   'src/ui/market_view.ts',
+  'src/ui/market_buy_confirm_core.ts',
   'src/ui/mailbox_view.ts',
   'src/ui/calendar_view.ts',
   'src/ui/char_view.ts',
@@ -245,6 +319,7 @@ const UI_PURE_CORES = [
   'src/ui/quality_glow.ts',
   'src/ui/map_pinch_zoom_core.ts',
   'src/ui/map_window_view.ts',
+  'src/ui/continent_land_mask_core.ts',
   'src/ui/continent_map_view.ts',
   'src/ui/map_open_sea_edge_core.ts',
   'src/ui/map_quest_list_view.ts',
@@ -283,6 +358,7 @@ const UI_PURE_CORES = [
   'src/ui/minimap_markers.ts',
   'src/ui/gathering_view.ts',
   'src/ui/gather_tool_tooltip.ts',
+  'src/ui/tool_effect_tooltip.ts',
   'src/ui/fct_core.ts',
   'src/ui/fct_event.ts',
   'src/ui/heal_landing_feedback_core.ts',
@@ -303,6 +379,7 @@ const UI_PURE_CORES = [
   'src/ui/loading_slow_hint_core.ts',
   'src/ui/reconnect_status_core.ts',
   'src/ui/chat_bubble_style.ts',
+  'src/game/graphics_rebuild_core.ts',
   'src/game/ui_effects_profile.ts',
   'src/game/ui_tier_knobs.ts',
   // Last Bell scene playback core: lives in src/game (its consumer is the
@@ -341,6 +418,7 @@ const DOM_GLOBAL_VALUE_ALLOWLIST = new Set([join(repoRoot, 'src/ui/safe_local_st
 // identity tint terms in UnrealBloom's composite shader.
 const RENDER_PURE_CORES = [
   'src/render/ability_vfx_core.ts',
+  'src/render/ability_vfx_longbuff_core.ts',
   'src/render/arena_water_band_core.ts',
   'src/render/biome_haze_field_core.ts',
   'src/render/blade_grass_dense_core.ts',
@@ -358,6 +436,7 @@ const RENDER_PURE_CORES = [
   'src/render/harbor_ship_update_core.ts',
   'src/render/prop_path_core.ts',
   'src/render/character_effects_core.ts',
+  'src/render/character_presentation_core.ts',
   'src/render/character_view_core.ts',
   'src/render/chunk_residency_core.ts',
   'src/render/cliff_scree_core.ts',
@@ -376,6 +455,7 @@ const RENDER_PURE_CORES = [
   'src/render/grass_cap_collapse_core.ts',
   'src/render/step_smooth_core.ts',
   'src/render/eastbrook_town_visibility_core.ts',
+  'src/render/fenbridge_town_visibility_core.ts',
   'src/render/occluder_fade_core.ts',
   'src/render/point_light_shader_core.ts',
   'src/render/post_bloom_shader_core.ts',
@@ -431,6 +511,7 @@ const RENDER_PURE_CORES = [
 const BARE_NAMED = [
   'src/ui/banner_queue.ts',
   'src/ui/item_kind_label.ts',
+  'src/ui/item_name_color.ts',
   'src/render/foliage_lod.ts',
   'src/render/compile_gate.ts',
   'src/render/prewarm_pass.ts',
@@ -438,6 +519,7 @@ const BARE_NAMED = [
   'src/render/prewarm_resume.ts',
   'src/ui/mob_idle_sfx.ts',
   'src/ui/gather_tool_tooltip.ts',
+  'src/ui/tool_effect_tooltip.ts',
   'src/ui/known_item.ts',
   'src/ui/unit_portrait.ts',
   'src/ui/xp_bar.ts',
@@ -445,6 +527,7 @@ const BARE_NAMED = [
   'src/ui/party_frames.ts',
   'src/ui/party_collapse.ts',
   'src/ui/guild_hide_offline.ts',
+  'src/ui/guild_motd_login.ts',
   'src/ui/rest_indicator.ts',
   'src/ui/low_health.ts',
   'src/ui/low_resource.ts',
@@ -510,9 +593,45 @@ describe('src/sim architecture invariants', () => {
     expect(simFiles.length).toBeGreaterThan(10);
   });
 
-  it('imports nothing from render/ui/game/net or three (host-agnostic core)', () => {
+  it('imports nothing from render/ui/game/net/server or three (host-agnostic core)', () => {
     const violations = scanImports(simFiles, forbiddenImport);
     expect(violations, `src/sim must stay host-agnostic:\n${violations.join('\n')}`).toEqual([]);
+  });
+
+  it('the ban actually FIRES on every spelling a sim file could reach a host by', () => {
+    // A guard with no self-test is a guard nobody has seen fail. The
+    // directory-with-trailing-slash spellings were caught; the BARE ones
+    // (`../server`, `../../server.js`) were not, and a type-only
+    // `import type { X } from '../server'` is exactly the shape a sim file
+    // drifts into first.
+    for (const spec of [
+      '../server',
+      '../../server.js',
+      '../../server/game',
+      './server/db',
+      '../net',
+      '../net/online',
+      '../ui/hud',
+      '../render/renderer',
+      '../game/input',
+      'three',
+      'three/examples/jsm/x',
+    ]) {
+      expect(forbiddenImport(spec), spec).not.toBeNull();
+    }
+    // ...and does NOT fire on the legitimate neighbours, so it can never be
+    // satisfied by a rule that simply bans everything.
+    for (const spec of [
+      './types',
+      '../world_api',
+      '../world_api/guild_bank',
+      './professions/training',
+      'node:assert',
+      './my_server_helper',
+      './renderer_notes',
+    ]) {
+      expect(forbiddenImport(spec), spec).toBeNull();
+    }
   });
 
   it('touches no DOM/browser globals', () => {
@@ -1035,9 +1154,11 @@ const EXPECTED_BARE_NAMED = [
   'src/ui/focus_order.ts',
   'src/ui/gather_tool_tooltip.ts',
   'src/ui/guild_hide_offline.ts',
+  'src/ui/guild_motd_login.ts',
   'src/ui/hud/delve/delve_map.ts',
   'src/ui/hud/quest/quest_tracker.ts',
   'src/ui/item_kind_label.ts',
+  'src/ui/item_name_color.ts',
   'src/ui/item_slot_labels.ts',
   'src/ui/known_item.ts',
   'src/ui/live_region_politeness.ts',
@@ -1056,6 +1177,7 @@ const EXPECTED_BARE_NAMED = [
   'src/ui/roving_index.ts',
   'src/ui/safe_local_storage.ts',
   'src/ui/swing_timer.ts',
+  'src/ui/tool_effect_tooltip.ts',
   'src/ui/unit_frame.ts',
   'src/ui/unit_portrait.ts',
   'src/ui/xp_bar.ts',
@@ -1345,7 +1467,12 @@ const COLOR_FUNC_RE = /\brgba?\s*\(/g;
 // is imported BY a painter and paints nothing itself; a window painter owns and
 // updates the nodes of its own window. What the gate enforces is that one of them
 // is chosen on purpose.
-const UI_PAINTER_HELPERS = ['src/ui/text_sprite_cache.ts'].map((rel) => join(repoRoot, rel));
+const UI_PAINTER_HELPERS = [
+  'src/ui/continent_land_mask.ts',
+  'src/ui/text_sprite_cache.ts',
+  // Detached tt-desc / tt-sub line mint (createElement + textContent only).
+  'src/ui/tooltip_line.ts',
+].map((rel) => join(repoRoot, rel));
 
 // Modules that REACH A HOST: they own browser state (the windows, the HUD
 // controllers, the drag / resize / focus plumbing, the storage-backed settings) or
@@ -1375,6 +1502,7 @@ const UI_DOM_MODULES = [
   'src/ui/armory_inspect.ts',
   'src/ui/bag_item_action_menu.ts',
   'src/ui/bags_window.ts',
+  'src/ui/bank_quantity_prompt.ts',
   'src/ui/bank_window.ts',
   'src/ui/calendar_window.ts',
   'src/ui/camera_prompt.ts',
@@ -1398,6 +1526,8 @@ const UI_DOM_MODULES = [
   'src/ui/form_draft.ts',
   'src/ui/gather_node_tooltip_controller.ts',
   'src/ui/gpu_notice_toast.ts',
+  'src/ui/guild_bank_log_window.ts',
+  'src/ui/guild_bank_window.ts',
   'src/ui/hud.ts',
   'src/ui/hud/chat/chat_geometry_controller.ts',
   'src/ui/hud/chat/chat_window_controller.ts',

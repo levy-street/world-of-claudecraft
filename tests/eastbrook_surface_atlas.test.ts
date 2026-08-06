@@ -16,9 +16,14 @@ import {
   EASTBROOK_TOWN_ASSET_URLS,
   eastbrookTownInternalsForTest,
 } from '../src/render/eastbrook_town';
-import { GFX } from '../src/render/gfx';
+import { gfxInternalsForTest } from '../src/render/gfx';
 
-const ORIGINAL_STANDARD_MATERIALS = GFX.standardMaterials;
+let restoreGfx: (() => void) | null = null;
+
+function setStandardMaterials(value: boolean): void {
+  restoreGfx?.();
+  restoreGfx = gfxInternalsForTest.overrideSettings({ standardMaterials: value });
+}
 
 function sourceAsset(name = 'TownOpaque'): THREE.Group {
   const group = new THREE.Group();
@@ -51,8 +56,8 @@ function atlasMaps(root: THREE.Object3D, atlas: THREE.Texture): THREE.Texture[] 
 }
 
 afterEach(() => {
-  (GFX as unknown as { standardMaterials: boolean }).standardMaterials =
-    ORIGINAL_STANDARD_MATERIALS;
+  restoreGfx?.();
+  restoreGfx = null;
 });
 
 describe('Eastbrook shared surface atlas', () => {
@@ -109,7 +114,7 @@ describe('Eastbrook shared surface atlas', () => {
   });
 
   it('binds the same map to town, Armoury, and chest on Low while preserving vertex colors', () => {
-    (GFX as unknown as { standardMaterials: boolean }).standardMaterials = false;
+    setStandardMaterials(false);
     const atlas = new THREE.Texture();
     const townSources = new Map(
       EASTBROOK_TOWN_ASSET_URLS.map((url) => [url, sourceAsset()] as const),
@@ -147,7 +152,7 @@ describe('Eastbrook shared surface atlas', () => {
   });
 
   it('uses the shared map with restrained authored roughness on Standard without color-map aliasing', () => {
-    (GFX as unknown as { standardMaterials: boolean }).standardMaterials = true;
+    setStandardMaterials(true);
     const atlas = new THREE.Texture();
     const source = new THREE.MeshStandardMaterial({
       color: 0x77808d,

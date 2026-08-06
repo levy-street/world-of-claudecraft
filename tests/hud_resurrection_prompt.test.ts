@@ -116,6 +116,7 @@ interface EventHarness {
     player: { dead: boolean; pos: { x: number; z: number } };
     craftingIdentity: { synced: boolean };
     craftSkills: Record<string, number>;
+    gatheringProficiency: Record<string, number>;
   };
   renderer: { handleEvent: ReturnType<typeof vi.fn> };
   playEventSfx: ReturnType<typeof vi.fn>;
@@ -137,6 +138,7 @@ function eventHarness(player: { dead: boolean }): EventHarness {
     player: { dead: player.dead, pos: { x: 0, z: 0 } },
     craftingIdentity: { synced: false },
     craftSkills: {},
+    gatheringProficiency: {},
   };
   hud.renderer = { handleEvent: vi.fn() };
   hud.playEventSfx = vi.fn();

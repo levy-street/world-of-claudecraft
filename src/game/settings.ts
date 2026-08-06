@@ -187,6 +187,12 @@ export const BOOL_SETTINGS = {
   // startAutoAttack still no-ops unless a valid hostile target is in range, and
   // heals / buffs / damage-breakable CC (gouge, sap, sheep) never trigger it.
   startAttackOnAbilityUse: { def: true },
+  // off by default: lock the action bar slots against drag-to-move,
+  // drag-to-replace, and clear (right-click / shift+clear-key) so an
+  // accidental click-and-drag mid-fight can't move or wipe a slot. Abilities
+  // still fire from keybinds and clicks while locked (see ui/action_bar_lock.ts
+  // and the hud.ts drag/drop/clear wiring it gates).
+  lockActionBars: { def: false },
   // on by default: slot 0 shows the classic fixed Attack (auto-attack) toggle.
   // Turning it off (or right-clicking the Attack button) removes it from the bar,
   // freeing slot 0 and its keybind to hold a normal assignable action.
@@ -431,6 +437,32 @@ export class Settings {
 
   all(): GameSettings {
     return { ...this.values };
+  }
+
+  /** Validate every value, apply the whole patch, then persist the settings blob once. */
+  patch(patch: Partial<GameSettings>): GameSettings {
+    const staged: Record<string, boolean | number> = {};
+    for (const [key, value] of Object.entries(patch)) {
+      if ((BOOL_KEYS as readonly string[]).includes(key)) {
+        if (typeof value !== 'boolean') {
+          throw new TypeError(`Invalid boolean setting: ${key}`);
+        }
+        staged[key] = value;
+        continue;
+      }
+      if ((NUMERIC_KEYS as readonly string[]).includes(key)) {
+        if (typeof value !== 'number' || !Number.isFinite(value)) {
+          throw new TypeError(`Invalid numeric setting: ${key}`);
+        }
+        staged[key] = clampNumeric(key as NumericSettingKey, value);
+        continue;
+      }
+      throw new TypeError(`Unknown setting: ${key}`);
+    }
+
+    this.values = { ...this.values, ...staged } as GameSettings;
+    this.save();
+    return this.all();
   }
 
   /** Clamp + store a value; returns the value actually applied. */

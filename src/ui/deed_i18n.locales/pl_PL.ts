@@ -7,6 +7,14 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  chr_drakemaw_broodlord: {
+    name: 'Pogromca Wylęgu',
+    desc: 'Zgładź Władcę Wylęgu Smoczej Paszczy pośród jego jaj, przez ryk, rozcinający cios i ogień.',
+  },
+  chr_maw_matriarch: {
+    name: 'Niebo Milknie',
+    desc: 'Zgładź Cindraleth, Matriarchinię Paszczy, w jej kraterowym gnieździe nad Smoczą Paszczą.',
+  },
   pvp_card_duel_first_win: {
     name: 'Zasady Domu',
     desc: 'Wygraj Pojedynek Karciany u Mistrza Kart.',
@@ -810,6 +818,10 @@ export const table: DeedLocaleTable = {
     name: 'Heroiczna: Kotlina Dzikiego Serca',
     desc: 'Pokonaj Zulgara, Głos Kotliny, w Kotlinie Dzikiego Serca na heroicznym poziomie trudności.',
   },
+  chr_peaks_gatherer: {
+    name: 'Plon z wyżyn',
+    desc: 'Pozyskaj żyłę rudy, drzewostan i kępę ziół na Wyżynach Ciernistego Szczytu.',
+  },
   chr_marsh_rares_ii: {
     name: 'Żarłok, doliczony',
     desc: 'Zabij Robakopaszczego Żarłoka, czwartą osławioną zgrozę Trzęsawiska Mokrzawia pominiętą w pierwszym rachunku.',
@@ -825,5 +837,29 @@ export const table: DeedLocaleTable = {
   chr_hollow_rares: {
     name: 'Stado pamięta',
     desc: 'Zabij Starego Szpikoskorupa i Aurelhorna, Pierwszego ze Stada, dwóch wędrownych rzadkich bossów Zasłoniętej Kotliny.',
+  },
+  chr_willowfen_gatherer: {
+    name: 'Obfitość mokradeł',
+    desc: 'Pozyskaj żyłę rudy, drzewostan i kępę ziół na Wierzbowych Mokradłach.',
+  },
+  chr_willowfen_first_cast: {
+    name: 'Kręgi na Liliowych Wrzosowiskach',
+    desc: 'Złów rybę w wodach Wierzbowych Mokradeł.',
+  },
+  chr_galecrest_gatherer: {
+    name: 'Zbiory na przylądku',
+    desc: 'Pozyskaj żyłę rudy, drzewostan i kępę ziół na Wichrowym Grzbiecie.',
+  },
+  chr_galecrest_first_cast: {
+    name: 'Żyłka w Lustrzanym Jeziorku',
+    desc: 'Złów rybę w wodach Wichrowego Grzbietu.',
+  },
+  chr_farshore_gatherer: {
+    name: 'Wyspiarskie zapasy',
+    desc: 'Pozyskaj żyłę rudy, drzewostan i kępę ziół na Dalekim Wybrzeżu.',
+  },
+  chr_farshore_first_cast: {
+    name: 'Co wiedzą mewy',
+    desc: 'Złów rybę w wodach Dalekiego Wybrzeża.',
   },
 };

@@ -29,6 +29,85 @@ const WAND_CUES: Partial<Record<MagicSchool, SfxId>> = {
   shadow: 'wand_shadow',
 };
 
+// A 'nova' fx event normally plays the shared spell_nova cue (every
+// self-centered or ground-targeted burst: Frost Nova, Arcane Explosion,
+// Ring of Frost, ...). A few abilities get their own distinct cast cue
+// instead, keyed off the casting ability id the event already carries: the
+// three AoE fear shouts (priest Psychic Scream, warlock Howl of Terror,
+// warrior Intimidating Shout, all archetype aoeFear), Frost Nova, and
+// Flamestrike (also archetype 'nova': a ground-targeted fire burst).
+const NOVA_ABILITY_CUES: Partial<Record<string, SfxId>> = {
+  psychic_scream: 'fear_shout',
+  howl_of_terror: 'fear_shout',
+  intimidating_shout: 'fear_shout',
+  frost_nova: 'frost_nova',
+  flamestrike: 'flamestrike',
+};
+
+// Shared by both nova-shaped events: the caster-anchored fx:'spellfx' nova
+// (self-centered/entity-anchored bursts) AND the world-anchored
+// fx:'spellfxAt' nova (ground-targeted bursts like Flamestrike, which always
+// takes the castAim branch and never the entity-anchored one). Exported so
+// hud.ts's spellfxAt handler can resolve the same override instead of
+// hardcoding 'spell_nova' regardless of ability (review finding, PR #2861:
+// the Flamestrike entry above could never fire on a real cast without this).
+export function novaAbilityCue(ability: string | undefined): SfxId {
+  return (ability && NOVA_ABILITY_CUES[ability]) || 'spell_nova';
+}
+
+// A damage-landing archetype (bolt/burst/strike/nova/beam/dot) always
+// resolves the shared impact_<school> cue (impactCueForDamage below). A few
+// abilities get their own distinct impact instead, keyed off
+// DamageEvent.abilityId, the stable content id only the PRIMARY direct hit
+// carries (DoT ticks omit it, so garrote's 18s bleed never replays this).
+// Every other fire spell (Fireball, the rest of the bolt/burst family)
+// keeps the shared impact_fire.
+const IMPACT_ABILITY_CUES: Partial<Record<string, SfxId>> = {
+  scorch: 'scorch',
+  pyroblast: 'pyroblast',
+  frozen_orb: 'frozen_orb',
+  glacial_spike: 'glacial_spike',
+  arcane_surge: 'arcane_blast',
+  ambush: 'ambush',
+  backstab: 'backstab',
+  garrote: 'garrote',
+  sinister_strike: 'sinister_strike',
+  eviscerate: 'eviscerate',
+};
+
+// A DoT's periodic damage tick shares the ordinary IMPACT_ABILITY_CUES/school
+// lookup above (impactCueForDamage runs on every 'damage' event, ticks
+// included), which would repeat a dedicated recording every interval for the
+// whole duration and read as spammy (see the HoT precedent, #2271: same
+// problem, heal side). Rupture is deliberately absent from IMPACT_ABILITY_CUES
+// above for exactly that reason; its dedicated cue instead plays once, off the
+// one-shot fx:'dotApply' event effect_dispatch.ts emits at ctx.applyAura time.
+const DOT_APPLY_ABILITY_CUES: Partial<Record<string, SfxId>> = {
+  rupture: 'eviscerate',
+};
+
+// A landed cc (stun/root/incapacitate) has no recording by default (see
+// ability_sfx_coverage.ts's RECORDED_IMPACT_ARCHETYPES, which deliberately
+// excludes 'cc'); these four now have one, keyed off the casting ability
+// id the fx:'ccImpact' event carries (effect_dispatch.ts gates the emit to
+// exactly this set, so no other stun/root/incapacitate fires the event at
+// all).
+const CC_IMPACT_ABILITY_CUES: Partial<Record<string, SfxId>> = {
+  hammer_of_justice: 'hammer_of_justice',
+  entangling_roots: 'entangling_roots',
+  blind: 'blind',
+  cheap_shot: 'cheap_shot',
+  sap: 'sap',
+};
+
+// fx:'blinkStep' fires from effect_dispatch.ts's blinkForward case, shared by
+// every dash-style teleport (Blink, Shadowstep); no recording covers it by
+// default (archetype 'dash', see ability_sfx_coverage.ts). Both now have one.
+const BLINK_STEP_ABILITY_CUES: Partial<Record<string, SfxId>> = {
+  blink: 'blink',
+  shadowstep: 'shadowstep',
+};
+
 // Exported (read-only, `as const`) purely so a test can pin its key set
 // against SFX_MOB_EXTENSION_FAMILIES: a family added to one and forgotten in
 // the other currently resolves at runtime to a key with no clip, which plays
@@ -164,6 +243,16 @@ export function materialImpactCue(target: Entity): SfxId {
 }
 
 export function impactCueForDamage(event: DamageEvent, target: Entity): SfxId | null {
+  // Keyed off the stable abilityId, not the display-label `ability` field:
+  // a display rename (Scald/Pyrelance/Aether Surge/Dirt Nap/Wicked Slash/
+  // Craven Thrust/Lurker's Strike/Throat Wire all differ from their id)
+  // would otherwise silently break every entry in IMPACT_ABILITY_CUES
+  // (review finding, PR #2861). abilityId is not populated by every
+  // dealDamage caller, so a missing one just falls through below.
+  if (event.abilityId) {
+    const override = IMPACT_ABILITY_CUES[event.abilityId];
+    if (override) return override;
+  }
   if (!event.school || event.school === 'physical') return materialImpactCue(target);
   const school = magicSchool(event.school);
   return school ? SCHOOL_CUES[school].impact : null;
@@ -179,13 +268,44 @@ export function spellFxCue(event: SpellFxEvent): { key: SfxId; anchorId: number 
       : SCHOOL_CUES[school].projectile;
     return { key, anchorId: event.sourceId };
   }
-  if (event.fx === 'nova') return { key: 'spell_nova', anchorId: event.targetId };
+  if (event.fx === 'nova') {
+    return { key: novaAbilityCue(event.ability), anchorId: event.targetId };
+  }
+  if (event.fx === 'fearImpact') return { key: 'fear', anchorId: event.targetId };
+  if (event.fx === 'ccImpact') {
+    const key = event.ability && CC_IMPACT_ABILITY_CUES[event.ability];
+    return key ? { key, anchorId: event.targetId } : null;
+  }
+  // blinkStep fires for every blinkForward-effect ability (Blink, Shadowstep);
+  // only Blink has a recording so far, keyed the same way as the cc trio.
+  if (event.fx === 'blinkStep') {
+    const key = event.ability && BLINK_STEP_ABILITY_CUES[event.ability];
+    return key ? { key, anchorId: event.targetId } : null;
+  }
+  if (event.fx === 'dotApply') {
+    const key = event.ability && DOT_APPLY_ABILITY_CUES[event.ability];
+    return key ? { key, anchorId: event.targetId } : null;
+  }
   return null;
 }
 
+// Per-ability overrides for a buff's apply moment: normally every buff plays
+// the shared buff_apply chime, keyed off Aura.id (the ability that applied
+// it). Ice Block (Cold Coffin), Cloak of Shadows (Shadecloak, an absorb
+// aura, same apply path), Vanish (Smokestep, a toggle stealth selfBuff, same
+// apply path too), and Stealth (Duskveil, the opening rogue stealth toggle,
+// identical selfBuff shape) get their own distinct cue instead.
+const BUFF_APPLY_ABILITY_CUES: Partial<Record<string, SfxId>> = {
+  ice_block: 'ice_block',
+  cloak_of_shadows: 'cloak_of_shadows',
+  vanish: 'vanish',
+  stealth: 'stealth',
+};
+
 export function auraApplyCue(event: AuraEvent, aura: Aura | null): SfxId | null {
   if (!event.gained || !aura) return null;
-  return isAuraDebuff(aura) ? 'debuff_apply' : 'buff_apply';
+  if (isAuraDebuff(aura)) return 'debuff_apply';
+  return BUFF_APPLY_ABILITY_CUES[aura.id] ?? 'buff_apply';
 }
 
 type HealEvent = Extract<SimEvent, { type: 'heal' }>;

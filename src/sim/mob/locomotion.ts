@@ -20,6 +20,11 @@
 // trace AND rng draw-order log stay byte-identical. The in-place Entity mutation is
 // intentional (the refactor's immutability waiver). The Nythraxis death-dialogue
 // branch is factored out behind ctx.onBossDeath (its body stays on Sim for N1).
+// One deliberate post-move exception: the idle wander draws and the resetEvadingMob
+// wander re-roll go through the shared idleRng helper (mob/idle_rng.ts) rather than
+// ctx.rng directly, so an off-stream mob's PASSIVE draws stay private. The helper's
+// fallback returns ctx.rng ITSELF, so every shared-stream mob's draw position is
+// byte-identical (pinned by tests/off_stream_rng.test.ts).
 //
 // `src/sim`-pure: no DOM/Three/render/ui/game/net imports, no Math.random/Date.now
 // (enforced by tests/architecture.test.ts). data/types/world/threat/pathfind and the
@@ -42,6 +47,9 @@ import {
   riftRankForBaseLevel,
 } from '../rift/ranks';
 import { instancePlayerIds } from '../rift/runs';
+// Type only: the idle sub-stream is threaded through the wander step as a local.
+// The helper that CONSTRUCTS one lives in mob/idle_rng.ts.
+import type { Rng } from '../rng';
 import type { SimContext } from '../sim_context';
 import { clearThreat, hasEscapeStealth, stealthDetectionRadius } from '../threat';
 import {
@@ -56,6 +64,7 @@ import {
   type MobTemplate,
   NYTHRAXIS_ADD_ID,
   NYTHRAXIS_BOSS_ID,
+  normAngle,
   SISTER_NHALIA_BOSS_ID,
   steadyAngleTo,
   TOLLING_BELL_TEMPLATE_ID,
@@ -71,6 +80,8 @@ import {
   updateMobChargeDash,
 } from './charge';
 import { updateMobCombatProfile } from './combat_profile';
+import { applyBroodBurn } from './dragonkin_brood';
+import { idleRng, wanderPause } from './idle_rng';
 import {
   claimMechanicSpacing,
   mechanicSlotHeld,
@@ -78,6 +89,14 @@ import {
   resetMechanicSpacing,
   tickMechanicSpacing,
 } from './mechanic_spacing';
+import {
+  impairedZoneFuseMult,
+  openRiftEscapeWindow,
+  RIFT_MECHANIC_WINDUP_SEC,
+  RIFT_POST_MECHANIC_SWING_GAP_SEC,
+  resetRiftMechanicWindups,
+  riftEscapeWindowActive,
+} from './rift_escape_window';
 import { rallyFleeingAllies } from './social_aggro';
 import { isTrivialTo, retargetMob, tickForcedTarget } from './targeting';
 import { emitMobYell } from './yells';
@@ -109,6 +128,11 @@ const NYTHRAXIS_HEROIC_ADD_IDS = new Set([
 ]);
 
 export function updateMob(ctx: SimContext, mob: Entity): void {
+  // Summoned quest add (widow hatchling): cancel its out-of-combat despawn while it
+  // is fighting; resetEvadingMob (re)starts the countdown when it leashes home.
+  if (mob.leashDespawnSecs !== undefined && !mob.dead && mob.inCombat) {
+    mob.despawnTimer = undefined;
+  }
   if (mob.dead) {
     ctx.onBossDeath(mob);
     if (mob.ownerId !== null && MOBS[mob.templateId]?.family !== 'demon') return;
@@ -400,13 +424,24 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
         break;
       }
       mob.wanderTimer -= DT;
+      // ONE idle sub-stream for the whole wander step, threaded through all three
+      // draw sites below (the ambient stable horses do the same, mob/ambient.ts).
+      // Two of them can fire on the SAME tick (a fresh target the mob already
+      // stands on arrives immediately) and idleRng re-seeds an off-stream mob from
+      // the tick plus its id, so a second call would hand the pause the very value
+      // the target angle just used. Taken on first draw, so an idle off-stream mob
+      // allocates nothing on the ticks that roll nothing; a shared-stream mob still
+      // gets ctx.rng, the same instance as before, so no draw moves position,
+      // order, or count.
+      let rng: Rng | null = null;
       if (mob.wanderTimer <= 0) {
+        rng = idleRng(ctx, mob);
         if (mob.wanderTarget) {
           mob.wanderTarget = null;
-          mob.wanderTimer = ctx.rng.range(3, 10);
+          mob.wanderTimer = wanderPause(rng, mob, 3, 10);
         } else {
-          const ang = ctx.rng.range(0, Math.PI * 2);
-          const r = ctx.rng.range(MIN_WANDER_RADIUS, MAX_WANDER_RADIUS);
+          const ang = rng.range(0, Math.PI * 2);
+          const r = rng.range(MIN_WANDER_RADIUS, MAX_WANDER_RADIUS);
           mob.wanderTarget = ctx.groundPos(
             mob.spawnPos.x + Math.sin(ang) * r,
             mob.spawnPos.z + Math.cos(ang) * r,
@@ -415,10 +450,31 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
         }
       }
       if (mob.wanderTarget) {
-        const arrived = ctx.moveToward(mob, mob.wanderTarget, mob.moveSpeed * 0.35);
-        if (arrived) {
+        // The same pause the walk-budget arm rolls, hasted the same way: arrival is
+        // the arm a quick mob actually reaches (a whelp ambles at moveSpeed 10 x
+        // 0.35, crossing the whole wander ring in about 5s), so dividing only the
+        // 30s timeout left the knob dead for the very mobs it was authored for.
+        const settle = () => {
           mob.wanderTarget = null;
-          mob.wanderTimer = ctx.rng.range(3, 10);
+          mob.wanderTimer = wanderPause(rng ?? idleRng(ctx, mob), mob, 3, 10);
+        };
+        // An authored-immobile mob (moveSpeed 0: the egg/sac puzzle objects, and
+        // the Drakelands clutch parks 75 of them in one zone) can never close the
+        // 2 to 9 yd its pick sits away, so the step below is a guaranteed no-op
+        // that still pays a full moveToward: a slide-fan collider resolve plus
+        // the groundHeight sample that dominates this whole lap. Reproduce the
+        // two outcomes directly instead. Inside the arrival band moveToward
+        // returns true and writes nothing else, so the draw above still fires on
+        // the same tick and the shared rng stream cannot move; outside it, a zero
+        // step puts every fan candidate back on the mob's own position, so the
+        // bearing write (`f` on the wire) is all that survives. The only effect
+        // dropped is the fan's un-wedge nudge, and an immobile mob has nowhere to
+        // be nudged to.
+        if (mob.moveSpeed <= 0) {
+          if (dist2d(mob.pos, mob.wanderTarget) < 0.3) settle();
+          else mob.facing = angleTo(mob.pos, mob.wanderTarget);
+        } else if (ctx.moveToward(mob, mob.wanderTarget, mob.moveSpeed * 0.35)) {
+          settle();
         }
       }
       break;
@@ -438,10 +494,13 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
       const result = updateMobCombatProfile(ctx, mob, () => {
         // The anti-kite snare, loud battle cries, and the heroic charge trigger
         // fire once per engaged tick, from either engaged state (mid-chase is
-        // the kite case they exist for).
+        // the kite case they exist for). The windup ticker runs AFTER the
+        // snare: on a detonation tick the snare still sees the window open and
+        // holds, so a slow can never land the same instant as the blast.
         pulseAntiKiteSnare(ctx, mob);
         pulseLoudYell(ctx, mob);
         tryStartMobCharge(ctx, mob);
+        tickRiftMechanicWindups(ctx, mob);
       });
       if (result === 'runAttackMechanics') runMobAttackMechanics(ctx, mob);
       break;
@@ -599,6 +658,165 @@ function consumeCrossedInfernoGates(
   return crossed;
 }
 
+// The aoePulse blast, extracted verbatim from the driver so the instant path
+// (unstamped mobs) and the windup detonation (rift-stamped bosses,
+// tickRiftMechanicWindups) share one body: same emit order, same one-draw-per-
+// player rng shape, same non-lethal cap.
+function fireAoePulse(
+  ctx: SimContext,
+  mob: Entity,
+  pulse: NonNullable<MobTemplate['aoePulse']>,
+  origin?: Vec3,
+): void {
+  // A windup detonation blasts from the telegraphed ring center (origin); the
+  // instant path (unstamped mobs) passes nothing and keeps the live position.
+  const center = origin ?? mob.pos;
+  const school = pulse.school ?? 'shadow';
+  ctx.emit({
+    type: 'spellfx',
+    sourceId: mob.id,
+    targetId: mob.id,
+    school,
+    fx: pulse.fx ?? 'nova',
+  });
+  // Rift rule: raw un-telegraphed damage never one-shots from full HP
+  // (the heroic_s x4 multiplier would otherwise cross that line).
+  // Mob-invariant, so computed once outside the player loop.
+  const capPulse = mobInRiftInstance(ctx, mob);
+  for (const meta of ctx.players.values()) {
+    const pe = ctx.entities.get(meta.entityId);
+    if (pe && !pe.dead && dist2d(pe.pos, center) <= pulse.radius) {
+      // Heroic scaling multiplies AFTER the draw so the rng stream is
+      // identical across difficulties (mechanicDamageMult, difficulty.ts).
+      let dmg = Math.round(ctx.rng.range(pulse.min, pulse.max) * (mob.mechanicDamageMult ?? 1));
+      if (capPulse) dmg = capRiftNonLethalMechanicDamage(dmg, pe.maxHp);
+      ctx.dealDamage(mob, pe, dmg, false, school, pulse.name, 'hit', true);
+    }
+  }
+}
+
+// The War Stomp slam, extracted verbatim from the driver for the same
+// instant-vs-windup split as fireAoePulse above.
+function fireWarStomp(
+  ctx: SimContext,
+  mob: Entity,
+  stomp: NonNullable<MobTemplate['stomp']>,
+  origin?: Vec3,
+): void {
+  // A windup detonation blasts from the telegraphed ring center (origin); the
+  // instant path (unstamped mobs) passes nothing and keeps the live position.
+  const center = origin ?? mob.pos;
+  const school = stomp.school ?? 'physical';
+  ctx.emit({ type: 'spellfx', sourceId: mob.id, targetId: mob.id, school, fx: 'nova' });
+  if (!MOBS[mob.templateId]?.quietMechanics)
+    ctx.emit({
+      type: 'log',
+      text: `${mob.name} unleashes ${stomp.name}!`,
+      color: '#ff9933',
+      entityId: mob.id,
+    });
+  const capStomp = mobInRiftInstance(ctx, mob);
+  for (const meta of ctx.players.values()) {
+    const pe = ctx.entities.get(meta.entityId);
+    if (!pe || pe.dead || dist2d(pe.pos, center) > stomp.radius) continue;
+    if (stomp.min !== undefined && stomp.max !== undefined) {
+      let dmg = Math.round(ctx.rng.range(stomp.min, stomp.max) * (mob.mechanicDamageMult ?? 1));
+      if (capStomp) dmg = capRiftNonLethalMechanicDamage(dmg, pe.maxHp);
+      ctx.dealDamage(mob, pe, dmg, false, school, stomp.name, 'hit', true);
+    }
+    if (pe.dead) continue; // a fatal slam should not also stun the corpse
+    ctx.applyAura(pe, {
+      id: 'stomp_stun',
+      name: stomp.name,
+      kind: 'stun',
+      remaining: stomp.duration,
+      duration: stomp.duration,
+      value: 0,
+      sourceId: mob.id,
+      school: school as Aura['school'],
+    });
+  }
+}
+
+// Start an instant-mechanic windup on a rift-stamped boss: arm the shared lock
+// through the windup (the bigCast cast-time precedent, so no other mechanic can
+// land mid-telegraph), stamp the countdown, and drape the ground-ring telegraph
+// at the TRUE blast radius so the edge players dodge is the edge they see.
+// Returns false (a no-op) for every unstamped mob, whose drivers keep the
+// shipped instant fire. Draws no rng.
+function startRiftMechanicWindup(
+  ctx: SimContext,
+  mob: Entity,
+  kind: 'stomp' | 'pulse',
+  radius: number,
+  school: Aura['school'],
+): boolean {
+  if ((mob.riftMechanicSpacing ?? 0) <= 0) return false;
+  claimMechanicSpacing(mob, RIFT_MECHANIC_WINDUP_SEC);
+  openRiftEscapeWindow(ctx, mob, RIFT_MECHANIC_WINDUP_SEC);
+  // Snapshot the ring center: the detonation is measured from HERE, so the
+  // edge players dodge stays the edge they were shown even if the boss chases
+  // during the windup.
+  if (kind === 'stomp') {
+    mob.stompWindupRemaining = RIFT_MECHANIC_WINDUP_SEC;
+    mob.stompWindupX = mob.pos.x;
+    mob.stompWindupZ = mob.pos.z;
+  } else {
+    mob.pulseWindupRemaining = RIFT_MECHANIC_WINDUP_SEC;
+    mob.pulseWindupX = mob.pos.x;
+    mob.pulseWindupZ = mob.pos.z;
+  }
+  ctx.emit({
+    type: 'spellfxAt',
+    x: mob.pos.x,
+    z: mob.pos.z,
+    school,
+    fx: 'runeCircle',
+    radius,
+    duration: RIFT_MECHANIC_WINDUP_SEC,
+  });
+  return true;
+}
+
+// Tick the in-flight instant-mechanic windups and detonate at zero. Runs from
+// the engaged-tick hook (both chase and attack states, next to the anti-kite
+// snare): a windup whose ring is already on the ground must complete even if
+// the tank steps out of melee, or the telegraph would lie. The detonation
+// pushes the next auto-attack out by RIFT_POST_MECHANIC_SWING_GAP_SEC BEFORE
+// this tick's swing resolves (the hook runs ahead of the pursuit swing), so a
+// blast can never stack with a white swing in the same instant. Inert for
+// every mob without a windup in flight (rift-stamped bosses only ever gain one).
+function tickRiftMechanicWindups(ctx: SimContext, mob: Entity): void {
+  if ((mob.stompWindupRemaining ?? 0) > 0) {
+    mob.stompWindupRemaining = Math.max(0, (mob.stompWindupRemaining ?? 0) - DT);
+    if (mob.stompWindupRemaining === 0) {
+      const stomp = MOBS[mob.templateId]?.stomp;
+      if (stomp) {
+        fireWarStomp(ctx, mob, stomp, {
+          x: mob.stompWindupX ?? mob.pos.x,
+          y: mob.pos.y,
+          z: mob.stompWindupZ ?? mob.pos.z,
+        });
+      }
+      mob.swingTimer = Math.max(mob.swingTimer, RIFT_POST_MECHANIC_SWING_GAP_SEC);
+    }
+  }
+  if ((mob.pulseWindupRemaining ?? 0) > 0) {
+    mob.pulseWindupRemaining = Math.max(0, (mob.pulseWindupRemaining ?? 0) - DT);
+    if (mob.pulseWindupRemaining === 0) {
+      const pulse = MOBS[mob.templateId]?.aoePulse;
+      if (pulse) {
+        fireAoePulse(ctx, mob, pulse, {
+          x: mob.pulseWindupX ?? mob.pos.x,
+          y: mob.pos.y,
+          z: mob.pulseWindupZ ?? mob.pos.z,
+        });
+      }
+      mob.swingTimer = Math.max(mob.swingTimer, RIFT_POST_MECHANIC_SWING_GAP_SEC);
+    }
+  }
+}
+
 function runMobAttackMechanics(ctx: SimContext, mob: Entity): void {
   // Every driver below consults riftMechanicSuppressed: a rift boss spawned at
   // a low rank runs only the head of its template's rankMechanics list (C=1 ..
@@ -649,78 +867,58 @@ function runMobAttackMechanics(ctx: SimContext, mob: Entity): void {
       });
     }
   }
-  // Boss/miniboss pulse mechanic.
+  // Boss/miniboss pulse mechanic. On a rift-stamped boss the fire is a WINDUP
+  // (a ground-ring telegraph, then the blast RIFT_MECHANIC_WINDUP_SEC later,
+  // tickRiftMechanicWindups); every other carrier keeps the shipped instant.
   const pulse = MOBS[mob.templateId]?.aoePulse;
   if (pulse && !riftMechanicSuppressed(mob, 'aoePulse')) {
     mob.pulseTimer -= DT;
     // Held (lock running, or an older-due sibling first): no reset, the timer
     // keeps drifting negative until this driver's turn at the shared slot.
     if (mob.pulseTimer <= 0 && !mechanicSlotHeld(mob, 'aoePulse')) {
-      mob.pulseTimer = pulse.every;
-      claimMechanicSpacing(mob);
-      const school = pulse.school ?? 'shadow';
-      ctx.emit({
-        type: 'spellfx',
-        sourceId: mob.id,
-        targetId: mob.id,
-        school,
-        fx: pulse.fx ?? 'nova',
-      });
-      // Rift rule: raw un-telegraphed damage never one-shots from full HP
-      // (the heroic_s x4 multiplier would otherwise cross that line).
-      // Mob-invariant, so computed once outside the player loop.
-      const capPulse = mobInRiftInstance(ctx, mob);
-      for (const meta of ctx.players.values()) {
-        const pe = ctx.entities.get(meta.entityId);
-        if (pe && !pe.dead && dist2d(pe.pos, mob.pos) <= pulse.radius) {
-          // Heroic scaling multiplies AFTER the draw so the rng stream is
-          // identical across difficulties (mechanicDamageMult, difficulty.ts).
-          let dmg = Math.round(ctx.rng.range(pulse.min, pulse.max) * (mob.mechanicDamageMult ?? 1));
-          if (capPulse) dmg = capRiftNonLethalMechanicDamage(dmg, pe.maxHp);
-          ctx.dealDamage(mob, pe, dmg, false, school, pulse.name, 'hit', true);
-        }
+      if (
+        startRiftMechanicWindup(
+          ctx,
+          mob,
+          'pulse',
+          pulse.radius,
+          (pulse.school ?? 'shadow') as Aura['school'],
+        )
+      ) {
+        mob.pulseTimer = pulse.every + RIFT_MECHANIC_WINDUP_SEC;
+      } else {
+        mob.pulseTimer = pulse.every;
+        claimMechanicSpacing(mob);
+        fireAoePulse(ctx, mob, pulse);
       }
     }
   }
   // Boss/miniboss War Stomp: a periodic ground slam that stuns and optionally
   // damages nearby players. Telegraphed via createMob, which seeds stompTimer to
   // one full interval so the first slam never lands the instant combat opens.
+  // On a rift-stamped boss the slam additionally WINDS UP behind a ground-ring
+  // telegraph (the "no tell" tank report on Warlord Grask: an instant stomp
+  // could land the same tick as an auto-attack); world and dungeon carriers
+  // (Korgath, mob_warstomp.test.ts) keep the shipped instant.
   const stomp = MOBS[mob.templateId]?.stomp;
   if (stomp && !riftMechanicSuppressed(mob, 'stomp')) {
     mob.stompTimer -= DT;
     // Held: no reset, the timer ages negative until this driver's slot turn.
     if (mob.stompTimer <= 0 && !mechanicSlotHeld(mob, 'stomp')) {
-      mob.stompTimer = stomp.every;
-      claimMechanicSpacing(mob);
-      const school = stomp.school ?? 'physical';
-      ctx.emit({ type: 'spellfx', sourceId: mob.id, targetId: mob.id, school, fx: 'nova' });
-      if (!MOBS[mob.templateId]?.quietMechanics)
-        ctx.emit({
-          type: 'log',
-          text: `${mob.name} unleashes ${stomp.name}!`,
-          color: '#ff9933',
-          entityId: mob.id,
-        });
-      const capStomp = mobInRiftInstance(ctx, mob);
-      for (const meta of ctx.players.values()) {
-        const pe = ctx.entities.get(meta.entityId);
-        if (!pe || pe.dead || dist2d(pe.pos, mob.pos) > stomp.radius) continue;
-        if (stomp.min !== undefined && stomp.max !== undefined) {
-          let dmg = Math.round(ctx.rng.range(stomp.min, stomp.max) * (mob.mechanicDamageMult ?? 1));
-          if (capStomp) dmg = capRiftNonLethalMechanicDamage(dmg, pe.maxHp);
-          ctx.dealDamage(mob, pe, dmg, false, school, stomp.name, 'hit', true);
-        }
-        if (pe.dead) continue; // a fatal slam should not also stun the corpse
-        ctx.applyAura(pe, {
-          id: 'stomp_stun',
-          name: stomp.name,
-          kind: 'stun',
-          remaining: stomp.duration,
-          duration: stomp.duration,
-          value: 0,
-          sourceId: mob.id,
-          school: school as Aura['school'],
-        });
+      if (
+        startRiftMechanicWindup(
+          ctx,
+          mob,
+          'stomp',
+          stomp.radius,
+          (stomp.school ?? 'physical') as Aura['school'],
+        )
+      ) {
+        mob.stompTimer = stomp.every + RIFT_MECHANIC_WINDUP_SEC;
+      } else {
+        mob.stompTimer = stomp.every;
+        claimMechanicSpacing(mob);
+        fireWarStomp(ctx, mob, stomp);
       }
     }
   }
@@ -771,6 +969,9 @@ function runMobAttackMechanics(ctx: SimContext, mob: Entity): void {
       ) {
         mob.bigCastTimer = bigCast.every + bigCast.castTime;
         claimMechanicSpacing(mob, bigCast.castTime);
+        // The bar is a telegraph: open the escape window to the authored cast
+        // time (a wall-clock deadline; a kite-frozen bar cannot pin it open).
+        openRiftEscapeWindow(ctx, mob, bigCast.castTime);
         mob.castingAbility = bigCast.castId;
         mob.castTotal = bigCast.castTime;
         mob.castRemaining = bigCast.castTime;
@@ -849,14 +1050,23 @@ function runMobAttackMechanics(ctx: SimContext, mob: Entity): void {
         // The anchor list is iterated in instancePlayerIds order and draws no
         // further rng, so the stream stays deterministic.
         const anchorPids = heroicS && tmplKey === 'deathZoneStrike' ? instPids : [targetPid];
+        // Impairment-aware fuses: each anchor's countdown stretches by their
+        // LIVE movement impairment (a snared or rooted runner cannot cross the
+        // radius in the authored fuse; the S-tempo escape math in
+        // rift/ranks.ts is solved at unimpaired run speed 7), capped by
+        // RIFT_IMPAIRED_FUSE_CAP. Deterministic and drawn-rng-free, so the
+        // target pick above keeps its documented stream position.
+        let maxFuse = fuse;
         for (const anchorPid of anchorPids) {
           const anchorE = ctx.entities.get(anchorPid);
           if (!anchorE || anchorE.dead) continue;
+          const anchorFuse = fuse * impairedZoneFuseMult(ctx, anchorE);
+          maxFuse = Math.max(maxFuse, anchorFuse);
           inst.bossDeathZones.push({
             x: anchorE.pos.x,
             z: anchorE.pos.z,
             radius: def.radius,
-            remaining: fuse,
+            remaining: anchorFuse,
           });
           // Notify online clients so they can mirror the zone countdown locally.
           // Interest-scoped by world position, so only instance players receive it.
@@ -865,17 +1075,23 @@ function runMobAttackMechanics(ctx: SimContext, mob: Entity): void {
             x: anchorE.pos.x,
             z: anchorE.pos.z,
             radius: def.radius,
-            durationSecs: fuse,
+            durationSecs: anchorFuse,
           });
         }
         // Begin casting - cast bar is the visual telegraph for players to move.
         // The spacing lock covers the whole fuse plus one window after the
         // detonation, so no instant (a fear above all) lands while players
-        // are stepping out of the zone.
-        claimMechanicSpacing(mob, fuse);
+        // are stepping out of the zone. The bar (and the lock) run to the
+        // LONGEST anchor fuse; a shorter zone in the same barrage detonates
+        // early via tickRiftBossDeathZones while the bar still fills.
+        claimMechanicSpacing(mob, maxFuse);
+        // The zones detonate on the global fuse clock (tickRiftBossDeathZones)
+        // whatever happens to the melee-gated bar, so the escape window runs to
+        // the LAST possible detonation and then closes on its own.
+        openRiftEscapeWindow(ctx, mob, maxFuse);
         mob.castingAbility = def.castId;
-        mob.castTotal = fuse;
-        mob.castRemaining = fuse;
+        mob.castTotal = maxFuse;
+        mob.castRemaining = maxFuse;
         mob.castTargetId = targetPid;
         mob.channeling = false;
         if (def.yell) emitMobYell(ctx, mob, def.yell);
@@ -962,6 +1178,74 @@ function runMobAttackMechanics(ctx: SimContext, mob: Entity): void {
       }
     }
   }
+  // Dragonkin fire breath (breathCone): bigCast's cast machinery aimed down a
+  // frontal cone instead of a radius. The mob shows a real cast bar for
+  // castTime (the telegraph; it keeps meleeing), then the breath lands on
+  // every living player inside `range` yards AND the `arcDeg` cone about the
+  // mob's CURRENT facing, so sidestepping the cone during the bar is the
+  // counterplay. Cadence lazy-seeds on the first engaged tick (the first
+  // breath lands one full interval into the fight, the stomp/bigCast
+  // telegraph convention) and is appended AFTER every existing driver so no
+  // existing mechanic's rng draw moves.
+  const breath = MOBS[mob.templateId]?.breathCone;
+  if (breath && !riftMechanicSuppressed(mob, 'breathCone')) {
+    if (mob.castingAbility === breath.castId) {
+      mob.castRemaining = Math.max(0, mob.castRemaining - DT);
+      if (mob.castRemaining <= 0) {
+        mob.castingAbility = null;
+        mob.castTotal = 0;
+        mob.castRemaining = 0;
+        mob.castTargetId = null;
+        const school = (breath.school ?? 'fire') as Aura['school'];
+        // The renderer draws the breath as a terrain-hugging cone off the
+        // mob's live facing (the existing fireCone visual), not a nova ring.
+        ctx.emit({
+          type: 'spellfx',
+          sourceId: mob.id,
+          targetId: mob.id,
+          school,
+          fx: 'fireCone',
+          range: breath.range,
+          angle: breath.arcDeg,
+        });
+        if (!MOBS[mob.templateId]?.quietMechanics)
+          ctx.emit({
+            type: 'log',
+            text: `${mob.name} unleashes ${breath.name}!`,
+            color: '#ff9933',
+            entityId: mob.id,
+          });
+        const capBreath = mobInRiftInstance(ctx, mob);
+        const halfArc = (breath.arcDeg * Math.PI) / 180 / 2;
+        for (const meta of ctx.players.values()) {
+          const pe = ctx.entities.get(meta.entityId);
+          if (!pe || pe.dead || dist2d(pe.pos, mob.pos) > breath.range) continue;
+          if (Math.abs(normAngle(angleTo(mob.pos, pe.pos) - mob.facing)) > halfArc) continue;
+          let dmg = Math.round(
+            ctx.rng.range(breath.min, breath.max) * (mob.mechanicDamageMult ?? 1),
+          );
+          if (capBreath) dmg = capRiftNonLethalMechanicDamage(dmg, pe.maxHp);
+          ctx.dealDamage(mob, pe, dmg, false, school, breath.name, 'hit', true);
+          if (breath.burn && !pe.dead) applyBroodBurn(ctx, mob, pe, breath.burn);
+        }
+      }
+    } else {
+      // Not in the rift spacing governor's table: breathCone ships on the
+      // open-world dragonkin only (no rift boss carries it), and the governed
+      // table requires a MANDATORY per-entity timer field. If a rift boss
+      // ever takes a breath cone, register breathTimer there first.
+      mob.breathTimer ??= breath.every;
+      mob.breathTimer -= DT;
+      if (mob.breathTimer <= 0 && mob.castingAbility === null) {
+        mob.breathTimer = breath.every + breath.castTime;
+        mob.castingAbility = breath.castId;
+        mob.castTotal = breath.castTime;
+        mob.castRemaining = breath.castTime;
+        mob.castTargetId = null;
+        mob.channeling = false;
+      }
+    }
+  }
 }
 
 // Howling Gale: the anti-kite snare pulse. A boss whose template declares `aoeSlow`
@@ -980,6 +1264,13 @@ function pulseAntiKiteSnare(ctx: SimContext, mob: Entity): void {
   if (!aoeSlow || riftMechanicSuppressed(mob, 'aoeSlow')) return;
   mob.aoeSlowTimer -= DT;
   if (mob.aoeSlowTimer > 0) return;
+  // Escape window (rift-stamped bosses only): a due snare HOLDS while a
+  // telegraph is in flight, exactly the hold-at-due shape of the spacing lock
+  // (the timer keeps drifting negative, and the snare fires the first tick the
+  // window closes). Landing a 50% slow mid-death-zone made the S-tempo escape
+  // math unsolvable (rift_escape_window.ts); between telegraphs the snare keeps
+  // its free anti-kite cadence, untouched for every unstamped carrier.
+  if (riftEscapeWindowActive(ctx, mob)) return;
   mob.aoeSlowTimer = aoeSlow.every;
   const school = (aoeSlow.school ?? 'nature') as Aura['school'];
   ctx.emit({ type: 'spellfx', sourceId: mob.id, targetId: mob.id, school, fx: 'nova' });
@@ -1030,6 +1321,9 @@ export function resetEvadingMob(ctx: SimContext, mob: Entity): void {
   mob.hp = mob.maxHp;
   mob.auras = [];
   mob.inCombat = false;
+  // A summoned quest add starts its out-of-combat despawn countdown the moment it
+  // leashes home (the player ran off); updateMob cancels it if the add re-engages.
+  if (mob.leashDespawnSecs !== undefined) mob.despawnTimer = mob.leashDespawnSecs;
   mob.tappedById = null;
   mob.leashAnchor = null;
   mob.evadeStall = 0;
@@ -1058,6 +1352,9 @@ export function resetEvadingMob(ctx: SimContext, mob: Entity): void {
   mob.terrifyTimer = MOBS[mob.templateId]?.terrify?.every ?? 0;
   // The shared spacing lock dies with the pull like the timers around it.
   resetMechanicSpacing(mob);
+  // An in-flight instant-mechanic windup dies with the pull too: its ground
+  // ring must not detonate on the next fresh engage.
+  resetRiftMechanicWindups(mob);
   // A mid-flight inferno channel dies with the pull; the cadence reseeds and
   // the hp gates re-arm alongside firedSummons above.
   mob.infernoTimer = MOBS[mob.templateId]?.infernoChannel?.every ?? 0;
@@ -1084,10 +1381,40 @@ export function resetEvadingMob(ctx: SimContext, mob: Entity): void {
   mob.deathZoneCastTimer = deathZoneCastDef?.every ?? 0;
   const deathZoneStrikeDef = MOBS[mob.templateId]?.deathZoneStrike;
   mob.deathZoneStrikeTimer = deathZoneStrikeDef?.every ?? 0;
+  // The dragonkin brood pull-state dies with the pull too: the breath cadence
+  // reseeds lazily (undefined -> full interval on the next engaged tick), a
+  // mid-flight breath bar clears with the bigCast family below, the cleave
+  // cadence restarts, the counter-stun re-arms, and the next pull opens with
+  // the engage shout again.
+  const breathDef = MOBS[mob.templateId]?.breathCone;
+  mob.breathTimer = undefined;
+  mob.swingCleaveCount = undefined;
+  mob.counterStunReadyAt = undefined;
+  mob.shoutFired = undefined;
+  mob.shoutIntroUntil = undefined;
+  // The whelp pounce state dies with the pull too (the respawnMob twin): the
+  // speed burst ends here, so the authored template speed is restored BEFORE
+  // leapUntil clears (the brood pass's own restore is gated on a LIVE leapUntil,
+  // dragonkin_brood.ts, and could never run again once this clears it), the
+  // re-pounce cooldown lifts so the next pull opens with the jump attack, and
+  // neither the unpaid pounce burn (mob_swing pays it on the first landed swing,
+  // whichever pull that is) nor an unspent one-hit ward carries into it.
+  // The four EGG fields respawnMob also clears deliberately stay out: a mob
+  // reaching here is alive, so broodCracked/broodHatched (corpse state) cannot
+  // be set, broodChainAt is a live clutch ripple no pull reset should cancel,
+  // and broodWardOnHatch is meant to outlive the egg's death.
+  if (mob.leapUntil !== undefined) {
+    mob.moveSpeed = MOBS[mob.templateId]?.moveSpeed ?? mob.moveSpeed;
+  }
+  mob.leapUntil = undefined;
+  mob.leapReadyAt = undefined;
+  mob.leapBurnPending = undefined;
+  mob.wardOneHit = undefined;
   if (
     (bigCastDef && mob.castingAbility === bigCastDef.castId) ||
     (deathZoneCastDef && mob.castingAbility === deathZoneCastDef.castId) ||
-    (deathZoneStrikeDef && mob.castingAbility === deathZoneStrikeDef.castId)
+    (deathZoneStrikeDef && mob.castingAbility === deathZoneStrikeDef.castId) ||
+    (breathDef && mob.castingAbility === breathDef.castId)
   ) {
     mob.castingAbility = null;
     mob.castTotal = 0;
@@ -1105,7 +1432,9 @@ export function resetEvadingMob(ctx: SimContext, mob: Entity): void {
       }
     }
   }
-  mob.wanderTimer = ctx.rng.range(2, 8);
+  // The reset re-seeds the idle timer, so an off-stream mob rolls it off-stream too
+  // (idleRng's fallback IS ctx.rng, so every other mob's draw is unmoved).
+  mob.wanderTimer = wanderPause(idleRng(ctx, mob), mob, 2, 8);
   if (mob.templateId === NYTHRAXIS_BOSS_ID) ctx.resetNythraxisEncounter(mob);
   if (mob.templateId === SISTER_NHALIA_BOSS_ID) resetDrownedLitanyBossEncounter(ctx, mob);
   // No bossId check needed here: clearDelveRaiseDeadChannel is a no-op for every

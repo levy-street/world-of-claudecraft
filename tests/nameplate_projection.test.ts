@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import {
+  isNameplateScreenAnchorVisible,
   isProjectedNameplateAnchorVisible,
   nameplateScreenTransform,
 } from '../src/render/nameplate_projection';
@@ -34,5 +35,15 @@ describe('nameplate projection', () => {
     expect(nameplateScreenTransform(123.456, 78.123)).toBe(
       'translate3d(123.46px, 78.12px, 0) translate(-50%, -100%)',
     );
+  });
+
+  it('rejects anchors outside the viewport before decluttering and painting them', () => {
+    expect(isNameplateScreenAnchorVisible(640, 360, 1280, 720)).toBe(true);
+    // Keep a bounded gutter so a wide plate or an emote can remain partially visible.
+    expect(isNameplateScreenAnchorVisible(-119, 360, 1280, 720)).toBe(true);
+    expect(isNameplateScreenAnchorVisible(-121, 360, 1280, 720)).toBe(false);
+    expect(isNameplateScreenAnchorVisible(1401, 360, 1280, 720)).toBe(false);
+    expect(isNameplateScreenAnchorVisible(640, -121, 1280, 720)).toBe(false);
+    expect(isNameplateScreenAnchorVisible(640, 841, 1280, 720)).toBe(false);
   });
 });

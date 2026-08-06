@@ -324,6 +324,7 @@ function makeFakeHost() {
     devCommands: false,
     marketListings: [],
     bankerIds: [],
+    guildBanks: new Map(),
     vcup: createVcState(),
     deedDirtyPids: new Set<number>(),
     deedDirtyKeys: new Map<number, Set<string>>(),
@@ -597,6 +598,14 @@ describe('createSimContext (isolated, fake host)', () => {
     expect(ctx.bankerIds).toBe(host.bankerIds);
     host.bankerIds.push(4242); // the Sim ctor pushes ids after the ctx is built
     expect(ctx.bankerIds).toEqual([4242]);
+  });
+
+  it('exposes guildBanks as a live shared view (the bankerIds idiom)', () => {
+    const { host } = makeFakeHost();
+    const ctx = createSimContext(host);
+    expect(ctx.guildBanks).toBe(host.guildBanks);
+    host.guildBanks.set(3, { treasury: 0, inventory: [], purchasedSlots: 0 });
+    expect(ctx.guildBanks.get(3)).toEqual({ treasury: 0, inventory: [], purchasedSlots: 0 });
   });
 
   it('passes every callback through to the host by identity (no rewrapping)', () => {

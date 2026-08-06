@@ -459,6 +459,25 @@ export function formatDuration(seconds: number, lang: SupportedLanguage = curren
   }).format(seconds);
 }
 
+// Locale-aware conjunction lists ("A, B, and C" / "A, B et C"): the list
+// separator and conjunction are locale data, never string concat. One
+// formatter is cached per language tag (mirrors numberFormatCache);
+// ListFormat instances are immutable, so sharing is safe. First consumer is
+// the material_profession_hint_view Used-by tooltip line.
+const listFormatCache = new Map<string, Intl.ListFormat>();
+export function formatList(
+  items: readonly string[],
+  lang: SupportedLanguage = currentLanguage,
+): string {
+  const tag = languageTag(lang);
+  let fmt = listFormatCache.get(tag);
+  if (!fmt) {
+    fmt = new Intl.ListFormat(tag, { style: 'long', type: 'conjunction' });
+    listFormatCache.set(tag, fmt);
+  }
+  return fmt.format(items);
+}
+
 export function formatDateTime(
   value: Date | number,
   options?: Intl.DateTimeFormatOptions,

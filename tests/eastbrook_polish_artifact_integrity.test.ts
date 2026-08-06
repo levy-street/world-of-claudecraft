@@ -614,14 +614,24 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(
   POLISH_ROOT,
   'metadata/after-desktop-ultra.json',
 );
-// Re-pinned at the release/v0.34.0 campaign merge: src/render/renderer.ts is the
-// rendererIntegration leaf of the polish composite provenance. The merged file
-// carries both the Last Bell deck-rider paths and the release's async-compile
-// gate, so only the provenance bytes move; the Eastbrook measurements do not.
+// Re-pinned for the merge of release/v0.35.0 into this branch. Every
+// rendererIntegration move on both sides now stacks on src/render/renderer.ts:
+// from the release, PR #2720's Eastbrook fence-removal layout evidence, the live
+// graphics rebuild (context recycle plus profile-aware Eastbrook runtime inputs,
+// PR #2799), the Bear Form quadruped rig (PR #2842), the far-field sprite
+// impostors, fog-free vista and horizon pass (PR #2793), the Blizzard timed
+// ground loop on the snowZone spellfx arm (PR #2861), and the brood
+// shout/flourish and attackByAbility wiring; from this branch, the
+// worldObjectBurning fire-burst cue. Both sides move the same leaf, so the merged
+// tree mints literals matching neither parent. The release retook the polish
+// captures and this branch adopts them verbatim: the accepted file still points
+// at the same captured view, and only its swept provenance bytes follow the
+// merged rendererIntegration and layout inputs.
+// Re-minted with scripts/assets/eastbrook_grand_armoury/remint_polish_provenance.mjs.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '1a0dda52643803321c41a9a10b046f665bcee370568cb9966efbd70681eead79';
+  '91b21d0481d88de775a336fdad87e901b2e2ca5a273d74ed4bf42844306c4e55';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  'e09f80e7b79910523636384ebfcc4ec6566b924118bc59934cc496db3cf22248';
+  '110e06843c14ade2a20530a1770ee82a1a0f86ae49ebad601b560fe2184fb5a1';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -923,7 +933,7 @@ describe('Eastbrook polish committed capture artifacts', () => {
   // implicit fact resting on two sha comparisons above.
   it('declares the frozen evidence triangle count as deliberately stale against the live contract', () => {
     expect(ACCEPTED_POLISH_V2_TOWN_CONTRACT.townTriangles).toBe(28_330);
-    expect(EASTBROOK_TOWN_CAPTURE_CONTRACTS['polish-v2'].townTriangles).toBe(29_110);
+    expect(EASTBROOK_TOWN_CAPTURE_CONTRACTS['polish-v2'].townTriangles).toBe(28_902);
   });
 
   it('pins the exact historical metadata inventory to every base capture and motion frame', () => {
@@ -1478,11 +1488,19 @@ describe('Eastbrook polish performance and contact evidence', () => {
     expect(acceptedFiles).toHaveLength(4);
     // Second-order seal, recomputed LAST in the re-mint recipe: it hashes the
     // performance evidence files, which carry the composite polish provenance.
-    // The merged renderer carries both the cinematics deck-rider paths and the
-    // release's async-compile gate. Those paths are inactive in Eastbrook, so
-    // only provenance hashes re-mint; measured evidence remains byte-identical.
+    // It therefore follows the first-order composite, so this merge moves it for
+    // the same reason: every rendererIntegration move on both sides stacks in
+    // that composite (from the release, PR #2720's fence-removal layout
+    // evidence, the live graphics rebuild #2799, the Bear Form rig swap #2842,
+    // the far-field impostors, fog-free vista and horizon pass #2793, the
+    // Blizzard timed ground loop #2861, and the brood shout/flourish wiring;
+    // from this branch, the worldObjectBurning fire-burst cue), recomputed last
+    // by remint_polish_provenance.mjs. The release retook the polish captures, so
+    // every measured value (frame timings, draw stats, triangle and scenario
+    // numbers) is adopted verbatim from the base tip; no parent's literal
+    // matched the merged tree, and no capture was retaken here.
     expect(fingerprint.digest('hex')).toBe(
-      'a94a9e0ac107928211cdd5e796c37a9bf2f7babbc8c96ada47489e5cbc93d1c0',
+      'a3bfd2d8ceef4ed3e7ea1083c781e9436ac7b3c7b0f93ebb776a70a5106b63cb',
     );
   });
 

@@ -98,4 +98,10 @@ export interface SpatialAudioSink {
     z: number,
     opts?: AbilityAudioOpts,
   ): void;
+  /** A fixed-duration ground zone loop (Blizzard's storm): starts `key`
+   *  looping at (x,y,z) and auto-stops after `duration` seconds. `id`
+   *  discriminates concurrent zones (e.g. two mages both casting Blizzard);
+   *  a fresh call with the same id restarts the timer at the new position,
+   *  matching a zone that just landed again. No-op for a key with no clip. */
+  timedGroundLoop(id: string, key: string, x: number, y: number, z: number, duration: number): void;
 }

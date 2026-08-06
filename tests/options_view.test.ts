@@ -1,4 +1,8 @@
 import { describe, expect, it } from 'vitest';
+import {
+  GRAPHICS_REBUILD_KEYS,
+  normalizeGraphicsSettingsSnapshot,
+} from '../src/game/graphics_rebuild_core';
 import { SETTING_RANGES } from '../src/game/settings';
 import {
   boolToggleNextValue,
@@ -8,6 +12,8 @@ import {
   buildGraphicsControls,
   buildInterfaceControls,
   buildOptionsMenu,
+  copyGraphicsDraft,
+  graphicsDraftDirty,
   INTERFACE_TAB_LABEL_KEY,
   INTERFACE_TAB_ORDER,
   type InterfaceTab,
@@ -18,6 +24,7 @@ import {
   sliderDispatchValue,
   toggleIsOn,
   toggleNextValue,
+  withGraphicsDraft,
 } from '../src/ui/options_view';
 
 // A fake settings projection over plain records, with the real numeric ranges so
@@ -98,6 +105,47 @@ describe('options_view: control primitive dispatch (cluster 1)', () => {
 // native-shell gating preserved; the preset + interfaceMode choices re-render.
 // ---------------------------------------------------------------------------
 describe('options_view: graphics dispatch matrix (cluster 3)', () => {
+  it('stages exactly the six renderer-bound settings over the live projection', () => {
+    expect(GRAPHICS_REBUILD_KEYS).toEqual([
+      'graphicsPreset',
+      'terrainDetail',
+      'foliageDensity',
+      'surfaceDetail',
+      'effectsQuality',
+      'shadowQuality',
+    ]);
+    const live = makeSource({ graphicsPreset: 2, terrainDetail: 0, renderScale: 0.75 });
+    const draft = normalizeGraphicsSettingsSnapshot({ graphicsPreset: 5, terrainDetail: 2 });
+    const staged = withGraphicsDraft(live, GRAPHICS_REBUILD_KEYS, draft);
+    expect(staged.num('graphicsPreset')).toBe(5);
+    expect(staged.num('terrainDetail')).toBe(2);
+    expect(staged.num('renderScale')).toBe(0.75);
+  });
+
+  it('tracks raw change and exact revert without mutating the applied snapshot', () => {
+    const applied = normalizeGraphicsSettingsSnapshot({
+      graphicsPreset: 5,
+      terrainDetail: 0.5,
+    });
+    const draft = copyGraphicsDraft(applied);
+    expect(graphicsDraftDirty(GRAPHICS_REBUILD_KEYS, draft, applied)).toBe(false);
+    draft.terrainDetail = 1;
+    expect(graphicsDraftDirty(GRAPHICS_REBUILD_KEYS, draft, applied)).toBe(true);
+    expect(applied.terrainDetail).toBe(0.5);
+    draft.terrainDetail = 0.5;
+    expect(graphicsDraftDirty(GRAPHICS_REBUILD_KEYS, draft, applied)).toBe(false);
+  });
+
+  it('uses the staged preset to reveal advanced controls before apply', () => {
+    const live = makeSource({ graphicsPreset: 2 });
+    const draft = normalizeGraphicsSettingsSnapshot({ graphicsPreset: 5 });
+    const controls = buildGraphicsControls(withGraphicsDraft(live, GRAPHICS_REBUILD_KEYS, draft), {
+      touch: false,
+      nativeShell: false,
+    });
+    expect(keysOf(controls).slice(0, 6)).toEqual([...GRAPHICS_REBUILD_KEYS]);
+  });
+
   it('lists the base desktop controls in order, no advanced sub-pickers', () => {
     const controls = buildGraphicsControls(makeSource({ graphicsPreset: 4 }), {
       touch: false,
@@ -382,6 +430,7 @@ const COMBAT_KEYS = [
   'fctScale',
   'showSecondaryActionBar',
   'showThirdActionBar',
+  'lockActionBars',
 ];
 const INTERFACE_KEYS_BY_TAB: Record<InterfaceTab, string[]> = {
   general: GENERAL_KEYS,

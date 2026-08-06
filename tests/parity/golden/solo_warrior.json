@@ -10,14 +10,14 @@
     "base mobSwing (mob swings the player)",
     "rollLoot via mob death (L1, ~5876/6036)"
   ],
-  "draws": 302,
-  "drawDigest": "f2f40719",
+  "draws": 310,
+  "drawDigest": "b5becd02",
   "frames": [
     {
       "tick": 0,
       "time": 0,
-      "nextId": 855,
-      "state": "4a86f113",
+      "nextId": 969,
+      "state": "35694f82",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -55,7 +55,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 846,
+          "entityId": 960,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -91,7 +91,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 846
+              "sourceId": 960
             }
           ],
           "blockChance": 0.05,
@@ -104,7 +104,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 100,
-          "id": 846,
+          "id": 960,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -148,45 +148,45 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 856,
-      "state": "39f912e7",
-      "events": "b16d0443",
+      "nextId": 970,
+      "state": "f6b58cdf",
+      "events": "e9f48919",
       "rng": {
         "draws": 7,
-        "digest": "d9dea8ae"
+        "digest": "4f9a2cfb"
       }
     },
     {
       "tick": 40,
       "time": 2,
-      "nextId": 856,
-      "state": "681575a5",
+      "nextId": 970,
+      "state": "56a76e77",
       "events": "741638a5",
       "rng": {
         "draws": 7,
-        "digest": "d9dea8ae"
+        "digest": "4f9a2cfb"
       }
     },
     {
       "tick": 60,
       "time": 3,
-      "nextId": 856,
-      "state": "b0c53f87",
-      "events": "bb8b94f8",
+      "nextId": 970,
+      "state": "3e3432fd",
+      "events": "bad8ddbd",
       "rng": {
-        "draws": 166,
-        "digest": "0a7c62b3"
+        "draws": 174,
+        "digest": "847684f0"
       }
     },
     {
       "tick": 72,
       "time": 3.6,
-      "nextId": 856,
-      "state": "99284c2e",
-      "events": "334f3484",
+      "nextId": 970,
+      "state": "f95c41f3",
+      "events": "2d07afaa",
       "rng": {
-        "draws": 255,
-        "digest": "ca1f00b6"
+        "draws": 265,
+        "digest": "b0a75673"
       },
       "label": "kill",
       "players": [
@@ -206,7 +206,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 7072,
+            "damageDealt": 7073,
             "damageTaken": 5,
             "kills": 1
           },
@@ -214,7 +214,7 @@
           "craftThrottle": {},
           "deedStats": {
             "counters": {
-              "damageDealt": 7072,
+              "damageDealt": 7073,
               "kills": 1
             },
             "dungeonClears": {},
@@ -244,7 +244,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 846,
+          "entityId": 960,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -282,7 +282,7 @@
               "name": "Battle Stance",
               "remaining": 3596.4,
               "school": "physical",
-              "sourceId": 846
+              "sourceId": 960
             }
           ],
           "blockChance": 0.05,
@@ -294,13 +294,13 @@
           "facing": 1.570796,
           "fallStartY": 1.5,
           "fiveSecondRule": 102.6,
-          "hp": 437,
-          "id": 846,
+          "hp": 49995,
+          "id": 960,
           "inCombat": true,
           "kind": "player",
           "level": 10,
           "lootFfaTimer": "Infinity",
-          "maxHp": 442,
+          "maxHp": 50000,
           "maxResource": 100,
           "moveSpeed": 7,
           "offhandItemId": "eastbrook_buckler",
@@ -330,7 +330,7 @@
             "str": 41
           },
           "swingTimer": 0.45,
-          "targetId": 855,
+          "targetId": 969,
           "templateId": "warrior",
           "weapon": {
             "max": 5,
@@ -350,7 +350,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hostile": true,
-          "id": 855,
+          "id": 969,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -360,11 +360,17 @@
           },
           "level": 2,
           "loot": {
-            "copper": 10
+            "copper": 6,
+            "items": [
+              {
+                "count": 1,
+                "itemId": "milepost_boots"
+              }
+            ]
           },
           "lootFfaTimer": 60,
           "lootRecipientIds": [
-            846
+            960
           ],
           "lootable": true,
           "maxHp": 6000,
@@ -388,8 +394,8 @@
             "armor": 10
           },
           "swingTimer": 0.45,
-          "tappedById": 846,
-          "targetId": 846,
+          "tappedById": 960,
+          "targetId": 960,
           "templateId": "forest_wolf",
           "weapon": {
             "max": 6,
@@ -402,12 +408,12 @@
     {
       "tick": 76,
       "time": 3.8,
-      "nextId": 856,
-      "state": "0eadc798",
-      "events": "b44d75d2",
+      "nextId": 970,
+      "state": "e23a643b",
+      "events": "de996439",
       "rng": {
-        "draws": 302,
-        "digest": "f2f40719"
+        "draws": 310,
+        "digest": "b5becd02"
       },
       "label": "final",
       "players": [
@@ -427,7 +433,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 7072,
+            "damageDealt": 7073,
             "damageTaken": 5,
             "kills": 1
           },
@@ -435,7 +441,7 @@
           "craftThrottle": {},
           "deedStats": {
             "counters": {
-              "damageDealt": 7072,
+              "damageDealt": 7073,
               "kills": 1
             },
             "dungeonClears": {},
@@ -469,7 +475,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 846,
+          "entityId": 960,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -507,7 +513,7 @@
               "name": "Battle Stance",
               "remaining": 3596.2,
               "school": "physical",
-              "sourceId": 846
+              "sourceId": 960
             }
           ],
           "blockChance": 0.05,
@@ -520,13 +526,13 @@
           "facing": 1.570796,
           "fallStartY": 1.5,
           "fiveSecondRule": 102.8,
-          "hp": 437,
-          "id": 846,
+          "hp": 49995,
+          "id": 960,
           "inCombat": true,
           "kind": "player",
           "level": 10,
           "lootFfaTimer": "Infinity",
-          "maxHp": 442,
+          "maxHp": 50000,
           "maxResource": 100,
           "moveSpeed": 7,
           "offhandItemId": "eastbrook_buckler",
@@ -556,7 +562,7 @@
             "str": 41
           },
           "swingTimer": 0.25,
-          "targetId": 855,
+          "targetId": 969,
           "templateId": "warrior",
           "weapon": {
             "max": 5,
@@ -576,7 +582,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hostile": true,
-          "id": 855,
+          "id": 969,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -586,11 +592,17 @@
           },
           "level": 2,
           "loot": {
-            "copper": 10
+            "copper": 6,
+            "items": [
+              {
+                "count": 1,
+                "itemId": "milepost_boots"
+              }
+            ]
           },
           "lootFfaTimer": 59.8,
           "lootRecipientIds": [
-            846
+            960
           ],
           "lootable": true,
           "maxHp": 6000,
@@ -614,8 +626,8 @@
             "armor": 10
           },
           "swingTimer": 0.45,
-          "tappedById": 846,
-          "targetId": 846,
+          "tappedById": 960,
+          "targetId": 960,
           "templateId": "forest_wolf",
           "weapon": {
             "max": 6,

@@ -249,17 +249,6 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the delve lockpick panel; a per-frame safety net behind a display check and a sig diff',
   },
   {
-    call: 'this.sceneController.update',
-    band: 'frame',
-    gate: '',
-    surface: 'window',
-    guard: {
-      kind: 'none',
-      why: 'the scene overlay uses PainterHost write elision, while the choice window cold-renders only when its choice or leader role changes; the countdown is intentionally live',
-    },
-    why: 'the cinematic overlay and Last Bell dialogue-choice window',
-  },
-  {
     call: 'this.tutorial.update',
     band: 'frame',
     gate: '',
@@ -1079,6 +1068,13 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the social window; a struct change rebuilds, a content change refreshes the list only',
   },
   {
+    call: 'this.updateGuildBillboardEcho',
+    band: 'slow',
+    gate: '',
+    surface: 'chrome',
+    why: 'appends one guild-billboard line to the chat log, latched on the MOTD value in guild_motd_login.ts (login and mid-session changes only, never on unrelated social re-pushes)',
+  },
+  {
     call: 'this.marketWindow.close',
     band: 'slow',
     gate: 'this.marketWindow.isOpen && !this.nearbyMarketNpc()',
@@ -1426,7 +1422,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
     expect(
       bySurface,
       "the surface split moved. A new call needs its surface decided; a CHANGED one means a repaint was reclassified, which is the one edit that can quietly drop a window row's invalidation guard.",
-    ).toEqual({ window: 42, chrome: 71, none: 15 });
+    ).toEqual({ window: 41, chrome: 72, none: 15 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');
@@ -1441,7 +1437,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       module: 22,
       hud: 5,
       callsite: 10,
-      none: 5,
+      none: 4,
     });
     // ...and the honest-exception list by NAME, because that is the one that should never
     // grow quietly: every entry is a window this repo knows has no invalidation guard.
@@ -1453,7 +1449,6 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       'this.lootRolls.update',
       'this.lootWindow.updateProximity',
       'this.questDialog.updateProximity',
-      'this.sceneController.update',
       'this.updateMapWindow',
     ]);
   });

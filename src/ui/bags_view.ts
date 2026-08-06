@@ -40,7 +40,9 @@ export interface BagItemInfo {
 
 /** The open-window modes that change what a bag click does. At most one is the
  *  effective mode (checked in priority order: trade, mail-attach, market-sell,
- *  vendor, bank-deposit, pet-feed). */
+ *  vendor, guild-bank-deposit, bank-deposit, bank-open-no-target, pet-feed; the
+ *  wiring sets at most one of the two bank modes, keyed off the bank window's
+ *  active tab). */
 export interface BagMode {
   tradeOpen: boolean;
   /** The Ravenpost mailbox is open on its Send tab (clicks attach parcels). */
@@ -48,8 +50,19 @@ export interface BagMode {
   /** The World Market is open on its Sell tab. */
   marketSell: boolean;
   vendorOpen: boolean;
-  /** The bank window is open (docked beside the bags): a click deposits the stack. */
+  /** The bank window is OPEN AT ALL (docked beside the bags), on any of its
+   *  panes and views. This is the mode that says "the bank cluster owns the bag
+   *  slot"; the two deposit modes below are the SUBSET of it where a grid is
+   *  actually on screen to drop into. The wiring sets it as a superset of both,
+   *  so open-with-neither-deposit-armed (the guild pane's Log view, a reading
+   *  surface) is a state the ladder can name instead of falling out the bottom
+   *  into the use/equip default. */
+  bankOpen: boolean;
+  /** The bank window is open ON ITS PERSONAL TAB: a click deposits the stack. */
   bankDeposit: boolean;
+  /** The bank window is open ON ITS GUILD TAB: a click deposits into the guild
+   *  bank instead. The wiring sets at most one of bankDeposit/guildBankDeposit. */
+  guildBankDeposit: boolean;
   /** Pet-feed cursor mode is armed. */
   petFeed: boolean;
 }
@@ -70,6 +83,12 @@ export type BagAction =
   | 'vendorSellBlocked'
   | 'bankDeposit'
   | 'bankDepositBlockedQuest'
+  /** The bank window is open with NEITHER grid on screen to deposit into. */
+  | 'bankDepositBlockedNoTarget'
+  | 'guildBankDeposit'
+  | 'guildBankDepositBlockedQuest'
+  | 'guildBankDepositBlockedSoulbound'
+  | 'guildBankDepositBlockedNoTransfer'
   | 'petFeed'
   | 'petFeedBlocked'
   | 'discardQuest'
@@ -86,18 +105,27 @@ export type BagTooltipHintKey =
   | 'itemUi.tooltip.clickSell'
   | 'hudChrome.bank.depositHint'
   | 'hudChrome.bank.cannotDeposit'
+  | 'hudChrome.bank.cannotDepositNow'
+  | 'hudChrome.bank.guildDepositHint'
+  | 'hudChrome.bank.guildCannotDeposit'
   | 'itemUi.tooltip.clickDestroy'
   | 'itemUi.tooltip.clickEquip'
   | 'itemUi.tooltip.clickConsume'
   | 'itemUi.tooltip.clickUseInstant'
   | 'itemUi.tooltip.clickUse'
+  // Tool-effect charms are not bag-usable: the sim refuses useItem with the
+  // "Open Professions to slot that" line, so the hover must not advertise
+  // "Click to use" for a click that only errors.
+  | 'hudChrome.professions.toolEffectTooltip.openProfessions'
   | 'hudChrome.mailbox.clickAttach'
   | 'hudChrome.mailbox.cannotMail'
   | '';
 
 /** Decide what a click on a bag item does. Mirrors the original click handler's
- *  priority order exactly: trade > mail-attach > market-sell > vendor > bank-deposit
- *  > pet-feed > quest > use. `instance` is the clicked SLOT's payload (issue 1165):
+ *  priority order exactly: trade > mail-attach > market-sell > vendor >
+ *  guild-bank-deposit > bank-deposit > bank-open-no-target > pet-feed > quest >
+ *  use (the wiring sets at most one of the two bank modes).
+ *  `instance` is the clicked SLOT's payload (issue 1165):
  *  a transfer-locked copy (bindOnTrade-armed or boundTo-bound,
  *  isTransferLockedInstance, the sim's pipe rule) blocks mail-attach and
  *  market-sell in place; an unlocked instanced copy stages as itself. */
@@ -130,9 +158,31 @@ export function bagItemAction(
   }
   // Window modes cluster before the armed pet-feed cursor (vendor beats pet-feed
   // today); the sim refuses a quest item, so block it in place with the deny toast.
+  // The GUILD tab carries the full anonymous-pipe policy (the sim's
+  // guildBankPipeRefusal: quest / soulbound / noMarketList / per-copy transfer
+  // lock), pre-empted here with the matching deny arms; note the top-of-function
+  // soulbound gate deliberately does NOT cover this mode, so the guild arm owns
+  // its own soulbound deny with the guild-worded sim line.
+  if (mode.guildBankDeposit) {
+    if (item.kind === 'quest') return 'guildBankDepositBlockedQuest';
+    if (item.soulbound) return 'guildBankDepositBlockedSoulbound';
+    if (item.noMarketList || isTransferLockedInstance(instance))
+      return 'guildBankDepositBlockedNoTransfer';
+    return 'guildBankDeposit';
+  }
   if (mode.bankDeposit) return item.kind === 'quest' ? 'bankDepositBlockedQuest' : 'bankDeposit';
+  // The bank window is open but NEITHER grid is on screen to drop into (today:
+  // its guild pane's Log view, a reading surface). This arm is stated
+  // EXPLICITLY rather than left to fall out the bottom of the ladder, because
+  // everything below it acts on the item: disarming both deposits without it
+  // turned "read the activity log" into "drink the potion / equip the plate /
+  // summon the mount" on the very next click. A disarmed mode must name its own
+  // no-target rung; it must never demote the click to the default use ladder.
+  if (mode.bankOpen) return 'bankDepositBlockedNoTarget';
   if (mode.petFeed) return item.kind === 'food' ? 'petFeed' : 'petFeedBlocked';
-  if (item.kind === 'quest') return 'discardQuest';
+  // A usable quest item (e.g. the firebottle: use.type 'throw') is USED on click,
+  // not discarded; only inert quest items fall through to the discard prompt.
+  if (item.kind === 'quest') return item.use ? 'use' : 'discardQuest';
   if (item.kind === 'bag') return 'equipBag';
   // A collected reins item falls through to 'use' like any other usable item:
   // clicking it summons that mount (sim useItem -> summonMountItem). There is no
@@ -148,15 +198,32 @@ export function bagItemAction(
  *  gains a mode or reorders. */
 export function bagUnknownAction(mode: BagMode): 'bankDeposit' | 'none' {
   if (mode.tradeOpen || mode.mailAttach || mode.marketSell || mode.vendorOpen) return 'none';
+  // The GUILD tab deliberately offers NOTHING on an unknown cell, stated here
+  // rather than left to fall out of the two bank modes being exclusive. The
+  // guild pipe refuses on four item dimensions (quest, soulbound,
+  // noMarketList, transfer-locked) that a client which does not know the def
+  // cannot evaluate, and a refused copy strands DORMANT in a shared book that
+  // no player action can clear. The personal pane keeps its deposit: its only
+  // refusal is quest, and its owner can always withdraw again.
+  if (mode.guildBankDeposit) return 'none';
+  // bankOpen-with-no-target needs no arm of its own here: an unknown cell has
+  // no use/equip ladder below it to fall into, so the closing 'none' is already
+  // the right answer. The ITEM ladder needed an explicit rung; this one does not.
   return mode.bankDeposit ? 'bankDeposit' : 'none';
 }
 
 /** Whether a shift-click on a bag item should link it into chat (classic
- *  shift-click-to-link). True in every mode except at a vendor or the open bank,
- *  where shift-click already owns the split-stack sell / deposit prompt; those
- *  affordances are left untouched. */
+ *  shift-click-to-link). True in every mode except at a vendor or an ARMED bank
+ *  deposit, where shift-click already owns the split-stack sell / deposit
+ *  prompt; those affordances are left untouched.
+ *
+ *  `bankOpen` is deliberately NOT in this list, unlike every other consumer of
+ *  it: the gate here is "does something else already own shift-click", and on a
+ *  bank view with no deposit target there is no split prompt to collide with.
+ *  Linking a stack into chat is inert and available on every other surface, so
+ *  the reading view keeps it. */
 export function bagShiftLinks(mode: BagMode): boolean {
-  return !mode.vendorOpen && !mode.bankDeposit;
+  return !mode.vendorOpen && !mode.bankDeposit && !mode.guildBankDeposit;
 }
 
 /** Resolve the exact inventory index of a clicked bag stack by REFERENCE identity,
@@ -229,10 +296,16 @@ export function bagsMoneyRowStale(display: string, copper: number, lastPainted: 
 export type BagDestroyAction = 'discard' | 'discardBlocked' | 'none';
 
 /** Decide the shift+right-click destroy affordance for a bag item. Inert in the
- *  transactional modes (trade / mail / market / vendor / pet-feed / bank-deposit),
+ *  transactional modes (trade / mail / market / vendor / pet-feed / the open bank),
  *  whose own click/contextmenu owns the slot; a noDiscard item is protected with
  *  feedback, every other item can be destroyed (mirrors the sim's discardItem rule,
- *  which accepts any non-noDiscard item). Left-click use/equip is unaffected. */
+ *  which accepts any non-noDiscard item). Left-click use/equip is unaffected.
+ *
+ *  The bank gate is `bankOpen`, not the two deposit modes: the window owning the
+ *  slot is what makes destroy inert, and that does not stop being true on a view
+ *  with no deposit target. Reading the guild activity log must not quietly re-arm
+ *  a destroy prompt over the bags. The two deposit modes stay listed so a caller
+ *  that sets one without the superset still reads as inert. */
 export function bagDestroyAction(item: BagItemInfo, mode: BagMode): BagDestroyAction {
   if (
     mode.tradeOpen ||
@@ -240,7 +313,9 @@ export function bagDestroyAction(item: BagItemInfo, mode: BagMode): BagDestroyAc
     mode.marketSell ||
     mode.vendorOpen ||
     mode.petFeed ||
-    mode.bankDeposit
+    mode.bankOpen ||
+    mode.bankDeposit ||
+    mode.guildBankDeposit
   )
     return 'none';
   if (item.noDiscard) return 'discardBlocked';
@@ -274,8 +349,26 @@ export function bagTooltipHintKey(
     return item.kind === 'quest' || item.noVendorSell
       ? 'itemUi.tooltip.cannotVendor'
       : 'itemUi.tooltip.clickSell';
+  if (mode.guildBankDeposit) {
+    // The guild pipe refuses more than quest items; every refused dimension
+    // reads the same guild cannot-be-banked hint (the click deny carries the
+    // exact sim wording), an allowed stack the guild deposit hint. The keys
+    // are DISTINCT from the personal pair: the consequences differ (a shared
+    // pool any officer can take from; a refused copy would strand dormant).
+    return item.kind === 'quest' ||
+      item.soulbound ||
+      item.noMarketList ||
+      isTransferLockedInstance(instance)
+      ? 'hudChrome.bank.guildCannotDeposit'
+      : 'hudChrome.bank.guildDepositHint';
+  }
   if (mode.bankDeposit)
     return item.kind === 'quest' ? 'hudChrome.bank.cannotDeposit' : 'hudChrome.bank.depositHint';
+  // Twin of bagItemAction's no-target rung: with the bank open and no grid on
+  // screen, the hint must NOT fall through to the kind branch and advertise
+  // "Click to equip" for a click that will be refused. The hover previews the
+  // exact line the click raises, the way the vendor / market cannot-hints do.
+  if (mode.bankOpen) return 'hudChrome.bank.cannotDepositNow';
   if (item.kind === 'quest') return 'itemUi.tooltip.clickDestroy';
   if (item.kind === 'mount') return '';
   if (
@@ -287,8 +380,24 @@ export function bagTooltipHintKey(
     return 'itemUi.tooltip.clickEquip';
   if (item.kind === 'food' || item.kind === 'drink') return 'itemUi.tooltip.clickConsume';
   if (item.kind === 'potion') return 'itemUi.tooltip.clickUseInstant';
+  // Charms (use.type 'toolEffect') slot from the Professions window, not from
+  // a bag click. Mirror the sim refusal copy so the hover never promises a
+  // use action the click cannot perform.
+  if (isToolEffectBagUse(item.use)) {
+    return 'hudChrome.professions.toolEffectTooltip.openProfessions';
+  }
   if (item.use) return 'itemUi.tooltip.clickUse';
   return '';
+}
+
+/** True when bag use payload is a tool-effect charm (ItemDef use.type). */
+function isToolEffectBagUse(use: unknown): boolean {
+  return (
+    !!use &&
+    typeof use === 'object' &&
+    Object.hasOwn(use, 'type') &&
+    (use as { type: unknown }).type === 'toolEffect'
+  );
 }
 
 /** The quality key into QUALITY_COLOR for an item ('common' when unspecified).
@@ -318,6 +427,61 @@ export interface BagGridModel {
   /** Stacks above the capacity budget (a legacy over-capacity save); the
    *  painter surfaces it on the capacity counter. 0 when within budget. */
   overflow: number;
+}
+
+/** Which no-match empty copy the bag grid should paint. Quest filter gets a
+ *  warm purpose-class line; every other filter keeps the generic no-match line. */
+export type BagNoMatchKind = 'generic' | 'quest';
+
+/** Discriminant for the empty-filter message. Pure so the painter only maps
+ *  kind -> t() key and never re-derives the category branch. */
+export function bagNoMatchKind(filter: BagFilterState): BagNoMatchKind {
+  return filter.category === 'quest' ? 'quest' : 'generic';
+}
+
+/** One row in a derived (list) bag grid: either a soft section caption or a stack.
+ *  Section rows are NEVER drop targets and never carry a bag cell index. */
+export type BagListRow = { kind: 'section'; section: 'quest' } | { kind: 'stack'; slot: InvSlot };
+
+/** Soft Quest section headers are allowed only when the grid is a derived list
+ *  (not the All+recent manual cell stream). Inserting a header node into the
+ *  drop-target cell stream would shift bagIndex positions and break reorder.
+ *  Category `quest` already implies bagOrderIsManual is false, so it is covered. */
+export function bagQuestSectionHeadersAllowed(filter: BagFilterState): boolean {
+  return !bagOrderIsManual(filter);
+}
+
+/** Build paint rows for a derived bag list. When section headers are allowed and
+ *  the visible list mixes quest and non-quest stacks, emits a soft Quest header
+ *  then quest stacks (stable relative order), then the rest (stable relative
+ *  order). When headers are disallowed or the list is not mixed, returns plain
+ *  stack rows in the original order so sort/search stay honest and the manual
+ *  All+recent path (which never calls this; it paints model.cells) stays free
+ *  of header nodes that would break drop indices. */
+export function buildBagListRows(
+  visible: readonly InvSlot[],
+  lookup: ItemLookup,
+  filter: BagFilterState,
+): BagListRow[] {
+  if (!bagQuestSectionHeadersAllowed(filter)) {
+    return visible.map((slot) => ({ kind: 'stack' as const, slot }));
+  }
+  const quest: InvSlot[] = [];
+  const rest: InvSlot[] = [];
+  for (const slot of visible) {
+    const item = lookup(slot.itemId);
+    if (item?.kind === 'quest') quest.push(slot);
+    else rest.push(slot);
+  }
+  // Soft section only when both sides exist. All-quest (category quest) and
+  // pure non-quest lists need no caption; a lone header would be noise.
+  if (quest.length === 0 || rest.length === 0) {
+    return visible.map((slot) => ({ kind: 'stack' as const, slot }));
+  }
+  const rows: BagListRow[] = [{ kind: 'section', section: 'quest' }];
+  for (const slot of quest) rows.push({ kind: 'stack', slot });
+  for (const slot of rest) rows.push({ kind: 'stack', slot });
+  return rows;
 }
 
 /** Build the filtered grid model from the raw inventory + filter state, reusing

@@ -48,6 +48,10 @@ const itemStringsEn = {
       // KIND stays 'junk' internally (substitution and sell rules key off
       // it) but its tooltip line reads this instead.
       fineMaterial: 'Fine Material',
+      // Honest materials (ores, reagents, raw cooking catches, ...): kind
+      // stays junk for Sell Junk / taxonomy, but the tooltip line reads
+      // Material so they do not look like grey trash.
+      material: 'Material',
       food: 'Food',
       drink: 'Drink',
     },
@@ -76,6 +80,13 @@ const itemStringsEn = {
       useDrink:
         'Use: Restores {amount} mana over {seconds} sec. Must remain seated while drinking.',
       questItem: 'Quest Item',
+      // Story tooltip lines (quest_item_tooltip_view.ts): related quest title,
+      // keep-rules footer, and orphaned copy when the item is no longer needed
+      // for an active quest. Progress reuses questUi.detail.objectiveProgress
+      // via the host so tracker and item tooltips share one number format.
+      questRelated: 'Quest: {quest}',
+      questRules: 'Cannot be sold, banked, or traded.',
+      questOrphaned: 'Not needed for any active quest.',
       classes: 'Classes: {classes}',
       sellPrice: 'Sell price: {money}',
       clickBuy: 'Click to buy',
@@ -223,6 +234,17 @@ const itemStringsEn = {
       reclaim: 'Reclaim',
       buyAria: 'Buy {item} for {price}',
       reclaimAria: 'Reclaim {item}',
+      // Confirm prompt gating a buyout (Reclaim stays one click: it returns your own
+      // goods and costs nothing). The stack body quotes the total ask and the
+      // per-unit ask the browse row showed; buyChanged is the confirm-time refusal
+      // when the listing was replaced or re-priced while the prompt was up (a listing
+      // that left entirely reuses itemUi.errors.listingUnavailable).
+      buyConfirmTitle: 'Confirm Purchase',
+      buyConfirmBody: 'Buy {item} for {price}?',
+      buyConfirmBodyStack: 'Buy {item} x{count} for {price} ({each} each)?',
+      buyConfirmAccept: 'Buy',
+      buyConfirmCancel: 'Cancel',
+      buyChanged: 'That listing changed before you confirmed. Check the price and try again.',
       sellNote:
         'List goods from your bags. The Merchant takes a {cut}% cut when an item sells. You are using {used}/{max} listing slots.',
       sellPickEmpty: 'Click an item in your bags to choose what to sell.',
@@ -1948,6 +1970,11 @@ const ITEM_ENTITY_IDS = [
   'arcane_essence',
   'arcane_shard',
   'fen_muster_order',
+  // Quest-dedupe pass (zones 1 to 3): the firebottle quest tools and collects.
+  'firebottle',
+  'murloc_hut',
+  'restless_skull',
+  'vanguard_bone',
   'mire_prowler_pelt',
   'lost_caravan_goods',
   'waterlogged_idol',
@@ -2373,6 +2400,7 @@ const ITEM_ENTITY_IDS = [
   'gatherers_cache',
   'artisans_eye',
   'reins_terrorspark_groundshaker',
+  'reins_drakemaw_raptor',
 ] as const;
 
 type ItemEntityId = (typeof ITEM_ENTITY_IDS)[number];
@@ -2471,6 +2499,14 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   gatherers_cache: "Gatherer's Cache",
   artisans_eye: "Artisan's Eye",
   reins_terrorspark_groundshaker: 'Ignition Key: Terrorspark Groundshaker',
+  // Quest-dedupe pass (zones 1 to 3): English-appended until the release fill
+  // folds them into the per-locale arrays.
+  firebottle: 'Firebottle',
+  murloc_hut: 'Mudfin Hut',
+  // Dragonkin brood rebuild (PR #2811), same English-appended treatment.
+  reins_drakemaw_raptor: 'Reins of the Drakemaw Raptor',
+  restless_skull: 'Restless Skull',
+  vanguard_bone: 'Vanguard Bone',
 };
 
 function itemTranslations(names: readonly string[]): ItemEntityTranslations {

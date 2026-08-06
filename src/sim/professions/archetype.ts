@@ -58,6 +58,13 @@ export interface ArchetypeState {
   // Progress toward the CURRENT switch's amends requirement (see
   // requiredAmendsProgress). Reset to 0 on every successful switch.
   amendsProgress: number;
+  // Jack of All Trades (issue #1296, the breadth attunement): true only when
+  // the character has attuned as Jack instead of an adjacent-pair archetype.
+  // Mutually exclusive with activeArchetype: a Jack's activeArchetype/
+  // pairedMajor/hobbyCraft stay null (see attuneJackOfAllTrades), and
+  // normalizeArchetypeState forces this false whenever activeArchetype is
+  // set, so the two identities can never both be live on the same save.
+  isJackOfAllTrades?: boolean;
 }
 
 /** A fresh character: no archetype chosen yet, never switched. */
@@ -69,6 +76,7 @@ export function emptyArchetypeState(): ArchetypeState {
     attunedPairs: [],
     switchCount: 0,
     amendsProgress: 0,
+    isJackOfAllTrades: false,
   };
 }
 
@@ -125,6 +133,12 @@ export function normalizeArchetypeState(
         ? saved.hobbyCraft
         : defaultHobbyForPair(state.activeArchetype, state.pairedMajor, skills);
   }
+  // Mutually exclusive with activeArchetype by construction: a save can never
+  // load as both an archetype AND Jack, whatever hand-edited/corrupt value it
+  // carries (a real save can only ever set one, since attuneJackOfAllTrades
+  // and acceptArchetypeQuest/attuneArchetypePair each refuse while the other
+  // identity is already live).
+  state.isJackOfAllTrades = state.activeArchetype === null && saved.isJackOfAllTrades === true;
   if (
     typeof saved.switchCount === 'number' &&
     Number.isFinite(saved.switchCount) &&
@@ -140,6 +154,22 @@ export function normalizeArchetypeState(
     state.amendsProgress = saved.amendsProgress;
   }
   return state;
+}
+
+export type PersistedArchetypeState = Omit<ArchetypeState, 'isJackOfAllTrades'> & {
+  isJackOfAllTrades?: true;
+};
+
+export function serializeArchetypeState(state: ArchetypeState): PersistedArchetypeState {
+  return {
+    activeArchetype: state.activeArchetype,
+    pairedMajor: state.pairedMajor,
+    hobbyCraft: state.hobbyCraft,
+    attunedPairs: [...state.attunedPairs],
+    switchCount: state.switchCount,
+    amendsProgress: state.amendsProgress,
+    ...(state.isJackOfAllTrades ? { isJackOfAllTrades: true } : {}),
+  };
 }
 
 function isCraftId(id: string): boolean {
@@ -364,6 +394,28 @@ export function hobbyCraftFor(ctx: SimContext, pid: number): string | null {
 const COMMON_CEILING_TIER = 0;
 const RARE_CEILING_TIER = 2;
 
+// Jack of All Trades breadth ceiling (issue #1296): every one of the ten
+// crafts empowers up to this tier and no further, so a Jack reaches a
+// working, decent version of every craft but a legendary-tier masterwork
+// bump on none (tier 4 on the masterwork quality ladder, masterwork.ts,
+// sits two rungs above this). Deliberately the SAME value as
+// RARE_CEILING_TIER, the pre-attunement default every craft already carries
+// before an archetype is ever chosen: per the maintainer's own framing when
+// this issue was parked ("the ceiling machinery supports a uniform mid-tier
+// cap"), Jack formalizes that existing rare-across-all-crafts default into a
+// real, permanent, chosen identity (see attuneJackOfAllTrades) rather than
+// introducing a second number. The design doc's own Open Questions section
+// leaves the exact magnitude genuinely open ("the Jack of All Trades ceiling
+// (uncommon vs rare across all ten)", docs/design/professions-system section
+// 21-tbd.html); this is the working value pending a resolved number, the
+// same posture wheel.ts's TIER_SKILL_STEP takes on its own open tuning
+// question. Because a real Jack's activeArchetype/pairedMajor/hobbyCraft are
+// always null (see ArchetypeState.isJackOfAllTrades), archetypeCeilingFor's
+// existing `activeArchetype === null` branch already returns this exact
+// value for every craft with zero further change: this constant exists so
+// the connection is named and testable, not implicit.
+export const JACK_CEILING_TIER = RARE_CEILING_TIER;
+
 /** The archetype-derived half of the empowerment ceiling for one craft: no
  *  cap (Infinity) for either of the player's two majors (`activeArchetype` or
  *  `pairedMajor`), capped at "rare" for the hobby (the opposite craft on
@@ -373,7 +425,12 @@ const RARE_CEILING_TIER = 2;
  *  `activeArchetype` is (see ArchetypeState); passing a non-null
  *  `activeArchetype` with a null `pairedMajor` (a malformed/pre-pair state
  *  that skipped `normalizeArchetypeState`) degrades to the single-craft
- *  reading rather than throwing. */
+ *  reading rather than throwing. Doubles as the Jack of All Trades breadth
+ *  ceiling (see JACK_CEILING_TIER above) once a player has attuned Jack: a
+ *  real Jack's activeArchetype is always null, and the `activeArchetype ===
+ *  null` branch below already returns JACK_CEILING_TIER (the same value),
+ *  so every existing caller (crafting.ts, enchanting.ts, combo_eligibility.ts)
+ *  handles a Jack crafter correctly with no isJackOfAllTrades parameter. */
 export function archetypeCeilingFor(
   activeArchetype: string | null,
   pairedMajor: string | null,
@@ -480,7 +537,11 @@ export function craftCeiling(
 export function acceptArchetypeQuest(ctx: SimContext, pid: number, craftId: string): boolean {
   const meta = ctx.players.get(pid);
   if (!meta || !isCraftId(craftId)) return false;
-  if (meta.archetype.activeArchetype !== null) return false;
+  // A Jack of All Trades is refused here too (#1296): switching FROM Jack TO
+  // an archetype is a real identity change the design doc leaves genuinely
+  // open (mechanics/costs TBD), so this legacy one-time hook must not let it
+  // happen for free just because activeArchetype also reads null for a Jack.
+  if (meta.archetype.activeArchetype !== null || meta.archetype.isJackOfAllTrades) return false;
   meta.archetype.activeArchetype = craftId;
   meta.archetype.pairedMajor = defaultPairedMajor(craftId);
   meta.archetype.hobbyCraft = defaultHobbyForPair(
@@ -508,6 +569,13 @@ export function attuneArchetypePair(
   if (!meta || !pair) return false;
   const [activeArchetype, pairedMajor] = pair;
   const state = meta.archetype;
+  // #1296: a Jack's activeArchetype/pairedMajor are null, the same shape as a
+  // never-attuned character, so without this guard a Jack could attune an
+  // archetype pair through the ordinary "first attunement" path for free.
+  // Switching FROM Jack is a real identity change the design doc leaves
+  // genuinely open (mechanics/costs TBD), so it is refused here, not silently
+  // allowed.
+  if (state.isJackOfAllTrades) return false;
   const current = archetypePairId(state.activeArchetype ?? '', state.pairedMajor);
   if (current === target) return false;
   const seen = state.attunedPairs.includes(target);
@@ -528,6 +596,9 @@ export function canAttuneArchetypePair(
   mode: AttunementMode,
 ): boolean {
   if (!isAdjacentPairTarget(target)) return false;
+  // Mirrors the guard in attuneArchetypePair above (#1296): a Jack must not
+  // read as eligible to attune an archetype pair through the ordinary path.
+  if (state.isJackOfAllTrades) return false;
   if (archetypePairId(state.activeArchetype ?? '', state.pairedMajor) === target) return false;
   const seen = state.attunedPairs.includes(target);
   return mode === 'new' ? !seen : seen;
@@ -574,5 +645,50 @@ export function switchArchetype(ctx: SimContext, pid: number, craftId: string): 
   if (pairId && !state.attunedPairs.includes(pairId)) state.attunedPairs.push(pairId);
   state.switchCount += 1;
   state.amendsProgress = 0;
+  return true;
+}
+
+// Jack of All Trades (issue #1296, the breadth attunement): a player's two
+// highest-capability crafts decide what the rare-tier "you have arrived"
+// offer looks like. Adjacent, and the pair forms an archetype (the
+// acceptance/pair-attunement quests above). NOT adjacent, and the offer is
+// Jack instead: the one sanctioned exception to the at-most-two-majors cap.
+// This module only implements the mechanical eligibility check and the
+// state transition itself (mirroring acceptArchetypeQuest's one-time-only
+// shape); the actual attunement QUEST content, and any switching flow either
+// direction between Jack and an archetype, are explicitly out of scope here
+// (the design doc's own Open Questions section leaves both TBD).
+
+/** Whether `skills` currently qualifies for the Jack of All Trades offer: the
+ *  two highest-capability crafts (wheel.ts tierCapability, ties broken by
+ *  CRAFT_RING order for a stable read) are both at least at the rare tier
+ *  AND are NOT ring-adjacent. Pure read over flat skill state; does not
+ *  consult ArchetypeState, so it stays meaningful even for a character who
+ *  has never attuned anything yet (the same "reach rare in two crafts"
+ *  moment that offers an archetype when the top two happen to be adjacent). */
+export function isEligibleForJackOfAllTrades(skills: CraftSkills): boolean {
+  const ranked = [...CRAFT_RING]
+    .map((craft) => ({ id: craft.id, tier: tierCapability(skills, craft.id) }))
+    .sort((a, b) => b.tier - a.tier);
+  const [first, second] = ranked;
+  if (!first || !second) return false;
+  if (first.tier < RARE_CEILING_TIER || second.tier < RARE_CEILING_TIER) return false;
+  return !isAdjacent(first.id, second.id);
+}
+
+/** Quest-validated first attunement into Jack of All Trades (mirrors
+ *  acceptArchetypeQuest's one-time shape): sets isJackOfAllTrades and clears
+ *  every archetype field, refusing (no side effect) unless the character has
+ *  never chosen ANY identity yet (activeArchetype null AND not already
+ *  Jack). Does not itself re-check isEligibleForJackOfAllTrades: like
+ *  acceptArchetypeQuest/attuneArchetypePair, eligibility is the calling quest
+ *  content's job to validate at accept and turn-in (see the module comment
+ *  on ArchetypeState). Returns whether the attunement happened. */
+export function attuneJackOfAllTrades(ctx: SimContext, pid: number): boolean {
+  const meta = ctx.players.get(pid);
+  if (!meta) return false;
+  const state = meta.archetype;
+  if (state.activeArchetype !== null || state.isJackOfAllTrades) return false;
+  state.isJackOfAllTrades = true;
   return true;
 }

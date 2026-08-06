@@ -7,6 +7,7 @@ import {
 import { RIFT_BOSS_IDS, RIFT_TRASH_IDS } from '../src/sim/content/rift/mobs';
 import { BUILTIN_WORLD, ITEMS, MOBS, riftInstanceOrigin } from '../src/sim/data';
 import { RIFT_MECHANIC_SPACING_SEC } from '../src/sim/mob/mechanic_spacing';
+import { RIFT_MECHANIC_WINDUP_SEC } from '../src/sim/mob/rift_escape_window';
 import { riftHeroicClearPool, riftNormalClearPool } from '../src/sim/rift/loot_pools';
 import { RIFT_TIER_INFO } from '../src/sim/rift/portals';
 import {
@@ -595,10 +596,19 @@ describe('rift ranks: non-lethal mechanic damage cap (heroic_s safety rule)', ()
     sim.player.hp = sim.player.maxHp;
     boss.mechanicDamageMult = 10_000_000; // force the raw roll far beyond max HP
     boss.pulseTimer = 0.01;
-    const events = sim.tick();
-    const hit = events.find(
-      (ev) => ev.type === 'damage' && ev.ability === pulse.name && ev.targetId === sim.player.id,
-    ) as { amount: number } | undefined;
+    // The stamped pulse now telegraphs before detonating (rift_escape_window.ts):
+    // drive through the windup until the blast lands, topping hp and holding
+    // position each tick so the only damage on the landing tick is the pulse.
+    let hit: { amount: number } | undefined;
+    for (let i = 0; i < Math.ceil((RIFT_MECHANIC_WINDUP_SEC + 1) * 20) && !hit; i++) {
+      sim.player.pos = { ...boss.pos, z: boss.pos.z - Math.min(6, pulse.radius - 1) };
+      sim.player.prevPos = { ...sim.player.pos };
+      sim.player.hp = sim.player.maxHp;
+      const events = sim.tick();
+      hit = events.find(
+        (ev) => ev.type === 'damage' && ev.ability === pulse.name && ev.targetId === sim.player.id,
+      ) as { amount: number } | undefined;
+    }
     expect(hit, 'the pulse landed').toBeTruthy();
     const cap = Math.floor(sim.player.maxHp * RIFT_NONLETHAL_MECHANIC_CAP_PCT);
     expect(hit!.amount, 'the cap engaged exactly').toBe(cap);
@@ -1385,8 +1395,12 @@ describe('rift ranks: budget escape and citadel exemption', () => {
     }
     expect(boss.castingAbility, 'the held zone cast once the lock cleared').toBe(def.castId);
     expect(inst.bossDeathZones.length, 'the zone was placed at cast start').toBeGreaterThan(0);
-    // It held for roughly the lock remainder, not a full fresh cycle.
-    expect(heldTicks * (1 / 20)).toBeLessThanOrEqual(RIFT_MECHANIC_SPACING_SEC + 0.5);
+    // It held for roughly the lock remainder, not a full fresh cycle. The
+    // warm-up pulse is a stamped WINDUP fire (rift_escape_window.ts), so the
+    // lock it armed spans the telegraph plus one spacing window.
+    expect(heldTicks * (1 / 20)).toBeLessThanOrEqual(
+      RIFT_MECHANIC_SPACING_SEC + RIFT_MECHANIC_WINDUP_SEC + 0.5,
+    );
   });
 
   it('dodgeability: deathZone castTime satisfies slowedSpeed * castTime >= radius * 1.2 for each boss with in-kit CC', () => {

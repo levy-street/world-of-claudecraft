@@ -56,6 +56,7 @@ import type { IWorldDuelArena } from '../src/world_api/duel_arena';
 import type { IWorldDungeonFinder } from '../src/world_api/dungeon_finder';
 import type { IWorldDungeons } from '../src/world_api/dungeons';
 import type { IWorldEntityRoster } from '../src/world_api/entity_roster';
+import type { IWorldGuildBank } from '../src/world_api/guild_bank';
 import type { IWorldInteraction } from '../src/world_api/interaction';
 import type { IWorldInventory } from '../src/world_api/inventory';
 import type { IWorldLoot } from '../src/world_api/loot';
@@ -276,6 +277,15 @@ export const IWORLD_MEMBERS = [
   { name: 'bankDeposit', kind: 'method' },
   { name: 'bankWithdraw', kind: 'method' },
   { name: 'bankBuySlots', kind: 'method' },
+  // --- guild bank: officer-plus proximity-gated read + gold/item/buy commands
+  //     (Phase 1 stubs in both worlds; the wire lands in Phase 2) ---
+  { name: 'guildBankInfo', kind: 'data' },
+  { name: 'guildBankDepositGold', kind: 'method' },
+  { name: 'guildBankWithdrawGold', kind: 'method' },
+  { name: 'guildBankDeposit', kind: 'method' },
+  { name: 'guildBankWithdraw', kind: 'method' },
+  { name: 'guildBankBuySlots', kind: 'method' },
+  { name: 'guildBankLog', kind: 'method' },
   // --- dungeons + delves commands and reads ---
   { name: 'enterDungeon', kind: 'method' },
   { name: 'leaveDungeon', kind: 'method' },
@@ -390,6 +400,7 @@ export const IWORLD_MEMBERS = [
   { name: 'activeTitle', kind: 'data' },
   { name: 'setActiveTitle', kind: 'method' },
   { name: 'deedsRarity', kind: 'method' },
+  { name: 'deedsRecent', kind: 'method' },
   { name: 'deedsLeaderboard', kind: 'method' },
   // --- Last Bell scenes (IWorldScenes): one presentation clock + commands ---
   { name: 'presentationTime', kind: 'data' },
@@ -505,14 +516,30 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // plus the release's Card Duel facet, the Professions 2.0 identity
     // surface, the mobile-station pair (placeMobileStation +
     // activeMobileStationCraft), the commissions unbindItem command, and the
-    // Rift + mounts surface. The action-bar pair and Last Bell's clock plus two
-    // scene methods are included in the merged facet union; making reins usable
-    // items removed selectedMount + selectMount from the prior surface. The
-    // v0.32.0 integration adds activeMasterLootRolls. The voyage loading
-    // screen suppression adds the synchronous sceneActiveForLocalPlayer.
-    expect(IWORLD_MEMBERS.length).toBe(285);
-    expect(DATA_MEMBERS.length).toBe(74);
-    expect(METHOD_MEMBERS.length).toBe(211);
+    // Rift + mounts surface. The v0.31.0 base merge added the release's three new
+    // members on top of the branch's 272; making reins usable items then removed
+    // two (selectedMount + selectMount) for 273; the v0.32.0 base merge adds
+    // activeMasterLootRolls, leaving 274; the packet's slotted tool effects add
+    // toolEffectSlots (data) and slotToolEffect (method) for 276, the
+    // acquisition craft's recharge command (rechargeToolEffect) makes 277,
+    // and the UX pass's node respawn countdown read (nodeRespawnSeconds)
+    // makes 278; the v0.33.0 sync merges bring the rift floor timer HUD's
+    // riftEventMsRemaining, the instance-payload pipes' marketListInstance,
+    // and reactive aura timing's reactiveAbilityWindowRemaining (all
+    // methods) for 281; the v0.34.0 sync removes the renderer-only
+    // riftCollisionToken (data) with third-person camera collision,
+    // leaving 280; a later v0.34.0 sync re-adds riftCollisionToken (data)
+    // so client-side swept-landing and click-to-move pathing can treat
+    // rift walls as solid, leaving 281. The Guild Bank foundation adds the six
+    // IWorldGuildBank members (guildBankInfo, one data read, plus five
+    // commands), leaving 287. The guild bank ACTIVITY LOG adds one read member
+    // (guildBankLog, a method because reading it is what requests the cold
+    // payload on demand: it has no snapshot key), leaving 288.
+    // The Last Bell scene facet adds one presentation-clock datum plus three
+    // commands to the v0.35 surface.
+    expect(IWORLD_MEMBERS.length).toBe(293);
+    expect(DATA_MEMBERS.length).toBe(75);
+    expect(METHOD_MEMBERS.length).toBe(218);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -588,6 +615,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'deedsEarned',
       'deedsLeaderboard',
       'deedsRarity',
+      'deedsRecent',
       'deleteLoadout',
       'delveBuyShopItem',
       'delveDaily',
@@ -631,6 +659,13 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'friendlyTabTarget',
       'gatheringProficiency',
       'guildAccept',
+      'guildBankBuySlots',
+      'guildBankDeposit',
+      'guildBankDepositGold',
+      'guildBankInfo',
+      'guildBankLog',
+      'guildBankWithdraw',
+      'guildBankWithdrawGold',
       'guildCreate',
       'guildDecline',
       'guildDemote',
@@ -844,6 +879,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'equipment',
       'equipmentInstances',
       'gatheringProficiency',
+      'guildBankInfo',
       'hobbyCraft',
       'honor',
       'inventory',
@@ -936,6 +972,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'dailyRewards',
       'deedsLeaderboard',
       'deedsRarity',
+      'deedsRecent',
       'deleteLoadout',
       'delveBuyShopItem',
       'delveInteract',
@@ -969,6 +1006,12 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'friendRemove',
       'friendlyTabTarget',
       'guildAccept',
+      'guildBankBuySlots',
+      'guildBankDeposit',
+      'guildBankDepositGold',
+      'guildBankLog',
+      'guildBankWithdraw',
+      'guildBankWithdrawGold',
       'guildCreate',
       'guildDecline',
       'guildDemote',
@@ -1444,6 +1487,19 @@ const FACET_BANK = [
 ] as const satisfies readonly (keyof IWorldBank)[];
 type _ExhaustBank = AssertNever<Exclude<keyof IWorldBank, (typeof FACET_BANK)[number]>>;
 
+const FACET_GUILD_BANK = [
+  'guildBankInfo',
+  'guildBankDepositGold',
+  'guildBankWithdrawGold',
+  'guildBankDeposit',
+  'guildBankWithdraw',
+  'guildBankBuySlots',
+  'guildBankLog',
+] as const satisfies readonly (keyof IWorldGuildBank)[];
+type _ExhaustGuildBank = AssertNever<
+  Exclude<keyof IWorldGuildBank, (typeof FACET_GUILD_BANK)[number]>
+>;
+
 const FACET_DUNGEONS = [
   'enterDungeon',
   'leaveDungeon',
@@ -1580,6 +1636,7 @@ const FACET_DEEDS = [
   'activeTitle',
   'setActiveTitle',
   'deedsRarity',
+  'deedsRecent',
   'deedsLeaderboard',
 ] as const satisfies readonly (keyof IWorldDeeds)[];
 type _ExhaustDeeds = AssertNever<Exclude<keyof IWorldDeeds, (typeof FACET_DEEDS)[number]>>;
@@ -1614,6 +1671,7 @@ const FACET_MEMBER_ARRAYS: Readonly<Record<string, readonly string[]>> = {
   market: FACET_MARKET,
   mail: FACET_MAIL,
   bank: FACET_BANK,
+  guildBank: FACET_GUILD_BANK,
   dungeons: FACET_DUNGEONS,
   delves: FACET_DELVES,
   dailyRewards: FACET_DAILY_REWARDS,
@@ -1629,7 +1687,7 @@ const FACET_MEMBER_ARRAYS: Readonly<Record<string, readonly string[]>> = {
 
 describe('W1: aggregate IWorld member set equals the disjoint union of the facets', () => {
   it('pins the facet count', () => {
-    expect(Object.keys(FACET_MEMBER_ARRAYS).length).toBe(31);
+    expect(Object.keys(FACET_MEMBER_ARRAYS).length).toBe(32);
   });
 
   it('each facet array is non-empty and internally duplicate-free', () => {
@@ -1657,8 +1715,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(285);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(285);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(293);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(293);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

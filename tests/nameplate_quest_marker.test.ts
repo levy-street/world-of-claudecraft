@@ -1,14 +1,16 @@
 // @vitest-environment happy-dom
 //
 // The overhead quest marker branch of the nameplate painter, now driven by the
-// shared quest_marker_kind rule (phase 23): the gold '!'/'?' arms must stay
-// byte-identical to the pre-phase painter, the blue repeat and dimmed cooldown
-// variants join them, and (the nameplate_ai_tag lesson) a LIVE transition from
-// gold to blue must repaint, which holds only while marker and markerClass stay
-// in the plate's static signature.
+// shared quest_marker_kind rule (phase 23) on the batched canvas surface: the
+// gold '!'/'?' arms must stay byte-identical to the pre-phase painter, the
+// blue repeat and dimmed cooldown variants join them, and (the
+// nameplate_ai_tag lesson) a LIVE transition from gold to blue must repaint,
+// which holds only while resolveContent recomputes marker and markerTone on
+// every full pass and the throttled-pass context reuse stays bounded.
 
 import * as THREE from 'three';
-import { describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { NameplateCanvasState, NameplateMarkerTone } from '../src/render/nameplate_canvas';
 import { NameplatePainter } from '../src/render/nameplate_painter';
 import type { EntityView } from '../src/render/renderer';
 import { QUESTS } from '../src/sim/data';
@@ -16,6 +18,43 @@ import type { Entity, QuestState } from '../src/sim/types';
 import type { IWorld } from '../src/world_api';
 
 const VIEWPORT = { width: 1280, height: 720 };
+
+function fakeContext(): CanvasRenderingContext2D {
+  const noop = vi.fn();
+  return {
+    setTransform: noop,
+    scale: noop,
+    translate: noop,
+    clearRect: noop,
+    save: noop,
+    restore: noop,
+    beginPath: noop,
+    closePath: noop,
+    moveTo: noop,
+    lineTo: noop,
+    quadraticCurveTo: noop,
+    arc: noop,
+    rect: noop,
+    clip: noop,
+    fill: noop,
+    stroke: noop,
+    drawImage: noop,
+    fillText: noop,
+    strokeText: noop,
+    setLineDash: noop,
+    measureText: (text: string) => ({
+      width: text.length * 7,
+      actualBoundingBoxLeft: (text.length * 7) / 2,
+      actualBoundingBoxRight: (text.length * 7) / 2,
+      actualBoundingBoxAscent: 10,
+      actualBoundingBoxDescent: 3,
+    }),
+  } as unknown as CanvasRenderingContext2D;
+}
+
+beforeEach(() => {
+  vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockImplementation(() => fakeContext());
+});
 
 function requireWorkOrderQuest() {
   const quest = Object.values(QUESTS).find((q) => q.repeatable && q.repeatCadenceTicks);
@@ -54,61 +93,39 @@ function entity(over: Partial<Entity> & { id: number }): Entity {
 }
 
 function view(): EntityView {
-  const div = (cls: string) => {
-    const el = document.createElement('div');
-    el.className = cls;
-    return el;
-  };
-  const img = () => document.createElement('img');
-  const levelEl = document.createElement('span');
-  levelEl.className = 'np-level';
   const group = new THREE.Group();
   group.position.set(0, 0, 0);
-  return {
-    group,
-    height: 2,
-    mountLift: 0,
-    nameplate: div('nameplate'),
-    nameEl: div('np-name'),
-    titleEl: div('np-title'),
-    guildEl: div('np-guild'),
-    hpBar: div('np-hpbar'),
-    hpFill: div('np-hpfill'),
-    emoteEl: div('np-emote'),
-    emoteIconEl: img(),
-    emoteLabelEl: document.createElement('span'),
-    markerEl: div('np-marker'),
-    castBar: div('np-castbar'),
-    castFill: div('np-castfill'),
-    castLabel: div('np-castlabel'),
-    raidMarkEl: div('np-raidmark'),
-    comboRow: div('np-combo'),
-    comboPips: [div('pip'), div('pip'), div('pip'), div('pip'), div('pip')],
-    tierEl: img(),
-    devTierEl: img(),
-    discordEl: img(),
-    aiEl: document.createElement('span'),
-    levelEl,
-    nameplateDisplay: 'none',
-    nameplateTransform: '',
-    nameplateSig: '',
-    nameplateStateMask: 0,
-    nameplateFriendlyPet: false,
-    nameplateHpWidth: '',
-    nameplateScale: 1,
-    nameplateBaseOpacity: '1',
-    nameplateOpacity: '',
-    comboSig: '',
-    tierValue: 0,
-    devTierValue: 0,
-    discordAvatarSig: '',
-    levelSig: '',
-  } as unknown as EntityView;
+  return { group, height: 2, mountLift: 0 } as EntityView;
+}
+
+interface PainterStateAccess {
+  states: Map<number, NameplateCanvasState>;
+}
+
+function stateOf(painter: NameplatePainter, id: number): NameplateCanvasState {
+  const state = (painter as unknown as PainterStateAccess).states.get(id);
+  if (!state) throw new Error(`Missing nameplate state for ${id}`);
+  return state;
+}
+
+/** The canvas translation of the DOM plate's marker-class contract: one
+ *  assertion per (glyph, tone) pair so each arm still pins both channels. */
+function expectMarker(
+  painter: NameplatePainter,
+  marker: string,
+  tone: NameplateMarkerTone,
+  label?: string,
+): void {
+  const state = stateOf(painter, 2);
+  expect(state.marker, label).toBe(marker);
+  expect(state.markerTone, label).toBe(tone);
 }
 
 /** A painter looking at the work order's giver NPC, with the quest-marker
  *  world knobs (state, history, the cadence mirror, extra quests for the
- *  cross-quest fold arms) under test control. */
+ *  cross-quest fold arms) under test control. The NPC sits inside
+ *  NAMEPLATE_URGENT_RANGE so a throttled update(false) still reaches the
+ *  content branch, which the snapshot-reuse arms below depend on. */
 function harness(knobs: {
   state: QuestState;
   /** true = the work order's id; an array = explicit questsDone ids (so a
@@ -127,8 +144,7 @@ function harness(knobs: {
     questIds: knobs.questIds ?? [WORK_ORDER.id],
   });
   const views = new Map<number, EntityView>();
-  const v = view();
-  views.set(npc.id, v);
+  views.set(npc.id, view());
   const camera = new THREE.PerspectiveCamera(60, VIEWPORT.width / VIEWPORT.height, 0.1, 500);
   camera.position.set(0, 3, 12);
   camera.lookAt(0, 1, 0);
@@ -150,26 +166,28 @@ function harness(knobs: {
       cadenceBlockedQuests: knobs.cadenceBlocked ? [WORK_ORDER.id] : [],
     },
   } as unknown as IWorld;
+  const layer = document.createElement('div');
   const painter = new NameplatePainter({
     views,
     camera,
     world,
+    layer,
     getViewport: () => VIEWPORT,
+    getDevicePixelRatio: () => 1,
     showNameplates: () => true,
     showDevBadges: () => true,
     showOwnNameplate: () => false,
     showPlayerNameplates: () => true,
     isHostilePlayer: () => false,
   });
-  return { painter, v, world };
+  return { painter, world };
 }
 
 describe('nameplate quest marker variants', () => {
   it("keeps the gold '!' for a never-completed offer, repeatable or not (Q30's first half)", () => {
-    const { painter, v } = harness({ state: 'available' });
+    const { painter } = harness({ state: 'available' });
     painter.update(true);
-    expect(v.markerEl.textContent).toBe('!');
-    expect(v.markerEl.className).toBe('np-marker avail');
+    expectMarker(painter, '!', 'quest');
 
     // The other half of "repeatable or not": a NON-repeatable quest whose id
     // IS in questsDone must stay gold at this surface too. The classifier
@@ -178,41 +196,35 @@ describe('nameplate quest marker variants', () => {
     const attuneId = 'q_prof_attune_smith';
     const plain = harness({ state: 'available', done: [attuneId], questIds: [attuneId] });
     plain.painter.update(true);
-    expect(plain.v.markerEl.textContent).toBe('!');
-    expect(plain.v.markerEl.className).toBe('np-marker avail');
+    expectMarker(plain.painter, '!', 'quest');
   });
 
   it("keeps the gold '?' for a ready turn-in and the gray '?' for an active one", () => {
     const ready = harness({ state: 'ready', done: true });
     ready.painter.update(true);
-    expect(ready.v.markerEl.textContent).toBe('?');
-    expect(ready.v.markerEl.className).toBe('np-marker ready');
+    expectMarker(ready.painter, '?', 'quest');
 
     const active = harness({ state: 'active' });
     active.painter.update(true);
-    expect(active.v.markerEl.textContent).toBe('?');
-    expect(active.v.markerEl.className).toBe('np-marker active');
+    expectMarker(active.painter, '?', 'active');
   });
 
   it("shows the blue '!' once the repeatable has been completed at least once", () => {
-    const { painter, v } = harness({ state: 'available', done: true });
+    const { painter } = harness({ state: 'available', done: true });
     painter.update(true);
-    expect(v.markerEl.textContent).toBe('!');
-    expect(v.markerEl.className).toBe('np-marker repeat');
+    expectMarker(painter, '!', 'repeat');
   });
 
   it("shows the dimmed '!' inside the cadence window, and nothing without the mirror", () => {
     const blocked = harness({ state: 'unavailable', done: true, cadenceBlocked: true });
     blocked.painter.update(true);
-    expect(blocked.v.markerEl.textContent).toBe('!');
-    expect(blocked.v.markerEl.className).toBe('np-marker cooldown');
+    expectMarker(blocked.painter, '!', 'cooldown');
 
     // An older server payload (no cadenceBlockedQuests) degrades to today's
     // no-marker plate rather than guessing.
     const bare = harness({ state: 'unavailable', done: true });
     bare.painter.update(true);
-    expect(bare.v.markerEl.textContent).toBe('');
-    expect(bare.v.markerEl.className).toBe('np-marker');
+    expectMarker(bare.painter, '', 'none');
   });
 
   it("folds across an NPC's quests: a ready turn-in beats a completed repeatable", () => {
@@ -228,15 +240,14 @@ describe('nameplate quest marker variants', () => {
       [attuneId, WORK_ORDER.id],
       [WORK_ORDER.id, attuneId],
     ]) {
-      const { painter, v } = harness({
+      const { painter } = harness({
         state: 'unavailable',
         done: true,
         questIds,
         questStates: { [WORK_ORDER.id]: 'available', [attuneId]: 'ready' },
       });
       painter.update(true);
-      expect(v.markerEl.textContent, questIds.join(',')).toBe('?');
-      expect(v.markerEl.className, questIds.join(',')).toBe('np-marker ready');
+      expectMarker(painter, '?', 'quest', questIds.join(','));
     }
   });
 
@@ -247,7 +258,7 @@ describe('nameplate quest marker variants', () => {
     // 'active' per quest instead and show the cooldown mark for the same
     // state; tests/quest_marker_surface_agreement.test.ts pins their side.
     const attuneId = 'q_prof_attune_smith';
-    const { painter, v } = harness({
+    const { painter } = harness({
       state: 'unavailable',
       done: true,
       cadenceBlocked: true,
@@ -255,8 +266,7 @@ describe('nameplate quest marker variants', () => {
       questStates: { [attuneId]: 'active' },
     });
     painter.update(true);
-    expect(v.markerEl.textContent).toBe('?');
-    expect(v.markerEl.className).toBe('np-marker active');
+    expectMarker(painter, '?', 'active');
   });
 
   it('heals a REPLACED questsDone set immediately, even on a throttled pass', () => {
@@ -265,13 +275,12 @@ describe('nameplate quest marker variants', () => {
     // re-check must drop the cached context, so a completion flips the plate
     // on the very next pass, full or throttled: the harness NPC sits inside
     // NAMEPLATE_URGENT_RANGE, so update(false) reaches the content branch.
-    const { painter, v, world } = harness({ state: 'available' });
+    const { painter, world } = harness({ state: 'available' });
     painter.update(true);
-    expect(v.markerEl.className).toBe('np-marker avail');
+    expectMarker(painter, '!', 'quest');
     (world as unknown as { questsDone: Set<string> }).questsDone = new Set([WORK_ORDER.id]);
     painter.update(false);
-    expect(v.markerEl.textContent).toBe('!');
-    expect(v.markerEl.className).toBe('np-marker repeat');
+    expectMarker(painter, '!', 'repeat');
   });
 
   it('reuses the snapshot for a cprof-only change until the next full pass: the bounded lag', () => {
@@ -281,47 +290,42 @@ describe('nameplate quest marker variants', () => {
     // the one-interval bound the field comment documents. Deleting the
     // cache (resolving fresh every pass) would dim here and redden this
     // arm; the next full pass re-resolves and dims.
-    const { painter, v, world } = harness({ state: 'available', done: true });
+    const { painter, world } = harness({ state: 'available', done: true });
     painter.update(true);
-    expect(v.markerEl.className).toBe('np-marker repeat');
+    expectMarker(painter, '!', 'repeat');
     (world as unknown as { questState: () => string }).questState = () => 'unavailable';
     (world.craftingIdentity as unknown as { cadenceBlockedQuests: string[] }).cadenceBlockedQuests =
       [WORK_ORDER.id];
     painter.update(false);
-    expect(v.markerEl.textContent).toBe('');
-    expect(v.markerEl.className).toBe('np-marker');
+    expectMarker(painter, '', 'none');
     painter.update(true);
-    expect(v.markerEl.textContent).toBe('!');
-    expect(v.markerEl.className).toBe('np-marker cooldown');
+    expectMarker(painter, '!', 'cooldown');
   });
 
-  it('repaints on a LIVE gold-to-blue transition: the marker class is in the plate signature', () => {
+  it('repaints on a LIVE gold-to-blue transition: the marker rides every full pass', () => {
     // The first completion of a work order happens while its giver's plate
-    // is on screen; if markerClass ever leaves the static signature the
-    // plate keeps the gold '!' until something else changes (the ai-tag
-    // lesson, applied to this branch).
-    const { painter, v, world } = harness({ state: 'available' });
+    // is on screen; resolveContent must recompute marker and markerTone on
+    // every full pass (the ai-tag lesson, applied to this branch), or the
+    // plate keeps the gold '!' until something else changes.
+    const { painter, world } = harness({ state: 'available' });
     painter.update(true);
-    expect(v.markerEl.className).toBe('np-marker avail');
+    expectMarker(painter, '!', 'quest');
     (world as unknown as { questsDone: Set<string> }).questsDone.add(WORK_ORDER.id);
     painter.update(true);
-    expect(v.markerEl.textContent).toBe('!');
-    expect(v.markerEl.className).toBe('np-marker repeat');
+    expectMarker(painter, '!', 'repeat');
 
-    // The reverse transitions ride the same signature (and the per-full-pass
+    // The reverse transitions ride the same recompute (and the per-full-pass
     // context refresh): a fresh turn-in arms the window (blue to dimmed),
     // and expiry returns the blue offer.
     (world as unknown as { questState: () => string }).questState = () => 'unavailable';
     (world.craftingIdentity as unknown as { cadenceBlockedQuests: string[] }).cadenceBlockedQuests =
       [WORK_ORDER.id];
     painter.update(true);
-    expect(v.markerEl.textContent).toBe('!');
-    expect(v.markerEl.className).toBe('np-marker cooldown');
+    expectMarker(painter, '!', 'cooldown');
     (world as unknown as { questState: () => string }).questState = () => 'available';
     (world.craftingIdentity as unknown as { cadenceBlockedQuests: string[] }).cadenceBlockedQuests =
       [];
     painter.update(true);
-    expect(v.markerEl.textContent).toBe('!');
-    expect(v.markerEl.className).toBe('np-marker repeat');
+    expectMarker(painter, '!', 'repeat');
   });
 });

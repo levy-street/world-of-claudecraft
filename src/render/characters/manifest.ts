@@ -37,6 +37,11 @@ export interface ClipMap {
   swim?: string;
   /** airborne base pose while jumping/falling */
   jump?: string;
+  /** Touchdown one-shot. Naming one opts the rig into the held-jump treatment:
+   *  `jump` stops looping and CLAMPS on its last frame (its airborne pose) for
+   *  however long the body stays off the ground, then this fires on the landing
+   *  edge. A rig without it keeps looping `jump` exactly as before. */
+  land?: string;
   walkBack?: string;
   /** one-shot played on respawn (skeleton awaken / boss taunt) */
   flourish?: string;
@@ -107,6 +112,12 @@ export interface VisualDef {
    *  ring would clip. */
   haloUpOffset?: number;
   haloRadius?: number;
+  /** Two-state prop mob (the dragonkin egg): the GLB ships BOTH state meshes
+   *  seated at the origin; alive shows `hide` only, and death swaps to `show`
+   *  (the cracked-open shell IS the corpse). assembleModel seeds the alive
+   *  state; CharacterVisual's enterDeath/revive flip it. Node names as
+   *  authored in the GLB. */
+  corpseMeshSwap?: { hide: string; show: string };
 }
 
 /** The slice of a VisualDef that decides how held weapons attach (which bones, and
@@ -199,6 +210,66 @@ const MOUNT_RIGGED: ClipMap = {
   death: 'Death',
 };
 
+// The Drakelands dragonkin brood (tmp/dragonkin_build.mjs bakes): artist
+// clips on the 25-bone mixamorig core. Run reuses the walk cycle (the rigs
+// ship no separate sprint; visual timeScale matching covers the chase). The
+// broodlord's specials resolve per mechanic: FireBreath rides the cast slot
+// (breathCone shows a real bar), Cleave/Stun ride attackByAbility off the
+// 'windup' spellfx ability ids, and Shout is the flourish one-shot the
+// 'shout'/'flourish' spellfx cues play.
+const DRAGONKIN_BROODLORD: ClipMap = {
+  idle: 'Idle',
+  walk: 'Walk',
+  run: 'Run',
+  attack: ['Attack'],
+  attackByAbility: { brood_cleave: 'Cleave', brood_stun: 'Stun' },
+  death: 'Death',
+  cast: 'FireBreath',
+  flourish: 'Shout',
+};
+const DRAGONKIN_BROODGUARD: ClipMap = {
+  idle: 'Idle',
+  walk: 'Walk',
+  run: 'Run',
+  attack: ['Attack'],
+  death: 'Death',
+  flourish: 'Shout',
+};
+const DRAGONKIN_WHELP: ClipMap = {
+  idle: 'Idle',
+  walk: 'Walk',
+  run: 'Run',
+  attack: ['JumpAttack'],
+  death: 'Death',
+  flourish: 'JumpAttack',
+};
+// Grubjaw the Glutton (the Mirefen Marsh rare): his own Tripo sculpt on the
+// 25-bone mixamorig core, auto-skinned by tmp/grubjaw_build.mjs. Two authored
+// swings rotate per attack (a bare Punch and the bigger WeaponA haymaker);
+// Death is a synthesized hips topple, since the drop ships no death clip.
+const GRUBJAW: ClipMap = {
+  idle: 'Idle',
+  walk: 'Walk',
+  run: 'Run',
+  attack: ['Punch', 'WeaponA'],
+  death: 'Death',
+};
+
+// Clipless two-state prop mobs (the dragonkin egg): the GLB ships NO clips, so
+// every action() lookup misses harmlessly (fadeTo null-guards) and the mesh
+// just stands; state changes are mesh-visibility swaps
+// (VisualDef.corpseMeshSwap), not clips. Names the nominal 'Idle' throughout
+// and registers in CLIPLESS_RIGS (tests/character_clipmaps.test.ts), the same
+// contract mob_spider_egg_sac holds: that registration is what exempts a
+// clip-less prop from the per-clip and far-LOD bake guards.
+const STATIC_PROP: ClipMap = {
+  idle: 'Idle',
+  walk: 'Idle',
+  run: 'Idle',
+  attack: ['Idle'],
+  death: 'Idle',
+};
+
 // Custom baked wolf rig (wolf_basic/greyjaw, Dog_Animation donor skeleton): the
 // animal() core plus the donor's Sit/Fall clips so player wolf forms sit and
 // jump properly, and a Walk swim base (a paddling gait at the gentle clip
@@ -208,6 +279,31 @@ const WOLF_BAKED: ClipMap = {
   sitIdle: 'Sit',
   swim: 'Walk',
   jump: 'Fall',
+};
+
+// Druid Bear Form: a purpose-built quadruped rig (29 deform bones; the gaits are
+// authored as IK foot paths, so walkRef/runRef below are MEASURED off the clips
+// rather than guessed). Jump/Land are a pair: `land` opts the rig into the held
+// airborne treatment (see ClipMap.land).
+//
+// It deliberately names no `cast`, no `emote` and no `attackByAbility`. Bear-form
+// abilities are instant, and the ability-VFX painter gates its ceremonial cast
+// gesture on an authored per-ability clip (hasGestureClip) while the cast base
+// state falls back to idle without a `cast` clip. Leaving all three out is what
+// keeps an instant cast from firing a swipe; real attacks still resolve `attack`.
+const BEAR_FORM: ClipMap = {
+  idle: 'Idle',
+  walk: 'Walk',
+  run: 'Run',
+  attack: ['Attack'],
+  hit: ['Hit'],
+  death: 'Death',
+  jump: 'Jump',
+  land: 'Land',
+  sitIdle: 'Sit',
+  // a paddling walk beats the steep no-clip procedural prone on a quadruped,
+  // the same call the wolf forms make
+  swim: 'Walk',
 };
 
 // Custom wild boar rig (wild_boar.glb)
@@ -713,8 +809,17 @@ export const VISUALS: Record<string, VisualDef> = {
     show: [],
     attach: [{ url: `${WEAPONS}/staff.glb`, bone: 'handslot.r' }],
     weaponSlots: [0],
+    // Faint warm lift only, to tell this apart from the mage/warlock models it
+    // shares mage.glb with. The whole rig is ONE merged material/atlas (skin,
+    // hair, and robe together), so this lerp multiplies the entire body, not
+    // just the cloth. Measured: 0xf0e9d6 is near white, so even at 0.5 the old
+    // strength only shifted the body by roughly (0.983, 0.980, 0.956), a
+    // near-no-op (issue #2678); dropped to 0.15 anyway for consistency with
+    // shaman/warlock, where the saturated tints DID flatten the face and
+    // hands at their old strengths. Kept low like the mob tints below that
+    // hit the same one-material-per-rig trap (mob_troll, mob_kobold, mob_ogre).
     tint: 0xf0e9d6,
-    tintStrength: 0.5,
+    tintStrength: 0.15,
   },
   player_shaman: {
     url: `${PLAYERS}/barbarian.glb`,
@@ -730,8 +835,12 @@ export const VISUALS: Record<string, VisualDef> = {
     ],
     weaponSlots: [0],
     offhandSlot: 1,
+    // Faint cool lift only: barbarian.glb is one merged material for the whole
+    // body (skin, fur, and leather together), so this lerp hits the face and
+    // hands as hard as the cloth. 0.4 (the class default strength) desaturated
+    // the whole model into a blue-grey wash on character create (issue #2678).
     tint: 0x6f8fc9,
-    tintStrength: 0.4,
+    tintStrength: 0.15,
   },
   player_mage: {
     url: `${PLAYERS}/mage.glb`,
@@ -755,8 +864,12 @@ export const VISUALS: Record<string, VisualDef> = {
       { url: `${WEAPONS}/spellbook_open.glb`, bone: 'handslot.l', gripRef: 'Spellbook_open' },
     ],
     weaponSlots: [0], // mainhand (wand) swaps; spellbook offhand stays
+    // Faint violet lift only, to tell this apart from the mage/priest models
+    // it shares mage.glb with (same one-material-per-rig caveat as those two:
+    // this multiplies skin and hair along with the robe). 0.45 read as a
+    // saturated full-body purple wash on character create (issue #2678).
     tint: 0x8d5fd3,
-    tintStrength: 0.45,
+    tintStrength: 0.15,
   },
   player_druid: {
     url: `${PLAYERS}/druid.glb`,
@@ -792,12 +905,19 @@ export const VISUALS: Record<string, VisualDef> = {
     height: 1.2,
     clips: animal(['Attack_Headbutt']),
   },
+  // Purpose-built quadruped (replaced a brown-tinted yeti, which was a biped
+  // standing in for a bear). No tint: the sculpt ships its own texture.
+  // walkRef/runRef are measured from the clips themselves (a planted foot slides
+  // backwards relative to the hips at exactly body speed), scaled by
+  // height/rawHeight = 2.35/0.588. They put full run (RUN_SPEED 7) at timeScale
+  // 1.30, clear of the 1.6 clamp where feet start skating.
   form_bear: {
-    url: `${CREATURES}/yetialt.glb`,
-    height: 2.4,
-    clips: BIPED14,
-    tint: 0x5a4030,
-    tintStrength: 0.55,
+    url: `${CREATURES}/bear_form.glb`,
+    height: 2.35,
+    clips: BEAR_FORM,
+    walkRef: 1.6,
+    runRef: 5.4,
+    attackTimeScale: 1,
   },
   // Druid Wolf Form AND shaman Shadewolf (ghost_wolf renders this visual with
   // the ghost material on top). Same custom baked wolf as the world wolves;
@@ -893,6 +1013,32 @@ export const VISUALS: Record<string, VisualDef> = {
     clips: MOUNT_RIGGED,
     walkRef: 3,
     runRef: 4.4,
+    lazyPreload: true,
+  },
+  // The Drakemaw Raptor (broodlord legendary drop): saddle-broken Tripo biped,
+  // gait-baked by scripts/bake_mount_gaits.mjs like the bear/toad/griffin. The
+  // imported source clips drove Hip TRANSLATION half a model unit off the bind
+  // pose (baked-in root motion), which at this height threw the body clear of
+  // the saddle and lurched it every stride; the baker authors rotation-only
+  // keys plus a root Y bob, so that cannot recur. walkRef is MEASURED off the
+  // baked clip (tmp/dragonkin_gait_measure.mjs): walk 3.02 yd/s.
+  mount_drakemaw_raptor: {
+    url: `${MOUNTS_DIR}/drakemaw_raptor.glb`,
+    height: 3.4,
+    clips: MOUNT_RIGGED,
+    walkRef: 3.0,
+    // runRef is deliberately the RIDDEN speed (RUN_SPEED 7 x +80% = 12.6), not
+    // the Run clip's measured 9.04 yd/s, so timeScale lands on exactly 1.0 and
+    // the clip plays at its authored 2.0 strides/sec (6.3 yd per bound).
+    // Foot-matching instead (runRef 9.04) gives timeScale 1.48 and a 2.96/sec
+    // cadence, which read as badly sped up on a 3.4 yd mount. That is the real
+    // tradeoff on this rig: under a perfect foot match, cadence is
+    // bodySpeed / (2 x stride x normScale) and so depends only on stride
+    // LENGTH, never on clip duration, which timeScale rescales away. Short legs
+    // therefore can only buy a calm cadence with slide. This costs 28%, well
+    // inside what the other baked mounts already ship (grag_bear's 3.58 yd/s
+    // natural against the same 12.6 leaves it sliding over half its travel).
+    runRef: 12.6,
     lazyPreload: true,
   },
 
@@ -1105,6 +1251,25 @@ export const VISUALS: Record<string, VisualDef> = {
     tint: 'entity',
     tintStrength: 0.2, // keep the green readable
   },
+  // The Mirefen Marsh rare, replacing his stand-in generic-troll body. Only
+  // the `grubjaw` template maps here (MOB_KEYS below), so every other troll
+  // keeps mob_troll. Gait refs measured (tmp/dragonkin_gait_measure.mjs) at
+  // his template scale 2.275: walk 4.36 (wander 2.63 -> 0.60x, exactly at the
+  // clamp floor, which is why the build slows his Walk clip) and run 10.94
+  // (chase 7.5 -> 0.69x). Both inside the matcher's clamps, so the feet plant.
+  mob_grubjaw: {
+    url: `${CREATURES}/grubjaw.glb`,
+    height: 2.9,
+    clips: GRUBJAW,
+    walkRef: 4.36,
+    runRef: 10.94,
+    // Barely-there wash. mob_troll tints 0.12 toward its template's BRIGHT
+    // green, which is what makes a stock Mirefen Troll pop; Grubjaw's own
+    // template colour is a dark 0x145a32, so the same strength only muddied
+    // his authored olive hide and read as near-black beside them.
+    tint: 'entity',
+    tintStrength: 0.04,
+  },
   mob_troll: {
     url: `${CREATURES}/orc.glb`,
     height: 2.4,
@@ -1186,6 +1351,80 @@ export const VISUALS: Record<string, VisualDef> = {
     clips: FLOATING,
     tint: 'entity',
     tintStrength: 0.2,
+  },
+  // --- The Drakelands dragonkin brood (v0.35 rework) ---------------------
+  // Tripo sculpts on the 25-bone mixamorig core with artist-authored clips,
+  // baked by tmp/dragonkin_build.mjs. The brood replaces the old floating
+  // dragonevolved wyrm ONLY in the Drakelands (per-template MOB_KEYS
+  // overrides below); the other dragonkin-family mobs keep the family
+  // fallback above.
+  // The gait references below are MEASURED, not guessed
+  // (tmp/dragonkin_gait_measure.mjs): ref = the clip's own natural world
+  // speed, 2 x stride x normScale x entityScale / duration, which is exactly
+  // what locomotionTimeScale divides the body speed by. They are per-DEF and
+  // scale-dependent, which is why the matriarch has her own def below rather
+  // than sharing the broodlord's: at scale 2.85 her stride covers 33% more
+  // ground per cycle, and reusing the lord's refs over-strode her by 25%.
+  mob_dragonkin_broodlord: {
+    url: `${CREATURES}/dragonkin_elite.glb`,
+    height: 2.6,
+    clips: DRAGONKIN_BROODLORD,
+    // scale 2.25: walk 4.24 (wander 3.3 -> 0.78x), run 7.92 (chase 9.5 ->
+    // 1.20x). Both land inside the matcher's clamps, so the feet plant.
+    walkRef: 4.24,
+    runRef: 7.92,
+    // 'entity' tint: the broodlords wash dark scale-brown (template color).
+    tint: 'entity',
+    tintStrength: 0.12,
+  },
+  // Cindraleth: the same GLB and clips as her broodlords, own refs for her
+  // scale 2.85 body (walk 5.37, run 10.04 -> her 9.0 chase plays at 0.90x).
+  // Her template color (0xf0b040) tints this shared body gold, so she reads
+  // as the gilded mother of the same brood.
+  mob_dragonkin_matriarch: {
+    url: `${CREATURES}/dragonkin_elite.glb`,
+    height: 2.6,
+    clips: DRAGONKIN_BROODLORD,
+    walkRef: 5.37,
+    runRef: 10.04,
+    tint: 'entity',
+    tintStrength: 0.12,
+  },
+  mob_dragonkin_broodguard: {
+    url: `${CREATURES}/dragonkin_mob.glb`,
+    height: 2.2,
+    clips: DRAGONKIN_BROODGUARD,
+    // scale 1.5: walk 2.15 (wander 2.98 -> 1.39x), run 5.59 (chase 8.5 ->
+    // 1.52x, a 0.55s sprint cadence). Feet plant at both speeds.
+    walkRef: 2.15,
+    runRef: 5.59,
+    tint: 'entity',
+    tintStrength: 0.1,
+  },
+  mob_dragonkin_whelp: {
+    url: `${CREATURES}/dragonkin_baby.glb`,
+    height: 1.05,
+    clips: DRAGONKIN_WHELP,
+    // scale 0.85: walk 0.54, run 1.87. A hatchling 0.9yd tall CANNOT
+    // foot-match a 10 yd/s chase (11 body-lengths/sec, gecko territory: the
+    // clip would need a 0.1s cycle), so this one keeps a residual slide by
+    // physics, not by oversight. The compressed 0.32s cycle reads as a
+    // frantic scurry, which is what hides it; the refs stay honest so the
+    // slow wander gait (and any future speed change) still matches.
+    walkRef: 0.54,
+    runRef: 1.87,
+    tint: 'entity',
+    tintStrength: 0.1,
+  },
+  // The egg is a clipless two-shell prop mob: alive shows Egg_Closed, death
+  // swaps to Egg_Open (the cracked shell IS the corpse; see corpseMeshSwap).
+  mob_dragon_egg: {
+    url: `${CREATURES}/dragon_egg.glb`,
+    height: 0.95,
+    clips: STATIC_PROP,
+    corpseMeshSwap: { hide: 'Egg_Closed', show: 'Egg_Open' },
+    tint: 'entity',
+    tintStrength: 0.08,
   },
   // Bog Thrall (The Drowned Litany): unused floating ghost rig, a stronger
   // fit for an undead swarm add than the generic skel_minion skeleton
@@ -1634,6 +1873,18 @@ const MOB_KEYS: Record<string, string> = {
   wildheart_hexcaller: 'mob_wildheart_hexcaller',
   wildheart_beastmaster: 'mob_wildheart_beastmaster',
   wildheart_high_priest: 'mob_wildheart_high_priest',
+  // The Drakelands dragonkin brood (v0.35): per-template overrides so the
+  // rework replaces every dragon model IN THE DRAKELANDS (Cindraleth
+  // included, re-tinted gold by her template color) while the dragonkin
+  // family fallback (the floating dragonevolved wyrm) stays for the sanctum,
+  // temple, rift, and Galecrest dragonkin.
+  drakemaw_broodlord: 'mob_dragonkin_broodlord',
+  cindraleth_maw_matriarch: 'mob_dragonkin_matriarch',
+  dragonkin_broodguard: 'mob_dragonkin_broodguard',
+  dragonkin_whelp: 'mob_dragonkin_whelp',
+  dragonkin_egg: 'mob_dragon_egg',
+  // Grubjaw the Glutton: his own body now, not the shared troll stand-in.
+  grubjaw: 'mob_grubjaw',
   // Ambient Highwatch stable horse: the Valorsteed mount model (mob_stable_horse
   // above) so it renders as an animated horse, not a humanoid.
   stable_horse: 'mob_stable_horse',
@@ -1661,6 +1912,10 @@ const MOB_KEYS: Record<string, string> = {
   // instead of the family fallback (beast -> wolf, undead -> skeleton minion).
   mirefen_widowling: 'mob_spider',
   spider_egg_sac: 'mob_spider_egg_sac',
+  // Broodmother clutch (q_broodmother): the destructible eggs reuse the egg-sac
+  // model (not a live spider), and the hatchling is a small spider.
+  spider_egg: 'mob_spider_egg_sac',
+  widow_hatchling: 'mob_spider',
   sump_troll_devourer: 'mob_troll',
   grave_silt_bulwark: 'mob_ogre',
   drowned_cantor: 'delve_mob_acolyte',

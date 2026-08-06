@@ -15,7 +15,7 @@
 // `src/sim`-pure: no DOM/Three, no Math.random/Date.now; all randomness is the
 // shared `ctx.rng` stream, drawn in the exact pre-move order.
 
-import { isDebuffAura, isDispellableAura } from '../aura_classify';
+import { isDebuffAura, isDispellableAura, isPlayerRemovableAura } from '../aura_classify';
 import { ABILITIES, isDelvePos, MOBS } from '../data';
 import { logCascadeCast, recordCascadeInitial } from '../dev/cascade_playtest';
 import { recalcPlayerStats } from '../entity';
@@ -363,6 +363,7 @@ export function runEffects(
           // Ability-scoped crit talents (ResolvedAbilityMod.critPct, e.g. the
           // Redhanded Craven Thrust mastery) ride the shared hit table.
           critBonus: mods.abilities[ability.id]?.critPct ?? 0,
+          abilityId: ability.id,
           onDealt:
             areaEcho || sweeping
               ? (amount) => {
@@ -509,6 +510,10 @@ export function runEffects(
                 ability: ability.id,
               });
               scheduleProjectile(ctx, p, target, (src, tgt) => {
+                // The echoed copy deliberately carries no abilityId: the copy
+                // keeps the shared school impact (one dedicated recording per
+                // cast), and threading the id here would ALSO route the echo
+                // hit through ability-filtered spellCrit procs a second time.
                 ctx.dealDamage(
                   src,
                   tgt,
@@ -1055,6 +1060,17 @@ export function runEffects(
             breakThreshold:
               fearBreakPct > 0 ? Math.max(1, Math.round(hostile.maxHp * fearBreakPct)) : undefined,
           });
+          // The shout above (fx:'nova') is the cast moment, once, at the
+          // caster; this is the landed-fear moment, once per creature
+          // actually feared, at that creature.
+          ctx.emit({
+            type: 'spellfx',
+            sourceId: p.id,
+            targetId: hostile.id,
+            school: ability.school,
+            fx: 'fearImpact',
+            ability: ability.id,
+          });
           ctx.enterCombat(p, hostile);
           if (hostile.kind === 'mob' && hostile.hostile) {
             addThreat(hostile, p.id, 10 * ctx.threatMod(p, ability.school));
@@ -1078,10 +1094,12 @@ export function runEffects(
         // Ice Block strips every player-removable debuff off the caster (control,
         // DoTs, stat saps, ...), broader than breakRoots and breakControl.
         // Encounter-authored unbreakable control stays until its owning script
-        // releases it.
+        // releases it, and an undispellable penalty (the recovery sicknesses) stays
+        // until its own timer runs out: isPlayerRemovableAura is the shared rule this
+        // and the dispel executor both answer to.
         for (let i = p.auras.length - 1; i >= 0; i--) {
           const aura = p.auras[i];
-          if (isDebuffAura(aura.kind, aura.value) && !isUnbreakableControlAura(aura)) {
+          if (isDebuffAura(aura.kind, aura.value) && isPlayerRemovableAura(aura)) {
             p.auras.splice(i, 1);
             ctx.emit({ type: 'aura', targetId: p.id, name: aura.name, gained: false });
           }
@@ -1231,6 +1249,16 @@ export function runEffects(
           school: eff.school ?? ability.school,
           leechPct: eff.leechPct,
         });
+        if (dotId === 'rupture') {
+          ctx.emit({
+            type: 'spellfx',
+            sourceId: p.id,
+            targetId: target.id,
+            school: eff.school ?? ability.school,
+            fx: 'dotApply',
+            ability: dotId,
+          });
+        }
         ctx.enterCombat(p, target);
         break;
       }
@@ -1303,6 +1331,19 @@ export function runEffects(
           eff.duration,
           ability.school,
         );
+        // Gripping Roots (entangling_roots) sounds at the target; every other
+        // root ability has no dedicated recording and stays silent here (see
+        // CC_IMPACT_ABILITY_CUES, src/ui/combat_sfx.ts).
+        if (ability.id === 'entangling_roots') {
+          ctx.emit({
+            type: 'spellfx',
+            sourceId: p.id,
+            targetId: target.id,
+            school: ability.school,
+            fx: 'ccImpact',
+            ability: ability.id,
+          });
+        }
         ctx.enterCombat(p, target);
         break;
       }
@@ -1325,6 +1366,19 @@ export function runEffects(
           sourceId: p.id,
           school: ability.school,
         });
+        // Sundering Gavel (hammer_of_justice) and Gut Punch (cheap_shot)
+        // sound at the target; every other stun has no dedicated recording
+        // and stays silent here.
+        if (ability.id === 'hammer_of_justice' || ability.id === 'cheap_shot') {
+          ctx.emit({
+            type: 'spellfx',
+            sourceId: p.id,
+            targetId: target.id,
+            school: ability.school,
+            fx: 'ccImpact',
+            ability: ability.id,
+          });
+        }
         ctx.enterCombat(p, target);
         break;
       }
@@ -1348,6 +1402,35 @@ export function runEffects(
           // break; plain incapacitates (Eye Jab, Wyvern Sting) insta-break.
           breakChanceScale: ability.fearDr ? FEAR_BREAK_CHANCE_SCALE : undefined,
         });
+        // Fear-flavored incapacitates (Harrow) sound at the target, distinct
+        // from plain stuns/incapacitates (Eye Jab, Wyvern Sting), which have
+        // no dedicated fear audio. Gated to ability.id, not the broader
+        // fearDr flag: death_coil (Morrowlash) also carries fearDr for its
+        // diminishing-returns/break-chance treatment but has no fear
+        // recording of its own and is absent from FEAR_IMPACT_ABILITIES, so
+        // a flag-only gate here made it double up its own shadow damage
+        // impact with Harrow's fear sound (review finding, PR #2861).
+        if (ability.id === 'fear') {
+          ctx.emit({
+            type: 'spellfx',
+            sourceId: p.id,
+            targetId: target.id,
+            school: ability.school,
+            fx: 'fearImpact',
+            ability: ability.id,
+          });
+        }
+        // Dirt Toss (blind) and Sap sound at the target too.
+        if (ability.id === 'blind' || ability.id === 'sap') {
+          ctx.emit({
+            type: 'spellfx',
+            sourceId: p.id,
+            targetId: target.id,
+            school: ability.school,
+            fx: 'ccImpact',
+            ability: ability.id,
+          });
+        }
         if (ability.awardsCombo && !comboAwarded) {
           ctx.awardCombo(p, target, ability.awardsCombo);
           comboAwarded = true;

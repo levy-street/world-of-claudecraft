@@ -45,7 +45,11 @@ export class BuffShells {
         varying vec3 vNormal;
         varying vec3 vView;
         void main() {
-          float fres = pow(1.0 - abs(dot(normalize(vNormal), normalize(vView))), 2.2);
+          // max() guards pow() where the surface faces the camera head-on: there
+          // abs(dot(...)) of two vectors normalized in shader overshoots 1.0 by
+          // an ulp, so the base goes negative and pow() returns NaN. One NaN
+          // pixel spreads into a hard-edged black rectangle through the bloom.
+          float fres = pow(max(0.0, 1.0 - abs(dot(normalize(vNormal), normalize(vView)))), 2.2);
           float pulse = 0.85 + 0.15 * sin(uTime * 5.0);
           vec3 col = uColor * (0.25 + 1.9 * fres) * pulse;
           gl_FragColor = vec4(col, uOpacity * (0.12 + 0.88 * fres));
@@ -129,6 +133,14 @@ export class BuffShells {
       slot.mesh.scale.setScalar(1.05 * (0.7 + 0.3 * grow));
       slot.mat.uniforms.uOpacity.value = 0.5 * grow * fadeOut;
       slot.mat.uniforms.uTime.value = time;
+    }
+  }
+
+  sleepEntity(entityId: number): void {
+    for (const slot of this.slots) {
+      if (!slot.active || slot.entityId !== entityId) continue;
+      slot.active = false;
+      slot.mesh.visible = false;
     }
   }
 

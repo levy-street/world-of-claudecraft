@@ -253,6 +253,86 @@ describe('combat SFX policy', () => {
     ).toEqual({ key: 'spell_nova', anchorId: 20 });
   });
 
+  it('gives the three AoE fear shouts their own nova cue instead of the shared spell_nova', () => {
+    for (const ability of ['psychic_scream', 'howl_of_terror', 'intimidating_shout']) {
+      expect(
+        spellFxCue({
+          type: 'spellfx',
+          sourceId: 10,
+          targetId: 10,
+          school: 'shadow',
+          fx: 'nova',
+          ability,
+        }),
+      ).toEqual({ key: 'fear_shout', anchorId: 10 });
+    }
+    // Every other nova ability keeps the shared cue.
+    expect(
+      spellFxCue({
+        type: 'spellfx',
+        sourceId: 10,
+        targetId: 10,
+        school: 'arcane',
+        fx: 'nova',
+        ability: 'arcane_explosion',
+      }),
+    ).toEqual({ key: 'spell_nova', anchorId: 10 });
+  });
+
+  it('gives Frost Nova its own cast cue instead of the shared spell_nova', () => {
+    expect(
+      spellFxCue({
+        type: 'spellfx',
+        sourceId: 10,
+        targetId: 10,
+        school: 'frost',
+        fx: 'nova',
+        ability: 'frost_nova',
+      }),
+    ).toEqual({ key: 'frost_nova', anchorId: 10 });
+  });
+
+  it('anchors the landed-fear moment to the feared target', () => {
+    expect(
+      spellFxCue({
+        type: 'spellfx',
+        sourceId: 10,
+        targetId: 20,
+        school: 'shadow',
+        fx: 'fearImpact',
+        ability: 'fear',
+      }),
+    ).toEqual({ key: 'fear', anchorId: 20 });
+  });
+
+  it('anchors the landed cc moment to the target for the covered set, and stays silent otherwise', () => {
+    for (const ability of ['hammer_of_justice', 'entangling_roots', 'blind', 'cheap_shot', 'sap']) {
+      expect(
+        spellFxCue({
+          type: 'spellfx',
+          sourceId: 10,
+          targetId: 20,
+          school: 'physical',
+          fx: 'ccImpact',
+          ability,
+        }),
+      ).toEqual({ key: ability, anchorId: 20 });
+    }
+    // No ability id, or an ability not in the covered set: no cue at all
+    // (the sim only ever emits ccImpact for this set, but the client
+    // resolver stays defensive regardless).
+    expect(
+      spellFxCue({
+        type: 'spellfx',
+        sourceId: 10,
+        targetId: 20,
+        school: 'physical',
+        fx: 'ccImpact',
+        ability: 'polymorph',
+      }),
+    ).toBeNull();
+  });
+
   it('uses explicit cast and impact school maps', () => {
     expect(castCueForAbility('fireball')).toBe('cast_fire');
     expect(castCueForAbility('lightning_bolt')).toBe('cast_lightning_bolt');
@@ -262,6 +342,205 @@ describe('combat SFX policy', () => {
     );
     expect(
       impactCueForDamage(damage({ school: 'chaos' }), target('mob', 'crypt_shambler')),
+    ).toBeNull();
+  });
+
+  it('gives Flamestrike its own cast cue instead of the shared spell_nova', () => {
+    expect(
+      spellFxCue({
+        type: 'spellfx',
+        sourceId: 10,
+        targetId: 10,
+        school: 'fire',
+        fx: 'nova',
+        ability: 'flamestrike',
+      }),
+    ).toEqual({ key: 'flamestrike', anchorId: 10 });
+  });
+
+  it('gives Scorch and Pyroblast their own impact instead of the shared impact_fire', () => {
+    for (const [abilityId, key] of [
+      ['scorch', 'scorch'],
+      ['pyroblast', 'pyroblast'],
+    ] as const) {
+      expect(
+        impactCueForDamage(
+          damage({ school: 'fire', ability: 'display label', abilityId }),
+          target('mob', 'crypt_shambler'),
+        ),
+      ).toBe(key);
+    }
+    // Every other fire spell (Fireball, etc.) keeps the shared impact_fire.
+    expect(
+      impactCueForDamage(
+        damage({ school: 'fire', ability: 'Fireball', abilityId: 'fireball' }),
+        target('mob', 'crypt_shambler'),
+      ),
+    ).toBe('impact_fire');
+  });
+
+  it('resolves the impact override off the stable abilityId, never the display-label ability field (#2861)', () => {
+    // Scorch's real display label is "Scald", not "scorch": a lookup keyed
+    // off the label instead of abilityId would silently never match.
+    expect(
+      impactCueForDamage(
+        damage({ school: 'fire', ability: 'Scald', abilityId: 'scorch' }),
+        target('mob', 'crypt_shambler'),
+      ),
+    ).toBe('scorch');
+    // An event with the id as its label but no abilityId (a caller that
+    // never threads one through) must NOT match by coincidence.
+    expect(
+      impactCueForDamage(
+        damage({ school: 'fire', ability: 'scorch', abilityId: undefined }),
+        target('mob', 'crypt_shambler'),
+      ),
+    ).toBe('impact_fire');
+  });
+
+  it('gives Frozen Orb and Glacial Spike their own impact instead of the shared impact_frost', () => {
+    for (const [abilityId, key] of [
+      ['frozen_orb', 'frozen_orb'],
+      ['glacial_spike', 'glacial_spike'],
+    ] as const) {
+      expect(
+        impactCueForDamage(
+          damage({ school: 'frost', ability: 'display label', abilityId }),
+          target('mob', 'crypt_shambler'),
+        ),
+      ).toBe(key);
+    }
+    // Every other frost spell (Ice Lance, etc.) keeps the shared impact_frost.
+    expect(
+      impactCueForDamage(
+        damage({ school: 'frost', ability: 'Ice Lance', abilityId: 'ice_lance' }),
+        target('mob', 'crypt_shambler'),
+      ),
+    ).toBe('impact_frost');
+  });
+
+  it('gives Aether Surge (arcane_surge) the arcane_blast cue instead of the shared impact_arcane', () => {
+    expect(
+      impactCueForDamage(
+        damage({ school: 'arcane', ability: 'Aether Surge', abilityId: 'arcane_surge' }),
+        target('mob', 'crypt_shambler'),
+      ),
+    ).toBe('arcane_blast');
+    // Every other arcane spell keeps the shared impact_arcane.
+    expect(
+      impactCueForDamage(
+        damage({ school: 'arcane', ability: 'Arcane Missiles', abilityId: 'arcane_missiles' }),
+        target('mob', 'crypt_shambler'),
+      ),
+    ).toBe('impact_arcane');
+  });
+
+  it('gives Ambush, Backstab, Garrote, Sinister Strike, and Eviscerate their own impact instead of the shared material impact', () => {
+    for (const [abilityId, key] of [
+      ['ambush', 'ambush'],
+      ['backstab', 'backstab'],
+      ['garrote', 'garrote'],
+      ['sinister_strike', 'sinister_strike'],
+      ['eviscerate', 'eviscerate'],
+    ] as const) {
+      expect(
+        impactCueForDamage(
+          damage({ school: 'physical', ability: 'display label', abilityId }),
+          target('mob', 'crypt_shambler'),
+        ),
+      ).toBe(key);
+    }
+    // Every other physical rogue strike keeps the shared material impact.
+    expect(
+      impactCueForDamage(
+        damage({ school: 'physical', ability: 'Mutilate', abilityId: 'mutilate' }),
+        target('mob', 'crypt_shambler'),
+      ),
+    ).toBe('impact_bone');
+  });
+
+  it('does not give Rupture its own impact on ordinary damage ticks (that would repeat every interval)', () => {
+    // Rupture rides the same eviscerate.mp3 recording, but only once, on the
+    // one-shot fx:'dotApply' apply moment tested below; the periodic 'damage'
+    // event every tick emits must fall through to the shared material impact,
+    // exactly like the HoT tick-silencing precedent (#2271, heal side).
+    expect(
+      impactCueForDamage(
+        damage({ school: 'physical', ability: 'Bleed Out', abilityId: 'rupture' }),
+        target('mob', 'crypt_shambler'),
+      ),
+    ).toBe('impact_bone');
+  });
+
+  it("does not replay Throat Wire's recording on its bleed ticks (garrote is a hybrid)", () => {
+    // Garrote IS in IMPACT_ABILITY_CUES (its direct hit plays the recording),
+    // and its bleed aura shares the ability id, so the only thing keeping the
+    // recording off the 18s tick train is that combat/auras.ts deliberately
+    // emits tick damage events with NO abilityId. Pin the tick shape here: a
+    // label-only garrote event resolves the shared material impact.
+    expect(
+      impactCueForDamage(
+        damage({ school: 'physical', ability: 'Throat Wire' }),
+        target('mob', 'crypt_shambler'),
+      ),
+    ).toBe('impact_bone');
+  });
+
+  it('gives Rupture its own cue once, on the dotApply moment', () => {
+    expect(
+      spellFxCue({
+        type: 'spellfx',
+        sourceId: 10,
+        targetId: 20,
+        school: 'physical',
+        fx: 'dotApply',
+        ability: 'rupture',
+      }),
+    ).toEqual({ key: 'eviscerate', anchorId: 20 });
+    // A dot with no dedicated recording stays silent.
+    expect(
+      spellFxCue({
+        type: 'spellfx',
+        sourceId: 10,
+        targetId: 20,
+        school: 'nature',
+        fx: 'dotApply',
+        ability: 'rake',
+      }),
+    ).toBeNull();
+  });
+
+  it('gives Blink and Shadowstep their own teleport cue (same blinkForward effect)', () => {
+    expect(
+      spellFxCue({
+        type: 'spellfx',
+        sourceId: 10,
+        targetId: 10,
+        school: 'arcane',
+        fx: 'blinkStep',
+        ability: 'blink',
+      }),
+    ).toEqual({ key: 'blink', anchorId: 10 });
+    expect(
+      spellFxCue({
+        type: 'spellfx',
+        sourceId: 10,
+        targetId: 10,
+        school: 'physical',
+        fx: 'blinkStep',
+        ability: 'shadowstep',
+      }),
+    ).toEqual({ key: 'shadowstep', anchorId: 10 });
+    // An ability sharing the effect with no recording of its own stays silent.
+    expect(
+      spellFxCue({
+        type: 'spellfx',
+        sourceId: 10,
+        targetId: 10,
+        school: 'physical',
+        fx: 'blinkStep',
+        ability: 'heroic_leap',
+      }),
     ).toBeNull();
   });
 
@@ -386,6 +665,28 @@ describe('combat SFX policy', () => {
     expect(auraApplyCue(gained, aura('buff_ap', -5))).toBe('debuff_apply');
     expect(auraApplyCue({ ...gained, gained: false }, aura('dot'))).toBeNull();
     expect(auraApplyCue(gained, null)).toBeNull();
+  });
+
+  it('gives Ice Block its own apply cue instead of the shared buff_apply', () => {
+    const gained = { type: 'aura', targetId: 1, name: 'Test Aura', gained: true } as const;
+    expect(auraApplyCue(gained, { ...aura('buff_ap'), id: 'ice_block' })).toBe('ice_block');
+    // Every other buff keeps the shared chime.
+    expect(auraApplyCue(gained, { ...aura('buff_ap'), id: 'ice_barrier' })).toBe('buff_apply');
+  });
+
+  it('gives Cloak of Shadows its own apply cue too (an absorb aura, same apply path)', () => {
+    const gained = { type: 'aura', targetId: 1, name: 'Test Aura', gained: true } as const;
+    expect(auraApplyCue(gained, { ...aura('absorb'), id: 'cloak_of_shadows' })).toBe(
+      'cloak_of_shadows',
+    );
+    // Every other absorb shield keeps the shared chime.
+    expect(auraApplyCue(gained, { ...aura('absorb'), id: 'power_word_shield' })).toBe('buff_apply');
+  });
+
+  it('gives Vanish and Stealth their own apply cue too (toggle stealth selfBuffs, same apply path)', () => {
+    const gained = { type: 'aura', targetId: 1, name: 'Test Aura', gained: true } as const;
+    expect(auraApplyCue(gained, { ...aura('stealth'), id: 'vanish' })).toBe('vanish');
+    expect(auraApplyCue(gained, { ...aura('stealth'), id: 'stealth' })).toBe('stealth');
   });
 
   it('uses unarmed swings in both druid combat forms', () => {

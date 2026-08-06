@@ -21,7 +21,7 @@ feature spec), or its program's dir; the top level is only for a living runbook.
 | `prd/` | Feature specs: requirements + `file:line` hook points + acceptance criteria. |
 | `qa-gate.md` | The QA-gate reference (Stop hook, pre-push floor, `npm run gate`, `/qa`); root CLAUDE.md points here. Living. |
 | `image-to-glb-asset-workflow.md` | Living runbook for reference-image intake, procedural Three.js authoring, optimized GLB export, renderer integration, performance gates, and in-game visual proof. |
-| `ai-pr-bot.md` | The non-blocking PR CI helpers: diff-scoped screenshots + AI review (`scripts/pr_shot_targets.mjs`, `prepare_ai_review.mjs`/`post_ai_review.mjs`). Living. |
+| `ai-pr-bot.md` | The non-blocking PR CI review helper (`prepare_ai_review.mjs`/`post_ai_review.mjs`), plus the local diff-scoped screenshot capture (`scripts/pr_shot_targets.mjs`). Living. |
 | `desktop-release.md`, `desktop-ship-notes.md`, `mobile-store-release.md` | Release runbooks (Electron/Steam; iOS/Android). Living. |
 | `sfx-studio-tutorial.md`, `codex.md` | Operator guides: the SFX Studio; the Codex support layer. Living. |
 | `security/` | `malware-scan-catalog.md`: the path-aware triage priors behind `scripts/malware_scan.mjs --gate`. Living. |

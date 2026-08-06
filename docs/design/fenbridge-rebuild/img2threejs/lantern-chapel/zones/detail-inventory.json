@@ -1,0 +1,282 @@
+{
+  "sourceImage": "docs/design/fenbridge-rebuild/references/lantern-chapel-turnaround.png",
+  "zonesDir": "docs/design/fenbridge-rebuild/img2threejs/lantern-chapel/zones",
+  "detailInventory": {
+    "scanMethod": "component-zones",
+    "targetMinDetails": 10,
+    "details": [
+      {
+        "id": "moss-footing",
+        "kind": "stain",
+        "description": "Moss follows the lowest stone joints and corner buttress contacts.",
+        "region": {
+          "x": 0.25,
+          "y": 0.76,
+          "width": 0.5,
+          "height": 0.16,
+          "units": "normalized"
+        },
+        "scale": "meso",
+        "affects": "stone albedo and roughness",
+        "mapsTo": {
+          "type": "material.localOverrides",
+          "ref": "stone/moss-footing"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/lantern-chapel/zones/front.png",
+        "confidence": 0.95
+      },
+      {
+        "id": "buttressed-stone-courses",
+        "kind": "seam",
+        "description": "Uneven damp-stone blocks and heavier corner buttresses seat the nave.",
+        "region": {
+          "x": 0.16,
+          "y": 0.7,
+          "width": 0.62,
+          "height": 0.2,
+          "units": "normalized"
+        },
+        "scale": "meso",
+        "affects": "foundation relief",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "foundation/buttressed-stone-courses"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/lantern-chapel/zones/hero.png",
+        "confidence": 0.93
+      },
+      {
+        "id": "timber-truss-rhythm",
+        "kind": "ridge",
+        "description": "Dark posts and diagonal gable braces divide the timber wall bays.",
+        "region": {
+          "x": 0.28,
+          "y": 0.25,
+          "width": 0.45,
+          "height": 0.45,
+          "units": "normalized"
+        },
+        "scale": "meso",
+        "affects": "nave frame relief",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "nave-shell/timber-truss-rhythm"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/lantern-chapel/zones/front.png",
+        "confidence": 0.94
+      },
+      {
+        "id": "sagged-shingle-courses",
+        "kind": "seam",
+        "description": "Teal shingles overlap in many horizontal rows across a shallow sagged roof.",
+        "region": {
+          "x": 0.22,
+          "y": 0.12,
+          "width": 0.63,
+          "height": 0.38,
+          "units": "normalized"
+        },
+        "scale": "meso",
+        "affects": "roof relief",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "roof-silhouette/sagged-shingle-courses"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/lantern-chapel/zones/side.png",
+        "confidence": 0.96
+      },
+      {
+        "id": "pointed-portal-frame",
+        "kind": "ridge",
+        "description": "Nested pointed arch trim frames the closed accessible double door.",
+        "region": {
+          "x": 0.39,
+          "y": 0.39,
+          "width": 0.25,
+          "height": 0.32,
+          "units": "normalized"
+        },
+        "scale": "meso",
+        "affects": "portal silhouette and relief",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "front-portal/pointed-portal-frame"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/lantern-chapel/zones/front.png",
+        "confidence": 0.97
+      },
+      {
+        "id": "diamond-gable-window",
+        "kind": "linework",
+        "description": "A small diamond amber window with dark cross mullions sits above the portal.",
+        "region": {
+          "x": 0.46,
+          "y": 0.28,
+          "width": 0.12,
+          "height": 0.12,
+          "units": "normalized"
+        },
+        "scale": "micro",
+        "affects": "front focal light",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "front-portal/diamond-gable-window"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/lantern-chapel/zones/front.png",
+        "confidence": 0.94
+      },
+      {
+        "id": "weathered-bell-and-clapper",
+        "kind": "contour",
+        "description": "A flared brass bell and clapper hang in an open timber gable.",
+        "region": {
+          "x": 0.44,
+          "y": 0.08,
+          "width": 0.12,
+          "height": 0.2,
+          "units": "normalized"
+        },
+        "scale": "meso",
+        "affects": "bell tower negative space",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "bell-gable/weathered-bell-and-clapper"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/lantern-chapel/zones/front.png",
+        "confidence": 0.93
+      },
+      {
+        "id": "lancet-mullion-rhythm",
+        "kind": "linework",
+        "description": "Repeated pointed amber lancets carry dark vertical mullions.",
+        "region": {
+          "x": 0.43,
+          "y": 0.52,
+          "width": 0.36,
+          "height": 0.24,
+          "units": "normalized"
+        },
+        "scale": "meso",
+        "affects": "window repetition and scale",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "lancet-window-system/lancet-mullion-rhythm"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/lantern-chapel/zones/side.png",
+        "confidence": 0.96
+      },
+      {
+        "id": "ledger-and-scroll-relief",
+        "kind": "ridge",
+        "description": "The protected side niche contains shallow ledger slabs and rolled parchment cylinders.",
+        "region": {
+          "x": 0.37,
+          "y": 0.57,
+          "width": 0.2,
+          "height": 0.18,
+          "units": "normalized"
+        },
+        "scale": "meso",
+        "affects": "archive service cue",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "archive-niche/ledger-and-scroll-relief"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/lantern-chapel/zones/hero.png",
+        "confidence": 0.91
+      },
+      {
+        "id": "grave-lamp-finials",
+        "kind": "contour",
+        "description": "Pointed grave-lamp caps and bracket ends repeat at exterior corners.",
+        "region": {
+          "x": 0.1,
+          "y": 0.45,
+          "width": 0.78,
+          "height": 0.28,
+          "units": "normalized"
+        },
+        "scale": "micro",
+        "affects": "chapel silhouette accents",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "lantern-finial-system/grave-lamp-finials"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/lantern-chapel/zones/hero.png",
+        "confidence": 0.87
+      },
+      {
+        "id": "lantern-cage-bars",
+        "kind": "linework",
+        "description": "Dark cage bars contain small amber lantern cores at the facade edges.",
+        "region": {
+          "x": 0.16,
+          "y": 0.49,
+          "width": 0.7,
+          "height": 0.2,
+          "units": "normalized"
+        },
+        "scale": "micro",
+        "affects": "lantern material separation",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "lantern-finial-system/lantern-cage-bars"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/lantern-chapel/zones/front.png",
+        "confidence": 0.93
+      },
+      {
+        "id": "rain-chain-links",
+        "kind": "linework",
+        "description": "Short dark rain-chain drops descend from side and rear eaves.",
+        "region": {
+          "x": 0.2,
+          "y": 0.5,
+          "width": 0.65,
+          "height": 0.28,
+          "units": "normalized"
+        },
+        "scale": "micro",
+        "affects": "eave drainage silhouette",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "rain-chain-system/rain-chain-links"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/lantern-chapel/zones/rear.png",
+        "confidence": 0.88
+      },
+      {
+        "id": "blank-archive-faces",
+        "kind": "linework",
+        "description": "Archive papers use fold and edge lines only, never readable text.",
+        "region": {
+          "x": 0.24,
+          "y": 0.6,
+          "width": 0.2,
+          "height": 0.2,
+          "units": "normalized"
+        },
+        "scale": "micro",
+        "affects": "parchment facade treatment",
+        "mapsTo": {
+          "type": "material.localOverrides",
+          "ref": "parchment/blank-archive-faces"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/lantern-chapel/zones/side.png",
+        "confidence": 0.9
+      }
+    ]
+  },
+  "authoringInstruction": "Inventory complete. Every detail maps to a real component local feature or material local override in sculpt-spec.json.",
+  "admission": {
+    "verdict": "pass",
+    "probe": "All four crops are technically conditional only for sub-1k resolution; macro and meso evidence remains usable.",
+    "duplicateGate": "front, side, rear, and hero are independently admitted."
+  },
+  "uncertainty": [
+    "Front, side, and hero views control the bell gable and archive niche; the rear view controls the plain rear timber bay and circular window.",
+    "Generated views vary minor lantern and finial placement; implement a restrained repeated bracket system without copying inconsistent counts.",
+    "Archive papers remain shallow, closed, and abstract with no readable writing; no interior is visible behind the portal or lancets.",
+    "The roof sag is approximated with pitched masses and stepped course offsets rather than dense curved tessellation."
+  ]
+}

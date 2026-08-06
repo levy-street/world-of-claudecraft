@@ -80,7 +80,17 @@ import { archetypeCeilingFor, craftSkillGainMultiplier } from './archetype';
 import { comboEligibility } from './combo_eligibility';
 import { isCommissionEligible } from './commission';
 import { isSignableMaterialRarity, type MaterialRarity } from './gathering';
-import { masterworkBonusStats, masterworkBumpedQuality, masterworkProcChance } from './masterwork';
+import {
+  type CraftVarianceOutcome,
+  JACK_VARIANCE_BETTER_PROC_BONUS,
+  rollCraftVariance,
+} from './jack_variance';
+import {
+  MASTERWORK_CHANCE_CAP,
+  masterworkBonusStats,
+  masterworkBumpedQuality,
+  masterworkProcChance,
+} from './masterwork';
 import { countAcrossGrades, materialGradeIds, planGradeRemoval } from './material_grades';
 import { materialTierBonusForReagents } from './material_tier';
 import { isStationActive } from './mobile_station';
@@ -104,6 +114,20 @@ import {
 // recipe) is retired; the free-floor COST rule (common-tier crafting never
 // costs anything) lives on in recipes.ts/types.ts.
 const CRAFT_SKILL_GAIN = 1;
+
+// Jack of All Trades cross-craft synergy discount (issue #1296, the second
+// improviser perk): an ADDITIONAL flat percentage shaved off every reagent's
+// required quantity for a Jack-attuned crafter, composing with the #1145
+// self-signed reduction and #1134 specialization discount the same way those
+// two already compose (requiredReagentCountFor below): one combined floor,
+// never fully waiving a reagent (floored at 1). Represents a Jack's breadth
+// across every craft lowering material waste, unlike specialization's
+// per-craft depth. Magnitude is an open design question (the doc's own Open
+// Questions section: "the material-saving bonus" magnitude "is open"); kept
+// modest and below PERK_THRESHOLDS' specialization discount
+// (content/professions.ts materialDiscountPct, 0.2), since a Jack is
+// deliberately broad-and-shallow rather than ever truly specialized.
+const JACK_MATERIAL_DISCOUNT_PCT = 0.1;
 
 function isCraftedDisenchantTrackedOutput(def: ItemDef | undefined): boolean {
   return (
@@ -141,6 +165,16 @@ export interface CraftResult {
   // so no UI may consume it (the honored-vs-ignored pins are its consumer);
   // the player-visible commission fact is the payload's bindOnTrade arm.
   commission?: boolean;
+  // Jack of All Trades improviser variance (#1296): present only for a
+  // Jack-attuned crafter (jack_variance.ts rollCraftVariance draws an
+  // ADDITIONAL rng roll only then, so every non-Jack craft still draws
+  // exactly the one masterwork proc roll, unchanged). 'worse' forced this
+  // craft's masterwork bump off outright; 'better' improved (never
+  // guaranteed) this craft's masterwork odds; 'normal' changed nothing.
+  // Sim-internal, the same as `commission` above: NOT projected into
+  // CraftResultView or the craftResult SimEvent, since there is no live
+  // quest path to become Jack yet (see archetype.ts attuneJackOfAllTrades).
+  variance?: CraftVarianceOutcome;
   // Present only when !ok: a stable reason code, not player-facing prose (the
   // caller renders/localizes the denial).
   reason?:
@@ -301,6 +335,7 @@ export function requiredReagentCount(
     reagent,
     craftSkills,
     professionId,
+    !!meta?.archetype?.isJackOfAllTrades,
   );
 }
 
@@ -311,17 +346,26 @@ export function requiredReagentCount(
  * window's view core computes its displayed requirement and Craft gate with
  * the SAME function the sim's availability check and consumption use, the
  * single-surface doctrine the difficulty label already follows.
+ *
+ * `isJackOfAllTrades` (#1296) composes a THIRD multiplicative discount, the
+ * cross-craft synergy material-saving perk, on top of the #1145/#1134 pair
+ * in the SAME single floor (never triple-floored, so the three never
+ * compound more aggressively than one combined percentage would). Defaults
+ * false so every existing caller (crafting_view.ts's UI projection included)
+ * is byte-identical until it is threaded a real Jack identity.
  */
 export function requiredReagentCountFor(
   hasSelfSigned: boolean,
   reagent: ProfessionReagent,
   craftSkills: CraftSkillState,
   professionId: string,
+  isJackOfAllTrades = false,
 ): RequiredReagentResult {
   const afterSelfSigned = hasSelfSigned ? Math.max(1, reagent.count - 1) : reagent.count;
   const multiplier = materialCostMultiplier(craftSkills, professionId);
+  const jackMultiplier = isJackOfAllTrades ? 1 - JACK_MATERIAL_DISCOUNT_PCT : 1;
   return {
-    count: Math.max(1, Math.floor(afterSelfSigned * multiplier)),
+    count: Math.max(1, Math.floor(afterSelfSigned * multiplier * jackMultiplier)),
     selfSignedBonusApplied: afterSelfSigned < reagent.count,
   };
 }
@@ -568,15 +612,26 @@ export function resolveCraftForRecipe(
       ctx.removeItem(take.itemId, take.count, pid);
     }
   }
-  // Masterwork proc draw: the single output-side rng draw, at the
-  // exact position the retired quality roll occupied so the world's draw
-  // order and the one-draw-per-successful-craft contract are preserved. The
-  // draw is UNCONDITIONAL on the success path: it happens even when the
-  // effect is gated off below, so the draw count per successful craft is
-  // always exactly 1 regardless of archetype state or output type. Every
-  // denial path above draws nothing, unchanged.
+  // Jack of All Trades improviser variance roll (#1296): an ADDITIONAL
+  // output-side draw, ONLY for a Jack-attuned crafter, positioned
+  // immediately before the masterwork proc draw below. Every non-Jack
+  // crafter (isJackOfAllTrades false, still the only reachable value: there
+  // is no live quest path to become Jack yet) draws nothing extra here, so
+  // the one-draw-per-successful-craft contract the masterwork proc draw
+  // documents below is unchanged for every existing scenario and test.
+  const jackVariance: CraftVarianceOutcome | null = meta?.archetype.isJackOfAllTrades
+    ? rollCraftVariance(ctx.rng.next())
+    : null;
+  // Masterwork proc draw: the single output-side rng draw for every
+  // non-Jack crafter, at the exact position the retired quality roll
+  // occupied so the world's draw order and the one-draw-per-successful-craft
+  // contract are preserved. The draw is UNCONDITIONAL on the success path:
+  // it happens even when the effect is gated off below, so the draw count
+  // per successful craft is exactly 1 (2 for a Jack, counting the variance
+  // roll above) regardless of archetype state or output type. Every denial
+  // path above draws nothing, unchanged.
   const procRoll = ctx.rng.next();
-  const procChance = masterworkProcChance({
+  const baseProcChance = masterworkProcChance({
     tiersAboveRecipe:
       tierCapability(craftSkills, recipe.professionId) - tierForSkill(recipe.skillReq),
     signedReagent: signedReagentUsed,
@@ -586,13 +641,24 @@ export function resolveCraftForRecipe(
     // it draws nothing and cannot move the single procRoll draw above.
     materialTierBonus: materialTierBonusForReagents(recipe.reagents),
   });
+  // A 'better' variance roll improves (never guarantees) this craft's
+  // masterwork odds, still capped at MASTERWORK_CHANCE_CAP like every other
+  // term composing into the chance. 'worse'/'normal' leave the base chance
+  // untouched; 'worse' instead forces the masterwork gate off outright below.
+  const procChance =
+    jackVariance === 'better'
+      ? Math.min(MASTERWORK_CHANCE_CAP, baseProcChance + JACK_VARIANCE_BETTER_PROC_BONUS)
+      : baseProcChance;
   // Effect gate (gates the EFFECT, never the draw): the def must bake a
   // non-null bonus record, and the bumped quality tier must not exceed the
   // archetype ceiling (the invariant that a dormant or hobby craft's
-  // output never exceeds its ceiling tier). When
-  // gated off, the craft still succeeds as a plain deterministic craft.
+  // output never exceeds its ceiling tier). A 'worse' Jack variance roll
+  // forces this arm off outright, even when procRoll would otherwise have
+  // hit. When gated off, the craft still succeeds as a plain deterministic
+  // craft.
   const masterwork =
     !!meta &&
+    jackVariance !== 'worse' &&
     procRoll < procChance &&
     bonusStats !== null &&
     bumped !== null &&
@@ -732,6 +798,7 @@ export function resolveCraftForRecipe(
   };
   if (masterwork) result.masterwork = true;
   if (commissioned) result.commission = true;
+  if (jackVariance !== null) result.variance = jackVariance;
   return result;
 }
 

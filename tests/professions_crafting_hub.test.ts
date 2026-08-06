@@ -34,7 +34,12 @@ import {
   isStationActive,
   placeMobileStationForPlayer,
 } from '../src/sim/professions/mobile_station';
-import { isAtStation, stationsOfType, stationTypeForCraft } from '../src/sim/professions/stations';
+import {
+  craftsForStationType,
+  isAtStation,
+  stationsOfType,
+  stationTypeForCraft,
+} from '../src/sim/professions/stations';
 import { Sim } from '../src/sim/sim';
 
 function makeSim(seed = 42) {
@@ -126,6 +131,19 @@ describe('station content', () => {
     for (const craftId of ['jewelcrafting', 'inscription', 'enchanting']) {
       expect(stationTypeForCraft(craftId)).toBeUndefined();
     }
+  });
+
+  it('craftsForStationType is the literal reverse of the craft map, in declaration order', () => {
+    // Literal pins, never a derived reverse of STATION_TYPE_BY_CRAFT (that
+    // compare would be a tautology). The forge is the one two-craft type and
+    // weaponcrafting comes first: the declaration-order tie-break the gossip
+    // Crafting shortcut (master_craft_core.ts) relies on.
+    expect(craftsForStationType('forge')).toEqual(['weaponcrafting', 'armorcrafting']);
+    expect(craftsForStationType('kitchens')).toEqual(['cooking']);
+    expect(craftsForStationType('apothecary')).toEqual(['alchemy']);
+    expect(craftsForStationType('tannery')).toEqual(['leatherworking']);
+    expect(craftsForStationType('loom')).toEqual(['tailoring']);
+    expect(craftsForStationType('toolworks')).toEqual(['engineering']);
   });
 
   it('FIELD_RECIPES is exactly the nine common recipes, and stamps split hands-vs-stations', () => {

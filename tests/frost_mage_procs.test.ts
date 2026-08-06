@@ -23,6 +23,7 @@ import type { PlayerMeta } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
 import type { Aura, Entity, SimEvent } from '../src/sim/types';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 // Frost mage proc engine (owner design 2026-07-11, combat/frost_mage.ts):
 // Rimelance (frostbolt) impacts roll Fingers of Frost (15%, 2 stacks) and
@@ -41,6 +42,10 @@ function makeSim(opts?: { spec?: string | null; seed?: number }): { sim: TestSim
     seed: opts?.seed ?? 1,
     playerClass: 'mage',
     autoEquip: true,
+    // The suite creates its one stationary target explicitly. Keeping the
+    // expanded campaign's ambient camps out makes long projectile drives both
+    // faster and immune to unrelated wildlife entering combat.
+    world: EMPTY_TEST_WORLD,
   }) as unknown as TestSim;
   sim.setPlayerLevel(20);
   const spec = opts?.spec === undefined ? 'frost' : opts.spec;

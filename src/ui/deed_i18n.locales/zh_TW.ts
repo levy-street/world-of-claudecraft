@@ -7,6 +7,14 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  chr_drakemaw_broodlord: {
+    name: '碎巢者',
+    desc: '在龍喉巢主的卵群之間將牠擊殺，撐過牠的怒吼、順劈斬與烈焰。',
+  },
+  chr_maw_matriarch: {
+    name: '長空歸寂',
+    desc: '在龍喉上方的火山口棲地中，擊殺辛卓蕾絲，龍喉之母。',
+  },
   pvp_card_duel_first_win: {
     name: '我的地盤我的規矩',
     desc: '在牌局大師處贏得一場紙牌對決。',
@@ -508,6 +516,10 @@ export const table: DeedLocaleTable = {
     name: '英雄：荒野之心盆地',
     desc: '以英雄難度在荒野之心盆地擊敗盆地之聲祖爾加。',
   },
+  chr_peaks_gatherer: {
+    name: '高地的收成',
+    desc: '在荊峰高地採集一處礦脈、一處林木與一叢草藥。',
+  },
   chr_marsh_rares_ii: {
     name: '暴食者，終得清算',
     desc: '斬殺暴食者蛆顎，泥沼濕地第四個有名有姓的惡煞，首次清算時被漏記在冊。',
@@ -523,5 +535,29 @@ export const table: DeedLocaleTable = {
   chr_hollow_rares: {
     name: '鹿群不忘',
     desc: '斬殺老髓殼與鹿群之首金輝角，帷幕幽谷的兩個遊蕩稀有首領。',
+  },
+  chr_willowfen_gatherer: {
+    name: '沼地的餽贈',
+    desc: '在柳澤沼地採集一處礦脈、一處林木與一叢草藥。',
+  },
+  chr_willowfen_first_cast: {
+    name: '睡蓮澤的漣漪',
+    desc: '在柳澤沼地的水域釣起一條魚。',
+  },
+  chr_galecrest_gatherer: {
+    name: '海岬上的收穫',
+    desc: '在疾風崖採集一處礦脈、一處林木與一叢草藥。',
+  },
+  chr_galecrest_first_cast: {
+    name: '鏡湖垂綸',
+    desc: '在疾風崖的水域釣起一條魚。',
+  },
+  chr_farshore_gatherer: {
+    name: '島上的補給',
+    desc: '在遠岸採集一處礦脈、一處林木與一叢草藥。',
+  },
+  chr_farshore_first_cast: {
+    name: '鷗鳥所知',
+    desc: '在遠岸的水域釣起一條魚。',
   },
 };

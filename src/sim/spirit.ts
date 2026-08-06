@@ -417,6 +417,11 @@ function applySickness(
     value,
     sourceId: p.id,
     school: 'shadow',
+    // The penalty is the whole point of both sicknesses, so no player counter may take
+    // it off: a dispel (warlock Voidfeast, paladin Cleansing Verdict), a cleanse (mage
+    // Cold Coffin), and the buff-bar right-click all skip it, exactly as dying and
+    // relogging already do (aurasSurvivingDeath). Only the timer clears it.
+    undispellable: true,
   });
 }
 
