@@ -33,6 +33,24 @@ export const BANNER_QUEUE_LIMIT = 6;
 
 export type BannerEnqueueOutcome = 'show' | 'queued' | 'dropped';
 
+/**
+ * Normalize a banner's secondary text into the LINES it will paint.
+ *
+ * A banner may carry one secondary line or several (the battleground verdict
+ * stacks its score-and-rating line, why the match ended, and the first-win
+ * bonus: independent sentences that each stay their own `t()` key rather than
+ * being concatenated into one). Normalizing HERE, before the payload is built,
+ * is what keeps the paint side's single `if (subtext)` gate honest: `!![]` is
+ * true, so an empty list reaching the element would add the `has-subtext` class
+ * to a banner with no subtext at all and lay out an empty second row. Empty
+ * strings are dropped for the same reason.
+ */
+export function bannerSubtextLines(subtext: string | string[] | undefined): string[] {
+  if (subtext === undefined) return [];
+  const lines = Array.isArray(subtext) ? subtext : [subtext];
+  return lines.filter((line) => line.length > 0);
+}
+
 export class BannerQueue<T> {
   private waitingCelebrations: { bannerClass: BannerClass; payload: T }[] = [];
   private pendingAmbient: T | null = null;

@@ -111,11 +111,16 @@ export function pruneYumiQueue(ctx: SimContext, fmt: YumiFormat): void {
       // Also drop the unit if a member slipped into a Vale Cup match/queue
       // after joining here (arenaQueueJoin blocks this at entry, and so does
       // startValeCupPractice in the other direction; this mirrors the
-      // 1v1/2v2/fiesta prunes as defense in depth).
+      // 1v1/2v2/fiesta prunes as defense in depth). A Thornhollow Fields member
+      // is likewise never seated into a yumi maze mid-match (the cross-queue
+      // hole behind the stale-arenaMatches release bug): the band's x already
+      // fails the threshold test, and the explicit membership check keeps the
+      // rule true even if a match ever seats a fighter outside the band.
       return (
         !!e &&
         !e.dead &&
         !ctx.arenaMatches.has(id) &&
+        !ctx.bgMatches.has(id) &&
         e.pos.x <= DUNGEON_X_THRESHOLD &&
         !ctx.vcupSeatedOrQueued(id)
       );
@@ -198,8 +203,12 @@ export function startYumiMatch(
   const metas = allPids.map((pid) => ctx.players.get(pid));
   if (slot === null || entities.some((e) => !e) || metas.some((m) => !m)) {
     const queue = yumiQueue(ctx, format);
-    const okA = teamA.every((pid) => ctx.entities.get(pid) && !ctx.arenaMatches.has(pid));
-    const okB = teamB.every((pid) => ctx.entities.get(pid) && !ctx.arenaMatches.has(pid));
+    const okA = teamA.every(
+      (pid) => ctx.entities.get(pid) && !ctx.arenaMatches.has(pid) && !ctx.bgMatches.has(pid),
+    );
+    const okB = teamB.every(
+      (pid) => ctx.entities.get(pid) && !ctx.arenaMatches.has(pid) && !ctx.bgMatches.has(pid),
+    );
     if (okB) queue.unshift({ pids: teamB, rating: arenaMod.arenaTeamRating(ctx, teamB, '2v2') });
     if (okA) queue.unshift({ pids: teamA, rating: arenaMod.arenaTeamRating(ctx, teamA, '2v2') });
     return;

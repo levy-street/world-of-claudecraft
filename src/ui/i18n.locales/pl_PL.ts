@@ -2425,9 +2425,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.calendar.events.delveDay.note':
     'Brat Halven zaznacza na swoich mapach: dobry dzień, by stawić czoła Zawalonemu Relikwiarzowi.',
   'hudChrome.calendar.events.delveDay.title': 'Dzień Wyprawy',
-  'hudChrome.calendar.events.fiestaNight.note':
-    'Ring Fiesty 2v2 przyciąga dziś wieczorem najgłośniejsze tłumy.',
-  'hudChrome.calendar.events.fiestaNight.title': 'Noc Fiesty',
   'hudChrome.calendar.events.fishingDerby.note':
     'Wędkarze obstawiają jeziora. Weź wędkę i powymieniaj się rybackimi opowieściami.',
   'hudChrome.calendar.events.fishingDerby.title': 'Zawody Wędkarskie',
@@ -4870,7 +4867,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'fiesta.end.draw': 'REMIS W FIESCIE! Zbyt wyrównane!',
   'fiesta.end.loss': 'FIESTA PRZEGRANA! Zagraj jeszcze raz!',
   'fiesta.end.win': 'FIESTA WYGRANA! 🎉 Co za zabawa!',
-  'fiesta.enterQueue': 'Dołącz do Fiesty!',
   'fiesta.error.leaderOnly': 'Tylko przywódca drużyny może zapisać waszą drużynę do {label}.',
   'fiesta.error.noAugment': 'Nie masz teraz żadnego wzmocnienia do wyboru.',
   'fiesta.error.notOnOffer': 'Tego wzmocnienia nie ma w ofercie.',
@@ -4887,9 +4883,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'fiesta.powerup.pow_colossus.name': 'Kolos',
   'fiesta.powerup.pow_moon_boots.name': 'Księżycowe Buty',
   'fiesta.powerup.pow_speed_demon.name': 'Demon Prędkości',
-  'fiesta.practice': '🎉 Trening z botami',
-  'fiesta.practiceNote':
-    'Trening offline: przyzywa 3 boty SI i zapisuje cię do Fiesty 2v2. Kliknij ponownie, by przerwać.',
   'fiesta.queue.join': 'Dołączasz do kolejki Fiesty 2v2. Szykuj się na ZABAWĘ…',
   'fiesta.queue.leave': 'Opuszczasz kolejkę Fiesty 2v2.',
   'fiesta.queue.teamLeave': 'Twoja drużyna opuszcza kolejkę Fiesty 2v2.',
@@ -5125,38 +5118,18 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.thorns': 'Chroni sojusznika tak, że atakujący wręcz ranią się przy uderzeniu.',
   'guide.abilityHook.thunder_clap': 'Uderza we wszystko wokół ciebie i spowalnia ataki wrogów.',
   'guide.abilityHook.wrath': 'Pocisk natury ciskany w cel z dystansu, twój podstawowy atak.',
-  'guide.arenaPage.augmentsNote':
-    'Ulepszenia i wzmocnienia działają tylko podczas meczu. Chodzi w nich o swobodne, doraźne buildy, a nie o trwałą potęgę, więc nikt nie kupi sobie zwycięstwa.',
   'guide.arenaPage.coliseumBody':
     'Koloseum to arena królestwa, gdzie stajesz naprzeciw innych graczy w meczach rankingowych, jeden na jednego lub dwóch na dwóch. Każdy przedział ma własny ranking, więc zwycięstwo wynosi cię po tej drabinie na oczach całego królestwa. Otwórz okno Areny, aby zapisać się do przedziału, samotnie lub ze swoim partnerem.',
   'guide.arenaPage.coliseumHeading': 'Popielne Koloseum',
   'guide.arenaPage.duelsBody':
     'Wyzwij dowolnego napotkanego gracza na przyjacielski pojedynek. Stawką jest tylko duma, więc to najprostszy sposób, by poznać starcie lub rozstrzygnąć przyjacielski spór.',
   'guide.arenaPage.duelsHeading': 'Pojedynki',
-  'guide.arenaPage.fiestaBody':
-    'Fiesta to szybka bijatyka dwóch na dwóch, toczona jako jedno nieprzerwane starcie, w którym każdy walczący zostaje sprowadzony do równych szans. W trakcie walki dobierasz ulepszenia, szybkie wzmocnienia, które w locie przekształcają twój zestaw, więc żaden mecz nie jest taki sam.',
-  'guide.arenaPage.fiestaHeading': 'Fiesta dwóch na dwóch',
   'guide.arenaPage.heading': 'Arena i PvP',
   'guide.arenaPage.intro':
     'Chcesz sprawdzić się przeciwko innym graczom? Tryb gracz kontra gracz jest wbudowany i zawsze sam go wybierasz, nigdy nie jest ci narzucony.',
   'guide.arenaPage.ladderBody':
     'Rozgrywka rankingowa śledzi twoją pozycję w czasie. Sprawdź ranking, by zobaczyć, gdzie jesteś i kto dzierży szczyt królestwa.',
   'guide.arenaPage.ladderHeading': 'Wspinaczka po drabinie rankingowej',
-  'guide.arenaPage.powerupsBody':
-    'Na arenę w trakcie walki spadają też świecące kule, dostępne dla tego, kto pierwszy do nich dotrze. Są celowo przesadne i działają tylko przez chwilę: Demon Prędkości dla mgnienia oślepiającego tempa, Kolos, by rozrosnąć się w ociężałego giganta, Księżycowe Buty dla skocznego susu w niskiej grawitacji oraz Berserker dla nagłego przypływu furii.',
-  'guide.arenaPage.powerupsTitle': 'Wzmocnienia na ringu',
-  'guide.arenaPage.waveGoldBody':
-    'Środkowa fala: obosieczne kombinacje, w których twój build zaczyna nabierać kształtu i rozbrzmiewać.',
-  'guide.arenaPage.waveGoldTitle': 'Złoto',
-  'guide.arenaPage.wavePrismaticBody':
-    'Ostatnia fala: definiujące build, rozsadzające ekran skoki mocy, które mają wydawać się absurdalne w najlepszym tego słowa znaczeniu.',
-  'guide.arenaPage.wavePrismaticTitle': 'Pryzmatyczny',
-  'guide.arenaPage.waveSilverBody':
-    'Pierwsza fala: czyste wzmocnienia pojedynczej cechy, które wyostrzają podstawy twojej klasy.',
-  'guide.arenaPage.waveSilverTitle': 'Srebro',
-  'guide.arenaPage.wavesBody':
-    'Starcie Fiesty podsuwa ci nowe wybory w miarę trwania, a stają się one coraz śmielsze, im dłużej toczy się walka. Budujesz od fali do fali, za każdym razem wybierając jedną z kilku opcji i zachowując ją do końca starcia.',
-  'guide.arenaPage.wavesTitle': 'Ulepszenia napływają falami',
   'guide.bestiary.flavor.gravecaller_cultist':
     'Odziani w szaty słudzy kultu śmierci, których dzieło plugawi groby od Doliny po szczyty. Gdzie się gromadzą, zmarli nie zaznają spoczynku.',
   'guide.bestiary.flavor.grubjaw':
@@ -6171,7 +6144,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hud.core.mapCanvasLabel': 'Mapa',
   'hud.core.mapSummary': 'Mapa {zone}.',
   'hud.core.maxLevel': 'MAKS. POZIOM',
-  'hud.core.mobileArena': 'Arena',
   'hud.core.mobileAttack': 'Atak',
   'hud.core.mobileCamera': 'Kamera — dotknij dwukrotnie, aby wyśrodkować',
   'hud.core.mobileChat': 'Czat',
@@ -6267,7 +6239,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hud.errors.whisperMissing': "Nie ma w sieci gracza o imieniu '{name}'.",
   'hud.errors.whisperSelf': 'Mamroczesz do siebie. Nikt tego nie słyszy.',
   'hud.keybinds.actions.actionBarSlot': 'Pasek akcji {slot}',
-  'hud.keybinds.actions.arena': 'Arena (Popielne Koloseum)',
   'hud.keybinds.actions.attack': 'Atak',
   'hud.keybinds.actions.attackMove': 'Atak w ruchu',
   'hud.keybinds.actions.autorun': 'Przełącz autobieg',
@@ -8463,9 +8434,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Rozdziera pancerz celu, zmniejszając go o {damage}% za każde nałożenie. Kumuluje się do 5 razy. Generuje dużą ilość zagrożenia.',
   'entities.mobs.training_dummy.name': 'Manekin treningowy',
   'entities.mobs.yumi_cat.name': 'Yumi',
-  'guide.arenaPage.yumiBody':
-    'Ochrona Yumi to drużynowy tryb z zadaniem, rozgrywany w labiryncie: każda strona strzeże własnego kociego chowańca, jednocześnie polując na cudzego. Co jakiś czas oba koty przeskakują w nowe zakątki labiryntu, więc walka waha się między obroną, polowaniem i wyścigiem, by znaleźć je na nowo. Zapisuj się w trybie trzech na trzech lub pięciu na pięciu; upadek w boju odstawia cię jedynie na chwilę.',
-  'guide.arenaPage.yumiHeading': 'Ochrona Yumi',
   'hudChrome.archetypeTitle.hobbyLabel': 'Pasja',
   'hudChrome.auraEffect.armorPct': 'Zmniejsza pancerz o {pct}%',
   'hudChrome.auraEffect.armorPctStacks': 'Zmniejsza pancerz o {pct}% ({stacks} nałożeń)',
@@ -8485,7 +8453,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'yumi.bracket5': 'Yumi 5 na 5',
   'yumi.end.loss': 'PORAŻKA! Twoja Yumi padła.',
   'yumi.end.win': 'ZWYCIĘSTWO! Yumi jest bezpieczna!',
-  'yumi.enterQueue': 'Dołącz do Ochrony Yumi!',
   'yumi.error.partyTooBig3': 'Ochrona Yumi 3 na 3 pozwala na drużynę liczącą do trzech osób.',
   'yumi.error.partyTooBig5': 'Ochrona Yumi 5 na 5 pozwala na drużynę liczącą do pięciu osób.',
   'yumi.hud.aria': 'Twoja Yumi ma {mine} z {max} zdrowia, wroga Yumi ma {theirs}.',

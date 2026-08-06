@@ -3,8 +3,9 @@
 // a latest-wins pending seat behind a live celebration, and the queue is
 // bounded. Pure core, driven directly; the Hud's timer chain is the caller.
 
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { BANNER_QUEUE_LIMIT, BannerQueue } from '../src/ui/banner_queue';
+import { BANNER_QUEUE_LIMIT, BannerQueue, bannerSubtextLines } from '../src/ui/banner_queue';
 
 describe('BannerQueue', () => {
   it('the R38 collision: a deed landing behind a live level-up queues instead of replacing', () => {
@@ -96,5 +97,58 @@ describe('BannerQueue', () => {
     expect(q.isLive).toBe(false);
     // After a clear, the next arrival shows immediately.
     expect(q.enqueue('ambient', plain)).toBe('show');
+  });
+});
+
+describe('bannerSubtextLines: the banner secondary-line contract', () => {
+  it('keeps a single string as one line', () => {
+    expect(bannerSubtextLines('Rating 1520 (+20)')).toEqual(['Rating 1520 (+20)']);
+  });
+
+  it('keeps a list as separate lines, in order', () => {
+    // The battleground verdict: three independent sentences, each its own t()
+    // key, never concatenated into one string a locale could not reorder.
+    expect(bannerSubtextLines(['Time expired', 'Thornhollow Fields 2:1', '+120 Honor'])).toEqual([
+      'Time expired',
+      'Thornhollow Fields 2:1',
+      '+120 Honor',
+    ]);
+  });
+
+  it('normalizes "no subtext" to an empty list, whatever shape it arrived in', () => {
+    // The paint side gates on a single `!!subtext`, and `!![]` is true: an empty
+    // list reaching the element would add has-subtext to a banner with no
+    // subtext and lay out an empty second row.
+    expect(bannerSubtextLines(undefined)).toEqual([]);
+    expect(bannerSubtextLines([])).toEqual([]);
+    expect(bannerSubtextLines('')).toEqual([]);
+  });
+
+  it('drops empty lines out of a list rather than painting a blank row', () => {
+    expect(bannerSubtextLines(['Time expired', '', 'Rating 1520'])).toEqual([
+      'Time expired',
+      'Rating 1520',
+    ]);
+    expect(bannerSubtextLines(['', ''])).toEqual([]);
+  });
+});
+
+describe('the banner paint side consumes the normalized lines', () => {
+  const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
+
+  it('normalizes ONCE at enqueue, so the payload never carries an empty list', () => {
+    expect(hud).toContain('const subtextLines = bannerSubtextLines(subtext);');
+    expect(hud).toContain('subtext: subtextLines.length > 0 ? subtextLines : undefined,');
+  });
+
+  it('paints one .banner-subtext span per line under one .banner-title', () => {
+    const paint = hud.slice(
+      hud.indexOf('private paintBanner('),
+      hud.indexOf('private paintBanner(') + 2000,
+    );
+    expect(paint).toContain("classList.toggle('has-subtext', !!subtext)");
+    expect(paint).toContain('const details = subtext.map((line) => {');
+    expect(paint).toContain("detail.className = 'banner-subtext';");
+    expect(paint).toContain('this.bannerEl.replaceChildren(title, ...details);');
   });
 });

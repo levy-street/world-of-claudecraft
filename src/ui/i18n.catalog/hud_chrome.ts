@@ -724,6 +724,7 @@ export const hudChromeStrings = {
     // Discord is a brand name; it stays identical across locales.
     discord: 'Discord',
     valecup: 'Vale Cup',
+    bgFlag: 'Battleground Flag Action',
     sheathe: 'Sheathe/Unsheathe Weapon',
     // Pet bar (Ctrl+1..5 by default) key-binding rows + category header.
     categoryPet: 'Pet',
@@ -852,6 +853,136 @@ export const hudChromeStrings = {
   // banners / log lines. Nation names are SHORT proper names; sport ability
   // names/descriptions localize through the entity catalog
   // (i18n.catalog/abilities.ts), not here.
+  // Thornhollow Fields, the 5v5 capture-the-flag battleground: the queue window, the
+  // in-match scoreboard strip, and the event banners/log lines.
+  // The merged PvP window's chrome: the launcher (one button for Thornhollow Fields and
+  // the arenas) and the tab-strip bracket labels.
+  pvp: {
+    // Icon-button hover: the initialism alone (the window names its own tabs;
+    // the long form overflowed the tooltip).
+    launcherTitle: 'PvP',
+    mobileLabel: 'PvP',
+    bracket1v1: '1v1',
+    bracket2v2: '2v2',
+  },
+  bg: {
+    title: 'Thornhollow Fields',
+    // The one-paragraph pitch above the queue button: what the place is, then
+    // what the match is. Kept to two sentences so the panel never scrolls.
+    blurb:
+      'Two ruined keeps face each other across a walled hollow in the shadow of Thornpeak: Crimson to the south, Azure to the north, and the older Ruin Courtyard between them that neither has ever held. Five a side, one banner each, and the first to carry three of theirs home takes the field.',
+    modeTag: '5v5 Capture the Flag',
+    offlineNote: 'Thornhollow Fields is syncing. The queue opens once the realm answers.',
+    ratingSummary: 'Rating. {wins} wins / {losses} losses',
+    careerCaptures: 'Career captures: {count}',
+    enterQueue: 'Enter the Queue',
+    enterQueueParty: 'Enter the Queue (party of {count})',
+    leaveQueue: 'Leave Queue',
+    searching: 'Searching. {count}/{size} in queue.',
+    queuedParty: 'Party of {count}.',
+    queueNote:
+      'Two teams of five. Steal the enemy banner and run it to your keep. First to 3 captures wins. Group up to 5 and queue together; grab Sprint Runes and weave the cover to lose your pursuers.',
+    matchInProgress: 'Battle in progress. {crimson}:{azure}.',
+    ladderAllTime: 'Ladder. All-Time',
+    noRanked: 'No champions ranked yet. Be the first.',
+    // The live section above the all-time board: rated champions connected
+    // right now, best first (the arena tabs' hud.arena.ladderOnline twin).
+    ladderOnline: 'Ladder. Online Now',
+    noChallengers: 'No champions online right now. Be the first.',
+    playerLevelClassTitle: '{name}. Level {level} {className}',
+    // The live rows carry no level (they are drawn from the connected roster,
+    // not the stored board), so they get their own name + class title.
+    playerClassTitle: '{name}. {className}',
+    // the in-match scoreboard strip
+    crimson: 'Crimson',
+    azure: 'Azure',
+    yourTeamTitle: 'Your team',
+    clock: '{minutes}:{seconds}',
+    formUp: 'Form up: {seconds}',
+    firstTo: 'First to {caps} captures',
+    flagState: {
+      home: 'Flag at the keep',
+      carried: 'Flag stolen!',
+      dropped: 'Flag on the ground',
+    },
+    respawnIn: 'Next wave: respawning in {seconds}',
+    // the frozen post-match result screen (state 'ended')
+    resultVictory: 'Victory!',
+    resultDefeat: 'Defeat',
+    resultDraw: 'Draw',
+    leavingIn: 'Leaving the battleground in {seconds}',
+    // the top-right kill feed (and its combat-log twin lines)
+    killFeed: '{killer} felled {victim}',
+    killFeedFallen: '{victim} has fallen',
+    // event banners + combat-log lines (hud.handleEvents)
+    foundBanner: 'Battle found. You fight for the {team}!',
+    countdownBanner: 'Thornhollow Fields begins in {seconds}',
+    startBanner: 'Capture the flag!',
+    flagTakenLog: '{name} has taken the {team} flag!',
+    flagDroppedLog: 'The {team} flag was dropped.',
+    flagReturnedLog: 'The {team} flag was returned.',
+    // The touch-host confirm for the voluntary flag drop (a long press is also the
+    // tooltip-peek gesture, so this cancel is the one that must not fire by accident).
+    dropFlagConfirmTitle: 'Drop the flag?',
+    dropFlagConfirmBody:
+      'You are carrying the enemy flag. Dropping it leaves it on the ground, where either team can reach it.',
+    dropFlagConfirmAccept: 'Drop the flag',
+    // Across-screen banner variants (separate sink, separate length budget)
+    boardToggleLabel: 'Match scoreboard. Press Enter to pin the full board open.',
+    levelRequirement: 'You must reach level {level} to unlock queueing for this battleground.',
+    board: {
+      kills: 'Kills',
+      assists: 'Assists',
+      deaths: 'Deaths',
+      captures: 'Captures',
+    },
+    flagTakenBanner: 'The {takers} have taken the {team} flag!',
+    flagReturnedBanner: 'The {team} flag was returned!',
+    capturedTeamBanner: 'The {takers} have captured the {team} flag! {crimson}:{azure}',
+    capturedLog: '{name} captured the {team} flag. Score {crimson}:{azure}.',
+    // SUPERSEDED, retained: the end moment used to be one long banner sentence.
+    // It now rides the same across-screen banner family as the flag calls above
+    // but as a big one-word verdict (resultVictory / resultDefeat / resultDraw,
+    // reused from the scoreboard) over the secondary lines below. These three
+    // keys stay in `en` because their translations are already shipped in the
+    // maintainer-owned overlays, which a contributor never edits to delete a row.
+    victoryBanner: 'Victory! Thornhollow Fields {crimson}:{azure}. Rating {rating} ({delta})',
+    defeatBanner: 'Defeat. Thornhollow Fields {crimson}:{azure}. Rating {rating} ({delta})',
+    drawBanner: 'Thornhollow Fields draw {crimson}:{azure}. Rating {rating} ({delta})',
+    // The verdict banner's first secondary line: the score and the rating swing.
+    endBannerDetail: 'Thornhollow Fields {crimson}:{azure}. Rating {rating} ({delta})',
+    endLog: 'Thornhollow Fields ended {crimson}:{azure}. Rating {rating} ({delta}).',
+    // Why the match ended, when it was not simply played to the capture target.
+    // A timer ending used to read exactly like a played-out one.
+    endedTimer: 'Time expired',
+    endedForfeit: 'The match was forfeited',
+    endedTimerLog: 'The match clock ran out; the higher score took the field.',
+    endedForfeitLog: 'The match was forfeited.',
+    // The first Thornhollow Fields win of each UTC day pays bonus Honor. ONE key
+    // for both sinks (the standing invitation chip on the queue panel and the
+    // verdict banner's bonus line): the sentence is identical, and a second key
+    // would make every locale translate the same string twice. The log line is
+    // its own key because it is past tense.
+    firstWinBonusLine: 'First win of the day: +{honor} Honor',
+    firstWinBonusLog: 'First win of the day: you gain {honor} bonus Honor.',
+    // Remaining-time calls, announced to the whole field (BG_TIME_WARNINGS).
+    timeWarningMinutes: '{minutes} minutes remain',
+    timeWarningOneMinute: 'One minute remains',
+    timeWarningMinutesLog: '{minutes} minutes remain in the battle.',
+    timeWarningOneMinuteLog: 'One minute remains in the battle.',
+    // Landmark names written onto the M-key map's atlas plate. Each names a
+    // rectangle the authored field itself declares, so they are the place names
+    // a player calls out, not decoration: short proper nouns, painted on canvas
+    // at plate-build time (battleground_map_painter). Each keep name titles its
+    // whole END of the field (the keep plus the chamber in front of it), which
+    // is the one name a player calls that ground by.
+    map: {
+      crimsonKeep: 'Crimson Keep',
+      azureKeep: 'Azure Keep',
+      ruinCourtyard: 'The Ruin Courtyard',
+      graveyard: 'Graveyard',
+    },
+  },
   vcup: {
     title: 'The Vale Cup',
     // Label on the hold-to-charge shoot power meter (short, uppercased in CSS).
@@ -1349,6 +1480,9 @@ export const hudChromeStrings = {
     dualPrice: '{money} + {honor}',
     balance: 'Honor: {amount}',
     honorFloat: '+{amount} Honor',
+    // The reason-naming variant of the float above (src/ui/honor_float_view.ts):
+    // the per-kill / per-assist drip says which one just paid.
+    honorFloatReason: '+{amount} Honor ({reason})',
     honorGain: 'You gain {amount} Honor ({reason}).',
     notEnoughHonor: 'Not enough Honor.',
     reasons: {
@@ -1356,6 +1490,18 @@ export const hudChromeStrings = {
       fiestaKill: 'Fiesta takedown',
       fiestaComplete: 'Fiesta completed',
       fiestaWin: 'Fiesta victory',
+      battlegroundWin: 'Thornhollow Fields victory',
+      battlegroundFirstWin: 'first Thornhollow Fields win today',
+      battlegroundComplete: 'Thornhollow Fields battle fought',
+      battlegroundKill: 'honorable kill',
+      battlegroundAssist: 'killing blow assisted',
+    },
+    // Short labels for the floating text over your own character. Kept apart from
+    // `reasons` above, which are mid-sentence fragments for the chat line.
+    floatReasons: {
+      kill: 'Kill',
+      assist: 'Assist',
+      firstWin: 'First Win',
     },
   },
   // Character sheet showcase layout: the two titled stat-panel headings under the
@@ -1976,6 +2122,9 @@ export const hudChromeStrings = {
       'Your next consecutive Fire builder critical strike grants Hot Streak; a non-critical builder removes Heating Up',
     elementalConvergencePrimed:
       'Your next spell from the other elemental school grants Elemental Convergence',
+    // The carried-flag buff's tooltip: the ONLY place the voluntary-drop
+    // affordance is spelled out, so the player can find it without folklore.
+    carriedFlag: 'You are carrying the enemy flag. Cancel this buff to drop it.',
     battleStance: 'Battle Stance: 10% more rage generation',
     berserkerStance: 'Berserker Stance: crits 3% more often and hit 3% harder',
     crit: 'Increases critical strike chance by {pct}%',
@@ -2727,10 +2876,6 @@ export const hudChromeStrings = {
         title: 'Market Day',
         note: 'The Merchant expects fresh stock. A fine day to browse the World Market.',
       },
-      fiestaNight: {
-        title: 'Fiesta Night',
-        note: 'The 2v2 Fiesta ring draws its loudest crowds tonight.',
-      },
       arenaClash: {
         title: 'Arena Clash',
         note: 'Duelists flock to the Ashen Coliseum. Queue up and climb the ladder.',
@@ -3129,6 +3274,28 @@ export const hudChromeStrings = {
       gatherersCache: "Gatherer's Cache",
       artisansEye: "Artisan's Eye",
       quickeningCharm: 'Springback Charm',
+    },
+    // Tool-effect charm tooltip copy (src/ui/tool_effect_tooltip.ts): what each
+    // charm does, how to slot it, and the charge ladder. Shared by item tooltips
+    // (bags / bank / crafting / market) and the Professions window hover card so
+    // a player never has to discover the system by trial and error. Bonus lines
+    // track applyEffectBonus kinds in professions/tools.ts; charge numbers come
+    // from TOOL_EFFECTS.startingDurability and RARITY_DURABILITY_BONUS.
+    toolEffectTooltip: {
+      kind: 'Tool charm',
+      bonus: {
+        gatherersCache: '+1 yield per harvest while charged.',
+        artisansEye: 'Raises the harvest grade by 1 tool tier while charged.',
+        // Catalog-only today: slotToolEffectRefused refuses every respawnSpeed
+        // effect until the arm is wired. The name still appears on hand-sent
+        // refusal lines, so the bonus copy stays honest about the catalog claim.
+        quickeningCharm: 'Shortens the node respawn timer it triggers.',
+      },
+      howToSlot:
+        'Slot onto a mining, logging, or herbalism tool from the Professions window. Consumed when slotted.',
+      charges: 'Starts with {base} charges on a common tool (+{bonus} per rarity rung).',
+      landOnly: 'Does not slot on fishing rods.',
+      openProfessions: 'Open Professions to slot this onto a gathering tool.',
     },
     // The toolEffectResult event's chat lines (the acquisition craft): one
     // line per outcome, rendered off ids only (the event is text-free).

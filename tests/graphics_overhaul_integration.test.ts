@@ -52,6 +52,7 @@ describe('graphics-overhaul integration', () => {
       'src/render/dungeon.ts',
       'src/render/eastbrook_town.ts',
       'src/render/yumi_maze.ts',
+      'src/render/battleground_placements.ts',
     ];
     for (const file of consumers) {
       const text = source(file);

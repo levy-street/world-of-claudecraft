@@ -174,6 +174,9 @@ interface DriveRow {
 
 const SIG_RETURN = 'if (sig === this.lastSig) return;';
 const VIEW_SIG_RETURN = 'if (view.sig === this.lastSig) return;';
+// The merged PvP window guards its two tab arms with the same shape against the same
+// field, so the Thornhollow Fields arm names its signature apart to stay pinnable.
+const RAVENRIFT_SIG_RETURN = 'if (ravenriftSig === this.lastSig) return;';
 const VIEW_SIG_BLOCK = 'if (view.sig !== this.lastSig) {';
 
 /**
@@ -688,17 +691,17 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
   {
     call: 'this.setDisplay',
     band: 'frame',
-    gate: 'ghost',
+    gate: 'ghost && !ghostInBgMatch',
     sites: 3,
     surface: 'chrome',
-    why: 'the ghost prompt and its two resurrect buttons',
+    why: 'the ghost prompt and its two resurrect buttons; a battleground spirit is exempt because the respawn wave is its only way back',
   },
   {
     call: 'this.setDisplay',
     band: 'frame',
-    gate: '!(ghost)',
+    gate: '!(ghost && !ghostInBgMatch)',
     surface: 'chrome',
-    why: 'hides the ghost prompt while not a ghost',
+    why: 'hides the ghost prompt while not a corpse-running ghost',
   },
   {
     call: 'this.showBanner',
@@ -840,6 +843,20 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the fiesta score, respawn, offer and augment overlays',
   },
   {
+    call: 'this.bgScoreboard.update',
+    band: 'medium',
+    gate: '',
+    surface: 'chrome',
+    why: 'the Thornhollow Fields in-match strip, the wave-respawn overlay and the spawn-protection line; the view core short-circuits an inactive match',
+  },
+  {
+    call: 'this.bgKillFeed.update',
+    band: 'medium',
+    gate: '',
+    surface: 'chrome',
+    why: 'ages out the Thornhollow Fields banner kill feed on its own clock, so an entry expires with no new event to drive it',
+  },
+  {
     call: 'this.yumiPainter.update',
     band: 'medium',
     gate: '',
@@ -899,8 +916,8 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     band: 'medium',
     gate: "$('#arena-window').style.display === 'block'",
     surface: 'window',
-    guard: { kind: 'module', module: 'arena_window.ts', proof: VIEW_SIG_RETURN },
-    why: 'the arena queue window',
+    guard: { kind: 'module', module: 'arena_window.ts', proof: RAVENRIFT_SIG_RETURN },
+    why: 'the merged PvP window (Thornhollow Fields and arena tabs); each tab arm builds its\n      own signature and returns on an unchanged one',
   },
   {
     call: 'this.dungeonFinderWindow.render',
@@ -1011,6 +1028,14 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     surface: 'window',
     guard: { kind: 'callsite' },
     why: 'gets the arena queue window out of the way when a bout starts; the seen latch makes it an edge',
+  },
+  {
+    call: 'this.arenaWindow.close',
+    band: 'frame',
+    gate: "inBgMatch && !this.bgMatchSeen && $('#arena-window').style.display === 'block'",
+    surface: 'window',
+    guard: { kind: 'callsite' },
+    why: "the same edge close when a Thornhollow Fields match seats: the queue lives on that window's Thornhollow Fields tab",
   },
   {
     call: 'this.valeCupWindow.close',
@@ -1422,7 +1447,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
     expect(
       bySurface,
       "the surface split moved. A new call needs its surface decided; a CHANGED one means a repaint was reclassified, which is the one edit that can quietly drop a window row's invalidation guard.",
-    ).toEqual({ window: 41, chrome: 72, none: 15 });
+    ).toEqual({ window: 42, chrome: 74, none: 15 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');
@@ -1436,7 +1461,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
     expect(byKind, 'a guard kind changed: say why in the PR, not only in the table').toEqual({
       module: 22,
       hud: 5,
-      callsite: 10,
+      callsite: 11,
       none: 4,
     });
     // ...and the honest-exception list by NAME, because that is the one that should never
@@ -1467,7 +1492,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       'the resolved guard list moved. A row changed which module it points at, which line it looks for, or dropped to a guard kind that names no source at all.',
     ).toEqual(
       [
-        'arena_window.ts: if (view.sig === this.lastSig) return;',
+        'arena_window.ts: if (ravenriftSig === this.lastSig) return;',
         'bags_window.ts: if (!bagsMoneyRowStale(el.style.display, this.deps.world().copper, this.lastMoneyCopper)) return;',
         'bank_window.ts: if (sig === this.lastSig) return;',
         'calendar_window.ts: if (sig === this.lastSig) return;',

@@ -239,13 +239,13 @@ describe('createWsAuth: authenticateWebSocket reject paths', () => {
     expectNoAdmissionWork(fixture);
   });
 
-  it('2c. rejects an auth-world-2 client on the auth-world-3 server before all admission work', async () => {
+  it('2c. rejects an auth-world-4 client on the auth-world-5 server before all admission work', async () => {
     const fixture = setup();
     const { ws, deps, req } = fixture;
 
     await createWsAuth(deps).authenticateWebSocket(
       asWs(ws),
-      JSON.stringify({ t: 'auth-world-2', token: 'tok', character: 7 }),
+      JSON.stringify({ t: 'auth-world-4', token: 'tok', character: 7 }),
       req,
     );
 
@@ -256,7 +256,7 @@ describe('createWsAuth: authenticateWebSocket reject paths', () => {
     expectNoAdmissionWork(fixture);
   });
 
-  it.each(['auth-world', 'auth-world-4', 'auth-world-next', 'auth-world-01', 'auth-world-1.0'])(
+  it.each(['auth-world', 'auth-world-6', 'auth-world-next', 'auth-world-01', 'auth-world-1.0'])(
     '2d. rejects the non-current world auth discriminator %s before all admission work',
     async (authType) => {
       const fixture = setup();

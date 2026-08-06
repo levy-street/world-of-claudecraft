@@ -226,6 +226,11 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://worldofclaudecraft.com/wiki/thornhollow-fields</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://worldofclaudecraft.com/wiki/deeds</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>

@@ -61,9 +61,9 @@ const PREFIX_CATEGORY: Record<string, DeedCategory> = {
 };
 
 describe('audited launch totals (literals: update deliberately with the catalog)', () => {
-  it('ships exactly 234 deeds worth 2815 total Renown', () => {
-    expect(DEED_ORDER.length).toBe(234);
-    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(2815);
+  it('ships exactly 238 deeds worth 2900 total Renown', () => {
+    expect(DEED_ORDER.length).toBe(238);
+    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(2900);
   });
 
   it('ships the audited per-category counts', () => {
@@ -76,7 +76,7 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       delve: 13,
       chronicle: 37,
       collection: 28,
-      pvp: 28,
+      pvp: 32,
       social: 18,
       exploration: 9,
       feat: 3,
@@ -136,6 +136,12 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       'chr_peaks_rares_ii',
       'chr_gleamstag',
       'chr_hollow_rares',
+      // Thornhollow Fields battleground block (order-pinned like the blocks above;
+      // the catalog carries it ahead of the chronicle pairs the release appended).
+      'pvp_bg_first_capture',
+      'pvp_bg_first_win',
+      'pvp_bg_wins_25',
+      'pvp_bg_captures_100',
       // The phase 20 bottom-map chronicle pairs (Q26): the gatherer and
       // first-cast deeds the strip zones carry, for the three zones the
       // density pass brought to strip density.
@@ -335,14 +341,14 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     expect(DEEDS.prog_ringwright).toBeUndefined();
   });
 
-  it('ships exactly 30 titles and 3 borders', () => {
+  it('ships exactly 31 titles and 3 borders', () => {
     const titles = ALL.filter((d) => d.reward?.kind === 'title');
     const borders = ALL.filter((d) => d.reward?.kind === 'border');
-    expect(titles.length).toBe(30);
+    expect(titles.length).toBe(31);
     expect(borders.length).toBe(3);
     // Titles and border slugs are unique (one deed per cosmetic).
     const titleTexts = titles.map((d) => (d.reward as { text: string }).text);
-    expect(new Set(titleTexts).size).toBe(30);
+    expect(new Set(titleTexts).size).toBe(31);
     const borderSlugs = borders.map((d) => (d.reward as { slug: string }).slug);
     expect([...borderSlugs].sort()).toEqual(['curators_gilt', 'deepward', 'prestige_laurels']);
   });
@@ -397,7 +403,10 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // standing broodlord rares) and chr_maw_matriarch (quest-trigger credit for
   // the shipped Cindraleth capstone). Both parents appended only, so no
   // shipped trigger or renown changed on either side.
-  const FROZEN_CATALOG_SHA256 = '4421793493830ebbde6691ea8af7f18a99d6917281c94f0b069bb66c1c82e9b1';
+  // Re-baselined at the v0.35.0 base merge, which unions the brood pair with
+  // the four Thornhollow Fields battleground deeds. No shipped trigger or
+  // renown changed on either side.
+  const FROZEN_CATALOG_SHA256 = '675132ec4e311f46999c76ea1cb0763c8f556021600f5f1269fdd2504fe8e210';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(

@@ -2790,9 +2790,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.calendar.events.delveDay.note':
     "Frère Halven l'inscrit sur ses cartes : un beau jour pour braver le Reliquaire effondré.",
   'hudChrome.calendar.events.delveDay.title': 'Jour de plongée',
-  'hudChrome.calendar.events.fiestaNight.note':
-    'Le ring de la Fiesta 2c2 attire ce soir ses foules les plus bruyantes.',
-  'hudChrome.calendar.events.fiestaNight.title': 'Nuit de la Fiesta',
   'hudChrome.calendar.events.fishingDerby.note':
     'Les pêcheurs bordent les lacs. Apportez une canne et échangez des histoires de pêche.',
   'hudChrome.calendar.events.fishingDerby.title': 'Concours de pêche',
@@ -3902,7 +3899,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hud.core.mobileMore': 'Plus',
   'hud.core.mobileMoreAria': 'Afficher plus de menus',
   'hud.core.mobileSocial': 'Relations',
-  'hud.core.mobileArena': 'Arène',
   'hud.core.mobileMenu': 'Menu',
   'hud.core.mobileSettings': 'Paramètres',
   'hud.core.mobileUse': 'Utiliser',
@@ -4012,7 +4008,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hud.keybinds.actions.nameplates': 'Afficher les barres de nom',
   'hud.keybinds.actions.meters': 'Compteurs de dégâts',
   'hud.keybinds.actions.social': 'Amis et guilde',
-  'hud.keybinds.actions.arena': 'Arène (Colisée cendré)',
   'hud.keybinds.actions.chat': 'Ouvrir la discussion',
   'hud.keybinds.actions.attack': 'Attaquer',
   'hud.keybinds.actions.actionBarSlot': "Barre d'action {slot}",
@@ -6517,7 +6512,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'fiesta.end.draw': 'FIESTA À ÉGALITÉ ! Trop serré pour départager !',
   'fiesta.end.loss': 'FIESTA PERDUE ! On remet ça !',
   'fiesta.end.win': 'FIESTA GAGNÉE ! 🎉 Quelle fête !',
-  'fiesta.enterQueue': 'Rejoignez la Fiesta !',
   'fiesta.error.leaderOnly': 'Seul le chef de groupe peut inscrire votre équipe pour {label}.',
   'fiesta.error.noAugment': "Vous n'avez aucune augmentation à choisir pour le moment.",
   'fiesta.error.notOnOffer': "Cette augmentation n'est pas proposée.",
@@ -6535,9 +6529,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'fiesta.powerup.pow_colossus.name': 'Colosse',
   'fiesta.powerup.pow_moon_boots.name': 'Bottes lunaires',
   'fiesta.powerup.pow_speed_demon.name': 'Démon de vitesse',
-  'fiesta.practice': '🎉 Entraînement contre des bots',
-  'fiesta.practiceNote':
-    'Entraînement hors ligne : fait apparaître 3 bots IA et vous inscrit pour une Fiesta 2c2. Cliquez à nouveau pour arrêter.',
   'fiesta.queue.join':
     "Vous rejoignez la file d'attente de la Fiesta 2c2. Préparez-vous à FAIRE LA FÊTE…",
   'fiesta.queue.leave': "Vous quittez la file d'attente de la Fiesta 2c2.",
@@ -7475,17 +7466,12 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Frappe tout autour de vous et ralentit les attaques des ennemis.',
   'guide.abilityHook.wrath':
     'Un trait de nature lancé sur une cible à distance, votre frappe de prédilection.',
-  'guide.arenaPage.augmentsNote':
-    "Les augmentations et bonus ne durent que le temps de la partie. Ils servent à des compositions ludiques et improvisées, pas à une puissance durable, pour que personne n'achète sa victoire.",
   'guide.arenaPage.coliseumBody':
     "Le Colisée est l'arène du royaume, où vous affrontez d'autres joueurs en matchs classés, en un contre un ou en deux contre deux. Chaque catégorie conserve son propre classement, si bien qu'une victoire vous fait grimper dans cette échelle, à la vue de tout le royaume. Ouvrez la fenêtre d'Arène pour vous inscrire à une catégorie, seul ou avec votre partenaire.",
   'guide.arenaPage.coliseumHeading': 'Le Colisée de cendres',
   'guide.arenaPage.duelsBody':
     "Défiez en duel amical n'importe quel joueur que vous croisez. Rien n'est en jeu, sinon la fierté: c'est donc le moyen le plus simple d'apprendre un affrontement ou de régler un différend bon enfant.",
   'guide.arenaPage.duelsHeading': 'Duels',
-  'guide.arenaPage.fiestaBody':
-    "Fiesta est une bagarre rapide à deux contre deux qui se joue en un seul match continu, où chaque combattant est mis sur un pied d'égalité. À mesure que le combat avance, vous draftez des augmentations, des bonus instantanés qui remodèlent votre panoplie à la volée, si bien qu'aucune partie ne se ressemble vraiment.",
-  'guide.arenaPage.fiestaHeading': 'Fiesta deux contre deux',
   'guide.arenaPage.heading': 'Arène et JcJ',
   'guide.arenaPage.intro':
     "Envie de vous mesurer aux autres joueurs? Le joueur contre joueur est intégré, et c'est toujours un choix, jamais quelque chose qu'on vous impose.",
@@ -7644,21 +7630,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Trois zones, du sud au nord, chacune un cran plus haut en niveau. Suivez le fil des quêtes et la contrée vous porte de la vallée jusqu'aux sommets.",
   'guide.worldPage.places': 'Lieux notables',
   'guide.worldPage.residents': 'Qui vous croiserez',
-  'guide.arenaPage.powerupsBody':
-    "Des orbes lumineux tombent aussi dans l'arène en pleine bataille, libres pour celui qui les atteint en premier. Ils sont volontairement démesurés et ne durent qu'un court instant : Démon de vitesse pour un éclair de cadence aveuglante, Colosse pour enfler en géant pataud, Bottes lunaires pour un bond rebondissant en gravité réduite, et Berserker pour un soudain accès de furie.",
-  'guide.arenaPage.powerupsTitle': "Les bonus de l'arène",
-  'guide.arenaPage.waveGoldBody':
-    'La manche intermédiaire : des combos à double tranchant où votre panoplie commence à prendre forme et à chanter.',
-  'guide.arenaPage.waveGoldTitle': 'Or',
-  'guide.arenaPage.wavePrismaticBody':
-    'La dernière manche : des pics dévastateurs qui définissent votre panoplie, faits pour paraître ridicules dans le meilleur sens du terme.',
-  'guide.arenaPage.wavePrismaticTitle': 'Prismatique',
-  'guide.arenaPage.waveSilverBody':
-    "La manche d'ouverture : des bonus simples sur une seule caractéristique qui affinent les bases de votre classe.",
-  'guide.arenaPage.waveSilverTitle': 'Argent',
-  'guide.arenaPage.wavesBody':
-    "Un match de Fiesta vous distribue de nouveaux choix au fil du jeu, et les choix se font plus audacieux à mesure que le combat se prolonge. Vous construisez d'une vague à l'autre, en retenant à chaque fois l'une des quelques options proposées et en la gardant pour le reste du match.",
-  'guide.arenaPage.wavesTitle': 'Les augmentations arrivent par vagues',
   'guide.bestiary.flavor.gravecaller_cultist':
     "Des serviteurs en robe du culte de la mort dont l'œuvre souille les tombes, du Val jusqu'aux sommets. Là où ils se réunissent, les morts ne reposent pas.",
   'guide.bestiary.flavor.grubjaw':
@@ -9081,9 +9052,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.willow_sprite.name': 'Lutin du saule',
   'entities.mobs.wood_wraith.name': 'Spectre des bois',
   'entities.mobs.wreck_thief.name': "Voleur des champs d'épaves",
-  'guide.arenaPage.yumiBody':
-    "Protégez Yumi est un mode d'objectif en équipe qui se joue dans un labyrinthe : chaque camp garde son propre familier félin tout en traquant celui de l'adversaire. De temps à autre, les deux chats se téléportent vers de nouveaux recoins du labyrinthe, si bien que le combat oscille entre défense, chasse et course pour les retrouver. Mettez-vous en file en trois contre trois ou cinq contre cinq ; tomber au combat ne vous met sur la touche qu'un instant.",
-  'guide.arenaPage.yumiHeading': 'Protégez Yumi',
   'hudChrome.archetypeTitle.hobbyLabel': 'Loisir',
   'hudChrome.auraEffect.armorPct': "Réduit l'armure de {pct}%",
   'hudChrome.auraEffect.armorPctStacks': "Réduit l'armure de {pct}% ({stacks} charges)",
@@ -9103,7 +9071,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'yumi.bracket5': 'Yumi 5c5',
   'yumi.end.loss': 'DÉFAITE ! Votre Yumi est tombé.',
   'yumi.end.win': 'VICTOIRE ! Yumi est sain et sauf !',
-  'yumi.enterQueue': 'Rejoignez Protégez Yumi !',
   'yumi.error.partyTooBig3': 'Protégez Yumi 3c3 autorise un groupe de trois joueurs maximum.',
   'yumi.error.partyTooBig5': 'Protégez Yumi 5c5 autorise un groupe de cinq joueurs maximum.',
   'yumi.hud.aria': 'Votre Yumi à {mine} points de vie sur {max}, Yumi ennemi à {theirs}.',

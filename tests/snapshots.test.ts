@@ -3317,6 +3317,7 @@ const ALL_DELTA_KEYS = [
   'bags',
   'bank',
   'belt',
+  'bg',
   'buyback',
   'cardDuel',
   'cds',
@@ -3909,6 +3910,7 @@ describe('full self-state snapshot delta fixture', () => {
     expect((client.tradeInfo as any)?.otherPid).toBe(memberPid); // trade -> tradeInfo
     expect((client.duelInfo as any)?.state).toBe('countdown'); // duel -> duelInfo
     expect(client.arenaInfo).not.toBeNull(); // arena -> arenaInfo
+    expect(client.bgInfo).not.toBeNull(); // bg -> bgInfo (queue/standing readout)
     expect(client.marketInfo).not.toBeNull(); // market -> marketInfo
     expect(client.marketCollectPending).toBe(true); // mktU -> marketCollectPending (truthy bit)
     expect(client.bankInfo).not.toBeNull(); // bank -> bankInfo
@@ -4204,10 +4206,11 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 64 unique keys in sorted order', () => {
-    // +1: guildBank (Guild Bank Phase 2), +1: belt (the tool-only container)
-    expect(ALL_DELTA_KEYS).toHaveLength(65);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(65);
+  it('ALL_DELTA_KEYS contains exactly 66 unique keys in sorted order', () => {
+    // +1: guildBank (Guild Bank Phase 2), +1: belt (the tool-only container),
+    // +1: bg (Thornhollow Fields). Two independent facets, one base.
+    expect(ALL_DELTA_KEYS).toHaveLength(66);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(66);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -4230,9 +4233,9 @@ describe('delta-key contract pins (anti-drift)', () => {
     // the Rift + mounts and worn-instance keys (einst, mntRtd and the rift
     // snapshot fragments) for 61, then v0.32's master-loot key mloot for 62,
     // plus the packet's slotted-tool-effects key tslot for 63, guildBank
-    // (Guild Bank Phase 2) for 64, then the tool-only container's key belt
-    // for 65.
-    expect(scraped.size).toBe(65);
+    // (Guild Bank Phase 2) for 64, the tool-only container's key belt for 65,
+    // and the battleground's bg self key for 66
+    expect(scraped.size).toBe(66);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

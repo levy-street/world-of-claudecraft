@@ -20,7 +20,11 @@ export function settingRow(label: string): { row: HTMLDivElement; name: HTMLSpan
 }
 
 /** A titled card/section container (role="group"), labelled for assistive tech. */
-export function settingsCard(parent: HTMLElement, title: string, opts: { className?: string } = {}): HTMLDivElement {
+export function settingsCard(
+  parent: HTMLElement,
+  title: string,
+  opts: { className?: string } = {},
+): HTMLDivElement {
   const card = document.createElement('div');
   card.className = `perf-card${opts.className ? ` ${opts.className}` : ''}`;
   card.setAttribute('role', 'group');
@@ -34,7 +38,11 @@ export function settingsCard(parent: HTMLElement, title: string, opts: { classNa
 }
 
 /** A lighter subhead used inside a card (e.g. metric-group headers). */
-export function subhead(parent: HTMLElement, title: string, className = 'perf-group-head'): HTMLDivElement {
+export function subhead(
+  parent: HTMLElement,
+  title: string,
+  className = 'perf-group-head',
+): HTMLDivElement {
   const h = document.createElement('div');
   h.className = className;
   h.textContent = title;
@@ -93,7 +101,10 @@ export interface SliderOpts {
 /** A labelled range slider with a live readout. Returns `setValue()` so an
  *  external change (e.g. drag-to-move) can push a new value into the control
  *  without a full re-render. */
-export function sliderControl(o: SliderOpts): { row: HTMLDivElement; setValue: (v: number) => void } {
+export function sliderControl(o: SliderOpts): {
+  row: HTMLDivElement;
+  setValue: (v: number) => void;
+} {
   const { row } = settingRow(o.label);
   const slider = document.createElement('input');
   slider.type = 'range';
@@ -105,14 +116,22 @@ export function sliderControl(o: SliderOpts): { row: HTMLDivElement; setValue: (
   slider.setAttribute('aria-label', o.label);
   const val = document.createElement('span');
   val.className = 'set-val';
-  const readout = (): void => { val.textContent = o.format(o.get()); };
+  const readout = (): void => {
+    val.textContent = o.format(o.get());
+  };
   readout();
-  slider.addEventListener('input', () => { o.set(Number(slider.value)); readout(); });
+  slider.addEventListener('input', () => {
+    o.set(Number(slider.value));
+    readout();
+  });
   row.append(slider, val);
   o.parent.appendChild(row);
   return {
     row,
-    setValue: (v: number) => { slider.value = String(v); readout(); },
+    setValue: (v: number) => {
+      slider.value = String(v);
+      readout();
+    },
   };
 }
 

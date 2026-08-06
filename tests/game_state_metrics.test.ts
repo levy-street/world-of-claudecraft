@@ -409,6 +409,7 @@ function recordingSink() {
   const fishingGotAways: Array<[string, string]> = [];
   const fishingEmptyHooks: Array<[string, string]> = [];
   const rodFees: string[] = [];
+  const bgResolved: Array<[string, string, number, number, number]> = [];
   const sink: GameMetricsCounters = {
     wsMessage(direction) {
       if (direction === 'in') wsIn++;
@@ -451,9 +452,13 @@ function recordingSink() {
     rodFeePaid(recipeId) {
       rodFees.push(recipeId);
     },
+    battlegroundResolved(cause, composition, durationSec, scoreCrimson, scoreAzure) {
+      bgResolved.push([cause, composition, durationSec, scoreCrimson, scoreAzure]);
+    },
   };
   return {
     sink,
+    bgResolved,
     dropped,
     seqGaps,
     credited,

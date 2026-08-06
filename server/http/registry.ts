@@ -25,6 +25,7 @@ import { routes as accountRoutes } from '../account';
 import { routes as adminRoutes } from '../admin';
 import { routes as appleAuthRoutes } from '../apple_auth';
 import { routes as authRoutes } from '../auth_routes';
+import { routes as battlegroundRoutes } from '../battleground';
 import { routes as characterRoutes } from '../characters';
 import { routes as claudiumRoutes } from '../claudium';
 import { routes as dailyRewardRoutes } from '../daily_rewards';
@@ -136,6 +137,7 @@ export const apiRoutes: readonly RouteDef[] = [
   ...internalRoutes,
   ...deedsRoutes,
   ...steamRoutes,
+  ...battlegroundRoutes,
   ...epicRoutes,
   ...otaUpdatesRoutes,
   // new:endpoint spreads appear above this line (npm run new:endpoint)

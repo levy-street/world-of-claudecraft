@@ -41,11 +41,12 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // 176 send / 188 dispatch on release/v0.34.0, +5 on BOTH sides for the
 // guild_bank_* cluster (Guild Bank Phase 2), +1 on both for guild_bank_log
 // (the activity log's on-demand READ request; its answer comes back on its own
-// one-shot 'gbanklog' frame, not the snapshot). The toolbelt adds four more
-// of each (equip/unequip/store/take).
-const EXPECTED_SEND_COUNT = 186;
-const EXPECTED_DISPATCH_COUNT = 198;
-const EXPECTED_DISPATCH_ONLY_COUNT = 12;
+// one-shot 'gbanklog' frame, not the snapshot). Two independent facets land
+// here: the toolbelt adds four sends (equip/unequip/store/take), and the
+// battleground adds three sends plus the dev-only force start.
+const EXPECTED_SEND_COUNT = 189; // 182 base + 4 toolbelt + 3 battleground
+const EXPECTED_DISPATCH_COUNT = 202; // 189 sends + 13 dispatch-only
+const EXPECTED_DISPATCH_ONLY_COUNT = 13; // + dev_bg_start
 
 // The chat sub-channel routing switch (server/game.ts `switch
 // (session.rememberedChat.channel)`) is NOT a msg.cmd dispatch; its labels must

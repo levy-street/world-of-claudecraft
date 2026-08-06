@@ -173,6 +173,188 @@ async function stubDesktopUpdateBridge(page) {
 
 export const TARGETS = [
   {
+    key: 'ravenrift',
+    label:
+      'Thornhollow Fields 5v5 battleground: field, gatehouse, carry, queue window, mobile scoreboard',
+    // Match the SOURCE files (the `.ts` suffixes keep the sim/render tests from
+    // classifying as visual).
+    when: [
+      'sim/battleground_layout.ts',
+      'render/battleground.ts',
+      'render/battleground_core.ts',
+      'ui/hud/battleground/',
+      'sim/social/battleground.ts',
+    ],
+    variants: [
+      { key: 'queue-window', scene: 'queue' },
+      // First staged scene on purpose: the match seating just placed the
+      // player on their real spawn point, and the DEFAULT chase camera is the
+      // honest witness for the spawn-clearance contract (no camDist override).
+      { key: 'spawn-camera', scene: 'spawn' },
+      { key: 'field', scene: 'field' },
+      { key: 'gatehouse', scene: 'gatehouse' },
+      { key: 'carry-scoreboard', scene: 'carry' },
+      { key: 'scoreboard-mobile', scene: 'carry', mobile: true },
+      { key: 'match-board', scene: 'board' },
+      { key: 'field-map', scene: 'map' },
+      // last on purpose: it kills the player, which would pollute later scenes
+      { key: 'graveyard', scene: 'graveyard' },
+    ],
+    async capture(page, variant) {
+      const scene = variant?.scene ?? 'field';
+      if (scene === 'queue') {
+        const opened = await page.evaluate(() => {
+          const game = window.__game;
+          if (!game?.sim) return { ok: false, reason: 'offline world is unavailable' };
+          game.hud.toggleBattleground();
+          return { ok: true };
+        });
+        if (!opened.ok) return { skip: opened.reason };
+        const ready = await pollForSize(page, '#arena-window');
+        if (!ready) return { skip: 'the PvP window never became visible' };
+        return { clip: '#arena-window' };
+      }
+      // Stage a live 5v5 offline: nine bots + the player queue, the form-up is
+      // fast-forwarded, and the camera frames the requested scene. Idempotent:
+      // a match already staged by an earlier variant is reused.
+      const staged = await page.evaluate(() => {
+        const game = window.__game;
+        const sim = game?.sim;
+        if (!sim || !sim.player) return { ok: false, reason: 'offline world is unavailable' };
+        if (!sim.bgMatchFor(sim.player.id)) {
+          const classes = [
+            'warrior',
+            'paladin',
+            'hunter',
+            'rogue',
+            'mage',
+            'priest',
+            'shaman',
+            'warlock',
+            'druid',
+          ];
+          const names = ['Bryn', 'Cael', 'Dax', 'Eira', 'Finn', 'Gust', 'Hale', 'Ivo', 'Jor'];
+          for (let i = 0; i < 9; i++) {
+            const pid = sim.addPlayer(classes[i], names[i]);
+            const e = sim.entities.get(pid);
+            e.level = 20;
+            sim.bgQueueJoin(pid);
+          }
+          sim.player.level = Math.max(20, sim.player.level);
+          sim.bgQueueJoin();
+        }
+        return { ok: true };
+      });
+      if (!staged.ok) return { skip: staged.reason };
+      await wait(400); // one tick seats the match
+      const live = await page.evaluate(() => {
+        const game = window.__game;
+        const sim = game.sim;
+        const match = sim.bgMatchFor(sim.player.id);
+        if (!match) return { ok: false, reason: 'match never seated' };
+        if (match.state === 'countdown') match.timer = 0.05; // skip the form-up
+        return { ok: true };
+      });
+      if (!live.ok) return { skip: live.reason };
+      await wait(600);
+      await page.evaluate((sceneKey) => {
+        const game = window.__game;
+        const sim = game.sim;
+        const match = sim.bgMatchFor(sim.player.id);
+        const myTeam = match.teams[0].includes(sim.player.id) ? 0 : 1;
+        const p = sim.player;
+        const tp = (x, z) => {
+          p.pos.x = x;
+          p.pos.z = z;
+          p.prevPos = { ...p.pos };
+        };
+        if (sceneKey === 'spawn') {
+          // No teleport: the seating placed us on the spawn ring. Face the
+          // enemy keep and put the chase camera behind at its defaults.
+          p.facing = myTeam === 0 ? 0 : Math.PI;
+          game.input.camYaw = p.facing;
+        } else if (sceneKey === 'field') {
+          // mid-field, camera pulled up and back over my keep's approach;
+          // offset east of the approach rune so the shot shows it LIVE
+          // instead of seizing it by standing on it
+          const home = match.flags[myTeam].home;
+          tp(home.x + 6, home.z + (myTeam === 0 ? 26 : -26));
+          game.input.camYaw = p.facing = myTeam === 0 ? 0 : Math.PI;
+          game.input.camDist = 24;
+          game.input.camPitch = 0.72;
+        } else if (sceneKey === 'gatehouse') {
+          // inside the south gatehouse, on the courtyard-door line (x -30,
+          // the 4yd door at x -32..-28), looking south through the room: the
+          // ambush crates, the offset field-side door beyond. The camera backs
+          // out through the courtyard door, so it never clips a wall.
+          const home = match.flags[0].home;
+          tp(home.x - 30, home.z + 66);
+          p.facing = Math.PI;
+          game.input.camYaw = Math.PI;
+          game.input.camDist = 11;
+          game.input.camPitch = 0.6;
+        } else {
+          // carry: stand on the ENEMY flag; the deliberate press follows
+          const foe = match.flags[myTeam === 0 ? 1 : 0];
+          tp(foe.pos.x, foe.pos.z);
+        }
+      }, scene);
+      if (scene === 'carry' || scene === 'board') {
+        await wait(300);
+        await page.evaluate(() => {
+          window.__game.sim.bgFlagAction();
+          window.__game.input.camDist = 11;
+          window.__game.input.camPitch = 0.4;
+        });
+        await wait(800);
+      }
+      if (scene === 'board') {
+        // pin the hover-expanded match board open and shoot just the strip
+        await page.evaluate(() => {
+          document.querySelector('#bg-scoreboard')?.classList.add('expanded');
+        });
+        await wait(400);
+        return { clip: '#bg-scoreboard' };
+      }
+      if (scene === 'map') {
+        // the M-key world map's Thornhollow Fields surface (schematic + honest markers)
+        const mapOk = await page.evaluate(() => {
+          const game = window.__game;
+          if (!game.sim.bgMatchFor(game.sim.player.id)) return false; // staging lost
+          game.hud.toggleMap();
+          return true;
+        });
+        if (!mapOk) return { skip: 'match staging lost before the map scene' };
+        await wait(600);
+        return { clip: '#map-window' };
+      }
+      if (scene === 'graveyard') {
+        await page.evaluate(() => {
+          const sim = window.__game.sim;
+          const p = sim.player;
+          sim.ctx.dealDamage(null, p, 9_999_999, false, 'physical', null, 'hit');
+        });
+        await wait(400);
+        await page.evaluate(() => {
+          // Drive the REAL death-overlay button, not the sim hook: this shot
+          // is also the regression check that the Release path works in a
+          // battleground (the sim-hook version masked a dead button once).
+          document.querySelector('#release-btn')?.click();
+          window.__game.input.camDist = 13;
+          window.__game.input.camPitch = 0.55;
+        });
+        await wait(600);
+        await page.evaluate(() => {
+          const game = window.__game;
+          game.input.camYaw = game.sim.player.facing; // chase behind the spirit
+        });
+        await wait(1200);
+      }
+      await wait(2600); // let the field build + banners settle
+      return {};
+    },
+  },
+  {
     key: 'skill-milestone-plate',
     label: 'Banner: gathering skill milestone plate (#2934)',
     when: ['ui/skill_level_toast_view'],
@@ -872,6 +1054,71 @@ export const TARGETS = [
       }
       await wait(700);
       return {};
+    },
+  },
+  {
+    key: 'bank-instance-marks',
+    label: 'Bank grid corner marks: masterwork seal and per-copy glyphs on banked slots',
+    when: ['ui/bank_window', 'ui/guild_bank_window', 'ui/item_instance_glyph_mark'],
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    async capture(page) {
+      await page.evaluate(() => {
+        const game = window.__game;
+        const sim = game?.sim;
+        // One copy per corner-mark kind plus a plain control stack, so the
+        // vault shows the masterwork seal and the enchanted / signed / bound
+        // glyphs beside an unmarked cell. The personal bank has no transfer
+        // lock, so every copy deposits.
+        try {
+          sim?.addItemInstance?.('worn_sword', {
+            signer: 'Thorgar',
+            rolled: { masterwork: true, stats: { str: 2, sta: 1 } },
+          });
+          sim?.addItemInstance?.('wolf_fang', { enchant: 'enchant_chest_stamina' });
+          sim?.addItemInstance?.('wolf_fang', { signer: 'Toralin' });
+          // rough_hide, not a quest-kind hide: the bank refuses quest items,
+          // so a quest-flagged fixture would silently drop the bound cell.
+          sim?.addItemInstance?.('rough_hide', { bindOnTrade: true });
+          sim?.addItem?.('baked_bread', 3);
+        } catch {}
+        // Stand beside the banker so the proximity-gated bank snapshot is
+        // live (bankInfo is null out of reach; the bank-chips recipe idiom).
+        try {
+          for (const e of sim.entities.values()) {
+            if (e.kind === 'npc' && e.templateId === 'bursar_fernando') {
+              const p = sim.entities.get(sim.playerId);
+              p.pos = { ...e.pos };
+              p.prevPos = { ...p.pos };
+              sim.rebucket(p);
+              break;
+            }
+          }
+        } catch {}
+        game?.hud?.openBank?.();
+      });
+      if (!(await pollForSize(page, '#bank-window'))) {
+        throw new Error('bank window did not open');
+      }
+      // Deposit through the real world command. Indices shift as slots empty,
+      // so always re-find the first instanced slot; the plain stack follows as
+      // the unmarked contrast cell.
+      await page.evaluate(() => {
+        const world = window.__game?.sim;
+        for (let guard = 0; guard < 8; guard++) {
+          const idx = world.inventory.findIndex((s) => s?.instance);
+          if (idx < 0) break;
+          world.bankDeposit(idx);
+        }
+        const plain = world.inventory.findIndex((s) => s?.itemId === 'baked_bread');
+        if (plain >= 0) world.bankDeposit(plain);
+      });
+      // Poll for the deposited cells, not the marks: the same recipe shoots
+      // the BEFORE tree, where the bank paints no corner mark at all.
+      if (!(await pollForSize(page, '#bank-window .bank-item'))) {
+        throw new Error('bank grid never filled after deposits');
+      }
+      await wait(700);
+      return { clip: '#bank-window' };
     },
   },
   {
@@ -4148,6 +4395,165 @@ export const TARGETS = [
         await wait(400);
       }
       return { clip: '#professions-window' };
+    },
+  },
+  {
+    key: 'tool-charm-cards',
+    label: 'Tool charm explainer cards: bag item tooltip and Professions live-row hover card',
+    when: ['src/ui/tool_effect_tooltip.ts'],
+    variants: [{ key: 'bag-tooltip' }, { key: 'professions-live-row' }],
+    async capture(page, variant) {
+      // The entry helper RETURNS false rather than throwing when the world
+      // boot outlasts its budget on a contended machine, and every step
+      // below silently no-ops without __game; gate on the hook so a slow
+      // boot reads as a retryable error, not a missing window.
+      let booted = false;
+      for (let attempt = 0; attempt < 60 && !booted; attempt++) {
+        booted = await page.evaluate(() =>
+          Boolean(window.__game?.hud && window.__game?.sim?.player),
+        );
+        if (!booted) await wait(1000);
+      }
+      if (!booted) throw new Error('world did not boot');
+      await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        document.querySelector('.gpu-notice-dismiss')?.click();
+      });
+      await wait(300);
+      if (variant?.key === 'bag-tooltip') {
+        // Grant the charm, open bags, hover its row: the tooltip card is the
+        // whole change, so the clip is the shared #tooltip box itself.
+        await page.evaluate(() => {
+          const game = window.__game;
+          if (!game) return;
+          try {
+            game.sim?.addItem('gatherers_cache', 1);
+          } catch {}
+          const el = document.querySelector('#bags');
+          if (el) el.style.display = 'none';
+          game.hud.toggleBags?.();
+        });
+        const bagsOpen = await pollForSize(page, '#bags');
+        if (!bagsOpen) throw new Error('bags window did not open');
+        // Poll for the granted charm's row: the grant and the bag paint can
+        // land a beat after the toggle on a cold contended run.
+        let hovered = false;
+        for (let attempt = 0; attempt < 10 && !hovered; attempt++) {
+          hovered = await page.evaluate(() => {
+            // The exact handle: bag rows key their focus by item id
+            // (bags_window.ts stackOrdinal mint), so the charm cannot be
+            // confused with any other rare the starter kit carries.
+            const row = document.querySelector('#bags [data-focus-key^="bag:gatherers_cache:"]');
+            if (!row) return false;
+            row.dispatchEvent(new MouseEvent('mouseenter'));
+            return true;
+          });
+          if (!hovered) await wait(500);
+        }
+        if (!hovered) {
+          const diag = await page.evaluate(() => ({
+            rows: document.querySelectorAll('#bags .bag-item').length,
+            classes: [...document.querySelectorAll('#bags .bag-item')]
+              .slice(0, 8)
+              .map((r) => r.className),
+          }));
+          throw new Error(`charm bag row not found to hover: ${JSON.stringify(diag)}`);
+        }
+        await wait(400);
+        return { clip: '#tooltip' };
+      }
+      // The live-row card: stage a slotted effect through the IWorld read (the
+      // professions target's renown-board precedent), open the window, hover
+      // the row the wiring marked with data-effect-tip.
+      await page.evaluate(() => {
+        const game = window.__game;
+        if (!game) return;
+        // Gathering (and its effect lines) renders only in FULL mode, and the
+        // sandbox character is unattuned (simplified), so stage an attuned
+        // identity plus a mining row (the professions target's stub precedent).
+        Object.defineProperty(game.world, 'craftingIdentity', {
+          value: {
+            version: 1,
+            synced: true,
+            craftSkills: {
+              weaponcrafting: 125,
+              armorcrafting: 87,
+              tailoring: 0,
+              leatherworking: 0,
+              cooking: 26,
+              alchemy: 0,
+              engineering: 0,
+              enchanting: 0,
+              jewelcrafting: 0,
+              inscription: 0,
+            },
+            activeArchetype: 'weaponcrafting',
+            pairedMajor: 'armorcrafting',
+            hobbyCraft: 'cooking',
+            attunedPairs: ['weaponcrafting+armorcrafting'],
+            switchCount: 1,
+            amendsProgress: 2,
+            amendsRequired: 8,
+            knownRecipes: [],
+          },
+          configurable: true,
+        });
+        Object.defineProperty(game.world, 'professionsState', {
+          value: { skills: [{ professionId: 'mining', skill: 88, maxSkill: 100 }] },
+          configurable: true,
+        });
+        Object.defineProperty(game.world, 'toolEffectSlots', {
+          value: [
+            {
+              professionId: 'mining',
+              effectId: 'gatherers_cache',
+              charges: 12,
+              maxCharges: 30,
+              confirmMode: 'always',
+            },
+          ],
+          configurable: true,
+        });
+        const el = document.querySelector('#professions-window');
+        if (el) el.style.display = 'none';
+        game.hud.toggleProfessions?.();
+      });
+      const open = await pollForSize(page, '#professions-window');
+      if (!open) throw new Error('professions window did not open');
+      // Repaint to pick the stubs up in case the first paint raced them, then
+      // poll for the marked row.
+      await page.evaluate(() => {
+        window.__game?.hud?.toggleProfessions?.();
+        window.__game?.hud?.toggleProfessions?.();
+      });
+      let hovered = false;
+      for (let attempt = 0; attempt < 10 && !hovered; attempt++) {
+        hovered = await page.evaluate(() => {
+          const row = document.querySelector('#professions-window [data-effect-tip]');
+          if (!row) return false;
+          row.scrollIntoView({ block: 'center' });
+          row.dispatchEvent(new MouseEvent('mouseenter'));
+          return true;
+        });
+        if (!hovered) await wait(500);
+      }
+      if (!hovered) {
+        const diag = await page.evaluate(() => ({
+          effects: document.querySelectorAll('#professions-window .prof-effect').length,
+          gatherRows: document.querySelectorAll('#professions-window .prof-gather-row').length,
+          slots: (() => {
+            try {
+              return JSON.stringify(window.__game?.world?.toolEffectSlots);
+            } catch (e) {
+              return String(e);
+            }
+          })(),
+        }));
+        throw new Error(`live effect row with data-effect-tip not found: ${JSON.stringify(diag)}`);
+      }
+      await wait(400);
+      return { clip: '#tooltip' };
     },
   },
   {

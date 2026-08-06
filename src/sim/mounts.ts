@@ -18,10 +18,11 @@
 // driven per tick and interruptible by combat or water). DISMOUNTING is instant
 // from every path, with no channel at all. Swapping straight from one mount to
 // another is instant too: there is nothing to put away. Rules: summoning requires
-// the riding skill FIRST, then ownership, and is blocked while in combat, dead, or
-// a released spirit; dismounting is never gated; death and water force-dismount
-// instantly. There is no per-mount level gate. Every mount is a ground mount, no
-// flying: nothing here touches the vertical axis.
+// the riding skill FIRST, then ownership, and is blocked inside a Thornhollow
+// Fields match (every state) and while in combat, dead, or a released spirit;
+// dismounting is never gated; death and water force-dismount instantly. There is
+// no per-mount level gate. Every mount is a ground mount, no flying: nothing here
+// touches the vertical axis.
 //
 // `src/sim`-pure and rng-free.
 
@@ -30,6 +31,7 @@ import { ITEMS } from './data';
 import { recalcPlayerStats } from './entity';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
+import { bgInMatch } from './social/battleground';
 import { DT, type Entity, FORM_AURA_KINDS, isNonSpellCast } from './types';
 
 // Summon channel duration (seconds). Mounting is a short cast the player can
@@ -145,6 +147,12 @@ export function forceDismount(ctx: SimContext, e: Entity): void {
 export function forceTrainingMount(ctx: SimContext, e: Entity): boolean {
   const meta = ctx.players.get(e.id);
   if (meta?.mountTraining?.state !== 'IN_PROGRESS') return false;
+  // Defense in depth for the whole-match ban: the race start platform is in the
+  // open world and a seated fighter cannot stand on it, but this is the one
+  // path that APPLIES a mount with no summon channel to gate, so it asks too.
+  // Silent (no toast): the caller is unreachable from inside a match, so a
+  // refusal line here would be text no player can ever see.
+  if (bgInMatch(ctx, e.id)) return false;
   e.mountKey = TRAINING_MOUNT_KEY;
   e.mountCastRemaining = 0;
   e.mountCastKey = '';
@@ -152,6 +160,10 @@ export function forceTrainingMount(ctx: SimContext, e: Entity): boolean {
   return true;
 }
 
+// Thornhollow Fields is fought on foot, start to finish. This replaced the
+// narrower "while carrying the flag" refusal: one rule for the whole match is
+// what a player can actually learn, and the carrier case is a subset of it.
+const IN_BATTLEGROUND_MSG = "You can't ride in a battleground.";
 const RIDING_UNTRAINED_MSG = 'You must learn to ride first. Find a riding trainer.';
 
 /** Strip all active form auras (FORM_AURA_KINDS) and ghost_wolf from the entity,
@@ -182,7 +194,12 @@ function cancelFormsAndGhostWolf(ctx: SimContext, e: Entity): void {
  *    1. riding skill  (the ONE gate that must never be bypassable: the item is in
  *       your bags, so without this check owning reins would imply riding them)
  *    2. ownership     (re-checked server-side even though the click proves it)
- *    3. dead/ghost, then combat
+ *    3. in a battleground, then dead/ghost, then combat
+ *
+ *  The battleground gate sits ABOVE dead/ghost and combat deliberately: it is a
+ *  standing rule for the whole match, not a transient state, so it is the one
+ *  that should speak. A downed or in-combat fighter pressing their reins would
+ *  otherwise be told the momentary reason and try again a second later.
  *
  *  Already riding something else: swap INSTANTLY, no dismount channel and no new
  *  summon channel. Clicking the reins you are already riding dismounts. */
@@ -207,6 +224,15 @@ export function summonMountItem(ctx: SimContext, pid: number, key: string): bool
     // Reuses the registered useItem deny (sim_i18n error.noItem) rather than
     // minting a new sim string.
     ctx.error(pid, "You don't have that item.");
+    return false;
+  }
+  // Thornhollow Fields is fought on foot for the WHOLE match (form-up, active
+  // play, and the post-match hold), not just while carrying. Seating a fighter
+  // already force-dismounts them (social/battleground.ts placeInBg); this is
+  // the other half of the same rule, and it also covers the mount-to-mount
+  // swap below, which is not a summon and would otherwise slip past every gate.
+  if (bgInMatch(ctx, pid)) {
+    ctx.error(pid, IN_BATTLEGROUND_MSG);
     return false;
   }
   if (e.dead || e.ghost) return false;
@@ -263,6 +289,13 @@ export function toggleMount(ctx: SimContext, pid: number): boolean {
   // the persisted pick and skips the ownership/level gates (begin already required
   // level 20). Combat/water still cancel the channel via updateMountTransition.
   if (meta.mountTraining?.state === 'IN_PROGRESS') {
+    // Same standing battleground rule, same position in the order as
+    // summonMountItem: the lesson steed is still a mount, and a lesson left
+    // running when the queue popped must not become a way to ride the field.
+    if (bgInMatch(ctx, pid)) {
+      ctx.error(pid, IN_BATTLEGROUND_MSG);
+      return false;
+    }
     if (e.dead || e.ghost) return false;
     if (e.inCombat) {
       ctx.error(pid, "You can't do that while in combat.");

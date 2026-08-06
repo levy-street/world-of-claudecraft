@@ -1429,8 +1429,6 @@ async function startGame(
     entryDiagnostics.markStable('[entry-guard] world entry stable; runtime probe armed');
   }, ENTRY_PROBE_STABLE_MS);
 
-  // Offline only: expose the dev "2v2 Fiesta vs Bots" practice toggle to the HUD.
-  if (offlineSim) hud.setFiestaPracticeHook(() => offlineSim.startFiestaPractice());
   // The Vale Cup practice-vs-bots button (the window calls world.vcupPracticeStart
   // through IWorld). Private instanced practice works online AND offline, so the
   // button is always available.
@@ -1733,6 +1731,9 @@ async function startGame(
           case 'valecup':
             hud.toggleValeCup();
             break;
+          case 'bgFlag':
+            bgFlagKey();
+            break;
           case 'mount':
             // Ride the pick immediately (every player always has one; the
             // character sheet's picker is where the pick changes).
@@ -2008,6 +2009,9 @@ async function startGame(
         break;
       case 'valecup':
         hud.toggleValeCup();
+        break;
+      case 'bgFlag':
+        bgFlagKey();
         break;
       case 'mount':
         world.toggleMounted();
@@ -2611,6 +2615,10 @@ async function startGame(
       ),
     prewarmRenderer: async (next) => {
       await next.prewarmInitialScene();
+      // Same law as the boot gate: the rebuilt renderer's far grid built
+      // eagerly behind this opaque curtain; hold (bounded) so the commit
+      // reveals a finished horizon instead of easing the fog out on screen.
+      await next.farVistaReady();
     },
     validateRenderer: (next) => {
       next.sync(1, 0, null, 0, null);
@@ -3058,6 +3066,14 @@ async function startGame(
       }
     }
   }
+  // The deliberate Thornhollow Fields flag press. Inside a live match the bare interact
+  // key also routes here (the field has no other interactables), which gives
+  // the mobile interact button flag parity for free; the world owns every rule
+  // (radius, team, the return-beats-press race), so a stray press is a no-op.
+  function bgFlagKey(): void {
+    if (world.bgInfo?.match) world.bgFlagAction();
+  }
+
   // The R40 per-use effect confirm gate, shared by every gather entry point
   // (world click, interact key, gathering-tool use): the pure question from
   // the view core, the ask through the HUD's confirm-dialog family. The
@@ -3068,6 +3084,10 @@ async function startGame(
       hud.confirmToolEffectUse(prompt, proceed),
   };
   function interactKey(): void {
+    if (world.bgInfo?.match?.state === 'active') {
+      world.bgFlagAction();
+      return;
+    }
     stopAutorunForInteraction(
       tryNearbyInteraction(
         world,
@@ -4558,6 +4578,17 @@ async function startGame(
       console.warn('Armory preview prewarm failed', err);
     }
   }
+  // The far vista has been building eagerly since the renderer was
+  // constructed, overlapping every asset wait above. Hold the curtain
+  // (bounded) until the grid can stand in for the fog, so the first visible
+  // frame carries the finished horizon; without this gate a loaded
+  // production boot starves the build and the fog lifts tens of seconds
+  // into play. On timeout the classic eased flip covers it, as before.
+  const farVistaReady = await renderer.farVistaReady();
+  entryDiagnostics.checkpoint('far-vista-ready', {
+    ...renderEntryDiagnostics(),
+    farVistaReady,
+  });
   setLoadingPercent(100, t('loading.enteringWorld'));
   await nextPaint();
   last = performance.now();

@@ -39,6 +39,15 @@
 
 import { Counter, Gauge, type Registry } from 'prom-client';
 import {
+  BG_COMPOSITIONS,
+  BG_END_CAUSES,
+  BG_SCORE_SIDES,
+  type BgCompositionLabel,
+  type BgEndCauseLabel,
+  bgScoreSides,
+  isBgEndCause,
+} from '../battleground_telemetry';
+import {
   COPPER_FLOW_SOURCES,
   type CopperFlowSource,
   HARVEST_BANDS,
@@ -147,6 +156,19 @@ export const WOC_ROD_FEE_PAYMENTS_TOTAL = 'woc_rod_fee_payments_total';
  *  the realm count, and dropping the by (recipe) grouping multiplies every
  *  training by the single HIGHEST fee (the two rod fees differ 4x). */
 export const WOC_ROD_FEE_COPPER = 'woc_rod_fee_copper';
+
+/** Resolved RATED Thornhollow Fields matches, by ending cause and composition.
+ *  The denominator for the two sums below, and on its own the cap-tuning read:
+ *  the share of matches the CLOCK ended rather than the winning capture is
+ *  `sum(rate(...{cause="timer"})) / sum(rate(...))`. */
+export const WOC_BATTLEGROUND_MATCHES_TOTAL = 'woc_battleground_matches_total';
+/** Summed ACTIVE seconds of those matches, same labels. Mean match length is
+ *  this over the count above; it is a SUM, so never graph it alone. */
+export const WOC_BATTLEGROUND_DURATION_SECONDS_TOTAL = 'woc_battleground_duration_seconds_total';
+/** Summed final scores of those matches, split into the high and low side of
+ *  each result (a draw contributes the same value to both). Mean captures per
+ *  match per side is this over the match count. */
+export const WOC_BATTLEGROUND_CAPTURES_TOTAL = 'woc_battleground_captures_total';
 
 /**
  * The FIXED set of loop phases surfaced on woc_sim_tick_phase_seconds. These are
@@ -482,6 +504,39 @@ export function registerGameStateMetrics(
     rodFeeCopper.set({ recipe }, rodFeeForRecipe(recipe));
   }
 
+  const bgMatches = new Counter({
+    name: WOC_BATTLEGROUND_MATCHES_TOTAL,
+    help: 'Total resolved RATED Thornhollow Fields matches, by ending (caps, timer, forfeit) and composition (premade, pug). The ending split is the BG_CAPS_TO_WIN tuning read.',
+    labelNames: ['ending', 'composition'],
+    registers: [registry],
+  });
+  const bgDurationSeconds = new Counter({
+    name: WOC_BATTLEGROUND_DURATION_SECONDS_TOTAL,
+    help: 'Summed ACTIVE seconds of resolved rated Thornhollow Fields matches, same labels. A SUM: mean length is this divided by woc_battleground_matches_total.',
+    labelNames: ['ending', 'composition'],
+    registers: [registry],
+  });
+  const bgCaptures = new Counter({
+    name: WOC_BATTLEGROUND_CAPTURES_TOTAL,
+    help: 'Summed final scores of resolved rated Thornhollow Fields matches, by ending and by the high or low side of the result. A SUM: mean captures per side is this divided by woc_battleground_matches_total.',
+    labelNames: ['ending', 'side'],
+    registers: [registry],
+  });
+  // Same zero-backfill as the drop causes: an operator comparing the timer share
+  // against the caps share needs both series to exist from boot, not from the
+  // first match that happens to end that way.
+  // The label is named `ending`, deliberately NOT `cause`: the ws-drop family
+  // already owns a `cause` label whose vocabulary is pinned by a registry-wide
+  // label scan, and a second family sharing the name would widen that pin
+  // rather than merely sit beside it.
+  for (const ending of BG_END_CAUSES) {
+    for (const composition of BG_COMPOSITIONS) {
+      bgMatches.inc({ ending, composition }, 0);
+      bgDurationSeconds.inc({ ending, composition }, 0);
+    }
+    for (const side of BG_SCORE_SIDES) bgCaptures.inc({ ending, side }, 0);
+  }
+
   return {
     wsMessage(direction: WsMessageDirection): void {
       try {
@@ -607,6 +662,32 @@ export function registerGameStateMetrics(
         rodFeePayments.inc({ recipe: recipeId });
       } catch {
         // Drop the sample rather than propagate into the event-routing path.
+      }
+    },
+    battlegroundResolved(
+      cause: BgEndCauseLabel,
+      composition: BgCompositionLabel,
+      durationSec: number,
+      scoreCrimson: number,
+      scoreAzure: number,
+    ): void {
+      try {
+        // The cause crosses an untyped seam (it is a string on the drained sim
+        // record), so the membership check is this family's cardinality bound.
+        // The composition is a boolean at its source and cannot be off-vocabulary.
+        if (!isBgEndCause(cause)) return;
+        // A non-finite or negative duration would corrupt the very mean the sum
+        // exists for; drop the whole sample rather than book a partial one.
+        if (!Number.isFinite(durationSec) || durationSec < 0) return;
+        if (!Number.isFinite(scoreCrimson) || !Number.isFinite(scoreAzure)) return;
+        if (scoreCrimson < 0 || scoreAzure < 0) return;
+        const { high, low } = bgScoreSides(scoreCrimson, scoreAzure);
+        bgMatches.inc({ ending: cause, composition });
+        bgDurationSeconds.inc({ ending: cause, composition }, durationSec);
+        bgCaptures.inc({ ending: cause, side: 'high' }, high);
+        bgCaptures.inc({ ending: cause, side: 'low' }, low);
+      } catch {
+        // Drop the sample rather than propagate into the tick path.
       }
     },
   };

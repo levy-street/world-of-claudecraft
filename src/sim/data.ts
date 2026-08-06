@@ -1242,6 +1242,61 @@ export function yumiMazeOriginAt(z: number): { x: number; z: number; slot: numbe
   return { x: o.x, z: o.z, slot: best };
 }
 
+// ---------------------------------------------------------------------------
+// Thornhollow Fields, the 5v5 capture-the-flag battleground. Its match
+// instances sit on the far-east instance plane like every other instanced
+// region, offset from INSTANCE_X_BASE rather than from world zero: the plane
+// moved east wholesale (see migrateLegacyInstancePos), so a raw offset would
+// land these matches in the OVERWORLD. The band is placed well past the
+// overflow-dungeon growth zone (DUNGEON_OVERFLOW_X_BASE + 600 per dungeon), so
+// adding dungeons can never walk into it.
+//
+// Unlike every other far-east band, this one has REAL terrain: the Thornhollow
+// field's sculpted heightfield (sim/battleground_field.ts serves world.ground
+// Height's band arm), and its per-slot colliders are registered into the
+// open-world spatial grid rather than scanned as one instance-local set
+// (sim/colliders.ts bandSlotColliders).
+// ---------------------------------------------------------------------------
+
+// x at/after this = a Thornhollow Fields instance.
+export const BG_BAND_X_MIN = INSTANCE_X_BASE + 30_000;
+// Two-sided cap, the Yumi-band move: the band never claims everything east, so
+// a later band stays classifiable.
+export const BG_BAND_X_MAX = INSTANCE_X_BASE + 34_000;
+// Battleground instances share this x; slots stack along z.
+export const BG_X = INSTANCE_X_BASE + 30_400;
+export const BG_SLOT_COUNT = 3; // concurrent 5v5 matches the world can host
+const BG_Z0 = -1500;
+const BG_SLOT_SPACING = 920; // way past the 100x280 field, so cross-slot player
+// pairs stay over 600yd apart: beyond even the RAISED in-band interest radius,
+// which applies to SAME-slot pairs only (server/game.ts BG_MATCH_DROP_RADIUS).
+// The band has the room, and physical separation is a cheaper guarantee than
+// relying on the same-slot filter alone.
+
+export function battlegroundOrigin(slot: number): { x: number; z: number } {
+  return { x: BG_X, z: BG_Z0 + slot * BG_SLOT_SPACING };
+}
+
+export function isBgPos(x: number): boolean {
+  return x >= BG_BAND_X_MIN && x < BG_BAND_X_MAX;
+}
+
+// Nearest battleground instance origin to a far-off position, matched by
+// z-band (the x is shared across slots). Mirrors arenaOriginAt.
+export function bgOriginAt(z: number): { x: number; z: number; slot: number } {
+  let best = 0,
+    bestD = Infinity;
+  for (let i = 0; i < BG_SLOT_COUNT; i++) {
+    const d = Math.abs(z - battlegroundOrigin(i).z);
+    if (d < bestD) {
+      bestD = d;
+      best = i;
+    }
+  }
+  const o = battlegroundOrigin(best);
+  return { x: o.x, z: o.z, slot: best };
+}
+
 export const DELVES: Record<string, DelveDef> = {
   [COLLAPSED_RELIQUARY_DELVE.id]: COLLAPSED_RELIQUARY_DELVE,
   [DROWNED_LITANY_DELVE.id]: DROWNED_LITANY_DELVE,

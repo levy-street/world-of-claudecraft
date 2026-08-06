@@ -343,6 +343,7 @@ export function canEnterDelve(ctx: SimContext, pid: number): string | null {
   if (ctx.tradeFor(pid)) return 'You cannot enter a delve while trading.';
   if (ctx.duelFor(pid)) return 'You cannot enter a delve during a duel.';
   if (ctx.arenaMatches.has(pid)) return 'You cannot enter a delve during an arena match.';
+  if (ctx.bgMatches.has(pid)) return 'You cannot enter a delve during a battleground.';
   return null;
 }
 

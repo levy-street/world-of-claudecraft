@@ -45,17 +45,34 @@ Phase 1 starts with these owner-selected values:
 - Fiesta takedown: 20 Honor.
 - Completed Fiesta match: 20 Honor.
 - Fiesta win bonus: 40 Honor.
+- Thornhollow Fields battleground win: 60 Honor per winning player
+  (`BATTLEGROUND_WIN_HONOR`).
+- Thornhollow Fields battleground loss, played out to a result: 20 Honor
+  (`BATTLEGROUND_LOSS_HONOR`); a draw pays the loss amount to both sides.
 
 Only the first ranked Arena win against the same opponent or team pays Honor
 each UTC day. Repeated Fiesta rewards against the same opposition pay 100, 50,
-25, then 0 percent.
+25, then 0 percent. Thornhollow Fields results decay on the same 100/50/25/0 curve per
+repeated opposing-team identity each UTC day (a full 5v5 match is long enough
+that the arena's first-win-only rule would be needlessly punishing).
 Ranked wins also taper after 10 wins in one UTC day to 50 percent, then after 15
 wins to a 25 percent floor. These values are named constants and can be tuned
 without changing rating, matchmaking, or combat rules.
 
 Offline Fiesta practice pays no Honor. Fiesta forfeits pay no completion or win
-bonus. Ranked and Fiesta result accounting is exactly once, including a
-disconnect during the post-match return delay.
+bonus, and a forfeited Thornhollow Fields match pays nothing on either side (the leavers'
+opponents still take the rating win). A Thornhollow Fields deserter takes the loss on
+the spot: leaving, disconnecting, or being jailed out of a live match records
+the L and applies the loss-side rating delta immediately, so pulling the plug
+while losing never protects a rating. Ranked, Fiesta, and Thornhollow Fields result
+accounting is exactly once, including a disconnect during the post-match return
+delay.
+
+Thornhollow Fields rating is its own per-character ladder (base 1500, floor 100), moved
+zero-sum by the arena's Elo over team-average ratings; a draw applies the 0.5
+draw score. The queue is rated but NOT rating-matched: matchmaking fills
+first-come from the queue, and strict banding is an explicitly deferred
+follow-up.
 
 ## FURY prices
 

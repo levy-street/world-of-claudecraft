@@ -197,19 +197,19 @@ describe('axe: talents window', () => {
 });
 
 // ---------------------------------------------------------------------------
-// Arena (#arena-window) - the offline host (dialog role + named title + close).
+// The merged PvP window (#arena-window) - offline hosts of BOTH tab families
+// (dialog role + named title + close). The window opens on the Thornhollow Fields tab.
 // ---------------------------------------------------------------------------
 
-describe('axe: arena window', () => {
-  it('offline host is clean (dialog role, labelled title)', async () => {
-    const root = host('arena-window');
-    root.style.display = 'none';
-    const win = new ArenaWindow(
+describe('axe: pvp window', () => {
+  const makeWin = (root: HTMLElement) =>
+    new ArenaWindow(
       stubDeps({
         root: () => root,
         world: () =>
           ({
             arenaInfo: null,
+            bgInfo: null,
             playerId: 1,
             player: { name: 'Aurelia' },
             partyInfo: null,
@@ -217,7 +217,23 @@ describe('axe: arena window', () => {
         captureFocus: () => null,
       }),
     );
+
+  it('offline Thornhollow Fields tab (the default) is clean (dialog role, labelled title)', async () => {
+    const root = host('arena-window');
+    root.style.display = 'none';
+    const win = makeWin(root);
     win.toggle();
+    expect(root.getAttribute('aria-labelledby')).toBe('arena-title');
+    expect(root.querySelector('#arena-title')).toBeTruthy();
+    await expectClean(root);
+  });
+
+  it('offline arena tab is clean too, after a strip switch', async () => {
+    const root = host('arena-window');
+    root.style.display = 'none';
+    const win = makeWin(root);
+    win.toggle();
+    win.openTab('1v1');
     expect(root.getAttribute('aria-labelledby')).toBe('arena-title');
     expect(root.querySelector('#arena-title')).toBeTruthy();
     await expectClean(root);

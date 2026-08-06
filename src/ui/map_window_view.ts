@@ -4,7 +4,8 @@
 // Conventions; reference delve_map.ts / delve_map_painter.ts). It maps IWorld
 // state plus the committed zone to a flat geometry model in canvas-pixel space:
 // the background blit rect, the zoomed-detail overlay, and every label / portal /
-// npc glyph / player arrow / ally dot / party dot already projected to (mx, my). No DOM, no
+// npc glyph / player arrow / ally dot / party dot / gather-node marker already
+// projected to (mx, my). No DOM, no
 // Three, no 2D context, no i18n, no color: the painter owns the context and
 // resolves the --color-map-* tokens + the localized label text. The delve branch
 // of the map is owned by delve_map_painter.ts; this core models only the
@@ -12,19 +13,31 @@
 //
 // DOM-free / i18n-free / deterministic so tests/map_window_view.test.ts can drive
 // it directly with both a Sim-shaped and a ClientWorld-mirror-shaped IWorld stub.
-// Markers carry the identity (zoneId / poiIndex / dungeonId / cls)
+// Markers carry the identity (zoneId / poiIndex / dungeonId / cls / nodeId)
 // the painter needs to resolve their localized text, never the resolved string.
 
-import { DUNGEON_LIST, isDelvePos, STRIP_MAX_X, STRIP_MIN_X, type ZoneDef } from '../sim/data';
+import type { GatheringProfessionId } from '../sim/content/professions';
+import {
+  DUNGEON_LIST,
+  GATHER_NODES,
+  isBgPos,
+  isDelvePos,
+  STRIP_MAX_X,
+  STRIP_MIN_X,
+  type ZoneDef,
+} from '../sim/data';
+import { NODE_HARVEST_TABLE } from '../sim/professions/gathering';
+import { canGatherTier } from '../sim/professions/tools';
 import {
   type MapQuestMarkerKind,
   type QuestObjectiveRef,
   questGiverNpcMarkers,
   questObjectiveAreas,
 } from '../sim/quest_targets';
-import type { BuildingDef, ZonePropsDef } from '../sim/types';
+import type { BuildingDef, GatherNodeType, ZonePropsDef } from '../sim/types';
 import type { Decoration } from '../sim/world';
 import type { FriendInfo, IWorld } from '../world_api';
+import { viewerUsableToolTier } from './gathering_view';
 import { overworldDungeonPortals } from './map_dungeon_portals';
 import { questNumbersByLog } from './map_quest_list_view';
 
@@ -61,8 +74,11 @@ const CAMPFIRE_MIN_RADIUS = 1.4;
 const CAMPFIRE_RADIUS_PPU = 0.5;
 
 /** Which world-map surface a given world renders: the delve schematic (owned by
- *  delve_map_painter) or the overworld map (this core). */
-export type MapWindowMode = 'delve' | 'overworld';
+ *  delve_map_painter), the Thornhollow Fields battleground band (routed to the plain
+ *  overworld surface: the band sits past WORLD_MAX_X, so the player/ally
+ *  markers self-suppress; the minimap owns the in-band field raster), or the
+ *  overworld map (this core). */
+export type MapWindowMode = 'delve' | 'battleground' | 'overworld';
 
 /** A map region in world coords, used with two meanings for spanX/spanZ. The
  *  internal `full` rect carries the current-zone square (its full spans). The
@@ -122,6 +138,10 @@ export interface MapNpcMarker {
  *  glyphs draw at a ~15px font, and a touch of slack keeps the hover forgiving. */
 export const MAP_NPC_GLYPH_HIT_RADIUS = 10;
 
+/** Hit radius for a zone-map gather node icon (ready radius ~5px plus slack for
+ *  the type silhouette and soft glow). Same nearest-wins rule as NPC glyphs. */
+export const MAP_GATHER_NODE_HIT_RADIUS = 10;
+
 /** The nearest quest-giver glyph within the hit radius of a canvas point, or
  *  null. Nearest (not first) so two adjacent givers resolve intuitively. */
 export function npcMarkerAt(
@@ -132,6 +152,45 @@ export function npcMarkerAt(
   let best: MapNpcMarker | null = null;
   let bestD2 = MAP_NPC_GLYPH_HIT_RADIUS * MAP_NPC_GLYPH_HIT_RADIUS;
   for (const n of npcs) {
+    const dx = mx - n.mx;
+    const dy = my - n.my;
+    const d2 = dx * dx + dy * dy;
+    if (d2 <= bestD2) {
+      bestD2 = d2;
+      best = n;
+    }
+  }
+  return best;
+}
+
+/** A gatherable world node on the zone map (ore / wood / herb). Positions come
+ *  from static content (never entities), so the online interest radius never
+ *  hides a far-away vein. `ready` / `locked` mirror the minimap's two
+ *  dimensions (per-viewer respawn + wield-filtered tool tier) so both surfaces
+ *  agree. Actionable info on every graphics tier (fairness: never preset-gated).
+ *  Distinct from quest-objective gather blobs in quest_targets: those cluster
+ *  only active-quest collect targets; this layer marks every node in the zone. */
+export interface MapGatherNodeMarker {
+  mx: number;
+  my: number;
+  /** Authored content id; the hover tooltip reuses buildGatherNodeTooltip. */
+  nodeId: string;
+  type: GatherNodeType;
+  ready: boolean;
+  locked: boolean;
+}
+
+/** The nearest gather-node marker within the hit radius of a canvas point, or
+ *  null. Nearest (not first) so a tight resource field resolves to the closest
+ *  icon under the cursor. */
+export function gatherNodeMarkerAt(
+  nodes: readonly MapGatherNodeMarker[],
+  mx: number,
+  my: number,
+): MapGatherNodeMarker | null {
+  let best: MapGatherNodeMarker | null = null;
+  let bestD2 = MAP_GATHER_NODE_HIT_RADIUS * MAP_GATHER_NODE_HIT_RADIUS;
+  for (const n of nodes) {
     const dx = mx - n.mx;
     const dy = my - n.my;
     const d2 = dx * dx + dy * dy;
@@ -285,6 +344,9 @@ export interface OverworldMapModel {
   portals: MapPortalMarker[];
   npcs: MapNpcMarker[];
   questAreas: MapQuestAreaMarker[];
+  /** Gather nodes in the committed zone (all zoom levels). Empty only when
+   *  the zone has no authored nodes in view. */
+  gatherNodes: MapGatherNodeMarker[];
   player: MapPlayerMarker | null;
   allies: MapAllyMarker[];
   /** Party members other than self, live world position (issue 2652). Empty
@@ -319,6 +381,7 @@ export interface OverworldMapInput {
 /** Which world-map surface this world renders. Delve when the player stands in a
  *  delve band and a run is active (matches the inline guard); overworld otherwise. */
 export function mapWindowMode(world: IWorld): MapWindowMode {
+  if (isBgPos(world.player.pos.x)) return 'battleground';
   return isDelvePos(world.player.pos.x) && world.delveRun ? 'delve' : 'overworld';
 }
 
@@ -439,6 +502,39 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
     portals.push({ mx, my, dungeonId: portal.id });
   }
 
+  // Gather nodes (ore / wood / herb) for the committed zone: static content
+  // positions, same ready/locked dimensions as the minimap. Zone-id filter
+  // first so a pan across a neighbour never leaks foreign nodes; then inView
+  // so a panned sub-rect only pays for what is on screen. Tool-tier memo is
+  // per-build and per-profession (the minimap shape): empty inventory locks
+  // every node, and a tool picked up between redraws re-resolves next paint.
+  // Cap is tiny (at most six of each type per zone in content), so individual
+  // markers stay cheap at every zoom, including the full-zone frame.
+  const gatherNodes: MapGatherNodeMarker[] = [];
+  let bestToolTiers: Map<GatheringProfessionId, number> | null = null;
+  let proficiency: Readonly<Record<string, number>> | undefined;
+  for (const node of GATHER_NODES) {
+    if (node.zoneId !== zone.id) continue;
+    if (!inView(node.pos.x, node.pos.z)) continue;
+    bestToolTiers ??= new Map();
+    const professionId = NODE_HARVEST_TABLE[node.type].professionId;
+    let best = bestToolTiers.get(professionId);
+    if (best === undefined) {
+      proficiency ??= world.gatheringProficiency;
+      best = viewerUsableToolTier(world, professionId, proficiency);
+      bestToolTiers.set(professionId, best);
+    }
+    const { mx, my } = toMap(node.pos.x, node.pos.z);
+    gatherNodes.push({
+      mx,
+      my,
+      nodeId: node.id,
+      type: node.type,
+      ready: world.nodeHarvestableByMe(node.id),
+      locked: !canGatherTier(best, node.tier),
+    });
+  }
+
   // Quest-giver glyphs, resolved from the static NPCS content table (like the
   // quest-area blobs above) rather than world.entities, so the online interest
   // radius never hides a distant giver's '!'/'?' glyph. questsDone and the
@@ -522,6 +618,7 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
     portals,
     npcs,
     questAreas,
+    gatherNodes,
     player,
     allies,
     party,

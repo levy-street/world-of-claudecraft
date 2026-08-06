@@ -950,6 +950,7 @@ export const zh_TW: EnTranslations = {
       "targetFriendlyNext": "切換友方目標",
       "discord": "Discord",
       "valecup": "溪谷盃",
+      "bgFlag": "戰場奪旗動作",
       "sheathe": "收起/拔出武器",
       "categoryPet": "寵物",
       "petAttack": "寵物：攻擊",
@@ -1026,6 +1027,93 @@ export const zh_TW: EnTranslations = {
       "timeout": "比賽失敗",
       "progress": "障礙 {n} / {total}",
       "timeLeft": "{seconds}秒"
+    },
+    "pvp": {
+      "launcherTitle": "PvP",
+      "mobileLabel": "PvP",
+      "bracket1v1": "1v1",
+      "bracket2v2": "2v2"
+    },
+    "bg": {
+      "title": "荊谷原野",
+      "blurb": "兩座廢棄的要塞隔著棘峰陰影下的圍牆山谷遙遙相望：緋紅在南，蔚藍在北，而兩者之間的古老廢墟庭院，誰都不曾真正佔據。每方五人，各持一面戰旗，先將對方戰旗奪回己方三次者贏得戰場。",
+      "modeTag": "5v5奪旗戰",
+      "offlineNote": "荊谷原野正在同步。待王國回應後即可排隊。",
+      "ratingSummary": "評分。{wins}勝 / {losses}敗",
+      "careerCaptures": "生涯奪旗:{count}",
+      "enterQueue": "加入佇列",
+      "enterQueueParty": "加入佇列({count}人隊伍)",
+      "leaveQueue": "離開佇列",
+      "searching": "搜尋中。佇列 {count}/{size}。",
+      "queuedParty": "{count}人隊伍。",
+      "queueNote": "兩隊各五人。奪取敵方軍旗並送回己方要塞。先奪得3次者獲勝。可組滿5人隊伍一同排隊;拾取疾行符文,並利用掩體甩開追兵。",
+      "matchInProgress": "戰鬥進行中。{crimson}:{azure}。",
+      "ladderAllTime": "天梯。歷史總榜",
+      "noRanked": "尚無勇士上榜。爭當第一。",
+      "ladderOnline": "天梯。目前在線",
+      "noChallengers": "目前沒有勇士在線。爭當第一。",
+      "playerLevelClassTitle": "{name}。{level}級{className}",
+      "playerClassTitle": "{name}。{className}",
+      "crimson": "赤紅隊",
+      "azure": "蔚藍隊",
+      "yourTeamTitle": "你的隊伍",
+      "clock": "{minutes}:{seconds}",
+      "formUp": "列隊:{seconds}",
+      "firstTo": "先奪得{caps}次旗幟",
+      "flagState": {
+        "home": "旗幟在要塞",
+        "carried": "旗幟被奪!",
+        "dropped": "旗幟落地"
+      },
+      "respawnIn": "下一波:{seconds}秒後復活",
+      "resultVictory": "勝利!",
+      "resultDefeat": "戰敗",
+      "resultDraw": "平手",
+      "leavingIn": "{seconds}秒後離開戰場",
+      "killFeed": "{killer}擊殺了{victim}",
+      "killFeedFallen": "{victim}倒下了",
+      "foundBanner": "戰鬥已就緒。你為{team}而戰!",
+      "countdownBanner": "荊谷原野{seconds}秒後開戰",
+      "startBanner": "奪取旗幟!",
+      "flagTakenLog": "{name}奪走了{team}的旗幟!",
+      "flagDroppedLog": "{team}的旗幟掉落了。",
+      "flagReturnedLog": "{team}的旗幟已歸還。",
+      "dropFlagConfirmTitle": "丟下旗幟？",
+      "dropFlagConfirmBody": "你正攜帶敵方旗幟。丟下後旗幟會留在地上，雙方都可以拾取。",
+      "dropFlagConfirmAccept": "丟下旗幟",
+      "boardToggleLabel": "比賽記分板。按 Enter 固定展開完整榜單。",
+      "levelRequirement": "你需要達到{level}級才能解鎖此戰場的排隊。",
+      "board": {
+        "kills": "擊殺",
+        "assists": "助攻",
+        "deaths": "死亡",
+        "captures": "奪旗"
+      },
+      "flagTakenBanner": "{takers}奪走了{team}的旗幟!",
+      "flagReturnedBanner": "{team}的旗幟已歸還!",
+      "capturedTeamBanner": "{takers}奪取了{team}的旗幟!{crimson}:{azure}",
+      "capturedLog": "{name}奪取了{team}的旗幟。比分{crimson}:{azure}。",
+      "victoryBanner": "勝利!荊谷原野{crimson}:{azure}。評分{rating}({delta})",
+      "defeatBanner": "戰敗。荊谷原野{crimson}:{azure}。評分{rating}({delta})",
+      "drawBanner": "荊谷原野平手{crimson}:{azure}。評分{rating}({delta})",
+      "endBannerDetail": "荊谷原野{crimson}:{azure}。評分{rating}({delta})",
+      "endLog": "荊谷原野結束,{crimson}:{azure}。評分{rating}({delta})。",
+      "endedTimer": "時間到",
+      "endedForfeit": "本場比賽以棄權告終",
+      "endedTimerLog": "比賽時間耗盡,由比分較高的一方拿下戰場。",
+      "endedForfeitLog": "本場比賽以棄權告終。",
+      "firstWinBonusLine": "每日首勝:+{honor}榮譽",
+      "firstWinBonusLog": "每日首勝:你額外獲得{honor}點榮譽。",
+      "timeWarningMinutes": "還剩{minutes}分鐘",
+      "timeWarningOneMinute": "還剩一分鐘",
+      "timeWarningMinutesLog": "本場戰鬥還剩{minutes}分鐘。",
+      "timeWarningOneMinuteLog": "本場戰鬥還剩一分鐘。",
+      "map": {
+        "crimsonKeep": "緋紅要塞",
+        "azureKeep": "蔚藍要塞",
+        "ruinCourtyard": "廢墟庭院",
+        "graveyard": "墓地"
+      }
     },
     "vcup": {
       "title": "溪谷盃",
@@ -1392,13 +1480,24 @@ export const zh_TW: EnTranslations = {
       "dualPrice": "{money} + {honor}",
       "balance": "榮譽：{amount}",
       "honorFloat": "+{amount} 榮譽",
+      "honorFloatReason": "+{amount} 榮譽（{reason}）",
       "honorGain": "你獲得了 {amount} 點榮譽（{reason}）。",
       "notEnoughHonor": "榮譽不足。",
       "reasons": {
         "arenaWin": "競技場勝利",
         "fiestaKill": "嘉年華擊倒",
         "fiestaComplete": "完成嘉年華",
-        "fiestaWin": "嘉年華勝利"
+        "fiestaWin": "嘉年華勝利",
+        "battlegroundWin": "荊谷原野勝利",
+        "battlegroundFirstWin": "荊谷原野每日首勝",
+        "battlegroundComplete": "荊谷原野參戰",
+        "battlegroundKill": "榮譽擊殺",
+        "battlegroundAssist": "助攻擊殺"
+      },
+      "floatReasons": {
+        "kill": "擊殺",
+        "assist": "助攻",
+        "firstWin": "首勝"
       }
     },
     "charSheet": {
@@ -1816,6 +1915,7 @@ export const zh_TW: EnTranslations = {
       "dmgDoneReduce": "造成的傷害降低 {pct}%",
       "heatingUp": "你的下一個火焰生成技能若連續造成致命一擊，會獲得熾熱連擊；未造成致命一擊則移除熱力迸發",
       "elementalConvergencePrimed": "你的下一個不同元素學派法術將觸發元素匯聚",
+      "carriedFlag": "你正攜帶敵方旗幟。取消該增益即可丟下旗幟。",
       "battleStance": "戰鬥姿態：怒氣產生提高 10%",
       "berserkerStance": "狂暴姿態：暴擊機率提高 3%，暴擊傷害提高 3%",
       "crit": "暴擊機率提高 {pct}%",
@@ -2392,10 +2492,6 @@ export const zh_TW: EnTranslations = {
           "title": "集市日",
           "note": "商人正等著新貨。今天很適合逛逛世界市場。"
         },
-        "fiestaNight": {
-          "title": "狂歡之夜",
-          "note": "今晚 2v2 狂歡擂台的人氣最旺。"
-        },
         "arenaClash": {
           "title": "競技場之戰",
           "note": "決鬥者湧向灰燼鬥獸場。排隊開打，向天梯進發。"
@@ -2632,6 +2728,18 @@ export const zh_TW: EnTranslations = {
         "gatherersCache": "採集者儲囊",
         "artisansEye": "匠人之眼",
         "quickeningCharm": "回春符"
+      },
+      "toolEffectTooltip": {
+        "kind": "工具符咒",
+        "bonus": {
+          "gatherersCache": "充能期間每次採集產出+1。",
+          "artisansEye": "充能期間將收穫品級提升1個工具等級。",
+          "quickeningCharm": "縮短其觸發的資源節點重生計時。"
+        },
+        "howToSlot": "在專業視窗中將其鑲嵌到採礦、伐木或藥草學工具上。鑲嵌後即消耗。",
+        "charges": "普通品質工具初始有{base}次充能（稀有度每升一級+{bonus}次）。",
+        "landOnly": "無法鑲嵌到釣竿上。",
+        "openProfessions": "打開專業視窗，將其鑲嵌到採集工具上。"
       },
       "toolEffectSlotButton": "鑲嵌{effect}",
       "toolEffectRechargeButton": "充能",
@@ -3208,6 +3316,7 @@ export const zh_TW: EnTranslations = {
       "talents": "天賦",
       "arena": "競技場與PvP",
       "valeCup": "溪谷盃",
+      "thornhollow": "荊谷原野",
       "deeds": "功績之書",
       "glossary": "詞彙表",
       "wishIKnew": "我希望早點知道的事",
@@ -3978,23 +4087,25 @@ export const zh_TW: EnTranslations = {
       "duelsBody": "向你遇到的任何玩家發起一場友誼決鬥。賭上的只有顏面，所以這是學習對戰組合或解決友好爭論最簡單的方式。",
       "coliseumHeading": "灰燼鬥獸場",
       "coliseumBody": "灰燼競技場是這個王國的競技場，你會在排名對戰中面對其他玩家，進行一對一或二對二的較量。每個級別都各自保有自己的排名，因此一場勝利能讓你在那道天梯上往上爬，讓整個王國都看得見。開啟競技場視窗即可報名參加某個級別，可以獨自一人，也可以與你的搭檔一同上場。",
-      "fiestaHeading": "二對二嘉年華",
-      "fiestaBody": "嘉年華是一種快節奏的二對二混戰，以一場連續不斷的對戰進行，每位鬥士都被拉到同一起跑線上。隨著戰鬥推進，你會抽選強化，這些快速的增益能即時重塑你的配套，讓每場對戰都不盡相同。",
-      "augmentsNote": "強化與增益只在該場對戰中有效。它們著重於即興、好玩的搭配，而非長久的力量，所以沒有人能花錢買到勝利。",
-      "wavesTitle": "強化如波浪般湧來",
-      "wavesBody": "一場嘉年華對戰會隨著進行不斷發給你新的選項，而戰鬥拖得愈久，選項也愈來愈大膽。你會一波接一波地堆疊構築，每次從幾個選項中挑一個，並保留到這場對戰結束。",
-      "waveSilverTitle": "白銀",
-      "waveSilverBody": "開場那波：乾淨俐落的單一屬性增益，磨利你職業的基本功。",
-      "waveGoldTitle": "黃金",
-      "waveGoldBody": "中段那波：雙刃般的搭配組合，你的配套在此開始成形，奏出旋律。",
-      "wavePrismaticTitle": "彩虹",
-      "wavePrismaticBody": "最後那波：足以定義整套配套、能融化整個畫面的爆發，刻意設計得荒謬到讓人拍案叫絕。",
-      "yumiHeading": "守護Yumi",
-      "yumiBody": "Protect Yumi是一種在迷宮中進行的團隊目標模式：每隊守護自己的貓咪使魔，同時獵殺對方的。兩隻貓咪會不時閃現到迷宮的新角落，戰鬥在防守、追獵與尋回之間不斷搖擺。可選擇3對3或5對5排隊；陣亡只會讓你短暫離場。",
-      "powerupsTitle": "鬥技場中的能量道具",
-      "powerupsBody": "戰鬥進行到一半，發光的能量球也會落入競技場，誰先搶到就歸誰。它們刻意設計得誇張過火，且只持續短短一陣子：速度惡魔讓你瞬間飆出令人目眩的步伐，巨像讓你脹大成笨重的巨人，月靴帶來低重力的彈跳躍動，狂戰士則是一股突如其來的暴怒之潮。",
       "ladderHeading": "在天梯上攀升",
       "ladderBody": "排名對戰會長期記錄你的名次。查看排行榜便能看到自己的位置，以及誰穩坐王國之巔。"
+    },
+    "thornhollowPage": {
+      "heading": "荊谷原野",
+      "intro": "一場排位 5v5 奪旗戰場，戰場位於棘峰之下老林中的圍牆山谷：兩座廢棄要塞沿著峽谷兩端遙遙相對，中間是一座更古老的庭院，誰都不曾真正佔據。每方五人，兩座要塞，一個目標：奪走敵方戰旗並趕在對方之前帶回家。",
+      "queueHeading": "排隊參戰",
+      "queueBody": "打開荊谷原野面板即可單人排隊,也可以組一支最多五人的隊伍一同排隊:隊伍總在同一邊,空位由單人勇士補齊。十人就位後,比賽會把雙方安置在各自要塞,短暫列隊後旗幟生效。",
+      "fieldHeading": "戰場地形",
+      "fieldBody": "一片有圍牆的露天戰場,被隔成三個區域:兩隊各自的前場,以及夾在中間的廢墟中庭。兩道橫貫全場的隔牆劃出邊界,穿行區域之間必須經過爭奪點:寬闊的正門,或是騎跨在隔牆上的門樓小屋,其錯位的兩扇門逼你繞過伏擊死角。每座要塞除正門外全部封死,奪旗進出只有這一個口;正門前還有一道矮壁壘擋住直衝的路線。中庭裡有空心的中央廢墟與兩枚側翼疾行符文,另外兩枚守在兩旗的接近路上。每個正門的中庭入口處還有一枚戰鬥或守護符文(短時間內提升傷害或減免傷害):兩個符文台開局同面,每次拾取後翻面。",
+      "flagsHeading": "旗幟",
+      "flagsBody": "每座要塞守著本隊軍旗。奪取敵旗並送到己方旗座即可得分;先奪得三次者獲勝,超時的戰鬥按比分定勝負。旗手陣亡時旗幟就地掉落:敵人可以再次拾起,而本隊隊員只需靠近便能立即將其送回。軍旗也絕不藏身:拾旗會解除潛行,旗手若以任何方式隱身,旗幟都會當場掉落。",
+      "pickupNote": "拾旗永遠需要主動按下戰場動作鍵:沒有人會因為跑過旗幟而意外成為旗手。",
+      "respawnHeading": "戰場陣亡",
+      "respawnBody": "死亡保留經典儀式:屍體停在原地,直到你親自釋放靈魂;靈魂會在你方主堡旁的圍欄墓地中升起,並被結界束縛,直到你方下一波復活潮。復活潮會同時喚起所有等待的靈魂;兩隊的復活潮刻意錯開,戰鬥永遠不會同時完全重置。這裡沒有跑屍,也沒有靈魂醫者的交易:釋放、等潮、再戰。",
+      "carrierHeading": "扛旗",
+      "carrierBody": "扛著敵旗太久的旗手會越來越脆弱,承受的傷害持續增加,直到旗幟被奪回、掉落或歸還。抱旗躲藏是敗招;把旗送回家才是勝途。",
+      "ladderHeading": "天梯",
+      "ladderBody": "每場比賽無論勝負都會移動角色的戰場評分,歷史總榜記錄王國的冠軍。勝利與鏖戰到底的失利也會透過戰爭體系發放榮譽。"
     },
     "valeCupPage": {
       "heading": "溪谷盃",
@@ -5882,7 +5993,6 @@ export const zh_TW: EnTranslations = {
   "yumi": {
     "bracket3": "Yumi 3v3",
     "bracket5": "Yumi 5v5",
-    "enterQueue": "加入Protect Yumi！",
     "queue": {
       "join": "你加入了Protect Yumi佇列。守好你的使魔……",
       "leave": "你離開了Protect Yumi佇列。",
@@ -5920,9 +6030,6 @@ export const zh_TW: EnTranslations = {
   },
   "fiesta": {
     "bracket": "Fiesta",
-    "enterQueue": "加入Fiesta！",
-    "practice": "🎉 對戰機器人練習",
-    "practiceNote": "離線練習：生成3個AI機器人並將你排入2v2 Fiesta佇列。再次點擊即可停止。",
     "banner": {
       "wave": "第{wave}/{total}波 — 選擇一項強化！",
       "augmentGained": "獲得強化：{name}！",
@@ -6404,7 +6511,6 @@ export const zh_TW: EnTranslations = {
       "mobileMore": "更多",
       "mobileMoreAria": "顯示更多選單",
       "mobileSocial": "社交",
-      "mobileArena": "競技場",
       "mobileMenu": "選單",
       "mobileSettings": "設定",
       "mobileUse": "使用",
@@ -6521,7 +6627,7 @@ export const zh_TW: EnTranslations = {
         "nameplates": "切換姓名板",
         "meters": "傷害統計",
         "social": "好友與公會",
-        "arena": "競技場（灰燼競技場）",
+        "arena": "PvP(荊谷原野與競技場)",
         "chat": "開啟聊天",
         "attack": "攻擊",
         "actionBarSlot": "動作列 {slot}"

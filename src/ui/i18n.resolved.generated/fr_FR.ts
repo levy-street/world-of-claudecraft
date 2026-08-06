@@ -950,6 +950,7 @@ export const fr_FR: EnTranslations = {
       "targetFriendlyNext": "Changer de cible alliée",
       "discord": "Discord",
       "valecup": "Coupe du Val",
+      "bgFlag": "Battleground Flag Action",
       "sheathe": "Ranger/Dégainer l'arme",
       "categoryPet": "Familier",
       "petAttack": "Familier : attaquer",
@@ -1026,6 +1027,93 @@ export const fr_FR: EnTranslations = {
       "timeout": "Course échouée",
       "progress": "Portes {n} sur {total}",
       "timeLeft": "{seconds} s"
+    },
+    "pvp": {
+      "launcherTitle": "PvP",
+      "mobileLabel": "PvP",
+      "bracket1v1": "1v1",
+      "bracket2v2": "2v2"
+    },
+    "bg": {
+      "title": "Thornhollow Fields",
+      "blurb": "Two ruined keeps face each other across a walled hollow in the shadow of Thornpeak: Crimson to the south, Azure to the north, and the older Ruin Courtyard between them that neither has ever held. Five a side, one banner each, and the first to carry three of theirs home takes the field.",
+      "modeTag": "5v5 Capture the Flag",
+      "offlineNote": "Thornhollow Fields is syncing. The queue opens once the realm answers.",
+      "ratingSummary": "Rating. {wins} wins / {losses} losses",
+      "careerCaptures": "Career captures: {count}",
+      "enterQueue": "Enter the Queue",
+      "enterQueueParty": "Enter the Queue (party of {count})",
+      "leaveQueue": "Leave Queue",
+      "searching": "Searching. {count}/{size} in queue.",
+      "queuedParty": "Party of {count}.",
+      "queueNote": "Two teams of five. Steal the enemy banner and run it to your keep. First to 3 captures wins. Group up to 5 and queue together; grab Sprint Runes and weave the cover to lose your pursuers.",
+      "matchInProgress": "Battle in progress. {crimson}:{azure}.",
+      "ladderAllTime": "Ladder. All-Time",
+      "noRanked": "No champions ranked yet. Be the first.",
+      "ladderOnline": "Ladder. Online Now",
+      "noChallengers": "No champions online right now. Be the first.",
+      "playerLevelClassTitle": "{name}. Level {level} {className}",
+      "playerClassTitle": "{name}. {className}",
+      "crimson": "Crimson",
+      "azure": "Azure",
+      "yourTeamTitle": "Your team",
+      "clock": "{minutes}:{seconds}",
+      "formUp": "Form up: {seconds}",
+      "firstTo": "First to {caps} captures",
+      "flagState": {
+        "home": "Flag at the keep",
+        "carried": "Flag stolen!",
+        "dropped": "Flag on the ground"
+      },
+      "respawnIn": "Next wave: respawning in {seconds}",
+      "resultVictory": "Victory!",
+      "resultDefeat": "Defeat",
+      "resultDraw": "Draw",
+      "leavingIn": "Leaving the battleground in {seconds}",
+      "killFeed": "{killer} felled {victim}",
+      "killFeedFallen": "{victim} has fallen",
+      "foundBanner": "Battle found. You fight for the {team}!",
+      "countdownBanner": "Thornhollow Fields begins in {seconds}",
+      "startBanner": "Capture the flag!",
+      "flagTakenLog": "{name} has taken the {team} flag!",
+      "flagDroppedLog": "The {team} flag was dropped.",
+      "flagReturnedLog": "The {team} flag was returned.",
+      "dropFlagConfirmTitle": "Drop the flag?",
+      "dropFlagConfirmBody": "You are carrying the enemy flag. Dropping it leaves it on the ground, where either team can reach it.",
+      "dropFlagConfirmAccept": "Drop the flag",
+      "boardToggleLabel": "Match scoreboard. Press Enter to pin the full board open.",
+      "levelRequirement": "You must reach level {level} to unlock queueing for this battleground.",
+      "board": {
+        "kills": "Kills",
+        "assists": "Assists",
+        "deaths": "Deaths",
+        "captures": "Captures"
+      },
+      "flagTakenBanner": "The {takers} have taken the {team} flag!",
+      "flagReturnedBanner": "The {team} flag was returned!",
+      "capturedTeamBanner": "The {takers} have captured the {team} flag! {crimson}:{azure}",
+      "capturedLog": "{name} captured the {team} flag. Score {crimson}:{azure}.",
+      "victoryBanner": "Victory! Thornhollow Fields {crimson}:{azure}. Rating {rating} ({delta})",
+      "defeatBanner": "Defeat. Thornhollow Fields {crimson}:{azure}. Rating {rating} ({delta})",
+      "drawBanner": "Thornhollow Fields draw {crimson}:{azure}. Rating {rating} ({delta})",
+      "endBannerDetail": "Thornhollow Fields {crimson}:{azure}. Rating {rating} ({delta})",
+      "endLog": "Thornhollow Fields ended {crimson}:{azure}. Rating {rating} ({delta}).",
+      "endedTimer": "Time expired",
+      "endedForfeit": "The match was forfeited",
+      "endedTimerLog": "The match clock ran out; the higher score took the field.",
+      "endedForfeitLog": "The match was forfeited.",
+      "firstWinBonusLine": "First win of the day: +{honor} Honor",
+      "firstWinBonusLog": "First win of the day: you gain {honor} bonus Honor.",
+      "timeWarningMinutes": "{minutes} minutes remain",
+      "timeWarningOneMinute": "One minute remains",
+      "timeWarningMinutesLog": "{minutes} minutes remain in the battle.",
+      "timeWarningOneMinuteLog": "One minute remains in the battle.",
+      "map": {
+        "crimsonKeep": "Crimson Keep",
+        "azureKeep": "Azure Keep",
+        "ruinCourtyard": "The Ruin Courtyard",
+        "graveyard": "Graveyard"
+      }
     },
     "vcup": {
       "title": "La Coupe du Val",
@@ -1392,13 +1480,24 @@ export const fr_FR: EnTranslations = {
       "dualPrice": "{money} + {honor}",
       "balance": "Honneur : {amount}",
       "honorFloat": "+{amount} points d’honneur",
+      "honorFloatReason": "+{amount} Honor ({reason})",
       "honorGain": "Vous gagnez {amount} points d’honneur ({reason}).",
       "notEnoughHonor": "Vous n’avez pas assez d’honneur.",
       "reasons": {
         "arenaWin": "Victoire en arène",
         "fiestaKill": "Élimination en Fiesta",
         "fiestaComplete": "Fiesta terminée",
-        "fiestaWin": "Victoire en Fiesta"
+        "fiestaWin": "Victoire en Fiesta",
+        "battlegroundWin": "Thornhollow Fields victory",
+        "battlegroundFirstWin": "first Thornhollow Fields win today",
+        "battlegroundComplete": "Thornhollow Fields battle fought",
+        "battlegroundKill": "honorable kill",
+        "battlegroundAssist": "killing blow assisted"
+      },
+      "floatReasons": {
+        "kill": "Kill",
+        "assist": "Assist",
+        "firstWin": "First Win"
       }
     },
     "charSheet": {
@@ -1816,6 +1915,7 @@ export const fr_FR: EnTranslations = {
       "dmgDoneReduce": "Réduit les dégâts infligés de {pct} %",
       "heatingUp": "Votre prochain coup critique consécutif d'un générateur de Feu accorde Bonne série ; un générateur sans critique supprime Chauffe en cours",
       "elementalConvergencePrimed": "Votre prochain sort de l'autre école élémentaire accorde la Convergence élémentaire",
+      "carriedFlag": "You are carrying the enemy flag. Cancel this buff to drop it.",
       "battleStance": "Posture de combat : 10% de génération de rage en plus",
       "berserkerStance": "Posture berserker : coups critiques 3% plus fréquents et 3% plus puissants",
       "crit": "Augmente les chances de coup critique de {pct}%",
@@ -2392,10 +2492,6 @@ export const fr_FR: EnTranslations = {
           "title": "Jour de marché",
           "note": "Le Marchand attend des marchandises fraîches. Un beau jour pour parcourir le Marché mondial."
         },
-        "fiestaNight": {
-          "title": "Nuit de la Fiesta",
-          "note": "Le ring de la Fiesta 2c2 attire ce soir ses foules les plus bruyantes."
-        },
         "arenaClash": {
           "title": "Choc des arènes",
           "note": "Les duellistes affluent au Colisée cendré. Entrez en file et grimpez au classement."
@@ -2632,6 +2728,18 @@ export const fr_FR: EnTranslations = {
         "gatherersCache": "Cache du collecteur",
         "artisansEye": "Œil de l'artisan",
         "quickeningCharm": "Breloque à ressort"
+      },
+      "toolEffectTooltip": {
+        "kind": "Tool charm",
+        "bonus": {
+          "gatherersCache": "+1 yield per harvest while charged.",
+          "artisansEye": "Raises the harvest grade by 1 tool tier while charged.",
+          "quickeningCharm": "Shortens the node respawn timer it triggers."
+        },
+        "howToSlot": "Slot onto a mining, logging, or herbalism tool from the Professions window. Consumed when slotted.",
+        "charges": "Starts with {base} charges on a common tool (+{bonus} per rarity rung).",
+        "landOnly": "Does not slot on fishing rods.",
+        "openProfessions": "Open Professions to slot this onto a gathering tool."
       },
       "toolEffectSlotButton": "Sertir {effect}",
       "toolEffectRechargeButton": "Recharger",
@@ -3208,6 +3316,7 @@ export const fr_FR: EnTranslations = {
       "talents": "Talents",
       "arena": "Arène et JcJ",
       "valeCup": "Coupe du Val",
+      "thornhollow": "Thornhollow Fields",
       "deeds": "Livre des hauts faits",
       "glossary": "Glossaire",
       "wishIKnew": "Ce que j'aurais aimé savoir",
@@ -3978,23 +4087,25 @@ export const fr_FR: EnTranslations = {
       "duelsBody": "Défiez en duel amical n'importe quel joueur que vous croisez. Rien n'est en jeu, sinon la fierté: c'est donc le moyen le plus simple d'apprendre un affrontement ou de régler un différend bon enfant.",
       "coliseumHeading": "Le Colisée de cendres",
       "coliseumBody": "Le Colisée est l'arène du royaume, où vous affrontez d'autres joueurs en matchs classés, en un contre un ou en deux contre deux. Chaque catégorie conserve son propre classement, si bien qu'une victoire vous fait grimper dans cette échelle, à la vue de tout le royaume. Ouvrez la fenêtre d'Arène pour vous inscrire à une catégorie, seul ou avec votre partenaire.",
-      "fiestaHeading": "Fiesta deux contre deux",
-      "fiestaBody": "Fiesta est une bagarre rapide à deux contre deux qui se joue en un seul match continu, où chaque combattant est mis sur un pied d'égalité. À mesure que le combat avance, vous draftez des augmentations, des bonus instantanés qui remodèlent votre panoplie à la volée, si bien qu'aucune partie ne se ressemble vraiment.",
-      "augmentsNote": "Les augmentations et bonus ne durent que le temps de la partie. Ils servent à des compositions ludiques et improvisées, pas à une puissance durable, pour que personne n'achète sa victoire.",
-      "wavesTitle": "Les augmentations arrivent par vagues",
-      "wavesBody": "Un match de Fiesta vous distribue de nouveaux choix au fil du jeu, et les choix se font plus audacieux à mesure que le combat se prolonge. Vous construisez d'une vague à l'autre, en retenant à chaque fois l'une des quelques options proposées et en la gardant pour le reste du match.",
-      "waveSilverTitle": "Argent",
-      "waveSilverBody": "La manche d'ouverture : des bonus simples sur une seule caractéristique qui affinent les bases de votre classe.",
-      "waveGoldTitle": "Or",
-      "waveGoldBody": "La manche intermédiaire : des combos à double tranchant où votre panoplie commence à prendre forme et à chanter.",
-      "wavePrismaticTitle": "Prismatique",
-      "wavePrismaticBody": "La dernière manche : des pics dévastateurs qui définissent votre panoplie, faits pour paraître ridicules dans le meilleur sens du terme.",
-      "yumiHeading": "Protégez Yumi",
-      "yumiBody": "Protégez Yumi est un mode d'objectif en équipe qui se joue dans un labyrinthe : chaque camp garde son propre familier félin tout en traquant celui de l'adversaire. De temps à autre, les deux chats se téléportent vers de nouveaux recoins du labyrinthe, si bien que le combat oscille entre défense, chasse et course pour les retrouver. Mettez-vous en file en trois contre trois ou cinq contre cinq ; tomber au combat ne vous met sur la touche qu'un instant.",
-      "powerupsTitle": "Les bonus de l'arène",
-      "powerupsBody": "Des orbes lumineux tombent aussi dans l'arène en pleine bataille, libres pour celui qui les atteint en premier. Ils sont volontairement démesurés et ne durent qu'un court instant : Démon de vitesse pour un éclair de cadence aveuglante, Colosse pour enfler en géant pataud, Bottes lunaires pour un bond rebondissant en gravité réduite, et Berserker pour un soudain accès de furie.",
       "ladderHeading": "Gravir l'échelle",
       "ladderBody": "Le jeu classé suit votre classement dans le temps. Consultez le classement pour voir où vous en êtes et qui tient le haut du royaume."
+    },
+    "thornhollowPage": {
+      "heading": "Thornhollow Fields",
+      "intro": "A ranked 5v5 capture-the-flag battleground fought in a walled hollow in the old growth below Thornpeak, where two ruined keeps face each other down the length of a ravine and an older courtyard sits between them that neither has ever held. Two teams of five, two keeps, one goal: steal the enemy banner and run it home before they run yours.",
+      "queueHeading": "Queueing up",
+      "queueBody": "Open the Thornhollow Fields panel and enter the queue solo, or bring a party of up to five and queue together: parties are always kept on one team, and the remaining seats fill with solo champions. When ten stand ready, the match seats both teams at their keeps for a short form-up before the flags go live.",
+      "fieldHeading": "The field",
+      "fieldBody": "A walled, open-air field carved into three chambers: each team has its own field before its keep, and the walled Ruin Courtyard sits between them. Two curtain walls span the full width, and every move between chambers passes a contested crossing: the wide main gate, or the gatehouse, a small room straddling the wall whose offset doors force a jog past an ambush corner. Each keep is sealed except its mouth, so every flag run starts and ends through the same opening, and a low barricade breaks the straight charge into it. The courtyard holds the hollow heart ruin and the two flank Sprint Runes; the other two wait on the flag approaches. A Battle or Ward Rune (more damage dealt, or less damage taken, for a few seconds) waits at each main gate's courtyard mouth: both pads open the match on the same face and flip with every claim.",
+      "flagsHeading": "Flags",
+      "flagsBody": "Each keep holds its team flag. Take the enemy flag and carry it to your own stand to score; the first team to three captures wins, and a timed-out battle resolves on score. A slain carrier drops the flag where they fell: an enemy can take it up again, while its own team returns it home instantly just by reaching it. The flag also refuses to hide: picking it up breaks stealth, and a carrier who turns invisible by any means drops it on the spot.",
+      "pickupNote": "Picking a flag up is always a deliberate press of the battleground action key: nobody ever becomes the carrier by strafing through the wrong spot.",
+      "respawnHeading": "Falling in battle",
+      "respawnBody": "Death keeps the classic rite: your corpse lies where it fell until YOU release, and the spirit rises in the fenced graveyard beside your keep, warded there until your team's next respawn wave. The wave raises every waiting spirit together, and the two team waves are deliberately staggered, so the fight never fully resets at once. There is no corpse run and no Spirit Healer bargain: release, wait out the wave, fight.",
+      "carrierHeading": "Carrying the flag",
+      "carrierBody": "A carrier who holds the enemy flag too long grows more and more vulnerable, taking ever-increasing damage until the flag is captured, dropped, or returned. Hiding with the flag is a losing plan; running it home is the winning one.",
+      "ladderHeading": "The ladder",
+      "ladderBody": "Every match moves a persistent per-character battleground rating, win or lose, and the all-time board ranks the realm champions. Wins and hard-fought losses also pay Honor through the Warfare system."
     },
     "valeCupPage": {
       "heading": "La Coupe du Val",
@@ -5882,7 +5993,6 @@ export const fr_FR: EnTranslations = {
   "yumi": {
     "bracket3": "Yumi 3c3",
     "bracket5": "Yumi 5c5",
-    "enterQueue": "Rejoignez Protégez Yumi !",
     "queue": {
       "join": "Vous rejoignez la file de Protégez Yumi. Gardez votre familier…",
       "leave": "Vous quittez la file de Protégez Yumi.",
@@ -5920,9 +6030,6 @@ export const fr_FR: EnTranslations = {
   },
   "fiesta": {
     "bracket": "Fiesta",
-    "enterQueue": "Rejoignez la Fiesta !",
-    "practice": "🎉 Entraînement contre des bots",
-    "practiceNote": "Entraînement hors ligne : fait apparaître 3 bots IA et vous inscrit pour une Fiesta 2c2. Cliquez à nouveau pour arrêter.",
     "banner": {
       "wave": "VAGUE {wave}/{total} — CHOISISSEZ UNE AUGMENTATION !",
       "augmentGained": "Augmentation obtenue : {name} !",
@@ -6404,7 +6511,6 @@ export const fr_FR: EnTranslations = {
       "mobileMore": "Plus",
       "mobileMoreAria": "Afficher plus de menus",
       "mobileSocial": "Relations",
-      "mobileArena": "Arène",
       "mobileMenu": "Menu",
       "mobileSettings": "Paramètres",
       "mobileUse": "Utiliser",
@@ -6521,7 +6627,7 @@ export const fr_FR: EnTranslations = {
         "nameplates": "Afficher les barres de nom",
         "meters": "Compteurs de dégâts",
         "social": "Amis et guilde",
-        "arena": "Arène (Colisée cendré)",
+        "arena": "PvP (Thornhollow Fields and Arenas)",
         "chat": "Ouvrir la discussion",
         "attack": "Attaquer",
         "actionBarSlot": "Barre d'action {slot}"

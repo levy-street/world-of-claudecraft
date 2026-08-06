@@ -199,6 +199,57 @@ governs this whole feature: online snapshots carry no distant entities and
 the fairness invariant forbids tier-gated actionable information, so any
 distant "life" can only ever be cosmetic, never real mobs or characters.
 
+## Boot readiness under production latency (fourth stage)
+
+Local play hid a pacing defect the production deploy exposed: the far
+grid built on `requestIdleCallback` slots (a fixed 12 rows per slot, 200ms
+timeout), and progress therefore depended entirely on the browser
+granting idle time. An idle dev machine grants a slot nearly every frame
+and the grid stands within the spawn fog-ease, invisible. A production
+boot does not: asset arrival, KTX2 transcode, GLTF parse and shader
+compile keep the main thread busy, every slot waits out its full timeout,
+and Safari (no `requestIdleCallback` at all) always does. Measured across
+the shipped grid (12 tiles, ~164 slices, well under a second of actual
+CPU) that is tens of seconds of classic fog after the reveal, then a late
+flip: the far background visibly updating long into play. A single build
+row can also cost ~8ms where the color recipe stacks, so a 12-row slice
+could block a frame for tens of milliseconds whenever it did land.
+
+The pacing is now cooperative and clock-bounded (`advanceWithinBudget` in
+`far_terrain_core.ts` holds the law, pinned by its test): every slice is
+a bounded TIME bite that always advances at least one row, so progress
+never depends on the host's idle policy. Two lanes:
+
+- POLITE (default; editor rebuilds, any leftover after entry): waits for
+  real idle time (taking what the browser grants, capped) but forces a
+  small bite on the timeout under sustained load. Worst case the full
+  grid recovers in seconds, without frame hitches.
+- EAGER (`FarTerrainView.accelerateInitialBuild`): plain macrotask turns
+  with a bigger bite, used only behind an opaque curtain where no frames
+  are watched. Timer-paced rather than message-paced on purpose, so it
+  interleaves fairly with the loading pipeline instead of outranking it.
+
+The curtained construction paths (boot, the graphics-settings rebuild)
+accelerate the initial build, and the whole grid completes while the
+curtain is still waiting on the network; the editor viewport, which
+constructs live Renderers against running frames on every document load,
+opts out via `RendererCreateOptions.eagerFarVista` and stays on polite
+pacing. Both curtain paths then gate the reveal on
+`Renderer.farVistaReady` (a thin consumer of `farVistaGate`, bounded by
+`FAR_VISTA_ENTRY_MAX_WAIT_MS`, with the classic eased flip as the
+timeout fallback, the losing timer cleared, and an entry-diagnostics
+checkpoint recording which way it went; both gate arms are pinned by
+`tests/far_terrain_view.test.ts`), and on success the next outdoor
+environment update settles scene fog at the horizon haze band, still
+behind the curtain: the first visible frame carries the finished horizon
+instead of easing the fog out on screen. The settle is fog only: the
+DETAIL horizon stays residency-governed and expands as chunks land,
+exactly as streaming always behaved, with the far mesh standing beneath
+it so no fog wall and no hole is ever visible. An interior login
+discards the settle and keeps its normal eased transition; editor
+terrain rebuilds keep polite pacing and the existing
+fog-closes-over-the-void behavior.
+
 ## Known tradeoffs
 
 - One sprite covers bark and canopy, so the whole picture takes the dominant

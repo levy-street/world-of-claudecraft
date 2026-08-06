@@ -70,7 +70,18 @@ export function hitFractionFromRating(rating: number): number {
   return rating / (HIT_RATING_PER_PCT * 100);
 }
 
-export type HonorReason = 'arena_win' | 'fiesta_kill' | 'fiesta_complete' | 'fiesta_win';
+export type HonorReason =
+  | 'arena_win'
+  | 'fiesta_kill'
+  | 'fiesta_complete'
+  | 'fiesta_win'
+  | 'battleground_win'
+  // The once-per-UTC-day first Thornhollow Fields win bonus, paid as its own
+  // grant beside the ordinary win award so the float and the chat line name it.
+  | 'battleground_first_win'
+  | 'battleground_complete'
+  | 'battleground_kill'
+  | 'battleground_assist';
 
 // Persisted anti-win-trading window for ranked honor. `winsByOpponent` is keyed
 // by bracket plus the stable, sorted opposing-team identity; `totalWins` drives
@@ -79,6 +90,15 @@ export interface HonorArenaDailyState {
   date: string;
   winsByOpponent: Record<string, number>;
   fiestaCompletionsByOpponent: Record<string, number>;
+  // Thornhollow Fields results per opposing-team identity (optional so pre-battleground
+  // saves stay byte-equal; absent until the first battleground result).
+  bgResultsByOpponent?: Record<string, number>;
+  // The first-win-of-the-day bonus has been paid for `date` already. Optional and
+  // absent until it is claimed, exactly like `bgResultsByOpponent`, so a save that
+  // predates the bonus (or a day that has not paid it yet) round-trips byte-equal.
+  // It rides THIS window rather than a state of its own because the window already
+  // owns the UTC date string and the one rollover that clears every daily counter.
+  bgFirstWinClaimed?: boolean;
   totalWins: number;
 }
 // Shared cooldown across ALL combat potions (classic-era potion sickness): one
@@ -420,6 +440,16 @@ export type AuraKind =
   // player can watch tick). Kept apart per user by the aura id (Temporal
   // Rift's 20s ICD, Overflowing Power's 30s shave window).
   | 'internal_cd'
+  // Thornhollow Fields: "you are carrying the enemy flag" (social/battleground.ts).
+  // Deliberately its own kind rather than a borrowed inert marker, because the
+  // guarantee it needs is that NOTHING keys on it: no combat reader, no stat
+  // recalc (it is neither buff_* nor form_*), and no dispel (it rides the
+  // physical school, which isDispellableAura refuses). It is pure visible state
+  // whose ONE affordance is the player-initiated cancel, which the battleground
+  // intercepts and turns into a voluntary flag drop. Its lifetime is exactly the
+  // carry: applied at the pickup, removed by clearCarrierAuras on every path the
+  // flag leaves the carrier.
+  | 'flag_carried'
   // Chronomancy Temporal Echo mark (docs/prd/mage-chronomancy.md section 13): a
   // per-caster (sourceId) buff on ONE ally; while it rides, a fraction of the
   // mage's Arcane damage heals the marked ally. Value is unused (1); the
@@ -4440,6 +4470,51 @@ export type SimEvent = { pid?: number } & (
       allies: ArenaCombatant[];
       enemies: ArenaCombatant[];
     }
+  // Thornhollow Fields 5v5 capture-the-flag: queue state, match lifecycle, flag plays,
+  // and the rating result. All personal (each carries a pid).
+  // position: the group's 1-based place in the queue line
+  | { type: 'bgQueued'; position: number }
+  | { type: 'bgUnqueued' }
+  | { type: 'bgFound'; team: number }
+  | { type: 'bgCountdown'; seconds: number }
+  | { type: 'bgStart' }
+  | {
+      type: 'bgFlag';
+      action: 'taken' | 'dropped' | 'returned' | 'captured';
+      team: number;
+      byName: string;
+      scoreCrimson: number;
+      scoreAzure: number;
+    }
+  // Kill feed: one per match member per player death (names resolve
+  // client-side against the localized feed line; teams color the entry).
+  | {
+      type: 'bgKill';
+      killerName: string | null; // null: an unattributed death (no enemy credit)
+      victimName: string;
+      killerTeam: number | null;
+      victimTeam: number;
+    }
+  // The match clock crossed a remaining-time threshold (BG_TIME_WARNINGS). One
+  // copy per match member, like bgKill: the call belongs to the whole field.
+  // `secondsLeft` is the threshold itself, not a live clock, so a late-delivered
+  // event never announces a number that has already gone stale.
+  | { type: 'bgTimeWarning'; secondsLeft: number }
+  | {
+      type: 'bgEnd';
+      won: boolean;
+      draw: boolean;
+      scoreCrimson: number;
+      scoreAzure: number;
+      ratingBefore: number;
+      ratingAfter: number;
+      // WHY the match ended, so the finish surface can say so: played to the
+      // capture target, the match clock ran out, or a side forfeited. A timer
+      // ending used to be indistinguishable from a played-out one on screen.
+      ended: 'caps' | 'timer' | 'forfeit';
+      // The first-win-of-the-day Honor bonus included in THIS result, or 0.
+      firstWinBonus: number;
+    }
   // 2v2 Fiesta party mode. All carry pid (personal - delivered to each combatant).
   // `fiestaScore`: the running team tally changed. `fiestaWave`: a new augment
   // wave just opened. `fiestaWord`: an exaggerated word-pop cue (the client maps
@@ -5862,6 +5937,8 @@ export type DeedMeterId =
   | 'talentPoints'
   | 'arenaRankedMatches'
   | 'arenaRankedWins'
+  | 'bgWins'
+  | 'bgCaptures'
   | 'vcupWins'
   | 'vcupGuildWins'
   | 'bankPurchasedSlots'

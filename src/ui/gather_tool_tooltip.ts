@@ -12,8 +12,9 @@
 // the reel line is handed this def's own `quality` and not just its tier), and
 // catch band b needs rod tier b + 1 (completeFishing), so band thresholds
 // index by tier - 1.
-// The dormant tool-effect slotting (tools.ts, parked) is deliberately NOT
-// advertised here.
+// Tool-effect charm slotting has its own sibling card (tool_effect_tooltip.ts,
+// composed right after these lines in Hud.itemTooltip), so it is deliberately
+// not described here.
 
 import type { GatheringProfessionId } from '../sim/content/professions';
 import {

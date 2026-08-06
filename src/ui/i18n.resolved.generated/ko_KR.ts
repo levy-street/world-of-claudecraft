@@ -950,6 +950,7 @@ export const ko_KR: EnTranslations = {
       "targetFriendlyNext": "아군 대상 순환",
       "discord": "Discord",
       "valecup": "베일 컵",
+      "bgFlag": "전장 깃발 행동",
       "sheathe": "무기 넣기/빼기",
       "categoryPet": "펫",
       "petAttack": "펫: 공격",
@@ -1026,6 +1027,93 @@ export const ko_KR: EnTranslations = {
       "timeout": "레이스 실패",
       "progress": "장애물 {n} / {total}",
       "timeLeft": "{seconds}초"
+    },
+    "pvp": {
+      "launcherTitle": "PvP",
+      "mobileLabel": "PvP",
+      "bracket1v1": "1v1",
+      "bracket2v2": "2v2"
+    },
+    "bg": {
+      "title": "쏜할로우 평원",
+      "blurb": "가시봉 그늘에 성벽으로 둘러싸인 분지를 사이에 두고 두 폐허가 된 요새가 마주 본다. 남쪽은 크림슨, 북쪽은 애저, 그 사이의 오래된 폐허 안뜰은 아직 누구도 차지하지 못했다. 5대 5, 깃발은 하나씩. 상대의 깃발을 먼저 세 번 가져오는 쪽이 전장을 차지한다.",
+      "modeTag": "5v5 깃발 뺏기",
+      "offlineNote": "쏜할로우 평원 동기화 중입니다. 서버 응답 후 대기열이 열립니다.",
+      "ratingSummary": "레이팅. {wins}승 / {losses}패",
+      "careerCaptures": "통산 탈취: {count}",
+      "enterQueue": "대기열 참가",
+      "enterQueueParty": "대기열 참가({count}인 파티)",
+      "leaveQueue": "대기열 나가기",
+      "searching": "검색 중. 대기열 {count}/{size}.",
+      "queuedParty": "{count}인 파티.",
+      "queueNote": "5인 2개 팀. 적의 군기를 빼앗아 아군 요새로 가져오세요. 먼저 3회 탈취한 팀이 승리합니다. 최대 5인 파티로 함께 참가할 수 있습니다. 질주 룬을 줍고 엄폐물 사이로 추격자를 따돌리세요.",
+      "matchInProgress": "전투 진행 중. {crimson}:{azure}.",
+      "ladderAllTime": "순위표. 역대 기록",
+      "noRanked": "아직 순위에 오른 용사가 없습니다. 첫 주인공이 되어보세요.",
+      "ladderOnline": "순위표. 현재 접속 중",
+      "noChallengers": "지금 접속 중인 용사가 없습니다. 첫 주인공이 되어보세요.",
+      "playerLevelClassTitle": "{name}. {level}레벨 {className}",
+      "playerClassTitle": "{name}. {className}",
+      "crimson": "진홍팀",
+      "azure": "청람팀",
+      "yourTeamTitle": "내 팀",
+      "clock": "{minutes}:{seconds}",
+      "formUp": "집결: {seconds}",
+      "firstTo": "{caps}회 선취 시 승리",
+      "flagState": {
+        "home": "깃발이 요새에 있음",
+        "carried": "깃발을 빼앗겼습니다!",
+        "dropped": "깃발이 바닥에 있음"
+      },
+      "respawnIn": "다음 웨이브: {seconds}초 후 부활",
+      "resultVictory": "승리!",
+      "resultDefeat": "패배",
+      "resultDraw": "무승부",
+      "leavingIn": "{seconds}초 후 전장을 떠납니다",
+      "killFeed": "{killer}이(가) {victim}을(를) 처치했습니다",
+      "killFeedFallen": "{victim}이(가) 쓰러졌습니다",
+      "foundBanner": "전투 성사. 당신은 {team} 소속입니다!",
+      "countdownBanner": "쏜할로우 평원 시작까지 {seconds}",
+      "startBanner": "깃발을 빼앗아라!",
+      "flagTakenLog": "{name}이(가) {team} 깃발을 빼앗았습니다!",
+      "flagDroppedLog": "{team} 깃발이 떨어졌습니다.",
+      "flagReturnedLog": "{team} 깃발이 반환되었습니다.",
+      "dropFlagConfirmTitle": "깃발을 내려놓을까요?",
+      "dropFlagConfirmBody": "적의 깃발을 운반하고 있습니다. 내려놓으면 깃발이 바닥에 남아 양 팀 모두 주울 수 있습니다.",
+      "dropFlagConfirmAccept": "깃발 내려놓기",
+      "boardToggleLabel": "경기 점수판. Enter 키로 전체 보드를 고정합니다.",
+      "levelRequirement": "이 전장의 대기열은 레벨 {level}에 도달하면 잠금 해제됩니다.",
+      "board": {
+        "kills": "처치",
+        "assists": "도움",
+        "deaths": "죽음",
+        "captures": "탈취"
+      },
+      "flagTakenBanner": "{takers} 팀이 {team} 깃발을 빼앗았습니다!",
+      "flagReturnedBanner": "{team} 깃발이 반환되었습니다!",
+      "capturedTeamBanner": "{takers} 팀이 {team} 깃발을 탈취!{crimson}:{azure}",
+      "capturedLog": "{name}이(가) {team} 깃발을 탈취했습니다. 점수 {crimson}:{azure}.",
+      "victoryBanner": "승리! 쏜할로우 평원 {crimson}:{azure}. 레이팅 {rating}({delta})",
+      "defeatBanner": "패배. 쏜할로우 평원 {crimson}:{azure}. 레이팅 {rating}({delta})",
+      "drawBanner": "쏜할로우 평원 무승부 {crimson}:{azure}. 레이팅 {rating}({delta})",
+      "endBannerDetail": "쏜할로우 평원 {crimson}:{azure}. 레이팅 {rating}({delta})",
+      "endLog": "쏜할로우 평원 종료, {crimson}:{azure}. 레이팅 {rating}({delta}).",
+      "endedTimer": "시간 종료",
+      "endedForfeit": "이 경기는 기권으로 끝났습니다",
+      "endedTimerLog": "경기 시간이 끝나 점수가 높은 쪽이 전장을 차지했습니다.",
+      "endedForfeitLog": "이 경기는 기권으로 끝났습니다.",
+      "firstWinBonusLine": "오늘의 첫 승리: 명예 +{honor}",
+      "firstWinBonusLog": "오늘의 첫 승리: 추가로 명예를 {honor} 획득했습니다.",
+      "timeWarningMinutes": "{minutes}분 남았습니다",
+      "timeWarningOneMinute": "1분 남았습니다",
+      "timeWarningMinutesLog": "전투가 {minutes}분 남았습니다.",
+      "timeWarningOneMinuteLog": "전투가 1분 남았습니다.",
+      "map": {
+        "crimsonKeep": "크림슨 요새",
+        "azureKeep": "애저 요새",
+        "ruinCourtyard": "폐허 안뜰",
+        "graveyard": "묘지"
+      }
     },
     "vcup": {
       "title": "베일 컵",
@@ -1392,13 +1480,24 @@ export const ko_KR: EnTranslations = {
       "dualPrice": "{money} + {honor}",
       "balance": "명예: {amount}",
       "honorFloat": "명예 +{amount}",
+      "honorFloatReason": "명예 +{amount} ({reason})",
       "honorGain": "명예를 {amount} 획득했습니다({reason}).",
       "notEnoughHonor": "명예가 부족합니다.",
       "reasons": {
         "arenaWin": "투기장 승리",
         "fiestaKill": "피에스타 처치",
         "fiestaComplete": "피에스타 완료",
-        "fiestaWin": "피에스타 승리"
+        "fiestaWin": "피에스타 승리",
+        "battlegroundWin": "쏜할로우 평원 승리",
+        "battlegroundFirstWin": "오늘의 쏜할로우 평원 첫 승리",
+        "battlegroundComplete": "쏜할로우 평원 참전",
+        "battlegroundKill": "명예로운 처치",
+        "battlegroundAssist": "처치 도움"
+      },
+      "floatReasons": {
+        "kill": "처치",
+        "assist": "도움",
+        "firstWin": "첫 승리"
       }
     },
     "charSheet": {
@@ -1816,6 +1915,7 @@ export const ko_KR: EnTranslations = {
       "dmgDoneReduce": "입히는 피해가 {pct}% 감소합니다",
       "heatingUp": "다음 화염 생성기가 연속으로 치명타를 적중하면 몰아치는 열기를 얻고, 치명타가 아니면 달아오름이 제거됩니다",
       "elementalConvergencePrimed": "다음에 다른 원소 계열 주문을 시전하면 원소 융합이 발동합니다",
+      "carriedFlag": "적의 깃발을 운반하고 있습니다. 이 버프를 해제하면 깃발을 내려놓습니다.",
       "battleStance": "전투 태세: 분노 생성 10% 증가",
       "berserkerStance": "광전사 태세: 치명타 확률 3% 증가, 피해 3% 증가",
       "crit": "치명타 확률이 {pct}% 증가합니다",
@@ -2392,10 +2492,6 @@ export const ko_KR: EnTranslations = {
           "title": "장날",
           "note": "상인이 새 물건을 기다립니다. 월드 마켓을 둘러보기 좋은 날."
         },
-        "fiestaNight": {
-          "title": "피에스타의 밤",
-          "note": "오늘 밤 2대2 피에스타 링이 가장 붐빕니다."
-        },
         "arenaClash": {
           "title": "투기장 격돌",
           "note": "결투사들이 잿빛 투기장으로 몰려듭니다. 대기열에 올라 순위를 노리세요."
@@ -2632,6 +2728,18 @@ export const ko_KR: EnTranslations = {
         "gatherersCache": "채집가의 주머니",
         "artisansEye": "장인의 눈",
         "quickeningCharm": "회복의 부적"
+      },
+      "toolEffectTooltip": {
+        "kind": "도구 부적",
+        "bonus": {
+          "gatherersCache": "충전된 동안 채집당 획득량 +1.",
+          "artisansEye": "충전된 동안 수확 등급이 도구 1단계만큼 올라갑니다.",
+          "quickeningCharm": "발동한 자원 채집지의 재생성 시간을 단축합니다."
+        },
+        "howToSlot": "전문 기술 창에서 채광, 벌목, 약초학 도구에 장착합니다. 장착 시 소모됩니다.",
+        "charges": "일반 등급 도구에서는 {base}회 충전으로 시작합니다(희귀도 한 단계마다 +{bonus}회).",
+        "landOnly": "낚싯대에는 장착할 수 없습니다.",
+        "openProfessions": "전문 기술 창을 열어 채집 도구에 장착하세요."
       },
       "toolEffectSlotButton": "{effect} 장착",
       "toolEffectRechargeButton": "재충전",
@@ -3208,6 +3316,7 @@ export const ko_KR: EnTranslations = {
       "talents": "특성",
       "arena": "투기장과 PvP",
       "valeCup": "베일 컵",
+      "thornhollow": "쏜할로우 평원",
       "deeds": "업적의 서",
       "glossary": "용어집",
       "wishIKnew": "미리 알았으면 좋았을 것들",
@@ -3978,23 +4087,25 @@ export const ko_KR: EnTranslations = {
       "duelsBody": "마주치는 누구에게나 가벼운 결투를 신청할 수 있습니다. 자존심 외에는 걸린 것이 없으므로, 상대법을 익히거나 가벼운 논쟁을 가리는 가장 쉬운 방법입니다.",
       "coliseumHeading": "잿빛 콜로세움",
       "coliseumBody": "콜로세움은 왕국의 투기장으로, 1대1 또는 2대2 등급전에서 다른 플레이어들과 맞붙는 곳입니다. 등급 구간마다 별도의 순위가 매겨지므로, 승리하면 그 사다리에서 순위가 올라 왕국 전체가 그 결과를 보게 됩니다. 투기장 창을 열어 혼자 또는 파트너와 함께 등급 구간에 참가 신청을 하세요.",
-      "fiestaHeading": "2대 2 피에스타",
-      "fiestaBody": "피에스타는 하나의 연속된 시합으로 치러지는 빠른 2대2 난투로, 모든 참가자가 동등한 조건에서 싸웁니다. 싸움이 진행되는 동안 증강을 골라 뽑는데, 이는 그때그때 구성을 바꾸는 빠른 강화 효과이므로 어떤 경기도 똑같이 흘러가지 않습니다.",
-      "augmentsNote": "증강과 강화 효과는 해당 경기 동안에만 유지됩니다. 지속적인 힘이 아니라 그 자리에서 재미있게 빌드를 짜는 것이 목적이므로, 돈으로 승리를 사는 일은 없습니다.",
-      "wavesTitle": "증강은 웨이브로 찾아옵니다",
-      "wavesBody": "피에스타 시합은 진행되면서 새로운 선택지를 건네주며, 시합이 길어질수록 그 선택은 점점 대담해집니다. 한 웨이브에서 다음 웨이브로 빌드를 쌓아 가는데, 매번 몇 가지 중 하나를 골라 남은 시합 동안 계속 지니게 됩니다.",
-      "waveSilverTitle": "실버",
-      "waveSilverBody": "첫 웨이브: 군더더기 없이 능력치 하나만 끌어올려 당신 직업의 기본기를 다듬어 줍니다.",
-      "waveGoldTitle": "골드",
-      "waveGoldBody": "중반 웨이브: 양날의 조합으로, 이 무렵부터 당신의 빌드가 모습을 갖추고 노래하기 시작합니다.",
-      "wavePrismaticTitle": "프리즘",
-      "wavePrismaticBody": "마지막 웨이브: 빌드를 결정짓고 화면을 녹여 버리는 폭발적인 한 방으로, 더없이 통쾌하게 터무니없는 느낌을 주려는 것입니다.",
-      "yumiHeading": "Yumi를 지켜라",
-      "yumiBody": "Protect Yumi는 미로에서 펼쳐지는 팀 목표 모드입니다. 각 팀은 아군 고양이 소환수를 지키면서 상대의 소환수를 사냥합니다. 두 고양이는 이따금 미로의 새 구석으로 순간이동하므로 전투는 수비, 추격, 수색 사이를 오갑니다. 3대3 또는 5대5로 참가할 수 있으며, 쓰러져도 잠시 벤치에 앉을 뿐입니다.",
-      "powerupsTitle": "원형 안의 강화 효과",
-      "powerupsBody": "빛나는 구슬이 전투 도중 투기장 안으로 떨어지기도 하며, 먼저 닿는 사람이 임자입니다. 일부러 과장되게 만들어졌고 효과는 잠깐뿐입니다. 눈이 멀 듯한 속도를 주는 스피드 데몬, 굼뜬 거인으로 부풀어 오르는 콜로서스, 저중력으로 통통 튀어 오르게 하는 문 부츠, 그리고 분노가 한순간에 폭발하는 버서커가 있습니다.",
       "ladderHeading": "순위 올리기",
       "ladderBody": "등급전은 시간이 지나며 당신의 순위를 기록합니다. 순위표를 확인해 자신의 위치와 서버 정상에 오른 이가 누구인지 살펴보세요."
+    },
+    "thornhollowPage": {
+      "heading": "쏜할로우 평원",
+      "intro": "가시봉 아래 오래된 숲의 성벽으로 둘러싸인 분지에서 벌어지는 랭크 5대 5 깃발 뺏기 전장. 협곡 양 끝에서 두 폐허 요새가 마주 보고, 그 사이에는 누구도 차지한 적 없는 더 오래된 안뜰이 있다. 다섯 명씩, 요새 둘, 목표 하나. 적의 깃발을 빼앗아 우리 깃발을 빼앗기기 전에 가져와라.",
+      "queueHeading": "대기열 참가",
+      "queueBody": "쏜할로우 평원 창을 열어 혼자 대기열에 서거나, 최대 5인 파티로 함께 참가하세요. 파티는 항상 같은 팀에 배치되고 남는 자리는 솔로 용사들로 채워집니다. 열 명이 모이면 양 팀이 각자의 요새에 배치되고, 짧은 집결 후 깃발이 활성화됩니다.",
+      "fieldHeading": "전장",
+      "fieldBody": "성벽으로 둘러싸인 야외 전장이 세 구역으로 나뉩니다. 양 팀 각자의 앞마당과 그 사이에 낀 폐허 안뜰입니다. 전장을 가로지르는 두 장벽이 경계를 이루며, 구역 사이를 오가려면 반드시 쟁탈 지점을 지나야 합니다. 넓은 정문과 장벽에 걸쳐 앉은 문루입니다. 문루의 두 문은 엇갈리게 나 있어 매복 모퉁이를 돌아가야 합니다. 각 요새는 정문을 제외하면 완전히 막혀 있어 깃발을 노리는 출입은 반드시 같은 입구를 지나며, 그 정문 앞에는 낮은 방책이 서서 일직선 돌격을 막습니다. 안뜰에는 속이 빈 중앙 유적과 측면의 질주 룬 2개가 있으며, 나머지 2개는 깃발 진입로에 놓여 있습니다.또한 각 정문의 안뜰 입구에는 전투 룬 또는 수호 룬(짧은 시간 동안 피해 증가 또는 피해 감소)이 기다립니다. 두 받침대는 같은 면으로 경기를 시작하며 차지할 때마다 면이 뒤집힙니다.",
+      "flagsHeading": "깃발",
+      "flagsBody": "각 요새는 자기 팀의 깃발을 지킵니다. 적 깃발을 빼앗아 아군 깃대까지 가져오면 득점하며, 먼저 3회 탈취한 팀이 승리하고 시간이 다 된 전투는 점수로 판가름납니다. 운반자가 쓰러지면 깃발은 그 자리에 떨어집니다. 적은 다시 주울 수 있지만, 깃발 주인 팀은 가까이 가기만 해도 즉시 되찾아옵니다. 또한 깃발은 결코 숨지 않습니다. 깃발을 주우면 은신이 풀리고, 운반자가 어떤 수단으로든 모습을 감추면 깃발은 그 자리에 떨어집니다.",
+      "pickupNote": "깃발 줍기는 언제나 전장 행동 키를 의도적으로 누르는 행위입니다. 깃발 위를 스쳐 지나갔다고 운반자가 되는 일은 없습니다.",
+      "respawnHeading": "전장에서의 죽음",
+      "respawnBody": "죽음은 고전 의식을 그대로 따릅니다. 시신은 직접 영혼을 해방할 때까지 그 자리에 남고, 영혼은 아군 요새 옆 울타리 묘지에서 일어나 다음 아군 부활 파도까지 그곳에 결박됩니다. 파도는 기다리던 모든 영혼을 함께 일으킵니다. 두 팀의 파도는 의도적으로 엇갈려 있어 전투가 한꺼번에 완전히 초기화되는 일은 없습니다. 시신 달리기도, 영혼 치유사와의 거래도 없습니다. 해방하고, 파도를 기다리고, 다시 싸우십시오.",
+      "carrierHeading": "깃발 운반",
+      "carrierBody": "적 깃발을 너무 오래 들고 있는 운반자는 점점 취약해져, 깃발이 탈취되거나 떨어지거나 반환될 때까지 받는 피해가 계속 늘어납니다. 깃발을 안고 숨는 것은 지는 길이고, 집으로 가져오는 것이 이기는 길입니다.",
+      "ladderHeading": "순위표",
+      "ladderBody": "승패와 관계없이 매 경기 캐릭터별 전장 레이팅이 움직이며, 역대 순위표가 서버의 챔피언을 기록합니다. 승리와 끝까지 싸운 패배에는 전쟁 체계를 통해 명예도 지급됩니다."
     },
     "valeCupPage": {
       "heading": "베일 컵",
@@ -5882,7 +5993,6 @@ export const ko_KR: EnTranslations = {
   "yumi": {
     "bracket3": "Yumi 3대3",
     "bracket5": "Yumi 5대5",
-    "enterQueue": "Protect Yumi 참가!",
     "queue": {
       "join": "Protect Yumi 대기열에 참가했습니다. 소환수를 지키세요…",
       "leave": "Protect Yumi 대기열에서 나갑니다.",
@@ -5920,9 +6030,6 @@ export const ko_KR: EnTranslations = {
   },
   "fiesta": {
     "bracket": "Fiesta",
-    "enterQueue": "Fiesta에 참가하세요!",
-    "practice": "🎉 봇 상대 연습",
-    "practiceNote": "오프라인 연습: AI 봇 3기를 소환하고 2대2 Fiesta 대기열에 등록합니다. 다시 클릭하면 중지합니다.",
     "banner": {
       "wave": "웨이브 {wave}/{total} - 증강을 선택하세요!",
       "augmentGained": "증강 획득: {name}!",
@@ -6404,7 +6511,6 @@ export const ko_KR: EnTranslations = {
       "mobileMore": "더보기",
       "mobileMoreAria": "메뉴 더 보기",
       "mobileSocial": "소셜",
-      "mobileArena": "투기장",
       "mobileMenu": "메뉴",
       "mobileSettings": "설정",
       "mobileUse": "사용",
@@ -6521,7 +6627,7 @@ export const ko_KR: EnTranslations = {
         "nameplates": "이름표 전환",
         "meters": "피해량 미터",
         "social": "친구 및 길드",
-        "arena": "투기장 (잿빛 원형경기장)",
+        "arena": "PvP(쏜할로우 평원과 투기장)",
         "chat": "채팅 열기",
         "attack": "공격",
         "actionBarSlot": "행동 단축바 {slot}"

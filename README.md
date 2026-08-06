@@ -241,6 +241,15 @@ Press `G` or the arena button to queue. Matchmaking teleports fighters into a pr
 
 Ranked wins and Fiesta takedowns pay **Honor**, which the quartermaster in town trades for a set of Warfare gear. Warfare is a PvP-only stat, so the set wins duels without ever out-gearing same-tier dungeon loot in PvE.
 
+### Thornhollow Fields (5v5 capture the flag)
+
+Press `G` to open the PvP window (Thornhollow Fields is its primary tab, beside the 1v1 and 2v2 arena brackets) and Enter the Queue, solo or with a party of up to five (parties stay together; solos fill the rest). Two teams of five fight over a walled, open-air field with a keep at each end: steal the enemy banner with a deliberate press of the battleground action key and run it to your own stand. First to 3 captures wins inside a 12-minute cap.
+
+- **Team wave respawns** (no graveyard run): each team's fallen rise together on a staggered wave clock at their keep, briefly spawn-protected until they act.
+- **Anti-turtle carrier fatigue**: hold the enemy flag too long and you take ever-increasing damage until it is captured, dropped, or returned. The flag also refuses to hide: grabbing it breaks stealth, and a carrier who turns invisible drops it on the spot.
+- **Three chambers, contested crossings**: two full-width curtain walls carve the field into each team's own field chamber and the walled Ruin Courtyard between them; every move between chambers passes the wide main gate or the gatehouse room with its offset doors. Each keep is sealed except its mouth, a low barricade breaks the straight charge into it, and **Sprint Runes** wait at the flag approaches and flanks. The whole map is point-symmetric, so neither team is favored.
+- A persistent per-character **battleground rating** (Elo over team averages, base 1500) with an all-time leaderboard (`GET /api/battleground/leaderboard`), and Honor for played-out wins and losses.
+
 ### Playing together
 
 - **Dungeon Finder**: open it with `Shift+I` to browse dungeons and raids, inspect bosses and loot, join an automatic tank/healer/DPS role queue, or create a premade listing. Finder-made groups still travel to the entrance together.
@@ -364,6 +373,7 @@ node scripts/tour_temple.mjs    # screenshot tour of the Glimmermere and Drowned
 node scripts/mp_integration.mjs # API, WS, and persistence checks (server running)
 node scripts/social_e2e.mjs     # trade and duel over the wire (ALLOW_DEV_COMMANDS=1)
 node scripts/arena_visual.mjs   # two clients queue and fight a ranked 1v1
+node scripts/squad_visual.mjs   # several clients queue and play Thornhollow Fields 5v5 CTF (ALLOW_DEV_COMMANDS=1)
 node scripts/crypt_raid.mjs     # five bots clear the Hollow Crypt (ALLOW_DEV_COMMANDS=1)
 ```
 

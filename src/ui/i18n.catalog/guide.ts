@@ -45,6 +45,7 @@ export const guideStrings = {
     talents: 'Talents',
     arena: 'Arena & PvP',
     valeCup: 'Vale Cup',
+    thornhollow: 'Thornhollow Fields',
     deeds: 'Book of Deeds',
     glossary: 'Glossary',
     wishIKnew: 'Things I Wish I Knew',
@@ -1144,38 +1145,41 @@ export const guideStrings = {
     coliseumHeading: 'The Ashen Coliseum',
     coliseumBody:
       "The Coliseum is the realm's arena, where you face other players in ranked matches, one on one or two on two. Each bracket keeps its own standing, so a win lifts you up that ladder for the whole realm to see. Open the Arena window to sign up for a bracket, alone or with your partner.",
-    fiestaHeading: 'Two versus two Fiesta',
-    fiestaBody:
-      'Fiesta is a fast, two-on-two brawl fought as one continuous bout, with every fighter brought to an even footing. As the fight runs you draft augments, quick boosts that reshape your kit on the fly, so no two matches play quite the same.',
-    augmentsNote:
-      'Augments and power-ups last only for the match. They are about playful, on-the-spot builds, not lasting power, so nobody buys their way to a win.',
 
-    // The three escalating augment waves, named as flavor. No numbers, no exact effects.
-    wavesTitle: 'Augments arrive in waves',
-    wavesBody:
-      'A Fiesta bout hands you fresh picks as it goes, and the picks grow bolder the longer the fight runs. You build from one wave to the next, choosing one of a few options each time and keeping it for the rest of the bout.',
-    waveSilverTitle: 'Silver',
-    waveSilverBody:
-      'The opening wave: clean, single-stat boosts that sharpen the basics of your class.',
-    waveGoldTitle: 'Gold',
-    waveGoldBody:
-      'The middle wave: two-edged combos where your build starts to take shape and sing.',
-    wavePrismaticTitle: 'Prismatic',
-    wavePrismaticBody:
-      'The final wave: build-defining, screen-melting spikes meant to feel ridiculous in the best way.',
-
-    // The grab-in-the-ring power-ups, named as playful flavor.
-    yumiHeading: 'Protect Yumi',
-    yumiBody:
-      'Protect Yumi is a team objective mode played in a maze: each side guards its own cat familiar while hunting the other. Every so often both cats blink to new corners of the maze, so the fight swings between defending, hunting, and racing to find them again. Queue as three versus three or five versus five; falling in battle only benches you for a moment.',
-    powerupsTitle: 'Power-ups in the ring',
-    powerupsBody:
-      'Glowing orbs also drop into the arena mid-fight, free for whoever reaches them first. They are deliberately over the top and last only a short while: Speed Demon for a blink of blinding pace, Colossus to swell up into a lumbering giant, Moon Boots for a bouncing, low-gravity leap, and Berserker for a sudden surge of fury.',
     ladderHeading: 'Climbing the ladder',
     ladderBody:
       'Ranked play tracks your standing over time. Check the leaderboard to see where you sit and who holds the top of the realm.',
   },
 
+  // The Thornhollow Fields 5v5 capture-the-flag battleground page
+  // (docs/design/thornhollow-fields-lore.md). Spoiler-safe: the mode, the field,
+  // flags, wave respawns, runes, the ladder; no honor amounts, rating math, or
+  // tuning constants.
+  thornhollowPage: {
+    heading: 'Thornhollow Fields',
+    intro:
+      'A ranked 5v5 capture-the-flag battleground fought in a walled hollow in the old growth below Thornpeak, where two ruined keeps face each other down the length of a ravine and an older courtyard sits between them that neither has ever held. Two teams of five, two keeps, one goal: steal the enemy banner and run it home before they run yours.',
+    queueHeading: 'Queueing up',
+    queueBody:
+      'Open the Thornhollow Fields panel and enter the queue solo, or bring a party of up to five and queue together: parties are always kept on one team, and the remaining seats fill with solo champions. When ten stand ready, the match seats both teams at their keeps for a short form-up before the flags go live.',
+    fieldHeading: 'The field',
+    fieldBody:
+      "A walled, open-air field carved into three chambers: each team has its own field before its keep, and the walled Ruin Courtyard sits between them. Two curtain walls span the full width, and every move between chambers passes a contested crossing: the wide main gate, or the gatehouse, a small room straddling the wall whose offset doors force a jog past an ambush corner. Each keep is sealed except its mouth, so every flag run starts and ends through the same opening, and a low barricade breaks the straight charge into it. The courtyard holds the hollow heart ruin and the two flank Sprint Runes; the other two wait on the flag approaches. A Battle or Ward Rune (more damage dealt, or less damage taken, for a few seconds) waits at each main gate's courtyard mouth: both pads open the match on the same face and flip with every claim.",
+    flagsHeading: 'Flags',
+    flagsBody:
+      'Each keep holds its team flag. Take the enemy flag and carry it to your own stand to score; the first team to three captures wins, and a timed-out battle resolves on score. A slain carrier drops the flag where they fell: an enemy can take it up again, while its own team returns it home instantly just by reaching it. The flag also refuses to hide: picking it up breaks stealth, and a carrier who turns invisible by any means drops it on the spot.',
+    pickupNote:
+      'Picking a flag up is always a deliberate press of the battleground action key: nobody ever becomes the carrier by strafing through the wrong spot.',
+    respawnHeading: 'Falling in battle',
+    respawnBody:
+      "Death keeps the classic rite: your corpse lies where it fell until YOU release, and the spirit rises in the fenced graveyard beside your keep, warded there until your team's next respawn wave. The wave raises every waiting spirit together, and the two team waves are deliberately staggered, so the fight never fully resets at once. There is no corpse run and no Spirit Healer bargain: release, wait out the wave, fight.",
+    carrierHeading: 'Carrying the flag',
+    carrierBody:
+      'A carrier who holds the enemy flag too long grows more and more vulnerable, taking ever-increasing damage until the flag is captured, dropped, or returned. Hiding with the flag is a losing plan; running it home is the winning one.',
+    ladderHeading: 'The ladder',
+    ladderBody:
+      'Every match moves a persistent per-character battleground rating, win or lose, and the all-time board ranks the realm champions. Wins and hard-fought losses also pay Honor through the Warfare system.',
+  },
   // The Vale Cup boarball minigame page (docs/prd/vale-cup.md). Spoiler-safe:
   // lore, how to play, nations, roles; no kick powers, timers, or matchmaker
   // internals. Nation/role NAMES render from the shared hudChrome.vcup.* keys.

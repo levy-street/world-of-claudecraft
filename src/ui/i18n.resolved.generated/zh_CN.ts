@@ -950,6 +950,7 @@ export const zh_CN: EnTranslations = {
       "targetFriendlyNext": "切换友方目标",
       "discord": "Discord",
       "valecup": "溪谷杯",
+      "bgFlag": "战场夺旗动作",
       "sheathe": "收起/拔出武器",
       "categoryPet": "宠物",
       "petAttack": "宠物：攻击",
@@ -1026,6 +1027,93 @@ export const zh_CN: EnTranslations = {
       "timeout": "比赛失败",
       "progress": "障碍 {n} / {total}",
       "timeLeft": "{seconds}秒"
+    },
+    "pvp": {
+      "launcherTitle": "PvP",
+      "mobileLabel": "PvP",
+      "bracket1v1": "1v1",
+      "bracket2v2": "2v2"
+    },
+    "bg": {
+      "title": "荆谷原野",
+      "blurb": "两座废弃的要塞隔着棘峰阴影下的围墙山谷遥遥相望：绯红在南，蔚蓝在北，而两者之间的古老废墟庭院，谁都不曾真正占据。每方五人，各持一面战旗，先将对方战旗夺回本方三次者赢得战场。",
+      "modeTag": "5v5夺旗战",
+      "offlineNote": "荆谷原野正在同步。待王国响应后即可排队。",
+      "ratingSummary": "评分。{wins}胜 / {losses}负",
+      "careerCaptures": "生涯夺旗:{count}",
+      "enterQueue": "加入队列",
+      "enterQueueParty": "加入队列({count}人小队)",
+      "leaveQueue": "离开队列",
+      "searching": "搜索中。队列 {count}/{size}。",
+      "queuedParty": "{count}人小队。",
+      "queueNote": "两队各五人。夺取敌方军旗并送回己方要塞。先夺得3次者获胜。可组满5人小队一同排队;拾取疾行符文,并利用掩体甩开追兵。",
+      "matchInProgress": "战斗进行中。{crimson}:{azure}。",
+      "ladderAllTime": "天梯。历史总榜",
+      "noRanked": "尚无勇士上榜。争当第一。",
+      "ladderOnline": "天梯。当前在线",
+      "noChallengers": "当前没有勇士在线。争当第一。",
+      "playerLevelClassTitle": "{name}。{level}级{className}",
+      "playerClassTitle": "{name}。{className}",
+      "crimson": "赤红队",
+      "azure": "蔚蓝队",
+      "yourTeamTitle": "你的队伍",
+      "clock": "{minutes}:{seconds}",
+      "formUp": "列队:{seconds}",
+      "firstTo": "先夺得{caps}次旗帜",
+      "flagState": {
+        "home": "旗帜在要塞",
+        "carried": "旗帜被夺!",
+        "dropped": "旗帜落地"
+      },
+      "respawnIn": "下一波:{seconds}秒后复活",
+      "resultVictory": "胜利!",
+      "resultDefeat": "战败",
+      "resultDraw": "平局",
+      "leavingIn": "{seconds}秒后离开战场",
+      "killFeed": "{killer}击杀了{victim}",
+      "killFeedFallen": "{victim}倒下了",
+      "foundBanner": "战斗已就绪。你为{team}而战!",
+      "countdownBanner": "荆谷原野{seconds}秒后开战",
+      "startBanner": "夺取旗帜!",
+      "flagTakenLog": "{name}夺走了{team}的旗帜!",
+      "flagDroppedLog": "{team}的旗帜掉落了。",
+      "flagReturnedLog": "{team}的旗帜已归还。",
+      "dropFlagConfirmTitle": "丢下旗帜？",
+      "dropFlagConfirmBody": "你正携带敌方旗帜。丢下后旗帜会留在地上，双方都可以拾取。",
+      "dropFlagConfirmAccept": "丢下旗帜",
+      "boardToggleLabel": "比赛记分板。按回车键固定展开完整榜单。",
+      "levelRequirement": "你需要达到{level}级才能解锁此战场的排队。",
+      "board": {
+        "kills": "击杀",
+        "assists": "助攻",
+        "deaths": "死亡",
+        "captures": "夺旗"
+      },
+      "flagTakenBanner": "{takers}夺走了{team}的旗帜!",
+      "flagReturnedBanner": "{team}的旗帜已归还!",
+      "capturedTeamBanner": "{takers}夺取了{team}的旗帜!{crimson}:{azure}",
+      "capturedLog": "{name}夺取了{team}的旗帜。比分{crimson}:{azure}。",
+      "victoryBanner": "胜利!荆谷原野{crimson}:{azure}。评分{rating}({delta})",
+      "defeatBanner": "战败。荆谷原野{crimson}:{azure}。评分{rating}({delta})",
+      "drawBanner": "荆谷原野平局{crimson}:{azure}。评分{rating}({delta})",
+      "endBannerDetail": "荆谷原野{crimson}:{azure}。评分{rating}({delta})",
+      "endLog": "荆谷原野结束,{crimson}:{azure}。评分{rating}({delta})。",
+      "endedTimer": "时间到",
+      "endedForfeit": "本场比赛以弃权告终",
+      "endedTimerLog": "比赛时间耗尽,由比分较高的一方拿下战场。",
+      "endedForfeitLog": "本场比赛以弃权告终。",
+      "firstWinBonusLine": "每日首胜:+{honor}荣誉",
+      "firstWinBonusLog": "每日首胜:你额外获得{honor}点荣誉。",
+      "timeWarningMinutes": "还剩{minutes}分钟",
+      "timeWarningOneMinute": "还剩一分钟",
+      "timeWarningMinutesLog": "本场战斗还剩{minutes}分钟。",
+      "timeWarningOneMinuteLog": "本场战斗还剩一分钟。",
+      "map": {
+        "crimsonKeep": "绯红要塞",
+        "azureKeep": "蔚蓝要塞",
+        "ruinCourtyard": "废墟庭院",
+        "graveyard": "墓地"
+      }
     },
     "vcup": {
       "title": "溪谷杯",
@@ -1392,13 +1480,24 @@ export const zh_CN: EnTranslations = {
       "dualPrice": "{money} + {honor}",
       "balance": "荣誉：{amount}",
       "honorFloat": "+{amount} 荣誉",
+      "honorFloatReason": "+{amount} 荣誉（{reason}）",
       "honorGain": "你获得了 {amount} 点荣誉（{reason}）。",
       "notEnoughHonor": "荣誉不足。",
       "reasons": {
         "arenaWin": "竞技场胜利",
         "fiestaKill": "嘉年华击倒",
         "fiestaComplete": "完成嘉年华",
-        "fiestaWin": "嘉年华胜利"
+        "fiestaWin": "嘉年华胜利",
+        "battlegroundWin": "荆谷原野胜利",
+        "battlegroundFirstWin": "荆谷原野每日首胜",
+        "battlegroundComplete": "荆谷原野参战",
+        "battlegroundKill": "荣誉击杀",
+        "battlegroundAssist": "助攻击杀"
+      },
+      "floatReasons": {
+        "kill": "击杀",
+        "assist": "助攻",
+        "firstWin": "首胜"
       }
     },
     "charSheet": {
@@ -1816,6 +1915,7 @@ export const zh_CN: EnTranslations = {
       "dmgDoneReduce": "造成的伤害降低 {pct}%",
       "heatingUp": "你的下一个火焰生成技能若连续造成暴击，会获得炽热连击；未造成暴击则移除热力迸发",
       "elementalConvergencePrimed": "你的下一个不同元素学派法术将触发元素汇聚",
+      "carriedFlag": "你正携带敌方旗帜。取消该增益即可丢下旗帜。",
       "battleStance": "战斗姿态：怒气产生提高 10%",
       "berserkerStance": "狂暴姿态：暴击几率提高 3%，暴击伤害提高 3%",
       "crit": "暴击几率提高 {pct}%",
@@ -2392,10 +2492,6 @@ export const zh_CN: EnTranslations = {
           "title": "集市日",
           "note": "商人正等着新货。今天很适合逛逛世界市场。"
         },
-        "fiestaNight": {
-          "title": "狂欢之夜",
-          "note": "今晚 2v2 狂欢擂台的人气最旺。"
-        },
         "arenaClash": {
           "title": "竞技场之战",
           "note": "决斗者涌向灰烬斗兽场。排队开打，向天梯进发。"
@@ -2632,6 +2728,18 @@ export const zh_CN: EnTranslations = {
         "gatherersCache": "采集者储囊",
         "artisansEye": "匠人之眼",
         "quickeningCharm": "回春符"
+      },
+      "toolEffectTooltip": {
+        "kind": "工具符咒",
+        "bonus": {
+          "gatherersCache": "充能期间每次采集产出+1。",
+          "artisansEye": "充能期间将收获品级提升1个工具等级。",
+          "quickeningCharm": "缩短其触发的资源节点重生计时。"
+        },
+        "howToSlot": "在专业窗口中将其镶嵌到采矿、伐木或草药学工具上。镶嵌后即消耗。",
+        "charges": "普通品质工具初始有{base}次充能（稀有度每升一级+{bonus}次）。",
+        "landOnly": "无法镶嵌到鱼竿上。",
+        "openProfessions": "打开专业窗口，将其镶嵌到采集工具上。"
       },
       "toolEffectSlotButton": "镶嵌{effect}",
       "toolEffectRechargeButton": "充能",
@@ -3208,6 +3316,7 @@ export const zh_CN: EnTranslations = {
       "talents": "天赋",
       "arena": "竞技场与 PvP",
       "valeCup": "溪谷杯",
+      "thornhollow": "荆谷原野",
       "deeds": "功绩之书",
       "glossary": "术语表",
       "wishIKnew": "我希望早点知道的事",
@@ -3978,23 +4087,25 @@ export const zh_CN: EnTranslations = {
       "duelsBody": "可以向你遇到的任何玩家发起一场友好的决斗。除了荣誉，没有任何东西被押上，因此这是了解某种对局，或友好地一较高下的最简单方式。",
       "coliseumHeading": "灰烬角斗场",
       "coliseumBody": "斗技场是王国的竞技场，你将在排名赛中对阵其他玩家，一对一或二对二皆可。每个组别都各自记录排名，因此一场胜利便能让你在那条天梯上攀升，让全王国的人都看得见。打开竞技场窗口，即可独自或与你的搭档一同报名参加某个组别。",
-      "fiestaHeading": "二对二嘉年华",
-      "fiestaBody": "嘉年华是一种快节奏的二对二混战，以一场连续不断的对局进行，每位战斗者都被拉到同一起跑线上。随着战斗推进，你会选取增幅，即时重塑你套路的快速强化，因此没有哪两场比赛的玩法会完全相同。",
-      "augmentsNote": "增幅和强化只在本场比赛中有效。它们关乎的是趣味、即兴的临场构筑，而非长久的强势，因此没人能靠花钱赢得胜利。",
-      "wavesTitle": "增幅分波登场",
-      "wavesBody": "嘉年华的每一场对局都会随着进程递给你全新的选择，比赛持续得越久，可选的强化就愈发大胆。你从一波构筑到下一波，每次从寥寥几个选项中挑选其一，并在这场对局余下的时间里一直保留它。",
-      "waveSilverTitle": "白银",
-      "waveSilverBody": "开场一波：干净利落的单项属性提升，磨砺你职业的基本功。",
-      "waveGoldTitle": "黄金",
-      "waveGoldBody": "中段一波：双刃组合，你的构筑在此开始成型、绽放光彩。",
-      "wavePrismaticTitle": "棱彩",
-      "wavePrismaticBody": "最后一波：足以定义构筑、炸裂屏幕的爆发，意在以最酣畅淋漓的方式让你直呼离谱。",
-      "yumiHeading": "守护Yumi",
-      "yumiBody": "Protect Yumi是一种在迷宫中进行的团队目标模式：每队守护自己的猫咪使魔，同时猎杀对方的。两只猫咪会不时闪现到迷宫的新角落，战斗在防守、追猎与寻回之间不断摇摆。可选择3对3或5对5排队；阵亡只会让你短暂离场。",
-      "powerupsTitle": "竞技场中的强化道具",
-      "powerupsBody": "激战正酣时，发光的能量球还会落入竞技场，谁先抢到便归谁。它们刻意夸张到极致，且只持续片刻：极速恶魔让你瞬间快得令人目眩，巨像将你膨胀成步履蹒跚的庞然大物，月靴带来低重力的弹跳腾跃，狂战士则让你猛然涌起一股暴怒。",
       "ladderHeading": "攀登天梯",
       "ladderBody": "排名对战会长期追踪你的排名。查看排行榜，看看你身处何处，以及谁占据着这片位面的榜首。"
+    },
+    "thornhollowPage": {
+      "heading": "荆谷原野",
+      "intro": "一场排位 5v5 夺旗战场，战场位于棘峰之下老林中的围墙山谷：两座废弃要塞沿着峡谷两端遥遥相对，中间是一座更古老的庭院，谁都不曾真正占据。每方五人，两座要塞，一个目标：夺走敌方战旗并抢在对方之前带回家。",
+      "queueHeading": "排队参战",
+      "queueBody": "打开荆谷原野面板即可单人排队,也可以组一支最多五人的小队一同排队:小队总在同一边,空位由单人勇士补齐。十人就位后,比赛会把双方安置在各自要塞,短暂列队后旗帜生效。",
+      "fieldHeading": "战场地形",
+      "fieldBody": "一片有围墙的露天战场,被隔成三个区域:两队各自的前场,以及夹在中间的废墟中庭。两道横贯全场的隔墙划出边界,穿行区域之间必须经过争夺点:宽阔的正门,或是骑跨在隔墙上的门楼小屋,其错位的两扇门逼你绕过伏击死角。每座要塞除正门外全部封死,夺旗进出只有这一个口;正门前还有一道矮壁垒挡住直冲的路线。中庭里有空心的中央废墟与两枚侧翼疾行符文,另外两枚守在两旗的接近路上。每个正门的中庭入口处还有一枚战斗或守护符文(短时间内提升伤害或减免伤害):两个符文台开局同面,每次拾取后翻面。",
+      "flagsHeading": "旗帜",
+      "flagsBody": "每座要塞守着本队军旗。夺取敌旗并送到己方旗座即可得分;先夺得三次者获胜,超时的战斗按比分定胜负。旗手阵亡时旗帜就地掉落:敌人可以再次拾起,而本队队员只需靠近便能立即将其送回。军旗也绝不藏身:拾旗会解除潜行,旗手若以任何方式隐身,旗帜都会当场掉落。",
+      "pickupNote": "拾旗永远需要主动按下战场动作键:没有人会因为跑过旗帜而意外成为旗手。",
+      "respawnHeading": "战场阵亡",
+      "respawnBody": "死亡保留经典仪式:尸体停在原地,直到你亲自释放灵魂;灵魂会在你方主堡旁的围栏墓地中升起,并被结界束缚,直到你方下一波复活潮。复活潮会同时唤起所有等待的灵魂;两队的复活潮刻意错开,战斗永远不会同时完全重置。这里没有跑尸,也没有灵魂医者的交易:释放、等潮、再战。",
+      "carrierHeading": "扛旗",
+      "carrierBody": "扛着敌旗太久的旗手会越来越脆弱,承受的伤害持续增加,直到旗帜被夺回、掉落或归还。抱旗躲藏是败招;把旗送回家才是胜途。",
+      "ladderHeading": "天梯",
+      "ladderBody": "每场比赛无论胜负都会移动角色的战场评分,历史总榜记录王国的冠军。胜利与鏖战到底的失利也会通过战争体系发放荣誉。"
     },
     "valeCupPage": {
       "heading": "溪谷杯",
@@ -5882,7 +5993,6 @@ export const zh_CN: EnTranslations = {
   "yumi": {
     "bracket3": "Yumi 3v3",
     "bracket5": "Yumi 5v5",
-    "enterQueue": "加入Protect Yumi！",
     "queue": {
       "join": "你加入了Protect Yumi队列。守好你的使魔……",
       "leave": "你离开了Protect Yumi队列。",
@@ -5920,9 +6030,6 @@ export const zh_CN: EnTranslations = {
   },
   "fiesta": {
     "bracket": "Fiesta",
-    "enterQueue": "加入Fiesta！",
-    "practice": "🎉 对战机器人练习",
-    "practiceNote": "离线练习：生成3个AI机器人并将你排入2v2 Fiesta队列。再次点击即可停止。",
     "banner": {
       "wave": "第{wave}/{total}波——选择一项强化！",
       "augmentGained": "获得强化：{name}！",
@@ -6404,7 +6511,6 @@ export const zh_CN: EnTranslations = {
       "mobileMore": "更多",
       "mobileMoreAria": "显示更多菜单",
       "mobileSocial": "社交",
-      "mobileArena": "竞技场",
       "mobileMenu": "菜单",
       "mobileSettings": "设置",
       "mobileUse": "使用",
@@ -6521,7 +6627,7 @@ export const zh_CN: EnTranslations = {
         "nameplates": "切换姓名板",
         "meters": "伤害统计",
         "social": "好友与公会",
-        "arena": "竞技场（灰烬斗技场）",
+        "arena": "PvP(荆谷原野与竞技场)",
         "chat": "打开聊天",
         "attack": "攻击",
         "actionBarSlot": "动作条 {slot}"

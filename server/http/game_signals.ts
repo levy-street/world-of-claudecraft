@@ -25,6 +25,7 @@
 // harvest band vocabulary). Nothing per-player and nothing per-GUILD (account
 // id, character id, guild id, name, ip) is ever passed as a label.
 
+import type { BgCompositionLabel, BgEndCauseLabel } from '../battleground_telemetry';
 import type { CopperFlowSource, HarvestBand, HarvestTier } from '../economy_telemetry';
 import type { FishingBandLabel } from '../fishing_telemetry';
 
@@ -214,6 +215,23 @@ export interface GameMetricsCounters {
    * multiplication and cannot drift from what the trainer actually charges.
    */
   rodFeePaid(recipeId: string): void;
+  /**
+   * One RESOLVED RATED Thornhollow Fields match, with the numbers BG_CAPS_TO_WIN
+   * is tuned against: how it ended, whether a premade was seated, how long the
+   * active phase ran, and the two final scores. Called ONCE per match (the sim
+   * writes one drained record per resolve, never one per fighter), and never for
+   * a /dev force-started unrated match, which is deliberately asymmetric.
+   *
+   * `durationSec` is elapsed ACTIVE seconds, so a match forfeited during form-up
+   * contributes a real zero rather than a negative or a countdown value.
+   */
+  battlegroundResolved(
+    cause: BgEndCauseLabel,
+    composition: BgCompositionLabel,
+    durationSec: number,
+    scoreCrimson: number,
+    scoreAzure: number,
+  ): void;
 }
 
 /** A sink that drops every signal; the slot default until boot wires the real one. */
@@ -233,6 +251,7 @@ export const noopGameMetricsCounters: GameMetricsCounters = {
   fishingGotAway() {},
   fishingEmptyHook() {},
   rodFeePaid() {},
+  battlegroundResolved() {},
 };
 
 let activeCounters: GameMetricsCounters = noopGameMetricsCounters;

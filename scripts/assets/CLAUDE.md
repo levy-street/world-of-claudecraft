@@ -28,6 +28,11 @@ For reference-image reconstruction and procedural GLB authoring, read the living
 - **`build_foliage.mjs`** is a superset for `foliage.json`: adds `weld + simplify`
   (target `ratio`), strips constant-white `COLOR_0`, and hue-rotates leaf textures
   via `recolor` rules. Use this only for foliage.
+- **`build_battleground_map.mjs`** (+ `battleground/`, own CLAUDE.md) builds the Thornhollow Fields
+  field's map document from the combat plan plus the Thornhollow art kit, and
+  `compile_thornhollow.mjs` compiles that document into `src/sim/thornhollow_field.generated.ts`.
+  Both are deterministic and both committed artifacts are freshness-gated by
+  `tests/battleground_band.test.ts`: re-run BOTH after any edit under `battleground/`.
 - **`compress_glb_textures.mjs` is the mandatory FINAL step after ANY exporter run.**
   Every embedded texture in a shipped GLB is KTX2/Basis (`KHR_texture_basisu`) so it
   stays GPU-compressed in memory instead of decoding to a full RGBA bitmap (the decode

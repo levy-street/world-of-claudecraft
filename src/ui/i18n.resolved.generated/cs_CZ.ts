@@ -950,6 +950,7 @@ export const cs_CZ: EnTranslations = {
       "targetFriendlyNext": "Procházet spojenecké cíle",
       "discord": "Discord",
       "valecup": "Pohár údolí",
+      "bgFlag": "Battleground Flag Action",
       "sheathe": "Zasunout/Vytasit zbraň",
       "categoryPet": "Mazlíček",
       "petAttack": "Mazlíček: Útok",
@@ -1026,6 +1027,93 @@ export const cs_CZ: EnTranslations = {
       "timeout": "Závod selhal",
       "progress": "Brány {n} z {total}",
       "timeLeft": "{seconds} s"
+    },
+    "pvp": {
+      "launcherTitle": "PvP",
+      "mobileLabel": "PvP",
+      "bracket1v1": "1v1",
+      "bracket2v2": "2v2"
+    },
+    "bg": {
+      "title": "Thornhollow Fields",
+      "blurb": "Two ruined keeps face each other across a walled hollow in the shadow of Thornpeak: Crimson to the south, Azure to the north, and the older Ruin Courtyard between them that neither has ever held. Five a side, one banner each, and the first to carry three of theirs home takes the field.",
+      "modeTag": "5v5 Capture the Flag",
+      "offlineNote": "Thornhollow Fields is syncing. The queue opens once the realm answers.",
+      "ratingSummary": "Rating. {wins} wins / {losses} losses",
+      "careerCaptures": "Career captures: {count}",
+      "enterQueue": "Enter the Queue",
+      "enterQueueParty": "Enter the Queue (party of {count})",
+      "leaveQueue": "Leave Queue",
+      "searching": "Searching. {count}/{size} in queue.",
+      "queuedParty": "Party of {count}.",
+      "queueNote": "Two teams of five. Steal the enemy banner and run it to your keep. First to 3 captures wins. Group up to 5 and queue together; grab Sprint Runes and weave the cover to lose your pursuers.",
+      "matchInProgress": "Battle in progress. {crimson}:{azure}.",
+      "ladderAllTime": "Ladder. All-Time",
+      "noRanked": "No champions ranked yet. Be the first.",
+      "ladderOnline": "Ladder. Online Now",
+      "noChallengers": "No champions online right now. Be the first.",
+      "playerLevelClassTitle": "{name}. Level {level} {className}",
+      "playerClassTitle": "{name}. {className}",
+      "crimson": "Crimson",
+      "azure": "Azure",
+      "yourTeamTitle": "Your team",
+      "clock": "{minutes}:{seconds}",
+      "formUp": "Form up: {seconds}",
+      "firstTo": "First to {caps} captures",
+      "flagState": {
+        "home": "Flag at the keep",
+        "carried": "Flag stolen!",
+        "dropped": "Flag on the ground"
+      },
+      "respawnIn": "Next wave: respawning in {seconds}",
+      "resultVictory": "Victory!",
+      "resultDefeat": "Defeat",
+      "resultDraw": "Draw",
+      "leavingIn": "Leaving the battleground in {seconds}",
+      "killFeed": "{killer} felled {victim}",
+      "killFeedFallen": "{victim} has fallen",
+      "foundBanner": "Battle found. You fight for the {team}!",
+      "countdownBanner": "Thornhollow Fields begins in {seconds}",
+      "startBanner": "Capture the flag!",
+      "flagTakenLog": "{name} has taken the {team} flag!",
+      "flagDroppedLog": "The {team} flag was dropped.",
+      "flagReturnedLog": "The {team} flag was returned.",
+      "dropFlagConfirmTitle": "Drop the flag?",
+      "dropFlagConfirmBody": "You are carrying the enemy flag. Dropping it leaves it on the ground, where either team can reach it.",
+      "dropFlagConfirmAccept": "Drop the flag",
+      "boardToggleLabel": "Match scoreboard. Press Enter to pin the full board open.",
+      "levelRequirement": "You must reach level {level} to unlock queueing for this battleground.",
+      "board": {
+        "kills": "Kills",
+        "assists": "Assists",
+        "deaths": "Deaths",
+        "captures": "Captures"
+      },
+      "flagTakenBanner": "The {takers} have taken the {team} flag!",
+      "flagReturnedBanner": "The {team} flag was returned!",
+      "capturedTeamBanner": "The {takers} have captured the {team} flag! {crimson}:{azure}",
+      "capturedLog": "{name} captured the {team} flag. Score {crimson}:{azure}.",
+      "victoryBanner": "Victory! Thornhollow Fields {crimson}:{azure}. Rating {rating} ({delta})",
+      "defeatBanner": "Defeat. Thornhollow Fields {crimson}:{azure}. Rating {rating} ({delta})",
+      "drawBanner": "Thornhollow Fields draw {crimson}:{azure}. Rating {rating} ({delta})",
+      "endBannerDetail": "Thornhollow Fields {crimson}:{azure}. Rating {rating} ({delta})",
+      "endLog": "Thornhollow Fields ended {crimson}:{azure}. Rating {rating} ({delta}).",
+      "endedTimer": "Time expired",
+      "endedForfeit": "The match was forfeited",
+      "endedTimerLog": "The match clock ran out; the higher score took the field.",
+      "endedForfeitLog": "The match was forfeited.",
+      "firstWinBonusLine": "First win of the day: +{honor} Honor",
+      "firstWinBonusLog": "First win of the day: you gain {honor} bonus Honor.",
+      "timeWarningMinutes": "{minutes} minutes remain",
+      "timeWarningOneMinute": "One minute remains",
+      "timeWarningMinutesLog": "{minutes} minutes remain in the battle.",
+      "timeWarningOneMinuteLog": "One minute remains in the battle.",
+      "map": {
+        "crimsonKeep": "Crimson Keep",
+        "azureKeep": "Azure Keep",
+        "ruinCourtyard": "The Ruin Courtyard",
+        "graveyard": "Graveyard"
+      }
     },
     "vcup": {
       "title": "Pohár údolí",
@@ -1392,13 +1480,24 @@ export const cs_CZ: EnTranslations = {
       "dualPrice": "{money} + {honor}",
       "balance": "Čest: {amount}",
       "honorFloat": "+{amount} cti",
+      "honorFloatReason": "+{amount} Honor ({reason})",
       "honorGain": "Získáváš {amount} cti ({reason}).",
       "notEnoughHonor": "Nemáš dost cti.",
       "reasons": {
         "arenaWin": "Vítězství v aréně",
         "fiestaKill": "Vyřazení ve Fiestě",
         "fiestaComplete": "Dokončení Fiesty",
-        "fiestaWin": "Vítězství ve Fiestě"
+        "fiestaWin": "Vítězství ve Fiestě",
+        "battlegroundWin": "Thornhollow Fields victory",
+        "battlegroundFirstWin": "first Thornhollow Fields win today",
+        "battlegroundComplete": "Thornhollow Fields battle fought",
+        "battlegroundKill": "honorable kill",
+        "battlegroundAssist": "killing blow assisted"
+      },
+      "floatReasons": {
+        "kill": "Kill",
+        "assist": "Assist",
+        "firstWin": "First Win"
       }
     },
     "charSheet": {
@@ -1816,6 +1915,7 @@ export const cs_CZ: EnTranslations = {
       "dmgDoneReduce": "Snižuje způsobené poškození o {pct} %",
       "heatingUp": "Tvůj příští po sobě jdoucí kritický zásah stavebního ohnivého kouzla udělí Žhavou sérii; nekritický stavební útok Rozehřívání odstraní",
       "elementalConvergencePrimed": "Tvoje příští kouzlo z jiné živlové školy udělí Živlovou konvergenci",
+      "carriedFlag": "You are carrying the enemy flag. Cancel this buff to drop it.",
       "battleStance": "Bojový postoj: o 10 % vyšší generování vzteku",
       "berserkerStance": "Postoj berserka: kritické zásahy o 3 % častěji a o 3 % tvrdší",
       "crit": "Zvyšuje šanci na kritický zásah o {pct} %",
@@ -2392,10 +2492,6 @@ export const cs_CZ: EnTranslations = {
           "title": "Tržní den",
           "note": "Obchodník čeká čerstvé zásoby. Skvělý den pro procházení Světového trhu."
         },
-        "fiestaNight": {
-          "title": "Fiesta noc",
-          "note": "Kruh 2v2 Fiesty dnes večer přitahuje nejhlasitější davy."
-        },
         "arenaClash": {
           "title": "Střet v aréně",
           "note": "Duelisté míří do Popelavého kolosea. Zařaď se do fronty a stoupej v žebříčku."
@@ -2632,6 +2728,18 @@ export const cs_CZ: EnTranslations = {
         "gatherersCache": "Sběračova skrýš",
         "artisansEye": "Řemeslníkovo oko",
         "quickeningCharm": "Odpružení"
+      },
+      "toolEffectTooltip": {
+        "kind": "Tool charm",
+        "bonus": {
+          "gatherersCache": "+1 yield per harvest while charged.",
+          "artisansEye": "Raises the harvest grade by 1 tool tier while charged.",
+          "quickeningCharm": "Shortens the node respawn timer it triggers."
+        },
+        "howToSlot": "Slot onto a mining, logging, or herbalism tool from the Professions window. Consumed when slotted.",
+        "charges": "Starts with {base} charges on a common tool (+{bonus} per rarity rung).",
+        "landOnly": "Does not slot on fishing rods.",
+        "openProfessions": "Open Professions to slot this onto a gathering tool."
       },
       "toolEffectSlotButton": "Vložit {effect}",
       "toolEffectRechargeButton": "Dobít",
@@ -3208,6 +3316,7 @@ export const cs_CZ: EnTranslations = {
       "talents": "Talenty",
       "arena": "Aréna a PvP",
       "valeCup": "Pohár údolí",
+      "thornhollow": "Thornhollow Fields",
       "deeds": "Kniha skutků",
       "glossary": "Glosář",
       "wishIKnew": "Co bych rád věděl dřív",
@@ -3978,23 +4087,25 @@ export const cs_CZ: EnTranslations = {
       "duelsBody": "Vyzvi libovolného hráče, kterého potkáš, na přátelský duel. V sázce je jen hrdost, takže je to nejsnazší cesta, jak se naučit matchup nebo vyřešit přátelskou hádku.",
       "coliseumHeading": "Popelavé koloseum",
       "coliseumBody": "Koloseum je aréna světa, kde čelíš ostatním hráčům v hodnocených zápasech jeden na jednoho nebo dva na dva. Každý bracket má vlastní pořadí, takže výhra tě v jeho žebříku posune pro celý svět. Otevři okno Arény a přihlas se do bracketu, sám nebo se svým partnerem.",
-      "fiestaHeading": "Fiesta dva na dva",
-      "fiestaBody": "Fiesta je rychlá řež dva na dva hraná jako jeden souvislý souboj, kde jsou všichni bojovníci postaveni na stejnou startovní čáru. Jak boj běží, draftuješ augmenty, rychlá posílení, která za běhu přetvarují tvůj kit, takže žádné dva zápasy nehrají stejně.",
-      "augmentsNote": "Augmenty a power-upy trvají jen pro zápas. Jsou o hravých, okamžitých buildech, ne o trvalé síle, takže si nikdo nekoupí cestu k výhře.",
-      "wavesTitle": "Augmenty přicházejí ve vlnách",
-      "wavesBody": "Souboj Fiesty ti podává čerstvé volby, jak běží, a volby jsou s délkou boje odvážnější. Stavíš od jedné vlny k další, pokaždé vybíráš jednu z několika možností a necháváš si ji do konce souboje.",
-      "waveSilverTitle": "Stříbrná",
-      "waveSilverBody": "Úvodní vlna: čistá posílení jedné statistiky, která zostří základy třídy.",
-      "waveGoldTitle": "Zlatá",
-      "waveGoldBody": "Prostřední vlna: dvousečné kombinace, kde se build začíná tvarovat a zpívat.",
-      "wavePrismaticTitle": "Prizmatická",
-      "wavePrismaticBody": "Závěrečná vlna: build určující, obrazovku tavící špičky, které mají působit směšně tím nejlepším způsobem.",
-      "yumiHeading": "Ochraňte Yumi",
-      "yumiBody": "Ochraňte Yumi je týmový objektivní režim, který se hraje v bludišti: každá strana hlídá svého vlastního kočičího společníka a zároveň loví toho druhého. Čas od času se obě kočky přenesou do nových koutů bludiště, takže se boj přelévá mezi obranou, lovem a závodem o to, kdo je najde dřív. Zařaď se do fronty jako tři na tři nebo pět na pět; pád v boji tě odstaví jen na okamžik.",
-      "powerupsTitle": "Power-upy v ringu",
-      "powerupsBody": "Do arény během boje padají také zářící orby, volné pro toho, kdo k nim doběhne první. Záměrně přehánějí a trvají jen krátce: Rychlostní démon pro záblesk oslepujícího tempa, Kolos pro nabobtnání v těžkopádného obra, Měsíční boty pro skákavý skok s nízkou gravitací a Berserker pro náhlý příval zuřivosti.",
       "ladderHeading": "Stoupání po žebříku",
       "ladderBody": "Hodnocené hraní sleduje tvoje postavení v čase. Podívej se na žebříček, kde sedíš a kdo drží vrchol světa."
+    },
+    "thornhollowPage": {
+      "heading": "Thornhollow Fields",
+      "intro": "A ranked 5v5 capture-the-flag battleground fought in a walled hollow in the old growth below Thornpeak, where two ruined keeps face each other down the length of a ravine and an older courtyard sits between them that neither has ever held. Two teams of five, two keeps, one goal: steal the enemy banner and run it home before they run yours.",
+      "queueHeading": "Queueing up",
+      "queueBody": "Open the Thornhollow Fields panel and enter the queue solo, or bring a party of up to five and queue together: parties are always kept on one team, and the remaining seats fill with solo champions. When ten stand ready, the match seats both teams at their keeps for a short form-up before the flags go live.",
+      "fieldHeading": "The field",
+      "fieldBody": "A walled, open-air field carved into three chambers: each team has its own field before its keep, and the walled Ruin Courtyard sits between them. Two curtain walls span the full width, and every move between chambers passes a contested crossing: the wide main gate, or the gatehouse, a small room straddling the wall whose offset doors force a jog past an ambush corner. Each keep is sealed except its mouth, so every flag run starts and ends through the same opening, and a low barricade breaks the straight charge into it. The courtyard holds the hollow heart ruin and the two flank Sprint Runes; the other two wait on the flag approaches. A Battle or Ward Rune (more damage dealt, or less damage taken, for a few seconds) waits at each main gate's courtyard mouth: both pads open the match on the same face and flip with every claim.",
+      "flagsHeading": "Flags",
+      "flagsBody": "Each keep holds its team flag. Take the enemy flag and carry it to your own stand to score; the first team to three captures wins, and a timed-out battle resolves on score. A slain carrier drops the flag where they fell: an enemy can take it up again, while its own team returns it home instantly just by reaching it. The flag also refuses to hide: picking it up breaks stealth, and a carrier who turns invisible by any means drops it on the spot.",
+      "pickupNote": "Picking a flag up is always a deliberate press of the battleground action key: nobody ever becomes the carrier by strafing through the wrong spot.",
+      "respawnHeading": "Falling in battle",
+      "respawnBody": "Death keeps the classic rite: your corpse lies where it fell until YOU release, and the spirit rises in the fenced graveyard beside your keep, warded there until your team's next respawn wave. The wave raises every waiting spirit together, and the two team waves are deliberately staggered, so the fight never fully resets at once. There is no corpse run and no Spirit Healer bargain: release, wait out the wave, fight.",
+      "carrierHeading": "Carrying the flag",
+      "carrierBody": "A carrier who holds the enemy flag too long grows more and more vulnerable, taking ever-increasing damage until the flag is captured, dropped, or returned. Hiding with the flag is a losing plan; running it home is the winning one.",
+      "ladderHeading": "The ladder",
+      "ladderBody": "Every match moves a persistent per-character battleground rating, win or lose, and the all-time board ranks the realm champions. Wins and hard-fought losses also pay Honor through the Warfare system."
     },
     "valeCupPage": {
       "heading": "Pohár údolí",
@@ -5882,7 +5993,6 @@ export const cs_CZ: EnTranslations = {
   "yumi": {
     "bracket3": "Yumi 3 na 3",
     "bracket5": "Yumi 5 na 5",
-    "enterQueue": "Zapoj se do Ochraňte Yumi!",
     "queue": {
       "join": "Vstupuješ do fronty Ochraňte Yumi. Hlídej svého společníka…",
       "leave": "Opouštíš frontu Ochraňte Yumi.",
@@ -5920,9 +6030,6 @@ export const cs_CZ: EnTranslations = {
   },
   "fiesta": {
     "bracket": "Fiesta",
-    "enterQueue": "Připojit se k Fiestě!",
-    "practice": "Trénink proti botům",
-    "practiceNote": "Offline trénink: vytvoří 3 AI boty a zařadí tě do 2v2 Fiesty. Klikni znovu pro zastavení.",
     "banner": {
       "wave": "VLNA {wave}/{total} - VYBER VYLEPŠENÍ!",
       "augmentGained": "Získáno vylepšení: {name}!",
@@ -6404,7 +6511,6 @@ export const cs_CZ: EnTranslations = {
       "mobileMore": "Více",
       "mobileMoreAria": "Zobrazit další menu",
       "mobileSocial": "Sociální",
-      "mobileArena": "Aréna",
       "mobileMenu": "Menu",
       "mobileSettings": "Nastavení",
       "mobileUse": "Použít",
@@ -6521,7 +6627,7 @@ export const cs_CZ: EnTranslations = {
         "nameplates": "Přepnout jmenovky",
         "meters": "Měřiče poškození",
         "social": "Přátelé a cech",
-        "arena": "Aréna (Popelavé koloseum)",
+        "arena": "PvP (Thornhollow Fields and Arenas)",
         "chat": "Otevřít chat",
         "attack": "Útok",
         "actionBarSlot": "Akční lišta {slot}"

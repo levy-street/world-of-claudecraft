@@ -135,6 +135,11 @@ function makeCtx() {
     yumiCatDamaged: vi.fn(),
     cleanupYumiMatch: vi.fn(),
     nextArenaMatchId: 1,
+    bgQueue: [],
+    bgMatches: new Map(),
+    bgBusySlots: new Set(),
+    bgOutcomes: [],
+    nextBgMatchId: 1,
     delveRuns: [],
     delvePetStash: new Map(),
     utcDay: '',
@@ -390,6 +395,11 @@ function makeCtx() {
     vcupShoot: vi.fn(),
     vcupSportDash: vi.fn(),
     vcupSportShove: vi.fn(),
+    // Thornhollow Fields battleground hooks.
+    bgOnPlayerDeath: vi.fn(),
+    bgOnPlayerDamaged: vi.fn(),
+    bgOnPlayerHealed: vi.fn(),
+    bgCancelFlagAura: vi.fn(() => false),
   };
   const ctx = createSimContext(host);
   return {

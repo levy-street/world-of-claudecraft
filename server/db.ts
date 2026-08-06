@@ -3619,6 +3619,63 @@ export async function topArenaRatings(
 }
 
 // ---------------------------------------------------------------------------
+// Thornhollow Fields rankings: the battleground's all-time 5v5 ladder. Ratings/records
+// live inside each character's state JSONB (no schema migration needed); only
+// characters who have actually fought a match appear. Read through the
+// server-side cache in main.ts, never run per request under load.
+// ---------------------------------------------------------------------------
+
+export interface BgLeaderRow {
+  name: string;
+  class: PlayerClass;
+  level: number;
+  rating: number;
+  wins: number;
+  losses: number;
+}
+
+// ACCEPTED COST (the arena twin's trade, doubled): predicating and ordering on
+// the COALESCE-wrapped JSONB expression can never match an index (the index
+// rule at the top of this file), so each cache refresh seq-scans and detoasts
+// every character blob in the realm. Bounded on purpose: the leaderboard is
+// fronted by a single-flight TTL cache (clients cannot bust it) and the
+// statement timeout, so the realm pays ONE scan per TTL. If realm size makes
+// that scan hurt, the documented upgrade is a bare `(state->>'bgRating')`
+// expression plus a partial index over eligible rows, applied to both twins.
+export async function topBgRatings(limit = 20): Promise<BgLeaderRow[]> {
+  // The 1500 literal mirrors BG_BASE_RATING (src/sim/social/battleground.ts);
+  // SQL cannot import the TS constant, so a base-rating retune must edit BOTH.
+  const ratingExpr = "COALESCE((state->>'bgRating')::int, 1500)";
+  const winsExpr = "COALESCE((state->>'bgWins')::int, 0)";
+  const lossesExpr = "COALESCE((state->>'bgLosses')::int, 0)";
+  const res = await runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS, (query) =>
+    query(
+      `SELECT name, class, level,
+            ${ratingExpr} AS rating,
+            ${winsExpr} AS wins,
+            ${lossesExpr} AS losses
+       FROM characters
+      WHERE realm = $1
+        AND state IS NOT NULL
+        AND ${winsExpr} + ${lossesExpr} > 0
+        AND EXISTS (SELECT 1 FROM accounts a
+                     WHERE a.id = characters.account_id AND ${ELIGIBLE_ACCOUNT_SQL})
+      ORDER BY rating DESC, wins DESC, name ASC
+      LIMIT $2`,
+      [REALM, Math.max(1, Math.min(100, limit))],
+    ),
+  );
+  return res.rows.map((r) => ({
+    name: r.name,
+    class: r.class,
+    level: r.level,
+    rating: Number(r.rating),
+    wins: Number(r.wins),
+    losses: Number(r.losses),
+  }));
+}
+
+// ---------------------------------------------------------------------------
 // Lifetime-XP leaderboard (Max-Level XP Overflow). Ranks characters by the
 // `lifetimeXp` stored in their state JSONB. The realm-scoped read (FR-4.3) is
 // backed by the `characters_lifetime_xp` index and the global read by

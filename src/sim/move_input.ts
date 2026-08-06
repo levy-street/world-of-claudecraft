@@ -1,4 +1,4 @@
-import { MoveInput, emptyMoveInput } from './types';
+import { emptyMoveInput, type MoveInput } from './types';
 
 const MOVE_FIELDS = [
   ['forward', 'f'],
@@ -11,7 +11,7 @@ const MOVE_FIELDS = [
 ] as const;
 const MAX_FACING_MAGNITUDE = 1000;
 
-type MoveField = typeof MOVE_FIELDS[number][0];
+type MoveField = (typeof MOVE_FIELDS)[number][0];
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);

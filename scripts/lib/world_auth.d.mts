@@ -1,4 +1,4 @@
-export const ONLINE_WORLD_AUTH_TYPE: 'auth-world-3';
+export const ONLINE_WORLD_AUTH_TYPE: 'auth-world-5';
 
 export const ONLINE_WORLD_INCOMPATIBLE_MESSAGE: 'Game and server versions are incompatible. Reload or update, then try again.';
 

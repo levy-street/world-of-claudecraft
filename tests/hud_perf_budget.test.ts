@@ -598,6 +598,26 @@ const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
     allow: { '.innerHTML': 1, '.setAttribute': 3, '.removeAttribute': 3 },
     reflowAllow: {},
   },
+  // The Thornhollow Fields scoreboard rebuilds its skeleton in ONE innerHTML write
+  // only when the STRUCTURAL sig changes (new match / roster change). Every
+  // per-frame write is facet-routed.
+  {
+    file: 'hud/battleground/battleground_scoreboard_painter.ts',
+    // The expanded/pinned state now rides ONE elided applier (applyExpanded),
+    // so the three raw classList calls and the raw aria-expanded write are gone;
+    // what is left is the four build-time role/aria-live attributes on the two
+    // self-mounted roots plus the one skeleton innerHTML.
+    allow: { '.innerHTML': 1, '.setAttribute': 4 },
+    reflowAllow: {},
+  },
+  // The bg kill feed rebuilds its tiny stack in ONE innerHTML write, on a
+  // death or an expiry only (the per-frame update elides on the pure core's
+  // reference equality); the setAttribute runs once at mount.
+  {
+    file: 'hud/battleground/battleground_kill_feed_painter.ts',
+    allow: { '.innerHTML': 1, '.setAttribute': 1 },
+    reflowAllow: {},
+  },
 ];
 
 // BUCKET 2 of 3: the src/ui painters that are NOT facet-routed because they draw to a 2D
@@ -625,9 +645,20 @@ const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
 // canvas.dataset.portrait, 4 accesses around one async image decode, two of them writes at
 // the start of a decode and two of them reads that abandon a decode whose unit changed;
 // perf_graph is handed both its context and its color and reaches for neither.
+// battleground_atlas_marks_painter is handed its context AND its projection and owns no
+// element at all: it is the mark read the M-map plate and the minimap's cached battleground
+// raster share, so it resolves nothing and reads nothing.
 const CANVAS_PAINTERS: ReadonlyArray<ScannedPainter> = [
   { file: 'continent_map_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },
   { file: 'hud/delve/delve_map_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },
+  { file: 'hud/battleground/battleground_atlas_marks_painter.ts', allow: {}, reflowAllow: {} },
+  // the M-map Thornhollow Fields plan: canvas-only, redrawn on the map cadence;
+  // like minimap it caches its one --color-* group resolve for the session
+  {
+    file: 'hud/battleground/battleground_map_painter.ts',
+    allow: {},
+    reflowAllow: { getComputedStyle: 1 },
+  },
   { file: 'map_window_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },
   { file: 'minimap_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },
   { file: 'perf_graph_painter.ts', allow: {}, reflowAllow: {} },

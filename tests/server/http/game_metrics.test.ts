@@ -21,6 +21,9 @@ import {
   registerGameStateMetrics,
   type TickPhaseMillis,
   WOC_ACCOUNTS_ONLINE,
+  WOC_BATTLEGROUND_CAPTURES_TOTAL,
+  WOC_BATTLEGROUND_DURATION_SECONDS_TOTAL,
+  WOC_BATTLEGROUND_MATCHES_TOTAL,
   WOC_CHARACTERS_CREATED_TOTAL,
   WOC_CHAT_MESSAGES_TOTAL,
   WOC_COPPER_CREDITED_TOTAL,
@@ -420,6 +423,9 @@ describe('registerGameStateMetrics: throughput counters via the returned sink', 
       WOC_FISHING_EMPTY_HOOKS_TOTAL,
       WOC_ROD_FEE_PAYMENTS_TOTAL,
       WOC_GUILD_BANK_INCIDENTS_TOTAL,
+      WOC_BATTLEGROUND_MATCHES_TOTAL,
+      WOC_BATTLEGROUND_DURATION_SECONDS_TOTAL,
+      WOC_BATTLEGROUND_CAPTURES_TOTAL,
     ]) {
       const metric = registry.getSingleMetric(name) as unknown as { inc: () => never };
       metric.inc = () => {
@@ -967,5 +973,88 @@ describe('guild bank activity log cache readout', () => {
     await registry.metrics();
     const second = await registry.metrics();
     expect(second).toContain(`${WOC_GUILD_BANK_LOG_CACHE}{kind="refreshes"} 1`);
+  });
+});
+
+// ---------------------------------------------------------------------------
+
+/** One battleground counter's sample value for an exact label pair, as a string. */
+function bgValue(text: string, name: string, labels: string): string | undefined {
+  return sampleValue(text, new RegExp(`^${name}\\{${labels}\\} (\\d+)$`, 'm'));
+}
+
+describe('registerGameStateMetrics: Thornhollow Fields match outcomes', () => {
+  it('exposes each counter under its exact exported name, pre-seeded at zero', async () => {
+    const registry = new Registry();
+    registerGameStateMetrics(registry, stubSource());
+    const text = await registry.metrics();
+
+    // Literal name pins: a rename must fail here, not merely swap a constant.
+    expect(WOC_BATTLEGROUND_MATCHES_TOTAL).toBe('woc_battleground_matches_total');
+    expect(WOC_BATTLEGROUND_DURATION_SECONDS_TOTAL).toBe('woc_battleground_duration_seconds_total');
+    expect(WOC_BATTLEGROUND_CAPTURES_TOTAL).toBe('woc_battleground_captures_total');
+    for (const name of [
+      WOC_BATTLEGROUND_MATCHES_TOTAL,
+      WOC_BATTLEGROUND_DURATION_SECONDS_TOTAL,
+      WOC_BATTLEGROUND_CAPTURES_TOTAL,
+    ]) {
+      expect(text).toContain(`# TYPE ${name} counter`);
+    }
+    // The cap-tuning read is a RATIO between two series, so BOTH have to exist
+    // from boot: a dashboard comparing timer against caps on a quiet realm must
+    // not divide by an absent series.
+    expect(bgValue(text, WOC_BATTLEGROUND_MATCHES_TOTAL, 'ending="timer",composition="solo"')).toBe(
+      '0',
+    );
+    expect(
+      bgValue(text, WOC_BATTLEGROUND_MATCHES_TOTAL, 'ending="caps",composition="grouped"'),
+    ).toBe('0');
+    expect(bgValue(text, WOC_BATTLEGROUND_CAPTURES_TOTAL, 'ending="caps",side="high"')).toBe('0');
+  });
+
+  it('books one match, its duration, and both ends of the final score', async () => {
+    const registry = new Registry();
+    const counters = registerGameStateMetrics(registry, stubSource());
+    counters.battlegroundResolved('timer', 'solo', 720, 2, 1);
+    counters.battlegroundResolved('timer', 'solo', 700, 0, 2);
+    counters.battlegroundResolved('caps', 'grouped', 415, 3, 1);
+    const text = await registry.metrics();
+
+    expect(bgValue(text, WOC_BATTLEGROUND_MATCHES_TOTAL, 'ending="timer",composition="solo"')).toBe(
+      '2',
+    );
+    expect(
+      bgValue(text, WOC_BATTLEGROUND_DURATION_SECONDS_TOTAL, 'ending="timer",composition="solo"'),
+    ).toBe('1420');
+    expect(
+      bgValue(text, WOC_BATTLEGROUND_MATCHES_TOTAL, 'ending="caps",composition="grouped"'),
+    ).toBe('1');
+    // high/low, never crimson/azure: the second timer match had the higher score
+    // on the OTHER team, and the sides must not depend on which team that was.
+    expect(bgValue(text, WOC_BATTLEGROUND_CAPTURES_TOTAL, 'ending="timer",side="high"')).toBe('4');
+    expect(bgValue(text, WOC_BATTLEGROUND_CAPTURES_TOTAL, 'ending="timer",side="low"')).toBe('1');
+    expect(bgValue(text, WOC_BATTLEGROUND_CAPTURES_TOTAL, 'ending="caps",side="high"')).toBe('3');
+  });
+
+  it('drops an off-vocabulary or malformed sample instead of minting a series', async () => {
+    const registry = new Registry();
+    const counters = registerGameStateMetrics(registry, stubSource());
+    // An ending cause a newer sim could invent: the label crosses an untyped
+    // seam, so the membership guard is this family's cardinality bound.
+    counters.battlegroundResolved('surrendered' as 'caps', 'solo', 300, 1, 0);
+    counters.battlegroundResolved('caps', 'solo', Number.NaN, 3, 1);
+    counters.battlegroundResolved('caps', 'solo', -5, 3, 1);
+    counters.battlegroundResolved('caps', 'solo', 300, -1, 1);
+    const text = await registry.metrics();
+
+    expect(text).not.toContain('surrendered');
+    // Every malformed sample was dropped WHOLE: no partial booking of the count
+    // without its duration, which would silently corrupt the mean.
+    expect(bgValue(text, WOC_BATTLEGROUND_MATCHES_TOTAL, 'ending="caps",composition="solo"')).toBe(
+      '0',
+    );
+    expect(
+      bgValue(text, WOC_BATTLEGROUND_DURATION_SECONDS_TOTAL, 'ending="caps",composition="solo"'),
+    ).toBe('0');
   });
 });

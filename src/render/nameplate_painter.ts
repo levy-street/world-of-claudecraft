@@ -258,7 +258,10 @@ export class NameplatePainter {
     languageChanged: boolean,
   ): void {
     state.currentTarget = entity.id === player.targetId;
-    state.hostile = entity.hostile;
+    // Enemy PLAYERS too, not just mobs: a battleground/duel/arena opponent
+    // must read hostile-red, never friendly-blue (same predicate the
+    // dead-enemy arm below already trusts).
+    state.hostile = entity.hostile || (entity.kind === 'player' && this.isHostilePlayer(entity));
     state.deadEnemy =
       entity.dead && (entity.hostile || (entity.kind === 'player' && this.isHostilePlayer(entity)));
     state.myPet = entity.ownerId === player.id;

@@ -26,6 +26,10 @@ import { suppressGpuNotice } from './lib/gpu_notice_suppress.mjs';
 import { classifyDiff, diffChangedPaths } from './pr_shot_targets.mjs';
 
 const URL = process.env.GAME_URL ?? 'http://localhost:5173';
+// Dev-entry load can outlast 60s on a contended machine (SwiftShader plus a
+// cold Vite module graph); NAV_TIMEOUT_MS raises the ceiling without touching
+// the default CI behavior.
+const NAV_TIMEOUT = Number(process.env.NAV_TIMEOUT_MS ?? 60000);
 const OUT = process.env.SHOTS_DIR ?? 'pr-shots';
 const DIFF_FILE = process.env.DIFF_FILE;
 fs.mkdirSync(OUT, { recursive: true });
@@ -155,7 +159,7 @@ async function shootSpecific(targets) {
           // Anything that has to be in place BEFORE the document loads (a request
           // stub via evaluateOnNewDocument, a storage seed).
           await variant.beforeLoad?.(page);
-          await page.goto(URL, { waitUntil: 'networkidle0', timeout: 60000 });
+          await page.goto(URL, { waitUntil: 'networkidle0', timeout: NAV_TIMEOUT });
           if (variant.mobile)
             await page.evaluate(() => document.body.classList.add('mobile-touch'));
           // A `landing: true` variant shoots the pre-game marketing shell (the home
@@ -173,7 +177,7 @@ async function shootSpecific(targets) {
           sharedPage = page;
           watch(page, 'desktop');
           await suppressGpuNotice(page);
-          await page.goto(URL, { waitUntil: 'networkidle0', timeout: 60000 });
+          await page.goto(URL, { waitUntil: 'networkidle0', timeout: NAV_TIMEOUT });
           await enterOfflineGame(page, {
             charClass: 'warrior',
             charName: 'Thorgar',
@@ -205,7 +209,7 @@ async function shootGenericHud(frames) {
     const page = await browser.newPage();
     watch(page, 'desktop');
     await suppressGpuNotice(page);
-    await page.goto(URL, { waitUntil: 'networkidle0', timeout: 60000 });
+    await page.goto(URL, { waitUntil: 'networkidle0', timeout: NAV_TIMEOUT });
     await enterOfflineGame(page, { charClass: 'warrior', charName: 'Thorgar', settleMs: 3000 });
     await shoot(page, `${next()}-hud-desktop`);
     await page.close();
@@ -223,7 +227,7 @@ async function shootGenericHud(frames) {
         userAgent:
           'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1',
       });
-      await mobile.goto(URL, { waitUntil: 'networkidle0', timeout: 60000 });
+      await mobile.goto(URL, { waitUntil: 'networkidle0', timeout: NAV_TIMEOUT });
       await mobile.evaluate(() => document.body.classList.add('mobile-touch'));
       await enterOfflineGame(mobile, { charClass: 'mage', charName: 'Aldwin', settleMs: 3000 });
       await shoot(mobile, `${next()}-hud-mobile`);
