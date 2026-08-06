@@ -326,6 +326,17 @@ const BIPED14: ClipMap = {
   death: 'Death',
 };
 
+// The bear family's own attack (scripts/build_bear_anims.mjs, issue #2889
+// round 2): BIPED14's Punch/Weapon attack is shared by reference across 6
+// unrelated families (mob_bear, mob_yeti, mob_murloc, mob_troll, mob_demon,
+// mob_demonalt). This "ground-swipe maul" clip is baked off yetialt.glb's
+// own donor poses (Punch's forward swing blended through the currently
+// unused Duck clip's low crouch-and-rise), so only mob_bear gets it.
+const BEAR_BIPED14: ClipMap = {
+  ...BIPED14,
+  attack: ['Bear_Attack'],
+};
+
 // Tripo biped rig. These creatures come through the current biped
 // pipeline, which retargets and bakes the complete game vocabulary directly.
 const TRIPO_BIPED_FULL_RIG: ClipMap = {
@@ -1276,7 +1287,10 @@ export const VISUALS: Record<string, VisualDef> = {
   mob_bear: {
     url: `${CREATURES}/yetialt.glb`,
     height: 2.2,
-    clips: BIPED14,
+    clips: BEAR_BIPED14,
+    // Bear_Attack clip donor (scripts/build_bear_anims.mjs): mesh-free,
+    // baked off this same rig's own poses.
+    animUrls: [`${CREATURES}/bear_ability_anims.glb`],
     tint: 0x5a4030,
     tintStrength: 0.5,
   },
