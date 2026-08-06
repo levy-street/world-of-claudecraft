@@ -9257,6 +9257,9 @@ export class Renderer {
       st.reverseBackpedal = ghostWolf;
       st.dead = visuallyDead;
       st.casting = characterCasting;
+      // Which ability, so the pose layer can tell a drawn shot from a pet
+      // utility cast (tame_beast is a 6s cast; a bow must not sit aimed for it).
+      st.castingAbility = characterCasting ? (e.castingAbility ?? null) : null;
       st.spinning =
         st.casting &&
         e.castingAbility !== null &&

@@ -64,6 +64,54 @@ export function weaponSkinAttackClips(weaponSkinId: string | null): SkinAttackCl
   return skin && weaponSkinHandling(skin) === 'bow' ? BOW_ATTACK : null;
 }
 
+/** Cast-time abilities that are a DRAWN SHOT, so a bow should be held aimed
+ *  for their duration.
+ *
+ *  An allowlist rather than a derived rule, because every derivable signal is
+ *  wrong somewhere: `casting` alone is true for tame_beast (6s) and revive_pet
+ *  (3s), and `minRange` (the classic ranged dead zone) is also carried by the
+ *  melee gap-closers charge and bear_charge. A hunter holding a bow aimed
+ *  through a six-second beast taming is the bug this prevents.
+ *
+ *  `tests/weapon_skins.test.ts` scans the ability table and fails if a new
+ *  cast-time shot lands without a row here, so the list cannot silently rot. */
+const DRAWN_SHOT_CAST_IDS: ReadonlySet<string> = new Set(['aimed_shot']);
+
+/** True when this cast is a drawn shot (see DRAWN_SHOT_CAST_IDS). */
+export function isDrawnShotCast(abilityId: string | null | undefined): boolean {
+  return !!abilityId && DRAWN_SHOT_CAST_IDS.has(abilityId);
+}
+
+/** What the rig's current one-shot IS, for callers that must tell a shot apart
+ *  from every other one-shot. `null` means no one-shot is playing. */
+export type OneShotKind = 'attack' | 'emote' | 'other' | null;
+
+/**
+ * Whether a displayed ranged skin should be presented AIMED right now.
+ *
+ * This answers "is this character shooting", which is NOT the same question as
+ * "is some one-shot playing", the test that used to stand in for it. That
+ * stand-in failed in both directions:
+ *
+ *  - A hit reaction is a one-shot and is not shooting, so a bow snapped upright
+ *    through the flinch every time its owner took a hit.
+ *  - A cast-time shot (Long Draw, castTime 3.0) is a held base state and not a
+ *    one-shot at all, so the bow stayed at its resting grip for the entire
+ *    three-second draw and only came up for the release. That is the exact
+ *    moment the aim pose was written for.
+ *
+ * A non-attack one-shot beats a concurrent cast: whatever interrupted the draw
+ * is what the body is actually playing, so the weapon should follow the hand.
+ *
+ * Both pin modes read this one answer, in opposite directions (a bow aims while
+ * it is true, a bow-slot gun carries muzzle-forward while it is false), so the
+ * flinch and the draw are fixed for both weapons at once.
+ */
+export function rangedSkinAiming(oneShot: OneShotKind, castingAbility: string | null): boolean {
+  if (oneShot !== null) return oneShot === 'attack';
+  return isDrawnShotCast(castingAbility);
+}
+
 /** The clip the CAST base state should hold while this skin is displayed, or
  *  null to keep the visual's authored cast.
  *
@@ -72,10 +120,20 @@ export function weaponSkinAttackClips(weaponSkinId: string | null): SkinAttackCl
  *  a hunter part-way through a cast-time shot (Long Draw, castTime 3.0) looked
  *  like a mage waving at a bow. A drawn bow holds the draw instead.
  *
- *  Keyed off HANDLING like the attack substitution: a crossbow (and a bow-slot
- *  gun, which aims like one) is shouldered rather than drawn, so it keeps the
+ *  Gated on the same drawn-shot allowlist the aim pin uses. Handling alone is
+ *  not enough: a bow skin is a bow during tame_beast too, and holding a full
+ *  draw through a six-second beast taming is the pose half of exactly the bug
+ *  isDrawnShotCast exists to prevent. Reported by review on PR 2941, where only
+ *  the ORIENTATION had been gated and the POSE had not.
+ *
+ *  Keyed off HANDLING as well as the ability: a crossbow (and a bow-slot gun,
+ *  which aims like one) is shouldered rather than drawn, so it keeps the
  *  authored cast until a pose exists for it. */
-export function weaponSkinCastClip(weaponSkinId: string | null): string | null {
+export function weaponSkinCastClip(
+  weaponSkinId: string | null,
+  castingAbility: string | null,
+): string | null {
+  if (!isDrawnShotCast(castingAbility)) return null;
   const skin = weaponSkinId ? WEAPON_SKINS[weaponSkinId] : null;
   return skin && weaponSkinHandling(skin) === 'bow' ? BOW_CAST_CLIP : null;
 }

@@ -13,6 +13,11 @@ export interface AnimState {
   reverseBackpedal?: boolean;
   dead: boolean;
   casting: boolean;
+  /** The ability id driving `casting`, or null. Presentation that must tell a
+   *  drawn SHOT apart from any other cast-time ability needs this: `casting`
+   *  alone is true for a hunter's tame_beast (6s) and revive_pet (3s) as well
+   *  as Long Draw. Display-only; never gates gameplay. */
+  castingAbility?: string | null;
   /** Channeling a self-centered whirl such as Bladestorm. This wins over the
    *  generic cast and locomotion poses. */
   spinning?: boolean;

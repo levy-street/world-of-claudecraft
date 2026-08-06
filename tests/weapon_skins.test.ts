@@ -332,17 +332,23 @@ describe('bow skin attack animation (hunter draw instead of crossbow aim)', () =
     // Casting is a HELD base state, and every class takes `Spellcasting` from
     // the shared kaykit() ClipMap, so a hunter part-way through Long Draw
     // (castTime 3.0) played a caster's arm circle while holding a bow.
-    expect(weaponSkinCastClip('winterbite')).toBe('Bow_Draw_Hold');
-    expect(weaponSkinCastClip('fletcher_s_guild_bow')).toBe('Bow_Draw_Hold');
+    expect(weaponSkinCastClip('winterbite', 'aimed_shot')).toBe('Bow_Draw_Hold');
+    expect(weaponSkinCastClip('fletcher_s_guild_bow', 'aimed_shot')).toBe('Bow_Draw_Hold');
+    // Only for a drawn SHOT. Reported by review on PR 2941: gating the aim pin
+    // alone left the POSE ungated, so a bow skin still held a full draw through
+    // tame_beast (6s) and revive_pet (3s).
+    expect(weaponSkinCastClip('winterbite', 'tame_beast')).toBeNull();
+    expect(weaponSkinCastClip('winterbite', 'revive_pet')).toBeNull();
+    expect(weaponSkinCastClip('winterbite', null)).toBeNull();
     // Crossbow handling is shouldered, not drawn: it keeps the authored cast
     // until a pose exists for it. The encore gun aims like a crossbow.
-    expect(weaponSkinCastClip('meteorlatch_crossbow')).toBeNull();
+    expect(weaponSkinCastClip('meteorlatch_crossbow', 'aimed_shot')).toBeNull();
     expect(weaponSkinHandling(WEAPON_SKINS.encore_bow)).toBe('crossbow');
-    expect(weaponSkinCastClip('encore_bow')).toBeNull();
+    expect(weaponSkinCastClip('encore_bow', 'aimed_shot')).toBeNull();
     // Melee skins and no skin never substitute a cast pose.
-    expect(weaponSkinCastClip('ice_fang_sword')).toBeNull();
-    expect(weaponSkinCastClip(null)).toBeNull();
-    expect(weaponSkinCastClip('not_a_skin')).toBeNull();
+    expect(weaponSkinCastClip('ice_fang_sword', 'aimed_shot')).toBeNull();
+    expect(weaponSkinCastClip(null, 'aimed_shot')).toBeNull();
+    expect(weaponSkinCastClip('not_a_skin', 'aimed_shot')).toBeNull();
     // The constructor only binds names in this list, so an unlisted clip would
     // resolve to no action and silently fall through to the caster gesture.
     expect(SKIN_ATTACK_CLIP_NAMES).toContain('Bow_Draw_Hold');
@@ -378,6 +384,67 @@ describe('bow skin attack animation (hunter draw instead of crossbow aim)', () =
       manifestSrc.indexOf('player_rogue: {'),
     );
     expect(hunterBlock).toContain('bow_hold_anim.glb');
+  });
+
+  it('the aim pin tracks SHOOTING, not merely "some one-shot is playing"', async () => {
+    const { rangedSkinAiming } = await import('../src/render/characters/skin_attack');
+    // The release: the attack one-shot is the moment the pin was written for.
+    expect(rangedSkinAiming('attack', null)).toBe(true);
+    // The DRAW: a cast-time shot (Long Draw, castTime 3.0) is a held base
+    // state, not a one-shot, so the old "is a one-shot playing" test missed
+    // the whole three seconds the bow should have been up.
+    expect(rangedSkinAiming(null, 'aimed_shot')).toBe(true);
+    // ...but only for a SHOT. Reported by review on PR 2941: a hunter's pet
+    // utility casts also set the cast state, and holding a bow aimed through a
+    // six-second beast taming is wrong.
+    expect(rangedSkinAiming(null, 'tame_beast')).toBe(false);
+    expect(rangedSkinAiming(null, 'revive_pet')).toBe(false);
+    // Taking a hit plays a one-shot and is NOT shooting. This is the case
+    // that made a bow jerk upright through the flinch.
+    expect(rangedSkinAiming('other', null)).toBe(false);
+    // Emotes were already excluded and stay excluded.
+    expect(rangedSkinAiming('emote', null)).toBe(false);
+    // Idle, doing nothing at all.
+    expect(rangedSkinAiming(null, null)).toBe(false);
+    // A one-shot that is not the attack wins over a concurrent cast flag:
+    // whatever interrupted the draw is what the body is actually playing.
+    expect(rangedSkinAiming('other', 'aimed_shot')).toBe(false);
+    // ...and the attack one-shot during a cast stays aimed (the release frame
+    // of a channelled shot, where both are briefly true).
+    expect(rangedSkinAiming('attack', 'aimed_shot')).toBe(true);
+  });
+
+  it('every cast-time ranged shot in the ability table is classified', async () => {
+    const { isDrawnShotCast } = await import('../src/render/characters/skin_attack');
+    const { ABILITIES } = await import('../src/sim/data');
+    // A DRAWN shot is the intersection the allowlist exists to name: it takes
+    // cast time (so the held pose is visible at all) and carries the classic
+    // ranged dead zone. Instant shots need no held pose, and a cast without a
+    // dead zone is a spell or a pet utility, not something a bow draws.
+    const candidates = Object.values(ABILITIES)
+      .filter((a) => (a.castTime ?? 0) > 0 && ((a as { minRange?: number }).minRange ?? 0) > 0)
+      .map((a) => a.id);
+    expect(candidates.length, 'the scan must not be vacuous').toBeGreaterThan(0);
+    const unclassified = candidates.filter((id) => !isDrawnShotCast(id));
+    expect(
+      unclassified,
+      `new cast-time ranged shot(s) with no DRAWN_SHOT_CAST_IDS row: ${unclassified.join(', ')}`,
+    ).toEqual([]);
+    // And the list must not creep the other way onto things that are not shots.
+    expect(isDrawnShotCast('tame_beast')).toBe(false);
+    expect(isDrawnShotCast('charge')).toBe(false);
+    expect(isDrawnShotCast(null)).toBe(false);
+  });
+
+  it('visual.ts asks the shared predicate rather than re-deriving the trigger', () => {
+    const src = readFileSync(join(ROOT, 'src/render/characters/visual.ts'), 'utf8');
+    const fn = src.slice(
+      src.indexOf('private applySkinOrientation('),
+      src.indexOf('/** Re-scale VFX point sprites'),
+    );
+    expect(fn).toContain('rangedSkinAiming(');
+    // The old inline trigger must be gone, not merely supplemented.
+    expect(fn).not.toContain('this.currentIsOneShot && !this.currentOneShotIsEmote');
   });
 
   it('the hunter ships the bow clip via animUrls and the GLB carries it', async () => {
