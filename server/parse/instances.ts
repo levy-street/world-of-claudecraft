@@ -17,8 +17,11 @@ interface SlotState {
   slotKey: string;
   view: InstanceSlotView;
   activeFight: OpenFight | null;
-  /** Mob ids registered in mobToSlot; instance mobs can spawn after claim. */
-  registeredMobCount: number;
+  /** Mob ids this state registered in mobToSlot. Tracked HERE because the
+   * slot view is the LIVE sim object: freeInstance reassigns its mobIds to []
+   * in the same call that nulls partyKey, so release() must never derive the
+   * unregister set from the view or every run leaks its roster forever. */
+  registeredMobIds: Set<number>;
 }
 
 export class DungeonSegmenter {
@@ -107,10 +110,10 @@ export class DungeonSegmenter {
       slotKey,
       view,
       activeFight: null,
-      registeredMobCount: view.mobIds.length,
+      registeredMobIds: new Set(view.mobIds),
     };
     this.slots.set(slotKey, state);
-    for (const mobId of view.mobIds) this.mobToSlot.set(mobId, state);
+    for (const mobId of state.registeredMobIds) this.mobToSlot.set(mobId, state);
   }
 
   private release(state: SlotState, closing: PendingClose[]): void {
@@ -121,9 +124,10 @@ export class DungeonSegmenter {
       });
       state.activeFight = null;
     }
-    for (const mobId of state.view.mobIds) {
+    for (const mobId of state.registeredMobIds) {
       if (this.mobToSlot.get(mobId) === state) this.mobToSlot.delete(mobId);
     }
+    state.registeredMobIds.clear();
     this.slots.delete(state.slotKey);
   }
 
@@ -133,9 +137,11 @@ export class DungeonSegmenter {
     state: SlotState,
     closing: PendingClose[],
   ): void {
-    if (state.view.mobIds.length !== state.registeredMobCount) {
-      for (const mobId of state.view.mobIds) this.mobToSlot.set(mobId, state);
-      state.registeredMobCount = state.view.mobIds.length;
+    if (state.view.mobIds.length > state.registeredMobIds.size) {
+      for (const mobId of state.view.mobIds) {
+        this.mobToSlot.set(mobId, state);
+        state.registeredMobIds.add(mobId);
+      }
     }
     const fight = state.activeFight;
     if (fight === null) return;

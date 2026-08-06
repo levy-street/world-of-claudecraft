@@ -23,6 +23,8 @@ const MARSHAL_CAP = 1000;
 /** Hard buffer cap so an unreachable service cannot grow memory forever. */
 const MAX_BUFFER = 50_000;
 const SHIP_TIMEOUT_MS = 5000;
+/** A quiet realm still drains its spool backlog on this cadence. */
+const SPOOL_REPLAY_INTERVAL_MS = 15_000;
 /**
  * Wall-clock budget for the shutdown drain, matching the deadline discipline
  * of the neighbouring shutdown steps (stopSteamMirror(5000) and friends): past
@@ -41,7 +43,9 @@ export interface ShipperIdentity {
 export class BatchShipper {
   private buffer: Record<string, unknown>[] = [];
   private timer: ReturnType<typeof setTimeout> | null = null;
+  private replayTimer: ReturnType<typeof setInterval> | null = null;
   private inFlight: Promise<void> | null = null;
+  private immediateScheduled = false;
   private stopped = false;
   private seq = 0;
   private readonly bootId = randomBytes(6).toString('base64url');
@@ -56,7 +60,10 @@ export class BatchShipper {
     private readonly now: () => number = () => Date.now(),
   ) {}
 
-  /** Hot-path entry: O(1) push, flushing always happens on the timer. */
+  /** Hot-path entry: O(1) push. Flushing (including the marshal's stringify
+   * loop) always happens off the caller's stack: the FLUSH_AT early trigger
+   * schedules a setImmediate rather than flushing inline, so the recorder's
+   * observe pass never pays serialization cost against its budget. */
   enqueue(record: Record<string, unknown>): void {
     if (this.stopped) return;
     if (this.buffer.length >= MAX_BUFFER) {
@@ -65,8 +72,17 @@ export class BatchShipper {
     }
     this.buffer.push(record);
     this.counters.recordsBuffered = this.buffer.length;
-    if (this.buffer.length >= FLUSH_AT) void this.flush();
-    else this.armTimer();
+    if (this.buffer.length >= FLUSH_AT) {
+      if (!this.immediateScheduled) {
+        this.immediateScheduled = true;
+        setImmediate(() => {
+          this.immediateScheduled = false;
+          void this.flush();
+        });
+      }
+    } else {
+      this.armTimer();
+    }
   }
 
   async flush(): Promise<void> {
@@ -88,6 +104,16 @@ export class BatchShipper {
     }
   }
 
+  /** Starts the idle spool-replay heartbeat; separate from the constructor so
+   * tests drive replay deterministically via flush(). */
+  startReplayHeartbeat(): void {
+    if (this.replayTimer !== null || this.stopped) return;
+    this.replayTimer = setInterval(() => {
+      if (this.inFlight === null && !this.stopped) void this.replayOneSpooled();
+    }, SPOOL_REPLAY_INTERVAL_MS);
+    this.replayTimer.unref?.();
+  }
+
   /** Final drain at shutdown: awaits any in-flight cycle, then ships until the
    * deadline and spools everything after it. Bounded by construction. */
   async stop(): Promise<void> {
@@ -95,6 +121,10 @@ export class BatchShipper {
     if (this.timer !== null) {
       clearTimeout(this.timer);
       this.timer = null;
+    }
+    if (this.replayTimer !== null) {
+      clearInterval(this.replayTimer);
+      this.replayTimer = null;
     }
     const deadline = this.now() + STOP_DEADLINE_MS;
     if (this.inFlight !== null) {
@@ -156,6 +186,10 @@ export class BatchShipper {
         headers,
         body: new Uint8Array(gzipped),
         signal: AbortSignal.timeout(SHIP_TIMEOUT_MS),
+        // A cross-origin redirect forwards custom headers (only Authorization
+        // and Cookie are stripped), so following one could hand the secret and
+        // the telemetry body to an http origin. Refuse redirects outright.
+        redirect: 'error',
       });
       if (!res.ok) {
         this.counters.batchesShipFailed++;

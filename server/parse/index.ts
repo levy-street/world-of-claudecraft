@@ -64,6 +64,7 @@ export function createParseSubsystem(opts: ParseSubsystemOptions): ParseSubsyste
     spool,
     counters,
   );
+  shipper.startReplayHeartbeat();
   const recorder = new ParseRecorder({
     flags,
     sim: opts.sim,
@@ -81,6 +82,7 @@ export function createParseSubsystem(opts: ParseSubsystemOptions): ParseSubsyste
       (snapshotDate) => loadCensusRows(opts.realm, snapshotDate),
       shipper,
       counters,
+      flags.censusUtcHour,
     );
     census.start();
   }

@@ -107,3 +107,18 @@ describe('loadParseFlags', () => {
     expect(flags.ingestToken).toBeNull();
   });
 });
+
+describe('loadParseFlags review pins', () => {
+  test('bracketed IPv6 loopback http is allowed; the bare form never appears', () => {
+    const flags = loadParseFlags({ ...BASE, PARSE_INGEST_URL: 'http://[::1]:8788/ingest' });
+
+    expect(flags.enabled).toBe(true);
+  });
+
+  test('PARSE_CENSUS_HOUR sets the UTC export hour with a sane default and clamp', () => {
+    expect(loadParseFlags({ ...BASE }).censusUtcHour).toBe(9);
+    expect(loadParseFlags({ ...BASE, PARSE_CENSUS_HOUR: '4' }).censusUtcHour).toBe(4);
+    expect(loadParseFlags({ ...BASE, PARSE_CENSUS_HOUR: '24' }).censusUtcHour).toBe(9);
+    expect(loadParseFlags({ ...BASE, PARSE_CENSUS_HOUR: 'noon' }).censusUtcHour).toBe(9);
+  });
+});

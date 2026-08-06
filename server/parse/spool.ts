@@ -55,13 +55,19 @@ export class BatchSpool {
     }
   }
 
-  /** Delete a shipped (or corrupt) batch file. Never throws. */
+  /** Delete a shipped (or corrupt) batch file. Never throws. Byte accounting
+   * moves only on a SUCCESSFUL unlink: a persistent unlink failure (say a
+   * read-only mount) must not drift spoolBytes below reality, or the byte cap
+   * stops bounding disk. */
   async remove(name: string): Promise<void> {
     try {
       const file = path.join(this.dir, name);
       const stat = await fs.stat(file).catch(() => null);
-      await fs.unlink(file).catch(() => undefined);
-      if (stat !== null) {
+      const unlinked = await fs.unlink(file).then(
+        () => true,
+        () => false,
+      );
+      if (unlinked && stat !== null) {
         this.counters.spoolBytes = Math.max(0, this.counters.spoolBytes - stat.size);
       }
     } catch (e) {

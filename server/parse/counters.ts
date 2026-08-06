@@ -1,7 +1,7 @@
 // Recorder observability: plain mutable counters on the hot path (an object
 // field bump, never a prom call per event), exported to prom-client at scrape
 // time via collect() gauges, the game_metrics convention. Bounded labels only.
-import { Counter, Gauge, type Registry } from 'prom-client';
+import { Gauge, type Registry } from 'prom-client';
 
 export interface ParseCounters {
   recordsBuffered: number;

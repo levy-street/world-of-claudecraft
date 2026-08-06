@@ -110,7 +110,15 @@ export class OpenFight {
   }
 
   addLateJoin(tick: number, participant: FightParticipant): void {
-    if (this.byCharacter.has(participant.characterId)) return;
+    if (this.byCharacter.has(participant.characterId)) {
+      // Mid-fight relog: the same character returns under a NEW entity id
+      // (pids are per-login). Re-point the entity index at the surviving
+      // accumulator so hasEntity/totals keep working; dedupe only the join
+      // RECORD, never the index, or every later event re-resolves the
+      // participant on the tick path and the post-relog rollup goes missing.
+      this.byEntity.set(participant.entityId, participant.characterId);
+      return;
+    }
     this.track(participant);
     this.sink.enqueue({ t: 'join', fightId: this.fightId, tick, participant });
     this.counters.recordsEmitted++;

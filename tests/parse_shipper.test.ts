@@ -15,6 +15,7 @@ interface FetchCall {
   url: string;
   headers: Record<string, string>;
   body: Uint8Array;
+  redirect: string | undefined;
 }
 
 function fakeFetch(responses: (number | Error)[]): { calls: FetchCall[]; fetch: typeof fetch } {
@@ -25,6 +26,7 @@ function fakeFetch(responses: (number | Error)[]): { calls: FetchCall[]; fetch: 
       url: String(url),
       headers: (init?.headers ?? {}) as Record<string, string>,
       body: init?.body as Uint8Array,
+      redirect: init?.redirect,
     });
     if (next instanceof Error) throw next;
     return { ok: (next ?? 200) < 400, status: next ?? 200 } as Response;
@@ -78,6 +80,9 @@ describe('BatchShipper', () => {
     expect(calls[0]?.headers[PARSE_SECRET_HEADER]).toBe('s3cret');
     expect(calls[0]?.headers['content-type']).toBe('application/x-ndjson');
     expect(calls[0]?.headers['content-encoding']).toBe('gzip');
+    // A followed cross-origin redirect would forward the secret header, so
+    // the shipper must refuse redirects outright.
+    expect(calls[0]?.redirect).toBe('error');
     const lines = batchLines(calls[0]?.body as Uint8Array);
     expect(lines[0]).toMatchObject({
       t: 'batch',
@@ -307,5 +312,30 @@ describe('BatchSpool', () => {
     const broken = new BatchSpool('/dev/null/not-a-dir', 10_000, createParseCounters());
     await expect(broken.append(Buffer.alloc(4))).resolves.toBeUndefined();
     expect(await broken.peekOldest()).toBeNull();
+  });
+});
+
+describe('BatchSpool review pins', () => {
+  test('a failed unlink never moves byte accounting, so the cap keeps bounding disk', async () => {
+    const counters = createParseCounters();
+    const dir = tempSpoolDir();
+    const spool = new BatchSpool(dir, 10_000, counters);
+    await spool.append(Buffer.alloc(100, 1));
+    const before = counters.spoolBytes;
+    const oldest = await spool.peekOldest();
+    expect(oldest).not.toBeNull();
+    if (oldest === null) return;
+
+    const { chmodSync } = await import('node:fs');
+    chmodSync(dir, 0o555);
+    try {
+      await spool.remove(oldest.name);
+      expect(counters.spoolBytes).toBe(before);
+    } finally {
+      chmodSync(dir, 0o755);
+    }
+    // Once the dir is writable again, the same remove succeeds and accounts.
+    await spool.remove(oldest.name);
+    expect(counters.spoolBytes).toBe(0);
   });
 });

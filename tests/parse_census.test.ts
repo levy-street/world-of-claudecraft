@@ -38,6 +38,7 @@ describe('CensusExporter', () => {
       },
       { enqueue: (r) => records.push(r) },
       counters,
+      9,
     );
 
     const count = await exporter.runOnce('2026-08-05');
@@ -57,6 +58,7 @@ describe('CensusExporter', () => {
       },
       { enqueue: () => undefined },
       counters,
+      9,
     );
 
     const count = await exporter.runOnce('2026-08-05');
@@ -75,10 +77,60 @@ describe('CensusExporter', () => {
       },
       { enqueue: () => undefined },
       createParseCounters(),
+      9,
     );
 
     await exporter.runOnce();
 
     expect(seenDay).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+  });
+});
+
+describe('CensusExporter schedule', () => {
+  function exporterAt(iso: string, hour: number, loads: string[]) {
+    const counters = createParseCounters();
+    const exporter = new CensusExporter(
+      async (day) => {
+        loads.push(day);
+        return [];
+      },
+      { enqueue: () => undefined },
+      counters,
+      hour,
+      () => new Date(iso),
+    );
+    return exporter;
+  }
+
+  test('fires only at the configured UTC hour', async () => {
+    const loads: string[] = [];
+    const off = exporterAt('2026-08-06T08:59:00Z', 9, loads);
+    expect(await off.maybeRun()).toBe(false);
+    const on = exporterAt('2026-08-06T09:10:00Z', 9, loads);
+    expect(await on.maybeRun()).toBe(true);
+    expect(loads).toEqual(['2026-08-06']);
+  });
+
+  test('runs at most once per day, then again the next day', async () => {
+    const loads: string[] = [];
+    let iso = '2026-08-06T09:10:00Z';
+    const counters = createParseCounters();
+    const exporter = new CensusExporter(
+      async (day) => {
+        loads.push(day);
+        return [];
+      },
+      { enqueue: () => undefined },
+      counters,
+      9,
+      () => new Date(iso),
+    );
+
+    expect(await exporter.maybeRun()).toBe(true);
+    iso = '2026-08-06T09:55:00Z';
+    expect(await exporter.maybeRun()).toBe(false);
+    iso = '2026-08-07T09:01:00Z';
+    expect(await exporter.maybeRun()).toBe(true);
+    expect(loads).toEqual(['2026-08-06', '2026-08-07']);
   });
 });

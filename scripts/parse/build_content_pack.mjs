@@ -121,6 +121,9 @@ if (process.argv.includes('--ship')) {
     headers: { 'content-type': 'application/x-ndjson', 'x-woc-parse-secret': token },
     body,
     signal: AbortSignal.timeout(15000),
+    // Never follow a redirect with the secret attached (cross-origin
+    // redirects forward custom headers).
+    redirect: 'error',
   });
   if (!res.ok) {
     console.error(`parse:content ship failed: ${res.status}`);

@@ -47,4 +47,5 @@ export const FAKE_PARSE_FLAGS: ParseFlags = {
   spoolMaxBytes: 1,
   envLabel: 'dev',
   censusEnabled: false,
+  censusUtcHour: 9,
 };

@@ -603,3 +603,85 @@ describe('BossCastSynthesizer ability change', () => {
     ]);
   });
 });
+
+describe('review regressions: relog and slot teardown', () => {
+  test('a mid-fight relog re-points the entity index without a duplicate join or lost rollup', () => {
+    const sim = fakeSim();
+    seedDungeon(sim);
+    // Pid 55 is the SAME character as pid 5 (a relog: pids are per-login).
+    sim.entities.set(55, player(55));
+    const records: Record<string, unknown>[] = [];
+    const counters = createParseCounters();
+    let resolves = 0;
+    const recorder = new ParseRecorder({
+      flags: FLAGS,
+      sim,
+      sink: { enqueue: (r) => records.push(r) },
+      counters,
+      resolveParticipant: (pid): FightParticipant | null => {
+        if (pid >= 100) return null;
+        const entity = sim.entities.get(pid);
+        if (entity === undefined) return null;
+        resolves++;
+        const characterId = pid === 55 ? 1005 : pid + 1000;
+        return {
+          entityId: pid,
+          characterId,
+          name: `Char${characterId}`,
+          class: 'mage',
+          spec: null,
+          level: 20,
+          team: null,
+          snapshot: null,
+        };
+      },
+      isBossTemplate: (t) => t === 'morthen',
+      idFactory: () => 'fight-0',
+      clock: () => 0,
+    });
+
+    sim.tickCount = 10;
+    recorder.observe([]);
+    sim.tickCount = 11;
+    recorder.observe([dmg(5, 500, 100)]);
+    // The relogged entity acts twice; only the FIRST event may re-resolve.
+    const resolvesBeforeRelog = resolves;
+    sim.tickCount = 12;
+    recorder.observe([dmg(55, 500, 40)]);
+    sim.tickCount = 13;
+    recorder.observe([dmg(55, 500, 60)]);
+    const boss = sim.entities.get(500);
+    if (boss !== undefined) boss.dead = true;
+    sim.tickCount = 20;
+    recorder.observe([]);
+
+    expect(records.filter((r) => r.t === 'join')).toHaveLength(0);
+    const close = records.find((r) => r.t === 'fight_close') as Record<string, unknown>;
+    const rollup = (close.rollup as { perParticipant: Record<string, { damage: number }> })
+      .perParticipant;
+    expect(rollup['1005']?.damage).toBe(200);
+    // Exactly one extra resolve for the relogged pid, then the index serves.
+    expect(resolves).toBe(resolvesBeforeRelog + 1);
+  });
+
+  test('a freed slot whose live mobIds were emptied in place still unregisters its roster', () => {
+    const sim = fakeSim();
+    const slot = seedDungeon(sim);
+    const { recorder, records } = makeRecorder(sim);
+
+    sim.tickCount = 10;
+    recorder.observe([]);
+    // freeInstance nulls partyKey AND reassigns mobIds = [] on the SAME live
+    // object the segmenter holds; the unregister set must not come from it.
+    (slot as { partyKey: string | null }).partyKey = null;
+    (slot as { mobIds: readonly number[] }).mobIds = [];
+    sim.tickCount = 20;
+    recorder.observe([]);
+
+    sim.tickCount = 21;
+    recorder.observe([dmg(5, 501, 60)]);
+
+    // A stale mobToSlot entry would open a fight against the dead slot state.
+    expect(records.filter((r) => r.t === 'fight_open')).toHaveLength(0);
+  });
+});

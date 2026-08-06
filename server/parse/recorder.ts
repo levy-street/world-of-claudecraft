@@ -308,10 +308,11 @@ export class ParseRecorder {
         };
       } else {
         // Fallback state-join for un-widened emit sites: scan the live aura
-        // array by name. Best-effort only: with two same-named auras from
-        // different casters this can attribute the wrong one (refresh-in-place
-        // keeps a refreshed aura at its original index, so recency is not
-        // recoverable from position).
+        // array backwards by name. A fresh application or refresh always
+        // appends to the end (applyAura splices then pushes), so the backward
+        // scan finds the most recent same-named aura. Best-effort only: with
+        // two same-named auras from different casters the older one is
+        // unreachable by name alone.
         const auras = this.opts.sim.entities.get(ev.targetId)?.auras;
         if (auras !== undefined) {
           for (let i = auras.length - 1; i >= 0; i--) {

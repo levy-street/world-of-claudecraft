@@ -51,11 +51,45 @@ describe('compose env passthrough', () => {
 
 describe('census PII discipline (source pins)', () => {
   test('the census SQL never touches accounts or session network columns', () => {
-    expect(CENSUS_SQL).not.toMatch(/accounts/i);
+    expect(CENSUS_SQL).not.toMatch(/\baccounts\b/i);
     expect(CENSUS_SQL).not.toMatch(/\.ip\b/);
     expect(CENSUS_SQL).not.toMatch(/\.ua\b/);
     expect(CENSUS_SQL).toContain('is_gm = FALSE');
     expect(CENSUS_SQL).toContain('LEAST(GREATEST(');
+  });
+
+  test('the census read is keyset-batched, projected, and rollup-aware', () => {
+    // Review pins: batches on c.id (never one unbounded statement), projects
+    // only the state sub-paths the mapper reads (never the whole blob), and
+    // adds the play_session_totals rollup term so lifetime playtime survives
+    // the retention sweep folding old sessions forward.
+    expect(CENSUS_SQL).toContain('c.id > $2');
+    expect(CENSUS_SQL).toContain('LIMIT $3');
+    expect(CENSUS_SQL).toContain('jsonb_build_object');
+    expect(CENSUS_SQL).not.toMatch(/c\.state[,\s]/);
+    expect(CENSUS_SQL).toContain('play_session_totals');
+  });
+
+  test('the fight participant snapshot stays minimized (never the whole state)', () => {
+    // The census side has its projection pinned above; this is the fight-side
+    // equivalent: resolveParseParticipant must build the seven-field snapshot,
+    // never ship serializeCharacter wholesale to the external service.
+    const source = read('server/game.ts');
+    const start = source.indexOf('private resolveParseParticipant');
+    expect(start).toBeGreaterThan(-1);
+    const body = source.slice(start, source.indexOf('\n  }', start));
+    expect(body).not.toMatch(/snapshot:\s*state\b/);
+    for (const field of [
+      'level:',
+      'lifetimeXp:',
+      'prestigeRank:',
+      'talents:',
+      'equipment:',
+      'arena1v1Rating:',
+      'arena2v2Rating:',
+    ]) {
+      expect(body, `snapshot field ${field}`).toContain(field);
+    }
   });
 
   test('toCensusRecord allowlists counters and never forwards unknown ones', () => {

@@ -19,8 +19,10 @@ function validatedIngestUrl(raw: string | null): string | null {
   try {
     const url = new URL(raw);
     if (url.protocol === 'https:') return raw;
+    // Node's URL keeps IPv6 hostnames bracketed, so the loopback check must
+    // compare against '[::1]', never a bare '::1'.
     const loopback =
-      url.hostname === 'localhost' || url.hostname === '127.0.0.1' || url.hostname === '::1';
+      url.hostname === 'localhost' || url.hostname === '127.0.0.1' || url.hostname === '[::1]';
     if (url.protocol === 'http:' && loopback) return raw;
     console.error(
       `[parse] PARSE_INGEST_URL must be https (or http to loopback), got ${url.protocol}//${url.hostname}: capture stays off`,
@@ -42,7 +44,11 @@ export interface ParseFlags {
   envLabel: ParseEnv;
   /** Daily census export rides capture; PARSE_CENSUS=0 opts out. */
   censusEnabled: boolean;
+  /** UTC hour of day the census export fires (PARSE_CENSUS_HOUR, 0 to 23). */
+  censusUtcHour: number;
 }
+
+const DEFAULT_CENSUS_UTC_HOUR = 9;
 
 export function loadParseFlags(env: NodeJS.ProcessEnv = process.env): ParseFlags {
   const ingestUrl = validatedIngestUrl(env.PARSE_INGEST_URL?.trim() || null);
@@ -77,5 +83,11 @@ export function loadParseFlags(env: NodeJS.ProcessEnv = process.env): ParseFlags
       1024,
     envLabel: envLabelRaw !== undefined && ENV_LABELS.has(envLabelRaw) ? envLabelRaw : 'dev',
     censusEnabled: env.PARSE_CENSUS !== '0',
+    censusUtcHour: censusHourFrom(env.PARSE_CENSUS_HOUR),
   };
+}
+
+function censusHourFrom(raw: string | undefined): number {
+  const hour = Number.parseInt(raw ?? '', 10);
+  return Number.isInteger(hour) && hour >= 0 && hour <= 23 ? hour : DEFAULT_CENSUS_UTC_HOUR;
 }
