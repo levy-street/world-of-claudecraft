@@ -57,3 +57,5 @@ export function crestIdForEntity(kind: string, family: string | undefined): stri
   if (kind === 'npc') return 'status_npc';
   return `family_${family ?? 'humanoid'}`;
 }
+
+// Phase 2 selective-CI measurement drill: UI-only comment-level change.
