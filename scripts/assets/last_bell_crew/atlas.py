@@ -104,6 +104,17 @@ ROGUE_SLOTS = {
     **_EXTRAS_A,
 }
 
+# The hooded rogue shares the plain rogue's cells wholesale (one `rogue` material
+# and one texture serves both bodies), plus a name for the belt run the plain
+# rogue leaves unnamed. What makes this base worth building on is in the UVs: the
+# COWL is half of `RogueHooded_Head` and it samples the CAPE's cell (r1c1), and
+# the face mask is 100 percent of the garment cell (r1c0). So "dark cowl over a
+# pale body" is two palette entries and NO re-UV, and the mask can be recoloured
+# or hidden on its own. Cells measured off the UVs the way the module header
+# describes, never assumed: survey the polygon centroids per cell and check the
+# result reproduces a KNOWN map (`rogue.glb` against ROGUE_SLOTS) before trusting it.
+ROGUE_HOODED_SLOTS = {**ROGUE_SLOTS, "belt": "r0c6"}
+
 MAGE_SLOTS = {
     "skin": "r0c0", "hair": "r0c1", "eyes": "r0c2",
     "cloth": "r1c0",       # the robe
@@ -174,6 +185,7 @@ SKEL_GOLEM_SLOTS = {
 SLOT_MAPS = {
     "knight.glb": KNIGHT_SLOTS,
     "rogue.glb": ROGUE_SLOTS,
+    "rogue_hooded.glb": ROGUE_HOODED_SLOTS,
     "mage.glb": MAGE_SLOTS,
     # mage_classic's UVs land on the same cells as mage's, and its first 18 bones
     # carry the same names, so it reuses the map wholesale.

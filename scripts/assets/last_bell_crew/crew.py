@@ -288,11 +288,19 @@ def arm(rig, weapons):
         # what he carries.
         if spec.get("built_in"):
             continue
+        stem = os.path.basename(spec["url"]).replace(".glb", "")
+        path = f"{REPO}/public/models/{spec['url']}"
+        # A `seat` is a 4x4 captured from a HUMAN-authored arrangement in the shared
+        # Blender session and it wins over the grip table outright. This is the path
+        # the GRIPS warning above says the committed plates need; without it a
+        # regenerated book silently reverts to a derived seat.
+        if spec.get("seat"):
+            out.append(parts.seated(f"Prop_{stem}", path, rig, spec["bone"],
+                                    spec["seat"]))
+            continue
         grip = dict(GRIPS[spec["grip"]])
         grip.update(spec.get("tune", {}))
-        stem = os.path.basename(spec["url"]).replace(".glb", "")
-        out.append(parts.held(f"Prop_{stem}", f"{REPO}/public/models/{spec['url']}",
-                              rig, spec["bone"], **grip))
+        out.append(parts.held(f"Prop_{stem}", path, rig, spec["bone"], **grip))
     return out
 
 
