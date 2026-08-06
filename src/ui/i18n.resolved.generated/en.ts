@@ -391,7 +391,8 @@ export const en: EnTranslations = {
     },
     "emoteEditor": {
       "title": "Emotes",
-      "done": "Done"
+      "done": "Done",
+      "close": "Close emotes"
     },
     "dailyRewards": {
       "title": "Daily Rewards",
@@ -1348,6 +1349,8 @@ export const en: EnTranslations = {
       "buttons": "Button Layout",
       "resetButtons": "Reset Button Layout",
       "menuAction": "Game Menu",
+      "zoomIn": "Zoom In",
+      "zoomOut": "Zoom Out",
       "help": "Left stick moves, right stick looks. Open a window to use the on-screen pointer."
     },
     "perf": {
@@ -3156,7 +3159,8 @@ export const en: EnTranslations = {
         "raise_fallen": "Raise Fallen (periodic waves of adds)",
         "soul_rend": "Soul Rend (marked players must spread and be healed)",
         "deathless_rage": "Deathless Rage (interrupted at the wardstones)",
-        "wardstones": "Wardstone channels (phase transition)"
+        "wardstones": "Wardstone channels (phase transition)",
+        "dread_curse": "Dread Curse (heroic only, stacking tank-swap debuff)"
       }
     },
     "deeds": {
@@ -3564,16 +3568,21 @@ export const en: EnTranslations = {
       "groupInterface": "Interface",
       "groupCamera": "Camera",
       "talents": "Talents",
+      "professions": "Professions",
       "arena": "Arena",
       "leaderboard": "Leaderboard",
       "deeds": "Book of Deeds",
+      "sheathe": "Sheathe/Unsheathe Weapon",
       "crafting": "Crafting",
       "valeCup": "Vale Cup",
+      "mount": "Mount / Dismount",
       "calendar": "Event Calendar",
+      "dungeonFinder": "Dungeon Finder",
       "discord": "Discord",
       "abilities": "Use action bar abilities (the number row; a second bar sits on the numpad)",
       "targetFriendly": "Target nearest friendly",
       "cycleFriendly": "Cycle friendly target",
+      "targetAuras": "Target buffs and debuffs",
       "gameMenu": "Open game menu and options",
       "bothMouse": "Both Mouse Buttons",
       "runForward": "Run forward",
@@ -3584,7 +3593,7 @@ export const en: EnTranslations = {
       "mobileHeading": "On mobile",
       "mobileBody": "Touch controls appear automatically on phones and tablets: a movement stick on the left, drag anywhere else to look, pinch with two fingers to zoom the camera, and on-screen buttons for your abilities and menus. A small arrow in the top left corner shows or hides the menu buttons, and the More button there holds the rest of your windows.",
       "controllerHeading": "On a controller",
-      "controllerBody": "Gamepads work too, and controller support is on by default. The left stick moves, the right stick aims the camera, and the face and shoulder buttons cover your abilities, jumping, and interacting. Open a window like your bags to bring up an on-screen pointer, and the game menu navigates directly with the D-pad and face buttons. You can remap the buttons and adjust stick deadzone, camera speed, vibration, and inverted look from the controller settings in the options."
+      "controllerBody": "Gamepads work too, and controller support is on by default. The left stick moves, the right stick aims the camera, and the face and shoulder buttons cover your abilities, jumping, and interacting. Open a window like your bags to bring up an on-screen pointer, and the game menu navigates directly with the D-pad and face buttons. You can remap the buttons and adjust stick deadzone, camera speed, vibration, and inverted look from the controller settings in the options, where a button can also be bound to zoom the camera in or out (unbound by default)."
     },
     "settingsPage": {
       "heading": "Settings & Performance",
@@ -4571,10 +4580,10 @@ export const en: EnTranslations = {
       "specimenBody": "Keep a little bag room spare when you farm: a signed windfall needs room of its own or a matching signed stack to land in, and if nothing fits the yield still arrives but the signature is lost. Corpse harvesting has its own jackpot arm too: about {pct}% of each harvested component comes up rare or better. A family with a perfect specimen to give (hide, silk, venom, meat) keeps its ordinary yield plain and mints the signed specimen beside it; every other family signs the yield itself.",
       "gatherDeedsHeading": "Deeds along the way",
       "gatherDeeds": {
-        "mining": "Your first node of any trade earns Fruits of the Field, and the 100 cap in Mining inscribes Ore in the Blood. Reaching 100 in any three of Mining, Logging, Herbalism, and Fishing adds Master Gatherer at 25 Renown, and cracking a pristine vein records its own collector's mark. Six zones keep a gatherer's chronicle page apiece too, filled by harvesting an ore vein, a wood stand, and an herb patch within the zone's bounds. None of these grant power: deeds are titles and Renown, a record of the roads you have walked.",
-        "logging": "Your first node of any trade earns Fruits of the Field, and the 100 cap in Logging inscribes Heartwood Hewer. Reaching 100 in any three of Mining, Logging, Herbalism, and Fishing adds Master Gatherer at 25 Renown, and a strike of ancient heartwood records its own collector's mark. Six zones keep a gatherer's chronicle page apiece too, filled by harvesting an ore vein, a wood stand, and an herb patch within the zone's bounds. Deeds are titles and Renown only, never power.",
-        "herbalism": "Your first node of any trade earns Fruits of the Field, and the 100 cap in Herbalism inscribes Master of the Meadow. Reaching 100 in any three of Mining, Logging, Herbalism, and Fishing adds Master Gatherer at 25 Renown, and a moonlit bloom records its own collector's mark. Six zones keep a gatherer's chronicle page apiece too, filled by harvesting an ore vein, a wood stand, and an herb patch within the zone's bounds. Deeds are titles and Renown only, never power.",
-        "fishing": "The 100 milestone inscribes Old Salt and 200 inscribes Master Angler with its title, the very top of the angler's art; Fishing also counts toward Master Gatherer, earned at 100 in any three gathering trades. A first fish from each of six zones' waters fills its own page, the three heartland zones and the Willowfen, the Galecrest, and the Farshore beyond them, and the Sunglint Koi records Glimmer of Hope, so travelers with a pole in their pack fill their book faster than they expect."
+        "mining": "Your first node of any trade earns Fruits of the Field, and the 100 cap in Mining inscribes Ore in the Blood. Reaching 100 in any three of Mining, Logging, Herbalism, and Fishing adds Master Gatherer at 25 Renown, and cracking a pristine vein records its own collector's mark. Twelve zones keep a gatherer's chronicle page apiece too, filled by harvesting an ore vein, a wood stand, and an herb patch within the zone's bounds. None of these grant power: deeds are titles and Renown, a record of the roads you have walked.",
+        "logging": "Your first node of any trade earns Fruits of the Field, and the 100 cap in Logging inscribes Heartwood Hewer. Reaching 100 in any three of Mining, Logging, Herbalism, and Fishing adds Master Gatherer at 25 Renown, and a strike of ancient heartwood records its own collector's mark. Twelve zones keep a gatherer's chronicle page apiece too, filled by harvesting an ore vein, a wood stand, and an herb patch within the zone's bounds. Deeds are titles and Renown only, never power.",
+        "herbalism": "Your first node of any trade earns Fruits of the Field, and the 100 cap in Herbalism inscribes Master of the Meadow. Reaching 100 in any three of Mining, Logging, Herbalism, and Fishing adds Master Gatherer at 25 Renown, and a moonlit bloom records its own collector's mark. Twelve zones keep a gatherer's chronicle page apiece too, filled by harvesting an ore vein, a wood stand, and an herb patch within the zone's bounds. Deeds are titles and Renown only, never power.",
+        "fishing": "The 100 milestone inscribes Old Salt and 200 inscribes Master Angler with its title, the very top of the angler's art; Fishing also counts toward Master Gatherer, earned at 100 in any three gathering trades. A first fish from each of twelve zones' waters fills its own page, the three heartland zones and the Willowfen, the Galecrest, the Farshore, the Frostveil, the Amberfall, the Nightbloom, the Wraithwood, the Palmreach, and the Evergarden beyond them, and the Sunglint Koi records Glimmer of Hope, so travelers with a pole in their pack fill their book faster than they expect."
       },
       "fish": {
         "startHeading": "Getting started",
@@ -13048,11 +13057,11 @@ export const en: EnTranslations = {
       },
       "q_prof_attune_outfitter": {
         "title": "The Outfitter's Measure",
-        "text": "Measure the cost before you cut, that is the first rule at my loom. Choose me and Leatherworking and Tailoring become your two majors, the pair you may carry beyond rare work; the craft opposite them settles in as your hobby, taken to rare and left there. The trades you set aside are not unravelled, {playerName}, only folded away, dormant until you take them up again. Be certain, though: should you leave this pair and later want it back, the way home is paid in labor that lengthens each time, five culled at first, then eight, then eleven, always a little more. If your mind is made, cull four webwood spiders and bring their silk to the loom, for good thread starts every good garment.",
+        "text": "Measure the cost before you cut, that is the first rule at my loom. Choose me and Leatherworking and Tailoring become your two majors, the pair you may carry beyond rare work; the craft opposite them settles in as your hobby, taken to rare and left there. The trades you set aside are not unravelled, {playerName}, only folded away, dormant until you take them up again. Be certain, though: should you leave this pair and later want it back, the way home is paid in labor that lengthens each time, five culled at first, then eight, then eleven, always a little more. If your mind is made, cull four Sableweb Lurkers and bring their silk to the loom, for good thread starts every good garment.",
         "completion": "Even thread, even hand. Leatherworking and Tailoring are yours to carry as far as your skill will reach. Measure twice, and they will not fail you.",
         "objectives": {
           "0": {
-            "label": "Webwood Spider culled"
+            "label": "Sableweb Lurker culled"
           }
         }
       },
@@ -13088,11 +13097,11 @@ export const en: EnTranslations = {
       },
       "q_prof_amends_outfitter": {
         "title": "Threads Rejoined",
-        "text": "Back at my loom after all. I hold no grudge, {playerName}, but the thread remembers a hand that let it go, and the cost of taking it up again is measured out longer each time. Cull the webwood spiders crowding the eastern woods, and the labor will settle your hands before they touch good silk again.",
+        "text": "Back at my loom after all. I hold no grudge, {playerName}, but the thread remembers a hand that let it go, and the cost of taking it up again is measured out longer each time. Cull the Sableweb Lurkers crowding the eastern woods, and the labor will settle your hands before they touch good silk again.",
         "completion": "Steady again. Leatherworking and Tailoring return to your hands as majors. Measure twice this time before you wander.",
         "objectives": {
           "0": {
-            "label": "Webwood Spider culled"
+            "label": "Sableweb Lurker culled"
           }
         }
       },
@@ -13108,11 +13117,11 @@ export const en: EnTranslations = {
       },
       "q_prof_amends_bombardier": {
         "title": "The Ledger Grows",
-        "text": "You came BACK, ha, they always come back, the loud stuff has a pull, yes? No sulking from me, {playerName}, but the ledger, oh the ledger, it grows every time you skip out, more each return, that is only fair. Go clear the tunnel rats out of the dig for me, sweat first, sparks later, that is the rule I just made up.",
+        "text": "You came BACK, ha, they always come back, the loud stuff has a pull, yes? No sulking from me, {playerName}, but the ledger, oh the ledger, it grows every time you skip out, more each return, that is only fair. Go clear the Deeprock Diggers out of the dig for me, sweat first, sparks later, that is the rule I just made up.",
         "completion": "THERE it is, the itch is back in your hands. Engineering and Alchemy, majors again, go on, go make a bang. Try to stay put this time, eh?",
         "objectives": {
           "0": {
-            "label": "Tunnel Rat exterminated"
+            "label": "Deeprock Digger exterminated"
           }
         }
       },

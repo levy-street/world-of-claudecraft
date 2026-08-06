@@ -391,7 +391,8 @@ export const de_DE: EnTranslations = {
     },
     "emoteEditor": {
       "title": "Emotes",
-      "done": "Fertig"
+      "done": "Fertig",
+      "close": "Close emotes"
     },
     "dailyRewards": {
       "title": "Tägliche Belohnungen",
@@ -1348,6 +1349,8 @@ export const de_DE: EnTranslations = {
       "buttons": "Tastenbelegung",
       "resetButtons": "Tastenbelegung zurücksetzen",
       "menuAction": "Spielmenü",
+      "zoomIn": "Zoom In",
+      "zoomOut": "Zoom Out",
       "help": "Linker Stick bewegt, rechter Stick steuert die Kamera. Öffne ein Fenster, um den Bildschirmzeiger zu verwenden."
     },
     "perf": {
@@ -3156,7 +3159,8 @@ export const de_DE: EnTranslations = {
         "raise_fallen": "Gefallene erheben (periodische Verstarkungswellen)",
         "soul_rend": "Seelenzerfetzung (markierte Spieler mussen sich verteilen und geheilt werden)",
         "deathless_rage": "Unsterbliche Raserei (an den Schutzsteinen unterbrochen)",
-        "wardstones": "Schutzstein-Kanale (Phasenubergang)"
+        "wardstones": "Schutzstein-Kanale (Phasenubergang)",
+        "dread_curse": "Dread Curse (heroic only, stacking tank-swap debuff)"
       }
     },
     "deeds": {
@@ -3564,16 +3568,21 @@ export const de_DE: EnTranslations = {
       "groupInterface": "Interface",
       "groupCamera": "Kamera",
       "talents": "Talente",
+      "professions": "Professions",
       "arena": "Arena",
       "leaderboard": "Bestenliste",
       "deeds": "Buch der Taten",
+      "sheathe": "Sheathe/Unsheathe Weapon",
       "crafting": "Handwerk",
       "valeCup": "Talpokal",
+      "mount": "Mount / Dismount",
       "calendar": "Ereigniskalender",
+      "dungeonFinder": "Dungeon Finder",
       "discord": "Discord",
       "abilities": "Aktionsleisten-Fähigkeiten einsetzen (die Zahlenreihe; eine zweite Leiste liegt auf dem Nummernblock)",
       "targetFriendly": "Nächstes freundliches Ziel anvisieren",
       "cycleFriendly": "Freundliches Ziel durchschalten",
+      "targetAuras": "Target buffs and debuffs",
       "gameMenu": "Spielmenü und Optionen öffnen",
       "bothMouse": "Beide Maustasten",
       "runForward": "Vorwärtslaufen",

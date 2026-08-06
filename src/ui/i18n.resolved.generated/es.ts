@@ -391,7 +391,8 @@ export const es: EnTranslations = {
     },
     "emoteEditor": {
       "title": "Emotes",
-      "done": "Listo"
+      "done": "Listo",
+      "close": "Close emotes"
     },
     "dailyRewards": {
       "title": "Recompensas diarias",
@@ -1348,6 +1349,8 @@ export const es: EnTranslations = {
       "buttons": "Distribución de botones",
       "resetButtons": "Restablecer distribución de botones",
       "menuAction": "Menú del juego",
+      "zoomIn": "Zoom In",
+      "zoomOut": "Zoom Out",
       "help": "El stick izquierdo mueve, el derecho controla la cámara. Abre una ventana para usar el puntero en pantalla."
     },
     "perf": {
@@ -3156,7 +3159,8 @@ export const es: EnTranslations = {
         "raise_fallen": "Despertar a los Caidos (oleadas periodicas de refuerzos)",
         "soul_rend": "Desgarro de Alma (los jugadores marcados deben dispersarse y recibir curacion)",
         "deathless_rage": "Furia Inmortal (se interrumpe en las piedras de guardia)",
-        "wardstones": "Canalizacion de piedras de guardia (transicion de fase)"
+        "wardstones": "Canalizacion de piedras de guardia (transicion de fase)",
+        "dread_curse": "Dread Curse (heroic only, stacking tank-swap debuff)"
       }
     },
     "deeds": {
@@ -3564,16 +3568,21 @@ export const es: EnTranslations = {
       "groupInterface": "Interfaz",
       "groupCamera": "Cámara",
       "talents": "Talentos",
+      "professions": "Professions",
       "arena": "Arena",
       "leaderboard": "Clasificación",
       "deeds": "Libro de Gestas",
+      "sheathe": "Sheathe/Unsheathe Weapon",
       "crafting": "Artesanía",
       "valeCup": "Copa del Valle",
+      "mount": "Mount / Dismount",
       "calendar": "Calendario de eventos",
+      "dungeonFinder": "Dungeon Finder",
       "discord": "Discord",
       "abilities": "Usar las habilidades de la barra de acción (la fila de números; una segunda barra está en el teclado numérico)",
       "targetFriendly": "Objetivo amistoso más cercano",
       "cycleFriendly": "Objetivo amistoso siguiente",
+      "targetAuras": "Target buffs and debuffs",
       "gameMenu": "Abrir el menú del juego y las opciones",
       "bothMouse": "Ambos botones del ratón",
       "runForward": "Correr hacia adelante",

@@ -2549,6 +2549,9 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
     if (req.method === 'DELETE' && assetIdMatch) {
       const accountId = await bearerActiveAccount(req, res);
       if (accountId === null) return;
+      if (!assetUploadRateLimited(req, accountId).allowed) {
+        return json(res, 429, { error: 'rate_limited' });
+      }
       return assetDeleteCore(res, accountId, Number(assetIdMatch[1]));
     }
     json(res, 404, { error: 'unknown endpoint' });

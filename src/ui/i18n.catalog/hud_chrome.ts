@@ -112,6 +112,7 @@ export const hudChromeStrings = {
   emoteEditor: {
     title: 'Emotes',
     done: 'Done',
+    close: 'Close emotes',
   },
   dailyRewards: {
     title: 'Daily Rewards',
@@ -1359,6 +1360,8 @@ export const hudChromeStrings = {
     buttons: 'Button Layout',
     resetButtons: 'Reset Button Layout',
     menuAction: 'Game Menu',
+    zoomIn: 'Zoom In',
+    zoomOut: 'Zoom Out',
     help: 'Left stick moves, right stick looks. Open a window to use the on-screen pointer.',
   },
   // Performance overlay (the customizable in-game stats panel + its Options
@@ -4002,6 +4005,7 @@ export const hudChromeStrings = {
       soul_rend: 'Soul Rend (marked players must spread and be healed)',
       deathless_rage: 'Deathless Rage (interrupted at the wardstones)',
       wardstones: 'Wardstone channels (phase transition)',
+      dread_curse: 'Dread Curse (heroic only, stacking tank-swap debuff)',
     },
   },
   // The Book of Deeds window: the deed catalog browser (summary strip,

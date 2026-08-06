@@ -538,6 +538,38 @@ describe('items vendor: buy / sell / sellAllJunk / buyBack', () => {
     expect(meta.honor).toBe(10_000 - 800);
   });
 
+  it('buyItem bulk purchase force-1s a soulbound copper-priced stackable, matching the count path (Q23)', () => {
+    const sim = makeWorld();
+    const { pid, wilkes, meta } = vendorPlayer(sim);
+    const ctx = ctxOf(sim);
+    const testId = 'test_soulbound_rations';
+    ITEMS[testId] = {
+      id: testId,
+      name: 'Test Soulbound Rations',
+      kind: 'food',
+      foodHp: 50,
+      buyValue: 10,
+      soulbound: true,
+      sellValue: 1,
+    };
+    wilkes.vendorItems.push(testId);
+
+    try {
+      // Ample gold: a plain copper-priced food row would bulk-buy the full
+      // bag stack size (20). Soulbound must instead fall through to the
+      // ordinary single-purchase path (vendorCountForced force-1), granting
+      // exactly one vendorStackSize-of-food purchase (5 units) at the
+      // per-unit price, never the bulk-multiplied quantity.
+      meta.copper = 10_000;
+      items.buyItem(ctx, wilkes.id, testId, pid, { bulk: true });
+      expect(sim.countItem(testId, pid)).toBe(5);
+      expect(meta.copper).toBe(10_000 - 10 * 5);
+    } finally {
+      wilkes.vendorItems.splice(wilkes.vendorItems.indexOf(testId), 1);
+      delete ITEMS[testId];
+    }
+  });
+
   it('buyItem bulk purchase never buys more than one mount, even with ample gold', () => {
     const sim = makeWorld();
     const pid = sim.addPlayer('warrior', 'MountBulkBuyer');

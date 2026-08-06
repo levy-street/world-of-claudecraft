@@ -32,6 +32,8 @@
   let activity = $state<Activity | null>(null);
   let onlineHistory = $state<OnlineHistory | null>(null);
   let onlineHistoryRange = $state<OnlineHistoryRange>('24h');
+  let liveFailed = $state(false);
+  let activityFailed = $state(false);
 
   const dayLabel = (day: string) => day.slice(5); // YYYY-MM-DD -> MM-DD
   let registrationPoints = $derived<BarPoint[]>((activity?.registrations ?? []).map((p) => ({ label: dayLabel(p.day), value: p.count })));
@@ -61,8 +63,9 @@
   async function refreshLive(): Promise<void> {
     try {
       overview = await apiGet<Overview>('/admin/api/overview');
+      liveFailed = false;
     } catch (err) {
-      if (!auth.handleAuthFailure(err)) console.error('live refresh failed:', err);
+      if (!auth.handleAuthFailure(err)) liveFailed = true;
     }
   }
 
@@ -74,8 +77,9 @@
       ]);
       activity = nextActivity;
       onlineHistory = nextOnlineHistory;
+      activityFailed = false;
     } catch (err) {
-      if (!auth.handleAuthFailure(err)) console.error('activity refresh failed:', err);
+      if (!auth.handleAuthFailure(err)) activityFailed = true;
     }
   }
 
@@ -95,7 +99,9 @@
 </script>
 
 <section id="stats">
-  {#if overview}
+  {#if liveFailed}
+    <div class="empty">{t('stats.loadFailed')}</div>
+  {:else if overview}
     <StatCard value={fmtNumber(overview.server.online)} label={t('stats.onlineNow')} />
     <StatCard value={fmtNumber(overview.server.onlineAccounts)} label={t('stats.onlineAccounts')} />
     <StatCard value={fmtNumber(overview.siteUsersNow)} label={t('stats.siteUsersNow')} />
@@ -118,36 +124,40 @@
 </section>
 
 <section id="charts">
-  <Panel
-    title={t('charts.onlineHistory', {
-      range: t(`charts.range.${onlineHistory?.range ?? onlineHistoryRange}`),
-    })}
-  >
-    <div class="range-tabs">
-      {#each ONLINE_HISTORY_RANGES as range}
-        <button
-          type="button"
-          class:active={onlineHistoryRange === range}
-          class="range-tab"
-          aria-pressed={onlineHistoryRange === range}
-          onclick={() => selectOnlineHistoryRange(range)}
-        >
-          {t(`charts.range.${range}`)}
-        </button>
-      {/each}
-    </div>
-    <LineChart points={onlinePoints} />
-  </Panel>
-  <Panel title={t('charts.registrations', { days: activity?.days ?? 0 })}>
-    <BarChart points={registrationPoints} />
-  </Panel>
-  <Panel title={t('charts.sessions', { days: activity?.days ?? 0 })}>
-    <BarChart points={sessionPoints} />
-  </Panel>
-  <Panel title={t('charts.classDistribution')}>
-    <BarChart points={classPoints} />
-  </Panel>
-  <Panel title={t('charts.levelDistribution')}>
-    <BarChart points={levelPoints} />
-  </Panel>
+  {#if activityFailed}
+    <div class="empty">{t('charts.loadFailed')}</div>
+  {:else}
+    <Panel
+      title={t('charts.onlineHistory', {
+        range: t(`charts.range.${onlineHistory?.range ?? onlineHistoryRange}`),
+      })}
+    >
+      <div class="range-tabs">
+        {#each ONLINE_HISTORY_RANGES as range}
+          <button
+            type="button"
+            class:active={onlineHistoryRange === range}
+            class="range-tab"
+            aria-pressed={onlineHistoryRange === range}
+            onclick={() => selectOnlineHistoryRange(range)}
+          >
+            {t(`charts.range.${range}`)}
+          </button>
+        {/each}
+      </div>
+      <LineChart points={onlinePoints} />
+    </Panel>
+    <Panel title={t('charts.registrations', { days: activity?.days ?? 0 })}>
+      <BarChart points={registrationPoints} />
+    </Panel>
+    <Panel title={t('charts.sessions', { days: activity?.days ?? 0 })}>
+      <BarChart points={sessionPoints} />
+    </Panel>
+    <Panel title={t('charts.classDistribution')}>
+      <BarChart points={classPoints} />
+    </Panel>
+    <Panel title={t('charts.levelDistribution')}>
+      <BarChart points={levelPoints} />
+    </Panel>
+  {/if}
 </section>

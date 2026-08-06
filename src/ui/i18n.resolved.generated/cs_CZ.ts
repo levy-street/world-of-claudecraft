@@ -391,7 +391,8 @@ export const cs_CZ: EnTranslations = {
     },
     "emoteEditor": {
       "title": "Emoty",
-      "done": "Hotovo"
+      "done": "Hotovo",
+      "close": "Close emotes"
     },
     "dailyRewards": {
       "title": "Denní odměny",
@@ -1348,6 +1349,8 @@ export const cs_CZ: EnTranslations = {
       "buttons": "Rozložení tlačítek",
       "resetButtons": "Resetovat rozložení tlačítek",
       "menuAction": "Herní menu",
+      "zoomIn": "Zoom In",
+      "zoomOut": "Zoom Out",
       "help": "Levá páčka pohybuje, pravá páčka rozhlíží. Otevři okno pro použití ukazatele na obrazovce."
     },
     "perf": {
@@ -3156,7 +3159,8 @@ export const cs_CZ: EnTranslations = {
         "raise_fallen": "Povstání padlých (periodické vlny přivolávek)",
         "soul_rend": "Trhání duše (označení hráči se musí rozejít a být vyléčeni)",
         "deathless_rage": "Nesmrtelný hněv (přerušen u ochranných kamenů)",
-        "wardstones": "Kanály ochranných kamenů (přechod fáze)"
+        "wardstones": "Kanály ochranných kamenů (přechod fáze)",
+        "dread_curse": "Dread Curse (heroic only, stacking tank-swap debuff)"
       }
     },
     "deeds": {
@@ -3564,16 +3568,21 @@ export const cs_CZ: EnTranslations = {
       "groupInterface": "Rozhraní",
       "groupCamera": "Kamera",
       "talents": "Talenty",
+      "professions": "Professions",
       "arena": "Aréna",
       "leaderboard": "Žebříček",
       "deeds": "Kniha skutků",
+      "sheathe": "Sheathe/Unsheathe Weapon",
       "crafting": "Výroba",
       "valeCup": "Pohár údolí",
+      "mount": "Mount / Dismount",
       "calendar": "Kalendář událostí",
+      "dungeonFinder": "Dungeon Finder",
       "discord": "Discord",
       "abilities": "Použít schopnosti na akční liště, číselná řada; druhá lišta je na numpadu",
       "targetFriendly": "Zacílit nejbližšího spojence",
       "cycleFriendly": "Přepínat spojenecký cíl",
+      "targetAuras": "Target buffs and debuffs",
       "gameMenu": "Otevřít herní menu a nastavení",
       "bothMouse": "Obě tlačítka myši",
       "runForward": "Běh vpřed",

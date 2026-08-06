@@ -2537,6 +2537,128 @@ export const DEEDS: Record<string, DeedDef> = {
     renown: 10,
     trigger: { kind: 'visit', markId: 'craft_rare:armorcrafting' },
   },
+  // The remaining starter-tier zones from the v0.32.0 expansion pick up the
+  // same chronicle pair the phase 20 pass gave Willowfen, Galecrest, and
+  // Farshore: identical infrastructure (starter-kit gather nodes plus the
+  // Vale-fallback catch table), just never wired to a deed. Drakelands
+  // already picked up its own pair (chr_drakemaw_broodlord,
+  // chr_maw_matriarch) with the v0.35.0 dragonkin brood rework, so this
+  // batch covers only the six zones that rework never touched. Copied
+  // line-for-line from the template above; renown 5 each.
+  chr_frostveil_gatherer: {
+    id: 'chr_frostveil_gatherer',
+    name: 'Terraced Harvest',
+    desc: 'Harvest an ore vein, a wood stand, and an herb patch in the Frostveil.',
+    category: 'chronicle',
+    renown: 5,
+    trigger: {
+      kind: 'visits',
+      markIds: ['gather:frostveil:ore', 'gather:frostveil:wood', 'gather:frostveil:herb'],
+    },
+  },
+  chr_frostveil_first_cast: {
+    id: 'chr_frostveil_first_cast',
+    name: 'First Ice on the Tarn',
+    desc: 'Catch a fish from the waters of the Frostveil.',
+    category: 'chronicle',
+    renown: 5,
+    trigger: { kind: 'visit', markId: 'fish:frostveil' },
+  },
+  chr_amberfall_gatherer: {
+    id: 'chr_amberfall_gatherer',
+    name: 'The Amberfall Harvest',
+    desc: 'Harvest an ore vein, a wood stand, and an herb patch in the Amberfall.',
+    category: 'chronicle',
+    renown: 5,
+    trigger: {
+      kind: 'visits',
+      markIds: ['gather:amberfall:ore', 'gather:amberfall:wood', 'gather:amberfall:herb'],
+    },
+  },
+  chr_amberfall_first_cast: {
+    id: 'chr_amberfall_first_cast',
+    name: 'A Catch from the Great Mere',
+    desc: 'Catch a fish from the waters of the Amberfall.',
+    category: 'chronicle',
+    renown: 5,
+    trigger: { kind: 'visit', markId: 'fish:amberfall' },
+  },
+  chr_nightbloom_gatherer: {
+    id: 'chr_nightbloom_gatherer',
+    name: 'The Dreaming Harvest',
+    desc: 'Harvest an ore vein, a wood stand, and an herb patch in the Nightbloom.',
+    category: 'chronicle',
+    renown: 5,
+    trigger: {
+      kind: 'visits',
+      markIds: ['gather:nightbloom:ore', 'gather:nightbloom:wood', 'gather:nightbloom:herb'],
+    },
+  },
+  chr_nightbloom_first_cast: {
+    id: 'chr_nightbloom_first_cast',
+    name: 'A Ripple on the Moonwell',
+    desc: 'Catch a fish from the waters of the Nightbloom.',
+    category: 'chronicle',
+    renown: 5,
+    trigger: { kind: 'visit', markId: 'fish:nightbloom' },
+  },
+  chr_wraithwood_gatherer: {
+    id: 'chr_wraithwood_gatherer',
+    name: 'Harvest Under the Canopy',
+    desc: 'Harvest an ore vein, a wood stand, and an herb patch in the Wraithwood.',
+    category: 'chronicle',
+    renown: 5,
+    trigger: {
+      kind: 'visits',
+      markIds: ['gather:wraithwood:ore', 'gather:wraithwood:wood', 'gather:wraithwood:herb'],
+    },
+  },
+  chr_wraithwood_first_cast: {
+    id: 'chr_wraithwood_first_cast',
+    name: 'A Cast in the Looking-Glass',
+    desc: 'Catch a fish from the waters of the Wraithwood.',
+    category: 'chronicle',
+    renown: 5,
+    trigger: { kind: 'visit', markId: 'fish:wraithwood' },
+  },
+  chr_palmreach_gatherer: {
+    id: 'chr_palmreach_gatherer',
+    name: 'Harvest on the Palmstrand',
+    desc: 'Harvest an ore vein, a wood stand, and an herb patch in the Palmreach.',
+    category: 'chronicle',
+    renown: 5,
+    trigger: {
+      kind: 'visits',
+      markIds: ['gather:palmreach:ore', 'gather:palmreach:wood', 'gather:palmreach:herb'],
+    },
+  },
+  chr_palmreach_first_cast: {
+    id: 'chr_palmreach_first_cast',
+    name: 'Casting the Sapphire Lagoon',
+    desc: 'Catch a fish from the waters of the Palmreach.',
+    category: 'chronicle',
+    renown: 5,
+    trigger: { kind: 'visit', markId: 'fish:palmreach' },
+  },
+  chr_evergarden_gatherer: {
+    id: 'chr_evergarden_gatherer',
+    name: "The Parterre's Bounty",
+    desc: 'Harvest an ore vein, a wood stand, and an herb patch in the Evergarden.',
+    category: 'chronicle',
+    renown: 5,
+    trigger: {
+      kind: 'visits',
+      markIds: ['gather:evergarden:ore', 'gather:evergarden:wood', 'gather:evergarden:herb'],
+    },
+  },
+  chr_evergarden_first_cast: {
+    id: 'chr_evergarden_first_cast',
+    name: 'A Cast on the Petal Pond',
+    desc: 'Catch a fish from the waters of the Evergarden.',
+    category: 'chronicle',
+    renown: 5,
+    trigger: { kind: 'visit', markId: 'fish:evergarden' },
+  },
 };
 
 for (const def of Object.values(DEEDS)) {

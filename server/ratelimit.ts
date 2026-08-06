@@ -353,11 +353,12 @@ export function resetCardUploadRateLimits(): void {
   cardUploadAccountAttempts.clear();
 }
 
-// GLB asset uploads (POST /api/assets) get their own per-IP AND per-account
-// bucket, mirroring the player-card upload throttle above: an upload flood can
-// never burn a player's login budget (these maps are separate from the shared
-// `attempts` map, so STRICTEST_RATE_LIMIT is unaffected), and a single account
-// spraying uploads through many IPs is still capped by the account key.
+// GLB asset mutations (POST /api/assets upload, DELETE /api/assets/:id) share
+// one per-IP AND per-account bucket, mirroring the player-card upload throttle
+// above: a flood of either can never burn a player's login budget (these maps
+// are separate from the shared `attempts` map, so STRICTEST_RATE_LIMIT is
+// unaffected), and a single account spraying requests through many IPs is
+// still capped by the account key.
 export const ASSET_UPLOAD_MAX_PER_MINUTE = 10;
 // Map saves are bigger writes (up to 2 MiB JSONB) but honest editors autosave;
 // 30/min leaves headroom for rapid save-as/fork flows while bounding floods.

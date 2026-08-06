@@ -204,10 +204,12 @@ async function deleteHandler(ctx: Ctx): Promise<void> {
 
 // ---------------------------------------------------------------------------
 // The route table. registry.ts spreads this into apiRoutes. /api/assets/mine is
-// static, so the router prefers it over the dynamic :file byte read. The legacy
-// DELETE arm mounts no limiter (matching legacy exactly); the byte GET carries
-// the public-read policy like its legacy arm's publicReadRateLimited check (the
-// coded-vs-prose 429 deviation, recorded).
+// static, so the router prefers it over the dynamic :file byte read. DELETE
+// shares the fused ASSET_UPLOAD_POLICY bucket with the upload lane, mirroring
+// how DELETE /api/maps/:id shares MAP_MUTATION_POLICY with its own create/save
+// lane (maps_routes.ts); the byte GET carries the public-read policy like its
+// legacy arm's publicReadRateLimited check (the coded-vs-prose 429 deviation,
+// recorded).
 // ---------------------------------------------------------------------------
 
 export const routes: RouteDef[] = [
@@ -242,7 +244,7 @@ export const routes: RouteDef[] = [
     method: 'DELETE',
     path: '/api/assets/:id',
     surface: 'api',
-    middleware: [activeGuard, requireOwnedAsset],
+    middleware: [activeGuard, rateLimit(ASSET_UPLOAD_POLICY), requireOwnedAsset],
     meta: { requireOwned: { kind: 'user_asset', ownerScope: 'account' } },
     handler: deleteHandler,
   },

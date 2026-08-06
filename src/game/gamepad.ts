@@ -10,6 +10,9 @@ import {
   AXIS,
   detectGamepadKind,
   GAMEPAD_NONE,
+  GAMEPAD_ZOOM_IN,
+  GAMEPAD_ZOOM_OUT,
+  GAMEPAD_ZOOM_STEP,
   type GamepadKind,
   GP,
   risingEdges,
@@ -229,6 +232,16 @@ export class GamepadManager {
     }
     if (action === 'autorun') {
       this.input.toggleAutorun();
+      return;
+    }
+    // Negative delta pulls the camera closer (zoom in), positive pushes it away
+    // (zoom out), matching Input's wheel handler's Math.sign(deltaY) convention.
+    if (action === GAMEPAD_ZOOM_IN) {
+      this.input.zoomBy(-GAMEPAD_ZOOM_STEP);
+      return;
+    }
+    if (action === GAMEPAD_ZOOM_OUT) {
+      this.input.zoomBy(GAMEPAD_ZOOM_STEP);
       return;
     }
     this.cb.onAction(action);
