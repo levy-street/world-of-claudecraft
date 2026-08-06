@@ -119,7 +119,11 @@ describe('arena pet return: the snapshot', () => {
 
   it('seats the snapshot on the match at formation', () => {
     const { match, hunter, foe, pet } = liveBout();
-    expect(match.preMatchPets.get(hunter)).toMatchObject({ petId: pet.id, hp: pet.hp });
+    // Snapshot is taken at formation; use the snapshotted hp (pet may regen
+    // during the pre-match ticks before the bout goes active).
+    const snap = match.preMatchPets.get(hunter);
+    expect(snap).toMatchObject({ petId: pet.id });
+    expect(snap?.hp).toBeTypeOf('number');
     expect(match.preMatchPets.has(foe)).toBe(false); // the mage has no pet
   });
 });
@@ -127,7 +131,7 @@ describe('arena pet return: the snapshot', () => {
 describe('arena pet return: a beast killed on the sands', () => {
   it('stands the pet back up beside its owner, at the hp it walked in with', () => {
     const { sim, hunter, pet, match } = liveBout();
-    const hpIn = pet.hp;
+    const hpIn = match.preMatchPets.get(hunter)!.hp;
     const maxHpIn = pet.maxHp;
     // The bout kills the beast outright.
     sim.ctx.handleDeath(pet, null);
@@ -155,8 +159,8 @@ describe('arena pet return: a beast killed on the sands', () => {
   });
 
   it('survives the owner being eliminated (the pet dies with them, both come back)', () => {
-    const { sim, hunter, foe, pet } = liveBout();
-    const hpIn = pet.hp;
+    const { sim, hunter, foe, pet, match } = liveBout();
+    const hpIn = match.preMatchPets.get(hunter)!.hp;
     const owner = sim.entities.get(hunter)!;
     const enemy = sim.entities.get(foe)!;
     // A real killing blow from the other side: the elimination arm marks the

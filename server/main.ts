@@ -809,8 +809,9 @@ function bustBoardCaches(): void {
   // and IP-ban writes fire this same hook, and they feed the
   // daily_reward_excluded_accounts view that unannouncedWinnerDays filters its
   // payouts through, so an exclusion is a content change a warm snapshot would
-  // hide. Without this a just-banned winner's username and wallet pubkey could
-  // still be announced publicly for up to the winners TTL. Scope, honestly: the
+  // hide. Without this a just-banned winner's username could still be announced
+  // publicly for up to the winners TTL (wallet pubkeys left the winner rows
+  // with the #2791 narrowing). Scope, honestly: the
   // bust is per process (the snapshot lives on this process's service singleton),
   // so it is immediate on the process that served the moderation write; a peer
   // realm process's warm snapshot converges within one TTL, the same fleet story

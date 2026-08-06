@@ -331,8 +331,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Una tariffa fissa per gradino di ricetta, addebitata una sola volta quando un maestro te la insegna; ogni gradino della tabella qui sotto è in uso reale oggi, dalle ricette iniziali gratuite fino alle lezioni sulle canne del fabbricante di attrezzi in cima.',
   'guide.profPages.econ.provenanceBody':
     'Alcuni oggetti portano un nome. Passaci sopra il puntatore e la descrizione dice Raccolto da tal dei tali su un materiale grezzo, oppure Realizzato da tal dei tali su un pezzo finito: lo stesso marchio, formulato secondo il modo in cui l’oggetto è venuto al mondo. Una firma è parte dell’oggetto stesso, viaggia con lui attraverso gli scambi, la banca, la posta, il Mercato Mondiale e persino il riacquisto da un venditore, e non svanisce mai.\n\nLa raccolta firma il suo lavoro migliore in automatico: ogni raccolto che tira raro o superiore arriva firmato, e i ritrovamenti rari firmano l’intera manna quintuplicata. Il tiro fortunato di un raccolto da carcassa firma la sua resa quando la famiglia non ha alcun esemplare da offrire; quando invece ce l’ha, lascia la resa semplice e conia accanto l’esemplare puro firmato. La fabbricazione firma seguendo la stessa linea: ogni copia di un risultato raro o superiore viene coniata firmata, e un capolavoro firma sempre, qualunque sia la sua qualità, così la versione più pregiata di qualsiasi pezzo nomina sempre il suo creatore. L’unica cosa che può costarti una firma è una borsa piena: un’unità firmata ha bisogno di uno spazio tutto suo, o di una pila firmata corrispondente, in cui posarsi.\n\nUna pila di oggetti condivide una sola identità, quindi due copie si uniscono solo quando ogni marchio combacia esattamente: stesso oggetto, stesso firmatario, stesse statistiche da capolavoro, stesso incanto, stesso vincolo. Un tronco firmato non si aggiunge mai a un mucchio semplice, in nessuna delle due direzioni (unirli cancellerebbe il nome di qualcuno), ma carichi identici si uniscono volentieri, così venti minerali firmati dallo stesso raccoglitore stanno in un’unica pila e una manna non ti fa a pezzi le borse.\n\nLe firme ripagano gli artigiani: tenere al banco una qualsiasi copia firmata di un reagente richiesto, chiunque l’abbia firmata, aggiunge 2 punti percentuali alla probabilità di capolavoro, e tenere un reagente firmato dalla tua stessa mano riduce di uno la quantità richiesta di quel reagente (mai sotto uno). Il tuo lavoro firmato di qualità rara o superiore continua persino a insegnarti qualcosa, oggi soltanto attraverso la boccetta: bevi una pozione che hai firmato e un piccolo rivolo di competenza torna al mestiere che l’ha preparata, purché quel mestiere sia uno dei tuoi principali attivi.',
-  'guide.profPages.econ.throttleBody':
-    'La produzione ha un tetto: fabbricazione, disincanto, incantamento, smantellamento e ricariche degli effetti degli strumenti condividono un unico budget di {actions} azioni riuscite in ogni finestra di {seconds} secondi. Un tentativo respinto non costa nulla e non consuma budget. Non lo sentirai mai in una sessione normale; esiste perché uno specialista al massimo con la banca piena non possa inondare il Mercato, qualunque sia la sua abilità o la sua scorta.',
   'guide.profPages.faq.a4':
     "Hai avuto un colpo di fortuna. Circa 1 raccolto su 90 innesca un evento di raccolta raro (antico cuore di legno su un albero, un filone intatto nel minerale, un fiore lunare tra le erbe): moltiplica per cinque la resa, firma ogni unità con il tuo nome e annuncia il ritrovamento all'intera zona. Anche un tiro di rarità raro o superiore su un raccolto ordinario firma la resa.\n\nI materiali firmati vanno tenuti o venduti cari: avere al banco una qualsiasi copia firmata di un reagente richiesto aggiunge 2 punti percentuali alla probabilità di capolavoro. Ricorda soltanto che si impilano unicamente con copie firmate in modo identico, quindi occupano uno slot della borsa tutto loro.",
   'guide.profPages.faq.a6':
@@ -712,7 +710,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.collectorsHeading': 'Collezionisti, trofei, e il prezzo di una storia',
   'guide.profPages.econ.collectorsBody':
     "I venditori sono ciechi alla provenienza: un oggetto firmato si vende a un PNG esattamente al suo prezzo normale. Il sovrapprezzo di una firma esiste solo tra i giocatori, il che e precisamente cio che lo rende interessante: una pila di minerale fortunato firmata da un celebre raccoglitore, un Taglio Pregiato da un raccolto fortunato, una lama da capolavoro che porta il nome di un artigiano ormai ritirato, valgono tutti cio che la memoria di qualcuno dice che valgano.\n\nIl Libro delle Imprese segue lo stesso istinto: Filone Intatto, Cuore di Legno Antico, Fiore di Luna, Un Esemplare Perfetto, e Barlume di Speranza sono segni da collezionista a zero Fama che esistono solo per provare che un momento e accaduto a te. Conserva l'oggetto che ha guadagnato l'impresa e tieni la ricevuta. Nulla di tutto questo e potere; la provenienza non compra statistiche e non vince battaglie, e il registro cartaceo del gioco dei giorni felici.",
-  'guide.profPages.econ.throttleHeading': 'Il limite delle azioni',
   'guide.profPages.econ.doctrineHeading': 'I giocatori commerciano con i giocatori',
   'guide.profPages.econ.doctrineBody':
     "L'economia artigianale e costruita su un'idea: i giocatori riforniscono i giocatori. I raccoglitori alimentano gli artigiani, gli artigiani alimentano chi fa missioni e chi fa raid, e chi smantella alimenta gli incantatori, con venditori e maestri di stazione ai margini per assorbire robaccia e monete piuttosto che competere con te. Se vuoi guadagnare denaro da una professione, il tuo cliente e una persona: scopri cosa consumano gli altri giocatori, fissa i prezzi in base al Mercato Mondiale, e tratta i sistemi PNG come un pavimento sotto i tuoi prezzi, non come il mercato stesso.\n\nL'equipaggiamento artigianale e calibrato per stare sotto il livello del raid: persino un capolavoro e sempre solo un livello di qualita sopra alla sua ricetta, mai oltre il leggendario, e il suo budget di statistiche rimane sotto la fascia del bottino del raid. La fucina ti prepara per i contenuti piu difficili; non li sostituisce. Questo mantiene artigiani, raider e il mercato in un triangolo stabile: i drop del raid rimangono ambiziosi, e i pezzi artigianali rimangono il miglior equipaggiamento che il denaro possa effettivamente comprare.",
@@ -6106,13 +6103,9 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.disenchantConfirmBodySpecial':
     'Questo distrugge una copia speciale di {item} (firmata, capolavoro o incantata) e produce materiali arcani. Questa azione non puo essere annullata.',
   'hudChrome.enchanting.disenchantConfirmTitle': 'Disincanta {item}?',
-  'hudChrome.enchanting.disenchantThrottled':
-    'Stai disincantando troppo velocemente. Attendi un momento e riprova.',
   'hudChrome.enchanting.disenchantedLine': 'Disincanti {item}.',
   'hudChrome.enchanting.enchantAppliedLine': 'Incanti {item} con {enchant}.',
   'hudChrome.enchanting.enchantInsufficient': "Non hai i materiali per quell'incantesimo.",
-  'hudChrome.enchanting.enchantThrottled':
-    'Stai incantando troppo velocemente. Attendi un momento e riprova.',
   'hudChrome.enchanting.enchantUnknown': "Quell'incantesimo non esiste.",
   'hudChrome.enchanting.enchantWrongSlot':
     "Quell'incantesimo non puo essere applicato a quell'oggetto.",
@@ -6127,8 +6120,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.salvageConfirmBodySpecial':
     'Questo distrugge una copia speciale di {item} (firmata, capolavoro o incantata) e produce materiali artigianali. Questa azione non puo essere annullata.',
   'hudChrome.enchanting.salvageConfirmTitle': 'Smantella {item}?',
-  'hudChrome.enchanting.salvageThrottled':
-    'Stai smantellando troppo velocemente. Attendi un momento e riprova.',
   'hudChrome.enchanting.salvagedLine': 'Smantelli {item}.',
   'hudChrome.enchanting.targetTitle': 'Scegli un oggetto da incantare',
   'hudChrome.emoteWheel.edit': 'Modifica',
@@ -8416,7 +8407,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Tutto in questa pagina risiede nel gioco: premi Esc per aprire le opzioni. Il menu si apre su una Panoramica degli elementi essenziali fissati, con le categorie su una barra laterale accanto: le impostazioni qui sotto si trovano sotto Grafica, Interfaccia e Accessibilità nel gruppo Schermo, e la Sovrapposizione prestazioni sotto Sistema. Più rapido ancora, scrivi un nome nella casella di ricerca in alto e salta dritto ad essa.',
   'guide.settingsPage.whyLabel': 'Perché funziona:',
   'hudChrome.crafting.close': 'Chiudi la lavorazione',
-  'hudChrome.crafting.craft': 'Mestiere',
   'hudChrome.crafting.craftedToast': 'Realizzato: {name}',
   'hudChrome.crafting.empty': 'Nessuna ricetta ancora conosciuta.',
   'hudChrome.crafting.insufficientMaterials': 'Non hai i materiali per quello.',
@@ -8612,8 +8602,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.increasePct.int': "Aumenta l'intelletto del {pct}%",
   'hudChrome.auraEffect.increasePct.sta': 'Aumenta la tempra del {pct}%',
   'hudChrome.crafting.recipeNotLearned': 'Non hai ancora imparato quella ricetta.',
-  'hudChrome.crafting.throttled':
-    'Stai fabbricando troppo in fretta. Aspetta un momento e riprova.',
   'hudChrome.mobile.chatPlaceholder': 'Scrivi qualcosa...',
   'hudChrome.mobile.hideKeyboard': 'Nascondi tastiera',
   'hudChrome.unitFrame.partyChip': 'Gruppo',

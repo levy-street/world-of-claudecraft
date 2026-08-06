@@ -249,8 +249,11 @@ describe('Chronomancy Phase 3 balance targets', () => {
   });
 
   it('Piro and Cryo sustain clearly more DPS than conservative Chronomancy (min over seeds)', {
-    // Twelve 200-second rotation sims; well past the 5s default.
-    timeout: 120_000,
+    // Twelve 200-second rotation sims; well past the 5s default. 120s was
+    // enough locally but timed out twice on the loaded CI shard (2026-08-05,
+    // both release-tip and PR runs), so the cap allows for shard contention;
+    // the assertions below are what gate, not the wall clock.
+    timeout: 240_000,
   }, () => {
     // The MIN over a fixed seed set, not one sampled fight: the QA's first
     // fix re-hunted a single seed that passed, and its own coverage audit

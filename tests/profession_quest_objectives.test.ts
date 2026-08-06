@@ -9,6 +9,7 @@ import { TIER2_TOOL_WIELD_PROFICIENCY } from '../src/sim/professions/wield_gate'
 import { Sim } from '../src/sim/sim';
 import type { QuestDef, QuestObjective, QuestProgress } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
+import { runCraft } from './helpers/enchant_family_cast';
 
 const TEST_QUEST_ID = 'q_test_profession_objectives';
 const originalQuest = QUESTS[TEST_QUEST_ID];
@@ -69,20 +70,20 @@ describe('craft quest objectives', () => {
     ]);
 
     // A denied matching attempt has no quest side effect.
-    sim.craftItem('recipe_minor_healing_potion', false, pid);
+    runCraft(sim, 'recipe_minor_healing_potion', false, pid);
     expect(sim.meta(pid)!.lastCraftResult?.reason).toBe('insufficient_materials');
     expect(qp.counts).toEqual([0]);
 
     // A successful but different recipe does not count.
     sim.addItem('spider_leg', 1, pid);
-    sim.craftItem('recipe_tough_jerky', false, pid);
+    runCraft(sim, 'recipe_tough_jerky', false, pid);
     expect(sim.meta(pid)!.lastCraftResult?.ok).toBe(true);
     expect(qp.counts).toEqual([0]);
 
     sim.addItem('linen_scrap', 1, pid);
     sim.addItem('spider_leg', 1, pid);
     sim.addItem('silverleaf_herb', 2, pid); // the reworked recipe's herb reagent
-    sim.craftItem('recipe_minor_healing_potion', false, pid);
+    runCraft(sim, 'recipe_minor_healing_potion', false, pid);
 
     expect(sim.meta(pid)!.lastCraftResult?.ok).toBe(true);
     expect(qp.counts).toEqual([1]);

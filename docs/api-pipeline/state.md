@@ -1183,6 +1183,13 @@ the dispatcher will serve `methodNotAllowed` / `notFound` itself once the delega
   today; at deletion it flips to the table's pre-auth 405 (`planned405BeforeAuth`). GET
   /api/maps/:id keeps its conditional anonymous-only prose throttle inside `optionalViewerGuard`
   on the surviving path BY DESIGN (documented in `mapsAssetsRateLimitedBodyToCode`).
+- **(f) The retired per-endpoint Discord GET pickups (#2791).** GET /internal/discord/relay,
+  /internal/discord/activity, and /internal/discord/daily-rewards-winners were removed from
+  BOTH arms (RouteDef and ladder) once the bot moved wholly to the outbox poll, so a request
+  to any of them now resolves off-table, delegates, and answers the ladder's terminal 404 in
+  both modes. The bot stopped calling them before the retirement (its client methods were
+  deleted with the outbox move), so a 404 delta from these paths is expected to be zero; any
+  residual hits are stale callers to investigate, not an unexplained delta against this gate.
 
 ### 3. Also part of the deletion follow-up PR
 

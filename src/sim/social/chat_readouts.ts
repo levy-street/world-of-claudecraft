@@ -38,7 +38,10 @@ import { threatEntries } from '../threat';
 import {
   type ArenaFormat,
   type Aura,
+  CRAFT_CAST_ID,
+  DISENCHANT_CAST_ID,
   dist2d,
+  ENCHANT_CAST_ID,
   type Entity,
   type EquipSlot,
   FISHING_CAST_ID,
@@ -47,6 +50,8 @@ import {
   MAX_LEVEL,
   MELEE_RANGE,
   questObjectiveRequired,
+  SALVAGE_CAST_ID,
+  TOOL_RECHARGE_CAST_ID,
   xpForLevel,
 } from '../types';
 import { UNSTUCK_COOLDOWN_ID } from '../unstuck_cooldown';
@@ -576,6 +581,21 @@ export function castingReadout(e: Entity): string {
     // The gather cast is public state (castRemaining/castTotal broadcast),
     // so an honest countdown is safe here, unlike the fishing arm above.
     return `You are gathering: ${remaining}s of ${total}s remaining.`;
+  }
+  if (e.castingAbility === CRAFT_CAST_ID) {
+    return `You are crafting: ${remaining}s of ${total}s remaining.`;
+  }
+  if (e.castingAbility === DISENCHANT_CAST_ID) {
+    return `You are disenchanting: ${remaining}s of ${total}s remaining.`;
+  }
+  if (e.castingAbility === ENCHANT_CAST_ID) {
+    return `You are enchanting: ${remaining}s of ${total}s remaining.`;
+  }
+  if (e.castingAbility === SALVAGE_CAST_ID) {
+    return `You are salvaging: ${remaining}s of ${total}s remaining.`;
+  }
+  if (e.castingAbility === TOOL_RECHARGE_CAST_ID) {
+    return `You are recharging a tool effect: ${remaining}s of ${total}s remaining.`;
   }
   const name = ABILITIES[e.castingAbility]?.name ?? e.castingAbility;
   const verb = e.channeling ? 'Channeling' : 'Casting';

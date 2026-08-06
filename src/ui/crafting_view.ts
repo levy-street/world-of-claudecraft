@@ -28,6 +28,7 @@ import { trainingStationTypeFor } from '../sim/professions/training';
 import type { ProfessionRecipeRecord } from '../sim/professions/types';
 import { MINIMAL_TIER_MULTIPLIER, REDUCED_TIER_MULTIPLIER } from '../sim/professions/wheel';
 import type { InvSlot, ItemDef, StationDef } from '../sim/types';
+import { recipeDurationSec } from './craft_cast_view';
 import { isRecipeKnownForViewer } from './hud/vendor/train_view';
 
 export interface RecipeDefLike {
@@ -113,6 +114,10 @@ export interface CraftingRecipeRow {
    *  flag would be ignored). The painter renders the per-craft checkbox only
    *  on these rows; the server re-validates eligibility on craft. */
   commissionEligible: boolean;
+  /** Expected craft-cast duration in sim seconds (Craft Cast System Phase 2).
+   *  Content table via craftCastDurationSec; actionable info, identical on
+   *  every graphics preset (duration chip is never tier-gated). */
+  durationSec: number;
 }
 
 export interface CraftingView {
@@ -288,6 +293,7 @@ export function buildCraftingView(
       difficulty,
       station,
       commissionEligible: isCommissionEligible(items[recipe.resultItemId]),
+      durationSec: recipeDurationSec(recipe),
       craftable:
         reagentRows.every((r) => r.satisfied) &&
         eligibility?.ok !== false &&

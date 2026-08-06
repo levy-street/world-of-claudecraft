@@ -30,7 +30,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 967,
-      "state": "ebf4cd14",
+      "state": "da103d8e",
       "events": "efef1e3a",
       "rng": {
         "draws": 3,
@@ -57,7 +57,6 @@
             "damageDealt": 30
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "damageDealt": 30
@@ -114,7 +113,6 @@
             "damageDealt": 30
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "damageDealt": 30
@@ -174,7 +172,6 @@
             "damageDealt": 30
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "damageDealt": 30
@@ -470,7 +467,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 967,
-      "state": "ef02306c",
+      "state": "00580554",
       "events": "e111a638",
       "rng": {
         "draws": 6,
@@ -497,7 +494,6 @@
             "damageDealt": 60
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "damageDealt": 60
@@ -554,7 +550,6 @@
             "damageDealt": 60
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "damageDealt": 60
@@ -614,7 +609,6 @@
             "damageDealt": 60
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "damageDealt": 60
@@ -910,7 +904,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 967,
-      "state": "e149981e",
+      "state": "0bafe014",
       "events": "e111a638",
       "rng": {
         "draws": 9,
@@ -937,7 +931,6 @@
             "damageDealt": 90
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "damageDealt": 90
@@ -994,7 +987,6 @@
             "damageDealt": 90
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "damageDealt": 90
@@ -1054,7 +1046,6 @@
             "damageDealt": 90
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "damageDealt": 90
@@ -1350,7 +1341,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 967,
-      "state": "addec4e4",
+      "state": "98e014a2",
       "events": "e111a638",
       "rng": {
         "draws": 12,
@@ -1377,7 +1368,6 @@
             "damageDealt": 120
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "damageDealt": 120
@@ -1434,7 +1424,6 @@
             "damageDealt": 120
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "damageDealt": 120
@@ -1494,7 +1483,6 @@
             "damageDealt": 120
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "damageDealt": 120
@@ -1790,7 +1778,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 967,
-      "state": "10ac7035",
+      "state": "7dd27b3d",
       "events": "72cbd0be",
       "rng": {
         "draws": 15,
@@ -1801,7 +1789,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 967,
-      "state": "767241e7",
+      "state": "5a9d144f",
       "events": "741638a5",
       "rng": {
         "draws": 15,
@@ -1812,7 +1800,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 967,
-      "state": "767241e7",
+      "state": "5a9d144f",
       "events": "741638a5",
       "rng": {
         "draws": 15,
@@ -1840,7 +1828,6 @@
             "damageTaken": 11
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "damageDealt": 120
@@ -1897,7 +1884,6 @@
             "damageDealt": 120
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "damageDealt": 120
@@ -1957,7 +1943,6 @@
             "damageDealt": 120
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "damageDealt": 120

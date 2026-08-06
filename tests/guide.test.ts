@@ -50,8 +50,6 @@ import { FISHING_TABLES_BY_BAND } from '../src/sim/content/items';
 import {
   CRAFT_GOLD_SINK_COPPER_PER_BUDGET,
   CRAFT_RING,
-  CRAFT_THROTTLE_MAX_PER_WINDOW,
-  CRAFT_THROTTLE_WINDOW_SECONDS,
   GATHERING_PROFESSION_IDS,
   GATHERING_PROFESSIONS,
   PERK_THRESHOLDS,
@@ -1756,15 +1754,12 @@ describe('Guide professions enchanting and economy accuracy', () => {
     );
   });
 
-  it('publishes the exact fees, throttle, masterwork odds, and market cut', () => {
+  it('publishes the exact fees, masterwork odds, and market cut', () => {
     const e = GUIDE_PROF_ECONOMY;
     expect(e.craftFeeCopperPerBudgetPoint).toBe(CRAFT_GOLD_SINK_COPPER_PER_BUDGET);
     expect(e.craftFeeCopperPerBudgetPoint).toBe(2);
-    expect(e.actionThrottle).toEqual({
-      windowSeconds: CRAFT_THROTTLE_WINDOW_SECONDS,
-      maxActions: CRAFT_THROTTLE_MAX_PER_WINDOW,
-    });
-    expect(e.actionThrottle).toEqual({ windowSeconds: 60, maxActions: 10 });
+    // Craft Cast System Phase 5: shared actionThrottle removed from guide data.
+    expect('actionThrottle' in e).toBe(false);
     expect(e.marketCutPct).toBe(Math.round(MARKET_CUT * 100));
     expect(e.marketCutPct).toBe(5);
     expect(e.listingDepositCopper).toBe(MARKET_LISTING_DEPOSIT_COPPER);

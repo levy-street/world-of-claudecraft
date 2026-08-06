@@ -96,7 +96,8 @@ const ACTIVITY_CAP = ACTIVITY_MAX_QUEUE;
 
 /**
  * The bound on the serialized `data` payload, in bytes. The worst-case fixture
- * below measured 290,671 bytes (0.3 ms of JSON.stringify; 279,891 before the
+ * below measured 287,100 bytes (0.2 ms of JSON.stringify; 290,671 before the
+ * #2791 narrowing dropped the unused winner-row fields, 279,891 before the
  * activity fixture moved to the wider deed item shape) when the drain moved to
  * a 1000-item link-change page and a one-day winners ask; the bound is roughly
  * 1.5x that, rounded to a clean number, so ordinary drift in the fixtures does
@@ -181,7 +182,9 @@ function activityItem(index: number, accountIds: number[]): QueuedActivity {
   };
 }
 
-/** One finalized reward day with the full ten-rank payout table. */
+/** One finalized reward day with the full ten-rank payout table, in the
+ *  announcement-narrow winner-row shape the service serves since #2791 (no
+ *  txSignature, wallet pubkey, or voided_by_* operator identity). */
 function winnerDay(dayIndex: number): unknown {
   return {
     day: `2026-06-${String(20 + dayIndex).padStart(2, '0')}`,
@@ -191,23 +194,12 @@ function winnerDay(dayIndex: number): unknown {
     taskName: 'Complete quests today. Points increase with time spent online.',
     nextTaskName: 'Win an arena match.',
     payouts: Array.from({ length: 10 }, (_, rank) => ({
-      day: `2026-06-${String(20 + dayIndex).padStart(2, '0')}`,
-      realm: 'Claudemoon',
       rank: rank + 1,
-      accountId: rank + 1,
       username: `Adventurer${rank + 1}`,
-      walletPubkey: 'Wa11etPubKey1111111111111111111111111111111',
       points: 4200 - rank * 100,
       prizePercent: 0.2,
       prizeUsd: 30,
       status: 'paid',
-      txSignature: '5'.repeat(88),
-      paidAt: '2026-06-30T22:05:00.000Z',
-      voidReason: null,
-      voidedById: null,
-      voidedByUsername: null,
-      voidedAt: null,
-      signedTransaction: null,
     })),
   };
 }

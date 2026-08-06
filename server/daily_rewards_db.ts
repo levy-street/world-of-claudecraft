@@ -119,12 +119,30 @@ export type DailyRewardPayoutAttemptClaimResult =
 
 export type DailyRewardFinalizeOutcome = 'finalized' | 'already_finalized';
 
+/**
+ * One winner row as the Discord announcement ships it: the fields the bot's
+ * message builder renders (rank, name, points, prize math) plus the payout
+ * status. Deliberately NARROWER than DailyRewardInternalPayoutRow: the wide
+ * row carried tx_signature, wallet pubkeys, and the voided_by_* operator
+ * identity to a caller that never used them, and the byte-parity pin against
+ * the standalone winners GET that blocked narrowing retired with that route
+ * (#2791). The ops/admin reads keep the full row.
+ */
+export interface DailyRewardWinnerPayoutRow {
+  rank: number;
+  username: string;
+  points: number;
+  prizePercent: number;
+  prizeUsd: number;
+  status: string;
+}
+
 export interface DailyRewardWinnerAnnouncement {
   day: string;
   realm: string;
   prizePoolUsd: number;
   finalizedAt: string | null;
-  payouts: DailyRewardInternalPayoutRow[];
+  payouts: DailyRewardWinnerPayoutRow[];
 }
 
 export interface DailyRewardDb {
@@ -260,6 +278,17 @@ function internalPayoutRow(row: Record<string, unknown>): DailyRewardInternalPay
   };
 }
 
+function winnerPayoutRow(row: Record<string, unknown>): DailyRewardWinnerPayoutRow {
+  return {
+    rank: Number(row.rank),
+    username: String(row.username),
+    points: Number(row.points),
+    prizePercent: Number(row.prize_percent),
+    prizeUsd: Number(row.prize_usd),
+    status: String(row.status),
+  };
+}
+
 function dateString(value: unknown): string | null {
   if (value instanceof Date) return value.toISOString();
   return optionalString(value);
@@ -273,6 +302,19 @@ function scoreRow(row: Record<string, unknown>): DailyRewardScoreRow {
     rank: Number(row.rank),
   };
 }
+
+// The winner-announcement payouts query, exported so a test can pin the RAW
+// text the call site executes: announcement-narrow on purpose
+// (DailyRewardWinnerPayoutRow), with no tx_signature, wallet pubkey (nor the
+// wallet_links join), or voided_by_* operator identity, because announcing
+// renders none of them (#2791). Widening this SELECT again is a data-exposure
+// decision, not a refactor; the pin makes it a deliberate one.
+export const DAILY_REWARD_WINNER_PAYOUTS_SQL = `SELECT p.rank, p.username, p.points, p.prize_percent, p.prize_usd, p.status
+           FROM daily_reward_payouts p
+          WHERE p.day = $1 AND p.realm = $2
+            AND NOT EXISTS (SELECT 1 FROM daily_reward_excluded_accounts b WHERE b.account_id = p.account_id)
+          ORDER BY p.rank ASC
+          LIMIT 10`;
 
 // banForAccount's query text, exported so an integration suite can execute the
 // real text against a scoped schema.
@@ -831,25 +873,16 @@ export class PgDailyRewardDb implements DailyRewardDb {
     );
     const out: DailyRewardWinnerAnnouncement[] = [];
     for (const day of days.rows) {
-      const payouts = await pool.query(
-        `SELECT p.day, p.realm, p.rank, p.account_id, p.username,
-                COALESCE(p.wallet_pubkey, wl.pubkey) AS wallet_pubkey, p.points,
-                p.prize_percent, p.prize_usd, p.status, p.tx_signature, p.paid_at,
-                p.void_reason, p.voided_by_id, p.voided_by_username, p.voided_at
-           FROM daily_reward_payouts p
-           LEFT JOIN wallet_links wl ON wl.account_id = p.account_id
-          WHERE p.day = $1 AND p.realm = $2
-            AND NOT EXISTS (SELECT 1 FROM daily_reward_excluded_accounts b WHERE b.account_id = p.account_id)
-          ORDER BY p.rank ASC
-          LIMIT 10`,
-        [String(day.day), String(day.realm)],
-      );
+      const payouts = await pool.query(DAILY_REWARD_WINNER_PAYOUTS_SQL, [
+        String(day.day),
+        String(day.realm),
+      ]);
       out.push({
         day: String(day.day),
         realm: String(day.realm),
         prizePoolUsd: Number(day.prize_pool_usd),
         finalizedAt: dateString(day.finalized_at),
-        payouts: payouts.rows.map(internalPayoutRow),
+        payouts: payouts.rows.map(winnerPayoutRow),
       });
     }
     return out;

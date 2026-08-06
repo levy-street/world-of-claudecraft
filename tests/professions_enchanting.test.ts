@@ -9,7 +9,6 @@ import { ITEMS } from '../src/sim/data';
 import { characterDerivedStats } from '../src/sim/entity';
 import { canStackInstancePayloads } from '../src/sim/item_instance_merge';
 import { removePreferFungible } from '../src/sim/items';
-import { CRAFT_THROTTLE_MAX_PER_WINDOW } from '../src/sim/professions/action_throttle';
 import {
   consumeEnchantedVictim,
   disenchantItem,
@@ -26,6 +25,7 @@ import {
 } from '../src/sim/professions/enchanting';
 import { Sim } from '../src/sim/sim';
 import { type InvSlot, xpForLevel } from '../src/sim/types';
+import { completeEnchantFamilyCast } from './helpers/enchant_family_cast';
 
 function makeSim(seed = 7) {
   return new Sim({ seed, playerClass: 'warrior', autoEquip: false });
@@ -99,6 +99,9 @@ describe('disenchant', () => {
     const sim = makeSim();
     sim.addItem('eastbrook_arming_sword', 1, sim.playerId);
     sim.disenchantItem('eastbrook_arming_sword');
+    // Phase 4: command starts a cast; result lands on complete.
+    expect(sim.lastDisenchantResult).toBeNull();
+    completeEnchantFamilyCast(sim);
     expect(sim.lastDisenchantResult?.ok).toBe(true);
     const denied = disenchantItem(sim.ctx, 'nonexistent_item_id');
     expect(denied.ok).toBe(false);
@@ -462,6 +465,8 @@ describe('applyEnchant', () => {
     sim.addItem('eastbrook_arming_sword', 1, pid);
     sim.addItem('arcane_dust', 5, pid);
     sim.applyEnchant('eastbrook_arming_sword', 'enchant_weapon_might');
+    expect(sim.lastEnchantResult).toBeNull();
+    completeEnchantFamilyCast(sim);
     expect(sim.lastEnchantResult?.ok).toBe(true);
   });
 
@@ -842,7 +847,7 @@ describe('quality-tiered enchanting gains', () => {
     expect(meta.craftSkills.enchanting).toBe(1);
   });
 
-  it('a crafted signed disenchant keeps material rewards and throttle but grants no enchanting skill', () => {
+  it('a crafted signed disenchant keeps material rewards but grants no enchanting skill', () => {
     const sim = makeSim();
     const pid = sim.playerId;
     const meta = sim.players.get(pid)!;
@@ -855,7 +860,8 @@ describe('quality-tiered enchanting gains', () => {
     expect(result.count).toBe(1);
     expect(sim.countItem('moggers_copper_cudgel', pid)).toBe(0);
     expect(sim.countItem('arcane_essence', pid)).toBe(1);
-    expect(meta.craftThrottle.count).toBe(1);
+    // Phase 4: enchant-family no longer stamps craftThrottle.
+    expect(meta.craftThrottle.count).toBe(0);
     expect(meta.craftSkills.enchanting ?? 0).toBe(0);
   });
 
@@ -870,7 +876,7 @@ describe('quality-tiered enchanting gains', () => {
     expect(result.ok).toBe(true);
     expect(sim.countItem('moggers_copper_cudgel', pid)).toBe(0);
     expect(sim.countItem('arcane_essence', pid)).toBe(1);
-    expect(meta.craftThrottle.count).toBe(1);
+    expect(meta.craftThrottle.count).toBe(0);
     expect(meta.craftSkills.enchanting).toBe(ENCHANTING_SKILL_GAIN);
   });
 
@@ -1066,17 +1072,14 @@ describe('apply enchant to WORN gear (in place)', () => {
     expect(meta.equipmentInstance.mainhand).toBeUndefined();
   });
 
-  it('draws from the SAME action throttle as the bagged arm', () => {
+  it('Phase 5: worn apply ignores inert craftThrottle (cast paces, not quota)', () => {
     const { sim, pid, meta } = wearing('mainhand', WORN_SWORD, { dust: 5 });
-    // Spend the whole shared window on bagged salvages, then the worn enchant
-    // must deny at the boundary with nothing consumed.
-    sim.addItem(WORN_SWORD, CRAFT_THROTTLE_MAX_PER_WINDOW, pid);
-    for (let i = 0; i < CRAFT_THROTTLE_MAX_PER_WINDOW; i++) sim.salvageItem(WORN_SWORD, pid);
+    meta.craftThrottle = { windowStart: sim.ctx.time, count: 999 };
     const result = resolveApplyEnchant(sim.ctx, pid, WORN_SWORD, WORN_ENCHANT, 'mainhand');
-    expect(result.ok).toBe(false);
-    expect(result.reason).toBe('throttled');
-    expect(sim.countItem('arcane_dust', pid)).toBe(5);
-    expect(meta.equipmentInstance.mainhand).toBeUndefined();
+    expect(result.ok).toBe(true);
+    expect(sim.countItem('arcane_dust', pid)).toBe(0);
+    expect(meta.equipmentInstance.mainhand?.enchant).toBe(WORN_ENCHANT);
+    expect(meta.craftThrottle.count).toBe(999);
   });
 
   it('has NO bag-capacity gate: a completely full pack still enchants worn gear', () => {
@@ -1137,6 +1140,7 @@ describe('apply enchant to WORN gear (in place)', () => {
   it('the applyEnchant command entry point forwards the slot and stashes the result', () => {
     const { sim, pid, meta } = wearing('mainhand', WORN_SWORD, { dust: 5 });
     sim.applyEnchant(WORN_SWORD, WORN_ENCHANT, 'mainhand', undefined, pid);
+    completeEnchantFamilyCast(sim, pid);
     expect(sim.lastEnchantResult?.ok).toBe(true);
     expect(meta.equipmentInstance.mainhand?.enchant).toBe(WORN_ENCHANT);
     // Same skill gain as the bagged arm (dust enchant tier 0, capability 0 ->
@@ -1221,12 +1225,10 @@ describe('replacing an enchant behind explicit confirmation (#2415)', () => {
     expect(sim.countItem('arcane_shard', pid)).toBe(0);
     expect(sim.countItem('arcane_essence', pid)).toBe(0);
     expect(sim.countItem('arcane_dust', pid)).toBe(0);
-    // Replacement is just an apply: the same quality-tiered skill gain landed
-    // and exactly ONE shared-throttle stamp was spent on it (one apply + one
-    // replace = two stamps total; a stamp-free replace would sidestep the
-    // shared 10-per-60s pace entirely).
+    // Replacement is just an apply: the same quality-tiered skill gain landed.
+    // Phase 4: enchant-family no longer stamps craftThrottle.
     expect(meta.craftSkills.enchanting).toBeGreaterThan(skillAfterApply);
-    expect(meta.craftThrottle.count).toBe(2);
+    expect(meta.craftThrottle.count).toBe(0);
   });
 
   it('grants EXACTLY the plain apply gain for the same enchant tier (same curve, same input)', () => {
@@ -1511,21 +1513,21 @@ describe('replacing an enchant behind explicit confirmation (#2415)', () => {
     expect(a.sim.ctx.rng.next()).toBe(b.sim.ctx.rng.next());
   });
 
-  it('draws from the SAME shared action throttle: a spent window denies the replace with nothing consumed', () => {
+  it('Phase 5: bagged replace ignores inert craftThrottle (cast paces, not quota)', () => {
     const sim = makeSim();
     const pid = sim.playerId;
+    const meta = sim.players.get(pid)!;
     sim.ctx.addItemInstance(SWORD, { enchant: MIGHT, rolled: { stats: { str: 2 } } }, pid);
     sim.addItem('arcane_dust', 5, pid);
-    sim.addItem(SWORD, CRAFT_THROTTLE_MAX_PER_WINDOW, pid);
-    for (let i = 0; i < CRAFT_THROTTLE_MAX_PER_WINDOW; i++) sim.salvageItem(SWORD, pid);
+    meta.craftThrottle = { windowStart: sim.ctx.time, count: 999 };
     const result = resolveApplyEnchant(sim.ctx, pid, SWORD, AGILITY, undefined, true);
-    expect(result.ok).toBe(false);
-    expect(result.reason).toBe('throttled');
-    expect(sim.countItem('arcane_dust', pid)).toBe(5);
+    expect(result.ok).toBe(true);
+    expect(sim.countItem('arcane_dust', pid)).toBe(0);
     const enchanted = sim.ctx
       .resolve(pid)!
       .meta.inventory.find((s) => s.itemId === SWORD && s.instance);
-    expect(enchanted?.instance?.enchant).toBe(MIGHT);
+    expect(enchanted?.instance?.enchant).toBe(AGILITY);
+    expect(meta.craftThrottle.count).toBe(999);
   });
 
   it('replaces a WORN enchanted copy in place: stats re-baked, signer intact, reagents spent', () => {

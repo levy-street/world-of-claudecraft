@@ -14,11 +14,11 @@
     "mode": "composite-sha256",
     "algorithm": "sha256",
     "baselineRevision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
-    "fingerprint": "628f66e2ba22fb456ca64603dfee7311bf766ee5d9ebe71d5e2b2109b01f1d3b",
+    "fingerprint": "9ed193cbbdadd0b3923427002f07252968b3969b273d24f2a7a200c214d1ef72",
     "components": {
       "townAsset": {
         "source": "scripts/assets/eastbrook_town/source_fingerprint.mjs",
-        "sourceFingerprint": "e15d65fda69efd04395e93dd28af8a56f2fb9bc1ff1125e3b605b07720891367"
+        "sourceFingerprint": "aa0df220a988f797ef37369faa2960f0e2430c2c7a4b32c4015aefb305e88371"
       },
       "authoritativeLayout": {
         "path": "src/sim/eastbrook_layout.ts",
@@ -43,7 +43,7 @@
         },
         "renderer": {
           "path": "src/render/renderer.ts",
-          "sha256": "a8d943f0c868eb9af0b5356195cd0bb8146230b28a9b088d94012a2c87d3087a"
+          "sha256": "e6f12ded94c6fefe72a4920d0a1599912f2a619596d3f787f5656310ce1178e4"
         },
         "viewPriorityPolicy": {
           "path": "src/render/prewarm_policy.ts",
@@ -52,18 +52,18 @@
       },
       "mailbox": {
         "source": "scripts/assets/eastbrook_mailbox/source_fingerprint.mjs",
-        "sourceFingerprint": "2d63ac194e8e21ac618c5cb6405e2e4aef2c19a0f63a8a29d92489275e53cba6",
+        "sourceFingerprint": "ae7d1d4f39141539cc83e1872a350a786622a1f7cd5a87df8e814a8a47870c53",
         "glb": {
           "path": "public/models/props/mailbox_pillar.glb",
-          "sha256": "599f931cebcee4652e2fff788947cc34bedacad7a5bf8a168f04e44f1bfcdc95"
+          "sha256": "4e964405a75f983dd8a4a7c9d71dd95757081512ed59ad5c859c9c8dbeac5e51"
         }
       },
       "noticeboard": {
         "source": "scripts/assets/eastbrook_noticeboard/source_fingerprint.mjs",
-        "sourceFingerprint": "0517cc8bd05d333786105323fcb13bed8b3c1f00820633be568bc6098133f00c",
+        "sourceFingerprint": "665f21c13eb1856d104fc1c91966f8784b20be86ff8d8b40848a94b3a61e7915",
         "glb": {
           "path": "public/models/props/eastbrook_noticeboard.glb",
-          "sha256": "765ac43c5be4942921aa48b9796a70681b030aa8f6882632a4ba5c6e6f6a97d6"
+          "sha256": "3d62c4801a90e843000c57443acc4c89bfb51eb43092d83c8081f7e5232ca5fa"
         }
       },
       "captureContract": {

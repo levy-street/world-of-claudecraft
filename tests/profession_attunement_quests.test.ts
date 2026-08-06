@@ -6,6 +6,7 @@ import { isIdentityTransitionQuest } from '../src/sim/quests/profession_quest_ef
 import { Sim } from '../src/sim/sim';
 import { terrainHeight } from '../src/sim/world';
 import { COMMAND_NAMES } from '../src/world_api';
+import { runCraft } from './helpers/enchant_family_cast';
 
 // The per-master attunement model retired the single shared acceptance /
 // make-amends quests in favor of one attune + one make-amends quest per anchor
@@ -299,7 +300,7 @@ describe('live profession attunement quests', () => {
       sim.addItem('linen_scrap', 1, pid);
       sim.addItem('spider_leg', 1, pid);
       sim.addItem('silverleaf_herb', 2, pid); // the reworked recipe's herb reagent
-      sim.craftItem('recipe_minor_healing_potion', false, pid); // masterwork proc: draws rng
+      runCraft(sim, 'recipe_minor_healing_potion', false, pid); // masterwork proc: draws rng
       acceptAt(sim, HOBBY_MASTER, HOBBY_QUEST, 'tailoring');
       completeAndTurnInAt(sim, HOBBY_MASTER, HOBBY_QUEST);
       for (let i = 0; i < 20; i++) sim.tick();

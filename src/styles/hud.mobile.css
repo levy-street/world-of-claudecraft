@@ -2918,6 +2918,48 @@
     min-height: 40px;
     white-space: nowrap;
   }
+  /* Craft cast Phase 2: readable duration + 40px craft control floor on touch. */
+  body.mobile-touch .crafting-duration-chip {
+    font-size: 12px;
+    padding: 2px 7px;
+  }
+  body.mobile-touch .crafting-recipe-btn {
+    min-height: 40px;
+  }
+  body.mobile-touch .crafting-craft-chip {
+    min-height: 40px;
+    min-width: 40px;
+    padding: 10px 16px;
+    font-size: 13px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  body.mobile-touch .crafting-cast-progress {
+    min-height: 40px;
+    padding: 8px 10px;
+  }
+  body.mobile-touch .crafting-cast-progress-track {
+    height: 22px;
+  }
+  body.mobile-touch .crafting-cast-progress-label {
+    font-size: 13px;
+  }
+  body.mobile-touch .crafting-cast-progress-timer {
+    font-size: 13px;
+  }
+  body.mobile-touch .crafting-cast-progress-batch {
+    font-size: 12px;
+  }
+  /* Phase 3 batch: 40px touch floor on qty stepper and Create All. */
+  body.mobile-touch .crafting-qty-btn,
+  body.mobile-touch .crafting-create-all-btn {
+    min-width: 40px;
+    min-height: 40px;
+  }
+  body.mobile-touch .crafting-qty-value {
+    font-size: 16px;
+  }
   /* Phase 22 retired the mobile-only track override, the full-width Cap wrap,
      and the Cap-header hide with the grid table itself: the rows are the
      professions row family now (name + value line, labeled pill chips), so
@@ -5635,7 +5677,8 @@
     /* Left-handed mirror of the nudge above, same magnitude, opposite side. */
     body.mobile-touch.hud-mobile-tablet.mobile-left-handed #player-frame,
     body.mobile-touch.hud-mobile-tablet.mobile-left-handed #castbar,
-    body.mobile-touch.hud-mobile-tablet.mobile-left-handed #swingbar {
+    body.mobile-touch.hud-mobile-tablet.mobile-left-handed #swingbar,
+    body.mobile-touch.hud-mobile-tablet.mobile-left-handed #pet-frame {
       left: calc(50% + 10px);
     }
   }

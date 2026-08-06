@@ -81,6 +81,9 @@ export interface CraftResultView {
     | 'combo_requirement_unmet'
     | 'recipe_not_learned'
     | 'throttled'
+    // Craft Cast System: denied because the player is already casting or
+    // consuming when craft_item arrives (start-gate only).
+    | 'busy'
     // Supersedes #1297's not_at_hub: denied because the recipe is
     // station-bound and the player is neither at a station of its type nor
     // holding an ACTIVE mobile station for that craft (the mobile arm checks
@@ -119,7 +122,7 @@ export interface SalvageResultView {
   itemId: string;
   materialItemId?: string;
   count?: number;
-  reason?: 'unknown_item' | 'not_salvageable' | 'not_held' | 'throttled' | 'no_bag_space';
+  reason?: 'unknown_item' | 'not_salvageable' | 'not_held' | 'throttled' | 'no_bag_space' | 'busy';
 }
 
 // Disenchant-result surface (Professions 2.0): mirrors
@@ -135,7 +138,13 @@ export interface DisenchantResultView {
   count?: number;
   secondaryItemId?: string;
   secondaryCount?: number;
-  reason?: 'unknown_item' | 'not_disenchantable' | 'not_held' | 'throttled' | 'no_bag_space';
+  reason?:
+    | 'unknown_item'
+    | 'not_disenchantable'
+    | 'not_held'
+    | 'throttled'
+    | 'no_bag_space'
+    | 'busy';
 }
 
 // Apply-enchant-result surface (Professions 2.0): mirrors
@@ -157,7 +166,8 @@ export interface ApplyEnchantResultView {
     // confirmReplace flag on the command, and the identical-enchant-id
     // re-apply whose accept would be pure reagent loss.
     | 'already_enchanted'
-    | 'same_enchant';
+    | 'same_enchant'
+    | 'busy';
 }
 
 // Commission order board (Professions 2.0, issue #1298): the viewer's own
@@ -271,7 +281,10 @@ export interface IWorldProfessions {
   // ruled-in equipment output kinds (src/sim/professions/commission.ts
   // isCommissionEligible); silently ignored otherwise. Omitted/false sends
   // a wire message byte-identical to the pre-phase form.
-  craftItem(recipeId: string, commission?: boolean): void;
+  // Craft Cast System Phase 3: optional `count` (default 1) starts a batch
+  // of that many casts; the sim clamps to CRAFT_BATCH_MAX and current mats-fit.
+  // Omitted/1 keeps a single-craft wire message byte-identical to pre-batch.
+  craftItem(recipeId: string, commission?: boolean, count?: number): void;
   craftingIdentity: CraftingIdentityView;
   // The title granted by the CURRENTLY-ACTIVE pair attunement (#1130, pair-named
   // under Professions 2.0): the CANONICAL PAIR ID (see

@@ -434,6 +434,14 @@ describe('buildCraftingView difficulty and skillReq', () => {
     expect(view.recipes[0].skillReq).toBe(75);
   });
 
+  it('surfaces content craft-cast durationSec on every row (Phase 2 chip source)', () => {
+    const items = table(item('recipe_dur_result'));
+    const field = buildCraftingView([{ ...recipe('recipe_field', []), skillReq: 0 }], [], items);
+    const mid = buildCraftingView([{ ...recipe('recipe_mid', []), skillReq: 50 }], [], items);
+    expect(field.recipes[0].durationSec).toBe(1.75);
+    expect(mid.recipes[0].durationSec).toBe(3);
+  });
+
   it('full at or above raw capability (this is how capability advances)', () => {
     // At capability: skill 100 (tier 4) vs skillReq 100 (tier 4).
     expect(difficultyFor(100, { cooking: 100 })).toBe('full');

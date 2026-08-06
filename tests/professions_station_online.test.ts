@@ -8,6 +8,7 @@
 // case or a stripped reason would leave every offline test green). Modeled
 // on the guild_letter_online session-routing suite.
 import { describe, expect, it, vi } from 'vitest';
+import { completeCraftCast } from './helpers/enchant_family_cast';
 
 // Mock the db layer so the live GameServer suite needs no Postgres; only the
 // wire dispatch and the tick -> routeEvents pump are under test, never
@@ -148,6 +149,8 @@ describe('station gate over the live GameServer wire (session routing)', () => {
     // The same craft that just denied in the arm above now succeeds AWAY from
     // every static station, through the server-side gate's mobile-station arm.
     cmd(server, sc, { cmd: 'craft_item', recipe: RECIPE_ID });
+    routeTick(server);
+    completeCraftCast(server.sim as never, sc.pid);
     routeTick(server);
 
     expect(server.sim.countItem('thorium_mining_pick', sc.pid)).toBe(1);

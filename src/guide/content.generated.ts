@@ -267,7 +267,16 @@ export interface GuideProfWorkOrder {
 
 export interface GuideProfEconomy {
   craftFeeCopperPerBudgetPoint: number;
-  actionThrottle: { windowSeconds: number; maxActions: number };
+  castPace: {
+    fieldSec: number;
+    skill25Sec: number;
+    skill50Sec: number;
+    skill75Sec: number;
+    comboSec: number;
+    enchantFamilySec: number;
+    rechargeSec: number;
+    batchMax: number;
+  };
   marketCutPct: number;
   listingDepositCopper: number;
   trainingFeeCopperByTier: number[];
@@ -10043,9 +10052,15 @@ export const GUIDE_PROF_MASTERWORK: GuideProfMasterwork = {
 
 export const GUIDE_PROF_ECONOMY: GuideProfEconomy = {
   "craftFeeCopperPerBudgetPoint": 2,
-  "actionThrottle": {
-    "windowSeconds": 60,
-    "maxActions": 10
+  "castPace": {
+    "fieldSec": 1.75,
+    "skill25Sec": 2.5,
+    "skill50Sec": 3,
+    "skill75Sec": 3.5,
+    "comboSec": 4,
+    "enchantFamilySec": 1.5,
+    "rechargeSec": 1.5,
+    "batchMax": 50
   },
   "marketCutPct": 5,
   "listingDepositCopper": 0,

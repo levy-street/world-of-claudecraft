@@ -140,7 +140,9 @@ describe('hud.ts commission opt-in state contract (source pins)', () => {
     // silently arm every subsequent craft of that recipe and no sim-side pin
     // could catch it (the sim honors whatever flag arrives).
     expect(hudSource).toContain('const commission = this.craftCommissionOptIn.delete(recipeId);');
-    expect(hudSource).toContain('this.sim.craftItem(recipeId, commission);');
+    expect(hudSource).toContain(
+      'this.sim.craftItem(recipeId, commission, Math.max(1, Math.floor(count)));',
+    );
   });
 
   it('the checkbox paints from has() and toggles through add/delete', () => {
@@ -154,7 +156,21 @@ describe('hud.ts commission opt-in state contract (source pins)', () => {
   it('closing the crafting window drops every armed checkbox (the off-by-default rule)', () => {
     const start = hudSource.indexOf('closeCrafting(): void {');
     expect(start).toBeGreaterThan(-1);
-    const arm = hudSource.slice(start, start + 600);
+    // Anchor on the METHOD BODY (brace depth), not a fixed byte count: a
+    // fixed slice went stale the moment closeCrafting grew unrelated lines.
+    let depth = 0;
+    let end = start;
+    for (let i = hudSource.indexOf('{', start); i < hudSource.length; i++) {
+      if (hudSource[i] === '{') depth++;
+      else if (hudSource[i] === '}') {
+        depth--;
+        if (depth === 0) {
+          end = i;
+          break;
+        }
+      }
+    }
+    const arm = hudSource.slice(start, end);
     expect(arm).toContain('this.craftCommissionOptIn.clear();');
   });
 });

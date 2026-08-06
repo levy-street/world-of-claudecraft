@@ -677,7 +677,10 @@ const HEAVY_SELF_CMDS = new Set<string>([
   'equip',
   'inv_move', // rewrites the inventory array order: the self snapshot must resend it
   'unequip_item',
-  'salvage_item',
+  // salvage_item is deliberately ABSENT since the Craft Cast System: the
+  // command only starts a cast (nothing mutates on receipt), and the
+  // complete-time loot event is a HEAVY_SELF_EVENTS member, so listing it
+  // here would buy a wasted heavy re-serialize per cast start.
   'rift_upgrade_item',
   'rift_enchant_item',
   'rift_socket_gem',
@@ -6253,7 +6256,13 @@ export class GameServer {
         // check (the dispatch type-guard rule); anything else reads as false.
         // The sim honors it only for eligible equipment outputs and mints the
         // bindOnTrade arm itself, so nothing here trusts client data.
-        if (typeof msg.recipe === 'string') sim.craftItem(msg.recipe, msg.commission === true, pid);
+        // Phase 3 optional `count`: finite numbers only; sim clamps to batch
+        // max and mats-fit (default 1 when omitted or non-numeric).
+        if (typeof msg.recipe === 'string') {
+          const count =
+            typeof msg.count === 'number' && Number.isFinite(msg.count) ? Math.floor(msg.count) : 1;
+          sim.craftItem(msg.recipe, msg.commission === true, pid, count);
+        }
         break;
       // Enchanting profession commands (Professions 2.0): the sim
       // resolvers re-validate ownership/eligibility/throttle (nothing trusted
@@ -8031,6 +8040,17 @@ export class GameServer {
       hirat: p.hitRating,
       eat: p.eating ? { remaining: round2(p.eating.remaining) } : null,
       drk: p.drinking ? { remaining: round2(p.drinking.remaining) } : null,
+      // Craft-cast session mirror (self-only, the eat/drk shape): the crafting
+      // window's recipe highlight and batch counter read these authoritatively
+      // online instead of click-time guesses, so the server's batch clamp and
+      // a mid-cast window close/reopen both stay truthful. Null at rest.
+      ccast: p.craftCastRecipeId
+        ? {
+            r: p.craftCastRecipeId,
+            rem: p.craftCastBatchRemaining,
+            tot: p.craftCastBatchTotal,
+          }
+        : null,
       opUntil: p.overpowerUntil > this.sim.time ? 1 : 0,
       opRem: round2(Math.max(0, p.overpowerUntil - this.sim.time)),
       ack: session.spectating ? 0 : anchorSession.lastInputSeq,

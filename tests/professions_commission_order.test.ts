@@ -43,6 +43,7 @@ import { craftItem as craftItemMod } from '../src/sim/professions/crafting';
 import type { ProfessionRecipeRecord } from '../src/sim/professions/types';
 import { type PlayerMeta, Sim } from '../src/sim/sim';
 import type { Entity, InvSlot, SimEvent } from '../src/sim/types';
+import { completeCraftCast } from './helpers/enchant_family_cast';
 
 const SWORD_RECIPE = 'recipe_eastbrook_arming_sword';
 const SWORD = 'eastbrook_arming_sword'; // weapon, commission-eligible
@@ -278,6 +279,7 @@ describe('deliverCommissionOrder', () => {
     grantReagents(sim, SWORD_RECIPE, crafter);
     const craft = craftItemMod(sim.ctx, SWORD_RECIPE, true, crafter);
     expect(craft.ok).toBe(true);
+    completeCraftCast(sim, crafter);
     const result = deliverCommissionOrder(sim.ctx, orderId, crafter);
     expect(result).toEqual({ ok: true, orderId, itemId: SWORD });
     expect(slotsOf(sim, crafter, SWORD)).toHaveLength(0);
@@ -315,6 +317,7 @@ describe('deliverCommissionOrder', () => {
     const orderId = acceptedOrder(sim, requester, crafter);
     grantReagents(sim, SWORD_RECIPE, crafter);
     craftItemMod(sim.ctx, SWORD_RECIPE, true, crafter);
+    completeCraftCast(sim, crafter);
     entityOf(sim, requester).pos.x += 9999;
     const result = deliverCommissionOrder(sim.ctx, orderId, crafter);
     expect(result).toEqual({ ok: false, orderId, itemId: SWORD, reason: 'deliver_out_of_range' });
@@ -335,6 +338,7 @@ describe('deliverCommissionOrder', () => {
     const orderId = acceptedOrder(sim, requester, crafter);
     grantReagents(sim, SWORD_RECIPE, crafter);
     craftItemMod(sim.ctx, SWORD_RECIPE, true, crafter);
+    completeCraftCast(sim, crafter);
     const { result, draws } = countDraws(sim, () =>
       deliverCommissionOrder(sim.ctx, orderId, crafter),
     );
@@ -468,7 +472,8 @@ describe('the Sim facade emits the personal text-free commissionOrderResult even
     expect(events[0].reason).toBeUndefined();
 
     grantReagents(sim, SWORD_RECIPE, crafter);
-    sim.craftItem(SWORD_RECIPE, true, crafter);
+    sim.craftItem(SWORD_RECIPE, true, crafter, 1);
+    completeCraftCast(sim, crafter);
     sim.drainEvents();
     sim.deliverCommissionOrder(orderId, crafter);
     events = orderResultEvents(sim.drainEvents());
@@ -519,7 +524,8 @@ describe('determinism: the order-board arc replays byte-identically', () => {
       const orderId = sim.commissionOrderBoard[0].id;
       sim.acceptCommissionOrder(orderId, crafter);
       grantReagents(sim, SWORD_RECIPE, crafter);
-      sim.craftItem(SWORD_RECIPE, true, crafter);
+      sim.craftItem(SWORD_RECIPE, true, crafter, 1);
+      completeCraftCast(sim, crafter);
       sim.deliverCommissionOrder(orderId, crafter);
       for (let i = 0; i < 40; i++) sim.tick();
       return JSON.stringify({
@@ -605,6 +611,12 @@ describe('live GameServer: the commission order board over the real wire', () =>
   }
 
   function routeTick(server: GameServer): void {
+    // Profession crafts are cast-paced: flush every player's craft cast after
+    // the command tick so the online arc still sees a completed craft.
+    (server as unknown as { routeEvents(e: SimEvent[]): void }).routeEvents(server.sim.tick());
+    for (const pid of server.sim.players.keys()) {
+      completeCraftCast(server.sim, pid);
+    }
     (server as unknown as { routeEvents(e: SimEvent[]): void }).routeEvents(server.sim.tick());
   }
 
