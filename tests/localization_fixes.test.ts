@@ -981,6 +981,11 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     // T1: player target selectors + raid-marker store (the setMarker error literal,
     // byte-identical after the move so its matcher is unchanged).
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/targeting.ts'), 'utf8'),
+    // The tool-only container's command bodies. Its equip/unequip logs are
+    // byte-identical to items.ts's, but the belt-specific refusals and the
+    // stow/take lines have their ONLY emitter occurrences here, so without this
+    // entry a rewording of them would be invisible to the guard.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/toolbelt.ts'), 'utf8'),
     // N1: the Nythraxis raid encounter (crypt-quest "ritual circle is silent" error +
     // the "<name> awakens!" summon log; the boss yells are variable-routed chat, not
     // scanned). Literals are byte-identical after the move so their matchers are unchanged.

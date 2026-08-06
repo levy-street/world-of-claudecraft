@@ -3317,6 +3317,7 @@ const ALL_DELTA_KEYS = [
   'atitle',
   'bags',
   'bank',
+  'belt',
   'bg',
   'buyback',
   'cardDuel',
@@ -3395,6 +3396,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   atitle: 'activeTitle',
   bags: 'bags',
   bank: 'bankInfo',
+  belt: 'toolbelt',
   blk: 'blockChance',
   buyback: 'vendorBuyback',
   bval: 'blockValue',
@@ -4208,11 +4210,12 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 66 unique keys in sorted order', () => {
+  it('ALL_DELTA_KEYS contains exactly 67 unique keys in sorted order', () => {
     // +1: guildBank (Guild Bank Phase 2), +1: the battleground bg key, +1: the
-    // commission order board's corder key (issue #1298).
-    expect(ALL_DELTA_KEYS).toHaveLength(66);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(66);
+    // commission order board's corder key (issue #1298), +1: belt (this
+    // branch's tool-only container).
+    expect(ALL_DELTA_KEYS).toHaveLength(67);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(67);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -4236,9 +4239,9 @@ describe('delta-key contract pins (anti-drift)', () => {
     // snapshot fragments) for 61, then v0.32's master-loot key mloot for 62,
     // plus the packet's slotted-tool-effects key tslot for 63, the
     // battleground's bg self key for 64, guildBank (Guild Bank Phase 2)
-    // for 65, and this branch's commission order board key corder
-    // (issue #1298) for 66.
-    expect(scraped.size).toBe(66);
+    // for 65, the commission order board key corder (issue #1298) for 66,
+    // and this branch's tool-only container key belt for 67.
+    expect(scraped.size).toBe(67);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

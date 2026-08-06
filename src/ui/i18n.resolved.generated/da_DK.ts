@@ -1886,7 +1886,17 @@ export const da_DK: EnTranslations = {
       "backpack": "Rygsæk",
       "bagSocketAria": "{name}: {slots}",
       "socketEmpty": "Tom taskeplads",
-      "unequipHint": "Klik for at fjerne denne taske"
+      "unequipHint": "Klik for at fjerne denne taske",
+      "toolbeltTitle": "Toolbelt",
+      "toolbeltNone": "No toolbelt worn",
+      "toolbeltRemoveHint": "Click to remove this toolbelt",
+      "toolbeltFilled": "{used}/{total} tools",
+      "toolSlotLabel": "Tool slot {slot}",
+      "toolSlotAria": "{slot}: {name}",
+      "toolSlotEmpty": "Empty",
+      "toolSlotStowHint": "Click to stow {name}",
+      "toolSlotTakeHint": "Click to take this tool back",
+      "toolSlotNoTool": "You have no tool to stow"
     },
     "raidConvert": {
       "toPartyDone": "Dit raid er konverteret tilbage til en gruppe.",
@@ -7358,6 +7368,7 @@ export const da_DK: EnTranslations = {
       "potion": "Eliksir",
       "elixir": "Eliksir",
       "bag": "Taske",
+      "toolbelt": "Toolbelt",
       "mount": "Ridedyr"
     },
     "stats": {
@@ -7404,7 +7415,9 @@ export const da_DK: EnTranslations = {
       "clickUseInstant": "Klik for at bruge øjeblikkeligt i kamp",
       "clickUse": "Klik for at bruge",
       "clickBuyback": "Klik for at købe tilbage",
-      "bagSlots": "Taske med {slots} pladser"
+      "bagSlots": "Taske med {slots} pladser",
+      "toolbeltSlots": "Holds {slots} tools",
+      "toolbeltDesc": "A belt that can hold your tools, freeing up space in your backpack."
     },
     "bags": {
       "title": "Tasker",
@@ -10304,6 +10317,15 @@ export const da_DK: EnTranslations = {
       },
       "reins_drakemaw_raptor": {
         "name": "Tøjler til Dragegabets Raptor"
+      },
+      "basic_toolbelt": {
+        "name": "Basic Toolbelt"
+      },
+      "reinforced_toolbelt": {
+        "name": "Reinforced Toolbelt"
+      },
+      "artisans_toolbelt": {
+        "name": "Artisan's Toolbelt"
       },
       "moggers_hide_quiver": {
         "name": "Moggers Skindkogger"

@@ -9,6 +9,7 @@ import {
   recipeById,
   TOOL_EFFECT_RECIPES,
   TOOL_RECIPES,
+  TOOLBELT_RECIPES,
 } from '../src/sim/content/recipes';
 import { STATIONS } from '../src/sim/data';
 import {
@@ -432,6 +433,7 @@ describe('craftItem command (#1127)', () => {
       ...CASTER_HUB_RECIPES,
       ...COMBO_RECIPES,
       ...LADDER_RECIPES,
+      ...TOOLBELT_RECIPES,
     ]
       .map((r) => r.id)
       .sort();
@@ -442,7 +444,8 @@ describe('craftItem command (#1127)', () => {
         TOOL_EFFECT_RECIPES.length +
         CASTER_HUB_RECIPES.length +
         COMBO_RECIPES.length +
-        LADDER_RECIPES.length,
+        LADDER_RECIPES.length +
+        TOOLBELT_RECIPES.length,
     );
     expect(sim.recipeList.map((r) => r.id).sort()).toEqual(allIds);
   });

@@ -42,9 +42,10 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // (the activity log's on-demand READ request; its answer comes back on its own
 // one-shot 'gbanklog' frame, not the snapshot), the battleground surface
 // (bg_queue/bg_leave/bg_flag sends plus the dev-only bg_queue force start),
-// and stopAutoAttackOnTargetSwitch joining as a send + dispatch pair (issue #1358).
-const EXPECTED_SEND_COUNT = 190;
-const EXPECTED_DISPATCH_COUNT = 203;
+// stopAutoAttackOnTargetSwitch joining as a send + dispatch pair (issue #1358),
+// and this branch's toolbelt adding four sends (equip/unequip/store/take).
+const EXPECTED_SEND_COUNT = 194; // 190 base + 4 toolbelt
+const EXPECTED_DISPATCH_COUNT = 207; // 194 sends + 13 dispatch-only
 const EXPECTED_DISPATCH_ONLY_COUNT = 13;
 
 // The chat sub-channel routing switch (server/game.ts `switch

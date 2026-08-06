@@ -1,6 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('../server/db', () => ({ pool: { query: vi.fn() } }));
+vi.mock('../server/db', () => ({
+  pool: { query: vi.fn() },
+  walletForAccount: vi.fn(async () => null),
+}));
 
 import { GameServer } from '../server/game';
 import { REALM } from '../server/realm';

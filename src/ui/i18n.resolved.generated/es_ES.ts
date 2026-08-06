@@ -1886,7 +1886,17 @@ export const es_ES: EnTranslations = {
       "backpack": "Mochila",
       "bagSocketAria": "{name}: {slots}",
       "socketEmpty": "Espacio de bolsa vacío",
-      "unequipHint": "Haz clic para quitar esta bolsa"
+      "unequipHint": "Haz clic para quitar esta bolsa",
+      "toolbeltTitle": "Toolbelt",
+      "toolbeltNone": "No toolbelt worn",
+      "toolbeltRemoveHint": "Click to remove this toolbelt",
+      "toolbeltFilled": "{used}/{total} tools",
+      "toolSlotLabel": "Tool slot {slot}",
+      "toolSlotAria": "{slot}: {name}",
+      "toolSlotEmpty": "Empty",
+      "toolSlotStowHint": "Click to stow {name}",
+      "toolSlotTakeHint": "Click to take this tool back",
+      "toolSlotNoTool": "You have no tool to stow"
     },
     "raidConvert": {
       "toPartyDone": "Tu banda ha vuelto a convertirse en grupo.",
@@ -7358,6 +7368,7 @@ export const es_ES: EnTranslations = {
       "potion": "Poción",
       "elixir": "Elixir",
       "bag": "Bolsa",
+      "toolbelt": "Toolbelt",
       "mount": "Montura"
     },
     "stats": {
@@ -7404,7 +7415,9 @@ export const es_ES: EnTranslations = {
       "clickUseInstant": "Haz clic para usar al instante en combate",
       "clickUse": "Haz clic para usar",
       "clickBuyback": "Haz clic para recomprar",
-      "bagSlots": "Bolsa de {slots} espacios"
+      "bagSlots": "Bolsa de {slots} espacios",
+      "toolbeltSlots": "Holds {slots} tools",
+      "toolbeltDesc": "A belt that can hold your tools, freeing up space in your backpack."
     },
     "bags": {
       "title": "Bolsas",
@@ -10304,6 +10317,15 @@ export const es_ES: EnTranslations = {
       },
       "reins_drakemaw_raptor": {
         "name": "Riendas del Raptor de Drakemaw"
+      },
+      "basic_toolbelt": {
+        "name": "Basic Toolbelt"
+      },
+      "reinforced_toolbelt": {
+        "name": "Reinforced Toolbelt"
+      },
+      "artisans_toolbelt": {
+        "name": "Artisan's Toolbelt"
       },
       "moggers_hide_quiver": {
         "name": "Carcaj de cuero de Mogger"

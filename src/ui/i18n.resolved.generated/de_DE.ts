@@ -1886,7 +1886,17 @@ export const de_DE: EnTranslations = {
       "backpack": "Rucksack",
       "bagSocketAria": "{name}: {slots}",
       "socketEmpty": "Leerer Taschenplatz",
-      "unequipHint": "Klicke, um diese Tasche abzulegen"
+      "unequipHint": "Klicke, um diese Tasche abzulegen",
+      "toolbeltTitle": "Toolbelt",
+      "toolbeltNone": "No toolbelt worn",
+      "toolbeltRemoveHint": "Click to remove this toolbelt",
+      "toolbeltFilled": "{used}/{total} tools",
+      "toolSlotLabel": "Tool slot {slot}",
+      "toolSlotAria": "{slot}: {name}",
+      "toolSlotEmpty": "Empty",
+      "toolSlotStowHint": "Click to stow {name}",
+      "toolSlotTakeHint": "Click to take this tool back",
+      "toolSlotNoTool": "You have no tool to stow"
     },
     "raidConvert": {
       "toPartyDone": "Euer Schlachtzug wurde wieder in eine Gruppe umgewandelt.",
@@ -7358,6 +7368,7 @@ export const de_DE: EnTranslations = {
       "potion": "Trank",
       "elixir": "Elixier",
       "bag": "Tasche",
+      "toolbelt": "Toolbelt",
       "mount": "Reittier"
     },
     "stats": {
@@ -7404,7 +7415,9 @@ export const de_DE: EnTranslations = {
       "clickUseInstant": "Zum sofortigen Benutzen im Kampf klicken",
       "clickUse": "Zum Benutzen klicken",
       "clickBuyback": "Zum Rückkaufen klicken",
-      "bagSlots": "Tasche mit {slots} Plätzen"
+      "bagSlots": "Tasche mit {slots} Plätzen",
+      "toolbeltSlots": "Holds {slots} tools",
+      "toolbeltDesc": "A belt that can hold your tools, freeing up space in your backpack."
     },
     "bags": {
       "title": "Taschen",
@@ -10304,6 +10317,15 @@ export const de_DE: EnTranslations = {
       },
       "reins_drakemaw_raptor": {
         "name": "Zügel des Drakenrachen-Raptors"
+      },
+      "basic_toolbelt": {
+        "name": "Basic Toolbelt"
+      },
+      "reinforced_toolbelt": {
+        "name": "Reinforced Toolbelt"
+      },
+      "artisans_toolbelt": {
+        "name": "Artisan's Toolbelt"
       },
       "moggers_hide_quiver": {
         "name": "Moggers Fellköcher"

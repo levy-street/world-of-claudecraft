@@ -93,6 +93,7 @@ export type BagAction =
   | 'petFeedBlocked'
   | 'discardQuest'
   | 'equipBag'
+  | 'equipToolbelt'
   | 'use';
 
 /** The tooltip hint sub-line i18n key for a bag item (or '' for no hint). */
@@ -185,6 +186,8 @@ export function bagItemAction(
   // not discarded; only inert quest items fall through to the discard prompt.
   if (item.kind === 'quest') return item.use ? 'use' : 'discardQuest';
   if (item.kind === 'bag') return 'equipBag';
+  // The tool-only container wears like a bag, into its own dedicated socket.
+  if (item.kind === 'toolbelt') return 'equipToolbelt';
   // A collected reins item falls through to 'use' like any other usable item:
   // clicking it summons that mount (sim useItem -> summonMountItem). There is no
   // picker to open any more.
@@ -546,5 +549,46 @@ export function buildBagBar(
     })),
     used,
     capacity,
+  };
+}
+
+/** One generic slot of the toolbelt bar: its position and the tool belted
+ *  there (null when empty - any gathering implement fits any slot). */
+export interface ToolSlotModel {
+  index: number;
+  itemId: string | null;
+}
+
+/** The toolbelt-bar model: whether a belt is worn at all, one entry per slot
+ *  the worn belt grants, and the ONE carried tool a click on any empty slot
+ *  stows next (null when nothing stowable is carried). Pure data; the painter
+ *  renders it.
+ *
+ *  `visible` is what decides whether the bar exists in the DOM at all. The
+ *  belt is the top of a tailoring ladder gated at skill 25, so on release day
+ *  essentially the whole population has no belt and no way to get one yet:
+ *  painting the row unconditionally gave every one of those players a
+ *  permanent empty "no toolbelt worn" line (and its divider rule) advertising
+ *  something they cannot have. The bar appears once the belt is part of the
+ *  player's world: worn, or carried but not yet put on, which is exactly when
+ *  the "no toolbelt worn" hint becomes actionable rather than noise. */
+export interface ToolbeltBarModel {
+  visible: boolean;
+  equipped: string | null;
+  slots: ToolSlotModel[];
+  stowCandidateId: string | null;
+}
+
+export function buildToolbeltBar(
+  equipped: string | null,
+  slotItemIds: readonly (string | null)[],
+  stowCandidateId: string | null,
+  carriesBelt: boolean,
+): ToolbeltBarModel {
+  return {
+    visible: equipped !== null || carriesBelt,
+    equipped,
+    slots: slotItemIds.map((itemId, index) => ({ index, itemId })),
+    stowCandidateId,
   };
 }

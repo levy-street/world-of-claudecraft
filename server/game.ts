@@ -6413,6 +6413,20 @@ export class GameServer {
           sim.unequipBag(msg.socket, pid);
         }
         break;
+      case 'equip_toolbelt':
+        if (typeof msg.item === 'string') sim.equipToolbelt(msg.item, pid);
+        break;
+      case 'unequip_toolbelt':
+        sim.unequipToolbelt(pid);
+        break;
+      case 'store_tool':
+        if (typeof msg.item === 'string') sim.storeToolInBelt(msg.item, pid);
+        break;
+      case 'take_tool':
+        // The slot is a positional index; the sim's own range/occupancy check
+        // is the real gate, this only keeps a non-number off that path.
+        if (typeof msg.slot === 'number') sim.takeToolFromBelt(msg.slot, pid);
+        break;
       case 'change_skin':
         if (typeof msg.skin === 'number') {
           if (msg.catalog === 'mech') {
@@ -8417,6 +8431,7 @@ export class GameServer {
       session.lastWireRev = meta.wireRev;
       maybe('inv', meta.inventory);
       maybe('bags', meta.bags);
+      maybe('belt', meta.toolbelt);
       // The owned mount collection (IWorldMounts.ownedMounts): the horse plus
       // every mount whose reins item sits in bags or bank. Its inputs are
       // meta.inventory (heavy-gated above) and meta.bank.inventory, which is

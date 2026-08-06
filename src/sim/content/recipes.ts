@@ -1519,6 +1519,68 @@ export const LADDER_RECIPES: ProfessionRecipeRecord[] = [
   },
 ];
 
+// The toolbelt ladder (tailoring): the tool-only containers of
+// src/sim/toolbelt.ts, 2/3/4 generic tool slots at skillReq 25/50/75 (tier
+// 1/2/3, one rung past the cloth ladder's top). A separate table rather than
+// three more LADDER_RECIPES rows because the ladder's shape (54 recipes,
+// rungs exactly at 0/25/50) is pinned. Loom-bound and trainer-taught at
+// weaver_ottilie like the cloth ladder; reagent lists stay cloth-and-thread
+// so a pure tailor never leaves zone-1 materials. Each rung's level/budget
+// mirrors its tier neighbors (goldweave at 25, silkbinders at 50, wardweave
+// at 75).
+export const TOOLBELT_RECIPES: ProfessionRecipeRecord[] = [
+  {
+    id: 'recipe_basic_toolbelt',
+    professionId: 'tailoring',
+    resultItemId: 'basic_toolbelt',
+    resultCount: 1,
+    // Harvested cloth plus vendor thread. Input 48 vs output 12.
+    reagents: [
+      { itemId: 'homespun_cloth', count: 3 },
+      { itemId: 'spool_of_thread', count: 3 },
+    ],
+    skillReq: 25,
+    itemLevelBudget: 16,
+    level: 15,
+    acquisition: ['trainer'],
+    stationType: 'loom',
+  },
+  {
+    id: 'recipe_reinforced_toolbelt',
+    professionId: 'tailoring',
+    resultItemId: 'reinforced_toolbelt',
+    resultCount: 1,
+    // Silk-backed cloth. Input 76 vs output 40.
+    reagents: [
+      { itemId: 'spider_silk', count: 4 },
+      { itemId: 'homespun_cloth', count: 2 },
+      { itemId: 'spool_of_thread', count: 4 },
+    ],
+    skillReq: 50,
+    itemLevelBudget: 20,
+    level: 20,
+    acquisition: ['trainer'],
+    stationType: 'loom',
+  },
+  {
+    id: 'recipe_artisans_toolbelt',
+    professionId: 'tailoring',
+    resultItemId: 'artisans_toolbelt',
+    resultCount: 1,
+    // The pristine-specimen rung, like the raiment. Input 152 vs output 120.
+    reagents: [
+      { itemId: 'pristine_silk', count: 2 },
+      { itemId: 'spider_silk', count: 6 },
+      { itemId: 'spool_of_thread', count: 6 },
+    ],
+    skillReq: 75,
+    itemLevelBudget: 20,
+    level: 20,
+    acquisition: ['trainer'],
+    stationType: 'loom',
+  },
+];
+
 // Exported (not just used internally by recipeById below) so the IWorld
 // recipeList read surface (Sim.recipeList / ClientWorld.recipeList) can list
 // every recipe, common, tool, and combo alike: see PR #1209 review, a combo
@@ -1532,6 +1594,7 @@ export const ALL_RECIPES: ProfessionRecipeRecord[] = [
   ...CASTER_HUB_RECIPES,
   ...COMBO_RECIPES,
   ...LADDER_RECIPES,
+  ...TOOLBELT_RECIPES,
 ];
 
 export function recipeById(recipeId: string): ProfessionRecipeRecord | undefined {

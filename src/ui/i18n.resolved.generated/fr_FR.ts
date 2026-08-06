@@ -1886,7 +1886,17 @@ export const fr_FR: EnTranslations = {
       "backpack": "Sac à dos",
       "bagSocketAria": "{name} : {slots}",
       "socketEmpty": "Emplacement de sac vide",
-      "unequipHint": "Cliquez pour retirer ce sac"
+      "unequipHint": "Cliquez pour retirer ce sac",
+      "toolbeltTitle": "Toolbelt",
+      "toolbeltNone": "No toolbelt worn",
+      "toolbeltRemoveHint": "Click to remove this toolbelt",
+      "toolbeltFilled": "{used}/{total} tools",
+      "toolSlotLabel": "Tool slot {slot}",
+      "toolSlotAria": "{slot}: {name}",
+      "toolSlotEmpty": "Empty",
+      "toolSlotStowHint": "Click to stow {name}",
+      "toolSlotTakeHint": "Click to take this tool back",
+      "toolSlotNoTool": "You have no tool to stow"
     },
     "raidConvert": {
       "toPartyDone": "Votre raid a été reconverti en groupe.",
@@ -7358,6 +7368,7 @@ export const fr_FR: EnTranslations = {
       "potion": "Potion",
       "elixir": "Élixir",
       "bag": "Sac",
+      "toolbelt": "Toolbelt",
       "mount": "Monture"
     },
     "stats": {
@@ -7404,7 +7415,9 @@ export const fr_FR: EnTranslations = {
       "clickUseInstant": "Cliquer pour utiliser instantanément en combat",
       "clickUse": "Cliquer pour utiliser",
       "clickBuyback": "Cliquer pour racheter",
-      "bagSlots": "Sac de {slots} emplacements"
+      "bagSlots": "Sac de {slots} emplacements",
+      "toolbeltSlots": "Holds {slots} tools",
+      "toolbeltDesc": "A belt that can hold your tools, freeing up space in your backpack."
     },
     "bags": {
       "title": "Sacs",
@@ -10304,6 +10317,15 @@ export const fr_FR: EnTranslations = {
       },
       "reins_drakemaw_raptor": {
         "name": "Rênes du Raptor du Drakemaw"
+      },
+      "basic_toolbelt": {
+        "name": "Basic Toolbelt"
+      },
+      "reinforced_toolbelt": {
+        "name": "Reinforced Toolbelt"
+      },
+      "artisans_toolbelt": {
+        "name": "Artisan's Toolbelt"
       },
       "moggers_hide_quiver": {
         "name": "Carquois en cuir de Mogger"

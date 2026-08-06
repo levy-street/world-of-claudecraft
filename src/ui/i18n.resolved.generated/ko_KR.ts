@@ -1886,7 +1886,17 @@ export const ko_KR: EnTranslations = {
       "backpack": "배낭",
       "bagSocketAria": "{name}: {slots}",
       "socketEmpty": "빈 가방 칸",
-      "unequipHint": "클릭하여 이 가방을 해제"
+      "unequipHint": "클릭하여 이 가방을 해제",
+      "toolbeltTitle": "공구 벨트",
+      "toolbeltNone": "착용한 공구 벨트 없음",
+      "toolbeltRemoveHint": "클릭하여 이 공구 벨트를 벗기",
+      "toolbeltFilled": "도구 {used}/{total}",
+      "toolSlotLabel": "도구 슬롯 {slot}",
+      "toolSlotAria": "{slot}: {name}",
+      "toolSlotEmpty": "비어 있음",
+      "toolSlotStowHint": "클릭하여 {name} 보관",
+      "toolSlotTakeHint": "클릭하여 이 도구를 꺼내기",
+      "toolSlotNoTool": "보관할 도구가 없습니다"
     },
     "raidConvert": {
       "toPartyDone": "공격대가 파티로 다시 전환되었습니다.",
@@ -7358,6 +7368,7 @@ export const ko_KR: EnTranslations = {
       "potion": "물약",
       "elixir": "비약",
       "bag": "가방",
+      "toolbelt": "공구 벨트",
       "mount": "탈것"
     },
     "stats": {
@@ -7404,7 +7415,9 @@ export const ko_KR: EnTranslations = {
       "clickUseInstant": "클릭하여 전투 중 즉시 사용",
       "clickUse": "클릭하여 사용",
       "clickBuyback": "클릭하여 되사기",
-      "bagSlots": "{slots}칸 가방"
+      "bagSlots": "{slots}칸 가방",
+      "toolbeltSlots": "도구를 {slots}개 수납할 수 있습니다",
+      "toolbeltDesc": "도구를 넣을 수 있는 벨트로, 배낭 공간을 절약해 줍니다."
     },
     "bags": {
       "title": "가방",
@@ -10304,6 +10317,15 @@ export const ko_KR: EnTranslations = {
       },
       "reins_drakemaw_raptor": {
         "name": "화산구 랩터의 고삐"
+      },
+      "basic_toolbelt": {
+        "name": "기본 공구 벨트"
+      },
+      "reinforced_toolbelt": {
+        "name": "보강된 공구 벨트"
+      },
+      "artisans_toolbelt": {
+        "name": "장인의 공구 벨트"
       },
       "moggers_hide_quiver": {
         "name": "모거의 가죽 화살통"

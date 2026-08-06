@@ -11,6 +11,7 @@
 // touch drag. Hence a narrow .money rewrite, and hence these assertions.
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { emptyToolbelt } from '../src/sim/toolbelt';
 import type { InvSlot } from '../src/sim/types';
 import { bagsWindowShown } from '../src/ui/bags_view';
 import { BagsWindow, type BagsWindowDeps } from '../src/ui/bags_window';
@@ -61,6 +62,7 @@ function harness(startCopper = 1000, inventory: InvSlot[] = SWORD): Harness {
         inventory,
         bags: [null, null, null, null],
         bagCapacity: 16,
+        toolbelt: emptyToolbelt(),
         get copper() {
           return copper;
         },

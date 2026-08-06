@@ -17,7 +17,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "e836976c",
+      "state": "195eaa7d",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -76,6 +76,7 @@
           "talents": {
             "rows": {}
           },
+          "toolbelt": {},
           "townFocus": {}
         }
       ],
@@ -149,7 +150,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "136718e4",
+      "state": "e31fb495",
       "events": "42eb0bb0",
       "rng": {
         "draws": 0,
@@ -213,6 +214,7 @@
             },
             "spec": "arms"
           },
+          "toolbelt": {},
           "townFocus": {}
         }
       ],
@@ -286,7 +288,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "a4ea70c9",
+      "state": "f01e9888",
       "events": "2d4bbbe3",
       "rng": {
         "draws": 0,
@@ -347,6 +349,7 @@
             "rows": {},
             "spec": "arms"
           },
+          "toolbelt": {},
           "townFocus": {}
         }
       ],
@@ -420,7 +423,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "733d497c",
+      "state": "3def7aed",
       "events": "edb445f3",
       "rng": {
         "draws": 0,
@@ -498,6 +501,7 @@
             },
             "spec": "arms"
           },
+          "toolbelt": {},
           "townFocus": {}
         }
       ],
@@ -571,7 +575,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "bfa504e7",
+      "state": "d35ff01a",
       "events": "eb14db1f",
       "rng": {
         "draws": 0,
@@ -649,6 +653,7 @@
             },
             "spec": "arms"
           },
+          "toolbelt": {},
           "townFocus": {}
         }
       ],
@@ -722,7 +727,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "203a05a7",
+      "state": "53a6b0da",
       "events": "66ad36ea",
       "rng": {
         "draws": 0,
@@ -800,6 +805,7 @@
             },
             "spec": "fury"
           },
+          "toolbelt": {},
           "townFocus": {}
         }
       ],
@@ -873,7 +879,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "203a05a7",
+      "state": "53a6b0da",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -951,6 +957,7 @@
             },
             "spec": "fury"
           },
+          "toolbelt": {},
           "townFocus": {}
         }
       ],

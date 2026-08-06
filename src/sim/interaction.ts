@@ -67,6 +67,7 @@ import {
   minWieldRequirementToWorkAny,
 } from './professions/wield_gate';
 import type { SimContext } from './sim_context';
+import { toolSearchInventory } from './toolbelt';
 import {
   cloneItemInstancePayload,
   dist2d,
@@ -424,7 +425,11 @@ export function harvestCorpse(
   // MONSTER_MATERIAL_TIERS, the prime directive) and bare hands float the
   // scan at 1, so in shipped content this gate never fires: it is the seam
   // future higher-tier corpse families compose with.
-  const bestAny = bestWieldableAnyGatherToolTier(meta.inventory, meta.gatheringProficiency, ITEMS);
+  const bestAny = bestWieldableAnyGatherToolTier(
+    toolSearchInventory(meta.inventory, meta.toolbelt),
+    meta.gatheringProficiency,
+    ITEMS,
+  );
   let toolDeniedEmitted = false;
   // #2457: the yield ledger the single harvestResult event below carries. Every
   // grant in this function passes { silent: true, callerLogs: true } from here
@@ -507,7 +512,7 @@ export function harvestCorpse(
         // in the bags and only its counter is short, name the smallest
         // proficiency that would put something already carried to work.
         const wieldReq = minWieldRequirementToWorkAny(
-          meta.inventory,
+          toolSearchInventory(meta.inventory, meta.toolbelt),
           monsterMaterialTierFor(y.component),
           ITEMS,
         );

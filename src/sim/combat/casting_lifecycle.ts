@@ -42,6 +42,7 @@ import type { SimContext } from '../sim_context';
 import { abilityScalingPower, channelTickBonus } from '../spell_scaling';
 import { resolveTalentHitMult } from '../talent_hit_mult';
 import { hasEscapeStealth } from '../threat';
+import { toolSearchInventory } from '../toolbelt';
 import type { AbilityDef, AbilityEffect, Entity, Vec3 } from '../types';
 import {
   angleTo,
@@ -327,7 +328,11 @@ export function updateCasting(ctx: SimContext, p: Entity, meta: PlayerMeta): voi
       // Draw-free, same as the tier-only scan it replaces, so the bite arm
       // still moves no rng and the two-draws-per-landed-session contract is
       // untouched.
-      const rod = bestOwnedGatherToolFor(meta.inventory, 'fishing', ITEMS);
+      const rod = bestOwnedGatherToolFor(
+        toolSearchInventory(meta.inventory, meta.toolbelt),
+        'fishing',
+        ITEMS,
+      );
       p.fishReelDeadlineTick =
         ctx.tickCount + Math.ceil(fishReelWindowSecFor(rod.tier, rod.rarity) / DT);
     } else if (p.fishReelDeadlineTick > 0 && ctx.tickCount > p.fishReelDeadlineTick) {

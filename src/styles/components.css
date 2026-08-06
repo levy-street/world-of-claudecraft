@@ -6617,9 +6617,16 @@
     box-shadow: inset 0 2px 6px #000d;
   }
   /* The bag bar: backpack + the 4 equip sockets + the used/total counter. */
+  /* Wraps rather than overflows. #bags is fluid down to a 180px floor
+     (--bags-slot-w), while every socket is a fixed 40px with flex: none, so a
+     full row (the backpack or belt socket plus 4 more) needs 216px before the
+     capacity counter is placed. Below that the row used to run off the panel
+     edge; wrapping keeps the same sockets in the same order on a second line.
+     No effect at the 310px steady-state width, where a full row still fits. */
   .bag-bar {
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
     gap: 4px;
     margin: 4px 0 2px;
   }
@@ -6675,6 +6682,40 @@
     font-size: 12px;
     color: var(--color-text-muted);
     padding: 6px;
+  }
+  /* The toolbelt bar sits under the bag bar and reuses its socket chrome. It
+     holds tools only and grants no pooled slots, so it is set apart by a rule
+     above it rather than by a second heading. */
+  .toolbelt-bar {
+    margin-top: 0;
+    padding-top: 4px;
+    border-top: 1px solid #2f281a;
+  }
+  /* An empty tool slot is CLICKABLE when the player carries a matching tool
+     (one-click stow), unlike an empty bag socket, which is inert. */
+  .toolbelt-bar .bag-socket.empty:not([aria-disabled="true"]) {
+    cursor: var(--cursor-point);
+    border-color: #4a3d26;
+  }
+  .toolbelt-bar .bag-socket.empty:not([aria-disabled="true"]):hover {
+    filter: brightness(1.25);
+  }
+  .toolbelt-none {
+    margin-left: 0;
+    color: var(--color-text-muted);
+  }
+  /* Phone portrait: #bags is at or near its 180px floor here, so the sockets
+     step down to keep the belt on ONE row (5 x 34px + 4 gaps = 186px) instead
+     of wrapping the counter onto a line of its own. Cosmetic sizing only, and
+     it moves the bag bar and the belt together so the two rows stay aligned. */
+  @media (max-width: 480px) {
+    #bags .bag-socket {
+      width: 34px;
+      height: 34px;
+    }
+    #bags .bag-capacity {
+      font-size: 11px;
+    }
   }
   /* Modular bag filtering: category chips + sort/search tools above the grid. */
   .bag-filter-bar {

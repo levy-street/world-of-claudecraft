@@ -30,7 +30,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 967,
-      "state": "18feeb15",
+      "state": "0ecc282f",
       "events": "c702eb13",
       "rng": {
         "draws": 0,
@@ -41,7 +41,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 967,
-      "state": "62cb6bec",
+      "state": "770e659e",
       "events": "224cbfd9",
       "rng": {
         "draws": 68,
@@ -52,7 +52,7 @@
       "tick": 75,
       "time": 3.75,
       "nextId": 967,
-      "state": "def24ac2",
+      "state": "ca92a66c",
       "events": "969ec561",
       "rng": {
         "draws": 267,
@@ -63,7 +63,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 967,
-      "state": "186085ad",
+      "state": "c75ae5a7",
       "events": "507341c9",
       "rng": {
         "draws": 502,
@@ -74,7 +74,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 967,
-      "state": "1de455b2",
+      "state": "e9d2c6f4",
       "events": "ada54ef3",
       "rng": {
         "draws": 789,
@@ -85,7 +85,7 @@
       "tick": 150,
       "time": 7.5,
       "nextId": 967,
-      "state": "2b5b2011",
+      "state": "045647e3",
       "events": "741638a5",
       "rng": {
         "draws": 1076,
@@ -96,7 +96,7 @@
       "tick": 163,
       "time": 8.15,
       "nextId": 967,
-      "state": "c533fd2a",
+      "state": "fbb94bac",
       "events": "8945b220",
       "rng": {
         "draws": 1227,
@@ -174,6 +174,7 @@
             },
             "spec": "arms"
           },
+          "toolbelt": {},
           "townFocus": {}
         },
         {
@@ -243,6 +244,7 @@
             },
             "spec": "arcane"
           },
+          "toolbelt": {},
           "townFocus": {}
         },
         {
@@ -313,6 +315,7 @@
             },
             "spec": "assassination"
           },
+          "toolbelt": {},
           "townFocus": {}
         },
         {
@@ -382,6 +385,7 @@
             },
             "spec": "beast_mastery"
           },
+          "toolbelt": {},
           "townFocus": {}
         }
       ],

@@ -1886,7 +1886,17 @@ export const en_XA: EnTranslations = {
       "backpack": "[Ɓáçķþáçķ]",
       "bagSocketAria": "[{name}: {slots}]",
       "socketEmpty": "[Éɱþţý ƀáĝ šļóţ]",
-      "unequipHint": "[Çļíçķ ţó ŕéɱóʋé ţĥíš ƀáĝ]"
+      "unequipHint": "[Çļíçķ ţó ŕéɱóʋé ţĥíš ƀáĝ]",
+      "toolbeltTitle": "[Ţóóļƀéļţ]",
+      "toolbeltNone": "[Ñó ţóóļƀéļţ ŵóŕñ]",
+      "toolbeltRemoveHint": "[Çļíçķ ţó ŕéɱóʋé ţĥíš ţóóļƀéļţ]",
+      "toolbeltFilled": "[{used}/{total} ţóóļš]",
+      "toolSlotLabel": "[Ţóóļ šļóţ {slot}]",
+      "toolSlotAria": "[{slot}: {name}]",
+      "toolSlotEmpty": "[Éɱþţý]",
+      "toolSlotStowHint": "[Çļíçķ ţó šţóŵ {name}]",
+      "toolSlotTakeHint": "[Çļíçķ ţó ţáķé ţĥíš ţóóļ ƀáçķ]",
+      "toolSlotNoTool": "[Ýóú ĥáʋé ñó ţóóļ ţó šţóŵ]"
     },
     "raidConvert": {
       "toPartyDone": "[Ýóúŕ ŕáíð ĥáš çóñʋéŕţéð ƀáçķ ţó á þáŕţý.]",
@@ -7358,6 +7368,7 @@ export const en_XA: EnTranslations = {
       "potion": "[Þóţíóñ]",
       "elixir": "[Éļíẋíŕ]",
       "bag": "[Ɓáĝ]",
+      "toolbelt": "[Ţóóļƀéļţ]",
       "mount": "[Ɱóúñţ]"
     },
     "stats": {
@@ -7404,7 +7415,9 @@ export const en_XA: EnTranslations = {
       "clickUseInstant": "[Çļíçķ ţó úšé íñšţáñţļý íñ çóɱƀáţ]",
       "clickUse": "[Çļíçķ ţó úšé]",
       "clickBuyback": "[Çļíçķ ţó ƀúý ƀáçķ]",
-      "bagSlots": "[{slots} Šļóţ Ɓáĝ]"
+      "bagSlots": "[{slots} Šļóţ Ɓáĝ]",
+      "toolbeltSlots": "[Ĥóļðš {slots} ţóóļš]",
+      "toolbeltDesc": "[Á ƀéļţ ţĥáţ çáñ ĥóļð ýóúŕ ţóóļš, ƒŕééíñĝ úþ šþáçé íñ ýóúŕ ƀáçķþáçķ.]"
     },
     "bags": {
       "title": "[Ɓáĝš]",
@@ -10304,6 +10317,15 @@ export const en_XA: EnTranslations = {
       },
       "reins_drakemaw_raptor": {
         "name": "[Ŕéíñš óƒ ţĥé Ðŕáķéɱáŵ Ŕáþţóŕ]"
+      },
+      "basic_toolbelt": {
+        "name": "[Ɓášíç Ţóóļƀéļţ]"
+      },
+      "reinforced_toolbelt": {
+        "name": "[Ŕéíñƒóŕçéð Ţóóļƀéļţ]"
+      },
+      "artisans_toolbelt": {
+        "name": "[Áŕţíšáñ'š Ţóóļƀéļţ]"
       },
       "moggers_hide_quiver": {
         "name": "[Ɱóĝĝéŕ'š Ĥíðé Ɋúíʋéŕ]"

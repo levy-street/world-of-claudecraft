@@ -1,6 +1,6 @@
 import { DEV_KIT_ROLES, devKitRole } from './content/dev_kit_roles';
 import { MOUNT_KEYS, TRAINING_MOUNT_KEY } from './content/mounts';
-import { GATHERING_PROFESSIONS } from './content/professions';
+import { CRAFT_RING, craftMaxSkillFor, GATHERING_PROFESSIONS } from './content/professions';
 import { DUNGEONS, ITEMS, MOBS, NPCS } from './data';
 import { applyDevKit } from './dev_kit';
 import { createGroundObject, createMob } from './entity';
@@ -10,6 +10,7 @@ import { MOUNT_TRAIN_MIN_LEVEL } from './mounts_training';
 import { isGatheringProfessionId, queueGatheringGrant } from './professions/gathering';
 import { placeMobileStationForPlayer } from './professions/mobile_station';
 import { cancelProfessionSessionOnDisplacement } from './professions/session_teardown';
+import { gainCraftSkill } from './professions/wheel';
 import { completeAllQuestsForDev } from './quests/dev_quest_commands';
 import { RIFT_RANK_BASE_LEVEL, riftRankForBaseLevel } from './rift/ranks';
 import { generateRiftPlan, isSetPieceSeed } from './rift/rift_gen';
@@ -320,6 +321,36 @@ export function handleDevChat(
     }
     const meta = ctx.players.get(pid);
     if (meta) queueGatheringGrant(meta, professionId, amount);
+    return null;
+  }
+
+  // The umbrella skill cheat: raises ANY profession by name. A craft id gains
+  // flat skill through the one real primitive (gainCraftSkill, so the craft's
+  // enforced cap holds); a gathering id delegates to the same queued grant
+  // /dev gather uses, so the two spellings cannot drift.
+  const professionMatch = /^\/(?:dev\s+profession|devprofession)\s+(\S+)(?:\s+(\d+))?\s*$/i.exec(
+    raw,
+  );
+  if (professionMatch) {
+    const professionId = professionMatch[1].toLowerCase();
+    const amount = clampInteger(Number(professionMatch[2] ?? 1), 1, 125);
+    const meta = ctx.players.get(pid);
+    if (!meta) return null;
+    if (isGatheringProfessionId(professionId)) {
+      queueGatheringGrant(meta, professionId, amount);
+      return null;
+    }
+    if (CRAFT_RING.some((craft) => craft.id === professionId)) {
+      gainCraftSkill(meta.craftSkills, professionId, amount);
+      emitDevLog(
+        ctx,
+        pid,
+        `[dev] ${professionId} skill +${amount} (now ${meta.craftSkills[professionId]}/${craftMaxSkillFor(professionId)}).`,
+      );
+      return null;
+    }
+    const options = [...CRAFT_RING.map((craft) => craft.id), ...Object.keys(GATHERING_PROFESSIONS)];
+    ctx.error(pid, `[dev] Unknown profession '${professionId}'. Options: ${options.join(', ')}.`);
     return null;
   }
 
@@ -636,7 +667,7 @@ export function handleDevChat(
   if (/^\/dev(?:\s|$)/i.test(raw)) {
     ctx.error(
       pid,
-      'Dev commands: /dev gui, /dev level, /dev tp, /dev spawn, /dev despawn, /dev killtarget, /dev give, /dev kit, /dev mounts, /dev mountquest, /dev gold, /dev quest, /dev quests, /dev attune, /dev mobilestation, /dev gather, /dev bot, /dev vendor, /dev bg, /dev lfg, /dev portal [seed] [level] [C|B|A|S] [infernal|random], /dev cascade, /dev sandbox, /dev smite, /dev god, /dev heal, /dev resource, /dev cooldowns, /dev revive, /dev combatreset, /dev dungeon, /dev raid, /dev kill',
+      'Dev commands: /dev gui, /dev level, /dev tp, /dev spawn, /dev despawn, /dev killtarget, /dev give, /dev kit, /dev mounts, /dev mountquest, /dev gold, /dev quest, /dev quests, /dev attune, /dev mobilestation, /dev gather, /dev profession, /dev bot, /dev vendor, /dev bg, /dev lfg, /dev portal [seed] [level] [C|B|A|S] [infernal|random], /dev cascade, /dev sandbox, /dev smite, /dev god, /dev heal, /dev resource, /dev cooldowns, /dev revive, /dev combatreset, /dev dungeon, /dev raid, /dev kill',
     );
     return null;
   }

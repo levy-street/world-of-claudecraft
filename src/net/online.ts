@@ -48,6 +48,7 @@ import { emptyCraftSkills } from '../sim/professions/wheel';
 import type { ResolvedAbility } from '../sim/sim';
 import { parseTalentAllocation } from '../sim/talent_allocation_input';
 import { repairTalentLoadouts } from '../sim/talent_loadouts';
+import { emptyToolbelt, type ToolbeltState } from '../sim/toolbelt';
 import {
   type Aura,
   cloneItemInstancePayload,
@@ -1431,6 +1432,9 @@ export class ClientWorld implements IWorld {
   // Equipped bag sockets, mirrored from snapshot self ('bags'); capacity is
   // derived locally from the shared item data (same math as the sim's bags.ts).
   bags: (string | null)[] = [null, null, null, null];
+  // The tool-only container, mirrored from snapshot self ('belt'). Grants no
+  // pooled slots, so unlike `bags` it never feeds bagCapacity.
+  toolbelt: ToolbeltState = emptyToolbelt();
   vendorBuyback: InvSlot[] = [];
   equipment: Partial<Record<EquipSlot, string>> = {};
   equipmentInstances: import('../sim/entity').PlayerEquipmentInstances = {};
@@ -3267,6 +3271,10 @@ export class ClientWorld implements IWorld {
         this.bags = s.bags;
         this.invChanged = true;
       }
+      if (s.belt !== undefined) {
+        this.toolbelt = s.belt;
+        this.invChanged = true;
+      }
       if (s.equip !== undefined) this.equipment = s.equip;
       if (s.einst !== undefined) this.equipmentInstances = s.einst;
       // IWorldCosmetics facet (W7) self-decode: cosmetics is delta-guarded (a
@@ -3879,6 +3887,18 @@ export class ClientWorld implements IWorld {
   }
   unequipBag(socket: number): void {
     this.cmd({ cmd: 'unequip_bag', socket });
+  }
+  equipToolbelt(itemId: string): void {
+    this.cmd({ cmd: 'equip_toolbelt', item: itemId });
+  }
+  unequipToolbelt(): void {
+    this.cmd({ cmd: 'unequip_toolbelt' });
+  }
+  storeToolInBelt(itemId: string): void {
+    this.cmd({ cmd: 'store_tool', item: itemId });
+  }
+  takeToolFromBelt(slotIndex: number): void {
+    this.cmd({ cmd: 'take_tool', slot: slotIndex });
   }
   useItem(itemId: string): void {
     this.cmd({ cmd: 'use', item: itemId });

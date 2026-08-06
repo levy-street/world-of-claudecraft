@@ -183,7 +183,10 @@ function itemMatchesType(item: ItemDef, filter: MarketItemTypeFilter): boolean {
       item.kind === 'potion' ||
       item.kind === 'elixir'
     );
-  if (filter === 'bag') return item.kind === 'bag';
+  // The Toolbelt browses with the bags: it is the other carried container, so a
+  // player looking for storage finds it here. It carries no bagSlots, so it
+  // matches the category itself and none of its slot-count subtypes.
+  if (filter === 'bag') return item.kind === 'bag' || item.kind === 'toolbelt';
   if (filter === 'material')
     return !isCosmeticItem(item) && (item.kind === 'junk' || item.kind === 'tool');
   if (filter === 'cosmetic') return isCosmeticItem(item);

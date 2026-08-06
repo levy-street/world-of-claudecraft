@@ -28,7 +28,7 @@
       "tick": 3,
       "time": 0.15,
       "nextId": 966,
-      "state": "60b8c3e6",
+      "state": "45ec8e3e",
       "events": "4a8f3918",
       "rng": {
         "draws": 2,
@@ -95,6 +95,7 @@
           "talents": {
             "rows": {}
           },
+          "toolbelt": {},
           "townFocus": {}
         },
         {
@@ -164,6 +165,7 @@
           "talents": {
             "rows": {}
           },
+          "toolbelt": {},
           "townFocus": {}
         }
       ],

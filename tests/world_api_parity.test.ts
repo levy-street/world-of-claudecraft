@@ -95,6 +95,7 @@ export const IWORLD_MEMBERS = [
   { name: 'inventory', kind: 'data' },
   { name: 'bags', kind: 'data' },
   { name: 'bagCapacity', kind: 'data' },
+  { name: 'toolbelt', kind: 'data' },
   { name: 'vendorBuyback', kind: 'data' },
   { name: 'equipment', kind: 'data' },
   { name: 'equipmentInstances', kind: 'data' },
@@ -159,6 +160,10 @@ export const IWORLD_MEMBERS = [
   { name: 'socketRiftGem', kind: 'method' },
   { name: 'equipBag', kind: 'method' },
   { name: 'unequipBag', kind: 'method' },
+  { name: 'equipToolbelt', kind: 'method' },
+  { name: 'unequipToolbelt', kind: 'method' },
+  { name: 'storeToolInBelt', kind: 'method' },
+  { name: 'takeToolFromBelt', kind: 'method' },
   { name: 'changeSkin', kind: 'method' },
   { name: 'claimEventSkin', kind: 'method' },
   { name: 'unequipMechChroma', kind: 'method' },
@@ -543,17 +548,14 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // commands), leaving 287. The guild bank ACTIVITY LOG adds one read member
     // (guildBankLog, a method because reading it is what requests the cold
     // payload on demand: it has no snapshot key), leaving 288. Thornhollow
-    // Fields adds the four battleground facet members on top of that base:
-    // the bgInfo data member plus the bgQueueJoin / bgQueueLeave / bgFlagAction
-    // commands, leaving 293 (this base tip already carries the Book of Deeds
-    // recent strip's deedsRecent read). The stop-auto-attack-on-target-switch
-    // setting adds setStopAutoAttackOnTargetSwitch (method), leaving 294. This
-    // branch's commission order board (issue #1298) adds commissionOrders
-    // (data) plus openCommissionOrder/cancelCommissionOrder/
-    // acceptCommissionOrder/deliverCommissionOrder (methods), leaving 299.
-    expect(IWORLD_MEMBERS.length).toBe(299);
-    expect(DATA_MEMBERS.length).toBe(76);
-    expect(METHOD_MEMBERS.length).toBe(223);
+    // Fields adds the four battleground facet members, stopAutoAttack adds
+    // setStopAutoAttackOnTargetSwitch, and the commission order board
+    // (issue #1298) adds commissionOrders plus its four commands, leaving 299.
+    // This branch's tool-only container adds one data member (toolbelt) plus
+    // four methods (equip/unequip/store/take), leaving 304.
+    expect(IWORLD_MEMBERS.length).toBe(304);
+    expect(DATA_MEMBERS.length).toBe(77);
+    expect(METHOD_MEMBERS.length).toBe(227);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -671,6 +673,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'equipBag',
       'equipItem',
       'equipItemToSlot',
+      'equipToolbelt',
       'equipment',
       'equipmentInstances',
       'feedPet',
@@ -825,10 +828,12 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'startAutoAttack',
       'stationPlacements',
       'stopAutoAttack',
+      'storeToolInBelt',
       'submitLootRoll',
       'switchLoadout',
       'tabTarget',
       'takeActionBarLayoutRestore',
+      'takeToolFromBelt',
       'talentPoints',
       'talentRole',
       'talentSpec',
@@ -838,6 +843,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'toggleMounted',
       'toggleWeaponStow',
       'toolEffectSlots',
+      'toolbelt',
       'townFocus',
       'tradeAccept',
       'tradeCancel',
@@ -851,6 +857,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'unequipBag',
       'unequipItem',
       'unequipMechChroma',
+      'unequipToolbelt',
       'unlockedMilestones',
       'unstuck',
       'upgradeRiftItem',
@@ -939,6 +946,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'talentSpec',
       'talents',
       'toolEffectSlots',
+      'toolbelt',
       'townFocus',
       'tradeInfo',
       'unlockedMilestones',
@@ -1026,6 +1034,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'equipBag',
       'equipItem',
       'equipItemToSlot',
+      'equipToolbelt',
       'feedPet',
       'forfeitCardDuel',
       'friendAdd',
@@ -1143,10 +1152,12 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'spinDailyReward',
       'startAutoAttack',
       'stopAutoAttack',
+      'storeToolInBelt',
       'submitLootRoll',
       'switchLoadout',
       'tabTarget',
       'takeActionBarLayoutRestore',
+      'takeToolFromBelt',
       'talentPoints',
       'targetEntity',
       'targetNearestFriendly',
@@ -1163,6 +1174,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'unequipBag',
       'unequipItem',
       'unequipMechChroma',
+      'unequipToolbelt',
       'unstuck',
       'upgradeRiftItem',
       'useItem',
@@ -1318,6 +1330,11 @@ const FACET_INVENTORY = [
   'socketRiftGem',
   'equipBag',
   'unequipBag',
+  'toolbelt',
+  'equipToolbelt',
+  'unequipToolbelt',
+  'storeToolInBelt',
+  'takeToolFromBelt',
 ] as const satisfies readonly (keyof IWorldInventory)[];
 type _ExhaustInventory = AssertNever<
   Exclude<keyof IWorldInventory, (typeof FACET_INVENTORY)[number]>
@@ -1749,8 +1766,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(299);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(299);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(304);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(304);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

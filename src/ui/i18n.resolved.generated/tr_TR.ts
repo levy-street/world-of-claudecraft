@@ -1886,7 +1886,17 @@ export const tr_TR: EnTranslations = {
       "backpack": "Sırt Çantası",
       "bagSocketAria": "{name}: {slots}",
       "socketEmpty": "Boş çanta yuvası",
-      "unequipHint": "Bu çantayı çıkarmak için tıkla"
+      "unequipHint": "Bu çantayı çıkarmak için tıkla",
+      "toolbeltTitle": "Toolbelt",
+      "toolbeltNone": "No toolbelt worn",
+      "toolbeltRemoveHint": "Click to remove this toolbelt",
+      "toolbeltFilled": "{used}/{total} tools",
+      "toolSlotLabel": "Tool slot {slot}",
+      "toolSlotAria": "{slot}: {name}",
+      "toolSlotEmpty": "Empty",
+      "toolSlotStowHint": "Click to stow {name}",
+      "toolSlotTakeHint": "Click to take this tool back",
+      "toolSlotNoTool": "You have no tool to stow"
     },
     "raidConvert": {
       "toPartyDone": "Akının yeniden gruba dönüştü.",
@@ -7358,6 +7368,7 @@ export const tr_TR: EnTranslations = {
       "potion": "Şifa İksiri",
       "elixir": "İksir",
       "bag": "Çanta",
+      "toolbelt": "Toolbelt",
       "mount": "Binek"
     },
     "stats": {
@@ -7404,7 +7415,9 @@ export const tr_TR: EnTranslations = {
       "clickUseInstant": "Savaşta anında kullanmak için tıkla",
       "clickUse": "Kullanmak için tıkla",
       "clickBuyback": "Geri satın almak için tıkla",
-      "bagSlots": "{slots} Yuvalı Çanta"
+      "bagSlots": "{slots} Yuvalı Çanta",
+      "toolbeltSlots": "Holds {slots} tools",
+      "toolbeltDesc": "A belt that can hold your tools, freeing up space in your backpack."
     },
     "bags": {
       "title": "Çantalar",
@@ -10304,6 +10317,15 @@ export const tr_TR: EnTranslations = {
       },
       "reins_drakemaw_raptor": {
         "name": "Ejder Ağzı Raptoru'nun Dizginleri"
+      },
+      "basic_toolbelt": {
+        "name": "Basic Toolbelt"
+      },
+      "reinforced_toolbelt": {
+        "name": "Reinforced Toolbelt"
+      },
+      "artisans_toolbelt": {
+        "name": "Artisan's Toolbelt"
       },
       "moggers_hide_quiver": {
         "name": "Mogger'ın Deri Sadağı"

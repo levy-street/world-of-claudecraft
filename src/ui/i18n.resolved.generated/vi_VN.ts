@@ -1886,7 +1886,17 @@ export const vi_VN: EnTranslations = {
       "backpack": "Ba Lô",
       "bagSocketAria": "{name}: {slots}",
       "socketEmpty": "Ô túi trống",
-      "unequipHint": "Nhấp để tháo chiếc túi này"
+      "unequipHint": "Nhấp để tháo chiếc túi này",
+      "toolbeltTitle": "Toolbelt",
+      "toolbeltNone": "No toolbelt worn",
+      "toolbeltRemoveHint": "Click to remove this toolbelt",
+      "toolbeltFilled": "{used}/{total} tools",
+      "toolSlotLabel": "Tool slot {slot}",
+      "toolSlotAria": "{slot}: {name}",
+      "toolSlotEmpty": "Empty",
+      "toolSlotStowHint": "Click to stow {name}",
+      "toolSlotTakeHint": "Click to take this tool back",
+      "toolSlotNoTool": "You have no tool to stow"
     },
     "raidConvert": {
       "toPartyDone": "Raid của bạn đã chuyển trở lại thành tổ đội.",
@@ -7358,6 +7368,7 @@ export const vi_VN: EnTranslations = {
       "potion": "Thuốc",
       "elixir": "Tiên Dược",
       "bag": "Túi",
+      "toolbelt": "Toolbelt",
       "mount": "Thú Cưỡi"
     },
     "stats": {
@@ -7404,7 +7415,9 @@ export const vi_VN: EnTranslations = {
       "clickUseInstant": "Nhấp để dùng tức thời trong chiến đấu",
       "clickUse": "Nhấp để sử dụng",
       "clickBuyback": "Nhấp để mua lại",
-      "bagSlots": "Túi {slots} Ô"
+      "bagSlots": "Túi {slots} Ô",
+      "toolbeltSlots": "Holds {slots} tools",
+      "toolbeltDesc": "A belt that can hold your tools, freeing up space in your backpack."
     },
     "bags": {
       "title": "Túi Đồ",
@@ -10304,6 +10317,15 @@ export const vi_VN: EnTranslations = {
       },
       "reins_drakemaw_raptor": {
         "name": "Dây Cương Cuồng Long Drakemaw"
+      },
+      "basic_toolbelt": {
+        "name": "Basic Toolbelt"
+      },
+      "reinforced_toolbelt": {
+        "name": "Reinforced Toolbelt"
+      },
+      "artisans_toolbelt": {
+        "name": "Artisan's Toolbelt"
       },
       "moggers_hide_quiver": {
         "name": "Ống Tên Da Của Mogger"

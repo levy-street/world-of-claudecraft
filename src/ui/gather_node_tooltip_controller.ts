@@ -24,6 +24,7 @@ import { ITEMS } from '../sim/data';
 import { NODE_HARVEST_TABLE } from '../sim/professions/gathering';
 import { canGatherTier } from '../sim/professions/tools';
 import { minWieldRequirementToWork } from '../sim/professions/wield_gate';
+import { toolSearchInventory } from '../sim/toolbelt';
 import type { GatherNodeDef, GatherNodeType } from '../sim/types';
 import type { IWorld } from '../world_api';
 import { esc } from './esc';
@@ -169,7 +170,12 @@ export function gatherNodeToolGateFor(
   // tier and no-tool lines keep their arms otherwise. Client and sim share
   // the resolvers, so the toast the pre-verdict composes is the toast the
   // server's own denial would render.
-  const wieldReq = minWieldRequirementToWork(world.inventory, professionId, node.tier, ITEMS);
+  const wieldReq = minWieldRequirementToWork(
+    toolSearchInventory(world.inventory, world.toolbelt),
+    professionId,
+    node.tier,
+    ITEMS,
+  );
   const wieldLocked =
     !canGatherTier(viewerToolTier, node.tier) && wieldReq !== null && wieldReq > 0;
   const unmetKey = wieldLocked

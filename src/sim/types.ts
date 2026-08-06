@@ -731,6 +731,7 @@ type ItemKind =
   | 'potion'
   | 'elixir'
   | 'bag'
+  | 'toolbelt'
   | 'mount';
 
 interface BaseItemDef {
@@ -792,7 +793,14 @@ interface BaseItemDef {
   quality?: 'poor' | 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary'; // gray/white/green/blue/purple/orange name colors
   // bags (kind:'bag'): extra inventory slots granted while equipped in one of
   // the 4 bag sockets (see src/sim/bags.ts; the 16-slot backpack is implicit).
+  // A toolbelt (kind:'toolbelt') is deliberately NOT a bag: it grants no pooled
+  // slots, it is a separate tool-only container (see src/sim/toolbelt.ts), so
+  // it never carries bagSlots.
   bagSlots?: number;
+  // toolbelts (kind:'toolbelt'): how many generic tool slots the belt has while
+  // worn (each holds any one gathering implement; the tailoring ladder's
+  // 2/3/4). Never combined with bagSlots.
+  toolSlots?: number;
   // Max copies per inventory slot. When omitted the default is derived from
   // `kind` (weapon/armor/bag/tool: 1, everything else: 20); see stackSizeOf.
   stackSize?: number;

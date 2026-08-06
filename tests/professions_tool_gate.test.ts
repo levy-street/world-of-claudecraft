@@ -769,8 +769,10 @@ describe('the harvest boundary enforces the wield gate (the re-minted deny pins)
       .replace(/(^|\s)\/\/.*$/gm, '$1')
       .replace(/\s+/g, '')
       .replace(/,\)/g, ')');
+    // The scan reads the combined backpack+belt view (toolSearchInventory),
+    // so a belted tool satisfies the corpse premium exactly like a carried one.
     expect(source).toContain(
-      'bestWieldableAnyGatherToolTier(meta.inventory,meta.gatheringProficiency,ITEMS)',
+      'bestWieldableAnyGatherToolTier(toolSearchInventory(meta.inventory,meta.toolbelt),meta.gatheringProficiency,ITEMS)',
     );
     expect(source).not.toContain('bestOwnedAnyGatherToolTier(');
     // And the denial names a wield requirement when one applies.

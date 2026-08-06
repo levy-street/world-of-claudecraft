@@ -1886,7 +1886,17 @@ export const zh_CN: EnTranslations = {
       "backpack": "背包",
       "bagSocketAria": "{name}：{slots}",
       "socketEmpty": "空背包栏位",
-      "unequipHint": "点击移除此背包"
+      "unequipHint": "点击移除此背包",
+      "toolbeltTitle": "工具腰带",
+      "toolbeltNone": "未佩戴工具腰带",
+      "toolbeltRemoveHint": "点击卸下此工具腰带",
+      "toolbeltFilled": "{used}/{total} 件工具",
+      "toolSlotLabel": "工具栏位 {slot}",
+      "toolSlotAria": "{slot}: {name}",
+      "toolSlotEmpty": "空",
+      "toolSlotStowHint": "点击收纳{name}",
+      "toolSlotTakeHint": "点击取回此工具",
+      "toolSlotNoTool": "你没有可收纳的工具"
     },
     "raidConvert": {
       "toPartyDone": "你的团队已转换回队伍。",
@@ -7358,6 +7368,7 @@ export const zh_CN: EnTranslations = {
       "potion": "药水",
       "elixir": "药剂",
       "bag": "背包",
+      "toolbelt": "工具腰带",
       "mount": "坐骑"
     },
     "stats": {
@@ -7404,7 +7415,9 @@ export const zh_CN: EnTranslations = {
       "clickUseInstant": "点击在战斗中立即使用",
       "clickUse": "点击使用",
       "clickBuyback": "点击回购",
-      "bagSlots": "{slots} 格背包"
+      "bagSlots": "{slots} 格背包",
+      "toolbeltSlots": "可容纳 {slots} 件工具",
+      "toolbeltDesc": "一条可以收纳工具的腰带，为你的背包腾出空间。"
     },
     "bags": {
       "title": "背包",
@@ -10304,6 +10317,15 @@ export const zh_CN: EnTranslations = {
       },
       "reins_drakemaw_raptor": {
         "name": "龙喉迅猛龙的缰绳"
+      },
+      "basic_toolbelt": {
+        "name": "基础工具腰带"
+      },
+      "reinforced_toolbelt": {
+        "name": "强化工具腰带"
+      },
+      "artisans_toolbelt": {
+        "name": "工匠的工具腰带"
       },
       "moggers_hide_quiver": {
         "name": "莫格的兽皮箭袋"

@@ -1886,7 +1886,17 @@ export const sv_SE: EnTranslations = {
       "backpack": "Ryggsäck",
       "bagSocketAria": "{name}: {slots}",
       "socketEmpty": "Tom väskplats",
-      "unequipHint": "Klicka för att ta bort den här väskan"
+      "unequipHint": "Klicka för att ta bort den här väskan",
+      "toolbeltTitle": "Toolbelt",
+      "toolbeltNone": "No toolbelt worn",
+      "toolbeltRemoveHint": "Click to remove this toolbelt",
+      "toolbeltFilled": "{used}/{total} tools",
+      "toolSlotLabel": "Tool slot {slot}",
+      "toolSlotAria": "{slot}: {name}",
+      "toolSlotEmpty": "Empty",
+      "toolSlotStowHint": "Click to stow {name}",
+      "toolSlotTakeHint": "Click to take this tool back",
+      "toolSlotNoTool": "You have no tool to stow"
     },
     "raidConvert": {
       "toPartyDone": "Din raid har omvandlats tillbaka till en grupp.",
@@ -7358,6 +7368,7 @@ export const sv_SE: EnTranslations = {
       "potion": "Trolldryck",
       "elixir": "Elixir",
       "bag": "Väska",
+      "toolbelt": "Toolbelt",
       "mount": "Riddjur"
     },
     "stats": {
@@ -7404,7 +7415,9 @@ export const sv_SE: EnTranslations = {
       "clickUseInstant": "Klicka för att använda omedelbart i strid",
       "clickUse": "Klicka för att använda",
       "clickBuyback": "Klicka för att köpa tillbaka",
-      "bagSlots": "Väska med {slots} platser"
+      "bagSlots": "Väska med {slots} platser",
+      "toolbeltSlots": "Holds {slots} tools",
+      "toolbeltDesc": "A belt that can hold your tools, freeing up space in your backpack."
     },
     "bags": {
       "title": "Väskor",
@@ -10304,6 +10317,15 @@ export const sv_SE: EnTranslations = {
       },
       "reins_drakemaw_raptor": {
         "name": "Tyglar till Drakgapsraptorn"
+      },
+      "basic_toolbelt": {
+        "name": "Basic Toolbelt"
+      },
+      "reinforced_toolbelt": {
+        "name": "Reinforced Toolbelt"
+      },
+      "artisans_toolbelt": {
+        "name": "Artisan's Toolbelt"
       },
       "moggers_hide_quiver": {
         "name": "Moggers skinnkoger"

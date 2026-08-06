@@ -418,6 +418,37 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     stats: { armor: 34, int: 5, spi: 3 },
     sellValue: 260,
   },
+  // The toolbelt ladder: tailoring's tool-only containers (TOOLBELT_RECIPES,
+  // taught at the loom at skillReq 25/50/75). Deliberately NOT kind 'bag':
+  // a belt grants no pooled slots and cannot go in a bag socket; instead
+  // `toolSlots` generic slots each hold one gathering implement
+  // (src/sim/toolbelt.ts). Never vendor-stocked (no buyValue) - the ladder is
+  // the only source - and every sellValue clears strictly below the recipe's
+  // summed reagent value per the economy invariant.
+  basic_toolbelt: {
+    id: 'basic_toolbelt',
+    name: 'Basic Toolbelt',
+    kind: 'toolbelt',
+    quality: 'common',
+    toolSlots: 2,
+    sellValue: 12,
+  },
+  reinforced_toolbelt: {
+    id: 'reinforced_toolbelt',
+    name: 'Reinforced Toolbelt',
+    kind: 'toolbelt',
+    quality: 'uncommon',
+    toolSlots: 3,
+    sellValue: 40,
+  },
+  artisans_toolbelt: {
+    id: 'artisans_toolbelt',
+    name: "Artisan's Toolbelt",
+    kind: 'toolbelt',
+    quality: 'rare',
+    toolSlots: 4,
+    sellValue: 120,
+  },
 
   // --- Crafted leather ladder (leatherworking) -----------------------------
   // Trainer-taught outputs of LADDER_RECIPES, three rungs at skillReq 0/25/50,

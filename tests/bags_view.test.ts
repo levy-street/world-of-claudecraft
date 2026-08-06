@@ -18,6 +18,7 @@ import {
   bankDepositOpensPrompt,
   buildBagGrid,
   buildBagListRows,
+  buildToolbeltBar,
   resolveDepositSubmit,
 } from '../src/ui/bags_view';
 
@@ -817,5 +818,45 @@ describe('noVendorSell affordances (the quest-granted starter tools)', () => {
     expect(bagItemAction(ITEMS.starterTool, { ...NO_MODE, tradeOpen: true })).toBe('trade');
     expect(bagItemAction(ITEMS.starterTool, { ...NO_MODE, bankDeposit: true })).toBe('bankDeposit');
     expect(bagItemAction(ITEMS.starterTool, NO_MODE)).toBe('use');
+  });
+});
+
+describe('buildToolbeltBar visibility', () => {
+  // The belt sits at the top of a tailoring ladder gated at skill 25, so the
+  // release-day population has neither a belt nor a way to get one. The bar
+  // must stay out of the DOM for them rather than showing a permanent empty
+  // row (and its divider) for a feature they cannot reach yet.
+  it('hides the bar when no belt is worn and none is carried', () => {
+    const model = buildToolbeltBar(null, [], null, false);
+    expect(model.visible).toBe(false);
+    expect(model.equipped).toBeNull();
+    expect(model.slots).toEqual([]);
+  });
+
+  it('shows the bar once a belt is worn', () => {
+    const model = buildToolbeltBar('basic_toolbelt', ['copper_mining_pick', null], null, false);
+    expect(model.visible).toBe(true);
+    expect(model.slots).toEqual([
+      { index: 0, itemId: 'copper_mining_pick' },
+      { index: 1, itemId: null },
+    ]);
+  });
+
+  it('shows the bar for a belt carried but not yet worn', () => {
+    // The one case where "no toolbelt worn" is actionable copy rather than
+    // noise: the player owns a belt and only has to put it on.
+    const model = buildToolbeltBar(null, [], null, true);
+    expect(model.visible).toBe(true);
+    expect(model.equipped).toBeNull();
+  });
+
+  it('carries the stow candidate through untouched', () => {
+    // Discriminating control: visibility is the only thing this predicate
+    // decides; it must not disturb the one-click stow target.
+    const model = buildToolbeltBar('basic_toolbelt', [null, null], 'handaxe', false);
+    expect(model.stowCandidateId).toBe('handaxe');
+    expect(
+      buildToolbeltBar('basic_toolbelt', [null, null], null, false).stowCandidateId,
+    ).toBeNull();
   });
 });
