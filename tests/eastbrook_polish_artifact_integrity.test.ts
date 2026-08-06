@@ -645,10 +645,15 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // renderer; the release's bounded ground-object reuse pool), so the merged tree
 // mints literals matching neither parent. Captures adopted verbatim from the
 // release tip; swept by remint_polish_provenance.mjs on the merged tree.
+// Re-pinned for the ability VFX first-use fix rebased onto release/v0.35.0: it
+// moves the rendererIntegration leaf (idle-slot spirit puppet builds, resumable
+// ability warm-up) and the viewPriorityPolicy leaf (src/render/prewarm_policy.ts),
+// so the composite re-mints and the metadata file's swept provenance bytes follow.
+// The accepted captures are unchanged; only these swept bytes moved.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'dcf57f6d70ee1c8b472f8d1114d129005c2f0d051db925b8cfe506ad1f0b8c03';
+  '8b5ea2f776f2bf9a9c7b7553097b5c197354106e3727bd186198e01a4c46b4de';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  'f748c054b28d4e30f80dbb41b52a47e590d24f6bd262cf800b4febe0535c83d9';
+  '6f8df557520fb299864269a31435143500b315523f8301c183faf227d4491559';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1526,10 +1531,14 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // matched the merged tree, and no capture was retaken here.
     // Re-pinned for the integrated v0.35 renderer on AAA-enhancements and
     // recomputed by remint_polish_provenance.mjs.
+    // Re-pinned again for the ability VFX first-use fix rebased onto
+    // release/v0.35.0: it moves the renderer-integration and view-priority-policy
+    // leaves of the first-order composite these files carry, so this second-order
+    // seal follows. Every measured value is unchanged; no capture was retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('4fd9c844d07805ba75c6749ae76ee139838d5f3f389fe2b20266671f7afb4cd0');
+    ).toBe('c04c7bf4513e92e910781f1e122fd6d9d1ca41ee49299986421791da54933380');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
