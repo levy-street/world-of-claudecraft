@@ -139,7 +139,8 @@ export function buildFish(
       })
     : new THREE.MeshLambertMaterial({ color: 0x95a9b6 });
 
-  const depthAt = (x: number, z: number): number => waterLevelAt(x, z) - terrainHeight(x, z, seed);
+  const depthAt = (x: number, z: number): number =>
+    waterLevelAt(x, z, seed) - terrainHeight(x, z, seed);
 
   const buildBody = (): THREE.Object3D => {
     if (loadedFishGltf) {

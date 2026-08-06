@@ -206,6 +206,13 @@ export interface GameMetricsCounters {
    * spent the cast and yielded nothing, which is what the series measures.
    */
   fishingGotAway(zone: HarvestBand, band: FishingBandLabel): void;
+  /**
+   * One session ended by a pre-bite re-press (the anti-spam early reel).
+   * Counted apart from the got-aways on purpose: a got-away is the game
+   * costing the player, an early reel is self-inflicted, and this series is
+   * how to tell whether the spam fix burns legitimate anglers.
+   */
+  fishingEarlyReel(zone: HarvestBand, band: FishingBandLabel): void;
   /** One cast whose single table draw resolved the empty (itemId: null) row. */
   fishingEmptyHook(zone: HarvestBand, band: FishingBandLabel): void;
   /**
@@ -249,6 +256,7 @@ export const noopGameMetricsCounters: GameMetricsCounters = {
   fishingCast() {},
   fishingCatch() {},
   fishingGotAway() {},
+  fishingEarlyReel() {},
   fishingEmptyHook() {},
   rodFeePaid() {},
   battlegroundResolved() {},

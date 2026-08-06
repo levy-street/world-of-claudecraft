@@ -391,7 +391,8 @@ export const pl_PL: EnTranslations = {
     },
     "emoteEditor": {
       "title": "Emotki",
-      "done": "Gotowe"
+      "done": "Gotowe",
+      "close": "Close emotes"
     },
     "dailyRewards": {
       "title": "Codzienne nagrody",
@@ -1277,6 +1278,24 @@ export const pl_PL: EnTranslations = {
       "graphicsFatal": "Przywracanie grafiki nie powiodło się. Wczytaj grę ponownie, aby kontynuować.",
       "graphicsReload": "Wczytaj grę ponownie",
       "graphicsDraftChanged": "Zmiany grafiki są gotowe do zastosowania.",
+      "gfxSectionQuality": "Quality",
+      "gfxSectionWorld": "World Detail",
+      "gfxSectionLighting": "Lighting & Effects",
+      "gfxSectionCamera": "Camera",
+      "gfxSectionDisplay": "Display",
+      "gfxSectionSystem": "System",
+      "gfxSectionTouch": "Touch Controls",
+      "gfxViewDistance": "View Distance",
+      "gfxWaterQuality": "Water Quality",
+      "gfxCharacterDetail": "Character Detail",
+      "gfxAmbientOcclusion": "Ambient Occlusion",
+      "gfxBloom": "Bloom",
+      "gfxAntiAliasing": "Anti-Aliasing",
+      "gfxDynamicLights": "Dynamic Lights",
+      "gfxParticleEffects": "Particle Effects",
+      "gfxHalf": "Half",
+      "gfxCustomNote": "Changing a dial switches the quality preset to Advanced: a custom mix built on the High-quality base, starting from the levels shown for your current preset.",
+      "gfxEffectsNote": "Ambient Occlusion, Bloom and Anti-Aliasing ride the post-processing chain: with Effects & Lighting on Low the chain is off and they have no effect.",
       "interfaceMode": "Tryb interfejsu",
       "interfaceModeAuto": "Auto",
       "interfaceModeDesktop": "Komputer",
@@ -1348,6 +1367,8 @@ export const pl_PL: EnTranslations = {
       "buttons": "Układ przycisków",
       "resetButtons": "Resetuj układ przycisków",
       "menuAction": "Menu gry",
+      "zoomIn": "Zoom In",
+      "zoomOut": "Zoom Out",
       "help": "Lewa gałka porusza, prawa gałka rozgląda. Otwórz okno, aby użyć wskaźnika ekranowego."
     },
     "perf": {
@@ -1576,6 +1597,7 @@ export const pl_PL: EnTranslations = {
     },
     "itemHeroicTag": "[HEROICZNY]",
     "itemSoulbound": "Związany z duszą",
+    "itemUniqueEquipped": "Unique-Equipped",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -2552,6 +2574,7 @@ export const pl_PL: EnTranslations = {
       "catchLine": "Wyciągasz: {name}",
       "biteLine": "Coś wzięło przynętę!",
       "gotAwayLine": "Uciekło.",
+      "earlyReelLine": "You reel in too soon. Nothing had taken the bait.",
       "nodeName": {
         "ore": "Żyła rudy",
         "wood": "Drzewostan",
@@ -3145,7 +3168,8 @@ export const pl_PL: EnTranslations = {
         "raise_fallen": "Wskrzeszenie Poległych (okresowe fale wrogów)",
         "soul_rend": "Rozdarcie Duszy (oznaczeni gracze muszą się rozprószyć i być leczeni)",
         "deathless_rage": "Nieśmiertelna Furia (przerywana przy kamieniach wardowych)",
-        "wardstones": "Kanały kamieni wardowych (przejście fazy)"
+        "wardstones": "Kanały kamieni wardowych (przejście fazy)",
+        "dread_curse": "Dread Curse (heroic only, stacking tank-swap debuff)"
       }
     },
     "deeds": {
@@ -3553,16 +3577,21 @@ export const pl_PL: EnTranslations = {
       "groupInterface": "Interfejs",
       "groupCamera": "Kamera",
       "talents": "Talenty",
+      "professions": "Professions",
       "arena": "Arena",
       "leaderboard": "Tabela wyników",
       "deeds": "Księga Czynów",
+      "sheathe": "Sheathe/Unsheathe Weapon",
       "crafting": "Wytwarzanie",
       "valeCup": "Puchar Doliny",
+      "mount": "Mount / Dismount",
       "calendar": "Kalendarz wydarzeń",
+      "dungeonFinder": "Dungeon Finder",
       "discord": "Discord",
       "abilities": "Używaj zdolności z paska akcji (rząd cyfr; drugi pasek znajduje się na klawiaturze numerycznej)",
       "targetFriendly": "Namierz najbliższy przyjazny cel",
       "cycleFriendly": "Przełączaj przyjazny cel",
+      "targetAuras": "Target buffs and debuffs",
       "gameMenu": "Otwórz menu gry i opcje",
       "bothMouse": "Oba przyciski myszy",
       "runForward": "Biegnij naprzód",
@@ -4314,6 +4343,8 @@ export const pl_PL: EnTranslations = {
       "sourcesBody": "Większość twoich wczesnych ulepszeń to nagrody za zadania, więc opłaca się kończyć zadania zamiast młócić wrogów. Wrogowie upuszczają wyposażenie, gdy ich pokonasz, sprzedawcy w mieście oferują solidne podstawy, rzemieślnicy przerabiają zebrane materiały na noszalne części, a rynek graczy pozwala kupować od innych poszukiwaczy przygód. Na samym szczycie dwie waluty znaków kupują ekwipunek nieosiągalny nigdzie indziej: Znaki Wypraw u opiekuna wypraw oraz Znaki heroiczne u heroicznego kwatermistrza.",
       "soulboundTitle": "Związany z duszą: tylko i wyłącznie twój",
       "soulboundBody": "Kilka szczególnych nagród jest związanych z duszą, przywiązanych do twojej postaci od chwili, gdy je zdobędziesz. Przedmiotu związanego z duszą nie można wymienić, wysłać pocztą, sprzedać sprzedawcy ani wystawić na targu; należy tylko i wyłącznie do ciebie. Dziś ta ochrona strzeże żetonów nagród, takich jak Znaki Heroiczne, podczas gdy zdobyty ekwipunek możesz swobodnie wymieniać, sprzedawać i udostępniać.",
+      "uniqueTitle": "Unique-Equipped: one legendary of a kind",
+      "uniqueBody": "Legendary items are unique-equipped: your character can wear only one copy of a given legendary at a time, and its heroic version counts as the same item. A second copy can ride in your bags, in the bank, or on the market, but trying to wear both at once is refused, and the tooltip carries a gold Unique-Equipped tag so you can see the rule before you plan a build around two of them.",
       "setsTitle": "Zestawy i bonusy zestawów",
       "setsBody": "Część pancerza występuje w pasujących do siebie rodzinach, gdzie kilka elementów skrojono tak, by wyglądały i walczyły jak jedna całość. Noś naraz dość elementów rodziny, a zestaw się przebudzi, dając bonusy ponad statystyki każdej części, a im więcej elementów nosisz, tym silniejszy się staje. Kilka takich rodzin trafia się jako cenne łupy podczas zdobywania poziomów; najpotężniejsze z nich pochodzą z najtrudniejszej zawartości grupowej blisko maksymalnego poziomu, więc kompletowanie pełnego zestawu to klasyczny cel końca gry.",
       "consumablesTitle": "Materiały zużywalne",
@@ -4570,6 +4601,7 @@ export const pl_PL: EnTranslations = {
         "startBody": "Prosta wędka kosztuje 20 miedziaków u Rybaka Brandta w Eastbrook (szukaj Starego Wilka Morskiego na wschodnim skraju miasta, przy drodze do Jeziora Lustrzanego); wędki mają na stanie także Majsterkowicz Gizzel, Zaopatrzeniowiec Hale w Fenbridge i Kwatermistrzyni Bree w Highwatch. Użyj wędki zwrócony ku wodzie na tyle głębokiej, by mieściła ryby, w odległości do jakichś 24 jardów przed sobą, a twój spławik poszybuje w jej stronę.\n\nNie zarzucisz w walce, wpław ani po śmierci: zamierzoną postawą jest łowienie z brzegu. Woda twardnieje jednak razem z lądem: trzęsawisko wymaga co najmniej Żelaznego Kołowrotka poziomu 2, a szczyty Srebrnego Strumienia poziomu 3, i żyłka zarzucona bez wędki, której dana woda wymaga, nigdy nie opuszcza twojej ręki. Ponad nimi stoją dwie wędki, Burzowy Kołowrotek i Kuta Przypływem: inżynierowie wytwarzają je w narzędziowni z tego, co wyciągnie żyłka, a lada wypraw przy Utopionej Litanii sprzedaje je za Znaki Wypraw po spełnieniu progów oczyszczeń, choć nigdy za monetę. Żadna woda ich nie wymaga, więc kupują krótsze oczekiwanie i szersze okno wyciągania zamiast dostępu, co na najwyższym szczeblu oznacza branie w równe trzy sekundy.",
         "biteHeading": "Branie i wyciąganie",
         "biteBody": "Po zarzuceniu branie przychodzi w ukrytej chwili między {min} a {max} sekundą; opóźnienie rozstrzyga się w momencie, gdy żyłka ląduje w wodzie, więc żadne dwa zarzucenia nie są całkiem takie same. Gdy spławik zanurkuje, masz okno {reel} sekund, by znów wcisnąć wędkę i wyciągnąć: wyciągnij w tym czasie, a połów ląduje w torbie, zawahaj się dłużej, a ryba ucieka i nic po niej nie zostaje. Cała sesja ma pułap {cap} sekund, więc nawet spokojne zarzucenie rozstrzyga się szybko.\n\nLepsze wędki wyostrzają oba końce minigry: każdy poziom wędki powyżej pierwszego ścina {rod} sekund z najdłuższego możliwego oczekiwania, nigdy poniżej trzysekundowej podłogi, której najlepsza wędka już dotyka, i dodaje {reelRod} sekund do okna wyciągania, więc Żelazny Kołowrotek sprowadza najgorsze oczekiwanie do 6,5 sekundy przy oknie 3,25 sekundy, a Srebrny Strumień do 5 przy oknie ponad 4, bo jego rzadkość poszerza wyciąganie nieco ponad to, co płaci sam poziom. Najszybsze brania nie zmieniają się niezależnie od tego, co trzymasz, a wędka musi jedynie leżeć w twoich torbach, by się liczyła.",
+        "earlyReelNote": "One caution for eager thumbs: press the pole again before anything bites and you reel in an empty line, ending the cast (a moment of grace right after casting forgives an accidental double-press). Patience is the whole game: wait for the bite, then strike.",
         "scheduleHeading": "Przyrost biegłości",
         "scheduleNote": "Przyrost wędkarski podąża za stałym harmonogramem bez żadnych kostek: pełny punkt za połów poniżej 50 biegłości, pół punktu poniżej 100, dziesiąta część poniżej 150 i powolna strużka 0,02 od 150 do 200. Ten ostatni odcinek to celowo podróż na tysiące połowów: 200 to deklaracja, a nie przystanek w drodze do czegoś innego.\n\nŚmieci przestają uczyć całkowicie przy {cutoff}: od tego miejsca wodorosty i buty to tylko wodorosty i buty. Sama woda też nakłada pułap na naukę: wody poziomu 1 w Dolinie (i każdy młody brzeg poza sercem królestwa) nie uczą niczego powyżej 100, wody trzęsawiska zatrzymują się na 150, i tylko wody Ciernistego Szczytu szkolą wędkarza całą drogę do 200. Każdy wyciągnięty połów daje poza tym przyrost według harmonogramu, więc gdy licznik staje, harmonogram mówi ci, byś poszukał głębszej wody.",
         "colProficiency": "Biegłość",
@@ -10305,6 +10337,15 @@ export const pl_PL: EnTranslations = {
       },
       "direfang_quiver": {
         "name": "Kołczan Direfang"
+      },
+      "sharp_claw": {
+        "name": "Sharp Claw"
+      },
+      "curved_tusk": {
+        "name": "Curved Tusk"
+      },
+      "pristine_claw": {
+        "name": "Pristine Claw"
       },
       "conjured_water4": {
         "name": "Wyczarowana woda źródlana"

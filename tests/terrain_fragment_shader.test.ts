@@ -1,3 +1,10 @@
+// @vitest-environment jsdom
+//
+// The splat material packs its six albedo photos through a 2D canvas
+// (buildSplatAlbedoArray), so compiling it needs a document. Without this
+// docblock the whole suite errors out in the default Node env before a single
+// pin runs, which is how it was sitting: every assertion below was reporting
+// nothing at all. jsdom stays scoped to this file per tests/CLAUDE.md.
 import * as THREE from 'three';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
@@ -96,8 +103,11 @@ describe('insane terrain fragment shader', () => {
       `if ( wocHasGrass || wocHasRock )
           macro2 = texture2D(uMacro, vWPos.xz * 0.0045 + 0.37).r;`,
     );
+    // The presence-mask cull composes with the detail-distance fade: the
+    // fine octave taps skip both when a layer is chunk-uniform absent AND
+    // past the wocDetailFade band where their maps have mipped flat.
     expect(fragmentShader).toContain(
-      `if ( wocHasDirt || wocHasRock )
+      `if ( (wocHasDirt || wocHasRock) && wocNearDetail )
           fineHard = texture2D(uRockN, tuv * 2.4).xy * 2.0 - 1.0;`,
     );
   });
@@ -135,7 +145,7 @@ describe('insane terrain fragment shader', () => {
       '(wocGroundHeight(tuv + sunStep * 2.2, swShade) - cavH) * 0.55 - 0.02',
     );
     expect(fragmentShader).toContain(
-      'groundShade *= 1.0 - min(max(occl, 0.0) * 4.5, 0.42) * cavW;',
+      'groundShade *= 1.0 - min(max(occl, 0.0) * 4.5, 0.42) * cavW * microFade;',
     );
     expect(fragmentShader).toContain(
       'diffuseColor.rgb *= alb * mix(vec3(1.0), vtint, 0.35) * macro * groundShade;',
@@ -175,6 +185,49 @@ describe('insane terrain fragment shader', () => {
     expect(grassAlbedoDepth).toBe(mapDepth);
     expect(albedoBlendDepth).toBe(mapDepth);
     expect(finalAccumulationDepth).toBe(mapDepth);
+  });
+
+  it('skips the near-field-only relief taps once their signal has mipped away', () => {
+    // Both gates exist to stop the shader paying texture taps for a value the
+    // mip chain has already flattened. Each one has to be a real branch (the
+    // taps must sit INSIDE it, not behind a multiply-by-zero) and each has to
+    // carry a smoothstep so the boundary can never draw a ring.
+    expect(fragmentShader).toContain('const float WOC_MICRO_SHADOW_NEAR = 40.0;');
+    expect(fragmentShader).toContain('const float WOC_MICRO_SHADOW_FAR = 70.0;');
+    expect(fragmentShader).toContain(
+      'smoothstep(WOC_MICRO_SHADOW_NEAR, WOC_MICRO_SHADOW_FAR, wocCamDist)',
+    );
+    expect(fragmentShader).toContain('if (microFade > 0.0) {');
+    const microGate = fragmentShader.indexOf('if (microFade > 0.0) {');
+    expect(microGate).toBeGreaterThan(-1);
+    expect(fragmentShader.indexOf('wocGroundHeight(tuv + sunStep')).toBeGreaterThan(microGate);
+
+    expect(fragmentShader).toContain('const float WOC_DETAIL_N_NEAR = 120.0;');
+    expect(fragmentShader).toContain('const float WOC_DETAIL_N_FAR = 220.0;');
+    expect(fragmentShader).toContain(
+      'float wocDetailN = 1.0 - smoothstep(WOC_DETAIL_N_NEAR, WOC_DETAIL_N_FAR, wocCamDist);',
+    );
+    expect(fragmentShader).toContain('if (wocDetailN > 0.0) {');
+    const detailGate = fragmentShader.indexOf('if (wocDetailN > 0.0) {');
+    for (const tap of [
+      'texture2D(uGrassN, combT + grassJitter)',
+      'texture2D(uDirtN, tuv * 0.55)',
+      'texture2D(uRockN, tuv * 0.6)',
+      'texture2D(uSandN, tuv)',
+      'texture2D(uRockN, tuv * 2.4)',
+      'texture2D(uGrassN, combT * 3.0)',
+      'texture2D(uRockN, tuv * 1.8)',
+    ]) {
+      expect(fragmentShader.indexOf(tap)).toBeGreaterThan(detailGate);
+    }
+    // The distance fade rides the same multiply as the slope fade, so a
+    // fragment at the gate edge reaches it continuously.
+    expect(fragmentShader).toContain('detN *= smoothstep(0.5, 0.82, vWNorm.y) * wocDetailN;');
+    // The CLIFF wall normals stay OUTSIDE the gate: wall relief is what keeps
+    // a mountainside reading as rock right out to the detail horizon.
+    expect(fragmentShader.indexOf('texture2D(uRockN, vWPos.yz * 0.132)')).toBeGreaterThan(
+      fragmentShader.indexOf('normal = normalize(normal + tbn * vec3(detN, 0.0));'),
+    );
   });
 
   it('keeps the shared terrain material opaque and depth-writing', () => {

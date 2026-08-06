@@ -77,7 +77,7 @@ function placeInWaterTrap(sim: Sim): void {
   const p = sim.player;
   p.pos = {
     x: WATER_TRAP.x,
-    y: swimSurfaceY(WATER_TRAP.x, WATER_TRAP.z),
+    y: swimSurfaceY(WATER_TRAP.x, WATER_TRAP.z, SEED),
     z: WATER_TRAP.z,
   };
   p.prevPos = { ...p.pos };
@@ -424,12 +424,16 @@ describe('unstuck graveyard move while alive', () => {
       (event): event is Extract<SimEvent, { type: 'aura' }> => event.type === 'aura',
     );
 
-    expect(auraEvents).toContainEqual({
-      type: 'aura',
-      targetId: player.id,
-      name: 'Resurrection Sickness',
-      gained: false,
-    });
+    // objectContaining: fade sites may gain attribution fields over time and
+    // this assertion cares only about the fade itself.
+    expect(auraEvents).toContainEqual(
+      expect.objectContaining({
+        type: 'aura',
+        targetId: player.id,
+        name: 'Resurrection Sickness',
+        gained: false,
+      }),
+    );
     expect(auraEvents).toContainEqual(
       expect.objectContaining({ name: 'Unstuck Sickness', gained: true }),
     );

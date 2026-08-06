@@ -65,7 +65,7 @@ import {
   zoneAt,
 } from '../sim/data';
 import { specialRoleColor } from '../sim/discord_roles';
-import { canEquipItem, weaponHand } from '../sim/equipment_rules';
+import { canEquipItem, isUniqueEquipped, weaponHand } from '../sim/equipment_rules';
 import { isItemLevelEligible, itemLevel, itemScore } from '../sim/item_level';
 import { requiredLevelFor } from '../sim/item_level_req';
 import type { Ante, PickAction } from '../sim/lockpick';
@@ -1495,7 +1495,7 @@ export class Hud {
   private minimapBg: HTMLCanvasElement;
   private clockEl: HTMLElement | null = null;
   private dayNightCtx: CanvasRenderingContext2D | null = null;
-  private lastDayNightDrawAt = 0; // the dial redraws ~1Hz; the 12h cycle barely moves
+  private lastDayNightDrawAt = 0; // the dial redraws ~1Hz; ample for the 20-minute cycle
   private raidLockoutEl: HTMLElement | null = null;
   private raidLockoutLocked = false;
   private clock24 = false; // 24-hour vs 12-hour AM/PM display
@@ -2392,8 +2392,8 @@ export class Hud {
     // UI-only concern, so `new Date()` here is fine (the sim-only time ban
     // doesn't apply — cf. meters.ts using performance.now()).
     this.clockEl = $('#minimap-clock');
-    // day/night dial on the minimap rim: a decorative canvas showing the 12h
-    // world cycle. Same UI-only wall-clock allowance as the clock above.
+    // day/night dial on the minimap rim: a decorative canvas showing the
+    // world day/night cycle. Same UI-only wall-clock allowance as the clock above.
     const dayNightCanvas = document.getElementById('minimap-daynight') as HTMLCanvasElement | null;
     this.dayNightCtx = dayNightCanvas?.getContext('2d') ?? null;
     // raid-lockout badge on the minimap rim: a lock icon whose hover/tap panel
@@ -3789,7 +3789,7 @@ export class Hud {
 
   private renderEmoteEditor(): void {
     const el = $('#emote-editor');
-    el.innerHTML = `<div class="panel-title"><span>${esc(t('hudChrome.emoteEditor.title'))}</span><span class="x-btn" data-close>${svgIcon('close')}</span></div>`;
+    el.innerHTML = `<div class="panel-title"><span>${esc(t('hudChrome.emoteEditor.title'))}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('hudChrome.emoteEditor.close'))}">${svgIcon('close')}</button></div>`;
     const count = document.createElement('div');
     count.className = 'emote-editor-count';
     const grid = document.createElement('div');
@@ -5501,11 +5501,22 @@ export class Hud {
           ? t('itemUi.slots.twoHand')
           : itemSlotName(item.slot);
       const armorTypeKey = itemArmorTypeLabelKey(item);
+      // Unique-equipped tag (every legendary with a slot; one worn copy per
+      // item family): rendered like the armor-weight indicator, right-aligned
+      // in the slot row's type seat, in the soulbound gold. With an armor
+      // weight already in that seat (a future legendary armor piece) the tag
+      // falls back to its own gold line so neither indicator is lost.
+      const uniqueTag = isUniqueEquipped(item) ? t('hudChrome.itemUniqueEquipped') : null;
       if (armorTypeKey) {
         // Red armor type = the viewing player's class cannot wear this armor weight
         // (e.g. a mage hovering Mail), so they know it is not for them at a glance.
         const badClass = canEquipItem(this.sim.cfg.playerClass, item) ? '' : ' tt-armor-bad';
         html += `<div class="tt-sub tt-row"><span>${esc(slotName)}</span><span class="tt-armor${badClass}">${esc(t(armorTypeKey))}</span></div>`;
+        if (uniqueTag) {
+          html += `<div class="tt-sub" style="color:var(--gold)">${esc(uniqueTag)}</div>`;
+        }
+      } else if (uniqueTag) {
+        html += `<div class="tt-sub tt-row"><span>${esc(slotName)}</span><span class="tt-unique">${esc(uniqueTag)}</span></div>`;
       } else {
         html += `<div class="tt-sub">${esc(slotName)}</div>`;
       }
@@ -9712,7 +9723,7 @@ export class Hud {
     this.lastDayNightDrawAt = 0;
   }
 
-  // Draw the minimap day/night dial: a ring painted with the 12h world sky cycle
+  // Draw the minimap day/night dial: a ring painted with the world sky cycle
   // (deep navy night, warm dawn/dusk glow, bright day blue), a "now" marker that
   // sweeps it once per cycle, and a centre sun or moon. Purely visual (the canvas
   // is aria-hidden) and reads the shared UTC-anchored cycle, so a glance shows the
@@ -9721,17 +9732,17 @@ export class Hud {
     const ctx = this.dayNightCtx;
     if (!ctx) return;
     const now = Date.now();
-    if (now - this.lastDayNightDrawAt < 1000) return; // the 12h cycle crawls; ~1Hz is ample
+    if (now - this.lastDayNightDrawAt < 1000) return; // the marker crawls; ~1Hz is ample
     this.lastDayNightDrawAt = now;
 
-    const S = 60; // backing resolution (CSS shows it at 30px, so 2x for crispness)
+    const S = 88; // backing resolution (CSS shows it at 44px, so 2x for crispness)
     const cx = S / 2;
     const cy = S / 2;
-    const rMid = 23; // ring centreline radius
-    const ringW = 8;
+    const rMid = 34; // ring centreline radius
+    const ringW = 11;
     const rInner = rMid - ringW / 2 - 2; // centre disc radius
     // noon (brightest) sits at the top, midnight at the bottom; the marker sweeps
-    // clockwise once per 12h. angle = pi/2 + phase*2pi (canvas y is down).
+    // clockwise once per cycle. angle = pi/2 + phase*2pi (canvas y is down).
     const angleForPhase = (p: number): number => Math.PI / 2 + p * Math.PI * 2;
     const rgb = (c: readonly [number, number, number]): string =>
       `rgb(${Math.round(c[0] * 255)}, ${Math.round(c[1] * 255)}, ${Math.round(c[2] * 255)})`;
@@ -9764,36 +9775,43 @@ export class Hud {
     if (daynessNow >= 0.5) {
       ctx.fillStyle = '#ffd45a';
       ctx.beginPath();
-      ctx.arc(cx, cy, 5.5, 0, Math.PI * 2);
+      ctx.arc(cx, cy, 8, 0, Math.PI * 2);
       ctx.fill();
       ctx.strokeStyle = '#ffd45a';
-      ctx.lineWidth = 1.4;
+      ctx.lineWidth = 2;
       for (let i = 0; i < 8; i++) {
         const a = (i / 8) * Math.PI * 2;
         ctx.beginPath();
-        ctx.moveTo(cx + Math.cos(a) * 8, cy + Math.sin(a) * 8);
-        ctx.lineTo(cx + Math.cos(a) * 10.5, cy + Math.sin(a) * 10.5);
+        ctx.moveTo(cx + Math.cos(a) * 11.5, cy + Math.sin(a) * 11.5);
+        ctx.lineTo(cx + Math.cos(a) * 15.5, cy + Math.sin(a) * 15.5);
         ctx.stroke();
       }
     } else {
       // crescent: a pale disc minus an offset disc repainted in the sky color
       ctx.fillStyle = '#e2e8f6';
       ctx.beginPath();
-      ctx.arc(cx, cy, 6, 0, Math.PI * 2);
+      ctx.arc(cx, cy, 8.8, 0, Math.PI * 2);
       ctx.fill();
       ctx.fillStyle = rgb(skyNow);
       ctx.beginPath();
-      ctx.arc(cx + 3, cy - 2.2, 6, 0, Math.PI * 2);
+      ctx.arc(cx + 4.4, cy - 3.2, 8.8, 0, Math.PI * 2);
       ctx.fill();
     }
 
-    // the "now" marker: a bright pip riding the ring at the current phase
+    // the "now" marker: a glowing pip riding the ring at the current phase,
+    // sized and haloed so the cycle position reads at a glance
     const am = angleForPhase(phaseNow);
+    ctx.save();
+    ctx.shadowColor = '#fff';
+    ctx.shadowBlur = 8;
     ctx.beginPath();
-    ctx.arc(cx + Math.cos(am) * rMid, cy + Math.sin(am) * rMid, 3.6, 0, Math.PI * 2);
+    ctx.arc(cx + Math.cos(am) * rMid, cy + Math.sin(am) * rMid, 5.2, 0, Math.PI * 2);
     ctx.fillStyle = '#fff';
     ctx.fill();
-    ctx.lineWidth = 1.4;
+    ctx.restore();
+    ctx.beginPath();
+    ctx.arc(cx + Math.cos(am) * rMid, cy + Math.sin(am) * rMid, 5.2, 0, Math.PI * 2);
+    ctx.lineWidth = 2;
     ctx.strokeStyle = '#000';
     ctx.stroke();
   }
@@ -11644,6 +11662,14 @@ export class Hud {
           // missed bite would spam an AFK-adjacent moment); the bobber sinks
           // out on its own as the cast ends.
           this.log(t('hudChrome.gathering.gotAwayLine'), '#a8a8a8');
+          break;
+        }
+        case 'fishingEarlyReel': {
+          // The angler reeled in before the bite (the spam-click fix): the
+          // line teaches the mechanic (wait for the bite), in the gotAwayLine
+          // register: grey, log only, NO cue (an early reel costs nothing,
+          // and a spammer would turn a cue into noise).
+          this.log(t('hudChrome.gathering.earlyReelLine'), '#a8a8a8');
           break;
         }
         case 'fishingEmptyHook': {
@@ -15906,7 +15932,7 @@ export class Hud {
       ? `<textarea class="cd-input" rows="3" ${opts.readOnly ? 'readonly' : ''} placeholder="${esc(opts.placeholder ?? '')}">${esc(opts.value ?? '')}</textarea>`
       : `<input class="cd-input" type="text" ${opts.readOnly ? 'readonly' : ''} placeholder="${esc(opts.placeholder ?? '')}" value="${esc(opts.value ?? '')}">`;
     el.innerHTML =
-      `<div class="panel-title"><span id="confirm-dialog-title">${esc(opts.title)}</span><span class="x-btn" data-cancel>${svgIcon('close')}</span></div>` +
+      `<div class="panel-title"><span id="confirm-dialog-title">${esc(opts.title)}</span><button type="button" class="x-btn" data-cancel aria-label="${esc(opts.cancelText ?? t('game.talents.cancel'))}">${svgIcon('close')}</button></div>` +
       (opts.label ? `<div class="cd-body">${esc(opts.label)}</div>` : '') +
       `<div class="cd-field">${field}</div>` +
       `<div class="cd-actions"><button class="btn" data-cancel>${esc(opts.cancelText ?? t('game.talents.cancel'))}</button>` +

@@ -100,13 +100,6 @@ const PROVEN_SAFE_BASES: ProvenSafeBase[] = [
     why: 'the offline inspector copy of the same clamped twinkles shader',
   },
   {
-    file: 'src/render/water.ts',
-    base: 'sunAlign',
-    sites: 3,
-    anchor: /float sunAlign = max\(dot\(reflect\(-uSunDir, N\), V\), 0\.0\)/,
-    why: 'sunAlign is itself a max(..., 0.0), reused by the three sun-lobe powers',
-  },
-  {
     file: 'src/render/worn_stone.ts',
     base: 'wornAxis',
     sites: 1,
@@ -137,7 +130,7 @@ const POW_SITES_PER_FILE: Record<string, number> = {
   'src/render/pbr_fragment_shader.ts': 1,
   'src/render/post_output_grade.ts': 1,
   'src/render/sky.ts': 1,
-  'src/render/water.ts': 4,
+  'src/render/water.ts': 1,
   'src/render/weapon_vfx.ts': 4,
   'src/render/worn_stone.ts': 1,
 };

@@ -391,7 +391,8 @@ export const zh_CN: EnTranslations = {
     },
     "emoteEditor": {
       "title": "表情",
-      "done": "完成"
+      "done": "完成",
+      "close": "关闭表情"
     },
     "dailyRewards": {
       "title": "每日奖励",
@@ -1277,6 +1278,24 @@ export const zh_CN: EnTranslations = {
       "graphicsFatal": "图形恢复失败。请重新加载游戏以继续。",
       "graphicsReload": "重新加载游戏",
       "graphicsDraftChanged": "图形更改已准备好应用。",
+      "gfxSectionQuality": "画质",
+      "gfxSectionWorld": "世界细节",
+      "gfxSectionLighting": "光照与特效",
+      "gfxSectionCamera": "镜头",
+      "gfxSectionDisplay": "显示",
+      "gfxSectionSystem": "系统",
+      "gfxSectionTouch": "触控操作",
+      "gfxViewDistance": "视野距离",
+      "gfxWaterQuality": "水面质量",
+      "gfxCharacterDetail": "角色细节",
+      "gfxAmbientOcclusion": "环境光遮蔽",
+      "gfxBloom": "泛光",
+      "gfxAntiAliasing": "抗锯齿",
+      "gfxDynamicLights": "动态光源",
+      "gfxParticleEffects": "粒子特效",
+      "gfxHalf": "半",
+      "gfxCustomNote": "调整任一细节旋钮会将画质预设切换为“高级”：一套基于“高”画质基础、以当前预设所示等级为起点的自定义组合。",
+      "gfxEffectsNote": "环境光遮蔽、泛光与抗锯齿依赖后期处理链：当“特效与光照”为低时，处理链关闭，这些选项不起作用。",
       "interfaceMode": "界面模式",
       "interfaceModeAuto": "自动",
       "interfaceModeDesktop": "桌面",
@@ -1348,6 +1367,8 @@ export const zh_CN: EnTranslations = {
       "buttons": "按键布局",
       "resetButtons": "重置按键布局",
       "menuAction": "游戏菜单",
+      "zoomIn": "Zoom In",
+      "zoomOut": "Zoom Out",
       "help": "左摇杆移动，右摇杆控制镜头。打开窗口即可使用屏幕指针。"
     },
     "perf": {
@@ -1576,6 +1597,7 @@ export const zh_CN: EnTranslations = {
     },
     "itemHeroicTag": "[英雄]",
     "itemSoulbound": "灵魂绑定",
+    "itemUniqueEquipped": "装备唯一",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -2552,6 +2574,7 @@ export const zh_CN: EnTranslations = {
       "catchLine": "你钓上了：{name}",
       "biteLine": "有东西上钩了！",
       "gotAwayLine": "它跑掉了。",
+      "earlyReelLine": "收线太早了，还没有鱼上钩。",
       "nodeName": {
         "ore": "矿脉",
         "wood": "林木",
@@ -3145,7 +3168,8 @@ export const zh_CN: EnTranslations = {
         "raise_fallen": "亡者复生（周期性召唤小怪）",
         "soul_rend": "灵魂撕裂（被标记者需分散并接受治疗）",
         "deathless_rage": "不死之怒（需在护符石处打断）",
-        "wardstones": "护符石引导（阶段转换）"
+        "wardstones": "护符石引导（阶段转换）",
+        "dread_curse": "恐惧诅咒（仅英雄难度，累加坦克轮换减益）"
       }
     },
     "deeds": {
@@ -3553,16 +3577,21 @@ export const zh_CN: EnTranslations = {
       "groupInterface": "界面",
       "groupCamera": "镜头",
       "talents": "天赋",
+      "professions": "专业",
       "arena": "竞技场",
       "leaderboard": "排行榜",
       "deeds": "功绩之书",
+      "sheathe": "收起/拔出武器",
       "crafting": "制作",
       "valeCup": "溪谷杯",
+      "mount": "骑乘 / 下骑",
       "calendar": "活动日历",
+      "dungeonFinder": "地下城查找器",
       "discord": "Discord",
       "abilities": "使用动作条技能（数字键行；第二条动作条位于小键盘）",
       "targetFriendly": "选中最近的友方",
       "cycleFriendly": "循环选择友方目标",
+      "targetAuras": "目标增益和减益效果",
       "gameMenu": "打开游戏菜单与选项",
       "bothMouse": "鼠标左右键",
       "runForward": "向前奔跑",
@@ -3573,7 +3602,7 @@ export const zh_CN: EnTranslations = {
       "mobileHeading": "移动端操作",
       "mobileBody": "在手机和平板上会自动出现触控操作：左侧是移动摇杆，在其他任意位置拖动即可环顾四周，用两根手指捏合可缩放镜头，屏幕上还有用于使用技能和打开菜单的按钮。左上角的一个小箭头可以显示或隐藏菜单按钮，那里的“更多”按钮则收纳着你其余的窗口。",
       "controllerHeading": "使用手柄",
-      "controllerBody": "手柄同样可用，且默认开启手柄支持。左摇杆控制移动，右摇杆控制镜头，正面按键与肩部按键则负责你的技能、跳跃和互动。打开像背包这样的窗口即可调出屏幕指针，而游戏菜单则可用方向键和正面按键直接操作。你可以在选项的手柄设置中重新映射按键，并调整摇杆死区、镜头速度、震动以及反转视角。"
+      "controllerBody": "手柄同样可用，且默认开启手柄支持。左摇杆控制移动，右摇杆控制镜头，正面按键与肩部按键则负责你的技能、跳跃和互动。打开像背包这样的窗口即可调出屏幕指针，而游戏菜单则可用方向键和正面按键直接操作。你可以在选项的手柄设置中重新映射按键，并调整摇杆死区、镜头速度、震动以及反转视角，还可以将一个按键绑定为拉近或拉远镜头（默认未绑定）。"
     },
     "settingsPage": {
       "heading": "设置和性能",
@@ -4314,6 +4343,8 @@ export const zh_CN: EnTranslations = {
       "sourcesBody": "早期的升级大多来自任务奖励，所以与其刷怪，不如完成任务更划算。敌人被击败时会掉落装备，城镇里的商人贩售扎实的基础货色，制作者能把采集来的材料打造成可穿戴的装备，玩家市场则让你能从其他冒险者那里买东西。而在山顶，两种特殊货币能买到别处绝无仅有的装备：探秘看守人处的探秘印记，以及英雄军需官处的英雄徽记。",
       "soulboundTitle": "灵魂绑定：唯你独有",
       "soulboundBody": "许多珍贵的装备都是灵魂绑定的，从你获得的那一刻起便与你的角色绑定。灵魂绑定的物品无法交易、无法邮寄、无法卖给商人，也无法在市场上挂单；它如今是你故事的一部分，无人能替你携带。",
+      "uniqueTitle": "装备唯一：同一件传说只能穿一件",
+      "uniqueBody": "传说物品是装备唯一的：你的角色同一时间只能穿戴某件传说物品的一份，其英雄版本也算作同一件物品。第二份可以放在背包、银行或市场里，但试图同时穿戴两份会被拒绝。物品提示上还带有金色的\"装备唯一\"标签，让你在围绕两件传说规划配装之前就能看到这条规则。",
       "setsTitle": "套装与套装效果",
       "setsBody": "有些护甲成套出现，数件装备在外观与战斗风格上浑然一体。同时穿戴足够多的同套部件，套装便会苏醒，在每件单品自身属性之外额外授予加成，而你穿的部件越多，加成就越强。少数这样的套系会在你升级途中作为珍贵掉落现身；其中最了不起的那些则来自接近等级上限的最高难度组队内容，因此凑齐一整套是经典的终局目标。",
       "consumablesTitle": "消耗品",
@@ -4570,6 +4601,7 @@ export const zh_CN: EnTranslations = {
         "startBody": "一根Simple Fishing Pole在Eastbrook的Fisherman Brandt处只卖20铜（他在镇东缘望着Mirror Lake）；Tinker Gizzel、Fenbridge的Provisioner Hale和Highwatch的Quartermaster Bree也有存货。面向前方约24码内足够深的水面使用鱼竿即可抛竿。战斗中、游泳时或死亡时无法抛竿：站在岸上钓才是正途，任何区域的可钓水域都行。",
         "biteHeading": "咬钩与收线",
         "biteBody": "抛竿后{min}到{max}秒之间鱼会咬钩（更好的鱼竿最多缩短{rod}秒等待），收线窗口持续{reel}秒、鱼竿每高一阶再加{reelRod}秒，单次垂钓最长{cap}秒。",
+        "earlyReelNote": "心急的钓手注意：鱼咬钩之前再按鱼竿，只会收回空线并结束这次垂钓（抛竿后的短暂宽限会原谅误触的连点）。耐心就是钓鱼的全部：等咬钩，再收线。",
         "scheduleHeading": "熟练度成长",
         "scheduleNote": "钓鱼成长按熟练度遵循固定档位，且从{cutoff}起，钓上杂物不再有任何成长。",
         "colProficiency": "熟练度",
@@ -10305,6 +10337,15 @@ export const zh_CN: EnTranslations = {
       },
       "direfang_quiver": {
         "name": "恐牙箭袋"
+      },
+      "sharp_claw": {
+        "name": "锋利的爪"
+      },
+      "curved_tusk": {
+        "name": "弯曲的獠牙"
+      },
+      "pristine_claw": {
+        "name": "完美的爪"
       },
       "conjured_water4": {
         "name": "魔法泉水"

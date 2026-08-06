@@ -4397,7 +4397,30 @@ export type SimEvent = { pid?: number } & (
     }
   | { type: 'questReady'; questId: string }
   | { type: 'questDone'; questId: string }
-  | { type: 'aura'; targetId: number; name: string; gained: boolean; auraKind?: AuraKind }
+  | {
+      type: 'aura';
+      targetId: number;
+      name: string;
+      gained: boolean;
+      auraKind?: AuraKind;
+      // Attribution the Aura object always had but the event used to drop
+      // (parse fidelity 7.2): the caster's entity id, the stable aura/ability
+      // id, and the stack count at application. Carried by the Sim.applyAura
+      // emit path (gained, refresh, and same-id brand-swap fades) and the
+      // stack-bump re-emit in effect_dispatch; the scattered gained AND fade
+      // sites elsewhere (mob_swing, Blood Frenzy, Pack Frenzy, pet buffs,
+      // empower_next, expiries, dispels, ...) still emit bare, and consumers
+      // must treat every field here as optional.
+      sourceId?: number;
+      abilityId?: string;
+      stacks?: number;
+      // True when a gained event displaced a same-id same-name aura already on
+      // the target (a re-application; no fade is emitted, and the aura moves
+      // to the end of the array exactly as a fresh application always has):
+      // parses and combat logs read this as SPELL_AURA_REFRESH rather than a
+      // fresh application.
+      refresh?: boolean;
+    }
   | {
       type: 'castStart';
       entityId: number;
@@ -4740,6 +4763,12 @@ export type SimEvent = { pid?: number } & (
       // same thing from amount === 0, since a genuine direct heal (applyHeal)
       // can also legitimately land at amount 0 (full HP, fully absorbed).
       cueOnly?: boolean;
+      // Healing lost to the missing-hp clamp (parse fidelity 7.1), omitted
+      // when zero. Computed AFTER heal-absorb consumption, so absorbed and
+      // overheal never double-count the same lost healing. Set at every
+      // clamped heal2 emit site; a tick whose heal fully overheals still
+      // emits nothing (those sites gate on healed > 0, unchanged).
+      overheal?: number;
     }
   // visual-only cue for the renderer: spell projectiles, channel beams, dot
   // ticks, aoe novas, and the ranged-mob windup telegraph ('windup' fires at
@@ -5445,6 +5474,16 @@ export type SimEvent = { pid?: number } & (
   // nothing but the ended cast; recast immediately. zoneId/band mirror
   // fishingResult, for the telemetry.
   | { type: 'fishingGotAway'; pid: number; zoneId: string; band: 0 | 1 | 2 }
+  // Fishing early reel (the spam-click fix): the angler re-pressed the pole
+  // BEFORE the bite, so the line came in empty and the session ended. Exists
+  // because a free pre-bite no-op made spam-pressing a guaranteed catch (one
+  // press always fell inside the armed reel window); ending the session is
+  // what makes the bite a reaction test again. Personal and text-free like
+  // fishingGotAway, and counted apart from it in the telemetry (a got-away
+  // is the game costing the player; an early reel is self-inflicted, and
+  // folding them would hide whether the anti-spam change burns real
+  // anglers). Costs nothing but the ended cast; recast immediately.
+  | { type: 'fishingEarlyReel'; pid: number; zoneId: string; band: 0 | 1 | 2 }
   // Fishing empty hook (Professions 2.0): the single table draw resolved
   // the itemId: null row (nothing was biting). Telemetry-only sibling of
   // fishingResult: the player feedback stays the existing localized log

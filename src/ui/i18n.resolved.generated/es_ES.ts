@@ -391,7 +391,8 @@ export const es_ES: EnTranslations = {
     },
     "emoteEditor": {
       "title": "Emotes",
-      "done": "Listo"
+      "done": "Listo",
+      "close": "Close emotes"
     },
     "dailyRewards": {
       "title": "Recompensas diarias",
@@ -1277,6 +1278,24 @@ export const es_ES: EnTranslations = {
       "graphicsFatal": "La recuperación gráfica falló. Recarga el juego para continuar.",
       "graphicsReload": "Recargar juego",
       "graphicsDraftChanged": "Los cambios gráficos están listos para aplicarse.",
+      "gfxSectionQuality": "Quality",
+      "gfxSectionWorld": "World Detail",
+      "gfxSectionLighting": "Lighting & Effects",
+      "gfxSectionCamera": "Camera",
+      "gfxSectionDisplay": "Display",
+      "gfxSectionSystem": "System",
+      "gfxSectionTouch": "Touch Controls",
+      "gfxViewDistance": "View Distance",
+      "gfxWaterQuality": "Water Quality",
+      "gfxCharacterDetail": "Character Detail",
+      "gfxAmbientOcclusion": "Ambient Occlusion",
+      "gfxBloom": "Bloom",
+      "gfxAntiAliasing": "Anti-Aliasing",
+      "gfxDynamicLights": "Dynamic Lights",
+      "gfxParticleEffects": "Particle Effects",
+      "gfxHalf": "Half",
+      "gfxCustomNote": "Changing a dial switches the quality preset to Advanced: a custom mix built on the High-quality base, starting from the levels shown for your current preset.",
+      "gfxEffectsNote": "Ambient Occlusion, Bloom and Anti-Aliasing ride the post-processing chain: with Effects & Lighting on Low the chain is off and they have no effect.",
       "interfaceMode": "Modo de interfaz",
       "interfaceModeAuto": "Auto",
       "interfaceModeDesktop": "Escritorio",
@@ -1348,6 +1367,8 @@ export const es_ES: EnTranslations = {
       "buttons": "Distribución de botones",
       "resetButtons": "Restablecer distribución de botones",
       "menuAction": "Menú del juego",
+      "zoomIn": "Zoom In",
+      "zoomOut": "Zoom Out",
       "help": "El stick izquierdo mueve, el derecho controla la cámara. Abre una ventana para usar el puntero en pantalla."
     },
     "perf": {
@@ -1576,6 +1597,7 @@ export const es_ES: EnTranslations = {
     },
     "itemHeroicTag": "[HEROICO]",
     "itemSoulbound": "Ligado al alma",
+    "itemUniqueEquipped": "Unique-Equipped",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -2552,6 +2574,7 @@ export const es_ES: EnTranslations = {
       "catchLine": "Recoges: {name}",
       "biteLine": "¡Algo muerde el anzuelo!",
       "gotAwayLine": "Se escapó.",
+      "earlyReelLine": "You reel in too soon. Nothing had taken the bait.",
       "nodeName": {
         "ore": "Veta de mineral",
         "wood": "Rodal de madera",
@@ -3145,7 +3168,8 @@ export const es_ES: EnTranslations = {
         "raise_fallen": "Despertar a los Caidos (oleadas periodicas de refuerzos)",
         "soul_rend": "Desgarro de Alma (los jugadores marcados deben dispersarse y recibir curacion)",
         "deathless_rage": "Furia Inmortal (se interrumpe en las piedras de guardia)",
-        "wardstones": "Canalizacion de piedras de guardia (transicion de fase)"
+        "wardstones": "Canalizacion de piedras de guardia (transicion de fase)",
+        "dread_curse": "Dread Curse (heroic only, stacking tank-swap debuff)"
       }
     },
     "deeds": {
@@ -3553,16 +3577,21 @@ export const es_ES: EnTranslations = {
       "groupInterface": "Interfaz",
       "groupCamera": "Cámara",
       "talents": "Talentos",
+      "professions": "Professions",
       "arena": "Arena",
       "leaderboard": "Clasificación",
       "deeds": "Libro de Gestas",
+      "sheathe": "Sheathe/Unsheathe Weapon",
       "crafting": "Artesanía",
       "valeCup": "Copa del Valle",
+      "mount": "Mount / Dismount",
       "calendar": "Calendario de eventos",
+      "dungeonFinder": "Dungeon Finder",
       "discord": "Discord",
       "abilities": "Usar las habilidades de la barra de acción (la fila de números; una segunda barra está en el teclado numérico)",
       "targetFriendly": "Objetivo amistoso más cercano",
       "cycleFriendly": "Objetivo amistoso siguiente",
+      "targetAuras": "Target buffs and debuffs",
       "gameMenu": "Abrir el menú del juego y las opciones",
       "bothMouse": "Ambos botones del ratón",
       "runForward": "Correr hacia adelante",
@@ -4314,6 +4343,8 @@ export const es_ES: EnTranslations = {
       "sourcesBody": "La mayoría de tus mejoras tempranas son recompensas de misiones, así que conviene completar misiones en lugar de farmear. Los enemigos sueltan equipo cuando los derrotas, los vendedores del pueblo venden buenas piezas básicas, los artesanos convierten materiales recolectados en piezas que puedes vestir y el mercado de jugadores te permite comprar a otros aventureros. En lo más alto, dos monedas de marcas compran equipo que no se encuentra en ningún otro sitio: las Marcas de Expedición con el guardián de expediciones, y las Marcas Heroicas con el intendente heroico.",
       "soulboundTitle": "Ligado al alma: tuyo y de nadie más",
       "soulboundBody": "Unas pocas recompensas especiales están ligadas al alma, atadas a tu personaje desde el momento en que las consigues. Un objeto ligado al alma no se puede intercambiar, enviar por correo, vender a un vendedor ni publicar en el mercado; es tuyo y de nadie más. Hoy esa protección resguarda fichas de premio como las Marcas Heroicas, mientras que el equipo que ganas es tuyo para intercambiarlo, venderlo o compartirlo con libertad.",
+      "uniqueTitle": "Unique-Equipped: one legendary of a kind",
+      "uniqueBody": "Legendary items are unique-equipped: your character can wear only one copy of a given legendary at a time, and its heroic version counts as the same item. A second copy can ride in your bags, in the bank, or on the market, but trying to wear both at once is refused, and the tooltip carries a gold Unique-Equipped tag so you can see the rule before you plan a build around two of them.",
       "setsTitle": "Conjuntos y bonificaciones de conjunto",
       "setsBody": "Parte de la armadura viene en familias a juego, varias piezas talladas para verse y combatir como una sola. Lleva suficientes piezas de una familia a la vez y el conjunto despierta, otorgando bonificaciones por encima de las características propias de cada pieza, y cuantas más lleves, más fuerte se vuelve. Unas pocas de estas familias aparecen como codiciados botines mientras subes de nivel; las mejores vienen del contenido en grupo más duro cerca del nivel máximo, así que perseguir un conjunto completo es un objetivo clásico del final del juego.",
       "consumablesTitle": "Consumibles",
@@ -4570,6 +4601,7 @@ export const es_ES: EnTranslations = {
         "startBody": "Una Caña de pescar sencilla cuesta 20 cobres con el Pescador Brandt en Eastbrook (busca al Viejo lobo de agua en el borde este del pueblo, junto al camino al Lago Espejo); Manitas Gizzel, el Proveedor Hale en Fenbridge y la Intendente Bree en Highwatch también tienen cañas en existencias. Usa la caña mirando hacia agua lo bastante profunda como para tener peces, hasta unos 24 metros por delante de ti, y tu flotador sale volando.\n\nNo puedes lanzar en combate, nadando ni muerto: lanzar desde la orilla es la postura prevista. Eso sí, el agua se vuelve más exigente igual que la tierra: la ciénaga pide al menos la Caña de carrete de hierro de nivel 2 y las cumbres la Caña del arroyo plateado de nivel 3, y un sedal lanzado sin la caña que esa agua exige no llega a salir de tu mano. Por encima de esas hay dos cañas más, la Caña de carrete de tormenta y la Caña forjada por la marea: los ingenieros las fabrican en el taller de herramientas con lo que saca el sedal, y el mostrador de expedición de La Letanía Ahogada las vende por Marcas de Expedición tras cumplir sus requisitos de finalización, aunque nunca por monedas. Ningún agua las exige, así que compran una espera más corta y una ventana de recogida más ancha en lugar de acceso, lo que en el peldaño superior significa una picada en tres segundos justos.",
         "biteHeading": "Picada y cobranza",
         "biteBody": "Tras el lanzamiento, la picada llega en un momento oculto entre {min} y {max} segundos; el retardo se decide cuando el sedal toca el agua, así que no hay dos lanzamientos que se sientan iguales. Cuando el flotador pica tienes una ventana de {reel} segundos para volver a pulsar la caña y recoger: recoge dentro de ella y la captura entra, duda un instante de más y el pez se escapa sin dejarte nada. Una sesión entera tiene un tope de {cap} segundos, así que incluso un lanzamiento tranquilo se resuelve rápido.\n\nLas cañas mejores afilan los dos extremos del minijuego: cada nivel de caña por encima del primero recorta {rod} segundos de la espera máxima posible, nunca por debajo del suelo de tres segundos que la caña superior ya roza, y añade {reelRod} segundos a la ventana de recogida, de modo que la Caña de carrete de hierro baja la peor espera a 6,5 segundos con una ventana de 3,25 segundos, y la Caña del arroyo plateado a 5 con una ventana de más de 4, pues su rareza ensancha la recogida un poco más allá de lo que paga el nivel por sí solo. Las picadas más rápidas no cambian nunca, lleves lo que lleves, y a una caña le basta con estar en tus bolsas para contar.",
+        "earlyReelNote": "One caution for eager thumbs: press the pole again before anything bites and you reel in an empty line, ending the cast (a moment of grace right after casting forgives an accidental double-press). Patience is the whole game: wait for the bite, then strike.",
         "scheduleHeading": "Ganancia de pericia",
         "scheduleNote": "La ganancia de Pesca sigue un programa fijo sin dados: un punto completo por captura por debajo de 50 de pericia, medio punto por debajo de 100, una décima por debajo de 150 y un lento goteo de 0,02 de 150 a 200. Ese último tramo es a propósito un viaje de miles de capturas: 200 es una declaración, no una parada de camino a otra cosa.\n\nLa chatarra deja de enseñar por completo en {cutoff}: a partir de ahí, las algas y las botas son solo algas y botas. El agua misma también pone tope a la lección: las aguas de nivel 1 del Valle (y toda orilla joven más allá de las tierras centrales) no enseñan nada pasado 100, las de la ciénaga se detienen en 150, y solo las de Thornpeak instruyen a un pescador todo el camino hasta 200. Por lo demás, cada captura cobrada gana al ritmo previsto, así que cuando el contador se estanca, el programa te está diciendo que busques aguas más profundas.",
         "colProficiency": "Pericia",
@@ -10305,6 +10337,15 @@ export const es_ES: EnTranslations = {
       },
       "direfang_quiver": {
         "name": "Carcaj de Direfang"
+      },
+      "sharp_claw": {
+        "name": "Sharp Claw"
+      },
+      "curved_tusk": {
+        "name": "Curved Tusk"
+      },
+      "pristine_claw": {
+        "name": "Pristine Claw"
       },
       "conjured_water4": {
         "name": "Agua de Manantial Invocada"

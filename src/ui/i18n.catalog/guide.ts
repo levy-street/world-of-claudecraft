@@ -270,16 +270,21 @@ export const guideStrings = {
     groupInterface: 'Interface',
     groupCamera: 'Camera',
     talents: 'Talents',
+    professions: 'Professions',
     arena: 'Arena',
     leaderboard: 'Leaderboard',
     deeds: 'Book of Deeds',
+    sheathe: 'Sheathe/Unsheathe Weapon',
     crafting: 'Crafting',
     valeCup: 'Vale Cup',
+    mount: 'Mount / Dismount',
     calendar: 'Event Calendar',
+    dungeonFinder: 'Dungeon Finder',
     discord: 'Discord',
     abilities: 'Use action bar abilities (the number row; a second bar sits on the numpad)',
     targetFriendly: 'Target nearest friendly',
     cycleFriendly: 'Cycle friendly target',
+    targetAuras: 'Target buffs and debuffs',
     gameMenu: 'Open game menu and options',
     bothMouse: 'Both Mouse Buttons',
     runForward: 'Run forward',
@@ -294,7 +299,7 @@ export const guideStrings = {
       'Touch controls appear automatically on phones and tablets: a movement stick on the left, drag anywhere else to look, pinch with two fingers to zoom the camera, and on-screen buttons for your abilities and menus. A small arrow in the top left corner shows or hides the menu buttons, and the More button there holds the rest of your windows.',
     controllerHeading: 'On a controller',
     controllerBody:
-      'Gamepads work too, and controller support is on by default. The left stick moves, the right stick aims the camera, and the face and shoulder buttons cover your abilities, jumping, and interacting. Open a window like your bags to bring up an on-screen pointer, and the game menu navigates directly with the D-pad and face buttons. You can remap the buttons and adjust stick deadzone, camera speed, vibration, and inverted look from the controller settings in the options.',
+      'Gamepads work too, and controller support is on by default. The left stick moves, the right stick aims the camera, and the face and shoulder buttons cover your abilities, jumping, and interacting. Open a window like your bags to bring up an on-screen pointer, and the game menu navigates directly with the D-pad and face buttons. You can remap the buttons and adjust stick deadzone, camera speed, vibration, and inverted look from the controller settings in the options, where a button can also be bound to zoom the camera in or out (unbound by default).',
   },
 
   // Settings & Performance reference. Option and value NAMES reuse the game's own
@@ -1400,6 +1405,11 @@ export const guideStrings = {
     soulboundBody:
       'A few special rewards are soulbound, bound to your character from the moment you earn them. A soulbound item cannot be traded, mailed, sold to a vendor, or listed on the market; it is yours and yours alone. Today that protection guards prize tokens such as Heroic Marks, while the gear you win is yours to trade, sell, or share freely.',
 
+    // Unique-equipped legendaries. Rule-level only: no item names or drop sources.
+    uniqueTitle: 'Unique-Equipped: one legendary of a kind',
+    uniqueBody:
+      'Legendary items are unique-equipped: your character can wear only one copy of a given legendary at a time, and its heroic version counts as the same item. A second copy can ride in your bags, in the bank, or on the market, but trying to wear both at once is refused, and the tooltip carries a gold Unique-Equipped tag so you can see the rule before you plan a build around two of them.',
+
     // Tier sets and set bonuses. Concept only: no set names, bonus numbers, or the raid boss.
     setsTitle: 'Sets and set bonuses',
     setsBody:
@@ -1789,13 +1799,13 @@ export const guideStrings = {
     gatherDeedsHeading: 'Deeds along the way',
     gatherDeeds: {
       mining:
-        "Your first node of any trade earns Fruits of the Field, and the 100 cap in Mining inscribes Ore in the Blood. Reaching 100 in any three of Mining, Logging, Herbalism, and Fishing adds Master Gatherer at 25 Renown, and cracking a pristine vein records its own collector's mark. Six zones keep a gatherer's chronicle page apiece too, filled by harvesting an ore vein, a wood stand, and an herb patch within the zone's bounds. None of these grant power: deeds are titles and Renown, a record of the roads you have walked.",
+        "Your first node of any trade earns Fruits of the Field, and the 100 cap in Mining inscribes Ore in the Blood. Reaching 100 in any three of Mining, Logging, Herbalism, and Fishing adds Master Gatherer at 25 Renown, and cracking a pristine vein records its own collector's mark. Twelve zones keep a gatherer's chronicle page apiece too, filled by harvesting an ore vein, a wood stand, and an herb patch within the zone's bounds. None of these grant power: deeds are titles and Renown, a record of the roads you have walked.",
       logging:
-        "Your first node of any trade earns Fruits of the Field, and the 100 cap in Logging inscribes Heartwood Hewer. Reaching 100 in any three of Mining, Logging, Herbalism, and Fishing adds Master Gatherer at 25 Renown, and a strike of ancient heartwood records its own collector's mark. Six zones keep a gatherer's chronicle page apiece too, filled by harvesting an ore vein, a wood stand, and an herb patch within the zone's bounds. Deeds are titles and Renown only, never power.",
+        "Your first node of any trade earns Fruits of the Field, and the 100 cap in Logging inscribes Heartwood Hewer. Reaching 100 in any three of Mining, Logging, Herbalism, and Fishing adds Master Gatherer at 25 Renown, and a strike of ancient heartwood records its own collector's mark. Twelve zones keep a gatherer's chronicle page apiece too, filled by harvesting an ore vein, a wood stand, and an herb patch within the zone's bounds. Deeds are titles and Renown only, never power.",
       herbalism:
-        "Your first node of any trade earns Fruits of the Field, and the 100 cap in Herbalism inscribes Master of the Meadow. Reaching 100 in any three of Mining, Logging, Herbalism, and Fishing adds Master Gatherer at 25 Renown, and a moonlit bloom records its own collector's mark. Six zones keep a gatherer's chronicle page apiece too, filled by harvesting an ore vein, a wood stand, and an herb patch within the zone's bounds. Deeds are titles and Renown only, never power.",
+        "Your first node of any trade earns Fruits of the Field, and the 100 cap in Herbalism inscribes Master of the Meadow. Reaching 100 in any three of Mining, Logging, Herbalism, and Fishing adds Master Gatherer at 25 Renown, and a moonlit bloom records its own collector's mark. Twelve zones keep a gatherer's chronicle page apiece too, filled by harvesting an ore vein, a wood stand, and an herb patch within the zone's bounds. Deeds are titles and Renown only, never power.",
       fishing:
-        "The 100 milestone inscribes Old Salt and 200 inscribes Master Angler with its title, the very top of the angler's art; Fishing also counts toward Master Gatherer, earned at 100 in any three gathering trades. A first fish from each of six zones' waters fills its own page, the three heartland zones and the Willowfen, the Galecrest, and the Farshore beyond them, and the Sunglint Koi records Glimmer of Hope, so travelers with a pole in their pack fill their book faster than they expect.",
+        "The 100 milestone inscribes Old Salt and 200 inscribes Master Angler with its title, the very top of the angler's art; Fishing also counts toward Master Gatherer, earned at 100 in any three gathering trades. A first fish from each of twelve zones' waters fills its own page, the three heartland zones and the Willowfen, the Galecrest, the Farshore, the Frostveil, the Amberfall, the Nightbloom, the Wraithwood, the Palmreach, and the Evergarden beyond them, and the Sunglint Koi records Glimmer of Hope, so travelers with a pole in their pack fill their book faster than they expect.",
     },
     fish: {
       startHeading: 'Getting started',
@@ -1804,6 +1814,11 @@ export const guideStrings = {
       biteHeading: 'Bite and reel',
       biteBody:
         'After the cast, a bite comes at a hidden moment between {min} and {max} seconds; the delay is decided when the line lands, so no two casts feel quite alike. When the bobber bites you have a {reel} second window to press the pole again and reel in: reel inside it and the catch lands, hesitate past it and the fish gets away with nothing to show. A whole session caps at {cap} seconds, so even a quiet cast resolves quickly.\n\nBetter rods sharpen both ends of the minigame: each rod tier above the first trims {rod} seconds off the longest possible wait, never below the three-second floor the top rod already grazes, and adds {reelRod} seconds to the reel window, so the Ironreel pulls the worst wait down to 6.5 seconds with a 3.25 second window, and the Silverstream to 5 with a window past 4, its rarity widening the reel a little beyond what the tier alone pays. The quickest bites never change whatever you hold, and a rod only needs to be in your bags to count.',
+      // The early reel (the spam-click fix): its own key rather than a
+      // biteBody reword, so the shipped translations of the paragraphs
+      // above stay live while locales catch up on this one.
+      earlyReelNote:
+        'One caution for eager thumbs: press the pole again before anything bites and you reel in an empty line, ending the cast (a moment of grace right after casting forgives an accidental double-press). Patience is the whole game: wait for the bite, then strike.',
       scheduleHeading: 'Proficiency gain',
       scheduleNote:
         "Fishing gain follows a fixed schedule with no dice: a full point per catch below 50 proficiency, half a point below 100, a tenth below 150, and a slow 0.02 trickle from 150 to 200. That last stretch is a thousands-of-catches journey on purpose: 200 is a statement, not a stop on the way to something else.\n\nJunk stops teaching entirely at {cutoff}: from there on, weeds and boots are just weeds and boots. The water itself caps the lesson too: the Vale's tier 1 waters (and every young shore beyond the heartland) teach nothing past 100, the marsh's stop at 150, and only Thornpeak's school an angler the whole way to 200. Every landed catch otherwise gains at the scheduled rate, so when the counter stalls, the schedule is telling you to seek deeper water.",

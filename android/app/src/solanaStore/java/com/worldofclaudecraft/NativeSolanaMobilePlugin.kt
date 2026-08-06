@@ -31,7 +31,7 @@ class NativeSolanaMobilePlugin : Plugin() {
     private val walletAdapter = MobileWalletAdapter(
         connectionIdentity = ConnectionIdentity(
             identityUri = Uri.parse("https://worldofclaudecraft.com"),
-            iconUri = Uri.parse("favicon.svg"),
+            iconUri = Uri.parse("favicon.ico"),
             identityName = "World of ClaudeCraft",
         ),
     )

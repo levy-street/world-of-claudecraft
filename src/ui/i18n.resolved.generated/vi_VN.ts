@@ -391,7 +391,8 @@ export const vi_VN: EnTranslations = {
     },
     "emoteEditor": {
       "title": "Biểu Cảm",
-      "done": "Xong"
+      "done": "Xong",
+      "close": "Close emotes"
     },
     "dailyRewards": {
       "title": "Phần Thưởng Hằng Ngày",
@@ -1277,6 +1278,24 @@ export const vi_VN: EnTranslations = {
       "graphicsFatal": "Khôi phục đồ họa thất bại. Hãy tải lại trò chơi để tiếp tục.",
       "graphicsReload": "Tải Lại Trò Chơi",
       "graphicsDraftChanged": "Các thay đổi đồ họa đã sẵn sàng để áp dụng.",
+      "gfxSectionQuality": "Quality",
+      "gfxSectionWorld": "World Detail",
+      "gfxSectionLighting": "Lighting & Effects",
+      "gfxSectionCamera": "Camera",
+      "gfxSectionDisplay": "Display",
+      "gfxSectionSystem": "System",
+      "gfxSectionTouch": "Touch Controls",
+      "gfxViewDistance": "View Distance",
+      "gfxWaterQuality": "Water Quality",
+      "gfxCharacterDetail": "Character Detail",
+      "gfxAmbientOcclusion": "Ambient Occlusion",
+      "gfxBloom": "Bloom",
+      "gfxAntiAliasing": "Anti-Aliasing",
+      "gfxDynamicLights": "Dynamic Lights",
+      "gfxParticleEffects": "Particle Effects",
+      "gfxHalf": "Half",
+      "gfxCustomNote": "Changing a dial switches the quality preset to Advanced: a custom mix built on the High-quality base, starting from the levels shown for your current preset.",
+      "gfxEffectsNote": "Ambient Occlusion, Bloom and Anti-Aliasing ride the post-processing chain: with Effects & Lighting on Low the chain is off and they have no effect.",
       "interfaceMode": "Chế Độ Giao Diện",
       "interfaceModeAuto": "Tự Động",
       "interfaceModeDesktop": "Máy Tính",
@@ -1348,6 +1367,8 @@ export const vi_VN: EnTranslations = {
       "buttons": "Bố Cục Nút",
       "resetButtons": "Đặt Lại Bố Cục Nút",
       "menuAction": "Menu Trò Chơi",
+      "zoomIn": "Zoom In",
+      "zoomOut": "Zoom Out",
       "help": "Cần trái để di chuyển, cần phải để quan sát. Mở một cửa sổ để dùng con trỏ trên màn hình."
     },
     "perf": {
@@ -1576,6 +1597,7 @@ export const vi_VN: EnTranslations = {
     },
     "itemHeroicTag": "[ANH HÙNG]",
     "itemSoulbound": "Ràng Buộc Linh Hồn",
+    "itemUniqueEquipped": "Unique-Equipped",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -2552,6 +2574,7 @@ export const vi_VN: EnTranslations = {
       "catchLine": "Bạn giật cần: {name}",
       "biteLine": "Có thứ gì đó cắn mồi!",
       "gotAwayLine": "Nó thoát mất rồi.",
+      "earlyReelLine": "You reel in too soon. Nothing had taken the bait.",
       "nodeName": {
         "ore": "Mạch Quặng",
         "wood": "Bãi Gỗ",
@@ -3145,7 +3168,8 @@ export const vi_VN: EnTranslations = {
         "raise_fallen": "Triệu Hồi Tử Giả (các đợt quân tiếp viện theo chu kỳ)",
         "soul_rend": "Xé Hồn (người chơi bị đánh dấu phải tản ra và được hồi máu)",
         "deathless_rage": "Thịnh Nộ Bất Tử (bị gián đoạn tại các đá hộ mệnh)",
-        "wardstones": "Kênh đá hộ mệnh (chuyển giai đoạn)"
+        "wardstones": "Kênh đá hộ mệnh (chuyển giai đoạn)",
+        "dread_curse": "Dread Curse (heroic only, stacking tank-swap debuff)"
       }
     },
     "deeds": {
@@ -3553,16 +3577,21 @@ export const vi_VN: EnTranslations = {
       "groupInterface": "Giao diện",
       "groupCamera": "Máy quay",
       "talents": "Thiên Phú",
+      "professions": "Professions",
       "arena": "Đấu Trường",
       "leaderboard": "Bảng xếp hạng",
       "deeds": "Sách Kỳ Công",
+      "sheathe": "Sheathe/Unsheathe Weapon",
       "crafting": "Chế Tác",
       "valeCup": "Cúp Thung Lũng",
+      "mount": "Mount / Dismount",
       "calendar": "Lịch Sự Kiện",
+      "dungeonFinder": "Dungeon Finder",
       "discord": "Discord",
       "abilities": "Dùng kỹ năng trên thanh hành động (hàng số; một thanh thứ hai nằm trên bàn phím số)",
       "targetFriendly": "Chọn mục tiêu thân thiện gần nhất",
       "cycleFriendly": "Lần lượt chọn mục tiêu thân thiện",
+      "targetAuras": "Target buffs and debuffs",
       "gameMenu": "Mở menu trò chơi và tùy chọn",
       "bothMouse": "Cả Hai Nút Chuột",
       "runForward": "Chạy tới trước",
@@ -4314,6 +4343,8 @@ export const vi_VN: EnTranslations = {
       "sourcesBody": "Phần lớn đồ nâng cấp thuở đầu là phần thưởng nhiệm vụ, nên hoàn thành nhiệm vụ đáng giá hơn là cày cuốc. Kẻ địch rơi trang bị khi bạn đánh bại chúng, người bán trong thị trấn bán những món cơ bản chắc chắn, thợ chế tác biến nguyên liệu thu thập thành những món mặc được, và chợ người chơi cho phép bạn mua từ những nhà phiêu lưu khác. Ở đỉnh cao, hai loại tiền huy hiệu mua được trang bị không tìm thấy ở đâu khác: Huy Hiệu Hang Sâu ở chỗ người giữ hang sâu, và Dấu Ấn Anh Hùng ở chỗ Quân Nhu Trưởng Anh Hùng.",
       "soulboundTitle": "Ràng Buộc Linh Hồn: của bạn và chỉ của riêng bạn",
       "soulboundBody": "Một vài phần thưởng đặc biệt là ràng buộc linh hồn, gắn với nhân vật của bạn ngay từ khoảnh khắc bạn giành được chúng. Một vật phẩm ràng buộc linh hồn không thể trao đổi, gửi thư, bán cho người bán, hay niêm yết trên chợ; nó là của bạn và chỉ của riêng bạn. Ngày nay sự bảo vệ ấy canh giữ những token phần thưởng như Dấu Ấn Anh Hùng, trong khi trang bị bạn giành được là của bạn để tùy ý trao đổi, bán, hay san sẻ.",
+      "uniqueTitle": "Unique-Equipped: one legendary of a kind",
+      "uniqueBody": "Legendary items are unique-equipped: your character can wear only one copy of a given legendary at a time, and its heroic version counts as the same item. A second copy can ride in your bags, in the bank, or on the market, but trying to wear both at once is refused, and the tooltip carries a gold Unique-Equipped tag so you can see the rule before you plan a build around two of them.",
       "setsTitle": "Bộ trang bị và hiệu ứng bộ",
       "setsBody": "Một số giáp đến theo những gia đình đồng bộ, vài món được tạo để trông và đánh như một thể thống nhất. Mặc đủ số món của một gia đình cùng lúc thì bộ thức dậy, trao thêm hiệu ứng bên trên các chỉ số riêng của từng món, và càng mặc nhiều món thì nó càng mạnh. Vài gia đình như vậy xuất hiện dưới dạng những món rơi quý giá khi bạn lên cấp; những bộ vĩ đại nhất đến từ nội dung theo nhóm khó nhất gần cấp tối đa, nên săn cho đủ một bộ là một mục tiêu hậu kỳ kinh điển.",
       "consumablesTitle": "Vật Phẩm Tiêu Hao",
@@ -4570,6 +4601,7 @@ export const vi_VN: EnTranslations = {
         "startBody": "Một Cần Câu Đơn Giản tốn 20 đồng từ Ngư Dân Brandt ở Eastbrook (hãy tìm Lão Thủy Thủ ở rìa phía đông thị trấn, cạnh con đường ra Hồ Gương); Thợ Máy Gizzel, Người Tiếp Tế Hale ở Fenbridge, và Quân Nhu Trưởng Bree ở Highwatch cũng có bán cần câu. Dùng cần trong khi quay mặt ra vùng nước đủ sâu để có cá, xa tới khoảng 24 thước trước mặt bạn, và cái phao sẽ bay ra.\n\nBạn không thể buông câu khi đang giao chiến, khi đang bơi, hay khi đã chết: đứng trên bờ mà câu mới là tư thế được tính. Nhưng nước cũng khó lên theo đất: đầm lầy đòi ít nhất Guồng Sắt bậc 2 còn vùng đỉnh núi đòi Suối Bạc bậc 3, và một dây câu buông ra mà thiếu cần câu vùng nước ấy đòi thì chẳng bao giờ rời khỏi tay bạn. Trên hai cần đó còn hai cần nữa, Guồng Bão và Triều Đúc: kỹ sư chế tạo chúng ở xưởng dụng cụ từ chính những gì dây câu kéo lên, và quầy hang sâu của Kinh Cầu Chết Chìm bán chúng lấy Huy Hiệu Hang Sâu sau các cổng lượt hoàn thành của nó, dù không bao giờ lấy tiền vàng. Không vùng nước nào đòi chúng, nên chúng mua khoảng chờ ngắn hơn và cửa sổ giật rộng hơn thay vì mua quyền vào, mà ở nấc trên cùng thì điều đó có nghĩa là cá cắn đúng ba giây chẵn.",
         "biteHeading": "Cắn mồi và giật cá",
         "biteBody": "Sau khi buông câu, cá cắn vào một thời điểm giấu kín nằm giữa {min} và {max} giây; độ trễ được quyết định ngay lúc dây chạm nước, nên không lần buông câu nào giống hệt lần nào. Khi phao rung, bạn có cửa sổ {reel} giây để bấm cần lần nữa mà giật lên: giật trong khoảng đó thì cá về tay, chần chừ quá thì cá thoát mất và bạn chẳng có gì để khoe. Trọn một lượt câu chặn trần ở {cap} giây, nên ngay cả một lần buông câu lặng lẽ cũng kết thúc nhanh.\n\nCần câu tốt hơn mài sắc cả hai đầu của trò nhỏ này: mỗi bậc cần câu trên bậc đầu tiên cắt bớt {rod} giây khỏi khoảng chờ dài nhất có thể, không bao giờ xuống dưới cái sàn ba giây mà cần câu đỉnh đã chạm tới, và cộng {reelRod} giây vào cửa sổ giật, nên Guồng Sắt kéo khoảng chờ tệ nhất xuống 6,5 giây với cửa sổ 3,25 giây, còn Suối Bạc xuống 5 với cửa sổ hơn 4, độ hiếm của nó nới cửa sổ giật rộng thêm chút ít ngoài phần mà riêng bậc đã trả. Những cú cắn nhanh nhất không bao giờ đổi dù bạn cầm gì, và một cần câu chỉ cần nằm trong túi là đã được tính.",
+        "earlyReelNote": "One caution for eager thumbs: press the pole again before anything bites and you reel in an empty line, ending the cast (a moment of grace right after casting forgives an accidental double-press). Patience is the whole game: wait for the bite, then strike.",
         "scheduleHeading": "Tích lũy thành thạo",
         "scheduleNote": "Tích lũy câu cá theo một lịch cố định, không có xúc xắc: một điểm đầy đủ mỗi lần câu được khi dưới 50 thành thạo, nửa điểm dưới 100, một phần mười dưới 150, và rỉ giọt chậm 0,02 từ 150 đến 200. Đoạn cuối ấy là hành trình hàng nghìn lần câu, và đó là chủ ý: 200 là một lời tuyên bố, không phải trạm dừng trên đường tới thứ gì khác.\n\nCá rác ngừng dạy hoàn toàn ở {cutoff}: từ đó trở đi, rong rêu và giày ống chỉ là rong rêu và giày ống. Bản thân vùng nước cũng chặn trần bài học: vùng nước bậc 1 của Thung Lũng (và mọi bờ nước non trẻ ngoài ba vùng lõi) không dạy gì quá 100, vùng nước của đầm lầy dừng ở 150, và chỉ có vùng nước Đỉnh Gai mới dạy một người câu suốt chặng đường tới 200. Ngoài ra mọi con cá kéo được lên đều tích lũy theo đúng nhịp của lịch, nên khi bộ đếm đứng yên, cái lịch đang bảo bạn đi tìm vùng nước sâu hơn.",
         "colProficiency": "Thành thạo",
@@ -10305,6 +10337,15 @@ export const vi_VN: EnTranslations = {
       },
       "direfang_quiver": {
         "name": "Ống Tên Direfang"
+      },
+      "sharp_claw": {
+        "name": "Sharp Claw"
+      },
+      "curved_tusk": {
+        "name": "Curved Tusk"
+      },
+      "pristine_claw": {
+        "name": "Pristine Claw"
       },
       "conjured_water4": {
         "name": "Nước Suối Được Tạo Phép"

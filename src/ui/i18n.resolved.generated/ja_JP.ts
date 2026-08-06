@@ -391,7 +391,8 @@ export const ja_JP: EnTranslations = {
     },
     "emoteEditor": {
       "title": "エモート",
-      "done": "完了"
+      "done": "完了",
+      "close": "エモートを閉じる"
     },
     "dailyRewards": {
       "title": "デイリー報酬",
@@ -1277,6 +1278,24 @@ export const ja_JP: EnTranslations = {
       "graphicsFatal": "グラフィックの復旧に失敗しました。続行するにはゲームを再読み込みしてください。",
       "graphicsReload": "ゲームを再読み込み",
       "graphicsDraftChanged": "グラフィックの変更を適用できます。",
+      "gfxSectionQuality": "画質",
+      "gfxSectionWorld": "ワールド詳細",
+      "gfxSectionLighting": "ライティングとエフェクト",
+      "gfxSectionCamera": "カメラ",
+      "gfxSectionDisplay": "表示",
+      "gfxSectionSystem": "システム",
+      "gfxSectionTouch": "タッチ操作",
+      "gfxViewDistance": "描画距離",
+      "gfxWaterQuality": "水面品質",
+      "gfxCharacterDetail": "キャラクター詳細",
+      "gfxAmbientOcclusion": "アンビエントオクルージョン",
+      "gfxBloom": "ブルーム",
+      "gfxAntiAliasing": "アンチエイリアス",
+      "gfxDynamicLights": "動的ライト",
+      "gfxParticleEffects": "パーティクル効果",
+      "gfxHalf": "半分",
+      "gfxCustomNote": "ダイヤルを変更すると画質プリセットが「詳細」に切り替わります。「高」品質ベースの上に、現在のプリセットに表示されているレベルを起点として組み立てるカスタム設定です。",
+      "gfxEffectsNote": "アンビエントオクルージョン、ブルーム、アンチエイリアスはポストプロセスチェーンに依存します。「エフェクトとライティング」が低の場合、チェーンが無効になりこれらの設定は効果がありません。",
       "interfaceMode": "操作モード",
       "interfaceModeAuto": "自動",
       "interfaceModeDesktop": "デスクトップ",
@@ -1348,6 +1367,8 @@ export const ja_JP: EnTranslations = {
       "buttons": "ボタン配置",
       "resetButtons": "ボタン配置をリセット",
       "menuAction": "ゲームメニュー",
+      "zoomIn": "Zoom In",
+      "zoomOut": "Zoom Out",
       "help": "左スティックで移動、右スティックで視点。ウィンドウを開くと画面ポインターが使えます。"
     },
     "perf": {
@@ -1576,6 +1597,7 @@ export const ja_JP: EnTranslations = {
     },
     "itemHeroicTag": "[ヒロイック]",
     "itemSoulbound": "魂縛",
+    "itemUniqueEquipped": "装備ユニーク",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -2552,6 +2574,7 @@ export const ja_JP: EnTranslations = {
       "catchLine": "{name}を釣り上げた",
       "biteLine": "何かが食いついた！",
       "gotAwayLine": "逃げられてしまった。",
+      "earlyReelLine": "巻き上げるのが早すぎた。まだ何も食いついていなかった。",
       "nodeName": {
         "ore": "鉱脈",
         "wood": "立木",
@@ -3145,7 +3168,8 @@ export const ja_JP: EnTranslations = {
         "raise_fallen": "死者蘇生（周期的な増援ウェーブ）",
         "soul_rend": "ソウルレンド（対象は散開して回復を受ける）",
         "deathless_rage": "不死の憤怒（ウォードストーンで妨害）",
-        "wardstones": "ウォードストーンの詠唱（フェーズ移行）"
+        "wardstones": "ウォードストーンの詠唱（フェーズ移行）",
+        "dread_curse": "ドレッドカース（ヒロイック限定、タンク交代用の累積デバフ）"
       }
     },
     "deeds": {
@@ -3553,16 +3577,21 @@ export const ja_JP: EnTranslations = {
       "groupInterface": "インターフェース",
       "groupCamera": "カメラ",
       "talents": "タレント",
+      "professions": "生産職",
       "arena": "アリーナ",
       "leaderboard": "リーダーボード",
       "deeds": "功績の書",
+      "sheathe": "武器を納刀/抜刀",
       "crafting": "製作",
       "valeCup": "ヴェイルカップ",
+      "mount": "騎乗 / 降車",
       "calendar": "イベントカレンダー",
+      "dungeonFinder": "ダンジョンファインダー",
       "discord": "Discord",
       "abilities": "アクションバーのアビリティを使用（数字キーの列。二つ目のバーはテンキーにあります）",
       "targetFriendly": "最も近い友好的な対象をターゲット",
       "cycleFriendly": "友好的なターゲットを順に切り替え",
+      "targetAuras": "ターゲットのバフとデバフ",
       "gameMenu": "ゲームメニューとオプションを開く",
       "bothMouse": "マウスの左右ボタン同時押し",
       "runForward": "前進",
@@ -3573,7 +3602,7 @@ export const ja_JP: EnTranslations = {
       "mobileHeading": "モバイルでは",
       "mobileBody": "スマートフォンやタブレットでは、タッチ操作が自動で表示されます。左側に移動用スティック、それ以外の場所はどこでもドラッグして視点操作、二本指でつまむとカメラをズームでき、そしてアビリティやメニュー用の画面上ボタンが現れます。左上隅の小さな矢印でメニューボタンの表示と非表示を切り替えられ、そこにある「その他」ボタンに残りのウィンドウがまとめられています。",
       "controllerHeading": "コントローラーでは",
-      "controllerBody": "ゲームパッドにも対応しており、コントローラーのサポートは初期設定で有効になっています。左スティックで移動し、右スティックでカメラを操作し、フェイスボタンとショルダーボタンでアビリティ、ジャンプ、対話を行います。バッグのようなウィンドウを開くと画面上のポインターが表示され、ゲームメニューは十字キーとフェイスボタンで直接操作できます。ボタンの割り当て変更や、スティックのデッドゾーン、カメラ速度、振動、視点反転の調整は、オプションのコントローラー設定から行えます。"
+      "controllerBody": "ゲームパッドにも対応しており、コントローラーのサポートは初期設定で有効になっています。左スティックで移動し、右スティックでカメラを操作し、フェイスボタンとショルダーボタンでアビリティ、ジャンプ、対話を行います。バッグのようなウィンドウを開くと画面上のポインターが表示され、ゲームメニューは十字キーとフェイスボタンで直接操作できます。ボタンの割り当て変更や、スティックのデッドゾーン、カメラ速度、振動、視点反転の調整は、オプションのコントローラー設定から行えます。ボタンをカメラのズームイン・ズームアウトに割り当てることもできます（初期状態では未割り当て）。"
     },
     "settingsPage": {
       "heading": "設定とパフォーマンス",
@@ -4314,6 +4343,8 @@ export const ja_JP: EnTranslations = {
       "sourcesBody": "序盤のアップグレードのほとんどはクエスト報酬なので、稼ぎ作業よりクエストを終わらせるほうが得です。敵は倒されると装備を落とし、町の商人は手堅い基本装備を売り、職人は採集した素材を身につけられる品へと変え、プレイヤーマーケットでは他の冒険者から買えます。そして頂の上では、二つの刻印通貨が、ほかでは見つからない装備を買わせてくれます。デルヴの番人のもとではデルヴの刻印、英雄補給係のもとでは英雄の証です。",
       "soulboundTitle": "魂縛：あなただけのもの",
       "soulboundBody": "価値ある品の多くは魂縛、つまり入手した瞬間からあなたのキャラクターに縛られています。魂縛のアイテムは取引にも郵送にも出せず、商人に売ることも、マーケットに出品することもできません。それはもうあなたの物語の一部であり、ほかの誰かが代わりに持ち運ぶことはできないのです。",
+      "uniqueTitle": "装備ユニーク：同じレジェンダリーは1つだけ",
+      "uniqueBody": "レジェンダリーアイテムは装備ユニークです。キャラクターは同じレジェンダリーを同時に1つしか装備できず、そのヒロイック版も同じアイテムとして扱われます。2つ目はバッグや銀行、マーケットに置けますが、両方を同時に装備しようとすると拒否されます。ツールチップには金色の「装備ユニーク」タグが表示されるので、2つ持ちのビルドを計画する前にこのルールを確認できます。",
       "setsTitle": "セットとセットボーナス",
       "setsBody": "一部の防具は、見た目も戦いぶりもひと揃いになるよう仕立てられた、おそろいのシリーズで手に入ります。同じシリーズを一定数まとめて装備するとセットが目を覚まし、各部位そのもののステータスに加えてボーナスを与え、装備する部位が多いほど効果は強まります。そうしたシリーズのいくつかは、レベリング中の貴重なドロップとしても現れます。最も偉大なものはレベル上限近くの最も手強いグループコンテンツから手に入るので、フルセットを追い求めることは古典的なエンドゲームの目標になっています。",
       "consumablesTitle": "消耗品",
@@ -4570,6 +4601,7 @@ export const ja_JP: EnTranslations = {
         "startBody": "Simple Fishing PoleはEastbrookのFisherman Brandtが20銅で売っています（町の東端でMirror Lakeを睨む老練の釣り師です）。Tinker Gizzel、FenbridgeのProvisioner Hale、HighwatchのQuartermaster Breeにも在庫があります。前方約24ヤード以内の十分に深い水面に向かって竿を使えば、浮きが飛んでいきます。戦闘中、泳いでいる間、死亡中は投げられません。岸から釣るのが本来の姿で、どの地方の釣れる水域でも構いません。",
         "biteHeading": "アタリとリール",
         "biteBody": "キャストから{min}から{max}秒でアタリが来ます（良い竿は待ちを最大{rod}秒縮めます）。リールの猶予は{reel}秒に竿がティア1つ上がるごとに{reelRod}秒加わり、1回のセッションは最長{cap}秒です。",
+        "earlyReelNote": "せっかちな指への注意：アタリが来る前にもう一度竿を使うと空の糸を巻き上げ、そのキャストは終わります（キャスト直後のわずかな猶予がうっかりの二度押しを許してくれます）。釣りは我慢がすべて。アタリを待って、それから合わせましょう。",
         "scheduleHeading": "熟練度成長",
         "scheduleNote": "釣りの成長は熟練度ごとの固定スケジュールに従い、{cutoff}からはガラクタを釣っても何も学べません。",
         "colProficiency": "熟練度",
@@ -10305,6 +10337,15 @@ export const ja_JP: EnTranslations = {
       },
       "direfang_quiver": {
         "name": "ダイアファングの矢筒"
+      },
+      "sharp_claw": {
+        "name": "鋭い鉤爪"
+      },
+      "curved_tusk": {
+        "name": "曲がった牙"
+      },
+      "pristine_claw": {
+        "name": "無傷の鉤爪"
       },
       "conjured_water4": {
         "name": "魔法の湧き水"

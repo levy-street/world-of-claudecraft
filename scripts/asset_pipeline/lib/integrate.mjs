@@ -407,7 +407,7 @@ export function appendCreditsRow({ assets, source }) {
   if (!rows.length) throw new Error('CREDITS.md table not found');
   const last = rows[rows.length - 1];
   const insertAt = last.index + last[0].length + 1;
-  const row = `| ${assets} | World of ClaudeCraft | ${source} | Project asset |\n`;
+  const row = `| ${assets} | World of ClaudeCraft | ${source} | Project asset | With the project only |\n`;
   credits = credits.slice(0, insertAt) + row + credits.slice(insertAt);
   write(FILES.credits, credits);
   return ['appended CREDITS.md row'];

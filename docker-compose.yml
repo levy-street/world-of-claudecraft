@@ -174,12 +174,26 @@ services:
       # Studio, run its installer against the host overlay root, and this server
       # reads only the stable runtime manifest plus immutable audio blobs here.
       SFX_PACK_DIR: /app/sfx-runtime/audio/sfx
+      # Combat parse capture (server/parse/): inert unless PARSE_CAPTURE=1 and
+      # an ingest URL is set. The spool dir must live on the mounted volume
+      # below so batches survive a container restart.
+      PARSE_CAPTURE: ${PARSE_CAPTURE:-}
+      PARSE_INGEST_URL: ${PARSE_INGEST_URL:-}
+      PARSE_INGEST_TOKEN: ${PARSE_INGEST_TOKEN:-}
+      PARSE_CAPTURE_SURFACES: ${PARSE_CAPTURE_SURFACES:-}
+      PARSE_SPOOL_DIR: ${PARSE_SPOOL_DIR:-/app/parse-spool}
+      PARSE_SPOOL_MAX_MB: ${PARSE_SPOOL_MAX_MB:-}
+      PARSE_ENV_LABEL: ${PARSE_ENV_LABEL:-}
+      PARSE_CENSUS: ${PARSE_CENSUS:-}
+      PARSE_CENSUS_HOUR: ${PARSE_CENSUS_HOUR:-}
+      WOC_BUILD_VERSION: ${WOC_BUILD_VERSION:-}
     # loopback-only: the TLS reverse proxy (Caddy) is the public entrance
     ports:
       - "127.0.0.1:8787:8787"
     volumes:
       - ${EASTBROOK_MEDIA_DIR:-./media-cache}:/app/dist/media
       - ${EASTBROOK_SFX_DIR:-./sfx-runtime}:/app/sfx-runtime:ro
+      - ${PARSE_SPOOL_HOST_DIR:-./parse-spool}:/app/parse-spool
     extra_hosts:
       - "host.docker.internal:host-gateway"
     # Exec form with a node one-liner, deliberately unlike the CMD-SHELL healthcheck

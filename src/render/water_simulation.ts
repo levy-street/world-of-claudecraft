@@ -190,7 +190,7 @@ export class WaterSimulation {
 
   constructor(private readonly renderer: THREE.WebGLRenderer) {
     this.enabled = supportsSimulation(renderer);
-    this.plan = waterFieldPlan(GFX.tier);
+    this.plan = waterFieldPlan(GFX.waterTier);
     this.stepSeconds = 1 / this.plan.stepHz;
     const propagationDistance = 10.5 * this.stepSeconds;
     this.damping = 0.74 ** this.stepSeconds;

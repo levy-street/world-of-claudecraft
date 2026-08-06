@@ -2,9 +2,10 @@
 // (server/user_assets_routes.ts). Sibling of tests/server/maps_routes.test.ts:
 // the RouteDefs and the legacy handleApi lanes share the same cores, so this
 // file pins the route-layer contract the parity corpus cannot reach db-free:
-// the guards, the pre-auth 413, the coded 429 on the shared upload bucket, the
-// requireOwnedAsset deny (resolved through the caller's own bounded list), the
-// binary byte-read response headers, and the in-handler :file shape parity.
+// the guards, the pre-auth 413, the coded 429 on the shared upload/delete
+// mutation bucket, the requireOwnedAsset deny (resolved through the caller's
+// own bounded list), the binary byte-read response headers, and the
+// in-handler :file shape parity.
 process.env.DATABASE_URL ||= 'postgres://test:test@127.0.0.1:5433/wocc_assets_routes';
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -247,8 +248,8 @@ describe('auth guards + the pre-auth 413', () => {
   });
 });
 
-describe('the shared upload limiter (coded 429, shared bucket)', () => {
-  it('throws the coded rate_limit.exceeded once the legacy bucket is drained', async () => {
+describe('the shared upload/delete mutation limiter (coded 429, shared bucket)', () => {
+  it('throws the coded rate_limit.exceeded once the legacy bucket is drained (upload)', async () => {
     const req = { headers: {}, socket: { remoteAddress: '10.8.8.8' } } as http.IncomingMessage;
     for (let i = 0; i < ASSET_UPLOAD_MAX_PER_MINUTE; i++) {
       assetUploadRateLimited(req, CALLER);
@@ -260,6 +261,27 @@ describe('the shared upload limiter (coded 429, shared bucket)', () => {
     expect(res.status).toBe(429);
     expect(res.body.code).toBe('rate_limit.exceeded');
     expect(res.headers['retry-after']).toBeDefined();
+  });
+
+  it('throws the coded rate_limit.exceeded once the shared bucket is drained (delete), like DELETE /api/maps/:id', async () => {
+    // DELETE /api/assets/:id had NO rate limiter at all (regression coverage):
+    // it now shares the SAME fused ip+account bucket as the upload lane, the
+    // same posture DELETE /api/maps/:id has with its own create/save lane.
+    const req = { headers: {}, socket: { remoteAddress: '10.8.8.9' } } as http.IncomingMessage;
+    for (let i = 0; i < ASSET_UPLOAD_MAX_PER_MINUTE; i++) {
+      assetUploadRateLimited(req, CALLER);
+    }
+    const deleteAsset = vi.fn();
+    fakeService({ listMine: async () => [assetRecord()], deleteAsset });
+    const res = await runRoute('DELETE', '/api/assets/:id', {
+      headers: { authorization: BEARER },
+      params: { id: '3' },
+      url: '/api/assets/3',
+    });
+    expect(res.status).toBe(429);
+    expect(res.body.code).toBe('rate_limit.exceeded');
+    expect(res.headers['retry-after']).toBeDefined();
+    expect(deleteAsset).not.toHaveBeenCalled();
   });
 });
 

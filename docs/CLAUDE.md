@@ -20,6 +20,7 @@ feature spec), or its program's dir; the top level is only for a living runbook.
 | `design/` | How systems are/should be built (notes below). |
 | `prd/` | Feature specs: requirements + `file:line` hook points + acceptance criteria. |
 | `qa-gate.md` | The QA-gate reference (Stop hook, pre-push floor, `npm run gate`, `/qa`); root CLAUDE.md points here. Living. |
+| `merge-queue.md` | The merge queue + required-check contract on `main` and `release/**` (the ruleset settings are not in git; this is their written contract, and the operator note for queue rejections). Living. |
 | `image-to-glb-asset-workflow.md` | Living runbook for reference-image intake, procedural Three.js authoring, optimized GLB export, renderer integration, performance gates, and in-game visual proof. |
 | `ai-pr-bot.md` | The non-blocking PR CI review helper (`prepare_ai_review.mjs`/`post_ai_review.mjs`), plus the local diff-scoped screenshot capture (`scripts/pr_shot_targets.mjs`). Living. |
 | `desktop-release.md`, `desktop-ship-notes.md`, `mobile-store-release.md` | Release runbooks (Electron/Steam; iOS/Android). Living. |

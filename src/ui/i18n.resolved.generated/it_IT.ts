@@ -391,7 +391,8 @@ export const it_IT: EnTranslations = {
     },
     "emoteEditor": {
       "title": "Emote",
-      "done": "Fine"
+      "done": "Fine",
+      "close": "Close emotes"
     },
     "dailyRewards": {
       "title": "Ricompense giornaliere",
@@ -1277,6 +1278,24 @@ export const it_IT: EnTranslations = {
       "graphicsFatal": "Ripristino della grafica non riuscito. Ricarica il gioco per continuare.",
       "graphicsReload": "Ricarica il gioco",
       "graphicsDraftChanged": "Le modifiche alla grafica sono pronte per essere applicate.",
+      "gfxSectionQuality": "Quality",
+      "gfxSectionWorld": "World Detail",
+      "gfxSectionLighting": "Lighting & Effects",
+      "gfxSectionCamera": "Camera",
+      "gfxSectionDisplay": "Display",
+      "gfxSectionSystem": "System",
+      "gfxSectionTouch": "Touch Controls",
+      "gfxViewDistance": "View Distance",
+      "gfxWaterQuality": "Water Quality",
+      "gfxCharacterDetail": "Character Detail",
+      "gfxAmbientOcclusion": "Ambient Occlusion",
+      "gfxBloom": "Bloom",
+      "gfxAntiAliasing": "Anti-Aliasing",
+      "gfxDynamicLights": "Dynamic Lights",
+      "gfxParticleEffects": "Particle Effects",
+      "gfxHalf": "Half",
+      "gfxCustomNote": "Changing a dial switches the quality preset to Advanced: a custom mix built on the High-quality base, starting from the levels shown for your current preset.",
+      "gfxEffectsNote": "Ambient Occlusion, Bloom and Anti-Aliasing ride the post-processing chain: with Effects & Lighting on Low the chain is off and they have no effect.",
       "interfaceMode": "Modalità interfaccia",
       "interfaceModeAuto": "Auto",
       "interfaceModeDesktop": "Desktop",
@@ -1348,6 +1367,8 @@ export const it_IT: EnTranslations = {
       "buttons": "Disposizione dei pulsanti",
       "resetButtons": "Ripristina disposizione dei pulsanti",
       "menuAction": "Menu di gioco",
+      "zoomIn": "Zoom In",
+      "zoomOut": "Zoom Out",
       "help": "Lo stick sinistro muove, quello destro orienta la telecamera. Apri una finestra per usare il puntatore a schermo."
     },
     "perf": {
@@ -1576,6 +1597,7 @@ export const it_IT: EnTranslations = {
     },
     "itemHeroicTag": "[EROICO]",
     "itemSoulbound": "Vincolato all’anima",
+    "itemUniqueEquipped": "Unique-Equipped",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -2552,6 +2574,7 @@ export const it_IT: EnTranslations = {
       "catchLine": "Riporti in superficie: {name}",
       "biteLine": "Qualcosa abbocca alla lenza!",
       "gotAwayLine": "E' fuggito.",
+      "earlyReelLine": "You reel in too soon. Nothing had taken the bait.",
       "nodeName": {
         "ore": "Filone di minerale",
         "wood": "Boschetto di alberi",
@@ -3145,7 +3168,8 @@ export const it_IT: EnTranslations = {
         "raise_fallen": "Richiama i Caduti (ondate periodiche di rinforzi)",
         "soul_rend": "Squarcio dell'Anima (i giocatori segnati devono disperdersi ed essere curati)",
         "deathless_rage": "Furia Immortale (interrotta alle pietre di guardia)",
-        "wardstones": "Canalizzazione delle pietre di guardia (transizione di fase)"
+        "wardstones": "Canalizzazione delle pietre di guardia (transizione di fase)",
+        "dread_curse": "Dread Curse (heroic only, stacking tank-swap debuff)"
       }
     },
     "deeds": {
@@ -3553,16 +3577,21 @@ export const it_IT: EnTranslations = {
       "groupInterface": "Interfaccia",
       "groupCamera": "Telecamera",
       "talents": "Talenti",
+      "professions": "Professions",
       "arena": "Arena",
       "leaderboard": "Classifica",
       "deeds": "Libro delle Imprese",
+      "sheathe": "Sheathe/Unsheathe Weapon",
       "crafting": "Creazione",
       "valeCup": "Coppa della Valle",
+      "mount": "Mount / Dismount",
       "calendar": "Calendario degli eventi",
+      "dungeonFinder": "Dungeon Finder",
       "discord": "Discord",
       "abilities": "Usa le abilità della barra delle azioni (la fila dei numeri; una seconda barra è sul tastierino numerico)",
       "targetFriendly": "Bersaglia l'amico più vicino",
       "cycleFriendly": "Scorri i bersagli amici",
+      "targetAuras": "Target buffs and debuffs",
       "gameMenu": "Apri il menu di gioco e le opzioni",
       "bothMouse": "Entrambi i pulsanti del mouse",
       "runForward": "Corri in avanti",
@@ -4314,6 +4343,8 @@ export const it_IT: EnTranslations = {
       "sourcesBody": "Gran parte dei tuoi primi miglioramenti sono ricompense delle missioni, perciò conviene portarle a termine invece di macinare nemici. I nemici lasciano cadere equipaggiamento quando li sconfiggi, i venditori in città vendono solide basi, gli artigiani trasformano i materiali raccolti in pezzi indossabili, e il mercato dei giocatori ti permette di comprare da altri avventurieri. In cima alla scalata, due valute in marchi comprano equipaggiamento introvabile altrove: i Sigilli d'Incursione presso il custode delle incursioni, e i Marchi Eroici presso il Quartiermastro Eroico.",
       "soulboundTitle": "Vincolato all'anima: tuo e tuo soltanto",
       "soulboundBody": "Alcune ricompense speciali sono vincolate all'anima, legate al tuo personaggio dal momento in cui le ottieni. Un oggetto vincolato all'anima non può essere scambiato, spedito, venduto a un venditore o messo in vendita sul mercato; è tuo e tuo soltanto. Oggi questa protezione custodisce i gettoni premio come i Marchi Eroici, mentre l'equipaggiamento che vinci è tuo da scambiare, vendere o condividere liberamente.",
+      "uniqueTitle": "Unique-Equipped: one legendary of a kind",
+      "uniqueBody": "Legendary items are unique-equipped: your character can wear only one copy of a given legendary at a time, and its heroic version counts as the same item. A second copy can ride in your bags, in the bank, or on the market, but trying to wear both at once is refused, and the tooltip carries a gold Unique-Equipped tag so you can see the rule before you plan a build around two of them.",
       "setsTitle": "Le tenute e i loro bonus",
       "setsBody": "Alcune armature arrivano in famiglie coordinate, più pezzi tagliati per apparire e combattere come una cosa sola. Indossa abbastanza pezzi di una famiglia insieme e la tenuta si risveglia, concedendo bonus che si aggiungono alle statistiche di ciascun pezzo, e più pezzi indossi più diventa forte. Alcune di queste famiglie compaiono come bottino ambito mentre sali di livello; le più grandi arrivano dai contenuti di gruppo più ardui vicino al limite di livello, perciò inseguire una tenuta completa è un classico obiettivo di fine gioco.",
       "consumablesTitle": "Consumabili",
@@ -4570,6 +4601,7 @@ export const it_IT: EnTranslations = {
         "startBody": "Una Canna da pesca semplice costa 20 monete di rame dal Pescatore Brandt a Eastbrook (cerca il Vecchio Sale al margine orientale della città, sulla strada per il Lago Specchio); anche l'Armeggiatore Gizzel, il Provveditore Hale a Fenbridge e il Quartiermastro Bree a Highwatch tengono canne in magazzino. Usa la canna rivolto verso acqua abbastanza profonda da contenere pesci, fino a circa 24 yard davanti a te, e il tuo galleggiante volerà fuori.\n\nNon puoi lanciare in combattimento, mentre nuoti o da morto: lanciare dalla riva è la postura prevista. L'acqua però si fa dura come si fa dura la terra: la palude vuole almeno la Canna con mulinello di ferro di livello 2 e le vette la Canna del ruscello d'argento di livello 3, e una lenza lanciata senza la canna che quell'acqua pretende non lascia mai la tua mano. Due canne stanno sopra queste, la Canna della Tempesta e la Canna Forgiamarea: gli ingegneri le fabbricano all'officina con ciò che la lenza tira su, e il banco dell'incursione della Litania Annegata le vende per Sigilli d'Incursione dietro ai suoi requisiti di completamento, ma mai per monete. Nessuna acqua le richiede, quindi comprano un'attesa più breve e una finestra di recupero più ampia invece dell'accesso, il che al gradino più alto significa un'abboccata in tre secondi netti.",
         "biteHeading": "Abboccata e salpata",
         "biteBody": "Dopo il lancio, l'abboccata arriva in un momento nascosto tra {min} e {max} secondi; il ritardo viene deciso quando la lenza tocca l'acqua, quindi non ci sono due lanci davvero uguali. Quando il galleggiante abbocca hai una finestra di {reel} secondi per premere di nuovo la canna e recuperare: recupera entro quel tempo e la cattura è tua, esita oltre e il pesce se ne va senza lasciarti nulla. Un'intera sessione si ferma a {cap} secondi, quindi anche un lancio tranquillo si risolve in fretta.\n\nLe canne migliori affinano entrambe le estremità del minigioco: ogni livello di canna sopra il primo taglia {rod} secondi dall'attesa più lunga possibile, mai sotto il minimo di tre secondi che la canna di punta già sfiora, e aggiunge {reelRod} secondi alla finestra di recupero, così la Canna con mulinello di ferro porta l'attesa peggiore a 6,5 secondi con una finestra di 3,25 secondi, e la Canna del ruscello d'argento a 5 con una finestra oltre i 4, dato che la sua rarità allarga il recupero un po' più di quanto paghi il livello da solo. Le abboccate più rapide non cambiano mai, qualunque cosa tu impugni, e a una canna basta stare nelle tue borse per contare.",
+        "earlyReelNote": "One caution for eager thumbs: press the pole again before anything bites and you reel in an empty line, ending the cast (a moment of grace right after casting forgives an accidental double-press). Patience is the whole game: wait for the bite, then strike.",
         "scheduleHeading": "Guadagno di competenza",
         "scheduleNote": "Il guadagno della Pesca segue un calendario fisso senza dadi: un punto intero per cattura sotto 50 di competenza, mezzo punto sotto 100, un decimo sotto 150 e un lento gocciolio di 0,02 da 150 a 200. Quell'ultimo tratto è deliberatamente un viaggio da migliaia di catture: 200 è una dichiarazione, non una tappa verso qualcos'altro.\n\nL'immondizia smette del tutto di insegnare a {cutoff}: da lì in poi, alghe e stivali sono soltanto alghe e stivali. Anche l'acqua stessa pone un tetto alla lezione: le acque di livello 1 della Valle (e ogni riva giovane oltre le terre centrali) non insegnano nulla oltre 100, quelle della palude si fermano a 150, e solo quelle di Thornpeak istruiscono un pescatore per l'intero tragitto fino a 200. Per il resto ogni cattura portata a riva guadagna al ritmo previsto, quindi quando il contatore si blocca, è il calendario che ti sta dicendo di cercare acque più profonde.",
         "colProficiency": "Competenza",
@@ -10305,6 +10337,15 @@ export const it_IT: EnTranslations = {
       },
       "direfang_quiver": {
         "name": "Faretra Direfang"
+      },
+      "sharp_claw": {
+        "name": "Sharp Claw"
+      },
+      "curved_tusk": {
+        "name": "Curved Tusk"
+      },
+      "pristine_claw": {
+        "name": "Pristine Claw"
       },
       "conjured_water4": {
         "name": "Acqua sorgiva evocata"

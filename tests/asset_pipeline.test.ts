@@ -608,7 +608,28 @@ describe('validators calibrated against shipped assets', () => {
 });
 
 // ---------------------------------------------------------------------------
-// 6. normalizeWeapon round-trip (the load-bearing correctness check)
+// 6. Prop normalization configuration identity
+// ---------------------------------------------------------------------------
+
+describe('prop normalization variants', () => {
+  it('invalidates the cached step when height, yaw, or texture ceiling changes', () => {
+    expect(glb.propNormalizeVariant({ height: 5.5, rotateYDeg: 0, maxTex: 256 })).toBe(
+      'r0_h5_5_t256',
+    );
+    expect(glb.propNormalizeVariant({ height: 5.4, rotateYDeg: 0, maxTex: 256 })).not.toBe(
+      glb.propNormalizeVariant({ height: 5.5, rotateYDeg: 0, maxTex: 256 }),
+    );
+    expect(glb.propNormalizeVariant({ height: 5.5, rotateYDeg: 90, maxTex: 256 })).not.toBe(
+      glb.propNormalizeVariant({ height: 5.5, rotateYDeg: 0, maxTex: 256 }),
+    );
+    expect(glb.propNormalizeVariant({ height: 5.5, rotateYDeg: 0, maxTex: 512 })).not.toBe(
+      glb.propNormalizeVariant({ height: 5.5, rotateYDeg: 0, maxTex: 256 }),
+    );
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 7. normalizeWeapon round-trip (the load-bearing correctness check)
 // ---------------------------------------------------------------------------
 
 describe('normalizeWeapon round-trip', () => {

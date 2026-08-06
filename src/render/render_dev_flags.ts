@@ -13,6 +13,14 @@
 //   canopy      - the canopy clump-detail layer
 //   n8ao        - the N8AO ambient-occlusion pass
 //   tmicroshadow - the terrain micro sun-shadow taps (ultra+)
+//   zonehaze    - the per-zone aerial haze field (biome_haze_field)
+//   nightlights - the night light field (night_light_field); off falls back
+//                 to the draped ground-glow pools and the mob glow discs
+//   fardetail   - the far vista mesh's world-scale rock detail (far_terrain);
+//                 off returns the tiles to one flat baked colour per vertex
+//   farvista    - the whole coarse far-vista terrain layer (far_terrain); off
+//                 is the A/B that says whether a suspect distant surface is
+//                 this layer or the real splat terrain underneath it
 
 const disabled = ((): ReadonlySet<string> => {
   const set = new Set<string>();

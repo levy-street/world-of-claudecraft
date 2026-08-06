@@ -164,6 +164,15 @@ describe('buildVendorView goods', () => {
     expect(view.goods[0].bulkQuantity).toBeUndefined();
   });
 
+  it('bulkQuantity is absent for a soulbound stackable copper-priced good (buyItem collapses a bulk request on a soulbound row to one purchase, so the preview must never promise more)', () => {
+    const items = table({
+      ...item('bound_ration', { buyValue: 4, stackSize: 20, kind: 'food' }),
+      soulbound: true,
+    });
+    const view = buildVendorView(['bound_ration'], [], items, RICH);
+    expect(view.goods[0].bulkQuantity).toBeUndefined();
+  });
+
   it('requires both balances for a dual-price good', () => {
     const items = table(item('blade', { buyValue: 25, priceHonor: 80 }));
     expect(

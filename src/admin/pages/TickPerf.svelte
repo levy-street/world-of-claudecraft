@@ -29,6 +29,7 @@
   let status = $state<PerfCaptureStatus | null>(null);
   let durationSeconds = $state<number>(10);
   let starting = $state(false);
+  let failed = $state(false);
 
   const msFormatter = new Intl.NumberFormat(adminLanguageTag(), {
     minimumFractionDigits: 2,
@@ -65,8 +66,9 @@
   async function refresh(): Promise<void> {
     try {
       status = await apiGet<PerfCaptureStatus>('/admin/api/perf/tick');
+      failed = false;
     } catch (err) {
-      if (!auth.handleAuthFailure(err)) console.error('tick perf refresh failed:', err);
+      if (!auth.handleAuthFailure(err)) failed = true;
     }
   }
 
@@ -111,50 +113,28 @@
     </button>
   </div>
 
-  <p class="status" aria-live="polite">
-    {#if status?.capturing}
-      {t('tickPerf.capturing', { seconds: remaining })}
-    {:else if status?.last}
-      {t('tickPerf.capturedAt', { when: fmtRelative(new Date(status.last.capturedAt).toISOString()) })}
-      &middot; {t('tickPerf.contextOnline', { online: fmtNumber(status.last.online) })}
-      &middot; {t('tickPerf.contextEntities', { entities: fmtNumber(status.last.simEntities) })}
-      &middot; {t('tickPerf.contextWindow', {
-        seconds: Math.round(status.last.durationMs / 1000),
-        samples: fmtNumber(status.last.profile.samples),
-      })}
-      {#if overBudget}<strong class="over">{t('tickPerf.overBudget')}</strong>{/if}
-    {:else}
-      {t('tickPerf.noCapture')}
-    {/if}
-  </p>
+  {#if failed}
+    <div class="empty">{t('tickPerf.loadFailed')}</div>
+  {:else}
+    <p class="status" aria-live="polite">
+      {#if status?.capturing}
+        {t('tickPerf.capturing', { seconds: remaining })}
+      {:else if status?.last}
+        {t('tickPerf.capturedAt', { when: fmtRelative(new Date(status.last.capturedAt).toISOString()) })}
+        &middot; {t('tickPerf.contextOnline', { online: fmtNumber(status.last.online) })}
+        &middot; {t('tickPerf.contextEntities', { entities: fmtNumber(status.last.simEntities) })}
+        &middot; {t('tickPerf.contextWindow', {
+          seconds: Math.round(status.last.durationMs / 1000),
+          samples: fmtNumber(status.last.profile.samples),
+        })}
+        {#if overBudget}<strong class="over">{t('tickPerf.overBudget')}</strong>{/if}
+      {:else}
+        {t('tickPerf.noCapture')}
+      {/if}
+    </p>
 
-  {#if status?.last}
-    <h3>{t('tickPerf.loopHeading')}</h3>
-    <table>
-      <thead>
-        <tr>
-          <th>{t('tickPerf.colPhase')}</th>
-          <th class="num">{t('tickPerf.colMean')}</th>
-          <th class="num">{t('tickPerf.colP95')}</th>
-          <th class="num">{t('tickPerf.colP99')}</th>
-          <th class="num">{t('tickPerf.colMax')}</th>
-        </tr>
-      </thead>
-      <tbody>
-        {#each loopRows as row (row.name)}
-          <tr class:total-row={row.name === 'total'}>
-            <td>{row.name}</td>
-            <td class="num">{ms(row.stats.mean)}</td>
-            <td class="num">{ms(row.stats.p95)}</td>
-            <td class="num">{ms(row.stats.p99)}</td>
-            <td class="num">{ms(row.stats.max)}</td>
-          </tr>
-        {/each}
-      </tbody>
-    </table>
-
-    {#if simRows.length > 0}
-      <h3>{t('tickPerf.simHeading')}</h3>
+    {#if status?.last}
+      <h3>{t('tickPerf.loopHeading')}</h3>
       <table>
         <thead>
           <tr>
@@ -166,8 +146,8 @@
           </tr>
         </thead>
         <tbody>
-          {#each simRows as row (row.name)}
-            <tr>
+          {#each loopRows as row (row.name)}
+            <tr class:total-row={row.name === 'total'}>
               <td>{row.name}</td>
               <td class="num">{ms(row.stats.mean)}</td>
               <td class="num">{ms(row.stats.p95)}</td>
@@ -177,6 +157,32 @@
           {/each}
         </tbody>
       </table>
+
+      {#if simRows.length > 0}
+        <h3>{t('tickPerf.simHeading')}</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>{t('tickPerf.colPhase')}</th>
+              <th class="num">{t('tickPerf.colMean')}</th>
+              <th class="num">{t('tickPerf.colP95')}</th>
+              <th class="num">{t('tickPerf.colP99')}</th>
+              <th class="num">{t('tickPerf.colMax')}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {#each simRows as row (row.name)}
+              <tr>
+                <td>{row.name}</td>
+                <td class="num">{ms(row.stats.mean)}</td>
+                <td class="num">{ms(row.stats.p95)}</td>
+                <td class="num">{ms(row.stats.p99)}</td>
+                <td class="num">{ms(row.stats.max)}</td>
+              </tr>
+            {/each}
+          </tbody>
+        </table>
+      {/if}
     {/if}
   {/if}
 </Panel>

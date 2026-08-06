@@ -112,13 +112,13 @@ describe('renderCorpseHarvestPicker: picker section', () => {
 });
 
 // #2509: the picker's mirror of the command-boundary refusal. Checking only
-// families with no harvest item behind them (claw, tusk, gills, horn) is a
-// command the sim refuses pre-claim, so the button goes dead and the section
-// says why IN PLACE: a `disabled` button takes no pointer events and leaves the
-// tab order (src/ui/focus_manager.ts), so a tooltip on it is unreachable.
+// families with no harvest item behind them (gills, horn) is a command the
+// sim refuses pre-claim, so the button goes dead and the section says why IN
+// PLACE: a `disabled` button takes no pointer events and leaves the tab order
+// (src/ui/focus_manager.ts), so a tooltip on it is unreachable.
 describe('renderCorpseHarvestPicker: a selection that forfeits every yield (#2509)', () => {
-  // old_greyjaw's real tags. Only claw is unmapped.
-  const GREYJAW = ['hide', 'fang', 'claw'];
+  // sethrael_palecoil's real tags. Only horn is unmapped (claw is mapped now).
+  const PALECOIL = ['hide', 'claw', 'horn'];
 
   function render(tags: string[], checked: string[] = []) {
     const container = document.createElement('div');
@@ -128,7 +128,7 @@ describe('renderCorpseHarvestPicker: a selection that forfeits every yield (#250
     // The painter re-derives through corpseHarvestView on every `change` event
     // anyway (corpse_harvest_window.ts), so a second, approximate copy of the
     // rule here only created a first render that could disagree with every
-    // render after it: the old inline `checked.every(t => t === 'claw' ...)`
+    // render after it: the old inline `checked.every(t => t === 'horn' ...)`
     // answered TRUE for an all-unmapped corpse where the core answers false
     // (nothing is forfeited there; #2513's separate term is what disables it).
     renderCorpseHarvestPicker(container, corpseHarvestView(tags, new Set(checked)), {
@@ -155,13 +155,13 @@ describe('renderCorpseHarvestPicker: a selection that forfeits every yield (#250
   }
 
   it('hides the reason line while the selection can still yield something', () => {
-    const t = render(GREYJAW, ['hide']);
+    const t = render(PALECOIL, ['hide']);
     expect(t.btn.disabled).toBe(false);
     expect(t.warning.hidden).toBe(true);
   });
 
   it('kills the button and states why when the last mapped box is unchecked', () => {
-    const t = render(GREYJAW, ['hide', 'claw']);
+    const t = render(PALECOIL, ['hide', 'horn']);
     expect(t.btn.disabled).toBe(false);
     t.toggle('hide');
     expect(t.btn.disabled).toBe(true);
@@ -176,13 +176,13 @@ describe('renderCorpseHarvestPicker: a selection that forfeits every yield (#250
     // A `disabled` button takes no pointer events and is not focusable, so
     // neither the shared tooltip nor an aria-label on it is reachable at the
     // moment the action dies. The live region is what carries the why.
-    const t = render(GREYJAW, ['hide']);
+    const t = render(PALECOIL, ['hide']);
     expect(t.warning.getAttribute('role')).toBe('status');
     expect(t.warning.getAttribute('aria-live')).toBe('polite');
     // Said once, not twice: the sentence lives on the line alone, never also
     // on the button, so browse mode does not read it back to back.
     t.toggle('hide');
-    t.toggle('claw');
+    t.toggle('horn');
     expect(t.warning.hidden).toBe(false);
     expect(t.btn.getAttribute('aria-label')).toBeNull();
   });
@@ -192,7 +192,7 @@ describe('renderCorpseHarvestPicker: a selection that forfeits every yield (#250
     // it would shove Harvest down at the exact moment the player is reaching
     // for it; below, only the popup's bottom edge moves. Pinned because the
     // whole layout-stability argument is invisible to every other assertion.
-    const t = render(GREYJAW, ['claw']);
+    const t = render(PALECOIL, ['horn']);
     expect(t.btn.nextElementSibling).toBe(t.warning);
   });
 
@@ -210,20 +210,20 @@ describe('renderCorpseHarvestPicker: a selection that forfeits every yield (#250
   });
 
   it('comes back to life the moment a mapped family is checked again', () => {
-    const t = render(GREYJAW, ['claw']);
+    const t = render(PALECOIL, ['horn']);
     expect(t.btn.disabled).toBe(true);
     expect(t.warning.hidden).toBe(false);
-    t.toggle('fang');
+    t.toggle('claw');
     expect(t.btn.disabled).toBe(false);
     expect(t.warning.hidden).toBe(true);
     t.btn.click();
-    expect(t.onHarvest).toHaveBeenLastCalledWith(['fang', 'claw']);
+    expect(t.onHarvest).toHaveBeenLastCalledWith(['claw', 'horn']);
   });
 
   it('never disables on the way back to an empty selection, which spreads', () => {
-    const t = render(GREYJAW, ['claw']);
+    const t = render(PALECOIL, ['horn']);
     expect(t.btn.disabled).toBe(true);
-    t.toggle('claw');
+    t.toggle('horn');
     expect(t.btn.disabled).toBe(false);
     expect(t.warning.hidden).toBe(true);
     t.btn.click();
@@ -231,16 +231,19 @@ describe('renderCorpseHarvestPicker: a selection that forfeits every yield (#250
   });
 
   it('draws NO section at all for an all-unmapped corpse (#2513)', () => {
-    // fen_troll (claw, tusk). The sim refuses the command at its corpse-level
-    // gate, so there is nothing for the picker to submit. Drawing the section
-    // with a dead button would be a NEW state and a bad one: the reason line
+    // warlock_imp retagged (gills, horn), the shared UNMAPPED fixture used
+    // across the sim suites now that claw and tusk are mapped (this branch's
+    // own fix retired fen_troll, the old fixture here, since claw and tusk
+    // were its tags). The sim refuses the command at its corpse-level gate,
+    // so there is nothing for the picker to submit. Drawing the section with
+    // a dead button would be a NEW state and a bad one: the reason line
     // reports a FORFEIT, which is a statement about the selection, and nothing
     // is being forfeited here, so it stays hidden and the player would get a
     // disabled control with no explanation and two checkboxes that do nothing.
     // An untagged corpse already shows no section; this matches it.
     const container = document.createElement('div');
     const onHarvest = vi.fn();
-    renderCorpseHarvestPicker(container, corpseHarvestView(['claw', 'tusk'], new Set()), {
+    renderCorpseHarvestPicker(container, corpseHarvestView(['gills', 'horn'], new Set()), {
       onHarvest,
       attachTooltip: () => {},
     });
@@ -252,7 +255,7 @@ describe('renderCorpseHarvestPicker: a selection that forfeits every yield (#250
     // unmapped families still draws its section, so this is the predicate and
     // not the painter refusing everything.
     const mixed = document.createElement('div');
-    renderCorpseHarvestPicker(mixed, corpseHarvestView(['hide', 'tusk', 'meat'], new Set()), {
+    renderCorpseHarvestPicker(mixed, corpseHarvestView(['hide', 'horn', 'meat'], new Set()), {
       onHarvest,
       attachTooltip: () => {},
     });
@@ -284,28 +287,29 @@ describe('renderCorpseHarvestPicker: a selection that forfeits every yield (#250
   });
 
   it('still submits on a MIXED corpse carrying the same unmapped families', () => {
-    // The discriminator for the case above: wild_boar's real tags carry tusk
-    // beside hide and meat, so the button lives and the pick goes through.
-    const t = render(['hide', 'tusk', 'meat'], []);
+    // The discriminator for the case above: a template carrying horn beside
+    // hide and meat (e.g. the Temple's gills/horn-tagged fixtures use the same
+    // shape), so the button lives and the pick goes through.
+    const t = render(['hide', 'horn', 'meat'], []);
     expect(t.btn.disabled).toBe(false);
-    t.toggle('tusk');
-    // tusk alone forfeits every yield: that is the #2509 arm, with its line.
+    t.toggle('horn');
+    // horn alone forfeits every yield: that is the #2509 arm, with its line.
     expect(t.btn.disabled).toBe(true);
     expect(t.warning.hidden).toBe(false);
     t.toggle('hide');
     expect(t.btn.disabled).toBe(false);
     expect(t.warning.hidden).toBe(true);
     t.btn.click();
-    expect(t.onHarvest).toHaveBeenLastCalledWith(['hide', 'tusk']);
+    expect(t.onHarvest).toHaveBeenLastCalledWith(['hide', 'horn']);
   });
 
   it('registers the tooltip exactly once, however many times the selection changes', () => {
     // Hud.attachTooltip binds a fresh listener set per call, so re-attaching
     // per toggle would stack them silently.
-    const t = render(GREYJAW, ['hide']);
+    const t = render(PALECOIL, ['hide']);
     t.toggle('hide');
-    t.toggle('claw');
-    t.toggle('claw');
+    t.toggle('horn');
+    t.toggle('horn');
     expect(t.attachTooltip.mock.calls.filter(([target]) => target === t.btn)).toHaveLength(1);
   });
 
@@ -316,10 +320,10 @@ describe('renderCorpseHarvestPicker: a selection that forfeits every yield (#250
   // carries and the #2509 refusal above stays reachable from the shipped
   // picker.
   it('marks the rows with no item behind them, and leaves them checkable', () => {
-    const t = render(GREYJAW, []);
+    const t = render(PALECOIL, []);
     const rows = [...t.container.querySelectorAll<HTMLElement>('.corpse-harvest-row')];
     expect(rows).toHaveLength(3);
-    // Only claw is marked, and it is marked in TEXT, not colour alone.
+    // Only horn is marked, and it is marked in TEXT, not colour alone.
     expect(rows.map((r) => r.classList.contains('corpse-harvest-row-no-yield'))).toEqual([
       false,
       false,
@@ -332,13 +336,13 @@ describe('renderCorpseHarvestPicker: a selection that forfeits every yield (#250
     // Still a live control: the sim ignores it either way, so the picker must
     // not pretend it cannot be pressed, and the pick still goes over the wire
     // verbatim (the sim boundary is what interprets it, never the client).
-    const claw = t.boxes.find((b) => b.value === 'claw')!;
-    expect(claw.disabled).toBe(false);
+    const horn = t.boxes.find((b) => b.value === 'horn')!;
+    expect(horn.disabled).toBe(false);
     t.toggle('hide');
-    t.toggle('claw');
+    t.toggle('horn');
     expect(t.btn.disabled).toBe(false);
     t.btn.click();
-    expect(t.onHarvest).toHaveBeenLastCalledWith(['hide', 'claw']);
+    expect(t.onHarvest).toHaveBeenLastCalledWith(['hide', 'horn']);
     // ...and checking it ALONE is still the #2509 refusal, which is the state a
     // filtered row list would have made unreachable from this picker.
     t.toggle('hide');
@@ -351,10 +355,10 @@ describe('renderCorpseHarvestPicker: a selection that forfeits every yield (#250
     // as two separate labelled nodes. The visible note is aria-hidden and the
     // whole sentence lives in the checkbox's own label, which is also why it is
     // a separate key and not the base label with a clause appended.
-    const t = render(GREYJAW, []);
+    const t = render(PALECOIL, []);
     const label = (tag: string) => t.boxes.find((b) => b.value === tag)?.getAttribute('aria-label');
     expect(label('hide')).toBe('Harvest Hide');
-    expect(label('claw')).toBe('Harvest Claw: nothing yet');
+    expect(label('horn')).toBe('Harvest Horn: nothing yet');
     const note = t.container.querySelector<HTMLElement>('.corpse-harvest-note')!;
     expect(note.getAttribute('aria-hidden')).toBe('true');
     // WCAG 2.2 SC 2.5.3, Label in Name: the accessible name must CONTAIN the
@@ -363,10 +367,10 @@ describe('renderCorpseHarvestPicker: a selection that forfeits every yield (#250
     // as a second literal, so it holds in every locale: the aria key takes the
     // mark as a {note} placeholder rather than restating it, which is what
     // makes that structural instead of a translator convention.
-    expect(label('claw')).toContain(note.textContent);
+    expect(label('horn')).toContain(note.textContent);
     // ...and the row's visible name is still in there too, so the containment
     // above cannot be satisfied by a label that dropped the component.
-    expect(label('claw')).toContain('Claw');
+    expect(label('horn')).toContain('Horn');
   });
 
   it('marks nothing on an all-mapped corpse', () => {
@@ -381,7 +385,7 @@ describe('renderCorpseHarvestPicker: a selection that forfeits every yield (#250
     // The retired concentrateHint said "fewer CHOSEN components", which the new
     // rule makes false in both directions on a mixed corpse: checking one more
     // unmapped row lowers nothing and unchecking one raises nothing.
-    const t = render(GREYJAW, []);
+    const t = render(PALECOIL, []);
     expect(t.container.querySelector('.corpse-harvest-hint')?.textContent).toBe(
       'The fewer components a harvest takes, the higher the tier of each.',
     );
@@ -392,31 +396,31 @@ describe('renderCorpseHarvestPicker: a selection that forfeits every yield (#250
     // computed and no painter read before this. It must follow the SIM's bonus,
     // not a box count: on this corpse the widest pick already carries a bonus,
     // so naming both mapped families is not a concentrate and naming one is.
-    const t = render(GREYJAW, []);
+    const t = render(PALECOIL, []);
     const section = t.container.querySelector<HTMLElement>('.corpse-harvest')!;
     expect(section.classList.contains('is-concentrated')).toBe(false);
     t.toggle('hide');
     expect(section.classList.contains('is-concentrated')).toBe(true);
     // Ticking the unmapped box changes nothing, which is the whole ruling seen
     // from the client: the sim scores this pick exactly as it scores ['hide'].
-    t.toggle('claw');
+    t.toggle('horn');
     expect(section.classList.contains('is-concentrated')).toBe(true);
     // The discriminating state, and the reason this case exists: naming both
     // MAPPED families is the widest pick this corpse offers, so it is not a
     // concentrate even though only two of the three boxes are checked. The
     // retired box-count definition called exactly this a concentrate, so a
     // painter still keyed off a count reds right here.
+    t.toggle('horn');
     t.toggle('claw');
-    t.toggle('fang');
-    expect(t.boxes.filter((b) => b.checked).map((b) => b.value)).toEqual(['hide', 'fang']);
+    expect(t.boxes.filter((b) => b.checked).map((b) => b.value)).toEqual(['hide', 'claw']);
     expect(section.classList.contains('is-concentrated')).toBe(false);
     // Checking every box is the same world again, by the same rule.
-    t.toggle('claw');
+    t.toggle('horn');
     expect(section.classList.contains('is-concentrated')).toBe(false);
     // ...and a dead pick is never "concentrated", though its raw bonus is the
     // whole tag count.
     t.toggle('hide');
-    t.toggle('fang');
+    t.toggle('claw');
     expect(t.btn.disabled).toBe(true);
     expect(section.classList.contains('is-concentrated')).toBe(false);
   });

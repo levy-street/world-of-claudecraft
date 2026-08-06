@@ -20,7 +20,7 @@ import { groundHeight, WATER_LEVEL, waterLevelAt } from '../src/sim/world';
 const SEED = 20061;
 
 function ride(x: number, z: number): number {
-  return Math.max(groundHeight(x, z, SEED), waterLevelAt(x, z));
+  return Math.max(groundHeight(x, z, SEED), waterLevelAt(x, z, SEED));
 }
 
 describe('the world edges end in coast, not cliff', () => {
@@ -70,7 +70,7 @@ describe('the world edges end in coast, not cliff', () => {
           const r = ride(x, z);
           if (prev !== null) {
             const rise = Math.abs(r - prev);
-            const wl = waterLevelAt(x, z);
+            const wl = waterLevelAt(x, z, SEED);
             const shoreRooted = Math.min(r, prev) < wl + 3;
             if (rise > MAX_RISE_PER_2YD && shoreRooted && r > wl + 0.05 && prev > wl + 0.05) {
               bad.push(`${name} t=${t} d=${d}: rise ${rise.toFixed(1)}`);

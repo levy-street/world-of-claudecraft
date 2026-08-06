@@ -359,6 +359,17 @@ const FLOATING: ClipMap = {
   death: 'Death',
 };
 
+// The elemental family's own attack (scripts/build_elemental_anims.mjs, issue
+// #2889): FLOATING's Headbutt/Punch is shared by reference across 9 unrelated
+// families (a fire elemental, a ghost, a dragon, a flying demon imp among
+// them). This clip is baked off golelingevolved.glb's own donor poses (a
+// forward lunge plus its two unused gesture clips), so only mob_elemental
+// gets it; the other 8 FLOATING families are untouched.
+const ELEMENTAL_FLOATING: ClipMap = {
+  ...FLOATING,
+  attack: ['Elemental_Attack'],
+};
+
 // 2023 enemy rig variant with a bite attack and no run clip (yeti)
 const ENEMY_BITE: ClipMap = {
   idle: 'Idle',
@@ -847,7 +858,49 @@ export const VISUALS: Record<string, VisualDef> = {
   player_mage: {
     url: `${PLAYERS}/mage.glb`,
     height: HUMANOID_H,
-    clips: kaykit(['2H_Melee_Attack_Chop']),
+    clips: {
+      ...kaykit(['2H_Melee_Attack_Chop']),
+      // Ability-specific spellcasts (scripts/build_mage_ability_anims.mjs,
+      // issue #2889): the mage had zero attackByAbility overrides across its
+      // kit, so every spell played the same melee chop. Mapped by school
+      // (src/sim/content/classes.ts) to the school's signature spells;
+      // Polymorph names its own clip (the one ability the clip is written
+      // for by name), and the point-blank AoE bursts (Frost Nova, Arcane
+      // Explosion, Dragon's Breath) share Cast_Nova's "slam and radiate
+      // outward" read regardless of school. Not every ability in the kit is
+      // listed: this is the first batch's representative slice, not
+      // exhaustive coverage (utility/buff/summon abilities keep the default
+      // chop until a later batch).
+      attackByAbility: {
+        fireball: 'Cast_Fire',
+        scorch: 'Cast_Fire',
+        fire_blast: 'Cast_Fire',
+        pyroblast: 'Cast_Fire',
+        combustion: 'Cast_Fire',
+        meteor: 'Cast_Fire',
+        flamestrike: 'Cast_Fire',
+        fireball_form: 'Cast_Fire',
+        frostbolt: 'Cast_Frost',
+        ice_lance: 'Cast_Frost',
+        frozen_orb: 'Cast_Frost',
+        blizzard: 'Cast_Frost',
+        glacial_spike: 'Cast_Frost',
+        ice_barrier: 'Cast_Frost',
+        arcane_missiles: 'Cast_Arcane',
+        arcane_surge: 'Cast_Arcane',
+        arcane_intellect: 'Cast_Arcane',
+        temporal_barrier: 'Cast_Arcane',
+        temporal_echo: 'Cast_Arcane',
+        temporal_cascade: 'Cast_Arcane',
+        frost_nova: 'Cast_Nova',
+        arcane_explosion: 'Cast_Nova',
+        dragons_breath: 'Cast_Nova',
+        polymorph: 'Cast_Polymorph',
+      },
+    },
+    // Ability-specific spellcast clips (scripts/build_mage_ability_anims.mjs):
+    // a mesh-free clip donor GLB baked off this rig's own spellcasting poses.
+    animUrls: [`${PLAYERS}/mage_ability_anims.glb`],
     // The hat and cape render regardless of this list: the current mage.glb
     // rigs every accessory as a SkinnedMesh, and the show allowlist
     // (assets.ts) only hides non-skinned nodes. The hatted silhouette is the
@@ -1336,7 +1389,10 @@ export const VISUALS: Record<string, VisualDef> = {
     url: `${CREATURES}/golelingevolved.glb`,
     height: 2.2,
     hover: 0.3,
-    clips: FLOATING,
+    clips: ELEMENTAL_FLOATING,
+    // Elemental_Attack clip donor (scripts/build_elemental_anims.mjs):
+    // mesh-free, baked off this same rig's own poses.
+    animUrls: [`${CREATURES}/elemental_ability_anims.glb`],
     tint: 'entity',
     tintStrength: 0.4,
   },

@@ -58,8 +58,17 @@ export function isFullSuiteTrigger(p) {
   const base = n.includes('/') ? n.slice(n.lastIndexOf('/') + 1) : n;
   if (FULL_SUITE_TRIGGER_RE.test(base)) return true;
   // Vitest setup/global-setup and the shared test helpers change behavior for
-  // every file that runs, so they can never be narrowed either.
+  // every file that runs, so they can never be narrowed either. NESTED helper
+  // directories too (tests/server/helpers/), excluding the test files that
+  // merely live beside the fakes: a changed test runs itself through the
+  // ordinary test bucket, and promoting it to everything is pure waste.
+  // Nested FIXTURE dirs (tests/server/fixtures/) deliberately stay inert: the
+  // golden corpus is huge, endpoint PRs regenerate it routinely, and every
+  // consuming suite reaches its fixtures through fs and therefore rides the
+  // always-run floor (verified against the real classifier; a future
+  // fixture-importing GRAPH test would be the thing to revisit here).
   if (n.startsWith('tests/helpers/') || n.startsWith('tests/fixtures/')) return true;
+  if (/^tests\/.+\/helpers\//.test(n) && !isTestPath(n)) return true;
   if (/^tests\/(global_setup|jsdom_local_storage_setup)\.[cm]?ts$/.test(n)) return true;
   return false;
 }

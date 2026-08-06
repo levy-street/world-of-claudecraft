@@ -1175,16 +1175,25 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     requiredItems: ['copper_mining_pick'],
     completionEffect: { type: 'attunePair', mode: 'new', pairId: 'weaponcrafting+armorcrafting' },
   },
+  // STALE-OVERLAY NOTE (docs/i18n-scaling/translation-workflow.md, "Rewording an
+  // existing English value"): the giver text and objectives.0.label for this key
+  // were reworded (mob display names webwood spider -> Sableweb Lurker) without a
+  // matching overlay re-fill. The status registry has no staleness detection yet
+  // (srcHash/enHash comparison is dormant), so translated locales keep rendering
+  // the OLD mob name and the release-tier pending gate will NOT catch it. Flagging
+  // here for the next maintainer i18n-locale-fill pass to re-do
+  // entities.quests.q_prof_attune_outfitter.{text,objectives.0.label} in every
+  // locale overlay.
   q_prof_attune_outfitter: {
     id: 'q_prof_attune_outfitter',
     name: "The Outfitter's Measure",
     giverNpcId: 'weaver_ottilie',
     turnInNpcId: 'weaver_ottilie',
-    text: 'Measure the cost before you cut, that is the first rule at my loom. Choose me and Leatherworking and Tailoring become your two majors, the pair you may carry beyond rare work; the craft opposite them settles in as your hobby, taken to rare and left there. The trades you set aside are not unravelled, $N, only folded away, dormant until you take them up again. Be certain, though: should you leave this pair and later want it back, the way home is paid in labor that lengthens each time, five culled at first, then eight, then eleven, always a little more. If your mind is made, cull four webwood spiders and bring their silk to the loom, for good thread starts every good garment.',
+    text: 'Measure the cost before you cut, that is the first rule at my loom. Choose me and Leatherworking and Tailoring become your two majors, the pair you may carry beyond rare work; the craft opposite them settles in as your hobby, taken to rare and left there. The trades you set aside are not unravelled, $N, only folded away, dormant until you take them up again. Be certain, though: should you leave this pair and later want it back, the way home is paid in labor that lengthens each time, five culled at first, then eight, then eleven, always a little more. If your mind is made, cull four Sableweb Lurkers and bring their silk to the loom, for good thread starts every good garment.',
     completionText:
       'Even thread, even hand. Leatherworking and Tailoring are yours to carry as far as your skill will reach. Measure twice, and they will not fail you.',
     objectives: [
-      { type: 'kill', targetMobId: 'webwood_spider', count: 4, label: 'Webwood Spider culled' },
+      { type: 'kill', targetMobId: 'webwood_spider', count: 4, label: 'Sableweb Lurker culled' },
     ],
     xpReward: 150,
     copperReward: 0,
@@ -1254,16 +1263,19 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
       pairId: 'weaponcrafting+armorcrafting',
     },
   },
+  // STALE-OVERLAY NOTE: same reword-without-refill gap as q_prof_attune_outfitter
+  // above (webwood spider -> Sableweb Lurker), needs an i18n-locale-fill pass for
+  // entities.quests.q_prof_amends_outfitter.{text,objectives.0.label}.
   q_prof_amends_outfitter: {
     id: 'q_prof_amends_outfitter',
     name: 'Threads Rejoined',
     giverNpcId: 'weaver_ottilie',
     turnInNpcId: 'weaver_ottilie',
-    text: 'Back at my loom after all. I hold no grudge, $N, but the thread remembers a hand that let it go, and the cost of taking it up again is measured out longer each time. Cull the webwood spiders crowding the eastern woods, and the labor will settle your hands before they touch good silk again.',
+    text: 'Back at my loom after all. I hold no grudge, $N, but the thread remembers a hand that let it go, and the cost of taking it up again is measured out longer each time. Cull the Sableweb Lurkers crowding the eastern woods, and the labor will settle your hands before they touch good silk again.',
     completionText:
       'Steady again. Leatherworking and Tailoring return to your hands as majors. Measure twice this time before you wander.',
     objectives: [
-      { type: 'kill', targetMobId: 'webwood_spider', count: 5, label: 'Webwood Spider culled' },
+      { type: 'kill', targetMobId: 'webwood_spider', count: 5, label: 'Sableweb Lurker culled' },
     ],
     xpReward: 100,
     copperReward: 0,
@@ -1290,16 +1302,19 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     resolvedObjectiveCounts: 'archetypeAmends',
     completionEffect: { type: 'attunePair', mode: 'return', pairId: 'alchemy+cooking' },
   },
+  // STALE-OVERLAY NOTE: same reword-without-refill gap as q_prof_attune_outfitter
+  // above (tunnel rat -> Deeprock Digger), needs an i18n-locale-fill pass for
+  // entities.quests.q_prof_amends_bombardier.{text,objectives.0.label}.
   q_prof_amends_bombardier: {
     id: 'q_prof_amends_bombardier',
     name: 'The Ledger Grows',
     giverNpcId: 'tinker_gizzel',
     turnInNpcId: 'tinker_gizzel',
-    text: 'You came BACK, ha, they always come back, the loud stuff has a pull, yes? No sulking from me, $N, but the ledger, oh the ledger, it grows every time you skip out, more each return, that is only fair. Go clear the tunnel rats out of the dig for me, sweat first, sparks later, that is the rule I just made up.',
+    text: 'You came BACK, ha, they always come back, the loud stuff has a pull, yes? No sulking from me, $N, but the ledger, oh the ledger, it grows every time you skip out, more each return, that is only fair. Go clear the Deeprock Diggers out of the dig for me, sweat first, sparks later, that is the rule I just made up.',
     completionText:
       'THERE it is, the itch is back in your hands. Engineering and Alchemy, majors again, go on, go make a bang. Try to stay put this time, eh?',
     objectives: [
-      { type: 'kill', targetMobId: 'tunnel_rat', count: 5, label: 'Tunnel Rat exterminated' },
+      { type: 'kill', targetMobId: 'tunnel_rat', count: 5, label: 'Deeprock Digger exterminated' },
     ],
     xpReward: 100,
     copperReward: 0,

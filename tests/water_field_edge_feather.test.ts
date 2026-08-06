@@ -75,7 +75,13 @@ describe('interactive water field edge', () => {
     // waveSampleAt writes `wave` as an out param, so it must be called in its
     // own statement: reading wave.r in the same expression is undefined in GLSL.
     expect(vert).toMatch(/float waveW = uWaveEnabled \* waveSampleAt\(pos\.xz, wave\);/);
-    expect(vert).toMatch(/pos\.y \+= wave\.r \* waveW;/);
+    // The lift also rides the baked shore gate (depthFade, see aSwellGate): the
+    // field clamps to +/- 0.65 yards and this was once the only displacement
+    // term with no depth gate at all, so a wake beside a beach raised the sheet
+    // over the sand. The weight and the gate are both required here; only the
+    // fragment stage's use of the field is left ungated, deliberately, so a
+    // wake still SHADES right up to the waterline.
+    expect(vert).toMatch(/pos\.y \+= wave\.r \* waveW \* depthFade;/);
     expect(frag).toMatch(/waveSlope = wave\.ba \* waveW/);
     expect(frag).toMatch(/waveEnergy = .*\* waveW/);
     view.dispose();

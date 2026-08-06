@@ -7,6 +7,7 @@ import {
 } from '../game/graphics_rebuild_core';
 import { safeStartupGraphicsPreset } from '../game/startup_graphics_safety';
 import { EFFECTS_QUALITY_LOW_CUTOFF } from '../game/ui_effects_profile';
+import { attachBiomeHaze } from './biome_haze_field';
 import { FAR_ANIM_RANGE_SCALE_MAX } from './crowd_lod';
 import { gfxAaPolicy } from './gfx_aa_policy_core';
 import { applyGfxOverridesFromSearch } from './gfx_override_core';
@@ -50,7 +51,11 @@ export function gfxTierAtLeast(tier: GfxTier, floor: GfxTier): boolean {
 // v20: High uses the reduced fixed-layer profile and the composer governor
 // consumes truthful logical-frame draw stats. Fleet dashboards segment these
 // semantics from the v19 relaxed scenery contract.
-export const GFX_CONFIG_VERSION = 20;
+// v21: round-12 per-effect Advanced dials (AA / bloom / AO / view distance /
+// water / character detail) join the derived profile: vistaTier and waterTier
+// become explicit settings fields and the post-chain per-effect flags follow
+// the dials rather than the effectsQuality bundle alone.
+export const GFX_CONFIG_VERSION = 21;
 
 export const GFX_BUCKET_IDS = [
   'resolution',
@@ -100,6 +105,14 @@ export interface GfxRuntimeHints {
   effectsQuality?: number;
   shadowQuality?: number;
   surfaceDetail?: number;
+  antiAliasing?: number;
+  bloomQuality?: number;
+  ambientOcclusion?: number;
+  viewDistance?: number;
+  waterQuality?: number;
+  characterDetail?: number;
+  dynamicLights?: number;
+  particleEffects?: number;
 }
 
 export interface GfxCapabilities {
@@ -214,6 +227,21 @@ export interface GfxSettings {
    * back to 1 on their own, so this is only the per-tier ceiling.
    */
   readonly farCharacterAnimScale: number;
+  /**
+   * The tier the far-field decision (`farFieldPolicy`) runs at: the profile
+   * tier everywhere except the Advanced preset, whose View Distance dial
+   * remaps it level by level. The capability laws (sprites need standard
+   * materials, the full foliage kit and an unconstrained memory ceiling; the
+   * vista needs sprites) still apply on top, so a constrained profile keeps
+   * its classic fog wall whatever this says.
+   */
+  readonly vistaTier: GfxTier;
+  /**
+   * The tier the camera-anchored water height field plans against
+   * (`waterFieldPlan`): the profile tier everywhere except the Advanced
+   * preset, whose Water Quality dial remaps it level by level.
+   */
+  readonly waterTier: GfxTier;
 }
 
 export interface GfxProfile {
@@ -1063,6 +1091,8 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
     // keep the straight-to-frozen far LOD.
     farCharacterAnimScale:
       tier === 'low' || constrainedMemory || nativeIosMemoryProfile ? 1 : FAR_ANIM_RANGE_SCALE_MAX,
+    vistaTier: tier,
+    waterTier: tier,
   };
   if (hints?.graphicsPreset === PRESET_ADVANCED) {
     // The Advanced custom mix maps each persisted sub-setting onto the SAME
@@ -1161,6 +1191,84 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
     else if (shadowLevel === 1)
       settings = { ...settings, shadowMap: 2560, terrainCastShadows: false };
     else if (shadowLevel === 3) settings = { ...settings, shadowMap: 8192 };
+    // Per-effect switches (round 12), layered AFTER Effects & Lighting and
+    // authoritative over its per-effect writes: Effects & Lighting stays the
+    // post-CHAIN master (its Low arm sheds the composer, and with no composer
+    // there is no pass to run these on, so the whole block is skipped there),
+    // while these dials own the individual passes. A pre-round-12 mix stores
+    // no values for them, so each dial's absent default DERIVES from the
+    // stored effectsQuality and reproduces the old bundle byte for byte. The
+    // AA dial can only DISABLE what the device policy grants (a memory-tight
+    // profile whose policy is 'none' never gains a tail pass from it), and
+    // Ambient Occlusion Full is how an Advanced mix reaches the full-res AO
+    // the ultra/insane tiers run.
+    if (settings.composer) {
+      const aoDial =
+        hints.ambientOcclusion ?? (effectsValue >= EFFECTS_QUALITY_LOW_CUTOFF ? 0.5 : 0);
+      const bloomDial = hints.bloomQuality ?? (effectsValue >= 0.75 ? 1 : 0);
+      const aaDial = hints.antiAliasing ?? (effectsValue >= 0.75 ? 1 : 0);
+      settings = {
+        ...settings,
+        ao: aoDial >= 0.25,
+        aoFullRes: aoDial >= 0.75,
+        bloom: bloomDial >= 0.5,
+        smaa: aaPolicy.postAa === 'smaa' && aaDial >= 0.5,
+      };
+    }
+    // View Distance / Water Quality: whole-tier remaps for the two subsystems
+    // that plan against a tier (the far-field policy still applies its own
+    // capability laws on top). Level 0/1/2/3 climbs low / medium / high, then
+    // the top rung each ladder actually distinguishes: the vista's insane 8yd
+    // grid (high and ultra share one plan), the water field's ultra 128 cells.
+    const vistaLevel = levelOf(hints.viewDistance ?? 1);
+    settings = {
+      ...settings,
+      vistaTier:
+        vistaLevel === 0
+          ? 'low'
+          : vistaLevel === 1
+            ? 'medium'
+            : vistaLevel === 2
+              ? 'high'
+              : 'insane',
+    };
+    const waterLevel = levelOf(hints.waterQuality ?? 1);
+    settings = {
+      ...settings,
+      waterTier:
+        waterLevel === 0
+          ? 'low'
+          : waterLevel === 1
+            ? 'medium'
+            : waterLevel === 2
+              ? 'high'
+              : 'ultra',
+    };
+    // Character Detail: Off collapses distant rigs straight to the frozen far
+    // mesh; On keeps the base profile's animated far band (never raised above
+    // the profile ceiling, so constrained devices stay collapsed either way).
+    if ((hints.characterDetail ?? 1) < 0.5) settings = { ...settings, farCharacterAnimScale: 1 };
+    // Dynamic Lights: Low keeps the constrained-device point-light pool
+    // (fewer live torches and night lights), never raised above the base.
+    if ((hints.dynamicLights ?? 1) < 0.5)
+      settings = { ...settings, maxPointLights: Math.min(settings.maxPointLights, 3) };
+    // Particle Effects: narrow the governable vfx budget band. The governor's
+    // machinery is untouched; Medium stops it raising past the tier baseline,
+    // Low pins the band at its floor. Purely a band clamp, so a tier retune
+    // flows through unchanged.
+    const vfxLevel = hints.particleEffects ?? 1;
+    if (vfxLevel < 0.75) {
+      const band = settings.bucketBands.vfx;
+      const vfx =
+        vfxLevel < 0.25
+          ? { ...band, baseline: band.min, max: band.min }
+          : { ...band, max: band.baseline };
+      settings = {
+        ...settings,
+        bucketBands: { ...settings.bucketBands, vfx },
+        bucketBaselines: { ...settings.bucketBaselines, vfx: vfx.baseline },
+      };
+    }
   }
   return applyGfxOverridesFromSearch(settings, hints?.search ?? '');
 }
@@ -1261,6 +1369,14 @@ function runtimeHints(): GfxRuntimeHints {
     effectsQuality: storedNumericSetting('effectsQuality'),
     shadowQuality: storedNumericSetting('shadowQuality'),
     surfaceDetail: storedNumericSetting('surfaceDetail'),
+    antiAliasing: storedNumericSetting('antiAliasing'),
+    bloomQuality: storedNumericSetting('bloomQuality'),
+    ambientOcclusion: storedNumericSetting('ambientOcclusion'),
+    viewDistance: storedNumericSetting('viewDistance'),
+    waterQuality: storedNumericSetting('waterQuality'),
+    characterDetail: storedNumericSetting('characterDetail'),
+    dynamicLights: storedNumericSetting('dynamicLights'),
+    particleEffects: storedNumericSetting('particleEffects'),
   };
 }
 
@@ -1695,6 +1811,11 @@ export const gfxInternalsForTest = {
 export const sharedUniforms = {
   uTime: { value: 0 },
   uRimBoost: { value: 1 },
+  /** (player x, player z, dense blade-carpet radius): the paint-free ring the
+   *  terrain splat reads so painted blades never show under the real carpet.
+   *  Radius 0 (a tier with no carpet) leaves the paint everywhere. Written by
+   *  the renderer each frame beside uTime. */
+  uCarpetRing: { value: new THREE.Vector3(0, 0, 0) },
 };
 
 // The one sun. Everything that needs the sun's position/direction (key light,
@@ -1811,6 +1932,10 @@ export function surfaceMat(opts: SurfaceMatOpts): THREE.Material {
         side: opts.side ?? THREE.FrontSide,
       });
   if (opts.rim && GFX.standardMaterials) addRimGlow(mat);
+  // Every surfaceMat surface takes the distant-zone air (compile-time no-op
+  // on tiers without a field): props and buildings at range must haze with
+  // the ground under them or the effect reads as nothing.
+  attachBiomeHaze(mat);
   matCache.set(key, mat);
   return mat;
 }

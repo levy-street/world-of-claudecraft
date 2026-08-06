@@ -561,8 +561,8 @@ function warlockPet(): Scenario {
 
 // P1a pet-AI tick: the slice paths the existing hunter_pet / warlock_pet goldens
 // leave UNPINNED. A warlock imp (a petRanged demon) runs the petRangedAttack
-// imp-bolt arm (the crit roll + AP-scaled fire damage, distinct from the shared
-// updateRangedPetAttack a ranged_dps petSpell mob uses, which hunter_pet covers); a
+// imp-bolt arm (the resist roll + crit roll + AP-scaled fire damage, distinct from the
+// shared updateRangedPetAttack a ranged_dps petSpell mob uses, which hunter_pet covers); a
 // voidwalker melee pet with NO pre-set target acquires one via petPickTarget
 // (aggressive auto-pull) then closes, auto-taunts, and mobSwings while keeping the
 // OWNER inCombat (the PET_COMBAT_LINGER coupling); and finally both pets drop their
@@ -574,7 +574,7 @@ function petAi(): Scenario {
     name: 'pet_ai',
     coverage: [
       'class:hunter (pet owner)',
-      'petRangedAttack imp-bolt arm (petRanged crit roll + AP-scaled fire damage)',
+      'petRangedAttack imp-bolt arm (petRanged resist roll + crit roll + AP-scaled fire damage)',
       'petPickTarget aggressive auto-pull',
       'updatePet melee arm: close + auto-taunt + mobSwing (PET_COMBAT_LINGER owner inCombat)',
       'petFollow heel transition (pets return to a moved owner)',
@@ -588,7 +588,8 @@ function petAi(): Scenario {
       beef(p);
 
       // Emberkin (petRanged demon): pre-targeted on a beefed wolf inside bolt range so
-      // updatePet runs the petRangedAttack arm (crit roll + AP-scaled fire damage).
+      // updatePet runs the petRangedAttack arm (resist roll + crit roll + AP-scaled
+      // fire damage; the resist BRANCH itself is pinned by pet_ranged_resist.test.ts).
       const imp = spawnMob(sim, 'emberkin', 12, p.pos.x + 2, p.pos.y, p.pos.z);
       imp.ownerId = p.id;
       imp.hostile = false;

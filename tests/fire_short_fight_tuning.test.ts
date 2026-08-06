@@ -29,15 +29,30 @@
 // fight-long damage, pinned by the sustained block at 60s and 120s plus the
 // Ignite contract at duration (pre-fix, sustained fire ran 2.2x-2.9x frost
 // at every duration and Ignite was 46% of all damage).
-import { describe, expect, it } from 'vitest';
-import { ABILITIES, ITEMS, MOBS } from '../src/sim/data';
+import { afterAll, describe, expect, it } from 'vitest';
+import { ABILITIES, BUILTIN_WORLD, ITEMS, MOBS, setActiveWorldContent } from '../src/sim/data';
 import { createMob, type PlayerEquipment, recalcPlayerStats } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
-import type { Entity } from '../src/sim/types';
+import type { Entity, WorldContent } from '../src/sim/types';
 
 const FIGHT_SECONDS = 27; // the reported Nythraxis kill length
 const SHORT_FIGHT_DPS_CEILING = 1.6; // x the sustained comparator, 27s window
 const SHORT_FIGHT_DPS_FLOOR = 1.0; // the nerf must not gut the burst identity
+
+// Measure combat, not ambient-world construction. Keeping the real class,
+// items, mobs and terrain while removing unrelated spawn/layout collections
+// gives every balance sample a stable RNG stream as the shipped world evolves.
+const FIRE_TEST_WORLD: WorldContent = {
+  ...BUILTIN_WORLD,
+  camps: [],
+  npcs: {},
+  groundObjects: [],
+  roads: [],
+};
+
+// Measurements are built while describe blocks are collected, before hooks run.
+setActiveWorldContent(FIRE_TEST_WORLD);
+afterAll(() => setActiveWorldContent(null));
 
 // BiS mage gear (owner direction 2026-07-25, gear-candidate sim): the
 // reported live loadout's sets (Soulflame 4pc + Mournweave 3pc) with every
@@ -62,22 +77,17 @@ const BIS_GEAR: PlayerEquipment = {
 type Spec = 'fire' | 'frost';
 type Rows = Record<number, string>;
 
-// The strongest talent build the 2026-07-24 Monte Carlo sweep found (rows
-// 5/8/11 are throughput-neutral, verified by the sweep): Racing Mind's extra
-// instant Pyrelance, Elemental Convergence fed by a free instant Icebind
-// weave, and Rune of Power under the whole opener. The talented ceiling
-// gate below runs THIS build; a naked-spec pin alone would miss it.
-// (BiS re-sweep 2026-07-25: at heroic gear the top burst builds swap
-// Convergence for a dead r17 within seed noise, ~280 vs ~276 mean, because
-// the Icebind weave's GCD costs more than the surge pays at high spell
-// power. This build stays the gate's pin: representative within 2% of the
-// strongest, and the sanity ceiling holds 35% headroom over either.)
+// Strongest heroic-gear talent build from the 2026-07-25 re-sweep (rows 5/8/11
+// are throughput-neutral): Racing Mind's extra instant Pyrelance and Rune of
+// Power under the whole opener. At this gear, Convergence's Icebind weave costs
+// more GCD throughput than its surge returns, so the build takes the neutral
+// Cold Snap row. The isolated combat fixture keeps that comparison stable.
 const TOP_TALENTED_ROWS: Rows = {
   5: 'mag_r5_ice_floes',
   8: 'mag_r8_warded',
   11: 'mag_r11_twin_nova',
   14: 'mag_r14_presence_of_mind',
-  17: 'mag_r17_convergence',
+  17: 'mag_r17_cold_snap',
   20: 'mag_r20_rune_of_power',
 };
 
@@ -99,7 +109,12 @@ interface CtxLike {
 }
 
 function gearedMage(spec: Spec, seed = 41, rows?: Rows): { sim: Sim; p: Entity } {
-  const sim = new Sim({ seed, playerClass: 'mage', autoEquip: true });
+  const sim = new Sim({
+    seed,
+    playerClass: 'mage',
+    autoEquip: true,
+    world: FIRE_TEST_WORLD,
+  });
   sim.setPlayerLevel(20);
   if (rows) expect(sim.applyTalents({ spec, rows } as never)).toBe(true);
   else expect(sim.setSpec(spec)).toBe(true);
@@ -328,11 +343,19 @@ describe('the tuned knobs (balance 2026-07-25, designer round)', () => {
     expect(ABILITIES.fire_blast.maxCharges).toBe(3);
     expect(ABILITIES.fire_blast.cooldown).toBe(30);
   });
+
+  it('pins the five-percent Pyrelance lift that restores sustained parity', () => {
+    expect(ABILITIES.pyroblast.effects).toEqual([
+      { type: 'directDamage', min: 179, max: 236 },
+      { type: 'dot', total: 50, duration: 12, interval: 2 },
+    ]);
+  });
 });
 
 // The Monte Carlo talent sweep (2026-07-24) showed the naked-spec pin above
-// is not the real ceiling: row 14/17/20 actives (Racing Mind, Convergence,
-// Rune of Power) stack multiplicatively on the trance loop. Designer round
+// is not the real ceiling: row 14/20 actives (Racing Mind and Rune of Power)
+// stack multiplicatively on the trance loop; the strongest heroic build takes
+// the throughput-neutral Cold Snap row at 17. Designer round
 // (2026-07-25): the burst window IS the fire identity (dump the Cinderfall
 // bank inside Phoenix Trance, chain free Pyrelances), so the burst is not
 // held to the fight-long line; it gets a SANITY ratio ceiling versus the
@@ -362,7 +385,7 @@ describe('talented burst window (Monte Carlo 2026-07-24, designer round 2026-07-
   it('reports the talented burst numbers (owner harness)', () => {
     const per = fire.map((r, k) => `${CEILING_SEEDS[k]}:${r.dps.toFixed(1)}`).join(' ');
     console.log(
-      `\n[fire talented burst] racing+convergence+rune, mean=${mean.toFixed(1)} frost=${frostMean.toFixed(1)} ratio=${(mean / frostMean).toFixed(2)} [${per}]`,
+      `\n[fire talented burst] racing+cold-snap+rune, mean=${mean.toFixed(1)} frost=${frostMean.toFixed(1)} ratio=${(mean / frostMean).toFixed(2)} [${per}]`,
     );
     expect(fire.length).toBe(CEILING_SEEDS.length);
   });
@@ -407,13 +430,12 @@ describe('sustained parity, entire fight (Monte Carlo follow-up 2026-07-24)', ()
   // balance; widening the pool is the fix, never discounting the floor.
   //
   // Sweep on this tree, talented fire vs talented frost mean DPS over the pool:
-  // 60s reads 208.8 vs 189.6 and 120s reads 212.5 vs 193.0, both ratio 1.10, so
-  // the parity floor clears by 10 points at each duration and the 1.25 ceiling by
-  // 15. Seeds 3 (both durations) and 1 (60s alone) sit BELOW parity on their own
-  // and stay in: the assertion is a claim about the MEAN, and dropping a pool's
-  // unlucky members is the seed-shopping a rule-defined pool exists to prevent
-  // (tests/chronomancy_balance.test.ts keeps its own sub-target seed for the same
-  // reason).
+  // The exact sweep values are recorded by the reporting test below. Both
+  // durations must clear parity and remain below the 1.25 ceiling. Individual
+  // seeds can sit below parity and stay in: the assertion is a claim about the
+  // mean, and dropping a pool's unlucky members would be seed-shopping.
+  // Seeds 3 and 1 have historically been those low-side members and stay in,
+  // just as tests/chronomancy_balance.test.ts keeps its own sub-target seed.
   const SUSTAINED_SEEDS = Array.from({ length: 10 }, (_, i) => i + 1);
   const SUSTAINED_CEILING = 1.25; // x talented frost, per duration
   // Owner ruling 2026-07-25: frost is the PvP-leaning spec, so fire must
@@ -468,8 +490,8 @@ describe('sustained parity, entire fight (Monte Carlo follow-up 2026-07-24)', ()
     // Paid Ignite over the full buffed rotation must not exceed what the
     // crits banked (40% each). Rounding can add fractions of a point per
     // tick, end-of-fight truncation loses the tail, so the healthy reading
-    // sits just under 1.0; the pre-fix double-dip read ~1.05-1.2 with Rune
-    // and Convergence running. Reuses the 120s runs measured above: re-running
+    // sits just under 1.0; the pre-fix Convergence sweep read ~1.05-1.2 with
+    // the double-dip active. Reuses the 120s runs measured above: re-running
     // sims inside the test body blew the 5s test timeout on loaded CI shards.
     const paid = at120.ignitePaid;
     const banked = at120.igniteBanked;

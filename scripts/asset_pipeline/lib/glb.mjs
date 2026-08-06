@@ -400,6 +400,11 @@ export async function normalizeWeapon(
 
 /** Normalize a generated prop GLB: base at y=0, centered XZ, world-unit height,
  *  optional yaw (radians) so the front/opening faces +Z. */
+export function propNormalizeVariant({ height, rotateYDeg = 0, maxTex = 512 }) {
+  const clean = (value) => String(value).replace(/[^a-zA-Z0-9_-]/g, '_');
+  return `r${clean(rotateYDeg)}_h${clean(height)}_t${clean(maxTex)}`;
+}
+
 export async function normalizeProp(inPath, outPath, { height, rotateY = 0, maxTex } = {}) {
   if (!height || height <= 0) throw new Error('normalizeProp needs a world-unit --height');
   const doc = await openGlb(inPath);

@@ -1041,6 +1041,35 @@ describe('Guide deeds cross-page surfaces', () => {
   });
 });
 
+// Five shipped keybound features (Professions, Target Buffs and Debuffs, Dungeon Finder,
+// Mount/Dismount, Sheathe) were entirely absent from the controls reference table. Each row
+// mirrors the game's real default bind (src/game/keybinds.ts), so a changed shipped default
+// reds this test instead of silently drifting the public reference.
+describe('Guide controls reference completeness', () => {
+  it('documents Professions, Target Buffs/Debuffs, Dungeon Finder, Mount, and Sheathe', () => {
+    setLanguage('en');
+    const html = controlsPage.render({
+      params: [],
+      sub: 'reference/controls',
+      titleKey: 'guide.nav.controls',
+    });
+    expect(html).toContain('<kbd>Shift+P</kbd></td><td>Professions</td>');
+    expect(html).toContain('<kbd>Shift+J</kbd></td><td>Target buffs and debuffs</td>');
+    expect(html).toContain('<kbd>Shift+I</kbd></td><td>Dungeon Finder</td>');
+    expect(html).toContain('<kbd>`</kbd></td><td>Mount / Dismount</td>');
+    expect(html).toContain('<kbd>Z</kbd></td><td>Sheathe/Unsheathe Weapon</td>');
+  });
+
+  it('keeps those five binds in step with the game defaults', () => {
+    const defaults = new Map(BIND_ACTIONS.map((a) => [a.id, a.defaults]));
+    expect(defaults.get('professions')).toEqual(['Shift+KeyP']);
+    expect(defaults.get('targetAuras')).toEqual(['Shift+KeyJ']);
+    expect(defaults.get('dungeonFinder')).toEqual(['Shift+KeyI']);
+    expect(defaults.get('mount')).toEqual(['Backquote']);
+    expect(defaults.get('sheathe')).toEqual(['KeyZ']);
+  });
+});
+
 // The bestiary, class, warlock, and gallery pages show a pre-rendered still
 // (public/guide-stills) as the default image of each figure. The generator bakes a `still`
 // URL for every figure with a model; these guards fail the build if a figure is missing its
@@ -1672,7 +1701,13 @@ describe('Guide professions gathering accuracy', () => {
         d.trigger.markIds.length > 0 &&
         d.trigger.markIds.every((m) => m.startsWith('gather:')),
     );
-    const words: Record<number, string> = { 5: 'five', 6: 'six', 7: 'seven', 8: 'eight' };
+    const words: Record<number, string> = {
+      5: 'five',
+      6: 'six',
+      7: 'seven',
+      8: 'eight',
+      12: 'twelve',
+    };
     const castWord = words[firstCast.length];
     expect(castWord, `unmapped first-cast count ${firstCast.length}`).toBeDefined();
     expect(guideStrings.profPages.gatherDeeds.fishing).toContain(

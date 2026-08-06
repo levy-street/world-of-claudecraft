@@ -18,7 +18,7 @@ export function placeAtHarvestSpot(sim: Sim, pid: number, nodeId: string): void 
   if (!p) throw new Error(`missing entity ${pid}`);
   const seed = sim.cfg.seed;
   const swimDeep = (x: number, z: number) =>
-    groundHeight(x, z, seed) < waterLevelAt(x, z) - PLAYER_SWIM_DEPTH;
+    groundHeight(x, z, seed) < waterLevelAt(x, z, seed) - PLAYER_SWIM_DEPTH;
   let spot = { x: node.pos.x, z: node.pos.z };
   if (swimDeep(spot.x, spot.z)) {
     outer: for (let d = 0.5; d <= 4.5; d += 0.5) {

@@ -14,10 +14,11 @@
 // and which rod it takes to cast there at all, live in professions/fishing_zones.ts.
 // Draw contract: a normal session draws one rng
 // value at cast start (the bite delay) and one more at a landed reel (the
-// table); a miss stays at one; the codfather reel draws nothing (early
-// return); a bags-full reel still draws the table (capacity gates after the
-// roll). Band selection is pure state, not a draw, and every deny arm is
-// draw-free.
+// table); a miss stays at one, as does an early reel (a pre-bite re-press
+// ends the session empty, the anti-spam arm in startFishing); the codfather
+// reel draws nothing (early return); a bags-full reel still draws the table
+// (capacity gates after the roll). Band selection is pure state, not a draw,
+// and every deny arm is draw-free.
 
 import { isActionLockingFormAuraKind } from '../combat/forms';
 import { FISHING_RARE_ID, FISHING_TABLES_BY_BAND, isRawCookingCatch } from '../content/items';
@@ -36,7 +37,7 @@ import {
   type ItemDef,
   isConsuming,
 } from '../types';
-import { groundHeight, waterLevelAt } from '../world';
+import { groundHeight, isInWaterBody, waterLevel } from '../world';
 import { rodTierRequiredForZone } from './fishing_zones';
 import { queueGatheringGrant } from './gathering';
 import { PROFICIENCY_BAND_THRESHOLDS, proficiencyBandFor } from './proficiency_bands';
@@ -85,6 +86,16 @@ export const FISH_BITE_DELAY_MAX_SEC = 8;
 export const FISH_BITE_DELAY_ROD_REDUCTION_SEC = 1.5;
 export const FISH_REEL_WINDOW_SEC = 2.5;
 export const FISH_REEL_WINDOW_ROD_BONUS_SEC = 0.75;
+
+// The early-reel grace (the double-press guard): a re-press inside the first
+// second of a session falls through to the ordinary busy denial instead of
+// ending the cast, so a bag double-click, a held key's auto-repeat, or a pad
+// interact press right on the heels of the cast cannot silently burn the
+// session. MUST stay strictly under FISH_BITE_DELAY_MIN_SEC: were the grace
+// to reach the earliest possible bite, presses inside it would be free all
+// the way to an armed reel window and the spam-click exploit would reopen
+// (the derivation is pinned in tests/professions_fishing.test.ts).
+export const FISH_EARLY_REEL_GRACE_SEC = 1;
 
 // What a ROD's own rarity adds to the window, per rung above common (the
 // shared ladder, tools.ts rarityLadderIndex). The land tools' rarity buys
@@ -255,7 +266,13 @@ export function fishingCatchGainAt(proficiency: number, isJunk: boolean, zoneTie
  *  (src/render/fishing_bobber_core.ts) deliberately mirrors the same ring
  *  and depth rule with its own allocation-free walk (render per-frame
  *  discipline); tests/fishing_bobber_core.test.ts pins the two walks in
- *  lockstep so they cannot drift. Pure and draw-free. */
+ *  lockstep so they cannot drift. Pure and draw-free.
+ *
+ *  DECLARED water bodies only, by design: the open sea became swimmable
+ *  with the water overhaul (waterLevelAt answers a finite surface there),
+ *  but the ocean stays unfishable, so this walk gates on isInWaterBody
+ *  rather than waterLevelAt (tests/fishing_zones.test.ts pins the seaward
+ *  deny). Author fishable sea water and both walks change together. */
 export function firstFishableSampleAhead(
   x: number,
   z: number,
@@ -267,7 +284,8 @@ export function firstFishableSampleAhead(
   for (const d of FISHING_SAMPLE_DISTANCES) {
     const sx = x + sin * d;
     const sz = z + cos * d;
-    const water = waterLevelAt(sx, sz);
+    if (!isInWaterBody(sx, sz)) continue;
+    const water = waterLevel();
     if (groundHeight(sx, sz, seed) < water - SWIM_DEPTH) return { x: sx, z: sz, water };
   }
   return null;
@@ -313,8 +331,10 @@ export function startFishing(ctx: SimContext, p: Entity, meta: PlayerMeta): void
   // isSwimming reads), with self-movement cancelling and every landed hit,
   // blocked or fully absorbed, cancelling too. A future displacement that
   // omits that clamp must either keep it or re-check the swim gate here.
-  // A re-press BEFORE the bite or AFTER
-  // the deadline falls through to the busy error below.
+  // A re-press BEFORE the bite ends the session empty (the early-reel arm
+  // below), except inside the first FISH_EARLY_REEL_GRACE_SEC where it stays
+  // the busy denial (the double-press guard); a re-press AFTER the deadline
+  // falls through to the busy error (the miss arm owns that tick).
   // Boundary contract (pinned): the reel is valid while ctx.tickCount <=
   // fishReelDeadlineTick; the miss fires at deadline + 1 in the tick phase.
   if (
@@ -331,6 +351,53 @@ export function startFishing(ctx: SimContext, p: Entity, meta: PlayerMeta): void
     // Cleared AFTER completeFishing on purpose: the completion reads the
     // pinned zone for the table and the deed credit.
     p.fishCastZoneId = '';
+    return;
+  }
+  // The early reel: a pole re-press during one's own session BEFORE the bite
+  // (fishBiteAtTick is still armed; the bite arm zeroes it when it fires)
+  // pulls the line in empty and ends the session. This arm is what keeps the
+  // bite a reaction test: it used to fall through to the free busy no-op
+  // below, which made spam-pressing a guaranteed catch, since one press
+  // always fell inside the armed reel window while every earlier press cost
+  // nothing. Now a press either answers the bite (the reel arm above) or
+  // ends the cast, so spamming casts and cancels forever and never lands a
+  // fish. Hoisted ABOVE the combat denial for the same reason the reel arm
+  // is: were the denial to win, an in-combat spammer would keep the free
+  // no-ops and the exploit. Fully self-guarded (only a LIVE pre-bite fishing
+  // session of one's own passes; the parity drives that direct-assign
+  // castingAbility leave fishBiteAtTick 0 and keep the busy denial), and
+  // draw-free on every path: the session's one bite-delay draw is simply
+  // abandoned, zoneId/band resolve from pure state like the miss arm's.
+  // Costs nothing but the ended cast; recast immediately.
+  //
+  // The grace: inside the first FISH_EARLY_REEL_GRACE_SEC of the session a
+  // re-press falls through to the ordinary denials below (busy, or combat)
+  // instead of ending the cast, so an accidental double-press never burns
+  // the session. Session age is the count of elapsed casting ticks read off
+  // the castTotal/castRemaining pair (updateCasting subtracts DT once per
+  // tick; the half-tick epsilon keeps the float accumulation from moving
+  // the boundary tick). Safe against the exploit because the grace ends two
+  // full seconds before the earliest possible bite: every press a spammer
+  // lands past it still cancels long before a window can arm. NOTE the age
+  // clock counts CASTING ticks (updateCasting calls) while fishBiteAtTick
+  // counts absolute ticks; they stay in lockstep only because no live
+  // fishing session can skip an updateCasting call today. If casting can
+  // ever pause while a session stays live, re-derive this age off
+  // ctx.tickCount (a stored cast-start tick) instead.
+  if (
+    p.castingAbility === FISHING_CAST_ID &&
+    p.fishBiteAtTick > 0 &&
+    p.castTotal - p.castRemaining >= FISH_EARLY_REEL_GRACE_SEC - DT / 2
+  ) {
+    const zoneId = p.fishCastZoneId || zoneAt(p.pos.x, p.pos.z).id;
+    const band = effectiveFishingBand(meta);
+    p.castingAbility = null;
+    p.castRemaining = 0;
+    p.fishBiteAtTick = 0;
+    p.fishReelDeadlineTick = 0;
+    p.fishCastZoneId = '';
+    ctx.emit({ type: 'fishingEarlyReel', pid: p.id, zoneId, band });
+    ctx.emit({ type: 'castStop', entityId: p.id, success: false });
     return;
   }
   if (p.inCombat) {
@@ -408,7 +475,7 @@ export function startFishing(ctx: SimContext, p: Entity, meta: PlayerMeta): void
   // zoneAt SATURATES at the world edges (any z past the north end resolves
   // to the northmost zone), and instanced spaces are laid out along z, so a
   // dungeon slot would inherit whatever zone its origin lands in. Harmless
-  // today because waterLevelAt returns -Infinity outside a declared lake and
+  // today because the probe walk accepts declared water bodies only and
   // every lake is in the overworld, so the water check above refuses first.
   // Author fishable water inside an instance and this needs a real answer.
   const probeZoneId = zoneAt(probe.x, probe.z).id;

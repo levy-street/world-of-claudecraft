@@ -152,48 +152,51 @@ describe('ModerationService', () => {
 
   it('applies persistent actions only after their DB write succeeds', async () => {
     vi.useFakeTimers();
-    vi.setSystemTime(new Date('2026-06-29T10:00:00Z'));
-    const actor = admin(1, 11);
-    const target = player(2, 22);
-    const context = setup({ actor, sessions: [target] });
+    try {
+      vi.setSystemTime(new Date('2026-06-29T10:00:00Z'));
+      const actor = admin(1, 11);
+      const target = player(2, 22);
+      const context = setup({ actor, sessions: [target] });
 
-    context.service.handleChatCommand(actor, '/mute "Player2" 5 spamming');
-    context.service.handleChatCommand(actor, '/suspend "Player2" 30 cheating');
-    context.service.handleChatCommand(actor, '/forcerename "Player2" offensive name');
-    await Promise.resolve();
-    await Promise.resolve();
+      context.service.handleChatCommand(actor, '/mute "Player2" 5 spamming');
+      context.service.handleChatCommand(actor, '/suspend "Player2" 30 cheating');
+      context.service.handleChatCommand(actor, '/forcerename "Player2" offensive name');
+      await Promise.resolve();
+      await Promise.resolve();
 
-    expect(context.muted).toEqual([
-      {
+      expect(context.muted).toEqual([
+        {
+          accountId: 22,
+          untilISO: '2026-06-29T10:05:00.000Z',
+          reason: 'spamming',
+        },
+      ]);
+      expect(context.suspend).toHaveBeenCalledWith({
         accountId: 22,
-        untilISO: '2026-06-29T10:05:00.000Z',
-        reason: 'spamming',
-      },
-    ]);
-    expect(context.suspend).toHaveBeenCalledWith({
-      accountId: 22,
-      adminAccountId: 11,
-      reason: 'cheating',
-      expiresAt: '2026-06-29T10:30:00.000Z',
-    });
-    expect(context.disconnected).toEqual([
-      { accountId: 22, reason: 'This account is suspended.' },
-      {
-        accountId: 22,
-        reason: 'A moderator requires one of your characters to be renamed.',
-      },
-    ]);
-    expect(context.forceRename).toHaveBeenCalledWith({
-      characterId: 522,
-      adminAccountId: 11,
-      reason: 'offensive name',
-    });
-    expect(context.systemNotices.map((notice) => notice.text)).toEqual([
-      'Muted Player2 for 5 minutes.',
-      'Suspended Player2 for 30 minutes.',
-      'Required Player2 to rename.',
-    ]);
-    vi.useRealTimers();
+        adminAccountId: 11,
+        reason: 'cheating',
+        expiresAt: '2026-06-29T10:30:00.000Z',
+      });
+      expect(context.disconnected).toEqual([
+        { accountId: 22, reason: 'This account is suspended.' },
+        {
+          accountId: 22,
+          reason: 'A moderator requires one of your characters to be renamed.',
+        },
+      ]);
+      expect(context.forceRename).toHaveBeenCalledWith({
+        characterId: 522,
+        adminAccountId: 11,
+        reason: 'offensive name',
+      });
+      expect(context.systemNotices.map((notice) => notice.text)).toEqual([
+        'Muted Player2 for 5 minutes.',
+        'Suspended Player2 for 30 minutes.',
+        'Required Player2 to rename.',
+      ]);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it('bans permanently without an expiry and disconnects the account', async () => {

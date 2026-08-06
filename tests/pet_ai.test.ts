@@ -190,7 +190,10 @@ describe('pet_ai module (P1a) — direct unit tests', () => {
       ev.some((e) => e.type === 'spellfx' && e.fx === 'projectile' && e.school === 'fire'),
     ).toBe(true);
     // The bolt's damage lands when it reaches the target (projectile_travel), not the
-    // tick it is hurled: advance until it connects.
+    // tick it is hurled: advance until it connects. The bolt now rolls spell resist
+    // on impact (tests/pet_ranged_resist.test.ts pins that arm); pin the hit roll to
+    // succeed so this test stays about the landing damage, not the resist draw.
+    sim.rng.chance = () => true;
     let landed = false;
     for (let i = 0; i < 20 && !landed; i++) {
       landed = (sim.tick() as Array<Record<string, any>>).some(
@@ -198,7 +201,7 @@ describe('pet_ai module (P1a) — direct unit tests', () => {
       );
     }
     expect(landed).toBe(true);
-    expect(target.hp).toBeLessThan(target.maxHp); // the bolt never misses (crit-only roll)
+    expect(target.hp).toBeLessThan(target.maxHp); // a landed bolt always damages
   });
 
   it('Water Jet is a real channel that slows, blocks bolts, and breaks out of range', () => {

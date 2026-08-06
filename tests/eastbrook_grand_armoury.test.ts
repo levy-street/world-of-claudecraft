@@ -70,7 +70,7 @@ function expectWalkableRoute(from: { x: number; z: number }, to: { x: number; z:
   expect(
     groundHeight(current.x, current.z, SEED),
     'route start is in deep water',
-  ).toBeGreaterThanOrEqual(waterLevelAt(current.x, current.z) - PLAYER_SWIM_DEPTH);
+  ).toBeGreaterThanOrEqual(waterLevelAt(current.x, current.z, SEED) - PLAYER_SWIM_DEPTH);
   expect(isBlocked(SEED, to.x, to.z, PLAYER_BODY_RADIUS), 'route destination is blocked').toBe(
     false,
   );
@@ -117,7 +117,7 @@ function expectWalkableRoute(from: { x: number; z: number }, to: { x: number; z:
     expect(
       nextGround,
       `deep-water route sample at ${resolved.x},${resolved.z}`,
-    ).toBeGreaterThanOrEqual(waterLevelAt(resolved.x, resolved.z) - PLAYER_SWIM_DEPTH);
+    ).toBeGreaterThanOrEqual(waterLevelAt(resolved.x, resolved.z, SEED) - PLAYER_SWIM_DEPTH);
     expect(
       (nextGround - previousGround) / Math.max(moved, Number.EPSILON),
       `route sample exceeds climb slope at ${resolved.x},${resolved.z}`,
@@ -484,7 +484,7 @@ describe('Eastbrook Grand Armoury gameplay preservation', () => {
     const points = [EASTBROOK_GRAND_ARMOURY.frontApproachWorld, NPCS.card_master.pos];
     for (const point of points) {
       expect(terrainHeight(point.x, point.z, SEED)).toBeGreaterThan(
-        waterLevelAt(point.x, point.z) - 0.8,
+        waterLevelAt(point.x, point.z, SEED) - 0.8,
       );
       expect(isBlocked(SEED, point.x, point.z, PLAYER_BODY_RADIUS)).toBe(false);
     }

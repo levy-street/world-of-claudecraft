@@ -3736,16 +3736,17 @@
     color: #fff;
     border-color: #c9a86a;
   }
-  /* day/night dial: a small satellite disc on the top-right rim of the minimap
-     (mirrors the #raid-lockout button placement), showing the 12h world cycle.
-     Purely informational, so it ignores pointer input. */
+  /* day/night dial: a satellite disc on the top-right rim of the minimap
+     (mirrors the #raid-lockout button placement), showing the world day/night
+     cycle. Sized to read at a glance; purely informational, so it ignores
+     pointer input. */
   #minimap-daynight {
     position: absolute;
-    top: 6px;
-    right: 6px;
+    top: 2px;
+    right: 2px;
     z-index: 3;
-    width: 30px;
-    height: 30px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
     border: 2px solid var(--border);
     background: #14141d;
@@ -4327,6 +4328,12 @@
   }
   #tooltip .tt-row .tt-armor.tt-armor-bad {
     color: #ff5040;
+  }
+  /* Unique-equipped tag (legendaries): sits in the same right-aligned seat as
+     the armor weight, in the soulbound gold. A rule cue, not a warning, so it
+     never takes the red bad-class treatment. */
+  #tooltip .tt-row .tt-unique {
+    color: var(--gold);
   }
   /* Weapon type (Sword/Dagger/Mace/...): its own plain line under the quality/kind
      line, above the slot. Keeps the muted tt-sub color, deliberately NOT brightened

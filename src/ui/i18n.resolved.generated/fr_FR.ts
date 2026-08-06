@@ -391,7 +391,8 @@ export const fr_FR: EnTranslations = {
     },
     "emoteEditor": {
       "title": "Emotes",
-      "done": "Terminé"
+      "done": "Terminé",
+      "close": "Close emotes"
     },
     "dailyRewards": {
       "title": "Récompenses quotidiennes",
@@ -1277,6 +1278,24 @@ export const fr_FR: EnTranslations = {
       "graphicsFatal": "Échec de la récupération graphique. Rechargez le jeu pour continuer.",
       "graphicsReload": "Recharger le jeu",
       "graphicsDraftChanged": "Les modifications graphiques sont prêtes à être appliquées.",
+      "gfxSectionQuality": "Quality",
+      "gfxSectionWorld": "World Detail",
+      "gfxSectionLighting": "Lighting & Effects",
+      "gfxSectionCamera": "Camera",
+      "gfxSectionDisplay": "Display",
+      "gfxSectionSystem": "System",
+      "gfxSectionTouch": "Touch Controls",
+      "gfxViewDistance": "View Distance",
+      "gfxWaterQuality": "Water Quality",
+      "gfxCharacterDetail": "Character Detail",
+      "gfxAmbientOcclusion": "Ambient Occlusion",
+      "gfxBloom": "Bloom",
+      "gfxAntiAliasing": "Anti-Aliasing",
+      "gfxDynamicLights": "Dynamic Lights",
+      "gfxParticleEffects": "Particle Effects",
+      "gfxHalf": "Half",
+      "gfxCustomNote": "Changing a dial switches the quality preset to Advanced: a custom mix built on the High-quality base, starting from the levels shown for your current preset.",
+      "gfxEffectsNote": "Ambient Occlusion, Bloom and Anti-Aliasing ride the post-processing chain: with Effects & Lighting on Low the chain is off and they have no effect.",
       "interfaceMode": "Mode d'interface",
       "interfaceModeAuto": "Auto",
       "interfaceModeDesktop": "Desktop",
@@ -1348,6 +1367,8 @@ export const fr_FR: EnTranslations = {
       "buttons": "Disposition des boutons",
       "resetButtons": "Réinitialiser la disposition des boutons",
       "menuAction": "Menu du jeu",
+      "zoomIn": "Zoom In",
+      "zoomOut": "Zoom Out",
       "help": "Le stick gauche déplace, le droit oriente la caméra. Ouvrez une fenêtre pour utiliser le pointeur à l'écran."
     },
     "perf": {
@@ -1576,6 +1597,7 @@ export const fr_FR: EnTranslations = {
     },
     "itemHeroicTag": "[HÉROÏQUE]",
     "itemSoulbound": "Lié à l’âme",
+    "itemUniqueEquipped": "Unique-Equipped",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -2552,6 +2574,7 @@ export const fr_FR: EnTranslations = {
       "catchLine": "Vous remontez : {name}",
       "biteLine": "Quelque chose mord à l'hameçon !",
       "gotAwayLine": "Il s'est échappé.",
+      "earlyReelLine": "You reel in too soon. Nothing had taken the bait.",
       "nodeName": {
         "ore": "Filon de minerai",
         "wood": "Bosquet de bois",
@@ -3145,7 +3168,8 @@ export const fr_FR: EnTranslations = {
         "raise_fallen": "Relever les morts (vagues périodiques de renforts)",
         "soul_rend": "Déchirement de l'âme (les joueurs marqués doivent s'écarter et être soignés)",
         "deathless_rage": "Fureur immortelle (interrompue aux pierres de garde)",
-        "wardstones": "Canaux des pierres de garde (transition de phase)"
+        "wardstones": "Canaux des pierres de garde (transition de phase)",
+        "dread_curse": "Dread Curse (heroic only, stacking tank-swap debuff)"
       }
     },
     "deeds": {
@@ -3553,16 +3577,21 @@ export const fr_FR: EnTranslations = {
       "groupInterface": "Interface",
       "groupCamera": "Caméra",
       "talents": "Talents",
+      "professions": "Professions",
       "arena": "Arène",
       "leaderboard": "Classement",
       "deeds": "Livre des hauts faits",
+      "sheathe": "Sheathe/Unsheathe Weapon",
       "crafting": "Artisanat",
       "valeCup": "Coupe du Val",
+      "mount": "Mount / Dismount",
       "calendar": "Calendrier des événements",
+      "dungeonFinder": "Dungeon Finder",
       "discord": "Discord",
       "abilities": "Utiliser les capacités de la barre d'action (la rangée de chiffres ; une seconde barre se trouve sur le pavé numérique)",
       "targetFriendly": "Cibler l'allié le plus proche",
       "cycleFriendly": "Cibler l'allié suivant",
+      "targetAuras": "Target buffs and debuffs",
       "gameMenu": "Ouvrir le menu et les options",
       "bothMouse": "Les deux boutons de la souris",
       "runForward": "Avancer",
@@ -4314,6 +4343,8 @@ export const fr_FR: EnTranslations = {
       "sourcesBody": "La plupart de vos premières améliorations sont des récompenses de quête, alors mieux vaut terminer les quêtes que de farmer. Les ennemis lâchent de l'équipement quand vous les vainquez, les marchands en ville vendent de bonnes bases, les artisans transforment les matériaux récoltés en pièces à porter, et le marché des joueurs vous permet d'acheter auprès d'autres aventuriers. Au sommet de la progression, deux monnaies de marques achètent un équipement introuvable ailleurs : les Marques de plongée auprès du gardien de plongée, et les Marques héroïques auprès de l'intendant héroïque.",
       "soulboundTitle": "Lié à l'âme : à vous et à vous seul",
       "soulboundBody": "Quelques récompenses spéciales sont liées à l'âme, attachées à votre personnage dès l'instant où vous les obtenez. Un objet lié à l'âme ne peut être échangé, envoyé par courrier, vendu à un marchand ni mis en vente sur le marché ; il est à vous et à vous seul. Aujourd'hui, cette protection couvre les jetons de récompense comme les Marques héroïques, tandis que l'équipement que vous remportez est à vous, libre à vous de l'échanger, de le vendre ou de le partager.",
+      "uniqueTitle": "Unique-Equipped: one legendary of a kind",
+      "uniqueBody": "Legendary items are unique-equipped: your character can wear only one copy of a given legendary at a time, and its heroic version counts as the same item. A second copy can ride in your bags, in the bank, or on the market, but trying to wear both at once is refused, and the tooltip carries a gold Unique-Equipped tag so you can see the rule before you plan a build around two of them.",
       "setsTitle": "Tenues et bonus de tenue",
       "setsBody": "Certaines armures se présentent en familles assorties, plusieurs pièces taillées pour s'accorder et combattre comme un tout. Portez-en assez d'une même famille à la fois et la tenue s'éveille, accordant des bonus qui s'ajoutent aux caractéristiques propres de chaque pièce, et plus vous en portez, plus elle se renforce. Quelques-unes de ces familles apparaissent comme des butins convoités au fil de votre montée en niveau ; les plus belles proviennent du contenu de groupe le plus exigeant près du niveau maximum, si bien que courir après une tenue complète est un objectif de fin de jeu classique.",
       "consumablesTitle": "Consommables",
@@ -4570,6 +4601,7 @@ export const fr_FR: EnTranslations = {
         "startBody": "Une Canne à pêche simple coûte 20 cuivres chez le Pêcheur Brandt à Eastbrook (cherchez le Vieux loup de mer à la lisière est de la ville, au bord de la route du Lac Miroir) ; Bricoleur Gizzel, l'Approvisionneur Hale à Fenbridge et la Quartier-maître Bree à Highwatch en tiennent aussi. Utilisez la canne face à une eau assez profonde pour abriter du poisson, jusqu'à environ 24 mètres devant vous, et votre bouchon part au loin.\n\nVous ne pouvez pas lancer en combat, en train de nager ou mort : lancer depuis la rive est la posture prévue. L'eau se durcit toutefois en même temps que la terre : le marais réclame au moins la Canne à moulinet de fer de palier 2 et les hauteurs la Canne du ruisseau d'argent de palier 3, et une ligne lancée sans la canne que cette eau exige ne quitte jamais votre main. Deux cannes se situent au-dessus, la Canne à moulinet d'orage et la Canne ouvrée par les marées : les ingénieurs les fabriquent à l'atelier d'outillage avec ce qu'une ligne remonte, et le comptoir de plongée de la Litanie noyée les vend contre des Marques de plongée derrière ses seuils de plongées réussies, mais jamais contre des pièces. Aucune eau ne les exige : elles achètent donc une attente plus courte et une fenêtre de remontée plus large plutôt qu'un accès, ce qui, à l'échelon le plus haut, signifie une touche en trois secondes tout rond.",
         "biteHeading": "Touche et remontée",
         "biteBody": "Après le lancer, la touche survient à un instant caché entre {min} et {max} secondes ; le délai est décidé au moment où la ligne se pose, si bien que deux lancers ne se ressemblent jamais tout à fait. Quand le bouchon plonge, vous disposez d'une fenêtre de {reel} secondes pour appuyer de nouveau sur la canne et remonter : remontez dans ce laps et la prise atterrit, hésitez au-delà et le poisson s'échappe sans rien laisser. Une session entière plafonne à {cap} secondes, même un lancer calme se résout donc vite.\n\nLes meilleures cannes affûtent les deux bouts du mini-jeu : chaque palier de canne au-dessus du premier retranche {rod} secondes à l'attente la plus longue possible, jamais en dessous du plancher de trois secondes que la canne la plus haute effleure déjà, et ajoute {reelRod} secondes à la fenêtre de remontée ; ainsi la Canne à moulinet de fer ramène la pire attente à 6,5 secondes avec une fenêtre de 3,25 secondes, et la Canne du ruisseau d'argent à 5 avec une fenêtre au-delà de 4, sa rareté élargissant la remontée un peu plus que ne le paie le palier seul. Les touches les plus rapides ne changent jamais, quoi que vous teniez, et il suffit qu'une canne soit dans vos sacs pour compter.",
+        "earlyReelNote": "One caution for eager thumbs: press the pole again before anything bites and you reel in an empty line, ending the cast (a moment of grace right after casting forgives an accidental double-press). Patience is the whole game: wait for the bite, then strike.",
         "scheduleHeading": "Progression de la maîtrise",
         "scheduleNote": "Le gain de Pêche suit un barème fixe, sans le moindre dé : un point plein par prise en dessous de 50 de maîtrise, un demi-point en dessous de 100, un dixième en dessous de 150, et un lent filet de 0,02 de 150 à 200. Ce dernier tronçon est un voyage de plusieurs milliers de prises, et c'est voulu : 200 est une déclaration, pas une halte sur la route vers autre chose.\n\nLa camelote cesse totalement d'enseigner à {cutoff} : à partir de là, les herbes et les bottes ne sont plus que des herbes et des bottes. L'eau elle-même plafonne aussi la leçon : les eaux de palier 1 du Val (et chaque jeune rivage au-delà du cœur du royaume) n'enseignent plus rien après 100, celles du marais s'arrêtent à 150, et seules celles de Thornpeak forment un pêcheur jusqu'à 200. Toute prise ramenée rapporte sinon au rythme prévu par le barème : quand le compteur cale, c'est le barème qui vous dit d'aller chercher des eaux plus profondes.",
         "colProficiency": "Compétence",
@@ -10305,6 +10337,15 @@ export const fr_FR: EnTranslations = {
       },
       "direfang_quiver": {
         "name": "Carquois de Direfang"
+      },
+      "sharp_claw": {
+        "name": "Sharp Claw"
+      },
+      "curved_tusk": {
+        "name": "Curved Tusk"
+      },
+      "pristine_claw": {
+        "name": "Pristine Claw"
       },
       "conjured_water4": {
         "name": "Eau de source invoquée"

@@ -119,7 +119,10 @@ describe('coverage: each scenario fires its subsystem', () => {
     const ev = rec.allEvents as Ev[];
     const impId = rec.notes.impId as number;
     const tankId = rec.notes.tankId as number;
-    // petRangedAttack: the emberkin's only damage path is the fire bolt (no miss roll).
+    // petRangedAttack: the emberkin's only damage path is the fire bolt (a resist
+    // roll then a crit roll; a resisted bolt emits kind:'resist', never 'miss').
+    // This scenario pins the resist DRAW's stream position via the rng digest; the
+    // resist BRANCH's behavior is pinned by tests/pet_ranged_resist.test.ts.
     expect(ev.some((e) => e.type === 'damage' && e.sourceId === impId && e.school === 'fire')).toBe(
       true,
     );

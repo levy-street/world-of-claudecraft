@@ -108,6 +108,14 @@ text-free personal bite SimEvent, and a server-authoritative reel window
 (`FISH_REEL_WINDOW_SEC` plus `FISH_REEL_WINDOW_ROD_BONUS_SEC` per rod tier
 above the first plus `FISH_REEL_WINDOW_RARITY_BONUS_SEC` per rarity rung
 above common); reel is re-pressing the pole. A miss costs only the cast.
+A re-press BEFORE the bite reels the line in empty and ends the session
+(the early-reel arm in `startFishing`, its own text-free `fishingEarlyReel`
+SimEvent and `woc_fishing_early_reels_total` series), except inside a short
+post-cast grace (`FISH_EARLY_REEL_GRACE_SEC`, strictly under
+`FISH_BITE_DELAY_MIN_SEC`) where it stays the plain busy denial so an
+accidental double-press cannot burn the cast. The early reel exists because
+a free pre-bite no-op made spam-pressing a guaranteed catch: one press
+always fell inside the armed window. Like a miss, it costs only the cast.
 The wire carries zero bite information (castRemaining decays uniformly), so a
 scripted client can react faster but can never learn the bite early or
 stretch the window: accepted by design, attention over reflexes. Catch

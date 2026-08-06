@@ -67,7 +67,7 @@ function expectPath(
     seed: SEED,
     bodyRadius,
     maxClimbSlope: PLAYER_MAX_CLIMB_SLOPE,
-    minGround: (x, z) => waterLevelAt(x, z) - PLAYER_SWIM_DEPTH,
+    minGround: (x, z) => waterLevelAt(x, z, SEED) - PLAYER_SWIM_DEPTH,
     maxSpan: 128,
   });
   expect(path.length, `${label} path`).toBeGreaterThan(0);

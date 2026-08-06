@@ -49,6 +49,20 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     quality: 'common',
     sellValue: 4,
   },
+  sharp_claw: {
+    id: 'sharp_claw',
+    name: 'Sharp Claw',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 5,
+  },
+  curved_tusk: {
+    id: 'curved_tusk',
+    name: 'Curved Tusk',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 5,
+  },
 
   // --- Pristine specimens (HARVEST_COMPONENT_SPECIMENS) --------------------
   // The signed jackpot a rare-or-better corpse-harvest rarity roll grants IN
@@ -75,6 +89,21 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     kind: 'junk',
     quality: 'rare',
     sellValue: 30,
+  },
+  // claw joins hide/silk/venomSac/meat with a specimen: fen_troll (claw, tusk)
+  // and old_greyjaw (hide, fang, claw) would otherwise carry TWO
+  // specimen-less families on one corpse (fang+claw, or claw+tusk), which
+  // breaks the capacity pre-gate's one-specimen-less-family-per-corpse
+  // premise (tests/corpse_harvest_sim.test.ts, "no corpse tags two
+  // specimen-less harvest families together"). tusk stays specimen-less,
+  // same as fang/cloth: it never shares a corpse with another specimen-less
+  // family once claw has its own.
+  pristine_claw: {
+    id: 'pristine_claw',
+    name: 'Pristine Claw',
+    kind: 'junk',
+    quality: 'rare',
+    sellValue: 25,
   },
   prime_cut: {
     id: 'prime_cut',

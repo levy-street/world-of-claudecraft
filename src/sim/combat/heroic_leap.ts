@@ -49,7 +49,7 @@ export function sweptLanding(ctx: SimContext, entity: Entity, aim: Vec3): Vec3 {
       const nextZ = fromZ + dz * progress;
       const step = Math.hypot(nextX - safeX, nextZ - safeZ);
       const nextGround = groundHeight(nextX, nextZ, ctx.cfg.seed);
-      if (nextGround < waterLevelAt(nextX, nextZ) - PLAYER_SWIM_DEPTH) break;
+      if (nextGround < waterLevelAt(nextX, nextZ, ctx.cfg.seed) - PLAYER_SWIM_DEPTH) break;
       if (
         nextGround > previousGround &&
         step > 1e-6 &&

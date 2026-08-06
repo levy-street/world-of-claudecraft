@@ -1,7 +1,7 @@
 // Chronomancy Phase 3 mechanics (docs/prd/mage-chronomancy.md 13.4 / 14): Aether
 // Surge (Oleada de éter), the single-target Arcane spender with per-caster Arcane
 // Charges. Each cast READS the charges held (scaling damage +30%/charge and cost
-// x1.9/charge), THEN banks one more (cap 4); the charge aura expires 10s after
+// x2/charge), THEN banks one more (cap 4); the charge aura expires 10s after
 // the last cast. Aether Darts (arcane_missiles) consumes every charge on its
 // first landed missile, splitting a flat Arcane bonus across the missiles.
 import { describe, expect, it } from 'vitest';
@@ -95,8 +95,9 @@ describe('Aether Surge charge multipliers (pure)', () => {
 });
 
 describe('Aether Surge cost at each charge level (resolvedAbility choke point)', () => {
-  it('the affordability/spend cost is base x1.9^charges, rounded', () => {
+  it('pins the tuned base and resolves affordability/spend at base x2^charges', () => {
     const base = ABILITIES.arcane_surge.cost; // provisional base, derived via harness
+    expect(base).toBe(14);
     const { sim, p } = chronoMage();
     for (let k = 0; k <= 4; k++) {
       p.auras = p.auras.filter((a) => a.id !== 'arcane_surge');

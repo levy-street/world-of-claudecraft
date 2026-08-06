@@ -391,7 +391,8 @@ export const id_ID: EnTranslations = {
     },
     "emoteEditor": {
       "title": "Emote",
-      "done": "Selesai"
+      "done": "Selesai",
+      "close": "Close emotes"
     },
     "dailyRewards": {
       "title": "Hadiah Harian",
@@ -1277,6 +1278,24 @@ export const id_ID: EnTranslations = {
       "graphicsFatal": "Pemulihan grafis gagal. Muat ulang game untuk melanjutkan.",
       "graphicsReload": "Muat Ulang Game",
       "graphicsDraftChanged": "Perubahan grafis siap diterapkan.",
+      "gfxSectionQuality": "Quality",
+      "gfxSectionWorld": "World Detail",
+      "gfxSectionLighting": "Lighting & Effects",
+      "gfxSectionCamera": "Camera",
+      "gfxSectionDisplay": "Display",
+      "gfxSectionSystem": "System",
+      "gfxSectionTouch": "Touch Controls",
+      "gfxViewDistance": "View Distance",
+      "gfxWaterQuality": "Water Quality",
+      "gfxCharacterDetail": "Character Detail",
+      "gfxAmbientOcclusion": "Ambient Occlusion",
+      "gfxBloom": "Bloom",
+      "gfxAntiAliasing": "Anti-Aliasing",
+      "gfxDynamicLights": "Dynamic Lights",
+      "gfxParticleEffects": "Particle Effects",
+      "gfxHalf": "Half",
+      "gfxCustomNote": "Changing a dial switches the quality preset to Advanced: a custom mix built on the High-quality base, starting from the levels shown for your current preset.",
+      "gfxEffectsNote": "Ambient Occlusion, Bloom and Anti-Aliasing ride the post-processing chain: with Effects & Lighting on Low the chain is off and they have no effect.",
       "interfaceMode": "Mode Antarmuka",
       "interfaceModeAuto": "Otomatis",
       "interfaceModeDesktop": "Desktop",
@@ -1348,6 +1367,8 @@ export const id_ID: EnTranslations = {
       "buttons": "Tata Letak Tombol",
       "resetButtons": "Atur Ulang Tata Letak Tombol",
       "menuAction": "Menu Game",
+      "zoomIn": "Zoom In",
+      "zoomOut": "Zoom Out",
       "help": "Tuas kiri untuk bergerak, tuas kanan untuk melihat. Buka jendela untuk memakai penunjuk di layar."
     },
     "perf": {
@@ -1576,6 +1597,7 @@ export const id_ID: EnTranslations = {
     },
     "itemHeroicTag": "[HEROIK]",
     "itemSoulbound": "Terikat Jiwa",
+    "itemUniqueEquipped": "Unique-Equipped",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -2552,6 +2574,7 @@ export const id_ID: EnTranslations = {
       "catchLine": "Kamu menarik: {name}",
       "biteLine": "Sesuatu menggigit umpannya!",
       "gotAwayLine": "Ikannya kabur.",
+      "earlyReelLine": "You reel in too soon. Nothing had taken the bait.",
       "nodeName": {
         "ore": "Urat Bijih",
         "wood": "Rumpun Kayu",
@@ -3145,7 +3168,8 @@ export const id_ID: EnTranslations = {
         "raise_fallen": "Bangkitkan Yang Gugur (gelombang bala bantuan berkala)",
         "soul_rend": "Robek Jiwa (pemain yang ditandai harus menyebar dan disembuhkan)",
         "deathless_rage": "Murka Abadi (diputus di wardstone)",
-        "wardstones": "Saluran Wardstone (transisi fase)"
+        "wardstones": "Saluran Wardstone (transisi fase)",
+        "dread_curse": "Dread Curse (heroic only, stacking tank-swap debuff)"
       }
     },
     "deeds": {
@@ -3553,16 +3577,21 @@ export const id_ID: EnTranslations = {
       "groupInterface": "Antarmuka",
       "groupCamera": "Kamera",
       "talents": "Bakat",
+      "professions": "Professions",
       "arena": "Arena",
       "leaderboard": "Papan Peringkat",
       "deeds": "Kitab Jasa",
+      "sheathe": "Sheathe/Unsheathe Weapon",
       "crafting": "Kriya",
       "valeCup": "Piala Lembah",
+      "mount": "Mount / Dismount",
       "calendar": "Kalender Acara",
+      "dungeonFinder": "Dungeon Finder",
       "discord": "Discord",
       "abilities": "Gunakan kemampuan action bar (deretan angka; bilah kedua ada di numpad)",
       "targetFriendly": "Targetkan kawan terdekat",
       "cycleFriendly": "Putar target kawan",
+      "targetAuras": "Target buffs and debuffs",
       "gameMenu": "Buka menu permainan dan opsi",
       "bothMouse": "Kedua Tombol Mouse",
       "runForward": "Lari maju",
@@ -4314,6 +4343,8 @@ export const id_ID: EnTranslations = {
       "sourcesBody": "Sebagian besar peningkatan awalmu adalah hadiah misi, jadi lebih menguntungkan menuntaskan misi daripada menggerus musuh. Musuh menjatuhkan perlengkapan saat kamu mengalahkannya, penjaja di kota menjual barang dasar yang andal, perajin mengubah bahan yang dikumpulkan menjadi potongan yang bisa dikenakan, dan pasar pemain memungkinkanmu membeli dari petualang lain. Di puncak bukit, dua mata uang tanda membeli perlengkapan yang tak ditemukan di tempat lain: Tanda Delve pada penjaga delve, dan Tanda Heroik pada Kepala Perbekalan Heroik.",
       "soulboundTitle": "Soulbound: milikmu dan hanya milikmu",
       "soulboundBody": "Beberapa hadiah istimewa bersifat soulbound, terikat pada karaktermu sejak saat kamu meraihnya. Barang soulbound tak bisa ditukar, dikirim lewat pos, dijual ke penjaja, atau didaftarkan di pasar; ia milikmu dan hanya milikmu. Saat ini perlindungan itu menjaga token hadiah seperti Tanda Heroik, sementara perlengkapan yang kamu menangkan bebas kamu tukar, jual, atau bagikan.",
+      "uniqueTitle": "Unique-Equipped: one legendary of a kind",
+      "uniqueBody": "Legendary items are unique-equipped: your character can wear only one copy of a given legendary at a time, and its heroic version counts as the same item. A second copy can ride in your bags, in the bank, or on the market, but trying to wear both at once is refused, and the tooltip carries a gold Unique-Equipped tag so you can see the rule before you plan a build around two of them.",
       "setsTitle": "Set dan bonus set",
       "setsBody": "Sebagian zirah hadir dalam keluarga yang serasi, beberapa potongan yang dirancang untuk tampak dan bertarung sebagai satu kesatuan. Kenakan cukup banyak dari satu keluarga sekaligus dan set itu pun bangkit, memberi bonus di atas stat tiap potongannya, dan makin banyak potongan yang kamu kenakan makin kuat jadinya. Beberapa keluarga semacam itu muncul sebagai jarahan berharga selagi kamu naik level; yang terhebat di antaranya berasal dari konten kelompok paling tangguh di dekat batas level, jadi memburu satu set lengkap adalah tujuan babak akhir yang klasik.",
       "consumablesTitle": "Barang Pakai Habis",
@@ -4570,6 +4601,7 @@ export const id_ID: EnTranslations = {
         "startBody": "Joran Pancing Sederhana berharga 20 tembaga dari Nelayan Brandt di Eastbrook (cari sang Pelaut Tua di tepi timur kota, di dekat jalan menuju Danau Cermin); Perajin Gizzel, Penyedia Bekal Hale di Fenbridge, dan Kepala Perbekalan Bree di Highwatch juga menyetok joran. Gunakan joran sambil menghadap air yang cukup dalam untuk menampung ikan, hingga sekitar 24 yard di depanmu, dan pelampungmu pun melayang keluar.\n\nKamu tidak bisa melempar saat bertarung, saat berenang, atau saat mati: melempar dari tepian adalah sikap yang dimaksudkan. Namun air menjadi lebih keras seiring daratannya: rawa menuntut setidaknya Joran gulungan besi tingkat 2 dan puncak-puncak menuntut Joran arus perak tingkat 3, dan kail yang dilempar tanpa joran yang diminta air itu tidak akan pernah lepas dari tanganmu. Dua joran duduk di atas keduanya, Stormreel dan Tidewrought: para insinyur membuatnya di bengkel alat dari apa yang ditarik kail, dan konter delve Litani Tenggelam menjualnya dengan Tanda Delve di balik gerbang penuntasannya, meski tidak pernah dengan koin. Tidak ada air yang meminta keduanya, jadi mereka membeli tunggu yang lebih pendek dan jendela penarikan yang lebih lebar alih-alih akses, yang pada anak tangga teratas berarti gigitan dalam tepat tiga detik.",
         "biteHeading": "Gigitan dan penarikan",
         "biteBody": "Setelah lemparan, gigitan datang pada saat tersembunyi antara {min} dan {max} detik; jedanya ditentukan ketika kail mendarat, jadi tidak ada dua lemparan yang terasa persis sama. Saat pelampung menggigit kamu punya jendela {reel} detik untuk menekan joran lagi dan menarik: tarik di dalam jendela itu dan tangkapan mendarat, ragu melewatinya dan ikan itu kabur tanpa meninggalkan apa pun. Satu sesi utuh dibatasi {cap} detik, sehingga bahkan lemparan yang sepi pun selesai dengan cepat.\n\nJoran yang lebih baik mempertajam kedua ujung minigame ini: setiap tingkat joran di atas yang pertama memangkas {rod} detik dari tunggu terlama yang mungkin, tidak pernah di bawah lantai tiga detik yang sudah disenggol joran teratas, dan menambah {reelRod} detik pada jendela penarikan, sehingga Joran gulungan besi menurunkan tunggu terburuk menjadi 6,5 detik dengan jendela 3,25 detik, dan Joran arus perak menjadi 5 dengan jendela lewat 4, kelangkaannya melebarkan penarikan sedikit di luar apa yang dibayar tingkatnya saja. Gigitan tercepat tidak pernah berubah apa pun yang kamu pegang, dan sebuah joran cukup berada di tasmu untuk dihitung.",
+        "earlyReelNote": "One caution for eager thumbs: press the pole again before anything bites and you reel in an empty line, ending the cast (a moment of grace right after casting forgives an accidental double-press). Patience is the whole game: wait for the bite, then strike.",
         "scheduleHeading": "Perolehan keahlian",
         "scheduleNote": "Perolehan memancing mengikuti jadwal tetap tanpa lemparan dadu: satu poin penuh per tangkapan di bawah kecakapan 50, setengah poin di bawah 100, sepersepuluh di bawah 150, dan tetesan lambat 0,02 dari 150 ke 200. Rentang terakhir itu memang sengaja menjadi perjalanan ribuan tangkapan: 200 adalah sebuah pernyataan, bukan persinggahan menuju sesuatu yang lain.\n\nRongsokan berhenti mengajar sepenuhnya di {cutoff}: sejak titik itu, rumput air dan sepatu bot hanyalah rumput air dan sepatu bot. Airnya sendiri juga membatasi pelajaran: perairan tingkat 1 milik Lembah (dan setiap pesisir muda di luar tanah inti) tidak mengajarkan apa pun setelah 100, perairan rawa berhenti di 150, dan hanya perairan Thornpeak yang mendidik seorang pemancing sepanjang jalan ke 200. Selain itu setiap tangkapan yang mendarat memberi perolehan sesuai laju jadwalnya, jadi ketika penghitung mandek, jadwal itu sedang menyuruhmu mencari air yang lebih dalam.",
         "colProficiency": "Keahlian",
@@ -10305,6 +10337,15 @@ export const id_ID: EnTranslations = {
       },
       "direfang_quiver": {
         "name": "Tabung Panah Direfang"
+      },
+      "sharp_claw": {
+        "name": "Sharp Claw"
+      },
+      "curved_tusk": {
+        "name": "Curved Tusk"
+      },
+      "pristine_claw": {
+        "name": "Pristine Claw"
       },
       "conjured_water4": {
         "name": "Air Mata Air Sihir"

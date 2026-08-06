@@ -78,8 +78,9 @@ it('the shipped world seed is pinned to its literal', () => {
 // a declared water body, so a dry sunken feature (the Mirefen impact crater is
 // one) stays legal exactly as isInWaterBody documents. The two predicates WERE
 // separated by the v0.32.0 expansion's coastal starter kits: seven shipped
-// expansion nodes sit below the global line (down to 3.6yd under it on the
-// Wickharbor cove floor) while passing this declared-water screen, which is
+// expansion nodes sat below the global line (down to 3.6yd under it on the
+// Wickharbor cove floor, whose two nodes moved ashore at the v0.34.0 merge)
+// while passing this declared-water screen, which is
 // why the world-plane check is now its own arm below (the sea-plane arm and
 // its exemption pin) rather than a claim in this comment. Measured headroom on
 // the shipped content when this margin landed: the tightest passing node
@@ -96,7 +97,7 @@ const REACH = INTERACT_RANGE;
 
 /** Height the local water surface sits at, or -Infinity where no water is declared. */
 function waterAt(x: number, z: number): number {
-  return waterLevelAt(x, z);
+  return waterLevelAt(x, z, WORLD_SEED);
 }
 
 /** True where the ground is high enough above any declared water to be dry land. */
@@ -405,23 +406,20 @@ describe('gather node placement: every node sits on ground a player can work', (
   const seaFreeboardAt = (x: number, z: number): number =>
     groundHeight(x, z, WORLD_SEED) - waterLevel();
 
-  // The seven shipped violators, pinned with the road-band exemption's logic:
-  // the set records a decision (these ship submerged or near-submerged today;
-  // relocating seven expansion starter nodes is zone-4-pass content work, not
-  // a side effect of a guard landing), and a NEW violation must be a human
-  // adding to this list rather than a silent drift. Measured freeboards at
-  // the pin: herb_galecrest_1 -3.60 and ore_galecrest_2 -3.40 (the Wickharbor
-  // cove floor), herb_farshore_isle_2 -1.37, wood_farshore_isle_1 -0.97,
-  // ore_frostveil_2 -0.49, ore_willowfen_1 +0.65, wood_evergarden_2 +0.50.
-  const SEA_PLANE_EXEMPT = [
-    'herb_farshore_isle_2',
-    'herb_galecrest_1',
-    'ore_frostveil_2',
-    'ore_galecrest_2',
-    'ore_willowfen_1',
-    'wood_evergarden_2',
-    'wood_farshore_isle_1',
-  ];
+  // The shipped violators, pinned with the road-band exemption's logic: the
+  // set records a decision (these ship near-submerged today; relocating
+  // expansion starter nodes is zone-4-pass content work, not a side effect
+  // of a guard landing), and a NEW violation must be a human adding to this
+  // list rather than a silent drift. Measured freeboards at the pin (after the
+  // waterline rose 0.2 to -4.3): ore_frostveil_2 -0.69, ore_willowfen_1 +0.45,
+  // wood_evergarden_2 +0.30.
+  // Four former members retired at the release/v0.34.0 merge: open-sea swim
+  // made the world sea real water, which turned herb_galecrest_1 (-3.60),
+  // ore_galecrest_2 (-3.40), herb_farshore_isle_2 (-1.37) and
+  // wood_farshore_isle_1 (-0.97) from render-only violations into nodes a
+  // player cannot stand at (or whose harvest disc dips to swim depth), so
+  // all four moved ashore instead of staying exempt.
+  const SEA_PLANE_EXEMPT = ['ore_frostveil_2', 'ore_willowfen_1', 'wood_evergarden_2'];
 
   it('sea plane: every node clears the WORLD water surface by the prop freeboard', () => {
     for (const node of GATHER_NODES) {
@@ -434,23 +432,25 @@ describe('gather node placement: every node sits on ground a player can work', (
     }
   });
 
-  it('the sea-plane exemption set holds exactly the seven shipped violators', () => {
+  it('the sea-plane exemption set holds exactly the shipped violators', () => {
     // Both directions at once: a new sub-margin node reds (it is not in the
     // list), and a relocated exemption reds too (the list would then name a
     // node that no longer violates, and the exemption must be retired with
-    // the fix rather than mask the next violator). Edge note (the QA round):
-    // the tightest PASSING node is ore_palmreach_1 at 1.012yd of freeboard,
-    // 0.012 above the margin, so a Palmreach-coast terrain touch is the
-    // likeliest next arrival here; that failure means terrain moved under a
-    // node, not that this pin broke.
+    // the fix rather than mask the next violator). Edge note: when the
+    // waterline rose 0.2 to -4.3, the four tightest passers (the three
+    // Mirefen shore herbs and ore_palmreach_1) arrived here at once and all
+    // four moved a few yards up their own shores instead of joining the
+    // list; the next arrival after a terrain or waterline touch means
+    // terrain moved under a node, not that this pin broke.
     const below = GATHER_NODES.filter((n) => seaFreeboardAt(n.pos.x, n.pos.z) < WATER_MARGIN)
       .map((n) => n.id)
       .sort();
     expect(below).toEqual(SEA_PLANE_EXEMPT);
     // Severity floor, per exemption (the review round: membership alone lets
-    // an exempt node sink further without a red). The deepest recorded
-    // violator sits at -3.60; a node dropping past -4.0 means the terrain
-    // under an exemption materially changed and the record must be re-read.
+    // an exempt node sink further without a red). The deepest surviving
+    // violator sits at -0.49; a node dropping past -0.8 (PLAYER_SWIM_DEPTH)
+    // stops being wadeable at all, the failure that forced the four
+    // retirements above, so the floor now sits exactly there.
     for (const id of SEA_PLANE_EXEMPT) {
       const node = GATHER_NODES.find((n) => n.id === id);
       expect(node, `${id} names a live node`).toBeDefined();
@@ -458,21 +458,27 @@ describe('gather node placement: every node sits on ground a player can work', (
       expect(
         seaFreeboardAt(node.pos.x, node.pos.z),
         `${id} sank past every recorded freeboard`,
-      ).toBeGreaterThan(-4);
+      ).toBeGreaterThan(-PLAYER_SWIM_DEPTH);
     }
   });
 
   it('the sea-plane arm rejects the Wickharbor cove floor, so it can fail', () => {
-    // herb_galecrest_1's shipped spot: the harbor cove carves the ground to
-    // 3.6yd BELOW the world sea plane, outside every declared water body, so
-    // the dry-land arm passes, the swim rules never engage, a player walks
-    // the cove floor, and the herb patch renders under the rendered harbor
-    // water. Assert the property first (the hole is real: suite-green by
-    // every other arm), then that this arm is the one that says no.
+    // herb_galecrest_1's pre-v0.34.0 spot: the harbor cove carves the ground
+    // to 3.6yd BELOW the world sea plane, outside every declared water body,
+    // so the dry-land arm passes and only depth-aware arms can object.
+    // Before open-sea swim the swim rules never engaged out here, a player
+    // walked the cove floor, every other arm passed, and this arm was the
+    // ONE that said no; since the water overhaul the open sea is real water,
+    // so the stand-spot arm now also refuses (the cove floor is swim depth,
+    // nothing in reach is standable). Assert both: the sea-plane arm still
+    // fires here (its non-vacuity, and it stays the only guard for the
+    // shallow wadeable band the exemption list records, where players stand
+    // fine and only the render sits underwater), and the swim model really
+    // did close the walk-the-cove-floor hole.
     const ON_WICKHARBOR_COVE_FLOOR = { x: 448, z: 400 };
     expect(isInWaterBody(ON_WICKHARBOR_COVE_FLOOR.x, ON_WICKHARBOR_COVE_FLOOR.z)).toBe(false);
     expect(isDryLand(ON_WICKHARBOR_COVE_FLOOR.x, ON_WICKHARBOR_COVE_FLOOR.z)).toBe(true);
-    expect(nearestStandSpot(ON_WICKHARBOR_COVE_FLOOR.x, ON_WICKHARBOR_COVE_FLOOR.z)).not.toBeNull();
+    expect(nearestStandSpot(ON_WICKHARBOR_COVE_FLOOR.x, ON_WICKHARBOR_COVE_FLOOR.z)).toBeNull();
     expect(seaFreeboardAt(ON_WICKHARBOR_COVE_FLOOR.x, ON_WICKHARBOR_COVE_FLOOR.z)).toBeLessThan(0);
   });
 
@@ -837,15 +843,15 @@ describe('gather node placement: every node sits on ground a player can work', (
     // the zone that will notice first, and the message names the measured figure
     // so the next reader can tell a drained zone from a resized denominator.
     const COVERAGE_RADIUS = 40;
-    // 35 since the v0.32.0 merge, was 40: the release fades the strip's rim
-    // mountains into flat, walkable staging ground, which grows every tuned
-    // zone's walkable-and-dry denominator by roughly a tenth without moving a
-    // node (Eastbrook re-measured at 37.3 against the same circuit that
-    // measured 40.6 pre-fade). The rule is unchanged (below the mob-camp
-    // density, slack-bounded below); only the calibration input resized,
-    // which is exactly the denominator caveat in the prose above. Phase 13's
-    // expansion-zone integration re-measures both numbers.
-    const COVERAGE_FLOOR_PCT = 35;
+    // 38 since the release/v0.34.0 merge, was 35 (and 40 before the v0.32.0
+    // rim-mountain fade grew the denominator): open-sea swim made coastal
+    // shallows real water, so shore cells fall out of the walkable-and-dry
+    // denominator and every coastal zone's fraction rises without a node
+    // moving (the leanest tuned zone re-measured at 40.2 against 37.3
+    // pre-overhaul). The rule is unchanged (below the mob-camp density,
+    // slack-bounded below); only the calibration input resized, which is
+    // exactly the denominator caveat in the prose above.
+    const COVERAGE_FLOOR_PCT = 38;
 
     /** Fraction of `cells` within COVERAGE_RADIUS of any of `centres`, as a percent. */
     const reachPct = (
@@ -899,8 +905,9 @@ describe('gather node placement: every node sits on ground a player can work', (
     // Not passing by slack: the leanest zone (Eastbrook, whose six ore veins are
     // held inside one 20-yard ring by tests/gather_nodes.test.ts and so cover
     // little ground between them) sits within 5 points of the floor. Measured at
-    // 40.6, so the floor is 0.6 points from biting, which is deliberate: a floor
-    // the content clears by twenty points asserts nothing.
+    // 40.2 after the v0.34.0 water overhaul, so the band holds by about two
+    // points each way, which is deliberate: a floor the content clears by
+    // twenty points asserts nothing.
     expect(leanest, `leanest zone coverage ${leanest.toFixed(1)} percent`).toBeLessThan(
       COVERAGE_FLOOR_PCT + 5,
     );
@@ -1319,12 +1326,16 @@ describe('gather node placement: every node sits on ground a player can work', (
   });
 
   it('spatial coverage: a bottom-map gathering circuit reaches most of each zone', () => {
-    // The same lattice, predicates, and floor as the tuned arm above (2yd
-    // lattice over the zone's own authored rect, canStand and isDryLand
-    // cells, 40yd reach): measured at authoring, willowfen 38.6, galecrest
-    // 37.2, farshore_isle 45.0 percent, against 9.5 to 15.5 before the pass.
+    // The same lattice and predicates as the tuned arm above (2yd lattice
+    // over the zone's own authored rect, canStand and isDryLand cells, 40yd
+    // reach): measured at authoring, willowfen 38.6, galecrest 37.2,
+    // farshore_isle 45.0 percent, against 9.5 to 15.5 before the pass. The
+    // floor re-tightened to 43 at the release/v0.34.0 merge for the same
+    // denominator resize the tuned arm records (open-sea swim drops coastal
+    // shallows out of the walkable ground, and the bottom-map rects carry
+    // the most coast): the leanest bottom zone re-measured at 45.2.
     const COVERAGE_RADIUS = 40;
-    const COVERAGE_FLOOR_PCT = 35;
+    const COVERAGE_FLOOR_PCT = 43;
     let leanest = Number.POSITIVE_INFINITY;
     for (const zone of BOTTOM_ZONES) {
       const cells: { x: number; z: number }[] = [];

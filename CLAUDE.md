@@ -332,4 +332,5 @@ correct.
 `README.md` (host/develop/play + fidelity checklist) · `DESIGN.md` (the adopted interface
 design-language standard; interface changes land through its rollout phases) ·
 `DEPLOY.md` (production) · `CREDITS.md` (asset licenses) · `docs/design/` (design docs) ·
-`docs/prd/` (feature specs) · `docs/qa-gate.md` (the layered QA gate).
+`docs/prd/` (feature specs) · `docs/qa-gate.md` (the layered QA gate) ·
+`docs/merge-queue.md` (the merge queue + required-check contract on protected branches).

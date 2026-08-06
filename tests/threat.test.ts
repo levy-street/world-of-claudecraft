@@ -1,7 +1,7 @@
 // Classic threat mechanics + the class kit that drives them (stances/forms,
 // stealth, pets).
-import { describe, expect, it } from 'vitest';
-import { abilitiesKnownAt, BUILTIN_WORLD } from '../src/sim/data';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { abilitiesKnownAt, BUILTIN_WORLD, setActiveWorldContent } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import {
   addThreat,
@@ -14,20 +14,23 @@ import type { Entity, WorldContent } from '../src/sim/types';
 import { dist2d, SUNDER_ARMOR_PCT_PER_STACK } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
 
-// These suites only ever reach for wolves, boars, murlocs and ridge stalkers
-// (plus dungeon content, which the spread keeps), so drop every other ambient
-// camp and all npcs/ground objects to keep sim.tick() cheap (subsystem-world
-// pattern from tests/fiesta.test.ts). Anything a case names by templateId has
-// to be on this list: nearestMob returns null for a filtered-out template, and
-// the case dies on the first property write rather than on an assertion.
+// These suites only reach for the listed ambient mobs. Keep dungeon content
+// and the production definitions, but omit unrelated constructor-only spawns
+// and road colliders so the multi-seed authority cases remain focused and fast.
 const THREAT_TEST_WORLD: WorldContent = {
   ...BUILTIN_WORLD,
   camps: BUILTIN_WORLD.camps.filter((camp) =>
-    ['forest_wolf', 'wild_boar', 'mudfin_murloc', 'ridge_stalker'].includes(camp.mobId),
+    ['forest_wolf', 'wild_boar', 'mudfin_murloc', 'ridge_stalker', 'tunnel_rat'].includes(
+      camp.mobId,
+    ),
   ),
   npcs: {},
   groundObjects: [],
+  roads: [],
 };
+
+beforeAll(() => setActiveWorldContent(THREAT_TEST_WORLD));
+afterAll(() => setActiveWorldContent(null));
 
 function makeSim(cls: Parameters<typeof simClass>[0] = 'warrior', seed = 42) {
   return new Sim({ seed, playerClass: cls, autoEquip: true, world: THREAT_TEST_WORLD });
@@ -566,35 +569,46 @@ describe('taunt and growl', () => {
   it('Sacred Goad always lands (never resists), even against a higher-level mob', () => {
     // The paladin taunt is holy-school (a spell), so on impact it used to roll a full
     // resist. A resisted taunt silently breaks tanking, so taunts now skip the roll.
-    // Against a +3 mob the old roll would resist a large fraction of the time; across
-    // many seeds the taunt must now land every time and never emit a 'resist'.
-    for (let seed = 1; seed <= 40; seed++) {
-      const sim = new Sim({ seed, playerClass: 'paladin', noPlayer: true });
-      const tank = sim.entities.get(sim.addPlayer('paladin', 'Tank'))!;
-      const dps = sim.entities.get(sim.addPlayer('mage', 'Dps'))!;
-      sim.setPlayerLevel(10, tank.id);
-      const wolf = nearestMob(sim, 'forest_wolf', tank);
-      wolf.level = tank.level + 3; // a wide level gap: a spell would often fully resist
-      teleport(sim, tank, wolf.pos.x + 25, wolf.pos.z);
-      teleport(sim, dps, wolf.pos.x - 2, wolf.pos.z);
-      wolf.threat.set(dps.id, 1000);
-      wolf.aggroTargetId = dps.id;
-      wolf.aiState = 'chase';
-      wolf.inCombat = true;
-      sim.targetEntity(wolf.id, tank.id);
-      tank.facing = Math.atan2(wolf.pos.x - tank.pos.x, wolf.pos.z - tank.pos.z);
+    // Force the shared spell-hit roll to reject every spell. A taunt must skip
+    // that roll entirely, which makes this stronger and faster than seed-hunting.
+    const sim = new Sim({
+      seed: 1,
+      playerClass: 'paladin',
+      noPlayer: true,
+      world: THREAT_TEST_WORLD,
+    });
+    const tank = sim.entities.get(sim.addPlayer('paladin', 'Tank'))!;
+    const dps = sim.entities.get(sim.addPlayer('mage', 'Dps'))!;
+    sim.setPlayerLevel(10, tank.id);
+    const wolf = nearestMob(sim, 'forest_wolf', tank);
+    wolf.level = tank.level + 3;
+    // Range has its own 30-yard contract above. Keep this authority test near
+    // the target so seed-specific terrain cannot turn it into a LOS test.
+    teleport(sim, tank, wolf.pos.x + 10, wolf.pos.z);
+    teleport(sim, dps, wolf.pos.x - 2, wolf.pos.z);
+    wolf.threat.set(dps.id, 1000);
+    wolf.aggroTargetId = dps.id;
+    wolf.aiState = 'chase';
+    wolf.inCombat = true;
+    sim.targetEntity(wolf.id, tank.id);
+    tank.facing = Math.atan2(wolf.pos.x - tank.pos.x, wolf.pos.z - tank.pos.z);
 
-      sim.castAbility('holy_taunt', tank.id);
-      let resisted = false;
+    const realChance = sim.rng.chance.bind(sim.rng);
+    sim.rng.chance = () => false;
+    sim.castAbility('holy_taunt', tank.id);
+    let resisted = false;
+    try {
       for (let i = 0; i < 25; i++) {
         for (const ev of sim.tick()) {
           if (ev.type === 'damage' && ev.kind === 'resist' && ev.ability === 'Sacred Goad')
             resisted = true;
         }
       }
-      expect(resisted, `seed ${seed}`).toBe(false);
-      expect(wolf.aggroTargetId, `seed ${seed}`).toBe(tank.id);
+    } finally {
+      sim.rng.chance = realChance;
     }
+    expect(resisted).toBe(false);
+    expect(wolf.aggroTargetId).toBe(tank.id);
   });
 
   it('growl requires bear form', () => {

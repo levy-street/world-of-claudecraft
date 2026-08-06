@@ -114,6 +114,32 @@ describe('highscore_board: the row/head shape the stylesheet depends on', () => 
   });
 });
 
+describe('highscore_board: rank/level/virtual level/prestige render through formatNumber', () => {
+  // A four-digit value is the decisive probe: formatNumber's default grouping
+  // inserts a thousands separator a raw template interpolation never would,
+  // matching how the lifetimeXp column already renders (formatXp).
+  it('formats the rank with digit grouping, not a raw number', () => {
+    const html = highscoreRowHtml(entry({ rank: 1234 }));
+    expect(html).toContain('<span class="hs-rank">1,234</span>');
+    expect(html).not.toContain('<span class="hs-rank">1234</span>');
+  });
+
+  it('formats the level and virtual level with digit grouping', () => {
+    const html = highscoreRowHtml(entry({ level: 1234, virtualLevel: 5678 }));
+    expect(html).toContain('>1,234</span>');
+    expect(html).toContain('>5,678</span>');
+    expect(html).not.toContain('>1234<');
+    expect(html).not.toContain('>5678<');
+  });
+
+  it('formats the prestige rank badge and its tooltip with digit grouping', () => {
+    const html = highscoreRowHtml(entry({ prestigeRank: 1234 }));
+    expect(html).toContain('&starf;1,234</span>');
+    expect(html).toContain(`${t('game.prestige.rank')} 1,234`);
+    expect(html).not.toContain('&starf;1234<');
+  });
+});
+
 describe('highscore_board: loadHighscoresInto (the thin consumer)', () => {
   it('paints the ranked board from the injected fetch', async () => {
     const el = host();

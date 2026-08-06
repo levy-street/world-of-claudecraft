@@ -32,7 +32,7 @@ export const I18N_RELEASE_TIER_SUITES = Object.freeze([
  * legs directly after this one, so both sides read the same constant rather than
  * the selective gate matching a display string that a rename would silently move.
  */
-export const PRE_VITEST_STEP_NAME = 'sfx check';
+export const PRE_VITEST_STEP_NAME = 'biome (changed files)';
 
 export const I18N_ARTIFACTS = Object.freeze([
   'src/ui/i18n.resolved.generated',
@@ -45,8 +45,10 @@ export const I18N_ARTIFACTS = Object.freeze([
  *
  * Cacheable pure artifacts go through `npx turbo run ...` (inputs/outputs in
  * turbo.json). Malware, biome, and tests always run via npm (no "passed"
- * cache). Typecheck + env + server builds share one turbo multi-task step so
- * independent work overlaps; client build stays separate (depends on gens).
+ * cache). i18n:gen, wiki:content, and sfx:check are independent leaf tasks in
+ * turbo.json (none dependsOn another), so they share one turbo multi-task step
+ * for wall-clock overlap on a cold cache, same as typecheck + env + server
+ * builds below; client build stays separate (depends on the gens finishing).
  *
  * @param {number} workers
  * @param {{
@@ -68,9 +70,9 @@ export function buildFullGateSteps(workers, opts = {}) {
   /** @type {Array<{ name: string, cmd: string, args: string[], hint?: string, env?: Record<string, string> }>} */
   const steps = [
     {
-      name: 'i18n artifacts',
+      name: 'i18n + wiki + sfx artifacts',
       cmd: 'npx',
-      args: turboRunArgs(['i18n:gen']),
+      args: turboRunArgs(['i18n:gen', 'wiki:content', 'sfx:check']),
     },
     {
       name: 'i18n freshness',
@@ -81,24 +83,14 @@ export function buildFullGateSteps(workers, opts = {}) {
         `(git add ${I18N_ARTIFACTS.join(' ')}) and re-run`,
     },
     {
-      name: 'wiki content',
-      cmd: 'npx',
-      args: turboRunArgs(['wiki:content']),
-    },
-    {
       name: 'malware scan',
       cmd: 'npm',
       args: ['run', 'security:gate'],
     },
     {
-      name: 'biome (changed files)',
+      name: PRE_VITEST_STEP_NAME,
       cmd: 'npm',
       args: ['run', 'ci:changed'],
-    },
-    {
-      name: PRE_VITEST_STEP_NAME,
-      cmd: 'npx',
-      args: turboRunArgs(['sfx:check']),
     },
   ];
 

@@ -355,7 +355,7 @@ export const GATHER_NODES: GatherNodeDef[] = [
     id: 'herb_mirefen_1',
     zoneId: 'mirefen_marsh',
     type: 'herb',
-    pos: { x: 29, z: 395 },
+    pos: { x: 26, z: 395 },
     level: 10,
     tier: 1,
   },
@@ -363,7 +363,7 @@ export const GATHER_NODES: GatherNodeDef[] = [
     id: 'herb_mirefen_2',
     zoneId: 'mirefen_marsh',
     type: 'herb',
-    pos: { x: -66, z: 458 },
+    pos: { x: -68, z: 459 },
     level: 10,
     tier: 1,
   },
@@ -528,12 +528,13 @@ export const GATHER_NODES: GatherNodeDef[] = [
     tier: 2,
   },
   // Followed herb_mirefen_1 off the pool it shared: it sat inside the same
-  // footprint at 3.55 yards under. Still 12 yards from that patch.
+  // footprint at 3.55 yards under, and the raised waterline later walked both
+  // patches further up the same shore. Still about 20 yards from that patch.
   {
     id: 'herb_mirefen_t2',
     zoneId: 'mirefen_marsh',
     type: 'herb',
-    pos: { x: 34, z: 406 },
+    pos: { x: 23, z: 416 },
     level: 10,
     tier: 2,
   },
@@ -1154,7 +1155,13 @@ export const GATHER_NODES: GatherNodeDef[] = [
     id: 'ore_galecrest_2',
     zoneId: 'galecrest',
     type: 'ore',
-    pos: { x: 466, z: 374 },
+    // Moved off the Wickharbor cove floor (466,374) at the release/v0.34.0
+    // merge: open-sea swim made the cove real water, so the old spot sat at
+    // swim depth where harvestNode's swim deny always refuses. The headland
+    // west of the cove keeps the whole harvest disc standable and a full
+    // yard above the sea plane (its sea-plane exemption retired with the
+    // move).
+    pos: { x: 430, z: 379 },
     level: 20,
     tier: 1,
   },
@@ -1181,8 +1188,16 @@ export const GATHER_NODES: GatherNodeDef[] = [
     // Nudged off (438,404) at the v0.32.0 merge: a 5.7 rise/run crag sat
     // inside the authored spot's 5yd harvest reach, and the flat ground west
     // of it would close the pair gap under the 30yd quest-target cluster
-    // link, so the patch moved out along the ridge foot instead.
-    pos: { x: 448, z: 400 },
+    // link, so the patch moved out along the ridge foot to (448,400). Moved
+    // again at the release/v0.34.0 merge: open-sea swim made the Wickharbor
+    // cove real water, the ridge-foot spot sat at swim depth with no
+    // standable ground in harvest reach, so the patch stepped west onto the
+    // cove rim at (435,400), which put it 31.4yd from its pair, inside the
+    // 27 to 32 identical-partition band the quest-target cluster pin keeps
+    // empty. Stepped up the rim to hold the pair gap at 35.0yd, back outside
+    // the band with real margin and clear of the crag's reach (its sea-plane
+    // exemption stays retired).
+    pos: { x: 436, z: 394 },
     level: 20,
     tier: 1,
   },
@@ -1313,7 +1328,7 @@ export const GATHER_NODES: GatherNodeDef[] = [
     id: 'ore_palmreach_1',
     zoneId: 'palmreach',
     type: 'ore',
-    pos: { x: -262, z: 794 },
+    pos: { x: -263, z: 795 },
     level: 20,
     tier: 1,
   },
@@ -1438,8 +1453,11 @@ export const GATHER_NODES: GatherNodeDef[] = [
     zoneId: 'farshore_isle',
     type: 'wood',
     // Nudged off (263,92) at the v0.32.0 merge: a 1.9 rise/run bluff sat
-    // inside the authored spot's 5yd harvest reach.
-    pos: { x: 259, z: 96 },
+    // inside the authored spot's 5yd harvest reach. Moved uphill off
+    // (259,96) at the release/v0.34.0 merge: open-sea swim made the shore
+    // shallows real water and the old strand spot's harvest disc dipped to
+    // swim depth (its sea-plane exemption retired with the move).
+    pos: { x: 269, z: 83 },
     level: 5,
     tier: 1,
   },
@@ -1463,7 +1481,11 @@ export const GATHER_NODES: GatherNodeDef[] = [
     id: 'herb_farshore_isle_2',
     zoneId: 'farshore_isle',
     type: 'herb',
-    pos: { x: 291, z: 122 },
+    // Moved inland off (291,122) at the release/v0.34.0 merge: open-sea
+    // swim made the shore shallows real water, and the old spot sat at swim
+    // depth with no standable ground in harvest reach (its sea-plane
+    // exemption retired with the move). Still 33yd from its pair.
+    pos: { x: 291, z: 104 },
     level: 5,
     tier: 1,
   },

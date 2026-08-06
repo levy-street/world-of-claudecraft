@@ -188,6 +188,15 @@ export interface BucketWindowInput {
  * have flipped to impostors, putting cones a few strides away; keyed near-edge
  * only, as this was before the shader owned the boundary, every tree in a
  * 540x240u slab drew at full detail until the whole slab left the swap.
+ *
+ * The shadow-only clones do NOT come through here at all. They are the one row
+ * with no fallback once the bucket drops (no impostor takes over, and the
+ * per-instance collapse cannot reach three's shadow depth material), which
+ * briefly made the numeric cap measure from their near edge: that inflated
+ * their kept radius by a bucket bounding radius, ~290u on the shipped
+ * ~500x240u slabs, and roughly tripled the shadow pass. The right axis for that
+ * row was never distance from the camera, it is the key light's own shadow
+ * volume, so it lives in foliage_shadow_core.ts now.
  */
 export function bucketVisible(w: BucketWindowInput): boolean {
   const nearEdge = w.centerDist - w.radius;

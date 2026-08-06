@@ -391,7 +391,8 @@ export const cs_CZ: EnTranslations = {
     },
     "emoteEditor": {
       "title": "Emoty",
-      "done": "Hotovo"
+      "done": "Hotovo",
+      "close": "Close emotes"
     },
     "dailyRewards": {
       "title": "Denní odměny",
@@ -1277,6 +1278,24 @@ export const cs_CZ: EnTranslations = {
       "graphicsFatal": "Obnova grafiky selhala. Pro pokračování hru znovu načti.",
       "graphicsReload": "Znovu načíst hru",
       "graphicsDraftChanged": "Změny grafiky jsou připravené k použití.",
+      "gfxSectionQuality": "Quality",
+      "gfxSectionWorld": "World Detail",
+      "gfxSectionLighting": "Lighting & Effects",
+      "gfxSectionCamera": "Camera",
+      "gfxSectionDisplay": "Display",
+      "gfxSectionSystem": "System",
+      "gfxSectionTouch": "Touch Controls",
+      "gfxViewDistance": "View Distance",
+      "gfxWaterQuality": "Water Quality",
+      "gfxCharacterDetail": "Character Detail",
+      "gfxAmbientOcclusion": "Ambient Occlusion",
+      "gfxBloom": "Bloom",
+      "gfxAntiAliasing": "Anti-Aliasing",
+      "gfxDynamicLights": "Dynamic Lights",
+      "gfxParticleEffects": "Particle Effects",
+      "gfxHalf": "Half",
+      "gfxCustomNote": "Changing a dial switches the quality preset to Advanced: a custom mix built on the High-quality base, starting from the levels shown for your current preset.",
+      "gfxEffectsNote": "Ambient Occlusion, Bloom and Anti-Aliasing ride the post-processing chain: with Effects & Lighting on Low the chain is off and they have no effect.",
       "interfaceMode": "Režim rozhraní",
       "interfaceModeAuto": "Automaticky",
       "interfaceModeDesktop": "Desktop",
@@ -1348,6 +1367,8 @@ export const cs_CZ: EnTranslations = {
       "buttons": "Rozložení tlačítek",
       "resetButtons": "Resetovat rozložení tlačítek",
       "menuAction": "Herní menu",
+      "zoomIn": "Zoom In",
+      "zoomOut": "Zoom Out",
       "help": "Levá páčka pohybuje, pravá páčka rozhlíží. Otevři okno pro použití ukazatele na obrazovce."
     },
     "perf": {
@@ -1576,6 +1597,7 @@ export const cs_CZ: EnTranslations = {
     },
     "itemHeroicTag": "[HRDINSKÉ]",
     "itemSoulbound": "Vázáno na duši",
+    "itemUniqueEquipped": "Unique-Equipped",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -2552,6 +2574,7 @@ export const cs_CZ: EnTranslations = {
       "catchLine": "Vytahuješ: {name}",
       "biteLine": "Něco zabralo!",
       "gotAwayLine": "Ta ti unikla.",
+      "earlyReelLine": "You reel in too soon. Nothing had taken the bait.",
       "nodeName": {
         "ore": "Rudná žíla",
         "wood": "Kmen stromů",
@@ -3145,7 +3168,8 @@ export const cs_CZ: EnTranslations = {
         "raise_fallen": "Povstání padlých (periodické vlny přivolávek)",
         "soul_rend": "Trhání duše (označení hráči se musí rozejít a být vyléčeni)",
         "deathless_rage": "Nesmrtelný hněv (přerušen u ochranných kamenů)",
-        "wardstones": "Kanály ochranných kamenů (přechod fáze)"
+        "wardstones": "Kanály ochranných kamenů (přechod fáze)",
+        "dread_curse": "Dread Curse (heroic only, stacking tank-swap debuff)"
       }
     },
     "deeds": {
@@ -3553,16 +3577,21 @@ export const cs_CZ: EnTranslations = {
       "groupInterface": "Rozhraní",
       "groupCamera": "Kamera",
       "talents": "Talenty",
+      "professions": "Professions",
       "arena": "Aréna",
       "leaderboard": "Žebříček",
       "deeds": "Kniha skutků",
+      "sheathe": "Sheathe/Unsheathe Weapon",
       "crafting": "Výroba",
       "valeCup": "Pohár údolí",
+      "mount": "Mount / Dismount",
       "calendar": "Kalendář událostí",
+      "dungeonFinder": "Dungeon Finder",
       "discord": "Discord",
       "abilities": "Použít schopnosti na akční liště, číselná řada; druhá lišta je na numpadu",
       "targetFriendly": "Zacílit nejbližšího spojence",
       "cycleFriendly": "Přepínat spojenecký cíl",
+      "targetAuras": "Target buffs and debuffs",
       "gameMenu": "Otevřít herní menu a nastavení",
       "bothMouse": "Obě tlačítka myši",
       "runForward": "Běh vpřed",
@@ -4314,6 +4343,8 @@ export const cs_CZ: EnTranslations = {
       "sourcesBody": "Většina raných vylepšení jsou odměny z úkolů, takže se vyplatí úkoly dokončovat, ne grindit. Nepřátelé pouštějí výbavu po porážce, prodejci ve městě prodávají solidní základy, řemeslníci mění nasbírané suroviny v nositelné kusy a hráčský trh ti dovolí nakupovat od ostatních dobrodruhů. Na vrcholu kopce kupují výbavu, kterou nikde jinde nenajdeš, dvě známkové měny: Známky výprav u správce výprav a Hrdinské značky u hrdinského zásobovače.",
       "soulboundTitle": "Vázané k duši: tvé a jen tvé",
       "soulboundBody": "Několik zvláštních odměn je vázaných k duši, spjatých s tvou postavou od chvíle, kdy si je vysloužíš. Předmět vázaný k duši nelze směnit, poslat poštou, prodat obchodníkovi ani vystavit na trhu; je tvůj a jen tvůj. Dnes tato ochrana střeží cenné tokeny jako Hrdinské známky, zatímco výbavu, kterou získáš, můžeš volně směňovat, prodávat i sdílet.",
+      "uniqueTitle": "Unique-Equipped: one legendary of a kind",
+      "uniqueBody": "Legendary items are unique-equipped: your character can wear only one copy of a given legendary at a time, and its heroic version counts as the same item. A second copy can ride in your bags, in the bank, or on the market, but trying to wear both at once is refused, and the tooltip carries a gold Unique-Equipped tag so you can see the rule before you plan a build around two of them.",
       "setsTitle": "Sady a bonusy sad",
       "setsBody": "Některá zbroj přichází ve sladěných rodinách, několika kusech střižených tak, aby vypadaly a bojovaly jako jeden celek. Oblékni dost kusů jedné rodiny najednou a sada se probudí, přidá bonusy nad vlastní statistiky každého kusu, a čím víc kusů nosíš, tím silnější je. Pár takových rodin se objevuje jako ceněné dropy během levelování; ty největší pocházejí z nejtěžšího skupinového obsahu blízko maximální úrovně, takže honba za celou sadou je klasický endgame cíl.",
       "consumablesTitle": "Spotřební předměty",
@@ -4570,6 +4601,7 @@ export const cs_CZ: EnTranslations = {
         "startBody": "Jednoduchý rybářský prut stojí 20 měďáků u Rybáře Brandta v Eastbrooku (hledej Starého mořského vlka na východním okraji města, u cesty k Zrcadlovému jezeru); pruty vedou i Kutil Gizzel, Zásobovač Hale ve Fenbridge a Intendantka Bree v Highwatchi. Použij prut čelem k vodě dost hluboké, aby v ní byly ryby, až asi 24 yardů před sebou, a splávek vyletí ven.\n\nNahazovat nemůžeš v boji, při plavání ani po smrti: zamýšlený postoj je nahazování z břehu. Voda ale tvrdne stejně jako země: močál chce alespoň Prut se železným navijákem 2. úrovně a výšiny Prut stříbrného potoka 3. úrovně a vlasec nahozený bez prutu, který si daná voda žádá, ti nikdy neopustí ruku. Nad nimi sedí dva pruty, Prut s bouřným navijákem a Prut kovaný přílivem: strojíři je vyrábějí v nástrojárně z toho, co vlasec vytáhne, a přepážka výpravy u Utopené litanie je prodává za Známky výprav za branami svých vyčištění, nikdy však za mince. Nechce je žádná voda, takže místo přístupu kupují kratší čekání a širší okno navíjení, což na nejvyšším příčli znamená záběr v rovných třech sekundách.",
         "biteHeading": "Záběr a vytažení",
         "biteBody": "Po nahození přijde záběr ve skryté chvíli mezi {min} a {max} sekundami; prodleva se rozhodne v okamžiku, kdy vlasec dopadne, takže žádná dvě nahození nejsou tak úplně stejná. Když splávek zabere, máš okno {reel} sekundy na to znovu zmáčknout prut a navinout: navineš uvnitř něj a úlovek přistane, zaváháš déle a ryba ti unikne, aniž bys měl co ukázat. Celé sezení se zastropuje na {cap} sekundách, takže i tiché nahození se vyřeší rychle.\n\nLepší pruty zostřují oba konce minihry: každá úroveň prutu nad první ukrojí {rod} sekundy z nejdelšího možného čekání, nikdy ne pod třísekundovou dolní hranici, kterou nejvyšší prut už škrábe, a přidá {reelRod} sekundy do okna navíjení, takže Prut se železným navijákem stáhne nejhorší čekání na 6,5 sekundy s oknem 3,25 sekundy a Prut stříbrného potoka na 5 s oknem přes 4, přičemž jeho vzácnost rozšíří navíjení o kus víc, než platí samotná úroveň. Nejrychlejší záběry se nemění, ať držíš cokoli, a prutu stačí k započtení ležet v brašnách.",
+        "earlyReelNote": "One caution for eager thumbs: press the pole again before anything bites and you reel in an empty line, ending the cast (a moment of grace right after casting forgives an accidental double-press). Patience is the whole game: wait for the bite, then strike.",
         "scheduleHeading": "Zisk dovednosti",
         "scheduleNote": "Zisk v Rybaření se řídí pevným plánem bez kostek: celý bod za úlovek pod 50 zdatnosti, půl bodu pod 100, desetina pod 150 a pomalá kapka 0,02 od 150 do 200. Ten poslední úsek je záměrně cesta na tisíce úlovků: 200 je prohlášení, ne zastávka na cestě k něčemu jinému.\n\nOdpad přestane učit úplně na {cutoff}: od té chvíle jsou plevele a boty jen plevele a boty. Strop lekci klade i sama voda: vody 1. úrovně v Údolí (a každé mladé pobřeží za hranicemi vnitrozemí) neučí nic nad 100, ty močálové končí na 150 a jen thornpeakské vychovají rybáře celou cestu k 200. Každý vytažený úlovek jinak přidává podle plánu, takže když se počitadlo zastaví, plán ti říká, ať vyhledáš hlubší vodu.",
         "colProficiency": "Zdatnost",
@@ -10305,6 +10337,15 @@ export const cs_CZ: EnTranslations = {
       },
       "direfang_quiver": {
         "name": "Toulec děsivého tesáku"
+      },
+      "sharp_claw": {
+        "name": "Sharp Claw"
+      },
+      "curved_tusk": {
+        "name": "Curved Tusk"
+      },
+      "pristine_claw": {
+        "name": "Pristine Claw"
       },
       "conjured_water4": {
         "name": "Vyčarovaná pramenitá voda"

@@ -3,30 +3,14 @@
 // on composer tiers. Render-only; update(time) drives a slow shimmer (drift,
 // waving opacity) with no per-frame allocation.
 import * as THREE from 'three';
-import { FROSTVEIL_ROADS } from '../sim/content/frostveil';
-import { hash2 } from '../sim/rng';
-import { terrainHeight } from '../sim/world';
+import { buildFrostIceFields } from './frost_ice_fields';
+import { auroraFadeBand } from './frost_sky_fade_core';
 
 export interface FrostSkyView {
   group: THREE.Group;
   glowLights: THREE.PointLight[];
   update(time: number, camX: number, camZ: number): void;
 }
-
-const ICEMANTLE = { x: -30, z: 1560 };
-const LANTERN_REACH = 95; // posts line the roads this far out of town
-const LANTERN_SPACING = 13;
-
-// Ice shards: glassy blue spires scattered over the benches, with monolith
-// rings at the landmarks (the Reach's answer to the Hollow's crystals).
-const ICE_FIELDS = [
-  { x: 30, z: 1745, r: 26, n: 12 }, // the Aurora Steps
-  { x: 52, z: 1638, r: 20, n: 8 }, // Glacier Tarn's shore
-  { x: 96, z: 1816, r: 22, n: 9 }, // the Howling Terraces
-  { x: -84, z: 1738, r: 18, n: 6 }, // the Shiverfen's edge
-  { x: -10, z: 1660, r: 40, n: 8 }, // the inner valley, scattered wide
-] as const;
-const ICE_TINTS = [0xbfe8ff, 0x9fd4f2, 0xd8f2ff];
 
 const RIBBONS = [
   { x: -60, z: 1660, y: 130, len: 420, h: 46, rot: 0.5, tint: 0x62f2b2, phase: 0 },
@@ -78,137 +62,7 @@ export function buildFrostSky(seed = 0): FrostSkyView {
   const group = new THREE.Group();
   group.name = 'frost-sky';
   const glowLights: THREE.PointLight[] = [];
-  const lanternMats: THREE.MeshStandardMaterial[] = [];
-
-  // --- lantern posts along the roads into Icemantle: small warm flames in
-  // the blue cold, the thing that makes the village read as shelter ---
-  {
-    const spots: { x: number; z: number; y: number }[] = [];
-    for (const road of FROSTVEIL_ROADS) {
-      for (let i = 0; i + 1 < road.length; i++) {
-        const a = road[i];
-        const b = road[i + 1];
-        const len = Math.hypot(b.x - a.x, b.z - a.z);
-        for (let d = LANTERN_SPACING / 2; d < len; d += LANTERN_SPACING) {
-          const t = d / len;
-          const x = a.x + (b.x - a.x) * t;
-          const z = a.z + (b.z - a.z) * t;
-          if (Math.hypot(x - ICEMANTLE.x, z - ICEMANTLE.z) > LANTERN_REACH) continue;
-          // offset to alternate roadsides
-          const nx = -(b.z - a.z) / len;
-          const nz = (b.x - a.x) / len;
-          const side = spots.length % 2 === 0 ? 2.2 : -2.2;
-          const lx = x + nx * side;
-          const lz = z + nz * side;
-          const y = terrainHeight(lx, lz, seed);
-          if (y < -3) continue;
-          spots.push({ x: lx, z: lz, y });
-        }
-      }
-    }
-    if (spots.length > 0) {
-      const postGeo = new THREE.CylinderGeometry(0.09, 0.12, 2.4, 5);
-      const postMat = new THREE.MeshStandardMaterial({ color: 0x4a3826, roughness: 0.9 });
-      const posts = new THREE.InstancedMesh(postGeo, postMat, spots.length);
-      const headGeo = new THREE.OctahedronGeometry(0.34, 0);
-      const headMat = new THREE.MeshStandardMaterial({
-        color: 0xffdf9a,
-        emissive: 0xffa848,
-        emissiveIntensity: 1.4,
-        roughness: 0.6,
-      });
-      lanternMats.push(headMat);
-      const heads = new THREE.InstancedMesh(headGeo, headMat, spots.length);
-      const m = new THREE.Matrix4();
-      const q = new THREE.Quaternion();
-      const v = new THREE.Vector3();
-      const sc = new THREE.Vector3(1, 1, 1);
-      spots.forEach((sp, i) => {
-        v.set(sp.x, sp.y + 1.2, sp.z);
-        posts.setMatrixAt(i, m.compose(v, q, sc));
-        v.set(sp.x, sp.y + 2.55, sp.z);
-        heads.setMatrixAt(i, m.compose(v, q, sc));
-      });
-      posts.instanceMatrix.needsUpdate = true;
-      heads.instanceMatrix.needsUpdate = true;
-      posts.castShadow = true;
-      posts.computeBoundingSphere();
-      heads.computeBoundingSphere();
-      group.add(posts);
-      group.add(heads);
-      // a warm pool of light at every third post (the fireLights budget
-      // rank-culls, so the town approach stays lit without a light per post)
-      spots.forEach((sp, i) => {
-        if (i % 3 !== 0) return;
-        const light = new THREE.PointLight(0xffa848, 4, 12, 2);
-        light.position.set(sp.x, sp.y + 2.7, sp.z);
-        light.userData.baseIntensity = 4;
-        glowLights.push(light);
-        group.add(light);
-      });
-    }
-  }
-
-  // --- ice shards on the benches ---
-  {
-    const shardGeo = new THREE.OctahedronGeometry(1, 0);
-    shardGeo.scale(0.34, 1.9, 0.34);
-    const geo = shardGeo.toNonIndexed();
-    const spots: { x: number; z: number; y: number; s: number; rot: number; tint: number }[] = [];
-    ICE_FIELDS.forEach((f, fi) => {
-      for (let k = 0; k < f.n; k++) {
-        const ang = hash2(k + fi * 17, 5, 4021) * Math.PI * 2;
-        const dist = Math.sqrt(hash2(k, fi + 9, 4031)) * f.r;
-        const x = f.x + Math.sin(ang) * dist;
-        const z = f.z + Math.cos(ang) * dist;
-        const y = terrainHeight(x, z, seed);
-        if (y < -3) continue;
-        spots.push({
-          x,
-          z,
-          y: y + 0.4,
-          s: 0.8 + hash2(k, fi, 4041) * 2.6,
-          rot: hash2(fi, k, 4051) * Math.PI * 2,
-          tint: ICE_TINTS[Math.floor(hash2(k + fi, 3, 4061) * ICE_TINTS.length)],
-        });
-      }
-    });
-    if (spots.length > 0) {
-      const mat = new THREE.MeshStandardMaterial({
-        color: 0xcfeaf8,
-        emissive: 0x2a5a78,
-        emissiveIntensity: 0.35,
-        roughness: 0.15,
-        metalness: 0.1,
-        flatShading: true,
-        transparent: true,
-        opacity: 0.92,
-      });
-      const mesh = new THREE.InstancedMesh(geo, mat, spots.length);
-      const m = new THREE.Matrix4();
-      const q = new THREE.Quaternion();
-      const qT = new THREE.Quaternion();
-      const up = new THREE.Vector3(0, 1, 0);
-      const axis = new THREE.Vector3();
-      const v = new THREE.Vector3();
-      const sc = new THREE.Vector3();
-      spots.forEach((sp, i) => {
-        q.setFromAxisAngle(up, sp.rot);
-        axis.set(Math.sin(sp.rot * 2.3), 0, Math.cos(sp.rot * 2.3)).normalize();
-        qT.setFromAxisAngle(axis, (hash2(i, 7, 4071) - 0.5) * 0.5);
-        q.premultiply(qT);
-        v.set(sp.x, sp.y + sp.s * 0.7, sp.z);
-        sc.set(sp.s, sp.s, sp.s);
-        mesh.setMatrixAt(i, m.compose(v, q, sc));
-        mesh.setColorAt(i, new THREE.Color(sp.tint));
-      });
-      mesh.instanceMatrix.needsUpdate = true;
-      if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
-      mesh.castShadow = true;
-      mesh.computeBoundingSphere();
-      group.add(mesh);
-    }
-  }
+  group.add(buildFrostIceFields(seed));
   const tex = auroraTexture();
   const ribbons: {
     mat: THREE.MeshBasicMaterial;
@@ -264,22 +118,16 @@ export function buildFrostSky(seed = 0): FrostSkyView {
     group,
     glowLights,
     update(time: number, camX: number, camZ: number): void {
-      // lantern flames flicker together, gently
-      for (const mat of lanternMats) {
-        mat.emissiveIntensity = 1.4 + Math.sin(time * 6.2) * 0.12 + Math.sin(time * 1.7) * 0.1;
-      }
       // The aurora belongs to the Reach: the curtains hang far above the
       // fog (fog: false, additive), so without this gate every neighboring
       // realm sees them over its horizon. Fade with the CAMERA across the
       // frost rect's edges: its z band, and (now that the Reach is the
       // center strip with realms on both sides) both x borders, so the
       // aurora never shows over the Drakelands east of x 180 nor the
-      // Amberfall west of x -180.
-      const fadeIn = Math.min(1, Math.max(0, (camZ - 1400) / 80));
-      const fadeOut = 1 - Math.min(1, Math.max(0, (camZ - 1920) / 80));
-      const fadeW = Math.min(1, Math.max(0, (camX + 220) / 80));
-      const fadeE = Math.min(1, Math.max(0, (220 - camX) / 80));
-      const band = Math.min(fadeIn, fadeOut, fadeW, fadeE);
+      // Amberfall west of x -180. The boundary math is the pure core
+      // frost_sky_fade_core.ts, so its zone-edge value stays testable
+      // without a canvas/document.
+      const band = auroraFadeBand(camX, camZ);
       for (const r of ribbons) {
         r.mesh.visible = band > 0.001;
         if (!r.mesh.visible) continue;

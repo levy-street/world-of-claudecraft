@@ -12003,17 +12003,34 @@
   .graphics-controls-disabled {
     opacity: 0.55;
   }
-  .graphics-apply {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
+  /* The graphics panel's one inline action row: Back, the stretching status,
+     then Reset (a quiet text button) beside the primary Apply at the end. */
+  .gfx-footer {
+    display: flex;
     align-items: center;
     gap: 10px;
     min-height: 40px;
-    margin: 8px 0;
-    padding: 8px;
-    border: 1px solid var(--color-border-showcase);
-    border-radius: 5px;
-    background: var(--color-bg-input);
+    margin-top: 8px;
+  }
+  .gfx-footer .btn {
+    margin: 0;
+  }
+  .gfx-footer .graphics-apply-status {
+    flex: 1 1 auto;
+    text-align: right;
+  }
+  /* The text-button variant: keeps .btn's box, focus ring and target size,
+     sheds the chrome so it reads as a secondary action beside Apply. */
+  .gfx-btn-text {
+    background: none;
+    border-color: transparent;
+    box-shadow: none;
+    color: var(--color-text-muted);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .gfx-btn-text:hover {
+    color: var(--color-accent);
   }
   .graphics-apply-status {
     min-width: 0;
@@ -12046,6 +12063,79 @@
   }
   .set-row.disabled {
     opacity: 0.45;
+  }
+  /* Graphics panel: wide, categorized two-column card form. The cards ride
+     the shared perf-card family (settings_controls.ts settingsCard() with the
+     gfx-card modifier), so only the panel's own grid, spacing and ladder
+     stacking live here. Cards collapse to one column on narrow viewports and
+     on any touch device, matching .perf-cols. */
+  #options-menu.gfx-wide {
+    width: min(880px, calc(100vw - 32px));
+  }
+  .gfx-cols {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    align-items: start;
+    margin-bottom: 8px;
+  }
+  .gfx-col {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-width: 0;
+  }
+  .gfx-card {
+    padding: 6px 15px 13px;
+  }
+  .gfx-card .set-rows {
+    margin-bottom: 0;
+  }
+  /* Rows align to the card's own padding (drop the row's horizontal inset). */
+  .gfx-card .set-row {
+    padding: 3px 0;
+  }
+  /* Ladder rows (the preset row and the per-system dials) stack the label
+     above the buttons: a half-width card leaves a 6-button segmented group
+     about 250px beside the 120px label column, which wraps to three cramped
+     lines. Full-width, the ladders sit on one or two clean lines. The
+     dangling grid-column the .set-choice span carries is cancelled below. */
+  .gfx-card .set-row:has(.set-choice) {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 4px 10px;
+  }
+  .gfx-card .set-row:has(.set-choice) > .set-choice {
+    grid-column: auto;
+  }
+  /* Full-width cards (Display / System / Touch) span both columns below the
+     dial cards; their single-height rows flow two-up so the closing band
+     stays compact, with a lone trailing row spanning rather than stranding a
+     half-empty cell (the perf-chips idiom). */
+  .gfx-card-wide {
+    grid-column: 1 / -1;
+  }
+  .gfx-card-wide .set-rows {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 2px 28px;
+    align-items: start;
+  }
+  .gfx-card-wide .set-rows > .set-row:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
+  @media (max-width: 720px) {
+    #options-menu.gfx-wide .gfx-cols {
+      grid-template-columns: 1fr;
+    }
+    #options-menu.gfx-wide .gfx-card-wide .set-rows {
+      grid-template-columns: 1fr;
+    }
+  }
+  body.mobile-touch #options-menu.gfx-wide .gfx-cols {
+    grid-template-columns: 1fr;
+  }
+  body.mobile-touch #options-menu.gfx-wide .gfx-card-wide .set-rows {
+    grid-template-columns: 1fr;
   }
   /* ---------- UI theme picker ---------- */
   .set-seg.theme-presets {

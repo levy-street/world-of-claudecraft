@@ -391,7 +391,8 @@ export const da_DK: EnTranslations = {
     },
     "emoteEditor": {
       "title": "Følelsesudtryk",
-      "done": "Færdig"
+      "done": "Færdig",
+      "close": "Close emotes"
     },
     "dailyRewards": {
       "title": "Daglige belønninger",
@@ -1277,6 +1278,24 @@ export const da_DK: EnTranslations = {
       "graphicsFatal": "Gendannelse af grafik mislykkedes. Genindlæs spillet for at fortsætte.",
       "graphicsReload": "Genindlæs spillet",
       "graphicsDraftChanged": "Grafikændringer er klar til at blive anvendt.",
+      "gfxSectionQuality": "Quality",
+      "gfxSectionWorld": "World Detail",
+      "gfxSectionLighting": "Lighting & Effects",
+      "gfxSectionCamera": "Camera",
+      "gfxSectionDisplay": "Display",
+      "gfxSectionSystem": "System",
+      "gfxSectionTouch": "Touch Controls",
+      "gfxViewDistance": "View Distance",
+      "gfxWaterQuality": "Water Quality",
+      "gfxCharacterDetail": "Character Detail",
+      "gfxAmbientOcclusion": "Ambient Occlusion",
+      "gfxBloom": "Bloom",
+      "gfxAntiAliasing": "Anti-Aliasing",
+      "gfxDynamicLights": "Dynamic Lights",
+      "gfxParticleEffects": "Particle Effects",
+      "gfxHalf": "Half",
+      "gfxCustomNote": "Changing a dial switches the quality preset to Advanced: a custom mix built on the High-quality base, starting from the levels shown for your current preset.",
+      "gfxEffectsNote": "Ambient Occlusion, Bloom and Anti-Aliasing ride the post-processing chain: with Effects & Lighting on Low the chain is off and they have no effect.",
       "interfaceMode": "Grænsefladetilstand",
       "interfaceModeAuto": "Auto",
       "interfaceModeDesktop": "Skrivebord",
@@ -1348,6 +1367,8 @@ export const da_DK: EnTranslations = {
       "buttons": "Knaplayout",
       "resetButtons": "Nulstil knaplayout",
       "menuAction": "Spilmenu",
+      "zoomIn": "Zoom In",
+      "zoomOut": "Zoom Out",
       "help": "Venstre stik bevæger, højre stik kigger. Åbn et vindue for at bruge skærmmarkøren."
     },
     "perf": {
@@ -1576,6 +1597,7 @@ export const da_DK: EnTranslations = {
     },
     "itemHeroicTag": "[HEROISK]",
     "itemSoulbound": "Sjælebundet",
+    "itemUniqueEquipped": "Unique-Equipped",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -2552,6 +2574,7 @@ export const da_DK: EnTranslations = {
       "catchLine": "Du hiver ind: {name}",
       "biteLine": "Noget tager madden!",
       "gotAwayLine": "Det slap væk.",
+      "earlyReelLine": "You reel in too soon. Nothing had taken the bait.",
       "nodeName": {
         "ore": "Malmåre",
         "wood": "Tømmerlund",
@@ -3145,7 +3168,8 @@ export const da_DK: EnTranslations = {
         "raise_fallen": "Rejse de Faldne (periodiske bølger af tilkaldelser)",
         "soul_rend": "Sjælerivning (markerede spillere skal sprede sig og heles)",
         "deathless_rage": "Udødelig Raseri (afbrydes ved vardstene)",
-        "wardstones": "Vardstenskanaler (faseovergang)"
+        "wardstones": "Vardstenskanaler (faseovergang)",
+        "dread_curse": "Dread Curse (heroic only, stacking tank-swap debuff)"
       }
     },
     "deeds": {
@@ -3553,16 +3577,21 @@ export const da_DK: EnTranslations = {
       "groupInterface": "Brugerflade",
       "groupCamera": "Kamera",
       "talents": "Talenter",
+      "professions": "Professions",
       "arena": "Arena",
       "leaderboard": "Resultattavle",
       "deeds": "Bedrifternes Bog",
+      "sheathe": "Sheathe/Unsheathe Weapon",
       "crafting": "Håndværk",
       "valeCup": "Dalpokalen",
+      "mount": "Mount / Dismount",
       "calendar": "Begivenhedskalender",
+      "dungeonFinder": "Dungeon Finder",
       "discord": "Discord",
       "abilities": "Brug handlingsbjælkens evner (talrækken; en anden bjælke sidder på det numeriske tastatur)",
       "targetFriendly": "Vælg nærmeste venlige",
       "cycleFriendly": "Skift venligt mål",
+      "targetAuras": "Target buffs and debuffs",
       "gameMenu": "Åbn spilmenu og indstillinger",
       "bothMouse": "Begge museknapper",
       "runForward": "Løb fremad",
@@ -4314,6 +4343,8 @@ export const da_DK: EnTranslations = {
       "sourcesBody": "De fleste af dine tidlige opgraderinger er opgavebelønninger, så det betaler sig at gøre opgaver færdige frem for at grinde. Fjender taber udstyr, når du besejrer dem, handlende i byen sælger solide basisvarer, håndværkere forvandler indsamlede materialer til bærbare stykker, og spillermarkedet lader dig købe fra andre eventyrere. På toppen af bakken køber to mærkevalutaer udstyr, som ikke findes andre steder: Delve-Mærker hos delve-vogteren og Heroiske Mærker hos den heroiske kvartermester.",
       "soulboundTitle": "Sjælebundet: din og din alene",
       "soulboundBody": "Nogle få særlige belønninger er sjælebundne, bundet til din karakter fra det øjeblik, du optjener dem. En sjælebunden genstand kan ikke byttes, sendes med posten, sælges til en handlende eller lægges op på markedet; den er din og din alene. I dag beskytter det præmietokens som Heroiske Mærker, mens det udstyr, du vinder, er dit at bytte, sælge eller dele frit.",
+      "uniqueTitle": "Unique-Equipped: one legendary of a kind",
+      "uniqueBody": "Legendary items are unique-equipped: your character can wear only one copy of a given legendary at a time, and its heroic version counts as the same item. A second copy can ride in your bags, in the bank, or on the market, but trying to wear both at once is refused, and the tooltip carries a gold Unique-Equipped tag so you can see the rule before you plan a build around two of them.",
       "setsTitle": "Sæt og sætbonusser",
       "setsBody": "Noget rustning kommer i matchede familier, flere stykker skåret til at se ud og kæmpe som ét. Bær nok af en familie på én gang, og sættet vågner og giver bonusser oven i hvert stykkes egne statistikker, og jo flere stykker du bærer, jo stærkere bliver det. Nogle få sådanne familier dukker op som eftertragtet bytte, mens du leveler; de største af dem kommer fra det sejeste gruppeindhold nær niveauloftet, så at jagte et fuldt sæt er et klassisk slutspilsmål.",
       "consumablesTitle": "Forbrugsvarer",
@@ -4570,6 +4601,7 @@ export const da_DK: EnTranslations = {
         "startBody": "En Simpel Fiskestang koster 20 kobber hos Fisker Brandt i Østbæk (kig efter den Gamle Søulk i byens østlige udkant, ved vejen til Spejlsøen); Tinker Gizel, Proviantmester Hale i Fenbridge og Kvartermester Bree i Højvagt fører også stænger. Brug stangen, mens du vender mod vand, der er dybt nok til at rumme fisk, op til omkring 24 yards foran dig, og din prop sejler ud.\n\nDu kan ikke kaste ud, mens du er i kamp, mens du svømmer, eller mens du er død: at kaste fra bredden er den tiltænkte stilling. Vandet bliver dog hårdere i takt med landet: sumpen vil have mindst niveau 2-stangen Jernhjulet og højderne niveau 3-stangen Sølvbækken, og en line, der kastes uden den stang, det vand kræver, forlader aldrig din hånd. To stænger sidder over dem, Stormhjulet og Tidevandssmedet: ingeniører fremstiller dem ved værktøjsværkerne af det, en line trækker op, og Det Druknede Litanis delve-disk sælger dem for Delve-Mærker bag sine rydningsporte, dog aldrig for mønt. Intet vand beder om dem, så de køber en kortere ventetid og et bredere indhivningsvindue frem for adgang, hvilket på det øverste trin betyder et bid på præcis tre sekunder.",
         "biteHeading": "Bid og indhivning",
         "biteBody": "Efter kastet kommer bidet i et skjult øjeblik mellem {min} og {max} sekunder; forsinkelsen afgøres, når linen lander, så ingen to kast føles helt ens. Når proppen bider, har du et vindue på {reel} sekunder til at trykke på stangen igen og hive ind: hiv inden for det, og fangsten lander, tøv forbi det, og fisken slipper væk uden noget at vise frem. En hel session har et loft på {cap} sekunder, så selv et stille kast afgøres hurtigt.\n\nBedre stænger skærper begge ender af minispillet: hvert stangniveau over det første trimmer {rod} sekunder af den længst mulige ventetid, aldrig under det gulv på tre sekunder, som topstangen allerede strejfer, og lægger {reelRod} sekunder til indhivningsvinduet, så Jernhjulet trækker den værste ventetid ned til 6,5 sekunder med et vindue på 3,25 sekunder, og Sølvbækken til 5 med et vindue over 4, idet dens sjældenhed udvider indhivningen en smule ud over, hvad niveauet alene betaler. De hurtigste bid ændrer sig aldrig, uanset hvad du holder, og en stang behøver kun at ligge i dine tasker for at tælle.",
+        "earlyReelNote": "One caution for eager thumbs: press the pole again before anything bites and you reel in an empty line, ending the cast (a moment of grace right after casting forgives an accidental double-press). Patience is the whole game: wait for the bite, then strike.",
         "scheduleHeading": "Færdighedspoint-optjening",
         "scheduleNote": "Fiskerioptjening følger en fast plan uden terninger: et helt point pr. fangst under 50 proficiens, et halvt point under 100, en tiendedel under 150 og et langsomt dryp på 0,02 fra 150 til 200. Den sidste strækning er med vilje en rejse på tusindvis af fangster: 200 er en erklæring, ikke et stoppested på vejen mod noget andet.\n\nSkrammel holder helt op med at lære fra sig ved {cutoff}: derfra er ukrudt og støvler bare ukrudt og støvler. Selve vandet sætter også loft over lektien: Dalens niveau 1-vande (og hver eneste unge kyst uden for kernelandet) lærer intet fra sig forbi 100, sumpens stopper ved 150, og kun Tornetops skoler en angler hele vejen til 200. Enhver landet fangst optjener ellers efter den fastsatte takst, så når tælleren står stille, fortæller planen dig, at du skal søge dybere vand.",
         "colProficiency": "Færdighed",
@@ -10305,6 +10337,15 @@ export const da_DK: EnTranslations = {
       },
       "direfang_quiver": {
         "name": "Direfang-Kogger"
+      },
+      "sharp_claw": {
+        "name": "Sharp Claw"
+      },
+      "curved_tusk": {
+        "name": "Curved Tusk"
+      },
+      "pristine_claw": {
+        "name": "Pristine Claw"
       },
       "conjured_water4": {
         "name": "Fremmanet kildevand"

@@ -391,7 +391,8 @@ export const pt_BR: EnTranslations = {
     },
     "emoteEditor": {
       "title": "Emotes",
-      "done": "Concluído"
+      "done": "Concluído",
+      "close": "Close emotes"
     },
     "dailyRewards": {
       "title": "Recompensas Diárias",
@@ -1277,6 +1278,24 @@ export const pt_BR: EnTranslations = {
       "graphicsFatal": "Falha na recuperação dos gráficos. Recarregue o jogo para continuar.",
       "graphicsReload": "Recarregar jogo",
       "graphicsDraftChanged": "As alterações gráficas estão prontas para aplicar.",
+      "gfxSectionQuality": "Quality",
+      "gfxSectionWorld": "World Detail",
+      "gfxSectionLighting": "Lighting & Effects",
+      "gfxSectionCamera": "Camera",
+      "gfxSectionDisplay": "Display",
+      "gfxSectionSystem": "System",
+      "gfxSectionTouch": "Touch Controls",
+      "gfxViewDistance": "View Distance",
+      "gfxWaterQuality": "Water Quality",
+      "gfxCharacterDetail": "Character Detail",
+      "gfxAmbientOcclusion": "Ambient Occlusion",
+      "gfxBloom": "Bloom",
+      "gfxAntiAliasing": "Anti-Aliasing",
+      "gfxDynamicLights": "Dynamic Lights",
+      "gfxParticleEffects": "Particle Effects",
+      "gfxHalf": "Half",
+      "gfxCustomNote": "Changing a dial switches the quality preset to Advanced: a custom mix built on the High-quality base, starting from the levels shown for your current preset.",
+      "gfxEffectsNote": "Ambient Occlusion, Bloom and Anti-Aliasing ride the post-processing chain: with Effects & Lighting on Low the chain is off and they have no effect.",
       "interfaceMode": "Modo de interface",
       "interfaceModeAuto": "Auto",
       "interfaceModeDesktop": "Desktop",
@@ -1348,6 +1367,8 @@ export const pt_BR: EnTranslations = {
       "buttons": "Disposição dos Botões",
       "resetButtons": "Redefinir Disposição dos Botões",
       "menuAction": "Menu do Jogo",
+      "zoomIn": "Zoom In",
+      "zoomOut": "Zoom Out",
       "help": "O analógico esquerdo move, o direito controla a câmera. Abra uma janela para usar o ponteiro na tela."
     },
     "perf": {
@@ -1576,6 +1597,7 @@ export const pt_BR: EnTranslations = {
     },
     "itemHeroicTag": "[HEROICO]",
     "itemSoulbound": "Vinculado à alma",
+    "itemUniqueEquipped": "Unique-Equipped",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -2552,6 +2574,7 @@ export const pt_BR: EnTranslations = {
       "catchLine": "Você recolhe: {name}",
       "biteLine": "Algo morde a isca!",
       "gotAwayLine": "Ele escapou.",
+      "earlyReelLine": "You reel in too soon. Nothing had taken the bait.",
       "nodeName": {
         "ore": "Veio de Minério",
         "wood": "Arvoredo de Madeira",
@@ -3145,7 +3168,8 @@ export const pt_BR: EnTranslations = {
         "raise_fallen": "Erguer os Caídos (ondas periódicas de reforços)",
         "soul_rend": "Rasgão de Alma (jogadores marcados devem se dispersar e ser curados)",
         "deathless_rage": "Fúria Imortal (interrompida nas pedras de guarda)",
-        "wardstones": "Canalizações das pedras de guarda (transição de fase)"
+        "wardstones": "Canalizações das pedras de guarda (transição de fase)",
+        "dread_curse": "Dread Curse (heroic only, stacking tank-swap debuff)"
       }
     },
     "deeds": {
@@ -3553,16 +3577,21 @@ export const pt_BR: EnTranslations = {
       "groupInterface": "Interface",
       "groupCamera": "Câmera",
       "talents": "Talentos",
+      "professions": "Professions",
       "arena": "Arena",
       "leaderboard": "Placar de líderes",
       "deeds": "Livro dos Feitos",
+      "sheathe": "Sheathe/Unsheathe Weapon",
       "crafting": "Criação",
       "valeCup": "Copa do Vale",
+      "mount": "Mount / Dismount",
       "calendar": "Calendário de eventos",
+      "dungeonFinder": "Dungeon Finder",
       "discord": "Discord",
       "abilities": "Usar habilidades da barra de ação (a fileira de números; uma segunda barra fica no teclado numérico)",
       "targetFriendly": "Mirar o aliado mais próximo",
       "cycleFriendly": "Alternar alvo aliado",
+      "targetAuras": "Target buffs and debuffs",
       "gameMenu": "Abrir o menu do jogo e as opções",
       "bothMouse": "Ambos os botões do mouse",
       "runForward": "Correr para frente",
@@ -4314,6 +4343,8 @@ export const pt_BR: EnTranslations = {
       "sourcesBody": "A maioria das suas melhorias iniciais são recompensas de missões, então vale a pena terminar missões em vez de farmar. Inimigos largam equipamento quando você os derrota, vendedores na cidade vendem o básico de confiança, artesãos transformam materiais coletados em peças vestíveis, e o mercado de jogadores permite comprar de outros aventureiros. Lá no topo, duas moedas de selos compram equipamentos que não se encontram em nenhum outro lugar: os Selos de Incursão com o guardião de incursões, e as Marcas Heroicas com o Intendente Heroico.",
       "soulboundTitle": "Vinculado à alma: seu e só seu",
       "soulboundBody": "Algumas recompensas especiais são vinculadas à alma, presas ao seu personagem desde o instante em que você as ganha. Um item vinculado à alma não pode ser negociado, enviado pelo correio, vendido a um vendedor nem anunciado no mercado; ele é seu e só seu. Hoje essa proteção guarda fichas de prêmio como as Marcas Heroicas, enquanto o equipamento que você conquista é seu para negociar, vender ou compartilhar livremente.",
+      "uniqueTitle": "Unique-Equipped: one legendary of a kind",
+      "uniqueBody": "Legendary items are unique-equipped: your character can wear only one copy of a given legendary at a time, and its heroic version counts as the same item. A second copy can ride in your bags, in the bank, or on the market, but trying to wear both at once is refused, and the tooltip carries a gold Unique-Equipped tag so you can see the rule before you plan a build around two of them.",
       "setsTitle": "Conjuntos e bônus de conjunto",
       "setsBody": "Algumas armaduras vêm em famílias combinando, várias peças talhadas para parecer e lutar como uma só. Vista o bastante de uma família ao mesmo tempo e o conjunto desperta, concedendo bônus por cima dos atributos de cada peça, e quanto mais peças você usa mais forte ele fica. Algumas dessas famílias surgem como saques valiosos enquanto você sobe de nível; as maiores delas vêm do conteúdo em grupo mais difícil perto do limite de nível, então perseguir um conjunto completo é um objetivo clássico de fim de jogo.",
       "consumablesTitle": "Consumíveis",
@@ -4570,6 +4601,7 @@ export const pt_BR: EnTranslations = {
         "startBody": "Uma Vara de Pesca Simples custa 20 cobre com o Pescador Brandt em Eastbrook (procure o Sal Velho na borda leste da cidade, junto à estrada para o Lago Espelho); o Engenhoqueiro Gizzel, o Fornecedor Hale em Fenbridge e a Intendente Bree em Highwatch também mantêm varas em estoque. Use a vara de frente para uma água funda o bastante para abrigar peixes, até cerca de 24 jardas à sua frente, e a sua boia voa para longe.\n\nVocê não pode lançar em combate, nadando ou morto: lançar da margem é a postura pretendida. A água, porém, fica mais dura conforme a terra fica: o pântano quer pelo menos a Vara com Molinete de Ferro de nível 2 e os picos a Vara do Riacho Prateado de nível 3, e uma linha lançada sem a vara que aquela água exige nunca sai da sua mão. Duas varas ficam acima dessas, a Vara com Molinete de Tempestade e a Vara Forjada pela Maré: engenheiros as criam na oficina de ferramentas com aquilo que a linha traz da água, e o balcão de incursão da Ladainha Afogada as vende por Selos de Incursão atrás de seus requisitos de conclusão, embora nunca por moedas. Nenhuma água as pede, então elas compram uma espera mais curta e uma janela de recolha mais larga em vez de acesso, o que no degrau mais alto significa uma fisgada em exatos três segundos.",
         "biteHeading": "Mordida e recolha",
         "biteBody": "Depois do lançamento, a fisgada vem em um instante oculto entre {min} e {max} segundos; o atraso é decidido quando a linha toca a água, então dois lançamentos nunca são exatamente iguais. Quando a boia afunda, você tem uma janela de {reel} segundos para apertar a vara de novo e recolher: recolha dentro dela e a captura é sua, hesite além dela e o peixe escapa sem deixar nada. Uma sessão inteira termina em no máximo {cap} segundos, então até um lançamento tranquilo se resolve rápido.\n\nVaras melhores afiam as duas pontas do minijogo: cada nível de vara acima do primeiro corta {rod} segundos da espera máxima possível, nunca abaixo do piso de três segundos que a vara do topo já roça, e acrescenta {reelRod} segundos à janela de recolha, então a Vara com Molinete de Ferro puxa a pior espera para 6,5 segundos com uma janela de 3,25 segundos, e a Vara do Riacho Prateado para 5 com uma janela acima de 4, sua raridade alargando a recolha um pouco além do que o nível sozinho paga. As fisgadas mais rápidas nunca mudam, seja qual for a vara que você segure, e basta a vara estar nas suas bolsas para contar.",
+        "earlyReelNote": "One caution for eager thumbs: press the pole again before anything bites and you reel in an empty line, ending the cast (a moment of grace right after casting forgives an accidental double-press). Patience is the whole game: wait for the bite, then strike.",
         "scheduleHeading": "Ganho de proficiência",
         "scheduleNote": "O ganho de Pesca segue uma tabela fixa, sem dados: um ponto inteiro por captura abaixo de 50 de proficiência, meio ponto abaixo de 100, um décimo abaixo de 150, e um fio lento de 0,02 de 150 a 200. Esse último trecho é uma jornada de milhares de capturas de propósito: 200 é uma declaração, não uma parada no caminho para outra coisa.\n\nA tralha para de ensinar por completo em {cutoff}: dali em diante, ervas daninhas e botas são apenas ervas daninhas e botas. A própria água também limita a lição: as águas de nível 1 do Vale (e toda margem jovem além das terras centrais) não ensinam nada acima de 100, as do pântano param em 150, e só as de Thornpeak instruem um pescador por todo o caminho até 200. Fora isso, toda captura fisgada rende no ritmo previsto, então quando o contador empaca, é a tabela dizendo a você para procurar águas mais profundas.",
         "colProficiency": "Perícia",
@@ -10305,6 +10337,15 @@ export const pt_BR: EnTranslations = {
       },
       "direfang_quiver": {
         "name": "Aljava Direfang"
+      },
+      "sharp_claw": {
+        "name": "Sharp Claw"
+      },
+      "curved_tusk": {
+        "name": "Curved Tusk"
+      },
+      "pristine_claw": {
+        "name": "Pristine Claw"
       },
       "conjured_water4": {
         "name": "Água de Nascente Conjurada"

@@ -443,6 +443,7 @@ export function applyDemonHealTick(ctx: SimContext, owner: Entity): void {
   const healed = Math.min(amount, pet.maxHp - pet.hp);
   if (healed <= 0) return;
   pet.hp += healed;
+  const overheal = amount - healed;
   ctx.emit({
     type: 'heal2',
     sourceId: owner.id,
@@ -450,6 +451,7 @@ export function applyDemonHealTick(ctx: SimContext, owner: Entity): void {
     amount: healed,
     crit: false,
     ability: 'Demon Heal',
+    ...(overheal > 0 ? { overheal } : {}),
   });
   ctx.healingThreat(owner, pet, healed);
 }

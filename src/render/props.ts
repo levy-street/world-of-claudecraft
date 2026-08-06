@@ -29,6 +29,7 @@ import type { BuildingDef } from '../sim/types';
 import { terrainHeight, WATER_LEVEL, waterLevel } from '../sim/world';
 import { loadGltf, releaseGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
+import { attachBiomeHaze } from './biome_haze_field';
 import { buildEastbrookGrandArmouryView } from './eastbrook_grand_armoury';
 import {
   isEastbrookRebuildBuilding,
@@ -687,6 +688,9 @@ function convertMaterial(
       strength: worn.strength,
     });
   }
+  // Distant-zone air (biome_haze_field.ts): every converted kit material
+  // hazes with the ground under it, chained over the worn-detail hook.
+  attachBiomeHaze(mat);
   mat.name = `${kit}:${s.name}`;
   matConvCache.set(key, mat);
   return mat;

@@ -2078,8 +2078,11 @@ export const ABILITIES: Record<string, AbilityDef> = {
     // The kit's hardest hit flies as the visibly heavier bolt (render-only).
     projectileFx: 'heavyBolt',
     effects: [
-      { type: 'directDamage', min: 170, max: 225 },
-      { type: 'dot', total: 48, duration: 12, interval: 2 },
+      // The first-ten-seed isolated combat sweep put 60s fire below frost.
+      // A 5% Pyrelance lift restores sustained parity while keeping the 27s
+      // burst beneath its 1.6x ceiling and leaving Ignite's contract intact.
+      { type: 'directDamage', min: 179, max: 236 },
+      { type: 'dot', total: 50, duration: 12, interval: 2 },
     ],
     description:
       'Hurls an immense fiery boulder that causes $d Fire damage plus additional damage over time.',
@@ -2452,7 +2455,10 @@ export const ABILITIES: Record<string, AbilityDef> = {
     class: 'mage',
     learnLevel: 5,
     specs: ['arcane'],
-    cost: 16,
+    // The integrated level-20 stat curve pushed the conservative rotation to
+    // 65.6s OOM at 16 mana. Fourteen restores the signed 70-80s sustain window
+    // without relaxing the emergency-spam or damage-separation contracts.
+    cost: 14,
     castTime: 2,
     cooldown: 0,
     range: 30,
@@ -2461,7 +2467,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     // Instant impact at cast completion (no traveling bolt): keeps the charge
     // read/write in one deterministic order, see combat/chronomancy.ts.
     projectile: false,
-    // (base cost is `cost: 16` above; DERIVED via the balance harness so the
+    // (base cost is `cost: 14` above; DERIVED via the balance harness so the
     // targets hold WITH the 25% free-cast proc's mana relief.)
     // Low base damage (DERIVED via tests/chronomancy_balance.test.ts): the
     // conservative rotation must sustain clearly under Piro/Cryo (>=35% below);

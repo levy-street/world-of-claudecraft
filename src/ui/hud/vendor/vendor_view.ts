@@ -163,11 +163,17 @@ export function buildVendorView(
     const gate = resolveVendorRowGate(itemId, balances.gatheringProficiency);
     // Bulk eligibility mirrors buyItem's server-side gate exactly (items.ts):
     // plain copper price, no Honor component, never a mount (buying several
-    // copies of the same reins would only waste gold), and the item must
-    // actually stack in the bags.
+    // copies of the same reins would only waste gold), never soulbound (the
+    // buy path collapses a bulk request on a soulbound row to a single
+    // vendorStackSize purchase, so the preview must never promise more), and
+    // the item must actually stack in the bags.
     const unitCopper = Math.max(0, item.buyValue ?? 0);
     const bulkEligible =
-      item.kind !== 'mount' && price.honor <= 0 && unitCopper > 0 && stackSizeOf(item) > 1;
+      item.kind !== 'mount' &&
+      !item.soulbound &&
+      price.honor <= 0 &&
+      unitCopper > 0 &&
+      stackSizeOf(item) > 1;
     const bulkQuantity = bulkEligible
       ? Math.max(1, bulkBuyQuantity(item, unitCopper, balances.copper))
       : undefined;

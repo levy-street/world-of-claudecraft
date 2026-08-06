@@ -391,7 +391,8 @@ export const tr_TR: EnTranslations = {
     },
     "emoteEditor": {
       "title": "İfadeler",
-      "done": "Tamam"
+      "done": "Tamam",
+      "close": "Close emotes"
     },
     "dailyRewards": {
       "title": "Günlük Ödüller",
@@ -1277,6 +1278,24 @@ export const tr_TR: EnTranslations = {
       "graphicsFatal": "Grafik kurtarma başarısız oldu. Devam etmek için oyunu yeniden yükle.",
       "graphicsReload": "Oyunu Yeniden Yükle",
       "graphicsDraftChanged": "Grafik değişiklikleri uygulanmaya hazır.",
+      "gfxSectionQuality": "Quality",
+      "gfxSectionWorld": "World Detail",
+      "gfxSectionLighting": "Lighting & Effects",
+      "gfxSectionCamera": "Camera",
+      "gfxSectionDisplay": "Display",
+      "gfxSectionSystem": "System",
+      "gfxSectionTouch": "Touch Controls",
+      "gfxViewDistance": "View Distance",
+      "gfxWaterQuality": "Water Quality",
+      "gfxCharacterDetail": "Character Detail",
+      "gfxAmbientOcclusion": "Ambient Occlusion",
+      "gfxBloom": "Bloom",
+      "gfxAntiAliasing": "Anti-Aliasing",
+      "gfxDynamicLights": "Dynamic Lights",
+      "gfxParticleEffects": "Particle Effects",
+      "gfxHalf": "Half",
+      "gfxCustomNote": "Changing a dial switches the quality preset to Advanced: a custom mix built on the High-quality base, starting from the levels shown for your current preset.",
+      "gfxEffectsNote": "Ambient Occlusion, Bloom and Anti-Aliasing ride the post-processing chain: with Effects & Lighting on Low the chain is off and they have no effect.",
       "interfaceMode": "Arayüz Modu",
       "interfaceModeAuto": "Otomatik",
       "interfaceModeDesktop": "Masaüstü",
@@ -1348,6 +1367,8 @@ export const tr_TR: EnTranslations = {
       "buttons": "Tuş Düzeni",
       "resetButtons": "Tuş Düzenini Sıfırla",
       "menuAction": "Oyun Menüsü",
+      "zoomIn": "Zoom In",
+      "zoomOut": "Zoom Out",
       "help": "Sol çubuk hareket ettirir, sağ çubuk bakışı yönlendirir. Ekran üzeri işaretçiyi kullanmak için bir pencere açın."
     },
     "perf": {
@@ -1576,6 +1597,7 @@ export const tr_TR: EnTranslations = {
     },
     "itemHeroicTag": "[KAHRAMANCA]",
     "itemSoulbound": "Ruha Bağlı",
+    "itemUniqueEquipped": "Unique-Equipped",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -2552,6 +2574,7 @@ export const tr_TR: EnTranslations = {
       "catchLine": "Çekiyorsunuz: {name}",
       "biteLine": "Bir şey yemi aldı!",
       "gotAwayLine": "Kaçtı gitti.",
+      "earlyReelLine": "You reel in too soon. Nothing had taken the bait.",
       "nodeName": {
         "ore": "Maden Damarı",
         "wood": "Kereste Koruluğu",
@@ -3145,7 +3168,8 @@ export const tr_TR: EnTranslations = {
         "raise_fallen": "Düşenleri Kaldır (periyodik yardımcı dalgaları)",
         "soul_rend": "Ruh Yırtılması (işaretlenen oyuncular yayılmalı ve iyileştirilmeli)",
         "deathless_rage": "Ölümsüz Öfke (koruma taşlarında kesilir)",
-        "wardstones": "Koruma taşı kanalları (faz geçişi)"
+        "wardstones": "Koruma taşı kanalları (faz geçişi)",
+        "dread_curse": "Dread Curse (heroic only, stacking tank-swap debuff)"
       }
     },
     "deeds": {
@@ -3553,16 +3577,21 @@ export const tr_TR: EnTranslations = {
       "groupInterface": "Arayüz",
       "groupCamera": "Kamera",
       "talents": "Yetenekler",
+      "professions": "Professions",
       "arena": "Arena",
       "leaderboard": "Lider Tablosu",
       "deeds": "Yiğitlikler Kitabı",
+      "sheathe": "Sheathe/Unsheathe Weapon",
       "crafting": "Üretim",
       "valeCup": "Vadi Kupası",
+      "mount": "Mount / Dismount",
       "calendar": "Etkinlik Takvimi",
+      "dungeonFinder": "Dungeon Finder",
       "discord": "Discord",
       "abilities": "Eylem çubuğu yeteneklerini kullan (rakam sırası; ikinci bir çubuk sayı tuş takımında yer alır)",
       "targetFriendly": "En yakın dostu hedefle",
       "cycleFriendly": "Dost hedefler arasında geç",
+      "targetAuras": "Target buffs and debuffs",
       "gameMenu": "Oyun menüsünü ve seçenekleri aç",
       "bothMouse": "Her İki Fare Düğmesi",
       "runForward": "İleri koş",
@@ -4314,6 +4343,8 @@ export const tr_TR: EnTranslations = {
       "sourcesBody": "Erken dönem yükseltmelerinizin çoğu görev ödülleridir, bu yüzden grindlemek yerine görevleri bitirmek işe yarar. Düşmanlar yendiğinizde teçhizat düşürür, kasabadaki satıcılar sağlam temel parçalar satar, zanaatkârlar toplanan malzemeleri giyilebilir parçalara dönüştürür ve oyuncu pazarı diğer maceracılardan alışveriş yapmanızı sağlar. Tepenin zirvesinde, başka hiçbir yerde bulunmayan teçhizatı iki nişan para birimi satın alır: mağara seferi bekçisindeki Mağara Nişanları ve Kahramanca Levazımcı'daki Kahramanca Nişanlar.",
       "soulboundTitle": "Ruha bağlı: yalnızca ve yalnızca sizin",
       "soulboundBody": "Birkaç özel ödül ruha bağlıdır, onları kazandığınız andan itibaren karakterinize bağlanır. Ruha bağlı bir eşya takas edilemez, postalanamaz, bir satıcıya satılamaz ya da pazara ilan edilemez; yalnızca ve yalnızca sizindir. Bugün bu koruma, Kahramanca Nişanları gibi ödül jetonlarını gözetir; kazandığınız teçhizat ise takas etmek, satmak ya da özgürce paylaşmak üzere sizindir.",
+      "uniqueTitle": "Unique-Equipped: one legendary of a kind",
+      "uniqueBody": "Legendary items are unique-equipped: your character can wear only one copy of a given legendary at a time, and its heroic version counts as the same item. A second copy can ride in your bags, in the bank, or on the market, but trying to wear both at once is refused, and the tooltip carries a gold Unique-Equipped tag so you can see the rule before you plan a build around two of them.",
       "setsTitle": "Takımlar ve takım bonusları",
       "setsBody": "Bazı zırhlar, birlikte görünmek ve dövüşmek üzere biçilmiş birkaç parçadan oluşan uyumlu ailelerle gelir. Bir aileden yeterince parçayı aynı anda giyin, takım uyanır ve her parçanın kendi istatistiklerinin üstüne bonuslar verir; giydiğiniz parça arttıkça da güçlenir. Böyle ailelerden birkaçı, seviye atlarken değerli düşüşler olarak ortaya çıkar; en büyükleri ise seviye tavanına yakın en çetin grup içeriğinden gelir, bu yüzden tam bir takımın peşine düşmek klasik bir son oyun hedefidir.",
       "consumablesTitle": "Sarf Malzemeleri",
@@ -4570,6 +4601,7 @@ export const tr_TR: EnTranslations = {
         "startBody": "Basit Olta, Doğudere'deki Balıkçı Brandt'ten 20 bakıra alınır (Eski Denizci'yi kasabanın doğu ucunda, Ayna Gölü'ne giden yolun kenarında arayın); Tamirci Gizzel, Fenbridge'deki Levazımcı Hale ve Highwatch'taki Donatım Subayı Bree de olta bulundurur. Oltayı, balık tutacak kadar derin bir suya dönükken, önünüzde yaklaşık 24 yardaya kadar kullanın; şamandıranız süzülüp gider.\n\nDövüşteyken, yüzerken ya da ölüyken olta atamazsınız: amaçlanan duruş kıyıdan atmaktır. Ne var ki sular da kara gibi sertleşir: bataklık en az kademe 2 Demir Makaralı Olta'yı, zirveler ise kademe 3 Gümüş Dere Oltası'nı ister ve o suyun istediği olta olmadan atılan misina elinizden hiç çıkmaz. Bunların üzerinde iki olta daha durur, Fırtına Makarası ve Gelgit Dövmesi: mühendisler bunları alet atölyesinde, misinanın sudan çıkardıklarıyla üretir; Boğulmuş Litanya'nın sefer tezgahı da temizleme kapılarının ardında Mağara Nişanı karşılığında satar, ama asla sikke karşılığında değil. Hiçbir su bunları istemez, dolayısıyla erişim yerine daha kısa bir bekleyiş ve daha geniş bir çekme penceresi satın alırlar; en üst basamakta bu, tam üç saniyede gelen bir ısırık demektir.",
         "biteHeading": "Isırma ve çekme",
         "biteBody": "Oltayı attıktan sonra ısırık, {min} ile {max} saniye arasında gizli bir anda gelir; gecikme misina suya değdiğinde belirlenir, bu yüzden hiçbir atış bir diğerine tam olarak benzemez. Şamandıra vurduğunda, oltaya tekrar basıp çekmek için {reel} saniyelik bir pencereniz olur: bu pencerenin içinde çekerseniz av elinizde kalır, geçirirseniz balık gösterecek hiçbir şey bırakmadan kaçar. Bütün bir seans {cap} saniyeyle sınırlıdır, bu yüzden sessiz bir atış bile çabuk sonuçlanır.\n\nDaha iyi oltalar mini oyunun her iki ucunu da keskinleştirir: ilkinin üzerindeki her olta kademesi, en üst oltanın hâlihazırda sıyırdığı üç saniyelik tabanın altına asla inmeden, mümkün olan en uzun bekleyişten {rod} saniye kırpar ve çekme penceresine {reelRod} saniye ekler; böylece Demir Makaralı Olta en kötü bekleyişi 3,25 saniyelik bir pencereyle 6,5 saniyeye, Gümüş Dere Oltası ise 4'ü aşan bir pencereyle 5 saniyeye indirir, nadirliği çekme süresini kademenin tek başına ödediğinin biraz ötesine genişletir. En hızlı ısırıklar elinizde ne olursa olsun hiç değişmez ve bir oltanın sayılması için yalnızca çantanızda olması yeterlidir.",
+        "earlyReelNote": "One caution for eager thumbs: press the pole again before anything bites and you reel in an empty line, ending the cast (a moment of grace right after casting forgives an accidental double-press). Patience is the whole game: wait for the bite, then strike.",
         "scheduleHeading": "Yetkinlik kazanımı",
         "scheduleNote": "Balıkçılık kazanımı zar atmayan sabit bir çizelgeyi izler: yetkinlik 50'nin altında av başına tam bir puan, 100'ün altında yarım puan, 150'nin altında onda bir ve 150'den 200'e yavaş bir 0,02'lik sızıntı. O son etap kasten binlerce avlık bir yolculuktur: 200 bir beyandır, başka bir şeye giderken uğranan bir durak değil.\n\nDöküntü, {cutoff} değerinde tamamen öğretmeyi bırakır: oradan sonra yosunlar ve çizmeler sadece yosun ve çizmedir. Suyun kendisi de dersi sınırlar: Vadi'nin kademe 1 suları (ve ana bölgelerin ötesindeki her genç kıyı) 100'ün ötesinde hiçbir şey öğretmez, bataklığınkiler 150'de durur ve bir balıkçıyı 200'e kadar yalnızca Dikenzirve'ninkiler okutur. Bunun dışında karaya çıkarılan her av çizelgedeki oranda kazandırır, yani sayaç durduğunda çizelge size daha derin su aramanızı söylüyordur.",
         "colProficiency": "Yetkinlik",
@@ -10305,6 +10337,15 @@ export const tr_TR: EnTranslations = {
       },
       "direfang_quiver": {
         "name": "Direfang Sadağı"
+      },
+      "sharp_claw": {
+        "name": "Sharp Claw"
+      },
+      "curved_tusk": {
+        "name": "Curved Tusk"
+      },
+      "pristine_claw": {
+        "name": "Pristine Claw"
       },
       "conjured_water4": {
         "name": "Sihirle Yaratılmış Kaynak Suyu"

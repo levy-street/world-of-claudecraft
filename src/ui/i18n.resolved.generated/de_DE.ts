@@ -391,7 +391,8 @@ export const de_DE: EnTranslations = {
     },
     "emoteEditor": {
       "title": "Emotes",
-      "done": "Fertig"
+      "done": "Fertig",
+      "close": "Close emotes"
     },
     "dailyRewards": {
       "title": "Tägliche Belohnungen",
@@ -1277,6 +1278,24 @@ export const de_DE: EnTranslations = {
       "graphicsFatal": "Grafik-Wiederherstellung fehlgeschlagen. Lade das Spiel neu, um fortzufahren.",
       "graphicsReload": "Spiel neu laden",
       "graphicsDraftChanged": "Grafikänderungen sind bereit zum Anwenden.",
+      "gfxSectionQuality": "Quality",
+      "gfxSectionWorld": "World Detail",
+      "gfxSectionLighting": "Lighting & Effects",
+      "gfxSectionCamera": "Camera",
+      "gfxSectionDisplay": "Display",
+      "gfxSectionSystem": "System",
+      "gfxSectionTouch": "Touch Controls",
+      "gfxViewDistance": "View Distance",
+      "gfxWaterQuality": "Water Quality",
+      "gfxCharacterDetail": "Character Detail",
+      "gfxAmbientOcclusion": "Ambient Occlusion",
+      "gfxBloom": "Bloom",
+      "gfxAntiAliasing": "Anti-Aliasing",
+      "gfxDynamicLights": "Dynamic Lights",
+      "gfxParticleEffects": "Particle Effects",
+      "gfxHalf": "Half",
+      "gfxCustomNote": "Changing a dial switches the quality preset to Advanced: a custom mix built on the High-quality base, starting from the levels shown for your current preset.",
+      "gfxEffectsNote": "Ambient Occlusion, Bloom and Anti-Aliasing ride the post-processing chain: with Effects & Lighting on Low the chain is off and they have no effect.",
       "interfaceMode": "Steuerungsmodus",
       "interfaceModeAuto": "Auto",
       "interfaceModeDesktop": "Desktop",
@@ -1348,6 +1367,8 @@ export const de_DE: EnTranslations = {
       "buttons": "Tastenbelegung",
       "resetButtons": "Tastenbelegung zurücksetzen",
       "menuAction": "Spielmenü",
+      "zoomIn": "Zoom In",
+      "zoomOut": "Zoom Out",
       "help": "Linker Stick bewegt, rechter Stick steuert die Kamera. Öffne ein Fenster, um den Bildschirmzeiger zu verwenden."
     },
     "perf": {
@@ -1576,6 +1597,7 @@ export const de_DE: EnTranslations = {
     },
     "itemHeroicTag": "[HEROISCH]",
     "itemSoulbound": "Seelengebunden",
+    "itemUniqueEquipped": "Unique-Equipped",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -2552,6 +2574,7 @@ export const de_DE: EnTranslations = {
       "catchLine": "Du holst ein: {name}",
       "biteLine": "Etwas nimmt den Köder!",
       "gotAwayLine": "Es ist entkommen.",
+      "earlyReelLine": "You reel in too soon. Nothing had taken the bait.",
       "nodeName": {
         "ore": "Erzader",
         "wood": "Holzstand",
@@ -3145,7 +3168,8 @@ export const de_DE: EnTranslations = {
         "raise_fallen": "Gefallene erheben (periodische Verstarkungswellen)",
         "soul_rend": "Seelenzerfetzung (markierte Spieler mussen sich verteilen und geheilt werden)",
         "deathless_rage": "Unsterbliche Raserei (an den Schutzsteinen unterbrochen)",
-        "wardstones": "Schutzstein-Kanale (Phasenubergang)"
+        "wardstones": "Schutzstein-Kanale (Phasenubergang)",
+        "dread_curse": "Dread Curse (heroic only, stacking tank-swap debuff)"
       }
     },
     "deeds": {
@@ -3553,16 +3577,21 @@ export const de_DE: EnTranslations = {
       "groupInterface": "Interface",
       "groupCamera": "Kamera",
       "talents": "Talente",
+      "professions": "Professions",
       "arena": "Arena",
       "leaderboard": "Bestenliste",
       "deeds": "Buch der Taten",
+      "sheathe": "Sheathe/Unsheathe Weapon",
       "crafting": "Handwerk",
       "valeCup": "Talpokal",
+      "mount": "Mount / Dismount",
       "calendar": "Ereigniskalender",
+      "dungeonFinder": "Dungeon Finder",
       "discord": "Discord",
       "abilities": "Aktionsleisten-Fähigkeiten einsetzen (die Zahlenreihe; eine zweite Leiste liegt auf dem Nummernblock)",
       "targetFriendly": "Nächstes freundliches Ziel anvisieren",
       "cycleFriendly": "Freundliches Ziel durchschalten",
+      "targetAuras": "Target buffs and debuffs",
       "gameMenu": "Spielmenü und Optionen öffnen",
       "bothMouse": "Beide Maustasten",
       "runForward": "Vorwärtslaufen",
@@ -4314,6 +4343,8 @@ export const de_DE: EnTranslations = {
       "sourcesBody": "Die meisten deiner frühen Verbesserungen sind Questbelohnungen, es zahlt sich also aus, Quests abzuschließen, statt zu grinden. Feinde lassen Ausrüstung fallen, wenn du sie bezwingst, Händler in der Stadt verkaufen solide Grundausstattung, Handwerker verwandeln gesammelte Materialien in tragbare Stücke, und der Spielermarkt lässt dich von anderen Abenteurern kaufen. Ganz oben auf dem Berg kaufen zwei Marken-Währungen Ausrüstung, die es sonst nirgends gibt: Tiefgang-Marken beim Tiefgang-Hüter und Heroische Marken beim heroischen Quartiermeister.",
       "soulboundTitle": "Seelengebunden: dein und nur dein",
       "soulboundBody": "Einige besondere Belohnungen sind seelengebunden, von dem Moment an, in dem du sie erringst, an deinen Charakter gebunden. Ein seelengebundener Gegenstand lässt sich nicht handeln, verschicken, an einen Händler verkaufen oder auf dem Markt einstellen; er gehört dir und dir allein. Heute schützt das Preis-Tokens wie Heroische Marken, während die Ausrüstung, die du gewinnst, dir gehört und frei gehandelt, verkauft oder geteilt werden kann.",
+      "uniqueTitle": "Unique-Equipped: one legendary of a kind",
+      "uniqueBody": "Legendary items are unique-equipped: your character can wear only one copy of a given legendary at a time, and its heroic version counts as the same item. A second copy can ride in your bags, in the bank, or on the market, but trying to wear both at once is refused, and the tooltip carries a gold Unique-Equipped tag so you can see the rule before you plan a build around two of them.",
       "setsTitle": "Sets und Set-Boni",
       "setsBody": "Manche Rüstung kommt in zusammengehörigen Familien, mehreren Teilen, die darauf zugeschnitten sind, als Einheit auszusehen und zu kämpfen. Trage genug Teile einer Familie gleichzeitig, und das Set erwacht und gewährt Boni zusätzlich zu den eigenen Werten jedes Teils, und je mehr Teile du trägst, desto stärker wird es. Einige wenige solcher Familien tauchen als begehrte Beute auf, während du aufsteigst; die größten von ihnen stammen aus dem härtesten Gruppeninhalt nahe der Höchststufe, weshalb die Jagd nach einem vollständigen Set ein klassisches Endgame-Ziel ist.",
       "consumablesTitle": "Verbrauchsgüter",
@@ -4570,6 +4601,7 @@ export const de_DE: EnTranslations = {
         "startBody": "Eine Einfache Angel kostet 20 Kupfer bei Fischer Brandt in Eastbrook (halte am Ostrand der Stadt nach dem Alten Seebären Ausschau, an der Straße zum Spiegelsee); auch Tüftler Gizzel, Proviantmeister Hale in Fenbridge und Quartiermeisterin Bree in Highwatch führen Angeln. Benutze die Angel mit Blick auf Wasser, das tief genug für Fische ist, bis etwa 24 Meter vor dir, und deine Pose fliegt hinaus.\n\nDu kannst nicht auswerfen, während du im Kampf bist, schwimmst oder tot bist: Der Wurf vom Ufer aus ist die vorgesehene Haltung. Das Wasser wird allerdings genauso anspruchsvoll wie das Land: Das Moor verlangt mindestens die Eisenrolle der Stufe 2 und die Höhen den Silberbach der Stufe 3, und eine Schnur, die ohne die vom Wasser geforderte Rute ausgeworfen wird, verlässt deine Hand nie. Zwei Ruten stehen darüber, die Sturmrolle und die Flutgeschmiedete: Ingenieure fertigen sie an der Werkzeugmacherei aus dem, was eine Schnur heraufholt, und der Tiefgang-Tresen der Ertrunkenen Litanei verkauft sie hinter ihren Abschluss-Schranken für Tiefgang-Marken, doch nie für Münzen. Kein Gewässer verlangt sie, sie kaufen also eine kürzere Wartezeit und ein breiteres Einholfenster statt Zugang, was auf der obersten Sprosse einen Biss nach glatten drei Sekunden bedeutet.",
         "biteHeading": "Biss und Einholen",
         "biteBody": "Nach dem Auswerfen kommt der Biss in einem verborgenen Moment zwischen {min} und {max} Sekunden; die Verzögerung wird festgelegt, sobald die Schnur aufs Wasser trifft, keine zwei Würfe fühlen sich also ganz gleich an. Wenn die Pose anbeißt, hast du ein Fenster von {reel} Sekunden, um die Angel erneut zu drücken und einzuholen: Holst du darin ein, landet der Fang, zögerst du darüber hinaus, entkommt der Fisch, und du hast nichts vorzuweisen. Ein ganzer Durchgang ist bei {cap} Sekunden gedeckelt, selbst ein ruhiger Wurf ist also schnell entschieden.\n\nBessere Ruten schärfen beide Enden des Minispiels: Jede Rutenstufe über der ersten kürzt die längstmögliche Wartezeit um {rod} Sekunden, nie unter das Minimum von drei Sekunden, das die oberste Rute ohnehin schon streift, und legt {reelRod} Sekunden auf das Einholfenster, sodass die Eisenrolle die schlimmste Wartezeit auf 6,5 Sekunden mit einem Fenster von 3,25 Sekunden drückt und der Silberbach auf 5 mit einem Fenster jenseits von 4, wobei seine Seltenheit das Einholen noch etwas weiter öffnet, als die Stufe allein zahlt. Die schnellsten Bisse ändern sich nie, was du auch hältst, und eine Rute muss nur in deinen Taschen liegen, um zu zählen.",
+        "earlyReelNote": "One caution for eager thumbs: press the pole again before anything bites and you reel in an empty line, ending the cast (a moment of grace right after casting forgives an accidental double-press). Patience is the whole game: wait for the bite, then strike.",
         "scheduleHeading": "Fertigkeitszuwachs",
         "scheduleNote": "Der Angelzuwachs folgt einem festen Plan ohne Würfel: ein voller Punkt pro Fang unter Fertigkeit 50, ein halber Punkt unter 100, ein Zehntel unter 150 und ein langsames Rinnsal von 0,02 von 150 bis 200. Diese letzte Strecke ist mit Absicht eine Reise über Tausende von Fängen: 200 ist eine Aussage, keine Zwischenstation auf dem Weg zu etwas anderem.\n\nPlunder hört bei {cutoff} vollständig auf zu lehren: Von da an sind Kraut und Stiefel eben nur Kraut und Stiefel. Auch das Gewässer selbst deckelt die Lektion: Die Gewässer der Stufe 1 im Tal (und jede junge Küste jenseits des Kernlands) lehren über 100 hinaus nichts mehr, die des Moores hören bei 150 auf, und nur die von Thornpeak schulen einen Angler den ganzen Weg bis 200. Jeder gelandete Fang bringt ansonsten den planmäßigen Zuwachs, wenn der Zähler also stockt, sagt dir der Plan, dass du tieferes Wasser suchen sollst.",
         "colProficiency": "Fertigkeit",
@@ -10305,6 +10337,15 @@ export const de_DE: EnTranslations = {
       },
       "direfang_quiver": {
         "name": "Direfang-Köcher"
+      },
+      "sharp_claw": {
+        "name": "Sharp Claw"
+      },
+      "curved_tusk": {
+        "name": "Curved Tusk"
+      },
+      "pristine_claw": {
+        "name": "Pristine Claw"
       },
       "conjured_water4": {
         "name": "Herbeigezaubertes Quellwasser"

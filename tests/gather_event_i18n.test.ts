@@ -330,6 +330,26 @@ describe('hudChrome.gathering catch line (Professions 2.0)', () => {
     expect(hasTranslation('hudChrome.gathering.emptyHookNote')).toBe(true);
   });
 
+  it('the fishingEarlyReel case logs the grey teach line and plays no cue (the spam-click fix)', () => {
+    // Same comment-stripped idiom as the fishingEmptyHook pin above. The
+    // early reel is self-inflicted and free, so it takes the gotAwayLine
+    // register exactly: a grey log line, no self-note, and NO cue (a spammer
+    // would turn a cue into noise).
+    const source = readFileSync(path.resolve(process.cwd(), 'src/ui/hud.ts'), 'utf8').replace(
+      /^\s*\/\/.*$/gm,
+      '',
+    );
+    const caseStart = source.indexOf("case 'fishingEarlyReel'");
+    expect(caseStart).toBeGreaterThan(-1);
+    const block = source.slice(caseStart, source.indexOf('break;', caseStart));
+    expect(block.includes("this.log(t('hudChrome.gathering.earlyReelLine'), '#a8a8a8')")).toBe(
+      true,
+    );
+    expect([...block.matchAll(/audio\.(\w+)\(/g)]).toHaveLength(0);
+    expect(block.includes('showSelfNote(')).toBe(false);
+    expect(hasTranslation('hudChrome.gathering.earlyReelLine')).toBe(true);
+  });
+
   it('the effectDepleted flag renders ONE gated FCT self-note (the last-charge signal)', () => {
     // The phase 14 QA: the HUD arm had no test at all. Same idiom as the
     // fishingEmptyHook pin above: comment-stripped, the note gated on the

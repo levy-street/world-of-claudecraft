@@ -3,8 +3,9 @@
 // full resist is the complement of the level-based spell-hit chance
 // (`spellHitChance` in types.ts), so a higher-level target resists a caster's
 // spells exactly as often as it would have made them "miss" before. Shared by
-// the player cast path (combat/casting_lifecycle.ts) and the pet ranged-spell
-// path (sim.ts) so both label the outcome the same way.
+// the player cast path (combat/casting_lifecycle.ts), the pet ranged-spell
+// path (sim.ts), and the player pet bolt path (pet/pet_ai.ts petRangedAttack)
+// so all three label the outcome the same way.
 
 import { type Entity, MOB_VS_PLAYER_MAX_MISS, spellHitChance } from '../types';
 
@@ -43,7 +44,11 @@ export function isSpellResisted(
 export const MOB_VS_PLAYER_MAX_RESIST = MOB_VS_PLAYER_MAX_MISS;
 
 // Directional resist roll for the mob-vs-player-side ranged/spell path (mob/
-// hunter-pet updateRangedPetAttack in sim.ts). Mirrors swingMissChance's
+// hunter-pet updateRangedPetAttack in sim.ts) and the player pet bolt path
+// (pet/pet_ai.ts petRangedAttack). A player-owned pet as caster takes the
+// UNFLOORED branch: mobAttacker requires ownerId === null, so the floor below
+// never binds and the pet keeps the full above-level resist scaling, exactly
+// like a player cast. Mirrors swingMissChance's
 // hostile-mob / player-side guard: a hostile wild mob (or its ranged attack)
 // casting at a player or player-owned pet has its resist chance floored so it
 // still hits at least (1 - MOB_VS_PLAYER_MAX_RESIST) of the time; player/pet ->

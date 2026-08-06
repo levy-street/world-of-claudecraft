@@ -391,7 +391,8 @@ export const nl_NL: EnTranslations = {
     },
     "emoteEditor": {
       "title": "Emotes",
-      "done": "Klaar"
+      "done": "Klaar",
+      "close": "Close emotes"
     },
     "dailyRewards": {
       "title": "Dagelijkse beloningen",
@@ -1277,6 +1278,24 @@ export const nl_NL: EnTranslations = {
       "graphicsFatal": "Herstel van de grafische instellingen is mislukt. Herlaad het spel om door te gaan.",
       "graphicsReload": "Spel herladen",
       "graphicsDraftChanged": "Grafische wijzigingen zijn klaar om toe te passen.",
+      "gfxSectionQuality": "Quality",
+      "gfxSectionWorld": "World Detail",
+      "gfxSectionLighting": "Lighting & Effects",
+      "gfxSectionCamera": "Camera",
+      "gfxSectionDisplay": "Display",
+      "gfxSectionSystem": "System",
+      "gfxSectionTouch": "Touch Controls",
+      "gfxViewDistance": "View Distance",
+      "gfxWaterQuality": "Water Quality",
+      "gfxCharacterDetail": "Character Detail",
+      "gfxAmbientOcclusion": "Ambient Occlusion",
+      "gfxBloom": "Bloom",
+      "gfxAntiAliasing": "Anti-Aliasing",
+      "gfxDynamicLights": "Dynamic Lights",
+      "gfxParticleEffects": "Particle Effects",
+      "gfxHalf": "Half",
+      "gfxCustomNote": "Changing a dial switches the quality preset to Advanced: a custom mix built on the High-quality base, starting from the levels shown for your current preset.",
+      "gfxEffectsNote": "Ambient Occlusion, Bloom and Anti-Aliasing ride the post-processing chain: with Effects & Lighting on Low the chain is off and they have no effect.",
       "interfaceMode": "Interfacemodus",
       "interfaceModeAuto": "Automatisch",
       "interfaceModeDesktop": "Desktop",
@@ -1348,6 +1367,8 @@ export const nl_NL: EnTranslations = {
       "buttons": "Knopindeling",
       "resetButtons": "Knopindeling resetten",
       "menuAction": "Spelmenu",
+      "zoomIn": "Zoom In",
+      "zoomOut": "Zoom Out",
       "help": "Linkerstick beweegt, rechterstick kijkt rond. Open een venster om de aanwijzer op het scherm te gebruiken."
     },
     "perf": {
@@ -1576,6 +1597,7 @@ export const nl_NL: EnTranslations = {
     },
     "itemHeroicTag": "[HELDHAFTIG]",
     "itemSoulbound": "Zielsgebonden",
+    "itemUniqueEquipped": "Unique-Equipped",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -2552,6 +2574,7 @@ export const nl_NL: EnTranslations = {
       "catchLine": "Je trekt in: {name}",
       "biteLine": "Er hapt iets naar het aas!",
       "gotAwayLine": "Hij ontsnapte.",
+      "earlyReelLine": "You reel in too soon. Nothing had taken the bait.",
       "nodeName": {
         "ore": "Ertsslagader",
         "wood": "Houtopstand",
@@ -3145,7 +3168,8 @@ export const nl_NL: EnTranslations = {
         "raise_fallen": "Gevallenen Herrijzen (periodieke golven van toevoegingen)",
         "soul_rend": "Zielenscheur (gemarkeerde spelers moeten spreiden en worden genezen)",
         "deathless_rage": "Doodloze Razernij (onderbroken bij de wardstones)",
-        "wardstones": "Wardstone-kanalen (faseovergang)"
+        "wardstones": "Wardstone-kanalen (faseovergang)",
+        "dread_curse": "Dread Curse (heroic only, stacking tank-swap debuff)"
       }
     },
     "deeds": {
@@ -3553,16 +3577,21 @@ export const nl_NL: EnTranslations = {
       "groupInterface": "Interface",
       "groupCamera": "Camera",
       "talents": "Talenten",
+      "professions": "Professions",
       "arena": "Arena",
       "leaderboard": "Ranglijst",
       "deeds": "Boek der Daden",
+      "sheathe": "Sheathe/Unsheathe Weapon",
       "crafting": "Vervaardigen",
       "valeCup": "De Dalbeker",
+      "mount": "Mount / Dismount",
       "calendar": "Evenementenkalender",
+      "dungeonFinder": "Dungeon Finder",
       "discord": "Discord",
       "abilities": "Actiebalkvaardigheden gebruiken (de cijferrij; een tweede balk staat op het numerieke toetsenblok)",
       "targetFriendly": "Dichtstbijzijnde bondgenoot aanwijzen",
       "cycleFriendly": "Door bondgenoten bladeren",
+      "targetAuras": "Target buffs and debuffs",
       "gameMenu": "Spelmenu en opties openen",
       "bothMouse": "Beide muisknoppen",
       "runForward": "Vooruit rennen",
@@ -4314,6 +4343,8 @@ export const nl_NL: EnTranslations = {
       "sourcesBody": "De meeste van je vroege verbeteringen zijn questbeloningen, dus het loont om quests af te ronden in plaats van te grinden. Vijanden laten uitrusting vallen wanneer je ze verslaat, verkopers in de stad verkopen degelijke basisspullen, ambachtslieden maken van verzamelde materialen draagbare stukken, en op de spelersmarkt kun je van andere avonturiers kopen. Bovenaan de heuvel kopen twee merkvaluta uitrusting die nergens anders te vinden is: Delve-Merken bij de delvebewaarder, en Heroïsche Merken bij de heroïsche kwartiermeester.",
       "soulboundTitle": "Zielgebonden: van jou en jou alleen",
       "soulboundBody": "Een paar bijzondere beloningen zijn zielgebonden, verbonden aan je personage vanaf het moment dat je ze verdient. Een zielgebonden voorwerp kun je niet verhandelen, versturen, aan een verkoper verkopen of op de markt zetten; het is van jou en jou alleen. Vandaag beschermt dat prijzentokens zoals Heroïsche Merken, terwijl de uitrusting die je wint van jou is om vrijelijk te verhandelen, verkopen of delen.",
+      "uniqueTitle": "Unique-Equipped: one legendary of a kind",
+      "uniqueBody": "Legendary items are unique-equipped: your character can wear only one copy of a given legendary at a time, and its heroic version counts as the same item. A second copy can ride in your bags, in the bank, or on the market, but trying to wear both at once is refused, and the tooltip carries a gold Unique-Equipped tag so you can see the rule before you plan a build around two of them.",
       "setsTitle": "Sets en setbonussen",
       "setsBody": "Sommige pantsers komen in bij elkaar passende families, meerdere stukken die zo gesneden zijn dat ze er als één uitzien en als één vechten. Draag er genoeg van een familie tegelijk en de set ontwaakt, en geeft bonussen bovenop de eigen statistieken van elk stuk, en hoe meer stukken je draagt, hoe sterker hij wordt. Een paar van zulke families duiken op als gewilde drops terwijl je levelt; de grootste ervan komen uit de zwaarste groepscontent vlak bij de levelcap, dus jagen op een volledige set is een klassiek eindspeldoel.",
       "consumablesTitle": "Verbruiksartikelen",
@@ -4570,6 +4601,7 @@ export const nl_NL: EnTranslations = {
         "startBody": "Een Eenvoudige Hengel kost 20 koper bij Visser Brandt in Oostbeek (zoek de Oude Zout aan de oostrand van de stad, bij de weg naar het Spiegelmeer); ook Knutselaar Gizzel, Proviandmeester Hale in Fenbridge en Kwartiermeester Bree in Highwatch hebben hengels op voorraad. Gebruik de hengel terwijl je naar water kijkt dat diep genoeg is om vis te herbergen, tot ongeveer 24 meter voor je, en je dobber vliegt uit.\n\nJe kunt niet werpen tijdens een gevecht, tijdens het zwemmen of terwijl je dood bent: werpen vanaf de oever is de bedoelde houding. Het water wordt wel zwaarder naarmate het land dat doet: het moeras wil minstens de rang 2 Hengel met ijzeren molen en de toppen de rang 3 Zilverbeek-hengel, en een lijn die wordt geworpen zonder de hengel die dat water vraagt, verlaat je hand nooit. Daarboven staan nog twee hengels, de Stormmolen-hengel en de Getijsmeed-hengel: knutselaars maken ze bij de gereedschapsmakerij uit wat een lijn ophaalt, en de delve-balie van De Verdronken Litanie verkoopt ze voor Delve-Tekens achter haar voltooiingsdrempels, zij het nooit voor munt. Geen enkel water vraagt erom, dus ze kopen een kortere wachttijd en een breder inhaalvenster in plaats van toegang, wat op de hoogste trede een beet in een strakke drie seconden betekent.",
         "biteHeading": "Aanslaan en inhalen",
         "biteBody": "Na de worp komt de beet op een verborgen moment tussen {min} en {max} seconden; de vertraging wordt bepaald op het ogenblik dat de lijn landt, dus geen twee worpen voelen helemaal hetzelfde. Wanneer de dobber aanslaat heb je een venster van {reel} seconde om de hengel opnieuw in te drukken en binnen te halen: haal je binnen dat venster in, dan landt de vangst; aarzel je te lang, dan ontsnapt de vis en houd je niets over. Een hele sessie wordt begrensd op {cap} seconden, dus zelfs een stille worp is snel afgehandeld.\n\nBetere hengels scherpen beide kanten van het minispel aan: elke hengelrang boven de eerste knipt {rod} seconde van de langst mogelijke wachttijd, nooit onder de ondergrens van drie seconden die de tophengel al schampt, en voegt {reelRod} seconde toe aan het inhaalvenster, zodat de Hengel met ijzeren molen de ergste wachttijd terugbrengt tot 6,5 seconde met een venster van 3,25 seconde, en de Zilverbeek-hengel tot 5 met een venster voorbij 4, waarbij zijn zeldzaamheid het inhalen nog iets verder verbreedt dan de rang alleen betaalt. De snelste beten veranderen nooit, wat je ook vasthoudt, en een hengel hoeft alleen in je tassen te zitten om mee te tellen.",
+        "earlyReelNote": "One caution for eager thumbs: press the pole again before anything bites and you reel in an empty line, ending the cast (a moment of grace right after casting forgives an accidental double-press). Patience is the whole game: wait for the bite, then strike.",
         "scheduleHeading": "Vaardigheidswinst",
         "scheduleNote": "Visvaardigheidswinst volgt een vast schema zonder dobbelsteen: een vol punt per vangst onder vaardigheid 50, een half punt onder 100, een tiende onder 150, en een traag straaltje van 0,02 van 150 tot 200. Dat laatste stuk is met opzet een reis van duizenden vangsten: 200 is een statement, geen halte op weg naar iets anders.\n\nRommel stopt volledig met leren bij {cutoff}: vanaf dat punt zijn wier en laarzen gewoon wier en laarzen. Ook het water zelf begrenst de les: de rang 1-wateren van het Dal (en elke jonge kust voorbij het kernland) leren je niets meer voorbij 100, die van het moeras stoppen bij 150, en alleen die van Doorntop scholen een hengelaar de hele weg tot 200. Elke gelande vangst levert verder winst op volgens het schema, dus wanneer de teller vastloopt, zegt het schema je dat je dieper water moet zoeken.",
         "colProficiency": "Vaardigheid",
@@ -10305,6 +10337,15 @@ export const nl_NL: EnTranslations = {
       },
       "direfang_quiver": {
         "name": "Direfang-Pijlkoker"
+      },
+      "sharp_claw": {
+        "name": "Sharp Claw"
+      },
+      "curved_tusk": {
+        "name": "Curved Tusk"
+      },
+      "pristine_claw": {
+        "name": "Pristine Claw"
       },
       "conjured_water4": {
         "name": "Getoverd bronwater"
