@@ -52,7 +52,7 @@ import {
 } from '../src/sim/jail';
 import type { PickAction } from '../src/sim/lockpick';
 import { lootHasGoneFfa } from '../src/sim/loot/loot_ffa';
-import { sanitizeMarketQuery } from '../src/sim/market_query';
+import { type MarketQuery, sanitizeMarketQuery } from '../src/sim/market_query';
 import { parseMoveInputFrame } from '../src/sim/move_input';
 import {
   partyFrameAbsorb,
@@ -546,6 +546,27 @@ const VC_WIRE_INTERVAL_TICKS = Math.max(1, Math.round(1 / (DT * VC_WIRE_HZ)));
 // the same cadence and only re-sends when a listing actually changes.
 const DF_WIRE_HZ = 2;
 const DF_WIRE_INTERVAL_TICKS = Math.max(1, Math.round(1 / (DT * DF_WIRE_HZ)));
+// World Market browse readout cadence. The browse view is a filter + page over
+// the whole listing book, the single most expensive per-viewer read in
+// selfWireJson on a grown book, and nothing in it carries a sub-second clock,
+// so 4 Hz keeps the window feeling live while capping the rebuild rate. The
+// viewer's OWN market commands re-arm the gate (MARKET_WIRE_PROMPT_CMDS) so
+// their search/buy/cancel feedback still lands on the next snapshot. On top of
+// the cadence, a rebuild-only-on-change gate (sim.marketBrowseRevFor plus the
+// query object identity) skips the rebuild entirely while nothing changed;
+// MARKET_BROWSE_REFRESH_TICKS is its staleness backstop, the heavy-gate
+// refresh idea applied here.
+const MARKET_WIRE_HZ = 4;
+const MARKET_WIRE_INTERVAL_TICKS = Math.max(1, Math.round(1 / (DT * MARKET_WIRE_HZ)));
+const MARKET_BROWSE_REFRESH_TICKS = 40;
+const MARKET_WIRE_PROMPT_CMDS = new Set<string>([
+  'market_search',
+  'market_list',
+  'market_list_instance',
+  'market_buy',
+  'market_cancel',
+  'market_collect',
+]);
 
 type ClientMessage = Record<string, unknown> & {
   ability?: string;
@@ -911,6 +932,14 @@ export interface ClientSession {
   lastBgWireTick: number;
   // Dungeon Finder readout, same idea at its own cadence (DF_WIRE_HZ)
   lastDfWireTick: number;
+  // World Market browse readout, same idea at its own cadence (MARKET_WIRE_HZ),
+  // plus the rebuild-only-on-change state: the sim browse revision and the
+  // query object last built for, and the tick of the last rebuild (the
+  // MARKET_BROWSE_REFRESH_TICKS staleness backstop's tracker).
+  lastMarketWireTick: number;
+  lastMarketBrowseRev: number | null;
+  lastMarketQueryRef: MarketQuery | null;
+  lastMarketRebuildTick: number;
   // set when a command or sim event that can change a heavy self field (bags,
   // gear, quests, talents, stats, ...) lands for this session, so the next
   // snapshot re-diffs those fields. Otherwise they're skipped (see
@@ -2077,6 +2106,10 @@ export class GameServer {
     moderator.lastSent = {};
     moderator.lastArenaWireTick = -ARENA_WIRE_INTERVAL_TICKS;
     moderator.lastDfWireTick = -DF_WIRE_INTERVAL_TICKS;
+    moderator.lastMarketWireTick = -MARKET_WIRE_INTERVAL_TICKS;
+    moderator.lastMarketBrowseRev = null;
+    moderator.lastMarketQueryRef = null;
+    moderator.lastMarketRebuildTick = 0;
     moderator.sentEnts.clear();
     // force the heavy self block (tal/inv/equip/bags/...) to re-run next
     // snapshot: it is gated on meta.wireRev vs session.lastWireRev, and that
@@ -2107,6 +2140,10 @@ export class GameServer {
     moderator.lastSent = {};
     moderator.lastArenaWireTick = -ARENA_WIRE_INTERVAL_TICKS;
     moderator.lastDfWireTick = -DF_WIRE_INTERVAL_TICKS;
+    moderator.lastMarketWireTick = -MARKET_WIRE_INTERVAL_TICKS;
+    moderator.lastMarketBrowseRev = null;
+    moderator.lastMarketQueryRef = null;
+    moderator.lastMarketRebuildTick = 0;
     moderator.sentEnts.clear();
     // same as enterSpectate: force the heavy self block to re-run so the
     // moderator's OWN talents/inventory/equip/etc. resend immediately
@@ -3514,6 +3551,10 @@ export class GameServer {
       lastArenaWireTick: -ARENA_WIRE_INTERVAL_TICKS,
       lastBgWireTick: -BG_WIRE_INTERVAL_TICKS,
       lastDfWireTick: -DF_WIRE_INTERVAL_TICKS,
+      lastMarketWireTick: -MARKET_WIRE_INTERVAL_TICKS,
+      lastMarketBrowseRev: null,
+      lastMarketQueryRef: null,
+      lastMarketRebuildTick: 0,
       selfHeavyDirty: true,
       lastWireRev: -1,
       sentEnts: new Map(),
@@ -6088,6 +6129,12 @@ export class GameServer {
     // re-diff those fields (combat-only commands like cast/target/attack do not,
     // which is what keeps the gating a win during a fight).
     if (typeof msg.cmd === 'string' && HEAVY_SELF_CMDS.has(msg.cmd)) session.selfHeavyDirty = true;
+    // The viewer's own market commands re-arm the market wire gate so their
+    // search/list/buy/cancel/collect feedback lands on the next snapshot
+    // instead of waiting out the MARKET_WIRE_HZ cadence.
+    if (typeof msg.cmd === 'string' && MARKET_WIRE_PROMPT_CMDS.has(msg.cmd)) {
+      session.lastMarketWireTick = -MARKET_WIRE_INTERVAL_TICKS;
+    }
     switch (command) {
       case 'castSlot':
         if (typeof msg.slot === 'number') sim.castAbilityBySlot(msg.slot | 0, pid);
@@ -8357,8 +8404,40 @@ export class GameServer {
       );
     }
     // market info is null unless the player is standing at the Merchant, so it
-    // only rides the wire for players actually browsing the World Market
-    maybe('market', this.sim.marketInfoFor(anchorSession.pid));
+    // only rides the wire for players actually browsing the World Market.
+    // Rebuilding that view is a filter plus a page over the WHOLE listing book,
+    // so it runs at its own cadence (MARKET_WIRE_HZ; the viewer's own market
+    // commands re-arm the gate for next-snapshot feedback) and, within the
+    // cadence, only when something it reads actually changed: the sim's browse
+    // revision (listings or collections), the viewer's query object (replaced
+    // wholesale by marketSearch, so identity is the change signal), or the
+    // staleness backstop coming due. Profiled: on a grown book the unconditional
+    // per-tick rebuild was the dominant bcastSelf cost.
+    const marketDue =
+      this.sim.tickCount - session.lastMarketWireTick >= MARKET_WIRE_INTERVAL_TICKS ||
+      sent.market === undefined;
+    if (marketDue) {
+      session.lastMarketWireTick = this.sim.tickCount;
+      const browseRev = this.sim.marketBrowseRevFor(anchorSession.pid);
+      if (browseRev === null) {
+        maybe('market', null);
+        session.lastMarketBrowseRev = null;
+      } else if (
+        sent.market === undefined ||
+        browseRev !== session.lastMarketBrowseRev ||
+        meta.marketQuery !== session.lastMarketQueryRef ||
+        this.sim.tickCount - session.lastMarketRebuildTick >= MARKET_BROWSE_REFRESH_TICKS
+      ) {
+        session.lastMarketQueryRef = meta.marketQuery;
+        session.lastMarketRebuildTick = this.sim.tickCount;
+        maybe('market', this.sim.marketInfoFor(anchorSession.pid));
+        // Stamp AFTER the rebuild: marketInfoFor can advance the revision as a
+        // read side effect (the legacy name-keyed collection merge), and a
+        // pre-rebuild stamp would leave this one behind, costing a redundant
+        // rebuild on the next due pass.
+        session.lastMarketBrowseRev = this.sim.marketBrowseRevFor(anchorSession.pid) ?? browseRev;
+      }
+    }
     // the lightweight collect-indicator bit streams ALWAYS (the mailU pattern),
     // so the minimap badge lights anywhere while proceeds/items wait
     maybe('mktU', this.sim.marketCollectPendingFor(anchorSession.pid) ? 1 : 0);

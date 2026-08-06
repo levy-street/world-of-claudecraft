@@ -10448,6 +10448,13 @@ export class Sim {
     return this.market.marketInfoFor(pid);
   }
 
+  // Server-only broadcast helper (never IWorld, the guildBankInfoForGuild
+  // precedent): the cheap change signal server/game.ts polls before paying for
+  // a marketInfoFor rebuild. Null while the player is not at a Merchant.
+  marketBrowseRevFor(pid: number): number | null {
+    return this.market.browseRevFor(pid);
+  }
+
   // The always-streamed collect-indicator bit (the mailUnreadFor pattern):
   // server/game.ts ships it on every snapshot as `mktU`.
   marketCollectPendingFor(pid: number): boolean {
