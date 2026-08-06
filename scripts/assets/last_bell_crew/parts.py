@@ -811,6 +811,34 @@ def held(name, glb, rig, bone, rot=(90, 0, 0), offset=(0, 0, 0), scale=1.0,
     return mount(prop, rig, bone, rot=rot, offset=offset, scale=scale, grip_at=grip_at)
 
 
+def seated(name, glb, rig, bone, seat):
+    """Import a prop and place it on a CAPTURED rest matrix from a live session.
+
+    The counterpart to `held`. `held` DERIVES a seat from a grip family; this takes
+    the 4x4 a human authored in the shared Blender session and uses it verbatim.
+
+    The captured `matrix_world` IS the rest placement, because the armature
+    modifier's rigid map is independent of the object transform, so it is ASSIGNED
+    rather than composed onto the importer's own Y-up rotation (the capture already
+    contains it), and it is never decomposed back into rot/offset/scale.
+    Re-deriving a human's seat is exactly what put a fist on a blade three times
+    over: `docs/design/last-bell-held-prop-workflow.md`, failures 2 and 4.
+    """
+    before = set(bpy.data.objects)
+    bpy.ops.import_scene.gltf(filepath=glb)
+    fresh = [o for o in bpy.data.objects if o not in before]
+    meshes = [o for o in fresh if o.type == "MESH"]
+    for o in fresh:
+        if o.type != "MESH":
+            bpy.data.objects.remove(o, do_unlink=True)
+    if not meshes:
+        raise ValueError(f"no geometry in {glb}")
+    prop = join(meshes, name) if len(meshes) > 1 else meshes[0]
+    prop.name = name
+    prop.matrix_world = Matrix(seat)
+    return skin(prop, rig, bone)
+
+
 def mount(prop, rig, bone, rot=(90, 0, 0), offset=(0, 0, 0), scale=1.0,
           grip_at="head"):
     """Seat an already-built prop on a hand slot and rigid-bind it.

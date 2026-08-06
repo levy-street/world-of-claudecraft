@@ -113,54 +113,52 @@ def build_coalfast_helm():
 def build_ollun():
     """Riftwatch Ollun, Breach Scholar.
 
-    Authored detail: the INSTRUMENT BANDOLIER WITH EMPTY LOOPS. He gives his
-    possessions away across the arc, so the strap that should carry a full set of
-    star-glass instruments is missing most of them. The gaps are the character.
+    Authored detail: NOT YET BUILT, see the note in the body. The characterisation
+    currently rides entirely on the two-tone cowl, which is deliberate but is not a
+    detail in the sense the rest of this file means it.
 
-    HOODED, and for a specific reason: the KayKit mage body wears long loose hair,
-    which reads female at a glance, and Ollun is a he. A hood settles that without
-    touching the shipped head, and a man who keeps the signal-fire vigil in Farshore
-    weather would own one. His hair is dark: nothing in the spec makes him old.
+    Built on the HOODED rogue, not the mage. The mage pass recoloured long loose
+    hair to robe slate and called it a hood, and it never read as one; this base
+    carries a REAL cowl (half of `RogueHooded_Head`, sampling the cape's own cell),
+    so the hood is geometry and the two-tone is two palette entries with no re-UV
+    at all: cowl, cape and shoulder panel dark on one cell, tunic and sleeves pale
+    on the other. His hair is dark; nothing in the spec makes him old.
+
+    The face mask is its OWN mesh, so hiding it is the one line below and the face
+    carries the dialogue. Keeping it instead (and re-celling it off the garment) is
+    the whole cost of a masked Riftfield variant, the same two-for-one Coalfast's
+    helm gets; that variant needs its own `cast.py` entry before it can build.
     """
-    rig, meshes = crew.load_base("mage.glb", hide=("Mage_Hat",))
+    rig, meshes = crew.load_base("rogue_hooded.glb", hide=("RogueHooded_Mask",))
     palette = crew.base_palette(
-        cloth=ramp(0x3F5F8A, 0x1B2C42),         # riftwatch slate: his entity colour
-        cape=ramp(0x33506F, 0x172538),
+        # r1c1 is the cowl AND the cape AND the shoulder panel: one entry moves all
+        # three, which is what makes the hood read as a single garment.
+        cape=ramp(0x3F5F8A, 0x1B2C42),          # riftwatch slate: his entity colour
+        cloth=ramp(0xE4D9C0, 0x9E9078),         # old paper: the record he keeps
+        trousers=ramp(0x33445C, 0x18222E),      # dark below, so the pale torso is framed
         hair=ramp(0x4A3A2C, 0x241C15),          # dark: he is not one of the old ones
         skin=ramp(0xE0AF8A, 0x9C6C4C),
-        trim=crew.GLASS,                        # instrument fittings read as glass
         leather=crew.LEATHER,
+        belt=crew.LEATHER_PALE,
         boots=crew.LEATHER,
+        gloves=crew.LEATHER,
+        plate=crew.BRONZE,                      # the few metal fittings he carries
+        trim=crew.GLASS,                        # instrument fittings read as glass
     )
     img, mat = crew.repaint(meshes, "ollun", palette)
-    body, head = _body(meshes), _body(meshes, HEAD)
-    # The long loose hair is what read as a woman, and it hangs past the hood at the
-    # sides where no hood can cover it. Re-UV it onto the ROBE's cell so it reads as
-    # the hood's own drape rather than as hair, which settles the silhouette without
-    # touching the shipped head mesh.
-    crew.reuv(head, "hair", "cloth", shade_t=0.40)
 
+    # NO head-mounted lens. Three seats were tried and all three were rejected on
+    # look: a `hug_band` circlet turned the cowl into a peaked forage cap in profile,
+    # a bracket-mounted lens cleared the hood's silhouette and read as a disc on a
+    # stick, and even flush in the cowl the thing read as an eye rather than as an
+    # instrument. Nothing goes on this hood; the cowl carries him on its own.
+    #
+    # OWED: his authored detail. The two-tone is characterisation but it is not a
+    # detail, and every other figure here has one. The candidate is the instrument
+    # bandolier with its EMPTY LOOPS (`parts.strap` plus two `parts.tag_row` runs on
+    # one `sash_path`, the Coalfast roll-of-names idiom), which is chest-mounted and
+    # so cannot repeat the head-clutter problem above.
     built = []
-    strap = parts.sash_path(body, 0.200, -0.290)
-    built.append(parts.strap("Ollun_Bandolier", strap, width=0.070, thick=0.022,
-                             cell="leather", shade_t=0.40, material=mat, up=(0, -1, 0)))
-    # Two instruments left and six loops. The loops sit on the SAME path so the eye
-    # reads the gaps as belonging to the set rather than as missing geometry.
-    built.append(parts.tag_row(
-        "Ollun_Loops", strap[1:5], count=6, cell="leather",
-        width=0.030, drop=0.052, thick=0.013, shade_t=0.55, material=mat,
-        offset=(0, -0.028, 0), span=(0.08, 0.92), lengths=(1, 1, 1, 1, 1, 1)))
-    built.append(parts.tag_row(
-        "Ollun_Instruments", strap[1:5], count=2, cell="glass",
-        width=0.044, drop=0.090, thick=0.020, shade_t=0.22, material=mat,
-        offset=(0, -0.040, 0), span=(0.10, 0.42), lengths=(1.0, 0.78)))
-    built.append(parts.plate("Ollun_Satchel", (0.255, -0.215, 0.700), (0.35, -1, 0),
-                             w=0.230, h=0.200, thick=0.075, cell="canvas",
-                             shade_t=0.34, material=mat))
-    _skinned(built, rig, {
-        "Ollun_Bandolier": "chest", "Ollun_Loops": "chest",
-        "Ollun_Instruments": "chest", "Ollun_Satchel": "hips",
-    })
     return _finish("ollun", rig, meshes, built, img, mat)
 
 

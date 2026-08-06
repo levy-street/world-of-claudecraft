@@ -271,7 +271,7 @@ CAST = {
         "title": "Breach Scholar",
         "post": "The signal-fire vigil, Watch Meadow",
         "entity_color": "#3f5f8a",
-        "base": "mage.glb",
+        "base": "rogue_hooded.glb",
         "height_yards": HUMANOID,
         "role": "Interrupts Rift effects and reads the changing anchor pattern.",
         "blurb": (
@@ -282,33 +282,57 @@ CAST = {
             "describes his own future."
         ),
         "signature": (
-            "The instrument bandolier, and its empty loops. He gives his "
-            "possessions away as the arc runs, so the strap that should hold a "
-            "full set of star-glass instruments is missing more of them every time "
-            "you see him. The gaps are the character: he suspected first, and said "
-            "nothing, because hope was also a calculation."
+            "The cowl, and what it hides. He is the one who suspected first and said "
+            "nothing, and a hood that shadows half a face says that before he opens "
+            "his mouth. Dark slate over old paper, so the man who keeps the record "
+            "is wearing the record. His authored detail, the instrument bandolier "
+            "with its empty loops, is still owed."
         ),
         "palette": [
-            ("Riftwatch slate", "#3f5f8a", "His sim entity colour, worn as the robe."),
-            ("Star-glass", "#a9dcee", "Instruments, and what the seal is made of."),
-            ("Old paper", "#e4d9c0", "The record that outlives him and reaches the Old Beacon."),
+            ("Riftwatch slate", "#3f5f8a", "His sim entity colour, worn as the cowl and cape."),
+            ("Star-glass", "#a9dcee", "His instruments, and what the seal is made of."),
+            ("Old paper", "#e4d9c0", "The tunic, and the record that reaches the Old Beacon."),
             ("Bell bronze", "#9c7437", "Instrument fittings, calibrated against the bell."),
         ],
         "notes": [
-            "Hooded, and for a reason: the KayKit mage body wears long loose hair, "
-            "which read as a woman at a glance. A hood settles it without touching "
-            "the shipped head, and a man who keeps the signal-fire vigil in Farshore "
-            "weather owns one. His hair is dark; nothing in the spec makes him old.",
+            "Built on the HOODED rogue, which carries a real cowl: half of "
+            "`RogueHooded_Head` samples the cape's own palette cell. The first pass "
+            "used the mage body, whose long loose hair was recoloured to robe slate "
+            "and called a hood; it never read as one. His hair is dark; nothing in "
+            "the spec makes him old.",
+            "The two-tone is the characterisation, and it costs two palette entries "
+            "and no re-UV: cowl, cape and shoulder panel slate on one cell, tunic and "
+            "sleeves old paper on the other. Dark hood over a pale body reads as a "
+            "scholar at gameplay distance, and reads as nobody else on this island.",
             "No wizard hat. He is an instrument-keeper and a record-keeper, not a "
             "spellcaster, and the silhouette should not promise magic.",
-            "The empty loops are authored asymmetrically, so the eye reads them as "
-            "absence rather than as a pattern.",
+            "The face mask is its own mesh and is hidden, so the face can carry the "
+            "dialogue. Keeping it is the whole cost of a masked Riftfield variant.",
+            "Still owed: the instrument bandolier with its EMPTY LOOPS. He gives his "
+            "possessions away as the arc runs, so the strap that should hold a full "
+            "set of instruments is missing more of them every time you see him. That "
+            "is a second authored detail, and it is not built yet.",
         ],
         "weapons": [
+            # HAND-AUTHORED seat, captured 2026-08-06 from `Ollun_Tweak` in the live
+            # session (`tmp/asset_src/last_bell_crew/Untitled.blend`) with the rig at
+            # the origin, so this 4x4 is the rest placement verbatim. It supersedes
+            # every derived attempt: the shared `stave` grip lays the staff level at the
+            # hip and drives its butt end through the cape, and neither the inverted
+            # crown (review 1.4) nor a grounded-vertical carry off Marsh's polearm
+            # rotation was accepted on look. Do not decompose this back into
+            # rot/offset/scale, and do not re-derive it.
             {"url": "weapons/brasscrown_walking_staff.glb", "bone": "handslot.r", "grip": "stave",
+             "seat": [
+                 (0.283230, 0.258260, 0.537292, -0.768651),
+                 (0.397020, 0.362019, -0.383298, -0.124619),
+                 (-0.444697, 0.487693, 0.000000, 1.119572),
+                 (0.0, 0.0, 0.0, 1.0),
+             ],
              "why": "A measuring staff he walks the Riftfields with, marked off in bell-lengths."},
-            {"url": "tools/journal_open.glb", "bone": "handslot.l", "grip": "book",
-             "why": "His record. It survives all five of them and travels to the parent order."},
+            # Review 1.5: the open journal was carried out front like a shield. Removed.
+            # His record now lives in the copy, and a closed book at the hip is the
+            # authored replacement when the prop pass comes.
         ],
         "poses": [
             ("Idle", 7, "Reading the breach"),
