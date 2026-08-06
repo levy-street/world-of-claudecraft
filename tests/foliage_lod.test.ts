@@ -49,7 +49,14 @@ function maxOutdoorFogFar(): number {
 
 function shippedBiomeFog(): { biome: string; near: number; far: number }[] {
   const maxFar = maxOutdoorFogFar();
-  const block = /BIOME_FOG[^{]*\{([\s\S]*?)\n {2}\};/.exec(rendererSrc);
+  // Anchored on the DECLARATION, not the first mention: `BIOME_FOG` is used
+  // thousands of lines above the table it names, and an unanchored match started
+  // there and ran to whichever `\n  };` came first. That terminator was the real
+  // table's only by luck, and a class property closing earlier (a bound arrow
+  // field) silently moved it in front of the table, leaving this sweep parsing a
+  // 230 KB body with no fog row in it. `[^=]*` crosses the Record<...> type, whose
+  // own brace is what kept the anchor off the declaration in the first place.
+  const block = /static BIOME_FOG[^=]*=\s*\{([\s\S]*?)\n {2}\};/.exec(rendererSrc);
   expect(block, 'BIOME_FOG table not found in renderer.ts').not.toBe(null);
   const body = (block as RegExpExecArray)[1];
   const rows = [...body.matchAll(/(\w+):\s*\{[^}]*near:\s*([\d.]+),\s*far:\s*([\w.]+)/g)].map(
