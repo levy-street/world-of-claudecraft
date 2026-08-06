@@ -9,6 +9,7 @@
 
 import type { ItemInstancePayload } from '../../../sim/types';
 import type { VendorBuyOptions } from '../../../sim/vendor_buy_stack';
+import { markDialogRoot } from '../../dialog_root';
 import { itemDisplayName } from '../../entity_i18n';
 import { esc } from '../../esc';
 import { focusedWithin, restoreFirstEnabled } from '../../focus_restore';
@@ -133,6 +134,7 @@ export function renderVendorWindow(
     ? [...focusedGrid.querySelectorAll('button')].indexOf(focused as HTMLButtonElement)
     : -1;
   const scrollTop = el.scrollTop;
+  markDialogRoot(el, { label: t('itemUi.vendor.goodsTitle', { name: vendorName }) });
   el.innerHTML = `<div class="panel-title"><span>${esc(t('itemUi.vendor.goodsTitle', { name: vendorName }))}</span><button type="button" class="x-btn" data-close data-focus-key="close" aria-label="${esc(t('itemUi.vendor.close'))}">${svgIcon('close')}</button></div>`;
 
   if (view.hasHonorGoods) {

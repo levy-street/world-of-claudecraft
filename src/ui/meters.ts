@@ -6,17 +6,23 @@
 //
 // "Threat" shows the engaged mob's REAL hate table (entity.threat, classic
 // rules: damage x stance modifiers, flat ability threat, split healing
-// threat — synced online as the top entries) and marks who the mob is
-// actually targeting (aggroTargetId). For finished encounters whose mob is
-// gone, it falls back to each member's damage on that mob.
+// threat, synced online as the top entries) and marks who the mob is
+// actually targeting (aggroTargetId). WHICH mob that is gets resolved live
+// every render by threat_subject_core.ts, never read off the encounter's
+// latched mainMobId: the latch froze the tab on the first mob of a pull and
+// then on its corpse. For a finished encounter with nothing live left, the tab
+// falls back to each member's damage on the latched mob AND says so in the
+// subtitle, because damage under a "Threat" heading reads as hate.
 //
-// A controlled pet (hunter, warlock, mage) is NOT its own row: its output folds
-// into its owner's, the way a real damage meter reports a hunter. The pet's
-// name survives on the per-ability breakdown entries, so hovering the owner's
-// bar still shows exactly what the pet contributed.
+// The pet rule differs by TAB, and that split is the point. On damage/healing a
+// controlled pet (hunter, warlock, mage) folds into its owner's row, the way a
+// real damage meter reports a hunter. On THREAT it gets its own row, because
+// the mob's pull-over rule compares each hate-table ENTRY separately: a folded
+// owner+pet number is measured against a threshold that is never applied to it,
+// which made every pet class read as though it should have pulled and had not.
 
 import { CLASSES } from '../sim/data';
-import type { SimEvent } from '../sim/types';
+import type { Entity, SimEvent } from '../sim/types';
 import type { IWorld } from '../world_api';
 import { abilityDisplayNameFromSource } from './ability_display_name';
 import { tEntity } from './entity_i18n';
@@ -24,8 +30,10 @@ import { esc } from './esc';
 import { formatNumber, type TranslationKey, t } from './i18n';
 import {
   type BreakdownEntry,
+  type BreakdownGroup,
   type BreakdownRow,
   breakdownKey,
+  buildGroupedMeterBreakdown,
   buildMeterBreakdown,
 } from './meters_breakdown_view';
 import { MeterFrame } from './meters_frame';
@@ -33,6 +41,7 @@ import { METER_FRAME_LIMITS, TABBED_METER_FRAME_LIMITS } from './meters_frame_co
 import { buildMeterTabMenu, type MeterMenuRow } from './meters_menu_view';
 import { buildMeterRows, type MeterPet, type MeterTab } from './meters_rows_view';
 import type { SimpleMenuItem } from './simple_context_menu';
+import { resolveThreatSubject } from './threat_subject_core';
 
 const ENCOUNTER_END_SECONDS = 5;
 const HISTORY_CAP = 8;
@@ -238,10 +247,14 @@ export class MeterData {
         return;
       }
     }
-    this.endEncounter(now);
+    this.endEncounter();
   }
 
-  endEncounter(now: number): void {
+  // Takes no clock: a closed segment's duration ends at the LAST ACTIVITY, not
+  // at the moment the idle sweep noticed, so the trailing quiet window never
+  // inflates it. (The parameter was vestigial and unread; dropping it is what
+  // the changed-files lint gate wanted once this file was touched.)
+  endEncounter(): void {
     const enc = this.current;
     if (!enc) return;
     this.current = null;
@@ -304,6 +317,10 @@ interface MeterRowNodes {
   num: HTMLElement;
   pid: number;
   name: string;
+  /** pet name when this bar is a pet's own hate row, else null */
+  petName: string | null;
+  /** the entity whose hate this bar represents (member pid, or the pet's) */
+  threatPid: number;
 }
 
 /** What a panel needs from its owner: the shared data and the live world. */
@@ -312,6 +329,8 @@ interface PanelHost {
   data: MeterData;
   /** Live pets per owner, scanned once per render by the owner. */
   petsByOwner(): Map<number, Pet[]>;
+  /** Self plus every party member, for deciding which mobs the group is on. */
+  partyPids(): Set<number>;
   attachTooltip(el: HTMLElement, html: () => string): void;
   /** Fired by a detached panel's close button. */
   onDock(tab: DetachableTab): void;
@@ -537,28 +556,37 @@ export class MetersPanel {
     this.hintEl.style.display = 'none';
 
     const isThreat = this.tab === 'threat';
-    const world = this.host.world;
-    const mob = isThreat && enc.mainMobId !== null ? world.entities.get(enc.mainMobId) : null;
+    // Scanned ONCE per render, not once per row: the pet rows and the aggro
+    // marker both need every member's pets, and re-walking the entity map per
+    // bar is the one part of this render that scales with the world.
+    const petsByOwner = isThreat ? this.host.petsByOwner() : null;
+    const { mob, liveThreat } = this.threatSubject(enc, petsByOwner);
     const aggroPid = mob && !mob.dead ? mob.aggroTargetId : null;
-    const mobName = enc.mainMobTemplateId
-      ? tEntity({ kind: 'mob', id: enc.mainMobTemplateId, field: 'name' })
-      : enc.mainMobName;
+    const subjectName = mob
+      ? tEntity({ kind: 'mob', id: mob.templateId, field: 'name' })
+      : enc.mainMobTemplateId
+        ? tEntity({ kind: 'mob', id: enc.mainMobTemplateId, field: 'name' })
+        : enc.mainMobName;
     const encounterLabel =
-      enc.label === 'Combat' || enc.label === 'All (session)' ? viewName : mobName;
+      enc.label === 'Combat' || enc.label === 'All (session)'
+        ? viewName
+        : enc.mainMobTemplateId
+          ? tEntity({ kind: 'mob', id: enc.mainMobTemplateId, field: 'name' })
+          : enc.mainMobName;
+    // Say plainly when the bars are the damage fallback rather than live hate:
+    // the numbers are honest, but under a "Threat" heading they read as hate and
+    // a player acts on them.
     this.subEl.textContent = isThreat
-      ? enc.mainMobName
-        ? t('hud.meters.target', { name: mobName })
-        : t('hud.meters.noTargetEngaged')
+      ? liveThreat
+        ? t('hud.meters.target', { name: subjectName })
+        : subjectName
+          ? t('hudChrome.meters.threatFallback', { name: subjectName })
+          : t('hud.meters.noTargetEngaged')
       : t('hud.meters.segmentSummary', {
           label: encounterLabel,
           duration: fmtDuration(enc.duration),
         });
 
-    const liveThreat = mob && !mob.dead && mob.threat.size > 0 ? mob.threat : null;
-    // Scanned ONCE per render, not once per row: the threat column and the
-    // aggro marker both need every member's pets, and re-walking the entity map
-    // per bar is the one part of this render that scales with the world.
-    const petsByOwner = isThreat ? this.host.petsByOwner() : null;
     const rows = buildMeterRows({
       tallies: enc.tallies.values(),
       tab: this.tab,
@@ -569,15 +597,17 @@ export class MetersPanel {
     });
 
     this.syncRowPool(rows.length);
-    rows.forEach(({ tally, value, fill, hasAggro }, i) => {
+    rows.forEach(({ tally, petName, threatPid, value, fill, hasAggro }, i) => {
       const row = this.rowPool[i];
       row.pid = tally.pid;
       row.name = tally.name;
+      row.petName = petName;
+      row.threatPid = threatPid;
       row.el.style.display = 'block';
       row.fill.style.width = `${Math.max(4, fill * 100)}%`;
       const color = tally.cls && (CLASSES as Record<string, { color: number }>)[tally.cls]?.color;
       row.fill.style.background = color ? `#${color.toString(16).padStart(6, '0')}cc` : '#888888cc';
-      row.label.textContent = tally.name;
+      row.label.textContent = petName ?? tally.name;
       row.num.textContent = isThreat ? fmtNum(value) : fmtPerSecondRow(value, value / enc.duration);
       row.el.classList.toggle('aggro', hasAggro);
     });
@@ -601,7 +631,16 @@ export class MetersPanel {
       const num = document.createElement('span');
       num.className = 'mt-num';
       el.append(fill, label, num);
-      const row: MeterRowNodes = { el, fill, label, num, pid: -1, name: '' };
+      const row: MeterRowNodes = {
+        el,
+        fill,
+        label,
+        num,
+        pid: -1,
+        name: '',
+        petName: null,
+        threatPid: -1,
+      };
       this.rowPool.push(row);
       this.rowsEl.appendChild(el);
       this.host.attachTooltip(el, () => this.breakdownHtml(row));
@@ -609,51 +648,106 @@ export class MetersPanel {
   }
 
   /**
-   * Hover panel for one bar: the member's per-ability damage/healing split (pet
-   * output labeled with the pet's name), or, on the threat tab, the split
-   * between the member and their pets. A finished encounter has no live hate
-   * table, so its threat number falls back to damage and the panel shows the
-   * damage breakdown that produced it.
+   * The mob the Threat tab is about right now, plus its hate table when it has
+   * one. Resolved LIVE from the world rather than read off the encounter's
+   * latched `mainMobId`, which is what froze the tab on a corpse mid-fight; the
+   * latched id survives only as the last-resort fallback for a finished
+   * encounter in the history pages.
+   */
+  private threatSubject(
+    enc: Encounter,
+    petsByOwner: Map<number, Pet[]> | null,
+  ): { mob: Entity | null; liveThreat: Map<number, number> | null } {
+    if (this.tab !== 'threat') return { mob: null, liveThreat: null };
+    const world = this.host.world;
+    const tracked = new Set(this.host.partyPids());
+    for (const pets of petsByOwner?.values() ?? []) for (const pet of pets) tracked.add(pet.pid);
+    const subjectId = resolveThreatSubject({
+      entities: world.entities.values(),
+      playerTargetId: world.player.targetId,
+      trackedPids: tracked,
+      fallbackMobId: enc.mainMobId,
+    });
+    const mob = subjectId !== null ? (world.entities.get(subjectId) ?? null) : null;
+    const liveThreat = mob && !mob.dead && mob.threat.size > 0 ? mob.threat : null;
+    return { mob, liveThreat };
+  }
+
+  /**
+   * Hover panel for one bar: the per-ability damage/healing split behind it (pet
+   * output labeled with the pet that acted). On the threat tab the bars are
+   * per-contributor already, so the panel narrows to just that contributor's
+   * abilities and says it is showing damage, never hate.
    */
   private breakdownHtml(row: MeterRowNodes): string {
     const { enc } = this.viewedEncounter();
     const tally = enc?.tallies.get(row.pid);
-    const title = `<div class="tt-title">${esc(tally?.name ?? row.name)}</div>`;
+    const title = `<div class="tt-title">${esc(row.petName ?? tally?.name ?? row.name)}</div>`;
     if (!enc || !tally) return title;
 
     const isThreat = this.tab === 'threat';
-    const world = this.host.world;
-    const mob = isThreat && enc.mainMobId !== null ? world.entities.get(enc.mainMobId) : null;
-    const liveThreat = mob && !mob.dead && mob.threat.size > 0 ? mob.threat : null;
-    const byContributor = isThreat && liveThreat !== null;
+    const source = this.tab === 'heal' ? tally.healByAbility : tally.dmgByAbility;
+    // On the threat tab each contributor (the member, and each pet) owns a bar,
+    // so the panel behind one bar is that contributor's abilities alone.
+    const entries: BreakdownEntry[] = [...source.values()].filter((e) =>
+      isThreat ? (e.petName ?? null) === row.petName : true,
+    );
 
-    let entries: BreakdownEntry[];
-    if (byContributor && liveThreat) {
-      entries = [
-        { ability: null, petName: null, amount: liveThreat.get(tally.pid) ?? 0 },
-        ...(this.host.petsByOwner().get(tally.pid) ?? []).map((pet) => ({
-          ability: null,
-          petName: pet.name,
-          amount: liveThreat.get(pet.pid) ?? 0,
-        })),
-      ];
-    } else {
-      entries = [...(this.tab === 'heal' ? tally.healByAbility : tally.dmgByAbility).values()];
+    // Threat rows are already per-contributor (one bar each), so their panel
+    // stays flat. Damage and healing fold a pet into its owner's bar, so THEIR
+    // panel groups by contributor: a subtotal per actor with its abilities under
+    // it, which is the only place a hunter can read what the pet actually did.
+    if (isThreat) {
+      const model = buildMeterBreakdown(entries, enc.duration);
+      // Always the DAMAGE label here: these entries are the damage that
+      // generated the hate, not the hate value on the bar.
+      const summary = t('hudChrome.meters.breakdownSummary', {
+        tab: t(TAB_LABEL_KEY.dmg),
+        value: fmtNum(model.total),
+      });
+      const body = model.rows.map((r) => this.breakdownRowHtml(r, false)).join('');
+      return `${title}<div class="mt-tip-sub">${esc(summary)}</div><div class="mt-tip-rows">${body}</div>`;
     }
 
-    const model = buildMeterBreakdown(entries, enc.duration);
+    const grouped = buildGroupedMeterBreakdown(entries, enc.duration);
     const summary = t('hudChrome.meters.breakdownSummary', {
-      tab: t(TAB_LABEL_KEY[isThreat && !byContributor ? 'dmg' : this.tab]),
-      value: isThreat ? fmtNum(model.total) : fmtPerSecondRow(model.total, model.perSecond),
+      tab: t(TAB_LABEL_KEY[this.tab]),
+      value: fmtPerSecondRow(grouped.total, grouped.perSecond),
     });
-    const body = model.rows
-      .map((r) => this.breakdownRowHtml(r, tally.name, byContributor))
+    const body = grouped.groups
+      .map((g) => {
+        const head = this.breakdownGroupHtml(g, tally.name);
+        // Nested under their own subtotal, so the ability rows never carry the
+        // pet's name a second time.
+        const rows = g.rows.map((r) => this.breakdownRowHtml(r, true)).join('');
+        return `${head}<div class="mt-tip-group">${rows}</div>`;
+      })
       .join('');
     return `${title}<div class="mt-tip-sub">${esc(summary)}</div><div class="mt-tip-rows">${body}</div>`;
   }
 
-  private breakdownRowHtml(row: BreakdownRow, memberName: string, byContributor: boolean): string {
-    const label = breakdownRowLabel(row, memberName, byContributor);
+  /** A contributor's subtotal line: the member or one of their pets. */
+  private breakdownGroupHtml(group: BreakdownGroup, memberName: string): string {
+    const value = t('hudChrome.meters.breakdownRow', {
+      value: fmtNum(group.amount),
+      percent: t('hudChrome.meters.percent', {
+        value: formatNumber(Math.round(group.share * 100), {
+          maximumFractionDigits: 0,
+          useGrouping: false,
+        }),
+      }),
+    });
+    return (
+      `<div class="mt-tip-row mt-tip-head">` +
+      `<span class="mt-tip-bar" style="width:${Math.max(2, group.fill * 100)}%"></span>` +
+      `<span class="mt-tip-name">${esc(group.petName ?? memberName)}</span>` +
+      `<span class="mt-tip-val">${esc(value)}</span>` +
+      `</div>`
+    );
+  }
+
+  private breakdownRowHtml(row: BreakdownRow, nested: boolean): string {
+    const label = breakdownRowLabel(row, nested);
     const value = t('hudChrome.meters.breakdownRow', {
       value: fmtNum(row.amount),
       percent: t('hudChrome.meters.percent', {
@@ -709,6 +803,7 @@ export class Meters {
       world,
       data: this.data,
       petsByOwner: () => this.livePetsByOwner(),
+      partyPids: () => this.partyPids(),
       attachTooltip: (el, html) => deps?.attachTooltip(el, html),
       onDock: (tab) => this.dock(tab),
       isDetached: (tab) => tab !== 'dmg' && this.isDetached(tab),
@@ -876,18 +971,20 @@ export class Meters {
   }
 }
 
-// Row label: the folded tail, a threat contributor (the member or one of their
-// pets), or an ability, prefixed with the pet's name when a pet cast it.
-function breakdownRowLabel(row: BreakdownRow, memberName: string, byContributor: boolean): string {
+// Row label: the folded tail, or an ability. A row NESTED under a contributor's
+// subtotal drops the pet prefix, because the group header above it already names
+// the actor; a flat row keeps the "Pet: Ability" form so it stays attributable
+// on its own.
+function breakdownRowLabel(row: BreakdownRow, nested: boolean): string {
   if (row.folded > 0) {
     return t('hudChrome.meters.breakdownOther', {
       count: formatNumber(row.folded, { maximumFractionDigits: 0, useGrouping: false }),
     });
   }
-  if (byContributor) return row.petName ?? memberName;
   const ability = row.ability
     ? abilityDisplayNameFromSource(row.ability)
     : t('hudChrome.meters.melee');
+  if (nested) return ability;
   return row.petName ? t('hudChrome.meters.petAbility', { pet: row.petName, ability }) : ability;
 }
 

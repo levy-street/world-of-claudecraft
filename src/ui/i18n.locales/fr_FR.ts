@@ -333,8 +333,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Un forfait unique par échelon de recette, prélevé une seule fois quand un maître vous l'enseigne ; chaque échelon du tableau ci-dessous est bel et bien en service aujourd'hui, des recettes de départ gratuites jusqu'aux leçons de canne du fabricant d'outils tout en haut.",
   'guide.profPages.econ.provenanceBody':
     "Certains objets portent un nom. Survolez-en un et l'infobulle indique Collecté par untel sur un matériau brut, ou Fabriqué par untel sur une pièce finie : la même marque, formulée selon la manière dont l'objet est né. Une signature fait partie de l'objet lui-même, elle voyage avec lui à travers les échanges, la banque, le courrier, le Marché mondial, et même un rachat chez un marchand, et elle ne s'efface jamais.\n\nLa récolte signe automatiquement son meilleur travail : toute récolte qui tire rare ou mieux arrive signée, et les trouvailles rares signent la totalité de leur aubaine au quintuple. Le jet chanceux d'une récolte sur cadavre signe son rendement là où la famille n'a pas de spécimen à donner, et là où elle en a un, garde le rendement ordinaire et frappe le spécimen immaculé signé à côté. L'artisanat signe selon la même ligne : chaque exemplaire d'un résultat rare ou mieux est frappé signé, et un chef-d'oeuvre signe toujours quelle que soit sa qualité, si bien que la plus belle version d'une pièce nomme toujours son créateur. La seule chose qui puisse vous coûter une signature, c'est un sac plein : une unité signée a besoin d'une place à elle, ou d'une pile signée identique, pour se poser.\n\nUne pile d'objets partage une seule identité : deux exemplaires ne fusionnent donc que si chaque marque correspond exactement, même objet, même signataire, mêmes caractéristiques de chef-d'oeuvre, même enchantement, même lien. Une bûche signée ne rejoint jamais un tas ordinaire, ni dans un sens ni dans l'autre (fusionner effacerait le nom de quelqu'un), mais des contenus identiques fusionnent volontiers : vingt minerais signés par le même collecteur tiennent donc dans une seule pile, et une aubaine ne met pas vos sacs en pièces.\n\nLes signatures rendent la pareille aux artisans : détenir à l'établi un exemplaire signé d'un réactif nécessaire, quel qu'en soit le signataire, ajoute 2 points de pourcentage à la chance de chef-d'oeuvre, et détenir un réactif signé de votre propre main réduit d'un la quantité requise de ce réactif (jamais en dessous d'un). Votre propre travail signé de qualité rare ou mieux continue même de vous enseigner, aujourd'hui par le seul flacon : buvez une potion que vous avez signée et un mince filet de compétence revient au métier qui l'a préparée, tant que ce métier fait partie de vos majeures actives.",
-  'guide.profPages.econ.throttleBody':
-    "La production a un plafond : l'artisanat, le désenchantement, l'enchantement, la récupération et les recharges d'effet d'outil partagent un même budget de {actions} actions réussies par fenêtre de {seconds} secondes. Une tentative refusée ne coûte rien et n'entame aucun budget. Vous ne le sentirez jamais en jeu normal ; il existe pour qu'un spécialiste au plafond disposant d'une banque pleine ne puisse pas inonder le Marché, quels que soient sa compétence et son stock.",
   'guide.profPages.faq.a4':
     "Vous avez décroché une aubaine. Environ 1 récolte sur 90 déclenche un événement de récolte rare (du bois de cœur ancien sur un arbre, une veine vierge dans le minerai, une floraison au clair de lune parmi les herbes) : il multiplie le rendement par cinq, signe chaque unité à votre nom, et annonce la trouvaille à la zone entière. Un jet de rareté rare ou mieux sur une récolte ordinaire signe lui aussi le rendement.\n\nLes matériaux signés méritent d'être gardés ou vendus cher : détenir à l'établi n'importe quel exemplaire signé d'un réactif requis ajoute 2 points de pourcentage à la chance de chef-d'oeuvre. Rappelez-vous seulement qu'ils ne se pilent qu'avec des exemplaires signés à l'identique, et qu'ils occupent donc leur propre emplacement de sac.",
   'guide.profPages.faq.a6':
@@ -713,7 +711,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.collectorsHeading': "Collectionneurs, trophées et le prix d'une histoire",
   'guide.profPages.econ.collectorsBody':
     "Les marchands sont aveugles à la provenance : un objet signé se vend à un PNJ exactement au même prix que sa version ordinaire. La prime sur une signature n'existe qu'entre joueurs, ce qui en fait précisément tout l'intérêt : une pile de minerai d'aubaine signé par un collecteur célèbre, une Coupe privilégiée issue d'une heureuse récolte, une lame chef-d'oeuvre portant le nom d'un artisan depuis retraité, tout cela vaut ce que la mémoire de quelqu'un dit qu'ils valent.\n\nLe Livre des hauts faits puise dans le même instinct : Veine vierge, Bois de cœur ancien, Floraison au clair de lune, Un spécimen parfait et Lueur d'espoir sont des marques de collection à Renom zéro qui existent uniquement pour prouver qu'un moment vous est arrivé. Gardez l'objet qui a valu le haut fait et vous en tenez la preuve. Rien de tout cela n'est de la puissance ; la provenance n'achète aucune caractéristique et ne gagne aucun combat, c'est la trace écrite du jeu sur les belles journées.",
-  'guide.profPages.econ.throttleHeading': "Le régulateur d'actions",
   'guide.profPages.econ.doctrineHeading': 'Les joueurs commercent entre eux',
   'guide.profPages.econ.doctrineBody':
     "L'économie de l'artisanat repose sur une idée : les joueurs approvisionnent les joueurs. Les collecteurs alimentent les artisans, les artisans alimentent les quêteurs et les pillards, et les démanteleurs alimentent les enchanteurs, les marchands et maîtres d'atelier se tenant en périphérie pour absorber les rebuts et les pièces plutôt que vous concurrencer. Si vous voulez gagner de l'argent avec un métier, votre client est une personne : apprenez ce que les autres joueurs consomment, fixez vos prix face au Marché mondial, et traitez les systèmes de PNJ comme un plancher sous vos prix, non comme le marché lui-même.\n\nL'équipement fabriqué est calibré pour se situer en dessous du plancher de raid : même un chef-d'oeuvre n'est jamais qu'un palier de qualité au-dessus de sa recette, jamais au-delà du légendaire, et son budget de caractéristiques reste sous la tranche de butin de raid. La forge vous prépare pour le contenu le plus difficile ; elle ne le remplace pas. Cela maintient les artisans, les pillards et le marché dans un triangle stable : les butins de raid restent aspirationnels, et les pièces fabriquées restent le meilleur équipement qu'on puisse réellement acheter.",
@@ -3066,6 +3063,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.partyGroup': 'Groupe {n}',
   'hudChrome.unitFrame.partyLabel': 'Votre groupe',
   'hudChrome.unitFrame.playerLabel': 'Votre personnage',
+  'hudChrome.unitFrame.petLabel': 'Votre familier',
   'hudChrome.unitFrame.targetAnnounce': 'Cible : {name}',
   'hudChrome.unitFrame.targetLabel': 'Votre cible',
   'seo.officialLabel': 'Site officiel de World of ClaudeCraft',
@@ -5380,6 +5378,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.items.ridge_stalker_pelt.name': 'Peau de rôdeur de la crête',
   'entities.items.old_cragmaws_pelt.name': 'Peau du vieux Cragmaw',
   'entities.items.cragmaw_huntcord.name': 'Ceinturon de chasse de Cragmaw',
+  'entities.items.cragmaw_huntquiver.name': 'Carquois de chasse de Cragmaw',
   'entities.items.glowing_wax.name': 'Cire luisante',
   'entities.items.ogre_war_totem.name': 'Totem de guerre ogre',
   'entities.items.storm_core.name': 'Noyau de tempête',
@@ -5456,6 +5455,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.items.mirejaw_scale_vest.name': "Gilet d'écailles de Mirejaw",
   'entities.items.moggers_copper_cudgel.name': 'Gourdin de cuivre de Mogger',
   'entities.items.moggers_shiv.name': 'Surin de Mogger',
+  'entities.items.moggers_hide_quiver.name': 'Carquois en cuir de Mogger',
   'entities.items.moggers_stomper_boots.name': 'Bottes piétineuses de Mogger',
   'entities.items.necromancers_legwraps.name': 'Jambières de Mournweave',
   'entities.items.necromancers_soulsteps.name': 'Soulsteps de Mournweave',
@@ -5480,6 +5480,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.items.cryptbone_pauldrons.name': "Espauliers d'os de crypte",
   'entities.items.deathlords_dread_visage.name': "Visage d'effroi de Barrowlord",
   'entities.items.gravewyrm_gauntlets.name': 'Gantelets du Gravewyrm',
+  'entities.items.gravewyrm_bone_quiver.name': 'Carquois en os du Gravewyrm',
   'entities.items.gravewyrm_mantle.name': 'Mantelet du Gravewyrm',
   'entities.items.mistveil_cord.name': 'Corde Voilebrume',
   'entities.items.mistveil_grips.name': 'Poignes Voilebrume',
@@ -6684,14 +6685,10 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.disenchantConfirmBodySpecial':
     'Cela détruit une copie spéciale de {item} (signée, de maître ou enchantée) et donne des matériaux arcaniques. Cette action est irréversible.',
   'hudChrome.enchanting.disenchantConfirmTitle': 'Désenchanter {item} ?',
-  'hudChrome.enchanting.disenchantThrottled':
-    'Vous désenchantez trop vite. Attendez un instant et réessayez.',
   'hudChrome.enchanting.disenchantedLine': 'Vous désenchantez {item}.',
   'hudChrome.enchanting.enchantAppliedLine': 'Vous enchantez {item} avec {enchant}.',
   'hudChrome.enchanting.enchantInsufficient':
     "Vous n'avez pas les matériaux pour cet enchantement.",
-  'hudChrome.enchanting.enchantThrottled':
-    'Vous enchantez trop vite. Attendez un instant et réessayez.',
   'hudChrome.enchanting.enchantUnknown': "Cet enchantement n'existe pas.",
   'hudChrome.enchanting.enchantWrongSlot':
     'Cet enchantement ne peut pas être appliqué à cet objet.',
@@ -6706,8 +6703,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.salvageConfirmBodySpecial':
     "Cela détruit une copie spéciale de {item} (signée, de maître ou enchantée) et donne des matériaux d'artisanat. Cette action est irréversible.",
   'hudChrome.enchanting.salvageConfirmTitle': 'Récupérer {item} ?',
-  'hudChrome.enchanting.salvageThrottled':
-    'Vous récupérez trop vite. Attendez un instant et réessayez.',
   'hudChrome.enchanting.salvagedLine': 'Vous récupérez {item}.',
   'hudChrome.enchanting.targetTitle': 'Choisissez un objet à enchanter',
   'hudChrome.meters.move': 'Faites glisser pour déplacer ce compteur',
@@ -6819,6 +6814,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.items.stormcallers_spaulders.name': 'Spallières de Galecall',
   'entities.items.bonewrought_greatsword.name': 'Espadon Bonewrought',
   'entities.items.direfang_greatblade.name': 'Grande lame de Direfang',
+  'entities.items.direfang_quiver.name': 'Carquois de Direfang',
   'entities.items.bonewrought_bulwark.name': 'Rempart Bonewrought',
   'entities.items.wraithfire_orb.name': 'Orbe Wraithfire',
   'hud.chat.context.convertToRaid': 'Convertir en raid',
@@ -8603,6 +8599,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.event.hint': 'Annoncer un raid, une rencontre ou un événement',
   'hudChrome.discord.relay.help.label': "Besoin d'aide",
   'hudChrome.discord.relay.help.hint': "Demander de l'aide à la communauté",
+  'hudChrome.options.hideUnusedActionSlots': "Masquer les emplacements d'action inutilisés",
   'hudChrome.options.showSecondaryActionBar': "Afficher la barre d'action secondaire",
   'errors.api.desktopCodeInvalid':
     "Le code de connexion de l'application de bureau est invalide ou expiré. Veuillez réessayer.",
@@ -8864,7 +8861,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Tout ce qui figure sur cette page vit dans le jeu : appuyez sur Échap pour ouvrir les options. Le menu s'ouvre sur un Aperçu des essentiels épinglés, les catégories rangées sur un rail à côté : les réglages ci-dessous se trouvent sous Graphiques, Interface et Accessibilité dans le groupe Affichage, et la Superposition de performances sous Système. Plus rapide encore, tapez un nom dans la barre de recherche en haut pour y accéder directement.",
   'guide.settingsPage.whyLabel': 'Pourquoi ça marche$1',
   'hudChrome.crafting.close': 'Fermer la fabrication',
-  'hudChrome.crafting.craft': 'Artisanat',
   'hudChrome.crafting.craftedToast': 'Fabriqué$1 {name}',
   'hudChrome.crafting.empty': "Aucune recette connue pour l'instant.",
   'hudChrome.crafting.insufficientMaterials': "Vous n'avez pas le matériel pour cela.",
@@ -9061,7 +9057,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.increasePct.int': "Augmente l'intelligence de {pct}%",
   'hudChrome.auraEffect.increasePct.sta': "Augmente l'endurance de {pct}%",
   'hudChrome.crafting.recipeNotLearned': "Vous n'avez pas encore appris cette recette.",
-  'hudChrome.crafting.throttled': 'Vous fabriquez trop vite. Patientez un instant et réessayez.',
   'hudChrome.mobile.chatPlaceholder': 'Dites quelque chose…',
   'hudChrome.mobile.hideKeyboard': 'Masquer le clavier',
   'hudChrome.unitFrame.partyChip': 'Groupe',
@@ -9936,6 +9931,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.keybinds.petAttack': 'Familier : attaquer',
   'hudChrome.keybinds.petDefensive': 'Familier : défensif',
   'hudChrome.keybinds.petStop': 'Familier : arrêter',
+  'hudChrome.keybinds.targetPet': 'Familier : cibler',
   'hudChrome.keybinds.petTaunt': 'Familier : provoquer',
   'hudChrome.mailbox.parcelQtyDecreaseAria': 'Envoyer un {item} de moins',
   'hudChrome.mailbox.parcelQtyIncreaseAria': 'Envoyer un {item} de plus',
@@ -10481,6 +10477,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Vos chances de parer entièrement une attaque de mêlée frontale, sans subir de dégâts. Un coup porté dans le dos ne peut pas être paré.',
   'hudChrome.options.mouseoverCast': 'Incantation au survol sur les cadres de groupe',
   'hudChrome.options.showTargetOfTarget': 'Afficher la cible de la cible',
+  'hudChrome.options.showPetFrame': 'Afficher votre familier',
   'hudChrome.unitFrame.targetOfTargetLabel': 'Cible de la cible',
   'itemUi.market.rarityLegendary': 'Légendaire',
   'loading.reconnectingAttempt':

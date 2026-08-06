@@ -608,6 +608,12 @@ function readJsonFile<T>(filePath: string): T {
   return JSON.parse(readFileSync(filePath, 'utf8')) as T;
 }
 
+// FROZEN, and no longer equal to the live town fingerprint: this is the identity of
+// the tree the v2 polish captures were taken against, not a mirror of the current
+// one. It first diverged when a lockfile-only dependency bump re-minted the town
+// fingerprint to aa0df220..., which moved the live value without retaking a single
+// screenshot. Do NOT sweep this to the live value along with the neighbouring
+// literals; it only moves if the captures themselves are retaken.
 const ACCEPTED_POLISH_V2_TOWN_SOURCE_FINGERPRINT =
   'e15d65fda69efd04395e93dd28af8a56f2fb9bc1ff1125e3b605b07720891367';
 const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(
@@ -628,10 +634,14 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(
 // at the same captured view, and only its swept provenance bytes follow the
 // merged rendererIntegration and layout inputs.
 // Re-minted with scripts/assets/eastbrook_grand_armoury/remint_polish_provenance.mjs.
+// Re-pinned again for the mobile-disconnect fix: src/render/renderer.ts gains the
+// bounded ground-object reuse pool (storePooledObject/takePooledObject cap), the
+// rendererIntegration leaf, so the composite (and the metadata file's second-order
+// digest that embeds it) re-mint once more.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '7e360a0508250c6a2ef7b8fe2af82417e46ab4dff791e1ce84668f849d3dbb80';
+  '515dade30aaad522cbda78d46b01b6c533a8eb4d9d05f11c65b761ced62cbb3b';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '689949a0bc0e3d1e93749c88fe57780efa7f13049c83ee2293c2cf2b6e484d9a';
+  '9ed193cbbdadd0b3923427002f07252968b3969b273d24f2a7a200c214d1ef72';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1499,8 +1509,10 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // every measured value (frame timings, draw stats, triangle and scenario
     // numbers) is adopted verbatim from the base tip; no parent's literal
     // matched the merged tree, and no capture was retaken here.
+    // Re-pinned again for the mobile-disconnect fix's src/render/renderer.ts change
+    // (bounded ground-object reuse pool), recomputed by remint_polish_provenance.mjs.
     expect(fingerprint.digest('hex')).toBe(
-      'e9fa5d129bef83c763b06c2113f18468b2fa2fac59bd7b8e910a71c4221e5e82',
+      '46522bd82e547f81b7a97c52333ce561223f18e09f715cc42a10f5c5a0d593d1',
     );
   });
 

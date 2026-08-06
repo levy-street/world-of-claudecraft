@@ -356,6 +356,10 @@ export interface OverworldMapModel {
   detail: MapDetail | null;
   /** Canvas-space "Show on Map" highlight, or null when absent / out of view. */
   ping: { mx: number; my: number } | null;
+  /** When the player is inside a rift, its floor name + C/B/A/S rank (rank null
+   *  for dev-portal runs), so the painter can show this instead of the
+   *  overworld zone title. Mirrors MinimapModel.rift; null outside a rift. */
+  rift: { name: string; rank: string | null } | null;
 }
 
 /** Inputs the painter feeds the builder each redraw. The cached terrain bg + the
@@ -396,6 +400,13 @@ export function mapWindowMode(world: IWorld): MapWindowMode {
 export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapModel {
   const { world, props, zone, zoom, center, canvasSize: S, decorations } = input;
   const p = world.player;
+
+  // Inside a rift the overworld zone (the current-zone frame below still keys
+  // off `zone`, which the player's far-off rift x displaces past any real
+  // band) is the wrong title; surface the generated rift floor name + rank
+  // instead, mirroring minimap_markers.ts's identical override.
+  const rf = world.riftFloor;
+  const rift = rf ? { name: rf.name, rank: rf.tier } : null;
 
   // Frame only the committed zone. A square frame preserves world scale; a
   // rectangular zone therefore gets ocean letterboxing on its shorter axis,
@@ -624,6 +635,7 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
     party,
     detail,
     ping,
+    rift,
   };
 }
 

@@ -42,6 +42,7 @@ import { type ArenaMatch, type InstanceSlot, type PlayerMeta, Sim } from '../src
 import { endArenaMatch } from '../src/sim/social/arena';
 import { applyResurrectionSickness } from '../src/sim/spirit';
 import type { DungeonDifficulty, Entity, Vec3 } from '../src/sim/types';
+import { completeCraftCast, runApplyEnchant, runDisenchant } from './helpers/enchant_family_cast';
 
 function makeSim(seed = 42): Sim {
   return new Sim({ seed, playerClass: 'warrior', autoEquip: false });
@@ -1371,7 +1372,10 @@ describe('station-bound craft counter (prog_tools_of_the_trade)', () => {
   it('a station-bound craft at the station bumps the counter and grants after the tick', () => {
     const sim = makeSim();
     const meta = stationCrafter(sim);
-    const result = craftItem(sim.ctx, STATION_RECIPE, false, meta.entityId);
+    const start = craftItem(sim.ctx, STATION_RECIPE, false, meta.entityId);
+    expect(start.ok && (start.casting || start.itemId)).toBeTruthy();
+    if (start.casting) completeCraftCast(sim, meta.entityId);
+    const result = meta.lastCraftResult ?? start;
     expect(result.ok).toBe(true);
     expect(meta.deedStats.counters.hubCraftsPerformed).toBe(1);
     expect(meta.deedStats.counters.craftsPerformed).toBe(1);
@@ -1391,7 +1395,10 @@ describe('station-bound craft counter (prog_tools_of_the_trade)', () => {
     expect(meta.deedStats.counters.craftsPerformed).toBe(0);
     // One step back inside the boundary, the same craft resolves and counts.
     e.pos.z = toolworks.pos.z + STATION_RADIUS - 1;
-    expect(craftItem(sim.ctx, STATION_RECIPE, false, meta.entityId).ok).toBe(true);
+    const start = craftItem(sim.ctx, STATION_RECIPE, false, meta.entityId);
+    expect(start.ok && start.casting).toBe(true);
+    completeCraftCast(sim, meta.entityId);
+    expect(meta.lastCraftResult?.ok).toBe(true);
     expect(meta.deedStats.counters.hubCraftsPerformed).toBe(1);
     sim.tick();
     expect(meta.deedsEarned.has('prog_tools_of_the_trade')).toBe(true);
@@ -1403,7 +1410,10 @@ describe('station-bound craft counter (prog_tools_of_the_trade)', () => {
     // one level under now resolves, counts, and grants.
     const sim = makeSim();
     const meta = stationCrafter(sim, 19);
-    const result = craftItem(sim.ctx, STATION_RECIPE, false, meta.entityId);
+    const start = craftItem(sim.ctx, STATION_RECIPE, false, meta.entityId);
+    expect(start.ok && (start.casting || start.itemId)).toBeTruthy();
+    if (start.casting) completeCraftCast(sim, meta.entityId);
+    const result = meta.lastCraftResult ?? start;
     expect(result.ok).toBe(true);
     expect(meta.deedStats.counters.hubCraftsPerformed).toBe(1);
     sim.tick();
@@ -1417,7 +1427,10 @@ describe('station-bound craft counter (prog_tools_of_the_trade)', () => {
     sim.ctx.addItem('wolf_fang', 2, meta.entityId);
     sim.ctx.addItem('bone_fragments', 4, meta.entityId);
     sim.ctx.addItem('smithing_flux', 6, meta.entityId);
-    const result = craftItem(sim.ctx, FIELD_RECIPE, false, meta.entityId);
+    const start = craftItem(sim.ctx, FIELD_RECIPE, false, meta.entityId);
+    expect(start.ok && (start.casting || start.itemId)).toBeTruthy();
+    if (start.casting) completeCraftCast(sim, meta.entityId);
+    const result = meta.lastCraftResult ?? start;
     expect(result.ok).toBe(true);
     expect(meta.deedStats.counters.craftsPerformed).toBe(1);
     expect(meta.deedStats.counters.hubCraftsPerformed).toBe(0);
@@ -1454,7 +1467,7 @@ describe('enchanting skill-gain sites', () => {
   it('a disenchant that lifts enchanting skill over a craftSkill threshold grants after the tick', () => {
     const sim = makeSim();
     const meta = stagedJustUnderThreshold(sim);
-    sim.disenchantItem('eastbrook_arming_sword');
+    runDisenchant(sim, 'eastbrook_arming_sword');
     expect(sim.lastDisenchantResult?.ok).toBe(true);
     expect(meta.craftSkills.enchanting).toBe(75);
     sim.tick();
@@ -1464,7 +1477,7 @@ describe('enchanting skill-gain sites', () => {
   it('an apply-enchant that lifts enchanting skill over the threshold grants after the tick', () => {
     const sim = makeSim();
     const meta = stagedJustUnderThreshold(sim);
-    sim.applyEnchant('eastbrook_arming_sword', 'enchant_weapon_might');
+    runApplyEnchant(sim, 'eastbrook_arming_sword', 'enchant_weapon_might');
     expect(sim.lastEnchantResult?.ok).toBe(true);
     expect(meta.craftSkills.enchanting).toBe(75);
     sim.tick();

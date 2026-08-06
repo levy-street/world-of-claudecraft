@@ -20,6 +20,12 @@ export const CASTER_ALL: PlayerClass[] = [
   'paladin',
   'druid',
 ];
+// Quivers: the hunter's held-offhand stat sticks. A bespoke, hunter-only lock
+// like FERAL above, and deliberately NOT the ROG group: rogues already reach the
+// offhand slot by dual wielding, so sharing the lock would hand them a second
+// way to fill a slot hunters have no way at all to fill. Like every held_offhand
+// this is the whole equip rule (src/sim/equipment_rules.ts canEquipItem).
+export const HUNTER_ONLY: PlayerClass[] = ['hunter'];
 const CASTER_WEAPON_CLASSES: PlayerClass[] = [
   'mage',
   'priest',
@@ -517,7 +523,16 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     bagSlots: 14,
     sellValue: 9000,
   },
-  // --- food & drink (vendor) ---
+  // --- food & drink (vendor, fished, conjured; see also zone2.ts/zone3.ts and
+  // profession_items.ts for the higher zone-bracket and crafted-cooking tiers).
+  // #1608: eating now STACKS with natural hp regen instead of replacing it
+  // (combat/auras.ts updateRegen), matching how drinking already stacks with
+  // mana regen, so every tier below is worth sitting down for at any stamina:
+  // there is no longer a crossover stamina past which it loses to standing
+  // still. The foodHp/drinkMana VALUES are unchanged: they already form a
+  // clear vendor -> fished -> conjured -> next-zone upgrade ladder (61 -> 90 ->
+  // 117 here, continuing to 243/432 in zone2 and 552/874 in zone3), and the
+  // stacking fix is what makes every rung of it worth the bag slot.
   baked_bread: {
     id: 'baked_bread',
     name: 'Cottage Loaf',
@@ -1095,12 +1110,27 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   },
   // --- combat potions (vendor): instant, usable in combat, 2-minute shared cooldown.
   // Restore less than sitting to eat/drink, the price you pay for not sitting (#103).
+  //
+  // Target fraction (#1608): each tier is sized against the LEAST tanky class for
+  // its resource (priest for potionHp, hunter for potionMana; see
+  // tests/consumables.test.ts) at BASE stats (no gear) at the TOP level of its
+  // intended zone bracket (ZONE1/2/3_ZONE.levelRange[1] in content/zone{1,2,3}.ts:
+  // 7/13/20), the hardest point in the bracket for the tier to still feel worth
+  // the cooldown. That lands potionHp around 80-90% and potionMana around 65-70%
+  // of the reference pool: a real, meaningful topper-upper rather than a sliver,
+  // with headroom against a geared character's larger pool (gear only grows the
+  // pool from here, so a geared cast of the same level sees a SMALLER fraction
+  // than the pinned floor, same as any flat-value consumable; the fix is that the
+  // floor itself is now generous, not that it tracks gear). Every tier in this
+  // ladder must stay BELOW the matching profession_items.ts alchemy draught (the
+  // crafted line is a strict upgrade over the vendor equivalent): keep the two in
+  // lockstep if either changes.
   minor_healing_potion: {
     id: 'minor_healing_potion',
     name: 'Minor Healing Potion',
     kind: 'potion',
     quality: 'common',
-    potionHp: 90,
+    potionHp: 110,
     sellValue: 8,
     buyValue: 40,
   },
@@ -1109,7 +1139,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     name: 'Minor Mana Potion',
     kind: 'potion',
     quality: 'common',
-    potionMana: 120,
+    potionMana: 145,
     sellValue: 8,
     buyValue: 40,
   },
@@ -1132,7 +1162,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     name: 'Lesser Healing Potion',
     kind: 'potion',
     quality: 'common',
-    potionHp: 150,
+    potionHp: 190,
     sellValue: 16,
     buyValue: 85,
   },
@@ -1141,7 +1171,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     name: 'Lesser Mana Potion',
     kind: 'potion',
     quality: 'common',
-    potionMana: 200,
+    potionMana: 250,
     sellValue: 16,
     buyValue: 85,
   },
@@ -1150,7 +1180,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     name: 'Healing Potion',
     kind: 'potion',
     quality: 'common',
-    potionHp: 280,
+    potionHp: 320,
     sellValue: 32,
     buyValue: 170,
   },
@@ -1159,7 +1189,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     name: 'Mana Potion',
     kind: 'potion',
     quality: 'common',
-    potionMana: 360,
+    potionMana: 410,
     sellValue: 32,
     buyValue: 170,
   },
@@ -1703,6 +1733,22 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     stats: { int: 1, spi: 1 },
     sellValue: 160,
     requiredClass: CASTER_ALL,
+  },
+  moggers_hide_quiver: {
+    id: 'moggers_hide_quiver',
+    name: "Mogger's Hide Quiver",
+    kind: 'held_offhand',
+    slot: 'offhand',
+    quality: 'uncommon',
+    // The hunter counterpart to valefire_lantern, off the same rare elite:
+    // Mogger (level 6) -> item level 7, offhand budget 2. Hunters are the one
+    // class no offhand rule admits (equipment_rules canDualWield excludes them,
+    // and no shield or held offhand names them), so the slot sat empty and its
+    // stat budget went uncollected. Held offhands equip by the literal
+    // requiredClass alone, which is what lets a hunter-only list work here.
+    stats: { agi: 1, sta: 1 },
+    sellValue: 160,
+    requiredClass: HUNTER_ONLY,
   },
   // --- quest items ---
   boar_hide: {

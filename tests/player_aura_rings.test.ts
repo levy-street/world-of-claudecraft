@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { PlayerAuraRings } from '../src/render/player_aura_rings';
 import { playerAuraOrnamentSpec } from '../src/render/player_aura_rings_core';
 
@@ -45,6 +45,20 @@ describe('PlayerAuraRings procedural ornaments', () => {
 
     expect(ring?.geometry.parameters.thetaSegments).toBe(64);
     expect(ornaments?.count).toBe(10);
+  });
+
+  it('disposes the discarded InstancedMesh GPU buffer on a loadout rebuild, not just its geometry/material', () => {
+    const rings = new PlayerAuraRings('high', true);
+    rings.setRings([input('raised_guard')]);
+    const [oldOrnaments] = rings.group.children.filter(
+      (child): child is THREE.InstancedMesh => child instanceof THREE.InstancedMesh,
+    );
+    const disposeSpy = vi.spyOn(oldOrnaments, 'dispose');
+
+    // a different proc id changes the rebuild signature (id:scale), discarding the old view
+    rings.setRings([input('iron_resolve')]);
+
+    expect(disposeSpy).toHaveBeenCalledTimes(1);
   });
 
   it('reports whether any ground ring exists so hidden frames can skip terrain work', () => {

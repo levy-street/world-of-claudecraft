@@ -388,6 +388,8 @@ export const de_DE: AdminTranslations = {
   "moderationHistory.actionKill": "Getötet",
   "moderationHistory.actionJail": "Inhaftiert",
   "moderationHistory.actionUnjail": "Aus der Haft entlassen",
+  "moderationHistory.actionSpectate": "Spectated",
+  "moderationHistory.actionUnspectate": "Stopped spectating",
   "moderationHistory.actionNote": "Notiz",
   "moderationHistory.actionResetPassword": "Passwort zurückgesetzt",
   "moderationHistory.actionDailyRewardsBan": "Für tägliche Belohnungen gesperrt",

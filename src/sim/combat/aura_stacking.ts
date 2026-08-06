@@ -21,6 +21,12 @@ export const SOURCE_INDEPENDENT_GROUP_BUFF_AURA_IDS: ReadonlySet<string> = new S
   // two separate 3-charge guaranteed-crit auras on a shared ally.
   'emboldening_roar_crit',
   'mark_of_the_wild',
+  // Mass Barrier (mage aoeAllyAbsorb): two mages must not stack two separate
+  // 130-absorb shields on a shared ally; the later cast replaces the first.
+  'mass_barrier',
+  // Nature's Fury (druid buff_spellcrit pulse): two druids in the same party
+  // pulsing onto a shared ally must not double the 3% spell-crit bonus.
+  'natures_fury',
   'power_word_fortitude',
   'rallying_cry_dr',
   'rallying_cry_hp',

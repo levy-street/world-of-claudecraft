@@ -31,6 +31,7 @@ import {
   WOC_DB_POOL_CLIENTS,
   WOC_FISHING_CASTS_TOTAL,
   WOC_FISHING_CATCHES_TOTAL,
+  WOC_FISHING_EARLY_REELS_TOTAL,
   WOC_FISHING_EMPTY_HOOKS_TOTAL,
   WOC_FISHING_GOT_AWAYS_TOTAL,
   WOC_FISHING_KOI_TOTAL,
@@ -420,6 +421,7 @@ describe('registerGameStateMetrics: throughput counters via the returned sink', 
       WOC_FISHING_CATCHES_TOTAL,
       WOC_FISHING_KOI_TOTAL,
       WOC_FISHING_GOT_AWAYS_TOTAL,
+      WOC_FISHING_EARLY_REELS_TOTAL,
       WOC_FISHING_EMPTY_HOOKS_TOTAL,
       WOC_ROD_FEE_PAYMENTS_TOTAL,
       WOC_GUILD_BANK_INCIDENTS_TOTAL,
@@ -451,6 +453,7 @@ describe('registerGameStateMetrics: throughput counters via the returned sink', 
     expect(() => counters.fishingCatch('mirefen_marsh', '1', false)).not.toThrow();
     expect(() => counters.fishingCatch('mirefen_marsh', '1', true)).not.toThrow();
     expect(() => counters.fishingGotAway('mirefen_marsh', '1')).not.toThrow();
+    expect(() => counters.fishingEarlyReel('mirefen_marsh', '1')).not.toThrow();
     expect(() => counters.fishingEmptyHook('mirefen_marsh', '1')).not.toThrow();
     expect(() => counters.rodFeePaid(ROD_FEE_RECIPE_IDS[0])).not.toThrow();
     expect(() => counters.guildBankIncident('reconcile')).not.toThrow();
@@ -686,6 +689,7 @@ const FISHING_COUNTER_NAMES = [
   WOC_FISHING_CATCHES_TOTAL,
   WOC_FISHING_KOI_TOTAL,
   WOC_FISHING_GOT_AWAYS_TOTAL,
+  WOC_FISHING_EARLY_REELS_TOTAL,
   WOC_FISHING_EMPTY_HOOKS_TOTAL,
 ];
 
@@ -700,6 +704,7 @@ describe('registerGameStateMetrics: fishing telemetry counters', () => {
     expect(WOC_FISHING_CATCHES_TOTAL).toBe('woc_fishing_catches_total');
     expect(WOC_FISHING_KOI_TOTAL).toBe('woc_fishing_koi_total');
     expect(WOC_FISHING_GOT_AWAYS_TOTAL).toBe('woc_fishing_got_aways_total');
+    expect(WOC_FISHING_EARLY_REELS_TOTAL).toBe('woc_fishing_early_reels_total');
     expect(WOC_FISHING_EMPTY_HOOKS_TOTAL).toBe('woc_fishing_empty_hooks_total');
     expect(WOC_ROD_FEE_PAYMENTS_TOTAL).toBe('woc_rod_fee_payments_total');
     expect(WOC_ROD_FEE_COPPER).toBe('woc_rod_fee_copper');
@@ -782,6 +787,8 @@ describe('registerGameStateMetrics: fishing telemetry counters', () => {
     counters.fishingCast('thornpeak_heights', '2');
     counters.fishingCatch('eastbrook_vale', '0', false);
     counters.fishingGotAway('eastbrook_vale', '0');
+    counters.fishingEarlyReel('eastbrook_vale', '0');
+    counters.fishingEarlyReel('eastbrook_vale', '0');
     counters.fishingEmptyHook('mirefen_marsh', '1');
     counters.fishingEmptyHook('mirefen_marsh', '1');
 
@@ -794,6 +801,10 @@ describe('registerGameStateMetrics: fishing telemetry counters', () => {
     expect(fishingValue(text, WOC_FISHING_CASTS_TOTAL, 'thornpeak_heights', '0')).toBe('0');
     expect(fishingValue(text, WOC_FISHING_CATCHES_TOTAL, 'eastbrook_vale', '0')).toBe('1');
     expect(fishingValue(text, WOC_FISHING_GOT_AWAYS_TOTAL, 'eastbrook_vale', '0')).toBe('1');
+    // The early reel moves ONLY its own series: a self-inflicted end folded
+    // into the got-aways would bury whether the anti-spam change costs
+    // legitimate anglers.
+    expect(fishingValue(text, WOC_FISHING_EARLY_REELS_TOTAL, 'eastbrook_vale', '0')).toBe('2');
     expect(fishingValue(text, WOC_FISHING_EMPTY_HOOKS_TOTAL, 'mirefen_marsh', '1')).toBe('2');
     // Each outcome lands on its OWN counter: a cast is not a catch.
     expect(fishingValue(text, WOC_FISHING_CATCHES_TOTAL, 'thornpeak_heights', '2')).toBe('0');
@@ -855,6 +866,7 @@ describe('registerGameStateMetrics: fishing telemetry counters', () => {
     counters.fishingCatch('eastbrook_vale', '7' as never, false);
     counters.fishingCatch('eastbrook_vale', '7' as never, true);
     counters.fishingGotAway('starter' as never, '0');
+    counters.fishingEarlyReel('starter' as never, '0');
     counters.fishingEmptyHook('eastbrook_vale', 'toString' as never);
     counters.rodFeePaid('recipe_copper_mining_pick');
     counters.rodFeePaid('toString');

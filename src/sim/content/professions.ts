@@ -393,13 +393,33 @@ export const MOBILE_CRAFTING_STATION_DURATION_TICKS = 20 * 60 * 10; // 10 minute
 // - `CRAFT_GOLD_SINK_COPPER_PER_BUDGET`: copper fee per point of a recipe's
 //   `itemLevelBudget`, charged on every successful craft (proportional to the
 //   value of what is being produced, same axis P4/P8 already scale off).
-// - `CRAFT_THROTTLE_WINDOW_SECONDS` / `CRAFT_THROTTLE_MAX_PER_WINDOW`: a flat
-//   cap on successful crafts (any recipe) per rolling sim-time window, so a
-//   maxed specialist cannot flood the market faster than this rate regardless
-//   of skill or material supply.
+// Craft Cast System Phase 5 retired the shared 10-per-60s action throttle:
+// pace is cast duration (plus materials, gold sink, stations, skill ceilings).
 export const CRAFT_GOLD_SINK_COPPER_PER_BUDGET = 2;
-export const CRAFT_THROTTLE_WINDOW_SECONDS = 60;
-export const CRAFT_THROTTLE_MAX_PER_WINDOW = 10;
+
+// Craft cast duration table (Craft Cast System Phase 1): content knobs for
+// professions/craft_cast_duration.ts. Locked starting numbers from the
+// implementation plan; retune with evidence, not feel. Floor/ceiling clamp
+// every computed duration so a future band cannot slip past the UX range.
+export const CRAFT_CAST_DURATION_FIELD_SEC = 1.75;
+export const CRAFT_CAST_DURATION_SKILL_25_SEC = 2.5;
+export const CRAFT_CAST_DURATION_SKILL_50_SEC = 3.0;
+export const CRAFT_CAST_DURATION_SKILL_75_SEC = 3.5;
+export const CRAFT_CAST_DURATION_SKILL_100_OR_COMBO_SEC = 4.0;
+export const CRAFT_CAST_DURATION_FLOOR_SEC = 1.5;
+export const CRAFT_CAST_DURATION_CEILING_SEC = 5.0;
+
+// Enchant-family cast duration (Craft Cast System Phase 4): fixed 1.5 s for
+// disenchant, apply-enchant, and salvage.
+export const ENCHANT_FAMILY_CAST_DURATION_SEC = 1.5;
+
+// Tool-effect recharge cast duration (Craft Cast System Phase 5): fixed 1.5 s.
+export const TOOL_RECHARGE_CAST_DURATION_SEC = 1.5;
+
+// Craft Cast System Phase 3: hard cap on crafts per craft_item start (UI qty
+// stepper, wire count, and sim clamp all share this ceiling). Materials and
+// bag space still stop a batch mid-run when they run out.
+export const CRAFT_BATCH_MAX = 50;
 
 // Crafting stations and masters (Professions 2.0): the content half
 // of ../professions/stations.ts. The old single level-20 crafting hub

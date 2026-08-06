@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { completeCraftCast } from './helpers/enchant_family_cast';
 
 // Mock the db layer so no Postgres is needed; snapshot logic is under test.
 vi.mock('../server/db', () => ({
@@ -3321,6 +3322,7 @@ const ALL_DELTA_KEYS = [
   'buyback',
   'cardDuel',
   'cds',
+  'corder',
   'corpse',
   'cosmetics',
   'cprof',
@@ -3399,6 +3401,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   buyback: 'vendorBuyback',
   bval: 'blockValue',
   cds: 'cooldowns',
+  corder: 'commissionOrders',
   cosmetics: 'accountCosmetics',
   cprof: 'craftingIdentity',
   dclears: 'delveClears',
@@ -3772,6 +3775,7 @@ describe('full self-state snapshot delta fixture', () => {
       session,
       JSON.stringify({ t: 'cmd', cmd: 'craft_item', recipe: recipe.id }),
     );
+    completeCraftCast(server.sim as never, session.pid);
     expect(server.sim.countItem(recipe.resultItemId, session.pid)).toBe(1);
   });
 
@@ -4206,11 +4210,12 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 66 unique keys in sorted order', () => {
-    // +1: guildBank (Guild Bank Phase 2), +1: belt (the tool-only container),
-    // +1: bg (Thornhollow Fields). Two independent facets, one base.
-    expect(ALL_DELTA_KEYS).toHaveLength(66);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(66);
+  it('ALL_DELTA_KEYS contains exactly 67 unique keys in sorted order', () => {
+    // +1: guildBank (Guild Bank Phase 2), +1: the battleground bg key, +1: the
+    // commission order board's corder key (issue #1298), +1: belt (this
+    // branch's tool-only container).
+    expect(ALL_DELTA_KEYS).toHaveLength(67);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(67);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -4232,10 +4237,11 @@ describe('delta-key contract pins (anti-drift)', () => {
     // The base-merge union: v0.31's 56 (incl. the market-collect key mktU) plus
     // the Rift + mounts and worn-instance keys (einst, mntRtd and the rift
     // snapshot fragments) for 61, then v0.32's master-loot key mloot for 62,
-    // plus the packet's slotted-tool-effects key tslot for 63, guildBank
-    // (Guild Bank Phase 2) for 64, the tool-only container's key belt for 65,
-    // and the battleground's bg self key for 66
-    expect(scraped.size).toBe(66);
+    // plus the packet's slotted-tool-effects key tslot for 63, the
+    // battleground's bg self key for 64, guildBank (Guild Bank Phase 2)
+    // for 65, the commission order board key corder (issue #1298) for 66,
+    // and this branch's tool-only container key belt for 67.
+    expect(scraped.size).toBe(67);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

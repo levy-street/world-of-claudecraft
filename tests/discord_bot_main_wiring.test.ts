@@ -493,4 +493,68 @@ describe('bot/main.ts loop wiring', () => {
     // One wrap site, so a second presence path cannot grow beside it unwrapped.
     expect((source.match(/withPresenceCounters\(/g) ?? []).length).toBe(1);
   });
+
+  it('wires handleInteraction so a real command failure reaches the player', () => {
+    // tests/discord_bot.test.ts only exercises interactionFailureFallback in
+    // isolation (a pure function of a boolean). Nothing else pins that
+    // handleInteraction actually catches a thrown error from the command
+    // dispatch, flips `acknowledged` ONLY after deferInteraction resolves, and
+    // routes the caught failure into the two fallback shapes the pure helper
+    // describes. A future edit could delete the try/catch entirely, or move
+    // `acknowledged = true` above the defer call, and every existing test
+    // (including the unit tests on the pure helper) would stay green while
+    // /whoami and /link silently hang again in Discord, which is the exact
+    // regression this PR fixes.
+    const source = mainSource();
+    const start = source.indexOf('const handleInteraction =');
+    const end = source.indexOf('\n  };', start);
+    expect(start).toBeGreaterThan(-1);
+    expect(end).toBeGreaterThan(start);
+    const body = source.slice(start, end);
+
+    // The whole dispatch (both /link and the defer-then-/whoami path) sits
+    // inside ONE try, so a throw anywhere in command handling is caught here
+    // rather than propagating past handleInteraction uncaught (the caller only
+    // logs, per the `.catch((e) => console.error(...))` at the call site, with
+    // no player-facing fallback of its own).
+    expect(body).toMatch(/try \{[\s\S]*\} catch \(e\) \{/);
+
+    // `acknowledged` starts false and flips true ONLY once deferInteraction has
+    // actually resolved, never earlier: setting it before the await, or beside
+    // respondInteraction, would make the fallback claim an ack that never
+    // landed and pick the wrong (edit) branch for a defer that itself threw.
+    expect(body).toMatch(
+      /let acknowledged = false;[\s\S]{0,400}?await discord\.deferInteraction\(/,
+    );
+    expect(body).toMatch(/await discord\.deferInteraction\([^)]*\);\s*acknowledged = true;/);
+    // respondInteraction (the /link path) never sets it: /link returns right
+    // after its one response, so a throw there must fall back to a fresh
+    // respond, not an edit against a response that was never deferred.
+    const respondIdx = body.indexOf('discord.respondInteraction(interactionId, token, {');
+    const returnIdx = body.indexOf('return;', respondIdx);
+    expect(respondIdx).toBeGreaterThan(-1);
+    expect(returnIdx).toBeGreaterThan(respondIdx);
+    expect(body.slice(respondIdx, returnIdx)).not.toContain('acknowledged = true');
+
+    // The catch block feeds the CURRENT `acknowledged` value into the pure
+    // helper (not a literal, not the pre-catch snapshot re-derived some other
+    // way), then dispatches on its `via` field to the matching Discord call:
+    // 'respond' fires a fresh ephemeral response, 'edit' patches the already
+    // deferred one. Swapping the two branches would type-check and pass the
+    // pure helper's own tests while every real failure showed Discord's raw
+    // error UI instead of the fallback text.
+    const catchIdx = body.indexOf('} catch (e) {');
+    expect(catchIdx).toBeGreaterThan(-1);
+    const catchBody = body.slice(catchIdx);
+    expect(catchBody).toMatch(
+      /const fallback = interactionFailureFallback\(acknowledged\);[\s\S]{0,200}?fallback\.via === 'respond'[\s\S]{0,200}?await discord\.respondInteraction\(interactionId, token, \{[\s\S]{0,120}?content: fallback\.content,[\s\S]{0,300}?\} else \{[\s\S]{0,200}?await discord\.editOriginalResponse\(cfg\.clientId, token, \{ content: fallback\.content \}\);/,
+    );
+    // The fallback's own failure is swallowed with a distinct log tag, not
+    // rethrown: there is genuinely nothing left to fall back to, but a bare
+    // swallow with the SAME message as the outer catch would be indistinguishable
+    // in logs from the original failure.
+    expect(catchBody).toMatch(
+      /catch \(e2\) \{\s*console\.error\('\[bot\] interaction fallback failed', e2\);/,
+    );
+  });
 });

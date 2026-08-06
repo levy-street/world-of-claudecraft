@@ -313,8 +313,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Ét fast gebyr pr. opskriftstrin, opkrævet én gang, når en mester underviser i det; hvert eneste trin i tabellen nedenfor er i brug i dag, fra de gratis startopskrifter til værktøjsmagerens stanglektioner i toppen.',
   'guide.profPages.econ.provenanceBody':
     "Nogle genstande bærer et navn. Hold musen over en, og værktøjstippet siger Indsamlet af den og den på et råmateriale, eller Udformet af den og den på et færdigt stykke: det samme mærke, formuleret efter hvordan genstanden blev til. En signatur er en del af selve genstanden, følger med den gennem handler, banken, posten, Verdensmarkedet og endda et tilbagekøb hos en sælger, og falmer aldrig.\n\nIndsamling signerer sit bedste arbejde automatisk: enhver høst, der ruller sjælden eller bedre, ankommer signeret, og sjældne fund signerer hele deres femdobbelte gevinst. Et heldigt kast ved en lighøst signerer sit udbytte, hvor familien ikke har noget eksemplar at give, og hvor den har, holder det udbyttet slet og præger det signerede uberørte eksemplar ved siden af. Fremstilling signerer efter samme linje: hvert eneste eksemplar af et resultat af sjælden kvalitet eller bedre præges signeret, og et mesterværk signerer altid, uanset dets kvalitet, så den fineste udgave af ethvert stykke nævner altid sin maker. Det ene, der kan koste dig en signatur, er en fuld taske: en signeret enhed skal have plads for sig selv, eller en matchende signeret stak, at lande i.\n\nEn stak genstande deler én identitet, så to eksemplarer smelter kun sammen, når hvert eneste mærke stemmer nøjagtigt: samme genstand, samme signatar, samme mesterværksstatistikker, samme fortryllelse, samme binding. En signeret stamme slutter sig aldrig til en slet bunke i nogen af retningerne (en sammensmeltning ville slette nogens navn), men identisk indhold smelter gerne sammen, så tyve malm signeret af den samme indsamler ligger i én stak, og en gevinst flår ikke dine tasker i stykker.\n\nSignaturer betaler håndværkere tilbage: at have et hvilket som helst signeret eksemplar af et nødvendigt reagens ved bænken, uanset hvem der signerede det, lægger 2 procentpoint til mesterværkschancen, og at have et reagens signeret af din egen hånd skærer én af det reagens' krævede antal (aldrig under et). Dit eget signerede arbejde af sjælden kvalitet eller bedre bliver endda ved med at lære dig noget, i dag kun gennem flasken: drik en eliksir, du har signeret, og et lille dryp færdighed flyder tilbage til det håndværk, der bryggede den, så længe det håndværk er et af dine aktive hovedfag.",
-  'guide.profPages.econ.throttleBody':
-    'Produktionen har et loft: fremstilling, affortrylling, fortryllelse, bjærgning og genopladning af værktøjseffekter deler ét budget på {actions} vellykkede handlinger i hvert vindue på {seconds} sekunder. Et afvist forsøg koster ingenting og bruger intet budget. Du kommer aldrig til at mærke det i normalt spil; det findes, så en specialist ved grænsen med en fuld bank ikke kan oversvømme Markedet, uanset færdighed eller lager.',
   'guide.profPages.faq.a4':
     'Du ramte et vindfald. Cirka 1 høst ud af 90 udløser en sjælden indsamlingsbegivenhed (gammelt kernetræ på et træ, en uberørt åre i malm, en måneskinsblomst blandt urterne): den ganger udbyttet fem gange, signerer hver eneste enhed med dit navn og bekendtgør fundet for hele zonen. Et rul på sjælden eller bedre ved en ordinær høst signerer også udbyttet.\n\nSignerede materialer er værd at beholde eller sælge dyrt: at have et hvilket som helst signeret eksemplar af et nødvendigt råmateriale ved bænken lægger 2 procentpoint til mesterværkschancen. Husk blot, at de kun stables med eksemplarer, der er signeret på præcis samme måde, så de optager deres egen taskeplads.',
   'guide.profPages.faq.a6':
@@ -688,7 +686,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.collectorsHeading': 'Samlere, trofæer og prisen på en historie',
   'guide.profPages.econ.collectorsBody':
     'Handlende er blinde for ophav: en signeret genstand sælger til en NPC til præcis dens ordinære pris. Præmien på en signatur eksisterer kun mellem spillere, og det er præcis det, der gør det interessant: en stak vindfaldsmalm signeret af en berømt indsamler, en Førsteklasses Udskæring fra en heldig høst, et mestervåben der nævner en håndværker, som siden er gået på pension, alt koster hvad end nogen husker at det er værd.\n\nBedrifternes Bog spiller på den samme instinkt: Uberørt Åre, Gammelt Kernetræ, måneskinsblomst, Et Perfekt Eksemplar og Et Glimt af Håb er nul-Hæder samlermærker, der udelukkende eksisterer for at bevise, at et øjeblik skete for dig. Behold den genstand der optjente bedriften, og du holder kvitteringen. Intet af dette er magt; ophav køber ingen statistikker og vinder ingen kampe, det er spillets papirspor af gode dage.',
-  'guide.profPages.econ.throttleHeading': 'Handlingsbegrænsningen',
   'guide.profPages.econ.doctrineHeading': 'Spillere handler med spillere',
   'guide.profPages.econ.doctrineBody':
     'Håndværksøkonomien er bygget på én idé: spillere forsyner spillere. Indsamlere fodrer håndværkere, håndværkere fodrer questere og raiders, og nedbrydere fodrer fortryllere, med handlende og stationsmestre, der står i kanten for at absorbere skrammel og mønt snarere end at konkurrere med dig. Hvis du vil tjene penge på et fag, er din kunde en person: lær hvad andre spillere brænder igennem, prissæt mod Verdensmarkedet, og behandl NPC-systemerne som et gulv under dine priser, ikke som markedet selv.\n\nFremstillet udstyr er afstemt til at ligge under raid-gulvet: selv et mesterværk er kun nogensinde ét kvalitetsniveau over sin opskrift, aldrig forbi legendarisk, og dets statistikbudget holder sig under raid-bytteområdet. Smedjen gør dig klar til det sværeste indhold; den erstatter det ikke. Det holder håndværkere, raiders og markedet i en stabil trekant: raid-bytte forbliver noget at stræbe efter, og fremstillede stykker forbliver det bedste udstyr, penge faktisk kan købe.',
@@ -3452,6 +3449,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.items.crag_warden_cudgel.name': 'Klippevogterkølle',
   'entities.items.craghorn_staff.name': 'Klippehorn-Stav',
   'entities.items.cragmaw_huntcord.name': 'Klippegabs Jagtsnor',
+  'entities.items.cragmaw_huntquiver.name': 'Klippegabs Jagtkogger',
   'entities.items.cragmaw_prowlboots.name': 'Klippegab Luskestøvler',
   'entities.items.cragprowl_belt.name': 'Klippeluske-Bælte',
   'entities.items.cragthorn_greatstaff.name': 'Klippetoerne Storstav',
@@ -3539,6 +3537,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.items.gravewardens_shiv.name': 'Gravvogterens Dolk',
   'entities.items.gravewoven_raiment.name': 'Gravvævet Dragt',
   'entities.items.gravewyrm_gauntlets.name': 'Gravorm-Panserhandsker',
+  'entities.items.gravewyrm_bone_quiver.name': 'Gravorm-Benkogger',
   'entities.items.gravewyrm_mantle.name': 'Gravorm-Kappe',
   'entities.items.gravewyrm_sabatons.name': 'Gravorm-Jernstøvler',
   'entities.items.gravewyrm_scale_hauberk.name': 'Gravorm-Skælbrynje',
@@ -3603,6 +3602,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.items.mistveil_grips.name': 'Tågeslør-Greb',
   'entities.items.moggers_copper_cudgel.name': 'Moggers Kobberkølle',
   'entities.items.moggers_shiv.name': 'Moggers Dolk',
+  'entities.items.moggers_hide_quiver.name': 'Moggers Skindkogger',
   'entities.items.moggers_stomper_boots.name': 'Moggers Trampestøvler',
   'entities.items.monarch_crown_helm.name': 'Monarkens Krone',
   'entities.items.copper_mining_pick.name': 'Kobberminehakke',
@@ -3739,6 +3739,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.items.stormcallers_spaulders.name': 'Galecall-Skulderplader',
   'entities.items.bonewrought_greatsword.name': 'Bonewrought-Storsværd',
   'entities.items.direfang_greatblade.name': 'Direfang-Storklinge',
+  'entities.items.direfang_quiver.name': 'Direfang-Kogger',
   'entities.items.bonewrought_bulwark.name': 'Bonewrought-Bolværk',
   'entities.items.wraithfire_orb.name': 'Wraithfire-Kugle',
   'entities.items.stormroot_cowl.name': 'Stormrod-Hætte',
@@ -6636,13 +6637,9 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.disenchantConfirmBodySpecial':
     'Dette ødelægger et særligt eksemplar af {item} (signeret, mesterværk eller fortryllet) og giver arkan materiale. Dette kan ikke fortrydes.',
   'hudChrome.enchanting.disenchantConfirmTitle': 'Affortrylle {item}?',
-  'hudChrome.enchanting.disenchantThrottled':
-    'Du affortrylles for hurtigt. Vent et øjeblik og prøv igen.',
   'hudChrome.enchanting.disenchantedLine': 'Du affortrylles {item}.',
   'hudChrome.enchanting.enchantAppliedLine': 'Du fortrylles {item} med {enchant}.',
   'hudChrome.enchanting.enchantInsufficient': 'Du har ikke materialerne til den fortryllelse.',
-  'hudChrome.enchanting.enchantThrottled':
-    'Du fortrylles for hurtigt. Vent et øjeblik og prøv igen.',
   'hudChrome.enchanting.enchantUnknown': 'Den fortryllelse eksisterer ikke.',
   'hudChrome.enchanting.enchantWrongSlot': 'Den fortryllelse kan ikke anvendes på den genstand.',
   'hudChrome.enchanting.noEnchants': 'Ingen fortryllelse bruger dette reagens.',
@@ -6656,7 +6653,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.salvageConfirmBodySpecial':
     'Dette ødelægger et særligt eksemplar af {item} (signeret, mesterværk eller fortryllet) og giver håndværksmaterialer. Dette kan ikke fortrydes.',
   'hudChrome.enchanting.salvageConfirmTitle': 'Bjærg {item}?',
-  'hudChrome.enchanting.salvageThrottled': 'Du bjærger for hurtigt. Vent et øjeblik og prøv igen.',
   'hudChrome.enchanting.salvagedLine': 'Du bjærger {item}.',
   'hudChrome.enchanting.targetTitle': 'Vælg en genstand at fortryle',
   'hudChrome.keybinds.emoteWheel': 'Følelseshjul',
@@ -6913,6 +6909,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.partyGroup': 'Gruppe {n}',
   'hudChrome.unitFrame.partyLabel': 'Dit følge',
   'hudChrome.unitFrame.playerLabel': 'Din helt',
+  'hudChrome.unitFrame.petLabel': 'Dit kæledyr',
   'hudChrome.unitFrame.targetAnnounce': 'Markér {name}',
   'hudChrome.unitFrame.targetLabel': 'Dit mål',
   'hudChrome.widgets.clockTitle': 'Lokal tid - klik for at skifte mellem 12/24-timers',
@@ -7854,6 +7851,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.help.label': 'Brug for hjælp',
   'hudChrome.discord.relay.help.hint': 'Bed fællesskabet om hjælp',
   'hudChrome.options.showPlayerNameplates': 'Vis spillernavneskilte',
+  'hudChrome.options.hideUnusedActionSlots': 'Skjul ubrugte handlingsfelter',
   'hudChrome.options.showSecondaryActionBar': 'Vis sekundær handlingslinje',
   'desktop.crash.body': 'Spilvisningen holdt op med at virke. Genindlæs den?',
   'desktop.crash.fatalBody': 'World of ClaudeCraft stødte på en uventet fejl og skal lukke.',
@@ -8185,7 +8183,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Alt på denne side lever i spillet: tryk på Esc for at åbne indstillingerne. Menuen åbner på en Oversigt over fastgjorte essentielle valg, med kategorierne på en skinne ved siden: indstillingerne nedenfor bor under Grafik, Interface og Tilgængelighed i Skærm-gruppen, og Performance Overlay under System. Endnu hurtigere, skriv et navn i søgefeltet øverst og spring direkte hen til det.',
   'guide.settingsPage.whyLabel': 'Hvorfor virker det:',
   'hudChrome.crafting.close': 'Tæt håndværk',
-  'hudChrome.crafting.craft': 'Håndværk',
   'hudChrome.crafting.craftedToast': 'Udformet: {name}',
   'hudChrome.crafting.empty': 'Ingen opskrifter kendt endnu.',
   'hudChrome.crafting.insufficientMaterials': 'Det har du ikke materialerne til.',
@@ -8279,7 +8276,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.increasePct.int': 'Øger Intellekt med {pct}%',
   'hudChrome.auraEffect.increasePct.sta': 'Øger Udholdenhed med {pct}%',
   'hudChrome.crafting.recipeNotLearned': 'Du har ikke lært den opskrift endnu.',
-  'hudChrome.crafting.throttled': 'Du laver ting for hurtigt. Vent et øjeblik, og prøv igen.',
   'hudChrome.mobile.chatPlaceholder': 'Sig noget...',
   'hudChrome.mobile.hideKeyboard': 'Skjul tastatur',
   'hudChrome.unitFrame.partyChip': 'Gruppe',
@@ -9156,6 +9152,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.keybinds.petAttack': 'Kæledyr: Angrib',
   'hudChrome.keybinds.petDefensive': 'Kæledyr: Defensiv',
   'hudChrome.keybinds.petStop': 'Kæledyr: Stop',
+  'hudChrome.keybinds.targetPet': 'Kæledyr: Sigt',
   'hudChrome.keybinds.petTaunt': 'Kæledyr: Hån',
   'hudChrome.keybinds.mount': 'Stig op / Stig af',
   'hudChrome.mailbox.parcelQtyDecreaseAria': 'Send én {item} mindre',
@@ -10061,6 +10058,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hud.combat.evaded': 'Din {ability} undgås af {target}.',
   'hudChrome.options.mouseoverCast': 'Museover-kast på grupperammer',
   'hudChrome.options.showTargetOfTarget': 'Vis målets mål',
+  'hudChrome.options.showPetFrame': 'Vis dit kæledyr',
   'hudChrome.unitFrame.targetOfTargetLabel': 'Målets Mål',
   'itemUi.market.rarityLegendary': 'Legendarisk',
   'loading.reconnectingAttempt':

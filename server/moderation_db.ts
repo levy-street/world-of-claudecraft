@@ -25,6 +25,8 @@ export const MODERATION_ACTIONS = [
   'kill',
   'jail',
   'unjail',
+  'spectate',
+  'unspectate',
   'suspend',
   'unsuspend',
   'ban',
@@ -549,6 +551,17 @@ export async function muteAccountChat(input: {
       reason,
       expiresAt,
     });
+    // Mirrors moderateAccount's ban/suspend arm: a chat mute is a punitive
+    // sanction on the reported account, so it resolves whatever open reports
+    // led to it the same way ban/suspend do. Without this, muting a reported
+    // account for its chat left the report sitting open forever, silently
+    // invisible to moderationQueue even though the account was sanctioned.
+    await client.query(
+      `UPDATE player_reports
+       SET status = 'actioned', reviewed_at = now(), reviewed_by_account_id = $2, review_note = $3
+       WHERE reported_account_id = $1 AND status = 'open'`,
+      [input.accountId, input.adminAccountId, reason],
+    );
     await client.query('COMMIT');
   } catch (err) {
     await client.query('ROLLBACK').catch(() => {});
@@ -918,7 +931,7 @@ export async function setDailyRewardsIpBan(input: {
 // Audit-only record for an in-game action whose live effect is owned by the
 // GameServer. Unlike account sanctions, this changes no persistent account state.
 export async function recordInGameAction(input: {
-  action: 'kick' | 'kill' | 'jail' | 'unjail';
+  action: 'kick' | 'kill' | 'jail' | 'unjail' | 'spectate' | 'unspectate';
   accountId: number;
   adminAccountId: number;
   reason: unknown;

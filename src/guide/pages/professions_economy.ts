@@ -1,5 +1,5 @@
 // Professions economy reference (/wiki/professions/economy): the exact fees,
-// sinks, throttles, work orders, and the Maker's Bond commission rules.
+// sinks, cast pacing, work orders, and the Maker's Bond commission rules.
 // Renders entirely from GUIDE_PROF_ECONOMY plus guide.* t() keys; NPC and
 // material names are baked English proper nouns. TRANSPARENCY POLICY
 // this page publishes EXACT numbers; the mirrored
@@ -58,6 +58,25 @@ function feesSection(): string {
       ${paras('guide.profPages.econ.trainingNote')}
       <ul class="guide-prof-bands">${trainingFees}</ul>
     </section>`;
+}
+
+function castPaceRows(): string {
+  // The EXACT cast-pace numbers (transparency policy: this page publishes
+  // exact numbers, and the in-game duration chip must never out-inform the
+  // wiki). All values ride GUIDE_PROF_ECONOMY.castPace tokens, never prose.
+  const cp = GUIDE_PROF_ECONOMY.castPace;
+  const sec = (n: number): string => formatNumber(n, { maximumFractionDigits: 2 });
+  const lines = [
+    t('guide.profPages.econ.castPaceField', { seconds: sec(cp.fieldSec) }),
+    t('guide.profPages.econ.castPaceSkill25', { seconds: sec(cp.skill25Sec) }),
+    t('guide.profPages.econ.castPaceSkill50', { seconds: sec(cp.skill50Sec) }),
+    t('guide.profPages.econ.castPaceSkill75', { seconds: sec(cp.skill75Sec) }),
+    t('guide.profPages.econ.castPaceCombo', { seconds: sec(cp.comboSec) }),
+    t('guide.profPages.econ.castPaceEnchantFamily', { seconds: sec(cp.enchantFamilySec) }),
+    t('guide.profPages.econ.castPaceRecharge', { seconds: sec(cp.rechargeSec) }),
+    t('guide.profPages.econ.castPaceBatch', { count: formatNumber(cp.batchMax) }),
+  ];
+  return lines.map((line) => `<li>${esc(line)}</li>`).join('');
 }
 
 function workOrdersSection(): string {
@@ -119,12 +138,10 @@ export function economyDetailHtml(): string {
         <h2>${esc(t('guide.profPages.econ.collectorsHeading'))}</h2>
         ${paras('guide.profPages.econ.collectorsBody')}
       </section>
-      <section class="guide-block" id="prof-throttle">
-        <h2>${esc(t('guide.profPages.econ.throttleHeading'))}</h2>
-        ${paras('guide.profPages.econ.throttleBody', {
-          actions: formatNumber(e.actionThrottle.maxActions),
-          seconds: formatNumber(e.actionThrottle.windowSeconds),
-        })}
+      <section class="guide-block" id="prof-cast-pace">
+        <h2>${esc(t('guide.profPages.econ.castPaceHeading'))}</h2>
+        ${paras('guide.profPages.econ.castPaceBody')}
+        <ul class="guide-prof-bands">${castPaceRows()}</ul>
       </section>
       <section class="guide-block" id="prof-doctrine">
         <h2>${esc(t('guide.profPages.econ.doctrineHeading'))}</h2>

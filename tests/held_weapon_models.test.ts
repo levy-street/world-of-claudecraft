@@ -198,18 +198,31 @@ describe('held weapon models', () => {
     expect(unmapped.map((item) => item.id)).toEqual([]);
   });
 
-  // The wraithfire_orb (and its generated heroic clone) plus the valefire_lantern
-  // are the known held model gaps: the shared art set has no orb or lantern model
-  // to map them to, so they need new art, not a table row. Pinning the exact set
-  // makes the exception conscious: a future held_offhand item must either map to
-  // a model or extend this pin.
-  it('pins the held_offhand items without a model (orb and lantern)', () => {
+  // The orbs, the lantern and the quivers (each with its generated heroic clone
+  // where the source is heroic-eligible) are the known held model gaps: the
+  // shared art set has no orb, lantern or quiver model to map them to, so they
+  // need new art, not a table row. The quivers are a softer gap than the orbs:
+  // the hunter's ranger.glb already carries a built-in quiver mesh, so an
+  // unmapped quiver reads correctly on the body instead of showing nothing.
+  // Pinning the exact set makes the exception conscious: a future held_offhand
+  // item must either map to a model or extend this pin.
+  it('pins the held_offhand items without a model (orbs, lantern and quivers)', () => {
     const heldOffhands = Object.values(ITEMS).filter((item) => item.kind === 'held_offhand');
     const unmapped = heldOffhands
       .filter((item) => itemOffhandModelUrl(item.id) === null)
       .map((item) => item.id)
       .sort();
-    expect(unmapped).toEqual(['heroic_wraithfire_orb', 'valefire_lantern', 'wraithfire_orb']);
+    expect(unmapped).toEqual([
+      'cragmaw_huntquiver',
+      'direfang_quiver',
+      'gravewyrm_bone_quiver',
+      'heroic_direfang_quiver',
+      'heroic_gravewyrm_bone_quiver',
+      'heroic_wraithfire_orb',
+      'moggers_hide_quiver',
+      'valefire_lantern',
+      'wraithfire_orb',
+    ]);
   });
 
   it('resolves actual offhands independently from the mainhand model', () => {

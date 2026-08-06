@@ -10,13 +10,13 @@
     "chest opens at LOW tier (attemptAvailable=false, looted=true), no deed, no coffer + surface exit opens"
   ],
   "draws": 5,
-  "drawDigest": "50aeceb5",
+  "drawDigest": "d337efdc",
   "frames": [
     {
       "tick": 0,
       "time": 0,
-      "nextId": 946,
-      "state": "4fe31e4b",
+      "nextId": 964,
+      "state": "9d745f87",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -42,7 +42,6 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -54,7 +53,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 941,
+          "entityId": 959,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
@@ -92,7 +91,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 62,
-          "id": 941,
+          "id": 959,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -144,78 +143,78 @@
     {
       "tick": 10,
       "time": 0.5,
-      "nextId": 960,
-      "state": "231f7669",
-      "events": "9accd8b6",
+      "nextId": 974,
+      "state": "f12b3e3d",
+      "events": "21b74e5a",
       "rng": {
         "draws": 3,
-        "digest": "8261aa7c"
+        "digest": "56bb6f30"
       }
     },
     {
       "tick": 20,
       "time": 1,
-      "nextId": 960,
-      "state": "d995a557",
-      "events": "5c135d1d",
+      "nextId": 974,
+      "state": "ef1183f3",
+      "events": "cc147418",
       "rng": {
         "draws": 3,
-        "digest": "8261aa7c"
+        "digest": "56bb6f30"
       }
     },
     {
       "tick": 30,
       "time": 1.5,
-      "nextId": 960,
-      "state": "95e8b1b1",
+      "nextId": 974,
+      "state": "4b078ab5",
       "events": "741638a5",
       "rng": {
         "draws": 3,
-        "digest": "8261aa7c"
+        "digest": "56bb6f30"
       }
     },
     {
       "tick": 40,
       "time": 2,
-      "nextId": 960,
-      "state": "64d9bb33",
+      "nextId": 974,
+      "state": "11e9d2e7",
       "events": "741638a5",
       "rng": {
         "draws": 3,
-        "digest": "8261aa7c"
+        "digest": "56bb6f30"
       }
     },
     {
       "tick": 50,
       "time": 2.5,
-      "nextId": 960,
-      "state": "04b084c9",
+      "nextId": 974,
+      "state": "c5558c5d",
       "events": "741638a5",
       "rng": {
         "draws": 3,
-        "digest": "8261aa7c"
+        "digest": "56bb6f30"
       }
     },
     {
       "tick": 60,
       "time": 3,
-      "nextId": 960,
-      "state": "79857287",
+      "nextId": 974,
+      "state": "5b4d5aa3",
       "events": "741638a5",
       "rng": {
         "draws": 3,
-        "digest": "8261aa7c"
+        "digest": "56bb6f30"
       }
     },
     {
       "tick": 69,
       "time": 3.45,
-      "nextId": 961,
-      "state": "19ff8ccf",
-      "events": "9ce30670",
+      "nextId": 975,
+      "state": "4ef653a3",
+      "events": "9ef041c2",
       "rng": {
         "draws": 5,
-        "digest": "50aeceb5"
+        "digest": "d337efdc"
       },
       "label": "lockpick-tries-exhausted",
       "players": [
@@ -235,14 +234,13 @@
           "bgRating": 1500,
           "cls": "rogue",
           "companionUpgrades": {},
-          "copper": 10,
+          "copper": 12,
           "counters": {
             "damageDealt": 636,
             "kills": 1,
             "xpGained": 898
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "damageDealt": 636,
@@ -290,7 +288,7 @@
             "eastbrook_ledger"
           ],
           "delveMarks": 1,
-          "entityId": 941,
+          "entityId": 959,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
@@ -330,7 +328,7 @@
           "dualWielding": true,
           "fiveSecondRule": 102.45,
           "hp": 50000,
-          "id": 941,
+          "id": 959,
           "inCombat": true,
           "kind": "player",
           "level": 7,
@@ -387,7 +385,7 @@
           "facing": 3.141593,
           "fiveSecondRule": 99,
           "hp": 1,
-          "id": 959,
+          "id": 973,
           "kind": "object",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -420,23 +418,23 @@
     {
       "tick": 70,
       "time": 3.5,
-      "nextId": 961,
-      "state": "e88c041d",
+      "nextId": 975,
+      "state": "a3f1b3bd",
       "events": "741638a5",
       "rng": {
         "draws": 5,
-        "digest": "50aeceb5"
+        "digest": "d337efdc"
       }
     },
     {
       "tick": 71,
       "time": 3.55,
-      "nextId": 961,
-      "state": "52793457",
+      "nextId": 975,
+      "state": "78a94f1b",
       "events": "741638a5",
       "rng": {
         "draws": 5,
-        "digest": "50aeceb5"
+        "digest": "d337efdc"
       },
       "label": "final",
       "players": [
@@ -456,14 +454,13 @@
           "bgRating": 1500,
           "cls": "rogue",
           "companionUpgrades": {},
-          "copper": 10,
+          "copper": 12,
           "counters": {
             "damageDealt": 636,
             "kills": 1,
             "xpGained": 898
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "damageDealt": 636,
@@ -511,7 +508,7 @@
             "eastbrook_ledger"
           ],
           "delveMarks": 1,
-          "entityId": 941,
+          "entityId": 959,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
@@ -551,7 +548,7 @@
           "dualWielding": true,
           "fiveSecondRule": 102.55,
           "hp": 50000,
-          "id": 941,
+          "id": 959,
           "inCombat": true,
           "kind": "player",
           "level": 7,
@@ -608,7 +605,7 @@
           "facing": 3.141593,
           "fiveSecondRule": 99,
           "hp": 1,
-          "id": 959,
+          "id": 973,
           "kind": "object",
           "level": 1,
           "lootFfaTimer": "Infinity",

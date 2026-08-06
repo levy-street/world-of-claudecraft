@@ -1,11 +1,12 @@
 // Significant-activity feed: the game loop detects notable moments (a character
 // reaching max level, a rare drop, a duel result, an arena win, a decided Vale
 // Cup match, a masterwork craft, a feed-worthy deed) and enqueues a structured
-// item here; the bot drains /internal/discord/activity and posts a rich card to
-// the activity channel, tagging the linked Discord user(s) involved.
+// item here; the bot drains it through the consolidated GET
+// /internal/discord/outbox poll and posts a rich card to the activity channel,
+// tagging the linked Discord user(s) involved.
 //
 // Pure + dependency-free (no Discord IO, no DB), so it is trivially testable. The
-// drain endpoint resolves accountIds to Discord identities; this layer is just the
+// outbox drain resolves accountIds to Discord identities; this layer is just the
 // in-memory hand-off, mirroring discord_relay.ts.
 
 export type ActivityKind =

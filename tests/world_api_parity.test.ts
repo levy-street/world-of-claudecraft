@@ -126,6 +126,7 @@ export const IWORLD_MEMBERS = [
   { name: 'tabTarget', kind: 'method' },
   { name: 'targetNearestFriendly', kind: 'method' },
   { name: 'friendlyTabTarget', kind: 'method' },
+  { name: 'setStopAutoAttackOnTargetSwitch', kind: 'method' },
   { name: 'startAutoAttack', kind: 'method' },
   { name: 'stopAutoAttack', kind: 'method' },
   { name: 'interact', kind: 'method' },
@@ -341,6 +342,12 @@ export const IWORLD_MEMBERS = [
   { name: 'lastSalvageResult', kind: 'data' },
   // Maker's Bond unbind service (Professions 2.0).
   { name: 'unbindItem', kind: 'method' },
+  // Commission order board (issue #1298).
+  { name: 'commissionOrders', kind: 'data' },
+  { name: 'openCommissionOrder', kind: 'method' },
+  { name: 'cancelCommissionOrder', kind: 'method' },
+  { name: 'acceptCommissionOrder', kind: 'method' },
+  { name: 'deliverCommissionOrder', kind: 'method' },
   // Tool effect slotting: one read row per gathering profession that has a
   // slotted effect, the command that installs one (consuming a crafted charm
   // copy), and the recharge command (the R39/R30 refill).
@@ -540,15 +547,15 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // IWorldGuildBank members (guildBankInfo, one data read, plus five
     // commands), leaving 287. The guild bank ACTIVITY LOG adds one read member
     // (guildBankLog, a method because reading it is what requests the cold
-    // payload on demand: it has no snapshot key), leaving 288, then 289 with
-    // the v0.35.0 cut. TWO independent facets land on top of that base here:
-    // the tool-only container adds one data member (toolbelt) plus four
-    // methods (equip/unequip/store/take), and Thornhollow Fields adds the
-    // bgInfo data member plus bgQueueJoin / bgQueueLeave / bgFlagAction.
-    // 289 + 5 + 4 = 298.
-    expect(IWORLD_MEMBERS.length).toBe(298);
-    expect(DATA_MEMBERS.length).toBe(76);
-    expect(METHOD_MEMBERS.length).toBe(222);
+    // payload on demand: it has no snapshot key), leaving 288. Thornhollow
+    // Fields adds the four battleground facet members, stopAutoAttack adds
+    // setStopAutoAttackOnTargetSwitch, and the commission order board
+    // (issue #1298) adds commissionOrders plus its four commands, leaving 299.
+    // This branch's tool-only container adds one data member (toolbelt) plus
+    // four methods (equip/unequip/store/take), leaving 304.
+    expect(IWORLD_MEMBERS.length).toBe(304);
+    expect(DATA_MEMBERS.length).toBe(77);
+    expect(METHOD_MEMBERS.length).toBe(227);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -561,6 +568,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     expect(IWORLD_MEMBERS.map((m) => m.name).sort()).toEqual([
       'abandonPet',
       'abandonQuest',
+      'acceptCommissionOrder',
       'acceptLinkedQuest',
       'acceptQuest',
       'accountCosmetics',
@@ -597,6 +605,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'buyHeroicVendorItem',
       'buyItem',
       'cancelAura',
+      'cancelCommissionOrder',
       'cardMinigameInfo',
       'castAbility',
       'castAbilityAt',
@@ -610,6 +619,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'claimEventSkin',
       'clearMarker',
       'collectDelveChestLoot',
+      'commissionOrders',
       'companionState',
       'companionUpgrade',
       'companionUpgrades',
@@ -629,6 +639,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'deedsRarity',
       'deedsRecent',
       'deleteLoadout',
+      'deliverCommissionOrder',
       'delveBuyShopItem',
       'delveDaily',
       'delveInteract',
@@ -747,6 +758,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'moveRaidMember',
       'nodeHarvestableByMe',
       'nodeRespawnSeconds',
+      'openCommissionOrder',
       'ownedMounts',
       'partyAccept',
       'partyDecline',
@@ -807,6 +819,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'setPetAutoWaterJet',
       'setPetMode',
       'setSpec',
+      'setStopAutoAttackOnTargetSwitch',
       'setTownFocus',
       'slotToolEffect',
       'socialInfo',
@@ -876,6 +889,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'bgInfo',
       'cardMinigameInfo',
       'cfg',
+      'commissionOrders',
       'companionState',
       'companionUpgrades',
       'copper',
@@ -945,6 +959,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     expect(METHOD_MEMBERS.map((m) => m.name).sort()).toEqual([
       'abandonPet',
       'abandonQuest',
+      'acceptCommissionOrder',
       'acceptLinkedQuest',
       'acceptQuest',
       'accountFlair',
@@ -969,6 +984,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'buyHeroicVendorItem',
       'buyItem',
       'cancelAura',
+      'cancelCommissionOrder',
       'castAbility',
       'castAbilityAt',
       'castAbilityBySlot',
@@ -991,6 +1007,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'deedsRarity',
       'deedsRecent',
       'deleteLoadout',
+      'deliverCommissionOrder',
       'delveBuyShopItem',
       'delveInteract',
       'delveRiteChoose',
@@ -1080,6 +1097,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'moveRaidMember',
       'nodeHarvestableByMe',
       'nodeRespawnSeconds',
+      'openCommissionOrder',
       'ownedMounts',
       'partyAccept',
       'partyDecline',
@@ -1127,6 +1145,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'setPetAutoWaterJet',
       'setPetMode',
       'setSpec',
+      'setStopAutoAttackOnTargetSwitch',
       'setTownFocus',
       'slotToolEffect',
       'socketRiftGem',
@@ -1261,6 +1280,7 @@ const FACET_TARGETING = [
   'tabTarget',
   'targetNearestFriendly',
   'friendlyTabTarget',
+  'setStopAutoAttackOnTargetSwitch',
 ] as const satisfies readonly (keyof IWorldTargeting)[];
 type _ExhaustTargeting = AssertNever<
   Exclude<keyof IWorldTargeting, (typeof FACET_TARGETING)[number]>
@@ -1647,6 +1667,11 @@ const FACET_PROFESSIONS = [
   'lastEnchantResult',
   'lastSalvageResult',
   'unbindItem',
+  'commissionOrders',
+  'openCommissionOrder',
+  'cancelCommissionOrder',
+  'acceptCommissionOrder',
+  'deliverCommissionOrder',
   'toolEffectSlots',
   'slotToolEffect',
   'rechargeToolEffect',
@@ -1741,8 +1766,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(298);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(298);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(304);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(304);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

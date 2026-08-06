@@ -560,4 +560,32 @@ export const table: DeedLocaleTable = {
     name: '鷗鳥所知',
     desc: '在遠岸的水域釣起一條魚。',
   },
+  prog_engineering_rare: {
+    name: '精密工程',
+    desc: '在工程學中製作你的第一件稀有品質物品。',
+  },
+  prog_alchemy_rare: {
+    name: '稀世佳釀',
+    desc: '在鍊金術中製作你的第一件稀有品質物品。',
+  },
+  prog_cooking_rare: {
+    name: '令人難忘的佳餚',
+    desc: '在烹飪中製作你的第一件稀有品質物品。',
+  },
+  prog_leatherworking_rare: {
+    name: '精細鞣製',
+    desc: '在製皮中製作你的第一件稀有品質物品。',
+  },
+  prog_tailoring_rare: {
+    name: '大師的針腳',
+    desc: '在裁縫中製作你的第一件稀有品質物品。',
+  },
+  prog_weaponcrafting_rare: {
+    name: '淬鍊至光亮',
+    desc: '在武器鍛造中製作你的第一件稀有品質物品。',
+  },
+  prog_armorcrafting_rare: {
+    name: '鍛造至完美',
+    desc: '在護甲鍛造中製作你的第一件稀有品質物品。',
+  },
 };

@@ -11,7 +11,9 @@ Codex have different entry points and share the same deterministic scripts and c
 | Instant copy gate | `.claude/hooks/qa-stop.sh` through each runtime's Stop hook | End of an agent turn | Yes, on a hard-invariant hit |
 | Deterministic floor | `.githooks/pre-push` | Before a push | Yes |
 | Day-loop fast path | `npm run gate:fast` through `scripts/gate_fast.mjs` | While iterating (agents and mid/low-tier machines) | No (local only; not merge) |
-| Full local gate | `npm run gate` through `scripts/gate.mjs` | Before implementation is called ready / pre-merge | Yes |
+| **Selective gate** | `node scripts/gate_select.mjs` | **Before implementation is called ready / pre-merge** | **Yes (the merge bar)** |
+| Full local gate | `npm run gate` through `scripts/gate.mjs` | When you want the whole suite locally, or the planner falls back | Yes (deeper check) |
+| Nightly full gate | `.github/workflows/nightly.yml`: full suite + checks + browser over the tips of main and the active `release/**` branch | Scheduled nightly (04:47 UTC) | No (alerting: files and closes one tracking issue) |
 | Judgment review | Claude `/qa` or Codex `$woc-qa`, plus scoped reviewers | End of a contribution | Advisory locally |
 
 ### Instant copy gate
@@ -105,6 +107,111 @@ ready or opening a mergeable PR. Piping a test run can hide its exit status, and
 unconstrained full-suite parallelism can make healthy heavy sim tests flake. Day-loop
 iteration may use `npm run gate:fast`; a green fast path alone is never enough to claim
 done.
+
+### Selective gate (`gate:select`)
+
+`node scripts/gate_select.mjs` is **the merge bar** (owner decision, 2026-08-05; recorded in
+`docs/local-gate-perf/state.md`). `npm run gate` remains the deeper check. The one-line
+difference from the other paths:
+
+| | Non-test steps | Tests | Merge bar? |
+|---|---|---|---|
+| `gate:fast` | **A subset.** No builds, no admin/bot typecheck, no i18n or wiki freshness, no sfx, no browser. | `related` plus two guard files | **No** |
+| `gate` | **All**, plus the dep-sync and ffmpeg preflights | **Every** test file | Yes (provably complete) |
+| `gate:select` | **All, and the same preflights** | always-run set + `related` | Yes (empirically complete) |
+
+The distinction that matters: **`gate:fast` is weaker because it drops whole checks;
+`gate:select` drops none of them.** A change that breaks the client bundle, the admin
+Svelte types, the bot build, i18n freshness, or SFX conformance fails `gate:select`
+exactly as it fails `gate`, and on a `release/**` branch it runs the release-tier i18n
+step too. Only the test step is narrowed, so the question "is this enough to ship a PR"
+reduces to one question: does the narrowed test step still catch what the full one would?
+
+**Why the narrowed test step is sufficient.** `vitest related` selects on the static
+import graph, which models most of this suite correctly and misses the rest *silently*
+(a skipped test does not error, so the gate still prints PASS). So selection is never
+trusted alone. `scripts/lib/test_visibility.mjs` classifies every test file first:
+
+- **blind**: reaches outside the graph (disk scan, subprocess, dynamic import, or an
+  fs-touching shared helper one hop away) and imports no source. `related` can never
+  select it. `tests/architecture.test.ts`, the determinism and sim-purity guard, is one
+  of these.
+- **partial**: reaches outside the graph *and* imports source, so `related` selects it
+  only sometimes, which hides better than never.
+- **graph**: pure imports, modelled correctly.
+
+Discovery matches vitest's own collection rule rather than approximating it, because a
+walker that misses a file the suite runs removes it from the always-run set silently.
+
+Every blind and partial file runs on **every** selective gate regardless of the diff.
+Only the graph-visible remainder is left to `related`. The set is recomputed from source
+on each run rather than read from a committed list, so it cannot go stale: a new test that
+scans from disk joins it the moment it lands.
+
+**Safety fallback.** Any change the planner cannot reason about (a lockfile, `package.json`,
+a vite/vitest/tsconfig edit, the shared test helpers or global setup) drops the whole run
+to the full suite. Selection is an optimization for changes we understand; everything else
+gets the old bar. Failing toward *more* tests is the only safe direction, which is also why
+an unresolvable diff base or a failing `git diff` is a hard stop rather than an empty
+changed set. The diff is taken against the BRANCH base, not just the dirty working tree:
+`GATE_SELECT_BASE` overrides it, otherwise the tracking branch is used.
+
+**Reading a shadow run.** It reports two numbers. *Escapes* (a file the full suite
+failed that selection skipped) is the strict signal, but it is empty on any green
+branch regardless of how sound selection is, so a green run is explicitly labelled
+INCONCLUSIVE on escapes rather than PASS. The *coverage delta* (files the full suite
+ran that selection skipped) exists on every run: it is not a defect list, it is the
+surface where an escape could hide, and it is what to actually study.
+
+**What it still cannot prove, and why that is acceptable.** The out-of-graph pattern list is
+a floor, not a proof, so this path is empirically complete rather than provably complete.
+The backstop is CI: `.github/workflows/ci.yml` runs the FULL suite (8-shard matrix) on every
+`pull_request` AND on every push to `main` / `release/**`, and the scheduled nightly full
+gate (next section) re-proves the tips daily with same-day alerting. A local selection miss
+therefore costs feedback latency, not correctness, because the full suite still runs on the
+PR before it merges. That is what makes this safe as the local bar.
+
+**Evidence it works.** Fault injection, 5/5 caught: a `Math.random()` in `src/sim`, a combat
+constant, a content record, a sim-emitted player string, and a deleted weapon `.glb`. In two
+of those (`Math.random` and the asset deletion) `vitest related` selected **nothing** and
+exited green; the always-run set caught both. That is the mechanism doing precisely the job
+it exists for.
+
+**No `npm run` alias yet, deliberately.** `tests/fenbridge_town_assets.test.ts`
+fingerprints the whole of `package.json` as an input to a shipping GLB, so adding a
+script entry invalidates the asset and demands a full re-export (63 files: preview
+PNGs, raw and optimized GLBs). Rather than put that churn in a tooling change, this
+ships as a direct `node` invocation. Adding the alias is a follow-up that either
+re-exports the asset or narrows the fingerprint to the dependency fields, which is
+the toolchain-relevant part its own comment cites as the reason for the pin.
+
+Pure planning logic: `scripts/lib/gate_discovery.mjs`, `scripts/lib/gate_select_plan.mjs`
+and `scripts/lib/test_visibility.mjs`, all pinned by `tests/gate_select_plan.test.ts`.
+
+### Nightly full gate (scheduled backstop)
+
+`.github/workflows/nightly.yml` re-proves the tips of `main` and the highest
+`release/vX.Y.Z` branch (the `v` is optional) every night: the full unsharded test suite, the serialized
+checks lane (mirroring ci.yml's release-checks run steps), and the Chromium browser
+lane, per ref. It exists because a red release tip once sat unwatched for days while
+every open PR inherited its failures; push runs show rot, but only to someone looking.
+
+The verdict lands in exactly one tracking issue (label `nightly-gate`, title "Nightly
+full gate is red"): created on the first red run, updated with the failed-job list on
+repeat failures, closed with a recovery comment on the first green run. A run that
+reports no failures but did not actually complete its lanes counts as red ("unproven"),
+never as recovery. A `workflow_dispatch` with the `ref` input gates exactly that ref and
+reports under the separate `nightly-gate-drill` identity, so acceptance drills never
+touch the production issue; nothing scheduled drains a red drill's issue, so close it
+by hand or finish the drill with a green dispatch at the same ref.
+
+Deliberate exclusions: the release-i18n 21-locale lane (expected red mid-cycle, issue
+#2820) and the release version gate (cannot rot without a push, which ci.yml covers).
+GitHub registers a workflow's cron AND its `workflow_dispatch` surface from the default
+branch, so neither can fire until the file reaches `main` with a release merge; the
+first drill and the first manual pass both come after that.
+Planning logic: `scripts/lib/nightly_plan.mjs`, pinned by `tests/nightly_plan.test.ts`;
+the workflow shape is pinned by `tests/nightly_workflow.test.ts`.
 
 ### Judgment review
 

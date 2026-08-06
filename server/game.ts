@@ -677,7 +677,10 @@ const HEAVY_SELF_CMDS = new Set<string>([
   'equip',
   'inv_move', // rewrites the inventory array order: the self snapshot must resend it
   'unequip_item',
-  'salvage_item',
+  // salvage_item is deliberately ABSENT since the Craft Cast System: the
+  // command only starts a cast (nothing mutates on receipt), and the
+  // complete-time loot event is a HEAVY_SELF_EVENTS member, so listing it
+  // here would buy a wasted heavy re-serialize per cast start.
   'rift_upgrade_item',
   'rift_enchant_item',
   'rift_socket_gem',
@@ -778,6 +781,13 @@ const HEAVY_SELF_EVENTS = new Set<string>([
   // offer an enchant the player can no longer afford. The bagged arm's loot
   // event already covered it; this makes both arms explicit.
   'enchantResult',
+  // Commission order board delivery (issue #1298): the crafter's arm
+  // removes the delivered copy directly from PlayerMeta.inventory (no
+  // addItem/removeItem call, so no loot event fires on that side), so the
+  // result event itself must re-diff the crafter's heavy self keys or their
+  // inv mirror goes stale until the staggered refresh. The requester's side
+  // already gets a loot event from the ordinary addItemInstance grant.
+  'commissionOrderResult',
 ]);
 
 // How often to re-broadcast online players' $WOC holder-tier flair. Each wallet
@@ -6071,6 +6081,9 @@ export class GameServer {
       case 'targetNearestFriendly':
         sim.targetNearestFriendly(pid);
         break;
+      case 'stopAutoAttackOnTargetSwitch':
+        sim.setStopAutoAttackOnTargetSwitch(!!msg.enabled, pid);
+        break;
       case 'attack':
         sim.startAutoAttack(pid);
         break;
@@ -6243,7 +6256,13 @@ export class GameServer {
         // check (the dispatch type-guard rule); anything else reads as false.
         // The sim honors it only for eligible equipment outputs and mints the
         // bindOnTrade arm itself, so nothing here trusts client data.
-        if (typeof msg.recipe === 'string') sim.craftItem(msg.recipe, msg.commission === true, pid);
+        // Phase 3 optional `count`: finite numbers only; sim clamps to batch
+        // max and mats-fit (default 1 when omitted or non-numeric).
+        if (typeof msg.recipe === 'string') {
+          const count =
+            typeof msg.count === 'number' && Number.isFinite(msg.count) ? Math.floor(msg.count) : 1;
+          sim.craftItem(msg.recipe, msg.commission === true, pid, count);
+        }
         break;
       // Enchanting profession commands (Professions 2.0): the sim
       // resolvers re-validate ownership/eligibility/throttle (nothing trusted
@@ -6297,6 +6316,34 @@ export class GameServer {
         // member so the cleared payload and the fee debit re-diff the self
         // inv/purse mirrors on the next snapshot.
         if (typeof msg.item === 'string') sim.unbindItem(msg.item, pid);
+        break;
+      // Commission order board (Professions 2.0, issue #1298): the sim
+      // resolvers re-validate every field (recipe/eligibility/scope/state/
+      // range/space, nothing trusted from the client); the outcome reaches
+      // this client as the pid-scoped text-free commissionOrderResult event,
+      // a HEAVY_SELF_EVENTS member so a delivery's bag change re-diffs the
+      // crafter's own inv mirror on the next snapshot (the requester's side
+      // rides the ordinary addItemInstance loot event). The durable order
+      // list itself converges through the per-tick `corder` self-delta for
+      // every affected viewer, not through this event.
+      case 'open_commission_order':
+        if (typeof msg.recipe === 'string' && (msg.scope === 'open' || msg.scope === 'crafter')) {
+          sim.openCommissionOrder(
+            msg.recipe,
+            msg.scope,
+            typeof msg.crafter === 'string' ? msg.crafter : undefined,
+            pid,
+          );
+        }
+        break;
+      case 'cancel_commission_order':
+        if (typeof msg.order === 'number') sim.cancelCommissionOrder(msg.order, pid);
+        break;
+      case 'accept_commission_order':
+        if (typeof msg.order === 'number') sim.acceptCommissionOrder(msg.order, pid);
+        break;
+      case 'deliver_commission_order':
+        if (typeof msg.order === 'number') sim.deliverCommissionOrder(msg.order, pid);
         break;
       case 'rift_upgrade_item':
         if (typeof msg.item === 'string') sim.upgradeRiftItem(msg.item, pid);
@@ -8007,6 +8054,17 @@ export class GameServer {
       hirat: p.hitRating,
       eat: p.eating ? { remaining: round2(p.eating.remaining) } : null,
       drk: p.drinking ? { remaining: round2(p.drinking.remaining) } : null,
+      // Craft-cast session mirror (self-only, the eat/drk shape): the crafting
+      // window's recipe highlight and batch counter read these authoritatively
+      // online instead of click-time guesses, so the server's batch clamp and
+      // a mid-cast window close/reopen both stay truthful. Null at rest.
+      ccast: p.craftCastRecipeId
+        ? {
+            r: p.craftCastRecipeId,
+            rem: p.craftCastBatchRemaining,
+            tot: p.craftCastBatchTotal,
+          }
+        : null,
       opUntil: p.overpowerUntil > this.sim.time ? 1 : 0,
       opRem: round2(Math.max(0, p.overpowerUntil - this.sim.time)),
       ack: session.spectating ? 0 : anchorSession.lastInputSeq,
@@ -8312,6 +8370,11 @@ export class GameServer {
     // naturally flips to null the tick a station lapses and the client never
     // reasons about tick domains. Small scalar, diffed per tick like atitle.
     maybe('mst', this.sim.activeMobileStationCraftFor(anchorSession.pid));
+    // Commission order board (issue #1298): the viewer's own projection
+    // (their requests, any order they accepted, and the open board), small
+    // and diffed per tick like `prof`/`cprof` above; this is how BOTH sides
+    // of an accept/deliver converge, not the commissionOrderResult event.
+    maybe('corder', this.sim.commissionOrdersFor(anchorSession.pid));
     // The viewer's own most recent enchanting-action outcomes (Professions
     // 2.0), or null. Small per-player reads diffed per tick like the other
     // scalars above (a successful action already refreshed the self inventory via
@@ -8635,6 +8698,9 @@ export class GameServer {
       }
       if (ev.type === 'fishingGotAway') {
         gameMetricsCounters().fishingGotAway(ev.zoneId, fishingBandLabel(ev.band));
+      }
+      if (ev.type === 'fishingEarlyReel') {
+        gameMetricsCounters().fishingEarlyReel(ev.zoneId, fishingBandLabel(ev.band));
       }
       if (ev.type === 'fishingEmptyHook') {
         gameMetricsCounters().fishingEmptyHook(ev.zoneId, fishingBandLabel(ev.band));

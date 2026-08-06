@@ -24,7 +24,7 @@ feature spec), or its program's dir; the top level is only for a living runbook.
 | `ai-pr-bot.md` | The non-blocking PR CI review helper (`prepare_ai_review.mjs`/`post_ai_review.mjs`), plus the local diff-scoped screenshot capture (`scripts/pr_shot_targets.mjs`). Living. |
 | `desktop-release.md`, `desktop-ship-notes.md`, `mobile-store-release.md` | Release runbooks (Electron/Steam; iOS/Android). Living. |
 | `sfx-studio-tutorial.md`, `codex.md` | Operator guides: the SFX Studio; the Codex support layer. Living. |
-| `security/` | `malware-scan-catalog.md`: the path-aware triage priors behind `scripts/malware_scan.mjs --gate`. Living. |
+| `security/` | `malware-scan-catalog.md`: the path-aware triage priors behind `scripts/malware_scan.mjs --gate`. `dependency-audit-catalog.md`: the `pnpm audit` gate model plus the accepted-advisory register `tests/dependency_audit_gate.test.ts` requires an entry in. Both living. |
 | `i18n/` | Localized contributor docs: per-locale translations of the root `README.md` and `CONTRIBUTING.md` (see i18n note below). |
 | `i18n-scaling/` | i18n architecture + workflow docs. `translation-workflow.md` is the canonical contributor/maintainer roles reference (root and `src/ui/CLAUDE.md` point here); `lazy-locales-and-contributor-workflow.md` is the lazy-locale/hygiene design package. |
 | `achievements/` | Book of Deeds handoff: maintainer notes (open decisions, deferrals, follow-ups) and the deed icon art brief. |

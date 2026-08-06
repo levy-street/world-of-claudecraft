@@ -247,6 +247,9 @@ export const ZONE1_MOBS: Record<string, MobTemplate> = {
       { itemId: 'moggers_shiv', chance: 0.25, rollGroup: 'mogger_chase' },
       { itemId: 'cryptstalker_jerkin', chance: 0.25, rollGroup: 'mogger_chase' },
       { itemId: 'valefire_lantern', chance: 0.2 },
+      // The hunter offhand rides its own independent roll beside the caster
+      // lantern, so neither class's odds depend on the other's.
+      { itemId: 'moggers_hide_quiver', chance: 0.2 },
     ],
     scale: 1.28,
     color: 0x8e5b33,

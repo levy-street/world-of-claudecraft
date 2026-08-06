@@ -594,6 +594,14 @@
     min-width: 0;
     max-width: 520px;
   }
+  /* How far the player frame's centred content row sits from the left edge of its
+     612px box: (612 - (portrait + the 520px bar column)) / 2. The pet frame hangs
+     beneath with a shorter row, so it cannot reach the same column by centring and
+     pays this inset explicitly instead. Held as one token so the two cannot drift
+     apart; measured against the rendered frames, not derived on paper. */
+  #actionbar-stack {
+    --unit-frame-content-inset: 18px;
+  }
   /* The player frame once MOVED (MovableFrame sets pf-detached alongside the
      saved left/top): hud.ts reparents it from the action-bar stack to #ui (a
      transformed #bottom-bar ancestor would hijack the positioning), where it
@@ -612,6 +620,65 @@
   #player-frame.pf-detached .uf-bars {
     flex: none;
     width: 190px;
+  }
+  /* Pet cluster: ONE row above the player frame holding the pet command bar on the
+     left and the pet's health frame on the right. Stacking the two as separate rows
+     spent about 52px of vertical space on what is one subject, and left the health
+     strip reading as a satellite of the player frame rather than part of the pet UI.
+     Side by side they measure ~294px (two 3-button groups) plus ~270px (portrait +
+     bars), which fits the 612px stack with room to spare.
+
+     The stack is bottom-anchored (#bottom-bar sits at bottom: 6px), so this grows it
+     UPWARD: the action bars and the player frame keep their positions and the
+     cluster appears above them. #petbar drops its absolute top:-52px seat here and
+     becomes an ordinary flex item; the mobile sheet keeps the two apart instead (see
+     hud.mobile.css), because there the command bar belongs under the thumb at the top
+     of the screen while the health strip belongs in the bottom-centre column. */
+  #pet-cluster {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
+    width: 612px;
+    margin: 0 auto;
+    padding-left: var(--unit-frame-content-inset);
+  }
+  #pet-cluster > #petbar {
+    position: static;
+    margin-bottom: 4px;
+  }
+  /* The health half of the cluster. Hidden until the player actually has a pet; the
+     family painter sets the inline display:flex, which outranks the `none` here. It
+     takes no width or centring of its own (the cluster row owns the layout) and no
+     extra zoom, so it scales with the player frame rather than drifting from it. */
+  #pet-frame {
+    position: relative;
+    top: auto;
+    left: auto;
+    margin: 0 0 4px;
+    display: none;
+    align-items: center;
+    justify-content: flex-start;
+    cursor: pointer;
+  }
+  #pet-frame > * {
+    zoom: var(--player-frame-scale, 1);
+  }
+  #pet-frame .uf-bars {
+    flex: none;
+    width: 210px;
+  }
+  #pet-frame:hover {
+    outline: 1px solid var(--gold-dim);
+  }
+  #pet-frame:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  /* A dead pet stays visible and selectable (Revive lives on the pet bar), so it
+     dims rather than hiding, matching the party frames' dead treatment. */
+  #pet-frame.dead {
+    opacity: 0.7;
   }
   #target-frame {
     left: 12px;
@@ -1710,6 +1777,22 @@
     background: #0d0d13;
     cursor: default;
     box-shadow: inset 0 0 10px #000;
+  }
+  /* Issue 2429: the "Hide Unused Action Slots" Interface option (hideUnusedActionSlots,
+     applied as this body class by main.ts). A slot with no ability or item bound loses
+     its black background, border, and keybind label so an unlearned class's bar reads
+     clean instead of a wall of empty squares; the box stays in the flex row (no
+     display: none) so it neither shifts a bound neighbor on the extra rows nor disturbs
+     the deliberate slot layout those rows exist for. The .action-btn:hover rule above
+     still applies (border-color: var(--gold)), so the slot stays a discoverable drop
+     target for dragging a new ability or item in. */
+  body.hide-unused-action-slots .action-btn.empty {
+    background: transparent;
+    border-color: transparent;
+    box-shadow: none;
+  }
+  body.hide-unused-action-slots .action-btn.empty .keybind {
+    display: none;
   }
   .action-btn .keybind {
     position: absolute;
@@ -3567,6 +3650,29 @@
     color: var(--color-text-muted);
     white-space: nowrap;
   }
+  /* Contributor subtotal on the damage/healing breakdown: the member, then each
+     pet that acted. It reads as a heading over the abilities nested beneath it,
+     which is what lets a hunter separate their own output from the pet's. */
+  #tooltip .mt-tip-head {
+    color: var(--color-text);
+    font-weight: 600;
+    margin-top: 3px;
+  }
+  #tooltip .mt-tip-head:first-child {
+    margin-top: 0;
+  }
+  #tooltip .mt-tip-head .mt-tip-val {
+    color: var(--color-text);
+  }
+  /* The abilities belonging to the subtotal directly above. Indented rather than
+     boxed: the tooltip is narrow, and a border would compete with the mini bars
+     already drawn behind every row. */
+  #tooltip .mt-tip-group {
+    padding-left: 10px;
+  }
+  #tooltip .mt-tip-group .mt-tip-name {
+    color: var(--color-text-muted);
+  }
   body.mobile-touch #meters-window .mt-rows {
     max-height: 82px;
     overflow-y: auto;
@@ -4169,6 +4275,15 @@
   #tooltip.mob-tooltip .tt-green {
     font-size: calc(14px * var(--tooltip-scale, 1));
   }
+  /* Elite/Boss rank badge (mob_tooltip_view.ts), between the level/family line
+     and any quest lines. Mirrors the target frame's gold, letter-spaced
+     #tf-elite-tag styling so the two rank cues read as the same chrome. */
+  #tooltip.mob-tooltip .tt-rank {
+    color: var(--gold);
+    font-family: var(--title-font);
+    letter-spacing: 1px;
+    font-size: calc(12px * var(--tooltip-scale, 1));
+  }
   /* The map quest-giver glyph tooltip: the quest's level-requirement line,
      dimmed under its gold title so the name stays the focus. */
   #tooltip .tt-quest-req {
@@ -4363,9 +4478,10 @@
      el.style.color onto a class the pooled fct_painter toggles (no hex
      in TS). Each class carries the exact hex the live fct() passed, grouped by colour:
      miss/dodge keyed self (#bbb) vs other (#fff); damage done by ability (#ffe97a) vs
-     auto-attack (#fff); damage taken (#ff5544); heal (#3ce63c); xp (#d9a3ff); rested
-     xp (#6db8ff); Honor (#ffd100); the self note (#ff8c66). Crit stays the separate
-     .fct.crit class. */
+     auto-attack (#fff); damage taken (#ff5544); a shield block done (#b8c4d9, steel grey,
+     a landed hit blunted) vs taken (#7ec8e3, a cooler steel blue, a landed block you made);
+     heal (#3ce63c); xp (#d9a3ff); rested xp (#6db8ff); Honor (#ffd100); the self note
+     (#ff8c66). Crit stays the separate .fct.crit class. */
   .fct-miss-self,
   .fct-dodge-self {
     color: #bbb;
@@ -4380,6 +4496,12 @@
   }
   .fct-damage-taken {
     color: #ff5544;
+  }
+  .fct-damage-done-block {
+    color: #b8c4d9;
+  }
+  .fct-damage-taken-block {
+    color: #7ec8e3;
   }
   .fct-absorb {
     color: #9fd7ff;

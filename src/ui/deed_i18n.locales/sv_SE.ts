@@ -805,4 +805,32 @@ export const table: DeedLocaleTable = {
     name: 'Det måsarna vet',
     desc: 'Fånga en fisk ur Fjärrkustens vatten.',
   },
+  prog_engineering_rare: {
+    name: 'Precisionsingenjörskonst',
+    desc: 'Skapa ditt första sällsynta föremål i Ingenjörskonst.',
+  },
+  prog_alchemy_rare: {
+    name: 'En sällsynt årgång',
+    desc: 'Skapa ditt första sällsynta föremål i Alkemi.',
+  },
+  prog_cooking_rare: {
+    name: 'En rätt att minnas',
+    desc: 'Skapa ditt första sällsynta föremål i Matlagning.',
+  },
+  prog_leatherworking_rare: {
+    name: 'Fin garvning',
+    desc: 'Skapa ditt första sällsynta föremål i Läderhantverkeri.',
+  },
+  prog_tailoring_rare: {
+    name: 'Ett mästerligt stygn',
+    desc: 'Skapa ditt första sällsynta föremål i Skrädderi.',
+  },
+  prog_weaponcrafting_rare: {
+    name: 'Härdad till glans',
+    desc: 'Skapa ditt första sällsynta föremål i Vapensmide.',
+  },
+  prog_armorcrafting_rare: {
+    name: 'Pansrad till perfektion',
+    desc: 'Skapa ditt första sällsynta föremål i Rustningssmide.',
+  },
 };

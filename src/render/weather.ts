@@ -209,13 +209,15 @@ export class Weather {
    *              (indoors / underwater / suppressed)
    */
   update(cam: THREE.Vector3, dt: number, biome: BiomeId | null): void {
-    // peaks -> snow, marsh -> rain, everything else clears
+    // peaks -> snow, marsh/haunt -> rain, everything else clears. Wraithwood's
+    // haunt biome keeps the same permanent drizzle the ambient audio already
+    // plays ("the haunted wood drips under a permanent drizzle" in renderer.ts).
     const want: Precip | null =
       !this.enabled || biome === null
         ? null
         : biome === 'peaks' || biome === 'frost'
           ? 'snow'
-          : biome === 'marsh'
+          : biome === 'marsh' || biome === 'haunt'
             ? 'rain'
             : null;
 

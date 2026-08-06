@@ -12,9 +12,22 @@ removed after Phase 12; living docs are listed in `README.md`.
 
 ## Locked decisions (do not re-litigate without owner)
 
-1. **Full gate remains the merge contract.** Faster paths are additive
-   (`gate:fast`, related tests, cached steps). They never replace pre-merge full gate
-   without an explicit owner decision recorded here.
+1. ~~**Full gate remains the merge contract.**~~ **SUPERSEDED 2026-08-05 (owner decision).**
+   The selective gate (`scripts/gate_select.mjs`) is now the pre-merge bar; `npm run gate`
+   remains the deeper local check. Rationale, in the order that actually decided it:
+   (a) the selective gate drops NO non-test step, so build, typecheck, freshness, sfx,
+   malware and browser coverage are unchanged; only test selection narrows.
+   (b) CI already runs the FULL suite on every `pull_request` AND on every push to
+   `main`/`release/**` (`.github/workflows/ci.yml`, 8-shard matrix). A local selection
+   miss therefore costs feedback latency, not correctness: CI catches it before merge.
+   This backstop already existed and was the missing premise in the original caution.
+   (c) fault injection: 5/5 caught across sim determinism, a combat constant, a content
+   record, a sim-emitted player string, and an asset deletion. In two of those
+   (`Math.random` in `src/sim`, deleting a weapon `.glb`) `vitest related` selected
+   NOTHING and exited green; the always-run set caught both.
+   Still true: selection is empirically complete, not provably complete. The pattern list
+   in `lib/test_visibility.mjs` is a floor and grew 407 -> 486 -> 509 over three passes.
+   `gate:fast` is unchanged and remains day-loop only.
 2. **Experiment freely; measure always.** A MISS is logged and dropped, not hidden.
 3. **Worker memory clamp stays.** Do not remove `computeGateWorkers` free-mem clamp
    to chase wall time. Add tier presets and docs instead.

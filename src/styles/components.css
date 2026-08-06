@@ -5661,6 +5661,181 @@
   .crafting-recipe-btn:disabled .crafting-craft-chip {
     filter: grayscale(0.7);
   }
+  /* Active craft row: gold wash on the chip (still disabled; progress is the
+     strip). Tint is a redundant hint next to the "Crafting" label + aria-busy. */
+  .crafting-recipe-btn.casting .crafting-craft-chip {
+    filter: none;
+    box-shadow: inset 0 0 0 1px var(--gold);
+  }
+  /* Duration chip: expected cast time before the click (actionable pace info,
+     identical on every graphics preset; never tier-gated or color-only). */
+  .crafting-duration-chip {
+    display: inline-block;
+    margin-left: 6px;
+    padding: 0 5px;
+    border: 1px solid var(--color-border-default);
+    border-radius: 3px;
+    font-family: var(--ui-font);
+    font-size: 10px;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-text-muted);
+    white-space: nowrap;
+  }
+  /* Polite live region: off-screen, announces cast start/complete/cancel. */
+  /* In-window craft-cast strip (Craft Cast System Phase 2): the SINGLE
+     progress surface for a craft cast while this window is open (the HUD
+     suppresses the overlay #castbar for craft casts only). A header band
+     between the tab strip and the scrollable body, on the DESIGN.md 10.5
+     progress-bar grammar: dark inset track under a one-pixel black keyline,
+     gold hardcast fill with a one-pixel top highlight, parchment label
+     centered IN the bar, tabular timer right, batch chip beside the track.
+     display:none at rest; the HUD's CastBarPainter owns show/hide (flex).
+     Tracks the real entity cast, never a client timer. */
+  .crafting-cast-progress {
+    display: none;
+    align-items: center;
+    gap: 10px;
+    margin: 8px 12px 0;
+    padding: 6px 8px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: var(--radius-sm);
+    background: rgba(0, 0, 0, 0.3);
+  }
+  /* Programmatic focus target for the mid-cast focus ladder (tabindex -1):
+     the shared button ring does not apply to a div, so it gets its own. */
+  .crafting-cast-progress:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 2px;
+  }
+  .crafting-cast-progress-track {
+    position: relative;
+    flex: 1 1 auto;
+    min-width: 0;
+    height: 20px;
+    border-radius: var(--radius-sm);
+    background: rgba(0, 0, 0, 0.45);
+    border: 1px solid rgba(0, 0, 0, 0.85);
+    overflow: hidden;
+  }
+  .crafting-cast-progress-fill {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(180deg, var(--gold), var(--gold-dim));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
+    /* Width is set every frame from real cast fields (no CSS animation). Always
+       transition:none so reduced-motion and full-motion read the same bar;
+       remaining time also lives in .crafting-cast-progress-timer text + aria. */
+    transition: none;
+  }
+  /* The recipe's display name, centered IN the bar (10.5: centered text when
+     height allows), above the fill in paint order. */
+  .crafting-cast-progress-label {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 3.5em;
+    font-family: var(--ui-font);
+    font-size: 12px;
+    color: var(--color-text-light);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+    white-space: nowrap;
+    overflow: hidden;
+  }
+  .crafting-cast-progress-timer {
+    position: absolute;
+    top: 0;
+    right: 8px;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    font-family: var(--ui-font);
+    font-size: 11px;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-text-light);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+  }
+  /* Phase 3 batch remaining on the cast strip (hidden when total <= 1). */
+  .crafting-cast-progress-batch {
+    flex: none;
+    font-family: var(--ui-font);
+    font-size: 11px;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-text-muted);
+    white-space: nowrap;
+  }
+  .crafting-cast-progress-batch[hidden] {
+    display: none;
+  }
+  /* Phase 3 qty stepper + Create All under each recipe card. */
+  .crafting-batch-row {
+    flex: 1 0 100%;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    padding: 0 10px 8px;
+  }
+  .crafting-qty-row {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .crafting-qty-btn {
+    min-width: 32px;
+    min-height: 32px;
+    padding: 0 8px;
+    border: 1px solid var(--color-border-default);
+    border-radius: 4px;
+    background: var(--color-bg-input);
+    color: var(--color-text-light);
+    font-family: var(--ui-font);
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+  }
+  .crafting-qty-btn:hover:not(:disabled) {
+    border-color: var(--gold-dim);
+    color: var(--gold);
+  }
+  .crafting-qty-btn:disabled {
+    opacity: 0.45;
+    cursor: default;
+  }
+  .crafting-qty-value {
+    min-width: 1.75em;
+    text-align: center;
+    font-family: var(--ui-font);
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-text-light);
+  }
+  .crafting-create-all-btn {
+    min-height: 32px;
+    padding: 5px 12px;
+    border: 1px solid var(--color-gold-600);
+    border-radius: var(--radius-sm);
+    background: linear-gradient(180deg, var(--gold-dim), var(--color-gold-600));
+    color: #1c1206;
+    font-family: var(--title-font);
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .crafting-create-all-btn:hover:not(:disabled) {
+    filter: brightness(1.08);
+  }
+  .crafting-create-all-btn:disabled {
+    filter: grayscale(0.7);
+    opacity: 0.55;
+    cursor: default;
+  }
   .crafting-recipe-item > .crafting-combo-requirement {
     flex: 1 0 100%;
     margin: 0;
@@ -5922,6 +6097,153 @@
   }
   .train-row.train-known .train-state {
     opacity: 0.7;
+  }
+
+  /* ---------- commission order board (issue #1298) ---------- */
+  /* The crafting window's header button that opens the board, sized like the
+     adjacent .x-btn close button but text-bearing (a pill, not a glyph). */
+  .crafting-orders-btn {
+    display: inline-flex;
+    align-items: center;
+    margin-left: auto;
+    margin-right: 8px;
+    padding: 4px 12px;
+    min-height: 26px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.3);
+    color: var(--color-text-muted);
+    font-family: var(--title-font);
+    font-size: 11px;
+    cursor: var(--cursor-point);
+  }
+  .crafting-orders-btn:hover {
+    color: var(--gold);
+    border-color: var(--gold-dim);
+  }
+  @media (pointer: coarse) {
+    .crafting-orders-btn {
+      min-height: 40px;
+    }
+  }
+  #commission-board-window {
+    width: 460px;
+  }
+  .commission-board-intro {
+    display: block;
+    padding: 4px 6px 6px;
+    color: var(--color-text-muted);
+    font-size: 10.5px;
+    line-height: 1.4;
+  }
+  /* The "open a new order" form: the mail-send form's field layout (label
+     stacked over control), a new class family since this is a distinct
+     surface, never a second edit of .mail-field. */
+  .commission-board-form {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 6px;
+    margin: 0 6px 10px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.2);
+  }
+  .commission-form-title {
+    font-family: var(--title-font);
+    font-size: 12px;
+    color: var(--gold);
+  }
+  .commission-field {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .commission-field label {
+    font-size: 11px;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .commission-field input[type="text"] {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 7px 10px;
+    font-size: 16px;
+    background: #120d07;
+    border: 1px solid #5a4a2a;
+    border-radius: 6px;
+    color: #ffe6a8;
+    font-family: Georgia, serif;
+  }
+  .commission-field input[type="text"]:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 1px;
+    border-color: var(--color-border-focus);
+  }
+  .commission-radio-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .commission-radio-row label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--color-text);
+    text-transform: none;
+    letter-spacing: normal;
+    cursor: var(--cursor-point);
+  }
+  .commission-submit-btn {
+    padding: 10px;
+    min-height: 40px;
+    font-family: var(--title-font);
+    font-size: 13px;
+    color: #1c1206;
+    background: linear-gradient(180deg, #e9c064, #b98a2e);
+    border: 1px solid #7a5a1e;
+    border-radius: 6px;
+    cursor: var(--cursor-point);
+  }
+  .commission-submit-btn:hover {
+    filter: brightness(1.08);
+  }
+  .commission-submit-btn:focus-visible,
+  .commission-order-btn:focus-visible,
+  .crafting-orders-btn:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  .commission-board-sections {
+    display: flex;
+    flex-direction: column;
+  }
+  /* One order row: the vendor-item card, non-button (several actions may
+     apply to one row), so the action chips live in their own trailing
+     cluster instead of the card itself being clickable. */
+  .commission-order-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .commission-order-actions {
+    display: flex;
+    gap: 6px;
+    margin-left: auto;
+  }
+  .commission-order-btn {
+    cursor: var(--cursor-point);
+    border: none;
+  }
+  @media (pointer: coarse) {
+    .commission-order-btn {
+      min-height: 40px;
+      padding-left: 14px;
+      padding-right: 14px;
+    }
   }
 
   /* ---------- bags ---------- */

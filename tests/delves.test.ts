@@ -1444,6 +1444,10 @@ describe('Tessa percent-of-health heal + rank cap', () => {
     meta.delveMarks = 100;
     meta.copper = 100;
     meta.companionUpgrades = { companion_tessa: 1 };
+    // Rank-up happens at Brother Halven's board (the delve door), not from
+    // inside the run: step back to the door before spending.
+    const door = DELVES.collapsed_reliquary.doorPos;
+    teleport(sim, door.x, door.z);
     sim.companionUpgrade('companion_tessa');
     expect(meta.companionUpgrades.companion_tessa).toBe(2);
     expect(meta.delveMarks).toBe(97);

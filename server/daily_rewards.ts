@@ -73,11 +73,14 @@ export const DAILY_REWARD_SPLITS = [
 // other shared-read caches in this process (DAILY_REWARD_BOARD_TTL_MS).
 export const DAILY_REWARD_WINNERS_TTL_MS = 30_000;
 
-// The limit every winners-cache refresh reads at. 5 is the ceiling any caller can
-// ask for (the GET /internal/discord/daily-rewards-winners clamp max, and the
-// fixed ask of the outbox drain), so one snapshot serves every limit and a
-// smaller one is a slice rather than a second read.
-const DAILY_REWARD_WINNERS_CACHE_LIMIT = 5;
+// How many unannounced winner days the winners cache reads at and the Discord
+// outbox drain ships: ONE, matching the bot's actual consumption (it announces
+// a day and then marks it, one per poll; a backlog drains across successive
+// polls). The retired standalone winners GET was the one caller that could ask
+// wider (its limit clamp allowed up to 5), so its retirement (#2791) collapsed
+// the old separate cache ceiling to the outbox's ask. Exported so its value is
+// pinned by tests/server/tunables.test.ts.
+export const DAILY_REWARD_WINNER_DAY_LIMIT = 1; // unannounced winner days per outbox poll (count)
 
 /**
  * One unannounced winner day as the cache STORES it: the database row plus the
@@ -118,11 +121,23 @@ const DEFAULT_TASKS: DailyRewardTaskSeed[] = [
   },
 ];
 
-interface RuntimeConfigCache {
-  day: string;
+interface RuntimeConfigCacheEntry {
   config: DailyRewardRuntimeConfig;
   at: number;
 }
+
+// How many distinct reward days the runtime-config cache holds at once. The
+// live working set is up to four: the reward-clock day the player-facing
+// status/spin paths ask for, the plain utcRewardDay() default the eligibility
+// and price reads use (a DIFFERENT day inside the dayStartUtcMinutes window,
+// between 00:00Z and the offset), and the winners-cache refresh's pending day
+// plus its successor (often one of the former). Four covers that set; the
+// bound exists so the map can never grow with arbitrary requested days. The
+// map REPLACED a single-slot cache (#2791): with one slot, each winners
+// refresh evicted the live day's config underneath the player-facing status
+// and spin paths, forcing a re-fetch per TTL for no reason. Exported so its
+// value and eviction are pinned by tests (tunables + daily_rewards_table).
+export const RUNTIME_CONFIG_CACHE_DAYS = 4;
 
 interface Eligibility {
   eligible: boolean;
@@ -148,7 +163,19 @@ export interface DailyRewardRuntimeConfig {
   tasks: DailyRewardTaskSeed[];
 }
 
-let runtimeConfigCache: RuntimeConfigCache | null = null;
+const runtimeConfigCache = new Map<string, RuntimeConfigCacheEntry>();
+
+// Store a day's config, refreshing its insertion-order position so the bound
+// always evicts the LEAST RECENTLY WRITTEN day, and cap the map.
+function storeRuntimeConfig(day: string, config: DailyRewardRuntimeConfig, at: number): void {
+  runtimeConfigCache.delete(day);
+  runtimeConfigCache.set(day, { config, at });
+  while (runtimeConfigCache.size > RUNTIME_CONFIG_CACHE_DAYS) {
+    const oldest = runtimeConfigCache.keys().next().value;
+    if (oldest === undefined) break;
+    runtimeConfigCache.delete(oldest);
+  }
+}
 let runtimeConfigFailureLog: { key: string; at: number } | null = null;
 const dailyRewardScheduleCache = new DailyRewardScheduleCache(fetchDailyRewardSchedule, {
   ttlMs: DAILY_REWARD_CONFIG_TTL_MS,
@@ -192,7 +219,7 @@ export function dailyRewardPayoutSplits(): readonly number[] {
 }
 
 export function resetDailyRewardPriceCacheForTests(): void {
-  runtimeConfigCache = null;
+  runtimeConfigCache.clear();
   dailyRewardScheduleCache.reset();
 }
 
@@ -454,24 +481,20 @@ export async function dailyRewardRuntimeConfig(
   requireFresh = false,
 ): Promise<DailyRewardRuntimeConfig> {
   const now = Date.now();
-  if (
-    !requireFresh &&
-    runtimeConfigCache &&
-    runtimeConfigCache.day === day &&
-    now - runtimeConfigCache.at < DAILY_REWARD_CONFIG_TTL_MS
-  ) {
-    return runtimeConfigCache.config;
+  const cached = runtimeConfigCache.get(day);
+  if (!requireFresh && cached && now - cached.at < DAILY_REWARD_CONFIG_TTL_MS) {
+    return cached.config;
   }
   try {
     const config = await fetchDailyRewardRuntimeConfig(day, requireFresh);
-    runtimeConfigCache = { day, config, at: now };
+    storeRuntimeConfig(day, config, now);
     return config;
   } catch (err) {
     if (requireFresh) throw err;
     logRuntimeConfigFailure(err);
     if (dailyRewardServiceUrl()) {
       const config = { ...fallbackRuntimeConfig(), enabled: false };
-      runtimeConfigCache = { day, config, at: now };
+      storeRuntimeConfig(day, config, now);
       return config;
     }
     return fallbackRuntimeConfig();
@@ -798,10 +821,10 @@ export class DailyRewardService {
    * set), so it goes through one cached read instead of the 1+N queries
    * unannouncedWinnerDays costs per poll (server/CLAUDE.md, Hot paths).
    *
-   * Every refresh reads at DAILY_REWARD_WINNERS_CACHE_LIMIT and stores days that
-   * are already FULLY DERIVED (see refreshWinnerDays), so one snapshot serves
-   * every caller: a smaller limit slices it rather than issuing a second read,
-   * and a warm poll costs zero database reads AND zero config fetches.
+   * Every refresh reads at DAILY_REWARD_WINNER_DAY_LIMIT, the outbox's own ask
+   * (its only caller since the standalone winners GET retired, #2791), and
+   * stores days that are already FULLY DERIVED (see refreshWinnerDays), so a
+   * warm poll costs zero database reads AND zero config fetches.
    *
    * BUST DOCTRINE. Every transition that moves a day into or out of the
    * unannounced set, or changes the CONTENT of a day already in it, busts this:
@@ -813,7 +836,8 @@ export class DailyRewardService {
    *  - voidPayout / restorePayout: a moderation edit to the payout rows a day
    *    carries.
    *  - markPayout's claim and mark arms (Phase 5 QA): the payout runner stamping
-   *    status / tx_signature / paid_at is content of a possibly-unannounced day.
+   *    status is content of a possibly-unannounced day (the narrowed winner rows
+   *    still carry status; tx_signature and paid_at left them with #2791).
    *    The resend arms are exempt because they write only the payout-ATTEMPTS
    *    table, which unannouncedWinnerDays never selects.
    *  - the excluded-accounts writes (the daily-reward ban and IP-ban tables
@@ -822,8 +846,9 @@ export class DailyRewardService {
    *    which main.ts calls from the post-moderation hook beside the board busts.
    * The last two are what server/CLAUDE.md's hot-path rule demands: an exclusion
    * is a moderation action, and a warm snapshot would let a just-banned winner's
-   * username and wallet pubkey be announced publicly for up to a TTL. TTL alone
-   * only delays enforcement, so it is not an acceptable answer here.
+   * username be announced publicly for up to a TTL (wallet pubkeys left the
+   * winner rows with the #2791 narrowing). TTL alone only delays enforcement,
+   * so it is not an acceptable answer here.
    * ACCEPTED TTL-BOUNDED GAPS, named so nobody re-derives them as oversights: a
    * LOGIN from an already-banned IP moves an account into the excluded view with
    * no moderation write and so no bust (converges within one TTL), and an
@@ -839,15 +864,17 @@ export class DailyRewardService {
    * The winners-cache refresh: the unannounced days plus the announcement copy
    * derived per day, so the snapshot is what a caller ships rather than raw rows.
    *
-   * The derivation lives HERE, not in discordWinnerAnnouncements, because
-   * dailyRewardRuntimeConfig is a single-slot cache: deriving per call meant up
-   * to two config fetches on every outbox poll for a pending day (about 40 per
-   * minute at a 3 s poll), and each of those evicted the slot the player-facing
-   * status/spin paths share. Deriving per REFRESH makes it at most one fetch per
+   * The derivation lives HERE, not in discordWinnerAnnouncements, so a warm
+   * poll ships the snapshot without touching the config cache at all: deriving
+   * per call meant config reads on every outbox poll for a pending day (about
+   * 20 per minute at a 3 s poll). The config cache is per-day since #2791, so
+   * the refresh's day-plus-successor reads no longer evict the live day's
+   * entry under the player-facing status/spin paths the way the old single
+   * slot did; deriving per REFRESH still bounds it to one config read per
    * distinct day per TTL.
    */
   private async refreshWinnerDays(): Promise<DailyRewardWinnerDay[]> {
-    const days = await this.db.unannouncedWinnerDays(DAILY_REWARD_WINNERS_CACHE_LIMIT);
+    const days = await this.db.unannouncedWinnerDays(DAILY_REWARD_WINNER_DAY_LIMIT);
     // Each day names its own featured task and the NEXT day's, so the set asked
     // about is the days themselves plus their successors, de-duplicated.
     const rewardDays = [...new Set(days.flatMap((day) => [day.day, addRewardDays(day.day, 1)]))];
@@ -1369,23 +1396,20 @@ export class DailyRewardService {
     return { payouts: await this.db.recentPayouts(limit) };
   }
 
-  async discordWinnerAnnouncements(limit = 1): Promise<unknown> {
-    // The snapshot arrives fully derived, so this method is a clamp and a copy:
-    // no database read and no config fetch on a warm cache, whatever the limit.
-    // Rows are copied on the way out, payout rows included, so a caller mutating
-    // its result can never poison the snapshot every other reader shares. The copy
-    // is one level deep because every day and payout field is a primitive today; a
-    // future nested-object field would need to join the copy, or the snapshot
-    // aliases it to every caller.
-    // NaN falls back to 1 explicitly: Math.max(1, Math.min(5, NaN)) is NaN, and
-    // slice(0, NaN) is an EMPTY slice, so an unguarded NaN limit would silently
-    // serve zero days rather than the minimum. NaN alone: an Infinity over-ask
-    // clamps UP to the ceiling like any other over-ask (Number.isFinite here
-    // would send it to the floor instead).
-    const asked = Number.isNaN(limit) ? 1 : limit;
-    const days = (await this.winnersCache.read())
-      .slice(0, Math.max(1, Math.min(DAILY_REWARD_WINNERS_CACHE_LIMIT, asked)))
-      .map((day) => ({ ...day, payouts: day.payouts.map((payout) => ({ ...payout })) }));
+  async discordWinnerAnnouncements(): Promise<unknown> {
+    // The snapshot arrives fully derived, so this method is a copy: no database
+    // read and no config fetch on a warm cache. Rows are copied on the way out,
+    // payout rows included, so a caller mutating its result can never poison the
+    // snapshot every other reader shares. The copy is one level deep because
+    // every day and payout field is a primitive today; a future nested-object
+    // field would need to join the copy, or the snapshot aliases it to every
+    // caller. The limit param (and its NaN clamp) retired with the standalone
+    // winners GET (#2791): the outbox is the only caller left and the cache
+    // already reads at its ask.
+    const days = (await this.winnersCache.read()).map((day) => ({
+      ...day,
+      payouts: day.payouts.map((payout) => ({ ...payout })),
+    }));
     return { days };
   }
 
@@ -1504,9 +1528,9 @@ export class DailyRewardService {
       if (result.outcome === 'invalid_status') {
         return { error: 'payout cannot be claimed', status: 409 };
       }
-      // A claim stamps status and tx_signature on a payout row a day still in the
-      // unannounced set carries, so the warm snapshot must not outlive it (the
-      // winnersCache bust doctrine). 'claimed' ONLY: the 'existing' arm is the
+      // A claim stamps status on a payout row a day still in the unannounced
+      // set carries (the narrowed winner rows still serve status), so the warm
+      // snapshot must not outlive it (the winnersCache bust doctrine). 'claimed' ONLY: the 'existing' arm is the
       // runner's idempotent retry and writes nothing, and busting on every retry
       // would evict a healthy snapshot exactly when the runner is unhealthy
       // (caught by the QA fresh-eyes round; 'like voidPayout' was wrong because
@@ -1540,8 +1564,8 @@ export class DailyRewardService {
       return ok ? { ok: true } : { error: 'resend attempt not found', status: 404 };
     }
     const outcome = await this.db.markPayout(day, rank, status, txSignature, error);
-    // Same doctrine as the claim arm above: paid/failed stamps (status, paid_at,
-    // tx_signature) are content of a possibly-unannounced day. 'updated' ONLY:
+    // Same doctrine as the claim arm above: a paid/failed stamp moves status,
+    // which is content of a possibly-unannounced day. 'updated' ONLY:
     // 'already' is the runner re-posting a paid mark after a dropped response,
     // which wrote nothing (the outcome split exists for exactly this decision).
     if (outcome === 'updated') this.winnersCache.bust();
@@ -1654,8 +1678,9 @@ export function bustDailyRewardBoardCache(): void {
 // on the module singleton. main.ts wires this into bustBoardCaches, the
 // post-moderation hook, because the daily-reward ban and IP-ban writes feed the
 // daily_reward_excluded_accounts view that unannouncedWinnerDays filters its
-// payouts through: without the bust, a just-excluded winner's username and wallet
-// pubkey stay announceable for up to a TTL. A suite driving the real service over
+// payouts through: without the bust, a just-excluded winner's username stays
+// announceable for up to a TTL (wallet pubkeys left the winner rows with the
+// #2791 narrowing). A suite driving the real service over
 // db fakes also resets the snapshot through this handle.
 export function bustDailyRewardWinnersCache(): void {
   dailyRewardService.bustWinnersCache();

@@ -33,6 +33,7 @@ import {
   hotTickBonus,
 } from '../spell_scaling';
 import { stunDrCategory } from '../stun_dr';
+import { resolveTalentHitMult } from '../talent_hit_mult';
 import { addThreat, dropThreat } from '../threat';
 import type { AbilityDef, Entity } from '../types';
 import {
@@ -243,6 +244,13 @@ export function runEffects(
   const ability = res.def;
   const isSpell = ability.school !== 'physical';
   const mods = ctx.playerMods(meta);
+  // The resolved mastery/talent damage and heal multiplier for this ability
+  // (talent_hit_mult.ts): the SAME number applyTalentMods already baked into
+  // its authored base magnitudes, reused here to scale the SP/AP rider a
+  // damage/heal/DoT/HoT/absorb site adds on top, so the advertised percentage
+  // reaches the whole hit, not just the base (issue: mastery/talent damage
+  // percent under-delivered at high SP/AP since the rider was never scaled).
+  const { dmgMult: talentDmgMult, healMult: talentHealMult } = resolveTalentHitMult(ability, mods);
   const spentCombo = ability.spendsCombo ? p.comboPoints : 0;
   let comboAwarded = false;
   const sureCrit = hasSureCritAura(p);
@@ -420,8 +428,15 @@ export function runEffects(
         // The flat rider scales with the school's rating: Spell Power for spells,
         // Ranged AP for hunter shots, melee Attack Power for physical specials.
         // abilityScalingPower picks the rating; powerScale (inside directHitBonus)
-        // applies the AP scale-down. A non-scaling effect just contributes 0.
-        dmg += directHitBonus(abilityScalingPower(p, ability), ability, res.castTime);
+        // applies the AP scale-down. talentDmgMult reaches the rider too, so a
+        // "+X%" mastery/talent scales the whole hit, not just the base roll.
+        dmg += directHitBonus(
+          abilityScalingPower(p, ability),
+          ability,
+          res.castTime,
+          false,
+          talentDmgMult,
+        );
         if (eff.vsRootedMult !== undefined && rooted) dmg *= eff.vsRootedMult;
         // Ice Lance against a frozen-counting target (combat/frost_mage.ts):
         // the per-cast resolution carries its 3x; 1 for every other cast.
@@ -553,7 +568,9 @@ export function runEffects(
           eff.base +
           eff.perCombo * spentCombo +
           ctx.rng.range(0, eff.variance) +
-          ctx.effectiveAttackPower(p) / 14;
+          // The AP rider gets the same talent/mastery multiplier already baked
+          // into eff.base/eff.perCombo, so it scales with the whole hit too.
+          (ctx.effectiveAttackPower(p) / 14) * talentDmgMult;
         const crit =
           ctx.rng.chance(consumeNextAttackCrit(ctx, p) ? 1 : p.critChance) ||
           sureCrit ||
@@ -662,8 +679,13 @@ export function runEffects(
         const initialApplied: number[] = [];
         for (const ally of targets) {
           const before = devPlaytest ? ally.hp : 0;
+          // Like heal/chainHeal, the base roll (eff.heal.min/max) is talent scaled
+          // by the massTemporalEcho case in classes.ts, and talentHealMult reaches
+          // the SP rider here too, so Chronoweave's "all healing" bonus applies to
+          // Temporal Cascade's initial heal the same way it does every other heal.
           const healAmount =
-            ctx.rng.range(eff.heal.min, eff.heal.max) + directHealBonus(p.spellPower, res.castTime);
+            ctx.rng.range(eff.heal.min, eff.heal.max) +
+            directHealBonus(p.spellPower, res.castTime, false, talentHealMult);
           ctx.applyHeal(p, ally, healAmount, ability.name);
           if (devPlaytest) {
             const applied = ally.hp - before;
@@ -725,7 +747,8 @@ export function runEffects(
         // Heals scale with Spell Power at the direct cast-time coefficient, the
         // healing mirror of the direct-nuke rider (applyHeal fires the crit).
         const healAmount =
-          ctx.rng.range(eff.min, eff.max) + directHealBonus(p.spellPower, res.castTime);
+          ctx.rng.range(eff.min, eff.max) +
+          directHealBonus(p.spellPower, res.castTime, false, talentHealMult);
         const healed = ctx.applyHeal(p, healTarget, healAmount, ability.name, ability.id);
         // Power Echo (mage choice row): the armed echo also repeats a direct HEAL
         // (Temporal Mend, Temporal Echo) at its fraction of the RESOLVED heal on
@@ -755,7 +778,8 @@ export function runEffects(
         // Selection and the per-hop spellfx arc adopted from Blaine1705's #1434.
         const first = target ?? p;
         const baseAmount =
-          ctx.rng.range(eff.min, eff.max) + directHealBonus(p.spellPower, res.castTime);
+          ctx.rng.range(eff.min, eff.max) +
+          directHealBonus(p.spellPower, res.castTime, false, talentHealMult);
         const chain: Entity[] = [first];
         while (chain.length <= eff.jumps) {
           const from = chain[chain.length - 1];
@@ -830,7 +854,14 @@ export function runEffects(
         // rider too would double-dip. Only pure HoTs (Rejuvenation) take the rider.
         const hybridHeal = res.effects.some((e) => e.type === 'heal');
         const hotBase = Math.max(1, Math.round(eff.total / (eff.duration / eff.interval)));
-        const hotSp = hybridHeal ? 0 : hotTickBonus(p.spellPower, eff.duration, eff.interval);
+        const hotSp = hybridHeal
+          ? 0
+          : hotTickBonus(
+              p.spellPower,
+              eff.duration,
+              eff.interval,
+              talentHealMult * (1 + mods.global.hotHealPct),
+            );
         ctx.applyAura(hotTarget, {
           id: ability.id,
           name: ability.name,
@@ -856,7 +887,13 @@ export function runEffects(
           kind: 'absorb',
           remaining: eff.duration,
           duration: eff.duration,
-          value: eff.amount + absorbBonus(p.spellPower, eff.spellPowerCoeff ?? 0),
+          value:
+            eff.amount +
+            absorbBonus(
+              p.spellPower,
+              eff.spellPowerCoeff ?? 0,
+              talentHealMult * (1 + mods.global.absorbPct),
+            ),
           sourceId: p.id,
           school: ability.school,
         });
@@ -894,12 +931,14 @@ export function runEffects(
         const seal = p.auras[sealIdx];
         p.auras.splice(sealIdx, 1);
         ctx.emit({ type: 'aura', targetId: p.id, name: seal.name, gained: false });
-        // Judgement is an instant holy nuke; scale it with Spell Power too.
+        // Judgement is an instant holy nuke; scale it with Spell Power too. The
+        // resolved talent/mastery multiplier (eff.dmgMult, carried forward by
+        // scaleEffect rather than baked into the seal's own value) now wraps
+        // the SP rider too, so it scales the whole hit like every other type.
         const baseDmg = ctx.rng.range(seal.value2 ?? 10, seal.value3 ?? 15);
         let dmg =
-          baseDmg * (eff.dmgMult ?? 1) +
-          (eff.flat ?? 0) +
-          directHitBonus(p.spellPower, ability, res.castTime);
+          (baseDmg + directHitBonus(p.spellPower, ability, res.castTime)) * (eff.dmgMult ?? 1) +
+          (eff.flat ?? 0);
         const crit =
           ctx.rng.chance(consumeNextAttackCrit(ctx, p) ? 1 : ctx.spellCrit(p)) || sureCrit;
         if (sureCrit) sureCritRolled = true;
@@ -1233,7 +1272,13 @@ export function runEffects(
         // Power here just like a spell DoT scales off Spell Power; `hybrid` still
         // suppresses the rider on a DoT that trails its own direct nuke.
         const dotSp = !hybrid
-          ? dotTickBonus(abilityScalingPower(p, ability), ability, eff.duration, eff.interval)
+          ? dotTickBonus(
+              abilityScalingPower(p, ability),
+              ability,
+              eff.duration,
+              eff.interval,
+              talentDmgMult * (1 + mods.global.dotDmgPct),
+            )
           : 0;
         const dotId = eff.auraId ?? ability.id;
         ctx.applyAura(target, {
@@ -1494,6 +1539,7 @@ export function runEffects(
           ability,
           res.castTime,
           true,
+          talentDmgMult,
         );
         // Collect the eligible targets FIRST (LoS + frontal gate) so a soft
         // target cap can know the count before any hit lands. The skips draw no
@@ -1600,11 +1646,17 @@ export function runEffects(
         // hop selection is deterministic (nearest squared distance, then lowest id) and
         // the chain uses one shared damage roll without additional RNG draws.
         const origin = target ?? p;
+        // Like directDamage/aoeDamage, chainDamage's base (min/max) is talent
+        // scaled by its scaleEffect case in classes.ts, and talentDmgMult
+        // reaches the SP/AP rider here too, so the whole bounce (base roll
+        // plus rider), not just the primary hit, scales with global spell
+        // damage / mastery / talent multipliers.
         const chainSpBonus = directHitBonus(
           abilityScalingPower(p, ability),
           ability,
           res.castTime,
           true,
+          talentDmgMult,
         );
         // Resolve the shared primary amount once before applying hop falloff.
         // Fractional spell-power coefficients must not make later hops round
@@ -1678,7 +1730,7 @@ export function runEffects(
           ability: ability.id,
         });
         // AoE heals take the same per-target coefficient penalty as AoE damage.
-        const aoeHealBonus = directHealBonus(p.spellPower, res.castTime, true);
+        const aoeHealBonus = directHealBonus(p.spellPower, res.castTime, true, talentHealMult);
         for (const m of friendliesInRadius(ctx, p, eff.radius)) {
           if (!ctx.hasLineOfSight(p, m)) continue;
           const healAmount = ctx.rng.range(eff.min, eff.max) + aoeHealBonus;
@@ -1717,7 +1769,14 @@ export function runEffects(
           abilityId: ability.id,
           // Each pulse is an AoE hit; scale per tick off the school's rating
           // (Spell Power, Ranged AP, or melee Attack Power for physical pulses).
-          spBonus: directHitBonus(abilityScalingPower(p, ability), ability, res.castTime, true),
+          // talentDmgMult reaches this snapshot too, same as every other rider.
+          spBonus: directHitBonus(
+            abilityScalingPower(p, ability),
+            ability,
+            res.castTime,
+            true,
+            talentDmgMult,
+          ),
           allyBuffPct: eff.allyBuffPct,
           igniteFrac: eff.igniteFrac,
           slowMult: eff.slowMult,
@@ -2222,7 +2281,13 @@ export function runEffects(
         // damaging roots such as Frost Nova retain their normal scaling path.
         const dealsDamage = eff.min !== 0 || eff.max !== 0;
         const aoeRootSp = dealsDamage
-          ? directHitBonus(abilityScalingPower(p, ability), ability, res.castTime, true)
+          ? directHitBonus(
+              abilityScalingPower(p, ability),
+              ability,
+              res.castTime,
+              true,
+              talentDmgMult,
+            )
           : 0;
         for (const m of ctx.hostilesInRadius(p, center, eff.radius)) {
           if (!ctx.hasLineOfSight(p, m)) continue;
@@ -2295,7 +2360,13 @@ export function runEffects(
         if (eff.deal) {
           let dmg =
             ctx.rng.range(eff.deal.min, eff.deal.max) +
-            directHitBonus(abilityScalingPower(p, ability), ability, res.castTime);
+            directHitBonus(
+              abilityScalingPower(p, ability),
+              ability,
+              res.castTime,
+              false,
+              talentDmgMult,
+            );
           if (isSpell) dmg *= spellDamageMultFromAuras(p);
           const crit =
             ctx.rng.chance(consumeNextAttackCrit(ctx, p) ? 1 : ctx.spellCrit(p)) || sureCrit;
@@ -2322,7 +2393,8 @@ export function runEffects(
         }
         if (eff.heal) {
           const healAmount =
-            ctx.rng.range(eff.heal.min, eff.heal.max) + directHealBonus(p.spellPower, res.castTime);
+            ctx.rng.range(eff.heal.min, eff.heal.max) +
+            directHealBonus(p.spellPower, res.castTime, false, talentHealMult);
           ctx.applyHeal(p, target, healAmount, ability.name, ability.id);
         }
         break;

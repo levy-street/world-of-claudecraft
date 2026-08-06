@@ -112,11 +112,20 @@ describe('Hunter Patch Up', () => {
   it('revives the dead owned pet at 35% health', () => {
     const sim = makeHunter();
     const pet = addPet(sim, sim.playerId, 0);
+    // addPet builds the pet by hand rather than through completeTame, so it starts
+    // without the owner's inherited share (pet/pet_scaling.ts). Let that settle while
+    // the pet is still alive, then re-pin the pool: revive takes 35% of the LIVE
+    // maxHp, so a share landing between the fixture and the cast would move the
+    // expected value. Re-deriving is a no-op once settled, so 1000 holds.
+    sim.tick();
+    pet.maxHp = 1_000;
     pet.dead = true;
+    pet.hp = 0;
 
     castPatchUp(sim);
 
     expect(pet.dead).toBe(false);
+    expect(pet.maxHp).toBe(1_000); // the pool really did stay pinned
     expect(pet.hp).toBe(350);
     expect(pet.ownerId).toBe(sim.playerId);
     expect(pet.auras.some((aura) => aura.id === 'revive_pet')).toBe(false);

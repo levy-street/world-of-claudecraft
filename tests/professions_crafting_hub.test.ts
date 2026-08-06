@@ -41,6 +41,7 @@ import {
   stationTypeForCraft,
 } from '../src/sim/professions/stations';
 import { Sim } from '../src/sim/sim';
+import { completeCraftCast } from './helpers/enchant_family_cast';
 
 function makeSim(seed = 42) {
   return new Sim({ seed, playerClass: 'warrior', autoEquip: false });
@@ -547,7 +548,9 @@ describe('station reagent sourcing (prog_tools_of_the_trade completability)', ()
     grantItem(sim, 'mithril_mining_pick', 1, pid);
 
     placeAt(sim, pid, toolworks.pos);
-    const result = craftItem(anySim.ctx, 'recipe_thorium_mining_pick', false, pid);
+    const start = craftItem(anySim.ctx, 'recipe_thorium_mining_pick', false, pid);
+    if (start.ok && start.casting) completeCraftCast(anySim as any, pid);
+    const result = (anySim as any).lastCraftResult ?? start;
     expect(result.ok).toBe(true);
     expect(sim.countItem('thorium_mining_pick', pid)).toBe(1);
     expect(sim.countItem('fine_iron_ore', pid)).toBe(0);

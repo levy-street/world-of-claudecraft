@@ -23,6 +23,7 @@ import type { ProfessionRecipeRecord } from '../src/sim/professions/types';
 import { type CraftSkills, emptyCraftSkills, tierCapability } from '../src/sim/professions/wheel';
 import { Sim } from '../src/sim/sim';
 import type { InvSlot } from '../src/sim/types';
+import { runCraft } from './helpers/enchant_family_cast';
 
 const ARMOR = CRAFT_RING[9].id; // 'armorcrafting' (the ring's wrap point since the Professions 2.0 reorder)
 // The second major acceptArchetypeQuest(ARMOR) defaults to: pinned as a
@@ -447,11 +448,13 @@ describe('archetype ceilings gate the masterwork effect (ceilings bind craft out
   // craft's proc roll is the FIRST rng draw after Sim construction in every
   // arm below (nothing else here draws), so the identical roll value reaches
   // the proc comparison each time: only the archetype ceiling changes the
-  // outcome, which is exactly what these cases pin. Re-hunted (37 -> 107)
-  // after the zones 1-3 quest-dedupe content pass added camps, mobs, and
-  // items (world-gen draws moved the post-construction rng position). Spares
-  // on record: 111, 118, 123, and 136.
-  const PROC_SEED = 107;
+  // outcome, which is exactly what these cases pin. Re-hunted twice for the
+  // same reason (content commits move the construction-time world-gen draws,
+  // so the post-construction rng position shifts): 37 -> 107 after the zones
+  // 1-3 quest-dedupe pass added camps, mobs, and items, then 107 -> 70 after
+  // the v0.35.0 release content commits (enchant offhand, hunter offhand, the
+  // deeds catalog). Spares on record: 94, 128, 130, 131, and 153.
+  const PROC_SEED = 70;
 
   function makeSim() {
     return new Sim({ seed: PROC_SEED, playerClass: 'warrior', autoEquip: false });
@@ -519,7 +522,7 @@ describe('archetype ceilings gate the masterwork effect (ceilings bind craft out
     const majorPid = major.playerId;
     major.acceptArchetypeQuest('tailoring');
     for (const r of recipe.reagents) major.addItem(r.itemId, r.count, majorPid);
-    const majorRun = observeDraws(major, () => major.craftItem(recipe.id, false, majorPid));
+    const majorRun = observeDraws(major, () => runCraft(major, recipe.id, false, majorPid));
     expect(majorRun.draws).toBe(1);
     expect(majorRun.roll).toBeLessThan(MASTERWORK_BASE_CHANCE); // the hunted premise
     expect(major.lastCraftResult?.masterwork).toBe(true);
@@ -550,7 +553,7 @@ describe('archetype ceilings gate the masterwork effect (ceilings bind craft out
     dormant.acceptArchetypeQuest(ARMOR);
     expect(metaOf(dormant, pid).archetype.hobbyCraft).toBe(STATE_HOBBY); // not tailoring: dormant
     for (const r of recipe.reagents) dormant.addItem(r.itemId, r.count, pid);
-    const run = observeDraws(dormant, () => dormant.craftItem(recipe.id, false, pid));
+    const run = observeDraws(dormant, () => runCraft(dormant, recipe.id, false, pid));
     expect(run.draws).toBe(1); // the proc draw is unconditional on success
     expect(run.roll).toBe(majorRun.roll); // the very roll that procced under the major
     expect(dormant.lastCraftResult?.ok).toBe(true);

@@ -532,6 +532,10 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
       { itemId: 'wildgrowth_leggings', chance: 0.05, rollGroup: 'korzul_bonus' },
       { itemId: 'grovewardens_grips', chance: 0.05, rollGroup: 'korzul_bonus' },
       { itemId: 'verdant_walkers', chance: 0.05, rollGroup: 'korzul_bonus' },
+      // korzul_bonus deliberately sums below 1 (some kills yield no bonus
+      // piece), so the quiver takes its 0.05 from that slack at the same
+      // per-class rate as every other piece here, diluting none of them.
+      { itemId: 'gravewyrm_bone_quiver', chance: 0.05, rollGroup: 'korzul_bonus' },
     ],
     scale: 1.8,
     color: 0x3d5c45,
@@ -674,7 +678,8 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     aggroRadius: 22,
     // Each nythraxis_drop_* rollGroup is exclusive (one partitioned rng draw per
     // group) and sums to exactly 1.00. The offhand/two-hander epics ride the
-    // existing four groups, one per group, with the set-piece chances rebalanced.
+    // existing four groups, with the set-piece chances rebalanced; group 3 is
+    // the offhand group and carries two (the caster orb and the hunter quiver).
     loot: [
       { copper: 150000, chance: 1 },
       { itemId: 'deathless_heartwood', chance: 0.03, rollGroup: 'nythraxis_drop_1' },
@@ -693,13 +698,19 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
       { itemId: 'crownforged_dreadhelm', chance: 0.14, rollGroup: 'nythraxis_drop_2' },
       { itemId: 'nighttalon_crown', chance: 0.14, rollGroup: 'nythraxis_drop_2' },
       { itemId: 'stormcallers_spaulders', chance: 0.14, rollGroup: 'nythraxis_drop_2' },
-      { itemId: 'wraithfire_orb', chance: 0.16, rollGroup: 'nythraxis_drop_3' },
-      { itemId: 'crownforged_dreadhelm', chance: 0.14, rollGroup: 'nythraxis_drop_3' },
-      { itemId: 'nighttalon_crown', chance: 0.14, rollGroup: 'nythraxis_drop_3' },
-      { itemId: 'soulflame_cowl', chance: 0.14, rollGroup: 'nythraxis_drop_3' },
-      { itemId: 'stormcallers_crown', chance: 0.14, rollGroup: 'nythraxis_drop_3' },
-      { itemId: 'nighttalon_shoulderguards', chance: 0.14, rollGroup: 'nythraxis_drop_3' },
-      { itemId: 'soulflame_mantle', chance: 0.14, rollGroup: 'nythraxis_drop_3' },
+      // Group 3 is the offhand group and now carries both offhand epics, the
+      // caster orb and the hunter quiver, at an equal 0.14. The group is
+      // exclusive and must sum to exactly 1, so seating an eighth entry is the
+      // one place a quiver costs existing drops: the two offhands come down from
+      // 0.16 and the six shared set pieces from 0.14 to 0.12.
+      { itemId: 'wraithfire_orb', chance: 0.14, rollGroup: 'nythraxis_drop_3' },
+      { itemId: 'direfang_quiver', chance: 0.14, rollGroup: 'nythraxis_drop_3' },
+      { itemId: 'crownforged_dreadhelm', chance: 0.12, rollGroup: 'nythraxis_drop_3' },
+      { itemId: 'nighttalon_crown', chance: 0.12, rollGroup: 'nythraxis_drop_3' },
+      { itemId: 'soulflame_cowl', chance: 0.12, rollGroup: 'nythraxis_drop_3' },
+      { itemId: 'stormcallers_crown', chance: 0.12, rollGroup: 'nythraxis_drop_3' },
+      { itemId: 'nighttalon_shoulderguards', chance: 0.12, rollGroup: 'nythraxis_drop_3' },
+      { itemId: 'soulflame_mantle', chance: 0.12, rollGroup: 'nythraxis_drop_3' },
       { itemId: 'direfang_greatblade', chance: 0.16, rollGroup: 'nythraxis_drop_4' },
       { itemId: 'soulflame_mantle', chance: 0.14, rollGroup: 'nythraxis_drop_4' },
       { itemId: 'crownforged_warspaulders', chance: 0.14, rollGroup: 'nythraxis_drop_4' },

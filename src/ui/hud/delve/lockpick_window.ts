@@ -23,6 +23,7 @@
 
 import type { Ante, LootTier, PickAction, StepResult } from '../../../sim/lockpick';
 import type { LockpickView } from '../../../world_api';
+import { markDialogRoot } from '../../dialog_root';
 import { esc } from '../../esc';
 import { formatNumber, type TranslationKey, t } from '../../i18n';
 import { svgIcon } from '../../ui_icons';
@@ -128,6 +129,10 @@ export class LockpickWindow {
       .join('');
     const title = coffer ? t('lockpickUi.cofferTitle') : t('lockpickUi.pickTitle');
     const blurb = coffer ? t('lockpickUi.cofferBlurb') : t('lockpickUi.pickBlurb');
+    // A standalone trapping window: announce it as a labeled dialog for the
+    // focus contract. Re-run on every ante/board repaint (including a
+    // language-switch relocalize), so the accessible name never goes stale.
+    markDialogRoot(el, { label: title });
     el.innerHTML =
       `<div class="panel-title"><span>${esc(title)}</span>` +
       `<button type="button" class="x-btn" data-close aria-label="${esc(t('lockpickUi.closeAria'))}">${svgIcon('close')}</button></div>` +
@@ -298,6 +303,11 @@ export class LockpickWindow {
         ? `<div class="lp-timer" aria-label="${esc(t('lockpickUi.timerAria'))}"><div class="lp-timer-track"><div class="lp-timer-bar" id="lp-timer-bar" style="width:100%"></div></div>` +
           `<span class="lp-timer-value" id="lp-timer-value">${esc(t('lockpickUi.seconds', { seconds: formatNumber(timerSecs, NUM1) }))}</span></div>`
         : '';
+    // Re-run every board repaint (a relocalize forces one via lastSig reset), so
+    // the accessible name never goes stale against the last-painted lock tier.
+    markDialogRoot(el, {
+      label: t('lockpickUi.boardTitle', { tier: this.deps.tierName(view.lootTier) }),
+    });
     el.innerHTML =
       `<div class="panel-title"><span>${esc(t('lockpickUi.boardTitle', { tier: this.deps.tierName(view.lootTier) }))}</span>` +
       `<button type="button" class="x-btn" data-close aria-label="${esc(t('lockpickUi.withdrawAria'))}">${svgIcon('close')}</button></div>` +

@@ -418,10 +418,12 @@ const FRAMES_KEYS = [
   'partyFrameShowSelf',
   'aurasOnPlayerFrame',
   'showTargetOfTarget',
+  'showPetFrame',
 ];
 const CHAT_KEYS = ['chatFontScale', 'chatOpacity', 'compactChat'];
 const COMBAT_KEYS = [
   'startAttackOnAbilityUse',
+  'stopAutoAttackOnTargetSwitch',
   'showAttackButton',
   'walkByAutoloot',
   'groundReticle',
@@ -430,6 +432,7 @@ const COMBAT_KEYS = [
   'fctScale',
   'showSecondaryActionBar',
   'showThirdActionBar',
+  'hideUnusedActionSlots',
   'lockActionBars',
 ];
 const INTERFACE_KEYS_BY_TAB: Record<InterfaceTab, string[]> = {
@@ -565,6 +568,22 @@ describe('options_view: interface tab taxonomy', () => {
     const all = buildInterfaceControls(makeSource());
     expect(find(all, 'showSecondaryActionBar')?.category).toBe('combat');
     expect(find(all, 'showThirdActionBar')?.category).toBe('combat');
+  });
+
+  // Issue 2429: the "Hide Unused Action Slots" toggle sits in the combat tab
+  // alongside the other action-bar controls, unconditionally enabled (unlike
+  // showThirdActionBar it has no dependency on another toggle).
+  it('renders the hide-unused-action-slots toggle in the combat tab, reflecting the stored value', () => {
+    const off = buildInterfaceControls(makeSource());
+    expect(find(off, 'hideUnusedActionSlots')).toMatchObject({
+      control: 'boolToggle',
+      category: 'combat',
+      labelKey: 'hudChrome.options.hideUnusedActionSlots',
+      on: false,
+    });
+
+    const on = buildInterfaceControls(makeSource({}, { hideUnusedActionSlots: true }));
+    expect(find(on, 'hideUnusedActionSlots')).toMatchObject({ on: true });
   });
 });
 

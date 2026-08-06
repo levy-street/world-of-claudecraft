@@ -190,9 +190,9 @@ describe('coverage: each scenario fires its subsystem', () => {
     // with b winning the contest reads identically), so pin each holder.
     const held = (pid: number) => sim.countItem('greyjaw_hide_boots', pid) as number;
     expect(held(a)).toBe(0); // the master looter assigned all three away
-    expect(held(b)).toBe(2); // direct grant + the contest win below
+    expect(held(b)).toBe(1); // direct grant only
     expect(held(c)).toBe(1); // direct grant only
-    expect(held(d)).toBe(0); // rolled below the tie, so won nothing
+    expect(held(d)).toBe(1); // rolled at the tie, then won the tie-break below
     // The deduped assignment never reopened as a roll.
     expect(evs.some((e) => e.type === 'lootRoll' && e.rollId === rollIds[1])).toBe(false);
 
@@ -210,19 +210,19 @@ describe('coverage: each scenario fires its subsystem', () => {
       .filter((e) => e.type === 'loot' && e.pid === a && /^Need Roll - /.test(text(e)))
       .map((e) => Number(/^Need Roll - (\d+)/.exec(text(e))?.[1]));
     // Re-seeded 1091 -> 1326 by the v0.32.0 base merge, then 1326 -> 1383 by the
-    // quest-dedupe content pass: the tie SHAPE is preserved (two rollers level at
-    // the top), only which rollers tie, the third roll, and the tie-break's
-    // winner move, because these branches shift the shared rng and never
-    // master-loot logic itself.
-    expect(needRolls).toEqual([69, 35, 69]); // b and d tie at the top, c below
-    // The tie-break picked b, and that outcome is the one observable effect of the
+    // quest-dedupe content pass, then 1383 -> 247 by the Galecrest unspawnable-quest
+    // camp fix: the tie SHAPE is preserved (two rollers level at the top), only
+    // which rollers tie, the third roll, and the tie-break's winner move, because
+    // these branches shift the shared rng and never master-loot logic itself.
+    expect(needRolls).toEqual([63, 51, 63]); // b and d tie at the top, c below
+    // The tie-break picked d, and that outcome is the one observable effect of the
     // master-loot-only draw, so it is pinned by name and by winning roll. WHICH of
     // the tied rollers wins is the rng's call and may move with the seed; that a
     // named one of them wins exactly once per party member is the claim.
     expect(
       evs.filter(
         (e) =>
-          e.type === 'loot' && text(e) === `Bbb wins [[i:greyjaw_hide_boots]] (${needRolls[0]})`,
+          e.type === 'loot' && text(e) === `Ddd wins [[i:greyjaw_hide_boots]] (${needRolls[0]})`,
       ).length,
     ).toBe(4); // announced once to each party member
 

@@ -8,6 +8,7 @@
 
 import { RITE_INTENSITY, RITE_INTENSITY_ORDER } from '../../../sim/delves/rite_tuning';
 import type { RiteIntensity } from '../../../sim/types';
+import { markDialogRoot } from '../../dialog_root';
 import { esc } from '../../esc';
 import { formatNumber, type TranslationKey, t } from '../../i18n';
 import { svgIcon } from '../../ui_icons';
@@ -62,6 +63,9 @@ export class RiteWindow {
         `</button>`
       );
     }).join('');
+    // A standalone trapping window (the lockpick ante-selector shape): announce
+    // it as a labeled dialog for the focus contract.
+    markDialogRoot(el, { label: t('delveRiteUi.title') });
     el.innerHTML =
       `<div class="panel-title"><span>${esc(t('delveRiteUi.title'))}</span>` +
       `<button type="button" class="x-btn" data-close aria-label="${esc(t('delveRiteUi.closeAria'))}">${svgIcon('close')}</button></div>` +

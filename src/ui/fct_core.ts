@@ -23,7 +23,10 @@
  * plus showSelfNote). damage-done splits into -ability vs -auto because the live color
  * differs by whether an ability fired; miss/dodge share the same color logic but stay
  * distinct kinds because their text differs (and the self-vs-other color split rides
- * the separate isSelf flag, not the kind).
+ * the separate isSelf flag, not the kind). damage-done-block / damage-taken-block are
+ * the shield-block counterpart of the plain damage-done and damage-taken kinds: a block
+ * still lands real (reduced) damage, unlike a full avoidance word, so it keeps the amount
+ * but reads with its own colour instead of a plain hit's.
  */
 export type FctKind =
   | 'miss'
@@ -32,7 +35,9 @@ export type FctKind =
   | 'evade'
   | 'damage-done-ability'
   | 'damage-done-auto'
+  | 'damage-done-block'
   | 'damage-taken'
+  | 'damage-taken-block'
   | 'absorb'
   | 'heal'
   | 'xp'
@@ -49,7 +54,9 @@ export type FctKind =
 export const DAMAGE_FCT_KINDS: ReadonlySet<FctKind> = new Set<FctKind>([
   'damage-done-ability',
   'damage-done-auto',
+  'damage-done-block',
   'damage-taken',
+  'damage-taken-block',
 ]);
 
 /** Whether `kind` is a combat-damage floater (a damage number, not a word/info floater). */
@@ -71,7 +78,9 @@ export type FctColorToken =
   | 'dodge-other'
   | 'damage-done-ability'
   | 'damage-done-auto'
+  | 'damage-done-block'
   | 'damage-taken'
+  | 'damage-taken-block'
   | 'absorb'
   | 'heal'
   | 'xp'
@@ -188,6 +197,18 @@ function colorToken(kind: FctKind, isSelf: boolean): FctColorToken {
  * purpose: time-relative animation and ttl eviction are the driver's per-frame concern
  * (it stamps the spawn clock), which keeps this core deterministic with nothing to inject.
  */
+/**
+ * Format the numeric amount interpolated into `hud.combat.floatingBlock` for a shield
+ * block. A block still lands real damage, so it must follow the SAME sign convention
+ * as the plain damage-done / damage-taken floaters it sits next to: outgoing (`taken:
+ * false`) stays unsigned like `damageDone`, incoming (`taken: true`) is prefixed with
+ * `-` like `damageTaken`, so a blocked incoming hit never reads as a positive number.
+ */
+export function blockFctAmountText(amount: number, crit: boolean, taken: boolean): string {
+  const sign = taken ? '-' : '';
+  return `${sign}${amount}${crit ? '!' : ''}`;
+}
+
 export function describeFct(event: FctEvent, jitter01: number): FctDescriptor {
   const { pos, scale } = event.target;
   return {

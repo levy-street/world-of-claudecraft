@@ -23,6 +23,7 @@ import { resolveDisenchant } from '../src/sim/professions/enchanting';
 import { Sim } from '../src/sim/sim';
 import * as tradeMod from '../src/sim/social/trade';
 import type { ItemDef, ItemInstancePayload, SimEvent } from '../src/sim/types';
+import { runSalvage } from './helpers/enchant_family_cast';
 
 const STEEL = 'resonant_steel';
 const HIDE = 'resonant_hide';
@@ -243,7 +244,7 @@ describe('salvage unknown_item reason (Sim delegate)', () => {
   it('an unknown item id denies with reason unknown_item and stashes it', () => {
     const sim = makeSim();
     sim.drainEvents();
-    sim.salvageItem('__p13_qa_no_such_item');
+    runSalvage(sim, '__p13_qa_no_such_item');
     expect(sim.lastSalvageResult?.ok).toBe(false);
     expect(sim.lastSalvageResult?.reason).toBe('unknown_item');
     const ev = sim.drainEvents().filter((e) => e.type === 'salvageResult');

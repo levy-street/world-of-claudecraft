@@ -388,6 +388,8 @@ export const sv_SE: AdminTranslations = {
   "moderationHistory.actionKill": "Dödad",
   "moderationHistory.actionJail": "Fängslad",
   "moderationHistory.actionUnjail": "Frisläppt ur fängelse",
+  "moderationHistory.actionSpectate": "Spectated",
+  "moderationHistory.actionUnspectate": "Stopped spectating",
   "moderationHistory.actionNote": "Notera",
   "moderationHistory.actionResetPassword": "Lösenordsåterställning",
   "moderationHistory.actionDailyRewardsBan": "Avstängd från dagliga belöningar",

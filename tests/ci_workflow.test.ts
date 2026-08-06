@@ -1,12 +1,21 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { isCodePath } from '../scripts/lib/ci_change_classify.mjs';
 import { buildFullGateSteps } from '../scripts/lib/gate_steps.mjs';
 
 const workflow = readFileSync(new URL('../.github/workflows/ci.yml', import.meta.url), 'utf8');
+const detectEntry = readFileSync(
+  new URL('../scripts/detect_code_changes.mjs', import.meta.url),
+  'utf8',
+);
 const packageJson = JSON.parse(
   readFileSync(new URL('../package.json', import.meta.url), 'utf8'),
 ) as { packageManager?: string };
 const gate = readFileSync(new URL('../scripts/gate.mjs', import.meta.url), 'utf8');
+const preflightCode = readFileSync(
+  new URL('../scripts/lib/gate_preflight.mjs', import.meta.url),
+  'utf8',
+);
 // gate.mjs with its comments removed, BOTH kinds. A raw-substring pin on a step
 // is not a pin at all: commenting the step out leaves the substring in the file,
 // so the assertion stays green while the local gate quietly stops running it.
@@ -70,33 +79,66 @@ const PR_TIER_EVENT_FRAGMENT =
 // Extra parens around the event fragment keep || from binding past the && code arm.
 const PR_TIER_IF_LINE = `    if: (${PR_TIER_EVENT_FRAGMENT}) && needs.changes.outputs.code == 'true'`;
 
-// Minimum code path globs the changes job must classify as code=true (D10).
-const CODE_PATH_GLOBS = [
-  'src/*',
-  'server/*',
-  'tests/*',
-  'headless/*',
-  'bot/*',
-  'scripts/*',
-  'package.json',
-  'pnpm-lock.yaml',
-  'tsconfig.json',
-  'tsconfig.admin.json',
-  'vite.config.ts',
-  'vitest.browser.config.ts',
-  'biome.json',
-  '.github/workflows/*',
-  'electron/*',
-  'android/*',
-  'ios/*',
-  'public/*',
+// Minimum code path set the changes job must classify as code=true (D10).
+// Each row pairs the original inline-YAML glob with a representative path;
+// the pin is behavioral (through scripts/lib/ci_change_classify.mjs) because
+// the rules no longer live in the workflow text at all.
+const CODE_PATH_SAMPLES = [
+  ['src/*', 'src/sim/sim.ts'],
+  ['server/*', 'server/game.ts'],
+  ['tests/*', 'tests/sim.test.ts'],
+  ['headless/*', 'headless/env_server.ts'],
+  ['bot/*', 'bot/src/index.ts'],
+  ['scripts/*', 'scripts/gate.mjs'],
+  ['package.json', 'package.json'],
+  ['pnpm-lock.yaml', 'pnpm-lock.yaml'],
+  ['tsconfig.json', 'tsconfig.json'],
+  ['tsconfig.admin.json', 'tsconfig.admin.json'],
+  ['vite.config.ts', 'vite.config.ts'],
+  ['vitest.browser.config.ts', 'vitest.browser.config.ts'],
+  ['biome.json', 'biome.json'],
+  ['.github/workflows/*', '.github/workflows/ci.yml'],
+  ['electron/*', 'electron/main.ts'],
+  ['android/*', 'android/app/build.gradle'],
+  ['ios/*', 'ios/App/AppDelegate.swift'],
+  ['public/*', 'public/models/prop.glb'],
   // Security-adjacent / deploy surfaces: must not skip malware+builds (privacy review).
-  'deploy/*',
-  'mediawiki/*',
-  'Dockerfile',
-  'Dockerfile.*',
-  'docker-compose.yml',
-  'docker-compose.yaml',
+  ['deploy/*', 'deploy/mediawiki/first-boot.sh'],
+  ['mediawiki/*', 'mediawiki/Dockerfile'],
+  ['Dockerfile', 'Dockerfile'],
+  ['Dockerfile.*', 'Dockerfile.bot'],
+  ['docker-compose.yml', 'docker-compose.yml'],
+  ['docker-compose.yaml', 'docker-compose.yaml'],
+  // Widened when the rules became a tested module: root build and
+  // supply-chain inputs the old inline set skipped (the shipped entry
+  // documents carry inline scripts and third-party tags; the configs steer
+  // the install and every bundle).
+  ['index.html', 'index.html'],
+  ['play.html', 'play.html'],
+  ['admin.html', 'admin.html'],
+  ['guide.html', 'guide.html'],
+  ['editor.html', 'editor.html'],
+  ['wallet-handoff.html', 'wallet-handoff.html'],
+  ['music_editor.html', 'music_editor.html'],
+  ['svelte.config.js', 'svelte.config.js'],
+  ['capacitor.config.ts', 'capacitor.config.ts'],
+  ['tsconfig.bot.json', 'tsconfig.bot.json'],
+  ['turbo.json', 'turbo.json'],
+  ['.npmrc', '.npmrc'],
+  ['.browserslistrc', '.browserslistrc'],
+  ['.dockerignore', '.dockerignore'],
+  ['data/*', 'data/battleground/thornhollow.map.json'],
+  ['python/*', 'python/wow_env.py'],
+] as const;
+
+// Paths that must stay classifiable as docs-only, or every documentation PR
+// silently pays the full 8-shard tier again.
+const NON_CODE_SAMPLES = [
+  'README.md',
+  'CLAUDE.md',
+  'docs/prd/some-spec.md',
+  'docs/screenshots/before.png',
+  '.github/PULL_REQUEST_TEMPLATE.md',
 ] as const;
 
 function jobSource(name: string): string {
@@ -104,8 +146,11 @@ function jobSource(name: string): string {
   // uppercase initial: a future job id like `pr-gate2` or `Release` would
   // otherwise not terminate the previous slice, letting one job's text bleed
   // into another and quietly satisfying a by-name pin from the wrong job.
+  // It also stops at a top-level (two-space) comment line: those document the
+  // NEXT job, and letting them bleed into the previous slice makes negative
+  // pins (not.toContain) fail on a neighbour's comment text.
   const match = workflow.match(
-    new RegExp(`\\n  ${name}:[\\s\\S]*?(?=\\n  [A-Za-z][A-Za-z0-9_-]*:|$)`),
+    new RegExp(`\\n  ${name}:[\\s\\S]*?(?=\\n  [A-Za-z][A-Za-z0-9_-]*:|\\n  #|$)`),
   );
   if (!match) throw new Error(`missing CI job: ${name}`);
   return match[0];
@@ -170,8 +215,13 @@ describe('CI workflow parity', () => {
     // (sfx_conform.mjs, export_bundle.mjs) bind to the static packages directly.
     // Either way no CI job apt-installs system FFmpeg; reintroducing the install
     // step would put its cost back on every job it touches.
+    // The preflight itself now lives in scripts/lib/gate_preflight.mjs so
+    // gate.mjs and gate_select.mjs share one copy; the pin follows it there and
+    // additionally holds gate.mjs to still invoking it, which is what actually
+    // makes the resolution reachable.
     expect(workflow).not.toContain('apt-get');
-    expect(gateCode).toContain("from './sfx/ffmpeg_paths.mjs'");
+    expect(preflightCode).toContain("from '../sfx/ffmpeg_paths.mjs'");
+    expect(gateCode).toContain('runGatePreflights');
   });
 
   it('runs the opt-in Chromium browser regressions in their own CI job', () => {
@@ -348,30 +398,57 @@ describe('CI workflow parity', () => {
     expect(releaseGate).not.toContain('Cache tsc incremental buildinfo');
   });
 
-  it('classifies docs-only PRs via a native changes job and keeps release unfiltered', () => {
-    // D10: native git-diff classifier (no dorny/paths-filter). Output code=true
-    // forces the full PR tier; code=false skips pr-gate/pr-checks/browser-gate.
-    // lint stays unfiltered. Release jobs never consult the output.
+  it('classifies docs-only PRs via the API-driven changes job and keeps release unfiltered', () => {
+    // D10 classifier: the changes job asks the GitHub API for the PR file list
+    // through scripts/detect_code_changes.mjs; rules and the fail-closed
+    // decision live in scripts/lib/ci_change_classify.mjs, whose behavior
+    // (every error path resolving to code=true) is pinned by
+    // tests/ci_change_classify.test.ts. Output code=true forces the full PR
+    // tier; code=false skips pr-gate/pr-checks/browser-gate. lint stays
+    // unfiltered. Release jobs never consult the output.
     const changes = jobSource('changes');
     expect(changes).toContain('id: filter');
     expect(changes).toContain('outputs:');
     expect(changes).toContain('code: ${{ steps.filter.outputs.code }}');
-    expect(changes).toContain('fetch-depth: 0');
-    expect(changes).toContain('EVENT_NAME');
-    expect(changes).toContain('BASE_SHA');
-    expect(changes).toContain('HEAD_SHA');
+    // Anchored, not toContain: a YAML-commented-out step keeps the substring
+    // but loses the indented shape, and this one line is the whole classifier.
+    expect(changes).toMatch(/\n {8}run: node scripts\/detect_code_changes\.mjs\n/);
+    // The script's appendFile is the ONLY writer of the code output: a shell
+    // step echoing into GITHUB_OUTPUT could override the classifier verdict.
+    expect(changes).not.toContain('GITHUB_OUTPUT');
+    // Exactly one checkout, blob-less, shallow, and sparse: the ~10 minute
+    // full-history checkout (which also wedged for 90+ minutes twice) must not
+    // return, and nothing in this job may need the tree beyond scripts/.
+    expect(changes.match(/uses: actions\/checkout/g)).toHaveLength(1);
+    expect(changes).not.toMatch(/^\s+fetch-depth:/m);
+    expect(changes).not.toContain('--unshallow');
+    expect(changes).toContain('filter: blob:none');
+    expect(changes).toMatch(/sparse-checkout: \|\n {12}scripts\n/);
+    // No toolchain setup or dependency install on this serial critical path:
+    // the classifier is stdlib-only and runs on the runner's preinstalled Node.
+    expect(changes).not.toContain('pnpm install');
+    expect(changes).not.toContain('actions/setup-node');
+    // A wedged runner fails fast (single-digit timeout) and gets retried,
+    // instead of stalling every downstream shard for 90+ minutes.
+    expect(changes).toMatch(/\n {4}timeout-minutes: [1-9]\n/);
+    // The API call authenticates with the workflow token via env (never
+    // secrets.* and never string-interpolated into the run line).
+    expect(changes).toContain('GITHUB_TOKEN: ${{ github.token }}');
     // changes must always run (no job-level if). Gating it to pull_request only
     // would leave needs.changes dependents skipped on push to main/dev.
     expect(changes.match(/^\s{4}if: .+$/gm) ?? []).toEqual([]);
-    // Non-PR events and empty/missing diffs fail closed toward code=true.
-    expect(changes).toContain('non-PR event: full PR tier (code=true)');
-    expect(changes).toContain('missing PR base/head SHAs: full PR tier (code=true)');
-    expect(changes).toContain('empty file list: full PR tier (code=true)');
-    expect(changes).toContain('echo "code=$code" >> "$GITHUB_OUTPUT"');
-    expect(changes).toContain('code=false');
-    expect(changes).toContain('code=true');
-    for (const glob of CODE_PATH_GLOBS) {
-      expect(changes).toContain(glob);
+    // The entry stays wired to the tested lib and writes the step output; the
+    // fail-closed reason strings themselves are pinned behaviorally in
+    // tests/ci_change_classify.test.ts.
+    expect(detectEntry).toContain("from './lib/ci_change_classify.mjs'");
+    expect(detectEntry).toContain('detectCode');
+    expect(detectEntry).toContain('GITHUB_OUTPUT');
+    expect(detectEntry).toContain('code=${code}');
+    for (const [, sample] of CODE_PATH_SAMPLES) {
+      expect(isCodePath(sample)).toBe(true);
+    }
+    for (const sample of NON_CODE_SAMPLES) {
+      expect(isCodePath(sample)).toBe(false);
     }
     // No third-party path-filter action (D10: justify dorny in progress.md if added).
     expect(workflow).not.toContain('dorny/paths-filter');
@@ -549,9 +626,18 @@ describe('CI workflow parity', () => {
     // entry would let `packages: write` be appended underneath it.
     expect(workflow).toMatch(/\npermissions:\n {2}contents: read\n\n/);
     // Unanchored on purpose: the read-only grant is workflow-level, and a JOB
-    // may re-declare `permissions:` at its own indent to widen it. Matching
-    // only at column 0 would miss exactly that escalation.
-    expect(workflow.match(/^\s*permissions:/gm)).toHaveLength(1);
+    // may re-declare `permissions:` at its own indent to widen it. Exactly two
+    // blocks are sanctioned: the workflow-level read-only default and the
+    // changes job's read-only widen (pull-requests: read, which the PR files
+    // endpoint needs once workflow permissions are declared). Any third block
+    // is an escalation; so is any write scope anywhere in the file.
+    expect(workflow.match(/^\s*permissions:/gm)).toHaveLength(2);
+    expect(jobSource('changes')).toMatch(
+      /\n {4}permissions:\n {6}contents: read\n {6}pull-requests: read\n/,
+    );
+    // \b, not $: a trailing comment after a write scope must not hide it, and
+    // \b after "write" also matches the write-all shorthand.
+    expect(workflow).not.toMatch(/^\s*[\w-]+:\s*write\b/m);
     expect(workflow).not.toContain('secrets.');
     expect(workflow).not.toContain("secrets['");
     expect(workflow).not.toContain('secrets["');

@@ -388,6 +388,8 @@ export const en_XA: AdminTranslations = {
   "moderationHistory.actionKill": "[Ķíļļéð]",
   "moderationHistory.actionJail": "[Ĵáíļéð]",
   "moderationHistory.actionUnjail": "[Ŕéļéášéð ƒŕóɱ ĵáíļ]",
+  "moderationHistory.actionSpectate": "[Šþéçţáţéð]",
+  "moderationHistory.actionUnspectate": "[Šţóþþéð šþéçţáţíñĝ]",
   "moderationHistory.actionNote": "[Ñóţé]",
   "moderationHistory.actionResetPassword": "[Þáššŵóŕð ŕéšéţ]",
   "moderationHistory.actionDailyRewardsBan": "[Ðáíļý Ŕéŵáŕðš ƀáññéð]",
