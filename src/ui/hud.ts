@@ -5501,11 +5501,22 @@ export class Hud {
           ? t('itemUi.slots.twoHand')
           : itemSlotName(item.slot);
       const armorTypeKey = itemArmorTypeLabelKey(item);
+      // Unique-equipped tag (every legendary with a slot; one worn copy per
+      // item family): rendered like the armor-weight indicator, right-aligned
+      // in the slot row's type seat, in the soulbound gold. With an armor
+      // weight already in that seat (a future legendary armor piece) the tag
+      // falls back to its own gold line so neither indicator is lost.
+      const uniqueTag = isUniqueEquipped(item) ? t('hudChrome.itemUniqueEquipped') : null;
       if (armorTypeKey) {
         // Red armor type = the viewing player's class cannot wear this armor weight
         // (e.g. a mage hovering Mail), so they know it is not for them at a glance.
         const badClass = canEquipItem(this.sim.cfg.playerClass, item) ? '' : ' tt-armor-bad';
         html += `<div class="tt-sub tt-row"><span>${esc(slotName)}</span><span class="tt-armor${badClass}">${esc(t(armorTypeKey))}</span></div>`;
+        if (uniqueTag) {
+          html += `<div class="tt-sub" style="color:var(--gold)">${esc(uniqueTag)}</div>`;
+        }
+      } else if (uniqueTag) {
+        html += `<div class="tt-sub tt-row"><span>${esc(slotName)}</span><span class="tt-unique">${esc(uniqueTag)}</span></div>`;
       } else {
         html += `<div class="tt-sub">${esc(slotName)}</div>`;
       }
@@ -5529,13 +5540,6 @@ export class Hud {
     // classic "Soulbound" line so a player can see it cannot be traded or destroyed.
     if (item.soulbound) {
       html += `<div class="tt-sub" style="color:var(--gold)">${esc(t('hudChrome.itemSoulbound'))}</div>`;
-    }
-    // Unique-equipped marker (every legendary): one worn copy per item family,
-    // so the rule is visible on the tooltip before an equip is refused. Gated
-    // on `slot` too: the rule lives in the equip path, so a slotless legendary
-    // (a future consumable or token) must not advertise it.
-    if (item.slot && isUniqueEquipped(item)) {
-      html += `<div class="tt-sub" style="color:var(--gold)">${esc(t('hudChrome.itemUniqueEquipped'))}</div>`;
     }
     // Maker's Bond lines (Professions 2.0): the commission
     // binds-on-first-trade warning or the bound lock, beside the def-level
