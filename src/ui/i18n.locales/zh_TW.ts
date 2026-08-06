@@ -6461,6 +6461,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.gear.slotsTitle': '你能裝備什麼',
   'guide.gear.soulboundBody':
     '許多珍貴的裝備是靈魂綁定的，從你取得的那一刻起便與你的角色綁定。靈魂綁定的物品無法交易、無法郵寄、無法賣給商人，也無法在市場上架；它如今是你故事的一部分，沒有其他人能替你佩戴它。',
+  'guide.gear.uniqueTitle': '裝備唯一：同一件傳說只能穿一件',
+  'guide.gear.uniqueBody':
+    '傳說物品是裝備唯一的：你的角色同一時間只能穿戴某件傳說物品的一份，其英雄版本也算作同一件物品。第二份可以放在背包、銀行或市場裡，但試圖同時穿戴兩份會被拒絕。物品提示上還帶有金色的「裝備唯一」標籤，讓你在圍繞兩件傳說規劃配裝之前就能看到這條規則。',
   'guide.gear.soulboundTitle': '靈魂綁定：屬於你，也僅屬於你',
   'guide.gear.sourcesBody':
     '你早期的升級大多來自任務獎勵，因此完成任務比刷怪更划算。敵人被你擊敗時會掉落裝備，城鎮裡的商人販售扎實的基本款，工匠會把採集來的材料製成可穿戴的裝備，玩家市場則讓你能向其他冒險者購買。而在攀上頂峰之後，兩種印記貨幣能買到別處找不到的裝備：秘探印記在秘探看守人處花用，英雄徽記則在英雄軍需官處花用。',
@@ -7148,6 +7151,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.wyrmshadow.bonus4':
     '你的武器致命一擊有 50% 的機率觸發「獠牙疾襲」，使攻擊速度提高 25%，持續 8 秒。',
   'hudChrome.itemSoulbound': '靈魂綁定',
+  'hudChrome.itemUniqueEquipped': '裝備唯一',
   'hudChrome.itemSet.header': '{name} ({have}/{total})',
   'hudChrome.itemProc.onMeleeHit': '命中時機率（{chance}%）：{effect}',
   'hudChrome.itemProc.onSpellDamage': '造成傷害的法術機率（{chance}%）：{effect}',

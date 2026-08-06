@@ -1585,6 +1585,7 @@ export const pl_PL: EnTranslations = {
     },
     "itemHeroicTag": "[HEROICZNY]",
     "itemSoulbound": "Związany z duszą",
+    "itemUniqueEquipped": "Unique-Equipped",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -4363,6 +4364,8 @@ export const pl_PL: EnTranslations = {
       "sourcesBody": "Większość twoich wczesnych ulepszeń to nagrody za zadania, więc opłaca się kończyć zadania zamiast młócić wrogów. Wrogowie upuszczają wyposażenie, gdy ich pokonasz, sprzedawcy w mieście oferują solidne podstawy, rzemieślnicy przerabiają zebrane materiały na noszalne części, a rynek graczy pozwala kupować od innych poszukiwaczy przygód. Na samym szczycie dwie waluty znaków kupują ekwipunek nieosiągalny nigdzie indziej: Znaki Wypraw u opiekuna wypraw oraz Znaki heroiczne u heroicznego kwatermistrza.",
       "soulboundTitle": "Związany z duszą: tylko i wyłącznie twój",
       "soulboundBody": "Kilka szczególnych nagród jest związanych z duszą, przywiązanych do twojej postaci od chwili, gdy je zdobędziesz. Przedmiotu związanego z duszą nie można wymienić, wysłać pocztą, sprzedać sprzedawcy ani wystawić na targu; należy tylko i wyłącznie do ciebie. Dziś ta ochrona strzeże żetonów nagród, takich jak Znaki Heroiczne, podczas gdy zdobyty ekwipunek możesz swobodnie wymieniać, sprzedawać i udostępniać.",
+      "uniqueTitle": "Unique-Equipped: one legendary of a kind",
+      "uniqueBody": "Legendary items are unique-equipped: your character can wear only one copy of a given legendary at a time, and its heroic version counts as the same item. A second copy can ride in your bags, in the bank, or on the market, but trying to wear both at once is refused, and the tooltip carries a gold Unique-Equipped tag so you can see the rule before you plan a build around two of them.",
       "setsTitle": "Zestawy i bonusy zestawów",
       "setsBody": "Część pancerza występuje w pasujących do siebie rodzinach, gdzie kilka elementów skrojono tak, by wyglądały i walczyły jak jedna całość. Noś naraz dość elementów rodziny, a zestaw się przebudzi, dając bonusy ponad statystyki każdej części, a im więcej elementów nosisz, tym silniejszy się staje. Kilka takich rodzin trafia się jako cenne łupy podczas zdobywania poziomów; najpotężniejsze z nich pochodzą z najtrudniejszej zawartości grupowej blisko maksymalnego poziomu, więc kompletowanie pełnego zestawu to klasyczny cel końca gry.",
       "consumablesTitle": "Materiały zużywalne",

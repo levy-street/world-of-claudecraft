@@ -1585,6 +1585,7 @@ export const vi_VN: EnTranslations = {
     },
     "itemHeroicTag": "[ANH HÙNG]",
     "itemSoulbound": "Ràng Buộc Linh Hồn",
+    "itemUniqueEquipped": "Unique-Equipped",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -4363,6 +4364,8 @@ export const vi_VN: EnTranslations = {
       "sourcesBody": "Phần lớn đồ nâng cấp thuở đầu là phần thưởng nhiệm vụ, nên hoàn thành nhiệm vụ đáng giá hơn là cày cuốc. Kẻ địch rơi trang bị khi bạn đánh bại chúng, người bán trong thị trấn bán những món cơ bản chắc chắn, thợ chế tác biến nguyên liệu thu thập thành những món mặc được, và chợ người chơi cho phép bạn mua từ những nhà phiêu lưu khác. Ở đỉnh cao, hai loại tiền huy hiệu mua được trang bị không tìm thấy ở đâu khác: Huy Hiệu Hang Sâu ở chỗ người giữ hang sâu, và Dấu Ấn Anh Hùng ở chỗ Quân Nhu Trưởng Anh Hùng.",
       "soulboundTitle": "Ràng Buộc Linh Hồn: của bạn và chỉ của riêng bạn",
       "soulboundBody": "Một vài phần thưởng đặc biệt là ràng buộc linh hồn, gắn với nhân vật của bạn ngay từ khoảnh khắc bạn giành được chúng. Một vật phẩm ràng buộc linh hồn không thể trao đổi, gửi thư, bán cho người bán, hay niêm yết trên chợ; nó là của bạn và chỉ của riêng bạn. Ngày nay sự bảo vệ ấy canh giữ những token phần thưởng như Dấu Ấn Anh Hùng, trong khi trang bị bạn giành được là của bạn để tùy ý trao đổi, bán, hay san sẻ.",
+      "uniqueTitle": "Unique-Equipped: one legendary of a kind",
+      "uniqueBody": "Legendary items are unique-equipped: your character can wear only one copy of a given legendary at a time, and its heroic version counts as the same item. A second copy can ride in your bags, in the bank, or on the market, but trying to wear both at once is refused, and the tooltip carries a gold Unique-Equipped tag so you can see the rule before you plan a build around two of them.",
       "setsTitle": "Bộ trang bị và hiệu ứng bộ",
       "setsBody": "Một số giáp đến theo những gia đình đồng bộ, vài món được tạo để trông và đánh như một thể thống nhất. Mặc đủ số món của một gia đình cùng lúc thì bộ thức dậy, trao thêm hiệu ứng bên trên các chỉ số riêng của từng món, và càng mặc nhiều món thì nó càng mạnh. Vài gia đình như vậy xuất hiện dưới dạng những món rơi quý giá khi bạn lên cấp; những bộ vĩ đại nhất đến từ nội dung theo nhóm khó nhất gần cấp tối đa, nên săn cho đủ một bộ là một mục tiêu hậu kỳ kinh điển.",
       "consumablesTitle": "Vật Phẩm Tiêu Hao",

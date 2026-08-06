@@ -1585,6 +1585,7 @@ export const it_IT: EnTranslations = {
     },
     "itemHeroicTag": "[EROICO]",
     "itemSoulbound": "Vincolato all’anima",
+    "itemUniqueEquipped": "Unique-Equipped",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -4363,6 +4364,8 @@ export const it_IT: EnTranslations = {
       "sourcesBody": "Gran parte dei tuoi primi miglioramenti sono ricompense delle missioni, perciò conviene portarle a termine invece di macinare nemici. I nemici lasciano cadere equipaggiamento quando li sconfiggi, i venditori in città vendono solide basi, gli artigiani trasformano i materiali raccolti in pezzi indossabili, e il mercato dei giocatori ti permette di comprare da altri avventurieri. In cima alla scalata, due valute in marchi comprano equipaggiamento introvabile altrove: i Sigilli d'Incursione presso il custode delle incursioni, e i Marchi Eroici presso il Quartiermastro Eroico.",
       "soulboundTitle": "Vincolato all'anima: tuo e tuo soltanto",
       "soulboundBody": "Alcune ricompense speciali sono vincolate all'anima, legate al tuo personaggio dal momento in cui le ottieni. Un oggetto vincolato all'anima non può essere scambiato, spedito, venduto a un venditore o messo in vendita sul mercato; è tuo e tuo soltanto. Oggi questa protezione custodisce i gettoni premio come i Marchi Eroici, mentre l'equipaggiamento che vinci è tuo da scambiare, vendere o condividere liberamente.",
+      "uniqueTitle": "Unique-Equipped: one legendary of a kind",
+      "uniqueBody": "Legendary items are unique-equipped: your character can wear only one copy of a given legendary at a time, and its heroic version counts as the same item. A second copy can ride in your bags, in the bank, or on the market, but trying to wear both at once is refused, and the tooltip carries a gold Unique-Equipped tag so you can see the rule before you plan a build around two of them.",
       "setsTitle": "Le tenute e i loro bonus",
       "setsBody": "Alcune armature arrivano in famiglie coordinate, più pezzi tagliati per apparire e combattere come una cosa sola. Indossa abbastanza pezzi di una famiglia insieme e la tenuta si risveglia, concedendo bonus che si aggiungono alle statistiche di ciascun pezzo, e più pezzi indossi più diventa forte. Alcune di queste famiglie compaiono come bottino ambito mentre sali di livello; le più grandi arrivano dai contenuti di gruppo più ardui vicino al limite di livello, perciò inseguire una tenuta completa è un classico obiettivo di fine gioco.",
       "consumablesTitle": "Consumabili",

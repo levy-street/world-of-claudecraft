@@ -1585,6 +1585,7 @@ export const nl_NL: EnTranslations = {
     },
     "itemHeroicTag": "[HELDHAFTIG]",
     "itemSoulbound": "Zielsgebonden",
+    "itemUniqueEquipped": "Unique-Equipped",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -4363,6 +4364,8 @@ export const nl_NL: EnTranslations = {
       "sourcesBody": "De meeste van je vroege verbeteringen zijn questbeloningen, dus het loont om quests af te ronden in plaats van te grinden. Vijanden laten uitrusting vallen wanneer je ze verslaat, verkopers in de stad verkopen degelijke basisspullen, ambachtslieden maken van verzamelde materialen draagbare stukken, en op de spelersmarkt kun je van andere avonturiers kopen. Bovenaan de heuvel kopen twee merkvaluta uitrusting die nergens anders te vinden is: Delve-Merken bij de delvebewaarder, en Heroïsche Merken bij de heroïsche kwartiermeester.",
       "soulboundTitle": "Zielgebonden: van jou en jou alleen",
       "soulboundBody": "Een paar bijzondere beloningen zijn zielgebonden, verbonden aan je personage vanaf het moment dat je ze verdient. Een zielgebonden voorwerp kun je niet verhandelen, versturen, aan een verkoper verkopen of op de markt zetten; het is van jou en jou alleen. Vandaag beschermt dat prijzentokens zoals Heroïsche Merken, terwijl de uitrusting die je wint van jou is om vrijelijk te verhandelen, verkopen of delen.",
+      "uniqueTitle": "Unique-Equipped: one legendary of a kind",
+      "uniqueBody": "Legendary items are unique-equipped: your character can wear only one copy of a given legendary at a time, and its heroic version counts as the same item. A second copy can ride in your bags, in the bank, or on the market, but trying to wear both at once is refused, and the tooltip carries a gold Unique-Equipped tag so you can see the rule before you plan a build around two of them.",
       "setsTitle": "Sets en setbonussen",
       "setsBody": "Sommige pantsers komen in bij elkaar passende families, meerdere stukken die zo gesneden zijn dat ze er als één uitzien en als één vechten. Draag er genoeg van een familie tegelijk en de set ontwaakt, en geeft bonussen bovenop de eigen statistieken van elk stuk, en hoe meer stukken je draagt, hoe sterker hij wordt. Een paar van zulke families duiken op als gewilde drops terwijl je levelt; de grootste ervan komen uit de zwaarste groepscontent vlak bij de levelcap, dus jagen op een volledige set is een klassiek eindspeldoel.",
       "consumablesTitle": "Verbruiksartikelen",

@@ -6743,6 +6743,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.gear.slotsTitle': '装備できるもの',
   'guide.gear.soulboundBody':
     '価値ある品の多くは魂縛、つまり入手した瞬間からあなたのキャラクターに縛られています。魂縛のアイテムは取引にも郵送にも出せず、商人に売ることも、マーケットに出品することもできません。それはもうあなたの物語の一部であり、ほかの誰かが代わりに持ち運ぶことはできないのです。',
+  'guide.gear.uniqueTitle': '装備ユニーク：同じレジェンダリーは1つだけ',
+  'guide.gear.uniqueBody':
+    'レジェンダリーアイテムは装備ユニークです。キャラクターは同じレジェンダリーを同時に1つしか装備できず、そのヒロイック版も同じアイテムとして扱われます。2つ目はバッグや銀行、マーケットに置けますが、両方を同時に装備しようとすると拒否されます。ツールチップには金色の「装備ユニーク」タグが表示されるので、2つ持ちのビルドを計画する前にこのルールを確認できます。',
   'guide.gear.soulboundTitle': '魂縛：あなただけのもの',
   'guide.gear.sourcesBody':
     '序盤のアップグレードのほとんどはクエスト報酬なので、稼ぎ作業よりクエストを終わらせるほうが得です。敵は倒されると装備を落とし、町の商人は手堅い基本装備を売り、職人は採集した素材を身につけられる品へと変え、プレイヤーマーケットでは他の冒険者から買えます。そして頂の上では、二つの刻印通貨が、ほかでは見つからない装備を買わせてくれます。デルヴの番人のもとではデルヴの刻印、英雄補給係のもとでは英雄の証です。',
@@ -7460,6 +7463,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.wyrmshadow.bonus4':
     '武器のクリティカルヒット時に50%の確率で「ファングラッシュ」が発動し、攻撃速度が8秒間25%上昇します。',
   'hudChrome.itemSoulbound': '魂縛',
+  'hudChrome.itemUniqueEquipped': '装備ユニーク',
   'hudChrome.itemSet.header': '{name} ({have}/{total})',
   'hudChrome.itemProc.onMeleeHit': '命中時に確率（{chance}%）：{effect}',
   'hudChrome.itemProc.onSpellDamage': 'ダメージ呪文で確率（{chance}%）：{effect}',

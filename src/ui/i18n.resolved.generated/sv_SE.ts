@@ -1585,6 +1585,7 @@ export const sv_SE: EnTranslations = {
     },
     "itemHeroicTag": "[HEROISK]",
     "itemSoulbound": "Själabunden",
+    "itemUniqueEquipped": "Unique-Equipped",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -4363,6 +4364,8 @@ export const sv_SE: EnTranslations = {
       "sourcesBody": "Det mesta av dina tidiga uppgraderingar är uppdragsbelöningar, så det lönar sig att slutföra uppdrag snarare än att grinda. Fiender släpper utrustning när du besegrar dem, handlare i staden säljer solida basvaror, hantverkare förvandlar insamlade material till bärbara pjäser, och spelarmarknaden låter dig köpa från andra äventyrare. Högst upp på kullen köper två märkesvalutor utrustning som inte finns någon annanstans: Delve-märken hos delvevaktaren, och heroiska märken hos den heroiska kvartersmästaren.",
       "soulboundTitle": "Själsbunden: din och endast din",
       "soulboundBody": "Ett fåtal särskilda belöningar är själsbundna, bundna till din karaktär från det ögonblick du förtjänar dem. Ett själsbundet föremål kan inte bytas, skickas med post, säljas till en handlare eller läggas upp på marknaden; det är ditt och endast ditt. I dag skyddar det värnet prispolletter som Heroiska märken, medan utrustningen du vinner är din att byta, sälja eller dela fritt.",
+      "uniqueTitle": "Unique-Equipped: one legendary of a kind",
+      "uniqueBody": "Legendary items are unique-equipped: your character can wear only one copy of a given legendary at a time, and its heroic version counts as the same item. A second copy can ride in your bags, in the bank, or on the market, but trying to wear both at once is refused, and the tooltip carries a gold Unique-Equipped tag so you can see the rule before you plan a build around two of them.",
       "setsTitle": "Set och setbonusar",
       "setsBody": "En del rustning kommer i matchande familjer, flera pjäser skurna för att se ut och slåss som en. Bär nog av en familj samtidigt så vaknar settet, vilket ger bonusar utöver varje pjäs egna egenskaper, och ju fler pjäser du bär desto starkare blir det. Några sådana familjer dyker upp som eftertraktade byten medan du klättrar i nivå; de främsta av dem kommer från det tuffaste gruppinnehållet nära nivåtaket, så att jaga ett komplett set är ett klassiskt slutspelsmål.",
       "consumablesTitle": "Förbrukningsvaror",
