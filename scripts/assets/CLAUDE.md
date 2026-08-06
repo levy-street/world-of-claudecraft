@@ -53,10 +53,21 @@ For reference-image reconstruction and procedural GLB authoring, read the living
   `docs/design/last-bell-held-prop-workflow.md`. Read it before mounting or
   verifying anything a character carries; it catalogs the five failure modes
   that let a wrong sword grip survive multiple "verified" claims, and the
-  authoring/capture/gate workflow that replaced them (human authors seats in
-  the live session and scrubs every clip; the agent captures every prop
-  transform and gates renders on contact-point crops across all clips before
-  deploying).
+  authoring/capture/gate workflow that replaced them. In short: derive a candidate
+  seat if you like, but the verdict is always FRAMES (three-plus yaws, every clip,
+  contact-point crops), never the score that produced it; a human in the live session
+  is the final word and is usually faster than another search round; and a settled seat
+  is CAPTURED as a `seat` row rather than re-derived, in `cast.py` for the book and on
+  the `AttachDef` for the game.
+- **`last_bell_crew/` specifics live in `crew.py`'s module docstring:** the BASE BODY
+  ROSTER (what each KayKit base can hide, and the welded-part traps, e.g. the druid's
+  antlers are part of its head mesh) and the ordered SHIPPING A FIGURE INTO THE GAME
+  sequence. Read the roster before picking a base for a new NPC, and the sequence before
+  claiming a figure is in the game: the concept book is a REVIEW SURFACE, and a figure
+  rendered into it is not shipped. A raw `CREW_OUT` export will not even load at runtime
+  (the loader requires meshopt), and `build_assets.mjs` optimizes every GLB in its
+  spec's `srcDir`, so stage one figure in its own directory or you will re-optimize
+  stale raws over shipped models.
 - **Source fingerprints are load-bearing.** Eastbrook-era exporters stamp a sha256 over a
   pinned input list (factory/entry/exporter/spec, `build_assets.mjs`, reference
   turnarounds, the shared atlas, and `package-lock.json`) into the GLB extras, and tests

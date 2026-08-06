@@ -101,6 +101,40 @@ through every clip).**
    cannot name its evidence is a claim about the checker's checklist, not
    about the art.
 
+## Who authors a seat
+
+Both can. **An agent should attempt a seat**, and the attempt is judged by the gate
+above, never by the search that produced it. What is NOT acceptable is treating a
+numeric score as the verdict: on 2026-08-06 a sweep that scored prop-vs-cape
+intersection picked a carry whose "crown-up" metric was inverted (it rendered
+crown-DOWN), and its clearance-optimal answer was rejected on sight. Derive a
+candidate, gate it on frames, and show it.
+
+**A human in the live session is the final word, and is faster than another search
+round.** When the authored arrangement is the one that ships, capture it (below)
+rather than trying to reproduce it from a grip family.
+
+## Where a captured seat lives (both sides)
+
+A seat is now first-class in BOTH pipelines, from ONE captured number:
+
+- **Book:** a `seat` key on the weapon spec in `cast.py`, a 4x4 rebased to a rig at
+  the origin, applied verbatim by `parts.seated` (`crew.arm` prefers it over `GRIPS`).
+- **Game:** `AttachSeat` on an `AttachDef` in `src/render/characters/manifest.ts`
+  (position + quaternion + scale in the CARRYING BONE's local space), applied by
+  `attachProp`, which short-circuits every derived grip path including the
+  variant-pack one. Pinned by `tests/visual_manifest.test.ts`.
+
+Capture recipe, per prop: read `matrix_world` and the owning rig's `matrix_world`,
+rebase to a rig at the origin for the book number, and take
+`(rig.matrix_world @ bone.matrix_local).inverted() @ obj.matrix_world` for the game
+number. Bone-LOCAL is deliberate: it is pose-independent, so one number holds across
+all 22 clips, and it survives the glTF Y-up conversion because it is a relative
+transform between two nodes in the same hierarchy.
+
+Do not decompose a captured seat back into rot/offset/scale, and do not hand-tune its
+digits: re-derivation is failures 2 and 4 above.
+
 ## Open items as of this writing
 
 - **Coalfast / Coalfast-sealed shield animation carry: RESOLVED.** The
@@ -110,9 +144,24 @@ through every clip).**
   the live session; the hand-set seat then passed the gate in all four clips
   on both Coalfast variants. Confirms the rule above: the carrying bone is as
   much a part of the seat as the transform.
-- **Game-side:** `adv_sword_1handed` should leave the `VAR_SWORD` row in
-  `KAYKIT_WEAPON_ACCESSORY`, and the hand-authored seats should land as
-  `WEAPON_GRIP_OVERRIDES` rows so the game and the book finally agree.
-- **Book pipeline:** `crew.py` `GRIPS["blade"]` still encodes the bare
-  attach; regenerating the book without baking the authored seats first will
-  resurrect the original bug.
+- **Seat plumbing and migration: RESOLVED 2026-08-06.** Coalfast (sword and
+  shield, both forms), Marsh (sword) and Ollun (staff) now carry `seat` rows in
+  both pipelines, captured from `LastBell_Grip_Review` / `Ollun_Tweak` in
+  `tmp/asset_src/last_bell_crew/Untitled.blend`. Regenerating the book no longer
+  reverts them, so the revert-the-webps dance is gone. Faithfulness was checked by
+  re-rendering and diffing against the committed plates: mean absolute difference
+  0.81/255 over 48 frames, concentrated on edges (anti-aliasing) plus three
+  mid-swing cells where the pose samples a hair differently, with no prop-shaped
+  displacement.
+- **`WEAPON_GRIP_OVERRIDES` was the wrong target** (this doc previously said the
+  seats should land there). It is keyed by weapon BASENAME, so it is global to a
+  model: Coalfast's nudge would move every `sword_1handed` in the game, players
+  included, and it cannot express a bone change at all. Per-character seats belong
+  on the per-character `AttachDef`. The overrides table remains correct for what it
+  is for: making one weapon MODEL sit well in any hand.
+- **Game-side, still open:** `adv_sword_1handed` should still leave the `VAR_SWORD`
+  row in `KAYKIT_WEAPON_ACCESSORY`. Marsh's seat bypasses that misroute for him, but
+  any other holder of that model still gets the wrist-crossing grip.
+- **In-game visual confirmation of the migrated seats is still owed.** They are
+  gated in Blender against the shipped rigs and pinned by tests, but nobody has yet
+  stood in front of these three NPCs in a running client.

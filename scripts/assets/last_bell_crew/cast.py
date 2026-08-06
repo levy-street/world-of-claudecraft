@@ -161,7 +161,21 @@ CAST = {
             "flat ribbon does once it is wider than the curve it lies on.",
         ],
         "weapons": [
+            # HAND-AUTHORED seats, captured 2026-08-06 from `LastBell_Grip_Review` in
+            # `tmp/asset_src/last_bell_crew/Untitled.blend`, rebased to a rig at the
+            # origin. They are the arrangement the committed plates were rendered from,
+            # and until they lived here every book rebuild silently reverted this figure
+            # to the derived `GRIPS` seat (the fist-on-blade bug). The SHIELD rides
+            # `lowerarm.l`: a strapped shield tracks the forearm, and on the hand slot it
+            # swung out beside the body like a tray through Walking_A and Block. Do not
+            # decompose or re-derive these.
             {"url": "weapons/adv_sword_1handed.glb", "bone": "handslot.r",
+             "seat": [
+                 (0.886411, -0.031524, -0.033389, -0.883133),
+                 (-0.039559, -0.196534, -0.864664, -0.017141),
+                 (0.023316, 0.864994, -0.197676, 1.101804),
+                 (0.0, 0.0, 0.0, 1.0),
+             ],
              # CORRECTION (2026-08-05): the claim this comment used to make, that
              # `VisualDef.attach` mounts a one-hander with a bare bone attach and
              # no aiming rotation, is FALSE, and building the book's mounts on it
@@ -222,9 +236,29 @@ CAST = {
             "waits for the helm he puts on to go inside.",
         ],
         "weapons": [
+            # HAND-AUTHORED seats, captured 2026-08-06 from `LastBell_Grip_Review` in
+            # `tmp/asset_src/last_bell_crew/Untitled.blend`, rebased to a rig at the
+            # origin. They are the arrangement the committed plates were rendered from,
+            # and until they lived here every book rebuild silently reverted this figure
+            # to the derived `GRIPS` seat (the fist-on-blade bug). The SHIELD rides
+            # `lowerarm.l`: a strapped shield tracks the forearm, and on the hand slot it
+            # swung out beside the body like a tray through Walking_A and Block. Do not
+            # decompose or re-derive these.
             {"url": "weapons/sword_1handed.glb", "bone": "handslot.r", "grip": "blade",
+             "seat": [
+                 (0.882923, -0.088573, -0.020867, -0.874462),
+                 (-0.039145, -0.185949, -0.86702, -0.494415),
+                 (0.082148, 0.863372, -0.188876, 0.979392),
+                 (0.0, 0.0, 0.0, 1.0),
+             ],
              "why": "A warden's arming sword: island-forged, unremarkable, kept sharp."},
-            {"url": "weapons/shield_square.glb", "bone": "handslot.l", "grip": "shield",
+            {"url": "weapons/shield_square.glb", "bone": "lowerarm.l", "grip": "shield",
+             "seat": [
+                 (-0.065468, -0.157533, 0.328094, 0.865933),
+                 (-0.294582, -0.172836, -0.141768, -0.02),
+                 (0.213738, -0.286461, -0.094893, 1.194966),
+                 (0.0, 0.0, 0.0, 1.0),
+             ],
              "why": "The heavy square shield the front line is built around. He is the line."},
         ],
         "poses": CREW_POSES,
@@ -259,9 +293,29 @@ CAST = {
             "going on costs a swapped visual key and nothing else.",
         ],
         "weapons": [
+            # HAND-AUTHORED seats, captured 2026-08-06 from `LastBell_Grip_Review` in
+            # `tmp/asset_src/last_bell_crew/Untitled.blend`, rebased to a rig at the
+            # origin. They are the arrangement the committed plates were rendered from,
+            # and until they lived here every book rebuild silently reverted this figure
+            # to the derived `GRIPS` seat (the fist-on-blade bug). The SHIELD rides
+            # `lowerarm.l`: a strapped shield tracks the forearm, and on the hand slot it
+            # swung out beside the body like a tray through Walking_A and Block. Do not
+            # decompose or re-derive these.
             {"url": "weapons/sword_1handed.glb", "bone": "handslot.r", "grip": "blade",
+             "seat": [
+                 (0.882923, -0.088573, -0.020867, -0.874462),
+                 (-0.039145, -0.185949, -0.86702, -0.494415),
+                 (0.082148, 0.863372, -0.188876, 0.979392),
+                 (0.0, 0.0, 0.0, 1.0),
+             ],
              "why": "The same sword. Nothing about the last hour is newly equipped."},
-            {"url": "weapons/shield_square.glb", "bone": "handslot.l", "grip": "shield",
+            {"url": "weapons/shield_square.glb", "bone": "lowerarm.l", "grip": "shield",
+             "seat": [
+                 (-0.065468, -0.157533, 0.328094, 0.865933),
+                 (-0.294582, -0.172836, -0.141768, -0.02),
+                 (0.213738, -0.286461, -0.094893, 1.194966),
+                 (0.0, 0.0, 0.0, 1.0),
+             ],
              "why": "The shield he holds the wound shut behind."},
         ],
         "poses": CREW_POSES,
