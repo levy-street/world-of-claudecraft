@@ -10,10 +10,10 @@
 
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { describe, expect, it, vi } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { ITEMS } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
-import type { EquipSlot } from '../src/sim/types';
+import type { EquipSlot, ItemDef } from '../src/sim/types';
 import {
   dropRequiredLevel,
   isPaperdollDraggable,
@@ -176,6 +176,231 @@ describe('paperdollDropAction unique-equipped mirror', () => {
     const offhandBefore = equipmentOf(sim, pid).offhand;
     sim.equipItemToSlot('kingsbane_last_oath', 'offhand', pid);
     expect(equipmentOf(sim, pid).offhand).toBe(offhandBefore);
+  });
+});
+
+// Masterwrought (the crafted-apex tier) is a COUNTED family rather than the
+// one-copy rule above: two worn pieces across the whole family, at most one of
+// them legendary, and duplicates of one piece are legal inside that budget. The
+// mirror reads the same sim leaf the equip path does, so these cases pin the
+// mapping from the leaf's two refusal reasons onto the drop actions.
+//
+// Synthetic flagged pieces, injected into the live ITEMS table the way
+// unique_equipped.test.ts does. The ids carry their own prefix so they cannot
+// collide with the sim-side suite's fixtures.
+const MW_BAND = 'test_mwdrop_band';
+const MW_TORC = 'test_mwdrop_torc';
+const MW_SIGNET = 'test_mwdrop_signet';
+const PLAIN_RING = 'test_mwdrop_plain_band';
+
+beforeAll(() => {
+  ITEMS[MW_BAND] = {
+    id: MW_BAND,
+    name: 'Test Masterwrought Band',
+    kind: 'armor',
+    slot: 'ring',
+    quality: 'epic',
+    masterwrought: true,
+    requiredLevel: 20,
+    stats: { sta: 1 },
+    sellValue: 1,
+  } as ItemDef;
+  ITEMS[MW_TORC] = {
+    id: MW_TORC,
+    name: 'Test Masterwrought Torc',
+    kind: 'armor',
+    slot: 'neck',
+    quality: 'epic',
+    masterwrought: true,
+    requiredLevel: 20,
+    stats: { sta: 1 },
+    sellValue: 1,
+  } as ItemDef;
+  // A legendary of its OWN family: the unique-equipped arm runs first and is
+  // family-scoped, so a distinct id keeps it out of the way of the legendary
+  // sub-cap this fixture exists to exercise.
+  ITEMS[MW_SIGNET] = {
+    id: MW_SIGNET,
+    name: 'Test Masterwrought Signet',
+    kind: 'armor',
+    slot: 'ring',
+    quality: 'legendary',
+    masterwrought: true,
+    requiredLevel: 20,
+    stats: { sta: 2 },
+    sellValue: 1,
+  } as ItemDef;
+  // Same slot and quality as MW_BAND but NOT flagged: the control that proves
+  // the arms key on the flag, not on the fixture shape.
+  ITEMS[PLAIN_RING] = {
+    id: PLAIN_RING,
+    name: 'Test Plain Band',
+    kind: 'armor',
+    slot: 'ring',
+    quality: 'epic',
+    requiredLevel: 20,
+    stats: { sta: 1 },
+    sellValue: 1,
+  } as ItemDef;
+});
+
+afterAll(() => {
+  delete ITEMS[MW_BAND];
+  delete ITEMS[MW_TORC];
+  delete ITEMS[MW_SIGNET];
+  delete ITEMS[PLAIN_RING];
+});
+
+describe('paperdollDropAction Masterwrought counted-family mirror', () => {
+  it('refuses a third flagged piece once two are already worn', () => {
+    expect(
+      paperdollDropAction(ITEMS[MW_BAND], 'ring2', 'warrior', 20, null, {
+        ring1: MW_BAND,
+        neck: MW_TORC,
+      }),
+    ).toBe('blockedMasterwroughtCap');
+  });
+
+  it('leaves an unflagged piece alone at the same worn count', () => {
+    expect(
+      paperdollDropAction(ITEMS[PLAIN_RING], 'ring2', 'warrior', 20, null, {
+        ring1: MW_BAND,
+        neck: MW_TORC,
+      }),
+    ).toBe('equip');
+  });
+
+  it('exempts the swapped slot, so replacing a worn flagged piece at the cap still equips', () => {
+    // ring1 already holds a flagged band; dropping onto it empties that slot,
+    // leaving one flagged piece (the neck) outside the exemption.
+    expect(
+      paperdollDropAction(ITEMS[MW_BAND], 'ring1', 'warrior', 20, null, {
+        ring1: MW_BAND,
+        neck: MW_TORC,
+      }),
+    ).toBe('equip');
+  });
+
+  it('names the LEGENDARY reason when the worn copy rolled legendary on an epic def', () => {
+    // The worn band's def is epic; only its instance payload makes it
+    // legendary-effective, which is exactly what the instances argument exists
+    // to carry into the mirror.
+    const equipment = { ring1: MW_BAND };
+    expect(paperdollDropAction(ITEMS[MW_SIGNET], 'ring2', 'warrior', 20, null, equipment)).toBe(
+      'equip',
+    );
+    expect(
+      paperdollDropAction(ITEMS[MW_SIGNET], 'ring2', 'warrior', 20, null, equipment, {
+        ring1: { rolled: { quality: 'legendary' } },
+      }),
+    ).toBe('blockedMasterwroughtLegendary');
+  });
+
+  it('lets a plain flagged piece in beside a worn legendary one', () => {
+    expect(
+      paperdollDropAction(
+        ITEMS[MW_BAND],
+        'ring2',
+        'warrior',
+        20,
+        null,
+        { ring1: MW_SIGNET },
+        { ring1: {} },
+      ),
+    ).toBe('equip');
+  });
+
+  it('predicts the consumed copy off the bags, reading the HIGHEST-index unit', () => {
+    // The dragged band's def is epic, so nothing about it is legendary until a
+    // carried unit says so. Which unit is not the player's choice: the sim
+    // consumes the highest-index matching stack, so the mirror must read that
+    // one and no other, whichever stack the drag happened to start from.
+    const worn = { ring1: MW_SIGNET };
+    const legendaryUnit = {
+      itemId: MW_BAND,
+      count: 1,
+      instance: { rolled: { quality: 'legendary' } },
+    };
+    const plainUnit = { itemId: MW_BAND, count: 1 };
+    expect(paperdollDropAction(ITEMS[MW_BAND], 'ring2', 'warrior', 20, null, worn, {}, [])).toBe(
+      'equip',
+    );
+    expect(
+      paperdollDropAction(ITEMS[MW_BAND], 'ring2', 'warrior', 20, null, worn, {}, [
+        plainUnit,
+        legendaryUnit,
+      ]),
+    ).toBe('blockedMasterwroughtLegendary');
+    // The same two units the other way round: the legendary one is no longer
+    // the copy an equip would lift, so the drop is legal again. This is the
+    // assertion that fails if the mirror ever reads "any matching unit".
+    expect(
+      paperdollDropAction(ITEMS[MW_BAND], 'ring2', 'warrior', 20, null, worn, {}, [
+        legendaryUnit,
+        plainUnit,
+      ]),
+    ).toBe('equip');
+  });
+
+  it('agrees with the sim on a refused third piece (the authority check)', () => {
+    const sim = new Sim({ seed: 11, playerClass: 'warrior', noPlayer: true }) as Sim &
+      Record<string, any>;
+    const pid = sim.addPlayer('warrior', 'Smith');
+    sim.setPlayerLevel(20, pid);
+    sim.addItem(MW_BAND, 2, pid);
+    sim.addItem(MW_TORC, 1, pid);
+    sim.equipItemToSlot(MW_BAND, 'ring1', pid);
+    sim.equipItemToSlot(MW_TORC, 'neck', pid);
+    const equipment = equipmentOf(sim, pid);
+    expect(equipment.ring1).toBe(MW_BAND);
+    expect(equipment.neck).toBe(MW_TORC);
+    expect(paperdollDropAction(ITEMS[MW_BAND], 'ring2', 'warrior', 20, null, equipment)).toBe(
+      'blockedMasterwroughtCap',
+    );
+    const ring2Before = equipmentOf(sim, pid).ring2;
+    sim.equipItemToSlot(MW_BAND, 'ring2', pid);
+    expect(equipmentOf(sim, pid).ring2).toBeUndefined();
+    expect(equipmentOf(sim, pid).ring2).toBe(ring2Before);
+  });
+
+  it('agrees with the sim when only the highest-index bag copy is legendary', () => {
+    // The case the mirror could only get right by predicting the consumed unit:
+    // the bags hold two copies of ONE flagged id and only the top one rolled
+    // legendary, so the equip is refused even though the player may well have
+    // dragged the plain copy. Both sides must reach that same verdict.
+    const sim = new Sim({ seed: 12, playerClass: 'warrior', noPlayer: true }) as Sim &
+      Record<string, any>;
+    const pid = sim.addPlayer('warrior', 'Ward');
+    sim.setPlayerLevel(20, pid);
+    sim.addItem(MW_SIGNET, 1, pid);
+    sim.equipItemToSlot(MW_SIGNET, 'ring1', pid);
+    expect(equipmentOf(sim, pid).ring1).toBe(MW_SIGNET);
+    // Pushed rather than added, because addItem would fold both units into one
+    // stack and the point here is two units with different payloads.
+    const meta = sim.players.get(pid)!;
+    meta.inventory.push({ itemId: MW_BAND, count: 1 });
+    meta.inventory.push({
+      itemId: MW_BAND,
+      count: 1,
+      instance: { rolled: { quality: 'legendary' } },
+    });
+    expect(
+      paperdollDropAction(
+        ITEMS[MW_BAND],
+        'ring2',
+        'warrior',
+        20,
+        null,
+        equipmentOf(sim, pid),
+        meta.equipmentInstance,
+        meta.inventory,
+      ),
+    ).toBe('blockedMasterwroughtLegendary');
+    sim.equipItemToSlot(MW_BAND, 'ring2', pid);
+    expect(equipmentOf(sim, pid).ring2).toBeUndefined();
+    const refusals: string[] = [];
+    for (const ev of sim.tick()) if (ev.type === 'error') refusals.push(ev.text);
+    expect(refusals).toContain('You can only equip one legendary Masterwrought item.');
   });
 });
 
