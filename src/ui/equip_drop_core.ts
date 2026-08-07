@@ -93,7 +93,7 @@ export function paperdollDropAction(
       (id) => ITEMS[id],
       ignore,
       instances,
-      inventory ? equipCandidateQuality(inventory, item.id, item) : undefined,
+      item.masterwrought && inventory ? equipCandidateQuality(inventory, item.id, item) : undefined,
     );
     if (mw) {
       return mw.reason === 'cap' ? 'blockedMasterwroughtCap' : 'blockedMasterwroughtLegendary';
