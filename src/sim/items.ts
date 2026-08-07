@@ -455,10 +455,11 @@ export function equipItem(
     def.masterwrought ? equipCandidateQuality(meta.inventory, itemId, def) : undefined,
   );
   if (masterwroughtConflict) {
-    // Two plain calls, each on ONE physical line: the S3 drift-guard regexes
-    // cannot span a line break, so an emit that biome wraps past 100 columns
-    // (as a shared ternary argument here would) is invisible to the guard.
-    // Keep each literal short enough to never wrap, or the guard goes blind.
+    // Two plain calls, each on ONE physical line: once biome wraps a call it
+    // also adds a trailing comma, which the S3 drift-guard's closing-paren
+    // anchor on this emit form does not match, and the guard's ternary form
+    // cannot span lines at all. Keep each literal short enough to never wrap,
+    // or the guard goes blind to it.
     if (masterwroughtConflict.reason === 'legendary') {
       ctx.error(meta.entityId, 'You can only equip one legendary Masterwrought item.');
     } else {
