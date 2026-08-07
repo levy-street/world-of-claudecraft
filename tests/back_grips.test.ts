@@ -1,6 +1,5 @@
 // src/render/characters/back_grips.ts: the pure on-back transform table for
 // sheathed weapons (family dispatch, side mirroring, unknown-family fallback).
-import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
   BACK_GRIP_FAMILIES,
@@ -8,6 +7,10 @@ import {
   quatFromEulerXYZ,
 } from '../src/render/characters/back_grips';
 import { KAYKIT_SHIELD_ACCESSORIES } from '../src/render/characters/held_item_grips';
+import {
+  KAYKIT_WEAPON_ACCESSORY,
+  VARIANT_GRIPS,
+} from '../src/render/characters/prop_placement_core';
 
 function quatLength(q: [number, number, number, number]): number {
   return Math.hypot(q[0], q[1], q[2], q[3]);
@@ -92,9 +95,6 @@ describe('backGripFor', () => {
   });
 });
 
-// The asset tables (assets.ts) import three.js, so they cannot be imported in the
-// plain-Node env: scan the source instead. This is the guard that would have caught
-// the Season 1 Armory families (maces, wands, bows, crossbows) sheathing as swords.
 describe('ranged carries are not handed', () => {
   // A bow/crossbow lies FLAT across the shoulders (the VAR_BOW spec's own
   // comment), which reads the same whichever hand drew it. The mirror exists so
@@ -153,45 +153,31 @@ describe('ranged carries are not handed', () => {
   });
 });
 
+// This is the guard that would have caught the Season 1 Armory families (maces, wands,
+// bows, crossbows) sheathing as swords.
+//
+// It used to REGEX the tables out of assets.ts, because that file imports three.js and
+// could not be loaded in the plain-Node env. The tables now live in the pure
+// `prop_placement_core`, so it reads the real objects. That closes a documented gap in
+// the old approach: `KAYKIT_WEAPON_ACCESSORY` spreads in `KAYKIT_SHIELD_ACCESSORIES`,
+// which produces no literal `key: 'Value'` pairs for a regex to see, so shield families
+// silently escaped this guard until the spread was merged back in by hand. Reading the
+// object cannot miss a spread.
 describe('every weapon grip family has a tuned on-back carry', () => {
-  const assetsSrc = readFileSync(
-    new URL('../src/render/characters/assets.ts', import.meta.url),
-    'utf8',
-  );
-
-  const variantFamilies = (): string[] => {
-    const table = assetsSrc.match(/const VARIANT_GRIPS[^{]*\{([\s\S]*?)\n\};/);
-    expect(table, 'VARIANT_GRIPS table not found in assets.ts').toBeTruthy();
-    return [...(table as RegExpMatchArray)[1].matchAll(/^\s*([A-Za-z0-9_']+):/gm)].map((m) =>
-      m[1].replace(/'/g, ''),
-    );
-  };
-
-  // KAYKIT_WEAPON_ACCESSORY also spreads in KAYKIT_SHIELD_ACCESSORIES from
-  // held_item_grips.ts (`...KAYKIT_SHIELD_ACCESSORIES,`), which a source-text
-  // regex over assets.ts alone cannot see: it produced no literal `key: 'Value'`
-  // pairs, so shield families silently escaped this guard (the exact gap that
-  // let Round_Shield/Rectangle_Shield/Badge_Shield sheathe with the sword pose
-  // instead of a tuned carry). Merge the spread module's own values in directly.
-  const accessoryFamilies = (): string[] => {
-    const table = assetsSrc.match(/const KAYKIT_WEAPON_ACCESSORY[^{]*\{([\s\S]*?)\n\};/);
-    expect(table, 'KAYKIT_WEAPON_ACCESSORY table not found in assets.ts').toBeTruthy();
-    const literal = [...(table as RegExpMatchArray)[1].matchAll(/:\s*'([A-Za-z0-9_]+)'/g)].map(
-      (m) => m[1],
-    );
-    return [...literal, ...Object.values(KAYKIT_SHIELD_ACCESSORIES)];
-  };
-
   it('covers every VARIANT_GRIPS family (the weapon-skin variant packs)', () => {
-    const families = variantFamilies();
+    const families = Object.keys(VARIANT_GRIPS);
     expect(families.length).toBeGreaterThan(5);
     const missing = families.filter((f) => !BACK_GRIP_FAMILIES.has(f));
     expect(missing, `variant families with no BACK_GRIPS carry: ${missing.join(', ')}`).toEqual([]);
   });
 
   it('covers every family a held item model resolves to', () => {
-    const families = [...new Set(accessoryFamilies())];
+    const families = [...new Set(Object.values(KAYKIT_WEAPON_ACCESSORY))];
     expect(families.length).toBeGreaterThan(5);
+    // The spread is really in there: a regex over the source text could not see it.
+    for (const shield of Object.values(KAYKIT_SHIELD_ACCESSORIES)) {
+      expect(families, 'shield families must reach this guard').toContain(shield);
+    }
     const missing = families.filter((f) => !BACK_GRIP_FAMILIES.has(f));
     expect(missing, `item families with no BACK_GRIPS carry: ${missing.join(', ')}`).toEqual([]);
   });

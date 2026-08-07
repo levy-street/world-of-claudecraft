@@ -83,7 +83,7 @@ describe('weapon families', () => {
   it('matches the engine VARIANT_GRIPS maxHeight clamp per grip family (drift check)', () => {
     // Parse the engine source rather than importing it: the pipeline numbers are
     // MEASUREMENTS of that file's convention, so drift must fail this test.
-    const src = readFileSync(join(ROOT, 'src/render/characters/assets.ts'), 'utf8');
+    const src = readFileSync(join(ROOT, 'src/render/characters/prop_placement_core.ts'), 'utf8');
     const block = src.match(/const VARIANT_GRIPS[^=]*=\s*\{([\s\S]*?)\n\};/);
     expect(block, 'VARIANT_GRIPS block in assets.ts').not.toBeNull();
     const engine: Record<string, number> = {};
@@ -207,7 +207,7 @@ describe('anchored registry edits', () => {
         file: 'src/ui/weapon_variants.ts',
         anchor: 'export const ITEM_WEAPON_VARIANTS: Record<string, string> = {',
       },
-      { file: 'src/render/characters/assets.ts', anchor: OBJ_ANCHOR },
+      { file: 'src/render/characters/prop_placement_core.ts', anchor: OBJ_ANCHOR },
     ];
     const dummy = "  __asset_pipeline_test__: 'VAR_TEST',\n";
     for (const { file, anchor } of cases) {
@@ -758,7 +758,7 @@ describe('asset library registry parsers', () => {
 
   it('parses KAYKIT_WEAPON_ACCESSORY into weaponKey -> grip family', async () => {
     const library = await libraryImport;
-    const src = readFileSync(join(ROOT, 'src/render/characters/assets.ts'), 'utf8');
+    const src = readFileSync(join(ROOT, 'src/render/characters/prop_placement_core.ts'), 'utf8');
     const map = library.parseAccessoryMap(src);
     expect(map.get('sword_a')).toBe('VAR_SWORD');
     expect(map.get('sword_1handed')).toBe('1H_Sword');
