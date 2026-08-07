@@ -125,64 +125,78 @@ describe('auto_attack meleeSwing: the white-hit table', () => {
     );
   });
 
-  it('slow one-hand auto attacks hit harder per swing than fast one-hand attacks at the same weapon damage budget', () => {
-    const hitWithSpeed = (speed: number): number => {
-      const { sim, p } = makeSim('warrior', 12);
-      const mob = spawnDummy(sim, p, 1);
-      p.attackPower = 0;
-      p.critChance = 0;
-      mob.stats = { ...mob.stats, armor: 0 };
-      sim.rng.next = () => 0.9; // clears miss/dodge/parry/block and crit; fixed weapon roll
-      const events = capture(sim);
+  // WEAPON DAMAGE CONTRACT (see the header comment on autoAttackWeaponDamageMult).
+  // `weapon.min/max` is RAW per-swing damage at the weapon's real speed, with the
+  // two-hand premium already folded in by itemization, so a weapon's power level is
+  // `avg / speed`. The swing path must pass that roll through untouched: re-deriving
+  // it from speed (or re-applying TWOHAND_DPS_MULT) double-counts what the item author
+  // already wrote and silently rebudgets every slow weapon in the game.
+  const swingRoll = (
+    weapon: { min: number; max: number; speed: number },
+    autoAttackHand?: 'mainhand' | 'offhand',
+  ): number => {
+    const { sim, p } = makeSim('warrior', 12);
+    const mob = spawnDummy(sim, p, 1);
+    p.attackPower = 0; // isolate the WEAPON term; AP is a separate, speed-normalized term
+    p.critChance = 0;
+    mob.stats = { ...mob.stats, armor: 0 };
+    sim.rng.next = () => 0.9; // clears miss/dodge/parry/block and crit; fixed weapon roll
+    const events = capture(sim);
 
-      const connected = meleeSwing(sim.ctx, p, mob, 0, null, {
-        cannotBeDodged: true,
-        weapon: { min: 20, max: 20, speed },
-        autoAttackHand: 'onehand',
-      });
+    const connected = meleeSwing(sim.ctx, p, mob, 0, null, {
+      cannotBeDodged: true,
+      weapon,
+      autoAttackHand,
+    });
 
-      expect(connected).toBe(true);
-      const hit = events.find(
-        (e): e is DamageEvent => isDamageEvent(e) && e.kind === 'hit' && e.sourceId === p.id,
-      );
-      expect(hit?.amount).toBeGreaterThan(0);
-      return hit?.amount ?? 0;
-    };
+    expect(connected).toBe(true);
+    const hit = events.find(
+      (e): e is DamageEvent => isDamageEvent(e) && e.kind === 'hit' && e.sourceId === p.id,
+    );
+    expect(hit?.amount).toBeGreaterThan(0);
+    return hit?.amount ?? 0;
+  };
 
-    const fast = hitWithSpeed(1);
-    const slow = hitWithSpeed(3);
-    expect(slow).toBeGreaterThan(fast);
-    expect({ fast, slow }).toEqual({ fast: 10, slow: 30 });
+  it('an auto attack deals the weapon roll as authored, never re-scaled by swing speed', () => {
+    // Same authored roll at three speeds: the per-swing damage must not move, because
+    // the slow weapon's bigger hit is expressed by the author writing a bigger min/max.
+    const fast = swingRoll({ min: 20, max: 20, speed: 1.7 }, 'mainhand');
+    const base = swingRoll({ min: 20, max: 20, speed: 2 }, 'mainhand');
+    const slow = swingRoll({ min: 20, max: 20, speed: 3.4 }, 'mainhand');
+    expect({ fast, base, slow }).toEqual({ fast: 20, base: 20, slow: 20 });
   });
 
-  it('a comparable two-hand auto attack hits harder per swing than a one-hand auto attack', () => {
-    const hitWithHand = (autoAttackHand: 'onehand' | 'twohand'): number => {
-      const { sim, p } = makeSim('warrior', 12);
-      const mob = spawnDummy(sim, p, 1);
-      p.attackPower = 0;
-      p.critChance = 0;
-      mob.stats = { ...mob.stats, armor: 0 };
-      sim.rng.next = () => 0.9; // clears miss/dodge/parry/block and crit; fixed weapon roll
-      const events = capture(sim);
+  it('two weapons authored at the same dps deliver the same white dps at any speed', () => {
+    // The decisive budget-neutrality check. Three weapons all authored at 20.0 dps
+    // (avg / speed; the rolls are whole numbers at every speed so swing rounding
+    // cannot mask a regression). Per-swing damage differs, but damage-per-second must
+    // not: before this fix the same three delivered 17.0 / 20.0 / 34.0 dps.
+    const dpsOf = (min: number, max: number, speed: number): number =>
+      swingRoll({ min, max, speed }, 'mainhand') / speed;
+    expect(dpsOf(34, 34, 1.7)).toBeCloseTo(20, 5);
+    expect(dpsOf(40, 40, 2)).toBeCloseTo(20, 5);
+    expect(dpsOf(68, 68, 3.4)).toBeCloseTo(20, 5);
+  });
 
-      const connected = meleeSwing(sim.ctx, p, mob, 0, null, {
-        cannotBeDodged: true,
-        weapon: { min: 20, max: 20, speed: 2 },
-        autoAttackHand,
-      });
+  it('a two-hander does not re-apply the itemization two-hand premium at swing time', () => {
+    // TWOHAND_DPS_MULT is an ITEMIZATION constant: heroic_loot.ts already bakes it into
+    // the authored min/max (weaponDpsBudget(33) = 16.6 x TWOHAND_DPS_MULT -> 19.1 dps).
+    // Importing it into the swing path applied it a second time.
+    const twoHanderRoll = swingRoll({ min: 52, max: 78, speed: 3.4 }, 'mainhand');
+    // rng 0.9 over [52, 78] lands at 75; a re-applied 1.15 premium would read 86.
+    expect(twoHanderRoll).toBe(75);
+  });
 
-      expect(connected).toBe(true);
-      const hit = events.find(
-        (e): e is DamageEvent => isDamageEvent(e) && e.kind === 'hit' && e.sourceId === p.id,
-      );
-      expect(hit?.amount).toBeGreaterThan(0);
-      return hit?.amount ?? 0;
-    };
+  it('an offhand auto attack deals half the weapon roll, the one real swing-time cut', () => {
+    const main = swingRoll({ min: 20, max: 20, speed: 2 }, 'mainhand');
+    const off = swingRoll({ min: 20, max: 20, speed: 2 }, 'offhand');
+    expect({ main, off }).toEqual({ main: 20, off: 10 });
+  });
 
-    const oneHand = hitWithHand('onehand');
-    const twoHand = hitWithHand('twohand');
-    expect(twoHand).toBeGreaterThan(oneHand);
-    expect({ oneHand, twoHand }).toEqual({ oneHand: 20, twoHand: 23 });
+  it('an ability weaponStrike (no autoAttackHand) is untouched by the offhand cut', () => {
+    // Abilities resolve through the same shell but pass no hand, so they must read the
+    // raw roll: the fix is scoped to white auto-attacks only.
+    expect(swingRoll({ min: 20, max: 20, speed: 3.4 })).toBe(20);
   });
 
   it('a 100% blind forces a miss: returns false, emits a miss, deals no damage', () => {
