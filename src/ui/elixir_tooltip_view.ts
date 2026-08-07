@@ -46,3 +46,5 @@ export function elixirTooltipLines(item: ItemDef): string {
       });
   return `<div class="tt-desc">${esc(text)}</div>`;
 }
+
+// Queue drill scratch marker: makes this a code PR so the shard matrix expands.
