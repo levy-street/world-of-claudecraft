@@ -5,6 +5,7 @@
 // the extraction is provably behavior-preserving, and so the precedence order cannot be
 // reshuffled by accident later: every branch below is a case that used to be answered by
 // a different surface differently.
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
   isHandslotBone,
@@ -12,6 +13,30 @@ import {
   type PropTransform,
   resolvePropPlacement,
 } from '../src/render/characters/prop_placement_core';
+
+describe('the shared mount stays cheap enough for the Guide to import', () => {
+  // The /wiki viewer is a LAZY chunk that deliberately loads one model on demand instead
+  // of the renderer's ~23 MB boot preload. `characters/assets.ts` kicks that preload off
+  // at MODULE IMPORT via registerPreload, so if `prop_mount` ever reaches it (directly or
+  // through the core), merely opening a wiki page starts fetching every character and
+  // weapon GLB in the game. That is the failure this pins, and it would not show up in
+  // any behavior test.
+  const ALLOWED = new Set([
+    'three',
+    './back_grips',
+    './held_item_grips',
+    './prop_placement_core',
+    './weapon_grip',
+  ]);
+
+  it.each(['prop_mount.ts', 'prop_placement_core.ts'])('%s imports nothing heavy', (file) => {
+    const src = readFileSync(new URL(`../src/render/characters/${file}`, import.meta.url), 'utf8');
+    const specs = [...src.matchAll(/from\s+'([^']+)'/g)].map((m) => m[1]);
+    expect(specs.length, 'vacuity floor: the file really does import things').toBeGreaterThan(0);
+    const forbidden = specs.filter((s) => !ALLOWED.has(s));
+    expect(forbidden, `only leaf, preload-free modules may be imported: ${forbidden}`).toEqual([]);
+  });
+});
 
 const RIGHT = 'handslot.r';
 const LEFT = 'handslot.l';

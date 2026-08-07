@@ -1,9 +1,14 @@
 // Builds a display-ready Three.js model for the Guide's interactive viewer from a baked
 // GuideModelSpec (mirrored from the renderer's VisualDef manifest by the content
 // generator). It reuses the renderer's pure GLB loader (loadGltf) so the Guide loads
-// exactly ONE model on demand instead of the renderer's full ~23 MB boot preload, and
-// mirrors the renderer's assembleModel logic (accessory allowlist, weapon attachments,
-// orientation fixups, subtle tint) so a figure here looks like it does in game.
+// exactly ONE model on demand instead of the renderer's full ~23 MB boot preload.
+//
+// Held props are mounted through the renderer's own `prop_mount`, so where a weapon sits
+// is SHARED with the game rather than mirrored here. It used to be mirrored, badly, and
+// the two silently disagreed for every armed figure in the wiki. `prop_mount` pulls in
+// only three.js plus the pure placement core, never `characters/assets.ts`, so the boot
+// preload stays out of this lazy chunk. The rest (accessory allowlist, orientation
+// fixups, subtle tint) is still mirrored, and still has to be kept honest by hand.
 //
 // This file is only ever reached through the lazy viewer chunk (scene.ts dynamically
 // imports it), so its three.js + loader cost never lands in the main Guide bundle.
@@ -11,6 +16,7 @@
 import * as THREE from 'three';
 import { clone as cloneSkinned } from 'three/addons/utils/SkeletonUtils.js';
 import { loadGltf } from '../../render/assets/loader';
+import { mountProp } from '../../render/characters/prop_mount';
 import type { GuideModelSpec } from '../content.generated';
 
 export interface BuiltModel {
@@ -108,23 +114,18 @@ export async function buildModel(spec: GuideModelSpec, tint: number | null): Pro
     });
   }
 
-  // Weapons and held props: load each, bind to its hand bone, copy any grip reference.
+  // Weapons and held props go on through the renderer's OWN mount, so the Guide cannot
+  // place a weapon differently from the game. It used to hand-roll this, implementing
+  // only `gripRef` and `position`: no flatten, no variant-pack family grip, no
+  // KAYKIT_HAND_GRIPS. A warrior's sword therefore sat at the bone origin at native
+  // scale here, half a yard down the arm and 180 degrees around from where the game puts
+  // it, in the live turntable AND in every committed still. Never re-derive a placement
+  // in this file; `mountProp` is the seam.
   for (const att of spec.attach ?? []) {
     const bone = findBone(model, att.bone);
     if (!bone) continue; // manifest/bone mismatch, ship without the prop
     const propGltf = await loadGltf(att.url);
-    const prop = cloneSkinned(propGltf.scene);
-    if (att.gripRef) {
-      const grip = findBone(model, att.gripRef);
-      if (grip) {
-        prop.position.copy(grip.position);
-        prop.quaternion.copy(grip.quaternion);
-        prop.scale.copy(grip.scale);
-      }
-    }
-    if (att.position) prop.position.set(att.position[0], att.position[1], att.position[2]);
-    if (att.rotationY) prop.rotation.y = att.rotationY;
-    bone.add(prop);
+    mountProp({ root: model, bone, scene: cloneSkinned(propGltf.scene), att });
   }
 
   // In-place orientation fixups for weapon/prop nodes baked into a GLB at the wrong angle.
