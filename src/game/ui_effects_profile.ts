@@ -164,3 +164,5 @@ export function uiEffectsTokens(profile: UiEffectsProfile): Record<string, strin
 export function uiEffectsAllowFctCrit(fxLevel: string | null | undefined): boolean {
   return fxLevel !== 'low';
 }
+
+// Queue drill scratch marker: makes this a code PR so the shard matrix expands.
