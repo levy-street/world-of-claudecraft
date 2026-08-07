@@ -83,7 +83,10 @@ export function paperdollDropAction(
     // The Masterwrought counted family, over the same exempt slots. The
     // incoming copy's effective quality comes from the sim's own unit-selection
     // rule run over the mirrored bags, so the mirror and the equip path read
-    // the SAME unit and neither a false block nor a false green is possible.
+    // the SAME unit. Online, all three inputs ride one heavy self-snapshot
+    // block, so they are never internally inconsistent with each other, but
+    // the mirror as a whole can lag the authority by a snapshot: a verdict
+    // here is feedback, and the sim's own re-validation is what decides.
     const mw = masterwroughtConflictSlot(
       item,
       equipment,

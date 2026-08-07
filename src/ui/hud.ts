@@ -5614,9 +5614,7 @@ export class Hud {
       // gold line, never the type seat, because a piece can carry both tags.
       if (item.masterwrought) {
         html += `<div class="tt-sub" style="color:var(--gold)">${esc(
-          t('hudChrome.itemMasterwrought', {
-            count: formatNumber(MASTERWROUGHT_EQUIP_CAP, { maximumFractionDigits: 0 }),
-          }),
+          t('hudChrome.itemMasterwrought', { count: itemNumber(MASTERWROUGHT_EQUIP_CAP) }),
         )}</div>`;
       }
     }
