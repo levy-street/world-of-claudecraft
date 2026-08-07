@@ -8761,6 +8761,10 @@ export const cs_CZ: EnTranslations = {
         "name": "Smrt s mečem v ruce",
         "description": "Obranná schopnost: po dobu 8 s utrpíš o 30 % méně poškození a vyhneš se mnohem více útokům."
       },
+      "intervene": {
+        "name": "Intervene",
+        "description": "Rush to a friendly player, shielding them from {damage} damage for 6 sec. Usable from 8 to 25 yards."
+      },
       "recklessness": {
         "name": "Bezhlavost",
         "description": "Rozzuření: tvoje generování vzteku se zvýší o 50 % a šance na kritický zásah o 20 % na 12 s."

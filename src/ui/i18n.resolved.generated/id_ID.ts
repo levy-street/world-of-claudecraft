@@ -8761,6 +8761,10 @@ export const id_ID: EnTranslations = {
         "name": "Mati oleh Pedang",
         "description": "Kemampuan bertahan: selama 8 detik kamu menerima 30% lebih sedikit kerusakan dan mengelak jauh lebih banyak serangan."
       },
+      "intervene": {
+        "name": "Intervene",
+        "description": "Rush to a friendly player, shielding them from {damage} damage for 6 sec. Usable from 8 to 25 yards."
+      },
       "recklessness": {
         "name": "Kenekatan",
         "description": "Mengamuk: penghasilan amarahmu meningkat sebesar 50% dan peluang serangan kritismu sebesar 20% selama 12 detik."

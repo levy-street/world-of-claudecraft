@@ -1,0 +1,161 @@
+// Intervene: the level-5 warrior mobility row's peel option, which replaced Double
+// Charge in place (the option id `war_row_double_charge` is FROZEN so saved picks
+// survive the content swap).
+//
+// Double Charge stored a second Onrush use, and because charges recharge in PARALLEL
+// here (combat/casting_lifecycle.ts arms one timer per spend), the second use returned
+// on the same 15 sec as the first: two 25-yard gap closers plus two 1 sec stuns per
+// cooldown, which made it the dominant warrior PvP pick.
+//
+// Intervene reuses the `charge` effect against a FRIENDLY target instead, so it adds
+// mobility and a peel without adding pressure. The two behaviors that must hold, and
+// that this file pins, are that the friendly rush mints NO rage and never flags the
+// caster into combat, and that the hostile Onrush is completely unchanged.
+
+import { describe, expect, it } from 'vitest';
+import { abilitiesKnownAt } from '../src/sim/content/classes';
+import { MOBS } from '../src/sim/data';
+import { createMob } from '../src/sim/entity';
+import { Sim } from '../src/sim/sim';
+import type { Entity, SimEvent } from '../src/sim/types';
+import { placePlayerInOpenField } from './helpers/open_field';
+
+const ROW_LEVEL = 5;
+const FROZEN_OPTION_ID = 'war_row_double_charge';
+
+function warriorAt(level: number, spec: string): { sim: Sim; p: Entity } {
+  const sim = new Sim({ seed: 11, playerClass: 'warrior', autoEquip: true });
+  sim.setPlayerLevel(level);
+  expect(sim.setSpec(spec)).toBe(true);
+  sim.tick();
+  expect(sim.selectTalentRow(ROW_LEVEL, FROZEN_OPTION_ID)).toBe(true);
+  placePlayerInOpenField(sim);
+  const p = sim.entities.get(sim.playerId);
+  if (!p) throw new Error('no player');
+  return { sim, p };
+}
+
+/** An ally `dist` yards away on the open-field lane, in line of sight. */
+function allyAt(sim: Sim, dist: number): Entity {
+  const pid = sim.addPlayer('priest', 'Ally');
+  placePlayerInOpenField(sim, pid, { z: dist });
+  const ally = sim.entities.get(pid);
+  if (!ally) throw new Error('no ally');
+  return ally;
+}
+
+function captureErrors(sim: Sim): string[] {
+  const out: string[] = [];
+  const inner = sim as unknown as { emit: (e: SimEvent) => void };
+  const original = inner.emit.bind(sim);
+  inner.emit = (e: SimEvent) => {
+    if (e.type === 'error') out.push(e.text);
+    original(e);
+  };
+  return out;
+}
+
+const gap = (a: Entity, b: Entity): number => Math.hypot(a.pos.x - b.pos.x, a.pos.z - b.pos.z);
+
+describe('Intervene (level-5 warrior mobility row)', () => {
+  it('is granted to EVERY warrior spec, not just one', () => {
+    // Grants bypass the level and spec gates in abilitiesKnownAt, and the ability
+    // carries no `specs` list, so a class row must reach all three specs. A spec-gated
+    // ability here would silently do nothing for the specs left out.
+    for (const spec of ['arms', 'fury', 'prot']) {
+      const { sim, p } = warriorAt(20, spec);
+      const meta = sim.players.get(p.id);
+      if (!meta) throw new Error('no meta');
+      const known = abilitiesKnownAt('warrior', 20, meta.talentMods);
+      expect(
+        known.some((a) => a.def.id === 'intervene'),
+        `${spec} knows Intervene`,
+      ).toBe(true);
+    }
+  });
+
+  it('rushes the caster to a friendly player and shields them', () => {
+    const { sim, p } = warriorAt(20, 'fury');
+    const ally = allyAt(sim, 15);
+    sim.tick();
+    const before = gap(p, ally);
+    expect(before).toBeCloseTo(15, 0);
+
+    sim.targetEntity(ally.id);
+    const errors = captureErrors(sim);
+    sim.castAbility('intervene');
+    for (let i = 0; i < 80; i++) sim.tick();
+
+    expect(gap(p, ally)).toBeLessThan(before);
+    expect(gap(p, ally)).toBeLessThanOrEqual(5);
+    const shield = ally.auras.find((a) => a.kind === 'absorb');
+    expect(shield?.name).toBe('Intervene');
+    // Rank 3 at level 20; the ranks track ~6-7% of the health curve across the band.
+    expect(shield?.value).toBe(50);
+    expect(errors).toEqual([]);
+  });
+
+  it('mints no rage and never flags the caster into combat', () => {
+    const { sim, p } = warriorAt(20, 'fury');
+    const ally = allyAt(sim, 15);
+    sim.tick();
+    p.resource = 0;
+    p.inCombat = false;
+    p.autoAttack = false;
+
+    sim.targetEntity(ally.id);
+    sim.castAbility('intervene');
+    for (let i = 0; i < 80; i++) sim.tick();
+
+    expect(p.resource).toBe(0);
+    expect(p.inCombat).toBe(false);
+    // Landing on an ally must not engage auto-attack: startAutoAttack would refuse a
+    // friendly target and toast "Invalid attack target." on every Intervene.
+    expect(p.autoAttack).toBe(false);
+  });
+
+  it('scales its shield by rank across the level band it is usable in', () => {
+    const shieldAt = (level: number): number => {
+      const { sim, p } = warriorAt(level, 'fury');
+      const meta = sim.players.get(p.id);
+      if (!meta) throw new Error('no meta');
+      const known = abilitiesKnownAt('warrior', level, meta.talentMods);
+      const iv = known.find((a) => a.def.id === 'intervene');
+      const absorb = iv?.effects.find((e) => e.type === 'absorb');
+      return absorb && absorb.type === 'absorb' ? absorb.amount : -1;
+    };
+    // A flat value tuned for the cap would be roughly three times as strong at level 5,
+    // where a warrior has 252 max health against 822 at level 20.
+    expect({ l5: shieldAt(5), l11: shieldAt(11), l17: shieldAt(17), l20: shieldAt(20) }).toEqual({
+      l5: 18,
+      l11: 34,
+      l17: 50,
+      l20: 50,
+    });
+  });
+
+  it('leaves the hostile Onrush completely unchanged', () => {
+    // The friendly branch is gated on target hostility, not on the ability id, so this
+    // is the regression guard for every warrior who never picks the row.
+    const { sim, p } = warriorAt(20, 'fury');
+    p.resource = 0;
+    p.inCombat = false;
+    p.autoAttack = false;
+    const mob = createMob(9002, MOBS.training_dummy, 20, {
+      x: p.pos.x,
+      y: p.pos.y,
+      z: p.pos.z + 15,
+    });
+    mob.hostile = true;
+    sim.addEntity(mob);
+    sim.targetEntity(mob.id);
+
+    sim.castAbility('charge');
+    for (let i = 0; i < 60; i++) sim.tick();
+
+    expect(p.resource).toBeGreaterThan(0); // Onrush still mints its 9 rage
+    expect(p.inCombat).toBe(true);
+    expect(p.autoAttack).toBe(true); // and still engages on arrival
+    expect(mob.auras.some((a) => a.kind === 'absorb')).toBe(false); // never shields an enemy
+  });
+});

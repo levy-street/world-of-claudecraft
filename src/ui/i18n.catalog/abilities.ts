@@ -1580,6 +1580,11 @@ const classAbilityNamesEn = {
         'Defensive cooldown: for 8 sec you take 30% less damage and dodge far more attacks.',
       ],
       [
+        'intervene',
+        'Intervene',
+        'Rush to a friendly player, shielding them from {damage} damage for 6 sec. Usable from 8 to 25 yards.',
+      ],
+      [
         'recklessness',
         'Recklessness',
         'Enrage: your rage generation increases by 50% and your critical strike chance by 20% for 12 sec.',

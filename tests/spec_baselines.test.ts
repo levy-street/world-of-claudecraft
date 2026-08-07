@@ -346,7 +346,11 @@ describe('v0.28 passive restoration hotfix', () => {
     );
 
     expect(withChoice.stats).toEqual(specOnly.stats);
-    expect(withChoice.abilities.charge?.bonusCharges).toBe(1);
+    // The level-5 row's frozen first option grants Intervene (was Double Charge); the
+    // point of the assertion is that the row layer lands WITHOUT disturbing the spec
+    // layer's stats above, not which effect kind the row happens to use.
+    expect(withChoice.grants.some((g) => g.ability === 'intervene')).toBe(true);
+    expect(specOnly.grants.some((g) => g.ability === 'intervene')).toBe(false);
   });
 
   it('keeps a restored baseline intact when a choice row is added', () => {

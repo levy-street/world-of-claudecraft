@@ -8761,6 +8761,10 @@ export const fr_FR: EnTranslations = {
         "name": "Périr par l'épée",
         "description": "Recours défensif : pendant 8 s, vous subissez 30% de dégâts en moins et esquivez bien plus d'attaques."
       },
+      "intervene": {
+        "name": "Intervene",
+        "description": "Rush to a friendly player, shielding them from {damage} damage for 6 sec. Usable from 8 to 25 yards."
+      },
       "recklessness": {
         "name": "Témérité",
         "description": "Enrage : votre génération de rage augmente de 50% et vos chances de coup critique de 20% pendant 12 s."

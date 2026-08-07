@@ -8761,6 +8761,10 @@ export const en: EnTranslations = {
         "name": "Die by the Sword",
         "description": "Defensive cooldown: for 8 sec you take 30% less damage and dodge far more attacks."
       },
+      "intervene": {
+        "name": "Intervene",
+        "description": "Rush to a friendly player, shielding them from {damage} damage for 6 sec. Usable from 8 to 25 yards."
+      },
       "recklessness": {
         "name": "Recklessness",
         "description": "Enrage: your rage generation increases by 50% and your critical strike chance by 20% for 12 sec."

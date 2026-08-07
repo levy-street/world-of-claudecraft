@@ -1482,6 +1482,8 @@ export type TranslationKeyFlat =
   | 'entities.abilities.insect_swarm.name'
   | 'entities.abilities.instant_poison.description'
   | 'entities.abilities.instant_poison.name'
+  | 'entities.abilities.intervene.description'
+  | 'entities.abilities.intervene.name'
   | 'entities.abilities.intimidating_shout.description'
   | 'entities.abilities.intimidating_shout.name'
   | 'entities.abilities.iron_resolve.description'

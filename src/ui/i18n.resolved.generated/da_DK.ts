@@ -8761,6 +8761,10 @@ export const da_DK: EnTranslations = {
         "name": "Dø ved Sværdet",
         "description": "Defensiv nedkøling: i 8 sek tager du 30% mindre skade og undviger langt flere angreb."
       },
+      "intervene": {
+        "name": "Intervene",
+        "description": "Rush to a friendly player, shielding them from {damage} damage for 6 sec. Usable from 8 to 25 yards."
+      },
       "recklessness": {
         "name": "Dumdristighed",
         "description": "Gør dig Rasende: din raserigenerering øges med 50% og din chance for kritiske slag med 20% i 12 sek."

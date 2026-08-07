@@ -2723,6 +2723,11 @@ export function runEffects(
         p.chargeTargetId = target.id;
         p.chargeTimeLeft = CHARGE_MAX_DURATION;
         p.chargePath = ctx.findChargePath(p, target);
+        // A rush to a FRIENDLY target (Intervene) is pure repositioning: it mints no
+        // rage and never flags the caster into combat. Only the hostile Onrush does,
+        // and it is gated on hostility rather than on the ability id so any future
+        // friendly rush inherits the same rule.
+        if (ctx.isFriendlyTo(p, target)) break;
         if (p.resourceType === 'rage') {
           const amount = meta.cls === 'warrior' ? 9 * warriorAbilityRageMult(ctx, p, meta) : 9;
           p.resource = Math.min(p.maxResource, p.resource + amount);

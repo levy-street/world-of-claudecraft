@@ -8761,6 +8761,10 @@ export const ko_KR: EnTranslations = {
         "name": "검의 승부",
         "description": "방어 재사용 기술입니다. 8초 동안 받는 피해가 30% 감소하고 훨씬 많은 공격을 회피합니다."
       },
+      "intervene": {
+        "name": "Intervene",
+        "description": "Rush to a friendly player, shielding them from {damage} damage for 6 sec. Usable from 8 to 25 yards."
+      },
       "recklessness": {
         "name": "무모함",
         "description": "격노: 12초 동안 분노 생성이 50%, 치명타 확률이 20% 증가합니다."

@@ -8761,6 +8761,10 @@ export const es_ES: EnTranslations = {
         "name": "Morir por la Espada",
         "description": "Recurso defensivo: durante 8 s recibes un 30% menos de daño y esquivas muchos más ataques."
       },
+      "intervene": {
+        "name": "Intervene",
+        "description": "Rush to a friendly player, shielding them from {damage} damage for 6 sec. Usable from 8 to 25 yards."
+      },
       "recklessness": {
         "name": "Temeridad",
         "description": "Te enfureces: tu generación de ira aumenta un 50% y tu probabilidad de golpe crítico un 20% durante 12 s."

@@ -370,7 +370,16 @@ describe('missing painted ability integration', () => {
   it('makes every live ability image-backed while preserving all 19 modifier/talent ids', () => {
     const accepted = manifest();
     expect(accepted.targetSets.abilities).toHaveLength(90);
-    expect(Object.keys(ABILITIES).filter((id) => !ABILITY_IMAGE_IDS.has(id))).toEqual([]);
+    // Abilities added AFTER this wave ride their procedural recipe until art is
+    // commissioned, the same way ITEM_ART_PENDING carries the hunter quivers: the wave
+    // assertion means "this wave discharged its debt", not "no ability may ever be
+    // procedural again". Intervene (the level-5 warrior row's Double Charge
+    // replacement) is the only outstanding ability art commission. Drop it from this
+    // list when public/ui/skills/warrior/intervene.webp lands; the per-target loop
+    // below still fails on any WAVE id that regresses to procedural.
+    expect(Object.keys(ABILITIES).filter((id) => !ABILITY_IMAGE_IDS.has(id))).toEqual([
+      'intervene',
+    ]);
     expect(sorted([...ABILITY_IMAGE_IDS].filter((id) => !Object.hasOwn(ABILITIES, id)))).toEqual([
       ...PRESERVED_IMAGE_BACKED_MODIFIER_IDS,
     ]);

@@ -8761,6 +8761,10 @@ export const zh_CN: EnTranslations = {
         "name": "剑在人在",
         "description": "防御性冷却技能：持续 8 秒，你受到的伤害降低 30%，并大幅提高躲闪攻击的几率。"
       },
+      "intervene": {
+        "name": "Intervene",
+        "description": "Rush to a friendly player, shielding them from {damage} damage for 6 sec. Usable from 8 to 25 yards."
+      },
       "recklessness": {
         "name": "鲁莽",
         "description": "激怒：你的怒气产生提高 50%，暴击几率提高 20%，持续 12 秒。"

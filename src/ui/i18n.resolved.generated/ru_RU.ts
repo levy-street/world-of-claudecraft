@@ -8761,6 +8761,10 @@ export const ru_RU: EnTranslations = {
         "name": "Погибель от меча",
         "description": "Защитная способность: в течение 8 сек вы получаете на 30% меньше урона и уклоняетесь от гораздо большего числа атак."
       },
+      "intervene": {
+        "name": "Intervene",
+        "description": "Rush to a friendly player, shielding them from {damage} damage for 6 sec. Usable from 8 to 25 yards."
+      },
       "recklessness": {
         "name": "Безрассудство",
         "description": "Бешенство: создание вашей ярости повышается на 50%, а шанс критического удара на 20% в течение 12 сек."

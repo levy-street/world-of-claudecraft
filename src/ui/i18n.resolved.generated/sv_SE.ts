@@ -8761,6 +8761,10 @@ export const sv_SE: EnTranslations = {
         "name": "Dö för svärdet",
         "description": "Defensiv nedkylning: i 8 sek tar du 30 % mindre skada och väjer undan för långt fler attacker."
       },
+      "intervene": {
+        "name": "Intervene",
+        "description": "Rush to a friendly player, shielding them from {damage} damage for 6 sec. Usable from 8 to 25 yards."
+      },
       "recklessness": {
         "name": "Hänsynslöshet",
         "description": "Försätter dig i raseri: din raserigenerering ökar med 50 % och din kritiska träffchans med 20 % i 12 sek."

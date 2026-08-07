@@ -8761,6 +8761,10 @@ export const tr_TR: EnTranslations = {
         "name": "Kılıçla Ölüm",
         "description": "Savunma yeteneği: 8 sn boyunca %30 daha az hasar alır ve saldırıları çok daha sık savuşturursun."
       },
+      "intervene": {
+        "name": "Intervene",
+        "description": "Rush to a friendly player, shielding them from {damage} damage for 6 sec. Usable from 8 to 25 yards."
+      },
       "recklessness": {
         "name": "Pervasızlık",
         "description": "Gazaba gelirsin: öfke üretimin %50, kritik vuruş şansın %20 artar, 12 sn sürer."

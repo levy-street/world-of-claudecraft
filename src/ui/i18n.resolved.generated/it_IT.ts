@@ -8761,6 +8761,10 @@ export const it_IT: EnTranslations = {
         "name": "Morte per la Spada",
         "description": "Tempo di recupero difensivo: per 8 sec subisci il 30% di danni in meno e schivi molti più attacchi."
       },
+      "intervene": {
+        "name": "Intervene",
+        "description": "Rush to a friendly player, shielding them from {damage} damage for 6 sec. Usable from 8 to 25 yards."
+      },
       "recklessness": {
         "name": "Temerarietà",
         "description": "Ti infuri: la tua generazione di rabbia aumenta del 50% e la tua probabilità di colpo critico del 20% per 12 sec."

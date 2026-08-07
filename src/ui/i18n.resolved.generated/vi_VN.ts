@@ -8761,6 +8761,10 @@ export const vi_VN: EnTranslations = {
         "name": "Sống Chết Cùng Kiếm",
         "description": "Kỹ năng phòng thủ hồi chiêu dài: trong 8 giây bạn nhận ít hơn 30% sát thương và né được nhiều đòn tấn công hơn hẳn."
       },
+      "intervene": {
+        "name": "Intervene",
+        "description": "Rush to a friendly player, shielding them from {damage} damage for 6 sec. Usable from 8 to 25 yards."
+      },
       "recklessness": {
         "name": "Liều Lĩnh",
         "description": "Cuồng Hóa: lượng nộ khí bạn tạo ra tăng 50% và tỉ lệ chí mạng tăng 20% trong 12 giây."

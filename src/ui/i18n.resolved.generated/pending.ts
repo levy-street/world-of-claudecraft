@@ -10,54 +10,99 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "entities.abilities.intervene.description",
+    "entities.abilities.intervene.name",
     "hudChrome.arenaGate.minLevelNote"
   ],
   "es_ES": [
+    "entities.abilities.intervene.description",
+    "entities.abilities.intervene.name",
     "hudChrome.arenaGate.minLevelNote"
   ],
   "fr_FR": [
+    "entities.abilities.intervene.description",
+    "entities.abilities.intervene.name",
     "hudChrome.arenaGate.minLevelNote"
   ],
   "fr_CA": [
+    "entities.abilities.intervene.description",
+    "entities.abilities.intervene.name",
     "hudChrome.arenaGate.minLevelNote"
   ],
   "en_CA": [],
   "it_IT": [
+    "entities.abilities.intervene.description",
+    "entities.abilities.intervene.name",
     "hudChrome.arenaGate.minLevelNote"
   ],
   "de_DE": [
+    "entities.abilities.intervene.description",
+    "entities.abilities.intervene.name",
     "hudChrome.arenaGate.minLevelNote"
   ],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
+  "zh_CN": [
+    "entities.abilities.intervene.description",
+    "entities.abilities.intervene.name"
+  ],
+  "zh_TW": [
+    "entities.abilities.intervene.description",
+    "entities.abilities.intervene.name"
+  ],
+  "ko_KR": [
+    "entities.abilities.intervene.description",
+    "entities.abilities.intervene.name"
+  ],
+  "ja_JP": [
+    "entities.abilities.intervene.description",
+    "entities.abilities.intervene.name"
+  ],
   "pt_BR": [
+    "entities.abilities.intervene.description",
+    "entities.abilities.intervene.name",
     "hudChrome.arenaGate.minLevelNote"
   ],
-  "ru_RU": [],
+  "ru_RU": [
+    "entities.abilities.intervene.description",
+    "entities.abilities.intervene.name"
+  ],
   "cs_CZ": [
+    "entities.abilities.intervene.description",
+    "entities.abilities.intervene.name",
     "hudChrome.arenaGate.minLevelNote"
   ],
   "nl_NL": [
+    "entities.abilities.intervene.description",
+    "entities.abilities.intervene.name",
     "hudChrome.arenaGate.minLevelNote"
   ],
   "pl_PL": [
+    "entities.abilities.intervene.description",
+    "entities.abilities.intervene.name",
     "hudChrome.arenaGate.minLevelNote"
   ],
   "id_ID": [
+    "entities.abilities.intervene.description",
+    "entities.abilities.intervene.name",
     "hudChrome.arenaGate.minLevelNote"
   ],
   "tr_TR": [
+    "entities.abilities.intervene.description",
+    "entities.abilities.intervene.name",
     "hudChrome.arenaGate.minLevelNote"
   ],
   "sv_SE": [
+    "entities.abilities.intervene.description",
+    "entities.abilities.intervene.name",
     "hudChrome.arenaGate.minLevelNote"
   ],
   "vi_VN": [
+    "entities.abilities.intervene.description",
+    "entities.abilities.intervene.name",
     "hudChrome.arenaGate.minLevelNote"
   ],
   "da_DK": [
+    "entities.abilities.intervene.description",
+    "entities.abilities.intervene.name",
     "hudChrome.arenaGate.minLevelNote"
   ]
 };

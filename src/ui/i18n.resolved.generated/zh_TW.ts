@@ -8761,6 +8761,10 @@ export const zh_TW: EnTranslations = {
         "name": "劍在人在",
         "description": "防禦性冷卻技：持續 8 秒，你受到的傷害降低 30%，並大幅提高閃躲攻擊的機率。"
       },
+      "intervene": {
+        "name": "Intervene",
+        "description": "Rush to a friendly player, shielding them from {damage} damage for 6 sec. Usable from 8 to 25 yards."
+      },
       "recklessness": {
         "name": "魯莽",
         "description": "激怒：你的怒氣產生提高 50%，暴擊機率提高 20%，持續 12 秒。"

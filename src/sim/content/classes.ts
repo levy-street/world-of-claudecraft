@@ -5285,6 +5285,57 @@ export const ABILITIES: Record<string, AbilityDef> = {
     description:
       'Defensive cooldown: for 8 sec you take 30% less damage and dodge far more attacks.',
   },
+  // The level-5 mobility row's peel option (replaces Double Charge, which stored a
+  // second Onrush use and, under the parallel per-charge recharge model, handed PvP
+  // warriors two 25-yard gap closers plus two stuns per 15 sec).
+  //
+  // Deliberately NOT a second Onrush: it reuses the `charge` effect but targets a
+  // FRIENDLY player, so it adds mobility and a peel without adding pressure. The row
+  // job is mobility with no direct damage increase (docs/design/class-design-rules.md),
+  // and this carries no damage, no control, and no rage.
+  //
+  // No `specs` field: this ability is ONLY ever reached as a row grant, and grants
+  // bypass the level and spec gates in abilitiesKnownAt, so a `specs` list here would
+  // be dead weight rather than a restriction. (Contrast die_by_sword above, which
+  // carries specs:['arms'] because it is ALSO Arms base kit; its row grant still
+  // reaches every spec.)
+  //
+  // The shield is ranked rather than flat so it tracks the health curve at roughly 6-7%
+  // of maximum health across the band it is usable in (252 hp at level 5, 822 at 20); a
+  // flat value tuned for the cap would be three times as strong at level 5. It is well
+  // under a dedicated healer shield (Mercy's Aegis rank 4 absorbs 210) by design.
+  intervene: {
+    id: 'intervene',
+    name: 'Intervene',
+    class: 'warrior',
+    learnLevel: 5,
+    cost: 0,
+    castTime: 0,
+    cooldown: 15,
+    range: 25,
+    minRange: 8,
+    school: 'physical',
+    requiresTarget: true,
+    targetType: 'friendly',
+    offGcd: true,
+    effects: [{ type: 'charge' }, { type: 'absorb', amount: 18, duration: 6 }],
+    ranks: [
+      {
+        rank: 2,
+        level: 11,
+        cost: 0,
+        effects: [{ type: 'charge' }, { type: 'absorb', amount: 34, duration: 6 }],
+      },
+      {
+        rank: 3,
+        level: 17,
+        cost: 0,
+        effects: [{ type: 'charge' }, { type: 'absorb', amount: 50, duration: 6 }],
+      },
+    ],
+    description:
+      'Rush to a friendly player, shielding them from $d damage for 6 sec. Usable from 8 to 25 yards.',
+  },
   recklessness: {
     id: 'recklessness',
     name: 'Recklessness',

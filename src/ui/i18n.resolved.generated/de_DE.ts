@@ -8761,6 +8761,10 @@ export const de_DE: EnTranslations = {
         "name": "Tod durch das Schwert",
         "description": "Defensive Abklingzeit: 8 Sek. lang erleidet Ihr 30% weniger Schaden und weicht weit mehr Angriffen aus."
       },
+      "intervene": {
+        "name": "Intervene",
+        "description": "Rush to a friendly player, shielding them from {damage} damage for 6 sec. Usable from 8 to 25 yards."
+      },
       "recklessness": {
         "name": "Tollkühnheit",
         "description": "Wutausbruch: Eure Wuterzeugung erhöht sich 12 Sek. lang um 50% und Eure kritische Trefferchance um 20%."

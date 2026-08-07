@@ -6165,7 +6165,9 @@ export class Sim {
       p.chargeTargetId = null;
       p.chargePath = [];
       if (target) p.facing = steadyAngleTo(p.pos, target.pos, p.facing);
-      if (arrived) this.startAutoAttack(p.id);
+      // Landing on a FRIENDLY target (Intervene) must not engage auto-attack:
+      // startAutoAttack would refuse an ally and toast "Invalid attack target."
+      if (arrived && target && this.isHostileTo(p, target)) this.startAutoAttack(p.id);
       return true;
     };
     if (!target || target.dead || p.chargeTimeLeft <= 0 || isRooted(p)) return done(false);

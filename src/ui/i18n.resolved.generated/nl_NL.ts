@@ -8761,6 +8761,10 @@ export const nl_NL: EnTranslations = {
         "name": "Door het Zwaard",
         "description": "Defensieve afkoeltijd: gedurende 8 sec loop je 30% minder schade op en ontwijk je veel meer aanvallen."
       },
+      "intervene": {
+        "name": "Intervene",
+        "description": "Rush to a friendly player, shielding them from {damage} damage for 6 sec. Usable from 8 to 25 yards."
+      },
       "recklessness": {
         "name": "Roekeloosheid",
         "description": "Maakt je Razend: gedurende 12 sec neemt je woedeopbouw met 50% toe en je kans op kritieke treffers met 20%."

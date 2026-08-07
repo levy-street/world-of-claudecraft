@@ -8761,6 +8761,10 @@ export const pl_PL: EnTranslations = {
         "name": "Śmierć od miecza",
         "description": "Umiejętność obronna: przez 8 sek. otrzymujesz o 30% mniejsze obrażenia i unikasz znacznie większej liczby ataków."
       },
+      "intervene": {
+        "name": "Intervene",
+        "description": "Rush to a friendly player, shielding them from {damage} damage for 6 sec. Usable from 8 to 25 yards."
+      },
       "recklessness": {
         "name": "Brawura",
         "description": "Szał: twoje generowanie wściekłości zwiększa się o 50%, a szansa na trafienie krytyczne o 20% na 12 sek."
