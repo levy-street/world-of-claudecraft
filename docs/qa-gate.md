@@ -11,7 +11,8 @@ Codex have different entry points and share the same deterministic scripts and c
 | Instant copy gate | `.claude/hooks/qa-stop.sh` through each runtime's Stop hook | End of an agent turn | Yes, on a hard-invariant hit |
 | Deterministic floor | `.githooks/pre-push` | Before a push | Yes |
 | Day-loop fast path | `npm run gate:fast` through `scripts/gate_fast.mjs` | While iterating (agents and mid/low-tier machines) | No (local only; not merge) |
-| Full local gate | `npm run gate` through `scripts/gate.mjs` | Before implementation is called ready / pre-merge | Yes |
+| **Selective gate** | `node scripts/gate_select.mjs` (on a checkout that carries the script; see below) | **Before implementation is called ready / pre-merge** | **Yes (the merge bar)** |
+| Full local gate | `npm run gate` through `scripts/gate.mjs` | When you want the whole suite locally, the planner falls back, or the checkout has no `gate_select.mjs` | Yes (deeper check) |
 | Judgment review | Claude `/qa` or Codex `$woc-qa`, plus scoped reviewers | End of a contribution | Advisory locally |
 
 ### Instant copy gate
@@ -83,7 +84,8 @@ Phase 5). Default environment remains `node`.
 
 ### Full local gate
 
-`npm run gate` (or `pnpm run gate`) is the **merge and "done" contract**. It mirrors CI:
+`npm run gate` (or `pnpm run gate`) is the **deeper local check**, and the merge and
+"done" contract on any checkout without `scripts/gate_select.mjs` (below). It mirrors CI:
 generated i18n freshness, malware scanning, changed-file formatting, the SFX conformance
 check, the full test suite, the browser regression suite (`npm run test:browser`, which
 drives Chromium through Playwright), the typecheck, and env, server, bot, and client
@@ -105,6 +107,70 @@ ready or opening a mergeable PR. Piping a test run can hide its exit status, and
 unconstrained full-suite parallelism can make healthy heavy sim tests flake. Day-loop
 iteration may use `npm run gate:fast`; a green fast path alone is never enough to claim
 done.
+
+### Selective gate (`gate:select`)
+
+`node scripts/gate_select.mjs` is **the merge bar** (owner decision, 2026-08-05; recorded
+in `docs/local-gate-perf/state.md`). `npm run gate` remains the deeper check.
+
+**Where the script exists.** The selection pipeline (`scripts/gate_select.mjs` plus
+`scripts/lib/gate_select_plan.mjs`, `gate_discovery.mjs`, and `test_visibility.mjs`) ships
+on the active release branch. Task worktrees are based there, so it is present in the
+normal case. This branch (`main`) does not carry it until the next release-to-main merge,
+and on a checkout without it `npm run gate` is the bar. Everything below describes the
+script as it runs on a checkout that has it.
+
+The one-line difference from the other paths:
+
+| | Non-test steps | Tests | Merge bar? |
+|---|---|---|---|
+| `gate:fast` | **A subset.** No builds, no admin/bot typecheck, no i18n or wiki freshness, no sfx, no browser. | `related` plus two guard files | **No** |
+| `gate` | **All**, plus the dep-sync and ffmpeg preflights | **Every** test file | Yes (provably complete) |
+| `gate:select` | **All, and the same preflights** | always-run set + `related` | Yes (empirically complete) |
+
+The distinction that matters: **`gate:fast` is weaker because it drops whole checks;
+`gate:select` drops none of them.** A change that breaks the client bundle, the admin
+Svelte types, the bot build, i18n freshness, or SFX conformance fails `gate:select`
+exactly as it fails `gate`, and on a `release/**` branch it runs the release-tier i18n
+step too. Only the test step is narrowed, so the question "is this enough to ship a PR"
+reduces to one question: does the narrowed test step still catch what the full one would?
+
+**Why the narrowed test step is sufficient.** `vitest related` selects on the static
+import graph, which models most of this suite correctly and misses the rest *silently*
+(a skipped test does not error, so the gate still prints PASS). So selection is never
+trusted alone. `scripts/lib/test_visibility.mjs` classifies every test file first:
+
+- **blind**: reaches outside the graph (disk scan, subprocess, dynamic import, or an
+  fs-touching shared helper one hop away) and imports no source. `related` can never
+  select it. `tests/architecture.test.ts`, the determinism and sim-purity guard, is one
+  of these.
+- **partial**: reaches outside the graph *and* imports source, so `related` selects it
+  only sometimes, which hides better than never.
+- **graph**: pure imports, modelled correctly.
+
+Every blind and partial file runs on **every** selective gate regardless of the diff.
+Only the graph-visible remainder is left to `related`. The set is recomputed from source
+on each run rather than read from a committed list, so it cannot go stale: a new test that
+scans from disk joins it the moment it lands.
+
+**Safety fallback.** Any change the planner cannot reason about (a lockfile,
+`package.json`, a vite/vitest/tsconfig edit, the shared test helpers or global setup)
+widens the whole run to the full suite. Failing toward *more* tests is the only safe
+direction, which is also why an unresolvable diff base or a failing `git diff` is a hard
+stop (exit 1) rather than an empty changed set: the run never narrows on a diff it could
+not read. The diff is taken against the BRANCH base, not just the dirty working tree:
+`GATE_SELECT_BASE` overrides it, otherwise the integration base is resolved
+(`resolveSelectBase` in `scripts/lib/gate_discovery.mjs`: the newest `origin/release/*`
+ref, then `origin/main`, then `origin/HEAD`). Deliberately not the tracking branch: a
+feature branch tracks its own pushed copy, so that diff empties out the moment you push,
+which is the silent narrowing this resolution exists to prevent.
+
+**What it still cannot prove, and why that is acceptable.** The out-of-graph pattern list
+is a floor, not a proof, so this path is empirically complete rather than provably
+complete. The backstop is CI: `.github/workflows/ci.yml` runs the FULL suite on every
+`pull_request` and on every push to `main` / `release/**` (8-shard matrix). A local
+selection miss therefore costs feedback latency, not correctness, because CI still runs
+the whole suite before the change can merge.
 
 ### Judgment review
 

@@ -54,13 +54,14 @@ the nested `npm run` forms below are the package.json script names.
 - `npm run dev`: Vite client on :5173 (proxies `/api`, `/admin/api`, `/ws` to :8787).
 - `npm run server`: esbuild-bundle + run the authoritative server on :8787.
 - `npm test`: Vitest. **Prefer a single file while iterating:** `npx vitest run tests/sim.test.ts`.
-- `node scripts/gate_select.mjs`: **the pre-merge gate** on every checkout that has the
-  script (the active release branch does, and task worktrees are based there, so this is
-  the normal case; main does not carry it yet). Same step list as `npm run gate` (nothing
-  dropped) with one substitution: the full vitest run becomes an always-run set plus
-  `vitest related`. Roughly 3x faster; falls back to the full suite for any change it
-  cannot reason about. See the release branch's `docs/qa-gate.md`. On a checkout without
-  the script, `npm run gate` is the gate.
+- `node scripts/gate_select.mjs`: **the pre-merge gate on any checkout that carries the
+  script**, which is the active release branch and the task worktrees based on it (the
+  normal case). `main` does not carry it until the next release merge, so `npm run gate`
+  is the gate on a bare main checkout. Same step list as `npm run gate` (nothing dropped)
+  with one substitution: the full vitest run becomes an always-run set plus
+  `vitest related`. Roughly 3x faster; any change it cannot reason about widens the run
+  back to the full suite, and an unresolvable diff base or an unreadable diff is a hard
+  stop, never a narrowed run. See `docs/qa-gate.md`.
 - `npm run gate`: the full CI-equivalent gate, still the deeper check (i18n gen + freshness, malware scan,
   changed-files biome, SFX conformance, full tests with bounded workers, `tsc`, all builds;
   release-tier automatically on a `release/**` branch; FFmpeg/ffprobe come from the bundled
@@ -101,9 +102,9 @@ Implementation requirements:
 
 Deliverable: a PR based off the latest release branch, following
 `.github/PULL_REQUEST_TEMPLATE.md`, that is **fully mergeable and passes CI**. Gate it locally
-with `node scripts/gate_select.mjs` (above) before calling it done (`npm run gate` on a
-checkout that predates the script; it also remains the deeper check when you want the
-whole suite locally).
+with `node scripts/gate_select.mjs` (above) before calling it done; `npm run gate` remains
+the deeper check when you want the whole suite locally, and is the gate itself on a
+checkout that predates the script.
 
 ## Architecture (the load-bearing ideas)
 - **One sim, three hosts.** The exact same `src/sim/` code runs the offline
