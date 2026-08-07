@@ -4,7 +4,9 @@ import {
   type ArmorItemDef,
   type ArmorType,
   type EquipSlot,
+  type InvSlot,
   type ItemDef,
+  type ItemInstancePayload,
   type PlayerClass,
   type WeaponItemDef,
 } from './types';
@@ -116,6 +118,101 @@ export function uniqueEquipConflictSlot(
     const worn = lookup(wornId);
     if (!worn || !isUniqueEquipped(worn)) continue;
     if (uniqueEquipFamily(worn) === family) return slot;
+  }
+  return null;
+}
+
+// THE unit-selection rule for an equip: the highest-index matching inventory
+// slot wins (see the comment at the consume site in items.ts equipItem for why
+// the top of the bags is what an equip picks up). Lives in this leaf rather
+// than beside the consume so the client mirror can answer "which copy would
+// this equip take" without importing the command bodies, and so the pre-equip
+// PEEK at a copy and the consume that lifts it can never pick different units:
+// a counted equip family reading a different copy's rolled quality than the one
+// it ends up wearing would be gameable by stack ordering alone.
+export function equipCandidateIndex(inventory: readonly InvSlot[], itemId: string): number {
+  for (let i = inventory.length - 1; i >= 0; i--) {
+    if (inventory[i].itemId === itemId) return i;
+  }
+  return -1;
+}
+
+// The effective quality of the copy an equip of `itemId` would consume now: the
+// selected unit's rolled quality when it carries one, else the def's. This is
+// what masterwroughtConflictSlot wants for `incomingQuality`.
+export function equipCandidateQuality(
+  inventory: readonly InvSlot[],
+  itemId: string,
+  def: ItemDef,
+): string | undefined {
+  const index = equipCandidateIndex(inventory, itemId);
+  const instance = index < 0 ? undefined : inventory[index].instance;
+  return instance?.rolled?.quality ?? def.quality;
+}
+
+// How many Masterwrought pieces a character may wear at once, and how many of
+// those may be legendary. A two-hander occupies one equipment slot and so
+// counts once, like every other piece.
+export const MASTERWROUGHT_EQUIP_CAP = 2;
+export const MASTERWROUGHT_LEGENDARY_CAP = 1;
+
+export type MasterwroughtConflict = { slot: EquipSlot; reason: 'cap' | 'legendary' };
+
+// The effective quality of a specific WORN copy: the instance's own rolled
+// quality wins over the def's when present, the same precedence
+// professions/battlefield_xp.ts reads rarity with.
+function wornEffectiveQuality(
+  def: ItemDef,
+  instance: ItemInstancePayload | undefined,
+): string | undefined {
+  return instance?.rolled?.quality ?? def.quality;
+}
+
+// The worn slot that would break the Masterwrought counted-family rule if
+// `item` were equipped now, or null when the equip is legal. Two counted caps,
+// reported apart so the refusal can say which one bit: `cap` when the character
+// already wears the maximum number of flagged pieces, `legendary` when the
+// incoming piece is legendary-effective and a legendary-effective flagged piece
+// is already worn. Duplicates of one flagged item are deliberately legal inside
+// the cap, so nothing here compares ids or families.
+//
+// The sub-cap reads INSTANCE-effective quality while isUniqueEquipped above
+// reads def quality only, so the two rules deliberately disagree about one
+// copy: a legendary-ROLLED copy of an epic def counts against this sub-cap and
+// is NOT unique-equipped.
+//
+// `ignoreSlots` names the slots this equip empties or overwrites (the target
+// slot itself, plus a slot the swap displaces, e.g. the offhand a two-hander
+// benches), which therefore cannot conflict with the incoming piece. `lookup`
+// resolves a worn id to its def and `instances` the worn per-copy payloads (the
+// sim passes ITEMS and meta.equipmentInstance; injected so this leaf stays
+// data-free). `incomingQuality` is the effective quality of the exact copy
+// about to be worn, which overrides the def's when the carried unit rolled its
+// own.
+export function masterwroughtConflictSlot(
+  item: ItemDef,
+  equipment: Partial<Record<EquipSlot, string>>,
+  lookup: (id: string) => ItemDef | undefined,
+  ignoreSlots: readonly EquipSlot[],
+  instances?: Partial<Record<EquipSlot, ItemInstancePayload>>,
+  incomingQuality?: string,
+): MasterwroughtConflict | null {
+  if (!item.masterwrought) return null;
+  const worn: { slot: EquipSlot; legendary: boolean }[] = [];
+  for (const slot of ALL_EQUIP_SLOTS) {
+    if (ignoreSlots.includes(slot)) continue;
+    const wornId = equipment[slot];
+    if (!wornId) continue;
+    const def = lookup(wornId);
+    if (!def?.masterwrought) continue;
+    worn.push({ slot, legendary: wornEffectiveQuality(def, instances?.[slot]) === 'legendary' });
+  }
+  if (worn.length >= MASTERWROUGHT_EQUIP_CAP) return { slot: worn[0].slot, reason: 'cap' };
+  if ((incomingQuality ?? item.quality) === 'legendary') {
+    const legendaryWorn = worn.filter((w) => w.legendary);
+    if (legendaryWorn.length >= MASTERWROUGHT_LEGENDARY_CAP) {
+      return { slot: legendaryWorn[0].slot, reason: 'legendary' };
+    }
   }
   return null;
 }

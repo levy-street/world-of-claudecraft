@@ -26,7 +26,10 @@ import {
   canEquipItem,
   canEquipItemInSlot,
   displacedSlotForEquip,
+  equipCandidateIndex,
+  equipCandidateQuality,
   isUniqueEquipped,
+  masterwroughtConflictSlot,
   resolveEquipSlot,
   slotAcceptsItem,
   uniqueEquipConflictSlot,
@@ -81,17 +84,15 @@ type EquippedInventoryUnit = InventoryUnit;
 export type VendorRemovedUnit = InventoryUnit;
 
 function consumeEquippedInventoryUnit(meta: PlayerMeta, itemId: string): EquippedInventoryUnit {
-  for (let i = meta.inventory.length - 1; i >= 0; i--) {
-    const slot = meta.inventory[i];
-    if (slot.itemId !== itemId) continue;
-    const instance =
-      slot.instance && slot.count > 1 ? cloneItemInstancePayload(slot.instance) : slot.instance;
-    const craftedRecipeId = slot.craftedRecipeId;
-    slot.count -= 1;
-    if (slot.count <= 0) meta.inventory.splice(i, 1);
-    return { instance, craftedRecipeId };
-  }
-  return { instance: undefined, craftedRecipeId: undefined };
+  const i = equipCandidateIndex(meta.inventory, itemId);
+  if (i < 0) return { instance: undefined, craftedRecipeId: undefined };
+  const slot = meta.inventory[i];
+  const instance =
+    slot.instance && slot.count > 1 ? cloneItemInstancePayload(slot.instance) : slot.instance;
+  const craftedRecipeId = slot.craftedRecipeId;
+  slot.count -= 1;
+  if (slot.count <= 0) meta.inventory.splice(i, 1);
+  return { instance, craftedRecipeId };
 }
 
 function equipmentPayloadFor(unit: EquippedInventoryUnit): ItemInstancePayload | undefined {
@@ -443,6 +444,31 @@ export function equipItem(
     )
   ) {
     ctx.error(meta.entityId, 'You can only equip one of those.');
+    return;
+  }
+  // Masterwrought is a COUNTED family rather than a per-item one: at most two
+  // flagged pieces worn and at most one of those legendary. The incoming
+  // quality is peeked off the exact copy the consume below will lift, so a
+  // legendary copy sitting under a plain one in the bags cannot slip past the
+  // sub-cap. Same ignoreSlots as the unique rule: a swap that empties a slot
+  // cannot conflict with what it puts there.
+  const masterwroughtConflict = masterwroughtConflictSlot(
+    def,
+    meta.equipment,
+    (id) => ITEMS[id],
+    displacedSlot ? [slot, displacedSlot] : [slot],
+    meta.equipmentInstance,
+    equipCandidateQuality(meta.inventory, itemId, def),
+  );
+  if (masterwroughtConflict) {
+    // Two plain calls rather than one ternary argument: the S3 drift-guard
+    // scanner only sees a single-line literal at an error emit, so these must
+    // stay written this way or the guard goes blind to them.
+    if (masterwroughtConflict.reason === 'legendary') {
+      ctx.error(meta.entityId, 'You can only equip one legendary Masterwrought item.');
+    } else {
+      ctx.error(meta.entityId, 'You can only equip two Masterwrought items.');
+    }
     return;
   }
   const displacedId = displacedSlot ? meta.equipment[displacedSlot] : undefined;

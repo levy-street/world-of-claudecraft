@@ -222,7 +222,13 @@ import {
   runDespawnDecay,
   tickGroundAoEs,
 } from './entity_roster';
-import { canEquipItem, resolveEquipSlot, uniqueEquipConflictSlot } from './equipment_rules';
+import {
+  canEquipItem,
+  equipCandidateQuality,
+  masterwroughtConflictSlot,
+  resolveEquipSlot,
+  uniqueEquipConflictSlot,
+} from './equipment_rules';
 import * as escortMod from './escort';
 import { initEscorts as initEscortsImpl, updateEscorts as updateEscortsImpl } from './escort';
 import { fleeSpeed } from './flee_speed';
@@ -9051,6 +9057,21 @@ export class Sim {
     // already worn anywhere: equipping the duplicate would be refused, and the
     // explicit equip path is where that refusal toast belongs.
     if (uniqueEquipConflictSlot(def, meta.equipment, (id) => ITEMS[id], [])) return;
+    // Same silent skip for the Masterwrought counted family (cap or legendary
+    // sub-cap). ignoreSlots stays empty like the rule above: auto-equip is a
+    // convenience, so it declines rather than reasoning about which worn piece
+    // a swap would free.
+    if (
+      masterwroughtConflictSlot(
+        def,
+        meta.equipment,
+        (id) => ITEMS[id],
+        [],
+        meta.equipmentInstance,
+        equipCandidateQuality(meta.inventory, itemId, def),
+      )
+    )
+      return;
     if (def.kind === 'weapon') {
       const cur = meta.equipment.mainhand ? ITEMS[meta.equipment.mainhand]?.weapon : null;
       const next = def.weapon;

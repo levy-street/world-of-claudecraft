@@ -834,6 +834,10 @@ interface BaseItemDef {
   // Marks a bespoke heroic-tier item (e.g. the Heroic Nythraxis raid epics) for
   // tooltip chrome; these keep their own name key, unlike heroicOf variants.
   heroic?: boolean;
+  // Member of the Masterwrought counted equip family: at most two flagged items
+  // worn, at most one of them with effective legendary quality
+  // (src/sim/equipment_rules.ts masterwroughtConflictSlot).
+  masterwrought?: boolean;
 }
 
 // Item-set bonuses (classic "tier set" style). Flat effects fold into
