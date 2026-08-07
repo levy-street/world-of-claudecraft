@@ -165,6 +165,8 @@ export function instanceBonusStatLines(instance?: ItemInstancePayload): string {
  *  recipe output lands on the equip/consume kinds (weapon, armor, food,
  *  potion, elixir, tool, bag), so the signed universe partitions cleanly on
  *  the kind alone; the partition is pinned in tests/item_instance_tooltip.test.ts.
+ *  Recipe patterns (kind 'recipe') sit outside that universe entirely: they are
+ *  never signed and no recipe crafts one, so they never reach this line.
  *  Raw fishing catches are also kind 'junk' (cooking reagents) but fishing never
  *  signs a catch, so they never reach the provenance line either. */
 export function isGatheredProvenanceKind(kind: ItemDef['kind'] | undefined): boolean {

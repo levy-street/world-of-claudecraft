@@ -12,6 +12,7 @@
 // the shipped catalog rather than a made-up name.
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { ALL_RECIPES, recipeById } from '../src/sim/content/recipes';
+import { resolvePatternLearn } from '../src/sim/professions/pattern_items';
 import type { ProfessionRecipeRecord } from '../src/sim/professions/types';
 import { Sim } from '../src/sim/sim';
 import type { ItemDef, RecipeItemDef } from '../src/sim/types';
@@ -36,6 +37,10 @@ const SUB_TIER_RECIPE = 'recipe_tooltip_pattern_sub_tier';
 // A REAL recipe, and trainer-only like every recipe shipped today: the
 // acquisition gate must silence it.
 const TRAINER_ONLY_RECIPE = 'recipe_sunpetal_mana_draught';
+// The grandfathered shape: NO acquisition key at all (the launch-era recipes
+// ship exactly this way), so the view's optional chain is exercised against a
+// missing list, not just a trainer-only one.
+const NO_LIST_RECIPE = 'recipe_tooltip_pattern_no_list';
 
 function dropRecipe(
   id: string,
@@ -64,6 +69,18 @@ const FIXTURES: ProfessionRecipeRecord[] = [
   }),
   dropRecipe(OFF_STEP_RECIPE, { skillReq: 60 }),
   dropRecipe(SUB_TIER_RECIPE, { skillReq: 10 }),
+  // Hand-built, not dropRecipe(): the grandfathered arm needs the acquisition
+  // KEY absent, which a Partial spread cannot express.
+  {
+    id: NO_LIST_RECIPE,
+    professionId: 'alchemy',
+    resultItemId: 'sunpetal_mana_draught',
+    resultCount: 1,
+    reagents: [{ itemId: 'sunpetal_herb', count: 1 }],
+    skillReq: 50,
+    itemLevelBudget: 20,
+    level: 20,
+  },
 ];
 
 beforeAll(() => {
@@ -140,6 +157,17 @@ describe('recipePatternTooltipModel', () => {
     expect(recipePatternTooltipLines(pattern(TRAINER_ONLY_RECIPE), viewer())).toBe('');
   });
 
+  it('answers null for a recipe with no acquisition list at all (grandfathered)', () => {
+    // The launch-era shape: no list, known to everyone, nothing a pattern
+    // could teach. The optional chain must answer null exactly like the sim's
+    // silent click, never throw over the missing key.
+    const fixture = recipeById(NO_LIST_RECIPE);
+    expect(fixture).toBeDefined();
+    expect(fixture && 'acquisition' in fixture).toBe(false);
+    expect(recipePatternTooltipModel(pattern(NO_LIST_RECIPE), viewer())).toBeNull();
+    expect(recipePatternTooltipLines(pattern(NO_LIST_RECIPE), viewer())).toBe('');
+  });
+
   it('reads skillMet off the viewer craft skill, per craft', () => {
     const under = recipePatternTooltipModel(
       pattern(GATED_RECIPE),
@@ -176,6 +204,36 @@ describe('recipePatternTooltipModel', () => {
     expect(atBand?.skillReq).toBe(60);
     expect(atBand?.skillMet).toBe(true);
     expect(belowBand?.skillMet).toBe(false);
+  });
+
+  it('agrees with resolvePatternLearn cell for cell across the skill matrix', () => {
+    // The coupling assertion the module header promises: hover (skillMet) and
+    // click (the sim resolver) may never disagree for a viewer who does not
+    // yet know the recipe. The view re-derives the tier band rather than
+    // calling teachTierMet, so this matrix is what keeps the two formulas one:
+    // mutate either side (a raw skill >= skillReq in training.ts, or a
+    // band-free compare in the view) and a cell reds. Recipes cover on-step
+    // (50), off-step (60), sub-tier (10), and free (0) gates; skills straddle
+    // every band edge those gates can meet.
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const pid = sim.addPlayer('warrior', 'Matrix');
+    const meta = sim.meta(pid);
+    if (!meta) throw new Error('missing meta');
+    for (const recipeId of [GATED_RECIPE, FREE_RECIPE, OFF_STEP_RECIPE, SUB_TIER_RECIPE]) {
+      const recipe = recipeById(recipeId);
+      if (!recipe) throw new Error(`missing fixture ${recipeId}`);
+      for (const skill of [0, 1, 24, 25, 49, 50, 59, 60, 74, 75, 100]) {
+        meta.craftSkills[recipe.professionId] = skill;
+        const model = recipePatternTooltipModel(
+          pattern(recipeId),
+          viewer({ craftSkills: { [recipe.professionId]: skill } }),
+        );
+        expect(model, `${recipeId} at skill ${skill}`).not.toBeNull();
+        expect(model?.skillMet, `${recipeId} at skill ${skill}`).toBe(
+          resolvePatternLearn(recipe, meta).ok,
+        );
+      }
+    }
   });
 
   it('refuses a never-practiced craft even when the tier band alone would pass', () => {

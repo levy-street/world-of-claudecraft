@@ -9,8 +9,8 @@ import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 // only exist because of where the dispatch sits (below useItem's dead gate)
 // are actually covered.
 //
-// The fixtures are synthetic on purpose: a recipe pushed onto the live
-// ALL_RECIPES array (recipeById linear-scans it) plus three item defs injected
+// The fixtures are synthetic on purpose: recipes pushed onto the live
+// ALL_RECIPES array (recipeById linear-scans it) plus item defs injected
 // into the live ITEMS table, all removed in afterAll, so no shipped-id golden
 // sees them and no content has to exist yet for this behavior to be pinned.
 
@@ -26,7 +26,7 @@ import { resolvePatternLearn } from '../src/sim/professions/pattern_items';
 import type { TrainResult } from '../src/sim/professions/training';
 import type { ProfessionRecipeRecord } from '../src/sim/professions/types';
 import { Sim } from '../src/sim/sim';
-import type { Entity, ItemDef, SimEvent } from '../src/sim/types';
+import type { Entity, RecipeItemDef, SimEvent } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
 import { supportedLanguages } from '../src/ui/i18n';
 import { DICT } from '../src/ui/sim_i18n';
@@ -96,22 +96,42 @@ const TRAINER_ONLY_RECIPE: ProfessionRecipeRecord = {
   acquisition: ['trainer'],
 };
 
+// The grandfathered shape: NO acquisition list at all, the form the launch-era
+// recipes actually ship in. isRecipeKnown answers true for EVERYONE on such a
+// recipe, so a pattern naming one exercises two things nothing else can: the
+// resolver's optional chain over a missing list, and the invalid-before-
+// already_known ranking on the real path (swapped arms would blame the player
+// with the known line instead of staying silent).
+const GRANDFATHERED_RECIPE: ProfessionRecipeRecord = {
+  id: 'recipe_test_pattern_grandfathered',
+  professionId: CRAFT,
+  resultItemId: 'eastbrook_arming_sword',
+  resultCount: 1,
+  reagents: [{ itemId: 'bone_fragments', count: 1 }],
+  skillReq: 0,
+  itemLevelBudget: 1,
+  level: 1,
+};
+
 // Every item id this suite injects shares this prefix, which is what lets the
-// shipped-content sweep at the bottom skip exactly this suite's defs: two of
-// the three are DELIBERATELY malformed (they exist to drive the silent-guard
+// shipped-content sweep at the bottom skip exactly this suite's defs: three of
+// the four are DELIBERATELY malformed (they exist to drive the silent-guard
 // arms), so a sweep that saw them would fail on fixtures rather than content.
 const SYNTHETIC_ID_PREFIX = 'test_pattern_';
 const PATTERN_ID = 'test_pattern_arming_sword';
 const MISSING_PATTERN_ID = 'test_pattern_missing_recipe';
 const TRAINER_PATTERN_ID = 'test_pattern_trainer_only';
+const GRANDFATHERED_PATTERN_ID = 'test_pattern_grandfathered';
 const MISSING_RECIPE_ID = 'recipe_test_pattern_no_such_recipe';
 
-function patternDef(id: string, name: string, teachesRecipeId: string): ItemDef {
-  return { id, name, kind: 'recipe', teachesRecipeId, sellValue: 25 } as ItemDef;
+// No cast: the annotation makes tsc the guard for the very shape the kind
+// exists to force (teachesRecipeId required, no use payload, no stackSize).
+function patternDef(id: string, name: string, teachesRecipeId: string): RecipeItemDef {
+  return { id, name, kind: 'recipe', teachesRecipeId, sellValue: 25 };
 }
 
 beforeAll(() => {
-  ALL_RECIPES.push(PATTERN_RECIPE, TRAINER_ONLY_RECIPE);
+  ALL_RECIPES.push(PATTERN_RECIPE, TRAINER_ONLY_RECIPE, GRANDFATHERED_RECIPE);
   ITEMS[PATTERN_ID] = patternDef(PATTERN_ID, 'Pattern: Test Arming Sword', PATTERN_RECIPE.id);
   ITEMS[MISSING_PATTERN_ID] = patternDef(
     MISSING_PATTERN_ID,
@@ -123,14 +143,21 @@ beforeAll(() => {
     'Pattern: Test Trainer Only',
     TRAINER_ONLY_RECIPE.id,
   );
+  ITEMS[GRANDFATHERED_PATTERN_ID] = patternDef(
+    GRANDFATHERED_PATTERN_ID,
+    'Pattern: Test Grandfathered',
+    GRANDFATHERED_RECIPE.id,
+  );
 });
 
 afterAll(() => {
-  for (const recipe of [PATTERN_RECIPE, TRAINER_ONLY_RECIPE]) {
+  for (const recipe of [PATTERN_RECIPE, TRAINER_ONLY_RECIPE, GRANDFATHERED_RECIPE]) {
     const at = ALL_RECIPES.indexOf(recipe);
     if (at >= 0) ALL_RECIPES.splice(at, 1);
   }
-  for (const id of [PATTERN_ID, MISSING_PATTERN_ID, TRAINER_PATTERN_ID]) delete ITEMS[id];
+  for (const id of [PATTERN_ID, MISSING_PATTERN_ID, TRAINER_PATTERN_ID, GRANDFATHERED_PATTERN_ID]) {
+    delete ITEMS[id];
+  }
 });
 
 function makeWorld(): Sim {
@@ -197,6 +224,13 @@ describe('resolvePatternLearn (the pure resolver)', () => {
     const { meta } = patternHolder(sim, 0, 0);
     expect(resolvePatternLearn(undefined, meta)).toEqual({ ok: false, reason: 'invalid' });
     expect(resolvePatternLearn(TRAINER_ONLY_RECIPE, meta)).toEqual({
+      ok: false,
+      reason: 'invalid',
+    });
+    // The grandfathered shape carries NO acquisition list at all: the optional
+    // chain must answer invalid, never throw, and never fall through to the
+    // already_known arm (which is true of everyone for this recipe).
+    expect(resolvePatternLearn(GRANDFATHERED_RECIPE, meta)).toEqual({
       ok: false,
       reason: 'invalid',
     });
@@ -355,6 +389,22 @@ describe('using a recipe pattern (offline host, the real useItem path)', () => {
     expect(meta.knownRecipes.has(TRAINER_ONLY_RECIPE.id)).toBe(false);
   });
 
+  it('is silent for a pattern whose recipe has no acquisition list at all, and never consumes it', () => {
+    // The grandfathered shape (the launch-era recipes ship exactly this way).
+    // isRecipeKnown answers TRUE for everyone here, so total silence is also
+    // the invalid-before-already_known ranking pinned on the REAL path: with
+    // the arms swapped this click would emit the known line and blame the
+    // player for an authoring bug.
+    const sim = makeWorld();
+    const { pid, meta } = patternHolder(sim, 100, 1, GRANDFATHERED_PATTERN_ID);
+
+    sim.drainEvents();
+    sim.useItem(GRANDFATHERED_PATTERN_ID, pid);
+    expect(sim.drainEvents()).toEqual([]);
+    expect(sim.countItem(GRANDFATHERED_PATTERN_ID, pid)).toBe(1);
+    expect(meta.knownRecipes.has(GRANDFATHERED_RECIPE.id)).toBe(false);
+  });
+
   it('is a silent no-op while dead: the dispatch sits below useItem dead gate', () => {
     const sim = makeWorld();
     const { pid, meta } = patternHolder(sim, 100);
@@ -381,6 +431,57 @@ describe('using a recipe pattern (offline host, the real useItem path)', () => {
     }
     expect(draws).toBe(0);
     expect(sim.countItem(PATTERN_ID, pid)).toBe(0);
+    // Positive control (the tests/mounts.test.ts idiom): the SAME wiring
+    // really counts a draw, so the zero above is a measurement, not a dead
+    // probe left green by a neutered observer.
+    sim.rng.setObserver(() => draws++);
+    try {
+      sim.rng.next();
+    } finally {
+      sim.rng.setObserver(null);
+    }
+    expect(draws).toBe(1);
+  });
+
+  it('draws no rng on any refusal arm either', () => {
+    // Every deny arm under one observer: profession, tier, already_known, and
+    // all three silent invalid shapes. The error lines asserted at the end are
+    // what prove the refusal arms actually RAN under the observer (an arm that
+    // silently did nothing would also draw nothing).
+    const sim = makeWorld();
+    const { pid, meta } = patternHolder(sim, 0, 1);
+    sim.addItem(MISSING_PATTERN_ID, 1, pid);
+    sim.addItem(TRAINER_PATTERN_ID, 1, pid);
+    sim.addItem(GRANDFATHERED_PATTERN_ID, 1, pid);
+    sim.drainEvents();
+    let draws = 0;
+    sim.rng.setObserver(() => draws++);
+    try {
+      sim.useItem(PATTERN_ID, pid); // profession (skill 0)
+      meta.craftSkills[CRAFT] = 99;
+      sim.useItem(PATTERN_ID, pid); // tier (one short)
+      meta.knownRecipes.add(PATTERN_RECIPE.id);
+      meta.craftSkills[CRAFT] = 100;
+      sim.useItem(PATTERN_ID, pid); // already_known
+      sim.useItem(MISSING_PATTERN_ID, pid); // invalid: unresolvable id
+      sim.useItem(TRAINER_PATTERN_ID, pid); // invalid: not drop-acquirable
+      sim.useItem(GRANDFATHERED_PATTERN_ID, pid); // invalid: no list at all
+    } finally {
+      sim.rng.setObserver(null);
+    }
+    expect(draws).toBe(0);
+    expect(errorTexts(sim.drainEvents())).toEqual([PROFESSION_ERROR, TIER_ERROR, KNOWN_ERROR]);
+    // Nothing was consumed by any refusal.
+    for (const id of [PATTERN_ID, MISSING_PATTERN_ID, TRAINER_PATTERN_ID, GRANDFATHERED_PATTERN_ID])
+      expect(sim.countItem(id, pid), id).toBe(1);
+    // Positive control through the identical wiring.
+    sim.rng.setObserver(() => draws++);
+    try {
+      sim.rng.next();
+    } finally {
+      sim.rng.setObserver(null);
+    }
+    expect(draws).toBe(1);
   });
 });
 
@@ -502,12 +603,14 @@ describe('shipped pattern content shape', () => {
   // feature has, and content review is the only place to catch it.
   it('skips exactly this suite own synthetic ids, and they are really present', () => {
     // The skip below is only safe while it covers this file's fixtures and
-    // nothing else. Two of the three are deliberately malformed; if a shipped
+    // nothing else. Three of the four are deliberately malformed; if a shipped
     // id ever took this prefix, the sweep would silently stop checking it.
     const synthetic = Object.keys(ITEMS)
       .filter((id) => id.startsWith(SYNTHETIC_ID_PREFIX))
       .sort();
-    expect(synthetic).toEqual([PATTERN_ID, MISSING_PATTERN_ID, TRAINER_PATTERN_ID].sort());
+    expect(synthetic).toEqual(
+      [PATTERN_ID, MISSING_PATTERN_ID, TRAINER_PATTERN_ID, GRANDFATHERED_PATTERN_ID].sort(),
+    );
   });
 
   it('every kind:recipe item teaches a resolvable, drop-acquirable recipe', () => {
@@ -523,6 +626,23 @@ describe('shipped pattern content shape', () => {
         recipe?.acquisition,
         `${id} teaches ${def.teachesRecipeId}, which no drop may teach`,
       ).toContain('drop');
+    }
+  });
+
+  it('every kind:recipe item honors the tradable-drop contract its comments state', () => {
+    // The def-level claims RecipeItemDef's doc rests on, none of which the
+    // TYPE can enforce: quality 'poor' would let one Sell Junk click vendor
+    // the pattern (junkSellableSlot gates on quality, not kind), and
+    // soulbound / noMarketList would contradict bind-by-consumption. Vacuous
+    // today like the sweep above; live the moment phase 11 ships a def.
+    for (const [id, def] of Object.entries(ITEMS)) {
+      if (def.kind !== 'recipe') continue;
+      if (id.startsWith(SYNTHETIC_ID_PREFIX)) continue;
+      expect(def.quality, `${id}: a poor-quality pattern is swept by Sell Junk`).not.toBe('poor');
+      expect(def.soulbound ?? false, `${id}: soulbound contradicts bind-by-consumption`).toBe(
+        false,
+      );
+      expect(def.noMarketList ?? false, `${id}: patterns are deliberately listable`).toBe(false);
     }
   });
 });

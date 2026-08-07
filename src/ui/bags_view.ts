@@ -394,10 +394,9 @@ export function bagTooltipHintKey(
     return 'hudChrome.professions.toolEffectTooltip.openProfessions';
   }
   // Patterns are usable but carry no `use` payload (the kind IS the payload),
-  // so they need their own row to reach the shared use hint; without it the
+  // so the kind joins this arm to reach the shared use hint; without it the
   // hover stayed silent about a click that learns a recipe.
-  if (item.kind === 'recipe') return 'itemUi.tooltip.clickUse';
-  if (item.use) return 'itemUi.tooltip.clickUse';
+  if (item.kind === 'recipe' || item.use) return 'itemUi.tooltip.clickUse';
   return '';
 }
 

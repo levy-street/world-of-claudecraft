@@ -133,7 +133,12 @@ describe('the crafted rod ladder', () => {
     // above the craft's own cap is unlearnable rather than merely expensive.
     const cap = craftMaxSkillFor('engineering');
     for (const recipe of ROD_RECIPES) {
-      expect(recipe.acquisition, `${recipe.id} acquisition`).toEqual(['trainer']);
+      expect(
+        recipe.acquisition,
+        `${recipe.id} acquisition: must stay trainer-only, or the rodFeePaid ` +
+          'metric in server/game.ts stops being a payment count (a drop-taught ' +
+          'rod would count pattern learns that charged no fee)',
+      ).toEqual(['trainer']);
       expect(
         tierForSkill(recipe.skillReq),
         `${recipe.id} skillReq ${recipe.skillReq} is above the reachable tier`,

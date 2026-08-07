@@ -194,8 +194,10 @@ function itemMatchesType(item: ItemDef, filter: MarketItemTypeFilter): boolean {
   // listable (a tradable drop that binds by being consumed, not on pickup) but
   // too few today to earn a chip of their own, so browsing them stays this
   // arm's job until content makes a dedicated category worth it. None of the
-  // three may be left reachable through 'All' alone
-  // (tests/market_filters.test.ts).
+  // three may be left reachable through 'All' alone (quest and mount in
+  // tests/market_filters.test.ts, whose sweep sees only the live catalog;
+  // recipe in tests/recipe_pattern_items.test.ts on a synthetic def until
+  // shipped pattern content exists for that sweep to pick up).
   if (filter === 'other')
     return item.kind === 'quest' || item.kind === 'mount' || item.kind === 'recipe';
   // Exhaustive on purpose: a future MARKET_ITEM_TYPE_FILTERS entry with no arm above

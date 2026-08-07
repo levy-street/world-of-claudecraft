@@ -107,6 +107,12 @@ or pure leaves, never a `Sim` import, randomness only via `ctx.rng` (guarded by
 - `training.ts`: master training (`resolveTrain`, tier-gated learning,
   `TRAINING_FEE_BY_TIER`, the one-time `PRE_TRAINING_RECIPE_IDS`
   grandfather).
+- `pattern_items.ts`: recipe pattern items (kind 'recipe'): the pure
+  `resolvePatternLearn` deny ladder (invalid silent, already-known,
+  never-practiced, tier via the shared `teachTierMet`) plus the
+  `useRecipePatternItem` apply arm dispatched from the items.ts useItem kind
+  chain; learns via `acquireRecipe` source 'drop', consumes exactly one copy
+  on success only, emits the text-free `trainResult` ok; draws NO rng.
 - `tools.ts` / `stations.ts` / `focus.ts` / `mobile_station.ts`: pure-leaf
   gates and bonuses (gather-tool tier, per-type crafting stations
   (superseding the retired level-20 hub), town focus allocation, field

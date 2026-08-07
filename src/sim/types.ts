@@ -1038,12 +1038,18 @@ export interface MountItemDef extends BaseItemDef {
 // at learn time, so a pattern is worth exactly what an unlearned copy is worth
 // and nothing once the knowledge is spent. Its own kind rather than a `use` arm
 // on OtherItemDef, so the recipe id can never be omitted (the Exclude above) and
-// the browse/stack/tooltip surfaces can key on the kind.
+// the browse/stack/tooltip surfaces can key on the kind. Two more fields are
+// barred outright: a `use` payload would resolve in useItem's use-arm chain
+// ABOVE the recipe kind arm, so the click would never reach the learn, and an
+// explicit `stackSize` wins over UNSTACKED_KINDS in stackSizeOf, so it would
+// silently stack a kind every surface asserts is one-per-slot.
 export interface RecipeItemDef extends BaseItemDef {
   kind: 'recipe';
   teachesRecipeId: string;
   armorType?: never;
   weapon?: never;
+  use?: never;
+  stackSize?: never;
 }
 
 export type ItemDef =

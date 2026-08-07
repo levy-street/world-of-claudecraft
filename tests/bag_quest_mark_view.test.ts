@@ -24,6 +24,7 @@ describe('bag_quest_mark_view: mark kind', () => {
       'elixir',
       'bag',
       'mount',
+      'recipe',
     ]) {
       expect(bagQuestMarkKind({ kind }), kind).toBeNull();
     }

@@ -8853,7 +8853,9 @@ export class GameServer {
       // emits trainResult ok having charged nothing. So this stays a payment
       // count only while no rod recipe carries 'drop' acquisition, which is what
       // makes a pattern able to teach it; both rod recipes are trainer-only
-      // today. Give one a pattern and this arm needs a fee-bearing discriminator
+      // today, and tests/professions_rod_recipes.test.ts pins each one's
+      // acquisition to exactly ['trainer'] naming this metric in its message.
+      // Give one a pattern and this arm needs a fee-bearing discriminator
       // instead. The fee amount is static content, published as
       // woc_rod_fee_copper.
       if (ev.type === 'trainResult' && ev.ok && isRodFeeRecipe(ev.recipeId)) {

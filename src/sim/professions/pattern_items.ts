@@ -112,9 +112,11 @@ export function useRecipePatternItem(
   }
   const learned = acquireRecipe(ctx, meta.entityId, def.teachesRecipeId, 'drop');
   // Defense in depth, the unlockMechChromaFromItem idiom: the resolver already
-  // proved every condition this mint re-checks, so a !ok here means the two
-  // disagreed. Return without consuming rather than eating the copy for
-  // nothing; a lost pattern is unrecoverable, a silent no-op is not.
+  // proved every condition this mint re-checks against the same recipe record
+  // and the same live meta, so this arm is UNREACHABLE today and exists for
+  // the day the mint grows a condition the resolver does not know. Return
+  // without consuming rather than eating the copy for nothing; a lost pattern
+  // is unrecoverable, a silent no-op is not.
   if (!learned.ok) return;
   // Consume by the id the caller was asked to use, not def.id: useItem's own
   // ownership gate counted THAT id, so spending anything else could remove a

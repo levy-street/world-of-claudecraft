@@ -5762,9 +5762,10 @@ export class Hud {
     // line when this character has learned it. The viewer state is the
     // existing craftingIdentity read, so bags, bank, mail, and market all
     // state the same three lines offline and online. The read is gated on the
-    // kind rather than left to the core's own guard: craftingIdentity rebuilds
-    // a copied skill record and a SORTED known-recipe list per call, and no
-    // other kind's hover should pay for it.
+    // kind rather than left to the core's own guard: the offline Sim rebuilds
+    // craftingIdentity (a copied skill record and a SORTED known-recipe list)
+    // on every call, so no other kind's hover should pay for it; the online
+    // ClientWorld read is a plain mirrored field and free either way.
     if (item.kind === 'recipe') {
       html += recipePatternTooltipLines(item, this.sim.craftingIdentity);
     }

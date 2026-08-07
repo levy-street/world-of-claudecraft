@@ -44,6 +44,7 @@ describe('quest_item_tooltip_view: non-quest', () => {
       'elixir',
       'bag',
       'mount',
+      'recipe',
     ]) {
       expect(questItemTooltipModel({ kind, itemId: 'x' }), kind).toBeNull();
     }

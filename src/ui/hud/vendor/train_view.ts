@@ -153,9 +153,11 @@ function rowState(
     return 'known';
   }
   // A recipe this master's station serves but that is not trainer-taught
-  // (drop/quest acquisition; none exist today) has no honest row state at a
-  // trainer: it is neither teachable nor tier-locked here, so it is omitted
-  // rather than rendered with a misleading requirement.
+  // (drop/quest acquisition) has no honest row state at a trainer: it is
+  // neither teachable nor tier-locked here, so it is omitted rather than
+  // rendered with a misleading requirement. The drop-taught MECHANISM exists
+  // (pattern items, src/sim/professions/pattern_items.ts), but no shipped
+  // recipe carries a drop or quest source yet.
   if (!recipe.acquisition?.includes('trainer')) return null;
   // The sim's own predicate, not a mirror of it: the row can never drift
   // from what resolveTrain will actually allow.

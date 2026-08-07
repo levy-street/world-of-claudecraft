@@ -101,12 +101,18 @@ describe('stackSizeTooltipLine', () => {
   });
 
   it('an explicit def stackSize wins over the kind default, formatter grouped', () => {
-    const probe: ItemDef = { ...ITEMS.minor_healing_potion, stackSize: 1000 };
+    // Narrow before spreading: RecipeItemDef bars stackSize outright, so a
+    // spread over the bare union no longer accepts the override.
+    const potion = ITEMS.minor_healing_potion;
+    if (potion.kind !== 'potion') throw new Error('fixture must be a potion');
+    const probe: ItemDef = { ...potion, stackSize: 1000 };
     expect(stackSizeTooltipLine(probe)).toBe('<div class="tt-sub">Max stack: 1,000</div>');
   });
 
   it('an explicit stackSize of 1 on a stackable kind also renders nothing', () => {
-    const probe: ItemDef = { ...ITEMS.minor_healing_potion, stackSize: 1 };
+    const potion = ITEMS.minor_healing_potion;
+    if (potion.kind !== 'potion') throw new Error('fixture must be a potion');
+    const probe: ItemDef = { ...potion, stackSize: 1 };
     expect(stackSizeTooltipLine(probe)).toBe('');
   });
 
