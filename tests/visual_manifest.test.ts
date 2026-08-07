@@ -212,53 +212,48 @@ describe('character visual manifest', () => {
   });
 });
 
-describe('hand-authored prop seats', () => {
-  // The Last Bell cast's held props carry seats captured from a live Blender session
-  // (docs/design/last-bell-held-prop-workflow.md). They exist because the per-weapon
-  // grip tables are global and cannot express a per-character carry, so these pins
-  // guard the two things that silently revert: the seat going missing (the prop falls
-  // back to a derived grip) and Coalfast's shield drifting back to a hand slot.
-  const seated = Object.entries(VISUALS).flatMap(([key, def]) =>
-    (def.attach ?? []).map((att, i) => ({ key, att, i })),
-  );
+describe('Last Bell cast: held props are baked, not attached', () => {
+  // The pipeline contract. These figures' weapons ship INSIDE their body GLB, already
+  // skinned to the carrying bone, so the concept book (which photographs the same file)
+  // and the game cannot disagree about how anyone holds anything. Re-adding an `attach`
+  // would re-derive the grip from the shared weapon tables and reintroduce the drift
+  // that had Ollun's staff level at his hip in game and crown-up on the page.
+  const BAKED = [
+    ['npc_coalfast', ['Prop_sword_1handed', 'Prop_shield_square']],
+    ['npc_coalfast_helm', ['Prop_sword_1handed', 'Prop_shield_square']],
+    ['npc_marsh', ['Prop_adv_sword_1handed']],
+    ['npc_ollun', ['Prop_brasscrown_walking_staff']],
+    ['npc_edda', ['Prop_iron_field_hammer', 'Prop_tongs']],
+    ['npc_saul', ['Prop_lantern']],
+  ] as const;
 
-  it('every authored seat is a usable rigid transform', () => {
-    const withSeat = seated.filter((r) => r.att.seat);
-    expect(withSeat.length).toBeGreaterThan(0);
-    for (const { key, att } of withSeat) {
-      const seat = att.seat!;
-      expect(seat.position, `${key} ${att.url}`).toHaveLength(3);
-      expect(seat.quaternion, `${key} ${att.url}`).toHaveLength(4);
-      for (const v of [...seat.position, ...seat.quaternion]) {
-        expect(Number.isFinite(v), `${key} ${att.url} finite`).toBe(true);
+  it('carries no runtime attachments', () => {
+    for (const [key] of BAKED) {
+      const def = VISUALS[key];
+      expect(def, key).toBeDefined();
+      expect(def.attach ?? [], `${key} must bake its props, not attach them`).toEqual([]);
+    }
+    // Ewald is a declared non-combatant and carries nothing at all.
+    expect(VISUALS.npc_ewald?.attach ?? [], 'npc_ewald').toEqual([]);
+  });
+
+  it('ships every baked prop inside the GLB it points at', async () => {
+    for (const [key, props] of BAKED) {
+      const url = VISUALS[key].url;
+      const file = fileURLToPath(new URL(`../public/${url}`, import.meta.url));
+      expect(existsSync(file), `${key} model on disk`).toBe(true);
+      await MeshoptDecoder.ready;
+      const reader = new NodeIO()
+        .registerExtensions(ALL_EXTENSIONS)
+        .registerDependencies({ 'meshopt.decoder': MeshoptDecoder });
+      const doc = await reader.read(file);
+      const nodes = doc
+        .getRoot()
+        .listNodes()
+        .map((n) => n.getName());
+      for (const prop of props) {
+        expect(nodes, `${key} bakes ${prop}`).toContain(prop);
       }
-      // a non-normalized quaternion would shear the prop
-      const len = Math.hypot(...seat.quaternion);
-      expect(len, `${key} ${att.url} quaternion length`).toBeCloseTo(1, 4);
-      expect(seat.scale, `${key} ${att.url} scale`).toBeGreaterThan(0);
-    }
-  });
-
-  it("Coalfast's shield stays strapped to the forearm, on both his forms", () => {
-    // A hand-slot shield read as a tray through Walking_A and Block; the authored fix
-    // rebound it to the forearm, and the bone is as much a part of the seat as the
-    // transform is.
-    const forms = ['npc_coalfast', 'npc_coalfast_helm'];
-    for (const key of forms) {
-      const shield = (VISUALS[key]?.attach ?? []).find((a) => a.url.includes('shield_square'));
-      expect(shield, `${key} carries a shield`).toBeDefined();
-      expect(shield!.bone, `${key} shield bone`).toBe('lowerarm.l');
-      expect(shield!.seat, `${key} shield seat`).toBeDefined();
-    }
-  });
-
-  it('a seated prop never also carries a derived placement override', () => {
-    // position/rotationY/gripRef are the older, weaker escape hatches. Both set at once
-    // means someone tuned one of them expecting it to apply; the seat silently wins.
-    for (const { key, att } of seated.filter((r) => r.att.seat)) {
-      expect(att.position, `${key} ${att.url}`).toBeUndefined();
-      expect(att.rotationY, `${key} ${att.url}`).toBeUndefined();
-      expect(att.gripRef, `${key} ${att.url}`).toBeUndefined();
     }
   });
 });

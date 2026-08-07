@@ -47,28 +47,6 @@ export interface ClipMap {
   emote?: Partial<Record<OverheadEmoteId, EmoteClipSpec>>;
 }
 
-/** A HAND-AUTHORED prop seat, in the carrying bone's own local space.
- *
- *  The per-weapon tables (`KAYKIT_WEAPON_ACCESSORY` + `WEAPON_GRIP_OVERRIDES`) tune a
- *  weapon MODEL globally, so they cannot express "this character holds this weapon
- *  this way": Coalfast's shield is strapped to his forearm while every other shield
- *  in the game sits in a hand slot. A `seat` is per-ATTACHMENT and therefore per
- *  character, it wins over every derived grip, and it is used verbatim.
- *
- *  Authored by positioning the prop in a live Blender session against the shipped
- *  rig, then capturing its transform relative to the carrying bone: see
- *  `docs/design/last-bell-held-prop-workflow.md`. Bone-LOCAL on purpose, so the
- *  number is independent of the pose it was authored in and holds across every clip.
- *  Do not re-derive one of these from a grip table, and do not hand-tune the digits. */
-export interface AttachSeat {
-  /** Bone-local position [x, y, z]. */
-  position: [number, number, number];
-  /** Bone-local orientation as a quaternion [x, y, z, w]. */
-  quaternion: [number, number, number, number];
-  /** Uniform scale. Carries the authored size; there is no family clamp on a seat. */
-  scale: number;
-}
-
 export interface AttachDef {
   url: string;
   bone: string;
@@ -76,8 +54,6 @@ export interface AttachDef {
   rotationY?: number;
   /** Copy grip from a built-in accessory node on the character rig (e.g. Spellbook_open). */
   gripRef?: string;
-  /** Hand-authored per-character seat. Beats every derived grip; see AttachSeat. */
-  seat?: AttachSeat;
 }
 
 export interface VisualDef {
@@ -603,59 +579,6 @@ const VELOCIRAPTOR: ClipMap = {
 // ---------------------------------------------------------------------------
 // The manifest
 // ---------------------------------------------------------------------------
-
-// Hand-authored prop seats for the Last Bell cast, captured 2026-08-06 from the live
-// review session (`tmp/asset_src/last_bell_crew/Untitled.blend`) as transforms in the
-// CARRYING BONE's own rest space, which is why they hold across all 22 clips. The same
-// arrangements drive the concept book's plates through `seat` rows in
-// `scripts/assets/last_bell_crew/cast.py`, so the book and the game agree by
-// construction instead of each deriving its own grip.
-//
-// These exist because the per-weapon tables cannot express them. Coalfast's shield is
-// STRAPPED to his forearm (`lowerarm.l`), not held in a hand slot, because a hand-slot
-// shield swung out beside him in Walking_A and Block like a tray; and Marsh's
-// `adv_sword_1handed` is the model the engine misroutes through the `VAR_SWORD`
-// variant-pack row, seating it across the wrist. A seat bypasses both paths.
-// Provenance and the gate every one of them passed:
-// `docs/design/last-bell-held-prop-workflow.md`.
-const SEAT_COALFAST_SWORD: AttachSeat = {
-  position: [-0.008671, 0.494415, -0.069869],
-  quaternion: [-0.046277, -0.777339, -0.626985, 0.022205],
-  scale: 0.8876,
-};
-const SEAT_COALFAST_SHIELD: AttachSeat = {
-  position: [0.01183, 0.413644, 0.088205],
-  quaternion: [-0.784539, -0.113153, -0.291103, 0.535681],
-  scale: 0.369795,
-};
-const SEAT_MARSH_SWORD: AttachSeat = {
-  position: [0, 0.017141, 0.052543],
-  quaternion: [0.02562, 0.781471, 0.623404, 0.00363],
-  scale: 0.8876,
-};
-const SEAT_OLLUN_STAFF: AttachSeat = {
-  position: [-0.114482, 0.124619, 0.070311],
-  quaternion: [0.529003, -0.469207, -0.703145, 0.074751],
-  scale: 0.66,
-};
-// Edda and Saul were never hand-authored; these are their BOOK carries (a GRIPS family
-// plus its per-spec tune) read back off the same factory that renders the plates, so the
-// game reproduces the page rather than deriving its own fit from the weapon tables.
-const SEAT_EDDA_HAMMER: AttachSeat = {
-  position: [0, 0.24968, 0],
-  quaternion: [-0.707107, 0, 0, 0.707107],
-  scale: 0.4785,
-};
-const SEAT_EDDA_TONGS: AttachSeat = {
-  position: [-0.025414, -0.056441, 0],
-  quaternion: [-0.707107, 0, 0, 0.707107],
-  scale: 0.450174,
-};
-const SEAT_SAUL_LANTERN: AttachSeat = {
-  position: [0, 0.02, 0.28681],
-  quaternion: [0, 0, 0, 1],
-  scale: 0.286809,
-};
 
 export const VISUALS: Record<string, VisualDef> = {
   // -- player classes ------------------------------------------------------
@@ -1517,6 +1440,18 @@ export const VISUALS: Record<string, VisualDef> = {
   },
 
   // -- The Last Bell of Gullhaven: the Farshore cast --------------------------
+  // THESE FIGURES CARRY NO `attach`, AND THAT IS DELIBERATE. Their held props are
+  // baked INTO the body GLB, already skinned to the carrying bone, by
+  // `scripts/assets/last_bell_crew/` (a `fixed` prop in `cast.py`, kept rather than
+  // dropped by `crew.export`). The concept book photographs that same shipped file, so
+  // the page and the game cannot disagree about how anyone holds anything.
+  //
+  // Re-adding an `attach` here would re-derive the grip from the shared weapon tables
+  // and put the drift back: that is what had Ollun's staff level at his hip in game
+  // while the book showed it crown-up, and Coalfast's shield in his fist rather than
+  // strapped to his forearm. If a carry looks wrong, fix it in Blender and re-run
+  // `node scripts/assets/last_bell_crew/ship.mjs <member>`; do not add a grip here.
+  // The full contract: `docs/design/last-bell-held-prop-workflow.md`.
   // Bespoke bodies built onto the shipped KayKit rigs by
   // `scripts/assets/last_bell_crew/` (a repainted palette atlas plus geometry
   // rigidly skinned to single bones), so each carries ONE material and merges to
@@ -1527,10 +1462,6 @@ export const VISUALS: Record<string, VisualDef> = {
     url: `${NPCS_DIR}/coalfast.glb`,
     height: HUMANOID_H,
     clips: kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
-    attach: [
-      { url: `${WEAPONS}/sword_1handed.glb`, bone: 'handslot.r', seat: SEAT_COALFAST_SWORD },
-      { url: `${WEAPONS}/shield_square.glb`, bone: 'lowerarm.l', seat: SEAT_COALFAST_SHIELD },
-    ],
   },
   // His finale form: the same body and clips with the helm closed and the crest
   // Hale's memorial figure wears. Lazy: it is only ever placed inside the campaign's
@@ -1540,10 +1471,6 @@ export const VISUALS: Record<string, VisualDef> = {
     height: HUMANOID_H,
     clips: kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
     lazyPreload: true,
-    attach: [
-      { url: `${WEAPONS}/sword_1handed.glb`, bone: 'handslot.r', seat: SEAT_COALFAST_SWORD },
-      { url: `${WEAPONS}/shield_square.glb`, bone: 'lowerarm.l', seat: SEAT_COALFAST_SHIELD },
-    ],
   },
   // The open journal is gone from his off hand on purpose: carried out in front it
   // read as a shield (cast review 1.5). The staff carries a hand-authored `grip`,
@@ -1553,28 +1480,16 @@ export const VISUALS: Record<string, VisualDef> = {
     url: `${NPCS_DIR}/ollun.glb`,
     height: HUMANOID_H,
     clips: kaykit(['2H_Melee_Attack_Chop']),
-    attach: [
-      {
-        url: `${WEAPONS}/brasscrown_walking_staff.glb`,
-        bone: 'handslot.r',
-        seat: SEAT_OLLUN_STAFF,
-      },
-    ],
   },
   npc_edda: {
     url: `${NPCS_DIR}/edda.glb`,
     height: HUMANOID_H,
     clips: kaykit(['1H_Melee_Attack_Chop']),
-    attach: [
-      { url: `${WEAPONS}/iron_field_hammer.glb`, bone: 'handslot.r', seat: SEAT_EDDA_HAMMER },
-      { url: `${TOOLS}/tongs.glb`, bone: 'handslot.l', seat: SEAT_EDDA_TONGS },
-    ],
   },
   npc_saul: {
     url: `${NPCS_DIR}/saul.glb`,
     height: HUMANOID_H,
     clips: kaykit(['1H_Melee_Attack_Chop']),
-    attach: [{ url: `${TOOLS}/lantern.glb`, bone: 'handslot.l', seat: SEAT_SAUL_LANTERN }],
   },
   // Tam's bell-striker is bespoke GEOMETRY on the body, not an attach: no shipped
   // weapon reads as one, and the campaign hands you that exact object afterwards.
@@ -1611,9 +1526,6 @@ export const VISUALS: Record<string, VisualDef> = {
     url: `${NPCS_DIR}/marsh.glb`,
     height: HUMANOID_H,
     clips: kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
-    attach: [
-      { url: `${WEAPONS}/adv_sword_1handed.glb`, bone: 'handslot.r', seat: SEAT_MARSH_SWORD },
-    ],
   },
 
   // -- The break-spawned -----------------------------------------------------

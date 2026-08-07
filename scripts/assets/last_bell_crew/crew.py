@@ -58,22 +58,24 @@ and validate a new survey by reproducing a base whose map is already known.
 
 SHIPPING A FIGURE INTO THE GAME
 -------------------------------
-The concept book is a review surface, not the deliverable. A figure is only IN THE GAME
-after all of this, in order:
+One command:
 
-  1. CREW_OUT=tmp/asset_src/<isolated dir> blender --background --python model.py
-     Use an ISOLATED staging dir. The committed spec's `srcDir` optimizes every GLB it
-     finds, and `tmp/asset_src/last_bell_crew/` still holds stale raw exports that
-     would be re-optimized over shipped models.
-  2. node scripts/assets/build_assets.mjs <spec>        (meshopt; a RAW export will
-     not load at runtime, the loader requires the compression)
-  3. node scripts/build_media_manifest.mjs generate     (or it never reaches prod)
-  4. Wire/verify the `VisualDef` in `src/render/characters/manifest.ts`: the model url,
-     the `attach` entries (with any authored `seat`), and the NPC_KEYS mapping.
-  5. npx vitest run tests/visual_manifest.test.ts tests/character_clipmaps.test.ts \\
-       tests/render_glb_replacement_assets.test.ts tests/render_asset_preload.test.ts
-     The clip gate is the one that bites after a base swap: a new base must still ship
-     every clip name the figure's ClipMap asks for.
+    node scripts/assets/last_bell_crew/ship.mjs ollun,coalfast     (or `all`)
+
+It builds and exports raw, optimizes into `public/` (meshopt: a raw export will not load
+at runtime), photographs the SHIPPED GLB into the book's plates, rebuilds the page, and
+regenerates the media manifest. Run it rather than the steps by hand; the order is
+load-bearing and two of the steps have traps (a shared staging dir re-optimizes stale raw
+exports over shipped models, and photographing before optimizing puts the book back to
+picturing a file that never shipped).
+
+The point of that order: a figure's `fixed` props are BAKED INTO its GLB by `export`
+below, and the book renders that same file, so what the page shows is what the game
+draws. There is no separate "add it to the game" step that can disagree. If a carry looks
+wrong on the page it is wrong in the game; fix it in Blender and re-run.
+
+Clip gate after a base swap: a new base body must still ship every clip name the figure's
+ClipMap asks for (`tests/character_clipmaps.test.ts`).
 """
 
 import bpy
@@ -357,25 +359,39 @@ def arm(rig, weapons):
         # the GRIPS warning above says the committed plates need; without it a
         # regenerated book silently reverts to a derived seat.
         if spec.get("seat"):
-            out.append(parts.seated(f"Prop_{stem}", path, rig, spec["bone"],
-                                    spec["seat"]))
-            continue
-        grip = dict(GRIPS[spec["grip"]])
-        grip.update(spec.get("tune", {}))
-        out.append(parts.held(f"Prop_{stem}", path, rig, spec["bone"], **grip))
+            prop = parts.seated(f"Prop_{stem}", path, rig, spec["bone"], spec["seat"])
+        else:
+            grip = dict(GRIPS[spec["grip"]])
+            grip.update(spec.get("tune", {}))
+            prop = parts.held(f"Prop_{stem}", path, rig, spec["bone"], **grip)
+        # FIXED props SHIP INSIDE the body GLB (see `export`). Marked on the object
+        # so the exporter needs no second lookup into the cast table.
+        prop["woc_fixed"] = bool(spec.get("fixed"))
+        out.append(prop)
     return out
 
 
 # ------------------------------------------------------------- export / report
 def export(out_path):
-    """Write the GLB: rig, skinned meshes, every shipped clip.
+    """Write the GLB: rig, skinned meshes, every shipped clip, and any FIXED prop.
 
-    Held props are PRESENTATION only and are dropped here: the game mounts them
-    through `VisualDef.attach` so a defender's weapon stays swappable.
+    A prop marked `fixed` in `cast.py` ships INSIDE the body, already skinned to
+    its carrying bone. That is the whole reason the game can match the concept
+    book: there is then ONE artifact, placed once in Blender, and both the book
+    and the renderer read it. A prop placed here and re-derived at runtime from a
+    grip table is two sources of truth, and they drifted every time.
+
+    An UNFLAGGED prop is still dropped, because it is presentation only and the
+    game mounts it through `VisualDef.attach` so the weapon stays swappable. Fixed
+    is therefore the right call for a story NPC whose kit never changes, and the
+    wrong one for anything a player equips: a baked weapon cannot sheathe (the
+    stow system only moves attached props) and it carries its own material, so it
+    costs one extra draw.
     """
     rig = next(o for o in bpy.data.objects if o.type == "ARMATURE")
     rig.data.pose_position = "POSE"
-    for o in [o for o in bpy.data.objects if o.name.startswith("Prop_")]:
+    for o in [o for o in bpy.data.objects if o.name.startswith("Prop_")
+              and not o.get("woc_fixed")]:
         bpy.data.objects.remove(o, do_unlink=True)
     # Select ONLY the figure: the plate-rendering pass leaves its lamps and camera
     # in the scene, and a whole-scene export would ship them inside the character.

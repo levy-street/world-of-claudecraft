@@ -57,17 +57,20 @@ For reference-image reconstruction and procedural GLB authoring, read the living
   seat if you like, but the verdict is always FRAMES (three-plus yaws, every clip,
   contact-point crops), never the score that produced it; a human in the live session
   is the final word and is usually faster than another search round; and a settled seat
-  is CAPTURED as a `seat` row rather than re-derived, in `cast.py` for the book and on
-  the `AttachDef` for the game.
+  is BAKED INTO THE BODY GLB (`"fixed": True` in `cast.py`) rather than re-derived at
+  runtime, so the book and the game read one artifact instead of two.
 - **`last_bell_crew/` specifics live in `crew.py`'s module docstring:** the BASE BODY
   ROSTER (what each KayKit base can hide, and the welded-part traps, e.g. the druid's
   antlers are part of its head mesh) and the ordered SHIPPING A FIGURE INTO THE GAME
   sequence. Read the roster before picking a base for a new NPC, and the sequence before
-  claiming a figure is in the game: the concept book is a REVIEW SURFACE, and a figure
-  rendered into it is not shipped. A raw `CREW_OUT` export will not even load at runtime
-  (the loader requires meshopt), and `build_assets.mjs` optimizes every GLB in its
-  spec's `srcDir`, so stage one figure in its own directory or you will re-optimize
-  stale raws over shipped models.
+  claiming a figure is in the game. **`node scripts/assets/last_bell_crew/ship.mjs <members>`
+  is that whole sequence in one command** (export raw, optimize into `public/`, photograph
+  the SHIPPED GLB into plates, rebuild the page, regenerate the media manifest) and it is
+  the supported way to ship a figure. Run it rather than the steps by hand: a raw export
+  will not load at runtime (the loader requires meshopt), `build_assets.mjs` optimizes
+  every GLB in its spec's `srcDir` so a shared staging dir silently re-optimizes stale
+  raws over shipped models, and photographing before optimizing puts the book back to
+  picturing a file that never shipped.
 - **Both Blender exporters share the browser archetype's SHAPE**, and only the factory
   differs: deterministic factory -> `tmp/asset_src` raw -> spec -> `build_assets.mjs` ->
   `public/`, except the factory is `model.py` run under `blender --background` (the

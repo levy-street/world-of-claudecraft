@@ -57,15 +57,34 @@ def auto_poses(limit=4):
     return picked
 
 
-def render_member(member, out_dir, turn_frames=TURN_FRAMES):
-    """Build one figure and render its plates. Returns the manifest entry."""
+def render_member(member, out_dir, turn_frames=TURN_FRAMES, from_shipped=True):
+    """Photograph a figure and render its plates. Returns the manifest entry.
+
+    `from_shipped` is the point of this module: the book loads the SHIPPED GLB out
+    of `public/models/chars/npcs/` rather than rebuilding the figure in memory, so
+    a plate is EVIDENCE ABOUT THE FILE THE GAME LOADS, not a preview of a Blender
+    scene that only ever existed here. Held props ride along because `crew.export`
+    bakes the fixed ones in, which is what makes "what you see in the book is what
+    you get in the game" structural instead of aspirational.
+
+    It falls back to building in memory when the figure has not been exported yet
+    (a first pass, or a look-dev loop before shipping), and the entry records which
+    path ran so a plate can never quietly claim to be something it is not.
+    """
     meta = cast.CAST[member]
     crew.wipe()
     seed = crew.seed_context()
-    built = figures.RECIPES[member]()
+    shipped = f"{crew.NPCS}/{member}.glb"
+    photographed = from_shipped and os.path.exists(shipped)
+    if photographed:
+        rig, _meshes = crew.load_shipped(f"{member}.glb")
+        built = {"rig": rig}
+    else:
+        built = figures.RECIPES[member]()
     bpy.data.objects.remove(seed, do_unlink=True)
     rig = built.get("rig")
     stats = crew.measure()
+    stats["source"] = "shipped GLB" if photographed else "in-memory build"
 
     os.makedirs(out_dir, exist_ok=True)
     entry = {k: v for k, v in meta.items()}

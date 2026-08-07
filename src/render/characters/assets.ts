@@ -354,14 +354,13 @@ function attachProp(
     payload.userData.heldSlot = 1;
   }
   payload.userData[HELD_PROP_TAG] = true;
-  // A hand-authored seat wins outright, including over the variant-pack grip: it was
-  // authored against this character on this bone, so nothing derived should refine it.
-  const variantGrip = att.seat || !isHandslotBone(att.bone) ? null : variantGripFor(att.url);
-  if (att.seat) {
-    payload.position.set(...att.seat.position);
-    payload.quaternion.set(...att.seat.quaternion);
-    payload.scale.setScalar(att.seat.scale);
-  } else if (variantGrip) {
+  // NOTE: there is deliberately no per-character grip override here. A figure whose
+  // carry has to match authored art ships that prop BAKED INTO ITS BODY GLB instead
+  // (see the Last Bell cast in manifest.ts), so nothing about it is re-derived at
+  // runtime. Everything that still routes through this function is a SWAPPABLE prop,
+  // where a per-family fit is the right answer.
+  const variantGrip = isHandslotBone(att.bone) ? variantGripFor(att.url) : null;
+  if (variantGrip) {
     applyVariantGrip(payload, att.bone, variantGrip, att.url);
   } else if (att.position || att.rotationY !== undefined) {
     if (att.position) payload.position.set(...att.position);
