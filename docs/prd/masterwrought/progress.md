@@ -2,7 +2,7 @@
 
 | Phase | Title | Status | Started | Completed |
 |---|---|---|---|---|
-| 01 | Masterwrought equip cap | pending | | |
+| 01 | Masterwrought equip cap | complete | 2026-08-07 | 2026-08-07 |
 | 01 QA | verify | pending | | |
 | 02 | Pattern items and recipe learning | pending | | |
 | 02 QA | verify | pending | | |
@@ -42,3 +42,14 @@ never future-PR items, per the delivery contract in `state.md`).
 
 ## Notes
 (append per completed phase)
+
+- Phase 01 (2026-08-07): counted family shipped in both hosts; all four deliverable
+  checklist items done. Cap and sub-cap live in `masterwroughtConflictSlot`
+  (equipment_rules pure leaf), wired in `equipItem` and the auto-equip silent skip; the
+  paperdoll mirror predicts the consumed copy over the mirrored bags. Refusals localized
+  in all 20 non-en sim DICT blocks; tooltip tag interpolates {count} from the cap const
+  with its five non-Latin fills (16 Latin overlays ride the release fill). Reviewed by
+  architecture-reviewer, cross-platform-sync, frontend-seam-reviewer (0 blocking); all
+  should-fix findings applied, deferrals recorded as open items in state.md. Known
+  inherited red: tests/anim_pipeline_hunter_ghost.test.ts is red AT the release tip
+  (byte-identical files); not a phase defect, fix belongs upstream.

@@ -120,10 +120,38 @@ Arcanite (new uses), Quintessent, Grand Banquet, Colossus Splitter, Aetherlens, 
   `stationType` or new station content (decide in phases 05/06, record here).
 
 ## Per-phase ledger (append as phases complete)
-- New IWorld members: (none yet)
-- New SimEvents / wire fields: (none yet)
-- New item ids: (none yet; ids are frozen once shipped, append-only goldens apply)
-- New i18n keys / matcher rules: (none yet)
-- New tests: (none yet)
+- New IWorld members: NONE (Phase 01 decision: the client pre-check reuses the existing
+  IWorldInventory reads `equipment`, `equipmentInstances`, and `inventory`; the parity pin
+  is untouched).
+- New SimEvents / wire fields: none (both refusals ride the existing `error` event).
+- New item ids: none (Phase 01 tests use runtime-injected synthetic ids only; ids are
+  frozen once shipped, append-only goldens apply).
+- New i18n keys / matcher rules: `error.masterwroughtCap` + `error.masterwroughtLegendary`
+  (sim matcher rows, real translations in all 20 non-en DICT blocks; the sim scope is
+  invisible to the release fill worklist so English-only rows would ship forever);
+  `hudChrome.itemMasterwrought` = 'Unique-Equipped: Masterwrought ({count})' with {count}
+  fed from MASTERWROUGHT_EQUIP_CAP through formatNumber (five non-Latin fills in-change
+  per M16; 16 Latin overlays pending for the release fill); glossary category
+  `masterwroughtSystem` pins the coined per-locale renderings.
+- New tests: `tests/masterwrought_cap.test.ts` (23 cases: pure matrix, enforcement, guard
+  order, auto-equip skip, legacy-save tolerance, constants pin, content-shape pin);
+  extended `tests/equip_drop_core.test.ts` (mirror cases + two Sim-authority checks).
+- Phase 01 API decisions: `masterwroughtConflictSlot(item, equipment, lookup, ignoreSlots,
+  instances?, incomingQuality?)` returns `{ slot, reason: 'cap' | 'legendary' } | null`
+  (the reason picks the refusal line; instance rolled.quality overrides def quality, a
+  DELIBERATE difference from isUniqueEquipped which stays def-only); the unit-selection
+  rule lives in equipment_rules as `equipCandidateIndex`/`equipCandidateQuality` so the
+  sim consume, the sim pre-check, and the client mirror share one selection. The two
+  refusal emits in items.ts MUST stay single-line literals: the S3 scanner cannot see a
+  wrapped or ternary emit (proven empirically; mutation-verified end to end).
 - Open items: JC/inscription station decision (phase 05/06); slot coverage audit results
-  (phase 08); web-verified name confirmations (each content phase).
+  (phase 08); web-verified name confirmations (each content phase); tooltip does not yet
+  state the legendary sub-cap, add the line when promotion makes it reachable (phase
+  13/14); `rolled.quality` is RETIRED for new writes (crafting.ts), so the Perfecting or
+  promotion phase must pick the field that carries instance legendary before the craft
+  phases assume one (ruling needed by phase 12); when flagged content lands, extend the
+  `tests/crafted_item_tooltip_coverage.test.ts` list, give the double gold tooltip line a
+  copy pass, and re-check dev_kit/pbe_boost preset slot counting (phases 03/08); the S3
+  scanner's blindness to wrapped/ternary emits is a repo-wide guard gap worth a durable
+  hardening outside this packet; `tests/anim_pipeline_hunter_ghost.test.ts` is red AT the
+  v0.36.0 release tip (inherited, files byte-identical), fix belongs upstream.
