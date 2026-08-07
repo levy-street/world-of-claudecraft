@@ -4,7 +4,7 @@
 |---|---|---|---|---|
 | 01 | Masterwrought equip cap | complete | 2026-08-07 | 2026-08-07 |
 | 01 QA | verify | complete | 2026-08-07 | 2026-08-07 |
-| 02 | Pattern items and recipe learning | pending | | |
+| 02 | Pattern items and recipe learning | complete | 2026-08-07 | 2026-08-07 |
 | 02 QA | verify | pending | | |
 | 03 | IP naming sweep | pending | | |
 | 03 QA | verify | pending | | |
@@ -54,6 +54,21 @@ never future-PR items, per the delivery contract in `state.md`).
   should-fix findings applied, deferrals recorded as open items in state.md. Known
   inherited red: tests/anim_pipeline_hunter_ghost.test.ts is red AT the release tip
   (byte-identical files); not a phase defect, fix belongs upstream.
+- Phase 02 (2026-08-07): pattern-item machinery shipped in both hosts with zero new IWorld
+  members, wire fields, or server handlers. ItemKind 'recipe' + RecipeItemDef.teachesRecipeId;
+  learn flow behind SimContext in professions/pattern_items.ts (already-known, unpracticed
+  profession, tier via the shared teachTierMet; acquireRecipe's first real caller; consume
+  exactly one on success; refusals single-line ctx.error, never consuming); success rides the
+  text-free trainResult ok event. Three refusal rows localized in all 20 non-en sim DICT
+  blocks (already-known copied verbatim from the trainer line per locale); pattern kind label
+  plus tooltip (teaches, requirement mirroring both gates, known state) as t() keys; patterns
+  unstacked, market-listable, 'other'-bucketed, parchment-iconed. No shipped content carries
+  the kind yet (phase 11 authors the drops on this machinery). Reviewed by
+  architecture-reviewer, cross-platform-sync, frontend-seam-reviewer (0 blocking), all
+  findings applied; the fix round was itself verified by a fresh qa-checklist agent whose one
+  blocking claim (S3 corpus miss) was refuted with a byte-mutation probe and whose 6
+  should-fix + 6 nits were applied in a second reviewed round. Decisions, traps, and phase 11
+  obligations recorded in the Phase 02 ledger in state.md.
 - Phase 01 QA (2026-08-07): six-auditor fan-out (correctness, test-decisiveness,
   cleanup, architecture-reviewer, cross-platform-sync, qa-checklist) over the four
   phase commits. Verdict PASS after the fix round: 2 blocking (tooltip tag untested;

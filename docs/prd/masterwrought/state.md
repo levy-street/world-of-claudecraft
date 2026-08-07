@@ -1,6 +1,6 @@
 # Masterwrought: cross-phase state
 
-Current phase: 01 built and QA-audited (fix round applied 2026-08-07); next is phase 02. Packet authored 2026-08-07.
+Current phase: 02 built and review-audited (two reviewed fix rounds applied 2026-08-07); next is phase 02 QA. Packet authored 2026-08-07.
 Branch: `feature/masterwrought` (worktree `~/Documents/wocc-masterwrought`), based on `origin/release/v0.36.0`.
 
 ## Delivery contract (non-negotiable)
@@ -206,3 +206,90 @@ Arcanite (new uses), Quintessent, Grand Banquet, Colossus Splitter, Aetherlens, 
   to the cap; acceptable for v1, flag for a ruling if legacy telemetry says otherwise.
   MasterwroughtConflict.slot is production-write-only (consumers branch on reason);
   kept for symmetry with uniqueEquipConflictSlot and future swap affordances.
+
+## Phase 02 ledger (pattern items; two reviewed fix rounds applied 2026-08-07)
+- Representation decision: a REAL new ItemKind 'recipe' via a dedicated RecipeItemDef union
+  member carrying a REQUIRED teachesRecipeId (types.ts; OtherItemDef excludes 'recipe' so a
+  pattern def cannot omit it). Rationale over the cheaper use.type-variant route: kind drives
+  the tooltip label, junk-sell exclusion, material-taxonomy exclusion, stacking (patterns are
+  in UNSTACKED_KINDS, one per slot), and the market browse bucket; a use-variant on junk/tool
+  would need per-site special cases at every one of those by phase 11. Patterns join the
+  market 'other' bucket (dedicated chip is phase 11's call; one-per-slot means the chip case
+  strengthens as pattern count grows).
+- Gate decomposition RULING: no profession-membership concept exists anywhere in the sim
+  (mastery_reset seeds every ring craft at 0; resolveTrain has no wrong-profession arm), so
+  the spec's three gates land as already-known (isRecipeKnown) -> profession-not-practiced
+  (craftSkills value 0) -> tier-unmet (the shared teachTierMet). Deliberate divergence, on
+  record: a trainer can teach a never-practiced character a tier-0 recipe; a pattern requires
+  the craft to have been practiced. Deny order mirrors resolveTrain replay discipline;
+  invalid content (unresolvable teachesRecipeId, or a recipe without 'drop' acquisition) is a
+  SILENT no-op, guarded by the content-shape sweep below. The learn path draws zero rng.
+- Learn flow: src/sim/professions/pattern_items.ts (pure resolvePatternLearn + apply arm
+  behind SimContext), dispatched from the useItem kind chain BELOW the dead gate (use while
+  dead is a silent no-op; usable in combat and while swimming, the potions precedent, on
+  record). acquireRecipe gained its first real caller (source 'drop'); consume is exactly one
+  copy by the dispatch itemId, only after acquire ok. Success emits the existing text-free
+  trainResult ok event (the HUD logs training.learned and the TrainLearnTracker confirmed
+  overlay flips the train row Known); NO lastTrainResult write (that stays the train-command
+  probe, pinned by identity) and NO event on refusals (they are ctx.error-only, or the deny
+  would double-print). Known consequence, fails closed: a pattern learn transiently
+  over-reserves that recipe's trainer fee in availableTrainCopper for one broadcast.
+- New i18n keys + matcher rows: error.patternKnown 'You already know that recipe.' (fills
+  copied VERBATIM per locale from resolved hudChrome.training.alreadyKnown so hover and click
+  agree byte for byte), error.patternProfession 'You have not practiced that profession.',
+  error.patternSkill 'Your skill is too low to learn that pattern.'; all three placeholder
+  free (EXACT self-registration, no RULES rows), real fills in all 20 non-en blocks (12
+  BASE_DICT + 8 BASE_NEW), en_CA on the English floor, each emit its own single-line
+  ctx.error (S3 coverage PROVEN by a byte-mutation probe; the professions directory glob at
+  the corpus assembly covers pattern_items.ts, no explicit entry needed). English vocabulary
+  mix is deliberate: you KNOW a recipe, you HOLD a pattern. hudChrome.pattern.teaches 'Use:
+  Teaches you how to craft {item}.' with its five non-Latin fills (M16), 15 Latin overlays
+  pending for the release fill. itemUi.kind.recipe 'Pattern' English plus one-word fills in
+  all 18 full overlays IN-CHANGE (deliberate deviation from English-only: keeps each locale's
+  pattern-word consistent with its sim DICT refusal rows; the release fill should still
+  REVIEW those words). Register clash inherited verbatim in three locales (de_DE Sie vs du,
+  pl_PL plural, tr_TR formal): reconcile at the trainer key during the release fill, not here.
+- Tooltip: pure core src/ui/recipe_pattern_tooltip_view.ts (UI_PURE_CORES registered) + a
+  thin kind-gated hud branch (craftingIdentity read gated on kind === 'recipe' for hover
+  cost). Teaches line gates on the SAME drop-acquisition predicate the resolver uses (a
+  non-drop pattern renders nothing, so the hover never advertises a click the sim refuses),
+  suppresses requirement/known lines while !synced, and the requirement met-state mirrors
+  BOTH sim gates (practiced && tier band via tierForSkill). Reuses skillReqLine and
+  training.alreadyKnown; known-state reads craftingIdentity.knownRecipes. Residual preview
+  gap, on record: a skillReq-0 pattern for a never-practiced viewer previews nothing while
+  the click refuses; no such content exists or is planned. Icons: recipe kind renders the
+  parchment/scroll family, arm placed ABOVE the substring fish-name arm (two-sided pin).
+- New IWorld members: NONE (tooltip reads the existing IWorldProfessions.craftingIdentity
+  incl. its synced flag; the use round-trip rides IWorldInventory.useItem and the cprof
+  delta; parity pin untouched). No wire, server-handler, or SimContext changes.
+- New item ids: none (synthetic test_pattern_ ids injected at runtime only; frozen-id golden
+  untouched). NO shipped content carries kind 'recipe' yet: every arm this phase adds is
+  reachable in play only when phase 11 authors patterns.
+- New tests: tests/recipe_pattern_items.test.ts (learn/consume both hosts incl. the real
+  'use' wire command, routeEvents fan-out of the trainResult event, cprof + ClientWorld
+  mirror; three refusal literals with items intact; tier boundary both sides; deny-order pin;
+  silent invalid guards; dead-gate placement; zero-rng observer; real marketList; unstacked
+  one-per-slot; order-insensitive 'other'-bucket pin; lastTrainResult identity pin; DICT.en +
+  20-locale coverage; the vacuous-today content-shape sweep requiring teachesRecipeId to
+  resolve AND the recipe to carry 'drop', with a companion pin holding the synthetic skip
+  honest); tests/recipe_pattern_tooltip_view.test.ts (model/lines, dual-shape Sim +
+  bareClient projections, synced and acquisition arms, sub-tier profession-gate arm both
+  ways, real Hud.itemTooltip reachability); extensions to item_icons, item_kind_line,
+  item_name_color, bags_view (transfer-mode matrix against literals), bag_filter (ALL-only),
+  crafted_item_tooltip_coverage (pure-builder EFFECT_SOURCES row + compose pin).
+- Traps recorded for later phases: ALL_RECIPES exists twice, content/recipes.ts is the array
+  recipeById scans and data.ts re-exports a COPY, so tests must push the content array; the
+  sim DICT is a literal-key union, so a test reading DICT.en['error.x'] is a COMPILE error
+  until the matcher row lands (cross-arm coupling); adding 'drop' to a previously
+  acquisition-less recipe flips isRecipeKnown from known-to-all to must-be-learned, so never
+  retrofit 'drop' without grandfather care.
+- Phase 11 obligations from this ledger: every authored pattern's recipe must carry 'drop'
+  acquisition (the content sweep enforces it and goes live then; add a count floor); rod
+  recipes must NEVER gain 'drop' or the rodFeePaid metric needs a fee-bearing discriminator
+  (comment at the metric); re-point the tooltip suite's real-recipe silence arm when
+  sunpetal-class content gains drops; pattern items need committed icon art or
+  ITEM_ART_PENDING entries; revisit a dedicated market/bag chip as pattern count grows;
+  author pattern skillReqs ON the 25-step tier boundaries or first decide the requirement
+  number question (the pattern hover prints the raw skillReq while the trainer surfaces
+  print the tier-band floor tierForSkill(skillReq) * TIER_SKILL_STEP; identical for every
+  on-step recipe, divergent copy for an off-step one).

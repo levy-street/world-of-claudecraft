@@ -30,8 +30,10 @@
 // over: the requirement line is suppressed at skillReq 0 (it would say nothing),
 // but the sim's `profession` arm still refuses a never-practiced character on
 // such a pattern, so that ONE combination (skillReq 0 + zero skill in the craft)
-// previews no gate while the click refuses. Every skillReq above 0 is covered,
-// because `skillMet` below carries the practiced arm too. No skillReq-0 pattern
+// previews no gate while the click refuses. Every skillReq above 0 whose craft
+// has a printable name is covered (a craft with no name key renders no
+// requirement line at any skillReq, per the guard at the render site), because
+// `skillMet` below carries the practiced arm too. No skillReq-0 pattern
 // exists in the content table, and this packet authors none; if one is ever
 // authored, the fix is to render the requirement line at skillReq 0 as well
 // (with wording that does not read as "Requires Alchemy 0").

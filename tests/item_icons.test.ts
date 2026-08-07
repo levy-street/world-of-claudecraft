@@ -646,6 +646,9 @@ describe('recipe patterns take the parchment page, whatever they are named', () 
   it('is the ordering and not the name: the same name on a NON-recipe kind still draws a fish', () => {
     // Without this half the pin above would also pass on a fallback that had
     // simply stopped drawing fish at all, which would be a different bug.
+    // The fish result here is the CURRENT substring behavior being controlled
+    // for, not a requirement: if the fish token list ever narrows to word
+    // boundaries (the real root cause), retire this half rather than defend it.
     const id = 'test_icon_fishy_junk_probe';
     ITEMS[id] = {
       id,
