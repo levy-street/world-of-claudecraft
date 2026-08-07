@@ -3026,6 +3026,9 @@ export const sv_SE: EnTranslations = {
       "alreadyKnown": "Det receptet känner du redan till.",
       "outOfRange": "Du måste vara på stationen för att träna."
     },
+    "pattern": {
+      "teaches": "Use: Teaches you {item}."
+    },
     "unbind": {
       "title": "Upplösning: {name}",
       "close": "Stäng upplösning",
@@ -7600,6 +7603,7 @@ export const sv_SE: EnTranslations = {
       "material": "Material",
       "food": "Mat",
       "drink": "Dryck",
+      "recipe": "Mönster",
       "tool": "Verktyg",
       "potion": "Trolldryck",
       "elixir": "Elixir",

@@ -610,6 +610,7 @@ import { questMarkerTooltipTag } from './quest_marker_tags';
 import { questProgressEventText } from './quest_progress_text';
 import { lockoutParts, lockoutShape } from './raid_lockout';
 import { type RaidLockoutI18n, raidLockoutPanelHtml } from './raid_lockout_view';
+import { recipePatternTooltipLines } from './recipe_pattern_tooltip_view';
 import { restView } from './rest_indicator';
 import { isTalentRowUnlockLevel } from './row_unlock_toast';
 import { localizeServerText } from './server_i18n';
@@ -5756,6 +5757,17 @@ export class Hud {
     // useItem), from the pure sibling view so bags, bank, crafting, vendor,
     // and market all state what the elixir does.
     html += elixirTooltipLines(item);
+    // Recipe patterns (kind 'recipe'): what the pattern teaches, the craft
+    // skill it wants (red when unmet), and the trainer's own already-known
+    // line when this character has learned it. The viewer state is the
+    // existing craftingIdentity read, so bags, bank, mail, and market all
+    // state the same three lines offline and online. The read is gated on the
+    // kind rather than left to the core's own guard: craftingIdentity rebuilds
+    // a copied skill record and a SORTED known-recipe list per call, and no
+    // other kind's hover should pay for it.
+    if (item.kind === 'recipe') {
+      html += recipePatternTooltipLines(item, this.sim.craftingIdentity);
+    }
     // Quest story block (related quest, progress, rules, orphaned). Replaces the
     // old plain "Quest Item" desc that doubled the kind line.
     if (questModel) html += this.questItemTooltipStoryHtml(questModel);

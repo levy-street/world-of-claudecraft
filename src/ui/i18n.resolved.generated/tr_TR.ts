@@ -3026,6 +3026,9 @@ export const tr_TR: EnTranslations = {
       "alreadyKnown": "Bu tarifi zaten biliyorsunuz.",
       "outOfRange": "Antrenman yapmak için istasyonda olmanız gerekmektedir."
     },
+    "pattern": {
+      "teaches": "Use: Teaches you {item}."
+    },
     "unbind": {
       "title": "Bağ Çözme: {name}",
       "close": "Bağı çözmeyi kapat",
@@ -7600,6 +7603,7 @@ export const tr_TR: EnTranslations = {
       "material": "Malzeme",
       "food": "Yiyecek",
       "drink": "İçecek",
+      "recipe": "Şema",
       "tool": "Alet",
       "potion": "Şifa İksiri",
       "elixir": "İksir",

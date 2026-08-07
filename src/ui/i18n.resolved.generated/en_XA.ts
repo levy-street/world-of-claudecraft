@@ -3026,6 +3026,9 @@ export const en_XA: EnTranslations = {
       "alreadyKnown": "[Ýóú áļŕéáðý ķñóŵ ţĥáţ ŕéçíþé.]",
       "outOfRange": "[Ýóú ɱúšţ ƀé áţ ţĥé šţáţíóñ ţó ţŕáíñ.]"
     },
+    "pattern": {
+      "teaches": "[Úšé: Ţéáçĥéš ýóú {item}.]"
+    },
     "unbind": {
       "title": "[Úñƀíñðíñĝ: {name}]",
       "close": "[Çļóšé úñƀíñðíñĝ]",
@@ -7600,6 +7603,7 @@ export const en_XA: EnTranslations = {
       "material": "[Ɱáţéŕíáļ]",
       "food": "[Ƒóóð]",
       "drink": "[Ðŕíñķ]",
+      "recipe": "[Þáţţéŕñ]",
       "tool": "[Ţóóļ]",
       "potion": "[Þóţíóñ]",
       "elixir": "[Éļíẋíŕ]",

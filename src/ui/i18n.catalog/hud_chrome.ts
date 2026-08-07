@@ -3896,6 +3896,15 @@ export const hudChromeStrings = {
     alreadyKnown: 'You already know that recipe.',
     outOfRange: 'You must be at the station to train.',
   },
+  // Recipe pattern items (kind 'recipe'), the drop-side second way to learn a
+  // recipe. Only the teaches line is new: the pattern tooltip's requirement
+  // line reuses crafting.skillReqLine and its known line reuses
+  // training.alreadyKnown above, since a pattern grants the same knowledge a
+  // trainer does and must not word it a second way. {item} is the LOCALIZED
+  // name of the item the taught recipe crafts (entity i18n, never a raw id).
+  pattern: {
+    teaches: 'Use: Teaches you {item}.',
+  },
   // Maker's Bond unbind service window + result lines (Professions 2.0):
   // the station master's second gossip service beside training.
   // Item NAMES resolve through entity i18n, never through these keys; the

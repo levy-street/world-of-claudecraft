@@ -75,6 +75,11 @@ export type ItemLookup = (itemId: string) => ItemDef | undefined;
 // kind test: grey vendor trash and the unclassified trophies match only 'all', and
 // the implements/charms/cosmetic tokens the old junk-or-tool predicate swept in
 // live under the 'tool' chip instead.
+// Recipe patterns (kind 'recipe') are deliberately ALL-ONLY: none of the chips fits
+// (a pattern is not a restorative, not an honest material, and not an implement), and
+// widening 'consumable' to cover it would put a permanent unlock beside the potions a
+// player filters for in a fight. A pattern is a short-lived stack anyway, held only
+// until it is used, so it earns its own chip when patterns become numerous, not before.
 export function matchesCategory(item: ItemDef, category: BagCategory): boolean {
   switch (category) {
     case 'all':

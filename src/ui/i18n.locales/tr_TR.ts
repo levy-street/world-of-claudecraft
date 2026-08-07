@@ -8115,6 +8115,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'itemUi.errors.tooManyListings': 'Pazarda aynı anda en fazla {count} mal tutabilirsin.',
   'itemUi.kind.armor': 'Zırh',
   'itemUi.kind.drink': 'İçecek',
+  'itemUi.kind.recipe': 'Şema',
   'itemUi.kind.elixir': 'İksir',
   'itemUi.kind.food': 'Yiyecek',
   'itemUi.kind.junk': 'Döküntü',

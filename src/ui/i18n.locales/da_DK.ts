@@ -7431,6 +7431,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'itemUi.errors.tooManyListings': 'Du må højst have {count} varer på markedet ad gangen.',
   'itemUi.kind.armor': 'Rustning',
   'itemUi.kind.drink': 'Drikke',
+  'itemUi.kind.recipe': 'Mønster',
   'itemUi.kind.elixir': 'Eliksir',
   'itemUi.kind.food': 'Mad',
   'itemUi.kind.junk': 'Skrammel',

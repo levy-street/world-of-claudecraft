@@ -3026,6 +3026,9 @@ export const da_DK: EnTranslations = {
       "alreadyKnown": "Den opskrift kender du allerede.",
       "outOfRange": "Du skal være på stationen for at træne."
     },
+    "pattern": {
+      "teaches": "Use: Teaches you {item}."
+    },
     "unbind": {
       "title": "Aflæsning: {name}",
       "close": "Luk aflæsning",
@@ -7600,6 +7603,7 @@ export const da_DK: EnTranslations = {
       "material": "Materiale",
       "food": "Mad",
       "drink": "Drikke",
+      "recipe": "Mønster",
       "tool": "Værktøj",
       "potion": "Eliksir",
       "elixir": "Eliksir",

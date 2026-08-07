@@ -3026,6 +3026,9 @@ export const cs_CZ: EnTranslations = {
       "alreadyKnown": "Ten recept už znáte.",
       "outOfRange": "Abys mohl trénovat, musíš být u řemeslné stanice."
     },
+    "pattern": {
+      "teaches": "Use: Teaches you {item}."
+    },
     "unbind": {
       "title": "Odpoutání: {name}",
       "close": "Zavřít odpoutání",
@@ -7600,6 +7603,7 @@ export const cs_CZ: EnTranslations = {
       "material": "Materiál",
       "food": "Jídlo",
       "drink": "Nápoj",
+      "recipe": "Vzor",
       "tool": "Nástroj",
       "potion": "Lektvar",
       "elixir": "Elixír",

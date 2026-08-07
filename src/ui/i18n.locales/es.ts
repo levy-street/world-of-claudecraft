@@ -4425,6 +4425,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'itemUi.kind.junk': 'Chatarra',
   'itemUi.kind.food': 'Comida',
   'itemUi.kind.drink': 'Bebida',
+  'itemUi.kind.recipe': 'Patrón',
   'itemUi.kind.tool': 'Herramienta',
   'itemUi.kind.potion': 'Poción',
   'itemUi.kind.elixir': 'Elixir',

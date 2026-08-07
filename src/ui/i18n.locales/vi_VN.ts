@@ -8094,6 +8094,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'itemUi.errors.tooManyListings': 'Bạn chỉ được giữ tối đa {count} món hàng trên chợ cùng lúc.',
   'itemUi.kind.armor': 'Giáp',
   'itemUi.kind.drink': 'Đồ Uống',
+  'itemUi.kind.recipe': 'Mẫu',
   'itemUi.kind.elixir': 'Tiên Dược',
   'itemUi.kind.food': 'Thức Ăn',
   'itemUi.kind.junk': 'Đồ Vụn',

@@ -7382,6 +7382,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'itemUi.errors.tooManyListings': 'Du får ha högst {count} varor på marknaden samtidigt.',
   'itemUi.kind.armor': 'Rustning',
   'itemUi.kind.drink': 'Dryck',
+  'itemUi.kind.recipe': 'Mönster',
   'itemUi.kind.elixir': 'Elixir',
   'itemUi.kind.food': 'Mat',
   'itemUi.kind.junk': 'Skräp',

@@ -7594,6 +7594,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'itemUi.errors.tooManyListings': 'Je mag hooguit {count} waren tegelijk op de markt houden.',
   'itemUi.kind.armor': 'Pantser',
   'itemUi.kind.drink': 'Drank',
+  'itemUi.kind.recipe': 'Patroon',
   'itemUi.kind.elixir': 'Elixer',
   'itemUi.kind.food': 'Voedsel',
   'itemUi.kind.junk': 'Rommel',

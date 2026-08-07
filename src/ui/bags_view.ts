@@ -188,6 +188,11 @@ export function bagItemAction(
   // A collected reins item falls through to 'use' like any other usable item:
   // clicking it summons that mount (sim useItem -> summonMountItem). There is no
   // picker to open any more.
+  // A recipe pattern falls through here too: using it learns the recipe and
+  // consumes the copy (professions/pattern_items.ts). It carries no def-level
+  // `use` payload, so the fall-through is the only rung that reaches it, and
+  // every transfer mode above deliberately treats it as an ordinary tradable
+  // stack (patterns are plain drops: not soulbound, not noMarketList).
   return 'use';
 }
 
@@ -386,6 +391,10 @@ export function bagTooltipHintKey(
   if (isToolEffectBagUse(item.use)) {
     return 'hudChrome.professions.toolEffectTooltip.openProfessions';
   }
+  // Patterns are usable but carry no `use` payload (the kind IS the payload),
+  // so they need their own row to reach the shared use hint; without it the
+  // hover stayed silent about a click that learns a recipe.
+  if (item.kind === 'recipe') return 'itemUi.tooltip.clickUse';
   if (item.use) return 'itemUi.tooltip.clickUse';
   return '';
 }

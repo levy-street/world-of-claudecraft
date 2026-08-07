@@ -3026,6 +3026,9 @@ export const ru_RU: EnTranslations = {
       "alreadyKnown": "Вы уже знаете этот рецепт.",
       "outOfRange": "Для обучения нужно стоять у мастерской."
     },
+    "pattern": {
+      "teaches": "Использование: обучает изготовлению предмета «{item}»."
+    },
     "unbind": {
       "title": "Снятие привязки: {name}",
       "close": "Закрыть снятие привязки",
@@ -7600,6 +7603,7 @@ export const ru_RU: EnTranslations = {
       "material": "Материал",
       "food": "Еда",
       "drink": "Напиток",
+      "recipe": "Схема",
       "tool": "Инструмент",
       "potion": "Зелье",
       "elixir": "Эликсир",

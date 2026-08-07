@@ -3026,6 +3026,9 @@ export const de_DE: EnTranslations = {
       "alreadyKnown": "Das Rezept kennen Sie bereits.",
       "outOfRange": "Du musst dich an der Handwerksstation befinden, um etwas zu lernen."
     },
+    "pattern": {
+      "teaches": "Use: Teaches you {item}."
+    },
     "unbind": {
       "title": "Entbindung: {name}",
       "close": "Entbindung schließen",
@@ -7600,6 +7603,7 @@ export const de_DE: EnTranslations = {
       "material": "Material",
       "food": "Essen",
       "drink": "Getränk",
+      "recipe": "Muster",
       "tool": "Werkzeug",
       "potion": "Trank",
       "elixir": "Elixier",

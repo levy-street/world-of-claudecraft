@@ -7615,6 +7615,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'itemUi.errors.tooManyListings': 'Możesz wystawić na rynku najwyżej {count} towarów naraz.',
   'itemUi.kind.armor': 'Pancerz',
   'itemUi.kind.drink': 'Napój',
+  'itemUi.kind.recipe': 'Wzór',
   'itemUi.kind.elixir': 'Eliksir',
   'itemUi.kind.food': 'Jedzenie',
   'itemUi.kind.junk': 'Tandeta',

@@ -3026,6 +3026,9 @@ export const fr_CA: EnTranslations = {
       "alreadyKnown": "Vous connaissez déjà cette recette.",
       "outOfRange": "Vous devez être à la gare pour vous entraîner."
     },
+    "pattern": {
+      "teaches": "Use: Teaches you {item}."
+    },
     "unbind": {
       "title": "Déliage : {name}",
       "close": "Fermer le déliage",
@@ -7600,6 +7603,7 @@ export const fr_CA: EnTranslations = {
       "material": "Matériau",
       "food": "Nourriture",
       "drink": "Boisson",
+      "recipe": "Patron",
       "tool": "Outil",
       "potion": "Potion",
       "elixir": "Élixir",

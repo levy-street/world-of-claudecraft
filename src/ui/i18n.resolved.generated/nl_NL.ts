@@ -3026,6 +3026,9 @@ export const nl_NL: EnTranslations = {
       "alreadyKnown": "Dat recept ken je al.",
       "outOfRange": "Je moet bij het werkstation zijn om te trainen."
     },
+    "pattern": {
+      "teaches": "Use: Teaches you {item}."
+    },
     "unbind": {
       "title": "Ontbinden: {name}",
       "close": "Ontbinden sluiten",
@@ -7600,6 +7603,7 @@ export const nl_NL: EnTranslations = {
       "material": "Materiaal",
       "food": "Voedsel",
       "drink": "Drank",
+      "recipe": "Patroon",
       "tool": "Gereedschap",
       "potion": "Toverdrank",
       "elixir": "Elixer",

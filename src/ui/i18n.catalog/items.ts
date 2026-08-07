@@ -54,6 +54,11 @@ const itemStringsEn = {
       material: 'Material',
       food: 'Food',
       drink: 'Drink',
+      // Recipe pattern items (kind 'recipe'): the physical drop that teaches
+      // one crafting recipe when used. "Pattern" rather than "Recipe" so the
+      // OBJECT in the bags reads apart from the KNOWLEDGE it grants, which the
+      // trainer and crafting surfaces already call a recipe.
+      recipe: 'Pattern',
     },
     stats: {
       armor: 'Armor',

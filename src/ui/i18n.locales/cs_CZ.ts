@@ -2655,6 +2655,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'itemUi.kind.armor': 'Brnění',
   'itemUi.kind.bag': 'Batoh',
   'itemUi.kind.drink': 'Nápoj',
+  'itemUi.kind.recipe': 'Vzor',
   'itemUi.kind.elixir': 'Elixír',
   'itemUi.kind.food': 'Jídlo',
   'itemUi.kind.junk': 'Odpad',

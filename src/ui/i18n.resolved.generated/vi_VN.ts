@@ -3026,6 +3026,9 @@ export const vi_VN: EnTranslations = {
       "alreadyKnown": "Bạn đã biết công thức đó rồi.",
       "outOfRange": "Bạn phải ở nhà ga để đào tạo."
     },
+    "pattern": {
+      "teaches": "Use: Teaches you {item}."
+    },
     "unbind": {
       "title": "Gỡ Ràng Buộc: {name}",
       "close": "Đóng gỡ ràng buộc",
@@ -7600,6 +7603,7 @@ export const vi_VN: EnTranslations = {
       "material": "Nguyên Liệu",
       "food": "Thức Ăn",
       "drink": "Đồ Uống",
+      "recipe": "Mẫu",
       "tool": "Dụng Cụ",
       "potion": "Thuốc",
       "elixir": "Tiên Dược",

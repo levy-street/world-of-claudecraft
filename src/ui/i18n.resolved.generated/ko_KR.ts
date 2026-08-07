@@ -3026,6 +3026,9 @@ export const ko_KR: EnTranslations = {
       "alreadyKnown": "이미 알고 있는 제조법입니다.",
       "outOfRange": "훈련하려면 작업대 옆에 있어야 합니다."
     },
+    "pattern": {
+      "teaches": "사용: {item} 제작법을 배웁니다."
+    },
     "unbind": {
       "title": "귀속 해제: {name}",
       "close": "귀속 해제 닫기",
@@ -7600,6 +7603,7 @@ export const ko_KR: EnTranslations = {
       "material": "재료",
       "food": "음식",
       "drink": "음료",
+      "recipe": "도안",
       "tool": "도구",
       "potion": "물약",
       "elixir": "비약",

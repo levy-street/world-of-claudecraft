@@ -111,6 +111,7 @@ describe('crafted item tooltip coverage', () => {
       'cookingCatchHintKey(item.id)',
       'materialProfessionHintText(item.id)',
       'elixirTooltipLines(item)',
+      'recipePatternTooltipLines(item, this.sim.craftingIdentity)',
       'stackSizeTooltipLine(item, instance)',
     ]) {
       expect(body, `itemTooltip must compose ${call}`).toContain(call);

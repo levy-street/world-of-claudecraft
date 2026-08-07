@@ -8212,6 +8212,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Kamu hanya boleh menyimpan paling banyak {count} barang di pasar sekaligus.',
   'itemUi.kind.armor': 'Zirah',
   'itemUi.kind.drink': 'Minuman',
+  'itemUi.kind.recipe': 'Pola',
   'itemUi.kind.elixir': 'Eliksir',
   'itemUi.kind.food': 'Makanan',
   'itemUi.kind.junk': 'Rongsokan',

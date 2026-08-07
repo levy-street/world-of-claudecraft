@@ -4564,6 +4564,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'itemUi.kind.junk': 'Plunder',
   'itemUi.kind.food': 'Essen',
   'itemUi.kind.drink': 'Getränk',
+  'itemUi.kind.recipe': 'Muster',
   'itemUi.kind.tool': 'Werkzeug',
   'itemUi.kind.potion': 'Trank',
   'itemUi.kind.elixir': 'Elixier',

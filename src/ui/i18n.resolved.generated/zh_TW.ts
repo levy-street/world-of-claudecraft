@@ -3026,6 +3026,9 @@ export const zh_TW: EnTranslations = {
       "alreadyKnown": "你已經學會了該配方。",
       "outOfRange": "你必須站在對應的工作臺旁才能訓練。"
     },
+    "pattern": {
+      "teaches": "使用：教你製作{item}。"
+    },
     "unbind": {
       "title": "解綁：{name}",
       "close": "關閉解綁",
@@ -7600,6 +7603,7 @@ export const zh_TW: EnTranslations = {
       "material": "材料",
       "food": "食物",
       "drink": "飲料",
+      "recipe": "圖樣",
       "tool": "工具",
       "potion": "藥水",
       "elixir": "藥劑",

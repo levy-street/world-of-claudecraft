@@ -3026,6 +3026,9 @@ export const id_ID: EnTranslations = {
       "alreadyKnown": "Anda sudah tahu resep itu.",
       "outOfRange": "Anda harus berada di stasiun untuk berlatih."
     },
+    "pattern": {
+      "teaches": "Use: Teaches you {item}."
+    },
     "unbind": {
       "title": "Pelepasan Ikat: {name}",
       "close": "Tutup pelepasan ikat",
@@ -7600,6 +7603,7 @@ export const id_ID: EnTranslations = {
       "material": "Bahan",
       "food": "Makanan",
       "drink": "Minuman",
+      "recipe": "Pola",
       "tool": "Perkakas",
       "potion": "Ramuan",
       "elixir": "Eliksir",

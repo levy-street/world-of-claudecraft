@@ -11,28 +11,34 @@
 export const pending: Record<string, readonly string[]> = {
   "es": [
     "hudChrome.arenaGate.minLevelNote",
-    "hudChrome.itemMasterwrought"
+    "hudChrome.itemMasterwrought",
+    "hudChrome.pattern.teaches"
   ],
   "es_ES": [
     "hudChrome.arenaGate.minLevelNote",
-    "hudChrome.itemMasterwrought"
+    "hudChrome.itemMasterwrought",
+    "hudChrome.pattern.teaches"
   ],
   "fr_FR": [
     "hudChrome.arenaGate.minLevelNote",
-    "hudChrome.itemMasterwrought"
+    "hudChrome.itemMasterwrought",
+    "hudChrome.pattern.teaches"
   ],
   "fr_CA": [
     "hudChrome.arenaGate.minLevelNote",
-    "hudChrome.itemMasterwrought"
+    "hudChrome.itemMasterwrought",
+    "hudChrome.pattern.teaches"
   ],
   "en_CA": [],
   "it_IT": [
     "hudChrome.arenaGate.minLevelNote",
-    "hudChrome.itemMasterwrought"
+    "hudChrome.itemMasterwrought",
+    "hudChrome.pattern.teaches"
   ],
   "de_DE": [
     "hudChrome.arenaGate.minLevelNote",
-    "hudChrome.itemMasterwrought"
+    "hudChrome.itemMasterwrought",
+    "hudChrome.pattern.teaches"
   ],
   "zh_CN": [],
   "zh_TW": [],
@@ -40,39 +46,48 @@ export const pending: Record<string, readonly string[]> = {
   "ja_JP": [],
   "pt_BR": [
     "hudChrome.arenaGate.minLevelNote",
-    "hudChrome.itemMasterwrought"
+    "hudChrome.itemMasterwrought",
+    "hudChrome.pattern.teaches"
   ],
   "ru_RU": [],
   "cs_CZ": [
     "hudChrome.arenaGate.minLevelNote",
-    "hudChrome.itemMasterwrought"
+    "hudChrome.itemMasterwrought",
+    "hudChrome.pattern.teaches"
   ],
   "nl_NL": [
     "hudChrome.arenaGate.minLevelNote",
-    "hudChrome.itemMasterwrought"
+    "hudChrome.itemMasterwrought",
+    "hudChrome.pattern.teaches"
   ],
   "pl_PL": [
     "hudChrome.arenaGate.minLevelNote",
-    "hudChrome.itemMasterwrought"
+    "hudChrome.itemMasterwrought",
+    "hudChrome.pattern.teaches"
   ],
   "id_ID": [
     "hudChrome.arenaGate.minLevelNote",
-    "hudChrome.itemMasterwrought"
+    "hudChrome.itemMasterwrought",
+    "hudChrome.pattern.teaches"
   ],
   "tr_TR": [
     "hudChrome.arenaGate.minLevelNote",
-    "hudChrome.itemMasterwrought"
+    "hudChrome.itemMasterwrought",
+    "hudChrome.pattern.teaches"
   ],
   "sv_SE": [
     "hudChrome.arenaGate.minLevelNote",
-    "hudChrome.itemMasterwrought"
+    "hudChrome.itemMasterwrought",
+    "hudChrome.pattern.teaches"
   ],
   "vi_VN": [
     "hudChrome.arenaGate.minLevelNote",
-    "hudChrome.itemMasterwrought"
+    "hudChrome.itemMasterwrought",
+    "hudChrome.pattern.teaches"
   ],
   "da_DK": [
     "hudChrome.arenaGate.minLevelNote",
-    "hudChrome.itemMasterwrought"
+    "hudChrome.itemMasterwrought",
+    "hudChrome.pattern.teaches"
   ]
 };

@@ -3026,6 +3026,9 @@ export const ja_JP: EnTranslations = {
       "alreadyKnown": "そのレシピはすでに習得しています。",
       "outOfRange": "訓練するには作業台のそばにいる必要があります。"
     },
+    "pattern": {
+      "teaches": "使用: {item}の作成法を習得します。"
+    },
     "unbind": {
       "title": "バインド解除：{name}",
       "close": "バインド解除を閉じる",
@@ -7600,6 +7603,7 @@ export const ja_JP: EnTranslations = {
       "material": "素材",
       "food": "食べ物",
       "drink": "飲み物",
+      "recipe": "図案",
       "tool": "道具",
       "potion": "ポーション",
       "elixir": "エリクサー",
