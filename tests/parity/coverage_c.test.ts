@@ -292,13 +292,20 @@ describe('coverage: each scenario fires its subsystem', () => {
     expect(chats.some((e) => e.text === 'Malric...')).toBe(true);
   }, 90_000);
 
-  it('warrior_row_capstones: double charge, thresholded fear, victory rush heal, bladestorm ticks', () => {
+  it('warrior_row_capstones: intervene, thresholded fear, victory rush heal, bladestorm ticks', () => {
     const rec = run('warrior_row_capstones');
     const sim = rec.sim as any;
     const pid = sim.playerId;
     const ev = rec.allEvents as Ev[];
-    expect(rec.notes.chargeSpent).toBe(2);
-    expect(rec.notes.chargeRecharging).toBe(true);
+    // The hostile Onrush keeps both side effects...
+    expect(rec.notes.onrushRage).toBe(true);
+    expect(rec.notes.onrushInCombat).toBe(true);
+    // ...and the friendly Intervene takes neither, while shielding the ally.
+    expect(rec.notes.interveneShield).toBe(50);
+    expect(rec.notes.interveneClosed).toBe(true);
+    expect(rec.notes.interveneRage).toBe(0);
+    expect(rec.notes.interveneInCombat).toBe(false);
+    expect(rec.notes.interveneAutoAttack).toBe(false);
     const feared = entities(rec).find((e) =>
       e.auras?.some((a: any) => a.id === 'fear_incap'),
     ) as any;
