@@ -349,6 +349,10 @@ const PLAYERS = 'models/chars/players';
 const ENEMIES = 'models/chars/enemies';
 const CREATURES = 'models/creatures';
 const WEAPONS = 'models/weapons';
+const TOOLS = 'models/tools';
+// The Last Bell cast: bespoke NPC and break-spawned bodies built by
+// `scripts/assets/last_bell_crew/` off the shipped KayKit rigs.
+const NPCS_DIR = 'models/chars/npcs';
 const MOUNTS_DIR = 'models/mounts';
 
 const ITEM_OFFHAND_MODELS: Readonly<Record<string, string>> = {
@@ -1435,6 +1439,134 @@ export const VISUALS: Record<string, VisualDef> = {
     tintStrength: 0.3,
   },
 
+  // -- The Last Bell of Gullhaven: the Farshore cast --------------------------
+  // THESE FIGURES CARRY NO `attach`, AND THAT IS DELIBERATE. Their held props are
+  // baked INTO the body GLB, already skinned to the carrying bone, by
+  // `scripts/assets/last_bell_crew/` (a `fixed` prop in `cast.py`, kept rather than
+  // dropped by `crew.export`). The concept book photographs that same shipped file, so
+  // the page and the game cannot disagree about how anyone holds anything.
+  //
+  // Re-adding an `attach` here would re-derive the grip from the shared weapon tables
+  // and put the drift back: that is what had Ollun's staff level at his hip in game
+  // while the book showed it crown-up, and Coalfast's shield in his fist rather than
+  // strapped to his forearm. If a carry looks wrong, fix it in Blender and re-run
+  // `node scripts/assets/last_bell_crew/ship.mjs <member>`; do not add a grip here.
+  // The full contract: `docs/design/last-bell-held-prop-workflow.md`.
+  // Bespoke bodies built onto the shipped KayKit rigs by
+  // `scripts/assets/last_bell_crew/` (a repainted palette atlas plus geometry
+  // rigidly skinned to single bones), so each carries ONE material and merges to
+  // one draw. Their held props stay `attach` entries rather than baked geometry, so
+  // a defender's weapon is still swappable. Concept book + rationale:
+  // `docs/design/last-bell-concept-art.html`.
+  npc_coalfast: {
+    url: `${NPCS_DIR}/coalfast.glb`,
+    height: HUMANOID_H,
+    clips: kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
+  },
+  // His finale form: the same body and clips with the helm closed and the crest
+  // Hale's memorial figure wears. Lazy: it is only ever placed inside the campaign's
+  // story instances, never at a shared-world post.
+  npc_coalfast_helm: {
+    url: `${NPCS_DIR}/coalfast_helm.glb`,
+    height: HUMANOID_H,
+    clips: kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
+    lazyPreload: true,
+  },
+  // The open journal is gone from his off hand on purpose: carried out in front it
+  // read as a shield (cast review 1.5). The staff carries a hand-authored `grip`,
+  // captured from the same live-session arrangement the concept book renders, so the
+  // game and the book show the same carry rather than each deriving its own.
+  npc_ollun: {
+    url: `${NPCS_DIR}/ollun.glb`,
+    height: HUMANOID_H,
+    clips: kaykit(['2H_Melee_Attack_Chop']),
+  },
+  npc_edda: {
+    url: `${NPCS_DIR}/edda.glb`,
+    height: HUMANOID_H,
+    clips: kaykit(['1H_Melee_Attack_Chop']),
+  },
+  npc_saul: {
+    url: `${NPCS_DIR}/saul.glb`,
+    height: HUMANOID_H,
+    clips: kaykit(['1H_Melee_Attack_Chop']),
+  },
+  // Tam's bell-striker is bespoke GEOMETRY on the body, not an attach: no shipped
+  // weapon reads as one, and the campaign hands you that exact object afterwards.
+  npc_tam: {
+    url: `${NPCS_DIR}/tam.glb`,
+    height: HUMANOID_H,
+    clips: kaykit(['1H_Melee_Attack_Chop']),
+  },
+  npc_nell: {
+    url: `${NPCS_DIR}/nell.glb`,
+    // Shorter than every adult on the island: she is Bren's daughter, and the
+    // scale is doing characterisation, not just documentation.
+    height: HUMANOID_H * 0.865,
+    clips: kaykit(['1H_Melee_Attack_Chop']),
+  },
+  // NO weapon. He is a declared non-combatant, and the spear he used to carry was
+  // `spear_a.glb`, the tribal one with the tassels: in the concept book's Cheer plate
+  // the shaft crossed his face and he read as biting it. His outfit carries him.
+  // `cast.py` cut it from the book; this is the game catching up.
+  npc_ewald: {
+    url: `${NPCS_DIR}/ewald.glb`,
+    height: HUMANOID_H,
+    clips: kaykit(['1H_Melee_Attack_Chop']),
+  },
+  // A militia sergeant with a sword and NO shield, which is the whole separation from
+  // Coalfast: they share this body and stand two POIs apart, so the warden keeps the
+  // heavy square shield and the front-line stance, and Marsh reads as the town's own,
+  // in a padded jack under an issued kettle hat with one good blade and nothing else.
+  //
+  // Carried a size up on the family grip (see the `tune` in the crew factory's cast
+  // table): the sword is the one place his kit is not the poorer of the two, and at the
+  // bare family scale it read smaller than the warden's.
+  npc_marsh: {
+    url: `${NPCS_DIR}/marsh.glb`,
+    height: HUMANOID_H,
+    clips: kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
+  },
+
+  // -- The break-spawned -----------------------------------------------------
+  // Repainted KayKit SKELETON bodies. The Quaternius demon/goblin/giant bodies the
+  // Farshore families used to fall back on are flat untextured blobs at this size;
+  // a frame that is not finished being a body is also the better read for
+  // "unfinished rooms pressing into the waking world". No entity tint: the palette
+  // is authored per mob, so a wash would only muddy it.
+  // The Riftspawn is no longer a repainted skeleton. A skeleton is a DEAD body and
+  // the lore wants an unfinished one, so it is now a four-armed antlered thing with
+  // no mouth, generated and then rigged onto the KayKit skeleton locally, which is
+  // why it carries the FULL kaykit() vocabulary rather than the reduced set a
+  // retargeted body would. Its lower arm pair is bound rigidly to the chest bone:
+  // extra limbs cost nothing to animate as long as they ride the torso.
+  mob_riftspawn: {
+    url: `${NPCS_DIR}/riftspawn_antler.glb`,
+    height: 2.1,
+    clips: kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
+  },
+  mob_breach_wretch: {
+    url: `${NPCS_DIR}/breach_wretch.glb`,
+    height: 2.1,
+    clips: skeletonClips(['1H_Melee_Attack_Chop']),
+  },
+  // Off the skeleton golem, which read as forged, fitted, painted armour and so
+  // implied a smith and a culture: exactly wrong for something a break spat out.
+  // Now a horn-crowned brute. Rigged locally like the Riftspawn, so it upgrades from
+  // the golem body's EIGHT clips (no block, cast, strafes, sit, jump or walk-back,
+  // which is why that body needed its own reduced map) to the full KayKit set.
+  // Attacks are the two SWEEPS, deliberately not the two-handed overhead chop. That
+  // clip pitches a human torso deep forward, and on a body this wide with a head this
+  // large it reads as face-planting rather than slamming (the un-amplified original
+  // folds the same way, so it is the clip meeting this silhouette, not the retarget).
+  // The clips themselves are re-authored: torso damped, shoulders amplified, so the
+  // blow is a low wide claw sweep that keeps its eyes on the target.
+  mob_sundered_horror: {
+    url: `${NPCS_DIR}/sundered_horror_thicket.glb`,
+    height: 2.8,
+    clips: kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
+  },
+
   // -- NPCs ------------------------------------------------------------------
   npc_knight: {
     url: `${PLAYERS}/knight.glb`,
@@ -1596,6 +1728,17 @@ const MOB_KEYS: Record<string, string> = {
   // (docs/prd/protect-yumi-assets.md item 1, delivered).
   yumi_cat: 'mob_yumi_cat',
   training_dummy: 'mob_training_dummy',
+  // The Last Bell of Gullhaven: the break-spawned. These used to fall through to
+  // their FAMILY defaults (demon -> mob_demonalt, kobold -> goblin, ogre -> giant),
+  // which are flat untextured Quaternius bodies at this size. Now they have bespoke
+  // repainted skeleton bodies; the two with baked textures keep their models and
+  // their entity tint.
+  riftspawn: 'mob_riftspawn',
+  breach_wretch: 'mob_breach_wretch',
+  sundered_horror: 'mob_sundered_horror',
+  // Burrowing and webbed exits are what the encounter reads through, and the beast
+  // family's wolf silhouette promises neither.
+  tidemill_stalker: 'mob_spider',
   emberkin: 'mob_demon',
   water_elemental: 'mob_water_elemental',
   gloomshade: 'mob_demon',
@@ -1785,6 +1928,20 @@ const NPC_KEYS: Record<string, string> = {
   cook_marlow: 'npc_villager',
   tanner_hesk: 'npc_villager',
   huntsman_deral: 'npc_scout',
+  // The Last Bell of Gullhaven: the Farshore's named defenders. Each has a bespoke
+  // body rather than the generic villager fallback these ids used to resolve to.
+  warden_coalfast: 'npc_coalfast',
+  riftwatch_ollun: 'npc_ollun',
+  quartermaster_edda: 'npc_edda',
+  mender_saul: 'npc_saul',
+  bellkeeper_tam: 'npc_tam',
+  fisher_nell: 'npc_nell',
+  sergeant_marsh: 'npc_marsh',
+  // Both ends of the crossing are the same man, so both templates are the same body
+  // (the ferryman crosses with his boat, per the classic convention the campaign
+  // content follows).
+  ferryman_ewald: 'npc_ewald',
+  ferryman_ewald_gullhaven: 'npc_ewald',
 };
 
 export function visualKeyFor(e: Entity): string {

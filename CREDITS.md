@@ -92,6 +92,7 @@ than free, so ask before you rely on it.
 | Dungeon modular kit (walls, floors, pillars, torches, banners, chests, furniture; also the Drakelands castle structure set) | Kay Lousberg (KayKit) | https://github.com/KayKit-Game-Assets/KayKit-Dungeon-Remastered-1.0 | CC0 1.0 | Yes |
 | Graveyard/crypt props, dead trees, lanterns | Kay Lousberg (KayKit) | https://github.com/KayKit-Game-Assets/KayKit-Halloween-Bits-1.0 | CC0 1.0 | Yes |
 | Extra character animation library (Rig_Medium) | Kay Lousberg (KayKit) | https://kaylousberg.itch.io/kaykit-character-animations | CC0 1.0 | Yes |
+| The Last Bell of Gullhaven cast (`models/chars/npcs/`): derivative bodies built onto the KayKit Adventurers and Skeletons rigs above, repainted palette atlases plus original geometry, by `scripts/assets/last_bell_crew/` | Kay Lousberg (KayKit), derivative work by this project | https://github.com/KayKit-Game-Assets | CC0 1.0 | Yes |
 | Animated creatures (wolf, bull, fox, stag, alpaca, spider, frog, goblin, orc, yeti, giant, demon, ghost, goleling, glub, tribal, velociraptor, dragon) | Quaternius | https://poly.pizza/u/Quaternius · https://quaternius.com | CC0 1.0 | Yes |
 | Stylized Nature MegaKit (trees, rocks, bushes, mushrooms, grass) | Quaternius | https://quaternius.itch.io/stylized-nature-megakit | CC0 1.0 | Yes |
 | Medieval Village Pack (houses, inn, blacksmith, well, market, cart) | Quaternius | https://quaternius.com/packs/medievalvillage.html | CC0 1.0 | Yes |
@@ -258,7 +259,7 @@ non-commercial. For commercial use, arrange your own licence with the author.
 | Generated prop model (wildheart_ancestor_ruin) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
 | Generated prop model (wildheart_jungle_canopy_tree) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
 | Procedural prop model (grand_ferry_ship) | World of ClaudeCraft | Project-authored deterministic procedural reconstruction of the retired Tripo reference | Project asset | With the project only |
-| Generated prop model (wardenHaleStatue) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
+| Procedural prop model (wardenHaleStatue) | World of ClaudeCraft + Kay Lousberg (KayKit) | Project-authored deterministic Blender reconstruction (scripts/assets/warden_hale_statue), replacing the retired Tripo generation; the bronze figure is the KayKit knight re-posed and the planted sword is KayKit sword_b, both CC0 (see the KayKit rows above) | Project asset (CC0 source geometry) | With the project only |
 Assets were optimized for shipping (animation clip pruning, meshopt compression,
 texture resizing) via `scripts/assets/build_assets.mjs`; raw packs are not
 committed.

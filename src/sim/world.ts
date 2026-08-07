@@ -4319,6 +4319,16 @@ function decorationAt(seed: number, gx: number, gz: number): Decoration | null {
   const x = gx + ox,
     z = gz + oz;
   if (isExcludedDecoration(x, z)) return null;
+  // A memorial precinct is cleared ground: no wild trees or boulders inside
+  // its radius, so the monument keeps sky behind it and sightlines from the
+  // town below. Tested on the JITTERED position, not the grid anchor: the
+  // scatter offsets each anchor by up to half a step, so an anchor-space test
+  // let a tree land inside the clearing anyway. Sourced from the active world
+  // (never a literal) so the clearing cannot drift from its memorial. Placement
+  // is hash-based, so skipping here shifts no other decoration or rng draw.
+  for (const memorial of getActiveWorldContent().services?.memorials ?? []) {
+    if (Math.hypot(x - memorial.x, z - memorial.z) < memorial.clearingRadius) return null;
+  }
   // The Sowfield stadium footprint grows no trees or rocks (hash-based
   // placement, so skipping here shifts no other decoration or rng draw).
   if (isInSowfieldShell(x, z)) return null;

@@ -236,8 +236,9 @@ describe('Last Bell campaign fixtures', () => {
       z: 139,
       rot: Math.PI,
       scale: 1,
-      r: 1.26,
-      h: 4.8,
+      // measured off the shipping GLB: a 2.8yd square base on a 7.48yd column
+      r: 1.4,
+      h: 7.48,
     };
     expect(FARSHORE_PROPS.decorProps).toContainEqual(statue);
     expect(PROPS.decorProps).toContainEqual(statue);
@@ -309,7 +310,7 @@ describe('Last Bell campaign fixtures', () => {
       x: statue.x,
       z: statue.z,
       // the measured circumscribed footprint, so collision matches the silhouette
-      r: 1.26,
+      r: 1.4,
       camGhost: true,
     });
     expect(statueCollider?.cameraTopY).toBeCloseTo(

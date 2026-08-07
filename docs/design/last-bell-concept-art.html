@@ -1,0 +1,1774 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The Last Bell of Gullhaven: Concept Book</title>
+<style>
+*,*::before,*::after{box-sizing:border-box}
+:root{
+  --ink-1000:#04090d; --ink-950:#071117; --ink-900:#0b171e; --ink-850:#10212a; --ink-800:#172b35;
+  --gold-700:#926321; --gold-600:#bc8732; --gold-500:#d8a645; --gold-400:#f0c86d; --gold-300:#ffe5a3;
+  --parch:#e8ddc6; --text:#cfd8dc; --faint:#8b9aa3;
+  --rule:color-mix(in srgb, var(--gold-700) 45%, transparent);
+}
+html{scroll-behavior:smooth}
+body{margin:0;background:
+    radial-gradient(1200px 700px at 20% -10%, #12242e 0%, transparent 60%),
+    radial-gradient(900px 600px at 90% 10%, #16202c 0%, transparent 55%),
+    var(--ink-1000);
+  color:var(--text);
+  font:16px/1.62 "Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  -webkit-font-smoothing:antialiased}
+.wrap{max-width:1120px;margin:0 auto;padding:clamp(20px,4vw,56px)}
+header.book{border-bottom:1px solid var(--rule);padding-bottom:28px;margin-bottom:8px}
+.kicker{font:600 12px/1 ui-sans-serif,system-ui,sans-serif;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--gold-500);margin:0 0 14px}
+h1{font-size:clamp(30px,5.2vw,52px);line-height:1.06;margin:0 0 12px;color:var(--parch);
+  font-weight:600;letter-spacing:-.01em}
+h1 small{display:block;font-size:clamp(14px,1.7vw,19px);color:var(--faint);font-weight:400;
+  letter-spacing:0;margin-top:12px;font-style:italic}
+.lede{max-width:76ch;color:#b8c4cb;margin:18px 0 0}
+.toc{display:flex;flex-wrap:wrap;gap:8px;list-style:none;padding:0;margin:26px 0 0}
+.toc a{display:inline-block;padding:6px 13px;border:1px solid var(--rule);border-radius:2px;
+  color:var(--gold-300);text-decoration:none;font:500 12px/1.3 ui-sans-serif,system-ui,sans-serif;
+  letter-spacing:.06em;text-transform:uppercase;background:rgba(255,229,163,.03)}
+.toc a:hover{border-color:var(--gold-500);background:rgba(255,229,163,.09);color:var(--gold-400)}
+
+.figure{margin:56px 0 0;padding:28px clamp(16px,2.4vw,32px) 32px;
+  background:linear-gradient(180deg,rgba(23,43,53,.55),rgba(7,17,23,.5));
+  border:1px solid var(--rule);border-radius:3px;
+  box-shadow:0 1px 0 rgba(255,229,163,.07) inset, 0 18px 40px -28px #000}
+.figure-head{display:flex;flex-wrap:wrap;gap:22px 34px;align-items:flex-start;
+  justify-content:space-between;border-bottom:1px solid rgba(146,99,33,.28);padding-bottom:18px}
+.ident h2{margin:0;font-size:clamp(23px,3vw,33px);color:var(--parch);font-weight:600;letter-spacing:-.005em}
+.ident .title{margin:5px 0 0;color:var(--gold-500);font:600 12.5px/1.4 ui-sans-serif,system-ui,sans-serif;
+  letter-spacing:.15em;text-transform:uppercase}
+.ident .post{margin:5px 0 0;color:var(--faint);font-size:14px;font-style:italic}
+.spec{display:grid;grid-template-columns:repeat(auto-fit,minmax(104px,1fr));gap:12px 20px;margin:0;
+  font:400 13px/1.4 ui-sans-serif,system-ui,sans-serif;min-width:min(100%,440px)}
+.spec dt{color:var(--faint);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:3px}
+.spec dd{margin:0;color:var(--parch)}
+.spec code,.post code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;color:var(--gold-300)}
+
+.figure-body{display:grid;grid-template-columns:minmax(240px,340px) 1fr;gap:clamp(20px,3vw,40px);
+  align-items:start;margin-top:26px}
+.turn-wrap{position:sticky;top:20px}
+.turn{background:
+    radial-gradient(120% 80% at 50% 8%, rgba(216,166,69,.09), transparent 62%),
+    linear-gradient(180deg,#0d1c24,#060f14);
+  border:1px solid var(--rule);border-radius:3px;overflow:hidden;position:relative}
+.turn::after{content:"";position:absolute;inset:auto 8% 5% 8%;height:14px;border-radius:50%;
+  background:radial-gradient(50% 100% at 50% 50%, rgba(0,0,0,.6), transparent 70%)}
+.turn-img{display:block;width:100%;height:auto;image-rendering:auto}
+.turn-ctl{display:flex;gap:10px;align-items:center;margin-top:10px}
+.btn{background:rgba(255,229,163,.06);border:1px solid var(--rule);color:var(--gold-300);
+  border-radius:2px;padding:5px 12px;cursor:pointer;
+  font:500 11.5px/1.3 ui-sans-serif,system-ui,sans-serif;letter-spacing:.09em;text-transform:uppercase}
+.btn:hover{border-color:var(--gold-500);color:var(--gold-400)}
+.scrub{flex:1;accent-color:var(--gold-500);min-width:0}
+
+.prose h3{margin:24px 0 7px;font:600 11.5px/1.3 ui-sans-serif,system-ui,sans-serif;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--gold-500)}
+.prose p{margin:0 0 12px;max-width:70ch}
+.signature{margin:22px 0 4px;padding:16px 18px;border-left:2px solid var(--gold-600);
+  background:linear-gradient(90deg,rgba(216,166,69,.09),transparent 85%)}
+.signature h3{margin-top:0}
+.signature p{margin:0;color:var(--parch)}
+.notes{margin:0;padding-left:20px}
+.notes li{margin:0 0 7px;color:#b8c4cb;max-width:72ch}
+
+.palette{list-style:none;padding:0;margin:8px 0 0;display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(232px,1fr));gap:10px}
+.chip{display:flex;gap:11px;align-items:flex-start;padding:9px 11px;border:1px solid rgba(146,99,33,.26);
+  border-radius:2px;background:rgba(7,17,23,.5)}
+.swatch{flex:0 0 auto;width:26px;height:38px;border-radius:2px;border:1px solid rgba(0,0,0,.55);
+  background:linear-gradient(180deg,var(--c),color-mix(in srgb,var(--c) 48%,#000))}
+.chip-text{font:400 12.5px/1.45 ui-sans-serif,system-ui,sans-serif;min-width:0}
+.chip-text b{color:var(--parch);font-weight:600}
+.chip-text code{display:inline-block;color:var(--gold-300);font-family:ui-monospace,Menlo,monospace;font-size:11px}
+.chip-text em{display:block;color:var(--faint);font-style:normal;margin-top:2px}
+
+.weapons{list-style:none;padding:0;margin:6px 0 0;display:grid;gap:8px}
+.weapons li{padding:9px 12px;border:1px solid rgba(146,99,33,.26);border-radius:2px;
+  background:rgba(7,17,23,.5);font:400 12.5px/1.45 ui-sans-serif,system-ui,sans-serif}
+.weapons b{color:var(--parch);font-weight:600;text-transform:capitalize}
+.weapons code{color:var(--gold-300);font-family:ui-monospace,Menlo,monospace;font-size:11px;
+  margin-left:7px}
+.weapons em{display:block;color:var(--faint);font-style:normal;margin-top:2px}
+/* Playable clips. The sheet is one horizontal strip; steps() walks it a cell at a
+   time, so playback needs no JS timer and stays in sync with itself. */
+.anims{margin-top:28px;border-top:1px solid rgba(146,99,33,.28);padding-top:20px}
+.anims-head{display:flex;align-items:center;gap:14px;margin-bottom:12px}
+.anims-head h3{margin:0;font:600 11.5px/1.3 ui-sans-serif,system-ui,sans-serif;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--gold-500)}
+.anim-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:14px}
+.anim{margin:0;background:linear-gradient(180deg,#0d1c24,#060f14);
+  border:1px solid rgba(146,99,33,.3);border-radius:3px;overflow:hidden}
+/* aspect-ratio takes UNITLESS numbers; feeding it px values is invalid and
+   collapses the stage to zero height, which is exactly what it did first time. */
+.anim-stage{width:100%;aspect-ratio:var(--arw)/var(--arh);
+  background-image:var(--sheet);background-repeat:no-repeat;
+  background-size:calc(var(--cells) * 100%) 100%;
+  animation:sprite-walk var(--dur) steps(var(--n)) infinite;
+  image-rendering:auto}
+.anim.paused .anim-stage{animation-play-state:paused}
+@keyframes sprite-walk{from{background-position-x:0%}to{background-position-x:100%}}
+.anim figcaption{padding:8px 11px 10px;border-top:1px solid rgba(146,99,33,.24);
+  font:400 11.5px/1.35 ui-sans-serif,system-ui,sans-serif;display:flex;
+  flex-direction:column;gap:2px}
+.anim figcaption b{color:var(--parch);font-weight:600}
+.anim figcaption span{color:var(--faint);font-family:ui-monospace,Menlo,monospace;font-size:10.5px}
+@media (prefers-reduced-motion:reduce){.anim-stage{animation-play-state:paused}}
+.plates{display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:14px;margin-top:30px;
+  border-top:1px solid rgba(146,99,33,.28);padding-top:24px}
+.plate{margin:0;background:linear-gradient(180deg,#0d1c24,#060f14);border:1px solid rgba(146,99,33,.3);
+  border-radius:3px;overflow:hidden}
+.plate img{display:block;width:100%;height:auto}
+.plate figcaption{padding:8px 11px 10px;border-top:1px solid rgba(146,99,33,.24);
+  font:400 11.5px/1.35 ui-sans-serif,system-ui,sans-serif;display:flex;flex-direction:column;gap:2px}
+.plate figcaption b{color:var(--parch);font-weight:600}
+.plate figcaption span{color:var(--faint);font-family:ui-monospace,Menlo,monospace;font-size:10.5px}
+
+.scale{list-style:none;padding:0;margin:26px 0 0;display:flex;align-items:flex-end;gap:clamp(8px,2vw,26px);
+  min-height:230px;overflow-x:auto;padding-bottom:6px}
+.scale li{flex:1 1 0;min-width:82px;display:flex;flex-direction:column;justify-content:flex-end;
+  align-items:center;gap:10px;height:230px}
+.bar{width:100%;max-width:64px;height:var(--h);border-radius:2px 2px 0 0;
+  background:linear-gradient(180deg,var(--gold-500),var(--gold-700));
+  border:1px solid rgba(0,0,0,.4);box-shadow:0 0 0 1px rgba(255,229,163,.14) inset}
+.bar-label{text-align:center;font:400 11.5px/1.35 ui-sans-serif,system-ui,sans-serif;display:flex;
+  flex-direction:column;gap:1px}
+.bar-label b{color:var(--parch);font-weight:600}
+.bar-label span{color:var(--faint)}
+
+footer.book{margin:60px 0 0;padding-top:24px;border-top:1px solid var(--rule);color:var(--faint);
+  font:400 13px/1.6 ui-sans-serif,system-ui,sans-serif}
+footer.book code{color:var(--gold-300);font-family:ui-monospace,Menlo,monospace;font-size:12px}
+footer.book ul{padding-left:20px;margin:8px 0 0}
+
+@media (max-width:820px){
+  .figure-body{grid-template-columns:1fr}
+  .turn-wrap{position:static;max-width:340px}
+}
+@media (prefers-reduced-motion:reduce){.turn-img{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="book">
+  <p class="kicker">World of ClaudeCraft &middot; The Farshore</p>
+  <h1>The Last Bell of Gullhaven
+    <small>Concept book: the watch, the island, and the things that come through the breaks.</small></h1>
+  <p class="lede">Every figure here is the shipping model, not a painting of one. Each is built
+    onto a KayKit Adventurers rig by a deterministic Blender factory
+    (<code>scripts/assets/last_bell_crew/</code>): a repainted palette atlas, bespoke geometry
+    rigidly skinned to single bones, and all 22 of the rig's shipped clips carried through
+    untouched. One material each, so a crew member still costs one draw call. Spin the
+    turnaround to check a silhouette; the clips under &ldquo;In motion&rdquo; are the real ones
+    the game plays, sampled frame by frame off these exact GLBs. Static pose plates are
+    deliberately absent: a prop that reads fine standing still can be plainly wrong the moment
+    a wrist moves, which is how a batch of reversed shields and an upside-down staff survived
+    the first review.</p>
+  <ul class="toc"><li><a href="#ewald">Ewald</a></li><li><a href="#marsh">Marsh</a></li><li><a href="#coalfast">Coalfast</a></li><li><a href="#coalfast_helm">Coalfast, sealed</a></li><li><a href="#ollun">Ollun</a></li><li><a href="#edda">Edda</a></li><li><a href="#saul">Saul</a></li><li><a href="#tam">Tam</a></li><li><a href="#nell">Nell</a></li><li><a href="#riftspawn">Riftspawn</a></li><li><a href="#breach_wretch">Breach Wretch</a></li><li><a href="#void_stalker">Void Stalker</a></li><li><a href="#tidemill_stalker">The Tidemill Stalker</a></li><li><a href="#sundered_horror">The Sundered Horror</a></li><li><a href="#scale">Scale</a></li></ul>
+</header>
+
+
+<section class="figure" id="ewald">
+  <header class="figure-head">
+    <div class="ident">
+      <h2>Ferryman Ewald</h2>
+      <p class="title">The Farshore Crossing</p>
+      <p class="post">The mainland pier, and the Gullhaven berth</p>
+    </div>
+    <dl class="spec">
+      <div><dt>Role</dt><dd>Not a fighter. The only way onto a besieged island.</dd></div>
+      <div><dt>Height</dt><dd>2.60 yd</dd></div>
+      <div><dt>Triangles</dt><dd>8,966</dd></div>
+      <div><dt>Clips</dt><dd>22</dd></div>
+      <div><dt>Materials</dt><dd>1 body (one draw)</dd></div>
+      <div><dt>Base</dt><dd><code>ranger.glb</code></dd></div>
+      
+      
+    </dl>
+  </header>
+
+  <div class="figure-body">
+    <div class="turn-wrap">
+      <div class="turn" data-frames="ewald_turn_00.webp,ewald_turn_01.webp,ewald_turn_02.webp,ewald_turn_03.webp,ewald_turn_04.webp,ewald_turn_05.webp,ewald_turn_06.webp,ewald_turn_07.webp,ewald_turn_08.webp,ewald_turn_09.webp,ewald_turn_10.webp,ewald_turn_11.webp" data-dir="last-bell-concept-art">
+        <img class="turn-img" src="last-bell-concept-art/ewald_turn_00.webp" alt="Ferryman Ewald, rotating turnaround">
+      </div>
+      <div class="turn-ctl">
+        <button class="btn spin" type="button" aria-pressed="true">Pause</button>
+        <input class="scrub" type="range" min="0" max="11" value="0"
+               aria-label="Ferryman Ewald turnaround angle">
+      </div>
+    </div>
+
+    <div class="prose">
+      <p>He sells nothing and saves lives anyway. Nobody crosses for the fishing any more, so every passenger he lands is someone who chose to come, and he has learned to tell them the one thing that matters before they step off: mind the bell, the town listens to it the way you listen to weather.</p>
+      <div class="signature">
+        <h3>The authored detail</h3>
+        <p>The sou'wester. A low oilskin hat with the brim turned down and a long tail at the back, which is the single most legible way to say SAILOR at gameplay distance. Under it the fare tin on a cord, hung where a passenger can reach it without being asked, because Q0 lets you pay or decline and he takes you either way.</p>
+      </div>
+      <ul class="palette">
+        <li class="chip">
+          <span class="swatch" style="--c:#4b4a41"></span>
+          <span class="chip-text">
+            <b>Oilskin</b> <code>#4b4a41</code>
+            <em>Waxed cloth, wet for thirty years. Dark, but still cloth.</em>
+          </span>
+        </li>
+        <li class="chip">
+          <span class="swatch" style="--c:#8a8468"></span>
+          <span class="chip-text">
+            <b>Salt canvas</b> <code>#8a8468</code>
+            <em>Sailcloth bleached pale by the strait.</em>
+          </span>
+        </li>
+        <li class="chip">
+          <span class="swatch" style="--c:#6c7c96"></span>
+          <span class="chip-text">
+            <b>Ferry slate</b> <code>#6c7c96</code>
+            <em>His sim entity colour, worn as the coat's lining.</em>
+          </span>
+        </li>
+        <li class="chip">
+          <span class="swatch" style="--c:#9c7437"></span>
+          <span class="chip-text">
+            <b>Bell bronze</b> <code>#9c7437</code>
+            <em>The fare tin, and the only bright thing on him.</em>
+          </span>
+        </li></ul>
+      
+      <h3>Design notes</h3><ul class="notes"><li>Built on the ranger body: a moustache and a plain male face, and layered working clothes rather than armour.</li><li>The hat is doing the characterisation. A dark coat alone read as a generic villager; the sou'wester makes him a sailor in one silhouette.</li></ul>
+    </div>
+  </div>
+
+  
+  <div class="anims">
+    <div class="anims-head">
+      <h3>In motion</h3>
+      <button class="btn anims-toggle" type="button" aria-pressed="true">Pause all</button>
+    </div>
+    <div class="anim-grid">
+      <figure class="anim">
+        <div class="anim-stage" data-frames="12" data-fps="12"
+             style="--sheet:url('last-bell-concept-art/ewald_anim_Idle.webp');--arw:300;--arh:380;--n:12;--cells:13;--dur:1.00s"></div>
+        <figcaption><b>At the gangplank</b><span>Idle</span></figcaption>
+      </figure>
+      <figure class="anim">
+        <div class="anim-stage" data-frames="12" data-fps="12"
+             style="--sheet:url('last-bell-concept-art/ewald_anim_Walking_A.webp');--arw:300;--arh:380;--n:12;--cells:13;--dur:1.00s"></div>
+        <figcaption><b>Working the deck</b><span>Walking_A</span></figcaption>
+      </figure>
+      <figure class="anim">
+        <div class="anim-stage" data-frames="12" data-fps="12"
+             style="--sheet:url('last-bell-concept-art/ewald_anim_Cheer.webp');--arw:300;--arh:380;--n:12;--cells:13;--dur:1.00s"></div>
+        <figcaption><b>Calling the crossing</b><span>Cheer</span></figcaption>
+      </figure>
+      <figure class="anim">
+        <div class="anim-stage" data-frames="12" data-fps="12"
+             style="--sheet:url('last-bell-concept-art/ewald_anim_Block.webp');--arw:300;--arh:380;--n:12;--cells:13;--dur:1.00s"></div>
+        <figcaption><b>Bracing on a swell</b><span>Block</span></figcaption>
+      </figure></div>
+  </div>
+</section>
+
+<section class="figure" id="marsh">
+  <header class="figure-head">
+    <div class="ident">
+      <h2>Sergeant Marsh</h2>
+      <p class="title">Town Militia</p>
+      <p class="post">The militia line, Watch Meadow</p>
+    </div>
+    <dl class="spec">
+      <div><dt>Role</dt><dd>Holds the road. Knows exactly what his line can and cannot kill.</dd></div>
+      <div><dt>Height</dt><dd>2.60 yd</dd></div>
+      <div><dt>Triangles</dt><dd>5,410</dd></div>
+      <div><dt>Clips</dt><dd>22</dd></div>
+      <div><dt>Materials</dt><dd>1 body (one draw) + 1 held</dd></div>
+      <div><dt>Base</dt><dd><code>knight.glb</code></dd></div>
+      
+      
+    </dl>
+  </header>
+
+  <div class="figure-body">
+    <div class="turn-wrap">
+      <div class="turn" data-frames="marsh_turn_00.webp,marsh_turn_01.webp,marsh_turn_02.webp,marsh_turn_03.webp,marsh_turn_04.webp,marsh_turn_05.webp,marsh_turn_06.webp,marsh_turn_07.webp,marsh_turn_08.webp,marsh_turn_09.webp,marsh_turn_10.webp,marsh_turn_11.webp" data-dir="last-bell-concept-art">
+        <img class="turn-img" src="last-bell-concept-art/marsh_turn_00.webp" alt="Sergeant Marsh, rotating turnaround">
+      </div>
+      <div class="turn-ctl">
+        <button class="btn spin" type="button" aria-pressed="true">Pause</button>
+        <input class="scrub" type="range" min="0" max="11" value="0"
+               aria-label="Sergeant Marsh turnaround angle">
+      </div>
+    </div>
+
+    <div class="prose">
+      <p>Operational and unsentimental. His line holds the road, and when the rift coughs up something they cannot put down he points at you and says so plainly. He is the measuring stick the campaign uses: what the militia cannot handle is what the squad is for.</p>
+      <div class="signature">
+        <h3>The authored detail</h3>
+        <p>The sword, and everything around it being worse. He owns exactly one good blade, and everything around it being worse. Around it: one pauldron on his right and nothing on the other, rope lashings where straps should be, a padded jack instead of plate, and a town kettle hat rather than anything a knight would own.</p>
+      </div>
+      <ul class="palette">
+        <li class="chip">
+          <span class="swatch" style="--c:#cfc4a8"></span>
+          <span class="chip-text">
+            <b>Padded jack</b> <code>#cfc4a8</code>
+            <em>Quilted cloth, not plate: what a town could actually afford, and his pale field.</em>
+          </span>
+        </li>
+        <li class="chip">
+          <span class="swatch" style="--c:#76726a"></span>
+          <span class="chip-text">
+            <b>Militia iron</b> <code>#76726a</code>
+            <em>The kettle hat, and the only palette metal on him. Warm, so it reads as town iron beside the squad's cold salt-scoured steel, and kept well under the jack: the hat is his largest single surface and will win the read at any lighter value.</em>
+          </span>
+        </li>
+        <li class="chip">
+          <span class="swatch" style="--c:#4a3826"></span>
+          <span class="chip-text">
+            <b>Dark leather</b> <code>#4a3826</code>
+            <em>Edging and boots: his dark field.</em>
+          </span>
+        </li>
+        <li class="chip">
+          <span class="swatch" style="--c:#a98a5c"></span>
+          <span class="chip-text">
+            <b>Hemp rope</b> <code>#a98a5c</code>
+            <em>Lashings where straps should be, made from what the docks had.</em>
+          </span>
+        </li>
+        <li class="chip">
+          <span class="swatch" style="--c:#9c7437"></span>
+          <span class="chip-text">
+            <b>Bell bronze</b> <code>#9c7437</code>
+            <em>The sergeant's sash, and nothing else. His one saturated note, and the marker that has to carry his rank.</em>
+          </span>
+        </li></ul>
+      <h3>What they carry</h3><ul class="weapons">
+      <li>
+        <b>adv sword 1handed</b>
+        <code>handslot.r</code>
+        <em>A big plain arming sword, town-forged: no fuller, no maker's mark, nothing on it a guild would sign. Carried a size up on the family grip so it reads heavier than the warden's, which is the one place his kit is not the poorer of the two.</em>
+      </li></ul>
+      <h3>Design notes</h3><ul class="notes"><li>Three values on purpose. The first pass painted iron, wool and rope at almost the same mid warm grey and he read as one flat monochrome mass; he now has a pale field (the jack), a dark field (leather and boots) and a single accent, the way Ewald does.</li><li>The value fix needed no geometry. On the knight body ONE cell covers the cuirass, arms, legs and the helmet, which is exactly why nothing could be separated: so the helmet's faces move to their own cell and the shared one is repainted as quilted cloth. A jack grown from his torso faces was tried first and cut, because a colour boundary that follows triangle edges came out as a sawtooth reading as tearing.</li><li>The helmet needed surgery, not a repaint. Re-UV'ing the knight's bascinet fixed its colour and never its shape: a closed helm over a padded CLOTH jack is a kit that contradicts itself, and its crown ribs read as a spiked coronet whatever cell they sampled. So it is cut down to a town kettle hat, with the brim extruded straight off the cut rim (the helmet's own edge carried outward, with real thickness) and the ribs relaxed away. His face reads now, which the campaign needs, since he is the one who tells you what his line cannot kill.</li><li>The brim then had to be filtered, not just extruded. The cut is a face-CENTRE test, so the rim it leaves steps by up to a whole face in both radius and height, and a radial push moves each vertex along its own direction: the brim did not merely inherit that sawtooth, it amplified it into the one edge that holds the silhouette. The rim is now low-passed around its own loop before anything is extruded and again per ring. A filter and not a circle fit, because the dome is offset and slightly oval and snapping it round would trade a sawtooth for a tin lid.</li><li>A polearm was tried first, at length, and cut. A halberd is the right idea for a militia sergeant, since it was a literal badge of rank, and it does not fit this body: the grip sits 28 percent up the haft, so the head starts barely half a unit above the hand, while this figure's head and hat are 48 percent of its total height. Held upright the blade is inside his skull at every roll and scale; the only clearance is a hard lean outboard, which reads as a flagpole. A sword is the honest answer at these proportions, and the record of the attempt is in `docs/design/last-bell-polearm-carry.md`.</li><li>The sword is carried a SIZE UP on the shared blade grip. At the bare family scale it measured smaller than the warden's arming sword, which inverts the one comparison that is supposed to run his way: everything else on him is the poorer of the two, and the blade is not.</li><li>Separated from Coalfast at every level, because they share a body and stand two POIs apart: a town kettle hat against a bare head, no cloak against warden rust, warm town iron against cold salt-scoured steel, a bare off hand against a heavy square shield, and one pauldron on the RIGHT against a three-lame stack on the LEFT.</li><li>Rank has to survive standing next to his own militia, who are built on the same body: the kettle hat, the right pauldron and a bell bronze sash. The sash takes over his diagonal lashing while the waist wrap stays hemp, so he gains a rank marker without losing the improvised repairs the character is built on.</li><li>The sash is built at SASH width, which is the whole reason it works. Left at the rope width it inherited it was 0.6 percent of his surface area, and recolouring something that small marks nothing: a rank badge has to be big enough to survive a glance from across a road. Wide and thin now, ridden out onto the real chest so its edges cannot cut into the torso the way a flat ribbon does once it is wider than the curve it lies on.</li></ul>
+    </div>
+  </div>
+
+  
+  <div class="anims">
+    <div class="anims-head">
+      <h3>In motion</h3>
+      <button class="btn anims-toggle" type="button" aria-pressed="true">Pause all</button>
+    </div>
+    <div class="anim-grid">
+      <figure class="anim">
+        <div class="anim-stage" data-frames="12" data-fps="12"
+             style="--sheet:url('last-bell-concept-art/marsh_anim_Idle.webp');--arw:300;--arh:380;--n:12;--cells:13;--dur:1.00s"></div>
+        <figcaption><b>Holding the road</b><span>Idle</span></figcaption>
+      </figure>
+      <figure class="anim">
+        <div class="anim-stage" data-frames="12" data-fps="12"
+             style="--sheet:url('last-bell-concept-art/marsh_anim_Walking_A.webp');--arw:300;--arh:380;--n:12;--cells:13;--dur:1.00s"></div>
+        <figcaption><b>Walking the line</b><span>Walking_A</span></figcaption>
+      </figure>
+      <figure class="anim">
+        <div class="anim-stage" data-frames="12" data-fps="12"
+             style="--sheet:url('last-bell-concept-art/marsh_anim_1H_Melee_Attack_Chop.webp');--arw:300;--arh:380;--n:12;--cells:13;--dur:1.00s"></div>
+        <figcaption><b>The strike</b><span>1H_Melee_Attack_Chop</span></figcaption>
+      </figure>
+      <figure class="anim">
+        <div class="anim-stage" data-frames="12" data-fps="12"
+             style="--sheet:url('last-bell-concept-art/marsh_anim_Block.webp');--arw:300;--arh:380;--n:12;--cells:13;--dur:1.00s"></div>
+        <figcaption><b>Bracing the line</b><span>Block</span></figcaption>
+      </figure></div>
+  </div>
+</section>
+
+<section class="figure" id="coalfast">
+  <header class="figure-head">
+    <div class="ident">
+      <h2>Warden Coalfast</h2>
+      <p class="title">Redoubt Commander</p>
+      <p class="post">The redoubt, Gullhaven</p>
+    </div>
+    <dl class="spec">
+      <div><dt>Role</dt><dd>Shield-bearing front line and battlefield commands.</dd></div>
+      <div><dt>Height</dt><dd>2.60 yd</dd></div>
+      <div><dt>Triangles</dt><dd>5,486</dd></div>
+      <div><dt>Clips</dt><dd>22</dd></div>
+      <div><dt>Materials</dt><dd>1 body (one draw) + 1 held</dd></div>
+      <div><dt>Base</dt><dd><code>knight.glb</code></dd></div>
+      
+      
+    </dl>
+  </header>
+
+  <div class="figure-body">
+    <div class="turn-wrap">
+      <div class="turn" data-frames="coalfast_turn_00.webp,coalfast_turn_01.webp,coalfast_turn_02.webp,coalfast_turn_03.webp,coalfast_turn_04.webp,coalfast_turn_05.webp,coalfast_turn_06.webp,coalfast_turn_07.webp,coalfast_turn_08.webp,coalfast_turn_09.webp,coalfast_turn_10.webp,coalfast_turn_11.webp" data-dir="last-bell-concept-art">
+        <img class="turn-img" src="last-bell-concept-art/coalfast_turn_00.webp" alt="Warden Coalfast, rotating turnaround">
+      </div>
+      <div class="turn-ctl">
+        <button class="btn spin" type="button" aria-pressed="true">Pause</button>
+        <input class="scrub" type="range" min="0" max="11" value="0"
+               aria-label="Warden Coalfast turnaround angle">
+      </div>
+    </div>
+
+    <div class="prose">
+      <p>Warm when he has time to be and frighteningly decisive when he does not. He has read Warden Hale's account of the last interior sealing more times than anyone alive, and has privately settled one thing: if the rite must be carried inside, the carrier will be him.</p>
+      <div class="signature">
+        <h3>The authored detail</h3>
+        <p>The roll of names. A leather bandolier hung with small bronze name-plates, one for every defender he has lost. It rhymes forward to the plinth of seal-bearers Saul sends you to read in Q7, and to the five name-stones Nell carries to Willowfen after the finale.</p>
+      </div>
+      <ul class="palette">
+        <li class="chip">
+          <span class="swatch" style="--c:#9ba7a3"></span>
+          <span class="chip-text">
+            <b>Salt-scoured iron</b> <code>#9ba7a3</code>
+            <em>Plate a wet island has been at for years.</em>
+          </span>
+        </li>
+        <li class="chip">
+          <span class="swatch" style="--c:#9c7437"></span>
+          <span class="chip-text">
+            <b>Bell bronze</b> <code>#9c7437</code>
+            <em>The Vigil's metal: the Bellheart, the bell, Hale's bronze.</em>
+          </span>
+        </li>
+        <li class="chip">
+          <span class="swatch" style="--c:#8a4b2b"></span>
+          <span class="chip-text">
+            <b>Warden rust</b> <code>#8a4b2b</code>
+            <em>His cloak, and literally his sim entity colour.</em>
+          </span>
+        </li>
+        <li class="chip">
+          <span class="swatch" style="--c:#a9dcee"></span>
+          <span class="chip-text">
+            <b>Star-glass</b> <code>#a9dcee</code>
+            <em>The island's own material, at his throat.</em>
+          </span>
+        </li></ul>
+      <h3>What they carry</h3><ul class="weapons">
+      <li>
+        <b>sword 1handed</b>
+        <code>handslot.r</code>
+        <em>A warden's arming sword: island-forged, unremarkable, kept sharp.</em>
+      </li>
+      <li>
+        <b>shield square</b>
+        <code>lowerarm.l</code>
+        <em>The heavy square shield the front line is built around. He is the line.</em>
+      </li></ul>
+      <h3>Design notes</h3><ul class="notes"><li>Bare-headed at his post: the campaign asks you to love these people, and a face carries that where a bucket helm cannot.</li><li>The bronze band is the warden's office. The crest that goes with it waits for the helm he puts on to go inside.</li></ul>
+    </div>
+  </div>
+
+  
+  <div class="anims">
+    <div class="anims-head">
+      <h3>In motion</h3>
+      <button class="btn anims-toggle" type="button" aria-pressed="true">Pause all</button>
+    </div>
+    <div class="anim-grid">
+      <figure class="anim">
+        <div class="anim-stage" data-frames="12" data-fps="12"
+             style="--sheet:url('last-bell-concept-art/coalfast_anim_Idle.webp');--arw:300;--arh:380;--n:12;--cells:13;--dur:1.00s"></div>
+        <figcaption><b>At their post</b><span>Idle</span></figcaption>
+      </figure>
+      <figure class="anim">
+        <div class="anim-stage" data-frames="12" data-fps="12"
+             style="--sheet:url('last-bell-concept-art/coalfast_anim_Walking_A.webp');--arw:300;--arh:380;--n:12;--cells:13;--dur:1.00s"></div>
+        <figcaption><b>On the move</b><span>Walking_A</span></figcaption>
+      </figure>
+      <figure class="anim">
+        <div class="anim-stage" data-frames="12" data-fps="12"
+             style="--sheet:url('last-bell-concept-art/coalfast_anim_1H_Melee_Attack_Chop.webp');--arw:300;--arh:380;--n:12;--cells:13;--dur:1.00s"></div>
+        <figcaption><b>The strike</b><span>1H_Melee_Attack_Chop</span></figcaption>
+      </figure>
+      <figure class="anim">
+        <div class="anim-stage" data-frames="12" data-fps="12"
+             style="--sheet:url('last-bell-concept-art/coalfast_anim_Block.webp');--arw:300;--arh:380;--n:12;--cells:13;--dur:1.00s"></div>
+        <figcaption><b>Under pressure</b><span>Block</span></figcaption>
+      </figure></div>
+  </div>
+</section>
+
+<section class="figure" id="coalfast_helm">
+  <header class="figure-head">
+    <div class="ident">
+      <h2>Warden Coalfast, sealed</h2>
+      <p class="title">Redoubt Commander, the breach</p>
+      <p class="post">Inside the wound</p>
+    </div>
+    <dl class="spec">
+      <div><dt>Role</dt><dd>The same man, going in.</dd></div>
+      <div><dt>Height</dt><dd>2.60 yd</dd></div>
+      <div><dt>Triangles</dt><dd>5,828</dd></div>
+      <div><dt>Clips</dt><dd>22</dd></div>
+      <div><dt>Materials</dt><dd>1 body (one draw) + 1 held</dd></div>
+      <div><dt>Base</dt><dd><code>knight.glb</code></dd></div>
+      
+      
+    </dl>
+  </header>
+
+  <div class="figure-body">
+    <div class="turn-wrap">
+      <div class="turn" data-frames="coalfast_helm_turn_00.webp,coalfast_helm_turn_01.webp,coalfast_helm_turn_02.webp,coalfast_helm_turn_03.webp,coalfast_helm_turn_04.webp,coalfast_helm_turn_05.webp,coalfast_helm_turn_06.webp,coalfast_helm_turn_07.webp,coalfast_helm_turn_08.webp,coalfast_helm_turn_09.webp,coalfast_helm_turn_10.webp,coalfast_helm_turn_11.webp" data-dir="last-bell-concept-art">
+        <img class="turn-img" src="last-bell-concept-art/coalfast_helm_turn_00.webp" alt="Warden Coalfast, sealed, rotating turnaround">
+      </div>
+      <div class="turn-ctl">
+        <button class="btn spin" type="button" aria-pressed="true">Pause</button>
+        <input class="scrub" type="range" min="0" max="11" value="0"
+               aria-label="Warden Coalfast, sealed turnaround angle">
+      </div>
+    </div>
+
+    <div class="prose">
+      <p>His finale form. The helm goes on to carry the rite inside, and with it the crest: the same fore-and-aft comb the bronze figure on Hale's column wears above the harbour steps. Every warden on this island grew up beneath that silhouette, and he is the next one to wear it.</p>
+      <div class="signature">
+        <h3>The authored detail</h3>
+        <p>The crest, and where it comes from. It is not a promotion, it is a quotation: he has read Hale's account more times than anyone alive, and he puts on the same outline knowing exactly how that story ends.</p>
+      </div>
+      <ul class="palette">
+        <li class="chip">
+          <span class="swatch" style="--c:#9ba7a3"></span>
+          <span class="chip-text">
+            <b>Salt-scoured iron</b> <code>#9ba7a3</code>
+            <em>The same harness, now closed.</em>
+          </span>
+        </li>
+        <li class="chip">
+          <span class="swatch" style="--c:#9c7437"></span>
+          <span class="chip-text">
+            <b>Bell bronze</b> <code>#9c7437</code>
+            <em>The crest, cast like the memorial's.</em>
+          </span>
+        </li>
+        <li class="chip">
+          <span class="swatch" style="--c:#8a4b2b"></span>
+          <span class="chip-text">
+            <b>Warden rust</b> <code>#8a4b2b</code>
+            <em>The cloak he does not come home in.</em>
+          </span>
+        </li>
+        <li class="chip">
+          <span class="swatch" style="--c:#a9dcee"></span>
+          <span class="chip-text">
+            <b>Star-glass</b> <code>#a9dcee</code>
+            <em>The badge that will be one of five anchors.</em>
+          </span>
+        </li></ul>
+      <h3>What they carry</h3><ul class="weapons">
+      <li>
+        <b>sword 1handed</b>
+        <code>handslot.r</code>
+        <em>The same sword. Nothing about the last hour is newly equipped.</em>
+      </li>
+      <li>
+        <b>shield square</b>
+        <code>lowerarm.l</code>
+        <em>The shield he holds the wound shut behind.</em>
+      </li></ul>
+      <h3>Design notes</h3><ul class="notes"><li>One asset, two forms: the same body, atlas and clips, so the helm going on costs a swapped visual key and nothing else.</li></ul>
+    </div>
+  </div>
+
+  
+  <div class="anims">
+    <div class="anims-head">
+      <h3>In motion</h3>
+      <button class="btn anims-toggle" type="button" aria-pressed="true">Pause all</button>
+    </div>
+    <div class="anim-grid">
+      <figure class="anim">
+        <div class="anim-stage" data-frames="12" data-fps="12"
+             style="--sheet:url('last-bell-concept-art/coalfast_helm_anim_Idle.webp');--arw:300;--arh:380;--n:12;--cells:13;--dur:1.00s"></div>
+        <figcaption><b>At their post</b><span>Idle</span></figcaption>
+      </figure>
+      <figure class="anim">
+        <div class="anim-stage" data-frames="12" data-fps="12"
+             style="--sheet:url('last-bell-concept-art/coalfast_helm_anim_Walking_A.webp');--arw:300;--arh:380;--n:12;--cells:13;--dur:1.00s"></div>
+        <figcaption><b>On the move</b><span>Walking_A</span></figcaption>
+      </figure>
+      <figure class="anim">
+        <div class="anim-stage" data-frames="12" data-fps="12"
+             style="--sheet:url('last-bell-concept-art/coalfast_helm_anim_1H_Melee_Attack_Chop.webp');--arw:300;--arh:380;--n:12;--cells:13;--dur:1.00s"></div>
+        <figcaption><b>The strike</b><span>1H_Melee_Attack_Chop</span></figcaption>
+      </figure>
+      <figure class="anim">
+        <div class="anim-stage" data-frames="12" data-fps="12"
+             style="--sheet:url('last-bell-concept-art/coalfast_helm_anim_Block.webp');--arw:300;--arh:380;--n:12;--cells:13;--dur:1.00s"></div>
+        <figcaption><b>Under pressure</b><span>Block</span></figcaption>
+      </figure></div>
+  </div>
+</section>
+
+<section class="figure" id="ollun">
+  <header class="figure-head">
+    <div class="ident">
+      <h2>Riftwatch Ollun</h2>
+      <p class="title">Breach Scholar</p>
+      <p class="post">The signal-fire vigil, Watch Meadow</p>
+    </div>
+    <dl class="spec">
+      <div><dt>Role</dt><dd>Interrupts Rift effects and reads the changing anchor pattern.</dd></div>
+      <div><dt>Height</dt><dd>2.60 yd</dd></div>
+      <div><dt>Triangles</dt><dd>6,881</dd></div>
+      <div><dt>Clips</dt><dd>22</dd></div>
+      <div><dt>Materials</dt><dd>1 body (one draw) + 1 held</dd></div>
+      <div><dt>Base</dt><dd><code>rogue_hooded.glb</code></dd></div>
+      
+      
+    </dl>
+  </header>
+
+  <div class="figure-body">
+    <div class="turn-wrap">
+      <div class="turn" data-frames="ollun_turn_00.webp,ollun_turn_01.webp,ollun_turn_02.webp,ollun_turn_03.webp,ollun_turn_04.webp,ollun_turn_05.webp,ollun_turn_06.webp,ollun_turn_07.webp,ollun_turn_08.webp,ollun_turn_09.webp,ollun_turn_10.webp,ollun_turn_11.webp" data-dir="last-bell-concept-art">
+        <img class="turn-img" src="last-bell-concept-art/ollun_turn_00.webp" alt="Riftwatch Ollun, rotating turnaround">
+      </div>
+      <div class="turn-ctl">
+        <button class="btn spin" type="button" aria-pressed="true">Pause</button>
+        <input class="scrub" type="range" min="0" max="11" value="0"
+               aria-label="Riftwatch Ollun turnaround angle">
+      </div>
+    </div>
+
+    <div class="prose">
+      <p>He can hear a breach change before it becomes visible, and he reads one the way a physician reads a chest. He designs the outer seal and genuinely hopes it will work; his calculations cannot prove that it will. Across the whole campaign he is the only squad member who never describes his own future.</p>
+      <div class="signature">
+        <h3>The authored detail</h3>
+        <p>The cowl, and what it hides. He is the one who suspected first and said nothing, and a hood that shadows half a face says that before he opens his mouth. Dark slate over old paper, so the man who keeps the record is wearing the record. His authored detail, the instrument bandolier with its empty loops, is still owed.</p>
+      </div>
+      <ul class="palette">
+        <li class="chip">
+          <span class="swatch" style="--c:#3f5f8a"></span>
+          <span class="chip-text">
+            <b>Riftwatch slate</b> <code>#3f5f8a</code>
+            <em>His sim entity colour, worn as the cowl and cape.</em>
+          </span>
+        </li>
+        <li class="chip">
+          <span class="swatch" style="--c:#a9dcee"></span>
+          <span class="chip-text">
+            <b>Star-glass</b> <code>#a9dcee</code>
+            <em>His instruments, and what the seal is made of.</em>
+          </span>
+        </li>
+        <li class="chip">
+          <span class="swatch" style="--c:#e4d9c0"></span>
+          <span class="chip-text">
+            <b>Old paper</b> <code>#e4d9c0</code>
+            <em>The tunic, and the record that reaches the Old Beacon.</em>
+          </span>
+        </li>
+        <li class="chip">
+          <span class="swatch" style="--c:#9c7437"></span>
+          <span class="chip-text">
+            <b>Bell bronze</b> <code>#9c7437</code>
+            <em>Instrument fittings, calibrated against the bell.</em>
+          </span>
+        </li></ul>
+      <h3>What they carry</h3><ul class="weapons">
+      <li>
+        <b>brasscrown walking staff</b>
+        <code>handslot.r</code>
+        <em>A measuring staff he walks the Riftfields with, marked off in bell-lengths.</em>
+      </li></ul>
+      <h3>Design notes</h3><ul class="notes"><li>Built on the HOODED rogue, which carries a real cowl: half of `RogueHooded_Head` samples the cape's own palette cell. The first pass used the mage body, whose long loose hair was recoloured to robe slate and called a hood; it never read as one. His hair is dark; nothing in the spec makes him old.</li><li>The two-tone is the characterisation, and it costs two palette entries and no re-UV: cowl, cape and shoulder panel slate on one cell, tunic and sleeves old paper on the other. Dark hood over a pale body reads as a scholar at gameplay distance, and reads as nobody else on this island.</li><li>No wizard hat. He is an instrument-keeper and a record-keeper, not a spellcaster, and the silhouette should not promise magic.</li><li>The face mask is its own mesh and is hidden, so the face can carry the dialogue. Keeping it is the whole cost of a masked Riftfield variant.</li><li>Still owed: the instrument bandolier with its EMPTY LOOPS. He gives his possessions away as the arc runs, so the strap that should hold a full set of instruments is missing more of them every time you see him. That is a second authored detail, and it is not built yet.</li></ul>
+    </div>
+  </div>
+
+  
+  <div class="anims">
+    <div class="anims-head">
+      <h3>In motion</h3>
+      <button class="btn anims-toggle" type="button" aria-pressed="true">Pause all</button>
+    </div>
+    <div class="anim-grid">
+      <figure class="anim">
+        <div class="anim-stage" data-frames="12" data-fps="12"
+             style="--sheet:url('last-bell-concept-art/ollun_anim_Idle.webp');--arw:300;--arh:380;--n:12;--cells:13;--dur:1.00s"></div>
+        <figcaption><b>Reading the breach</b><span>Idle</span></figcaption>
+      </figure>
+      <figure class="anim">
+        <div class="anim-stage" data-frames="12" data-fps="12"
+             style="--sheet:url('last-bell-concept-art/ollun_anim_Walking_A.webp');--arw:300;--arh:380;--n:12;--cells:13;--dur:1.00s"></div>
+        <figcaption><b>Pacing the evacuation route</b><span>Walking_A</span></figcaption>
+      </figure>
+      <figure class="anim">
+        <div class="anim-stage" data-frames="12" data-fps="12"
+             style="--sheet:url('last-bell-concept-art/ollun_anim_Spellcast_Raise.webp');--arw:300;--arh:380;--n:12;--cells:13;--dur:1.00s"></div>
+        <figcaption><b>Raising the outer seal</b><span>Spellcast_Raise</span></figcaption>
+      </figure>
+      <figure class="anim">
+        <div class="anim-stage" data-frames="12" data-fps="12"
+             style="--sheet:url('last-bell-concept-art/ollun_anim_Block.webp');--arw:300;--arh:380;--n:12;--cells:13;--dur:1.00s"></div>
+        <figcaption><b>When the pattern divides</b><span>Block</span></figcaption>
+      </figure></div>
+  </div>
+</section>
+
+<section class="figure" id="edda">
+  <header class="figure-head">
+    <div class="ident">
+      <h2>Quartermaster Edda</h2>
+      <p class="title">Redoubt Armorer</p>
+      <p class="post">The forge, Gullhaven redoubt</p>
+    </div>
+    <dl class="spec">
+      <div><dt>Role</dt><dd>Heavy ranged damage, demolitions and charge placement.</dd></div>
+      <div><dt>Height</dt><dd>2.60 yd</dd></div>
+      <div><dt>Triangles</dt><dd>7,630</dd></div>
+      <div><dt>Clips</dt><dd>22</dd></div>
+      <div><dt>Materials</dt><dd>1 body (one draw) + 2 held</dd></div>
+      <div><dt>Base</dt><dd><code>rogue.glb</code></dd></div>
+      
+      
+    </dl>
+  </header>
+
+  <div class="figure-body">
+    <div class="turn-wrap">
+      <div class="turn" data-frames="edda_turn_00.webp,edda_turn_01.webp,edda_turn_02.webp,edda_turn_03.webp,edda_turn_04.webp,edda_turn_05.webp,edda_turn_06.webp,edda_turn_07.webp,edda_turn_08.webp,edda_turn_09.webp,edda_turn_10.webp,edda_turn_11.webp" data-dir="last-bell-concept-art">
+        <img class="turn-img" src="last-bell-concept-art/edda_turn_00.webp" alt="Quartermaster Edda, rotating turnaround">
+      </div>
+      <div class="turn-ctl">
+        <button class="btn spin" type="button" aria-pressed="true">Pause</button>
+        <input class="scrub" type="range" min="0" max="11" value="0"
+               aria-label="Quartermaster Edda turnaround angle">
+      </div>
+    </div>
+
+    <div class="prose">
+      <p>She repairs the same battered equipment so often that she treats it like part of the family, and she names her machines. Abrasive, practical, and very funny when afraid: the more frightened she is, the funnier she gets. She voted to call the mainland for relief, and in Q6 it is her hand that puts the flare up.</p>
+      <div class="signature">
+        <h3>The authored detail</h3>
+        <p>The charge rack. Star-glass charges she built herself, racked across her chest where she can reach them without looking. She stays at the charge station at the end for the reason she always gives, that only she can arm it, and never for the reason everyone else can see.</p>
+      </div>
+      <ul class="palette">
+        <li class="chip">
+          <span class="swatch" style="--c:#6b6b3a"></span>
+          <span class="chip-text">
+            <b>Forge olive</b> <code>#6b6b3a</code>
+            <em>Her sim entity colour: workshop canvas, not livery.</em>
+          </span>
+        </li>
+        <li class="chip">
+          <span class="swatch" style="--c:#2a2724"></span>
+          <span class="chip-text">
+            <b>Soot</b> <code>#2a2724</code>
+            <em>Hands, forearms and hem. It does not wash out.</em>
+          </span>
+        </li>
+        <li class="chip">
+          <span class="swatch" style="--c:#a9dcee"></span>
+          <span class="chip-text">
+            <b>Star-glass</b> <code>#a9dcee</code>
+            <em>The charges, ground and set by her own hand.</em>
+          </span>
+        </li>
+        <li class="chip">
+          <span class="swatch" style="--c:#9c7437"></span>
+          <span class="chip-text">
+            <b>Bell bronze</b> <code>#9c7437</code>
+            <em>Fittings, and the bell she helps reforge.</em>
+          </span>
+        </li></ul>
+      <h3>What they carry</h3><ul class="weapons">
+      <li>
+        <b>iron field hammer</b>
+        <code>handslot.r</code>
+        <em>The field hammer she rebuilds the redoubt's kit with. It has a name.</em>
+      </li>
+      <li>
+        <b>tongs</b>
+        <code>handslot.l</code>
+        <em>Forge tongs: how star-glass gets handled by someone who intends to keep her fingers.</em>
+      </li></ul>
+      <h3>Design notes</h3><ul class="notes"><li>Soot is painted UP the forearms and DOWN the hem, the two places a forge actually marks, rather than as an even grime pass.</li><li>Her tools read as maintained, not worn out. She is the reason the squad's gear outperforms the militia's.</li></ul>
+    </div>
+  </div>
+
+  
+  <div class="anims">
+    <div class="anims-head">
+      <h3>In motion</h3>
+      <button class="btn anims-toggle" type="button" aria-pressed="true">Pause all</button>
+    </div>
+    <div class="anim-grid">
+      <figure class="anim">
+        <div class="anim-stage" data-frames="12" data-fps="12"
+             style="--sheet:url('last-bell-concept-art/edda_anim_Idle.webp');--arw:300;--arh:380;--n:12;--cells:13;--dur:1.00s"></div>
+        <figcaption><b>At the forge</b><span>Idle</span></figcaption>
+      </figure>
+      <figure class="anim">
+        <div class="anim-stage" data-frames="12" data-fps="12"
+             style="--sheet:url('last-bell-concept-art/edda_anim_Walking_A.webp');--arw:300;--arh:380;--n:12;--cells:13;--dur:1.00s"></div>
+        <figcaption><b>Carrying a charge</b><span>Walking_A</span></figcaption>
+      </figure>
+      <figure class="anim">
+        <div class="anim-stage" data-frames="12" data-fps="12"
+             style="--sheet:url('last-bell-concept-art/edda_anim_1H_Melee_Attack_Chop.webp');--arw:300;--arh:380;--n:12;--cells:13;--dur:1.00s"></div>
+        <figcaption><b>Setting the charge</b><span>1H_Melee_Attack_Chop</span></figcaption>
+      </figure>
+      <figure class="anim">
+        <div class="anim-stage" data-frames="12" data-fps="12"
+             style="--sheet:url('last-bell-concept-art/edda_anim_Cheer.webp');--arw:300;--arh:380;--n:12;--cells:13;--dur:1.00s"></div>
+        <figcaption><b>Funniest when frightened</b><span>Cheer</span></figcaption>
+      </figure></div>
+  </div>
+</section>
+
+<section class="figure" id="saul">
+  <header class="figure-head">
+    <div class="ident">
+      <h2>Mender Saul</h2>
+      <p class="title">Field Surgeon</p>
+      <p class="post">The wounded, Gullhaven redoubt</p>
+    </div>
+    <dl class="spec">
+      <div><dt>Role</dt><dd>Healing, cleansing dream-corruption, keeping the anchor holders alive.</dd></div>
+      <div><dt>Height</dt><dd>2.60 yd</dd></div>
+      <div><dt>Triangles</dt><dd>4,121</dd></div>
+      <div><dt>Clips</dt><dd>28</dd></div>
+      <div><dt>Materials</dt><dd>1 body (one draw) + 2 held</dd></div>
+      <div><dt>Base</dt><dd><code>mage_classic.glb</code></dd></div>
+      
+      
+    </dl>
+  </header>
+
+  <div class="figure-body">
+    <div class="turn-wrap">
+      <div class="turn" data-frames="saul_turn_00.webp,saul_turn_01.webp,saul_turn_02.webp,saul_turn_03.webp,saul_turn_04.webp,saul_turn_05.webp,saul_turn_06.webp,saul_turn_07.webp,saul_turn_08.webp,saul_turn_09.webp,saul_turn_10.webp,saul_turn_11.webp" data-dir="last-bell-concept-art">
+        <img class="turn-img" src="last-bell-concept-art/saul_turn_00.webp" alt="Mender Saul, rotating turnaround">
+      </div>
+      <div class="turn-ctl">
+        <button class="btn spin" type="button" aria-pressed="true">Pause</button>
+        <input class="scrub" type="range" min="0" max="11" value="0"
+               aria-label="Mender Saul turnaround angle">
+      </div>
+    </div>
+
+    <div class="prose">
+      <p>Gentle, exhausted, and harder to frighten than any of them. He made peace with the precedent before anyone else did, and he is the one who makes sure the newcomer understands the histories before the histories happen to them: it is Saul who sends you to read the statue's plinth.</p>
+      <div class="signature">
+        <h3>The authored detail</h3>
+        <p>The mended apron. Every patch on it is stitched the way he ties a bandage, in the same over-and-back he has used on a thousand people, because he mends his own kit with the only hands he has. He treats every patient by name and has never once mentioned his own.</p>
+      </div>
+      <ul class="palette">
+        <li class="chip">
+          <span class="swatch" style="--c:#9a3b3b"></span>
+          <span class="chip-text">
+            <b>Mender's red</b> <code>#9a3b3b</code>
+            <em>His sim entity colour. It hides what the work leaves.</em>
+          </span>
+        </li>
+        <li class="chip">
+          <span class="swatch" style="--c:#dfe3e2"></span>
+          <span class="chip-text">
+            <b>Bandage linen</b> <code>#dfe3e2</code>
+            <em>Clean, and rationed, and always the newest thing on him.</em>
+          </span>
+        </li>
+        <li class="chip">
+          <span class="swatch" style="--c:#63482f"></span>
+          <span class="chip-text">
+            <b>Worn leather</b> <code>#63482f</code>
+            <em>An instrument roll older than most of the militia.</em>
+          </span>
+        </li>
+        <li class="chip">
+          <span class="swatch" style="--c:#a9dcee"></span>
+          <span class="chip-text">
+            <b>Star-glass</b> <code>#a9dcee</code>
+            <em>What cleanses dream-corruption, and all he has of it.</em>
+          </span>
+        </li></ul>
+      <h3>What they carry</h3><ul class="weapons">
+      <li>
+        <b>lantern</b>
+        <code>handslot.l</code>
+        <em>He works among the wounded at night. The lantern is how they find him.</em>
+      </li></ul>
+      <h3>Design notes</h3><ul class="notes"><li>Built on mage_classic, not the mage body: it carries a short dark cut and a plain male face where the mage body's long hair read as a woman. Same palette cells, same bone names, so the recipe is unchanged.</li><li>Exhausted, not old. His hair stays dark; the tiredness is in the kit.</li><li>The only figure whose authored detail is REPAIR rather than equipment. Everything about him is something kept working past its life.</li><li>Lantern in the off hand, nothing in the main. He is the one person on the island whose hands are the tools.</li></ul>
+    </div>
+  </div>
+
+  
+  <div class="anims">
+    <div class="anims-head">
+      <h3>In motion</h3>
+      <button class="btn anims-toggle" type="button" aria-pressed="true">Pause all</button>
+    </div>
+    <div class="anim-grid">
+      <figure class="anim">
+        <div class="anim-stage" data-frames="12" data-fps="12"
+             style="--sheet:url('last-bell-concept-art/saul_anim_Idle.webp');--arw:300;--arh:380;--n:12;--cells:13;--dur:1.00s"></div>
+        <figcaption><b>With the wounded</b><span>Idle</span></figcaption>
+      </figure>
+      <figure class="anim">
+        <div class="anim-stage" data-frames="12" data-fps="12"
+             style="--sheet:url('last-bell-concept-art/saul_anim_Walking_A.webp');--arw:300;--arh:380;--n:12;--cells:13;--dur:1.00s"></div>
+        <figcaption><b>Called away</b><span>Walking_A</span></figcaption>
+      </figure>
+      <figure class="anim">
+        <div class="anim-stage" data-frames="12" data-fps="12"
+             style="--sheet:url('last-bell-concept-art/saul_anim_Spellcasting.webp');--arw:300;--arh:380;--n:12;--cells:13;--dur:1.00s"></div>
+        <figcaption><b>Cleansing the corruption</b><span>Spellcasting</span></figcaption>
+      </figure>
+      <figure class="anim">
+        <div class="anim-stage" data-frames="12" data-fps="12"
+             style="--sheet:url('last-bell-concept-art/saul_anim_Sit_Floor_Idle.webp');--arw:300;--arh:380;--n:12;--cells:13;--dur:1.00s"></div>
+        <figcaption><b>The rest he does not take</b><span>Sit_Floor_Idle</span></figcaption>
+      </figure></div>
+  </div>
+</section>
+
+<section class="figure" id="tam">
+  <header class="figure-head">
+    <div class="ident">
+      <h2>Bellkeeper Tam</h2>
+      <p class="title">Watchbell Keeper</p>
+      <p class="post">The watchbell brazier, the Landing</p>
+    </div>
+    <dl class="spec">
+      <div><dt>Role</dt><dd>Protective wards, crowd control, and the Bellheart's counter-note.</dd></div>
+      <div><dt>Height</dt><dd>2.60 yd</dd></div>
+      <div><dt>Triangles</dt><dd>6,269</dd></div>
+      <div><dt>Clips</dt><dd>22</dd></div>
+      <div><dt>Materials</dt><dd>1 body (one draw)</dd></div>
+      <div><dt>Base</dt><dd><code>barbarian.glb</code></dd></div>
+      
+      
+    </dl>
+  </header>
+
+  <div class="figure-body">
+    <div class="turn-wrap">
+      <div class="turn" data-frames="tam_turn_00.webp,tam_turn_01.webp,tam_turn_02.webp,tam_turn_03.webp,tam_turn_04.webp,tam_turn_05.webp,tam_turn_06.webp,tam_turn_07.webp,tam_turn_08.webp,tam_turn_09.webp,tam_turn_10.webp,tam_turn_11.webp" data-dir="last-bell-concept-art">
+        <img class="turn-img" src="last-bell-concept-art/tam_turn_00.webp" alt="Bellkeeper Tam, rotating turnaround">
+      </div>
+      <div class="turn-ctl">
+        <button class="btn spin" type="button" aria-pressed="true">Pause</button>
+        <input class="scrub" type="range" min="0" max="11" value="0"
+               aria-label="Bellkeeper Tam turnaround angle">
+      </div>
+    </div>
+
+    <div class="prose">
+      <p>Coalfast's oldest friend, and the only person who can reliably read and answer the Bellheart's changing tone. He uses humour to keep fear from becoming the most important person in the room, claims not to believe in the old Vigil rites, and knows every word of them. His silence is the alarm.</p>
+      <div class="signature">
+        <h3>The authored detail</h3>
+        <p>The bell-striker, worn pale where his hand goes. It is the one object the campaign hands you afterwards as a keepsake, so it has to be recognisably HIS before you ever receive it: bronze head, leather haft, and sixty years of grip polished into the same four inches.</p>
+      </div>
+      <ul class="palette">
+        <li class="chip">
+          <span class="swatch" style="--c:#4a7b6b"></span>
+          <span class="chip-text">
+            <b>Watch teal</b> <code>#4a7b6b</code>
+            <em>His sim entity colour: the bell-keeper's coat.</em>
+          </span>
+        </li>
+        <li class="chip">
+          <span class="swatch" style="--c:#9c7437"></span>
+          <span class="chip-text">
+            <b>Bell bronze</b> <code>#9c7437</code>
+            <em>More of it on him than on anyone. He is the bell's man.</em>
+          </span>
+        </li>
+        <li class="chip">
+          <span class="swatch" style="--c:#9c7a4e"></span>
+          <span class="chip-text">
+            <b>Grip pale</b> <code>#9c7a4e</code>
+            <em>Where the striker's leather has gone the colour of bone.</em>
+          </span>
+        </li>
+        <li class="chip">
+          <span class="swatch" style="--c:#d3a07a"></span>
+          <span class="chip-text">
+            <b>Weathered</b> <code>#d3a07a</code>
+            <em>Forty years of standing at the causeway's end.</em>
+          </span>
+        </li></ul>
+      
+      <h3>Design notes</h3><ul class="notes"><li>Built on the barbarian body for breadth, with the bear hat dropped. He is an old soldier's shape, not a warden's.</li><li>The striker is bespoke geometry rather than a stock weapon, because no shipped model reads as a bell-striker and the keepsake has to match.</li></ul>
+    </div>
+  </div>
+
+  
+  <div class="anims">
+    <div class="anims-head">
+      <h3>In motion</h3>
+      <button class="btn anims-toggle" type="button" aria-pressed="true">Pause all</button>
+    </div>
+    <div class="anim-grid">
+      <figure class="anim">
+        <div class="anim-stage" data-frames="12" data-fps="12"
+             style="--sheet:url('last-bell-concept-art/tam_anim_Idle.webp');--arw:300;--arh:380;--n:12;--cells:13;--dur:1.00s"></div>
+        <figcaption><b>Listening</b><span>Idle</span></figcaption>
+      </figure>
+      <figure class="anim">
+        <div class="anim-stage" data-frames="12" data-fps="12"
+             style="--sheet:url('last-bell-concept-art/tam_anim_1H_Melee_Attack_Chop.webp');--arw:300;--arh:380;--n:12;--cells:13;--dur:1.00s"></div>
+        <figcaption><b>One toll for the fields</b><span>1H_Melee_Attack_Chop</span></figcaption>
+      </figure>
+      <figure class="anim">
+        <div class="anim-stage" data-frames="12" data-fps="12"
+             style="--sheet:url('last-bell-concept-art/tam_anim_Cheer.webp');--arw:300;--arh:380;--n:12;--cells:13;--dur:1.00s"></div>
+        <figcaption><b>Keeping fear out of the room</b><span>Cheer</span></figcaption>
+      </figure>
+      <figure class="anim">
+        <div class="anim-stage" data-frames="12" data-fps="12"
+             style="--sheet:url('last-bell-concept-art/tam_anim_Block.webp');--arw:300;--arh:380;--n:12;--cells:13;--dur:1.00s"></div>
+        <figcaption><b>Wards up</b><span>Block</span></figcaption>
+      </figure></div>
+  </div>
+</section>
+
+<section class="figure" id="nell">
+  <header class="figure-head">
+    <div class="ident">
+      <h2>Nell</h2>
+      <p class="title">Bell-runner</p>
+      <p class="post">Between the posts and the tower</p>
+    </div>
+    <dl class="spec">
+      <div><dt>Role</dt><dd>Carries messages. Not part of the final expedition, and survives it.</dd></div>
+      <div><dt>Height</dt><dd>2.25 yd</dd></div>
+      <div><dt>Triangles</dt><dd>7,758</dd></div>
+      <div><dt>Clips</dt><dd>22</dd></div>
+      <div><dt>Materials</dt><dd>1 body (one draw)</dd></div>
+      <div><dt>Base</dt><dd><code>rogue.glb</code></dd></div>
+      
+      
+    </dl>
+  </header>
+
+  <div class="figure-body">
+    <div class="turn-wrap">
+      <div class="turn" data-frames="nell_turn_00.webp,nell_turn_01.webp,nell_turn_02.webp,nell_turn_03.webp,nell_turn_04.webp,nell_turn_05.webp,nell_turn_06.webp,nell_turn_07.webp,nell_turn_08.webp,nell_turn_09.webp,nell_turn_10.webp,nell_turn_11.webp" data-dir="last-bell-concept-art">
+        <img class="turn-img" src="last-bell-concept-art/nell_turn_00.webp" alt="Nell, rotating turnaround">
+      </div>
+      <div class="turn-ctl">
+        <button class="btn spin" type="button" aria-pressed="true">Pause</button>
+        <input class="scrub" type="range" min="0" max="11" value="0"
+               aria-label="Nell turnaround angle">
+      </div>
+    </div>
+
+    <div class="prose">
+      <p>Bren's daughter. Her father's death is weeks old, she is terrified of the work, and she does it anyway: her courage is not the absence of fear, it is returning to the shore in spite of it. She helps evacuate Gullhaven, takes over the bell post afterwards, and is the person who later asks you to carry five name-stones to Willowfen.</p>
+      <div class="signature">
+        <h3>The authored detail</h3>
+        <p>The tally cord. A knotted line at her hip, one knot for every run she has made since her father died, because counting them is how she keeps going back. It is the only piece of characterisation in the book that is a number.</p>
+      </div>
+      <ul class="palette">
+        <li class="chip">
+          <span class="swatch" style="--c:#6e8ca8"></span>
+          <span class="chip-text">
+            <b>Runner's blue</b> <code>#6e8ca8</code>
+            <em>Her sim entity colour, and the lightest cloth on the island.</em>
+          </span>
+        </li>
+        <li class="chip">
+          <span class="swatch" style="--c:#bfae8e"></span>
+          <span class="chip-text">
+            <b>Salt canvas</b> <code>#bfae8e</code>
+            <em>A satchel cut down from something of her father's.</em>
+          </span>
+        </li>
+        <li class="chip">
+          <span class="swatch" style="--c:#9c7437"></span>
+          <span class="chip-text">
+            <b>Bell bronze</b> <code>#9c7437</code>
+            <em>The hand-bell. Small, and the loudest thing she owns.</em>
+          </span>
+        </li>
+        <li class="chip">
+          <span class="swatch" style="--c:#9c7a4e"></span>
+          <span class="chip-text">
+            <b>Rope</b> <code>#9c7a4e</code>
+            <em>The tally cord, and the knots in it.</em>
+          </span>
+        </li></ul>
+      
+      <h3>Design notes</h3><ul class="notes"><li>Shorter than every adult on the island (2.25 against 2.6). The scale chart is doing characterisation work here, not just documentation.</li><li>No armour and no weapon. She is the only figure in the campaign whose job is to be somewhere else, fast.</li><li>On the rogue body, not the ranger's: the ranger carries a moustache (it went to Ewald) and its quiver reads as a hunter, which is exactly what she is not. Youngest skin and hair in the book.</li></ul>
+    </div>
+  </div>
+
+  
+  <div class="anims">
+    <div class="anims-head">
+      <h3>In motion</h3>
+      <button class="btn anims-toggle" type="button" aria-pressed="true">Pause all</button>
+    </div>
+    <div class="anim-grid">
+      <figure class="anim">
+        <div class="anim-stage" data-frames="12" data-fps="12"
+             style="--sheet:url('last-bell-concept-art/nell_anim_Running_A.webp');--arw:300;--arh:380;--n:12;--cells:13;--dur:1.00s"></div>
+        <figcaption><b>Running the bell</b><span>Running_A</span></figcaption>
+      </figure>
+      <figure class="anim">
+        <div class="anim-stage" data-frames="12" data-fps="12"
+             style="--sheet:url('last-bell-concept-art/nell_anim_Idle.webp');--arw:300;--arh:380;--n:12;--cells:13;--dur:1.00s"></div>
+        <figcaption><b>Waiting for the toll</b><span>Idle</span></figcaption>
+      </figure>
+      <figure class="anim">
+        <div class="anim-stage" data-frames="12" data-fps="12"
+             style="--sheet:url('last-bell-concept-art/nell_anim_Cheer.webp');--arw:300;--arh:380;--n:12;--cells:13;--dur:1.00s"></div>
+        <figcaption><b>Calling the code</b><span>Cheer</span></figcaption>
+      </figure>
+      <figure class="anim">
+        <div class="anim-stage" data-frames="12" data-fps="12"
+             style="--sheet:url('last-bell-concept-art/nell_anim_Hit_A.webp');--arw:300;--arh:380;--n:12;--cells:13;--dur:1.00s"></div>
+        <figcaption><b>Going back anyway</b><span>Hit_A</span></figcaption>
+      </figure></div>
+  </div>
+</section>
+
+<section class="figure" id="riftspawn">
+  <header class="figure-head">
+    <div class="ident">
+      <h2>Riftspawn</h2>
+      <p class="title">Break-spawned</p>
+      <p class="post">The island's fringe</p>
+    </div>
+    <dl class="spec">
+      <div><dt>Role</dt><dd>The common spill. Knows only the way it came and the thing in front of it.</dd></div>
+      <div><dt>Height</dt><dd>1.78 yd</dd></div>
+      <div><dt>Triangles</dt><dd>3,961</dd></div>
+      <div><dt>Clips</dt><dd>22</dd></div>
+      <div><dt>Materials</dt><dd>1 body (one draw)</dd></div>
+      <div><dt>Base</dt><dd><code>riftspawn_antler.glb</code></dd></div>
+      <div><dt>Family</dt><dd>demon</dd></div>
+      <div><dt>Levels</dt><dd>3 to 4</dd></div>
+    </dl>
+  </header>
+
+  <div class="figure-body">
+    <div class="turn-wrap">
+      <div class="turn" data-frames="riftspawn_turn_00.webp,riftspawn_turn_01.webp,riftspawn_turn_02.webp,riftspawn_turn_03.webp,riftspawn_turn_04.webp,riftspawn_turn_05.webp,riftspawn_turn_06.webp,riftspawn_turn_07.webp,riftspawn_turn_08.webp,riftspawn_turn_09.webp,riftspawn_turn_10.webp,riftspawn_turn_11.webp" data-dir="last-bell-concept-art">
+        <img class="turn-img" src="last-bell-concept-art/riftspawn_turn_00.webp" alt="Riftspawn, rotating turnaround">
+      </div>
+      <div class="turn-ctl">
+        <button class="btn spin" type="button" aria-pressed="true">Pause</button>
+        <input class="scrub" type="range" min="0" max="11" value="0"
+               aria-label="Riftspawn turnaround angle">
+      </div>
+    </div>
+
+    <div class="prose">
+      <p>Whatever a rift is, it does not spill fishermen. Riftspawn are what already made it through and now roam away from the redoubt, and they are the twelve you kill in Q0 while the militia watches. The first enemy anyone fights on this island, which makes it the first thing that has to say what a rift is.</p>
+      <div class="signature">
+        <h3>The authored detail</h3>
+        <p>It has no mouth. A narrow blank face, two cold eyes, and nothing else: this is a thing that does not eat and does not speak, which is a stranger idea than any set of teeth. Above it, antlers branch wider than its own body.</p>
+      </div>
+      <ul class="palette">
+        <li class="chip">
+          <span class="swatch" style="--c:#7a3fb0"></span>
+          <span class="chip-text">
+            <b>Rift violet</b> <code>#7a3fb0</code>
+            <em>Its sim entity colour, and now the skin itself.</em>
+          </span>
+        </li>
+        <li class="chip">
+          <span class="swatch" style="--c:#3b2450"></span>
+          <span class="chip-text">
+            <b>Deep bruise</b> <code>#3b2450</code>
+            <em>The shadow value. Purple, never black.</em>
+          </span>
+        </li>
+        <li class="chip">
+          <span class="swatch" style="--c:#c2439a"></span>
+          <span class="chip-text">
+            <b>Wound magenta</b> <code>#c2439a</code>
+            <em>Edge accents where the body was cut wrong.</em>
+          </span>
+        </li>
+        <li class="chip">
+          <span class="swatch" style="--c:#9fe4ee"></span>
+          <span class="chip-text">
+            <b>Cold eye</b> <code>#9fe4ee</code>
+            <em>The only bright thing on it, and the family mark.</em>
+          </span>
+        </li></ul>
+      
+      <h3>Design notes</h3><ul class="notes"><li>No longer a repainted skeleton. A skeleton is a DEAD body and the lore wants an unfinished one, so the whole approach changed: generated from a concept, then rigged onto the KayKit skeleton locally rather than retargeted, which is why it carries all 22 native clips.</li><li>Four arms, and they cost nothing. The lower pair is bound rigidly to the chest bone, so it rides the torso through every clip: no new bones, no per-clip posing. Only free-swinging extra limbs are expensive.</li><li>The arm bone chain sat at z 1.107 while all four arms lived between 0.69 and 0.96, so Walking_A dragged the lower pair inward and tangled it. The fix was to drop the chain onto the upper pair's real line: editing the REST pose is safe, because rest is the bind, so the mesh does not move but every clip now rotates the arm about a pivot inside the geometry.</li></ul>
+    </div>
+  </div>
+
+  
+  <div class="anims">
+    <div class="anims-head">
+      <h3>In motion</h3>
+      <button class="btn anims-toggle" type="button" aria-pressed="true">Pause all</button>
+    </div>
+    <div class="anim-grid">
+      <figure class="anim">
+        <div class="anim-stage" data-frames="12" data-fps="12"
+             style="--sheet:url('last-bell-concept-art/riftspawn_anim_Idle.webp');--arw:300;--arh:380;--n:12;--cells:13;--dur:1.00s"></div>
+        <figcaption><b>Waiting at the fringe</b><span>Idle</span></figcaption>
+      </figure>
+      <figure class="anim">
+        <div class="anim-stage" data-frames="12" data-fps="12"
+             style="--sheet:url('last-bell-concept-art/riftspawn_anim_Walking_A.webp');--arw:300;--arh:380;--n:12;--cells:13;--dur:1.00s"></div>
+        <figcaption><b>Coming through</b><span>Walking_A</span></figcaption>
+      </figure>
+      <figure class="anim">
+        <div class="anim-stage" data-frames="12" data-fps="12"
+             style="--sheet:url('last-bell-concept-art/riftspawn_anim_1H_Melee_Attack_Chop.webp');--arw:300;--arh:380;--n:12;--cells:13;--dur:1.00s"></div>
+        <figcaption><b>The rake, all four arms</b><span>1H_Melee_Attack_Chop</span></figcaption>
+      </figure>
+      <figure class="anim">
+        <div class="anim-stage" data-frames="12" data-fps="12"
+             style="--sheet:url('last-bell-concept-art/riftspawn_anim_1H_Melee_Attack_Slice_Diagonal.webp');--arw:300;--arh:380;--n:12;--cells:13;--dur:1.00s"></div>
+        <figcaption><b>The swipe, upper pair over the top</b><span>1H_Melee_Attack_Slice_Diagonal</span></figcaption>
+      </figure>
+      <figure class="anim">
+        <div class="anim-stage" data-frames="12" data-fps="12"
+             style="--sheet:url('last-bell-concept-art/riftspawn_anim_Hit_A.webp');--arw:300;--arh:380;--n:12;--cells:13;--dur:1.00s"></div>
+        <figcaption><b>Struck</b><span>Hit_A</span></figcaption>
+      </figure></div>
+  </div>
+</section>
+
+<section class="figure" id="breach_wretch">
+  <header class="figure-head">
+    <div class="ident">
+      <h2>Breach Wretch</h2>
+      <p class="title">Break-spawned</p>
+      <p class="post">The island's fringe</p>
+    </div>
+    <dl class="spec">
+      <div><dt>Role</dt><dd>The small ones come in numbers, and they come fast.</dd></div>
+      <div><dt>Height</dt><dd>1.89 yd</dd></div>
+      <div><dt>Triangles</dt><dd>4,722</dd></div>
+      <div><dt>Clips</dt><dd>25</dd></div>
+      <div><dt>Materials</dt><dd>2 body</dd></div>
+      <div><dt>Base</dt><dd><code>skeleton_rogue.glb</code></dd></div>
+      <div><dt>Family</dt><dd>kobold</dd></div>
+      <div><dt>Levels</dt><dd>3 to 5</dd></div>
+    </dl>
+  </header>
+
+  <div class="figure-body">
+    <div class="turn-wrap">
+      <div class="turn" data-frames="breach_wretch_turn_00.webp,breach_wretch_turn_01.webp,breach_wretch_turn_02.webp,breach_wretch_turn_03.webp,breach_wretch_turn_04.webp,breach_wretch_turn_05.webp,breach_wretch_turn_06.webp,breach_wretch_turn_07.webp,breach_wretch_turn_08.webp,breach_wretch_turn_09.webp,breach_wretch_turn_10.webp,breach_wretch_turn_11.webp" data-dir="last-bell-concept-art">
+        <img class="turn-img" src="last-bell-concept-art/breach_wretch_turn_00.webp" alt="Breach Wretch, rotating turnaround">
+      </div>
+      <div class="turn-ctl">
+        <button class="btn spin" type="button" aria-pressed="true">Pause</button>
+        <input class="scrub" type="range" min="0" max="11" value="0"
+               aria-label="Breach Wretch turnaround angle">
+      </div>
+    </div>
+
+    <div class="prose">
+      <p>Wretches are the pressure the redoubt lives under between the big nights: quick, many, and willing. They carry the breakscarred steel Edda asks you to bring back.</p>
+      <div class="signature">
+        <h3>The authored detail</h3>
+        <p>A low, quick, hooded silhouette. Nothing about one of them is frightening, which is exactly the point: they are the pressure the redoubt lives under between the big nights.</p>
+      </div>
+      <ul class="palette">
+        <li class="chip">
+          <span class="swatch" style="--c:#bfb6c8"></span>
+          <span class="chip-text">
+            <b>Void bone</b> <code>#bfb6c8</code>
+            <em>The same bleached frame, smaller.</em>
+          </span>
+        </li>
+        <li class="chip">
+          <span class="swatch" style="--c:#5a4a78"></span>
+          <span class="chip-text">
+            <b>Bruise violet</b> <code>#5a4a78</code>
+            <em>Its sim entity colour, worn as the hood.</em>
+          </span>
+        </li>
+        <li class="chip">
+          <span class="swatch" style="--c:#a9dcee"></span>
+          <span class="chip-text">
+            <b>Star-glass</b> <code>#a9dcee</code>
+            <em>Three small shards. It has not been through as much.</em>
+          </span>
+        </li></ul>
+      
+      <h3>Design notes</h3><ul class="notes"><li>Rebuilt off the KayKit skeleton rogue: hooded and low, so a pack of them reads as a crowd rather than as five copies of one threat. The flat Quaternius goblin it replaced read as neither.</li></ul>
+    </div>
+  </div>
+
+  
+  <div class="anims">
+    <div class="anims-head">
+      <h3>In motion</h3>
+      <button class="btn anims-toggle" type="button" aria-pressed="true">Pause all</button>
+    </div>
+    <div class="anim-grid">
+      <figure class="anim">
+        <div class="anim-stage" data-frames="12" data-fps="12"
+             style="--sheet:url('last-bell-concept-art/breach_wretch_anim_Idle.webp');--arw:300;--arh:380;--n:12;--cells:13;--dur:1.00s"></div>
+        <figcaption><b>At rest</b><span>Idle</span></figcaption>
+      </figure>
+      <figure class="anim">
+        <div class="anim-stage" data-frames="12" data-fps="12"
+             style="--sheet:url('last-bell-concept-art/breach_wretch_anim_Walking_A.webp');--arw:300;--arh:380;--n:12;--cells:13;--dur:1.00s"></div>
+        <figcaption><b>Moving</b><span>Walking_A</span></figcaption>
+      </figure>
+      <figure class="anim">
+        <div class="anim-stage" data-frames="12" data-fps="12"
+             style="--sheet:url('last-bell-concept-art/breach_wretch_anim_1H_Melee_Attack_Chop.webp');--arw:300;--arh:380;--n:12;--cells:13;--dur:1.00s"></div>
+        <figcaption><b>Attacking</b><span>1H_Melee_Attack_Chop</span></figcaption>
+      </figure>
+      <figure class="anim">
+        <div class="anim-stage" data-frames="12" data-fps="12"
+             style="--sheet:url('last-bell-concept-art/breach_wretch_anim_Hit_A.webp');--arw:300;--arh:380;--n:12;--cells:13;--dur:1.00s"></div>
+        <figcaption><b>Struck</b><span>Hit_A</span></figcaption>
+      </figure></div>
+  </div>
+</section>
+
+<section class="figure" id="void_stalker">
+  <header class="figure-head">
+    <div class="ident">
+      <h2>Void Stalker</h2>
+      <p class="title">Break-spawned</p>
+      <p class="post">The edge of the watchfires</p>
+    </div>
+    <dl class="spec">
+      <div><dt>Role</dt><dd>Hunts the edges of the light the watchfires throw.</dd></div>
+      <div><dt>Height</dt><dd>1.84 yd</dd></div>
+      <div><dt>Triangles</dt><dd>2,858</dd></div>
+      <div><dt>Clips</dt><dd>14</dd></div>
+      <div><dt>Materials</dt><dd>1 body (one draw)</dd></div>
+      <div><dt>Base</dt><dd><code>wolf_basic.glb</code></dd></div>
+      <div><dt>Family</dt><dd>beast</dd></div>
+      <div><dt>Levels</dt><dd>5 to 6</dd></div>
+    </dl>
+  </header>
+
+  <div class="figure-body">
+    <div class="turn-wrap">
+      <div class="turn" data-frames="void_stalker_turn_00.webp,void_stalker_turn_01.webp,void_stalker_turn_02.webp,void_stalker_turn_03.webp,void_stalker_turn_04.webp,void_stalker_turn_05.webp,void_stalker_turn_06.webp,void_stalker_turn_07.webp,void_stalker_turn_08.webp,void_stalker_turn_09.webp,void_stalker_turn_10.webp,void_stalker_turn_11.webp" data-dir="last-bell-concept-art">
+        <img class="turn-img" src="last-bell-concept-art/void_stalker_turn_00.webp" alt="Void Stalker, rotating turnaround">
+      </div>
+      <div class="turn-ctl">
+        <button class="btn spin" type="button" aria-pressed="true">Pause</button>
+        <input class="scrub" type="range" min="0" max="11" value="0"
+               aria-label="Void Stalker turnaround angle">
+      </div>
+    </div>
+
+    <div class="prose">
+      <p>The reason the island keeps its fires burning at the perimeter rather than the centre. It does not test a lit line; it waits for one to gutter.</p>
+      <div class="signature">
+        <h3>The authored detail</h3>
+        <p>That it chooses where to hunt. It does not test a lit line; it waits for one to gutter, which is why the island keeps its fires at the perimeter rather than the centre.</p>
+      </div>
+      <ul class="palette">
+        <li class="chip">
+          <span class="swatch" style="--c:#2f2a44"></span>
+          <span class="chip-text">
+            <b>Starless</b> <code>#2f2a44</code>
+            <em>Its sim entity colour, applied the way the renderer applies it.</em>
+          </span>
+        </li>
+        <li class="chip">
+          <span class="swatch" style="--c:#8c8270"></span>
+          <span class="chip-text">
+            <b>Wolf coat</b> <code>#8c8270</code>
+            <em>The baked texture underneath, kept and darkened.</em>
+          </span>
+        </li></ul>
+      
+      <h3>Design notes</h3><ul class="notes"><li>Kept on the wolf body: it is the only quadruped in the kit that holds up at this size, and a stalker needs four legs. Re-coloured exactly the way `tintedMaterial` does it at runtime, so the plate matches the game.</li><li>OPEN: star-glass dorsal shards were built and CUT. At every offset tried they read as pale ice spikes standing off the back rather than glass grown through it. The tint alone already carries it, so the mark it shares with the skeleton spawn is missing here, and that is a follow-up.</li></ul>
+    </div>
+  </div>
+
+  
+  <div class="anims">
+    <div class="anims-head">
+      <h3>In motion</h3>
+      <button class="btn anims-toggle" type="button" aria-pressed="true">Pause all</button>
+    </div>
+    <div class="anim-grid">
+      <figure class="anim">
+        <div class="anim-stage" data-frames="12" data-fps="12"
+             style="--sheet:url('last-bell-concept-art/void_stalker_anim_Idle.webp');--arw:300;--arh:380;--n:12;--cells:13;--dur:1.00s"></div>
+        <figcaption><b>At rest</b><span>Idle</span></figcaption>
+      </figure>
+      <figure class="anim">
+        <div class="anim-stage" data-frames="12" data-fps="12"
+             style="--sheet:url('last-bell-concept-art/void_stalker_anim_Walk.webp');--arw:300;--arh:380;--n:12;--cells:13;--dur:1.00s"></div>
+        <figcaption><b>Moving</b><span>Walk</span></figcaption>
+      </figure>
+      <figure class="anim">
+        <div class="anim-stage" data-frames="12" data-fps="12"
+             style="--sheet:url('last-bell-concept-art/void_stalker_anim_Attack.webp');--arw:300;--arh:380;--n:12;--cells:13;--dur:1.00s"></div>
+        <figcaption><b>Attacking</b><span>Attack</span></figcaption>
+      </figure>
+      <figure class="anim">
+        <div class="anim-stage" data-frames="12" data-fps="12"
+             style="--sheet:url('last-bell-concept-art/void_stalker_anim_Idle_HitReact_Left.webp');--arw:300;--arh:380;--n:12;--cells:13;--dur:1.00s"></div>
+        <figcaption><b>Struck</b><span>Idle_HitReact_Left</span></figcaption>
+      </figure></div>
+  </div>
+</section>
+
+<section class="figure" id="tidemill_stalker">
+  <header class="figure-head">
+    <div class="ident">
+      <h2>The Tidemill Stalker</h2>
+      <p class="title">Q0 boss, elite</p>
+      <p class="post">The Tidemill, Watch Meadow</p>
+    </div>
+    <dl class="spec">
+      <div><dt>Role</dt><dd>Demonstrates the gap between the player and the militia.</dd></div>
+      <div><dt>Height</dt><dd>2.10 yd</dd></div>
+      <div><dt>Triangles</dt><dd>2,712</dd></div>
+      <div><dt>Clips</dt><dd>5</dd></div>
+      <div><dt>Materials</dt><dd>2 body</dd></div>
+      <div><dt>Base</dt><dd><code>spider.glb</code></dd></div>
+      <div><dt>Family</dt><dd>beast</dd></div>
+      <div><dt>Levels</dt><dd>5, fixed</dd></div>
+    </dl>
+  </header>
+
+  <div class="figure-body">
+    <div class="turn-wrap">
+      <div class="turn" data-frames="tidemill_stalker_turn_00.webp,tidemill_stalker_turn_01.webp,tidemill_stalker_turn_02.webp,tidemill_stalker_turn_03.webp,tidemill_stalker_turn_04.webp,tidemill_stalker_turn_05.webp,tidemill_stalker_turn_06.webp,tidemill_stalker_turn_07.webp,tidemill_stalker_turn_08.webp,tidemill_stalker_turn_09.webp,tidemill_stalker_turn_10.webp,tidemill_stalker_turn_11.webp" data-dir="last-bell-concept-art">
+        <img class="turn-img" src="last-bell-concept-art/tidemill_stalker_turn_00.webp" alt="The Tidemill Stalker, rotating turnaround">
+      </div>
+      <div class="turn-ctl">
+        <button class="btn spin" type="button" aria-pressed="true">Pause</button>
+        <input class="scrub" type="range" min="0" max="11" value="0"
+               aria-label="The Tidemill Stalker turnaround angle">
+      </div>
+    </div>
+
+    <div class="prose">
+      <p>It dug into the mill and it is wearing the miller's roof. This is the first thing on the island the militia cannot put down, which is the whole job of the fight: Marsh points at you, nothing follows you in, and the kill is yours alone. Coalfast recruits you off the back of it.</p>
+      <div class="signature">
+        <h3>The authored detail</h3>
+        <p>The roof it should be wearing. The campaign says it dug into the mill and came out carrying the miller's roof, and that is what this boss ought to look like.</p>
+      </div>
+      <ul class="palette">
+        <li class="chip">
+          <span class="swatch" style="--c:#3a4a2f"></span>
+          <span class="chip-text">
+            <b>Mill moss</b> <code>#3a4a2f</code>
+            <em>The sim entity colour, applied as a runtime tint.</em>
+          </span>
+        </li>
+        <li class="chip">
+          <span class="swatch" style="--c:#5c6470"></span>
+          <span class="chip-text">
+            <b>Tidemill slate</b> <code>#5c6470</code>
+            <em>Roof it has not shed.</em>
+          </span>
+        </li></ul>
+      
+      <h3>Design notes</h3><ul class="notes"><li>Mapped onto the spider body rather than the beast family's wolf: the encounter reads through burrowing and webbed exits, and a wolf silhouette promises neither.</li><li>OPEN: the carried mill roof is NOT modelled. Slate courses were prototyped and cut. The spider is a compact thorax under a wide leg span, and every seating of the slate read as a floating shelf rather than carried wreckage. Shipping a plate that misrepresents the model is worse than naming the gap, so it carries star-glass for now and the roof is a follow-up, not a delivery.</li></ul>
+    </div>
+  </div>
+
+  
+  <div class="anims">
+    <div class="anims-head">
+      <h3>In motion</h3>
+      <button class="btn anims-toggle" type="button" aria-pressed="true">Pause all</button>
+    </div>
+    <div class="anim-grid">
+      <figure class="anim">
+        <div class="anim-stage" data-frames="12" data-fps="12"
+             style="--sheet:url('last-bell-concept-art/tidemill_stalker_anim_Spider_Idle.webp');--arw:300;--arh:380;--n:12;--cells:13;--dur:1.00s"></div>
+        <figcaption><b>At rest</b><span>Spider_Idle</span></figcaption>
+      </figure>
+      <figure class="anim">
+        <div class="anim-stage" data-frames="12" data-fps="12"
+             style="--sheet:url('last-bell-concept-art/tidemill_stalker_anim_Spider_Walk.webp');--arw:300;--arh:380;--n:12;--cells:13;--dur:1.00s"></div>
+        <figcaption><b>Moving</b><span>Spider_Walk</span></figcaption>
+      </figure>
+      <figure class="anim">
+        <div class="anim-stage" data-frames="12" data-fps="12"
+             style="--sheet:url('last-bell-concept-art/tidemill_stalker_anim_Spider_Attack.webp');--arw:300;--arh:380;--n:12;--cells:13;--dur:1.00s"></div>
+        <figcaption><b>Attacking</b><span>Spider_Attack</span></figcaption>
+      </figure>
+      <figure class="anim">
+        <div class="anim-stage" data-frames="12" data-fps="12"
+             style="--sheet:url('last-bell-concept-art/tidemill_stalker_anim_Spider_Death.webp');--arw:300;--arh:380;--n:12;--cells:13;--dur:1.00s"></div>
+        <figcaption><b>Struck</b><span>Spider_Death</span></figcaption>
+      </figure></div>
+  </div>
+</section>
+
+<section class="figure" id="sundered_horror">
+  <header class="figure-head">
+    <div class="ident">
+      <h2>The Sundered Horror</h2>
+      <p class="title">World elite</p>
+      <p class="post">The Sundered Cliffs</p>
+    </div>
+    <dl class="spec">
+      <div><dt>Role</dt><dd>The biggest thing the cliffs' break ever let through.</dd></div>
+      <div><dt>Height</dt><dd>4.06 yd</dd></div>
+      <div><dt>Triangles</dt><dd>3,865</dd></div>
+      <div><dt>Clips</dt><dd>22</dd></div>
+      <div><dt>Materials</dt><dd>1 body (one draw)</dd></div>
+      <div><dt>Base</dt><dd><code>sundered_horror_thicket.glb</code></dd></div>
+      <div><dt>Family</dt><dd>ogre</dd></div>
+      <div><dt>Levels</dt><dd>7, fixed</dd></div>
+    </dl>
+  </header>
+
+  <div class="figure-body">
+    <div class="turn-wrap">
+      <div class="turn" data-frames="sundered_horror_turn_00.webp,sundered_horror_turn_01.webp,sundered_horror_turn_02.webp,sundered_horror_turn_03.webp,sundered_horror_turn_04.webp,sundered_horror_turn_05.webp,sundered_horror_turn_06.webp,sundered_horror_turn_07.webp,sundered_horror_turn_08.webp,sundered_horror_turn_09.webp,sundered_horror_turn_10.webp,sundered_horror_turn_11.webp" data-dir="last-bell-concept-art">
+        <img class="turn-img" src="last-bell-concept-art/sundered_horror_turn_00.webp" alt="The Sundered Horror, rotating turnaround">
+      </div>
+      <div class="turn-ctl">
+        <button class="btn spin" type="button" aria-pressed="true">Pause</button>
+        <input class="scrub" type="range" min="0" max="11" value="0"
+               aria-label="The Sundered Horror turnaround angle">
+      </div>
+    </div>
+
+    <div class="prose">
+      <p>The island's high-water mark for what a break can deliver, and the only figure in this book that stands taller than a person. Everything the squad says about this year being the worst in living memory is measured against things like this arriving more often.</p>
+      <div class="signature">
+        <h3>The authored detail</h3>
+        <p>The crown of horns. Not two horns but a thicket of them, uneven, growing out of the skull in every direction and half burying the face underneath. At four yards it is the only figure in this book that stands taller than a person, and the horns are what you see first.</p>
+      </div>
+      <ul class="palette">
+        <li class="chip">
+          <span class="swatch" style="--c:#8a2f6a"></span>
+          <span class="chip-text">
+            <b>Wound magenta</b> <code>#8a2f6a</code>
+            <em>Its sim entity colour, and the flush along its flanks.</em>
+          </span>
+        </li>
+        <li class="chip">
+          <span class="swatch" style="--c:#5c3474"></span>
+          <span class="chip-text">
+            <b>Brute violet</b> <code>#5c3474</code>
+            <em>The hide. Heavy, saturated, never grey.</em>
+          </span>
+        </li>
+        <li class="chip">
+          <span class="swatch" style="--c:#2e1c3c"></span>
+          <span class="chip-text">
+            <b>Horn shadow</b> <code>#2e1c3c</code>
+            <em>Deep purple in the horn thicket, holding the silhouette.</em>
+          </span>
+        </li>
+        <li class="chip">
+          <span class="swatch" style="--c:#9fe4ee"></span>
+          <span class="chip-text">
+            <b>Cold eye</b> <code>#9fe4ee</code>
+            <em>The family mark, shared with the Riftspawn.</em>
+          </span>
+        </li></ul>
+      
+      <h3>Design notes</h3><ul class="notes"><li>Off the KayKit skeleton golem, which read as forged, fitted, painted armour and therefore implied a smith and a culture: exactly wrong for something a break spat out. A horned brute implies nobody made it.</li><li>Rigged locally onto the KayKit skeleton like the Riftspawn, which upgrades it from the golem's EIGHT clips to the full set: it has block, cast, strafes and a jump for the first time.</li><li>Generated twice. The first pass posed its heavy arms hanging to the ground, which is not a T-pose, so the local rig fitted its arm line to the reference wrist line and scaled it 21x: Walking_A shredded the head. Regenerating the same design in a T-pose cost 55 cents and tamed the worst of it; the head and horns were only properly owned by the head bone once the weight solver grew a real length scale (see docs/design/sundered-horror-rig-audit.md).</li><li>Its blow is a SWEEP, never the two-handed overhead chop. Its arms are stubby against a torso half as wide as the whole figure, so the arm bone chain sits buried inside the body mass and there is no elbow in the open to articulate: rotating the arm harder achieves nothing. The clips were re-authored the other way round instead, damping the torso pitch and amplifying the shoulders, so the mass leans into a low wide claw sweep and keeps its eyes on the target rather than folding over its own head.</li></ul>
+    </div>
+  </div>
+
+  
+  <div class="anims">
+    <div class="anims-head">
+      <h3>In motion</h3>
+      <button class="btn anims-toggle" type="button" aria-pressed="true">Pause all</button>
+    </div>
+    <div class="anim-grid">
+      <figure class="anim">
+        <div class="anim-stage" data-frames="12" data-fps="12"
+             style="--sheet:url('last-bell-concept-art/sundered_horror_anim_Idle.webp');--arw:300;--arh:380;--n:12;--cells:13;--dur:1.00s"></div>
+        <figcaption><b>At the cliffs</b><span>Idle</span></figcaption>
+      </figure>
+      <figure class="anim">
+        <div class="anim-stage" data-frames="12" data-fps="12"
+             style="--sheet:url('last-bell-concept-art/sundered_horror_anim_Walking_A.webp');--arw:300;--arh:380;--n:12;--cells:13;--dur:1.00s"></div>
+        <figcaption><b>Coming down the slope</b><span>Walking_A</span></figcaption>
+      </figure>
+      <figure class="anim">
+        <div class="anim-stage" data-frames="12" data-fps="12"
+             style="--sheet:url('last-bell-concept-art/sundered_horror_anim_1H_Melee_Attack_Chop.webp');--arw:300;--arh:380;--n:12;--cells:13;--dur:1.00s"></div>
+        <figcaption><b>The haymaker, shoulder through the arc</b><span>1H_Melee_Attack_Chop</span></figcaption>
+      </figure>
+      <figure class="anim">
+        <div class="anim-stage" data-frames="12" data-fps="12"
+             style="--sheet:url('last-bell-concept-art/sundered_horror_anim_1H_Melee_Attack_Slice_Diagonal.webp');--arw:300;--arh:380;--n:12;--cells:13;--dur:1.00s"></div>
+        <figcaption><b>The sweep, over the top</b><span>1H_Melee_Attack_Slice_Diagonal</span></figcaption>
+      </figure>
+      <figure class="anim">
+        <div class="anim-stage" data-frames="12" data-fps="12"
+             style="--sheet:url('last-bell-concept-art/sundered_horror_anim_Hit_A.webp');--arw:300;--arh:380;--n:12;--cells:13;--dur:1.00s"></div>
+        <figcaption><b>Struck</b><span>Hit_A</span></figcaption>
+      </figure></div>
+  </div>
+</section>
+
+
+<section class="figure" id="scale">
+  <header class="figure-head"><div class="ident"><h2>Scale</h2>
+    <p class="title">Every figure against the player's eye line</p>
+    <p class="post">Runtime height in yards, the number <code>VisualDef.height</code> normalises each rig to</p>
+  </div></header>
+  <ul class="scale">
+      <li>
+        <span class="bar" style="--h:64.0%"></span>
+        <span class="bar-label"><b>Ferryman Ewald</b><span>2.60 yd</span></span>
+      </li>
+      <li>
+        <span class="bar" style="--h:64.0%"></span>
+        <span class="bar-label"><b>Sergeant Marsh</b><span>2.60 yd</span></span>
+      </li>
+      <li>
+        <span class="bar" style="--h:64.0%"></span>
+        <span class="bar-label"><b>Warden Coalfast</b><span>2.60 yd</span></span>
+      </li>
+      <li>
+        <span class="bar" style="--h:64.0%"></span>
+        <span class="bar-label"><b>Warden Coalfast, sealed</b><span>2.60 yd</span></span>
+      </li>
+      <li>
+        <span class="bar" style="--h:64.0%"></span>
+        <span class="bar-label"><b>Riftwatch Ollun</b><span>2.60 yd</span></span>
+      </li>
+      <li>
+        <span class="bar" style="--h:64.0%"></span>
+        <span class="bar-label"><b>Quartermaster Edda</b><span>2.60 yd</span></span>
+      </li>
+      <li>
+        <span class="bar" style="--h:64.0%"></span>
+        <span class="bar-label"><b>Mender Saul</b><span>2.60 yd</span></span>
+      </li>
+      <li>
+        <span class="bar" style="--h:64.0%"></span>
+        <span class="bar-label"><b>Bellkeeper Tam</b><span>2.60 yd</span></span>
+      </li>
+      <li>
+        <span class="bar" style="--h:55.4%"></span>
+        <span class="bar-label"><b>Nell</b><span>2.25 yd</span></span>
+      </li>
+      <li>
+        <span class="bar" style="--h:44.0%"></span>
+        <span class="bar-label"><b>Riftspawn</b><span>1.78 yd</span></span>
+      </li>
+      <li>
+        <span class="bar" style="--h:46.6%"></span>
+        <span class="bar-label"><b>Breach Wretch</b><span>1.89 yd</span></span>
+      </li>
+      <li>
+        <span class="bar" style="--h:45.3%"></span>
+        <span class="bar-label"><b>Void Stalker</b><span>1.84 yd</span></span>
+      </li>
+      <li>
+        <span class="bar" style="--h:51.7%"></span>
+        <span class="bar-label"><b>The Tidemill Stalker</b><span>2.10 yd</span></span>
+      </li>
+      <li>
+        <span class="bar" style="--h:100.0%"></span>
+        <span class="bar-label"><b>The Sundered Horror</b><span>4.06 yd</span></span>
+      </li></ul>
+</section>
+
+<footer class="book">
+  <p><b>Lore anchors.</b> Story, cast and timeline come from the campaign's source of truth
+    and its spec; nothing here invents a fact about the island.</p>
+  <ul>
+    <li><code>docs/design/last-bell-campaign.html</code>, the working source of truth</li>
+    <li><code>docs/design/farshore-last-bell-spec.md</code> sections 4 (lore foundation) and 5 (principal cast)</li>
+    <li><code>src/sim/content/farshore.ts</code> and <code>src/sim/content/last_bell_campaign.ts</code>,
+      for posts, titles, greetings and the entity colours used as each figure's cloth</li>
+    <li><code>scripts/assets/warden_hale_statue/model.py</code>, whose crest motif the living watch wears</li>
+  </ul>
+  <p>Regenerate: <code>blender --background --python scripts/assets/last_bell_crew/model.py</code>
+    with <code>CREW_PLATES</code> set, then
+    <code>node scripts/assets/last_bell_crew/build_concept_book.mjs &lt;plates-dir&gt;</code>.</p>
+</footer>
+</div>
+<script>
+// Turntables: cycle the pre-rendered stations, and let the reader scrub or drag.
+// Honours prefers-reduced-motion by starting paused.
+(function () {
+  var calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Playable clips: CSS drives the frames, so this only owns play/pause.
+  document.querySelectorAll('.anims').forEach(function (block) {
+    var btn = block.querySelector('.anims-toggle');
+    var cells = block.querySelectorAll('.anim');
+    function set(paused) {
+      cells.forEach(function (c) { c.classList.toggle('paused', paused); });
+      btn.textContent = paused ? 'Play all' : 'Pause all';
+      btn.setAttribute('aria-pressed', String(!paused));
+    }
+    if (calm) set(true);
+    btn.addEventListener('click', function () {
+      set(!cells[0].classList.contains('paused'));
+    });
+  });
+  document.querySelectorAll('.turn-wrap').forEach(function (wrap) {
+    var stage = wrap.querySelector('.turn');
+    var img = wrap.querySelector('.turn-img');
+    var btn = wrap.querySelector('.spin');
+    var scrub = wrap.querySelector('.scrub');
+    var frames = stage.dataset.frames.split(',');
+    var dir = stage.dataset.dir;
+    var i = 0, timer = null;
+
+    frames.forEach(function (f) { var p = new Image(); p.src = dir + '/' + f; });
+
+    function show(n) {
+      i = ((n % frames.length) + frames.length) % frames.length;
+      img.src = dir + '/' + frames[i];
+      scrub.value = String(i);
+    }
+    function play() {
+      if (timer) return;
+      timer = setInterval(function () { show(i + 1); }, 110);
+      btn.textContent = 'Pause';
+      btn.setAttribute('aria-pressed', 'true');
+    }
+    function stop() {
+      clearInterval(timer); timer = null;
+      btn.textContent = 'Spin';
+      btn.setAttribute('aria-pressed', 'false');
+    }
+    btn.addEventListener('click', function () { timer ? stop() : play(); });
+    scrub.addEventListener('input', function () { stop(); show(Number(scrub.value)); });
+
+    var dragging = false, startX = 0, startI = 0;
+    stage.addEventListener('pointerdown', function (e) {
+      dragging = true; startX = e.clientX; startI = i; stop();
+      stage.setPointerCapture(e.pointerId); stage.style.cursor = 'grabbing';
+    });
+    stage.addEventListener('pointermove', function (e) {
+      if (!dragging) return;
+      show(startI + Math.round((e.clientX - startX) / 14));
+    });
+    stage.addEventListener('pointerup', function (e) {
+      dragging = false; stage.releasePointerCapture(e.pointerId); stage.style.cursor = 'grab';
+    });
+    stage.style.cursor = 'grab';
+
+    // only spin what the reader can actually see
+    var io = new IntersectionObserver(function (rows) {
+      rows.forEach(function (r) {
+        if (r.isIntersecting && !calm && !dragging) play(); else stop();
+      });
+    }, { threshold: 0.25 });
+    io.observe(wrap);
+    if (calm) stop();
+  });
+})();
+</script>
+</body>
+</html>

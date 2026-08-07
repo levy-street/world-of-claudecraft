@@ -210,12 +210,16 @@ const LANDING_SHOT_SECONDS = 6;
 // open-water leg and another carries open water to the arrival glide, and
 // everything after that is fade-free: a hard cut to the landing dolly with
 // the ship already parked, and a visible ease back to gameplay. The fades
-// themselves keep the film shape: 1.5 s down, 1 s of black, 2 s up, with the
-// fade-in starting half the hold after the cut so the boat is already
-// composed and under way in its new position before anything is visible.
-const VOYAGE_FADE_OUT_SECONDS = 1.5;
-const VOYAGE_FADE_IN_SECONDS = 2;
-const VOYAGE_HOLD_SECONDS = 1;
+// themselves keep the film shape, tightened one owner pass later: 1.2 s down,
+// 0.8 s of black, 1.6 s up (the quicker fade-down, longer fade-up ratio is
+// preserved), with the fade-in starting half the hold after the cut so the
+// boat is already composed and under way in its new position before anything
+// is visible. Shorter covers also hand each leg back more of its own screen
+// time: the open-water shot now reads clear for 5.4 s of its 9 s window
+// where the longer fades left it 1.5 s.
+const VOYAGE_FADE_OUT_SECONDS = 1.2;
+const VOYAGE_FADE_IN_SECONDS = 1.6;
+const VOYAGE_HOLD_SECONDS = 0.8;
 const VOYAGE_CUT = {
   fadeSeconds: VOYAGE_FADE_OUT_SECONDS,
   fadeInSeconds: VOYAGE_FADE_IN_SECONDS,
@@ -223,27 +227,41 @@ const VOYAGE_CUT = {
 } as const;
 
 // openWater and seaArrival sit late enough that every shot holds fully clear
-// for a real beat between the two fade pairs.
+// for a real beat between the two fade pairs. The open-water leg is the
+// crossing itself, so it runs 1.5x the 6 s legs on either side of it (9 s,
+// openWater to seaArrival): the middle of a voyage is where the journey
+// should be felt, and it is the one shot with nothing to do but be at sea.
+// Everything from seaArrival on is the same authored timing shifted by that
+// extra 3 s, so the arrival glide, park, story beats, and hand-back keep
+// their exact relationships.
 const VOYAGE_CORE_BEATS = {
   open: 0,
   castOff: 0,
   openWater: 7,
-  seaArrival: 13,
-  park: 19.05,
+  seaArrival: 16,
+  park: 22.05,
 } as const;
 
 const RERIDE_BEATS = {
   ...VOYAGE_CORE_BEATS,
-  release: 26.3,
-  end: 27.15,
+  release: 29.3,
+  end: 30.15,
 } as const;
 
+// Q0's story tail takes 2.95 s of the open-water leg's extra 3 s, not the
+// full 3: a scene whose teardown ops sit exactly ON its duration must land on
+// a tick the sim's 20 Hz accumulator actually reaches, and the accumulated
+// clock passes 37.65 s at tick 753 while it arrives just UNDER 37.7 s at tick
+// 754. An end beat there fires the letterbox and input-lock release a tick
+// after the scene's own duration (harmless live, a real teardown gap to the
+// shot linter). The 0.05 comes out of the statue hold; every spacing in the
+// story tail (toll to release, release to end) is unchanged.
 const Q0_VOYAGE_BEATS = {
   ...VOYAGE_CORE_BEATS,
-  statue: 19.05,
-  toll: 26.95,
-  release: 33.85,
-  end: 34.7,
+  statue: 22.05,
+  toll: 29.9,
+  release: 36.8,
+  end: 37.65,
 } as const;
 
 const Q0_DOORWAY_BEATS = {
@@ -522,21 +540,24 @@ function voyageTimeline(
 }
 
 // Hale's memorial now stands on the berm crest north of the redoubt (805,139,
-// terrain 9.4) instead of in the market, so this beat is re-composed rather
+// a level 10.4 terrace cut by MEMORIAL_TERRAIN_EDITS) instead of in the
+// market, so this beat is re-composed rather
 // than just re-aimed: the camera climbs the berm's south face from below and
 // looks UP at the bronze against the sky, which is the angle a memorial on a
 // hill wants. `height` is yards above terrain at each point (scenes.ts
-// resolves it against groundPos), and the terrain climbs from 5.9 at z=127 to
-// 9.4 at the crest, so these read lower than they look. The lookAt sits 3.4 up
-// to hold the FIGURE, not the plinth. The cut into the toll beat is
-// fade-covered, so the jump to that shot's own opening needs no continuity.
+// resolves it against groundPos), and the graded approach climbs from about
+// 5.6 at z=127 to the 10.4 terrace, so these read lower than they look. The lookAt holds the
+// FIGURE, not the column: the memorial column carries the bronze from 4.48 to
+// 7.48, so 5.9 sits on its middle where 3.4 held the older plinth-top figure.
+// The cut into the toll beat is fade-covered, so the jump to that shot's own
+// opening needs no continuity.
 const Q0_STATUE_SHOT: SceneDollyShotDef = {
   kind: 'dolly',
   points: [
     { x: 802, z: 127, height: 3.5 },
     { x: 804, z: 132, height: 2.8 },
   ],
-  lookAt: { kind: 'point', point: { x: 805, z: 139, height: 3.4 } },
+  lookAt: { kind: 'point', point: { x: 805, z: 139, height: 5.9 } },
   dur: 4.8,
   subjectRef: 'wardenHaleStatue',
 };

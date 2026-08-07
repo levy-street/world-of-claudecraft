@@ -354,6 +354,11 @@ function attachProp(
     payload.userData.heldSlot = 1;
   }
   payload.userData[HELD_PROP_TAG] = true;
+  // NOTE: there is deliberately no per-character grip override here. A figure whose
+  // carry has to match authored art ships that prop BAKED INTO ITS BODY GLB instead
+  // (see the Last Bell cast in manifest.ts), so nothing about it is re-derived at
+  // runtime. Everything that still routes through this function is a SWAPPABLE prop,
+  // where a per-family fit is the right answer.
   const variantGrip = isHandslotBone(att.bone) ? variantGripFor(att.url) : null;
   if (variantGrip) {
     applyVariantGrip(payload, att.bone, variantGrip, att.url);

@@ -211,3 +211,49 @@ describe('character visual manifest', () => {
     );
   });
 });
+
+describe('Last Bell cast: held props are baked, not attached', () => {
+  // The pipeline contract. These figures' weapons ship INSIDE their body GLB, already
+  // skinned to the carrying bone, so the concept book (which photographs the same file)
+  // and the game cannot disagree about how anyone holds anything. Re-adding an `attach`
+  // would re-derive the grip from the shared weapon tables and reintroduce the drift
+  // that had Ollun's staff level at his hip in game and crown-up on the page.
+  const BAKED = [
+    ['npc_coalfast', ['Prop_sword_1handed', 'Prop_shield_square']],
+    ['npc_coalfast_helm', ['Prop_sword_1handed', 'Prop_shield_square']],
+    ['npc_marsh', ['Prop_adv_sword_1handed']],
+    ['npc_ollun', ['Prop_brasscrown_walking_staff']],
+    ['npc_edda', ['Prop_iron_field_hammer', 'Prop_tongs']],
+    ['npc_saul', ['Prop_lantern']],
+  ] as const;
+
+  it('carries no runtime attachments', () => {
+    for (const [key] of BAKED) {
+      const def = VISUALS[key];
+      expect(def, key).toBeDefined();
+      expect(def.attach ?? [], `${key} must bake its props, not attach them`).toEqual([]);
+    }
+    // Ewald is a declared non-combatant and carries nothing at all.
+    expect(VISUALS.npc_ewald?.attach ?? [], 'npc_ewald').toEqual([]);
+  });
+
+  it('ships every baked prop inside the GLB it points at', async () => {
+    for (const [key, props] of BAKED) {
+      const url = VISUALS[key].url;
+      const file = fileURLToPath(new URL(`../public/${url}`, import.meta.url));
+      expect(existsSync(file), `${key} model on disk`).toBe(true);
+      await MeshoptDecoder.ready;
+      const reader = new NodeIO()
+        .registerExtensions(ALL_EXTENSIONS)
+        .registerDependencies({ 'meshopt.decoder': MeshoptDecoder });
+      const doc = await reader.read(file);
+      const nodes = doc
+        .getRoot()
+        .listNodes()
+        .map((n) => n.getName());
+      for (const prop of props) {
+        expect(nodes, `${key} bakes ${prop}`).toContain(prop);
+      }
+    }
+  });
+});

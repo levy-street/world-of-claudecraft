@@ -130,6 +130,7 @@ import {
   SPIRIT_HEALER_NPC_ID,
 } from './content/graveyards';
 import { GROUND_PICKUP_LINES } from './content/ground_pickup_lines';
+import { GULLHAVEN_PLOT_PADS, GULLHAVEN_TOWN_BENCHES } from './content/gullhaven';
 import { LAST_BELL_DUNGEON_DEFS } from './content/last_bell';
 import {
   LAST_BELL_CAMPAIGN_MOBS,
@@ -140,6 +141,7 @@ import {
 import { LAST_BELL_SQUAD_MOBS } from './content/last_bell_squad';
 import { MAGE_PET_MOBS } from './content/mage_pets';
 import { MAILBOXES } from './content/mailboxes';
+import { MEMORIAL_TERRAIN_EDITS, MEMORIALS } from './content/memorials';
 import {
   NIGHTBLOOM_CAMPS,
   NIGHTBLOOM_ITEMS,
@@ -727,6 +729,7 @@ export const BUILTIN_WORLD: WorldContent = {
     stations: STATIONS,
     mailboxes: MAILBOXES,
     noticeboards: NOTICEBOARDS,
+    memorials: MEMORIALS,
     graveyards: OVERWORLD_GRAVEYARDS,
   },
   // invisible collision walls: the moderation cage plus the Last Keep's
@@ -734,7 +737,20 @@ export const BUILTIN_WORLD: WorldContent = {
   blockers: [...JAIL_BLOCKERS, ...CASTLE_BLOCKERS],
   // The jail cage floor plus the harbor shore grading (harbor_layout.ts):
   // both are pure HeightStamp data applied through terrainHeight's edit layer.
-  terrainEdits: [...JAIL_TERRAIN_EDITS, ...HARBOR_TERRAIN_EDITS],
+  // Memorial grading lands LAST so its terrace wins locally over the
+  // broader harbor pads it overlaps at the berm.
+  // Gullhaven's town benches land after the harbour grading (whose 4.40 street
+  // pocket they stay clear of) and BEFORE the memorial's, which then cuts its
+  // own terrace and contour path into the result. Its building PLOT PADS land
+  // last of all: a house floor must be flat wherever it stands, and the
+  // memorial's outer domes reach the town's south bench.
+  terrainEdits: [
+    ...JAIL_TERRAIN_EDITS,
+    ...HARBOR_TERRAIN_EDITS,
+    ...GULLHAVEN_TOWN_BENCHES,
+    ...MEMORIAL_TERRAIN_EDITS,
+    ...GULLHAVEN_PLOT_PADS,
+  ],
 };
 
 let activeWorld: WorldContent = BUILTIN_WORLD;

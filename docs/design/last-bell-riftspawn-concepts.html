@@ -1,0 +1,436 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Riftspawn: horns, purple, extra limbs</title>
+<style>
+*,*::before,*::after{box-sizing:border-box}
+:root{
+  --ink-1000:#04090d; --gold-700:#926321; --gold-600:#bc8732; --gold-500:#d8a645;
+  --gold-400:#f0c86d; --gold-300:#ffe5a3;
+  --parch:#e8ddc6; --text:#cfd8dc; --faint:#8b9aa3;
+  --bad:#c96a5a; --good:#7fae74;
+  --rule:color-mix(in srgb, var(--gold-700) 45%, transparent);
+}
+html{scroll-behavior:smooth}
+body{margin:0;background:
+    radial-gradient(1200px 700px at 20% -10%, #12242e 0%, transparent 60%),
+    radial-gradient(900px 600px at 90% 10%, #16202c 0%, transparent 55%),
+    var(--ink-1000);
+  color:var(--text);
+  font:16px/1.62 "Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  -webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:clamp(20px,4vw,56px)}
+header.book{border-bottom:1px solid var(--rule);padding-bottom:26px}
+.kicker{font:600 12px/1 ui-sans-serif,system-ui,sans-serif;letter-spacing:.22em;
+  text-transform:uppercase;color:var(--gold-500);margin:0 0 14px}
+h1{font-size:clamp(28px,4.8vw,46px);line-height:1.07;margin:0 0 12px;color:var(--parch);
+  font-weight:600;letter-spacing:-.01em}
+h1 small{display:block;font-size:clamp(14px,1.7vw,19px);color:var(--faint);font-weight:400;
+  margin-top:12px;font-style:italic}
+.lede{max-width:76ch;color:#b8c4cb;margin:18px 0 0}
+.brief{margin:22px 0 0;padding:16px 20px;border-left:2px solid var(--gold-600);
+  background:linear-gradient(90deg,rgba(216,166,69,.11),transparent 86%)}
+.brief p{margin:0 0 8px;color:var(--parch)}
+.brief p:last-child{margin:0}
+.brief b{color:var(--gold-300)}
+.toc{display:flex;flex-wrap:wrap;gap:8px;list-style:none;padding:0;margin:24px 0 0}
+.toc a{display:inline-block;padding:6px 13px;border:1px solid var(--rule);border-radius:2px;
+  color:var(--gold-300);text-decoration:none;
+  font:500 12px/1.3 ui-sans-serif,system-ui,sans-serif;letter-spacing:.06em;
+  text-transform:uppercase;background:rgba(255,229,163,.03)}
+.toc a:hover{border-color:var(--gold-500);background:rgba(255,229,163,.09)}
+
+section{margin:50px 0 0;padding:26px clamp(16px,2.4vw,30px) 30px;
+  background:linear-gradient(180deg,rgba(23,43,53,.55),rgba(7,17,23,.5));
+  border:1px solid var(--rule);border-radius:3px;
+  box-shadow:0 1px 0 rgba(255,229,163,.07) inset, 0 18px 40px -28px #000}
+section.rec{border-color:var(--gold-500);
+  box-shadow:0 0 0 1px rgba(216,166,69,.22), 0 18px 40px -28px #000}
+.head{display:flex;flex-wrap:wrap;gap:10px 24px;align-items:baseline;
+  justify-content:space-between;border-bottom:1px solid rgba(146,99,33,.28);
+  padding-bottom:14px;margin-bottom:22px}
+.head h2{margin:0;font-size:clamp(21px,2.7vw,29px);color:var(--parch);font-weight:600}
+.head .device{margin:4px 0 0;color:var(--gold-500);
+  font:600 11.5px/1.4 ui-sans-serif,system-ui,sans-serif;letter-spacing:.15em;
+  text-transform:uppercase}
+.badge{font:600 10px/1 ui-sans-serif,system-ui,sans-serif;letter-spacing:.14em;
+  text-transform:uppercase;padding:6px 9px;border-radius:2px;border:1px solid currentColor;
+  white-space:nowrap}
+.badge.pick{color:var(--gold-400)} .badge.alt{color:var(--good)}
+.badge.hold{color:var(--faint)}
+.stats{margin:0;color:var(--faint);font-family:ui-monospace,Menlo,monospace;font-size:11px}
+.tick{list-style:none;padding:0;margin:0 0 18px;display:flex;flex-wrap:wrap;gap:7px}
+.tick li{font:600 10px/1 ui-sans-serif,system-ui,sans-serif;letter-spacing:.1em;
+  text-transform:uppercase;padding:5px 8px;border-radius:2px;
+  border:1px solid rgba(127,174,116,.5);color:var(--good)}
+.tick li.miss{border-color:rgba(201,106,90,.5);color:var(--bad)}
+
+.stage{display:grid;grid-template-columns:minmax(230px,1fr) minmax(300px,1.6fr);
+  gap:clamp(16px,2.4vw,26px);align-items:start}
+.concept,.views{margin:0}
+.frame{background:radial-gradient(120% 80% at 50% 8%, rgba(216,166,69,.07), transparent 62%),
+    linear-gradient(180deg,#0d1c24,#060f14);
+  border:1px solid rgba(146,99,33,.3);border-radius:3px;overflow:hidden}
+.frame img{display:block;width:100%;height:auto}
+.cap{padding:8px 11px 10px;border-top:1px solid rgba(146,99,33,.24);
+  font:400 11.5px/1.4 ui-sans-serif,system-ui,sans-serif;color:var(--faint)}
+.cap b{color:var(--parch);font-weight:600;display:block}
+.views ul{list-style:none;padding:0;margin:0;display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(124px,1fr));gap:10px}
+.views li{margin:0}
+
+.read{margin-top:22px;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:18px 30px}
+.read h3{margin:0 0 6px;font:600 11px/1.3 ui-sans-serif,system-ui,sans-serif;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--gold-500)}
+.read h3.warn{color:var(--bad)}
+.read p{margin:0;max-width:62ch}
+
+.money{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:14px;
+  list-style:none;padding:0;margin:6px 0 0}
+.money li{padding:12px 14px;border:1px solid rgba(146,99,33,.28);border-radius:2px;
+  background:rgba(7,17,23,.5)}
+.money dt{color:var(--faint);font:400 10.5px/1.3 ui-sans-serif,system-ui,sans-serif;
+  letter-spacing:.13em;text-transform:uppercase;margin-bottom:5px}
+.money dd{margin:0;color:var(--parch);font-size:20px}
+.money dd small{display:block;color:var(--faint);font-size:11.5px;
+  font-family:ui-sans-serif,system-ui,sans-serif}
+h3.band{margin:26px 0 8px;font:600 11px/1.3 ui-sans-serif,system-ui,sans-serif;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--gold-500)}
+ul.notes{margin:10px 0 0;padding-left:20px}
+ul.notes li{margin:0 0 8px;color:#b8c4cb;max-width:74ch}
+code{font-family:ui-monospace,Menlo,monospace;font-size:12.5px;color:var(--gold-300)}
+
+.dead{opacity:.62}
+.dead h2{font-size:19px}
+.deadgrid{list-style:none;padding:0;margin:14px 0 0;display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.deadgrid figcaption{padding:8px 10px 10px;border-top:1px solid rgba(146,99,33,.24);
+  font:400 11.5px/1.4 ui-sans-serif,system-ui,sans-serif;color:var(--faint)}
+.deadgrid b{color:var(--parch);font-weight:600;display:block}
+footer.book{margin:54px 0 0;padding-top:22px;border-top:1px solid var(--rule);
+  color:var(--faint);font:400 13px/1.65 ui-sans-serif,system-ui,sans-serif}
+footer.book ul{padding-left:20px;margin:8px 0 0}
+@media (max-width:760px){.stage{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="book">
+  <p class="kicker">World of ClaudeCraft &middot; The Farshore &middot; Riftspawn, round two</p>
+  <h1>Horns, purple, extra limbs
+    <small>Five more Riftspawn, built from what you actually liked.</small></h1>
+
+  <div class="brief">
+    <p><b>The mob is locked:</b> the Riftspawn. First quest on the island, Q0 "Ashore": report
+      to Sergeant Marsh at the Watch Meadow, then kill twelve of these on the militia line.
+      First enemy anyone fights in the campaign. Level 3 to 4, entity colour violet
+      <code>0x7a3fb0</code>, a little under two yards tall.</p>
+    <p><b>The brief for this round:</b> horns, saturated purple, extra limbs. No architecture,
+      no hoods, no cloaks, nothing tailored. Bare bodies, so the horns and the limbs carry the
+      silhouette.</p>
+  </div>
+
+  <p class="lede">Two things I fixed from the first round, both my errors. I had asked for
+    "dark desaturated violet-grey" and got five nearly black bodies; this round asks for
+    saturated purple with deep purple shadows instead of black, which is why these actually
+    read as purple. And the word "drape" reliably produced clothing, so this round says bare,
+    twice. The architecture in round one came out of a design doc in the repo, not from the
+    brief, and it is gone.</p>
+
+  <p class="lede"><b style="color:var(--parch)">On extra limbs being expensive: mostly they are
+    not.</b> Extra arms only cost real money if they need to move independently. A second pair
+    bound rigidly to the chest bone, folded or clasped, rides the torso through every animation
+    for free: no new bones, no per-clip posing, all 22 KayKit clips work untouched. That is
+    exactly the pose the strongest candidate below already has. Only free-swinging extra arms
+    need paying for.</p>
+
+  <ul class="toc">
+    <li><a href="#b1">1. Four-arm imp</a></li>
+    <li><a href="#b5">2. Antler stalker</a></li>
+    <li><a href="#b4">3. Mantis</a></li>
+    <li><a href="#b2">4. Horn thicket</a></li>
+    <li><a href="#b3">5. Six-arm</a></li>
+    <li><a href="#next">Cost and next step</a></li>
+    <li><a href="#roundone">Round one (rejected)</a></li>
+  </ul>
+</header>
+
+<section class="rec" id="b1">
+  <div class="head">
+    <div><h2>The Four-Arm Imp</h2>
+      <p class="device">All three likes, at once</p></div>
+    <span class="badge pick">My pick</span>
+    <p class="stats">4,073 tris &middot; 1 material</p>
+  </div>
+  <ul class="tick"><li>Horns</li><li>Purple</li><li>Four arms</li><li>Free to animate</li></ul>
+  <div class="stage">
+    <figure class="concept"><div class="frame">
+      <img src="last-bell-riftspawn-concepts/b1_fourarm_concept.webp" alt="Four-arm imp concept art">
+      <div class="cap"><b>Concept</b>Generated concept art, before the model.</div>
+    </div></figure>
+    <figure class="views"><ul>
+      <li><div class="frame"><img src="last-bell-riftspawn-concepts/b1_fourarm_090.webp" alt="front"><div class="cap"><b>Front</b></div></div></li>
+      <li><div class="frame"><img src="last-bell-riftspawn-concepts/b1_fourarm_180.webp" alt="side"><div class="cap"><b>Side</b></div></div></li>
+      <li><div class="frame"><img src="last-bell-riftspawn-concepts/b1_fourarm_270.webp" alt="back"><div class="cap"><b>Back</b></div></div></li>
+      <li><div class="frame"><img src="last-bell-riftspawn-concepts/b1_fourarm_000.webp" alt="side"><div class="cap"><b>Side</b></div></div></li>
+    </ul></figure>
+  </div>
+  <div class="read">
+    <div><h3>What works</h3>
+      <p>Big curling ram horns with magenta along the ridges, huge cold glowing eyes, and the
+        second pair of arms clasped tight against its chest, which is precisely the
+        free-to-animate configuration. Digitigrade legs ending in black claws. Of everything
+        generated across both rounds this is the one that could stand next to the KayKit cast
+        today with no adjustment: the proportions, the flat colour blocks and the chunky facets
+        are all native. It is also the cheapest to finish.</p></div>
+    <div><h3 class="warn">What is wrong with it</h3>
+      <p>It is cute. Big eyes on a small body reads as adorable more than nightmarish, and
+        this thing is supposed to be what a rift vomits onto a besieged island. Whether that
+        matters is a taste call and yours to make: plenty of classic MMOs make their level 3
+        trash appealing on purpose. If you want it meaner, the fix is small and local: shrink
+        the eyes, drop the brow, and lengthen the jaw.</p></div>
+  </div>
+</section>
+
+<section id="b5">
+  <div class="head">
+    <div><h2>The Antler Stalker</h2>
+      <p class="device">No mouth</p></div>
+    <span class="badge alt">If you want eerie</span>
+    <p class="stats">3,961 tris &middot; 1 material</p>
+  </div>
+  <ul class="tick"><li>Horns</li><li>Purple</li><li>Four arms</li></ul>
+  <div class="stage">
+    <figure class="concept"><div class="frame">
+      <img src="last-bell-riftspawn-concepts/b5_antler_stalker_concept.webp" alt="Antler stalker concept art">
+      <div class="cap"><b>Concept</b>Generated concept art, before the model.</div>
+    </div></figure>
+    <figure class="views"><ul>
+      <li><div class="frame"><img src="last-bell-riftspawn-concepts/b5_antler_stalker_090.webp" alt="front"><div class="cap"><b>Front</b></div></div></li>
+      <li><div class="frame"><img src="last-bell-riftspawn-concepts/b5_antler_stalker_180.webp" alt="side"><div class="cap"><b>Side</b></div></div></li>
+      <li><div class="frame"><img src="last-bell-riftspawn-concepts/b5_antler_stalker_270.webp" alt="back"><div class="cap"><b>Back</b></div></div></li>
+      <li><div class="frame"><img src="last-bell-riftspawn-concepts/b5_antler_stalker_000.webp" alt="side"><div class="cap"><b>Side</b></div></div></li>
+    </ul></figure>
+  </div>
+  <div class="read">
+    <div><h3>What works</h3>
+      <p>The eeriest thing either round produced, and the reason is one detail: it has no
+        mouth. A narrow blank face, two cold eyes, and nothing else. It does not eat and it
+        does not speak, which is a far stranger idea than a set of teeth. The antlers branch
+        wider than its own body, so its silhouette is the most distinctive here, and four long
+        thin arms with oversized clawed hands finish it.</p></div>
+    <div><h3 class="warn">What is wrong with it</h3>
+      <p>The thin limbs and narrow torso are the least chibi proportions of the batch, so it
+        sits slightly outside the KayKit family; it would want thickening. The antlers are wide
+        enough to clip through doorways and tight terrain, which is a real problem for a mob
+        that spawns in numbers. And its arms are held out rather than folded, so if all four
+        need to swing it costs animation work the imp does not.</p></div>
+  </div>
+</section>
+
+<section id="b4">
+  <div class="head">
+    <div><h2>The Mantis</h2>
+      <p class="device">Not a person at all</p></div>
+    <span class="badge hold">Third</span>
+    <p class="stats">3,941 tris &middot; 1 material</p>
+  </div>
+  <ul class="tick"><li>Horns</li><li>Purple</li><li>Four arms</li><li>Free to animate</li></ul>
+  <div class="stage">
+    <figure class="concept"><div class="frame">
+      <img src="last-bell-riftspawn-concepts/b4_mantis_concept.webp" alt="Mantis demon concept art">
+      <div class="cap"><b>Concept</b>Generated concept art, before the model.</div>
+    </div></figure>
+    <figure class="views"><ul>
+      <li><div class="frame"><img src="last-bell-riftspawn-concepts/b4_mantis_090.webp" alt="front"><div class="cap"><b>Front</b></div></div></li>
+      <li><div class="frame"><img src="last-bell-riftspawn-concepts/b4_mantis_180.webp" alt="side"><div class="cap"><b>Side</b></div></div></li>
+      <li><div class="frame"><img src="last-bell-riftspawn-concepts/b4_mantis_270.webp" alt="back"><div class="cap"><b>Back</b></div></div></li>
+      <li><div class="frame"><img src="last-bell-riftspawn-concepts/b4_mantis_000.webp" alt="side"><div class="cap"><b>Side</b></div></div></li>
+    </ul></figure>
+  </div>
+  <div class="read">
+    <div><h3>What works</h3>
+      <p>Swept antenna horns, hexagonal chitin plates on the shoulders, and two pairs of
+        clawed hands folded up against the chest, again in the free configuration. The most
+        genuinely alien of the five: it is not a small person with horns, it is something with
+        the wrong number of everything. The purple carapace reads well and the eyes are the
+        right cold blue.</p></div>
+    <div><h3 class="warn">What is wrong with it</h3>
+      <p>It reads insect before it reads demon, which pulls against the mob's declared
+        <code>demon</code> family and against the lore, where these things come out of a
+        dreaming world rather than a hive. The antennae are thin enough to disappear at
+        gameplay distance, taking the horn read with them.</p></div>
+  </div>
+</section>
+
+<section id="b2">
+  <div class="head">
+    <div><h2>The Horn Thicket</h2>
+      <p class="device">Horns as the whole design</p></div>
+    <span class="badge hold">Wrong tier</span>
+    <p class="stats">3,770 tris &middot; 1 material</p>
+  </div>
+  <ul class="tick"><li>Horns</li><li>Purple</li><li class="miss">No extra limbs</li>
+    <li class="miss">Eyes came out green</li></ul>
+  <div class="stage">
+    <figure class="concept"><div class="frame">
+      <img src="last-bell-riftspawn-concepts/b2_hornthicket_concept.webp" alt="Horn thicket concept art">
+      <div class="cap"><b>Concept</b>Generated concept art, before the model.</div>
+    </div></figure>
+    <figure class="views"><ul>
+      <li><div class="frame"><img src="last-bell-riftspawn-concepts/b2_hornthicket_090.webp" alt="front"><div class="cap"><b>Front</b></div></div></li>
+      <li><div class="frame"><img src="last-bell-riftspawn-concepts/b2_hornthicket_180.webp" alt="side"><div class="cap"><b>Side</b></div></div></li>
+      <li><div class="frame"><img src="last-bell-riftspawn-concepts/b2_hornthicket_270.webp" alt="back"><div class="cap"><b>Back</b></div></div></li>
+      <li><div class="frame"><img src="last-bell-riftspawn-concepts/b2_hornthicket_000.webp" alt="side"><div class="cap"><b>Side</b></div></div></li>
+    </ul></figure>
+  </div>
+  <div class="read">
+    <div><h3>What works</h3>
+      <p>If horns are the thing you like, this is the horn design: a domed skull studded with
+        uneven spikes radiating in every direction, with the face sunk underneath them. Long
+        heavy arms hanging to the ground and a hunched stance give it genuine weight, and it is
+        the only one of the ten that looks like it could actually hurt the militia line.</p></div>
+    <div><h3 class="warn">What is wrong with it</h3>
+      <p>It has no extra limbs, and the eyes came out sickly green instead of the cold blue
+        every other break-spawned thing burns, so it breaks the family mark. Mostly though it
+        is the wrong tier: this reads as a boss or a rare, not as the thing you kill twelve of
+        in the opening quest. Worth keeping for later.</p></div>
+  </div>
+</section>
+
+<section id="b3">
+  <div class="head">
+    <div><h2>The Six-Arm</h2>
+      <p class="device">Most limbs, least threat</p></div>
+    <span class="badge hold">Weakest</span>
+    <p class="stats">3,619 tris &middot; 1 material</p>
+  </div>
+  <ul class="tick"><li>Horns</li><li>Purple</li><li>Six arms</li>
+    <li class="miss">Ignored the "no legs" instruction</li></ul>
+  <div class="stage">
+    <figure class="concept"><div class="frame">
+      <img src="last-bell-riftspawn-concepts/b3_sixarm_floater_concept.webp" alt="Six-arm concept art">
+      <div class="cap"><b>Concept</b>Generated concept art, before the model.</div>
+    </div></figure>
+    <figure class="views"><ul>
+      <li><div class="frame"><img src="last-bell-riftspawn-concepts/b3_sixarm_floater_090.webp" alt="front"><div class="cap"><b>Front</b></div></div></li>
+      <li><div class="frame"><img src="last-bell-riftspawn-concepts/b3_sixarm_floater_180.webp" alt="side"><div class="cap"><b>Side</b></div></div></li>
+      <li><div class="frame"><img src="last-bell-riftspawn-concepts/b3_sixarm_floater_270.webp" alt="back"><div class="cap"><b>Back</b></div></div></li>
+      <li><div class="frame"><img src="last-bell-riftspawn-concepts/b3_sixarm_floater_000.webp" alt="side"><div class="cap"><b>Side</b></div></div></li>
+    </ul></figure>
+  </div>
+  <div class="read">
+    <div><h3>What works</h3>
+      <p>Six arms fanned down its sides is the boldest limb statement of the batch, and it
+        reads clearly from every angle. If "multiple limbs" is the idea you care most about,
+        this is the purest expression of it.</p></div>
+    <div><h3 class="warn">What is wrong with it</h3>
+      <p>I asked for no legs at all, with the lower body tapering to a wisp of smoke so it
+        floated. The generator ignored that completely and gave it ordinary legs, so the idea
+        that made it interesting is missing. What is left is a cat-faced imp with a lot of
+        arms, and it is the cutest of the ten by a distance, which for this mob is the wrong
+        direction.</p></div>
+  </div>
+</section>
+
+<section id="next">
+  <div class="head"><div><h2>Cost, and the next step</h2>
+    <p class="device">Ten candidates, and what finishing one takes</p></div></div>
+
+  <ul class="money">
+    <li><dt>This round</dt><dd>$2.75<small>275 credits, five candidates</small></dd></li>
+    <li><dt>Both rounds</dt><dd>$5.50<small>550 credits, ten candidates</small></dd></li>
+    <li><dt>Remaining</dt><dd>$169<small>16,945 credits</small></dd></li>
+    <li><dt>To finish one</dt><dd>$0.00<small>rigged locally, see below</small></dd></li>
+  </ul>
+
+  <h3 class="band">Finishing is free, and it is also the better result</h3>
+  <p>The obvious next step would be Tripo's own rig plus animation retarget, about $1.05 for a
+    small preset clip set. There is a better option that costs nothing. The pipeline ships a
+    <code>rig-manual</code> lane that fits a generated mesh onto the actual KayKit skeleton
+    locally and computes the skin weights on this machine. The model then inherits the
+    reference body's entire clip library natively: all 22 KayKit animations, including the
+    Block and strafe clips Tripo's preset library cannot supply at any price.</p>
+  <p>That matters for style, not just money. Every figure already in the concept book moves on
+    those exact clips, so the Riftspawn would animate identically to Ewald and Marsh rather
+    than merely looking similar while moving differently. Both requirements are met by all
+    five candidates: they are T-posed, and they are humanoid enough in proportion.</p>
+
+  <h3 class="band">One thing worth saying about picking</h3>
+  <p>These are not mutually exclusive. The campaign needs several break-spawned bodies, and
+    the review notes are explicit that its two commonest enemies must not share a silhouette.
+    The imp and the antler stalker are about as far apart as two purple horned things can be,
+    so shipping the imp as the Riftspawn and the stalker as its sibling the Breach Wretch
+    would solve two problems with one batch. The horn thicket would then sit nicely as
+    something rarer and heavier.</p>
+
+  <h3 class="band">Pick one and I will</h3>
+  <ul class="notes">
+    <li>Rig it onto the KayKit skeleton with all 22 clips, free, then render every clip and
+      check for weight bleed at the joints.</li>
+    <li>Take it into Blender for whatever the notes above call for: thickening the stalker's
+      limbs, or shrinking the imp's eyes and lengthening its jaw if you want it meaner.</li>
+    <li>Retune the albedo so it sits close to the violet entity colour, so the game's runtime
+      tint reinforces the art instead of washing it out. That mistake is why the shipped
+      wolf's tint is invisible in every frame.</li>
+    <li>Wire it in: the <code>VisualDef</code>, the <code>MOB_KEYS</code> entry, the real
+      world height, then a screenshot of it standing on the militia line in the running
+      game.</li>
+    <li>Add it to the concept book with a turntable and playable clips, like the two figures
+      already published there.</li>
+  </ul>
+  <p style="margin-top:18px">If none of these is right either, another five is $2.75 and about
+    twelve minutes. Naming the parts you like from across the ten is the fastest way to get
+    there; that is what turned round one into round two.</p>
+</section>
+
+<section class="dead" id="roundone">
+  <div class="head"><div><h2>Round one, rejected</h2>
+    <p class="device">Kept for reference</p></div>
+    <p class="stats">$2.75 &middot; five candidates</p></div>
+  <p>These leaned on "architectural fragments as body parts", which came from
+    <code>docs/design/last-bell-cast-review-notes.md</code> section 4.4, not from the brief.
+    Three of the five were also hooded shrouds, and the palette instruction I wrote produced
+    near-black bodies rather than purple. Recorded here so the reasoning is not lost, and
+    because the sleeper's four folded arms are what led to this round.</p>
+  <ul class="deadgrid">
+    <li><figure class="frame"><img src="last-bell-riftspawn-concepts/v1_unfinished_090.webp" alt="unfinished">
+      <figcaption><b>Unfinished</b>Concept beat the model.</figcaption></figure></li>
+    <li><figure class="frame"><img src="last-bell-riftspawn-concepts/v2_doorway_090.webp" alt="doorway">
+      <figcaption><b>Doorway</b>Arch in the chest.</figcaption></figure></li>
+    <li><figure class="frame"><img src="last-bell-riftspawn-concepts/v3_sleeper_090.webp" alt="sleeper">
+      <figcaption><b>Sleeper</b>The four folded arms carried forward.</figcaption></figure></li>
+    <li><figure class="frame"><img src="last-bell-riftspawn-concepts/v4_hollow_090.webp" alt="hollow">
+      <figcaption><b>Hollow</b>Generic hooded wraith.</figcaption></figure></li>
+    <li><figure class="frame"><img src="last-bell-riftspawn-concepts/v5_roomcorner_090.webp" alt="room corner">
+      <figcaption><b>Room corner</b>Masonry torso.</figcaption></figure></li>
+  </ul>
+</section>
+
+<footer class="book">
+  <p><b>Provenance.</b> Concept images and meshes generated through
+    <code>scripts/asset_pipeline/pipeline.mjs creature</code> (Tripo API), each stopped at
+    <code>--until generate</code> so no rigging was paid for. Model plates rendered in Blender
+    through <code>scripts/assets/last_bell_crew/preview.py</code>, the same lighting rig as the
+    published concept book, framed on each mesh's true bounding box. Triangle and material
+    counts measured at import. Front is yaw 90, measured rather than assumed: Tripo's raw
+    output faces a different axis than the book's rig expects.</p>
+  <ul>
+    <li>The quest that pins this mob: <code>src/sim/content/last_bell_campaign.ts</code>,
+      <code>q_lb_q0_ashore</code></li>
+    <li>The mob template: <code>src/sim/content/farshore.ts</code>,
+      <code>FARSHORE_MOBS.riftspawn</code></li>
+    <li>Generation scripts: <code>tmp/gen_riftspawn.sh</code> (round one),
+      <code>tmp/gen_riftspawn2.sh</code> (round two, with the prompt corrections recorded in
+      its header)</li>
+    <li>Render script: <code>tmp/render_variants.py</code></li>
+    <li>Jobs are resumable and kept: <code>tmp/asset_pipeline/creature_riftspawn_*</code></li>
+  </ul>
+</footer>
+</div>
+</body>
+</html>

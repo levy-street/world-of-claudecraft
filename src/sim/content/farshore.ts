@@ -30,6 +30,13 @@ import type {
   ZonePropsDef,
 } from '../types';
 import { emptyZoneProps } from '../types';
+import {
+  GULLHAVEN_BUILDINGS,
+  GULLHAVEN_CHURCHYARD_FENCE,
+  GULLHAVEN_TOWN_PROPS,
+  gullhavenWallProps,
+} from './gullhaven';
+import { GULLHAVEN_MEMORIAL, memorialRailProps } from './memorials';
 
 export const FARSHORE_ZONE: ZoneDef = {
   id: 'farshore_isle',
@@ -61,14 +68,24 @@ export const FARSHORE_ZONE: ZoneDef = {
   welcomeQuestId: 'q_fs_bell_at_the_landing',
 };
 
+// Every road through Gullhaven meets at ONE junction node, (822, 118), the
+// square's centre. They used to START a few yards apart from each other near it
+// (the Watch Meadow road at (826, 114), the Wreckfields road at (820, 128)),
+// which put three near-parallel painted bands through the middle of the town and
+// left the market and the houses as two clusters with a smear of track between
+// them. Sharing the node makes it read as a crossroads, which is what a market
+// square is, and gives the blocks between the roads back to the town.
 export const FARSHORE_ROADS: { x: number; z: number }[][] = [
   [
+    { x: 784, z: 118 },
+    { x: 791.5, z: 121 },
     { x: 800, z: 122 },
     { x: 812, z: 120 },
     { x: 822, z: 118 },
-  ], // the harbor pier -> Gullhaven
+  ], // the harbour pier -> the west gate -> Gullhaven
   [
-    { x: 826, z: 114 },
+    { x: 822, z: 118 },
+    { x: 831, z: 110 },
     { x: 880, z: 70 },
     { x: 935, z: 35 },
     { x: 985, z: 12 },
@@ -91,10 +108,40 @@ export const FARSHORE_ROADS: { x: number; z: number }[][] = [
     { x: 1098, z: -24 },
   ], // the Watch Meadow -> the Sundered Cliffs' foot
   [
-    { x: 820, z: 128 },
+    { x: 822, z: 118 },
+    { x: 826, z: 130 },
     { x: 855, z: 165 },
     { x: 880, z: 195 },
   ], // Gullhaven -> the Wreckfields
+  // The shore road, up the west coast toward the Landing. Fisher Bram's escort
+  // (q_fs_bram_come_home) already walked this line home and the lore names it
+  // "the shore road", but it was not a road: he crossed open grass. It is a road
+  // now, so the redoubt's north gate stands on a way in rather than on turf.
+  [
+    { x: 808, z: 66 },
+    { x: 812.7, z: 91.6 },
+    { x: 818, z: 108 },
+    { x: 822, z: 118 },
+  ], // the shore road -> the north gate -> Gullhaven
+  // The town -> Warden Hale's memorial. It now BRANCHES at (807, 123) instead of
+  // starting at (814, 121): that first leg ran 1.5 to 2.6 yards from the harbour
+  // road and parallel to it, so the two painted bands merged into one wide smear
+  // across the square's west side rather than reading as a junction.
+  // It CONTOURS the mound's west flank
+  // rather than climbing the face: the same curve MEMORIAL_TERRAIN_EDITS
+  // grades, so the painted road always sits on graded ground and the climb
+  // stays at about 0.2 per yard. You come round the hill and the bronze
+  // arrives in view, instead of trudging straight at it.
+  [
+    { x: 807, z: 123 },
+    { x: 801, z: 124.5 },
+    { x: 797, z: 127.5 },
+    { x: 795.5, z: 131 },
+    { x: 797.5, z: 133.5 },
+    { x: 801, z: 134 },
+    { x: 805, z: 133.2 },
+    { x: 805, z: 137.5 },
+  ],
 ] as { x: number; z: number }[][];
 
 // No portals: the Farshore is reached on foot, across the Ferrywalk causeway
@@ -645,20 +692,30 @@ export const FARSHORE_PROPS: ZonePropsDef = {
   // Gullhaven, the redoubt: a fishing town turned to holding a line. The
   // homes still stand, but a war camp crowds the market and the fences have
   // become a barricade ring.
-  buildings: [
-    { kind: 'inn', x: 813, z: 112, w: 6, d: 7, rot: 0.5 }, // the muster hall
-    { kind: 'house', x: 827, z: 126, w: 5, d: 5, rot: -1.1 },
-    { kind: 'house', x: 811, z: 126, w: 5, d: 5, rot: 2.1 },
-    { kind: 'chapel', x: 831, z: 110, w: 5, d: 7, rot: -2.4 }, // the menders' hall
-  ],
+  // Gullhaven, the redoubt: a fishing town turned to holding a line. The homes
+  // still stand, but a war camp crowds the market and the curtain wall on the
+  // landward side is what the fences became.
+  //
+  // The buildings live in src/sim/content/gullhaven.ts, which also derives the
+  // plot pads that level their ground and the curtain that encloses them. The
+  // four original houses were RE-SITED rather than kept: three of them stood in
+  // the painted road (one dead centre of the memorial path, one dead centre of
+  // the Watch Meadow road) and two had an NPC standing inside their solid box.
+  buildings: GULLHAVEN_BUILDINGS.map(({ kind, x, z, w, d, rot }) => ({ kind, x, z, w, d, rot })),
   // Warden Hale's memorial. It stands on the berm crest NORTH of the redoubt
-  // (ground 9.4, about 4 yd above the town's flat 5.5 pad) rather than in the
+  // (graded to a level 10.4 terrace, about 5 yd above the town's flat 5.5
+  // pad, by MEMORIAL_TERRAIN_EDITS) rather than in the
   // market it used to crowd: a memorial reads as a memorial with space around
   // it, and from up here the bronze looks back down over the town and the
   // harbor steps the way the histories describe. Facing south, inland over the
   // town, per the Q0 line. One authored asset now, not two scaled nature-kit
   // blocks; the collider radius is the measured circumscribed footprint so
   // collision matches the silhouette.
+  //
+  // The bronze warden now stands on a European-style memorial column rather
+  // than a plinth, which took the asset from 4.8 to 7.48 yd: a shaft only has
+  // to out-measure the figure to read as a column at all. Both numbers below
+  // are measured off the shipping GLB, not chosen.
   decorProps: [
     {
       key: 'wardenHaleStatue',
@@ -666,9 +723,44 @@ export const FARSHORE_PROPS: ZonePropsDef = {
       z: 139,
       rot: Math.PI,
       scale: 1,
-      r: 1.26,
-      h: 4.8,
+      r: 1.4,
+      h: 7.48,
     },
+    // ---- Gullhaven's redoubt ---------------------------------------------
+    // The wall ring and the town fittings, DERIVED from src/sim/content/gullhaven.ts
+    // so the props here and the oriented boxes in colliders.ts stay one geometry.
+    ...gullhavenWallProps(),
+    ...GULLHAVEN_TOWN_PROPS,
+
+    // ---- the memorial precinct -------------------------------------------
+    // Rebuilt after the first pass read as scattered rubble in a forest. Three
+    // corrections, all from measuring the assets instead of picking them by
+    // name: hexFenceStone is 1.15 long and 0.27 high, so spacing it every 3
+    // yards left 1.85 yard gaps and it read as debris (dropped); kcasBench is
+    // a salmon-pink castle picnic table, absurd at a memorial (dropped); and
+    // gardenIronFence is 4.0 long with rot 0 running along X, so a run needs
+    // ~3.5 spacing to overlap rather than gap.
+    //
+    // Trees and rocks are cleared inside the memorial's clearingRadius
+    // (decorationAt in world.ts), so the planting below is the only greenery
+    // on the mound and the bronze keeps sky behind it.
+    //
+    // The path arrives from the WEST after contouring the mound, so the
+    // perimeter opens on that side and closes the south and east where the
+    // ground falls away.
+    // The rail, DERIVED from GULLHAVEN_MEMORIAL.rail so the props and the
+    // colliders in colliders.ts cannot drift apart. Do not hand-list these.
+    ...memorialRailProps(GULLHAVEN_MEMORIAL),
+    // Planting in matched pairs on the terrace diagonals: it frames the plinth
+    // and never stands on the axis you walk in on.
+    { key: 'shrubFlowering', x: 803.1, z: 137.7, scale: 1, r: 0.5, h: 1.4 },
+    { key: 'shrubFlowering', x: 806.9, z: 137.7, scale: 1, r: 0.5, h: 1.4 },
+    { key: 'shrubFlowering', x: 803.1, z: 141.5, scale: 1, r: 0.5, h: 1.4 },
+    { key: 'shrubFlowering', x: 806.9, z: 141.5, scale: 1, r: 0.5, h: 1.4 },
+    { key: 'oakTree', x: 786.5, z: 150, rot: 0.6, scale: 1.2, r: 0.8, h: 9 },
+    // Moved clear of the south bench: at (823.5, 149) it stood in the middle of
+    // the levelled building ground GULLHAVEN_TERRAIN_EDITS cuts there.
+    { key: 'oakTree', x: 836, z: 156, rot: -1.1, scale: 1.25, r: 0.8, h: 9 },
   ],
   wells: [{ x: 820, z: 119, r: 1.5 }],
   stalls: [
@@ -681,25 +773,27 @@ export const FARSHORE_PROPS: ZonePropsDef = {
     [823, 108], // ration and quarrel stores against the siege
     [805, 120],
   ],
+  // No watchfire in the square. Gullhaven builds in STONE: a stone curtain, a
+  // stone bell tower, mortared houses. A campfire on the market cobbles read as
+  // a war camp pitched on top of a town rather than a town holding a line. The
+  // two that remain are outposts with no roof over them, which is the point.
   campfires: [
-    [819, 114], // the muster fire
     [782, -26], // the Landing's brazier on the west shore
     [992, 6], // the Watch Meadow's signal fire, kept burning for the vigil
   ],
-  // the barricade ring: the town's old windward fences, doubled and closed
-  // into a defensive line around the muster
-  fences: [
-    { x1: 803, z1: 104, x2: 823, z2: 102 },
-    { x1: 829, z1: 104, x2: 837, z2: 112 },
-    { x1: 807, z1: 134, x2: 827, z2: 136 },
-    { x1: 799, z1: 114, x2: 801, z2: 126 },
-  ],
-  // the war camp: tents crowd the market where the fish stalls used to stand
-  tents: [
-    { x: 815, z: 108, rot: 0.4, scale: 1 },
-    { x: 829, z: 118, rot: -1.8, scale: 1 },
-    { x: 807, z: 110, rot: 2.3, scale: 1 },
-  ],
+  // The barricade ring is retired. It read as clutter around the muster, and
+  // the north run (x 807-827, z 134-136) cut straight across the memorial's
+  // south approach: a solid line between the town and the monument, which is
+  // where the stray collision up there came from. The siege reads through the
+  // war camp, the watchfires and the redoubt itself, not a rail fence.
+  // The churchyard wall behind the menders' hall (src/sim/content/gullhaven.ts).
+  // The old barricade ring is still retired: it read as clutter round the muster
+  // and cut across the memorial's south approach.
+  fences: [...GULLHAVEN_CHURCHYARD_FENCE],
+  // No tents either, for the same reason: canvas beside a stone bell tower and
+  // mortared houses is two different towns in one frame. The siege now reads
+  // through the curtain wall, the gates and the salvage on the quay.
+  tents: [],
   // The Landing's small fishing jetty on the west shore. Gullhaven's own
   // waterfront is the authored harbor below, which replaced the interim
   // single-dock town pier (a dock deck seats on its anchor's terrain, so it

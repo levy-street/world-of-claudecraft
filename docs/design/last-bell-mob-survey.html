@@ -1,0 +1,481 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The Last Bell: mob survey and the Riftspawn proposal</title>
+<style>
+*,*::before,*::after{box-sizing:border-box}
+:root{
+  --ink-1000:#04090d; --ink-950:#071117; --ink-900:#0b171e; --ink-850:#10212a; --ink-800:#172b35;
+  --gold-700:#926321; --gold-600:#bc8732; --gold-500:#d8a645; --gold-400:#f0c86d; --gold-300:#ffe5a3;
+  --parch:#e8ddc6; --text:#cfd8dc; --faint:#8b9aa3;
+  --bad:#c96a5a; --good:#7fae74;
+  --rule:color-mix(in srgb, var(--gold-700) 45%, transparent);
+}
+html{scroll-behavior:smooth}
+body{margin:0;background:
+    radial-gradient(1200px 700px at 20% -10%, #12242e 0%, transparent 60%),
+    radial-gradient(900px 600px at 90% 10%, #16202c 0%, transparent 55%),
+    var(--ink-1000);
+  color:var(--text);
+  font:16px/1.62 "Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  -webkit-font-smoothing:antialiased}
+.wrap{max-width:1120px;margin:0 auto;padding:clamp(20px,4vw,56px)}
+header.book{border-bottom:1px solid var(--rule);padding-bottom:28px}
+.kicker{font:600 12px/1 ui-sans-serif,system-ui,sans-serif;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--gold-500);margin:0 0 14px}
+h1{font-size:clamp(28px,4.8vw,46px);line-height:1.07;margin:0 0 12px;color:var(--parch);
+  font-weight:600;letter-spacing:-.01em}
+h1 small{display:block;font-size:clamp(14px,1.7vw,19px);color:var(--faint);font-weight:400;
+  letter-spacing:0;margin-top:12px;font-style:italic}
+.lede{max-width:74ch;color:#b8c4cb;margin:18px 0 0}
+.toc{display:flex;flex-wrap:wrap;gap:8px;list-style:none;padding:0;margin:26px 0 0}
+.toc a{display:inline-block;padding:6px 13px;border:1px solid var(--rule);border-radius:2px;
+  color:var(--gold-300);text-decoration:none;font:500 12px/1.3 ui-sans-serif,system-ui,sans-serif;
+  letter-spacing:.06em;text-transform:uppercase;background:rgba(255,229,163,.03)}
+.toc a:hover{border-color:var(--gold-500);background:rgba(255,229,163,.09);color:var(--gold-400)}
+
+section{margin:56px 0 0;padding:28px clamp(16px,2.4vw,32px) 32px;
+  background:linear-gradient(180deg,rgba(23,43,53,.55),rgba(7,17,23,.5));
+  border:1px solid var(--rule);border-radius:3px;
+  box-shadow:0 1px 0 rgba(255,229,163,.07) inset, 0 18px 40px -28px #000}
+section > h2{margin:0 0 4px;font-size:clamp(22px,2.9vw,31px);color:var(--parch);font-weight:600;
+  letter-spacing:-.005em}
+.sub{margin:0 0 22px;color:var(--gold-500);font:600 12px/1.4 ui-sans-serif,system-ui,sans-serif;
+  letter-spacing:.15em;text-transform:uppercase}
+section p{max-width:74ch}
+h3{margin:26px 0 8px;font:600 11.5px/1.3 ui-sans-serif,system-ui,sans-serif;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--gold-500)}
+blockquote{margin:18px 0;padding:14px 18px;border-left:2px solid var(--gold-600);
+  background:linear-gradient(90deg,rgba(216,166,69,.09),transparent 85%);color:var(--parch)}
+blockquote p{margin:0}
+blockquote cite{display:block;margin-top:8px;color:var(--faint);
+  font:400 12px/1.4 ui-sans-serif,system-ui,sans-serif}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;color:var(--gold-300)}
+
+.grid{list-style:none;padding:0;margin:6px 0 0;display:grid;gap:14px}
+.g4{grid-template-columns:repeat(auto-fit,minmax(190px,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(232px,1fr))}
+.card{margin:0;background:linear-gradient(180deg,#0d1c24,#060f14);
+  border:1px solid rgba(146,99,33,.3);border-radius:3px;overflow:hidden;display:flex;
+  flex-direction:column}
+.card > img{display:block;width:100%;height:auto;background:
+    radial-gradient(120% 80% at 50% 8%, rgba(216,166,69,.07), transparent 62%)}
+.card figcaption{padding:10px 12px 12px;border-top:1px solid rgba(146,99,33,.24);
+  font:400 12.5px/1.45 ui-sans-serif,system-ui,sans-serif;display:flex;flex-direction:column;
+  gap:4px;flex:1}
+.card b{color:var(--parch);font-weight:600}
+.card .meta{color:var(--faint);font-family:ui-monospace,Menlo,monospace;font-size:10.5px}
+.card em{font-style:normal;color:#b8c4cb}
+.card .use{color:var(--gold-300)}
+.pick{border-color:var(--gold-500);box-shadow:0 0 0 1px rgba(216,166,69,.28)}
+.tag{align-self:flex-start;font:600 9.5px/1 ui-sans-serif,system-ui,sans-serif;letter-spacing:.14em;
+  text-transform:uppercase;padding:4px 7px;border-radius:2px;border:1px solid currentColor}
+.tag.no{color:var(--bad)} .tag.yes{color:var(--good)} .tag.maybe{color:var(--gold-500)}
+
+.opt{margin:16px 0 0;padding:20px 22px;border:1px solid rgba(146,99,33,.3);border-radius:3px;
+  background:rgba(7,17,23,.42)}
+.opt.lead{border-color:var(--gold-500);background:linear-gradient(180deg,rgba(216,166,69,.07),rgba(7,17,23,.5))}
+.opt h4{margin:0 0 2px;font-size:19px;color:var(--parch);font-weight:600}
+.opt .why{margin:0 0 12px;color:var(--gold-500);font:600 11px/1.4 ui-sans-serif,system-ui,sans-serif;
+  letter-spacing:.13em;text-transform:uppercase}
+.opt p{margin:0 0 10px}
+.opt dl{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;margin:12px 0 0;
+  font:400 13px/1.5 ui-sans-serif,system-ui,sans-serif}
+.opt dt{color:var(--faint);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;
+  padding-top:3px}
+.opt dd{margin:0;color:#c3ced5}
+ul.notes{margin:8px 0 0;padding-left:20px}
+ul.notes li{margin:0 0 8px;color:#b8c4cb;max-width:72ch}
+.ask{margin:16px 0 0;padding:18px 20px;border-left:2px solid var(--gold-600);
+  background:linear-gradient(90deg,rgba(216,166,69,.1),transparent 88%)}
+.ask h4{margin:0 0 6px;font-size:17px;color:var(--parch);font-weight:600}
+.ask p{margin:0;color:#c3ced5}
+footer.book{margin:60px 0 0;padding-top:24px;border-top:1px solid var(--rule);color:var(--faint);
+  font:400 13px/1.65 ui-sans-serif,system-ui,sans-serif}
+footer.book ul{padding-left:20px;margin:8px 0 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="book">
+  <p class="kicker">World of ClaudeCraft &middot; The Farshore &middot; Working survey</p>
+  <h1>The things that come through the breaks
+    <small>What the first mob looks like now, what parts the kit already ships, and one
+      proposal for what to do about it.</small></h1>
+  <p class="lede">This is not the concept book. It is the survey that comes before one:
+    every image below is a real render of a file already in this repo, shot on the concept
+    book's own lighting rig, so a decision made here holds up against the plates already
+    published. Nothing here has been modelled yet. The point is to look at the actual
+    material and pick a direction.</p>
+  <ul class="toc">
+    <li><a href="#problem">The problem</a></li>
+    <li><a href="#idea">The idea</a></li>
+    <li><a href="#parts">The parts bin</a></li>
+    <li><a href="#bodies">The bodies</a></li>
+    <li><a href="#options">Four directions</a></li>
+    <li><a href="#decide">What I need from you</a></li>
+  </ul>
+</header>
+
+<section id="problem">
+  <h2>The problem</h2>
+  <p class="sub">Riftspawn, exactly as it ships today</p>
+  <p>The Riftspawn is the common trash of the campaign: the twelve you kill in the opening
+    quest while the militia watches. It is the first enemy the player ever fights on the
+    island, so it is the first thing that has to say what a rift <em>is</em>. Here it is from
+    four angles, straight out of <code>public/models/chars/npcs/riftspawn.glb</code>.</p>
+
+  <ul class="grid g4">
+    <li class="card"><img src="last-bell-mob-survey/riftspawn_000.webp" alt="Riftspawn, front">
+      <figcaption><b>Front</b><span class="meta">yaw 0</span>
+        <em>Giant chibi skull, cream eyes, purple mantle, brown belt, gold buckle, work
+          shorts.</em></figcaption></li>
+    <li class="card"><img src="last-bell-mob-survey/riftspawn_055.webp" alt="Riftspawn, three quarter">
+      <figcaption><b>Three quarter</b><span class="meta">yaw 55</span>
+        <em>The ribcage is visible between mantle and belt, and it is the most interesting
+          thing on the model.</em></figcaption></li>
+    <li class="card"><img src="last-bell-mob-survey/riftspawn_130.webp" alt="Riftspawn, rear three quarter">
+      <figcaption><b>Rear three quarter</b><span class="meta">yaw 130</span>
+        <em>The five star-glass shards the book promises are somewhere in here. They do not
+          read.</em></figcaption></li>
+    <li class="card"><img src="last-bell-mob-survey/riftspawn_200.webp" alt="Riftspawn, rear">
+      <figcaption><b>Rear</b><span class="meta">yaw 200</span>
+        <em>From behind it is a skeleton in a cape. Nothing identifies it as
+          break-spawned.</em></figcaption></li>
+  </ul>
+
+  <h3>The verdict already on record</h3>
+  <blockquote>
+    <p>The most generic of the three, a classic dungeon skeleton in a purple mantle with a
+      brown belt, gold buckle and work shorts. The wardrobe actively fights the lore: a belt
+      someone buckled says "dressed corpse", undeath plus civilisation, the two things the
+      brief excludes.</p>
+    <cite>docs/design/last-bell-cast-review-notes.md, section 4.1</cite>
+  </blockquote>
+  <p>The lore this is supposed to serve is not undeath. It is unfinished rooms from a
+    sleeping world pressing into the waking one. A skeleton is a <em>dead</em> body. What the
+    brief asks for is an <em>unfinished</em> one. Those are different shapes.</p>
+  <p>Two other faults worth naming, because any fix has to close them:</p>
+  <ul class="notes">
+    <li>The star-glass, the one mark every break-spawned thing in the book is supposed to
+      share, fails on all five mobs. Here the shards sit <em>inside</em> the ribcage, so the
+      body occludes them from every angle. A pale blue spike with strong emission also just
+      reads as ice, not glass.</li>
+    <li>The eye glow is cream here and ice blue on its two siblings. One family should burn
+      one colour.</li>
+  </ul>
+</section>
+
+<section id="idea">
+  <h2>The idea</h2>
+  <p class="sub">The Riftspawn is a doorway trying to be a person</p>
+  <p>Cut an arched opening clean through its chest. Give the opening real jamb thickness, so
+    it is a piece of architecture and not a decal. Put cold pale light and a single flat
+    unpainted colour inside it. Then take the tailoring off and let a drape hang where the
+    shorts were.</p>
+  <p>Three reasons this is the move, in order of how much they matter:</p>
+  <ul class="notes">
+    <li><b>A hole in the silhouette is the only kind of wrong that survives distance.</b>
+      Detail vanishes at gameplay range; an outline you can see through does not. Nothing
+      else in the bestiary has one, so it also makes the Riftspawn instantly
+      identifiable.</li>
+    <li><b>Architecture is already native to this art style.</b> The review notes call
+      architectural fragments the highest-leverage device available and worry about where to
+      get them. They are already here: 381 KayKit dungeon pieces under
+      <code>public/models/dungeon/</code>, same painted low-poly look as the cast, already
+      optimized, already credited. A chunky stone arch cannot look like it came from a
+      different game, because it came from the same pack.</li>
+    <li><b>The body already has the hole.</b> Look at the three-quarter plate again: this
+      skeleton's torso is an open ribcage. We are not adding an aperture, we are uncovering
+      the one that is there and rebuilding it as masonry. That is why the surgery is small
+      rather than a rebuild.</li>
+  </ul>
+  <h3>On method</h3>
+  <p>The parts below are references and donors, not stickers. Anything added gets derived
+    from the host's own faces and welded flush, which is the rule the repo already
+    records: edit the mesh, never generate a shape and fit it over the model. The reason the
+    previous attempts failed (a mill roof hovering over a spider, shards standing off a
+    back) is that they were parked next to the body instead of cut into it.</p>
+</section>
+
+<section id="parts">
+  <h2>The parts bin</h2>
+  <p class="sub">Real KayKit dungeon pieces, already in the repo</p>
+  <p>Every one of these is a file the game already ships. Triangle counts are measured, and
+    they are tiny: the whole Riftspawn body is about 5,300 triangles, so a 600 triangle arch
+    is affordable even before it gets trimmed to the part we actually want.</p>
+
+  <ul class="grid g3">
+    <li class="card pick"><img src="last-bell-mob-survey/wall_inset_shelves_broken_032.webp" alt="Broken inset shelves">
+      <figcaption><span class="tag yes">Strongest</span><b>wall_inset_shelves_broken</b>
+        <span class="meta">751 tris</span>
+        <em>An arched recess with snapped timber beams stabbing across it.</em>
+        <span class="use">This is the whole idea in one existing file: the arch AND the
+          broken rafters through it. The chest aperture, more or less as is.</span>
+      </figcaption></li>
+    <li class="card pick"><img src="last-bell-mob-survey/wall_archedwindow_open_032.webp" alt="Open arched window">
+      <figcaption><span class="tag yes">Strongest</span><b>wall_archedwindow_open</b>
+        <span class="meta">635 tris</span>
+        <em>A clean arched opening with a proper stone sill and real jamb depth.</em>
+        <span class="use">The cleaner, more formal version of the same aperture. Reads as
+          deliberate architecture rather than damage.</span>
+      </figcaption></li>
+    <li class="card pick"><img src="last-bell-mob-survey/wall_broken_032.webp" alt="Broken wall">
+      <figcaption><span class="tag yes">Strongest</span><b>wall_broken</b>
+        <span class="meta">784 tris</span>
+        <em>A torn hole with jagged masonry teeth around the rim.</em>
+        <span class="use">The violent version: a chest that was punched through rather than
+          built with an opening. Teeth give the star-glass somewhere to grow from.</span>
+      </figcaption></li>
+    <li class="card"><img src="last-bell-mob-survey/arch_032.webp" alt="Freestanding arch">
+      <figcaption><span class="tag maybe">Good</span><b>arch</b><span class="meta">436 tris</span>
+        <em>A freestanding voussoir arch on two short columns.</em>
+        <span class="use">Shoulder yoke, or a ribcage replacement: the arch springs from the
+          hips and the shoulders sit on its crown.</span>
+      </figcaption></li>
+    <li class="card"><img src="last-bell-mob-survey/column_broken_032.webp" alt="Broken column">
+      <figcaption><span class="tag maybe">Good</span><b>column_broken</b><span class="meta">108 tris</span>
+        <em>Five snapped shafts on a base, each ending in a clean flat break.</em>
+        <span class="use">The "unfinished" language, exactly. An arm that ends in this instead
+          of a hand is the strongest single wrongness in the bin.</span>
+      </figcaption></li>
+    <li class="card"><img src="last-bell-mob-survey/stairs_modular_center_032.webp" alt="Modular stairs">
+      <figcaption><span class="tag maybe">Good</span><b>stairs_modular_center</b>
+        <span class="meta">54 tris</span>
+        <em>Eight clean steps, and almost free.</em>
+        <span class="use">A stair-step spine ridge down the back, which would finally give
+          the rear view an identity.</span>
+      </figcaption></li>
+    <li class="card"><img src="last-bell-mob-survey/wall_window_open_032.webp" alt="Open timber window">
+      <figcaption><span class="tag maybe">Maybe</span><b>wall_window_open</b><span class="meta">604 tris</span>
+        <em>A square timber-framed window opening.</em>
+        <span class="use">Warmer and more domestic than the arch. Reads cottage rather than
+          dungeon, which may be too cosy for a rift.</span>
+      </figcaption></li>
+    <li class="card"><img src="last-bell-mob-survey/fence_pillar_broken_032.webp" alt="Broken fence pillar">
+      <figcaption><span class="tag maybe">Maybe</span><b>fence_pillar_broken</b>
+        <span class="meta">102 tris</span>
+        <em>A snapped stone post with a chamfered break and a carved slot.</em>
+        <span class="use">Limb stock. The carved slot could serve as a single eye
+          socket.</span>
+      </figcaption></li>
+    <li class="card"><img src="last-bell-mob-survey/rubble_half_032.webp" alt="Rubble pile">
+      <figcaption><span class="tag maybe">Maybe</span><b>rubble_half</b><span class="meta">390 tris</span>
+        <em>A faceted heap of broken stone, warm brown.</em>
+        <span class="use">Material to graft into a shoulder or hip so the figure looks
+          part-collapsed. Wrong colour as shipped; repaintable.</span>
+      </figcaption></li>
+    <li class="card"><img src="last-bell-mob-survey/scaffold_beam_wall_032.webp" alt="Timber beam">
+      <figcaption><span class="tag maybe">Maybe</span><b>scaffold_beam_wall</b>
+        <span class="meta">16 tris</span>
+        <em>One plain timber beam. Sixteen triangles.</em>
+        <span class="use">Rafter stock for anything that needs a snapped beam driven through
+          it, at essentially no cost.</span>
+      </figcaption></li>
+    <li class="card"><img src="last-bell-mob-survey/wall_doorway_032.webp" alt="Doorway with door">
+      <figcaption><span class="tag no">Reject</span><b>wall_doorway</b><span class="meta">1,068 tris</span>
+        <em>Arched doorway with a hung timber door and an iron ring.</em>
+        <span class="use">The door and its ironwork say carpenter and locksmith. Craft and
+          culture are exactly what the brief excludes. The arch under it is usable, the
+          door is not.</span>
+      </figcaption></li>
+    <li class="card"><img src="last-bell-mob-survey/wall_cracked_032.webp" alt="Cracked wall">
+      <figcaption><span class="tag no">Reject</span><b>wall_cracked</b><span class="meta">2,010 tris</span>
+        <em>An intact wall with a hairline crack and some plants.</em>
+        <span class="use">Surface detail only, no opening, and it costs more than everything
+          else here. Nothing to take.</span>
+      </figcaption></li>
+  </ul>
+</section>
+
+<section id="bodies">
+  <h2>The bodies</h2>
+  <p class="sub">Which host we operate on, and one finding that settles it</p>
+  <p>I lined up every plausible host in the kit to check whether a different body would come
+    pre-solved. It does not, and the reason is worth knowing before we start cutting.</p>
+  <ul class="grid g3">
+    <li class="card pick"><img src="last-bell-mob-survey/skeleton_minion_000.webp" alt="KayKit skeleton minion">
+      <figcaption><span class="tag yes">Recommended host</span><b>skeleton_minion</b>
+        <span class="meta">5,288 tris &middot; 31 clips</span>
+        <em>Today's base. Belt, buckle and shorts to cut, and a skull to rework.</em>
+        <span class="use">Wins because its torso is already an open ribcage, and because it
+          already exports, already has the palette map written, and already carries the
+          full clip set.</span>
+      </figcaption></li>
+    <li class="card"><img src="last-bell-mob-survey/skeleton_rogue_000.webp" alt="KayKit skeleton rogue">
+      <figcaption><b>skeleton_rogue</b><span class="meta">6,638 tris &middot; 25 clips</span>
+        <em>Hooded, and the hood does read here.</em>
+        <span class="use">Spoken for: this is the Breach Wretch's body. Keeping the two
+          siblings on different bodies is what stops a pack reading as five copies of one
+          threat.</span>
+      </figcaption></li>
+    <li class="card"><img src="last-bell-mob-survey/skeleton_golem_000.webp" alt="KayKit skeleton golem">
+      <figcaption><b>skeleton_golem</b><span class="meta">7,156 tris &middot; 8 clips</span>
+        <em>Horned skull, real bulk, fitted plate.</em>
+        <span class="use">Spoken for by the Sundered Horror, and correctly: it is the only
+          body in the kit with the weight for a world elite. Too big for trash.</span>
+      </figcaption></li>
+    <li class="card"><img src="last-bell-mob-survey/mage_classic_000.webp" alt="KayKit mage">
+      <figcaption><b>mage_classic</b><span class="meta">5,683 tris &middot; 28 clips</span>
+        <em>Robed, which sounded promising. Also belted, buckled, and hatted.</em>
+        <span class="use">No advantage. Adds a human face to remove and needs a new palette
+          map written.</span>
+      </figcaption></li>
+    <li class="card"><img src="last-bell-mob-survey/rogue_hooded_000.webp" alt="KayKit hooded rogue">
+      <figcaption><b>rogue_hooded</b><span class="meta">7,185 tris &middot; 22 clips</span>
+        <em>Hood, mask, belt, buckle, boots.</em>
+        <span class="use">The most tailored body in the lineup. Worst starting point for a
+          thing that should wear drapes or nothing.</span>
+      </figcaption></li>
+    <li class="card"><img src="last-bell-mob-survey/druid_000.webp" alt="KayKit druid">
+      <figcaption><b>druid</b><span class="meta">7,784 tris &middot; 22 clips</span>
+        <em>Antlers, hood, cinched robe, belt.</em>
+        <span class="use">The antlers are the only interesting part and they belong to a
+          different creature. Not this one.</span>
+      </figcaption></li>
+  </ul>
+  <h3>The finding</h3>
+  <p>Every single body in the kit wears a belt with a buckle. Minion, rogue, golem, mage,
+    hooded rogue, druid: all belted. So "start from a robed body to avoid the tailoring
+    problem" is not an option that exists. The tailoring has to be cut off whichever host we
+    pick, which removes the only argument for changing hosts. Stay on
+    <code>skeleton_minion</code>, and treat cutting the belt as step one rather than as a
+    reason to switch.</p>
+</section>
+
+<section id="options">
+  <h2>Four directions</h2>
+  <p class="sub">All four are buildable by surgery on the same host. They are not compatible; pick one</p>
+
+  <div class="opt lead">
+    <h4>A. Doorway torso</h4>
+    <p class="why">My recommendation</p>
+    <p>An arched opening cut clean through the chest where the ribcage is now, with real jamb
+      depth and a flat unpainted interior lit cold pale blue. The skull becomes a featureless
+      oval with one clean seam where a face should start, and the glow lives in the seam. The
+      belt, buckle and shorts come off; a drape grown from the torso's own faces falls where
+      the shorts were. Star-glass through one shoulder, dark violet glass with a pale rim
+      only, pushed through a raised discoloured entry so glass and body share an edge.</p>
+    <dl>
+      <dt>Donors</dt><dd><code>wall_inset_shelves_broken</code> or
+        <code>wall_archedwindow_open</code> for the arch profile, <code>scaffold_beam_wall</code>
+        for a snapped rafter through the opening</dd>
+      <dt>Reads at range</dt><dd>Yes, and better than anything else here: it is a hole in the
+        outline</dd>
+      <dt>Rig cost</dt><dd>None. No new bones, all 31 clips carry through untouched</dd>
+      <dt>Risk</dt><dd>An opening through a chibi torso this short may leave too little
+        material above and below it. This is the thing to test first, in Blender, before
+        anything else gets built</dd>
+    </dl>
+  </div>
+
+  <div class="opt">
+    <h4>B. Unfinished person</h4>
+    <p class="why">The cheapest, and the safest</p>
+    <p>Asymmetry carries it instead of an aperture. One arm and shoulder finished; the other
+      still raw frame, ending in a clean flat cut that shows a single unpainted colour, the
+      way <code>column_broken</code> ends. Featureless head, same drape, same star-glass
+      treatment. The dream simply stopped rendering half of it.</p>
+    <dl>
+      <dt>Donors</dt><dd><code>column_broken</code> for the break language,
+        <code>rubble_half</code> grafted into the unfinished shoulder</dd>
+      <dt>Reads at range</dt><dd>Yes. A missing hand changes the outline</dd>
+      <dt>Rig cost</dt><dd>None</dd>
+      <dt>Risk</dt><dd>Lowest risk of the four, and the least memorable. Reads as damaged
+        before it reads as unfinished, and "damaged skeleton" is close to where we already
+        are</dd>
+    </dl>
+  </div>
+
+  <div class="opt">
+    <h4>C. Room-corner demon</h4>
+    <p class="why">The most demonic, and the most expensive</p>
+    <p>The torso is literally the corner of an unfinished room: two wall planes meeting at an
+      edge, a small arched window in the chest with pale light behind it, roof-lath spurs off
+      the shoulders, small horns. Furthest from a skeleton, closest to the "more demonic"
+      note in the brief.</p>
+    <dl>
+      <dt>Donors</dt><dd><code>wall_archedwindow_open</code>,
+        <code>scaffold_beam_wall</code> for the lath spurs</dd>
+      <dt>Reads at range</dt><dd>Yes, strongly</dd>
+      <dt>Rig cost</dt><dd>None, but the clips suffer: a hard-cornered box torso fights the
+        torso twist in the walk and attack cycles, and a flat plane creasing through itself
+        is very visible</dd>
+      <dt>Risk</dt><dd>Highest. It also drifts toward "small building with legs", which is a
+        different creature from "the trash you kill twelve of"</dd>
+    </dl>
+  </div>
+
+  <div class="opt">
+    <h4>D. Wrong-count sleeper</h4>
+    <p class="why">Strong idea, wrong figure</p>
+    <p>Four arms, the extra pair folded across the chest, a violet sheet-shroud, eyes closed
+      with the glow coming from under the lids, star-glass out of the back. Wrong number of
+      limbs is silhouette-level wrongness and it is genuinely dreamlike.</p>
+    <dl>
+      <dt>Donors</dt><dd>None needed; this is body surgery only</dd>
+      <dt>Reads at range</dt><dd>Yes</dd>
+      <dt>Rig cost</dt><dd>Real. Two new bones, and the extra pair has to be posed
+        per clip or it hangs dead through all 31 of them</dd>
+      <dt>Risk</dt><dd>The cost lands on the most numerous mob in the campaign, which is the
+        worst place to spend it. Worth holding for a single named elite instead</dd>
+    </dl>
+  </div>
+</section>
+
+<section id="decide">
+  <h2>What I need from you</h2>
+  <p class="sub">Three answers, then I start cutting</p>
+
+  <div class="ask">
+    <h4>1. Which direction, A to D?</h4>
+    <p>A is my recommendation and B is the safe fallback. If you want, I can build A's
+      aperture as a five minute test in Blender first and render it, so you are choosing
+      against a picture instead of a paragraph.</p>
+  </div>
+  <div class="ask">
+    <h4>2. How far does the skull go?</h4>
+    <p>A featureless head is the single biggest step away from "Halloween skeleton", and it
+      is also the biggest departure from what is on screen today. Options: keep the skull and
+      only fix the eye colour, blank it into a featureless oval with one seam, or something
+      between the two (fill the sockets, keep the jaw).</p>
+  </div>
+  <div class="ask">
+    <h4>3. Is the published book the destination, or a second page?</h4>
+    <p>The existing concept book already lists the Riftspawn in its running order, so the
+      mobs can simply join it as each one passes review. The alternative is a separate mobs
+      book on its own branch, which keeps this work clear of the Ewald and Marsh follow-ups
+      still open. I lean toward one book, since the builder is already set up for it.</p>
+  </div>
+
+  <h3>One thing I decided without asking</h3>
+  <p>The review notes prescribe generating replacement creatures through the Tripo pipeline,
+    on the grounds that bolt-on props failed and glass and flesh have to be one mesh. The
+    premise is right and the conclusion does not follow: mesh surgery also makes them one
+    mesh, and it never leaves the art style, because it never leaves the kit. The parts bin
+    above is the argument. If you want Tripo kept as a fallback for the wolf and the spider,
+    which are harder cases, say so and I will treat those two separately.</p>
+</section>
+
+<footer class="book">
+  <p><b>Provenance.</b> Every image is a Blender render of a file already committed to this
+    repo, shot through <code>scripts/assets/last_bell_crew/preview.py</code>, the same warm
+    key, cool fill and warm rim rig the published concept book uses. Triangle and clip counts
+    are measured at import, not quoted.</p>
+  <ul>
+    <li>Renders: <code>tmp/mob_survey.py</code>, run with
+      <code>blender --background --python tmp/mob_survey.py</code></li>
+    <li>Mob definitions and copy: <code>scripts/assets/last_bell_crew/cast.py</code></li>
+    <li>The review this answers: <code>docs/design/last-bell-cast-review-notes.md</code>,
+      section 4</li>
+    <li>The published book: <code>docs/design/last-bell-concept-art.html</code></li>
+    <li>Method rule this pass follows: <code>scripts/assets/CLAUDE.md</code>, the
+      Blender-authored assets paragraph</li>
+  </ul>
+</footer>
+</div>
+</body>
+</html>

@@ -2113,6 +2113,13 @@ export const zh_TW: EnTranslations = {
     "noticeboard": {
       "empty": "看起來沒有張貼任何內容。"
     },
+    "memorial": {
+      "title": "Memorial",
+      "dedication": "To the wardens of Gullhaven who carried a seal into the Breach and did not come out again. The town keeps the bell for them.",
+      "rollHeading": "Roll of Honour ({count})",
+      "roomRemaining": "The stone below the last name has been left bare.",
+      "close": "Close memorial"
+    },
     "bank": {
       "title": "銀行",
       "subtitle": "鍍金保險箱",
