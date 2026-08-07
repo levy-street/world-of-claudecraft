@@ -8762,8 +8762,8 @@ export const zh_TW: EnTranslations = {
         "description": "防禦性冷卻技：持續 8 秒，你受到的傷害降低 30%，並大幅提高閃躲攻擊的機率。"
       },
       "intervene": {
-        "name": "Intervene",
-        "description": "Rush to a friendly player, shielding them from {damage} damage for 6 sec. Usable from 8 to 25 yards."
+        "name": "援護",
+        "description": "衝向一名友方玩家，為其抵擋 {damage} 點傷害，持續 6 秒。可在 8 到 25 碼距離使用。"
       },
       "recklessness": {
         "name": "魯莽",

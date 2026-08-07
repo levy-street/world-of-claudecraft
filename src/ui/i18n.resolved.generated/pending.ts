@@ -40,31 +40,16 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.intervene.name",
     "hudChrome.arenaGate.minLevelNote"
   ],
-  "zh_CN": [
-    "entities.abilities.intervene.description",
-    "entities.abilities.intervene.name"
-  ],
-  "zh_TW": [
-    "entities.abilities.intervene.description",
-    "entities.abilities.intervene.name"
-  ],
-  "ko_KR": [
-    "entities.abilities.intervene.description",
-    "entities.abilities.intervene.name"
-  ],
-  "ja_JP": [
-    "entities.abilities.intervene.description",
-    "entities.abilities.intervene.name"
-  ],
+  "zh_CN": [],
+  "zh_TW": [],
+  "ko_KR": [],
+  "ja_JP": [],
   "pt_BR": [
     "entities.abilities.intervene.description",
     "entities.abilities.intervene.name",
     "hudChrome.arenaGate.minLevelNote"
   ],
-  "ru_RU": [
-    "entities.abilities.intervene.description",
-    "entities.abilities.intervene.name"
-  ],
+  "ru_RU": [],
   "cs_CZ": [
     "entities.abilities.intervene.description",
     "entities.abilities.intervene.name",

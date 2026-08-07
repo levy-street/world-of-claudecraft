@@ -8762,8 +8762,8 @@ export const zh_CN: EnTranslations = {
         "description": "防御性冷却技能：持续 8 秒，你受到的伤害降低 30%，并大幅提高躲闪攻击的几率。"
       },
       "intervene": {
-        "name": "Intervene",
-        "description": "Rush to a friendly player, shielding them from {damage} damage for 6 sec. Usable from 8 to 25 yards."
+        "name": "援护",
+        "description": "冲向一名友方玩家，为其抵挡 {damage} 点伤害，持续 6 秒。可在 8 到 25 码距离使用。"
       },
       "recklessness": {
         "name": "鲁莽",

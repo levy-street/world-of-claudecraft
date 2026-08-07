@@ -8762,8 +8762,8 @@ export const ja_JP: EnTranslations = {
         "description": "防御的クールダウン。8秒間、受けるダメージが30%減少し、攻撃を回避する確率が大幅に上昇します。"
       },
       "intervene": {
-        "name": "Intervene",
-        "description": "Rush to a friendly player, shielding them from {damage} damage for 6 sec. Usable from 8 to 25 yards."
+        "name": "援護",
+        "description": "味方プレイヤーに突撃し、6秒間{damage}ダメージを吸収するシールドを付与します。射程8-25yd。"
       },
       "recklessness": {
         "name": "無謀",

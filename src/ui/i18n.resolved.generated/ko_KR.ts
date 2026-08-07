@@ -8762,8 +8762,8 @@ export const ko_KR: EnTranslations = {
         "description": "방어 재사용 기술입니다. 8초 동안 받는 피해가 30% 감소하고 훨씬 많은 공격을 회피합니다."
       },
       "intervene": {
-        "name": "Intervene",
-        "description": "Rush to a friendly player, shielding them from {damage} damage for 6 sec. Usable from 8 to 25 yards."
+        "name": "엄호",
+        "description": "아군 플레이어에게 돌진하여 6초 동안 피해 {damage}을(를) 흡수하는 보호막을 부여합니다. 사거리 8-25yd."
       },
       "recklessness": {
         "name": "무모함",

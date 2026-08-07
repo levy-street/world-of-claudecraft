@@ -8762,8 +8762,8 @@ export const ru_RU: EnTranslations = {
         "description": "Защитная способность: в течение 8 сек вы получаете на 30% меньше урона и уклоняетесь от гораздо большего числа атак."
       },
       "intervene": {
-        "name": "Intervene",
-        "description": "Rush to a friendly player, shielding them from {damage} damage for 6 sec. Usable from 8 to 25 yards."
+        "name": "Вмешательство",
+        "description": "Рывок к союзному игроку, поглощающий {damage} ед. урона в течение 6 сек. Действует на расстоянии от 8 до 25 м."
       },
       "recklessness": {
         "name": "Безрассудство",
