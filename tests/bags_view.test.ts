@@ -68,6 +68,18 @@ const ITEMS: Record<string, ItemDef> = {
     soulbound: true,
     noDiscard: true,
   } as ItemDef,
+  // A recipe pattern: teaches teachesRecipeId when used from the bags, then is
+  // consumed. It carries no def-level `use` payload, so it reaches the click
+  // ladder's final fall-through like a mount reins item does.
+  pattern: {
+    kind: 'recipe',
+    name: 'Pattern: Eastbrook Arming Sword',
+    quality: 'rare',
+    // A REAL recipe id (recipes.ts), not an item id: nothing here resolves it,
+    // but a fixture carrying an item id in a recipe field is the kind of thing
+    // the next author copies into a place that DOES resolve it.
+    teachesRecipeId: 'recipe_eastbrook_arming_sword',
+  } as ItemDef,
 };
 const lookup: ItemLookup = (id) => ITEMS[id];
 
@@ -165,6 +177,9 @@ describe('bagItemAction priority order', () => {
     expect(bagItemAction(ITEMS.sword, { ...NO_MODE, petFeed: true })).toBe('petFeedBlocked');
     expect(bagItemAction(ITEMS.questItem, NO_MODE)).toBe('discardQuest');
     expect(bagItemAction(ITEMS.potion, NO_MODE)).toBe('use');
+    // A recipe pattern falls through to the same 'use' rung: using it teaches
+    // the recipe and consumes the copy.
+    expect(bagItemAction(ITEMS.pattern, NO_MODE)).toBe('use');
   });
 });
 
@@ -505,6 +520,8 @@ describe('bagTooltipHintKey', () => {
       'hudChrome.professions.toolEffectTooltip.openProfessions',
     );
     expect(bagTooltipHintKey({ kind: 'junk' }, NO_MODE)).toBe('');
+    // A recipe pattern hints click-to-use, like the fishing rod above.
+    expect(bagTooltipHintKey(ITEMS.pattern, NO_MODE)).toBe('itemUi.tooltip.clickUse');
   });
 
   it('raw cooking catches are not clickConsume (junk reagents, no food kind)', () => {

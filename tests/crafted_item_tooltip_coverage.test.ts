@@ -21,6 +21,7 @@ import { elixirTooltipLines } from '../src/ui/elixir_tooltip_view';
 import { gatherToolTooltipLines } from '../src/ui/gather_tool_tooltip';
 import { materialHintLine } from '../src/ui/material_hint_view';
 import { materialProfessionHintText } from '../src/ui/material_profession_hint_view';
+import { recipePatternTooltipLines } from '../src/ui/recipe_pattern_tooltip_view';
 import { toolEffectTooltipLines } from '../src/ui/tool_effect_tooltip';
 
 const EFFECT_SOURCES: Array<[string, (def: ItemDef) => boolean]> = [
@@ -53,6 +54,18 @@ const EFFECT_SOURCES: Array<[string, (def: ItemDef) => boolean]> = [
   // (rules plus the orphaned line at minimum), so the kind alone is the
   // faithful mirror of the hud branch's questModel gate.
   ['quest story block', (def) => def.kind === 'quest'],
+  // Recipe patterns (kind 'recipe'). Driven through the pure builder rather
+  // than the bare kind, mirroring the elixir and gathering-tool rows: the
+  // builder answers '' for a pattern whose taught recipe does not resolve or
+  // is not drop-acquirable, and a kind-alone predicate would green-light
+  // exactly those, which are the patterns whose click is a silent no-op. The
+  // viewer is the widest honest one (synced, nothing known, no skill), so this
+  // fires whenever the hud branch would render anything at all.
+  [
+    'recipe pattern lines',
+    (def) =>
+      recipePatternTooltipLines(def, { synced: true, knownRecipes: [], craftSkills: {} }) !== '',
+  ],
 ];
 
 describe('crafted item tooltip coverage', () => {

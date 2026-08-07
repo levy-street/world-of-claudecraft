@@ -1,23 +1,77 @@
 // Recipe PATTERN tooltip core: the model resolution plus the three rendered
 // lines. English copy is asserted directly (the gather_tool_tooltip.test.ts
-// idiom), and the numbers/ids come from the REAL recipe table rather than a
-// synthetic one, so a recipe whose skillReq or result item moves fails here
-// instead of shipping a tooltip that quotes a number the crafting window
-// disagrees with. Only the pattern ITEM def is synthetic (patterns are content
-// the phase adds separately; the core takes any ItemDef).
-import { describe, expect, it } from 'vitest';
-import { recipeById } from '../src/sim/content/recipes';
+// idiom).
+//
+// The taught recipes are SYNTHETIC, pushed onto the live table in beforeAll and
+// removed in afterAll (the tests/recipe_pattern_items.test.ts fixture idiom).
+// That is forced, not a shortcut: the view refuses any recipe the content table
+// does not mark drop-acquirable, and no shipped recipe carries 'drop' yet
+// (phase 11 authors that content), so a real id could only ever pin the
+// silence. The silence itself is pinned against a real trainer-only recipe
+// below, and the result ITEM ids stay real, so the teaches line still quotes
+// the shipped catalog rather than a made-up name.
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { ALL_RECIPES, recipeById } from '../src/sim/content/recipes';
+import type { ProfessionRecipeRecord } from '../src/sim/professions/types';
+import { Sim } from '../src/sim/sim';
 import type { ItemDef, RecipeItemDef } from '../src/sim/types';
+import { Hud } from '../src/ui/hud';
 import {
   type RecipePatternViewerInput,
   recipePatternTooltipLines,
   recipePatternTooltipModel,
 } from '../src/ui/recipe_pattern_tooltip_view';
+import { bareClient } from './helpers/bare_client';
 
-// An alchemy recipe with a real skill gate (skillReq 50) and a resolvable
-// result item, and a common-tier weaponcrafting recipe gated at 0.
-const GATED_RECIPE = 'recipe_sunpetal_mana_draught';
-const FREE_RECIPE = 'recipe_eastbrook_arming_sword';
+// An alchemy recipe with a real skill gate and a resolvable result item.
+const GATED_RECIPE = 'recipe_tooltip_pattern_gated';
+// The same craft gated at 0, for the no-requirement-line arm.
+const FREE_RECIPE = 'recipe_tooltip_pattern_free';
+// skillReq 60 is deliberately NOT a multiple of TIER_SKILL_STEP: it is the only
+// shape that can tell the tier-band derivation apart from a raw `skill >= req`.
+const OFF_STEP_RECIPE = 'recipe_tooltip_pattern_off_step';
+// A REAL recipe, and trainer-only like every recipe shipped today: the
+// acquisition gate must silence it.
+const TRAINER_ONLY_RECIPE = 'recipe_sunpetal_mana_draught';
+
+function dropRecipe(
+  id: string,
+  over: Partial<ProfessionRecipeRecord> = {},
+): ProfessionRecipeRecord {
+  return {
+    id,
+    professionId: 'alchemy',
+    resultItemId: 'sunpetal_mana_draught',
+    resultCount: 1,
+    reagents: [{ itemId: 'sunpetal_herb', count: 1 }],
+    skillReq: 50,
+    itemLevelBudget: 20,
+    level: 20,
+    acquisition: ['drop'],
+    ...over,
+  };
+}
+
+const FIXTURES: ProfessionRecipeRecord[] = [
+  dropRecipe(GATED_RECIPE),
+  dropRecipe(FREE_RECIPE, {
+    professionId: 'weaponcrafting',
+    resultItemId: 'eastbrook_arming_sword',
+    skillReq: 0,
+  }),
+  dropRecipe(OFF_STEP_RECIPE, { skillReq: 60 }),
+];
+
+beforeAll(() => {
+  ALL_RECIPES.push(...FIXTURES);
+});
+
+afterAll(() => {
+  for (const recipe of FIXTURES) {
+    const at = ALL_RECIPES.indexOf(recipe);
+    if (at >= 0) ALL_RECIPES.splice(at, 1);
+  }
+});
 
 function pattern(teachesRecipeId: string): RecipeItemDef {
   return {
@@ -31,11 +85,11 @@ function pattern(teachesRecipeId: string): RecipeItemDef {
 }
 
 function viewer(over: Partial<RecipePatternViewerInput> = {}): RecipePatternViewerInput {
-  return { knownRecipes: [], craftSkills: {}, ...over };
+  return { synced: true, knownRecipes: [], craftSkills: {}, ...over };
 }
 
 describe('recipePatternTooltipModel', () => {
-  it('resolves the taught recipe off the real table', () => {
+  it('resolves the taught recipe off the live table', () => {
     const recipe = recipeById(GATED_RECIPE);
     expect(recipe).toBeDefined();
     const model = recipePatternTooltipModel(pattern(GATED_RECIPE), viewer());
@@ -70,6 +124,18 @@ describe('recipePatternTooltipModel', () => {
     expect(recipePatternTooltipLines(pattern('recipe_from_a_newer_build'), viewer())).toBe('');
   });
 
+  it('answers null for a recipe no drop may teach, matching the sim silent refusal', () => {
+    // The acquisition gate, pinned against REAL shipped content: every recipe
+    // in the table today is trainer-only, and resolvePatternLearn refuses such
+    // a pattern with no message at all, so the hover must not describe a click
+    // that does nothing. This arm flips the day phase 11 authors drop content
+    // for this id, which is the moment the pin should be re-pointed.
+    const real = recipeById(TRAINER_ONLY_RECIPE);
+    expect(real?.acquisition).toEqual(['trainer']);
+    expect(recipePatternTooltipModel(pattern(TRAINER_ONLY_RECIPE), viewer())).toBeNull();
+    expect(recipePatternTooltipLines(pattern(TRAINER_ONLY_RECIPE), viewer())).toBe('');
+  });
+
   it('reads skillMet off the viewer craft skill, per craft', () => {
     const under = recipePatternTooltipModel(
       pattern(GATED_RECIPE),
@@ -89,6 +155,25 @@ describe('recipePatternTooltipModel', () => {
     expect(wrongCraft?.skillMet).toBe(false);
   });
 
+  it('derives skillMet from the tier bands the learn gate uses, not a raw compare', () => {
+    // skillReq 60 sits inside tier 2 (25-wide bands), so skill 50 is already at
+    // tier 2 and professions/training.ts teachTierMet says yes. A raw
+    // `50 >= 60` would paint this hover red for a crafter the sim will teach,
+    // which is the exact drift this derivation exists to prevent. Skill 49
+    // (tier 1) is the negative half, so the assertion is not vacuous.
+    const atBand = recipePatternTooltipModel(
+      pattern(OFF_STEP_RECIPE),
+      viewer({ craftSkills: { alchemy: 50 } }),
+    );
+    const belowBand = recipePatternTooltipModel(
+      pattern(OFF_STEP_RECIPE),
+      viewer({ craftSkills: { alchemy: 49 } }),
+    );
+    expect(atBand?.skillReq).toBe(60);
+    expect(atBand?.skillMet).toBe(true);
+    expect(belowBand?.skillMet).toBe(false);
+  });
+
   it('reads known off the viewer known-recipe list', () => {
     expect(
       recipePatternTooltipModel(pattern(GATED_RECIPE), viewer({ knownRecipes: [GATED_RECIPE] }))
@@ -104,7 +189,9 @@ describe('recipePatternTooltipModel', () => {
 describe('recipePatternTooltipLines', () => {
   it('states what the pattern teaches, in the item name, not the recipe id', () => {
     const html = recipePatternTooltipLines(pattern(GATED_RECIPE), viewer());
-    expect(html).toContain('<div class="tt-desc">Use: Teaches you Sunpetal Mana Draught.</div>');
+    expect(html).toContain(
+      '<div class="tt-desc">Use: Teaches you how to craft Sunpetal Mana Draught.</div>',
+    );
     expect(html).not.toContain(GATED_RECIPE);
   });
 
@@ -119,7 +206,7 @@ describe('recipePatternTooltipLines', () => {
 
   it('renders no requirement line for a recipe gated at 0', () => {
     const html = recipePatternTooltipLines(pattern(FREE_RECIPE), viewer());
-    expect(html).toContain('Use: Teaches you');
+    expect(html).toContain('Use: Teaches you how to craft');
     expect(html).not.toContain('Requires');
   });
 
@@ -130,7 +217,8 @@ describe('recipePatternTooltipLines', () => {
       viewer({ knownRecipes: [GATED_RECIPE] }),
     );
     expect(unknown).not.toContain('You already know that recipe.');
-    // The trainer's own wording, reused rather than reworded.
+    // The trainer's own wording, reused rather than reworded, and now the same
+    // sentence the sim's own refusal raises on the click.
     expect(known).toContain('<div class="tt-red">You already know that recipe.</div>');
   });
 
@@ -147,5 +235,126 @@ describe('recipePatternTooltipLines', () => {
     expect(teaches).toBeGreaterThanOrEqual(0);
     expect(requires).toBeGreaterThan(teaches);
     expect(known).toBeGreaterThan(requires);
+  });
+
+  it('renders the teaches line ALONE before the first cprof snapshot lands', () => {
+    // An online client's craftSkills and knownRecipes are empty defaults until
+    // that snapshot arrives, so both gated lines would be answering off state
+    // the client does not have. The viewer here deliberately carries state that
+    // WOULD produce both lines, proving the suppression is the synced flag and
+    // not merely empty inputs.
+    const unsynced = recipePatternTooltipLines(
+      pattern(GATED_RECIPE),
+      viewer({ synced: false, knownRecipes: [GATED_RECIPE], craftSkills: { alchemy: 0 } }),
+    );
+    expect(unsynced).toContain('Use: Teaches you how to craft Sunpetal Mana Draught.');
+    expect(unsynced).not.toContain('Requires');
+    expect(unsynced).not.toContain('You already know');
+    // The same state synced renders all three, so the arm above is a real gate.
+    const synced = recipePatternTooltipLines(
+      pattern(GATED_RECIPE),
+      viewer({ knownRecipes: [GATED_RECIPE], craftSkills: { alchemy: 0 } }),
+    );
+    expect(synced).toContain('Requires');
+    expect(synced).toContain('You already know');
+  });
+});
+
+describe('same input, same output across both IWorld shapes', () => {
+  // The pure-core contract from src/ui/CLAUDE.md: the offline Sim projects a
+  // freshly built view (copied skill record, SORTED known list) while the
+  // online client mirrors a plain wire object, so the core must not depend on
+  // either shape. A core reaching for Set.has or a prototype method would pass
+  // one arm and fail the other.
+  function offlineViewer(skill: number, known: readonly string[]): RecipePatternViewerInput {
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const pid = sim.addPlayer('warrior', 'Patternist');
+    const meta = sim.meta(pid);
+    if (!meta) throw new Error('missing meta');
+    meta.craftSkills.alchemy = skill;
+    for (const id of known) meta.knownRecipes.add(id);
+    return sim.craftingIdentityFor(pid);
+  }
+
+  function mirrorViewer(skill: number, known: readonly string[]): RecipePatternViewerInput {
+    const client = bareClient(7);
+    // The shape applySnapshot stamps on a cprof delta: a plain object, a plain
+    // record, a plain array.
+    client.craftingIdentity = {
+      ...client.craftingIdentity,
+      synced: true,
+      craftSkills: { alchemy: skill },
+      knownRecipes: [...known],
+    };
+    return client.craftingIdentity;
+  }
+
+  const CASES: Array<[string, number, readonly string[]]> = [
+    ['unpracticed and unknown', 0, []],
+    ['at the gate, unknown', 50, []],
+    ['known, and the list carries an unrelated id too', 50, [FREE_RECIPE, GATED_RECIPE]],
+  ];
+
+  it.each(CASES)('renders identical lines for %s', (_label, skill, known) => {
+    const item = pattern(GATED_RECIPE);
+    const offline = recipePatternTooltipLines(item, offlineViewer(skill, known));
+    const mirror = recipePatternTooltipLines(item, mirrorViewer(skill, known));
+    // Non-vacuous: every case renders at least the teaches line.
+    expect(offline).toContain('Teaches you how to craft');
+    expect(mirror).toBe(offline);
+    expect(recipePatternTooltipModel(item, mirrorViewer(skill, known))).toEqual(
+      recipePatternTooltipModel(item, offlineViewer(skill, known)),
+    );
+  });
+});
+
+describe('reachability through the real Hud tooltip', () => {
+  // The lines above are only worth pinning if the coordinator actually composes
+  // them. Drive the REAL Hud.itemTooltip on a prototype-only instance (the
+  // tests/masterwrought_tooltip.test.ts rig) with a kind:'recipe' def, so an
+  // unwired or wrongly-gated call site fails here rather than shipping a
+  // pattern whose hover says only "Uncommon Pattern".
+  function hudTooltip(item: ItemDef, craftingIdentity: RecipePatternViewerInput): string {
+    const hud = Object.create(Hud.prototype) as unknown as {
+      sim: {
+        player: { level: number };
+        cfg: { playerClass: string };
+        equipment: Record<string, string>;
+        craftingIdentity: RecipePatternViewerInput;
+      };
+      itemTooltip(item: ItemDef, compare?: boolean): string;
+    };
+    hud.sim = {
+      player: { level: 80 },
+      cfg: { playerClass: 'warrior' },
+      equipment: {},
+      craftingIdentity,
+    };
+    return hud.itemTooltip(item, false);
+  }
+
+  it('renders the teaches line for a pattern def', () => {
+    const html = hudTooltip(pattern(GATED_RECIPE), viewer());
+    expect(html).toContain('Use: Teaches you how to craft Sunpetal Mana Draught.');
+  });
+
+  it('renders the red requirement and known lines through the same call', () => {
+    const html = hudTooltip(
+      pattern(GATED_RECIPE),
+      viewer({ knownRecipes: [GATED_RECIPE], craftSkills: { alchemy: 0 } }),
+    );
+    expect(html).toContain('<div class="tt-red">Requires Alchemy 50</div>');
+    expect(html).toContain('<div class="tt-red">You already know that recipe.</div>');
+  });
+
+  it('adds nothing pattern-shaped for a non-pattern def', () => {
+    const potion: ItemDef = {
+      id: 'qa_potion_reach',
+      name: 'QA Potion',
+      kind: 'potion',
+      quality: 'common',
+      sellValue: 1,
+    };
+    expect(hudTooltip(potion, viewer())).not.toContain('Teaches you');
   });
 });

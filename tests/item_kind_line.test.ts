@@ -32,6 +32,8 @@ describe('itemKindLabel and itemQualityLabel, driven directly', () => {
     // No item id at all (callers without one): plain junk.
     expect(itemKindLabel('junk')).toBe('Junk');
     expect(itemKindLabel('weapon', 'fine_iron_ore')).toBe('Weapon');
+    // Recipe pattern items render the classic "Pattern" kind line.
+    expect(itemKindLabel('recipe')).toBe('Pattern');
   });
 
   it('quality defaults to common when the def carries none', () => {

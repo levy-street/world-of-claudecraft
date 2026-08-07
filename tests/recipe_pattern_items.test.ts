@@ -14,8 +14,14 @@ import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 // into the live ITEMS table, all removed in afterAll, so no shipped-id golden
 // sees them and no content has to exist yet for this behavior to be pinned.
 
-import { ALL_RECIPES } from '../src/sim/content/recipes';
+import { stackSizeOf } from '../src/sim/bags';
+import { ALL_RECIPES, recipeById } from '../src/sim/content/recipes';
 import { ITEMS } from '../src/sim/data';
+import {
+  defaultMarketQuery,
+  MARKET_ITEM_TYPE_FILTERS,
+  marketItemMatches,
+} from '../src/sim/market_query';
 import { resolvePatternLearn } from '../src/sim/professions/pattern_items';
 import type { ProfessionRecipeRecord } from '../src/sim/professions/types';
 import { Sim } from '../src/sim/sim';
@@ -54,7 +60,7 @@ import { bareClient, broadcast, fakeWs, joinServer } from './helpers/bare_client
 // the S3 guard ties those rows to the emit site in pattern_items.ts, so the
 // chain from test literal to matcher to emit closes with no self-comparison
 // link anywhere in it.
-const KNOWN_ERROR = 'You already know that pattern.';
+const KNOWN_ERROR = 'You already know that recipe.';
 const PROFESSION_ERROR = 'You have not practiced that profession.';
 const TIER_ERROR = 'Your skill is too low to learn that pattern.';
 
@@ -89,6 +95,11 @@ const TRAINER_ONLY_RECIPE: ProfessionRecipeRecord = {
   acquisition: ['trainer'],
 };
 
+// Every item id this suite injects shares this prefix, which is what lets the
+// shipped-content sweep at the bottom skip exactly this suite's defs: two of
+// the three are DELIBERATELY malformed (they exist to drive the silent-guard
+// arms), so a sweep that saw them would fail on fixtures rather than content.
+const SYNTHETIC_ID_PREFIX = 'test_pattern_';
 const PATTERN_ID = 'test_pattern_arming_sword';
 const MISSING_PATTERN_ID = 'test_pattern_missing_recipe';
 const TRAINER_PATTERN_ID = 'test_pattern_trainer_only';
@@ -143,11 +154,22 @@ function errorTexts(events: SimEvent[]): string[] {
     .map((e) => e.text);
 }
 
-/** Use `itemId` and return every error line the use produced, exactly. */
-function useAndCollectErrors(sim: Sim, itemId: string, pid: number): string[] {
+function trainResults(events: SimEvent[]): Array<Extract<SimEvent, { type: 'trainResult' }>> {
+  return events.filter(
+    (e): e is Extract<SimEvent, { type: 'trainResult' }> => e.type === 'trainResult',
+  );
+}
+
+/** Use `itemId` and return every event the use produced, exactly. */
+function useAndCollect(sim: Sim, itemId: string, pid: number): SimEvent[] {
   sim.drainEvents();
   sim.useItem(itemId, pid);
-  return errorTexts(sim.drainEvents());
+  return sim.drainEvents();
+}
+
+/** Use `itemId` and return every error line the use produced, exactly. */
+function useAndCollectErrors(sim: Sim, itemId: string, pid: number): string[] {
+  return errorTexts(useAndCollect(sim, itemId, pid));
 }
 
 function merchant(sim: Sim): Entity {
@@ -208,7 +230,16 @@ describe('using a recipe pattern (offline host, the real useItem path)', () => {
     expect(meta.knownRecipes.has(PATTERN_RECIPE.id)).toBe(false);
     expect(sim.countItem(PATTERN_ID, pid)).toBe(1);
 
-    expect(useAndCollectErrors(sim, PATTERN_ID, pid)).toEqual([]);
+    const events = useAndCollect(sim, PATTERN_ID, pid);
+    expect(errorTexts(events)).toEqual([]);
+    // The success FEEDBACK, and the whole reason a learn is not silent: the
+    // same text-free personal trainResult Sim.trainRecipe emits, which is what
+    // makes the hud log "You have learned {recipe}." and flip the train
+    // window's row to Known with no client change. Exactly one, so a second
+    // emit site cannot creep in and double-log the learn.
+    expect(trainResults(events)).toEqual([
+      { type: 'trainResult', ok: true, recipeId: PATTERN_RECIPE.id, pid },
+    ]);
 
     expect(meta.knownRecipes.has(PATTERN_RECIPE.id)).toBe(true);
     expect(sim.countItem(PATTERN_ID, pid)).toBe(0);
@@ -231,7 +262,12 @@ describe('using a recipe pattern (offline host, the real useItem path)', () => {
     const sim = makeWorld();
     const { pid, meta } = patternHolder(sim, 0);
 
-    expect(useAndCollectErrors(sim, PATTERN_ID, pid)).toEqual([PROFESSION_ERROR]);
+    const events = useAndCollect(sim, PATTERN_ID, pid);
+    expect(errorTexts(events)).toEqual([PROFESSION_ERROR]);
+    // A refusal is ctx.error-only. An ok:false trainResult would ALSO render
+    // through the hud's trainResult deny arm, so the player would read the
+    // same refusal twice in two different wordings.
+    expect(trainResults(events)).toEqual([]);
 
     expect(sim.countItem(PATTERN_ID, pid)).toBe(1);
     expect(meta.knownRecipes.has(PATTERN_RECIPE.id)).toBe(false);
@@ -242,7 +278,9 @@ describe('using a recipe pattern (offline host, the real useItem path)', () => {
     const sim = makeWorld();
     const { pid, meta } = patternHolder(sim, 99);
 
-    expect(useAndCollectErrors(sim, PATTERN_ID, pid)).toEqual([TIER_ERROR]);
+    const denied = useAndCollect(sim, PATTERN_ID, pid);
+    expect(errorTexts(denied)).toEqual([TIER_ERROR]);
+    expect(trainResults(denied)).toEqual([]);
     expect(sim.countItem(PATTERN_ID, pid)).toBe(1);
     expect(meta.knownRecipes.has(PATTERN_RECIPE.id)).toBe(false);
 
@@ -260,7 +298,9 @@ describe('using a recipe pattern (offline host, the real useItem path)', () => {
     expect(useAndCollectErrors(sim, PATTERN_ID, pid)).toEqual([]);
     expect(sim.countItem(PATTERN_ID, pid)).toBe(1);
 
-    expect(useAndCollectErrors(sim, PATTERN_ID, pid)).toEqual([KNOWN_ERROR]);
+    const denied = useAndCollect(sim, PATTERN_ID, pid);
+    expect(errorTexts(denied)).toEqual([KNOWN_ERROR]);
+    expect(trainResults(denied)).toEqual([]);
     expect(sim.countItem(PATTERN_ID, pid)).toBe(1);
   });
 
@@ -273,7 +313,9 @@ describe('using a recipe pattern (offline host, the real useItem path)', () => {
     expect(useAndCollectErrors(sim, PATTERN_ID, pid)).toEqual([]);
     meta.craftSkills[CRAFT] = 0;
 
-    expect(useAndCollectErrors(sim, PATTERN_ID, pid)).toEqual([KNOWN_ERROR]);
+    const denied = useAndCollect(sim, PATTERN_ID, pid);
+    expect(errorTexts(denied)).toEqual([KNOWN_ERROR]);
+    expect(trainResults(denied)).toEqual([]);
     expect(sim.countItem(PATTERN_ID, pid)).toBe(1);
   });
 
@@ -330,7 +372,39 @@ describe('using a recipe pattern (offline host, the real useItem path)', () => {
   });
 });
 
+describe('patterns never stack (one per bag slot, classic style)', () => {
+  it('caps at one per slot, so two copies occupy two distinct inventory slots', () => {
+    // 'recipe' is an UNSTACKED_KIND in src/sim/bags.ts, joining gear: classic
+    // recipe drops are one per slot. That is what makes a hoard of unlearned
+    // patterns cost real bag space, and it is the premise behind the bag chip
+    // rationale in src/ui/bag_filter.ts.
+    expect(stackSizeOf(ITEMS[PATTERN_ID])).toBe(1);
+
+    const sim = makeWorld();
+    const { pid, meta } = patternHolder(sim, 100, 2);
+    const slots = meta.inventory.filter((s) => s.itemId === PATTERN_ID);
+    expect(slots.length).toBe(2);
+    expect(slots.map((s) => s.count)).toEqual([1, 1]);
+    expect(sim.countItem(PATTERN_ID, pid)).toBe(2);
+
+    // And the learn spends exactly one of the two slots, not one of a stack.
+    expect(useAndCollectErrors(sim, PATTERN_ID, pid)).toEqual([]);
+    expect(meta.inventory.filter((s) => s.itemId === PATTERN_ID).length).toBe(1);
+  });
+});
+
 describe('patterns on the World Market', () => {
+  it('browses under the other type filter, and no other bucket claims it', () => {
+    // A pattern is not a weapon, armor, bag, consumable, material or cosmetic,
+    // so the catch-all bucket is the honest home for it. Driving the whole
+    // exported filter list means a future chip that started claiming patterns
+    // fails here instead of quietly splitting them across two tabs.
+    const matched = MARKET_ITEM_TYPE_FILTERS.filter((itemType) =>
+      marketItemMatches(PATTERN_ID, { ...defaultMarketQuery(), itemType }),
+    );
+    expect(matched).toEqual(['all', 'other']);
+  });
+
   it('lists a pattern for sale: tradable drops, bound only by being consumed', () => {
     const sim = makeWorld();
     const { pid } = patternHolder(sim, 0);
@@ -385,6 +459,40 @@ describe('using a recipe pattern over the live server (online host)', () => {
     broadcast(server);
     applyLatest();
     expect(client.craftingIdentity.knownRecipes).toContain(PATTERN_RECIPE.id);
+  });
+});
+
+describe('shipped pattern content shape', () => {
+  // VACUOUS TODAY on purpose: no shipped item carries kind 'recipe' yet, so
+  // this sweep asserts over an empty set until phase 11 authors the drops. It
+  // goes live the moment it does, and the two conditions it checks are exactly
+  // the ones resolvePatternLearn refuses SILENTLY: a pattern that trips either
+  // is a dead click with no message at all, the worst failure mode this
+  // feature has, and content review is the only place to catch it.
+  it('skips exactly this suite own synthetic ids, and they are really present', () => {
+    // The skip below is only safe while it covers this file's fixtures and
+    // nothing else. Two of the three are deliberately malformed; if a shipped
+    // id ever took this prefix, the sweep would silently stop checking it.
+    const synthetic = Object.keys(ITEMS)
+      .filter((id) => id.startsWith(SYNTHETIC_ID_PREFIX))
+      .sort();
+    expect(synthetic).toEqual([PATTERN_ID, MISSING_PATTERN_ID, TRAINER_PATTERN_ID].sort());
+  });
+
+  it('every kind:recipe item teaches a resolvable, drop-acquirable recipe', () => {
+    for (const [id, def] of Object.entries(ITEMS)) {
+      if (def.kind !== 'recipe') continue;
+      if (id.startsWith(SYNTHETIC_ID_PREFIX)) continue;
+      const recipe = recipeById(def.teachesRecipeId);
+      expect(
+        recipe,
+        `${id} teaches ${def.teachesRecipeId}, which resolves to no recipe`,
+      ).toBeDefined();
+      expect(
+        recipe?.acquisition,
+        `${id} teaches ${def.teachesRecipeId}, which no drop may teach`,
+      ).toContain('drop');
+    }
   });
 });
 

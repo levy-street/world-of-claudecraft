@@ -51,6 +51,18 @@ const ITEMS: Record<string, ItemDef> = {
     mount: 'valorsteed',
     quality: 'common',
   },
+  // A recipe pattern: deliberately ALL-ONLY (no chip fits a permanent unlock),
+  // and does not stack (UNSTACKED_KIND in src/sim/bags.ts).
+  pattern: {
+    id: 'pattern',
+    name: 'Pattern: Eastbrook Arming Sword',
+    kind: 'recipe',
+    // A REAL recipe id (recipes.ts), not an item id: nothing here resolves it,
+    // but a fixture carrying an item id in a recipe field is the kind of thing
+    // the next author copies into a place that DOES resolve it.
+    teachesRecipeId: 'recipe_eastbrook_arming_sword',
+    quality: 'rare',
+  },
 } as unknown as Record<string, ItemDef>;
 
 const lookup = (id: string): ItemDef | undefined => ITEMS[id];
@@ -301,6 +313,17 @@ describe('BAG_CATEGORIES', () => {
       'quest',
       'mount',
     ]);
+  });
+});
+
+describe('matchesCategory: recipe patterns are ALL-ONLY', () => {
+  it('matches "all" and no other chip, driven off the live BAG_CATEGORIES list', () => {
+    // Driving off BAG_CATEGORIES (not a hand-written list) means a future chip
+    // added to the row cannot silently start claiming patterns without this
+    // test noticing.
+    for (const category of BAG_CATEGORIES) {
+      expect(matchesCategory(ITEMS.pattern, category), category).toBe(category === 'all');
+    }
   });
 });
 

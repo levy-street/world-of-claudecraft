@@ -48,6 +48,7 @@ describe('item_name_color: quality path for non-quest', () => {
       'elixir',
       'bag',
       'mount',
+      'recipe',
     ]) {
       expect(itemNameColor({ kind, quality: 'rare' }), kind).toBe(QUALITY_COLOR.rare);
       expect(itemNameColor({ kind, quality: 'epic' }), kind).toBe(QUALITY_COLOR.epic);
