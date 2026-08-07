@@ -45,6 +45,7 @@ import { mountOwned, summonMountItem } from './mounts';
 import { learnRiding } from './mounts_training';
 import { battlefieldExperienceTrickle } from './professions/battlefield_xp';
 import { useGatherToolItem } from './professions/gathering';
+import { useRecipePatternItem } from './professions/pattern_items';
 import type { ItemUseResult, PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import {
@@ -806,6 +807,12 @@ export function useItem(ctx: SimContext, itemId: string, pid?: number): ItemUseR
     // first. Reins are never consumed: mountOwned() derives ownership from holding
     // the item, so removing it here would delete the mount.
     summonMountItem(ctx, meta.entityId, def.mount);
+  } else if (def.kind === 'recipe') {
+    // A pattern teaches the recipe it names and is spent doing so.
+    // useRecipePatternItem owns every gate and the consume; it sits here, below
+    // the dead gate above, so using a pattern while dead is a silent no-op like
+    // every other kind arm in this chain.
+    useRecipePatternItem(ctx, def, meta);
   }
 }
 

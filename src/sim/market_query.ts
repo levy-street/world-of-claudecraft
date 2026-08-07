@@ -190,9 +190,14 @@ function itemMatchesType(item: ItemDef, filter: MarketItemTypeFilter): boolean {
   // The catch-all for catalog kinds with no browse category of their own. Mount
   // reins join quest items here: quest items are never listable, and reins
   // (listable now that they are unbound) are too few to earn a filter chip.
-  // Neither may be left reachable through 'All' alone
+  // Recipe patterns join them for the same reason: they are deliberately
+  // listable (a tradable drop that binds by being consumed, not on pickup) but
+  // too few today to earn a chip of their own, so browsing them stays this
+  // arm's job until content makes a dedicated category worth it. None of the
+  // three may be left reachable through 'All' alone
   // (tests/market_filters.test.ts).
-  if (filter === 'other') return item.kind === 'quest' || item.kind === 'mount';
+  if (filter === 'other')
+    return item.kind === 'quest' || item.kind === 'mount' || item.kind === 'recipe';
   // Exhaustive on purpose: a future MARKET_ITEM_TYPE_FILTERS entry with no arm above
   // reddens tsc here instead of silently inheriting the 'other' predicate, which is
   // how `bag` browsed as nothing at all for its whole life before this arm existed.

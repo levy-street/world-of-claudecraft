@@ -751,7 +751,8 @@ type ItemKind =
   | 'potion'
   | 'elixir'
   | 'bag'
-  | 'mount';
+  | 'mount'
+  | 'recipe';
 
 interface BaseItemDef {
   id: string;
@@ -1011,7 +1012,7 @@ export interface HeldOffhandItemDef extends BaseItemDef {
 }
 
 export interface OtherItemDef extends BaseItemDef {
-  kind: Exclude<ItemKind, 'armor' | 'weapon' | 'held_offhand' | 'mount'>;
+  kind: Exclude<ItemKind, 'armor' | 'weapon' | 'held_offhand' | 'mount' | 'recipe'>;
   armorType?: never;
 }
 
@@ -1029,13 +1030,30 @@ export interface MountItemDef extends BaseItemDef {
   weapon?: never;
 }
 
+// A recipe PATTERN item: the physical drop that teaches one ProfessionRecipeRecord
+// when used from the bags (src/sim/professions/pattern_items.ts). The def names the
+// recipe it teaches and nothing else; `teachesRecipeId` is a recipe id
+// (content/recipes.ts recipeById), never an item id. Patterns are ordinary
+// tradable drops: no soulbound, no noMarketList. The bind happens by CONSUMPTION
+// at learn time, so a pattern is worth exactly what an unlearned copy is worth
+// and nothing once the knowledge is spent. Its own kind rather than a `use` arm
+// on OtherItemDef, so the recipe id can never be omitted (the Exclude above) and
+// the browse/stack/tooltip surfaces can key on the kind.
+export interface RecipeItemDef extends BaseItemDef {
+  kind: 'recipe';
+  teachesRecipeId: string;
+  armorType?: never;
+  weapon?: never;
+}
+
 export type ItemDef =
   | ArmorItemDef
   | WeaponItemDef
   | JewelryItemDef
   | HeldOffhandItemDef
   | OtherItemDef
-  | MountItemDef;
+  | MountItemDef
+  | RecipeItemDef;
 
 // Per-instance item payload (#1165). Additive and OPTIONAL: most items stay plain
 // {itemId, count} with no instance payload (fungible, market-listable). A slot
