@@ -5137,7 +5137,10 @@ export const ABILITIES: Record<string, AbilityDef> = {
     learnLevel: 6,
     cost: 0,
     castTime: 0,
-    cooldown: 20,
+    // 30s (was 20s, owner 2026-08-07): the warrior mobility budget in PvP is the
+    // whole point of the level-5 row re-cut above, and Heroic Leap is the other
+    // half of it. Base kit, so this lands on all three specs.
+    cooldown: 30,
     range: 30,
     school: 'physical',
     requiresTarget: false,
@@ -5311,7 +5314,10 @@ export const ABILITIES: Record<string, AbilityDef> = {
     learnLevel: 5,
     cost: 0,
     castTime: 0,
-    cooldown: 15,
+    // 30s (owner 2026-08-07), deliberately DOUBLE the hostile Onrush's 15s: this
+    // row exists to reduce the warrior mobility budget in PvP, so the replacement
+    // must not hand back a short-cooldown reposition through the friendly door.
+    cooldown: 30,
     range: 25,
     minRange: 8,
     school: 'physical',

@@ -14,7 +14,7 @@
 
 import { describe, expect, it } from 'vitest';
 import { abilitiesKnownAt } from '../src/sim/content/classes';
-import { MOBS } from '../src/sim/data';
+import { ABILITIES, MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
 import type { Entity, SimEvent } from '../src/sim/types';
@@ -132,6 +132,17 @@ describe('Intervene (level-5 warrior mobility row)', () => {
       l17: 50,
       l20: 50,
     });
+  });
+
+  it('holds the warrior mobility budget: Intervene and Heroic Leap on 30 sec', () => {
+    // The point of this row re-cut is the PvP mobility budget, so the two knobs move
+    // together and are pinned together. Intervene sits at DOUBLE the hostile Onrush
+    // deliberately: the replacement must not hand a short-cooldown reposition back
+    // through the friendly door. Heroic Leap is base kit, so its 30 sec reaches all
+    // three specs, not just the warriors who take this row.
+    expect(ABILITIES.intervene.cooldown).toBe(30);
+    expect(ABILITIES.heroic_leap.cooldown).toBe(30);
+    expect(ABILITIES.charge.cooldown).toBe(15);
   });
 
   it('leaves the hostile Onrush completely unchanged', () => {
