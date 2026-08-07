@@ -9068,7 +9068,7 @@ export class Sim {
         (id) => ITEMS[id],
         [],
         meta.equipmentInstance,
-        equipCandidateQuality(meta.inventory, itemId, def),
+        def.masterwrought ? equipCandidateQuality(meta.inventory, itemId, def) : undefined,
       )
     )
       return;

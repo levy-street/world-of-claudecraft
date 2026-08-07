@@ -137,6 +137,16 @@ export function equipCandidateIndex(inventory: readonly InvSlot[], itemId: strin
   return -1;
 }
 
+// THE effective-quality precedence rule, shared by the worn side and the
+// incoming side below: a copy's own rolled quality wins over its def's when
+// present, the same precedence professions/battlefield_xp.ts reads rarity with.
+function effectiveQuality(
+  def: ItemDef,
+  instance: ItemInstancePayload | undefined,
+): string | undefined {
+  return instance?.rolled?.quality ?? def.quality;
+}
+
 // The effective quality of the copy an equip of `itemId` would consume now: the
 // selected unit's rolled quality when it carries one, else the def's. This is
 // what masterwroughtConflictSlot wants for `incomingQuality`.
@@ -147,26 +157,20 @@ export function equipCandidateQuality(
 ): string | undefined {
   const index = equipCandidateIndex(inventory, itemId);
   const instance = index < 0 ? undefined : inventory[index].instance;
-  return instance?.rolled?.quality ?? def.quality;
+  return effectiveQuality(def, instance);
 }
 
 // How many Masterwrought pieces a character may wear at once, and how many of
 // those may be legendary. A two-hander occupies one equipment slot and so
-// counts once, like every other piece.
+// counts once, like every other piece. Retuning either cap is never a quiet
+// one-line edit: the refusal prose in src/ui/sim_i18n.ts spells these numbers
+// out in every locale and the tooltip copy interpolates the equip cap, so a
+// retune must sweep all of that copy with it (the pinned test in
+// tests/masterwrought_cap.test.ts is the reminder).
 export const MASTERWROUGHT_EQUIP_CAP = 2;
 export const MASTERWROUGHT_LEGENDARY_CAP = 1;
 
 export type MasterwroughtConflict = { slot: EquipSlot; reason: 'cap' | 'legendary' };
-
-// The effective quality of a specific WORN copy: the instance's own rolled
-// quality wins over the def's when present, the same precedence
-// professions/battlefield_xp.ts reads rarity with.
-function wornEffectiveQuality(
-  def: ItemDef,
-  instance: ItemInstancePayload | undefined,
-): string | undefined {
-  return instance?.rolled?.quality ?? def.quality;
-}
 
 // The worn slot that would break the Masterwrought counted-family rule if
 // `item` were equipped now, or null when the equip is legal. Two counted caps,
@@ -188,7 +192,10 @@ function wornEffectiveQuality(
 // sim passes ITEMS and meta.equipmentInstance; injected so this leaf stays
 // data-free). `incomingQuality` is the effective quality of the exact copy
 // about to be worn, which overrides the def's when the carried unit rolled its
-// own.
+// own. Quality strings are compared strictly: a rolled quality that is not
+// exactly 'legendary' (a typo, a future tier) counts as non-legendary, so the
+// sub-cap fails OPEN on an unrecognized string while the piece count itself is
+// unaffected.
 export function masterwroughtConflictSlot(
   item: ItemDef,
   equipment: Partial<Record<EquipSlot, string>>,
@@ -205,7 +212,7 @@ export function masterwroughtConflictSlot(
     if (!wornId) continue;
     const def = lookup(wornId);
     if (!def?.masterwrought) continue;
-    worn.push({ slot, legendary: wornEffectiveQuality(def, instances?.[slot]) === 'legendary' });
+    worn.push({ slot, legendary: effectiveQuality(def, instances?.[slot]) === 'legendary' });
   }
   if (worn.length >= MASTERWROUGHT_EQUIP_CAP) return { slot: worn[0].slot, reason: 'cap' };
   if ((incomingQuality ?? item.quality) === 'legendary') {

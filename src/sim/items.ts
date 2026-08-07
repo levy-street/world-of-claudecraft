@@ -435,14 +435,8 @@ export function equipItem(
   // same item). The target slot and a displaced slot are exempt: both are
   // emptied by this swap, so the copy they hold never coexists with the
   // incoming one (the Titan Grip same-id NON-legendary pair stays legal).
-  if (
-    uniqueEquipConflictSlot(
-      def,
-      meta.equipment,
-      (id) => ITEMS[id],
-      displacedSlot ? [slot, displacedSlot] : [slot],
-    )
-  ) {
+  const ignoreSlots = displacedSlot ? [slot, displacedSlot] : [slot];
+  if (uniqueEquipConflictSlot(def, meta.equipment, (id) => ITEMS[id], ignoreSlots)) {
     ctx.error(meta.entityId, 'You can only equip one of those.');
     return;
   }
@@ -456,14 +450,15 @@ export function equipItem(
     def,
     meta.equipment,
     (id) => ITEMS[id],
-    displacedSlot ? [slot, displacedSlot] : [slot],
+    ignoreSlots,
     meta.equipmentInstance,
-    equipCandidateQuality(meta.inventory, itemId, def),
+    def.masterwrought ? equipCandidateQuality(meta.inventory, itemId, def) : undefined,
   );
   if (masterwroughtConflict) {
-    // Two plain calls rather than one ternary argument: the S3 drift-guard
-    // scanner only sees a single-line literal at an error emit, so these must
-    // stay written this way or the guard goes blind to them.
+    // Two plain calls, each on ONE physical line: the S3 drift-guard regexes
+    // cannot span a line break, so an emit that biome wraps past 100 columns
+    // (as a shared ternary argument here would) is invisible to the guard.
+    // Keep each literal short enough to never wrap, or the guard goes blind.
     if (masterwroughtConflict.reason === 'legendary') {
       ctx.error(meta.entityId, 'You can only equip one legendary Masterwrought item.');
     } else {
@@ -483,14 +478,16 @@ export function equipItem(
     delete meta.equipment[displacedSlot];
     if (meta.equipmentInstance) delete meta.equipmentInstance[displacedSlot];
   }
-  // removeItem scans from the highest inventory index down (sim.ts), so a
-  // freshly-enchanted copy (pushed onto the end by addItemInstance,
-  // src/sim/professions/enchanting.ts applyEnchant) is what this picks up first
-  // when both a plain and an enchanted copy of the same item exist and nothing
-  // else has been looted since. That only holds while the enchanted copy stays
-  // the highest-index match: loot another plain copy afterward and the plain
-  // one gets equipped instead. Deterministic, acceptable for v1, but a future
-  // picker UI should not assume the enchanted copy is always favored.
+  // consumeEquippedInventoryUnit lifts the highest-index matching unit (the
+  // equipCandidateIndex rule in equipment_rules.ts, shared with the client
+  // mirror), so a freshly-enchanted copy (pushed onto the end by
+  // addItemInstance, src/sim/professions/enchanting.ts applyEnchant) is what
+  // this picks up first when both a plain and an enchanted copy of the same
+  // item exist and nothing else has been looted since. That only holds while
+  // the enchanted copy stays the highest-index match: loot another plain copy
+  // afterward and the plain one gets equipped instead. Deterministic,
+  // acceptable for v1, but a future picker UI should not assume the enchanted
+  // copy is always favored.
   const consumed = consumeEquippedInventoryUnit(meta, itemId);
   ctx.onInventoryChangedForQuests(meta);
   if (old) {
