@@ -19,10 +19,14 @@ batch-heavy phases the table marks. Steps:
    EnterWorktree tool (path: /Users/fernando/Documents/wocc-masterwrought), or stop and
    ask the user to relaunch there; phase work never runs from the main checkout. Then
    `git status` clean in `~/Documents/wocc-masterwrought`. Then SYNC THE
-   RELEASE BRANCH (maintainer directive, every phase, no exceptions): `git fetch origin`,
-   merge the NEWEST `origin/release/**` into `feature/masterwrought`, resolve, and run the
-   `release-merge-audit` skill on the merge before any phase work. Scan memory
-   (`MEMORY.md` index) for entries matching the phase domain.
+   RELEASE BRANCH (maintainer directive, every phase, no exceptions): `git fetch origin
+   --prune`, then DISCOVER the newest release branch by version sort, never by assuming
+   the branch's current upstream or the last phase's target is still it:
+   `git branch -r | grep 'origin/release/' | sort -V | tail -1`
+   (the packet started on release/v0.36.0; when a release/v0.37.0 or later appears, THAT
+   is the merge target from that phase on). Merge that branch into `feature/masterwrought`,
+   resolve, and run the `release-merge-audit` skill on the merge before any phase work.
+   Scan memory (`MEMORY.md` index) for entries matching the phase domain.
 1. LOAD CONTEXT via an Explore agent (never read planning docs or coordinator monoliths in
    the main loop): `state.md`, `progress.md`, this phase's file, and the phase's listed
    source files. The agent returns a focused summary.
