@@ -3449,11 +3449,10 @@ export class ClientWorld implements IWorld {
       // mst -> activeMobileStationCraft: a nullable scalar, so the delta's
       // explicit null (station expired or never placed) must overwrite.
       if (s.mst !== undefined) this.activeMobileStationCraft = (s.mst as string | null) ?? null;
-      // Commission order board (issue #1298): server-gated on the board
-      // revision at the corder wire cadence (a passive party converges within
-      // one cadence window; the viewer's own commands re-arm for the next
-      // snapshot), and this is how BOTH sides of an accept/deliver converge
-      // (not the commissionOrderResult event, which is deny-toast only).
+      // Commission order board (issue #1298): server-diffed per tick like
+      // prof/cprof above, so this is how BOTH sides of an accept/deliver
+      // converge (not the commissionOrderResult event, which is deny-toast
+      // only).
       if (s.corder !== undefined) this.commissionOrders = s.corder ?? [];
       // Enchanting-action outcome mirrors (Professions 2.0): the
       // convergence arm for lastDisenchantResult/lastEnchantResult/lastSalvageResult

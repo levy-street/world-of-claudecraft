@@ -217,7 +217,6 @@ export const fr_CA: AdminTranslations = {
   "tickPerf.overBudget": "au-delà du budget de 50ms",
   "tickPerf.loopHeading": "Phases de la boucle",
   "tickPerf.simHeading": "phases internes de sim.tick()",
-  "tickPerf.selfHeading": "Self snapshot key groups (bcastSelf)",
   "tickPerf.colPhase": "Phase",
   "tickPerf.colMean": "Moyenne",
   "tickPerf.colP95": "p95",

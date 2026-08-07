@@ -217,7 +217,6 @@ export const id_ID: AdminTranslations = {
   "tickPerf.overBudget": "melebihi anggaran 50ms",
   "tickPerf.loopHeading": "Fase loop",
   "tickPerf.simHeading": "Fase internal sim.tick()",
-  "tickPerf.selfHeading": "Self snapshot key groups (bcastSelf)",
   "tickPerf.colPhase": "Fase",
   "tickPerf.colMean": "Rerata",
   "tickPerf.colP95": "p95",

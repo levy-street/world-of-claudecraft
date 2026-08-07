@@ -10,65 +10,25 @@
 // and `pretest`). Reproducibility is checked by tests/i18n_admin_catalog.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [
-    "tickPerf.selfHeading"
-  ],
-  "es_ES": [
-    "tickPerf.selfHeading"
-  ],
-  "fr_FR": [
-    "tickPerf.selfHeading"
-  ],
-  "fr_CA": [
-    "tickPerf.selfHeading"
-  ],
+  "es": [],
+  "es_ES": [],
+  "fr_FR": [],
+  "fr_CA": [],
   "en_CA": [],
-  "it_IT": [
-    "tickPerf.selfHeading"
-  ],
-  "de_DE": [
-    "tickPerf.selfHeading"
-  ],
-  "zh_CN": [
-    "tickPerf.selfHeading"
-  ],
-  "zh_TW": [
-    "tickPerf.selfHeading"
-  ],
-  "ko_KR": [
-    "tickPerf.selfHeading"
-  ],
-  "ja_JP": [
-    "tickPerf.selfHeading"
-  ],
-  "pt_BR": [
-    "tickPerf.selfHeading"
-  ],
-  "ru_RU": [
-    "tickPerf.selfHeading"
-  ],
-  "cs_CZ": [
-    "tickPerf.selfHeading"
-  ],
-  "nl_NL": [
-    "tickPerf.selfHeading"
-  ],
-  "pl_PL": [
-    "tickPerf.selfHeading"
-  ],
-  "id_ID": [
-    "tickPerf.selfHeading"
-  ],
-  "tr_TR": [
-    "tickPerf.selfHeading"
-  ],
-  "sv_SE": [
-    "tickPerf.selfHeading"
-  ],
-  "vi_VN": [
-    "tickPerf.selfHeading"
-  ],
-  "da_DK": [
-    "tickPerf.selfHeading"
-  ]
+  "it_IT": [],
+  "de_DE": [],
+  "zh_CN": [],
+  "zh_TW": [],
+  "ko_KR": [],
+  "ja_JP": [],
+  "pt_BR": [],
+  "ru_RU": [],
+  "cs_CZ": [],
+  "nl_NL": [],
+  "pl_PL": [],
+  "id_ID": [],
+  "tr_TR": [],
+  "sv_SE": [],
+  "vi_VN": [],
+  "da_DK": []
 };

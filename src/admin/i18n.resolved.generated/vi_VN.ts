@@ -217,7 +217,6 @@ export const vi_VN: AdminTranslations = {
   "tickPerf.overBudget": "vượt ngân sách 50ms",
   "tickPerf.loopHeading": "Các giai đoạn vòng lặp",
   "tickPerf.simHeading": "Các giai đoạn bên trong sim.tick()",
-  "tickPerf.selfHeading": "Self snapshot key groups (bcastSelf)",
   "tickPerf.colPhase": "Giai đoạn",
   "tickPerf.colMean": "Trung bình",
   "tickPerf.colP95": "p95",

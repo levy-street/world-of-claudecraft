@@ -237,13 +237,8 @@ const CALLBACK_KEYS = [
   'mailHeroicMarks',
   'mailAuthoredLetter',
   'mailboxHoldsItem',
-  // Commission order board change signal (professions/commission_order.ts
-  // writes it at every board mutation; the server's corder gate reads it).
-  'bumpCommissionOrderBoardRev',
   // Set proc firing.
   'applySetProcs',
-  // Book of Deeds lifetime-counter bump (deeds.ts owns the body).
-  'bumpDeedStat',
   // Vale Cup <-> Arena queue exclusion (social/vale_cup.ts).
   'vcupSeatedOrQueued',
   // The Vale Cup sport-move arms (social/vale_cup.ts).
@@ -350,7 +345,6 @@ function makeFakeHost() {
     fiestaBotPids: [],
     mobScanCounters: createMobScanCounters(),
     bumpDeedStat: vi.fn(),
-    bumpCommissionOrderBoardRev: vi.fn(),
     markItemDiscovered: vi.fn(),
     markVisited: vi.fn(),
     markDeedsDirty: vi.fn(),

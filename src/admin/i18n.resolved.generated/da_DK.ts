@@ -217,7 +217,6 @@ export const da_DK: AdminTranslations = {
   "tickPerf.overBudget": "over 50ms-budgettet",
   "tickPerf.loopHeading": "Løkkefaser",
   "tickPerf.simHeading": "sim.tick() interne faser",
-  "tickPerf.selfHeading": "Self snapshot key groups (bcastSelf)",
   "tickPerf.colPhase": "Fase",
   "tickPerf.colMean": "Gns.",
   "tickPerf.colP95": "p95",

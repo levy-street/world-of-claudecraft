@@ -2017,16 +2017,6 @@ export class Sim {
   // In-memory only, like trades/duels, swept by updateCommissionOrders in
   // the end-of-tick block.
   commissionOrderBoard: CommissionOrder[] = [];
-  // Change signal for the server's corder snapshot gate (the market
-  // browseRevFor pattern). The counter lives here (state stays on Sim) but
-  // every WRITER lives in professions/commission_order.ts, reaching it
-  // through the ctx.bumpCommissionOrderBoardRev callback at each board
-  // mutation site (open/accept/cancel/deliver on success, the retention
-  // sweep per settled or dropped row); a future mutation site must bump the
-  // same way or the server gate serves a stale projection until its
-  // staleness backstop. Never persisted; the board is in-memory only, so
-  // both reset together on boot.
-  commissionOrderBoardRev = 0;
   private nextCommissionOrderId = 1;
   // Guild Bank books: guild id -> live GuildBankState, loaded by the server per
   // realm through loadGuildBank (guild_bank.ts owns the shape; Phase 3 wires the
@@ -5424,11 +5414,6 @@ export class Sim {
       mailAuthoredLetter: (meta, letter) =>
         sim.postOffice.sendLetter(sim.postOffice.mailKeyFor(meta), meta.name, letter, 'system'),
       mailboxHoldsItem: (meta, itemId) => sim.postOffice.mailboxHoldsItem(meta, itemId),
-      // Commission order board change signal: the module's mutation sites
-      // advance the counter the server's corder gate polls.
-      bumpCommissionOrderBoardRev: () => {
-        sim.commissionOrderBoardRev++;
-      },
       // Book of Deeds seam callbacks (owned by deeds.ts). Late-bound arrows so
       // sim.ctx resolves at call time (the Q1 pattern).
       bumpDeedStat: (meta, stat, delta) => deedsMod.bumpDeedStat(sim.ctx, meta, stat, delta),
@@ -5851,9 +5836,7 @@ export class Sim {
     resurrectionOfferMod.updateResurrectionOffers(this.ctx);
     // Commission order board retention sweep (issue #1298): draws no rng, so
     // appending here is safe (the Vale Cup zero-rng-phase precedent); expires
-    // stale open orders and prunes terminal ones past their retain window
-    // (each mutation advances the board revision through the module's own
-    // bump sites).
+    // stale open orders and prunes terminal ones past their retain window.
     updateCommissionOrders(this.ctx);
     lap?.('trades');
     this.updateLootRolls();
@@ -8893,12 +8876,8 @@ export class Sim {
   }
 
   /** Per-player form of `commissionOrders`, for the server's `corder`
-   *  self-delta (server/game.ts). NOT a small read: it walks the whole
-   *  realm-global board and every open-scope order lands in EVERY viewer's
-   *  projection, so its cost is O(board) per call and the board grows with
-   *  realm activity (24 h open TTL). The server therefore rebuilds it only
-   *  behind the commissionOrderBoardRev change gate plus a wire cadence,
-   *  never per tick. */
+   *  self-delta (server/game.ts): a small per-player read, diffed per tick
+   *  like `prof`/`cprof`. */
   commissionOrdersFor(pid: number): readonly CommissionOrderRow[] {
     return commissionOrderRowsFor(this.ctx, pid);
   }
@@ -10726,13 +10705,6 @@ export class Sim {
 
   mailInfoFor(pid: number): import('../world_api').MailInfo | null {
     return this.postOffice.mailInfoFor(pid);
-  }
-
-  // Server-only broadcast helper (never IWorld, the marketBrowseRevFor shape):
-  // the cheap change signal server/game.ts polls before paying for a
-  // mailInfoFor rebuild. Null while the player is not at a raven pillar.
-  mailRevFor(pid: number): number | null {
-    return this.postOffice.mailRevFor(pid);
   }
 
   mailUnreadFor(pid: number): number {

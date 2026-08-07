@@ -502,33 +502,6 @@ export const SIM_MOB_ZONE_PHASES = [
   MOB_ZONE_PHASE_OTHER,
 ];
 
-// Per-key-group attribution buckets for the bcastSelf phase (selfWireJson).
-// HOST-DERIVED like the mob zone buckets and populated only while a detailed
-// capture is active, so a production capture names WHICH self key group eats
-// the budget instead of one opaque bcastSelf total: the market and corder
-// incidents both hid inside that total for a whole diagnosis round each.
-// Buckets are CONTIGUOUS code ranges of selfWireJson (a lap probe, the sim
-// perfLap shape), not individual keys, to keep the probe to one clock read
-// per boundary.
-export const SELF_WIRE_PHASES = [
-  'base', // wireEntity + the always-on scalar block + its stringify
-  'timers', // lockouts, corpse, auras, cooldowns, node cooldowns, charges, stats, weapon
-  'social', // party, marks, trade, duel, cardDuel, honor, arena
-  'bg',
-  'vcup',
-  'df',
-  'market',
-  'mail',
-  'bank', // bank + guildBank
-  'loot', // lroll, lrollg, mloot
-  'delve',
-  'prof', // prof, cprof, mst
-  'corder',
-  'craft', // enchant outcomes, town focus, gathering, tool slots, mounts, renown, title
-  'heavy', // the wireRev-gated heavy block + sport
-  'assemble', // the final base-JSON + extras splice (multi-KB copy on a heavy payload)
-].map((n) => `self.${n}`);
-
 // The zone/group bucket a mob's update cost is attributed to. Pure and allocation-free
 // (a cheap zoneAt band scan plus a Map lookup of an interned string).
 export function mobZonePhase(mob: Entity): string {
@@ -594,54 +567,6 @@ const MARKET_WIRE_PROMPT_CMDS = new Set<string>([
   'market_buy',
   'market_cancel',
   'market_collect',
-]);
-// Commission order board readout, the market recipe applied to the second
-// O(realm-collection) read that shipped on the per-tick self path (issue
-// #1298's `corder`): commissionOrdersFor walks the whole board and every
-// open-scope order lands in EVERY viewer's projection, so the unconditional
-// per-tick rebuild scaled with realm activity exactly like the market browse
-// did. Same three layers: a 4 Hz cadence, a rebuild-only-on-change gate
-// polling sim.commissionOrderBoardRev (viewer-independent: the projection is
-// a pure function of board plus pid), and a staleness backstop. The viewer's
-// OWN commission commands re-arm the gate for next-snapshot feedback.
-const CORDER_WIRE_HZ = 4;
-export const CORDER_WIRE_INTERVAL_TICKS = Math.max(1, Math.round(1 / (DT * CORDER_WIRE_HZ)));
-export const CORDER_BOARD_REFRESH_TICKS = 40;
-const CORDER_WIRE_PROMPT_CMDS = new Set<string>([
-  'open_commission_order',
-  'cancel_commission_order',
-  'accept_commission_order',
-  'deliver_commission_order',
-]);
-// Known residual, named on purpose: the board revision is realm-global and
-// corder has no proximity gate, so ONE board mutation anywhere re-triggers an
-// O(board) rebuild for every online session at its next due tick. Under
-// sustained churn (~4 mutations per second) the change gate degenerates to
-// the plain 5x cadence win. If that rate ever materializes, the next lever is
-// the bg readout's sharedMatchView memo shape: build the viewer-identical
-// open-scope subset once per board revision and splice the per-viewer rows.
-// The mail gate below shares the realm-global-revision half of this residual
-// (any letter booked anywhere rebuilds every at-pillar viewer's inbox at up
-// to 4 Hz); cheap now that mailInfoFor is bucket-based, and the
-// per-recipient buckets make a per-recipient revision the natural follow-up.
-
-// Ravenpost mailbox readout cadence, the market gate applied to `mail`: the
-// view is a full projection of the viewer's delivered letters (bodies
-// included) that used to re-serialize at 20 Hz for anyone standing at a raven
-// pillar, and nothing in it carries a sub-second clock. On top of the cadence,
-// a rebuild-only-on-change gate (sim.mailRevFor) skips the rebuild while
-// nothing changed; MAIL_REFRESH_TICKS is its staleness backstop, and the
-// viewer's OWN mail commands re-arm the gate so their take/delete/read
-// feedback still lands on the next snapshot. The always-streamed O(1) `mailU`
-// envelope count is deliberately NOT gated.
-const MAIL_WIRE_HZ = 4;
-export const MAIL_WIRE_INTERVAL_TICKS = Math.max(1, Math.round(1 / (DT * MAIL_WIRE_HZ)));
-export const MAIL_REFRESH_TICKS = 40;
-const MAIL_WIRE_PROMPT_CMDS = new Set<string>([
-  'mail_send',
-  'mail_take',
-  'mail_delete',
-  'mail_read',
 ]);
 
 type ClientMessage = Record<string, unknown> & {
@@ -1016,19 +941,6 @@ export interface ClientSession {
   lastMarketBrowseRev: number | null;
   lastMarketQueryRef: MarketQuery | null;
   lastMarketRebuildTick: number;
-  // Commission order board readout, same recipe at its own cadence
-  // (CORDER_WIRE_HZ): the board revision last built for plus the backstop
-  // tracker. The revision is viewer-independent (sim.commissionOrderBoardRev),
-  // so there is no query ref to track.
-  lastCorderWireTick: number;
-  lastCorderBoardRev: number | null;
-  lastCorderRebuildTick: number;
-  // Ravenpost mailbox readout, the market shape at its own cadence
-  // (MAIL_WIRE_HZ): the sim mail revision last built for and the tick of the
-  // last rebuild (the MAIL_REFRESH_TICKS staleness backstop's tracker).
-  lastMailWireTick: number;
-  lastMailRev: number | null;
-  lastMailRebuildTick: number;
   // set when a command or sim event that can change a heavy self field (bags,
   // gear, quests, talents, stats, ...) lands for this session, so the next
   // snapshot re-diffs those fields. Otherwise they're skipped (see
@@ -1909,8 +1821,6 @@ export class GameServer {
     ...SIM_LAP_PHASES,
     // Per-zone breakdown of the mob.update phase, with the same capture gating.
     ...SIM_MOB_ZONE_PHASES,
-    // Per-key-group breakdown of the bcastSelf phase, same capture gating.
-    ...SELF_WIRE_PHASES,
   ]);
   // Detailed-timing switch. When true, the per-client broadcast sub-phase timing
   // (bcastGrid/bcastSelf/visits) AND the sim.tick() perfLap sub-phases are measured;
@@ -1925,11 +1835,6 @@ export class GameServer {
   // probe pays one Map.get (plus one ring add) per mob per tick in steady state.
   // Unbounded is fine: templateIds are a finite content set (MOBS).
   private readonly mobUpdateBucketNames = new Map<string, string>();
-  // Per-callback ns accumulators behind the SELF_WIRE_PHASES buckets: filled by
-  // the selfWireJson lap probe across every session of a broadcast pass, then
-  // flushed into the tickProfiler beside the bcastSelf total. Only touched
-  // while perfDetailActive.
-  private readonly selfWireNs = new Map<string, bigint>();
   // On-demand capture state (admin-triggered). The deadline is wall-clock based:
   // a saturated sim may commit far fewer or many more ticks than nominal, but a
   // requested 30-second incident capture must still finish after about 30 seconds.
@@ -2207,12 +2112,6 @@ export class GameServer {
     moderator.lastMarketBrowseRev = null;
     moderator.lastMarketQueryRef = null;
     moderator.lastMarketRebuildTick = 0;
-    moderator.lastCorderWireTick = -CORDER_WIRE_INTERVAL_TICKS;
-    moderator.lastCorderBoardRev = null;
-    moderator.lastCorderRebuildTick = 0;
-    moderator.lastMailWireTick = -MAIL_WIRE_INTERVAL_TICKS;
-    moderator.lastMailRev = null;
-    moderator.lastMailRebuildTick = 0;
     moderator.sentEnts.clear();
     // force the heavy self block (tal/inv/equip/bags/...) to re-run next
     // snapshot: it is gated on meta.wireRev vs session.lastWireRev, and that
@@ -2247,12 +2146,6 @@ export class GameServer {
     moderator.lastMarketBrowseRev = null;
     moderator.lastMarketQueryRef = null;
     moderator.lastMarketRebuildTick = 0;
-    moderator.lastCorderWireTick = -CORDER_WIRE_INTERVAL_TICKS;
-    moderator.lastCorderBoardRev = null;
-    moderator.lastCorderRebuildTick = 0;
-    moderator.lastMailWireTick = -MAIL_WIRE_INTERVAL_TICKS;
-    moderator.lastMailRev = null;
-    moderator.lastMailRebuildTick = 0;
     moderator.sentEnts.clear();
     // same as enterSpectate: force the heavy self block to re-run so the
     // moderator's OWN talents/inventory/equip/etc. resend immediately
@@ -2728,7 +2621,6 @@ export class GameServer {
           this.sim.utcDay = new Date().toISOString().slice(0, 10);
           this.bcastGridNs = 0n;
           this.bcastSelfNs = 0n;
-          this.selfWireNs.clear();
           this.bcSerializeNs = 0n;
           this.bcVisits = 0;
           this.bcSerializes = 0;
@@ -2788,7 +2680,6 @@ export class GameServer {
           lap('broadcast');
           this.tickProfiler.add('bcastGrid', Number(this.bcastGridNs) / 1e6);
           this.tickProfiler.add('bcastSelf', Number(this.bcastSelfNs) / 1e6);
-          this.flushSelfWirePhases();
           this.socialPosTimer += dt;
           if (this.socialPosTimer >= 1) {
             this.socialPosTimer = 0;
@@ -3666,12 +3557,6 @@ export class GameServer {
       lastMarketBrowseRev: null,
       lastMarketQueryRef: null,
       lastMarketRebuildTick: 0,
-      lastCorderWireTick: -CORDER_WIRE_INTERVAL_TICKS,
-      lastCorderBoardRev: null,
-      lastCorderRebuildTick: 0,
-      lastMailWireTick: -MAIL_WIRE_INTERVAL_TICKS,
-      lastMailRev: null,
-      lastMailRebuildTick: 0,
       selfHeavyDirty: true,
       lastWireRev: -1,
       sentEnts: new Map(),
@@ -3846,15 +3731,6 @@ export class GameServer {
     }
     session.lastInputSeq = 0;
     session.lastInputAt = this.sim.time;
-    // Load-bearing for every rev + cadence gate (market, mail, corder):
-    // wiping lastSent makes sent.market/sent.mail/sent.corder undefined, and
-    // each gate's `sent.X === undefined` arm forces both dueness and a
-    // rebuild on the next snapshot, so the stale lastXRev trackers need no
-    // reset here (pinned by the resume case in
-    // tests/commission_wire_cadence.test.ts). A future resume that PRESERVES
-    // lastSent (a reconnect-bandwidth optimization) must reset those
-    // trackers instead, or the gates serve a stale view until their
-    // staleness backstops.
     session.lastSent = {};
     session.timerWireVersion =
       meta.timerWireVersion === STABLE_TIMER_WIRE_VERSION ? STABLE_TIMER_WIRE_VERSION : 1;
@@ -5473,20 +5349,6 @@ export class GameServer {
     this.perfCaptureMaxTicksPerCallback = Math.max(this.perfCaptureMaxTicksPerCallback, ticksRun);
   }
 
-  // Flush the per-pass selfWireJson bucket accumulators into the profiler,
-  // beside the bcastSelf total they decompose. A method (not inline in the
-  // loop callback) so the flush BODY is testable directly, and the loop-side
-  // wiring (this call site next to the bcastSelf add, plus the per-pass
-  // selfWireNs.clear) is source-pinned by the same suite
-  // (tests/self_wire_phase_breakdown.test.ts), so deleting either cannot
-  // silently zero or inflate the admin table.
-  private flushSelfWirePhases(): void {
-    if (!this.perfDetailActive) return;
-    for (const [phase, ns] of this.selfWireNs) {
-      this.tickProfiler.add(phase, Number(ns) / 1e6);
-    }
-  }
-
   // Resolve (and memoize) the registered profiler bucket for a mob template. A
   // templateId whose family does not resolve falls into 'other'; every result is a
   // name registered via MOB_UPDATE_BUCKETS, so TickProfiler.add never drops it.
@@ -6276,16 +6138,6 @@ export class GameServer {
     if (typeof msg.cmd === 'string' && MARKET_WIRE_PROMPT_CMDS.has(msg.cmd)) {
       session.lastMarketWireTick = -MARKET_WIRE_INTERVAL_TICKS;
     }
-    // Same prompt re-arm for the commission board gate.
-    if (typeof msg.cmd === 'string' && CORDER_WIRE_PROMPT_CMDS.has(msg.cmd)) {
-      session.lastCorderWireTick = -CORDER_WIRE_INTERVAL_TICKS;
-    }
-    // Same re-arm for the viewer's own mail commands (send/take/delete/read):
-    // their mailbox feedback lands on the next snapshot instead of waiting out
-    // the MAIL_WIRE_HZ cadence.
-    if (typeof msg.cmd === 'string' && MAIL_WIRE_PROMPT_CMDS.has(msg.cmd)) {
-      session.lastMailWireTick = -MAIL_WIRE_INTERVAL_TICKS;
-    }
     switch (command) {
       case 'castSlot':
         if (typeof msg.slot === 'number') sim.castAbilityBySlot(msg.slot | 0, pid);
@@ -6588,10 +6440,8 @@ export class GameServer {
       // a HEAVY_SELF_EVENTS member so a delivery's bag change re-diffs the
       // crafter's own inv mirror on the next snapshot (the requester's side
       // rides the ordinary addItemInstance loot event). The durable order
-      // list itself converges through the `corder` self-delta for every
-      // affected viewer, not through this event: the actor on the next
-      // snapshot (their own command re-arms the corder gate), passive
-      // viewers within one CORDER_WIRE_HZ window.
+      // list itself converges through the per-tick `corder` self-delta for
+      // every affected viewer, not through this event.
       case 'open_commission_order':
         if (typeof msg.recipe === 'string' && (msg.scope === 'open' || msg.scope === 'crafter')) {
           sim.openCommissionOrder(
@@ -8282,18 +8132,6 @@ export class GameServer {
     anchorSession: ClientSession = session,
     vcupDue = false,
   ): string {
-    // Per-bucket attribution for bcastSelf (SELF_WIRE_PHASES): one clock read
-    // per bucket boundary, active only during a detailed capture, accumulated
-    // across every session of the pass into selfWireNs and flushed beside the
-    // bcastSelf total. The steady-state loop pays a single null check.
-    let selfLapMark = this.perfDetailActive ? process.hrtime.bigint() : 0n;
-    const selfLap = this.perfDetailActive
-      ? (bucket: string): void => {
-          const t = process.hrtime.bigint();
-          this.selfWireNs.set(bucket, (this.selfWireNs.get(bucket) ?? 0n) + (t - selfLapMark));
-          selfLapMark = t;
-        }
-      : null;
     const stableTimerWire = session.timerWireVersion === STABLE_TIMER_WIRE_VERSION;
     const self = wireEntity(p, !stableTimerWire);
     Object.assign(self, {
@@ -8342,7 +8180,6 @@ export class GameServer {
       ddiff: this.sim.dungeonDifficulty(anchorSession.pid),
     });
     const json = JSON.stringify(self);
-    selfLap?.('self.base');
     // heavy, rarely-changing fields ride along only when their serialized
     // form differs from what this session last received; the client treats
     // an absent field as "unchanged" (a fresh session always gets them all)
@@ -8484,7 +8321,6 @@ export class GameServer {
     }
     maybe('stats', p.stats);
     maybe('weapon', p.weapon);
-    selfLap?.('self.timers');
     maybe('party', this.partyWire(anchorSession.pid));
     maybe('marks', this.markersWire(anchorSession.pid));
     maybe('trade', this.tradeWire(anchorSession.pid));
@@ -8498,7 +8334,6 @@ export class GameServer {
       session.lastArenaWireTick = this.sim.tickCount;
       maybe('arena', this.sim.arenaInfoFor(anchorSession.pid));
     }
-    selfLap?.('self.social');
     // Thornhollow Fields readout at its own UI cadence (BG_WIRE_HZ). The viewer-identical
     // match core is memoized per tick inside the sim (sharedMatchView), so ten
     // in-match viewers share one build; only the per-viewer scalars differ.
@@ -8512,7 +8347,6 @@ export class GameServer {
       );
       maybe('bg', this.sim.bgInfoFor(anchorSession.pid, ladder));
     }
-    selfLap?.('self.bg');
     // Vale Cup readout at its own UI cadence (VC_WIRE_HZ). Dueness (`vcupDue`) is
     // decided once per broadcast pass in broadcastSnapshots and realm-global, so the
     // shared bundle is built once per due pass rather than on each session's own
@@ -8569,7 +8403,6 @@ export class GameServer {
         maybe('vcup', null);
       }
     }
-    selfLap?.('self.vcup');
     // Dungeon Finder at its own UI cadence (DF_WIRE_HZ): the personal `df`
     // blob carries whole-second clocks (queue wait, proposal countdown), so
     // re-evaluating every tick would re-serialize it 20 times per visible
@@ -8589,7 +8422,6 @@ export class GameServer {
         ),
       );
     }
-    selfLap?.('self.df');
     // market info is null unless the player is standing at the Merchant, so it
     // only rides the wire for players actually browsing the World Market.
     // Rebuilding that view is a filter plus a page over the WHOLE listing book,
@@ -8628,35 +8460,8 @@ export class GameServer {
     // the lightweight collect-indicator bit streams ALWAYS (the mailU pattern),
     // so the minimap badge lights anywhere while proceeds/items wait
     maybe('mktU', this.sim.marketCollectPendingFor(anchorSession.pid) ? 1 : 0);
-    selfLap?.('self.market');
-    // The Ravenpost mailbox view rides the market gate's exact shape: on the
-    // MAIL_WIRE_HZ cadence (re-armed by the viewer's own mail commands), only
-    // when the sim's mail revision moved since the last build, with
-    // MAIL_REFRESH_TICKS as the staleness backstop. The full projection
-    // (letter bodies included) used to re-serialize at 20 Hz for every player
-    // at a raven pillar; nothing in it carries a sub-second clock. Null (not
-    // at a pillar) still ships promptly on the cadence so the window closes.
-    const mailDue =
-      this.sim.tickCount - session.lastMailWireTick >= MAIL_WIRE_INTERVAL_TICKS ||
-      sent.mail === undefined;
-    if (mailDue) {
-      session.lastMailWireTick = this.sim.tickCount;
-      const mailRev = this.sim.mailRevFor(anchorSession.pid);
-      if (mailRev === null) {
-        maybe('mail', null);
-        session.lastMailRev = null;
-      } else if (
-        sent.mail === undefined ||
-        mailRev !== session.lastMailRev ||
-        this.sim.tickCount - session.lastMailRebuildTick >= MAIL_REFRESH_TICKS
-      ) {
-        session.lastMailRebuildTick = this.sim.tickCount;
-        maybe('mail', this.sim.mailInfoFor(anchorSession.pid));
-        session.lastMailRev = mailRev;
-      }
-    }
+    maybe('mail', this.sim.mailInfoFor(anchorSession.pid));
     maybe('mailU', this.sim.mailUnreadFor(anchorSession.pid));
-    selfLap?.('self.mail');
     // bank info is null unless the player is standing at a banker, so it only
     // rides the wire for players actually browsing their deposit box (the mail
     // pattern). Not heavy-gated: it appears from proximity, not this session's
@@ -8670,7 +8475,6 @@ export class GameServer {
     // bank: it can change from OTHER members' deposits, not just this
     // session's own commands.
     maybe('guildBank', this.sim.guildBankInfoFor(anchorSession.pid));
-    selfLap?.('self.bank');
     // open need-greed rolls this player can still answer, so a client that
     // missed the transient lootRoll event re-shows the prompt from state. Stays
     // per-tick (it's interactive state that appears from others' actions).
@@ -8687,14 +8491,12 @@ export class GameServer {
     // does while lastSent is empty) the key delta-elides away for them. Per-tick
     // like lroll, and like lroll it costs one pendingLootRolls scan per session.
     maybe('mloot', this.sim.activeMasterLootRolls(anchorSession.pid));
-    selfLap?.('self.loot');
     maybe('drun', this.sim.delveRunWire(anchorSession.pid));
     maybe('dcompanion', this.sim.delveCompanionWire(anchorSession.pid));
     maybe('dmarks', this.sim.delveMarksFor(anchorSession.pid));
     maybe('dcomp', this.sim.companionUpgradesFor(anchorSession.pid));
     maybe('dclears', this.sim.delveClearsFor(anchorSession.pid));
     maybe('delveDaily', this.sim.delveDailyWire(anchorSession.pid));
-    selfLap?.('self.delve');
     // per-player read, so kept per-tick like the other small maps above. Wire
     // key `prof` and IWorld member `professionsState` are the settled names
     // for the professions facet (#1164, src/sim/professions/CLAUDE.md). `gprof`
@@ -8710,34 +8512,11 @@ export class GameServer {
     // naturally flips to null the tick a station lapses and the client never
     // reasons about tick domains. Small scalar, diffed per tick like atitle.
     maybe('mst', this.sim.activeMobileStationCraftFor(anchorSession.pid));
-    selfLap?.('self.prof');
-    // Commission order board (issue #1298): the viewer's projection (their
-    // requests, any order they accepted, and the open board); this is how
-    // BOTH sides of an accept/deliver converge, not the
-    // commissionOrderResult event. NOT a small read: it walks the whole
-    // realm-global board and every open-scope order is in every viewer's
-    // projection, so it rides the market recipe: its own cadence
-    // (CORDER_WIRE_HZ; the viewer's own commission commands re-arm the
-    // gate), a rebuild-only-on-change check against the board revision
-    // (viewer-independent, so no per-viewer signal is needed), and a
-    // staleness backstop.
-    const corderDue =
-      this.sim.tickCount - session.lastCorderWireTick >= CORDER_WIRE_INTERVAL_TICKS ||
-      sent.corder === undefined;
-    if (corderDue) {
-      session.lastCorderWireTick = this.sim.tickCount;
-      const boardRev = this.sim.commissionOrderBoardRev;
-      if (
-        sent.corder === undefined ||
-        boardRev !== session.lastCorderBoardRev ||
-        this.sim.tickCount - session.lastCorderRebuildTick >= CORDER_BOARD_REFRESH_TICKS
-      ) {
-        session.lastCorderBoardRev = boardRev;
-        session.lastCorderRebuildTick = this.sim.tickCount;
-        maybe('corder', this.sim.commissionOrdersFor(anchorSession.pid));
-      }
-    }
-    selfLap?.('self.corder');
+    // Commission order board (issue #1298): the viewer's own projection
+    // (their requests, any order they accepted, and the open board), small
+    // and diffed per tick like `prof`/`cprof` above; this is how BOTH sides
+    // of an accept/deliver converge, not the commissionOrderResult event.
+    maybe('corder', this.sim.commissionOrdersFor(anchorSession.pid));
     // The viewer's own most recent enchanting-action outcomes (Professions
     // 2.0), or null. Small per-player reads diffed per tick like the other
     // scalars above (a successful action already refreshed the self inventory via
@@ -8779,7 +8558,6 @@ export class GameServer {
     // this session dirty, and the title echo must not wait on the heavy gate).
     maybe('renown', meta.renown);
     maybe('atitle', meta.activeTitle);
-    selfLap?.('self.craft');
     // Heavy, rarely-changing fields: building + stringifying these every tick for
     // every player is the dominant avoidable broadcast cost. Skip them unless a
     // heavy command/event marked this session dirty, or its staggered safety
@@ -8854,10 +8632,7 @@ export class GameServer {
       // strand the client on the sport kit).
       maybe('sport', meta.sportRole ? { role: meta.sportRole } : null);
     }
-    selfLap?.('self.heavy');
-    const assembled = extra === '' ? json : `${json.slice(0, -1)}${extra}}`;
-    selfLap?.('self.assemble');
-    return assembled;
+    return extra === '' ? json : `${json.slice(0, -1)}${extra}}`;
   }
 
   // Global party-frame aggregates (aggro holders + incoming heals), scanned once
