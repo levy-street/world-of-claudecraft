@@ -10707,6 +10707,13 @@ export class Sim {
     return this.postOffice.mailInfoFor(pid);
   }
 
+  // Server-only broadcast helper (never IWorld, the marketBrowseRevFor shape):
+  // the cheap change signal server/game.ts polls before paying for a
+  // mailInfoFor rebuild. Null while the player is not at a raven pillar.
+  mailRevFor(pid: number): number | null {
+    return this.postOffice.mailRevFor(pid);
+  }
+
   mailUnreadFor(pid: number): number {
     return this.postOffice.mailUnreadFor(pid);
   }
