@@ -169,7 +169,7 @@ CAST = {
             # `lowerarm.l`: a strapped shield tracks the forearm, and on the hand slot it
             # swung out beside the body like a tray through Walking_A and Block. Do not
             # decompose or re-derive these.
-            {"url": "weapons/adv_sword_1handed.glb", "bone": "handslot.r",
+            {"url": "weapons/adv_sword_1handed.glb", "bone": "handslot.r", "fixed": True,
              "seat": [
                  (0.886411, -0.031524, -0.033389, -0.883133),
                  (-0.039559, -0.196534, -0.864664, -0.017141),
@@ -244,7 +244,7 @@ CAST = {
             # `lowerarm.l`: a strapped shield tracks the forearm, and on the hand slot it
             # swung out beside the body like a tray through Walking_A and Block. Do not
             # decompose or re-derive these.
-            {"url": "weapons/sword_1handed.glb", "bone": "handslot.r", "grip": "blade",
+            {"url": "weapons/sword_1handed.glb", "bone": "handslot.r", "fixed": True, "grip": "blade",
              "seat": [
                  (0.882923, -0.088573, -0.020867, -0.874462),
                  (-0.039145, -0.185949, -0.86702, -0.494415),
@@ -252,7 +252,7 @@ CAST = {
                  (0.0, 0.0, 0.0, 1.0),
              ],
              "why": "A warden's arming sword: island-forged, unremarkable, kept sharp."},
-            {"url": "weapons/shield_square.glb", "bone": "lowerarm.l", "grip": "shield",
+            {"url": "weapons/shield_square.glb", "bone": "lowerarm.l", "fixed": True, "grip": "shield",
              "seat": [
                  (-0.065468, -0.157533, 0.328094, 0.865933),
                  (-0.294582, -0.172836, -0.141768, -0.02),
@@ -301,7 +301,7 @@ CAST = {
             # `lowerarm.l`: a strapped shield tracks the forearm, and on the hand slot it
             # swung out beside the body like a tray through Walking_A and Block. Do not
             # decompose or re-derive these.
-            {"url": "weapons/sword_1handed.glb", "bone": "handslot.r", "grip": "blade",
+            {"url": "weapons/sword_1handed.glb", "bone": "handslot.r", "fixed": True, "grip": "blade",
              "seat": [
                  (0.882923, -0.088573, -0.020867, -0.874462),
                  (-0.039145, -0.185949, -0.86702, -0.494415),
@@ -309,7 +309,7 @@ CAST = {
                  (0.0, 0.0, 0.0, 1.0),
              ],
              "why": "The same sword. Nothing about the last hour is newly equipped."},
-            {"url": "weapons/shield_square.glb", "bone": "lowerarm.l", "grip": "shield",
+            {"url": "weapons/shield_square.glb", "bone": "lowerarm.l", "fixed": True, "grip": "shield",
              "seat": [
                  (-0.065468, -0.157533, 0.328094, 0.865933),
                  (-0.294582, -0.172836, -0.141768, -0.02),
@@ -376,7 +376,7 @@ CAST = {
             # crown (review 1.4) nor a grounded-vertical carry off Marsh's polearm
             # rotation was accepted on look. Do not decompose this back into
             # rot/offset/scale, and do not re-derive it.
-            {"url": "weapons/brasscrown_walking_staff.glb", "bone": "handslot.r", "grip": "stave",
+            {"url": "weapons/brasscrown_walking_staff.glb", "bone": "handslot.r", "fixed": True, "grip": "stave",
              "seat": [
                  (0.283230, 0.258260, 0.537292, -0.768651),
                  (0.397020, 0.362019, -0.383298, -0.124619),
@@ -429,9 +429,9 @@ CAST = {
             "squad's gear outperforms the militia's.",
         ],
         "weapons": [
-            {"url": "weapons/iron_field_hammer.glb", "bone": "handslot.r", "grip": "haft",
+            {"url": "weapons/iron_field_hammer.glb", "bone": "handslot.r", "fixed": True, "grip": "haft",
              "why": "The field hammer she rebuilds the redoubt's kit with. It has a name."},
-            {"url": "tools/tongs.glb", "bone": "handslot.l", "grip": "tool",
+            {"url": "tools/tongs.glb", "bone": "handslot.l", "fixed": True, "grip": "tool",
              "why": "Forge tongs: how star-glass gets handled by someone who intends to keep her fingers."},
         ],
         "poses": [
@@ -478,7 +478,7 @@ CAST = {
             "the island whose hands are the tools.",
         ],
         "weapons": [
-            {"url": "tools/lantern.glb", "bone": "handslot.l", "grip": "hang",
+            {"url": "tools/lantern.glb", "bone": "handslot.l", "fixed": True, "grip": "hang",
              "why": "He works among the wounded at night. The lantern is how they find him."},
         ],
         "poses": [

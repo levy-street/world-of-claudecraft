@@ -101,7 +101,58 @@ through every clip).**
    cannot name its evidence is a claim about the checker's checklist, not
    about the art.
 
-## Who authors a seat
+## The contract: the shipped GLB is the only artifact
+
+Everything above was written while the book and the game were TWO SOURCES OF TRUTH.
+The book placed held props in Blender; the game re-derived them at runtime from the
+shared grip tables. Two mechanisms agree only by coincidence, and they drifted every
+single time: Ollun's staff sat level at his hip in game while the page showed it
+crown-up, and Coalfast's shield sat in his fist rather than strapped to his forearm.
+
+That split is now closed, and this is the rule that replaces the seat-capture dance:
+
+> **A figure's fixed props are baked INTO its body GLB, and the concept book
+> photographs that shipped GLB. One artifact, read by both.**
+
+- `cast.py` marks a prop `"fixed": True`. `crew.export` keeps those (still skinned to
+  their carrying bone) instead of dropping them; anything unflagged is still dropped,
+  because it is a swappable prop the game mounts through `VisualDef.attach`.
+- `plates.render_member` loads `public/models/chars/npcs/<id>.glb` rather than
+  rebuilding the figure, so a plate is EVIDENCE ABOUT THE FILE THE GAME LOADS. Its
+  manifest records which path ran, so a plate cannot quietly claim to be something else.
+- The Last Bell `VisualDef`s therefore carry NO `attach`, and re-adding one puts the
+  drift straight back. Pinned by `tests/visual_manifest.test.ts`, which asserts both the
+  absent `attach` and the presence of each `Prop_*` node inside the shipped GLB.
+
+### Fixed or attached
+
+Bake it when the figure always carries that exact thing: a story NPC, a fixed piece of
+characterisation. Two costs, both real: a baked prop **cannot sheathe or be swapped**
+(the stow system only moves attached props), and it brings its own material, so it adds
+one draw. Attach it when a player equips it, when it must sheathe, or when the model is
+shared across many holders and a per-family fit is genuinely the right answer.
+
+### The one command
+
+    node scripts/assets/last_bell_crew/ship.mjs ollun,coalfast
+    node scripts/assets/last_bell_crew/ship.mjs all
+
+Build and export raw, optimize into `public/` (meshopt: the runtime loader cannot read a
+raw export), photograph the shipped file into plates, rebuild the page, regenerate the
+media manifest. The order matters: photographing before optimizing puts the book back to
+picturing something that never shipped.
+
+### The loop this is built for
+
+1. An agent or a human composes the figure and its carry in the live Blender session.
+2. The human nudges whatever looks wrong, in Blender, directly.
+3. `ship.mjs` runs. The page updates.
+4. The page is the review surface and the share surface. It is a plain HTML file plus a
+   webp folder in `docs/design/`, so anyone with the repo opens it directly, no server.
+5. When the page is right, the game is already right. There is no separate "add it to
+   the game" step that can disagree, because the game loads the file the page pictured.
+
+## Who authors a seat, when a prop IS attached
 
 Both can. **An agent should attempt a seat**, and the attempt is judged by the gate
 above, never by the search that produced it. What is NOT acceptable is treating a
