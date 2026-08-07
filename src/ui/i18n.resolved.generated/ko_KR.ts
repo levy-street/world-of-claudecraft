@@ -8763,7 +8763,7 @@ export const ko_KR: EnTranslations = {
       },
       "intervene": {
         "name": "엄호",
-        "description": "아군 플레이어에게 돌진하여 6초 동안 피해 {damage}을(를) 흡수하는 보호막을 부여합니다. 사거리 8-25yd."
+        "description": "아군 플레이어에게 돌진하여 6초 동안 피해 {damage}을(를) 흡수하는 보호막을 부여합니다."
       },
       "recklessness": {
         "name": "무모함",

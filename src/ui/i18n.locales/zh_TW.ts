@@ -80,7 +80,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.die_by_sword.name': '劍在人在',
   'entities.abilities.intervene.name': '援護',
   'entities.abilities.intervene.description':
-    '衝向一名友方玩家，為其抵擋 {damage} 點傷害，持續 6 秒。可在 8 到 25 碼距離使用。',
+    '衝向一名友方玩家，為其抵擋 {damage} 點傷害，持續 6 秒。',
   'entities.abilities.emboldening_roar.description':
     '發出壯膽的怒吼：你與 40 碼內的友方玩家獲得壯膽效果，且你接下來的 3 個技能必定是暴擊。（狂怒）',
   'entities.abilities.emboldening_roar.name': '壯膽怒吼',

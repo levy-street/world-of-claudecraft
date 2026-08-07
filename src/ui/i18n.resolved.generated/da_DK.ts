@@ -8763,7 +8763,7 @@ export const da_DK: EnTranslations = {
       },
       "intervene": {
         "name": "Intervene",
-        "description": "Rush to a friendly player, shielding them from {damage} damage for 6 sec. Usable from 8 to 25 yards."
+        "description": "Rush to a friendly player, shielding them from {damage} damage for 6 sec."
       },
       "recklessness": {
         "name": "Dumdristighed",

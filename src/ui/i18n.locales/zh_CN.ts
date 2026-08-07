@@ -80,7 +80,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.die_by_sword.name': '剑在人在',
   'entities.abilities.intervene.name': '援护',
   'entities.abilities.intervene.description':
-    '冲向一名友方玩家，为其抵挡 {damage} 点伤害，持续 6 秒。可在 8 到 25 码距离使用。',
+    '冲向一名友方玩家，为其抵挡 {damage} 点伤害，持续 6 秒。',
   'entities.abilities.emboldening_roar.description':
     '发出一声鼓舞的怒吼：你和 40 码内的友方玩家获得鼓舞，你接下来的 3 个技能必定暴击。（狂怒）',
   'entities.abilities.emboldening_roar.name': '鼓舞怒吼',

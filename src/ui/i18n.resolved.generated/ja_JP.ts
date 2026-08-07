@@ -8763,7 +8763,7 @@ export const ja_JP: EnTranslations = {
       },
       "intervene": {
         "name": "援護",
-        "description": "味方プレイヤーに突撃し、6秒間{damage}ダメージを吸収するシールドを付与します。射程8-25yd。"
+        "description": "味方プレイヤーに突撃し、6秒間{damage}ダメージを吸収するシールドを付与します。"
       },
       "recklessness": {
         "name": "無謀",

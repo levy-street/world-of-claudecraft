@@ -77,7 +77,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.die_by_sword.name': 'Погибель от меча',
   'entities.abilities.intervene.name': 'Вмешательство',
   'entities.abilities.intervene.description':
-    'Рывок к союзному игроку, поглощающий {damage} ед. урона в течение 6 сек. Действует на расстоянии от 8 до 25 м.',
+    'Рывок к союзному игроку, поглощающий {damage} ед. урона в течение 6 сек.',
   'entities.abilities.emboldening_roar.description':
     'Издает ободряющий рев: вы и дружественные игроки в пределах 40 м воодушевлены, а ваши следующие 3 способности гарантированно станут критическими ударами. (ветка «Неистовство»)',
   'entities.abilities.emboldening_roar.name': 'Ободряющий рев',

@@ -5333,8 +5333,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
         effects: [{ type: 'charge' }, { type: 'absorb', amount: 50, duration: 6 }],
       },
     ],
-    description:
-      'Rush to a friendly player, shielding them from $d damage for 6 sec. Usable from 8 to 25 yards.',
+    description: 'Rush to a friendly player, shielding them from $d damage for 6 sec.',
   },
   recklessness: {
     id: 'recklessness',

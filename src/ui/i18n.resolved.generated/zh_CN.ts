@@ -8763,7 +8763,7 @@ export const zh_CN: EnTranslations = {
       },
       "intervene": {
         "name": "援护",
-        "description": "冲向一名友方玩家，为其抵挡 {damage} 点伤害，持续 6 秒。可在 8 到 25 码距离使用。"
+        "description": "冲向一名友方玩家，为其抵挡 {damage} 点伤害，持续 6 秒。"
       },
       "recklessness": {
         "name": "鲁莽",

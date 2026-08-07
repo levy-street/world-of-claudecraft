@@ -79,7 +79,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.die_by_sword.name': '剣に死す',
   'entities.abilities.intervene.name': '援護',
   'entities.abilities.intervene.description':
-    '味方プレイヤーに突撃し、6秒間{damage}ダメージを吸収するシールドを付与します。射程8-25yd。',
+    '味方プレイヤーに突撃し、6秒間{damage}ダメージを吸収するシールドを付与します。',
   'entities.abilities.emboldening_roar.description':
     '奮い立たせる咆哮を上げ、40yd以内の自分と味方プレイヤーを鼓舞します。次の3回のアビリティが必ずクリティカルになります。（狂怒）',
   'entities.abilities.emboldening_roar.name': '奮起の咆哮',

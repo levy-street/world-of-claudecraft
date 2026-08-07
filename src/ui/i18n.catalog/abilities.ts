@@ -1582,7 +1582,7 @@ const classAbilityNamesEn = {
       [
         'intervene',
         'Intervene',
-        'Rush to a friendly player, shielding them from {damage} damage for 6 sec. Usable from 8 to 25 yards.',
+        'Rush to a friendly player, shielding them from {damage} damage for 6 sec.',
       ],
       [
         'recklessness',
