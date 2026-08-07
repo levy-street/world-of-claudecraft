@@ -181,6 +181,36 @@ describe('bagItemAction priority order', () => {
     // the recipe and consumes the copy.
     expect(bagItemAction(ITEMS.pattern, NO_MODE)).toBe('use');
   });
+
+  it('stages a recipe pattern in every transfer mode like an ordinary tradable drop', () => {
+    // A pattern carries no transfer restriction of its own (no noMarketList,
+    // no soulbound, no quest kind), and that is a claim about the whole mode
+    // matrix, not only the NO_MODE rung the case above covers. The literals
+    // come first on purpose: a bare compare against the reference item would
+    // stay green if the ladder broke for BOTH of them.
+    const MODES = [
+      'tradeOpen',
+      'mailAttach',
+      'marketSell',
+      'vendorOpen',
+      'guildBankDeposit',
+      'bankDeposit',
+    ] as const;
+    const staged = MODES.map((mode) => bagItemAction(ITEMS.pattern, { ...NO_MODE, [mode]: true }));
+    expect(staged).toEqual([
+      'trade',
+      'mailAttach',
+      'marketSell',
+      'vendorSell',
+      'guildBankDeposit',
+      'bankDeposit',
+    ]);
+    // And identical to the unrestricted reference item, so a def-level gate
+    // added to patterns later cannot land without failing here.
+    expect(staged).toEqual(
+      MODES.map((mode) => bagItemAction(ITEMS.sword, { ...NO_MODE, [mode]: true })),
+    );
+  });
 });
 
 describe('transfer-locked instanced copies (issue 1165)', () => {

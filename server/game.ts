@@ -8846,10 +8846,16 @@ export class GameServer {
       if (ev.type === 'fishingEmptyHook') {
         gameMetricsCounters().fishingEmptyHook(ev.zoneId, fishingBandLabel(ev.band));
       }
-      // One rod training fee paid. Only the ok arm charges (Sim.trainRecipe
-      // debits exactly once and a duplicate resolves train_already_known), so
-      // the ok check is what makes this a payment count and not an attempt
-      // count. The fee amount is static content, published as woc_rod_fee_copper.
+      // One rod training fee paid. The ok arm is what separates a payment from
+      // an attempt on the TRAINER path (Sim.trainRecipe debits exactly once and
+      // a duplicate resolves train_already_known), but ok alone no longer
+      // implies a fee: a pattern-item learn (src/sim/professions/pattern_items.ts)
+      // emits trainResult ok having charged nothing. So this stays a payment
+      // count only while no rod recipe carries 'drop' acquisition, which is what
+      // makes a pattern able to teach it; both rod recipes are trainer-only
+      // today. Give one a pattern and this arm needs a fee-bearing discriminator
+      // instead. The fee amount is static content, published as
+      // woc_rod_fee_copper.
       if (ev.type === 'trainResult' && ev.ok && isRodFeeRecipe(ev.recipeId)) {
         gameMetricsCounters().rodFeePaid(ev.recipeId);
       }

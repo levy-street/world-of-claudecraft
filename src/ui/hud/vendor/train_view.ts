@@ -82,9 +82,17 @@ export interface TrainViewDeps {
   /** Server-confirmed learns (trainResult ok) the mirrored knownRecipes set
    *  may not carry yet: unioned into the known set so the row flips to Known
    *  the moment the result lands, never a repaint behind the cprof mirror.
-   *  Their fees stay reserved until the mirror carries the grant, because
-   *  the cprof grant and the debited copper ride the same self-frame: an
-   *  unmirrored confirm means an unmirrored debit. Absent means none. */
+   *  Their fees stay reserved until the mirror carries the grant, because on
+   *  the TRAINER path the cprof grant and the debited copper ride the same
+   *  self-frame, so an unmirrored confirm means an unmirrored debit.
+   *  A pattern-item learn (src/sim/professions/pattern_items.ts) joins this
+   *  set too, since TrainLearnTracker.resolve accepts an unsolicited
+   *  trainResult, and it charges no fee at all. So for the one broadcast
+   *  between that confirm and its cprof, availableTrainCopper reserves a fee
+   *  that will never be debited: the estimate over-reserves and fails CLOSED
+   *  (a sibling row can read unaffordable for a moment; nothing is ever
+   *  wrongly enabled), and it clears itself once the mirror carries the grant
+   *  and the id leaves the reserve. Absent means none. */
   confirmedRecipes?: ReadonlySet<string>;
 }
 

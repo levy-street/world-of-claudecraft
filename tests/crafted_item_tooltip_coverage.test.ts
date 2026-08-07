@@ -59,8 +59,16 @@ const EFFECT_SOURCES: Array<[string, (def: ItemDef) => boolean]> = [
   // builder answers '' for a pattern whose taught recipe does not resolve or
   // is not drop-acquirable, and a kind-alone predicate would green-light
   // exactly those, which are the patterns whose click is a silent no-op. The
-  // viewer is the widest honest one (synced, nothing known, no skill), so this
-  // fires whenever the hud branch would render anything at all.
+  // viewer (synced, nothing known, no skill) is the widest one for the two
+  // lines this sweep is about: the teaches line renders whenever the result
+  // item resolves, and the requirement line renders at its most permissive.
+  // It is not universal, and the ONE case it misses is worth naming rather
+  // than rounding off: a viewer who already KNOWS the recipe also gets the
+  // already-known line, so a pattern whose result item has no ItemDef AND
+  // whose recipe prints no requirement line (skillReq 0, or a craft with no
+  // name key) would render that single line for them while this predicate
+  // reads ''. Such a def is a tooltip that says nothing to everyone else, so
+  // failing this sweep is the right answer for it, not a false negative.
   [
     'recipe pattern lines',
     (def) =>

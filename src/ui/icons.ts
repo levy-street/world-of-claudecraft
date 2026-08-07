@@ -3565,6 +3565,14 @@ function itemFallback(id: string): IconRecipe | null {
     const isCloth = has(name, ['linen', 'silk', 'woven', 'cloth', 'wool']);
     return r(isCloth ? 'cloth' : 'leather', isCloth ? 'cloth' : 'leather', ['sack'], fx);
   }
+  // Recipe patterns (kind 'recipe') are a written page, so they take the same
+  // 'parchment' ground quest items do rather than falling through to the junk
+  // trinket below, which would ink every unlearned pattern the color of vendor
+  // trash. It sits ahead of BOTH arms below: the fall-through keys on 'quest'
+  // alone, and the fish arm matches on the NAME with no kind gate, so a pattern
+  // named "Pattern: Steel Longsword" would draw a fish off the 'eel' substring.
+  // Every arm above is kind-gated and cannot match a 'recipe'.
+  if (it.kind === 'recipe') return r('parchment', 'leather', ['scroll'], fx);
   // Raw fishing catches left kind food for cooking reagents; keep a fish-like
   // procedural recipe so they never fall through to generic junk trinkets when
   // static WebP is missing. Name tokens cover cooked fish siblings and rares.
@@ -3574,11 +3582,6 @@ function itemFallback(id: string): IconRecipe | null {
   ) {
     return r('drink', 'sky', ['fish'], fx);
   }
-  // Recipe patterns (kind 'recipe') are a written page, so they take the same
-  // 'parchment' ground quest items do rather than falling through to the junk
-  // trinket below, which would ink every unlearned pattern the color of vendor
-  // trash. Ahead of the fall-through because that arm keys on 'quest' alone.
-  if (it.kind === 'recipe') return r('parchment', 'leather', ['scroll'], fx);
   const t = trinketPrimitive(name);
   return r(it.kind === 'quest' ? 'parchment' : 'junk', t.pal, [{ p: t.p, pal: t.pal }], fx);
 }

@@ -23,6 +23,7 @@ import {
   marketItemMatches,
 } from '../src/sim/market_query';
 import { resolvePatternLearn } from '../src/sim/professions/pattern_items';
+import type { TrainResult } from '../src/sim/professions/training';
 import type { ProfessionRecipeRecord } from '../src/sim/professions/types';
 import { Sim } from '../src/sim/sim';
 import type { Entity, ItemDef, SimEvent } from '../src/sim/types';
@@ -229,6 +230,13 @@ describe('using a recipe pattern (offline host, the real useItem path)', () => {
     const { pid, meta } = patternHolder(sim, 100);
     expect(meta.knownRecipes.has(PATTERN_RECIPE.id)).toBe(false);
     expect(sim.countItem(PATTERN_ID, pid)).toBe(1);
+    // A SENTINEL, not the birth default (which is null): the pin below has to
+    // tell "the learn left this alone" apart from "nothing has ever written
+    // it", and only a pre-stamped value can. meta.lastTrainResult is the train
+    // COMMAND's own probe, so a pattern learn writing it would leave the next
+    // reader holding a train outcome that never happened.
+    const probeSentinel: TrainResult = { ok: false, recipeId: 'recipe_sentinel', fee: 7 };
+    meta.lastTrainResult = probeSentinel;
 
     const events = useAndCollect(sim, PATTERN_ID, pid);
     expect(errorTexts(events)).toEqual([]);
@@ -243,6 +251,10 @@ describe('using a recipe pattern (offline host, the real useItem path)', () => {
 
     expect(meta.knownRecipes.has(PATTERN_RECIPE.id)).toBe(true);
     expect(sim.countItem(PATTERN_ID, pid)).toBe(0);
+    // Untouched, object identity included: Sim.trainRecipe assigns a fresh
+    // resolveTrain result here on EVERY train, ok or not, and the pattern path
+    // deliberately does not (see the comment at its emit site).
+    expect(meta.lastTrainResult).toBe(probeSentinel);
     // The public read the offline HUD actually consumes, not the raw Set: this
     // is the surface a client sees, so the learn is proven end to end offline.
     expect(sim.craftingIdentityFor(pid).knownRecipes).toContain(PATTERN_RECIPE.id);
@@ -402,7 +414,10 @@ describe('patterns on the World Market', () => {
     const matched = MARKET_ITEM_TYPE_FILTERS.filter((itemType) =>
       marketItemMatches(PATTERN_ID, { ...defaultMarketQuery(), itemType }),
     );
-    expect(matched).toEqual(['all', 'other']);
+    // Sorted on BOTH sides: the claim is which chips match, not the order the
+    // chip list happens to declare them in, and reordering MARKET_ITEM_TYPE_FILTERS
+    // is a presentation change that must not red this pin.
+    expect([...matched].sort()).toEqual(['all', 'other'].sort());
   });
 
   it('lists a pattern for sale: tradable drops, bound only by being consumed', () => {
@@ -455,6 +470,22 @@ describe('using a recipe pattern over the live server (online host)', () => {
 
     expect(meta.knownRecipes.has(PATTERN_RECIPE.id)).toBe(true);
     expect(server.sim.countItem(PATTERN_ID, session.pid)).toBe(0);
+
+    // The success FEEDBACK on the wire, not merely in the sim's queue.
+    // routeEvents is the real per-session fan-out the world loop drives, and
+    // broadcastSnapshots never touches the event queue, so without this the
+    // cprof pin below would stay green for a learn whose "You have learned"
+    // line reached nobody. Exactly one, addressed to this session's pid.
+    (server as unknown as { routeEvents(events: SimEvent[]): void }).routeEvents(
+      server.sim.drainEvents(),
+    );
+    const delivered = fc.sent
+      .filter((m) => m.t === 'events')
+      .flatMap((m) => m.list as SimEvent[])
+      .filter((e) => e.type === 'trainResult');
+    expect(delivered).toEqual([
+      { type: 'trainResult', ok: true, recipeId: PATTERN_RECIPE.id, pid: session.pid },
+    ]);
 
     broadcast(server);
     applyLatest();

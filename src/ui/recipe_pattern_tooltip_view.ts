@@ -26,6 +26,16 @@
 // resolvePatternLearn refuses that pattern SILENTLY: advertising a click the
 // sim will not honor is worse than the bare "Common Pattern" tooltip.
 //
+// One residual gap follows from those silences, stated rather than papered
+// over: the requirement line is suppressed at skillReq 0 (it would say nothing),
+// but the sim's `profession` arm still refuses a never-practiced character on
+// such a pattern, so that ONE combination (skillReq 0 + zero skill in the craft)
+// previews no gate while the click refuses. Every skillReq above 0 is covered,
+// because `skillMet` below carries the practiced arm too. No skillReq-0 pattern
+// exists in the content table, and this packet authors none; if one is ever
+// authored, the fix is to render the requirement line at skillReq 0 as well
+// (with wording that does not read as "Requires Alchemy 0").
+//
 // DOM/Three-free (registered in tests/architecture.test.ts UI_PURE_CORES).
 
 import { recipeById } from '../sim/content/recipes';
@@ -65,12 +75,19 @@ export interface RecipePatternTooltipModel {
   resultItemId: string;
   professionId: string;
   skillReq: number;
-  /** True when the viewer's skill in that craft clears the learn gate. Derived
-   *  from the TIER bands, exactly as professions/training.ts teachTierMet
-   *  decides it, never a raw `skill >= skillReq`: the two agree only while
-   *  every skillReq is a multiple of TIER_SKILL_STEP, and the first content
-   *  recipe gated at, say, 60 would paint this line red for a crafter the sim
-   *  is perfectly willing to teach. */
+  /** True when the viewer's skill in that craft clears the learn gate, meaning
+   *  BOTH arms resolvePatternLearn checks: the craft has been practiced at all
+   *  (flat skill above 0, its `profession` arm) AND the tier is met.
+   *  The tier half is derived from the TIER bands, exactly as
+   *  professions/training.ts teachTierMet decides it, never a raw
+   *  `skill >= skillReq`: the two agree only while every skillReq is a multiple
+   *  of TIER_SKILL_STEP, and the first content recipe gated at, say, 60 would
+   *  paint this line red for a crafter the sim is perfectly willing to teach.
+   *  The practiced half is what the tier bands alone cannot say: a skillReq of
+   *  1 to 24 buckets to tier 0, which an unpracticed crafter at skill 0 also
+   *  sits in, so tier alone would paint a plain requirement line for a click
+   *  the sim refuses. A pattern is stricter than a trainer here on purpose
+   *  (pattern_items.ts arm 3), so the hover must be too. */
   skillMet: boolean;
   /** True when the viewer already knows the recipe (the use would refuse). */
   known: boolean;
@@ -96,14 +113,15 @@ export function recipePatternTooltipModel(
   // `invalid` arm). A pattern naming a recipe no drop may teach is an authoring
   // bug whose click is a silent no-op, so the hover must not describe it.
   if (!recipe.acquisition?.includes('drop')) return null;
+  const skill = craftSkillOf(viewer.craftSkills, recipe.professionId);
   return {
     recipeId: recipe.id,
     resultItemId: recipe.resultItemId,
     professionId: recipe.professionId,
     skillReq: recipe.skillReq,
-    skillMet:
-      tierForSkill(craftSkillOf(viewer.craftSkills, recipe.professionId)) >=
-      tierForSkill(recipe.skillReq),
+    // Both of resolvePatternLearn's skill arms, in its order: practiced at all,
+    // then the tier band. See the field doc on RecipePatternTooltipModel.
+    skillMet: skill > 0 && tierForSkill(skill) >= tierForSkill(recipe.skillReq),
     known: viewer.knownRecipes.includes(recipe.id),
   };
 }

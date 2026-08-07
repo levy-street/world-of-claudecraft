@@ -30,6 +30,9 @@ const FREE_RECIPE = 'recipe_tooltip_pattern_free';
 // skillReq 60 is deliberately NOT a multiple of TIER_SKILL_STEP: it is the only
 // shape that can tell the tier-band derivation apart from a raw `skill >= req`.
 const OFF_STEP_RECIPE = 'recipe_tooltip_pattern_off_step';
+// skillReq inside tier 0 (1..24), where skill 0 buckets to the SAME tier: the
+// only shape that can tell the practiced arm apart from the tier arm.
+const SUB_TIER_RECIPE = 'recipe_tooltip_pattern_sub_tier';
 // A REAL recipe, and trainer-only like every recipe shipped today: the
 // acquisition gate must silence it.
 const TRAINER_ONLY_RECIPE = 'recipe_sunpetal_mana_draught';
@@ -60,6 +63,7 @@ const FIXTURES: ProfessionRecipeRecord[] = [
     skillReq: 0,
   }),
   dropRecipe(OFF_STEP_RECIPE, { skillReq: 60 }),
+  dropRecipe(SUB_TIER_RECIPE, { skillReq: 10 }),
 ];
 
 beforeAll(() => {
@@ -174,6 +178,27 @@ describe('recipePatternTooltipModel', () => {
     expect(belowBand?.skillMet).toBe(false);
   });
 
+  it('refuses a never-practiced craft even when the tier band alone would pass', () => {
+    // resolvePatternLearn's `profession` arm, mirrored: skillReq 10 buckets to
+    // tier 0, and so does skill 0, so the tier comparison ALONE says yes to a
+    // character who has never touched alchemy and whose click the sim refuses.
+    // Skill 1 is the same tier and the same requirement, differing only in the
+    // practiced arm, so this pair isolates that arm and nothing else.
+    const unpracticed = recipePatternTooltipModel(
+      pattern(SUB_TIER_RECIPE),
+      viewer({ craftSkills: { alchemy: 0 } }),
+    );
+    const practiced = recipePatternTooltipModel(
+      pattern(SUB_TIER_RECIPE),
+      viewer({ craftSkills: { alchemy: 1 } }),
+    );
+    expect(unpracticed?.skillReq).toBe(10);
+    expect(unpracticed?.skillMet).toBe(false);
+    expect(practiced?.skillMet).toBe(true);
+    // An absent craft key reads the same as an explicit 0 (hasOwn-safe read).
+    expect(recipePatternTooltipModel(pattern(SUB_TIER_RECIPE), viewer())?.skillMet).toBe(false);
+  });
+
   it('reads known off the viewer known-recipe list', () => {
     expect(
       recipePatternTooltipModel(pattern(GATED_RECIPE), viewer({ knownRecipes: [GATED_RECIPE] }))
@@ -202,6 +227,19 @@ describe('recipePatternTooltipLines', () => {
     expect(
       recipePatternTooltipLines(pattern(GATED_RECIPE), viewer({ craftSkills: { alchemy: 50 } })),
     ).toContain('<div class="tt-sub">Requires Alchemy 50</div>');
+  });
+
+  it('paints the requirement line red for a never-practiced craft inside tier 0', () => {
+    // The rendered half of the practiced arm: same recipe, same requirement,
+    // and the ONLY difference is one point of alchemy. Without that arm both
+    // sides render tt-sub and the unpracticed viewer reads a plain requirement
+    // for a click that answers "You have not practiced that profession."
+    expect(
+      recipePatternTooltipLines(pattern(SUB_TIER_RECIPE), viewer({ craftSkills: { alchemy: 0 } })),
+    ).toContain('<div class="tt-red">Requires Alchemy 10</div>');
+    expect(
+      recipePatternTooltipLines(pattern(SUB_TIER_RECIPE), viewer({ craftSkills: { alchemy: 1 } })),
+    ).toContain('<div class="tt-sub">Requires Alchemy 10</div>');
   });
 
   it('renders no requirement line for a recipe gated at 0', () => {

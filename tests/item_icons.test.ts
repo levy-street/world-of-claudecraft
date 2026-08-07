@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
 import { describe, expect, it } from 'vitest';
 import { ITEMS } from '../src/sim/data';
+import type { ItemDef } from '../src/sim/types';
 import {
   ITEM_ART_PENDING,
   ITEM_IMAGE_IDS,
@@ -606,5 +607,57 @@ describe('unknown item ids resolve to the shared fallback recipe (stale-client p
       (item) => !ITEM_WEAPON_VARIANTS[item.id] && itemIconRecipe(item.id) !== unknown,
     );
     expect(derived).toBeTruthy();
+  });
+});
+
+describe('recipe patterns take the parchment page, whatever they are named', () => {
+  // The kind:'recipe' arm in itemFallback must sit ABOVE the fish-name arm,
+  // which carries no kind gate and matches on SUBSTRINGS: 'eel' is inside
+  // "Steel", so a pattern for a steel weapon is the shape that catches a
+  // wrong ordering. Every arm above the recipe one is kind-gated and cannot
+  // claim a pattern, so this is the only ordering the fallback can get wrong.
+  //
+  // The def is synthetic and removed in finally: no shipped item carries kind
+  // 'recipe' yet (phase 11 authors the drops), and the art-coverage sweeps
+  // above would fail on an artless one left in the table.
+  function withPatternDef<T>(name: string, run: (id: string) => T): T {
+    const id = 'test_icon_pattern_probe';
+    ITEMS[id] = {
+      id,
+      name,
+      kind: 'recipe',
+      quality: 'uncommon',
+      sellValue: 25,
+      teachesRecipeId: 'recipe_eastbrook_arming_sword',
+    } as ItemDef;
+    try {
+      return run(id);
+    } finally {
+      delete ITEMS[id];
+    }
+  }
+
+  it('inks a pattern whose name embeds a fish token as parchment, not a fish', () => {
+    const recipe = withPatternDef('Pattern: Steel Longsword', (id) => itemIconRecipe(id));
+    expect(recipe.bg).toBe('parchment');
+    expect(recipe.prims.map((prim) => prim.p)).toEqual(['scroll']);
+  });
+
+  it('is the ordering and not the name: the same name on a NON-recipe kind still draws a fish', () => {
+    // Without this half the pin above would also pass on a fallback that had
+    // simply stopped drawing fish at all, which would be a different bug.
+    const id = 'test_icon_fishy_junk_probe';
+    ITEMS[id] = {
+      id,
+      name: 'Steel Longsword Offcut',
+      kind: 'junk',
+      quality: 'common',
+      sellValue: 1,
+    } as ItemDef;
+    try {
+      expect(itemIconRecipe(id).prims.map((prim) => prim.p)).toEqual(['fish']);
+    } finally {
+      delete ITEMS[id];
+    }
   });
 });
