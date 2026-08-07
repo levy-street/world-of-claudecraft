@@ -739,15 +739,23 @@ export const ABILITIES: Record<string, AbilityDef> = {
     effects: [
       // Balance pass 2026-07-10: was 0.6 weapon + 24 per hit (too efficient for a
       // free, rage-generating, 2-charge spell); retuned to 0.45 weapon + 16.
-      { type: 'weaponStrike', bonus: 14, weaponMult: 0.4 },
-      { type: 'weaponStrike', bonus: 14, weaponMult: 0.4 },
+      // 2026-08-07: 0.4 + 14 -> 0.35 + 12, the third cut in the same direction.
+      // frost-fury-rebalance.md calls Twinstrike the FILLER that "supplies a small
+      // amount of rage", but it measured at 23.6% of all Fury damage on the shipped
+      // probe, the number two source, nearly matching an 80-rage spender while
+      // costing zero rage and generating 4. That gap between stated role and
+      // measured share is what this trims; it does not touch the spender, which
+      // review deliberately declined to gate (income was the problem, not the
+      // spender).
+      { type: 'weaponStrike', bonus: 12, weaponMult: 0.35 },
+      { type: 'weaponStrike', bonus: 12, weaponMult: 0.35 },
       // v0.27.1 rage fix: halved from 8. Bloodletting is Fury's generating
       // builder; Twinstrike keeps a taste of rage but no longer co-funds a
       // Red Harvest every ~6 seconds.
       { type: 'gainResource', amount: 4 },
     ],
     description:
-      'Instantly strike with your weapon twice, each hit dealing 40% weapon damage plus $d, and generate 4 rage. Stores up to 2 charges. (Fury)',
+      'Instantly strike with your weapon twice, each hit dealing 35% weapon damage plus $d, and generate 4 rage. Stores up to 2 charges. (Fury)',
   },
   execute: {
     id: 'execute',

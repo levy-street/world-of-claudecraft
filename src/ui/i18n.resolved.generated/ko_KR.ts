@@ -8695,7 +8695,7 @@ export const ko_KR: EnTranslations = {
       },
       "raging_gale": {
         "name": "쌍격",
-        "description": "무기로 즉시 두 번 공격하여 각 타격마다 무기 피해의 40%에 {damage}를 더한 피해를 입히고 분노 4를 생성합니다. 최대 2회까지 충전됩니다. (분노 특성)"
+        "description": "무기로 즉시 두 번 공격하여 각 타격마다 무기 피해의 35%에 {damage}를 더한 피해를 입히고 분노 4를 생성합니다. 최대 2회까지 충전됩니다. (분노 특성)"
       },
       "red_harvest": {
         "name": "붉은 수확",

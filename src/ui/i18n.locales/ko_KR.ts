@@ -108,7 +108,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '날카로운 외침으로 15yd 이내의 모든 적의 이동 속도를 8초 동안 50% 감소시킵니다.',
   'entities.abilities.piercing_howl.name': '꿰뚫는 절규',
   'entities.abilities.raging_gale.description':
-    '무기로 즉시 두 번 공격하여 각 타격마다 무기 피해의 40%에 {damage}를 더한 피해를 입히고 분노 4를 생성합니다. 최대 2회까지 충전됩니다. (분노 특성)',
+    '무기로 즉시 두 번 공격하여 각 타격마다 무기 피해의 35%에 {damage}를 더한 피해를 입히고 분노 4를 생성합니다. 최대 2회까지 충전됩니다. (분노 특성)',
   'entities.abilities.raging_gale.name': '쌍격',
   'entities.abilities.raised_guard.description':
     '방패 뒤로 몸을 웅크려 6초 동안 받는 물리 피해가 50% 감소합니다. 최대 2회까지 충전됩니다. (방어 특성)',

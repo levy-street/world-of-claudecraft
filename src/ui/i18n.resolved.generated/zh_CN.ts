@@ -8695,7 +8695,7 @@ export const zh_CN: EnTranslations = {
       },
       "raging_gale": {
         "name": "双重打击",
-        "description": "立即用武器攻击两次，每次命中造成 40% 武器伤害加 {damage}，并产生 4 点怒气。最多储存 2 次充能。（狂怒）"
+        "description": "立即用武器攻击两次，每次命中造成 35% 武器伤害加 {damage}，并产生 4 点怒气。最多储存 2 次充能。（狂怒）"
       },
       "red_harvest": {
         "name": "血色收割",

@@ -107,4 +107,37 @@ describe('healer primary mana efficiency', () => {
     expect(paladinRatio).toBeGreaterThanOrEqual(priestHealRatio * 0.9);
     expect(paladinRatio).toBeLessThanOrEqual(priestHealRatio * 1.1);
   });
+
+  // Fury's free filler must stay well under its rage spender per cast.
+  // frost-fury-rebalance.md assigns Twinstrike the FILLER role ("supplies a small
+  // amount of rage") and Red Harvest the payoff ("converts rage into the main
+  // payoff"), but Twinstrike costs ZERO rage and generates 4, so nothing in the
+  // resource economy stops it drifting up: it has now been cut three times
+  // (0.6 -> 0.45 -> 0.4 -> 0.35 weapon) and still measured 21% of all damage.
+  // Asserted as a RATIO against the spender rather than a literal coefficient, so
+  // the guard states the design rule instead of restating the data.
+  it('keeps Fury Twinstrike a filler: exact coefficients, and free relative to the spender', () => {
+    const hits = (id: string) =>
+      ABILITIES[id].effects.filter(
+        (e): e is Extract<typeof e, { type: 'weaponStrike' }> => e.type === 'weaponStrike',
+      );
+    const twin = hits('raging_gale');
+    const harvest = hits('red_harvest');
+
+    // Exact pin. A ratio alone is NOT enough here: at the pre-change 0.4 the filler
+    // still sat comfortably under any defensible ratio bound, so a ratio-only guard
+    // would have passed on the very state this cut was made to fix. The literal is
+    // the deliberate balance decision, so moving it must be deliberate too.
+    expect(twin.map((e) => [e.weaponMult, e.bonus])).toEqual([
+      [0.35, 12],
+      [0.35, 12],
+    ]);
+    expect(ABILITIES.raging_gale.cost).toBe(0);
+
+    // And the standing design rule the number serves: the FREE filler stays under
+    // the full-bar spender per cast, which the exact pin alone would not say.
+    const sum = (es: typeof twin) => es.reduce((n, e) => n + (e.weaponMult ?? 1), 0);
+    expect(sum(twin)).toBeLessThan(sum(harvest));
+    expect(ABILITIES.red_harvest.cost).toBeGreaterThan(0);
+  });
 });

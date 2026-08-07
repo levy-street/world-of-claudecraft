@@ -1497,7 +1497,7 @@ const classAbilityNamesEn = {
       [
         'raging_gale',
         'Twinstrike',
-        'Instantly strike with your weapon twice, each hit dealing 40% weapon damage plus {damage}, and generate 4 rage. Stores up to 2 charges. (Fury)',
+        'Instantly strike with your weapon twice, each hit dealing 35% weapon damage plus {damage}, and generate 4 rage. Stores up to 2 charges. (Fury)',
       ],
       [
         'red_harvest',

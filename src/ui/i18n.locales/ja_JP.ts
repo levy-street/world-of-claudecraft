@@ -108,7 +108,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '劈くような叫びを上げ、15yd以内のすべての敵の移動速度を8秒間、50%低下させます。',
   'entities.abilities.piercing_howl.name': '貫く咆哮',
   'entities.abilities.raging_gale.description':
-    '武器で即座に2回攻撃し、それぞれ武器ダメージの40%に{damage}を加えたダメージを与え、怒りを4生成します。最大2チャージまで蓄積します。（狂怒）',
+    '武器で即座に2回攻撃し、それぞれ武器ダメージの35%に{damage}を加えたダメージを与え、怒りを4生成します。最大2チャージまで蓄積します。（狂怒）',
   'entities.abilities.raging_gale.name': '双撃',
   'entities.abilities.raised_guard.description':
     '盾の陰に身を構え、6秒間、受ける物理ダメージが50%減少します。最大2チャージまで蓄積します。（防御）',

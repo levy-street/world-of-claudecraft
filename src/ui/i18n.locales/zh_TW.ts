@@ -109,7 +109,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '一聲穿刺的吼叫，使 15 碼內的所有敵人減速 50%，持續 8 秒。',
   'entities.abilities.piercing_howl.name': '穿刺怒吼',
   'entities.abilities.raging_gale.description':
-    '立即以武器攻擊兩次，每擊造成 40% 武器傷害外加 {damage}，並產生 4 點怒氣。最多儲存 2 次充能。（狂怒）',
+    '立即以武器攻擊兩次，每擊造成 35% 武器傷害外加 {damage}，並產生 4 點怒氣。最多儲存 2 次充能。（狂怒）',
   'entities.abilities.raging_gale.name': '雙擊',
   'entities.abilities.raised_guard.description':
     '舉盾防禦：你受到的物理傷害降低 50%，持續 6 秒。最多儲存 2 次充能。（防護）',

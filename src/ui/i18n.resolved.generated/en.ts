@@ -8695,7 +8695,7 @@ export const en: EnTranslations = {
       },
       "raging_gale": {
         "name": "Twinstrike",
-        "description": "Instantly strike with your weapon twice, each hit dealing 40% weapon damage plus {damage}, and generate 4 rage. Stores up to 2 charges. (Fury)"
+        "description": "Instantly strike with your weapon twice, each hit dealing 35% weapon damage plus {damage}, and generate 4 rage. Stores up to 2 charges. (Fury)"
       },
       "red_harvest": {
         "name": "Red Harvest",
