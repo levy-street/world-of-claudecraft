@@ -903,7 +903,7 @@ describe('purgeMailOwner - deleting a character', () => {
     // phantom-producing seed evaporates and the pin below turns vacuous.
     tickFor(sim, MAIL_DELIVERY_SECONDS + 2);
     // biome-ignore lint/suspicious/noExplicitAny: read the raw index directly.
-    expect((sim.postOffice as any).unreadIndex.get('Doomed')).toBe(1);
+    expect((sim.postOffice as any).index.unread.get('Doomed')).toBe(1);
     expect(sim.purgeMailOwner(DOOMED_ID, 'Doomed')).toBe(true);
     // The parcel flew home to its live sender rather than being destroyed.
     const flown = letterBy(sim, (m) => m.subject === 'LegacyDelivered', 'returned parcel');
@@ -915,7 +915,7 @@ describe('purgeMailOwner - deleting a character', () => {
     // here), and the next holder of the name reads exactly the truth (their
     // own welcome letter, nothing inherited).
     // biome-ignore lint/suspicious/noExplicitAny: read the raw index directly.
-    expect((sim.postOffice as any).unreadIndex.has('Doomed')).toBe(false);
+    expect((sim.postOffice as any).index.unread.has('Doomed')).toBe(false);
     const nextHolder = sim.addPlayer('mage', 'Doomed', { characterId: 999 });
     expect(sim.mailUnreadFor(nextHolder)).toBe(unreadOracle(sim, nextHolder));
     expect(sim.mailUnreadFor(alice)).toBe(unreadOracle(sim, alice));
@@ -1143,7 +1143,7 @@ describe('purgeMailOwner - deleting a character', () => {
 
     expect(sim.purgeMailOwner(DOOMED_ID, 'Doomed')).toBe(true);
     // biome-ignore lint/suspicious/noExplicitAny: the in-flight set is module-private.
-    const undelivered = (sim.postOffice as any).undelivered as Set<unknown>;
+    const undelivered = (sim.postOffice as any).index.undelivered as Set<unknown>;
     expect(undelivered.has(note)).toBe(false);
     // Flying past the old delivery time must not resurrect it in the unread index.
     tickFor(sim, MAIL_DELIVERY_SECONDS + 2);
