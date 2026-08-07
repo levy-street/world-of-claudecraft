@@ -94,18 +94,22 @@ describe('elemental family bespoke attack (issue #2889 batch 1)', () => {
     expect(elementalBlock).not.toContain('clips: FLOATING,');
 
     // FLOATING itself (the constant definition, not a VisualDef using it) must
-    // still read the original shared attack: the other 8 families sharing it
+    // still read the original shared attack: every family still sharing it
     // by reference must be untouched by this change.
     const floatingConstBlock = manifestBlock('const FLOATING: ClipMap = {', '};');
     expect(floatingConstBlock).toContain("attack: ['Headbutt', 'Punch']");
 
     // Every other VisualDef still pointing at the shared constant is untouched
     // by THIS migration. The exact count also reflects any other family this
-    // same batched initiative (issue #2889) has since migrated off FLOATING
-    // in this branch (see tests/anim_pipeline_warlock_nightkin.test.ts for
-    // the nightkin migration), so this pin tracks this branch's own state,
-    // not a repo-wide invariant other batches must hold to.
+    // same batched initiative (issue #2889) has since migrated off FLOATING:
+    // 9 originally, minus the one migrated to ELEMENTAL_FLOATING here, minus
+    // the ghost family's own follow-up migration to GHOST_FLOATING
+    // (tests/anim_pipeline_hunter_ghost.test.ts, stacked on this same batch),
+    // minus the nightkin family's migration to NIGHTKIN_FLOATING
+    // (tests/anim_pipeline_warlock_nightkin.test.ts), leaves 6 remaining
+    // direct `clips: FLOATING,` usages. This pin tracks this branch's own
+    // state, not a repo-wide invariant other batches must hold to.
     const remaining = [...MANIFEST_SRC.matchAll(/clips: FLOATING,/g)].length;
-    expect(remaining).toBe(7);
+    expect(remaining).toBe(6);
   });
 });

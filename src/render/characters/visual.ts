@@ -1107,16 +1107,34 @@ export class CharacterVisual {
 
   playAttack(abilityId?: string): void {
     if (this.deadLock) return;
-    const override = abilityId ? this.def.clips.attackByAbility?.[abilityId] : undefined;
+    // Resolved against THIS rig's bound clips: a rig without the substitute
+    // (every body but the hunter) keeps its own authored attack instead of
+    // swinging with no animation at all.
+    const skinAttack = pickSkinAttackClips(this.weaponSkinId, (c) => this.action(c) !== null);
+    // A displayed bow skin substitutes Bow_Draw_Shot for the hunter's RANGED
+    // attacks, including the ranged per-ability overrides: the crossbow-
+    // shoulder ability poses (Hunter_Shot_Snap etc.) are authored for the
+    // class's authored crossbow and would look backwards with a bow visibly
+    // drawn. It must NOT substitute for a non-ranged override: the three
+    // melee abilities (raptor_strike, mongoose_bite, wing_clip) play a
+    // bespoke Hunter_Melee_* swing regardless of a displayed bow, since a bow
+    // skin never changes how a melee hit is thrown, and the self-buff aspect
+    // toggles / Fevered Draw (rapid_fire) play the class's own baked
+    // Spellcast_Raise raise/buff ceremony through this same playAttack path
+    // (the ability-VFX painter triggers non-contact authored gestures here
+    // too), never a draw-shot. Both are identified by their clip-name
+    // convention rather than a hardcoded ability list, so any future
+    // non-ranged override keeps its authored clip automatically
+    // (tests/weapon_skins.test.ts).
+    const rawOverride = abilityId ? this.def.clips.attackByAbility?.[abilityId] : undefined;
+    const overrideIsNonRanged =
+      rawOverride?.startsWith('Hunter_Melee_') || rawOverride === 'Spellcast_Raise';
+    const override = !skinAttack || overrideIsNonRanged ? rawOverride : undefined;
     if (override && this.action(override)) {
       this.playOneShot(override, this.def.attackTimeScale ?? 1.3);
       this.currentOneShotIsAttack = true;
       return;
     }
-    // Resolved against THIS rig's bound clips: a rig without the substitute
-    // (every body but the hunter) keeps its own authored attack instead of
-    // swinging with no animation at all.
-    const skinAttack = pickSkinAttackClips(this.weaponSkinId, (c) => this.action(c) !== null);
     const style = weaponAttackStyle(this.weaponItemId, this.offhandItemId);
     const handClip = style ? this.def.clips.attackByHand?.[style] : undefined;
     if (!skinAttack && handClip && this.action(handClip)) {
