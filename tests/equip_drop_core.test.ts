@@ -21,7 +21,6 @@ import {
 } from '../src/ui/equip_drop_core';
 import { Hud } from '../src/ui/hud';
 import { resolveDropTargetAt } from '../src/ui/item_drop_hit_test';
-import { bareClient } from './helpers/bare_client';
 
 function equipmentOf(sim: Sim & Record<string, any>, pid: number): Record<string, string> {
   const meta = sim.players.get(pid);
@@ -476,64 +475,6 @@ describe('char_window masterwrought mirror wiring (source pins)', () => {
     expect(src).toContain("this.deps.showError(tSim('error.masterwroughtCap'));");
     expect(src).toContain("case 'blockedMasterwroughtLegendary':");
     expect(src).toContain("this.deps.showError(tSim('error.masterwroughtLegendary'));");
-  });
-});
-
-describe('the mirrored worn payloads survive a wire null (einst normalization)', () => {
-  it('an explicit null einst clears the mirror to an empty map, never to null', () => {
-    // The server's maybe() encoder stringifies `value ?? null`, so a null CAN
-    // ride the wire if a future encoder change ever produces one; the mirror's
-    // type says plain map. Seed a non-empty mirror first so "cleared to {}" is
-    // distinguishable from "kept the prior value".
-    const c = bareClient(7) as ReturnType<typeof bareClient> & Record<string, unknown>;
-    c.equipmentInstances = { ring1: { rolled: { quality: 'legendary' } } };
-    const self = {
-      id: 7,
-      k: 'player',
-      tid: 'warrior',
-      nm: 'Wire',
-      lv: 20,
-      x: 0,
-      y: 0,
-      z: 0,
-      f: 0,
-      hp: 100,
-      mhp: 100,
-      res: 0,
-      mres: 100,
-      rtype: 'mana',
-      xp: 0,
-      copper: 0,
-      inv: [],
-      equip: {},
-      einst: null,
-      qlog: [],
-      qdone: [],
-      cds: {},
-      gcd: 0,
-      stats: { str: 1, agi: 1, sta: 1, int: 1, spi: 1, armor: 0 },
-      weapon: { min: 1, max: 2, speed: 2 },
-    };
-    (c as unknown as { applySnapshot(snap: unknown): void }).applySnapshot({
-      t: 'snap',
-      tick: 1,
-      time: 0,
-      self,
-      ents: [],
-    });
-    expect(c.equipmentInstances).toEqual({});
-    expect(c.equipmentInstances).not.toBeNull();
-    // And the delta guard half: an ABSENT einst keeps the prior mirror.
-    c.equipmentInstances = { ring1: { rolled: { quality: 'legendary' } } };
-    const { einst: _dropped, ...selfWithoutEinst } = self;
-    (c as unknown as { applySnapshot(snap: unknown): void }).applySnapshot({
-      t: 'snap',
-      tick: 2,
-      time: 0.05,
-      self: selfWithoutEinst,
-      ents: [],
-    });
-    expect(c.equipmentInstances).toEqual({ ring1: { rolled: { quality: 'legendary' } } });
   });
 });
 

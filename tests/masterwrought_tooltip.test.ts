@@ -17,9 +17,9 @@ interface TooltipHarness {
   itemTooltip(item: ItemDef, compare?: boolean): string;
 }
 
-function harness(playerClass = 'warrior'): TooltipHarness {
+function harness(): TooltipHarness {
   const hud = Object.create(Hud.prototype) as unknown as TooltipHarness;
-  hud.sim = { player: { level: 80 }, cfg: { playerClass }, equipment: {} };
+  hud.sim = { player: { level: 80 }, cfg: { playerClass: 'warrior' }, equipment: {} };
   return hud;
 }
 
