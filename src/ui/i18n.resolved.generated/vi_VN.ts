@@ -3274,6 +3274,9 @@ export const vi_VN: EnTranslations = {
       "toZone": "Bản Đồ Vùng",
       "toggleAria": "Chuyển đổi giữa bản đồ thế giới và bản đồ vùng",
       "levels": "Cấp {min} đến {max}"
+    },
+    "arenaGate": {
+      "minLevelNote": "Requires level {level}"
     }
   },
   "gatherEvent": {

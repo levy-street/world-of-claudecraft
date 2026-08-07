@@ -21,6 +21,7 @@ import {
   UNSTUCK_SICKNESS_ID,
 } from '../src/sim/resurrection';
 import { Sim } from '../src/sim/sim';
+import { ARENA_MIN_LEVEL } from '../src/sim/social/arena';
 import { applyResurrectionSickness, applyUnstuckSickness } from '../src/sim/spirit';
 import type { Aura, Entity, PlayerClass } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
@@ -261,8 +262,9 @@ describe('warlock Voidfeast cannot devour a sickness', () => {
 // But the wipe also meant one queue laundered the whole penalty, so the debt is now
 // stashed in preMatchPools and handed back on the way out (restoreArenaReturnPools).
 
-// Seat a real ranked bout, at a level where a sickness has a non-zero duration
-// (applySickness is a no-op below level 10, which is what makes the level matter here).
+// Seat a real ranked bout, at a level that clears both floors in play here:
+// applySickness is a no-op below level 10 (which is what makes the level matter
+// for this suite), and ranked queueing itself is gated at ARENA_MIN_LEVEL.
 function seatArenaBout(): { sim: AnySim; a: number; b: number } {
   const sim = new Sim({
     seed: 42,
@@ -276,7 +278,7 @@ function seatArenaBout(): { sim: AnySim; a: number; b: number } {
     [a, 0],
     [b, 6],
   ] as const) {
-    sim.setPlayerLevel(12, pid);
+    sim.setPlayerLevel(ARENA_MIN_LEVEL, pid);
     const e = sim.entities.get(pid) as Entity;
     e.pos.x = x;
     e.pos.z = -40;

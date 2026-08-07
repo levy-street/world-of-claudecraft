@@ -3274,6 +3274,9 @@ export const sv_SE: EnTranslations = {
       "toZone": "Zonkarta",
       "toggleAria": "Växla mellan världskartan och zonkartan",
       "levels": "Nivåer {min} till {max}"
+    },
+    "arenaGate": {
+      "minLevelNote": "Requires level {level}"
     }
   },
   "gatherEvent": {

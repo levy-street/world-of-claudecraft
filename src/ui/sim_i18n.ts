@@ -85,6 +85,15 @@ const baseEnTable = {
   'error.specLevel': 'You may choose a specialization at level {level}.',
   'error.equipLevel': 'You must be level {level} to equip that.',
   'error.mountLevel': 'You must be level {level} to ride that mount.',
+  // Ranked Arena's minimum-level queue gate (src/sim/social/arena.ts
+  // arenaQueueJoin, 1v1/2v2 only): the joining player's own level, and a
+  // premade teammate's level checked in the per-member loop.
+  'error.arenaMinLevel': 'You must be level {level} to queue for the arena.',
+  'error.arenaMinLevelMember': '{name} must be at least level {level} to queue for the arena.',
+  // The 1v1 auto-prune notice (src/sim/social/arena.ts matchmakeArena1v1):
+  // byte-identical to arenaQueueLeave's own 1v1 leave text so both paths give
+  // a still-connected player the same "you left the queue" line.
+  'log.arenaQueueAutoLeave1v1': 'You leave the Ashen Coliseum queue.',
   // Mount collection pivot (src/sim/mounts.ts toggleMount, src/sim/items.ts
   // buyItem): the toggle with nothing owned, and the two stablemaster buy gates.
   // Placeholder-free, so they register in the EXACT matcher automatically.
@@ -10213,6 +10222,14 @@ const RULES: Rule[] = [
   {
     re: /^You must be level (\d+) to ride that mount\.$/,
     build: (m) => tSim('error.mountLevel', { level: m[1] }),
+  },
+  {
+    re: /^You must be level (\d+) to queue for the arena\.$/,
+    build: (m) => tSim('error.arenaMinLevel', { level: m[1] }),
+  },
+  {
+    re: /^(.+) must be at least level (\d+) to queue for the arena\.$/,
+    build: (m) => tSim('error.arenaMinLevelMember', { name: m[1], level: m[2] }),
   },
   {
     re: /^You must have a shield equipped\.$/,

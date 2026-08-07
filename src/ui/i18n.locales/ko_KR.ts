@@ -211,6 +211,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.voidfeast.description':
     '마법 효과 하나(적의 이로운 효과 또는 아군의 해로운 효과)를 삼키고 최대 생명력의 6%를 회복합니다.',
   'hudChrome.abilityError.shieldRequired': '방패를 착용해야 합니다.',
+  'hudChrome.arenaGate.minLevelNote': '레벨 {level} 필요',
   'hudChrome.wocStore.title': 'WOC 상점',
   'hudChrome.wocStore.close': 'WOC 상점 닫기',
   'hudChrome.wocStore.tabsLabel': 'WOC 상점 구역',

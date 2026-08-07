@@ -10,22 +10,28 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "hudChrome.arenaGate.minLevelNote",
     "hudChrome.itemMasterwrought"
   ],
   "es_ES": [
+    "hudChrome.arenaGate.minLevelNote",
     "hudChrome.itemMasterwrought"
   ],
   "fr_FR": [
+    "hudChrome.arenaGate.minLevelNote",
     "hudChrome.itemMasterwrought"
   ],
   "fr_CA": [
+    "hudChrome.arenaGate.minLevelNote",
     "hudChrome.itemMasterwrought"
   ],
   "en_CA": [],
   "it_IT": [
+    "hudChrome.arenaGate.minLevelNote",
     "hudChrome.itemMasterwrought"
   ],
   "de_DE": [
+    "hudChrome.arenaGate.minLevelNote",
     "hudChrome.itemMasterwrought"
   ],
   "zh_CN": [],
@@ -33,31 +39,40 @@ export const pending: Record<string, readonly string[]> = {
   "ko_KR": [],
   "ja_JP": [],
   "pt_BR": [
+    "hudChrome.arenaGate.minLevelNote",
     "hudChrome.itemMasterwrought"
   ],
   "ru_RU": [],
   "cs_CZ": [
+    "hudChrome.arenaGate.minLevelNote",
     "hudChrome.itemMasterwrought"
   ],
   "nl_NL": [
+    "hudChrome.arenaGate.minLevelNote",
     "hudChrome.itemMasterwrought"
   ],
   "pl_PL": [
+    "hudChrome.arenaGate.minLevelNote",
     "hudChrome.itemMasterwrought"
   ],
   "id_ID": [
+    "hudChrome.arenaGate.minLevelNote",
     "hudChrome.itemMasterwrought"
   ],
   "tr_TR": [
+    "hudChrome.arenaGate.minLevelNote",
     "hudChrome.itemMasterwrought"
   ],
   "sv_SE": [
+    "hudChrome.arenaGate.minLevelNote",
     "hudChrome.itemMasterwrought"
   ],
   "vi_VN": [
+    "hudChrome.arenaGate.minLevelNote",
     "hudChrome.itemMasterwrought"
   ],
   "da_DK": [
+    "hudChrome.arenaGate.minLevelNote",
     "hudChrome.itemMasterwrought"
   ]
 };

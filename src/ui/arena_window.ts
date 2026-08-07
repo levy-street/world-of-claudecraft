@@ -19,6 +19,7 @@
 
 import { audio } from '../game/audio';
 import type { ArenaMapId } from '../sim/dungeon_layout';
+import { ARENA_MIN_LEVEL } from '../sim/social/arena';
 import { BG_TEAM_SIZE } from '../sim/social/battleground';
 import type { PlayerClass } from '../sim/types';
 import type { ArenaFormat, IWorld } from '../world_api';
@@ -267,6 +268,7 @@ export class ArenaWindow {
       playerName: world.player.name,
       party: world.partyInfo,
       allTime: this.allTime,
+      playerLevel: world.player.level,
     });
 
     if (view.kind === 'offline') {
@@ -541,9 +543,14 @@ export class ArenaWindow {
       );
     }
     const btnCls = action.queueDisabled ? 'btn disabled' : 'btn';
+    const note = action.belowMinLevel
+      ? t('hudChrome.arenaGate.minLevelNote', {
+          level: formatNumber(ARENA_MIN_LEVEL, { maximumFractionDigits: 0 }),
+        })
+      : t('hud.arena.queueNote');
     return (
       `<button class="${btnCls}" data-act="queue"${action.queueDisabled ? ' disabled' : ''}>${esc(t('hud.arena.enterQueue'))}</button>` +
-      `<div class="arena-note">${esc(t('hud.arena.queueNote'))}</div>`
+      `<div class="arena-note">${esc(note)}</div>`
     );
   }
 

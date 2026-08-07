@@ -70,6 +70,7 @@ function startArenaMode(format: '1v1' | 'fiesta' | 'yumi3') {
         ? ['paladin', 'mage', 'rogue', 'priest']
         : ['paladin', 'mage', 'rogue', 'priest', 'hunter', 'druid'];
   const pids = classes.map((cls, i) => sim.addPlayer(cls, `P${i}`));
+  for (const pid of pids) sim.setPlayerLevel(20, pid);
   for (const pid of pids) sim.arenaQueueJoin(pid, format);
   sim.tick();
   const match = advanceArena(sim, pids[0]);

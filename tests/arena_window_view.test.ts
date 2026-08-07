@@ -61,6 +61,10 @@ function input(over: Partial<ArenaViewInput> = {}): ArenaViewInput {
     playerName: 'Me',
     party: null,
     allTime: {},
+    // Above ARENA_MIN_LEVEL by default so the pre-existing queue-gating suite
+    // below tests party/leader gating, not the level gate; the level-gate
+    // suite overrides this explicitly.
+    playerLevel: 20,
     ...over,
   };
 }
@@ -128,7 +132,7 @@ describe('buildArenaView: bracket resolution + commit', () => {
 describe('buildArenaView: queue gating', () => {
   it('disables 1v1 queue while in a party', () => {
     const v = live(buildArenaView(input({ party: party([{ pid: 1 }, { pid: 2 }]) })));
-    expect(v.action).toEqual({ kind: 'idle', queueDisabled: true });
+    expect(v.action).toEqual({ kind: 'idle', queueDisabled: true, belowMinLevel: false });
   });
 
   it('disables a 2v2 queue for a non-leader of a full party', () => {
@@ -137,7 +141,7 @@ describe('buildArenaView: queue gating', () => {
         input({ selectedBracket: '2v2', playerId: 2, party: party([{ pid: 1 }, { pid: 2 }], 1) }),
       ),
     );
-    expect(v.action).toEqual({ kind: 'idle', queueDisabled: true });
+    expect(v.action).toEqual({ kind: 'idle', queueDisabled: true, belowMinLevel: false });
     expect(v.party.kind).toBe('members');
   });
 
@@ -147,12 +151,74 @@ describe('buildArenaView: queue gating', () => {
         input({ selectedBracket: '2v2', party: party([{ pid: 1 }, { pid: 2 }, { pid: 3 }]) }),
       ),
     );
-    expect(v.action).toEqual({ kind: 'idle', queueDisabled: true });
+    expect(v.action).toEqual({ kind: 'idle', queueDisabled: true, belowMinLevel: false });
     expect(v.party.kind).toBe('warn');
   });
 
   it('enables a solo 1v1 queue', () => {
-    expect(live(buildArenaView(input())).action).toEqual({ kind: 'idle', queueDisabled: false });
+    expect(live(buildArenaView(input())).action).toEqual({
+      kind: 'idle',
+      queueDisabled: false,
+      belowMinLevel: false,
+    });
+  });
+});
+
+describe('buildArenaView: ranked minimum-level gate', () => {
+  it('disables a below-level solo 1v1 queue and flags belowMinLevel', () => {
+    const v = live(buildArenaView(input({ playerLevel: 14 })));
+    expect(v.action).toEqual({ kind: 'idle', queueDisabled: true, belowMinLevel: true });
+  });
+
+  it('disables a below-level solo 2v2 queue and flags belowMinLevel', () => {
+    const v = live(buildArenaView(input({ selectedBracket: '2v2', playerLevel: 1 })));
+    expect(v.action).toEqual({ kind: 'idle', queueDisabled: true, belowMinLevel: true });
+  });
+
+  it('does not gate Fiesta or Protect Yumi on level (only 1v1/2v2 are ranked)', () => {
+    // Fiesta and Protect Yumi share the same "not 1v1/2v2" branch in
+    // buildArenaView, so exercising Fiesta covers both.
+    const v = live(buildArenaView(input({ selectedBracket: 'fiesta', playerLevel: 1 })));
+    expect(v.action).toEqual({ kind: 'idle', queueDisabled: false, belowMinLevel: false });
+  });
+
+  it('re-enables the queue once the character reaches the minimum level', () => {
+    const v = live(buildArenaView(input({ playerLevel: 15 })));
+    expect(v.action).toEqual({ kind: 'idle', queueDisabled: false, belowMinLevel: false });
+  });
+
+  it("disables an at-level leader's 2v2 queue when a teammate is below the floor", () => {
+    const v = live(
+      buildArenaView(
+        input({
+          selectedBracket: '2v2',
+          playerId: 1,
+          playerLevel: 20,
+          party: party([
+            { pid: 1, level: 20 },
+            { pid: 2, level: 10 },
+          ]),
+        }),
+      ),
+    );
+    expect(v.action).toEqual({ kind: 'idle', queueDisabled: true, belowMinLevel: true });
+  });
+
+  it('does not gate a full-level 2v2 party', () => {
+    const v = live(
+      buildArenaView(
+        input({
+          selectedBracket: '2v2',
+          playerId: 1,
+          playerLevel: 20,
+          party: party([
+            { pid: 1, level: 20 },
+            { pid: 2, level: 20 },
+          ]),
+        }),
+      ),
+    );
+    expect(v.action).toEqual({ kind: 'idle', queueDisabled: false, belowMinLevel: false });
   });
 });
 

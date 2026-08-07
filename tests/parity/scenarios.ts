@@ -37,6 +37,7 @@ import type { PendingLootRoll } from '../../src/sim/loot/loot_roll';
 import { startFishing } from '../../src/sim/professions/fishing';
 import { gatherCastDurationSec, gatherNodeById } from '../../src/sim/professions/gathering';
 import { type ArenaMatch, type PlayerMeta, Sim } from '../../src/sim/sim';
+import { ARENA_MIN_LEVEL } from '../../src/sim/social/arena';
 import { addThreat } from '../../src/sim/threat';
 import {
   type Aura,
@@ -875,6 +876,8 @@ function arena1v1(): Scenario {
       const sim = rec.sim;
       const a = sim.addPlayer('warrior', 'Aleph');
       const b = sim.addPlayer('mage', 'Bet');
+      sim.setPlayerLevel(ARENA_MIN_LEVEL, a);
+      sim.setPlayerLevel(ARENA_MIN_LEVEL, b);
       const playerA = sim.entities.get(a);
       const playerB = sim.entities.get(b);
       if (!playerA || !playerB) throw new Error('arena_1v1 setup failed to spawn players');
@@ -1101,6 +1104,7 @@ function arena2v2Wipe(): Scenario {
       const names = ['Aleph', 'Bet', 'Gimel', 'Dalet'];
       const pids = classes.map((c, i) => sim.addPlayer(c, names[i]));
       pids.forEach((pid, i) => {
+        sim.setPlayerLevel(ARENA_MIN_LEVEL, pid);
         teleport(sim, requireEntity(sim, pid, 'parity scenario entity'), i * 3, -40);
       });
       rec.track(...pids);

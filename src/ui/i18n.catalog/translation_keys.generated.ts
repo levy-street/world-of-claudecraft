@@ -6386,6 +6386,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.archetypeTitle.hobbyLabel'
   | 'hudChrome.archetypeTitle.label'
   | 'hudChrome.archetypeTitle.none'
+  | 'hudChrome.arenaGate.minLevelNote'
   | 'hudChrome.auraEffect.absorb'
   | 'hudChrome.auraEffect.allStatsPctReduce'
   | 'hudChrome.auraEffect.armorFlat'

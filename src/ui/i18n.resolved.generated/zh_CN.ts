@@ -3274,6 +3274,9 @@ export const zh_CN: EnTranslations = {
       "toZone": "地区地图",
       "toggleAria": "在世界地图和地区地图之间切换",
       "levels": "等级 {min} 到 {max}"
+    },
+    "arenaGate": {
+      "minLevelNote": "需要等级 {level}"
     }
   },
   "gatherEvent": {

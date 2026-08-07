@@ -208,6 +208,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.voidfeast.description':
     '吞噬一个魔法效果（敌人的增益或盟友的减益），并恢复你最大生命值的6%。',
   'hudChrome.abilityError.shieldRequired': '你必须装备一面盾牌。',
+  'hudChrome.arenaGate.minLevelNote': '需要等级 {level}',
   'hudChrome.wocStore.title': 'WOC 商店',
   'hudChrome.wocStore.close': '关闭 WOC 商店',
   'hudChrome.wocStore.tabsLabel': 'WOC 商店分区',

@@ -3274,6 +3274,9 @@ export const ja_JP: EnTranslations = {
       "toZone": "ゾーンマップ",
       "toggleAria": "ワールドマップとゾーンマップを切り替える",
       "levels": "レベル {min} から {max}"
+    },
+    "arenaGate": {
+      "minLevelNote": "レベル {level} が必要です"
     }
   },
   "gatherEvent": {

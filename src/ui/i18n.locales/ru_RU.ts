@@ -206,6 +206,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.voidfeast.description':
     'Поглощает один магический эффект (положительный с врага или отрицательный с союзника) и восстанавливает 6% от максимального запаса здоровья.',
   'hudChrome.abilityError.shieldRequired': 'Необходимо экипировать щит.',
+  'hudChrome.arenaGate.minLevelNote': 'Требуется уровень {level}',
   'hudChrome.wocStore.title': 'Магазин WOC',
   'hudChrome.wocStore.close': 'Закрыть магазин WOC',
   'hudChrome.wocStore.tabsLabel': 'Разделы магазина WOC',

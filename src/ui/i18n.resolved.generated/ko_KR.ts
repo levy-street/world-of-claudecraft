@@ -3274,6 +3274,9 @@ export const ko_KR: EnTranslations = {
       "toZone": "지역 지도",
       "toggleAria": "세계 지도와 지역 지도 전환",
       "levels": "레벨 {min}부터 {max}까지"
+    },
+    "arenaGate": {
+      "minLevelNote": "레벨 {level} 필요"
     }
   },
   "gatherEvent": {

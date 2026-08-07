@@ -3274,6 +3274,9 @@ export const da_DK: EnTranslations = {
       "toZone": "Zonekort",
       "toggleAria": "Skift mellem verdenskortet og zonekortet",
       "levels": "Niveauer {min} til {max}"
+    },
+    "arenaGate": {
+      "minLevelNote": "Requires level {level}"
     }
   },
   "gatherEvent": {

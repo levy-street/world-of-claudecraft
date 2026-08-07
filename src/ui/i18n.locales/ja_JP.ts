@@ -206,6 +206,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.voidfeast.description':
     '魔法効果（敵の有益効果または味方の有害効果）を貪り、自分の最大体力の6%を回復する。',
   'hudChrome.abilityError.shieldRequired': '盾を装備する必要があります。',
+  'hudChrome.arenaGate.minLevelNote': 'レベル {level} が必要です',
   'hudChrome.wocStore.title': 'WOCストア',
   'hudChrome.wocStore.close': 'WOCストアを閉じる',
   'hudChrome.wocStore.tabsLabel': 'WOCストアのセクション',

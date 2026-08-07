@@ -4207,4 +4207,10 @@ export const hudChromeStrings = {
     // Hover tooltip over a zone region: its name plus the suggested level band.
     levels: 'Levels {min} to {max}',
   },
+  // Ranked Arena's minimum-level queue gate (src/sim/social/arena.ts
+  // arenaQueueJoin, 1v1/2v2 only): the arena window's disabled-queue note
+  // when the local character is below the floor.
+  arenaGate: {
+    minLevelNote: 'Requires level {level}',
+  },
 };

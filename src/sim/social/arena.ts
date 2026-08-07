@@ -121,6 +121,13 @@ export const ARENA_BASE_RATING = 1500; // every character starts here, unranked
 const ARENA_MIN_RATING = 100; // a rating floor so a losing streak can't go absurd
 const ARENA_K_FACTOR = 32; // Elo sensitivity per match
 const FIESTA_COUNTDOWN = 5;
+// Ranked (1v1/2v2) matchmaking is pure Elo: every character starts at the same
+// base rating regardless of level, so without a floor a fresh level-1 could
+// queue straight into ranked play. Reuse the Frostreach Frontier open-PvP-zone
+// entry level (docs/prd/frontier-pvp-honor.md) rather than inventing a number.
+// Fiesta needs no gate (fiestaStandardize normalizes every fighter to the same
+// level for the bout) and neither does Protect Yumi (unranked, out of scope here).
+export const ARENA_MIN_LEVEL = 15;
 
 // Standard Elo. Returns the points the winner gains (and the loser loses) for
 // an outright result; a draw moves each toward its expected score by half.
@@ -184,6 +191,10 @@ export function arenaQueueJoin(
   }
 
   if (fmt === '1v1') {
+    if (r.e.level < ARENA_MIN_LEVEL) {
+      ctx.error(id, `You must be level ${ARENA_MIN_LEVEL} to queue for the arena.`);
+      return;
+    }
     const party = ctx.partyOf(id);
     if (party && party.members.length > 1) {
       ctx.error(id, 'Leave your party before queueing for 1v1.');
@@ -286,6 +297,12 @@ export function arenaQueueJoin(
   // destination queue and the flavour text differ.
   const isFiesta = fmt === 'fiesta';
   const label = isFiesta ? 'Fiesta' : '2v2';
+  // Ranked 2v2 only: Fiesta standardizes every fighter to the same level for
+  // the bout, so it needs no level gate (see ARENA_MIN_LEVEL above).
+  if (!isFiesta && r.e.level < ARENA_MIN_LEVEL) {
+    ctx.error(id, `You must be level ${ARENA_MIN_LEVEL} to queue for the arena.`);
+    return;
+  }
   const party = ctx.partyOf(id);
   let unitPids: number[];
   if (!party || party.members.length === 1) {
@@ -330,6 +347,13 @@ export function arenaQueueJoin(
     }
     if (ctx.trades.has(mPid)) {
       ctx.error(id, `${mMeta.name} must finish trading before queueing.`);
+      return;
+    }
+    if (!isFiesta && e.level < ARENA_MIN_LEVEL) {
+      ctx.error(
+        id,
+        `${mMeta.name} must be at least level ${ARENA_MIN_LEVEL} to queue for the arena.`,
+      );
       return;
     }
     if (e.pos.x > DUNGEON_X_THRESHOLD) {
@@ -687,6 +711,7 @@ export function updateArena(ctx: SimContext): void {
 export function matchmakeArena1v1(ctx: SimContext): void {
   let guard = ARENA_SLOT_COUNT + 1;
   while (guard-- > 0) {
+    const pruned: number[] = [];
     ctx.arenaQueue1v1 = ctx.arenaQueue1v1.filter((id) => {
       const e = ctx.entities.get(id);
       // A queued player who walked into a dungeon/instance is not matchable: the
@@ -695,14 +720,30 @@ export function matchmakeArena1v1(ctx: SimContext): void {
       // a Vale Cup match/queue after joining here (arenaQueueJoin already blocks
       // this at entry; this is the defense-in-depth re-check for paths that seat
       // a player into Vale Cup without going through that guard, e.g. practice).
-      return (
+      const keep =
         !!e &&
         !e.dead &&
         !ctx.arenaMatches.has(id) &&
         e.pos.x <= DUNGEON_X_THRESHOLD &&
-        !ctx.vcupSeatedOrQueued(id)
-      );
+        !ctx.vcupSeatedOrQueued(id);
+      // Only a still-connected player needs the notice below (a disconnected
+      // one has no session left to receive it).
+      if (!keep && e) pruned.push(id);
+      return keep;
     });
+    // A still-connected player silently pruned from the queue (dead, walked
+    // into an instance, or seated in Vale Cup) gets the same notice an
+    // explicit arenaQueueLeave gives, rather than finding out only when the
+    // arena window stops showing them as queued.
+    for (const pid of pruned) {
+      ctx.emit({ type: 'arenaUnqueued', pid });
+      ctx.emit({
+        type: 'log',
+        text: 'You leave the Ashen Coliseum queue.',
+        color: '#ffa040',
+        pid,
+      });
+    }
     if (ctx.arenaQueue1v1.length < 2 || freeArenaSlot(ctx, '1v1') === null) return;
     const aPid = ctx.arenaQueue1v1[0];
     const aRating = arenaRatingForPid(ctx, aPid, '1v1');
@@ -739,8 +780,31 @@ export function pruneTeamQueue(ctx: SimContext, fmt: '2v2' | 'fiesta'): void {
         !ctx.vcupSeatedOrQueued(id)
       );
     });
-  if (fmt === 'fiesta') ctx.arenaQueueFiesta = ctx.arenaQueueFiesta.filter(keep);
-  else ctx.arenaQueue2v2 = ctx.arenaQueue2v2.filter(keep);
+  const queue = fmt === 'fiesta' ? ctx.arenaQueueFiesta : ctx.arenaQueue2v2;
+  const pruned: ArenaQueueUnit[] = [];
+  const survivors = queue.filter((unit) => {
+    if (keep(unit)) return true;
+    pruned.push(unit);
+    return false;
+  });
+  if (fmt === 'fiesta') ctx.arenaQueueFiesta = survivors;
+  else ctx.arenaQueue2v2 = survivors;
+  if (pruned.length === 0) return;
+  // A dropped unit can carry a teammate who did nothing wrong (the OTHER member
+  // walked into an instance, died, or got seated in Vale Cup): give every
+  // still-connected member of the unit the same notice an explicit
+  // arenaQueueLeave gives, rather than leaving them silently unqueued.
+  const leaveText =
+    fmt === 'fiesta'
+      ? 'You leave the 2v2 Fiesta queue.'
+      : 'You leave the Ashen Coliseum 2v2 queue.';
+  for (const unit of pruned) {
+    for (const pid of unit.pids) {
+      if (!ctx.entities.get(pid)) continue;
+      ctx.emit({ type: 'arenaUnqueued', pid });
+      ctx.emit({ type: 'log', text: leaveText, color: '#ffa040', pid });
+    }
+  }
 }
 
 export function removeTeamQueueUnits(
@@ -1119,7 +1183,11 @@ export function endArenaMatch(
           delta,
           won,
         ));
-        if (won === true) awardRankedArenaWinHonor(ctx, meta, match.format, opponentTeamKey);
+        // Rating (addArenaResult above) and Deeds (onArenaMatchEndForDeeds below)
+        // are deliberately forfeit-inclusive; Honor is not, mirroring Fiesta's
+        // completion-honor guard a few lines down.
+        if (won === true && reason !== 'forfeit')
+          awardRankedArenaWinHonor(ctx, meta, match.format, opponentTeamKey);
       } else {
         ratingBefore = ratingAfter = arenaStanding(meta, match.format).rating;
         if (match.fiesta && !match.practice && reason !== 'forfeit') {

@@ -20,6 +20,7 @@ import {
 } from '../src/sim/dungeon_layout';
 import { PLAYER_BODY_RADIUS } from '../src/sim/pathfind';
 import { eloDelta, Sim } from '../src/sim/sim';
+import { ARENA_MIN_LEVEL } from '../src/sim/social/arena';
 import type { PlayerClass, WorldContent } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
 
@@ -54,6 +55,8 @@ function queueDuo(
   const sim = makeWorld();
   const a = sim.addPlayer(aClass, 'Aleph');
   const b = sim.addPlayer(bClass, 'Bet');
+  sim.setPlayerLevel(ARENA_MIN_LEVEL, a);
+  sim.setPlayerLevel(ARENA_MIN_LEVEL, b);
   teleport(sim, a, 0, -40);
   teleport(sim, b, 6, -40);
   beforeQueue?.(sim, a, b);
@@ -102,6 +105,7 @@ describe('arena: queue + matchmaking', () => {
   it('a lone contender waits; a second one triggers a match', () => {
     const sim = makeWorld();
     const a = sim.addPlayer('warrior', 'Aleph');
+    sim.setPlayerLevel(ARENA_MIN_LEVEL, a);
     teleport(sim, a, 0, -40);
     sim.arenaQueueJoin(a);
     sim.tick();
@@ -109,6 +113,7 @@ describe('arena: queue + matchmaking', () => {
     expect(sim.arenaInfoFor(a)!.queued).toBe(true);
 
     const b = sim.addPlayer('rogue', 'Bet');
+    sim.setPlayerLevel(ARENA_MIN_LEVEL, b);
     teleport(sim, b, 6, -40);
     sim.arenaQueueJoin(b);
     sim.tick();
@@ -120,6 +125,7 @@ describe('arena: queue + matchmaking', () => {
   it('leaving the queue cancels matchmaking', () => {
     const sim = makeWorld();
     const a = sim.addPlayer('warrior', 'Aleph');
+    sim.setPlayerLevel(ARENA_MIN_LEVEL, a);
     teleport(sim, a, 0, -40);
     sim.arenaQueueJoin(a);
     expect(sim.arenaQueue1v1).toContain(a);
@@ -130,6 +136,7 @@ describe('arena: queue + matchmaking', () => {
   it('cannot queue a second bracket while already queued', () => {
     const sim = makeWorld();
     const a = sim.addPlayer('warrior', 'Aleph');
+    sim.setPlayerLevel(ARENA_MIN_LEVEL, a);
     teleport(sim, a, 0, -40);
     sim.arenaQueueJoin(a);
     const errsBefore = sim.events.filter((e) => e.type === 'error').length;
@@ -144,7 +151,10 @@ describe('arena: queue + matchmaking', () => {
     const a = sim.addPlayer('warrior', 'Aleph');
     const b = sim.addPlayer('mage', 'Bet');
     const c = sim.addPlayer('rogue', 'Gimel');
-    for (const pid of [a, b, c]) teleport(sim, pid, 0, -40);
+    for (const pid of [a, b, c]) {
+      sim.setPlayerLevel(ARENA_MIN_LEVEL, pid);
+      teleport(sim, pid, 0, -40);
+    }
     sim.meta(a)!.arenaRating = 1500;
     sim.meta(b)!.arenaRating = 1800; // far from Aleph
     sim.meta(c)!.arenaRating = 1510; // closest to Aleph
@@ -167,6 +177,110 @@ describe('arena: queue + matchmaking', () => {
     sim.enterCrypt(a); // now standing in a far-off instance
     sim.arenaQueueJoin(a);
     expect(sim.arenaQueue1v1).not.toContain(a);
+  });
+});
+
+describe('arena: ranked minimum-level gate', () => {
+  it('rejects a below-level solo 1v1 join with no rating advantage from twinking down', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph'); // default level 1
+    teleport(sim, a, 0, -40);
+    sim.arenaQueueJoin(a);
+    expect(sim.arenaQueue1v1).not.toContain(a);
+    expect(sim.events.some((e) => e.type === 'error')).toBe(true);
+  });
+
+  it('accepts a solo 1v1 join once the character reaches the minimum level', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    sim.setPlayerLevel(ARENA_MIN_LEVEL, a);
+    teleport(sim, a, 0, -40);
+    sim.arenaQueueJoin(a);
+    expect(sim.arenaQueue1v1).toContain(a);
+  });
+
+  it('rejects a below-level solo 2v2 join', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    teleport(sim, a, 0, -40);
+    sim.arenaQueueJoin(a, '2v2');
+    expect(sim.arenaQueue2v2.length).toBe(0);
+  });
+
+  it('rejects an at-level leader queueing 2v2 with a below-level party member', () => {
+    const sim = makeWorld();
+    const leader = sim.addPlayer('warrior', 'Aleph');
+    const member = sim.addPlayer('mage', 'Bet'); // stays at default level 1
+    sim.setPlayerLevel(ARENA_MIN_LEVEL, leader);
+    teleport(sim, leader, 0, -40);
+    teleport(sim, member, 3, -40);
+    sim.partyInvite(member, leader);
+    sim.partyAccept(member);
+    sim.arenaQueueJoin(leader, '2v2');
+    expect(sim.arenaQueue2v2.length).toBe(0);
+    expect(sim.events.some((e) => e.type === 'error' && e.text.includes('Bet'))).toBe(true);
+  });
+
+  it('does not gate Fiesta: a fresh level-1 character can still queue it', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph'); // default level 1
+    teleport(sim, a, 0, -40);
+    sim.arenaQueueJoin(a, 'fiesta');
+    expect(sim.arenaQueueFiesta.some((u) => u.pids.includes(a))).toBe(true);
+  });
+});
+
+describe('arena: queue auto-prune notifies survivors', () => {
+  it('notifies a still-connected 1v1 queuer pruned for walking into an instance', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    sim.setPlayerLevel(ARENA_MIN_LEVEL, a);
+    teleport(sim, a, 0, -40);
+    sim.arenaQueueJoin(a);
+    expect(sim.arenaQueue1v1).toContain(a);
+    sim.drainEvents();
+
+    teleport(sim, a, 80, 88);
+    sim.enterCrypt(a); // walks into an instance while still queued
+    const events = sim.tick(); // matchmakeArena1v1's prune drops them
+
+    expect(sim.arenaQueue1v1).not.toContain(a);
+    expect(events).toContainEqual({ type: 'arenaUnqueued', pid: a });
+    expect(
+      events.some((e) => e.type === 'log' && e.text === 'You leave the Ashen Coliseum queue.'),
+    ).toBe(true);
+  });
+
+  it('notifies the still-connected teammate when the other half of a 2v2 premade is pruned', () => {
+    const sim = makeWorld();
+    const leader = sim.addPlayer('warrior', 'Aleph');
+    const member = sim.addPlayer('mage', 'Bet');
+    sim.setPlayerLevel(ARENA_MIN_LEVEL, leader);
+    sim.setPlayerLevel(ARENA_MIN_LEVEL, member);
+    teleport(sim, leader, 0, -40);
+    teleport(sim, member, 3, -40);
+    sim.partyInvite(member, leader);
+    sim.partyAccept(member);
+    sim.arenaQueueJoin(leader, '2v2');
+    expect(sim.arenaQueue2v2.some((u) => u.pids.includes(member))).toBe(true);
+    sim.drainEvents();
+
+    // The leader dies mid-queue; the whole premade unit is pruned even though
+    // the member is untouched and still standing where they queued.
+    const leaderEntity = sim.entities.get(leader)!;
+    leaderEntity.dead = true;
+    const events = sim.tick();
+
+    expect(sim.arenaQueue2v2.length).toBe(0);
+    expect(events).toContainEqual({ type: 'arenaUnqueued', pid: member });
+    expect(
+      events.some(
+        (e) =>
+          e.type === 'log' &&
+          e.text === 'You leave the Ashen Coliseum 2v2 queue.' &&
+          e.pid === member,
+      ),
+    ).toBe(true);
   });
 });
 
@@ -278,6 +392,7 @@ describe('arena: a full bout', () => {
     const names = ['Aleph', 'Bet', 'Gimel', 'Dalet'];
     const pids = classes.map((cls, i) => sim.addPlayer(cls, names[i]));
     pids.forEach((pid, i) => {
+      sim.setPlayerLevel(ARENA_MIN_LEVEL, pid);
       teleport(sim, pid, i * 3, -40);
     });
     for (const pid of pids) sim.arenaQueueJoin(pid, '2v2');
@@ -454,6 +569,7 @@ function queue2v2(classes: PlayerClass[] = ['warrior', 'mage', 'rogue', 'priest'
   const sim = makeWorld();
   const names = ['Aleph', 'Bet', 'Gimel', 'Dalet'];
   const pids = classes.map((cls, i) => sim.addPlayer(cls, names[i]));
+  for (const pid of pids) sim.setPlayerLevel(ARENA_MIN_LEVEL, pid);
   for (let i = 0; i < pids.length; i++) teleport(sim, pids[i], i * 3, -40);
   for (const pid of pids) sim.arenaQueueJoin(pid, '2v2');
   sim.tick();
@@ -484,7 +600,10 @@ describe('arena: 2v2 queue + matchmaking', () => {
     const a2 = sim.addPlayer('paladin', 'Bet');
     const b1 = sim.addPlayer('mage', 'Gimel');
     const b2 = sim.addPlayer('rogue', 'Dalet');
-    for (const pid of [a1, a2, b1, b2]) teleport(sim, pid, 0, -40);
+    for (const pid of [a1, a2, b1, b2]) {
+      sim.setPlayerLevel(ARENA_MIN_LEVEL, pid);
+      teleport(sim, pid, 0, -40);
+    }
     sim.meta(a1)!.arena2v2Rating = 1500;
     sim.meta(a2)!.arena2v2Rating = 1500;
     sim.meta(b1)!.arena2v2Rating = 1800;
@@ -508,7 +627,10 @@ describe('arena: 2v2 queue + matchmaking', () => {
     const p2 = sim.addPlayer('paladin', 'Bet');
     const s1 = sim.addPlayer('mage', 'Gimel');
     const s2 = sim.addPlayer('rogue', 'Dalet');
-    for (const pid of [p1, p2, s1, s2]) teleport(sim, pid, 0, -40);
+    for (const pid of [p1, p2, s1, s2]) {
+      sim.setPlayerLevel(ARENA_MIN_LEVEL, pid);
+      teleport(sim, pid, 0, -40);
+    }
     sim.partyInvite(p2, p1);
     sim.partyAccept(p2);
     sim.arenaQueueJoin(p1, '2v2');
@@ -525,6 +647,8 @@ describe('arena: 2v2 queue + matchmaking', () => {
     const sim = makeWorld();
     const leader = sim.addPlayer('warrior', 'Aleph');
     const member = sim.addPlayer('mage', 'Bet');
+    sim.setPlayerLevel(ARENA_MIN_LEVEL, leader);
+    sim.setPlayerLevel(ARENA_MIN_LEVEL, member);
     teleport(sim, leader, 0, -40);
     teleport(sim, member, 3, -40);
     sim.partyInvite(member, leader);
@@ -542,7 +666,10 @@ describe('arena: 2v2 queue + matchmaking', () => {
     const sim = makeWorld();
     const leader = sim.addPlayer('warrior', 'Aleph');
     const member = sim.addPlayer('mage', 'Bet');
-    for (const pid of [leader, member]) teleport(sim, pid, 0, -40);
+    for (const pid of [leader, member]) {
+      sim.setPlayerLevel(ARENA_MIN_LEVEL, pid);
+      teleport(sim, pid, 0, -40);
+    }
     sim.partyInvite(member, leader);
     sim.partyAccept(member);
     sim.arenaQueueJoin(leader, '2v2');
