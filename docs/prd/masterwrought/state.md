@@ -1,6 +1,6 @@
 # Masterwrought: cross-phase state
 
-Current phase: 02 built and review-audited (two reviewed fix rounds applied 2026-08-07); next is phase 02 QA. Packet authored 2026-08-07.
+Current phase: 02 COMPLETE including QA (PASS, fix round 6175c95836, 2026-08-07); next is phase 03 (IP naming sweep, phase-03-naming-sweep.md). Packet authored 2026-08-07.
 Branch: `feature/masterwrought` (worktree `~/Documents/wocc-masterwrought`), based on `origin/release/v0.36.0`.
 
 ## Delivery contract (non-negotiable)
@@ -99,8 +99,10 @@ Arcanite (new uses), Quintessent, Grand Banquet, Colossus Splitter, Aetherlens, 
 
 ## Key existing seams (from the research; verified against v0.35.0, re-verify on v0.36.0 drift)
 - Recipes: `src/sim/content/recipes.ts` (`ALL_RECIPES`), shape `ProfessionRecipeRecord`
-  (`src/sim/professions/types.ts`), `acquisition: ['drop']` typed + `acquireRecipe`
-  plumbed (`src/sim/professions/crafting.ts`) with zero users; NO recipe item kind exists.
+  (`src/sim/professions/types.ts`). SUPERSEDED BY PHASE 02 (the research-era premise said
+  zero users and no kind): `acquireRecipe` now has its first real caller (source 'drop',
+  `src/sim/professions/pattern_items.ts`) and the `'recipe'` ItemKind exists
+  (`RecipeItemDef`, `src/sim/types.ts`); no shipped content carries the kind until phase 11.
 - Unique-equipped: `src/sim/equipment_rules.ts` `isUniqueEquipped` is hardcoded
   `quality === 'legendary'`; the counted Masterwrought family is NEW machinery beside it.
 - Masterwork: `src/sim/professions/masterwork.ts` (pure leaf, locked constants); proc site
@@ -238,14 +240,15 @@ Arcanite (new uses), Quintessent, Grand Banquet, Colossus Splitter, Aetherlens, 
   copied VERBATIM per locale from resolved hudChrome.training.alreadyKnown so hover and click
   agree byte for byte), error.patternProfession 'You have not practiced that profession.',
   error.patternSkill 'Your skill is too low to learn that pattern.'; all three placeholder
-  free (EXACT self-registration, no RULES rows), real fills in all 20 non-en blocks (12
-  BASE_DICT + 8 BASE_NEW), en_CA on the English floor, each emit its own single-line
+  free (EXACT self-registration, no RULES rows), real fills in every non-en locale block
+  across BOTH dict tables (BASE_DICT in sim_i18n.ts plus BASE_NEW in sim_i18n.newlocales.ts),
+  en_CA on the English floor, each emit its own single-line
   ctx.error (S3 coverage PROVEN by a byte-mutation probe; the professions directory glob at
   the corpus assembly covers pattern_items.ts, no explicit entry needed). English vocabulary
   mix is deliberate: you KNOW a recipe, you HOLD a pattern. hudChrome.pattern.teaches 'Use:
-  Teaches you how to craft {item}.' with its five non-Latin fills (M16), 15 Latin overlays
-  pending for the release fill. itemUi.kind.recipe 'Pattern' English plus one-word fills in
-  all 18 full overlays IN-CHANGE (deliberate deviation from English-only: keeps each locale's
+  Teaches you how to craft {item}.' with its M16 non-Latin fills, the remaining Latin
+  overlays pending for the release fill. itemUi.kind.recipe 'Pattern' English plus one-word
+  fills in every full overlay IN-CHANGE (deliberate deviation from English-only: keeps each locale's
   pattern-word consistent with its sim DICT refusal rows; the release fill should still
   REVIEW those words). Register clash inherited verbatim in three locales (de_DE Sie vs du,
   pl_PL plural, tr_TR formal): reconcile at the trainer key during the release fill, not here.
@@ -289,7 +292,70 @@ Arcanite (new uses), Quintessent, Grand Banquet, Colossus Splitter, Aetherlens, 
   (comment at the metric); re-point the tooltip suite's real-recipe silence arm when
   sunpetal-class content gains drops; pattern items need committed icon art or
   ITEM_ART_PENDING entries; revisit a dedicated market/bag chip as pattern count grows;
-  author pattern skillReqs ON the 25-step tier boundaries or first decide the requirement
-  number question (the pattern hover prints the raw skillReq while the trainer surfaces
-  print the tier-band floor tierForSkill(skillReq) * TIER_SKILL_STEP; identical for every
-  on-step recipe, divergent copy for an off-step one).
+  author pattern skillReqs ON the TIER_SKILL_STEP tier boundaries or first decide the
+  requirement number question (the pattern hover prints the raw skillReq while the trainer
+  surfaces print the tier-band floor tierForSkill(skillReq) * TIER_SKILL_STEP; identical for
+  every on-step recipe, divergent copy for an off-step one).
+
+## Phase 02 QA ledger (audited 2026-08-07; fix round 6175c95836)
+- Audit shape: seven fresh auditors (correctness + a surfaces child, rng-and-golden,
+  test-decisiveness, cleanup, architecture-reviewer, cross-platform-sync, qa-checklist) over
+  git diff 80d4afd062..b873eac88e on the tree with release/v0.36.0 re-merged (0fc4e544d6).
+  ZERO blocking findings; every should-fix and nit applied or recorded below, none deferred.
+- Refutations THIS round, both settled with the file open plus a live probe (do not
+  re-raise): (1) "pattern_items.ts is not in the S3 corpus" re-raised by a sync auditor who
+  read only the hand-kept readFileSync list and missed the socialSourceUnder professions
+  glob; settled BOTH directions by live byte probes (DICT row edit reds s3_registered, emit
+  literal edit reds s3_registered). (2) "no online-arm test exists": the online describe
+  drives the real {cmd:'use'} wire command through GameServer.handleMessage with the
+  routeEvents fan-out and the cprof mirror. (3) "the rod-fee invariant is unguarded prose":
+  tests/professions_rod_recipes.test.ts pins each rod recipe's acquisition to exactly
+  ['trainer']; the pin's message now names the rodFeePaid metric and the server comment
+  cites the pin.
+- Type hardening: RecipeItemDef now bars `use` and `stackSize` outright (never-fields
+  beside armorType/weapon): a use payload would resolve ABOVE the recipe kind arm and the
+  click would never learn; an explicit stackSize wins over UNSTACKED_KINDS in stackSizeOf.
+  The suite fixtures dropped their casts so tsc guards the def shape; the one union-spread
+  casualty (stack_size_tooltip_view's explicit-stackSize probes) narrows to the potion arm
+  before spreading.
+- New decisive pins this round, each proven by a live mutation probe (restore by EDIT,
+  never checkout): the grandfathered no-acquisition fixture on BOTH suites (sim silence +
+  copy intact + invalid-before-already_known on the real path; tooltip model null; reds a
+  dropped optional chain on either side), the hover-click cross-check matrix (model.skillMet
+  vs resolvePatternLearn cell for cell; reds a raw-compare teachTierMet), positive controls
+  on the zero-rng observer plus a draw-free sweep over EVERY refusal arm (red on a neutered
+  Rng observer), and the def-level tradable-drop sweep (quality not 'poor' because
+  junkSellableSlot gates on QUALITY not kind; no soulbound; no noMarketList; vacuous today
+  like its siblings, live the moment phase 11 ships a def).
+- Kind-sweep completeness: 'recipe' joined the two stale every-non-quest-ItemKind lists
+  (tests/bag_quest_mark_view.test.ts, tests/quest_item_tooltip_view.test.ts); the phase had
+  updated the other two sibling lists, these two were the missed pair.
+- Rulings recorded (settled, do not re-raise): patterns are NOT hotbar-placeable (comment at
+  isHotbarItemId beside the reins rationale: a one-shot unlock would leave a dead button
+  after its first press; elixir precedent); discard of an unlearned pattern stays the
+  generic confirm (patterns are ordinary tradable items, the escalated confirm keys on
+  instance payloads, classic-correct); PatternLearnResult stays exported with zero external
+  consumers (it names the public resolver's return type, the training.ts TrainResult idiom);
+  removeItem-by-dispatch-itemId vs def.id is unpinnable without an unshippable
+  table-key-vs-def-id mismatch fixture (recorded, no change); the frozen-id golden is a
+  DELETION guard only, so "no shipped pattern ids" is actually held by the zero
+  kind:'recipe' content greps plus the content-shape sweep, not the golden.
+- Docs/comment corrections: the Key existing seams recipes row (the phase itself
+  superseded its zero-users/no-kind premise); the professions CLAUDE.md module map gained
+  its pattern_items.ts row; the hud.ts tooltip gate comment now says WHICH host pays the
+  craftingIdentity rebuild (offline Sim; the ClientWorld read is a mirrored field); the
+  defense-in-depth !learned.ok comment now says unreachable today; the
+  isGatheredProvenanceKind docstring places kind 'recipe' outside the signed universe; the
+  market_query 'other' comment cites where the recipe arm is actually pinned; train_view's
+  not-trainer-taught comment notes the mechanism now exists while content does not.
+- Phase 11 obligations ADDED by this QA round (beyond the build ledger's list): decide
+  vendorCountForced for a vendor-sold pattern before one ships (the count row would show
+  5x/10x; surplus patterns are tradable unlike reins, so it is a decision, not a copy of
+  the mount arm); scripts/mediawiki/build_seed.mjs interpolates raw item.kind into wiki
+  prose and categories, so the first shipped pattern needs kind-aware wording there; add
+  the 'recipe' census row to tests/material_taxonomy.test.ts when content lands (adding it
+  now would red on the empty catalog); extend tests/stack_size_tooltip_view.test.ts's
+  UNSTACKED-kind probe with a shipped pattern id then; icon art remains a hard landing
+  blocker (ITEM_IMAGE_IDS auto-enters every non-weapon id and ITEM_ART_PENDING is
+  deliberately empty, so a shipped pattern with no art 404s and reds item_icons; the
+  procedural parchment arm serves only ids parked in ITEM_ART_PENDING).

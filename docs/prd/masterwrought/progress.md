@@ -5,7 +5,7 @@
 | 01 | Masterwrought equip cap | complete | 2026-08-07 | 2026-08-07 |
 | 01 QA | verify | complete | 2026-08-07 | 2026-08-07 |
 | 02 | Pattern items and recipe learning | complete | 2026-08-07 | 2026-08-07 |
-| 02 QA | verify | pending | | |
+| 02 QA | verify | complete | 2026-08-07 | 2026-08-07 |
 | 03 | IP naming sweep | pending | | |
 | 03 QA | verify | pending | | |
 | 04 | Materials backbone | pending | | |
@@ -69,6 +69,31 @@ never future-PR items, per the delivery contract in `state.md`).
   blocking claim (S3 corpus miss) was refuted with a byte-mutation probe and whose 6
   should-fix + 6 nits were applied in a second reviewed round. Decisions, traps, and phase 11
   obligations recorded in the Phase 02 ledger in state.md.
+- Phase 02 QA (2026-08-07): seven-auditor fan-out (correctness plus a surfaces child,
+  rng-and-golden, test-decisiveness, cleanup, architecture-reviewer, cross-platform-sync,
+  qa-checklist) over git diff 80d4afd062..b873eac88e, after re-merging the moved
+  release/v0.36.0 tip (merge 0fc4e544d6, release-merge-audit clean; the merge also fixed
+  the inherited hunter_ghost red via PR 3111). Verdict PASS after the fix round: 0
+  blocking, 9 should-fix, 14 nits found across the seven reports (deduped); every finding
+  applied or recorded in the Phase 02 QA ledger in state.md, none deferred. Three findings
+  REFUTED with the file open plus live probes (the S3 corpus miss re-raise, twice-probed
+  byte mutation both directions; the no-online-test claim; the unguarded-rod-fee claim).
+  The stated QA focus verified with hard evidence: zero rng draws walked transitively and
+  pinned with positive-controlled observers over success AND every refusal arm; the
+  frozen-id golden untouched and green with zero kind:'recipe' content anywhere (and
+  recorded as a deletion guard, the content sweep being the real addition guard); S3
+  coverage of every refusal line proven by emit-side and DICT-side byte probes. Fix round
+  (6175c95836): RecipeItemDef use/stackSize never-fields, cast-free fixtures, the
+  grandfathered no-acquisition fixture both suites, the hover-click cross-check matrix,
+  refusal-arm draw-free sweep, tradable-drop def sweep (quality/soulbound/noMarketList),
+  the two missed every-non-quest-kind lists, the rodFeePaid-naming assertion message,
+  hotbar-exclusion ruling comment, and seven comment/docs corrections; every new pin
+  proven decisive by live mutation probes (all red on target, tree restored by edit).
+  Validation green: tsc, recipe_pattern_items, recipe_pattern_tooltip_view, architecture,
+  localization_fixes, crafted_item_tooltip_coverage, i18n_completeness,
+  bag_quest_mark_view, quest_item_tooltip_view, professions_rod_recipes,
+  stack_size_tooltip_view, item_instance_tooltip, bags_view, bag_filter, hud_perf_budget,
+  i18n:gen freshness, biome on all touched files.
 - Phase 01 QA (2026-08-07): six-auditor fan-out (correctness, test-decisiveness,
   cleanup, architecture-reviewer, cross-platform-sync, qa-checklist) over the four
   phase commits. Verdict PASS after the fix round: 2 blocking (tooltip tag untested;
