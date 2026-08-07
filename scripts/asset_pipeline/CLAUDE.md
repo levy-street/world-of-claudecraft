@@ -51,7 +51,7 @@ gripFrac from `lib/families.mjs`, WebP 512 textures, meshopt) plus a 128px HUD i
 The key MUST contain a family token: sword, dagger, staff, hammer, axe, halberd, spear,
 scythe, or wand (`tests/held_weapon_models.test.ts` contract), or pass `--family`.
 `--apply` copies the GLB to `public/models/weapons/` and the icon to `public/ui/weapons/`,
-registers the key in `KAYKIT_WEAPON_ACCESSORY` (`src/render/characters/assets.ts`), maps any
+registers the key in `KAYKIT_WEAPON_ACCESSORY` (`src/render/characters/prop_placement_core.ts`), maps any
 `--items` ids in `ITEM_WEAPON_VARIANTS` (`src/ui/weapon_variants.ts`), and appends the
 CREDITS.md row. The ItemDef snippet is printed for the agent to place by hand (real
 vanilla-style stats are a gameplay judgment). After `--apply` run:
@@ -334,8 +334,8 @@ strip; `--serve` upgrades it to live rendering.
 When a weapon is held by a character, a "grip fit" bar exposes per-weapon move (x/y/z), rotate
 (x/y/z degrees), and scale sliders that update the in-hand transform live. These layer ON TOP
 of the family variant grip (lift + shrink clamp + hand flip) via `WEAPON_GRIP_OVERRIDES` in
-`src/render/characters/weapon_grip.ts` (the pure `variantGripTransform` the engine's
-`applyVariantGrip` uses; the viewer mirrors the same math). "Save" POSTs to `/api/grip/save`
+`src/render/characters/weapon_grip.ts` (the pure `variantGripTransform` that
+`resolvePropPlacement` composes; the viewer mirrors the same math). "Save" POSTs to `/api/grip/save`
 (`integrate.saveGripOverride`, an anchored numeric upsert keyed by weapon model basename, so no
 free text reaches the source); "Reset" restores the family default (an identity override removes
 the key). Save is enabled only for APPLIED weapons (`public/models/weapons`, which have a stable

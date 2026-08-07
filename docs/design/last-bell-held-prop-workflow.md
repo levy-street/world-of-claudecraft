@@ -12,9 +12,12 @@ rule that prevents it.
 The book mounted every blade with a literal bare bone attach
 (`GRIPS["blade"]` in `scripts/assets/last_bell_crew/crew.py`) because a note
 in `cast.py` claimed that is what `VisualDef.attach` does in-game. It is not:
-the engine resolves a real grip transform per weapon family (`attachProp` in
-`src/render/characters/assets.ts`, via `applyHandGrip` / `applyVariantGrip`
-and the `KAYKIT_HAND_GRIPS` / `KAYKIT_SHIELD_GRIPS` tables).
+the engine resolves a real grip transform per weapon family. That resolution now
+lives in ONE place, `resolvePropPlacement`
+(`src/render/characters/prop_placement_core.ts`), which the game, the /wiki guide
+viewer and the asset-pipeline inspector all call, and which owns the
+`KAYKIT_WEAPON_ACCESSORY` / `VARIANT_GRIPS` / `KAYKIT_HAND_GRIPS` /
+`KAYKIT_SHIELD_GRIPS` tables.
 
 **Rule: a comment describing another system is hearsay. Read the system, or
 better, look at its rendered output.**
