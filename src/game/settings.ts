@@ -320,6 +320,18 @@ export const BOOL_SETTINGS = {
   // 23..33). main.ts enforces that this row can only remain enabled while the
   // secondary row is visible. Mobile exposes the same slots through ring pages.
   showThirdActionBar: { def: false },
+  // on by default, desktop only: the two-line interact prompt above the action
+  // bars naming whatever the interact key would act on right now (the target's
+  // name over a keyboard glyph, the action word, and the bound keycap). Purely
+  // a display preference; the key works identically with the prompt hidden. The
+  // touch interface never shows it (it names a keyboard binding), so the row is
+  // hidden from the options list there rather than shown as a dead toggle.
+  showInteractPrompt: { def: true },
+  // on by default, desktop only: a thin gold outline on the interactable under
+  // the mouse cursor (NPC, corpse, chest, mailbox, door, gather node). Purely a
+  // display preference; hovering already changes the cursor either way, and the
+  // outline never marks anything the player could not already interact with.
+  interactHighlight: { def: true },
   // off by default: the classic "target of target" mini-frame. When on, and you have
   // a target, a small unit frame under the target frame shows who YOUR target is
   // targeting (a mob's aggro target, a player's selected target). Purely a display

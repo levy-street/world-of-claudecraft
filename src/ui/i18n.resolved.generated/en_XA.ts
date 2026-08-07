@@ -774,6 +774,26 @@ export const en_XA: EnTranslations = {
       "ready": "[Šŵíñĝ]",
       "seconds": "[{seconds}š]"
     },
+    "interactPrompt": {
+      "interact": "[Íñţéŕáçţ]",
+      "loot": "[Ļóóţ]",
+      "talk": "[Ţáļķ]",
+      "open": "[Óþéñ]",
+      "take": "[Ţáķé]",
+      "gather": "[Ĝáţĥéŕ]",
+      "enter": "[Éñţéŕ]",
+      "leave": "[Ļéáʋé]",
+      "name": {
+        "lockedChest": "[Ļóçķéð Çĥéšţ]",
+        "rewardChest": "[Ŕéŵáŕð Çĥéšţ]",
+        "surfaceExit": "[Ŵáý Óúţ]",
+        "reliquary": "[Ðŕóŵñéð Ŕéļíɋúáŕý]",
+        "bellShrine": "[Ɓéļļ Šĥŕíñé]",
+        "candleShrine": "[Çáñðļé Šĥŕíñé]",
+        "reedShrine": "[Ŕééð Šĥŕíñé]",
+        "skullShrine": "[Šķúļļ Šĥŕíñé]"
+      }
+    },
     "rest": {
       "resting": "[Ŕéšţíñĝ]"
     },
@@ -1218,6 +1238,8 @@ export const en_XA: EnTranslations = {
       "showThirdActionBar": "[Šĥóŵ Ţĥíŕð Áçţíóñ Ɓáŕ]",
       "lockActionBars": "[Ļóçķ Áçţíóñ Ɓáŕš]",
       "showTargetOfTarget": "[Šĥóŵ Ţáŕĝéţ óƒ Ţáŕĝéţ]",
+      "showInteractPrompt": "[Šĥóŵ Íñţéŕáçţ Þŕóɱþţ]",
+      "interactHighlight": "[Ĥíĝĥļíĝĥţ Íñţéŕáçţáƀļéš óñ Ĥóʋéŕ]",
       "showAttackButton": "[Šĥóŵ Áţţáçķ Ɓúţţóñ]",
       "showDailyRewardsChest": "[Šĥóŵ Ðáíļý Ŕéŵáŕðš Çĥéšţ]",
       "mobileCameraJoystick": "[Çáɱéŕá ĵóýšţíçķ]",

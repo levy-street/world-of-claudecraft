@@ -125,6 +125,42 @@ export function hoverCursorKind(
   return 'default';
 }
 
+/** Whether a hovered entity should wear the interact highlight (the thin gold
+ *  rim, see src/render/interact_highlight.ts).
+ *
+ *  Deliberately RANGE-BLIND, unlike the interact-key scan: the outline answers
+ *  "is that thing something I could interact with", and a click on a distant
+ *  NPC or corpse already walks you to it (shouldApproachPickedEntity above), so
+ *  gating the cue on range would hide it exactly when it is most useful. It is
+ *  never wider than the real affordance though: every arm below mirrors a case
+ *  handlePickedEntity actually routes, so nothing lights up that a press or
+ *  click would refuse outright. */
+export function isInteractHighlightTarget(
+  e: Entity | undefined,
+  player: Pick<Entity, 'id' | 'dead' | 'ghost'>,
+  playerId: number,
+  harvestStateReliable = true,
+  partyMemberIds: readonly number[] | null = null,
+): boolean {
+  if (!e || e.id === playerId || e.id === player.id) return false;
+  if (e.kind === 'npc') {
+    // The graveyard angel is the ONLY interactable a ghost has; every other NPC
+    // refuses a dead or released player.
+    return e.templateId === 'spirit_healer' ? !!player.ghost : !player.dead;
+  }
+  if (player.dead) return false;
+  if (e.kind === 'object') return !!e.lootable || !!e.templateId?.startsWith('delve_');
+  if (e.kind === 'mob') {
+    if (isEscorteeEntity(e)) return !e.dead;
+    return (
+      e.dead &&
+      !!e.lootable &&
+      corpseLootAvailability(e, playerId, harvestStateReliable, partyMemberIds).canOpen
+    );
+  }
+  return false;
+}
+
 export function isActivePvpOpponent(world: PickInteractionWorld, e: Entity): boolean {
   return (
     e.kind === 'player' &&

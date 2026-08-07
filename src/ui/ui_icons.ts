@@ -66,6 +66,7 @@ export type UiIconName =
   | 'swap'
   | 'nameplates'
   | 'vibrate'
+  | 'keyboard'
   | 'lock'
   | 'mail'
   | 'ball'
@@ -180,6 +181,11 @@ const ICONS: Record<UiIconName, string> = {
   // phone handset flanked by vibration waves (hand-authored to match the bar glyphs)
   vibrate:
     '<path fill-rule="evenodd" d="M196 80h120a24 24 0 0 1 24 24v304a24 24 0 0 1-24 24H196a24 24 0 0 1-24-24V104a24 24 0 0 1 24-24zm4 40v272h112V120H200z"/><path d="M96 176v160h28V176zM388 176v160h28V176zM40 216v80h26v-80zM446 216v80h26v-80z"/>',
+  // hand-authored keyboard (the interact prompt above the action bars): a
+  // hollowed case with two key rows and a spacebar, so it reads as "press a key
+  // on your keyboard" beside the bound keycap at ~13px
+  keyboard:
+    '<path fill-rule="evenodd" d="M56 128h400a24 24 0 0 1 24 24v208a24 24 0 0 1-24 24H56a24 24 0 0 1-24-24V152a24 24 0 0 1 24-24zm12 40v176h376V168H68z"/><path d="M96 196h44v40H96zM160 196h44v40h-44zM224 196h44v40h-44zM288 196h44v40h-44zM352 196h44v40h-44zM96 256h44v40H96zM160 256h44v40h-44zM224 256h44v40h-44zM288 256h44v40h-44zM352 256h44v40h-44zM160 316h192v40H160z"/>',
   // hand-authored padlock — shackle over a solid body (nonzero fill merges them)
   lock: '<path d="M256 96a72 72 0 0 0-72 72v64h40v-64a32 32 0 0 1 64 0v64h40v-64a72 72 0 0 0-72-72zM150 224a26 26 0 0 0-26 26v140a26 26 0 0 0 26 26h212a26 26 0 0 0 26-26V250a26 26 0 0 0-26-26z"/>',
   // hand-authored sealed envelope (frame + flap V), distinct from the solid

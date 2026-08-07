@@ -77,6 +77,7 @@ import {
 } from './game/graphics_rebuild_crash_guard';
 import { Input } from './game/input';
 import { InputActivityMeter, installInputActivityTracking } from './game/input_activity';
+import { InteractPromptScanGate, interactPromptTarget } from './game/interact_prompt';
 import { stopAutorunForInteraction } from './game/interaction_autorun';
 import {
   activePvpOpponentIds,
@@ -84,6 +85,7 @@ import {
   handlePickedEntity,
   hoverCursorKind,
   isAttackableEntity,
+  isInteractHighlightTarget,
   shouldApproachPickedEntity,
   shouldDeferPickedCorpseToGatherNode,
 } from './game/interactions';
@@ -110,7 +112,7 @@ import { watchMobileMoreState } from './game/mobile_more_diagnostics';
 import { mouselookReleaseFacing } from './game/mouselook_release';
 import { diagonalMovementVisualFacing } from './game/movement_visual';
 import { music } from './game/music';
-import { tryNearbyInteraction } from './game/nearby_interaction';
+import { scanNearbyInteraction, tryNearbyInteraction } from './game/nearby_interaction';
 import { isOfflineModeAvailable } from './game/offline_mode_gate';
 import { padReelItemId } from './game/pad_reel';
 import { createPerfMonitor } from './game/perf';
@@ -266,6 +268,7 @@ import {
   ALL_CLASSES,
   DT,
   dist2d,
+  type Entity,
   MELEE_RANGE,
   type PlayerClass,
   RUN_SPEED,
@@ -2218,6 +2221,15 @@ async function startGame(
       if (!v) hud.cancelGroundAim();
       return;
     }
+    if (key === 'showInteractPrompt' || key === 'interactHighlight') {
+      // Both are read LIVE off the store, the prompt on its scan tick and the
+      // outline on the hover frame, so persisting the choice is the only work:
+      // a flip takes effect within one tick with no reload. The explicit arm
+      // (rather than the numeric fallback at the end of this function) is what
+      // keeps that true if either ever needs a side effect.
+      settings.set(key, !!value);
+      return;
+    }
     if (
       key === 'partyFrameShowResource' ||
       key === 'partyFrameShowAbsorbs' ||
@@ -3774,10 +3786,52 @@ async function startGame(
   const hoverPartyMemberIds = new Set<number>();
   const hoverPvpOpponentIds = new Set<number>();
 
+  // The gather node under the cursor, published by the node hover-tooltip
+  // module so the outline reuses ITS raycast instead of adding a second one.
+  let hoverPickedNodeId: string | null = null;
+
+  // Thin gold rim on the interactable under the cursor (Highlight Interactables
+  // on Hover). Reads the pick the hover-cursor pass already did, so it costs one
+  // predicate and one renderer call; the renderer rebuilds shells only when the
+  // target actually changes. A picked ENTITY always wins over a node, matching
+  // the node tooltip's own precedence.
+  function updateInteractHighlight(entity: Entity | undefined): void {
+    // Mouselook hides the cursor and freezes the pick point, so a hover cue
+    // would sit on whatever the pointer happened to be over when the look
+    // started and then stay there while the camera swings away.
+    if (
+      !settings.get('interactHighlight') ||
+      useTouchInterface() ||
+      input.isMouselookActive() ||
+      input.isDragging()
+    ) {
+      renderer.setInteractHighlight(null, null);
+      return;
+    }
+    if (entity) {
+      // The party roster is only consulted for a corpse's loot rights, and
+      // building it allocates; resolve it for that case alone so an ordinary
+      // hover frame allocates nothing.
+      const partyIds =
+        entity.kind === 'mob' && entity.dead ? localPartyMemberIds(world.partyInfo) : null;
+      const highlighted = isInteractHighlightTarget(
+        entity,
+        world.player,
+        world.playerId,
+        true,
+        partyIds,
+      );
+      renderer.setInteractHighlight(highlighted ? entity.id : null, null);
+      return;
+    }
+    renderer.setInteractHighlight(null, hoverPickedNodeId);
+  }
+
   function updateHoverCursor(): void {
     if (!input.hoverActive || input.isDragging() || hud.isModalOpen()) {
       input.setHoverCursor('default');
       hud.clearHoverTooltip();
+      renderer.setInteractHighlight(null, null);
       return;
     }
     if (hoverPickGate.shouldPick(input.hoverX, input.hoverY, performance.now())) {
@@ -3788,6 +3842,7 @@ async function startGame(
     input.setHoverCursor(
       hoverCursorKind(entity, world.playerId, partyMemberIds(hoverPartyMemberIds), pvpOpponents),
     );
+    updateInteractHighlight(entity);
     // WoW-style mouseover tooltip (name / level / creature type) for a mob under
     // the cursor, reusing the same (gated) pick this function already does for
     // the hover-cursor kind above; the tooltip content still re-resolves every
@@ -3801,6 +3856,25 @@ async function startGame(
     }
   }
 
+  // The interact prompt above the action bars (Show Interact Prompt). It reads
+  // the SAME scan the interact key dispatches from, on its own slower cadence:
+  // the scan sweeps every entity in range, which is far too much to redo per
+  // frame and far more than the player's walking speed needs.
+  const interactPromptGate = new InteractPromptScanGate();
+
+  function updateInteractPrompt(now: number): void {
+    if (!interactPromptGate.shouldScan(now)) return;
+    const touch = useTouchInterface();
+    const enabled = settings.get('showInteractPrompt');
+    // Skip the sweep entirely when the prompt cannot show; the painter still
+    // gets the call so a toggle-off is reflected on the very next tick.
+    const target =
+      enabled && !touch
+        ? interactPromptTarget(scanNearbyInteraction(world, GATHER_NODES), world.entities)
+        : null;
+    hud.setInteractPrompt(target, enabled, touch);
+  }
+
   // Desktop-only gather-node hover tooltip (Professions 2.0): the
   // module owns the listener/throttle/paint; this is thin wiring only.
   attachGatherNodeHoverTooltip(
@@ -3810,6 +3884,9 @@ async function startGame(
     (x, y) => renderer.pickGatherNode(x, y),
     (x, y) => renderer.pick(x, y),
     () => input.isDragging() || hud.isModalOpen(),
+    (nodeId) => {
+      hoverPickedNodeId = nodeId;
+    },
   );
 
   // Gathering-tool item use (#2343): a bags click or hotbar press on a
@@ -3963,6 +4040,7 @@ async function startGame(
     } finally {
       perf.finishTrace('input.hoverCursor', traceStart, 'active', hoverActive);
     }
+    updateInteractPrompt(now);
     perf.markInputFrame(performance.now());
 
     const mouselook = intro === null && input.isMouselookActive() && !movementFrozen();

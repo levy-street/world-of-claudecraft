@@ -2116,7 +2116,12 @@ describe('client HTML shell', () => {
     expect(mainTs).toContain(
       "import { stopAutorunForInteraction } from './game/interaction_autorun';",
     );
-    expect(mainTs).toContain("import { tryNearbyInteraction } from './game/nearby_interaction';");
+    // scanNearbyInteraction rides the SAME import: the interact prompt reads the
+    // scan the press dispatches from, so a second proximity sweep can never
+    // drift from this one.
+    expect(mainTs).toContain(
+      "import { scanNearbyInteraction, tryNearbyInteraction } from './game/nearby_interaction';",
+    );
     expect(mainTs).toContain('stopAutorunForInteraction(\n      tryNearbyInteraction(');
     // Open-gate flip: the trailing (online === null) override is gone,
     // so the helpers default harvestStateReliable = true (trusting the hcb

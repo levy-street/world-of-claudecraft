@@ -400,6 +400,10 @@ const GENERAL_KEYS = [
   'showItemLevel',
   'showOwnNameplate',
   'showPlayerNameplates',
+  // Desktop-only pair; buildInterfaceControls defaults to the desktop shape, so
+  // they belong in this list and drop out under { touch: true } (pinned below).
+  'showInteractPrompt',
+  'interactHighlight',
 ];
 const FRAMES_KEYS = [
   'playerFrameScale',
@@ -481,6 +485,19 @@ describe('options_view: interface dispatch matrix (cluster 5)', () => {
 
     const visible = buildInterfaceControls(makeSource({}, { showSecondaryActionBar: true }));
     expect(find(visible, 'showThirdActionBar')).toMatchObject({ disabled: false });
+  });
+
+  it('drops the two interact-affordance rows on touch, where neither applies', () => {
+    // Both name a keyboard/mouse affordance the touch interface does not have
+    // (a bound interact keycap, and a hover outline), so on touch they are
+    // omitted rather than shown as toggles that change nothing.
+    const touch = keysOf(buildInterfaceControls(makeSource(), { touch: true }));
+    expect(touch).not.toContain('showInteractPrompt');
+    expect(touch).not.toContain('interactHighlight');
+    // Every other row survives, so the gate is scoped to these two.
+    expect(touch).toContain('showPlayerNameplates');
+    expect(touch).toContain('stickyTarget');
+    expect(touch).toContain('showSecondaryActionBar');
   });
 
   it('marks only uiScale as commit-on-release; the other comfort sliders stay live (#1558)', () => {
