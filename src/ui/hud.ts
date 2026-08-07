@@ -72,7 +72,12 @@ import {
   zoneAt,
 } from '../sim/data';
 import { specialRoleColor } from '../sim/discord_roles';
-import { canEquipItem, isUniqueEquipped, weaponHand } from '../sim/equipment_rules';
+import {
+  canEquipItem,
+  isUniqueEquipped,
+  MASTERWROUGHT_EQUIP_CAP,
+  weaponHand,
+} from '../sim/equipment_rules';
 import { isItemLevelEligible, itemLevel, itemScore } from '../sim/item_level';
 import { requiredLevelFor } from '../sim/item_level_req';
 import type { Ante, PickAction } from '../sim/lockpick';
@@ -5601,6 +5606,18 @@ export class Hud {
         html += `<div class="tt-sub tt-row"><span>${esc(slotName)}</span><span class="tt-unique">${esc(uniqueTag)}</span></div>`;
       } else {
         html += `<div class="tt-sub">${esc(slotName)}</div>`;
+      }
+      // Masterwrought (the crafted-apex tier) is a COUNTED family, not the
+      // one-copy rule above: the tag names the budget the whole family shares
+      // rather than this one item, and reads that budget off the sim's own cap
+      // so the number can never drift from the rule. It always takes its own
+      // gold line, never the type seat, because a piece can carry both tags.
+      if (item.masterwrought) {
+        html += `<div class="tt-sub" style="color:var(--gold)">${esc(
+          t('hudChrome.itemMasterwrought', {
+            count: formatNumber(MASTERWROUGHT_EQUIP_CAP, { maximumFractionDigits: 0 }),
+          }),
+        )}</div>`;
       }
     }
     // Optional item-level readout (off by default; src/sim/item_level.ts derives it

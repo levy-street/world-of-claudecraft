@@ -16,30 +16,43 @@ import {
   canEquipItem,
   canEquipItemInSlot,
   displacedSlotForEquip,
+  equipCandidateQuality,
+  masterwroughtConflictSlot,
   slotAcceptsItem,
   uniqueEquipConflictSlot,
 } from '../sim/equipment_rules';
 import { meetsLevelRequirement, requiredLevelFor } from '../sim/item_level_req';
-import type { EquipSlot, ItemDef, PlayerClass } from '../sim/types';
+import type { EquipSlot, InvSlot, ItemDef, ItemInstancePayload, PlayerClass } from '../sim/types';
 
 /** What dropping a bag item on a paperdoll slot does. The blocked* variants are
  *  refusals the painter surfaces (a rejecting drop target + an error toast), and
  *  each names the ONE reason, checked in the sim's own order: wrong socket first
  *  (a helm on a ring finger), then class proficiency, then the level gate, then
- *  the unique-equipped rule (a second worn copy of a legendary). */
+ *  the unique-equipped rule (a second worn copy of a legendary), then the two
+ *  Masterwrought counted-family caps (the family's worn budget, then the one
+ *  legendary allowed inside it). */
 export type PaperdollDropAction =
   | 'equip'
   | 'blockedSlot'
   | 'blockedClass'
   | 'blockedLevel'
-  | 'blockedUnique';
+  | 'blockedUnique'
+  | 'blockedMasterwroughtCap'
+  | 'blockedMasterwroughtLegendary';
 
 /** Decide what dropping `item` on the `slot` paperdoll socket does for a `cls`
  *  character of `level`. Mirrors src/sim/items.ts equipItem's guard order, so a
  *  drop this returns 'equip' for is one the sim accepts. `equipment` is the worn
  *  set the unique-equipped rule reads; callers pass the live map (omitted, the
  *  unique arm is skipped, for legacy call shapes only: every paperdoll surface
- *  passes it). */
+ *  passes it). `instances` is the worn per-copy payloads, which decide whether a
+ *  worn Masterwrought piece counts as legendary; `inventory` is the mirrored
+ *  bags, from which this PREDICTS the copy the sim will actually consume by
+ *  running the sim's own selection rule (equipCandidateQuality) over it. That
+ *  prediction is the whole point: the sim consumes the HIGHEST-index matching
+ *  unit regardless of which stack the player dragged, so reading the dragged
+ *  unit instead would disagree with the authority in both directions. Omitted,
+ *  the def's quality rules. */
 export function paperdollDropAction(
   item: ItemDef,
   slot: EquipSlot,
@@ -47,6 +60,8 @@ export function paperdollDropAction(
   level: number,
   spec?: string | null,
   equipment?: Partial<Record<EquipSlot, string>>,
+  instances?: Partial<Record<EquipSlot, ItemInstancePayload>>,
+  inventory?: readonly InvSlot[],
 ): PaperdollDropAction {
   // Only real gear equips; a consumable or material declares no slot at all, and
   // a bag equips into its own bar socket, never the paperdoll.
@@ -64,6 +79,21 @@ export function paperdollDropAction(
     const ignore = displaced ? [slot, displaced] : [slot];
     if (uniqueEquipConflictSlot(item, equipment, (id) => ITEMS[id], ignore)) {
       return 'blockedUnique';
+    }
+    // The Masterwrought counted family, over the same exempt slots. The
+    // incoming copy's effective quality comes from the sim's own unit-selection
+    // rule run over the mirrored bags, so the mirror and the equip path read
+    // the SAME unit and neither a false block nor a false green is possible.
+    const mw = masterwroughtConflictSlot(
+      item,
+      equipment,
+      (id) => ITEMS[id],
+      ignore,
+      instances,
+      inventory ? equipCandidateQuality(inventory, item.id, item) : undefined,
+    );
+    if (mw) {
+      return mw.reason === 'cap' ? 'blockedMasterwroughtCap' : 'blockedMasterwroughtLegendary';
     }
   }
   return 'equip';

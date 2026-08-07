@@ -1614,6 +1614,7 @@ export const tr_TR: EnTranslations = {
     "itemHeroicTag": "[KAHRAMANCA]",
     "itemSoulbound": "Ruha Bağlı",
     "itemUniqueEquipped": "Eşsiz Kuşanım",
+    "itemMasterwrought": "Unique-Equipped: Masterwrought ({count})",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"

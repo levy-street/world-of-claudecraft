@@ -1614,6 +1614,7 @@ export const id_ID: EnTranslations = {
     "itemHeroicTag": "[HEROIK]",
     "itemSoulbound": "Terikat Jiwa",
     "itemUniqueEquipped": "Unik-Dipakai",
+    "itemMasterwrought": "Unique-Equipped: Masterwrought ({count})",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"

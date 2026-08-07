@@ -1614,6 +1614,7 @@ export const cs_CZ: EnTranslations = {
     "itemHeroicTag": "[HRDINSKÉ]",
     "itemSoulbound": "Vázáno na duši",
     "itemUniqueEquipped": "Jedinečně nositelné",
+    "itemMasterwrought": "Unique-Equipped: Masterwrought ({count})",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"

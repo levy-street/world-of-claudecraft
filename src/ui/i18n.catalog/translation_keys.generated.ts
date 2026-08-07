@@ -7645,6 +7645,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.itemArmorType.leather'
   | 'hudChrome.itemArmorType.mail'
   | 'hudChrome.itemHeroicTag'
+  | 'hudChrome.itemMasterwrought'
   | 'hudChrome.itemMenu.applyEnchant'
   | 'hudChrome.itemMenu.disenchant'
   | 'hudChrome.itemMenu.equip'

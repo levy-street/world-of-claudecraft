@@ -1614,6 +1614,7 @@ export const ru_RU: EnTranslations = {
     "itemHeroicTag": "[ГЕРОИЧЕСКИЙ]",
     "itemSoulbound": "Персональный",
     "itemUniqueEquipped": "Уникальный (экипируется)",
+    "itemMasterwrought": "Уникальный (экипируется): Ковка мастера ({count})",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"

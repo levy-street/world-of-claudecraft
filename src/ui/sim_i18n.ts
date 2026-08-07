@@ -126,6 +126,13 @@ const baseEnTable = {
   // Unique-equipped refusal: a second worn copy of the same legendary item
   // (src/sim/items.ts equipItem, rule in src/sim/equipment_rules.ts).
   'error.uniqueEquipped': 'You can only equip one of those.',
+  // Masterwrought counted-family refusals: the crafted-apex tier is worn at most
+  // two pieces at a time, and at most ONE of those two may be legendary
+  // (src/sim/items.ts equipItem, rule in src/sim/equipment_rules.ts
+  // masterwroughtConflictSlot). Placeholder-free, so both register in the EXACT
+  // matcher automatically.
+  'error.masterwroughtCap': 'You can only equip two Masterwrought items.',
+  'error.masterwroughtLegendary': 'You can only equip one legendary Masterwrought item.',
   // Refusal when an aimed equip slot (a paperdoll drop target) does not accept the
   // dragged piece, e.g. a helm dropped on a ring finger (src/sim/items.ts equipItem).
   'error.wrongEquipSlot': 'That does not go in that slot.',
@@ -1346,6 +1353,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.icicles': 'Carámbanos',
     'aura.perfectMoment': 'Momento perfecto',
     'error.uniqueEquipped': 'Solo puedes equiparte uno de esos.',
+    'error.masterwroughtCap': 'Solo puedes equiparte dos objetos maestroforjados.',
+    'error.masterwroughtLegendary': 'Solo puedes equiparte un objeto maestroforjado legendario.',
     'error.townFocusCannotAfford': 'No puedes pagar ese reajuste de enfoque.',
     'log.townFocusRespecComplete': 'Tu reajuste de enfoque se ha completado.',
   },
@@ -1787,6 +1796,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.icicles': 'Carámbanos',
     'aura.perfectMoment': 'Momento perfecto',
     'error.uniqueEquipped': 'Solo puedes llevar equipado uno de esos.',
+    'error.masterwroughtCap': 'Solo puedes llevar equipados dos objetos maestroforjados.',
+    'error.masterwroughtLegendary':
+      'Solo puedes llevar equipado un objeto maestroforjado legendario.',
     'error.townFocusCannotAfford': 'No puedes costear ese reajuste de enfoque.',
     'log.townFocusRespecComplete': 'Tu reajuste de enfoque ha terminado.',
   },
@@ -2237,6 +2249,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.icicles': 'Stalactites de glace',
     'aura.perfectMoment': 'Moment parfait',
     'error.uniqueEquipped': 'Vous ne pouvez en équiper qu’un seul de ce type.',
+    'error.masterwroughtCap': 'Vous ne pouvez équiper que deux objets forgés de maître.',
+    'error.masterwroughtLegendary':
+      'Vous ne pouvez équiper qu’un seul objet légendaire forgé de maître.',
     'error.townFocusCannotAfford': "Vous n'avez pas les moyens de cette respécialisation de focus.",
     'log.townFocusRespecComplete': 'Votre respécialisation de focus est terminée.',
   },
@@ -2687,6 +2702,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.icicles': 'Stalactites de glace',
     'aura.perfectMoment': 'Moment parfait',
     'error.uniqueEquipped': 'Vous ne pouvez porter qu’un seul objet de ce type.',
+    'error.masterwroughtCap': 'Vous ne pouvez porter que deux objets forgés de maître.',
+    'error.masterwroughtLegendary':
+      'Vous ne pouvez porter qu’un seul objet légendaire forgé de maître.',
     'error.townFocusCannotAfford':
       'Vous n’avez pas assez de moyens pour cette respécialisation de focus.',
     'log.townFocusRespecComplete': 'Votre respécialisation de focus est complétée.',
@@ -3322,6 +3340,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.icicles': 'Ghiaccioli',
     'aura.perfectMoment': 'Momento Perfetto',
     'error.uniqueEquipped': 'Puoi equipaggiarne solo uno di quel tipo.',
+    'error.masterwroughtCap': 'Puoi equipaggiare solo due oggetti maestroforgiati.',
+    'error.masterwroughtLegendary':
+      'Puoi equipaggiare solo un oggetto maestroforgiato leggendario.',
     'error.townFocusCannotAfford': 'Non puoi permetterti quella rispecializzazione del focus.',
     'log.townFocusRespecComplete': 'La tua rispecializzazione del focus è completata.',
   },
@@ -3768,6 +3789,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.icicles': 'Eiszapfen',
     'aura.perfectMoment': 'Perfekter Moment',
     'error.uniqueEquipped': 'Du kannst davon nur eins ausrüsten.',
+    'error.masterwroughtCap': 'Du kannst nur zwei meistergeschmiedete Gegenstände ausrüsten.',
+    'error.masterwroughtLegendary':
+      'Du kannst nur einen legendären meistergeschmiedeten Gegenstand ausrüsten.',
     'error.townFocusCannotAfford': 'Du kannst dir diese Fokus-Neuverteilung nicht leisten.',
     'log.townFocusRespecComplete': 'Deine Fokus-Neuverteilung ist abgeschlossen.',
   },
@@ -4196,6 +4220,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.icicles': '冰锥',
     'aura.perfectMoment': '完美时刻',
     'error.uniqueEquipped': '你只能装备一个此类物品。',
+    'error.masterwroughtCap': '你最多只能装备两件大师锻造物品。',
+    'error.masterwroughtLegendary': '你只能装备一件传说品质的大师锻造物品。',
     'error.townFocusCannotAfford': '你负担不起这次专注重置。',
     'log.townFocusRespecComplete': '你的专注重置已完成。',
   },
@@ -4624,6 +4650,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.icicles': '冰錐',
     'aura.perfectMoment': '完美時刻',
     'error.uniqueEquipped': '你只能裝備一個此類物品。',
+    'error.masterwroughtCap': '你最多只能裝備兩件大師鍛造物品。',
+    'error.masterwroughtLegendary': '你只能裝備一件傳說品質的大師鍛造物品。',
     'error.townFocusCannotAfford': '你負擔不起這次專注重置。',
     'log.townFocusRespecComplete': '你的專注重置已完成。',
   },
@@ -5061,6 +5089,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.icicles': '고드름',
     'aura.perfectMoment': '완벽한 순간',
     'error.uniqueEquipped': '그런 것은 하나만 장착할 수 있습니다.',
+    'error.masterwroughtCap': '명장 제작 아이템은 두 개까지만 장착할 수 있습니다.',
+    'error.masterwroughtLegendary': '전설 등급 명장 제작 아이템은 하나만 장착할 수 있습니다.',
     'error.townFocusCannotAfford': '해당 집중 재설정 비용을 감당할 수 없습니다.',
     'log.townFocusRespecComplete': '집중 재설정이 완료되었습니다.',
   },
@@ -5507,6 +5537,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.icicles': '氷柱',
     'aura.perfectMoment': '完璧な瞬間',
     'error.uniqueEquipped': 'その種類は1つだけ装備できます。',
+    'error.masterwroughtCap': '名匠鍛造アイテムは2つまでしか装備できません。',
+    'error.masterwroughtLegendary': '伝説の名匠鍛造アイテムは1つだけ装備できます。',
     'error.townFocusCannotAfford': 'そのフォーカス再設定を支払えません。',
     'log.townFocusRespecComplete': 'フォーカス再設定が完了しました。',
   },
@@ -5946,6 +5978,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.icicles': 'Pingentes de Gelo',
     'aura.perfectMoment': 'Momento Perfeito',
     'error.uniqueEquipped': 'Você só pode equipar um desses.',
+    'error.masterwroughtCap': 'Você só pode equipar dois itens forjados por mestre.',
+    'error.masterwroughtLegendary': 'Você só pode equipar um item lendário forjado por mestre.',
     'error.townFocusCannotAfford': 'Você não pode pagar essa redefinição de foco.',
     'log.townFocusRespecComplete': 'Sua redefinição de foco foi concluída.',
   },
@@ -6391,6 +6425,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.icicles': 'Сосульки',
     'aura.perfectMoment': 'Идеальный миг',
     'error.uniqueEquipped': 'Можно экипировать только один такой предмет.',
+    'error.masterwroughtCap': 'Можно экипировать только два предмета «Ковка мастера».',
+    'error.masterwroughtLegendary':
+      'Можно экипировать только один легендарный предмет «Ковка мастера».',
     'error.townFocusCannotAfford': 'Вам не хватает средств на эту смену фокуса.',
     'log.townFocusRespecComplete': 'Смена фокуса завершена.',
   },

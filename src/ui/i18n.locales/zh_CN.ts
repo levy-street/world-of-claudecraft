@@ -7237,6 +7237,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '你的武器致命一击有 50% 的几率触发“獠牙疾袭”，使攻击速度提高 25%，持续 8 秒。',
   'hudChrome.itemSoulbound': '灵魂绑定',
   'hudChrome.itemUniqueEquipped': '装备唯一',
+  'hudChrome.itemMasterwrought': '装备唯一：大师锻造（{count}）',
   'hudChrome.itemSet.header': '{name} ({have}/{total})',
   'hudChrome.itemProc.onMeleeHit': '命中时几率（{chance}%）：{effect}',
   'hudChrome.itemProc.onSpellDamage': '造成伤害的法术几率（{chance}%）：{effect}',

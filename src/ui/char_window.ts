@@ -386,6 +386,8 @@ export class CharWindow {
         world.player.level,
         world.talentSpec,
         world.equipment,
+        world.equipmentInstances,
+        world.inventory,
       )
     ) {
       case 'blockedSlot':
@@ -403,6 +405,12 @@ export class CharWindow {
         return;
       case 'blockedUnique':
         this.deps.showError(tSim('error.uniqueEquipped'));
+        return;
+      case 'blockedMasterwroughtCap':
+        this.deps.showError(tSim('error.masterwroughtCap'));
+        return;
+      case 'blockedMasterwroughtLegendary':
+        this.deps.showError(tSim('error.masterwroughtLegendary'));
         return;
       case 'equip':
         world.equipItemToSlot(itemId, slot);
@@ -432,6 +440,8 @@ export class CharWindow {
           world.player.level,
           world.talentSpec,
           world.equipment,
+          world.equipmentInstances,
+          world.inventory,
         ) === 'equip';
       row.classList.toggle('drop-target', accepts);
     }
@@ -455,6 +465,8 @@ export class CharWindow {
           world.player.level,
           world.talentSpec,
           world.equipment,
+          world.equipmentInstances,
+          world.inventory,
         ) !== 'equip'
       )
         return;

@@ -1614,6 +1614,7 @@ export const ko_KR: EnTranslations = {
     "itemHeroicTag": "[영웅]",
     "itemSoulbound": "귀속",
     "itemUniqueEquipped": "착용 시 고유",
+    "itemMasterwrought": "착용 시 고유: 명장 제작 ({count})",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"

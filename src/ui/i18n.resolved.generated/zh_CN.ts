@@ -1614,6 +1614,7 @@ export const zh_CN: EnTranslations = {
     "itemHeroicTag": "[英雄]",
     "itemSoulbound": "灵魂绑定",
     "itemUniqueEquipped": "装备唯一",
+    "itemMasterwrought": "装备唯一：大师锻造（{count}）",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"

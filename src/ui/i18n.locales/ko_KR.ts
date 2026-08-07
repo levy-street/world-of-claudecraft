@@ -7544,6 +7544,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '무기 치명타 적중 시 50% 확률로 "송곳니 질주"가 발동하여 공격 속도가 25% 증가합니다. 8초 동안 지속됩니다.',
   'hudChrome.itemSoulbound': '귀속',
   'hudChrome.itemUniqueEquipped': '착용 시 고유',
+  'hudChrome.itemMasterwrought': '착용 시 고유: 명장 제작 ({count})',
   'hudChrome.itemSet.header': '{name} ({have}/{total})',
   'hudChrome.itemProc.onMeleeHit': '적중 시 확률 ({chance}%): {effect}',
   'hudChrome.itemProc.onSpellDamage': '피해 주문 시 확률 ({chance}%): {effect}',

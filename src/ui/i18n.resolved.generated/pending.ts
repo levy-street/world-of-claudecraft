@@ -9,25 +9,55 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.itemMasterwrought"
+  ],
+  "es_ES": [
+    "hudChrome.itemMasterwrought"
+  ],
+  "fr_FR": [
+    "hudChrome.itemMasterwrought"
+  ],
+  "fr_CA": [
+    "hudChrome.itemMasterwrought"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "hudChrome.itemMasterwrought"
+  ],
+  "de_DE": [
+    "hudChrome.itemMasterwrought"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "hudChrome.itemMasterwrought"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "hudChrome.itemMasterwrought"
+  ],
+  "nl_NL": [
+    "hudChrome.itemMasterwrought"
+  ],
+  "pl_PL": [
+    "hudChrome.itemMasterwrought"
+  ],
+  "id_ID": [
+    "hudChrome.itemMasterwrought"
+  ],
+  "tr_TR": [
+    "hudChrome.itemMasterwrought"
+  ],
+  "sv_SE": [
+    "hudChrome.itemMasterwrought"
+  ],
+  "vi_VN": [
+    "hudChrome.itemMasterwrought"
+  ],
+  "da_DK": [
+    "hudChrome.itemMasterwrought"
+  ]
 };
