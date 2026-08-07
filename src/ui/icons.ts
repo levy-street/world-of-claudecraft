@@ -3574,6 +3574,11 @@ function itemFallback(id: string): IconRecipe | null {
   ) {
     return r('drink', 'sky', ['fish'], fx);
   }
+  // Recipe patterns (kind 'recipe') are a written page, so they take the same
+  // 'parchment' ground quest items do rather than falling through to the junk
+  // trinket below, which would ink every unlearned pattern the color of vendor
+  // trash. Ahead of the fall-through because that arm keys on 'quest' alone.
+  if (it.kind === 'recipe') return r('parchment', 'leather', ['scroll'], fx);
   const t = trinketPrimitive(name);
   return r(it.kind === 'quest' ? 'parchment' : 'junk', t.pal, [{ p: t.p, pal: t.pal }], fx);
 }

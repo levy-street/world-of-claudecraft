@@ -3027,7 +3027,7 @@ export const tr_TR: EnTranslations = {
       "outOfRange": "Antrenman yapmak için istasyonda olmanız gerekmektedir."
     },
     "pattern": {
-      "teaches": "Use: Teaches you {item}."
+      "teaches": "Use: Teaches you how to craft {item}."
     },
     "unbind": {
       "title": "Bağ Çözme: {name}",

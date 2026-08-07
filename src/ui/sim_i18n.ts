@@ -213,7 +213,7 @@ const baseEnTable = {
   // kind:'recipe' drop teaches its recipe, and these are the three ways that
   // use is denied. Placeholder-free, so all three register in the EXACT
   // matcher automatically.
-  'error.patternKnown': 'You already know that pattern.',
+  'error.patternKnown': 'You already know that recipe.',
   'error.patternProfession': 'You have not practiced that profession.',
   'error.patternSkill': 'Your skill is too low to learn that pattern.',
   'error.townFocusNotInTown': 'You must be in town to set your focus.',
@@ -1371,7 +1371,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.uniqueEquipped': 'Solo puedes equiparte uno de esos.',
     'error.masterwroughtCap': 'Solo puedes equiparte dos objetos maestroforjados.',
     'error.masterwroughtLegendary': 'Solo puedes equiparte un objeto maestroforjado legendario.',
-    'error.patternKnown': 'Ya conoces ese patrón.',
+    'error.patternKnown': 'Ya conoces esa receta.',
     'error.patternProfession': 'No has practicado esa profesión.',
     'error.patternSkill': 'Tu habilidad es demasiado baja para aprender ese patrón.',
     'error.townFocusCannotAfford': 'No puedes pagar ese reajuste de enfoque.',
@@ -1818,7 +1818,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.masterwroughtCap': 'Solo puedes llevar equipados dos objetos maestroforjados.',
     'error.masterwroughtLegendary':
       'Solo puedes llevar equipado un objeto maestroforjado legendario.',
-    'error.patternKnown': 'Ya conoces ese patrón.',
+    'error.patternKnown': 'Ya conoces esa receta.',
     'error.patternProfession': 'No has practicado esa profesión.',
     'error.patternSkill': 'Tu nivel de habilidad es demasiado bajo para aprender ese patrón.',
     'error.townFocusCannotAfford': 'No puedes costear ese reajuste de enfoque.',
@@ -2274,7 +2274,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.masterwroughtCap': 'Vous ne pouvez équiper que deux objets forgés de maître.',
     'error.masterwroughtLegendary':
       'Vous ne pouvez équiper qu’un seul objet légendaire forgé de maître.',
-    'error.patternKnown': 'Vous connaissez déjà ce patron.',
+    'error.patternKnown': 'Vous connaissez déjà cette recette.',
     'error.patternProfession': "Vous n'avez pas pratiqué cette profession.",
     'error.patternSkill': 'Votre compétence est trop faible pour apprendre ce patron.',
     'error.townFocusCannotAfford': "Vous n'avez pas les moyens de cette respécialisation de focus.",
@@ -2730,7 +2730,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.masterwroughtCap': 'Vous ne pouvez porter que deux objets forgés de maître.',
     'error.masterwroughtLegendary':
       'Vous ne pouvez porter qu’un seul objet légendaire forgé de maître.',
-    'error.patternKnown': 'Vous connaissez déjà ce patron.',
+    'error.patternKnown': 'Vous connaissez déjà cette recette.',
     'error.patternProfession': "Vous n'avez pas pratiqué cette profession.",
     'error.patternSkill': 'Votre compétence est trop faible pour apprendre ce patron.',
     'error.townFocusCannotAfford':
@@ -3371,7 +3371,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.masterwroughtCap': 'Puoi equipaggiare solo due oggetti maestroforgiati.',
     'error.masterwroughtLegendary':
       'Puoi equipaggiare solo un oggetto maestroforgiato leggendario.',
-    'error.patternKnown': 'Conosci già quello schema.',
+    'error.patternKnown': 'Conosci già quella ricetta.',
     'error.patternProfession': 'Non hai praticato quella professione.',
     'error.patternSkill': 'La tua abilità è troppo bassa per imparare quello schema.',
     'error.townFocusCannotAfford': 'Non puoi permetterti quella rispecializzazione del focus.',
@@ -3823,7 +3823,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.masterwroughtCap': 'Du kannst nur zwei meistergeschmiedete Gegenstände ausrüsten.',
     'error.masterwroughtLegendary':
       'Du kannst nur einen legendären meistergeschmiedeten Gegenstand ausrüsten.',
-    'error.patternKnown': 'Dieses Muster kennst du bereits.',
+    'error.patternKnown': 'Das Rezept kennen Sie bereits.',
     'error.patternProfession': 'Du hast diesen Beruf nicht ausgeübt.',
     'error.patternSkill': 'Deine Fertigkeit ist zu gering, um dieses Muster zu erlernen.',
     'error.townFocusCannotAfford': 'Du kannst dir diese Fokus-Neuverteilung nicht leisten.',
@@ -4256,7 +4256,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.uniqueEquipped': '你只能装备一个此类物品。',
     'error.masterwroughtCap': '你最多只能装备两件大师锻造物品。',
     'error.masterwroughtLegendary': '你只能装备一件传说品质的大师锻造物品。',
-    'error.patternKnown': '你已经学会了该图样。',
+    'error.patternKnown': '你已经学会了该配方。',
     'error.patternProfession': '你尚未修习该专业。',
     'error.patternSkill': '你的技能不足以学习该图样。',
     'error.townFocusCannotAfford': '你负担不起这次专注重置。',
@@ -4689,7 +4689,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.uniqueEquipped': '你只能裝備一個此類物品。',
     'error.masterwroughtCap': '你最多只能裝備兩件大師鍛造物品。',
     'error.masterwroughtLegendary': '你只能裝備一件傳說品質的大師鍛造物品。',
-    'error.patternKnown': '你已經學會了該圖樣。',
+    'error.patternKnown': '你已經學會了該配方。',
     'error.patternProfession': '你尚未修習該專業。',
     'error.patternSkill': '你的技能不足以學習該圖樣。',
     'error.townFocusCannotAfford': '你負擔不起這次專注重置。',
@@ -5131,7 +5131,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.uniqueEquipped': '그런 것은 하나만 장착할 수 있습니다.',
     'error.masterwroughtCap': '명장 제작 아이템은 두 개까지만 장착할 수 있습니다.',
     'error.masterwroughtLegendary': '전설 등급 명장 제작 아이템은 하나만 장착할 수 있습니다.',
-    'error.patternKnown': '이미 알고 있는 도안입니다.',
+    'error.patternKnown': '이미 알고 있는 제조법입니다.',
     'error.patternProfession': '해당 전문 기술을 수련한 적이 없습니다.',
     'error.patternSkill': '숙련도가 낮아 그 도안을 배울 수 없습니다.',
     'error.townFocusCannotAfford': '해당 집중 재설정 비용을 감당할 수 없습니다.',
@@ -5582,7 +5582,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.uniqueEquipped': 'その種類は1つだけ装備できます。',
     'error.masterwroughtCap': '名匠鍛造アイテムは2つまでしか装備できません。',
     'error.masterwroughtLegendary': '伝説の名匠鍛造アイテムは1つだけ装備できます。',
-    'error.patternKnown': 'その図案はすでに習得しています。',
+    'error.patternKnown': 'そのレシピはすでに習得しています。',
     'error.patternProfession': 'その職業を修めていません。',
     'error.patternSkill': '技能が足りないため、その図案を習得できません。',
     'error.townFocusCannotAfford': 'そのフォーカス再設定を支払えません。',
@@ -6026,7 +6026,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.uniqueEquipped': 'Você só pode equipar um desses.',
     'error.masterwroughtCap': 'Você só pode equipar dois itens forjados por mestre.',
     'error.masterwroughtLegendary': 'Você só pode equipar um item lendário forjado por mestre.',
-    'error.patternKnown': 'Você já conhece esse molde.',
+    'error.patternKnown': 'Você já conhece essa receita.',
     'error.patternProfession': 'Você não praticou essa profissão.',
     'error.patternSkill': 'Sua habilidade é baixa demais para aprender esse molde.',
     'error.townFocusCannotAfford': 'Você não pode pagar essa redefinição de foco.',
@@ -6477,7 +6477,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.masterwroughtCap': 'Можно экипировать только два предмета «Ковка мастера».',
     'error.masterwroughtLegendary':
       'Можно экипировать только один легендарный предмет «Ковка мастера».',
-    'error.patternKnown': 'Вы уже знаете эту схему.',
+    'error.patternKnown': 'Вы уже знаете этот рецепт.',
     'error.patternProfession': 'Вы не занимались этой профессией.',
     'error.patternSkill': 'Ваш навык слишком низок, чтобы изучить эту схему.',
     'error.townFocusCannotAfford': 'Вам не хватает средств на эту смену фокуса.',

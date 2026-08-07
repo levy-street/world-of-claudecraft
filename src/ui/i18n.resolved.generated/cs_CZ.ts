@@ -3027,7 +3027,7 @@ export const cs_CZ: EnTranslations = {
       "outOfRange": "Abys mohl trénovat, musíš být u řemeslné stanice."
     },
     "pattern": {
-      "teaches": "Use: Teaches you {item}."
+      "teaches": "Use: Teaches you how to craft {item}."
     },
     "unbind": {
       "title": "Odpoutání: {name}",

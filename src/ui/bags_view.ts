@@ -192,7 +192,9 @@ export function bagItemAction(
   // consumes the copy (professions/pattern_items.ts). It carries no def-level
   // `use` payload, so the fall-through is the only rung that reaches it, and
   // every transfer mode above deliberately treats it as an ordinary tradable
-  // stack (patterns are plain drops: not soulbound, not noMarketList).
+  // drop (not soulbound, not noMarketList). Patterns never stack, though:
+  // 'recipe' is an UNSTACKED_KIND (src/sim/bags.ts), so each cell here holds
+  // exactly one copy and a click can only ever spend that one.
   return 'use';
 }
 

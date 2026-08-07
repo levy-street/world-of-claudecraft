@@ -78,8 +78,12 @@ export type ItemLookup = (itemId: string) => ItemDef | undefined;
 // Recipe patterns (kind 'recipe') are deliberately ALL-ONLY: none of the chips fits
 // (a pattern is not a restorative, not an honest material, and not an implement), and
 // widening 'consumable' to cover it would put a permanent unlock beside the potions a
-// player filters for in a fight. A pattern is a short-lived stack anyway, held only
-// until it is used, so it earns its own chip when patterns become numerous, not before.
+// player filters for in a fight. Note patterns do NOT stack: 'recipe' is an
+// UNSTACKED_KIND (src/sim/bags.ts), so every copy holds its own slot and a player
+// sitting on unlearned patterns pays more bag space than a stacking drop would cost.
+// That makes the case for a dedicated chip arrive SOONER, not later; all-only stands
+// for now purely on chip-count restraint, and is the first thing to revisit if the
+// chip rail ever earns another entry.
 export function matchesCategory(item: ItemDef, category: BagCategory): boolean {
   switch (category) {
     case 'all':

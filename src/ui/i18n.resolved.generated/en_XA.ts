@@ -3027,7 +3027,7 @@ export const en_XA: EnTranslations = {
       "outOfRange": "[Ýóú ɱúšţ ƀé áţ ţĥé šţáţíóñ ţó ţŕáíñ.]"
     },
     "pattern": {
-      "teaches": "[Úšé: Ţéáçĥéš ýóú {item}.]"
+      "teaches": "[Úšé: Ţéáçĥéš ýóú ĥóŵ ţó çŕáƒţ {item}.]"
     },
     "unbind": {
       "title": "[Úñƀíñðíñĝ: {name}]",

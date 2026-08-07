@@ -3027,7 +3027,7 @@ export const vi_VN: EnTranslations = {
       "outOfRange": "Bạn phải ở nhà ga để đào tạo."
     },
     "pattern": {
-      "teaches": "Use: Teaches you {item}."
+      "teaches": "Use: Teaches you how to craft {item}."
     },
     "unbind": {
       "title": "Gỡ Ràng Buộc: {name}",

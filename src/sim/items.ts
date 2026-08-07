@@ -812,7 +812,7 @@ export function useItem(ctx: SimContext, itemId: string, pid?: number): ItemUseR
     // useRecipePatternItem owns every gate and the consume; it sits here, below
     // the dead gate above, so using a pattern while dead is a silent no-op like
     // every other kind arm in this chain.
-    useRecipePatternItem(ctx, def, meta);
+    useRecipePatternItem(ctx, itemId, def, meta);
   }
 }
 

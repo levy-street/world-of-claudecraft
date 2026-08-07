@@ -3027,7 +3027,7 @@ export const sv_SE: EnTranslations = {
       "outOfRange": "Du måste vara på stationen för att träna."
     },
     "pattern": {
-      "teaches": "Use: Teaches you {item}."
+      "teaches": "Use: Teaches you how to craft {item}."
     },
     "unbind": {
       "title": "Upplösning: {name}",

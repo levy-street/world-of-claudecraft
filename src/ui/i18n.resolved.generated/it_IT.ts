@@ -3027,7 +3027,7 @@ export const it_IT: EnTranslations = {
       "outOfRange": "Devi essere alla stazione per allenarti."
     },
     "pattern": {
-      "teaches": "Use: Teaches you {item}."
+      "teaches": "Use: Teaches you how to craft {item}."
     },
     "unbind": {
       "title": "Scioglimento: {name}",

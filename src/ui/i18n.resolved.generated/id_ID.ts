@@ -3027,7 +3027,7 @@ export const id_ID: EnTranslations = {
       "outOfRange": "Anda harus berada di stasiun untuk berlatih."
     },
     "pattern": {
-      "teaches": "Use: Teaches you {item}."
+      "teaches": "Use: Teaches you how to craft {item}."
     },
     "unbind": {
       "title": "Pelepasan Ikat: {name}",

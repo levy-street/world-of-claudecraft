@@ -53,8 +53,11 @@ export type PatternLearnResult =
  *    zero-skill read. Deliberate: it is the one condition that separates
  *    "wrong craft entirely" from "right craft, not skilled enough" below.
  * 4. `tier`: teachTierMet is unmet. Reused from ./training.ts rather than
- *    restated, so a pattern and a trainer can never disagree about who is
- *    allowed to learn a given recipe.
+ *    restated, so on the TIER question a pattern and a trainer can never
+ *    disagree about who is allowed to learn a given recipe. They DO diverge
+ *    one arm earlier, deliberately: a trainer teaches a tier-0 recipe to a
+ *    character who has never touched the craft, while a pattern refuses at
+ *    arm 3 until the profession has actually been practiced.
  * 5. otherwise ok.
  */
 export function resolvePatternLearn(
@@ -75,7 +78,12 @@ export function resolvePatternLearn(
  * function's dead gate, so using a pattern while dead is a silent no-op like
  * every other kind arm there.
  */
-export function useRecipePatternItem(ctx: SimContext, def: RecipeItemDef, meta: PlayerMeta): void {
+export function useRecipePatternItem(
+  ctx: SimContext,
+  itemId: string,
+  def: RecipeItemDef,
+  meta: PlayerMeta,
+): void {
   const recipe = recipeById(def.teachesRecipeId);
   const verdict = resolvePatternLearn(recipe, meta);
   if (!verdict.ok) {
@@ -85,11 +93,18 @@ export function useRecipePatternItem(ctx: SimContext, def: RecipeItemDef, meta: 
     // cannot span lines at all. Keep each literal short enough to never wrap,
     // or the guard goes blind to it.
     if (verdict.reason === 'already_known') {
-      ctx.error(meta.entityId, 'You already know that pattern.');
+      ctx.error(meta.entityId, 'You already know that recipe.');
     } else if (verdict.reason === 'profession') {
       ctx.error(meta.entityId, 'You have not practiced that profession.');
     } else if (verdict.reason === 'tier') {
       ctx.error(meta.entityId, 'Your skill is too low to learn that pattern.');
+    } else if (verdict.reason !== 'invalid') {
+      // Exhaustiveness anchor: 'invalid' is the ONE deliberately silent reason
+      // (below), so anything reaching here is a PatternLearnResult reason added
+      // without an arm. `never` makes that a compile error instead of a click
+      // that neither refuses nor learns.
+      const _exhaustive: never = verdict.reason;
+      void _exhaustive;
     }
     // 'invalid' falls through silently, the same contract as useItem's own
     // `if (!def) return;` arm. A refusal NEVER consumes the pattern.
@@ -101,5 +116,17 @@ export function useRecipePatternItem(ctx: SimContext, def: RecipeItemDef, meta: 
   // disagreed. Return without consuming rather than eating the copy for
   // nothing; a lost pattern is unrecoverable, a silent no-op is not.
   if (!learned.ok) return;
-  ctx.removeItem(def.id, 1, meta.entityId);
+  // Consume by the id the caller was asked to use, not def.id: useItem's own
+  // ownership gate counted THAT id, so spending anything else could remove a
+  // copy the player was never charged for.
+  ctx.removeItem(itemId, 1, meta.entityId);
+  // Success feedback, the Sim.trainRecipe shape: the same text-free personal
+  // trainResult the trainer path emits, so the hud's existing handler logs
+  // "You have learned {recipe}." and the train window's row flips to Known
+  // with no client change. Two deliberate choices. It does NOT write
+  // meta.lastTrainResult, which is the train COMMAND's own probe rather than a
+  // record of knowing a recipe. And NO trainResult is emitted on a refusal:
+  // the refusals above are ctx.error-only, because an ok:false event would
+  // double-print through the hud's trainResult deny renderer.
+  ctx.emit({ type: 'trainResult', ok: true, recipeId: def.teachesRecipeId, pid: meta.entityId });
 }

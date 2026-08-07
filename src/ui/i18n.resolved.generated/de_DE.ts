@@ -3027,7 +3027,7 @@ export const de_DE: EnTranslations = {
       "outOfRange": "Du musst dich an der Handwerksstation befinden, um etwas zu lernen."
     },
     "pattern": {
-      "teaches": "Use: Teaches you {item}."
+      "teaches": "Use: Teaches you how to craft {item}."
     },
     "unbind": {
       "title": "Entbindung: {name}",

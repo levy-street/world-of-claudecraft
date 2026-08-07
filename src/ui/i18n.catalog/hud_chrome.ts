@@ -3903,7 +3903,7 @@ export const hudChromeStrings = {
   // trainer does and must not word it a second way. {item} is the LOCALIZED
   // name of the item the taught recipe crafts (entity i18n, never a raw id).
   pattern: {
-    teaches: 'Use: Teaches you {item}.',
+    teaches: 'Use: Teaches you how to craft {item}.',
   },
   // Maker's Bond unbind service window + result lines (Professions 2.0):
   // the station master's second gossip service beside training.

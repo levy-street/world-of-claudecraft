@@ -3027,7 +3027,7 @@ export const nl_NL: EnTranslations = {
       "outOfRange": "Je moet bij het werkstation zijn om te trainen."
     },
     "pattern": {
-      "teaches": "Use: Teaches you {item}."
+      "teaches": "Use: Teaches you how to craft {item}."
     },
     "unbind": {
       "title": "Ontbinden: {name}",

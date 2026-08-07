@@ -3027,7 +3027,7 @@ export const da_DK: EnTranslations = {
       "outOfRange": "Du skal være på stationen for at træne."
     },
     "pattern": {
-      "teaches": "Use: Teaches you {item}."
+      "teaches": "Use: Teaches you how to craft {item}."
     },
     "unbind": {
       "title": "Aflæsning: {name}",
