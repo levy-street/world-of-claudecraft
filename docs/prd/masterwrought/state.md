@@ -1,6 +1,6 @@
 # Masterwrought: cross-phase state
 
-Current phase: none started. Packet authored 2026-08-07.
+Current phase: 01 built and QA-audited (fix round applied 2026-08-07); next is phase 02. Packet authored 2026-08-07.
 Branch: `feature/masterwrought` (worktree `~/Documents/wocc-masterwrought`), based on `origin/release/v0.36.0`.
 
 ## Delivery contract (non-negotiable)
@@ -130,28 +130,79 @@ Arcanite (new uses), Quintessent, Grand Banquet, Colossus Splitter, Aetherlens, 
   (sim matcher rows, real translations in all 20 non-en DICT blocks; the sim scope is
   invisible to the release fill worklist so English-only rows would ship forever);
   `hudChrome.itemMasterwrought` = 'Unique-Equipped: Masterwrought ({count})' with {count}
-  fed from MASTERWROUGHT_EQUIP_CAP through formatNumber (five non-Latin fills in-change
-  per M16; 16 Latin overlays pending for the release fill); glossary category
+  fed from MASTERWROUGHT_EQUIP_CAP through itemNumber (five non-Latin fills in-change
+  per M16; 15 Latin overlays pending for the release fill, en_CA is NOT one of them, it
+  auto-resolves from en); glossary category
   `masterwroughtSystem` pins the coined per-locale renderings.
-- New tests: `tests/masterwrought_cap.test.ts` (23 cases: pure matrix, enforcement, guard
-  order, auto-equip skip, legacy-save tolerance, constants pin, content-shape pin);
-  extended `tests/equip_drop_core.test.ts` (mirror cases + two Sim-authority checks).
+- New tests: `tests/masterwrought_cap.test.ts` (pure matrix, enforcement, guard order,
+  auto-equip skip, legacy-save tolerance incl. a two-legendary over-cap save, constants +
+  DICT.en cross-pins, per-locale refusal coverage over all 20 non-en DICT blocks,
+  content-shape pin with isEquipSlot); `tests/masterwrought_tooltip.test.ts` (the tag
+  arm on the real itemTooltip: presence, absence, coexistence with the unique tag);
+  extended `tests/equip_drop_core.test.ts` (mirror cases incl. the displaced-slot
+  exemption, two Sim-authority checks that assert the refusal strings, char_window
+  call-site source pins); `tests/equipment_instances_wire.test.ts` (the einst
+  self-snapshot decode: wire-null clears to empty map, absent keeps prior, real map
+  replaces).
+- Client API surface (QA addendum): `PaperdollDropAction` gained
+  `'blockedMasterwroughtCap' | 'blockedMasterwroughtLegendary'` (an exhaustive switch on
+  the union must add both arms) and `paperdollDropAction` gained optional params 7/8
+  (`instances`, `inventory`); all three char_window.ts call sites pass both, and a source
+  pin holds that wiring (omitting them silently degrades the mirror to def quality).
+  src/net/online.ts einst decode hardened to `s.einst ?? {}` (a wire null can never leave
+  the mirror's equipmentInstances null; delta semantics unchanged, absent keeps prior).
 - Phase 01 API decisions: `masterwroughtConflictSlot(item, equipment, lookup, ignoreSlots,
   instances?, incomingQuality?)` returns `{ slot, reason: 'cap' | 'legendary' } | null`
   (the reason picks the refusal line; instance rolled.quality overrides def quality, a
   DELIBERATE difference from isUniqueEquipped which stays def-only); the unit-selection
   rule lives in equipment_rules as `equipCandidateIndex`/`equipCandidateQuality` so the
   sim consume, the sim pre-check, and the client mirror share one selection. The two
-  refusal emits in items.ts MUST stay single-line literals: the S3 scanner cannot see a
-  wrapped or ternary emit (proven empirically; mutation-verified end to end).
+  refusal emits in items.ts MUST each stay on ONE physical line. Mechanism (QA-verified
+  against the real scanner regexes, twice): on the plain-literal form a biome wrap adds
+  a TRAILING COMMA that the scanner's closing-paren anchor does not match (the regex
+  classes themselves span newlines); the ternary/notice forms exclude newlines outright.
+  A SINGLE-LINE ternary IS visible (the `ert` regex); the original "cannot see a
+  ternary" wording was wrong.
 - Open items: JC/inscription station decision (phase 05/06); slot coverage audit results
   (phase 08); web-verified name confirmations (each content phase); tooltip does not yet
   state the legendary sub-cap, add the line when promotion makes it reachable (phase
   13/14); `rolled.quality` is RETIRED for new writes (crafting.ts), so the Perfecting or
   promotion phase must pick the field that carries instance legendary before the craft
-  phases assume one (ruling needed by phase 12); when flagged content lands, extend the
+  phases assume one (ruling needed by phase 12; QA sharpening: the only live writers
+  stamp 'epic' on rift shell ids, so the ENTIRE sub-cap instance-override machinery is
+  INERT until that ruling lands, and the phase-12 field decision should come BEFORE the
+  first legendary-flagged def; keep masterwrought item ids disjoint from the rift shell
+  id set, whose writer stamps rolled.quality on worn instances); promotion of a WORN
+  piece bypasses the sub-cap entirely, nothing re-validates after equip, so the
+  Perfecting/promotion phase must re-run the family check at promotion time or a
+  character wearing two flagged epics promotes both to legendary-effective with no
+  refusal (phase 12/13); when flagged content lands, extend the
   `tests/crafted_item_tooltip_coverage.test.ts` list, give the double gold tooltip line a
-  copy pass, and re-check dev_kit/pbe_boost preset slot counting (phases 03/08); the S3
-  scanner's blindness to wrapped/ternary emits is a repo-wide guard gap worth a durable
-  hardening outside this packet; `tests/anim_pipeline_hunter_ghost.test.ts` is red AT the
+  copy pass, and re-check dev_kit/pbe_boost preset slot counting (phases 03/08; QA
+  sharpening: pbe_boost's bisKitForRole scores by budget with no family awareness and
+  buildBoostedCharacterState HARD-THROWS `boost equip failed` when a kit slot does not
+  take, per class, so a flagged-heavy BiS kit is a boot-time crash, not a quiet miscount);
+  the /wiki guide gear page explains unique-equipped but has no Masterwrought section
+  yet, add one when content makes the tier visible (phase 08+); the packet PR's
+  before/after screenshot for the tooltip tag needs a synthetic flagged item (nothing
+  shipped carries the flag), decide the capture approach at PR time; the S3
+  scanner's blindness to WRAPPED emits is a repo-wide guard gap worth a durable
+  hardening outside this packet (a single-line ternary is visible, see the API
+  decisions entry); the sim_i18n BASE_NEW locale blocks re-declare themselves after the
+  `...BASE_NEW` spread and each MUST begin with its own inner `...BASE_NEW.<lang>`
+  spread or every BASE_NEW fill silently shadows to English with nothing red
+  (QA-verified all 8 current blocks do; the per-locale coverage test in
+  masterwrought_cap.test.ts guards only the two masterwrought keys; a durable
+  whole-DICT passthrough guard is a hardening candidate beside the S3 one);
+  `tests/anim_pipeline_hunter_ghost.test.ts` is red AT the
   v0.36.0 release tip (inherited, files byte-identical), fix belongs upstream.
+- Design notes recorded by QA (behavior as shipped, not defects): auto-equip passes
+  empty ignoreSlots to the family check (mirroring the unique-rule precedent), so at
+  the cap a lootable in-slot UPGRADE is silently declined where the explicit equip
+  path would swap it; a player report of "my Masterwrought upgrade stopped
+  auto-equipping" is designed behavior. An OVER-CAP legacy character cannot swap
+  WITHIN the family at all (ignoreSlots exempts one worn slot, two others still meet
+  the cap), so a three-piece legacy loadout is frozen until the player unequips down
+  to the cap; acceptable for v1, flag for a ruling if legacy telemetry says otherwise.
+  MasterwroughtConflict.slot is production-write-only (consumers branch on reason);
+  kept for symmetry with uniqueEquipConflictSlot and future swap affordances.
