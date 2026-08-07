@@ -774,6 +774,26 @@ export const id_ID: EnTranslations = {
       "ready": "Ayun",
       "seconds": "{seconds}d"
     },
+    "interactPrompt": {
+      "interact": "Interact",
+      "loot": "Loot",
+      "talk": "Talk",
+      "open": "Open",
+      "take": "Take",
+      "gather": "Gather",
+      "enter": "Enter",
+      "leave": "Leave",
+      "name": {
+        "lockedChest": "Locked Chest",
+        "rewardChest": "Reward Chest",
+        "surfaceExit": "Way Out",
+        "reliquary": "Drowned Reliquary",
+        "bellShrine": "Bell Shrine",
+        "candleShrine": "Candle Shrine",
+        "reedShrine": "Reed Shrine",
+        "skullShrine": "Skull Shrine"
+      }
+    },
     "rest": {
       "resting": "Beristirahat"
     },
@@ -1218,6 +1238,8 @@ export const id_ID: EnTranslations = {
       "showThirdActionBar": "Tampilkan Bilah Tindakan Ketiga",
       "lockActionBars": "Kunci Bilah Aksi",
       "showTargetOfTarget": "Tampilkan Sasaran dari Sasaran",
+      "showInteractPrompt": "Show Interact Prompt",
+      "interactHighlight": "Highlight Interactables on Hover",
       "showAttackButton": "Tampilkan Tombol Serang",
       "showDailyRewardsChest": "Tampilkan Peti Hadiah Harian",
       "mobileCameraJoystick": "Joystick kamera",

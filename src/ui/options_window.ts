@@ -1280,7 +1280,10 @@ export class OptionsWindow {
     if (hooks)
       this.applyControls(
         body,
-        interfaceControlsForTab(buildInterfaceControls(this.settingsSource(hooks)), tab),
+        interfaceControlsForTab(
+          buildInterfaceControls(this.settingsSource(hooks), { touch: useTouchInterface() }),
+          tab,
+        ),
         hooks,
         (focusKey) => {
           this.renderInterface();

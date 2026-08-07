@@ -774,6 +774,26 @@ export const fr_FR: EnTranslations = {
       "ready": "Coup",
       "seconds": "{seconds} s"
     },
+    "interactPrompt": {
+      "interact": "Interact",
+      "loot": "Loot",
+      "talk": "Talk",
+      "open": "Open",
+      "take": "Take",
+      "gather": "Gather",
+      "enter": "Enter",
+      "leave": "Leave",
+      "name": {
+        "lockedChest": "Locked Chest",
+        "rewardChest": "Reward Chest",
+        "surfaceExit": "Way Out",
+        "reliquary": "Drowned Reliquary",
+        "bellShrine": "Bell Shrine",
+        "candleShrine": "Candle Shrine",
+        "reedShrine": "Reed Shrine",
+        "skullShrine": "Skull Shrine"
+      }
+    },
     "rest": {
       "resting": "Au repos"
     },
@@ -1218,6 +1238,8 @@ export const fr_FR: EnTranslations = {
       "showThirdActionBar": "Afficher la troisième barre d'action",
       "lockActionBars": "Verrouiller les barres d'action",
       "showTargetOfTarget": "Afficher la cible de la cible",
+      "showInteractPrompt": "Show Interact Prompt",
+      "interactHighlight": "Highlight Interactables on Hover",
       "showAttackButton": "Afficher le bouton d'attaque",
       "showDailyRewardsChest": "Afficher le coffre des récompenses quotidiennes",
       "mobileCameraJoystick": "Manette de caméra",

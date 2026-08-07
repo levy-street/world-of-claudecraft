@@ -774,6 +774,26 @@ export const ja_JP: EnTranslations = {
       "ready": "攻撃",
       "seconds": "{seconds}秒"
     },
+    "interactPrompt": {
+      "interact": "調べる",
+      "loot": "Loot",
+      "talk": "Talk",
+      "open": "Open",
+      "take": "Take",
+      "gather": "採取",
+      "enter": "入る",
+      "leave": "出る",
+      "name": {
+        "lockedChest": "施錠された宝箱",
+        "rewardChest": "報酬の宝箱",
+        "surfaceExit": "Way Out",
+        "reliquary": "水没した聖遺物箱",
+        "bellShrine": "鐘の祠",
+        "candleShrine": "蝋燭の祠",
+        "reedShrine": "葦の祠",
+        "skullShrine": "髑髏の祠"
+      }
+    },
     "rest": {
       "resting": "休息中"
     },
@@ -1218,6 +1238,8 @@ export const ja_JP: EnTranslations = {
       "showThirdActionBar": "3本目のアクションバーを表示",
       "lockActionBars": "アクションバーをロック",
       "showTargetOfTarget": "ターゲットのターゲットを表示",
+      "showInteractPrompt": "インタラクト表示を出す",
+      "interactHighlight": "カーソルを合わせた対象を強調",
       "showAttackButton": "攻撃ボタンを表示",
       "showDailyRewardsChest": "デイリー報酬の宝箱を表示",
       "mobileCameraJoystick": "カメラスティック",

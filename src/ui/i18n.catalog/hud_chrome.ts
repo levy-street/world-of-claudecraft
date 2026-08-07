@@ -366,6 +366,37 @@ export const hudChromeStrings = {
     ready: 'Swing',
     seconds: '{seconds}s',
   },
+  // The interact prompt above the action bars (desktop only): one action word
+  // beside the bound keycap, under the name of whatever the interact key would
+  // act on. One word each, chosen to match what the press actually does, so the
+  // prompt never promises a different outcome than the key delivers.
+  interactPrompt: {
+    interact: 'Interact',
+    loot: 'Loot',
+    talk: 'Talk',
+    open: 'Open',
+    take: 'Take',
+    gather: 'Gather',
+    // A dungeon door and its exit are named for the place, so they take the
+    // travel words rather than "Open".
+    enter: 'Enter',
+    leave: 'Leave',
+    // (No "unbound" key here: the painter reuses hud.options.unbound, the Key
+    // Bindings screen's own word for an unassigned action.)
+    // Plain nouns for the delve props whose NAMEPLATE text is a call to action
+    // ("Press F to pick the lock"). The prompt's own second line already says
+    // what pressing does, so its first line names the thing instead.
+    name: {
+      lockedChest: 'Locked Chest',
+      rewardChest: 'Reward Chest',
+      surfaceExit: 'Way Out',
+      reliquary: 'Drowned Reliquary',
+      bellShrine: 'Bell Shrine',
+      candleShrine: 'Candle Shrine',
+      reedShrine: 'Reed Shrine',
+      skullShrine: 'Skull Shrine',
+    },
+  },
   rest: {
     resting: 'Resting',
   },
@@ -1136,6 +1167,11 @@ export const hudChromeStrings = {
     // default): a small unit frame under the target frame showing who your target
     // is targeting.
     showTargetOfTarget: 'Show Target of Target',
+    // Desktop-only Combat-tab toggles (on by default) for the two interact
+    // affordances: the keycap prompt above the action bars, and the thin gold
+    // outline on an interactable under the mouse cursor.
+    showInteractPrompt: 'Show Interact Prompt',
+    interactHighlight: 'Highlight Interactables on Hover',
     // Interface panel toggle for the fixed Attack button in the first action-bar
     // slot (on by default). Off frees that slot for a normal action (drag one in;
     // its key then casts it). Right-clicking the Attack button flips this off too.

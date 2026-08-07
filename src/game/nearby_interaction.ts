@@ -6,7 +6,7 @@ import {
   type QuestProgress,
 } from '../sim/types';
 import { corpseLootAvailability, localPartyMemberIds } from './corpse_loot_availability';
-import { decideEscortPress, handleEscortPress } from './escort_interact';
+import { decideEscortPress, type EscortPressVerdict, handleEscortPress } from './escort_interact';
 import {
   type GatherEffectConfirmGate,
   type GatherNodeToolGate,
@@ -51,26 +51,35 @@ export interface NearbyInteractionHud {
 
 type NearbyGatherNode = Pick<GatherNodeDef, 'id' | 'pos' | 'type' | 'tier'>;
 
-/** Find and dispatch one eligible nearby interaction in stable priority order.
- *  `nodeToolGateFor` (Professions 2.0) resolves the tool-tier access
- *  gate + localized denial line for the node about to be harvested; it sits
- *  with the node list (not trailing) so the live call site (main.ts
- *  interactKey) still closes on the nothing-to-interact string, as pinned by
- *  tests/client_shell.test.ts. `escortAwayText` sits before that same string
- *  for the same reason. */
-export function tryNearbyInteraction(
-  world: NearbyInteractionWorld,
-  hud: NearbyInteractionHud,
+/** What an interact press would act on right now, in the SAME stable priority
+ *  order tryNearbyInteraction dispatches. The scan is split out from the
+ *  dispatch so the on-screen interact prompt (src/ui/interact_prompt_view.ts)
+ *  reads exactly what the key would do: two independent scans would drift the
+ *  moment either priority list changed, and a prompt that names something the
+ *  key does not act on is worse than no prompt.
+ *
+ *  `escortAway` is a scan RESULT, not an interactable: it is the last-resort
+ *  denial line, so it dispatches an error toast and shows no prompt. */
+export type NearbyInteractionScan =
+  | { kind: 'corpse'; entityId: number }
+  | { kind: 'delve'; entityId: number }
+  | { kind: 'object'; entityId: number }
+  | { kind: 'npc'; entityId: number }
+  | { kind: 'escortStart'; verdict: Extract<EscortPressVerdict, { kind: 'start' }> }
+  | { kind: 'node'; node: NearbyGatherNode }
+  | { kind: 'escortAway' }
+  | null;
+
+/** Resolve which nearby thing an interact press would act on, without acting.
+ *  Pure: no dispatch, no HUD, no toasts. See NearbyInteractionScan. */
+export function scanNearbyInteraction(
+  world: Pick<
+    NearbyInteractionWorld,
+    'player' | 'playerId' | 'partyInfo' | 'entities' | 'questLog'
+  >,
   gatherNodes: readonly NearbyGatherNode[],
-  nodeToolGateFor: ((node: NearbyGatherNode) => GatherNodeToolGate) | null,
-  tooFarText: string,
-  notReadyText: string,
-  escortAwayText: string,
-  nothingToInteractText: string,
   harvestStateReliable = true,
-  // The R40 per-use effect confirm gate, threaded to the node dispatch.
-  effectConfirm?: GatherEffectConfirmGate,
-): InteractionOutcome {
+): NearbyInteractionScan {
   const player = world.player;
   const playerId = world.playerId ?? player.id;
   const partyIds = localPartyMemberIds(world.partyInfo);
@@ -133,8 +142,53 @@ export function tryNearbyInteraction(
     }
   }
 
-  if (bestCorpse !== null) {
-    const corpse = world.entities.get(bestCorpse);
+  if (bestCorpse !== null) return { kind: 'corpse', entityId: bestCorpse };
+  if (bestDelve !== null) return { kind: 'delve', entityId: bestDelve };
+  if (bestObject !== null) return { kind: 'object', entityId: bestObject };
+  if (bestNpc !== null) return { kind: 'npc', entityId: bestNpc };
+  // STARTING an escort sits below the npc arm (an escortee is mob-kind, so the
+  // two can never compete) and above gather nodes: an escortee standing in
+  // front of you beats the node you happen to be over. Corpses still win, so
+  // looting the ambush wave is never swallowed.
+  const escort = player.dead
+    ? ({ kind: 'none' } as const)
+    : decideEscortPress(player.pos, world.entities, world.questLog);
+  if (escort.kind === 'start') return { kind: 'escortStart', verdict: escort };
+  if (bestNode !== null) return { kind: 'node', node: bestNode };
+  // The away line is a LAST resort that only replaces the generic
+  // nothing-to-interact message: an absent escortee must never eat a press that
+  // some other arm above could have used (a node underfoot at an empty post).
+  if (escort.kind === 'away') return { kind: 'escortAway' };
+  return null;
+}
+
+/** Find and dispatch one eligible nearby interaction in stable priority order.
+ *  `nodeToolGateFor` (Professions 2.0) resolves the tool-tier access
+ *  gate + localized denial line for the node about to be harvested; it sits
+ *  with the node list (not trailing) so the live call site (main.ts
+ *  interactKey) still closes on the nothing-to-interact string, as pinned by
+ *  tests/client_shell.test.ts. `escortAwayText` sits before that same string
+ *  for the same reason. */
+export function tryNearbyInteraction(
+  world: NearbyInteractionWorld,
+  hud: NearbyInteractionHud,
+  gatherNodes: readonly NearbyGatherNode[],
+  nodeToolGateFor: ((node: NearbyGatherNode) => GatherNodeToolGate) | null,
+  tooFarText: string,
+  notReadyText: string,
+  escortAwayText: string,
+  nothingToInteractText: string,
+  harvestStateReliable = true,
+  // The R40 per-use effect confirm gate, threaded to the node dispatch.
+  effectConfirm?: GatherEffectConfirmGate,
+): InteractionOutcome {
+  const player = world.player;
+  const playerId = world.playerId ?? player.id;
+  const partyIds = localPartyMemberIds(world.partyInfo);
+  const scan = scanNearbyInteraction(world, gatherNodes, harvestStateReliable);
+
+  if (scan?.kind === 'corpse') {
+    const corpse = world.entities.get(scan.entityId);
     if (!corpse) return false;
     // Unified press: harvest first, then loot, as two separate
     // commands (processed in receipt order in the same server tick batch).
@@ -142,15 +196,15 @@ export function tryNearbyInteraction(
     // emptied half is never dispatched (no denial-toast spam); the server
     // still revalidates both authoritatively.
     const availability = corpseLootAvailability(corpse, playerId, harvestStateReliable, partyIds);
-    if (availability.harvestable) world.harvestCorpse(bestCorpse);
-    if (availability.hasLoot) return world.lootCorpse(bestCorpse);
+    if (availability.harvestable) world.harvestCorpse(scan.entityId);
+    if (availability.hasLoot) return world.lootCorpse(scan.entityId);
     return availability.harvestable;
   }
-  if (bestDelve !== null) {
-    return world.delveInteract(bestDelve);
+  if (scan?.kind === 'delve') {
+    return world.delveInteract(scan.entityId);
   }
-  if (bestObject !== null) {
-    const object = world.entities.get(bestObject);
+  if (scan?.kind === 'object') {
+    const object = world.entities.get(scan.entityId);
     if (!object) return false;
     if (object.templateId === 'dungeon_door' && object.dungeonId) {
       return world.enterDungeon(object.dungeonId);
@@ -160,11 +214,11 @@ export function tryNearbyInteraction(
       hud.openMailbox();
       return true;
     } else {
-      return world.pickUpObject(bestObject);
+      return world.pickUpObject(scan.entityId);
     }
   }
-  if (bestNpc !== null) {
-    const npc = world.entities.get(bestNpc);
+  if (scan?.kind === 'npc') {
+    const npc = world.entities.get(scan.entityId);
     if (npc?.kind !== 'npc') return false;
     if (npc.templateId === 'spirit_healer') {
       // The scan only picks a spirit healer for a ghost; route the revive
@@ -172,37 +226,31 @@ export function tryNearbyInteraction(
       // directly (it applies The Keeper's Toll).
       hud.requestSpiritHealerResurrect();
     } else if (npc.templateId === 'brother_halven' || npc.templateId === 'brother_halven_marsh') {
-      hud.openDelveBoard(bestNpc);
+      hud.openDelveBoard(scan.entityId);
     } else {
-      hud.openQuestDialog(bestNpc);
+      hud.openQuestDialog(scan.entityId);
     }
     return true;
   }
-  // STARTING an escort sits below the npc arm (an escortee is mob-kind, so the
-  // two can never compete) and above gather nodes: an escortee standing in
-  // front of you beats the node you happen to be over. Corpses still win, so
-  // looting the ambush wave is never swallowed.
-  const escort = player.dead
-    ? ({ kind: 'none' } as const)
-    : decideEscortPress(player.pos, world.entities, world.questLog);
-  if (escort.kind === 'start') return handleEscortPress(world, hud, escort, escortAwayText);
-  if (bestNode !== null) {
+  if (scan?.kind === 'escortStart') {
+    return handleEscortPress(world, hud, scan.verdict, escortAwayText);
+  }
+  if (scan?.kind === 'node') {
     return handleGatherNodeInteract(
       world,
       hud,
       player.pos,
-      bestNode.id,
-      bestNode.pos,
+      scan.node.id,
+      scan.node.pos,
       tooFarText,
       notReadyText,
-      nodeToolGateFor?.(bestNode),
+      nodeToolGateFor?.(scan.node),
       effectConfirm,
     );
   }
-  // The away line is a LAST resort that only replaces the generic
-  // nothing-to-interact message: an absent escortee must never eat a press that
-  // some other arm above could have used (a node underfoot at an empty post).
-  if (escort.kind === 'away') return handleEscortPress(world, hud, escort, escortAwayText);
+  if (scan?.kind === 'escortAway') {
+    return handleEscortPress(world, hud, { kind: 'away' }, escortAwayText);
+  }
   hud.showError(nothingToInteractText);
   return false;
 }

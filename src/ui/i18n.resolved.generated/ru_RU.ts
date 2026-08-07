@@ -774,6 +774,26 @@ export const ru_RU: EnTranslations = {
       "ready": "Замах",
       "seconds": "{seconds} сек."
     },
+    "interactPrompt": {
+      "interact": "Действие",
+      "loot": "Loot",
+      "talk": "Talk",
+      "open": "Open",
+      "take": "Take",
+      "gather": "Собрать",
+      "enter": "Войти",
+      "leave": "Выйти",
+      "name": {
+        "lockedChest": "Запертый сундук",
+        "rewardChest": "Сундук с наградой",
+        "surfaceExit": "Way Out",
+        "reliquary": "Затонувший реликварий",
+        "bellShrine": "Алтарь колокола",
+        "candleShrine": "Алтарь свечи",
+        "reedShrine": "Алтарь тростника",
+        "skullShrine": "Алтарь черепа"
+      }
+    },
     "rest": {
       "resting": "Отдых"
     },
@@ -1218,6 +1238,8 @@ export const ru_RU: EnTranslations = {
       "showThirdActionBar": "Показывать третью панель действий",
       "lockActionBars": "Заблокировать панели действий",
       "showTargetOfTarget": "Показывать цель цели",
+      "showInteractPrompt": "Показывать подсказку действия",
+      "interactHighlight": "Подсвечивать объекты под курсором",
       "showAttackButton": "Показывать кнопку атаки",
       "showDailyRewardsChest": "Показывать сундук ежедневных наград",
       "mobileCameraJoystick": "Джойстик камеры",

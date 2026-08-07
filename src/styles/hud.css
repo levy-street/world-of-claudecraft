@@ -1645,6 +1645,81 @@
   body.show-actionbar3 #swingbar {
     bottom: 292px;
   }
+  /* Interact prompt: the two-line hint naming whatever the interact key would
+     act on, floating directly above the topmost ability row. Desktop only (the
+     touch interface interacts through the action ring, and hud.mobile.css hides
+     it outright).
+
+     ZERO-HEIGHT ON PURPOSE. #actionbar-stack is a bottom-docked column, so a row
+     that grows when the prompt appears would shove the player frame and the
+     stance/pet bars up and down as the player walks past NPCs. The slot stays
+     height:0 and the content hangs above it out of flow, so showing and hiding
+     the prompt moves nothing. display is owned by InteractPromptPainter (none
+     or block, both zero-height either way); pointer-events stay off, since this
+     sits over the world canvas and must never eat a click meant for it. */
+  #interact-prompt {
+    display: none;
+    position: relative;
+    height: 0;
+    pointer-events: none;
+  }
+  #interact-prompt .ip-box {
+    position: absolute;
+    bottom: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    white-space: nowrap;
+    text-shadow:
+      0 1px 2px #000,
+      0 0 6px #000a;
+  }
+  #interact-prompt .ip-name {
+    font-family: var(--title-font);
+    font-size: 14px;
+    line-height: 16px;
+    color: #f2e2b0;
+    letter-spacing: 0.2px;
+  }
+  #interact-prompt .ip-action {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    line-height: 14px;
+    color: #c9bda0;
+  }
+  #interact-prompt .ip-glyph {
+    display: inline-flex;
+    color: var(--gold-dim);
+  }
+  #interact-prompt .ip-glyph .ui-icon {
+    width: 14px;
+    height: 14px;
+  }
+  #interact-prompt .ip-cap {
+    min-width: 17px;
+    padding: 0 4px;
+    border: 1px solid #6b5a2a;
+    border-radius: 3px;
+    background: #17141fcc;
+    box-shadow: inset 0 1px 0 #ffffff14;
+    font-family: var(--title-font);
+    font-size: 11px;
+    line-height: 15px;
+    text-align: center;
+    color: var(--gold);
+  }
+  /* An unbound interact action shows the word, not a keycap that implies a key. */
+  #interact-prompt .ip-cap.unbound {
+    border-color: transparent;
+    background: none;
+    box-shadow: none;
+    color: #9c9280;
+  }
   #actionbar,
   #actionbar2,
   #actionbar3 {

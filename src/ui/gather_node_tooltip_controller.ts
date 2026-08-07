@@ -205,6 +205,11 @@ export function attachGatherNodeHoverTooltip(
   pickGatherNode: (clientX: number, clientY: number) => string | null,
   pickEntity: (clientX: number, clientY: number) => number | null,
   pointerBusy: () => boolean,
+  // Publishes the node currently under the cursor (null for none), so the
+  // interact hover outline can reuse THIS module's raycast instead of running a
+  // second one every frame. Optional: a caller that only wants the tooltip
+  // (tests, fixtures) omits it.
+  onNodeHover: (nodeId: string | null) => void = () => {},
 ): void {
   const tooltipEl = document.getElementById('tooltip');
   if (!tooltipEl) return;
@@ -250,7 +255,12 @@ export function attachGatherNodeHoverTooltip(
 
   // Only ever hide the shared box when THIS module painted it (the
   // hideMapAreaTip idiom), so an unrelated owner's tooltip is never wiped.
+  // The hover outline is dismissed on EVERY hide path, including the ones that
+  // return early because no tooltip was showing (a press, leaving the canvas):
+  // the outline can be up without the tip, since a node whose tip is suppressed
+  // by an entity in front of it never sets `shown`.
   const hide = (): void => {
+    onNodeHover(null);
     clearRefresh();
     lastPaint = null;
     if (!shown) return;
@@ -308,6 +318,7 @@ export function attachGatherNodeHoverTooltip(
     // mob/player tooltip in the fixed corner slot); only a bare node shows.
     const nodeId =
       pickEntity(ev.clientX, ev.clientY) === null ? pickGatherNode(ev.clientX, ev.clientY) : null;
+    onNodeHover(nodeId);
     const model = nodeId !== null ? buildGatherNodeTooltip(world, nodeId) : null;
     if (model === null || nodeId === null) {
       hide();

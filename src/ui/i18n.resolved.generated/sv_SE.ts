@@ -774,6 +774,26 @@ export const sv_SE: EnTranslations = {
       "ready": "Sving",
       "seconds": "{seconds}s"
     },
+    "interactPrompt": {
+      "interact": "Interact",
+      "loot": "Loot",
+      "talk": "Talk",
+      "open": "Open",
+      "take": "Take",
+      "gather": "Gather",
+      "enter": "Enter",
+      "leave": "Leave",
+      "name": {
+        "lockedChest": "Locked Chest",
+        "rewardChest": "Reward Chest",
+        "surfaceExit": "Way Out",
+        "reliquary": "Drowned Reliquary",
+        "bellShrine": "Bell Shrine",
+        "candleShrine": "Candle Shrine",
+        "reedShrine": "Reed Shrine",
+        "skullShrine": "Skull Shrine"
+      }
+    },
     "rest": {
       "resting": "Vilar"
     },
@@ -1218,6 +1238,8 @@ export const sv_SE: EnTranslations = {
       "showThirdActionBar": "Visa tredje åtgärdsfältet",
       "lockActionBars": "Lås åtgärdsfälten",
       "showTargetOfTarget": "Visa målets mål",
+      "showInteractPrompt": "Show Interact Prompt",
+      "interactHighlight": "Highlight Interactables on Hover",
       "showAttackButton": "Visa attackknapp",
       "showDailyRewardsChest": "Visa kistan för dagliga belöningar",
       "mobileCameraJoystick": "Kamera joystick",

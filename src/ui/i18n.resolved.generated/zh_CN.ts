@@ -774,6 +774,26 @@ export const zh_CN: EnTranslations = {
       "ready": "挥击",
       "seconds": "{seconds}秒"
     },
+    "interactPrompt": {
+      "interact": "互动",
+      "loot": "Loot",
+      "talk": "Talk",
+      "open": "Open",
+      "take": "Take",
+      "gather": "采集",
+      "enter": "进入",
+      "leave": "离开",
+      "name": {
+        "lockedChest": "上锁的箱子",
+        "rewardChest": "战利品箱",
+        "surfaceExit": "Way Out",
+        "reliquary": "沉溺圣匣",
+        "bellShrine": "钟之神龛",
+        "candleShrine": "烛之神龛",
+        "reedShrine": "苇之神龛",
+        "skullShrine": "颅之神龛"
+      }
+    },
     "rest": {
       "resting": "休息中"
     },
@@ -1218,6 +1238,8 @@ export const zh_CN: EnTranslations = {
       "showThirdActionBar": "显示第三动作条",
       "lockActionBars": "锁定动作条",
       "showTargetOfTarget": "显示目标的目标",
+      "showInteractPrompt": "显示互动提示",
+      "interactHighlight": "悬停时高亮可互动目标",
       "showAttackButton": "显示攻击按钮",
       "showDailyRewardsChest": "显示每日奖励宝箱",
       "mobileCameraJoystick": "摄像机摇杆",

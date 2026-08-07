@@ -774,6 +774,26 @@ export const nl_NL: EnTranslations = {
       "ready": "Slag",
       "seconds": "{seconds}s"
     },
+    "interactPrompt": {
+      "interact": "Interact",
+      "loot": "Loot",
+      "talk": "Talk",
+      "open": "Open",
+      "take": "Take",
+      "gather": "Gather",
+      "enter": "Enter",
+      "leave": "Leave",
+      "name": {
+        "lockedChest": "Locked Chest",
+        "rewardChest": "Reward Chest",
+        "surfaceExit": "Way Out",
+        "reliquary": "Drowned Reliquary",
+        "bellShrine": "Bell Shrine",
+        "candleShrine": "Candle Shrine",
+        "reedShrine": "Reed Shrine",
+        "skullShrine": "Skull Shrine"
+      }
+    },
     "rest": {
       "resting": "Aan het rusten"
     },
@@ -1218,6 +1238,8 @@ export const nl_NL: EnTranslations = {
       "showThirdActionBar": "Derde actiebalk tonen",
       "lockActionBars": "Actiebalken vergrendelen",
       "showTargetOfTarget": "Doelwit van doelwit tonen",
+      "showInteractPrompt": "Show Interact Prompt",
+      "interactHighlight": "Highlight Interactables on Hover",
       "showAttackButton": "Aanvalsknop Tonen",
       "showDailyRewardsChest": "Kist met dagelijkse beloningen tonen",
       "mobileCameraJoystick": "Camerajoystick",

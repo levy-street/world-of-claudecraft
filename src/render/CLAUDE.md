@@ -25,7 +25,10 @@ Everything else is a sibling module in one of these families:
   its rank-tinted energy membrane (`buildRiftGateBody`), and `rift_rank.ts` is
   the floating C/B/A/S rank badge above a world rift portal.
 - **Per-frame overlay/FX modules** ticked from `sync()`: `vfx.ts` (pooled
-  particles), `weather.ts`, `character_effects.ts`.
+  particles), `weather.ts`, `character_effects.ts`. `interact_highlight.ts` is
+  the hover rim on an interactable: an inverted-hull shell per mesh of ONE
+  hovered subtree, chosen because the world renders in a single forward pass
+  with no composer (`renderer.setInteractHighlight`, `tests/interact_highlight.test.ts`).
 - **The nameplate suite** (below) owns all overhead text and badges.
 - **Pure logic cores** (below) hold Node-tested per-frame decisions.
 - **Perf governors:** `render_budget.ts` (adaptive frame budget, see

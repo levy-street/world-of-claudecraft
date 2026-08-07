@@ -774,6 +774,26 @@ export const ko_KR: EnTranslations = {
       "ready": "공격",
       "seconds": "{seconds}초"
     },
+    "interactPrompt": {
+      "interact": "상호작용",
+      "loot": "Loot",
+      "talk": "Talk",
+      "open": "Open",
+      "take": "Take",
+      "gather": "채집",
+      "enter": "입장",
+      "leave": "나가기",
+      "name": {
+        "lockedChest": "잠긴 상자",
+        "rewardChest": "보상 상자",
+        "surfaceExit": "Way Out",
+        "reliquary": "물에 잠긴 성물함",
+        "bellShrine": "종의 제단",
+        "candleShrine": "촛불의 제단",
+        "reedShrine": "갈대의 제단",
+        "skullShrine": "해골의 제단"
+      }
+    },
     "rest": {
       "resting": "휴식 중"
     },
@@ -1218,6 +1238,8 @@ export const ko_KR: EnTranslations = {
       "showThirdActionBar": "세 번째 액션 바 표시",
       "lockActionBars": "액션 바 잠금",
       "showTargetOfTarget": "대상의 대상 표시",
+      "showInteractPrompt": "상호작용 안내 표시",
+      "interactHighlight": "마우스를 올린 대상 강조",
       "showAttackButton": "공격 버튼 표시",
       "showDailyRewardsChest": "일일 보상 보물상자 표시",
       "mobileCameraJoystick": "카메라 조이스틱",

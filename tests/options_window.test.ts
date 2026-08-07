@@ -233,8 +233,11 @@ describe('options_window: interface tab split', () => {
   });
 
   it('filters the declarative controls to the active tab', () => {
-    expect(painter).toContain(
-      'interfaceControlsForTab(buildInterfaceControls(this.settingsSource(hooks)), tab)',
+    // The builder now also takes the device flags (the two desktop-only interact
+    // rows drop out on touch), so the call spans lines; the claim is unchanged:
+    // the tab filter wraps the declarative builder, it does not replace it.
+    expect(painter).toMatch(
+      /interfaceControlsForTab\(\s*buildInterfaceControls\(this\.settingsSource\(hooks\), \{ touch: useTouchInterface\(\) \}\),\s*tab,\s*\)/,
     );
   });
 

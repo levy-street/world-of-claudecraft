@@ -484,7 +484,13 @@ export const INTERFACE_TAB_LABEL_KEY: Record<InterfaceTab, TranslationKey> = {
 const tag = (category: InterfaceTab, controls: OptionsControl[]): OptionsControl[] =>
   controls.map((c): OptionsControl => ({ ...c, category }));
 
-export function buildInterfaceControls(s: OptionsSettingsSource): OptionsControl[] {
+/** `env` gates the two DESKTOP-only interact affordances below. It is optional
+ *  and defaults to the desktop shape so every existing caller and fixture keeps
+ *  its one-argument form; the live painter passes the real device flags. */
+export function buildInterfaceControls(
+  s: OptionsSettingsSource,
+  env: Pick<OptionsEnv, 'touch'> = { touch: false },
+): OptionsControl[] {
   return [
     ...tag('general', [
       // uiScale commits on release: applying it live rescales the whole UI (the
@@ -507,6 +513,15 @@ export function buildInterfaceControls(s: OptionsSettingsSource): OptionsControl
       boolToggle(s, 'showItemLevel', 'hudChrome.options.showItemLevel'),
       boolToggle(s, 'showOwnNameplate', 'hudChrome.options.showOwnNameplate'),
       boolToggle(s, 'showPlayerNameplates', 'hudChrome.options.showPlayerNameplates'),
+      // Desktop only: both name or mark a keyboard/mouse affordance the touch
+      // interface does not have (the bound interact keycap, and a hover
+      // outline), so on touch they are omitted rather than shown dead.
+      ...(env.touch
+        ? []
+        : [
+            boolToggle(s, 'showInteractPrompt', 'hudChrome.options.showInteractPrompt'),
+            boolToggle(s, 'interactHighlight', 'hudChrome.options.interactHighlight'),
+          ]),
     ]),
     ...tag('frames', [
       slider(s, 'playerFrameScale', 'hudChrome.options.playerFrameScale'),

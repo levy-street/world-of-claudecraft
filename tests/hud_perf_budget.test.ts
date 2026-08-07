@@ -550,6 +550,10 @@ const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
   { file: 'proc_overlay_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'aura_overlay_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'cast_bar_painter.ts', allow: {}, reflowAllow: {} },
+  // The interact prompt's keyboard glyph is static markup hydrated from
+  // index.html, so this painter writes only text/display/class through the
+  // facet: no innerHTML, no element queries of its own.
+  { file: 'interact_prompt_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'unit_frame_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'hud/action_bar/action_bar_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'hud/action_bar/mobile_action_ring_painter.ts', allow: {}, reflowAllow: {} },

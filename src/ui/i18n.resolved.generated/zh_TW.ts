@@ -774,6 +774,26 @@ export const zh_TW: EnTranslations = {
       "ready": "揮砍",
       "seconds": "{seconds}秒"
     },
+    "interactPrompt": {
+      "interact": "互動",
+      "loot": "Loot",
+      "talk": "Talk",
+      "open": "Open",
+      "take": "Take",
+      "gather": "採集",
+      "enter": "進入",
+      "leave": "離開",
+      "name": {
+        "lockedChest": "上鎖的箱子",
+        "rewardChest": "戰利品箱",
+        "surfaceExit": "Way Out",
+        "reliquary": "沉溺聖匣",
+        "bellShrine": "鐘之神龕",
+        "candleShrine": "燭之神龕",
+        "reedShrine": "葦之神龕",
+        "skullShrine": "顱之神龕"
+      }
+    },
     "rest": {
       "resting": "休息中"
     },
@@ -1218,6 +1238,8 @@ export const zh_TW: EnTranslations = {
       "showThirdActionBar": "顯示第三動作列",
       "lockActionBars": "鎖定動作列",
       "showTargetOfTarget": "顯示目標的目標",
+      "showInteractPrompt": "顯示互動提示",
+      "interactHighlight": "滑鼠移過時標示可互動目標",
       "showAttackButton": "顯示攻擊按鈕",
       "showDailyRewardsChest": "顯示每日獎勵寶箱",
       "mobileCameraJoystick": "攝影機搖桿",

@@ -3,6 +3,7 @@ import { corpseLootAvailability, localPartyMemberIds } from '../game/corpse_loot
 import type { GamepadKind } from '../game/gamepad_map';
 import type { GraphicsSettingsSnapshot } from '../game/graphics_rebuild_core';
 import { InstanceMusicController } from '../game/instance_music';
+import type { InteractPromptTarget } from '../game/interact_prompt';
 import { type Keybinds, keyCapLabel, keyLabel } from '../game/keybinds';
 import { music } from '../game/music';
 import type { GameSettings, Settings } from '../game/settings';
@@ -417,6 +418,8 @@ import {
 } from './i18n';
 import { iconDataUrl, QUALITY_COLOR, raidMarkerDataUrl } from './icons';
 import { InspectWindow } from './inspect_window';
+import { InteractPromptPainter, interactPromptName } from './interact_prompt_painter';
+import { makeInteractPromptState, resolveInteractPrompt } from './interact_prompt_view';
 import { itemArmorTypeLabelKey } from './item_armor_type';
 import { requiredClassesForTooltip } from './item_class_restriction';
 import { itemStatDeltas } from './item_compare';
@@ -1375,6 +1378,12 @@ export class Hud {
   private swingbarEl = $('#swingbar');
   private swingFillEl = this.swingbarEl.querySelector('.fill') as HTMLElement;
   private swingLabelEl = this.swingbarEl.querySelector('.label') as HTMLElement;
+  // Interact prompt (above the action bars). Queried ONCE like the swing bar's
+  // children; the painter never re-queries them.
+  private interactPromptEl = $('#interact-prompt');
+  private interactPromptNameEl = this.interactPromptEl.querySelector('.ip-name') as HTMLElement;
+  private interactPromptVerbEl = this.interactPromptEl.querySelector('.ip-verb') as HTMLElement;
+  private interactPromptCapEl = this.interactPromptEl.querySelector('.ip-cap') as HTMLElement;
   private deathOverlayEl = $('#death-overlay');
   private releaseSpiritBtnEl = $('#release-btn');
   private ghostPromptEl = $('#ghost-prompt');
@@ -3710,6 +3719,15 @@ export class Hud {
     this.swingFillEl,
     this.swingLabelEl,
   );
+  private readonly interactPromptPainter = new InteractPromptPainter(
+    this.writerFacet,
+    this.interactPromptEl,
+    this.interactPromptNameEl,
+    this.interactPromptVerbEl,
+    this.interactPromptCapEl,
+  );
+  // Reused across every prompt paint (the allocation-light core contract).
+  private readonly interactPromptState = makeInteractPromptState();
   // The spell-activation proc overlay (the Rising Phoenix, owner design
   // 2026-07-11): built ONCE here (proc_overlay_dom), draggable + persistent
   // (proc_overlay_drag), class-toggled per frame via the elided writers
@@ -4777,6 +4795,33 @@ export class Hud {
   // main.ts applySetting. When off, the per-frame update paints the frame hidden.
   setShowTargetOfTarget(on: boolean): void {
     this.showTargetOfTarget = on;
+  }
+
+  // Repaint the interact prompt above the action bars. Driven from main.ts on
+  // the prompt's own scan cadence (INTERACT_PROMPT_SCAN_MS), not per frame:
+  // `target` is what the interact key would act on right now, resolved from the
+  // SAME scan the key dispatches from, so the two can never name different
+  // things. The keycap comes from the live binding here rather than the caller,
+  // since the HUD already owns the Keybinds profile that a rebind writes.
+  setInteractPrompt(target: InteractPromptTarget | null, enabled: boolean, touch: boolean): void {
+    const entity =
+      target && target.entityId !== null ? this.sim.entities.get(target.entityId) : undefined;
+    this.interactPromptPainter.paint(
+      resolveInteractPrompt(
+        {
+          enabled,
+          touch,
+          kind: target?.kind ?? null,
+          name: target ? interactPromptName(target.kind, entity, target.nodeType) : '',
+          // The full-length label, not the compact action-bar keycap form: this
+          // cap has room for "Shift+Z" and should read like the key you press.
+          // Empty when the player cleared the binding, which the core reports as
+          // `unbound` and the painter renders as a word instead of a key.
+          keyLabel: this.keybinds.primaryLabel('interact'),
+        },
+        this.interactPromptState,
+      ),
+    );
   }
 
   private itemIcon(item: ItemDef): string {

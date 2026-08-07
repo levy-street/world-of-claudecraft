@@ -219,6 +219,7 @@ import { buildHollowGates } from './hollow_gates';
 import { type IceBlockVisual, syncIceBlockVisual } from './ice_block_visual';
 import { idleSlot } from './idle_queue';
 import { buildImpactSite, type ImpactSiteView, MIREFEN_IMPACT_SITE } from './impact_site';
+import { InteractHighlight } from './interact_highlight';
 import { ensureDelveInteriorKit } from './interior_kit';
 import { buildJailScene, type JailSceneView } from './jail_scene';
 import { buildJungleFeatures, type JungleFeaturesView } from './jungle_features';
@@ -1241,6 +1242,10 @@ export class Renderer {
   private aoeRingNext = 0;
   private recklessSkulls = new RecklessSkullPainter();
   private groundAimReticle: GroundAimReticleVisual;
+  // Hover outline for interactables (see interact_highlight.ts). Owns nothing
+  // in the scene until a target is set, so it costs nothing while the pointer
+  // is over open world.
+  private interactHighlight = new InteractHighlight();
   raycaster = new THREE.Raycaster();
   private readonly raycastNdc = new THREE.Vector2();
   private readonly raycastGroundPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
@@ -8126,6 +8131,10 @@ export class Renderer {
   private removeView(id: number, terminal = false): void {
     const v = this.views.get(id);
     if (!v) return;
+    // Before anything below pools or disposes this view's meshes: the hover
+    // outline hangs shell meshes INSIDE this subtree that borrow its geometry
+    // and skeleton, so it has to let go first.
+    this.interactHighlight.clearIfTarget(v.group);
     this.scene.remove(v.group);
     this.lightOwnerGroups.delete(v.group);
     if (v.viewLights.length > 0) {
@@ -9551,6 +9560,10 @@ export class Renderer {
     this.recklessSkulls.update(dt);
     this.fishingBobbers.update(dt, this.sim.entities, this.sim.cfg.seed);
     this.updateGroundAimReticle(dt);
+    // Hold the hover outline at a constant screen thickness: its shells expand
+    // per unit of view depth, so the scale depends on the live FOV (the camera
+    // feel layers kick it) and the viewport height. No-ops with no target.
+    this.interactHighlight.update(this.camera, this.viewport.height);
     // dev-only Tab-target cone overlay: re-drape the front cone on the terrain
     // under the local player, oriented to the model's rendered facing.
     if (this.targetCone) {
@@ -10781,6 +10794,24 @@ export class Renderer {
     slot.mat.color.setHex(colorHex ?? SCHOOL_COLORS[school] ?? 0xffffff);
     if (!this.lowGfx) slot.mat.color.multiplyScalar(SELECTION_RING_BOOST);
     slot.ring.visible = true;
+  }
+
+  /** Point the interact hover outline at an entity, a gather node, or nothing.
+   *  Callers pass what the pointer is over; resolving that to a subtree is the
+   *  renderer's job because only it holds the view/node scene graph. Passing
+   *  the same target every frame is free (the highlight rebuilds on change). */
+  setInteractHighlight(entityId: number | null, nodeId: string | null): void {
+    if (entityId !== null) {
+      const view = this.views.get(entityId);
+      this.interactHighlight.setTarget(view?.group ?? null);
+      return;
+    }
+    if (nodeId !== null) {
+      const node = this.gatherNodeMeshes.find((o) => o.userData.gatherNodeId === nodeId);
+      this.interactHighlight.setTarget(node ?? null);
+      return;
+    }
+    this.interactHighlight.setTarget(null);
   }
 
   setGroundAimReticle(
