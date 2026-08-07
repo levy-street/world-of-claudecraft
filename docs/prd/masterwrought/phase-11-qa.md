@@ -10,6 +10,13 @@ Goal: audit the Phase 11 wiring for draw-order safety, referential completeness,
 reachability, and market coverage before the Perfecting stage builds on a complete
 acquisition loop.
 
+WORKTREE GUARD (do this FIRST; the user runs multiple concurrent sessions): run pwd.
+If you are not in /Users/fernando/Documents/wocc-masterwrought, switch this session into
+it NOW with the EnterWorktree tool (path: /Users/fernando/Documents/wocc-masterwrought).
+If EnterWorktree is unavailable or refuses, STOP and ask the user to relaunch Claude Code
+from that directory. Phase work never runs from the main checkout at
+~/Documents/world-of-claudecraft.
+
 STEP 0 - PRE-FLIGHT: git status clean (Phase 11 committed); SYNC RELEASE per the
 canonical workflow (fetch, merge newest origin/release/**, release-merge-audit). Memory
 scan: test-pin trap index (READ before judging any pin), loot draw-order and parity

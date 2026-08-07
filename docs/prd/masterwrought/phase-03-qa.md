@@ -11,6 +11,13 @@ phases author new names against the confirmed registry. Audit emphasis (the phas
 focus): no id changed anywhere; tests/shipped_item_ids.test.ts untouched-green; the S3
 guard green; wiki regenerated.
 
+WORKTREE GUARD (do this FIRST; the user runs multiple concurrent sessions): run pwd.
+If you are not in /Users/fernando/Documents/wocc-masterwrought, switch this session into
+it NOW with the EnterWorktree tool (path: /Users/fernando/Documents/wocc-masterwrought).
+If EnterWorktree is unavailable or refuses, STOP and ask the user to relaunch Claude Code
+from that directory. Phase work never runs from the main checkout at
+~/Documents/world-of-claudecraft.
+
 STEP 0 - PRE-FLIGHT: git status clean (Phase 03 committed); SYNC RELEASE per the
 canonical workflow (fetch, merge newest origin/release/**, release-merge-audit). Memory
 scan: test-pin trap index (READ before judging any pin), i18n traps (reword staleness,

@@ -15,6 +15,13 @@ Goal: execute the whole-feature QA matrix, run the final release sync and the fu
 release-tier gate, prepare the PR body with screenshots, offer packet teardown, and
 push or open the PR ONLY on the maintainer's word.
 
+WORKTREE GUARD (do this FIRST; the user runs multiple concurrent sessions): run pwd.
+If you are not in /Users/fernando/Documents/wocc-masterwrought, switch this session into
+it NOW with the EnterWorktree tool (path: /Users/fernando/Documents/wocc-masterwrought).
+If EnterWorktree is unavailable or refuses, STOP and ask the user to relaunch Claude Code
+from that directory. Phase work never runs from the main checkout at
+~/Documents/world-of-claudecraft.
+
 STEP 0 - PRE-FLIGHT (canonical Team Workflow, docs/prd/masterwrought/implementation-plan.md):
 - git status clean (all 16 phases and their QA rounds committed); then the FINAL RELEASE
   SYNC: git fetch origin, merge the newest origin/release/** into feature/masterwrought,

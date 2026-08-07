@@ -11,6 +11,13 @@ completeness before Phase 11 hangs every apex pattern on this machinery. Audit e
 (the phase's QA focus): the learn path draws no rng; pattern items respect the frozen-id
 golden; S3 matcher coverage for every refusal line.
 
+WORKTREE GUARD (do this FIRST; the user runs multiple concurrent sessions): run pwd.
+If you are not in /Users/fernando/Documents/wocc-masterwrought, switch this session into
+it NOW with the EnterWorktree tool (path: /Users/fernando/Documents/wocc-masterwrought).
+If EnterWorktree is unavailable or refuses, STOP and ask the user to relaunch Claude Code
+from that directory. Phase work never runs from the main checkout at
+~/Documents/world-of-claudecraft.
+
 STEP 0 - PRE-FLIGHT: git status clean (Phase 02 committed); SYNC RELEASE per the
 canonical workflow (fetch, merge newest origin/release/**, release-merge-audit). Memory
 scan: test-pin trap index (READ before judging any pin), frozen-id golden gotchas, i18n

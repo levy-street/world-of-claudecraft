@@ -12,6 +12,13 @@ Goal: 9 apex armor pieces (3 per armor craft) plus the tailoring apex bag, with 
 picks decided by a coverage audit, every budget exactly formula-derived, and the apex
 budget sweep test born in this phase.
 
+WORKTREE GUARD (do this FIRST; the user runs multiple concurrent sessions): run pwd.
+If you are not in /Users/fernando/Documents/wocc-masterwrought, switch this session into
+it NOW with the EnterWorktree tool (path: /Users/fernando/Documents/wocc-masterwrought).
+If EnterWorktree is unavailable or refuses, STOP and ask the user to relaunch Claude Code
+from that directory. Phase work never runs from the main checkout at
+~/Documents/world-of-claudecraft.
+
 STEP 0 - PRE-FLIGHT (canonical Team Workflow, docs/prd/masterwrought/implementation-plan.md):
 - git status clean; then SYNC RELEASE: git fetch origin, merge the newest origin/release/**
   into feature/masterwrought, run the release-merge-audit skill on the merge.

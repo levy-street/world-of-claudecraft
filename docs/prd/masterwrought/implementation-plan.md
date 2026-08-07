@@ -14,7 +14,11 @@ Nothing is deferred to a future PR; an item is in this packet or cut.
 Every phase runs as its own fresh session at xhigh effort; add `ultracode` for the
 batch-heavy phases the table marks. Steps:
 
-0. PRE-FLIGHT: `git status` clean in `~/Documents/wocc-masterwrought`. Then SYNC THE
+0. PRE-FLIGHT: WORKTREE GUARD first (the user runs multiple concurrent sessions): if pwd
+   is not `~/Documents/wocc-masterwrought`, switch this session into it with the
+   EnterWorktree tool (path: /Users/fernando/Documents/wocc-masterwrought), or stop and
+   ask the user to relaunch there; phase work never runs from the main checkout. Then
+   `git status` clean in `~/Documents/wocc-masterwrought`. Then SYNC THE
    RELEASE BRANCH (maintainer directive, every phase, no exceptions): `git fetch origin`,
    merge the NEWEST `origin/release/**` into `feature/masterwrought`, resolve, and run the
    `release-merge-audit` skill on the merge before any phase work. Scan memory

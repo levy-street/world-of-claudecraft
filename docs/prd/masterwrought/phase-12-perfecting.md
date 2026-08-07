@@ -15,6 +15,13 @@ attempt to walk an apex piece up a rank track to Perfected (R1), binding the pie
 moment Perfecting begins (R2), fail-forward only, with bonus stats worth exactly the
 R5-safe delta, in both hosts, persisted, with a parity scenario.
 
+WORKTREE GUARD (do this FIRST; the user runs multiple concurrent sessions): run pwd.
+If you are not in /Users/fernando/Documents/wocc-masterwrought, switch this session into
+it NOW with the EnterWorktree tool (path: /Users/fernando/Documents/wocc-masterwrought).
+If EnterWorktree is unavailable or refuses, STOP and ask the user to relaunch Claude Code
+from that directory. Phase work never runs from the main checkout at
+~/Documents/world-of-claudecraft.
+
 STEP 0 - PRE-FLIGHT (canonical Team Workflow, docs/prd/masterwrought/implementation-plan.md):
 - git status clean; then SYNC RELEASE: git fetch origin, merge the newest origin/release/**
   into feature/masterwrought, run the release-merge-audit skill on the merge.

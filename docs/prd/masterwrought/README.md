@@ -19,3 +19,8 @@ Read in this order:
 
 House cadence: phase, then that phase's QA, then the next phase. Every phase session
 starts by merging the latest `origin/release/**` and running `release-merge-audit`.
+
+Sessions self-relocate: every phase prompt opens with a worktree guard that switches the
+session into `~/Documents/wocc-masterwrought` via EnterWorktree when launched anywhere
+else (the maintainer runs multiple concurrent sessions from the main checkout), so a
+phase prompt can be pasted into any new session regardless of its launch directory.

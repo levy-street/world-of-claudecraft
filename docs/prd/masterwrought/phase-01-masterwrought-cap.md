@@ -10,6 +10,13 @@ Model: xhigh effort. Harness: Claude Code. Worktree: ~/Documents/wocc-masterwrou
 Goal: every future apex piece needs the counted equip family "Unique-Equipped:
 Masterwrought (2)" with the one-orange sub-cap; build it now, fully tested, in both hosts.
 
+WORKTREE GUARD (do this FIRST; the user runs multiple concurrent sessions): run pwd.
+If you are not in /Users/fernando/Documents/wocc-masterwrought, switch this session into
+it NOW with the EnterWorktree tool (path: /Users/fernando/Documents/wocc-masterwrought).
+If EnterWorktree is unavailable or refuses, STOP and ask the user to relaunch Claude Code
+from that directory. Phase work never runs from the main checkout at
+~/Documents/world-of-claudecraft.
+
 STEP 0 - PRE-FLIGHT (canonical Team Workflow, docs/prd/masterwrought/implementation-plan.md):
 - git status clean; then SYNC RELEASE: git fetch origin, merge the newest origin/release/**
   into feature/masterwrought, run the release-merge-audit skill on the merge.

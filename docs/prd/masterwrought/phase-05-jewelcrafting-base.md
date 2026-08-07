@@ -11,6 +11,13 @@ a Workflow after the serial station decision).
 Goal: jewelcrafting exists (today it has zero recipes): the 0/25/50 rungs, station and
 trainer wiring, icons, names, wiki, with every budget exactly formula-derived (R10).
 
+WORKTREE GUARD (do this FIRST; the user runs multiple concurrent sessions): run pwd.
+If you are not in /Users/fernando/Documents/wocc-masterwrought, switch this session into
+it NOW with the EnterWorktree tool (path: /Users/fernando/Documents/wocc-masterwrought).
+If EnterWorktree is unavailable or refuses, STOP and ask the user to relaunch Claude Code
+from that directory. Phase work never runs from the main checkout at
+~/Documents/world-of-claudecraft.
+
 STEP 0 - PRE-FLIGHT (canonical Team Workflow, docs/prd/masterwrought/implementation-plan.md):
 - git status clean; then SYNC RELEASE: git fetch origin, merge the newest origin/release/**
   into feature/masterwrought, run the release-merge-audit skill on the merge.

@@ -10,6 +10,13 @@ Goal: audit the crafting UX pass against the frontend contracts (buckets, write 
 pure-core registration), i18n sink classification, mobile safe areas, and DESIGN.md
 rollout compliance before the audit phases run.
 
+WORKTREE GUARD (do this FIRST; the user runs multiple concurrent sessions): run pwd.
+If you are not in /Users/fernando/Documents/wocc-masterwrought, switch this session into
+it NOW with the EnterWorktree tool (path: /Users/fernando/Documents/wocc-masterwrought).
+If EnterWorktree is unavailable or refuses, STOP and ask the user to relaunch Claude Code
+from that directory. Phase work never runs from the main checkout at
+~/Documents/world-of-claudecraft.
+
 STEP 0 - PRE-FLIGHT: git status clean (Phase 14 committed); SYNC RELEASE per the
 canonical workflow (fetch, merge newest origin/release/**, release-merge-audit). Memory
 scan: test-pin trap index (READ before judging any pin), pure-core triple registration,
