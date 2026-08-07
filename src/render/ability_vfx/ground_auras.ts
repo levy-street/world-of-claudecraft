@@ -1,5 +1,6 @@
 import * as THREE from 'three';
-import { drapeRingLocalY } from '../selection_ring';
+import { drapeFanLocalY, drapeStrideFor, fanVertexSpacing } from '../drape_lod_core';
+import type { VfxAnchorResolver } from '../vfx_anchor';
 import type { AbilityVfxTextures } from './fx_textures';
 
 // Soft additive ground annuli at a buffed character's feet: the DEFAULT read
@@ -23,6 +24,7 @@ import type { AbilityVfxTextures } from './fx_textures';
 // onto the outermost band, whose hue blends toward the newcomer.
 
 const AURA_SLOTS = 9;
+const AURA_SEGMENTS = 40;
 export const GROUND_AURA_BANDS = 3;
 const BAND_RADIUS = [1.3, 1.55, 1.8];
 // Peak additive opacity: noticeable when you look, invisible when you fight.
@@ -44,10 +46,16 @@ const SPIN_RATE = 0.25;
 const DRAPE_LIFT = 0.08;
 const BAND_LIFT_STEP = 0.015;
 // Re-drape thresholds: skip the per-vertex resample while the wearer stands
-// still and the breath scale drift stays under ~1.5% (the residual height
-// error at that drift is millimeters).
+// still and the breath scale drift stays small. The scale threshold is
+// RELATIVE, and deliberately wider than the breath's own peak-to-peak swing
+// (+-5% at 0.4 Hz): under the old absolute 0.02 yard threshold a character
+// standing perfectly still re-draped all 42 vertices several times a second,
+// forever, per band, to correct heights by (drift x radius x slope), which is
+// centimetres on anything walkable. Now the drape settles once the disc has
+// finished growing in and the breath rides it. Movement still re-drapes at a
+// centimetre, because that IS real new terrain under the disc.
 const DRAPE_MOVE_EPS = 0.01;
-const DRAPE_SCALE_EPS = 0.02;
+const DRAPE_SCALE_REL_EPS = 0.12;
 
 interface AuraSlot {
   mesh: THREE.Mesh;
@@ -71,6 +79,9 @@ interface AuraSlot {
 }
 
 const colorScratch = new THREE.Color();
+// Per-frame anchor scratch (see ../vfx_anchor.ts): update() resolves the wearer
+// once per live band and consumes the reading inside that iteration.
+const anchorScratch = new THREE.Vector3();
 
 export class GroundAuras {
   private slots: AuraSlot[] = [];
@@ -80,7 +91,7 @@ export class GroundAuras {
   constructor(scene: THREE.Scene, tex: AbilityVfxTextures) {
     // Rotation is baked into the geometry (instead of mesh.rotation.x) so the
     // position attribute's Y IS the up-axis the drape writes.
-    const geo = new THREE.CircleGeometry(1, 40);
+    const geo = new THREE.CircleGeometry(1, AURA_SEGMENTS);
     geo.rotateX(-Math.PI / 2);
     const basePos = geo.getAttribute('position') as THREE.BufferAttribute;
     this.localXZ = new Float32Array(basePos.count * 2);
@@ -204,9 +215,12 @@ export class GroundAuras {
     dt: number,
     time: number,
     frame: number,
-    anchor: (id: number, frac: number) => { x: number; y: number; z: number } | null,
+    anchor: VfxAnchorResolver,
     groundY: (x: number, z: number) => number,
+    camX?: number,
+    camZ?: number,
   ): void {
+    const camKnown = camX !== undefined && camZ !== undefined;
     for (const slot of this.slots) {
       if (!slot.active) continue;
       if (slot.release === Number.POSITIVE_INFINITY && slot.stamp !== frame) {
@@ -214,7 +228,7 @@ export class GroundAuras {
         slot.release = slot.age + FADE_OUT;
       }
       slot.age += dt;
-      const at = slot.age < slot.release ? anchor(slot.entityId, 0) : null;
+      const at = slot.age < slot.release ? anchor(slot.entityId, 0, anchorScratch) : null;
       if (!at || slot.age >= slot.release) {
         slot.active = false;
         slot.mesh.visible = false;
@@ -237,12 +251,17 @@ export class GroundAuras {
       if (
         Math.abs(at.x - slot.drapeX) > DRAPE_MOVE_EPS ||
         Math.abs(at.z - slot.drapeZ) > DRAPE_MOVE_EPS ||
-        Math.abs(scale - slot.drapeScale) > DRAPE_SCALE_EPS
+        Math.abs(scale - slot.drapeScale) > slot.drapeScale * DRAPE_SCALE_REL_EPS
       ) {
         slot.drapeX = at.x;
         slot.drapeZ = at.z;
         slot.drapeScale = scale;
-        drapeRingLocalY(
+        // A moving buffed character re-drapes every frame, per band: thin the
+        // sampling with camera distance (../drape_lod_core). Only the vertical
+        // fidelity of a faint cosmetic annulus changes; where it sits does not.
+        const dx = at.x - (camX ?? 0);
+        const dz = at.z - (camZ ?? 0);
+        drapeFanLocalY(
           this.localXZ,
           at.x,
           at.z,
@@ -251,6 +270,7 @@ export class GroundAuras {
           DRAPE_LIFT + slot.band * BAND_LIFT_STEP,
           groundY,
           slot.drapeY,
+          drapeStrideFor(camKnown ? dx * dx + dz * dz : -1, fanVertexSpacing(scale, AURA_SEGMENTS)),
         );
         const pos = slot.mesh.geometry.getAttribute('position') as THREE.BufferAttribute;
         for (let i = 0; i < slot.drapeY.length; i++) pos.setY(i, slot.drapeY[i]);

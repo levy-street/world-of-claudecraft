@@ -20,7 +20,12 @@ describe('character presentation sleep wiring', () => {
     );
     expect(renderer).toContain('if (runCharacterPresentation) active.update(dt, st, animate);');
     expect(renderer).toContain('else active.advanceOffscreen(dt);');
-    expect(renderer).toContain('if (runCharacterPresentation) v.visual.updateWeaponVfx(dt);');
+    // The weapon-skin rig is still gated on presentation (a hidden rig writes no
+    // uniforms), and a visible one now carries its shed multiplier: the pin
+    // covers both halves so neither can be dropped.
+    expect(renderer).toContain(
+      'if (runCharacterPresentation) {\n        v.visual.updateWeaponVfx(dt, weaponVfxShedScale(d2, this.appliedBudgetLevels?.vfx ?? 1));\n      }',
+    );
     expect(renderer).toContain('v.mountVisual.advanceOffscreen(dt);');
   });
 

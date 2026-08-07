@@ -24,7 +24,7 @@ import { OverlaySprites } from './overlay_sprites';
 import { LightPillars } from './pillars';
 import { AbilityVfxRibbons, type BoltTrailStyle, type RibbonAnchor } from './ribbons';
 import { ShockRings } from './rings';
-import { ArchetypeSequencer, type SequencerHost } from './sequencer';
+import { ArchetypeSequencer, type SeqPoint, type SequencerHost } from './sequencer';
 import { BuffShells } from './shells';
 import { isCrescendoArchetype, SPECTACLE } from './spectacle';
 import {
@@ -52,6 +52,13 @@ export type ParticleBurst = (
 const camPosScratch = new THREE.Vector3();
 const camRightScratch = new THREE.Vector3();
 const camFwdScratch = new THREE.Vector3();
+// Per-frame anchor scratch (see ../vfx_anchor.ts). Three separate ones because
+// the per-frame draws below hold up to two readings at once (a windup's feet
+// AND head), and the sequencer host delegate must not clobber a reading its
+// caller is still holding.
+const anchorScratchA = new THREE.Vector3();
+const anchorScratchB = new THREE.Vector3();
+const hostAnchorScratch = new THREE.Vector3();
 
 // The Three-side engine of the per-ability VFX system: owns the pooled
 // primitive families ported from the Ability VFX Gallery (ribbon trails, shock
@@ -315,8 +322,8 @@ export class AbilityVfxFx implements SequencerHost {
   // entity, frame-stamp swept exactly like windups/orbits. Drawn for at most
   // the MAX_STUN_STAR_BANDS best-ranked entities per frame (the fixed pick
   // arrays are the selection scratch, reused every frame). hx/hy/hz cache the
-  // frame's resolved head anchor so the draw never re-resolves it (the
-  // renderer's anchor delegate allocates a Vector3 per call).
+  // frame's resolved head anchor so the ranking pass and the draw share one
+  // resolve instead of asking the anchor delegate twice.
   private stunStars = new Map<
     number,
     { remaining: number; stamp: number; hx: number; hy: number; hz: number }
@@ -864,8 +871,17 @@ export class AbilityVfxFx implements SequencerHost {
 
   // ---- SequencerHost surface (sequencer.ts drives these) ------------------
 
-  anchorOf(id: number, frac: number): { x: number; y: number; z: number } | null {
-    return this.anchor(id, frac);
+  anchorOf(id: number, frac: number, out?: SeqPoint): SeqPoint | null {
+    // No destination: keep the historical contract exactly (a fresh vector the
+    // caller may retain). With one, resolve through this engine's scratch and
+    // copy the three floats out, so the sequencer stays Three-free.
+    if (!out) return this.anchor(id, frac);
+    const at = this.anchor(id, frac, hostAnchorScratch);
+    if (!at) return null;
+    out.x = at.x;
+    out.y = at.y;
+    out.z = at.z;
+    return out;
   }
 
   // True when the aura-driven stunned-star band actually WON a draw slot in
@@ -1444,16 +1460,29 @@ export class AbilityVfxFx implements SequencerHost {
       s.t -= dt;
       if (s.t > 0) continue;
       s.active = false;
-      const at = s.entityId >= 0 ? this.anchor(s.entityId, 0.5) : s;
+      const at = s.entityId >= 0 ? this.anchor(s.entityId, 0.5, anchorScratchA) : s;
       if (at) this.screenFxAt(at.x, at.y, at.z, s.strength);
     }
+    // The small ground discs thin their terrain drape with camera distance
+    // (../drape_lod_core), so the decal pool needs this frame's camera before
+    // anything spawns into it. The shock rings deliberately do NOT thin: their
+    // footprints are too wide for an interpolated drape to stay honest.
+    this.decals.setCameraPosition(camPosScratch.x, camPosScratch.z);
     this.ribbons.update(dt, camPosScratch);
     this.rings.update(dt, this.camera.quaternion);
     this.flipbooks.update(dt, this.camera.quaternion);
     this.decals.update(dt);
     this.pillars.update(dt);
     this.shells.update(dt, this.time, this.frame, this.anchor);
-    this.groundAuras.update(dt, this.time, this.frame, this.anchor, this.groundY);
+    this.groundAuras.update(
+      dt,
+      this.time,
+      this.frame,
+      this.anchor,
+      this.groundY,
+      camPosScratch.x,
+      camPosScratch.z,
+    );
     this.spirits.update(dt);
     this.overlay.beginFrame();
     // The stunned-star bands draw FIRST in the frame's overlay batch: the
@@ -1472,7 +1501,7 @@ export class AbilityVfxFx implements SequencerHost {
         this.stunStars.delete(id);
         continue;
       }
-      const head = this.anchorOf(id, 1.0);
+      const head = this.anchorOf(id, 1.0, anchorScratchA);
       if (!head) continue;
       s.hx = head.x;
       s.hy = head.y;
@@ -1590,7 +1619,7 @@ export class AbilityVfxFx implements SequencerHost {
     const q = 0.75 + 0.25 * this.qualityLevel;
     const pulse = 1 + 0.07 * Math.sin(this.time * 14);
     if (style === 'runes') {
-      const feet = this.anchor(entityId, 0.04);
+      const feet = this.anchor(entityId, 0.04, anchorScratchA);
       if (!feet) return;
       const n = 4;
       const r = 1.25 - 0.35 * p;
@@ -1607,7 +1636,7 @@ export class AbilityVfxFx implements SequencerHost {
           2.1,
         );
       }
-      const chest = this.anchor(entityId, 0.58);
+      const chest = this.anchor(entityId, 0.58, anchorScratchB);
       if (chest)
         this.overlay.push(
           chest.x,
@@ -1622,7 +1651,7 @@ export class AbilityVfxFx implements SequencerHost {
       return;
     }
     if (style === 'stance') {
-      const feet = this.anchor(entityId, 0.06);
+      const feet = this.anchor(entityId, 0.06, anchorScratchA);
       if (!feet) return;
       for (let k = 0; k < 3; k++) {
         const a = this.time * 1.1 + k * 2.1 + entityId;
@@ -1641,7 +1670,7 @@ export class AbilityVfxFx implements SequencerHost {
       return;
     }
     if (style === 'weapon') {
-      const hand = this.anchor(entityId, 0.46);
+      const hand = this.anchor(entityId, 0.46, anchorScratchA);
       if (!hand) return;
       this.overlay.push(
         hand.x,
@@ -1666,8 +1695,8 @@ export class AbilityVfxFx implements SequencerHost {
       return;
     }
     if (style === 'ascend') {
-      const feet = this.anchor(entityId, 0.04);
-      const head = this.anchor(entityId, 1.0);
+      const feet = this.anchor(entityId, 0.04, anchorScratchA);
+      const head = this.anchor(entityId, 1.0, anchorScratchB);
       if (!feet || !head) return;
       const span = head.y - feet.y + 0.8;
       for (let k = 0; k < 4; k++) {
@@ -1697,7 +1726,7 @@ export class AbilityVfxFx implements SequencerHost {
       return;
     }
     // orb (default) and vortex share the hand orb; vortex pulls from wider out
-    const at = this.anchor(entityId, 0.58);
+    const at = this.anchor(entityId, 0.58, anchorScratchA);
     if (!at) return;
     const size = (0.28 + 0.5 * p) * pulse * q;
     this.overlay.push(at.x, at.y + 0.12, at.z, colorHex, size, OVERLAY_CELL.glow, 0.85, 1.9);
@@ -1737,7 +1766,7 @@ export class AbilityVfxFx implements SequencerHost {
   // overrides the style DNA so same-band buffs still read as different spells.
   private drawOrbit(entityId: number, band: OrbitBand): void {
     const dna = ORBIT_DNA[band.style];
-    const at = this.anchor(entityId, dna.frac);
+    const at = this.anchor(entityId, dna.frac, anchorScratchA);
     if (!at) return;
     const o = band.o;
     const fade = Math.min(1, band.age / 0.25) * (0.55 + 0.45 * this.qualityLevel);

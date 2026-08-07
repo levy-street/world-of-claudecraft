@@ -2829,6 +2829,10 @@ export interface WeaponVfxCreateOptions {
   backdrop?: boolean;
 }
 
+/** Scene-census bucket for every weapon-skin VFX rig (the `?perf` overlay's
+ *  `renderCategory`). Diagnostics only: nothing reads it to decide a draw. */
+export const WEAPON_VFX_RENDER_CATEGORY = 'weaponvfx';
+
 export interface WeaponVfxHandle {
   group: THREE.Group;
   sceneExtras: THREE.Group;
@@ -2854,6 +2858,13 @@ export function createWeaponVfx(
   group.name = 'weapon_vfx';
   const sceneExtras = new THREE.Group();
   sceneExtras.name = 'weapon_vfx_extras';
+  // Diagnostics-only label the `?perf` scene census buckets by (the renderer's
+  // setRenderCategory writes the same key, and the census inherits it down the
+  // subtree). Without it a rig's 6 to 10 additive draws landed in the character
+  // rig's own bucket, so the overlay could not see what a skin actually costs.
+  // NEVER a behaviour or visibility gate.
+  group.userData.renderCategory = WEAPON_VFX_RENDER_CATEGORY;
+  sceneExtras.userData.renderCategory = WEAPON_VFX_RENDER_CATEGORY;
 
   const parts: VfxPart[] = [];
   const emissives: EmissiveEntry[] = [];
@@ -3124,6 +3135,10 @@ export function buildWeaponVfxPrewarmGroup(): THREE.Group {
   // are part of every program cache key: one extra point light here and the
   // whole boot compile warms keys no live frame ever asks for.
   handle.light.visible = false;
+  // The boot prewarm group is census-tagged 'prewarm' as a whole; keep this
+  // synthetic rig inside that bucket rather than reporting as a live skin.
+  handle.group.userData.renderCategory = 'prewarm';
+  handle.sceneExtras.userData.renderCategory = 'prewarm';
   group.add(host);
   group.add(handle.sceneExtras);
   return group;

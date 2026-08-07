@@ -39,6 +39,25 @@ layers behind the `index.ts` barrel:
   of the entry. Anything new added to `prewarmSpawn` that a live frame would
   SEE must not be added here.
 
+Steady-state cost rules (what a live fight is allowed to spend per frame):
+- **Anchors resolve into a scratch.** The shared resolver
+  (`../vfx_anchor.ts`) takes an optional caller-owned destination; every
+  PER-FRAME path here passes one and allocates nothing, while the one-shot
+  spawn paths omit it and keep the retainable fresh vector. `tests/
+  ability_vfx_frame_cost.test.ts` drives the real engine and fails on any
+  destination-less resolve inside `update()`.
+- **Immediate-mode buffers upload their prefix, not their capacity.**
+  `ribbons.ts` and `overlay_sprites.ts` `clearUpdateRanges()` +
+  `addUpdateRange(0, used)` before `needsUpdate`, the pooled cloud's idiom
+  (`../vfx.ts` `packRenderCloud`); `setDrawRange` is what makes everything past
+  the prefix unreachable.
+- **The small ground discs thin their terrain drape with distance**
+  (`../drape_lod_core.ts`, consumed by `ground_auras.ts` and `decals.ts`). The
+  wide shock rings deliberately do NOT: a 10 to 20 yard footprint moves by
+  yards under an interpolated drape, which the core's header records with the
+  measured numbers. Every sample taken is one the exact drape would take, so
+  no mark's footprint moves.
+
 Renderer contract: construct `AbilityVfxFx` with (scene, camera, anchor,
 groundY), hand it to `AbilityVfx` via deps (which also wires the Vfx particle
 burst, the pulseAt light delegate, and the probe stat sink), call

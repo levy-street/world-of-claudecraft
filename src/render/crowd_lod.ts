@@ -27,6 +27,24 @@ const CROWD_LOD_HARD_RIGS = 48;
 const CROWD_LOD_MIN_SCALE = 0.6;
 
 /**
+ * The articulated-rig range BEFORE the crowd and per-tier factors below scale it:
+ * the one distance in this policy that is the same number on every client, in
+ * every scene, on every preset.
+ *
+ * Everything else here is deliberately adaptive, which makes it the wrong anchor
+ * for anything a second client must agree with: `crowdLodScaleSq` reads a
+ * PER-CLIENT, per-frame count of visible rigs, so the live band edges swing by
+ * more than 2x as unrelated players wander in and out of one viewer's frustum,
+ * and two viewers standing in the same spot do not even compute the same edge.
+ * A cosmetic fade keyed to the live edge would therefore pulse on crowd churn
+ * and differ between viewers; keyed to THIS it cannot do either
+ * (`weapon_vfx_shed_core.ts` is the consumer, and its header says why that
+ * matters for graphics-settings fairness).
+ */
+export const CHARACTER_LOD_RANGE = 58;
+export const CHARACTER_LOD_RANGE_SQ = CHARACTER_LOD_RANGE * CHARACTER_LOD_RANGE;
+
+/**
  * Ceiling on the linear range multiplier the animated far band may add on top of
  * the articulated band (58yd base * 1.3 = ~75yd, just inside the 80yd draw cap).
  * `gfx.ts` picks the per-tier value; this module clamps to it so no caller can

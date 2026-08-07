@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { loadTexture, releaseTexture } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { GFX } from './gfx';
+import type { VfxAnchorResolver } from './vfx_anchor';
 import {
   insertActiveParticleSlot,
   pointSpriteBoundingRadius,
@@ -271,7 +272,9 @@ function projectileSprites(school: string): { core: number; trail: number } {
     : { core: SPR.glowCore, trail: SPR.sparkle };
 }
 
-export type EntityAnchor = (id: number, heightFrac: number) => THREE.Vector3 | null;
+// The world-anchor resolver (src/render/vfx_anchor.ts owns the contract and the
+// allocation-free `out` parameter).
+export type EntityAnchor = VfxAnchorResolver;
 
 export class Vfx {
   private points: THREE.Points;
@@ -302,6 +305,14 @@ export class Vfx {
   private tmpColor = new THREE.Color();
   private tmpDirection = new THREE.Vector3();
   private readonly beamUp = new THREE.Vector3(0, 1, 0);
+  // Per-frame anchor scratch (see vfx_anchor.ts): update() resolves a bubble
+  // beam's two endpoints and each projectile's target every frame. Each reading
+  // is consumed before its scratch is reused, and the beam pair needs two
+  // because both endpoints are live at once.
+  private readonly beamFromScratch = new THREE.Vector3();
+  private readonly beamToScratch = new THREE.Vector3();
+  private readonly homingScratch = new THREE.Vector3();
+  private readonly homingDir = new THREE.Vector3();
   // fireworkBurst palette scratch, reused across shells (spawn() copies
   // components, never retaining the reference): a goal volley allocates
   // no Color objects.
@@ -1606,8 +1617,8 @@ export class Vfx {
     for (let i = this.bubbleBeams.length - 1; i >= 0; i--) {
       const stream = this.bubbleBeams[i];
       stream.remaining -= dt;
-      const from = this.anchor(stream.sourceId, 0.58);
-      const to = this.anchor(stream.targetId, 0.52);
+      const from = this.anchor(stream.sourceId, 0.58, this.beamFromScratch);
+      const to = this.anchor(stream.targetId, 0.52, this.beamToScratch);
       if (!from || !to || stream.remaining <= 0) {
         this.removeBubbleBeam(i);
         continue;
@@ -1664,12 +1675,12 @@ export class Vfx {
     for (let i = this.projectiles.length - 1; i >= 0; i--) {
       const pr = this.projectiles[i];
       pr.ttl -= dt;
-      const target = this.anchor(pr.targetId, 0.5);
+      const target = this.anchor(pr.targetId, 0.5, this.homingScratch);
       if (!target || pr.ttl <= 0) {
         this.projectiles.splice(i, 1);
         continue;
       }
-      const dir = target.clone().sub(pr.pos);
+      const dir = this.homingDir.subVectors(target, pr.pos);
       const dist = dir.length();
       const step = pr.speed * dt;
       if (dist <= Math.max(0.7, step)) {
