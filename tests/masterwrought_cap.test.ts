@@ -9,7 +9,9 @@ import {
   masterwroughtConflictSlot,
 } from '../src/sim/equipment_rules';
 import { Sim } from '../src/sim/sim';
-import type { EquipSlot, ItemDef } from '../src/sim/types';
+import { type EquipSlot, type ItemDef, isEquipSlot } from '../src/sim/types';
+import { supportedLanguages } from '../src/ui/i18n';
+import { DICT } from '../src/ui/sim_i18n';
 
 // Masterwrought is a COUNTED equip family, not a per-item one: a character may
 // wear at most two flagged pieces, and at most one of those may be legendary by
@@ -25,7 +27,7 @@ const LEGENDARY_ERROR = 'You can only equip one legendary Masterwrought item.';
 // sockets plus a neck (three flagged pieces with no armor-weight or dual-wield
 // preconditions), a shield the two-hander displaces, and the two-hander itself.
 // Injected into the live ITEMS table the way unique_equipped/grant_line_view do,
-// and removed afterward; no shipped item carries the flag in this phase.
+// and removed afterward; no shipped item carries the flag until content lands.
 const RING_ID = 'test_masterwrought_ring';
 const AMULET_ID = 'test_masterwrought_amulet';
 const EMBER_ID = 'test_masterwrought_ember_band';
@@ -155,13 +157,33 @@ function tickErrors(sim: Sim, pid?: number): string[] {
 describe('masterwrought cap constants', () => {
   it('pins the two caps the player-facing copy is written against', () => {
     // Both numbers are spelled out as PROSE in the refusal lines ("two", "one")
-    // and baked into the tooltip {count}, in every locale. Retuning either cap
-    // means rewriting that copy in all of them, so it can never be a quiet
-    // one-line constant edit: this pin is the reminder.
+    // in every locale, and the tooltip {count} interpolates the equip cap.
+    // Retuning either cap means rewriting that copy everywhere, so it can
+    // never be a quiet one-line constant edit: this pin is the reminder.
     expect(MASTERWROUGHT_EQUIP_CAP).toBe(2);
     expect(MASTERWROUGHT_LEGENDARY_CAP).toBe(1);
-    expect(CAP_ERROR).toContain('two');
-    expect(LEGENDARY_ERROR).toContain('one');
+    // The suite's literals ARE the registered English matcher rows; the S3
+    // guard ties those rows to the emit site in items.ts, so this closes the
+    // chain from test literal to matcher to emit with no self-comparison link.
+    expect(DICT.en['error.masterwroughtCap']).toBe(CAP_ERROR);
+    expect(DICT.en['error.masterwroughtLegendary']).toBe(LEGENDARY_ERROR);
+  });
+
+  it('carries a real translation of both refusals in every non-English locale', () => {
+    // The sim DICT scope is invisible to the release-fill worklist, and the
+    // DICT assembly backfills a dropped row with English, so the S2 key-count
+    // parity can never notice one going missing. Byte-identical English in a
+    // non-en block is exactly that silent leak, and this is the guard for it.
+    // en_CA deliberately inherits English; en_XA is not a supported language.
+    const locales = supportedLanguages.filter((lang) => lang !== 'en' && lang !== 'en_CA');
+    expect(locales.length).toBe(20);
+    for (const lang of locales) {
+      for (const key of ['error.masterwroughtCap', 'error.masterwroughtLegendary'] as const) {
+        const row = DICT[lang][key];
+        expect(row && row.trim().length > 0, `${lang}.${key} empty or missing`).toBe(true);
+        expect(row, `${lang}.${key} left as English`).not.toBe(DICT.en[key]);
+      }
+    }
   });
 });
 
@@ -341,6 +363,27 @@ describe('masterwrought counted family (pure equipment_rules)', () => {
     expect(masterwroughtConflictSlot(flaggedLegendary, oneWorn, lookup, none)?.reason).toBe(
       'legendary',
     );
+  });
+
+  it('treats an unrecognized quality string as non-legendary (the sub-cap fails open)', () => {
+    // Both compares are strict === 'legendary': a typo or a future tier name
+    // never consumes the sub-cap and never blocks an equip as if it did. The
+    // piece COUNT is quality-blind either way, so only the sub-cap is at stake.
+    expect(
+      masterwroughtConflictSlot(
+        flaggedRing,
+        { ring1: 'pure_mw_legendary' },
+        lookup,
+        none,
+        undefined,
+        'mythic',
+      ),
+    ).toBeNull();
+    expect(
+      masterwroughtConflictSlot(flaggedLegendary, { ring1: 'pure_mw_ring' }, lookup, none, {
+        ring1: { rolled: { quality: 'Legendary' } },
+      }),
+    ).toBeNull();
   });
 });
 
@@ -532,21 +575,41 @@ describe('masterwrought cap enforcement (equipItem)', () => {
     );
     expect(sim.equipment.neck).toBe(AMULET_ID);
   });
+
+  it('wears duplicate copies of one epic flagged item inside the cap (no id comparison)', () => {
+    // R16 through the REAL equip path, not just the pure rule: the counted
+    // family compares no ids or families, so two copies of one flagged epic
+    // fill both fingers with no refusal.
+    const sim = makeWarrior(7113);
+    grant(sim, RING_ID, 2);
+
+    sim.equipItemToSlot(RING_ID, 'ring1');
+    sim.equipItemToSlot(RING_ID, 'ring2');
+    expect(tickErrors(sim)).toHaveLength(0);
+    expect(sim.equipment.ring1).toBe(RING_ID);
+    expect(sim.equipment.ring2).toBe(RING_ID);
+    expect(sim.countItem(RING_ID)).toBe(0);
+  });
 });
 
 describe('masterwrought content shape', () => {
   it('keeps the flag on equippable defs only, so no flagged piece can go uncounted', () => {
     // The count walks ALL_EQUIP_SLOTS, so a flagged item that lands anywhere
-    // else (a bag socket, a consumable) would wear for free. equipItem's own
-    // gate admits exactly these three kinds; jewelry is not a fourth, it IS
-    // kind 'armor' (JewelryItemDef), which is why it is absent here.
+    // else (a bag socket, a consumable, a bogus slot string) would wear for
+    // free. equipItem's own gate admits exactly these three kinds; jewelry is
+    // not a fourth, it IS kind 'armor' (JewelryItemDef). The slot must be a
+    // REAL equip slot (or the 'ring' KIND, which resolves to ring1/ring2), not
+    // merely truthy: a typo'd slot would never reach the walk.
     const equippable = new Set(['weapon', 'armor', 'held_offhand']);
     const flagged = Object.values(ITEMS).filter((def) => def.masterwrought === true);
     // Vacuity floor: this suite's own synthetics keep the check honest until
     // shipped content carries the flag.
     expect(flagged.length).toBeGreaterThan(0);
     for (const def of flagged) {
-      expect(def.slot, `${def.id} carries the flag but declares no slot`).toBeTruthy();
+      const slotIsReal = def.slot === 'ring' || (!!def.slot && isEquipSlot(def.slot));
+      expect(slotIsReal, `${def.id} carries the flag on unknown slot ${String(def.slot)}`).toBe(
+        true,
+      );
       expect(equippable.has(def.kind), `${def.id} has non-equippable kind ${def.kind}`).toBe(true);
     }
   });
@@ -582,6 +645,35 @@ describe('masterwrought sub-cap reads the copy being worn', () => {
     );
     expect(stillCarried).toBeDefined();
   });
+
+  it('wears a legendary roll of an epic def (not unique-equipped) and it then holds the sub-cap', () => {
+    // The deliberate disagreement documented in equipment_rules.ts: the
+    // unique-equipped rule reads DEF quality only, so a legendary-ROLLED copy
+    // of an epic def is never unique-equipped, while this counted family reads
+    // that same copy as legendary-effective. Both halves through the REAL
+    // path: the copy equips beside a plain copy of its own id, and once worn
+    // its live payload is what the sub-cap counts.
+    const sim = makeWarrior(7112);
+    grant(sim, RING_ID);
+    sim.equipItemToSlot(RING_ID, 'ring1');
+    sim.tick();
+    expect(sim.equipment.ring1).toBe(RING_ID);
+
+    sim.addItemInstance(RING_ID, { rolled: { quality: 'legendary' } });
+    sim.tick();
+    sim.equipItemToSlot(RING_ID, 'ring2');
+    expect(tickErrors(sim)).toHaveLength(0);
+    expect(sim.equipment.ring2).toBe(RING_ID);
+    expect(sim.equipmentInstances.ring2?.rolled?.quality).toBe('legendary');
+
+    // The worn roll occupies the sub-cap, read off the live worn payload the
+    // equip itself wrote, never a hand-written instance map.
+    grant(sim, EMBER_ID);
+    const before = { ...sim.equipment };
+    sim.equipItemToSlot(EMBER_ID, 'ring1');
+    expect(tickErrors(sim)).toContain(LEGENDARY_ERROR);
+    expect({ ...sim.equipment }).toEqual(before);
+  });
 });
 
 describe('masterwrought legacy save tolerance', () => {
@@ -602,6 +694,32 @@ describe('masterwrought legacy save tolerance', () => {
     expect(meta.equipment.ring2).toBe(RING_ID);
     expect(meta.equipment.neck).toBe(AMULET_ID);
     expect(sim.countItem(RING_ID, pid)).toBe(0);
+
+    grant(sim, BULWARK_ID, 1, pid);
+    const before = { ...meta.equipment };
+    sim.equipItemToSlot(BULWARK_ID, 'offhand', pid);
+    expect(tickErrors(sim, pid)).toContain(CAP_ERROR);
+    expect({ ...meta.equipment }).toEqual(before);
+    expect(sim.countItem(BULWARK_ID, pid)).toBe(1);
+  });
+
+  it('keeps three DISTINCT flagged pieces, two of them legendary, and refuses only the next', () => {
+    // The sub-cap gets no load-time sweep either: a save wearing two
+    // legendary-effective flagged pieces keeps both. Distinct ids on purpose,
+    // so the duplicate-unique load bench (benchDuplicateUniqueEquipped) stays
+    // out of the picture and the tolerance proven is this family's own.
+    const source = makeWarrior(7114);
+    const state = source.serializeCharacter(source.playerId)!;
+    state.equipment.ring1 = EMBER_ID;
+    state.equipment.ring2 = ASH_ID;
+    state.equipment.neck = AMULET_ID;
+
+    const sim = new Sim({ seed: 7115, playerClass: 'warrior', noPlayer: true });
+    const pid = sim.addPlayer('warrior', 'Overcap', { state });
+    const meta = sim.meta(pid)!;
+    expect(meta.equipment.ring1).toBe(EMBER_ID);
+    expect(meta.equipment.ring2).toBe(ASH_ID);
+    expect(meta.equipment.neck).toBe(AMULET_ID);
 
     grant(sim, BULWARK_ID, 1, pid);
     const before = { ...meta.equipment };

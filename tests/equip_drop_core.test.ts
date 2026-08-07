@@ -21,6 +21,7 @@ import {
 } from '../src/ui/equip_drop_core';
 import { Hud } from '../src/ui/hud';
 import { resolveDropTargetAt } from '../src/ui/item_drop_hit_test';
+import { bareClient } from './helpers/bare_client';
 
 function equipmentOf(sim: Sim & Record<string, any>, pid: number): Record<string, string> {
   const meta = sim.players.get(pid);
@@ -192,6 +193,8 @@ const MW_BAND = 'test_mwdrop_band';
 const MW_TORC = 'test_mwdrop_torc';
 const MW_SIGNET = 'test_mwdrop_signet';
 const PLAIN_RING = 'test_mwdrop_plain_band';
+const MW_GREATSWORD = 'test_mwdrop_greatsword';
+const MW_BULWARK = 'test_mwdrop_bulwark';
 
 beforeAll(() => {
   ITEMS[MW_BAND] = {
@@ -242,6 +245,34 @@ beforeAll(() => {
     stats: { sta: 1 },
     sellValue: 1,
   } as ItemDef;
+  // A flagged two-hander and the flagged shield it benches: the pair that
+  // exercises the mirror's DISPLACED-slot exemption, which no jewelry drop can.
+  ITEMS[MW_GREATSWORD] = {
+    id: MW_GREATSWORD,
+    name: 'Test Mwdrop Greatsword',
+    kind: 'weapon',
+    slot: 'mainhand',
+    hand: 'twohand',
+    quality: 'epic',
+    masterwrought: true,
+    requiredLevel: 20,
+    weapon: { min: 10, max: 20, speed: 3.0 },
+    requiredClass: ['warrior', 'rogue', 'hunter', 'shaman', 'paladin'],
+    stats: { str: 1 },
+    sellValue: 1,
+  } as ItemDef;
+  ITEMS[MW_BULWARK] = {
+    id: MW_BULWARK,
+    name: 'Test Mwdrop Bulwark',
+    kind: 'armor',
+    slot: 'offhand',
+    shield: true,
+    quality: 'epic',
+    masterwrought: true,
+    requiredLevel: 20,
+    stats: { armor: 40 },
+    sellValue: 1,
+  } as ItemDef;
 });
 
 afterAll(() => {
@@ -249,6 +280,8 @@ afterAll(() => {
   delete ITEMS[MW_TORC];
   delete ITEMS[MW_SIGNET];
   delete ITEMS[PLAIN_RING];
+  delete ITEMS[MW_GREATSWORD];
+  delete ITEMS[MW_BULWARK];
 });
 
 describe('paperdollDropAction Masterwrought counted-family mirror', () => {
@@ -277,6 +310,20 @@ describe('paperdollDropAction Masterwrought counted-family mirror', () => {
       paperdollDropAction(ITEMS[MW_BAND], 'ring1', 'warrior', 20, null, {
         ring1: MW_BAND,
         neck: MW_TORC,
+      }),
+    ).toBe('equip');
+  });
+
+  it('exempts the DISPLACED slot too: a flagged two-hander over a flagged shield at the cap', () => {
+    // Shield plus band is already the cap, but the two-hander benches the
+    // shield, so the pieces actually worn afterward are band plus two-hander.
+    // The mirror-side twin of the sim's displacement case: this is the drop
+    // that goes red if the mirror's ignore list ever narrows to the target
+    // slot alone.
+    expect(
+      paperdollDropAction(ITEMS[MW_GREATSWORD], 'mainhand', 'warrior', 20, null, {
+        offhand: MW_BULWARK,
+        ring1: MW_BAND,
       }),
     ).toBe('equip');
   });
@@ -357,10 +404,13 @@ describe('paperdollDropAction Masterwrought counted-family mirror', () => {
     expect(paperdollDropAction(ITEMS[MW_BAND], 'ring2', 'warrior', 20, null, equipment)).toBe(
       'blockedMasterwroughtCap',
     );
-    const ring2Before = equipmentOf(sim, pid).ring2;
     sim.equipItemToSlot(MW_BAND, 'ring2', pid);
     expect(equipmentOf(sim, pid).ring2).toBeUndefined();
-    expect(equipmentOf(sim, pid).ring2).toBe(ring2Before);
+    // The refusal itself, not just the absence of an equip: an unrelated
+    // silent no-op in the equip path would leave ring2 empty too.
+    const refusals: string[] = [];
+    for (const ev of sim.tick()) if (ev.type === 'error') refusals.push(ev.text);
+    expect(refusals).toContain('You can only equip two Masterwrought items.');
   });
 
   it('agrees with the sim when only the highest-index bag copy is legendary', () => {
@@ -401,6 +451,89 @@ describe('paperdollDropAction Masterwrought counted-family mirror', () => {
     const refusals: string[] = [];
     for (const ev of sim.tick()) if (ev.type === 'error') refusals.push(ev.text);
     expect(refusals).toContain('You can only equip one legendary Masterwrought item.');
+  });
+});
+
+describe('char_window masterwrought mirror wiring (source pins)', () => {
+  const stripped = (rel: string): string =>
+    readFileSync(join(__dirname, rel), 'utf8').replace(/^\s*\/\/.*$/gm, '');
+
+  it('all three paperdollDropAction call sites feed the mirror the worn payloads AND the bags', () => {
+    // Dropping either argument silently degrades the mirror to def quality,
+    // the exact false green the consumed-copy prediction exists to prevent,
+    // and nothing else goes red when that happens: the arguments are optional
+    // by design (legacy call shapes), so only a pin can hold the wiring.
+    const src = stripped('../src/ui/char_window.ts');
+    const wired = src.match(/world\.equipment,\s*world\.equipmentInstances,\s*world\.inventory,/g);
+    expect(wired).toHaveLength(3);
+    // And no call site sits outside the wired shape.
+    expect(src.match(/paperdollDropAction\(/g)).toHaveLength(3);
+  });
+
+  it('both refusal reasons map to their own sim-worded toast', () => {
+    const src = stripped('../src/ui/char_window.ts');
+    expect(src).toContain("case 'blockedMasterwroughtCap':");
+    expect(src).toContain("this.deps.showError(tSim('error.masterwroughtCap'));");
+    expect(src).toContain("case 'blockedMasterwroughtLegendary':");
+    expect(src).toContain("this.deps.showError(tSim('error.masterwroughtLegendary'));");
+  });
+});
+
+describe('the mirrored worn payloads survive a wire null (einst normalization)', () => {
+  it('an explicit null einst clears the mirror to an empty map, never to null', () => {
+    // The server's maybe() encoder stringifies `value ?? null`, so a null CAN
+    // ride the wire if a future encoder change ever produces one; the mirror's
+    // type says plain map. Seed a non-empty mirror first so "cleared to {}" is
+    // distinguishable from "kept the prior value".
+    const c = bareClient(7) as ReturnType<typeof bareClient> & Record<string, unknown>;
+    c.equipmentInstances = { ring1: { rolled: { quality: 'legendary' } } };
+    const self = {
+      id: 7,
+      k: 'player',
+      tid: 'warrior',
+      nm: 'Wire',
+      lv: 20,
+      x: 0,
+      y: 0,
+      z: 0,
+      f: 0,
+      hp: 100,
+      mhp: 100,
+      res: 0,
+      mres: 100,
+      rtype: 'mana',
+      xp: 0,
+      copper: 0,
+      inv: [],
+      equip: {},
+      einst: null,
+      qlog: [],
+      qdone: [],
+      cds: {},
+      gcd: 0,
+      stats: { str: 1, agi: 1, sta: 1, int: 1, spi: 1, armor: 0 },
+      weapon: { min: 1, max: 2, speed: 2 },
+    };
+    (c as unknown as { applySnapshot(snap: unknown): void }).applySnapshot({
+      t: 'snap',
+      tick: 1,
+      time: 0,
+      self,
+      ents: [],
+    });
+    expect(c.equipmentInstances).toEqual({});
+    expect(c.equipmentInstances).not.toBeNull();
+    // And the delta guard half: an ABSENT einst keeps the prior mirror.
+    c.equipmentInstances = { ring1: { rolled: { quality: 'legendary' } } };
+    const { einst: _dropped, ...selfWithoutEinst } = self;
+    (c as unknown as { applySnapshot(snap: unknown): void }).applySnapshot({
+      t: 'snap',
+      tick: 2,
+      time: 0.05,
+      self: selfWithoutEinst,
+      ents: [],
+    });
+    expect(c.equipmentInstances).toEqual({ ring1: { rolled: { quality: 'legendary' } } });
   });
 });
 
