@@ -1,0 +1,418 @@
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
+
+// Recipe pattern items (Masterwrought phase 02): a kind:'recipe' drop that
+// teaches ONE ProfessionRecipeRecord when used from the bags and is spent doing
+// so. The learn path is src/sim/professions/pattern_items.ts (a pure resolver
+// plus a thin apply function), dispatched from the `recipe` arm of items.ts
+// useItem. Everything here drives the REAL path (sim.useItem / the server's
+// 'use' wire command), never the module's internals by hand, so the arms that
+// only exist because of where the dispatch sits (below useItem's dead gate)
+// are actually covered.
+//
+// The fixtures are synthetic on purpose: a recipe pushed onto the live
+// ALL_RECIPES array (recipeById linear-scans it) plus three item defs injected
+// into the live ITEMS table, all removed in afterAll, so no shipped-id golden
+// sees them and no content has to exist yet for this behavior to be pinned.
+
+import { ALL_RECIPES } from '../src/sim/content/recipes';
+import { ITEMS } from '../src/sim/data';
+import { resolvePatternLearn } from '../src/sim/professions/pattern_items';
+import type { ProfessionRecipeRecord } from '../src/sim/professions/types';
+import { Sim } from '../src/sim/sim';
+import type { Entity, ItemDef, SimEvent } from '../src/sim/types';
+import { groundHeight } from '../src/sim/world';
+import { supportedLanguages } from '../src/ui/i18n';
+import { DICT } from '../src/ui/sim_i18n';
+
+// Mock the db layer so the online arm below needs no Postgres (shape from
+// tests/prof_intro_hint_online.test.ts). Hoisted above the server/game import.
+vi.mock('../server/db', () => ({
+  pool: { query: vi.fn(async () => ({ rows: [] })) },
+  saveCharacterState: vi.fn(async () => {}),
+  saveCharacterAndMarketState: vi.fn(async () => {}),
+  openPlaySession: vi.fn(async () => 1),
+  touchCharacterLogin: vi.fn(async () => {}),
+  closePlaySession: vi.fn(async () => {}),
+  insertChatLogs: vi.fn(async () => {}),
+  walletForAccount: vi.fn(async () => null),
+  markAccountQuestComplete: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
+  grantAccountMechChroma: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
+  setAccountWeaponSkinLoadout: vi.fn(async () => ({
+    completedQuestIds: [],
+    mechChromaIds: [],
+    weaponSkinIds: [],
+    weaponSkinLoadout: {},
+  })),
+  loadAccountFlair: vi.fn(async () => ({ ai: false, streamer: false, links: {} })),
+}));
+
+import { GameServer } from '../server/game';
+import { bareClient, broadcast, fakeWs, joinServer } from './helpers/bare_client';
+
+// The three refusal literals, spelled out once. These ARE the registered
+// English matcher rows (pinned against DICT.en at the bottom of this file), and
+// the S3 guard ties those rows to the emit site in pattern_items.ts, so the
+// chain from test literal to matcher to emit closes with no self-comparison
+// link anywhere in it.
+const KNOWN_ERROR = 'You already know that pattern.';
+const PROFESSION_ERROR = 'You have not practiced that profession.';
+const TIER_ERROR = 'Your skill is too low to learn that pattern.';
+
+const CRAFT = 'weaponcrafting';
+
+// skillReq 100 lands the recipe on tier 4 (tierForSkill buckets by 25), so a
+// player at 99 sits one tier short and a player at 100 is exactly at tier: the
+// boundary both arms of the tier case below straddle.
+const PATTERN_RECIPE: ProfessionRecipeRecord = {
+  id: 'recipe_test_pattern_taught',
+  professionId: CRAFT,
+  resultItemId: 'eastbrook_arming_sword',
+  resultCount: 1,
+  reagents: [{ itemId: 'bone_fragments', count: 1 }],
+  skillReq: 100,
+  itemLevelBudget: 1,
+  level: 1,
+  acquisition: ['drop'],
+};
+
+// Trainer-only: a pattern pointing at it is an authoring bug, and the content
+// guard must swallow it silently rather than blame the player's character.
+const TRAINER_ONLY_RECIPE: ProfessionRecipeRecord = {
+  id: 'recipe_test_pattern_trainer_only',
+  professionId: CRAFT,
+  resultItemId: 'eastbrook_arming_sword',
+  resultCount: 1,
+  reagents: [{ itemId: 'bone_fragments', count: 1 }],
+  skillReq: 0,
+  itemLevelBudget: 1,
+  level: 1,
+  acquisition: ['trainer'],
+};
+
+const PATTERN_ID = 'test_pattern_arming_sword';
+const MISSING_PATTERN_ID = 'test_pattern_missing_recipe';
+const TRAINER_PATTERN_ID = 'test_pattern_trainer_only';
+const MISSING_RECIPE_ID = 'recipe_test_pattern_no_such_recipe';
+
+function patternDef(id: string, name: string, teachesRecipeId: string): ItemDef {
+  return { id, name, kind: 'recipe', teachesRecipeId, sellValue: 25 } as ItemDef;
+}
+
+beforeAll(() => {
+  ALL_RECIPES.push(PATTERN_RECIPE, TRAINER_ONLY_RECIPE);
+  ITEMS[PATTERN_ID] = patternDef(PATTERN_ID, 'Pattern: Test Arming Sword', PATTERN_RECIPE.id);
+  ITEMS[MISSING_PATTERN_ID] = patternDef(
+    MISSING_PATTERN_ID,
+    'Pattern: Test Missing Recipe',
+    MISSING_RECIPE_ID,
+  );
+  ITEMS[TRAINER_PATTERN_ID] = patternDef(
+    TRAINER_PATTERN_ID,
+    'Pattern: Test Trainer Only',
+    TRAINER_ONLY_RECIPE.id,
+  );
+});
+
+afterAll(() => {
+  for (const recipe of [PATTERN_RECIPE, TRAINER_ONLY_RECIPE]) {
+    const at = ALL_RECIPES.indexOf(recipe);
+    if (at >= 0) ALL_RECIPES.splice(at, 1);
+  }
+  for (const id of [PATTERN_ID, MISSING_PATTERN_ID, TRAINER_PATTERN_ID]) delete ITEMS[id];
+});
+
+function makeWorld(): Sim {
+  return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+}
+
+/** A player with `skill` in the pattern's craft, holding `count` copies. */
+function patternHolder(sim: Sim, skill: number, count = 1, itemId = PATTERN_ID) {
+  const pid = sim.addPlayer('warrior', 'Patternist');
+  const meta = sim.meta(pid);
+  if (!meta) throw new Error('missing meta');
+  meta.autoEquip = false;
+  meta.craftSkills[CRAFT] = skill;
+  if (count > 0) sim.addItem(itemId, count, pid);
+  sim.drainEvents();
+  return { pid, meta };
+}
+
+function errorTexts(events: SimEvent[]): string[] {
+  return events
+    .filter((e): e is Extract<SimEvent, { type: 'error' }> => e.type === 'error')
+    .map((e) => e.text);
+}
+
+/** Use `itemId` and return every error line the use produced, exactly. */
+function useAndCollectErrors(sim: Sim, itemId: string, pid: number): string[] {
+  sim.drainEvents();
+  sim.useItem(itemId, pid);
+  return errorTexts(sim.drainEvents());
+}
+
+function merchant(sim: Sim): Entity {
+  for (const e of sim.entities.values()) if (e.templateId === 'the_merchant') return e;
+  throw new Error('the Merchant was not spawned');
+}
+
+function standAtMerchant(sim: Sim, pid: number): void {
+  const m = merchant(sim);
+  const e = sim.entities.get(pid);
+  if (!e) throw new Error(`missing entity ${pid}`);
+  e.pos.x = m.pos.x;
+  e.pos.z = m.pos.z;
+  e.pos.y = groundHeight(e.pos.x, e.pos.z, sim.cfg.seed);
+  e.prevPos = { ...e.pos };
+}
+
+describe('resolvePatternLearn (the pure resolver)', () => {
+  // The deny ORDER is the contract, so each arm is checked with EVERY later
+  // condition also failing: an arm that answered out of order would return a
+  // different reason here, not merely a differently-worded one.
+  it('answers invalid for an unresolved recipe and for one that is not a drop', () => {
+    const sim = makeWorld();
+    const { meta } = patternHolder(sim, 0, 0);
+    expect(resolvePatternLearn(undefined, meta)).toEqual({ ok: false, reason: 'invalid' });
+    expect(resolvePatternLearn(TRAINER_ONLY_RECIPE, meta)).toEqual({
+      ok: false,
+      reason: 'invalid',
+    });
+  });
+
+  it('ranks already_known above profession, and profession above tier', () => {
+    const sim = makeWorld();
+    const { meta } = patternHolder(sim, 0, 0);
+    // skill 0 fails BOTH the profession and the tier arm; profession wins.
+    expect(resolvePatternLearn(PATTERN_RECIPE, meta)).toEqual({ ok: false, reason: 'profession' });
+    meta.knownRecipes.add(PATTERN_RECIPE.id);
+    // Now every one of the three later arms would fail; already_known wins.
+    expect(resolvePatternLearn(PATTERN_RECIPE, meta)).toEqual({
+      ok: false,
+      reason: 'already_known',
+    });
+  });
+
+  it('answers tier for a practiced-but-underskilled crafter and ok at tier', () => {
+    const sim = makeWorld();
+    const { meta } = patternHolder(sim, 99, 0);
+    expect(resolvePatternLearn(PATTERN_RECIPE, meta)).toEqual({ ok: false, reason: 'tier' });
+    meta.craftSkills[CRAFT] = 100;
+    expect(resolvePatternLearn(PATTERN_RECIPE, meta)).toEqual({ ok: true });
+  });
+});
+
+describe('using a recipe pattern (offline host, the real useItem path)', () => {
+  it('learns the recipe, consumes the copy, and shows up on the public crafting read', () => {
+    const sim = makeWorld();
+    const { pid, meta } = patternHolder(sim, 100);
+    expect(meta.knownRecipes.has(PATTERN_RECIPE.id)).toBe(false);
+    expect(sim.countItem(PATTERN_ID, pid)).toBe(1);
+
+    expect(useAndCollectErrors(sim, PATTERN_ID, pid)).toEqual([]);
+
+    expect(meta.knownRecipes.has(PATTERN_RECIPE.id)).toBe(true);
+    expect(sim.countItem(PATTERN_ID, pid)).toBe(0);
+    // The public read the offline HUD actually consumes, not the raw Set: this
+    // is the surface a client sees, so the learn is proven end to end offline.
+    expect(sim.craftingIdentityFor(pid).knownRecipes).toContain(PATTERN_RECIPE.id);
+  });
+
+  it('consumes exactly one copy, leaving the rest of the stack alone', () => {
+    const sim = makeWorld();
+    const { pid } = patternHolder(sim, 100, 2);
+    expect(sim.countItem(PATTERN_ID, pid)).toBe(2);
+
+    expect(useAndCollectErrors(sim, PATTERN_ID, pid)).toEqual([]);
+
+    expect(sim.countItem(PATTERN_ID, pid)).toBe(1);
+  });
+
+  it('refuses a crafter who has never practiced the craft, keeping the pattern', () => {
+    const sim = makeWorld();
+    const { pid, meta } = patternHolder(sim, 0);
+
+    expect(useAndCollectErrors(sim, PATTERN_ID, pid)).toEqual([PROFESSION_ERROR]);
+
+    expect(sim.countItem(PATTERN_ID, pid)).toBe(1);
+    expect(meta.knownRecipes.has(PATTERN_RECIPE.id)).toBe(false);
+    expect(sim.craftingIdentityFor(pid).knownRecipes).not.toContain(PATTERN_RECIPE.id);
+  });
+
+  it('refuses one tier short and learns at tier: both sides of the skill boundary', () => {
+    const sim = makeWorld();
+    const { pid, meta } = patternHolder(sim, 99);
+
+    expect(useAndCollectErrors(sim, PATTERN_ID, pid)).toEqual([TIER_ERROR]);
+    expect(sim.countItem(PATTERN_ID, pid)).toBe(1);
+    expect(meta.knownRecipes.has(PATTERN_RECIPE.id)).toBe(false);
+
+    // One point of skill crosses from tier 3 to tier 4 and the same click lands.
+    meta.craftSkills[CRAFT] = 100;
+    expect(useAndCollectErrors(sim, PATTERN_ID, pid)).toEqual([]);
+    expect(sim.countItem(PATTERN_ID, pid)).toBe(0);
+    expect(meta.knownRecipes.has(PATTERN_RECIPE.id)).toBe(true);
+  });
+
+  it('refuses a second copy once the recipe is known, keeping that copy', () => {
+    const sim = makeWorld();
+    const { pid } = patternHolder(sim, 100, 2);
+
+    expect(useAndCollectErrors(sim, PATTERN_ID, pid)).toEqual([]);
+    expect(sim.countItem(PATTERN_ID, pid)).toBe(1);
+
+    expect(useAndCollectErrors(sim, PATTERN_ID, pid)).toEqual([KNOWN_ERROR]);
+    expect(sim.countItem(PATTERN_ID, pid)).toBe(1);
+  });
+
+  it('tells an already-taught crafter they know it even with zero skill in the craft', () => {
+    // The deny-order pin on the REAL path: both the already-known and the
+    // profession arm are live, and already-known must win. Get there by
+    // learning for real, then dropping the skill back to zero.
+    const sim = makeWorld();
+    const { pid, meta } = patternHolder(sim, 100, 2);
+    expect(useAndCollectErrors(sim, PATTERN_ID, pid)).toEqual([]);
+    meta.craftSkills[CRAFT] = 0;
+
+    expect(useAndCollectErrors(sim, PATTERN_ID, pid)).toEqual([KNOWN_ERROR]);
+    expect(sim.countItem(PATTERN_ID, pid)).toBe(1);
+  });
+
+  it('is silent for a pattern whose recipe id does not resolve, and never consumes it', () => {
+    const sim = makeWorld();
+    const { pid, meta } = patternHolder(sim, 100, 1, MISSING_PATTERN_ID);
+
+    sim.drainEvents();
+    sim.useItem(MISSING_PATTERN_ID, pid);
+    // No event of ANY type: an authoring bug reads as a dead click, exactly
+    // like useItem's own unknown-def arm, never as a refusal line.
+    expect(sim.drainEvents()).toEqual([]);
+    expect(sim.countItem(MISSING_PATTERN_ID, pid)).toBe(1);
+    expect(meta.knownRecipes.size).toBe(0);
+  });
+
+  it('is silent for a pattern whose recipe is not acquirable by drop, and never consumes it', () => {
+    const sim = makeWorld();
+    const { pid, meta } = patternHolder(sim, 100, 1, TRAINER_PATTERN_ID);
+
+    sim.drainEvents();
+    sim.useItem(TRAINER_PATTERN_ID, pid);
+    expect(sim.drainEvents()).toEqual([]);
+    expect(sim.countItem(TRAINER_PATTERN_ID, pid)).toBe(1);
+    expect(meta.knownRecipes.has(TRAINER_ONLY_RECIPE.id)).toBe(false);
+  });
+
+  it('is a silent no-op while dead: the dispatch sits below useItem dead gate', () => {
+    const sim = makeWorld();
+    const { pid, meta } = patternHolder(sim, 100);
+    const p = sim.entities.get(pid);
+    if (!p) throw new Error(`missing entity ${pid}`);
+    p.dead = true;
+
+    sim.drainEvents();
+    sim.useItem(PATTERN_ID, pid);
+    expect(sim.drainEvents()).toEqual([]);
+    expect(sim.countItem(PATTERN_ID, pid)).toBe(1);
+    expect(meta.knownRecipes.has(PATTERN_RECIPE.id)).toBe(false);
+  });
+
+  it('draws no rng at all on a successful learn', () => {
+    const sim = makeWorld();
+    const { pid } = patternHolder(sim, 100);
+    let draws = 0;
+    sim.rng.setObserver(() => draws++);
+    try {
+      sim.useItem(PATTERN_ID, pid);
+    } finally {
+      sim.rng.setObserver(null);
+    }
+    expect(draws).toBe(0);
+    expect(sim.countItem(PATTERN_ID, pid)).toBe(0);
+  });
+});
+
+describe('patterns on the World Market', () => {
+  it('lists a pattern for sale: tradable drops, bound only by being consumed', () => {
+    const sim = makeWorld();
+    const { pid } = patternHolder(sim, 0);
+    standAtMerchant(sim, pid);
+    sim.drainEvents();
+
+    sim.marketList(PATTERN_ID, 1, 500, pid);
+
+    expect(errorTexts(sim.drainEvents())).toEqual([]);
+    const listing = sim.marketListings.find(
+      (l) => l.sellerKey === String(pid) && l.itemId === PATTERN_ID,
+    );
+    expect(listing?.count).toBe(1);
+    // Fully escrowed: the seller keeps none, so the listing is real, not a
+    // silently-dropped no-op that left the item in the bags.
+    expect(sim.countItem(PATTERN_ID, pid)).toBe(0);
+  });
+});
+
+describe('using a recipe pattern over the live server (online host)', () => {
+  it('learns server-side and the learned id reaches the client through the cprof mirror', () => {
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 91, 'Patternist');
+    const meta = server.sim.meta(session.pid);
+    if (!meta) throw new Error('missing meta');
+    meta.autoEquip = false;
+    meta.craftSkills[CRAFT] = 100;
+    server.sim.addItem(PATTERN_ID, 1, session.pid);
+
+    // Baseline mirror BEFORE the learn, through the real ClientWorld.
+    broadcast(server);
+    const client = bareClient(session.pid);
+    const snaps = () => fc.sent.filter((m) => m.t === 'snap');
+    const applyLatest = () => {
+      const list = snaps();
+      (client as unknown as { applySnapshot: (s: unknown) => void }).applySnapshot(
+        list[list.length - 1],
+      );
+    };
+    applyLatest();
+    expect(client.craftingIdentity.synced).toBe(true);
+    expect(client.craftingIdentity.knownRecipes).not.toContain(PATTERN_RECIPE.id);
+
+    // The REAL wire command the bag click sends: no server change was needed
+    // for patterns, so this is the existing 'use' route end to end.
+    server.handleMessage(session, JSON.stringify({ t: 'cmd', cmd: 'use', item: PATTERN_ID }));
+
+    expect(meta.knownRecipes.has(PATTERN_RECIPE.id)).toBe(true);
+    expect(server.sim.countItem(PATTERN_ID, session.pid)).toBe(0);
+
+    broadcast(server);
+    applyLatest();
+    expect(client.craftingIdentity.knownRecipes).toContain(PATTERN_RECIPE.id);
+  });
+});
+
+describe('pattern refusal localization', () => {
+  it('registers all three refusals as the exact English matcher rows', () => {
+    expect(DICT.en['error.patternKnown']).toBe(KNOWN_ERROR);
+    expect(DICT.en['error.patternProfession']).toBe(PROFESSION_ERROR);
+    expect(DICT.en['error.patternSkill']).toBe(TIER_ERROR);
+  });
+
+  it('carries a real translation of all three in every non-English locale', () => {
+    // The sim DICT scope is invisible to the release-fill worklist, and the
+    // DICT assembly backfills a dropped row with English, so the S2 key-count
+    // parity can never notice one going missing. Byte-identical English in a
+    // non-en block is exactly that silent leak, and this is the guard for it.
+    // en_CA deliberately inherits English.
+    const locales = supportedLanguages.filter((lang) => lang !== 'en' && lang !== 'en_CA');
+    expect(locales.length).toBeGreaterThanOrEqual(20);
+    for (const lang of locales) {
+      for (const key of [
+        'error.patternKnown',
+        'error.patternProfession',
+        'error.patternSkill',
+      ] as const) {
+        const row = DICT[lang][key];
+        expect(row && row.trim().length > 0, `${lang}.${key} empty or missing`).toBe(true);
+        expect(row, `${lang}.${key} left as English`).not.toBe(DICT.en[key]);
+      }
+    }
+  });
+});
