@@ -1085,6 +1085,8 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.lootHeroic': 'Hrdinský bonus, vždy vypadne jedno z těchto:',
   'hudChrome.finder.lootMaybe': 'Může vypadnout nejvýše jeden z těchto předmětů:',
   'hudChrome.finder.mech.deathless_rage': 'Nesmrtelný hněv (přerušen u ochranných kamenů)',
+  'hudChrome.finder.mech.dread_curse':
+    'Děsivá kletba (pouze heroická, sčítající se oslabení pro střídání tanků)',
   'hudChrome.finder.mech.deathstalker_cleave': 'Sek smrtilovcovy zbraně (čelní sek)',
   'hudChrome.finder.mech.enrage': 'Zuří při nízkém zdraví',
   'hudChrome.finder.mech.grave_cleaver': 'Hrobní sekáč (čelní sek)',
@@ -4710,6 +4712,8 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobTooltip.friendly': 'Přátelský',
   'hudChrome.mobTooltip.hostile': 'Nepřátelský',
   'hudChrome.mobTooltip.levelFamily': 'Úroveň {level} {family}',
+  'hudChrome.mobTooltip.elite': 'Elita',
+  'hudChrome.mobTooltip.boss': 'Boss',
   'hudChrome.raidConvert.leaderOnly': 'Na skupinu může převést jen vůdce raidu.',
   'hudChrome.raidConvert.notRaid': 'Tvoje skupina není raid.',
   'hudChrome.raidConvert.toPartyDone': 'Tvůj raid byl převeden zpět na skupinu.',
@@ -4730,6 +4734,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.questTracker.expandHint': 'Rozbalit tracker úkolů',
   'hudChrome.castBar.playerAria': 'Tvoje lišta sesílání',
   'hudChrome.castBar.targetAria': 'Lišta sesílání jednotky',
+  'hudChrome.emoteEditor.close': 'Zavřít emoty',
   'hudChrome.emoteEditor.done': 'Hotovo',
   'hudChrome.emoteEditor.title': 'Emoty',
   'hudChrome.emoteWheel.edit': 'Upravit',
@@ -10020,7 +10025,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'guide.dungeonsPage.resetBody':
     'Když změníte obtížnost, zatímco skupina stále drží přidělené průchody, staré nároky chvíli zůstanou a pak samy zmizí. Vůdce skupiny je může opustit okamžitě volbou Resetovat všechny instance v nabídce vlastního portrétu nebo příkazem /dungeon reset. Obtížnost musí být skutečně změněna, uvnitř nesmí zůstat nikdo živý ani padlý a mezi resety je krátká prodleva. U dveří na špatné obtížnosti vás hra varuje před začátkem. Raid se takto nikdy neresetuje; platí pro něj vlastní pravidla uzamčení.',
   'guide.dungeonsPage.wildheartBody':
-    'Deštěm promáčená džunglová kaldera, kde dvě vyvýšené lovecké stezky obtáčejí nefritovou cenotu. Projdi doupaty šelem a troskami předků, poté vystoupej na rituální pyramidu, abys čelil Zulgarovi.',
+    'Deštěm promáčená džunglová kaldera, kde dvě vyvýšené lovecké stezky obtáčejí nefritovou cenotu. Projdi doupaty šelem a troskami předků, poté vystoupej na rituální pyramidu, abys zjistil, kdo čeká na vrcholu.',
   'guide.gear.itemLevelBody':
     'Pro rychlé porovnání dvou kusů zapněte v možnostech Zobrazit úroveň předmětu. Výbava se známým původem, od nepřátel, z úkolů a řemesel, pak ukazuje úroveň předmětu: jediné číslo, které přibližně vyjadřuje sílu podle zdroje a umožňuje poznat lepší vylepšení i mezi různými sloty. Kusy bez takového původu, například základní zboží obchodníků a počáteční výbava, úroveň neukazují; chybějící číslo je normální.',
   'hudChrome.auraEffect.battleStance': 'Bojový postoj: o 10 % vyšší generování vzteku',
@@ -10695,6 +10700,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchantName.enchant_neck_agility': 'Okouzlení náhrdelníku - Obratnost',
   'hudChrome.enchantName.enchant_neck_intellect': 'Okouzlení náhrdelníku - Intelekt',
   'hudChrome.enchantName.enchant_neck_spirit': 'Okouzlení náhrdelníku - Duch',
+  'hudChrome.enchantName.enchant_offhand_stamina': 'Okouzlení vedlejší ruky - Výdrž',
   'hudChrome.enchantName.enchant_ring_agility': 'Okouzlení prstenu - Obratnost',
   'hudChrome.enchantName.enchant_ring_intellect': 'Okouzlení prstenu - Intelekt',
   'hudChrome.enchantName.enchant_ring_spirit': 'Okouzlení prstenu - Duch',

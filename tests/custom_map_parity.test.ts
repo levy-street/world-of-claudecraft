@@ -142,7 +142,12 @@ describe('custom-map terrain seam', () => {
     const fenbridgeWallIds = new Set(FENBRIDGE_LAYOUT.wall.segments.map((segment) => segment.id));
     expect((props.walls ?? []).some((wall) => fenbridgeWallIds.has(wall.id))).toBe(false);
 
-    const customWorld: WorldContent = { ...BUILTIN_WORLD, props, services: undefined };
+    const customWorld: WorldContent = {
+      ...BUILTIN_WORLD,
+      roads: [],
+      props,
+      services: undefined,
+    };
     setActiveWorldContent(customWorld);
     const wall = FENBRIDGE_LAYOUT.wall.segments[0].footprint;
     const jamb = FENBRIDGE_LAYOUT.wall.gates[0].arch.jambs[0];

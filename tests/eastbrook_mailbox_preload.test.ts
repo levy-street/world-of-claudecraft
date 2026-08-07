@@ -174,7 +174,8 @@ describe('Eastbrook mailbox tier-independent preload', () => {
     expect(branch).toContain('const built = buildMailboxPillar(e.id);');
     expect(branch).toContain('body = built.group;');
     expect(branch).toContain('height = built.height;');
-    expect(branch).toContain('objectMesh = body!;');
+    expect(branch).toContain('objectMesh = body;');
+    expect(branch).not.toContain('objectMesh = body!;');
     expect(branch).not.toContain('sparkleTexture');
     expect(branch).not.toContain('new THREE.Sprite');
   });

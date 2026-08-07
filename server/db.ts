@@ -661,6 +661,12 @@ CREATE INDEX IF NOT EXISTS bug_reports_account_created ON bug_reports(account_id
 -- accounts_created_at. A (status, created_at) composite would not satisfy this
 -- ordering without a leading-column filter.
 CREATE INDEX IF NOT EXISTS bug_reports_created ON bug_reports(created_at DESC);
+-- Review lifecycle, mirroring player_reports' reviewed_at/reviewed_by_account_id/
+-- review_note trio: an admin resolving or dismissing a report stamps these so the
+-- status badge is no longer a dead read-only value.
+ALTER TABLE bug_reports ADD COLUMN IF NOT EXISTS reviewed_at TIMESTAMPTZ;
+ALTER TABLE bug_reports ADD COLUMN IF NOT EXISTS reviewed_by_account_id INT REFERENCES accounts(id) ON DELETE SET NULL;
+ALTER TABLE bug_reports ADD COLUMN IF NOT EXISTS review_note TEXT NOT NULL DEFAULT '';
 CREATE TABLE IF NOT EXISTS account_moderation_actions (
   id BIGSERIAL PRIMARY KEY,
   account_id INT REFERENCES accounts(id) ON DELETE CASCADE,

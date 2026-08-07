@@ -23,7 +23,7 @@ import { createGroundObject } from '../entity';
 import { Rng } from '../rng';
 import type { SimContext } from '../sim_context';
 import { RIFT_TIER_COLORS, type RiftTier, type ZoneDef } from '../types';
-import { groundHeight, WATER_LEVEL } from '../world';
+import { groundHeight, terrainSteepnessAt, WATER_LEVEL } from '../world';
 import { RIFT_RANK_BASE_LEVEL } from './ranks';
 import { generateRiftPlan } from './rift_gen';
 import type { RiftEvent } from './types';
@@ -249,6 +249,9 @@ export function spawnNaturalRiftPortal(
     if (zoneAt(x, z).id !== zone.id) continue;
     if (Math.hypot(x - zone.hub.x, z - zone.hub.z) < zone.hub.radius + 30) continue;
     if (groundHeight(x, z, ctx.cfg.seed) < WATER_LEVEL + 0.5) continue;
+    // A portal must open on standable ground: the natural-relief crags make
+    // cliffside rolls real, and a portal on one is unreachable or a fall.
+    if (terrainSteepnessAt(x, z, ctx.cfg.seed) > 0.9) continue;
     if (isBlocked(ctx.cfg.seed, x, z, 1.5)) continue;
     position = { x, z };
     break;

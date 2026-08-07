@@ -4,11 +4,11 @@
 // site) to a UNIT VIEW (the values the painter writes). It has NO hardcoded
 // element id and NO single-instance assumption: it is a pure function of the
 // descriptor, so the same descriptor always yields the same view (DOM-free,
-// i18n-free, no Math.random / Date.now / performance.now). The player frame is the
-// FIRST instance through this seam; target and party are added as further
-// instances of the EXACT seam with no core change, so the descriptor deliberately
-// carries the FULL field set target and party need even though the player leaves
-// some at their always-present values.
+// translation-free (no t()/tEntity), no Math.random / Date.now / performance.now).
+// The player frame is the FIRST instance through this seam; target and party are
+// added as further instances of the EXACT seam with no core change, so the
+// descriptor deliberately carries the FULL field set target and party need even
+// though the player leaves some at their always-present values.
 //
 // What the core actually computes (the rest is a typed pass-through that pins the
 // contract): the present/hidden gate (a unit may be absent), the absorb-shield
@@ -17,7 +17,12 @@
 // block's `rage : energy : mana` ternary and adds the `none` case a target frame
 // with no resource bar needs). Health/resource fractions and the hp/resource TEXT
 // are preformatted at the call site (allocation-light: no raw entity references,
-// no per-element garbage), exactly as the inline player block computed them.
+// no per-element garbage), exactly as the inline player block computed them; the
+// ONE exception is the absorb-shield total appended to hpText ("523 / 600 (60)"),
+// which the core derives itself from the raw absorb input via absorbBarView and so
+// cannot be preformatted upstream. That number is routed through formatNumber
+// (useGrouping:false, matching hud_frames.ts) so its digits follow the active
+// locale like every other unit-frame number.
 
 import type { ResourceType } from '../sim/types';
 import {
@@ -26,6 +31,17 @@ import {
   absorbBarView,
   absorbBarViewInto,
 } from './absorb_bar';
+import { formatNumber } from './i18n';
+
+// The absorb-total suffix appended to hpText ("523 / 600 (60)") runs through
+// formatNumber with useGrouping:false so its digits follow the active locale
+// like every other unit-frame number, matching hud_frames.ts. This is the
+// core's one narrow, deliberate use of the i18n runtime: it calls no
+// t()/tEntity (see tests/unit_frame.test.ts), so it still emits no
+// translated STRINGS, only locale-correct digits for a number it derives
+// internally (absorbBarView's total) that the call site has no way to
+// preformat itself.
+const ABSORB_TEXT_OPTS: Intl.NumberFormatOptions = { maximumFractionDigits: 0, useGrouping: false };
 
 /**
  * The resource-bar discriminator the painter routes to a class on the resource
@@ -184,7 +200,10 @@ export function unitResourceClass(kind: UnitResourceKind): UnitResourceClass {
 export function unitFrameView(d: UnitFrameDescriptor): UnitFrameView {
   if (!d.present) return HIDDEN;
   const absorb = d.absorb ? absorbBarView(d.absorb) : NO_ABSORB;
-  const hpText = d.showAbsorbText && absorb.total > 0 ? `${d.hpText} (${absorb.total})` : d.hpText;
+  const hpText =
+    d.showAbsorbText && absorb.total > 0
+      ? `${d.hpText} (${formatNumber(absorb.total, ABSORB_TEXT_OPTS)})`
+      : d.hpText;
   return {
     present: true,
     hpFrac: d.hpFrac,
@@ -275,7 +294,7 @@ export function unitFrameViewInto(buffer: UnitFrameBuffer, d: UnitFrameDescripto
     if (d.hpText !== buffer.absorbTextBase || absorb.total !== buffer.absorbTextTotal) {
       buffer.absorbTextBase = d.hpText;
       buffer.absorbTextTotal = absorb.total;
-      buffer.absorbText = `${d.hpText} (${absorb.total})`;
+      buffer.absorbText = `${d.hpText} (${formatNumber(absorb.total, ABSORB_TEXT_OPTS)})`;
     }
     out.hpText = buffer.absorbText;
   } else {

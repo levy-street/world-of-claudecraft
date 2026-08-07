@@ -82,11 +82,20 @@ export const COYOTE_TIME = 0.15;
 export const FALL_SAFE_DISTANCE = 12; // yards of free fall before damage
 export const STEEP_SLIDE_SPEED = RUN_SPEED; // yd/s a player skids downhill off unwalkable ground
 export const SWIM_SPEED_MULT = 0.65;
+// Buoyancy: a submerged body rises toward the swim surface at this rate
+// (yd/s) instead of teleporting there. Walking past the swim-depth line used
+// to snap y from the lake bed straight to the surface in one tick; a fixed
+// deterministic rise keeps the same end state and reads as floating up.
+export const SWIM_BUOYANCY_RISE = 5;
+// Deepest a falling body plunges below the swim surface before buoyancy takes
+// over (a dive reads as a dive, not as landing on glass), always kept clear
+// of the bed itself.
+export const SWIM_MAX_PLUNGE = 1.2;
 // Body bobs just below the water line at this location (terrain/feature-aware:
-// -Infinity outside a declared lake, so this is never called off a waterline
-// that doesn't exist there).
-export function swimSurfaceY(x: number, z: number): number {
-  return waterLevelAt(x, z) - 0.75;
+// -Infinity outside every declared lake and the open sea, so this is never
+// called off a waterline that doesn't exist there).
+export function swimSurfaceY(x: number, z: number, seed: number): number {
+  return waterLevelAt(x, z, seed) - 0.75;
 }
 const SWIM_DEPTH = PLAYER_SWIM_DEPTH; // ground this far under the water line = deep water
 const MAX_CLIMB_SLOPE = PLAYER_MAX_CLIMB_SLOPE;
@@ -132,8 +141,8 @@ export function jumpMult(e: Entity): number {
 
 export function isSwimming(e: Entity, seed: number): boolean {
   return (
-    groundHeight(e.pos.x, e.pos.z, seed) < waterLevelAt(e.pos.x, e.pos.z) - SWIM_DEPTH &&
-    e.pos.y <= swimSurfaceY(e.pos.x, e.pos.z) + 0.15
+    groundHeight(e.pos.x, e.pos.z, seed) < waterLevelAt(e.pos.x, e.pos.z, seed) - SWIM_DEPTH &&
+    e.pos.y <= swimSurfaceY(e.pos.x, e.pos.z, seed) + 0.15
   );
 }
 
@@ -327,7 +336,7 @@ export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInp
         !!p.mountKey &&
         !swimming &&
         groundHeight(moveOut.x, moveOut.z, deps.seed) <
-          waterLevelAt(moveOut.x, moveOut.z) - SWIM_DEPTH;
+          waterLevelAt(moveOut.x, moveOut.z, deps.seed) - SWIM_DEPTH;
       if (mountBlockedByWater) {
         if (!p.onGround) {
           p.vx = 0;
@@ -388,7 +397,7 @@ function stepInstancedRegion(
       // so stepping back into a water body from the submerged bed just outside
       // its footprint is never a wall (real water can continue past a
       // footprint edge into the open sea)
-      const wls = stepWaterLevel(p.pos.x, p.pos.z, nx, nz);
+      const wls = stepWaterLevel(p.pos.x, p.pos.z, nx, nz, deps.seed);
       const g1 = groundHeight(nx, nz, deps.seed);
       const r0 = Math.max(groundHeight(p.pos.x, p.pos.z, deps.seed), wls);
       const r1 = Math.max(g1, wls);
@@ -415,7 +424,7 @@ function stepInstancedRegion(
       // dais rim), not a face to bounce off.
       const h1 = groundHeight(nx, nz, deps.seed);
       if (h1 > p.pos.y + MANTLE_REACH) {
-        const wls = stepWaterLevel(p.pos.x, p.pos.z, nx, nz);
+        const wls = stepWaterLevel(p.pos.x, p.pos.z, nx, nz, deps.seed);
         const r0 = Math.max(groundHeight(p.pos.x, p.pos.z, deps.seed), wls);
         const r1 = Math.max(h1, wls);
         const run = Math.hypot(nx - p.pos.x, nz - p.pos.z);
@@ -443,7 +452,7 @@ function stepInstancedRegion(
     if (
       p.mountKey &&
       !swimming &&
-      groundHeight(nx, nz, deps.seed) < waterLevelAt(nx, nz) - SWIM_DEPTH
+      groundHeight(nx, nz, deps.seed) < waterLevelAt(nx, nz, deps.seed) - SWIM_DEPTH
     ) {
       nx = p.pos.x;
       nz = p.pos.z;
@@ -492,17 +501,23 @@ function verticalPass(
     BODY_RADIUS,
     p.pos.y + (p.onGround ? 0 : MANTLE_REACH),
   );
-  const deepWater = ground < waterLevelAt(p.pos.x, p.pos.z) - SWIM_DEPTH;
-  if (deepWater && p.pos.y <= swimSurfaceY(p.pos.x, p.pos.z) + 0.05) {
-    // treading water at the surface
-    p.pos.y = swimSurfaceY(p.pos.x, p.pos.z);
+  const deepWater = ground < waterLevelAt(p.pos.x, p.pos.z, deps.seed) - SWIM_DEPTH;
+  if (deepWater && p.pos.y <= swimSurfaceY(p.pos.x, p.pos.z, deps.seed) + 0.05) {
+    const surfaceY = swimSurfaceY(p.pos.x, p.pos.z, deps.seed);
+    // In the water column: buoyancy carries a submerged body up toward the
+    // surface at a fixed rate (never past it), then it treads there. The old
+    // one-tick snap from the bed to the surface teleported anyone who walked
+    // over the swim-depth line.
+    p.pos.y = Math.min(surfaceY, p.pos.y + SWIM_BUOYANCY_RISE * DT);
     p.vy = 0;
     p.vx = 0;
     p.vz = 0;
     p.onGround = true;
     p.jumping = false;
     p.fallStartY = p.pos.y;
-    if (inp.jump && !isRooted(p) && !mountLocked) {
+    // The shore hop fires only from the surface itself: a body still rising
+    // from a dive cannot spring off water it is suspended in.
+    if (inp.jump && p.pos.y >= surfaceY - 1e-9 && !isRooted(p) && !mountLocked) {
       // small hop to climb onto shores and docks
       p.vy = JUMP_VELOCITY * 0.7 * jumpMult(p);
       p.vx = wishX * wishSpeed;
@@ -537,9 +552,15 @@ function verticalPass(
     p.vy -= GRAVITY * DT;
     p.pos.y += p.vy * DT;
     p.fallStartY = Math.max(p.fallStartY, p.pos.y);
-    if (deepWater && p.pos.y <= swimSurfaceY(p.pos.x, p.pos.z)) {
-      // splashing into deep water breaks the fall
-      p.pos.y = swimSurfaceY(p.pos.x, p.pos.z);
+    if (deepWater && p.pos.y <= swimSurfaceY(p.pos.x, p.pos.z, deps.seed)) {
+      // Splashing into deep water breaks the fall (no fall damage, ever). The
+      // integration above already carried the body below the surface this
+      // tick, so keep that as a brief plunge, bounded to SWIM_MAX_PLUNGE and
+      // held clear of the bed; buoyancy (the tread branch above) floats it
+      // back up over the following ticks.
+      const surfaceY = swimSurfaceY(p.pos.x, p.pos.z, deps.seed);
+      const plungeFloor = Math.min(surfaceY, Math.max(ground + 0.2, surfaceY - SWIM_MAX_PLUNGE));
+      p.pos.y = Math.max(plungeFloor, Math.min(surfaceY, p.pos.y));
       p.vy = 0;
       p.vx = 0;
       p.vz = 0;

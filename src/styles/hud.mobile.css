@@ -3717,6 +3717,7 @@
   body.mobile-touch #spellbook,
   body.mobile-touch #options-menu,
   body.mobile-touch #options-menu.kb-wide,
+  body.mobile-touch #options-menu.gfx-wide,
   body.mobile-touch #options-menu.perf-wide {
     left: 50%;
     right: auto;
@@ -3785,6 +3786,7 @@
   body.mobile-touch #spellbook,
   body.mobile-touch #options-menu,
   body.mobile-touch #options-menu.kb-wide,
+  body.mobile-touch #options-menu.gfx-wide,
   body.mobile-touch #options-menu.perf-wide {
     width: min(560px, calc(var(--app-vw) / var(--ui-scale, 1) - 20px));
     max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 92px);
@@ -4198,6 +4200,26 @@
   }
   body.mobile-touch .perf-card {
     padding: 8px 15px 14px;
+  }
+  /* Graphics panel on touch: the same roomier width as the perf panel, cards
+     stacked single-column (the components.css mobile-touch .gfx-cols rule).
+     Divided by the live UI scale like the shared options-panel rule above,
+     NOT a raw 100vw: #ui's zoom multiplies every author length, so a raw
+     viewport unit overflows the screen at any --ui-scale above 1. The cards
+     themselves ride the perf-card family, so the .perf-card touch rules
+     already cover them. */
+  body.mobile-touch #options-menu.gfx-wide {
+    width: min(640px, calc(var(--app-vw) / var(--ui-scale, 1) - 24px));
+  }
+  /* The inline action row wraps on touch: the status takes its own leading
+     line so the three buttons keep comfortable side-by-side targets. */
+  body.mobile-touch .gfx-footer {
+    flex-wrap: wrap;
+  }
+  body.mobile-touch .gfx-footer .graphics-apply-status {
+    flex-basis: 100%;
+    order: -1;
+    text-align: left;
   }
   /* Options/settings row heights (Phase 4, presentation only): every touch-gated
      settings row (graphics/audio/interface panels via settingsViewShell's bare

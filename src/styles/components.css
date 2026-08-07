@@ -1008,6 +1008,36 @@
     opacity: 0.4;
     cursor: default;
   }
+  /* #1144 re-spec cost model: the payment-tier picker + its cost preview. */
+  .town-focus-tier-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: 8px;
+  }
+  .town-focus-tier-label {
+    font-size: 12px;
+  }
+  .town-focus-tier-select {
+    min-height: 28px;
+    padding: 2px 6px;
+    border: 1px solid var(--color-border-default);
+    border-radius: 4px;
+    background: transparent;
+    color: inherit;
+    font-family: var(--ui-font);
+    font-size: 12px;
+  }
+  .town-focus-tier-select:disabled {
+    opacity: 0.4;
+    cursor: default;
+  }
+  .town-focus-cost {
+    font-size: 11px;
+    opacity: 0.75;
+    margin-top: 4px;
+  }
   .town-focus-save {
     width: 100%;
     margin-top: 8px;
@@ -11731,6 +11761,34 @@
     gap: 8px;
     align-items: center;
   }
+  /* The sale ledger under the proceeds line: what sold, to whom, for how much.
+     Indented and dimmer than a .mkt-collect row because it itemizes the purse
+     above rather than naming another thing to pick up. */
+  .mkt-sale-list {
+    margin: -4px 0 8px 12px;
+  }
+  .mkt-sale {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 6px 8px;
+    border-left: 2px solid var(--border);
+    margin-bottom: 4px;
+  }
+  .mkt-sale-name {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .mkt-sale-buyer,
+  .mkt-sale-more {
+    font-size: 0.85em;
+    opacity: 0.7;
+  }
+  .mkt-sale-more {
+    padding: 4px 8px;
+  }
   #map-canvas {
     /* Authored display size matching the 560x560 backing store (index.html /
        play.html). Without a CSS length the canvas box is a replaced intrinsic size,
@@ -12003,17 +12061,34 @@
   .graphics-controls-disabled {
     opacity: 0.55;
   }
-  .graphics-apply {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
+  /* The graphics panel's one inline action row: Back, the stretching status,
+     then Reset (a quiet text button) beside the primary Apply at the end. */
+  .gfx-footer {
+    display: flex;
     align-items: center;
     gap: 10px;
     min-height: 40px;
-    margin: 8px 0;
-    padding: 8px;
-    border: 1px solid var(--color-border-showcase);
-    border-radius: 5px;
-    background: var(--color-bg-input);
+    margin-top: 8px;
+  }
+  .gfx-footer .btn {
+    margin: 0;
+  }
+  .gfx-footer .graphics-apply-status {
+    flex: 1 1 auto;
+    text-align: right;
+  }
+  /* The text-button variant: keeps .btn's box, focus ring and target size,
+     sheds the chrome so it reads as a secondary action beside Apply. */
+  .gfx-btn-text {
+    background: none;
+    border-color: transparent;
+    box-shadow: none;
+    color: var(--color-text-muted);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .gfx-btn-text:hover {
+    color: var(--color-accent);
   }
   .graphics-apply-status {
     min-width: 0;
@@ -12046,6 +12121,79 @@
   }
   .set-row.disabled {
     opacity: 0.45;
+  }
+  /* Graphics panel: wide, categorized two-column card form. The cards ride
+     the shared perf-card family (settings_controls.ts settingsCard() with the
+     gfx-card modifier), so only the panel's own grid, spacing and ladder
+     stacking live here. Cards collapse to one column on narrow viewports and
+     on any touch device, matching .perf-cols. */
+  #options-menu.gfx-wide {
+    width: min(880px, calc(100vw - 32px));
+  }
+  .gfx-cols {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    align-items: start;
+    margin-bottom: 8px;
+  }
+  .gfx-col {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-width: 0;
+  }
+  .gfx-card {
+    padding: 6px 15px 13px;
+  }
+  .gfx-card .set-rows {
+    margin-bottom: 0;
+  }
+  /* Rows align to the card's own padding (drop the row's horizontal inset). */
+  .gfx-card .set-row {
+    padding: 3px 0;
+  }
+  /* Ladder rows (the preset row and the per-system dials) stack the label
+     above the buttons: a half-width card leaves a 6-button segmented group
+     about 250px beside the 120px label column, which wraps to three cramped
+     lines. Full-width, the ladders sit on one or two clean lines. The
+     dangling grid-column the .set-choice span carries is cancelled below. */
+  .gfx-card .set-row:has(.set-choice) {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 4px 10px;
+  }
+  .gfx-card .set-row:has(.set-choice) > .set-choice {
+    grid-column: auto;
+  }
+  /* Full-width cards (Display / System / Touch) span both columns below the
+     dial cards; their single-height rows flow two-up so the closing band
+     stays compact, with a lone trailing row spanning rather than stranding a
+     half-empty cell (the perf-chips idiom). */
+  .gfx-card-wide {
+    grid-column: 1 / -1;
+  }
+  .gfx-card-wide .set-rows {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 2px 28px;
+    align-items: start;
+  }
+  .gfx-card-wide .set-rows > .set-row:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
+  @media (max-width: 720px) {
+    #options-menu.gfx-wide .gfx-cols {
+      grid-template-columns: 1fr;
+    }
+    #options-menu.gfx-wide .gfx-card-wide .set-rows {
+      grid-template-columns: 1fr;
+    }
+  }
+  body.mobile-touch #options-menu.gfx-wide .gfx-cols {
+    grid-template-columns: 1fr;
+  }
+  body.mobile-touch #options-menu.gfx-wide .gfx-card-wide .set-rows {
+    grid-template-columns: 1fr;
   }
   /* ---------- UI theme picker ---------- */
   .set-seg.theme-presets {

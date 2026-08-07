@@ -29,6 +29,15 @@ layers behind the `index.ts` barrel:
   spec impact flag, staggered rings, lingers, and the 14 signature motifs;
   instants run it compressed (0.15s release to impact). `fx_textures.ts`
   builds the shared canvas textures once, deterministically.
+- `prewarm.ts`: the warm-up work that is SAFE to run in a live frame, as
+  explicit units (`abilityVfxTexturePrewarmSteps`, one per impact sheet plus the
+  shared canvases; `collectAbilityVfxCompileTargets`, one program link per
+  distinct pooled material). `AbilityVfxFx.prewarmSpawn` stays boot-window only,
+  because it spawns VISIBLE primitives; these units are what the renderer's
+  `vfx.ability-primitives` manifest entry retains when the entry deadline drops
+  it, and what constrained (phone-class) devices run in the background instead
+  of the entry. Anything new added to `prewarmSpawn` that a live frame would
+  SEE must not be added here.
 
 Renderer contract: construct `AbilityVfxFx` with (scene, camera, anchor,
 groundY), hand it to `AbilityVfx` via deps (which also wires the Vfx particle

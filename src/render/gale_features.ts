@@ -10,7 +10,7 @@
 // realm modules: build once, update(time) turns the beacon.
 import * as THREE from 'three';
 import { BEACON_SPIRAL, beaconSpiralLift } from '../sim/beacon_spiral';
-import { GALE_HARBOR_DECKS, galeDeckSurfaceAt } from '../sim/gale_harbor';
+import { GALE_HARBOR_DECKS } from '../sim/gale_harbor';
 import { hash2 } from '../sim/rng';
 import { terrainHeight, WATER_LEVEL } from '../sim/world';
 import { loadGltf } from './assets/loader';
@@ -228,18 +228,39 @@ export function buildGaleFeatures(seed: number): GaleFeaturesView {
       group.add(mergeBoxes(slabs, stone));
       group.add(mergeBoxes(rails, iron));
     }
-    // the turning light: two opposed additive cones riding a pivot
+    // the turning light: two opposed additive cones riding a pivot. Real-beam
+    // treatment: per-vertex alpha runs each cone from a hot core at the lamp
+    // to nothing at its mouth, so the beam melts into the night instead of
+    // ending in a hard elliptical cap (the open mouth's far wall used to read
+    // as one), and the HDR material color pushes the near-lamp core over the
+    // bloom threshold so the light genuinely glares on composer tiers.
     const beamMat = new THREE.MeshBasicMaterial({
-      color: 0xffe9a8,
+      color: new THREE.Color(0xffe9a8).multiplyScalar(2.1), // HDR, pre-tonemap
       transparent: true,
-      opacity: 0.22,
+      opacity: 0.45,
+      vertexColors: true,
       blending: THREE.AdditiveBlending,
       depthWrite: false,
       fog: false,
       side: THREE.DoubleSide,
     });
     for (const flip of [1, -1]) {
-      const cone = new THREE.Mesh(new THREE.ConeGeometry(4.2, 60, 12, 1, true), beamMat);
+      // 8 height segments so the alpha falloff curve interpolates smoothly
+      const coneGeo = new THREE.ConeGeometry(4.2, 60, 12, 8, true);
+      const conePos = coneGeo.getAttribute('position');
+      const fade = new Float32Array(conePos.count * 4);
+      for (let vi = 0; vi < conePos.count; vi++) {
+        // apex (+y, at the lamp) alpha 1; mouth (-y) alpha 0, eased so the
+        // core stays hot and the tail falls off long and soft
+        const along = (conePos.getY(vi) + 30) / 60;
+        const a = along ** 1.6;
+        fade[vi * 4 + 0] = 1;
+        fade[vi * 4 + 1] = 1;
+        fade[vi * 4 + 2] = 1;
+        fade[vi * 4 + 3] = a;
+      }
+      coneGeo.setAttribute('color', new THREE.BufferAttribute(fade, 4));
+      const cone = new THREE.Mesh(coneGeo, beamMat);
       cone.rotation.z = (flip * Math.PI) / 2;
       cone.position.x = flip * 30;
       beam.add(cone);

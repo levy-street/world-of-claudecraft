@@ -34,6 +34,15 @@ import {
   marketItemMatches,
   sanitizeMarketQuery,
 } from './market_query';
+import {
+  cloneSaleLog,
+  emptySaleLog,
+  isSaleLogEmpty,
+  type MarketSaleLog,
+  mergeSaleLogs,
+  recordSale,
+  sanitizeSaleLog,
+} from './market_sale_log';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import {
@@ -135,6 +144,10 @@ export interface MarketListing {
 export interface MarketCollection {
   copper: number;
   items: InvSlot[];
+  /** The itemized ledger behind `copper` (market_sale_log.ts): one row per sale
+   *  still awaiting pickup. Cleared with the gold it explains, never with the
+   *  items, which are returns rather than sales. */
+  sales: MarketSaleLog;
 }
 
 // Persistable market state. `secondsLeft` is stored instead of an absolute
@@ -154,7 +167,14 @@ export interface MarketSave {
     instance?: ItemInstancePayload;
     craftedRecipeId?: string;
   }[];
-  collections: { key: string; copper: number; items: InvSlot[] }[];
+  collections: {
+    key: string;
+    copper: number;
+    items: InvSlot[];
+    /** Additive: the pending sale ledger. Absent on every pre-ledger save and on
+     *  any collection holding only returns, which load as an empty log. */
+    sales?: MarketSaleLog;
+  }[];
   nextListingId: number;
 }
 
@@ -172,7 +192,71 @@ export class Market {
   // auction house at whichever auctioneer is closest.
   merchantIds: number[] = [];
 
+  // Browse-view revision counters. bookRev advances on any change to the
+  // LISTINGS set and keys the sorted-book memo below; browseRev advances on any
+  // change a browse snapshot can observe (listings AND collections) and is what
+  // the server's rebuild-only-on-change gate reads through browseRevFor. Every
+  // mutation site must go through bumpBook/bumpCollections or the memo and the
+  // server gate serve stale views; the wire-reachable mutating verbs (list,
+  // list-instance, buy, cancel, collect, expiry, rekey, purge, load) are each
+  // pinned against exactly that in tests/market_browse_cache.test.ts.
+  private bookRev = 0;
+  private browseRev = 0;
+  private sortedBookCache: { rev: number; source: MarketListing[]; rows: MarketListing[] } | null =
+    null;
+
   constructor(private readonly ctx: SimContext) {}
+
+  private bumpBook(): void {
+    this.bookRev++;
+    this.browseRev++;
+  }
+
+  private bumpCollections(): void {
+    this.browseRev++;
+  }
+
+  // The whole book, name-then-price sorted, memoized per bookRev. The sort is
+  // viewer-independent, and re-running the ICU localeCompare comparator
+  // n log n times per viewer per tick was the dominant broadcast cost on a
+  // grown book (the bcastSelf hot spot). Per-viewer reads FILTER this stably
+  // sorted book, which yields the exact sequence the old filter-then-sort
+  // produced: a stable sort with an element-only comparator commutes with
+  // filter. The source/length guards catch only a wholesale array replacement
+  // or a row added/removed without a bump (the test-harness push case); an
+  // equal-length swap or an in-place sort-key edit is invisible to them, so
+  // correctness rests on every real writer living in this module and riding a
+  // bump site (the module sweep in the fix review verified exactly that).
+  private sortedBook(): readonly MarketListing[] {
+    const c = this.sortedBookCache;
+    if (
+      c &&
+      c.rev === this.bookRev &&
+      c.source === this.marketListings &&
+      c.rows.length === this.marketListings.length
+    ) {
+      return c.rows;
+    }
+    const rows = [...this.marketListings].sort((a, b) => {
+      const na = ITEMS[a.itemId]?.name ?? a.itemId;
+      const nb = ITEMS[b.itemId]?.name ?? b.itemId;
+      return na.localeCompare(nb) || a.price - b.price;
+    });
+    this.sortedBookCache = { rev: this.bookRev, source: this.marketListings, rows };
+    return rows;
+  }
+
+  // The change signal the server's snapshot gate polls instead of rebuilding
+  // the browse view every tick: null while this player is not at a Merchant
+  // (the same gate marketInfoFor applies), else the current browse revision.
+  // Server-only (never IWorld), the guildBankInfoForGuild precedent.
+  browseRevFor(pid: number): number | null {
+    const meta = this.ctx.players.get(pid);
+    const e = this.ctx.entities.get(pid);
+    if (!meta || !e) return null;
+    if (!this.nearMerchant(e)) return null;
+    return this.browseRev;
+  }
 
   // Public ctor-seed entry: the Sim ctor calls this right after the NPC loop sets
   // `merchantId`, replacing the inline `this.seedHouseListings()`.
@@ -214,7 +298,7 @@ export class Market {
   private collectionFor(key: string): MarketCollection {
     let c = this.marketCollections.get(key);
     if (!c) {
-      c = { copper: 0, items: [] };
+      c = { copper: 0, items: [], sales: emptySaleLog() };
       this.marketCollections.set(key, c);
     }
     return c;
@@ -229,7 +313,12 @@ export class Market {
     // cloneInvSlot: an instanced return's payload must never alias between the
     // merged-away bucket and the surviving one.
     to.items.push(...from.items.map(cloneInvSlot));
+    // The ledger follows its gold: the merged-away bucket's copper landed in `to`
+    // above, so the rows explaining it have to travel with it or the surviving
+    // collection would show proceeds it cannot account for.
+    mergeSaleLogs(to.sales, from.sales);
     this.marketCollections.delete(fromKey);
+    this.bumpCollections();
     return true;
   }
 
@@ -267,6 +356,13 @@ export class Market {
     for (const slot of collection?.items ?? []) {
       if (rekeySigner(slot.instance, oldName, newName)) changed = true;
     }
+    // In-place listing edits (sellerName/signer) that the length guard on the
+    // sorted-book memo cannot catch, so the bump is what invalidates here.
+    // Unconditional on purpose: the browse view also reads meta.name (the
+    // isMine sellerName projection), which just moved even when no row
+    // matched, and a rename is far too rare for the over-invalidation to
+    // matter.
+    this.bumpBook();
     return changed;
   }
 
@@ -296,6 +392,7 @@ export class Market {
     }
     if (this.marketCollections.delete(key)) changed = true;
     if (name !== '' && name !== key && this.marketCollections.delete(name)) changed = true;
+    if (changed) this.bumpBook();
     return changed;
   }
 
@@ -320,6 +417,7 @@ export class Market {
     // never persisted, so without the floor a grown stock table reissues ids an
     // older build already handed to persisted player listings (#2463).
     this.nextListingId = playerListingIdFloor(this.marketListings.map((l) => l.id));
+    this.bumpBook();
   }
 
   // List a stack from your bags for sale. The goods are escrowed (pulled from
@@ -330,7 +428,17 @@ export class Market {
   marketSearch(query: MarketQuery, pid?: number): void {
     const r = this.ctx.resolve(pid);
     if (!r) return;
-    r.meta.marketQuery = sanitizeMarketQuery(query);
+    const next = sanitizeMarketQuery(query);
+    // Keep the previous object when nothing changed: the server's snapshot gate
+    // uses the query object's IDENTITY as its change signal, so replacing it
+    // wholesale on a byte-identical re-send (a client re-firing the same
+    // search every command window) would force a full browse rebuild per
+    // re-send, re-opening the per-viewer cost the sorted-book memo closes.
+    // Both objects come out of sanitizeMarketQuery/defaultMarketQuery with the
+    // same flat fixed shape, so the stringify compare covers every field,
+    // including ones added later.
+    if (JSON.stringify(r.meta.marketQuery) === JSON.stringify(next)) return;
+    r.meta.marketQuery = next;
   }
 
   marketList(itemId: string, count: number, price: number, pid?: number): void {
@@ -465,6 +573,7 @@ export class Market {
         ...(craftedRecipeId === undefined ? {} : { craftedRecipeId }),
       });
     });
+    this.bumpBook();
     this.ctx.emit({
       type: 'loot',
       // biome-ignore lint/style/useTemplate: keep this scanner-friendly shape for i18n extraction.
@@ -555,6 +664,7 @@ export class Market {
         ? {}
         : { craftedRecipeId: escrowed.craftedRecipeId }),
     });
+    this.bumpBook();
     this.ctx.emit({
       type: 'loot',
       text: `Listed ${def.name} on the World Market for ${formatMoney(ask)}.`,
@@ -619,8 +729,20 @@ export class Market {
     );
     if (!listing.house) {
       const proceeds = Math.max(0, Math.floor(listing.price * (1 - MARKET_CUT)));
-      this.collectionFor(listing.sellerKey).copper += proceeds;
+      const col = this.collectionFor(listing.sellerKey);
+      col.copper += proceeds;
+      // Itemize the sale beside the gold it produced. The listing row is spliced
+      // away on the next line, so this is the last point that still knows WHAT
+      // sold; without it the seller's collection is a bare copper total.
+      recordSale(col.sales, {
+        itemId: listing.itemId,
+        count: listing.count,
+        price: listing.price,
+        proceeds,
+        buyerName: meta.name,
+      });
       this.marketListings.splice(idx, 1);
+      this.bumpBook();
       const sellerMeta = this.metaByMarketSellerKey(listing.sellerKey);
       if (sellerMeta) {
         this.ctx.emit({
@@ -668,6 +790,7 @@ export class Market {
       return;
     }
     this.marketListings.splice(idx, 1);
+    this.bumpBook();
     grantCopies(
       this.ctx,
       meta.entityId,
@@ -696,10 +819,13 @@ export class Market {
       return;
     }
     const col = this.collectionForSeller(meta);
-    if (!col || (col.copper <= 0 && col.items.length === 0)) {
+    if (!col || (col.copper <= 0 && col.items.length === 0 && isSaleLogEmpty(col.sales))) {
       this.ctx.error(meta.entityId, 'You have nothing to collect.');
       return;
     }
+    // Every path past the guard mutates the collection (gold zeroed, items
+    // granted or kept), so bump once up front.
+    this.bumpCollections();
     if (col.copper > 0) {
       meta.copper += col.copper;
       this.ctx.emit({
@@ -711,6 +837,13 @@ export class Market {
       this.ctx.bumpDeedStat(meta, 'marketSaleCopper', col.copper);
       col.copper = 0;
     }
+    // The ledger clears with the GOLD, not at the end of the method: the capacity
+    // gate below can leave items behind and return early, and rows describing gold
+    // already paid out must not survive to be shown (and re-shown) next collect.
+    // Cleared unconditionally, because a sale whose proceeds floored to 0 copper
+    // (a 1-copper listing against the Merchant's cut) still logs a row, and that
+    // row would otherwise be uncollectable forever.
+    col.sales = emptySaleLog();
     // Capacity gate: items that don't fit stay in the collection box (never
     // destroyed); the gold above is always collected. Instance-aware on both
     // arms so a returned instanced listing keeps its payload here too.
@@ -746,6 +879,7 @@ export class Market {
       const l = this.marketListings[i];
       if (l.house || this.ctx.time < l.expiresAt) continue;
       this.marketListings.splice(i, 1);
+      this.bumpBook();
       // Conditional spread: a plain row must not grow an `instance: undefined`/
       // `craftedRecipeId: undefined` key (rows are persisted and diffed
       // byte-for-byte). BOTH are spread independently because a row can carry
@@ -781,7 +915,7 @@ export class Market {
     const meta = this.ctx.players.get(pid);
     if (!meta) return false;
     const col = this.collectionForSeller(meta);
-    return !!col && (col.copper > 0 || col.items.length > 0);
+    return !!col && (col.copper > 0 || col.items.length > 0 || !isSaleLogEmpty(col.sales));
   }
 
   marketInfoFor(pid: number): import('../world_api').MarketInfo | null {
@@ -796,12 +930,9 @@ export class Market {
     // the client over a single wire window) is what lets a player page through and
     // filter every listing, not just the first MARKET_WIRE_LIMIT.
     const query: MarketQuery = meta.marketQuery;
-    const matched = this.marketListings.filter((l) => marketItemMatches(l.itemId, query));
-    const sorted = [...matched].sort((a, b) => {
-      const na = ITEMS[a.itemId]?.name ?? a.itemId;
-      const nb = ITEMS[b.itemId]?.name ?? b.itemId;
-      return na.localeCompare(nb) || a.price - b.price;
-    });
+    // Filter the memoized sorted book instead of sorting the filtered book:
+    // identical sequence (see sortedBook), without the per-viewer sort.
+    const sorted = this.sortedBook().filter((l) => marketItemMatches(l.itemId, query));
     // The viewer's own listings are always wired (so they can reclaim from the Browse
     // tab without hunting for the right page); other sellers' listings are paged. Own
     // count (<= MARKET_MAX_LISTINGS = 12) plus one page (MARKET_PAGE_SIZE = 50) stays
@@ -839,7 +970,7 @@ export class Market {
       listings,
       // Every listing matching the filter (the viewer's own plus all others), so the
       // SELL/notes read true counts; `pageCount` below paginates the others.
-      totalCount: matched.length,
+      totalCount: sorted.length,
       filter: query.search,
       // Echo every filter axis, not just the search text: a fresh join (post-
       // linkdead-grace reconnect) resets this session-only query to default, and
@@ -859,6 +990,10 @@ export class Market {
       // maps) must never leak out of the escrow book. Own goods, so the full
       // payload (not the public trim) is correct here, the self inv precedent.
       collectionItems: col ? col.items.map(cloneInvSlot) : [],
+      // Cloned for the same reason as the slots above: the offline host hands this
+      // straight to the UI, and the live ledger must not be reachable from it.
+      collectionSales: col ? col.sales.entries.map((e) => ({ ...e })) : [],
+      collectionSalesOmitted: col?.sales.omitted ?? 0,
       cutPct: Math.round(MARKET_CUT * 100),
       maxListings: MARKET_MAX_LISTINGS,
       myListingCount,
@@ -892,6 +1027,10 @@ export class Market {
         // cloneInvSlot, not a shallow spread: an instanced return's payload
         // must not alias between the live collection and the serialized blob.
         items: c.items.map(cloneInvSlot),
+        // Conditional + deep-cloned, the listing arm's doctrine: a collection
+        // holding only returns writes no `sales` key at all, so blobs that
+        // predate the ledger round-trip byte-identical.
+        ...(isSaleLogEmpty(c.sales) ? {} : { sales: cloneSaleLog(c.sales) }),
       })),
       nextListingId: this.nextListingId,
     };
@@ -986,6 +1125,9 @@ export class Market {
       if (!c || typeof c.key !== 'string') continue;
       this.marketCollections.set(c.key, {
         copper: Math.max(0, Math.floor(c.copper) || 0),
+        // Untrusted blob data like every slot below it; a missing key (every
+        // pre-ledger save) sanitizes to an empty log.
+        sales: sanitizeSaleLog(c.sales),
         // Keep returned/expired-listing items even when their id is unknown, for
         // the same reason as listings above: a content edit must not silently
         // empty a player's pending pickups. The id stays dormant until corrected.
@@ -1020,6 +1162,7 @@ export class Market {
       );
     }
     this.reclaimSoulboundListings();
+    this.bumpBook();
   }
 
   // Migration for a listing whose item became SOULBOUND after it was listed (a
@@ -1030,6 +1173,8 @@ export class Market {
   // expired-listing return (updateMarket). Runs once at load and is idempotent
   // (a returned listing is removed, so the next save has none; new listings of a
   // soulbound item are already blocked at list time).
+  // Bump-site note: relies on its single caller (loadMarket) bumping bookRev
+  // after it returns; a second caller must bump for itself.
   private reclaimSoulboundListings(): void {
     for (let i = this.marketListings.length - 1; i >= 0; i--) {
       const l = this.marketListings[i];

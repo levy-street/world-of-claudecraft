@@ -32,6 +32,23 @@ const SWORD_GLB = join(ROOT, 'public/models/weapons/sword_a.glb');
 const FOX_GLB = join(ROOT, 'public/models/creatures/fox.glb');
 const BARREL_GLB = join(ROOT, 'public/models/props/barrel.glb');
 const TMP = join(ROOT, 'tmp/asset_pipeline/test');
+const SKINS_DIR_EXPR = '${' + 'SKINS_DIR}';
+
+interface WeaponFamilySpec {
+  grip: string;
+  gripFrac: number;
+  height: number;
+  maxHeight: number;
+  tokens: string[];
+}
+
+interface ClipPlan {
+  game: string;
+  presets: string[];
+}
+
+const WEAPON_FAMILIES = families.WEAPON_FAMILIES as Record<string, WeaponFamilySpec>;
+const BIPED_CLIP_PLAN = families.BIPED_CLIP_PLAN as ClipPlan[];
 
 // ---------------------------------------------------------------------------
 // 1. Weapon families
@@ -53,9 +70,9 @@ describe('weapon families', () => {
   });
 
   it('keeps every family spec internally consistent', () => {
-    const entries = Object.entries(families.WEAPON_FAMILIES);
+    const entries = Object.entries(WEAPON_FAMILIES);
     expect(entries.length).toBeGreaterThan(0);
-    for (const [name, fam] of entries as [string, any][]) {
+    for (const [name, fam] of entries) {
       expect(fam.gripFrac, `${name} gripFrac`).toBeGreaterThan(0);
       expect(fam.gripFrac, `${name} gripFrac`).toBeLessThan(1);
       expect(fam.height, `${name} height vs maxHeight`).toBeLessThanOrEqual(fam.maxHeight + 0.01);
@@ -78,7 +95,7 @@ describe('weapon families', () => {
     // The six families shipped today (VAR_SWORD 2.0, VAR_DAGGER 1.4, VAR_STAFF
     // 2.4, VAR_AXE 1.5, VAR_POLEARM 2.5, VAR_WAND 1.2).
     expect(Object.keys(engine).length).toBeGreaterThanOrEqual(6);
-    for (const [name, fam] of Object.entries(families.WEAPON_FAMILIES) as [string, any][]) {
+    for (const [name, fam] of Object.entries(WEAPON_FAMILIES)) {
       expect(engine[fam.grip], `${name}: engine grip ${fam.grip}`).toBeDefined();
       expect(fam.maxHeight, `${name}: maxHeight vs engine ${fam.grip}`).toBe(engine[fam.grip]);
     }
@@ -157,7 +174,7 @@ describe('anchored registry edits', () => {
     // would land the new entry as a bare expression BEFORE the whole line.
     const SRC = [
       'export const SKINS = {',
-      '  player_paladin: [null, `${SKINS_DIR}/paladin/alt_a.png`],',
+      `  player_paladin: [null, \`${SKINS_DIR_EXPR}/paladin/alt_a.png\`],`,
       '  player_mage: [',
       '    null,',
       '  ],',
@@ -167,10 +184,10 @@ describe('anchored registry edits', () => {
     const out = integrate.insertIntoBlock(
       SRC,
       'player_paladin: [',
-      '    `${SKINS_DIR}/paladin/alt_d.png`,\n',
+      `    \`${SKINS_DIR_EXPR}/paladin/alt_d.png\`,\n`,
     );
     expect(out).toContain(
-      '  player_paladin: [null, `${SKINS_DIR}/paladin/alt_a.png`, `${SKINS_DIR}/paladin/alt_d.png`,],',
+      `  player_paladin: [null, \`${SKINS_DIR_EXPR}/paladin/alt_a.png\`, \`${SKINS_DIR_EXPR}/paladin/alt_d.png\`,],`,
     );
     // The other entries are untouched and bracket balance holds.
     expect(out).toContain('  player_mage: [\n    null,\n  ],');
@@ -546,14 +563,14 @@ describe('prompt builders', () => {
 
 describe('clip plans', () => {
   it('the biped plan covers the required ClipMap fields plus Hit/Cast/Jump', () => {
-    const games = families.BIPED_CLIP_PLAN.map((c: any) => c.game);
+    const games = BIPED_CLIP_PLAN.map((c) => c.game);
     for (const need of ['Idle', 'Walk', 'Run', 'Attack', 'Death', 'Hit', 'Cast', 'Jump']) {
       expect(games, need).toContain(need);
     }
   });
 
   it('every biped preset comes from the biped library', () => {
-    for (const c of families.BIPED_CLIP_PLAN as { game: string; presets: string[] }[]) {
+    for (const c of BIPED_CLIP_PLAN) {
       expect(c.presets.length, c.game).toBeGreaterThan(0);
       for (const p of c.presets) {
         expect(p.startsWith('preset:biped:'), `${c.game}: ${p}`).toBe(true);
@@ -608,7 +625,28 @@ describe('validators calibrated against shipped assets', () => {
 });
 
 // ---------------------------------------------------------------------------
-// 6. normalizeWeapon round-trip (the load-bearing correctness check)
+// 6. Prop normalization configuration identity
+// ---------------------------------------------------------------------------
+
+describe('prop normalization variants', () => {
+  it('invalidates the cached step when height, yaw, or texture ceiling changes', () => {
+    expect(glb.propNormalizeVariant({ height: 5.5, rotateYDeg: 0, maxTex: 256 })).toBe(
+      'r0_h5_5_t256',
+    );
+    expect(glb.propNormalizeVariant({ height: 5.4, rotateYDeg: 0, maxTex: 256 })).not.toBe(
+      glb.propNormalizeVariant({ height: 5.5, rotateYDeg: 0, maxTex: 256 }),
+    );
+    expect(glb.propNormalizeVariant({ height: 5.5, rotateYDeg: 90, maxTex: 256 })).not.toBe(
+      glb.propNormalizeVariant({ height: 5.5, rotateYDeg: 0, maxTex: 256 }),
+    );
+    expect(glb.propNormalizeVariant({ height: 5.5, rotateYDeg: 0, maxTex: 512 })).not.toBe(
+      glb.propNormalizeVariant({ height: 5.5, rotateYDeg: 0, maxTex: 256 }),
+    );
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 7. normalizeWeapon round-trip (the load-bearing correctness check)
 // ---------------------------------------------------------------------------
 
 describe('normalizeWeapon round-trip', () => {

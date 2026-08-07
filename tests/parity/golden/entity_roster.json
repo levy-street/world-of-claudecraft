@@ -10,7 +10,7 @@
     "releaseSpirit ghost release + Spirit Healer resurrect (Resurrection Sickness)"
   ],
   "draws": 4,
-  "drawDigest": "343e2396",
+  "drawDigest": "0d8664bb",
   "frames": [
     {
       "tick": 0,
@@ -152,7 +152,7 @@
       "events": "a5e3fe0a",
       "rng": {
         "draws": 4,
-        "digest": "343e2396"
+        "digest": "0d8664bb"
       }
     },
     {
@@ -163,7 +163,7 @@
       "events": "741638a5",
       "rng": {
         "draws": 4,
-        "digest": "343e2396"
+        "digest": "0d8664bb"
       }
     },
     {
@@ -174,7 +174,7 @@
       "events": "741638a5",
       "rng": {
         "draws": 4,
-        "digest": "343e2396"
+        "digest": "0d8664bb"
       },
       "label": "post-churn",
       "players": [
@@ -322,7 +322,7 @@
       "events": "741638a5",
       "rng": {
         "draws": 4,
-        "digest": "343e2396"
+        "digest": "0d8664bb"
       },
       "label": "ghost-release",
       "players": [
@@ -466,7 +466,7 @@
       "events": "c453183d",
       "rng": {
         "draws": 4,
-        "digest": "343e2396"
+        "digest": "0d8664bb"
       },
       "label": "healer-resurrect",
       "players": [
@@ -616,7 +616,7 @@
       "events": "5f5b7b5b",
       "rng": {
         "draws": 4,
-        "digest": "343e2396"
+        "digest": "0d8664bb"
       }
     },
     {
@@ -627,7 +627,7 @@
       "events": "741638a5",
       "rng": {
         "draws": 4,
-        "digest": "343e2396"
+        "digest": "0d8664bb"
       },
       "label": "final",
       "players": [

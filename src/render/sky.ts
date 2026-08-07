@@ -3,6 +3,8 @@ import { COLUMN_ZONES, columnBlendAt, STRIP_ZONES } from '../sim/data';
 import type { BiomeId } from '../sim/types';
 import { SOWFIELD_CENTER } from '../sim/vale_cup_layout';
 import { loadHdr, loadTexture } from './assets/loader';
+import { BIOME_HAZE_DECLARATIONS, biomeHazeUniforms, hasBiomeHazeField } from './biome_haze_field';
+import { HAZE_SKY_SAMPLE_DIST, HAZE_SKY_TINT_MAX } from './biome_haze_field_core';
 import {
   createEnvironmentBlend,
   SKY_ENVIRONMENT_RESPONSE,
@@ -17,7 +19,7 @@ import { skyTexture } from './textures';
 // High tier: the dome fragment shader samples real Poly Haven equirect HDRIs
 // (one per biome) by view direction, cross-fading two maps across the same
 // zone-boundary windows the terrain palette uses. Each HDRI's sample is
-// rotated in azimuth so its real sun sits at SUN_ANCHOR's azimuth — the one
+// rotated in azimuth so its real sun sits at SUN_ANCHOR's azimuth, the one
 // canonical sun that shadows, god rays and water glints all share. Procedural
 // warm sun-glow lobes stay layered on top so the anchor direction always
 // carries the glow even where the HDRI sun's elevation differs.
@@ -455,6 +457,10 @@ export interface SkyView {
   setCameraPos(x: number, z: number, dt: number): void;
   /** per-channel day/night multiplier on the dome color (1,1,1 = full day) */
   setDayNight(mul: readonly [number, number, number]): void;
+  /** the cycle's live sky grading: the sun/moon direction the dawn/dusk glow
+   *  anchors to, how strongly that warm horizon lobe shows (0 = sun high or
+   *  deep under), and how far the sky desaturates toward moonlit grey. */
+  setCycle(sunDir: THREE.Vector3, duskWarm: number, nightDesat: number): void;
   /** current scene fog color: drives the dome's horizon fog band */
   setFog(color: THREE.Color): void;
   /** set the star-field strength (0 day, 1 deep night) and the current time in
@@ -487,7 +493,15 @@ const SKY_VERT = /* glsl */ `
   }
 `;
 
-const SKY_FRAG = /* glsl */ `
+// The dome fragment is composed per session: when the renderer built the
+// biome haze field (vista tiers), the dome becomes one more consumer of the
+// SAME field and shared uniform block the terrain layers splice, adding a
+// directional horizon-band tint; without a field the string is byte-identical
+// to the legacy shader. Decided once, before the material compiles, exactly
+// like the geometry consumers gate on hasBiomeHazeField().
+const skyFrag = (zoneHaze: boolean): string => /* glsl */ `${
+  zoneHaze ? BIOME_HAZE_DECLARATIONS : ''
+}
   uniform sampler2D uSkyA;
   uniform sampler2D uSkyB;
   uniform float uMix;
@@ -507,6 +521,9 @@ const SKY_FRAG = /* glsl */ `
   uniform vec3 uTintA; // per-biome dome grade (white = untouched)
   uniform vec3 uTintB;
   uniform vec3 uDayNight; // day/night grade (white = full day, dark blue = night)
+  uniform vec3 uSunDirLive; // live sun/moon direction the dawn/dusk glow anchors to
+  uniform float uDuskWarm;  // dawn/dusk horizon-glow strength (0 = none)
+  uniform float uNightDesat; // how far the sky greys out toward night
   uniform vec3 uFog; // current scene fog color (biome + day/night graded)
   uniform float uLiftA; // 1 = mask the HDRI's photographed horizon hills
   uniform float uLiftB;
@@ -514,16 +531,28 @@ const SKY_FRAG = /* glsl */ `
 
   vec3 sampleSky(sampler2D map, vec3 dir, float uOff, vec3 tune, float lift) {
     // lift resamples low view angles from just above the photographed ridge
-    // line, dissolving the HDRI's baked-in horizon hills into clean sky
-    float y = mix(dir.y, 0.26, lift * smoothstep(0.24, -0.06, dir.y));
+    // line, dissolving the HDRI's baked-in horizon hills into clean sky. Every
+    // shipped sky is generated with a clean ocean horizon and lifts nothing,
+    // so the common path is a uniform 0 where the mix collapses to dir.y; the
+    // branch is on a uniform, so the whole draw takes one path.
+    float y = dir.y;
+    if (lift > 0.0) y = mix(dir.y, 0.26, lift * smoothstep(0.24, -0.06, dir.y));
     vec2 uv = vec2(
       atan(dir.z, dir.x) * 0.15915494 + 0.5 + uOff,
       asin(clamp(y, -1.0, 1.0)) * 0.31830989 + 0.5);
     vec3 c = texture2D(map, uv).rgb * tune.x;
     // per-biome contrast around a fixed pivot just under the cloud whites:
     // deepens the open sky between clouds and spreads cloud shading back out
-    // before the ACES highlight shoulder compresses it flat
-    c = 0.8 * pow(max(c, vec3(0.0)) / 0.8, vec3(tune.z));
+    // before the ACES highlight shoulder compresses it flat.
+    //
+    // Half the shipped skies (the mood-dark ones, and every biome the table
+    // leaves at the default) run contrast 1, where this is arithmetically the
+    // identity. A uniform is not a compile-time constant, so nothing folds it
+    // away and those skies paid three pow() per sample, twice per pixel across
+    // the biome blend. The branch is on a uniform, so a whole draw takes one
+    // path, and skipping it is not merely equal but exact: pow(x, 1.0) is
+    // exp2(log2(x)) on the hardware, which does not round-trip perfectly.
+    if (tune.z != 1.0) c = 0.8 * pow(max(c, vec3(0.0)) / 0.8, vec3(tune.z));
     return min(c, vec3(tune.y));
   }
 
@@ -571,21 +600,74 @@ const SKY_FRAG = /* glsl */ `
       c = mix(c, backdrop, uBackdropStrength * mix(uBackdropAmtA, uBackdropAmtB, uMix));
     }
     c *= mix(uTintA, uTintB, uMix); // biome grade
+    // Cycle sky grading, between the biome grade and the dark night multiply:
+    // (1) desaturate toward night, so the day HDRI greys out to moonlight
+    // instead of reading as a dimmed daytime photograph; (2) pour a warm
+    // dawn/dusk glow into the horizon band around the live sun azimuth while
+    // the sun crosses it, so the sky itself sets and rises with the sun.
+    float cycleLum = dot(c, vec3(0.2126, 0.7152, 0.0722));
+    c = mix(c, vec3(cycleLum), uNightDesat);
     c *= uDayNight;                 // world day/night grade
+    // The dawn/dusk glow lands AFTER the dark multiply: the sunset sky is the
+    // brightest thing in the frame at the horizon crossing, so the grade must
+    // not dim it (uDuskWarm is zero through deep night, so nothing leaks).
+    if (uDuskWarm > 0.001) {
+      vec2 sunAz = normalize(uSunDirLive.xz);
+      vec2 dirAz = normalize(dir.xz + vec2(1e-5, 0.0));
+      float align = max(dot(dirAz, sunAz), 0.0);
+      // The glow climbs to dir.y 0.55 rather than 0.45: a sunset that stops a
+      // few degrees off the horizon reads as a stripe, and the camera looks
+      // DOWN, so the band has to reach well up the dome to fill the frame.
+      float band = (1.0 - smoothstep(0.04, 0.55, dir.y)) * smoothstep(-0.24, -0.02, dir.y);
+      float warm = uDuskWarm * band * (0.2 + 0.8 * align * align);
+      vec3 duskCol = vec3(1.0, 0.34, 0.09);
+      // Two terms with very different costs. The MIX rewrites the sky toward
+      // the dusk hue scaled by the sky's OWN luminance, so it re-colours what
+      // is already there; it can be pushed. The ADD is real extra radiance into
+      // the band around the sun, and it feeds the bloom threshold that hazes
+      // distant sprite impostors out to white, so it goes the other way: 0.5,
+      // under the 0.6 it replaces. Deeper orange, less light.
+      //
+      // The min() is the load-bearing part. Uncapped, this target reached red
+      // 1.38 over the bright HDR sky, and after the ACES curve and the output
+      // GAIN that pinned red at 255 across roughly 5 percent of the frame at the
+      // horizon crossing: a wide detail-less wash, not a sun. Capping the target
+      // under 1 means the re-colour can never itself be a clipping value, while
+      // the 0.3 floor still lifts the DARK sky, which is where the glow reads
+      // and where clipping is impossible anyway.
+      float duskTarget = min(0.3 + 0.9 * cycleLum, 0.95);
+      c = mix(c, duskCol * duskTarget, warm * 0.8);
+      c += duskCol * warm * align * align * 0.5;
+    }
     // The sun and moon discs are billboard sprites (see renderer.ts) so they stay
     // perfect circles on screen; the dome only carries the sky and the stars.
     // stars: a fine field of small twinkling points at hash-jittered spots, only
     // above the horizon, fading in as the sky darkens
     if (uStarAmt > 0.001) {
-      vec2 suv = vec2(atan(dir.z, dir.x), asin(clamp(dir.y, -1.0, 1.0))) * 72.0;
-      vec2 scell = floor(suv);
-      float present = step(0.9, hash12(scell));
-      vec2 sf = fract(suv) - vec2(hash12(scell + 7.0), hash12(scell + 13.0));
-      float point = smoothstep(0.012, 0.0, dot(sf, sf));            // small points
-      float twinkle = 0.55 + 0.45 * sin(uTime * (1.5 + hash12(scell + 3.0) * 3.5) + hash12(scell + 19.0) * 6.2832);
-      float star = present * point * (0.4 + 0.6 * hash12(scell + 41.0)) * twinkle;
+      // THREE NESTED EARLY-OUTS, and none of them changes a pixel. The field
+      // is six hash12 (a sin each) plus a twinkle sine plus an atan/asin pair
+      // on EVERY sky pixel of every night frame, and almost all of it lands on
+      // zero: below the horizon there are no stars at all, only about one cell
+      // in ten holds one, and a star's disc covers a few percent of the cell
+      // that holds it. Each gate below is the exact condition under which the
+      // term it guards was already multiplied out to zero, so the output is
+      // identical and only the work is gone. The gates are coherent too: the
+      // horizon test is a band, and a cell is ~0.8 degrees, which at a 1280
+      // wide frame is roughly a ten pixel block taking one path.
       float upper = smoothstep(-0.02, 0.2, dir.y);                  // no stars below the horizon
-      c += vec3(0.9, 0.93, 1.0) * star * upper * uStarAmt;
+      if (upper > 0.0) {
+        vec2 suv = vec2(atan(dir.z, dir.x), asin(clamp(dir.y, -1.0, 1.0))) * 72.0;
+        vec2 scell = floor(suv);
+        if (hash12(scell) >= 0.9) {                                 // this cell holds a star
+          vec2 sf = fract(suv) - vec2(hash12(scell + 7.0), hash12(scell + 13.0));
+          float point = smoothstep(0.012, 0.0, dot(sf, sf));        // small points
+          if (point > 0.0) {                                        // inside its disc
+            float twinkle = 0.55 + 0.45 * sin(uTime * (1.5 + hash12(scell + 3.0) * 3.5) + hash12(scell + 19.0) * 6.2832);
+            float star = point * (0.4 + 0.6 * hash12(scell + 41.0)) * twinkle;
+            c += vec3(0.9, 0.93, 1.0) * star * upper * uStarAmt;
+          }
+        }
+      }
     }
     // Horizon fog band: blend the dome into the scene's fog color at low view
     // angles, so fully fogged geometry (far trees, unloaded land, distant
@@ -598,7 +680,26 @@ const SKY_FRAG = /* glsl */ `
     // degrees, then fade to clear sky by ~21 degrees for the taller stuff
     // (a neighbor realm's coast trees seen across a strait).
     c = mix(uFog, c, smoothstep(0.1, 0.36, dir.y));
-    gl_FragColor = vec4(c, 1.0);
+${
+  zoneHaze
+    ? `    // Distant-zone air on the dome (biome_haze_field.ts): the sky just
+    // above the horizon takes the colour of the realm the view ray lands in
+    // (the field sampled ${HAZE_SKY_SAMPLE_DIST} yards out along the ray), so
+    // the Nightbloom's twilight lavender and the Frostveil's snow-white air
+    // read in the SKY from across a border, not only on the ground. Lands
+    // AFTER the fog band above (inside it the band's own ramp multiplied the
+    // tint to nothing), with a window that is ZERO at the true rim: on the
+    // vista tiers fog saturates only at the extreme rim, and geometry there
+    // lands at exactly the fog colour, so the dome must too.
+    {
+      vec2 wocSkyXZ = uHazeCam + normalize(dir.xz + vec2(1e-5, 0.0)) * ${HAZE_SKY_SAMPLE_DIST.toFixed(1)};
+      vec4 wocSkyHaze = texture2D(uHazeField, (wocSkyXZ - uHazeRect.xy) * uHazeRect.zw);
+      float wocSkyBand = smoothstep(0.02, 0.1, dir.y) * (1.0 - smoothstep(0.16, 0.38, dir.y));
+      c = mix(c, wocSkyHaze.rgb * uHazeGrade, ${HAZE_SKY_TINT_MAX.toFixed(6)} * wocSkyHaze.a * wocSkyBand);
+    }
+`
+    : ''
+}    gl_FragColor = vec4(c, 1.0);
     #include <tonemapping_fragment>
     #include <colorspace_fragment>
   }
@@ -725,6 +826,7 @@ export function buildSky(
         current = biomeBlendAt(x, z);
       },
       setDayNight: () => {},
+      setCycle: () => {},
       setFog: () => {},
       setStars: () => {},
       envTexture: () => null,
@@ -762,14 +864,22 @@ export function buildSky(
     uTintA: { value: tintVec(start.from) },
     uTintB: { value: tintVec(start.to) },
     uDayNight: { value: new THREE.Vector3(1, 1, 1) },
+    uSunDirLive: { value: sun.clone() },
+    uDuskWarm: { value: 0 },
+    uNightDesat: { value: 0 },
     uFog: { value: new THREE.Color(0x7095bd) },
     uLiftA: { value: BIOME_HORIZON_LIFT[start.from] },
     uLiftB: { value: BIOME_HORIZON_LIFT[start.to] },
   };
+  // Distant-zone atmosphere on the horizon band: same compile-time gate and
+  // SHARED uniform objects as the terrain layers (the renderer builds the
+  // field before buildSky runs), so the dome's tint follows the same camera
+  // and day/night grade with zero per-frame writes of its own.
+  const zoneHaze = hasBiomeHazeField();
   const material = new THREE.ShaderMaterial({
-    uniforms,
+    uniforms: { ...uniforms, ...(zoneHaze ? biomeHazeUniforms() : {}) },
     vertexShader: SKY_VERT,
-    fragmentShader: SKY_FRAG,
+    fragmentShader: skyFrag(zoneHaze),
     side: THREE.BackSide,
     fog: false,
     depthWrite: false,
@@ -811,6 +921,11 @@ export function buildSky(
     setDayNight(mul: readonly [number, number, number]): void {
       uniforms.uDayNight.value.set(mul[0], mul[1], mul[2]);
     },
+    setCycle(liveSunDir: THREE.Vector3, duskWarm: number, nightDesat: number): void {
+      uniforms.uSunDirLive.value.copy(liveSunDir);
+      uniforms.uDuskWarm.value = duskWarm;
+      uniforms.uNightDesat.value = nightDesat;
+    },
     setFog(color: THREE.Color): void {
       uniforms.uFog.value.copy(color);
     },
@@ -828,7 +943,7 @@ export function buildSky(
       // dome samples at u + off. three r165 negates environmentRotation
       // before building the PMREM lookup matrix ("accommodate left-handed
       // frame", WebGLMaterials.js), so the effective lookup azimuth is
-      // alpha + theta — matching the dome needs theta = +off*2pi. (A negated
+      // alpha + theta, so matching the dome needs theta = +off*2pi. (A negated
       // value lands the env sun 2x the offset away from the dome's.)
       return sunOffsetU(biome, sun) * 2 * Math.PI;
     },
@@ -836,3 +951,8 @@ export function buildSky(
     currentBiomeBlend: () => current,
   };
 }
+
+// The composed dome fragment for the shader-string tests
+// (tests/sky_zone_haze.test.ts): both arms of the zone-haze gate without
+// standing up the HDRI asset graph.
+export const skyZoneHazeInternalsForTest = { skyFrag };

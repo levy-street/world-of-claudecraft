@@ -1081,6 +1081,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.lootHeroic': 'Heroik bonusu, bunlardan biri her zaman düşer:',
   'hudChrome.finder.lootMaybe': 'En fazla bunlardan biri düşebilir:',
   'hudChrome.finder.mech.deathless_rage': 'Ölümsüz Öfke (koruma taşlarında kesilir)',
+  'hudChrome.finder.mech.dread_curse':
+    'Dehşet Laneti (yalnızca kahramanlık, tank değişimi için biriken zayıflatma)',
   'hudChrome.finder.mech.deathstalker_cleave': 'Ölüm Avcısının Biçişi (öne doğru yay saldırısı)',
   'hudChrome.finder.mech.enrage': 'Düşük canda çılgına döner',
   'hudChrome.finder.mech.grave_cleaver': 'Mezar Biçici (öne doğru yay saldırısı)',
@@ -2479,6 +2481,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobTooltip.friendly': 'Dost',
   'hudChrome.mobTooltip.hostile': 'Düşman',
   'hudChrome.mobTooltip.levelFamily': 'Seviye {level} {family}',
+  'hudChrome.mobTooltip.elite': 'Seçkin',
+  'hudChrome.mobTooltip.boss': 'Patron',
   'hudChrome.options.aurasOnPlayerFrame': 'Oyuncu Çerçevesinde Güçlendirmeler',
   'hudChrome.options.playerFrameScale': 'Oyuncu Çerçevesi Ölçeği',
   'hudChrome.options.showDailyRewardsChest': 'Günlük Ödül Sandığını Göster',
@@ -7331,6 +7335,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.controller.resetButtons': 'Tuş Düzenini Sıfırla',
   'hudChrome.controller.title': 'Oyun Kolu',
   'hudChrome.controller.vibration': 'Titreşim',
+  'hudChrome.emoteEditor.close': 'İfadeleri kapat',
   'hudChrome.emoteEditor.done': 'Tamam',
   'hudChrome.emoteEditor.title': 'İfadeler',
   'hudChrome.emoteWheel.edit': 'Düzenle',
@@ -10025,7 +10030,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'guide.dungeonsPage.resetBody':
     'Grubun sahiplenilmiş koşuları tutarken zorluğu değiştirirsen eski haklar kendiliğinden silinmeden önce bir süre kalır. Grup lideri kendi portre menüsünden Tüm Örnekleri Sıfırla seçeneğini seçerek veya /dungeon reset yazarak bunları hemen bırakabilir. Zorluk gerçekten değiştirilmiş olmalı, içeride canlı ya da düşmüş hiç kimse kalmamalı ve sıfırlamalar arasında kısa bir bekleme süresi vardır. Kapıya yanlış zorlukta gelirsen oyun başlamadan önce uyarır. Baskın bu şekilde asla sıfırlanmaz; kendi kilit kuralları geçerlidir.',
   'guide.dungeonsPage.wildheartBody':
-    'İki yükseltilmiş av patikasının yeşim rengi bir cenoteyi çevrelediği, yağmurla ıslanmış bir orman kalderası. Canavar inlerini ve ata kalıntılarını geç, ardından Zulgar ile yüzleşmek için ritüel piramidine tırman.',
+    'İki yükseltilmiş av patikasının yeşim rengi bir cenoteyi çevrelediği, yağmurla ıslanmış bir orman kalderası. Canavar inlerini ve ata kalıntılarını geç, ardından zirvede kimin seni beklediğini görmek için ritüel piramidine tırman.',
   'guide.gear.itemLevelBody':
     'İki parçayı hızlıca karşılaştırmak için seçeneklerden Eşya Seviyesini Göster’i aç. Düşmanlardan, görevlerden ve üretim mesleklerinden gelen, kaynağı bilinen teçhizat bir eşya seviyesi gösterir: kaynağına göre gücünü yaklaşık belirten tek bir sayı, farklı yuvalar arasında bile hangi yükseltmenin daha etkili olduğunu gösterir. Basit satıcı eşyaları ve başlangıç teçhizatı gibi böyle bir kaynağı olmayan parçalarda seviye görünmez; sayının olmaması normaldir.',
   'guide.professions.craftHowTitle': 'Üretim penceresi',
@@ -10788,6 +10793,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchantName.enchant_neck_agility': 'Kolye Büyüsü - Çeviklik',
   'hudChrome.enchantName.enchant_neck_intellect': 'Kolye Büyüsü - Zeka',
   'hudChrome.enchantName.enchant_neck_spirit': 'Kolye Büyüsü - Ruh',
+  'hudChrome.enchantName.enchant_offhand_stamina': 'İkincil El Büyüsü - Dayanıklılık',
   'hudChrome.enchantName.enchant_ring_agility': 'Yüzük Büyüsü - Çeviklik',
   'hudChrome.enchantName.enchant_ring_intellect': 'Yüzük Büyüsü - Zeka',
   'hudChrome.enchantName.enchant_ring_spirit': 'Yüzük Büyüsü - Ruh',

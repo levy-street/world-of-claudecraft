@@ -283,6 +283,7 @@ export function buildCharacterList(
         c.class,
         c.state?.equipment?.mainhand ?? null,
         weaponSkinLoadout,
+        c.state?.skinCatalog === 'mech' ? 'mech' : 'class',
       ),
     })),
   };

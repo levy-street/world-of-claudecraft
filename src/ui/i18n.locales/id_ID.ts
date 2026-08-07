@@ -1093,6 +1093,8 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.lootHeroic': 'Bonus heroik, salah satu dari ini selalu jatuh:',
   'hudChrome.finder.lootMaybe': 'Paling banyak salah satu dari ini mungkin jatuh:',
   'hudChrome.finder.mech.deathless_rage': 'Murka Abadi (diputus di wardstone)',
+  'hudChrome.finder.mech.dread_curse':
+    'Kutukan Kengerian (khusus heroik, debuff bertumpuk untuk pergantian tank)',
   'hudChrome.finder.mech.deathstalker_cleave': 'Tebasan Deathstalker (tebasan ke depan)',
   'hudChrome.finder.mech.enrage': 'Mengamuk saat darah menipis',
   'hudChrome.finder.mech.grave_cleaver': 'Penebas Kubur (tebasan ke depan)',
@@ -2496,6 +2498,8 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobTooltip.friendly': 'Ramah',
   'hudChrome.mobTooltip.hostile': 'Bermusuhan',
   'hudChrome.mobTooltip.levelFamily': '{family} Level {level}',
+  'hudChrome.mobTooltip.elite': 'Elite',
+  'hudChrome.mobTooltip.boss': 'Bos',
   'hudChrome.options.aurasOnPlayerFrame': 'Buff pada Bingkai Pemain',
   'hudChrome.options.playerFrameScale': 'Skala Bingkai Pemain',
   'hudChrome.options.showDailyRewardsChest': 'Tampilkan Peti Hadiah Harian',
@@ -7410,6 +7414,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.controller.resetButtons': 'Atur Ulang Tata Letak Tombol',
   'hudChrome.controller.title': 'Kontroler',
   'hudChrome.controller.vibration': 'Getaran',
+  'hudChrome.emoteEditor.close': 'Tutup emote',
   'hudChrome.emoteEditor.done': 'Selesai',
   'hudChrome.emoteEditor.title': 'Emote',
   'hudChrome.emoteWheel.edit': 'Sunting',
@@ -8755,6 +8760,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchantName.enchant_neck_agility': 'Mantrai Kalung - Kegesitan',
   'hudChrome.enchantName.enchant_neck_intellect': 'Mantrai Kalung - Kecerdasan',
   'hudChrome.enchantName.enchant_neck_spirit': 'Mantrai Kalung - Roh',
+  'hudChrome.enchantName.enchant_offhand_stamina': 'Mantrai Tangan Sekunder - Stamina',
   'hudChrome.enchantName.enchant_ring_agility': 'Mantrai Cincin - Kegesitan',
   'hudChrome.enchantName.enchant_ring_intellect': 'Mantrai Cincin - Kecerdasan',
   'hudChrome.enchantName.enchant_ring_spirit': 'Mantrai Cincin - Roh',
@@ -10140,7 +10146,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'guide.dungeonsPage.resetBody':
     'Jika kesulitan diganti saat kelompok masih memegang perjalanan yang diklaim, klaim lama bertahan sebentar sebelum hilang sendiri. Pemimpin kelompok dapat segera melepaskannya dengan memilih Reset Semua Instansi di menu potretnya sendiri atau mengetik /dungeon reset. Kesulitan harus benar-benar sudah diubah, tidak boleh ada siapa pun, hidup atau gugur, di dalam, dan ada jeda singkat antarreset. Jika tiba di pintu dengan kesulitan yang salah, permainan akan memberi tahu sebelum perjalanan dimulai. Raid tidak pernah direset dengan cara ini; aturan pengunciannya sendiri tetap berlaku.',
   'guide.dungeonsPage.wildheartBody':
-    'Sebuah kaldera rimba yang basah oleh hujan tempat dua jalur perburuan yang ditinggikan mengelilingi cenote giok. Lintasi sarang-sarang binatang buas dan reruntuhan leluhur, lalu daki piramida ritual untuk menghadapi Zulgar.',
+    'Sebuah kaldera rimba yang basah oleh hujan tempat dua jalur perburuan yang ditinggikan mengelilingi cenote giok. Lintasi sarang-sarang binatang buas dan reruntuhan leluhur, lalu daki piramida ritual untuk melihat siapa yang menunggu di puncaknya.',
   'guide.gear.itemLevelBody':
     'Untuk membandingkan dua perlengkapan dengan cepat, aktifkan Tampilkan Level Item di opsi. Perlengkapan yang sumbernya diketahui, dari musuh, misi, dan profesi kerajinan, kemudian menampilkan level item: satu angka yang memperkirakan kekuatan berdasarkan asalnya dan memudahkan melihat peningkatan terbaik, bahkan antar-slot. Item tanpa sumber seperti itu, misalnya barang dasar pedagang dan perlengkapan awal, tidak menampilkan level; angka yang tidak ada adalah hal normal.',
   'hudChrome.auraEffect.battleStance': 'Kuda-kuda Tempur: penghasilan amarah 10% lebih banyak',

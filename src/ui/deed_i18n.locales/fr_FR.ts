@@ -15,6 +15,54 @@ export const table: DeedLocaleTable = {
     name: 'Le ciel se tait',
     desc: 'Terrassez Cindraleth, Matriarche de la Gueule, dans son perchoir de cratère au-dessus du Drakemaw.',
   },
+  chr_frostveil_gatherer: {
+    name: 'Recolte en terrasses',
+    desc: 'Recoltez un filon de minerai, un bosquet de bois et un carre d herbes a Frostveil.',
+  },
+  chr_frostveil_first_cast: {
+    name: 'Premiere glace sur le lac',
+    desc: 'Pechez un poisson dans les eaux de Frostveil.',
+  },
+  chr_amberfall_gatherer: {
+    name: 'La recolte d Amberfall',
+    desc: 'Recoltez un filon de minerai, un bosquet de bois et un carre d herbes a Amberfall.',
+  },
+  chr_amberfall_first_cast: {
+    name: 'Une prise du grand marais',
+    desc: 'Pechez un poisson dans les eaux d Amberfall.',
+  },
+  chr_nightbloom_gatherer: {
+    name: 'La recolte reveuse',
+    desc: 'Recoltez un filon de minerai, un bosquet de bois et un carre d herbes a Nightbloom.',
+  },
+  chr_nightbloom_first_cast: {
+    name: 'Une ride sur le puits lunaire',
+    desc: 'Pechez un poisson dans les eaux de Nightbloom.',
+  },
+  chr_wraithwood_gatherer: {
+    name: 'Recolte sous la canopee',
+    desc: 'Recoltez un filon de minerai, un bosquet de bois et un carre d herbes a Wraithwood.',
+  },
+  chr_wraithwood_first_cast: {
+    name: 'Un lancer dans la baie miroir',
+    desc: 'Pechez un poisson dans les eaux de Wraithwood.',
+  },
+  chr_palmreach_gatherer: {
+    name: 'Recolte sur la greve aux palmes',
+    desc: 'Recoltez un filon de minerai, un bosquet de bois et un carre d herbes a Palmreach.',
+  },
+  chr_palmreach_first_cast: {
+    name: 'Lancer dans le lagon saphir',
+    desc: 'Pechez un poisson dans les eaux de Palmreach.',
+  },
+  chr_evergarden_gatherer: {
+    name: 'La generosite du parterre',
+    desc: 'Recoltez un filon de minerai, un bosquet de bois et un carre d herbes a Evergarden.',
+  },
+  chr_evergarden_first_cast: {
+    name: 'Un lancer sur l etang aux petales',
+    desc: 'Pechez un poisson dans les eaux d Evergarden.',
+  },
   pvp_card_duel_first_win: {
     name: 'Faire la loi',
     desc: 'Remportez un Duel de cartes auprès du Maître des cartes.',

@@ -412,7 +412,7 @@ describe('the craft output arms each stand their hub line down', () => {
     // 90 -> 53 after the Eastbrook camp respacing thinned the zone-1 camp
     // counts, then 53 -> 3 after the v0.35.0 release content commits added the
     // enchant and hunter offhands and the deeds catalog.)
-    const sim = new Sim({ seed: 3, playerClass: 'warrior', autoEquip: false });
+    const sim = new Sim({ seed: 74, playerClass: 'warrior', autoEquip: false });
     const pid = sim.playerId;
     sim.acceptArchetypeQuest('tailoring');
     const meta = sim.players.get(pid);

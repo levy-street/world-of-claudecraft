@@ -29,6 +29,7 @@ import type { BuildingDef } from '../sim/types';
 import { terrainHeight, WATER_LEVEL, waterLevel } from '../sim/world';
 import { loadGltf, releaseGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
+import { attachBiomeHaze } from './biome_haze_field';
 import { buildEastbrookGrandArmouryView } from './eastbrook_grand_armoury';
 import {
   isEastbrookRebuildBuilding,
@@ -687,6 +688,9 @@ function convertMaterial(
       strength: worn.strength,
     });
   }
+  // Distant-zone air (biome_haze_field.ts): every converted kit material
+  // hazes with the ground under it, chained over the worn-detail hook.
+  attachBiomeHaze(mat);
   mat.name = `${kit}:${s.name}`;
   matConvCache.set(key, mat);
   return mat;
@@ -2130,7 +2134,8 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
     const cv = document.createElement('canvas');
     cv.width = CW;
     cv.height = CH;
-    const ctx = cv.getContext('2d')!;
+    const ctx = cv.getContext('2d');
+    if (!ctx) throw new Error('2d canvas context unavailable');
 
     ctx.fillStyle = '#2b2722';
     ctx.fillRect(0, 0, CW, CH);
@@ -2405,12 +2410,13 @@ function pointInsideFootprint(h: Hideable, x: number, z: number): boolean {
   const dx = x - h.x,
     dz = z - h.z;
   if (h.r !== undefined) return dx * dx + dz * dz < h.r * h.r;
+  if (h.rot === undefined || h.hw === undefined || h.hd === undefined) return false;
   // world -> OBB local (three.js rotation.y convention), mirrors colliders.rotY
-  const c = Math.cos(h.rot!),
-    s = Math.sin(h.rot!);
+  const c = Math.cos(h.rot),
+    s = Math.sin(h.rot);
   const lx = dx * c - dz * s;
   const lz = dx * s + dz * c;
-  return Math.abs(lx) < h.hw! && Math.abs(lz) < h.hd!;
+  return Math.abs(lx) < h.hw && Math.abs(lz) < h.hd;
 }
 
 function segmentCircleEntry(
@@ -2437,8 +2443,9 @@ function segmentCircleEntry(
 }
 
 function segmentObbEntry(h: Hideable, ax: number, az: number, bx: number, bz: number): number {
-  const c = Math.cos(h.rot!),
-    s = Math.sin(h.rot!);
+  if (h.rot === undefined || h.hw === undefined || h.hd === undefined) return Infinity;
+  const c = Math.cos(h.rot),
+    s = Math.sin(h.rot);
   const adx = ax - h.x,
     adz = az - h.z;
   const bdx = bx - h.x,
@@ -2447,17 +2454,17 @@ function segmentObbEntry(h: Hideable, ax: number, az: number, bx: number, bz: nu
   const laz = adx * s + adz * c;
   const lbx = bdx * c - bdz * s;
   const lbz = bdx * s + bdz * c;
-  if (Math.abs(lax) < h.hw! && Math.abs(laz) < h.hd!) return 0;
+  if (Math.abs(lax) < h.hw && Math.abs(laz) < h.hd) return 0;
 
   const dx = lbx - lax,
     dz = lbz - laz;
   let tmin = -Infinity,
     tmax = Infinity;
   if (Math.abs(dx) < 1e-9) {
-    if (lax < -h.hw! || lax > h.hw!) return Infinity;
+    if (lax < -h.hw || lax > h.hw) return Infinity;
   } else {
-    let t1 = (-h.hw! - lax) / dx,
-      t2 = (h.hw! - lax) / dx;
+    let t1 = (-h.hw - lax) / dx,
+      t2 = (h.hw - lax) / dx;
     if (t1 > t2) {
       const tmp = t1;
       t1 = t2;
@@ -2467,10 +2474,10 @@ function segmentObbEntry(h: Hideable, ax: number, az: number, bx: number, bz: nu
     tmax = Math.min(tmax, t2);
   }
   if (Math.abs(dz) < 1e-9) {
-    if (laz < -h.hd! || laz > h.hd!) return Infinity;
+    if (laz < -h.hd || laz > h.hd) return Infinity;
   } else {
-    let t1 = (-h.hd! - laz) / dz,
-      t2 = (h.hd! - laz) / dz;
+    let t1 = (-h.hd - laz) / dz,
+      t2 = (h.hd - laz) / dz;
     if (t1 > t2) {
       const tmp = t1;
       t1 = t2;

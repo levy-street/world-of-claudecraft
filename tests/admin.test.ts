@@ -618,8 +618,40 @@ describe('admin api auth', () => {
       fakeGame,
     );
 
-    expect(listAccounts).toHaveBeenCalledWith('bob', 2, 50);
+    expect(listAccounts).toHaveBeenCalledWith('bob', 2, 50, 'id', 'desc');
     expect(res.statusCode).toBe(200);
+  });
+
+  it('passes an allowlisted sort/dir through to the accounts query and rejects a bogus column', async () => {
+    vi.mocked(accountAndScopeForToken).mockResolvedValue(fullToken(7));
+    vi.mocked(isAdminAccount).mockResolvedValue(true);
+    vi.mocked(listAccounts).mockResolvedValue({ rows: [], total: 0, page: 1, limit: 25 });
+
+    const sorted = fakeRes();
+    await handleAdminApi(
+      fakeReq({
+        token: VALID_TOKEN,
+        url: '/admin/api/accounts?sort=character_count&dir=asc',
+      }),
+      sorted,
+      fakeGame,
+    );
+    expect(sorted.statusCode).toBe(200);
+    expect(listAccounts).toHaveBeenCalledWith('', 1, 25, 'character_count', 'asc');
+
+    vi.mocked(listAccounts).mockClear();
+    const bogus = fakeRes();
+    await handleAdminApi(
+      fakeReq({
+        token: VALID_TOKEN,
+        url: '/admin/api/accounts?sort=id;%20DROP%20TABLE%20accounts&dir=asc',
+      }),
+      bogus,
+      fakeGame,
+    );
+    expect(bogus.statusCode).toBe(200);
+    // An unrecognized sort column falls back to the safe default, never the raw value.
+    expect(listAccounts).toHaveBeenCalledWith('', 1, 25, 'id', 'desc');
   });
 
   it('passes pagination, search, and sorting through to the characters query', async () => {

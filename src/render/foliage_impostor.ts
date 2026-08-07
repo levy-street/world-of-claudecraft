@@ -8,9 +8,11 @@
 // picks the two atlas views bracketing its camera bearing (offset by its own
 // placement yaw, so a forest never shows one repeated silhouette) and blends
 // them, so orbiting the camera never snaps. Lighting is the live standard
-// pipeline over the quad's up normal, the exact response the ground plane
-// has, so day-night grades, biome light and fog all land on the sprite the
-// way they land on the terrain under it.
+// pipeline over a shading normal that leans off vertical toward the camera
+// and fans across the card (IMPOSTOR_NORMAL_GLSL in foliage_impostor_core.ts),
+// so a sprite keeps the terrain's response to day-night grades, biome light
+// and fog while still lighting one side and shading the other the way the
+// real tree it replaces does.
 //
 // The handoff against the real meshes is per instance and jittered: the real
 // side collapses each tree at swap - fade * jitter (foliage_collapse.ts) and
@@ -27,7 +29,7 @@
 
 import * as THREE from 'three';
 import { WORLD_MIN_X, WORLD_MIN_Z } from '../sim/data';
-import { terrainHeight } from '../sim/world';
+import { attachBiomeHaze } from './biome_haze_field';
 import {
   createFarShortfallSampler,
   FAR_WORLD_MARGIN,
@@ -36,11 +38,13 @@ import {
 } from './far_terrain_core';
 import { collapseWindowUniforms } from './foliage_collapse';
 import {
+  CANOPY_EMISSIVE_FLOOR,
   IMPOSTOR_ATLAS_BUDGET,
   IMPOSTOR_CATEGORY_VIEWS,
   IMPOSTOR_CATEGORY_WIND,
   IMPOSTOR_CELL_PX,
   IMPOSTOR_JITTER_GLSL,
+  IMPOSTOR_NORMAL_GLSL,
   IMPOSTOR_ROW_BUDGET,
   type ImpostorArchetypeSpec,
   type ImpostorCellRect,
@@ -135,7 +139,7 @@ export interface ImpostorSession {
  * profile tests).
  */
 export function activeFarFieldPolicy(): FarFieldPolicy {
-  return farFieldPolicy(GFX.tier, GFX);
+  return farFieldPolicy(GFX.vistaTier, GFX);
 }
 
 /** Sprites ship per the shared far-field policy (never on lean or
@@ -151,10 +155,14 @@ export function impostorsActive(): boolean {
 // Neutral, yaw-agnostic studio rig: a hemisphere gives the bake its top-down
 // volume (canopy crowns brighter than skirts) without stamping a sun
 // direction into a sprite that must read correctly from every bearing at
-// every hour. Absolute level is close to 1 so the live standard-material lighting
-// supplies the actual brightness.
-const BAKE_SKY = 1.15;
-const BAKE_GROUND = 0.62;
+// every hour. Absolute level is close to 1 so the live standard-material
+// lighting supplies the actual brightness. The PI factor cancels Lambert's
+// 1/PI: the bake material writes albedo x irradiance / PI, and the atlas is
+// then bound as a MAP and lit again by the live shading, so without the
+// cancellation the sprite pays the 1/PI twice and lands about 3x darker than
+// the real tree it replaces.
+const BAKE_SKY = 1.15 * Math.PI;
+const BAKE_GROUND = 0.62 * Math.PI;
 
 const bakeMaterialCache = new Map<THREE.Material, THREE.Material>();
 
@@ -375,9 +383,10 @@ function bakeAtlas(
 // Draw material
 // ---------------------------------------------------------------------------
 
-// One unit quad shared by every impostor mesh: x centered, base at y 0, up
-// normals so the live standard-material lighting gives the sprite the ground plane's
-// response (see the module header).
+// One unit quad shared by every impostor mesh: x centered, base at y 0. The
+// stored normals are placeholders the vertex stage overwrites per instance
+// (IMPOSTOR_NORMAL_GLSL), since the shading normal depends on where the
+// camera stands, not on the quad.
 let quadGeo: THREE.BufferGeometry | null = null;
 function impostorQuadGeo(): THREE.BufferGeometry {
   if (quadGeo) return quadGeo;
@@ -432,6 +441,21 @@ function impostorMaterial(category: ImpostorCategory, atlas: THREE.Texture): THR
   // Standard, matching the real foliage materials: the sprites must take
   // the same realm IBL irradiance their 3D twins take, or their shaded
   // sides read darker than the trees they replace.
+  //
+  // vertexColors STAYS OFF, and the per-instance tint still applies. three
+  // derives USE_INSTANCING_COLOR from the mesh owning an instanceColor (see
+  // instancingColor in WebGLPrograms), never from this flag, and its fragment
+  // side defines USE_COLOR from that same instancing path, so setColorAt
+  // reaches diffuseColor either way. Turning the flag ON is what broke: it
+  // defines USE_COLOR in the VERTEX prefix too, and there `color_vertex` runs
+  // `vColor *= color` against a `color` attribute the impostor quad does not
+  // have. An unbound attribute reads (0, 0, 0), which zeroed vColor and with
+  // it every sprite's whole diffuse term. What was left to draw was the
+  // canopy emissive floor plus a specular lobe, neither of which is
+  // multiplied by diffuseColor: a flat cutout, one colour, unable to react to
+  // the sun at any hour, warm and washed out under a low sun because the
+  // specular alone carried the light's colour. Pinned by
+  // tests/foliage_impostor_core.test.ts.
   const mat = new THREE.MeshStandardMaterial({
     map: atlas,
     alphaTest: 0.35,
@@ -441,6 +465,14 @@ function impostorMaterial(category: ImpostorCategory, atlas: THREE.Texture): THR
     metalness: 0,
   });
   mat.name = `foliage:impostor-${category}`;
+  // The canopy ambient floor the real trees carry (foliage.ts), shaped by
+  // the same atlas texel in the fragment patch below. Without it a sprite is
+  // the only tree in the scene with no floor and crushes to a pure black
+  // silhouette at night. Foliage categories only: rocks and buildings do not
+  // carry the floor in their real form either.
+  if (category === 'tree' || category === 'dress') {
+    mat.emissive.setRGB(...CANOPY_EMISSIVE_FLOOR);
+  }
   // Amplitude policy per category (CATEGORY_WIND): sway parity for the
   // things that sway, hard zero for the rigid kit (rocks, buildings). The
   // sway direction is world-fixed here where the real mesh sways in its
@@ -474,22 +506,50 @@ function impostorMaterial(category: ImpostorCategory, atlas: THREE.Texture): THR
         varying float vImpBlend;`,
       )
       .replace(
-        '#include <begin_vertex>',
+        // The billboard basis is built HERE, a chunk earlier than the offsets
+        // that consume it: three resolves the shading normal before
+        // <begin_vertex> runs, so a normal written down there would never
+        // reach the fragment stage. Culled instances now pay the basis before
+        // <begin_vertex> drops them, a few ALU on a 2-triangle quad against
+        // the fragment work the cull is actually there to save.
+        '#include <beginnormal_vertex>',
         `vec3 impOrigin = vec3(instanceMatrix[3][0], instanceMatrix[3][1], instanceMatrix[3][2]);
         vec2 collapseOrigin = impOrigin.xz;
         float impDist = distance(collapseOrigin, cameraPosition.xz);
-        float impJitter = ${IMPOSTOR_JITTER_GLSL};
+        float impSx = length(instanceMatrix[0].xyz);
+        float impSy = length(instanceMatrix[1].xyz);
+        float impSz = max(length(instanceMatrix[2].xyz), 1e-6);
+        float impYaw = atan(-instanceMatrix[0].z, instanceMatrix[0].x);
+        // The yaw's cosine and sine come straight off the normalized first
+        // column, which a Y rotation stores as (cos, 0, -sin) times the x
+        // scale. Exact, one divide cheaper than a cos and a sin, and immune
+        // to the half turn SwiftShader returns from atan(-0.0, positive):
+        // that lands an axis-aligned instance's normal facing backwards.
+        float impC = instanceMatrix[0].x / impSx;
+        float impS = -instanceMatrix[0].z / impSx;
+        vec2 impToCam = cameraPosition.xz - collapseOrigin;
+        vec3 impFwd = vec3(impToCam.x, 0.0, impToCam.y) / max(impDist, 1e-4);
+        vec3 impRight = normalize(cross(vec3(0.0, 1.0, 0.0), impFwd));
+        ${IMPOSTOR_NORMAL_GLSL}
+        // The offsets below un-rotate and DIVIDE by the instance scale so the
+        // stock instancing chunk lands them where the billboard math put
+        // them. A normal takes the mirror of that: the stock chunk divides
+        // each component by its column length squared before applying
+        // mat3(instanceMatrix), which nets out to dividing a normal by the
+        // scale where a position is multiplied by it. So un-rotate the same
+        // way and MULTIPLY, and impNormal survives into world space intact.
+        vec3 objectNormal = vec3(impC * impNormal.x - impS * impNormal.z, impNormal.y,
+          impS * impNormal.x + impC * impNormal.z) * vec3(impSx, impSy, impSz);`,
+      )
+      .replace(
+        '#include <begin_vertex>',
+        `float impJitter = ${IMPOSTOR_JITTER_GLSL};
         float impBegin = uImpSwap - uImpFade * impJitter;
         float impKeep = step(impBegin, impDist) * (1.0 - step(uImpSpriteFar, impDist));
         if (impKeep == 0.0) {
           gl_Position = vec4(2.0, 2.0, 2.0, 1.0);
           return;
         }
-        float impSx = length(instanceMatrix[0].xyz);
-        float impSy = length(instanceMatrix[1].xyz);
-        float impSz = max(length(instanceMatrix[2].xyz), 1e-6);
-        float impYaw = atan(-instanceMatrix[0].z, instanceMatrix[0].x);
-        vec2 impToCam = cameraPosition.xz - collapseOrigin;
         // bearing of the camera as seen from the instance, same wrap as the bake
         float impViewAng = atan(impToCam.x, impToCam.y);
         float impRel = fract((impYaw - impViewAng) / 6.2831853 + 1.0);
@@ -502,8 +562,6 @@ function impostorMaterial(category: ImpostorCategory, atlas: THREE.Texture): THR
         float impCellH = aImpostorCell.w;
         vImpUvA = vec2(aImpostorCell.x + (impV0 + uv.x) * impCellW, aImpostorCell.y + uv.y * impCellH);
         vImpUvB = vec2(aImpostorCell.x + (impV1 + uv.x) * impCellW, aImpostorCell.y + uv.y * impCellH);
-        vec3 impFwd = vec3(impToCam.x, 0.0, impToCam.y) / max(impDist, 1e-4);
-        vec3 impRight = normalize(cross(vec3(0.0, 1.0, 0.0), impFwd));
         vec3 impOff = impRight * (position.x * impSx) + vec3(0.0, 1.0, 0.0) * (position.y * impSy);
         // Past the detail envelope the ground under a sprite is the coarse
         // far-tile mesh, which can sit below the true heightfield, so far
@@ -519,8 +577,6 @@ function impostorMaterial(category: ImpostorCategory, atlas: THREE.Texture): THR
         // undo the instance rotation and scale so the stock instancing chunk
         // (project_vertex applies instanceMatrix) lands the quad exactly on
         // the billboarded world offsets computed above
-        float impC = cos(impYaw);
-        float impS = sin(impYaw);
         vec3 transformed = vec3(impC * impOff.x - impS * impOff.z, impOff.y, impS * impOff.x + impC * impOff.z)
           / vec3(impSx, impSy, impSz);`,
       );
@@ -530,18 +586,65 @@ function impostorMaterial(category: ImpostorCategory, atlas: THREE.Texture): THR
         `#include <common>
         varying vec2 vImpUvA;
         varying vec2 vImpUvB;
-        varying float vImpBlend;`,
+        varying float vImpBlend;
+        vec4 impTexel;`,
+      )
+      .replace(
+        '#include <normal_fragment_begin>',
+        `#include <normal_fragment_begin>
+        #ifdef DOUBLE_SIDED
+          // The vertex stage authors this normal in camera terms, so it is
+          // already correct for whichever face the rasterizer keeps; the
+          // double-sided chunk's flip would aim it away from the camera and
+          // invert the lit and shaded sides. faceDirection squared undoes it.
+          normal *= faceDirection;
+        #endif`,
       )
       .replace(
         '#include <map_fragment>',
         `{
           vec4 impA = texture2D( map, vImpUvA );
           vec4 impB = texture2D( map, vImpUvB );
-          diffuseColor *= mix( impA, impB, vImpBlend );
+          impTexel = mix( impA, impB, vImpBlend );
+          diffuseColor *= impTexel;
         }`,
+      )
+      .replace(
+        // Drop the specular lobe. It is the one term here that never
+        // multiplies the atlas texel, so on a flat card carrying a single
+        // smooth synthetic normal it lands as a uniform sheet of the light's
+        // own colour and no sprite texture survives it. A real canopy spreads
+        // the same energy over thousands of leaf orientations, so it never
+        // forms a card-sized highlight. Measured against a real twin: under a
+        // high sun with the camera facing it the lobe was 38 percent of the
+        // sprite's pixel and left the sprite 2.2x brighter than the tree it
+        // replaces; dropping it brings that to 1.6x. At a low sun it is under
+        // 5 percent, so dawn and dusk barely move, and the sprite layer (the
+        // most pixels in the far field) saves a PMREM sample per fragment.
+        '#include <lights_fragment_end>',
+        `#include <lights_fragment_end>
+        reflectedLight.directSpecular = vec3( 0.0 );
+        reflectedLight.indirectSpecular = vec3( 0.0 );`,
+      )
+      .replace(
+        // Shape the canopy ambient floor by the blended atlas texel, the
+        // impostor equivalent of the real canopy's emissiveMap = leaf map
+        // (the stock chunk would sample flat uv, not the per-view cells).
+        // Categories with no floor have emissive = black, so this is free.
+        '#include <emissivemap_fragment>',
+        'totalEmissiveRadiance *= impTexel.rgb;',
       );
   };
   mat.customProgramCacheKey = () => `foliage-impostor-${CATEGORY_VIEWS[category]}`;
+  // The distant-zone air (biome_haze_field.ts), and this layer is the one that
+  // most needs it: past the detail envelope the sprites ARE the trees, rocks
+  // and buildings, so a sprite holding full local colour over hazed ground is
+  // the exact self-cancelling failure that field's own header warns about (it
+  // reads as "there is no fog at all", with the vista splitting into hazed
+  // ground plus unhazed collage on top of it). Attached LAST on purpose:
+  // attachBiomeHaze wraps whatever onBeforeCompile and customProgramCacheKey
+  // are already installed, so it has to see the two set above.
+  attachBiomeHaze(mat);
   materialCache.set(category, mat);
   return mat;
 }

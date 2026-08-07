@@ -15,6 +15,54 @@ export const table: DeedLocaleTable = {
     name: 'Небо смолкает',
     desc: 'Синдралет, Матриарх Дрейкмо, повержена в своём кратерном гнездовье над Дрейкмо.',
   },
+  chr_frostveil_gatherer: {
+    name: 'Urozhay na terrasakh',
+    desc: 'Soberi rudnuyu zhilu, lesnuyu porosl i gryadku trav vo Frostveil.',
+  },
+  chr_frostveil_first_cast: {
+    name: 'Pervyy led na gornom ozere',
+    desc: 'Poymay rybu v vodakh Frostveil.',
+  },
+  chr_amberfall_gatherer: {
+    name: 'Urozhay Amberfall',
+    desc: 'Soberi rudnuyu zhilu, lesnuyu porosl i gryadku trav v Amberfall.',
+  },
+  chr_amberfall_first_cast: {
+    name: 'Ulov iz velikoy topi',
+    desc: 'Poymay rybu v vodakh Amberfall.',
+  },
+  chr_nightbloom_gatherer: {
+    name: 'Snovidcheskiy urozhay',
+    desc: 'Soberi rudnuyu zhilu, lesnuyu porosl i gryadku trav v Nightbloom.',
+  },
+  chr_nightbloom_first_cast: {
+    name: 'Ryab na lunnom kolodtse',
+    desc: 'Poymay rybu v vodakh Nightbloom.',
+  },
+  chr_wraithwood_gatherer: {
+    name: 'Urozhay pod krovley lesa',
+    desc: 'Soberi rudnuyu zhilu, lesnuyu porosl i gryadku trav v Wraithwood.',
+  },
+  chr_wraithwood_first_cast: {
+    name: 'Zabros v zerkalnoy bukhte',
+    desc: 'Poymay rybu v vodakh Wraithwood.',
+  },
+  chr_palmreach_gatherer: {
+    name: 'Urozhay na palmovom beregu',
+    desc: 'Soberi rudnuyu zhilu, lesnuyu porosl i gryadku trav v Palmreach.',
+  },
+  chr_palmreach_first_cast: {
+    name: 'Zabros v sapfirovoy lagune',
+    desc: 'Poymay rybu v vodakh Palmreach.',
+  },
+  chr_evergarden_gatherer: {
+    name: 'Dary partera',
+    desc: 'Soberi rudnuyu zhilu, lesnuyu porosl i gryadku trav v Evergarden.',
+  },
+  chr_evergarden_first_cast: {
+    name: 'Zabros v prud s lepestkami',
+    desc: 'Poymay rybu v vodakh Evergarden.',
+  },
   pvp_card_duel_first_win: {
     name: 'Свои правила',
     desc: 'Победите в карточной дуэли у Карточного мастера.',

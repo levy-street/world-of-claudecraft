@@ -605,21 +605,16 @@
   /* The player frame once MOVED (MovableFrame sets pf-detached alongside the
      saved left/top): hud.ts reparents it from the action-bar stack to #ui (a
      transformed #bottom-bar ancestor would hijack the positioning), where it
-     sits absolutely like the target frame and drops to the target frame's
-     compact bar width, so the two frames read as a pair. Desktop only; the
-     mobile stylesheet owns its own placement (the controller clears the inline
-     position and this class on the mobile layout). */
+     sits absolutely like the target frame while keeping the full player-frame
+     width. Desktop only; the mobile stylesheet owns its own placement (the
+     controller clears the inline position and this class on the mobile layout). */
   #player-frame.pf-detached {
     position: absolute;
     top: 12px;
-    width: auto;
+    width: 612px;
     margin: 0;
     justify-content: flex-start;
     z-index: 6;
-  }
-  #player-frame.pf-detached .uf-bars {
-    flex: none;
-    width: 190px;
   }
   /* Pet cluster: ONE row above the player frame holding the pet command bar on the
      left and the pet's health frame on the right. Stacking the two as separate rows
@@ -3736,16 +3731,17 @@
     color: #fff;
     border-color: #c9a86a;
   }
-  /* day/night dial: a small satellite disc on the top-right rim of the minimap
-     (mirrors the #raid-lockout button placement), showing the 12h world cycle.
-     Purely informational, so it ignores pointer input. */
+  /* day/night dial: a satellite disc on the top-right rim of the minimap
+     (mirrors the #raid-lockout button placement), showing the world day/night
+     cycle. Sized to read at a glance; purely informational, so it ignores
+     pointer input. */
   #minimap-daynight {
     position: absolute;
-    top: 6px;
-    right: 6px;
+    top: 2px;
+    right: 2px;
     z-index: 3;
-    width: 30px;
-    height: 30px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
     border: 2px solid var(--border);
     background: #14141d;

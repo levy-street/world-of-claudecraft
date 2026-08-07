@@ -52,6 +52,8 @@ function info(listings: MarketListingView[], over: Partial<MarketInfo> = {}): Ma
     pageCount: 1,
     collectionCopper: 0,
     collectionItems: [],
+    collectionSales: [],
+    collectionSalesOmitted: 0,
     cutPct: 5,
     maxListings: 16,
     myListingCount: 0,

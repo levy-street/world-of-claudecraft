@@ -287,6 +287,9 @@ export const BASE_NEW = {
     'aura.raggedGash': 'Rozšklebená rána',
     'aura.soulblaze': 'Dušový žár',
     'mechanic.siltHide': 'Bahenní kůže',
+    'error.uniqueEquipped': 'Můžete mít vybavený jen jeden takový předmět.',
+    'error.townFocusCannotAfford': 'Tuto změnu zaměření si nemůžete dovolit.',
+    'log.townFocusRespecComplete': 'Změna zaměření je dokončena.',
   },
   da_DK: {
     'dfinder.needSpec': 'Vælg en specialisering for at bruge Fangekældersfinder.',
@@ -581,6 +584,9 @@ export const BASE_NEW = {
     'aura.raggedGash': 'Laset Flænge',
     'aura.soulblaze': 'Sjælebrand',
     'mechanic.siltHide': 'Dyndskjul',
+    'error.uniqueEquipped': 'Du kan kun udstyre én af den slags.',
+    'error.townFocusCannotAfford': 'Du har ikke råd til den fokusomlægning.',
+    'log.townFocusRespecComplete': 'Din fokusomlægning er fuldført.',
   },
   id_ID: {
     'dfinder.needSpec': 'Pilih spesialisasi untuk menggunakan Pencari Dungeon.',
@@ -881,6 +887,9 @@ export const BASE_NEW = {
     'aura.bonesplinter': 'Serpih Tulang',
     'aura.raggedGash': 'Cabikan Kasar',
     'aura.soulblaze': 'Nyala Jiwa',
+    'error.uniqueEquipped': 'Anda hanya dapat memakai satu benda seperti itu.',
+    'error.townFocusCannotAfford': 'Anda tidak mampu membayar pengaturan ulang fokus itu.',
+    'log.townFocusRespecComplete': 'Pengaturan ulang fokus Anda selesai.',
   },
   nl_NL: {
     'dfinder.needSpec': 'Kies een specialisatie om de Kerkerzoekmachine te gebruiken.',
@@ -1180,6 +1189,9 @@ export const BASE_NEW = {
     'aura.raggedGash': 'Rafelige Snee',
     'aura.soulblaze': 'Zielevlam',
     'mechanic.siltHide': 'Slibhuid',
+    'error.uniqueEquipped': 'Je kunt er maar één van dat type uitrusten.',
+    'error.townFocusCannotAfford': 'Je kunt die focus-herschikking niet betalen.',
+    'log.townFocusRespecComplete': 'Je focus-herschikking is voltooid.',
   },
   pl_PL: {
     'dfinder.needSpec': 'Wybierz specjalizację, aby korzystać ze Znajdywacza Lochów.',
@@ -1477,6 +1489,9 @@ export const BASE_NEW = {
     'aura.raggedGash': 'Poszarpana rana',
     'aura.soulblaze': 'Płomień duszy',
     'mechanic.siltHide': 'Mułowa skóra',
+    'error.uniqueEquipped': 'Możesz założyć tylko jeden taki przedmiot.',
+    'error.townFocusCannotAfford': 'Nie stać cię na tę zmianę skupienia.',
+    'log.townFocusRespecComplete': 'Zmiana skupienia została ukończona.',
   },
   sv_SE: {
     'dfinder.needSpec': 'Välj en specialisering för att använda Fängelsehålsletaren.',
@@ -1771,6 +1786,9 @@ export const BASE_NEW = {
     'aura.raggedGash': 'Rivsår',
     'aura.soulblaze': 'Själslåga',
     'mechanic.siltHide': 'Slamhud',
+    'error.uniqueEquipped': 'Du kan bara utrusta en sådan.',
+    'error.townFocusCannotAfford': 'Du har inte råd med den fokusomläggningen.',
+    'log.townFocusRespecComplete': 'Din fokusomläggning är klar.',
   },
   tr_TR: {
     'dfinder.needSpec': "Zindan Bulucu'yu kullanmak için bir uzmanlaşma seç.",
@@ -2061,6 +2079,9 @@ export const BASE_NEW = {
     'aura.bonesplinter': 'Kemikkıymık',
     'aura.raggedGash': 'Pürüzlü Yarık',
     'aura.soulblaze': 'Ruhalazı',
+    'error.uniqueEquipped': 'Bunlardan yalnızca birini kuşanabilirsin.',
+    'error.townFocusCannotAfford': 'Bu odak yeniden dağıtımını karşılayamazsın.',
+    'log.townFocusRespecComplete': 'Odak yeniden dağıtımın tamamlandı.',
   },
   vi_VN: {
     'dfinder.needSpec': 'Hãy chọn chuyên môn hóa để sử dụng Tìm Hầm Ngục.',
@@ -2355,6 +2376,9 @@ export const BASE_NEW = {
     'aura.raggedGash': 'Vết Rách Toạc',
     'aura.soulblaze': 'Hồn Hỏa',
     'mechanic.siltHide': 'Da Phù Sa',
+    'error.uniqueEquipped': 'Bạn chỉ có thể trang bị một món như vậy.',
+    'error.townFocusCannotAfford': 'Bạn không đủ tiền để đặt lại tiêu điểm đó.',
+    'log.townFocusRespecComplete': 'Việc đặt lại tiêu điểm của bạn đã hoàn tất.',
   },
 };
 

@@ -10,6 +10,14 @@
 // fs and git access are injected so Vitest pins the real logic rather than a
 // replica of it.
 
+import {
+  buildAlwaysRunSet,
+  buildHelperImportPattern,
+  classifyTestSource,
+  FS_HELPER_DIRS,
+  HELPER_FS_PATTERN,
+} from './test_visibility.mjs';
+
 /**
  * Vitest's own default include is `**\/*.{test,spec}.?(c|m)[jt]s?(x)`, and
  * vite.config.ts excludes node_modules, dist, the agent-runtime dirs, .worktrees,
@@ -82,6 +90,65 @@ export function listTestFiles(io) {
   walk(dir);
   out.sort();
   return out;
+}
+
+/**
+ * Classify the whole suite in one call: walk the fs-helper directories, build
+ * the helper-import pattern, list every collected test file, and fold the
+ * per-file classifications into the always-run set.
+ *
+ * Extracted on the rule of three: gate_select.mjs and gate_shadow.mjs carried
+ * this block verbatim, and the CI shard runner (scripts/ci_shard_test.mjs) is
+ * the third consumer. Three copies of the classification loop is three chances
+ * for the gate, its validator, and CI to reason over different suites.
+ *
+ * @param {{
+ *   root: string,
+ *   readdirSync: (p: string, o: { withFileTypes: true }) => Array<{ name: string, isDirectory(): boolean, isFile(): boolean }>,
+ *   readFileSync: (p: string, enc: string) => string,
+ *   join: (...parts: string[]) => string,
+ *   relative: (from: string, to: string) => string,
+ *   sep: string,
+ * }} io
+ * @returns {{ testFiles: string[], alwaysRun: string[], reasons: Record<string, string[]>, counts: { blind: number, partial: number, graph: number } }}
+ */
+export function collectSuiteVisibility(io) {
+  const { root, readdirSync, readFileSync, join, relative, sep } = io;
+  // Shared helpers that themselves reach outside the graph, so a test delegating
+  // its fs access one hop away is not mistaken for pure.
+  const fsHelpers = FS_HELPER_DIRS.flatMap((dir) => {
+    const full = join(root, dir);
+    try {
+      // .ts AND .mjs/.js: a JS helper in these dirs delegates fs just as well,
+      // and a .ts-only filter would silently never scan it.
+      return readdirSync(full, { withFileTypes: true })
+        .filter(
+          (e) => e.isFile() && /\.[cm]?[jt]s$/.test(e.name) && !/\.(test|spec)\./.test(e.name),
+        )
+        .filter((e) => HELPER_FS_PATTERN.test(readFileSync(join(full, e.name), 'utf8')))
+        .map((e) => `${dir}/${e.name.replace(/\.[cm]?[jt]s$/, '')}`);
+    } catch {
+      return [];
+    }
+  });
+  const helperImportPattern = buildHelperImportPattern(fsHelpers);
+  const testFiles = listTestFiles({
+    root,
+    dir: join(root, 'tests'),
+    readdirSync,
+    join,
+    relative,
+    sep,
+  });
+  const { alwaysRun, reasons, counts } = buildAlwaysRunSet(
+    testFiles.map((file) => ({
+      file,
+      visibility: classifyTestSource(readFileSync(join(root, file), 'utf8'), {
+        helperImportPattern,
+      }),
+    })),
+  );
+  return { testFiles, alwaysRun, reasons, counts };
 }
 
 /**

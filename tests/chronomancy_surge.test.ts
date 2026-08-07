@@ -1,10 +1,11 @@
 // Chronomancy Phase 3 mechanics (docs/prd/mage-chronomancy.md 13.4 / 14): Aether
 // Surge (Oleada de éter), the single-target Arcane spender with per-caster Arcane
 // Charges. Each cast READS the charges held (scaling damage +30%/charge and cost
-// x1.9/charge), THEN banks one more (cap 4); the charge aura expires 10s after
+// x2/charge), THEN banks one more (cap 4); the charge aura expires 10s after
 // the last cast. Aether Darts (arcane_missiles) consumes every charge on its
 // first landed missile, splitting a flat Arcane bonus across the missiles.
 import { describe, expect, it } from 'vitest';
+
 import {
   AETHER_SURGE_COST_PER_CHARGE,
   AETHER_SURGE_DMG_PER_CHARGE,
@@ -18,6 +19,7 @@ import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
 import type { Aura, Entity, SimEvent } from '../src/sim/types';
+import { expectDefined } from './helpers/defined';
 
 function chronoMage(level = 20) {
   const sim = new Sim({ seed: 41, playerClass: 'mage', autoEquip: true });
@@ -95,8 +97,9 @@ describe('Aether Surge charge multipliers (pure)', () => {
 });
 
 describe('Aether Surge cost at each charge level (resolvedAbility choke point)', () => {
-  it('the affordability/spend cost is base x1.9^charges, rounded', () => {
+  it('pins the tuned base and resolves affordability/spend at base x2^charges', () => {
     const base = ABILITIES.arcane_surge.cost; // provisional base, derived via harness
+    expect(base).toBe(14);
     const { sim, p } = chronoMage();
     for (let k = 0; k <= 4; k++) {
       p.auras = p.auras.filter((a) => a.id !== 'arcane_surge');
@@ -162,7 +165,7 @@ describe('Aether Surge feeds Temporal Echo (no hidden heal bonus)', () => {
     const { sim, p } = chronoMage();
     const mob = addHostile(sim);
     const allyId = sim.addPlayer('warrior', 'Marcado');
-    const ally = sim.entities.get(allyId)!;
+    const ally = expectDefined(sim.entities.get(allyId));
     ally.pos.x = p.pos.x + 4;
     ally.pos.z = p.pos.z;
     ally.maxHp = 1_000_000;
@@ -290,7 +293,7 @@ describe('Aether Surge free-cast proc', () => {
   it('the free proc only covers Aether Surge, not other casts', () => {
     const { sim, p } = chronoMage();
     const allyId = sim.addPlayer('warrior', 'Aliado');
-    const ally = sim.entities.get(allyId)!;
+    const ally = expectDefined(sim.entities.get(allyId));
     ally.pos.x = p.pos.x + 4;
     ally.pos.z = p.pos.z;
     ally.hp = Math.floor(ally.maxHp * 0.4);

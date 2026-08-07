@@ -135,9 +135,12 @@ export class FocusManager {
         }
       }
       const focusables = this.focusablesIn(root);
-      // Skip the close (X) button on open so focus lands on a meaningful control, not the
-      // dismiss affordance; fall back to it only when it is the sole focusable element.
-      const target = focusables.find((el) => !el.matches('[data-close]')) ?? focusables[0];
+      // Skip dismiss and explicitly secondary header actions on open so focus
+      // lands on the window's primary content; keep them in the Tab cycle.
+      const target =
+        focusables.find(
+          (el) => !el.matches('[data-close]') && !el.matches('[data-skip-open-focus]'),
+        ) ?? focusables[0];
       (target ?? root).focus();
     }, 0);
   }

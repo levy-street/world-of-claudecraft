@@ -1,5 +1,6 @@
 import type * as http from 'node:http';
 import { verifyLoginTwoFactor } from './account';
+import { parseAdminAccountSort } from './admin_accounts_sort';
 import {
   accountDetail,
   associationsForIp,
@@ -55,7 +56,12 @@ import {
   newToken,
   verifyPassword,
 } from './auth';
-import { getBugReportScreenshot, listBugReports } from './bug_report_db';
+import {
+  type BugReportResolution,
+  getBugReportScreenshot,
+  listBugReports,
+  resolveBugReport,
+} from './bug_report_db';
 import {
   characterProfessionsSheetFromRow,
   restoreItemBodyError,
@@ -923,6 +929,21 @@ export async function handleAdminApi(
       const ignored = await ignoreReport(Number(ignoreMatch[1]), accountId, body.note);
       return ignored ? ok(res, { ok: true }) : fail(res, 404, 'open report not found');
     }
+    const bugReportResolveMatch = /^\/admin\/api\/bug-reports\/(\d+)\/(resolve|dismiss)$/.exec(
+      path,
+    );
+    if (req.method === 'POST' && bugReportResolveMatch) {
+      const body = await readBody(req);
+      const status: BugReportResolution =
+        bugReportResolveMatch[2] === 'resolve' ? 'resolved' : 'dismissed';
+      const resolved = await resolveBugReport(
+        Number(bugReportResolveMatch[1]),
+        accountId,
+        status,
+        body.note,
+      );
+      return resolved ? ok(res, { ok: true }) : fail(res, 404, 'open bug report not found');
+    }
     const forceRenameMatch = /^\/admin\/api\/moderation\/characters\/(\d+)\/force-rename$/.exec(
       path,
     );
@@ -1390,7 +1411,8 @@ export async function handleAdminApi(
     if (path === '/admin/api/accounts') {
       const { page, limit } = parsePageParams(url.searchParams);
       const search = (url.searchParams.get('search') ?? '').slice(0, 64);
-      return ok(res, await listAccounts(search, page, limit));
+      const { sort, dir } = parseAdminAccountSort(url.searchParams);
+      return ok(res, await listAccounts(search, page, limit, sort, dir));
     }
     if (path === '/admin/api/guilds') {
       const { page, limit } = parsePageParams(url.searchParams);
@@ -1803,6 +1825,7 @@ function makeRealAdminDb() {
     sessionsByDay,
     listBugReports,
     getBugReportScreenshot,
+    resolveBugReport,
     listUnstuckReports: (options: Parameters<typeof listUnstuckReportsDb>[1]) =>
       listUnstuckReportsDb(pool, options),
     listUnstuckHotspots: (options: Parameters<typeof listUnstuckHotspotsDb>[1]) =>
@@ -2175,11 +2198,12 @@ async function perfTickCaptureHandler(ctx: Ctx): Promise<void> {
   ok(ctx.res, useAdminRuntime().startPerfCapture(durationMs));
 }
 
-/** GET /admin/api/accounts: paged account search (search clamped to 64 chars). */
+/** GET /admin/api/accounts: paged, sortable account search (search clamped to 64 chars). */
 async function accountsHandler(ctx: Ctx): Promise<void> {
   const { page, limit } = parsePageParams(ctx.url.searchParams);
   const search = (ctx.url.searchParams.get('search') ?? '').slice(0, 64);
-  ok(ctx.res, await adminDb().listAccounts(search, page, limit));
+  const { sort, dir } = parseAdminAccountSort(ctx.url.searchParams);
+  ok(ctx.res, await adminDb().listAccounts(search, page, limit, sort, dir));
 }
 
 /** GET /admin/api/guilds: current-realm guild search with bounded pagination. */
@@ -2887,6 +2911,22 @@ async function bugScreenshotHandler(ctx: Ctx): Promise<void> {
   ok(ctx.res, { screenshot: await adminDb().getBugReportScreenshot(adminTargetId(ctx)) });
 }
 
+/** POST /admin/api/bug-reports/:id/(resolve|dismiss): close an open bug report, audited. */
+function bugReportResolveHandler(status: BugReportResolution) {
+  return async (ctx: Ctx): Promise<void> => {
+    const body = await readBody(ctx.req);
+    const resolved = await adminDb().resolveBugReport(
+      adminTargetId(ctx),
+      ctxAccountId(ctx),
+      status,
+      body.note,
+    );
+    return resolved ? ok(ctx.res, { ok: true }) : fail(ctx.res, 404, 'open bug report not found');
+  };
+}
+const bugReportResolveHandlerResolved = bugReportResolveHandler('resolved');
+const bugReportResolveHandlerDismissed = bugReportResolveHandler('dismissed');
+
 /** GET /admin/api/characters: paged, sortable character search. */
 async function charactersHandler(ctx: Ctx): Promise<void> {
   const { page, limit } = parsePageParams(ctx.url.searchParams);
@@ -3451,6 +3491,22 @@ export const routes: RouteDef[] = [
     middleware: [requireAdmin, requireAdminTarget('bugReport')],
     meta: adminTargetMeta('bugReport'),
     handler: bugScreenshotHandler,
+  },
+  {
+    method: 'POST',
+    path: '/admin/api/bug-reports/:id/resolve',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('bugReport')],
+    meta: adminTargetMeta('bugReport'),
+    handler: bugReportResolveHandlerResolved,
+  },
+  {
+    method: 'POST',
+    path: '/admin/api/bug-reports/:id/dismiss',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('bugReport')],
+    meta: adminTargetMeta('bugReport'),
+    handler: bugReportResolveHandlerDismissed,
   },
   {
     method: 'GET',

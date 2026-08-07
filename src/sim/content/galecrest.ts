@@ -631,13 +631,13 @@ export const GALECREST_QUEST_CAMPS: CampDef[] = [
   // (q_gc_scuttlers_in_the_pots): they climbed up from the shoals to raid
   // the crab pots, so their two camps flank the road south of town, clear
   // of the wreck_thief camp further down at (444, 438).
-  { mobId: 'shoal_scuttler', center: { x: 410, z: 400 }, radius: 9, count: 5 },
-  { mobId: 'shoal_scuttler', center: { x: 440, z: 460 }, radius: 8, count: 5 },
+  { mobId: 'shoal_scuttler', center: { x: 410, z: 400 }, radius: 9, count: 5, offStream: true },
+  { mobId: 'shoal_scuttler', center: { x: 440, z: 460 }, radius: 8, count: 5, offStream: true },
   // Gale wisps on the high downs beside the Mirror Tarn
   // (q_gc_wind_against_the_wick): kept east of the tarn itself and clear of
   // the topiary_wolf pack that already holds its southwest bank.
-  { mobId: 'gale_wisp', center: { x: 330, z: 565 }, radius: 9, count: 4 },
-  { mobId: 'gale_wisp', center: { x: 355, z: 585 }, radius: 8, count: 4 },
+  { mobId: 'gale_wisp', center: { x: 330, z: 565 }, radius: 9, count: 4, offStream: true },
+  { mobId: 'gale_wisp', center: { x: 355, z: 585 }, radius: 8, count: 4, offStream: true },
 ];
 
 export const GALECREST_PROPS: ZonePropsDef = {

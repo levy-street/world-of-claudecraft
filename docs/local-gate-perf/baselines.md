@@ -293,7 +293,7 @@ Vitest guidance: fs cache helps most on small re-runs with large module graphs).
 | Item | Value |
 |---|---|
 | Config | `test.experimental.fsModuleCache: true` |
-| Cache dir | `node_modules/.experimental-vitest-cache` (~3.8 MiB after full suite) |
+| Cache dir | `node_modules/.experimental-vitest-cache` (measured 2026-08-06: ~102 MB, ~1078 entries after a partial run; a CI shard's store compresses to 57-73 MB per `actions/cache` entry; the ~3.8 MiB figure recorded here earlier was wrong) |
 | Clear | `npx vitest --clearCache` |
 | `test:related` | `vitest related --run --passWithNoTests` |
 | `test:changed` | `vitest run --passWithNoTests --changed` |

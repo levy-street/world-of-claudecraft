@@ -18,7 +18,7 @@ import { EASTBROOK_BUILDINGS_BY_ID, localToWorld } from '../src/sim/eastbrook_la
 import { createMob } from '../src/sim/entity';
 import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE } from '../src/sim/pathfind';
 import { Sim } from '../src/sim/sim';
-import { dist2d, type Entity, type SimEvent } from '../src/sim/types';
+import { dist2d, type Entity, type LootEntry, type SimEvent } from '../src/sim/types';
 import {
   DECORATION_MAX_SLOPE,
   generateDecorationsInBounds,
@@ -28,8 +28,25 @@ import {
   terrainWallStandoff,
   WATER_LEVEL,
 } from '../src/sim/world';
+
 import { decorations, formRaid, makeLootSim, makeSim, SEED, teleportTo } from './fixes_shared';
+import { expectDefined } from './helpers/defined';
 import { wallFootFixture } from './helpers/wall_foot';
+
+interface SimPrivateHarness {
+  moveToward(e: Entity, target: { x: number; y: number; z: number }, speed: number): void;
+  applyAura(target: Entity, aura: Entity['auras'][number]): void;
+  handleDeath(target: Entity, source: Entity | null): void;
+  rollLoot(
+    mob: Entity,
+    killer: ReturnType<Sim['meta']>,
+    eligible?: ReturnType<Sim['meta']>[],
+  ): void;
+}
+
+function asHarness(sim: Sim): SimPrivateHarness {
+  return sim as unknown as SimPrivateHarness;
+}
 
 describe('quest lifecycle', () => {
   it('stops showing the Redbrook starter hint after the first quest is accepted', () => {
@@ -40,12 +57,14 @@ describe('quest lifecycle', () => {
       'Find Marshal Redbrook in town - he has work for you.',
     );
 
-    const redbrook = [...sim.entities.values()].find((e) => e.templateId === 'marshal_redbrook')!;
+    const redbrook = expectDefined(
+      [...sim.entities.values()].find((e) => e.templateId === 'marshal_redbrook'),
+    );
     teleportTo(sim, redbrook.pos.x + 2, redbrook.pos.z + 2);
     sim.acceptQuest('q_wolves');
     expect(zoneWelcomeText(starterZone, (questId) => sim.questState(questId))).toBeNull();
 
-    const qp = sim.questLog.get('q_wolves')!;
+    const qp = expectDefined(sim.questLog.get('q_wolves'));
     qp.counts[0] = 8;
     qp.state = 'ready';
 
@@ -64,7 +83,9 @@ describe('quest lifecycle', () => {
     expect(sim.questState('q_wolves')).toBe('available');
     expect(sim.questLog.has('q_wolves')).toBe(false);
 
-    const redbrook = [...sim.entities.values()].find((e) => e.templateId === 'marshal_redbrook')!;
+    const redbrook = expectDefined(
+      [...sim.entities.values()].find((e) => e.templateId === 'marshal_redbrook'),
+    );
     teleportTo(sim, redbrook.pos.x + 2, redbrook.pos.z);
     sim.acceptQuest('q_wolves');
     expect(sim.questState('q_wolves')).toBe('active');
@@ -72,12 +93,14 @@ describe('quest lifecycle', () => {
 
   it('a turned-in quest cannot be accepted again', () => {
     const sim = makeSim();
-    const redbrook = [...sim.entities.values()].find((e) => e.templateId === 'marshal_redbrook')!;
+    const redbrook = expectDefined(
+      [...sim.entities.values()].find((e) => e.templateId === 'marshal_redbrook'),
+    );
     teleportTo(sim, redbrook.pos.x + 2, redbrook.pos.z + 2);
     sim.acceptQuest('q_wolves');
     expect(sim.questState('q_wolves')).toBe('active');
 
-    const qp = sim.questLog.get('q_wolves')!;
+    const qp = expectDefined(sim.questLog.get('q_wolves'));
     qp.counts[0] = 8;
     qp.state = 'ready';
 
@@ -421,7 +444,17 @@ describe('swimming', () => {
     const p = sim.player;
     teleportTo(sim, LAKE.x, LAKE.z);
     expect(groundHeight(LAKE.x, LAKE.z, SEED)).toBeLessThan(WATER_LEVEL - 0.8);
-    sim.tick();
+    // The water overhaul made buoyancy physical: a body dropped over deep
+    // water RISES to the float band over a few ticks (measured: surfaced at
+    // tick 9 from the lakebed) instead of snapping there in one. The
+    // guarantee this pins is reaching the band promptly and STAYING in it.
+    let surfacedAt = -1;
+    for (let i = 0; i < 40 && surfacedAt < 0; i++) {
+      sim.tick();
+      if (p.pos.y > WATER_LEVEL - 1.0) surfacedAt = i + 1;
+    }
+    expect(surfacedAt, 'reaches the float band within 2s').toBeGreaterThan(0);
+    for (let i = 0; i < 20; i++) sim.tick();
     expect(p.pos.y).toBeGreaterThan(WATER_LEVEL - 1.0);
     expect(p.pos.y).toBeLessThan(WATER_LEVEL);
     expect(sim.isSwimming(p)).toBe(true);
@@ -429,7 +462,9 @@ describe('swimming', () => {
 
   it('ordinary mobs chase into deep water and keep dealing melee damage', () => {
     const sim = makeSim();
-    const wolf = [...sim.entities.values()].find((e) => e.templateId === 'forest_wolf')!;
+    const wolf = expectDefined(
+      [...sim.entities.values()].find((e) => e.templateId === 'forest_wolf'),
+    );
     // park a chase target in the middle of the lake
     const p = sim.player;
     teleportTo(sim, LAKE.x, LAKE.z);
@@ -458,7 +493,7 @@ describe('swimming', () => {
       sim.groundPos(LAKE.x + 24, LAKE.z + 24),
     );
     for (let i = 0; i < 120; i++) {
-      (sim as any).moveToward(rare, { x: LAKE.x, y: 0, z: LAKE.z }, rare.moveSpeed);
+      asHarness(sim).moveToward(rare, { x: LAKE.x, y: 0, z: LAKE.z }, rare.moveSpeed);
     }
     expect(groundHeight(rare.pos.x, rare.pos.z, SEED)).toBeLessThan(WATER_LEVEL - 0.8);
     expect(rare.pos.y).toBeGreaterThan(WATER_LEVEL - 1.0);
@@ -498,7 +533,7 @@ describe('rare spawn rules', () => {
     const sim = makeSim();
     const rare = createMob(990002, MOBS.mirejaw_the_ravenous, 10, { x: 0, y: 0, z: 0 });
 
-    (sim as any).applyAura(rare, {
+    asHarness(sim).applyAura(rare, {
       id: 'test_root',
       name: 'Test Root',
       kind: 'root',
@@ -506,10 +541,11 @@ describe('rare spawn rules', () => {
       duration: 5,
       value: 0,
       sourceId: sim.playerId,
+      school: 'physical',
     });
     expect(rare.auras.some((a) => a.kind === 'root')).toBe(false);
 
-    (sim as any).applyAura(rare, {
+    asHarness(sim).applyAura(rare, {
       id: 'test_slow',
       name: 'Test Slow',
       kind: 'slow',
@@ -517,6 +553,7 @@ describe('rare spawn rules', () => {
       duration: 5,
       value: 0.5,
       sourceId: sim.playerId,
+      school: 'physical',
     });
     expect(rare.auras.some((a) => a.kind === 'slow')).toBe(true);
   });
@@ -524,7 +561,7 @@ describe('rare spawn rules', () => {
   it('rare respawn timers use their configured multiplier', () => {
     const sim = new Sim({ seed: SEED, playerClass: 'warrior', respawnSeconds: 2 });
     const rare = createMob(990003, MOBS.mirejaw_the_ravenous, 10, { x: 0, y: 0, z: 0 });
-    (sim as any).handleDeath(rare, null);
+    asHarness(sim).handleDeath(rare, null);
     expect(rare.respawnTimer).toBe(1296);
   });
 
@@ -533,18 +570,18 @@ describe('rare spawn rules', () => {
     for (const id of ids) {
       const sim = new Sim({ seed: SEED, playerClass: 'warrior' });
       const mob = createMob(990004, MOBS[id], MOBS[id].maxLevel, { x: 0, y: 0, z: 0 });
-      (sim as any).handleDeath(mob, null);
+      asHarness(sim).handleDeath(mob, null);
       expect(mob.respawnTimer, id).toBe(180);
     }
   });
 
   it('Mogger respawns on a quest-boss timer instead of a long rare-spawn timer', () => {
     const sim = new Sim({ seed: SEED, playerClass: 'warrior', respawnSeconds: 2 });
-    const mogger = [...sim.entities.values()].find(
-      (e) => e.kind === 'mob' && e.templateId === 'mogger',
-    )!;
+    const mogger = expectDefined(
+      [...sim.entities.values()].find((e) => e.kind === 'mob' && e.templateId === 'mogger'),
+    );
 
-    (sim as any).handleDeath(mogger, null);
+    asHarness(sim).handleDeath(mogger, null);
 
     expect(mogger.respawnTimer).toBe(8);
   });
@@ -586,7 +623,9 @@ describe('the Hollow Crypt doors', () => {
     expect(p.pos.x).toBeGreaterThan(DUNGEON_X_THRESHOLD);
 
     // the exit portal sits 6yd behind the entry point — walk into it
-    const exit = [...sim.entities.values()].find((e) => e.templateId === 'dungeon_exit')!;
+    const exit = expectDefined(
+      [...sim.entities.values()].find((e) => e.templateId === 'dungeon_exit'),
+    );
     p.pos.x = exit.pos.x;
     p.pos.z = exit.pos.z + 1.2;
     p.facing = Math.PI;
@@ -608,8 +647,8 @@ describe('the Hollow Crypt doors', () => {
     teleportTo(sim, CRYPT_DOOR_POS.x, CRYPT_DOOR_POS.z - 1, b);
     sim.tick();
 
-    const ea = sim.entities.get(a)!;
-    const eb = sim.entities.get(b)!;
+    const ea = expectDefined(sim.entities.get(a));
+    const eb = expectDefined(sim.entities.get(b));
     expect(ea.pos.x).toBeGreaterThan(DUNGEON_X_THRESHOLD);
     expect(eb.pos.x).toBeGreaterThan(DUNGEON_X_THRESHOLD);
     const slotA = sim.instanceSlotAt(ea.pos);
@@ -630,8 +669,8 @@ describe('the Hollow Crypt doors', () => {
     sim.tick();
     teleportTo(sim, CRYPT_DOOR_POS.x, CRYPT_DOOR_POS.z - 1, b);
     sim.tick();
-    const slotA = sim.instanceSlotAt(sim.entities.get(a)!.pos);
-    const slotB = sim.instanceSlotAt(sim.entities.get(b)!.pos);
+    const slotA = sim.instanceSlotAt(expectDefined(sim.entities.get(a)).pos);
+    const slotB = sim.instanceSlotAt(expectDefined(sim.entities.get(b)).pos);
     expect(slotA).not.toBeNull();
     expect(slotB).not.toBeNull();
     expect(slotA).not.toBe(slotB);
@@ -705,7 +744,7 @@ describe('mob stat scaling', () => {
 describe('boss loot and encounter resets', () => {
   it('boss roll groups drop at most one item from each exclusive table', () => {
     const sim = makeLootSim();
-    const meta = sim.meta(sim.playerId)!;
+    const meta = expectDefined(sim.meta(sim.playerId));
     for (const [bossId, groupId, exactlyOne] of [
       ['morthen', 'morthen_guaranteed_uncommon', true],
       ['morthen', 'morthen_bonus', false],
@@ -721,7 +760,9 @@ describe('boss loot and encounter resets', () => {
       ['korzul_the_gravewyrm', 'korzul_bonus', false],
     ] as const) {
       const template = MOBS[bossId];
-      const groupItems = template.loot.filter((l) => l.rollGroup === groupId).map((l) => l.itemId!);
+      const groupItems = template.loot
+        .filter((l) => l.rollGroup === groupId)
+        .map((l) => expectDefined(l.itemId));
       expect(groupItems.length).toBeGreaterThan(0);
       const mob = createMob(900000, template, 20, { x: 0, y: 0, z: 0 });
       // accessor defeats TS narrowing (mob.loot is assigned null in the loop)
@@ -729,7 +770,7 @@ describe('boss loot and encounter resets', () => {
       const seen = new Set<string>();
       for (let i = 0; i < 300; i++) {
         mob.loot = null;
-        (sim as any).rollLoot(mob, meta);
+        asHarness(sim).rollLoot(mob, meta);
         const dropped = (lootOf(mob)?.items ?? []).filter((s) => groupItems.includes(s.itemId));
         if (exactlyOne) {
           expect(dropped.length, `${bossId}/${groupId} kill #${i}`).toBeGreaterThanOrEqual(1);
@@ -743,7 +784,7 @@ describe('boss loot and encounter resets', () => {
 
   it('dungeon bosses always drop gear but cap bonus quality drops', () => {
     const sim = makeLootSim();
-    const meta = sim.meta(sim.playerId)!;
+    const meta = expectDefined(sim.meta(sim.playerId));
     const lootOf = (m: Entity) => m.loot;
     for (const bossId of [
       'morthen',
@@ -757,7 +798,7 @@ describe('boss loot and encounter resets', () => {
       const mob = createMob(900010, template, template.maxLevel, { x: 0, y: 0, z: 0 });
       for (let i = 0; i < 300; i++) {
         mob.loot = null;
-        (sim as any).rollLoot(mob, meta);
+        asHarness(sim).rollLoot(mob, meta);
         // Gear only: a collectible mount reins (kind 'mount') rides its own
         // independent drop and is exempt from the bonus-gear caps.
         const gear = (lootOf(mob)?.items ?? []).filter((s) => {
@@ -799,7 +840,7 @@ describe('boss loot and encounter resets', () => {
     // Cyra was downed during the fight; her corpse is still on the mob. Classic
     // group rules keep a fallen-but-in-range member in the split (the old bug
     // erased her share for dying). Only Dara, who is far away, is excluded.
-    sim.entities.get(c)!.dead = true;
+    expectDefined(sim.entities.get(c)).dead = true;
     const mob = createMob(990099, MOBS.forest_wolf, 2, { x: 20, y: 0, z: 22 });
     mob.dead = true;
     mob.lootable = true;
@@ -921,11 +962,11 @@ describe('boss loot and encounter resets', () => {
     mob.loot = { copper: 0, items: [{ itemId: 'greyjaw_hide_boots', count: 1 }] };
     sim.entities.set(mob.id, mob);
 
-    const rng = (sim as any).rng;
+    const rng = sim.rng;
     const realInt = rng.int.bind(rng);
     const rolls = [1, 100];
     rng.int = (min: number, max: number) =>
-      min === 1 && max === 100 ? rolls.shift()! : realInt(min, max);
+      min === 1 && max === 100 ? expectDefined(rolls.shift()) : realInt(min, max);
 
     sim.events.length = 0;
     sim.lootCorpse(mob.id, a);
@@ -1104,11 +1145,16 @@ describe('boss loot and encounter resets', () => {
       sim.meta(pid)?.questLog.set('q_boars', { questId: 'q_boars', counts: [0], state: 'active' });
     }
     const mob = createMob(990101, MOBS.wild_boar, 3, { x: 20, y: 0, z: 22 });
-    const boarHide = MOBS.wild_boar.loot.find((entry) => entry.itemId === 'boar_hide')!;
+    const boarHide = expectDefined(
+      MOBS.wild_boar.loot.find((entry) => entry.itemId === 'boar_hide'),
+    );
     const oldChance = boarHide.chance;
     boarHide.chance = 1;
     try {
-      (sim as any).rollLoot(mob, sim.meta(a)!, [sim.meta(a)!, sim.meta(b)!]);
+      asHarness(sim).rollLoot(mob, expectDefined(sim.meta(a)), [
+        expectDefined(sim.meta(a)),
+        expectDefined(sim.meta(b)),
+      ]);
     } finally {
       boarHide.chance = oldChance;
     }
@@ -1179,10 +1225,10 @@ describe('boss loot and encounter resets', () => {
     const mob = createMob(990102, MOBS.wild_boar, 3, { x: 20, y: 0, z: 22 });
     // Inject a (mis)configured drop gated on q_boars but for an item the quest
     // does not collect. It must never drop, even at chance 1.
-    const bogus = { itemId: 'greyjaw_fang', chance: 1, questId: 'q_boars' };
-    MOBS.wild_boar.loot.push(bogus as any);
+    const bogus: LootEntry = { itemId: 'greyjaw_fang', chance: 1, questId: 'q_boars' };
+    MOBS.wild_boar.loot.push(bogus);
     try {
-      (sim as any).rollLoot(mob, sim.meta(a)!, [sim.meta(a)!]);
+      asHarness(sim).rollLoot(mob, expectDefined(sim.meta(a)), [expectDefined(sim.meta(a))]);
     } finally {
       MOBS.wild_boar.loot.pop();
     }
@@ -1196,7 +1242,9 @@ describe('boss loot and encounter resets', () => {
     teleportTo(sim, 45, 515 - 1.2); // walk into the Sunken Bastion door
     sim.tick();
     expect(p.pos.x).toBeGreaterThan(DUNGEON_X_THRESHOLD);
-    const vael = [...sim.entities.values()].find((e) => e.templateId === 'vael_the_mistcaller')!;
+    const vael = expectDefined(
+      [...sim.entities.values()].find((e) => e.templateId === 'vael_the_mistcaller'),
+    );
     const thralls = () =>
       [...sim.entities.values()].filter((e) => e.templateId === 'drowned_thrall').length;
     // pull to 50%: the 60% summon threshold fires one wave of 2 thralls

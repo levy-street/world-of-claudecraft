@@ -44,7 +44,7 @@ describe('horizon apron carries real bathymetry', () => {
     mockWaterShaderAssets();
     const { buildWater } = await import('../src/render/water');
     const { shoreDepthAt, WATER_SEABED_CLAMP_YARDS } = await import('../src/render/water_core');
-    const { WORLD_SIZE, WORLD_MAX_Z, WORLD_MIN_Z } = await import('../src/sim/data');
+    const { WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z } = await import('../src/sim/data');
     await Promise.resolve();
 
     const view = buildWater(SEED);
@@ -57,7 +57,9 @@ describe('horizon apron carries real bathymetry', () => {
 
     // Every apron vertex sitting INSIDE the world must read what the seabed
     // actually is there, which is what the zone plane covering it reads.
-    const half = WORLD_SIZE / 2;
+    // The FULL world rect, side columns included (WORLD_SIZE / 2 is one
+    // column's half-width and left the outer coasts unguarded).
+    const half = WORLD_MAX_X;
     let insideChecked = 0;
     let worstError = 0;
     for (let i = 0; i < pos.count; i++) {
@@ -90,7 +92,7 @@ describe('horizon apron carries real bathymetry', () => {
     mockWaterShaderAssets();
     const { buildWater } = await import('../src/render/water');
     const { WATER_FOAM_WIDTH_YARDS } = await import('../src/render/water_core');
-    const { WORLD_SIZE, WORLD_MAX_Z, WORLD_MIN_Z } = await import('../src/sim/data');
+    const { WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z } = await import('../src/sim/data');
     await Promise.resolve();
 
     const view = buildWater(SEED);
@@ -102,7 +104,9 @@ describe('horizon apron carries real bathymetry', () => {
     // Only OUTSIDE the world, where the apron is the surface you actually see.
     // Inside it, the apron lies under the zone plane and correctly mirrors that
     // plane's own shelf and surf.
-    const half = WORLD_SIZE / 2;
+    // The FULL world rect, side columns included (WORLD_SIZE / 2 is one
+    // column's half-width and left the outer coasts unguarded).
+    const half = WORLD_MAX_X;
     // The shader reads surf as depth/slope, so a slope of zero or a constant
     // slope against real shelf depths would flood the open sea with foam.
     let checked = 0;
@@ -120,6 +124,75 @@ describe('horizon apron carries real bathymetry', () => {
     }
     expect(checked).toBeGreaterThan(1000);
     expect(foamOnOpenWater).toBe(0);
+    view.dispose();
+  });
+});
+
+// The apron is thousands of yards across, so a single mesh's bounds intersect
+// the frustum from every camera in the world and every kept triangle is
+// submitted every frame, most of it behind the view. It is drawn as a grid of
+// blocks over ONE vertex buffer instead. Two things can go wrong silently: a
+// block whose bounds are the WHOLE sheet culls nothing (the split becomes pure
+// added draw calls), and a partition that loses or repeats a quad puts a hole
+// or a double-blended patch in the open sea.
+describe('horizon apron draws as frustum-cullable blocks', () => {
+  it('splits into blocks with their own tight bounds, over one shared buffer', async () => {
+    vi.resetModules();
+    mockWaterShaderAssets();
+    const { buildWater } = await import('../src/render/water');
+    const { buildWaterSurfaceIndex } = await import('../src/render/water_core');
+    await Promise.resolve();
+
+    const view = buildWater(SEED);
+    // Before any zone streams in, every visible mesh is an apron block (the
+    // from-below twins are built hidden).
+    const blocks = view.meshes.filter((m) => m.visible);
+    expect(blocks.length).toBeGreaterThan(1);
+
+    const material = blocks[0].material;
+    const position = blocks[0].geometry.attributes.position as THREE.BufferAttribute;
+    const columns = Math.round(Math.sqrt(position.count));
+    expect(columns * columns).toBe(position.count);
+
+    let sheetMinX = Number.POSITIVE_INFINITY;
+    let sheetMaxX = Number.NEGATIVE_INFINITY;
+    for (let i = 0; i < position.count; i++) {
+      sheetMinX = Math.min(sheetMinX, position.getX(i));
+      sheetMaxX = Math.max(sheetMaxX, position.getX(i));
+    }
+    const sheetWidth = sheetMaxX - sheetMinX;
+    expect(sheetWidth).toBeGreaterThan(1000);
+
+    let drawn = 0;
+    let coverMinX = Number.POSITIVE_INFINITY;
+    let coverMaxX = Number.NEGATIVE_INFINITY;
+    for (const block of blocks) {
+      // One material and one program: the split must not multiply state.
+      expect(block.material).toBe(material);
+      // One vertex buffer: the blocks index into the SAME upload, so the
+      // build-time bake and the editor refit still write through all of them.
+      expect(block.geometry.attributes.position).toBe(position);
+      expect(block.renderOrder).toBeLessThan(0);
+      const box = block.geometry.boundingBox;
+      expect(box, 'a block without bounds can never be culled').not.toBeNull();
+      if (!box) continue;
+      // Tight: a block spanning the whole sheet defeats the entire split.
+      expect(box.max.x - box.min.x).toBeLessThan(sheetWidth * 0.75);
+      expect(box.max.z - box.min.z).toBeLessThan(sheetWidth * 0.75);
+      // And it must reach the surface it draws, including the swell lift.
+      expect(box.min.y).toBeLessThan(-0.65);
+      expect(box.max.y).toBeGreaterThan(0.65);
+      coverMinX = Math.min(coverMinX, box.min.x);
+      coverMaxX = Math.max(coverMaxX, box.max.x);
+      drawn += block.geometry.getIndex()?.count ?? 0;
+    }
+    // Together the blocks still span the sheet, and still draw exactly the
+    // triangle set the whole-sheet dry-tile cull would have drawn.
+    expect(coverMinX).toBeCloseTo(sheetMinX, 3);
+    expect(coverMaxX).toBeCloseTo(sheetMaxX, 3);
+    const depth = blocks[0].geometry.attributes.aShoreDepth as THREE.BufferAttribute;
+    const whole = buildWaterSurfaceIndex(depth.array as Float32Array, columns, columns);
+    expect(drawn).toBe(whole === null ? (columns - 1) * (columns - 1) * 6 : whole.length);
     view.dispose();
   });
 });

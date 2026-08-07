@@ -22,7 +22,7 @@ export function footstepSurfaceAt(
 ): Surface {
   if (x > DUNGEON_X_THRESHOLD) return 'stone';
   if (isOnDockDeck(x, z)) return 'wood';
-  const waterLevel = waterLevelAt(x, z);
+  const waterLevel = waterLevelAt(x, z, seed);
   if (groundHeight(x, z, seed) < waterLevel && y <= waterLevel + 0.3) return 'water';
   const biome = zoneBiomeAt(x, z);
   if (biome === 'vale') return 'grass';

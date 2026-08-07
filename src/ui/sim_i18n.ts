@@ -196,6 +196,15 @@ const baseEnTable = {
   'error.townFocusNotInTown': 'You must be in town to set your focus.',
   'error.townFocusOverBudget': 'That allocation exceeds your focus point budget.',
   'error.townFocusInvalid': 'Invalid focus allocation.',
+  // #1144: the chosen re-spec payment tier's coin/material cost is unaffordable.
+  'error.townFocusCannotAfford': 'You cannot afford that focus re-spec.',
+  // #1144: the 'time'/'timeAndPartial' tiers queue the reallocation instead of
+  // committing it immediately; these three cover the queue/resolve lifecycle
+  // (see Sim.setTownFocus / updateTownFocusRespec in src/sim/sim.ts).
+  'log.townFocusRespecQueued': 'Your focus re-spec will complete in {seconds}s.',
+  'log.townFocusRespecComplete': 'Your focus re-spec is complete.',
+  'error.townFocusRespecCancelled':
+    'You could not afford your pending focus re-spec, so it was cancelled.',
   // Custom per-item ground-pickup lines (src/sim/content/ground_pickup_lines.ts).
   // Emitted via def.pickupDeny/def.pickupEnough (variable-routed, so the S3 guard
   // cannot see them); values must stay byte-identical to that table for the EXACT
@@ -1328,6 +1337,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.enraged': 'Enfurecido',
     'aura.icicles': 'Carámbanos',
     'aura.perfectMoment': 'Momento perfecto',
+    'error.uniqueEquipped': 'Solo puedes equiparte uno de esos.',
+    'error.townFocusCannotAfford': 'No puedes pagar ese reajuste de enfoque.',
+    'log.townFocusRespecComplete': 'Tu reajuste de enfoque se ha completado.',
   },
   es_ES: {
     'error.guildBankNoGuild': 'Debes estar en una hermandad para usar el banco de la hermandad.',
@@ -1766,6 +1778,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.wintersChill': 'Frío Invernal',
     'aura.icicles': 'Carámbanos',
     'aura.perfectMoment': 'Momento perfecto',
+    'error.uniqueEquipped': 'Solo puedes llevar equipado uno de esos.',
+    'error.townFocusCannotAfford': 'No puedes costear ese reajuste de enfoque.',
+    'log.townFocusRespecComplete': 'Tu reajuste de enfoque ha terminado.',
   },
   fr_FR: {
     'error.guildBankNoGuild': 'Vous devez être dans une guilde pour utiliser la banque de guilde.',
@@ -2213,6 +2228,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.wintersChill': 'Froid hivernal',
     'aura.icicles': 'Stalactites de glace',
     'aura.perfectMoment': 'Moment parfait',
+    'error.uniqueEquipped': 'Vous ne pouvez en équiper qu’un seul de ce type.',
+    'error.townFocusCannotAfford': "Vous n'avez pas les moyens de cette respécialisation de focus.",
+    'log.townFocusRespecComplete': 'Votre respécialisation de focus est terminée.',
   },
   fr_CA: {
     'error.guildBankNoGuild': 'Vous devez être dans une guilde pour utiliser la banque de guilde.',
@@ -2660,6 +2678,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.wintersChill': 'Froid hivernal',
     'aura.icicles': 'Stalactites de glace',
     'aura.perfectMoment': 'Moment parfait',
+    'error.uniqueEquipped': 'Vous ne pouvez porter qu’un seul objet de ce type.',
+    'error.townFocusCannotAfford':
+      'Vous n’avez pas assez de moyens pour cette respécialisation de focus.',
+    'log.townFocusRespecComplete': 'Votre respécialisation de focus est complétée.',
   },
   en_CA: {
     'log.seaFatigue': 'The open sea saps your strength. Swim back to shore!',
@@ -3291,6 +3313,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.wintersChill': 'Gelo Invernale',
     'aura.icicles': 'Ghiaccioli',
     'aura.perfectMoment': 'Momento Perfetto',
+    'error.uniqueEquipped': 'Puoi equipaggiarne solo uno di quel tipo.',
+    'error.townFocusCannotAfford': 'Non puoi permetterti quella rispecializzazione del focus.',
+    'log.townFocusRespecComplete': 'La tua rispecializzazione del focus è completata.',
   },
   de_DE: {
     'error.guildBankNoGuild': 'Ihr müsst in einer Gilde sein, um die Gildenbank zu benutzen.',
@@ -3734,6 +3759,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.wintersChill': 'Winterkälte',
     'aura.icicles': 'Eiszapfen',
     'aura.perfectMoment': 'Perfekter Moment',
+    'error.uniqueEquipped': 'Du kannst davon nur eins ausrüsten.',
+    'error.townFocusCannotAfford': 'Du kannst dir diese Fokus-Neuverteilung nicht leisten.',
+    'log.townFocusRespecComplete': 'Deine Fokus-Neuverteilung ist abgeschlossen.',
   },
   zh_CN: {
     'error.guildBankNoGuild': '你必须加入公会才能使用公会银行。',
@@ -4159,6 +4187,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.wintersChill': '凛冬之寒',
     'aura.icicles': '冰锥',
     'aura.perfectMoment': '完美时刻',
+    'error.uniqueEquipped': '你只能装备一个此类物品。',
+    'error.townFocusCannotAfford': '你负担不起这次专注重置。',
+    'log.townFocusRespecComplete': '你的专注重置已完成。',
   },
   zh_TW: {
     'error.guildBankNoGuild': '你必須加入公會才能使用公會銀行。',
@@ -4584,6 +4615,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.wintersChill': '凜冬之寒',
     'aura.icicles': '冰錐',
     'aura.perfectMoment': '完美時刻',
+    'error.uniqueEquipped': '你只能裝備一個此類物品。',
+    'error.townFocusCannotAfford': '你負擔不起這次專注重置。',
+    'log.townFocusRespecComplete': '你的專注重置已完成。',
   },
   ko_KR: {
     'error.guildBankNoGuild': '길드 은행을 사용하려면 길드에 소속되어 있어야 합니다.',
@@ -5018,6 +5052,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.wintersChill': '겨울의 한기',
     'aura.icicles': '고드름',
     'aura.perfectMoment': '완벽한 순간',
+    'error.uniqueEquipped': '그런 것은 하나만 장착할 수 있습니다.',
+    'error.townFocusCannotAfford': '해당 집중 재설정 비용을 감당할 수 없습니다.',
+    'log.townFocusRespecComplete': '집중 재설정이 완료되었습니다.',
   },
   ja_JP: {
     'error.guildBankNoGuild': 'ギルド銀行を利用するにはギルドに加入している必要があります。',
@@ -5461,6 +5498,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.wintersChill': '冬の凍え',
     'aura.icicles': '氷柱',
     'aura.perfectMoment': '完璧な瞬間',
+    'error.uniqueEquipped': 'その種類は1つだけ装備できます。',
+    'error.townFocusCannotAfford': 'そのフォーカス再設定を支払えません。',
+    'log.townFocusRespecComplete': 'フォーカス再設定が完了しました。',
   },
   pt_BR: {
     'error.guildBankNoGuild': 'Você precisa estar em uma guilda para usar o banco da guilda.',
@@ -5897,6 +5937,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.wintersChill': 'Frio do Inverno',
     'aura.icicles': 'Pingentes de Gelo',
     'aura.perfectMoment': 'Momento Perfeito',
+    'error.uniqueEquipped': 'Você só pode equipar um desses.',
+    'error.townFocusCannotAfford': 'Você não pode pagar essa redefinição de foco.',
+    'log.townFocusRespecComplete': 'Sua redefinição de foco foi concluída.',
   },
   ru_RU: {
     'error.guildBankNoGuild': 'Чтобы пользоваться банком гильдии, нужно состоять в гильдии.',
@@ -6339,6 +6382,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.wintersChill': 'Зимний холод',
     'aura.icicles': 'Сосульки',
     'aura.perfectMoment': 'Идеальный миг',
+    'error.uniqueEquipped': 'Можно экипировать только один такой предмет.',
+    'error.townFocusCannotAfford': 'Вам не хватает средств на эту смену фокуса.',
+    'log.townFocusRespecComplete': 'Смена фокуса завершена.',
   },
   ...BASE_NEW,
   cs_CZ: {
@@ -10014,6 +10060,11 @@ function locTalentTail(s: string): string {
 
 type Rule = { re: RegExp; build: (m: RegExpExecArray) => string };
 const RULES: Rule[] = [
+  // #1144: timed town-focus re-spec queued (Sim.setTownFocus).
+  {
+    re: /^Your focus re-spec will complete in (\d+)s\.$/,
+    build: (m) => tSim('log.townFocusRespecQueued', { seconds: m[1] }),
+  },
   // Ready-check result summary (social/ready_check.ts finalizeReadyCheck).
   {
     re: /^Ready check: (\d+) ready, (\d+) not ready, (\d+) no response\.$/,

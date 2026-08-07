@@ -48,6 +48,8 @@ function info(over: Partial<MarketInfo> = {}): MarketInfo {
     pageCount: 1,
     collectionCopper: 0,
     collectionItems: [],
+    collectionSales: [],
+    collectionSalesOmitted: 0,
     cutPct: 5,
     maxListings: 10,
     myListingCount: 0,
@@ -342,6 +344,74 @@ describe('market_view: collect states', () => {
     expect(body.rows[0].count).toBe(3);
   });
 
+  it('itemizes the sales behind the proceeds line', () => {
+    const body = buildMarketCollect(
+      info({
+        collectionCopper: 1140,
+        collectionSales: [
+          { itemId: 'bone_fragments', count: 3, price: 200, proceeds: 190, buyerName: 'Buyer' },
+          { itemId: 'wolf_fang', count: 1, price: 1000, proceeds: 950, buyerName: 'Someone' },
+        ],
+      }),
+    );
+    expect(body.state).toBe('items');
+    if (body.state !== 'items') return;
+    expect(body.sales.map((s) => [s.item.id, s.count, s.proceeds, s.buyerName])).toEqual([
+      ['bone_fragments', 3, 190, 'Buyer'],
+      ['wolf_fang', 1, 950, 'Someone'],
+    ]);
+    expect(body.salesOmitted).toBe(0);
+    expect(body.rows).toEqual([]);
+  });
+
+  it('carries the sim ledger cap through as an omitted count', () => {
+    const body = buildMarketCollect(
+      info({
+        collectionCopper: 500,
+        collectionSales: [
+          { itemId: 'wolf_fang', count: 1, price: 200, proceeds: 190, buyerName: 'Buyer' },
+        ],
+        collectionSalesOmitted: 4,
+      }),
+    );
+    if (body.state !== 'items') throw new Error('expected an items body');
+    expect(body.sales.length).toBe(1);
+    expect(body.salesOmitted).toBe(4);
+  });
+
+  it('counts a sale of a retired item id as omitted rather than dropping it silently', () => {
+    const body = buildMarketCollect(
+      info({
+        collectionCopper: 500,
+        collectionSales: [
+          { itemId: 'gone', count: 1, price: 200, proceeds: 190, buyerName: 'Buyer' },
+          { itemId: 'wolf_fang', count: 1, price: 400, proceeds: 380, buyerName: 'Buyer' },
+        ],
+        collectionSalesOmitted: 1,
+      }),
+    );
+    if (body.state !== 'items') throw new Error('expected an items body');
+    expect(body.sales.map((s) => s.item.id)).toEqual(['wolf_fang']);
+    // 1 dropped by the sim's cap plus the 1 this view could not name.
+    expect(body.salesOmitted).toBe(2);
+  });
+
+  // A 1-copper listing nets 0 after the Merchant's cut: gold-only emptiness would
+  // hide the row entirely, and the tab would claim nothing is waiting.
+  it('is NOT empty when a zero-proceeds sale is the only thing waiting', () => {
+    const body = buildMarketCollect(
+      info({
+        collectionSales: [
+          { itemId: 'wolf_fang', count: 1, price: 1, proceeds: 0, buyerName: 'Buyer' },
+        ],
+      }),
+    );
+    expect(body.state).toBe('items');
+    if (body.state !== 'items') return;
+    expect(body.proceeds).toBe(0);
+    expect(body.sales.length).toBe(1);
+  });
+
   it('counts the collect badge: a proceeds purse plus each returned stack', () => {
     expect(marketCollectBadgeCount(null)).toBe(0);
     expect(marketCollectBadgeCount(info())).toBe(0);
@@ -356,6 +426,28 @@ describe('market_view: collect states', () => {
         }),
       ),
     ).toBe(3);
+  });
+
+  it('counts the purse ONCE however many sales fill it, and once for a 0-copper sale', () => {
+    const sales = [
+      { itemId: 'wolf_fang', count: 1, price: 200, proceeds: 190, buyerName: 'Buyer' },
+      { itemId: 'bone_fragments', count: 1, price: 200, proceeds: 190, buyerName: 'Buyer' },
+    ];
+    // Three sales' worth of gold is still one purse, so the badge reads 1, not 3.
+    expect(marketCollectBadgeCount(info({ collectionCopper: 380, collectionSales: sales }))).toBe(
+      1,
+    );
+    // A sale that netted no copper still fills the purse slot: the tab has a row.
+    expect(
+      marketCollectBadgeCount(
+        info({
+          collectionCopper: 0,
+          collectionSales: [
+            { itemId: 'wolf_fang', count: 1, price: 1, proceeds: 0, buyerName: 'Buyer' },
+          ],
+        }),
+      ),
+    ).toBe(1);
   });
 });
 

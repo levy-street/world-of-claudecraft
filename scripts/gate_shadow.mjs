@@ -29,22 +29,15 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   chunkFileArgs,
+  collectSuiteVisibility,
   compareSelection,
   filterExisting,
   listChangedPaths,
-  listTestFiles,
   resolveSelectBase,
 } from './lib/gate_discovery.mjs';
 import { resolveAvailableMemoryBytes } from './lib/gate_memory.mjs';
 import { buildSelectPlan } from './lib/gate_select_plan.mjs';
 import { computeGateWorkers, resolveGateWorkerTierCap } from './lib/gate_workers.mjs';
-import {
-  buildAlwaysRunSet,
-  buildHelperImportPattern,
-  classifyTestSource,
-  FS_HELPER_DIRS,
-  HELPER_FS_PATTERN,
-} from './lib/test_visibility.mjs';
 
 const shell = process.platform === 'win32';
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -103,30 +96,17 @@ function runVitest(tag, args) {
   return { ran, failed };
 }
 
-const io = { root: repoRoot, readdirSync, join: path.join, relative: path.relative, sep: path.sep };
-
-const fsHelpers = FS_HELPER_DIRS.flatMap((dir) => {
-  const full = path.join(repoRoot, dir);
-  try {
-    return readdirSync(full, { withFileTypes: true })
-      .filter((e) => e.isFile() && /\.[cm]?ts$/.test(e.name) && !/\.(test|spec)\./.test(e.name))
-      .filter((e) => HELPER_FS_PATTERN.test(readFileSync(path.join(full, e.name), 'utf8')))
-      .map((e) => `${dir}/${e.name.replace(/\.[cm]?ts$/, '')}`);
-  } catch {
-    return [];
-  }
+// One shared classification with gate_select.mjs and the CI shard runner
+// (lib/gate_discovery.mjs): the validator must reason over the same suite as
+// the gates it validates.
+const { alwaysRun } = collectSuiteVisibility({
+  root: repoRoot,
+  readdirSync,
+  readFileSync,
+  join: path.join,
+  relative: path.relative,
+  sep: path.sep,
 });
-const helperImportPattern = buildHelperImportPattern(fsHelpers);
-
-const testFiles = listTestFiles({ ...io, dir: path.join(repoRoot, 'tests') });
-const { alwaysRun } = buildAlwaysRunSet(
-  testFiles.map((file) => ({
-    file,
-    visibility: classifyTestSource(readFileSync(path.join(repoRoot, file), 'utf8'), {
-      helperImportPattern,
-    }),
-  })),
-);
 
 const { base, reason: baseReason } = resolveSelectBase({ env: process.env, run: git });
 if (!base) {
@@ -141,7 +121,11 @@ try {
   process.exit(1);
 }
 
-const plan = buildSelectPlan({ changedPaths, alwaysRunFiles: alwaysRun });
+const plan = buildSelectPlan({
+  changedPaths,
+  alwaysRunFiles: alwaysRun,
+  exists: (f) => existsSync(path.join(repoRoot, f)),
+});
 console.log(`[gate:shadow] base=${base} (${baseReason}); plan mode=${plan.mode} (${plan.reason})`);
 if (plan.mode === 'full') {
   console.log('[gate:shadow] planner already falls back to the full suite: no escape possible.');

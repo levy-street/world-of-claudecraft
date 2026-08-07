@@ -1,7 +1,7 @@
 // The height a moving body actually rides over a spot, for slope gating: the
-// waterline wherever the ground is submerged (inside a declared water body;
-// waterLevelAt() is -Infinity everywhere else, so dry land is untouched), the
-// ground itself otherwise. Swimmers and waders float over the bed, so gating
+// waterline wherever the ground is submerged (inside a declared water body or
+// the generator-carved open sea; waterLevelAt() is -Infinity everywhere else,
+// so dry land is untouched), the ground itself otherwise. Swimmers and waders float over the bed, so gating
 // their steps on the RAW lakebed height reads an uneven bed as a wall of
 // cliffs: a wading player (too shallow to swim, ground within
 // PLAYER_SWIM_DEPTH of the waterline) gets every step blocked and is eternally
@@ -12,13 +12,13 @@
 import { groundHeight, STEEPNESS_SAMPLE, terrainSteepnessAt, waterLevelAt } from './world';
 
 // Clamp an already-sampled ground height to the local waterline.
-export function rideHeight(x: number, z: number, h: number): number {
-  const wl = waterLevelAt(x, z);
+export function rideHeight(x: number, z: number, h: number, seed: number): number {
+  const wl = waterLevelAt(x, z, seed);
   return h < wl ? wl : h;
 }
 
 export function rideHeightAt(x: number, z: number, seed: number): number {
-  return rideHeight(x, z, groundHeight(x, z, seed));
+  return rideHeight(x, z, groundHeight(x, z, seed), seed);
 }
 
 // The waterline governing a STEP between two points: the higher of the two
@@ -27,17 +27,20 @@ export function rideHeightAt(x: number, z: number, seed: number): number {
 // submerged bed just OUTSIDE a footprint must be able to step back in, so the
 // step rides the body's surface if either end has one. Both ends dry gives
 // -Infinity (no clamp anywhere on land).
-export function stepWaterLevel(x0: number, z0: number, x1: number, z1: number): number {
-  return Math.max(waterLevelAt(x0, z0), waterLevelAt(x1, z1));
+export function stepWaterLevel(
+  x0: number,
+  z0: number,
+  x1: number,
+  z1: number,
+  seed: number,
+): number {
+  return Math.max(waterLevelAt(x0, z0, seed), waterLevelAt(x1, z1, seed));
 }
 
 // Feet-under-water test: the ground at (x, z) sits below a live waterline.
 // Weaker than isSwimming (any submerged depth, not just swimmable depth).
-// Order matters for the hot paths: waterLevelAt is a cheap footprint scan
-// (-Infinity outside every declared lake), so the whole dry world answers
-// false without ever sampling the full terrain stack.
 export function isSubmergedAt(x: number, z: number, seed: number): boolean {
-  const wl = waterLevelAt(x, z);
+  const wl = waterLevelAt(x, z, seed);
   return wl !== -Infinity && groundHeight(x, z, seed) < wl;
 }
 
@@ -78,7 +81,7 @@ export function shoreStepOut(
 ): boolean {
   // The STEP waterline, so a mover on the submerged bed just outside a
   // footprint (real water continuing past the rect) gets the same pull-out.
-  const wl = stepWaterLevel(x0, z0, nx, nz);
+  const wl = stepWaterLevel(x0, z0, nx, nz, seed);
   return (
     // the cheap footprint test first: dry land (waterline -Infinity) answers
     // false before any terrain sampling (this runs inside the movement gates)

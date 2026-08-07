@@ -35,9 +35,12 @@ lets the same `sim/` run offline, on the server, and headless.
   to "not `sim/`": (a) `render/` may import **pure, deterministic** sim geometry/data
   helpers so it shares the sim's terrain/movement math instead of re-deriving it
   (exemplars: `sim/world` terrain heights, `sim/player_motion` run by the
-  display-only self extrapolator `render/self_motion.ts`, `sim/data`; enumerate the
-  live set with `grep -rn "from '.*sim/" src/render`); reaching into mutable `Sim`
-  state or `sim/sim.ts` logic stays forbidden. (b) `render`/`game` use `ui/`'s
+  display-only self extrapolator `render/self_motion.ts`, `sim/data`, and the
+  placement readouts for anything the sim COLLIDES with, so the mesh and the
+  collider come from one list: `colliders.bankerChestSpots`,
+  `colliders.streetlampPlacements` + its `sim/streetlamp_layout`/`streetlamp_style`
+  leaves; enumerate the live set with `grep -rn "from '.*sim/" src/render`);
+  reaching into mutable `Sim` state or `sim/sim.ts` logic stays forbidden. (b) `render`/`game` use `ui/`'s
   i18n + icon surface (`t`, `tEntity`, `ui/icons`).
 - `net/` -> `sim/` (types plus **pure display helpers** such as `abilitiesKnownAt`/
   `computeQuestState`; the server re-validates everything) + `world_api.ts`

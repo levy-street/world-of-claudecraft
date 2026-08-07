@@ -1128,6 +1128,64 @@ export const TARGETS = [
     },
   },
   {
+    key: 'stack-size-tooltip',
+    label: 'A single potion hovered in the bags, with the Max stack line',
+    when: ['stack_size_tooltip'],
+    // Desktop only, the material-usedby precedent: the synthetic hover path
+    // does not raise #tooltip on the touch layout, and the tooltip content is
+    // byte-identical on mobile anyway. ONE copy on purpose: the line exists
+    // for the player with no stack badge to learn from.
+    async capture(page) {
+      // Same SwiftShader boot patience as the material-usedby recipe: wait
+      // for the boot hook, then clear the overlays a late boot re-raises.
+      await page.waitForFunction(() => window.__game?.sim?.player, { timeout: 90000 });
+      await dismissEntryOverlays(page);
+      await page.evaluate(() => {
+        const sim = window.__game?.sim;
+        try {
+          sim?.addItem('silverleaf_healing_draught', 1);
+        } catch {}
+        const el = document.querySelector('#bags');
+        if (el) el.style.display = 'none';
+        window.__game?.hud?.toggleBags?.();
+      });
+      await pollForSize(page, '#bags');
+      // Hover through the REAL pointer path so the tooltip is the one a
+      // player sees, not a hand-built string.
+      await page.evaluate(() => {
+        const cells = [...document.querySelectorAll('#bags *')];
+        const el = cells.find((c) => {
+          const bg = c instanceof HTMLElement ? c.style.backgroundImage : '';
+          const img = c.querySelector?.('img');
+          return (
+            (bg && bg.includes('silverleaf_healing_draught')) ||
+            (img && img.getAttribute('src')?.includes('silverleaf_healing_draught'))
+          );
+        });
+        if (!el) return;
+        const r = el.getBoundingClientRect();
+        for (const type of [
+          'pointerenter',
+          'pointerover',
+          'mouseenter',
+          'mouseover',
+          'pointermove',
+          'mousemove',
+        ]) {
+          el.dispatchEvent(
+            new MouseEvent(type, {
+              bubbles: true,
+              clientX: r.left + r.width / 2,
+              clientY: r.top + r.height / 2,
+            }),
+          );
+        }
+      });
+      await wait(600);
+      return { clip: '#ui' };
+    },
+  },
+  {
     key: 'material-usedby-tooltip',
     label: 'Rough Hide tooltip with the Used-by craft affinity line',
     when: [
@@ -1180,6 +1238,69 @@ export const TARGETS = [
           return (
             (bg && bg.includes('rough_hide')) ||
             (img && img.getAttribute('src')?.includes('rough_hide'))
+          );
+        });
+        if (!el) return;
+        const r = el.getBoundingClientRect();
+        for (const type of [
+          'pointerenter',
+          'pointerover',
+          'mouseenter',
+          'mouseover',
+          'pointermove',
+          'mousemove',
+        ]) {
+          el.dispatchEvent(
+            new MouseEvent(type, {
+              bubbles: true,
+              clientX: r.left + r.width / 2,
+              clientY: r.top + r.height / 2,
+            }),
+          );
+        }
+      });
+      await wait(600);
+      return { clip: '#ui' };
+    },
+  },
+  {
+    key: 'elixir-use-tooltip',
+    label: 'Elixir of the Boar tooltip with its Use line',
+    when: ['ui/elixir_tooltip_view'],
+    // Desktop only, the material-usedby-tooltip rationale: the synthetic
+    // hover path does not raise #tooltip on the touch layout, and the
+    // tooltip content is byte-identical on mobile.
+    async capture(page) {
+      // Same SwiftShader boot patience as the material-usedby recipe: wait
+      // for the boot hook, then clear the overlays a late boot re-raises.
+      await page.waitForFunction(() => window.__game?.sim?.player, { timeout: 90000 });
+      await dismissEntryOverlays(page);
+      await page.evaluate(() => {
+        const sim = window.__game?.sim;
+        // The boar elixir is the reported item; the serpent rung beside it
+        // shows the ladder's top numbers on the same shot.
+        for (const id of ['elixir_of_the_boar', 'elixir_of_the_serpent']) {
+          try {
+            sim?.addItem(id, 1);
+          } catch {}
+        }
+        const el = document.querySelector('#bags');
+        if (el) el.style.display = 'none';
+        window.__game?.hud?.toggleBags?.();
+      });
+      await pollForSize(page, '#bags');
+      // Hover the boar elixir through the REAL pointer path so the tooltip
+      // is the one a player sees, not a hand-built string.
+      await page.evaluate(() => {
+        const cells = [...document.querySelectorAll('#bags *')];
+        const el = cells.find((c) => {
+          const bg = c instanceof HTMLElement ? c.style.backgroundImage : '';
+          const img = c.querySelector?.('img');
+          const aria = c.getAttribute?.('aria-label') ?? '';
+          return (
+            (bg && bg.includes('elixir_of_the_boar')) ||
+            (img && img.getAttribute('src')?.includes('elixir_of_the_boar')) ||
+            aria.startsWith('Elixir of the Boar')
           );
         });
         if (!el) return;
@@ -2464,6 +2585,63 @@ export const TARGETS = [
       });
       const open = await pollForSize(page, '#market-window');
       return open ? { clip: '#market-window' } : {};
+    },
+  },
+  {
+    key: 'market-collect-ledger',
+    label: 'World Market Collect tab (itemized sale ledger under the proceeds line)',
+    when: ['ui/market_window', 'ui/market_view', 'sim/market'],
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    // Offline there is only one player and nobody can buy their own listing, so a real
+    // sale cannot be driven from the client: seed the seller's collection directly (the
+    // snapshots-fixture precedent) with proceeds, an itemized ledger, and one returned
+    // stack, then open the Collect tab. The `sales` key is simply ignored on the BASE
+    // commit, which is the contrast this pair is for: same purse, no itemization.
+    async capture(page) {
+      await page.evaluate(() => {
+        const sim = window.__game?.sim;
+        const p = sim?.player;
+        if (p?.pos) {
+          p.pos.x = 0;
+          p.pos.z = 11.5;
+        }
+        const meta = sim?.players?.get(p?.id);
+        const key = String(meta?.characterId ?? meta?.entityId ?? p?.id);
+        const sale = (itemId, count, price, buyerName) => ({
+          itemId,
+          count,
+          price,
+          proceeds: Math.floor(price * 0.95),
+          buyerName,
+        });
+        sim?.market?.marketCollections?.set(key, {
+          copper: 950 + 2850 + 1140,
+          items: [{ itemId: 'bone_fragments', count: 3 }],
+          sales: {
+            entries: [
+              sale('wolf_fang', 1, 1000, 'Rhaelin'),
+              sale('greyjaw_pelt_cloak', 1, 3000, 'Torvald'),
+              sale('roasted_boar', 4, 1200, 'Mirelle'),
+            ],
+            omitted: 0,
+          },
+        });
+        const el = document.querySelector('#market-window');
+        if (el) el.style.display = 'none';
+        window.__game?.hud?.openMarket?.();
+        const bags = document.querySelector('#bags');
+        if (bags) bags.style.display = 'none';
+      });
+      if (!(await pollForSize(page, '#market-window'))) return {};
+      const opened = await page.evaluate(() => {
+        const tab = document.querySelector('#market-window [data-tab="collect"]');
+        if (!tab) return false;
+        tab.click();
+        return true;
+      });
+      if (!opened) return {};
+      await wait(300);
+      return { clip: '#market-window' };
     },
   },
   {
@@ -6664,6 +6842,202 @@ export const TARGETS = [
     },
   },
   {
+    key: 'bow-cast-pose',
+    label: 'Hunter mid-cast with a bow: the drawn hold, not the caster gesture',
+    when: ['render/characters/skin_attack', 'players/bow_hold_anim', 'build_bow_hold_anim'],
+    variants: [{ key: 'long-draw-desktop', charClass: 'hunter', charName: 'Drawick' }],
+    async capture(page, _variant) {
+      // Entry is async: stage against the world global, not a fixed settle.
+      await page.waitForFunction(() => !!window.__game?.sim?.player, {
+        timeout: 90000,
+        polling: 250,
+      });
+      await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        document.querySelector('#gpu-notice')?.remove();
+      });
+      await wait(300);
+      const staged = await page.evaluate(() => {
+        const game = window.__game;
+        const sim = game?.sim;
+        const player = sim?.player;
+        if (!game || !sim || !player) return { ok: false, reason: 'offline world unavailable' };
+        sim.setPlayerLevel?.(60, player.id);
+        sim.addItem('direfang_greatblade', 1);
+        sim.equipItem('direfang_greatblade');
+        sim.changeWeaponSkin('winterbite');
+        return { ok: true };
+      });
+      if (!staged.ok) throw new Error(`bow cast staging failed: ${staged.reason}`);
+      // Level-up deed banners cross mid-screen for seconds after the grant.
+      await wait(9000);
+      await page.evaluate(() => {
+        const b = document.querySelector('#banner');
+        if (b) b.style.display = 'none';
+        const game = window.__game;
+        const sim = game?.sim;
+        const p = sim?.player;
+        if (game?.input) game.input.camDist = 6;
+        // Long Draw is a 35yd damage cast and the nearest spawn sits past it.
+        let best = null;
+        let bestD = Infinity;
+        for (const e of sim?.entities?.values?.() ?? []) {
+          if (e === p || e.kind !== 'mob' || e.dead) continue;
+          const d = Math.hypot(e.pos.x - p.pos.x, e.pos.z - p.pos.z);
+          if (d < bestD) {
+            bestD = d;
+            best = e;
+          }
+        }
+        if (best) {
+          // 15yd: outside Long Draw's minRange 8 dead zone (the classic ranged
+          // rule casting_lifecycle enforces, and the reason a 6yd stance was
+          // refused with no error line) and well inside its 35yd range.
+          p.pos.x = best.pos.x - 15;
+          p.pos.z = best.pos.z;
+          // prevPos MUST follow the teleport (tests/CLAUDE.md's recipe). Without
+          // it the next tick sees a 40yd delta, reads the player as moving, and
+          // movement cancels the cast: the whole reason this shot would not fire.
+          p.prevPos = { ...p.pos };
+          p.facing = Math.atan2(best.pos.x - p.pos.x, best.pos.z - p.pos.z);
+          p.prevFacing = p.facing;
+          sim.targetEntity(best.id);
+        }
+        // Assign the slot in the SAME evaluate as the click: the HUD repaints
+        // from its saved slot map and drops an older assignment.
+        game.hud.hotbarActions[0] = { type: 'ability', id: 'aimed_shot' };
+        game.hud.saveSlotMap?.();
+      });
+      await page.click('.action-btn[data-hotbar-slot="1"]');
+      // Shoot INSIDE the 3s cast, past the fade-in so the pose is fully driven.
+      await wait(1200);
+      const cast = await page.evaluate(() => {
+        const p = window.__game?.sim?.player;
+        return { casting: !!p?.castingAbility, ability: p?.castingAbility ?? null };
+      });
+      if (!cast.casting && process.env.SHOT_BASELINE !== '1') {
+        throw new Error(`the cast never started: ${JSON.stringify(cast)}`);
+      }
+      await page.evaluate(
+        () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))),
+      );
+      return {};
+    },
+  },
+  {
+    key: 'mech-weapon-skins',
+    label: 'Weapon skins on the Combat Mech: which weapon shows, and in which hand',
+    // The rule module decides WHICH types apply, the manifest and assets decide
+    // what the body actually holds, and skin_attack decides how it is swung.
+    when: [
+      'sim/content/weapon_skin_rules',
+      'render/characters/skin_attack',
+      'render/characters/manifest',
+      'render/characters/assets',
+    ],
+    // One hunter, one greatblade, four looks. The class-rig variant is the
+    // CONTROL: it must be pixel-identical before and after, since the whole
+    // change is scoped to the body that shows the equipped weapon.
+    variants: [
+      {
+        key: 'hunter-classrig-bow-desktop',
+        charClass: 'hunter',
+        charName: 'Fenwick',
+        catalog: 'class',
+        skinId: 'winterbite',
+      },
+      {
+        key: 'hunter-mech-bow-desktop',
+        charClass: 'hunter',
+        charName: 'Fenwick',
+        catalog: 'mech',
+        skinId: 'winterbite',
+      },
+      {
+        key: 'hunter-mech-gun-desktop',
+        charClass: 'hunter',
+        charName: 'Fenwick',
+        catalog: 'mech',
+        skinId: 'encore_bow',
+      },
+      {
+        key: 'hunter-mech-sword-desktop',
+        charClass: 'hunter',
+        charName: 'Fenwick',
+        catalog: 'mech',
+        skinId: 'ice_fang_sword',
+      },
+    ],
+    async capture(page, variant) {
+      await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        document.querySelector('.gpu-notice-dismiss')?.click();
+        document.querySelector('#gpu-notice')?.remove();
+      });
+      await wait(300);
+      const staged = await page.evaluate((shot) => {
+        const game = window.__game;
+        const sim = game?.sim;
+        const player = sim?.player;
+        if (!game || !sim || !player) return { ok: false, reason: 'offline world unavailable' };
+        // Level for the equip gate, then equip through the real inventory path
+        // so the mainhand lands the way a player's would.
+        sim.setPlayerLevel?.(60, player.id);
+        sim.addItem('direfang_greatblade', 1);
+        sim.equipItem('direfang_greatblade');
+        sim.changeSkin(0, shot.catalog);
+        sim.changeWeaponSkin(shot.skinId);
+        return {
+          ok: sim.equipment?.mainhand === 'direfang_greatblade',
+          reason: 'the greatblade did not equip',
+          // Reported, never asserted: on the BEFORE pass a mech sword skin is
+          // legitimately rejected, which is the regression being shown.
+          applied: player.weaponSkinId ?? null,
+        };
+      }, variant);
+      if (!staged.ok) throw new Error(`mech weapon skin staging failed: ${staged.reason}`);
+      // The mech body is lazy-loaded and every skin model is streamed, so the
+      // first frames after staging can still show the class rig or the plain
+      // item model. Poll for the swap rather than trusting a fixed wait.
+      if (variant.catalog === 'mech') {
+        await page.waitForFunction(() => window.__game?.sim?.player?.skinCatalog === 'mech', {
+          timeout: 30000,
+          polling: 250,
+        });
+      }
+      // Levelling to 60 fires a cascade of deed banners plus the Ravenpost mail
+      // banner across mid-screen, exactly where the character stands. Let them
+      // run out, then hide the plate so a late one cannot land on the frame.
+      await wait(9000);
+      // Shoot the character sheet's paperdoll turntable, not the world.
+      // The in-world camera was tried first and is the wrong instrument here:
+      // the body drifts to face nearby mobs between variants, the world camera
+      // frames a 2.6yd character inside a whole town, and the held weapon came
+      // out a smudge at the default distance while a closer camera clipped it
+      // against the unit frame. The paperdoll is centered, lit, uncluttered,
+      // identical across variants, and it runs the same resolveActiveWeaponSkin
+      // call the world does (hud.ts mountCharPreview), so it is a real read of
+      // this change rather than a staged one.
+      await page.evaluate(() => {
+        const banner = document.querySelector('#banner');
+        if (banner) banner.style.display = 'none';
+        window.__game?.hud?.toggleChar?.();
+      });
+      if (!(await pollForSize(page, '#char-model-preview'))) {
+        throw new Error('character sheet paperdoll did not open');
+      }
+      // The turntable needs a beat to mount the rig, stream the skin GLB and
+      // settle its pose before it is worth shooting.
+      await wait(3500);
+      await page.evaluate(
+        () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))),
+      );
+      return { clip: '#char-model-preview' };
+    },
+  },
+  {
     key: 'auto-acquire-target',
     label: 'Target frame after auto-acquiring the nearest attacking mob (issue #2787)',
     when: ['casting_lifecycle', 'auto_acquire_target'],
@@ -6730,6 +7104,60 @@ export const TARGETS = [
       );
       if (!proof) throw new Error('auto-acquire did not select the attacking mob');
       return {};
+    },
+  },
+  {
+    key: 'bow-skin-scale',
+    label: 'Bow skin size against the character, on the paperdoll turntable',
+    when: ['characters/weapon_grip'],
+    variants: [
+      { key: 'winterbite-desktop', charClass: 'hunter', charName: 'Sizewick', skin: 'winterbite' },
+      {
+        key: 'fletcher-desktop',
+        charClass: 'hunter',
+        charName: 'Sizewick',
+        skin: 'fletcher_s_guild_bow',
+      },
+    ],
+    async capture(page, variant) {
+      await page.waitForFunction(() => !!window.__game?.sim?.player, {
+        timeout: 90000,
+        polling: 250,
+      });
+      await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        document.querySelector('#gpu-notice')?.remove();
+      });
+      const staged = await page.evaluate((shot) => {
+        const sim = window.__game?.sim;
+        const player = sim?.player;
+        if (!sim || !player) return { ok: false, reason: 'offline world unavailable' };
+        sim.setPlayerLevel?.(60, player.id);
+        sim.addItem('direfang_greatblade', 1);
+        sim.equipItem('direfang_greatblade');
+        sim.changeWeaponSkin(shot.skin);
+        return { ok: true };
+      }, variant);
+      if (!staged.ok) throw new Error(`bow scale staging failed: ${staged.reason}`);
+      // The level grant fires a run of deed banners across mid-screen.
+      await wait(9000);
+      // The paperdoll turntable frames the character identically every run, so
+      // the weapon's size against the BODY is comparable shot to shot, which a
+      // world camera at a variable distance is not.
+      await page.evaluate(() => {
+        const b = document.querySelector('#banner');
+        if (b) b.style.display = 'none';
+        window.__game?.hud?.toggleChar?.();
+      });
+      if (!(await pollForSize(page, '#char-model-preview'))) {
+        throw new Error('character sheet paperdoll did not open');
+      }
+      await wait(3500);
+      await page.evaluate(
+        () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))),
+      );
+      return { clip: '#char-model-preview' };
     },
   },
   {

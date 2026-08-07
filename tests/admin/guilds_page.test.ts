@@ -411,6 +411,7 @@ describe('Guilds page', () => {
   });
 
   it('ignores an older directory response that resolves after a newer search', async () => {
+    vi.useFakeTimers();
     grantPermissions(['accounts.read']);
     let resolveOld!: (value: typeof directory) => void;
     let resolveNew!: (value: typeof directory) => void;
@@ -428,7 +429,11 @@ describe('Guilds page', () => {
     await fireEvent.input(screen.getByRole('textbox', { name: t('guilds.searchLabel') }), {
       target: { value: 'new' },
     });
-    await new Promise((resolve) => setTimeout(resolve, 350));
+    // Fires the search debounce (SEARCH_DEBOUNCE_MS = 300ms, src/admin/state/poll.ts)
+    // via fake timers rather than a real-time wait: a real setTimeout(resolve, 350)
+    // here raced the component's own 300ms debounce with only a 50ms margin, so it
+    // flaked under CI/full-suite core contention. Advancing fake time is deterministic.
+    await vi.advanceTimersByTimeAsync(300);
 
     resolveNew({
       ...directory,

@@ -37,7 +37,7 @@ import {
   type ItemDef,
   isConsuming,
 } from '../types';
-import { groundHeight, waterLevelAt } from '../world';
+import { groundHeight, isInWaterBody, waterLevel } from '../world';
 import { rodTierRequiredForZone } from './fishing_zones';
 import { queueGatheringGrant } from './gathering';
 import { PROFICIENCY_BAND_THRESHOLDS, proficiencyBandFor } from './proficiency_bands';
@@ -266,7 +266,13 @@ export function fishingCatchGainAt(proficiency: number, isJunk: boolean, zoneTie
  *  (src/render/fishing_bobber_core.ts) deliberately mirrors the same ring
  *  and depth rule with its own allocation-free walk (render per-frame
  *  discipline); tests/fishing_bobber_core.test.ts pins the two walks in
- *  lockstep so they cannot drift. Pure and draw-free. */
+ *  lockstep so they cannot drift. Pure and draw-free.
+ *
+ *  DECLARED water bodies only, by design: the open sea became swimmable
+ *  with the water overhaul (waterLevelAt answers a finite surface there),
+ *  but the ocean stays unfishable, so this walk gates on isInWaterBody
+ *  rather than waterLevelAt (tests/fishing_zones.test.ts pins the seaward
+ *  deny). Author fishable sea water and both walks change together. */
 export function firstFishableSampleAhead(
   x: number,
   z: number,
@@ -278,7 +284,8 @@ export function firstFishableSampleAhead(
   for (const d of FISHING_SAMPLE_DISTANCES) {
     const sx = x + sin * d;
     const sz = z + cos * d;
-    const water = waterLevelAt(sx, sz);
+    if (!isInWaterBody(sx, sz)) continue;
+    const water = waterLevel();
     if (groundHeight(sx, sz, seed) < water - SWIM_DEPTH) return { x: sx, z: sz, water };
   }
   return null;
@@ -468,7 +475,7 @@ export function startFishing(ctx: SimContext, p: Entity, meta: PlayerMeta): void
   // zoneAt SATURATES at the world edges (any z past the north end resolves
   // to the northmost zone), and instanced spaces are laid out along z, so a
   // dungeon slot would inherit whatever zone its origin lands in. Harmless
-  // today because waterLevelAt returns -Infinity outside a declared lake and
+  // today because the probe walk accepts declared water bodies only and
   // every lake is in the overworld, so the water check above refuses first.
   // Author fishable water inside an instance and this needs a real answer.
   const probeZoneId = zoneAt(probe.x, probe.z).id;

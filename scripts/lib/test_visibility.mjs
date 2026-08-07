@@ -61,7 +61,34 @@ export const OUT_OF_GRAPH_PATTERNS = Object.freeze([
   // (tests/mob_rally.test.ts) and that would be a large false-positive class.
   ['execFileSync', /\bexecFileSync\s*\(/],
   ['spawnSync', /\bspawnSync\s*\(/],
-  ['dynamic-import', /\bawait\s+import\s*\(/],
+  // Any call-form import(), not just the awaited adjacency: a dynamic import
+  // wrapped in Promise.all(...) or returned bare is just as invisible to the
+  // static graph, and the awaited-only regex missed those forms.
+  ['dynamic-import', /\bimport\s*\(/],
+  // Third-party fs readers. A test that asserts on the CONTENT of a shipped
+  // binary asset through a library (NodeIO GLB reads, sharp image metadata)
+  // makes no fs call of its own, so the function patterns above never fire,
+  // while an asset-only diff classifies inert and selects no related sources:
+  // tests/boar_asset.test.ts, tests/arena_render.test.ts, and
+  // tests/continent_map_view.test.ts were all graph-classified escapes until
+  // these import signals joined the list (Phase 2 adversarial audit).
+  ['gltf-transform', /from\s*['"]@gltf-transform\//],
+  ['sharp', /from\s*['"]sharp['"]|require\(\s*['"]sharp['"]\s*\)/],
+  // Generated i18n artifacts (the resolved locale slices and the
+  // TranslationKey union): the selective planner classifies them into their
+  // own never-widen bucket (lib/gate_select_plan.mjs) and feeds the changed
+  // artifact paths to `vitest related` as graph nodes, which is what selects
+  // their consumers (the artifacts are INSIDE the module graph, and are its
+  // most-connected i18n node; the catalog/overlay sources reach the runtime
+  // only through type-erased edges). This entry is the BELT over that
+  // mechanism, not the mechanism: it floors the handful of suites that
+  // name the artifacts in their own text, so a direct consumer keeps running
+  // even on PRs whose diff carries no artifact at all, and even if a future
+  // import shape ever fell out of vitest's graph walk. Matches the artifact
+  // NAMES, not the exact paths: an import specifier is relative
+  // ('./i18n.resolved.generated/en') and a moved artifact tree should keep
+  // flooring its consumers.
+  ['generated-i18n', /i18n\.resolved\.generated|translation_keys\.generated/],
 ]);
 
 /**
@@ -78,23 +105,55 @@ export const FS_HELPER_DIRS = Object.freeze([
   'tests/helpers',
   'tests/server/helpers',
   'tests/util',
+  // The parity harness: run_scenarios.ts reads the goldens off disk, and every
+  // parity suite delegates through it. Without this entry a golden-only diff
+  // left 11 of the 12 parity files unselected by the LOCAL merge bar (CI was
+  // already safe via CI_GUARD_PREFIXES).
+  'tests/parity',
 ]);
 
-/** Does a shared helper itself reach outside the graph? */
+/**
+ * Does a shared helper itself reach outside the graph? Wider than
+ * OUT_OF_GRAPH_PATTERNS on the sync-stat family and fs/promises because a
+ * helper is one hop from every importer: over-matching costs a few extra
+ * always-run files, under-matching silently un-floors every test that
+ * delegates its fs access.
+ */
 export const HELPER_FS_PATTERN =
-  /readFileSync|readdirSync|globSync|existsSync|execFileSync|execSync|spawnSync|from ['"]node:(?:fs|child_process)['"]/;
+  /readFileSync|readdirSync|globSync|existsSync|execFileSync|execSync|spawnSync|statSync|lstatSync|opendirSync|readlinkSync|createReadStream|from ['"](?:node:)?fs\/promises['"]|from ['"]node:(?:fs|child_process)['"]/;
 
 /**
  * Build the import-matching regex for a set of fs-touching helper module paths.
+ *
+ * Matches the helper by basename AND its parent directory as a barrel tail
+ * (`from './helpers'`): tests/CLAUDE.md tells contributors to import the
+ * shared fakes via the `index.ts` barrel, and a barrel hop must not hide an
+ * fs-touching helper (tests/server/helpers/golden.ts re-exported by
+ * `export * from './golden'` was invisible to the basename-only match).
+ * Deliberately BROAD: once a dir name like `helpers` or `util` joins the
+ * alternation, ANY import ending in that segment matches, including ones
+ * outside the helper dirs. Over-matching adds a file to the floor; the
+ * opposite direction silently un-floors a delegating test.
  *
  * @param {string[]} helperPaths repo-relative, extension stripped
  * @returns {RegExp | null}
  */
 export function buildHelperImportPattern(helperPaths) {
-  const names = [...new Set((helperPaths ?? []).map((p) => p.split('/').pop()))].filter(Boolean);
+  const paths = (helperPaths ?? []).filter(Boolean);
+  const names = [
+    ...new Set(
+      paths.flatMap((p) => {
+        const segs = p.split('/');
+        return [segs.pop(), segs.pop()];
+      }),
+    ),
+  ].filter(Boolean);
   if (names.length === 0) return null;
   const alt = names.map((n) => n.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|');
-  return new RegExp(`from\\s*['"][^'"]*\\/(?:${alt})['"]`);
+  // Optional extension tail: an ESM .mjs/.js helper must be imported WITH its
+  // extension, and a name-must-end-the-specifier match would discover such a
+  // helper and then never match its importers.
+  return new RegExp(`from\\s*['"][^'"]*\\/(?:${alt})(?:\\.[cm]?[jt]s)?['"]`);
 }
 
 /** Static imports from the product source trees the graph DOES model. */
@@ -117,7 +176,7 @@ export function classifyTestSource(source, { helperImportPattern = null } = {}) 
   for (const [label, re] of OUT_OF_GRAPH_PATTERNS) {
     if (re.test(text)) reasons.push(label);
   }
-  if (helperImportPattern && helperImportPattern.test(text)) reasons.push('fs-helper-import');
+  if (helperImportPattern?.test(text)) reasons.push('fs-helper-import');
   const srcImports = SRC_IMPORT_RE.test(text);
   if (reasons.length === 0) return { klass: 'graph', reasons, srcImports };
   return { klass: srcImports ? 'partial' : 'blind', reasons, srcImports };

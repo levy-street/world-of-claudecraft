@@ -38,6 +38,8 @@ import {
   PORTALS,
   RIFT_REGION_HALF_X,
   RIFT_REGION_HALF_Z,
+  STRIP_MAX_X,
+  STRIP_MIN_X,
   yumiMazeOriginAt,
 } from './data';
 import {
@@ -93,6 +95,8 @@ import {
   TOWN_WALL_SHORT_PILLAR_TOP_FRAC,
   TOWN_WALL_TALL_PILLAR_ALONG,
 } from './prop_layout';
+import { type PlacedStreetlamp, planStreetlamps, styleStreetlampSites } from './streetlamp_layout';
+import { STREETLAMP_COLLIDER_RADIUS, STREETLAMP_FIXTURE_HEIGHT } from './streetlamp_style';
 import { townPropPlacements } from './town_props';
 import type { WorldContent } from './types';
 import { valeCupColliders } from './vale_cup_layout';
@@ -105,6 +109,7 @@ import {
   generateDecorationsInBounds,
   groundHeight,
   reachPalmSpots,
+  roadDistance,
   terrainHeight,
   waterLevelAt,
 } from './world';
@@ -848,7 +853,7 @@ function staticWorldColliders(seed: number): Collider[] {
       const bx = d.x + off.x;
       const bz = d.z + off.z;
       const bg = groundHeight(bx, bz, seed);
-      const wl = waterLevelAt(bx, bz);
+      const wl = waterLevelAt(bx, bz, seed);
       const afloat = bg < wl - 0.1;
       const deckY = (afloat ? wl + 0.18 : bg + 0.06) + DOCK_BOAT.deckHeight;
       out.push({
@@ -1431,23 +1436,157 @@ function gridFor(seed: number): ColliderGrid {
   // Bind the chest spots this build resolved to this grid, so a later build
   // for another world/seed can never leak its spots into this one's readers.
   bankerChestSpotsByGrid.set(grid, lastBuiltBankerChestSpots);
-  for (const c of built) {
-    const b = colliderBounds(c);
-    const x0 = Math.floor((b.minX - MAX_BODY_RADIUS) / GRID_CELL);
-    const x1 = Math.floor((b.maxX + MAX_BODY_RADIUS) / GRID_CELL);
-    const z0 = Math.floor((b.minZ - MAX_BODY_RADIUS) / GRID_CELL);
-    const z1 = Math.floor((b.maxZ + MAX_BODY_RADIUS) / GRID_CELL);
-    for (let gx = x0; gx <= x1; gx++) {
-      for (let gz = z0; gz <= z1; gz++) {
-        const key = cellKey(gx, gz);
-        const list = grid.cells.get(key);
-        if (list) list.push(c);
-        else grid.cells.set(key, [c]);
-      }
+  for (const c of built) registerInCells(grid, c);
+  perContent.set(seed, grid);
+  // Streetlamps join AFTER the grid is published, and the order is the whole
+  // trick: planning a post calls resolvePosition to check the spot is free,
+  // which routes straight back through gridFor. Caching the lamp-free grid
+  // first turns that re-entry into a plain cache hit instead of a recursive
+  // rebuild, and hands the plan exactly the rule it wants: a post is vetted
+  // against buildings, props and decorations, never against another lamp
+  // (spacing between lamps is the layout's own minSeparation).
+  addStreetlampColliders(grid, seed);
+  return grid;
+}
+
+/**
+ * Index one collider into every cell its bounds, inflated by MAX_BODY_RADIUS,
+ * touch. That margin is what makes the single-cell support and glue reads
+ * complete, so every path that adds a collider to a grid goes through here
+ * rather than repeating the arithmetic.
+ */
+function registerInCells(grid: ColliderGrid, c: Collider): void {
+  const b = colliderBounds(c);
+  const x0 = Math.floor((b.minX - MAX_BODY_RADIUS) / GRID_CELL);
+  const x1 = Math.floor((b.maxX + MAX_BODY_RADIUS) / GRID_CELL);
+  const z0 = Math.floor((b.minZ - MAX_BODY_RADIUS) / GRID_CELL);
+  const z1 = Math.floor((b.maxZ + MAX_BODY_RADIUS) / GRID_CELL);
+  for (let gx = x0; gx <= x1; gx++) {
+    for (let gz = z0; gz <= z1; gz++) {
+      const key = cellKey(gx, gz);
+      const list = grid.cells.get(key);
+      if (list) list.push(c);
+      else grid.cells.set(key, [c]);
     }
   }
-  perContent.set(seed, grid);
-  return grid;
+}
+
+// ---------------------------------------------------------------------------
+// Streetlamps
+// ---------------------------------------------------------------------------
+
+/** Body radius a candidate lamp spot is vetted with: resolvePosition pushes a
+ *  body out of whatever it overlaps, so a spot that comes back moved was
+ *  already owned by a building, stall, well or fence, and a lamp inside one of
+ *  those is worse than no lamp. */
+const LAMP_CLEARANCE = 1.1;
+/** How far a candidate may be nudged by a collider before the spot is refused. */
+const LAMP_CLEARANCE_EPSILON = 0.05;
+
+// The lamps this grid resolved, stored per grid so a later build for another
+// world or seed can never leak its posts into this one's readers. Same shape
+// (and the same reason) as bankerChestSpotsByGrid above.
+const streetlampsByGrid = new WeakMap<object, PlacedStreetlamp[]>();
+
+/** Strict authored-area identity at a point, or null outside every zone. This
+ *  decides which fixture style a stretch of road is lit with, so it must not
+ *  fall back to a nearest zone: a lamp just outside every rect is genuinely
+ *  wilderness and takes the default. */
+function lampAreaAt(x: number, z: number, zones: readonly WorldZoneRect[]): string | null {
+  for (const zone of zones) {
+    const xMin = zone.xMin ?? STRIP_MIN_X;
+    const xMax = zone.xMax ?? STRIP_MAX_X;
+    if (x >= xMin && x < xMax && z >= zone.zMin && z < zone.zMax) return zone.id;
+  }
+  return null;
+}
+
+interface WorldZoneRect {
+  id: string;
+  zMin: number;
+  zMax: number;
+  xMin?: number;
+  xMax?: number;
+}
+
+/**
+ * Plan the whole world's streetlamps for `seed`, with each site's fixture
+ * identity resolved. The ONE list: colliders below plant a post on it and
+ * `streetlampPlacements` hands the same rows to the renderer, so what is drawn
+ * and what is walked into cannot come apart.
+ */
+function buildStreetlampPlacements(seed: number): PlacedStreetlamp[] {
+  const content = getActiveWorldContent();
+  const plan = planStreetlamps(
+    content.roads,
+    content.zones.map((zone) => ({ x: zone.hub.x, z: zone.hub.z, radius: zone.hub.radius })),
+    {
+      groundAt: (x, z) => terrainHeight(x, z, seed),
+      blocked: (x, z) => {
+        const resolved = resolvePosition(seed, x, z, LAMP_CLEARANCE);
+        return (
+          Math.abs(resolved.x - x) > LAMP_CLEARANCE_EPSILON ||
+          Math.abs(resolved.z - z) > LAMP_CLEARANCE_EPSILON
+        );
+      },
+      roadClear: roadDistance,
+      areaAt: (x, z) => lampAreaAt(x, z, content.zones),
+    },
+    {
+      authoredClearMin: MAX_BODY_RADIUS + Math.max(...Object.values(STREETLAMP_COLLIDER_RADIUS)),
+    },
+  );
+  return styleStreetlampSites(plan.sites, content.zones);
+}
+
+/**
+ * Plant a solid post on every lamp the plan placed, then bind the plan to this
+ * grid for the renderer to read back.
+ *
+ * The post is a full-height circle: no `moveTopY`, so it blocks at any
+ * altitude. A five-and-a-half yard lamp is not something a jump clears, and
+ * nothing about it is standable. `cameraTopY` carries its real top, which puts
+ * it above the sight line and lets it block a cast exactly as a tree trunk of
+ * the same girth does.
+ *
+ * A lamp standing where an authored NPC does keeps its mesh and loses its
+ * collider, the same rule the graveyard headstones follow: the town's furniture
+ * never walls off someone you have to walk up to and talk to.
+ */
+function addStreetlampColliders(grid: ColliderGrid, seed: number): void {
+  const placements = buildStreetlampPlacements(seed);
+  streetlampsByGrid.set(grid, placements);
+  if (placements.length === 0) return;
+  const npcSpots = townNpcPositions();
+  let planted = 0;
+  for (const lamp of placements) {
+    const r = STREETLAMP_COLLIDER_RADIUS[lamp.style];
+    if (standsOnNpcSpot(lamp.x, lamp.z, r, npcSpots)) continue;
+    const post: Collider = {
+      type: 'circle',
+      x: lamp.x,
+      z: lamp.z,
+      r,
+      cameraTopY: lamp.y + STREETLAMP_FIXTURE_HEIGHT,
+    };
+    assignLateGridIndex(grid, post);
+    registerInCells(grid, post);
+    planted++;
+  }
+  // Vetting the sites above ran resolvePosition, which caches a combined
+  // authored-plus-decoration list per cell. Those entries predate the posts
+  // just registered, so drop the combined view (the expensive decoration
+  // cells stay) and let it rebuild with the lamps in it.
+  if (planted > 0) grid.combinedCells.clear();
+}
+
+/**
+ * The resolved streetlamp placements for the active world at `seed`: the single
+ * source `src/render/streetlamps.ts` instances its fixtures from, so the post
+ * you see is the post you collide with (the `bankerChestSpots` arrangement).
+ */
+export function streetlampPlacements(seed: number): readonly PlacedStreetlamp[] {
+  return streetlampsByGrid.get(gridFor(seed)) ?? [];
 }
 
 // Decoration scale is `0.7 + hash * 0.9` (world.ts), and rocks have the
@@ -1485,11 +1624,12 @@ function decorationCollider(seed: number, d: Decoration): Collider | null {
   };
 }
 
-/** Claim the next `gridIndex` for a lazily built decoration body, growing the
- *  grid's stamp buffer to cover it. Authored colliders are indexed eagerly in
- *  gridFor; decorations join the same id space as they materialize, which is
- *  what keeps queryOpenWorldColliders' dedupe complete. */
-function assignDecorationGridIndex(grid: ColliderGrid, c: Collider): void {
+/** Claim the next `gridIndex` for a collider built after the eager pass,
+ *  growing the grid's stamp buffer to cover it. Authored colliders are indexed
+ *  in gridFor; streetlamp posts and lazily materialized decoration bodies join
+ *  the same id space afterwards, which is what keeps queryOpenWorldColliders'
+ *  dedupe complete across all three. */
+function assignLateGridIndex(grid: ColliderGrid, c: Collider): void {
   const i = grid.nextGridIndex++;
   c.gridIndex = i;
   if (i >= grid.stamps.length) {
@@ -1528,7 +1668,7 @@ function collidersInCell(grid: ColliderGrid, seed: number, gx: number, gz: numbe
       if (!collider) {
         const built = decorationCollider(seed, decoration);
         if (!built) continue;
-        assignDecorationGridIndex(grid, built);
+        assignLateGridIndex(grid, built);
         grid.decorationBodies.set(bodyKey, built);
         collider = built;
       }

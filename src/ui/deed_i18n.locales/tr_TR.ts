@@ -15,6 +15,54 @@ export const table: DeedLocaleTable = {
     name: 'Gök Sessizleşiyor',
     desc: "Ağız Anaerkili Cindraleth'i, Ejder Ağzı'nın üzerindeki krater tüneğinde öldür.",
   },
+  chr_frostveil_gatherer: {
+    name: 'Teras Hasadi',
+    desc: 'Frostveil de bir cevher damari, bir odun alani ve bir ot yatagi hasat et.',
+  },
+  chr_frostveil_first_cast: {
+    name: 'Golcukte Ilk Buz',
+    desc: 'Frostveil sularindan bir balik yakala.',
+  },
+  chr_amberfall_gatherer: {
+    name: 'Amberfall Hasadi',
+    desc: 'Amberfall da bir cevher damari, bir odun alani ve bir ot yatagi hasat et.',
+  },
+  chr_amberfall_first_cast: {
+    name: 'Buyuk Batakliktan Bir Av',
+    desc: 'Amberfall sularindan bir balik yakala.',
+  },
+  chr_nightbloom_gatherer: {
+    name: 'Dusleyen Hasat',
+    desc: 'Nightbloom da bir cevher damari, bir odun alani ve bir ot yatagi hasat et.',
+  },
+  chr_nightbloom_first_cast: {
+    name: 'Ay Kuyusunda Bir Halka',
+    desc: 'Nightbloom sularindan bir balik yakala.',
+  },
+  chr_wraithwood_gatherer: {
+    name: 'Golge Altinda Hasat',
+    desc: 'Wraithwood da bir cevher damari, bir odun alani ve bir ot yatagi hasat et.',
+  },
+  chr_wraithwood_first_cast: {
+    name: 'Ayna Koyunda Bir Atis',
+    desc: 'Wraithwood sularindan bir balik yakala.',
+  },
+  chr_palmreach_gatherer: {
+    name: 'Palmiye Kiyisinda Hasat',
+    desc: 'Palmreach te bir cevher damari, bir odun alani ve bir ot yatagi hasat et.',
+  },
+  chr_palmreach_first_cast: {
+    name: 'Safir Lagune Atis',
+    desc: 'Palmreach sularindan bir balik yakala.',
+  },
+  chr_evergarden_gatherer: {
+    name: 'Parterin Bereketi',
+    desc: 'Evergarden da bir cevher damari, bir odun alani ve bir ot yatagi hasat et.',
+  },
+  chr_evergarden_first_cast: {
+    name: 'Yaprak Havuzunda Bir Atis',
+    desc: 'Evergarden sularindan bir balik yakala.',
+  },
   pvp_card_duel_first_win: {
     name: 'Ev Kuralları',
     desc: "Kart Ustası'nın yanında bir Kart Düellosu kazan.",

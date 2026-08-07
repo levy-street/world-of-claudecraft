@@ -211,10 +211,10 @@ describe('draw_stats_core', () => {
     expect(first.calls).not.toBe(5300);
   });
 
-  it('pins the config version that segments the recovered High preset', () => {
-    // v20 separates the truthful governor signal and reduced High fixed-layer
-    // profile from v19 fleet comparisons.
-    expect(GFX_CONFIG_VERSION).toBe(20);
+  it('pins the config version that segments the expanded graphics profiles', () => {
+    // v21 separates the staged per-system graphics controls and expanded
+    // profile bytes from v20 fleet comparisons.
+    expect(GFX_CONFIG_VERSION).toBe(21);
   });
 
   it('clamps a backward counter jump at zero, per field, and recovers', () => {

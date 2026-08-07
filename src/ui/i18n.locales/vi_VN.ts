@@ -990,6 +990,8 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.lootHeroic': 'Thưởng anh hùng, luôn rơi một trong số này:',
   'hudChrome.finder.lootMaybe': 'Tối đa một trong số này có thể rơi:',
   'hudChrome.finder.mech.deathless_rage': 'Thịnh Nộ Bất Tử (bị gián đoạn tại các đá hộ mệnh)',
+  'hudChrome.finder.mech.dread_curse':
+    'Lời Nguyền Kinh Hoàng (chỉ anh hùng, hiệu ứng bất lợi cộng dồn để đổi tank)',
   'hudChrome.finder.mech.deathstalker_cleave': 'Chém Ngang Thần Chết (chém ngang phía trước)',
   'hudChrome.finder.mech.enrage': 'Nổi giận khi máu thấp',
   'hudChrome.finder.mech.grave_cleaver': 'Chém Mộ Phần (chém ngang phía trước)',
@@ -2384,6 +2386,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchantName.enchant_neck_agility': 'Pháp Khắc Vòng Cổ - Nhanh Nhẹn',
   'hudChrome.enchantName.enchant_neck_intellect': 'Pháp Khắc Vòng Cổ - Trí Tuệ',
   'hudChrome.enchantName.enchant_neck_spirit': 'Pháp Khắc Vòng Cổ - Tinh Thần',
+  'hudChrome.enchantName.enchant_offhand_stamina': 'Pháp Khắc Tay Phụ - Thể Lực',
   'hudChrome.enchantName.enchant_ring_agility': 'Pháp Khắc Nhẫn - Nhanh Nhẹn',
   'hudChrome.enchantName.enchant_ring_intellect': 'Pháp Khắc Nhẫn - Trí Tuệ',
   'hudChrome.enchantName.enchant_ring_spirit': 'Pháp Khắc Nhẫn - Tinh Thần',
@@ -2475,6 +2478,8 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobTooltip.friendly': 'Thân Thiện',
   'hudChrome.mobTooltip.hostile': 'Thù Địch',
   'hudChrome.mobTooltip.levelFamily': '{family} cấp {level}',
+  'hudChrome.mobTooltip.elite': 'Tinh Anh',
+  'hudChrome.mobTooltip.boss': 'Boss',
   'hudChrome.mobile.hotbarPage': 'Kỹ Năng',
   'hudChrome.mobile.hotbarPageAria': 'Hiện bộ kỹ năng tiếp theo',
   'hudChrome.options.aurasOnPlayerFrame': 'Hiệu Ứng Có Lợi Trên Khung Người Chơi',
@@ -7365,6 +7370,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.controller.resetButtons': 'Đặt Lại Bố Cục Nút',
   'hudChrome.controller.title': 'Tay Cầm',
   'hudChrome.controller.vibration': 'Rung',
+  'hudChrome.emoteEditor.close': 'Đóng biểu cảm',
   'hudChrome.emoteEditor.done': 'Xong',
   'hudChrome.emoteEditor.title': 'Biểu Cảm',
   'hudChrome.emoteWheel.edit': 'Chỉnh Sửa',
@@ -9993,7 +9999,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'guide.dungeonsPage.resetBody':
     'Nếu đổi độ khó khi đội vẫn giữ các lượt đã nhận, quyền cũ sẽ tồn tại một lúc rồi tự xóa. Trưởng nhóm có thể bỏ chúng ngay bằng cách chọn Đặt Lại Tất Cả Phụ Bản trong menu chân dung của mình hoặc gõ /dungeon reset. Độ khó phải thực sự đã đổi, không ai dù còn sống hay đã ngã xuống được ở bên trong, và có thời gian chờ ngắn giữa các lần đặt lại. Nếu đến cửa với độ khó sai, trò chơi sẽ báo trước khi bắt đầu. Raid không bao giờ được đặt lại theo cách này; quy tắc khóa riêng vẫn áp dụng.',
   'guide.dungeonsPage.wildheartBody':
-    'Một miệng núi lửa rừng rậm đẫm mưa, nơi hai lối đi săn bắn trên cao vòng quanh một hố sụt ngọc bích. Băng qua những hang thú và tàn tích tổ tiên, rồi leo lên kim tự tháp nghi lễ để đối mặt với Zulgar.',
+    'Một miệng núi lửa rừng rậm đẫm mưa, nơi hai lối đi săn bắn trên cao vòng quanh một hố sụt ngọc bích. Băng qua những hang thú và tàn tích tổ tiên, rồi leo lên kim tự tháp nghi lễ để xem ai đang chờ trên đỉnh.',
   'guide.gear.itemLevelBody':
     'Để so sánh nhanh hai món, hãy bật Hiện Cấp Vật Phẩm trong tùy chọn. Trang bị có nguồn rõ ràng từ kẻ địch, nhiệm vụ và nghề chế tạo sẽ hiện cấp vật phẩm: một con số ước lượng sức mạnh theo nguồn gốc, giúp nhận ra nâng cấp tốt hơn ngay cả giữa các ô khác nhau. Các món không có nguồn như vậy, chẳng hạn hàng cơ bản của thương nhân và trang bị khởi đầu, không hiện cấp; thiếu con số là bình thường.',
   'hudChrome.auraEffect.battleStance': 'Thế Công: tạo nộ khí nhiều hơn 10%',

@@ -1126,6 +1126,8 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.lootHeroic': 'Heroisk bonus, et af disse falder altid:',
   'hudChrome.finder.lootMaybe': 'Højst et af disse kan falde:',
   'hudChrome.finder.mech.deathless_rage': 'Udødelig Raseri (afbrydes ved vardstene)',
+  'hudChrome.finder.mech.dread_curse':
+    'Rædselsforbandelse (kun heroisk, stablende svækkelse til tankskifte)',
   'hudChrome.finder.mech.deathstalker_cleave': 'Dødsstalkers Mejning (frontal mejning)',
   'hudChrome.finder.mech.enrage': 'Raserer ved lavt helbred',
   'hudChrome.finder.mech.grave_cleaver': 'Gravhugger (frontal mejning)',
@@ -2362,6 +2364,8 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobTooltip.friendly': 'Venlig',
   'hudChrome.mobTooltip.hostile': 'Fjendtlig',
   'hudChrome.mobTooltip.levelFamily': 'Niveau {level} {family}',
+  'hudChrome.mobTooltip.elite': 'Elite',
+  'hudChrome.mobTooltip.boss': 'Boss',
   'hudChrome.options.aurasOnPlayerFrame': 'Buffs på spillerrammen',
   'hudChrome.options.playerFrameScale': 'Spillerrammens skala',
   'hudChrome.options.showDailyRewardsChest': 'Vis kisten med daglige belønninger',
@@ -6574,6 +6578,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.harvestTooltip':
     'Indsamler de markerede komponenter. Hvert kadaver kan kun hostes en gang, og det gælder for den første der kommer. Tager ikke byttet.',
   'hudChrome.corpseHarvest.title': 'Høst',
+  'hudChrome.emoteEditor.close': 'Luk følelsesudtryk',
   'hudChrome.emoteEditor.done': 'Færdig',
   'hudChrome.emoteEditor.title': 'Følelsesudtryk',
   'hudChrome.emoteWheel.edit': 'Rediger',
@@ -6615,6 +6620,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchantName.enchant_neck_agility': 'Fortryl halskæde - Smidighed',
   'hudChrome.enchantName.enchant_neck_intellect': 'Fortryl halskæde - Intellekt',
   'hudChrome.enchantName.enchant_neck_spirit': 'Fortryl halskæde - Ånd',
+  'hudChrome.enchantName.enchant_offhand_stamina': 'Fortryl sekundær hånd - Udholdenhed',
   'hudChrome.enchantName.enchant_ring_agility': 'Fortryl ring - Smidighed',
   'hudChrome.enchantName.enchant_ring_intellect': 'Fortryl ring - Intellekt',
   'hudChrome.enchantName.enchant_ring_spirit': 'Fortryl ring - Ånd',
@@ -10028,7 +10034,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'guide.dungeonsPage.resetBody':
     'Hvis du skifter sværhedsgrad, mens gruppen stadig har krævede gennemløb, bliver de gamle krav stående et stykke tid. Gruppelederen kan straks opgive dem ved at vælge Nulstil alle instanser i menuen på sit eget portræt eller skrive /dungeon reset. Sværhedsgraden skal faktisk være ændret, ingen levende eller faldne må være indenfor, og der er en kort nedkøling mellem nulstillinger. Ved døren på forkert sværhedsgrad advarer spillet før start. Raidet nulstilles aldrig sådan; dets egne låsningsregler gælder.',
   'guide.dungeonsPage.wildheartBody':
-    'En regnvåd jungle-caldera hvor to hævede jagtstier omkranser en jade-cenote. Kryds bæstenes huler og forfædrenes ruiner, og bestig derefter ritualpyramiden for at møde Zulgar.',
+    'En regnvåd jungle-caldera hvor to hævede jagtstier omkranser en jade-cenote. Kryds bæstenes huler og forfædrenes ruiner, og bestig derefter ritualpyramiden for at se, hvem der venter på toppen.',
   'guide.gear.itemLevelBody':
     'Slå Vis genstandsniveau til i indstillingerne for hurtigt at sammenligne to dele. Udstyr med en kendt kilde, fra fjender, opgaver og håndværksfag, viser derefter et genstandsniveau: et enkelt tal, der omtrent angiver styrken ud fra oprindelsen og gør opgraderinger sammenlignelige, selv på tværs af pladser. Dele uden en sådan kilde, som simple handelsvarer og startudstyr, viser intet niveau; et manglende tal er normalt.',
   'hudChrome.auraEffect.battleStance': 'Kampstilling: 10% mere raserigenerering',

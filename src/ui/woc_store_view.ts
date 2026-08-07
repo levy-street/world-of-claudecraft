@@ -15,7 +15,7 @@ import {
   type WeaponSkinDef,
   type WeaponSkinRarity,
 } from '../sim/content/weapon_skins';
-import type { PlayerClass, WeaponSkinType } from '../sim/types';
+import type { PlayerClass, SkinCatalog, WeaponSkinType } from '../sim/types';
 import type { AccountCosmetics } from '../world_api/cosmetics';
 
 export interface WocStoreItemInput {
@@ -57,6 +57,9 @@ export interface ArmoryContext {
   cosmetics: Pick<AccountCosmetics, 'weaponSkinIds' | 'weaponSkinLoadout'>;
   cls: string;
   mainhandItemId: string | null;
+  /** The body being worn: the Combat Mech shows the equipped mainhand, so it
+   *  decides which skin types a hunter can apply (weapon_skin_rules). */
+  skinCatalog: SkinCatalog;
 }
 
 export function armorySkinArt(skinId: string): string {
@@ -75,7 +78,7 @@ export function buildArmorySections(
 ): ArmorySection[] {
   const serviceRows = new Map(items.filter((i) => i.kind === 'skin').map((i) => [i.itemId, i]));
   const applicableTypes = new Set<WeaponSkinType>(
-    skinnableWeaponTypesFor(ctx.cls, ctx.mainhandItemId),
+    skinnableWeaponTypesFor(ctx.cls, ctx.mainhandItemId, ctx.skinCatalog),
   );
   const sections = new Map<string, ArmorySection>();
   for (const skin of WEAPON_SKIN_LIST) {

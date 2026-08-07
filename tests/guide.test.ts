@@ -105,7 +105,7 @@ import {
   WIELD_REQUIREMENT_BY_TIER,
 } from '../src/sim/professions/wield_gate';
 import { DEED_IMAGE_IDS } from '../src/ui/deed_image_ids';
-import { ensureLocaleLoaded, setLanguage, t } from '../src/ui/i18n';
+import { ensureLocaleLoaded, type SupportedLanguage, setLanguage, t } from '../src/ui/i18n';
 import { guideStrings } from '../src/ui/i18n.catalog/guide';
 
 const repoRoot = fileURLToPath(new URL('..', import.meta.url));
@@ -1014,6 +1014,84 @@ describe('Guide deeds cross-page surfaces', () => {
         `id="dungeon-${d.id}"`,
       );
     }
+  });
+
+  it('never leaks a boss personal name into the dungeons page card copy', () => {
+    // Regression pin: wildheartBody once named the Wildheart Basin boss outright
+    // ("...to face Zulgar"), breaking with every sibling body's withhold-the-name
+    // idiom (sanctumBody, raidBody, sagaPeaksBody). The full-name scan the deeds
+    // page uses would have missed it (the leak was the bare personal name, not the
+    // comma-joined title), so this checks the personal name segment on its own.
+    setLanguage('en');
+    const html = dungeonsPage.render({
+      params: [],
+      sub: 'dungeons',
+      titleKey: 'guide.nav.dungeons',
+    });
+    for (const boss of Object.values(MOBS).filter((m) => m.boss)) {
+      const personalName = boss.name.split(',')[0];
+      expect(
+        html.includes(personalName),
+        `boss personal name "${personalName}" leaked into the dungeons page`,
+      ).toBe(false);
+    }
+  });
+
+  it('never leaks the Wildheart Basin boss name in a translated locale either', async () => {
+    // Follow-up regression pin (review on PR #2903): the first fix only reworded the
+    // English catalog value plus the eager en/en_CA/en_XA bundles, leaving every
+    // translated overlay still naming the boss. Drive every translated locale that
+    // carries this key, the same way a real translated visitor would
+    // (ensureLocaleLoaded before render), and check for that LOCALE's own personal-name
+    // form, not just the English "Zulgar": a second review round on this PR found the
+    // first version of this test only covered 6 of the 17 fixed overlays and compared
+    // every locale against the English name, so a translated overlay that leaked the
+    // localized form (zh_CN "祖尔加", zh_TW "祖爾加", ja_JP "ズルガー", ko_KR "줄가르",
+    // or the Cyrillic ru_RU "Зулгар") would have passed silently. The Latin-script
+    // locales below (including inflected forms like cs_CZ "Zulgarovi" and pl_PL
+    // "Zulgarowi") all still contain the "Zulgar" substring, so one shared check
+    // covers them; the four non-Latin scripts get their own literal.
+    const wildheartBoss = Object.values(MOBS).find((m) => m.id === 'wildheart_high_priest');
+    expect(wildheartBoss, 'wildheart_high_priest mob missing from content').toBeTruthy();
+    const personalName = (wildheartBoss?.name ?? '').split(',')[0];
+    expect(personalName).toBe('Zulgar');
+    const forbiddenByLocale: Partial<Record<SupportedLanguage, string>> = {
+      cs_CZ: personalName,
+      da_DK: personalName,
+      de_DE: personalName,
+      es: personalName,
+      fr_FR: personalName,
+      id_ID: personalName,
+      it_IT: personalName,
+      nl_NL: personalName,
+      pl_PL: personalName,
+      pt_BR: personalName,
+      ru_RU: 'Зулгар',
+      sv_SE: personalName,
+      tr_TR: personalName,
+      vi_VN: personalName,
+      ja_JP: 'ズルガー',
+      ko_KR: '줄가르',
+      zh_CN: '祖尔加',
+      zh_TW: '祖爾加',
+    };
+    for (const [locale, forbidden] of Object.entries(forbiddenByLocale) as [
+      SupportedLanguage,
+      string,
+    ][]) {
+      await ensureLocaleLoaded(locale);
+      setLanguage(locale);
+      const html = dungeonsPage.render({
+        params: [],
+        sub: 'dungeons',
+        titleKey: 'guide.nav.dungeons',
+      });
+      expect(
+        html.includes(forbidden),
+        `boss personal name "${forbidden}" leaked into the ${locale} dungeons page`,
+      ).toBe(false);
+    }
+    setLanguage('en');
   });
 
   it('documents the new default binds on the controls page', () => {

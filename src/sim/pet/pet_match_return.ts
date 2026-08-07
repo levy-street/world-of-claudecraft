@@ -69,6 +69,26 @@ export function snapshotMatchPet(ctx: SimContext, ownerPid: number): MatchPetSna
 }
 
 /**
+ * Carry forward harmless pre-fight pet changes that happen after match formation.
+ * The countdown can tick passive regen before the gates open, so the return
+ * snapshot follows the same living entity into the active bout. Call this before
+ * fighter normalization, which can rescale the owner's pet.
+ */
+export function refreshMatchPetSnapshot(
+  ctx: SimContext,
+  ownerPid: number,
+  snap: MatchPetSnapshot | null | undefined,
+): void {
+  if (!snap) return;
+  const pet = petOf(ctx, ownerPid);
+  if (!pet || pet.id !== snap.petId || pet.dead) return;
+  const state = serializePet(ctx, ownerPid);
+  if (!state) return;
+  snap.hp = pet.hp;
+  snap.state = state;
+}
+
+/**
  * Stamp a snapshotted pet whose CORPSE has decayed away. Called from the one site
  * that unravels an owned corpse (the demon arm of updateMob in mob/locomotion.ts):
  * every other way a pet entity can vanish mid-bout is the owner's own doing, and

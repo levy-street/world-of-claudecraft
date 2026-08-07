@@ -1,4 +1,5 @@
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
 // The Node major every deploy and CI carrier must agree on, and the exact runtime
@@ -15,7 +16,6 @@ const TARGET_TAG = 'node:26-slim';
 const dockerfile = readFileSync('Dockerfile', 'utf8');
 const ciWorkflow = readFileSync('.github/workflows/ci.yml', 'utf8');
 const auditWorkflow = readFileSync('.github/workflows/audit.yml', 'utf8');
-const prAiWorkflow = readFileSync('.github/workflows/pr-ai.yml', 'utf8');
 const desktopWorkflow = readFileSync('.github/workflows/desktop-publish.yml', 'utf8');
 const nightlyWorkflow = readFileSync('.github/workflows/nightly.yml', 'utf8');
 const deployDoc = readFileSync('DEPLOY.md', 'utf8');
@@ -115,14 +115,6 @@ describe('deploy and CI Node version pin', () => {
     expect(nightlyWorkflow).toContain(`node-version: ${TARGET_MAJOR}`);
   });
 
-  // pr-ai.yml runs only the codex-action review jobs and deliberately sets up no Node
-  // toolchain of its own, so there is no version for the cross-carrier pin to hold. Do
-  // not delete this arm if a Node step returns: swap it back to the pinned form above
-  // (every value equals TARGET_MAJOR, non-empty) so the new carrier joins the bump.
-  it('keeps pr-ai.yml free of a Node toolchain the cross-carrier pin would miss', () => {
-    expect(nodeVersionValues(prAiWorkflow)).toEqual([]);
-  });
-
   // DEPLOY.md's containerized tsc-gate builds the type check inside
   // `docker run ... node:<tag>`. This is the carrier the deploy_watchdog literal
   // cannot catch drifting against the rest, so extract its major and equate it to
@@ -140,7 +132,8 @@ describe('deploy and CI Node version pin', () => {
   // positive pin locks that intentional divergence: it reds if desktop-publish.yml is
   // accidentally swept to the target major with the rest, forcing a conscious decision
   // (and an update here) rather than a silent bump. If the publish path is later moved
-  // to the target too, fold it into nodeVersionValues above and delete this.
+  // to the target too, fold it into nodeVersionValues above, delete this, and drop its
+  // NODE_MAJOR_EXEMPTIONS entry below.
   it('keeps desktop-publish.yml on Node 22, not the target major', () => {
     const values = nodeVersionValues(desktopWorkflow);
     expect(values.length).toBeGreaterThan(0);
@@ -156,6 +149,98 @@ describe('deploy and CI Node version pin', () => {
   // lies about the image the healthcheck runs in.
   it('keeps the docker-compose healthcheck comment on the target base tag', () => {
     expect(compose).toContain(`(${TARGET_TAG})`);
+  });
+
+  // The whole-directory closer: the per-file arms above each pin a KNOWN carrier, so a
+  // NEW workflow carrying its own Node toolchain would land unpinned and drift silently.
+  // ota-publish.yml did exactly that (Node 22 with no recorded decision, inherited from
+  // desktop-publish, until the 2026-08-07 bump). Enumerate .github/workflows and hold
+  // every declared node-version to the target major unless the file is in the named
+  // exemption list below. The read is single-level by GitHub's own contract: Actions
+  // registers only top-level workflow files, so a YAML parked in a subdirectory is inert
+  // to CI and a flat read matches the real registration surface rather than narrowing it.
+  // The read still checks that premise (tests/CLAUDE.md, scan-guard rules): the day this
+  // directory grows a subdirectory, refuse loudly instead of quietly skipping whatever
+  // sits inside it, because a workflow parked there would also silently never run in CI.
+  const WORKFLOW_DIR = '.github/workflows';
+  const workflowEntries = readdirSync(WORKFLOW_DIR, { withFileTypes: true });
+  const workflowSubdirs = workflowEntries.filter((e) => e.isDirectory()).map((e) => e.name);
+  if (workflowSubdirs.length > 0) {
+    throw new Error(
+      `${WORKFLOW_DIR} grew subdirectories (${workflowSubdirs.join(', ')}): a workflow file ` +
+        'in there is inert to Actions and invisible to this scan; move it to the top level ' +
+        'or extend this scan consciously.',
+    );
+  }
+  const workflowFiles = workflowEntries
+    .filter((e) => e.isFile() && /\.ya?ml$/.test(e.name))
+    .map((e) => e.name)
+    .sort();
+
+  // Workflows allowed off the target major, each with its recorded reason. An entry must
+  // BOTH exist and still diverge (second test below), so an exemption cannot rot into a
+  // blanket waiver after the divergence it covered is gone.
+  const NODE_MAJOR_EXEMPTIONS: Record<string, string> = {
+    'desktop-publish.yml':
+      'Steam/Electron publish path deliberately held on Node 22 until separately revisited',
+  };
+
+  it('holds every workflow node-version to the target major or a named exemption', () => {
+    // Vacuity floor: the enumeration must see the known carriers before "every" means much.
+    expect(workflowFiles).toContain('ci.yml');
+    expect(workflowFiles).toContain('desktop-publish.yml');
+    expect(workflowFiles).toContain('ota-publish.yml');
+    const filesWithValues = new Set<string>();
+    for (const file of workflowFiles) {
+      if (file in NODE_MAJOR_EXEMPTIONS) continue;
+      const text = readFileSync(join(WORKFLOW_DIR, file), 'utf8');
+      // Only a literal numeric node-version is pinnable by extraction, so the
+      // non-literal carriers must be banned here or a new workflow could ride
+      // node-version-file, an expression, or lts/latest straight past the pin.
+      expect(
+        text.includes('node-version-file:'),
+        `${file} uses node-version-file; pin a literal node-version or exempt it with a reason`,
+      ).toBe(false);
+      for (const m of text.matchAll(/^\s*node-version:\s*(.*)$/gm)) {
+        expect(
+          /^['"]?\d+['"]?$/.test(m[1].trim()),
+          `${file} carries a non-literal node-version "${m[1].trim()}"; only a plain major ` +
+            'is pinnable here. Use a literal or exempt the file with a reason.',
+        ).toBe(true);
+      }
+      const values = nodeVersionValues(text);
+      if (values.length > 0) filesWithValues.add(file);
+      for (const value of values) {
+        expect(
+          value,
+          `${file} declares node-version ${value}; the target major is ${TARGET_MAJOR}. ` +
+            'Bump it or add a reasoned NODE_MAJOR_EXEMPTIONS entry.',
+        ).toBe(TARGET_MAJOR);
+      }
+    }
+    // Per-file vacuity floor for the carrier this arm exists to hold: dropping the
+    // explicit version to ride the runner default is exactly the silent-drift shape,
+    // so a known carrier losing all its node-version lines must red, not pass empty.
+    // (ci.yml, audit.yml, and nightly.yml have their own non-empty guards above.)
+    expect(
+      filesWithValues,
+      'ota-publish.yml no longer declares any node-version; the runner default is unpinned',
+    ).toContain('ota-publish.yml');
+  });
+
+  it('keeps every exemption naming a real, still-divergent workflow', () => {
+    for (const [file, reason] of Object.entries(NODE_MAJOR_EXEMPTIONS)) {
+      expect(reason.trim().length, `${file} exemption needs a recorded reason`).toBeGreaterThan(0);
+      expect(workflowFiles, `stale exemption: ${file} is not in ${WORKFLOW_DIR}`).toContain(file);
+      const values = nodeVersionValues(readFileSync(join(WORKFLOW_DIR, file), 'utf8'));
+      expect(values.length, `${file} declares no node-version; drop the exemption`).toBeGreaterThan(
+        0,
+      );
+      expect(
+        values.some((value) => value !== TARGET_MAJOR),
+        `${file} sits on the target major now; drop the exemption`,
+      ).toBe(true);
+    }
   });
 
   // DEPLOY.md's tsc-gate carries a prose aside for the host that already has Node on PATH

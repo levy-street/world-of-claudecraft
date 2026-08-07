@@ -58,7 +58,7 @@ export function blockedTowardTarget(
   const nz = e.pos.z + Math.cos(facing) * step;
   const canSwim = ctx.mobCanSwim(MOBS[e.templateId]);
   const seed = ctx.cfg.seed;
-  if (!canSwim && groundHeight(nx, nz, seed) < waterLevelAt(nx, nz) - PLAYER_SWIM_DEPTH)
+  if (!canSwim && groundHeight(nx, nz, seed) < waterLevelAt(nx, nz, seed) - PLAYER_SWIM_DEPTH)
     return true;
   // The uphill steep-wall gate: a cliff face refuses a chase step exactly as it
   // does in moveToward, so a mob pinned under a ledge reads as blocked, not as
@@ -67,7 +67,7 @@ export function blockedTowardTarget(
   if (nearSteepWalls(nx, nz) && terrainSteepnessAt(nx, nz, seed) > PLAYER_MAX_CLIMB_SLOPE) {
     const ride = (x: number, z: number): number => {
       const h = groundHeight(x, z, seed);
-      const wl = waterLevelAt(x, z);
+      const wl = waterLevelAt(x, z, seed);
       return canSwim && h < wl ? wl : h;
     };
     if (ride(nx, nz) > ride(e.pos.x, e.pos.z)) return true;

@@ -1127,6 +1127,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.lootHeroic': 'Heroisk bonus, ett av dessa faller alltid:',
   'hudChrome.finder.lootMaybe': 'Högst ett av dessa kan falla:',
   'hudChrome.finder.mech.deathless_rage': 'Dödsfri vrede (avbryts vid väktarstenarna)',
+  'hudChrome.finder.mech.dread_curse':
+    'Skräckförbannelse (endast heroisk, staplande försvagning för tankbyte)',
   'hudChrome.finder.mech.deathstalker_cleave': 'Dödsstalkarens huggsving (frontalt huggsving)',
   'hudChrome.finder.mech.enrage': 'Rasar vid låga livspunkter',
   'hudChrome.finder.mech.grave_cleaver': 'Grav-klyvare (frontalt huggsving)',
@@ -2361,6 +2363,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobTooltip.friendly': 'Vänlig',
   'hudChrome.mobTooltip.hostile': 'Fientlig',
   'hudChrome.mobTooltip.levelFamily': 'Nivå {level} {family}',
+  'hudChrome.mobTooltip.elite': 'Elit',
+  'hudChrome.mobTooltip.boss': 'Boss',
   'hudChrome.options.aurasOnPlayerFrame': 'Förstärkningar på spelarramen',
   'hudChrome.options.playerFrameScale': 'Spelarramens skala',
   'hudChrome.options.showDailyRewardsChest': 'Visa kistan för dagliga belöningar',
@@ -6606,6 +6610,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.controller.resetButtons': 'Återställ knapplayout',
   'hudChrome.controller.title': 'Handkontroll',
   'hudChrome.controller.vibration': 'Vibration',
+  'hudChrome.emoteEditor.close': 'Stäng gester',
   'hudChrome.emoteEditor.done': 'Klar',
   'hudChrome.emoteEditor.title': 'Gester',
   'hudChrome.emoteWheel.edit': 'Redigera',
@@ -10045,7 +10050,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.dungeonsPage.resetBody':
     'Om du byter svårighetsgrad medan gruppen fortfarande har hävdade rundor ligger de gamla anspråken kvar en stund. Gruppledaren kan släppa dem direkt genom att välja Återställ alla instanser i menyn på sitt eget porträtt eller skriva /dungeon reset. Svårighetsgraden måste faktiskt ha ändrats, ingen levande eller fallen får vara kvar inuti och en kort väntetid skiljer återställningarna åt. Vid dörren på fel svårighetsgrad varnar spelet innan starten. Raiden återställs aldrig så här; dess egna låsningsregler gäller.',
   'guide.dungeonsPage.wildheartBody':
-    'En regnvåt djungelkaldera där två upphöjda jaktstigar cirklar en jadegrön cenot. Korsa bestars lyor och förfädersruiner, klättra sedan upp för ritualpyramiden för att möta Zulgar.',
+    'En regnvåt djungelkaldera där två upphöjda jaktstigar cirklar en jadegrön cenot. Korsa bestars lyor och förfädersruiner, klättra sedan upp för ritualpyramiden för att se vem som väntar på toppen.',
   'guide.gear.itemLevelBody':
     'Slå på Visa föremålsnivå i alternativen för att snabbt jämföra två delar. Utrustning med känd källa, från fiender, uppdrag och hantverksyrken, visar då en föremålsnivå: ett enda tal som ungefär anger styrkan utifrån ursprunget och gör förbättringar jämförbara även mellan olika platser. Delar utan sådan källa, som enkla handelsvaror och startutrustning, visar ingen nivå; ett saknat tal är normalt.',
   'hudChrome.auraEffect.battleStance': 'Stridsställning: 10% mer raserigenerering',
@@ -10738,6 +10743,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchantName.enchant_neck_agility': 'Förtrollning Halsband - Rörlighet',
   'hudChrome.enchantName.enchant_neck_intellect': 'Förtrollning Halsband - Intelligens',
   'hudChrome.enchantName.enchant_neck_spirit': 'Förtrollning Halsband - Ande',
+  'hudChrome.enchantName.enchant_offhand_stamina': 'Förtrollning Bi-hand - Uthållighet',
   'hudChrome.enchantName.enchant_ring_agility': 'Förtrollning Ring - Rörlighet',
   'hudChrome.enchantName.enchant_ring_intellect': 'Förtrollning Ring - Intelligens',
   'hudChrome.enchantName.enchant_ring_spirit': 'Förtrollning Ring - Ande',

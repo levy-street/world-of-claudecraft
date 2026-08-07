@@ -303,7 +303,7 @@ export default defineConfig({
   // plugin is scoped to Vitest so it cannot affect production client builds.
   plugins: [
     svelte(),
-    ...(process.env.VITEST ? [svelteTesting()] : []),
+    ...(process.env.VITEST ? [svelteTesting({ autoCleanup: false })] : []),
     staticPageAliasPlugin(),
     i18nModulepreloadPlugin(),
     musicEditorSavePlugin(),
@@ -383,7 +383,7 @@ export default defineConfig({
     // Runs per test file (unlike globalSetup, which runs once outside any
     // DOM environment). Needed on Node 22+ for jsdom and happy-dom files;
     // no-op when `window` is absent (default node env). See the file.
-    setupFiles: ['./tests/jsdom_local_storage_setup.ts'],
+    setupFiles: ['./tests/svelte_testing_setup.ts', './tests/jsdom_local_storage_setup.ts'],
     // Two kinds of exclusion, kept together:
     // - agent-runtime directories may contain local worktree copies, and their tracked
     //   config or instruction files are not product test sources. Excluding them keeps a

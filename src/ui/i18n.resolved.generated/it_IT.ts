@@ -392,7 +392,7 @@ export const it_IT: EnTranslations = {
     "emoteEditor": {
       "title": "Emote",
       "done": "Fine",
-      "close": "Close emotes"
+      "close": "Chiudi emote"
     },
     "dailyRewards": {
       "title": "Ricompense giornaliere",
@@ -1278,6 +1278,24 @@ export const it_IT: EnTranslations = {
       "graphicsFatal": "Ripristino della grafica non riuscito. Ricarica il gioco per continuare.",
       "graphicsReload": "Ricarica il gioco",
       "graphicsDraftChanged": "Le modifiche alla grafica sono pronte per essere applicate.",
+      "gfxSectionQuality": "Quality",
+      "gfxSectionWorld": "World Detail",
+      "gfxSectionLighting": "Lighting & Effects",
+      "gfxSectionCamera": "Camera",
+      "gfxSectionDisplay": "Display",
+      "gfxSectionSystem": "System",
+      "gfxSectionTouch": "Touch Controls",
+      "gfxViewDistance": "View Distance",
+      "gfxWaterQuality": "Water Quality",
+      "gfxCharacterDetail": "Character Detail",
+      "gfxAmbientOcclusion": "Ambient Occlusion",
+      "gfxBloom": "Bloom",
+      "gfxAntiAliasing": "Anti-Aliasing",
+      "gfxDynamicLights": "Dynamic Lights",
+      "gfxParticleEffects": "Particle Effects",
+      "gfxHalf": "Half",
+      "gfxCustomNote": "Changing a dial switches the quality preset to Advanced: a custom mix built on the High-quality base, starting from the levels shown for your current preset.",
+      "gfxEffectsNote": "Ambient Occlusion, Bloom and Anti-Aliasing ride the post-processing chain: with Effects & Lighting on Low the chain is off and they have no effect.",
       "interfaceMode": "Modalità interfaccia",
       "interfaceModeAuto": "Auto",
       "interfaceModeDesktop": "Desktop",
@@ -1805,7 +1823,13 @@ export const it_IT: EnTranslations = {
       "saveButton": "Salva priorità",
       "notInTownHint": "Devi essere in città per impostare la priorità.",
       "increaseAria": "Aumenta la priorità di {component}",
-      "decreaseAria": "Riduci la priorità di {component}"
+      "decreaseAria": "Riduci la priorità di {component}",
+      "respecTierLabel": "Re-spec speed",
+      "respecTierTimeOption": "Free (take your time)",
+      "respecTierPartialOption": "Faster (small cost)",
+      "respecTierInstantOption": "Instant (full cost)",
+      "respecCostFree": "Free",
+      "respecCostLine": "Costs {coin} and {materials}"
     },
     "party": {
       "promoteLeader": "Promuovi a Capo",
@@ -2052,7 +2076,7 @@ export const it_IT: EnTranslations = {
       "familyDemon": "Demone",
       "hostile": "Ostile",
       "friendly": "Amichevole",
-      "elite": "Elite",
+      "elite": "Élite",
       "boss": "Boss"
     },
     "targetFrame": {
@@ -2661,7 +2685,7 @@ export const it_IT: EnTranslations = {
     "enchantName": {
       "enchant_weapon_might": "Incanta Arma - Potenza",
       "enchant_weapon_intellect": "Incanta Arma - Potere Magico",
-      "enchant_offhand_stamina": "Enchant Offhand - Stamina",
+      "enchant_offhand_stamina": "Incanta Mano Secondaria - Robustezza",
       "enchant_helmet_fortitude": "Incanta Elmo - Fortezza",
       "enchant_neck_spirit": "Incanta Collana - Spirito",
       "enchant_shoulder_agility": "Incanta Spalle - Agilita",
@@ -3151,7 +3175,7 @@ export const it_IT: EnTranslations = {
         "soul_rend": "Squarcio dell'Anima (i giocatori segnati devono disperdersi ed essere curati)",
         "deathless_rage": "Furia Immortale (interrotta alle pietre di guardia)",
         "wardstones": "Canalizzazione delle pietre di guardia (transizione di fase)",
-        "dread_curse": "Dread Curse (heroic only, stacking tank-swap debuff)"
+        "dread_curse": "Maledizione del Terrore (solo eroica, penalità cumulativa per cambio tank)"
       }
     },
     "deeds": {
@@ -4100,7 +4124,7 @@ export const it_IT: EnTranslations = {
       "bastionBody": "Una fortezza allagata perduta nella palude, difesa dagli annegati e dalla marea crescente in persona.",
       "templeBody": "Un santuario sommerso lungo la strada della palude, una deviazione per i curiosi e i ben preparati.",
       "sanctumBody": "Il cuore oscuro di Thornpeak, dove la lunga opera del culto raggiunge il suo apice terribile.",
-      "wildheartBody": "Una caldera di giungla battuta dalla pioggia, dove due sentieri di caccia rialzati circondano un cenote di giada. Attraversa tane di bestie e rovine ataviche, poi sali la piramide rituale per affrontare Zulgar.",
+      "wildheartBody": "Una caldera di giungla battuta dalla pioggia, dove due sentieri di caccia rialzati circondano un cenote di giada. Attraversa tane di bestie e rovine ataviche, poi sali la piramide rituale per scoprire chi ti aspetta in cima.",
       "raidName": "L'incursione di fine gioco",
       "raidBody": "Oltre una porta reale sigillata attende una prova per dieci giocatori: uno scontro a più fasi e un potere immortale che l'intera incursione deve neutralizzare insieme. Guadagnati l'ingresso, poi porta nove amici.",
       "heroicTitle": "Modalità eroica",
@@ -7386,11 +7410,14 @@ export const it_IT: EnTranslations = {
       "stat": "+{value} {stat}",
       "useFood": "Usa: ripristina {amount} salute in {seconds} s. Devi restare seduto mentre mangi.",
       "useDrink": "Usa: ripristina {amount} mana in {seconds} s. Devi restare seduto mentre bevi.",
+      "useElixir": "Use: Increases your {stat} by {value} for {minutes} min. Usable in combat.",
+      "useElixirAura": "Use: Grants {aura} for {minutes} min. Usable in combat.",
       "questItem": "Oggetto missione",
       "questRelated": "Missione: {quest}",
       "questRules": "Non può essere venduto, depositato in banca o scambiato.",
       "questOrphaned": "Non serve per nessuna missione attiva.",
       "classes": "Classi: {classes}",
+      "maxStack": "Max stack: {count}",
       "sellPrice": "Prezzo di vendita: {money}",
       "clickBuy": "Clicca per comprare",
       "clickSell": "Clicca per vendere",
@@ -7541,6 +7568,8 @@ export const it_IT: EnTranslations = {
       "collectEmpty": "Non c'è nulla in attesa. Ricavi e inserzioni scadute si ritirano qui.",
       "collectNote": "Ricavi e merci restituite che il Mercante conserva per te.",
       "saleProceeds": "Ricavi di vendita",
+      "saleBuyer": "Sold to {buyer}",
+      "saleOlder": "Plus {count} earlier sales, included in the total.",
       "collectAll": "Ritira tutto"
     },
     "logs": {
@@ -10319,6 +10348,15 @@ export const it_IT: EnTranslations = {
       },
       "direfang_quiver": {
         "name": "Faretra Direfang"
+      },
+      "sharp_claw": {
+        "name": "Sharp Claw"
+      },
+      "curved_tusk": {
+        "name": "Curved Tusk"
+      },
+      "pristine_claw": {
+        "name": "Pristine Claw"
       },
       "conjured_water4": {
         "name": "Acqua sorgiva evocata"

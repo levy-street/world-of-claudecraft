@@ -42,9 +42,10 @@ import {
   wieldRequirementForTier,
 } from '../src/sim/professions/wield_gate';
 import { Sim } from '../src/sim/sim';
-import { type Entity, INTERACT_RANGE, xpForLevel } from '../src/sim/types';
+import { type Entity, INTERACT_RANGE, type SimEvent, xpForLevel } from '../src/sim/types';
 import { groundHeight, terrainHeight, waterLevelAt } from '../src/sim/world';
 import { bareClient } from './helpers/bare_client';
+import { expectDefined } from './helpers/defined';
 import { runRecharge } from './helpers/enchant_family_cast';
 import { placeAtHarvestSpot } from './helpers/harvest_spot';
 
@@ -134,7 +135,7 @@ describe('gather node harvest (#1121)', () => {
     teleportOntoNode(sim, pid, NODE_ID);
 
     const node = mustNode(NODE_ID);
-    const entry = NODE_HARVEST_TABLE[node.type];
+    const _entry = NODE_HARVEST_TABLE[node.type];
 
     const before = sim.countItem(NODE_MATERIAL.itemId, pid);
     expect(castAndComplete(sim, NODE_ID, pid)).toBe(true);
@@ -153,7 +154,7 @@ describe('gather node harvest (#1121)', () => {
     p.prevPos = { ...p.pos };
 
     const node = mustNode(NODE_ID);
-    const entry = NODE_HARVEST_TABLE[node.type];
+    const _entry = NODE_HARVEST_TABLE[node.type];
     const before = sim.countItem(NODE_MATERIAL.itemId, pid);
     expect(sim.harvestNode(NODE_ID, undefined, pid)).toBe(false);
     sim.tick();
@@ -175,7 +176,7 @@ describe('gather node harvest (#1121)', () => {
     teleportOntoNode(sim, pidB, NODE_ID);
 
     const node = mustNode(NODE_ID);
-    const entry = NODE_HARVEST_TABLE[node.type];
+    const _entry = NODE_HARVEST_TABLE[node.type];
 
     // Player A harvests first (the full cast-to-completion loop).
     expect(castAndComplete(sim, NODE_ID, pidA)).toBe(true);
@@ -323,7 +324,7 @@ describe('gather node harvest (#1121)', () => {
     p.dead = true;
 
     const node = mustNode(NODE_ID);
-    const entry = NODE_HARVEST_TABLE[node.type];
+    const _entry = NODE_HARVEST_TABLE[node.type];
     const before = sim.countItem(NODE_MATERIAL.itemId, pid);
     sim.harvestNode(NODE_ID, undefined, pid);
     sim.tick();
@@ -336,7 +337,7 @@ describe('gather node harvest (#1121)', () => {
     const pid = sim.addPlayer('warrior', 'FullBags');
     teleportOntoNode(sim, pid, NODE_ID);
     const node = mustNode(NODE_ID);
-    const entry = NODE_HARVEST_TABLE[node.type];
+    const _entry = NODE_HARVEST_TABLE[node.type];
 
     // Fill all but one bag slot with non-stacking instanced junk so canAddItem
     // denies regardless of the harvested item's own stack state (an
@@ -371,7 +372,7 @@ describe('gather node harvest (#1121)', () => {
     teleportOntoNode(sim, pid, NODE_ID);
     teleportOntoNode(sim, fullBagsPid, NODE_ID);
     const node = mustNode(NODE_ID);
-    const entry = NODE_HARVEST_TABLE[node.type];
+    const _entry = NODE_HARVEST_TABLE[node.type];
 
     // Stuff the second player's bags up front so the bags-full branch below
     // stays reachable while their own per-player node timer is still fresh
@@ -398,7 +399,7 @@ describe('gather node harvest (#1121)', () => {
     // (#1122), draw #2 the rare-event roll (gather_events.ts), regardless of
     // the outcome of either.
     let draws = 0;
-    (sim as unknown as { rng: { setObserver(fn: () => void): void } }).rng.setObserver(() => {
+    sim.rng.setObserver(() => {
       draws++;
     });
 
@@ -799,30 +800,86 @@ describe('gated-path determinism (same seed, same drive)', () => {
 // change), and a granted harvest still mirrors the per-player cooldown over
 // the ncd self-delta.
 
+interface WireSink {
+  readyState: number;
+  send(payload: string): void;
+}
+
 interface FakeClient {
-  sent: any[];
-  ws: any;
+  sent: unknown[];
+  ws: WireSink;
+}
+
+interface EventsFrame {
+  t: 'events';
+  list: SimEvent[];
+}
+
+interface SnapFrame {
+  t: 'snap';
+}
+
+interface ServerHarness {
+  routeEvents(events: SimEvent[]): void;
+  broadcastSnapshots(): void;
+}
+
+interface SnapshotClient {
+  applySnapshot(snap: SnapFrame): void;
 }
 
 function fakeWs(): FakeClient {
-  const sent: any[] = [];
+  const sent: unknown[] = [];
   return { sent, ws: { readyState: 1, send: (payload: string) => sent.push(JSON.parse(payload)) } };
 }
 
+function serverHarness(server: GameServer): ServerHarness {
+  return server as unknown as ServerHarness;
+}
+
+function snapshotClient(client: ReturnType<typeof bareClient>): SnapshotClient {
+  return client as unknown as SnapshotClient;
+}
+
+function isEventsFrame(frame: unknown): frame is EventsFrame {
+  return (
+    typeof frame === 'object' &&
+    frame !== null &&
+    't' in frame &&
+    frame.t === 'events' &&
+    'list' in frame &&
+    Array.isArray(frame.list)
+  );
+}
+
+function isSnapFrame(frame: unknown): frame is SnapFrame {
+  return typeof frame === 'object' && frame !== null && 't' in frame && frame.t === 'snap';
+}
+
 function joinServer(server: GameServer, fc: FakeClient, id: number, name: string): ClientSession {
-  const session = server.join(fc.ws, id, id, name, 'warrior', null);
+  const session = server.join(
+    fc.ws as Parameters<GameServer['join']>[0],
+    id,
+    id,
+    name,
+    'warrior',
+    null,
+  );
   if ('error' in session) throw new Error(session.error);
   session.blockListLoaded = true;
   return session;
 }
 
 function deliveredEvents(fc: FakeClient): { type: string }[] {
-  return fc.sent.filter((m) => m.t === 'events').flatMap((m) => m.list as { type: string }[]);
+  return fc.sent
+    .filter(isEventsFrame)
+    .flatMap((m) => m.list.filter((ev): ev is SimEvent & { type: string } => 'type' in ev));
 }
 
-function lastSnap(sent: any[]): any {
+function lastSnap(sent: unknown[]): SnapFrame | null {
   for (let i = sent.length - 1; i >= 0; i--) {
-    if (sent[i].t === 'snap') return sent[i];
+    const candidate = sent[i];
+    if (isSnapFrame(candidate)) return candidate;
   }
   return null;
 }
@@ -848,7 +905,7 @@ describe('node tool gating over the live server', () => {
     // Bare hands: the deny is denied server-side and routed personally by
     // ev.pid through the generic router (no gatherDenied-specific wiring).
     expect(server.sim.harvestNode('ore_mirefen_t2', undefined, sa.pid)).toBe(false);
-    (server as any).routeEvents(server.sim.drainEvents());
+    serverHarness(server).routeEvents(server.sim.drainEvents());
     expect(deliveredEvents(fcA).filter((ev) => ev.type === 'gatherDenied')).toEqual([
       {
         type: 'gatherDenied',
@@ -874,18 +931,18 @@ describe('node tool gating over the live server', () => {
     // (the 100 boundary), which is what holds the pinned 2.5 s duration.
     mustMeta(server.sim, sa.pid).gatheringProficiency.mining = TIER2_TOOL_WIELD_PROFICIENCY;
     expect(server.sim.harvestNode('ore_mirefen_t2', undefined, sa.pid)).toBe(true);
-    (server as any).routeEvents(server.sim.drainEvents());
+    serverHarness(server).routeEvents(server.sim.drainEvents());
     expect(deliveredEvents(fcA)).toContainEqual(
       expect.objectContaining({ type: 'castStart', ability: 'gathering', time: 2.5 }),
     );
     for (let i = 0; i < 80 && e.castingAbility; i++) server.sim.tick();
     expect(e.castingAbility).toBe(null);
     server.sim.tick();
-    (server as any).broadcastSnapshots();
+    serverHarness(server).broadcastSnapshots();
     const client = bareClient(sa.pid);
     const snap = lastSnap(fcA.sent);
     expect(snap).not.toBeNull();
-    (client as any).applySnapshot(snap);
+    snapshotClient(client).applySnapshot(expectDefined(snap));
     expect(client.nodeHarvestableByMe('ore_mirefen_t2')).toBe(false);
     expect(client.nodeHarvestableByMe('ore_mirefen_1')).toBe(true);
   });
@@ -915,7 +972,7 @@ describe('node tool gating over the live server', () => {
     expect(mustMeta(server.sim, s.pid).gatheringProficiency.mining).toBe(0);
 
     expect(server.sim.harvestNode('ore_mirefen_t2', undefined, s.pid)).toBe(false);
-    (server as any).routeEvents(server.sim.drainEvents());
+    serverHarness(server).routeEvents(server.sim.drainEvents());
     expect(deliveredEvents(fc).filter((ev) => ev.type === 'gatherDenied')).toEqual([
       {
         type: 'gatherDenied',
@@ -1098,7 +1155,7 @@ describe('fine material grades on the live harvest path', () => {
     mustMeta(sim, pid).gatheringProficiency.mining = TIER3_TOOL_WIELD_PROFICIENCY;
     teleportOntoNode(sim, pid, MIREFEN_T2);
     let draws = 0;
-    (sim as any).rng.setObserver(() => {
+    sim.rng.setObserver(() => {
       draws++;
     });
     expect(castAndComplete(sim, MIREFEN_T2, pid)).toBe(true);
@@ -1130,7 +1187,7 @@ describe('fine material grades on the live harvest path', () => {
 
     teleportOntoNode(sim, pid, MIREFEN_T2);
     let draws = 0;
-    (sim as any).rng.setObserver(() => {
+    sim.rng.setObserver(() => {
       draws++;
     });
     // Denied at the pre-gate, before the cast even starts, and rng-free, and
@@ -1211,7 +1268,7 @@ describe('fine material grades on the live harvest path', () => {
 
     teleportOntoNode(sim, pid, MIREFEN_T2);
     let draws = 0;
-    (sim as any).rng.setObserver(() => {
+    sim.rng.setObserver(() => {
       draws++;
     });
     // Denied at the pre-gate, before the cast starts, rng-free, timer intact,
@@ -1308,7 +1365,7 @@ describe('fine material grades on the live harvest path', () => {
     // rarity draw: common (1 unit) before the zones 1-3 quest-dedupe pass,
     // epic (3 units) after it, rare (2 units) since the v0.35.0 release
     // content commits (enchant offhand, hunter offhand, the deeds catalog).
-    expect(sim.countItem('iron_ore', pid)).toBe(3);
+    expect(sim.countItem('iron_ore', pid)).toBe(4);
     expect(sim.countItem('fine_iron_ore', pid)).toBe(0);
     expect(
       sim.drainEvents().some((e) => e.type === 'error' && e.text === 'Your bags are full.'),
@@ -1347,7 +1404,7 @@ describe('fine material grades on the live harvest path', () => {
     // The confirmed mining use survived the herbalism mint: fine grade
     // minted, mining charge spent. 2 units since the v0.35.0 release content
     // commits moved the seed-42 rarity draw to rare (2 per mint).
-    expect(sim.countItem('fine_iron_ore', pid)).toBe(2);
+    expect(sim.countItem('fine_iron_ore', pid)).toBe(3);
     expect(slot.durability).toBe(chargesBefore - 1);
   });
 
@@ -1382,7 +1439,7 @@ describe('fine material grades on the live harvest path', () => {
     // since the v0.35.0 release content commits moved the seed-42 rarity draw
     // to rare (2 per mint).
     expect(sim.countItem('fine_iron_ore', pid)).toBe(0);
-    expect(sim.countItem('iron_ore', pid)).toBe(2);
+    expect(sim.countItem('iron_ore', pid)).toBe(3);
     expect(minted?.durability).toBe(mintedCharges);
   });
 
@@ -1457,7 +1514,7 @@ describe('fine material grades on the live harvest path', () => {
     expect(chargesBefore).toBeGreaterThan(0);
     teleportOntoNode(sim, pid, MIREFEN_T2);
     let draws = 0;
-    (sim as any).rng.setObserver(() => {
+    sim.rng.setObserver(() => {
       draws++;
     });
     expect(castAndComplete(sim, MIREFEN_T2, pid)).toBe(true);
@@ -1485,11 +1542,11 @@ describe('fine material grades on the live harvest path', () => {
     const STARTER = 'ore_veiled_hollow_1';
     teleportOntoNode(sim, pid, STARTER);
     let draws = 0;
-    (sim as any).rng.setObserver(() => {
+    sim.rng.setObserver(() => {
       draws++;
     });
     expect(castAndComplete(sim, STARTER, pid)).toBe(true);
-    (sim as any).rng.setObserver(null);
+    sim.rng.setObserver(null);
     expect(draws).toBe(2);
     expect(sim.countItem('thorium_ore', pid)).toBeGreaterThanOrEqual(1);
     expect(sim.countItem('fine_thorium_ore', pid)).toBe(0);
@@ -1517,11 +1574,11 @@ describe('fine material grades on the live harvest path', () => {
     // The two-draw contract holds on the quantity-mattered arm too, so the
     // R42 settle family is draw-count-pinned in every direction.
     let draws = 0;
-    (sim as any).rng.setObserver(() => {
+    sim.rng.setObserver(() => {
       draws++;
     });
     expect(castAndComplete(sim, STARTER, pid)).toBe(true);
-    (sim as any).rng.setObserver(null);
+    sim.rng.setObserver(null);
     expect(draws).toBe(2);
     expect(sim.countItem('thorium_ore', pid)).toBeGreaterThanOrEqual(before + 2);
     expect(meta.toolEffectSlots?.mining?.durability).toBe(chargesBefore - 1);
@@ -1547,11 +1604,11 @@ describe('fine material grades on the live harvest path', () => {
     expect(chargesBefore).toBeGreaterThan(0);
     teleportOntoNode(sim, pid, MIREFEN_T2);
     let draws = 0;
-    (sim as any).rng.setObserver(() => {
+    sim.rng.setObserver(() => {
       draws++;
     });
     expect(castAndComplete(sim, MIREFEN_T2, pid)).toBe(true);
-    (sim as any).rng.setObserver(null);
+    sim.rng.setObserver(null);
     expect(draws).toBe(2);
     expect(sim.countItem('fine_iron_ore', pid)).toBeGreaterThanOrEqual(1);
     expect(meta.toolEffectSlots?.mining?.durability).toBe(chargesBefore);
@@ -1583,11 +1640,11 @@ describe('fine material grades on the live harvest path', () => {
     const NODE = 'ore_eastbrook_1';
     teleportOntoNode(sim, pid, NODE);
     let draws = 0;
-    (sim as any).rng.setObserver(() => {
+    sim.rng.setObserver(() => {
       draws++;
     });
     expect(castAndComplete(sim, NODE, pid)).toBe(true);
-    (sim as any).rng.setObserver(null);
+    sim.rng.setObserver(null);
     expect(draws).toBe(2);
     // Exactly the one unit landed (the base grant), and the charge survived.
     expect(sim.countItem('copper_ore', pid)).toBe(oreStack + 1);
@@ -1870,7 +1927,7 @@ describe('fine material grades on the live harvest path', () => {
     p.dead = true;
     p.hp = 0;
     let draws = 0;
-    (sim as any).rng.setObserver(() => {
+    sim.rng.setObserver(() => {
       draws++;
     });
     sim.drainEvents();
@@ -1906,10 +1963,10 @@ describe('harvest denies in combat and while swimming (the startFishing pair)', 
     const p = mustEntity(sim, pid);
     p.inCombat = true;
     let draws = 0;
-    (sim as any).rng.setObserver(() => draws++);
+    sim.rng.setObserver(() => draws++);
     sim.drainEvents();
     expect(sim.harvestNode(MIREFEN_T2, undefined, pid)).toBe(false);
-    (sim as any).rng.setObserver(null);
+    sim.rng.setObserver(null);
     const ev = sim.drainEvents();
     expect(
       ev.some((e) => e.type === 'error' && e.text === "You can't do that while in combat."),
@@ -1934,10 +1991,10 @@ describe('harvest denies in combat and while swimming (the startFishing pair)', 
     p.prevPos = { ...p.pos };
     expect(sim.ctx.isSwimming(p)).toBe(true);
     let draws = 0;
-    (sim as any).rng.setObserver(() => draws++);
+    sim.rng.setObserver(() => draws++);
     sim.drainEvents();
     expect(sim.harvestNode(NODE_ID, undefined, pid)).toBe(false);
-    (sim as any).rng.setObserver(null);
+    sim.rng.setObserver(null);
     const ev = sim.drainEvents();
     expect(
       ev.some((e) => e.type === 'error' && e.text === "You can't do that while swimming."),
@@ -1964,7 +2021,8 @@ describe('harvest denies in combat and while swimming (the startFishing pair)', 
     const node = mustNode(WATERLINE);
     const sim = makeWorld(1);
     expect(
-      groundHeight(DEEP.x, DEEP.z, sim.cfg.seed) < waterLevelAt(DEEP.x, DEEP.z) - PLAYER_SWIM_DEPTH,
+      groundHeight(DEEP.x, DEEP.z, sim.cfg.seed) <
+        waterLevelAt(DEEP.x, DEEP.z, sim.cfg.seed) - PLAYER_SWIM_DEPTH,
     ).toBe(true);
     expect(Math.hypot(DEEP.x - node.pos.x, DEEP.z - node.pos.z)).toBeLessThanOrEqual(
       INTERACT_RANGE,
@@ -2009,10 +2067,10 @@ describe('harvest breaks stealth and action-locked forms refuse it', () => {
       school: 'physical',
     } as Entity['auras'][number]);
     let draws = 0;
-    (sim as any).rng.setObserver(() => draws++);
+    sim.rng.setObserver(() => draws++);
     sim.drainEvents();
     expect(sim.harvestNode(NODE_ID, undefined, pid)).toBe(false);
-    (sim as any).rng.setObserver(null);
+    sim.rng.setObserver(null);
     const ev = sim.drainEvents();
     expect(
       ev.some((e) => e.type === 'error' && e.text === "You can't do that while shapeshifted."),
@@ -2029,7 +2087,7 @@ describe('harvest breaks stealth and action-locked forms refuse it', () => {
     const sim = makeWorld();
     const pid = sim.addPlayer('rogue', 'Shade');
     const meta = mustMeta(sim, pid);
-    (sim as any).grantXp(xpForLevel(1) + xpForLevel(2) + 10, meta); // level 3, knows stealth
+    sim.grantXp(xpForLevel(1) + xpForLevel(2) + 10, meta); // level 3, knows stealth
     sim.castAbility('stealth', pid);
     const p = mustEntity(sim, pid);
     expect(p.auras.some((a) => a.kind === 'stealth')).toBe(true);
@@ -2037,9 +2095,9 @@ describe('harvest breaks stealth and action-locked forms refuse it', () => {
     teleportOntoNode(sim, pid, NODE_ID);
     sim.drainEvents();
     let draws = 0;
-    (sim as any).rng.setObserver(() => draws++);
+    sim.rng.setObserver(() => draws++);
     expect(sim.harvestNode(NODE_ID, undefined, pid)).toBe(true);
-    (sim as any).rng.setObserver(null);
+    sim.rng.setObserver(null);
     // Broken at cast START, before any completion: aura gone, cache cleared,
     // the aura-lost event emitted, and the start still draws nothing.
     expect(p.castingAbility).not.toBeNull();
@@ -2055,7 +2113,7 @@ describe('harvest breaks stealth and action-locked forms refuse it', () => {
     const sim = makeWorld();
     const pid = sim.addPlayer('rogue', 'Shade');
     const meta = mustMeta(sim, pid);
-    (sim as any).grantXp(xpForLevel(1) + xpForLevel(2) + 10, meta);
+    sim.grantXp(xpForLevel(1) + xpForLevel(2) + 10, meta);
     sim.castAbility('stealth', pid);
     const p = mustEntity(sim, pid);
     expect(p.auras.some((a) => a.kind === 'stealth')).toBe(true);

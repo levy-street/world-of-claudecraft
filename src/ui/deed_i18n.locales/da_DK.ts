@@ -15,6 +15,54 @@ export const table: DeedLocaleTable = {
     name: 'Himlen Bliver Stille',
     desc: 'Dræb Cindraleth Gabmatriarken i hendes kraterrede over Dragegabet.',
   },
+  chr_frostveil_gatherer: {
+    name: 'Host pa terrasserne',
+    desc: 'Host en malmare, en traestand og et urtebed i Frostveil.',
+  },
+  chr_frostveil_first_cast: {
+    name: 'Forste is pa tarnen',
+    desc: 'Fang en fisk i Frostveils vande.',
+  },
+  chr_amberfall_gatherer: {
+    name: 'Amberfalls host',
+    desc: 'Host en malmare, en traestand og et urtebed i Amberfall.',
+  },
+  chr_amberfall_first_cast: {
+    name: 'En fangst fra den store mose',
+    desc: 'Fang en fisk i Amberfalls vande.',
+  },
+  chr_nightbloom_gatherer: {
+    name: 'Den drommende host',
+    desc: 'Host en malmare, en traestand og et urtebed i Nightbloom.',
+  },
+  chr_nightbloom_first_cast: {
+    name: 'En ring pa manebronden',
+    desc: 'Fang en fisk i Nightblooms vande.',
+  },
+  chr_wraithwood_gatherer: {
+    name: 'Host under kronerne',
+    desc: 'Host en malmare, en traestand og et urtebed i Wraithwood.',
+  },
+  chr_wraithwood_first_cast: {
+    name: 'Et kast i spejlbugten',
+    desc: 'Fang en fisk i Wraithwoods vande.',
+  },
+  chr_palmreach_gatherer: {
+    name: 'Host pa palmstranden',
+    desc: 'Host en malmare, en traestand og et urtebed i Palmreach.',
+  },
+  chr_palmreach_first_cast: {
+    name: 'Kast i safirlagunen',
+    desc: 'Fang en fisk i Palmreachs vande.',
+  },
+  chr_evergarden_gatherer: {
+    name: 'Parterrets rigdom',
+    desc: 'Host en malmare, en traestand og et urtebed i Evergarden.',
+  },
+  chr_evergarden_first_cast: {
+    name: 'Et kast pa kronbladsdammen',
+    desc: 'Fang en fisk i Evergardens vande.',
+  },
   pvp_card_duel_first_win: {
     name: 'Husets Regler',
     desc: 'Vind en Kortduel hos Kortmesteren.',

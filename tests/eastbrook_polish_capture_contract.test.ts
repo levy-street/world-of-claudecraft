@@ -42,6 +42,35 @@ interface AttributionTargetFixture {
   childMeshCount: number;
 }
 
+// The live composite pin. Mint history (kept from the previous in-place
+// comments): re-pinned across the pnpm-lock migration (which moved the
+// three GLB *SourceFingerprint leaves, since the lockfile is a hashed input
+// of every GLB source fingerprint), and then across PR #2720's
+// fence-removal layout evidence, the v0.34.0 Bear Form rig (#2842), the live
+// graphics rebuild (#2799), far-field impostors and fog-free vista (#2793),
+// brood shout/flourish wiring, the worldObjectBurning fire-burst cue, the
+// Thornhollow renderer sync, and the release/v0.35.0 into AAA-enhancements
+// merge, each of which moved a runtimeRender leaf (usually
+// src/render/renderer.ts); every mint used
+// scripts/assets/eastbrook_grand_armoury/remint_polish_provenance.mjs.
+// Across all of those mints no GLB pipeline input or geometry value changed
+// and no capture was retaken here: Eastbrook itself is untouched, and the
+// one capture retake (by the release) was adopted verbatim with its swept
+// metadata and performance JSONs. Re-derive whenever renderer.ts changes.
+// On a mismatch the test prints the full diagnostics (moved leaves,
+// dirty-input verdict, the one-step remint command) instead of a raw object
+// diff; see provenance_diagnostics.mjs for the 2026-08-05 stale-mint root
+// cause this legibility exists to prevent.
+// Re-pinned for the PR #2982 merge: the release-side weapon-skin apply
+// queue moves src/render/renderer.ts, and the PR-side ability VFX warm-up
+// moves src/render/renderer.ts plus src/render/prewarm_policy.ts. Those
+// runtimeRender leaves re-mint the composite. No Eastbrook input, geometry
+// value, or capture moved.
+// Re-pinned for the PR #2983 revert: the rendererIntegration leaf moved
+// back while PR #2982's prewarm policy remains in the release.
+const PINNED_POLISH_COMPOSITE_FINGERPRINT =
+  '8009031470c8cd5831d3171dd630c8cf58eebc10678c392a8e70e5b8fbd67693';
+
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
     {
@@ -355,36 +384,41 @@ describe('Eastbrook polish capture contract', () => {
       noticeboardSourceFingerprint: noticeboardFingerprint.eastbrookNoticeboardSourceFingerprint(),
       noticeboardGlbSha256: await fileSha256(EASTBROOK_POLISH_PROVENANCE_INPUTS.noticeboardGlb),
     });
+    // On a mismatch the diagnostics module names the moved leaf against the
+    // committed evidence seal, reports whether any fingerprinted input is
+    // dirty vs HEAD (the stale-mint hazard: the 2026-08-05 craft-cast pin
+    // was minted and then renderer.ts moved again before commit, so the pin
+    // matched no tree), and prints the one-step remint command. The plain
+    // toMatchObject diff buried all three of those answers.
+    if (provenance.fingerprint !== PINNED_POLISH_COMPOSITE_FINGERPRINT) {
+      const [diagnostics, { fileURLToPath }] = await Promise.all([
+        import('../scripts/assets/eastbrook_grand_armoury/provenance_diagnostics.mjs'),
+        import('node:url'),
+      ]);
+      // The whole composition (seal read, path collection, git verdict,
+      // formatting) lives in the builder so the glue that only ever runs
+      // when a pin is already stale stays unit-tested with injected
+      // seal-reader and git (tests/eastbrook_provenance_diagnostics.test.ts).
+      expect.fail(
+        diagnostics.buildPolishProvenanceMismatchReport({
+          pinnedFingerprint: PINNED_POLISH_COMPOSITE_FINGERPRINT,
+          computed: provenance,
+          repoRoot: fileURLToPath(repoRoot),
+          inputs: EASTBROOK_POLISH_PROVENANCE_INPUTS,
+          sourceFileLists: [
+            townFingerprint.EASTBROOK_TOWN_SOURCE_FILES,
+            mailboxFingerprint.EASTBROOK_MAILBOX_SOURCE_FILES,
+            noticeboardFingerprint.EASTBROOK_NOTICEBOARD_SOURCE_FILES,
+          ],
+        }),
+      );
+    }
     expect(provenance).toMatchObject({
       schemaVersion: 1,
       mode: 'composite-sha256',
       algorithm: 'sha256',
       baselineRevision: EASTBROOK_POLISH_BASELINE_REVISION,
-      // Deliberately re-pinned, and this mint stacks every leaf move on both sides
-      // of the merge onto src/render/renderer.ts, the rendererIntegration leaf of
-      // this composite: the pnpm-lock migration (a hashed input to every GLB source
-      // fingerprint), PR #2720's fence-removal layout evidence, release/v0.34.0's
-      // Bear Form quadruped rig (PR #2842), live graphics rebuild (context recycle
-      // plus profile-aware Eastbrook runtime inputs, PR #2799), far-field sprite
-      // impostors and fog-free vista (PR #2793), and brood shout/flourish wiring;
-      // and from this branch the worldObjectBurning fire-burst cue (torched murloc
-      // huts, q_deepfen_purge). The release also retook the polish captures and
-      // re-swept their metadata and performance JSONs, and those files are adopted
-      // verbatim here. Each move shifts the leaf's own sha256 and with it the
-      // composite, so the merged tree mints one fingerprint matching neither
-      // parent's literal. No GLB source fingerprint moved, not one pipeline input
-      // or geometry value changed, and no capture was retaken: Eastbrook itself is
-      // untouched by all of it. Re-minted with
-      // scripts/assets/eastbrook_grand_armoury/remint_polish_provenance.mjs.
-      // Re-pinned at the Thornhollow branch sync: that branch edits
-      // src/render/renderer.ts (battleground occluder fade and ward state),
-      // the renderer-integration leaf, so the composite re-mints. Re-derive
-      // whenever renderer.ts changes.
-      // Re-pinned for the mobile-disconnect fix: src/render/renderer.ts gains the
-      // bounded ground-object reuse pool (storePooledObject/takePooledObject cap),
-      // the renderer-integration leaf, so the composite re-mints again. Regenerated
-      // via scripts/assets/eastbrook_grand_armoury/remint_polish_provenance.mjs.
-      fingerprint: '9ed193cbbdadd0b3923427002f07252968b3969b273d24f2a7a200c214d1ef72',
+      fingerprint: PINNED_POLISH_COMPOSITE_FINGERPRINT,
       components: {
         captureContract: {
           id: 'polish-v2',

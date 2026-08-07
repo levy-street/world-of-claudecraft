@@ -10,8 +10,8 @@
     "base mobSwing (mob swings the player)",
     "rollLoot via mob death (L1, ~5876/6036)"
   ],
-  "draws": 308,
-  "drawDigest": "a4f00f2a",
+  "draws": 309,
+  "drawDigest": "f78161ea",
   "frames": [
     {
       "tick": 0,
@@ -149,44 +149,44 @@
       "tick": 20,
       "time": 1,
       "nextId": 965,
-      "state": "04dc8afa",
-      "events": "5ab18457",
+      "state": "c395d0b1",
+      "events": "911add89",
       "rng": {
-        "draws": 2,
-        "digest": "e795a964"
+        "draws": 7,
+        "digest": "4f9a2cfb"
       }
     },
     {
       "tick": 40,
       "time": 2,
       "nextId": 965,
-      "state": "80476412",
+      "state": "eea107ad",
       "events": "741638a5",
       "rng": {
-        "draws": 2,
-        "digest": "e795a964"
+        "draws": 7,
+        "digest": "4f9a2cfb"
       }
     },
     {
       "tick": 60,
       "time": 3,
       "nextId": 965,
-      "state": "ea25fb31",
-      "events": "ccf86ca8",
+      "state": "9364cbc3",
+      "events": "30c22ce9",
       "rng": {
         "draws": 174,
-        "digest": "cd2cf034"
+        "digest": "847684f0"
       }
     },
     {
       "tick": 72,
       "time": 3.6,
       "nextId": 965,
-      "state": "29b33650",
+      "state": "438c9d2f",
       "events": "14b3b208",
       "rng": {
-        "draws": 266,
-        "digest": "c05f7dc6"
+        "draws": 263,
+        "digest": "d3f0124f"
       },
       "label": "kill",
       "players": [
@@ -207,14 +207,14 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 7036,
-            "damageTaken": 4,
+            "damageDealt": 7073,
+            "damageTaken": 5,
             "kills": 1
           },
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "damageDealt": 7036,
+              "damageDealt": 7073,
               "kills": 1
             },
             "dungeonClears": {},
@@ -294,7 +294,7 @@
           "facing": 1.570796,
           "fallStartY": 1.5,
           "fiveSecondRule": 102.6,
-          "hp": 49996,
+          "hp": 49995,
           "id": 959,
           "inCombat": true,
           "kind": "player",
@@ -360,7 +360,7 @@
           },
           "level": 2,
           "loot": {
-            "copper": 10,
+            "copper": 11,
             "items": [
               {
                 "count": 1,
@@ -409,11 +409,11 @@
       "tick": 76,
       "time": 3.8,
       "nextId": 965,
-      "state": "716b2c50",
+      "state": "98199d99",
       "events": "7d77b079",
       "rng": {
-        "draws": 308,
-        "digest": "a4f00f2a"
+        "draws": 309,
+        "digest": "f78161ea"
       },
       "label": "final",
       "players": [
@@ -434,14 +434,14 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 7036,
-            "damageTaken": 4,
+            "damageDealt": 7073,
+            "damageTaken": 5,
             "kills": 1
           },
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "damageDealt": 7036,
+              "damageDealt": 7073,
               "kills": 1
             },
             "dungeonClears": {},
@@ -526,7 +526,7 @@
           "facing": 1.570796,
           "fallStartY": 1.5,
           "fiveSecondRule": 102.8,
-          "hp": 49996,
+          "hp": 49995,
           "id": 959,
           "inCombat": true,
           "kind": "player",
@@ -592,7 +592,7 @@
           },
           "level": 2,
           "loot": {
-            "copper": 10,
+            "copper": 11,
             "items": [
               {
                 "count": 1,

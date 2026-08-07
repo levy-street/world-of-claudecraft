@@ -150,6 +150,7 @@ export const WILLOWFEN_MOBS: Record<string, MobTemplate> = {
     ],
     scale: 1,
     color: 0x7aa848,
+    componentTags: ['gills', 'hide'],
   },
   drowsy_croaker: {
     id: 'drowsy_croaker',

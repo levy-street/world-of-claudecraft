@@ -20,6 +20,7 @@ import { Rng } from '../src/sim/rng';
 import type { PlayerMeta } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 import type { Entity, LootEntry, LootSlot, SimEvent } from '../src/sim/types';
+import { expectDefined } from './helpers/defined';
 
 // Direct unit tests for the extracted loot-distribution module (L1). These drive the
 // module's exported `(ctx, ...)` functions through `sim.ctx` (the real SimContext
@@ -332,7 +333,7 @@ describe('loot_roll: need-greed resolution (module entry)', () => {
     submitLootRoll(sim.ctx, rollId, 'pass', b);
     submitLootRoll(sim.ctx, rollId, 'pass', c);
 
-    expect((sim as any).pendingLootRolls.has(rollId)).toBe(false);
+    expect(sim.ctx.pendingLootRolls.has(rollId)).toBe(false);
     const returned = mob.loot?.items.find((s) => s.itemId === 'greyjaw_hide_boots');
     expect(returned).toMatchObject({ count: 1, openToAll: true });
   });
@@ -354,7 +355,7 @@ describe('loot_roll: need-greed resolution (module entry)', () => {
       // `a` never answered: the leave itself is the last-candidate trigger that
       // runs resolveLootRoll (the only leave-path branch that resolves a roll).
       sim.removePlayer(a);
-      expect((sim as any).pendingLootRolls.has(rollId)).toBe(false);
+      expect(sim.ctx.pendingLootRolls.has(rollId)).toBe(false);
       expect(sim.countItem('greyjaw_hide_boots', a)).toBe(0);
       // Won by a live needer, not scattered back to the corpse.
       expect(mob.loot?.items.find((s) => s.itemId === 'greyjaw_hide_boots')).toBeUndefined();
@@ -389,7 +390,7 @@ describe('loot_roll: need-greed resolution (module entry)', () => {
     sim.removePlayer(a); // the leave resolves the tied roll and must draw the tie-break
 
     expect(int).toHaveBeenCalledWith(0, 1); // the resolve-time tie-break fired on the leave path
-    expect((sim as any).pendingLootRolls.has(rollId)).toBe(false);
+    expect(sim.ctx.pendingLootRolls.has(rollId)).toBe(false);
     // Exactly one live needer holds it; the leaver never does.
     expect(sim.countItem('greyjaw_hide_boots', a)).toBe(0);
     expect(sim.countItem('greyjaw_hide_boots', b) + sim.countItem('greyjaw_hide_boots', c)).toBe(1);
@@ -412,7 +413,7 @@ describe('loot_roll: need-greed resolution (module entry)', () => {
     submitLootRoll(sim.ctx, rollId, 'greed', b);
     submitLootRoll(sim.ctx, rollId, 'pass', c);
 
-    expect((sim as any).pendingLootRolls.has(rollId)).toBe(false);
+    expect(sim.ctx.pendingLootRolls.has(rollId)).toBe(false);
     expect(sim.countItem('greyjaw_hide_boots', b)).toBe(0);
     expect(mob.loot?.items.find((slot) => slot.itemId === 'greyjaw_hide_boots')).toMatchObject({
       count: 1,
@@ -511,7 +512,7 @@ describe('loot_roll: group roll status + resolution broadcast (module entry)', (
 
   it('hides a curate-phase master roll from the group status', () => {
     const { sim, a, rollId } = openRoll();
-    const roll = (sim as any).pendingLootRolls.get(rollId);
+    const roll = expectDefined(sim.ctx.pendingLootRolls.get(rollId));
     roll.masterLooter = a;
     expect(lootRollGroupStatus(sim.ctx, a)).toHaveLength(0);
   });
@@ -623,27 +624,37 @@ describe('loot_roll: corpse-loot helpers (module entry)', () => {
 
   it('pruneCorpseLoot collapses an emptied corpse whose every family is unmapped (#2513)', () => {
     // The fourth arm, and the reason the harvest half is isHarvestableCorpse
-    // here and not a tag COUNT. fen_troll carries claw and tusk, neither
-    // mapped, so the command boundary refuses a harvest and the claim can never
-    // be spent. Counting tags held the 30s grace window open forever waiting on
-    // it, which is worse than the pre-#2513 world where a player could at least
-    // burn the claim to collapse the corpse.
-    expect(MOBS.fen_troll.componentTags).toEqual(['claw', 'tusk']);
-    expect(isHarvestableCorpse(MOBS.fen_troll.componentTags)).toBe(false);
+    // here and not a tag COUNT. fen_troll carried claw and tusk, neither
+    // mapped at the time, so the command boundary refused a harvest and the
+    // claim could never be spent. Both are mapped now (this branch's own
+    // fix), so no shipped template is left in that shape: gills and horn are
+    // still waiting on theirs, so this retags a real, otherwise-untagged
+    // template (warlock_imp) for the duration of the case, restored in a
+    // finally. Counting tags held the 30s grace window open forever waiting
+    // on it, which is worse than the pre-#2513 world where a player could at
+    // least burn the claim to collapse the corpse.
+    const template = MOBS.warlock_imp;
+    const priorTags = template.componentTags;
+    template.componentTags = ['gills', 'horn'];
     const sim = makeSim();
-    const mob = createMob(sim.nextId++, MOBS.fen_troll, 12, { x: 0, y: 0, z: 0 });
-    mob.dead = true;
-    mob.lootable = true;
-    mob.corpseTimer = 60;
-    // The claim is UNSPENT, which is the state the grace arm used to key on:
-    // the arm is chosen by the corpse's families, not by the claim.
-    expect(mob.harvestClaimedBy).toBeNull();
-    mob.loot = { copper: 0, items: [{ itemId: 'x', count: 0 }] };
-    sim.entities.set(mob.id, mob);
-    pruneCorpseLoot(sim.ctx, mob);
-    expect(mob.loot).toBeNull();
-    expect(mob.lootable).toBe(false);
-    expect(mob.corpseTimer).toBe(4);
+    try {
+      expect(isHarvestableCorpse(template.componentTags)).toBe(false);
+      const mob = createMob(sim.nextId++, template, 12, { x: 0, y: 0, z: 0 });
+      mob.dead = true;
+      mob.lootable = true;
+      mob.corpseTimer = 60;
+      // The claim is UNSPENT, which is the state the grace arm used to key on:
+      // the arm is chosen by the corpse's families, not by the claim.
+      expect(mob.harvestClaimedBy).toBeNull();
+      mob.loot = { copper: 0, items: [{ itemId: 'x', count: 0 }] };
+      sim.entities.set(mob.id, mob);
+      pruneCorpseLoot(sim.ctx, mob);
+      expect(mob.loot).toBeNull();
+      expect(mob.lootable).toBe(false);
+      expect(mob.corpseTimer).toBe(4);
+    } finally {
+      template.componentTags = priorTags;
+    }
     // The discriminator, identical rig and identical unspent claim: a corpse
     // with a MAPPED family still takes the grace arm, so this is the predicate
     // narrowing and not the grace arm being deleted.

@@ -1093,16 +1093,20 @@ describe('zone-map gather nodes', () => {
 
   it('culls nodes outside the zoomed view rect (pan pays only for what is on screen)', () => {
     // zoom 3 framed at the player (0, 0): the visible square is 120yd wide
-    // and the cull pads it by the marker margin. The Copper Dig west field
-    // stays inside the pad; the far-west veins and the outlying wood / herb
-    // spawns drop.
+    // and the cull pads it by the marker margin, so the band runs to +-84yd.
+    // The Copper Dig west field stays inside the pad; the far-west veins and
+    // the outlying wood / herb spawns drop. Both sides of the z bound are
+    // named: the Sowfield herb sits 15yd inside it and the boar-downs herb
+    // well outside, so a cull that stopped culling and one that culled
+    // everything both red.
     const model = buildOverworldMapModel(input(makeOverworldWorld('sim'), 3));
     const kept = new Set(model.gatherNodes.map((n) => n.nodeId));
     expect(kept.has('wood_eastbrook_2')).toBe(true); // (-57, -6): in view
     expect(kept.has('ore_eastbrook_1')).toBe(true); // (-70, -53): inside the pad
     expect(kept.has('ore_eastbrook_4')).toBe(false); // (-92, -48): west of the pad
-    expect(kept.has('herb_eastbrook_4')).toBe(false); // (23, -99): south of the pad
-    expect(model.gatherNodes).toHaveLength(8);
+    expect(kept.has('herb_eastbrook_4')).toBe(true); // (6, -69): inside the pad
+    expect(kept.has('wood_eastbrook_5')).toBe(false); // (7, 140): north of the pad
+    expect(model.gatherNodes).toHaveLength(9);
   });
 
   it('never leaks nodes from another zone into the committed zone model', () => {

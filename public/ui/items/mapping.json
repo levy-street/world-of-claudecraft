@@ -2178,6 +2178,30 @@
       "sourcePack": "greaves",
       "sourceFile": "22.png",
       "confidence": "medium"
+    },
+    {
+      "itemId": "sharp_claw",
+      "name": "Sharp Claw",
+      "sourcePack": "woc_original_svg",
+      "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+    },
+    {
+      "itemId": "curved_tusk",
+      "name": "Curved Tusk",
+      "sourcePack": "woc_original_svg",
+      "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+    },
+    {
+      "itemId": "pristine_claw",
+      "name": "Pristine Claw",
+      "sourcePack": "woc_original_svg",
+      "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
     }
   ],
   "generatedBatches": [

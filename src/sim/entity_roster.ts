@@ -34,8 +34,23 @@ import { CAST_COMPLETE_EPS, DT, emptyMoveInput } from './types';
 // Mobs that despawn after sitting out of combat too long (boss adds that should not
 // litter the world). The idle timer is reset to DAMAGE_IDLE_DESPAWN_SECONDS whenever
 // they take damage (that reset still lives on Sim in the damage path, C1).
+//
+// `dragonkin_whelp` is here because a hatchling is the one summoned add with no
+// summoner to clean it up. mob/locomotion.ts acts on `summonedAdd` only in the
+// DEAD branch (a slain add unravels with its corpse), and the brood hatch does
+// not register the whelp on the egg's `summonedIds`, so respawnMob's
+// despawnSummonedAdds cannot reach one either. A whelp nobody killed therefore
+// lived forever while its egg re-clutched on the trash cadence and hatched
+// another for the next passer-by: measured at 92 live whelps after one walk of
+// the Drakemaw belt, 184 after two, 267 after three, out of 75 authored eggs.
+// The idle timer only runs out of combat, so an engaged whelp is never yanked
+// out of a fight (pinned by tests/dragonkin_whelp_litter.test.ts).
 export const DAMAGE_IDLE_DESPAWN_SECONDS = 60;
-export const DAMAGE_IDLE_DESPAWN_MOB_IDS = new Set(['varkas_boneguard', 'bound_guardian']);
+export const DAMAGE_IDLE_DESPAWN_MOB_IDS = new Set([
+  'varkas_boneguard',
+  'bound_guardian',
+  'dragonkin_whelp',
+]);
 
 // A ticking ground hazard (e.g. Consecration). Scheduled by the damage/effect path
 // (C1/C4b, still on Sim) and drained here by tickGroundAoEs.

@@ -57,6 +57,7 @@ import {
   COPPER_PER_SILVER,
   type MarketBrowseBody,
   type MarketCollectBody,
+  type MarketCollectSaleRow,
   type MarketSellBody,
   type MarketSellMeta,
   type MarketSubtypeKind,
@@ -271,6 +272,11 @@ export class MarketWindow {
       info?.pageCount,
       info?.collectionCopper,
       info?.collectionItems,
+      // The ledger is its own axis, not a shadow of the copper: a sale whose
+      // proceeds floor to 0 moves neither the purse nor the goods, and without
+      // this the open Collect tab would never repaint to show its row.
+      info?.collectionSales,
+      info?.collectionSalesOmitted,
     ]);
     if (sig === this.lastSig) return;
     this.lastSig = sig;
@@ -842,6 +848,7 @@ export class MarketWindow {
       row.innerHTML = `<span>${esc(t('itemUi.market.saleProceeds'))}</span><span class="mkt-price">${this.deps.moneyHtml(view.proceeds)}</span>`;
       body.appendChild(row);
     }
+    this.renderCollectSales(body, view.sales, view.salesOmitted);
     for (const { item, count, instance } of view.rows) {
       const qColor = QUALITY_COLOR[item.quality ?? 'common'] ?? QUALITY_DEFAULT_COLOR;
       const row = document.createElement('div');
@@ -862,6 +869,46 @@ export class MarketWindow {
       audio.coin();
     });
     body.appendChild(btn);
+  }
+
+  // The itemized ledger under the proceeds line: what sold, to whom, and for how
+  // much, so the single gold figure above is accountable. Sits between the purse
+  // and the returned-goods rows because it explains the purse, not the goods.
+  private renderCollectSales(
+    body: HTMLElement,
+    sales: MarketCollectSaleRow[],
+    omitted: number,
+  ): void {
+    if (sales.length === 0 && omitted === 0) return;
+    const list = document.createElement('div');
+    list.className = 'mkt-sale-list';
+    for (const { item, count, proceeds, buyerName } of sales) {
+      const qColor = QUALITY_COLOR[item.quality ?? 'common'] ?? QUALITY_DEFAULT_COLOR;
+      const row = document.createElement('div');
+      row.className = 'mkt-sale';
+      const stack =
+        count > 1
+          ? ` ${t('itemUi.market.stackCount', { count: formatNumber(count, { maximumFractionDigits: 0 }) })}`
+          : '';
+      // esc on the buyer: a player-authored name reaching innerHTML raw is the
+      // exact hole src/ui/CLAUDE.md names.
+      row.innerHTML =
+        `<span class="mkt-collect-item">${this.deps.itemIcon(item)}` +
+        `<span class="mkt-sale-name"><span style="color:${qColor}">${esc(itemDisplayName(item))}${esc(stack)}</span>` +
+        `<span class="mkt-sale-buyer">${esc(t('itemUi.market.saleBuyer', { buyer: buyerName }))}</span></span></span>` +
+        `<span class="mkt-price">${this.deps.moneyHtml(proceeds)}</span>`;
+      this.deps.attachTooltip(row, () => this.deps.itemTooltip(item));
+      list.appendChild(row);
+    }
+    if (omitted > 0) {
+      const more = document.createElement('div');
+      more.className = 'mkt-sale-more';
+      more.textContent = t('itemUi.market.saleOlder', {
+        count: formatNumber(omitted, { maximumFractionDigits: 0 }),
+      });
+      list.appendChild(more);
+    }
+    body.appendChild(list);
   }
 
   // Fungible stock only: the plain listing form's quantity cap must match what

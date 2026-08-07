@@ -146,8 +146,10 @@ describe('blockedTowardTarget', () => {
 describe('blockedTowardTarget: world block modes (pinned live-world coordinates)', () => {
   it('an unclimbable steep face ahead reads as blocked', () => {
     const ctx = makeCtx({ blocked: false, seed: WORLD_SEED });
-    const mob = makeMob(-1500, 180); // rim wall band, uphill to the east
-    expect(blockedTowardTarget(ctx, mob, { x: -1480, y: 0, z: 180 }, SPEED)).toBe(true);
+    // rim wall band, uphill to the east (re-scanned after the natural-relief
+    // rim teeth moved the steep bands a few yards off the old pin)
+    const mob = makeMob(-1490, 180);
+    expect(blockedTowardTarget(ctx, mob, { x: -1470, y: 0, z: 180 }, SPEED)).toBe(true);
   });
 
   it('a Great Maze hedge crossing reads as blocked', () => {

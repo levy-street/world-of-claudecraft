@@ -10,7 +10,7 @@
 
 import { ITEMS } from '../data';
 import { canEquipItem } from '../equipment_rules';
-import type { PlayerClass, WeaponSkinLoadout, WeaponSkinType } from '../types';
+import type { PlayerClass, SkinCatalog, WeaponSkinLoadout, WeaponSkinType } from '../types';
 import { WEAPON_SKINS } from './weapon_skins';
 
 export type ItemWeaponType = WeaponSkinType | 'polearm';
@@ -159,22 +159,35 @@ export function weaponTypeForItem(itemId: string | null | undefined): ItemWeapon
 }
 
 /**
- * Skin types the player may apply right now. Requires an equipped mainhand
- * weapon. Hunters always display the class ranged weapon regardless of the
- * equipped item, so they may apply bow and crossbow skins; every other class
- * displays the equipped item, so the skin must match that item's type.
+ * Skin types the player may apply right now, in RESOLUTION ORDER (the first
+ * entry present in the loadout is the one displayed). Requires an equipped
+ * mainhand weapon.
+ *
+ * Which types apply depends on the BODY, not just the class, because the body
+ * decides what the hand actually shows. The hunter rig displays a fixed ranged
+ * attach and never the equipped item (`player_hunter` carries no `weaponSlots`,
+ * so only a bow/crossbow skin can replace it), which is why hunters take the
+ * ranged types rather than their weapon's. The Combat Mech is a separate body
+ * that DOES swap in the equipped mainhand, so a mech hunter can additionally
+ * skin the weapon they are really holding.
+ *
+ * Ranged stays first for a mech hunter: it preserves the look a hunter already
+ * had before putting the suit on, and a player who prefers the weapon skin
+ * clears the ranged one (`Sim.setWeaponSkin(pid, null, type)`), so nothing is
+ * locked out either way.
  */
 export function skinnableWeaponTypesFor(
   cls: string,
   mainhandItemId: string | null | undefined,
+  skinCatalog: SkinCatalog,
 ): WeaponSkinType[] {
   if (!mainhandItemId) return [];
-  // Crossbow first: it is the hunter's native visual, so with both types in the
-  // loadout the crossbow skin wins resolution deterministically.
-  if (cls === 'hunter') return ['crossbow', 'bow'];
-  const t = weaponTypeForItem(mainhandItemId);
-  if (!t || t === 'polearm') return [];
-  return [t];
+  const held = weaponTypeForItem(mainhandItemId);
+  const item: WeaponSkinType[] = !held || held === 'polearm' ? [] : [held];
+  // Crossbow before bow: they share the one ranged display slot, so with both
+  // in the loadout the crossbow skin wins resolution deterministically.
+  if (cls !== 'hunter') return item;
+  return skinCatalog === 'mech' ? ['crossbow', 'bow', ...item] : ['crossbow', 'bow'];
 }
 
 /**
@@ -187,9 +200,10 @@ export function resolveActiveWeaponSkin(
   cls: string,
   mainhandItemId: string | null | undefined,
   loadout: WeaponSkinLoadout | null | undefined,
+  skinCatalog: SkinCatalog,
 ): string | null {
   if (!loadout) return null;
-  for (const t of skinnableWeaponTypesFor(cls, mainhandItemId)) {
+  for (const t of skinnableWeaponTypesFor(cls, mainhandItemId, skinCatalog)) {
     const skinId = loadout[t];
     if (skinId && WEAPON_SKINS[skinId]?.weaponType === t) return skinId;
   }
@@ -218,13 +232,15 @@ export function offhandMirrorsWeaponSkin(
   return weaponTypeForItem(offhandItemId) === def.weaponType;
 }
 
-/** True when `skinType` may be applied with the given class and mainhand item. */
+/** True when `skinType` may be applied with the given class, mainhand item and
+ *  displayed body. */
 export function weaponSkinTypeMatches(
   cls: string,
   mainhandItemId: string | null | undefined,
   skinType: WeaponSkinType,
+  skinCatalog: SkinCatalog,
 ): boolean {
-  return skinnableWeaponTypesFor(cls, mainhandItemId).includes(skinType);
+  return skinnableWeaponTypesFor(cls, mainhandItemId, skinCatalog).includes(skinType);
 }
 
 /**
@@ -263,13 +279,20 @@ const eligibleByType = new Map<WeaponSkinType, readonly PlayerClass[]>();
 
 /**
  * Every class that can ever APPLY a skin of this weapon type (the store card
- * eligibility chips). Hunters always display the class ranged weapon, so bow
- * and crossbow are hunter-only and hunters are never eligible for any other
- * type. Other types derive from the item data: a class is eligible when it can
- * equip a proficiency-locked weapon of the type (starter weapons carry no
- * class lock and would mark every type all-class, so locked rows decide; a
- * type with no locked rows falls back to the full equip check). Memoized: the
- * item data is static content.
+ * eligibility chips). Bow and crossbow are hunter-only: they replace the
+ * hunter rig's fixed ranged attach, which no other class has. Every other type
+ * derives from the item data: a class is eligible when it can equip a
+ * proficiency-locked weapon of the type (starter weapons carry no class lock
+ * and would mark every type all-class, so locked rows decide; a type with no
+ * locked rows falls back to the full equip check).
+ *
+ * Hunters are NOT excluded from the melee types. They were, back when no body
+ * could show a hunter's equipped weapon, but the Combat Mech does, so a hunter
+ * holding a sword in the suit really can apply a sword skin and the chip would
+ * be lying. The item data already answers this per type, so no hunter carve-out
+ * is needed: hunters appear for exactly the types they can equip. Whether the
+ * skin applies to the body they are wearing RIGHT NOW is the separate
+ * `canApplyNow` question (`skinnableWeaponTypesFor`). Memoized: static content.
  */
 export function eligibleClassesForWeaponSkinType(type: WeaponSkinType): readonly PlayerClass[] {
   const memo = eligibleByType.get(type);
@@ -283,9 +306,7 @@ export function eligibleClassesForWeaponSkinType(type: WeaponSkinType): readonly
       .flatMap((id) => (ITEMS[id] ? [ITEMS[id]] : []));
     const locked = items.filter((item) => item.requiredClass);
     const pool = locked.length ? locked : items;
-    out = CLASS_ORDER.filter(
-      (cls) => cls !== 'hunter' && pool.some((item) => canEquipItem(cls, item)),
-    );
+    out = CLASS_ORDER.filter((cls) => pool.some((item) => canEquipItem(cls, item)));
   }
   eligibleByType.set(type, out);
   return out;

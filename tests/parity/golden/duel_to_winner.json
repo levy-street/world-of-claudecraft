@@ -8,8 +8,8 @@
     "updateDuels countdown -> active + duelStart",
     "endDuel on a PvP finishing blow (winner/loser + this.duels cleared)"
   ],
-  "draws": 530,
-  "drawDigest": "dfb03466",
+  "draws": 526,
+  "drawDigest": "8f824e62",
   "frames": [
     {
       "tick": 0,
@@ -29,7 +29,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 965,
-      "state": "7c7bf15f",
+      "state": "4cd5fdb9",
       "events": "bb6cd868",
       "rng": {
         "draws": 0,
@@ -40,7 +40,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 965,
-      "state": "db1ce54c",
+      "state": "72bd1c6e",
       "events": "f9f579a8",
       "rng": {
         "draws": 0,
@@ -51,22 +51,22 @@
       "tick": 60,
       "time": 3,
       "nextId": 965,
-      "state": "9a39c019",
+      "state": "e75684bf",
       "events": "cea7d96e",
       "rng": {
-        "draws": 140,
-        "digest": "aad057f3"
+        "draws": 137,
+        "digest": "bec97bd6"
       }
     },
     {
       "tick": 61,
       "time": 3.05,
       "nextId": 965,
-      "state": "4023f5a6",
+      "state": "9eef330e",
       "events": "9d9e6365",
       "rng": {
-        "draws": 157,
-        "digest": "76cce856"
+        "draws": 152,
+        "digest": "1202574a"
       },
       "label": "duel-active",
       "players": [
@@ -208,7 +208,7 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": 2.242568,
+          "fallStartY": 0.449488,
           "fiveSecondRule": 102.05,
           "hp": 100,
           "id": 963,
@@ -223,7 +223,7 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "y": 2.242568,
+            "y": 0.449488,
             "z": -40
           },
           "potionCooldownUntil": -1,
@@ -257,7 +257,7 @@
           "critChance": 0.056,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
-          "fallStartY": 2.139867,
+          "fallStartY": 0.3323,
           "fiveSecondRule": 102.05,
           "hp": 54,
           "id": 964,
@@ -272,7 +272,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 4,
-            "y": 2.139867,
+            "y": 0.3323,
             "z": -40
           },
           "potionCooldownUntil": -1,
@@ -305,11 +305,11 @@
       "tick": 61,
       "time": 3.05,
       "nextId": 965,
-      "state": "2638e36d",
+      "state": "d392ab3b",
       "events": "fe298cb7",
       "rng": {
-        "draws": 157,
-        "digest": "76cce856"
+        "draws": 152,
+        "digest": "1202574a"
       },
       "label": "duel-ended",
       "players": [
@@ -456,7 +456,7 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": 2.242568,
+          "fallStartY": 0.449488,
           "fiveSecondRule": 102.05,
           "hp": 100,
           "id": 963,
@@ -471,7 +471,7 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "y": 2.242568,
+            "y": 0.449488,
             "z": -40
           },
           "potionCooldownUntil": -1,
@@ -505,7 +505,7 @@
           "critChance": 0.056,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
-          "fallStartY": 2.139867,
+          "fallStartY": 0.3323,
           "fiveSecondRule": 102.05,
           "hp": 1,
           "id": 964,
@@ -520,7 +520,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 4,
-            "y": 2.139867,
+            "y": 0.3323,
             "z": -40
           },
           "potionCooldownUntil": -1,
@@ -553,33 +553,33 @@
       "tick": 80,
       "time": 4,
       "nextId": 965,
-      "state": "c2077508",
+      "state": "8271c7fc",
       "events": "251b6de1",
       "rng": {
-        "draws": 313,
-        "digest": "30689d20"
+        "draws": 305,
+        "digest": "22034388"
       }
     },
     {
       "tick": 100,
       "time": 5,
       "nextId": 965,
-      "state": "bfea924b",
+      "state": "bcfdfaff",
       "events": "741638a5",
       "rng": {
-        "draws": 523,
-        "digest": "0c48dd81"
+        "draws": 519,
+        "digest": "e86da331"
       }
     },
     {
       "tick": 101,
       "time": 5.05,
       "nextId": 965,
-      "state": "65c2a89e",
+      "state": "54ff0eb4",
       "events": "741638a5",
       "rng": {
-        "draws": 530,
-        "digest": "dfb03466"
+        "draws": 526,
+        "digest": "8f824e62"
       },
       "label": "final",
       "players": [
@@ -740,7 +740,7 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": 2.242568,
+          "fallStartY": 0.449488,
           "fiveSecondRule": 104.05,
           "hp": 100,
           "id": 963,
@@ -755,7 +755,7 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "y": 2.242568,
+            "y": 0.449488,
             "z": -40
           },
           "potionCooldownUntil": -1,
@@ -789,7 +789,7 @@
           "critChance": 0.056,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
-          "fallStartY": 2.139867,
+          "fallStartY": 0.3323,
           "fiveSecondRule": 104.05,
           "hp": 7,
           "id": 964,
@@ -804,7 +804,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 4,
-            "y": 2.139867,
+            "y": 0.3323,
             "z": -40
           },
           "potionCooldownUntil": -1,

@@ -340,11 +340,48 @@ export function buildOptionsMenu(opts: { bugReportAvailable: boolean }): Options
 // own modules.
 // ---------------------------------------------------------------------------
 
-/** Body control rows for the Graphics sub-panel, in render order. The interleaved
- *  notes (browser-effects, interface-mode) live here; the painter appends the
- *  trailing graphics/reload notes + the reload button + footer as panel chrome. */
-export function buildGraphicsControls(s: OptionsSettingsSource, env: OptionsEnv): OptionsControl[] {
-  const out: OptionsControl[] = [];
+/** One titled card of the two-column Graphics sub-panel. */
+export interface GraphicsSection {
+  titleKey: TranslationKey;
+  /** Desktop placement: column 1 (left), column 2 (right), or 'full' (a card
+   *  spanning both columns below them, its rows flowing two-up). Narrow/touch
+   *  stacks everything in section order. */
+  column: 1 | 2 | 'full';
+  controls: OptionsControl[];
+}
+
+// The two-option Off/On ladder the per-effect binaries render with.
+const offOnOptions: ChoiceOption[] = [
+  { value: 0, labelKey: 'hud.options.off' },
+  { value: 1, labelKey: 'hud.options.on' },
+];
+// Ambient Occlusion's three rungs: Off, half-resolution, full-resolution
+// (Full is how an Advanced mix reaches the ultra tiers' full-res AO).
+const ambientOcclusionOptions: ChoiceOption[] = [
+  { value: 0, labelKey: 'hud.options.off' },
+  { value: 0.5, labelKey: 'hudChrome.options.gfxHalf' },
+  { value: 1, labelKey: 'hud.options.surfaceDetailFull' },
+];
+// The two-step Low/High ladder (Character Detail's distant-rig animation
+// band, Dynamic Lights' point-light pool).
+const lowHighOptions: ChoiceOption[] = [
+  { value: 0, labelKey: 'hud.options.graphicsPresetLow' },
+  { value: 1, labelKey: 'hud.options.graphicsPresetHigh' },
+];
+
+/** The Graphics sub-panel as titled cards in a two-column form (the perf
+ *  panel's categorized layout). The per-system dials render for EVERY preset
+ *  (round 12): under a fixed preset they display that preset's seeded levels
+ *  and editing one switches the staged draft to the Advanced custom mix
+ *  (graphics_rebuild_core.stageGraphicsDraftChange, wired by the painter); the
+ *  dial ladders re-render so the preset row tracks that switch. The native
+ *  shell keeps its capped preset row only (its memory profile owns most of the
+ *  dial-mapped knobs, so the dials would be dead controls there). */
+export function buildGraphicsSections(
+  s: OptionsSettingsSource,
+  env: OptionsEnv,
+): GraphicsSection[] {
+  const quality: OptionsControl[] = [];
   const graphicsPresetOptions: ChoiceOption[] = [
     { value: 1, labelKey: 'hud.options.graphicsPresetLow' },
     { value: 2, labelKey: 'hud.options.graphicsPresetMedium' },
@@ -360,29 +397,74 @@ export function buildGraphicsControls(s: OptionsSettingsSource, env: OptionsEnv)
       { value: 5, labelKey: 'hud.options.graphicsPresetAdvanced' },
     );
   }
-  out.push(choice(s, 'graphicsPreset', 'hud.options.graphicsQuality', graphicsPresetOptions, true));
-  // Advanced preset (5) reveals the per-system level ladders (round 10:
-  // four-step quality dials replacing the historical Low/High binaries, plus
-  // the new Surface Detail dial).
-  if (Math.round(s.num('graphicsPreset')) === 5) {
-    out.push(choice(s, 'terrainDetail', 'hud.options.terrainDetail', qualityLadderOptions));
-    out.push(choice(s, 'foliageDensity', 'hud.options.foliageDensity', qualityLadderOptions));
-    out.push(choice(s, 'surfaceDetail', 'hud.options.surfaceDetail', surfaceDetailOptions));
-    out.push(choice(s, 'effectsQuality', 'hud.options.effectsQuality', effectsLadderOptions));
-    out.push(choice(s, 'shadowQuality', 'hud.options.shadowQuality', qualityLadderOptions));
-  }
-  out.push(
+  quality.push(
+    choice(s, 'graphicsPreset', 'hud.options.graphicsQuality', graphicsPresetOptions, true),
+  );
+  // The custom-switch explainer renders only under a FIXED preset: once the
+  // Advanced mix is active the dials edit in place and the note is a no-op.
+  if (!env.nativeShell && Math.round(s.num('graphicsPreset')) !== 5)
+    quality.push(note('hudChrome.options.gfxCustomNote'));
+
+  // The per-system dial cards: the world's geometry/dressing layers in one,
+  // the light-and-post passes in the other.
+  const world: OptionsControl[] = [
+    choice(s, 'terrainDetail', 'hud.options.terrainDetail', qualityLadderOptions, true),
+    choice(s, 'foliageDensity', 'hud.options.foliageDensity', qualityLadderOptions, true),
+    choice(s, 'surfaceDetail', 'hud.options.surfaceDetail', surfaceDetailOptions, true),
+    choice(s, 'viewDistance', 'hudChrome.options.gfxViewDistance', qualityLadderOptions, true),
+    choice(s, 'waterQuality', 'hudChrome.options.gfxWaterQuality', qualityLadderOptions, true),
+    choice(s, 'characterDetail', 'hudChrome.options.gfxCharacterDetail', lowHighOptions, true),
+  ];
+  const lighting: OptionsControl[] = [
+    choice(s, 'effectsQuality', 'hud.options.effectsQuality', effectsLadderOptions, true),
+    choice(s, 'shadowQuality', 'hud.options.shadowQuality', qualityLadderOptions, true),
+    choice(
+      s,
+      'ambientOcclusion',
+      'hudChrome.options.gfxAmbientOcclusion',
+      ambientOcclusionOptions,
+      true,
+    ),
+    choice(s, 'bloomQuality', 'hudChrome.options.gfxBloom', offOnOptions, true),
+    choice(s, 'antiAliasing', 'hudChrome.options.gfxAntiAliasing', offOnOptions, true),
+    choice(s, 'dynamicLights', 'hudChrome.options.gfxDynamicLights', lowHighOptions, true),
+    choice(
+      s,
+      'particleEffects',
+      'hudChrome.options.gfxParticleEffects',
+      effectsLadderOptions,
+      true,
+    ),
+    // The per-effect switches ride the post chain: Effects & Lighting on Low
+    // sheds that whole chain, so they have nothing to run on there.
+    note('hudChrome.options.gfxEffectsNote'),
+  ];
+
+  const camera: OptionsControl[] = [slider(s, 'cameraSpeed', 'hud.options.cameraSpeed')];
+  // Camera Speed only scales mouselook; touch gets a dedicated look-rate slider.
+  if (env.touch) camera.push(slider(s, 'touchLookSpeed', 'hud.options.touchLookSpeed'));
+
+  const display: OptionsControl[] = [
+    slider(s, 'renderScale', 'hud.options.renderQuality'),
+    slider(s, 'brightness', 'hud.options.brightness'),
+    slider(s, 'cameraFov', 'hud.options.fieldOfView', 'degrees', 1),
+    toggle(s, 'fullscreen', 'hud.options.fullscreen'),
+    toggle(s, 'weather', 'game.settings.weather'),
+    toggle(s, 'showOverflowXp', 'game.settings.showOverflowXp'),
+  ];
+
+  const system: OptionsControl[] = [
     choice(s, 'browserEffects', 'hudChrome.options.browserEffects', [
       { value: 0, labelKey: 'hudChrome.options.browserEffectsAuto' },
       { value: 1, labelKey: 'hudChrome.options.browserEffectsFull' },
       { value: 2, labelKey: 'hudChrome.options.browserEffectsReduced' },
       { value: 3, labelKey: 'hudChrome.options.browserEffectsMinimal' },
     ]),
-  );
-  out.push(note('hudChrome.options.browserEffectsNote'));
+    note('hudChrome.options.browserEffectsNote'),
+  ];
   // Desktop vs on-screen touch controls. Hidden in the native shell (forces touch).
   if (!env.nativeShell) {
-    out.push(
+    system.push(
       choice(
         s,
         'interfaceMode',
@@ -395,29 +477,61 @@ export function buildGraphicsControls(s: OptionsSettingsSource, env: OptionsEnv)
         true,
       ),
     );
-    out.push(note('hudChrome.options.interfaceModeNote'));
+    system.push(note('hudChrome.options.interfaceModeNote'));
   }
-  out.push(slider(s, 'cameraSpeed', 'hud.options.cameraSpeed'));
-  // Camera Speed only scales mouselook; touch gets a dedicated look-rate slider.
-  if (env.touch) out.push(slider(s, 'touchLookSpeed', 'hud.options.touchLookSpeed'));
-  out.push(slider(s, 'brightness', 'hud.options.brightness'));
-  out.push(slider(s, 'cameraFov', 'hud.options.fieldOfView', 'degrees', 1));
-  out.push(slider(s, 'renderScale', 'hud.options.renderQuality'));
-  out.push(toggle(s, 'fullscreen', 'hud.options.fullscreen'));
-  out.push(toggle(s, 'showOverflowXp', 'game.settings.showOverflowXp'));
-  if (env.touch) out.push(slider(s, 'touchOpacity', 'hud.options.touchOpacity'));
-  out.push(toggle(s, 'weather', 'game.settings.weather'));
-  if (env.touch) out.push(slider(s, 'joystickScale', 'hud.options.joystickSize'));
-  if (env.touch) out.push(slider(s, 'actionButtonScale', 'hud.options.buttonSize'));
-  if (env.touch) out.push(slider(s, 'joystickDeadzone', 'hud.options.joystickDeadzone'));
-  if (env.touch) out.push(boolToggle(s, 'touchInvertLook', 'hud.options.invertLook'));
-  // Camera joystick is hidden/off by default (swipe-look is primary); left-handed
-  // layout already has a Key Bindings row (leftHandedTouch), but is surfaced here
-  // too since it is squarely a touch/graphics-panel concern for touch players.
-  if (env.touch)
-    out.push(boolToggle(s, 'mobileCameraJoystick', 'hudChrome.options.mobileCameraJoystick'));
-  if (env.touch) out.push(boolToggle(s, 'leftHandedTouch', 'hudChrome.options.mobileLeftHanded'));
-  return out;
+
+  // The two dial cards balance the columns (Quality + World left, Lighting +
+  // Camera right); the row-style cards (Display, System, Touch) span FULL
+  // width below them with their rows flowing two-up, so neither column ends
+  // in a ragged gap. The dial cards are omitted on the native shell (its
+  // memory profile owns the dial-mapped knobs, so they would be dead rows).
+  const sections: GraphicsSection[] = [
+    { titleKey: 'hudChrome.options.gfxSectionQuality', column: 1, controls: quality },
+  ];
+  if (!env.nativeShell) {
+    sections.push(
+      { titleKey: 'hudChrome.options.gfxSectionWorld', column: 1, controls: world },
+      { titleKey: 'hudChrome.options.gfxSectionLighting', column: 2, controls: lighting },
+    );
+  }
+  sections.push(
+    { titleKey: 'hudChrome.options.gfxSectionCamera', column: 2, controls: camera },
+    { titleKey: 'hudChrome.options.gfxSectionDisplay', column: 'full', controls: display },
+    { titleKey: 'hudChrome.options.gfxSectionSystem', column: 'full', controls: system },
+  );
+  if (env.touch) {
+    sections.push({
+      titleKey: 'hudChrome.options.gfxSectionTouch',
+      column: 'full',
+      controls: [
+        slider(s, 'touchOpacity', 'hud.options.touchOpacity'),
+        slider(s, 'joystickScale', 'hud.options.joystickSize'),
+        slider(s, 'actionButtonScale', 'hud.options.buttonSize'),
+        slider(s, 'joystickDeadzone', 'hud.options.joystickDeadzone'),
+        boolToggle(s, 'touchInvertLook', 'hud.options.invertLook'),
+        // Camera joystick is hidden/off by default (swipe-look is primary);
+        // left-handed layout already has a Key Bindings row (leftHandedTouch),
+        // but is surfaced here too since it is squarely a touch/graphics-panel
+        // concern for touch players.
+        boolToggle(s, 'mobileCameraJoystick', 'hudChrome.options.mobileCameraJoystick'),
+        boolToggle(s, 'leftHandedTouch', 'hudChrome.options.mobileLeftHanded'),
+      ],
+    });
+  }
+  return sections;
+}
+
+/** The one flatten both consumers share: the painter feeds the reset footer
+ *  with flattenGraphicsSections(sections) over the SAME section objects it
+ *  painted, so the card layout and the reset-key scope can never disagree. */
+export function flattenGraphicsSections(sections: GraphicsSection[]): OptionsControl[] {
+  return sections.flatMap((section) => section.controls);
+}
+
+/** The Graphics sub-panel's controls as one flat list (the card sections in
+ *  order), for the dispatch tests that pin the full set. */
+export function buildGraphicsControls(s: OptionsSettingsSource, env: OptionsEnv): OptionsControl[] {
+  return flattenGraphicsSections(buildGraphicsSections(s, env));
 }
 
 // ---------------------------------------------------------------------------

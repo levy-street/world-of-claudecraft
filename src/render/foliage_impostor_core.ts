@@ -128,6 +128,37 @@ export const IMPOSTOR_MIN_BAND = 48;
  */
 export const IMPOSTOR_SWAP_FADE = 24;
 
+/**
+ * How much of the budgeted real-model radius the SPRITE arm actually spends.
+ *
+ * The lean arm has no impostors, so its trees must run to the full budgeted
+ * radius or the forest visibly ends (treeDetailDistance in foliage_lod.ts).
+ * The sprite arm is under no such obligation: past the handoff the tree is
+ * still there, drawn as a baked picture of itself at the same base, height,
+ * tint and sway. So the budgeted radius is a CEILING on quality, not a floor
+ * on correctness, and the outermost stretch of it is the most expensive part
+ * of the whole foliage layer: real-model cost grows with the SQUARE of the
+ * radius, so the last 22 percent of the disc's reach is 39 percent of its
+ * area, and every tree in that ring costs a hundred-odd triangles instead of
+ * two.
+ *
+ * 0.78 puts the clear-air handoff at 234 yards where it used to sit at 300
+ * (times the governor's own lever, so a starved budget still pulls in from
+ * there). At 234 yards a 14 yard tree is about 50 screen pixels tall against
+ * an 80 pixel atlas cell, so the sprite is still oversampled, and 12 baked
+ * yaw views blended pairwise means the camera has to travel roughly 120 yards
+ * sideways before the sprite even changes view pair. The floor below
+ * (SPRITE_SWAP_MIN, the authors' own clear-air limit at 150) is untouched and
+ * still binds first, so this can never push a card into the near field.
+ *
+ * What it costs, stated honestly: between 234 and 300 yards a tree is a
+ * billboard rather than geometry, so it loses canopy self-parallax under
+ * camera translation and its silhouette stops changing with pitch. Both are
+ * things you can find at 234 yards if you go looking for them with the camera;
+ * neither is something you notice while playing.
+ */
+export const SPRITE_SWAP_BUDGET = 0.78;
+
 /** The closest swap the blend law allows for this fog pair. */
 export function spriteSwapFloor(fogNear: number, fogFar: number): number {
   if (!(fogFar > fogNear)) return SPRITE_SWAP_MIN;
@@ -141,6 +172,12 @@ export function spriteSwapFloor(fogNear: number, fogFar: number): number {
  * LIVE foliage cull; the final clamp against it is what parks the swap on a
  * residency fog wall (real trees to the wall, no sprites in the camera's lap)
  * while the wall lasts.
+ *
+ * `base` is the tier's authored detail radius and `distanceScale` the
+ * governor's lever; the sprite arm spends SPRITE_SWAP_BUDGET of their product
+ * rather than all of it, because past the handoff the tree keeps being drawn
+ * (see that constant for the trade). Every other law here is unchanged, and
+ * the floor still wins where it is higher.
  */
 export function spriteSwapDistance(
   base: number,
@@ -149,7 +186,7 @@ export function spriteSwapDistance(
   fogFar: number,
   fogLimit: number,
 ): number {
-  const budgeted = base * distanceScale;
+  const budgeted = base * distanceScale * SPRITE_SWAP_BUDGET;
   const band = Math.min(IMPOSTOR_MIN_BAND, 0.25 * fogLimit);
   const swap = Math.max(Math.min(budgeted, fogLimit - band), spriteSwapFloor(fogNear, fogFar));
   return Math.min(swap, fogLimit);
@@ -279,3 +316,92 @@ export function shippedImpostorInventory(): ImpostorArchetypeSpec[] {
   }
   return specs;
 }
+
+// ---------------------------------------------------------------------------
+// Sprite shading normal
+// ---------------------------------------------------------------------------
+
+/**
+ * How far the sprite's shading normal leans off vertical, 0 (the old
+ * straight-up quad normal) to 1 (a pure camera-facing cylinder).
+ *
+ * A quad carrying up normals takes the GROUND PLANE's light response, which
+ * reads as a canopy only while the sun is high. This world's sun never passes
+ * 41 degrees (CELESTIAL_ARC_HEIGHT in day_night_core.ts) and sits under 3
+ * degrees around dawn and dusk, where dot(up, sunDir) is about 0.05: every
+ * sprite loses its directional term in the same frame and flattens into one
+ * ambient-lit cutout while the real trees beside it still show a warm lit
+ * side and a dark back. Leaning the normal toward the camera restores the
+ * directional term at a low sun; keeping most of the vertical component is
+ * what preserves the midday response the sprite-to-tree parity was tuned
+ * against. At this value the bearing-averaged noon term holds about 83
+ * percent of the up-normal response while the dawn lit edge gains roughly a
+ * factor of 11, which is the trade this constant exists to make.
+ */
+export const IMPOSTOR_NORMAL_TILT = 0.4;
+
+/**
+ * Half-width of the horizontal normal fan across the card, in radians. The
+ * leaning normal alone would light a whole sprite uniformly from its own
+ * bearing; fanning it from one edge to the other makes the card shade like a
+ * standing cylinder instead, so a single sprite carries a lit side and a
+ * shaded side the way its real twin's canopy does. A canopy is a soft mass,
+ * not a mirror-finish tube, so the fan stops short of the full 90 degrees a
+ * true cylinder silhouette would take.
+ */
+export const IMPOSTOR_NORMAL_FAN = 1.05;
+
+/**
+ * Shared GLSL for the sprite shading normal. Declares `impNormal` in WORLD
+ * space from the billboard basis the vertex stage has already built
+ * (`impFwd`, the horizontal direction from the instance toward the camera,
+ * and `impRight`, across the card) plus the vertex's own place across the
+ * card (`position.x`, -0.5 at the left edge to 0.5 at the right). The caller
+ * un-rotates it into the instance frame; see foliage_impostor.ts.
+ */
+export const IMPOSTOR_NORMAL_GLSL = `
+        float impFan = position.x * ${(2 * IMPOSTOR_NORMAL_FAN).toFixed(5)};
+        vec3 impNormal = normalize(mix(vec3(0.0, 1.0, 0.0),
+          impFwd * cos(impFan) + impRight * sin(impFan), ${IMPOSTOR_NORMAL_TILT.toFixed(3)}));`;
+
+/**
+ * The world-space shading normal IMPOSTOR_NORMAL_GLSL builds, in plain TS so
+ * the light response can be pinned in Node. `faceX` is the vertex's
+ * position.x (-0.5 to 0.5) and (`fwdX`, `fwdZ`) the horizontal direction from
+ * the instance toward the camera. Mirrors the GLSL step for step: the two
+ * only stay honest because the core test evaluates this one against the
+ * numbers the shader constants above interpolate.
+ */
+export function impostorSpriteNormal(
+  faceX: number,
+  fwdX: number,
+  fwdZ: number,
+  tilt: number = IMPOSTOR_NORMAL_TILT,
+  fan: number = IMPOSTOR_NORMAL_FAN,
+): [number, number, number] {
+  const len = Math.hypot(fwdX, fwdZ) || 1;
+  const fx = fwdX / len;
+  const fz = fwdZ / len;
+  // impRight = cross(up, impFwd)
+  const rx = fz;
+  const rz = -fx;
+  const ang = faceX * 2 * fan;
+  const c = Math.cos(ang);
+  const s = Math.sin(ang);
+  const nx = (fx * c + rx * s) * tilt;
+  const ny = 1 - tilt;
+  const nz = (fz * c + rz * s) * tilt;
+  const n = Math.hypot(nx, ny, nz) || 1;
+  return [nx / n, ny / n, nz / n];
+}
+
+/**
+ * The texture-shaped canopy ambient floor, shared by the real canopy
+ * materials (foliage.ts, where its rationale lives: a dense canopy
+ * shadow-maps itself into darkness) and the sprite impostors. Emissive is
+ * added after all light attenuation, so it is the one term that survives the
+ * deep-night light scale: an impostor without it reads as a pure black
+ * silhouette at night while its real twin stays readable. One constant so
+ * the two sides of the swap line can never drift apart.
+ */
+export const CANOPY_EMISSIVE_FLOOR: readonly [number, number, number] = [0.155, 0.175, 0.135];

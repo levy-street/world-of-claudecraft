@@ -195,7 +195,12 @@ describe('frostbolt proc generation', () => {
   // wait) is a lot of synchronous sim work for vitest's 5s default: fine on an
   // idle machine, but tight under worker-pool CPU contention. Real execution is
   // sub-second in isolation; give this one real headroom instead of flaking.
-  const PROC_TEST_TIMEOUT_MS = 20_000;
+  // 20 s proved to be exactly the contention envelope, not headroom: when the
+  // Phase 4 long-sims lane re-partitioned the shard packs, this test timed
+  // out at 20 s on the same recomposed shard in two consecutive CI runs
+  // (31107474546, 31110001519) while passing everywhere else, so the budget
+  // now carries the same loaded-CI margin the other long walkers get.
+  const PROC_TEST_TIMEOUT_MS = 60_000;
 
   it(
     'a committed-frost mage eventually rolls both procs, capped at 2 stacks',

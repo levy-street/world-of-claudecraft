@@ -378,8 +378,8 @@ describe('the variance roll actually changes the masterwork outcome (#1296, hunt
     sim.addItem('spool_of_thread', 5, pid);
   }
 
-  it('a worse roll forces the masterwork bump off even though the proc roll alone would have hit (seed 62)', () => {
-    const sim = makeSim(62);
+  it('a worse roll forces the masterwork bump off even though the proc roll alone would have hit (seed 51)', () => {
+    const sim = makeSim(51);
     const pid = sim.playerId;
     const meta = metaOf(sim, pid);
     vestmentsScenario(sim, pid, meta, true);
@@ -398,8 +398,8 @@ describe('the variance roll actually changes the masterwork outcome (#1296, hunt
     expect(sim.lastCraftResult?.masterwork).toBeUndefined();
   });
 
-  it('a better roll improves the odds enough to turn an otherwise-miss into a masterwork hit (seed 2)', () => {
-    const sim = makeSim(2);
+  it('a better roll improves the odds enough to turn an otherwise-miss into a masterwork hit (seed 96)', () => {
+    const sim = makeSim(96);
     const pid = sim.playerId;
     const meta = metaOf(sim, pid);
     vestmentsScenario(sim, pid, meta, false);

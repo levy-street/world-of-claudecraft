@@ -57,6 +57,7 @@ export const TERRAIN_APPLIER = {
   glacierTarnRamp: 31,
   sowfieldFlatten: 32,
   stableFlatten: 33,
+  fenSouthShore: 34,
 } as const;
 
 function bounds(minX: number, maxX: number, minZ: number, maxZ: number): TerrainRegionBounds {
@@ -89,7 +90,9 @@ export const TERRAIN_APPLIER_BOUNDS: readonly (readonly TerrainRegionBounds[] | 
   [bounds(126, 262, -80, 60)],
   null,
   null,
-  [bounds(-180, -124, 940, 1925), bounds(124, 180, 940, 1925)],
+  // 194, not 180: the flank carve now skirts STRIP_FLANK_OUTER_SKIRT yards past
+  // the strip edge so it fades into the column shore instead of walling it off.
+  [bounds(-194, -124, 940, 1925), bounds(124, 194, 940, 1925)],
   null,
   null,
   [bounds(260, 480, 2160, 2360)],
@@ -101,6 +104,11 @@ export const TERRAIN_APPLIER_BOUNDS: readonly (readonly TerrainRegionBounds[] | 
   [bounds(25.5, 57, 1631.5, 1649)],
   [bounds(-64, 42, -149, -75)],
   [bounds(320, 436, 536, 616)],
+  // The fen's south shore: west of the world bound skirt out to the corner
+  // where its bay meets the vale headland (FEN_SHORE_CORNER_X), and from the
+  // tail fade (FEN_SHORE_TAIL_Z) north to FEN_ZMIN + FEN_SHORE_SUPPORT, the
+  // widest the wandered waterline plus its bank shave can reach inland.
+  [bounds(-566, -232, 132, 336)],
 ];
 
 interface MutableCell {

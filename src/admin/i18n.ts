@@ -190,6 +190,7 @@ export const ADMIN_ERROR_KEYS: Record<string, string> = {
   'invalid authentication code': 'error.invalidTwoFactorCode',
   'admin accounts cannot be suspended or banned': 'error.cannotModerateAdmin',
   'open report not found': 'error.reportNotFound',
+  'open bug report not found': 'error.bugReportNotFound',
   'account not found': 'error.accountNotFound',
   'account is not suspended': 'error.accountNotSuspended',
   'moderation action failed': 'error.moderationFailed',

@@ -40,7 +40,7 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { HARVEST_COMPONENT_ITEMS } from '../src/sim/content/professions';
-import { FOCUS_POINT_BUDGET } from '../src/sim/professions/focus';
+import { FOCUS_POINT_BUDGET, type RespecPaymentTier } from '../src/sim/professions/focus';
 import { FOCUSABLE_SELECTOR, FocusManager } from '../src/ui/focus_manager';
 import { Hud } from '../src/ui/hud';
 import { t } from '../src/ui/i18n';
@@ -50,7 +50,7 @@ import {
   type TownFocusView,
   townFocusRenderSig,
 } from '../src/ui/town_focus_view';
-import { renderTownFocusWindow } from '../src/ui/town_focus_window';
+import { renderTownFocusWindow, type TownFocusRespecPreview } from '../src/ui/town_focus_window';
 import { makeWindowFocus, type WindowFocusBridge } from '../src/ui/window_focus';
 
 const COMPONENT = TOWN_FOCUS_COMPONENTS[0];
@@ -61,6 +61,17 @@ const OTHER_COMPONENT = TOWN_FOCUS_COMPONENTS[1];
 function viewOf(allocation: Record<string, number>, inTown = true): TownFocusView {
   return buildTownFocusView(allocation, FOCUS_POINT_BUDGET, inTown);
 }
+
+// #1144: this file owns everything about the painter's REBUILD/focus behavior
+// and asserts nothing about the re-spec cost preview (that is
+// tests/town_focus_number_format.test.ts and the Sim-level charge tests in
+// tests/town_focus_sim.test.ts). A fixed free-tier, zero-cost preview keeps
+// every call site below exercising exactly what it did before the tier
+// picker existed.
+const NO_COST_RESPEC: TownFocusRespecPreview = {
+  tier: 'time',
+  cost: { durationMs: 0, coin: 0, materials: 0 },
+};
 
 // ---------------------------------------------------------------------------
 // 1. The pure signature.
@@ -418,6 +429,7 @@ describe('refreshOpenTownFocusIfChanged', () => {
 interface TownFocusRenderHarness {
   sim: { townFocus: Record<string, number>; setTownFocus(next: Record<string, number>): void };
   townFocusDraft: Record<string, number> | null;
+  townFocusRespecTier: RespecPaymentTier;
   lastTownFocusSig: string;
   isInTown(): boolean;
   renderTownFocus(): void;
@@ -437,6 +449,9 @@ function makeRenderHud(allocation: Record<string, number>): {
   let inTown = true;
   hud.sim = { townFocus: {}, setTownFocus: vi.fn() } as unknown as TownFocusRenderHarness['sim'];
   hud.townFocusDraft = { ...allocation };
+  // Object.create skips field initializers (the class declares 'time' as the
+  // default), so seed it by hand like every other field this harness carries.
+  hud.townFocusRespecTier = 'time';
   hud.lastTownFocusSig = '';
   hud.isInTown = () => inTown;
   hud.closeTownFocus = vi.fn() as unknown as TownFocusRenderHarness['closeTownFocus'];
@@ -550,7 +565,12 @@ describe('renderTownFocusWindow carries keyboard focus across its own wipe', () 
     const el = document.createElement('div');
     el.id = 'town-focus-window';
     document.body.appendChild(el);
-    renderTownFocusWindow(el, view, { onStep, onSave: vi.fn(), onClose: vi.fn() });
+    renderTownFocusWindow(el, view, NO_COST_RESPEC, {
+      onStep,
+      onTierChange: vi.fn(),
+      onSave: vi.fn(),
+      onClose: vi.fn(),
+    });
     return { el, onStep };
   }
 
@@ -558,8 +578,9 @@ describe('renderTownFocusWindow carries keyboard focus across its own wipe', () 
     const { el } = paint(viewOf({ [COMPONENT]: 2 }));
     stepButton(el, COMPONENT, 'inc').focus();
     // The step handler repaints the panel, exactly as Hud.renderTownFocus does.
-    renderTownFocusWindow(el, viewOf({ [COMPONENT]: 3 }), {
+    renderTownFocusWindow(el, viewOf({ [COMPONENT]: 3 }), NO_COST_RESPEC, {
       onStep: vi.fn(),
+      onTierChange: vi.fn(),
       onSave: vi.fn(),
       onClose: vi.fn(),
     });
@@ -573,8 +594,9 @@ describe('renderTownFocusWindow carries keyboard focus across its own wipe', () 
     // player lands on <body> and cannot continue.
     const { el } = paint(viewOf({ [COMPONENT]: 1 }));
     stepButton(el, COMPONENT, 'dec').focus();
-    renderTownFocusWindow(el, viewOf({}), {
+    renderTownFocusWindow(el, viewOf({}), NO_COST_RESPEC, {
       onStep: vi.fn(),
+      onTierChange: vi.fn(),
       onSave: vi.fn(),
       onClose: vi.fn(),
     });
@@ -586,8 +608,9 @@ describe('renderTownFocusWindow carries keyboard focus across its own wipe', () 
     const { el } = paint(viewOf({ [COMPONENT]: 1 }));
     stepButton(el, COMPONENT, 'dec').focus();
     // Walking out of town disables every stepper AND Save.
-    renderTownFocusWindow(el, viewOf({ [COMPONENT]: 1 }, false), {
+    renderTownFocusWindow(el, viewOf({ [COMPONENT]: 1 }, false), NO_COST_RESPEC, {
       onStep: vi.fn(),
+      onTierChange: vi.fn(),
       onSave: vi.fn(),
       onClose: vi.fn(),
     });
@@ -598,8 +621,9 @@ describe('renderTownFocusWindow carries keyboard focus across its own wipe', () 
     const { el } = paint(viewOf({ [COMPONENT]: 1 }));
     const save = el.querySelector<HTMLButtonElement>('.town-focus-save');
     save?.focus();
-    renderTownFocusWindow(el, viewOf({ [COMPONENT]: 2 }), {
+    renderTownFocusWindow(el, viewOf({ [COMPONENT]: 2 }), NO_COST_RESPEC, {
       onStep: vi.fn(),
+      onTierChange: vi.fn(),
       onSave: vi.fn(),
       onClose: vi.fn(),
     });
@@ -613,8 +637,9 @@ describe('renderTownFocusWindow carries keyboard focus across its own wipe', () 
     // destructive control to hand a player who was dismissing the panel.
     const { el } = paint(viewOf({ [COMPONENT]: 1 }));
     el.querySelector<HTMLButtonElement>('[data-close]')?.focus();
-    renderTownFocusWindow(el, viewOf({ [COMPONENT]: 2 }), {
+    renderTownFocusWindow(el, viewOf({ [COMPONENT]: 2 }), NO_COST_RESPEC, {
       onStep: vi.fn(),
+      onTierChange: vi.fn(),
       onSave: vi.fn(),
       onClose: vi.fn(),
     });
@@ -630,8 +655,9 @@ describe('renderTownFocusWindow carries keyboard focus across its own wipe', () 
     document.body.appendChild(outside);
     const { el } = paint(viewOf({ [COMPONENT]: 1 }));
     outside.focus();
-    renderTownFocusWindow(el, viewOf({ [COMPONENT]: 2 }), {
+    renderTownFocusWindow(el, viewOf({ [COMPONENT]: 2 }), NO_COST_RESPEC, {
       onStep: vi.fn(),
+      onTierChange: vi.fn(),
       onSave: vi.fn(),
       onClose: vi.fn(),
     });
@@ -650,8 +676,9 @@ describe('renderTownFocusWindow carries keyboard focus across its own wipe', () 
     document.body.appendChild(outside);
     const { el } = paint(viewOf({ [COMPONENT]: 1 }));
     outside.focus();
-    renderTownFocusWindow(el, viewOf({ [COMPONENT]: 2 }), {
+    renderTownFocusWindow(el, viewOf({ [COMPONENT]: 2 }), NO_COST_RESPEC, {
       onStep: vi.fn(),
+      onTierChange: vi.fn(),
       onSave: vi.fn(),
       onClose: vi.fn(),
     });
@@ -665,7 +692,9 @@ describe('renderTownFocusWindow carries keyboard focus across its own wipe', () 
     const keys = [...el.querySelectorAll<HTMLElement>('[data-focus-key]')].map(
       (n) => n.dataset.focusKey,
     );
-    expect(keys.length).toBe(TOWN_FOCUS_COMPONENTS.length * 2 + 2);
+    // +2 stepper keys per component, plus the three singletons: the #1144
+    // tier select, Save, Close.
+    expect(keys.length).toBe(TOWN_FOCUS_COMPONENTS.length * 2 + 3);
     expect(new Set(keys).size).toBe(keys.length);
   });
 });
@@ -768,7 +797,10 @@ describe('Town Focus repaint-gate wiring (source pins)', () => {
 // ---------------------------------------------------------------------------
 
 interface TownFocusFocusHarness {
-  sim: { townFocus: Record<string, number>; setTownFocus(next: Record<string, number>): void };
+  sim: {
+    townFocus: Record<string, number>;
+    setTownFocus(next: Record<string, number>, tier: RespecPaymentTier): void;
+  };
   townFocusDraft: Record<string, number> | null;
   lastTownFocusSig: string;
   townFocusWindowFocus: WindowFocusBridge;
@@ -1019,7 +1051,9 @@ describe('the Town Focus panel is wired into the shared focus system', () => {
     save?.focus();
     save?.click();
     vi.runAllTimers();
-    expect(hud.sim.setTownFocus).toHaveBeenCalledWith({ [COMPONENT]: 2 });
+    // 'time': toggleTownFocus resets the #1144 tier picker to the free
+    // default on every fresh open, and this test never touches the select.
+    expect(hud.sim.setTownFocus).toHaveBeenCalledWith({ [COMPONENT]: 2 }, 'time');
     expect(hud.townFocusOpen).toBe(false);
     expect(document.activeElement).toBe(opener);
   });

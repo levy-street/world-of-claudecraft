@@ -1232,6 +1232,8 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.lootHeroic': "Bonus héroïque, l'un de ces objets tombe toujours:",
   'hudChrome.finder.lootMaybe': "Au plus l'un de ces objets peut tomber:",
   'hudChrome.finder.mech.deathless_rage': 'Fureur immortelle (interrompue aux pierres de garde)',
+  'hudChrome.finder.mech.dread_curse':
+    'Malédiction d’effroi (héroïque seulement, affaiblissement cumulatif pour échange de tank)',
   'hudChrome.finder.mech.deathstalker_cleave': 'Balayage du traqueur de mort (cleave frontal)',
   'hudChrome.finder.mech.enrage': 'Entre en rage à faible santé',
   'hudChrome.finder.mech.grave_cleaver': 'Faucheur de tombes (cleave frontal)',
@@ -2893,6 +2895,8 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobTooltip.friendly': 'Amical',
   'hudChrome.mobTooltip.hostile': 'Hostile',
   'hudChrome.mobTooltip.levelFamily': '{family} niveau {level}',
+  'hudChrome.mobTooltip.elite': 'Élite',
+  'hudChrome.mobTooltip.boss': 'Boss',
   'hudChrome.options.aurasOnPlayerFrame': 'Améliorations sur le cadre du joueur',
   'hudChrome.options.playerFrameScale': 'Échelle du cadre du joueur',
   'hudChrome.options.showDailyRewardsChest': 'Afficher le coffre des récompenses quotidiennes',
@@ -6619,6 +6623,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.harvestTooltip':
     "Récupère les composants cochés. Chaque cadavre ne peut être dépecé qu'une fois, premier arrivé. Ne prend pas le butin.",
   'hudChrome.corpseHarvest.title': 'Dépeçage',
+  'hudChrome.emoteEditor.close': 'Fermer les emotes',
   'hudChrome.emoteEditor.done': 'Terminé',
   'hudChrome.emoteEditor.title': 'Emotes',
   'hudChrome.emotes.bow': "S'incliner",
@@ -6663,6 +6668,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchantName.enchant_neck_agility': 'Enchantement Collier - Agilité',
   'hudChrome.enchantName.enchant_neck_intellect': 'Enchantement Collier - Intellect',
   'hudChrome.enchantName.enchant_neck_spirit': 'Enchantement Collier - Esprit',
+  'hudChrome.enchantName.enchant_offhand_stamina': 'Enchantement Main gauche - Endurance',
   'hudChrome.enchantName.enchant_ring_agility': 'Enchantement Anneau - Agilité',
   'hudChrome.enchantName.enchant_ring_intellect': 'Enchantement Anneau - Intellect',
   'hudChrome.enchantName.enchant_ring_spirit': 'Enchantement Anneau - Esprit',
@@ -10446,7 +10452,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'guide.dungeonsPage.resetBody':
     'Si vous changez de difficulté alors que votre groupe détient encore des parcours revendiqués, les anciennes revendications persistent un moment avant de disparaître. Le chef de groupe peut les abandonner immédiatement : choisissez Réinitialiser toutes les instances dans le menu de son portrait, ou saisissez /dungeon reset. La difficulté doit réellement avoir changé, personne, vivant ou mort, ne doit rester à l’intérieur, et un court délai sépare deux réinitialisations. Si vous arrivez à l’entrée avec la mauvaise difficulté, le jeu vous avertit avant le début. Le raid n’est jamais réinitialisé ainsi ; ses propres règles de verrouillage restent en vigueur.',
   'guide.dungeonsPage.wildheartBody':
-    'Une caldeira de jungle détrempée par la pluie où deux sentiers de chasse surélevés encerclent un cénote de jade. Traversez tanières de bêtes et ruines ancestrales, puis gravissez la pyramide rituelle pour affronter Zulgar.',
+    'Une caldeira de jungle détrempée par la pluie où deux sentiers de chasse surélevés encerclent un cénote de jade. Traversez tanières de bêtes et ruines ancestrales, puis gravissez la pyramide rituelle pour voir qui vous attend au sommet.',
   'guide.gear.itemLevelBody':
     'Pour comparer rapidement deux pièces, activez Afficher le niveau d’objet dans les options. L’équipement dont la provenance est connue, obtenu sur les ennemis, par les quêtes ou les métiers, affiche alors un niveau d’objet : une valeur unique qui estime sa puissance d’après sa source et permet de repérer la meilleure amélioration, même entre emplacements différents. Les pièces sans telle provenance, comme les articles de base des marchands et l’équipement de départ, n’en affichent pas ; cette absence est normale.',
   'guide.gear.qualityBody':

@@ -28,7 +28,24 @@ Everything else is a sibling module in one of these families:
   its rank-tinted energy membrane (`buildRiftGateBody`), and `rift_rank.ts` is
   the floating C/B/A/S rank badge above a world rift portal.
 - **Per-frame overlay/FX modules** ticked from `sync()`: `vfx.ts` (pooled
-  particles), `weather.ts`, `character_effects.ts`.
+  particles), `weather.ts` (any weathered biome inside the camera box drives
+  precipitation and masked spawns keep it over that zone's own cells, so a
+  neighbouring realm's snow is visible from outside; decisions in
+  `weather_field_core.ts`), `character_effects.ts`.
+- **Cross-surface shader services** own a shared uniform block plus a GLSL
+  snippet that SEVERAL materials splice, never a copy per material.
+  `biome_haze_field.ts` (+ its `_core`) is the reference: one small world-space
+  DataTexture of per-zone haze colour and strength (colour carries the zone's
+  light level and its baked weather veil, so a twilight realm reads dim and a
+  snowing one white from outside), which `terrain.ts`, the far vista tiles and
+  `water.ts` all splice at the same anchor (immediately before
+  `<fog_fragment>`) on the same uniform objects, so distant land carries its
+  own realm's atmosphere and the detail-horizon handoff cannot draw a ring.
+  The sky dome (`sky.ts`) is a fourth consumer on the same uniforms: a
+  directional horizon-band tint sampled along the view ray, applied before
+  the dome's own fog band so the camera zone's fog still owns the true rim.
+  The renderer builds the field once from its outdoor fog presets and pushes
+  the camera + `dnGrade.fog` per frame; `?zonehaze=off` is the A/B switch.
 - **The nameplate suite** (below) owns all overhead text and badges.
 - **Pure logic cores** (below) hold Node-tested per-frame decisions.
 - **Perf governors:** `render_budget.ts` (adaptive frame budget, see
@@ -195,6 +212,14 @@ collision/movement.
   (material, z-band), share materials via `surfaceMat`, distance-cull/LOD in
   `sync` (see the `*_RANGE_SQ` constants). No per-frame `new THREE.*` in hot paths;
   reuse the `tmpV` scratch vectors / scratch arrays already in `renderer.ts`.
+- **Cloning a material? Use `material_clone_hooks.ts`.** `Material.clone()` copies
+  userData but silently DROPS `onBeforeCompile`, and three keys its program cache
+  on `customProgramCacheKey()`, whose default return value IS
+  `onBeforeCompile.toString()`. So a bare clone of a patched material (rim glow,
+  the worn surface-detail layer) both renders un-patched AND links a whole new
+  program on its first draw, wherever that draw lands. `cloneMaterialWithHooks`
+  re-attaches exactly the layers the source carried, in the source's order, so
+  the composed key comes out identical and the clone reuses the linked program.
 - **`render_budget.ts` is the renderer's adaptive-budget core** (tier-driven frame
   budget + telemetry, keyed off `gfx.ts` quality bands). `renderer.ts` owns it,
   degrades against it, and pushes the resulting grass/foliage/vfx quality levels into

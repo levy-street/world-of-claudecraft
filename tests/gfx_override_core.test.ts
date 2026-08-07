@@ -143,16 +143,15 @@ describe('gfx override application', () => {
       ]),
     );
 
-    // Regenerated for the new maxPooledObjects field (mobile-disconnect fix: bounds the
-    // ground-object reuse pool on constrained-memory devices, mirroring maxPooledCharacterVisuals).
-    // New field, same shape otherwise; every profile's byte pin shifts because the key exists now.
+    // Regenerated for the combined v21 profile controls and maxPooledObjects field. The staged
+    // vista and water tiers plus the bounded ground-object pool move every derived profile byte.
     expect(hashes).toEqual({
-      low: 'edbafff9b716f0cd2ee525390025a8f10b474b4ed19ed67c22d56b16d3e8b840',
-      medium: '63569868f1845852334269e5547b67a389099306ef90b835916c3c393568d770',
-      high: '6ff17afbf9ac4bf36a64c9cc4ec501143f0572506fcf1aad1fd603a0d0c15a19',
-      ultra: 'd496bf434d20782e7c0a63feaf5097305c47dae4615a81cb8019faf1cf61a8fb',
-      insane: 'd4498dbaa24f061443c527ca4ce5a331bdaf36c68c9fc847208a34d5892e97a8',
-      advanced: 'cb2710197cf5ad2be0f8e2917a3bb223aefcea29149d45eff9bb65df3d45f1e9',
+      low: '4987a6b9a467580e2cb92a69c480991393c2c225ea15c34163d32c2ea1b79421',
+      medium: '631057f9ab877b911d9dc8871ce4618cdbe7e41834e138cdf8fca2ec65605c1a',
+      high: '8bae7a847914010b9c2628b83b71db75071473e4a0454fccc7f5995d99fb5c8c',
+      ultra: '6e4125654ebe9e92439a87a0025e8c2980261381f7519ed4e4151441f709663f',
+      insane: '9b8c9748c3c859e5f205ae1158ac78ed946cc334c0a430220805f35a99a49011',
+      advanced: 'c593310aac361378b53d43809c53c7c1f5f9947b811eea19e5ff0aab456e75e4',
     });
   });
 

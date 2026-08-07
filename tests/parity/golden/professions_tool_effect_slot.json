@@ -17,7 +17,7 @@
     "R40 confirmed prompt use: two draws, bonus applied, charge spent (the consented digest)"
   ],
   "draws": 6,
-  "drawDigest": "2c41400b",
+  "drawDigest": "1272a77a",
   "frames": [
     {
       "tick": 0,
@@ -307,11 +307,11 @@
       "tick": 51,
       "time": 2.55,
       "nextId": 964,
-      "state": "149d5bb4",
-      "events": "fe777845",
+      "state": "79171eeb",
+      "events": "a10631da",
       "rng": {
         "draws": 2,
-        "digest": "d9dab85a"
+        "digest": "00a2a78c"
       },
       "label": "harvest-with-effect-applied",
       "players": [
@@ -389,7 +389,7 @@
               "itemId": "mithril_mining_pick"
             },
             {
-              "count": 2,
+              "count": 3,
               "itemId": "fine_iron_ore"
             }
           ],
@@ -439,7 +439,7 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": -2.136687,
+          "fallStartY": -2.134597,
           "fiveSecondRule": 101.55,
           "hp": 100,
           "id": 959,
@@ -455,7 +455,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 36,
-            "y": -2.136687,
+            "y": -2.134597,
             "z": 350
           },
           "potionCooldownUntil": -1,
@@ -487,11 +487,11 @@
       "tick": 53,
       "time": 2.65,
       "nextId": 964,
-      "state": "50b38beb",
+      "state": "db92da10",
       "events": "414479fe",
       "rng": {
         "draws": 2,
-        "digest": "d9dab85a"
+        "digest": "00a2a78c"
       },
       "label": "same-vein-denied-by-own-timer",
       "players": [
@@ -569,7 +569,7 @@
               "itemId": "mithril_mining_pick"
             },
             {
-              "count": 2,
+              "count": 3,
               "itemId": "fine_iron_ore"
             }
           ],
@@ -619,7 +619,7 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": -2.136687,
+          "fallStartY": -2.134597,
           "fiveSecondRule": 101.65,
           "hp": 100,
           "id": 959,
@@ -635,7 +635,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 36,
-            "y": -2.136687,
+            "y": -2.134597,
             "z": 350
           },
           "potionCooldownUntil": -1,
@@ -667,11 +667,11 @@
       "tick": 55,
       "time": 2.75,
       "nextId": 964,
-      "state": "aeec96ef",
+      "state": "2ab38680",
       "events": "1796b529",
       "rng": {
         "draws": 2,
-        "digest": "d9dab85a"
+        "digest": "00a2a78c"
       },
       "label": "prompt-mode-reslotted",
       "players": [
@@ -749,7 +749,7 @@
               "itemId": "mithril_mining_pick"
             },
             {
-              "count": 2,
+              "count": 3,
               "itemId": "fine_iron_ore"
             }
           ],
@@ -799,7 +799,7 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": -2.136687,
+          "fallStartY": -2.134597,
           "fiveSecondRule": 101.75,
           "hp": 100,
           "id": 959,
@@ -815,7 +815,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 36,
-            "y": -2.136687,
+            "y": -2.134597,
             "z": 350
           },
           "potionCooldownUntil": -1,
@@ -847,11 +847,11 @@
       "tick": 106,
       "time": 5.3,
       "nextId": 964,
-      "state": "9c614696",
+      "state": "824e44a9",
       "events": "4be0fb68",
       "rng": {
         "draws": 4,
-        "digest": "b247a679"
+        "digest": "49d036fe"
       },
       "label": "prompt-unconfirmed-skips-whole",
       "players": [
@@ -930,7 +930,7 @@
               "itemId": "mithril_mining_pick"
             },
             {
-              "count": 2,
+              "count": 3,
               "itemId": "fine_iron_ore"
             },
             {
@@ -1036,11 +1036,11 @@
       "tick": 157,
       "time": 7.85,
       "nextId": 964,
-      "state": "5ceae577",
-      "events": "bc352f64",
+      "state": "947a4856",
+      "events": "7f087928",
       "rng": {
         "draws": 6,
-        "digest": "2c41400b"
+        "digest": "1272a77a"
       },
       "label": "prompt-confirmed-fires-and-spends",
       "players": [
@@ -1119,7 +1119,7 @@
               "itemId": "mithril_mining_pick"
             },
             {
-              "count": 4,
+              "count": 3,
               "itemId": "fine_iron_ore"
             },
             {
@@ -1128,6 +1128,13 @@
                 "signer": "Adventurer"
               },
               "itemId": "iron_ore"
+            },
+            {
+              "count": 4,
+              "instance": {
+                "signer": "Adventurer"
+              },
+              "itemId": "fine_iron_ore"
             }
           ],
           "lifetimeXp": 108,
@@ -1178,7 +1185,7 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": 2.911251,
+          "fallStartY": 1.743181,
           "fiveSecondRule": 106.85,
           "hp": 100,
           "id": 959,
@@ -1194,7 +1201,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 45,
-            "y": 2.911251,
+            "y": 1.743181,
             "z": 491
           },
           "potionCooldownUntil": -1,
@@ -1226,11 +1233,11 @@
       "tick": 159,
       "time": 7.95,
       "nextId": 964,
-      "state": "93e6ab9a",
+      "state": "0b65a053",
       "events": "741638a5",
       "rng": {
         "draws": 6,
-        "digest": "2c41400b"
+        "digest": "1272a77a"
       },
       "label": "final",
       "players": [
@@ -1309,7 +1316,7 @@
               "itemId": "mithril_mining_pick"
             },
             {
-              "count": 4,
+              "count": 3,
               "itemId": "fine_iron_ore"
             },
             {
@@ -1318,6 +1325,13 @@
                 "signer": "Adventurer"
               },
               "itemId": "iron_ore"
+            },
+            {
+              "count": 4,
+              "instance": {
+                "signer": "Adventurer"
+              },
+              "itemId": "fine_iron_ore"
             }
           ],
           "lifetimeXp": 108,
@@ -1368,7 +1382,7 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": 2.911251,
+          "fallStartY": 1.743181,
           "fiveSecondRule": 106.95,
           "hp": 100,
           "id": 959,
@@ -1384,7 +1398,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 45,
-            "y": 2.911251,
+            "y": 1.743181,
             "z": 491
           },
           "potionCooldownUntil": -1,

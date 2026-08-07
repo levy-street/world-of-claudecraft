@@ -15,7 +15,7 @@ import { type Ev, entities, run } from './run_scenarios';
 describe('coverage: each scenario fires its subsystem', () => {
   it('solo_warrior: auto-attack + mobSwing both ways, mob death -> rollLoot produced loot', () => {
     const rec = run('solo_warrior');
-    const pid = (rec.sim as any).playerId;
+    const pid = rec.sim.playerId;
     const ev = rec.allEvents as Ev[];
     const playerDealt = ev.some((e) => e.type === 'damage' && e.sourceId === pid);
     const playerTookHit = ev.some((e) => e.type === 'damage' && e.targetId === pid);
@@ -31,7 +31,7 @@ describe('coverage: each scenario fires its subsystem', () => {
   it('solo_mage: casting lifecycle runs', () => {
     const rec = run('solo_mage');
     const events = rec.allEvents as Ev[];
-    const pid = (rec.sim as any).playerId;
+    const pid = rec.sim.playerId;
     expect(events.some((e) => e.type === 'castStart')).toBe(true);
     // The fixture lives in the shared collider-free lane so this proves effect
     // dispatch and spell damage, not merely that a cast bar began behind town LOS.
@@ -40,7 +40,7 @@ describe('coverage: each scenario fires its subsystem', () => {
 
   it('solo_rogue: weaponStrike via sinister_strike fires', () => {
     const rec = run('solo_rogue');
-    const pid = (rec.sim as any).playerId;
+    const pid = rec.sim.playerId;
     const ev = rec.allEvents as Ev[];
     const sinister = ev.some(
       (e) =>
@@ -54,11 +54,11 @@ describe('coverage: each scenario fires its subsystem', () => {
 
   it('affix_mob: frenzyOnHit buff on mob + bleed on player + player-cast taunt (4279)', () => {
     const rec = run('affix_mob');
-    const pid = (rec.sim as any).playerId;
+    const pid = rec.sim.playerId;
     // old_greyjaw is also a rare world spawn, so match across ALL of them (the
     // scenario's own spawn is the one that gets wounded into a frenzy + taunted).
     const greyjaws = entities(rec).filter((e) => e.templateId === 'old_greyjaw');
-    const player = (rec.sim as any).player;
+    const player = rec.sim.player;
     expect(greyjaws.some((e) => e.auras?.some((a: Ev) => a.id === 'blood_frenzy'))).toBe(true);
     expect(player.auras?.some((a: Ev) => a.kind === 'dot')).toBe(true);
     // applyTaunt (player cast) forced the greyjaw onto the player.
@@ -67,7 +67,7 @@ describe('coverage: each scenario fires its subsystem', () => {
 
   it('mob_swing_affixes: stun/venom/silence/rampage procs land + friendly pet never debuffs', () => {
     const rec = run('mob_swing_affixes');
-    const n = rec.notes as Record<string, any>;
+    const n = rec.notes;
     // Each heavy-hitter proc fired its rng.chance and applied its aura on a landed swing.
     expect(n.stunLanded).toBe(true); // mogger_lackey stunOnHit
     expect(n.venomLanded).toBe(true); // webwood_spider venom DoT
@@ -79,7 +79,7 @@ describe('coverage: each scenario fires its subsystem', () => {
 
   it('hunter_pet: friendly ranged pet (8093) AND hostile petSpell mob (6776) both fire', () => {
     const rec = run('hunter_pet');
-    const pid = (rec.sim as any).playerId;
+    const pid = rec.sim.playerId;
     const ev = rec.allEvents as Ev[];
     const pet = entities(rec).find((e) => e.ownerId === pid && e.templateId === 'warlock_imp');
     expect(pet).toBeTruthy();
@@ -102,7 +102,7 @@ describe('coverage: each scenario fires its subsystem', () => {
 
   it('warlock_pet: melee pet swings (8117) and manual taunt forces the target (4885)', () => {
     const rec = run('warlock_pet');
-    const pid = (rec.sim as any).playerId;
+    const pid = rec.sim.playerId;
     const pet = entities(rec).find((e) => e.ownerId === pid);
     expect(pet).toBeTruthy();
     expect((rec.allEvents as Ev[]).some((e) => e.type === 'damage' && e.sourceId === pet.id)).toBe(
@@ -119,7 +119,10 @@ describe('coverage: each scenario fires its subsystem', () => {
     const ev = rec.allEvents as Ev[];
     const impId = rec.notes.impId as number;
     const tankId = rec.notes.tankId as number;
-    // petRangedAttack: the emberkin's only damage path is the fire bolt (no miss roll).
+    // petRangedAttack: the emberkin's only damage path is the fire bolt (a resist
+    // roll then a crit roll; a resisted bolt emits kind:'resist', never 'miss').
+    // This scenario pins the resist DRAW's stream position via the rng digest; the
+    // resist BRANCH's behavior is pinned by tests/pet_ranged_resist.test.ts.
     expect(ev.some((e) => e.type === 'damage' && e.sourceId === impId && e.school === 'fire')).toBe(
       true,
     );
@@ -152,7 +155,7 @@ describe('coverage: each scenario fires its subsystem', () => {
     // never toggles off into no pet).
     expect(logs.filter((t) => t.includes('answers your summons')).length).toBeGreaterThanOrEqual(4);
     // despawnPet scrubbed the hunter's targetId (set to the demon, nulled on its hard despawn).
-    expect((rec.sim as any).player.targetId).toBeNull();
+    expect(rec.sim.player.targetId).toBeNull();
     // abandon's despawnPersistentPet scrub pulled the biter off the (now-gone) pet.
     const petId = rec.notes.petId as number;
     expect(entities(rec).every((e) => e.aggroTargetId !== petId)).toBe(true);
@@ -182,7 +185,7 @@ describe('coverage: each scenario fires its subsystem', () => {
     // augment wave actually ran: an offer was presented and a pick recorded.
     expect(ev.some((e) => e.type === 'augmentOffer')).toBe(true);
     const victimPid = rec.notes.fiestaVictimPid as number;
-    expect((rec.sim as any).players.get(victimPid)?.fiestaAugments?.length).toBeGreaterThan(0);
+    expect(rec.sim.players.get(victimPid)?.fiestaAugments?.length).toBeGreaterThan(0);
   });
 
   it('fiesta_powerups: a power-up is grabbed (buff aura), the ring burns, and a downed fighter revives', () => {
@@ -195,6 +198,6 @@ describe('coverage: each scenario fires its subsystem', () => {
     // a downed fighter came back on their respawn timer (fiestaRevive -> respawn).
     expect(ev.some((e) => e.type === 'respawn')).toBe(true);
     const victimPid = rec.notes.fiestaPowerupVictimPid as number;
-    expect((rec.sim as any).entities.get(victimPid)?.dead).toBe(false);
+    expect(rec.sim.entities.get(victimPid)?.dead).toBe(false);
   }, 90_000);
 });

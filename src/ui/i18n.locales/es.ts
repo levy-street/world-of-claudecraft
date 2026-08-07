@@ -1081,6 +1081,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.lootMaybe': 'Puede caer como maximo uno de estos:',
   'hudChrome.finder.mech.deathless_rage':
     'Furia Inmortal (se interrumpe en las piedras de guardia)',
+  'hudChrome.finder.mech.dread_curse':
+    'Maldicion Pavorosa (solo heroico, perjuicio acumulativo para cambio de tanque)',
   'hudChrome.finder.mech.deathstalker_cleave': 'Tajo del Acechador de la Muerte (tajo frontal)',
   'hudChrome.finder.mech.enrage': 'Entra en furia al tener poca salud',
   'hudChrome.finder.mech.grave_cleaver': 'Hacha Funebra (tajo frontal)',
@@ -2478,6 +2480,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobTooltip.familyDemon': 'Demonio',
   'hudChrome.mobTooltip.hostile': 'Hostil',
   'hudChrome.mobTooltip.friendly': 'Amistoso',
+  'hudChrome.mobTooltip.elite': 'Élite',
+  'hudChrome.mobTooltip.boss': 'Jefe',
   'hud.core.mapCanvasLabel': 'Mapa',
   'hud.core.mapSummary': 'Mapa de {zone}.',
   'hudChrome.castBar.playerAria': 'Tu barra de lanzamiento',
@@ -5991,6 +5995,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.compass.SE': 'SE',
   'hudChrome.compass.SW': 'SO',
   'hudChrome.compass.W': 'O',
+  'hudChrome.emoteEditor.close': 'Cerrar emotes',
   'hudChrome.emoteEditor.done': 'Listo',
   'hudChrome.emoteEditor.title': 'Emotes',
   'hudChrome.emotes.bow': 'Reverencia',
@@ -10245,7 +10250,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'guide.dungeonsPage.resetBody':
     'Si cambias la dificultad mientras tu grupo aún conserva recorridos reclamados, las reclamaciones anteriores permanecen un tiempo antes de borrarse solas. El líder del grupo puede liberarlas de inmediato: elige Restablecer todas las instancias en el menú de su propio retrato o escribe /dungeon reset. Solo funciona después de cambiar realmente la dificultad, cuando no queda nadie dentro, vivo o caído, y hay un breve tiempo de espera entre restablecimientos. Si llegas a la entrada con la dificultad equivocada, el juego te avisa antes de comenzar. La banda nunca se restablece así; conserva sus propias reglas de bloqueo.',
   'guide.dungeonsPage.wildheartBody':
-    'Una caldera selvática empapada de lluvia donde dos senderos de caza elevados rodean un cenote de jade. Cruza guaridas de bestias y ruinas ancestrales, y luego escala la pirámide ritual para enfrentarte a Zulgar.',
+    'Una caldera selvática empapada de lluvia donde dos senderos de caza elevados rodean un cenote de jade. Cruza guaridas de bestias y ruinas ancestrales, y luego escala la pirámide ritual para ver quién te espera en la cima.',
   'guide.gear.itemLevelBody':
     'Para comparar rápidamente dos piezas, activa Mostrar nivel de objeto en las opciones. El equipo de origen conocido, obtenido de enemigos, misiones y profesiones de artesanía, mostrará un nivel de objeto: una cifra que aproxima su poder según su procedencia y permite ver de un vistazo qué mejora pesa más, incluso entre ranuras distintas. Las piezas sin ese origen, como los artículos básicos de vendedor y el equipo inicial, no muestran nivel de objeto; que falte la cifra es normal, no un error.',
   'hudChrome.auraEffect.battleStance': 'Actitud de Batalla: un 10% más de generación de ira',
@@ -11027,6 +11032,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchantName.enchant_neck_agility': 'Encantar collar - Agilidad',
   'hudChrome.enchantName.enchant_neck_intellect': 'Encantar collar - Intelecto',
   'hudChrome.enchantName.enchant_neck_spirit': 'Encantar collar - Espíritu',
+  'hudChrome.enchantName.enchant_offhand_stamina': 'Encantar mano secundaria - Aguante',
   'hudChrome.enchantName.enchant_ring_agility': 'Encantar anillo - Agilidad',
   'hudChrome.enchantName.enchant_ring_intellect': 'Encantar anillo - Intelecto',
   'hudChrome.enchantName.enchant_ring_spirit': 'Encantar anillo - Espíritu',

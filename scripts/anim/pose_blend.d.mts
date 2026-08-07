@@ -46,6 +46,7 @@ export function indexClip(root: Root, name: string): ClipIndex;
 export function sampleChannel(ch: SampledChannel, t: number): number[];
 export function samplePose(clipIndex: ClipIndex, t: number): Pose;
 export function poseValue(pose: Pose, key: string, fallback: Pose | undefined): number[] | null;
+export function mergePoses(...poses: readonly Pose[]): Pose;
 
 export interface BakeClipOptions {
   clipName: string;

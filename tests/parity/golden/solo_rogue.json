@@ -8,8 +8,8 @@
     "meleeSwing weaponStrike (sinister_strike via castAbility ~3736)",
     "combo points"
   ],
-  "draws": 254,
-  "drawDigest": "ce2beedc",
+  "draws": 249,
+  "drawDigest": "1567f635",
   "frames": [
     {
       "tick": 0,
@@ -142,44 +142,44 @@
       "tick": 20,
       "time": 1,
       "nextId": 965,
-      "state": "8bb00a6d",
-      "events": "6033bbac",
+      "state": "160c639a",
+      "events": "f4d55994",
       "rng": {
-        "draws": 8,
-        "digest": "1b9a7b49"
+        "draws": 12,
+        "digest": "f30c489f"
       }
     },
     {
       "tick": 40,
       "time": 2,
       "nextId": 965,
-      "state": "8a8eeab4",
-      "events": "7ea70221",
+      "state": "fe5faa25",
+      "events": "89d55a68",
       "rng": {
-        "draws": 15,
-        "digest": "bda8363f"
+        "draws": 19,
+        "digest": "d68c35cb"
       }
     },
     {
       "tick": 60,
       "time": 3,
       "nextId": 965,
-      "state": "0317a728",
-      "events": "ebb1dac0",
+      "state": "0eb126e2",
+      "events": "8c849a9d",
       "rng": {
-        "draws": 159,
-        "digest": "a5f58e8b"
+        "draws": 162,
+        "digest": "fe151d49"
       }
     },
     {
       "tick": 72,
       "time": 3.6,
       "nextId": 965,
-      "state": "ef9883de",
+      "state": "058a63ba",
       "events": "741638a5",
       "rng": {
-        "draws": 254,
-        "digest": "ce2beedc"
+        "draws": 249,
+        "digest": "1567f635"
       },
       "label": "final",
       "players": [
@@ -200,13 +200,14 @@
           "cls": "rogue",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 78,
-            "damageTaken": 16
+            "damageDealt": 104,
+            "damageTaken": 8
           },
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "damageDealt": 78
+              "crits": 1,
+              "damageDealt": 104
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -275,7 +276,7 @@
           "facing": 1.570796,
           "fallStartY": 1.5,
           "fiveSecondRule": 102.6,
-          "hp": 49984,
+          "hp": 49992,
           "id": 959,
           "inCombat": true,
           "kind": "player",
@@ -339,7 +340,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 8922,
+          "hp": 8896,
           "id": 964,
           "inCombat": true,
           "kind": "mob",
@@ -376,7 +377,7 @@
           "threat": [
             [
               959,
-              79
+              105
             ]
           ],
           "weapon": {

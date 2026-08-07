@@ -4,16 +4,27 @@
 // committed evidence seals and two pinned test literals go stale. This
 // recomputes the provenance from the current tree with the capture contract's
 // own derivation, sweeps it through the four committed after seals (top-level
-// and per-record blocks), and prints the two literals to pin:
+// and per-record blocks), and prints the three literals to pin:
 //
 //   node scripts/assets/eastbrook_grand_armoury/remint_polish_provenance.mjs
 //
 // Then update, if they moved:
 //   - tests/eastbrook_polish_capture_contract.test.ts: the pinned composite
-//     fingerprint literal
-//   - tests/eastbrook_polish_artifact_integrity.test.ts: the second-order
-//     performance evidence digest literal (recomputed LAST, from the swept
-//     files, matching the test's own name\0bytes\0 stream)
+//     fingerprint literal (PINNED_POLISH_COMPOSITE_FINGERPRINT)
+//   - tests/eastbrook_polish_artifact_integrity.test.ts: the metadata
+//     authority sha256 (ACCEPTED_POLISH_V2_METADATA_SHA256, the swept
+//     after-desktop-ultra.json) and the second-order performance evidence
+//     digest literal (recomputed LAST, from the swept files, matching the
+//     test's own name\0bytes\0 stream)
+//
+// A mint reads WORKING-TREE bytes by design (it must be able to seal
+// uncommitted edits that land in the same commit), which is exactly how the
+// 2026-08-05 craft-cast pin went stale: the mint ran, then renderer.ts moved
+// again before the merge committed, so the pin matched no tree that ever
+// existed (see provenance_diagnostics.mjs for the proven root cause). This
+// tool therefore prints the git status of every fingerprinted input at mint
+// time: commit exactly those bytes with the new pin, and RE-RUN the mint if
+// any input moves again before the commit.
 //
 // GLB pipeline inputs (scripts/assets sources, pnpm-lock.yaml) are NOT
 // covered here: those need the full deterministic export re-run described in
@@ -36,6 +47,9 @@ const mailbox = await import(
 );
 const notice = await import(
   new URL('scripts/assets/eastbrook_noticeboard/source_fingerprint.mjs', rootUrl)
+);
+const diagnostics = await import(
+  new URL('scripts/assets/eastbrook_grand_armoury/provenance_diagnostics.mjs', rootUrl)
 );
 
 const { deriveEastbrookPolishCompositeProvenance, EASTBROOK_POLISH_PROVENANCE_INPUTS: INPUTS } =
@@ -104,9 +118,36 @@ for (const fileName of accepted) {
   secondOrder.update('\0');
 }
 
-console.log('composite fingerprint (pin in eastbrook_polish_capture_contract.test.ts):');
+const metadataAuthoritySha = createHash('sha256')
+  .update(await readFile(new URL(diagnostics.POLISH_SEAL_PATH, rootUrl)))
+  .digest('hex');
+
+console.log('composite fingerprint (pin in eastbrook_polish_capture_contract.test.ts,');
+console.log('PINNED_POLISH_COMPOSITE_FINGERPRINT):');
 console.log(`  ${current.fingerprint}`);
+console.log('metadata authority sha256 (pin in eastbrook_polish_artifact_integrity.test.ts,');
+console.log('ACCEPTED_POLISH_V2_METADATA_SHA256, recomputed from the swept file):');
+console.log(`  ${metadataAuthoritySha}`);
 console.log(
   'second-order performance digest (pin in eastbrook_polish_artifact_integrity.test.ts):',
 );
 console.log(`  ${secondOrder.digest('hex')}`);
+console.log('do NOT touch ACCEPTED_POLISH_V2_TOWN_SOURCE_FINGERPRINT in that same test:');
+console.log('it is the FROZEN identity of the tree the captures were taken against, and');
+console.log('it moves only if the captures themselves are retaken.');
+
+// The stale-mint tripwire: name every fingerprinted input that differs from
+// HEAD right now. Minting over dirty inputs is legitimate ONLY when exactly
+// these bytes ship in the same commit as the new pins.
+const inputPaths = diagnostics.collectPolishProvenanceInputPaths({
+  inputs: INPUTS,
+  sourceFileLists: [
+    town.EASTBROOK_TOWN_SOURCE_FILES,
+    mailbox.EASTBROOK_MAILBOX_SOURCE_FILES,
+    notice.EASTBROOK_NOTICEBOARD_SOURCE_FILES,
+  ],
+});
+const dirty = diagnostics.gitDirtyStatusLines({ repoRoot, paths: inputPaths });
+for (const line of diagnostics.formatMintInputStatus(dirty)) {
+  console.log(line);
+}

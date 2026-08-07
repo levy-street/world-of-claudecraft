@@ -148,6 +148,51 @@ describe('progressive terrain build', () => {
     idle.cancelStreaming();
   });
 
+  // Escalation: an in-flight idle build switches to fast pacing mid-zone. In
+  // Node the idle fallback is a >=200ms cooperative timer while fast yields
+  // are setTimeout(0), so MOCK TIME separates the paces decisively: a zone
+  // needs well over a hundred yields, so an un-escalated idle build cannot
+  // finish inside a few mock seconds, while an escalated one races through
+  // its zero-delay yields within each single advance call.
+  for (const [name, escalate] of [
+    [
+      'a fast ensureZone joining an in-flight idle build escalates it',
+      (terrain: { ensureZone: (z: unknown) => Promise<void> }, zone: unknown) =>
+        void terrain.ensureZone(zone),
+    ],
+    [
+      'escalateZone flips an in-flight idle build to fast pacing',
+      (terrain: { escalateZone: (id: string) => void }, zone: { id: string }) =>
+        terrain.escalateZone(zone.id),
+    ],
+  ] as const) {
+    it(name, async () => {
+      vi.resetModules();
+      mockEmptyAssetLoads();
+      const { buildTerrain } = await import('../src/render/terrain');
+      const { zoneAt } = await import('../src/sim/data');
+
+      const zone = zoneAt(0, 0);
+      const terrain = buildTerrain(20061);
+      const task = terrain.ensureZone(zone, undefined, { pace: 'idle' });
+      // Control: three mock seconds of idle-slot pacing cannot finish a zone
+      // (a build takes over a hundred 200ms slots un-escalated).
+      for (let i = 0; i < 12; i++) await vi.advanceTimersByTimeAsync(250);
+      expect(terrain.isZoneLoaded(zone.id)).toBe(false);
+
+      // biome-ignore lint/suspicious/noExplicitAny: the loop above erases the concrete view type
+      escalate(terrain as any, zone as any);
+      // Escalated, the remaining build must land within a few more mock
+      // seconds: far under the un-escalated idle-slot budget.
+      for (let i = 0; i < 40 && !terrain.isZoneLoaded(zone.id); i++) {
+        await vi.advanceTimersByTimeAsync(250);
+      }
+      expect(terrain.isZoneLoaded(zone.id)).toBe(true);
+      await task;
+      terrain.cancelStreaming();
+    });
+  }
+
   it('builds the chunks nearest a per-call priority point before farther ones', async () => {
     vi.resetModules();
     mockEmptyAssetLoads();

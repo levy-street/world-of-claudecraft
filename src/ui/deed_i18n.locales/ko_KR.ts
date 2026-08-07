@@ -15,6 +15,54 @@ export const table: DeedLocaleTable = {
     name: '하늘의 침묵',
     desc: '화산구의 어미 신드랄레스를 드레이크모 위 분화구 둥지에서 처치하십시오.',
   },
+  chr_frostveil_gatherer: {
+    name: '계단식 수확',
+    desc: 'Frostveil에서 광맥, 나무 군락, 약초밭을 수확합니다.',
+  },
+  chr_frostveil_first_cast: {
+    name: '산중 호수의 첫 얼음',
+    desc: 'Frostveil의 물가에서 물고기를 낚습니다.',
+  },
+  chr_amberfall_gatherer: {
+    name: 'Amberfall의 수확',
+    desc: 'Amberfall에서 광맥, 나무 군락, 약초밭을 수확합니다.',
+  },
+  chr_amberfall_first_cast: {
+    name: '큰 늪의 한 마리',
+    desc: 'Amberfall의 물가에서 물고기를 낚습니다.',
+  },
+  chr_nightbloom_gatherer: {
+    name: '꿈꾸는 수확',
+    desc: 'Nightbloom에서 광맥, 나무 군락, 약초밭을 수확합니다.',
+  },
+  chr_nightbloom_first_cast: {
+    name: '달샘의 잔물결',
+    desc: 'Nightbloom의 물가에서 물고기를 낚습니다.',
+  },
+  chr_wraithwood_gatherer: {
+    name: '나무 지붕 아래 수확',
+    desc: 'Wraithwood에서 광맥, 나무 군락, 약초밭을 수확합니다.',
+  },
+  chr_wraithwood_first_cast: {
+    name: '거울 만의 한 투척',
+    desc: 'Wraithwood의 물가에서 물고기를 낚습니다.',
+  },
+  chr_palmreach_gatherer: {
+    name: '야자 해변의 수확',
+    desc: 'Palmreach에서 광맥, 나무 군락, 약초밭을 수확합니다.',
+  },
+  chr_palmreach_first_cast: {
+    name: '사파이어 석호에 던진 낚싯줄',
+    desc: 'Palmreach의 물가에서 물고기를 낚습니다.',
+  },
+  chr_evergarden_gatherer: {
+    name: '정원의 화단이 준 선물',
+    desc: 'Evergarden에서 광맥, 나무 군락, 약초밭을 수확합니다.',
+  },
+  chr_evergarden_first_cast: {
+    name: '꽃잎 연못의 한 투척',
+    desc: 'Evergarden의 물가에서 물고기를 낚습니다.',
+  },
   pvp_card_duel_first_win: {
     name: '패를 보여줘',
     desc: '카드 마스터에게서 카드 대결에 승리하십시오.',

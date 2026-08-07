@@ -65,7 +65,17 @@ export function buildHollowGates(seed: number): HollowGatesView {
     outer.add(inner);
     inner.position.set(-cx * s, -box.min.y * s, -cz * s);
     inner.scale.setScalar(s);
-    outer.position.set(x, terrainHeight(x, z, seed) - 0.25, z);
+    // Seat at the footprint MINIMUM (center + a ring under the mound's
+    // base), not the center sample: the calm pad levels the bench, but the
+    // classic ground still undulates ~half a yard, and a base edge hovering
+    // over a dip reads as floating on a prop this wide.
+    let seatY = terrainHeight(x, z, seed);
+    for (let i = 0; i < 8; i++) {
+      const a = (i / 8) * Math.PI * 2;
+      const h = terrainHeight(x + Math.cos(a) * 4.5, z + Math.sin(a) * 4.5, seed);
+      if (h < seatY) seatY = h;
+    }
+    outer.position.set(x, seatY - 0.35, z);
     outer.rotation.y = facing;
     outer.traverse((o) => {
       const mesh = o as THREE.Mesh;

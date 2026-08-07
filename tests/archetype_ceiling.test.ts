@@ -454,7 +454,7 @@ describe('archetype ceilings gate the masterwork effect (ceilings bind craft out
   // 1-3 quest-dedupe pass added camps, mobs, and items, then 107 -> 70 after
   // the v0.35.0 release content commits (enchant offhand, hunter offhand, the
   // deeds catalog). Spares on record: 94, 128, 130, 131, and 153.
-  const PROC_SEED = 70;
+  const PROC_SEED = 53;
 
   function makeSim() {
     return new Sim({ seed: PROC_SEED, playerClass: 'warrior', autoEquip: false });

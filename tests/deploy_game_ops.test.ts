@@ -178,12 +178,18 @@ describe('healthcheck probe behavior (executed)', () => {
 
   it('exits 0 on a 200, and nonzero on a 503 and on a refused connection', async () => {
     const ok = await listen(200);
-    expect(await runProbe(ok.port)).toBe(0);
-    await new Promise((resolve) => ok.server.close(resolve));
+    try {
+      expect(await runProbe(ok.port)).toBe(0);
+    } finally {
+      await new Promise((resolve) => ok.server.close(resolve));
+    }
 
     const stalled = await listen(503);
-    expect(await runProbe(stalled.port)).toBe(1);
-    await new Promise((resolve) => stalled.server.close(resolve));
+    try {
+      expect(await runProbe(stalled.port)).toBe(1);
+    } finally {
+      await new Promise((resolve) => stalled.server.close(resolve));
+    }
 
     // Reuse the just-freed port for the refused arm: nothing listens there anymore.
     expect(await runProbe(stalled.port)).toBe(1);

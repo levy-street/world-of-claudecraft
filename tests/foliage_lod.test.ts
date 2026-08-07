@@ -349,6 +349,26 @@ describe('foliage LOD: the real-model and impostor windows cover the world', () 
   });
 });
 
+describe('foliage LOD: the shadow clones no longer take this window', () => {
+  // They key on the key light's own orthographic shadow volume instead
+  // (src/render/foliage_shadow_core.ts, tests/foliage_shadow_core.test.ts).
+  // Nothing here may grow a shadow-specific arm again: the near-edge probe this
+  // module briefly carried for them inflated their kept radius by a bucket
+  // bounding radius, ~290u on the shipped ~500x240u slabs.
+  const lodSrc = readFileSync(new URL('../src/render/foliage_lod.ts', import.meta.url), 'utf8');
+
+  it('keeps bucketVisible camera-keyed on the bucket centre for every row', () => {
+    expect(lodSrc).not.toContain('maxFromNearEdge');
+    expect(lodSrc).toContain('if (w.centerDist < minCap || w.centerDist >= maxCap) return false;');
+  });
+
+  it('routes the shadow rows to the light-volume core', () => {
+    const foliageSrc = readFileSync(new URL('../src/render/foliage.ts', import.meta.url), 'utf8');
+    expect(foliageSrc).toContain("from './foliage_shadow_core'");
+    expect(foliageSrc).toContain('shadowRowVisible(');
+  });
+});
+
 describe('foliage LOD: sprite rows (the merged per-bucket impostor meshes)', () => {
   const spriteRow = (centerDist: number, over: Partial<BucketWindowInput> = {}) =>
     windowFor({

@@ -52,11 +52,17 @@ function paint(allocation: Record<string, number>, budget: number): HTMLElement 
   const el = document.createElement('div');
   el.id = 'town-focus-window';
   document.body.appendChild(el);
-  renderTownFocusWindow(el, buildTownFocusView(allocation, budget, true), {
-    onStep: vi.fn(),
-    onSave: vi.fn(),
-    onClose: vi.fn(),
-  });
+  renderTownFocusWindow(
+    el,
+    buildTownFocusView(allocation, budget, true),
+    { tier: 'time', cost: { durationMs: 0, coin: 0, materials: 0 } },
+    {
+      onStep: vi.fn(),
+      onTierChange: vi.fn(),
+      onSave: vi.fn(),
+      onClose: vi.fn(),
+    },
+  );
   return el;
 }
 

@@ -19,7 +19,7 @@ import { runCraft } from './helpers/enchant_family_cast';
 // base masterwork chance at this seed. Pre-verified against this exact grant
 // order (3x linen_scrap then 1x spider_leg, then the craft); seeds 94, 128,
 // 130, 131, and 153 also land, kept on record here as spares.
-const PROC_SEED = 70;
+const PROC_SEED = 53;
 const RECIPE_ID = 'recipe_eastbrook_ritual_vestments';
 const ITEM_ID = 'eastbrook_ritual_vestments';
 

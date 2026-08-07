@@ -1,7 +1,7 @@
 // @vitest-environment happy-dom
 import './_setup';
 import { fireEvent, render, screen } from '@testing-library/svelte';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const listPage = {
   rows: [
@@ -26,6 +26,7 @@ const listPage = {
   limit: 25,
 };
 
+const apiPost = vi.fn();
 vi.mock('../../src/admin/api', () => ({
   ApiError: class ApiError extends Error {
     status: number;
@@ -38,7 +39,7 @@ vi.mock('../../src/admin/api', () => ({
     if (path.includes('/screenshot')) return { screenshot: 'data:image/png;base64,AAAA' };
     return listPage;
   }),
-  apiPost: vi.fn(),
+  apiPost: (...a: unknown[]) => apiPost(...a),
   getToken: () => 'tok',
   getAdminName: () => 'admin',
   clearSession: () => {},
@@ -46,13 +47,56 @@ vi.mock('../../src/admin/api', () => ({
 
 import { t } from '../../src/admin/i18n';
 import BugReports from '../../src/admin/pages/BugReports.svelte';
+import { grantPermissions } from './_grant';
+
+beforeEach(() => {
+  apiPost.mockReset();
+  apiPost.mockResolvedValue({});
+});
 
 describe('BugReports', () => {
   it('lists reports and opens a screenshot overlay on demand', async () => {
+    grantPermissions();
     render(BugReports);
     expect(await screen.findByText('stuck in wall')).toBeInTheDocument();
     await fireEvent.click(screen.getByText(t('bugReports.viewScreenshot')));
     const img = await screen.findByAltText(t('bugReports.screenshotAlt'));
     expect(img).toHaveAttribute('src', 'data:image/png;base64,AAAA');
+  });
+
+  it('resolves an open report with a note through the confirm dialog', async () => {
+    grantPermissions();
+    render(BugReports);
+    await screen.findByText('stuck in wall');
+
+    await fireEvent.click(screen.getByText(t('bugReports.resolve')));
+    expect(await screen.findByText(t('bugReports.confirmResolve'))).toBeInTheDocument();
+    const noteInput = screen.getByPlaceholderText(t('detail.notePlaceholder'));
+    await fireEvent.input(noteInput, { target: { value: 'fixed in 0.34.1' } });
+    await fireEvent.click(screen.getByText(t('dialog.confirm')));
+
+    expect(apiPost).toHaveBeenCalledWith('/admin/api/bug-reports/5/resolve', {
+      note: 'fixed in 0.34.1',
+    });
+  });
+
+  it('dismisses an open report with no note (the note is optional)', async () => {
+    grantPermissions();
+    render(BugReports);
+    await screen.findByText('stuck in wall');
+
+    await fireEvent.click(screen.getByText(t('bugReports.dismiss')));
+    expect(await screen.findByText(t('bugReports.confirmDismiss'))).toBeInTheDocument();
+    await fireEvent.click(screen.getByText(t('dialog.confirm')));
+
+    expect(apiPost).toHaveBeenCalledWith('/admin/api/bug-reports/5/dismiss', { note: '' });
+  });
+
+  it('hides the resolve/dismiss actions without moderation.act', async () => {
+    grantPermissions(['support.read']);
+    render(BugReports);
+    await screen.findByText('stuck in wall');
+    expect(screen.queryByText(t('bugReports.resolve'))).not.toBeInTheDocument();
+    expect(screen.queryByText(t('bugReports.dismiss'))).not.toBeInTheDocument();
   });
 });

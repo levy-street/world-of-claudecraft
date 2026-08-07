@@ -15,6 +15,54 @@ export const table: DeedLocaleTable = {
     name: 'Obloha zmlkla',
     desc: 'Zab Cindraleth, matriarchu Tlamy, v jejím kráterovém hnízdišti nad Dračí tlamou.',
   },
+  chr_frostveil_gatherer: {
+    name: 'Sklizen na terasach',
+    desc: 'Vytez rudnou zilu, drevni porost a bylinny zahon ve Frostveilu.',
+  },
+  chr_frostveil_first_cast: {
+    name: 'Prvni led na plese',
+    desc: 'Chyt rybu ve vodach Frostveilu.',
+  },
+  chr_amberfall_gatherer: {
+    name: 'Sklizen Amberfallu',
+    desc: 'Vytez rudnou zilu, drevni porost a bylinny zahon v Amberfallu.',
+  },
+  chr_amberfall_first_cast: {
+    name: 'Ulovek z Velkeho morasu',
+    desc: 'Chyt rybu ve vodach Amberfallu.',
+  },
+  chr_nightbloom_gatherer: {
+    name: 'Snici sklizen',
+    desc: 'Vytez rudnou zilu, drevni porost a bylinny zahon v Nightbloomu.',
+  },
+  chr_nightbloom_first_cast: {
+    name: 'Vlna na mesicni studni',
+    desc: 'Chyt rybu ve vodach Nightbloomu.',
+  },
+  chr_wraithwood_gatherer: {
+    name: 'Sklizen pod korunami',
+    desc: 'Vytez rudnou zilu, drevni porost a bylinny zahon ve Wraithwoodu.',
+  },
+  chr_wraithwood_first_cast: {
+    name: 'Nahozeni v Zrcadlove zatoce',
+    desc: 'Chyt rybu ve vodach Wraithwoodu.',
+  },
+  chr_palmreach_gatherer: {
+    name: 'Sklizen na palmovem pobrezi',
+    desc: 'Vytez rudnou zilu, drevni porost a bylinny zahon v Palmreachi.',
+  },
+  chr_palmreach_first_cast: {
+    name: 'Nahozeni v safirove lagune',
+    desc: 'Chyt rybu ve vodach Palmreache.',
+  },
+  chr_evergarden_gatherer: {
+    name: 'Bohatstvi parteru',
+    desc: 'Vytez rudnou zilu, drevni porost a bylinny zahon v Evergardenu.',
+  },
+  chr_evergarden_first_cast: {
+    name: 'Nahozeni na okvetnim rybnice',
+    desc: 'Chyt rybu ve vodach Evergardenu.',
+  },
   pvp_card_duel_first_win: {
     name: 'Vlastní pravidla',
     desc: 'Vyhraj Karetní souboj u Karetního mistra.',

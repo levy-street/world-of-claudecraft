@@ -3,6 +3,7 @@ import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
+import { expectDefined } from './helpers/defined';
 
 // The priest/shaman/paladin row redesign (docs/design/choice-row-quality-pass.md):
 // each proc-engine primitive proven end to end through the live content that
@@ -223,7 +224,7 @@ describe('shaman redesign', () => {
     const after = cds.get('earth_shock') ?? 0;
     // Natural decay over N ticks plus the 0.5 sec shave per landed swing.
     expect(mob.dead).toBe(false);
-    expect(before! - after).toBeGreaterThan(0.5);
+    expect(expectDefined(before) - after).toBeGreaterThan(0.5);
   });
 
   it('Undertow Promise: every 3rd Mending Waters leaves an emergency heal echo', () => {
@@ -259,12 +260,12 @@ describe('paladin redesign', () => {
   it('Righteous Cause: swings under an active Oathbrand shave the Verdict cooldown', () => {
     // Seed hunted so the first counted physical swing LANDS under the re-branded
     // seal: an avoided swing draws no shave and the cooldown delta assertion
-    // needs a landed hit. Re-hunted from 1 after the v0.34.0 merge composed this
+    // needs a landed hit. Re-hunted from 2 after the v0.35.0 base sync composed this
     // branch's quest-dedupe content with the release's Dragonkin brood, shifting
-    // every shared-stream draw (seed 1 now shaves nothing: 6.000 to 5.950, one
-    // tick of ordinary decay). Not a behavior regression: 67 of seeds 1 to 80
-    // shave the full amount, landing at 5.450. Spares: 3, 4.
-    const { sim, p } = rig('paladin', 20, { 14: 'pal_r14_righteous_cause' }, 2);
+    // every shared-stream draw (seed 2 now shaves nothing: 6.000 to 5.950, one
+    // tick of ordinary decay). Not a behavior regression: nearby seeds still
+    // shave the full amount, landing at 5.450. Spares: 4, 5.
+    const { sim, p } = rig('paladin', 20, { 14: 'pal_r14_righteous_cause' }, 3);
     addTargetMob(sim);
     castAndSettle(sim, 'seal_of_righteousness', 2);
     castAndSettle(sim, 'judgement', 2);
@@ -279,7 +280,7 @@ describe('paladin redesign', () => {
       }
     }
     expect(swings).toBeGreaterThan(0);
-    expect(p.cooldowns.get('judgement') ?? 0).toBeLessThan(before! - 0.5);
+    expect(p.cooldowns.get('judgement') ?? 0).toBeLessThan(expectDefined(before) - 0.5);
   });
 
   it('Deathless Ardor: a killing blow leaves 1 health, once per 180 sec', () => {

@@ -1201,6 +1201,8 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.lootHeroic': 'Bonus eroico, uno di questi cade sempre:',
   'hudChrome.finder.lootMaybe': 'Al massimo uno di questi puo cadere:',
   'hudChrome.finder.mech.deathless_rage': 'Furia Immortale (interrotta alle pietre di guardia)',
+  'hudChrome.finder.mech.dread_curse':
+    'Maledizione del Terrore (solo eroica, penalità cumulativa per cambio tank)',
   'hudChrome.finder.mech.deathstalker_cleave':
     'Fendente del Cacciatore di Morti (fendente frontale)',
   'hudChrome.finder.mech.enrage': 'Va in furia con poca salute',
@@ -2471,6 +2473,8 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobTooltip.friendly': 'Amichevole',
   'hudChrome.mobTooltip.hostile': 'Ostile',
   'hudChrome.mobTooltip.levelFamily': '{family} di livello {level}',
+  'hudChrome.mobTooltip.elite': 'Élite',
+  'hudChrome.mobTooltip.boss': 'Boss',
   'hudChrome.options.aurasOnPlayerFrame': 'Buff sul riquadro del giocatore',
   'hudChrome.options.playerFrameScale': 'Scala del riquadro del giocatore',
   'hudChrome.options.showDailyRewardsChest': 'Mostra forziere delle ricompense giornaliere',
@@ -6042,6 +6046,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.harvestTooltip':
     'Raccoglie i componenti selezionati. Ogni carcassa puo essere raccolta una volta, chi prima arriva. Non prende il bottino.',
   'hudChrome.corpseHarvest.title': 'Raccolta',
+  'hudChrome.emoteEditor.close': 'Chiudi emote',
   'hudChrome.emoteEditor.done': 'Fine',
   'hudChrome.emoteEditor.title': 'Emote',
   'hudChrome.emotes.bow': 'Inchino',
@@ -6081,6 +6086,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchantName.enchant_neck_agility': 'Incanta Collana - Agilita',
   'hudChrome.enchantName.enchant_neck_intellect': 'Incanta Collana - Intelletto',
   'hudChrome.enchantName.enchant_neck_spirit': 'Incanta Collana - Spirito',
+  'hudChrome.enchantName.enchant_offhand_stamina': 'Incanta Mano Secondaria - Robustezza',
   'hudChrome.enchantName.enchant_ring_agility': 'Incanta Anello - Agilita',
   'hudChrome.enchantName.enchant_ring_intellect': 'Incanta Anello - Intelletto',
   'hudChrome.enchantName.enchant_ring_spirit': 'Incanta Anello - Spirito',
@@ -10323,7 +10329,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'guide.dungeonsPage.resetBody':
     'Se cambi difficoltà mentre il gruppo conserva ancora delle spedizioni assegnate, le vecchie assegnazioni restano per un po’ prima di svanire. Il capogruppo può abbandonarle subito scegliendo Reimposta tutte le istanze dal menu del proprio ritratto oppure digitando /dungeon reset. La difficoltà deve essere stata davvero cambiata, nessuno, vivo o caduto, può trovarsi all’interno e tra due ripristini passa un breve tempo di recupero. Se arrivi all’ingresso con la difficoltà sbagliata, il gioco ti avvisa prima dell’inizio. L’incursione non viene mai reimpostata così e mantiene le proprie regole di vincolo.',
   'guide.dungeonsPage.wildheartBody':
-    'Una caldera di giungla battuta dalla pioggia, dove due sentieri di caccia rialzati circondano un cenote di giada. Attraversa tane di bestie e rovine ataviche, poi sali la piramide rituale per affrontare Zulgar.',
+    'Una caldera di giungla battuta dalla pioggia, dove due sentieri di caccia rialzati circondano un cenote di giada. Attraversa tane di bestie e rovine ataviche, poi sali la piramide rituale per scoprire chi ti aspetta in cima.',
   'guide.gear.itemLevelBody':
     'Per confrontare rapidamente due pezzi, attiva Mostra livello oggetto nelle opzioni. L’equipaggiamento di provenienza nota, ottenuto da nemici, missioni e mestieri, mostra un livello oggetto: un unico valore che ne indica approssimativamente la potenza in base alla fonte e rende immediata la scelta del miglior potenziamento, anche tra slot diversi. I pezzi senza tale provenienza, come gli articoli base dei mercanti e l’equipaggiamento iniziale, non mostrano alcun livello; è normale.',
   'guide.gear.qualityBody':

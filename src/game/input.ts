@@ -103,7 +103,9 @@ export interface InputCallbacks {
   onClickPick(x: number, y: number, button: number): void;
   /** Attack-move key pressed (only fires while Attack Move mode is on); x/y is the cursor. */
   onAttackMove?(x: number, y: number): void;
-  /** When false, edge actions (spells, UI keys) are ignored. */
+  /** When false, keydown-driven actions are ignored: edge actions (spells, UI keys)
+   *  and held movement keys. Escape is handled before this gate and still reaches
+   *  onUiKey; key releases are ungated. */
   canUseGameKeys?: () => boolean;
   onInputIntent?(kind: 'move' | 'look' | 'zoom'): void;
 }

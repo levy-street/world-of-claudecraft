@@ -19,7 +19,11 @@
 // mobSwing/dealDamage/moveToward/updateRangedPetAttack callees the dispatcher calls)
 // are preserved exactly so the parity gate's full-state trace AND rng draw-order log
 // stay byte-identical. The in-place Entity mutation is intentional (the refactor's
-// immutability waiver). The shared movement/combat entry points (updateRangedPetAttack,
+// immutability waiver). One DELIBERATE post-extraction behavior change rides on
+// top of the verbatim move: petRangedAttack now rolls isMobSpellResisted before
+// its crit roll (player pet bolts were resist-immune by omission, unlike every
+// other spell path), with the pet_ai parity golden re-minted for the extra draw
+// in the same PR; every other draw position is still the verbatim move. The shared movement/combat entry points (updateRangedPetAttack,
 // mobSwing, applyTaunt, moveToward), the pet-management helpers (syncPetAspect,
 // despawnPersistentPet), and the stat/predicate helpers (effectiveAttackPower,
 // isHostileTo, isStunned, isRooted, moveSpeedMult, swingIntervalMult, mobCanSwim,
@@ -31,6 +35,7 @@
 // state routes through the seam.
 
 import { lineOfSightClear } from '../colliders';
+import { isMobSpellResisted } from '../combat/spell_resist';
 import { MOBS } from '../data';
 import { pctValue } from '../entity';
 import { isTrivialTo } from '../mob/targeting';
@@ -344,7 +349,7 @@ export function petFollow(ctx: SimContext, pet: Entity, owner: Entity): void {
 export function applyPetOwnerScaling(ctx: SimContext, pet: Entity): void {
   if (pet.ownerId === null) return;
   const meta = ctx.players.get(pet.ownerId);
-  if (!meta || meta.cls !== 'hunter') return;
+  if (meta?.cls !== 'hunter') return;
   const owner = ctx.entities.get(pet.ownerId);
   if (!owner) return;
   const template = MOBS[pet.templateId];
@@ -389,7 +394,11 @@ function petHasteMult(pet: Entity): number {
 
 /** A ranged demon pet (imp) hurls a spell-school bolt: a telegraphed
  *  projectile that bypasses armor, mirroring the player caster path. Damage
- *  comes from the mob's weapon range + AP, exactly like its melee siblings. */
+ *  comes from the mob's weapon range + AP, exactly like its melee siblings.
+ *  The bolt rolls the same spell-resist table as every other spell path
+ *  (isMobSpellResisted, shared with Sim.updateRangedPetAttack): a player pet
+ *  as caster takes the full above-level resist scaling, and a fully resisted
+ *  bolt deals nothing but still pulls the target into combat. */
 export function petRangedAttack(
   ctx: SimContext,
   pet: Entity,
@@ -416,6 +425,20 @@ export function petRangedAttack(
   // The imp's bolt resolves on arrival (projectile_travel), not the tick it is hurled;
   // it fizzles if the pet or its target dies before impact.
   scheduleProjectile(ctx, pet, target, (src, tgt) => {
+    if (isMobSpellResisted(ctx.rng, src, tgt, src.hitBonus)) {
+      ctx.emit({
+        type: 'damage',
+        sourceId: src.id,
+        targetId: tgt.id,
+        amount: 0,
+        crit: false,
+        school: ranged.school,
+        ability: null,
+        kind: 'resist',
+      });
+      ctx.enterCombat(src, tgt);
+      return;
+    }
     const crit = ctx.rng.chance(0.05);
     let dmg =
       ctx.rng.range(src.weapon.min, src.weapon.max) +

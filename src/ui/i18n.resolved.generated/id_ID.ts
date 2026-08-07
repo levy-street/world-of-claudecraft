@@ -392,7 +392,7 @@ export const id_ID: EnTranslations = {
     "emoteEditor": {
       "title": "Emote",
       "done": "Selesai",
-      "close": "Close emotes"
+      "close": "Tutup emote"
     },
     "dailyRewards": {
       "title": "Hadiah Harian",
@@ -1278,6 +1278,24 @@ export const id_ID: EnTranslations = {
       "graphicsFatal": "Pemulihan grafis gagal. Muat ulang game untuk melanjutkan.",
       "graphicsReload": "Muat Ulang Game",
       "graphicsDraftChanged": "Perubahan grafis siap diterapkan.",
+      "gfxSectionQuality": "Quality",
+      "gfxSectionWorld": "World Detail",
+      "gfxSectionLighting": "Lighting & Effects",
+      "gfxSectionCamera": "Camera",
+      "gfxSectionDisplay": "Display",
+      "gfxSectionSystem": "System",
+      "gfxSectionTouch": "Touch Controls",
+      "gfxViewDistance": "View Distance",
+      "gfxWaterQuality": "Water Quality",
+      "gfxCharacterDetail": "Character Detail",
+      "gfxAmbientOcclusion": "Ambient Occlusion",
+      "gfxBloom": "Bloom",
+      "gfxAntiAliasing": "Anti-Aliasing",
+      "gfxDynamicLights": "Dynamic Lights",
+      "gfxParticleEffects": "Particle Effects",
+      "gfxHalf": "Half",
+      "gfxCustomNote": "Changing a dial switches the quality preset to Advanced: a custom mix built on the High-quality base, starting from the levels shown for your current preset.",
+      "gfxEffectsNote": "Ambient Occlusion, Bloom and Anti-Aliasing ride the post-processing chain: with Effects & Lighting on Low the chain is off and they have no effect.",
       "interfaceMode": "Mode Antarmuka",
       "interfaceModeAuto": "Otomatis",
       "interfaceModeDesktop": "Desktop",
@@ -1805,7 +1823,13 @@ export const id_ID: EnTranslations = {
       "saveButton": "Simpan Fokus",
       "notInTownHint": "Kamu harus berada di kota untuk mengatur fokusmu.",
       "increaseAria": "Tambah fokus pada {component}",
-      "decreaseAria": "Kurangi fokus pada {component}"
+      "decreaseAria": "Kurangi fokus pada {component}",
+      "respecTierLabel": "Re-spec speed",
+      "respecTierTimeOption": "Free (take your time)",
+      "respecTierPartialOption": "Faster (small cost)",
+      "respecTierInstantOption": "Instant (full cost)",
+      "respecCostFree": "Free",
+      "respecCostLine": "Costs {coin} and {materials}"
     },
     "party": {
       "promoteLeader": "Angkat jadi Pemimpin",
@@ -2053,7 +2077,7 @@ export const id_ID: EnTranslations = {
       "hostile": "Bermusuhan",
       "friendly": "Ramah",
       "elite": "Elite",
-      "boss": "Boss"
+      "boss": "Bos"
     },
     "targetFrame": {
       "unlock": "Pindahkan bingkai sasaran",
@@ -2661,7 +2685,7 @@ export const id_ID: EnTranslations = {
     "enchantName": {
       "enchant_weapon_might": "Mantrai Senjata - Kekuatan",
       "enchant_weapon_intellect": "Mantrai Senjata - Daya Mantra",
-      "enchant_offhand_stamina": "Enchant Offhand - Stamina",
+      "enchant_offhand_stamina": "Mantrai Tangan Sekunder - Stamina",
       "enchant_helmet_fortitude": "Mantrai Helm - Keteguhan",
       "enchant_neck_spirit": "Mantrai Kalung - Roh",
       "enchant_shoulder_agility": "Mantrai Bahu - Kegesitan",
@@ -3151,7 +3175,7 @@ export const id_ID: EnTranslations = {
         "soul_rend": "Robek Jiwa (pemain yang ditandai harus menyebar dan disembuhkan)",
         "deathless_rage": "Murka Abadi (diputus di wardstone)",
         "wardstones": "Saluran Wardstone (transisi fase)",
-        "dread_curse": "Dread Curse (heroic only, stacking tank-swap debuff)"
+        "dread_curse": "Kutukan Kengerian (khusus heroik, debuff bertumpuk untuk pergantian tank)"
       }
     },
     "deeds": {
@@ -4100,7 +4124,7 @@ export const id_ID: EnTranslations = {
       "bastionBody": "Benteng terendam yang lenyap ditelan rawa, dikuasai para penjaga yang tenggelam dan oleh pasang air itu sendiri.",
       "templeBody": "Tempat pemujaan bermandi cahaya bulan yang tenggelam di bawah danau bercahaya tinggi di puncak gunung, dijangkau melalui sebuah gerbang cahaya dingin. Sebuah pemujaan yang tenggelam masih bernyanyi di bawah sana dalam jubah lapuk mereka, dan peringatan yang terukir di tepian mengatakan sesuatu di bawah hanya tertidur. Sebuah misteri yang berdiri sendiri, terpisah dari kisah utama, untuk mereka yang penasaran dan siap sedia.",
       "sanctumBody": "Jantung kelam Thornpeak, tempat pekerjaan panjang sang pemuja mencapai puncaknya yang mengerikan.",
-      "wildheartBody": "Sebuah kaldera rimba yang basah oleh hujan tempat dua jalur perburuan yang ditinggikan mengelilingi cenote giok. Lintasi sarang-sarang binatang buas dan reruntuhan leluhur, lalu daki piramida ritual untuk menghadapi Zulgar.",
+      "wildheartBody": "Sebuah kaldera rimba yang basah oleh hujan tempat dua jalur perburuan yang ditinggikan mengelilingi cenote giok. Lintasi sarang-sarang binatang buas dan reruntuhan leluhur, lalu daki piramida ritual untuk melihat siapa yang menunggu di puncaknya.",
       "raidName": "Raid akhir permainan",
       "raidBody": "Di balik pintu kerajaan yang tersegel menanti cobaan untuk sepuluh pemain: pertarungan berfase banyak dan sebuah kekuatan abadi yang harus dipadamkan bersama oleh seluruh raid. Raih jalanmu untuk masuk, lalu bawa sembilan kawan.",
       "heroicTitle": "Mode heroik",
@@ -7386,11 +7410,14 @@ export const id_ID: EnTranslations = {
       "stat": "+{value} {stat}",
       "useFood": "Pakai: Memulihkan {amount} nyawa selama {seconds} detik. Harus tetap duduk selama makan.",
       "useDrink": "Pakai: Memulihkan {amount} mana selama {seconds} detik. Harus tetap duduk selama minum.",
+      "useElixir": "Use: Increases your {stat} by {value} for {minutes} min. Usable in combat.",
+      "useElixirAura": "Use: Grants {aura} for {minutes} min. Usable in combat.",
       "questItem": "Barang Misi",
       "questRelated": "Misi: {quest}",
       "questRules": "Tidak dapat dijual, disimpan di bank, atau ditukar.",
       "questOrphaned": "Tidak dibutuhkan untuk misi aktif mana pun.",
       "classes": "Kelas: {classes}",
+      "maxStack": "Max stack: {count}",
       "sellPrice": "Harga jual: {money}",
       "clickBuy": "Klik untuk membeli",
       "clickSell": "Klik untuk menjual",
@@ -7541,6 +7568,8 @@ export const id_ID: EnTranslations = {
       "collectEmpty": "Tidak ada yang menunggu. Hasil penjualan dan daftar kedaluwarsa terkumpul di sini.",
       "collectNote": "Pendapatan dan barang kembalian yang disimpan Pedagang untukmu.",
       "saleProceeds": "Hasil penjualan",
+      "saleBuyer": "Sold to {buyer}",
+      "saleOlder": "Plus {count} earlier sales, included in the total.",
       "collectAll": "Ambil Semua"
     },
     "logs": {
@@ -10319,6 +10348,15 @@ export const id_ID: EnTranslations = {
       },
       "direfang_quiver": {
         "name": "Tabung Panah Direfang"
+      },
+      "sharp_claw": {
+        "name": "Sharp Claw"
+      },
+      "curved_tusk": {
+        "name": "Curved Tusk"
+      },
+      "pristine_claw": {
+        "name": "Pristine Claw"
       },
       "conjured_water4": {
         "name": "Air Mata Air Sihir"

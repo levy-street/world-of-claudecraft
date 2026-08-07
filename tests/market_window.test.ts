@@ -44,6 +44,38 @@ describe('market_window: no magic values', () => {
   });
 });
 
+describe('market_window: the Collect tab sale ledger', () => {
+  // The ledger is its own repaint axis: a sale whose proceeds floor to 0 copper
+  // moves neither collectionCopper nor collectionItems, so a signature watching
+  // only those two would leave an open Collect tab showing a stale list.
+  it('watches the ledger in the refresh signature, not just the purse and the goods', () => {
+    const sig = painter.slice(
+      painter.indexOf('const sig = JSON.stringify(['),
+      painter.indexOf('if (sig === this.lastSig) return;'),
+    );
+    expect(sig).toContain('info?.collectionSales');
+    expect(sig).toContain('info?.collectionSalesOmitted');
+  });
+
+  it('escapes the buyer name before it reaches innerHTML', () => {
+    expect(painter).toContain("esc(t('itemUi.market.saleBuyer', { buyer: buyerName }))");
+  });
+
+  it('drives the ledger rows from CSS classes the stylesheet actually defines', () => {
+    for (const cls of ['mkt-sale-list', 'mkt-sale', 'mkt-sale-name', 'mkt-sale-buyer']) {
+      expect(painter, `painter must use .${cls}`).toContain(cls);
+      expect(componentsCss, `components.css must define .${cls}`).toContain(`.${cls}`);
+    }
+  });
+
+  it('builds the rows in the pure core, leaving the painter no item resolution', () => {
+    expect(core).toContain('collectionSales');
+    // The painter consumes MarketCollectSaleRow; it never reaches into ITEMS itself.
+    expect(painter).toContain('MarketCollectSaleRow');
+    expect(painter.includes("from '../sim/data'")).toBe(false);
+  });
+});
+
 describe('market_window: WCAG 2.2 AA', () => {
   it('returns focus to the opener on close', () => {
     expect(painter).toContain('captureFocus');

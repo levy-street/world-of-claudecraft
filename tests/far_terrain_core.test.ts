@@ -7,6 +7,8 @@ import {
   createFarTileBuilder,
   detailCullFar,
   FAR_MESH_DROP,
+  FAR_RIM_TINT_ALT,
+  FAR_RIM_TINT_BASE,
   FAR_TILE_FOG_MARGIN,
   FAR_TILE_SIZE,
   FAR_WORLD_MARGIN,
@@ -19,13 +21,14 @@ import {
   farTileBuildOrder,
   farTileVisible,
   farVertexHeight,
+  farVertexRenderY,
   farVistaPlan,
   horizonHazePlan,
   planFarTiles,
   srgbHexToLinear,
 } from '../src/render/far_terrain_core';
 import { WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_X, WORLD_MIN_Z } from '../src/sim/data';
-import { terrainHeight } from '../src/sim/world';
+import { terrainHeight, WATER_LEVEL } from '../src/sim/world';
 
 const SEED = 20061; // the fixed built-in world seed (src/main.ts)
 const MAX_OUTDOOR = 850; // zone_streaming.ts envelope
@@ -63,10 +66,26 @@ describe('farVistaPlan: per-tier vista envelopes', () => {
   });
 
   it('every enabled spacing divides the tile size (shared-edge grid, no cracks)', () => {
-    for (const tier of ['medium', 'high', 'ultra'] as const) {
+    for (const tier of ['medium', 'high', 'ultra', 'insane'] as const) {
       const plan = farVistaPlan(tier, false);
       expect(FAR_TILE_SIZE % plan.spacing).toBe(0);
     }
+  });
+
+  it('ultra does not tessellate the vista finer than high, which buys nothing', () => {
+    // The layer's nearest fragment sits past the detail horizon less the
+    // discard margin, about 640 yards out, where one cell of either grid is
+    // barely more than a dozen screen pixels: the extra vertices bought
+    // sub-pixel silhouette accuracy and cost 44 percent more vista triangles
+    // every frame plus 44 percent more terrainHeight sampling in the boot
+    // build. The ladder still has to be monotone, and insane still exists to
+    // measure the finer grid against.
+    const high = farVistaPlan('high', false).spacing;
+    const ultra = farVistaPlan('ultra', false).spacing;
+    const insane = farVistaPlan('insane', false).spacing;
+    expect(ultra).toBe(high);
+    expect(insane).toBeLessThan(ultra);
+    expect(ultra).toBeLessThan(farVistaPlan('medium', false).spacing);
   });
 });
 
@@ -88,15 +107,34 @@ describe('detailCullFar: the classic envelope still bounds the detail subsystems
     for (const tier of ['medium', 'high', 'ultra', 'insane'] as const) {
       const plan = farVistaPlan(tier, false);
       const haze = horizonHazePlan(plan.envelopeFar);
-      // the band starts in the OUTER half of the vista, comfortably past
-      // everything the detail subsystems draw (700u): gameplay range and the
-      // handoff line stay crystal clear on every vista tier
-      expect(haze.near).toBeGreaterThan(FOGLESS_DETAIL_FAR * 1.9);
-      expect(haze.near).toBeGreaterThanOrEqual(plan.envelopeFar * 0.5);
+      // the band starts in the outer half of the vista, past everything the
+      // detail subsystems draw (700u), with a third again of clear margin on
+      // the tightest tier: gameplay range and the handoff line stay crystal
+      // clear on every vista tier
+      expect(haze.near).toBeGreaterThan(FOGLESS_DETAIL_FAR * 1.3);
+      expect(haze.near).toBeGreaterThanOrEqual(plan.envelopeFar * 0.35);
       // full atmosphere only past the whole-world envelope: the sea horizon
       // melts, the world itself stays readable
       expect(haze.far).toBeGreaterThan(plan.envelopeFar);
       expect(haze.near).toBeLessThan(plan.envelopeFar);
+    }
+  });
+
+  it('mid-range content takes exactly zero haze, the world rim takes most of it', () => {
+    // The two halves of "slight atmosphere so the very far objects fade away":
+    // nothing the detail subsystems draw may be tinted at all (the fog color
+    // is the biome preset times the day/night grade, so a band that reached
+    // inward would repaint mid-distance sprites at dawn), and the far rim has
+    // to pick up enough of it to actually read as distance.
+    const fogAt = (d: number, haze: { near: number; far: number }): number =>
+      Math.max(0, Math.min(1, (d - haze.near) / (haze.far - haze.near)));
+    for (const tier of ['medium', 'high', 'ultra', 'insane'] as const) {
+      const plan = farVistaPlan(tier, false);
+      const haze = horizonHazePlan(plan.envelopeFar);
+      expect(fogAt(FOGLESS_DETAIL_FAR, haze)).toBe(0);
+      const atRim = fogAt(plan.envelopeFar, haze);
+      expect(atRim).toBeGreaterThan(0.5); // the horizon genuinely softens
+      expect(atRim).toBeLessThan(0.75); // but never washes the world out
     }
   });
 });
@@ -216,7 +254,7 @@ describe('createFarTileBuilder: real heights, deterministic, incremental', () =>
     return b.result();
   };
 
-  it('positions carry the crest-preserving height minus the anti-poke drop', () => {
+  it('positions carry the sampled height minus the drop and the clearance', () => {
     const data = buildAll(64);
     const side = farGridSide(tile.size, SPACING);
     expect(data.positions.length).toBe(side * side * 3);
@@ -231,17 +269,64 @@ describe('createFarTileBuilder: real heights, deterministic, incremental', () =>
       const z = tile.z0 + iz * SPACING;
       expect(data.positions[vi]).toBe(x);
       expect(data.positions[vi + 2]).toBe(z);
-      // farVertexHeight, not the raw point sample: the crest max keeps ridge
-      // silhouettes truthful now that no fog hides the shaving.
-      expect(data.positions[vi + 1]).toBeCloseTo(
-        farVertexHeight(x, z, SPACING, SEED) - FAR_MESH_DROP,
-        4,
+      // At or under farVertexHeight minus the drop: the builder also subtracts a
+      // per-vertex CLEARANCE (far_surface_core.ts), which is zero on ground the
+      // flat triangles already sit under and grows where they would bridge a
+      // dip. Never above, which is the invariant the whole layer rests on.
+      expect(data.positions[vi + 1]).toBeLessThanOrEqual(
+        farVertexHeight(x, z, SPACING, SEED) - FAR_MESH_DROP + 1e-4,
       );
-      expect(data.positions[vi + 1]).toBeGreaterThanOrEqual(
-        terrainHeight(x, z, SEED) - FAR_MESH_DROP - 1e-4,
+      expect(data.positions[vi + 1]).toBeLessThanOrEqual(
+        terrainHeight(x, z, SEED) - FAR_MESH_DROP + 1e-4,
       );
     }
     expect(data.minY).toBeLessThanOrEqual(data.maxY);
+  });
+
+  it('NEVER rises above the real terrain, at any spacing, on any ground', () => {
+    // The invariant this whole layer lives or dies by. The coarse mesh is a
+    // stand-in; the instant it sits higher than the terrain it stands in for,
+    // it wins the depth test and surfaces through the detailed terrain as a
+    // smooth skin in the wrong shape. Swept rather than spot-checked, because
+    // the failure only appeared on steep ground: the previous recipe took the
+    // MAX of the half-cell neighbourhood and then ADDED up to 4.75 units of
+    // crag, so it cleared the true surface almost everywhere with any slope.
+    for (const spacing of [8, 10, 12, 16]) {
+      let worst = Number.NEGATIVE_INFINITY;
+      let worstAt = '';
+      // A transect over the mountain-heavy north (Thornpeak z 540..900) plus the
+      // valley and coast bands, so cliffs, ridges, meadow and shore all appear.
+      for (let z = -160; z <= 900; z += 37) {
+        for (let x = -500; x <= 500; x += 53) {
+          const over = farVertexHeight(x, z, spacing, SEED) - terrainHeight(x, z, SEED);
+          if (over > worst) {
+            worst = over;
+            worstAt = `spacing ${spacing} at ${x},${z}`;
+          }
+        }
+      }
+      // Zero, not a tolerance: the min can only equal the point sample, and the
+      // crag only subtracts. FAR_MESH_DROP is then pure headroom on top.
+      expect(worst, worstAt).toBeLessThanOrEqual(1e-6);
+    }
+  });
+
+  it('still breaks up high ground, so peaks are not smooth cones', () => {
+    // The crag now carves instead of building, and it still has to DO something:
+    // a coarse peak with no relief reads as a cone whatever its colour.
+    const spacing = 10;
+    let varied = 0;
+    let samples = 0;
+    for (let z = 540; z <= 900; z += 11) {
+      for (let x = -400; x <= 400; x += 17) {
+        const raw = terrainHeight(x, z, SEED);
+        if (raw < 20) continue; // crag only engages on high ground
+        samples++;
+        if (Math.abs(farVertexHeight(x, z, spacing, SEED) - raw) > 0.5) varied++;
+      }
+    }
+    expect(samples).toBeGreaterThan(50);
+    expect(varied / samples).toBeGreaterThan(0.5);
   });
 
   it('a one-row-at-a-time build is byte-identical to a one-shot build', () => {
@@ -276,7 +361,8 @@ describe('farGroundColor: the far recipe reads like the world it stands in for',
   const color = (x: number, z: number): [number, number, number] => {
     const out: [number, number, number] = [0, 0, 0];
     const h = terrainHeight(x, z, SEED);
-    farGroundColor(x, z, h, 0.1, SEED, out);
+    // gentle ground the mesh resolves fully: no widening, the bare thresholds
+    farGroundColor(x, z, h, 0.1, 0, 0, SEED, out);
     return out;
   };
 
@@ -299,18 +385,128 @@ describe('farGroundColor: the far recipe reads like the world it stands in for',
     expect(r).toBeGreaterThanOrEqual(b); // warm volcanic rock, not blue-white
   });
 
-  it('the world rim fades toward the atmospheric haze tone', () => {
+  it('the world rim shifts COOL toward the atmospheric haze tone', () => {
     const rim = color(WORLD_MAX_X + 120, 1200);
     const interior = color(0, 1200);
-    // the rim tone is the hazy blue: blue channel dominates its red
-    expect(rim[2]).toBeGreaterThan(rim[0]);
-    // and it is far from the interior ground color
+    // The direction is what the wash means, and it survives whatever base tone
+    // (green, rock, sand) the rim happens to stand on: the hazy peak tone is
+    // blue-dominant, so mixing toward it always widens blue over red. An
+    // absolute "blue beats red" only held while the wash was heavy enough to
+    // overwhelm a warm base, which is exactly the strength it should not have.
+    expect(rim[2] - rim[0]).toBeGreaterThan(interior[2] - interior[0]);
+    // and it is a visible shift, not a rounding difference
     const dist = Math.hypot(rim[0] - interior[0], rim[1] - interior[1], rim[2] - interior[2]);
     expect(dist).toBeGreaterThan(0.05);
   });
 
+  it('the rim wash stays a hint: the LIVE haze owns the recession, not the bake', () => {
+    // Baked paint cannot answer the sky, the hour, or the weather, and the
+    // per-zone haze field now puts real aerial perspective on exactly the
+    // kilometre-plus distances the rim band sits at. Their sum is the contract:
+    // at 0.18 plus 0.30 the two painted the same recession twice and the rim
+    // range read as flat pale cones under every light.
+    expect(FAR_RIM_TINT_BASE + FAR_RIM_TINT_ALT).toBeLessThanOrEqual(0.25);
+    // ...and never zero, or a rim valley loses its distance cue entirely
+    expect(FAR_RIM_TINT_BASE).toBeGreaterThan(0);
+    expect(FAR_RIM_TINT_ALT).toBeGreaterThan(0);
+    // altitude still weighted: a summit recedes further than the ground below it
+    const low = color(WORLD_MAX_X + 120, 1200);
+    const high: [number, number, number] = [0, 0, 0];
+    farGroundColor(WORLD_MAX_X + 120, 1200, 46, 0.1, 0, 0, SEED, high);
+    expect(high[2] - high[0]).toBeGreaterThan(low[2] - low[0]);
+  });
+
   it('stays deterministic: same input, same triple', () => {
     expect(color(123, 456)).toEqual(color(123, 456));
+  });
+});
+
+describe('the coarse mesh never paints a transition it cannot resolve', () => {
+  // A mountainside a few hundred yards out rendered as large individually
+  // shaded triangles, several of them pale snow-white against near-black
+  // neighbours. The normals were never the cause (they are smooth
+  // neighbour-averaged central differences, and the shading variance they
+  // carry is the real heightfield's). The colour recipe was: it re-reads the
+  // near terrain's thresholds, which are sized against a heightfield that
+  // steps 6 units, on a mesh whose cliffs climb 25 units between NEIGHBOURING
+  // vertices. A 26 unit snow ramp then resolves inside one cell.
+  const lum = (r: number, g: number, b: number): number => 0.2126 * r + 0.7152 * g + 0.0722 * b;
+
+  it('a threshold the mesh resolves is untouched; one it cannot is spread out', () => {
+    // Two heights one cell apart on the Duskmoor sea cliffs, straddling the
+    // snow line. Sampled as if the mesh resolved them (no per-cell change)
+    // they take the bare thresholds and land far apart; sampled with the
+    // climb those cells really carry, the same pair converges.
+    const [x, z] = [156, 924];
+    const at = (h: number, rise: number, slopeRise: number): number => {
+      const out: [number, number, number] = [0, 0, 0];
+      farGroundColor(x, z, h, 2.7, rise, slopeRise, SEED, out);
+      return lum(out[0], out[1], out[2]);
+    };
+    const sharpGap = Math.abs(at(66.6, 0, 0) - at(41.6, 0, 0));
+    const softGap = Math.abs(at(66.6, 21.6, 1.5) - at(41.6, 39.5, 1.5));
+    expect(sharpGap).toBeGreaterThan(0.3); // the shipped hard step
+    expect(softGap).toBeLessThan(sharpGap / 2); // more than halved
+  });
+
+  it('adjacent far vertices never step a whole palette apart, on any spacing', () => {
+    // The real builder over the steepest above-water ground in the world
+    // (the Duskmoor cliffs, slopes past 3.0 at far-mesh scale). Measured
+    // against the shipped recipe this region peaked at 0.63; the pin sits
+    // just above what the widened ramps leave, so a threshold that stops
+    // widening fails here rather than in a screenshot.
+    for (const spacing of [8, 12, 16]) {
+      const tile: FarTile = { x0: -140, z0: 700, size: 480, cx: 100, cz: 940 };
+      const b = createFarTileBuilder(tile, spacing, SEED);
+      while (!b.step(4096)) {
+        // drain
+      }
+      const d = b.result();
+      const side = farGridSide(tile.size, spacing);
+      let worst = 0;
+      const pair = (a: number, c: number): void => {
+        // underwater vertices are hidden by the water plane, so only the
+        // visible surface is held to this
+        if (d.positions[a * 3 + 1] < WATER_LEVEL || d.positions[c * 3 + 1] < WATER_LEVEL) return;
+        worst = Math.max(
+          worst,
+          Math.abs(
+            lum(d.colors[a * 3], d.colors[a * 3 + 1], d.colors[a * 3 + 2]) -
+              lum(d.colors[c * 3], d.colors[c * 3 + 1], d.colors[c * 3 + 2]),
+          ),
+        );
+      };
+      for (let iz = 0; iz < side; iz++) {
+        for (let ix = 0; ix < side; ix++) {
+          if (ix > 0) pair(iz * side + ix, iz * side + ix - 1);
+          if (iz > 0) pair(iz * side + ix, (iz - 1) * side + ix);
+        }
+      }
+      expect(worst).toBeLessThan(0.33);
+    }
+  });
+
+  it('still snows the summits: softening the ramp did not just erase the snow', () => {
+    const tile: FarTile = { x0: -140, z0: 700, size: 480, cx: 100, cz: 940 };
+    const b = createFarTileBuilder(tile, 8, SEED);
+    while (!b.step(4096)) {
+      // drain
+    }
+    const d = b.result();
+    const side = farGridSide(tile.size, 8);
+    let gentleHigh = 0;
+    let snowBright = 0;
+    for (let i = 0; i < side * side; i++) {
+      // High ground the mesh DOES resolve: a summit or a ledge, not a face.
+      // The bar is 50 rather than the snow line itself because the line
+      // carries a deliberate 14 unit patch-noise shift, so a vertex sitting a
+      // couple of units over it is legitimately bare on an unlucky sample.
+      if (d.positions[i * 3 + 1] < 50 || d.normals[i * 3 + 1] < 0.93) continue;
+      gentleHigh++;
+      if (lum(d.colors[i * 3], d.colors[i * 3 + 1], d.colors[i * 3 + 2]) > 0.5) snowBright++;
+    }
+    expect(gentleHigh).toBeGreaterThan(0);
+    expect(snowBright).toBe(gentleHigh);
   });
 });
 
@@ -398,11 +594,12 @@ describe('farFieldPolicy: the ONE capability decision for sprites and the vista'
 });
 
 describe('createFarShortfallSampler: session-scoped, never a stale surface', () => {
-  // A ridge crest inside the world where the coarse grid meaningfully
-  // shaves height, so shortfalls are non-trivial.
-  const at = { x: 300, z: 100 };
+  // Inside the world on ground with real relief, and deliberately OFF the cell
+  // diagonal (tx + tz > 1), so the reconstruction below exercises the second
+  // triangle rather than the seam where both halves agree.
+  const at = { x: 303, z: 100 };
 
-  it('matches a fresh farVertexHeight bilinear reconstruction', () => {
+  it('matches a fresh farVertexRenderY reconstruction over the rendered cell', () => {
     const spacing = 12;
     const seed = 20061;
     const sampler = createFarShortfallSampler(seed, spacing, -1000, -1000);
@@ -411,11 +608,18 @@ describe('createFarShortfallSampler: session-scoped, never a stale surface', () 
     const z0 = -1000 + Math.floor((at.z + 1000) / spacing) * spacing;
     const tx = (at.x - x0) / spacing;
     const tz = (at.z - z0) / spacing;
-    const h = (x: number, z: number) => farVertexHeight(x, z, spacing, seed);
-    const farY =
-      (h(x0, z0) * (1 - tx) + h(x0 + spacing, z0) * tx) * (1 - tz) +
-      (h(x0, z0 + spacing) * (1 - tx) + h(x0 + spacing, z0 + spacing) * tx) * tz;
-    const want = Math.max(0, baseY - (farY - FAR_MESH_DROP));
+    expect(tx + tz).toBeGreaterThan(1);
+    const h = (x: number, z: number) => farVertexRenderY(x, z, spacing, seed);
+    // The anti-diagonal split farGridIndices emits, from the far corner back
+    // along its two edges: the surface the GPU actually rasterizes here.
+    const h10 = h(x0 + spacing, z0);
+    const h01 = h(x0, z0 + spacing);
+    const h11 = h(x0 + spacing, z0 + spacing);
+    const farY = h11 + (h01 - h11) * (1 - tx) + (h10 - h11) * (1 - tz);
+    // farVertexRenderY already carries FAR_MESH_DROP and the clearance, so
+    // there is no second drop to subtract off the reconstructed surface.
+    const want = Math.max(0, baseY - farY);
+    expect(want).toBeGreaterThan(FAR_MESH_DROP - 1e-9); // guards test vacuity
     expect(sampler.shortfall(at.x, at.z, baseY)).toBeCloseTo(want, 10);
     // and the cached second read is identical
     expect(sampler.shortfall(at.x, at.z, baseY)).toBeCloseTo(want, 10);

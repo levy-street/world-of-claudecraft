@@ -526,4 +526,18 @@ export const es_ES: Record<string, string> = {
   'error.guildMemberLimit': 'Esta hermandad supera el límite de miembros permitido.',
   'error.guildNameInvalid':
     'El nombre de la hermandad debe tener entre 3 y 24 letras con espacios simples.',
+  'stats.loadFailed': 'no se pudieron cargar las estadísticas del servidor',
+  'usage.loadFailed': 'no se pudo cargar el uso del proveedor',
+  'tickPerf.loadFailed': 'no se pudo cargar el estado del perfilador de ticks',
+  'charts.loadFailed': 'no se pudieron cargar los gráficos',
+  'moderationHistory.actionSpectate': 'Observar',
+  'moderationHistory.actionUnspectate': 'Dejar de observar',
+  'error.bugReportNotFound': 'no se encontró el informe de error abierto',
+  'bugReports.colActions': 'Acciones',
+  'bugReports.resolve': 'Resolver',
+  'bugReports.dismiss': 'Descartar',
+  'bugReports.confirmResolve': '¿Resolver este informe de error?',
+  'bugReports.confirmDismiss': '¿Descartar este informe de error?',
+  'bugReports.reviewed': 'Revisado',
+  'dialog.report': 'Informe',
 };

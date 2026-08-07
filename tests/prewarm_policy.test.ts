@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
   CONSTRAINED_PREWARM_KEEP,
+  CONSTRAINED_PREWARM_RESUME,
   constrainedEntryViewCreateBudget,
   interactionLandmarkViewPriority,
   mandatoryLandmarkViewsReady,
@@ -10,6 +11,7 @@ import {
   type PrewarmPolicyInput,
   partitionMandatoryLandmarkCandidates,
   prewarmBuildDeadline,
+  prewarmEntryResumesAfterSkip,
   prewarmEntryRuns,
   prewarmEntryShouldDefer,
   remainingPrewarmViewBudget,
@@ -228,6 +230,44 @@ describe('the keep-list is the minimal entry set', () => {
         'world.initial-frame',
       ].sort(),
     );
+  });
+});
+
+describe('constrained skips that still resume in the background', () => {
+  const constrained = resolvePrewarmPolicy({ ...BASE, constrainedMemory: true });
+  const desktop = resolvePrewarmPolicy(BASE);
+
+  it('skips the ability-VFX warm-up at entry but keeps its units', () => {
+    // Both halves matter: skipping keeps the entry window short, resuming is
+    // what stops the six impact sheets from being drawn on the first spell
+    // impact of each school, i.e. mid-combat.
+    expect(prewarmEntryRuns('vfx.ability-primitives', constrained)).toBe(false);
+    expect(prewarmEntryResumesAfterSkip('vfx.ability-primitives', constrained)).toBe(true);
+  });
+
+  it('never resumes an entry skipped for its GPU footprint', () => {
+    for (const id of [
+      'entities.mob-archetypes',
+      'entities.npc-archetypes',
+      'sky.biome-variants',
+      'surface-detail.textures',
+      'vfx.atlas',
+    ]) {
+      expect(prewarmEntryRuns(id, constrained)).toBe(false);
+      expect(prewarmEntryResumesAfterSkip(id, constrained)).toBe(false);
+    }
+  });
+
+  it('is inert on the desktop manifest, which runs the entry outright', () => {
+    expect(prewarmEntryRuns('vfx.ability-primitives', desktop)).toBe(true);
+    expect(prewarmEntryResumesAfterSkip('vfx.ability-primitives', desktop)).toBe(false);
+  });
+
+  it('keeps the resume list disjoint from the keep-list', () => {
+    expect(CONSTRAINED_PREWARM_RESUME.length).toBeGreaterThan(0);
+    for (const id of CONSTRAINED_PREWARM_RESUME) {
+      expect(CONSTRAINED_PREWARM_KEEP).not.toContain(id);
+    }
   });
 });
 

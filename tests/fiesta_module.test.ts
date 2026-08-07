@@ -42,6 +42,26 @@ describe('fiesta module: deterministic offer draw', () => {
   });
 });
 
+describe('fiesta module: "+X% all damage" augments carry both damage halves', () => {
+  it('aug_avatar sets spellDmgPct alongside meleeDmgPct, matching its own tooltip and the aug_bloodhunter/aug_overdrive sibling pattern', () => {
+    for (const id of ['aug_bloodhunter', 'aug_overdrive', 'aug_avatar']) {
+      const aug = AUGMENTS_BY_ID[id];
+      const melee = aug.effect.global?.meleeDmgPct ?? 0;
+      expect(melee).toBeGreaterThan(0);
+      expect(aug.effect.global?.spellDmgPct).toBe(melee);
+    }
+  });
+
+  it('picking aug_avatar raises the merged spellDmgPct by the same amount as meleeDmgPct', () => {
+    const sim = makeWorld();
+    const pid = sim.addPlayer('paladin', 'A');
+    const base = sim.players.get(pid)!.talentMods;
+    const merged = fiesta.mergeAugmentMods(base, ['aug_avatar']);
+    expect(merged.global.spellDmgPct - base.global.spellDmgPct).toBeCloseTo(0.25, 6);
+    expect(merged.global.spellDmgPct).toBeCloseTo(merged.global.meleeDmgPct, 6);
+  });
+});
+
 describe('fiesta module: mergeAugmentMods', () => {
   it('folds an augment effect into a deep clone, never mutating the base', () => {
     const aug = AUGMENTS.find((a) => (a.effect.stats?.crit ?? 0) > 0)!;

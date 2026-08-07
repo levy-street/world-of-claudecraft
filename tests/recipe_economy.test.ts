@@ -9,7 +9,11 @@
 // leggings) closed through the maintainer-approved paired arm (input rework
 // plus an output sellValue re-price), so the frozen list below is EMPTY.
 import { describe, expect, it } from 'vitest';
-import { STATION_TYPE_BY_CRAFT } from '../src/sim/content/professions';
+import {
+  HARVEST_COMPONENT_ITEMS,
+  HARVEST_COMPONENT_SPECIMENS,
+  STATION_TYPE_BY_CRAFT,
+} from '../src/sim/content/professions';
 import {
   ALL_RECIPES,
   COMBO_RECIPES,
@@ -45,6 +49,12 @@ function outputValue(recipe: ProfessionRecipeRecord): number {
   const def = ITEMS[recipe.resultItemId];
   if (!def) throw new Error(`recipe result ${recipe.resultItemId} has no ItemDef`);
   return def.sellValue * recipe.resultCount;
+}
+
+function requireRecipe(id: string): ProfessionRecipeRecord {
+  const recipe = recipeById(id);
+  if (!recipe) throw new Error(`recipe ${id} missing`);
+  return recipe;
 }
 
 // The legacy gold-positive exception list is EMPTY as of the economy rework
@@ -164,7 +174,7 @@ describe('THE ECONOMY INVARIANT', () => {
     // requiredReagentCountFor. Self-sign alone would give 6*60 + 4*20 = 440,
     // so without this pin a discount regression would silently widen the
     // bound and let a 300-to-440 re-price slip through green.
-    expect(minAchievableInputValue(recipeById('recipe_sootscale_mantle')!)).toBe(300);
+    expect(minAchievableInputValue(requireRecipe('recipe_sootscale_mantle'))).toBe(300);
   });
 
   it('no recipe is fully vendor-fed in live stock, and the bound above does not rest on that', () => {
@@ -308,6 +318,9 @@ describe('REFERENTIAL INTEGRITY', () => {
 describe('MATERIAL DEMAND COVERAGE', () => {
   // Every gathered/harvested/vendor material Phases 4 and 10 introduced must be
   // consumed by at least one recipe, so no supply node produces a dead good.
+  // The corpse-harvest families closed later ride the same pin: wolf_fang
+  // (Phase 15) and the #2905 claw/tusk trio, so HARVEST_MATERIALS and SPECIMENS
+  // now list every HARVEST_COMPONENT_ITEMS / HARVEST_COMPONENT_SPECIMENS value.
   const NODE_YIELDS = [
     'copper_ore',
     'iron_ore',
@@ -321,12 +334,21 @@ describe('MATERIAL DEMAND COVERAGE', () => {
   ];
   const HARVEST_MATERIALS = [
     'rough_hide',
+    'wolf_fang',
     'spider_silk',
     'venom_gland',
     'game_meat',
     'homespun_cloth',
+    'sharp_claw',
+    'curved_tusk',
   ];
-  const SPECIMENS = ['pristine_hide', 'pristine_silk', 'pristine_venom_gland', 'prime_cut'];
+  const SPECIMENS = [
+    'pristine_hide',
+    'pristine_silk',
+    'pristine_venom_gland',
+    'prime_cut',
+    'pristine_claw',
+  ];
   const VENDOR_REAGENTS = [
     'smithing_flux',
     'spool_of_thread',
@@ -354,6 +376,14 @@ describe('MATERIAL DEMAND COVERAGE', () => {
       for (const row of Object.values(byZone)) liveYields.add(row.itemId);
     }
     expect([...liveYields].sort()).toEqual([...NODE_YIELDS].sort());
+  });
+
+  it('pins the harvest material and specimen literals to the live component tables', () => {
+    // Same anti-rot arm as the node yields above: the next harvest family
+    // must join these lists (and so the consumed-by-a-recipe sweep below), not
+    // drift past them the way #2905's claw/tusk trio originally shipped.
+    expect([...HARVEST_MATERIALS].sort()).toEqual(Object.values(HARVEST_COMPONENT_ITEMS).sort());
+    expect([...SPECIMENS].sort()).toEqual(Object.values(HARVEST_COMPONENT_SPECIMENS).sort());
   });
 
   it('every material, specimen, and vendor reagent is consumed by at least one recipe', () => {
@@ -400,10 +430,13 @@ describe('LADDER SHAPE PINS', () => {
     'ironbark_log',
     'silverleaf_herb',
     'rough_hide',
+    'wolf_fang',
     'spider_silk',
     'venom_gland',
     'game_meat',
     'homespun_cloth',
+    'sharp_claw',
+    'curved_tusk',
     'linen_scrap',
     'bone_fragments',
     'spider_leg',
@@ -418,6 +451,7 @@ describe('LADDER SHAPE PINS', () => {
     'pristine_silk',
     'pristine_venom_gland',
     'prime_cut',
+    'pristine_claw',
   ]);
 
   function isConsumable(itemId: string): boolean {

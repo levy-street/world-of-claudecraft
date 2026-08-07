@@ -394,8 +394,19 @@ function swapAttachDef(
   weaponItemId: string | null | undefined,
   weaponSkinId: string | null | undefined = null,
 ): AttachDef {
-  const url =
-    residentOrEnsure(weaponSkinModelUrl(weaponSkinId)) ?? itemWeaponModelUrl(weaponItemId);
+  // A DISPLAYED ranged skin takes the ranged hand rule here too, not only on
+  // the fixed-attach path (rangedSkinAttachDef): the Combat Mech is a swap-slot
+  // body that a hunter can wear, so a drawn bow must move to the left handslot
+  // (the front arm) on it exactly as it does on the hunter rig. Keyed off the
+  // RESIDENT skin url, so a skin still streaming leaves the equipped item's
+  // model in its authored hand rather than relocating a sword.
+  const skinUrl = residentOrEnsure(weaponSkinModelUrl(weaponSkinId));
+  if (skinUrl) {
+    const skin = weaponSkinId ? WEAPON_SKINS[weaponSkinId] : null;
+    const bone = skin ? weaponSkinAttachBone(weaponSkinHandling(skin), base.bone) : base.bone;
+    return { url: skinUrl, bone };
+  }
+  const url = itemWeaponModelUrl(weaponItemId);
   return url ? { url, bone: base.bone } : base;
 }
 
@@ -717,6 +728,17 @@ export function preloadMechAssets(): Promise<void> {
       gltfByUrl.set(def.url, g);
     }),
   ];
+  // Clip donors too (the bow draw): prepareVisual resolves every animUrls entry
+  // and THROWS on one that is not resident. The mech's donor happens to be the
+  // hunter's as well, so the eager sweep covers it today, but a lazyPreload def
+  // must not depend on another def staying eager to load its own clips.
+  for (const url of def.animUrls ?? []) {
+    jobs.push(
+      loadGltf(url).then((g) => {
+        gltfByUrl.set(assetUrl(url), g);
+      }),
+    );
+  }
   for (const url of SKINS.player_mech ?? []) if (url) jobs.push(loadSkinTexInto(url, skinTexByUrl));
   if (GFX.standardMaterials) {
     for (const url of SKIN_EMISSIVE.player_mech ?? [])
@@ -756,6 +778,9 @@ export function trainingDummyAssetsReady(): boolean {
 export function mechAssetsReady(): boolean {
   const def = VISUALS.player_mech;
   if (!def || !gltfByUrl.has(assetUrl(def.url))) return false;
+  // Clip donors gate readiness too: prepareVisual resolves them, so reporting
+  // ready without them turns the first mech build into a throw.
+  if (!(def.animUrls ?? []).every((url) => gltfByUrl.has(assetUrl(url)))) return false;
   const skinsReady = (SKINS.player_mech ?? []).every((url) => !url || skinTexByUrl.has(url));
   if (!GFX.standardMaterials) return skinsReady;
   return (

@@ -509,7 +509,12 @@ export class AbilityVfx {
       const ceremonial =
         arch === 'buff' || arch === 'summon' || arch === 'cc' || arch === 'heal' || !!full?.spirit;
       const utility =
-        targeted && (arch === 'strike' || arch === 'cc' || arch === 'burst' || arch === 'shout');
+        (targeted &&
+          (arch === 'strike' || arch === 'cc' || arch === 'burst' || arch === 'shout')) ||
+        // Untargeted shout/dash carry no victim to anchor a contact claim and
+        // no castFx of their own (heroic_leap, piercing_howl): selfCast is
+        // their only completion cue, same as the ceremonies above.
+        (!targeted && (arch === 'shout' || arch === 'dash'));
       if (!full || !(utility || ceremonial)) return false;
     }
     const tier = this.castTier(ev.sourceId, ev.ability);

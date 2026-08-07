@@ -827,12 +827,41 @@ describe('page/limit pagination contract', () => {
       headers: { authorization: BEARER },
     });
     expect(r.status).toBe(200);
-    expect(listAccounts).toHaveBeenCalledWith('bob', 2, 10);
+    expect(listAccounts).toHaveBeenCalledWith('bob', 2, 10, 'id', 'desc');
     expect(r.body).toEqual({
       success: true,
       data: { rows: [{ id: 1 }], total: 1, page: 2, limit: 10, search: 'bob' },
       error: null,
     });
+  });
+
+  it('passes an allowlisted accounts sort/dir through and falls back on a bogus column', async () => {
+    const listAccounts = vi.fn(
+      async (_search: string, page: number, limit: number, _sort: string, _dir: string) => ({
+        rows: [],
+        total: 0,
+        page,
+        limit,
+      }),
+    );
+    authedAdminDb({ listAccounts });
+    installAdminRuntime();
+
+    const sorted = await runRoute('GET', '/admin/api/accounts', {
+      url: '/admin/api/accounts?sort=max_level&dir=asc',
+      headers: { authorization: BEARER },
+    });
+    expect(sorted.status).toBe(200);
+    expect(listAccounts).toHaveBeenCalledWith('', 1, 25, 'max_level', 'asc');
+
+    listAccounts.mockClear();
+    const bogus = await runRoute('GET', '/admin/api/accounts', {
+      url: '/admin/api/accounts?sort=not_a_real_column&dir=asc',
+      headers: { authorization: BEARER },
+    });
+    expect(bogus.status).toBe(200);
+    // An unrecognized sort column falls back to the safe id/desc default.
+    expect(listAccounts).toHaveBeenCalledWith('', 1, 25, 'id', 'desc');
   });
 
   it('clamps limit to MAX_PAGE_LIMIT (200) and floors page at 1', async () => {
@@ -846,7 +875,7 @@ describe('page/limit pagination contract', () => {
       url: '/admin/api/accounts?page=-5&limit=9999',
       headers: { authorization: BEARER },
     });
-    expect(listAccounts).toHaveBeenCalledWith('', 1, 200);
+    expect(listAccounts).toHaveBeenCalledWith('', 1, 200, 'id', 'desc');
   });
 
   it('is LENIENT: a non-numeric page/limit DEFAULTS (never 422)', async () => {
@@ -862,7 +891,7 @@ describe('page/limit pagination contract', () => {
     });
     expect(r.status).toBe(200);
     // page defaults to 1, limit to DEFAULT_PAGE_LIMIT (25); NOT a validation 422.
-    expect(listAccounts).toHaveBeenCalledWith('', 1, 25);
+    expect(listAccounts).toHaveBeenCalledWith('', 1, 25, 'id', 'desc');
   });
 
   it('bug-reports uses page/limit and the { rows, total, page, limit } shape', async () => {
@@ -2256,6 +2285,49 @@ describe('migrated write handlers + side effects (QA gate parity coverage)', () 
     });
     expect(r.body).toEqual({ success: true, data: { ok: true }, error: null });
     expect(ignoreReport).toHaveBeenCalledWith(5, ADMIN_ACCOUNT_ID, 'duplicate');
+  });
+
+  it('a successful bug-report resolve resolves ok:true, passing status + the note from the body', async () => {
+    const resolveBugReport = vi.fn(async () => true);
+    authedAdminDb({ resolveBugReport });
+    installAdminRuntime();
+    const r = await runRoute('POST', '/admin/api/bug-reports/:id/resolve', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      body: { note: 'fixed in 0.34.1' },
+    });
+    expect(r.body).toEqual({ success: true, data: { ok: true }, error: null });
+    expect(resolveBugReport).toHaveBeenCalledWith(
+      5,
+      ADMIN_ACCOUNT_ID,
+      'resolved',
+      'fixed in 0.34.1',
+    );
+  });
+
+  it('a successful bug-report dismiss resolves ok:true, passing status + the note from the body', async () => {
+    const resolveBugReport = vi.fn(async () => true);
+    authedAdminDb({ resolveBugReport });
+    installAdminRuntime();
+    const r = await runRoute('POST', '/admin/api/bug-reports/:id/dismiss', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      body: {},
+    });
+    expect(r.body).toEqual({ success: true, data: { ok: true }, error: null });
+    expect(resolveBugReport).toHaveBeenCalledWith(5, ADMIN_ACCOUNT_ID, 'dismissed', undefined);
+  });
+
+  it('404s a bug-report resolve for a report that is not open', async () => {
+    authedAdminDb({ resolveBugReport: async () => false });
+    installAdminRuntime();
+    const r = await runRoute('POST', '/admin/api/bug-reports/:id/resolve', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      body: { note: 'already handled' },
+    });
+    expect(r.status).toBe(404);
+    expect(r.body).toEqual({ success: false, data: null, error: 'open bug report not found' });
   });
 });
 

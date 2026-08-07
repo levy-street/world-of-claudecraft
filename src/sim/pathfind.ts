@@ -36,8 +36,14 @@ function minGroundAt(o: PathOpts, x: number, z: number): number {
 // swimming over submerged ground, the ground itself otherwise. Used only for
 // slope/climb gating so an uneven lake bed doesn't read as a cliff. The clamp
 // itself is shared with the movement kernel (ride_height.ts).
-function rideHeight(x: number, z: number, h: number, swim: boolean | undefined): number {
-  return swim ? rideOverWater(x, z, h) : h;
+function rideHeight(
+  x: number,
+  z: number,
+  h: number,
+  swim: boolean | undefined,
+  seed: number,
+): number {
+  return swim ? rideOverWater(x, z, h, seed) : h;
 }
 
 const CELL = 1; // yards
@@ -64,7 +70,7 @@ function segmentWalkable(
   const steps = Math.max(1, Math.ceil(d / SMOOTH_SAMPLE_STEP));
   let prevX = from.x;
   let prevZ = from.z;
-  let prevRide = rideHeight(prevX, prevZ, groundHeight(prevX, prevZ, o.seed), o.swim);
+  let prevRide = rideHeight(prevX, prevZ, groundHeight(prevX, prevZ, o.seed), o.swim, o.seed);
   for (let i = 1; i <= steps; i++) {
     const t = i / steps;
     const x = from.x + dx * t;
@@ -78,7 +84,7 @@ function segmentWalkable(
     ) {
       return false;
     }
-    const ride = rideHeight(x, z, h, o.swim);
+    const ride = rideHeight(x, z, h, o.swim, o.seed);
     const stepLen = Math.hypot(x - prevX, z - prevZ);
     const rise = ride - prevRide;
     if (stepLen > 1e-6 && rise > 0 && rise / stepLen > o.maxClimbSlope) return false;
@@ -174,7 +180,8 @@ export function findPath(
   };
   const heapPop = (): number[] => {
     const top = heap[0];
-    const last = heap.pop()!;
+    const last = heap.pop();
+    if (!last) throw new Error('heap underflow');
     if (heap.length > 0) {
       heap[0] = last;
       let i = 0;
@@ -208,7 +215,7 @@ export function findPath(
     }
     const gx = cur % W,
       gz = (cur / W) | 0;
-    const hCur = rideHeight(cx(gx), cz(gz), groundAt(cur), o.swim);
+    const hCur = rideHeight(cx(gx), cz(gz), groundAt(cur), o.swim, o.seed);
     for (let dz = -1; dz <= 1; dz++) {
       for (let dx = -1; dx <= 1; dx++) {
         if (dx === 0 && dz === 0) continue;
@@ -220,7 +227,7 @@ export function findPath(
         // diagonals only when both orthogonal cells are clear (no corner clipping)
         if (dx !== 0 && dz !== 0 && (!walkable(gz * W + nx) || !walkable(nz * W + gx))) continue;
         const stepLen = (dx !== 0 && dz !== 0 ? Math.SQRT2 : 1) * CELL;
-        const rise = rideHeight(cx(nx), cz(nz), groundAt(n), o.swim) - hCur;
+        const rise = rideHeight(cx(nx), cz(nz), groundAt(n), o.swim, o.seed) - hCur;
         if (rise > 0 && rise / stepLen > o.maxClimbSlope) continue;
         const g = gScore[cur] + stepLen;
         if (g < gScore[n]) {
@@ -265,7 +272,9 @@ export function findPlayerPath(
     // un-climbable banks stop them. Charge keeps the deep-water cutoff, and only
     // inside a declared lake's footprint: a dry sunken feature (crater, tunnel,
     // sinkhole) outside every lake has no floor at all, however deep it goes.
-    minGround: swim ? -Infinity : (x: number, z: number) => waterLevelAt(x, z) - PLAYER_SWIM_DEPTH,
+    minGround: swim
+      ? -Infinity
+      : (x: number, z: number) => waterLevelAt(x, z, seed) - PLAYER_SWIM_DEPTH,
     maxSpan,
     ignoreFences,
     swim,
@@ -282,7 +291,7 @@ function playerDestinationWalkable(
   if (isBlocked(seed, p.x, p.z, PLAYER_BODY_RADIUS, false, undefined, riftToken)) return false;
   // Swimmers can stop on the water; walkers can't, so deep water inside a
   // declared lake is rejected and the caller snaps to the nearest shore.
-  return swim || groundHeight(p.x, p.z, seed) >= waterLevelAt(p.x, p.z) - PLAYER_SWIM_DEPTH;
+  return swim || groundHeight(p.x, p.z, seed) >= waterLevelAt(p.x, p.z, seed) - PLAYER_SWIM_DEPTH;
 }
 
 export function resolvePlayerDestination(

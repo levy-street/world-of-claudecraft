@@ -1908,8 +1908,11 @@ function policePitch(ctx: SimContext, match: VcMatch): void {
     else if (nearest === dE) nlx = PITCH.xMax + VC_PITCH_EJECT_MARGIN;
     else nlx = PITCH.xMin - VC_PITCH_EJECT_MARGIN;
     // A bystander swept off the pitch is displaced like any other teleport:
-    // a live gather/fishing session (a herb node sits inside the Sowfield
-    // bounds) must not travel with them.
+    // a live profession session must not travel with them. No gather node or
+    // fishing spot sits inside the ground any more (a herb patch did until the
+    // Sowfield screen landed in tests/gather_node_placement.test.ts), but every
+    // other non-spell cast still can: crafting, salvage, enchanting and tool
+    // recharge all start wherever the player is standing.
     cancelProfessionSessionOnDisplacement(ctx, e);
     e.pos = ctx.groundPos(nlx + ox, nlz + oz);
     e.prevPos = { ...e.pos }; // hard teleport: no interpolated streak across the boards

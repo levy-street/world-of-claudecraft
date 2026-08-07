@@ -44,7 +44,6 @@ import { fineGradeReachable, harvestGradeItemId } from './material_grades';
 import { gatherActionXp } from './profession_xp';
 import { proficiencyBandFor } from './proficiency_bands';
 import {
-  applyEffectBonus,
   applyToolEffectUse,
   bestOwnedGatherToolFor,
   canGatherTier,
@@ -1218,9 +1217,11 @@ export function harvestFamilyYieldsItem(component: string): boolean {
  * Does this mob's corpse support profession harvest at all? Answers on the
  * MAPPED families the corpse carries, not on its tag COUNT (#2513).
  *
- * The count answer was a lie on exactly one shipped template: fen_troll carries
- * `claw` and `tusk` and HARVEST_COMPONENT_ITEMS maps neither, so its corpse
- * advertised a harvest it could never pay, accepted the command, spent the
+ * The count answer was a lie on exactly one shipped template: fen_troll
+ * carried `claw` and `tusk` and HARVEST_COMPONENT_ITEMS mapped neither at the
+ * time (#2905 has since wired both, so no shipped template is all-unmapped
+ * today), so its corpse advertised a harvest it could never pay, accepted the
+ * command, spent the
  * single-use claim, drew one tier roll per effective family, granted nothing,
  * and emitted NOTHING AT ALL (the harvestResult ledger is gated on
  * `granted.length > 0`). Measured pre-fix: an omitted pick, `[]` and
@@ -1404,9 +1405,11 @@ export function effectiveFocusComponents(
  * function starts answering a question nobody asked it, and the two gates would
  * be one narrowing away from disagreeing. Its second half is now belt and
  * braces rather than the load-bearing term it was for #2509, and both states
- * are pinned separately (tests/corpse_harvest_view.test.ts holds
- * forfeitsEveryYield FALSE on fen_troll while harvestDisabled is TRUE, so the
- * two terms can never quietly coincide).
+ * are pinned separately (tests/corpse_harvest_view.test.ts drives both terms
+ * on sethrael_palecoil's real mixed tags, and the all-unmapped arm rides the
+ * retagged fixtures in tests/corpse_harvest_window.test.ts and
+ * tests/loot_window_controller.test.ts, so the two terms can never quietly
+ * coincide).
  *
  * Pure and rng-free, so the refusal it drives draws nothing.
  */

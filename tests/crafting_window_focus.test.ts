@@ -14,7 +14,7 @@
 
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { InvSlot, ItemDef } from '../src/sim/types';
 import { buildCraftingView, type RecipeDefLike } from '../src/ui/crafting_view';
 import { type CraftingWindowDeps, renderCraftingWindow } from '../src/ui/crafting_window';
@@ -171,6 +171,56 @@ describe('crafting window: Tab focus trap and restore-on-close', () => {
     expect(document.activeElement).not.toBe(document.body);
   });
 
+  it('moves focus into the dialog on the ordinary open path before Tab is pressed', async () => {
+    const opener = document.createElement('button');
+    document.body.appendChild(opener);
+    opener.focus();
+
+    const el = document.createElement('div');
+    el.id = 'crafting-window';
+    document.body.appendChild(el);
+
+    const fm = new FocusManager();
+    const bridge = makeWindowFocus(fm, () => el);
+
+    renderCraftingWindow(el, craftableView(), craftingDeps());
+    const capturedOpener = bridge.captureFocus();
+    fm.focusFirst(el);
+
+    const tabBtn = el.querySelector<HTMLButtonElement>('.crafting-tab');
+    await vi.waitFor(() => expect(document.activeElement).toBe(tabBtn));
+
+    expect(pressTab()).toBe(true);
+    expect(el.contains(document.activeElement)).toBe(true);
+
+    bridge.restoreFocus(capturedOpener);
+    await vi.waitFor(() => expect(document.activeElement).toBe(opener));
+  });
+
+  it('moves focus to the selected tab for the craftId handoff path', () => {
+    const opener = document.createElement('button');
+    document.body.appendChild(opener);
+    opener.focus();
+
+    const el = document.createElement('div');
+    el.id = 'crafting-window';
+    document.body.appendChild(el);
+
+    const fm = new FocusManager();
+    const bridge = makeWindowFocus(fm, () => el);
+
+    renderCraftingWindow(el, craftableView(), craftingDeps());
+    bridge.captureFocus();
+    const selected = el.querySelector<HTMLButtonElement>('.crafting-tab.sel');
+    selected?.focus();
+
+    expect(document.activeElement).toBe(selected);
+    expect(pressTab()).toBe(true);
+    expect(el.contains(document.activeElement)).toBe(true);
+
+    bridge.restoreFocus(null);
+  });
+
   it('hands focus back to the opener on close, tearing the trap down', async () => {
     const opener = document.createElement('button');
     document.body.appendChild(opener);
@@ -225,6 +275,23 @@ describe('hud.ts crafting window wiring (source pins; Hud is a monolith no test 
     expect(body.indexOf('this.renderCrafting();')).toBeLessThan(
       body.indexOf('this.craftingOpenerFocus = this.craftingWindowFocus.captureFocus();'),
     );
+  });
+
+  it('openCrafting moves focus inside for both ordinary opens and craftId handoffs', () => {
+    const start = hudSource.indexOf('openCrafting(craftId?: string): void {');
+    const end = hudSource.indexOf('private craftCastSessionForPlayer(): CraftCastSessionView {');
+    expect(start).toBeGreaterThan(-1);
+    expect(end).toBeGreaterThan(start);
+    const body = hudSource.slice(start, end);
+    const selectedTabFocus =
+      "($('#crafting-window').querySelector('.crafting-tab.sel') as HTMLElement | null)?.focus();";
+    const ordinaryFocus = "this.focusManager.focusFirst($('#crafting-window'));";
+    expect(body).toContain(selectedTabFocus);
+    expect(body).toContain(ordinaryFocus);
+    expect(body.indexOf('if (craftId !== undefined) {')).toBeLessThan(
+      body.indexOf(selectedTabFocus),
+    );
+    expect(body.indexOf(selectedTabFocus)).toBeLessThan(body.indexOf(ordinaryFocus));
   });
 
   it('closeCrafting restores focus to the opener and clears the field', () => {

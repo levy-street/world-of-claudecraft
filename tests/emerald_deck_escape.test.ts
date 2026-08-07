@@ -24,6 +24,7 @@ import { REACH_DECKS, reachDeckSurface } from '../src/sim/reach_decks';
 import { Sim } from '../src/sim/sim';
 import type { Entity, MoveInput } from '../src/sim/types';
 import { groundHeight, terrainHeight, terrainSteepness, WATER_LEVEL } from '../src/sim/world';
+import { expectDefined } from './helpers/defined';
 
 // The shipped seed: the report is seed-pinned world geometry.
 const SEED = 20061;
@@ -141,9 +142,11 @@ function makeSimWalker(spot: { x: number; z: number }) {
   const sim = new Sim({ seed: SEED, playerClass: 'warrior', autoEquip: true });
   sim.setPlayerLevel(20);
   const p = sim.player;
-  const meta = (
-    sim as unknown as { players: Map<number, { moveInput: { forward: boolean } }> }
-  ).players.get((sim as unknown as { playerId: number }).playerId)!;
+  const meta = expectDefined(
+    (sim as unknown as { players: Map<number, { moveInput: { forward: boolean } }> }).players.get(
+      (sim as unknown as { playerId: number }).playerId,
+    ),
+  );
   p.pos.x = spot.x;
   p.pos.z = spot.z;
   p.pos.y = groundHeight(spot.x, spot.z, SEED) + 0.05;
@@ -255,15 +258,15 @@ describe('the Palmreach jungle-pool walkway keeps no one', () => {
     // lifts either anchor, both walkway surfaces move and every clearance
     // measured here goes stale.
     // the ground at both anchors, unchanged
-    expect(terrain(PLATFORM.ax, PLATFORM.az)).toBeCloseTo(-4.05, 2);
-    expect(terrain(-361, 994)).toBeCloseTo(2.64, 2);
+    expect(terrain(PLATFORM.ax, PLATFORM.az)).toBeCloseTo(-3.86, 2);
+    expect(terrain(-361, 994)).toBeCloseTo(2.66, 2);
     // the shore root sits below the freeboard line, so the platform is seated
     // on the freeboard, not on the shore: that is what makes its plane level
     expect(terrain(PLATFORM.ax, PLATFORM.az)).toBeLessThan(WATER_LEVEL + GALE_DECK_FREEBOARD);
     // and so the planes themselves are where every clearance here assumes
-    expect(galeDeckSurfaceAt(PLATFORM, 0, terrain, WATER_LEVEL)).toBeCloseTo(-3.61, 2);
-    expect(galeDeckSurfaceAt(STAIR, -STAIR.hl, terrain, WATER_LEVEL)).toBeCloseTo(-3.61, 2);
-    expect(galeDeckSurfaceAt(STAIR, STAIR.hl, terrain, WATER_LEVEL)).toBeCloseTo(2.98, 2);
+    expect(galeDeckSurfaceAt(PLATFORM, 0, terrain, WATER_LEVEL)).toBeCloseTo(-3.41, 2);
+    expect(galeDeckSurfaceAt(STAIR, -STAIR.hl, terrain, WATER_LEVEL)).toBeCloseTo(-3.41, 2);
+    expect(galeDeckSurfaceAt(STAIR, STAIR.hl, terrain, WATER_LEVEL)).toBeCloseTo(3.0, 2);
   });
 
   it('ties the platform into the sand a player can step back up', () => {

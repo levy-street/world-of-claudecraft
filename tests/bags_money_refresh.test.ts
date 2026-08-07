@@ -54,6 +54,7 @@ vi.mock('../server/db', () => ({
 }));
 
 import { type ClientSession, GameServer } from '../server/game';
+import { emptySaleLog } from '../src/sim/market_sale_log';
 import type { Entity } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
 import { bareClient } from './helpers/bare_client';
@@ -125,6 +126,7 @@ function setup() {
   sim.market.marketCollections.set(String(meta.characterId ?? meta.entityId), {
     copper: PROCEEDS,
     items: [],
+    sales: emptySaleLog(),
   });
 
   const client = bareClient(session.pid);
@@ -200,6 +202,7 @@ describe('bag money-row freshness on a money-only delta (#2373)', () => {
     sim.market.marketCollections.set(String(meta.characterId ?? meta.entityId), {
       copper: 0,
       items: [{ itemId: 'worn_sword', count: 1 }],
+      sales: emptySaleLog(),
     });
 
     const snap = collect(server, fc, session);

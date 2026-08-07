@@ -33,6 +33,7 @@ import { MOUNT_RACE_START_PLATFORM, type MountKey } from '../src/sim/content/mou
 import { COMBO_RECIPES } from '../src/sim/content/recipes';
 import { BUILTIN_WORLD, DELVES, GATHER_NODES, ITEMS, MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
+import { emptySaleLog } from '../src/sim/market_sale_log';
 import { MOUNT_RACE_COUNTDOWN_TICKS } from '../src/sim/mount_race';
 import { Sim } from '../src/sim/sim';
 import { type Aura, DT, type PlayerClass, type WorldContent } from '../src/sim/types';
@@ -3506,7 +3507,11 @@ function dirtyEveryDeltaField(): {
   if (merchant) merchant.pos = { ...p.pos };
   // `mktU`: credit a pending collection so the collect-indicator bit is 1 (the
   // name key merges into the canonical seller key on first read).
-  (sim.market as any).marketCollections.set(meta.name, { copper: 95, items: [] });
+  (sim.market as any).marketCollections.set(meta.name, {
+    copper: 95,
+    items: [],
+    sales: emptySaleLog(),
+  });
   // `mail`: mailInfoFor is null unless near a mailbox, so relocate one onto the
   // player. `mailU` is already non-zero: every fresh character got the one-time
   // Ravenpost welcome letter (delay 0) at join.

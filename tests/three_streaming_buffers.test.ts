@@ -78,7 +78,7 @@ describe('Three.js streaming buffer contracts', () => {
 
     const snowMap = material.map;
     const materialVersion = material.version;
-    weather.update(new THREE.Vector3(), 1 / 60, 'marsh');
+    weather.update(new THREE.Vector3(), 1 / 60, 'marsh', () => 'marsh');
     expect(material.map).not.toBe(snowMap);
     expect(material.version).toBe(materialVersion);
   });

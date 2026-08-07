@@ -104,7 +104,7 @@ describe('terrain region index', () => {
     expect(heightBody).toContain('let h = baseHeight(x, z, seed, region);');
     expect(heightBody).toContain('for (const campIndex of region.campIndices)');
     expect(heightBody).not.toContain('for (const camp of CAMPS)');
-    expect(heightBody.match(/terrainRegionHas\(region, TERRAIN_APPLIER\./g)).toHaveLength(34);
+    expect(heightBody.match(/terrainRegionHas\(region, TERRAIN_APPLIER\./g)).toHaveLength(35);
   });
 
   it('falls back to the full ordered scan for non-finite query coordinates', () => {

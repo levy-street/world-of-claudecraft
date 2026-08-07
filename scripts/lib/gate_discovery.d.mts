@@ -15,6 +15,23 @@ export function listTestFiles(io: {
   sep: string;
 }): string[];
 
+export function collectSuiteVisibility(io: {
+  root: string;
+  readdirSync: (
+    p: string,
+    o: { withFileTypes: true },
+  ) => Array<{ name: string; isDirectory(): boolean; isFile(): boolean }>;
+  readFileSync: (p: string, enc: 'utf8') => string;
+  join: (...parts: string[]) => string;
+  relative: (from: string, to: string) => string;
+  sep: string;
+}): {
+  testFiles: string[];
+  alwaysRun: string[];
+  reasons: Record<string, string[]>;
+  counts: { blind: number; partial: number; graph: number };
+};
+
 export function resolveSelectBase(io: {
   env?: Record<string, string | undefined>;
   run: (cmd: string, args: string[]) => { status: number | null; stdout?: string };

@@ -206,6 +206,13 @@ export async function fetchPrFiles({
  * reason carries the listed and reported counts so a suspicious skip can be
  * audited from the job log alone.
  *
+ * When the listing was fetched AND survived the count cross-check, it is
+ * returned as `files` so the caller can derive further decisions (the
+ * selective test mode) from the SAME snapshot instead of a second fetch that
+ * could race a push. Every fail-closed path returns no `files`: absence means
+ * "you cannot prove anything about this diff", which downstream must treat as
+ * full-suite.
+ *
  * @param {{
  *   eventName: string,
  *   prNumber: number,
@@ -215,7 +222,7 @@ export async function fetchPrFiles({
  *   apiUrl?: string,
  *   fetchImpl?: typeof fetch,
  * }} opts
- * @returns {Promise<{ code: boolean, reason: string }>}
+ * @returns {Promise<{ code: boolean, reason: string, files?: Array<{ filename?: string, previous_filename?: string | null, status?: string }> }>}
  */
 export async function detectCode({
   eventName,
@@ -252,9 +259,10 @@ export async function detectCode({
       return {
         code: false,
         reason: `${result.reason} (${files.length} files listed; event reports ${reported})`,
+        files,
       };
     }
-    return result;
+    return { ...result, files };
   } catch (err) {
     // JSON-escaped like the filenames: V8 parse errors embed raw response
     // snippets (newlines included), and this string reaches the CI log.

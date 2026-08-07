@@ -337,6 +337,17 @@ const BEAR_BIPED14: ClipMap = {
   attack: ['Bear_Attack'],
 };
 
+// mob_troll's own attack (scripts/build_troll_anims.mjs, issue #2889):
+// BIPED14's Punch/Weapon is shared by reference across 6 unrelated families
+// (a yeti, a frog-murloc, a demon and its alt among them). This clip is baked
+// off orc.glb's own donor poses (a crouch coil, the existing overhand club
+// swing, the existing punch's follow-through lean, and a head nod), so only
+// mob_troll gets it; the other 5 BIPED14 families are untouched.
+const TROLL_BIPED14: ClipMap = {
+  ...BIPED14,
+  attack: ['Troll_Smash'],
+};
+
 // Tripo biped rig. These creatures come through the current biped
 // pipeline, which retargets and bakes the complete game vocabulary directly.
 const TRIPO_BIPED_FULL_RIG: ClipMap = {
@@ -360,6 +371,18 @@ const ENEMY7: ClipMap = {
   death: 'Death',
 };
 
+// The kobold family's own attack (scripts/build_kobold_anims.mjs, issue
+// #2889): ENEMY7's Attack is shared by reference with mob_ogre (a giant
+// twice its height, on giant.glb), so a kobold currently swings the exact
+// same single double-claw chop. This clip is baked off goblin.glb's own
+// donor poses (Attack's own beats re-timed into a two-part combo, plus
+// Jump, a clip goblin.glb ships that ENEMY7 never wires), so only
+// mob_kobold gets it; mob_ogre stays on the shared constant untouched.
+const KOBOLD_ENEMY7: ClipMap = {
+  ...ENEMY7,
+  attack: ['Kobold_Pounce'],
+};
+
 // floating/flying rigs (goleling/dragon) — hover instead of walking
 const FLOATING: ClipMap = {
   idle: 'Flying_Idle',
@@ -379,6 +402,17 @@ const FLOATING: ClipMap = {
 const ELEMENTAL_FLOATING: ClipMap = {
   ...FLOATING,
   attack: ['Elemental_Attack'],
+};
+
+// The nightkin family's own attack (scripts/build_nightkin_anims.mjs, issue
+// #2889): FLOATING's Headbutt/Punch is shared by reference across 8 other
+// unrelated families (a ghost, a dragon, a flying demon imp, a glowing wisp
+// among them). This clip is baked off tribal.glb's own donor poses (a
+// forward lunge plus its two unused gesture clips), so only mob_nightkin
+// gets it; the other FLOATING families are untouched.
+const NIGHTKIN_FLOATING: ClipMap = {
+  ...FLOATING,
+  attack: ['Nightkin_Attack'],
 };
 
 // 2023 enemy rig variant with a bite attack and no run clip (yeti)
@@ -706,6 +740,13 @@ export const VISUALS: Record<string, VisualDef> = {
   player_warrior: {
     url: `${PLAYERS}/knight.glb`,
     height: HUMANOID_H,
+    // Every clip knight.glb ships is already wired somewhere in this block
+    // (idle/walk/attack/hit/emotes account for the full shipped library, no
+    // spare donor pose), so Heroic Leap (issue #2889 batch, verified against
+    // the warrior's real kit in src/sim/content/classes.ts, not assumed) is
+    // authored by pose-sample-and-blend (scripts/build_warrior_ability_anims.mjs)
+    // instead of pointed at an unused clip.
+    animUrls: [`${PLAYERS}/warrior_ability_anims.glb`],
     clips: {
       ...kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
       attackByHand: {
@@ -739,6 +780,41 @@ export const VISUALS: Record<string, VisualDef> = {
         // Jawcrack is a bare-fist interrupt: the synthesized punch
         // (scripts/_add_pummel_punch_anim.mjs), not a weapon swing.
         pummel: 'Punch_A',
+        // Heroic Leap is a position-targeted jump, not a swing: the bespoke
+        // pose-sample-and-blend clip (coil, airborne, driven two-hand slam on
+        // landing). It carries no castFx and resolves no target entity, so it
+        // completes through the renderer's generic 'selfCast' cue, which only
+        // draws a body gesture via this exact attackByAbility entry
+        // (CharacterVisual.hasAttackClipOverride, src/render/ability_vfx/
+        // painter.ts's non-contact 'selfCast' branch); with no entry it plays
+        // nothing at all on the body.
+        heroic_leap: 'Warrior_Heroic_Leap',
+        // Victory Rush is a real weapon strike (weaponStrike effect, not a
+        // pure buff), so it lands through the ordinary damage-event attack
+        // trigger like every entry above it: a confident decisive swing, the
+        // same clip heroic_strike/overpower/hamstring already use.
+        victory_rush: '1H_Melee_Attack_Slice_Diagonal',
+        // Seething Fury and Recklessness are both a defiant roar of rage: no
+        // castFx, no target, so (like Heroic Leap above) the existing Cheer
+        // gesture only shows up once an attackByAbility entry exists for it.
+        berserker_rage: 'Cheer',
+        recklessness: 'Cheer',
+        // Die by the Sword braces behind the blade: the existing raised_guard
+        // donor (Block) reads the same defensive beat, reached the same way.
+        die_by_sword: 'Block',
+        // Avatar's colossus transformation gets the raised-arm flourish
+        // (the longest clip on the rig, fits a dramatic moment), same path.
+        avatar: 'Spellcast_Raise',
+        // Piercing Howl's own description calls it "a piercing shout" even
+        // though it carries no castFx (unlike the six castFx:'shout'
+        // abilities below, which the painter's 'shout' case always plays as
+        // the Cheer EMOTE and never reaches attackByAbility at all - adding
+        // an entry for any of those would be dead code, so this batch leaves
+        // them alone). Piercing Howl's own selfCast cue DOES reach the same
+        // gesture path Heroic Leap/berserker_rage/etc use above, and the
+        // painter's shout-emote call right after it is guarded on
+        // isMidOneShot, so it does not stomp this gesture.
+        piercing_howl: 'Spellcast_Raise',
       },
     },
     show: ['Knight_Helmet', 'Knight_Cape'], // v2 knight dropped the built-in Badge_Shield mesh
@@ -755,7 +831,34 @@ export const VISUALS: Record<string, VisualDef> = {
     clips: {
       ...kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
       attackByHand: { twohand: '2H_Melee_Attack_Chop' },
+      // Ability-specific clips (scripts/build_paladin_ability_anims.mjs,
+      // issue #2889 follow-up batch): the paladin had zero attackByAbility
+      // overrides across its kit, so every ability played the same melee
+      // chop. Almost the whole kit shares school: 'holy' (classes.ts), so
+      // school cannot differentiate anything the way it did for the mage:
+      // mapped instead by the ability's EFFECT TYPE (judgement, groundAoE,
+      // stun, absorb/defensive selfBuff, buffTarget/aura selfBuff, heal).
+      // Not every ability in the kit is listed: this is a representative
+      // slice, not exhaustive coverage (seal_of_righteousness, exorcism,
+      // holy_taunt, and rebuke keep the default chop until a later batch).
+      attackByAbility: {
+        judgement: 'Cast_Verdict',
+        consecration: 'Cast_Consecrate',
+        hammer_of_justice: 'Cast_HammerBash',
+        divine_protection: 'Cast_Ward',
+        sacred_bulwark: 'Cast_Ward',
+        blessing_of_might: 'Cast_Blessing',
+        devotion_aura: 'Cast_Blessing',
+        retribution_aura: 'Cast_Blessing',
+        righteous_fury: 'Cast_Blessing',
+        holy_light: 'Cast_HolyMend',
+        flash_of_light: 'Cast_HolyMend',
+        lay_on_hands: 'Cast_HolyMend',
+      },
     },
+    // Ability-specific clips (scripts/build_paladin_ability_anims.mjs): a
+    // mesh-free clip donor GLB baked off this rig's own poses.
+    animUrls: [`${PLAYERS}/paladin_ability_anims.glb`],
     // dedicated paladin model (helmeted variant) — ships its own Cape + Helmet
     // meshes and texture, so no show-list/tint. Shield + paladin hammer arrive
     // in the weapons pass; the gripped axe holds the slot until then.
@@ -773,7 +876,7 @@ export const VISUALS: Record<string, VisualDef> = {
     // Bow-draw clips for the Season 1 bow skins (scripts/build_bow_anims.mjs):
     // with a bow displayed the shot plays a draw instead of the crossbow
     // shoulder-aim (visual.ts weaponSkinAttackClips).
-    animUrls: [`${PLAYERS}/bow_anims.glb`],
+    animUrls: [`${PLAYERS}/bow_anims.glb`, `${PLAYERS}/bow_hold_anim.glb`],
     // dedicated ranger model — the quiver is a built-in mesh, so it's no longer
     // a separate chest attachment
     attach: [{ url: `${WEAPONS}/crossbow_1handed.glb`, bone: 'handslot.r' }],
@@ -795,8 +898,45 @@ export const VISUALS: Record<string, VisualDef> = {
         // Dirt Toss throws dirt, not daggers: the synthesized crouch-scoop
         // and underhand fling (scripts/_add_dirt_throw_anim.mjs).
         blind: 'Dirt_Throw',
+        // Rest of the kit (scripts/build_rogue_ability_anims.mjs, issue
+        // #2889): pose-sample-and-blend clips off rogue.glb's own donor
+        // poses. Wicked Slash is the combo-builder poke; Eye Jab and Sap
+        // share its silhouette since both are instant single-target
+        // debilitating strikes with no unique read of their own.
+        sinister_strike: 'Rogue_Quick_Strike',
+        gouge: 'Rogue_Quick_Strike',
+        sap: 'Rogue_Quick_Strike',
+        // Craven Thrust drives the dagger in from behind.
+        backstab: 'Rogue_Backstab',
+        // Lurker's Strike is the kit's biggest single hit (2.5x weapon,
+        // stealth-gated): its own bigger, more telegraphed lunge.
+        ambush: 'Rogue_Ambush',
+        // Gut Punch and Low Blow both land at gut/kidney height.
+        cheap_shot: 'Rogue_Low_Blow',
+        kidney_shot: 'Rogue_Low_Blow',
+        // Combo-spending finishers read as one decisive two-blade cut.
+        eviscerate: 'Rogue_Finisher_Slash',
+        rupture: 'Rogue_Finisher_Slash',
+        expose_armor: 'Rogue_Finisher_Slash',
+        // Ghostfoot is a defensive dodge buff: rogue.glb's own already-baked
+        // 'Block' guard, no bake needed (the pattern player_warrior's
+        // raised_guard already uses).
+        evasion: 'Block',
+        // Cutthroat Tempo, Smokestep, Quickened Blood, and Duskveil are all
+        // self-buff/stealth toggles with no combat swing to author: rogue.
+        // glb's own already-baked 'Spellcast_Raise', the pattern player_
+        // warrior's sanguine_aura and the hunter batch's aspect toggles both
+        // use. Adder's Bite and Festering Venom (the poison weapon imbues)
+        // are excluded, the same call the mage batch made for its own
+        // utility/summon abilities.
+        slice_and_dice: 'Spellcast_Raise',
+        vanish: 'Spellcast_Raise',
+        adrenaline_rush: 'Spellcast_Raise',
+        stealth: 'Spellcast_Raise',
       },
     },
+    // Ability-specific attack clips (scripts/build_rogue_ability_anims.mjs).
+    animUrls: [`${PLAYERS}/rogue_ability_anims.glb`],
     show: ['Rogue_Cape'],
     attach: [
       { url: `${WEAPONS}/dagger.glb`, bone: 'handslot.r' },
@@ -836,9 +976,11 @@ export const VISUALS: Record<string, VisualDef> = {
     // hair, and robe together), so this lerp multiplies the entire body, not
     // just the cloth. Measured: 0xf0e9d6 is near white, so even at 0.5 the old
     // strength only shifted the body by roughly (0.983, 0.980, 0.956), a
-    // near-no-op (issue #2678); dropped further to 0.12, the same faint-wash
-    // strength the manifest already uses elsewhere (mob_troll) to differentiate
-    // a shared model without hiding its base texture.
+    // near-no-op (issue #2678); dropped to 0.12 anyway for consistency with
+    // shaman/warlock, where the saturated tints DID flatten the face and
+    // hands at their old strengths. Kept at the same faint-wash strength the
+    // manifest already uses elsewhere (mob_troll) to differentiate a shared
+    // model without hiding its base texture.
     tint: 0xf0e9d6,
     tintStrength: 0.12,
   },
@@ -923,7 +1065,42 @@ export const VISUALS: Record<string, VisualDef> = {
   player_warlock: {
     url: `${PLAYERS}/mage.glb`,
     height: HUMANOID_H,
-    clips: kaykit(['Spellcast_Shoot']), // wand zap reads better than a staff bonk
+    clips: {
+      ...kaykit(['Spellcast_Shoot']), // wand zap reads better than a staff bonk
+      // Ability-specific spellcasts (scripts/build_warlock_ability_anims.mjs,
+      // issue #2889): the warlock had zero attackByAbility overrides across
+      // its kit, so every spell played the same wand zap. Mapped by school
+      // (src/sim/content/classes.ts): shadow curses get the decisive clawed
+      // point (Warlock_Cast_Shadow), fire gets the scrappier ignite flick
+      // (Warlock_Cast_Fire), the life-drain channel gets its own sustained
+      // pull (Warlock_Cast_Drain), and every instant-cast (castTime 0)
+      // ability, regardless of mechanic, shares one fast decisive gesture
+      // (Warlock_Cast_Burst), the same call the mage batch made folding
+      // three different AoE mechanics into one Cast_Nova. This maps the
+      // whole non-pet kit: the seven summon_* pet abilities are channels
+      // with no combat swing to author, excluded the same way the hunter
+      // batch excluded tame_beast/dismiss_pet/revive_pet.
+      attackByAbility: {
+        shadow_bolt: 'Warlock_Cast_Shadow',
+        corruption: 'Warlock_Cast_Shadow',
+        curse_of_agony: 'Warlock_Cast_Shadow',
+        immolate: 'Warlock_Cast_Fire',
+        searing_pain: 'Warlock_Cast_Fire',
+        rain_of_fire: 'Warlock_Cast_Fire',
+        drain_life: 'Warlock_Cast_Drain',
+        shadowburn: 'Warlock_Cast_Burst',
+        fear: 'Warlock_Cast_Burst',
+        life_tap: 'Warlock_Cast_Burst',
+        demon_skin: 'Warlock_Cast_Burst',
+        spell_lock: 'Warlock_Cast_Burst',
+      },
+    },
+    // Ability-specific spellcast clips (scripts/build_warlock_ability_anims.mjs):
+    // a mesh-free clip donor GLB baked off this same mage.glb rig's own
+    // poses, but its OWN clip names and timing, not a reuse of the mage's
+    // mage_ability_anims.glb (the two GLBs are wired onto different
+    // VisualDefs and never load together).
+    animUrls: [`${PLAYERS}/warlock_ability_anims.glb`],
     show: [],
     attach: [
       { url: `${WEAPONS}/wand.glb`, bone: 'handslot.r' },
@@ -959,6 +1136,12 @@ export const VISUALS: Record<string, VisualDef> = {
     // baked in from knight.glb (scripts/bake_mech_anims.mjs) — these names now
     // resolve like any other class. Lazy-loaded; see preloadMechAssets().
     clips: kaykit(['1H_Melee_Attack_Chop']),
+    // Same bow-draw donor the hunter loads. The mech is the one body that shows
+    // a HUNTER's equipped weapon, so it is also the one body besides the hunter
+    // that can display a bow skin, and Bow_Draw_Shot targets the same KayKit
+    // Rig_Medium bones this model uses. Without it a displayed bow falls back to
+    // the melee chop (skin_attack.ts pickSkinAttackClips).
+    animUrls: [`${PLAYERS}/bow_anims.glb`],
     // Class-agnostic cosmetic body, but it still holds the wearer's equipped
     // mainhand: the shared handslot.r bone carries the grip (the mech reuses the
     // exact KayKit rig), so weaponSlots swaps attach[0] to the equipped weapon's
@@ -1219,7 +1402,12 @@ export const VISUALS: Record<string, VisualDef> = {
     // Attack_Kick, not 'Attack': the rig ships no clip by that name, so every
     // second swing in the rotation resolved to nothing and played no animation
     // at all (the repainted siblings below always had it right).
-    clips: animal(['Attack_Headbutt', 'Attack_Kick']),
+    // Own bespoke charge attack (scripts/build_stag_anims.mjs, issue #2889):
+    // spread the animal() factory result and override only attack, so the
+    // repainted siblings (veiled_stag/gleamstag/veiled_doe/aurelhorn, separate
+    // GLB files on the same rig) keep the standing Headbutt/Kick pair.
+    clips: { ...animal(['Attack_Headbutt', 'Attack_Kick']), attack: ['Stag_Attack_Charge'] },
+    animUrls: [`${CREATURES}/stag_ability_anims.glb`],
     tint: 'entity',
     tintStrength: 0.35,
   },
@@ -1319,7 +1507,8 @@ export const VISUALS: Record<string, VisualDef> = {
   mob_kobold: {
     url: `${CREATURES}/goblin.glb`,
     height: 2.1,
-    clips: ENEMY7,
+    animUrls: [`${CREATURES}/kobold_ability_anims.glb`],
+    clips: KOBOLD_ENEMY7,
     tint: 'entity',
     tintStrength: 0.2, // keep the green readable
   },
@@ -1346,7 +1535,10 @@ export const VISUALS: Record<string, VisualDef> = {
     url: `${CREATURES}/orc.glb`,
     height: 2.4,
     // faint wash only — 0.35 flooded every material with the template green
-    clips: BIPED14,
+    clips: TROLL_BIPED14,
+    // Troll_Smash clip donor (scripts/build_troll_anims.mjs): mesh-free,
+    // baked off this same rig's own poses.
+    animUrls: [`${CREATURES}/troll_ability_anims.glb`],
     tint: 'entity',
     tintStrength: 0.12,
   },
@@ -1565,7 +1757,10 @@ export const VISUALS: Record<string, VisualDef> = {
     url: `${CREATURES}/tribal.glb`,
     height: 1.9,
     hover: 0.3,
-    clips: FLOATING,
+    clips: NIGHTKIN_FLOATING,
+    // Nightkin_Attack clip donor (scripts/build_nightkin_anims.mjs):
+    // mesh-free, baked off this same rig's own poses.
+    animUrls: [`${CREATURES}/nightkin_ability_anims.glb`],
     tint: 'entity',
     tintStrength: 0.3,
   },
@@ -1729,7 +1924,14 @@ export const VISUALS: Record<string, VisualDef> = {
   skel_boss: {
     url: `${ENEMIES}/skeleton_mage.glb`,
     height: 2.5,
-    clips: skeletonClips(['2H_Melee_Attack_Chop'], 'Taunt'),
+    // Morthen the Gravecaller's visual (a dungeon final boss, dungeons.ts): its
+    // own attack instead of the plain 2H chop skel_mage and delve_skel_varric
+    // still share off the same skeletonClips() vocabulary (scripts/
+    // build_skelboss_anims.mjs, issue #2889). Spread the factory result and
+    // override only attack, so skel_mage/delve_skel_varric/rift_ritualist stay
+    // on the shared swing.
+    clips: { ...skeletonClips(['2H_Melee_Attack_Chop'], 'Taunt'), attack: ['SkelBoss_Attack'] },
+    animUrls: [`${ENEMIES}/skelboss_ability_anims.glb`],
     attach: [{ url: `${WEAPONS}/skeleton_staff.glb`, bone: 'handslot.r' }],
     tint: 'entity',
     tintStrength: 0.25,
@@ -1754,7 +1956,19 @@ export const VISUALS: Record<string, VisualDef> = {
   skel_golem: {
     url: `${ENEMIES}/skeleton_golem.glb`,
     height: 3.4,
-    clips: skeletonLargeClips(['2H_Melee_Attack_Chop', '1H_Melee_Attack_Chop']),
+    // Bespoke attack (scripts/build_skeleton_golem_anims.mjs, issue #2889
+    // follow-up batch): this rig backs four named boss/rare VisualDef
+    // assignments (nythraxis_scourge_of_thornpeak, a dungeon final boss; plus
+    // ancient_guardian, waking_warden, idol_guardian below), but still played
+    // the exact same generic swing every plain humanoid mob uses. Spreads the
+    // original skeletonLargeClips result and overrides just the attack
+    // field, the same pattern ELEMENTAL_FLOATING uses over the shared
+    // FLOATING constant: idle/walk/run/hit/death stay the shared set.
+    clips: {
+      ...skeletonLargeClips(['2H_Melee_Attack_Chop', '1H_Melee_Attack_Chop']),
+      attack: ['Golem_Slam'],
+    },
+    animUrls: [`${ENEMIES}/skeleton_golem_anims.glb`],
     // the baked golem axe ships without the 180° grip flip the rig expects, so
     // the blade faces backwards; spin it about its handle (local Y) to face out.
     weaponFix: [{ node: 'Skeleton_Golem_Axe', rotY: Math.PI }],

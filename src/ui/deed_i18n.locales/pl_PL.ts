@@ -15,6 +15,54 @@ export const table: DeedLocaleTable = {
     name: 'Niebo Milknie',
     desc: 'Zgładź Cindraleth, Matriarchinię Paszczy, w jej kraterowym gnieździe nad Smoczą Paszczą.',
   },
+  chr_frostveil_gatherer: {
+    name: 'Zbiory na tarasach',
+    desc: 'Zbierz zyle rudy, kepke drewna i grzadke ziol we Frostveilu.',
+  },
+  chr_frostveil_first_cast: {
+    name: 'Pierwszy lod na jeziorze',
+    desc: 'Zlow rybe w wodach Frostveilu.',
+  },
+  chr_amberfall_gatherer: {
+    name: 'Zbiory Amberfallu',
+    desc: 'Zbierz zyle rudy, kepke drewna i grzadke ziol w Amberfallu.',
+  },
+  chr_amberfall_first_cast: {
+    name: 'Polow z wielkich mokradel',
+    desc: 'Zlow rybe w wodach Amberfallu.',
+  },
+  chr_nightbloom_gatherer: {
+    name: 'Sniace zbiory',
+    desc: 'Zbierz zyle rudy, kepke drewna i grzadke ziol w Nightbloomie.',
+  },
+  chr_nightbloom_first_cast: {
+    name: 'Kragi na ksiezycowej studni',
+    desc: 'Zlow rybe w wodach Nightbloomu.',
+  },
+  chr_wraithwood_gatherer: {
+    name: 'Zbiory pod koronami',
+    desc: 'Zbierz zyle rudy, kepke drewna i grzadke ziol w Wraithwoodzie.',
+  },
+  chr_wraithwood_first_cast: {
+    name: 'Rzut w lustrzanej zatoce',
+    desc: 'Zlow rybe w wodach Wraithwoodu.',
+  },
+  chr_palmreach_gatherer: {
+    name: 'Zbiory na palmowej plazy',
+    desc: 'Zbierz zyle rudy, kepke drewna i grzadke ziol w Palmreachu.',
+  },
+  chr_palmreach_first_cast: {
+    name: 'Rzut w szafirowej lagunie',
+    desc: 'Zlow rybe w wodach Palmreachu.',
+  },
+  chr_evergarden_gatherer: {
+    name: 'Dar parteru',
+    desc: 'Zbierz zyle rudy, kepke drewna i grzadke ziol w Evergardenie.',
+  },
+  chr_evergarden_first_cast: {
+    name: 'Rzut na platkowym stawie',
+    desc: 'Zlow rybe w wodach Evergardenu.',
+  },
   pvp_card_duel_first_win: {
     name: 'Zasady Domu',
     desc: 'Wygraj Pojedynek Karciany u Mistrza Kart.',

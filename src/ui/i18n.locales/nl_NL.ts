@@ -1187,6 +1187,8 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.lootHeroic': 'Heroïsche bonus, een van deze valt altijd:',
   'hudChrome.finder.lootMaybe': 'Maximaal een van deze kan vallen:',
   'hudChrome.finder.mech.deathless_rage': 'Doodloze Razernij (onderbroken bij de wardstones)',
+  'hudChrome.finder.mech.dread_curse':
+    'Schrikvloek (alleen heroisch, stapelende verzwakking voor tankwissel)',
   'hudChrome.finder.mech.deathstalker_cleave': 'Doodstalker-Maaislaan (frontale maaislaan)',
   'hudChrome.finder.mech.enrage': 'Razend bij weinig gezondheid',
   'hudChrome.finder.mech.grave_cleaver': 'Grafsplijter (frontale maaislaan)',
@@ -1853,6 +1855,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchantName.enchant_neck_agility': 'Ketting betoveren - Behendigheid',
   'hudChrome.enchantName.enchant_neck_intellect': 'Ketting betoveren - Intellect',
   'hudChrome.enchantName.enchant_neck_spirit': 'Ketting betoveren - Geest',
+  'hudChrome.enchantName.enchant_offhand_stamina': 'Bijhand betoveren - Uithoudingsvermogen',
   'hudChrome.enchantName.enchant_ring_agility': 'Ring betoveren - Behendigheid',
   'hudChrome.enchantName.enchant_ring_intellect': 'Ring betoveren - Intellect',
   'hudChrome.enchantName.enchant_ring_spirit': 'Ring betoveren - Geest',
@@ -2593,6 +2596,8 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobTooltip.friendly': 'Vriendelijk',
   'hudChrome.mobTooltip.hostile': 'Vijandig',
   'hudChrome.mobTooltip.levelFamily': 'Niveau {level} {family}',
+  'hudChrome.mobTooltip.elite': 'Elite',
+  'hudChrome.mobTooltip.boss': 'Baas',
   'hudChrome.options.aurasOnPlayerFrame': 'Buffs op het spelerframe',
   'hudChrome.options.playerFrameScale': 'Schaal spelerframe',
   'hudChrome.options.showDailyRewardsChest': 'Kist met dagelijkse beloningen tonen',
@@ -6794,6 +6799,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.controller.resetButtons': 'Knopindeling resetten',
   'hudChrome.controller.title': 'Controller',
   'hudChrome.controller.vibration': 'Trilling',
+  'hudChrome.emoteEditor.close': 'Emotes sluiten',
   'hudChrome.emoteEditor.done': 'Klaar',
   'hudChrome.emoteEditor.title': 'Emotes',
   'hudChrome.emoteWheel.edit': 'Bewerken',
@@ -10111,7 +10117,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'guide.dungeonsPage.resetBody':
     'Als je van moeilijkheid wisselt terwijl je groep nog geclaimde runs heeft, blijven de oude claims even staan voordat ze vanzelf verdwijnen. De groepsleider kan ze direct loslaten via Alle instanties resetten in het menu van het eigen portret, of met /dungeon reset. De moeilijkheid moet echt gewijzigd zijn, er mag niemand, levend of gevallen, binnen zijn en tussen resets geldt een korte afkoeltijd. Bij de deur op de verkeerde moeilijkheid waarschuwt het spel voor de start. De raid wordt nooit zo gereset; daarvoor blijven de eigen lockoutregels gelden.',
   'guide.dungeonsPage.wildheartBody':
-    'Een regennatte junglecaldera waar twee verhoogde jachtpaden om een jaden cenote cirkelen. Doorkruis beestenholen en voorouderruines, en beklim dan de rituele piramide om Zulgar te trotseren.',
+    'Een regennatte junglecaldera waar twee verhoogde jachtpaden om een jaden cenote cirkelen. Doorkruis beestenholen en voorouderruines, en beklim dan de rituele piramide om te zien wie er op de top wacht.',
   'guide.gear.itemLevelBody':
     'Schakel Itemniveau tonen in de opties in om twee stukken snel te vergelijken. Uitrusting met een bekende bron, van vijanden, quests en ambachten, toont dan een itemniveau: één getal dat de kracht op basis van de herkomst benadert en upgrades zelfs tussen verschillende vakken vergelijkbaar maakt. Stukken zonder zo’n bron, zoals eenvoudige handelswaar en startuitrusting, tonen geen itemniveau; een ontbrekend getal is normaal.',
   'guide.gear.qualityBody':

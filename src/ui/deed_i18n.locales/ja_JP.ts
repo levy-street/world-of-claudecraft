@@ -15,6 +15,54 @@ export const table: DeedLocaleTable = {
     name: '空の静寂',
     desc: 'ドレイクモウを見下ろす火口のねぐらで、シンドラレス、火口の母竜を討ち取れ。',
   },
+  chr_frostveil_gatherer: {
+    name: '段丘の収穫',
+    desc: 'Frostveilで鉱脈、木立、薬草畑を収穫する。',
+  },
+  chr_frostveil_first_cast: {
+    name: '湖沼の初氷',
+    desc: 'Frostveilの水辺で魚を釣る。',
+  },
+  chr_amberfall_gatherer: {
+    name: 'Amberfallの収穫',
+    desc: 'Amberfallで鉱脈、木立、薬草畑を収穫する。',
+  },
+  chr_amberfall_first_cast: {
+    name: '大湿原の一匹',
+    desc: 'Amberfallの水辺で魚を釣る。',
+  },
+  chr_nightbloom_gatherer: {
+    name: '夢見る収穫',
+    desc: 'Nightbloomで鉱脈、木立、薬草畑を収穫する。',
+  },
+  chr_nightbloom_first_cast: {
+    name: '月の井戸の波紋',
+    desc: 'Nightbloomの水辺で魚を釣る。',
+  },
+  chr_wraithwood_gatherer: {
+    name: '樹冠の下の収穫',
+    desc: 'Wraithwoodで鉱脈、木立、薬草畑を収穫する。',
+  },
+  chr_wraithwood_first_cast: {
+    name: '鏡の入り江への一投',
+    desc: 'Wraithwoodの水辺で魚を釣る。',
+  },
+  chr_palmreach_gatherer: {
+    name: '椰子浜の収穫',
+    desc: 'Palmreachで鉱脈、木立、薬草畑を収穫する。',
+  },
+  chr_palmreach_first_cast: {
+    name: 'サファイア潟への一投',
+    desc: 'Palmreachの水辺で魚を釣る。',
+  },
+  chr_evergarden_gatherer: {
+    name: '花壇の恵み',
+    desc: 'Evergardenで鉱脈、木立、薬草畑を収穫する。',
+  },
+  chr_evergarden_first_cast: {
+    name: '花びら池への一投',
+    desc: 'Evergardenの水辺で魚を釣る。',
+  },
   pvp_card_duel_first_win: {
     name: '我が流儀',
     desc: 'カードマスターのもとでカードデュエルに勝利する。',

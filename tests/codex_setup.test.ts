@@ -268,37 +268,45 @@ describe('Codex skills', () => {
   });
 });
 
-describe('Codex PR review automation', () => {
-  it('isolates untrusted PR data and keeps credentials in separate least-privilege jobs', () => {
-    const workflow = read('.github/workflows/pr-ai.yml');
-    expect(workflow).toContain('uses: openai/codex-action@v1');
-    expect(workflow).toContain(`openai-api-key: \${{ secrets.OPENAI_API_KEY }}`);
-    expect(workflow).toContain('permission-profile: ":read-only"');
-    expect(workflow).toContain('safety-strategy: "drop-sudo"');
-    expect(workflow).toContain('path: review/untrusted/pr');
-    expect(workflow).toContain('persist-credentials: false');
-    expect(workflow).not.toContain('CODEX_AUTH_JSON');
-    expect(workflow).not.toContain('danger-full-access');
-    expect(workflow).not.toContain('npm install -g @openai/codex');
-
-    const reviewStart = workflow.indexOf('  codex-review:');
-    const postStart = workflow.indexOf('  post-codex-review:');
-    expect(reviewStart).toBeGreaterThan(0);
-    expect(postStart).toBeGreaterThan(reviewStart);
-    const reviewJob = workflow.slice(reviewStart, postStart);
-    const actionStart = reviewJob.indexOf('uses: openai/codex-action@v1');
-    expect(actionStart).toBeGreaterThan(0);
-    expect(reviewJob.slice(actionStart)).not.toMatch(/^\s+- name:/m);
-    expect(workflow.slice(postStart)).not.toContain('OPENAI_API_KEY');
+describe('retired CI reviewer stays retired', () => {
+  // The Codex CI review workflow was removed 2026-08 (maintainer decision;
+  // docs/codex.md, "Pull request automation"). Reintroducing a CI reviewer
+  // needs a fresh security design, so the absence is pinned the decisive way:
+  // a scan of the whole workflow directory, not a hardcoded filename that a
+  // renamed workflow would evade.
+  //
+  // The OPENAI_API_KEY arm is DELIBERATELY broader than the retirement: the
+  // secret's only legitimate consumers are server-side and local tooling env
+  // vars, never a workflow. If a future workflow legitimately needs it,
+  // narrow this assertion to the codex-action arm; do not delete the test.
+  it('keeps every workflow free of the codex-action and its credential', () => {
+    const dir = path.join(root, '.github/workflows');
+    const files = fs.readdirSync(dir).filter((f) => /\.ya?ml$/.test(f));
+    expect(files.length).toBeGreaterThan(0);
+    for (const f of files) {
+      const text = fs.readFileSync(path.join(dir, f), 'utf8');
+      expect(text, f).not.toContain('openai/codex-action');
+      expect(text, f).not.toContain('OPENAI_API_KEY');
+    }
   });
 
-  it('has a valid fixed output schema and no obsolete credential-bearing runner', () => {
-    const schema = JSON.parse(read('.github/codex/review-output.schema.json'));
-    expect(schema.additionalProperties).toBe(false);
-    expect(schema.properties.findings.maxItems).toBe(20);
-    expect(fs.existsSync(path.join(root, 'scripts/prepare_ai_review.mjs'))).toBe(true);
-    expect(fs.existsSync(path.join(root, 'scripts/post_ai_review.mjs'))).toBe(true);
-    expect(fs.existsSync(path.join(root, 'scripts/ai_review.mjs'))).toBe(false);
-    expect(fs.existsSync(path.join(root, 'scripts/ai_review_diff.mjs'))).toBe(false);
+  it('keeps the retired reviewer files deleted', () => {
+    for (const p of [
+      '.github/codex',
+      'docs/ai-pr-bot.md',
+      'scripts/prepare_ai_review.mjs',
+      'scripts/prepare_ai_review.d.mts',
+      'scripts/post_ai_review.mjs',
+      'scripts/post_ai_review.d.mts',
+      'scripts/redact_secrets.mjs',
+      'scripts/redact_secrets.d.mts',
+      'scripts/gh_sticky_comment.mjs',
+      'scripts/ai_review.mjs',
+      'scripts/ai_review_diff.mjs',
+      'tests/ai_review.test.ts',
+      'tests/redact_secrets.test.ts',
+    ]) {
+      expect(fs.existsSync(path.join(root, p)), p).toBe(false);
+    }
   });
 });

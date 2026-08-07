@@ -8,6 +8,7 @@ import { offhandMirrorsWeaponSkin } from '../../sim/content/weapon_skin_rules';
 import { WEAPON_SKINS } from '../../sim/content/weapon_skins';
 import type { OverheadEmoteId } from '../../world_api';
 import { GFX } from '../gfx';
+import { cloneMaterialWithHooks } from '../material_clone_hooks';
 import { createWeaponVfx, WEAPON_VFX, type WeaponVfxHandle } from '../weapon_vfx';
 import { weaponVfxTuningFor } from '../weapon_vfx_tuning';
 import {
@@ -37,7 +38,14 @@ import {
 import { buildHalo } from './halo';
 import type { EmoteClipSpec, VisualDef, WeaponLayoutOverride } from './manifest';
 import { SkeletonUpdateCache, type SkeletonUpdateStats } from './skeleton_update_cache';
-import { SKIN_ATTACK_CLIP_NAMES, weaponSkinAttackClips, weaponSkinOrientPin } from './skin_attack';
+import {
+  type OneShotKind,
+  pickSkinAttackClips,
+  rangedSkinAiming,
+  SKIN_ATTACK_CLIP_NAMES,
+  weaponSkinCastClip,
+  weaponSkinOrientPin,
+} from './skin_attack';
 import { configureTightBoneTextures } from './skin_gpu_layout';
 import { createStowTransition, forceStow, requestStow, tickStow } from './stow_transition';
 import { weaponAttackStyle } from './weapon_attack_style_core';
@@ -383,6 +391,14 @@ export class CharacterVisual {
   private current: THREE.AnimationAction | null = null;
   private currentIsOneShot = false;
   private currentOneShotIsEmote = false;
+  // Whether the live one-shot is the ATTACK, as opposed to a hit react, a
+  // landing, the sheathe gesture or any other one-shot. Only the aim pin needs
+  // the distinction (skin_attack.ts rangedSkinAiming); a stale true is harmless
+  // because every read gates on currentIsOneShot first.
+  private currentOneShotIsAttack = false;
+  /** The ability driving the cast base state, mirrored from AnimState so the
+   *  aim pin can tell a drawn shot from a pet utility cast. */
+  private castingAbility: string | null = null;
   private deadLock = false;
   /** consecutive frames with no action driving the pose (the T-pose watchdog) */
   private starvedFrames = 0;
@@ -614,6 +630,7 @@ export class CharacterVisual {
       this.playOneShot(landClip, 1);
     this.wasAirborne = s.airborne;
 
+    this.castingAbility = s.casting ? (s.castingAbility ?? null) : null;
     if (!this.deadLock) {
       const desired = this.desiredBase(s);
       const baseChanged = desired !== this.baseState;
@@ -999,19 +1016,25 @@ export class CharacterVisual {
     const override = abilityId ? this.def.clips.attackByAbility?.[abilityId] : undefined;
     if (override && this.action(override)) {
       this.playOneShot(override, this.def.attackTimeScale ?? 1.3);
+      this.currentOneShotIsAttack = true;
       return;
     }
-    const skinAttack = weaponSkinAttackClips(this.weaponSkinId);
+    // Resolved against THIS rig's bound clips: a rig without the substitute
+    // (every body but the hunter) keeps its own authored attack instead of
+    // swinging with no animation at all.
+    const skinAttack = pickSkinAttackClips(this.weaponSkinId, (c) => this.action(c) !== null);
     const style = weaponAttackStyle(this.weaponItemId, this.offhandItemId);
     const handClip = style ? this.def.clips.attackByHand?.[style] : undefined;
     if (!skinAttack && handClip && this.action(handClip)) {
       this.playOneShot(handClip, this.def.attackTimeScale ?? 1.3);
+      this.currentOneShotIsAttack = true;
       return;
     }
     const clips = skinAttack?.clips ?? this.def.clips.attack;
     if (clips.length === 0) return;
     const name = clips[this.attackIdx++ % clips.length];
     this.playOneShot(name, skinAttack?.timeScale ?? this.def.attackTimeScale ?? 1.3);
+    this.currentOneShotIsAttack = true;
   }
 
   /** Bladed Gyre is instant, so it uses one short body spin instead of the
@@ -1218,7 +1241,11 @@ export class CharacterVisual {
       this.writeAuraGlow(cached);
       return cached;
     }
-    const glow = material.clone();
+    // Program-preserving clone: a bare clone() drops the source's
+    // onBeforeCompile layers, so it both renders un-patched and links a fresh
+    // program on its first draw (material_clone_hooks.ts). That first draw is
+    // the first spec'd hit on this rig, i.e. mid-combat for every mob.
+    const glow = cloneMaterialWithHooks(material);
     this.writeAuraGlow(glow);
     this.auraGlowMaterials.set(material, glow);
     return glow;
@@ -1389,7 +1416,17 @@ export class CharacterVisual {
   setWeaponSkin(weaponSkinId: string | null): THREE.Object3D[] | null {
     if (weaponSkinId === this.weaponSkinId) return null;
     this.weaponSkinId = weaponSkinId;
-    return this.reattachHeldWeapon();
+    const payloads = this.reattachHeldWeapon();
+    // The CAST pose depends on the displayed skin (a drawn bow holds its draw),
+    // but the base action is only re-selected on a base-state EDGE. A skin
+    // applied or removed mid-cast does not edge the state, so without this the
+    // rig keeps Spellcasting after equipping the bow, or keeps Bow_Draw_Hold
+    // after removing it, for the rest of the cast. Reported by review on 2950.
+    if (!this.deadLock && !this.currentIsOneShot && this.baseState === 'cast') {
+      const next = this.baseAction();
+      if (next && next !== this.current) this.fadeTo(next, FADE, false);
+    }
+    return payloads;
   }
 
   /** Re-attach BOTH held hands (gear swap / skin change), honoring an active
@@ -1595,9 +1632,20 @@ export class CharacterVisual {
    *  bow-slot gun to GUN_CARRY_QUAT everywhere BUT the shot (and never while
    *  dead: a corpse's weapon just lies with the hand). Position always follows
    *  the hand. No-op without pinned payloads. */
+  /** The live one-shot's kind for the aim pin. Derived rather than stored as a
+   *  third latch, so it cannot drift out of step with currentIsOneShot. */
+  private currentOneShotKind(): OneShotKind {
+    if (!this.currentIsOneShot) return null;
+    if (this.currentOneShotIsEmote) return 'emote';
+    return this.currentOneShotIsAttack ? 'attack' : 'other';
+  }
+
   private applySkinOrientation(dt: number): void {
     if (this.orientPins.length === 0) return;
-    const shot = this.currentIsOneShot && !this.currentOneShotIsEmote;
+    // "Is this character shooting", asked properly: the attack one-shot (the
+    // release) or an active cast (the draw of a cast-time shot). A hit react is
+    // a one-shot and is NOT shooting; see rangedSkinAiming.
+    const shot = rangedSkinAiming(this.currentOneShotKind(), this.castingAbility);
     const step = dt / BOW_PIN_BLEND_S;
     this.root.getWorldQuaternion(BOW_Q_ROOT);
     for (const entry of this.orientPins) {
@@ -1973,7 +2021,13 @@ export class CharacterVisual {
       case 'run':
         return this.action(c.run) ?? this.action(c.walk);
       case 'cast':
-        return this.action(c.cast) ?? this.action(c.idle);
+        // A displayed bow holds its draw here instead of the shared caster
+        // gesture; every other weapon keeps the rig's authored cast.
+        return (
+          this.action(weaponSkinCastClip(this.weaponSkinId, this.castingAbility) ?? undefined) ??
+          this.action(c.cast) ??
+          this.action(c.idle)
+        );
       case 'spin':
         return this.action(c.attack[0]) ?? this.action(c.idle);
       case 'swim':
@@ -2045,6 +2099,7 @@ export class CharacterVisual {
     repeats = 1,
     emoteId: OverheadEmoteId | null = null,
   ): void {
+    this.currentOneShotIsAttack = false;
     const a = this.action(name);
     if (!a) return;
     const prev = this.current;

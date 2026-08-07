@@ -15,6 +15,54 @@ export const table: DeedLocaleTable = {
     name: '长空归寂',
     desc: '在龙喉上空的火山口栖地中，击杀辛德拉蕾丝，龙喉之母。',
   },
+  chr_frostveil_gatherer: {
+    name: '梯田收获',
+    desc: '在Frostveil采集一处矿脉、一片木料和一块草药地。',
+  },
+  chr_frostveil_first_cast: {
+    name: '山湖初冰',
+    desc: '在Frostveil水域钓上一条鱼。',
+  },
+  chr_amberfall_gatherer: {
+    name: 'Amberfall的收获',
+    desc: '在Amberfall采集一处矿脉、一片木料和一块草药地。',
+  },
+  chr_amberfall_first_cast: {
+    name: '大沼泽之获',
+    desc: '在Amberfall水域钓上一条鱼。',
+  },
+  chr_nightbloom_gatherer: {
+    name: '梦中收获',
+    desc: '在Nightbloom采集一处矿脉、一片木料和一块草药地。',
+  },
+  chr_nightbloom_first_cast: {
+    name: '月井涟漪',
+    desc: '在Nightbloom水域钓上一条鱼。',
+  },
+  chr_wraithwood_gatherer: {
+    name: '树冠下的收获',
+    desc: '在Wraithwood采集一处矿脉、一片木料和一块草药地。',
+  },
+  chr_wraithwood_first_cast: {
+    name: '镜湾一投',
+    desc: '在Wraithwood水域钓上一条鱼。',
+  },
+  chr_palmreach_gatherer: {
+    name: '棕榈滩收获',
+    desc: '在Palmreach采集一处矿脉、一片木料和一块草药地。',
+  },
+  chr_palmreach_first_cast: {
+    name: '蓝宝石潟湖垂钓',
+    desc: '在Palmreach水域钓上一条鱼。',
+  },
+  chr_evergarden_gatherer: {
+    name: '花坛馈赠',
+    desc: '在Evergarden采集一处矿脉、一片木料和一块草药地。',
+  },
+  chr_evergarden_first_cast: {
+    name: '花瓣池一投',
+    desc: '在Evergarden水域钓上一条鱼。',
+  },
   pvp_card_duel_first_win: {
     name: '以牌为规',
     desc: '在牌局大师处赢得一场纸牌对决。',

@@ -8,6 +8,7 @@ import {
   easeOutCubic,
   indexClip,
   lerpV,
+  mergePoses,
   poseValue,
   pushPoseRamp,
   sampleChannel,
@@ -99,6 +100,26 @@ describe('pose_blend math', () => {
     expect(poseValue(pose, 'a|translation', fallback)).toEqual([1, 2, 3]);
     expect(poseValue(pose, 'b|translation', fallback)).toEqual([9, 9, 9]);
     expect(poseValue(pose, 'c|translation', fallback)).toBeNull();
+  });
+
+  it('mergePoses unions donor poses, earlier poses winning on a shared key', () => {
+    const first = new Map([
+      ['a|translation', [1, 1, 1]],
+      ['shared|translation', [2, 2, 2]],
+    ]);
+    const second = new Map([
+      ['shared|translation', [9, 9, 9]],
+      ['b|translation', [3, 3, 3]],
+    ]);
+    const merged = mergePoses(first, second);
+    expect(merged.get('a|translation')).toEqual([1, 1, 1]);
+    expect(merged.get('b|translation')).toEqual([3, 3, 3]);
+    expect(merged.get('shared|translation')).toEqual([2, 2, 2]);
+    expect(merged.size).toBe(3);
+  });
+
+  it('mergePoses with no poses returns an empty pose', () => {
+    expect(mergePoses().size).toBe(0);
   });
 
   it('sampleChannel clamps to the endpoints and lerps in between', () => {

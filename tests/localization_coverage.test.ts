@@ -358,6 +358,8 @@ describe('i18n Localization Key Coverage', () => {
     action: 'Open Chat',
     amount: 42,
     answered: 6,
+    // The elixir use line's granted-buff name (itemUi.tooltip.useElixirAura).
+    aura: 'Might of the Boar',
     base: 14,
     rested: 18,
     buyer: 'Mira',
@@ -400,6 +402,8 @@ describe('i18n Localization Key Coverage', () => {
     max: 25,
     message: 'Meet at the inn',
     min: 16,
+    // The elixir use line's buff duration in whole minutes (itemUi.tooltip.useElixir*).
+    minutes: 10,
     money: '12 copper',
     name: 'Aki',
     needed: 400,

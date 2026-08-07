@@ -1278,6 +1278,24 @@ export const zh_TW: EnTranslations = {
       "graphicsFatal": "圖形復原失敗。請重新載入遊戲以繼續。",
       "graphicsReload": "重新載入遊戲",
       "graphicsDraftChanged": "圖形變更已準備好套用。",
+      "gfxSectionQuality": "畫質",
+      "gfxSectionWorld": "世界細節",
+      "gfxSectionLighting": "光照與特效",
+      "gfxSectionCamera": "鏡頭",
+      "gfxSectionDisplay": "顯示",
+      "gfxSectionSystem": "系統",
+      "gfxSectionTouch": "觸控操作",
+      "gfxViewDistance": "視野距離",
+      "gfxWaterQuality": "水面品質",
+      "gfxCharacterDetail": "角色細節",
+      "gfxAmbientOcclusion": "環境光遮蔽",
+      "gfxBloom": "泛光",
+      "gfxAntiAliasing": "反鋸齒",
+      "gfxDynamicLights": "動態光源",
+      "gfxParticleEffects": "粒子特效",
+      "gfxHalf": "半",
+      "gfxCustomNote": "調整任一細節旋鈕會將畫質預設切換為「進階」：一套基於「高」畫質基礎、以目前預設所示等級為起點的自訂組合。",
+      "gfxEffectsNote": "環境光遮蔽、泛光與反鋸齒依賴後期處理鏈：當「特效與光照」為低時，處理鏈關閉，這些選項不起作用。",
       "interfaceMode": "介面模式",
       "interfaceModeAuto": "自動",
       "interfaceModeDesktop": "桌面",
@@ -1805,7 +1823,13 @@ export const zh_TW: EnTranslations = {
       "saveButton": "儲存專注",
       "notInTownHint": "你必須在城鎮中才能設定專注。",
       "increaseAria": "增加對{component}的專注",
-      "decreaseAria": "減少對{component}的專注"
+      "decreaseAria": "減少對{component}的專注",
+      "respecTierLabel": "重新分配速度",
+      "respecTierTimeOption": "免費（花費時間）",
+      "respecTierPartialOption": "更快（少量花費）",
+      "respecTierInstantOption": "即時（全額花費）",
+      "respecCostFree": "免費",
+      "respecCostLine": "花費 {coin} 和 {materials}"
     },
     "party": {
       "promoteLeader": "提升為隊長",
@@ -2053,7 +2077,7 @@ export const zh_TW: EnTranslations = {
       "hostile": "敵對",
       "friendly": "友方",
       "elite": "精英",
-      "boss": "Boss"
+      "boss": "首領"
     },
     "targetFrame": {
       "unlock": "移動目標框",
@@ -4100,7 +4124,7 @@ export const zh_TW: EnTranslations = {
       "bastionBody": "一座沉入沼澤、被遺忘的要塞，由溺亡的守軍與不斷上漲的潮水本身所據守。",
       "templeBody": "沼澤大道旁一座沉沒的神龕，是為好奇且準備充分者預備的支線之路。",
       "sanctumBody": "棘峰的黑暗核心，邪教漫長的圖謀在此達到恐怖的頂點。",
-      "wildheartBody": "一座被暖雨浸透的叢林火山口，兩條高起的獵徑環繞著碧色深潭。穿過獸巢與先祖遺跡，在儀式金字塔上迎戰祖爾加。",
+      "wildheartBody": "一座被暖雨浸透的叢林火山口，兩條高起的獵徑環繞著碧色深潭。穿過獸巢與先祖遺跡，在儀式金字塔頂端看看是誰在等待。",
       "raidName": "最終團隊副本",
       "raidBody": "在一道封印的皇家大門之後，等待著一場十人試煉：一場多階段的戰鬥，以及一股整個團隊必須齊心遏止的不死力量。先掙得入內的資格，再帶上九位夥伴。",
       "heroicTitle": "英雄模式",
@@ -7386,11 +7410,14 @@ export const zh_TW: EnTranslations = {
       "stat": "+{value} {stat}",
       "useFood": "使用：在 {seconds} 秒內恢復 {amount} 點生命值。進食時必須保持坐下。",
       "useDrink": "使用：在 {seconds} 秒內恢復 {amount} 點法力值。飲水時必須保持坐下。",
+      "useElixir": "使用：使你的{stat}提高 {value} 點，持續 {minutes} 分鐘。戰鬥中可用。",
+      "useElixirAura": "使用：獲得{aura}效果，持續 {minutes} 分鐘。戰鬥中可用。",
       "questItem": "任務物品",
       "questRelated": "任務：{quest}",
       "questRules": "無法出售、存入銀行或交易。",
       "questOrphaned": "目前沒有進行中的任務需要此物品。",
       "classes": "職業：{classes}",
+      "maxStack": "最大堆疊：{count}",
       "sellPrice": "出售價格：{money}",
       "clickBuy": "點擊購買",
       "clickSell": "點擊出售",
@@ -7541,6 +7568,8 @@ export const zh_TW: EnTranslations = {
       "collectEmpty": "沒有待領取內容。銷售收益和過期上架會在這裡領取。",
       "collectNote": "商人為你保管的收益和退回貨物。",
       "saleProceeds": "銷售收益",
+      "saleBuyer": "Sold to {buyer}",
+      "saleOlder": "另有 {count} 筆較早的交易，已計入總額。",
       "collectAll": "全部領取"
     },
     "logs": {
@@ -10319,6 +10348,15 @@ export const zh_TW: EnTranslations = {
       },
       "direfang_quiver": {
         "name": "厲牙箭袋"
+      },
+      "sharp_claw": {
+        "name": "鋒利的爪"
+      },
+      "curved_tusk": {
+        "name": "彎曲的獠牙"
+      },
+      "pristine_claw": {
+        "name": "完美的爪"
       },
       "conjured_water4": {
         "name": "魔法泉水"

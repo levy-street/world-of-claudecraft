@@ -105,6 +105,9 @@ describe('PBR character rim fragment pruning', () => {
   });
 
   it('composes after the actual terrain shader hook without losing either optimization', async () => {
+    vi.stubGlobal('document', {
+      createElement: () => ({ width: 0, height: 0, getContext: () => null }),
+    });
     vi.doMock('../src/render/assets/loader', () => ({
       loadTexture: () => Promise.resolve(new THREE.Texture()),
     }));
@@ -143,6 +146,7 @@ describe('PBR character rim fragment pruning', () => {
       vi.doUnmock('../src/render/assets/loader');
       vi.doUnmock('../src/render/assets/preload');
       vi.doUnmock('../src/render/textures');
+      vi.unstubAllGlobals();
     }
   });
 

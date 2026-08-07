@@ -15,6 +15,54 @@ export const table: DeedLocaleTable = {
     name: 'Himlen tystnar',
     desc: 'Fäll Cindraleth, Gapets matriark, i hennes kraterbo ovanför Drakgapet.',
   },
+  chr_frostveil_gatherer: {
+    name: 'Skord pa terrasserna',
+    desc: 'Skorda en malmadra, ett tradbestand och en ortbadd i Frostveil.',
+  },
+  chr_frostveil_first_cast: {
+    name: 'Forsta isen pa tjarnen',
+    desc: 'Fanga en fisk i Frostveils vatten.',
+  },
+  chr_amberfall_gatherer: {
+    name: 'Amberfalls skord',
+    desc: 'Skorda en malmadra, ett tradbestand och en ortbadd i Amberfall.',
+  },
+  chr_amberfall_first_cast: {
+    name: 'En fangst fran stormyren',
+    desc: 'Fanga en fisk i Amberfalls vatten.',
+  },
+  chr_nightbloom_gatherer: {
+    name: 'Den drommande skorden',
+    desc: 'Skorda en malmadra, ett tradbestand och en ortbadd i Nightbloom.',
+  },
+  chr_nightbloom_first_cast: {
+    name: 'En ring pa manbrunnen',
+    desc: 'Fanga en fisk i Nightblooms vatten.',
+  },
+  chr_wraithwood_gatherer: {
+    name: 'Skord under lovtaket',
+    desc: 'Skorda en malmadra, ett tradbestand och en ortbadd i Wraithwood.',
+  },
+  chr_wraithwood_first_cast: {
+    name: 'Ett kast i spegelviken',
+    desc: 'Fanga en fisk i Wraithwoods vatten.',
+  },
+  chr_palmreach_gatherer: {
+    name: 'Skord pa palmstranden',
+    desc: 'Skorda en malmadra, ett tradbestand och en ortbadd i Palmreach.',
+  },
+  chr_palmreach_first_cast: {
+    name: 'Kast i safirlagunen',
+    desc: 'Fanga en fisk i Palmreachs vatten.',
+  },
+  chr_evergarden_gatherer: {
+    name: 'Parterrens gava',
+    desc: 'Skorda en malmadra, ett tradbestand och en ortbadd i Evergarden.',
+  },
+  chr_evergarden_first_cast: {
+    name: 'Ett kast pa kronbladsdammen',
+    desc: 'Fanga en fisk i Evergardens vatten.',
+  },
   pvp_card_duel_first_win: {
     name: 'Husregler',
     desc: 'Vinn en kortduell hos Kortmästaren.',

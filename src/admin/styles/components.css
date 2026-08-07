@@ -325,6 +325,10 @@
     font-size: var(--font-size-small);
     color: var(--text-dim);
   }
+  .bug-report-actions {
+    display: flex;
+    gap: 10px;
+  }
   .bug-shot-overlay {
     position: fixed;
     inset: 0;

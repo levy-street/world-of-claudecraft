@@ -38,11 +38,11 @@ afterEach(() => setActiveWorldContent(null));
 describe('ride_height: the waterline-clamped heightfield view', () => {
   it('clamps submerged ground to the waterline and leaves dry ground alone', () => {
     setActiveWorldContent(world());
-    expect(rideHeight(LAKE.x, LAKE.z, WATER_LEVEL - 0.75)).toBe(WATER_LEVEL);
+    expect(rideHeight(LAKE.x, LAKE.z, WATER_LEVEL - 0.75, SEED)).toBe(WATER_LEVEL);
     expect(rideHeightAt(LAKE.x, LAKE.z, SEED)).toBe(WATER_LEVEL);
     expect(isSubmergedAt(LAKE.x, LAKE.z, SEED)).toBe(true);
     // no declared water body: -Infinity waterline never clamps
-    expect(rideHeight(DRY.x, DRY.z, -20)).toBe(-20);
+    expect(rideHeight(DRY.x, DRY.z, -20, SEED)).toBe(-20);
     expect(rideHeightAt(DRY.x, DRY.z, SEED)).toBe(groundHeight(DRY.x, DRY.z, SEED));
     expect(isSubmergedAt(DRY.x, DRY.z, SEED)).toBe(false);
   });

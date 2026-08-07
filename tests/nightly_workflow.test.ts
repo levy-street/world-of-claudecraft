@@ -75,9 +75,8 @@ describe('nightly gate workflow', () => {
       const job = jobSource(name);
       // A wedged runner must fail the job, not eat the night.
       expect(job).toMatch(/\n {4}timeout-minutes: \d+\n/);
-      // No checkout leaves a token in .git/config (pr-ai.yml precedent): the
-      // write-scoped report job must not persist one, and the lanes are where
-      // arbitrary-ref code runs.
+      // No checkout leaves a token in .git/config: the write-scoped report job
+      // must not persist one, and the lanes are where arbitrary-ref code runs.
       expect(job).toContain('persist-credentials: false');
     }
     expect(workflow.match(/persist-credentials: false/g)).toHaveLength(JOB_NAMES.length);
@@ -135,6 +134,17 @@ describe('nightly gate workflow', () => {
     // The expected-red release-i18n locale tier stays out of the whole file
     // (issue #2820), not just out of the tests job.
     expect(workflow).not.toContain('I18N_RELEASE_TIER');
+    // Uncached by design, and pinned because docs/qa-gate.md says so out
+    // loud: the nightly is the one full replay that never restores the
+    // vitest transform cache the PR-tier test jobs persist (Phase 4, plus
+    // the long-sims lane since Phase 6), so a cache-layer bug can never
+    // hide from it.
+    expect(workflow).not.toContain('.experimental-vitest-cache');
+    // Retry-free by design too (Phase 6): the nightly must never run the
+    // PR tier's selection-aware entry or its known-flake retry runner; a
+    // nightly teardown-rpc red stays red, per docs/qa-gate.md.
+    expect(workflow).not.toContain('ci_shard_test');
+    expect(workflow).not.toContain('ci_leg_runner');
   });
 
   it('mirrors the serialized release checks from ci.yml and the browser lane', () => {

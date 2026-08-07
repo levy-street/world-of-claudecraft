@@ -79,9 +79,10 @@ describe('graphics tier resolution', () => {
     expect(tierFromHints(desktop, false)).toBe('medium'); // unknown device -> medium fallback
     expect(tierFromHints({ ...desktop, graphicsPreset: 0 }, false)).toBe('low'); // legacy explicit 0
     expect(tierFromHints(desktop, true)).toBe('low'); // software GL with no preset -> low floor
-    // unset + unknown mobile -> medium (not the old unset -> ultra default)
+    // unset + any touch device -> low (the mobile entry-memory floor; never the old unset ->
+    // ultra default, and no longer the medium an unknown phone used to land on)
     expect(tierFromHints({ ...desktop, maxTouchPoints: 1, coarsePointer: true }, false)).toBe(
-      'medium',
+      'low',
     );
     // a URL-forced tier always wins, even on a touch device or software GL
     expect(
@@ -840,59 +841,127 @@ describe('graphics tier resolution', () => {
       ).toBe(2);
     });
 
-    it('caps mobile at HIGH: flagship / strong-on-touch -> HIGH, weak phone -> LOW, else MEDIUM', () => {
+    it('floors EVERY touch device at LOW, whatever its GPU class reports', () => {
+      // The world-entry scene build's peak memory footprint, not the frame rate, is what the
+      // mobile default protects: phone-class WebKit kills the WebContent process when the tab
+      // crosses its per-process ceiling, and the tier the build runs at is what decides that
+      // footprint. So detection may never hand a touch device anything above the floor.
       expect(
         resolveDefaultGraphicsPreset({
           ...phone,
           gpuRenderer: 'Adreno (TM) 740',
           deviceMemory: 8,
         }),
-      ).toBe(3); // flagship phone
-      // an M-series iPad (Apple Silicon on a touch device) is capped at HIGH (ultra is desktop-only);
-      // the touch cap is unchanged by the MacBook thermal default (issue 1676).
-      expect(resolveDefaultGraphicsPreset({ ...phone, gpuRenderer: 'Apple M2' })).toBe(3);
+      ).toBe(1); // flagship phone, previously HIGH
+      // an M-series iPad (Apple Silicon on a touch device), previously HIGH
+      expect(resolveDefaultGraphicsPreset({ ...phone, gpuRenderer: 'Apple M2' })).toBe(1);
+      // a desktop-class discrete GPU string on a touch device, previously HIGH
+      expect(
+        resolveDefaultGraphicsPreset({
+          ...phone,
+          gpuRenderer: 'ANGLE (NVIDIA, NVIDIA GeForce RTX 4080)',
+          deviceMemory: 8,
+          hardwareConcurrency: 16,
+        }),
+      ).toBe(1);
       expect(
         resolveDefaultGraphicsPreset({
           ...phone,
           gpuRenderer: 'Adreno (TM) 330',
         }),
       ).toBe(1); // old phone
-      expect(resolveDefaultGraphicsPreset(phone)).toBe(2); // typical/unknown phone -> medium
+      expect(resolveDefaultGraphicsPreset(phone)).toBe(1); // typical/masked phone, previously MEDIUM
+      // narrowViewport is the other half of the touch check: a coarse-pointer-less touch device
+      // on a narrow viewport is still mobile, so it floors too.
+      expect(
+        resolveDefaultGraphicsPreset({
+          ...desktop,
+          maxTouchPoints: 5,
+          narrowViewport: true,
+          gpuRenderer: 'Apple M2',
+        }),
+      ).toBe(1);
     });
 
-    it('caps a REPORTED tight-memory mobile device at LOW regardless of GPU class (memory safety is a separate axis from GPU capability)', () => {
-      // A flagship-class mobile GPU paired with a genuine 3-4 GB total RAM budget is a
-      // common real Android configuration; without this cap it would default to HIGH (the
-      // branch just above), and the world's baseline texture/geometry residency alone is
-      // large enough on that tier to cross the OS's per-tab memory ceiling during ordinary
-      // play, reported upstream as "randomly disconnects no matter the network."
+    it('leaves the DESKTOP ladder untouched: no-touch devices keep their historical tiers', () => {
+      // The mobile floor keys off the touch check ALONE, so a device reporting no touch points
+      // must be unaffected, including a mobile-flagship GPU string (Android TV box, emulation).
+      expect(resolveDefaultGraphicsPreset({ ...desktop, gpuRenderer: 'Adreno (TM) 740' })).toBe(3);
+      expect(resolveDefaultGraphicsPreset({ ...desktop, gpuRenderer: 'Apple M2' })).toBe(2);
+      expect(resolveDefaultGraphicsPreset(desktop)).toBe(2);
+      // a touchscreen laptop (touch points, but a fine pointer on a wide viewport) is NOT mobile
+      expect(
+        resolveDefaultGraphicsPreset({
+          ...desktop,
+          maxTouchPoints: 10,
+          gpuRenderer: 'ANGLE (NVIDIA, NVIDIA GeForce RTX 4080)',
+          deviceMemory: 8,
+          hardwareConcurrency: 16,
+        }),
+      ).toBe(4);
+    });
+
+    it('makes every mobile result CONCLUSIVE, so first run persists it instead of re-detecting', () => {
+      // firstRunGraphicsPreset persists what resolveDefaultGraphicsPreset returns unless it is
+      // MEDIUM, the inconclusive fallback it deliberately leaves unpinned to re-detect on later
+      // boots. The mobile floor must therefore never resolve to MEDIUM, or a phone would be
+      // re-detected every boot and never carry a persisted preset at all.
+      for (const gpuRenderer of [undefined, 'Apple M2', 'Adreno (TM) 740', 'Mali-G52']) {
+        expect(resolveDefaultGraphicsPreset({ ...phone, gpuRenderer })).not.toBe(2);
+      }
+      // and the marker still short-circuits ahead of any detection, so a later explicit player
+      // choice is never re-detected over.
+      expect(firstRunGraphicsPreset(true)).toBeNull();
+    });
+
+    it('lands the unset-preset mobile RENDER tier on low too, matching the persisted preset', () => {
+      // tierFromHints shares resolveDefaultGraphicsPreset, so the 3D tier and the data-fx-level
+      // stamp agree on a first boot before main.ts has persisted anything.
+      expect(tierFromHints({ ...phone, gpuRenderer: 'Apple M2' }, false)).toBe('low');
+      expect(tierFromHints(phone, false)).toBe('low');
+      // an EXPLICIT stored preset still wins on mobile: the floor is a default, not a cap.
+      expect(tierFromHints({ ...phone, gpuRenderer: 'Apple M2', graphicsPreset: 3 }, false)).toBe(
+        'high',
+      );
+    });
+
+    it('floors a REPORTED tight-memory mobile device at LOW, and every other phone with it', () => {
+      // #2955 added this as a memory-gated floor: a flagship-class mobile GPU paired with a
+      // genuine 3-4 GB total RAM budget is a common real Android configuration, and the world's
+      // baseline texture/geometry residency alone on HIGH is large enough to cross the OS's
+      // per-tab memory ceiling during ordinary play, reported upstream as "randomly disconnects
+      // no matter the network." Those cases still floor; the blanket mobile floor now subsumes
+      // them, which is why the cases that used to sit just OUTSIDE the memory gate floor too.
       expect(
         resolveDefaultGraphicsPreset({
           ...phone,
-          gpuRenderer: 'Adreno (TM) 740', // flagship: HIGH without the memory floor
+          gpuRenderer: 'Adreno (TM) 740', // flagship: HIGH before either floor
           deviceMemory: 3,
         }),
       ).toBe(1);
       expect(
         resolveDefaultGraphicsPreset({
           ...phone,
-          gpuRenderer: 'ANGLE (NVIDIA, NVIDIA GeForce RTX 4080)', // strongDesktop-on-touch: HIGH otherwise
+          gpuRenderer: 'ANGLE (NVIDIA, NVIDIA GeForce RTX 4080)', // strongDesktop-on-touch
           deviceMemory: 4,
         }),
       ).toBe(1);
-      // exactly at the TIGHT_MEMORY_MAX_GB threshold still floors; one above does not.
+      // At the old TIGHT_MEMORY_MAX_GB threshold and one above it: both floor now. The threshold
+      // is no longer load-bearing for the preset, since ample RAM does not buy a phone a tier.
       expect(
         resolveDefaultGraphicsPreset({ ...phone, gpuRenderer: 'Adreno (TM) 740', deviceMemory: 4 }),
       ).toBe(1);
+      // One above the tight-memory threshold is still LOW because the mobile
+      // first-run floor is broader than the RAM-only emergency cap.
       expect(
         resolveDefaultGraphicsPreset({ ...phone, gpuRenderer: 'Adreno (TM) 740', deviceMemory: 5 }),
-      ).toBe(3);
+      ).toBe(1);
       // Never fires on desktop (not mobile) even at the same low deviceMemory: PITFALL 1's
       // "thin RAM never pulls a tier down" rule still holds for the GPU-capability ladder.
       expect(resolveDefaultGraphicsPreset({ ...desktop, deviceMemory: 3 })).toBe(2);
-      // Never fires when mem is unreported (Safari/Firefox never expose deviceMemory, so a
-      // flagship iPhone must not be misread as tight): the flagship-mobile HIGH default holds.
-      expect(resolveDefaultGraphicsPreset({ ...phone, gpuRenderer: 'Apple A17 Pro GPU' })).toBe(3);
+      // Unreported memory (Safari/Firefox) must not fabricate a tight-memory reason, but the
+      // broader mobile first-run floor still covers iOS/WebKit, whose process kill is most brutal.
+      expect(resolveDefaultGraphicsPreset({ ...phone, gpuRenderer: 'Apple A17 Pro GPU' })).toBe(1);
     });
 
     it('defaults Apple Silicon Macs to MEDIUM, not ultra (thermally constrained laptops, issue 1676)', () => {

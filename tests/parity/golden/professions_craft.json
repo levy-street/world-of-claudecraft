@@ -1,6 +1,6 @@
 {
   "scenario": "professions_craft",
-  "seed": 2,
+  "seed": 5,
   "sampleEvery": 20,
   "ticks": 0,
   "coverage": [
@@ -13,7 +13,7 @@
     "post-proc plain craft: the draw stream continues (one draw per successful craft)"
   ],
   "draws": 3,
-  "drawDigest": "bfe71585",
+  "drawDigest": "7e0fce15",
   "frames": [
     {
       "tick": 0,
@@ -289,7 +289,7 @@
       "events": "1c2f4eb7",
       "rng": {
         "draws": 1,
-        "digest": "3d9489e0"
+        "digest": "412668e3"
       },
       "label": "craft-plain",
       "players": [
@@ -444,7 +444,7 @@
       "events": "d5054716",
       "rng": {
         "draws": 2,
-        "digest": "13fe82e1"
+        "digest": "58bf8a9e"
       },
       "label": "craft-masterwork",
       "players": [
@@ -651,7 +651,7 @@
       "events": "1c2f4eb7",
       "rng": {
         "draws": 3,
-        "digest": "bfe71585"
+        "digest": "7e0fce15"
       },
       "label": "craft-plain-2",
       "players": [
@@ -856,7 +856,7 @@
       "events": "cff806af",
       "rng": {
         "draws": 3,
-        "digest": "bfe71585"
+        "digest": "7e0fce15"
       },
       "label": "craft-cast-armed",
       "players": [
@@ -1078,7 +1078,7 @@
       "events": "741638a5",
       "rng": {
         "draws": 3,
-        "digest": "bfe71585"
+        "digest": "7e0fce15"
       },
       "label": "final",
       "players": [

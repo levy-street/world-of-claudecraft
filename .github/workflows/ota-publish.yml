@@ -71,7 +71,12 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: 22
+          # Node 26 to match the repo target (tests/deploy_node_version.test.ts):
+          # the bundle is built by the same pnpm + vite chain every CI run and the
+          # node:26-slim Dockerfile already prove on 26. The 22 here was inherited
+          # from desktop-publish, whose hold is a recorded decision; this one was
+          # not, so it follows the target (maintainer call, 2026-08-07).
+          node-version: 26
           cache: pnpm
 
       - name: Install dependencies

@@ -212,8 +212,9 @@ describe('harvest-family trash carries usable components instead of coin', () =>
   });
 
   it('gives every beast, spider and reptile at least one HARVESTABLE tag', () => {
-    // Mapped in HARVEST_COMPONENT_ITEMS specifically: unmapped tags like claw and
-    // tusk are dead weight the corpse-harvest command cannot turn into an item.
+    // Mapped in HARVEST_COMPONENT_ITEMS specifically: unmapped tags like gills
+    // and horn are dead weight the corpse-harvest command cannot turn into an
+    // item.
     const bare = governed()
       .filter(
         ({ template }) =>
@@ -231,9 +232,9 @@ describe('harvest-family trash carries usable components instead of coin', () =>
       [{ componentTags: tags }].filter(
         (t) => !(t.componentTags ?? []).some((tag) => tag in HARVEST_COMPONENT_ITEMS),
       ).length;
-    expect(bareOf(['claw', 'tusk'])).toBe(1);
+    expect(bareOf(['gills', 'horn'])).toBe(1);
     expect(bareOf(['hide'])).toBe(0);
-    expect(bareOf(['claw', 'hide'])).toBe(0);
+    expect(bareOf(['gills', 'hide'])).toBe(0);
     expect(bareOf([])).toBe(1);
   });
 

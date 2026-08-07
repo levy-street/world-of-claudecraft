@@ -199,6 +199,12 @@ describe('Android Seeker distribution boundary', () => {
     expect(main).toContain("? t('wallet.seekerAppHelp')");
   });
 
+  it('points the MWA connection identity icon at a favicon that actually ships', () => {
+    expect(plugin).toContain('iconUri = Uri.parse("favicon.ico")');
+    expect(plugin).not.toContain('favicon.svg');
+    expect(existsSync('public/favicon.ico')).toBe(true);
+  });
+
   it('promotes the existing rewards button below Chat without covering mobile unit frames', () => {
     expect(main).toContain(
       "document.getElementById('mobile-combat-controls')?.appendChild(dailyRewardsButton)",

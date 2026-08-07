@@ -138,7 +138,11 @@ export const EVERGARDEN_ROADS: { x: number; z: number }[][] = [
 export const EVERGARDEN_PORTALS: PortalDef[] = [];
 
 // The garden's shapes: stags and wolves clipped from living hedge, the gnome
-// groundskeepers, and the Bull that guards the Fountain Court.
+// groundskeepers, and the Bull that guards the Fountain Court. The three
+// topiary beasts are hedge CONSTRUCTS (tests/economy_yield.test.ts
+// HEDGE_CONSTRUCTS): no hide or meat to take, so they stay untagged and pay
+// coin instead. hedge_knight is flesh under plate (its linen_scrap loot row
+// mirrors vale_bandit's), so it is the zone's one corpse-harvest candidate.
 export const EVERGARDEN_MOBS: Record<string, MobTemplate> = {
   topiary_stag: {
     id: 'topiary_stag',
@@ -199,6 +203,7 @@ export const EVERGARDEN_MOBS: Record<string, MobTemplate> = {
     ],
     scale: 1.0,
     color: 0xb8c4d0, // burnished plate
+    componentTags: ['cloth'],
   },
   hedge_gnome: {
     id: 'hedge_gnome',

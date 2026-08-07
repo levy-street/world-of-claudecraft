@@ -8,7 +8,7 @@
     "multi-player party"
   ],
   "draws": 2,
-  "drawDigest": "abc5fd1d",
+  "drawDigest": "6f587c5e",
   "frames": [
     {
       "tick": 0,
@@ -28,11 +28,11 @@
       "tick": 3,
       "time": 0.15,
       "nextId": 966,
-      "state": "60b8c3e6",
-      "events": "4a8f3918",
+      "state": "ebf29f7d",
+      "events": "1bad28d0",
       "rng": {
         "draws": 2,
-        "digest": "abc5fd1d"
+        "digest": "6f587c5e"
       },
       "label": "final",
       "players": [
@@ -189,7 +189,7 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": 0.954697,
+          "fallStartY": 0.963955,
           "fiveSecondRule": 99.15,
           "hp": 100,
           "id": 963,
@@ -205,7 +205,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 20,
-            "y": 0.954697,
+            "y": 0.963955,
             "z": 20
           },
           "potionCooldownUntil": -1,
@@ -239,7 +239,7 @@
           "critChance": 0.056,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
-          "fallStartY": 0.774854,
+          "fallStartY": 0.789491,
           "fiveSecondRule": 99.15,
           "hp": 54,
           "id": 964,
@@ -254,7 +254,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 21,
-            "y": 0.774854,
+            "y": 0.789491,
             "z": 20
           },
           "potionCooldownUntil": -1,
@@ -290,7 +290,7 @@
           "dead": true,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": 1.076834,
+          "fallStartY": 1.085,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 54,
@@ -306,14 +306,14 @@
           "petMode": "defensive",
           "pos": {
             "x": 20,
-            "y": 1.076834,
+            "y": 1.085,
             "z": 22
           },
           "potionCooldownUntil": -1,
           "respawnTimer": -0.15,
           "spawnPos": {
             "x": 20,
-            "y": 1.076834,
+            "y": 1.085,
             "z": 22
           },
           "stats": {

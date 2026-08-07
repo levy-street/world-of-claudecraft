@@ -12,7 +12,7 @@
 //     [--prompt "curved ember-glowing blade"] [--image path|url] [--family sword] \
 //     [--items item_id1,item_id2] [--model-file existing.glb] [--flip] [--roll deg] [--apply] [--job id]
 //   node scripts/asset_pipeline/pipeline.mjs prop --name market_fountain --height 2.4 \
-//     [--prompt "..."] [--image ...] [--rotate-y 90] [--apply] [--job id]
+//     [--prompt "..."] [--image ...] [--rotate-y 90] [--max-texture 256] [--apply] [--job id]
 //   node scripts/asset_pipeline/pipeline.mjs creature --name bog_lurker \
 //     [--prompt "..."] [--image ...] [--rig-type biped] [--height 2.0] [--job id]
 //   node scripts/asset_pipeline/pipeline.mjs skin --class warrior --suffix lava \
@@ -43,6 +43,7 @@ import {
   inspectGlb,
   normalizeProp,
   normalizeWeapon,
+  propNormalizeVariant,
 } from './lib/glb.mjs';
 import {
   appendCreditsRow,
@@ -569,10 +570,22 @@ async function cmdProp() {
   if (await reviewStop(job, 'texture', tex?.glb ?? gen.raw)) return;
 
   const built = job.path(`${name}.glb`);
-  const rotateY = (Number(opt('rotate-y', 0)) * Math.PI) / 180;
-  const rotVariant = String(opt('rotate-y', 0));
-  await job.step(`normalize_r${rotVariant}`, () =>
-    normalizeProp(tex?.glb ?? gen.raw, built, { height, rotateY }),
+  const rotateYDeg = Number(opt('rotate-y', 0));
+  const rotateY = (rotateYDeg * Math.PI) / 180;
+  const maxTex = Number(opt('max-texture', 512));
+  if (!Number.isInteger(maxTex) || maxTex < 4) {
+    throw new Error('--max-texture must be an integer of at least 4 pixels');
+  }
+  const normalizeVariant = propNormalizeVariant({ height, rotateYDeg, maxTex });
+  job.set('propConfig', {
+    height,
+    rotateYDeg,
+    maxTex,
+    faceLimit: faceLimitOpt(CATEGORY_SPECS.prop.faceLimit),
+    model: opt('model') === 'hifi' ? 'hifi' : 'lowpoly',
+  });
+  await job.step(`normalize_${normalizeVariant}`, () =>
+    normalizeProp(tex?.glb ?? gen.raw, built, { height, rotateY, maxTex }),
   );
 
   const check = await validateProp(built, { height });
@@ -583,7 +596,7 @@ async function cmdProp() {
     printReport(job, { ok: false, errors: check.errors });
     throw new Error('prop failed validation');
   }
-  await previewStage(job, built, `preview_r${rotVariant}`);
+  await previewStage(job, built, `preview_${normalizeVariant}`);
 
   const actions = [];
   if (flag('apply')) {

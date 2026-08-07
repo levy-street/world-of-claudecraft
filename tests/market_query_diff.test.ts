@@ -35,6 +35,8 @@ function echoOf(overrides: Partial<MarketInfo> = {}): MarketInfo {
     pageCount: 1,
     collectionCopper: 0,
     collectionItems: [],
+    collectionSales: [],
+    collectionSalesOmitted: 0,
     cutPct: 5,
     maxListings: 12,
     myListingCount: 0,

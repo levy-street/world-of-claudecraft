@@ -104,10 +104,33 @@ export interface MarketCollectRow {
   instance?: ItemInstancePayload;
 }
 
+/**
+ * One Collect row on the SALES side: a completed sale the proceeds line sums up.
+ * Distinct from MarketCollectRow above, which is goods coming BACK (an expired or
+ * reclaimed listing); these goods are gone and what waits is the gold.
+ */
+export interface MarketCollectSaleRow {
+  item: ItemDef;
+  count: number;
+  /** Net copper this sale contributed, after the Merchant's cut. */
+  proceeds: number;
+  buyerName: string;
+}
+
 /** The Collect tab body: nothing to collect, or proceeds + item stacks. */
 export type MarketCollectBody =
   | { state: 'empty' }
-  | { state: 'items'; proceeds: number; rows: MarketCollectRow[] };
+  | {
+      state: 'items';
+      proceeds: number;
+      /** Itemized sales behind `proceeds`, oldest first. */
+      sales: MarketCollectSaleRow[];
+      /** Sales not listed in `sales`: dropped by the sim's ledger cap, or skipped
+       *  here because the item id no longer resolves. Their gold is still in
+       *  `proceeds`, so the tab reports the count instead of quietly under-listing. */
+      salesOmitted: number;
+      rows: MarketCollectRow[];
+    };
 
 /**
  * The full market view-model: the data-absent state, or one of the three tab
@@ -224,7 +247,13 @@ export function buildMarketSell(
 
 /** Build the Collect tab body from a snapshot. */
 export function buildMarketCollect(info: MarketInfo): MarketCollectBody {
-  if (info.collectionCopper <= 0 && info.collectionItems.length === 0) {
+  // A sale whose proceeds floored to 0 copper still leaves a ledger row, so the
+  // empty test reads the ledger too: an empty body would strand it unshown.
+  if (
+    info.collectionCopper <= 0 &&
+    info.collectionItems.length === 0 &&
+    info.collectionSales.length === 0
+  ) {
     return { state: 'empty' };
   }
   const rows: MarketCollectRow[] = [];
@@ -233,7 +262,25 @@ export function buildMarketCollect(info: MarketInfo): MarketCollectBody {
     if (!item) continue;
     rows.push({ item, count: slot.count, ...(slot.instance ? { instance: slot.instance } : {}) });
   }
-  return { state: 'items', proceeds: info.collectionCopper, rows };
+  const sales: MarketCollectSaleRow[] = [];
+  // An id a content edit retired can no longer be named, so the row is dropped
+  // like the returns above; it counts as omitted rather than vanishing, because
+  // its gold is still inside the proceeds total this list is explaining.
+  let salesOmitted = info.collectionSalesOmitted;
+  for (const sale of info.collectionSales) {
+    const item = ITEMS[sale.itemId];
+    if (!item) {
+      salesOmitted += 1;
+      continue;
+    }
+    sales.push({
+      item,
+      count: sale.count,
+      proceeds: sale.proceeds,
+      buyerName: sale.buyerName,
+    });
+  }
+  return { state: 'items', proceeds: info.collectionCopper, sales, salesOmitted, rows };
 }
 
 /**
@@ -320,7 +367,12 @@ export function marketFilterMenus(itemType: MarketItemTypeFilter): MarketFilterM
  */
 export function marketCollectBadgeCount(info: MarketInfo | null): number {
   if (!info) return 0;
-  return (info.collectionCopper > 0 ? 1 : 0) + info.collectionItems.length;
+  // The purse counts ONCE however many sales fill it: the ledger itemizes the same
+  // gold the purse already stands for, so counting rows too would double it. The
+  // ledger only widens WHEN the purse counts, for the 0-copper sale that leaves a
+  // row and no coin (a 1-copper listing against the Merchant's cut).
+  const purse = info.collectionCopper > 0 || info.collectionSales.length > 0 ? 1 : 0;
+  return purse + info.collectionItems.length;
 }
 
 /** The minimap-corner collect indicator (the mailIndicatorView pattern). */

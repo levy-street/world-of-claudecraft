@@ -54,6 +54,96 @@ describe('appearance skin selection', () => {
     expect(sent).toEqual([{ t: 'cmd', cmd: 'change_skin', skin: 2, catalog: 'class' }]);
   });
 
+  it('re-resolves the active weapon skin when the BODY changes (offline)', () => {
+    // The mech shows a hunter's equipped weapon and the class rig does not, so
+    // the applicable skin types differ per body. Switching bodies has to
+    // re-resolve, or the skin the new body would show stays dark until some
+    // unrelated gear change happens to recompute it.
+    const sim = new Sim({ seed: 1, playerClass: 'hunter', playerName: 'Mechhunter' });
+    const pid = sim.primaryId;
+    const e = sim.entities.get(pid);
+    if (!e) throw new Error('no player entity');
+    e.mainhandItemId = 'direfang_greatblade';
+
+    // A sword skin is only applicable in the suit, so put it on first.
+    sim.setPlayerSkin(pid, 0, 'mech');
+    expect(sim.setWeaponSkin(pid, 'ice_fang_sword')).toBe(true);
+    expect(e.weaponSkinId).toBe('ice_fang_sword');
+
+    // Back to the hunter rig: that body cannot render a sword skin at all.
+    sim.setPlayerSkin(pid, 0, 'class');
+    expect(e.weaponSkinId).toBeNull();
+
+    // ...and returning to the suit brings it back, still parked in the loadout.
+    sim.setPlayerSkin(pid, 0, 'mech');
+    expect(e.weaponSkinId).toBe('ice_fang_sword');
+  });
+
+  it('re-resolves the active weapon skin when the BODY changes (online mirror)', async () => {
+    // Parity with the offline arm above: both IWorld implementations must swap
+    // the displayed skin with the body, or the two hosts disagree about what a
+    // mech hunter is holding until the next snapshot lands.
+    const { bareClient } = await import('./helpers/bare_client');
+    const client = bareClient(7, { playerClass: 'hunter' });
+    Object.assign(client, {
+      connected: true,
+      ws: { readyState: 1, send: () => undefined },
+    });
+    (globalThis as any).WebSocket = { OPEN: 1 };
+    const p = client.entities.get(7) ?? { id: 7 };
+    Object.assign(p, {
+      id: 7,
+      templateId: 'hunter',
+      mainhandItemId: 'direfang_greatblade',
+      weaponSkinLoadout: { sword: 'ice_fang_sword' },
+      skin: 0,
+      skinCatalog: 'class',
+    });
+    client.entities.set(7, p as never);
+
+    client.changeSkin(0, 'mech');
+    expect((p as { weaponSkinId?: string | null }).weaponSkinId).toBe('ice_fang_sword');
+
+    client.changeSkin(0, 'class');
+    expect((p as { weaponSkinId?: string | null }).weaponSkinId).toBeNull();
+  });
+
+  it('re-resolves the active weapon skin when unequipping the mech chroma (online)', async () => {
+    // The chroma unequip drops the wearer OFF the mech body, which is a body
+    // change like any other: the offline Sim routes it through setPlayerSkin and
+    // re-resolves, but ClientWorld writes skinCatalog directly and so kept a
+    // sword skin the class rig cannot render until the next authoritative
+    // snapshot corrected it. Reported by review on PR 2940.
+    const { bareClient } = await import('./helpers/bare_client');
+    const client = bareClient(7, { playerClass: 'hunter' });
+    Object.assign(client, {
+      connected: true,
+      ws: { readyState: 1, send: () => undefined },
+      accountCosmetics: { completedQuestIds: [], mechChromaIds: ['amber_crimson'] },
+      inventory: [],
+    });
+    (globalThis as any).WebSocket = { OPEN: 1 };
+    const { mechChromaSkinIndex } = await import('../src/sim/content/skins');
+    const skin = mechChromaSkinIndex('amber_crimson');
+    const p = client.entities.get(7) ?? { id: 7 };
+    Object.assign(p, {
+      id: 7,
+      templateId: 'hunter',
+      mainhandItemId: 'direfang_greatblade',
+      weaponSkinLoadout: { sword: 'ice_fang_sword' },
+      weaponSkinId: 'ice_fang_sword',
+      skin,
+      skinCatalog: 'mech',
+    });
+    client.entities.set(7, p as never);
+
+    client.unequipMechChroma('amber_crimson');
+
+    expect((p as { skinCatalog?: string }).skinCatalog).toBe('class');
+    // The class rig cannot render a sword skin, so it must not stay resolved.
+    expect((p as { weaponSkinId?: string | null }).weaponSkinId).toBeNull();
+  });
+
   it('sends the online mech chroma unequip command and mirrors the returned item immediately', () => {
     const sent: unknown[] = [];
     const client: ClientWorld = Object.create(ClientWorld.prototype);

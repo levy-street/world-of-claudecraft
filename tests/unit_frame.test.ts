@@ -6,10 +6,11 @@
 // party instances reuse the seam with NO core change. It also pins the
 // resourceKind -> resClass discriminator
 // (the old inline `rage : energy : mana` ternary + the `none` case), the
-// present/hidden gate, the absorbBarView resolution, same-input-same-output
-// determinism, the ClientWorld-vs-Sim parity assertion, and that the
-// core carries NO hardcoded element id / single-instance assumption and is
-// DOM-free + i18n-free (the painter owns the DOM and t()).
+// present/hidden gate, the absorbBarView resolution + its formatNumber-routed
+// absorb-total suffix, same-input-same-output determinism, the ClientWorld-vs-Sim
+// parity assertion, and that the core carries NO hardcoded element id /
+// single-instance assumption, is DOM-free, and stays translation-free (no
+// t()/tEntity; the painter owns the DOM and player-facing strings).
 
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
@@ -234,21 +235,81 @@ describe('unitFrameView: determinism + ClientWorld-vs-Sim parity', () => {
   });
 });
 
-describe('unit_frame core stays DOM-free, i18n-free, and id-free (no single-instance assumption)', () => {
+describe('unit_frame core stays DOM-free, translation-free, and id-free (no single-instance assumption)', () => {
   const src = readFileSync(new URL('../src/ui/unit_frame.ts', import.meta.url), 'utf8');
   const code = src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
 
-  it('imports no i18n runtime and calls no t()/tEntity/formatNumber', () => {
-    expect(code).not.toContain("from './i18n'");
+  // The core imports ONLY formatNumber from the i18n runtime, to route the
+  // absorb-shield total it derives internally through locale-correct digits
+  // (see the file header + unitFrameView "absorb-total text" tests below); it
+  // must never call t()/tEntity, which would mean the core is picking
+  // translated STRINGS rather than pass-through/derived numbers.
+  it('imports only formatNumber from i18n and calls no t()/tEntity', () => {
+    expect(code).toContain("from './i18n'");
+    expect(code).toMatch(/\bformatNumber\(/);
     expect(code).not.toMatch(/\bt\(/);
     expect(code).not.toMatch(/\btEntity\(/);
-    expect(code).not.toMatch(/\bformatNumber\(/);
   });
 
   it('references no element id selector or #player-frame (no hardcoded instance)', () => {
     expect(code).not.toMatch(/#pf-/);
     expect(code).not.toMatch(/player-frame/);
     expect(code).not.toMatch(/querySelector|getElementById/);
+  });
+});
+
+describe('unitFrameView / unitFrameViewInto: absorb-total text runs through formatNumber', () => {
+  it('appends the shield total to hpText with useGrouping:false digits', () => {
+    const v = unitFrameView(
+      playerDescriptor({
+        hpText: '300 / 600',
+        showAbsorbText: true,
+        absorb: { hp: 300, maxHp: 600, auras: [shield(60)] },
+      }),
+    );
+    expect(v.hpText).toBe('300 / 600 (60)');
+  });
+
+  it('keeps a four-digit shield total ungrouped (no thousands separator)', () => {
+    const v = unitFrameView(
+      playerDescriptor({
+        hpText: '300 / 6000',
+        showAbsorbText: true,
+        absorb: { hp: 300, maxHp: 6000, auras: [shield(1234)] },
+      }),
+    );
+    expect(v.hpText).toBe('300 / 6000 (1234)');
+  });
+
+  it('omits the suffix when showAbsorbText is off even with an active shield', () => {
+    const v = unitFrameView(
+      playerDescriptor({
+        hpText: '300 / 600',
+        showAbsorbText: false,
+        absorb: { hp: 300, maxHp: 600, auras: [shield(60)] },
+      }),
+    );
+    expect(v.hpText).toBe('300 / 600');
+  });
+
+  it('omits the suffix entirely when there is no active shield', () => {
+    const v = unitFrameView(
+      playerDescriptor({ hpText: '300 / 600', showAbsorbText: true, absorb: null }),
+    );
+    expect(v.hpText).toBe('300 / 600');
+  });
+
+  it('matches between the allocating unitFrameView and the buffer-filling unitFrameViewInto', () => {
+    const descriptor = playerDescriptor({
+      hpText: '300 / 6000',
+      showAbsorbText: true,
+      absorb: { hp: 300, maxHp: 6000, auras: [shield(1234)] },
+    });
+    const buffer = newUnitFrameBuffer();
+    const fromAllocating = unitFrameView(descriptor);
+    const fromBuffer = unitFrameViewInto(buffer, descriptor);
+    expect(fromBuffer.hpText).toBe(fromAllocating.hpText);
+    expect(fromBuffer.hpText).toBe('300 / 6000 (1234)');
   });
 });
 

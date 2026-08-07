@@ -12,7 +12,11 @@
 // walking instead. Spread is what buys that, so it is measured, not assumed:
 // tests/gather_node_placement.test.ts holds every zone to keeping 40 percent of
 // its walkable ground within 40 yards of a node, and holds every coordinate to
-// being dry, walkable, unblocked, reachable and workable.
+// being dry, walkable, unblocked, reachable and workable. "Dry" is two rules
+// there, not one: the node's own seat clears the water surface by the prop
+// freeboard, AND no ground inside its harvest reach lies under water, so a
+// gatherer never wades to work a patch. The same file also keeps every node out
+// of the Sowfield's boarball ground.
 //
 // What "spends the wait walking" does and does not mean, measured rather than
 // asserted, because the honest version is narrower than the slogan. Modelling a
@@ -238,16 +242,23 @@ export const GATHER_NODES: GatherNodeDef[] = [
     tier: 1,
   },
   // Three more patches across the east half of the vale, which had no herb at
-  // all: the Sowfield croplands south of town, the boar downs east of Boar
-  // Meadow, and the rise between the downs and the Fallen Chapel. Silverleaf
-  // growing on open pasture and tilled ground is the same flavour as the Mirror
-  // Lake bank, and it means a herbalist walking east is not walking away from
-  // their profession.
+  // all: the meadow above the Sowfield south of town, the boar downs east of
+  // Boar Meadow, and the rise between the downs and the Fallen Chapel.
+  // Silverleaf growing on open pasture and tilled ground is the same flavour as
+  // the Mirror Lake bank, and it means a herbalist walking east is not walking
+  // away from their profession.
   {
     id: 'herb_eastbrook_4',
     zoneId: 'eastbrook_vale',
     type: 'herb',
-    pos: { x: 23, z: -99 },
+    // Moved off (23,-99): that spot sat INSIDE the boarball pitch, in the east
+    // goal's corner (vale_cup_layout PITCH is x -48..26 by z -127..-97), so the
+    // patch grew on the playing surface of a live match and a gatherer working
+    // it was swept off by the pitch police. Now on the meadow above the ground,
+    // 4 yards clear of the whole Sowfield shell the terrain flatten and the
+    // decoration screen already reserve (SOWFIELD_EXCLUDE), with 8.0yd of sea
+    // freeboard and 5.4yd of it across the whole harvest reach.
+    pos: { x: 6, z: -69 },
     level: 4,
     tier: 1,
   },
@@ -355,7 +366,7 @@ export const GATHER_NODES: GatherNodeDef[] = [
     id: 'herb_mirefen_1',
     zoneId: 'mirefen_marsh',
     type: 'herb',
-    pos: { x: 29, z: 395 },
+    pos: { x: 26, z: 395 },
     level: 10,
     tier: 1,
   },
@@ -363,7 +374,7 @@ export const GATHER_NODES: GatherNodeDef[] = [
     id: 'herb_mirefen_2',
     zoneId: 'mirefen_marsh',
     type: 'herb',
-    pos: { x: -66, z: 458 },
+    pos: { x: -68, z: 459 },
     level: 10,
     tier: 1,
   },
@@ -528,12 +539,13 @@ export const GATHER_NODES: GatherNodeDef[] = [
     tier: 2,
   },
   // Followed herb_mirefen_1 off the pool it shared: it sat inside the same
-  // footprint at 3.55 yards under. Still 12 yards from that patch.
+  // footprint at 3.55 yards under, and the raised waterline later walked both
+  // patches further up the same shore. Still about 20 yards from that patch.
   {
     id: 'herb_mirefen_t2',
     zoneId: 'mirefen_marsh',
     type: 'herb',
-    pos: { x: 34, z: 406 },
+    pos: { x: 23, z: 416 },
     level: 10,
     tier: 2,
   },
@@ -766,7 +778,16 @@ export const GATHER_NODES: GatherNodeDef[] = [
     id: 'ore_frostveil_2',
     zoneId: 'frostveil',
     type: 'ore',
-    pos: { x: 16, z: 1574 },
+    // Moved uphill off (16,1574): the authored spot sat UNDER the world sea
+    // plane in a snowmelt basin (-0.38yd, and -0.54 across its reach), so the
+    // vein rendered on the pond floor and a miner worked it from the water.
+    // Now east along the basin's south rim, whole harvest reach clear of the
+    // sea plane (tests/gather_node_placement.test.ts measures it). x is 22,
+    // not the rim-nearest 12: at (12,1564) this vein sat 30.3yd from
+    // ore_frostveil_1 at (8,1534), inside the 27-32yd clustering band
+    // tests/quest_targets.test.ts keeps empty so quest-area grouping cannot
+    // flip with the threshold; 22 restores 33.1yd of separation.
+    pos: { x: 22, z: 1564 },
     level: 19,
     tier: 1,
   },
@@ -846,7 +867,11 @@ export const GATHER_NODES: GatherNodeDef[] = [
     type: 'herb',
     // Nudged off (-342,2116) at the v0.32.0 merge: the authored spot clears
     // the amberfall mere's surface by under a third of the required yard.
-    pos: { x: -342, z: 2110 },
+    // Moved again off (-342,2110): the patch itself cleared the water (1.70yd)
+    // but the mere reached 0.13yd INTO its harvest disc, so picking it meant
+    // standing in the shallows. Now 4.2yd of freeboard, the whole reach 2.1yd
+    // dry.
+    pos: { x: -339, z: 2105 },
     level: 19,
     tier: 1,
   },
@@ -869,8 +894,12 @@ export const GATHER_NODES: GatherNodeDef[] = [
     zoneId: 'willowfen',
     type: 'ore',
     // Nudged off (-322,336) at the v0.32.0 merge: the authored spot sits on
-    // the fen waterline (0.03yd of the required yard of bank clearance).
-    pos: { x: -318, z: 336 },
+    // the fen waterline (0.03yd of the required yard of bank clearance). The
+    // nudge was not enough: (-318,336) still cleared the sea plane by only
+    // 0.47yd and its harvest reach dipped under the waterline (-0.03), so the
+    // vein stood in the shallows. Now up on the fen bank, 6.1yd of freeboard
+    // and 4.7yd of clearance across the whole reach.
+    pos: { x: -304, z: 324 },
     level: 20,
     tier: 1,
   },
@@ -895,8 +924,10 @@ export const GATHER_NODES: GatherNodeDef[] = [
     zoneId: 'willowfen',
     type: 'wood',
     // Nudged off (-390,324) at the v0.32.0 merge: half the required yard of
-    // bank clearance over the fen water.
-    pos: { x: -392, z: 322 },
+    // bank clearance over the fen water. Moved again off (-392,322): the fen
+    // still reached 0.13yd into the stand's harvest disc. Now 3.2yd of
+    // freeboard, the whole reach 2.7yd clear of the water.
+    pos: { x: -398, z: 319 },
     level: 20,
     tier: 1,
   },
@@ -996,8 +1027,11 @@ export const GATHER_NODES: GatherNodeDef[] = [
     zoneId: 'willowfen',
     type: 'wood',
     // North fen west stand. Nudged off (-418,580) at authoring (Q15): 1.08yd
-    // of world-sea freeboard; the moved spot clears at 1.69.
-    pos: { x: -417, z: 580 },
+    // of world-sea freeboard; the moved spot clears at 1.69. Moved again off
+    // (-417,580): freeboard at the stand was never the whole story, and the
+    // fen ran 0.83yd deep into its harvest disc. Now 4.3yd of freeboard with
+    // the whole reach 2.2yd dry.
+    pos: { x: -411, z: 582 },
     level: 20,
     tier: 1,
   },
@@ -1154,7 +1188,13 @@ export const GATHER_NODES: GatherNodeDef[] = [
     id: 'ore_galecrest_2',
     zoneId: 'galecrest',
     type: 'ore',
-    pos: { x: 466, z: 374 },
+    // Moved off the Wickharbor cove floor (466,374) at the release/v0.34.0
+    // merge: open-sea swim made the cove real water, so the old spot sat at
+    // swim depth where harvestNode's swim deny always refuses. The headland
+    // west of the cove keeps the whole harvest disc standable and a full
+    // yard above the sea plane (its sea-plane exemption retired with the
+    // move).
+    pos: { x: 430, z: 379 },
     level: 20,
     tier: 1,
   },
@@ -1181,8 +1221,16 @@ export const GATHER_NODES: GatherNodeDef[] = [
     // Nudged off (438,404) at the v0.32.0 merge: a 5.7 rise/run crag sat
     // inside the authored spot's 5yd harvest reach, and the flat ground west
     // of it would close the pair gap under the 30yd quest-target cluster
-    // link, so the patch moved out along the ridge foot instead.
-    pos: { x: 448, z: 400 },
+    // link, so the patch moved out along the ridge foot to (448,400). Moved
+    // again at the release/v0.34.0 merge: open-sea swim made the Wickharbor
+    // cove real water, the ridge-foot spot sat at swim depth with no
+    // standable ground in harvest reach, so the patch stepped west onto the
+    // cove rim at (435,400), which put it 31.4yd from its pair, inside the
+    // 27 to 32 identical-partition band the quest-target cluster pin keeps
+    // empty. Stepped up the rim to hold the pair gap at 35.0yd, back outside
+    // the band with real margin and clear of the crag's reach (its sea-plane
+    // exemption stays retired).
+    pos: { x: 436, z: 394 },
     level: 20,
     tier: 1,
   },
@@ -1190,7 +1238,14 @@ export const GATHER_NODES: GatherNodeDef[] = [
     id: 'herb_galecrest_2',
     zoneId: 'galecrest',
     type: 'herb',
-    pos: { x: 406, z: 412 },
+    // Moved inland off (406,412): the patch sat 2 yards from the Wickharbor
+    // cove's waterline, which reached 1.30yd into its harvest disc, so a sixth
+    // of the reach was open water. Now on the headland above the cove, whole
+    // reach clear (tests/gather_node_placement.test.ts measures it). (405,407),
+    // not the first dry pick (407,406): that spot sat 31.4yd from
+    // herb_galecrest_1 at (436,394), inside the 27-32yd clustering band
+    // tests/quest_targets.test.ts keeps empty; this one restores 33.6yd.
+    pos: { x: 405, z: 407 },
     level: 20,
     tier: 1,
   },
@@ -1313,7 +1368,7 @@ export const GATHER_NODES: GatherNodeDef[] = [
     id: 'ore_palmreach_1',
     zoneId: 'palmreach',
     type: 'ore',
-    pos: { x: -262, z: 794 },
+    pos: { x: -263, z: 795 },
     level: 20,
     tier: 1,
   },
@@ -1391,7 +1446,11 @@ export const GATHER_NODES: GatherNodeDef[] = [
     id: 'wood_evergarden_2',
     zoneId: 'evergarden',
     type: 'wood',
-    pos: { x: 290, z: 772 },
+    // Moved up the bank off (290,772): the stand cleared the world sea plane
+    // by 0.39yd with open water 1.5yd away, so the logs sat in the lake's
+    // margin and the harvest disc ran 0.89yd under it. Now 5.4yd of
+    // freeboard, the whole reach 2.1yd clear.
+    pos: { x: 290, z: 780 },
     level: 20,
     tier: 1,
   },
@@ -1438,8 +1497,11 @@ export const GATHER_NODES: GatherNodeDef[] = [
     zoneId: 'farshore_isle',
     type: 'wood',
     // Nudged off (263,92) at the v0.32.0 merge: a 1.9 rise/run bluff sat
-    // inside the authored spot's 5yd harvest reach.
-    pos: { x: 259, z: 96 },
+    // inside the authored spot's 5yd harvest reach. Moved uphill off
+    // (259,96) at the release/v0.34.0 merge: open-sea swim made the shore
+    // shallows real water and the old strand spot's harvest disc dipped to
+    // swim depth (its sea-plane exemption retired with the move).
+    pos: { x: 269, z: 83 },
     level: 5,
     tier: 1,
   },
@@ -1463,7 +1525,11 @@ export const GATHER_NODES: GatherNodeDef[] = [
     id: 'herb_farshore_isle_2',
     zoneId: 'farshore_isle',
     type: 'herb',
-    pos: { x: 291, z: 122 },
+    // Moved inland off (291,122) at the release/v0.34.0 merge: open-sea
+    // swim made the shore shallows real water, and the old spot sat at swim
+    // depth with no standable ground in harvest reach (its sea-plane
+    // exemption retired with the move). Still 33yd from its pair.
+    pos: { x: 291, z: 104 },
     level: 5,
     tier: 1,
   },
@@ -1539,8 +1605,13 @@ export const GATHER_NODES: GatherNodeDef[] = [
     id: 'wood_farshore_isle_6',
     zoneId: 'farshore_isle',
     type: 'wood',
-    // Ferrywalk causeway approach.
-    pos: { x: 210, z: -24 },
+    // Ferrywalk causeway approach. Moved inland off (210,-24): that spot sat
+    // on the last yard of the causeway spit with the sea 2 yards away and
+    // 1.32yd deep inside the harvest disc, so a fifth of the ground a player
+    // could legally gather from was open water and the logs read as standing
+    // in the surf. Now up the approach, 6.2yd of freeboard with the whole
+    // reach 2.7yd clear of the water.
+    pos: { x: 207, z: -18 },
     level: 5,
     tier: 1,
   },
@@ -1559,8 +1630,15 @@ export const GATHER_NODES: GatherNodeDef[] = [
     type: 'herb',
     // North shore east of Gull Mere, outside its blend footprint, bundling
     // with the fishing site. Nudged off (358,140) at authoring (Q15): 1.16yd
-    // of world-sea freeboard; the moved spot clears at 1.52.
-    pos: { x: 358, z: 138 },
+    // of world-sea freeboard; the moved spot clears at 1.52. Moved off
+    // (358,138) too: that spot stood on the NECK between the mere and the sea,
+    // open water on four of its eight compass bearings at 14 yards and the
+    // waterline on a fifth, with the shoreline tangent to its harvest reach
+    // (+0.07yd). That is the patch the player report meant by "in the water"
+    // even though every guard passed it. Now back off the neck onto the shore
+    // meadow, 2.5yd of freeboard with the whole reach 2.1yd dry, still walking
+    // distance from the fishing site.
+    pos: { x: 366, z: 128 },
     level: 5,
     tier: 1,
   },

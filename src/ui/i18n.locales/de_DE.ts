@@ -1188,6 +1188,8 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.lootMaybe': 'Hochstens eines davon kann fallen:',
   'hudChrome.finder.mech.deathless_rage':
     'Unsterbliche Raserei (an den Schutzsteinen unterbrochen)',
+  'hudChrome.finder.mech.dread_curse':
+    'Schreckensfluch (nur heroisch, stapelnder Schwachungseffekt fur Tankwechsel)',
   'hudChrome.finder.mech.deathstalker_cleave': 'Todjaeger-Schwung (frontaler Schwung)',
   'hudChrome.finder.mech.enrage': 'Rasiert bei geringer Gesundheit',
   'hudChrome.finder.mech.grave_cleaver': 'Grabspalter (frontaler Schwung)',
@@ -2505,6 +2507,8 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobTooltip.friendly': 'Freundlich',
   'hudChrome.mobTooltip.hostile': 'Feindlich',
   'hudChrome.mobTooltip.levelFamily': 'Stufe {level} {family}',
+  'hudChrome.mobTooltip.elite': 'Elite',
+  'hudChrome.mobTooltip.boss': 'Boss',
   'hudChrome.options.aurasOnPlayerFrame': 'Stärkungszauber am Spielerfenster',
   'hudChrome.options.playerFrameScale': 'Skalierung des Spielerfensters',
   'hudChrome.options.showDailyRewardsChest': 'Truhe der täglichen Belohnungen anzeigen',
@@ -6065,6 +6069,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.components.venomSac': 'Giftsack',
   'hudChrome.corpseHarvest.harvestButton': 'Verwerten',
   'hudChrome.corpseHarvest.title': 'Verwerten',
+  'hudChrome.emoteEditor.close': 'Emotes schließen',
   'hudChrome.emoteEditor.done': 'Fertig',
   'hudChrome.emoteEditor.title': 'Emotes',
   'hudChrome.emotes.bow': 'Verbeugen',
@@ -9652,6 +9657,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchantName.enchant_neck_agility': 'Amulett verzaubern - Beweglichkeit',
   'hudChrome.enchantName.enchant_neck_intellect': 'Amulett verzaubern - Intellekt',
   'hudChrome.enchantName.enchant_neck_spirit': 'Amulett verzaubern - Geist',
+  'hudChrome.enchantName.enchant_offhand_stamina': 'Nebenhand verzaubern - Ausdauer',
   'hudChrome.enchantName.enchant_ring_agility': 'Ring verzaubern - Beweglichkeit',
   'hudChrome.enchantName.enchant_ring_intellect': 'Ring verzaubern - Intellekt',
   'hudChrome.enchantName.enchant_ring_spirit': 'Ring verzaubern - Geist',
@@ -11087,7 +11093,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Das Blätterdach schließt sich über der Straße wie ein Deckel. Halte dich an die Laternen von Gallowmere, und antworte nicht, wenn der Wald deinen Namen ruft.',
   'fiesta.augment.cardAria': '{name} ({category}): {description}',
   'guide.dungeonsPage.wildheartBody':
-    'Eine regendurchtränkte Dschungelcaldera, in der zwei erhöhte Jagdpfade einen jadegrünen Cenote umkreisen. Durchquere Tierhöhlen und Ahnenruinen, dann erklimme die Ritualpyramide, um Zulgar entgegenzutreten.',
+    'Eine regendurchtränkte Dschungelcaldera, in der zwei erhöhte Jagdpfade einen jadegrünen Cenote umkreisen. Durchquere Tierhöhlen und Ahnenruinen, dann erklimme die Ritualpyramide, um zu sehen, wer oben wartet.',
   'guide.family.demon.desc':
     'Eindringlinge von jenseits der Risse, ganz Feuer und Bosheit. Wo einer steht, ist ein Durchbruch nie fern.',
   'guide.family.demon.name': 'Dämonen',

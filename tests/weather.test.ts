@@ -30,6 +30,7 @@ afterEach(() => {
 interface WeatherProbe {
   material: THREE.PointsMaterial;
   points: THREE.Points;
+  positions: Float32Array;
   mode: 'snow' | 'rain';
   intensity: number;
   textures: { flake: THREE.CanvasTexture; streak: THREE.CanvasTexture };
@@ -42,7 +43,8 @@ function settle(
   cam: THREE.Vector3,
   biome: Parameters<Weather['update']>[2],
 ): void {
-  for (let i = 0; i < 200; i++) weather.update(cam, 0.1, biome);
+  if (biome === null) return;
+  for (let i = 0; i < 200; i++) weather.update(cam, 0.1, biome, () => biome);
 }
 
 describe('ambient precipitation biome mapping', () => {
@@ -79,5 +81,34 @@ describe('ambient precipitation biome mapping', () => {
 
     settle(weather, cam, 'vale');
     expect(probe.points.visible).toBe(false);
+  });
+
+  it('reseeds a live pool when a new precipitation type is masked to a neighbouring biome', () => {
+    installCanvasStub();
+    const scene = new THREE.Scene();
+    const weather = new Weather(scene, true);
+    const probe = weather as unknown as WeatherProbe;
+    const cam = new THREE.Vector3(0, 0, 0);
+
+    settle(weather, cam, 'peaks');
+    expect(probe.mode).toBe('snow');
+    expect(probe.points.visible).toBe(true);
+
+    // The camera stays in clear Amberfall while rain occupies only x > 10.
+    // Switching snow -> rain fades through the style swap while the cloud is
+    // still barely visible, so the swap itself must count as a masked
+    // activation and reseed the whole pool into the rainy side of the border.
+    const remoteRain = (x: number): 'amber' | 'marsh' => (x > 10 ? 'marsh' : 'amber');
+    for (let i = 0; i < 500 && probe.mode !== 'rain'; i++) {
+      weather.update(cam, 0.016, 'amber', remoteRain);
+    }
+
+    expect(probe.mode).toBe('rain');
+    expect(probe.points.visible).toBe(true);
+    let rainy = 0;
+    for (let i = 0; i < probe.positions.length; i += 3) {
+      if (remoteRain(probe.positions[i]) === 'marsh') rainy++;
+    }
+    expect(rainy / (probe.positions.length / 3)).toBeGreaterThan(0.98);
   });
 });

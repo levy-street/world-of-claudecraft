@@ -77,7 +77,7 @@ function placeInWaterTrap(sim: Sim): void {
   const p = sim.player;
   p.pos = {
     x: WATER_TRAP.x,
-    y: swimSurfaceY(WATER_TRAP.x, WATER_TRAP.z),
+    y: swimSurfaceY(WATER_TRAP.x, WATER_TRAP.z, SEED),
     z: WATER_TRAP.z,
   };
   p.prevPos = { ...p.pos };

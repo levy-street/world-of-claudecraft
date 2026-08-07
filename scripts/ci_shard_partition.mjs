@@ -120,7 +120,6 @@ export const DURATION_WEIGHT_OVERLAY = Object.freeze({
   'tests/guild_letter_online.test.ts': 16_000,
   'tests/dungeon_finder.test.ts': 17_000,
   'tests/sfx_studio_server_security.test.ts': 16_000,
-  'tests/ai_review.test.ts': 18_000,
 });
 
 /**

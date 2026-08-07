@@ -701,6 +701,8 @@ function marketInfo(shape: WorldShape): MarketInfo {
     pageCount: 1,
     collectionCopper: 0,
     collectionItems: [],
+    collectionSales: [],
+    collectionSalesOmitted: 0,
     cutPct: 5,
     maxListings: 10,
     myListingCount: 0,

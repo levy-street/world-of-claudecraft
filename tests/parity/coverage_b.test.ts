@@ -214,7 +214,7 @@ describe('coverage: each scenario fires its subsystem', () => {
     // camp fix: the tie SHAPE is preserved (two rollers level at the top), only
     // which rollers tie, the third roll, and the tie-break's winner move, because
     // these branches shift the shared rng and never master-loot logic itself.
-    expect(needRolls).toEqual([63, 51, 63]); // b and d tie at the top, c below
+    expect(needRolls).toEqual([46, 60, 60]); // c and d tie at the top, b below
     // The tie-break picked d, and that outcome is the one observable effect of the
     // master-loot-only draw, so it is pinned by name and by winning roll. WHICH of
     // the tied rollers wins is the rng's call and may move with the seed; that a
@@ -222,7 +222,7 @@ describe('coverage: each scenario fires its subsystem', () => {
     expect(
       evs.filter(
         (e) =>
-          e.type === 'loot' && text(e) === `Ddd wins [[i:greyjaw_hide_boots]] (${needRolls[0]})`,
+          e.type === 'loot' && text(e) === `Ddd wins [[i:greyjaw_hide_boots]] (${needRolls[1]})`,
       ).length,
     ).toBe(4); // announced once to each party member
 

@@ -6,6 +6,9 @@ import { describe, expect, it } from 'vitest';
 const captureContract =
   // @ts-expect-error The executable capture contract intentionally ships as plain Node ESM.
   await import('../scripts/assets/eastbrook_grand_armoury/capture_contract.mjs');
+const { POLISH_SEAL_PATH, REMINT_COMMAND } = await import(
+  '../scripts/assets/eastbrook_grand_armoury/provenance_diagnostics.mjs'
+);
 const {
   assertTownArmouryIdentity,
   assertTownAttributionTargetState,
@@ -616,10 +619,10 @@ function readJsonFile<T>(filePath: string): T {
 // literals; it only moves if the captures themselves are retaken.
 const ACCEPTED_POLISH_V2_TOWN_SOURCE_FINGERPRINT =
   'e15d65fda69efd04395e93dd28af8a56f2fb9bc1ff1125e3b605b07720891367';
-const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(
-  POLISH_ROOT,
-  'metadata/after-desktop-ultra.json',
-);
+// Derived from the diagnostics module's one seal-path constant, so this
+// pin, the failure diagnostics, and the remint tool's printed metadata
+// authority sha can never silently point at three different files.
+const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // Re-pinned for the merge of release/v0.34.0 into this branch. Every
 // rendererIntegration move on both sides now stacks on src/render/renderer.ts:
 // from the release, PR #2720's Eastbrook fence-removal layout evidence, the live
@@ -634,14 +637,24 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(
 // at the same captured view, and only its swept provenance bytes follow the
 // merged rendererIntegration and layout inputs.
 // Re-minted with scripts/assets/eastbrook_grand_armoury/remint_polish_provenance.mjs.
-// Re-pinned again for the mobile-disconnect fix: src/render/renderer.ts gains the
-// bounded ground-object reuse pool (storePooledObject/takePooledObject cap), the
-// rendererIntegration leaf, so the composite (and the metadata file's second-order
-// digest that embeds it) re-mint once more.
+// Re-pinned for the integrated v0.35 renderer on AAA-enhancements. The accepted
+// captures are unchanged; only the rendererIntegration leaf, composite, and the
+// metadata file's second-order digest are re-minted on this branch.
+// Re-pinned again for the merge of release/v0.35.0 into AAA-enhancements: both
+// sides moved the rendererIntegration leaf (this branch's integrated v0.35
+// renderer; the release's bounded ground-object reuse pool), so the merged tree
+// mints literals matching neither parent. Captures adopted verbatim from the
+// release tip; swept by remint_polish_provenance.mjs on the merged tree.
+// Re-pinned for the PR #2982 merge: the release-side weapon-skin apply queue
+// and the PR-side ability VFX warm-up both move runtimeRender provenance leaves
+// (src/render/renderer.ts and src/render/prewarm_policy.ts), so the composite
+// and metadata seal both re-mint on the merged tree. No capture was retaken.
+// Re-pinned for the PR #2983 revert: the rendererIntegration leaf moved back
+// while PR #2982's prewarm policy remains in the release. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '515dade30aaad522cbda78d46b01b6c533a8eb4d9d05f11c65b761ced62cbb3b';
+  '19fb0f88b9df4c2db922b3a110c31c42f23e770ca36b22befccc311755a6e52b';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '9ed193cbbdadd0b3923427002f07252968b3969b273d24f2a7a200c214d1ef72';
+  '8009031470c8cd5831d3171dd630c8cf58eebc10678c392a8e70e5b8fbd67693';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -932,8 +945,16 @@ describe('Eastbrook polish committed capture artifacts', () => {
   });
 
   it('pins the historical metadata authority independently', () => {
-    expect(sha256File(ACCEPTED_POLISH_V2_METADATA_PATH)).toBe(ACCEPTED_POLISH_V2_METADATA_SHA256);
-    expect(ACCEPTED_POLISH_V2_PROVENANCE.fingerprint).toBe(ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE);
+    // On a legitimate re-mint both literals move together with the capture
+    // contract's composite pin; the remint tool prints all three.
+    expect(
+      sha256File(ACCEPTED_POLISH_V2_METADATA_PATH),
+      `the accepted metadata authority moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND}`,
+    ).toBe(ACCEPTED_POLISH_V2_METADATA_SHA256);
+    expect(
+      ACCEPTED_POLISH_V2_PROVENANCE.fingerprint,
+      `the sealed composite fingerprint moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND}`,
+    ).toBe(ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE);
   });
 
   // The frozen polish-v2 evidence intentionally predates the bank rebuild: it
@@ -1509,11 +1530,18 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // every measured value (frame timings, draw stats, triangle and scenario
     // numbers) is adopted verbatim from the base tip; no parent's literal
     // matched the merged tree, and no capture was retaken here.
-    // Re-pinned again for the mobile-disconnect fix's src/render/renderer.ts change
-    // (bounded ground-object reuse pool), recomputed by remint_polish_provenance.mjs.
-    expect(fingerprint.digest('hex')).toBe(
-      '46522bd82e547f81b7a97c52333ce561223f18e09f715cc42a10f5c5a0d593d1',
-    );
+    // Re-pinned for the integrated v0.35 renderer on AAA-enhancements and
+    // recomputed by remint_polish_provenance.mjs.
+    // Re-pinned for the PR #2982 merge: the first-order composite follows the
+    // release-side weapon-skin renderer changes and the PR-side ability VFX
+    // warm-up changes, then this second-order performance seal follows the
+    // swept evidence bytes. No capture was retaken.
+    // Re-pinned for the PR #2983 revert: the swept evidence follows the
+    // reverted renderer while preserving PR #2982's prewarm-policy leaf.
+    expect(
+      fingerprint.digest('hex'),
+      `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
+    ).toBe('a34e518a7e1f38d98e6260e1185ede860246e45dbb96b79521e37e21b14c8545');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

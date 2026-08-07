@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { ITEMS } from '../src/sim/data';
+import type { MarketCollection } from '../src/sim/market';
 import { MARKET_PLAYER_LISTING_ID_BASE } from '../src/sim/market_listing_ids';
 import type { MarketQuery } from '../src/sim/market_query';
+import { emptySaleLog, type MarketSaleLog } from '../src/sim/market_sale_log';
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
@@ -439,6 +441,215 @@ describe('the World Market: the Merchant', () => {
     expect(sim.marketInfoFor(seller)?.collectionCopper).toBe(0);
   });
 
+  // The pending sale ledger: the itemized rows behind the one proceeds figure, so
+  // a seller can tell WHICH listings sold rather than reading a bare copper total.
+  // The leaf's own math is tests/market_sale_log.test.ts; these pin the wiring.
+  describe('the pending sale ledger', () => {
+    // Sell `count` copies at `price` and return the seller's fresh market view.
+    const sellOne = (
+      sim: Sim,
+      seller: number,
+      buyer: number,
+      itemId: string,
+      count: number,
+      price: number,
+    ): MarketInfo => {
+      sim.addItem(itemId, count, seller);
+      sim.marketList(itemId, count, price, seller);
+      sim.marketBuy(
+        listingBy(
+          sim,
+          (l) => l.sellerKey === marketSellerKey(seller) && l.itemId === itemId,
+          `${itemId} listing`,
+        ).id,
+        buyer,
+      );
+      return marketInfo(sim, seller);
+    };
+
+    const world = () => {
+      const sim = makeWorld();
+      const seller = sim.addPlayer('warrior', 'Seller');
+      const buyer = sim.addPlayer('mage', 'Buyer');
+      standAtMerchant(sim, seller);
+      standAtMerchant(sim, buyer);
+      playerOf(sim, buyer).copper = 100_000;
+      return { sim, seller, buyer };
+    };
+
+    it('itemizes a completed sale beside the gold it produced', () => {
+      const { sim, seller, buyer } = world();
+
+      const info = sellOne(sim, seller, buyer, 'wolf_fang', 2, 1000);
+
+      expect(info.collectionCopper).toBe(950); // 1000 - 5%
+      expect(info.collectionSales).toEqual([
+        { itemId: 'wolf_fang', count: 2, price: 1000, proceeds: 950, buyerName: 'Buyer' },
+      ]);
+      expect(info.collectionSalesOmitted).toBe(0);
+    });
+
+    it('lists one row per sale, oldest first, and the rows sum to the proceeds', () => {
+      const { sim, seller, buyer } = world();
+
+      sellOne(sim, seller, buyer, 'wolf_fang', 1, 1000);
+      const info = sellOne(sim, seller, buyer, 'bone_fragments', 3, 500);
+
+      expect(info.collectionSales.map((s) => s.itemId)).toEqual(['wolf_fang', 'bone_fragments']);
+      expect(info.collectionSales.reduce((n, s) => n + s.proceeds, 0)).toBe(info.collectionCopper);
+    });
+
+    it('clears the ledger with the gold it explains', () => {
+      const { sim, seller, buyer } = world();
+      sellOne(sim, seller, buyer, 'wolf_fang', 1, 1000);
+
+      sim.marketCollect(seller);
+
+      const after = marketInfo(sim, seller);
+      expect(after.collectionCopper).toBe(0);
+      expect(after.collectionSales).toEqual([]);
+      expect(after.collectionSalesOmitted).toBe(0);
+      expect(copperOf(sim, seller)).toBe(950);
+    });
+
+    it('does not re-pay or re-show a collected sale on the next collect', () => {
+      const { sim, seller, buyer } = world();
+      sellOne(sim, seller, buyer, 'wolf_fang', 1, 1000);
+      sim.marketCollect(seller);
+      sim.drainEvents();
+
+      sim.marketCollect(seller);
+
+      expect(copperOf(sim, seller)).toBe(950);
+      expect(marketInfo(sim, seller).collectionSales).toEqual([]);
+      expect(
+        sim
+          .drainEvents()
+          .some((e) => e.type === 'error' && e.text === 'You have nothing to collect.'),
+      ).toBe(true);
+    });
+
+    // The trap this feature could most easily ship: the item arm returns EARLY when
+    // bags are full, but the gold is always taken. A ledger cleared at the end of
+    // the method would survive that return and be shown (and paid out) again.
+    it('a bags-full collect takes the gold AND the ledger, and leaves the goods', () => {
+      const { sim, seller, buyer } = world();
+      sellOne(sim, seller, buyer, 'wolf_fang', 1, 1000);
+      // A second listing expires back into the same collection, so this collect has
+      // both a purse and goods waiting.
+      sim.addItem('bone_fragments', 1, seller);
+      sim.marketList('bone_fragments', 1, 50, seller);
+      const listing = listingBy(sim, (l) => l.itemId === 'bone_fragments', 'expiring listing');
+      listing.expiresAt = sim.time - 1;
+      for (let i = 0; i < 20; i++) sim.tick(); // updateMarket runs once a second
+      const meta = playerOf(sim, seller);
+      meta.bags = [null, null, null, null];
+      meta.inventory = Array.from({ length: 16 }, () => ({ itemId: 'roasted_boar', count: 20 }));
+      sim.drainEvents();
+
+      sim.marketCollect(seller);
+
+      expect(
+        sim.drainEvents().some((e) => e.type === 'error' && e.text === 'Your bags are full.'),
+      ).toBe(true);
+      const after = marketInfo(sim, seller);
+      expect(copperOf(sim, seller)).toBe(950); // gold always lands
+      expect(after.collectionCopper).toBe(0);
+      expect(after.collectionSales).toEqual([]); // and its ledger left with it
+      expect(after.collectionItems).toEqual([{ itemId: 'bone_fragments', count: 1 }]);
+    });
+
+    // A 1-copper listing nets floor(1 * 0.95) = 0, so the sale leaves a row and no
+    // coin. Nothing else in the collection would report it, and the old
+    // gold-or-goods emptiness test would have stranded it forever.
+    it('a sale whose proceeds floor to zero still shows, still pends, and still clears', () => {
+      const { sim, seller, buyer } = world();
+
+      const info = sellOne(sim, seller, buyer, 'wolf_fang', 1, 1);
+
+      expect(info.collectionCopper).toBe(0);
+      expect(info.collectionSales).toEqual([
+        { itemId: 'wolf_fang', count: 1, price: 1, proceeds: 0, buyerName: 'Buyer' },
+      ]);
+      expect(sim.marketCollectPendingFor(seller)).toBe(true);
+
+      sim.marketCollect(seller);
+
+      expect(marketInfo(sim, seller).collectionSales).toEqual([]);
+      expect(sim.marketCollectPendingFor(seller)).toBe(false);
+    });
+
+    it('follows the seller through a rename, with the gold it accounts for', () => {
+      const { sim, seller, buyer } = world();
+      sellOne(sim, seller, buyer, 'wolf_fang', 1, 1000);
+      // Re-key the collection to the legacy name-keyed bucket the rename folds in.
+      const internals = sim.market as unknown as {
+        marketCollections: Map<string, MarketCollection>;
+      };
+      const col = internals.marketCollections.get(marketSellerKey(seller));
+      if (!col) throw new Error('missing seller collection');
+      internals.marketCollections.delete(marketSellerKey(seller));
+      internals.marketCollections.set('Seller', col);
+
+      expect(sim.rekeyMarketSeller(Number(marketSellerKey(seller)), 'Seller', 'Renamed')).toBe(
+        true,
+      );
+      renameLiveCharacter(sim, seller, 'Renamed');
+
+      const after = marketInfo(sim, seller);
+      expect(after.collectionCopper).toBe(950);
+      expect(after.collectionSales).toEqual([
+        { itemId: 'wolf_fang', count: 1, price: 1000, proceeds: 950, buyerName: 'Buyer' },
+      ]);
+    });
+
+    it('survives a market save/load round-trip', () => {
+      const { sim, seller, buyer } = world();
+      sellOne(sim, seller, buyer, 'wolf_fang', 2, 1000);
+
+      const save = sim.serializeMarket();
+      const sim2 = makeWorld();
+      sim2.loadMarket(save);
+      const reloaded = (
+        sim2.market as unknown as { marketCollections: Map<string, MarketCollection> }
+      ).marketCollections.get(marketSellerKey(seller));
+
+      expect(reloaded?.copper).toBe(950);
+      expect(reloaded?.sales.entries).toEqual([
+        { itemId: 'wolf_fang', count: 2, price: 1000, proceeds: 950, buyerName: 'Buyer' },
+      ]);
+      expect(reloaded?.sales.omitted).toBe(0);
+    });
+
+    it('writes no sales key for a collection holding only returns (old blobs unchanged)', () => {
+      const { sim, seller } = world();
+      sim.addItem('bone_fragments', 1, seller);
+      sim.marketList('bone_fragments', 1, 50, seller);
+      listingBy(sim, (l) => l.itemId === 'bone_fragments', 'expiring listing').expiresAt =
+        sim.time - 1;
+      for (let i = 0; i < 20; i++) sim.tick(); // updateMarket runs once a second
+
+      const row = sim.serializeMarket().collections.find((c) => c.copper === 0);
+      expect(row?.items.length).toBe(1);
+      expect('sales' in (row ?? {})).toBe(false);
+    });
+
+    it('loads a pre-ledger save (a collection with no sales key) as an empty ledger', () => {
+      const sim = makeWorld();
+      sim.loadMarket({
+        listings: [],
+        collections: [{ key: '77', copper: 500, items: [] }],
+        nextListingId: 1,
+      });
+
+      const col = (
+        sim.market as unknown as { marketCollections: Map<string, MarketCollection> }
+      ).marketCollections.get('77');
+      expect(col?.copper).toBe(500);
+      expect(col?.sales).toEqual({ entries: [], omitted: 0 });
+    });
+  });
+
   it('forbids buying your own listing, but lets you reclaim it', () => {
     const sim = makeWorld();
     const seller = sim.addPlayer('warrior', 'Seller');
@@ -529,9 +740,9 @@ describe('the World Market: the Merchant', () => {
     listing.sellerKey = 'Seller';
     listing.sellerName = 'Seller';
     const internals = sim.market as unknown as {
-      marketCollections: Map<string, { copper: number; items: [] }>;
+      marketCollections: Map<string, { copper: number; items: []; sales: MarketSaleLog }>;
     };
-    internals.marketCollections.set('Seller', { copper: 95, items: [] });
+    internals.marketCollections.set('Seller', { copper: 95, items: [], sales: emptySaleLog() });
 
     expect(sim.rekeyMarketSeller(77, 'Seller', 'Renamed')).toBe(true);
     renameLiveCharacter(sim, seller, 'Renamed');
@@ -557,12 +768,13 @@ describe('the World Market: the Merchant', () => {
     const internals = sim.market as unknown as {
       marketCollections: Map<
         string,
-        { copper: number; items: { instance?: { signer?: string } }[] }
+        { copper: number; items: { instance?: { signer?: string } }[]; sales: MarketSaleLog }
       >;
     };
     internals.marketCollections.set('77', {
       copper: 0,
       items: [{ itemId: 'wolf_fang', count: 1, instance: { signer: 'Seller' } } as never],
+      sales: emptySaleLog(),
     });
 
     expect(sim.rekeyMarketSeller(77, 'Seller', 'Renamed')).toBe(true);

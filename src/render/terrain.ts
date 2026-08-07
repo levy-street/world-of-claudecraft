@@ -1,22 +1,30 @@
 import * as THREE from 'three';
 import {
-  COLUMN_ZONES,
-  columnBlendAt,
   STRIP_MAX_X,
   STRIP_MIN_X,
-  STRIP_ZONES,
   WORLD_MAX_X,
   WORLD_MAX_Z,
   WORLD_MIN_Z,
   ZONES,
 } from '../sim/data';
-import { fbm2 } from '../sim/rng';
-import type { BiomeId, ZoneDef } from '../sim/types';
-import { roadDistance, WATER_LEVEL, zoneBiomeAt } from '../sim/world';
+import type { ZoneDef } from '../sim/types';
+import { WATER_LEVEL } from '../sim/world';
 import { loadTexture } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
+import {
+  BIOME_HAZE_DECLARATIONS,
+  biomeHazeFragmentGlsl,
+  biomeHazeUniforms,
+  hasBiomeHazeField,
+} from './biome_haze_field';
 import { type ChunkGrid, type GroundPendingAt, orderCellsForEntry } from './chunk_residency_core';
-import { GFX, type GfxSettings, SUN_DIR } from './gfx';
+import { GFX, type GfxSettings, SUN_DIR, sharedUniforms } from './gfx';
+import {
+  hasNightLightField,
+  NIGHT_LIGHT_DECLARATIONS,
+  nightLightFragmentGlsl,
+  nightLightUniforms,
+} from './night_light_field';
 import { renderLayerDisabled } from './render_dev_flags';
 
 // The terrain relief ladder (GFX.terrainRelief, one source for the tier
@@ -36,12 +44,16 @@ const terrainReliefLevel = (): number => (renderLayerDisabled('trelief') ? 0 : G
 const richTerrainSplat = (): boolean =>
   terrainReliefLevel() >= 1 && !renderLayerDisabled('talbedo');
 
+import { getGrassGroundBake } from './grass_ground_bake';
 import { idleSlot } from './idle_queue';
-import { impactCraterTerrainBlend } from './impact_terrain';
+import {
+  GRASS_BAKE_PATCH_YARDS,
+  GRASS_PAINT_GAIN,
+  MEADOW_CARPET_FADE_START,
+} from './meadow_tuning';
 import {
   beginChunkGeometry,
   type ChunkGeometryArrays,
-  type ChunkGeometryBuildState,
   fillChunkIndexRow,
   fillChunkVertexRow,
 } from './terrain_chunk_build';
@@ -535,8 +547,8 @@ const float WOC_GRASS_MID_OCTAVE = 0.22;
 // Both endpoints average ~1.0 so the drift is value-neutral: it can never
 // read as light/dark patching, only as hue you feel across a field.
 const float WOC_GRASS_HUE_DRIFT_FREQ = 0.024;
-const vec3 WOC_GRASS_HUE_WARM = vec3(1.035, 1.012, 0.955);
-const vec3 WOC_GRASS_HUE_COOL = vec3(0.968, 0.995, 1.042);
+const vec3 WOC_GRASS_HUE_WARM = vec3(1.05, 1.015, 0.94);
+const vec3 WOC_GRASS_HUE_COOL = vec3(0.952, 0.99, 1.058);
 // WOC_COMB_*: combed-turf anisotropy. The finest grass detail (the fine
 // albedo octave, the blade normal, the 3x fine-soft grain) samples through a
 // locally-rotating anisotropic transform: features stretch 1/COMPRESS
@@ -556,7 +568,220 @@ const float WOC_GRASS_H_MEAN = 0.812;   // measured R-channel mean
 const float WOC_GRASS_H_INV_SD = 12.9;  // 1 / measured R-channel sd 0.0775
 const float WOC_GRASS_HEIGHT_SHADE = 0.10;
 const float WOC_GRASS_RECESS_SAT = 0.12;
+// --- distance gates: stop paying for taps whose signal has mipped away ---
+// WOC_MICRO_SHADOW_*: the micro sun-shadow marches the height proxy one
+// SUN_UV_STEP (0.016 uv = 0.073 yards = about 8 texels of the 512px packed AO
+// field) toward the sun and shades where the sunward neighbourhood reads
+// higher. Once mip selection picks a footprint wider than that step BOTH
+// probes land in the same texel and occl is zero BY ARITHMETIC, which the
+// shipped code still paid two to six texture taps to compute. That happens
+// near 59 yards (one texel subtends a pixel at about 7.4 yards, so the step is
+// covered at mip 3), so the term fades out over 40 to 70 and the taps are
+// skipped entirely past the far end: no visible change, the shader simply
+// stops computing a zero.
+const float WOC_MICRO_SHADOW_NEAR = 40.0;
+const float WOC_MICRO_SHADOW_FAR = 70.0;
+// WOC_DETAIL_N_*: the planar-XZ detail normals (grass blade, dirt, rock, sand,
+// the fine octaves and the gravel grain) all live at 4.5 to 8 yard tilings, so
+// mip averaging pulls a normal map toward flat (0, 0, 1) and their
+// perturbation decays with the mip scale: roughly 7 percent of the near-field
+// amplitude at 100 yards and under 4 percent past 220, on top of the slope
+// fade that already keeps them to near-horizontal ground. Fading them out over
+// 120 to 220 and skipping the taps past that is the one place this shader
+// trades something real, and what it trades is a few percent of micro relief
+// on flat ground more than 120 yards away. The CLIFF wall normals are
+// deliberately NOT gated: wall relief is what makes a mountainside read as
+// rock all the way out to the detail horizon.
+const float WOC_DETAIL_N_NEAR = 120.0;
+const float WOC_DETAIL_N_FAR = 220.0;
 `;
+
+// The paint-free ring: inside the dense blade carpet the soil shows the
+// plain photo grass, and the painted meadow ramps in across the carpet's
+// own outer fade (MEADOW_CARPET_FADE_START of the tier radius), so the real
+// blades and the painted ones never share the same ground and the two fades
+// cannot drift apart. uCarpetRing is (player xz, tier carpet radius) via
+// sharedUniforms; radius 0 (a tier with no carpet, or ?meadowband=off style
+// dev flags publishing nothing) keeps the paint everywhere, exactly the
+// shipped look. uPlainLift is a CPU-computed CONSTANT (bake mean over the
+// photo layer's mean, clamped to a sane range, identity when either mean is
+// unavailable): tone continuity with zero per-pixel sampler arithmetic, so
+// no code path can leave the safe range the way a live mip-division did.
+const GRASS_PAINT_RING_GLSL = `
+          if ( uCarpetRing.z > 0.0 ) {
+            float wocPaintT = smoothstep(uCarpetRing.z * ${MEADOW_CARPET_FADE_START.toFixed(2)},
+              uCarpetRing.z, distance(vWPos.xz, uCarpetRing.xy));
+            grassAlb = mix(WOC_ALB(tuv, WOC_L_GRASS) * uPlainLift, grassAlb, wocPaintT);
+          }`;
+
+// The meadow-continuum grass layer: when the ground bake exists, the grass
+// albedo is the BAKED blade artwork (grass_ground_bake.ts) sampled ONCE at
+// true world scale, replacing the photo octave stack. No rescaled octaves:
+// a rescaled stroke is a scaled-up grass element, which the meadow rules
+// ban; anti-tiling comes from the jitter phase drift and the hue wander
+// only. The comb-frame locals stay declared at both tiers because the
+// detail-normal chunk and the tussock shade still sample through them.
+function grassBakeAlbedoGlsl(rich: boolean): string {
+  const uvScale = (1 / GRASS_BAKE_PATCH_YARDS).toFixed(6);
+  const comb = rich
+    ? `vec2 grassJitter = vec2(0.0);
+        if ( wocHasGrass ) {
+          grassJitter = (vec2(
+            texture2D(uMacro, vWPos.xz * 0.028 + 0.07).r,
+            texture2D(uMacro, vWPos.xz * 0.028 + 0.63).r) - 0.5) * WOC_GRASS_SCALE_JITTER;
+        }
+        vec2 combDir = vec2(1.0, 0.0);
+        if ( wocHasGrass || wocHasSand ) {
+          float combA = (texture2D(uMacro, vWPos.xz * WOC_COMB_FREQ + 0.19).r - 0.5) * WOC_COMB_SWING;
+          combDir = vec2(cos(combA), sin(combA));
+        }
+        vec2 combPerp = vec2(-combDir.y, combDir.x);
+        vec2 combT = vec2(dot(tuv, combDir) * WOC_COMB_COMPRESS, dot(tuv, combPerp));
+        vec3 grassAlb = vec3(0.0);
+        if ( wocHasGrass ) {
+          grassAlb = texture2D(uGrassBake, vWPos.xz * ${uvScale} + grassJitter).rgb;
+          float bakeHueT = texture2D(uMacro, vWPos.xz * WOC_GRASS_HUE_DRIFT_FREQ + 0.53).r;
+          grassAlb *= mix(WOC_GRASS_HUE_WARM, WOC_GRASS_HUE_COOL, bakeHueT);${GRASS_PAINT_RING_GLSL}
+        }`
+    : `vec2 combT = tuv;
+        vec2 grassJitter = vec2(0.0);
+        vec2 combDir = vec2(1.0, 0.0);
+        vec2 combPerp = vec2(0.0, 1.0);
+        vec3 grassAlb = vec3(0.0);
+        if ( wocHasGrass ) {
+          grassAlb = texture2D(uGrassBake, vWPos.xz * ${uvScale}).rgb;${GRASS_PAINT_RING_GLSL}
+        }`;
+  return comb;
+}
+
+/**
+ * The paint ring's constant tone lift: bake mean over the photo grass
+ * layer's mean, both linear, clamped to a sane range. Identity when the
+ * photo layer's mean is unavailable (its image had not resolved when the
+ * albedo array was packed): the ring then shows the photo layer at its own
+ * tone, which at worst is a slight tone step under the dense carpet, never
+ * a runaway.
+ */
+function plainGrassLift(
+  photoMean: readonly [number, number, number] | null,
+  bakeMean: readonly [number, number, number],
+): THREE.Vector3 {
+  const lift = new THREE.Vector3(1, 1, 1);
+  if (!photoMean) return lift;
+  const clamp = (v: number) => Math.min(2.5, Math.max(0.4, v));
+  if (photoMean[0] > 1e-4) lift.x = clamp(bakeMean[0] / photoMean[0]);
+  if (photoMean[1] > 1e-4) lift.y = clamp(bakeMean[1] / photoMean[1]);
+  if (photoMean[2] > 1e-4) lift.z = clamp(bakeMean[2] / photoMean[2]);
+  return lift;
+}
+
+// ---------------------------------------------------------------------------
+// The packed albedo array: the six splat photo COLOUR layers (grass, dirt,
+// rock, sand, mud, snow) in ONE sampler2DArray, because the splat fragment
+// shader lives against the WebGL guarantee of 16 texture units and six
+// separate albedo samplers no longer fit. The count that broke it, at the
+// ultra tier: 12 photo samplers + uMacro + uGroundAO + uGrassBake +
+// uHazeField + three's own normalMap + directionalShadowMap + envMap = 17,
+// and a program past 16 FAILS TO LINK, which draws no terrain at all (the
+// v0.34 invisible-ground regression: useProgram spam, ground missing under
+// the player). Packing the albedos into one array unit brings the shader to
+// 12 with headroom; tests/terrain_sampler_budget.test.ts pins the budget.
+// ---------------------------------------------------------------------------
+
+/** Layer order of the packed albedo array; the shader's WOC_L_* constants
+ *  mirror these indices and the budget test pins the two lists together. */
+export const SPLAT_ALBEDO_LAYERS = ['grassC', 'dirtC', 'rockC', 'sandC', 'mudC', 'snowC'] as const;
+const SPLAT_ALBEDO_SIZE = 1024;
+
+// The shader half of the pack: WOC_ALB replaces what used to be a
+// texture2D(u<Layer>, uv).rgb tap, sampling the same texel from the array
+// (the rows are packed bottom-up to match the flipY the image textures had).
+const SPLAT_ALBEDO_GLSL = `
+        #define WOC_ALB( uv, layer ) texture( uAlb, vec3( uv, layer ) ).rgb
+        const float WOC_L_GRASS = 0.0;
+        const float WOC_L_DIRT = 1.0;
+        const float WOC_L_ROCK = 2.0;
+        const float WOC_L_SAND = 3.0;
+        const float WOC_L_MUD = 4.0;
+        const float WOC_L_SNOW = 5.0;`;
+
+interface SplatAlbedoArray {
+  texture: THREE.DataArrayTexture;
+  /** Linear-space mean of the grass layer, or null when its image had not
+   *  resolved and the layer is the neutral fail-safe fill. */
+  grassMean: [number, number, number] | null;
+  /** True when every layer was packed from a real, resolved image. */
+  complete: boolean;
+}
+
+let splatAlbedoCache: SplatAlbedoArray | null = null;
+
+/**
+ * Pack the six albedo photos into one DataArrayTexture. Carries the old
+ * per-texture FAIL-SAFE forward: a layer whose image has not resolved is
+ * filled neutral mid-grey (quietly wrong) instead of three's default white
+ * (loudly wrong). Rows are written bottom-up so each layer samples exactly
+ * as the flipY image textures it replaces. Cached once complete; a build
+ * that had to fill any placeholder re-packs on the next world build, when
+ * the deferred preload has had time to land.
+ */
+function buildSplatAlbedoArray(t: Record<string, THREE.Texture>): SplatAlbedoArray {
+  if (splatAlbedoCache?.complete) return splatAlbedoCache;
+  const size = SPLAT_ALBEDO_SIZE;
+  const data = new Uint8Array(size * size * 4 * SPLAT_ALBEDO_LAYERS.length);
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext('2d', { willReadFrequently: true });
+  let complete = true;
+  let grassMean: [number, number, number] | null = null;
+  for (let layer = 0; layer < SPLAT_ALBEDO_LAYERS.length; layer++) {
+    const img = t[SPLAT_ALBEDO_LAYERS[layer]]?.image as CanvasImageSource | undefined;
+    const w = (img as { width?: number } | undefined)?.width;
+    const dst = data.subarray(layer * size * size * 4, (layer + 1) * size * size * 4);
+    if (!ctx || !img || !w) {
+      dst.fill(96); // the neutral fail-safe shade the per-texture bind used
+      for (let i = 3; i < dst.length; i += 4) dst[i] = 255;
+      complete = false;
+      continue;
+    }
+    ctx.save();
+    // bottom-up rows: DataArrayTexture never flips, the Image textures did
+    ctx.translate(0, size);
+    ctx.scale(1, -1);
+    ctx.drawImage(img, 0, 0, size, size);
+    ctx.restore();
+    const px = ctx.getImageData(0, 0, size, size).data;
+    dst.set(px);
+    if (SPLAT_ALBEDO_LAYERS[layer] === 'grassC') {
+      let r = 0;
+      let g = 0;
+      let b = 0;
+      for (let i = 0; i < px.length; i += 4) {
+        r += px[i];
+        g += px[i + 1];
+        b += px[i + 2];
+      }
+      const inv = 4 / px.length;
+      // canvas bytes are sRGB; the shader samples through an sRGB decode,
+      // so the mean is carried in linear space (gamma 2.2 approximation)
+      const lin = (sum: number) => ((sum * inv) / 255) ** 2.2;
+      grassMean = [lin(r), lin(g), lin(b)];
+    }
+  }
+  const texture = new THREE.DataArrayTexture(data, size, size, SPLAT_ALBEDO_LAYERS.length);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.wrapS = THREE.RepeatWrapping;
+  texture.wrapT = THREE.RepeatWrapping;
+  texture.magFilter = THREE.LinearFilter;
+  texture.minFilter = THREE.LinearMipmapLinearFilter;
+  texture.generateMipmaps = true;
+  texture.anisotropy = ALBEDO_ANISOTROPY;
+  texture.needsUpdate = true;
+  splatAlbedoCache?.texture.dispose();
+  splatAlbedoCache = { texture, grassMean, complete };
+  return splatAlbedoCache;
+}
 
 function buildSplatMaterial(
   normalTex: THREE.DataTexture,
@@ -568,6 +793,15 @@ function buildSplatMaterial(
   groundSplatMaps();
   const macro = macroNoiseTexture();
   const t = TERRAIN_TEX;
+  // The meadow-continuum ground paint: present whenever the renderer baked
+  // the blade-cluster texture before terrain build. ?grassbake=off is the
+  // dev A/B switch back to the photo grass layer.
+  const grassBake = renderLayerDisabled('grassbake') ? null : getGrassGroundBake();
+  // Distant-zone atmosphere: resolved once, before compile, so a tier without
+  // the field (low, `?zonehaze=off`) keeps the exact shader it always had.
+  const zoneHaze = hasBiomeHazeField();
+  // Night lamplight on the ground, same compile-time contract (`?nightlights=off`).
+  const nightLights = hasNightLightField();
   const mat = new THREE.MeshStandardMaterial({
     vertexColors: true,
     roughness: 1.0,
@@ -575,22 +809,40 @@ function buildSplatMaterial(
     normalMap: normalTex,
     normalScale: new THREE.Vector2(1.15, 1.15),
   });
+  // FAIL-SAFE for the splat photo set: a texture whose image has not
+  // resolved yet binds as three's default WHITE, and a white splat layer
+  // paints the whole ground flat pale (seen live, intermittent: the bake's
+  // synchronous constructor readback can reorder against the deferred
+  // preload lane). A neutral mid-grey placeholder is wrong quietly for a
+  // frame; white is wrong loudly forever, because the bind is by value.
+  // The six COLOUR layers carry the same fail-safe inside the packed array
+  // (buildSplatAlbedoArray fills a missing layer neutral grey).
+  const neutral = new THREE.DataTexture(new Uint8Array([96, 96, 96, 255]), 1, 1);
+  neutral.needsUpdate = true;
+  const resolved = (tex: THREE.Texture | undefined): THREE.Texture =>
+    (tex?.image as { width?: number } | undefined)?.width ? (tex as THREE.Texture) : neutral;
+  const albedo = buildSplatAlbedoArray(t);
   mat.onBeforeCompile = (sh) => {
     Object.assign(sh.uniforms, brush);
     Object.assign(sh.uniforms, {
-      uGrass: { value: t.grassC },
-      uGrassN: { value: t.grassN },
-      uDirt: { value: t.dirtC },
-      uDirtN: { value: t.dirtN },
-      uRock: { value: t.rockC },
-      uRockN: { value: t.rockN },
-      uSand: { value: t.sandC },
-      uSandN: { value: t.sandN },
-      uMud: { value: t.mudC },
-      uSnow: { value: t.snowC },
+      uAlb: { value: albedo.texture },
+      uGrassN: { value: resolved(t.grassN) },
+      uDirtN: { value: resolved(t.dirtN) },
+      uRockN: { value: resolved(t.rockN) },
+      uSandN: { value: resolved(t.sandN) },
       uMacro: { value: macro },
       uGroundAO: { value: t.groundAO },
     });
+    if (grassBake) {
+      sh.uniforms.uGrassBake = { value: grassBake.texture };
+      // The paint-free ring (GRASS_PAINT_RING_GLSL): the live ring by shared
+      // reference, and the constant tone lift computed ONCE here. Identity
+      // (1,1,1) whenever the photo layer's mean cannot be read: the worst
+      // case is then a slight tone step under the dense carpet, never a
+      // blown-out ground.
+      sh.uniforms.uCarpetRing = sharedUniforms.uCarpetRing;
+      sh.uniforms.uPlainLift = { value: plainGrassLift(albedo.grassMean, grassBake.mean) };
+    }
     sh.vertexShader = sh.vertexShader
       .replace(
         '#include <common>',
@@ -627,7 +879,11 @@ function buildSplatMaterial(
         flat varying vec2 vTerrainExtraPresence;
         varying vec3 vWPos;
         varying vec3 vWNorm;
-        uniform sampler2D uGrass, uGrassN, uDirt, uDirtN, uRock, uRockN, uSand, uSandN, uMud, uSnow, uMacro, uGroundAO;
+        precision highp sampler2DArray;
+        uniform sampler2DArray uAlb;
+        uniform sampler2D uGrassN, uDirtN, uRockN, uSandN, uMacro, uGroundAO;
+        ${grassBake ? 'uniform sampler2D uGrassBake;\n        uniform vec3 uCarpetRing;\n        uniform vec3 uPlainLift;' : ''}
+        ${SPLAT_ALBEDO_GLSL}
         ${GROUND_RELIEF_GLSL}
         ${BRUSH_RING_GLSL}`,
       )
@@ -687,6 +943,15 @@ function buildSplatMaterial(
         float wocCamDist = length(pRay);`
             : 'float wocCamDist = length(cameraPosition - vWPos);'
         }
+        // Detail-distance fade: the fine grain (grass octave jitter, the mid
+        // octave, the hue drift, and every per-layer detail-normal tap) is
+        // sub-pixel past ~60yd, where mips have already averaged the maps to
+        // their DC. Each gated effect multiplies by this fade so it reaches
+        // exactly zero BEFORE its taps stop being sampled: the skip is
+        // seam-free by construction and the far field drops around a dozen
+        // texture taps per fragment.
+        float wocDetailFade = 1.0 - smoothstep(46.0, 62.0, wocCamDist);
+        bool wocNearDetail = wocDetailFade > 0.001;
         ${
           // upW feeds both the parallax fade and the cavity slope fade; emit
           // it once whenever any relief level is active.
@@ -796,12 +1061,20 @@ function buildSplatMaterial(
         // scale, so march the height proxy two steps toward the sun and shade
         // texels whose sunward neighbourhood sits higher, creating clod-scale
         // self-shadowing that gives the relief a lit and a shade side.
-        {
+        //
+        // Distance-gated (WOC_MICRO_SHADOW_*): the march is one clod wide, so
+        // past the mip level that covers it both probes read the same texel
+        // and occl is zero on its own. The gate only stops the shader paying
+        // two to six texture taps to arrive at that zero; the smoothstep is
+        // what guarantees no ring at the boundary.
+        float microFade = 1.0
+          - smoothstep(WOC_MICRO_SHADOW_NEAR, WOC_MICRO_SHADOW_FAR, wocCamDist);
+        if (microFade > 0.0) {
           vec2 sunStep = vec2(${SUN_UV_STEP.x}, ${SUN_UV_STEP.y});
           float occl = max(
             wocGroundHeight(tuv + sunStep, swShade) - cavH - 0.02,
             (wocGroundHeight(tuv + sunStep * 2.2, swShade) - cavH) * 0.55 - 0.02);
-          groundShade *= 1.0 - min(max(occl, 0.0) * 4.5, 0.42) * cavW;
+          groundShade *= 1.0 - min(max(occl, 0.0) * 4.5, 0.42) * cavW * microFade;
         }`
             : ''
         }`
@@ -832,17 +1105,23 @@ function buildSplatMaterial(
           // bench measured the meadow tier gap with relief already off, so
           // the no-relief tiers keep the plain two-octave anti-tiling mix.
           // ?talbedo=off is the dev perf-attribution kill switch.
-          richTerrainSplat()
-            ? `vec2 grassJitter = vec2(0.0);
-        if ( wocHasGrass ) {
+          // With the ground bake active, both tiers take the baked-blade
+          // grass layer instead (one true-scale tap; see grassBakeAlbedoGlsl).
+          grassBake
+            ? grassBakeAlbedoGlsl(richTerrainSplat())
+            : richTerrainSplat()
+              ? `vec2 grassJitter = vec2(0.0);
+        if ( wocHasGrass && wocNearDetail ) {
           // Per-octave scale jitter: a slow (~36yd) two-channel drift field
         // nudges each octave's sample position a different amount and sign,
         // so the tilings slide against each other across the map and their
         // repeats never line up into one fixed cadence. The warp gradient is
         // tiny (well under a yard of drift over ~36yd) so nothing smears.
+        // Faded with distance (wocDetailFade) so the far tap-skip cannot seam.
           grassJitter = (vec2(
             texture2D(uMacro, vWPos.xz * 0.028 + 0.07).r,
-            texture2D(uMacro, vWPos.xz * 0.028 + 0.63).r) - 0.5) * WOC_GRASS_SCALE_JITTER;
+            texture2D(uMacro, vWPos.xz * 0.028 + 0.63).r) - 0.5)
+            * (WOC_GRASS_SCALE_JITTER * wocDetailFade);
         }
         // Combed growth direction: the finest grass detail samples through a
         // locally-rotating ANISOTROPIC transform (comb frame: compressed
@@ -865,26 +1144,33 @@ function buildSplatMaterial(
         vec3 grassAlb = vec3(0.0);
         if ( wocHasGrass ) {
           grassAlb = mix(
-            texture2D(uGrass, combT + grassJitter).rgb,
-            texture2D(uGrass, vec2(-tuv.y, tuv.x) * 0.31 - grassJitter * 0.6).rgb,
+            WOC_ALB(combT + grassJitter, WOC_L_GRASS),
+            WOC_ALB(vec2(-tuv.y, tuv.x) * 0.31 - grassJitter * 0.6, WOC_L_GRASS),
             0.56 + (macro2 - 0.5) * 0.3);
         // Third, LOW-amplitude mid octave between the fine (1.0x) and coarse
         // (0.31x) tilings: 0.57x scale rotated 23 degrees (cos 0.9205 and
         // sin 0.3907 folded into the constants), with its own seed offset so
         // it shares no phase with either neighbour. Variety without
         // amplitude: a third uncorrelated voice against the pair's residual
-        // shared repeat, too faint to form patches of its own.
-        vec2 grassUvMid = vec2(tuv.x * 0.525 - tuv.y * 0.223, tuv.x * 0.223 + tuv.y * 0.525);
-        grassAlb = mix(grassAlb,
-          texture2D(uGrass, grassUvMid + vec2(0.41, 0.87) + grassJitter * 0.8).rgb,
-          WOC_GRASS_MID_OCTAVE);
+        // shared repeat, too faint to form patches of its own. The mid
+        // octave fades with wocDetailFade, so skipping its tap in the far
+        // field changes nothing at the boundary.
+        if ( wocNearDetail ) {
+          vec2 grassUvMid = vec2(tuv.x * 0.525 - tuv.y * 0.223, tuv.x * 0.223 + tuv.y * 0.525);
+          grassAlb = mix(grassAlb,
+            WOC_ALB(grassUvMid + vec2(0.41, 0.87) + grassJitter * 0.8, WOC_L_GRASS),
+            WOC_GRASS_MID_OCTAVE * wocDetailFade);
+        }
         // ~42yd hue rotation: meadows drift a few percent between warm
         // yellow-green and cool blue-green. Value-neutral endpoints, so it
-        // adds randomness you feel across a field without a patch to point at.
-          float grassHueT = texture2D(uMacro, vWPos.xz * WOC_GRASS_HUE_DRIFT_FREQ + 0.53).r;
-          grassAlb *= mix(WOC_GRASS_HUE_WARM, WOC_GRASS_HUE_COOL, grassHueT);
+        // adds randomness you feel across a field without a patch to point
+        // at. Deliberately OUTSIDE the detail-distance fade: this is a
+        // macro-scale term whose whole job is to keep the FAR field from
+        // washing into one uniform green sheet.
+        float grassHueT = texture2D(uMacro, vWPos.xz * WOC_GRASS_HUE_DRIFT_FREQ + 0.53).r;
+        grassAlb *= mix(WOC_GRASS_HUE_WARM, WOC_GRASS_HUE_COOL, grassHueT);
         }`
-            : `// No-relief tiers: the plain two-octave anti-tiling mix (the
+              : `// No-relief tiers: the plain two-octave anti-tiling mix (the
         // 90-degree-rotated coarse octave still kills the shared repeat).
         // The comb-frame locals stay declared at IDENTITY for the detail
         // normal chunk (which samples the grass normal through them on every
@@ -896,8 +1182,8 @@ function buildSplatMaterial(
         vec3 grassAlb = vec3(0.0);
         if ( wocHasGrass ) {
           grassAlb = mix(
-            texture2D(uGrass, tuv).rgb,
-            texture2D(uGrass, vec2(-tuv.y, tuv.x) * 0.31).rgb,
+            WOC_ALB(tuv, WOC_L_GRASS),
+            WOC_ALB(vec2(-tuv.y, tuv.x) * 0.31, WOC_L_GRASS),
             0.56 + (macro2 - 0.5) * 0.3);
         }`
         }
@@ -940,14 +1226,14 @@ function buildSplatMaterial(
         vec2 dirtUv2 = vec2(tuv.x * 0.277 - tuv.y * 0.208, tuv.x * 0.208 + tuv.y * 0.277);
         float dirtOctMask = texture2D(uMacro, vWPos.xz * 0.11 + 0.29).r;
         vec3 dirtFlat = mix(
-          texture2D(uDirt, tuv * 0.55).rgb,
-          texture2D(uDirt, dirtUv2).rgb,
+          WOC_ALB(tuv * 0.55, WOC_L_DIRT),
+          WOC_ALB(dirtUv2, WOC_L_DIRT),
           0.22 + dirtOctMask * 0.5);
         // Micro-soften: pull the pebble-scale speckle toward its own local
         // mean (a forced-coarse mip of the same tap) so the path reads as
         // packed earth with embedded stones, not carpet pile. The macro
         // octaves below run on the softened base, so patch structure stays.
-        dirtFlat = mix(dirtFlat, textureLod(uDirt, tuv * 0.55, 2.0).rgb, 0.30);
+        dirtFlat = mix(dirtFlat, textureLod(uAlb, vec3(tuv * 0.55, WOC_L_DIRT), 2.0).rgb, 0.30);
         // Two macro octaves hand the soil the low-frequency structure a photo
         // tile cannot carry: ~6yd value mottling (footworn patches) and ~20yd
         // value plus grey-brown hue drift (damp hollows). Both reuse uMacro;
@@ -960,7 +1246,7 @@ function buildSplatMaterial(
         dirtFlat = mix(dirtFlat, dirtGrey, clamp(0.24 + dirtMac20 * 0.4, 0.0, 0.65));`
             : `// Simple-splat tiers: one dirt tap; the wear bands below still
         // apply so trails keep their compacted-core read.
-        vec3 dirtFlat = texture2D(uDirt, tuv * 0.55).rgb;`
+        vec3 dirtFlat = WOC_ALB(tuv * 0.55, WOC_L_DIRT);`
         }
         // Path wear across the trail: the vertex dirt weight sits near 0.85
         // at a trail's core and feathers out over ~1.4yd at the margin, so it
@@ -974,7 +1260,7 @@ function buildSplatMaterial(
         pathEdge = vSplatR.y * (1.0 - pathCore) * (1.0 - vExtra.x);
         dirtFlat *= 1.0 + pathCore * 0.07 - pathEdge * 0.05;
         if ( wocHasMud )
-          dirtFlat = mix(dirtFlat, texture2D(uMud, tuv * 0.8).rgb, vExtra.x);
+          dirtFlat = mix(dirtFlat, WOC_ALB(tuv * 0.8, WOC_L_MUD), vExtra.x);
         ${
           richTerrainSplat()
             ? `// Trails read as packed grit, not smooth brown paint: fold a
@@ -984,12 +1270,12 @@ function buildSplatMaterial(
         // macro soil structure above, the old weight let single-scale
         // micro-grain dominate the read again, the exact carpet failure.
         gravelW = 0.07 * (1.0 - vExtra.x);
-        dirtFlat = mix(dirtFlat, texture2D(uRock, tuv * 1.8).rgb, gravelW);`
+        dirtFlat = mix(dirtFlat, WOC_ALB(tuv * 1.8, WOC_L_ROCK), gravelW);`
             : ''
         }
         vec3 dirtWall = mix(
-          texture2D(uDirt, vWPos.xy * 0.176).rgb,
-          texture2D(uDirt, vWPos.zy * 0.176).rgb,
+          WOC_ALB(vWPos.xy * 0.176, WOC_L_DIRT),
+          WOC_ALB(vWPos.zy * 0.176, WOC_L_DIRT),
           axisW);
         // marsh swaps packed dirt for wet mud (roads, hub discs included)
         dirtAlb = mix(dirtFlat, dirtWall, dirtWallW);
@@ -1007,10 +1293,10 @@ function buildSplatMaterial(
         vec2 rockUv2 = vec2(tuv.x * 0.203 - tuv.y * 0.260, tuv.x * 0.260 + tuv.y * 0.203);
         float rockOctMask = texture2D(uMacro, vWPos.xz * 0.033 + 0.83).r;
         vec3 rockFlat = mix(
-          texture2D(uRock, tuv * 0.6).rgb,
-          texture2D(uRock, rockUv2).rgb,
+          WOC_ALB(tuv * 0.6, WOC_L_ROCK),
+          WOC_ALB(rockUv2, WOC_L_ROCK),
           0.2 + rockOctMask * 0.5);`
-            : 'vec3 rockFlat = texture2D(uRock, tuv * 0.6).rgb;'
+            : 'vec3 rockFlat = WOC_ALB(tuv * 0.6, WOC_L_ROCK);'
         }
         // macro2 (hoisted above the grass blend) also drives the wall plate
         // mix, so plate zones vary across a mountainside without spending a
@@ -1032,10 +1318,10 @@ function buildSplatMaterial(
             ? `float rockDrift = texture2D(uMacro, vWPos.xz * 0.041 + 0.47).r;
         float plateMix = 0.58 + (macro2 - 0.5) * 0.55 + (rockDrift - 0.5) * 0.3;
         vec3 rockWall = mix(
-          mix(texture2D(uRock, vWPos.xy * 0.132).rgb,
-              texture2D(uRock, vWPos.xy * 0.043).rgb, plateMix),
-          mix(texture2D(uRock, vWPos.yz * 0.132).rgb,
-              texture2D(uRock, vWPos.yz * 0.043).rgb, plateMix),
+          mix(WOC_ALB(vWPos.xy * 0.132, WOC_L_ROCK),
+              WOC_ALB(vWPos.xy * 0.043, WOC_L_ROCK), plateMix),
+          mix(WOC_ALB(vWPos.yz * 0.132, WOC_L_ROCK),
+              WOC_ALB(vWPos.yz * 0.043, WOC_L_ROCK), plateMix),
           axisW);
         rockAlb = mix(rockFlat, rockWall, wallW);
         // Macro stone drift: cooler grey patches against warmer tan ones,
@@ -1063,22 +1349,38 @@ function buildSplatMaterial(
         // cliff cavity resample (wallCav stays declared for the roughness
         // plate term, folded to zero).
         vec3 rockWall = mix(
-          texture2D(uRock, vWPos.xy * 0.132).rgb,
-          texture2D(uRock, vWPos.yz * 0.132).rgb,
+          WOC_ALB(vWPos.xy * 0.132, WOC_L_ROCK),
+          WOC_ALB(vWPos.yz * 0.132, WOC_L_ROCK),
           axisW);
         rockAlb = mix(rockFlat, rockWall, wallW);`
         }
         }
         vec3 sandAlb = vec3(0.0);
         if ( wocHasSand )
-          sandAlb = texture2D(uSand, tuv).rgb;
-        vec3 alb = grassAlb * vSplatR.x
+          sandAlb = WOC_ALB(tuv, WOC_L_SAND);
+        ${
+          grassBake
+            ? `// Per-layer tint (meadow continuum): the baked grass layer is
+        // tint-NEUTRAL artwork, so it takes the FULL vertex tint (on grass,
+        // vColor IS groundGrassColorAt: the palette + patch noise the blades
+        // tint from) scaled by the constructed paint gain, uniform at every
+        // distance. The photo layers keep the gentle 0.35 modulation they
+        // were authored against; vtint35 is reused by the snow and impact
+        // mixes so those keep today's response.
+        vec3 vtint = clamp(vColor.rgb * 2.0, 0.0, 2.0);
+        vec3 vtint35 = mix(vec3(1.0), vtint, 0.35);
+        vec3 alb = grassAlb * vtint * ${(GRASS_PAINT_GAIN / 2).toFixed(4)} * vSplatR.x
+                 + (dirtAlb * vSplatR.y
+                 + rockAlb * vSplatR.z
+                 + sandAlb * vSplatR.w) * vtint35;`
+            : `vec3 alb = grassAlb * vSplatR.x
                  + dirtAlb * vSplatR.y
                  + rockAlb * vSplatR.z
-                 + sandAlb * vSplatR.w;
+                 + sandAlb * vSplatR.w;`
+        }
         // snow cover on the peaks/rim, by baked per-vertex weight
         if ( wocHasSnow )
-          alb = mix(alb, texture2D(uSnow, tuv * 0.7).rgb, vExtra.y);
+          alb = mix(alb, WOC_ALB(tuv * 0.7, WOC_L_SNOW)${grassBake ? ' * vtint35' : ''}, vExtra.y);
         // Wet shoreline: within ~1.6u above the waterline (WATER_LEVEL is
         // inlined from src/sim/world.ts at material build), sand and dirt
         // darken and tighten as if soaked, so every shore carries a wet
@@ -1101,18 +1403,24 @@ function buildSplatMaterial(
         // Meteor impact terrain is authored by the same crater profile as the
         // heightfield. Apply it in albedo space so the PBR textures do not wash
         // the crater floor back toward marsh sand.
-        vec3 impactAlb = mix(vec3(0.20, 0.08, 0.035), vec3(0.055, 0.040, 0.032), vExtra.w);
+        vec3 impactAlb = mix(vec3(0.20, 0.08, 0.035), vec3(0.055, 0.040, 0.032), vExtra.w)${grassBake ? ' * vtint35' : ''};
         alb = mix(alb, impactAlb, clamp(vExtra.z * 0.86 + vExtra.w * 0.18, 0.0, 0.96));
         // very-low-frequency hue drift (~100u wavelength) keeps distant
         // hills from flattening into one uniform lawn green (macro2 itself is
         // sampled up by the rock wall blend, which shares it)
         alb = mix(alb, alb * vec3(1.07, 1.03, 0.86), (macro2 - 0.5) * 0.75 * vSplat.x);
-        // real albedo carries the hue now; vertex color only modulates gently
+        ${
+          grassBake
+            ? `// vertex tint already folded in per layer above (grass full,
+        // photo layers at 0.35): only the macro swing and relief shade left.
+        diffuseColor.rgb *= alb * macro * groundShade;`
+            : `// real albedo carries the hue now; vertex color only modulates gently
         // so the biome painting (roads, hub discs, snowline) still reads.
         // (vColor was authored as a full sRGB ground color, so re-centre it
         // around 1.0 before using it as a multiplier.)
         vec3 vtint = clamp(vColor.rgb * 2.0, 0.0, 2.0);
-        diffuseColor.rgb *= alb * mix(vec3(1.0), vtint, 0.35) * macro * groundShade;`,
+        diffuseColor.rgb *= alb * mix(vec3(1.0), vtint, 0.35) * macro * groundShade;`
+        }`,
       )
       .replace(
         '#include <color_fragment>',
@@ -1168,19 +1476,29 @@ function buildSplatMaterial(
         // space; the chain rule scales the along-comb slope by the
         // compression, which IS the combed look: smooth along the growth
         // direction, ridged across it.
+        //
+        // The whole planar-XZ cluster is distance-gated (WOC_DETAIL_N_*): every
+        // tap here samples a 4.5 to 8 yard tiling, which mips toward flat, so
+        // past the fade the perturbation these seven taps compute is a few
+        // percent of what it is underfoot. The cliff wall normals further down
+        // stay ungated on purpose. The per-tap wocNearDetail gates compose
+        // with it (same purpose, per-layer granularity).
+        vec2 detN = vec2(0.0);
+        float wocDetailN = 1.0 - smoothstep(WOC_DETAIL_N_NEAR, WOC_DETAIL_N_FAR, wocCamDist);
+        if (wocDetailN > 0.0) {
         vec2 gNxy = vec2(0.0);
-        if ( wocHasGrass ) {
+        if ( wocHasGrass && wocNearDetail ) {
           vec3 gN = texture2D(uGrassN, combT + grassJitter).xyz * 2.0 - 1.0;
           gNxy = gN.x * WOC_COMB_COMPRESS * combDir + gN.y * combPerp;
         }
         vec3 dN = vec3(0.0);
-        if ( wocHasDirt )
+        if ( wocHasDirt && wocNearDetail )
           dN = texture2D(uDirtN, tuv * 0.55).xyz * 2.0 - 1.0;
         vec3 rN = vec3(0.0);
-        if ( wocHasRock )
+        if ( wocHasRock && wocNearDetail )
           rN = texture2D(uRockN, tuv * 0.6).xyz * 2.0 - 1.0;
         vec3 sN = vec3(0.0);
-        if ( wocHasSand )
+        if ( wocHasSand && wocNearDetail )
           sN = texture2D(uSandN, tuv).xyz * 2.0 - 1.0;
         ${
           richTerrainSplat()
@@ -1190,13 +1508,13 @@ function buildSplatMaterial(
         // source map is indistinguishable once summed into a layer's normal:
         // the hard layers share the crisp tap, the soft layers the gentle one.
         vec2 fineHard = vec2(0.0);
-        if ( wocHasDirt || wocHasRock )
+        if ( (wocHasDirt || wocHasRock) && wocNearDetail )
           fineHard = texture2D(uRockN, tuv * 2.4).xy * 2.0 - 1.0;
         // The fine-soft grain is combed like the blade normal (the 3x tiling
         // was the single loudest dot-scale voice): elongated micro-grain for
         // grass, and on sand it reads as wind-swept ripple rather than dots.
         vec2 fineSoft = vec2(0.0);
-        if ( wocHasGrass || wocHasSand ) {
+        if ( (wocHasGrass || wocHasSand) && wocNearDetail ) {
           vec2 fineSoftRaw = texture2D(uGrassN, combT * 3.0).xy * 2.0 - 1.0;
           fineSoft = fineSoftRaw.x * WOC_COMB_COMPRESS * combDir + fineSoftRaw.y * combPerp;
         }
@@ -1204,7 +1522,7 @@ function buildSplatMaterial(
         // path shows is lit rather than painted (gravelW already fades it
         // with the marsh mud swap)
         vec2 gvN = vec2(0.0);
-        if ( wocHasDirt )
+        if ( wocHasDirt && wocNearDetail )
           gvN = texture2D(uRockN, tuv * 1.8).xy * 2.0 - 1.0;`
             : `// Simple-splat tiers: base-scale detail normals only (the
         // merge-base budget); the fine octaves fold to zero and every term
@@ -1222,15 +1540,17 @@ function buildSplatMaterial(
         // single-frequency speckle dominate again; grass fine grain down to
         // 0.45 (was 0.65): with the comb stretch it supplies direction, not
         // contrast, and the combed blade normal gNxy keeps full weight
-        vec2 detN = (gNxy + fineSoft * 0.45) * vSplatR.x * 1.5
-                  + (dN.xy + fineHard * 0.7 + gvN * gravelW * 0.5) * vSplatR.y * 1.55 * dirtDetail
-                  + (rN.xy + fineHard * 0.9) * vSplatR.z * 1.5 * (1.0 - wallW)
-                  + (sN.xy + fineSoft * 0.9) * vSplatR.w * 1.1;
+        detN = (gNxy + fineSoft * 0.45) * vSplatR.x * 1.5
+             + (dN.xy + fineHard * 0.7 + gvN * gravelW * 0.5) * vSplatR.y * 1.55 * dirtDetail
+             + (rN.xy + fineHard * 0.9) * vSplatR.z * 1.5 * (1.0 - wallW)
+             + (sN.xy + fineSoft * 0.9) * vSplatR.w * 1.1;
         detN *= 1.0 - vExtra.y * 0.7; // snow softens the relief beneath it
         // Planar-XZ UVs stretch on steep faces and the detail normals smear
         // into vertical streaks there; fade them out by slope and let the
-        // wall projection below own the cliff relief.
-        detN *= smoothstep(0.5, 0.82, vWNorm.y);
+        // wall projection below own the cliff relief. The distance fade rides
+        // the same multiply, so the gate can never open a step at its edge.
+        detN *= smoothstep(0.5, 0.82, vWNorm.y) * wocDetailN;
+        }
         normal = normalize(normal + tbn * vec3(detN, 0.0));
         // cliffs: wall-projected rock normal so steep faces get real relief
         // (approximate world-space tangent frames per projection plane; the
@@ -1250,6 +1570,37 @@ function buildSplatMaterial(
           normal = normalize(normal + mat3(viewMatrix) * wallPerturb * (vSplat.z * wallW * 1.1));
         }`,
       );
+    // Night lamplight (night_light_field.ts): every lamp, camp fire, and
+    // nearby body contributes REAL irradiance inside the material's lighting
+    // resolve (reflectedLight.directDiffuse through the albedo BRDF), the
+    // same path a THREE.PointLight takes, so lamplight multiplies with the
+    // splat's own colour and normals and the tonemapper rolls it off softly.
+    // Downstream of the lighting resolve it is ordinary shaded surface, so
+    // the haze and fog blocks dim it with distance like everything else.
+    if (nightLights) {
+      Object.assign(sh.uniforms, nightLightUniforms());
+      sh.fragmentShader = sh.fragmentShader
+        .replace('#include <common>', `#include <common>${NIGHT_LIGHT_DECLARATIONS}`)
+        .replace(
+          '#include <lights_fragment_end>',
+          `${nightLightFragmentGlsl('vWPos.xyz')}\n\t#include <lights_fragment_end>`,
+        );
+    }
+    // Per-zone aerial perspective (biome_haze_field.ts): the SAME snippet on
+    // the SAME uniforms the far vista tiles splice, so the 300 to 700 yard
+    // band the detail terrain owns hands off to the far mesh with no ring at
+    // the seam. Distant ground reads as the air of the zone it belongs to,
+    // which is the whole point: a neighbouring realm looks like itself from
+    // across a bay instead of waiting for the border to swap the world.
+    if (zoneHaze) {
+      Object.assign(sh.uniforms, biomeHazeUniforms());
+      sh.fragmentShader = sh.fragmentShader
+        .replace('#include <common>', `#include <common>${BIOME_HAZE_DECLARATIONS}`)
+        .replace(
+          '#include <fog_fragment>',
+          `${biomeHazeFragmentGlsl('vWPos.xz')}\n\t#include <fog_fragment>`,
+        );
+    }
   };
   return mat;
 }
@@ -1328,6 +1679,17 @@ export interface TerrainView {
     opts?: EnsureZoneOptions,
   ): Promise<void>;
   isZoneLoaded(zoneId: string): boolean;
+  /**
+   * Escalate an in-flight idle-paced ensureZone to fast pacing: its yields
+   * switch from browser idle slots to plain macrotasks, so the remaining
+   * chunks stream at build speed instead of idle-slot speed. The use case is
+   * the player ARRIVING in (or a gating caller joining) a zone whose
+   * background prepare is still running: without this the ground under their
+   * feet keeps crawling in at idle pace for tens of seconds. Idempotent;
+   * unknown zone ids are a no-op; a zone never de-escalates (it is about to
+   * finish anyway).
+   */
+  escalateZone(zoneId: string): void;
   /**
    * The chunk lattice this view builds on, plus whether a given cell still owes
    * geometry. The outdoor fog clamp reads ground residency through this narrow
@@ -1610,6 +1972,10 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
   const built = new Set<number>();
   const loadedZones = new Set<string>();
   const pendingZones = new Map<string, Promise<void>>();
+  // Zones whose in-flight idle build has been escalated to fast pacing (the
+  // player arrived, or a gating caller joined the shared task). Checked at
+  // every yield, so an escalation takes effect mid-build.
+  const escalatedZones = new Set<string>();
   // Set by cancelStreaming(): every in-flight ensureZone loop bails at its next
   // yield point without marking its zone loaded, so a discarded view (see
   // renderer rebuildTerrain) stops adding chunks instead of building on a
@@ -1689,9 +2055,19 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
       return Promise.resolve();
     }
     const pending = pendingZones.get(zone.id);
-    if (pending) return pending;
+    if (pending) {
+      // A fast caller joining an idle build must not wait at idle pace: a
+      // teleport loading screen once sat behind an already-running background
+      // prepare for its full idle-slot duration.
+      if (opts?.pace !== 'idle') escalatedZones.add(zone.id);
+      return pending;
+    }
     const idlePace = opts?.pace === 'idle';
-    const yieldSlice = idlePace ? yieldIdle : yieldBuild;
+    // Re-checked at every yield rather than captured: escalateZone can flip
+    // an in-flight idle build to fast pacing mid-zone.
+    const yieldSlice = idlePace
+      ? (): Promise<void> => (escalatedZones.has(zone.id) ? yieldBuild() : yieldIdle())
+      : yieldBuild;
     // Gating builds race in batches of four. Idle geometry has its own
     // row/time-sliced builder, preserving one mesh per cell without a blocking
     // 60 yd build or the old four-mesh subdivision workaround.
@@ -1787,6 +2163,9 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
   return {
     group,
     ensureZone,
+    escalateZone: (zoneId: string) => {
+      escalatedZones.add(zoneId);
+    },
     isZoneLoaded: (zoneId: string) => loadedZones.has(zoneId),
     groundResidency: () => residency,
     cancelStreaming(): void {

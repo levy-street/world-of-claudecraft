@@ -213,9 +213,14 @@ describe('post-entry mob-body streaming (packaged iOS)', () => {
   it('degrades a not-yet-resident skin to the base weapon instead of throwing', () => {
     // All three attach resolvers route their skin url through residentOrEnsure,
     // which kicks the fetch and returns null so the resident fallback applies.
+    // swapAttachDef reads the skin url first and uses it only when resident,
+    // then falls back to the item model. Two statements rather than one `??`
+    // because a DISPLAYED ranged skin also relocates the bone on that arm (a
+    // bow moves to the left handslot on the mech), which the fallback must not.
     expect(assetsSource).toContain(
-      'residentOrEnsure(weaponSkinModelUrl(weaponSkinId)) ?? itemWeaponModelUrl(weaponItemId)',
+      'const skinUrl = residentOrEnsure(weaponSkinModelUrl(weaponSkinId));',
     );
+    expect(assetsSource).toContain('const url = itemWeaponModelUrl(weaponItemId);');
     expect(assetsSource).toContain(
       'const resident = residentOrEnsure(url) ?? itemOffhandModelUrl(offhandItemId);',
     );

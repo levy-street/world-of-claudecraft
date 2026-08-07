@@ -75,11 +75,15 @@ describe('gather node rendering', () => {
         expect(node).toBeDefined();
         if (!node) continue;
         expect(position.x).toBe(node.pos.x);
+        // 5 decimal places, not 6: the instance matrix stores float32, whose
+        // quantum at double-digit heights (~2e-6) already exceeds a 5e-7
+        // tolerance; which side of it a node lands on depends on the exact
+        // terrain height, so digit 6 was a coin flip, not a pin.
         expect(position.y).toBeCloseTo(
           terrainHeight(node.pos.x, node.pos.z, seed) +
             NODE_Y_OFFSET[node.type] -
             (nodeTierScale(node.tier) - 1) * templateMinY,
-          6,
+          5,
         );
         expect(position.z).toBe(node.pos.z);
         expect(

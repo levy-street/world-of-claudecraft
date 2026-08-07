@@ -1188,6 +1188,8 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.lootHeroic': 'Bônus heroico, um destes cai sempre:',
   'hudChrome.finder.lootMaybe': 'No máximo um destes pode cair:',
   'hudChrome.finder.mech.deathless_rage': 'Fúria Imortal (interrompida nas pedras de guarda)',
+  'hudChrome.finder.mech.dread_curse':
+    'Maldição do Pavor (somente heroico, penalidade cumulativa para troca de tanque)',
   'hudChrome.finder.mech.deathstalker_cleave': 'Corte do Caçador da Morte (golpe em cone frontal)',
   'hudChrome.finder.mech.enrage': 'Entra em frenesi com pouca vida',
   'hudChrome.finder.mech.grave_cleaver': 'Ceifador de Tumbas (golpe em cone frontal)',
@@ -2445,6 +2447,8 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobTooltip.friendly': 'Amistoso',
   'hudChrome.mobTooltip.hostile': 'Hostil',
   'hudChrome.mobTooltip.levelFamily': '{family} de nível {level}',
+  'hudChrome.mobTooltip.elite': 'Elite',
+  'hudChrome.mobTooltip.boss': 'Chefe',
   'hudChrome.options.aurasOnPlayerFrame': 'Benefícios no Quadro do Jogador',
   'hudChrome.options.playerFrameScale': 'Escala do Quadro do Jogador',
   'hudChrome.options.showDailyRewardsChest': 'Mostrar Baú de Recompensas Diárias',
@@ -5999,6 +6003,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.components.venomSac': 'Bolsa de veneno',
   'hudChrome.corpseHarvest.harvestButton': 'Coletar',
   'hudChrome.corpseHarvest.title': 'Coleta',
+  'hudChrome.emoteEditor.close': 'Fechar emotes',
   'hudChrome.emoteEditor.done': 'Concluído',
   'hudChrome.emoteEditor.title': 'Emotes',
   'hudChrome.emotes.bow': 'Reverência',
@@ -10158,7 +10163,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'guide.dungeonsPage.resetBody':
     'Ao trocar a dificuldade enquanto o grupo ainda mantém incursões reivindicadas, as reivindicações antigas permanecem por algum tempo antes de sumirem. O líder pode abandoná-las imediatamente escolhendo Redefinir todas as instâncias no menu do próprio retrato ou digitando /dungeon reset. Isso só funciona depois que a dificuldade realmente mudou, quando ninguém, vivo ou caído, permanece dentro, e há um curto intervalo entre redefinições. Se você chegar à entrada na dificuldade errada, o jogo avisará antes do início. A raide nunca é redefinida assim; suas próprias regras de vínculo continuam valendo.',
   'guide.dungeonsPage.wildheartBody':
-    'Uma caldeira de selva encharcada de chuva, onde duas trilhas de caça elevadas circundam um cenote de jade. Atravesse covis de feras e ruínas ancestrais, depois suba a pirâmide ritual para enfrentar Zulgar.',
+    'Uma caldeira de selva encharcada de chuva, onde duas trilhas de caça elevadas circundam um cenote de jade. Atravesse covis de feras e ruínas ancestrais, depois suba a pirâmide ritual para ver quem espera no topo.',
   'guide.gear.itemLevelBody':
     'Para comparar duas peças rapidamente, ative Mostrar nível do item nas opções. Equipamentos de origem conhecida, obtidos de inimigos, missões e profissões de criação, passam a mostrar um nível do item: um único número que estima a força com base na origem e permite identificar a melhor melhoria, mesmo entre espaços diferentes. Peças sem essa origem, como itens básicos de vendedores e equipamento inicial, não mostram nível; a ausência do número é normal.',
   'hudChrome.auraEffect.battleStance': 'Postura de Batalha: 10% mais geração de raiva',
@@ -10900,6 +10905,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchantName.enchant_neck_agility': 'Encantar Colar - Agilidade',
   'hudChrome.enchantName.enchant_neck_intellect': 'Encantar Colar - Intelecto',
   'hudChrome.enchantName.enchant_neck_spirit': 'Encantar Colar - Espírito',
+  'hudChrome.enchantName.enchant_offhand_stamina': 'Encantar Mão Secundária - Vigor',
   'hudChrome.enchantName.enchant_ring_agility': 'Encantar Anel - Agilidade',
   'hudChrome.enchantName.enchant_ring_intellect': 'Encantar Anel - Intelecto',
   'hudChrome.enchantName.enchant_ring_spirit': 'Encantar Anel - Espírito',

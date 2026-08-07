@@ -10,7 +10,7 @@
 
 import { describe, expect, it, vi } from 'vitest';
 import { SPORT_KITS, VALE_CUP_BALL_TEMPLATE_ID } from '../src/sim/content/vale_cup';
-import { DUNGEON_X_THRESHOLD } from '../src/sim/data';
+import { DUNGEON_X_THRESHOLD, GATHER_NODES } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import {
   VC_DESERTER_LOCKOUT,
@@ -18,7 +18,7 @@ import {
   VC_MATCH_DURATION,
   vcupPackTeams,
 } from '../src/sim/social/vale_cup';
-import type { SimEvent } from '../src/sim/types';
+import { CRAFT_CAST_ID, isNonSpellCast, type SimEvent } from '../src/sim/types';
 import {
   GOAL_LINE_EAST_X,
   GOAL_LINE_WEST_X,
@@ -1048,11 +1048,25 @@ describe('Vale Cup: the pitch is closed during a match', () => {
 });
 
 describe('the pitch police and live profession sessions', () => {
+  // Both arms below used to lean on herb_eastbrook_4 standing at (23,-99),
+  // INSIDE the pitch, so a real harvest could be started on the playing
+  // surface. That placement was the defect tests/gather_node_placement.test.ts
+  // now forbids outright (no node inside SOWFIELD_EXCLUDE), and the patch
+  // moved to the meadow above the ground. The behavior these arms guard is
+  // unchanged and still reachable: every non-spell cast counts (isNonSpellCast
+  // covers crafting, salvage, enchanting and tool recharge as well as
+  // gathering and fishing), and none of those needs a world node under the
+  // player's feet, so a bystander really can be mid-session on the pitch.
+  const NODE = GATHER_NODES.find((n) => n.id === 'herb_eastbrook_4');
+  if (!NODE) throw new Error('missing herb_eastbrook_4');
+
   it('the goal-reset kickoff placement ends a FIGHTER live gather session', () => {
-    // Fighters are skipped by the pitch police, and a herb node sits inside
-    // the pitch: a gather cast started during the goal celebrate must not
-    // ride the kickoff teleport (the golden-goal and goal-reset placements
-    // arrive with no arena reset, unlike match start and teardown).
+    // Fighters are skipped by the pitch police, so this arm is about the
+    // PLACEMENT rather than the eject: a gather cast started during the goal
+    // celebrate must not ride the kickoff teleport (the golden-goal and
+    // goal-reset placements arrive with no arena reset, unlike match start and
+    // teardown). Where the fighter wandered off to does not matter, so this
+    // stays a real harvest at the real node.
     const sim = makeWorld();
     const a = addAt(sim, 'warrior', 'Kicker');
     const b = addAt(sim, 'mage', 'Keeper');
@@ -1067,11 +1081,14 @@ describe('the pitch police and live profession sessions', () => {
       e.inCombat = false;
     }
     sim.addItem('gathering_sickle', 1, a);
-    teleport(sim, a, 23, -99); // herb_eastbrook_4, inside the pitch
-    expect(sim.harvestNode('herb_eastbrook_4', undefined, a)).toBe(true);
+    teleport(sim, a, NODE.pos.x, NODE.pos.z);
+    expect(sim.harvestNode(NODE.id, undefined, a)).toBe(true);
     const e = sim.entities.get(a);
     if (!e) throw new Error('missing fighter');
     expect(e.castingAbility).not.toBeNull();
+    // The premise the old fixture got for free: the fighter is NOT on the
+    // pitch, so the placement below is the only thing that can move them.
+    expect(isOnPitch(e.pos.x, e.pos.z)).toBe(false);
 
     // Force the goal-reset arm: the goal phase expiring with no pending
     // winner runs placeCupFighters straight into the kickoff placement.
@@ -1080,14 +1097,19 @@ describe('the pitch police and live profession sessions', () => {
     match.pendingWinner = undefined;
     sim.tick();
 
+    expect(isOnPitch(e.pos.x, e.pos.z)).toBe(true);
     expect(e.castingAbility).toBeNull();
     expect(e.gatherCastNodeId).toBe('');
   });
 
-  it('sweeping a bystander off the live pitch ends their gather session', () => {
-    // herb_eastbrook_4 sits at (23, -99), INSIDE the Sowfield bounds: a
-    // harvest can legally start on the open pitch, and the next match tick's
-    // policePitch eject is a hard teleport that must not carry the session.
+  it('sweeping a bystander off the live pitch ends their profession session', () => {
+    // This arm DOES need the bystander standing on the playing surface, and
+    // no gather node may sit there any more, so the session is a crafting
+    // cast: placed by direct field assignment, the same precedent
+    // tests/professions_session_teardown.test.ts uses for paths whose
+    // precondition is a spot with no water or nodes. What is under test is
+    // unchanged: policePitch's eject is a hard teleport, and it must not carry
+    // a live non-spell cast with it.
     const sim = makeWorld();
     const a = addAt(sim, 'warrior', 'Kicker');
     const b = addAt(sim, 'mage', 'Keeper');
@@ -1101,20 +1123,22 @@ describe('the pitch police and live profession sessions', () => {
       e.corpseTimer = 9999;
       e.inCombat = false;
     }
-    const c = sim.addPlayer('warrior', 'Herbalist');
-    sim.addItem('gathering_sickle', 1, c);
-    teleport(sim, c, 23, -99);
-    expect(sim.harvestNode('herb_eastbrook_4', undefined, c)).toBe(true);
+    const c = sim.addPlayer('warrior', 'Crafter');
+    teleport(sim, c, PITCH_CENTER.x, PITCH_CENTER.z);
     const e = sim.entities.get(c);
-    if (!e) throw new Error('missing herbalist');
-    expect(e.castingAbility).not.toBeNull();
+    if (!e) throw new Error('missing crafter');
+    expect(isOnPitch(e.pos.x, e.pos.z)).toBe(true);
+    e.castingAbility = CRAFT_CAST_ID;
+    e.castTotal = 3;
+    e.castRemaining = 3;
+    expect(isNonSpellCast(e.castingAbility)).toBe(true);
 
     sim.tick();
 
     // Ejected past the boards, and the session ended with the teleport.
     expect(isOnPitch(e.pos.x, e.pos.z)).toBe(false);
     expect(e.castingAbility).toBeNull();
-    expect(e.gatherCastNodeId).toBe('');
+    expect(e.castRemaining).toBe(0);
   });
 });
 

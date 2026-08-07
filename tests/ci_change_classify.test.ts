@@ -255,7 +255,9 @@ describe('detectCode (fail closed end to end)', () => {
   }) as unknown as typeof fetch;
 
   it('returns code=true for non-PR events without touching the API', async () => {
-    for (const eventName of ['push', 'workflow_dispatch', 'schedule', '']) {
+    // merge_group is the queue's event: a queue run must always take the full
+    // PR tier (there is no PR files listing to classify on a merge group).
+    for (const eventName of ['push', 'workflow_dispatch', 'schedule', 'merge_group', '']) {
       expect(await detectCode({ ...BASE, eventName, fetchImpl: neverFetch })).toEqual({
         code: true,
         reason: 'non-PR event: full PR tier (code=true)',
@@ -320,11 +322,14 @@ describe('detectCode (fail closed end to end)', () => {
     ];
     const { impl } = pagedFetch(docs);
     // The skip decision must be auditable from the job log alone: how many
-    // files were listed and what the event reported.
+    // files were listed and what the event reported. The classified listing is
+    // returned as `files` so the Phase 2 mode decision reads the SAME snapshot
+    // instead of fetching again into a race with a new push.
     expect(await detectCode({ ...BASE, reportedCount: 3, fetchImpl: impl })).toEqual({
       code: false,
       reason:
         'docs-only (or non-code) change: skip pr-gate, pr-checks, browser-gate (3 files listed; event reports 3)',
+      files: docs,
     });
     // changed_files missing from the payload skips the count check but still
     // classifies (pagination terminated below the cap, so the listing is
@@ -334,16 +339,46 @@ describe('detectCode (fail closed end to end)', () => {
       code: false,
       reason:
         'docs-only (or non-code) change: skip pr-gate, pr-checks, browser-gate (3 files listed; event reports n/a)',
+      files: docs,
     });
   });
 
   it('classifies a code PR as code=true through the same path', async () => {
-    const { impl } = pagedFetch([{ filename: 'docs/a.md' }, { filename: 'src/sim/sim.ts' }]);
+    const listing: Entry[] = [{ filename: 'docs/a.md' }, { filename: 'src/sim/sim.ts' }];
+    const { impl } = pagedFetch(listing);
     const result = await detectCode({ ...BASE, reportedCount: 2, fetchImpl: impl });
     expect(result).toEqual({
       code: true,
       reason: 'code path change detected ("src/sim/sim.ts"): full PR tier',
+      files: listing,
     });
+  });
+
+  it('returns no files on any fail-closed path, so the mode decision cannot trust them', async () => {
+    // Absence of `files` is the contract: every code=true-by-doubt return
+    // (non-PR event, missing PR context, missing token, API failure, empty
+    // listing, count mismatch) proves nothing about the diff, and a mode
+    // decision reading a partial listing would narrow the run on unproven
+    // data. One assertion per named arm.
+    const rejecting = (async () => {
+      throw new Error('ECONNRESET');
+    }) as unknown as typeof fetch;
+    expect(
+      await detectCode({ ...BASE, eventName: 'push', fetchImpl: neverFetch }),
+    ).not.toHaveProperty('files');
+    expect(
+      await detectCode({ ...BASE, prNumber: Number.NaN, fetchImpl: neverFetch }),
+    ).not.toHaveProperty('files');
+    expect(await detectCode({ ...BASE, token: '', fetchImpl: neverFetch })).not.toHaveProperty(
+      'files',
+    );
+    expect(await detectCode({ ...BASE, fetchImpl: rejecting })).not.toHaveProperty('files');
+    const { impl: empty } = pagedFetch([]);
+    expect(await detectCode({ ...BASE, fetchImpl: empty })).not.toHaveProperty('files');
+    const { impl } = pagedFetch([{ filename: 'docs/a.md' }]);
+    expect(await detectCode({ ...BASE, reportedCount: 5, fetchImpl: impl })).not.toHaveProperty(
+      'files',
+    );
   });
 });
 
@@ -358,7 +393,12 @@ describe('detect_code_changes.mjs entry (subprocess)', () => {
   let apiUrl = '';
   const server = createServer((_req, res) => {
     res.setHeader('content-type', 'application/json');
-    res.end(JSON.stringify([{ filename: 'docs/prd/spec.md' }, { filename: 'README.md' }]));
+    res.end(
+      JSON.stringify([
+        { filename: 'docs/prd/spec.md', status: 'modified' },
+        { filename: 'README.md', status: 'modified' },
+      ]),
+    );
   });
 
   beforeAll(async () => {
@@ -423,14 +463,37 @@ describe('detect_code_changes.mjs entry (subprocess)', () => {
     return file;
   }
 
-  it('writes code=true to GITHUB_OUTPUT for a push event', async () => {
+  it('writes code=true and test_mode=full to GITHUB_OUTPUT for a push event', async () => {
     const run = await runEntry('push', { GITHUB_EVENT_NAME: 'push' });
     expect(run.exitCode).toBe(0);
-    expect(run.output).toBe('code=true\n');
+    // Exact whole-output pin: these four lines are the entire contract the
+    // dependent jobs read, and selection must never activate off a PR event.
+    expect(run.output).toBe(
+      'code=true\n' +
+        'test_mode=full\n' +
+        'test_mode_reason=selection applies to pull requests only: full suite\n' +
+        'changed_files=[]\n',
+    );
     expect(run.log).toContain('non-PR event');
   });
 
-  it('writes code=false for a docs-only PR through the real fetch path', async () => {
+  it('writes code=true and test_mode=full to GITHUB_OUTPUT for a merge queue run', async () => {
+    // The merge_group event is the queue's own run over the candidate merge
+    // result; the queue is the last pre-merge bar, so the handover the shard
+    // jobs read must be the full-suite contract, end to end through the real
+    // entry, exactly as for push.
+    const run = await runEntry('merge-group', { GITHUB_EVENT_NAME: 'merge_group' });
+    expect(run.exitCode).toBe(0);
+    expect(run.output).toBe(
+      'code=true\n' +
+        'test_mode=full\n' +
+        'test_mode_reason=selection applies to pull requests only: full suite\n' +
+        'changed_files=[]\n',
+    );
+    expect(run.log).toContain('non-PR event');
+  });
+
+  it('writes code=false and the selective handover for a docs-only PR through the real fetch path', async () => {
     const run = await runEntry('docs', {
       GITHUB_EVENT_NAME: 'pull_request',
       GITHUB_EVENT_PATH: eventFixture('docs-event', {
@@ -441,13 +504,23 @@ describe('detect_code_changes.mjs entry (subprocess)', () => {
       GITHUB_API_URL: apiUrl,
     });
     expect(run.exitCode).toBe(0);
-    expect(run.output).toBe('code=false\n');
+    // The docs-only PR skips the shards on code=false either way; the pin is
+    // that the SAME fetched snapshot fed both decisions and the changed list
+    // rides the output as one line of JSON.
+    expect(run.output).toBe(
+      'code=false\n' +
+        'test_mode=selective\n' +
+        'test_mode_reason=selective: 0 changed source file(s), 0 changed test file(s), 2 inert path(s)\n' +
+        'changed_files=["docs/prd/spec.md","README.md"]\n',
+    );
     expect(run.log).toContain('2 files listed; event reports 2');
   });
 
   it('fails closed when the payload count disagrees with the listing', async () => {
     // This also pins that changed_files is actually read and passed through:
-    // if that wiring broke, this case would classify docs-only.
+    // if that wiring broke, this case would classify docs-only. The mode
+    // decision must fail closed off the same mismatch (detectCode returns no
+    // files on any unprovable path).
     const run = await runEntry('mismatch', {
       GITHUB_EVENT_NAME: 'pull_request',
       GITHUB_EVENT_PATH: eventFixture('mismatch-event', {
@@ -458,7 +531,12 @@ describe('detect_code_changes.mjs entry (subprocess)', () => {
       GITHUB_API_URL: apiUrl,
     });
     expect(run.exitCode).toBe(0);
-    expect(run.output).toBe('code=true\n');
+    expect(run.output).toBe(
+      'code=true\n' +
+        'test_mode=full\n' +
+        'test_mode_reason=no provable changed-file listing: full suite\n' +
+        'changed_files=[]\n',
+    );
     expect(run.log).toContain('listed 2 files but the event reports 5');
   });
 });

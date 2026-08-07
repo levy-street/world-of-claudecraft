@@ -33,6 +33,14 @@ const mediumPreferences: GraphicsSettingsSnapshot = {
   surfaceDetail: 1,
   effectsQuality: 1,
   shadowQuality: 1,
+  antiAliasing: 1,
+  bloomQuality: 1,
+  ambientOcclusion: 1,
+  viewDistance: 1,
+  waterQuality: 1,
+  characterDetail: 1,
+  dynamicLights: 1,
+  particleEffects: 1,
 };
 
 describe('GfxProfile resolution and activation', () => {

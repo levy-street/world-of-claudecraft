@@ -1,6 +1,7 @@
 export interface PrFileEntry {
   filename?: string;
   previous_filename?: string | null;
+  status?: string;
 }
 
 export interface CodeDecision {
@@ -33,4 +34,4 @@ export function detectCode(opts: {
   token: string;
   apiUrl?: string;
   fetchImpl?: typeof fetch;
-}): Promise<CodeDecision>;
+}): Promise<CodeDecision & { files?: PrFileEntry[] }>;

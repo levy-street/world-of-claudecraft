@@ -15,6 +15,54 @@ export const table: DeedLocaleTable = {
     name: 'Langit Membisu',
     desc: 'Tumpaskan Cindraleth Sang Matriark Rahang di sarang kawahnya di atas Drakemaw.',
   },
+  chr_frostveil_gatherer: {
+    name: 'Panen Teras',
+    desc: 'Panen urat bijih, tegakan kayu, dan petak herba di Frostveil.',
+  },
+  chr_frostveil_first_cast: {
+    name: 'Es Pertama di Tarn',
+    desc: 'Tangkap ikan dari perairan Frostveil.',
+  },
+  chr_amberfall_gatherer: {
+    name: 'Panen Amberfall',
+    desc: 'Panen urat bijih, tegakan kayu, dan petak herba di Amberfall.',
+  },
+  chr_amberfall_first_cast: {
+    name: 'Tangkapan dari Rawa Besar',
+    desc: 'Tangkap ikan dari perairan Amberfall.',
+  },
+  chr_nightbloom_gatherer: {
+    name: 'Panen Bermimpi',
+    desc: 'Panen urat bijih, tegakan kayu, dan petak herba di Nightbloom.',
+  },
+  chr_nightbloom_first_cast: {
+    name: 'Riak di Sumur Bulan',
+    desc: 'Tangkap ikan dari perairan Nightbloom.',
+  },
+  chr_wraithwood_gatherer: {
+    name: 'Panen di Bawah Kanopi',
+    desc: 'Panen urat bijih, tegakan kayu, dan petak herba di Wraithwood.',
+  },
+  chr_wraithwood_first_cast: {
+    name: 'Lemparan di Teluk Cermin',
+    desc: 'Tangkap ikan dari perairan Wraithwood.',
+  },
+  chr_palmreach_gatherer: {
+    name: 'Panen di Pantai Palem',
+    desc: 'Panen urat bijih, tegakan kayu, dan petak herba di Palmreach.',
+  },
+  chr_palmreach_first_cast: {
+    name: 'Melempar di Laguna Safir',
+    desc: 'Tangkap ikan dari perairan Palmreach.',
+  },
+  chr_evergarden_gatherer: {
+    name: 'Karunia Parterre',
+    desc: 'Panen urat bijih, tegakan kayu, dan petak herba di Evergarden.',
+  },
+  chr_evergarden_first_cast: {
+    name: 'Lemparan di Kolam Kelopak',
+    desc: 'Tangkap ikan dari perairan Evergarden.',
+  },
   pvp_card_duel_first_win: {
     name: 'Aturan Sendiri',
     desc: 'Menangkan Duel Kartu di hadapan Ahli Kartu.',

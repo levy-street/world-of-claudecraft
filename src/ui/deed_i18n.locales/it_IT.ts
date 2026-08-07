@@ -15,6 +15,54 @@ export const table: DeedLocaleTable = {
     name: 'Il Cielo Tace',
     desc: 'Uccidi Cindraleth, la Matriarca delle Fauci, nel suo nido nel cratere sopra il Drakemaw.',
   },
+  chr_frostveil_gatherer: {
+    name: 'Raccolto sui terrazzamenti',
+    desc: 'Raccogli una vena di minerale, un gruppo di legna e un appezzamento d erbe nel Frostveil.',
+  },
+  chr_frostveil_first_cast: {
+    name: 'Primo ghiaccio sul lago',
+    desc: 'Pesca un pesce nelle acque del Frostveil.',
+  },
+  chr_amberfall_gatherer: {
+    name: 'Il raccolto di Amberfall',
+    desc: 'Raccogli una vena di minerale, un gruppo di legna e un appezzamento d erbe ad Amberfall.',
+  },
+  chr_amberfall_first_cast: {
+    name: 'Una preda dalla grande palude',
+    desc: 'Pesca un pesce nelle acque di Amberfall.',
+  },
+  chr_nightbloom_gatherer: {
+    name: 'Il raccolto sognante',
+    desc: 'Raccogli una vena di minerale, un gruppo di legna e un appezzamento d erbe a Nightbloom.',
+  },
+  chr_nightbloom_first_cast: {
+    name: 'Un increspatura sul pozzo lunare',
+    desc: 'Pesca un pesce nelle acque di Nightbloom.',
+  },
+  chr_wraithwood_gatherer: {
+    name: 'Raccolto sotto la volta',
+    desc: 'Raccogli una vena di minerale, un gruppo di legna e un appezzamento d erbe nel Wraithwood.',
+  },
+  chr_wraithwood_first_cast: {
+    name: 'Un lancio nella baia dello specchio',
+    desc: 'Pesca un pesce nelle acque del Wraithwood.',
+  },
+  chr_palmreach_gatherer: {
+    name: 'Raccolto sulla spiaggia di palme',
+    desc: 'Raccogli una vena di minerale, un gruppo di legna e un appezzamento d erbe a Palmreach.',
+  },
+  chr_palmreach_first_cast: {
+    name: 'Lancio nella laguna di zaffiro',
+    desc: 'Pesca un pesce nelle acque di Palmreach.',
+  },
+  chr_evergarden_gatherer: {
+    name: 'Il dono del parterre',
+    desc: 'Raccogli una vena di minerale, un gruppo di legna e un appezzamento d erbe a Evergarden.',
+  },
+  chr_evergarden_first_cast: {
+    name: 'Un lancio sullo stagno dei petali',
+    desc: 'Pesca un pesce nelle acque di Evergarden.',
+  },
   pvp_card_duel_first_win: {
     name: 'Regole di Casa',
     desc: 'Vinci un Duello di Carte dal Maestro delle Carte.',

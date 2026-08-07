@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { isBlocked } from '../src/sim/colliders';
 import { BUILTIN_WORLD, CAMPS } from '../src/sim/data';
 import { PLAYER_MAX_CLIMB_SLOPE } from '../src/sim/pathfind';
+import { rideSteepnessAt } from '../src/sim/ride_height';
 import { Sim } from '../src/sim/sim';
 import type { WorldContent } from '../src/sim/types';
 import { terrainDownhill, terrainHeight, terrainSteepness, WATER_LEVEL } from '../src/sim/world';
@@ -179,12 +180,32 @@ describe('unwalkable slope movement gates', () => {
     const meta = sim.players.get(sim.player.id);
     if (!meta) throw new Error('missing player meta');
     meta.moveInput.jump = true;
+    // The kernel decides the jump from the state at the START of a tick
+    // (player_motion.ts: STANDING there, with the RIDE-surface steepness
+    // memo over the climb limit AND an actual downhill at the exact
+    // position; rideSteepnessAt clamps submerged ground to the waterline so
+    // a lake-bed dip never strips control from a wader), and the body also
+    // moves within the tick. So the honest assertion is at the jump's
+    // launch moment, with the kernel's own predicate: whenever vy flips
+    // positive this tick, the PRE-tick state must not have been
+    // standing-on-kernel-steep. An airborne launch is the coyote window (a
+    // slide-off opens it by design, and the airborne contour gate still
+    // refuses any face you could not walk up). The natural-relief terrain
+    // is what makes the raw-steepness/post-tick shortcut misfire: a slide
+    // can end in a shoreline dip whose raw memo reads steep while the
+    // ridden surface is walkable.
+    let prevVy = 0;
     for (let i = 0; i < 20 * 5; i++) {
-      sim.tick();
       const p = sim.player;
-      if (terrainSteepness(p.pos.x, p.pos.z, SEED) > CLIMB_LIMIT) {
-        expect(p.vy, `tick ${i}: jumped off steep ground`).toBeLessThanOrEqual(0);
+      const preSteep =
+        p.onGround &&
+        rideSteepnessAt(p.pos.x, p.pos.z, SEED) > CLIMB_LIMIT &&
+        terrainDownhill(p.pos.x, p.pos.z, SEED) !== null;
+      sim.tick();
+      if (prevVy <= 0 && p.vy > 0) {
+        expect(preSteep, `tick ${i}: jumped off steep ground`).toBe(false);
       }
+      prevVy = p.vy;
     }
   });
 

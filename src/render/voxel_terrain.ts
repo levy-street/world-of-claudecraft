@@ -298,7 +298,7 @@ export function buildVoxelTerrain(seed: number): VoxelTerrainView {
           }
           mud[vi] = marshWeightAt(vz);
           snow[vi] = Math.max(0, Math.min(1, (vy - SNOW_HEIGHT) / SNOW_FEATHER));
-          const wl = waterLevelAt(vx, vz);
+          const wl = waterLevelAt(vx, vz, seed);
           sand[vi] = wl === -Infinity ? 0 : Math.max(0, Math.min(1, 1 - (vy - wl) / 2));
         }
         geo.setAttribute('aRoad', new THREE.BufferAttribute(road, 1));

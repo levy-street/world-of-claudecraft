@@ -108,6 +108,14 @@ export const ADMIN_ROUTE_PERMISSIONS: readonly AdminRouteRule[] = [
     pattern: /^\/admin\/api\/bug-reports\/(\d+)\/screenshot$/,
     permission: 'support.read',
   },
+  // Resolving/dismissing is an operator write a player never sees, same shape as
+  // the account flair writes above: it rides the general moderation.act bucket
+  // rather than minting a one-off permission.
+  {
+    method: 'POST',
+    pattern: /^\/admin\/api\/bug-reports\/(\d+)\/(resolve|dismiss)$/,
+    permission: 'moderation.act',
+  },
 
   { method: 'GET', pattern: '/admin/api/suspicious-players', permission: 'botdetector.read' },
   { method: 'GET', pattern: '/admin/api/detection-calibration', permission: 'botdetector.read' },

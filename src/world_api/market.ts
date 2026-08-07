@@ -6,6 +6,7 @@ import type {
   MarketRarityFilter,
   MarketSubtypeFilter,
 } from '../sim/market_query';
+import type { MarketSaleRecord } from '../sim/market_sale_log';
 import type { InvSlot, ItemInstancePayload } from '../sim/types';
 
 // ---------------------------------------------------------------------------
@@ -51,6 +52,13 @@ export interface MarketInfo {
   pageCount: number; // total browse pages of other sellers' listings (>= 1)
   collectionCopper: number; // proceeds waiting to be collected
   collectionItems: InvSlot[]; // returned/expired items waiting to be collected
+  /** The itemized ledger behind `collectionCopper`: one row per sale still awaiting
+   *  pickup, oldest first. Empty when nothing has sold since the last collect. */
+  collectionSales: MarketSaleRecord[];
+  /** Older sales the ledger cap dropped. Their gold IS in `collectionCopper`, so the
+   *  tab says how many rows it is not listing rather than showing a short list that
+   *  does not add up. */
+  collectionSalesOmitted: number;
   cutPct: number; // the Merchant's cut on a sale, as a percentage
   maxListings: number; // per-seller active-listing cap
   myListingCount: number; // how many active listings the viewer already has

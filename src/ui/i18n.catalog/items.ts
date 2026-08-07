@@ -79,6 +79,11 @@ const itemStringsEn = {
       useFood: 'Use: Restores {amount} health over {seconds} sec. Must remain seated while eating.',
       useDrink:
         'Use: Restores {amount} mana over {seconds} sec. Must remain seated while drinking.',
+      // Battle elixirs (elixir_tooltip_view.ts): the stat line for a mapped
+      // buff kind, and the aura-name fallback so an unmapped kind still says
+      // what quaffing grants instead of saying nothing.
+      useElixir: 'Use: Increases your {stat} by {value} for {minutes} min. Usable in combat.',
+      useElixirAura: 'Use: Grants {aura} for {minutes} min. Usable in combat.',
       questItem: 'Quest Item',
       // Story tooltip lines (quest_item_tooltip_view.ts): related quest title,
       // keep-rules footer, and orphaned copy when the item is no longer needed
@@ -88,6 +93,9 @@ const itemStringsEn = {
       questRules: 'Cannot be sold, banked, or traded.',
       questOrphaned: 'Not needed for any active quest.',
       classes: 'Classes: {classes}',
+      // Stackable per-slot cap (stack_size_tooltip_view.ts); unstackable
+      // kinds render no line at all rather than "Max stack: 1".
+      maxStack: 'Max stack: {count}',
       sellPrice: 'Sell price: {money}',
       clickBuy: 'Click to buy',
       clickSell: 'Click to sell',
@@ -256,6 +264,10 @@ const itemStringsEn = {
       collectEmpty: 'Nothing waiting. Sale proceeds and expired listings collect here.',
       collectNote: 'Earnings and returned goods the Merchant is holding for you.',
       saleProceeds: 'Sale proceeds',
+      // The itemized ledger under the proceeds line. saleOlder covers the rows the
+      // ledger cap dropped, whose gold IS still in the total above.
+      saleBuyer: 'Sold to {buyer}',
+      saleOlder: 'Plus {count} earlier sales, included in the total.',
       collectAll: 'Collect All',
     },
     logs: {
@@ -2405,6 +2417,9 @@ const ITEM_ENTITY_IDS = [
   'cragmaw_huntquiver',
   'gravewyrm_bone_quiver',
   'direfang_quiver',
+  'sharp_claw',
+  'curved_tusk',
+  'pristine_claw',
 ] as const;
 
 type ItemEntityId = (typeof ITEM_ENTITY_IDS)[number];
@@ -2517,6 +2532,9 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   cragmaw_huntquiver: 'Cragmaw Huntquiver',
   gravewyrm_bone_quiver: 'Gravewyrm Bone Quiver',
   direfang_quiver: 'Direfang Quiver',
+  sharp_claw: 'Sharp Claw',
+  curved_tusk: 'Curved Tusk',
+  pristine_claw: 'Pristine Claw',
 };
 
 function itemTranslations(names: readonly string[]): ItemEntityTranslations {

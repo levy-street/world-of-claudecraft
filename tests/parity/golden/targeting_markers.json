@@ -10,7 +10,7 @@
     "setMarker set/toggle-off/symbol-uniqueness + clearEntityMarker death-strip (~11956/12002)"
   ],
   "draws": 5,
-  "drawDigest": "577302fa",
+  "drawDigest": "763c21d0",
   "frames": [
     {
       "tick": 0,
@@ -4586,11 +4586,11 @@
       "tick": 0,
       "time": 0,
       "nextId": 969,
-      "state": "972a9e66",
+      "state": "d83e9f5b",
       "events": "c2e1234c",
       "rng": {
         "draws": 5,
-        "digest": "577302fa"
+        "digest": "763c21d0"
       },
       "label": "m2-dead",
       "players": [
@@ -5013,11 +5013,15 @@
           },
           "level": 3,
           "loot": {
-            "copper": 9,
+            "copper": 10,
             "items": [
               {
                 "count": 1,
                 "itemId": "wolf_fang"
+              },
+              {
+                "count": 1,
+                "itemId": "milepost_boots"
               }
             ]
           },
@@ -5108,11 +5112,11 @@
       "tick": 0,
       "time": 0,
       "nextId": 969,
-      "state": "972a9e66",
+      "state": "d83e9f5b",
       "events": "741638a5",
       "rng": {
         "draws": 5,
-        "digest": "577302fa"
+        "digest": "763c21d0"
       },
       "label": "final",
       "players": [
@@ -5535,11 +5539,15 @@
           },
           "level": 3,
           "loot": {
-            "copper": 9,
+            "copper": 10,
             "items": [
               {
                 "count": 1,
                 "itemId": "wolf_fang"
+              },
+              {
+                "count": 1,
+                "itemId": "milepost_boots"
               }
             ]
           },
