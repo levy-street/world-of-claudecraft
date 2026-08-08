@@ -1612,6 +1612,19 @@ describe('elixir aura names stay wired to the sim aura matcher', () => {
     setLanguage('en');
     expect(localizeSimAuraName('Venomfire Vigor')).toBe('Vipersear Vigor');
   });
+
+  it('the phase 03 wire-carried renames keep legacy aliases for the deploy window', () => {
+    // Same precedent as Venomfire Vigor above: a not-yet-restarted server
+    // still emits the pre-rename strings, so the new client must localize
+    // them until the release carrying the rename fully ships. Drop with the
+    // alias rows after v0.36.0 ships.
+    setLanguage('en');
+    expect(localizeSimAuraName('Winterbite')).toBe(localizeSimAuraName('Wintergnaw'));
+    const legacyLine = "The dead answer Deacon Varric's call!";
+    const canonicalLine = "The dead answer Deacon Vandric's call!";
+    expect(localizeSimText(legacyLine)).toBe(localizeSimText(canonicalLine));
+    expect(localizeSimText(legacyLine)).not.toBe(legacyLine);
+  });
 });
 
 // --- Vendor-sell log line: the "Sold <item>[ xN] for <money>." arm in

@@ -489,7 +489,19 @@ registry names verified CLEAR or GENERIC. Full verdicts: naming-audit.md.
   dead detonate siblings (PactSeal/BloodRite/PitSentence, no coin); the pre-phase
   shaman-kit old-name residue in comments and test fixtures (~20 files, earlier rename
   wave, none player-visible); talent_i18n Latin semantic staleness for
-  Thunderhurl/Zealwing stays under obligation 3.
+  Thunderhurl/Zealwing stays under obligation 3; the abilities.ts inert per-locale
+  arms (dead code, the overlay layer wins assembly) still carry roughly 143 stale
+  renderings per non-Latin locale from the EARLIER rename tracks; QA refreshed only
+  the six phase 03 coins, so the block is a strip-or-refresh cleanup candidate.
+- Phase 03 QA round 3 (the fresh reviewer over the fix round, per the phase QA file):
+  9 findings, all applied. The overlay guard gained RAID_EXTRA (was unscanned), the
+  six missing phase 03 coins (Holy Shock, Swiftmend, Nightkin, Varric, Okku,
+  Moonwell), derivation canaries + non-zero scan counters (the toEqual([]) no-op
+  hole), a hard fail on a missing per-language matcher table, and reverse
+  script-family rules for the Latin locales; the Hellfire Citadel arm joined the
+  ip_scrub teeth fixture (36 entries); the two deploy-window aliases got pins beside
+  the Venomfire precedent; the NAME-MAP QA rows moved their annotations to a footnote
+  so the bare flags arm.
 - Standing rule codified per the maintainer's mid-phase instruction: every NEW
   player-visible proper noun is IP-checked at authoring time in the same change (root
   CLAUDE.md content bullet + src/sim/content/CLAUDE.md "Naming originality" section).
