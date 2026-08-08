@@ -38,9 +38,14 @@ visit or a punishment for lateness is violating the design, not tuning it.
   guard suite cloning the physical-safety arms (dry land, no collider overlap, reachable
   stand spot, zone containment, spacing) for `FARM_PATCHES`. Hub anchors for patch
   sites and farmer NPCs: eastbrook_vale at Eastbrook, mirefen_marsh at Fenbridge,
-  thornpeak_heights at Highwatch, and evergarden at the formal parterre grounds (the
-  Evergarden has no named hub; the parterre is the anchor). Phase files may use these
-  hub names; this mapping is the anchor.
+  thornpeak_heights at Highwatch, and evergarden at the formal parterre grounds.
+  CORRECTED IN PHASE 2 against shipped content: the Evergarden DOES have a named hub,
+  Hedgewick at (320, 810) (EVERGARDEN_ZONE.hub, src/sim/content/evergarden.ts); the
+  parterre is the POI 'the_statuary_walk' ("The Parterre Walk") at (360, 875). The
+  parterre grounds remain the PATCH-SITE anchor (the beds sit on the parterre lawn),
+  but every hub-reachability arm floods from the ZONE hub, Hedgewick, because that is
+  what the cloned hubFloodStart reads. Phase files may use these hub names; this
+  mapping is the anchor.
 - D3: Growth is wall-clock and offline-friendly. Stage deadlines are epoch-ms values
   evaluated against `ctx.lockoutNowMs()` (the `raidLockouts` idiom, the ONE sanctioned
   wall-clock seam; server injects the realm clock, the offline browser host degrades to
@@ -441,9 +446,20 @@ question does not arise (farming has no station).
 
 ## Per-phase ledgers (append as phases complete)
 
-- New IWorld members: (none yet)
-- New SimEvents: (none yet)
-- New wire keys: (none yet)
+- New IWorld members: Phase 2: farmPatches (data) and myFarmPlots (data) on the new
+  IWorldFarming facet (src/world_api/farming.ts); parity pins moved 302 to 304
+  members, 77 to 79 data, 32 to 33 facets. RE-RUN tests/world_api_parity.test.ts and
+  tests/snapshots.test.ts after EVERY release absorb into this branch: identical
+  count-pin bumps on both sides auto-merge to a wrong total with no textual conflict
+  (the char-sheet playtime precedent).
+- New SimEvents: (none yet; Phase 2 deliberately adds none, and NO plot state may
+  ever ride an event payload: the parity omit-defaults shield does not cover event
+  digests)
+- New wire keys: Phase 2: fplot (the self delta mirroring myFarmPlots; tslot-shaped
+  emit with the pre-serialized empty arm; registered in ALL_DELTA_KEYS and
+  TERSE_TO_IWORLD, count pin 67 to 68). The projection NEVER carries
+  PlotState.survivalRoll or yieldSeed; the negative leak pin in tests/snapshots.test.ts
+  drives the real selfWireJson broadcast with an exhaustive nine-key set assertion.
 - New i18n keys and matcher rows: Phase 1 added, all English-only catalog rows with
   five non-Latin overlay fills each (M16): hudChrome.gathering.farming,
   hudChrome.gathering.toolTierUnmet.farming, hudChrome.gathering.toolRequired.farming,
@@ -474,8 +490,66 @@ question does not arise (farming has no station).
   two-key guide count prose (the phase file letters this (e)). THIS ledger's
   lettering is canonical; the phase file's five-letter block differs and
   points here (harmonized in Phase 1 QA, 2026-08-08).
+  Phase 2: (h) FARM_CROP_IDS pre-declares ONE crop id, 'wheat' (packet-locked via
+  the intro quest): the load-side allowlist and the end-to-end round trip need a
+  real id to prove a surviving row; the growth phase owns the catalog and nothing
+  can plant this phase, so no live save can carry it. (i) The D2 Evergarden hub
+  prose was FALSE against shipped content and is corrected in D2 above: Hedgewick
+  is the zone hub and the reachability flood origin; the parterre stays the
+  patch-site anchor. (j) FARMING_ZONES is farming's OWN tier column, deliberately
+  diverging from the shipped zone-progression ladder at evergarden (tier 4 showcase
+  vs the named inversion's tier 1), so the fishing test's GATHER_NODES derivation
+  CANNOT be copied: literal pins plus the one-ladder arm (FARM_PATCHES[].tier
+  toBe the reader) guard it instead, and a fifth farming hub must update both in
+  the same change. (k) The placement suite grew three arms beyond the phase file's
+  list, each with a counter-example: camp-footprint clearance (the west-Eastbrook
+  site passed every physical arm yet sat 8.1 yd inside the Sableweb camp), road
+  clearance (5 yd, the world.ts screen), and bed-vs-gather-node clearance; the
+  Phase 1 deferral of the node hover tooltip maps to "the beds phase" is RE-DEFERRED
+  by the fishing precedent: farming has no GatherNodeType, so those maps stay
+  farming-free permanently, and the gatherDeniedLineKey surface decision moves to
+  the phase that ships plant/harvest commands. (l) The FarmPlotView clock-base
+  question (host-clock absolutes: epoch ms online, sim-clock ms offline) is
+  DOCUMENTED as a seam contract this phase (no render/ui consumer may subtract
+  Date.now; rely on status), and the RaidLockout-style derived duration field is
+  deferred to the growth phase, which owns the first timer surface. (m) Four code
+  commits, not five: the parity regen was proven a byte-identical no-op again (the
+  (b) precedent), so no goldens commit exists.
 - Dev command surface: (Phase 3 records the exact /dev farm cheat names here at
   completion; Phases 7 and 8 depend on them for dev-created crops)
+- Growth-phase (Phase 3) handoff from the Phase 2 review round, decide these ON
+  PURPOSE rather than inherit them:
+  - The anchor semantics family: the farm_persist nowMs > 0 guard means an offline
+    load at sim.time 0 keeps saved anchors while a post-tick load re-anchors (two
+    offline load paths disagree), and offline growth restarts inflated rather than
+    continuing through logout; the reviewers' concrete direction is re-anchor to
+    max(nowMs, 1) or an epoch-based offline clock, pinned by BOTH a fresh-Sim load
+    and a post-tick load. The mirror hazard (an absurdly PAST anchor loading on a
+    wall-clock host reads instantly ready) needs no code now: the scan pin in
+    tests/professions_farming_state.test.ts holds the no-caller-outside-server
+    premise, and a save editor can craft instant-ready with legit-looking values
+    anyway, so an epoch floor buys no anti-tamper value.
+  - The derived-duration wire field (RaidLockout msRemaining template) lands with
+    the first timer UI; until then the clock-base contract comment in
+    src/world_api/farming.ts is the only guard.
+  - Absent/corrupt hidden slots: prefer DERIVING a replacement deterministically
+    (bed id plus plantedAtMs) over re-rolling at harvest, so a dropped slot is not
+    a reroll primitive.
+  - Admin visibility: serializeCharacter snapshots (server/admin.ts character
+    inspection) will expose filled survivalRoll/yieldSeed to operators; decide
+    whether that is acceptable when the slots go live.
+  - Deploy-order constraint (mixed fleet): an old server process autosaves the
+    whole blob WITHOUT farmPlots, so this build must be fully rolled out before
+    any build that can PLANT ships; a rollback past this phase after plants exist
+    destroys plot state on the next autosave.
+  - The per-tick fplot emit stringifies every planted player's rows at 20 Hz
+    (tslot-consistent, bounded at 23 beds); revisit if rows grow.
+  - Spectator sessions mirror the spectated player's plots into myFarmPlots (the
+    whole self block does this); do not hang plant/harvest UI off it while
+    spectating.
+  - Stale beds-arrive-later comments to sweep when farming's guide content lands:
+    scripts/wiki/build_content.mjs:773 and src/guide/pages/professions_gathering.ts
+    header prose (release-side files, deliberately untouched this phase).
 
 ## OPEN items (maintainer decisions or later-phase calls, never guess)
 

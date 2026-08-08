@@ -8,7 +8,7 @@
 | Packet PR merged | superseded by D22 (local-only; no farming PRs) | | |
 | Phase 1 (foundation) | done | 2026-08-07 | 2026-08-08 |
 | Phase 1 QA | done (PASS-WITH-FOLLOWUPS) | 2026-08-08 | 2026-08-08 |
-| Phase 2 (patches and plots) | not started | | |
+| Phase 2 (patches and plots) | done | 2026-08-08 | 2026-08-08 |
 | Phase 2 QA | not started | | |
 | Phase 3 (growth engine) | not started | | |
 | Phase 3 QA | not started | | |
@@ -237,7 +237,95 @@ and together enumerate SEVEN distinct deviations; state.md's ledger is now
 the canonical superset (a) to (g) and the phase file points at it.
 
 ### Phase 2
-(not started)
+Completed 2026-08-08 on fix/farming-phase-02-patches-and-plots, merged --no-ff into
+feature/farming-plan per D22 (no push, no PR). Release sync: origin/release/v0.36.0
+absorbed at the phase start (merge 743a1ee6ad, tip e5c16ca398, the PR 3138 wiki
+refresh, 14 commits / 89 files, guide-only; the one conflict was the generated
+pending.ts, regen-resolved; release-merge-audit clean, no divergences).
+
+Acceptance (phase file STEP 5):
+- [x] FARM_PATCHES covers exactly the four D2 hubs at the locked tiers (eastbrook_vale
+      1, mirefen_marsh 2, thornpeak_heights 3, evergarden 4), every bed id stable and
+      documented as a persisted save key; positions and bed counts in Notes below.
+- [x] tests/farm_patch_placement.test.ts green with every physical-safety arm (dry
+      land, sea freeboard, water in reach, slope with reach sweep, collider overlap,
+      stand spot, hub reachability, zone containment, bed spacing) plus the Sowfield,
+      camp-footprint, road and gather-node-clearance screens, each arm paired with a
+      counter-example proving it can fail.
+- [x] src/sim/professions/farming_zones.ts follows the fishing_zones template
+      (Object.hasOwn reader, explicit row per farming zone, derived knobs); the
+      one-ladder arm pins FARM_PATCHES[].tier to the reader, so no other module
+      hardcodes a farming zone tier.
+- [x] PlayerMeta.farmPlots exists, initialized empty in addPlayer; the empty Map
+      canonicalizes to an inert [] in the parity sampler (shield proven again).
+- [x] CharacterState.farmPlots is optional with a default: a pre-farming save loads
+      cleanly and re-omits the key on save, proven end to end through a real Sim.
+- [x] Normalize-on-load drops unknown bed and crop ids, drops non-finite and
+      non-positive timestamps, clamps duration to FARM_MAX_GROW_MS BEFORE the future
+      re-anchor, guards the zero offline clock, drops a corrupt hidden slot without
+      the row; 13 tamper arms plus malformed-container and prototype-key pins.
+- [x] The save round trip is green with expectation literals built fresh (no
+      reference-aliased self-comparison); clamp and sort pins mutation-checked.
+- [x] IWorldFarming exists with reads only (farmPatches, myFarmPlots), implemented in
+      BOTH Sim and ClientWorld; tests/world_api_parity.test.ts pins updated (302 to
+      304 members, 77 to 79 data, 32 to 33 facets) and green.
+- [x] fplot registered in ALL_DELTA_KEYS and TERSE_TO_IWORLD (67 to 68, literal-string
+      pins, sorted position between equip and gprof); the snapshots round-trip pin is
+      green and the delta fixture plants a real row so the mirror cannot pass on the
+      empty default.
+- [x] The negative wire-leak pin drives the REAL selfWireJson broadcast and proves the
+      payload carries neither survivalRoll nor yieldSeed, with an exhaustive nine-key
+      set assertion; mutation-checked (a forced leak and a key rename both red).
+- [x] tests/parity green (193 passed) AND the UPDATE_PARITY=1 regen left the goldens
+      byte-identical, so there is NO parity commit this phase (the deviation (b)
+      precedent holds; the growth phase inherits the first real regen).
+- [x] tests/architecture.test.ts green: sim purity, zero new rng call sites.
+- [x] Nothing is player-reachable: no command, no item, no render, no UI, no event.
+
+Notes:
+- Patch positions and bed counts (all coordinates x, z; a patch is a rectangular
+  grid on a 5 yard pitch, the INTERACT_RANGE floor; anchor = grid centroid):
+  - patch_eastbrook, tier 1, anchor (18.5, 32.5), 4 beds at (16,30) (21,30) (16,35)
+    (21,35): the north lane out of town. The obvious west farmland PASSED every
+    physical arm but sits 8.1 yd inside the Sableweb webwood camp footprint, which
+    forced both the move and a new camp-clearance arm.
+  - patch_mirefen, tier 2, anchor (-22, 341), 5 beds at (-26,339) (-21,339) (-16,339)
+    (-26,344) (-21,344): drained ground south-west of Fenbridge; the no-water-in-reach
+    arm forced the move off the skeleton rows.
+  - patch_thornpeak, tier 3, anchor (-18, 687.5), 6 beds at (-23,685) (-18,685)
+    (-13,685) (-23,690) (-18,690) (-13,690): the shelf below Highwatch; the
+    reach-sweep slope arm rejected the first candidate column.
+  - patch_evergarden, tier 4, anchor (348.5, 874.5), 8 beds at x 341/346/351/356 by
+    z 872/877: the parterre lawn 12 yd west of The Parterre Walk, off its lane;
+    reachability floods from the ZONE hub Hedgewick (320, 810).
+- Bed counts are tier-scaled 4/5/6/8 (the showcase reads as one garden); bed ids
+  bed_<hub>_<n>, patch ids patch_<hub>, both persisted save keys, never renumber.
+- Placement constants decided in-phase: BED_CLEARANCE = PLAYER_BODY_RADIUS +
+  SWEEP_STEP (beds ship no collider this phase, the herb null-body case);
+  BED_SPACING = INTERACT_RANGE inclusive, with the tightest real pair sitting
+  exactly on the floor and pinned with toBe. Two arms beyond the brief: road
+  clearance (5 yd, the world.ts screen) and bed-vs-gather-node clearance (5 yd).
+- The review round (cross-platform-sync, architecture-reviewer, migration-safety,
+  qa-checklist: 0 BLOCKING everywhere) added: the deep freeze of FARM_PATCHES with
+  a frozen pin, farmPlots registration in PROFESSIONS_BLOB_FIELDS, readonly content
+  interfaces, stable-id destroy-on-load warnings at both id edit sites, the
+  clock-base contract comments on the seam (see state.md, growth-phase handoff),
+  the dev-channel drop warn on load, malformed-container and prototype-key pins,
+  and the serializeCharacter caller scan pin.
+- Would-be PR body (D22, recorded in lieu of a PR):
+  Title: feat(professions): farming patches and per-player plot state (phase 2)
+  Summary: The world knows where garden beds are and each player can persist plot
+  state, with the wire carrying only the public projection. Adds FARM_PATCHES
+  (4 hub sites, 23 stable beds) with a cloned physical-safety placement suite,
+  farming's own tier ladder leaf, PlayerMeta.farmPlots with an optional
+  anti-tampered CharacterState row, the IWorldFarming read facet in both worlds,
+  and the fplot self delta whose projection provably never carries the hidden
+  pre-rolled outcome slots. No command, item, growth, render, or UI: nothing is
+  player-reachable this phase.
+  Testing: 4 new/extended suites (59 tests) plus the wire, parity-pin,
+  architecture, bandwidth, env-protocol and full parity suites (940+ tests
+  across the validation list), UPDATE_PARITY=1 regen byte-identical, gate_select
+  PASS. Screenshots: n/a (no visual surface).
 
 ### Phase 3
 (not started)
