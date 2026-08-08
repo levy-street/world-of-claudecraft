@@ -62,6 +62,13 @@ export interface IWorldProgressionXp {
   unlockedMilestones: string[];
   // Classic Rested XP pool (inn-rested kill-XP bonus); 0 when not rested.
   restedXp: number;
+  // Lifetime played time in seconds for the SELF character (the same running
+  // total the /playtime chat command reports and the save persists). The
+  // offline Sim derives it live from the sim clock; the online ClientWorld
+  // mirrors the server's self wire, which quantizes to whole minutes so the
+  // delta gate ships it about once a minute instead of every tick. Display
+  // only (the character sheet's Time Played line); no gameplay reads it.
+  playtimeSeconds: number;
   // Flat per-craft skill tracking (#1126): one independent, additive-only skill
   // value for each of the ten crafts on the professions ring, keyed by craft id
   // (see src/sim/content/professions.ts and src/sim/professions/wheel.ts). No

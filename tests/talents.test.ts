@@ -33,6 +33,7 @@ import {
 import { type PlayerMeta, Sim } from '../src/sim/sim';
 import { ALL_CLASSES, MAX_LEVEL, type PlayerClass, type SimEvent } from '../src/sim/types';
 import { talentRowOptionIconRef } from '../src/ui/talent_icons';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 // 'personal_barrier' is the shieldConsumed SLOT sentinel (combat/talent_procs.ts):
 // it resolves at runtime to whichever personal barrier the spec provides.
@@ -70,7 +71,7 @@ function requiredMeta(sim: Sim, pid = sim.playerId): PlayerMeta {
 }
 
 function warriorAtCap(seed = 7): Sim {
-  const sim = new Sim({ seed, playerClass: 'warrior' });
+  const sim = new Sim({ seed, playerClass: 'warrior', world: EMPTY_TEST_WORLD });
   sim.setPlayerLevel(MAX_LEVEL);
   return sim;
 }
@@ -381,7 +382,7 @@ describe('canonical build strings', () => {
 
 describe('Sim authoritative Talent V2 integration', () => {
   it('commits a spec at level 5 and applies its signature and mastery immediately', () => {
-    const sim = new Sim({ seed: 7, playerClass: 'warrior' });
+    const sim = new Sim({ seed: 7, playerClass: 'warrior', world: EMPTY_TEST_WORLD });
     sim.setPlayerLevel(4);
     expect(sim.setSpec('fury')).toBe(false);
     expect(sim.known.some((ability) => ability.def.id === 'bloodthirst')).toBe(false);
@@ -422,7 +423,7 @@ describe('Sim authoritative Talent V2 integration', () => {
   });
 
   it('rejects locked, unknown, and cross-class row selections', () => {
-    const sim = new Sim({ seed: 7, playerClass: 'warrior' });
+    const sim = new Sim({ seed: 7, playerClass: 'warrior', world: EMPTY_TEST_WORLD });
     sim.setPlayerLevel(5);
     expect(sim.selectTalentRow(8, 'war_row_die_by_the_sword')).toBe(false);
     expect(sim.selectTalentRow(5, 'missing')).toBe(false);
@@ -475,7 +476,12 @@ describe('Sim authoritative Talent V2 integration', () => {
     const state = sim.serializeCharacter(sim.playerId);
     if (!state) throw new Error('Failed to serialize the Warrior');
 
-    const restored = new Sim({ seed: 9, playerClass: 'warrior', noPlayer: true });
+    const restored = new Sim({
+      seed: 9,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: EMPTY_TEST_WORLD,
+    });
     const pid = restored.addPlayer('warrior', 'Reloaded', { state });
     const meta = requiredMeta(restored, pid);
     expect(meta.talents).toEqual(
@@ -502,7 +508,12 @@ describe('Sim authoritative Talent V2 integration', () => {
     if (!state) throw new Error('Failed to serialize the Warrior');
     state.level = 8;
 
-    const restored = new Sim({ seed: 9, playerClass: 'warrior', noPlayer: true });
+    const restored = new Sim({
+      seed: 9,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: EMPTY_TEST_WORLD,
+    });
     const pid = restored.addPlayer('warrior', 'Repaired', { state });
     expect(requiredMeta(restored, pid).talents).toEqual(
       allocation('arms', { 5: 'war_row_double_charge' }),
@@ -589,7 +600,7 @@ describe('Sim loadouts and stable hot-path bake', () => {
   });
 
   it('repairs an untrusted next loadout before auto-applying it on deletion', () => {
-    const sim = new Sim({ seed: 7, playerClass: 'warrior' });
+    const sim = new Sim({ seed: 7, playerClass: 'warrior', world: EMPTY_TEST_WORLD });
     sim.setPlayerLevel(8);
     expect(sim.saveLoadout('Safe', [], allocation('arms', { 5: 'war_row_double_charge' }))).toBe(0);
     const meta = requiredMeta(sim);
@@ -622,7 +633,7 @@ describe('Sim loadouts and stable hot-path bake', () => {
 
 describe('spec switch cancels orphaned form auras', () => {
   it('drops Moonkin Form (and its buffs) when respeccing away from Balance', () => {
-    const sim = new Sim({ seed: 11, playerClass: 'druid' });
+    const sim = new Sim({ seed: 11, playerClass: 'druid', world: EMPTY_TEST_WORLD });
     sim.setPlayerLevel(MAX_LEVEL);
     expect(sim.setSpec('balance')).toBe(true);
     sim.castAbility('moonkin_form', sim.playerId);
@@ -637,7 +648,7 @@ describe('spec switch cancels orphaned form auras', () => {
   });
 
   it('drops Gloamveil Form when respeccing a priest away from Shadow', () => {
-    const sim = new Sim({ seed: 12, playerClass: 'priest' });
+    const sim = new Sim({ seed: 12, playerClass: 'priest', world: EMPTY_TEST_WORLD });
     sim.setPlayerLevel(MAX_LEVEL);
     expect(sim.setSpec('shadow')).toBe(true);
     sim.castAbility('shadowform', sim.playerId);

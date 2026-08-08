@@ -141,8 +141,62 @@ describe('Mage meteor visual', () => {
 
     fx.update(1.3);
     expect(scene.getObjectByName('mage-meteor-fx')).toBeUndefined();
-    expect(disposedMaterials.size).toBeGreaterThanOrEqual(10);
+    // Materials are pooled by kind instead of disposed on expiry: a burst of
+    // casts (raid boss Meteor Shower) reuses the retired batch rather than
+    // paying dispose + fresh-allocate every cast. Per-instance geometry
+    // (baked from the spawn's own position) still can't be shared, so it
+    // still disposes as before.
+    expect(disposedMaterials.size).toBe(0);
     expect(disposedGeometries.size).toBe(4);
+  });
+
+  it('recycles retired meteor materials into a later cast instead of allocating fresh ones', () => {
+    const scene = new THREE.Scene();
+    const fx = new MageGroundFx(scene, () => 3, vi.fn());
+
+    fx.spawnMeteor({ x: 4, z: 7, radius: 8, duration: 2 });
+    const firstRoot = scene.getObjectByName('mage-meteor-fx') as THREE.Group;
+    const firstRock = firstRoot.getObjectByName('mage-meteor-rock') as THREE.Mesh;
+    const firstBoundary = firstRoot.getObjectByName(
+      'mage-meteor-telegraph-boundary',
+    ) as THREE.LineLoop;
+    const firstRockMat = firstRock.material as THREE.MeshStandardMaterial;
+    const firstBoundaryMat = firstBoundary.material as THREE.LineBasicMaterial;
+
+    // Run the first meteor all the way through fall, scorch, and cleanup.
+    fx.update(2); // fall completes, lands
+    fx.update(2.2); // scorch linger (METEOR_SCORCH_LINGER = 2.2) elapses, retires
+    expect(scene.getObjectByName('mage-meteor-fx')).toBeUndefined();
+
+    fx.spawnMeteor({ x: 40, z: -12, radius: 8, duration: 2 });
+    const secondRoot = scene.getObjectByName('mage-meteor-fx') as THREE.Group;
+    const secondRock = secondRoot.getObjectByName('mage-meteor-rock') as THREE.Mesh;
+    const secondBoundary = secondRoot.getObjectByName(
+      'mage-meteor-telegraph-boundary',
+    ) as THREE.LineLoop;
+
+    // Same Material instances come back out of the free list...
+    expect(secondRock.material).toBe(firstRockMat);
+    expect(secondBoundary.material).toBe(firstBoundaryMat);
+    // ...reset to their config baseline opacity, not whatever the retired
+    // instance last animated to (boundary opacity was driven to 0 at landing).
+    expect((secondBoundary.material as THREE.LineBasicMaterial).opacity).toBeCloseTo(0.42, 5);
+  });
+
+  it('never hands a live meteor material to a second concurrent cast', () => {
+    const scene = new THREE.Scene();
+    const fx = new MageGroundFx(scene, () => 3, vi.fn());
+
+    fx.spawnMeteor({ x: 4, z: 7, radius: 8, duration: 5 });
+    fx.spawnMeteor({ x: -9, z: 15, radius: 8, duration: 5 });
+    const roots = scene.children.filter((child) => child.name === 'mage-meteor-fx');
+    expect(roots.length).toBe(2);
+    const [firstRoot, secondRoot] = roots as THREE.Group[];
+    const firstRock = (firstRoot.getObjectByName('mage-meteor-rock') as THREE.Mesh)
+      .material as THREE.Material;
+    const secondRock = (secondRoot.getObjectByName('mage-meteor-rock') as THREE.Mesh)
+      .material as THREE.Material;
+    expect(secondRock).not.toBe(firstRock);
   });
 
   it('keeps the Blizzard boundary visible until the zone expires', () => {
@@ -167,6 +221,28 @@ describe('Mage meteor visual', () => {
 
     fx.update(0.01);
     expect(scene.getObjectByName('mage-blizzard-boundary')).toBeUndefined();
+  });
+
+  it('recycles retired Blizzard snow/boundary materials into a later cast', () => {
+    const scene = new THREE.Scene();
+    const fx = new MageGroundFx(scene, () => 3, vi.fn());
+
+    fx.spawnSnow({ x: 4, z: 7, radius: 7, duration: 1 });
+    const firstSnow = scene.getObjectByName('mage-blizzard-snow') as THREE.Points;
+    const firstRing = scene.getObjectByName('mage-blizzard-boundary') as THREE.Mesh;
+    const firstSnowMat = firstSnow.material as THREE.PointsMaterial;
+    const firstRingMat = firstRing.material as THREE.MeshBasicMaterial;
+
+    fx.update(1.1); // past duration, retires
+    expect(scene.getObjectByName('mage-blizzard-snow')).toBeUndefined();
+
+    fx.spawnSnow({ x: -20, z: 30, radius: 5, duration: 1 });
+    const secondSnow = scene.getObjectByName('mage-blizzard-snow') as THREE.Points;
+    const secondRing = scene.getObjectByName('mage-blizzard-boundary') as THREE.Mesh;
+    expect(secondSnow.material).toBe(firstSnowMat);
+    expect(secondRing.material).toBe(firstRingMat);
+    expect((secondSnow.material as THREE.PointsMaterial).opacity).toBeCloseTo(0.9, 5);
+    expect((secondRing.material as THREE.MeshBasicMaterial).opacity).toBeCloseTo(0.55, 5);
   });
 
   it('drapes Rune of Power over uneven terrain instead of clipping through it', () => {
@@ -198,5 +274,29 @@ describe('Mage meteor visual', () => {
 
     fx.update(12);
     expect(scene.getObjectByName('mage-rune-power')).toBeUndefined();
+  });
+
+  it('recycles retired Rune of Power materials into a later cast', () => {
+    const scene = new THREE.Scene();
+    const fx = new MageGroundFx(scene, () => 3, vi.fn());
+
+    fx.spawnRune({ x: 10, z: 20, radius: 6, duration: 12 });
+    const firstRune = scene.getObjectByName('mage-rune-power') as THREE.Group;
+    const firstGlow = firstRune.getObjectByName('mage-rune-power-glow') as THREE.Mesh;
+    const firstOuterRing = firstRune.getObjectByName('mage-rune-power-outer-ring') as THREE.Mesh;
+    const firstGlowMat = firstGlow.material as THREE.MeshBasicMaterial;
+    const firstOuterRingMat = firstOuterRing.material as THREE.MeshBasicMaterial;
+
+    fx.update(12); // past duration, retires
+    expect(scene.getObjectByName('mage-rune-power')).toBeUndefined();
+
+    fx.spawnRune({ x: -30, z: 5, radius: 6, duration: 12 });
+    const secondRune = scene.getObjectByName('mage-rune-power') as THREE.Group;
+    const secondGlow = secondRune.getObjectByName('mage-rune-power-glow') as THREE.Mesh;
+    const secondOuterRing = secondRune.getObjectByName('mage-rune-power-outer-ring') as THREE.Mesh;
+    expect(secondGlow.material).toBe(firstGlowMat);
+    expect(secondOuterRing.material).toBe(firstOuterRingMat);
+    expect((secondGlow.material as THREE.MeshBasicMaterial).opacity).toBeCloseTo(0.18, 5);
+    expect((secondOuterRing.material as THREE.MeshBasicMaterial).opacity).toBeCloseTo(0.75, 5);
   });
 });

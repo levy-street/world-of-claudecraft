@@ -33,19 +33,19 @@ export const table: DeedLocaleTable = {
     desc: "Nettoyez une faille de rang S, le palier le plus difficile qu'un portail de faille puisse faire apparaître.",
   },
   pvp_honor_sergeant: {
-    name: 'Sergent',
+    name: 'Brise-lignes',
     desc: "Gagnez 10 000 points d'honneur au cours de votre vie de personnage. Les dépenser ne vous fait jamais perdre ce rang.",
-    title: 'Sergent',
+    title: 'Brise-lignes',
   },
   pvp_honor_knight_lieutenant: {
-    name: 'Chevalier-Lieutenant',
+    name: 'Ravageur des champs',
     desc: "Gagnez 40 000 points d'honneur au cours de votre vie de personnage, une vraie saison de guerre derrière vous.",
-    title: 'Chevalier-Lieutenant',
+    title: 'Ravageur des champs',
   },
   pvp_honor_field_marshal: {
-    name: 'Maréchal',
+    name: 'Couronné par la guerre',
     desc: "Gagnez 150 000 points d'honneur au cours de votre vie de personnage. Rare sur n'importe quel royaume, et c'est voulu ainsi.",
-    title: 'Maréchal',
+    title: 'Couronné par la guerre',
   },
   chr_drakemaw_broodlord: {
     name: 'Brise-Couvée',

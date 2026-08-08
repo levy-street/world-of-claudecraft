@@ -188,7 +188,7 @@ describe('arena: online integration (GameServer)', () => {
     const fcB = fakeWs();
     const sa = joinServer(server, fcA, 30, 'Deserter', 'warrior');
     const sb = joinServer(server, fcB, 31, 'Victor', 'mage');
-    server.sim.utcDay = '2026-07-11';
+    server.sim.resetDay = '2026-07-11';
     teleport(server.sim, sa.pid, 0, -40);
     teleport(server.sim, sb.pid, 4, -40);
     server.handleMessage(sa, JSON.stringify({ t: 'cmd', cmd: 'arena_queue' }));

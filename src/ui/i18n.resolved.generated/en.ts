@@ -373,7 +373,7 @@ export const en: EnTranslations = {
       "unavailable": "Unstuck is unavailable in your current state."
     },
     "fct": {
-      "absorbed": "Absorbed {amount}",
+      "absorbed": "Absorbed ({amount})",
       "cheap": "Cheap!"
     },
     "emotes": {
@@ -1319,6 +1319,7 @@ export const en: EnTranslations = {
       "keybindHelpLockCursorOnRotate": "Keeps the mouse cursor inside the window while you drag to rotate the camera, so it cannot reach the screen edge or move to another monitor. Turn off if you prefer a free cursor.",
       "showWalletOnCharacterScreen": "Show Wallet on Character Screen",
       "showWalletOnPlayerCard": "Show Wallet on Player Card",
+      "showPlaytime": "Show Time Played on Character Screen",
       "showDevBadges": "Show Developer Badges",
       "showOwnNameplate": "Show My Nameplate",
       "showPlayerNameplates": "Show Player Nameplates",
@@ -1551,7 +1552,13 @@ export const en: EnTranslations = {
     },
     "charSheet": {
       "offense": "Offense",
-      "defense": "Defense"
+      "defense": "Defense",
+      "playtimeLabel": "Time Played",
+      "playtimeParts": "{major}, {minor}",
+      "playtimeUnderMinute": "Less than a minute",
+      "playtimeHidden": "Hidden",
+      "showPlaytimeAria": "Show time played",
+      "hidePlaytimeAria": "Hide time played"
     },
     "statInfo": {
       "fromYour": "From your {value} {stat}:",
@@ -1672,6 +1679,24 @@ export const en: EnTranslations = {
         "few": "{count} seconds remaining",
         "many": "{count} seconds remaining",
         "other": "{count} seconds remaining"
+      },
+      "playtimeDays": {
+        "one": "{count} day",
+        "few": "{count} days",
+        "many": "{count} days",
+        "other": "{count} days"
+      },
+      "playtimeHours": {
+        "one": "{count} hour",
+        "few": "{count} hours",
+        "many": "{count} hours",
+        "other": "{count} hours"
+      },
+      "playtimeMinutes": {
+        "one": "{count} minute",
+        "few": "{count} minutes",
+        "many": "{count} minutes",
+        "other": "{count} minutes"
       },
       "playersOnline": {
         "one": "Who: {count} player online on {realm}.",

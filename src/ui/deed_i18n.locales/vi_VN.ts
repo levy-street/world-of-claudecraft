@@ -33,19 +33,19 @@ export const table: DeedLocaleTable = {
     desc: 'Dọn sạch một Rạn Nứt hạng S, bậc khó nhất mà một cổng Rạn Nứt có thể sinh ra.',
   },
   pvp_honor_sergeant: {
-    name: 'Trung Sĩ',
+    name: 'Kẻ Phá Trận',
     desc: 'Kiếm được 10.000 danh dự trong suốt cuộc đời nhân vật. Tiêu nó đi không bao giờ khiến bạn mất cấp bậc.',
-    title: 'Trung Sĩ',
+    title: 'Kẻ Phá Trận',
   },
   pvp_honor_knight_lieutenant: {
-    name: 'Hiệp Sĩ Trung Úy',
+    name: 'Kẻ Tàn Phá Chiến Trường',
     desc: 'Kiếm được 40.000 danh dự trong suốt cuộc đời nhân vật, cả một mùa chiến tranh thực sự phía sau bạn.',
-    title: 'Hiệp Sĩ Trung Úy',
+    title: 'Kẻ Tàn Phá Chiến Trường',
   },
   pvp_honor_field_marshal: {
-    name: 'Thống Chế',
+    name: 'Vương Miện Chiến Tranh',
     desc: 'Kiếm được 150.000 danh dự trong suốt cuộc đời nhân vật. Hiếm có trên bất kỳ vương quốc nào, và nó nên như vậy.',
-    title: 'Thống Chế',
+    title: 'Vương Miện Chiến Tranh',
   },
   chr_drakemaw_broodlord: {
     name: 'Kẻ Phá Vỡ Ổ Trứng',

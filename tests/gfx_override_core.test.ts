@@ -143,15 +143,18 @@ describe('gfx override application', () => {
       ]),
     );
 
-    // Regenerated for the combined v21 profile controls and maxPooledObjects field. The staged
-    // vista and water tiers plus the bounded ground-object pool move every derived profile byte.
+    // Regenerated for the GfxSettings.nativeIosMemoryProfile -> iosMemoryProfile rename (the
+    // field now covers every iOS WebKit host, not just the packaged native app; see gfx.ts).
+    // Only the serialized KEY NAME moves for these desktop-default cases (none of them pass an
+    // iOS platform hint, so the field's VALUE stays false throughout), but JSON.stringify bakes
+    // the key name into the byte pin same as any other field.
     expect(hashes).toEqual({
-      low: '4987a6b9a467580e2cb92a69c480991393c2c225ea15c34163d32c2ea1b79421',
-      medium: '631057f9ab877b911d9dc8871ce4618cdbe7e41834e138cdf8fca2ec65605c1a',
-      high: '8bae7a847914010b9c2628b83b71db75071473e4a0454fccc7f5995d99fb5c8c',
-      ultra: '6e4125654ebe9e92439a87a0025e8c2980261381f7519ed4e4151441f709663f',
-      insane: '9b8c9748c3c859e5f205ae1158ac78ed946cc334c0a430220805f35a99a49011',
-      advanced: 'c593310aac361378b53d43809c53c7c1f5f9947b811eea19e5ff0aab456e75e4',
+      low: 'ffdec5a230db44fbb7ebfeaff1c7f70f41580ce717eed7fd9a25bc10c5ad21ec',
+      medium: '469d80e5a2f24e5d154e88f187bf35d03511549089c7a07ee0dd973771184d57',
+      high: 'be25f35848d170b70f25036ef8209df5ca0cdd6ced3660e53ded55ec6e65c45a',
+      ultra: '8ea3fcdd2c997953394b856aceeaf5036cfb638c0834401a39db349fea2cd3be',
+      insane: '5ce1944db03460cb8427df78b81503807405a5e26c25b5380f8b5d3557761de8',
+      advanced: '52c2de0c12c7897dd24bb600bec815f715c95aa2824eae895c8939f7d041414b',
     });
   });
 

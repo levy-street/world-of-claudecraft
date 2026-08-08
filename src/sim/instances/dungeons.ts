@@ -536,20 +536,46 @@ export function leaveDungeon(ctx: SimContext, pid?: number): boolean {
       return false;
     }
   }
-  // Stepping out of the instance removes the leaver (and anything they own,
-  // e.g. their pet) from every inside mob's hate table: dancing in and out of
-  // the exit portal cannot be used to kite a pull to the door and back.
-  // Re-entering means earning aggro from scratch.
-  const inst = ctx.instances.find((i) => i.partyKey !== null && instanceClaimContains(i, p.pos));
-  if (inst) scrubInstanceThreat(ctx, inst, p.id);
-  cancelProfessionSessionOnDisplacement(ctx, p);
-  p.pos = ctx.groundPos(dungeon.doorPos.x, dungeon.doorPos.z - 4);
+  const door = detachFromDungeon(ctx, p);
+  if (!door) return false; // unreachable: dungeonAt already answered above
+  p.pos = ctx.groundPos(door.x, door.z);
   p.prevPos = { ...p.pos };
   ctx.rebucket(p);
   p.targetId = null;
   p.autoAttack = false;
   ctx.emit({ type: 'log', text: dungeon.leaveText, color: '#b9f', pid: r.meta.entityId });
   return true;
+}
+
+// How far outside the door an exiting player is set down, so they do not land
+// inside the trigger volume they just came through.
+const DUNGEON_DOOR_RETURN_INSET = 4;
+
+/**
+ * Detach a player from the dungeon instance they stand in WITHOUT moving them,
+ * and report the outside door they belong at. Returns null when they are not
+ * inside a dungeon, so a caller gets the "are they instanced" question and the
+ * cleanup in one step.
+ *
+ * Stepping out of the instance removes the leaver (and anything they own, e.g.
+ * their pet) from every inside mob's hate table: dancing in and out of the exit
+ * portal cannot be used to kite a pull to the door and back. Re-entering means
+ * earning aggro from scratch.
+ *
+ * The scrub and the profession teardown are exactly `leaveDungeon`'s; what
+ * differs is who performs the displacement. `leaveDungeon` walks the player to
+ * the door itself, while a battleground queue pop teleports them to the field
+ * and needs the door only as the point to set them back down at when the match
+ * ends. Sending them back to their raw interior coordinates instead would drop
+ * them into an instance claim that may no longer exist by then.
+ */
+export function detachFromDungeon(ctx: SimContext, p: Entity): { x: number; z: number } | null {
+  const dungeon = dungeonAt(p.pos.x);
+  if (!dungeon) return null;
+  const inst = ctx.instances.find((i) => i.partyKey !== null && instanceClaimContains(i, p.pos));
+  if (inst) scrubInstanceThreat(ctx, inst, p.id);
+  cancelProfessionSessionOnDisplacement(ctx, p);
+  return { x: dungeon.doorPos.x, z: dungeon.doorPos.z - DUNGEON_DOOR_RETURN_INSET };
 }
 
 // Drop one departing player (and every entity they own) from the hate tables of

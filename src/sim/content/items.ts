@@ -1741,12 +1741,14 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     slot: 'offhand',
     quality: 'uncommon',
     // The hunter counterpart to valefire_lantern, off the same rare elite:
-    // Mogger (level 6) -> item level 7, offhand budget 2. Hunters are the one
-    // class no offhand rule admits (equipment_rules canDualWield excludes them,
-    // and no shield or held offhand names them), so the slot sat empty and its
-    // stat budget went uncollected. Held offhands equip by the literal
+    // Mogger (level 6) -> item level 7, worn-offhand budget 1. Hunters are the
+    // one class no offhand rule admits (equipment_rules canDualWield excludes
+    // them, and no shield or held offhand names them), so the slot sat empty and
+    // its stat budget went uncollected. Held offhands equip by the literal
     // requiredClass alone, which is what lets a hunter-only list work here.
-    stats: { agi: 1, sta: 1 },
+    // The opening rung's budget is a single point, so it is agility alone.
+    occupiesHand: false,
+    stats: { agi: 1 },
     sellValue: 160,
     requiredClass: HUNTER_ONLY,
   },

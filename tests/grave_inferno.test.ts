@@ -3,6 +3,7 @@ import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 // Grave Inferno: Korzul's Baron-Geddon-style channel, replacing his old
 // Necrotic Shockwave aoePulse (570-798 unmitigated on every melee each 8s
@@ -19,7 +20,12 @@ const SEED = 24601;
 type TickEvent = ReturnType<Sim['tick']>[number];
 
 function setup(mult: number) {
-  const sim = new Sim({ seed: SEED, playerClass: 'warrior', noPlayer: true });
+  const sim = new Sim({
+    seed: SEED,
+    playerClass: 'warrior',
+    noPlayer: true,
+    world: EMPTY_TEST_WORLD,
+  });
   const tankPid = sim.addPlayer('warrior', 'Tank');
   sim.setPlayerLevel(20, tankPid);
   const tank = sim.entities.get(tankPid)!;

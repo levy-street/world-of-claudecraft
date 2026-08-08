@@ -33,19 +33,19 @@ export const table: DeedLocaleTable = {
     desc: 'Sランクのリフトを攻略する。リフトポータルが出現させうる最高難度の階級だ。',
   },
   pvp_honor_sergeant: {
-    name: '軍曹',
+    name: '陣砕き',
     desc: '生涯名誉10,000を獲得する。使っても階級を失うことはない。',
-    title: '軍曹',
+    title: '陣砕き',
   },
   pvp_honor_knight_lieutenant: {
-    name: '騎士中尉',
+    name: '野荒らし',
     desc: '生涯名誉40,000を獲得する。本物の戦を一シーズン戦い抜いてきた証だ。',
-    title: '騎士中尉',
+    title: '野荒らし',
   },
   pvp_honor_field_marshal: {
-    name: '元帥',
+    name: '戦の冠',
     desc: '生涯名誉150,000を獲得する。どのレルムでも希少であり、それでいい。',
-    title: '元帥',
+    title: '戦の冠',
   },
   chr_drakemaw_broodlord: {
     name: '卵砕き',

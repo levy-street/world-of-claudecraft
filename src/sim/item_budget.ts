@@ -81,6 +81,19 @@ export const TWOHAND_STAT_MULT = 1.3;
 // heroic variants, and tests all share one number.
 export const TWOHAND_DPS_MULT = 1.15;
 
+// The slot weight for an offhand that is WORN rather than held (occupiesHand
+// false: today the hunter quivers). It replaces SLOT_STAT_MULT.offhand for those
+// items, and is lower for the same reason TWOHAND_STAT_MULT dropped from 2 to
+// 1.3: both numbers price a slot against what taking it costs you. A held
+// offhand is priced at 0.75 because wearing one SACRIFICES the two-hander. A worn
+// offhand sacrifices nothing (displacedSlotForEquip lets it coexist), so pricing
+// it at 0.75 would hand its class the two-hander's 1.3 AND the offhand's 0.75 for
+// 2.05, above the 1.75 ceiling the comment above guarantees. At 0.45 the pair
+// sums to exactly 1.75, so a two-hander-plus-quiver hunter lands level with every
+// dual-wield or weapon-and-shield setup of the same item level instead of ahead
+// of it. tests/twohand_rebudget.test.ts pins the ceiling.
+export const WORN_OFFHAND_STAT_MULT = 0.45;
+
 // The source level the "Heroic X" upgraded drop variants read as: one heroic tier
 // above the level-20 dungeons, so epics land at item level 28 (22 + the epic bump
 // of 6) and rares at 25 (22 + 3). content/heroic_variants.ts scales each variant's
@@ -118,15 +131,31 @@ export function scaleWeaponDamage(
 }
 
 // The total primary-stat points an item of this level + quality + slot should grant.
+// `slotMultOverride` replaces the SLOT_STAT_MULT lookup for an item whose slot
+// weight is not decided by the slot alone; slotStatMultForItem below is the only
+// thing that produces one.
 export function primaryStatBudget(
   level: number,
   quality: ItemDef['quality'],
   slot: ItemSlot | undefined,
+  slotMultOverride?: number,
 ): number {
   if (!slot) return 0;
   const q = QUALITY_STAT_MULT[quality ?? 'common'] ?? 0;
-  const s = SLOT_STAT_MULT[slot] ?? 0.7;
+  const s = slotMultOverride ?? SLOT_STAT_MULT[slot] ?? 0.7;
   return Math.max(0, Math.round(level * q * s * STAT_PER_ILVL));
+}
+
+// The slot weight an item rides when its own def, not just its slot, decides the
+// price: a WORN offhand takes the lighter worn line because it costs no two-hander
+// (see WORN_OFFHAND_STAT_MULT). Returns undefined when the plain slot weight
+// applies, which is every other item. Both budget call sites (expectedStatBudget
+// for the live item, makeHeroicVariant for a generated upgrade) route through this
+// so a quiver can never be priced two different ways.
+export function slotStatMultForItem(item: ItemDef): number | undefined {
+  return item.kind === 'held_offhand' && item.occupiesHand === false
+    ? WORN_OFFHAND_STAT_MULT
+    : undefined;
 }
 
 // Redistribute `budget` primary-stat points across whichever attributes the item

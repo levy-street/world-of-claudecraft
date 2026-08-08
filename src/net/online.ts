@@ -1458,6 +1458,10 @@ export class ClientWorld implements IWorld {
   prestigeRank = 0;
   // Rested XP pool, mirrored from snapshot self.
   restedXp = 0;
+  // Lifetime played seconds, mirrored from snapshot self (`ptime`, quantized
+  // to whole minutes server-side so the delta gate ships it about once a
+  // minute).
+  playtimeSeconds = 0;
   unlockedMilestones: string[] = [];
   // --- IWorldTalents: talents + spec/role + saved loadouts, mirrored from
   // snapshot self (display + staging). ---
@@ -3436,6 +3440,7 @@ export class ClientWorld implements IWorld {
       }
       if (s.renown !== undefined) this.renown = s.renown ?? 0;
       if (s.atitle !== undefined) this.activeTitle = s.atitle ?? null;
+      if (s.ptime !== undefined) this.playtimeSeconds = s.ptime ?? 0;
       if (s.lroll !== undefined) this.lootRollPrompts = s.lroll ?? [];
       if (s.lrollg !== undefined) this.lootRollGroup = s.lrollg ?? [];
       if (s.mloot !== undefined) this.masterLootPrompts = s.mloot ?? [];

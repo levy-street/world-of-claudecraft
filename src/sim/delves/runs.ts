@@ -302,10 +302,12 @@ export function delveRunForMob(ctx: SimContext, mobId: number): DelveRun | null 
 }
 
 export function refreshDelveDaily(ctx: SimContext, meta: PlayerMeta): void {
-  // `utcDay` is supplied by the host (never read from the wall clock here, so the
-  // sim stays deterministic). When unknown (''), the daily window does not roll
-  // over, same-seed replays stay reproducible.
-  const today = ctx.utcDay;
+  // `resetDay` is supplied by the host (never read from the wall clock here, so
+  // the sim stays deterministic), and is the realm's own daily boundary rather
+  // than a UTC calendar date, so the delve daily rolls over with every other
+  // daily. When unknown (''), the window does not roll over, same-seed replays
+  // stay reproducible.
+  const today = ctx.resetDay;
   if (today && meta.delveDaily.date !== today) {
     meta.delveDaily = { date: today, firstClearXp: new Set(), markClears: 0 };
   }

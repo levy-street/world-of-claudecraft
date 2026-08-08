@@ -33,19 +33,19 @@ export const table: DeedLocaleTable = {
     desc: 'Bersihkan Rift peringkat S, tingkat tersulit yang bisa dimunculkan portal Rift.',
   },
   pvp_honor_sergeant: {
-    name: 'Sersan',
+    name: 'Pemecah Barisan',
     desc: 'Raih 10.000 kehormatan seumur hidupmu. Membelanjakannya tidak akan pernah menghilangkan pangkat ini.',
-    title: 'Sersan',
+    title: 'Pemecah Barisan',
   },
   pvp_honor_knight_lieutenant: {
-    name: 'Letnan Ksatria',
+    name: 'Perusak Medan',
     desc: 'Raih 40.000 kehormatan seumur hidupmu, satu musim perang sungguhan di belakangmu.',
-    title: 'Letnan Ksatria',
+    title: 'Perusak Medan',
   },
   pvp_honor_field_marshal: {
-    name: 'Marsekal Lapangan',
+    name: 'Bermahkota Perang',
     desc: 'Raih 150.000 kehormatan seumur hidupmu. Langka di realm mana pun, dan memang seharusnya begitu.',
-    title: 'Marsekal Lapangan',
+    title: 'Bermahkota Perang',
   },
   chr_drakemaw_broodlord: {
     name: 'Pemusnah Tetasan',

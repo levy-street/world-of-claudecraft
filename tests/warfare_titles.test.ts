@@ -29,9 +29,9 @@ import type { Entity, SimEvent } from '../src/sim/types';
 // The ladder, restated independently of the catalog so a threshold, renown
 // value, or title text edited in content reds here too.
 const LADDER = [
-  { id: 'pvp_honor_sergeant', amount: 10_000, renown: 10, title: 'Sergeant' },
-  { id: 'pvp_honor_knight_lieutenant', amount: 40_000, renown: 25, title: 'Knight-Lieutenant' },
-  { id: 'pvp_honor_field_marshal', amount: 150_000, renown: 50, title: 'Field Marshal' },
+  { id: 'pvp_honor_sergeant', amount: 10_000, renown: 10, title: 'Linebreaker' },
+  { id: 'pvp_honor_knight_lieutenant', amount: 40_000, renown: 25, title: 'Fieldreaver' },
+  { id: 'pvp_honor_field_marshal', amount: 150_000, renown: 50, title: 'Warcrowned' },
 ] as const;
 
 function world(): Sim {

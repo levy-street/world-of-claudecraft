@@ -1319,6 +1319,7 @@ export const ko_KR: EnTranslations = {
       "keybindHelpLockCursorOnRotate": "드래그하여 카메라를 회전하는 동안 마우스 커서를 창 안에 유지하여 화면 가장자리에 닿거나 다른 모니터로 이동하지 않도록 합니다. 자유로운 커서를 원하면 끄세요.",
       "showWalletOnCharacterScreen": "캐릭터 화면에 지갑 표시",
       "showWalletOnPlayerCard": "플레이어 카드에 지갑 표시",
+      "showPlaytime": "캐릭터 화면에 플레이 시간 표시",
       "showDevBadges": "개발자 배지 표시",
       "showOwnNameplate": "내 이름표 표시",
       "showPlayerNameplates": "플레이어 이름표 표시",
@@ -1551,7 +1552,13 @@ export const ko_KR: EnTranslations = {
     },
     "charSheet": {
       "offense": "공격",
-      "defense": "방어"
+      "defense": "방어",
+      "playtimeLabel": "플레이 시간",
+      "playtimeParts": "{major} {minor}",
+      "playtimeUnderMinute": "1분 미만",
+      "playtimeHidden": "숨김",
+      "showPlaytimeAria": "플레이 시간 표시",
+      "hidePlaytimeAria": "플레이 시간 숨기기"
     },
     "statInfo": {
       "fromYour": "당신의 {value} {stat}에서:",
@@ -1672,6 +1679,24 @@ export const ko_KR: EnTranslations = {
         "few": "{count}초 남음",
         "many": "{count}초 남음",
         "other": "{count}초 남음"
+      },
+      "playtimeDays": {
+        "one": "{count}일",
+        "few": "{count}일",
+        "many": "{count}일",
+        "other": "{count}일"
+      },
+      "playtimeHours": {
+        "one": "{count}시간",
+        "few": "{count}시간",
+        "many": "{count}시간",
+        "other": "{count}시간"
+      },
+      "playtimeMinutes": {
+        "one": "{count}분",
+        "few": "{count}분",
+        "many": "{count}분",
+        "other": "{count}분"
       },
       "playersOnline": {
         "one": "검색: {realm} 서버에 {count}명의 플레이어가 접속 중입니다.",

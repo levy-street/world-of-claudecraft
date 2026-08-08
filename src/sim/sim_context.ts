@@ -224,8 +224,18 @@ export interface SimContextPrimitives {
   // P1b's nextId dedupes with I1's declaration above.)
   readonly delveRuns: DelveRun[];
   readonly delvePetStash: Map<number, PetState>;
-  // Host-supplied UTC day string ('' = unknown) gating the delve daily reset.
+  // Host-supplied UTC calendar day ('' = unknown). A CALENDAR DATE, used to stamp
+  // when something happened (the Book of Deeds earn date). For "has the daily
+  // rolled over", read `resetDay` below instead: the two answer different
+  // questions and no longer share a boundary.
   readonly utcDay: string;
+  // Host-supplied daily-reset WINDOW key ('' = unknown), gating every daily
+  // rollover: the first battleground win of the day, arena/fiesta honor DR, and
+  // the delve daily. The host derives it from the realm's own reset boundary (the
+  // same 3 AM realm-local instant the raid lockouts expire on), so a realm has ONE
+  // daily boundary. '' means the host set no calendar, so nothing ever rolls over
+  // and same-seed replays stay reproducible.
+  readonly resetDay: string;
   // Wild-respawn queue (P1b: completeTame pushes the tamed beast's respawn). Live view;
   // the backing array stays on Sim, mutated in place (push), so read-only ref.
   readonly pendingMobRespawns: PendingMobRespawn[];
@@ -1249,6 +1259,9 @@ export function createSimContext(host: SimContextHost): SimContext {
     },
     get delvePetStash() {
       return host.delvePetStash;
+    },
+    get resetDay() {
+      return host.resetDay;
     },
     get utcDay() {
       return host.utcDay;

@@ -165,15 +165,15 @@ function dailyWindow(ctx: SimContext, meta: PlayerMeta) {
   let daily = meta.honorArenaDaily;
   if (!daily) {
     daily = {
-      date: ctx.utcDay,
+      date: ctx.resetDay,
       winsByOpponent: {},
       fiestaCompletionsByOpponent: {},
       totalWins: 0,
     };
     meta.honorArenaDaily = daily;
   }
-  if (ctx.utcDay && daily.date !== ctx.utcDay) {
-    daily.date = ctx.utcDay;
+  if (ctx.resetDay && daily.date !== ctx.resetDay) {
+    daily.date = ctx.resetDay;
     daily.winsByOpponent = {};
     daily.fiestaCompletionsByOpponent = {};
     // Back to `undefined` (not `{}`) so an untouched day stays byte-equal in
@@ -193,13 +193,13 @@ function dailyWindow(ctx: SimContext, meta: PlayerMeta) {
  * The READ-ONLY twin of the rollover in `dailyWindow` above, for the readouts
  * (`bgInfoFor`) that must never mutate the window they report on: a stored date
  * that is not today reads as re-armed without writing the rollover, which the
- * next actual award does. `utcDay === ''` means the host set no calendar, so
+ * next actual award does. `resetDay === ''` means the host set no calendar, so
  * the window never rolls over and the stored flag is the whole answer.
  */
-export function bgFirstWinBonusAvailable(utcDay: string, meta: PlayerMeta): boolean {
+export function bgFirstWinBonusAvailable(resetDay: string, meta: PlayerMeta): boolean {
   const daily = meta.honorArenaDaily;
   if (!daily) return true;
-  if (utcDay && daily.date !== utcDay) return true;
+  if (resetDay && daily.date !== resetDay) return true;
   return daily.bgFirstWinClaimed !== true;
 }
 

@@ -33,19 +33,19 @@ export const table: DeedLocaleTable = {
     desc: 'Ryd en S-rangs Rift, det hårdeste niveau en Rift-portal kan spawne.',
   },
   pvp_honor_sergeant: {
-    name: 'Sergent',
+    name: 'Linjebryder',
     desc: 'Optjen 10.000 Ære i din levetid. At bruge den koster dig aldrig rangen.',
-    title: 'Sergent',
+    title: 'Linjebryder',
   },
   pvp_honor_knight_lieutenant: {
-    name: 'Ridderløjtnant',
+    name: 'Markhærger',
     desc: 'Optjen 40.000 Ære i din levetid, en hel sæsons rigtig krig bag dig.',
-    title: 'Ridderløjtnant',
+    title: 'Markhærger',
   },
   pvp_honor_field_marshal: {
-    name: 'Feltmarskal',
+    name: 'Krigskronet',
     desc: 'Optjen 150.000 Ære i din levetid. Sjælden på ethvert rige, og sådan bør det være.',
-    title: 'Feltmarskal',
+    title: 'Krigskronet',
   },
   chr_drakemaw_broodlord: {
     name: 'Yngelknuseren',

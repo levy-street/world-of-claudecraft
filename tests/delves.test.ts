@@ -1225,7 +1225,7 @@ describe('delve reward chest + surface exit flow', () => {
 
   it('daily reset + first-vs-repeat XP keys off the injected UTC day (deterministic)', () => {
     const sim = makeSim();
-    sim.utcDay = '2026-06-18';
+    sim.resetDay = '2026-06-18';
     sim.setPlayerLevel(DELVES.collapsed_reliquary.minLevel);
     const meta = (sim as any).players.get(sim.playerId);
     const rewards = DELVES.collapsed_reliquary.baseRewards;
@@ -1259,7 +1259,7 @@ describe('delve reward chest + surface exit flow', () => {
     (sim as any).freeDelveRun(run);
 
     // Day rollover: the daily window resets (firstClearXp cleared, markClears 0).
-    sim.utcDay = '2026-06-19';
+    sim.resetDay = '2026-06-19';
     run = enterFinale(sim);
     killBoss(sim, run);
     lastXp = 0;
@@ -1269,10 +1269,10 @@ describe('delve reward chest + surface exit flow', () => {
     expect(lastXp).toBe(rewards.firstClearXp); // first clear again after reset
   });
 
-  it('refreshDelveDaily never reads the wall clock (no reset when utcDay unset)', () => {
+  it('refreshDelveDaily never reads the wall clock (no reset when resetDay unset)', () => {
     const sim = makeSim();
-    // utcDay defaults to '' (deterministic / headless): the window must not roll over.
-    expect(sim.utcDay).toBe('');
+    // resetDay defaults to '' (deterministic / headless): the window must not roll over.
+    expect(sim.resetDay).toBe('');
     sim.setPlayerLevel(DELVES.collapsed_reliquary.minLevel);
     const meta = (sim as any).players.get(sim.playerId);
     meta.delveDaily = { date: 'pinned', firstClearXp: new Set(['x']), markClears: 2 };
@@ -1307,7 +1307,7 @@ describe('delve reward chest + surface exit flow', () => {
 
   it('unlocks one lore journal entry per clear, capped at five (PRD §6.4)', () => {
     const sim = makeSim();
-    sim.utcDay = '2026-06-18';
+    sim.resetDay = '2026-06-18';
     sim.setPlayerLevel(DELVES.collapsed_reliquary.minLevel);
     const meta = (sim as any).players.get(sim.playerId);
     const order = [

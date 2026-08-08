@@ -8,13 +8,31 @@
 // run after run. Escorts only exist in the July-2026 zones, which is exactly
 // where players reported piles of stacked mobs and why the older zones were fine.
 import { describe, expect, it } from 'vitest';
-import { ESCORTS } from '../src/sim/data';
+import { BUILTIN_WORLD, ESCORTS } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
-import type { Entity } from '../src/sim/types';
+import type { Entity, WorldContent } from '../src/sim/types';
 
 const ESCORT_ID = 'esc_fv_wren';
 const QUEST_ID = 'q_fv_seeing_wren_home';
 const ESCORTEE_TEMPLATE = 'apprentice_wren';
+
+// The escortee itself (apprentice_wren) is spawned by the world-init escort
+// hook (src/sim/escort.ts initEscorts), unconditionally, regardless of
+// WorldContent: it draws no rng and never reads camps/npcs/groundObjects. The
+// only ambient content these tests actually touch is the esc_fv_wren run's
+// own ambush roster (fen_sprite, spawned dynamically by fireAmbushes, also
+// rng-free) and the Shiverfen's resident fen_sprite camp, which the first two
+// tests assert the run must NOT add to. Keep just that camp (plus its sibling
+// snowdrift_wolf camps, the run's second wave) and drop every other zone's
+// camps/npcs/groundObjects, so Sim construction skips the full 11-zone world.
+const ESCORT_AMBUSH_TEST_WORLD: WorldContent = {
+  ...BUILTIN_WORLD,
+  camps: BUILTIN_WORLD.camps.filter(
+    (camp) => camp.mobId === 'fen_sprite' || camp.mobId === 'snowdrift_wolf',
+  ),
+  npcs: {},
+  groundObjects: [],
+};
 
 function makeSim(): Sim {
   // respawnSeconds pins the whole world to a 2s base, so "did a killed
@@ -25,6 +43,7 @@ function makeSim(): Sim {
     playerClass: 'warrior',
     playerName: 'Escorter',
     respawnSeconds: 2,
+    world: ESCORT_AMBUSH_TEST_WORLD,
   });
   sim.player.level = 20;
   sim.questLog.set(QUEST_ID, { questId: QUEST_ID, counts: [0], state: 'active' });

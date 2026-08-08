@@ -562,8 +562,8 @@ describe('farFieldPolicy: the ONE capability decision for sprites and the vista'
     }
   });
 
-  it('native iOS memory profile: NEITHER arm (constrained and no standard materials)', () => {
-    // nativeIosMemoryProfile forces constrainedMemory true AND
+  it('iOS WebKit memory profile: NEITHER arm (constrained and no standard materials)', () => {
+    // iosMemoryProfile forces constrainedMemory true AND
     // standardMaterials false in gfx.ts; either alone already disables both
     // arms here.
     const policy = farFieldPolicy('high', {

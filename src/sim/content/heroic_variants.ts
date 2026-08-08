@@ -19,6 +19,7 @@ import {
   primaryStatBudget,
   QUALITY_ILVL_BONUS,
   scaleWeaponDamage,
+  slotStatMultForItem,
   TWOHAND_DPS_MULT,
   TWOHAND_STAT_MULT,
   weaponDpsBudget,
@@ -93,7 +94,8 @@ function makeHeroicVariant(base: ItemDef, sourceLevel = HEROIC_VARIANT_SOURCE_LE
   // Rounded like expectedStatBudget so variant budgets stay integral under the
   // fractional TWOHAND_STAT_MULT.
   const targetBudget = Math.round(
-    primaryStatBudget(targetLevel, base.quality, base.slot) * handMultiplier,
+    primaryStatBudget(targetLevel, base.quality, base.slot, slotStatMultForItem(base)) *
+      handMultiplier,
   );
   const baseBudget = base.stats
     ? PRIMARY_STATS.reduce((sum, stat) => sum + (base.stats?.[stat] ?? 0), 0)

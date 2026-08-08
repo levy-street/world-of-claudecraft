@@ -373,7 +373,7 @@ export const en_XA: EnTranslations = {
       "unavailable": "[Úñšţúçķ íš úñáʋáíļáƀļé íñ ýóúŕ çúŕŕéñţ šţáţé.]"
     },
     "fct": {
-      "absorbed": "[Áƀšóŕƀéð {amount}]",
+      "absorbed": "[Áƀšóŕƀéð ({amount})]",
       "cheap": "[Çĥéáþ!]"
     },
     "emotes": {
@@ -1319,6 +1319,7 @@ export const en_XA: EnTranslations = {
       "keybindHelpLockCursorOnRotate": "[Ķééþš ţĥé ɱóúšé çúŕšóŕ íñšíðé ţĥé ŵíñðóŵ ŵĥíļé ýóú ðŕáĝ ţó ŕóţáţé ţĥé çáɱéŕá, šó íţ çáññóţ ŕéáçĥ ţĥé šçŕééñ éðĝé óŕ ɱóʋé ţó áñóţĥéŕ ɱóñíţóŕ. Ţúŕñ óƒƒ íƒ ýóú þŕéƒéŕ á ƒŕéé çúŕšóŕ.]",
       "showWalletOnCharacterScreen": "[Šĥóŵ Ŵáļļéţ óñ Çĥáŕáçţéŕ Šçŕééñ]",
       "showWalletOnPlayerCard": "[Šĥóŵ Ŵáļļéţ óñ Þļáýéŕ Çáŕð]",
+      "showPlaytime": "[Šĥóŵ Ţíɱé Þļáýéð óñ Çĥáŕáçţéŕ Šçŕééñ]",
       "showDevBadges": "[Šĥóŵ Ðéʋéļóþéŕ Ɓáðĝéš]",
       "showOwnNameplate": "[Šĥóŵ Ɱý Ñáɱéþļáţé]",
       "showPlayerNameplates": "[Šĥóŵ Þļáýéŕ Ñáɱéþļáţéš]",
@@ -1551,7 +1552,13 @@ export const en_XA: EnTranslations = {
     },
     "charSheet": {
       "offense": "[Óƒƒéñšé]",
-      "defense": "[Ðéƒéñšé]"
+      "defense": "[Ðéƒéñšé]",
+      "playtimeLabel": "[Ţíɱé Þļáýéð]",
+      "playtimeParts": "[{major}, {minor}]",
+      "playtimeUnderMinute": "[Ļéšš ţĥáñ á ɱíñúţé]",
+      "playtimeHidden": "[Ĥíððéñ]",
+      "showPlaytimeAria": "[Šĥóŵ ţíɱé þļáýéð]",
+      "hidePlaytimeAria": "[Ĥíðé ţíɱé þļáýéð]"
     },
     "statInfo": {
       "fromYour": "[Ƒŕóɱ ýóúŕ {value} {stat}:]",
@@ -1672,6 +1679,24 @@ export const en_XA: EnTranslations = {
         "few": "[{count} šéçóñðš ŕéɱáíñíñĝ]",
         "many": "[{count} šéçóñðš ŕéɱáíñíñĝ]",
         "other": "[{count} šéçóñðš ŕéɱáíñíñĝ]"
+      },
+      "playtimeDays": {
+        "one": "[{count} ðáý]",
+        "few": "[{count} ðáýš]",
+        "many": "[{count} ðáýš]",
+        "other": "[{count} ðáýš]"
+      },
+      "playtimeHours": {
+        "one": "[{count} ĥóúŕ]",
+        "few": "[{count} ĥóúŕš]",
+        "many": "[{count} ĥóúŕš]",
+        "other": "[{count} ĥóúŕš]"
+      },
+      "playtimeMinutes": {
+        "one": "[{count} ɱíñúţé]",
+        "few": "[{count} ɱíñúţéš]",
+        "many": "[{count} ɱíñúţéš]",
+        "other": "[{count} ɱíñúţéš]"
       },
       "playersOnline": {
         "one": "[Ŵĥó: {count} þļáýéŕ óñļíñé óñ {realm}.]",

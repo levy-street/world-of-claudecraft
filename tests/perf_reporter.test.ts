@@ -102,7 +102,7 @@ function qualityBuckets(): NonNullable<PerfSnapshot['renderer']>['qualityBuckets
       maxPointLights: 6,
       activePointLights: 6,
       shadowMap: 4096,
-      nativeIosMemoryProfile: false,
+      iosMemoryProfile: false,
     },
   };
 }

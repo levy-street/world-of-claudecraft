@@ -120,14 +120,27 @@ export function uniqueEquipConflictSlot(
   return null;
 }
 
+// Does this item take up a HAND, as opposed to merely filling the offhand slot?
+// Everything held does: weapons, shields, and the caster orbs and tomes. An item
+// WORN on the offhand slot does not, a quiver being the case that forced the
+// distinction (it hangs on the back; the hunter's ranger.glb has always drawn it
+// there rather than in a fist). This is the question the two-hand exclusion below
+// actually means to ask, so a worn offhand is outside that rule rather than an
+// exception to it, and any future worn offhand inherits the behavior.
+export function occupiesHand(item: ItemDef): boolean {
+  return item.kind !== 'held_offhand' || item.occupiesHand !== false;
+}
+
 // The slot an equip into `slot` empties as a side effect (the two-hand/offhand
 // exclusion): equipping into the offhand benches a worn two-hand mainhand, and
-// equipping a two-hander into the mainhand benches the offhand. Fury's Titan
-// Grip exemption is weapon-only: a valid Fury pair may contain one or two
-// two-handers, so nothing is displaced. `lookup` resolves an equipped id to its
-// def (the sim passes ITEMS; kept injected so this leaf stays data-free). This
-// is THE displacement rule equipItem applies; the paperdoll drop feedback
-// mirrors it so the two can never disagree.
+// equipping a two-hander into the mainhand benches the offhand. The rule exists
+// because a two-hander uses both hands, so it only binds items that need a hand:
+// a worn offhand (occupiesHand false) coexists with a two-hander in either
+// direction. Fury's Titan Grip exemption is weapon-only: a valid Fury pair may
+// contain one or two two-handers, so nothing is displaced. `lookup` resolves an
+// equipped id to its def (the sim passes ITEMS; kept injected so this leaf stays
+// data-free). This is THE displacement rule equipItem applies; the paperdoll drop
+// feedback mirrors it so the two can never disagree.
 export function displacedSlotForEquip(
   item: ItemDef,
   slot: EquipSlot,
@@ -137,6 +150,7 @@ export function displacedSlotForEquip(
   spec?: string | null,
 ): EquipSlot | null {
   if (slot === 'offhand') {
+    if (!occupiesHand(item)) return null;
     const mainhand = equipment.mainhand ? lookup(equipment.mainhand) : undefined;
     const titanPair = item.kind === 'weapon' && canDualWieldTwoHand(cls, spec);
     if (mainhand?.kind === 'weapon' && weaponHand(mainhand) === 'twohand' && !titanPair) {
@@ -146,6 +160,7 @@ export function displacedSlotForEquip(
   }
   if (slot === 'mainhand' && item.kind === 'weapon' && weaponHand(item) === 'twohand') {
     const offhand = equipment.offhand ? lookup(equipment.offhand) : undefined;
+    if (offhand && !occupiesHand(offhand)) return null;
     const titanPair = offhand?.kind === 'weapon' && canDualWieldTwoHand(cls, spec);
     if (equipment.offhand && !titanPair) return 'offhand';
   }

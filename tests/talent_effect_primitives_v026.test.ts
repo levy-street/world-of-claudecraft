@@ -4,6 +4,7 @@ import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { type ResolvedAbility, Sim } from '../src/sim/sim';
 import type { Aura, Entity } from '../src/sim/types';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 function addHostile(sim: Sim, distance = 2): Entity {
   const player = sim.player;
@@ -71,7 +72,12 @@ function step(sim: Sim, ticks: number): void {
 
 describe('Talents V2 dispel and steal primitives', () => {
   it('removes only a friendly magic debuff and recalculates stats after removal', () => {
-    const sim = new Sim({ seed: 1, playerClass: 'paladin', noPlayer: true });
+    const sim = new Sim({
+      seed: 1,
+      playerClass: 'paladin',
+      noPlayer: true,
+      world: EMPTY_TEST_WORLD,
+    });
     const casterId = sim.addPlayer('paladin', 'Caster');
     const allyId = sim.addPlayer('mage', 'Ally');
     sim.setPlayerLevel(20, casterId);
@@ -92,7 +98,7 @@ describe('Talents V2 dispel and steal primitives', () => {
   });
 
   it('steals an enemy magic benefit but leaves enemy physical and harmful auras alone', () => {
-    const sim = new Sim({ seed: 2, playerClass: 'mage', autoEquip: true });
+    const sim = new Sim({ seed: 2, playerClass: 'mage', autoEquip: true, world: EMPTY_TEST_WORLD });
     const enemy = addHostile(sim);
     enemy.auras.push(aura(enemy, 'magic_blessing', 'buff_spellpower', 40, 'holy'));
     enemy.auras.push(aura(enemy, 'physical_guard', 'buff_armor', 50, 'physical'));
@@ -111,7 +117,12 @@ describe('Talents V2 dispel and steal primitives', () => {
     ['buff_sta', 10],
     ['buff_sta_pct', 20],
   ] as const)('reverses non-player %s stat folds when Spellsteal removes them', (kind, value) => {
-    const sim = new Sim({ seed: 22, playerClass: 'mage', autoEquip: true });
+    const sim = new Sim({
+      seed: 22,
+      playerClass: 'mage',
+      autoEquip: true,
+      world: EMPTY_TEST_WORLD,
+    });
     const enemy = addHostile(sim);
     const baseMaxHp = enemy.maxHp;
     enemy.hp = Math.round(baseMaxHp * 0.5);
@@ -126,7 +137,12 @@ describe('Talents V2 dispel and steal primitives', () => {
   });
 
   it('starts Greater Invisibility damage reduction when Spellsteal ends the vanish', () => {
-    const sim = new Sim({ seed: 23, playerClass: 'mage', autoEquip: true });
+    const sim = new Sim({
+      seed: 23,
+      playerClass: 'mage',
+      autoEquip: true,
+      world: EMPTY_TEST_WORLD,
+    });
     const enemy = addHostile(sim);
     sim.ctx.applyAura(enemy, {
       ...aura(enemy, 'greater_invisibility', 'stealth', 1, 'arcane'),
@@ -147,7 +163,12 @@ describe('Talents V2 dispel and steal primitives', () => {
   });
 
   it('lets Voidfeast devour the correctly directed magic aura and heal its caster', () => {
-    const sim = new Sim({ seed: 3, playerClass: 'warlock', autoEquip: true });
+    const sim = new Sim({
+      seed: 3,
+      playerClass: 'warlock',
+      autoEquip: true,
+      world: EMPTY_TEST_WORLD,
+    });
     const enemy = addHostile(sim);
     enemy.auras.push(aura(enemy, 'magic_blessing', 'buff_spellpower', 40, 'holy'));
     sim.player.hp = Math.floor(sim.player.maxHp / 2);
@@ -162,7 +183,12 @@ describe('Talents V2 dispel and steal primitives', () => {
 
 describe('Talents V2 movement and control primitives', () => {
   it('routes Typhoon through shared knockback resistance and applies its daze', () => {
-    const sim = new Sim({ seed: 4, playerClass: 'druid', autoEquip: true });
+    const sim = new Sim({
+      seed: 4,
+      playerClass: 'druid',
+      autoEquip: true,
+      world: EMPTY_TEST_WORLD,
+    });
     const enemy = addHostile(sim);
     enemy.knockbackResistance = 1;
     const before = { ...enemy.pos };
@@ -188,7 +214,12 @@ describe('Talents V2 movement and control primitives', () => {
   it('uses Frost Trap armed stun control rather than a movable root', () => {
     // Balance pass (G6): Rime Snare is an armed trap at the hunter's feet
     // now; the freeze lands on first contact after the arm delay.
-    const sim = new Sim({ seed: 5, playerClass: 'hunter', autoEquip: true });
+    const sim = new Sim({
+      seed: 5,
+      playerClass: 'hunter',
+      autoEquip: true,
+      world: EMPTY_TEST_WORLD,
+    });
     const enemy = addHostile(sim, 4);
     const beforeHp = enemy.hp;
     const rng = sim.ctx.rng as typeof sim.ctx.rng & {
@@ -216,7 +247,12 @@ describe('Talents V2 movement and control primitives', () => {
     ).toBe(true);
     expect(enemy.auras.some((entry) => entry.kind === 'root')).toBe(false);
 
-    const mage = new Sim({ seed: 5, playerClass: 'mage', autoEquip: true });
+    const mage = new Sim({
+      seed: 5,
+      playerClass: 'mage',
+      autoEquip: true,
+      world: EMPTY_TEST_WORLD,
+    });
     const frostNovaTarget = addHostile(mage, 4);
     const frostNovaHp = frostNovaTarget.hp;
     runAbilityEffect(mage, null, 'frost_nova');
@@ -224,14 +260,24 @@ describe('Talents V2 movement and control primitives', () => {
   });
 
   it('supports Silence, Preparation, and swept root-breaking Blink', () => {
-    const priest = new Sim({ seed: 6, playerClass: 'priest', autoEquip: true });
+    const priest = new Sim({
+      seed: 6,
+      playerClass: 'priest',
+      autoEquip: true,
+      world: EMPTY_TEST_WORLD,
+    });
     const enemy = addHostile(priest);
     runAbilityEffect(priest, enemy, 'silence');
     expect(
       enemy.auras.some((entry) => entry.id === 'silence_silence' && entry.kind === 'silence'),
     ).toBe(true);
 
-    const rogue = new Sim({ seed: 7, playerClass: 'rogue', autoEquip: true });
+    const rogue = new Sim({
+      seed: 7,
+      playerClass: 'rogue',
+      autoEquip: true,
+      world: EMPTY_TEST_WORLD,
+    });
     rogue.player.cooldowns.set('sprint', 30);
     rogue.player.cooldowns.set('evasion', 40);
     rogue.player.cooldowns.set('vanish', 50);
@@ -249,7 +295,12 @@ describe('Talents V2 movement and control primitives', () => {
       rechargeLength: 30,
     });
 
-    const mage = new Sim({ seed: 8, playerClass: 'mage', autoEquip: true });
+    const mage = new Sim({
+      seed: 8,
+      playerClass: 'mage',
+      autoEquip: true,
+      world: EMPTY_TEST_WORLD,
+    });
     mage.ctx.applyAura(mage.player, aura(mage.player, 'test_root', 'root', 0, 'nature'));
     const originalResolve = mage.ctx.resolveMovePoint;
     let resolvedSteps = 0;
@@ -268,14 +319,24 @@ describe('Talents V2 movement and control primitives', () => {
   });
 
   it('preserves unbreakable encounter control across player removal primitives', () => {
-    const warrior = new Sim({ seed: 81, playerClass: 'warrior', autoEquip: true });
+    const warrior = new Sim({
+      seed: 81,
+      playerClass: 'warrior',
+      autoEquip: true,
+      world: EMPTY_TEST_WORLD,
+    });
     warrior.player.auras.push(
       unbreakableControl(warrior.player, 'scripted_stun', 'stun', 'shadow'),
     );
     runAbilityEffect(warrior, null, 'avatar');
     expect(warrior.player.auras.some((entry) => entry.id === 'scripted_stun')).toBe(true);
 
-    const mage = new Sim({ seed: 82, playerClass: 'mage', autoEquip: true });
+    const mage = new Sim({
+      seed: 82,
+      playerClass: 'mage',
+      autoEquip: true,
+      world: EMPTY_TEST_WORLD,
+    });
     mage.player.auras.push(unbreakableControl(mage.player, 'scripted_root', 'root', 'nature'));
     const mageStart = { ...mage.player.pos };
     const originalResolve = mage.ctx.resolveMovePoint;
@@ -294,7 +355,12 @@ describe('Talents V2 movement and control primitives', () => {
     expect(mage.player.pos).toEqual(mageStart);
     expect(protectedRootMoveSteps).toBe(0);
 
-    const castingMage = new Sim({ seed: 85, playerClass: 'mage', autoEquip: true });
+    const castingMage = new Sim({
+      seed: 85,
+      playerClass: 'mage',
+      autoEquip: true,
+      world: EMPTY_TEST_WORLD,
+    });
     castingMage.setPlayerLevel(20);
     castingMage.tick();
     castingMage.player.gcdRemaining = 0;
@@ -309,14 +375,24 @@ describe('Talents V2 movement and control primitives', () => {
     expect(castingMage.player.resource).toBe(castingMageResource);
     expect(castingMage.player.cooldowns.has('blink')).toBe(false);
 
-    const rogue = new Sim({ seed: 84, playerClass: 'rogue', autoEquip: true });
+    const rogue = new Sim({
+      seed: 84,
+      playerClass: 'rogue',
+      autoEquip: true,
+      world: EMPTY_TEST_WORLD,
+    });
     const shadowstepTarget = addHostile(rogue, 10);
     rogue.player.auras.push(unbreakableControl(rogue.player, 'scripted_root', 'root', 'nature'));
     const rogueStart = { ...rogue.player.pos };
     runAbilityEffect(rogue, shadowstepTarget, 'shadowstep');
     expect(rogue.player.pos).toEqual(rogueStart);
 
-    const paladin = new Sim({ seed: 83, playerClass: 'paladin', noPlayer: true });
+    const paladin = new Sim({
+      seed: 83,
+      playerClass: 'paladin',
+      noPlayer: true,
+      world: EMPTY_TEST_WORLD,
+    });
     const casterId = paladin.addPlayer('paladin', 'Caster');
     const allyId = paladin.addPlayer('mage', 'Ally');
     const ally = paladin.entities.get(allyId);
@@ -331,7 +407,7 @@ describe('Talents V2 stasis and resource-sap primitives', () => {
   it('Ice Block stops actions and auto attacks, and recasts to cancel the stasis', () => {
     // Cold Coffin is mage base kit now (learnLevel 12, stasis + cleanseSelf; the
     // old row-granted absorb shield died with the mage rework).
-    const sim = new Sim({ seed: 9, playerClass: 'mage', autoEquip: true });
+    const sim = new Sim({ seed: 9, playerClass: 'mage', autoEquip: true, world: EMPTY_TEST_WORLD });
     sim.setPlayerLevel(20);
     const enemy = addHostile(sim);
     sim.targetEntity(enemy.id);
@@ -354,7 +430,12 @@ describe('Talents V2 stasis and resource-sap primitives', () => {
   });
 
   it('Lifesap ticks the current resource every two seconds and is stilled by hard control', () => {
-    const sim = new Sim({ seed: 10, playerClass: 'druid', autoEquip: true });
+    const sim = new Sim({
+      seed: 10,
+      playerClass: 'druid',
+      autoEquip: true,
+      world: EMPTY_TEST_WORLD,
+    });
     sim.setPlayerLevel(20);
     expect(sim.applyTalents({ spec: null, rows: { 11: 'dru_r11_innervate' } })).toBe(true);
     sim.player.inCombat = true;

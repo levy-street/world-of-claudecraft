@@ -27,8 +27,9 @@ import {
   keepInteriorBounds,
 } from '../battleground_layout';
 import { applyGreaterInvisibilityAftereffect } from '../combat/greater_invisibility';
-import { BG_SLOT_COUNT, battlegroundOrigin, DUNGEON_X_THRESHOLD } from '../data';
+import { BG_SLOT_COUNT, battlegroundOrigin } from '../data';
 import { createGroundObject } from '../entity';
+import { detachFromDungeon } from '../instances/dungeons';
 import {
   awardBattlegroundAssistHonor,
   awardBattlegroundHonor,
@@ -295,20 +296,18 @@ export function bgQueueJoin(ctx: SimContext, pid?: number, opts?: { bypassLevel?
     ctx.error(id, 'You are already in a battleground.');
     return;
   }
-  if (r.e.dead) {
-    ctx.error(id, 'You cannot queue for Thornhollow Fields while dead.');
-    return;
-  }
+  // Dying and stepping into a dungeon are deliberately NOT refusals. Waiting in
+  // line is not an activity, so it should survive whatever the player does with
+  // the wait; a corpse run or a dungeon pull that silently cancelled the queue
+  // was the single most common way players lost a spot without noticing. The
+  // seat handles both: placeInBg revives and clears the spirit arm, and the pop
+  // detaches an instanced fighter through the dungeon door (startBgMatch).
   if (ctx.arenaMatches.has(id)) {
     ctx.error(id, 'You cannot queue for Thornhollow Fields while in another match.');
     return;
   }
   if (!opts?.bypassLevel && r.e.level < BG_MIN_LEVEL) {
     ctx.error(id, `Thornhollow Fields requires level ${BG_MIN_LEVEL}.`);
-    return;
-  }
-  if (r.e.pos.x > DUNGEON_X_THRESHOLD) {
-    ctx.error(id, 'You cannot queue from inside an instance.');
     return;
   }
   const existing = bgGroupContaining(ctx, id);
@@ -546,22 +545,26 @@ function tickCountdown(ctx: SimContext, match: BgMatch): void {
 }
 
 function matchmakeBg(ctx: SimContext): void {
-  // Drop members who went offline, died, entered a match, or walked into
-  // instanced content while waiting; tell the survivors they fell out of
-  // line instead of silently flipping their window back to idle.
+  // Waiting in line survives whatever the player does with the wait: dying and
+  // walking into a dungeon USED to drop them here, which is how players lost a
+  // spot without noticing. Exactly three things still end the wait, and only the
+  // last of them is the player's own doing worth a line of text:
+  //   offline        the entity is gone, so there is nobody left to tell
+  //   already seated a match claimed them (backfill, /dev); silent by design
+  //   arena match    they committed to a different rated fight
+  // Anything else HOLDS the spot, and the pop cleans up after them instead.
   for (const g of ctx.bgQueue) {
     g.pids = g.pids.filter((p) => {
       const e = ctx.entities.get(p);
-      if (e && !e.dead && !ctx.bgMatches.has(p) && e.pos.x <= DUNGEON_X_THRESHOLD) return true;
-      if (e && !ctx.bgMatches.has(p)) {
-        ctx.emit({ type: 'bgUnqueued', pid: p });
-        ctx.emit({
-          type: 'log',
-          text: 'You leave the Thornhollow Fields queue.',
-          color: '#7fd4ff',
-          pid: p,
-        });
-      }
+      if (!e || ctx.bgMatches.has(p)) return false;
+      if (!ctx.arenaMatches.has(p)) return true;
+      ctx.emit({ type: 'bgUnqueued', pid: p });
+      ctx.emit({
+        type: 'log',
+        text: 'You leave the Thornhollow Fields queue.',
+        color: '#7fd4ff',
+        pid: p,
+      });
       return false;
     });
   }
@@ -726,7 +729,13 @@ export function startBgMatch(
   for (const pid of [...teamA, ...teamB]) {
     const e = ctx.entities.get(pid);
     if (!e) continue;
-    returns.set(pid, { x: e.pos.x, z: e.pos.z, facing: e.facing });
+    // A fighter popped out of a dungeon is detached from it here: their claim's
+    // hate tables are scrubbed exactly as walking out of the door would, and
+    // their return point becomes that door rather than the interior coordinates
+    // they were standing on, which may belong to no live claim by the time the
+    // match ends. Everyone else returns to the spot they were pulled from.
+    const door = detachFromDungeon(ctx, e);
+    returns.set(pid, { x: door?.x ?? e.pos.x, z: door?.z ?? e.pos.z, facing: e.facing });
     preMatchPools.set(pid, snapshotArenaReturnPools(e));
   }
   const flags = ([0, 1] as BgTeam[]).map((team) => {
@@ -1796,7 +1805,7 @@ export function bgInfoFor(
     // A READ, never the rollover: `bgFirstWinBonusAvailable` reports a stored
     // date that is not today as re-armed without writing anything, because a
     // per-viewer wire builder must not mutate the daily window it reports on.
-    firstWinBonusReady: bgFirstWinBonusAvailable(ctx.utcDay, meta),
+    firstWinBonusReady: bgFirstWinBonusAvailable(ctx.resetDay, meta),
     match: matchInfo,
     ladder: ladder ?? bgLadder(ctx),
   };

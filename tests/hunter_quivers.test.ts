@@ -1,14 +1,29 @@
 import { describe, expect, it } from 'vitest';
 import { ITEMS, MOBS } from '../src/sim/data';
-import { canDualWield, canEquipItem, canEquipItemInSlot } from '../src/sim/equipment_rules';
-import { expectedStatBudget, itemLevel } from '../src/sim/item_level';
+import {
+  canDualWield,
+  canEquipItem,
+  canEquipItemInSlot,
+  displacedSlotForEquip,
+  occupiesHand,
+} from '../src/sim/equipment_rules';
+import {
+  expectedStatBudget,
+  itemLevel,
+  primaryStatBudget,
+  SLOT_STAT_MULT,
+  TWOHAND_STAT_MULT,
+  WORN_OFFHAND_STAT_MULT,
+} from '../src/sim/item_level';
 import { Sim } from '../src/sim/sim';
 import { ALL_CLASSES, type ItemDef, type PlayerClass } from '../src/sim/types';
 
 // The hunter quiver ladder (issue: hunters were the one class with a
 // permanently empty offhand). Held offhands equip by their literal
-// requiredClass alone, which is the whole reason a hunter-only offhand needs no
-// engine change: see src/sim/equipment_rules.ts canEquipItem.
+// requiredClass alone, which is what lets a hunter-only offhand work without
+// touching canEquipItem: see src/sim/equipment_rules.ts. The DISPLACEMENT rule
+// is a separate question that the original change missed; see the two-hander
+// block at the bottom of this file.
 const QUIVERS = [
   'moggers_hide_quiver',
   'cragmaw_huntquiver',
@@ -71,7 +86,7 @@ describe('hunter quivers', () => {
       const sta = item.stats?.sta ?? 0;
       expect(primaryStatSum(item), `${id} budget`).toBe(expectedStatBudget(item));
       // Hunter identity: agility-led, stamina second, nothing else. The opening
-      // rung's budget is only 2 points, which splits 1/1 and cannot be led.
+      // rung's worn budget is a single point, so it is agility alone.
       expect(agi, `${id} agi`).toBeGreaterThanOrEqual(sta);
       if (primaryStatSum(item) > 2) expect(agi, `${id} agi lead`).toBeGreaterThan(sta);
       expect(item.stats?.int ?? 0, `${id} int`).toBe(0);
@@ -143,7 +158,7 @@ describe('hunter quivers', () => {
     expect(sim.equipment.offhand).toBe('direfang_quiver');
     // recalcPlayerStats is the one place gear reaches the entity; the offhand
     // slot was previously dead weight for this class.
-    expect(sim.player.stats.agi).toBe(before + 9);
+    expect(sim.player.stats.agi).toBe(before + 5);
     // A quiver is not a weapon: it must never light up the dual-wield path.
     expect(sim.player.dualWielding).toBe(false);
     expect(sim.player.offhandWeapon).toBeNull();
@@ -198,5 +213,191 @@ describe('hunter offhand parity', () => {
     }
     expect([...ALL_CLASSES].filter((c) => !classesWithAnOffhand.has(c))).toEqual([]);
     expect(classesWithAnOffhand.has('hunter')).toBe(true);
+  });
+});
+
+// The case PR #2930 never wrote, and the bug that shipped because of it: every
+// equip test above starts from an EMPTY mainhand, so nothing exercised the
+// two-hand/offhand exclusion. A hunter can equip 14 different two-handers, so
+// wearing one and then equipping a quiver silently benched the weapon.
+describe('a worn quiver coexists with a two-hander', () => {
+  const lookup = (id: string) => ITEMS[id];
+
+  it('displaces nothing when a quiver goes on over a two-handed mainhand', () => {
+    for (const id of QUIVERS) {
+      expect(
+        displacedSlotForEquip(
+          ITEMS[id],
+          'offhand',
+          { mainhand: 'direfang_greatblade' },
+          lookup,
+          'hunter',
+          'marksmanship',
+        ),
+        id,
+      ).toBeNull();
+    }
+  });
+
+  it('displaces nothing when a two-hander goes on over a worn quiver', () => {
+    // The mirror of the case above. Same rule, opposite direction: easy to fix
+    // one arm and leave the other, which would just move the bug.
+    for (const id of QUIVERS) {
+      expect(
+        displacedSlotForEquip(
+          ITEMS.direfang_greatblade,
+          'mainhand',
+          { offhand: id },
+          lookup,
+          'hunter',
+          'marksmanship',
+        ),
+        id,
+      ).toBeNull();
+    }
+  });
+
+  it('keeps the exclusion for every offhand that is actually HELD', () => {
+    // The fix is "does this take a hand", not "is this a hunter". A caster orb,
+    // a lantern and a shield are all held, so they still bench a two-hander and
+    // are still benched by one.
+    for (const [id, cls] of [
+      ['wraithfire_orb', 'mage'],
+      ['valefire_lantern', 'mage'],
+      ['bonewrought_bulwark', 'warrior'],
+    ] as const) {
+      expect(occupiesHand(ITEMS[id]), id).toBe(true);
+      expect(
+        displacedSlotForEquip(
+          ITEMS[id],
+          'offhand',
+          { mainhand: 'bonewrought_greatsword' },
+          lookup,
+          cls,
+          null,
+        ),
+        `${id} over 2H`,
+      ).toBe('mainhand');
+      expect(
+        displacedSlotForEquip(
+          ITEMS.bonewrought_greatsword,
+          'mainhand',
+          { offhand: id },
+          lookup,
+          cls,
+          null,
+        ),
+        `2H over ${id}`,
+      ).toBe('offhand');
+    }
+  });
+
+  it('marks the quivers worn and every other offhand held', () => {
+    for (const id of QUIVERS) expect(occupiesHand(ITEMS[id]), id).toBe(false);
+    const heldOffhands = Object.values(ITEMS).filter(
+      (item) => item.slot === 'offhand' && !occupiesHand(item),
+    );
+    // Quivers (and their heroic clones) are the ONLY worn offhands today. A new
+    // one landing here without a deliberate budget decision is the regression
+    // this pins against.
+    expect(heldOffhands.map((item) => item.id).sort()).toEqual([
+      'cragmaw_huntquiver',
+      'direfang_quiver',
+      'gravewyrm_bone_quiver',
+      'heroic_direfang_quiver',
+      'heroic_gravewyrm_bone_quiver',
+      'moggers_hide_quiver',
+    ]);
+  });
+
+  it('wears a two-hander and a quiver together through the real sim path', () => {
+    const sim = new Sim({ seed: 7, playerClass: 'hunter', autoEquip: false });
+    const pid = sim.player.id;
+    sim.setPlayerLevel(20);
+    const baseAgi = sim.player.stats.agi;
+
+    sim.addItem('direfang_greatblade', 1, pid);
+    sim.addItem('direfang_quiver', 1, pid);
+    sim.equipItem('direfang_greatblade', pid);
+    sim.equipItem('direfang_quiver', pid);
+
+    // Both worn at once: the reported bug was the mainhand going empty here.
+    expect(sim.equipment.mainhand).toBe('direfang_greatblade');
+    expect(sim.equipment.offhand).toBe('direfang_quiver');
+    // And both sets of stats actually reach the entity (14 + 5 agility).
+    expect(sim.player.stats.agi).toBe(baseAgi + 19);
+    // Still not a dual wield: the quiver is worn, not a second weapon.
+    expect(sim.player.dualWielding).toBe(false);
+    expect(sim.player.offhandWeapon).toBeNull();
+  });
+
+  it('wears them together in the opposite equip order too', () => {
+    const sim = new Sim({ seed: 7, playerClass: 'hunter', autoEquip: false });
+    const pid = sim.player.id;
+    sim.setPlayerLevel(20);
+
+    sim.addItem('direfang_quiver', 1, pid);
+    sim.addItem('direfang_greatblade', 1, pid);
+    sim.equipItem('direfang_quiver', pid);
+    sim.equipItem('direfang_greatblade', pid);
+
+    expect(sim.equipment.mainhand).toBe('direfang_greatblade');
+    expect(sim.equipment.offhand).toBe('direfang_quiver');
+  });
+
+  it('still benches a hunter two-hander for a HELD offhand through the sim', () => {
+    // The negative arm through the real path: hunters have no held offhand of
+    // their own, so borrow the rule directly. A shield-wearing warrior loses the
+    // greatsword exactly as before this change.
+    const sim = new Sim({ seed: 7, playerClass: 'warrior', autoEquip: false });
+    const pid = sim.player.id;
+    sim.setPlayerLevel(20);
+    sim.addItem('bonewrought_greatsword', 1, pid);
+    sim.addItem('bonewrought_bulwark', 1, pid);
+    sim.equipItem('bonewrought_greatsword', pid);
+    sim.equipItem('bonewrought_bulwark', pid);
+
+    expect(sim.equipment.offhand).toBe('bonewrought_bulwark');
+    expect(sim.equipment.mainhand).toBeUndefined();
+  });
+});
+
+describe('worn offhand budget', () => {
+  it('keeps a two-hander plus a worn offhand inside the slot-weight ceiling', () => {
+    // THE invariant this change had to respect. item_budget.ts guarantees that a
+    // two-hander never out-stats a mainhand + offhand pairing of the same item
+    // level. A worn offhand is the first item that stacks WITH a two-hander, so
+    // the two weights together are what must stay inside the ceiling, not the
+    // two-hander alone. Priced at the held offhand's 0.75 this would read 2.05.
+    expect(TWOHAND_STAT_MULT + WORN_OFFHAND_STAT_MULT).toBeLessThanOrEqual(
+      SLOT_STAT_MULT.mainhand + SLOT_STAT_MULT.offhand,
+    );
+    // And a worn offhand is strictly cheaper than the held one it shares a slot
+    // with, which is the whole reason it is allowed to coexist.
+    expect(WORN_OFFHAND_STAT_MULT).toBeLessThan(SLOT_STAT_MULT.offhand);
+  });
+
+  it('prices each quiver on the worn line, below the held offhand of its tier', () => {
+    // Same slot, same item level, same quality as the caster orb, lower budget:
+    // the orb costs you the two-hander and the quiver does not.
+    expect(itemLevel(ITEMS.direfang_quiver)).toBe(itemLevel(ITEMS.wraithfire_orb));
+    expect(ITEMS.direfang_quiver.quality).toBe(ITEMS.wraithfire_orb.quality);
+    expect(primaryStatSum(ITEMS.direfang_quiver)).toBe(9);
+    expect(primaryStatSum(ITEMS.wraithfire_orb)).toBe(15);
+    expect(QUIVERS.map((id) => primaryStatSum(ITEMS[id]))).toEqual([1, 4, 6, 9]);
+  });
+
+  it('carries the worn line into the generated heroic clones', () => {
+    // heroic_variants.ts re-derives stats from the budget, so a clone that
+    // skipped slotStatMultForItem would quietly re-inflate to the held line.
+    for (const id of ['heroic_gravewyrm_bone_quiver', 'heroic_direfang_quiver']) {
+      const item = ITEMS[id];
+      expect(item, id).toBeDefined();
+      expect(occupiesHand(item), id).toBe(false);
+      expect(primaryStatSum(item), id).toBe(expectedStatBudget(item));
+      expect(primaryStatSum(item), `${id} below held line`).toBeLessThan(
+        primaryStatBudget(itemLevel(item)!, item.quality, 'offhand'),
+      );
+    }
   });
 });

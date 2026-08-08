@@ -33,19 +33,19 @@ export const table: DeedLocaleTable = {
     desc: 'Ontruim een S-rangs Rift, de zwaarste rang die een Riftportaal kan voortbrengen.',
   },
   pvp_honor_sergeant: {
-    name: 'Sergeant',
+    name: 'Liniebreker',
     desc: 'Verdien 10.000 eer in je levensloop. Ze uitgeven kost je nooit de rang.',
-    title: 'Sergeant',
+    title: 'Liniebreker',
   },
   pvp_honor_knight_lieutenant: {
-    name: 'Ridder-Luitenant',
+    name: 'Veldplunderaar',
     desc: 'Verdien 40.000 eer in je levensloop, een heus seizoen oorlog achter de rug.',
-    title: 'Ridder-Luitenant',
+    title: 'Veldplunderaar',
   },
   pvp_honor_field_marshal: {
-    name: 'Veldmaarschalk',
+    name: 'Oorlogsgekroond',
     desc: 'Verdien 150.000 eer in je levensloop. Zeldzaam op elk rijk, en dat hoort ook zo.',
-    title: 'Veldmaarschalk',
+    title: 'Oorlogsgekroond',
   },
   chr_drakemaw_broodlord: {
     name: 'Broedselbreker',

@@ -45,6 +45,28 @@ describe('cacheControlFor', () => {
     expect(cacheControlFor('/audio/voice/npc.mp3?v=18153d1b82cb')).toBe('no-cache');
   });
 
+  it('marks NPC voice lines and zone/combat music immutable only with a well-formed hash query', () => {
+    expect(
+      cacheControlFor('/audio/voice/brother_aldric/greeting__brother_aldric.mp3?v=bf01ef558bba'),
+    ).toBe('public, max-age=31536000, immutable');
+    expect(cacheControlFor('/audio/music/vale.mp3?v=d40a82892e1e')).toBe(
+      'public, max-age=31536000, immutable',
+    );
+    // No query at all: the pre-versioning shape, must stay revalidated.
+    expect(cacheControlFor('/audio/voice/brother_aldric/greeting__brother_aldric.mp3')).toBe(
+      'no-cache',
+    );
+    expect(cacheControlFor('/audio/music/vale.mp3')).toBe('no-cache');
+    // Malformed / short hash: never trusted, regardless of content.
+    expect(
+      cacheControlFor('/audio/voice/brother_aldric/greeting__brother_aldric.mp3?v=stale'),
+    ).toBe('no-cache');
+    expect(cacheControlFor('/audio/music/vale.mp3?v=stale')).toBe('no-cache');
+    // Voice lines require the <voiceNpc>/<key>.mp3 shape: a bare file directly
+    // under /audio/voice/ never matches.
+    expect(cacheControlFor('/audio/voice/vale.mp3?v=d40a82892e1e')).toBe('no-cache');
+  });
+
   it('keeps the stable runtime pack fresh and verified audio blobs immutable', () => {
     const hash = 'a'.repeat(64);
     expect(cacheControlFor('/audio/sfx/runtime-pack.json')).toBe('no-store');

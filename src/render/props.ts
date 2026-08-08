@@ -425,11 +425,14 @@ const LOW_TIER_PROP_KEYS: readonly PropKey[] = [
  * the high-performance renderer then resolves medium+), a tier-SCOPED preload set
  * would omit props that buildProps then places, and propAsset() throws "prop asset
  * not preloaded", the v0.16.0 farmCrate crash on world entry (red "Could not start
- * the renderer" overlay). So every tier preloads the full PROP_ASSET_DEFS, mirroring
- * foliage.ts, which sources its one frozen MODEL_URLS list for both preload and
- * placement and is structurally immune to this class of bug. Because every placement
- * key is typed PropKey (a key of PROP_ASSET_DEFS), the full set is provably a superset
- * of anything buildProps can place, on every tier and device.
+ * the renderer" overlay). So every tier preloads the full PROP_ASSET_DEFS, matching the
+ * same tier-independent-superset invariant foliage.ts's deferred boot lane enforces
+ * (a `deferredFoliageUrlsForBoot()` gate once broke it there too and reopened this
+ * exact crash for "models/foliage/pine_2.glb" - see the P0 comment in foliage.ts).
+ * The shapes differ (this function ignores its tier argument outright; foliage.ts's
+ * loop just never filters by tier in the first place) but the invariant is identical.
+ * Because every placement key is typed PropKey (a key of PROP_ASSET_DEFS), the full
+ * set is provably a superset of anything buildProps can place, on every tier and device.
  *
  * The arg is retained to document the invariant and to let the guard test assert it at
  * the lowest (most dangerous) import tier; the result intentionally ignores it.
@@ -484,9 +487,10 @@ for (const key of ALL_PROP_KEYS) {
     // superset; live profile preparation may load only the requested target.
     if (!deferredPropKeysForBoot().has(key)) return Promise.resolve();
     return preparePropSource(key).then(() => {
-      // Preserve the packaged-iOS boot path: extract each source as it lands
-      // and release its parsed scene before the renderer build.
-      if (GFX.nativeIosMemoryProfile) propAsset(key);
+      // Preserve the iOS WebKit boot path (Safari, other iOS browsers, and the
+      // packaged app alike): extract each source as it lands and release its
+      // parsed scene before the renderer build.
+      if (GFX.iosMemoryProfile) propAsset(key);
     });
   });
 }
@@ -2269,7 +2273,7 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
   // Far-cell merged bakes for the hideables (dual representation): identical
   // world-baked geometry on the SHARED pre-clone materials, one mesh per
   // (cell, material, castShadow). The per-frame swap lives in update().
-  // Constrained-memory profiles (phone WebKit, native iOS) skip the bake:
+  // Constrained-memory profiles (phone WebKit, every iOS WebKit host) skip the bake:
   // duplicating the prop geometry at world entry is exactly the allocation
   // spike the v0.27.2 memory hotfix class guards against, and the draw-call
   // win matters most on the desktop tiers.
@@ -2696,7 +2700,7 @@ function buildFarPropCells(group: THREE.Group, hideables: Hideable[]): FarPropCe
     // shadow via the bake exactly as they did per-material before; the
     // lowProps ghost path (whole-group hide) cannot diverge because every
     // lowProps profile also disables dynamicShadows (gfx.ts:
-    // constrainedMemory is true whenever nativeIosMemoryProfile is).
+    // constrainedMemory is true whenever iosMemoryProfile is).
     for (const h of cellBuild.hideables) {
       for (const b of h.bakeMeshes) b.mesh.castShadow = false;
     }

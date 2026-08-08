@@ -1736,6 +1736,86 @@
     color: #7c7256;
     font-style: italic;
   }
+  /* The lifetime "Time Played" line footing the character sheet: the shared
+     inset-card treatment laid out as one slim row (label, value, then the
+     reveal/conceal eye pushed to the far edge). */
+  .char-playtime {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .char-playtime .cp-title {
+    margin-bottom: 0;
+  }
+  .char-playtime-value {
+    font-size: 13px;
+    color: #fff;
+    font-weight: normal;
+    font-variant-numeric: tabular-nums;
+  }
+  .char-playtime-value-hidden {
+    /* Information-bearing text (the concealed state's only signal), so the
+       readable muted token, not the fainter .cp-none gray. */
+    color: var(--color-text-muted);
+    font-style: italic;
+  }
+  /* The value's privacy eye: the helm eye's circle chrome, seated inline at
+     the row's far edge instead of on a socket corner. */
+  .char-playtime-eye {
+    position: relative;
+    flex: none;
+    margin-left: auto;
+    width: 26px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border-radius: 50%;
+    border: 1px solid rgba(202, 164, 114, 0.5);
+    background: rgba(40, 26, 20, 0.85);
+    color: var(--color-text-secondary, #d6c1a0);
+    cursor: var(--cursor-point);
+    transition:
+      border-color 0.12s,
+      box-shadow 0.12s,
+      color 0.12s;
+  }
+  .char-playtime-eye .ui-icon {
+    width: 14px;
+    height: 14px;
+  }
+  /* Invisible hit extension to the 36px desktop / 40px mobile floors
+     (DESIGN.md 10.1: padding where the visual is smaller). */
+  .char-playtime-eye::after {
+    content: "";
+    position: absolute;
+    inset: -6px;
+    border-radius: 50%;
+  }
+  body.mobile-touch .char-playtime-eye::after {
+    inset: -8px;
+  }
+  .char-playtime-eye[aria-pressed="true"] {
+    color: rgba(214, 193, 160, 0.55);
+  }
+  .char-playtime-eye:hover,
+  .char-playtime-eye:focus-visible {
+    border-color: rgba(255, 218, 160, 0.8);
+    color: #fff;
+    box-shadow: 0 0 7px rgba(202, 164, 114, 0.4);
+  }
+  /* Steady keyboard ring, distinct from hover (the HUD-chrome WCAG contract):
+     never transitioned (the transition list above excludes outline). */
+  .char-playtime-eye:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .char-playtime-eye {
+      transition: none;
+    }
+  }
   .ms-badge {
     display: inline-block;
     font-size: 10.5px;

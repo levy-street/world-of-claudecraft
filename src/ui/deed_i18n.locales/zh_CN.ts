@@ -33,19 +33,19 @@ export const table: DeedLocaleTable = {
     desc: '清除一个S级裂隙，这是裂隙传送门能够生成的最高难度等级。',
   },
   pvp_honor_sergeant: {
-    name: '中士',
+    name: '破阵者',
     desc: '生涯累计获得10,000点荣誉。花费荣誉不会剥夺你的军阶。',
-    title: '中士',
+    title: '破阵者',
   },
   pvp_honor_knight_lieutenant: {
-    name: '骑士中尉',
+    name: '掠野者',
     desc: '生涯累计获得40,000点荣誉，那是一整个赛季真枪实弹的战争。',
-    title: '骑士中尉',
+    title: '掠野者',
   },
   pvp_honor_field_marshal: {
-    name: '陆军元帅',
+    name: '战冠者',
     desc: '生涯累计获得150,000点荣誉。在任何王国都十分罕见，理应如此。',
-    title: '陆军元帅',
+    title: '战冠者',
   },
   chr_drakemaw_broodlord: {
     name: '碎卵者',

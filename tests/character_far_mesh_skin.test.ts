@@ -37,6 +37,14 @@ describe('far-LOD mesh follows the selected body skin', () => {
       loadTexture: vi.fn((url: string) =>
         Promise.resolve(Object.assign(new THREE.Texture(), { name: url })),
       ),
+      // loadSkinTexInto requests the .ktx2 sibling for a textures/skins/ atlas;
+      // tag it back to the .png identity so this test still names the alt skin
+      // by the SKINS entry it came from, not by which loader fetched it.
+      loadKtx2Texture: vi.fn((url: string) =>
+        Promise.resolve(
+          Object.assign(new THREE.Texture(), { name: url.replace(/\.ktx2$/, '.png') }),
+        ),
+      ),
       releaseGltf: vi.fn(),
     }));
     const { charactersReady, prepareVisual } = await import('../src/render/characters/assets');

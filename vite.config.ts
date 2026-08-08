@@ -323,6 +323,26 @@ export default defineConfig({
   },
   server: {
     port: 5173,
+    // Vite's default watch ignore list is only .git, node_modules, test-results,
+    // cacheDir and outDir, so the dev watcher otherwise descends into every agent
+    // runtime directory at the repo root. A linked worktree parked under one of them
+    // is a full second checkout: its 7 root *.html entries each trigger a page reload
+    // on change (Vite reloads for ANY watched .html, in the module graph or not), and
+    // its tsconfig.json triggers a full reload plus a moduleGraph.invalidateAll().
+    // Creating, deleting, or switching branches inside such a worktree rewrites all of
+    // them at once, so the served game reloads for edits that cannot reach it. Same
+    // rows as `test.exclude` below (see its comment), for the same reason; pinned by
+    // tests/vite_dev_watch.test.ts.
+    watch: {
+      ignored: [
+        '**/.claude/**',
+        '**/.codex/**',
+        '**/.agents/**',
+        '**/.worktrees/**',
+        '**/.venv/**',
+        '**/tmp/**',
+      ],
+    },
     proxy: {
       '/api': { target: apiProxyTarget, changeOrigin: true },
       '/admin/api': { target: apiProxyTarget, changeOrigin: true },

@@ -33,19 +33,19 @@ export const table: DeedLocaleTable = {
     desc: '清除一個S級裂隙，裂隙傳送門所能生成的最高分級。',
   },
   pvp_honor_sergeant: {
-    name: '中士',
+    name: '破陣者',
     desc: '生涯累計獲得10,000點榮譽。花費榮譽不會讓你失去此階級。',
-    title: '中士',
+    title: '破陣者',
   },
   pvp_honor_knight_lieutenant: {
-    name: '騎士中尉',
+    name: '掠野者',
     desc: '生涯累計獲得40,000點榮譽，象徵你已歷經一季真正的戰爭。',
-    title: '騎士中尉',
+    title: '掠野者',
   },
   pvp_honor_field_marshal: {
-    name: '元帥',
+    name: '戰冠者',
     desc: '生涯累計獲得150,000點榮譽。在任何王國都極為罕見，而它本該如此。',
-    title: '元帥',
+    title: '戰冠者',
   },
   chr_drakemaw_broodlord: {
     name: '碎巢者',

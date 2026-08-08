@@ -30,11 +30,12 @@ import { dropRequiredLevel, paperdollDropAction } from './equip_drop_core';
 import { esc } from './esc';
 import { gatheringProfessionNameKey } from './gathering_profession_name';
 import { buildGatheringProficiencyRows } from './gathering_view';
-import { formatNumber, type TranslationKey, t } from './i18n';
+import { formatNumber, type TranslationKey, t, tPlural } from './i18n';
 import { iconDataUrl, QUALITY_COLOR } from './icons';
 import type { ItemDragState } from './item_drag_state';
 import { wornTooltipInstance } from './item_instance_tooltip';
 import type { PainterHostPresentation } from './painter_host';
+import { playtimeParts, playtimeShape } from './playtime_view';
 import { hydratePortraits, modularLookFor, portraitChipHtml } from './portrait_chip';
 import { archetypeImageUrl, professionImageUrl } from './profession_art';
 import { qualityGlowShadow } from './quality_glow';
@@ -92,6 +93,35 @@ export function hobbyCraftText(craftId: string | null): string {
   return craftNameText(craftId);
 }
 
+/** Localized lifetime played text, RuneScape style: the two coarsest non-zero
+ *  units ("12 days, 5 hours" / "5 hours, 42 minutes"), a single unit when the
+ *  next one down is zero ("2 days" / "42 minutes"), and a sub-minute floor
+ *  line. The parts split lives in the playtime_view pure core; counts run
+ *  through formatNumber and the join is a t() template so a locale can
+ *  reorder or drop the separator. Exported for the view-model test. */
+export function playtimeText(seconds: number): string {
+  const { days, hours, minutes } = playtimeParts(seconds);
+  const num = (n: number) => formatNumber(n, { maximumFractionDigits: 0 });
+  const dayPart = () => tPlural('hudChrome.plurals.playtimeDays', days, { count: num(days) });
+  const hourPart = () => tPlural('hudChrome.plurals.playtimeHours', hours, { count: num(hours) });
+  const minutePart = () =>
+    tPlural('hudChrome.plurals.playtimeMinutes', minutes, { count: num(minutes) });
+  switch (playtimeShape(seconds)) {
+    case 'daysHours':
+      return t('hudChrome.charSheet.playtimeParts', { major: dayPart(), minor: hourPart() });
+    case 'days':
+      return dayPart();
+    case 'hoursMinutes':
+      return t('hudChrome.charSheet.playtimeParts', { major: hourPart(), minor: minutePart() });
+    case 'hours':
+      return hourPart();
+    case 'minutes':
+      return minutePart();
+    case 'lessThanMinute':
+      return t('hudChrome.charSheet.playtimeUnderMinute');
+  }
+}
+
 /**
  * Hud-supplied glue. Composes the shared PainterHostPresentation bag
  * (icon/tooltip) and adds the character-sheet surface: world reads, the localized
@@ -138,6 +168,13 @@ export interface CharWindowDeps extends PainterHostPresentation {
   /** Flip the helmet-visibility preference. HUD-owned side effects (wire
    *  command, stored choice, portrait re-snapshot, sheet repaint). */
   toggleHelm(): void;
+  /** The Time Played eye's current state: is the lifetime value revealed?
+   *  A per-device display preference (settings.showPlaytime); the total keeps
+   *  accruing while concealed. */
+  playtimeVisible(): boolean;
+  /** Flip the stored Time Played preference and repaint the sheet (HUD-owned:
+   *  the settings write and the repaint). */
+  togglePlaytimeVisible(): void;
 }
 
 const SHARE_GLYPH =
@@ -218,6 +255,7 @@ export class CharWindow {
     html += this.deps.talentSummaryHtml();
     html += this.deps.progressionHtml(p.level);
     html += this.gatheringHtml(world);
+    html += this.playtimeHtml(world);
     html += `<div class="pc-share-row"><button type="button" class="btn pc-share-btn" data-act="share-card">${SHARE_GLYPH}<span>${esc(t('playerCard.shareButton'))}</span></button></div>`;
     el.innerHTML = html;
     hydratePortraits(el);
@@ -232,6 +270,27 @@ export class CharWindow {
       audio.click();
       this.deps.openPlayerCard();
     });
+    const playtimeEye = el.querySelector<HTMLElement>('[data-act="toggle-playtime"]');
+    if (playtimeEye) {
+      this.deps.attachTooltip(playtimeEye, () =>
+        esc(
+          t(
+            this.deps.playtimeVisible()
+              ? 'hudChrome.charSheet.hidePlaytimeAria'
+              : 'hudChrome.charSheet.showPlaytimeAria',
+          ),
+        ),
+      );
+      playtimeEye.addEventListener('click', () => {
+        audio.click();
+        // The toggle repaints the whole sheet (innerHTML rebuild), so hand
+        // focus to the rebuilt eye or a keyboard user lands on <body>.
+        this.deps.togglePlaytimeVisible();
+        this.deps.restoreFocus(
+          this.deps.root().querySelector<HTMLElement>('[data-act="toggle-playtime"]'),
+        );
+      });
+    }
     const view = buildPaperdollView(world.equipment, ITEMS);
     const leftCol = el.querySelector('#equip-col-left');
     const rightCol = el.querySelector('#equip-col-right');
@@ -274,6 +333,26 @@ export class CharWindow {
       })
       .join('');
     return `<div class="char-progression"><div class="cp-title">${esc(t('hudChrome.gathering.title'))}</div><div class="char-stats cp-stats">${items}</div></div>`;
+  }
+
+  // The lifetime "Time Played" line (the same running total the /playtime
+  // chat command reports, IWorldProgressionXp.playtimeSeconds), footing the
+  // sheet in the shared inset-card treatment. The eye conceals the VALUE per
+  // device (screenshot / stream privacy) without stopping the accrual; state
+  // and the settings write are HUD-owned through deps, the helm eye doctrine.
+  // The value is a per-render snapshot ON PURPOSE: a cold window may not arm
+  // its own repeating driver (tests/hud_perf_budget.test.ts), so an open sheet
+  // refreshes on the next repaint (reopen, equip change, locale switch), never
+  // on a clock. Do not "fix" staleness with a setInterval here.
+  private playtimeHtml(world: IWorld): string {
+    const visible = this.deps.playtimeVisible();
+    const value = visible
+      ? playtimeText(world.playtimeSeconds)
+      : t('hudChrome.charSheet.playtimeHidden');
+    const eyeLabel = t(
+      visible ? 'hudChrome.charSheet.hidePlaytimeAria' : 'hudChrome.charSheet.showPlaytimeAria',
+    );
+    return `<div class="char-progression char-playtime"><span class="cp-title char-playtime-label">${esc(t('hudChrome.charSheet.playtimeLabel'))}</span><b class="char-playtime-value${visible ? '' : ' char-playtime-value-hidden'}">${esc(value)}</b><button type="button" class="char-playtime-eye" data-act="toggle-playtime" aria-pressed="${visible ? 'false' : 'true'}" aria-label="${esc(eyeLabel)}">${svgIcon(visible ? 'eye' : 'eye-off')}</button></div>`;
   }
 
   private buildSlotRow(cell: PaperdollSlot): HTMLElement {
