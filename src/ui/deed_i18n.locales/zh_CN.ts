@@ -134,7 +134,6 @@ export const table: DeedLocaleTable = {
   prog_herbalism_100: { name: '草甸之主', desc: '草药学熟练度达到100点。' },
   prog_master_gatherer: {
     name: '采集大师',
-    desc: '在采矿、伐木、草药学、钓鱼中，任意三门的熟练度达到100点。',
   },
   prog_first_craft: { name: '亲手所制', desc: '完成你的第一次成功制造。' },
   prog_craft_specialist: {

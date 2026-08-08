@@ -303,9 +303,11 @@ export function buildGatherNodeTooltip(
  *  up is the zone rod gate (D9, this water takes a better rod, so the tier IS
  *  named). Without the split a player standing in Thornpeak holding a tier-2
  *  rod would be told to go and get a fishing pole they are already carrying.
- *  Surface 'node' splits the same way across the four node professions
- *  (mining, logging, herbalism, and farming, whose crop beds are nodes);
- *  anything unexpected falls back to the profession-neutral corpse line. */
+ *  Surface 'node' splits the same way across four professions: mining,
+ *  logging, herbalism, and farming, whose denial lines are pre-wired here
+ *  ahead of its crop beds shipping (the phase that ships them decides the
+ *  exact surface its patches emit); anything unexpected falls back to the
+ *  profession-neutral corpse line. */
 export function gatherDeniedLineKey(
   surface: 'node' | 'corpse' | 'fishing',
   professionId?: GatheringProfessionId,

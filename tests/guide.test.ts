@@ -1468,6 +1468,26 @@ describe('Guide professions gathering accuracy', () => {
     expect(gatherHubBody).toContain('Farming');
   });
 
+  // Master Gatherer's trigger counts every registered trade (src/sim/deeds.ts
+  // filters GATHERING_PROFESSION_IDS), so prose that enumerates the roster goes
+  // stale the moment a trade joins. It went stale twice, on fishing and again
+  // on farming, so the enumerating form is banned outright rather than patched
+  // a third time. tests/deeds_content.test.ts owns the trigger itself; this
+  // pins the player-visible strings that describe it.
+  it('never enumerates the Master Gatherer roster in the deed prose', () => {
+    setLanguage('en');
+    for (const id of GATHERING_PROFESSION_IDS) {
+      const body = t(`guide.profPages.gatherDeeds.${id}` as never);
+      expect(body.length, id).toBeGreaterThan(0);
+      expect(body, `gatherDeeds.${id} enumerates the gathering roster`).not.toMatch(
+        /any three of/i,
+      );
+    }
+    expect(DEEDS.prog_master_gatherer.desc).toBe(
+      'Reach 100 proficiency in any three gathering trades.',
+    );
+  });
+
   it('aggregates every world node into its zone row (tool tier = node tier)', () => {
     const typeFor: Record<string, string> = { mining: 'ore', logging: 'wood', herbalism: 'herb' };
     for (const g of GUIDE_PROF_GATHERING) {

@@ -1,6 +1,8 @@
 // Gathering profession content (data-as-code, exempt from module-first size
 // rules per root CLAUDE.md: this is a declarative table, not logic). Starter
-// set is Mining, Logging, Herbalism; the state and gain logic live in
+// set was Mining, Logging, Herbalism; Fishing (Professions 2.0) and Farming
+// (the farming program, ungainable until its growth phase ships) joined
+// later. The state and gain logic live in
 // ../professions/gathering.ts behind the SimContext seam. `icon` is a plain
 // identifier (no emoji glyph, per the repo copy rule); a future UI surface
 // resolves it to a procedural icon the same way ability/item icons do.

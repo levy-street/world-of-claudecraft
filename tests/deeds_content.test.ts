@@ -754,6 +754,32 @@ describe('table shape', () => {
   });
 });
 
+describe('count-form gathering deeds stay earnable', () => {
+  // Farming joined GATHERING_PROFESSION_IDS in farming Phase 1 but stays
+  // ungainable until its growth phase ships, so an any-N gathering trigger
+  // demanding more professions than are actually gainable would ship an
+  // unearnable deed. Today that safety is a property of the catalog, not the
+  // engine, so this guard pins it: when farming becomes gainable, raise
+  // GAINABLE_GATHERING_PROFESSIONS to GATHERING_PROFESSION_IDS.length.
+  const GAINABLE_GATHERING_PROFESSIONS = 4;
+  it('caps every any-N gathering trigger at the gainable profession count', () => {
+    expect(GATHERING_PROFESSION_IDS.length).toBe(5);
+    let countForm = 0;
+    for (const def of ALL) {
+      const t = def.trigger;
+      if (t.kind !== 'gathering' || t.professionId !== undefined) continue;
+      countForm += 1;
+      expect(
+        t.count ?? 1,
+        `${def.id}: any-N gathering deed demands more professions than are gainable`,
+      ).toBeLessThanOrEqual(GAINABLE_GATHERING_PROFESSIONS);
+    }
+    // The loop must have seen the real count-form deeds (prog_first_gather
+    // and prog_master_gatherer) or this guard is vacuous.
+    expect(countForm).toBeGreaterThanOrEqual(2);
+  });
+});
+
 describe('trigger references resolve against the real content tables', () => {
   it('quest, dungeon, delve, item, craft, and profession references all exist', () => {
     for (const def of ALL) {
