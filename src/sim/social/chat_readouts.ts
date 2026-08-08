@@ -51,6 +51,7 @@ import {
   MELEE_RANGE,
   questObjectiveRequired,
   SALVAGE_CAST_ID,
+  SUNDER_CAST_ID,
   TOOL_RECHARGE_CAST_ID,
   xpForLevel,
 } from '../types';
@@ -593,6 +594,9 @@ export function castingReadout(e: Entity): string {
   }
   if (e.castingAbility === SALVAGE_CAST_ID) {
     return `You are salvaging: ${remaining}s of ${total}s remaining.`;
+  }
+  if (e.castingAbility === SUNDER_CAST_ID) {
+    return `You are sundering: ${remaining}s of ${total}s remaining.`;
   }
   if (e.castingAbility === TOOL_RECHARGE_CAST_ID) {
     return `You are recharging a tool effect: ${remaining}s of ${total}s remaining.`;

@@ -1494,11 +1494,6 @@ export function handleDeath(
     // only the participation snapshot above receives marks.
     lockNormalDungeonResetOnBossKill(ctx, e);
     ctx.awardHeroicMarks(e, heroicRewardRecipients);
-    // Masterwrought materials (phase 04): Wyrmfall Cores and the weekly ember
-    // check for the same participation snapshot. Runs AFTER rollLoot returned
-    // above, so its single count draw appends to the tick's rng sequence and
-    // can never reorder loot rolls.
-    ctx.awardWyrmfallCores(e, heroicRewardRecipients);
     // A bossExitPortal dungeon opens its far-end exit the moment the final
     // boss falls (both difficulties; no-op everywhere else).
     spawnBossExitPortal(ctx, e);
@@ -1513,6 +1508,15 @@ export function handleDeath(
       // World-boss deeds ride the same never-pruned contributor roster.
       deedsMod.onWorldBossKilledForDeeds(ctx, e, worldBossContribs);
     }
+    // Masterwrought materials (phase 04): Wyrmfall Cores and the weekly ember
+    // check for the same participation snapshot. Deliberately BELOW every loot
+    // roll on this path (rollLoot above, rollWorldBossLoot for a world boss),
+    // so its single count draw always appends to the tick's rng sequence and
+    // can never reorder a loot roll, whatever kind of kill this is. Draw-order
+    // neutral to move here from above the world-boss block: an instance kill
+    // has no worldBossContribs and a world boss is never hosted in an instance
+    // slot, so no kill reaches both a wyrmfall draw and a world-boss roll.
+    ctx.awardWyrmfallCores(e, heroicRewardRecipients);
   }
 }
 

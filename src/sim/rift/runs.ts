@@ -1419,7 +1419,9 @@ function completeRiftClear(ctx: SimContext, inst: RiftInstance, boss: Entity | n
     // character, ruling R9) plus the weekly ember check. Deliberately outside
     // the boss guard: the grant pays the CLEAR, not the corpse, and it draws
     // no rng, honoring addRiftProgressionLoot's draw-free contract above.
-    awardRiftFirstClearMaterials(ctx, claim.event.tier, participants);
+    // Rank from baseLevel, the creditRiftClearDeeds precedent above, so the
+    // winning and losing ember arms can never disagree on a clear's rank.
+    awardRiftFirstClearMaterials(ctx, riftRankForBaseLevel(inst.baseLevel), participants);
     const portalId = claim.event.portalId ?? inst.portalId;
     if (portalId !== null) closeNaturalRiftPortal(ctx, portalId, 'sealed');
     const firstClear = claim.event.firstClear;

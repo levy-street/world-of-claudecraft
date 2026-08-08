@@ -95,6 +95,8 @@ describe('craft-family cast-start audio wiring (Craft Cast System Phase 6)', () 
     expect(body).toContain('DISENCHANT_CAST_ID');
     expect(body).toContain('ENCHANT_CAST_ID');
     expect(body).toContain('SALVAGE_CAST_ID');
+    // Masterwrought phase 04: the sunder cast joins the family wind-up.
+    expect(body).toContain('SUNDER_CAST_ID');
     expect(body).toContain('TOOL_RECHARGE_CAST_ID');
   });
 });

@@ -405,7 +405,10 @@ import {
   normalizeHobbyMemoryOnLoad,
 } from './professions/hobby_memory';
 import type { MasterworkProc } from './professions/masterwork';
-import * as masterwroughtMaterials from './professions/masterwrought_materials';
+import {
+  awardWyrmfallCores as awardWyrmfallCoresImpl,
+  emberWeekAnchorOf,
+} from './professions/masterwrought_materials';
 import { applyMasteryReset, updateMasteryResetNotices } from './professions/mastery_reset';
 import {
   isStationActive,
@@ -425,7 +428,10 @@ import {
   salvageItem as salvageItemImpl,
 } from './professions/salvage';
 import { cancelProfessionSessionOnDisplacement } from './professions/session_teardown';
-import * as sundering from './professions/sundering';
+import {
+  completeSunderCast as completeSunderCastImpl,
+  extractEssence as extractEssenceImpl,
+} from './professions/sundering';
 import {
   applyPairTransitionTierMail,
   normalizeTierMailOnLoad,
@@ -3313,7 +3319,13 @@ export class Sim {
           ),
         };
       }
-      meta.emberWeekAnchor = typeof s.emberWeekAnchor === 'string' ? s.emberWeekAnchor : '';
+      // Normalized through the anchor parser, not stored verbatim: any
+      // unparseable or off-anchor value (corrupt row, tampered save, a future
+      // date-format change) degrades to a state the weekly grant recovers
+      // from, instead of stalling it forever (unparseable reads as same-week).
+      meta.emberWeekAnchor = emberWeekAnchorOf(
+        typeof s.emberWeekAnchor === 'string' ? s.emberWeekAnchor : '',
+      );
       // The Book of Deeds. Earned days load verbatim; the legacy milestone set
       // unions into the earned map (milestone unification); renown is
       // RECOMPUTED from the earned set below (the sim is authoritative, the
@@ -5279,8 +5291,9 @@ export class Sim {
       // Masterwrought materials (phase 04): owned by
       // professions/masterwrought_materials; late-bound arrow so the module
       // reads the live ctx at call time (the N1 grantNythraxisLockout idiom).
-      awardWyrmfallCores: (mob, recipients) =>
-        masterwroughtMaterials.awardWyrmfallCores(sim.ctx, mob, recipients),
+      // Deliberately NO Sim method delegate, unlike awardHeroicMarks above: no
+      // foreign caller resolves this on the facade (tests reach it via ctx).
+      awardWyrmfallCores: (mob, recipients) => awardWyrmfallCoresImpl(sim.ctx, mob, recipients),
       addEntity: sim.addEntity.bind(sim),
       dropEntity: sim.dropEntity.bind(sim),
       rebucket: sim.rebucket.bind(sim),
@@ -5439,7 +5452,7 @@ export class Sim {
       completeDisenchantCast: (p, meta) => completeDisenchantCastImpl(sim.ctx, p, meta),
       completeApplyEnchantCast: (p, meta) => completeApplyEnchantCastImpl(sim.ctx, p, meta),
       completeSalvageCast: (p, meta) => completeSalvageCastImpl(sim.ctx, p, meta),
-      completeSunderCast: (p, meta) => sundering.completeSunderCast(sim.ctx, p, meta),
+      completeSunderCast: (p, meta) => completeSunderCastImpl(sim.ctx, p, meta),
       completeRechargeCast: (p, meta) => completeRechargeCastImpl(sim.ctx, p, meta),
       applyDemonHealTick: sim.applyDemonHealTick.bind(sim),
       // C4b effect-dispatch surface: the per-effect switch the cast lifecycle hands
@@ -9101,7 +9114,7 @@ export class Sim {
     const pid = typeof pidOrTarget === 'number' ? pidOrTarget : undefined;
     const targetSlotIndex = typeof pidOrTarget === 'object' ? pidOrTarget.slotIndex : slotIndex;
     if (refusedWhileDead(this.ctx, pid)) return;
-    sundering.extractEssence(this.ctx, itemId, pid, targetSlotIndex);
+    extractEssenceImpl(this.ctx, itemId, pid, targetSlotIndex);
   }
 
   // Enchanting profession commands (IWorldProfessions): same thin-

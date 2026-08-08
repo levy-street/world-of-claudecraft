@@ -38,6 +38,7 @@ import {
   isNonSpellCast,
   SALVAGE_CAST_ID,
   type SimEvent,
+  SUNDER_CAST_ID,
   TOOL_RECHARGE_CAST_ID,
 } from '../src/sim/types';
 
@@ -103,12 +104,14 @@ describe('profession cast sentinels', () => {
     expect(DISENCHANT_CAST_ID).toBe('disenchanting');
     expect(ENCHANT_CAST_ID).toBe('enchanting_apply');
     expect(SALVAGE_CAST_ID).toBe('salvaging');
+    expect(SUNDER_CAST_ID).toBe('sundering');
     expect(TOOL_RECHARGE_CAST_ID).toBe('tool_recharge');
     for (const id of [
       CRAFT_CAST_ID,
       DISENCHANT_CAST_ID,
       ENCHANT_CAST_ID,
       SALVAGE_CAST_ID,
+      SUNDER_CAST_ID,
       TOOL_RECHARGE_CAST_ID,
     ]) {
       expect(isNonSpellCast(id), id).toBe(true);

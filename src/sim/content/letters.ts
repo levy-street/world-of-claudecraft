@@ -49,12 +49,26 @@ export const WELCOME_LETTER: LetterDef = {
 // back-line healer, a fallen or released raider). The mark stacks ride as the
 // attachment; the PostOffice fills `items` per kill (marks vary by dungeon), so
 // this base carries none. Body stays count-free so the letterId localizes cleanly.
+export const HEROIC_MARK_LETTER: LetterDef = {
+  letterId: 'heroic_marks_reward',
+  senderName: 'The Heroic Quartermaster',
+  subject: 'Your Heroic Marks',
+  body:
+    'Your warband cleared the heroic trial while you fought from the back, or ' +
+    'from the dirt. Your lockout was struck all the same, so your share of ' +
+    'Heroic Marks flies to you here rather than being lost. Spend them well.\n\n' +
+    '- The Heroic Quartermaster',
+  delaySeconds: 0,
+};
+
 // Wyrmfall Core reward letter (Masterwrought phase 04): posted to a final-boss
 // participant who entered the run but was absent at the corpse when the cores
 // paid out (awardWyrmfallCores in professions/masterwrought_materials.ts). The
 // core stacks ride as the attachment; the PostOffice fills `items` per kill
 // (the count is rolled per kill), so this base carries none. Body stays
-// count-free so the letterId localizes cleanly.
+// count-free so the letterId localizes cleanly. The Quartermaster signs the
+// normal-raid deliveries too: the packet keeps one materials postman rather
+// than minting a difficulty-split sender (recorded in the phase ledger).
 export const WYRMFALL_CORE_LETTER: LetterDef = {
   letterId: 'wyrmfall_core_reward',
   senderName: 'The Heroic Quartermaster',
@@ -65,18 +79,6 @@ export const WYRMFALL_CORE_LETTER: LetterDef = {
     'the corpse-pickers. Put them to good work at a bench.\n\n' +
     '- The Heroic Quartermaster',
   copper: 0,
-  delaySeconds: 0,
-};
-
-export const HEROIC_MARK_LETTER: LetterDef = {
-  letterId: 'heroic_marks_reward',
-  senderName: 'The Heroic Quartermaster',
-  subject: 'Your Heroic Marks',
-  body:
-    'Your warband cleared the heroic trial while you fought from the back, or ' +
-    'from the dirt. Your lockout was struck all the same, so your share of ' +
-    'Heroic Marks flies to you here rather than being lost. Spend them well.\n\n' +
-    '- The Heroic Quartermaster',
   delaySeconds: 0,
 };
 

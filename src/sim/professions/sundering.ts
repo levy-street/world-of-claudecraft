@@ -16,10 +16,11 @@
 // Determinism: the extraction draws NO rng anywhere (yield is a deterministic
 // constant), so it is draw-order neutral by construction.
 //
-// Feedback: refusals are single-line ctx.error emits (each with its EXACT
-// matcher row in src/ui/sim_i18n.ts, the phase 02 pattern); success passes
-// callerLogs so the hub's generic receive line yields to the one sunder line
-// naming the destroyed piece (the loot ding still fires).
+// Feedback: refusals are single-line ctx.error emits, each localized at the
+// client (three EXACT rows in src/ui/sim_i18n.ts; the busy line rides the
+// hud's own localizeErrorText map, which wins before localizeSimText runs);
+// success is silent + callerLogs, so the sunder log line below owns both
+// halves of the grant feedback (#2458).
 
 import { bagCapacity, bagsFullError, fitsAll } from '../bags';
 import { ITEMS } from '../data';

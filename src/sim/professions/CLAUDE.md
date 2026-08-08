@@ -113,6 +113,17 @@ or pure leaves, never a `Sim` import, randomness only via `ctx.rng` (guarded by
   `useRecipePatternItem` apply arm dispatched from the items.ts useItem kind
   chain; learns via `acquireRecipe` source 'drop', consumes exactly one copy
   on success only, emits the text-free `trainResult` ok; draws NO rng.
+- `masterwrought_materials.ts`: the Masterwrought chase-material income side
+  (`awardWyrmfallCores` from the death hub, the rift first-clear arm, the
+  weekly Maker's Ember accrual with its pure civil-date week math, the
+  per-character per-source reset-day gate on `PlayerMeta.wyrmfallDaily`).
+  ONE rng draw per credited eligible final-boss kill, appended after every
+  loot roll; the rift arm is draw-free.
+- `sundering.ts`: the Sundered Essence extraction (`extractEssence` /
+  `completeSunderCast`): a SUNDER_CAST_ID cast on the enchant-family session
+  seam, raid-sourced epics only (`isSunderable` over the item_level source
+  index), deterministic 1:1 yield, the disenchant-style pinned-slot re-check
+  at completion; draws NO rng.
 - `tools.ts` / `stations.ts` / `focus.ts` / `mobile_station.ts`: pure-leaf
   gates and bonuses (gather-tool tier, per-type crafting stations
   (superseding the retired level-20 hub), town focus allocation, field

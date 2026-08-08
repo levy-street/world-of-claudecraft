@@ -433,6 +433,8 @@ export const V07_SLASH = [
   'You are disenchanting: Akis of Akis remaining.',
   'You are enchanting: Akis of Akis remaining.',
   'You are salvaging: Akis of Akis remaining.',
+  // Masterwrought phase 04: the sunder cast joins the same /cast backstop.
+  'You are sundering: Akis of Akis remaining.',
   'You are recharging a tool effect: Akis of Akis remaining.',
   'You are in Aki (levels Aki–Aki) at (5, 5).',
   'You are in Aki.',

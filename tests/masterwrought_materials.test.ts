@@ -25,6 +25,7 @@ import {
 } from '../src/sim/professions/masterwrought_materials';
 import { isSunderable, SUNDERED_ESSENCE_YIELD } from '../src/sim/professions/sundering';
 import { spawnNaturalRiftPortal } from '../src/sim/rift/portals';
+import { RIFT_RANK_BASE_LEVEL } from '../src/sim/rift/ranks';
 import { descendRift, updateRiftInstances } from '../src/sim/rift/runs';
 import type { PlayerMeta, Sim as SimType } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
@@ -227,6 +228,42 @@ describe('wyrmfall cores: the boss faucet', () => {
     expect(sim.countItem(WYRMFALL_CORE_ITEM_ID, leader)).toBeGreaterThanOrEqual(WYRMFALL_BOSS_MIN);
   });
 
+  it('a door-camper on the claim who never entered is paid nothing, mailed nothing', () => {
+    const { sim, leader, boss } = heroicMorthenRig();
+    // Joins the party (so the claim holds them) AFTER the instance exists,
+    // but never walks through the door: not present, not in enteredBy.
+    const camper = sim.addPlayer('rogue', 'Camper');
+    sim.partyInvite(camper, leader);
+    sim.partyAccept(camper);
+    const leaderMeta = sim.players.get(leader)! as PlayerMeta;
+    const camperMeta = sim.players.get(camper)! as PlayerMeta;
+    sim.ctx.awardWyrmfallCores(boss, [leaderMeta]);
+    expect(sim.countItem(WYRMFALL_CORE_ITEM_ID, camper)).toBe(0);
+    const camperName = sim.players.get(camper)!.name;
+    // Filter by letterId: every fresh character also holds the Ravenpost
+    // welcome letter, which is not this faucet's mail.
+    const letters = ((sim.postOffice as any).mail as any[]).filter(
+      (m) => m.recipientName === camperName && m.letterId === 'wyrmfall_core_reward',
+    );
+    expect(letters).toHaveLength(0);
+    // Their daily gate is untouched: roster membership alone is not income,
+    // and it must not burn the day's source either.
+    expect(camperMeta.wyrmfallDaily.sources.size).toBe(0);
+  });
+
+  it('a kill with no hosting instance draws nothing (the world-boss shape)', () => {
+    const sim = makeDungeonSim(11);
+    const pid = sim.addPlayer('warrior', 'Wanderer');
+    const meta = sim.players.get(pid)! as PlayerMeta;
+    // A final-boss TEMPLATE outside any instance slot (the world-boss
+    // coupling the death-hub comment names): passes the template precheck,
+    // then exits on the instance scan, before the count draw.
+    const strayBoss = { id: 999999, templateId: 'nythraxis_scourge_of_thornpeak' } as AnyEntity;
+    const draws = countDraws(sim, () => sim.ctx.awardWyrmfallCores(strayBoss, [meta]));
+    expect(draws).toBe(0);
+    expect(sim.countItem(WYRMFALL_CORE_ITEM_ID, pid)).toBe(0);
+  });
+
   it('a participant absent from the corpse but on the claim is paid by raven, not bags', () => {
     const { sim, leader, member, boss } = heroicMorthenRig();
     const leaderMeta = sim.players.get(leader)! as PlayerMeta;
@@ -248,12 +285,57 @@ describe('wyrmfall cores: the boss faucet', () => {
   });
 });
 
+describe('wyrmfall cores: the two raid arms', () => {
+  // Compact attuned-raid harness (the tests/dungeons.test.ts shape): five
+  // raiders, all attuned, the tank claims the arena, everyone walks in.
+  function raidRig(difficulty: 'normal' | 'heroic') {
+    const sim = makeDungeonSim(77);
+    const tank = sim.addPlayer('warrior', 'Tank');
+    sim.players.get(tank)!.questsDone.add('q_nythraxis_bound_guardian');
+    const raiders: number[] = [tank];
+    for (let i = 0; i < 4; i++) {
+      const pid = sim.addPlayer('mage', `Dps${i}`);
+      sim.players.get(pid)!.questsDone.add('q_nythraxis_bound_guardian');
+      sim.partyInvite(pid, tank);
+      sim.partyAccept(pid);
+      raiders.push(pid);
+    }
+    sim.convertPartyToRaid(tank);
+    if (difficulty === 'heroic') sim.setDungeonDifficulty('heroic', tank);
+    for (const pid of raiders) {
+      enterDungeon(sim.ctx, 'nythraxis_crypt', pid);
+      enterDungeon(sim.ctx, 'nythraxis_boss_arena', pid);
+    }
+    const inst = claimedDungeon(sim, 'nythraxis_boss_arena', difficulty);
+    expect(inst).toBeTruthy();
+    const boss = mobInInstance(sim, inst, 'nythraxis_scourge_of_thornpeak');
+    return { sim, raiders, boss };
+  }
+
+  it('the NORMAL raid pays cores even though it pays no marks', () => {
+    const { sim, raiders, boss } = raidRig('normal');
+    const metas = raiders.map((pid) => sim.players.get(pid)! as PlayerMeta);
+    const draws = countDraws(sim, () => sim.ctx.awardWyrmfallCores(boss, metas));
+    expect(draws).toBe(1);
+    const first = sim.countItem(WYRMFALL_CORE_ITEM_ID, raiders[0]);
+    expect(first).toBeGreaterThanOrEqual(WYRMFALL_BOSS_MIN);
+    for (const pid of raiders) expect(sim.countItem(WYRMFALL_CORE_ITEM_ID, pid)).toBe(first);
+    expect(metas[0].wyrmfallDaily.sources.has('nythraxis_boss_arena:normal')).toBe(true);
+  });
+
+  it('the HEROIC raid pays cores through the heroic tuning row', () => {
+    const { sim, raiders, boss } = raidRig('heroic');
+    const metas = raiders.map((pid) => sim.players.get(pid)! as PlayerMeta);
+    expect(countDraws(sim, () => sim.ctx.awardWyrmfallCores(boss, metas))).toBe(1);
+    expect(sim.countItem(WYRMFALL_CORE_ITEM_ID, raiders[0])).toBeGreaterThanOrEqual(
+      WYRMFALL_BOSS_MIN,
+    );
+    expect(metas[0].wyrmfallDaily.sources.has('nythraxis_boss_arena:heroic')).toBe(true);
+  });
+});
+
 describe('wyrmfall cores: the rift first-clear arm', () => {
-  function riftEventRig(tier: 'A' | 'S' | 'B'): {
-    sim: AnySim;
-    winner: number;
-    inst: any;
-  } {
+  function riftEventRig(tier: 'A' | 'S' | 'B') {
     const sim = new Sim({
       seed: 99117,
       playerClass: 'warrior',
@@ -268,13 +350,17 @@ describe('wyrmfall cores: the rift first-clear arm', () => {
     expect(spawnNaturalRiftPortal(sim.ctx, 0)).toBe(true);
     const portalInfo = sim.naturalRiftPortals[0];
     const event = sim.riftEvents.find((e: any) => e.eventId === portalInfo.eventId)!;
-    // The grant keys on the EVENT's rank; pin it to the arm under test (the
-    // floors still generate from the rolled baseLevel, irrelevant here).
+    // Pin the arm under test through the portal's BASE LEVEL: the grant reads
+    // the clear's rank from riftRankForBaseLevel(inst.baseLevel), the
+    // creditRiftClearDeeds precedent, so the event tier is kept in sync only
+    // for the world-race bookkeeping.
     event.tier = tier;
-    const portal = sim.entities.get(portalInfo.id)!;
+    const portal = sim.entities.get(portalInfo.id)! as AnyEntity;
+    portal.riftBaseLevel = RIFT_RANK_BASE_LEVEL[tier];
     sim.enterRift(portal.riftSeed!, portal.riftBaseLevel!, winner, undefined, portal as any);
     const inst = sim.riftInstances.find((i: any) => i.memberIds.has(winner))!;
-    return { sim, winner, inst };
+    expect(inst.baseLevel).toBe(RIFT_RANK_BASE_LEVEL[tier]);
+    return { sim, winner, inst, portal, portalInfo };
   }
 
   function winRace(sim: AnySim, inst: any, pid: number): void {
@@ -311,7 +397,7 @@ describe('wyrmfall cores: the rift first-clear arm', () => {
     // Next reset day: the rift source pays again.
     (sim as any).resetDay = '2026-08-13';
     awardRiftFirstClearMaterials(sim.ctx, 'A', [winner]);
-    expect(sim.countItem(WYRMFALL_CORE_ITEM_ID, winner)).toBe(2 * WYRMFALL_RIFT_COUNT.A);
+    expect(sim.countItem(WYRMFALL_CORE_ITEM_ID, winner)).toBe(2 * (WYRMFALL_RIFT_COUNT.A ?? 0));
   });
 
   it('an S-rank first clear pays the risk premium; B pays nothing', () => {
@@ -324,6 +410,24 @@ describe('wyrmfall cores: the rift first-clear arm', () => {
     const bRig = riftEventRig('B');
     winRace(bRig.sim, bRig.inst, bRig.winner);
     expect(bRig.sim.countItem(WYRMFALL_CORE_ITEM_ID, bRig.winner)).toBe(0);
+  });
+
+  it('a losing A-rank crew gets the ember and no cores, end to end', () => {
+    const { sim, winner, inst, portal } = riftEventRig('A');
+    (sim as any).resetDay = TUESDAY;
+    const loser = sim.addPlayer('mage', 'Bet');
+    sim.setPlayerLevel(20, loser);
+    sim.enterRift(portal.riftSeed!, portal.riftBaseLevel!, loser, undefined, portal as any);
+    const loserRun = sim.riftInstances.find((i: any) => i.memberIds.has(loser))!;
+    expect(loserRun.instanceId).not.toBe(inst.instanceId);
+    winRace(sim, inst, winner);
+    expect(sim.countItem(WYRMFALL_CORE_ITEM_ID, winner)).toBe(WYRMFALL_RIFT_COUNT.A);
+    expect(sim.countItem(MAKERS_EMBER_ITEM_ID, winner)).toBe(1);
+    // The competitor finishes their own run and completes as a loser: the
+    // race forfeits the cores, never the weekly keystone (mercy, not a prize).
+    winRace(sim, loserRun, loser);
+    expect(sim.countItem(WYRMFALL_CORE_ITEM_ID, loser)).toBe(0);
+    expect(sim.countItem(MAKERS_EMBER_ITEM_ID, loser)).toBe(1);
   });
 });
 
@@ -568,7 +672,7 @@ describe('sundered essence: the extraction', () => {
     sim.extractEssence(RAID_EPIC, pid, 0);
     expect(p.castingAbility).toBe('sundering');
     expect(p.enchantCastItemId).toBe(RAID_EPIC);
-    (sim as any).cancelCast?.(p) ?? sim.ctx.cancelCast(p);
+    sim.ctx.cancelCast(p);
     expect(p.castingAbility).toBeNull();
     expect(p.enchantCastItemId).toBe('');
     expect(p.enchantCastTargetPin).toBe('');
@@ -635,6 +739,12 @@ describe('persistence: the two new PlayerMeta fields', () => {
     (sim2 as any).resetDay = TUESDAY;
     tryGrantMakersEmber(sim2.ctx, meta2);
     expect(sim2.countItem(MAKERS_EMBER_ITEM_ID, pid2)).toBe(1);
+    // A parseable but OFF-ANCHOR stored value (a Thursday) normalizes to its
+    // week's Tuesday on load, so the weekly math never sees a mid-week base.
+    state.emberWeekAnchor = '2026-08-13';
+    const sim3 = makeDungeonSim(3);
+    const pid3 = sim3.addPlayer('warrior', 'Bad', { state });
+    expect((sim3.players.get(pid3)! as PlayerMeta).emberWeekAnchor).toBe(TUESDAY);
   });
 
   it('zero-default omission: an untouched character serializes without the keys', () => {

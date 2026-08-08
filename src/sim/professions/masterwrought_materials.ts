@@ -26,10 +26,16 @@
 // same contract as every other daily). The weekly boundary is DERIVED from
 // resetDay by pure calendar math (the most recent weekly reset day on or
 // before it), not from a second clock: the realm keeps exactly one reset
-// boundary, per the phase 03 QA amendment.
+// boundary, per the phase 03 QA amendment. Two consequences worth naming:
+// a host that never sets resetDay (the headless RL env, replays) sees a
+// ONE-SHOT faucet (each source pays once per save, the delve-daily degrade)
+// and never grants an ember; and a DEV-portal rift clear (no world event, so
+// no race claim) grants neither cores nor embers on either arm, on purpose:
+// dev portals are not a material faucet.
 
 import { HEROIC_DUNGEON_TUNING } from '../content/dungeon_difficulty';
 import { instanceLockoutMetas } from '../instances/dungeons';
+import type { RiftTier } from '../types';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import type { Entity } from '../types';
@@ -45,13 +51,27 @@ export const WYRMFALL_BOSS_MIN = 1;
 export const WYRMFALL_BOSS_MAX = 3;
 
 // Rift first-clear grants are deterministic (draw-free by design): the S rank
-// pays the risk premium.
-export const WYRMFALL_RIFT_COUNT: Readonly<Record<string, number>> = { A: 1, S: 2 };
+// pays the risk premium. Typed against the real rank union so a typo or a
+// future rank token is a compile error, never a silent zero payout.
+export const WYRMFALL_RIFT_COUNT: Readonly<Partial<Record<RiftTier, number>>> = { A: 1, S: 2 };
+
+// Ember eligibility for rift clears, stated on its own: R4 (the keystone's
+// pillars) and R9 (the core faucet) are independent rulings, so the ember set
+// is not derived from the core count table even though the two agree today.
+export const EMBER_ELIGIBLE_RIFT_TIERS: ReadonlySet<RiftTier> = new Set(['A', 'S']);
 
 // The daily-gate source token for the rift arm; instance arms use
 // `${dungeonId}:${difficulty}` so the normal and heroic raid stay distinct
 // sources, mirroring the difficulty-scoped raid lockout.
 export const WYRMFALL_RIFT_SOURCE = 'rift';
+
+// Every final-boss template the boss faucet can ever pay on: the heroic
+// tuning table's finalBossIds (which include the raid arena's) plus the raid
+// boss for its normal-difficulty arm. Derived once from data-as-code.
+const FINAL_BOSS_TEMPLATE_IDS: ReadonlySet<string> = new Set([
+  ...Object.values(HEROIC_DUNGEON_TUNING).map((t) => t.finalBossId),
+  NYTHRAXIS_BOSS_ID,
+]);
 
 // The civil weekday the ember week rolls on: Tuesday, the classic weekly
 // reset day. Sunday = 0 to match the (days + 4) % 7 epoch arithmetic below.
@@ -191,6 +211,11 @@ export function tryGrantMakersEmber(ctx: SimContext, meta: PlayerMeta): void {
  *  completion counts toward the keystone even when the core gate already
  *  closed today. */
 export function awardWyrmfallCores(ctx: SimContext, mob: Entity, recipients: PlayerMeta[]): void {
+  // Template precheck before the instance scan: this runs on EVERY mob death
+  // (the death hub calls unconditionally), and the slot scan below walks every
+  // claimed instance's mobIds. Only a final-boss template can ever qualify, so
+  // open-world trash exits here without scanning anything.
+  if (!FINAL_BOSS_TEMPLATE_IDS.has(mob.templateId)) return;
   const inst = ctx.instances.find((i) => i.partyKey !== null && i.mobIds.includes(mob.id));
   if (!inst) return;
   const tuning = HEROIC_DUNGEON_TUNING[inst.dungeonId];
@@ -233,7 +258,7 @@ export function awardWyrmfallCores(ctx: SimContext, mob: Entity, recipients: Pla
  *  participant ticks the weekly ember check. Draw-free on purpose. */
 export function awardRiftFirstClearMaterials(
   ctx: SimContext,
-  tier: string,
+  tier: RiftTier,
   participants: readonly number[],
 ): void {
   const riftCount = WYRMFALL_RIFT_COUNT[tier] ?? 0;
@@ -256,10 +281,10 @@ export function awardRiftFirstClearMaterials(
  *  weekly keystone is mercy, not a race prize (ruling R4). */
 export function grantRiftClearEmbers(
   ctx: SimContext,
-  tier: string,
+  tier: RiftTier,
   participants: readonly number[],
 ): void {
-  if (WYRMFALL_RIFT_COUNT[tier] === undefined) return;
+  if (!EMBER_ELIGIBLE_RIFT_TIERS.has(tier)) return;
   for (const pid of participants) {
     const meta = ctx.players.get(pid);
     if (meta) tryGrantMakersEmber(ctx, meta);
