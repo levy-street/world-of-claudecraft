@@ -31,6 +31,7 @@ import {
   FARM_KEEP_CHANCE_BASE,
   FARM_PLANT_CAST_SEC,
   FARM_SURVIVAL_AT_GATE,
+  FARM_SURVIVAL_BAND_SPAN,
   FARM_WITHERED_HUSK_COUNT,
   FARM_WITHERED_HUSK_ITEM_ID,
   FARMING_GAIN_SCHEDULE,
@@ -174,6 +175,24 @@ describe('the crop catalog and the cast sentinel', () => {
     expect(CROP.durationMs).toBeGreaterThanOrEqual(30 * 60_000);
     expect(CROP.durationMs).toBeLessThanOrEqual(60 * 60_000);
     expect(CROP.durationMs).toBe(2_700_000);
+  });
+
+  it('pins the plant cast length to its wire-visible literal', () => {
+    // castTotal/castRemaining ride the wire off this constant, and every other
+    // assertion reaches it through the import, which is a self-comparison (the
+    // wire-name-constant rule). One literal pin, here.
+    expect(FARM_PLANT_CAST_SEC).toBe(2);
+  });
+
+  it('binds the catalog band math to the survival ramp span (two independent 25s)', () => {
+    // farmCropSkillThreshold (content/farm_crops.ts) and farmSurvivalChance
+    // (professions/farm_projection.ts) re-derive the 25-point band SEPARATELY:
+    // the projection is a content-import-free pure leaf, so it cannot read the
+    // catalog helper. This pin is the one thing tying the two constants
+    // together; tuning either alone reds here (QA-round finding).
+    for (const tier of [1, 2, 3, 4]) {
+      expect(farmCropSkillThreshold(tier)).toBe((tier - 1) * FARM_SURVIVAL_BAND_SPAN);
+    }
   });
 
   it('derives the skill threshold from the shared 25-point band math', () => {
@@ -521,6 +540,51 @@ describe('plantCrop: the stated gate order, every arm draw-free', () => {
     expect(h.meta.farmPlots.size).toBe(0);
   });
 
+  it('preserves stealth, sitting and mount on a refusal (the trio runs after every gate)', () => {
+    // The mirror of the success-path state-breaking pin below: the deliberate
+    // action trio (breakStealth, standUp, forceDismount) sits AFTER every deny
+    // arm, so a refused plant never reveals or unseats the player. Armed
+    // exactly like the success pin but with an empty seed pouch, so the
+    // refusal comes from the LAST gate in the stated order: if the trio ever
+    // moves above ANY gate, this arm reds while the success pin stays green.
+    const p = h.sim.player;
+    p.sitting = true;
+    p.mountKey = DEFAULT_MOUNT;
+    p.auras.push({
+      id: 'stealth',
+      name: 'Stealth',
+      kind: 'stealth',
+      remaining: 600,
+      duration: 600,
+      value: 0,
+      sourceId: p.id,
+      school: 'physical',
+    });
+    p.stealthed = true;
+    const from = h.sim.events.length;
+    expect(countDraws(h.sim, () => plant(h))).toBe(0);
+    expect(denyReason(h.sim, from)).toBe('no_seed');
+    expect(p.sitting).toBe(true);
+    expect(p.mountKey).toBe(DEFAULT_MOUNT);
+    expect(p.stealthed).toBe(true);
+    expect(p.auras.some((a) => a.kind === 'stealth')).toBe(true);
+  });
+
+  it('answers bed_taken before no_seed when both gates would refuse (order proof)', () => {
+    // The one inter-gate precedence arm: every other deny test fails exactly
+    // one gate, which proves each arm but not their order. Here BOTH the
+    // bed-taken gate and the seed gate would refuse, and the earlier one must
+    // own the reason: a player replanting a taken bed with an empty pouch is
+    // told the bed is taken, not to buy seeds.
+    giveSeeds(h);
+    plant(h); // takes BED with the only seed
+    clearCast(h.sim);
+    expect(h.sim.countItem(SEED_ID, h.pid)).toBe(0);
+    const from = h.sim.events.length;
+    expect(countDraws(h.sim, () => plant(h))).toBe(0);
+    expect(denyReason(h.sim, from)).toBe('bed_taken');
+  });
+
   it('inserts plots in SORTED bed order, whatever order they were planted in', () => {
     // Load-bearing, not cosmetic: normalizeFarmPlots rebuilds this map sorted
     // on every load, so a plant-order map would iterate differently after a
@@ -725,6 +789,17 @@ describe('harvestCrop: draw-free on every path', () => {
     // The event agrees with the bags: every unit is fine grade, none is base.
     expect(h.sim.countItem(FINE_ID, h.pid)).toBe(swept.fine);
     expect(h.sim.countItem(PRODUCE_ID, h.pid)).toBe(0);
+    // EXECUTED flag coverage for the fine-produce grant site: this harvest's
+    // one grant is the fine item, so these assertions exercise exactly the
+    // grant the flags pin's skill-0 harvest almost never reaches (its fine
+    // chance is 2 percent per pick) and the source-text sweep can only
+    // pattern-match (QA-round finding).
+    const loots = eventsOf(h.sim, from, 'loot');
+    expect(loots.length).toBeGreaterThan(0);
+    for (const lev of loots) {
+      expect(lev.silent, lev.text).toBe(true);
+      expect(lev.callerLogs, lev.text).toBe(true);
+    }
   });
 
   it('keeps count positive and itemId real on EVERY harvest shape', () => {
@@ -808,6 +883,37 @@ describe('harvestCrop: draw-free on every path', () => {
     expect(h.meta.pendingGatherGrants).toEqual([]);
   });
 
+  it('pays husks when the crop id retired mid-session, with the same one-line flags', () => {
+    // The defensive !crop arm: reachable only for an in-memory plot whose
+    // catalog row vanished between plant and harvest (the load-side allowlist
+    // drops such rows before they can get here). Forced so the arm's grant,
+    // event and flags carry EXECUTED coverage rather than source-scan-only
+    // (QA-round finding). The roll is forced to survive first: a failed roll
+    // would pay from the ORDINARY withered arm and prove nothing about this
+    // one.
+    plantAndRipen();
+    const plot = h.meta.farmPlots.get(BED) as PlotState;
+    plot.survivalRoll = 0;
+    plot.cropId = 'retired_crop';
+    const from = h.sim.events.length;
+    expect(countDraws(h.sim, () => harvest(h))).toBe(0);
+    expect(h.meta.farmPlots.has(BED)).toBe(false);
+    expect(h.sim.countItem(FARM_WITHERED_HUSK_ITEM_ID, h.pid)).toBe(FARM_WITHERED_HUSK_COUNT);
+    expect(h.sim.countItem(PRODUCE_ID, h.pid)).toBe(0);
+    const withered = eventsOf(h.sim, from, 'farmWithered');
+    expect(withered).toHaveLength(1);
+    expect(withered[0].cropId).toBe('retired_crop');
+    expect(withered[0].count).toBe(FARM_WITHERED_HUSK_COUNT);
+    const loots = eventsOf(h.sim, from, 'loot');
+    expect(loots.length).toBeGreaterThan(0);
+    for (const lev of loots) {
+      expect(lev.silent, lev.text).toBe(true);
+      expect(lev.callerLogs, lev.text).toBe(true);
+    }
+    // No proficiency: there was nothing to harvest.
+    expect(h.meta.pendingGatherGrants).toEqual([]);
+  });
+
   it('lets a farmer who out-levelled the crop harvest a would-be failure', () => {
     plantAndRipen();
     const plot = h.meta.farmPlots.get(BED) as PlotState;
@@ -874,6 +980,51 @@ describe('harvestCrop: draw-free on every path', () => {
     const from = h.sim.events.length;
     harvest(h);
     expect(eventsOf(h.sim, from, 'farmHarvested')).toHaveLength(1);
+  });
+
+  it('answers range before no_plot when both gates would refuse (order proof)', () => {
+    // Harvest's one precedence arm, the twin of plantCrop's bed_taken-vs-
+    // no_seed proof: standing far from an empty bed co-arms the range gate and
+    // the plot gate, and the earlier one must own the reason.
+    h.sim.player.pos.x += 500;
+    h.sim.player.pos.z += 500;
+    const from = h.sim.events.length;
+    expect(countDraws(h.sim, () => harvest(h))).toBe(0);
+    expect(denyReason(h.sim, from)).toBe('range');
+    expect(h.meta.farmPlots.has(BED)).toBe(false);
+  });
+
+  it('keeps stealth, the seat and the mount: harvesting is deliberately light', () => {
+    // Unlike plantCrop, whose deliberate-action trio breaks stealth, stands
+    // the farmer up and dismounts (a cast is a deliberate act), the harvest
+    // performs NO state-breaking side effects, and the omission is a decision,
+    // not an oversight (state.md deviation (v), the QA round): the harvest is
+    // the instant second visit of the two a cycle ever gets, and forcing a
+    // per-bed dismount or reveal would tax exactly the walk-the-row pattern
+    // the anti-chore thesis protects. Personal plots are uncontested, so
+    // neither stealth nor the mount buys anything against another player.
+    plantAndRipen();
+    const p = h.sim.player;
+    p.sitting = true;
+    p.mountKey = DEFAULT_MOUNT;
+    p.auras.push({
+      id: 'stealth',
+      name: 'Stealth',
+      kind: 'stealth',
+      remaining: 600,
+      duration: 600,
+      value: 0,
+      sourceId: p.id,
+      school: 'physical',
+    });
+    p.stealthed = true;
+    const from = h.sim.events.length;
+    harvest(h);
+    expect(eventsOf(h.sim, from, 'farmHarvested')).toHaveLength(1);
+    expect(p.stealthed).toBe(true);
+    expect(p.auras.some((a) => a.kind === 'stealth')).toBe(true);
+    expect(p.mountKey).toBe(DEFAULT_MOUNT);
+    expect(p.sitting).toBe(true);
   });
 });
 
