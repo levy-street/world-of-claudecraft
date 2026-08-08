@@ -113,10 +113,10 @@ export const WARRIOR_ROWS: RowTree = [
         id: 'war_row_lingering_dread',
         name: 'Lingering Dread',
         description:
-          'Enemies feared by your Intimidating Shout can endure 20% of their health in damage before the fear breaks.',
+          'Enemies feared by your Intimidating Shout can endure 10% of their health in damage before the fear breaks.',
         // LIVE: arms the breakThreshold on the aoeFear apply (the threshold
         // arm in combat/damage.ts soaks damage before the classic snap).
-        effect: { global: { fearBreakPct: 0.2 } },
+        effect: { global: { fearBreakPct: 0.1 } },
       },
     ],
   },

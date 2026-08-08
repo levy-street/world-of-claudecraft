@@ -9,8 +9,8 @@
     "victory rush on-kill window + selfHealPctMax",
     "bladestorm self-centered channel ticks"
   ],
-  "draws": 999,
-  "drawDigest": "8169520c",
+  "draws": 1003,
+  "drawDigest": "261ba775",
   "frames": [
     {
       "tick": 0,
@@ -967,7 +967,7 @@
       "tick": 32,
       "time": 1.6,
       "nextId": 967,
-      "state": "b2f7de03",
+      "state": "396bd5d9",
       "events": "593737ad",
       "rng": {
         "draws": 10,
@@ -1215,13 +1215,13 @@
           "auras": [
             {
               "breakChanceScale": 0.1,
-              "breakThreshold": 1600,
+              "breakThreshold": 800,
               "breaksOnDamage": true,
-              "duration": 8,
+              "duration": 4,
               "id": "fear_incap",
               "kind": "incapacitate",
               "name": "Intimidating Shout",
-              "remaining": 8,
+              "remaining": 4,
               "school": "physical",
               "sourceId": 959,
               "value": -1.60888
@@ -1284,13 +1284,13 @@
           "auras": [
             {
               "breakChanceScale": 0.1,
-              "breakThreshold": 1600,
+              "breakThreshold": 800,
               "breaksOnDamage": true,
-              "duration": 8,
+              "duration": 4,
               "id": "fear_incap",
               "kind": "incapacitate",
               "name": "Intimidating Shout",
-              "remaining": 8,
+              "remaining": 4,
               "school": "physical",
               "sourceId": 959,
               "value": 0.685026
@@ -1417,7 +1417,7 @@
       "tick": 36,
       "time": 1.8,
       "nextId": 967,
-      "state": "129b62ba",
+      "state": "369c657c",
       "events": "741638a5",
       "rng": {
         "draws": 10,
@@ -1428,7 +1428,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 967,
-      "state": "dc260f09",
+      "state": "809a4299",
       "events": "741638a5",
       "rng": {
         "draws": 10,
@@ -1439,7 +1439,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 969,
-      "state": "a7b393eb",
+      "state": "a644007f",
       "events": "daaecae4",
       "rng": {
         "draws": 19,
@@ -1693,13 +1693,13 @@
           "auras": [
             {
               "breakChanceScale": 0.1,
-              "breakThreshold": 1600,
+              "breakThreshold": 800,
               "breaksOnDamage": true,
-              "duration": 8,
+              "duration": 4,
               "id": "fear_incap",
               "kind": "incapacitate",
               "name": "Intimidating Shout",
-              "remaining": 7.6,
+              "remaining": 3.6,
               "school": "physical",
               "sourceId": 959,
               "value": -1.60888
@@ -1773,13 +1773,13 @@
           "auras": [
             {
               "breakChanceScale": 0.1,
-              "breakThreshold": 1600,
+              "breakThreshold": 800,
               "breaksOnDamage": true,
-              "duration": 8,
+              "duration": 4,
               "id": "fear_incap",
               "kind": "incapacitate",
               "name": "Intimidating Shout",
-              "remaining": 7.6,
+              "remaining": 3.6,
               "school": "physical",
               "sourceId": 959,
               "value": 0.685026
@@ -2027,7 +2027,7 @@
       "tick": 44,
       "time": 2.2,
       "nextId": 969,
-      "state": "3663ce0e",
+      "state": "6d3a5c22",
       "events": "8580efe5",
       "rng": {
         "draws": 48,
@@ -2038,7 +2038,7 @@
       "tick": 48,
       "time": 2.4,
       "nextId": 969,
-      "state": "40c4b76a",
+      "state": "6b3ef7a4",
       "events": "741638a5",
       "rng": {
         "draws": 84,
@@ -2049,7 +2049,7 @@
       "tick": 52,
       "time": 2.6,
       "nextId": 969,
-      "state": "53608e54",
+      "state": "c58db602",
       "events": "6a4a2315",
       "rng": {
         "draws": 111,
@@ -2060,7 +2060,7 @@
       "tick": 56,
       "time": 2.8,
       "nextId": 969,
-      "state": "81f92baa",
+      "state": "eaf6c664",
       "events": "741638a5",
       "rng": {
         "draws": 135,
@@ -2071,7 +2071,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 969,
-      "state": "9517d153",
+      "state": "7adff7a7",
       "events": "570a8eca",
       "rng": {
         "draws": 164,
@@ -2082,7 +2082,7 @@
       "tick": 64,
       "time": 3.2,
       "nextId": 969,
-      "state": "8508fb07",
+      "state": "4b60d4e3",
       "events": "741638a5",
       "rng": {
         "draws": 209,
@@ -2093,7 +2093,7 @@
       "tick": 68,
       "time": 3.4,
       "nextId": 969,
-      "state": "af633552",
+      "state": "765ce070",
       "events": "741638a5",
       "rng": {
         "draws": 240,
@@ -2104,7 +2104,7 @@
       "tick": 72,
       "time": 3.6,
       "nextId": 969,
-      "state": "f1c2363e",
+      "state": "9c96eafc",
       "events": "741638a5",
       "rng": {
         "draws": 267,
@@ -2115,7 +2115,7 @@
       "tick": 76,
       "time": 3.8,
       "nextId": 969,
-      "state": "994a3636",
+      "state": "c0dcc3e6",
       "events": "741638a5",
       "rng": {
         "draws": 297,
@@ -2126,7 +2126,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 969,
-      "state": "ba9d3056",
+      "state": "86acb1b8",
       "events": "0fd08e9c",
       "rng": {
         "draws": 332,
@@ -2137,7 +2137,7 @@
       "tick": 84,
       "time": 4.2,
       "nextId": 969,
-      "state": "27ec3341",
+      "state": "b68210b9",
       "events": "f849cf02",
       "rng": {
         "draws": 366,
@@ -2148,7 +2148,7 @@
       "tick": 88,
       "time": 4.4,
       "nextId": 969,
-      "state": "c493e4bb",
+      "state": "3710b35f",
       "events": "741638a5",
       "rng": {
         "draws": 407,
@@ -2159,7 +2159,7 @@
       "tick": 92,
       "time": 4.6,
       "nextId": 969,
-      "state": "598fb3bb",
+      "state": "71d41873",
       "events": "741638a5",
       "rng": {
         "draws": 458,
@@ -2170,7 +2170,7 @@
       "tick": 96,
       "time": 4.8,
       "nextId": 969,
-      "state": "c0aedd93",
+      "state": "a330ad19",
       "events": "741638a5",
       "rng": {
         "draws": 497,
@@ -2181,7 +2181,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 969,
-      "state": "6bf6eec8",
+      "state": "0f2ced02",
       "events": "e2786253",
       "rng": {
         "draws": 542,
@@ -2192,7 +2192,7 @@
       "tick": 104,
       "time": 5.2,
       "nextId": 969,
-      "state": "bd2c451c",
+      "state": "4f734d1a",
       "events": "741638a5",
       "rng": {
         "draws": 575,
@@ -2203,7 +2203,7 @@
       "tick": 108,
       "time": 5.4,
       "nextId": 969,
-      "state": "fb49c7e3",
+      "state": "b6b3a723",
       "events": "741638a5",
       "rng": {
         "draws": 617,
@@ -2214,8 +2214,8 @@
       "tick": 112,
       "time": 5.6,
       "nextId": 969,
-      "state": "9a42c533",
-      "events": "69b2b64d",
+      "state": "5d685b1a",
+      "events": "f5a7ce38",
       "rng": {
         "draws": 663,
         "digest": "203e7eb8"
@@ -2225,7 +2225,7 @@
       "tick": 116,
       "time": 5.8,
       "nextId": 969,
-      "state": "907c3a9c",
+      "state": "25e122f5",
       "events": "741638a5",
       "rng": {
         "draws": 715,
@@ -2236,7 +2236,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 969,
-      "state": "cbbd5610",
+      "state": "5129bec0",
       "events": "51b78975",
       "rng": {
         "draws": 751,
@@ -2247,7 +2247,7 @@
       "tick": 124,
       "time": 6.2,
       "nextId": 969,
-      "state": "db98ad57",
+      "state": "87659eea",
       "events": "87ec8719",
       "rng": {
         "draws": 798,
@@ -2258,7 +2258,7 @@
       "tick": 128,
       "time": 6.4,
       "nextId": 969,
-      "state": "b98bc87d",
+      "state": "fc35b2c5",
       "events": "978cf1e7",
       "rng": {
         "draws": 845,
@@ -2269,7 +2269,7 @@
       "tick": 132,
       "time": 6.6,
       "nextId": 969,
-      "state": "015dd989",
+      "state": "63a0a28c",
       "events": "741638a5",
       "rng": {
         "draws": 897,
@@ -2280,33 +2280,33 @@
       "tick": 136,
       "time": 6.8,
       "nextId": 969,
-      "state": "6709e503",
-      "events": "741638a5",
+      "state": "b42d3448",
+      "events": "deb62f15",
       "rng": {
-        "draws": 927,
-        "digest": "96638237"
+        "draws": 928,
+        "digest": "0d316e79"
       }
     },
     {
       "tick": 140,
       "time": 7,
       "nextId": 969,
-      "state": "febe39c5",
+      "state": "eb8f6002",
       "events": "741638a5",
       "rng": {
-        "draws": 970,
-        "digest": "ee123225"
+        "draws": 971,
+        "digest": "e67515eb"
       }
     },
     {
       "tick": 140,
       "time": 7,
       "nextId": 969,
-      "state": "febe39c5",
+      "state": "eb8f6002",
       "events": "741638a5",
       "rng": {
-        "draws": 970,
-        "digest": "ee123225"
+        "draws": 971,
+        "digest": "e67515eb"
       },
       "label": "bladestorm-done",
       "players": [
@@ -2563,21 +2563,8 @@
         },
         {
           "aggroTargetId": 959,
-          "aiState": "chase",
+          "aiState": "attack",
           "auras": [
-            {
-              "breakChanceScale": 0.1,
-              "breakThreshold": 1574,
-              "breaksOnDamage": true,
-              "duration": 8,
-              "id": "fear_incap",
-              "kind": "incapacitate",
-              "name": "Intimidating Shout",
-              "remaining": 2.6,
-              "school": "physical",
-              "sourceId": 959,
-              "value": -1.60888
-            },
             {
               "duration": 8,
               "id": "pack_frenzy",
@@ -2594,7 +2581,7 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "facing": -1.60888,
+          "facing": 1.525199,
           "fallStartY": -3.044473,
           "fiveSecondRule": 99,
           "hostile": true,
@@ -2615,9 +2602,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": -50.593753,
-            "y": -3.991358,
-            "z": 81.599106
+            "x": -33.040012,
+            "y": -3.517973,
+            "z": 82.352146
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
@@ -2628,6 +2615,7 @@
           "stats": {
             "armor": 70
           },
+          "swingTimer": 1.338462,
           "tappedById": 959,
           "templateId": "forest_wolf",
           "threat": [
@@ -2647,19 +2635,6 @@
           "aiState": "chase",
           "auras": [
             {
-              "breakChanceScale": 0.1,
-              "breakThreshold": 1600,
-              "breaksOnDamage": true,
-              "duration": 8,
-              "id": "fear_incap",
-              "kind": "incapacitate",
-              "name": "Intimidating Shout",
-              "remaining": 2.6,
-              "school": "physical",
-              "sourceId": 959,
-              "value": 0.685026
-            },
-            {
               "duration": 8,
               "id": "pack_frenzy",
               "kind": "buff_haste",
@@ -2675,7 +2650,7 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "facing": 0.685026,
+          "facing": -2.56012,
           "fallStartY": -3.044473,
           "fiveSecondRule": 99,
           "hostile": true,
@@ -2696,9 +2671,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": -14.046819,
-            "y": -3.012732,
-            "z": 104.149281
+            "x": -24.228729,
+            "y": -3.03129,
+            "z": 89.857002
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
@@ -2709,7 +2684,6 @@
           "stats": {
             "armor": 70
           },
-          "swingTimer": 0.75,
           "templateId": "forest_wolf",
           "threat": [
             [
@@ -2893,22 +2867,22 @@
       "tick": 144,
       "time": 7.2,
       "nextId": 969,
-      "state": "51c9367a",
-      "events": "44cc1946",
+      "state": "94999889",
+      "events": "714c6cb8",
       "rng": {
-        "draws": 999,
-        "digest": "8169520c"
+        "draws": 1003,
+        "digest": "261ba775"
       }
     },
     {
       "tick": 144,
       "time": 7.2,
       "nextId": 969,
-      "state": "51c9367a",
+      "state": "94999889",
       "events": "741638a5",
       "rng": {
-        "draws": 999,
-        "digest": "8169520c"
+        "draws": 1003,
+        "digest": "261ba775"
       },
       "label": "final",
       "players": [
@@ -2930,7 +2904,7 @@
           "companionUpgrades": {},
           "counters": {
             "damageDealt": 1202,
-            "damageTaken": 52,
+            "damageTaken": 54,
             "kills": 1
           },
           "craftSkills": {},
@@ -3096,7 +3070,7 @@
           "channelTickEvery": 1,
           "channelTickTimer": 1,
           "chargeTimeLeft": 2.4,
-          "combatTimer": 1.15,
+          "combatTimer": 0.15,
           "comboUntil": -1,
           "cooldowns": [
             [
@@ -3122,7 +3096,7 @@
           "facing": 1.570796,
           "fallStartY": -3.042729,
           "fiveSecondRule": 106.2,
-          "hp": 623,
+          "hp": 621,
           "id": 959,
           "inCombat": true,
           "kind": "player",
@@ -3141,7 +3115,7 @@
             "z": 82.534589
           },
           "potionCooldownUntil": -1,
-          "resource": 79.675,
+          "resource": 81.875,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -3167,21 +3141,8 @@
         },
         {
           "aggroTargetId": 959,
-          "aiState": "chase",
+          "aiState": "attack",
           "auras": [
-            {
-              "breakChanceScale": 0.1,
-              "breakThreshold": 1574,
-              "breaksOnDamage": true,
-              "duration": 8,
-              "id": "fear_incap",
-              "kind": "incapacitate",
-              "name": "Intimidating Shout",
-              "remaining": 2.4,
-              "school": "physical",
-              "sourceId": 959,
-              "value": -1.60888
-            },
             {
               "duration": 8,
               "id": "pack_frenzy",
@@ -3198,7 +3159,7 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "facing": -1.60888,
+          "facing": 1.525199,
           "fallStartY": -3.044473,
           "fiveSecondRule": 99,
           "hostile": true,
@@ -3219,9 +3180,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": -51.503093,
-            "y": -3.996194,
-            "z": 81.564459
+            "x": -32.640428,
+            "y": -3.443499,
+            "z": 82.370379
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
@@ -3232,6 +3193,7 @@
           "stats": {
             "armor": 70
           },
+          "swingTimer": 1.138462,
           "tappedById": 959,
           "templateId": "forest_wolf",
           "threat": [
@@ -3251,19 +3213,6 @@
           "aiState": "chase",
           "auras": [
             {
-              "breakChanceScale": 0.1,
-              "breakThreshold": 1600,
-              "breaksOnDamage": true,
-              "duration": 8,
-              "id": "fear_incap",
-              "kind": "incapacitate",
-              "name": "Intimidating Shout",
-              "remaining": 2.4,
-              "school": "physical",
-              "sourceId": 959,
-              "value": 0.685026
-            },
-            {
               "duration": 8,
               "id": "pack_frenzy",
               "kind": "buff_haste",
@@ -3279,7 +3228,7 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "facing": 0.685026,
+          "facing": -2.56012,
           "fallStartY": -3.044473,
           "fiveSecondRule": 99,
           "hostile": true,
@@ -3300,9 +3249,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": -13.471068,
-            "y": -3.015813,
-            "z": 104.853988
+            "x": -25.107537,
+            "y": -3.034278,
+            "z": 88.519955
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
@@ -3313,7 +3262,6 @@
           "stats": {
             "armor": 70
           },
-          "swingTimer": 0.75,
           "templateId": "forest_wolf",
           "threat": [
             [

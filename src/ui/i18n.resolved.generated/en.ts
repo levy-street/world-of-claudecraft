@@ -8779,7 +8779,7 @@ export const en: EnTranslations = {
       },
       "intimidating_shout": {
         "name": "Intimidating Shout",
-        "description": "A terrifying shout that sends up to 5 enemies within 8 yards fleeing in fear for 8 sec. Damage may break the effect."
+        "description": "A terrifying shout that sends up to 5 enemies within 8 yards fleeing in fear for 4 sec. Damage may break the effect."
       },
       "revenge": {
         "name": "Revenge",

@@ -5209,10 +5209,15 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'physical',
     requiresTarget: false,
     // Classic-era shape (25 rage / 3 min / 5 targets / 8 yd / 8 sec) scaled to
-    // the 1-20 band: cost and cooldown tuned down, the fear itself unchanged.
-    effects: [{ type: 'aoeFear', duration: 8, radius: 8, maxTargets: 5 }],
+    // the 1-20 band: cost and cooldown tuned down. The DURATION now diverges too
+    // (owner 2026-08-07, 8 -> 4): classic's 8 sec left the melee class with a
+    // longer fear than either caster whose identity is fear (Psychic Scream 4,
+    // Howl of Terror 3), and PVP_FEAR_DR_RESET (60s) is half this cooldown, so DR
+    // never engages and every cast landed the full 8. 4 anchors on Psychic Scream
+    // rather than on an invented number.
+    effects: [{ type: 'aoeFear', duration: 4, radius: 8, maxTargets: 5 }],
     description:
-      'A terrifying shout that sends up to 5 enemies within 8 yards fleeing in fear for 8 sec. Damage may break the effect.',
+      'A terrifying shout that sends up to 5 enemies within 8 yards fleeing in fear for 4 sec. Damage may break the effect.',
   },
   bladestorm: {
     id: 'bladestorm',

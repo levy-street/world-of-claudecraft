@@ -2450,6 +2450,20 @@ function warriorRowCapstones(): Scenario {
       p.resource = 50;
       p.gcdRemaining = 0;
       sim.castAbility('intimidating_shout');
+      // Record the fear AT APPLY. Reading it from end-of-run state only worked
+      // while the fear was 8 sec: the Victory Rush and Bladestorm legs below run
+      // over five seconds, so a 4 sec fear is long expired by then and the
+      // coverage anchor silently found nothing to assert on.
+      {
+        const feared = [...sim.entities.values()].find((e) =>
+          (e as AnyEntity).auras.some((a) => a.id === 'fear_incap'),
+        ) as AnyEntity | undefined;
+        const fear = feared?.auras.find((a) => a.id === 'fear_incap');
+        rec.notes.fearApplied = fear !== undefined;
+        rec.notes.fearDuration = fear?.duration;
+        rec.notes.fearBreaksOnDamage = fear?.breaksOnDamage === true;
+        rec.notes.fearBreakThreshold = fear?.breakThreshold;
+      }
       rec.snapshot('feared');
       rec.tick(8);
       // Victory Rush: a lethal blow opens the window; the strike on a fresh
