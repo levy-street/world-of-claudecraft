@@ -63,7 +63,7 @@ any divergence); the MATERIAL_GRADES row shape; the procedural icon registration
 recipe and the profession-icon precedent; the TOOL_RECIPES row shape and the
 toolworks station id; the shape of the R23 top-rung-unpriced-and-craftable arm;
 slotToolEffectRefused's current policy and where hoes must be admitted; the
-FARM_PATCHES def shape and current bed-count status per hub; the FARMING_ZONES set
+FARM_PATCHES def shape and current bed-count status per hub; the FARMING_ZONE_TIERS set
 and tiers; where the farming rollout arms belong in
 tests/professions_zone_rollout.test.ts; the draw-count contract pin location and
 current values; the farming_session golden re-record recipe (UPDATE_PARITY=1); the
@@ -121,7 +121,7 @@ hand-edited).
 
 Lane E, patches and rollout arms: finalize FARM_PATCHES bed counts per hub; add the
 farming rollout arms to tests/professions_zone_rollout.test.ts keyed to
-FARMING_ZONES per D2. Per farming zone the arms assert: patches exist on legal
+FARMING_ZONE_TIERS per D2. Per farming zone the arms assert: patches exist on legal
 ground, a tier-appropriate crop set, seed/produce/twin/icon/name integrity, a hoe
 rung per tier, the top rung unpriced, and every material has a consumer or an
 explicit Phase 6 consumer note. The hub-stocking arm is authored now but states that
@@ -249,7 +249,7 @@ STOPPING RULES
   not coded around.
 
 When everything above is done: gate via node scripts/gate_select.mjs (the armory
-browser red is the standing environmental exception; grep the log for "[gate] FAIL";
+browser red is the standing environmental exception; grep the log for "FAIL" (the selective gate prints "[gate:select] FAIL", the full gate "[gate] FAIL") plus the GATE EXIT marker;
 PR CI is the arbiter), push, and open the PR against the release branch this phase
 was based on, following .github/PULL_REQUEST_TEMPLATE.md.
 ```

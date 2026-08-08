@@ -386,11 +386,17 @@ import {
   isEnchantedInstance,
 } from './professions/enchanting';
 import {
+  countDroppedHiddenSlots,
   normalizeFarmPlots,
   type PersistedFarmPlot,
   serializeFarmPlots,
 } from './professions/farm_persist';
-import { type FarmPlotView, type PlotState, projectFarmPlots } from './professions/farm_projection';
+import {
+  EMPTY_FARM_PLOT_VIEWS,
+  type FarmPlotView,
+  type PlotState,
+  projectFarmPlots,
+} from './professions/farm_projection';
 import * as fishing from './professions/fishing';
 import type { RespecPaymentTier } from './professions/focus';
 import * as professionsFocus from './professions/focus';
@@ -3295,11 +3301,17 @@ export class Sim {
       });
       // Dev-channel visibility for the silent-drop arms (the knownRecipes
       // precedent): a retired bed id or a tampered row vanishes on load by
-      // design, but an operator reading server logs should see it happen.
-      if (s.farmPlots && Object.keys(s.farmPlots).length > meta.farmPlots.size) {
-        console.warn(
-          `[load] dropped ${Object.keys(s.farmPlots).length - meta.farmPlots.size} farmPlots row(s) for ${meta.name} (unknown bed/crop id or invalid deadline)`,
-        );
+      // design, and a corrupt hidden slot drops while its row SURVIVES (so
+      // the row count alone cannot see it), but an operator reading server
+      // logs should see both happen.
+      {
+        const droppedRows = s.farmPlots ? Object.keys(s.farmPlots).length - meta.farmPlots.size : 0;
+        const droppedSlots = countDroppedHiddenSlots(s.farmPlots, meta.farmPlots);
+        if (droppedRows > 0 || droppedSlots > 0) {
+          console.warn(
+            `[load] dropped ${droppedRows} farmPlots row(s) and ${droppedSlots} hidden slot(s) for ${meta.name} (unknown bed/crop id, invalid deadline, or non-finite slot)`,
+          );
+        }
       }
       meta.profTierTutorialSent = s.profTierTutorialSent === true;
       meta.delveMarks = s.delveMarks ?? 0;
@@ -11907,17 +11919,18 @@ export class Sim {
 
   // The viewer's farm plots, projected for the seam. Takes an explicit pid
   // (the toolEffectSlotsFor precedent) so the server can build one player's
-  // delta while the offline getter below reads the primary. Returns [] for an
-  // unknown pid and for a player with no planted bed, which is the default and
-  // the overwhelming majority. The projection owns the bed-id sort and the
-  // hidden-slot leak barrier (professions/farm_projection.ts).
-  farmPlotsFor(pid: number): FarmPlotView[] {
+  // delta while the offline getter below reads the primary. Returns the
+  // shared frozen empty projection for an unknown pid and for a player with
+  // no planted bed, which is the default and the overwhelming majority (the
+  // EMPTY_TOOL_EFFECT_SLOT_VIEWS arm above). The projection owns the bed-id
+  // sort and the hidden-slot leak barrier (professions/farm_projection.ts).
+  farmPlotsFor(pid: number): readonly FarmPlotView[] {
     const meta = this.players.get(pid);
-    if (!meta) return [];
+    if (!meta) return EMPTY_FARM_PLOT_VIEWS;
     return projectFarmPlots(meta.farmPlots, this.lockoutNowMs());
   }
 
-  get myFarmPlots(): FarmPlotView[] {
+  get myFarmPlots(): readonly FarmPlotView[] {
     return this.farmPlotsFor(this.primaryId);
   }
 

@@ -124,7 +124,7 @@ STOPPING RULES
 - Stop if the phase diff cannot be identified cleanly.
 
 Close: re-run node scripts/gate_select.mjs after fixes (the armory browser red is
-the standing environmental exception; grep the log for "[gate] FAIL"; PR CI is the
+the standing environmental exception; grep the log for "FAIL" (the selective gate prints "[gate:select] FAIL", the full gate "[gate] FAIL") plus the GATE EXIT marker; PR CI is the
 arbiter) and push the fix commits to the phase PR.
 Packet teardown never happens in this phase; it belongs to Phase 13 QA only.
 ```

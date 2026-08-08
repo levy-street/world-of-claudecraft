@@ -91,7 +91,7 @@ Agent A, patch content and placement guard:
   per-site bed count (uniform or tier-scaled); record the choice in progress.md Notes
   and the state.md ledger.
 - src/sim/professions/farming_zones.ts: a pure leaf per the fishing_zones.ts header
-  rules: the FARMING_ZONES tier ladder, an Object.hasOwn reader, an explicit row per
+  rules: the FARMING_ZONE_TIERS tier ladder, an Object.hasOwn reader, an explicit row per
   farming zone, and every knob DERIVED from the tier, never an independent constant.
 - tests/farm_patch_placement.test.ts: clone the physical-safety arms from
   tests/gather_node_placement.test.ts for FARM_PATCHES: dry land, no collider
@@ -255,7 +255,7 @@ STOPPING RULES
 
 When every step above is done and no BLOCKING stands: gate via
 BROWSER_PATH=$HOME/.cache/ms-playwright/chromium-1228/chrome-linux64/chrome
-node scripts/gate_select.mjs (grep the log for "[gate] FAIL"), then, per D22
+node scripts/gate_select.mjs (grep the log for "FAIL" (the selective gate prints "[gate:select] FAIL", the full gate "[gate] FAIL") plus the GATE EXIT marker), then, per D22
 (supersedes the original push-and-open-a-PR line here): merge the phase branch
 --no-ff into feature/farming-plan and delete it. Do NOT push and do NOT open a
 PR; the would-be PR body goes in progress.md's Phase 2 Notes. Deviations decided

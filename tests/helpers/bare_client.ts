@@ -8,6 +8,7 @@
 
 import type { ClientSession, GameServer } from '../../server/game';
 import { ClientWorld } from '../../src/net/online';
+import { FARM_PATCHES } from '../../src/sim/content/farm_patches';
 import { emptyAllocation } from '../../src/sim/content/talents';
 import { ALL_RECIPES } from '../../src/sim/data';
 import { freshDeedStats } from '../../src/sim/deeds';
@@ -129,6 +130,13 @@ export function bareClient(pid: number, overrides: BareClientOverrides = {}): Cl
     cadenceBlockedQuests: [],
   };
   c.gatheringProficiency = {};
+  // The tslot/fplot self-delta mirrors and the static patch table, matching
+  // the class's own static defaults (src/net/online.ts): a consumer test
+  // reading IWorldFarming or the tool slots through this fixture must see
+  // what a freshly constructed online client sees, not undefined.
+  c.toolEffectSlots = [];
+  c.farmPatches = FARM_PATCHES;
+  c.myFarmPlots = [];
   c.delveClears = {};
   c.delveDaily = { date: '', firstClearXp: [], markClears: 0 };
   c.professionsState = { skills: [] };

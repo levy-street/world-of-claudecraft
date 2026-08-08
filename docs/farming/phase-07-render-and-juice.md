@@ -49,7 +49,7 @@ Spawn one Explore agent (thoroughness: very thorough) to read and summarize:
   docs/image-to-glb-asset-workflow.md.
 - Source files for this phase: src/sim/content/farm_patches.ts (FARM_PATCHES and
   FarmPatchDef as landed in Phase 2; progress.md notes any name refinement),
-  src/sim/professions/farming_zones.ts (FARMING_ZONES, its one home),
+  src/sim/professions/farming_zones.ts (FARMING_ZONE_TIERS, its one home),
   src/world_api/farming.ts (the IWorldFarming facet as landed), the closest existing
   scripts/assets/build_*.mjs exporter to use as the template (Explore picks and names
   it), the best existing src/render adapter precedent for signature-guarded rebuilds
@@ -232,7 +232,7 @@ STOPPING RULES
 - Stop if a review BLOCKING cannot be fixed without out-of-scope changes.
 
 Close: gate via node scripts/gate_select.mjs (the armory browser red is the standing
-environmental exception; grep the log for "[gate] FAIL"; PR CI is the arbiter), push,
+environmental exception; grep the log for "FAIL" (the selective gate prints "[gate:select] FAIL", the full gate "[gate] FAIL") plus the GATE EXIT marker; PR CI is the arbiter), push,
 and open the PR against the release branch this phase was based on per
 .github/PULL_REQUEST_TEMPLATE.md, with before/after screenshots (desktop and mobile)
 captured via the pr-screenshots skill, committed under docs/screenshots, and

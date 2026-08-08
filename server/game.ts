@@ -8787,8 +8787,9 @@ export class GameServer {
     // for every player with no planted bed, so after the first snapshot of a
     // session the key delta-elides away for almost everyone. The empty arm
     // compares the constant '[]' directly (byte-identical to maybe(...)):
-    // farmPlotsFor allocates a fresh array per call, so stringifying an empty
-    // projection per player per tick would buy nothing.
+    // the empty read is the shared frozen EMPTY_FARM_PLOT_VIEWS (no per-call
+    // allocation since the Phase 2 QA fix), and skipping the stringify of an
+    // empty projection per player per tick is still the cheaper arm.
     const fplotRows = this.sim.farmPlotsFor(anchorSession.pid);
     if (fplotRows.length === 0) maybeSerialized('fplot', '[]');
     else maybe('fplot', fplotRows);

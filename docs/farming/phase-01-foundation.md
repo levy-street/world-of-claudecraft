@@ -266,7 +266,7 @@ The new professions-window row is a visual change: capture before/after screensh
 per the pr-screenshots skill (desktop, and mobile where relevant), commit them under
 docs/screenshots, and reference them from the PR body. Then gate via
 node scripts/gate_select.mjs (the armory browser red is the standing environmental
-exception; grep the log for "[gate] FAIL"; PR CI is the arbiter), push, and open the
+exception; grep the log for "FAIL" (the selective gate prints "[gate:select] FAIL", the full gate "[gate] FAIL") plus the GATE EXIT marker; PR CI is the arbiter), push, and open the
 PR against the release branch this phase was based on per
 .github/PULL_REQUEST_TEMPLATE.md.
 ```

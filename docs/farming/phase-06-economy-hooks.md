@@ -187,7 +187,7 @@ STOPPING RULES
   not coded around.
 
 When everything above is done: gate via node scripts/gate_select.mjs (the armory
-browser red is the standing environmental exception; grep the log for "[gate] FAIL";
+browser red is the standing environmental exception; grep the log for "FAIL" (the selective gate prints "[gate:select] FAIL", the full gate "[gate] FAIL") plus the GATE EXIT marker;
 PR CI is the arbiter), push, and open the PR against the release branch this phase
 was based on, following .github/PULL_REQUEST_TEMPLATE.md.
 ```

@@ -103,7 +103,7 @@ Agent 3, dead code and cleanup:
   DOM/Three/render/ui/game/net imports in src/sim/); no unresolved TODOs (the hidden
   outcome slots are declared-for-Phase-3 by design, which is a documented forward
   reference, not a TODO); naming consistency (bed ids, fplot, FarmPatchDef,
-  FARMING_ZONES); no leftover throwaway files.
+  FARMING_ZONE_TIERS); no leftover throwaway files.
 
 Then dispatch the Review Dispatch Matrix rows in docs/farming/implementation-plan.md
 that match the phase diff (expected: cross-platform-sync, architecture-reviewer,
@@ -119,7 +119,7 @@ STEP 3 - FIX
 - Separate fix commits with explicit paths, Conventional Commits with bodies, never
   git add -A, no session links or Claude attribution.
 - After fixes: node scripts/gate_select.mjs (the armory browser red is the standing
-  environmental exception; grep the log for "[gate] FAIL"), then, per D22, merge the
+  environmental exception; grep the log for "FAIL" (the selective gate prints "[gate:select] FAIL", the full gate "[gate] FAIL") plus the GATE EXIT marker), then, per D22, merge the
   local QA fix branch --no-ff into feature/farming-plan; never push, never open a PR.
 
 STEP 4 - DOC UPDATES

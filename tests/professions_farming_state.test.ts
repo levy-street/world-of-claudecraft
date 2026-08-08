@@ -9,15 +9,16 @@
 // byte-identically to a pre-farming save.
 import fs from 'node:fs';
 import path from 'node:path';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { FARM_BED_IDS, FARM_CROP_IDS, FARM_PATCHES } from '../src/sim/content/farm_patches';
 import {
+  countDroppedHiddenSlots,
   FARM_MAX_GROW_MS,
   normalizeFarmPlots,
   type PersistedFarmPlot,
   serializeFarmPlots,
 } from '../src/sim/professions/farm_persist';
-import type { PlotState } from '../src/sim/professions/farm_projection';
+import { type PlotState, projectFarmPlots } from '../src/sim/professions/farm_projection';
 import { type CharacterState, type PlayerMeta, Sim } from '../src/sim/sim';
 
 // Fixture allowlists for the pure arms: the leaf takes its allowlists as
@@ -122,6 +123,31 @@ describe('the pure farm-plot round trip (no Sim)', () => {
     expect(serializeFarmPlots(new Map())).toBeUndefined();
   });
 
+  it('omits a non-finite hidden slot at write time, the JSON hygiene arm', () => {
+    // NaN and Infinity are not representable in JSON and would round-trip as
+    // null; the writer drops the SLOT (never the row) so the persisted bytes
+    // stay honest.
+    const live = new Map<string, PlotState>([
+      [
+        'bed_alpha',
+        {
+          cropId: 'turnip',
+          plantedAtMs: 1_000,
+          readyAtMs: 5_000,
+          survivalRoll: Number.NaN,
+          yieldSeed: 7,
+          compost: false,
+          watch: false,
+          tonic: false,
+          notified: false,
+        },
+      ],
+    ]);
+    const saved = serializeFarmPlots(live) as Record<string, PersistedFarmPlot>;
+    expect(Object.keys(saved.bed_alpha)).not.toContain('survivalRoll');
+    expect(saved.bed_alpha.yieldSeed).toBe(7);
+  });
+
   it('loads an absent field as the no-plots default, always a fresh map', () => {
     const a = normalizeFarmPlots(undefined, {
       validBedIds: BEDS,
@@ -135,6 +161,68 @@ describe('the pure farm-plot round trip (no Sim)', () => {
     });
     expect(a.size).toBe(0);
     expect(b).not.toBe(a);
+  });
+});
+
+describe('the public projection, driven directly (the pure-leaf contract)', () => {
+  // The module header promises "a Vitest imports it directly"; this suite is
+  // that import. The wire-path twin lives in tests/snapshots.test.ts.
+  const plot = (over: Partial<PlotState> = {}): PlotState => ({
+    cropId: 'turnip',
+    plantedAtMs: 1_000,
+    readyAtMs: 5_000,
+    compost: false,
+    watch: false,
+    tonic: false,
+    notified: false,
+    ...over,
+  });
+
+  it('projects the empty map to the shared frozen instance, no per-call allocation', () => {
+    // The empty case is ~100% of players until planting ships, and the
+    // projection runs per session per tick on the snapshot path: the
+    // EMPTY_TOOL_EFFECT_SLOT_VIEWS precedent, identity-pinned so a fresh []
+    // regression reds here.
+    const m = new Map<string, PlotState>();
+    expect(projectFarmPlots(m, 1_000)).toBe(projectFarmPlots(m, 2_000));
+    expect(projectFarmPlots(m, 1_000)).toEqual([]);
+    expect(Object.isFrozen(projectFarmPlots(m, 1_000))).toBe(true);
+  });
+
+  it('sorts rows by bed id regardless of map insertion order', () => {
+    const m = new Map<string, PlotState>([
+      ['bed_beta', plot()],
+      ['bed_alpha', plot()],
+    ]);
+    expect(projectFarmPlots(m, 10_000).map((r) => r.bedId)).toEqual(['bed_alpha', 'bed_beta']);
+  });
+
+  it('turns ready EXACTLY at readyAtMs, growing one ms before', () => {
+    // The boundary frame is a stated contract (src/world_api/farming.ts:
+    // withered may surface only AT or after readyAtMs), so the growth phase
+    // builds on "at readyAtMs the plot is already ready". A drift from < to <=
+    // in the projector must red here.
+    const m = new Map<string, PlotState>([['bed_alpha', plot({ readyAtMs: 5_000 })]]);
+    expect(projectFarmPlots(m, 4_999)[0]?.status).toBe('growing');
+    expect(projectFarmPlots(m, 5_000)[0]?.status).toBe('ready');
+  });
+
+  it('picks the nine public fields explicitly, never the hidden slots', () => {
+    const m = new Map<string, PlotState>([
+      ['bed_alpha', plot({ survivalRoll: 0.5, yieldSeed: 9 })],
+    ]);
+    const row = projectFarmPlots(m, 10_000)[0] as unknown as Record<string, unknown>;
+    expect(Object.keys(row).sort()).toEqual([
+      'bedId',
+      'compost',
+      'cropId',
+      'notified',
+      'plantedAtMs',
+      'readyAtMs',
+      'status',
+      'tonic',
+      'watch',
+    ]);
   });
 });
 
@@ -224,11 +312,21 @@ describe('load-side anti-tamper (one corrupt dimension per arm)', () => {
   });
 
   it('normalizes every flag through === true', () => {
+    // Every flag gets its own junk arm so dropping the coercion on any ONE of
+    // the four is a red, not just on compost.
     const loaded = norm({
-      bed_alpha: { ...VALID, compost: 1 as unknown as boolean, watch: true },
+      bed_alpha: {
+        ...VALID,
+        compost: 1 as unknown as boolean,
+        watch: true,
+        tonic: 'yes' as unknown as boolean,
+        notified: 0 as unknown as boolean,
+      },
     });
     expect(loaded.get('bed_alpha')?.compost).toBe(false);
     expect(loaded.get('bed_alpha')?.watch).toBe(true);
+    expect(loaded.get('bed_alpha')?.tonic).toBe(false);
+    expect(loaded.get('bed_alpha')?.notified).toBe(false);
   });
 
   it('loads a malformed container shape to the no-plots default without throwing', () => {
@@ -258,8 +356,39 @@ describe('load-side anti-tamper (one corrupt dimension per arm)', () => {
     expect(({} as { cropId?: unknown }).cropId).toBeUndefined();
   });
 
+  it('inserts survivors in sorted bed order, never saved-JSON key order', () => {
+    // The live Map's iteration order must be sim-owned: the growth phase will
+    // iterate meta.farmPlots per tick, and if insertion mirrored the saved
+    // JSON, the rng stream position would become a function of JSONB key
+    // order, a DB round-trip artifact outside the sim's control.
+    const loaded = norm({ bed_beta: { ...VALID }, bed_alpha: { ...VALID } });
+    expect([...loaded.keys()]).toEqual(['bed_alpha', 'bed_beta']);
+  });
+
   it('pins the tamper ceiling to its literal (seven days in ms)', () => {
     expect(FARM_MAX_GROW_MS).toBe(604800000);
+  });
+});
+
+describe('hidden-slot drop counting (the operator signal)', () => {
+  it('counts non-finite slots on surviving rows and nothing else', () => {
+    const saved = {
+      bed_alpha: { ...VALID, survivalRoll: Number.NaN, yieldSeed: null as unknown as number },
+      bed_beta: { ...VALID, survivalRoll: 0.5 },
+      bed_bogus: { ...VALID, survivalRoll: Number.NaN },
+    };
+    const loaded = norm(saved);
+    // bed_alpha survives with BOTH slots dropped; bed_beta keeps its finite
+    // slot; bed_bogus is a dropped ROW, which is the row counter's job.
+    expect(countDroppedHiddenSlots(saved, loaded)).toBe(2);
+  });
+
+  it('is zero for an absent field, a clean load, and a malformed container', () => {
+    expect(countDroppedHiddenSlots(undefined, new Map())).toBe(0);
+    const clean = { bed_alpha: { ...VALID, survivalRoll: 0.25 } };
+    expect(countDroppedHiddenSlots(clean, norm(clean))).toBe(0);
+    const junk = 'bed_alpha' as unknown as Record<string, PersistedFarmPlot>;
+    expect(countDroppedHiddenSlots(junk, norm(junk))).toBe(0);
   });
 });
 
@@ -317,6 +446,37 @@ describe('the save round trip through a real Sim', () => {
     });
   });
 
+  it('warns the operator once when a load drops rows or hidden slots', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    try {
+      const state = baseState();
+      state.farmPlots = {
+        bed_not_a_real_bed: {
+          cropId: 'wheat',
+          plantedAtMs: NOW_MS - 1_000,
+          readyAtMs: NOW_MS + 1,
+        },
+        [BED]: {
+          cropId: 'wheat',
+          plantedAtMs: NOW_MS - 30_000,
+          readyAtMs: NOW_MS + 60_000,
+          survivalRoll: Number.NaN,
+        },
+      };
+      load(state);
+      const dropWarns = warn.mock.calls
+        .map((c) => String(c[0]))
+        .filter((m) => m.includes('[load] dropped'));
+      expect(dropWarns).toHaveLength(1);
+      // Both silent-drop families surface: the tampered row AND the corrupt
+      // hidden slot on the surviving row (which the row counter cannot see).
+      expect(dropWarns[0]).toContain('1 farmPlots row(s)');
+      expect(dropWarns[0]).toContain('1 hidden slot(s)');
+    } finally {
+      warn.mockRestore();
+    }
+  });
+
   it('loads a pre-farming save to no plots and re-omits the key on save', () => {
     const state = baseState();
     expect('farmPlots' in state).toBe(false);
@@ -364,6 +524,51 @@ describe('the save round trip through a real Sim', () => {
     expect(sim.farmPlotsFor(987_654)).toEqual([]);
   });
 
+  it('serves the shared empty projection for a plotless player and an unknown pid', () => {
+    // Both empty arms return the ONE frozen instance (the
+    // EMPTY_TOOL_EFFECT_SLOT_VIEWS precedent): this runs per session per tick
+    // on the snapshot path, and a fresh [] per call was an allocation for the
+    // overwhelming majority who have no planted bed.
+    const { sim, pid } = load(baseState());
+    expect(sim.farmPlotsFor(pid)).toBe(sim.farmPlotsFor(pid));
+    expect(sim.farmPlotsFor(pid)).toBe(sim.farmPlotsFor(987_654));
+    expect(sim.farmPlotsFor(pid)).toEqual([]);
+  });
+
+  it('pins the persisted bed-id roster to its literals', () => {
+    // Bed ids are SAVE KEYS: the load allowlist destroys any plot whose id
+    // leaves this list, so a rename is a deliberate destroy-on-load decision.
+    // Uniqueness and set-size pins cannot see a rename; only literals can.
+    expect([...FARM_BED_IDS].sort()).toEqual([
+      'bed_eastbrook_1',
+      'bed_eastbrook_2',
+      'bed_eastbrook_3',
+      'bed_eastbrook_4',
+      'bed_evergarden_1',
+      'bed_evergarden_2',
+      'bed_evergarden_3',
+      'bed_evergarden_4',
+      'bed_evergarden_5',
+      'bed_evergarden_6',
+      'bed_evergarden_7',
+      'bed_evergarden_8',
+      'bed_mirefen_1',
+      'bed_mirefen_2',
+      'bed_mirefen_3',
+      'bed_mirefen_4',
+      'bed_mirefen_5',
+      'bed_thornpeak_1',
+      'bed_thornpeak_2',
+      'bed_thornpeak_3',
+      'bed_thornpeak_4',
+      'bed_thornpeak_5',
+      'bed_thornpeak_6',
+    ]);
+    // The crop allowlist is a save-key roster too (deviation (h): one
+    // pre-declared crop until the growth phase ships the catalog).
+    expect([...FARM_CROP_IDS]).toEqual(['wheat']);
+  });
+
   it('serves the static patch table by reference, deep-frozen', () => {
     const { sim } = load(baseState());
     expect(sim.farmPatches).toBe(FARM_PATCHES);
@@ -379,34 +584,45 @@ describe('the save round trip through a real Sim', () => {
 });
 
 describe('the cross-clock-base save assumption', () => {
-  it('serializeCharacter has no caller outside server/, the epoch-anchor premise', () => {
+  it('every serializeCharacter caller lives in server/ and injects the wall clock', () => {
     // farm_persist.ts stores ABSOLUTE deadlines and its normalize guard only
     // re-anchors future rows, which is safe solely because every persisted
-    // blob is written AND read by a wall-clock host: serializeCharacter is
-    // called nowhere outside server/. If an offline host (sim-clock ms from
-    // zero) ever wrote a blob a server later loads, every crop would read
-    // decades past ready with no arm firing. This scan turns that prose
-    // premise into a pin (the deeds_content producer-site idiom): a new
-    // caller outside server/ must revisit farm_persist.ts's clock-base
-    // doctrine before it lands.
+    // blob is written AND read by a WALL-CLOCK host. That is two properties,
+    // and the directory scan alone only proved the weaker one: three
+    // server-side scratch sims (character creation, the PBE boost builder,
+    // the community test-account templates) sat inside server/ while
+    // building on the sim-clock default (0 before the first tick), which is
+    // exactly the anchor family normalize can never repair (a t=0 anchor on
+    // a wall-clock host reads decades past ready with no arm firing). So the
+    // scan pins BOTH: no caller outside server/, and every caller file
+    // injects lockoutNowMs. The file-level token check is a tripwire, not
+    // proof (the deeds_content producer-site idiom): the decisive fact is
+    // each scratch-sim constructor passing () => Date.now(). A caller that
+    // cannot inject the wall clock must revisit farm_persist.ts's clock-base
+    // doctrine before it lands. (scripts/*.mjs probes stay out of scope:
+    // they never reach Postgres.)
     const roots = ['src', 'server', 'headless'].map((d) => path.join(__dirname, '..', d));
-    const callers = new Set<string>();
+    const callers = new Map<string, string>();
     const walk = (dir: string): void => {
       for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
         const p = path.join(dir, entry.name);
         if (entry.isDirectory()) walk(p);
-        else if (
-          entry.name.endsWith('.ts') &&
-          /\.serializeCharacter\(/.test(fs.readFileSync(p, 'utf8'))
-        ) {
-          callers.add(path.relative(path.join(__dirname, '..'), p));
+        else if (entry.name.endsWith('.ts')) {
+          const content = fs.readFileSync(p, 'utf8');
+          if (/\.serializeCharacter\(/.test(content)) {
+            callers.set(path.relative(path.join(__dirname, '..'), p), content);
+          }
         }
       }
     };
     for (const root of roots) walk(root);
     expect(callers.size).toBeGreaterThan(0); // the scan itself must see the real call sites
-    for (const caller of callers) {
+    for (const [caller, content] of callers) {
       expect(caller.startsWith('server/'), `${caller} calls serializeCharacter`).toBe(true);
+      expect(
+        /lockoutNowMs/.test(content),
+        `${caller} persists character blobs without injecting the wall clock (lockoutNowMs)`,
+      ).toBe(true);
     }
   });
 });

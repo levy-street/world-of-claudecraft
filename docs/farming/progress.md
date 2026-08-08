@@ -9,7 +9,7 @@
 | Phase 1 (foundation) | done | 2026-08-07 | 2026-08-08 |
 | Phase 1 QA | done (PASS-WITH-FOLLOWUPS) | 2026-08-08 | 2026-08-08 |
 | Phase 2 (patches and plots) | done | 2026-08-08 | 2026-08-08 |
-| Phase 2 QA | not started | | |
+| Phase 2 QA | done (PASS-WITH-FOLLOWUPS) | 2026-08-08 | 2026-08-08 |
 | Phase 3 (growth engine) | not started | | |
 | Phase 3 QA | not started | | |
 | Phase 4 (knobs) | not started | | |
@@ -332,6 +332,65 @@ Notes:
   architecture, bandwidth, env-protocol and full parity suites (940+ tests
   across the validation list), UPDATE_PARITY=1 regen byte-identical, gate_select
   PASS. Screenshots: n/a (no visual surface).
+
+Phase 2 QA (2026-08-08), verdict PASS-WITH-FOLLOWUPS, fixes on
+fix/farming-phase-02-qa merged --no-ff per D22:
+- Pre-audit: absorbed release/v0.36.0 tip 81804a179e (wiki accuracy round 2,
+  guide-only) as merge c7fe3a9334; release-merge-audit clean (farming's three
+  guide prose edits survived verbatim; the new release-authored
+  guide_key_coverage suite passes on the merged tree); world_api_parity plus
+  snapshots re-run green at the merged HEAD per the standing post-absorb rule.
+- Audit shape: an 8-agent workflow (context loader, correctness with live
+  wire-leak/load-tamper/tick probes, test-coverage, dead-code, plus
+  cross-platform-sync, architecture-reviewer, migration-safety, qa-checklist)
+  followed by the two matrix rows the build never dispatched:
+  privacy-security-review (its row matches by text; verdict ship-it, the one
+  should-fix is the Phase 3 hidden-slot clamp gate, ledgered in the handoff)
+  and database-performance-reviewer (borderline row via stored-data growth;
+  verdict PASS, corrected the first fleet estimate's storage-vs-write-volume
+  conflation and added two plant-phase gates, all ledgered in the state.md
+  handoff). migration-safety and database-performance both needed the known
+  agent-redispatch recovery. 0 BLOCKING anywhere.
+- Correctness probes (all green, real paths): hidden slots and yield seed
+  filled then proven absent over a real GameServer broadcast while status
+  stayed clock-derived (a doomed pre-roll on an expired timer reads ready, a
+  healthy one on a future timer reads growing); load-tamper blob (bogus bed,
+  unknown crop, over-ceiling and exact-ceiling deadlines) loads clean with
+  drops and an exact clamp; 20-tick advanceable-clock probes pin growing at
+  ready-1ms and ready AT readyAtMs; live-surface holds (zero references from
+  ui/render/game/guide/editor/headless).
+- Fixed (9 commits): normalize now inserts in sorted bed order (the rng
+  iteration-order hazard the growth phase must not inherit);
+  projectFarmPlots/farmPlotsFor serve a shared frozen empty projection
+  (the toolEffectSlotsFor allocation precedent) and the seam signatures
+  tightened to readonly; the scratch-sim character builders (creation, PBE
+  boost, community templates) now inject lockoutNowMs and the clock-base scan
+  pin demands the token (it previously proved only the weaker
+  no-caller-outside-server property); the load warning now counts dropped
+  hidden slots (countDroppedHiddenSlots), which the row count cannot see; new
+  pins for the status boundary at exactly readyAtMs, the 23-literal bed-id
+  roster (a rename is a destroy-on-load decision), per-flag junk arms for
+  tonic/notified, the write-side non-finite slot omission, a direct
+  projectFarmPlots unit describe, farmPlots sampled-not-inert in the parity
+  sampler, a real-ClientWorld farmPatches by-reference pin (withDomStubs),
+  and the bareClient sweep (toolEffectSlots, farmPatches, myFarmPlots);
+  comment drift corrected (the farm_persist re-roll comment now states the
+  derive-deterministically handoff rule; the key-sort rationale no longer
+  claims JSONB key order; the allowlist-Set freeze asymmetry is documented;
+  docs name FARMING_ZONE_TIERS, the export that exists).
+- Mutation pass: 16 mutations, 16 killed with named failing tests (the four
+  former expected-survivors from the coverage audit all die on the new pins).
+- Validation: tsc clean; the 11-suite matrix batch 646 green; tests/parity
+  194 passed 1 skipped (one new harness test; goldens untouched);
+  ci:changed rc=0 AFTER refreshing origin/main (a stale main ref sweeps
+  release-side scripts into the changed set; fetch main before gating) and
+  one genuine format fix in sim.ts.
+- Deferred with owners (ledgered in state.md): hidden-slot range clamps land
+  WITH their value domains (the privacy gate for Phase 3); the msRemaining
+  derived duration field and the offline anchor-semantics family stay the
+  Phase 3 handoff; admin character inspection must field-pick like the wire
+  projection when a farm section lands; the deploy-order constraint moves to
+  DEPLOY.md when planting ships; render-phase FarmBedDef export symmetry.
 
 ### Phase 3
 (not started)

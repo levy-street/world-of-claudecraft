@@ -4,10 +4,12 @@ Read this file first in every phase session. It is the single authority for lock
 decisions. If a phase file contradicts this file, this file wins and the phase file
 gets swept in the same pass (amend the QA twin too, always).
 
-Current phase: Phase 1 done, QA passed 2026-08-08 (PASS-WITH-FOLLOWUPS); Phase 2
-next. Packet authored 2026-08-07 off release/v0.36.0; the branch has absorbed
-release/v0.36.0 through 6ed4d7e12c (second absorb 2026-08-08, release-merge-audit
-clean, parity re-proven byte-identical on the merged HEAD).
+Current phase: Phase 2 done, QA passed 2026-08-08 (PASS-WITH-FOLLOWUPS); Phase 3
+(growth engine) next. Packet authored 2026-08-07 off release/v0.36.0; the branch
+has absorbed release/v0.36.0 through 81804a179e (fourth absorb, at Phase 2 QA
+2026-08-08: the guide-only wiki accuracy round 2; release-merge-audit clean,
+parity and snapshots re-proven green on the merged HEAD; the third absorb
+e5c16ca398 opened Phase 2 itself).
 Working tree: ALL farming work happens in the persistent worktree
 `~/Documents/woc-farming-plan`. Other sessions share the main checkout; never work there.
 
@@ -33,7 +35,7 @@ visit or a punishment for lateness is violating the design, not tuning it.
   Rationale, verified: a new `GatherNodeType` is conscripted by
   `tests/professions_zone_rollout.test.ts` (R37) and `tests/gather_node_placement.test.ts`
   into every zone at exact pinned counts. Farming instead adds its OWN rollout arms
-  keyed to an explicit set: `FARMING_ZONES = eastbrook_vale (tier 1), mirefen_marsh
+  keyed to an explicit set: `FARMING_ZONE_TIERS = eastbrook_vale (tier 1), mirefen_marsh
   (tier 2), thornpeak_heights (tier 3), evergarden (tier 4)`, plus its OWN placement
   guard suite cloning the physical-safety arms (dry land, no collider overlap, reachable
   stand spot, zone containment, spacing) for `FARM_PATCHES`. Hub anchors for patch
@@ -367,7 +369,7 @@ freshness gate (`tests/guide.test.ts`, regen via `npm run wiki:content`), and th
 parity golden set (D23).
 
 R37 (`tests/professions_zone_rollout.test.ts`): farming adds its OWN arms against
-`FARMING_ZONES` (patch coverage per farming zone, seed/produce/fine-twin integrity,
+`FARMING_ZONE_TIERS` (patch coverage per farming zone, seed/produce/fine-twin integrity,
 hoe rungs at each tier with the hub stocking rule, top rung unpriced and craftable,
 chronicle deeds earnable). The existing node arms are untouched. The farming station
 question does not arise (farming has no station).
@@ -423,7 +425,7 @@ question does not arise (farming has no station).
   a mobile screenshot script against a phone viewport.
 - Phase end: `node scripts/gate_select.mjs` (the fast pre-merge gate);
   `npm run gate` for the deep check. Known environmental red: the armory browser
-  pixel test; grep the log for "[gate] FAIL", never trust a piped exit code, and PR CI
+  pixel test; grep the log for "FAIL" (the selective gate prints "[gate:select] FAIL", the full gate "[gate] FAIL") plus the GATE EXIT marker, never trust a piped exit code, and PR CI
   is the arbiter.
 
 ## Key planned files (working names; a phase may refine with a note here)
@@ -433,7 +435,7 @@ question does not arise (farming has no station).
   produce, fine twins, compost, husks, tonic, hoes, dishes, feast)
 - `src/sim/professions/farming.ts` (the driver: plant, harvest, growth script,
   survival/yield resolution, updateFarming, ready-check helpers)
-- `src/sim/professions/farming_zones.ts` (FARMING_ZONES, the zone tier side table:
+- `src/sim/professions/farming_zones.ts` (FARMING_ZONE_TIERS, the zone tier side table:
   the one home of the zone set; farm_patches.ts never redefines it)
 - `src/world_api/farming.ts` (IWorldFarming facet: patch defs, my plots, commands)
 - `src/ui/harvest_journal_view.ts` + `src/ui/harvest_journal_window.ts` (or the
@@ -496,7 +498,7 @@ question does not arise (farming has no station).
   can plant this phase, so no live save can carry it. (i) The D2 Evergarden hub
   prose was FALSE against shipped content and is corrected in D2 above: Hedgewick
   is the zone hub and the reachability flood origin; the parterre stays the
-  patch-site anchor. (j) FARMING_ZONES is farming's OWN tier column, deliberately
+  patch-site anchor. (j) FARMING_ZONE_TIERS is farming's OWN tier column, deliberately
   diverging from the shipped zone-progression ladder at evergarden (tier 4 showcase
   vs the named inversion's tier 1), so the fishing test's GATHER_NODES derivation
   CANNOT be copied: literal pins plus the one-ladder arm (FARM_PATCHES[].tier
@@ -532,25 +534,79 @@ question does not arise (farming has no station).
     continuing through logout; the reviewers' concrete direction is re-anchor to
     max(nowMs, 1) or an epoch-based offline clock, pinned by BOTH a fresh-Sim load
     and a post-tick load. The mirror hazard (an absurdly PAST anchor loading on a
-    wall-clock host reads instantly ready) needs no code now: the scan pin in
-    tests/professions_farming_state.test.ts holds the no-caller-outside-server
-    premise, and a save editor can craft instant-ready with legit-looking values
-    anyway, so an epoch floor buys no anti-tamper value.
+    wall-clock host reads instantly ready) needs no code now: since Phase 2 QA the
+    scan pin in tests/professions_farming_state.test.ts holds the CLOCK-BASE
+    premise directly (every serializeCharacter caller lives in server/ AND injects
+    lockoutNowMs; the three scratch-sim builders, creation / PBE boost / community
+    templates, were fixed to pass () => Date.now() after passing the old
+    directory-only scan on the sim-clock default), and a save editor can craft
+    instant-ready with legit-looking values anyway, so an epoch floor buys no
+    anti-tamper value.
   - The derived-duration wire field (RaidLockout msRemaining template) lands with
     the first timer UI; until then the clock-base contract comment in
     src/world_api/farming.ts is the only guard.
   - Absent/corrupt hidden slots: prefer DERIVING a replacement deterministically
     (bed id plus plantedAtMs) over re-rolling at harvest, so a dropped slot is not
-    a reroll primitive.
+    a reroll primitive. Since Phase 2 QA a dropped slot is visible to operators
+    (countDroppedHiddenSlots feeds the load warn; the row count alone could not
+    see a surviving row lose a slot).
+  - HARD GATE from the privacy review: clamp survivalRoll into its real interval
+    and yieldSeed to a bounded integer IN THE SAME CHANGE that gives the slots
+    meaning; today they pass the load on a bare finite() check while every
+    neighbouring field has an allowlist, a positivity check, a ceiling, or a
+    coercion, which is fine only while their value domain does not exist.
+  - Iteration order is now guaranteed: normalizeFarmPlots inserts in sorted bed
+    order (Phase 2 QA), so per-tick iteration over meta.farmPlots can draw rng
+    without the stream position depending on JSONB key order. Do not regress this
+    with an unsorted bulk insert.
+  - Read-identity asymmetry at the seam: Sim.farmPlotsFor allocates a fresh array
+    per NON-EMPTY read (the empty arms return the shared frozen
+    EMPTY_FARM_PLOT_VIEWS since Phase 2 QA) while ClientWorld.myFarmPlots keeps
+    one array until the next fplot delta; the first UI consumer must not memoize
+    by reference or === -diff rows across reads.
   - Admin visibility: serializeCharacter snapshots (server/admin.ts character
     inspection) will expose filled survivalRoll/yieldSeed to operators; decide
-    whether that is acceptable when the slots go live.
+    whether that is acceptable when the slots go live. The R35 professions
+    inspector shapes output through characterProfessionsSheet's explicit field
+    picks and never touches state.farmPlots today; a farm section added there
+    must field-pick the way the wire projection does, never dump the record.
+  - The crop content table ships to the browser (src/net/online.ts imports
+    farm_patches.ts): patch/bed geography and ids are safe, and published
+    per-crop base rates would be too, but the moment a rate column lands in
+    that table re-check what a client can compute (the per-plot pre-roll stays
+    the only real secret).
   - Deploy-order constraint (mixed fleet): an old server process autosaves the
     whole blob WITHOUT farmPlots, so this build must be fully rolled out before
     any build that can PLANT ships; a rollback past this phase after plants exist
-    destroys plot state on the next autosave.
+    destroys plot state on the next autosave. Carry this into DEPLOY.md in the
+    phase that makes plots plantable; it lives only here until then.
   - The per-tick fplot emit stringifies every planted player's rows at 20 Hz
     (tslot-consistent, bounded at 23 beds); revisit if rows grow.
+  - Stored-data growth at fleet scale (the database-performance row, recorded
+    at Phase 2 QA; the reviewer corrected the first estimate's conflation):
+    a fully planted character adds 4,451 bytes of JSONB to characters.state
+    (23 beds at about 193.5 bytes; blob ceiling re-minted 14336). STORAGE is
+    one-time: about 44.5 MB per 10k fully planted characters. WRITE volume
+    scales with CONCURRENT ONLINE, not the table: the 30 s autosave sweep
+    (AUTOSAVE_SECONDS, server/game.ts) writes only online sessions, so the
+    worst case is about 4.45 MB per sweep at the R36 1,000-concurrent target
+    (about 148 KB/s logical). Today's real number is ZERO: no writer exists.
+    Postgres rewrites the whole TOAST value on any change, so once plants
+    exist the delta rides every autosave of a planted character; pglz should
+    compress the 23 near-identical rows well below the uncompressed figure
+    (inferred, not measured).
+  - TWO MORE HARD GATES from the database review, landing WITH the plant
+    writer (Phase 3): (1) validate the bed id against FARM_BED_IDS at plant
+    time and pin the refusal; the load-side allowlist is the ONLY 23-row
+    bound and it cannot catch a live writer bug before the blob grows.
+    (2) a runtime size signal on the serialized character state
+    (JSON.stringify(cleanState).length already exists at
+    server/db.ts saveCharacterState; guild-bank books have a measured skip
+    bound and warn, the character blob has none). Sizing measurement recipe,
+    DISPOSABLE local PG16 only: pg_column_size(state) with and without the
+    13,948-byte worst-case blob for the compressed delta, then
+    pg_current_wal_lsn() movement across about 100 repeated UPDATEs of each
+    shape for per-save WAL amplification.
   - Spectator sessions mirror the spectated player's plots into myFarmPlots (the
     whole self block does this); do not hang plant/harvest UI off it while
     spectating.

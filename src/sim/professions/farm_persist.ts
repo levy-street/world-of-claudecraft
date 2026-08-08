@@ -66,9 +66,11 @@ export function serializeFarmPlots(
   if (plots.size === 0) return undefined;
   const out: Record<string, PersistedFarmPlot> = {};
   // KEY-SORTED like the packet's other persisted maps (questedHobbies,
-  // serializeNodeReadiness), so persisted blob diffs stay readable instead of
-  // carrying per-player plant order. Readers are keyed lookups; only the
-  // serialized text changes.
+  // serializeNodeReadiness). Postgres JSONB does not preserve object key
+  // order, so this buys nothing for the DB text; what it does buy is
+  // deterministic serialized BYTES for the blob-bound suites and JS-level
+  // round-trip diffs, instead of carrying per-player plant order. Readers
+  // are keyed lookups; only the serialized text changes.
   for (const bedId of [...plots.keys()].sort((a, b) => (a < b ? -1 : a > b ? 1 : 0))) {
     const p = plots.get(bedId) as PlotState;
     out[bedId] = {
@@ -101,13 +103,41 @@ export function serializeFarmPlots(
  *
  *  Always returns a FRESH map, so an absent field loads to the no-plots
  *  default and no caller can alias the saved object. */
+/** Count hidden slots (survivalRoll / yieldSeed) that normalizeFarmPlots
+ *  dropped from SURVIVING rows: present in the saved row but non-finite (a
+ *  JSON null, a string, NaN), so the row loads clean while the slot silently
+ *  vanishes. Operator signal only, consumed by the load-site console.warn:
+ *  the row counter cannot see this family, and the growth phase needs slot
+ *  loss visible in logs before it derives replacements (the state.md
+ *  handoff rule: derive deterministically, never re-roll). Rows normalize
+ *  dropped entirely are the row counter's job, not this one's. */
+export function countDroppedHiddenSlots(
+  saved: Record<string, PersistedFarmPlot> | undefined,
+  loaded: ReadonlyMap<string, PlotState>,
+): number {
+  if (!saved || typeof saved !== 'object') return 0;
+  let dropped = 0;
+  for (const [bedId, row] of Object.entries(saved)) {
+    if (!row || typeof row !== 'object' || !loaded.has(bedId)) continue;
+    if (row.survivalRoll !== undefined && !finite(row.survivalRoll)) dropped++;
+    if (row.yieldSeed !== undefined && !finite(row.yieldSeed)) dropped++;
+  }
+  return dropped;
+}
+
 export function normalizeFarmPlots(
   saved: Record<string, PersistedFarmPlot> | undefined,
   opts: { validBedIds: ReadonlySet<string>; validCropIds: ReadonlySet<string>; nowMs: number },
 ): Map<string, PlotState> {
   const out = new Map<string, PlotState>();
   if (!saved) return out;
-  for (const [bedId, row] of Object.entries(saved)) {
+  // KEY-SORTED insertion, mirroring the serializer: the live Map's iteration
+  // order must be sim-owned, never a saved-JSON key-order artifact. The growth
+  // phase iterates this Map per tick, so an unsorted insert would make the rng
+  // stream position depend on how the DB round-tripped the blob.
+  for (const [bedId, row] of Object.entries(saved).sort(([a], [b]) =>
+    a < b ? -1 : a > b ? 1 : 0,
+  )) {
     if (!row || !opts.validBedIds.has(bedId) || !opts.validCropIds.has(row.cropId)) continue;
     if (!finite(row.plantedAtMs) || !finite(row.readyAtMs)) continue;
     if (row.plantedAtMs <= 0 || row.readyAtMs <= 0) continue;
@@ -129,9 +159,12 @@ export function normalizeFarmPlots(
       cropId: row.cropId,
       plantedAtMs,
       readyAtMs: plantedAtMs + duration,
-      // A corrupt hidden slot drops the SLOT, never the row: the growth phase
-      // re-rolls an absent slot at harvest, so dropping the plot instead would
-      // destroy a real crop over a field the player cannot see.
+      // A corrupt hidden slot drops the SLOT, never the row: dropping the
+      // plot instead would destroy a real crop over a field the player cannot
+      // see. The growth phase fills an absent slot by DERIVING a
+      // deterministic replacement (bed id plus plantedAtMs, the state.md
+      // handoff rule), never a fresh roll, so a dropped slot is not a reroll
+      // primitive.
       ...(finite(row.survivalRoll) ? { survivalRoll: row.survivalRoll } : {}),
       ...(finite(row.yieldSeed) ? { yieldSeed: row.yieldSeed } : {}),
       compost: row.compost === true,

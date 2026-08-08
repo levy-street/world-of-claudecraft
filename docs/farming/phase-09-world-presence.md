@@ -260,7 +260,7 @@ STOPPING RULES
 - Stop if a review BLOCKING cannot be fixed without out-of-scope changes.
 
 Close: gate via node scripts/gate_select.mjs (the armory browser red is the
-standing environmental exception; grep the log for "[gate] FAIL"; PR CI is the
+standing environmental exception; grep the log for "FAIL" (the selective gate prints "[gate:select] FAIL", the full gate "[gate] FAIL") plus the GATE EXIT marker; PR CI is the
 arbiter), push, and open the PR against the release branch this phase was based on
 per .github/PULL_REQUEST_TEMPLATE.md, with before/after screenshots (desktop and
 mobile) captured via the pr-screenshots skill, committed under docs/screenshots,

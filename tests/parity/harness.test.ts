@@ -101,6 +101,29 @@ describe('samplePlayerMeta', () => {
     meta.copper += 999; // mutate the live meta after sampling
     expect(digest(snapshot)).toBe(frozen); // snapshot is unaffected
   });
+
+  it('omits the inert empty farm-plot map and samples a planted plot', () => {
+    // The Phase 2 acceptance claim made explicit: farmPlots is SAMPLED (D23,
+    // gameplay state, never META_EXCLUDE), and its empty default is inert so
+    // registering the field moved no golden. Both arms pinned by name here so
+    // a future exclusion or a sampler regression reds a farming-named test.
+    const meta = freshMeta();
+    expect(Object.keys(samplePlayerMeta(meta) as Record<string, unknown>)).not.toContain(
+      'farmPlots',
+    );
+    const before = digest(samplePlayerMeta(meta));
+    meta.farmPlots.set('bed_eastbrook_1', {
+      cropId: 'wheat',
+      plantedAtMs: 1_000,
+      readyAtMs: 5_000,
+      compost: false,
+      watch: false,
+      tonic: false,
+      notified: false,
+    });
+    expect(Object.keys(samplePlayerMeta(meta) as Record<string, unknown>)).toContain('farmPlots');
+    expect(digest(samplePlayerMeta(meta))).not.toBe(before);
+  });
 });
 
 describe('sampleEntity', () => {
