@@ -13104,7 +13104,7 @@ export const es_ES: EnTranslations = {
       },
       "q_zealots": {
         "title": "Cánticos en el viento",
-        "text": "When the wind comes off the southern peaks, {playerName}, it carries chanting. The Broodsworn no longer hides - they have raised tents below the Sanctum and they sing to what sleeps beneath it. Silence twelve zealots. Every voice stilled buys the mountain another night of sleep.",
+        "text": "When the wind comes off the southern peaks, {playerName}, it carries chanting. The Broodsworn no longer hides: they have raised tents below the Sanctum and they sing to what sleeps beneath it. Silence twelve zealots. Every voice stilled buys the mountain another night of sleep.",
         "completion": "El viento está más callado. Lo que me inquieta, {playerName}, es que algo quizá responda al canto.",
         "objectives": {
           "0": {

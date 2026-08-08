@@ -234,7 +234,7 @@ Her örnek **Heroic** olarak da çalışır: daha yüksek seviyeli düşmanlar, 
 
 ### Delve'ler
 
-Delve'ler, bir veya iki oyuncu için ayrı, ölçeklenebilir bir küçük grup modudur; her seferinde rastgele odalardan yeniden inşa edilir ve bir ganimet zarı yerine kilit açma mini oyunuyla açılan kilitli bir kutsal emanet sandığında biter. **The Collapsed Reliquary** (seviye 7 ve üstü) Deacon Varric'te sona erer ve tek başına gidersen bir yapay zeka yoldaşı, Tessa, yanında savaşır. **The Drowned Litany** (seviye 12 ve üstü) izi Mirefen Marsh'ın kıyısındaki su basmış bir tapınağa kadar takip eder. Bir delve panosu kademeyi belirler: Heroic düşman seviyelerini yükseltir ve daha zengin ödüller için rastgele bir ek özellik ekler.
+Delve'ler, bir veya iki oyuncu için ayrı, ölçeklenebilir bir küçük grup modudur; her seferinde rastgele odalardan yeniden inşa edilir ve bir ganimet zarı yerine kilit açma mini oyunuyla açılan kilitli bir kutsal emanet sandığında biter. **The Collapsed Reliquary** (seviye 7 ve üstü) Deacon Vandric'te sona erer ve tek başına gidersen bir yapay zeka yoldaşı, Tessa, yanında savaşır. **The Drowned Litany** (seviye 12 ve üstü) izi Mirefen Marsh'ın kıyısındaki su basmış bir tapınağa kadar takip eder. Bir delve panosu kademeyi belirler: Heroic düşman seviyelerini yükseltir ve daha zengin ödüller için rastgele bir ek özellik ekler.
 
 ### Dereceli PvP (the Ashen Coliseum)
 

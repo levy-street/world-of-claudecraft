@@ -13064,7 +13064,7 @@ export const nl_NL: EnTranslations = {
       },
       "q_drogmar": {
         "title": "Krijgsheer Drogmar",
-        "text": "Warlord Drogmar took the Broodsworn's coin and swore the clans to the mountain's waking. He is the hammer they mean to swing at my wall - and when he slams the ground, {playerName}, do not be standing near him. Take your companions into the war-camp and end him, for Highwatch.",
+        "text": "Warlord Drogmar took the Broodsworn's coin and swore the clans to the mountain's waking. He is the hammer they mean to swing at my wall, and when he slams the ground, {playerName}, do not be standing near him. Take your companions into the war-camp and end him, for Highwatch.",
         "completion": "Drogmar, dood in zijn eigen kamp. De clans zullen zich verstrooien naar de hoge passen, je hebt mijn muur een winter gekocht, {playerName}.",
         "objectives": {
           "0": {

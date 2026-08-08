@@ -234,7 +234,7 @@ Každá instance běží také na **Heroic**: nepřátelé vyšších úrovní, 
 
 ### Delves
 
-Delves jsou samostatný, škálovatelný režim pro malou skupinu jednoho nebo dvou hráčů, při každém průchodu přestavěný z náhodných komnat a končící u zamčené relikviářové truhly, která se otevírá minihrou na páčení zámků, ne hodem o loot. **The Collapsed Reliquary** (od úrovně 7) končí u Deacon Varric a pokud jdeš sám, po tvém boku bojuje AI společnice Tessa. **The Drowned Litany** (od úrovně 12) sleduje stopu do zatopené svatyně na okraji Mirefen Marsh. Nástěnka delves nastavuje stupeň: Heroic zvedá úrovně nepřátel a přidává náhodný afix pro bohatší odměny.
+Delves jsou samostatný, škálovatelný režim pro malou skupinu jednoho nebo dvou hráčů, při každém průchodu přestavěný z náhodných komnat a končící u zamčené relikviářové truhly, která se otevírá minihrou na páčení zámků, ne hodem o loot. **The Collapsed Reliquary** (od úrovně 7) končí u Deacon Vandric a pokud jdeš sám, po tvém boku bojuje AI společnice Tessa. **The Drowned Litany** (od úrovně 12) sleduje stopu do zatopené svatyně na okraji Mirefen Marsh. Nástěnka delves nastavuje stupeň: Heroic zvedá úrovně nepřátel a přidává náhodný afix pro bohatší odměny.
 
 ### Hodnocené PvP (the Ashen Coliseum)
 

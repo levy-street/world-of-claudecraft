@@ -234,7 +234,7 @@ Gravecaller 主线贯穿三个五人精英副本，第四个则守在一道月�
 
 ### Delves
 
-Delves 是一种独立的、可缩放的小队模式，供一到两名玩家游玩，每次进入都会从随机房间重建，终点是一只上锁的圣物箱，它靠开锁小游戏打开，而不是靠战利品掷骰。**The Collapsed Reliquary**（7 级及以上）终点是 Deacon Varric，单人挑战时会有一位 AI 同伴 Tessa 与你并肩作战。**The Drowned Litany**（12 级及以上）循着线索深入 Mirefen Marsh 边缘一座被水淹没的圣所。一块 delve 公告板用来设定层级：英雄会提升敌人等级并加入一条随机词缀，以换取更丰厚的奖励。
+Delves 是一种独立的、可缩放的小队模式，供一到两名玩家游玩，每次进入都会从随机房间重建，终点是一只上锁的圣物箱，它靠开锁小游戏打开，而不是靠战利品掷骰。**The Collapsed Reliquary**（7 级及以上）终点是 Deacon Vandric，单人挑战时会有一位 AI 同伴 Tessa 与你并肩作战。**The Drowned Litany**（12 级及以上）循着线索深入 Mirefen Marsh 边缘一座被水淹没的圣所。一块 delve 公告板用来设定层级：英雄会提升敌人等级并加入一条随机词缀，以换取更丰厚的奖励。
 
 ### 排名制 PvP（the Ashen Coliseum）
 

@@ -19,8 +19,9 @@ Branch: `feature/masterwrought` (worktree `~/Documents/wocc-masterwrought`), bas
 ## Locked design rulings (settled with the maintainer 2026-08-07; do not re-litigate)
 1. R1 The above-raid step is the PERFECTING STAGE (fork B): a deliberate upgrade performed
    on an existing apex piece, consuming 1 Maker's Ember + Sundered Essence + 1 Prismglass
-   Setting per attempt (registry name amended by the Phase 03 audit; same material). It BINDS the piece, is fail-forward only (failure consumes
-   materials, never harms or downgrades the piece), and the existing craft-time masterwork
+   Setting per attempt (registry name amended by the Phase 03 audit; same material). It
+   BINDS the piece, is fail-forward only (failure consumes materials, never harms or
+   downgrades the piece), and the existing craft-time masterwork
    proc on an apex craft grants a head start on the stage instead of a quality bump.
    `src/sim/professions/masterwork.ts` and its locked constants are NOT modified.
 2. R2 Base apex pieces are freely tradable. A piece binds at the moment Perfecting begins.
@@ -436,3 +437,33 @@ registry names verified CLEAR or GENERIC. Full verdicts: naming-audit.md.
   for the c55bf057c2 wave; regen is `npm run wiki:seed`, deferred with the phase 11
   build_seed.mjs obligation); sim_i18n.ts:8240's 'Venomfire Vigor' legacy alias ("drop
   after v0.29.0") is overdue dead code, left for a cleanup phase.
+- Phase 03 review round (cross-platform-sync + qa-checklist, both COVERAGE-prompted;
+  the QA verdict was NOT READY on one blocker, all items resolved in the fix round):
+  FIXED: four em dashes on renamed lines (zone3 quest text x2, a zone3 comment,
+  build_seed.mjs) that the range-diff copy scan would have counted as added; two
+  Victor's-Surge escape artifacts in sim comments; 12 stale aura.frostbite sim DICT
+  locale rows (they still translated the ORIGINAL 'Frostbite'; now render Wintergnaw
+  per locale, matching the skin's renderings); the hud.css Rimeneedle comment and the
+  asset-pipeline weapon_vfx.js viewer copy (the rename driver only filtered
+  .ts/.mjs/.md/.json, missing .css/.js: extension gap on record); two plural 'Frozen
+  Orbs' comments the word-boundary replace missed; public/ui/*/mapping.json art
+  provenance records (25 token swaps; public/ is deployed verbatim, so old coins there
+  were live IP surface); README.md + the 20 docs/i18n mirrors' 'Deacon Varric'
+  (proper-noun swap only, no translation touched); the mediawiki seed regen was ATTEMPTED and REVERTED: npm run wiki:seed produces a
+  coin-free seed, but re-baking the zone prose re-adds 95 grandfathered em-dash lines
+  as new lines and the pre-push/CI copy scan does not exclude mediawiki/, so the regen
+  is blocked until a content-prose dash chore lands; the seed stays stale-on-record
+  with the phase 11 build_seed.mjs obligation (and still has no freshness gate,
+  hardening candidate); the naming-audit 2605-vs-2606 count reconciled (the +1 is
+  shard 10's un-articled 'Wildheart Basin' duplicate row).
+  RECORDED, pre-existing, not this phase's regressions (QA follow-ups for a cleanup or
+  QA phase, do NOT re-raise as phase defects): last-write-wins reverse-map collisions
+  in sim_i18n (Raised Bonewalker, Rime Elemental, Aether Surge, Patch Up); ability
+  def-vs-catalog English divergence (shadowform def 'Gloamveil' vs catalog 'Gloamveil
+  Form'; meteor def 'Meteor' vs catalog 'Skystone': fixing shifts parity goldens, needs
+  its own proof round); the family-wide rift mechanic-name matcher gap (Pitsteel Sweep,
+  Pitfire Ring, Hoof of Ruin, Wing Buffet and siblings render raw English in all
+  locales; closing it means new aura.* keys + 20-locale fills per name); the positional
+  item catalog (ITEM_ENTITY_IDS vs name array, length-checked only) wants a
+  derived-or-pinned guard; the rename state proof is env-gated so CI never runs it
+  (hardening candidate); release-tier pending=0 stays red by design until the fill.

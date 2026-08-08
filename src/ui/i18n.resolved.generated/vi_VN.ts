@@ -13064,7 +13064,7 @@ export const vi_VN: EnTranslations = {
       },
       "q_drogmar": {
         "title": "Lãnh Chúa Chiến Tranh Drogmar",
-        "text": "Warlord Drogmar took the Broodsworn's coin and swore the clans to the mountain's waking. He is the hammer they mean to swing at my wall - and when he slams the ground, {playerName}, do not be standing near him. Take your companions into the war-camp and end him, for Highwatch.",
+        "text": "Warlord Drogmar took the Broodsworn's coin and swore the clans to the mountain's waking. He is the hammer they mean to swing at my wall, and when he slams the ground, {playerName}, do not be standing near him. Take your companions into the war-camp and end him, for Highwatch.",
         "completion": "Drogmar, chết ngay trong trại của hắn. Các bộ tộc sẽ tản về những con đèo cao - ngươi đã mua cho bức tường của ta thêm một mùa đông, {playerName}.",
         "objectives": {
           "0": {
@@ -13104,7 +13104,7 @@ export const vi_VN: EnTranslations = {
       },
       "q_zealots": {
         "title": "Khúc Tụng Trong Gió",
-        "text": "When the wind comes off the southern peaks, {playerName}, it carries chanting. The Broodsworn no longer hides - they have raised tents below the Sanctum and they sing to what sleeps beneath it. Silence twelve zealots. Every voice stilled buys the mountain another night of sleep.",
+        "text": "When the wind comes off the southern peaks, {playerName}, it carries chanting. The Broodsworn no longer hides: they have raised tents below the Sanctum and they sing to what sleeps beneath it. Silence twelve zealots. Every voice stilled buys the mountain another night of sleep.",
         "completion": "Gió đã lặng hơn. Nhưng điều khiến ta lo lắng không phải là tiếng tụng niệm, {playerName}, mà là có thứ gì đó có thể đang tụng niệm đáp lại.",
         "objectives": {
           "0": {

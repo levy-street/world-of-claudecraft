@@ -234,7 +234,7 @@ Varje instans går också att köra på **Heroic**: fiender på högre nivå, sk
 
 ### Delves
 
-Delves är ett separat, skalbart läge för små grupper med en eller två spelare, ombyggt från slumpade kammare vid varje genomgång och avslutat vid en låst relikvariekista som öppnas genom ett dyrkningsminispel i stället för ett lootkast. **The Collapsed Reliquary** (nivå 7 och uppåt) slutar vid Deacon Varric, med en AI-följeslagare, Tessa, som slåss vid din sida om du går ensam. **The Drowned Litany** (nivå 12 och uppåt) följer spåret in i en översvämmad helgedom i utkanten av Mirefen Marsh. En delve-tavla sätter nivån: Heroic höjer fiendernas nivåer och lägger till ett slumpat affix för rikare belöningar.
+Delves är ett separat, skalbart läge för små grupper med en eller två spelare, ombyggt från slumpade kammare vid varje genomgång och avslutat vid en låst relikvariekista som öppnas genom ett dyrkningsminispel i stället för ett lootkast. **The Collapsed Reliquary** (nivå 7 och uppåt) slutar vid Deacon Vandric, med en AI-följeslagare, Tessa, som slåss vid din sida om du går ensam. **The Drowned Litany** (nivå 12 och uppåt) följer spåret in i en översvämmad helgedom i utkanten av Mirefen Marsh. En delve-tavla sätter nivån: Heroic höjer fiendernas nivåer och lägger till ett slumpat affix för rikare belöningar.
 
 ### Rankad PvP (the Ashen Coliseum)
 

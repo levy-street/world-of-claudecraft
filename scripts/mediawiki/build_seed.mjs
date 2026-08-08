@@ -140,7 +140,7 @@ add('Quick Start', section('First hour route', bullets([
 add('The Gravecaller Saga', section('Overview', 'The main story follows Brother Aldric from restless bones outside Eastbrook to Korzul the Gravewyrm beneath Thornpeak.') + section('Acts', bullets([
   link(titleBy.zone.get('eastbrook_vale'), 'Eastbrook Vale') + ' — Morthen the Gravecaller and ' + link(titleBy.dungeon.get('hollow_crypt'), 'The Hollow Crypt') + '.',
   link(titleBy.zone.get('mirefen_marsh'), 'Mirefen Marsh') + ' — Vael the Fogbinder and ' + link(titleBy.dungeon.get('sunken_bastion'), 'The Sunken Bastion') + '.',
-  link(titleBy.zone.get('thornpeak_heights'), 'Thornpeak Heights') + ' — Broodsworn zealots, Highwatch, and ' + link(titleBy.dungeon.get('gravewyrm_sanctum'), 'Gravewyrm Sanctum') + '.',
+  link(titleBy.zone.get('thornpeak_heights'), 'Thornpeak Heights') + ': Broodsworn zealots, Highwatch, and ' + link(titleBy.dungeon.get('gravewyrm_sanctum'), 'Gravewyrm Sanctum') + '.',
 ])), ['Lore', 'Quests']);
 
 add('Community Lore', section('Launch-week myths', bullets([

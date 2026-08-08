@@ -1474,7 +1474,7 @@
     },
     {
       "itemId": "reins_terrorspark_groundshaker",
-      "name": "Ignition Key: Terrorspark Groundshaker",
+      "name": "Ignition Key: Dreadspark Groundshaker",
       "sourcePack": "woc_mount_models",
       "sourceFile": "terrorspark_groundshaker.glb",
       "confidence": "high",
@@ -2039,7 +2039,7 @@
     },
     {
       "itemId": "varric_shadow_cowl",
-      "name": "Varric's Shadow Cowl",
+      "name": "Vandric's Shadow Cowl",
       "sourcePack": "helmets",
       "sourceFile": "23.png",
       "confidence": "high"
@@ -2118,21 +2118,21 @@
     },
     {
       "itemId": "wyrmcult_grand_robe",
-      "name": "Wyrmcult Grand Robe",
+      "name": "Broodsworn Grand Robe",
       "sourcePack": "armor",
       "sourceFile": "44.png",
       "confidence": "high"
     },
     {
       "itemId": "wyrmcult_orders",
-      "name": "Wyrmcult Orders",
+      "name": "Broodsworn Orders",
       "sourcePack": "generic100b",
       "sourceFile": "81.png",
       "confidence": "medium"
     },
     {
       "itemId": "wyrmcult_soulsteps",
-      "name": "Wyrmcult Soulsteps",
+      "name": "Broodsworn Soulsteps",
       "sourcePack": "equipment",
       "sourceFile": "14.png",
       "confidence": "medium"
@@ -3903,8 +3903,8 @@
           "acceptedSourcePath": "tmp/imagegen/missing-painted-icons/accepted/items/fountain_court_mantle.png"
         },
         "frostmane_mantle": {
-          "canonicalDisplayName": "Mantle of the Frostmane",
-          "canonicalGameplayMeaningOrAcquisition": "Rare cloth shoulder reward for Frostmane Tyrant in Frostveil, a trophy tied to the village's debt and the tyrant's snow mane.",
+          "canonicalDisplayName": "Mantle of the Rimemane",
+          "canonicalGameplayMeaningOrAcquisition": "Rare cloth shoulder reward for Rimemane Tyrant in Frostveil, a trophy tied to the village's debt and the tyrant's snow mane.",
           "intendedVisualSubject": "A white and ice-blue cloth shoulder mantle heavily edged in a snow-beast mane, with frost clumped at the fur tips.",
           "references": [
             {
@@ -3926,7 +3926,7 @@
               "license": "Project asset, rights reserved"
             }
           ],
-          "generationPrompt": "Use case: stylized-concept\nAsset type: square game inventory icon\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG inventory art for Mantle of the Frostmane (frostmane_mantle)\nCanonical context: Rare cloth shoulder reward for Frostmane Tyrant in Frostveil, a trophy tied to the village's debt and the tyrant's snow mane.\nSubject: A white and ice-blue cloth shoulder mantle heavily edged in a snow-beast mane, with frost clumped at the fur tips.\nScene/backdrop: opaque blue-black or charcoal atmospheric vignette\nComposition/framing: one tangible centered object or established slot-appropriate pair, strong silhouette at 28px, 10 to 16px safe margins at 128px\nLighting/mood: top-left key light with restrained rim or internal magical accent\nConstraints: physically distinct design; no UI border, rarity frame, halo, text, watermark, mannequin, character, scene diorama or crop",
+          "generationPrompt": "Use case: stylized-concept\nAsset type: square game inventory icon\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG inventory art for Mantle of the Rimemane (frostmane_mantle)\nCanonical context: Rare cloth shoulder reward for Rimemane Tyrant in Frostveil, a trophy tied to the village's debt and the tyrant's snow mane.\nSubject: A white and ice-blue cloth shoulder mantle heavily edged in a snow-beast mane, with frost clumped at the fur tips.\nScene/backdrop: opaque blue-black or charcoal atmospheric vignette\nComposition/framing: one tangible centered object or established slot-appropriate pair, strong silhouette at 28px, 10 to 16px safe margins at 128px\nLighting/mood: top-left key light with restrained rim or internal magical accent\nConstraints: physically distinct design; no UI border, rarity frame, halo, text, watermark, mannequin, character, scene diorama or crop",
           "acceptedSourcePath": "tmp/imagegen/missing-painted-icons/accepted/items/frostmane_mantle.png"
         },
         "graskbreaker_girdle": {
@@ -4120,7 +4120,7 @@
         },
         "mantle_of_the_unhorsed": {
           "canonicalDisplayName": "Mantle of the Unhorsed",
-          "canonicalGameplayMeaningOrAcquisition": "Rare cloth shoulder reward for Horn of the Huntsman in Wraithwood; the Pale Huntsman is unhorsed, his horn stops mid-note, and Gallowmere's bells answer.",
+          "canonicalGameplayMeaningOrAcquisition": "Rare cloth shoulder reward for Horn of the Huntsman in Wraithwood; the Pale Huntsman is unhorsed, his horn stops mid-note, and Gibbetmere's bells answer.",
           "intendedVisualSubject": "A spectral dark-hunt cloth shoulder mantle fastened by a snapped hunting-horn clasp and a subtle piece of broken horse tack; not a generic grave mantle.",
           "references": [
             {
@@ -4142,7 +4142,7 @@
               "license": "Project asset, rights reserved"
             }
           ],
-          "generationPrompt": "Use case: stylized-concept\nAsset type: square game inventory icon\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG inventory art for Mantle of the Unhorsed (mantle_of_the_unhorsed)\nCanonical context: Rare cloth shoulder reward for Horn of the Huntsman in Wraithwood; the Pale Huntsman is unhorsed, his horn stops mid-note, and Gallowmere's bells answer.\nSubject: A spectral dark-hunt cloth shoulder mantle fastened by a snapped hunting-horn clasp and a subtle piece of broken horse tack; not a generic grave mantle.\nScene/backdrop: opaque blue-black or charcoal atmospheric vignette\nComposition/framing: one tangible centered object or established slot-appropriate pair, strong silhouette at 28px, 10 to 16px safe margins at 128px\nLighting/mood: top-left key light with restrained rim or internal magical accent\nConstraints: physically distinct design; no UI border, rarity frame, halo, text, watermark, mannequin, character, scene diorama or crop",
+          "generationPrompt": "Use case: stylized-concept\nAsset type: square game inventory icon\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG inventory art for Mantle of the Unhorsed (mantle_of_the_unhorsed)\nCanonical context: Rare cloth shoulder reward for Horn of the Huntsman in Wraithwood; the Pale Huntsman is unhorsed, his horn stops mid-note, and Gibbetmere's bells answer.\nSubject: A spectral dark-hunt cloth shoulder mantle fastened by a snapped hunting-horn clasp and a subtle piece of broken horse tack; not a generic grave mantle.\nScene/backdrop: opaque blue-black or charcoal atmospheric vignette\nComposition/framing: one tangible centered object or established slot-appropriate pair, strong silhouette at 28px, 10 to 16px safe margins at 128px\nLighting/mood: top-left key light with restrained rim or internal magical accent\nConstraints: physically distinct design; no UI border, rarity frame, halo, text, watermark, mannequin, character, scene diorama or crop",
           "acceptedSourcePath": "tmp/imagegen/missing-painted-icons/accepted/items/mantle_of_the_unhorsed.png"
         },
         "mawscale_pauldrons": {
@@ -6530,7 +6530,7 @@
         },
         "gallowmere_grave_candle": {
           "canonicalDisplayName": "Grave-Candle",
-          "canonicalGameplayMeaningOrAcquisition": "Quest interaction token in Wraithwood: relight four Grave-Candles for Candles at the Bounds after drizzle drowned them; while lit, the boundary wards keep Gallowmere's buried dead down.",
+          "canonicalGameplayMeaningOrAcquisition": "Quest interaction token in Wraithwood: relight four Grave-Candles for Candles at the Bounds after drizzle drowned them; while lit, the boundary wards keep Gibbetmere's buried dead down.",
           "intendedVisualSubject": "A wet grave taper on a small boundary-stone base, with a dark drowned wick and only the relighting taper or first spark nearby; show the doused target state, not an already blazing candle.",
           "references": [
             {
@@ -6552,7 +6552,7 @@
               "license": "Project asset, rights reserved"
             }
           ],
-          "generationPrompt": "Use case: stylized-concept\nAsset type: square game inventory icon\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG inventory art for Grave-Candle (gallowmere_grave_candle)\nCanonical context: Quest interaction token in Wraithwood: relight four Grave-Candles for Candles at the Bounds after drizzle drowned them; while lit, the boundary wards keep Gallowmere's buried dead down.\nSubject: A wet grave taper on a small boundary-stone base, with a dark drowned wick and only the relighting taper or first spark nearby; show the doused target state, not an already blazing candle.\nScene/backdrop: opaque blue-black or charcoal atmospheric vignette\nComposition/framing: one tangible centered object or established slot-appropriate pair, strong silhouette at 28px, 10 to 16px safe margins at 128px\nLighting/mood: top-left key light with restrained rim or internal magical accent\nConstraints: physically distinct design; no UI border, rarity frame, halo, text, watermark, mannequin, character, scene diorama or crop",
+          "generationPrompt": "Use case: stylized-concept\nAsset type: square game inventory icon\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG inventory art for Grave-Candle (gallowmere_grave_candle)\nCanonical context: Quest interaction token in Wraithwood: relight four Grave-Candles for Candles at the Bounds after drizzle drowned them; while lit, the boundary wards keep Gibbetmere's buried dead down.\nSubject: A wet grave taper on a small boundary-stone base, with a dark drowned wick and only the relighting taper or first spark nearby; show the doused target state, not an already blazing candle.\nScene/backdrop: opaque blue-black or charcoal atmospheric vignette\nComposition/framing: one tangible centered object or established slot-appropriate pair, strong silhouette at 28px, 10 to 16px safe margins at 128px\nLighting/mood: top-left key light with restrained rim or internal magical accent\nConstraints: physically distinct design; no UI border, rarity frame, halo, text, watermark, mannequin, character, scene diorama or crop",
           "acceptedSourcePath": "tmp/imagegen/missing-painted-icons/accepted/items/gallowmere_grave_candle.png"
         },
         "gilded_sap_clot": {

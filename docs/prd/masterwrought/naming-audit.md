@@ -201,8 +201,11 @@ Amberfall Harvest, Wrathwing... (renamed), Hellfire... (renamed).
   protocol; several replaced non-Latin values were the other game's official
   localized coins (see the rename table note).
 
-## Appendix: per-name dispositions (2606 unique names)
+## Appendix: per-name dispositions (2606 rows)
 
+2606 rows = the 2605 unique inventory names plus one sweep-emitted variant
+('Wildheart Basin', shard 10's un-articled duplicate of 'The Wildheart Basin';
+kept as its own row so the sweep output reconciles exactly).
 Counts: RENAMED 52 | BORDERLINE (maintainer) 15 | KEEP (flagged, kept) 92 |
 CLEAR 290 | GENERIC 2157. GENERIC = shared/plain vocabulary (no search hit
 claimed); CLEAR = distinctive or coined, web-verified unclaimed by any other
@@ -2818,3 +2821,47 @@ frozen).
 | Yumi's Biggest Fan | GENERIC |  | deed:hid_yumi_cheer |
 | Yumi's Keepsake Locket | GENERIC |  | item:yumis_keepsake_locket |
 | Zealotsbane Blade | GENERIC |  | item:zealotsbane_blade |
+## Evidence links (confirmed collisions)
+
+Source URLs captured by the sweep and verify agents at audit time (they may rot;
+the named source in the rename table is the durable citation):
+
+- Crusader Strike: https://warcraft.wiki.gg/wiki/Crusader_Strike
+- Cryptbloom Shoulderguards: https://runescape.wiki/w/Cryptbloom_armour
+- Deacon Varric: https://dragonage.fandom.com/wiki/Varric_Tethras
+- Eldergleam: https://en.uesp.net/wiki/Skyrim:Eldergleam_Sanctuary
+- Flickerstep: https://diablo.fandom.com/wiki/Flickerstep
+- Frostmane Yeti: https://warcraft.wiki.gg/wiki/Frostmane_tribe
+- Frozen Orb: https://warcraft.wiki.gg/wiki/Frozen_Orb
+- Gallowmere: https://en.wikipedia.org/wiki/MediEvil
+- Glacial Spike: https://warcraft.wiki.gg/wiki/Glacial_Spike
+- Harvest Sprite: https://harvestmoon.fandom.com/wiki/Harvest_Sprites_(FoMT)
+- Hellfire Ring: https://diablo.fandom.com/wiki/Hellfire_Ring
+- Hellsteel Sweep: https://warcraft.wiki.gg/wiki/Kazzara,_the_Hellforged
+- Heroic Leap: https://warcraft.wiki.gg/wiki/Heroic_Leap
+- Holy Nova: https://warcraft.wiki.gg/wiki/Holy_Nova
+- Holy Shock: https://warcraft.wiki.gg/wiki/Holy_Shock
+- Icy Veins: https://warcraft.wiki.gg/wiki/Icy_Veins
+- Ignition Key: Terrorspark Groundshaker: https://www.wowhead.com/npc=10078/terrorspark
+- Knight-Lieutenant: https://warcraft.wiki.gg/wiki/Knight-Lieutenant
+- Mistforged Pauldrons: https://wiki.guildwars2.com/index.php?search=Mistforged
+- Nightkin Stargazer: https://fallout.fandom.com/wiki/Nightkin
+- Okku: https://forgottenrealms.fandom.com/wiki/Okku
+- Sanctum Sprint: https://wiki.guildwars2.com/wiki/Sanctum_Sprint
+- Smokestep: https://runescape.wiki/w/Smokestep_aura
+- Spellbreak: https://en.wikipedia.org/wiki/Spellbreak
+- Spellsteal: https://warcraft.wiki.gg/wiki/Spellsteal
+- Spiritmend: https://warcraft.wiki.gg/wiki/Spiritmend_Robe
+- Storm Bolt: https://warcraft.wiki.gg/wiki/Storm_Bolt
+- Stormcrag: https://en.uesp.net/wiki/Online:Stormcrag_Crypt
+- Summon Emberkin: https://www.d20pfsrd.com/races/other-races/featured-races/arg-aasimar/
+- Summon Gloomshade: https://warcraft.wiki.gg/wiki/Gloomshade_Grove
+- Summon Warfiend: https://warcraft.wiki.gg/wiki/Soulripper_Warfiend
+- Swiftmend: https://warcraft.wiki.gg/wiki/Swiftmend
+- The Moonwell: https://warcraft.wiki.gg/wiki/Moonwell
+- Varric's Shadow Cowl: https://dragonage.fandom.com/wiki/Varric_Tethras
+- Victory Rush: https://warcraft.wiki.gg/wiki/Victory_Rush
+- Winterbite: https://www.destinypedia.com/Winterbite
+- Wrathwing: https://calamitymod.fandom.com/wiki/Wrathwing
+- Wyrmcult Grand Robe: https://warcraft.wiki.gg/wiki/Wyrmcult
+- Wyvern Sting: https://warcraft.wiki.gg/wiki/Wyvern_Sting

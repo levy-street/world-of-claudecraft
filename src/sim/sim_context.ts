@@ -126,7 +126,7 @@ export interface SimContextPrimitives {
   // delayedEvents.
   pendingProjectiles: PendingProjectile[];
   readonly groundAoEs: GroundAoE[];
-  // Live frost-mage Frozen Orbs (combat/frozen_orb.ts): released by the cast's
+  // Live frost-mage Frostglobes (combat/frozen_orb.ts): released by the cast's
   // frozenOrb effect, drifted/pulsed by tickFrozenOrbs in the tick prologue.
   // Mutated in place (push/splice) like groundAoEs, so read-only.
   readonly frozenOrbs: FrozenOrbState[];

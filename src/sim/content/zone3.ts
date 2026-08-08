@@ -891,7 +891,7 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
     scale: 1.0,
     color: 0xc9c2b5,
   },
-  // Voskar the Emberwing — a young drake the Broodsworn chained above the Sanctum
+  // Voskar the Emberwing, a young drake the Broodsworn chained above the Sanctum
   // and starved into a weapon. The only dragonkin rare on the peaks: it breathes
   // fire in a wide cone, and its searing bite leaves wounds that refuse to close.
   voskar_emberwing: {
@@ -1644,7 +1644,7 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
     name: 'Warlord Drogmar',
     giverNpcId: 'captain_thessaly',
     turnInNpcId: 'captain_thessaly',
-    text: "Warlord Drogmar took the Broodsworn's coin and swore the clans to the mountain's waking. He is the hammer they mean to swing at my wall — and when he slams the ground, $N, do not be standing near him. Take your companions into the war-camp and end him, for Highwatch.",
+    text: "Warlord Drogmar took the Broodsworn's coin and swore the clans to the mountain's waking. He is the hammer they mean to swing at my wall, and when he slams the ground, $N, do not be standing near him. Take your companions into the war-camp and end him, for Highwatch.",
     completionText:
       'Drogmar, dead in his own camp. The clans will scatter to the high passes — you have bought my wall a winter, $N.',
     objectives: [
@@ -1720,7 +1720,7 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
     name: 'Chants on the Wind',
     giverNpcId: 'brother_aldric_highwatch',
     turnInNpcId: 'brother_aldric_highwatch',
-    text: 'When the wind comes off the southern peaks, $N, it carries chanting. The Broodsworn no longer hides — they have raised tents below the Sanctum and they sing to what sleeps beneath it. Silence twelve zealots. Every voice stilled buys the mountain another night of sleep.',
+    text: 'When the wind comes off the southern peaks, $N, it carries chanting. The Broodsworn no longer hides: they have raised tents below the Sanctum and they sing to what sleeps beneath it. Silence twelve zealots. Every voice stilled buys the mountain another night of sleep.',
     completionText:
       'The wind is quieter. But what troubles me is not the chanting, $N — it is that something may be chanting back.',
     objectives: [

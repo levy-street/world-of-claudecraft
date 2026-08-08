@@ -234,7 +234,7 @@ Ogni istanza gira anche in **Eroico**: nemici di livello più alto, meccaniche p
 
 ### Delve
 
-Le delve sono una modalità per piccoli gruppi separata e scalabile per uno o due giocatori, ricostruita da camere casuali a ogni run e conclusa su una cassa reliquiario chiusa a chiave che si apre attraverso un minigioco di scasso anziché con un tiro sul bottino. **The Collapsed Reliquary** (livello 7 e oltre) si conclude con Deacon Varric, con una compagna IA, Tessa, che combatte al tuo fianco se vai in solitaria. **The Drowned Litany** (livello 12 e oltre) segue la traccia dentro un santuario allagato ai margini di Mirefen Marsh. Una bacheca delle delve imposta il livello: l'Eroico alza i livelli dei nemici e aggiunge un affisso casuale per ricompense più ricche.
+Le delve sono una modalità per piccoli gruppi separata e scalabile per uno o due giocatori, ricostruita da camere casuali a ogni run e conclusa su una cassa reliquiario chiusa a chiave che si apre attraverso un minigioco di scasso anziché con un tiro sul bottino. **The Collapsed Reliquary** (livello 7 e oltre) si conclude con Deacon Vandric, con una compagna IA, Tessa, che combatte al tuo fianco se vai in solitaria. **The Drowned Litany** (livello 12 e oltre) segue la traccia dentro un santuario allagato ai margini di Mirefen Marsh. Una bacheca delle delve imposta il livello: l'Eroico alza i livelli dei nemici e aggiunge un affisso casuale per ricompense più ricche.
 
 ### PvP classificato (l'Ashen Coliseum)
 

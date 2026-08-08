@@ -229,7 +229,7 @@ Every instance also runs on **Heroic**: higher-level enemies, sharper mechanics,
 
 ### Delves
 
-Delves are a separate, scalable small-group mode for one or two players, rebuilt from randomized chambers on every run and ending on a locked reliquary chest that opens through a lockpicking minigame rather than a loot roll. **The Collapsed Reliquary** (level 7 and up) ends at Deacon Varric, with an AI companion, Tessa, fighting at your side if you go alone. **The Drowned Litany** (level 12 and up) follows the trail into a flooded shrine at the edge of Mirefen Marsh. A delve board sets the tier: Heroic raises enemy levels and adds a random affix for richer rewards.
+Delves are a separate, scalable small-group mode for one or two players, rebuilt from randomized chambers on every run and ending on a locked reliquary chest that opens through a lockpicking minigame rather than a loot roll. **The Collapsed Reliquary** (level 7 and up) ends at Deacon Vandric, with an AI companion, Tessa, fighting at your side if you go alone. **The Drowned Litany** (level 12 and up) follows the trail into a flooded shrine at the edge of Mirefen Marsh. A delve board sets the tier: Heroic raises enemy levels and adds a random affix for richer rewards.
 
 ### Ranked PvP (the Ashen Coliseum)
 

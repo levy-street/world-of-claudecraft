@@ -13064,7 +13064,7 @@ export const pl_PL: EnTranslations = {
       },
       "q_drogmar": {
         "title": "Wódz Drogmar",
-        "text": "Warlord Drogmar took the Broodsworn's coin and swore the clans to the mountain's waking. He is the hammer they mean to swing at my wall - and when he slams the ground, {playerName}, do not be standing near him. Take your companions into the war-camp and end him, for Highwatch.",
+        "text": "Warlord Drogmar took the Broodsworn's coin and swore the clans to the mountain's waking. He is the hammer they mean to swing at my wall, and when he slams the ground, {playerName}, do not be standing near him. Take your companions into the war-camp and end him, for Highwatch.",
         "completion": "Drogmar, martwy we własnym obozie. Klany rozproszą się ku wysokim przełęczom, kupiłeś mojemu murowi całą zimę, {playerName}.",
         "objectives": {
           "0": {
@@ -13104,7 +13104,7 @@ export const pl_PL: EnTranslations = {
       },
       "q_zealots": {
         "title": "Pieśni na wietrze",
-        "text": "When the wind comes off the southern peaks, {playerName}, it carries chanting. The Broodsworn no longer hides - they have raised tents below the Sanctum and they sing to what sleeps beneath it. Silence twelve zealots. Every voice stilled buys the mountain another night of sleep.",
+        "text": "When the wind comes off the southern peaks, {playerName}, it carries chanting. The Broodsworn no longer hides: they have raised tents below the Sanctum and they sing to what sleeps beneath it. Silence twelve zealots. Every voice stilled buys the mountain another night of sleep.",
         "completion": "Wiatr jest cichszy. Lecz to, co mnie niepokoi, to nie śpiewy, {playerName}, to że coś może odśpiewywać w odpowiedzi.",
         "objectives": {
           "0": {

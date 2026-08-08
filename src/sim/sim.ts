@@ -2073,7 +2073,7 @@ export class Sim {
     if (abilityId !== 'mongoose_bite') return 0;
     return Math.max(0, this.player.overpowerUntil - this.time);
   }
-  // Live frost-mage Frozen Orbs (combat/frozen_orb.ts): sim state, never
+  // Live frost-mage Frostglobes (combat/frozen_orb.ts): sim state, never
   // serialized; drifted and pulsed by tickFrozenOrbs in the tick prologue.
   private frozenOrbs: FrozenOrbState[] = [];
   // Book of Deeds: players whose deed-relevant state changed this tick (the

@@ -13064,7 +13064,7 @@ export const en_CA: EnTranslations = {
       },
       "q_drogmar": {
         "title": "Warlord Drogmar",
-        "text": "Warlord Drogmar took the Broodsworn's coin and swore the clans to the mountain's waking. He is the hammer they mean to swing at my wall - and when he slams the ground, {playerName}, do not be standing near him. Take your companions into the war-camp and end him, for Highwatch.",
+        "text": "Warlord Drogmar took the Broodsworn's coin and swore the clans to the mountain's waking. He is the hammer they mean to swing at my wall, and when he slams the ground, {playerName}, do not be standing near him. Take your companions into the war-camp and end him, for Highwatch.",
         "completion": "Drogmar, dead in his own camp. The clans will scatter to the high passes - you have bought my wall a winter, {playerName}.",
         "objectives": {
           "0": {
@@ -13104,7 +13104,7 @@ export const en_CA: EnTranslations = {
       },
       "q_zealots": {
         "title": "Chants on the Wind",
-        "text": "When the wind comes off the southern peaks, {playerName}, it carries chanting. The Broodsworn no longer hides - they have raised tents below the Sanctum and they sing to what sleeps beneath it. Silence twelve zealots. Every voice stilled buys the mountain another night of sleep.",
+        "text": "When the wind comes off the southern peaks, {playerName}, it carries chanting. The Broodsworn no longer hides: they have raised tents below the Sanctum and they sing to what sleeps beneath it. Silence twelve zealots. Every voice stilled buys the mountain another night of sleep.",
         "completion": "The wind is quieter. But what troubles me is not the chanting, {playerName} - it is that something may be chanting back.",
         "objectives": {
           "0": {

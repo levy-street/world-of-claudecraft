@@ -234,7 +234,7 @@ Mọi instance cũng chạy được ở **Heroic**: kẻ thù cấp cao hơn, c
 
 ### Delve
 
-Delve là một chế độ nhóm nhỏ có thể scale riêng biệt cho một hoặc hai người chơi, được dựng lại từ các phòng ngẫu nhiên ở mỗi lượt chơi và kết thúc tại một rương thánh tích bị khóa, mở ra qua một minigame cạy khóa chứ không phải một lượt roll loot. **The Collapsed Reliquary** (cấp 7 trở lên) kết thúc tại Deacon Varric, với một bạn đồng hành AI, Tessa, chiến đấu bên cạnh bạn nếu bạn đi một mình. **The Drowned Litany** (cấp 12 trở lên) lần theo dấu vết vào một ngôi đền ngập nước ở rìa Mirefen Marsh. Một bảng delve đặt bậc chơi: Heroic nâng cấp độ kẻ thù và thêm một affix ngẫu nhiên để có phần thưởng hậu hĩnh hơn.
+Delve là một chế độ nhóm nhỏ có thể scale riêng biệt cho một hoặc hai người chơi, được dựng lại từ các phòng ngẫu nhiên ở mỗi lượt chơi và kết thúc tại một rương thánh tích bị khóa, mở ra qua một minigame cạy khóa chứ không phải một lượt roll loot. **The Collapsed Reliquary** (cấp 7 trở lên) kết thúc tại Deacon Vandric, với một bạn đồng hành AI, Tessa, chiến đấu bên cạnh bạn nếu bạn đi một mình. **The Drowned Litany** (cấp 12 trở lên) lần theo dấu vết vào một ngôi đền ngập nước ở rìa Mirefen Marsh. Một bảng delve đặt bậc chơi: Heroic nâng cấp độ kẻ thù và thêm một affix ngẫu nhiên để có phần thưởng hậu hĩnh hơn.
 
 ### PvP xếp hạng (the Ashen Coliseum)
 
