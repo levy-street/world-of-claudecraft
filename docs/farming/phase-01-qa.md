@@ -7,6 +7,19 @@ row at 0 with no way to gain skill). Fixes ride the same PR branch as separate
 commits. The design authority is `docs/farming/state.md`; the promises under audit are
 `docs/farming/phase-01-foundation.md`.
 
+AMENDED 2026-08-08 (Phase 1 executed under D22, local-only): there is NO PR. Audit
+the merge commit of fix/farming-phase-01-foundation into feature/farming-plan
+instead: BASE=$(git merge-base origin/release/v0.36.0 feature/farming-plan) with the
+phase-start commit recorded in progress.md; ignore this file's gh pr instructions.
+Audit against the executed deviations recorded in phase-01-foundation.md's
+"EXECUTED WITH DEVIATIONS" block, progress.md Phase 1 Notes, and state.md "Locked
+deviations": expect a PENDING_ART_IDS allowlist in tests/profession_icons.test.ts
+(verify its inverted assertions and the E3 companion), expect NO parity golden
+commit (verify tests/parity is green and the regen is byte-identical rather than
+demanding an isolated golden commit), expect six commits not five, and expect the
+Master Gatherer roster prose reword (deeds.ts desc, 18 dropped locale desc fills,
+three reworded gatherDeeds bodies with 15 non-Latin fills) inside this phase.
+
 ### QA Starter Prompt
 
 ```
