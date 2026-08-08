@@ -2082,6 +2082,53 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     sellValue: 40,
   },
 
+  // --- Masterwrought shared chase materials (Masterwrought phase 04) ------
+  // The three materials every apex craft chain consumes. Faucets and gates
+  // live in src/sim/professions/masterwrought_materials.ts; the extraction
+  // that yields Sundered Essence is src/sim/professions/sundering.ts.
+  // The tradable making-catalyst: 1 to 3 drop per final-boss kill in the raid
+  // (either difficulty) and the heroic five-mans, per participant; rift A/S
+  // first clears grant deterministically; the Heroic Quartermaster sells it
+  // for Heroic Marks. Freely tradable and market-listable by ruling R2's
+  // tradable-catalyst design: same 'junk' reuse as the arcane materials, and
+  // quality 'rare' keeps sellAllJunk (poor-only) away from it.
+  wyrmfall_core: {
+    id: 'wyrmfall_core',
+    name: 'Wyrmfall Core',
+    kind: 'junk',
+    quality: 'rare',
+    stackSize: 20,
+    sellValue: 50,
+  },
+  // The bound ceiling material: sundering any raid-sourced epic of the tier
+  // (a cast-paced extraction, disenchant-adjacent) breaks it into essence.
+  // Token shape follows heroic_mark (tool + explicit stackSize + soulbound +
+  // noDiscard: a chase material is never lost to a stray discard; it is spent
+  // by the Perfecting stage).
+  sundered_essence: {
+    id: 'sundered_essence',
+    name: 'Sundered Essence',
+    kind: 'tool',
+    quality: 'epic',
+    stackSize: 20,
+    sellValue: 0,
+    soulbound: true,
+    noDiscard: true,
+  },
+  // The weekly keystone (ruling R4): 1 per week per character, bankable
+  // (missed weeks accrue), granted on the first eligible endgame completion
+  // of the week. Same token shape as the essence above.
+  makers_ember: {
+    id: 'makers_ember',
+    name: "Maker's Ember",
+    kind: 'tool',
+    quality: 'epic',
+    stackSize: 20,
+    sellValue: 0,
+    soulbound: true,
+    noDiscard: true,
+  },
+
   // --- Quartermaster's Consignment ---------------------------------------
   // A standing line of practical adventuring gear. The Merchant keeps eight
   // pieces stocked on the World Market (see seedHouseListings); four more are

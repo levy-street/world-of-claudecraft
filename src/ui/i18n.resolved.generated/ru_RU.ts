@@ -11672,6 +11672,15 @@ export const ru_RU: EnTranslations = {
       "heroic_mark": {
         "name": "Героический знак"
       },
+      "wyrmfall_core": {
+        "name": "Ядро драконопада"
+      },
+      "sundered_essence": {
+        "name": "Расколотая эссенция"
+      },
+      "makers_ember": {
+        "name": "Уголёк мастера"
+      },
       "eastbrook_buckler": {
         "name": "Истврукский баклер"
       },

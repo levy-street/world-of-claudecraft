@@ -109,6 +109,11 @@ const ALLOWED_UNCLASSIFIED_JUNK = [
   'guardian_core',
   'last_keep_signet',
   'old_cragmaws_pelt',
+  // Masterwrought phase 04: the tradable making-catalyst ships before the
+  // apex recipes that consume it (phases 07 to 10). The moment a recipe
+  // lists it as a reagent it derives IN through the reagent source table;
+  // move it out of this allowlist in that change.
+  'wyrmfall_core',
 ] as const;
 
 // The six vendor-buyable crafting staples, ruled IN by name (Q6).

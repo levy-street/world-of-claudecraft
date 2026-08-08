@@ -11672,6 +11672,15 @@ export const tr_TR: EnTranslations = {
       "heroic_mark": {
         "name": "Kahramanca Nişan"
       },
+      "wyrmfall_core": {
+        "name": "Wyrmfall Core"
+      },
+      "sundered_essence": {
+        "name": "Sundered Essence"
+      },
+      "makers_ember": {
+        "name": "Maker's Ember"
+      },
       "eastbrook_buckler": {
         "name": "Doğudere Kalkanı"
       },

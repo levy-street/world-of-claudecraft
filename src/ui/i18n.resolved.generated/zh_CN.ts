@@ -11672,6 +11672,15 @@ export const zh_CN: EnTranslations = {
       "heroic_mark": {
         "name": "英雄徽记"
       },
+      "wyrmfall_core": {
+        "name": "坠龙核心"
+      },
+      "sundered_essence": {
+        "name": "断裂精华"
+      },
+      "makers_ember": {
+        "name": "匠人余烬"
+      },
       "eastbrook_buckler": {
         "name": "东溪小圆盾"
       },

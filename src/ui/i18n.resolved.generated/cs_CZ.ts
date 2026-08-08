@@ -11672,6 +11672,15 @@ export const cs_CZ: EnTranslations = {
       "heroic_mark": {
         "name": "Hrdinská značka"
       },
+      "wyrmfall_core": {
+        "name": "Wyrmfall Core"
+      },
+      "sundered_essence": {
+        "name": "Sundered Essence"
+      },
+      "makers_ember": {
+        "name": "Maker's Ember"
+      },
       "eastbrook_buckler": {
         "name": "Eastbrookský pukléř"
       },

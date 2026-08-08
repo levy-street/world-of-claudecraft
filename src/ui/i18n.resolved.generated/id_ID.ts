@@ -11672,6 +11672,15 @@ export const id_ID: EnTranslations = {
       "heroic_mark": {
         "name": "Tanda Heroik"
       },
+      "wyrmfall_core": {
+        "name": "Wyrmfall Core"
+      },
+      "sundered_essence": {
+        "name": "Sundered Essence"
+      },
+      "makers_ember": {
+        "name": "Maker's Ember"
+      },
       "eastbrook_buckler": {
         "name": "Perisai Kecil Eastbrook"
       },

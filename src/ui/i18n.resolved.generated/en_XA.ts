@@ -11672,6 +11672,15 @@ export const en_XA: EnTranslations = {
       "heroic_mark": {
         "name": "[Ĥéŕóíç Ɱáŕķ]"
       },
+      "wyrmfall_core": {
+        "name": "[Ŵýŕɱƒáļļ Çóŕé]"
+      },
+      "sundered_essence": {
+        "name": "[Šúñðéŕéð Éššéñçé]"
+      },
+      "makers_ember": {
+        "name": "[Ɱáķéŕ'š Éɱƀéŕ]"
+      },
       "eastbrook_buckler": {
         "name": "[Éášţƀŕóóķ Ɓúçķļéŕ]"
       },

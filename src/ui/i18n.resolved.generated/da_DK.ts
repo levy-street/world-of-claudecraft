@@ -11672,6 +11672,15 @@ export const da_DK: EnTranslations = {
       "heroic_mark": {
         "name": "Heroisk Mærke"
       },
+      "wyrmfall_core": {
+        "name": "Wyrmfall Core"
+      },
+      "sundered_essence": {
+        "name": "Sundered Essence"
+      },
+      "makers_ember": {
+        "name": "Maker's Ember"
+      },
       "eastbrook_buckler": {
         "name": "Østbæk Rundskjold"
       },

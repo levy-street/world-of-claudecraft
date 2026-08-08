@@ -2188,6 +2188,30 @@
       "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
     },
     {
+      "itemId": "wyrmfall_core",
+      "name": "Wyrmfall Core",
+      "sourcePack": "woc_original_svg",
+      "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+    },
+    {
+      "itemId": "sundered_essence",
+      "name": "Sundered Essence",
+      "sourcePack": "woc_original_svg",
+      "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+    },
+    {
+      "itemId": "makers_ember",
+      "name": "Maker's Ember",
+      "sourcePack": "woc_original_svg",
+      "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+    },
+    {
       "itemId": "curved_tusk",
       "name": "Curved Tusk",
       "sourcePack": "woc_original_svg",

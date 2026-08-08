@@ -11672,6 +11672,15 @@ export const de_DE: EnTranslations = {
       "heroic_mark": {
         "name": "Heroische Marke"
       },
+      "wyrmfall_core": {
+        "name": "Wyrmfall Core"
+      },
+      "sundered_essence": {
+        "name": "Sundered Essence"
+      },
+      "makers_ember": {
+        "name": "Maker's Ember"
+      },
       "eastbrook_buckler": {
         "name": "Eastbrook-Faustschild"
       },

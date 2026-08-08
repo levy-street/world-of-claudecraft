@@ -11672,6 +11672,15 @@ export const pl_PL: EnTranslations = {
       "heroic_mark": {
         "name": "Znak heroiczny"
       },
+      "wyrmfall_core": {
+        "name": "Wyrmfall Core"
+      },
+      "sundered_essence": {
+        "name": "Sundered Essence"
+      },
+      "makers_ember": {
+        "name": "Maker's Ember"
+      },
       "eastbrook_buckler": {
         "name": "Puklerz ze Wschodniego Strumienia"
       },

@@ -11672,6 +11672,15 @@ export const vi_VN: EnTranslations = {
       "heroic_mark": {
         "name": "Dấu Ấn Anh Hùng"
       },
+      "wyrmfall_core": {
+        "name": "Wyrmfall Core"
+      },
+      "sundered_essence": {
+        "name": "Sundered Essence"
+      },
+      "makers_ember": {
+        "name": "Maker's Ember"
+      },
       "eastbrook_buckler": {
         "name": "Khiên Nhỏ Đông Khê"
       },

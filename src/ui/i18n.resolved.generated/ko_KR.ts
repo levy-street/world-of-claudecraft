@@ -11672,6 +11672,15 @@ export const ko_KR: EnTranslations = {
       "heroic_mark": {
         "name": "영웅의 징표"
       },
+      "wyrmfall_core": {
+        "name": "낙룡의 핵"
+      },
+      "sundered_essence": {
+        "name": "갈라진 정수"
+      },
+      "makers_ember": {
+        "name": "장인의 불씨"
+      },
       "eastbrook_buckler": {
         "name": "이스트브룩 버클러"
       },

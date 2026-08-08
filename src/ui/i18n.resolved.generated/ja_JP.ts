@@ -11672,6 +11672,15 @@ export const ja_JP: EnTranslations = {
       "heroic_mark": {
         "name": "英雄の証"
       },
+      "wyrmfall_core": {
+        "name": "竜墜の核"
+      },
+      "sundered_essence": {
+        "name": "断たれし精髄"
+      },
+      "makers_ember": {
+        "name": "匠の残り火"
+      },
       "eastbrook_buckler": {
         "name": "イーストブルックのバックラー"
       },

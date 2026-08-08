@@ -11672,6 +11672,15 @@ export const it_IT: EnTranslations = {
       "heroic_mark": {
         "name": "Marchio Eroico"
       },
+      "wyrmfall_core": {
+        "name": "Wyrmfall Core"
+      },
+      "sundered_essence": {
+        "name": "Sundered Essence"
+      },
+      "makers_ember": {
+        "name": "Maker's Ember"
+      },
       "eastbrook_buckler": {
         "name": "Brocchiero di Eastbrook"
       },
