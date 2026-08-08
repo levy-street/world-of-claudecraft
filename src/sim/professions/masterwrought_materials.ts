@@ -35,10 +35,9 @@
 
 import { HEROIC_DUNGEON_TUNING } from '../content/dungeon_difficulty';
 import { instanceLockoutMetas } from '../instances/dungeons';
-import type { RiftTier } from '../types';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
-import type { Entity } from '../types';
+import type { Entity, RiftTier } from '../types';
 import { NYTHRAXIS_BOSS_ID } from '../types';
 
 export const WYRMFALL_CORE_ITEM_ID = 'wyrmfall_core';
