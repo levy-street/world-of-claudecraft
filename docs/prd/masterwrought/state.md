@@ -467,3 +467,22 @@ registry names verified CLEAR or GENERIC. Full verdicts: naming-audit.md.
   item catalog (ITEM_ENTITY_IDS vs name array, length-checked only) wants a
   derived-or-pinned guard; the rename state proof is env-gated so CI never runs it
   (hardening candidate); release-tier pending=0 stays red by design until the fill.
+- Phase 03 pin-audit round (test-coverage-auditor, applied in 6b90a3d908) + gate
+  fallout (17e5934a8c): the auditor proved two ip_scrub arms DEAD (the scanner never
+  walked deed names/reward titles or graveyard labels; Sanctum Sprint,
+  Knight-Lieutenant, and Eldershine Rest were guarded only by literal pins) and two
+  renames UNPINNED at their source (sim DICT aura.frostbite English row, the armory
+  catalog skin literal): both scan surfaces added, all pins added, POI pins now
+  resolve by frozen poi id, and a new teeth test replays every phase 03 old name so
+  an inert hardcoded arm fails the gate. The rename state proof gained a scoping
+  self-check plus the committed-slice invocation recipe (base = the mint commit's
+  parent 233bd5bed0~1, NOT HEAD~1; re-run green 7/7 post-commit). The stale-tree gate
+  run also surfaced the zh_CN mount-name pin (CJK literals need their own pass beside
+  the English-token driver; sweep found exactly one) and the eastbrook polish
+  fingerprint (folds renderer.ts; re-minted via its own script, stale-pin verdict
+  applied). GATE INFRASTRUCTURE GOTCHA hit twice: the turbo i18n:gen task cache is
+  SHARED ACROSS WORKTREES in the main checkout and its input list omits
+  src/sim/content plus the sim/server DICTs, so a warm cache replays stale resolved
+  bundles the local regen cannot reproduce; run the gate with TURBO_FORCE=1 on this
+  branch until the input-list fix (on feature/bank-storage) merges. Memory updated
+  ([[turbo-i18n-gen-stale-dict-cache]]).
