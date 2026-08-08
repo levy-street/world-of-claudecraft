@@ -54,16 +54,18 @@ function makeClientWorld(): ClientWorld {
 }
 
 describe('professions contracts (#1164)', () => {
-  it('IWorldProfessions.professionsState carries the four all-zero gathering skills on a fresh Sim', () => {
+  it('IWorldProfessions.professionsState carries the five all-zero gathering skills on a fresh Sim', () => {
     const sim = new Sim({ seed: SIM_SEED, playerClass: PROBE_CLASS });
     // Pins the enforced per-profession caps
-    // (mining/logging/herbalism 100, fishing 200) replace the old uniform 300.
+    // (mining/logging/herbalism/farming 100, fishing 200) replace the old
+    // uniform 300, and the append-last order farming joined in.
     expect(sim.professionsState).toEqual({
       skills: [
         { professionId: 'mining', skill: 0, maxSkill: 100 },
         { professionId: 'logging', skill: 0, maxSkill: 100 },
         { professionId: 'herbalism', skill: 0, maxSkill: 100 },
         { professionId: 'fishing', skill: 0, maxSkill: 200 },
+        { professionId: 'farming', skill: 0, maxSkill: 100 },
       ],
     });
   });

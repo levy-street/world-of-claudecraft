@@ -553,6 +553,31 @@ describe('tool-tier lock dimension', () => {
     expect(gatherDeniedLineKey('corpse', undefined, 2)).toBe(
       'hudChrome.gathering.toolTierUnmetCorpse',
     );
+    // Farming joined the node arm with its crop beds, so all THREE sub-arms
+    // must resolve farming-specific keys. Pinned per sub-arm rather than once:
+    // an id left off the node-profession check falls through silently, and the
+    // player is told about a corpse tool while standing at a crop bed.
+    expect(gatherDeniedLineKey('node', 'farming', 2)).toBe(
+      'hudChrome.gathering.toolTierUnmet.farming',
+    );
+    expect(gatherDeniedLineKey('node', 'farming', 1)).toBe(
+      'hudChrome.gathering.toolRequired.farming',
+    );
+    expect(gatherDeniedLineKey('node', 'farming', 1, 40)).toBe(
+      'hudChrome.gathering.wieldUnmet.farming',
+    );
+    // The fallthrough this guards against, named: none of the three may land on
+    // the profession-neutral corpse pair, which is where an unlisted id goes.
+    for (const key of [
+      gatherDeniedLineKey('node', 'farming', 2),
+      gatherDeniedLineKey('node', 'farming', 1),
+      gatherDeniedLineKey('node', 'farming', 1, 40),
+    ]) {
+      expect(
+        ['hudChrome.gathering.toolTierUnmetCorpse', 'hudChrome.gathering.wieldUnmetCorpse'],
+        'farming must never fall through to a corpse line',
+      ).not.toContain(key);
+    }
     // Unexpected shapes never reach t() with an untracked key: a node surface
     // with fishing (no fishing world nodes) or a missing professionId falls
     // back to the profession-neutral corpse line.
@@ -567,8 +592,13 @@ describe('tool-tier lock dimension', () => {
     expect(gatherToolNoNodeKey('mining')).toBe('hudChrome.gathering.noNodeNearby.mining');
     expect(gatherToolNoNodeKey('logging')).toBe('hudChrome.gathering.noNodeNearby.logging');
     expect(gatherToolNoNodeKey('herbalism')).toBe('hudChrome.gathering.noNodeNearby.herbalism');
+    // Farming has its own arm: a hoe used away from a bed must say so. Without
+    // the arm it inherits the mining fallback and reports a missing ore vein,
+    // which is why the mining key is called out as the wrong answer here.
+    expect(gatherToolNoNodeKey('farming')).toBe('hudChrome.gathering.noNodeNearby.farming');
+    expect(gatherToolNoNodeKey('farming')).not.toBe('hudChrome.gathering.noNodeNearby.mining');
     // Fishing never emits gatherToolNoNode (rods route to startFishing), so
-    // anything but the three node professions takes the safe mining fallback.
+    // anything but the four node professions takes the safe mining fallback.
     expect(gatherToolNoNodeKey('fishing')).toBe('hudChrome.gathering.noNodeNearby.mining');
   });
 
@@ -582,7 +612,13 @@ describe('buildGatheringProficiencyRows', () => {
   it('returns one row per gathering profession, in the fixed order', () => {
     const world = makeWorld({ proficiency: { mining: 3, logging: 0, herbalism: 7 } });
     const rows = buildGatheringProficiencyRows(world);
-    expect(rows.map((r) => r.professionId)).toEqual(['mining', 'logging', 'herbalism', 'fishing']);
+    expect(rows.map((r) => r.professionId)).toEqual([
+      'mining',
+      'logging',
+      'herbalism',
+      'fishing',
+      'farming',
+    ]);
   });
 
   it('matches the input values exactly', () => {
@@ -593,13 +629,14 @@ describe('buildGatheringProficiencyRows', () => {
       { professionId: 'logging', value: 4, displayValue: 4, maxSkill: 100 },
       { professionId: 'herbalism', value: 0, displayValue: 0, maxSkill: 100 },
       { professionId: 'fishing', value: 0, displayValue: 0, maxSkill: 200 },
+      { professionId: 'farming', value: 0, displayValue: 0, maxSkill: 100 },
     ]);
   });
 
   it('carries the per-profession content cap so a readout can render a denominator', () => {
     // A bare integer that moves +1 per harvest is what reads as a character
     // level. Every row carries its own cap, and fishing's 200 is NOT the 100
-    // the other three share, so a readout can never print one profession's bar
+    // the other four share, so a readout can never print one profession's bar
     // against another's ceiling.
     const rows = buildGatheringProficiencyRows(makeWorld({ proficiency: { mining: 12 } }));
     expect(rows.map((r) => [r.professionId, r.maxSkill])).toEqual([
@@ -607,6 +644,7 @@ describe('buildGatheringProficiencyRows', () => {
       ['logging', 100],
       ['herbalism', 100],
       ['fishing', 200],
+      ['farming', 100],
     ]);
   });
 
@@ -614,8 +652,8 @@ describe('buildGatheringProficiencyRows', () => {
     // The cap comes from GATHERING_PROFESSIONS, not the per-row wire value,
     // precisely so a missing or garbage skills row degrades to "0 / 100"
     // rather than a nonsense "0 / 0" or "0 / undefined". mining carries a
-    // deliberately wrong wire cap and logging a zero one; herbalism and
-    // fishing carry no wire row at all.
+    // deliberately wrong wire cap and logging a zero one; herbalism, fishing,
+    // and farming carry no wire row at all.
     const world = {
       player: { pos: { x: 0, z: 0 } },
       inventory: [],
@@ -633,6 +671,7 @@ describe('buildGatheringProficiencyRows', () => {
       ['logging', 100],
       ['herbalism', 100],
       ['fishing', 200],
+      ['farming', 100],
     ]);
     // The values themselves still come off the wire, so the cap swap did not
     // quietly detach the readout from the player's real proficiency.

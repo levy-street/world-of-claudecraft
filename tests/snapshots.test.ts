@@ -3600,7 +3600,7 @@ function dirtyEveryDeltaField(): {
   meta.delveMarks = 7;
   meta.delveClears = { 'collapsed_reliquary:heroic': 1 };
   meta.companionUpgrades = { companion_tessa: 2 };
-  meta.gatheringProficiency = { mining: 6, logging: 0, herbalism: 0, fishing: 0 };
+  meta.gatheringProficiency = { mining: 6, logging: 0, herbalism: 0, fishing: 0, farming: 0 };
   // tslot: a REAL slotted effect, not the empty default. Without this the key
   // rides the first snapshot as `[]`, which is not null, so it passes the
   // "dirtied to a non-default value" loop below vacuously and nothing anywhere
@@ -4013,6 +4013,7 @@ describe('full self-state snapshot delta fixture', () => {
       logging: 0,
       herbalism: 0,
       fishing: 0,
+      farming: 0,
     }); // gprof -> gatheringProficiency
     // tslot -> toolEffectSlots: the projected row shape, so a decode onto the
     // wrong field or a renamed wire key reddens here rather than silently
@@ -4034,13 +4035,15 @@ describe('full self-state snapshot delta fixture', () => {
     expect(client.nodeHarvestableByMe(GATHER_NODES[0].id)).toBe(false);
     expect(client.nodeHarvestableByMe('not_a_real_node')).toBe(true);
     // Re-pin: the enforced per-profession caps
-    // (mining/logging/herbalism 100, fishing 200) replace the old uniform 300.
+    // (mining/logging/herbalism/farming 100, fishing 200) replace the old
+    // uniform 300, in the append-last order farming joined in.
     expect(client.professionsState).toEqual({
       skills: [
         { professionId: 'mining', skill: 6, maxSkill: 100 },
         { professionId: 'logging', skill: 0, maxSkill: 100 },
         { professionId: 'herbalism', skill: 0, maxSkill: 100 },
         { professionId: 'fishing', skill: 0, maxSkill: 200 },
+        { professionId: 'farming', skill: 0, maxSkill: 100 },
       ],
     }); // prof -> professionsState
     expect(client.craftingIdentity).toMatchObject({

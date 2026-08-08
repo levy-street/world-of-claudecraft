@@ -389,6 +389,11 @@ describe('hudChrome.gathering catch line (Professions 2.0)', () => {
       expect(hasTranslation(key as Parameters<typeof hasTranslation>[0]), key).toBe(true);
       expect(GATHERING_PROFESSION_NAME_KEYS[id], `name key for ${id}`).toBe(key);
     }
+    // The loop above builds its expectation from the id itself, so it proves
+    // the SHAPE of every row rather than any one row's value. Farming, the
+    // newest id and the one whose absence the fan-out actually caught (an
+    // unlisted id renders NO name anywhere), is pinned to its literal key too.
+    expect(GATHERING_PROFESSION_NAME_KEYS.farming).toBe('hudChrome.gathering.farming');
     // No extra ids: an entry for a profession that no longer exists would
     // render a label for a row nothing produces.
     expect(Object.keys(GATHERING_PROFESSION_NAME_KEYS).sort()).toEqual(

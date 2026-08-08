@@ -51,6 +51,16 @@ const ART_ICON_IDS = [
   'masterwork_seal',
 ];
 
+// Row ids that ship PROCEDURAL-ONLY until the maintainer's next painted icon
+// batch: the manifest declares them (so the commission is on the books) and
+// their recipe renders the live UI, but no .webp master exists yet, so they are
+// deliberately absent from PROFESSION_IMAGE_IDS and from mapping.json. Only the
+// art-backed assertions of E2 are relaxed for these; every other guard here
+// still binds them, and the companion test below pins that the procedural
+// fallback they fall back TO actually exists. The farming asset manifest lands
+// with the phase 13 art batch and clears this list.
+const PENDING_ART_IDS = new Set(['gather_farming']);
+
 const isDotfile = (p: string): boolean => path.basename(p).startsWith('.');
 const isMapping = (p: string): boolean => path.basename(p) === 'mapping.json';
 
@@ -167,6 +177,7 @@ describe('profession webp icons', () => {
 
   it('covers exactly the profession and gathering ids that retain procedural recipes', () => {
     expect([...RECIPE_ICON_IDS].sort()).toEqual([
+      'gather_farming',
       'gather_fishing',
       'gather_herbalism',
       'gather_logging',
@@ -271,6 +282,18 @@ describe('profession webp icons', () => {
     const productionIds = [...PROFESSION_IMAGE_IDS];
     const mutableImageIds = PROFESSION_IMAGE_IDS as Set<string>;
     for (const id of RECIPE_ICON_IDS) {
+      if (PENDING_ART_IDS.has(id)) {
+        // Inverted rather than skipped, so the allowlist cannot outlive the art
+        // it is waiting on: the day the maintainer's batch commits
+        // <id>.webp and the generated registry picks it up, THIS assertion
+        // fails and the id must be struck from PENDING_ART_IDS above.
+        expect(
+          PROFESSION_IMAGE_IDS.has(id),
+          `${id} is on the pending-art allowlist but is now art-backed: drop it from PENDING_ART_IDS`,
+        ).toBe(false);
+        expect(professionImageUrl(id)).toBeNull();
+        continue;
+      }
       expect(PROFESSION_IMAGE_IDS.has(id), `${id} must begin art-backed in production`).toBe(true);
       expect(professionImageUrl(id)).toBe(`/ui/professions/${id}.webp`);
     }
@@ -293,6 +316,25 @@ describe('profession webp icons', () => {
     }
 
     expect([...PROFESSION_IMAGE_IDS]).toEqual(productionIds);
+  });
+
+  it('E3) every pending-art id is a real row id that renders a procedural icon', () => {
+    // The price of the E2 relaxation: an id excused from the art check must
+    // still prove it renders SOMETHING deliberate, or the allowlist would be a
+    // way to ship a row with the generic unknown-icon fallback. Three claims,
+    // because each fails differently: the id is a live row (not a typo that
+    // silently excuses nothing), it has an explicit recipe, and it composes.
+    stubCanvasDocument();
+    for (const id of PENDING_ART_IDS) {
+      expect(RECIPE_ICON_IDS, `${id} must be a live profession/gathering row id`).toContain(id);
+      expect(
+        hasProfessionIconRecipe(id),
+        `${id} ships procedural-only, so it MUST have an explicit recipe`,
+      ).toBe(true);
+      const url = professionIconUrl(id, 46);
+      expect(url, `${id} must compose a procedural icon`).toBe(STUB_DATA_URL);
+      expect((url as string).length, `${id} procedural icon must be non-empty`).toBeGreaterThan(0);
+    }
   });
 
   it('F) mapping.json provenance stays a bijection with the committed files at 128px', () => {

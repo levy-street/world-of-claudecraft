@@ -251,9 +251,11 @@ describe('char_window: profession art placements', () => {
     const values = [...root.querySelectorAll('.char-gather-row b')].map((b) => b.textContent);
     // The row renders a BOUNDED "skill / max", never a bare integer. The floor
     // still holds (99.75 and 99.5 read 99, never a fake crossed 100), and
-    // fishing's denominator is its own 200 cap, not the 100 the other three
-    // share.
-    expect(values).toEqual(['99 / 100', '12 / 100', '100 / 100', '99 / 200']);
+    // fishing's denominator is its own 200 cap, not the 100 the other four
+    // share. Farming's untouched "0 / 100" tail is load-bearing: a gathering id
+    // missing from GATHERING_PROFESSION_NAME_KEYS renders NO row at all, so
+    // this list length is what catches the silent drop on a fifth profession.
+    expect(values).toEqual(['99 / 100', '12 / 100', '100 / 100', '99 / 200', '0 / 100']);
     // Decisive against a regression to the bare integer: no row may render a
     // lone number with no denominator.
     for (const value of values) expect(value).toMatch(/^\d+ \/ \d+$/);

@@ -1422,7 +1422,17 @@ describe('Guide professions generated content accuracy', () => {
 });
 
 describe('Guide professions gathering accuracy', () => {
-  it('covers the four gathering professions with grounded caps and bands', () => {
+  it('covers every gathering profession with grounded caps and bands', () => {
+    // Literal list, not a mirror of GATHERING_PROFESSION_IDS: comparing the
+    // generated ids against the same array the generator iterates cannot see a
+    // trade that never reached the wiki. The mirror below still ties order.
+    expect(GUIDE_PROF_GATHERING.map((g) => g.id)).toEqual([
+      'mining',
+      'logging',
+      'herbalism',
+      'fishing',
+      'farming',
+    ]);
     expect(GUIDE_PROF_GATHERING.map((g) => g.id)).toEqual([...GATHERING_PROFESSION_IDS]);
     for (const g of GUIDE_PROF_GATHERING) {
       expect(g.maxSkill).toBe(
@@ -1432,12 +1442,47 @@ describe('Guide professions gathering accuracy', () => {
     }
     expect(GUIDE_PROF_GATHERING.find((g) => g.id === 'mining')?.maxSkill).toBe(100);
     expect(GUIDE_PROF_GATHERING.find((g) => g.id === 'fishing')?.maxSkill).toBe(200);
+    expect(GUIDE_PROF_GATHERING.find((g) => g.id === 'farming')?.maxSkill).toBe(100);
+  });
+
+  // Both hub bodies used to spell the trade count into the prose ("four
+  // gathering trades"), which made the wiki quietly lie the moment a fifth
+  // trade was registered. They are count-free now, and the hub sentence names
+  // every trade the sim ships, so a sixth one cannot land without an edit here.
+  it('describes the gathering trades count-free and names every one of them', () => {
+    setLanguage('en');
+    const bodies = [
+      ['guide.professions.whatBody', t('guide.professions.whatBody')],
+      ['guide.professions.gatherHubBody', t('guide.professions.gatherHubBody')],
+    ] as const;
+    for (const [key, value] of bodies) {
+      expect(value.length, key).toBeGreaterThan(0);
+      expect(value, `${key} spells a gathering-trade count`).not.toMatch(/\b(four|five)\b/i);
+    }
+    const gatherHubBody = t('guide.professions.gatherHubBody');
+    for (const id of GATHERING_PROFESSION_IDS) {
+      const name = GATHERING_PROFESSIONS[id].name;
+      expect(gatherHubBody, `gatherHubBody never names ${name}`).toContain(name);
+    }
+    // Literal, so the loop above cannot pass vacuously on an empty id list.
+    expect(gatherHubBody).toContain('Farming');
   });
 
   it('aggregates every world node into its zone row (tool tier = node tier)', () => {
     const typeFor: Record<string, string> = { mining: 'ore', logging: 'wood', herbalism: 'herb' };
     for (const g of GUIDE_PROF_GATHERING) {
       if (g.id === 'fishing') continue;
+      if (g.id === 'farming') {
+        // Farming is registered as a trade before its beds, tools, and harvest
+        // table exist, so the generator emits the row with empty tables and no
+        // respawn number. Pinned empty ON PURPOSE: the phase that ships farming
+        // content reds here and has to give the trade real rows, rather than
+        // slipping through a skip.
+        expect(g.nodes).toEqual([]);
+        expect(g.tools).toEqual([]);
+        expect(g.respawnSeconds).toBeUndefined();
+        continue;
+      }
       const simNodes = GATHER_NODES.filter((n) => n.type === typeFor[g.id]);
       const total = (g.nodes ?? []).reduce((sum, row) => sum + row.count, 0);
       expect(total, `${g.id} node count drifted`).toBe(simNodes.length);

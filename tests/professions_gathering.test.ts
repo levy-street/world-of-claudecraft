@@ -16,8 +16,9 @@ function makeSim(seed = 42) {
 }
 
 describe('gathering profession proficiency (#1119)', () => {
-  it('content table defines the four gathering professions', () => {
+  it('content table defines the five gathering professions', () => {
     expect(Object.keys(GATHERING_PROFESSIONS).sort()).toEqual([
+      'farming',
       'fishing',
       'herbalism',
       'logging',
@@ -31,16 +32,34 @@ describe('gathering profession proficiency (#1119)', () => {
     sim.chat('/dev gather mining 5', pid);
     sim.tick();
     const meta = (sim as any).players.get(pid);
-    expect(meta.gatheringProficiency).toEqual({ mining: 5, logging: 0, herbalism: 0, fishing: 0 });
+    expect(meta.gatheringProficiency).toEqual({
+      mining: 5,
+      logging: 0,
+      herbalism: 0,
+      fishing: 0,
+      farming: 0,
+    });
 
     sim.chat('/dev gather mining 3', pid);
     sim.tick();
-    expect(meta.gatheringProficiency).toEqual({ mining: 8, logging: 0, herbalism: 0, fishing: 0 });
+    expect(meta.gatheringProficiency).toEqual({
+      mining: 8,
+      logging: 0,
+      herbalism: 0,
+      fishing: 0,
+      farming: 0,
+    });
 
     sim.chat('/dev gather logging 2', pid);
     sim.tick();
     // Mining is untouched by a Logging grant: independent, additive counters.
-    expect(meta.gatheringProficiency).toEqual({ mining: 8, logging: 2, herbalism: 0, fishing: 0 });
+    expect(meta.gatheringProficiency).toEqual({
+      mining: 8,
+      logging: 2,
+      herbalism: 0,
+      fishing: 0,
+      farming: 0,
+    });
   });
 
   it('the IWorld read surface exposes the same per-profession skills, mapped to PlayerProfessionSkill', () => {
@@ -48,7 +67,7 @@ describe('gathering profession proficiency (#1119)', () => {
     const pid = sim.playerId;
     sim.chat('/dev gather herbalism 4', pid);
     sim.tick();
-    // The enforced per-profession caps (mining/logging/herbalism 100,
+    // The enforced per-profession caps (mining/logging/herbalism/farming 100,
     // fishing 200) replace the old uniform 300.
     const expected = {
       skills: [
@@ -56,6 +75,7 @@ describe('gathering profession proficiency (#1119)', () => {
         { professionId: 'logging', skill: 0, maxSkill: 100 },
         { professionId: 'herbalism', skill: 4, maxSkill: 100 },
         { professionId: 'fishing', skill: 0, maxSkill: 200 },
+        { professionId: 'farming', skill: 0, maxSkill: 100 },
       ],
     };
     expect(sim.professionsState).toEqual(expected);
@@ -70,13 +90,25 @@ describe('gathering profession proficiency (#1119)', () => {
     sim.tick();
 
     const state = (sim as any).serializeCharacter(pid);
-    expect(state.professions).toEqual({ mining: 7, logging: 0, herbalism: 2, fishing: 0 });
+    expect(state.professions).toEqual({
+      mining: 7,
+      logging: 0,
+      herbalism: 2,
+      fishing: 0,
+      farming: 0,
+    });
 
     // Fresh Sim, same character, loading the saved state back in.
     const sim2 = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
     const loadedPid = sim2.addPlayer('warrior', 'Loaded', { state });
     const meta2 = (sim2 as any).players.get(loadedPid);
-    expect(meta2.gatheringProficiency).toEqual({ mining: 7, logging: 0, herbalism: 2, fishing: 0 });
+    expect(meta2.gatheringProficiency).toEqual({
+      mining: 7,
+      logging: 0,
+      herbalism: 2,
+      fishing: 0,
+      farming: 0,
+    });
   });
 
   it('a NONZERO fishing proficiency survives the save/load round trip', () => {
@@ -91,12 +123,19 @@ describe('gathering profession proficiency (#1119)', () => {
 
     const state = (sim as any).serializeCharacter(pid);
     // The save dual-writes both the legacy and the current key.
-    expect(state.professions).toEqual({ mining: 7, logging: 0, herbalism: 0, fishing: 57 });
+    expect(state.professions).toEqual({
+      mining: 7,
+      logging: 0,
+      herbalism: 0,
+      fishing: 57,
+      farming: 0,
+    });
     expect(state.gatheringProficiency).toEqual({
       mining: 7,
       logging: 0,
       herbalism: 0,
       fishing: 57,
+      farming: 0,
     });
 
     const sim2 = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
@@ -107,6 +146,7 @@ describe('gathering profession proficiency (#1119)', () => {
       logging: 0,
       herbalism: 0,
       fishing: 57,
+      farming: 0,
     });
   });
 
@@ -128,7 +168,13 @@ describe('gathering profession proficiency (#1119)', () => {
     const sim2 = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
     const loadedPid = sim2.addPlayer('warrior', 'RolledBack', { state });
     const meta2 = (sim2 as any).players.get(loadedPid);
-    expect(meta2.gatheringProficiency).toEqual({ mining: 7, logging: 0, herbalism: 0, fishing: 0 });
+    expect(meta2.gatheringProficiency).toEqual({
+      mining: 7,
+      logging: 0,
+      herbalism: 0,
+      fishing: 0,
+      farming: 0,
+    });
   });
 
   it('backward-compatible: an old save lacking the field loads with all-zero proficiency', () => {
@@ -146,7 +192,13 @@ describe('gathering profession proficiency (#1119)', () => {
     const sim2 = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
     loadedPid = sim2.addPlayer('warrior', 'Old', { state });
     const meta2 = (sim2 as any).players.get(loadedPid);
-    expect(meta2.gatheringProficiency).toEqual({ mining: 0, logging: 0, herbalism: 0, fishing: 0 });
+    expect(meta2.gatheringProficiency).toEqual({
+      mining: 0,
+      logging: 0,
+      herbalism: 0,
+      fishing: 0,
+      farming: 0,
+    });
   });
 
   it('a genuine pre-rename save (professions set, gatheringProficiency absent) loads via the legacy fallback', () => {
@@ -159,14 +211,26 @@ describe('gathering profession proficiency (#1119)', () => {
     // Simulate a save written before the gatheringProficiency rename: only the
     // legacy `professions` key carries real data.
     delete state.gatheringProficiency;
-    expect(state.professions).toEqual({ mining: 6, logging: 0, herbalism: 0, fishing: 0 });
+    expect(state.professions).toEqual({
+      mining: 6,
+      logging: 0,
+      herbalism: 0,
+      fishing: 0,
+      farming: 0,
+    });
 
     const sim2 = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
     const loadedPid = sim2.addPlayer('warrior', 'PreRename', { state });
     const meta2 = (sim2 as any).players.get(loadedPid);
     // Regression pin for the dead reassignments that dropped this fallback:
     // must load the legacy data, not all-zero.
-    expect(meta2.gatheringProficiency).toEqual({ mining: 6, logging: 0, herbalism: 0, fishing: 0 });
+    expect(meta2.gatheringProficiency).toEqual({
+      mining: 6,
+      logging: 0,
+      herbalism: 0,
+      fishing: 0,
+      farming: 0,
+    });
   });
 
   it('normalizeGatheringProficiency defaults zero on undefined/partial/malformed input', () => {
@@ -177,6 +241,7 @@ describe('gathering profession proficiency (#1119)', () => {
       logging: 0,
       herbalism: 0,
       fishing: 0,
+      farming: 0,
     });
     // malformed/negative values are clamped, never thrown
     expect(normalizeGatheringProficiency({ mining: -5, logging: 'nope' as any })).toEqual({
@@ -184,6 +249,7 @@ describe('gathering profession proficiency (#1119)', () => {
       logging: 0,
       herbalism: 0,
       fishing: 0,
+      farming: 0,
     });
     // A nonzero fishing value passes through intact (every other
     // fixture in this file feeds fishing 0, which a fishing-specific drop
@@ -193,6 +259,7 @@ describe('gathering profession proficiency (#1119)', () => {
       logging: 0,
       herbalism: 0,
       fishing: 57,
+      farming: 0,
     });
   });
 
@@ -224,7 +291,13 @@ describe('gathering profession proficiency (#1119)', () => {
     queueGatheringGrant(meta, 'mining', 3);
     queueGatheringGrant(meta, 'mining', 4);
     drainGatheringGrants(meta);
-    expect(meta.gatheringProficiency).toEqual({ mining: 7, logging: 0, herbalism: 0, fishing: 0 });
+    expect(meta.gatheringProficiency).toEqual({
+      mining: 7,
+      logging: 0,
+      herbalism: 0,
+      fishing: 0,
+      farming: 0,
+    });
     expect(meta.pendingGatherGrants).toEqual([]);
   });
 
@@ -237,7 +310,13 @@ describe('gathering profession proficiency (#1119)', () => {
     queueGatheringGrant(meta, 'mining', -3);
     queueGatheringGrant(meta, 'mining', 0);
     drainGatheringGrants(meta);
-    expect(meta.gatheringProficiency).toEqual({ mining: 5, logging: 0, herbalism: 0, fishing: 0 });
+    expect(meta.gatheringProficiency).toEqual({
+      mining: 5,
+      logging: 0,
+      herbalism: 0,
+      fishing: 0,
+      farming: 0,
+    });
     expect(meta.pendingGatherGrants).toEqual([]);
   });
 
@@ -329,7 +408,13 @@ describe('gathering profession proficiency (#1119)', () => {
     sim.chat('/dev gather mining 5', pid);
     sim.tick();
     const meta = (sim as any).players.get(pid);
-    expect(meta.gatheringProficiency).toEqual({ mining: 0, logging: 0, herbalism: 0, fishing: 0 });
+    expect(meta.gatheringProficiency).toEqual({
+      mining: 0,
+      logging: 0,
+      herbalism: 0,
+      fishing: 0,
+      farming: 0,
+    });
   });
 
   it('node-tier-relative gain: gatherNodeGainMultiplier walks the mastery curve AT the band boundaries', () => {
@@ -371,6 +456,12 @@ describe('gathering profession proficiency (#1119)', () => {
     expect(() => sim.chat('/dev gather skinning 5', pid)).not.toThrow();
     sim.tick();
     const meta = (sim as any).players.get(pid);
-    expect(meta.gatheringProficiency).toEqual({ mining: 0, logging: 0, herbalism: 0, fishing: 0 });
+    expect(meta.gatheringProficiency).toEqual({
+      mining: 0,
+      logging: 0,
+      herbalism: 0,
+      fishing: 0,
+      farming: 0,
+    });
   });
 });
