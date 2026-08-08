@@ -386,6 +386,7 @@ import {
   isEnchantedInstance,
 } from './professions/enchanting';
 import {
+  countDroppedHiddenSlots,
   normalizeFarmPlots,
   type PersistedFarmPlot,
   serializeFarmPlots,
@@ -3300,11 +3301,19 @@ export class Sim {
       });
       // Dev-channel visibility for the silent-drop arms (the knownRecipes
       // precedent): a retired bed id or a tampered row vanishes on load by
-      // design, but an operator reading server logs should see it happen.
-      if (s.farmPlots && Object.keys(s.farmPlots).length > meta.farmPlots.size) {
-        console.warn(
-          `[load] dropped ${Object.keys(s.farmPlots).length - meta.farmPlots.size} farmPlots row(s) for ${meta.name} (unknown bed/crop id or invalid deadline)`,
-        );
+      // design, and a corrupt hidden slot drops while its row SURVIVES (so
+      // the row count alone cannot see it), but an operator reading server
+      // logs should see both happen.
+      {
+        const droppedRows = s.farmPlots
+          ? Object.keys(s.farmPlots).length - meta.farmPlots.size
+          : 0;
+        const droppedSlots = countDroppedHiddenSlots(s.farmPlots, meta.farmPlots);
+        if (droppedRows > 0 || droppedSlots > 0) {
+          console.warn(
+            `[load] dropped ${droppedRows} farmPlots row(s) and ${droppedSlots} hidden slot(s) for ${meta.name} (unknown bed/crop id, invalid deadline, or non-finite slot)`,
+          );
+        }
       }
       meta.profTierTutorialSent = s.profTierTutorialSent === true;
       meta.delveMarks = s.delveMarks ?? 0;

@@ -101,6 +101,28 @@ export function serializeFarmPlots(
  *
  *  Always returns a FRESH map, so an absent field loads to the no-plots
  *  default and no caller can alias the saved object. */
+/** Count hidden slots (survivalRoll / yieldSeed) that normalizeFarmPlots
+ *  dropped from SURVIVING rows: present in the saved row but non-finite (a
+ *  JSON null, a string, NaN), so the row loads clean while the slot silently
+ *  vanishes. Operator signal only, consumed by the load-site console.warn:
+ *  the row counter cannot see this family, and the growth phase needs slot
+ *  loss visible in logs before it derives replacements (the state.md
+ *  handoff rule: derive deterministically, never re-roll). Rows normalize
+ *  dropped entirely are the row counter's job, not this one's. */
+export function countDroppedHiddenSlots(
+  saved: Record<string, PersistedFarmPlot> | undefined,
+  loaded: ReadonlyMap<string, PlotState>,
+): number {
+  if (!saved || typeof saved !== 'object') return 0;
+  let dropped = 0;
+  for (const [bedId, row] of Object.entries(saved)) {
+    if (!row || typeof row !== 'object' || !loaded.has(bedId)) continue;
+    if (row.survivalRoll !== undefined && !finite(row.survivalRoll)) dropped++;
+    if (row.yieldSeed !== undefined && !finite(row.yieldSeed)) dropped++;
+  }
+  return dropped;
+}
+
 export function normalizeFarmPlots(
   saved: Record<string, PersistedFarmPlot> | undefined,
   opts: { validBedIds: ReadonlySet<string>; validCropIds: ReadonlySet<string>; nowMs: number },

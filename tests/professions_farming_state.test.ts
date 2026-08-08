@@ -9,9 +9,10 @@
 // byte-identically to a pre-farming save.
 import fs from 'node:fs';
 import path from 'node:path';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { FARM_BED_IDS, FARM_CROP_IDS, FARM_PATCHES } from '../src/sim/content/farm_patches';
 import {
+  countDroppedHiddenSlots,
   FARM_MAX_GROW_MS,
   normalizeFarmPlots,
   type PersistedFarmPlot,
@@ -369,6 +370,28 @@ describe('load-side anti-tamper (one corrupt dimension per arm)', () => {
   });
 });
 
+describe('hidden-slot drop counting (the operator signal)', () => {
+  it('counts non-finite slots on surviving rows and nothing else', () => {
+    const saved = {
+      bed_alpha: { ...VALID, survivalRoll: Number.NaN, yieldSeed: null as unknown as number },
+      bed_beta: { ...VALID, survivalRoll: 0.5 },
+      bed_bogus: { ...VALID, survivalRoll: Number.NaN },
+    };
+    const loaded = norm(saved);
+    // bed_alpha survives with BOTH slots dropped; bed_beta keeps its finite
+    // slot; bed_bogus is a dropped ROW, which is the row counter's job.
+    expect(countDroppedHiddenSlots(saved, loaded)).toBe(2);
+  });
+
+  it('is zero for an absent field, a clean load, and a malformed container', () => {
+    expect(countDroppedHiddenSlots(undefined, new Map())).toBe(0);
+    const clean = { bed_alpha: { ...VALID, survivalRoll: 0.25 } };
+    expect(countDroppedHiddenSlots(clean, norm(clean))).toBe(0);
+    const junk = 'bed_alpha' as unknown as Record<string, PersistedFarmPlot>;
+    expect(countDroppedHiddenSlots(junk, norm(junk))).toBe(0);
+  });
+});
+
 describe('the save round trip through a real Sim', () => {
   // A real epoch-ms clock through the lockoutNowMs seam (never Date.now): the
   // same host hook the raid lockouts use.
@@ -421,6 +444,37 @@ describe('the save round trip through a real Sim', () => {
     expect(sim.serializeCharacter(pid)?.farmPlots).toEqual({
       [BED]: { cropId: 'wheat', plantedAtMs: NOW_MS - 30_000, readyAtMs: NOW_MS + 60_000 },
     });
+  });
+
+  it('warns the operator once when a load drops rows or hidden slots', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    try {
+      const state = baseState();
+      state.farmPlots = {
+        bed_not_a_real_bed: {
+          cropId: 'wheat',
+          plantedAtMs: NOW_MS - 1_000,
+          readyAtMs: NOW_MS + 1,
+        },
+        [BED]: {
+          cropId: 'wheat',
+          plantedAtMs: NOW_MS - 30_000,
+          readyAtMs: NOW_MS + 60_000,
+          survivalRoll: Number.NaN,
+        },
+      };
+      load(state);
+      const dropWarns = warn.mock.calls
+        .map((c) => String(c[0]))
+        .filter((m) => m.includes('[load] dropped'));
+      expect(dropWarns).toHaveLength(1);
+      // Both silent-drop families surface: the tampered row AND the corrupt
+      // hidden slot on the surviving row (which the row counter cannot see).
+      expect(dropWarns[0]).toContain('1 farmPlots row(s)');
+      expect(dropWarns[0]).toContain('1 hidden slot(s)');
+    } finally {
+      warn.mockRestore();
+    }
   });
 
   it('loads a pre-farming save to no plots and re-omits the key on save', () => {
