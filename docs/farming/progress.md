@@ -7,7 +7,7 @@
 | Packet authored | done | 2026-08-07 | 2026-08-07 |
 | Packet PR merged | superseded by D22 (local-only; no farming PRs) | | |
 | Phase 1 (foundation) | done | 2026-08-07 | 2026-08-08 |
-| Phase 1 QA | not started | | |
+| Phase 1 QA | done (PASS-WITH-FOLLOWUPS) | 2026-08-08 | 2026-08-08 |
 | Phase 2 (patches and plots) | not started | | |
 | Phase 2 QA | not started | | |
 | Phase 3 (growth engine) | not started | | |
@@ -169,6 +169,72 @@ gains the Farming 0 / 100 row with its procedural icon). Capture tooling learned
 lessons alongside: the professions shot target now fires on content/professions
 changes, its staged professionsState stub carries the fifth row, and a
 mobile-gathering variant scrolls the section into view."
+
+#### Phase 1 QA (2026-08-08, verdict PASS-WITH-FOLLOWUPS)
+
+Audited the exact phase diff b284c8c6b9..1005e52bb3 on the merged tree.
+Pre-audit, the moved release tip (0051daaab7 to 6ed4d7e12c) was absorbed as
+merge a9959c3670 (400 files; the only textual conflict was the generated
+pending.ts bundle, resolved by regenerating via i18n:gen and wiki:content)
+and the release-merge-audit skill ran clean: every both-side overlap file
+verified (all farming keys survived; the roster-free Master Gatherer desc won
+over the release parent's still-enumerating form), no legacy-arm divergence,
+no injected-helper drift. Parity was re-proven on the post-merge HEAD: 193
+green plus an UPDATE_PARITY=1 regen byte-identical under tests/parity/golden,
+closing the drift window the second absorb had opened over the phase's
+original proof.
+
+Audit shape: an 8-agent fan-out (context reload plus correctness, coverage,
+and dead-code packet audits, plus the matrix reviewers cross-platform-sync,
+architecture-reviewer, frontend-seam-reviewer, and the qa-checklist gate);
+8 of 8 delivered, 0 BLOCKING anywhere. Six scripted mutation checks (both
+gathering_view denial arms, the tooltip kind-key swap, the icon-id rename,
+the refusal-arm delete, the guide length-guard weaken) all KILLED with named
+failing tests and nonzero exit codes. The correctness audit re-read the
+committed screenshots (farming row at 0 / 100 visible, desktop and mobile),
+drove a live 400-tick headless-Sim probe (farming stays 0 while the four old
+professions gain; probe deleted, tree clean), and re-confirmed the roster
+grep returns nothing.
+
+Fixed this round on fix/farming-phase-01-qa (merged --no-ff, branch deleted):
+- SHOULD-FIX: the char sheet farming row painted NO icon (professionImageUrl
+  is null for a pending-art id) while the professions window painted the
+  procedural composer; the painter now resolves through professionIconUrl
+  and the render test pins all five srcs (found independently by the
+  frontend-seam review and the coverage audit).
+- SHOULD-FIX: the static farming tool-effect refusal had no self-clearing
+  tripwire, and the REST validator arm (restoreSlotBodyError) pinned fishing
+  and Springback but not farming; both pinned now (architecture review plus
+  the qa-checklist adversarial pass).
+- SHOULD-FIX: the blob-growth lower bound still tracked the pre-Farming
+  9,451 measure while its comment claimed re-measure tracking; re-minted
+  9216 to 9280 against the 9,497 re-measure (coverage audit).
+- SHOULD-FIX: the resolveSlotToolEffect refusals contract comment enumerated
+  only fishing; farming named (correctness audit).
+- NICE-TO-HAVE: dropped the constant-true E3 length assertion in the icon
+  suite (flagged by three audits independently).
+
+Deferred with owners (pre-ledgered in state.md unless noted):
+- Latin-overlay stale count prose (whatBody, gatherHubBody, the three
+  gatherDeeds bodies) and the 18 dropped Master Gatherer desc fills:
+  release-time i18n reconcile. Dropping the stale guide fills now would red
+  i18n_semantic_regressions; deed_i18n has its own sanctioned drop protocol,
+  which is why the two surfaces were handled differently.
+- The 120 farming pending rows: the release-tier fill workflow (deliberate;
+  I18N_RELEASE_TIER=1 hard-fails until the maintainer fill).
+- The guide anti-roster pin binds English only; extend it across locales AT
+  the release fill (today it would red on the deferred stale fills).
+- GAINABLE_GATHERING_PROFESSIONS raise: growth phase (ledgered).
+- Node-tooltip Partial maps stay farming-free: beds phase (ledgered).
+- Stale dev-facing comments (src/net/online.ts gprof pair, src/sim/types.ts,
+  the src/guide/pages/professions.ts header, scripts/load_professions.mjs
+  GATHER_PROFS): inherited debt, ledgered in state.md this round.
+- No real-browser E2E drives the five-row professions window; unit plus
+  jsdom plus the committed screenshots accepted for a dormant surface.
+
+Also harmonized: the state.md and phase-file deviation letterings disagreed
+and together enumerate SEVEN distinct deviations; state.md's ledger is now
+the canonical superset (a) to (g) and the phase file points at it.
 
 ### Phase 2
 (not started)
