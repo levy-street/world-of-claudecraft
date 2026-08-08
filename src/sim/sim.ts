@@ -6453,7 +6453,7 @@ export class Sim {
         direct,
       );
     }
-    // Blizzard: every enemy this pulse struck shaves the running Frozen Orb
+    // Blizzard: every enemy this pulse struck shaves the running Frostglobe
     // cooldown, bounded by the per-cast budget reset at zone placement
     // (frost_mage owns the math; deterministic, no rng).
     if (effect.orbCdr && zoneStruck > 0 && source.kind === 'player') {

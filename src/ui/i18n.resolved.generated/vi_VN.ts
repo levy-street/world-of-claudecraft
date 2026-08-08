@@ -566,7 +566,7 @@ export const vi_VN: EnTranslations = {
         "ice_fang_sword": {
           "name": "Nanh băng",
           "look": "Lưỡi cong làm bằng băng băng nhạt, những tinh thể sương muối lởm chởm dọc theo sống lưng, một lõi đông lạnh màu lục lam phát sáng ở lớp chắn ngang đầy đặn hơn bằng băng.",
-          "lore": "Sản phẩm hàng đầu của loại đông lạnh và là sản phẩm mà mọi nhà sưu tập đều hướng tới đầu tiên. Ice Fang được chạm khắc chứ không phải rèn từ một nhánh sông băng bao phủ Thornpeak phía trên Highwatch, lõi màu lục lam của nó cháy lạnh như ánh sáng của Glimmermere. Nó tạo ra không khí mà nó cắt. Người bảo vệ tường thề rằng một người lính đã mang nó vào đêm tuyết dày đã cản trở Wyrmcult, và 'đã mua được bức tường trong mùa đông'."
+          "lore": "Sản phẩm hàng đầu của loại đông lạnh và là sản phẩm mà mọi nhà sưu tập đều hướng tới đầu tiên. Ice Fang được chạm khắc chứ không phải rèn từ một nhánh sông băng bao phủ Thornpeak phía trên Highwatch, lõi màu lục lam của nó cháy lạnh như ánh sáng của Glimmermere. Nó tạo ra không khí mà nó cắt. Người bảo vệ tường thề rằng một người lính đã mang nó vào đêm tuyết dày đã cản trở Broodsworn, và 'đã mua được bức tường trong mùa đông'."
         },
         "glaciersplit_axe": {
           "name": "Rìu Tách Băng",
@@ -594,7 +594,7 @@ export const vi_VN: EnTranslations = {
           "lore": "Một nhánh băng sông băng phát sáng, được cho là bị vỡ ra từ vùng đất sâu bên dưới Sanctum, nơi cái lạnh của ngọn núi có răng. Sương muối nở không ngừng từ vòng cổ bạc của nó và không bao giờ tan, không phải do lửa hay mùa hè. Pháp Sư giữ nó ở gần vì cái lạnh mà nó mang lại cho công việc của họ, và giữ nó ở xa vào những đêm nó dường như nghiêng về phía hầm mộ của Nythraxis và lắng nghe."
         },
         "winterbite": {
-          "name": "Nanh Đông",
+          "name": "Wintergnaw",
           "look": "Thép bạc và cung băng xanh, lõi đông lạnh màu lục lam phát sáng trong ống đứng, một mũi tên có móc bằng băng rắn, hơi lạnh.",
           "lore": "Một cây cung bằng thép bạc và băng Thornpeak, phần nâng của nó được thắp sáng bởi lõi màu lục lam lạnh lẽo có tác dụng đóng băng mũi tên vào dây. Nó tạo thành một trục băng sông băng rắn chắc cải cách mỗi lần vẽ; người bắn cung không mang theo ống tên trên tường, chỉ mang theo cái lạnh. Highwatch đã giữ Rình Rậper Ridge vượt qua một cuộc bao vây với một người giống như vậy: họ nói, một cung thủ duy nhất và những mũi tên giá trị cho cả một mùa đông luôn ở đó."
         },
@@ -1006,7 +1006,7 @@ export const vi_VN: EnTranslations = {
       "name_shadowjump_toad": "Kama-Kage, Cóc Nhảy Bóng Tối",
       "name_stormfeather_griffin": "Stormfeather Vươn Trời",
       "name_thunderstrut_gobbler": "Thunderstrut, Gà Tây Vĩ Đại",
-      "name_terrorspark_groundshaker": "Tia Kinh Hoàng, Kẻ Rung Chuyển Mặt Đất",
+      "name_terrorspark_groundshaker": "Dreadspark Groundshaker",
       "name_drakemaw_raptor": "Cuồng Long Drakemaw",
       "desc_valorsteed": "Một con chiến mã khỏe mạnh, bước chân vững chãi, giúp tăng tốc độ di chuyển.",
       "desc_grag_bear": "Một chú gấu khỏe mạnh, bước chân vững chãi, giúp tăng tốc độ di chuyển.",
@@ -1487,7 +1487,7 @@ export const vi_VN: EnTranslations = {
         "battleTrance": "Nhập Định Chiến Đấu",
         "overpowerCharge": "Tăng Cường Bàn Tay Đẫm Máu",
         "suddenDeath": "Đột Tử",
-        "victoryRush": "Đà Chiến Thắng",
+        "victoryRush": "Victor's Surge",
         "enrage": "Cuồng Loạn: Phẫn Nộ",
         "heatingUp": "Đang Nóng Lên",
         "arcaneCharge": "Điện Tích Bí Thuật",
@@ -1970,7 +1970,7 @@ export const vi_VN: EnTranslations = {
       "sanguine": "Tăng tốc độ tấn công thêm {hastePct}% và sát thương gây ra thêm {dmgPct}%",
       "battleTrance": "Đòn Cướp Phá hoặc Đòn Tàn Phế tiếp theo của bạn không tốn nộ khí",
       "revengeFree": "Phục Thù tiếp theo của bạn không tốn nộ khí",
-      "victoryRush": "Đà Chiến Thắng đã sẵn sàng",
+      "victoryRush": "Victor's Surge is ready",
       "maxHpPct": "Tăng máu tối đa thêm {pct}%",
       "temporalHourglass": "Miễn nhiễm và không thể hành động; hồi phục máu và tăng tốc phục hồi thời gian hồi chiêu. Nhấp chuột phải để hủy bỏ.",
       "tongues": "Aumenta el tiempo de lanzamiento un {pct}%",
@@ -4031,13 +4031,13 @@ export const vi_VN: EnTranslations = {
       "valeBlurb": "Thung lũng khởi đầu xanh tươi, nơi những anh hùng mới rèn luyện bản lĩnh với lũ sói và đám cướp quanh thị trấn Eastbrook.",
       "marshBlurb": "Một xứ sở chìm trong sương mù và phế tích. Bầy mudfin tràn ngập vùng nước nông và một thứ gì đó cổ xưa hơn đang cựa quậy dưới mặt nước, được canh chừng từ thị trấn cầu Fenbridge.",
       "peaksBlurb": "Những rặng núi bị gió bào mòn và các hầm mỏ cũ vươn tới những hiểm họa lạnh giá, cao nhất của vương quốc, được trấn giữ bởi tiền đồn Highwatch.",
-      "duskBlurb": "Một thung lũng chìm trong hoàng hôn vĩnh cửu dưới tán đại thụ Eldergleam, nơi những phế tích pha lê tỏa sáng và không khí ngân vang phép thuật cổ xưa.",
+      "duskBlurb": "Một thung lũng chìm trong hoàng hôn vĩnh cửu dưới tán đại thụ Eldershine, nơi những phế tích pha lê tỏa sáng và không khí ngân vang phép thuật cổ xưa.",
       "emberBlurb": "Vùng đất hoang tàn ngập tro tàn và bloodglass, rực sáng dưới ánh bão chớp giật, nơi bầy rồng lượn vòng trên miệng núi lửa và lửa trại của troll cháy rực giữa những cồn cát, tất cả được canh giữ từ thị trấn cổng Wyrmwatch.",
       "frostBlurb": "Một khoảng lặng phủ tuyết và thông đen dưới ánh cực quang, nơi cái lạnh dường như cũng đang thức tỉnh, còn Icemantle vẫn giữ cho lửa trại không bao giờ tắt.",
       "amberBlurb": "Một mùa thu vĩnh cửu với những chiếc lá vàng đỏ không bao giờ rụng, quần tụ quanh thị trấn Lanternmere rực sáng ánh đèn lồng.",
       "fenBlurb": "Một vùng đất ngập nước tươi sáng, rộn ràng tiếng vo ve, phủ đầy hoa súng và dòng nước chảy chậm, được băng qua bằng những lối ván gỗ cũ kỹ từ thị trấn cầu Bridgemere.",
       "nightBlurb": "Một cõi giới của đêm khuya lấp lánh sao trời, nơi hoa lá thắp sáng những lối đi và Moonrest lặng lẽ canh giữ dưới bầu trời đang say giấc mộng.",
-      "hauntBlurb": "Một khu rừng ma ám dưới những tán cây khổng lồ, nơi những ngọn đèn lồng của Gallowmere là thứ ánh sáng chân thật duy nhất trên con đường.",
+      "hauntBlurb": "Một khu rừng ma ám dưới những tán cây khổng lồ, nơi những ngọn đèn lồng của Gibbetmere là thứ ánh sáng chân thật duy nhất trên con đường.",
       "galeBlurb": "Những vách đá ven biển và cao nguyên lộng gió nơi cơn gió chẳng bao giờ ngơi nghỉ, Hải Đăng Cổ chẳng bao giờ tắt, và Wickharbor thì luôn đóng chặt cửa nẻo.",
       "jungleBlurb": "Một mớ bòng bong nhiệt đới của những rặng cọ, cát trắng và tiếng chim ríu rít vang xa, cùng thị trấn ven biển Drifthaven vẫn giữ ngọn lửa cháy sáng trên bãi cát.",
       "gardenBlurb": "Một cõi giới vườn mê cung hàng rào vẫn được xén tỉa gọn gàng dù chưa ai từng thấy bóng dáng một người làm vườn nào, bước vào qua khỏi Hedgewick và những sân đài phun nước của nó.",
@@ -4048,7 +4048,7 @@ export const vi_VN: EnTranslations = {
       "peaksGreeting": "Hai trăm năm bức tường này đã đứng vững. Nó sẽ không sụp đổ dưới phiên gác của ta, nhưng nó đang rền rĩ.",
       "peaksGreeter": "Đại Úy Thessaly, Highwatch",
       "duskGreeting": "Rất ít người như bạn từng đứng dưới những tán cành này. Hãy bước đi nhẹ nhàng, và xin chào đón bạn đến đây.",
-      "duskGreeter": "Người Giữ Saelwyn, Eldergleam",
+      "duskGreeter": "Người Giữ Saelwyn, Eldershine",
       "emberGreeting": "Gió nóng thổi từ vùng đất hoang, rồng bay lượn trên Drakemaw, và lửa trại của troll cháy giữa những cồn cát. Uống nước trước khi bước ra ngoài đó.",
       "emberGreeter": "Vệ Quan Cổng, Wyrmwatch",
       "frostGreeting": "Tuyết nuốt trọn mọi âm thanh ngoài kia, sau bức tường. Nếu ánh sáng bắt đầu nhảy múa trên trời, hãy giữ giọng thật khẽ và lửa thì đừng để tắt.",
@@ -4060,7 +4060,7 @@ export const vi_VN: EnTranslations = {
       "nightGreeting": "Qua khỏi Nightgate, chính bầu không khí cũng đang chìm trong giấc mộng. Hãy men theo ánh sáng của hoa, và để ý đến thế giới đang say ngủ treo lơ lửng trên bầu trời.",
       "nightGreeter": "Vệ Quan Canh Thức, Moonrest",
       "hauntGreeting": "Hãy bám theo ánh đèn lồng, lữ khách à. Và nếu khu rừng gọi tên bạn từ ngoài con đường, đừng bao giờ đáp lại.",
-      "hauntGreeter": "Người Thắp Đèn, Gallowmere",
+      "hauntGreeter": "Người Thắp Đèn, Gibbetmere",
       "galeGreeting": "Ở đây gió chưa từng một lần ngừng thổi, và Hải Đăng Cổ chưa từng một lần tắt lửa. Nhớ đóng cửa quán trọ lại sau lưng nhé.",
       "galeGreeter": "Người Giữ Hải Đăng, Wickharbor",
       "jungleGreeting": "Cát ấm, tiếng chim ríu rít, và một khu rừng rậm nuốt trọn cả chân trời. Chúng tôi luôn giữ một ngọn lửa cháy trên bãi biển; cố mà quay về với nó nhé.",
@@ -4069,14 +4069,14 @@ export const vi_VN: EnTranslations = {
       "gardenGreeter": "Người Giữ Cổng, Hedgewick",
       "valePlaceNotes": "Eastbrook là căn cứ nhà đầu tiên của bạn. Wolf Run và Boar Meadow là vùng săn bắn hiền hòa; Mirror Lake là vùng nước câu cá lý tưởng, dù lũ cá bùn lúc nhúc nơi vùng nước nông của nó; Sableweb và Copper Dig giấu lũ nhện và đám đào mỏ tham quặng; một Bandit Camp và Fallen Chapel chứa những công việc gai góc hơn; Reliquary Hill dẫn xuống Collapsed Reliquary, delve đầu tiên của vương quốc; Brightwood Glade là một khu rừng thưa ngập nắng, tĩnh lặng ở phía bắc; và Sân Heo Nái là sân bóng heo rừng có tường bao của Eastbrook, nơi Cúp Thung Lũng thi đấu dưới một lệnh hưu chiến mùa gặt.",
       "marshPlaceNotes": "Fenbridge canh giữ con đường khô ráo duy nhất. Prowler Reeds và Deepfen Shallows đầy ắp thú đầm lầy và mudfin; Widow Thicket giăng kín mạng nhện dày đặc; Drowned Chapel và Troll Mounds giữ những hiểm họa cổ xưa hơn, với Kinh Cầu Chết Chìm, delve của riêng đầm lầy, mở ra ngay phía bắc các gò mộ; Gravecaller Encampment là nơi giáo phái đào hầm ẩn náu, và Pháo Đài Chìm là trái tim hầm ngục của đầm lầy.",
-      "peaksPlaceNotes": "Highwatch giữ vững bức tường. Stalker Ridge và Deeprock Burrows thuộc về mèo núi và lũ đào hang; Ogre Foothills và Drogmar's War-Camp thuộc về lũ côn đồ đánh thuê; Stormcrag lách tách tiếng các nguyên tố, và bên dưới nó Hồ Lung Linh phát sáng, hồ nước trên núi mà bờ của nó giữ cánh cổng ánh sáng nhợt nhạt dẫn xuống Ngôi Đền Chết Chìm; Wyrmcult Tents và Revenant Fields bao quanh vùng đất cao của giáo phái, với Thánh Đường Mộ Long ở đỉnh của nó.",
-      "duskPlaceNotes": "Eldergleam quần tụ dưới tán đại thụ. Hang Duskfall cùng đài quan sát của nó là lối vào và cũng là cảnh tượng đầu tiên của thung lũng; Rừng Cổ Thụ và Bồn Địa Starfall giữ lấy miền nam tĩnh lặng; Sân Chìm ôm những phế tích rậm rạp ở phía đông; còn Vực Sâu Lấp Lánh và Bãi Cạn Pha Lê tỏa sáng khắp miền bắc.",
+      "peaksPlaceNotes": "Highwatch giữ vững bức tường. Stalker Ridge và Deeprock Burrows thuộc về mèo núi và lũ đào hang; Ogre Foothills và Drogmar's War-Camp thuộc về lũ côn đồ đánh thuê; Stormcrag lách tách tiếng các nguyên tố, và bên dưới nó Hồ Lung Linh phát sáng, hồ nước trên núi mà bờ của nó giữ cánh cổng ánh sáng nhợt nhạt dẫn xuống Ngôi Đền Chết Chìm; Broodsworn Tents và Revenant Fields bao quanh vùng đất cao của giáo phái, với Thánh Đường Mộ Long ở đỉnh của nó.",
+      "duskPlaceNotes": "Eldershine quần tụ dưới tán đại thụ. Hang Duskfall cùng đài quan sát của nó là lối vào và cũng là cảnh tượng đầu tiên của thung lũng; Rừng Cổ Thụ và Bồn Địa Starfall giữ lấy miền nam tĩnh lặng; Sân Chìm ôm những phế tích rậm rạp ở phía đông; còn Vực Sâu Lấp Lánh và Bãi Cạn Pha Lê tỏa sáng khắp miền bắc.",
       "emberPlaceNotes": "Wyrmwatch trấn giữ cổng vào. Gatewood là mảng xanh cuối cùng trước vùng đất hoang; Cồn Cát Tro Tàn cuộn tro bụi và những thứ còn tệ hơn thế; Trollmoot là nơi lũ troll cồn cát tụ tập quanh lửa trại; Cánh Đồng Bloodglass lấp lánh những mảnh vỡ sắc như dao cạo; còn Miệng Núi Lửa Drakemaw là vương miện bốc khói mà bầy rồng vẫn lượn vòng quanh.",
       "frostPlaceNotes": "Icemantle giữ ngọn lửa ấm cuối cùng. Snowline đánh dấu nơi tuyết trôi bắt đầu chiếm lĩnh; Hồ Băng Hà là vùng nước đen tĩnh lặng dưới lớp băng; Bậc Thang Cực Quang vươn lên dưới ánh sáng nhảy múa; Shiverfen là đầm lầy đóng băng chẳng bao giờ thực sự ngủ yên; còn Bậc Thềm Gào Thét thì đêm nào cũng xứng với cái tên của mình.",
       "amberPlaceNotes": "Lanternmere tỏa sáng giữa lòng mùa gặt. Goldmelt là con đèo phủ hổ phách dẫn vào thị trấn; Vườn Cây Dát Vàng và Thung Lũng Mùa Gặt giữ những vụ mùa ngọt nhất cùng những tên trộm liều lĩnh nhất; Đại Hồ phản chiếu những tán lá rực cháy; Đồi Cindermaple sừng sững cao nhất và đỏ nhất; còn Trụ Đá Nghiêng thì lưu giữ ký ức về một điều gì đó cổ xưa hơn cả mùa thu.",
       "fenPlaceNotes": "Bridgemere nằm vắt ngang dòng nước chảy chậm. Bậc Thang Amberfen đổ xuống từ miền đất mùa gặt; Lilymoors và Vũng Nước Bogshine lấp lánh ma trơi và chuồn chuồn; Willowweep buông cành rủ xuống mặt hồ; còn Vùng Đất Lim Dim là nơi hiền hòa nhất mà vùng đất này có thể có.",
-      "nightPlaceNotes": "Moonrest giữ vững buổi canh thức. Nightgate là lối vào miền đất nửa đêm; Moonwell lưu giữ ánh sao mà bạn có thể đứng cạnh bên; Gloamfield nở hoa trong bóng tối; Đài Canh Thức Bất Động dõi trông mà chẳng bao giờ lay động; còn Gò Mộ Không Ngủ là nơi duy nhất ở đây chẳng bao giờ chìm vào giấc mộng.",
-      "hauntPlaceNotes": "Gallowmere co cụm bên trong vòng đèn lồng của mình. Crowgate là cánh cửa u ám của khu rừng; Bụi Rậm Của Góa Phụ giăng kín tơ nhện dày đặc; Khoảng Rừng Treo và Nhà Nguyện Mournstone giữ lại những nỗi đau cổ xưa nhất của khu rừng; còn Bãi Trống Của Thợ Săn thuộc về bất cứ thứ gì vẫn còn săn đuổi nơi đó.",
+      "nightPlaceNotes": "Moonrest giữ vững buổi canh thức. Nightgate là lối vào miền đất nửa đêm; Moonspring lưu giữ ánh sao mà bạn có thể đứng cạnh bên; Gloamfield nở hoa trong bóng tối; Đài Canh Thức Bất Động dõi trông mà chẳng bao giờ lay động; còn Gò Mộ Không Ngủ là nơi duy nhất ở đây chẳng bao giờ chìm vào giấc mộng.",
+      "hauntPlaceNotes": "Gibbetmere co cụm bên trong vòng đèn lồng của mình. Crowgate là cánh cửa u ám của khu rừng; Bụi Rậm Của Góa Phụ giăng kín tơ nhện dày đặc; Khoảng Rừng Treo và Nhà Nguyện Mournstone giữ lại những nỗi đau cổ xưa nhất của khu rừng; còn Bãi Trống Của Thợ Săn thuộc về bất cứ thứ gì vẫn còn săn đuổi nơi đó.",
       "galePlaceNotes": "Wickharbor nghiêng mình đón gió. Windway là con đường vách đá dẫn vào; Cao Nguyên Gào Thét trải dài trọc lóc dưới cơn cuồng phong; Hải Đăng Cổ đã cháy sáng lâu đến mức không ai còn nhớ nổi từ bao giờ; Shear đổ dốc thẳng đứng xuống mặt nước; Wreckfields giữ cho bờ biển này luôn thành thật; còn Hồ Gương là thứ duy nhất còn tĩnh lặng trong cả cõi này.",
       "junglePlaceNotes": "Drifthaven giữ ngọn lửa của mình trên bãi biển. Tanglemouth là nơi dòng sông gặp bức tường xanh thẳm; Palmstrand chạy dài trắng xóa và ấm áp dọc theo sóng biển; Rừng Rậm Ngọc Lục Bảo và Vinefall nuốt trọn vùng nội địa; Đầm Phá Lam Ngọc tỏa sáng trong vắt và sâu thẳm; còn Tượng Thần Chìm dõi theo từ dưới làn nước.",
       "gardenPlaceNotes": "Hedgewick chờ đợi ngay tại Cổng Vườn. Lối Đi Bồn Hoa nở rộ sắc màu được xén tỉa gọn gàng; Lâu Đài Dawnhold vẫn huấn luyện hiệp sĩ sau những bức tường mới; Ao Cánh Hoa trôi dạt sắc hồng quanh năm; Cối Xay Cũ vẫn tự xoay vòng luống hoa của riêng nó; Đại Mê Cung thay đổi cách cư xử cho từng vị khách, những vòm cổng của nó được canh giữ bởi lũ cáo lá; Trạm Gác Phương Bắc trấn giữ con đường ra; Bồn Hoa Huệ nghỉ ngơi phía sau tất cả; và Sân Đài Phun Nước vẫn chảy trong vắt tại trái tim khu vườn.",
@@ -6277,24 +6277,24 @@ export const vi_VN: EnTranslations = {
     "boss": {
       "varric": {
         "bell": {
-          "emote": "Phó Tế Varric nắm chặt chiếc chuông bị chôn bằng cả hai tay!",
-          "log": "Phó Tế Varric bắt đầu rung chiếc chuông tang lễ.",
-          "warning": "Tránh xa Phó Tế Varric!",
+          "emote": "Phó Tế Vandric nắm chặt chiếc chuông bị chôn bằng cả hai tay!",
+          "log": "Phó Tế Vandric bắt đầu rung chiếc chuông tang lễ.",
+          "warning": "Tránh xa Phó Tế Vandric!",
           "impact": "Tiếng chuông ngân vang làm nứt toác nền căn phòng!",
           "lesson": "Chuông Ngân: một cú giáng đất mỗi mười hai giây. Hãy tránh xa trước khi nó giáng xuống."
         },
         "raise": {
-          "emote": "Phó Tế Varric gọi tên từ những nấm mồ vỡ nát!",
-          "log": "Phó Tế Varric bắt đầu Triệu Hồi Tử Thi.",
+          "emote": "Phó Tế Vandric gọi tên từ những nấm mồ vỡ nát!",
+          "log": "Phó Tế Vandric bắt đầu Triệu Hồi Tử Thi.",
           "warning": "Chặn đứng nghi lễ gọi hồn!",
           "object": "Nấm mồ nứt nẻ rùng mình với hơi thở bị đánh cắp.",
           "interrupt_ok": "Nghi lễ gọi hồn bị gián đoạn.",
-          "interrupt_fail": "Kẻ chết đáp lại lời gọi của Phó Tế Varric!",
+          "interrupt_fail": "Kẻ chết đáp lại lời gọi của Phó Tế Vandric!",
           "lesson": "Hãy gián đoạn nấm mồ nứt nẻ trong vòng năm giây, nếu không kẻ chết sẽ trỗi dậy theo lời gọi của hắn."
         },
         "pull": "Ngươi giẫm lên cát bụi thánh thiêng với mục đích ô uế. Quỳ xuống, và để được điểm danh.",
         "intro": "Không linh hồn nào mất đi. Chỉ là bị đặt nhầm chỗ.",
-        "mid60": "Phó Tế Varric đọc tên từ cuốn sổ với niềm đắc thắng run rẩy.",
+        "mid60": "Phó Tế Vandric đọc tên từ cuốn sổ với niềm đắc thắng run rẩy.",
         "mid30": "Chiếc chuông tang lễ đáp lại mỗi cái tên hắn xướng lên.",
         "defeat": "Không... ta đã có những cái tên... ta đã có tất cả..."
       }
@@ -7980,7 +7980,7 @@ export const vi_VN: EnTranslations = {
       },
       "cold_snap": {
         "name": "Tiếng Gọi Mùa Đông",
-        "description": "Hoàn tất thời gian hồi của Bước Chớp, Màn Sương Giá và Tàng Hình Cao Cấp. (tài năng pháp sư)"
+        "description": "Finishes the cooldown on Flitstep, Frostveil, and Greater Invisibility. (Mage talent)"
       },
       "greater_invisibility": {
         "name": "Tàng Hình Cao Cấp",
@@ -8031,15 +8031,15 @@ export const vi_VN: EnTranslations = {
         "description": "Phóng ba luồng băng giá, mỗi luồng gây {damage} sát thương băng giá, và đặt Winter's Chill lên mục tiêu: 2 phép thuật tương thích tiếp theo sẽ coi mục tiêu đó như bị đóng băng. Brain Freeze khiến Winterlash được thi triển ngay lập tức và bỏ qua thời gian hồi chiêu. (Sương giá)"
       },
       "frozen_orb": {
-        "name": "Quả Cầu Băng Giá",
+        "name": "Frostglobe",
         "description": "Phóng ra một quả cầu băng xoáy bay về phía trước trong 8 giây, gây sát thương {damage} Băng mỗi giây cho kẻ địch ở gần và làm chậm chúng đi 30%. Mỗi xung đập tạo ra một Băng. (Sương giá)"
       },
       "blizzard": {
         "name": "Bão Tuyết",
-        "description": "Triệu gọi bão tuyết xuống khu vực mục tiêu trong 6 giây, gây {damage} sát thương Băng mỗi giây và làm chậm kẻ thù 40%. Mỗi kẻ thù bị đánh trúng rút ngắn 0,5 giây của Frozen Orb, tối đa 3 giây mỗi lần thi triển. (Băng)"
+        "description": "Triệu gọi bão tuyết xuống khu vực mục tiêu trong 6 giây, gây {damage} sát thương Băng mỗi giây và làm chậm kẻ thù 40%. Mỗi kẻ thù bị đánh trúng rút ngắn 0,5 giây của Frostglobe, tối đa 3 giây mỗi lần thi triển. (Băng)"
       },
       "glacial_spike": {
-        "name": "Chông Băng Hà",
+        "name": "Rimeneedle",
         "description": "Triệu hồi một gai băng khổng lồ, tiêu hao 5 Băng Nhọn để gây {damage} sát thương Băng và đóng băng mục tiêu tại chỗ trong 4 giây. (Băng)"
       },
       "glacial_front": {
@@ -8171,7 +8171,7 @@ export const vi_VN: EnTranslations = {
         "description": "Đòn kết liễu gây vết thương cho mục tiêu, khiến nó chảy máu nhận {damage} trong 16 giây."
       },
       "vanish": {
-        "name": "Bước Khói",
+        "name": "Smokefade",
         "description": "Biến mất khỏi tầm nhìn, đi vào Duskveil ngay cả trong chiến đấu. Bạn di chuyển chậm hơn 50% khi ẩn nấp. Kéo dài tối đa 10 giây."
       },
       "instant_poison": {
@@ -8555,7 +8555,7 @@ export const vi_VN: EnTranslations = {
         "description": "Bước vào cơn thịnh nộ sục sôi, tạo 20 nộ khí. (Tài năng Chiến Binh)"
       },
       "crusader_strike": {
-        "name": "Đòn Thập Tự",
+        "name": "Oathstrike",
         "description": "Đánh mục tiêu bằng sát thương vũ khí cộng {damage} sát thương Thánh. (tài năng Paladin)"
       },
       "chain_heal": {
@@ -8567,7 +8567,7 @@ export const vi_VN: EnTranslations = {
         "description": "Nhận sức mạnh ác quỷ, tăng giáp và sức tấn công trong 20 giây. (tài năng Warlock)"
       },
       "holy_shock": {
-        "name": "Sốc Thánh",
+        "name": "Lightjolt",
         "description": "Gây sốc một mục tiêu đồng minh bằng năng lượng Thánh, hồi cho họ {damage}. (dấu ấn Thánh)"
       },
       "aura_surge": {
@@ -8587,7 +8587,7 @@ export const vi_VN: EnTranslations = {
         "description": "Truyền cảm hứng cho đồng minh gần đó, tăng sức mạnh tấn công thêm 35 trong 5 phút. (dấu ấn Thiện Xạ)"
       },
       "wyvern_sting": {
-        "name": "Cú Chích Rồng Bay",
+        "name": "Drakesting",
         "description": "Chích kẻ địch từ xa, làm chúng bất động tối đa 4 giây. Bất kỳ sát thương nào cũng phá hiệu ứng. (dấu ấn Sinh Tồn)"
       },
       "arcane_power": {
@@ -8599,7 +8599,7 @@ export const vi_VN: EnTranslations = {
         "description": "Tăng tỉ lệ chí mạng phép 50% trong 15 giây. (kỹ năng đặc trưng Fire)"
       },
       "icy_veins": {
-        "name": "Huyết Mạch Băng Giá",
+        "name": "Coldsurge",
         "description": "Tăng tốc độ phép 30% và ngăn gián đoạn cùng đẩy lùi thi triển trong 10 giây. (kỹ năng đặc trưng Frost)"
       },
       "cold_blood": {
@@ -8619,7 +8619,7 @@ export const vi_VN: EnTranslations = {
         "description": "Truyền sức mạnh cho một mục tiêu đồng minh, tăng sức mạnh phép thêm 28 trong 15 giây. (dấu ấn Kỷ Luật)"
       },
       "holy_nova": {
-        "name": "Nova Thánh",
+        "name": "Hallowburst",
         "description": "Gây một vụ nổ ánh sáng Thánh, hồi cho đồng minh gần đó {damage} và gây sát thương cho kẻ địch gần đó. (dấu ấn Thánh)"
       },
       "shadowform": {
@@ -8647,7 +8647,7 @@ export const vi_VN: EnTranslations = {
         "description": "Xung phong vào kẻ địch và trói chân chúng trong 1 giây. Tầm 8-25 m. (dấu ấn Hoang Dã)"
       },
       "swiftmend": {
-        "name": "Hồi Phục Nhanh",
+        "name": "Fleetmend",
         "description": "Tiêu thụ một hiệu ứng hồi máu theo thời gian trên mục tiêu đồng minh để hồi cho họ {damage}. (dấu ấn Phục Hồi)"
       },
       "summon_imp": {
@@ -8655,8 +8655,8 @@ export const vi_VN: EnTranslations = {
         "description": "Triệu hồi một Emberkin dưới quyền chỉ huy của Thuật Sĩ Hắc Ám. Emberkin ném Tiễn Tro vào kẻ địch của bạn từ xa. Triệu hồi một con quỷ mới sẽ giải tán con hiện tại. Bạn chỉ có thể có một con quỷ cùng lúc."
       },
       "summon_voidwalker": {
-        "name": "Triệu Hồi Gloomshade",
-        "description": "Triệu hồi một Gloomshade dưới quyền chỉ huy của Thuật Sĩ Hắc Ám. Gloomshade là con quỷ vững chãi khiêu khích kẻ địch của bạn và hứng chịu đòn tấn công. Triệu hồi một con quỷ mới sẽ giải tán con hiện tại. Bạn chỉ có thể có một con quỷ cùng lúc."
+        "name": "Triệu Hồi Duskmurk",
+        "description": "Triệu hồi một Duskmurk dưới quyền chỉ huy của Thuật Sĩ Hắc Ám. Duskmurk là con quỷ vững chãi khiêu khích kẻ địch của bạn và hứng chịu đòn tấn công. Triệu hồi một con quỷ mới sẽ giải tán con hiện tại. Bạn chỉ có thể có một con quỷ cùng lúc."
       },
       "summon_succubus": {
         "name": "Triệu Hồi Duskborn",
@@ -8755,7 +8755,7 @@ export const vi_VN: EnTranslations = {
         "description": "Các đòn đánh thường của bạn có cơ hội cho phép bạn tung Nấm Mồ Sớm lên mục tiêu ở bất kỳ mức máu nào mà không tốn nộ khí. (nhánh Vũ Khí)"
       },
       "storm_bolt": {
-        "name": "Cú Ném Bão Tố",
+        "name": "Thunderhurl",
         "description": "Ném vũ khí của bạn vào mục tiêu gây {damage} sát thương, làm choáng nó trong 3 giây."
       },
       "piercing_howl": {
@@ -8775,7 +8775,7 @@ export const vi_VN: EnTranslations = {
         "description": "Tẩm máu quân thù lên vũ khí của bạn: bạn và các đồng minh cận chiến nhận thêm 10% tốc độ tấn công và 10% sát thương trong 20 giây."
       },
       "victory_rush": {
-        "name": "Đà Chiến Thắng",
+        "name": "Victor's Surge",
         "description": "Giáng đòn gây sát thương vũ khí cộng thêm {damage} và hồi 20% máu tối đa của bạn. Chỉ dùng được trong vòng 20 giây sau khi hạ gục một kẻ địch."
       },
       "intimidating_shout": {
@@ -8787,7 +8787,7 @@ export const vi_VN: EnTranslations = {
         "description": "Tấn công theo một vòng cung rộng, gây sát thương Vật Lý lên mọi kẻ địch phía trước bạn. Trên 5 mục tiêu thì sát thương bị giảm. Khi bạn né hoặc gạt đòn, Phục Thù tiếp theo của bạn có thể không tốn nộ khí. (Protection)"
       },
       "heroic_leap": {
-        "name": "Bước Nhảy Chiến",
+        "name": "Vaulting Charge",
         "description": "Nhảy đến khu vực mục tiêu, gây {damage} sát thương lên kẻ địch lân cận khi tiếp đất."
       },
       "rallying_cry": {
@@ -8803,7 +8803,7 @@ export const vi_VN: EnTranslations = {
         "description": "Hóa thành một khổng tượng trong 20 giây, phá bỏ mọi hiệu ứng khống chế lên bạn và tăng 20% sát thương gây ra."
       },
       "avenging_wrath": {
-        "name": "Cánh Báo Thù",
+        "name": "Zealwing",
         "description": "Triệu hồi sức mạnh báo thù, tăng 60 sức mạnh công kích và 30 sức mạnh phép thuật của bạn trong 20 giây. (thiên phú Paladin)"
       },
       "berserk": {
@@ -8815,7 +8815,7 @@ export const vi_VN: EnTranslations = {
         "description": "Hóa thành một cơn bão thép cuồng xoáy, đánh trúng mọi kẻ địch trong phạm vi 6 mét với {damage} sát thương mỗi giây trong 4 giây."
       },
       "blink": {
-        "name": "Bước Chớp",
+        "name": "Flitstep",
         "description": "Dịch chuyển bạn 15 m về phía trước và phá hiệu ứng trói chân. (thiên phú Pháp sư)"
       },
       "bloodlust": {
@@ -8843,7 +8843,7 @@ export const vi_VN: EnTranslations = {
         "description": "Golpea a gần đó kẻ địch con escarcha e inflige {damage} de daño de Băng. (thiên phú pháp sư)"
       },
       "counterspell": {
-        "name": "Phản Phép",
+        "name": "Spellsever",
         "description": "Chống lại phép mục tiêu đang niệm và ngăn mục tiêu thi triển phép thuộc hệ đó trong 6 giây."
       },
       "curse_of_exhaustion": {
@@ -8992,7 +8992,7 @@ export const vi_VN: EnTranslations = {
       },
       "preparation": {
         "name": "Dự Phòng",
-        "description": "Kết thúc thời gian hồi của Chạy nước rút, Né tránh và Biến mất. (thiên phú Đạo tặc)"
+        "description": "Finishes the cooldown on Swift Heels, Ghostfoot, and Smokefade. (Rogue talent)"
       },
       "presence_of_mind": {
         "name": "Tâm Trí Tăng Tốc",
@@ -9023,7 +9023,7 @@ export const vi_VN: EnTranslations = {
         "description": "Bạn biến mất trong đám khói, tăng 30% khả năng né tránh trong 8 giây."
       },
       "spellsteal": {
-        "name": "Đánh Cắp Phép",
+        "name": "Spellplunder",
         "description": "Đánh cắp một hiệu ứng phép thuật có lợi từ kẻ địch và chuyển nó sang bạn."
       },
       "startle_shot": {
@@ -9421,7 +9421,7 @@ export const vi_VN: EnTranslations = {
         "name": "Mảnh Tim Của Kazzix"
       },
       "wyrmcult_orders": {
-        "name": "Mệnh Lệnh Long Giáo"
+        "name": "Broodsworn Orders"
       },
       "ritual_phylactery": {
         "name": "Bùa Hộ Mệnh Nghi Lễ"
@@ -9484,7 +9484,7 @@ export const vi_VN: EnTranslations = {
         "name": "Áo Giáp Vảy Mộ Long"
       },
       "wyrmcult_grand_robe": {
-        "name": "Đại Áo Choàng Long Giáo"
+        "name": "Broodsworn Grand Robe"
       },
       "wyrmscale_jerkin": {
         "name": "Áo Da Long Vảy"
@@ -10153,7 +10153,7 @@ export const vi_VN: EnTranslations = {
         "name": "Áo Choàng Vai Khúc Ca Mảnh"
       },
       "wyrmcult_spellgrips": {
-        "name": "Găng Pháp Thuật Tà Long"
+        "name": "Broodsworn Spellgrips"
       },
       "thornpeak_wildwraps": {
         "name": "Quấn Hoang Dã Đỉnh Gai"
@@ -10162,7 +10162,7 @@ export const vi_VN: EnTranslations = {
         "name": "Áo Giáp Lưới Tế Bão"
       },
       "cryptbloom_shoulderguards": {
-        "name": "Giáp Vai Hoa Hầm Mộ"
+        "name": "Tombpetal Shoulderguards"
       },
       "gravewyrm_thornmaul": {
         "name": "Búa Gai Mộ Long"
@@ -10417,7 +10417,7 @@ export const vi_VN: EnTranslations = {
         "name": "Giày Lót Lò Sưởi"
       },
       "frostmane_mantle": {
-        "name": "Áo Choàng Của Bờm Băng Giá"
+        "name": "Mantle of the Rimemane"
       },
       "ashbone_war_brand": {
         "name": "Chiến Đao Xương Tro"
@@ -10576,7 +10576,7 @@ export const vi_VN: EnTranslations = {
         "name": "Con Mắt Nghệ Nhân"
       },
       "reins_terrorspark_groundshaker": {
-        "name": "Chìa Khóa Khởi Động: Tia Kinh Hoàng, Kẻ Rung Chuyển Mặt Đất"
+        "name": "Ignition Key: Dreadspark Groundshaker"
       },
       "reins_drakemaw_raptor": {
         "name": "Dây Cương Cuồng Long Drakemaw"
@@ -10744,7 +10744,7 @@ export const vi_VN: EnTranslations = {
         "name": "Chùy Thánh Hóa của Voss"
       },
       "wyrmcult_soulsteps": {
-        "name": "Bước Hồn Long Giáo"
+        "name": "Broodsworn Soulsteps"
       },
       "wyrmshadow_harness": {
         "name": "Đai Giáp Nightfang"
@@ -10975,7 +10975,7 @@ export const vi_VN: EnTranslations = {
         "name": "Mũ Thánh Tích Của Phó Tế"
       },
       "varric_shadow_cowl": {
-        "name": "Mũ Trùm Bóng Tối của Varric"
+        "name": "Mũ Trùm Bóng Tối của Vandric"
       },
       "siltguard_helm": {
         "name": "Mũ Giáp Hộ Bùn"
@@ -11152,7 +11152,7 @@ export const vi_VN: EnTranslations = {
         "name": "Dây Lưng Hàn Cốt"
       },
       "mistforged_pauldrons": {
-        "name": "Giáp Vai Rèn Sương"
+        "name": "Fogforged Pauldrons"
       },
       "tideguard_faceguard": {
         "name": "Mũ Che Mặt Vệ Triều"
@@ -11466,10 +11466,10 @@ export const vi_VN: EnTranslations = {
         "name": "Lãnh Chúa Mảnh Vỡ Kazzix"
       },
       "wyrmcult_zealot": {
-        "name": "Cuồng Tín Long Giáo"
+        "name": "Broodsworn Zealot"
       },
       "wyrmcult_necromancer": {
-        "name": "Tử Linh Sư Long Giáo"
+        "name": "Broodsworn Necromancer"
       },
       "boneclad_revenant": {
         "name": "Vong Hồn Bọc Xương"
@@ -11577,7 +11577,7 @@ export const vi_VN: EnTranslations = {
         "name": "Hình Nộm Vô Thánh"
       },
       "deacon_varric": {
-        "name": "Chấp Sự Varric"
+        "name": "Chấp Sự Vandric"
       },
       "acolyte_tessa": {
         "name": "Tế Đồ Tessa"
@@ -11769,7 +11769,7 @@ export const vi_VN: EnTranslations = {
         "name": "Tinh Linh Đầm Lầy"
       },
       "frostmane_yeti": {
-        "name": "Người Tuyết Bờm Băng Giá"
+        "name": "Rimemane Yeti"
       },
       "terrace_howler": {
         "name": "Kẻ Gào Thét Bậc Thang"
@@ -11817,7 +11817,7 @@ export const vi_VN: EnTranslations = {
         "name": "Meredark"
       },
       "harvest_sprite": {
-        "name": "Tinh Linh Mùa Gặt"
+        "name": "Gleaning Sprite"
       },
       "mere_lurker": {
         "name": "Kẻ Rình Đầm Hồ"
@@ -11841,7 +11841,7 @@ export const vi_VN: EnTranslations = {
         "name": "Kẻ Rảo Bước Chạng Vạng"
       },
       "nightkin_stargazer": {
-        "name": "Kẻ Ngắm Sao Tộc Đêm"
+        "name": "Gloamkin Stargazer"
       },
       "barrow_king": {
         "name": "Vua Gò Mộ"
@@ -11991,7 +11991,7 @@ export const vi_VN: EnTranslations = {
         "name": "Emberkin"
       },
       "gloomshade": {
-        "name": "Gloomshade"
+        "name": "Duskmurk"
       },
       "duskborn": {
         "name": "Duskborn"
@@ -12262,7 +12262,7 @@ export const vi_VN: EnTranslations = {
       },
       "provisioner_fenna": {
         "name": "Người Tiếp Tế Fenna",
-        "title": "Người Tiếp Tế Của Eldergleam",
+        "title": "Người Tiếp Tế Của Eldershine",
         "greeting": "Bánh mì vẫn còn ấm, nước vẫn còn ngọt lành. Hollow ban tặng, và ta cũng vậy."
       },
       "wardsmith_orun": {
@@ -12387,12 +12387,12 @@ export const vi_VN: EnTranslations = {
       },
       "sexton_marrow": {
         "name": "Người Giữ Mộ Marrow",
-        "title": "Người Giữ Mộ Của Gallowmere",
+        "title": "Người Giữ Mộ Của Gibbetmere",
         "greeting": "Chúng tôi chôn họ thật sâu ở đây, và rung chuông để họ nhớ mà nằm yên."
       },
       "widow_tansy": {
         "name": "Quả Phụ Tansy",
-        "title": "Thợ Làm Nến Của Gallowmere",
+        "title": "Thợ Làm Nến Của Gibbetmere",
         "greeting": "Một ngọn nến cho mỗi nấm mộ, và không được để ngọn nào tắt. Không một ngọn nào, ngươi nghe rõ chưa?"
       },
       "vicar_creel": {
@@ -12416,7 +12416,7 @@ export const vi_VN: EnTranslations = {
         "greeting": "Biển cả cho đi, cát giữ lại, và rừng rậm lấy đi. Hãy ở lại trên bờ cát, kẻ lạ mặt."
       },
       "hermit_okku": {
-        "name": "Okku",
+        "name": "Okrim",
         "title": "Người Đã Bước Vào Trong",
         "greeting": "Im lặng nào. Tiếng trống đếm mọi thứ bước đi dưới tán cây, và chúng đã đếm được ngươi rồi."
       },
@@ -13064,7 +13064,7 @@ export const vi_VN: EnTranslations = {
       },
       "q_drogmar": {
         "title": "Lãnh Chúa Chiến Tranh Drogmar",
-        "text": "Lãnh Chúa Chiến Tranh Drogmar đã nhận vàng của Long Giáo và thề đưa các bộ tộc theo sự thức tỉnh của ngọn núi. Hắn là cây búa mà chúng định vung vào bức tường của ta - và khi hắn giáng xuống mặt đất, {playerName}, chớ đứng gần hắn. Hãy đưa đồng đội vào trại chiến và kết liễu hắn, vì Highwatch.",
+        "text": "Warlord Drogmar took the Broodsworn's coin and swore the clans to the mountain's waking. He is the hammer they mean to swing at my wall - and when he slams the ground, {playerName}, do not be standing near him. Take your companions into the war-camp and end him, for Highwatch.",
         "completion": "Drogmar, chết ngay trong trại của hắn. Các bộ tộc sẽ tản về những con đèo cao - ngươi đã mua cho bức tường của ta thêm một mùa đông, {playerName}.",
         "objectives": {
           "0": {
@@ -13104,11 +13104,11 @@ export const vi_VN: EnTranslations = {
       },
       "q_zealots": {
         "title": "Khúc Tụng Trong Gió",
-        "text": "Khi gió thổi xuống từ những đỉnh núi phía nam, {playerName}, nó mang theo tiếng tụng niệm. Giáo Phái Cuồng Long không còn ẩn nấp nữa, chúng đã dựng lều bên dưới Thánh Đường và hát cho thứ ngủ vùi bên dưới nó. Bịt miệng mười hai tín đồ. Mỗi giọng nói bị làm im lặng mua cho ngọn núi thêm một đêm ngủ yên.",
+        "text": "When the wind comes off the southern peaks, {playerName}, it carries chanting. The Broodsworn no longer hides - they have raised tents below the Sanctum and they sing to what sleeps beneath it. Silence twelve zealots. Every voice stilled buys the mountain another night of sleep.",
         "completion": "Gió đã lặng hơn. Nhưng điều khiến ta lo lắng không phải là tiếng tụng niệm, {playerName}, mà là có thứ gì đó có thể đang tụng niệm đáp lại.",
         "objectives": {
           "0": {
-            "label": "Tín Đồ Cuồng Long đã hạ"
+            "label": "Broodsworn Zealot slain"
           }
         }
       },
@@ -13181,7 +13181,7 @@ export const vi_VN: EnTranslations = {
             "label": "Tín Đồ Cuồng Long đã hạ"
           },
           "1": {
-            "label": "Tử Linh Sư Cuồng Long đã hạ"
+            "label": "Broodsworn Necromancer slain"
           }
         }
       },
@@ -13621,7 +13621,7 @@ export const vi_VN: EnTranslations = {
       },
       "q_hollow_old_marrowshell": {
         "title": "Chiếc Mai Cũ Của Bãi Cạn",
-        "text": "Cái tên đầu tiên là Lão Vỏ Tủy, một con cua to bằng cả chiếc xe đã săn mồi ở bãi cạn phía đông từ trước khi Eldergleam có cổng. Nó lang thang khắp nơi, {playerName}, nên bạn sẽ phải đi dọc bờ biển cho đến khi bắt gặp dấu vết của nó. Đừng đi một mình, và đừng tin vào sự bất động của nó.",
+        "text": "Cái tên đầu tiên là Lão Vỏ Tủy, một con cua to bằng cả chiếc xe đã săn mồi ở bãi cạn phía đông từ trước khi Eldershine có cổng. Nó lang thang khắp nơi, {playerName}, nên bạn sẽ phải đi dọc bờ biển cho đến khi bắt gặp dấu vết của nó. Đừng đi một mình, và đừng tin vào sự bất động của nó.",
         "completion": "Bãi cạn giờ lại chỉ còn là nước. Ta đã chứng kiến cái mai đó đánh bại những thợ săn giỏi hơn ta, {playerName}. Nhưng không phải bạn.",
         "objectives": {
           "0": {
@@ -13763,12 +13763,12 @@ export const vi_VN: EnTranslations = {
         }
       },
       "q_fv_frostmane_tyrant": {
-        "title": "Bạo Chúa Bờm Băng Giá",
-        "text": "Những kẻ gào thét không phải đang săn mồi khi chúng xuống khỏi bậc thềm. Chúng đang chạy trốn. Một con người tuyết đã chiếm lấy vùng đất cao, dân miền núi gọi nó là Bờm Băng Giá, và ngay cả các bầy sói cũng không chịu chia sẻ một sườn núi với nó. Việc này phải chấm dứt, {playerName}, trước khi mùa đông đẩy nó xuống tận tường thành của ta. Rủ theo một người bạn. Rủ theo hai người.",
-        "completion": "Khi gió lặng đêm qua, cả ngôi làng đã nghe thấy sự im lặng nơi Bờm Băng Giá từng ở. Vùng Đất này nợ bạn một món nợ sẽ mất nhiều năm để trả, {playerName}. Hãy khoác lên thứ này, và mọi cánh cửa ở Icemantle sẽ rộng mở với bạn.",
+        "title": "The Rimemane Tyrant",
+        "text": "The howlers were not hunting when they came down the terraces. They were fleeing. A yeti has claimed the high ground, the mountain folk call it the Rimemane, and even the packs will not share a slope with it. It has to end, {playerName}, before winter drives it down to my walls. Bring a friend. Bring two.",
+        "completion": "When the wind dropped last night the whole village heard the silence where the Rimemane used to be. The Reach owes you a debt it will be years in paying, {playerName}. Wear this, and every door in Icemantle is open to you.",
         "objectives": {
           "0": {
-            "label": "Bờm Băng Giá bị tiêu diệt"
+            "label": "The Rimemane slain"
           }
         }
       },
@@ -13921,7 +13921,7 @@ export const vi_VN: EnTranslations = {
         "completion": "Bốn chiếc xô đã về lại trên móc treo và những hàng cây đã yên tĩnh trở lại. Bạn ra tay mạnh mẽ với đám tinh linh hơn ta nhiều, {playerName}, và hôm nay ta mừng vì điều đó.",
         "objectives": {
           "0": {
-            "label": "Tinh Linh Mùa Gặt bị đuổi đi"
+            "label": "Gleaning Sprite driven off"
           },
           "1": {
             "label": "Xô Hứng Nhựa được tìm lại"
@@ -14063,7 +14063,7 @@ export const vi_VN: EnTranslations = {
       },
       "q_nb_eyes_on_the_vigil": {
         "title": "Mắt Nhìn Về Canh Thức Vĩnh Cửu",
-        "text": "Có thứ gì đó khiến những kẻ rảo bước trở nên táo bạo và đàn hươu bất an, {playerName}, và ta không thể đọc được điều đó từ những bông hoa. Cassian có thể đọc được từ bầu trời. Ông ấy giữ trại quan sát của mình gần Canh Thức Vĩnh Cửu phía đông nơi này, nơi tộc đêm lang thang giữa những phiến đá. Tìm ông ấy, và hỏi xem các vì sao đang nói gì.",
+        "text": "Something has the striders bold and the herds uneasy, {playerName}, and I cannot read it in the flowers. Cassian can read it in the sky. He keeps his observatory camp by the Standing Vigil east of here, where the gloamkin drift among the stones. Find him, and ask what the stars are saying.",
         "completion": "Lira cử bạn đến? Vậy là cả những khu vườn cũng cảm nhận được điều đó. Ngồi cạnh ống kính một lát đi, {playerName}. Các vì sao đã bất an suốt một tháng, và mỗi bản đồ ta vẽ đều nghiêng về phía bắc, hướng đến gò mộ.",
         "objectives": {
           "0": {
@@ -14073,7 +14073,7 @@ export const vi_VN: EnTranslations = {
       },
       "q_nb_charts_of_the_stones": {
         "title": "Bản Đồ Trong Những Phiến Đá",
-        "text": "Những phiến đá Canh Thức còn cổ xưa hơn cả Moonrest, cổ xưa hơn cả tộc đêm chăm sóc chúng, và bề mặt của chúng được khắc những bản đồ sao mà ta đã dành cả đời để học cách đọc. Bầu trời đã dịch chuyển, {playerName}, và ta phải biết đã dịch chuyển bao xa. Đọc bản đồ trên ba phiến đá và mang về cho ta phương vị của chúng.",
+        "text": "The Vigil stones are older than Moonrest, older than the gloamkin who tend them, and their faces are cut with star charts I have spent my life learning to read. The sky has shifted, {playerName}, and I must know how far. Read the charts on three of the stones and bring me their bearings.",
         "completion": "Không còn nghi ngờ gì nữa. Mọi phương vị đều đã dịch chuyển dần về phía Gò Mộ Không Ngủ, như thể chính bầu trời đang cúi xuống gò đất đó để quan sát. Các vị vua xưa được chôn cất dưới những vì sao thẳng hàng không phải vô cớ, {playerName}.",
         "objectives": {
           "0": {
@@ -14097,7 +14097,7 @@ export const vi_VN: EnTranslations = {
       "q_nb_the_barrow_king": {
         "title": "Vua Gò Mộ Thức Tỉnh",
         "text": "Mọi phương vị, mọi vì sao bất an, mọi gò mộ đang mở ra đều chỉ về một điều: Vua Gò Mộ đang thức tỉnh dưới gò đất lớn, và vương quốc này không có bình minh để ngăn nó lại. Nó phải được cho an nghỉ trước khi nó nhớ lại vương miện của mình, {playerName}. Đừng đi một mình: rủ theo một người bạn, và giữ ánh sáng hoa sau lưng bạn.",
-        "completion": "Các vì sao đã lắng xuống lần đầu tiên trong cả mùa, {playerName}. Các gò mộ đã đóng lại, tộc đêm đã trở nên tĩnh lặng bên những phiến đá của họ, và vị vua lại ngủ yên bên dưới. Hãy khoác lên tấm áo choàng này: Moonrest đã cắt nó cho bất cứ ai màn đêm cuối cùng cũng tin tưởng.",
+        "completion": "The stars have settled for the first time in a season, {playerName}. The mounds are closed, the gloamkin have gone still at their stones, and the king sleeps below once more. Wear this mantle: Moonrest cut it for whoever the night finally trusted.",
         "objectives": {
           "0": {
             "label": "Vua Gò Mộ được cho an nghỉ"
@@ -14105,9 +14105,9 @@ export const vi_VN: EnTranslations = {
         }
       },
       "q_ww_bells_of_gallowmere": {
-        "title": "Những Chiếc Chuông Của Gallowmere",
-        "text": "Nghe tiếng chuông đó không, {playerName}? Đó là Gallowmere, trên con đường phía bắc, đang rung chuông ru người chết của nó vào giấc ngủ. Người Giữ Mộ Marrow giữ số đếm của mọi linh hồn dưới tán rừng, cả người sống lẫn người đã chôn cất. Đi đến và được đếm, trước khi khu rừng tự đếm bạn.",
-        "completion": "Cobb đã đưa bạn lên con đường này nguyên vẹn à? Người tốt đấy. Ông ấy đã giữ những chiếc đèn lồng cổng đó cháy sáng suốt ba mươi năm, và khu rừng chưa từng một lần vượt qua được ông ấy. Chào mừng đến Gallowmere, {playerName}. Chú ý đến những chiếc chuông.",
+        "title": "Những Chiếc Chuông Của Gibbetmere",
+        "text": "Nghe tiếng chuông đó không, {playerName}? Đó là Gibbetmere, trên con đường phía bắc, đang rung chuông ru người chết của nó vào giấc ngủ. Người Giữ Mộ Marrow giữ số đếm của mọi linh hồn dưới tán rừng, cả người sống lẫn người đã chôn cất. Đi đến và được đếm, trước khi khu rừng tự đếm bạn.",
+        "completion": "Cobb đã đưa bạn lên con đường này nguyên vẹn à? Người tốt đấy. Ông ấy đã giữ những chiếc đèn lồng cổng đó cháy sáng suốt ba mươi năm, và khu rừng chưa từng một lần vượt qua được ông ấy. Chào mừng đến Gibbetmere, {playerName}. Chú ý đến những chiếc chuông.",
         "objectives": {
           "0": {
             "label": "Báo cáo với Người Giữ Mộ Marrow"
@@ -14136,7 +14136,7 @@ export const vi_VN: EnTranslations = {
       },
       "q_ww_candles_at_the_bounds": {
         "title": "Nến Ở Ranh Giới",
-        "text": "Bốn phiến đá ranh giới bao quanh Gallowmere, {playerName}, một trên mỗi con đường ra vào, và một ngọn nến mộ cháy trên mỗi phiến đá. Khi chúng còn cháy, người đã chôn vẫn ở yên dưới mộ. Mưa phùn đã làm tắt chúng, cả bốn ngọn, và ta đã quá già để tự mình đi vòng quanh ranh giới. Cầm lấy cây nến của ta và thắp lại chúng, thật nhanh.",
+        "text": "Bốn phiến đá ranh giới bao quanh Gibbetmere, {playerName}, một trên mỗi con đường ra vào, và một ngọn nến mộ cháy trên mỗi phiến đá. Khi chúng còn cháy, người đã chôn vẫn ở yên dưới mộ. Mưa phùn đã làm tắt chúng, cả bốn ngọn, và ta đã quá già để tự mình đi vòng quanh ranh giới. Cầm lấy cây nến của ta và thắp lại chúng, thật nhanh.",
         "completion": "Cả bốn ngọn đều cháy sao? Vậy thì hãy thở phào đi, {playerName}. Bạn không nghe thấy, nhưng cả ngôi làng đã nghe: những chiếc chuông rung nhẹ nhõm hơn ngay khoảnh khắc sợi bấc cuối cùng bắt lửa.",
         "objectives": {
           "0": {
@@ -14166,7 +14166,7 @@ export const vi_VN: EnTranslations = {
       },
       "q_ww_what_the_bark_holds": {
         "title": "Điều Mà Vỏ Cây Nắm Giữ",
-        "text": "Trong Trảng Rừng Treo Cổ phía đông Gallowmere, lũ nhả tơ treo người chết được bọc tơ của chúng từ những cành cây, và những kẻ lê bước vỏ cây khắc đứng canh gác bên dưới như những người khiêng quan tài kiên nhẫn. Đó là người dân của chúng ta ở trên đó, {playerName}. Đập tan năm kẻ lê bước, hạ xuống ba xác chết bị bọc, và đưa họ về với đất.",
+        "text": "Trong Trảng Rừng Treo Cổ phía đông Gibbetmere, lũ nhả tơ treo người chết được bọc tơ của chúng từ những cành cây, và những kẻ lê bước vỏ cây khắc đứng canh gác bên dưới như những người khiêng quan tài kiên nhẫn. Đó là người dân của chúng ta ở trên đó, {playerName}. Đập tan năm kẻ lê bước, hạ xuống ba xác chết bị bọc, và đưa họ về với đất.",
         "completion": "Ba linh hồn trở lại dưới lòng đất chân chính trước khi màn đêm buông xuống. Những kẻ lê bước sẽ mọc lại, vỏ cây luôn như vậy, nhưng đêm nay trảng rừng treo trống không, và như thế là đủ.",
         "objectives": {
           "0": {
@@ -14180,17 +14180,17 @@ export const vi_VN: EnTranslations = {
       "q_ww_walking_mosley_home": {
         "title": "Đưa Mosley Về Nhà",
         "text": "Người đào mộ của ta, Mosley, đã đi trên con đường nhà nguyện ba ngày trước để mở một huyệt mộ trong khu đất cũ, và hố đào đã sập xuống trên người ông ấy. Ông ấy đã cào bới thoát ra, kẻ ngốc đó vẫn còn sống, nhưng ông ấy đang co ro cạnh những ngôi mộ nhà nguyện và không dám di chuyển vì lũ nhả tơ trên đường. Đưa ông ấy về nhà, {playerName}. Ta không thể rung chuông cho một người còn sống.",
-        "completion": "Ông ấy đã bước qua cổng bằng chính đôi chân mình, thề rằng từ giờ sẽ không đào gì sâu hơn một luống củ cải. Ông ấy sẽ trở lại khu đất đó trước ngày Chủ Nhật, họ luôn như vậy. Cảm ơn bạn, {playerName}. Gallowmere giữ gìn người dân của mình, đó là toàn bộ luật lệ của chúng ta.",
+        "completion": "Ông ấy đã bước qua cổng bằng chính đôi chân mình, thề rằng từ giờ sẽ không đào gì sâu hơn một luống củ cải. Ông ấy sẽ trở lại khu đất đó trước ngày Chủ Nhật, họ luôn như vậy. Cảm ơn bạn, {playerName}. Gibbetmere giữ gìn người dân của mình, đó là toàn bộ luật lệ của chúng ta.",
         "objectives": {
           "0": {
-            "label": "Người Đào Mộ Mosley được đưa an toàn trở lại Gallowmere"
+            "label": "Người Đào Mộ Mosley được đưa an toàn trở lại Gibbetmere"
           }
         }
       },
       "q_ww_horn_of_the_huntsman": {
         "title": "Chiếc Tù Và Của Thợ Săn",
         "text": "Chắc giờ bạn đã nghe thấy tiếng tù và, {playerName}, mỏng manh và xa xăm, âm thanh khiến cả khu rừng nín thở. Thợ Săn Nhợt Nhạt cưỡi ngựa qua khoảng trống của hắn phía bắc nơi này, và mỗi ngôi mộ hắn đi qua đều trở nên nông hơn. Hắn từng là một con người, và hắn đã bị chôn cất sai cách, và ta đã thôi giả vờ rằng lời cầu nguyện có thể giải quyết được điều đó. Rủ theo một người bạn, rủ theo hai người, và hất hắn khỏi lưng ngựa.",
-        "completion": "Tiếng tù và ngừng bặt giữa chừng. Mỗi chiếc chuông ở Gallowmere đã rung một lần, tự nó rung lên, rồi khu rừng trở nên yên tĩnh hơn bất cứ lúc nào ta từng nghe trong ba mươi năm qua. Bạn đã thực hiện nghi lễ mà ta không thể, {playerName}. Khoác lên thứ này, và bước đi dưới tán rừng mà không sợ hãi.",
+        "completion": "Tiếng tù và ngừng bặt giữa chừng. Mỗi chiếc chuông ở Gibbetmere đã rung một lần, tự nó rung lên, rồi khu rừng trở nên yên tĩnh hơn bất cứ lúc nào ta từng nghe trong ba mươi năm qua. Bạn đã thực hiện nghi lễ mà ta không thể, {playerName}. Khoác lên thứ này, và bước đi dưới tán rừng mà không sợ hãi.",
         "objectives": {
           "0": {
             "label": "Thợ Săn Nhợt Nhạt bị hất khỏi lưng ngựa"
@@ -14239,11 +14239,11 @@ export const vi_VN: EnTranslations = {
       },
       "q_pr_the_man_who_went_in": {
         "title": "Người Đã Bước Vào Trong",
-        "text": "Những người thợ lặn sẽ không bước qua ranh giới cây cối, {playerName}, và tôi sẽ không yêu cầu họ làm vậy. Chắc bạn đã nghe tiếng trống rồi: ai cũng nghe thấy, vào đêm thứ hai. Chỉ có một người trên hòn đảo này từng bước về phía âm thanh đó và trở lại. Okku. Ông ấy cắm trại dưới những cây đa lớn tại Vinefall, sâu trên con đường Tangle. Tìm ông ấy, và hỏi ông ấy xem màu xanh đó đang giấu điều gì.",
+        "text": "Những người thợ lặn sẽ không bước qua ranh giới cây cối, {playerName}, và tôi sẽ không yêu cầu họ làm vậy. Chắc bạn đã nghe tiếng trống rồi: ai cũng nghe thấy, vào đêm thứ hai. Chỉ có một người trên hòn đảo này từng bước về phía âm thanh đó và trở lại. Okrim. Ông ấy cắm trại dưới những cây đa lớn tại Vinefall, sâu trên con đường Tangle. Tìm ông ấy, và hỏi ông ấy xem màu xanh đó đang giấu điều gì.",
         "completion": "Isha cử bạn đến? Ngọc Mẫu đã không nhắc đến tên tôi suốt nhiều năm rồi. Ngồi ngoài tầm với của dây leo đi, {playerName}, và tôi sẽ kể cho bạn nghe những gì tôi biết: tiếng trống không phải là mối nguy hiểm. Chúng là lời cảnh báo.",
         "objectives": {
           "0": {
-            "label": "Tìm Okku tại Vinefall"
+            "label": "Tìm Okrim tại Vinefall"
           }
         }
       },
@@ -14722,7 +14722,7 @@ export const vi_VN: EnTranslations = {
             "label": "Hồ Lung Linh"
           },
           "7": {
-            "label": "Lều Giáo Phái Cuồng Long"
+            "label": "Broodsworn Tents"
           },
           "8": {
             "label": "Cánh Đồng Vong Linh"
@@ -14734,10 +14734,10 @@ export const vi_VN: EnTranslations = {
       },
       "veiled_hollow": {
         "name": "Thung Lũng Sương Phủ",
-        "welcome": "Không khí nơi đây vang vọng phép thuật cổ xưa. Hãy tìm đến Người Canh Giữ Saelwyn dưới gốc đại thụ của Eldergleam.",
+        "welcome": "Không khí nơi đây vang vọng phép thuật cổ xưa. Hãy tìm đến Người Canh Giữ Saelwyn dưới gốc đại thụ của Eldershine.",
         "pois": {
           "0": {
-            "label": "Eldergleam"
+            "label": "Eldershine"
           },
           "1": {
             "label": "Hang Động Duskfall"
@@ -14875,7 +14875,7 @@ export const vi_VN: EnTranslations = {
             "label": "Nightgate"
           },
           "2": {
-            "label": "Moonwell"
+            "label": "Moonspring"
           },
           "3": {
             "label": "Gloamfield"
@@ -14890,10 +14890,10 @@ export const vi_VN: EnTranslations = {
       },
       "wraithwood": {
         "name": "Rừng Oan Hồn",
-        "welcome": "Tán lá khép lại trên con đường như một chiếc nắp đậy. Hãy bám theo ánh đèn lồng của Gallowmere, và đừng đáp lời nếu khu rừng gọi tên bạn.",
+        "welcome": "Tán lá khép lại trên con đường như một chiếc nắp đậy. Hãy bám theo ánh đèn lồng của Gibbetmere, và đừng đáp lời nếu khu rừng gọi tên bạn.",
         "pois": {
           "0": {
-            "label": "Gallowmere"
+            "label": "Gibbetmere"
           },
           "1": {
             "label": "Crowgate"

@@ -844,7 +844,7 @@ describe('rogue stealth', () => {
     expect(wolf.threat.has(rogue.id)).toBe(false);
   });
 
-  it('Smokestep allows out-of-combat rogue actions after escaping', () => {
+  it('Smokefade allows out-of-combat rogue actions after escaping', () => {
     const sim = makeSim('rogue');
     sim.setPlayerLevel(20);
     const wolf = nearestMob(sim, 'forest_wolf');
@@ -856,7 +856,7 @@ describe('rogue stealth', () => {
     hit(sim, sim.player, wolf, 30);
     sim.castAbility('vanish');
     expect(sim.player.inCombat).toBe(false);
-    expect(sim.player.auras.some((a) => a.name === 'Smokestep' && a.kind === 'stealth')).toBe(true);
+    expect(sim.player.auras.some((a) => a.name === 'Smokefade' && a.kind === 'stealth')).toBe(true);
 
     sim.targetEntity(wolf.id);
     sim.player.resource = sim.player.maxResource;
@@ -867,7 +867,7 @@ describe('rogue stealth', () => {
     expect(sim.player.auras.some((a) => a.kind === 'stealth')).toBe(true);
   });
 
-  it('Smokestep clears focus and stops incoming attacks from a single Ridge Stalker', () => {
+  it('Smokefade clears focus and stops incoming attacks from a single Ridge Stalker', () => {
     const sim = makeSim('rogue');
     sim.setPlayerLevel(20);
     const rogue = sim.player;
@@ -891,7 +891,7 @@ describe('rogue stealth', () => {
     const hpAfterEscape = rogue.hp;
     sim.castAbility('vanish');
 
-    expect(rogue.auras.some((a) => a.name === 'Smokestep' && a.kind === 'stealth')).toBe(true);
+    expect(rogue.auras.some((a) => a.name === 'Smokefade' && a.kind === 'stealth')).toBe(true);
     expect(rogue.cooldowns.has('vanish')).toBe(true);
     expect(rogue.autoAttack).toBe(false);
     expect(rogue.targetId).toBeNull();
@@ -2055,7 +2055,7 @@ describe('warlock demon summons', () => {
     expect(sim.entities.has(demon.id)).toBe(true);
   });
 
-  it('Summon Gloomshade replaces the emberkin with a tank demon that Growls', () => {
+  it('Summon Duskmurk replaces the emberkin with a tank demon that Growls', () => {
     const sim = makeSim('warlock');
     sim.setPlayerLevel(10);
     const imp = summonImp(sim);
@@ -2065,7 +2065,7 @@ describe('warlock demon summons', () => {
     for (let i = 0; i < 20 * 6; i++) sim.tick();
     const voidwalker = expectDefined(sim.petOf(sim.playerId));
     expect(voidwalker.templateId).toBe('gloomshade');
-    expect(voidwalker.name).toBe('Gloomshade');
+    expect(voidwalker.name).toBe('Duskmurk');
     expect(voidwalker.id).not.toBe(imp.id);
     expect(sim.entities.has(imp.id)).toBe(false);
     expect(voidwalker.maxHp).toBeGreaterThan(imp.maxHp);

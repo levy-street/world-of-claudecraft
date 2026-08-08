@@ -1,7 +1,7 @@
 // The Veiled Hollow (levels 15-20). A sheltered valley realm sealed beneath
 // the mountains north of Thornpeak long before the Gravecaller conspiracy;
 // the seal has thinned, and a concealed cave in the Thornpeak cliffs now
-// leads through. Permanent dusk, glowing flora, and the town of Eldergleam
+// leads through. Permanent dusk, glowing flora, and the town of Eldershine
 // around the roots of a great tree. Reached only by portal: the southern
 // border ridge is sealed (see sealedSouthBorder in world.ts).
 
@@ -28,7 +28,7 @@ export const REALM_ZONE: ZoneDef = {
   levelRange: [15, 20],
   biome: 'dusk',
   sealedSouthBorder: true,
-  hub: { x: -40, z: 1030, radius: 30, name: 'Eldergleam' },
+  hub: { x: -40, z: 1030, radius: 30, name: 'Eldershine' },
   graveyard: { x: -60, z: 1004 },
   // Overlapping carves make organic shorelines: inlets and coves instead of
   // circular ponds. The tarn cuts into the western highlands; the falls pool
@@ -46,7 +46,7 @@ export const REALM_ZONE: ZoneDef = {
     { x: 142, z: 1142, radius: 8 }, // ...its reeded southern finger
   ],
   pois: [
-    { x: -40, z: 1030, label: 'Eldergleam', id: 'eldergleam' },
+    { x: -40, z: 1030, label: 'Eldershine', id: 'eldergleam' },
     { x: -140, z: 952, label: 'Duskfall Cave', id: 'duskfall_cave' },
     { x: -118, z: 988, label: 'Duskfall Overlook', id: 'duskfall_overlook' },
     { x: 30, z: 955, label: 'Elder Grove', id: 'elder_grove' },
@@ -55,15 +55,15 @@ export const REALM_ZONE: ZoneDef = {
     { x: 75, z: 1165, label: 'Crystalline Shallows', id: 'crystalline_shallows' },
     { x: -70, z: 1155, label: 'The Gleaming Deep', id: 'the_gleaming_deep' },
   ],
-  welcome: 'The air hums with old magic. Seek Keeper Saelwyn beneath the great tree of Eldergleam.',
+  welcome: 'The air hums with old magic. Seek Keeper Saelwyn beneath the great tree of Eldershine.',
   welcomeQuestId: 'q_veil_thinned',
 };
 
-// Winding valley paths: the cave descent into Eldergleam, then spokes out to
+// Winding valley paths: the cave descent into Eldershine, then spokes out to
 // the grove, the basin, the ruins, and the mushroom forest.
 export const REALM_ROADS: { x: number; z: number }[][] = [
   [
-    // the Eldergleam ring: a circular walk around the great tree; the four
+    // the Eldershine ring: a circular walk around the great tree; the four
     // spoke roads below each end on this circle
     { x: -40, z: 1040 },
     { x: -33, z: 1038.1 },
@@ -84,20 +84,20 @@ export const REALM_ROADS: { x: number; z: number }[][] = [
     { x: -125, z: 980 },
     { x: -95, z: 1005 },
     { x: -53, z: 1022 },
-  ], // Duskfall Cave -> the Eldergleam ring, west
+  ], // Duskfall Cave -> the Eldershine ring, west
   [
     { x: -45, z: 1039 },
     { x: -45, z: 1052 },
     { x: -60, z: 1105 },
     { x: -70, z: 1150 },
-  ], // the Eldergleam ring, north -> the Gleaming Deep
+  ], // the Eldershine ring, north -> the Gleaming Deep
   [
     { x: -26, z: 1030 },
     { x: -18, z: 1030 },
     { x: 30, z: 1042 },
     { x: 80, z: 1062 },
     { x: 120, z: 1085 },
-  ], // the Eldergleam ring, east -> the Sunken Court
+  ], // the Eldershine ring, east -> the Sunken Court
   [
     { x: -33, z: 1014 },
     { x: -30, z: 1010 },
@@ -105,7 +105,7 @@ export const REALM_ROADS: { x: number; z: number }[][] = [
     { x: 70, z: 975 },
     { x: 88, z: 982 },
     { x: 100, z: 984 },
-  ], // the Eldergleam ring, southeast -> Starfall Basin -> the Star's Cradle causeway
+  ], // the Eldershine ring, southeast -> Starfall Basin -> the Star's Cradle causeway
   [
     { x: -62, z: 1155 },
     { x: -10, z: 1172 },
@@ -460,7 +460,7 @@ export const REALM_MOBS: Record<string, MobTemplate> = {
 };
 
 // ---------------------------------------------------------------------------
-// The people of Eldergleam.
+// The people of Eldershine.
 // ---------------------------------------------------------------------------
 
 export const REALM_NPCS: Record<string, NpcDef> = {
@@ -493,7 +493,7 @@ export const REALM_NPCS: Record<string, NpcDef> = {
   provisioner_fenna: {
     id: 'provisioner_fenna',
     name: 'Provisioner Fenna',
-    title: 'Eldergleam Provisioner',
+    title: 'Eldershine Provisioner',
     pos: { x: -46, z: 1031 },
     facing: -0.87,
     color: 0x8fbf8a,
@@ -530,7 +530,7 @@ export const REALM_NPCS: Record<string, NpcDef> = {
     greeting:
       'The monuments out there have not spoken to anyone in an age. Perhaps they were waiting for fresh ears.',
   },
-  // The huntsman keeps a lookout among the stag meadows, far from Eldergleam:
+  // The huntsman keeps a lookout among the stag meadows, far from Eldershine:
   // Fenna's breadcrumb sends players out to find him, and his chain hunts the
   // Hollow's two wandering rare bosses.
   huntsman_deral: {
@@ -846,7 +846,7 @@ export const REALM_QUESTS: Record<string, QuestDef> = {
     name: 'The Old Shell of the Shallows',
     giverNpcId: 'huntsman_deral',
     turnInNpcId: 'huntsman_deral',
-    text: 'The first name is Old Marrowshell, a crab the size of a cart that has hunted the eastern shallows since before Eldergleam had a gate. It wanders, $N, so you will have to walk the shoreline until you cross its track. Do not go alone, and do not trust its stillness.',
+    text: 'The first name is Old Marrowshell, a crab the size of a cart that has hunted the eastern shallows since before Eldershine had a gate. It wanders, $N, so you will have to walk the shoreline until you cross its track. Do not go alone, and do not trust its stillness.',
     completionText:
       'The shallows are just water again. I have watched that shell break better hunters than me, $N. Not you.',
     objectives: [
@@ -1150,7 +1150,7 @@ export const REALM_PROPS: ZonePropsDef = {
     { x: -140, z: 847, rot: Math.PI }, // Thornpeak side, opening south
     { x: -140, z: 948, rot: 0 }, // realm side, opening north
   ],
-  // Eldergleam: the hub town under the great tree (the tree itself is placed
+  // Eldershine: the hub town under the great tree (the tree itself is placed
   // by render/realm_flora.ts; these are the built structures around it).
   // The great tree's trunk is solid (colliders.ts); everything else rings it
   // at a respectful distance so the square breathes.

@@ -1,6 +1,6 @@
 // The Nightbloom's dressing, render-only: fields of emissive lumen blossoms
 // that carry the realm's name, and glow lights at the two stone rings and the
-// Moonwell. Same contract as the sibling realm modules: build once,
+// Moonspring. Same contract as the sibling realm modules: build once,
 // update(time) animates gently, glowLights join the renderer's rank-culled
 // fireLights budget. (The dreambeam shafts were removed at the user's request.)
 import * as THREE from 'three';
@@ -22,7 +22,7 @@ const NIGHT_ZMAX = 1820;
 // foliage grid, but emissive so they bloom on composer tiers).
 const BLOSSOM_FIELDS = [
   { x: -444, z: 1496, r: 34 }, // Gloamfield
-  { x: -298, z: 1388, r: 26 }, // the Moonwell's shore
+  { x: -298, z: 1388, r: 26 }, // the Moonspring's shore
   { x: -380, z: 1340, r: 24 }, // the Nightgate meadows
   { x: -330, z: 1520, r: 28 }, // the midrealm saddle
   { x: -354, z: 1666, r: 22 }, // the barrow downs
@@ -111,7 +111,7 @@ export function buildNightFeatures(seed: number): NightFeaturesView {
   const GLOWS = [
     { x: -272, z: 1538, c: 0xc8b4ff, i: 1.6 }, // the Standing Vigil
     { x: -360, z: 1650, c: 0xb0a0e8, i: 1.4 }, // the Sleepless Barrow
-    { x: -290, z: 1380, c: 0xffc8ec, i: 1.2 }, // the Moonwell's water glow
+    { x: -290, z: 1380, c: 0xffc8ec, i: 1.2 }, // the Moonspring's water glow
   ];
   for (const g of GLOWS) {
     const y = Math.max(terrainHeight(g.x, g.z, seed), WATER_LEVEL) + 3;

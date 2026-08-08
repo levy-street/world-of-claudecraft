@@ -215,7 +215,7 @@ describe('canonical Talents V2 allocation', () => {
 
   it('folds each selected row exactly once', () => {
     // The owner mage tree (89d1625a2) replaced Impulse; Double Blink is the
-    // row 5 option that grants one bonus charge (on Flickerstep/blink).
+    // row 5 option that grants one bonus charge (on Flitstep/blink).
     const mods = computeTalentModifiers(
       'mage',
       { spec: null, rows: { 5: 'mag_r5_double_blink' } },

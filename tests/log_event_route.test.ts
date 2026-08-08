@@ -20,7 +20,7 @@ describe('isCombatFlavorLog', () => {
     expect(isCombatFlavorLog(42, 7)).toBe(false);
   });
 
-  it('keeps an entityId-anchored mechanic telegraph (e.g. Deacon Varric begins Raise Dead) in General/Chat', () => {
+  it('keeps an entityId-anchored mechanic telegraph (e.g. Deacon Vandric begins Raise Dead) in General/Chat', () => {
     expect(isCombatFlavorLog(42, undefined, true)).toBe(false);
   });
 });

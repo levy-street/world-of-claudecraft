@@ -38,9 +38,7 @@ export const table: DeedLocaleTable = {
     title: 'Sergent',
   },
   pvp_honor_knight_lieutenant: {
-    name: 'Chevalier-Lieutenant',
     desc: "Gagnez 40 000 points d'honneur au cours de votre vie de personnage, une vraie saison de guerre derrière vous.",
-    title: 'Chevalier-Lieutenant',
   },
   pvp_honor_field_marshal: {
     name: 'Maréchal',
@@ -76,7 +74,6 @@ export const table: DeedLocaleTable = {
     desc: 'Recoltez un filon de minerai, un bosquet de bois et un carre d herbes a Nightbloom.',
   },
   chr_nightbloom_first_cast: {
-    name: 'Une ride sur le puits lunaire',
     desc: 'Pechez un poisson dans les eaux de Nightbloom.',
   },
   chr_wraithwood_gatherer: {
@@ -304,7 +301,6 @@ export const table: DeedLocaleTable = {
     title: 'Terrasse-wyrm',
   },
   dgn_sanctum_speed: {
-    name: 'Sprint du Sanctuaire',
     desc: 'Vainquez Korzul le Gravewyrm dans les 15 minutes suivant la prise du Sanctuaire du Gravewyrm par votre groupe.',
   },
   dgn_nythraxis_gravebreaker: {
@@ -370,7 +366,7 @@ export const table: DeedLocaleTable = {
   },
   dlv_varric_ringers: {
     name: 'Les cloches se taisent',
-    desc: "Vaincre le Diacre Varric alors que chaque Sonneur funéraire qu'il relève a déjà été abattu.",
+    desc: "Vaincre le Diacre Vandric alors que chaque Sonneur funéraire qu'il relève a déjà été abattu.",
   },
   dlv_nhalia_bells: {
     name: 'Étouffe-cloches',
@@ -449,7 +445,6 @@ export const table: DeedLocaleTable = {
   },
   chr_peaks_chapter_iii: {
     name: 'Chronique de Thornpeak',
-    desc: "Mener l'histoire de la montagne à son terme : le Culte du Wyrm brisé, le Sanctuaire réduit au silence, le Pic Éveillé abattu et toutes les terreurs nommées des falaises terrassées.",
     title: 'de Thornpeak',
   },
   chr_peaks_sparring: {

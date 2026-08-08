@@ -292,7 +292,7 @@ export function spellFxCue(event: SpellFxEvent): { key: SfxId; anchorId: number 
 // Per-ability overrides for a buff's apply moment: normally every buff plays
 // the shared buff_apply chime, keyed off Aura.id (the ability that applied
 // it). Ice Block (Cold Coffin), Cloak of Shadows (Shadecloak, an absorb
-// aura, same apply path), Vanish (Smokestep, a toggle stealth selfBuff, same
+// aura, same apply path), Vanish (Smokefade, a toggle stealth selfBuff, same
 // apply path too), and Stealth (Duskveil, the opening rogue stealth toggle,
 // identical selfBuff shape) get their own distinct cue instead.
 const BUFF_APPLY_ABILITY_CUES: Partial<Record<string, SfxId>> = {

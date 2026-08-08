@@ -702,8 +702,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.items.tidewrought_fishing_rod.name': 'Cần câu triều luyện',
   'entities.items.gatherers_cache.name': 'Túi Trữ Của Thợ Thu Thập',
   'entities.items.artisans_eye.name': 'Con Mắt Nghệ Nhân',
-  'entities.items.reins_terrorspark_groundshaker.name':
-    'Chìa Khóa Khởi Động: Tia Kinh Hoàng, Kẻ Rung Chuyển Mặt Đất',
   'hud.options.graphicsPresetInsane': 'Cực Đại',
   'hud.options.surfaceDetail': 'Chi Tiết Bề Mặt',
   'hud.options.surfaceDetailBasic': 'Cơ Bản',
@@ -741,7 +739,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraOverlay.procs.overpowerCharge': 'Tăng Cường Bàn Tay Đẫm Máu',
   'hudChrome.auraOverlay.procs.revenge': 'Phục Thù!',
   'hudChrome.auraOverlay.procs.suddenDeath': 'Đột Tử',
-  'hudChrome.auraOverlay.procs.victoryRush': 'Đà Chiến Thắng',
   'hudChrome.auraOverlay.reposition': 'Thiết lập vị trí',
   'hudChrome.auraOverlay.reset': 'Đặt Lại Vị Trí',
   'hudChrome.auraOverlay.screenPosition': 'Vị trí trên màn hình',
@@ -760,7 +757,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.epic.unlink': 'Hủy liên kết Epic',
   'hudChrome.mounts.desc_terrorspark_groundshaker':
     'Một cỗ máy bọc giáp nhỏ gọn với bánh xích nặng, pháo nòng lớn và yên ngồi dành cho những người lái gan dạ.',
-  'hudChrome.mounts.name_terrorspark_groundshaker': 'Tia Kinh Hoàng, Kẻ Rung Chuyển Mặt Đất',
   'hudChrome.targetAuras.all': 'Tất cả',
   'hudChrome.targetAuras.buffs': 'Buff',
   'hudChrome.targetAuras.configureRows': 'Cấu hình hào quang mục tiêu',
@@ -1083,7 +1079,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Kéo một đợt aether nguyên chất xuyên qua kẻ thù gây {damage} sát thương. Mỗi lần tung chiêu để lại một Điện Tích Bí Thuật làm tăng sát thương và tốc độ thi triển của Sức Mạnh Bí Thuật tiếp theo (5% nhanh hơn mỗi điện tích) nhưng tăng mạnh chi phí mana, chồng tối đa 4 lần; Phi Tiêu Ê-te tiêu hao các điện tích. Mỗi lần thi triển cũng có thể kích hoạt Aether Rush, khiến Sức Mạnh Bí Thuật tiếp theo miễn phí và thi triển nhanh gấp đôi.',
   'entities.abilities.arcane_surge.name': 'Sức Mạnh Bí Thuật',
   'entities.abilities.blizzard.description':
-    'Triệu gọi bão tuyết xuống khu vực mục tiêu trong 6 giây, gây {damage} sát thương Băng mỗi giây và làm chậm kẻ thù 40%. Mỗi kẻ thù bị đánh trúng rút ngắn 0,5 giây của Frozen Orb, tối đa 3 giây mỗi lần thi triển. (Băng)',
+    'Triệu gọi bão tuyết xuống khu vực mục tiêu trong 6 giây, gây {damage} sát thương Băng mỗi giây và làm chậm kẻ thù 40%. Mỗi kẻ thù bị đánh trúng rút ngắn 0,5 giây của Frostglobe, tối đa 3 giây mỗi lần thi triển. (Băng)',
   'entities.abilities.blizzard.name': 'Bão Tuyết',
   'entities.abilities.brain_freeze.name': 'Đóng Băng Trí Não',
   'entities.abilities.dragons_breath.description':
@@ -1096,13 +1092,11 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Biến thành than hồng rực cháy, tăng tốc độ di chuyển lên {buff}%. Bạn không thể tấn công hay thi triển phép trong khi biến đổi. Thi triển lại để trở về dạng bình thường.',
   'entities.abilities.fireball_form.name': 'Dạng Than Hồng',
   'entities.abilities.flurry.name': 'Roi Mùa Đông',
-  'entities.abilities.frozen_orb.name': 'Quả Cầu Băng Giá',
   'entities.abilities.glacial_front.description':
     'Giữ để tích tụ màn băng giá ngày càng rộng, rồi thả ra thành hình nón. Tích tụ lâu hơn sẽ đạt xa hơn và gây nhiều sát thương hơn. Tất cả kẻ thù bị trúng sẽ bị làm chậm 50% trong 4 giây; tích tụ tối đa còn cố định chúng trong 1 giây. (Băng)',
   'entities.abilities.glacial_front.name': 'Tiền Tuyến Băng Hà',
   'entities.abilities.glacial_spike.description':
     'Triệu hồi một gai băng khổng lồ, tiêu hao 5 Băng Nhọn để gây {damage} sát thương Băng và đóng băng mục tiêu tại chỗ trong 4 giây. (Băng)',
-  'entities.abilities.glacial_spike.name': 'Chông Băng Hà',
   'entities.abilities.ice_lance.description':
     'Phóng một mảnh băng gây {damage} sát thương Băng, nhân ba lần với mục tiêu đang đóng băng. Tiêu hao Fingers of Frost hoặc một điện tích Cơn Lạnh Mùa Đông để coi mục tiêu như đang đóng băng. (Băng)',
   'entities.abilities.ice_lance.name': 'Thương Băng',
@@ -1568,7 +1562,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.furious_mending.name': 'Hồi Phục Cuồng Nộ',
   'entities.abilities.heroic_leap.description':
     'Nhảy đến khu vực mục tiêu, gây {damage} sát thương lên kẻ địch lân cận khi tiếp đất.',
-  'entities.abilities.heroic_leap.name': 'Bước Nhảy Chiến',
   'entities.abilities.intimidating_shout.description':
     'Một tiếng hét kinh hoàng khiến tối đa 5 kẻ địch trong vòng 8 thước bỏ chạy trong sợ hãi suốt 8 giây. Sát thương có thể phá vỡ hiệu ứng.',
   'entities.abilities.intimidating_shout.name': 'Tiếng Hét Uy Hiếp',
@@ -1607,7 +1600,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.seasoned_soldier.name': 'Người Lính Dày Dạn',
   'entities.abilities.storm_bolt.description':
     'Ném vũ khí của bạn vào mục tiêu gây {damage} sát thương, làm choáng nó trong 3 giây.',
-  'entities.abilities.storm_bolt.name': 'Cú Ném Bão Tố',
   'entities.abilities.sudden_death.description':
     'Các đòn đánh thường của bạn có cơ hội cho phép bạn tung Nấm Mồ Sớm lên mục tiêu ở bất kỳ mức máu nào mà không tốn nộ khí. (nhánh Vũ Khí)',
   'entities.abilities.sudden_death.name': 'Đột Tử',
@@ -1616,7 +1608,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sweeping_strikes.name': 'Vòng Cung Mở Rộng',
   'entities.abilities.victory_rush.description':
     'Giáng đòn gây sát thương vũ khí cộng thêm {damage} và hồi 20% máu tối đa của bạn. Chỉ dùng được trong vòng 20 giây sau khi hạ gục một kẻ địch.',
-  'entities.abilities.victory_rush.name': 'Đà Chiến Thắng',
   'hudChrome.specPanel.complexity': 'Độ phức tạp',
   'hudChrome.specPanel.complexityHigh': 'Cao',
   'hudChrome.specPanel.complexityLow': 'Thấp',
@@ -1630,9 +1621,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.talentRows.tab': 'Lựa chọn',
   'hudChrome.talentRows.readoutSummary': 'Thiên phú: {head}, đã chọn {spent}/{total} hàng.',
   'entities.abilities.aspect_of_the_wild.name': 'Dáng Nanh Hoang',
-  'entities.abilities.avenging_wrath.name': 'Cánh Báo Thù',
   'entities.abilities.berserk.name': 'Sương Đỏ',
-  'entities.abilities.blink.name': 'Bước Chớp',
   'entities.abilities.bloodlust.name': 'Trống Chiến',
   'entities.abilities.chain_lightning.name': 'Sét Rẽ Nhánh',
   'entities.abilities.chaos_bolt.name': 'Tia Hủy Diệt',
@@ -1672,7 +1661,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.smoke_screen.name': 'Màn Khói',
   'entities.abilities.smoke_screen.description':
     'Bạn biến mất trong đám khói, tăng 30% khả năng né tránh trong 8 giây.',
-  'entities.abilities.spellsteal.name': 'Đánh Cắp Phép',
   'entities.abilities.spellsteal.description':
     'Đánh cắp một hiệu ứng phép thuật có lợi từ kẻ địch và chuyển nó sang bạn.',
   'entities.abilities.startle_shot.name': 'Phát Bắn Giật Mình',
@@ -2068,7 +2056,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.items.lunar_tide_greatstaff.name': 'Đại Trượng Triều Nguyệt',
   'entities.items.medallion_of_endless_profit.name': 'Huy Chương Lợi Nhuận Bất Tận',
   'entities.items.mistcallers_fang.name': 'Nanh của Kẻ Gọi Sương',
-  'entities.items.mistforged_pauldrons.name': 'Giáp Vai Rèn Sương',
   'entities.items.morthens_cryptforged_hauberk.name': 'Áo Giáp Lưới Rèn Hầm Mộ của Morthen',
   'entities.items.nielas_coldlight_band.name': 'Nhẫn Hàn Quang của Niela',
   'entities.items.oath_of_the_round_table.name': 'Lời Thề Bàn Tròn',
@@ -3321,24 +3308,24 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'delveUi.board.tier.heroic': 'Anh Hùng',
   'delveUi.board.tier.normal': 'Thường',
   'delveUi.board.title': 'Bảng Hang Sâu',
-  'delveUi.boss.varric.bell.emote': 'Phó Tế Varric nắm chặt chiếc chuông bị chôn bằng cả hai tay!',
+  'delveUi.boss.varric.bell.emote': 'Phó Tế Vandric nắm chặt chiếc chuông bị chôn bằng cả hai tay!',
   'delveUi.boss.varric.bell.impact': 'Tiếng chuông ngân vang làm nứt toác nền căn phòng!',
   'delveUi.boss.varric.bell.lesson':
     'Chuông Ngân: một cú giáng đất mỗi mười hai giây. Hãy tránh xa trước khi nó giáng xuống.',
-  'delveUi.boss.varric.bell.log': 'Phó Tế Varric bắt đầu rung chiếc chuông tang lễ.',
-  'delveUi.boss.varric.bell.warning': 'Tránh xa Phó Tế Varric!',
+  'delveUi.boss.varric.bell.log': 'Phó Tế Vandric bắt đầu rung chiếc chuông tang lễ.',
+  'delveUi.boss.varric.bell.warning': 'Tránh xa Phó Tế Vandric!',
   'delveUi.boss.varric.defeat': 'Không... ta đã có những cái tên... ta đã có tất cả...',
   'delveUi.boss.varric.intro': 'Không linh hồn nào mất đi. Chỉ là bị đặt nhầm chỗ.',
   'delveUi.boss.varric.mid30': 'Chiếc chuông tang lễ đáp lại mỗi cái tên hắn xướng lên.',
-  'delveUi.boss.varric.mid60': 'Phó Tế Varric đọc tên từ cuốn sổ với niềm đắc thắng run rẩy.',
+  'delveUi.boss.varric.mid60': 'Phó Tế Vandric đọc tên từ cuốn sổ với niềm đắc thắng run rẩy.',
   'delveUi.boss.varric.pull':
     'Ngươi giẫm lên cát bụi thánh thiêng với mục đích ô uế. Quỳ xuống, và để được điểm danh.',
-  'delveUi.boss.varric.raise.emote': 'Phó Tế Varric gọi tên từ những nấm mồ vỡ nát!',
-  'delveUi.boss.varric.raise.interrupt_fail': 'Kẻ chết đáp lại lời gọi của Phó Tế Varric!',
+  'delveUi.boss.varric.raise.emote': 'Phó Tế Vandric gọi tên từ những nấm mồ vỡ nát!',
+  'delveUi.boss.varric.raise.interrupt_fail': 'Kẻ chết đáp lại lời gọi của Phó Tế Vandric!',
   'delveUi.boss.varric.raise.interrupt_ok': 'Nghi lễ gọi hồn bị gián đoạn.',
   'delveUi.boss.varric.raise.lesson':
     'Hãy gián đoạn nấm mồ nứt nẻ trong vòng năm giây, nếu không kẻ chết sẽ trỗi dậy theo lời gọi của hắn.',
-  'delveUi.boss.varric.raise.log': 'Phó Tế Varric bắt đầu Triệu Hồi Tử Thi.',
+  'delveUi.boss.varric.raise.log': 'Phó Tế Vandric bắt đầu Triệu Hồi Tử Thi.',
   'delveUi.boss.varric.raise.object': 'Nấm mồ nứt nẻ rùng mình với hơi thở bị đánh cắp.',
   'delveUi.boss.varric.raise.warning': 'Chặn đứng nghi lễ gọi hồn!',
   'delveUi.chest.flavor': 'Kẻ chết đã giao nộp những gì chúng có thể buông bỏ.',
@@ -3821,8 +3808,8 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Triệu hồi một Duskborn dưới quyền chỉ huy của Thuật Sĩ Hắc Ám. Duskborn là con quỷ mong manh nhưng đánh nhanh và gây sát thương cận chiến mạnh. Triệu hồi một con quỷ mới sẽ giải tán con hiện tại. Bạn chỉ có thể có một con quỷ cùng lúc.',
   'entities.abilities.summon_succubus.name': 'Triệu Hồi Duskborn',
   'entities.abilities.summon_voidwalker.description':
-    'Triệu hồi một Gloomshade dưới quyền chỉ huy của Thuật Sĩ Hắc Ám. Gloomshade là con quỷ vững chãi khiêu khích kẻ địch của bạn và hứng chịu đòn tấn công. Triệu hồi một con quỷ mới sẽ giải tán con hiện tại. Bạn chỉ có thể có một con quỷ cùng lúc.',
-  'entities.abilities.summon_voidwalker.name': 'Triệu Hồi Gloomshade',
+    'Triệu hồi một Duskmurk dưới quyền chỉ huy của Thuật Sĩ Hắc Ám. Duskmurk là con quỷ vững chãi khiêu khích kẻ địch của bạn và hứng chịu đòn tấn công. Triệu hồi một con quỷ mới sẽ giải tán con hiện tại. Bạn chỉ có thể có một con quỷ cùng lúc.',
+  'entities.abilities.summon_voidwalker.name': 'Triệu Hồi Duskmurk',
   'entities.abilities.sunder_armor.name': 'Xẻ Giáp',
   'entities.abilities.swipe.description':
     'Quật quét các kẻ địch lân cận gây {damage} sát thương. Tạo thêm đe dọa. Chỉ dùng được ở Bruin Form.',
@@ -3847,7 +3834,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.travel_form.name': 'Hình Thần Tốc',
   'entities.abilities.vanish.description':
     'Biến mất khỏi tầm nhìn, đi vào Duskveil ngay cả trong chiến đấu. Bạn di chuyển chậm hơn 50% khi ẩn nấp. Kéo dài tối đa 10 giây.',
-  'entities.abilities.vanish.name': 'Bước Khói',
   'entities.abilities.whirlwind.description':
     'Xoay theo một vòng cung chết chóc, đánh tất cả kẻ địch lân cận gây {damage}. (Tài năng Cuồng Nộ)',
   'entities.abilities.whirlwind.name': 'Vòng Xoáy Lưỡi Kiếm',
@@ -3857,7 +3843,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.wrath.description':
     'Phóng một tia năng lượng tự nhiên gây {damage} sát thương Tự Nhiên.',
   'entities.abilities.wrath.name': 'Tia Hoang Dã',
-  'entities.abilities.holy_shock.name': 'Sốc Thánh',
   'entities.abilities.holy_shock.description':
     'Gây sốc một mục tiêu đồng minh bằng năng lượng Thánh, hồi cho họ {damage}. (dấu ấn Thánh)',
   'entities.abilities.holy_shield.name': 'Khiên Thánh',
@@ -3869,7 +3854,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.trueshot_aura.name': 'Hào Quang Bắn Chuẩn',
   'entities.abilities.trueshot_aura.description':
     'Truyền cảm hứng cho đồng minh gần đó, tăng sức mạnh tấn công thêm 35 trong 5 phút. (dấu ấn Thiện Xạ)',
-  'entities.abilities.wyvern_sting.name': 'Cú Chích Rồng Bay',
   'entities.abilities.wyvern_sting.description':
     'Chích kẻ địch từ xa, làm chúng bất động tối đa 4 giây. Bất kỳ sát thương nào cũng phá hiệu ứng. (dấu ấn Sinh Tồn)',
   'entities.abilities.arcane_power.name': 'Sức Mạnh Bí Thuật',
@@ -3878,7 +3862,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.combustion.name': 'Phượng Hoàng Xuất Thần',
   'entities.abilities.combustion.description':
     'Tăng tỉ lệ chí mạng phép 50% trong 15 giây. (kỹ năng đặc trưng Fire)',
-  'entities.abilities.icy_veins.name': 'Huyết Mạch Băng Giá',
   'entities.abilities.icy_veins.description':
     'Tăng tốc độ phép 30% và ngăn gián đoạn cùng đẩy lùi thi triển trong 10 giây. (kỹ năng đặc trưng Frost)',
   'entities.abilities.cold_blood.name': 'Máu Lạnh',
@@ -3893,7 +3876,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.power_infusion.name': 'Truyền Sức Mạnh',
   'entities.abilities.power_infusion.description':
     'Truyền sức mạnh cho một mục tiêu đồng minh, tăng sức mạnh phép thêm 28 trong 15 giây. (dấu ấn Kỷ Luật)',
-  'entities.abilities.holy_nova.name': 'Nova Thánh',
   'entities.abilities.holy_nova.description':
     'Gây một vụ nổ ánh sáng Thánh, hồi cho đồng minh gần đó {damage} và gây sát thương cho kẻ địch gần đó. (dấu ấn Thánh)',
   'entities.abilities.shadowform.name': 'Dạng Bóng Tối',
@@ -3914,10 +3896,8 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.feral_charge.name': 'Xung Phong Hoang Dã',
   'entities.abilities.feral_charge.description':
     'Xung phong vào kẻ địch và trói chân chúng trong 1 giây. Tầm 8-25 m. (dấu ấn Hoang Dã)',
-  'entities.abilities.swiftmend.name': 'Hồi Phục Nhanh',
   'entities.abilities.swiftmend.description':
     'Tiêu thụ một hiệu ứng hồi máu theo thời gian trên mục tiêu đồng minh để hồi cho họ {damage}. (dấu ấn Phục Hồi)',
-  'entities.abilities.crusader_strike.name': 'Đòn Thập Tự',
   'entities.abilities.crusader_strike.description':
     'Đánh mục tiêu bằng sát thương vũ khí cộng {damage} sát thương Thánh. (tài năng Paladin)',
   'entities.abilities.metamorphosis.name': 'Biến Hình',
@@ -4300,7 +4280,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.items.valespun_robe.name': 'Áo Choàng Dệt Thung Lũng',
   'entities.items.vanguard_azure_armor_plate.name': 'Lam Ngọc Tiên Phong',
   'entities.items.vanguard_chrome_armor_plate.name': 'Crôm Tiên Phong',
-  'entities.items.varric_shadow_cowl.name': 'Mũ Trùm Bóng Tối của Varric',
+  'entities.items.varric_shadow_cowl.name': 'Mũ Trùm Bóng Tối của Vandric',
   'entities.items.verlans_oathblade.name': 'Thề Kiếm của Verlan',
   'entities.items.voss_sanctified_mace.name': 'Chùy Thánh Hóa của Voss',
   'entities.items.wanderers_chestguard.name': 'Giáp Ngực của Lãng Du Khách',
@@ -4319,9 +4299,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.items.mistcallers_duffel.name': 'Túi vải của Fogbinder',
   'entities.items.worn_sword.name': 'Đoản Kiếm Rỗ Sét',
   'entities.items.woven_robe.name': 'Áo Choàng Dệt Thung Khê',
-  'entities.items.wyrmcult_grand_robe.name': 'Đại Áo Choàng Long Giáo',
-  'entities.items.wyrmcult_orders.name': 'Mệnh Lệnh Long Giáo',
-  'entities.items.wyrmcult_soulsteps.name': 'Bước Hồn Long Giáo',
   'entities.items.wyrmfang_greatblade.name': 'Đại Kiếm Long Nha',
   'entities.items.wyrmscale_jerkin.name': 'Áo Da Long Vảy',
   'entities.items.wyrmshadow_harness.name': 'Đai Giáp Nightfang',
@@ -4368,7 +4345,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.choirmother_selthe.name': 'Mẫu Ca Selthe',
   'entities.mobs.corrupted_priest_malric.name': 'Tu Sĩ Hủ Hóa Malric',
   'entities.mobs.crypt_shambler.name': 'Xác Lê Hầm Mộ',
-  'entities.mobs.deacon_varric.name': 'Chấp Sự Varric',
+  'entities.mobs.deacon_varric.name': 'Chấp Sự Vandric',
   'entities.mobs.deacon_voss.name': 'Chấp Sự Voss',
   'entities.mobs.deathstalker_voss.name': 'Sát Thủ Tử Thần Voss',
   'entities.mobs.deepfen_murloc.name': 'Quái Đớp Deepfen',
@@ -4448,7 +4425,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.vision_aldren_warrior.name': 'Ảo Ảnh Đội Trưởng Aldren',
   'entities.mobs.vision_deathstalker_voss.name': 'Ảo Ảnh Sát Thủ Hoàng Gia Voss',
   'entities.mobs.vision_malric_mage.name': 'Ảo Ảnh Đại Tu Sĩ Malric',
-  'entities.mobs.gloomshade.name': 'Gloomshade',
+  'entities.mobs.gloomshade.name': 'Duskmurk',
   'entities.mobs.voskar_emberwing.name': 'Voskar Cánh Tàn Lửa',
   'entities.mobs.warlock_imp.name': 'Quỷ Lửa',
   'entities.mobs.warlock_voidwalker.name': 'Quỷ Hư Không',
@@ -4456,8 +4433,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.webwood_spider.name': 'Kẻ Rình Sableweb',
   'entities.mobs.wild_boar.name': 'Lợn Rừng',
   'entities.mobs.wraithbinder_maldrec.name': 'Kẻ Buộc Oan Hồn Maldrec',
-  'entities.mobs.wyrmcult_necromancer.name': 'Tử Linh Sư Long Giáo',
-  'entities.mobs.wyrmcult_zealot.name': 'Cuồng Tín Long Giáo',
   'entities.mobs.ysolei.name': 'Ysolei, Hóa Thân Nguyệt Chết Chìm',
   'entities.npcs.apothecary_lin.greeting':
     'Cẩn thận từng bước trong khu rừng phía đông nhé, bạn của ta.',
@@ -4638,8 +4613,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_drogmar.completion':
     'Drogmar, chết ngay trong trại của hắn. Các bộ tộc sẽ tản về những con đèo cao - ngươi đã mua cho bức tường của ta thêm một mùa đông, {playerName}.',
   'entities.quests.q_drogmar.objectives.0.label': 'Đã hạ Lãnh Chúa Chiến Tranh Drogmar',
-  'entities.quests.q_drogmar.text':
-    'Lãnh Chúa Chiến Tranh Drogmar đã nhận vàng của Long Giáo và thề đưa các bộ tộc theo sự thức tỉnh của ngọn núi. Hắn là cây búa mà chúng định vung vào bức tường của ta - và khi hắn giáng xuống mặt đất, {playerName}, chớ đứng gần hắn. Hãy đưa đồng đội vào trại chiến và kết liễu hắn, vì Highwatch.',
   'entities.quests.q_drogmar.title': 'Lãnh Chúa Chiến Tranh Drogmar',
   'entities.quests.q_drowned.completion':
     'Mỗi kẻ ngươi hạ là một linh hồn bị đánh cắp được giải thoát. Nhưng kẻ đã dìm chết chúng vẫn đang đổ nước.',
@@ -4996,7 +4969,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_voice_below.completion':
     'Sự quỳ lạy đã ngừng. Chúng ta chưa làm im được giọng nói ấy, {playerName}, chỉ làm mỏng đi dàn đồng ca của nó. Vậy là phải đủ rồi.',
   'entities.quests.q_voice_below.objectives.0.label': 'Tín Đồ Cuồng Long đã hạ',
-  'entities.quests.q_voice_below.objectives.1.label': 'Tử Linh Sư Cuồng Long đã hạ',
   'entities.quests.q_voice_below.text':
     'Đêm qua cả trại giáo phái quỳ rạp xuống cùng một lúc, {playerName}, từng tín đồ, từng tử linh sư, tất cả hướng về Thánh Đường. Korzul giờ nói chuyện với chúng trong giấc ngủ; Vael đã nghe thấy chính giọng nói ấy ở đầm lầy, và Morthen trước hắn. Hạ gục đám giáo đồ ấy, mười tín đồ, sáu tử linh sư, trước khi giọng nói đó có đủ tay để tự kéo mở cánh cổng.',
   'entities.quests.q_voice_below.title': 'Giọng Nói Bên Dưới',
@@ -5026,9 +4998,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_wyrm_sigils.title': 'Phù Ấn của Thần Long',
   'entities.quests.q_zealots.completion':
     'Gió đã lặng hơn. Nhưng điều khiến ta lo lắng không phải là tiếng tụng niệm, {playerName}, mà là có thứ gì đó có thể đang tụng niệm đáp lại.',
-  'entities.quests.q_zealots.objectives.0.label': 'Tín Đồ Cuồng Long đã hạ',
-  'entities.quests.q_zealots.text':
-    'Khi gió thổi xuống từ những đỉnh núi phía nam, {playerName}, nó mang theo tiếng tụng niệm. Giáo Phái Cuồng Long không còn ẩn nấp nữa, chúng đã dựng lều bên dưới Thánh Đường và hát cho thứ ngủ vùi bên dưới nó. Bịt miệng mười hai tín đồ. Mỗi giọng nói bị làm im lặng mua cho ngọn núi thêm một đêm ngủ yên.',
   'entities.quests.q_zealots.title': 'Khúc Tụng Trong Gió',
   'entities.quests.q_af_amber_from_the_herd.completion':
     'Sáu khối, sạch như mật ong vừa rót. Đôi găng tay này được khâu từ mẻ nhựa cuối cùng, {playerName}: cứng lại vì nhựa cây, và ấm hơn vẻ ngoài của chúng.',
@@ -5062,7 +5031,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_af_orchard_call.title': 'Một Chuyến Xe Cho Khu Vườn',
   'entities.quests.q_af_sprites_and_spigots.completion':
     'Bốn chiếc xô đã về lại trên móc treo và những hàng cây đã yên tĩnh trở lại. Bạn ra tay mạnh mẽ với đám tinh linh hơn ta nhiều, {playerName}, và hôm nay ta mừng vì điều đó.',
-  'entities.quests.q_af_sprites_and_spigots.objectives.0.label': 'Tinh Linh Mùa Gặt bị đuổi đi',
   'entities.quests.q_af_sprites_and_spigots.objectives.1.label': 'Xô Hứng Nhựa được tìm lại',
   'entities.quests.q_af_sprites_and_spigots.text':
     'Tinh linh mùa gặt, {playerName}. Chúng cạy vòi hứng nhựa của ta ra khỏi thân cây vì vị ngọt bên trong và ném những chiếc xô vào bãi cỏ. Hãy đuổi tám tên trộm nhỏ này đi và mang về bốn chiếc xô của ta, thì những chuyến xe sẽ lại lăn bánh.',
@@ -5257,12 +5225,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_fv_ember_caches.text':
     'Một chiếc xe trượt chở kho than hồng đã lật nhào trên đường hồ băng đêm qua: những chiếc ấm sắt giữ cho ngọn lửa ủ sống suốt một tháng. Ba chiếc vẫn còn nằm trong tuyết, {playerName}, và lữ quán không thể để mất những gì chúng chứa. Hãy mang ngọn lửa về nhà.',
   'entities.quests.q_fv_ember_caches.title': 'Than Hồng Trên Đường Hồ Băng',
-  'entities.quests.q_fv_frostmane_tyrant.completion':
-    'Khi gió lặng đêm qua, cả ngôi làng đã nghe thấy sự im lặng nơi Bờm Băng Giá từng ở. Vùng Đất này nợ bạn một món nợ sẽ mất nhiều năm để trả, {playerName}. Hãy khoác lên thứ này, và mọi cánh cửa ở Icemantle sẽ rộng mở với bạn.',
-  'entities.quests.q_fv_frostmane_tyrant.objectives.0.label': 'Bờm Băng Giá bị tiêu diệt',
-  'entities.quests.q_fv_frostmane_tyrant.text':
-    'Những kẻ gào thét không phải đang săn mồi khi chúng xuống khỏi bậc thềm. Chúng đang chạy trốn. Một con người tuyết đã chiếm lấy vùng đất cao, dân miền núi gọi nó là Bờm Băng Giá, và ngay cả các bầy sói cũng không chịu chia sẻ một sườn núi với nó. Việc này phải chấm dứt, {playerName}, trước khi mùa đông đẩy nó xuống tận tường thành của ta. Rủ theo một người bạn. Rủ theo hai người.',
-  'entities.quests.q_fv_frostmane_tyrant.title': 'Bạo Chúa Bờm Băng Giá',
   'entities.quests.q_fv_howl_above.completion':
     'Tám con, và bản hợp xướng chạng vạng đã thưa hơn vì điều đó. Nhưng những kẻ gào thét không rời đỉnh núi vô cớ. Có thứ gì đó trên đó đã xui khiến chúng, và ta sợ rằng thứ đó có một cái tên.',
   'entities.quests.q_fv_howl_above.objectives.0.label': 'Kẻ Gào Thét Bậc Thang bị tiêu diệt',
@@ -5398,7 +5360,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Bãi cạn giờ lại chỉ còn là nước. Ta đã chứng kiến cái mai đó đánh bại những thợ săn giỏi hơn ta, {playerName}. Nhưng không phải bạn.',
   'entities.quests.q_hollow_old_marrowshell.objectives.0.label': 'Lão Vỏ Tủy bị tiêu diệt',
   'entities.quests.q_hollow_old_marrowshell.text':
-    'Cái tên đầu tiên là Lão Vỏ Tủy, một con cua to bằng cả chiếc xe đã săn mồi ở bãi cạn phía đông từ trước khi Eldergleam có cổng. Nó lang thang khắp nơi, {playerName}, nên bạn sẽ phải đi dọc bờ biển cho đến khi bắt gặp dấu vết của nó. Đừng đi một mình, và đừng tin vào sự bất động của nó.',
+    'Cái tên đầu tiên là Lão Vỏ Tủy, một con cua to bằng cả chiếc xe đã săn mồi ở bãi cạn phía đông từ trước khi Eldershine có cổng. Nó lang thang khắp nơi, {playerName}, nên bạn sẽ phải đi dọc bờ biển cho đến khi bắt gặp dấu vết của nó. Đừng đi một mình, và đừng tin vào sự bất động của nó.',
   'entities.quests.q_hollow_old_marrowshell.title': 'Chiếc Mai Cũ Của Bãi Cạn',
   'entities.quests.q_hollow_the_huntsman.completion':
     'Fenna cử bạn đến? Tốt. Vậy là bà ấy tin tưởng bạn, và ta có hai cái tên cần được gạch bỏ.',
@@ -5417,15 +5379,11 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_nb_charts_of_the_stones.completion':
     'Không còn nghi ngờ gì nữa. Mọi phương vị đều đã dịch chuyển dần về phía Gò Mộ Không Ngủ, như thể chính bầu trời đang cúi xuống gò đất đó để quan sát. Các vị vua xưa được chôn cất dưới những vì sao thẳng hàng không phải vô cớ, {playerName}.',
   'entities.quests.q_nb_charts_of_the_stones.objectives.0.label': 'Bản đồ sao đã được đọc',
-  'entities.quests.q_nb_charts_of_the_stones.text':
-    'Những phiến đá Canh Thức còn cổ xưa hơn cả Moonrest, cổ xưa hơn cả tộc đêm chăm sóc chúng, và bề mặt của chúng được khắc những bản đồ sao mà ta đã dành cả đời để học cách đọc. Bầu trời đã dịch chuyển, {playerName}, và ta phải biết đã dịch chuyển bao xa. Đọc bản đồ trên ba phiến đá và mang về cho ta phương vị của chúng.',
   'entities.quests.q_nb_charts_of_the_stones.title': 'Bản Đồ Trong Những Phiến Đá',
   'entities.quests.q_nb_eyes_on_the_vigil.completion':
     'Lira cử bạn đến? Vậy là cả những khu vườn cũng cảm nhận được điều đó. Ngồi cạnh ống kính một lát đi, {playerName}. Các vì sao đã bất an suốt một tháng, và mỗi bản đồ ta vẽ đều nghiêng về phía bắc, hướng đến gò mộ.',
   'entities.quests.q_nb_eyes_on_the_vigil.objectives.0.label':
     'Tìm Nhà Thiên Văn Cassian tại Canh Thức Vĩnh Cửu',
-  'entities.quests.q_nb_eyes_on_the_vigil.text':
-    'Có thứ gì đó khiến những kẻ rảo bước trở nên táo bạo và đàn hươu bất an, {playerName}, và ta không thể đọc được điều đó từ những bông hoa. Cassian có thể đọc được từ bầu trời. Ông ấy giữ trại quan sát của mình gần Canh Thức Vĩnh Cửu phía đông nơi này, nơi tộc đêm lang thang giữa những phiến đá. Tìm ông ấy, và hỏi xem các vì sao đang nói gì.',
   'entities.quests.q_nb_eyes_on_the_vigil.title': 'Mắt Nhìn Về Canh Thức Vĩnh Cửu',
   'entities.quests.q_nb_night_gardens.completion':
     'Vẫn còn phát sáng, từng cánh hoa một. Miếu thờ sẽ thoảng hương đêm suốt một tuần, và Moonrest sẽ ngủ ngon hơn nhờ vậy.',
@@ -5453,8 +5411,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_nb_striders_in_the_dark.text':
     'Những kẻ rảo bước chạng vạng luôn là những thợ săn kiên nhẫn, {playerName}, nhưng gần đây chúng lẻn thẳng vào các luống hoa và bắt đi những chú cừu con lông trăng ngay dưới đèn lồng của chúng ta. Diệt mười con và trả lại sự yên tĩnh cho những ngọn đồi.',
   'entities.quests.q_nb_striders_in_the_dark.title': 'Những Kẻ Rảo Bước Trong Bóng Tối',
-  'entities.quests.q_nb_the_barrow_king.completion':
-    'Các vì sao đã lắng xuống lần đầu tiên trong cả mùa, {playerName}. Các gò mộ đã đóng lại, tộc đêm đã trở nên tĩnh lặng bên những phiến đá của họ, và vị vua lại ngủ yên bên dưới. Hãy khoác lên tấm áo choàng này: Moonrest đã cắt nó cho bất cứ ai màn đêm cuối cùng cũng tin tưởng.',
   'entities.quests.q_nb_the_barrow_king.objectives.0.label': 'Vua Gò Mộ được cho an nghỉ',
   'entities.quests.q_nb_the_barrow_king.text':
     'Mọi phương vị, mọi vì sao bất an, mọi gò mộ đang mở ra đều chỉ về một điều: Vua Gò Mộ đang thức tỉnh dưới gò đất lớn, và vương quốc này không có bình minh để ngăn nó lại. Nó phải được cho an nghỉ trước khi nó nhớ lại vương miện của mình, {playerName}. Đừng đi một mình: rủ theo một người bạn, và giữ ánh sáng hoa sau lưng bạn.',
@@ -5505,9 +5461,9 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_pr_the_lost_navigator.title': 'Vị Hoa Tiêu Lạc Lối',
   'entities.quests.q_pr_the_man_who_went_in.completion':
     'Isha cử bạn đến? Ngọc Mẫu đã không nhắc đến tên tôi suốt nhiều năm rồi. Ngồi ngoài tầm với của dây leo đi, {playerName}, và tôi sẽ kể cho bạn nghe những gì tôi biết: tiếng trống không phải là mối nguy hiểm. Chúng là lời cảnh báo.',
-  'entities.quests.q_pr_the_man_who_went_in.objectives.0.label': 'Tìm Okku tại Vinefall',
+  'entities.quests.q_pr_the_man_who_went_in.objectives.0.label': 'Tìm Okrim tại Vinefall',
   'entities.quests.q_pr_the_man_who_went_in.text':
-    'Những người thợ lặn sẽ không bước qua ranh giới cây cối, {playerName}, và tôi sẽ không yêu cầu họ làm vậy. Chắc bạn đã nghe tiếng trống rồi: ai cũng nghe thấy, vào đêm thứ hai. Chỉ có một người trên hòn đảo này từng bước về phía âm thanh đó và trở lại. Okku. Ông ấy cắm trại dưới những cây đa lớn tại Vinefall, sâu trên con đường Tangle. Tìm ông ấy, và hỏi ông ấy xem màu xanh đó đang giấu điều gì.',
+    'Những người thợ lặn sẽ không bước qua ranh giới cây cối, {playerName}, và tôi sẽ không yêu cầu họ làm vậy. Chắc bạn đã nghe tiếng trống rồi: ai cũng nghe thấy, vào đêm thứ hai. Chỉ có một người trên hòn đảo này từng bước về phía âm thanh đó và trở lại. Okrim. Ông ấy cắm trại dưới những cây đa lớn tại Vinefall, sâu trên con đường Tangle. Tìm ông ấy, và hỏi ông ấy xem màu xanh đó đang giấu điều gì.',
   'entities.quests.q_pr_the_man_who_went_in.title': 'Người Đã Bước Vào Trong',
   'entities.quests.q_pr_what_the_drums_guard.completion':
     'Rêu, vỏ trai ngọc, và máu lợn rừng, được nén bằng những ngón tay. Có thứ gì đó trong tàn tích đó vẫn đang giữ nghi lễ của nó, {playerName}, và Vệ Binh ngăn chặn mọi thứ khác. Đã đến lúc chúng ta nói thẳng về điều này.',
@@ -5633,19 +5589,19 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Những Glimmerwisp mang theo những hạt ánh sao cổ xưa đã rơi xuống đây khi Hollow bị phong ấn. Sáu hạt, và đèn miếu thờ sẽ cháy sáng suốt một năm. Chỉ lấy từ những con đang tàn lụi thôi; Hollow cho đi đủ nhiều mà không cần tham lam.',
   'entities.quests.q_wisp_lights.title': 'Ánh Sáng Của Bãi Cạn',
   'entities.quests.q_ww_bells_of_gallowmere.completion':
-    'Cobb đã đưa bạn lên con đường này nguyên vẹn à? Người tốt đấy. Ông ấy đã giữ những chiếc đèn lồng cổng đó cháy sáng suốt ba mươi năm, và khu rừng chưa từng một lần vượt qua được ông ấy. Chào mừng đến Gallowmere, {playerName}. Chú ý đến những chiếc chuông.',
+    'Cobb đã đưa bạn lên con đường này nguyên vẹn à? Người tốt đấy. Ông ấy đã giữ những chiếc đèn lồng cổng đó cháy sáng suốt ba mươi năm, và khu rừng chưa từng một lần vượt qua được ông ấy. Chào mừng đến Gibbetmere, {playerName}. Chú ý đến những chiếc chuông.',
   'entities.quests.q_ww_bells_of_gallowmere.objectives.0.label': 'Báo cáo với Người Giữ Mộ Marrow',
   'entities.quests.q_ww_bells_of_gallowmere.text':
-    'Nghe tiếng chuông đó không, {playerName}? Đó là Gallowmere, trên con đường phía bắc, đang rung chuông ru người chết của nó vào giấc ngủ. Người Giữ Mộ Marrow giữ số đếm của mọi linh hồn dưới tán rừng, cả người sống lẫn người đã chôn cất. Đi đến và được đếm, trước khi khu rừng tự đếm bạn.',
-  'entities.quests.q_ww_bells_of_gallowmere.title': 'Những Chiếc Chuông Của Gallowmere',
+    'Nghe tiếng chuông đó không, {playerName}? Đó là Gibbetmere, trên con đường phía bắc, đang rung chuông ru người chết của nó vào giấc ngủ. Người Giữ Mộ Marrow giữ số đếm của mọi linh hồn dưới tán rừng, cả người sống lẫn người đã chôn cất. Đi đến và được đếm, trước khi khu rừng tự đếm bạn.',
+  'entities.quests.q_ww_bells_of_gallowmere.title': 'Những Chiếc Chuông Của Gibbetmere',
   'entities.quests.q_ww_candles_at_the_bounds.completion':
     'Cả bốn ngọn đều cháy sao? Vậy thì hãy thở phào đi, {playerName}. Bạn không nghe thấy, nhưng cả ngôi làng đã nghe: những chiếc chuông rung nhẹ nhõm hơn ngay khoảnh khắc sợi bấc cuối cùng bắt lửa.',
   'entities.quests.q_ww_candles_at_the_bounds.objectives.0.label': 'Nến mộ được thắp lại',
   'entities.quests.q_ww_candles_at_the_bounds.text':
-    'Bốn phiến đá ranh giới bao quanh Gallowmere, {playerName}, một trên mỗi con đường ra vào, và một ngọn nến mộ cháy trên mỗi phiến đá. Khi chúng còn cháy, người đã chôn vẫn ở yên dưới mộ. Mưa phùn đã làm tắt chúng, cả bốn ngọn, và ta đã quá già để tự mình đi vòng quanh ranh giới. Cầm lấy cây nến của ta và thắp lại chúng, thật nhanh.',
+    'Bốn phiến đá ranh giới bao quanh Gibbetmere, {playerName}, một trên mỗi con đường ra vào, và một ngọn nến mộ cháy trên mỗi phiến đá. Khi chúng còn cháy, người đã chôn vẫn ở yên dưới mộ. Mưa phùn đã làm tắt chúng, cả bốn ngọn, và ta đã quá già để tự mình đi vòng quanh ranh giới. Cầm lấy cây nến của ta và thắp lại chúng, thật nhanh.',
   'entities.quests.q_ww_candles_at_the_bounds.title': 'Nến Ở Ranh Giới',
   'entities.quests.q_ww_horn_of_the_huntsman.completion':
-    'Tiếng tù và ngừng bặt giữa chừng. Mỗi chiếc chuông ở Gallowmere đã rung một lần, tự nó rung lên, rồi khu rừng trở nên yên tĩnh hơn bất cứ lúc nào ta từng nghe trong ba mươi năm qua. Bạn đã thực hiện nghi lễ mà ta không thể, {playerName}. Khoác lên thứ này, và bước đi dưới tán rừng mà không sợ hãi.',
+    'Tiếng tù và ngừng bặt giữa chừng. Mỗi chiếc chuông ở Gibbetmere đã rung một lần, tự nó rung lên, rồi khu rừng trở nên yên tĩnh hơn bất cứ lúc nào ta từng nghe trong ba mươi năm qua. Bạn đã thực hiện nghi lễ mà ta không thể, {playerName}. Khoác lên thứ này, và bước đi dưới tán rừng mà không sợ hãi.',
   'entities.quests.q_ww_horn_of_the_huntsman.objectives.0.label':
     'Thợ Săn Nhợt Nhạt bị hất khỏi lưng ngựa',
   'entities.quests.q_ww_horn_of_the_huntsman.text':
@@ -5664,9 +5620,9 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Phía nam nơi này, Nhà Nguyện Mournstone đang mục nát bên cạnh hồ nước đen của nó, và một người đàn ông vẫn chăm sóc nó: Cha Xứ Creel, người không chịu rời đi khi mái nhà sụp đổ. Ông ấy biết những nghi lễ xưa rõ hơn cả những chiếc chuông của ta, {playerName}, và ông ấy đã không gửi tin tức suốt một tháng nay. Đi trên con đường nhà nguyện và xem ông ấy còn thở không.',
   'entities.quests.q_ww_the_last_vicar.title': 'Cha Xứ Cuối Cùng',
   'entities.quests.q_ww_walking_mosley_home.completion':
-    'Ông ấy đã bước qua cổng bằng chính đôi chân mình, thề rằng từ giờ sẽ không đào gì sâu hơn một luống củ cải. Ông ấy sẽ trở lại khu đất đó trước ngày Chủ Nhật, họ luôn như vậy. Cảm ơn bạn, {playerName}. Gallowmere giữ gìn người dân của mình, đó là toàn bộ luật lệ của chúng ta.',
+    'Ông ấy đã bước qua cổng bằng chính đôi chân mình, thề rằng từ giờ sẽ không đào gì sâu hơn một luống củ cải. Ông ấy sẽ trở lại khu đất đó trước ngày Chủ Nhật, họ luôn như vậy. Cảm ơn bạn, {playerName}. Gibbetmere giữ gìn người dân của mình, đó là toàn bộ luật lệ của chúng ta.',
   'entities.quests.q_ww_walking_mosley_home.objectives.0.label':
-    'Người Đào Mộ Mosley được đưa an toàn trở lại Gallowmere',
+    'Người Đào Mộ Mosley được đưa an toàn trở lại Gibbetmere',
   'entities.quests.q_ww_walking_mosley_home.text':
     'Người đào mộ của ta, Mosley, đã đi trên con đường nhà nguyện ba ngày trước để mở một huyệt mộ trong khu đất cũ, và hố đào đã sập xuống trên người ông ấy. Ông ấy đã cào bới thoát ra, kẻ ngốc đó vẫn còn sống, nhưng ông ấy đang co ro cạnh những ngôi mộ nhà nguyện và không dám di chuyển vì lũ nhả tơ trên đường. Đưa ông ấy về nhà, {playerName}. Ta không thể rung chuông cho một người còn sống.',
   'entities.quests.q_ww_walking_mosley_home.title': 'Đưa Mosley Về Nhà',
@@ -5675,7 +5631,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_ww_what_the_bark_holds.objectives.0.label': 'Kẻ Lê Bước Vỏ Cây Khắc bị hạ gục',
   'entities.quests.q_ww_what_the_bark_holds.objectives.1.label': 'Di Hài Bọc Lụa được hạ xuống',
   'entities.quests.q_ww_what_the_bark_holds.text':
-    'Trong Trảng Rừng Treo Cổ phía đông Gallowmere, lũ nhả tơ treo người chết được bọc tơ của chúng từ những cành cây, và những kẻ lê bước vỏ cây khắc đứng canh gác bên dưới như những người khiêng quan tài kiên nhẫn. Đó là người dân của chúng ta ở trên đó, {playerName}. Đập tan năm kẻ lê bước, hạ xuống ba xác chết bị bọc, và đưa họ về với đất.',
+    'Trong Trảng Rừng Treo Cổ phía đông Gibbetmere, lũ nhả tơ treo người chết được bọc tơ của chúng từ những cành cây, và những kẻ lê bước vỏ cây khắc đứng canh gác bên dưới như những người khiêng quan tài kiên nhẫn. Đó là người dân của chúng ta ở trên đó, {playerName}. Đập tan năm kẻ lê bước, hạ xuống ba xác chết bị bọc, và đưa họ về với đất.',
   'entities.quests.q_ww_what_the_bark_holds.title': 'Điều Mà Vỏ Cây Nắm Giữ',
   'entities.quests.q_ww_widows_skeins.completion':
     'Sáu cuộn tơ, mềm như một hơi thở nín lặng. Người chết sẽ nằm yên hơn trong đó. Nhận lấy những tấm bọc này, ta đã khâu chúng từ mẻ cuối cùng, và khu rừng chưa từng một lần cắn thủng chúng.',
@@ -5720,7 +5676,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.zones.thornpeak_heights.pois.4.label': 'Trại Chiến của Drogmar',
   'entities.zones.thornpeak_heights.pois.5.label': 'Vách Bão',
   'entities.zones.thornpeak_heights.pois.6.label': 'Hồ Lung Linh',
-  'entities.zones.thornpeak_heights.pois.7.label': 'Lều Giáo Phái Cuồng Long',
   'entities.zones.thornpeak_heights.pois.8.label': 'Cánh Đồng Vong Linh',
   'entities.zones.thornpeak_heights.pois.9.label': 'Thánh Đường Mộ Long',
   'entities.zones.thornpeak_heights.welcome':
@@ -5789,7 +5744,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.zones.nightbloom.name': 'Cánh Đồng Dạ Hoa',
   'entities.zones.nightbloom.pois.0.label': 'Moonrest',
   'entities.zones.nightbloom.pois.1.label': 'Nightgate',
-  'entities.zones.nightbloom.pois.2.label': 'Moonwell',
+  'entities.zones.nightbloom.pois.2.label': 'Moonspring',
   'entities.zones.nightbloom.pois.3.label': 'Gloamfield',
   'entities.zones.nightbloom.pois.4.label': 'Canh Thức Vĩnh Cửu',
   'entities.zones.nightbloom.pois.5.label': 'Gò Mộ Không Ngủ',
@@ -5806,7 +5761,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.zones.palmreach.welcome':
     'Cát ấm, tiếng chim ríu rít, và một khu rừng nuốt trọn cả chân trời. Drifthaven vẫn giữ một đống lửa cháy sáng trên bãi biển chờ bạn.',
   'entities.zones.veiled_hollow.name': 'Thung Lũng Sương Phủ',
-  'entities.zones.veiled_hollow.pois.0.label': 'Eldergleam',
+  'entities.zones.veiled_hollow.pois.0.label': 'Eldershine',
   'entities.zones.veiled_hollow.pois.1.label': 'Hang Động Duskfall',
   'entities.zones.veiled_hollow.pois.2.label': 'Đài Quan Sát Duskfall',
   'entities.zones.veiled_hollow.pois.3.label': 'Rừng Cổ Thụ',
@@ -5815,7 +5770,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.zones.veiled_hollow.pois.6.label': 'Bãi Cạn Pha Lê',
   'entities.zones.veiled_hollow.pois.7.label': 'Vực Sâu Lấp Lánh',
   'entities.zones.veiled_hollow.welcome':
-    'Không khí nơi đây vang vọng phép thuật cổ xưa. Hãy tìm đến Người Canh Giữ Saelwyn dưới gốc đại thụ của Eldergleam.',
+    'Không khí nơi đây vang vọng phép thuật cổ xưa. Hãy tìm đến Người Canh Giữ Saelwyn dưới gốc đại thụ của Eldershine.',
   'entities.zones.willowfen.name': 'Đầm Liễu',
   'entities.zones.willowfen.pois.0.label': 'Bridgemere',
   'entities.zones.willowfen.pois.1.label': 'Bậc Thang Amberfen',
@@ -5826,14 +5781,14 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.zones.willowfen.welcome':
     'Đầm lầy rộn ràng tiếng chuồn chuồn và ong bay vo ve. Hãy băng qua cây cầu vào Bridgemere và nghỉ chân đôi chút.',
   'entities.zones.wraithwood.name': 'Rừng Oan Hồn',
-  'entities.zones.wraithwood.pois.0.label': 'Gallowmere',
+  'entities.zones.wraithwood.pois.0.label': 'Gibbetmere',
   'entities.zones.wraithwood.pois.1.label': 'Crowgate',
   'entities.zones.wraithwood.pois.2.label': 'Lùm Cây Của Góa Phụ',
   'entities.zones.wraithwood.pois.3.label': 'Trảng Rừng Treo Cổ',
   'entities.zones.wraithwood.pois.4.label': 'Nhà Nguyện Mournstone',
   'entities.zones.wraithwood.pois.5.label': 'Khoảng Trống Của Thợ Săn',
   'entities.zones.wraithwood.welcome':
-    'Tán lá khép lại trên con đường như một chiếc nắp đậy. Hãy bám theo ánh đèn lồng của Gallowmere, và đừng đáp lời nếu khu rừng gọi tên bạn.',
+    'Tán lá khép lại trên con đường như một chiếc nắp đậy. Hãy bám theo ánh đèn lồng của Gibbetmere, và đừng đáp lời nếu khu rừng gọi tên bạn.',
   'errors.api.accountBanned': 'Tài khoản này đã bị cấm.',
   'errors.api.accountSuspended': 'Tài khoản này bị đình chỉ đến {date}.',
   'errors.api.alreadyInWorld': 'Nhân vật đã ở trong thế giới.',
@@ -7093,7 +7048,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.peaksGreeting':
     'Hai trăm năm bức tường này đã đứng vững. Nó sẽ không sụp đổ dưới phiên gác của ta, nhưng nó đang rền rĩ.',
   'guide.worldPage.peaksPlaceNotes':
-    "Highwatch giữ vững bức tường. Stalker Ridge và Deeprock Burrows thuộc về mèo núi và lũ đào hang; Ogre Foothills và Drogmar's War-Camp thuộc về lũ côn đồ đánh thuê; Stormcrag lách tách tiếng các nguyên tố, và bên dưới nó Hồ Lung Linh phát sáng, hồ nước trên núi mà bờ của nó giữ cánh cổng ánh sáng nhợt nhạt dẫn xuống Ngôi Đền Chết Chìm; Wyrmcult Tents và Revenant Fields bao quanh vùng đất cao của giáo phái, với Thánh Đường Mộ Long ở đỉnh của nó.",
+    "Highwatch giữ vững bức tường. Stalker Ridge và Deeprock Burrows thuộc về mèo núi và lũ đào hang; Ogre Foothills và Drogmar's War-Camp thuộc về lũ côn đồ đánh thuê; Stormcrag lách tách tiếng các nguyên tố, và bên dưới nó Hồ Lung Linh phát sáng, hồ nước trên núi mà bờ của nó giữ cánh cổng ánh sáng nhợt nhạt dẫn xuống Ngôi Đền Chết Chìm; Broodsworn Tents và Revenant Fields bao quanh vùng đất cao của giáo phái, với Thánh Đường Mộ Long ở đỉnh của nó.",
   'guide.worldPage.places': 'Những địa điểm đáng chú ý',
   'guide.worldPage.residents': 'Những người bạn sẽ gặp',
   'guide.worldPage.valeBlurb':
@@ -9652,12 +9607,12 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.amberPlaceNotes':
     'Lanternmere tỏa sáng giữa lòng mùa gặt. Goldmelt là con đèo phủ hổ phách dẫn vào thị trấn; Vườn Cây Dát Vàng và Thung Lũng Mùa Gặt giữ những vụ mùa ngọt nhất cùng những tên trộm liều lĩnh nhất; Đại Hồ phản chiếu những tán lá rực cháy; Đồi Cindermaple sừng sững cao nhất và đỏ nhất; còn Trụ Đá Nghiêng thì lưu giữ ký ức về một điều gì đó cổ xưa hơn cả mùa thu.',
   'guide.worldPage.duskBlurb':
-    'Một thung lũng chìm trong hoàng hôn vĩnh cửu dưới tán đại thụ Eldergleam, nơi những phế tích pha lê tỏa sáng và không khí ngân vang phép thuật cổ xưa.',
-  'guide.worldPage.duskGreeter': 'Người Giữ Saelwyn, Eldergleam',
+    'Một thung lũng chìm trong hoàng hôn vĩnh cửu dưới tán đại thụ Eldershine, nơi những phế tích pha lê tỏa sáng và không khí ngân vang phép thuật cổ xưa.',
+  'guide.worldPage.duskGreeter': 'Người Giữ Saelwyn, Eldershine',
   'guide.worldPage.duskGreeting':
     'Rất ít người như bạn từng đứng dưới những tán cành này. Hãy bước đi nhẹ nhàng, và xin chào đón bạn đến đây.',
   'guide.worldPage.duskPlaceNotes':
-    'Eldergleam quần tụ dưới tán đại thụ. Hang Duskfall cùng đài quan sát của nó là lối vào và cũng là cảnh tượng đầu tiên của thung lũng; Rừng Cổ Thụ và Bồn Địa Starfall giữ lấy miền nam tĩnh lặng; Sân Chìm ôm những phế tích rậm rạp ở phía đông; còn Vực Sâu Lấp Lánh và Bãi Cạn Pha Lê tỏa sáng khắp miền bắc.',
+    'Eldershine quần tụ dưới tán đại thụ. Hang Duskfall cùng đài quan sát của nó là lối vào và cũng là cảnh tượng đầu tiên của thung lũng; Rừng Cổ Thụ và Bồn Địa Starfall giữ lấy miền nam tĩnh lặng; Sân Chìm ôm những phế tích rậm rạp ở phía đông; còn Vực Sâu Lấp Lánh và Bãi Cạn Pha Lê tỏa sáng khắp miền bắc.',
   'guide.worldPage.emberBlurb':
     'Vùng đất hoang tàn ngập tro tàn và bloodglass, rực sáng dưới ánh bão chớp giật, nơi bầy rồng lượn vòng trên miệng núi lửa và lửa trại của troll cháy rực giữa những cồn cát, tất cả được canh giữ từ thị trấn cổng Wyrmwatch.',
   'guide.worldPage.emberGreeter': 'Vệ Quan Cổng, Wyrmwatch',
@@ -9694,12 +9649,12 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.gardenPlaceNotes':
     'Hedgewick chờ đợi ngay tại Cổng Vườn. Lối Đi Bồn Hoa nở rộ sắc màu được xén tỉa gọn gàng; Lâu Đài Dawnhold vẫn huấn luyện hiệp sĩ sau những bức tường mới; Ao Cánh Hoa trôi dạt sắc hồng quanh năm; Cối Xay Cũ vẫn tự xoay vòng luống hoa của riêng nó; Đại Mê Cung thay đổi cách cư xử cho từng vị khách, những vòm cổng của nó được canh giữ bởi lũ cáo lá; Trạm Gác Phương Bắc trấn giữ con đường ra; Bồn Hoa Huệ nghỉ ngơi phía sau tất cả; và Sân Đài Phun Nước vẫn chảy trong vắt tại trái tim khu vườn.',
   'guide.worldPage.hauntBlurb':
-    'Một khu rừng ma ám dưới những tán cây khổng lồ, nơi những ngọn đèn lồng của Gallowmere là thứ ánh sáng chân thật duy nhất trên con đường.',
-  'guide.worldPage.hauntGreeter': 'Người Thắp Đèn, Gallowmere',
+    'Một khu rừng ma ám dưới những tán cây khổng lồ, nơi những ngọn đèn lồng của Gibbetmere là thứ ánh sáng chân thật duy nhất trên con đường.',
+  'guide.worldPage.hauntGreeter': 'Người Thắp Đèn, Gibbetmere',
   'guide.worldPage.hauntGreeting':
     'Hãy bám theo ánh đèn lồng, lữ khách à. Và nếu khu rừng gọi tên bạn từ ngoài con đường, đừng bao giờ đáp lại.',
   'guide.worldPage.hauntPlaceNotes':
-    'Gallowmere co cụm bên trong vòng đèn lồng của mình. Crowgate là cánh cửa u ám của khu rừng; Bụi Rậm Của Góa Phụ giăng kín tơ nhện dày đặc; Khoảng Rừng Treo và Nhà Nguyện Mournstone giữ lại những nỗi đau cổ xưa nhất của khu rừng; còn Bãi Trống Của Thợ Săn thuộc về bất cứ thứ gì vẫn còn săn đuổi nơi đó.',
+    'Gibbetmere co cụm bên trong vòng đèn lồng của mình. Crowgate là cánh cửa u ám của khu rừng; Bụi Rậm Của Góa Phụ giăng kín tơ nhện dày đặc; Khoảng Rừng Treo và Nhà Nguyện Mournstone giữ lại những nỗi đau cổ xưa nhất của khu rừng; còn Bãi Trống Của Thợ Săn thuộc về bất cứ thứ gì vẫn còn săn đuổi nơi đó.',
   'guide.worldPage.jungleBlurb':
     'Một mớ bòng bong nhiệt đới của những rặng cọ, cát trắng và tiếng chim ríu rít vang xa, cùng thị trấn ven biển Drifthaven vẫn giữ ngọn lửa cháy sáng trên bãi cát.',
   'guide.worldPage.jungleGreeter': 'Nữ Quản Cảng, Drifthaven',
@@ -9713,7 +9668,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.nightGreeting':
     'Qua khỏi Nightgate, chính bầu không khí cũng đang chìm trong giấc mộng. Hãy men theo ánh sáng của hoa, và để ý đến thế giới đang say ngủ treo lơ lửng trên bầu trời.',
   'guide.worldPage.nightPlaceNotes':
-    'Moonrest giữ vững buổi canh thức. Nightgate là lối vào miền đất nửa đêm; Moonwell lưu giữ ánh sao mà bạn có thể đứng cạnh bên; Gloamfield nở hoa trong bóng tối; Đài Canh Thức Bất Động dõi trông mà chẳng bao giờ lay động; còn Gò Mộ Không Ngủ là nơi duy nhất ở đây chẳng bao giờ chìm vào giấc mộng.',
+    'Moonrest giữ vững buổi canh thức. Nightgate là lối vào miền đất nửa đêm; Moonspring lưu giữ ánh sao mà bạn có thể đứng cạnh bên; Gloamfield nở hoa trong bóng tối; Đài Canh Thức Bất Động dõi trông mà chẳng bao giờ lay động; còn Gò Mộ Không Ngủ là nơi duy nhất ở đây chẳng bao giờ chìm vào giấc mộng.',
   'entities.abilities.chain_heal.description':
     'Hồi phục một lượng lớn máu cho một mục tiêu đồng minh, sau đó lan sang tối đa 2 đồng minh ở gần; lượng hồi phục giảm 50% sau mỗi lần lan. (Kỹ năng chủ lực của Hồi Phục)',
   'entities.abilities.chain_heal.name': 'Hồi Máu Liên Hoàn',
@@ -9722,7 +9677,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.counter_shot.name': 'Phát Bắn Phản Đòn',
   'entities.abilities.counterspell.description':
     'Chống lại phép mục tiêu đang niệm và ngăn mục tiêu thi triển phép thuộc hệ đó trong 6 giây.',
-  'entities.abilities.counterspell.name': 'Phản Phép',
   'entities.abilities.holy_taunt.description':
     'Chế nhạo mục tiêu: mối đe dọa của bạn tăng lên tương đương với kẻ thù đáng ghét nhất của nó và nó buộc phải tấn công bạn trong 3 giây.',
   'entities.abilities.holy_taunt.name': 'Khiêu Khích Thánh',
@@ -9997,7 +9951,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.skins.ice_fang_sword.look':
     'Lưỡi cong làm bằng băng băng nhạt, những tinh thể sương muối lởm chởm dọc theo sống lưng, một lõi đông lạnh màu lục lam phát sáng ở lớp chắn ngang đầy đặn hơn bằng băng.',
   'hudChrome.wocStore.skins.ice_fang_sword.lore':
-    "Sản phẩm hàng đầu của loại đông lạnh và là sản phẩm mà mọi nhà sưu tập đều hướng tới đầu tiên. Ice Fang được chạm khắc chứ không phải rèn từ một nhánh sông băng bao phủ Thornpeak phía trên Highwatch, lõi màu lục lam của nó cháy lạnh như ánh sáng của Glimmermere. Nó tạo ra không khí mà nó cắt. Người bảo vệ tường thề rằng một người lính đã mang nó vào đêm tuyết dày đã cản trở Wyrmcult, và 'đã mua được bức tường trong mùa đông'.",
+    "Sản phẩm hàng đầu của loại đông lạnh và là sản phẩm mà mọi nhà sưu tập đều hướng tới đầu tiên. Ice Fang được chạm khắc chứ không phải rèn từ một nhánh sông băng bao phủ Thornpeak phía trên Highwatch, lõi màu lục lam của nó cháy lạnh như ánh sáng của Glimmermere. Nó tạo ra không khí mà nó cắt. Người bảo vệ tường thề rằng một người lính đã mang nó vào đêm tuyết dày đã cản trở Broodsworn, và 'đã mua được bức tường trong mùa đông'.",
   'hudChrome.wocStore.skins.ice_fang_sword.name': 'Nanh băng',
   'hudChrome.wocStore.skins.lacquered_wand.look':
     'Đũa sơn mài mảnh màu đỏ đậm, hai dải đồng thau đánh bóng, đầu đũa tròn nhỏ bằng đồng.',
@@ -10044,7 +9998,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Thép bạc và cung băng xanh, lõi đông lạnh màu lục lam phát sáng trong ống đứng, một mũi tên có móc bằng băng rắn, hơi lạnh.',
   'hudChrome.wocStore.skins.winterbite.lore':
     'Một cây cung bằng thép bạc và băng Thornpeak, phần nâng của nó được thắp sáng bởi lõi màu lục lam lạnh lẽo có tác dụng đóng băng mũi tên vào dây. Nó tạo thành một trục băng sông băng rắn chắc cải cách mỗi lần vẽ; người bắn cung không mang theo ống tên trên tường, chỉ mang theo cái lạnh. Highwatch đã giữ Rình Rậper Ridge vượt qua một cuộc bao vây với một người giống như vậy: họ nói, một cung thủ duy nhất và những mũi tên giá trị cho cả một mùa đông luôn ở đó.',
-  'hudChrome.wocStore.skins.winterbite.name': 'Nanh Đông',
   'hudChrome.wocStore.storeTab': 'Cửa hàng',
   'hudChrome.wocStore.tabsLabel': 'Các phần của Cửa hàng WOC',
   'hudChrome.wocStore.title': 'Cửa hàng WOC',
@@ -10137,8 +10090,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Bắn một loạt tên vào khu vực mục tiêu, gây {damage} sát thương Vật lý lên kẻ địch trong bán kính 8 m. (thiên phú Thợ săn)',
   'entities.abilities.prayer_of_healing.description':
     'Hồi {damage} máu cho đồng minh ở gần. (thiên phú Tu sĩ)',
-  'entities.abilities.preparation.description':
-    'Kết thúc thời gian hồi của Chạy nước rút, Né tránh và Biến mất. (thiên phú Đạo tặc)',
   'entities.abilities.presence_of_mind.description':
     'Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 giây. (thiên phú pháp sư)',
   'entities.abilities.psychic_scream.description':
@@ -10159,8 +10110,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.blazing_barrier.description':
     'Bao bọc bản thân trong lửa, hấp thụ {damage} sát thương trong 60 giây. (Lửa)',
   'entities.abilities.cold_snap.name': 'Tiếng Gọi Mùa Đông',
-  'entities.abilities.cold_snap.description':
-    'Hoàn tất thời gian hồi của Bước Chớp, Màn Sương Giá và Tàng Hình Cao Cấp. (tài năng pháp sư)',
   'entities.abilities.greater_invisibility.name': 'Tàng Hình Cao Cấp',
   'entities.abilities.hot_streak.name': 'Chuỗi Nóng',
   'entities.abilities.hot_streak.description':
@@ -10211,7 +10160,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.emberwing_drake.name': 'Rồng Cánh Lửa',
   'entities.mobs.fen_sprite.name': 'Tinh Linh Đầm Lầy',
   'entities.mobs.fisher_bram.name': 'Ngư Dân Bram',
-  'entities.mobs.frostmane_yeti.name': 'Người Tuyết Bờm Băng Giá',
   'entities.mobs.gale_wisp.name': 'Tinh Linh Cuồng Phong',
   'entities.mobs.gilded_stag.name': 'Hươu Đực Dát Vàng',
   'entities.mobs.gleamstag.name': 'Hươu Lấp Lánh',
@@ -10220,7 +10168,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.gloam_strider.name': 'Kẻ Rảo Bước Chạng Vạng',
   'entities.mobs.gravedigger_mosley.name': 'Người Đào Mộ Mosley',
   'entities.mobs.gravenbark_shambler.name': 'Kẻ Lê Bước Vỏ Cây Khắc',
-  'entities.mobs.harvest_sprite.name': 'Tinh Linh Mùa Gặt',
   'entities.mobs.hedge_gnome.name': 'Yêu Tinh Đất Hàng Rào',
   'entities.mobs.hedge_knight.name': 'Hiệp Sĩ Dawnhold',
   'entities.mobs.ice_wisp.name': 'Tinh Linh Băng',
@@ -10230,7 +10177,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.moonfleece_grazer.name': 'Kẻ Gặm Cỏ Lông Trăng',
   'entities.mobs.moor_ram.name': 'Cừu Đực Đầm Hoang',
   'entities.mobs.mushroom_pixie.name': 'Yêu Tinh Tộc Lấp Lánh',
-  'entities.mobs.nightkin_stargazer.name': 'Kẻ Ngắm Sao Tộc Đêm',
   'entities.mobs.old_marrowshell.name': 'Lão Vỏ Tủy',
   'entities.mobs.orchard_treant.name': 'Mộc Nhân Vườn Cây',
   'entities.mobs.pale_huntsman.name': 'Thợ Săn Nhợt Nhạt',
@@ -10444,7 +10390,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.battleTrance':
     'Đòn Cướp Phá hoặc Đòn Tàn Phế tiếp theo của bạn không tốn nộ khí',
   'hudChrome.auraEffect.revengeFree': 'Phục Thù tiếp theo của bạn không tốn nộ khí',
-  'hudChrome.auraEffect.victoryRush': 'Đà Chiến Thắng đã sẵn sàng',
   'hudChrome.auraEffect.maxHpPct': 'Tăng máu tối đa thêm {pct}%',
   'hudChrome.statInfo.names.parry': 'Gạt Đòn',
   'hudChrome.statInfo.desc.parry':
@@ -10541,7 +10486,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.items.cragprowl_belt.name': 'Thắt Lưng Kẻ Rình Sườn Đá',
   'entities.items.cragthorn_greatstaff.name': 'Đại Trượng Gai Sườn Đá',
   'entities.items.cragward_pauldrons.name': 'Giáp Vai Vệ Sườn Đá',
-  'entities.items.cryptbloom_shoulderguards.name': 'Giáp Vai Hoa Hầm Mộ',
   'entities.items.dreamroot_boots.name': 'Giày Rễ Mộng',
   'entities.items.duskthorn_mantle.name': 'Áo Choàng Gai Hoàng Hôn',
   'entities.items.fenbark_leggings.name': 'Giáp Chân Vỏ Đầm Lầy',
@@ -10581,7 +10525,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.items.wildgrove_cinch.name': 'Đai Lưng Rừng Hoang',
   'entities.items.wildgrowth_leggings.name': 'Giáp Chân Hoang Sinh',
   'entities.items.wildsoul_maul.name': 'Búa Hồn Hoang',
-  'entities.items.wyrmcult_spellgrips.name': 'Găng Pháp Thuật Tà Long',
   'entities.items.abyssal_loop.name': 'Vòng Vực Thẳm',
   'entities.items.abysswrought_band.name': 'Nhẫn Rèn Vực Thẳm',
   'entities.items.amberfall_sap_bucket.name': 'Xô Hứng Nhựa',
@@ -10604,7 +10547,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.items.farshore_salt_moss.name': 'Rêu Muối Farshore',
   'entities.items.fenway_mooring_line.name': 'Dây Neo Bị Cắt',
   'entities.items.fountain_court_mantle.name': 'Áo Choàng Của Sân Đài Phun Nước',
-  'entities.items.frostmane_mantle.name': 'Áo Choàng Của Bờm Băng Giá',
   'entities.items.galecrest_ram_wool.name': 'Lông Cừu Nhờn',
   'entities.items.gallowmere_grave_candle.name': 'Nến Mộ',
   'entities.items.gilded_sap_clot.name': 'Khối Nhựa Dát Vàng',
@@ -10883,7 +10825,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.hearthkeeper_maeve.title': 'Người Giữ Lữ Quán Lò Sưởi',
   'entities.npcs.hermit_okku.greeting':
     'Im lặng nào. Tiếng trống đếm mọi thứ bước đi dưới tán cây, và chúng đã đếm được ngươi rồi.',
-  'entities.npcs.hermit_okku.name': 'Okku',
+  'entities.npcs.hermit_okku.name': 'Okrim',
   'entities.npcs.hermit_okku.title': 'Người Đã Bước Vào Trong',
   'entities.npcs.huntsman_deral.greeting':
     'Im lặng nào. Bầy thú biết rõ từng âm thanh mà thung lũng này tạo ra, và tôi cũng vậy.',
@@ -10936,7 +10878,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.provisioner_fenna.greeting':
     'Bánh mì vẫn còn ấm, nước vẫn còn ngọt lành. Hollow ban tặng, và ta cũng vậy.',
   'entities.npcs.provisioner_fenna.name': 'Người Tiếp Tế Fenna',
-  'entities.npcs.provisioner_fenna.title': 'Người Tiếp Tế Của Eldergleam',
+  'entities.npcs.provisioner_fenna.title': 'Người Tiếp Tế Của Eldershine',
   'entities.npcs.quartermaster_edda.greeting':
     'Thép và muối, {className}, đó là tất cả những gì ta còn để trao cho ngươi. Hãy nhận lấy và khiến những vết rạn phải hối hận vì đã mở ra trong tầm tay ta.',
   'entities.npcs.quartermaster_edda.name': 'Quân Nhu Trưởng Edda',
@@ -10972,7 +10914,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.sexton_marrow.greeting':
     'Chúng tôi chôn họ thật sâu ở đây, và rung chuông để họ nhớ mà nằm yên.',
   'entities.npcs.sexton_marrow.name': 'Người Giữ Mộ Marrow',
-  'entities.npcs.sexton_marrow.title': 'Người Giữ Mộ Của Gallowmere',
+  'entities.npcs.sexton_marrow.title': 'Người Giữ Mộ Của Gibbetmere',
   'entities.npcs.strandwatcher_pell.greeting':
     'Cuối cùng cũng ra khỏi rừng cây đen. Thở đi, kẻ lạ mặt, mặt trời vẫn còn ngự trị ở phía bên này của con đèo.',
   'entities.npcs.strandwatcher_pell.name': 'Người Canh Bờ Pell',
@@ -11020,7 +10962,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.widow_tansy.greeting':
     'Một ngọn nến cho mỗi nấm mộ, và không được để ngọn nào tắt. Không một ngọn nào, ngươi nghe rõ chưa?',
   'entities.npcs.widow_tansy.name': 'Quả Phụ Tansy',
-  'entities.npcs.widow_tansy.title': 'Thợ Làm Nến Của Gallowmere',
+  'entities.npcs.widow_tansy.title': 'Thợ Làm Nến Của Gibbetmere',
   'gatherEvent.ancientHeartwood': '{finder} đã đốn hạ một tâm gỗ cổ xưa!',
   'gatherEvent.moonlitBloom': '{finder} phát hiện ra hoa nở dưới ánh trăng!',
   'gatherEvent.pristineVein': '{finder} đánh vào mạch máu nguyên sơ!',

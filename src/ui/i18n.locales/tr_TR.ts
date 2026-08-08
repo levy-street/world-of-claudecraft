@@ -842,8 +842,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.items.tidewrought_fishing_rod.name': 'Gelgit Dövmeli Olta',
   'entities.items.gatherers_cache.name': 'Toplayıcının Zulası',
   'entities.items.artisans_eye.name': 'Zanaatkârın Gözü',
-  'entities.items.reins_terrorspark_groundshaker.name':
-    'Kontak Anahtarı: Dehşetkıvılcım, Yer Sarsan',
   'hud.options.graphicsPresetInsane': 'Ekstrem',
   'hud.options.surfaceDetail': 'Yüzey Detayı',
   'hud.options.surfaceDetailBasic': 'Temel',
@@ -881,7 +879,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraOverlay.procs.overpowerCharge': 'Kızıl El Güçlendirmesi',
   'hudChrome.auraOverlay.procs.revenge': 'İntikam!',
   'hudChrome.auraOverlay.procs.suddenDeath': 'Ani Ölüm',
-  'hudChrome.auraOverlay.procs.victoryRush': 'Zafer Atılımı',
   'hudChrome.auraOverlay.reposition': 'Konumları ayarla',
   'hudChrome.auraOverlay.reset': 'Konumu Sıfırla',
   'hudChrome.auraOverlay.screenPosition': 'Ekran konumu',
@@ -900,7 +897,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.epic.unlink': 'Epic bağlantısını kaldır',
   'hudChrome.mounts.desc_terrorspark_groundshaker':
     'Ağır paletleri, büyük çaplı bir topu ve korkusuz pilotlar için yapılmış bir eyeri olan kompakt zırhlı bir makine.',
-  'hudChrome.mounts.name_terrorspark_groundshaker': 'Dehşetkıvılcım, Yer Sarsan',
   'hudChrome.targetAuras.all': 'Tümü',
   'hudChrome.targetAuras.buffs': 'Takviyeler',
   'hudChrome.targetAuras.configureRows': 'Hedef auralarını yapılandır',
@@ -1221,8 +1217,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.arcane_surge.description':
     "Düşmanın içinden ham aether dalgası geçirerek {damage} hasar verir. Her kullanım bir Gizemli Yük bırakır: bu yük bir sonraki Aether Dalgası'nın hasarını ve çeviri hızını artırır (her biri %5 daha hızlı) ama mana maliyetini keskin şekilde yükseltir; en fazla 4 yığın yapılabilir. Aether Okları yükleri harcar. Her kullanım aynı zamanda Aether Atılımı'nı harekete geçirebilir ve bir sonraki Aether Dalgası'nı ücretsiz ve iki kat daha hızlı hale getirebilir.",
   'entities.abilities.arcane_surge.name': 'Aether Dalgası',
-  'entities.abilities.blizzard.description':
-    "Hedef alana 6 saniye boyunca buz fırtınası çağırır, her saniye {damage} Don hasarı verir ve düşmanları %40 yavaşlatır. Vurulan her düşman Donmuş Küre'nin süresini 0,5 saniye azaltır (kullanım başına en fazla 3 saniye). (Don)",
   'entities.abilities.blizzard.name': 'Kar Fırtınası',
   'entities.abilities.brain_freeze.name': 'Beyin Donması',
   'entities.abilities.dragons_breath.description':
@@ -1235,13 +1229,11 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Alev saçan bir köze dönüşerek hareket hızını {buff}% artır. Dönüşüm sırasında saldıramazsın veya büyü kullanamazsın. Normal formuna dönmek için yeniden kullan.',
   'entities.abilities.fireball_form.name': 'Kor Formu',
   'entities.abilities.flurry.name': 'Kış Kırbacı',
-  'entities.abilities.frozen_orb.name': 'Donmuş Küre',
   'entities.abilities.glacial_front.description':
     'Genişleyen bir don cephesi biriktirmek için basılı tut, ardından bir koni şeklinde bırak. Daha uzun şarjlar daha uzağa ulaşır ve daha fazla hasar verir. Vurulan tüm düşmanlar 4 saniye boyunca %50 yavaşlar. Azami şarj ayrıca onları 1 saniye kökler. (Don)',
   'entities.abilities.glacial_front.name': 'Buzul Cephesi',
   'entities.abilities.glacial_spike.description':
     'Devasa bir buz dikeni çağırarak 5 Buz Parçası tüketir, {damage} Don hasarı verir ve hedefi 4 saniye olduğu yere dondurur. (Don)',
-  'entities.abilities.glacial_spike.name': 'Buzul Dikeni',
   'entities.abilities.ice_lance.description':
     "Bir buz kıymığı fırlatarak {damage} Don hasarı verir; donmuş hedefe karşı üç kat etkilidir. Donmuş Parmaklar'ı veya Kışın Üşümesi'nin bir yükünü harcayarak hedefi donmuş gibi değerlendirir. (Don)",
   'entities.abilities.ice_lance.name': 'Buz Mızrağı',
@@ -1680,7 +1672,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.furious_mending.name': 'Öfkeli Onarım',
   'entities.abilities.heroic_leap.description':
     'Hedef bölgeye sıçrar ve yere indiğinde yakındaki düşmanlara {damage} hasar verirsin.',
-  'entities.abilities.heroic_leap.name': 'Savaş Sıçrayışı',
   'entities.abilities.intimidating_shout.description':
     '8 yarda içindeki en fazla 5 düşmanı 8 sn boyunca korku içinde kaçırtan dehşet verici bir nara. Hasar etkiyi bozabilir.',
   'entities.abilities.intimidating_shout.name': 'Gözdağı Narası',
@@ -1719,7 +1710,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.seasoned_soldier.name': 'Tecrübeli Asker',
   'entities.abilities.storm_bolt.description':
     'Silahını hedefe fırlatır, {damage} hasar verir ve onu 3 sn sersemletirsin.',
-  'entities.abilities.storm_bolt.name': 'Fırtına Oku',
   'entities.abilities.sudden_death.description':
     'Otomatik saldırıların, canı ne olursa olsun bir hedefe hiç öfke harcamadan Erken Mezar kullanmana izin verme şansı taşır. (Silahşor)',
   'entities.abilities.sudden_death.name': 'Ani Ölüm',
@@ -1728,7 +1718,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sweeping_strikes.name': 'Genişleyen Yay',
   'entities.abilities.victory_rush.description':
     "Silah hasarı artı {damage} vurur ve azami canının %20'sini iyileştirirsin. Yalnızca bir düşman öldürdükten sonraki 20 sn içinde kullanılabilir.",
-  'entities.abilities.victory_rush.name': 'Zafer Atılımı',
   'hudChrome.specPanel.complexity': 'Karmaşıklık',
   'hudChrome.specPanel.complexityHigh': 'Yüksek',
   'hudChrome.specPanel.complexityLow': 'Düşük',
@@ -1742,9 +1731,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.talentRows.tab': 'Seçimler',
   'hudChrome.talentRows.readoutSummary': 'Yetenekler: {head}, {spent}/{total} sıra seçildi.',
   'entities.abilities.aspect_of_the_wild.name': 'Yaban Dişi Sureti',
-  'entities.abilities.avenging_wrath.name': 'İntikam Kanadı',
   'entities.abilities.berserk.name': 'Kızıl Sis',
-  'entities.abilities.blink.name': 'Titreşim Adımı',
   'entities.abilities.bloodlust.name': 'Savaş Davulları',
   'entities.abilities.chain_lightning.name': 'Çatallı Yıldırım',
   'entities.abilities.chaos_bolt.name': 'Yıkım Oku',
@@ -1784,7 +1771,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.smoke_screen.name': 'Duman Perdesi',
   'entities.abilities.smoke_screen.description':
     'Bir duman bulutunda kaybolur ve 8 sn. boyunca kaçınma şansını %30 artırırsın.',
-  'entities.abilities.spellsteal.name': 'Büyü Çalma',
   'entities.abilities.spellsteal.description':
     'Bir düşmandan faydalı bir büyü etkisi çalar ve sana aktarır.',
   'entities.abilities.startle_shot.name': 'İrkilten Atış',
@@ -2189,7 +2175,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.items.lunar_tide_greatstaff.name': 'Ay Gelgiti Büyük Asası',
   'entities.items.medallion_of_endless_profit.name': 'Bitmez Kâr Madalyonu',
   'entities.items.mistcallers_fang.name': 'Sisçağıranın Dişi',
-  'entities.items.mistforged_pauldrons.name': 'Sisdövümü Omuzlukları',
   'entities.items.morthens_cryptforged_hauberk.name': "Morthen'in Mezardövümü Zırh Gömleği",
   'entities.items.nielas_coldlight_band.name': "Niela'nın Soğukışık Halkası",
   'entities.items.oath_of_the_round_table.name': 'Yuvarlak Masa Yemini',
@@ -3378,24 +3363,24 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'delveUi.board.tier.heroic': 'Kahramanca',
   'delveUi.board.tier.normal': 'Normal',
   'delveUi.board.title': 'Mağara Panosu',
-  'delveUi.boss.varric.bell.emote': 'Diyakoz Varric gömülü çanı iki eliyle kavrar!',
+  'delveUi.boss.varric.bell.emote': 'Diyakoz Vandric gömülü çanı iki eliyle kavrar!',
   'delveUi.boss.varric.bell.impact': 'Çanın çınlaması mahzenin zeminini çatlatır!',
   'delveUi.boss.varric.bell.lesson':
     'Çan Çınlaması: her on iki saniyede bir yere vuruş. Düşmeden önce uzaklaş.',
-  'delveUi.boss.varric.bell.log': 'Diyakoz Varric defin çanını çalmaya başlar.',
-  'delveUi.boss.varric.bell.warning': "Diyakoz Varric'ten uzaklaş!",
+  'delveUi.boss.varric.bell.log': 'Diyakoz Vandric defin çanını çalmaya başlar.',
+  'delveUi.boss.varric.bell.warning': "Diyakoz Vandric'ten uzaklaş!",
   'delveUi.boss.varric.defeat': 'Hayır... İsimler bendeydi... Hepsi bendeydi...',
   'delveUi.boss.varric.intro': 'Hiçbir ruh kaybolmaz. Yalnızca yanlış yerleştirilir.',
   'delveUi.boss.varric.mid30': 'Defin çanı söylediği her isme yanıt verir.',
-  'delveUi.boss.varric.mid60': 'Diyakoz Varric defterden isimleri titrek bir zaferle okur.',
+  'delveUi.boss.varric.mid60': 'Diyakoz Vandric defterden isimleri titrek bir zaferle okur.',
   'delveUi.boss.varric.pull':
     'Kutsal toprağa kirli niyetlerle ayak basıyorsun. Diz çök ve sayıma katıl.',
-  'delveUi.boss.varric.raise.emote': 'Diyakoz Varric kırık mezarlardan isimler çağırır!',
-  'delveUi.boss.varric.raise.interrupt_fail': "Ölüler Diyakoz Varric'in çağrısına yanıt verir!",
+  'delveUi.boss.varric.raise.emote': 'Diyakoz Vandric kırık mezarlardan isimler çağırır!',
+  'delveUi.boss.varric.raise.interrupt_fail': "Ölüler Diyakoz Vandric'in çağrısına yanıt verir!",
   'delveUi.boss.varric.raise.interrupt_ok': 'Mezar ayini sekteye uğrar.',
   'delveUi.boss.varric.raise.lesson':
     'Çatlamış mezarı beş saniye içinde kes, yoksa ölüler onun çağrısına kalkar.',
-  'delveUi.boss.varric.raise.log': "Diyakoz Varric Ölü Diriltme'ye başlar.",
+  'delveUi.boss.varric.raise.log': "Diyakoz Vandric Ölü Diriltme'ye başlar.",
   'delveUi.boss.varric.raise.object': 'Çatlamış mezar çalınmış bir nefesle titrer.',
   'delveUi.boss.varric.raise.warning': 'Mezar ayinini durdur!',
   'delveUi.chest.flavor': 'Ölüler ayırabildiklerini teslim etti.',
@@ -3868,8 +3853,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Karabüyücünün komutası altında bir Duskborn çağırır. Duskborn, yakın dövüşte hızla vuran ve sert darbeler indiren kırılgan bir iblistir. Yeni bir iblis çağırmak mevcut olanı gönderir. Bir seferde yalnızca bir iblisin olabilir.',
   'entities.abilities.summon_succubus.name': 'Duskborn Çağırma',
   'entities.abilities.summon_voidwalker.description':
-    'Karabüyücünün komutası altında bir Gloomshade çağırır. Gloomshade, düşmanlarını kışkırtan ve cezayı üstüne çeken sağlam bir iblistir. Yeni bir iblis çağırmak mevcut olanı gönderir. Bir seferde yalnızca bir iblisin olabilir.',
-  'entities.abilities.summon_voidwalker.name': 'Gloomshade Çağırma',
+    'Karabüyücünün komutası altında bir Duskmurk çağırır. Duskmurk, düşmanlarını kışkırtan ve cezayı üstüne çeken sağlam bir iblistir. Yeni bir iblis çağırmak mevcut olanı gönderir. Bir seferde yalnızca bir iblisin olabilir.',
+  'entities.abilities.summon_voidwalker.name': 'Duskmurk Çağırma',
   'entities.abilities.sunder_armor.name': 'Zırh Kesme',
   'entities.abilities.swipe.description':
     'Yakındaki düşmanları {damage} hasar için savurur. Ekstra tehdit üretir. Yalnızca Bruin Formu.',
@@ -3894,7 +3879,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.travel_form.name': 'Fleet Formu',
   'entities.abilities.vanish.description':
     "Gözden kaybolursun, dövüşte bile Duskveil'e geçersin. Gizliyken %50 daha yavaş hareket edersin. 10 saniyeye kadar sürer.",
-  'entities.abilities.vanish.name': 'Duman Adımı',
   'entities.abilities.whirlwind.description':
     'Ölümcül bir yayda dönerek yakındaki tüm düşmanları {damage} için vurursun. (Cinnet yeteneği)',
   'entities.abilities.whirlwind.name': 'Bıçaklı Girdap',
@@ -3904,7 +3888,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.wrath.description':
     '{damage} Doğa hasarı için bir doğa enerjisi oku fırlatır.',
   'entities.abilities.wrath.name': 'Yaban Oku',
-  'entities.abilities.holy_shock.name': 'Kutsal Şok',
   'entities.abilities.holy_shock.description':
     'Dost bir hedefi Kutsal enerjiyle sarsar ve onu {damage} kadar iyileştirir. (Kutsal imza)',
   'entities.abilities.holy_shield.name': 'Kutsal Kalkan',
@@ -3916,7 +3899,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.trueshot_aura.name': 'Keskin Nişan Aurası',
   'entities.abilities.trueshot_aura.description':
     'Yakındaki müttefiklere ilham verir, saldırı gücünü 5 dk boyunca 35 artırır. (Nişancılık imzası)',
-  'entities.abilities.wyvern_sting.name': 'Viverna Sokması',
   'entities.abilities.wyvern_sting.description':
     'Düşmanı uzaktan sokar ve en fazla 4 sn boyunca etkisiz bırakır. Herhangi bir hasar etkiyi bozar. (Hayatta Kalma imzası)',
   'entities.abilities.arcane_power.name': 'Gizemli Güç',
@@ -3925,7 +3907,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.combustion.name': 'Anka Transı',
   'entities.abilities.combustion.description':
     'Büyü kritik şansını %50 artırır, 15 sn sürer. (Ateş imza yeteneği)',
-  'entities.abilities.icy_veins.name': 'Buzlu Damarlar',
   'entities.abilities.icy_veins.description':
     'Büyü hızını %30 artırır ve 10 sn boyunca büyü kesintisini ve geri itmeyi önler. (Buz imza yeteneği)',
   'entities.abilities.cold_blood.name': 'Soğukkanlılık',
@@ -3940,7 +3921,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.power_infusion.name': 'Güç Aşılaması',
   'entities.abilities.power_infusion.description':
     'Dost bir hedefe güç aşılar, büyü gücünü 15 sn boyunca 28 artırır. (Disiplin imzası)',
-  'entities.abilities.holy_nova.name': 'Kutsal Nova',
   'entities.abilities.holy_nova.description':
     'Kutsal ışık patlaması yaratır, yakındaki müttefikleri {damage} kadar iyileştirir ve yakındaki düşmanlara hasar verir. (Kutsal imza)',
   'entities.abilities.shadowform.name': 'Gölge Formu',
@@ -3961,10 +3941,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.feral_charge.name': 'Yabani Hücum',
   'entities.abilities.feral_charge.description':
     'Bir düşmana hücum eder ve onu 1 sn köklersin. 8-25 m menzil. (Yabanilik imzası)',
-  'entities.abilities.swiftmend.name': 'Hızlı İyileştirme',
   'entities.abilities.swiftmend.description':
     'Dost bir hedefteki zamanla iyileştirme etkisini tüketerek onu {damage} kadar iyileştirir. (Restorasyon imzası)',
-  'entities.abilities.crusader_strike.name': 'Haçlı Darbesi',
   'entities.abilities.crusader_strike.description':
     'Hedefe silah hasarı artı {damage} Kutsal hasar verir. (Paladin yeteneği)',
   'entities.abilities.metamorphosis.name': 'Metamorfoz',
@@ -4348,7 +4326,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.items.valespun_robe.name': 'Vadieğirme Cübbesi',
   'entities.items.vanguard_azure_armor_plate.name': 'Öncü Birlik Gök Mavisi',
   'entities.items.vanguard_chrome_armor_plate.name': 'Öncü Birlik Krom',
-  'entities.items.varric_shadow_cowl.name': "Varric'in Gölge Başlığı",
+  'entities.items.varric_shadow_cowl.name': "Vandric'in Gölge Başlığı",
   'entities.items.verlans_oathblade.name': "Verlan'ın Yemin Kılıcı",
   'entities.items.voss_sanctified_mace.name': "Voss'un Kutsanmış Topuzu",
   'entities.items.wanderers_chestguard.name': 'Gezginin Göğüslüğü',
@@ -4367,9 +4345,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.items.mistcallers_duffel.name': "Fogbinder'ın Denizci Çantası",
   'entities.items.worn_sword.name': 'Çentikli Kısa Kılıç',
   'entities.items.woven_robe.name': 'Vadidokuma Cübbesi',
-  'entities.items.wyrmcult_grand_robe.name': 'Ejdertarikatı Görkemli Cübbesi',
-  'entities.items.wyrmcult_orders.name': 'Ejdertarikatı Emirleri',
-  'entities.items.wyrmcult_soulsteps.name': 'Ejdertarikatı Ruhadımları',
   'entities.items.wyrmfang_greatblade.name': 'Ejderdişi Pala',
   'entities.items.wyrmscale_jerkin.name': 'Ejderpulu Ceketi',
   'entities.items.wyrmshadow_harness.name': 'Nightfang Koşumu',
@@ -4417,7 +4392,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.choirmother_selthe.name': 'Koroana Selthe',
   'entities.mobs.corrupted_priest_malric.name': 'Yozlaşmış Rahip Malric',
   'entities.mobs.crypt_shambler.name': 'Mahzen Sürünücüsü',
-  'entities.mobs.deacon_varric.name': 'Diyakoz Varric',
+  'entities.mobs.deacon_varric.name': 'Diyakoz Vandric',
   'entities.mobs.deacon_voss.name': 'Diyakoz Voss',
   'entities.mobs.deathstalker_voss.name': 'Ölümavcısı Voss',
   'entities.mobs.deepfen_murloc.name': 'Deepfen Isirgani',
@@ -4497,7 +4472,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.vision_aldren_warrior.name': "Kaptan Aldren'in Hayali",
   'entities.mobs.vision_deathstalker_voss.name': "Kraliyet Suikastçısı Voss'un Hayali",
   'entities.mobs.vision_malric_mage.name': "Baş Rahip Malric'in Hayali",
-  'entities.mobs.gloomshade.name': 'Gloomshade',
+  'entities.mobs.gloomshade.name': 'Duskmurk',
   'entities.mobs.voskar_emberwing.name': 'Korkanat Voskar',
   'entities.mobs.warlock_imp.name': 'Ateş İblisi',
   'entities.mobs.warlock_voidwalker.name': 'Boşluk İblisi',
@@ -4505,8 +4480,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.webwood_spider.name': 'Sableweb Pusucusu',
   'entities.mobs.wild_boar.name': 'Yaban Domuzu',
   'entities.mobs.wraithbinder_maldrec.name': 'Hayaletbağlayan Maldrec',
-  'entities.mobs.wyrmcult_necromancer.name': 'Ejder Tarikatı Nekromcusu',
-  'entities.mobs.wyrmcult_zealot.name': 'Ejder Tarikatı Bağnazı',
   'entities.mobs.ysolei.name': "Ysolei, Boğulmuş Ay'ın Avatarı",
   'entities.npcs.apothecary_lin.greeting': 'Doğu ormanlarında adımına dikkat et, dostum.',
   'entities.npcs.apothecary_lin.name': 'Eczacı Lin',
@@ -4681,8 +4654,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_drogmar.completion':
     'Drogmar, kendi kampında ölü. Klanlar yüksek geçitlere dağılacak, duvarıma bir kışlık zaman kazandırdın, {playerName}.',
   'entities.quests.q_drogmar.objectives.0.label': 'Savaş Ağası Drogmar öldürüldü',
-  'entities.quests.q_drogmar.text':
-    "Savaş Ağası Drogmar, Ejdertarikatı'nın altınını aldı ve klanları dağın uyanışına yemin ettirdi. O, duvarıma savurmayı düşündükleri çekiç, ve yere vurduğunda, {playerName}, yanında durma. Yoldaşlarını savaş kampına götür ve onu yok et, Highwatch için.",
   'entities.quests.q_drogmar.title': 'Savaş Ağası Drogmar',
   'entities.quests.q_drowned.completion':
     'Yere serdiğin her biri, özgür kalan çalınmış bir ruh. Ama onları boğan kişi hâlâ su döküyor.',
@@ -5032,7 +5003,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_voice_below.completion':
     'Diz çökmeler durdu. Sesi susturmadık, {playerName}, yalnızca korosunu inceltik. Bu kadarı yeterli olmalı.',
   'entities.quests.q_voice_below.objectives.0.label': 'Öldürülen Ejder Tarikatı Yobazı',
-  'entities.quests.q_voice_below.objectives.1.label': 'Öldürülen Ejder Tarikatı Nekromantı',
   'entities.quests.q_voice_below.text':
     "Dün gece bütün tarikat kampı bir anda diz çöktü, {playerName}, her yobaz, her nekromant, hepsi Mabet'e dönük. Korzul artık onlara uykularında konuşuyor; Vael bataklıkta aynı sesi duydu, ondan önce de Morthen. Cemaati biçin, on yobaz, altı nekromant, o sesin kapıyı kendi elleriyle açacak kadar ele sahip olmasından önce.",
   'entities.quests.q_voice_below.title': 'Aşağıdaki Ses',
@@ -5062,9 +5032,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_wyrm_sigils.title': 'Ejderin Mühürleri',
   'entities.quests.q_zealots.completion':
     'Rüzgâr daha sessiz. Ama beni rahatsız eden ilahi söylemeleri değil, {playerName}, asıl mesele bir şeyin onlara karşılık söylüyor olabileceği.',
-  'entities.quests.q_zealots.objectives.0.label': 'Öldürülen Ejder Tarikatı Yobazı',
-  'entities.quests.q_zealots.text':
-    "Rüzgâr güney zirvelerinden geldiğinde, {playerName}, ilahi taşır. Ejder Tarikatı artık saklanmıyor, Mabet'in aşağısına çadırlar kurdular ve altında uyuyana şarkı söylüyorlar. On iki yobazı sustur. Susturulan her ses, dağa bir gecelik uyku daha kazandırır.",
   'entities.quests.q_zealots.title': 'Rüzgârdaki İlahiler',
   'entities.quests.q_af_amber_from_the_herd.completion':
     'Altı pıhtı, dökülmüş bal kadar temiz. Bu eldivenler son partiden dikildi, {playerName}: reçineyle sertleşmiş ve göründüğünden daha sıcak.',
@@ -5099,7 +5066,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_af_orchard_call.title': 'Bahçe İçin Bir Araba',
   'entities.quests.q_af_sprites_and_spigots.completion':
     'Dört kova kancalarına geri döndü ve sıralar sessizleşti. Perilerle benden daha ağır bir elin var, {playerName}, ve bugün buna sevindim.',
-  'entities.quests.q_af_sprites_and_spigots.objectives.0.label': 'Kovulan Hasat Perisi',
   'entities.quests.q_af_sprites_and_spigots.objectives.1.label': 'Kurtarılan Reçine Toplama Kovası',
   'entities.quests.q_af_sprites_and_spigots.text':
     'Hasat perileri, {playerName}. İçindeki tatlılık için musluklarımı gövdelerden söküp kovaları çimenlere fırlatıyorlar. Bu küçük hırsızlardan sekiz tanesini kov ve dört kovamı geri getir, arabalar yeniden yola çıksın.',
@@ -5291,12 +5257,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_fv_ember_caches.text':
     'Dün gece göl yolunda bir kor kutusu kızağı devrildi: bir ay boyunca canlı bir ateşi saklayan demir kazanlar. Üçü hala karda yatıyor, {playerName}, ve loca içerdiklerinden vazgeçemez. Ateşi eve getir.',
   'entities.quests.q_fv_ember_caches.title': 'Göl Yolundaki Korlar',
-  'entities.quests.q_fv_frostmane_tyrant.completion':
-    "Dün gece rüzgar dindiğinde, bütün köy Kırağı Yeleli'nin eskiden olduğu yerdeki sessizliği duydu. Diyar sana yıllarca ödeyeceği bir borç içinde, {playerName}. Bunu tak, ve Icemantle'daki her kapı sana açık.",
-  'entities.quests.q_fv_frostmane_tyrant.objectives.0.label': 'Öldürülen Kırağı Yeleli',
-  'entities.quests.q_fv_frostmane_tyrant.text':
-    'Uluyanlar taraçalardan indiğinde avlanmıyorlardı. Kaçıyorlardı. Bir yeti yüksek toprakları ele geçirdi, dağ halkı ona Kırağı Yeleli diyor, ve sürüler bile onunla bir yamacı paylaşmıyor. Bu bitmeli, {playerName}, kış onu duvarlarıma sürmeden önce. Bir arkadaş getir. İki getir.',
-  'entities.quests.q_fv_frostmane_tyrant.title': 'Kırağı Yeleli Zorba',
   'entities.quests.q_fv_howl_above.completion':
     'Sekiz, ve alacakaranlık korosu bu yüzden daha seyrek. Ama uluyanlar zirveleri boşuna terk etmez. Yukarıdaki bir şey onları hareket ettirdi, ve korkarım ki bunun bir adı var.',
   'entities.quests.q_fv_howl_above.objectives.0.label': 'Öldürülen Taraça Uluyanı',
@@ -5430,7 +5390,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Sığlıklar yeniden sadece su. O kabuğun benden daha iyi avcıları kırdığını gördüm, {playerName}. Seni değil.',
   'entities.quests.q_hollow_old_marrowshell.objectives.0.label': 'Öldürülen Yaşlı İlikkabuk',
   'entities.quests.q_hollow_old_marrowshell.text':
-    "İlk isim Yaşlı İlikkabuk, Eldergleam'ın bir kapısı olmadan önce doğu sığlıklarında avlanan, bir araba büyüklüğünde bir yengeç. Dolaşır, {playerName}, o yüzden izine rastlayana kadar kıyı boyunca yürümen gerekecek. Yalnız gitme ve durgunluğuna güvenme.",
+    "İlk isim Yaşlı İlikkabuk, Eldershine'ın bir kapısı olmadan önce doğu sığlıklarında avlanan, bir araba büyüklüğünde bir yengeç. Dolaşır, {playerName}, o yüzden izine rastlayana kadar kıyı boyunca yürümen gerekecek. Yalnız gitme ve durgunluğuna güvenme.",
   'entities.quests.q_hollow_old_marrowshell.title': 'Sığlıkların Yaşlı Kabuğu',
   'entities.quests.q_hollow_the_huntsman.completion':
     'Fenna mı gönderdi seni? Güzel. Demek sana güveniyor, ve benim çizilmesi gereken iki ismim var.',
@@ -5449,15 +5409,11 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_nb_charts_of_the_stones.completion':
     "Şüphe kalmadı. Her yön Uykusuz Höyük'e doğru sürünmüş, sanki gökyüzünün kendisi izlemek için o höyüğe eğiliyormuş gibi. Eski krallar bir sebepten hizalanmış yıldızların altına gömülmüştü, {playerName}.",
   'entities.quests.q_nb_charts_of_the_stones.objectives.0.label': 'Okunan Yıldız Haritası',
-  'entities.quests.q_nb_charts_of_the_stones.text':
-    "Nöbet taşları Moonrest'ten daha yaşlı, onlara bakan gece halkından daha yaşlı, ve yüzeyleri, hayatımı okumayı öğrenmeye adadığım yıldız haritalarıyla kazınmış. Gökyüzü kaydı, {playerName}, ve ne kadar olduğunu bilmem gerekiyor. Üç taştaki haritaları oku ve bana yönlerini getir.",
   'entities.quests.q_nb_charts_of_the_stones.title': 'Taşlardaki Haritalar',
   'entities.quests.q_nb_eyes_on_the_vigil.completion':
     'Lira mı gönderdi seni? Demek bahçeler de hissediyor. Bir an dürbünün yanında otur, {playerName}. Yıldızlar bir aydır huzursuz, ve çizdiğim her harita kuzeye, höyüğe doğru eğiliyor.',
   'entities.quests.q_nb_eyes_on_the_vigil.objectives.0.label':
     "Ebedi Nöbet'te Gökbilimci Cassian'ı Bul",
-  'entities.quests.q_nb_eyes_on_the_vigil.text':
-    "Bir şey, gezginleri cesur ve sürüleri huzursuz yapıyor, {playerName}, ve bunu çiçeklerde okuyamıyorum. Cassian bunu gökyüzünde okuyabilir. Gözlem kampını, gece halkının taşlar arasında süzüldüğü, buranın doğusundaki Ebedi Nöbet'in yanında tutuyor. Onu bul, ve yıldızların ne söylediğini sor.",
   'entities.quests.q_nb_eyes_on_the_vigil.title': 'Nöbetteki Gözler',
   'entities.quests.q_nb_night_gardens.completion':
     'Hala parıldıyor, her yaprağı. Mabet bir hafta boyunca gece kokacak, ve Moonrest bu sayede daha rahat uyuyor.',
@@ -5484,8 +5440,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_nb_striders_in_the_dark.text':
     'Alacakaranlık gezginleri her zaman sabırlı avcılar olmuştur, {playerName}, ama son zamanlarda tam çiçek tarhlarına sızıp fenerlerimizin altında ay yünü kuzularını alıyorlar. On tanesini temizle ve bozkırlara sessizliğini geri ver.',
   'entities.quests.q_nb_striders_in_the_dark.title': 'Karanlıktaki Gezginler',
-  'entities.quests.q_nb_the_barrow_king.completion':
-    'Yıldızlar bir mevsim içinde ilk kez sakinleşti, {playerName}. Höyükler kapandı, gece halkı taşlarının yanında durgunlaştı, ve kral bir kez daha aşağıda uyuyor. Bu pelerini tak: Moonrest onu, gecenin sonunda güvendiği kişi için kesti.',
   'entities.quests.q_nb_the_barrow_king.objectives.0.label': 'Huzura Kavuşturulan Höyük Kralı',
   'entities.quests.q_nb_the_barrow_king.text':
     'Her yön, her huzursuz yıldız, her açılmış höyük tek bir şeye işaret ediyor: Höyük Kralı büyük höyüğün altında uyanıyor, ve bu diyarın onu geri tutacak bir şafağı yok. Tacını hatırlamadan önce huzura kavuşturulmalı, {playerName}. Yalnız gitme: bir arkadaş getir ve çiçek ışığını arkanda tut.',
@@ -5536,9 +5490,9 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_pr_the_man_who_went_in.completion':
     'Isha mı gönderdi seni? İnci Ana yıllardır adımı ağzına almadı. Sarmaşıkların erişemeyeceği bir yere otur, {playerName}, ve bildiklerimi anlatayım: davullar tehlike değil. Onlar bir uyarı.',
   'entities.quests.q_pr_the_man_who_went_in.objectives.0.label':
-    "Sarmaşık Şelalesi'nde Okku'yu Bul",
+    "Sarmaşık Şelalesi'nde Okrim'yu Bul",
   'entities.quests.q_pr_the_man_who_went_in.text':
-    "Dalgıçlar ağaç sınırının ötesine adım atmayacak, {playerName}, ve onlardan bunu istemeyeceğim. Şimdiye kadar davulları duymuşsundur zaten: herkes ikinci geceye kadar duyar. Bu adada o sese doğru yürüyüp geri dönen tek bir adam oldu. Okku. Sarmaşık yolunun derinliklerindeki Sarmaşık Şelalesi'nde büyük banyan ağaçlarının altında kamp kuruyor. Onu bul ve yeşilliğin ne sakladığını sor.",
+    "Dalgıçlar ağaç sınırının ötesine adım atmayacak, {playerName}, ve onlardan bunu istemeyeceğim. Şimdiye kadar davulları duymuşsundur zaten: herkes ikinci geceye kadar duyar. Bu adada o sese doğru yürüyüp geri dönen tek bir adam oldu. Okrim. Sarmaşık yolunun derinliklerindeki Sarmaşık Şelalesi'nde büyük banyan ağaçlarının altında kamp kuruyor. Onu bul ve yeşilliğin ne sakladığını sor.",
   'entities.quests.q_pr_the_man_who_went_in.title': 'İçeri Giren Adam',
   'entities.quests.q_pr_what_the_drums_guard.completion':
     'Yosun, inci kabuğu ve yaban domuzu kanı, parmaklarla sıkıştırılmış. O harabedeki bir şey hala ayinlerini sürdürüyor, {playerName}, ve Muhafız geri kalan her şeyi dışarıda tutuyor. Bunun hakkında açıkça konuşma zamanı geldi.',
@@ -5664,19 +5618,19 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     "Şimdiye kadar duymuşsundur, {playerName}: horlama. Yavaş ve ağır, Uykulu Düzlükler'in ötesinde, sanki bataklığın kendisi uykusunda dönüyormuş gibi. Kurbağalar, periler, öğlen yanan ışık cinleri: hepsi o ses başladığında başladı. Bir ruh bunun ne olduğunu bilebilir. Ana Sedge, hendeğin batısında ve uzak kıyının aşağısında, Willowweep'te bir kamp tutuyor. Onu bul ve bataklığımın ortasında ne uyuduğunu sor.",
   'entities.quests.q_wf_witch_of_willowweep.title': "Willowweep'in Cadısı",
   'entities.quests.q_ww_bells_of_gallowmere.completion':
-    "Cobb seni yolun yukarısına sağ salim mi gönderdi? İyi adam. O kapı fenerlerini otuz yıldır yanık tuttu, ve orman onu bir kez bile geçemedi. Gallowmere'e hoş geldin, {playerName}. Çanlara dikkat et.",
+    "Cobb seni yolun yukarısına sağ salim mi gönderdi? İyi adam. O kapı fenerlerini otuz yıldır yanık tuttu, ve orman onu bir kez bile geçemedi. Gibbetmere'e hoş geldin, {playerName}. Çanlara dikkat et.",
   'entities.quests.q_ww_bells_of_gallowmere.objectives.0.label': "Mezarcı Marrow'a Rapor Ver",
   'entities.quests.q_ww_bells_of_gallowmere.text':
-    'O çan seslerini duyuyor musun, {playerName}? Bu, kuzey yolunun yukarısındaki Gallowmere, ölülerini uykuya çalıyor. Mezarcı Marrow, örtünün altındaki her ruhun sayımını tutuyor, yaşayan ve gömülü. Git ve sayıl, orman seni kendi başına saymadan önce.',
-  'entities.quests.q_ww_bells_of_gallowmere.title': "Gallowmere'in Çanları",
+    'O çan seslerini duyuyor musun, {playerName}? Bu, kuzey yolunun yukarısındaki Gibbetmere, ölülerini uykuya çalıyor. Mezarcı Marrow, örtünün altındaki her ruhun sayımını tutuyor, yaşayan ve gömülü. Git ve sayıl, orman seni kendi başına saymadan önce.',
+  'entities.quests.q_ww_bells_of_gallowmere.title': "Gibbetmere'in Çanları",
   'entities.quests.q_ww_candles_at_the_bounds.completion':
     'Dördü de mi yanıyor? O zaman nefes al, {playerName}. Sen duymadın ama bütün köy duydu: son fitil tutuştuğu an çanlar daha rahat çaldı.',
   'entities.quests.q_ww_candles_at_the_bounds.objectives.0.label': 'Yeniden Yakılan Mezar Mumu',
   'entities.quests.q_ww_candles_at_the_bounds.text':
-    "Dört sınır taşı Gallowmere'i çevreler, {playerName}, çıkan her yolda bir tane, ve her taşta bir mezar mumu yanar. Onlar yandığı sürece, gömülüler gömülü kalır. Çisenti hepsini söndürdü, dördünü de, ve ben sınırları tek başıma yürüyecek kadar yaşlıyım. Mumumu al ve onları çabucak yeniden yak.",
+    "Dört sınır taşı Gibbetmere'i çevreler, {playerName}, çıkan her yolda bir tane, ve her taşta bir mezar mumu yanar. Onlar yandığı sürece, gömülüler gömülü kalır. Çisenti hepsini söndürdü, dördünü de, ve ben sınırları tek başıma yürüyecek kadar yaşlıyım. Mumumu al ve onları çabucak yeniden yak.",
   'entities.quests.q_ww_candles_at_the_bounds.title': 'Sınırlardaki Mumlar',
   'entities.quests.q_ww_horn_of_the_huntsman.completion':
-    "Borazan notanın ortasında durdu. Gallowmere'deki her çan kendiliğinden bir kez çaldı, ve sonra orman otuz yıldır duyduğumdan daha sessizleşti. Benim yapamadığım ayini sen yaptın, {playerName}. Bunu tak ve örtünün altında korkmadan yürü.",
+    "Borazan notanın ortasında durdu. Gibbetmere'deki her çan kendiliğinden bir kez çaldı, ve sonra orman otuz yıldır duyduğumdan daha sessizleşti. Benim yapamadığım ayini sen yaptın, {playerName}. Bunu tak ve örtünün altında korkmadan yürü.",
   'entities.quests.q_ww_horn_of_the_huntsman.objectives.0.label': 'Attan İndirilen Solgun Avcı',
   'entities.quests.q_ww_horn_of_the_huntsman.text':
     'Şimdiye kadar borazanı duymuşsundur, {playerName}, ince ve uzak, bütün ormanın nefesini tuttuğu ses. Solgun Avcı, buranın kuzeyindeki çayırında at sürüyor, ve geçtiği her mezar daha da sığlaşıyor. Bir zamanlar bir insandı, ve yanlış gömüldü, ve duanın bunu çözeceğini düşünmekten vazgeçtim. Bir arkadaş al, iki al, ve onu attan indir.',
@@ -5694,9 +5648,9 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Buranın güneyinde Yas Taşı Şapeli, kara göletinin yanında çürüyor, ve bir adam hala ona bakıyor: çatı çöktüğünde ayrılmayı reddeden Papaz Creel. Eski ayinleri benim çanlarımdan daha iyi biliyor, {playerName}, ve bir aydır haber göndermedi. Şapel yolunu yürü ve nefes aldığını gör.',
   'entities.quests.q_ww_the_last_vicar.title': 'Son Papaz',
   'entities.quests.q_ww_walking_mosley_home.completion':
-    'Kapıdan kendi ayaklarının üzerinde geçti, bundan sonra bir şalgam tarhından daha derin bir şey kazmayacağına yemin ederek. Pazara kadar avluya geri dönecek, hep dönerler. Teşekkür ederim, {playerName}. Gallowmere halkını tutar, bütün yasamız bu.',
+    'Kapıdan kendi ayaklarının üzerinde geçti, bundan sonra bir şalgam tarhından daha derin bir şey kazmayacağına yemin ederek. Pazara kadar avluya geri dönecek, hep dönerler. Teşekkür ederim, {playerName}. Gibbetmere halkını tutar, bütün yasamız bu.',
   'entities.quests.q_ww_walking_mosley_home.objectives.0.label':
-    "Mezarcı Mosley Gallowmere'e Güvenle Ulaştırıldı",
+    "Mezarcı Mosley Gibbetmere'e Güvenle Ulaştırıldı",
   'entities.quests.q_ww_walking_mosley_home.text':
     'Mezarcım Mosley üç gün önce eski avluda bir mezar açmak için şapel yolunu tuttu, ve kazı üzerine çöktü. Tırnaklarıyla kazıp çıktı, aptal yaşıyor, ama şapel mezarlarının yanında büzülmüş ve yoldaki örücüler yüzünden kımıldamıyor. Onu eve götür, {playerName}. Yaşayan bir adam için çanları çalamam.',
   'entities.quests.q_ww_walking_mosley_home.title': "Mosley'i Eve Ulaştırmak",
@@ -5706,7 +5660,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_ww_what_the_bark_holds.objectives.1.label':
     'İndirilen İpekle Sarılmış Kalıntılar',
   'entities.quests.q_ww_what_the_bark_holds.text':
-    "Gallowmere'in doğusundaki Asılı Çayırlık'ta örücüler ipekle sarılmış ölülerini dallara asıyor, ve mezar kütüğü sürüngenleri altında sabırlı tabut taşıyıcılar gibi nöbet tutuyor. Yukarıdakiler bizim halkımız, {playerName}. Beş sürüngeni devir, sarılı ölülerden üçünü indir, ve onları toprağa, eve getir.",
+    "Gibbetmere'in doğusundaki Asılı Çayırlık'ta örücüler ipekle sarılmış ölülerini dallara asıyor, ve mezar kütüğü sürüngenleri altında sabırlı tabut taşıyıcılar gibi nöbet tutuyor. Yukarıdakiler bizim halkımız, {playerName}. Beş sürüngeni devir, sarılı ölülerden üçünü indir, ve onları toprağa, eve getir.",
   'entities.quests.q_ww_what_the_bark_holds.title': 'Kabuğun Sakladığı',
   'entities.quests.q_ww_widows_skeins.completion':
     'Altı yumak, tutulmuş bir nefes kadar yumuşak. Ölüler bunun içinde daha rahat yatacak. Şu sargıları al, son partiden diktim, ve orman onları bir kez bile ısırıp geçmedi.',
@@ -5750,7 +5704,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.zones.thornpeak_heights.pois.4.label': "Drogmar'ın Savaş Kampı",
   'entities.zones.thornpeak_heights.pois.5.label': 'Fırtınakaya',
   'entities.zones.thornpeak_heights.pois.6.label': 'Işıltıgöl',
-  'entities.zones.thornpeak_heights.pois.7.label': 'Ejder Tarikatı Çadırları',
   'entities.zones.thornpeak_heights.pois.8.label': 'Hortlak Tarlaları',
   'entities.zones.thornpeak_heights.pois.9.label': 'Mezarejderi Mabedi',
   'entities.zones.thornpeak_heights.welcome':
@@ -5820,7 +5773,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.zones.nightbloom.name': 'Gece Çiçeği',
   'entities.zones.nightbloom.pois.0.label': 'Moonrest',
   'entities.zones.nightbloom.pois.1.label': 'Gece Kapısı',
-  'entities.zones.nightbloom.pois.2.label': 'Ay Kuyusu',
   'entities.zones.nightbloom.pois.3.label': 'Gloamfield',
   'entities.zones.nightbloom.pois.4.label': 'Ebedi Nöbet',
   'entities.zones.nightbloom.pois.5.label': 'Uykusuz Höyük',
@@ -5837,7 +5789,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.zones.palmreach.welcome':
     'Sıcak kum, gürültücü kuşlar ve ufku yutan bir orman. Drifthaven senin için sahilde bir ateş yakıyor.',
   'entities.zones.veiled_hollow.name': 'Örtülü Vadi',
-  'entities.zones.veiled_hollow.pois.0.label': 'Eldergleam',
+  'entities.zones.veiled_hollow.pois.0.label': 'Eldershine',
   'entities.zones.veiled_hollow.pois.1.label': 'Alacakaranlık Mağarası',
   'entities.zones.veiled_hollow.pois.2.label': 'Alacakaranlık Seyir Tepesi',
   'entities.zones.veiled_hollow.pois.3.label': 'Kadim Koru',
@@ -5846,7 +5798,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.zones.veiled_hollow.pois.6.label': 'Kristal Sığlıklar',
   'entities.zones.veiled_hollow.pois.7.label': 'Parıldayan Derinlik',
   'entities.zones.veiled_hollow.welcome':
-    "Hava eski bir büyüyle uğulduyor. Eldergleam'ın büyük ağacının altında Bekçi Saelwyn'i ara.",
+    "Hava eski bir büyüyle uğulduyor. Eldershine'ın büyük ağacının altında Bekçi Saelwyn'i ara.",
   'entities.zones.willowfen.name': 'Söğüt Bataklığı',
   'entities.zones.willowfen.pois.0.label': 'Bridgemere',
   'entities.zones.willowfen.pois.1.label': 'Kehribar Basamakları',
@@ -5857,14 +5809,14 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.zones.willowfen.welcome':
     "Bataklık yusufçuklar ve arılarla uğulduyor. Köprüden geçip Bridgemere'e ulaş ve orada biraz dinlen.",
   'entities.zones.wraithwood.name': 'Hayalet Ormanı',
-  'entities.zones.wraithwood.pois.0.label': 'Gallowmere',
+  'entities.zones.wraithwood.pois.0.label': 'Gibbetmere',
   'entities.zones.wraithwood.pois.1.label': 'Karga Kapısı',
   'entities.zones.wraithwood.pois.2.label': 'Dul Çalılığı',
   'entities.zones.wraithwood.pois.3.label': 'Asılı Çayırlık',
   'entities.zones.wraithwood.pois.4.label': 'Yas Taşı Şapeli',
   'entities.zones.wraithwood.pois.5.label': 'Avcının Açıklığı',
   'entities.zones.wraithwood.welcome':
-    "Ağaç tepeleri yolun üzerinde bir kapak gibi kapanıyor. Gallowmere'in fenerlerinden ayrılma ve orman adını seslenirse cevap verme.",
+    "Ağaç tepeleri yolun üzerinde bir kapak gibi kapanıyor. Gibbetmere'in fenerlerinden ayrılma ve orman adını seslenirse cevap verme.",
   'errors.api.accountBanned': 'Bu hesap yasaklandı.',
   'errors.api.accountSuspended': 'Bu hesap {date} tarihine kadar askıya alındı.',
   'errors.api.alreadyInWorld': 'Karakter zaten dünyada.',
@@ -7107,8 +7059,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.peaksGreeter': 'Yüzbaşı Thessaly, Highwatch',
   'guide.worldPage.peaksGreeting':
     'İki yüz yıldır bu sur dayandı. Benim nöbetimde yıkılmayacak, ama inliyor.',
-  'guide.worldPage.peaksPlaceNotes':
-    "Highwatch suru tutar. Sinsi Sırt ve Deeprock Oyukları sırt kedilerinin ve oyucularındır; Dev Etekleri ve Drogmar Savaş Kampı kiralık zorbalarındır; Fırtınakaya elementallerle çıtırdar ve altında Işıltıgöl ışıldar, kıyısı Boğulmuş Tapınak'a inen solgun ışıktan geçidi barındıran dağ gölü; Solucankült Çadırları ve Hortlak Tarlaları tarikatın yüksek mevzisini kuşatır, zirvesinde Mezarejderi Mabedi yer alır.",
   'guide.worldPage.places': 'Görülmeye değer yerler',
   'guide.worldPage.residents': 'Karşılaşacağınız kişiler',
   'guide.worldPage.valeBlurb':
@@ -9733,12 +9683,12 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.amberPlaceNotes':
     'Lanternmere, hasadın tam kalbinde parıldar. Altın Eriyiş, kehribar gibi kaygan bir geçittir; Yaldızlı Bahçe ve Hasat Vadisi en tatlı ürünleri ve en cüretkar hırsızları barındırır; Büyük Göl yanan yaprakları yansıtır; Kül Akçaağaç Tepesi en yüksekte durur ve en kızıl renktedir; ve Eğik Dikilitaş sonbahardan daha eski bir şeyi hatırlar.',
   'guide.worldPage.duskBlurb':
-    "Eldergleam'ın büyük ağacının altında kalıcı bir alacakaranlığın hüküm sürdüğü, kristal kalıntıların parıldadığı ve havanın eski bir büyüyle uğuldadığı bir vadi.",
-  'guide.worldPage.duskGreeter': 'Bekçi Saelwyn, Eldergleam',
+    "Eldershine'ın büyük ağacının altında kalıcı bir alacakaranlığın hüküm sürdüğü, kristal kalıntıların parıldadığı ve havanın eski bir büyüyle uğuldadığı bir vadi.",
+  'guide.worldPage.duskGreeter': 'Bekçi Saelwyn, Eldershine',
   'guide.worldPage.duskGreeting':
     'Senin türünden pek azı bu dalların altında durmuştur. Nazikçe yürü ve hoş geldin.',
   'guide.worldPage.duskPlaceNotes':
-    'Eldergleam, büyük ağacın altında toplanır. Alacakaranlık Mağarası ve seyir tepesi içeri giden yol ve vadinin ilk görünüşüdür; Kadim Koru ve Yıldız Düşümü Çukuru sessiz güneyi korur; Batık Avlu doğuda yabani otlarla kaplı kalıntıları barındırır; Parıldayan Derinlik ve Kristal Sığlıklar ise kuzeyde parıldar.',
+    'Eldershine, büyük ağacın altında toplanır. Alacakaranlık Mağarası ve seyir tepesi içeri giden yol ve vadinin ilk görünüşüdür; Kadim Koru ve Yıldız Düşümü Çukuru sessiz güneyi korur; Batık Avlu doğuda yabani otlarla kaplı kalıntıları barındırır; Parıldayan Derinlik ve Kristal Sığlıklar ise kuzeyde parıldar.',
   'guide.worldPage.emberBlurb':
     "Ejderlerin kaldera üzerinde daireler çizdiği ve trol ateşlerinin kumullar arasında yandığı, kapı kasabası Wyrmwatch'tan gözlenen, fırtınayla aydınlanan kül ve kan camı çorak toprakları.",
   'guide.worldPage.emberGreeter': 'Kapı muhafızı, Wyrmwatch',
@@ -9775,12 +9725,12 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.gardenPlaceNotes':
     "Hedgewick, Bahçe Kapısı'nda bekler. Çiçek Terası Yolu kırpılmış renklerle çiçek açar; Şafak Kalesi yeni duvarların ardında şövalyelerini eğitir; Yaprak Gölcüğü yıl boyunca pembe tonlarda süzülür; Eski Değirmen kendi halka tarhlarını çevirir; Büyük Labirent her konuk için düzenini değiştirir, kemerlerini yapraklı tilkiler gözetler; Kuzey Karakolu çıkış yolunu korur; Zambak Çukuru bunların hepsinin ötesinde dinlenir; ve Çeşme Avlusu hala bahçenin kalbinde berrak akar.",
   'guide.worldPage.hauntBlurb':
-    "Devasa ağaç tepelerinin altındaki lanetli bir orman, yolda tek dürüst ışığın Gallowmere'in fenerleri olduğu.",
-  'guide.worldPage.hauntGreeter': 'Fener yakıcısı, Gallowmere',
+    "Devasa ağaç tepelerinin altındaki lanetli bir orman, yolda tek dürüst ışığın Gibbetmere'in fenerleri olduğu.",
+  'guide.worldPage.hauntGreeter': 'Fener yakıcısı, Gibbetmere',
   'guide.worldPage.hauntGreeting':
     'Fenerlerin yanından ayrılma, gezgin. Ve eğer orman yolun dışından adını seslenirse, cevap verme.',
   'guide.worldPage.hauntPlaceNotes':
-    'Gallowmere kendi fenerlerinin içine sinmiştir. Karga Kapısı, ormanın kasvetli ön kapısıdır; Dul Çalılığı ağlarla sıkıca örülüdür; Asılı Çayırlık ve Yas Taşı Şapeli ormanın en eski kederlerini barındırır; ve Avcının Açıklığı hala orada avlanan her neyse ona aittir.',
+    'Gibbetmere kendi fenerlerinin içine sinmiştir. Karga Kapısı, ormanın kasvetli ön kapısıdır; Dul Çalılığı ağlarla sıkıca örülüdür; Asılı Çayırlık ve Yas Taşı Şapeli ormanın en eski kederlerini barındırır; ve Avcının Açıklığı hala orada avlanan her neyse ona aittir.',
   'guide.worldPage.jungleBlurb':
     "Palmiyelerden, beyaz kumdan ve gürültücü kuşlardan oluşan tropikal bir sarmaşık, sahil kasabası Drifthaven'ın kıyıda bir ateş yaktığı.",
   'guide.worldPage.jungleGreeter': 'Liman amiri, Drifthaven',
@@ -9793,8 +9743,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.nightGreeter': 'Nöbet bekçisi, Moonrest',
   'guide.worldPage.nightGreeting':
     "Gece Kapısı'nın ardında havanın kendisi rüya görür. Çiçek ışığını takip et ve gökyüzünde asılı duran uykudaki dünyaya dikkat et.",
-  'guide.worldPage.nightPlaceNotes':
-    'Moonrest nöbeti tutar. Gece Kapısı gece yarısı ülkesine giden yoldur; Ay Kuyusu yanında durabileceğin yıldız ışığını barındırır; Gloamfield karanlıkta çiçek açar; Ebedi Nöbet hiç kımıldamadan gözetler; ve Uykusuz Höyük burada asla rüya görmeyen tek yerdir.',
   'entities.abilities.chain_heal.description':
     'Bir müttefiki büyük miktarda iyileştirir, ardından yakındaki en fazla 2 müttefike sıçrar ve her sıçramada %50 daha az iyileştirir. (Restorasyonun simge yeteneği)',
   'entities.abilities.chain_heal.name': 'Zincirleme İyileştirme',
@@ -9803,7 +9751,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.counter_shot.name': 'Karşı Atış',
   'entities.abilities.counterspell.description':
     'Hedefin büyü kullanımına karşı koyar ve 6 saniye boyunca o okuldan büyü yapılmasını engeller.',
-  'entities.abilities.counterspell.name': 'Karşı Büyü',
   'entities.abilities.holy_taunt.description':
     'Hedefi alaya alır: Tehditiniz en nefret ettiği düşmanla eşleşecek şekilde yükselir ve 3 saniye boyunca size saldırmak zorunda kalır.',
   'entities.abilities.holy_taunt.name': 'Kutsal Tahrik',
@@ -10079,8 +10026,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.skins.hoarfrost_vigil_staff.name': 'Kırağı Nöbeti',
   'hudChrome.wocStore.skins.ice_fang_sword.look':
     'Soluk buzul buzunun kavisli bıçağı, omurga boyunca sivri uçlu kırağı kristalleri, daha dolgun, buz saçağı çapraz korumasında parlak camgöbeği donmuş bir çekirdek.',
-  'hudChrome.wocStore.skins.ice_fang_sword.lore':
-    "Dondurulmuş sınıfın amiral gemisi ve her koleksiyoncunun ilk ulaştığı parça. Ice Fang, Highwatch'ın yukarısındaki Thornpeak'i çevreleyen buzulun bir dişinden oyulmuş, dövülmemiş, camgöbeği çekirdeği Glimmermere'in ışığı kadar soğuktu. Kestiği havayı çevreliyor. Duvar muhafızı, yoğun kar yağışının Wyrmkült'ü geride bıraktığı gece onu bir askerin taşıdığına ve 'duvarı bir kış satın aldığına' yemin etti.",
   'hudChrome.wocStore.skins.ice_fang_sword.name': 'Buz Dişi',
   'hudChrome.wocStore.skins.lacquered_wand.look':
     'İnce koyu kırmızı lake çubuk, iki cilalı pirinç bant, küçük yuvarlak pirinç uç.',
@@ -10126,7 +10071,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Gümüş rengi çelik ve mavi buz yay, yükselticide parlayan camgöbeği donmuş çekirdek, katı buz ve soğuk buhardan oluşan çentikli bir ok.',
   'hudChrome.wocStore.skins.winterbite.lore':
     "Gümüş rengi çelikten ve Thornpeak buzundan yapılmış bir yay; yükselticisi, okun teline doğru donmasını sağlayan soğuk camgöbeği bir çekirdekle aydınlatılıyor. Her çekişi yeniden şekillendiren katı buzul buzundan oluşan bir şaftı çentikliyor; okçu duvarda ok kılıfı taşımaz, sadece soğuktur. Highwatch, Sinsi Sokulmaer Ridge'i buna benzer biriyle kuşatma altında tuttu: Söylediklerine göre tek bir okçu ve her zaman orada olan bir kışa yetecek kadar ok vardı.",
-  'hudChrome.wocStore.skins.winterbite.name': 'Kış ısırığı',
   'hudChrome.wocStore.storeTab': 'Mağaza',
   'hudChrome.wocStore.tabsLabel': 'WOC Mağaza bölümleri',
   'hudChrome.wocStore.title': 'WOC Mağazası',
@@ -10219,8 +10163,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Hedef alana bir yaylım atışı yaparak 8 m içindeki düşmanlara {damage} Fiziksel hasar verir. (Avcı yeteneği)',
   'entities.abilities.prayer_of_healing.description':
     'Yakındaki müttefikleri {damage} iyileştirir. (Rahip yeteneği)',
-  'entities.abilities.preparation.description':
-    'Sprint, Kaçınma ve Kaybolmanın bekleme süresini bitirir. (Haydut yeteneği)',
   'entities.abilities.presence_of_mind.description':
     'Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 sn. (büyücü yeteneği)',
   'entities.abilities.psychic_scream.description':
@@ -10240,8 +10182,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.blazing_barrier.description':
     'Kendini alevlerle sararak 60 sn. boyunca {damage} hasarı soğurursun. (Ateş)',
   'entities.abilities.cold_snap.name': 'Kışın Çağrısı',
-  'entities.abilities.cold_snap.description':
-    'Titrek Adım, Ayaz Örtüsü ve Üstün Görünmezlik yeteneklerinin bekleme süresini bitirir. (büyücü yeteneği)',
   'entities.abilities.greater_invisibility.name': 'Üstün Görünmezlik',
   'entities.abilities.hot_streak.name': 'Sıcak Seri',
   'entities.abilities.hot_streak.description':
@@ -10292,7 +10232,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.emberwing_drake.name': 'Kor Kanat Ejderi',
   'entities.mobs.fen_sprite.name': 'Bataklık Perisi',
   'entities.mobs.fisher_bram.name': 'Balıkçı Bram',
-  'entities.mobs.frostmane_yeti.name': 'Kırağı Yeleli Yeti',
   'entities.mobs.gale_wisp.name': 'Fırtına Işık Cini',
   'entities.mobs.gilded_stag.name': 'Yaldızlı Geyik',
   'entities.mobs.gleamstag.name': 'Parıltılı Geyik',
@@ -10301,7 +10240,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.gloam_strider.name': 'Alacakaranlık Gezgini',
   'entities.mobs.gravedigger_mosley.name': 'Mezarcı Mosley',
   'entities.mobs.gravenbark_shambler.name': 'Mezar Kütüğü Sürüngeni',
-  'entities.mobs.harvest_sprite.name': 'Hasat Perisi',
   'entities.mobs.hedge_gnome.name': 'Çit Cücesi',
   'entities.mobs.hedge_knight.name': 'Şafak Kalesi Şövalyesi',
   'entities.mobs.ice_wisp.name': 'Buz Işık Cini',
@@ -10311,7 +10249,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.moonfleece_grazer.name': 'Ay Yünü Otlayıcısı',
   'entities.mobs.moor_ram.name': 'Bozkır Koçu',
   'entities.mobs.mushroom_pixie.name': 'Parıltı Halkı Perisi',
-  'entities.mobs.nightkin_stargazer.name': 'Gece Halkı Yıldız Gözlemcisi',
   'entities.mobs.old_marrowshell.name': 'Yaşlı İlikkabuk',
   'entities.mobs.orchard_treant.name': 'Bahçe Ağaç Devi',
   'entities.mobs.pale_huntsman.name': 'Solgun Avcı',
@@ -10525,7 +10462,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.battleTrance':
     'Bir sonraki Yağmacı Darbesi veya Sakatlayan Darbe hiç Öfkeye mal olmaz',
   'hudChrome.auraEffect.revengeFree': 'Bir sonraki İntikam hiç Öfkeye mal olmaz',
-  'hudChrome.auraEffect.victoryRush': 'Zafer Atılımı hazır',
   'hudChrome.auraEffect.maxHpPct': 'Azami canı %{pct} artırır',
   'hudChrome.statInfo.names.parry': 'Karşılama',
   'hudChrome.statInfo.desc.parry':
@@ -10620,7 +10556,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.items.cragprowl_belt.name': 'Kayalıksızı Kemeri',
   'entities.items.cragthorn_greatstaff.name': 'Kayadikenin Büyük Asası',
   'entities.items.cragward_pauldrons.name': 'Kayamuhafız Omuzlukları',
-  'entities.items.cryptbloom_shoulderguards.name': 'Mezarçiçeği Omuz Korumaları',
   'entities.items.dreamroot_boots.name': 'Rüyakök Çizmeleri',
   'entities.items.duskthorn_mantle.name': 'Alacadiken Pelerini',
   'entities.items.fenbark_leggings.name': 'Bataklık Kabuğu Tozlukları',
@@ -10661,7 +10596,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.items.wildgrove_cinch.name': 'Vahşi Koruluk Kemeri',
   'entities.items.wildgrowth_leggings.name': 'Vahşi Büyüme Tozlukları',
   'entities.items.wildsoul_maul.name': 'Vahşi Ruh Balyozu',
-  'entities.items.wyrmcult_spellgrips.name': 'Ejdertarikatı Büyü Eldivenleri',
   'entities.items.abyssal_loop.name': 'Uçurum Halkası',
   'entities.items.abysswrought_band.name': 'Uçurumda Dövülmüş Halka',
   'entities.items.amberfall_sap_bucket.name': 'Reçine Toplama Kovası',
@@ -10684,7 +10618,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.items.farshore_salt_moss.name': 'Uzak Kıyı Tuz Yosunu',
   'entities.items.fenway_mooring_line.name': 'Kesilmiş Bağlama Halatı',
   'entities.items.fountain_court_mantle.name': 'Çeşme Avlusu Pelerini',
-  'entities.items.frostmane_mantle.name': 'Kırağı Yeleli Pelerini',
   'entities.items.galecrest_ram_wool.name': 'Yağlı Koç Yünü',
   'entities.items.gallowmere_grave_candle.name': 'Mezar Mumu',
   'entities.items.gilded_sap_clot.name': 'Yaldızlı Reçine Pıhtısı',
@@ -10962,7 +10895,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.hearthkeeper_maeve.title': 'Ocak Evinin Bekçisi',
   'entities.npcs.hermit_okku.greeting':
     'Şimdi sessiz ol. Davullar ağaçların altında yürüyen her şeyi sayar ve seni de zaten saydılar.',
-  'entities.npcs.hermit_okku.name': 'Okku',
+  'entities.npcs.hermit_okku.name': 'Okrim',
   'entities.npcs.hermit_okku.title': 'İçeri Giren Adam',
   'entities.npcs.huntsman_deral.greeting':
     'Şimdi sessiz ol. Sürü bu vadinin çıkardığı her sesi bilir, ben de öyle.',
@@ -11015,7 +10948,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.provisioner_fenna.greeting':
     'Ekmek hala sıcak, su hala tatlı. Vadi sağlıyor, ben de öyle.',
   'entities.npcs.provisioner_fenna.name': 'Erzakçı Fenna',
-  'entities.npcs.provisioner_fenna.title': 'Eldergleam Erzakçısı',
+  'entities.npcs.provisioner_fenna.title': 'Eldershine Erzakçısı',
   'entities.npcs.quartermaster_edda.greeting':
     'Çelik ve tuz, {className}, dağıtacak elimde kalan tek şey bu. Al bunu ve gediklerin, ulaşabileceğim yerde açıldıklarına pişman olmalarını sağla.',
   'entities.npcs.quartermaster_edda.name': 'Levazımcı Edda',
@@ -11050,7 +10983,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.sexton_marrow.greeting':
     'Onları burada derin gömüyoruz ve çanları çalıyoruz ki aşağıda kalmaları gerektiğini hatırlasınlar.',
   'entities.npcs.sexton_marrow.name': 'Mezarcı Marrow',
-  'entities.npcs.sexton_marrow.title': 'Gallowmere Mezarcısı',
+  'entities.npcs.sexton_marrow.title': 'Gibbetmere Mezarcısı',
   'entities.npcs.strandwatcher_pell.greeting':
     'Sonunda kara ağaçlardan çıktın. Nefes al, yabancı, güneş geçidin bu tarafında duruyor.',
   'entities.npcs.strandwatcher_pell.name': 'Kıyı Bekçisi Pell',
@@ -11097,7 +11030,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.widow_tansy.greeting':
     'Her mezar için bir mum ve hiçbiri sönmemeli. Hiçbiri, duyuyor musun beni?',
   'entities.npcs.widow_tansy.name': 'Dul Tansy',
-  'entities.npcs.widow_tansy.title': "Gallowmere'in Mum Yapımcısı",
+  'entities.npcs.widow_tansy.title': "Gibbetmere'in Mum Yapımcısı",
   'gatherEvent.ancientHeartwood': '{finder} eski bir öz odunu kesti!',
   'gatherEvent.moonlitBloom': '{finder} ay ışığının aydınlattığı bir çiçek keşfetti!',
   'gatherEvent.pristineVein': '{finder} bozulmamış bir damara çarptı!',

@@ -87,7 +87,7 @@ export interface ActionBarAuraInput {
   kind: AuraKind;
   value?: number;
   empowerAbilities?: readonly string[];
-  /** Stacks, for a stack-gated ability (Glacial Spike needs 5 Icicles). */
+  /** Stacks, for a stack-gated ability (Rimeneedle needs 5 Icicles). */
   stacks?: number;
 }
 
@@ -479,7 +479,7 @@ export function createActionBarView(
         // the slot is usable at any resource and glows (the sim predicate is
         // imported so bar and combat can never disagree on the proc's scope).
         const freeByProc = ability.cost > 0 && freeCostAuraActive(player.auras, def.id);
-        // A kill-window ability (Victory Rush): usable only while its enabling
+        // A kill-window ability (Victor's Surge): usable only while its enabling
         // aura is worn, and it glows while the window is open.
         let windowOpen = true;
         let windowGlow = false;

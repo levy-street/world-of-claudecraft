@@ -79,7 +79,7 @@ export type GroundAoE = {
   // Meteor: Ignite each struck enemy for this fraction of the resolved pulse
   // damage (fire_mage.applyIgnite copies the number; no re-roll).
   igniteFrac?: number;
-  // Blizzard riders: the per-pulse snare and the Frozen Orb cooldown shave.
+  // Blizzard riders: the per-pulse snare and the Frostglobe cooldown shave.
   slowMult?: number;
   slowDuration?: number;
   orbCdr?: boolean;

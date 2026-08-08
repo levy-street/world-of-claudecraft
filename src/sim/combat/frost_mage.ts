@@ -41,18 +41,18 @@ export const SHATTER_CRIT_BONUS = 0.5;
 export const ICE_LANCE_FROZEN_MULT = 3;
 
 // Spells that may SPEND a Winter's Chill charge on impact (the PDF's
-// "compatible spells"). Glacial Spike and Comet Storm join in a later phase.
+// "compatible spells"). Rimeneedle and Comet Storm join in a later phase.
 // Flurry is deliberately absent: it PLANTS the debuff and must never eat the
 // charges it just applied. The UI reads this same set for its glow scope.
 export const WINTERS_CHILL_SPENDERS: ReadonlySet<string> = new Set(['ice_lance']);
 
-// Blizzard feeds Frozen Orb: each enemy a pulse strikes shaves this off the
+// Blizzard feeds Frostglobe: each enemy a pulse strikes shaves this off the
 // orb's running cooldown, capped per Blizzard cast (owner design 2026-07-11).
 export const BLIZZARD_ORB_CDR_PER_ENEMY = 0.5;
 export const BLIZZARD_ORB_CDR_CAP = 3;
 
-// Icicles: the frost build-up resource. Rimelance impacts and Frozen Orb pulses
-// each bank one, up to ICICLE_MAX; at the cap Glacial Spike is castable
+// Icicles: the frost build-up resource. Rimelance impacts and Frostglobe pulses
+// each bank one, up to ICICLE_MAX; at the cap Rimeneedle is castable
 // (requiresAuraStacks) and consumes the whole stack. A long duration so a partial
 // stack survives between casts in a real fight, refreshed on each new icicle.
 export const ICICLE_MAX = 5;
@@ -75,7 +75,7 @@ export function frostProcGlowActive(
 }
 
 /** Pure reader: the banked Icicle count (0..ICICLE_MAX). Exposed for the frost
- *  build-up overlay to render the stack as it fills toward a Glacial Spike, the
+ *  build-up overlay to render the stack as it fills toward a Rimeneedle, the
  *  same structural-aura idiom as chronoOverlayCharges. */
 export function frostIcicleCharges(auras: readonly { kind: string; stacks?: number }[]): number {
   const icicles = auras.find((a) => a.kind === 'icicles');
@@ -143,7 +143,7 @@ export function gainBrainFreeze(ctx: SimContext, p: Entity): void {
   ctx.emit({ type: 'spellfx', sourceId: p.id, targetId: p.id, school: 'frost', fx: 'procSurge' });
 }
 
-/** Bank one Icicle (Rimelance impact or Frozen Orb pulse), up to ICICLE_MAX.
+/** Bank one Icicle (Rimelance impact or Frostglobe pulse), up to ICICLE_MAX.
  *  Refreshes the duration on each gain so a partial stack does not decay mid
  *  build-up; at the cap the new icicle is lost (no over-cap), mirroring the
  *  anti-waste rule of the procs. Deterministic aura write, no rng. */
@@ -298,7 +298,7 @@ export function frostMageAfterCast(
   if (ability.class !== 'mage' || p.kind !== 'player') return;
   if (ability.id === 'frostbolt') {
     rollFrostboltProcs(ctx, p, meta);
-    // Each Rimelance impact also banks an Icicle toward Glacial Spike.
+    // Each Rimelance impact also banks an Icicle toward Rimeneedle.
     if (isCommittedFrost(ctx, meta)) gainIcicle(ctx, p);
   } else if (ability.id === 'flurry' && isCommittedFrost(ctx, meta)) {
     if (target && !target.dead) applyWintersChill(ctx, p, target);
@@ -306,13 +306,13 @@ export function frostMageAfterCast(
 }
 
 /** Channel-start hook (casting_lifecycle's channel block): a fresh Blizzard
- *  gets a fresh Frozen Orb refund budget. Inert for every other channel. */
+ *  gets a fresh Frostglobe refund budget. Inert for every other channel. */
 export function frostMageChannelStart(p: Entity, abilityId: string): void {
   if (abilityId === 'blizzard') p.blizzardOrbCdr = 0;
 }
 
 /** Position-channel pulse hook: every enemy a Blizzard pulse struck shaves
- *  BLIZZARD_ORB_CDR_PER_ENEMY off Frozen Orb's RUNNING cooldown, at most
+ *  BLIZZARD_ORB_CDR_PER_ENEMY off Frostglobe's RUNNING cooldown, at most
  *  BLIZZARD_ORB_CDR_CAP per cast (the budget frostMageChannelStart reset).
  *  Deterministic tick math, no rng; a no-op without a running orb cooldown. */
 export function frostMageChannelPulse(

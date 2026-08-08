@@ -38,9 +38,7 @@ export const table: DeedLocaleTable = {
     title: 'Seržant',
   },
   pvp_honor_knight_lieutenant: {
-    name: 'Rytíř-poručík',
     desc: 'Získej za celý svůj život 40 000 cti, celou sezónu skutečné války za sebou.',
-    title: 'Rytíř-poručík',
   },
   pvp_honor_field_marshal: {
     name: 'Polní maršál',
@@ -76,7 +74,6 @@ export const table: DeedLocaleTable = {
     desc: 'Vytez rudnou zilu, drevni porost a bylinny zahon v Nightbloomu.',
   },
   chr_nightbloom_first_cast: {
-    name: 'Vlna na mesicni studni',
     desc: 'Chyt rybu ve vodach Nightbloomu.',
   },
   chr_wraithwood_gatherer: {
@@ -279,7 +276,6 @@ export const table: DeedLocaleTable = {
     title: 'Drakobijce',
   },
   dgn_sanctum_speed: {
-    name: 'Sprint svatyní',
     desc: 'Poraz Korzula Hrobodraka do 15 minut od chvíle, kdy si tvá skupina zabrala Svatyni Hrobodraka.',
   },
   dgn_nythraxis_gravebreaker: {
@@ -345,7 +341,7 @@ export const table: DeedLocaleTable = {
   },
   dlv_varric_ringers: {
     name: 'Zvony umlkly',
-    desc: 'Poraz Diákona Varrica poté, co pobiješ každého Pohřebního zvoníka, kterého pozvedne.',
+    desc: 'Poraz Diákona Vandrica poté, co pobiješ každého Pohřebního zvoníka, kterého pozvedne.',
   },
   dlv_nhalia_bells: {
     name: 'Tišitel zvonů',
@@ -421,7 +417,6 @@ export const table: DeedLocaleTable = {
   },
   chr_peaks_chapter_iii: {
     name: 'Kronika Thornpeaku',
-    desc: 'Doveď příběh hory až do konce: kult draka rozprášen, Svatyně umlčena, Probouzející se štít sražen a všechny pojmenované hrůzy skalisek pobity.',
     title: 'z Thornpeaku',
   },
   chr_peaks_sparring: {

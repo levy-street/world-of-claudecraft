@@ -50,7 +50,7 @@ export const TALENT_ABILITIES_V2_A = {
   },
   avenging_wrath: {
     id: 'avenging_wrath',
-    name: 'Wrathwing',
+    name: 'Zealwing',
     class: 'paladin',
     learnLevel: 10,
     cost: 60,
@@ -240,7 +240,7 @@ export const TALENT_ABILITIES_V2_A = {
     requiresTarget: false,
     offGcd: true,
     effects: [{ type: 'clearCooldowns', abilities: ['sprint', 'evasion', 'vanish'] }],
-    description: 'Finishes the cooldown on Swift Heels, Ghostfoot, and Smokestep. (Rogue talent)',
+    description: 'Finishes the cooldown on Swift Heels, Ghostfoot, and Smokefade. (Rogue talent)',
   },
   ghostly_strike: {
     id: 'ghostly_strike',

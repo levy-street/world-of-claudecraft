@@ -268,7 +268,7 @@ const NPC_IDS = [
   'chronicler_saul', // Book of Deeds Chronicler (Eastbrook, zone 1)
   'chronicler_osric_fenn', // Book of Deeds Chronicler (Fenbridge, zone 2)
   'chronicler_edda_hartwell', // Book of Deeds Chronicler (Highwatch, zone 3)
-  // Eldergleam, the Veiled Hollow
+  // Eldershine, the Veiled Hollow
   'keeper_saelwyn',
   'loremother_bryn',
   'provisioner_fenna',
@@ -300,7 +300,7 @@ const NPC_IDS = [
   'lira_dewsong',
   'weaver_amelle',
   'astronomer_cassian',
-  // Gallowmere, the Wraithwood
+  // Gibbetmere, the Wraithwood
   'lampman_cobb',
   'sexton_marrow',
   'widow_tansy',

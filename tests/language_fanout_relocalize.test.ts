@@ -531,7 +531,7 @@ describe('#2529 delve tracker: the fan-out arm was present but inert', () => {
       element,
       world: () => world,
       delveName: () => 'Collapsed Reliquary',
-      mobName: () => 'Deacon Varric',
+      mobName: () => 'Deacon Vandric',
       attachTooltip: () => {},
       closeRitePanel: () => {},
     });
@@ -564,7 +564,7 @@ describe('#2529 delve tracker: the fan-out arm was present but inert', () => {
       element,
       world: () => ({ delveRun: null, delveMarks: 0 }) as Pick<IWorld, 'delveRun' | 'delveMarks'>,
       delveName: () => 'Collapsed Reliquary',
-      mobName: () => 'Deacon Varric',
+      mobName: () => 'Deacon Vandric',
       attachTooltip: () => {},
       closeRitePanel,
     });

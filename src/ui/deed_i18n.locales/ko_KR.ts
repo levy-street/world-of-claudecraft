@@ -38,9 +38,9 @@ export const table: DeedLocaleTable = {
     title: '병장',
   },
   pvp_honor_knight_lieutenant: {
-    name: '기사-소위',
+    name: '배너릿',
     desc: '평생 명예 40,000을 획득하십시오. 진짜 전쟁을 한 계절 치른 셈입니다.',
-    title: '기사-소위',
+    title: '배너릿',
   },
   pvp_honor_field_marshal: {
     name: '원수',
@@ -254,7 +254,7 @@ export const table: DeedLocaleTable = {
     title: '고룡을 쓰러뜨린 자',
   },
   dgn_sanctum_speed: {
-    name: '성소 질주',
+    name: '성소 경주',
     desc: '파티가 무덤고룡 성소를 차지한 뒤 15분 안에 무덤고룡 코르줄을 처치하십시오.',
   },
   dgn_nythraxis_gravebreaker: {
@@ -317,7 +317,7 @@ export const table: DeedLocaleTable = {
   },
   dlv_varric_ringers: {
     name: '종은 침묵한다',
-    desc: '부제 바릭이 일으킨 장례 종지기를 모두 처치한 상태로 그를 물리치십시오.',
+    desc: '부제 반드릭이 일으킨 장례 종지기를 모두 처치한 상태로 그를 물리치십시오.',
   },
   dlv_nhalia_bells: {
     name: '종을 재우는 자',
@@ -393,7 +393,7 @@ export const table: DeedLocaleTable = {
   },
   chr_peaks_chapter_iii: {
     name: '쏜피크의 연대기',
-    desc: '산의 이야기를 끝까지 지켜보십시오: 고룡교단을 무너뜨리고, 성소를 침묵시키고, 깨어나는 봉우리를 쓰러뜨리고, 바위산의 이름난 공포를 모두 처치하십시오.',
+    desc: '산의 이야기를 끝까지 지켜보십시오: 용서약단을 무너뜨리고, 성소를 침묵시키고, 깨어나는 봉우리를 쓰러뜨리고, 바위산의 이름난 공포를 모두 처치하십시오.',
     title: '쏜피크의 증인',
   },
   chr_peaks_sparring: {

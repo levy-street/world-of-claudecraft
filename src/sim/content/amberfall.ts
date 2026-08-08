@@ -161,7 +161,7 @@ export const AMBERFALL_MOBS: Record<string, MobTemplate> = {
   },
   harvest_sprite: {
     id: 'harvest_sprite',
-    name: 'Harvest Sprite',
+    name: 'Gleaning Sprite',
     minLevel: 18,
     maxLevel: 19,
     family: 'burrower',
@@ -343,7 +343,12 @@ export const AMBERFALL_QUESTS: Record<string, QuestDef> = {
     completionText:
       'Four buckets back on their hooks and the rows gone quiet. You have a heavier hand with sprites than I do, $N, and today I am glad of it.',
     objectives: [
-      { type: 'kill', targetMobId: 'harvest_sprite', count: 8, label: 'Harvest Sprite driven off' },
+      {
+        type: 'kill',
+        targetMobId: 'harvest_sprite',
+        count: 8,
+        label: 'Gleaning Sprite driven off',
+      },
       {
         type: 'interact',
         targetObjectItemId: 'amberfall_sap_bucket',

@@ -92,7 +92,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.furious_mending.name': '狂怒療傷',
   'entities.abilities.heroic_leap.description':
     '躍向目標區域，落地時對附近的敵人造成 {damage} 點傷害。',
-  'entities.abilities.heroic_leap.name': '英勇飛躍',
+  'entities.abilities.heroic_leap.name': '騰躍衝鋒',
   'entities.abilities.intimidating_shout.description':
     '一聲駭人的怒吼，使 8 碼內最多 5 個敵人陷入恐懼而逃竄，持續 8 秒。傷害可能會打破效果。',
   'entities.abilities.intimidating_shout.name': '破膽怒吼',
@@ -131,7 +131,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.seasoned_soldier.name': '沙場老兵',
   'entities.abilities.storm_bolt.description':
     '將你的武器擲向目標，造成 {damage} 點傷害，並使其昏迷 3 秒。',
-  'entities.abilities.storm_bolt.name': '風暴之錘',
+  'entities.abilities.storm_bolt.name': '雷霆投擲',
   'entities.abilities.sudden_death.description':
     '你的自動攻擊有機率讓你能對任何生命值的目標施放提早入土，且不消耗怒氣。（武器）',
   'entities.abilities.sudden_death.name': '猝死',
@@ -140,7 +140,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sweeping_strikes.name': '擴弧斬',
   'entities.abilities.victory_rush.description':
     '攻擊造成武器傷害外加 {damage}，並治療你 20% 的最大生命值。只能在擊殺敵人後的 20 秒內使用。',
-  'entities.abilities.victory_rush.name': '乘勝追擊',
+  'entities.abilities.victory_rush.name': '勝者之勢',
   'hudChrome.specPanel.complexity': '複雜度',
   'hudChrome.specPanel.complexityHigh': '高',
   'hudChrome.specPanel.complexityLow': '低',
@@ -154,9 +154,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.talentRows.tab': '抉擇',
   'hudChrome.talentRows.readoutSummary': '天賦：{head}，已選擇 {spent}/{total} 列。',
   'entities.abilities.aspect_of_the_wild.name': '野牙偽裝',
-  'entities.abilities.avenging_wrath.name': '復仇之翼',
+  'entities.abilities.avenging_wrath.name': '熱誠之翼',
   'entities.abilities.berserk.name': '赤紅迷霧',
-  'entities.abilities.blink.name': '閃爍步',
+  'entities.abilities.blink.name': '輕掠步',
   'entities.abilities.bloodlust.name': '戰鼓',
   'entities.abilities.chain_lightning.name': '叉狀閃電',
   'entities.abilities.chaos_bolt.name': '毀滅箭',
@@ -357,7 +357,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.skins.ice_fang_sword.look':
     '蒼白冰河彎刃，刃背生鋸齒狀霜晶，血槽內有發光的青藍冰核，護手如冰柱。',
   'hudChrome.wocStore.skins.ice_fang_sword.lore':
-    '這是冰封品級的旗艦，也是每位收藏家最先伸手的一件。 Ice Fang 並非鍛造，而是從覆蓋 Highwatch 上方 Thornpeak 的冰川尖牙中雕成；青藍核心寒冷燃燒，如 Glimmermere 水面的冷光。它劈過之處連空氣都會結霜。城牆守衛發誓，大雪擋住 Wyrmcult 的那一夜，一名士兵帶著它，「為城牆買下了一個冬天」。',
+    '這是冰封品級的旗艦，也是每位收藏家最先伸手的一件。 Ice Fang 並非鍛造，而是從覆蓋 Highwatch 上方 Thornpeak 的冰川尖牙中雕成；青藍核心寒冷燃燒，如 Glimmermere 水面的冷光。它劈過之處連空氣都會結霜。城牆守衛發誓，大雪擋住 Broodsworn 的那一夜，一名士兵帶著它，「為城牆買下了一個冬天」。',
   'hudChrome.wocStore.skins.glaciersplit_axe.name': '裂冰',
   'hudChrome.wocStore.skins.glaciersplit_axe.look':
     '半透明藍色冰川斧頭，裂開的內部泛著青藍光，霜晶密布，斧柄拖曳寒霧。',
@@ -383,7 +383,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '一根發光的青藍冰川尖刺，白霜從銀環綻開，周圍浮著淡淡寒霧。',
   'hudChrome.wocStore.skins.everwinter_wand.lore':
     '一根發光的冰川尖刺，據說折自 Sanctum 下方的深潭，那裡的山寒長著利齒。白霜不斷從銀環綻放，無論烈火或盛夏都無法使它融化。法師將它貼身攜帶，借寒意輔助施法；但在它似乎傾向 Nythraxis 墓室並靜靜聆聽的夜晚，又會把它放得遠遠的。',
-  'hudChrome.wocStore.skins.winterbite.name': '寒冬之噬',
+  'hudChrome.wocStore.skins.winterbite.name': '寒冬之嚙',
   'hudChrome.wocStore.skins.winterbite.look':
     '鍍銀鋼與藍冰製成的弓，弓把內有青藍冰核，弦上搭著實冰箭矢，寒霧繚繞。',
   'hudChrome.wocStore.skins.winterbite.lore':
@@ -3033,9 +3033,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.summon_imp.name': '召喚燼裔',
   'entities.abilities.summon_imp.description':
     '召喚一隻聽從術士命令的燼裔。燼裔會從遠處向你的敵人投擲灰燼箭。召喚新的惡魔會驅散你目前的惡魔。你同時只能擁有一隻惡魔。',
-  'entities.abilities.summon_voidwalker.name': '召喚幽蔭',
+  'entities.abilities.summon_voidwalker.name': '召喚暮影',
   'entities.abilities.summon_voidwalker.description':
-    '召喚一隻聽從術士命令的幽蔭。幽蔭是一種堅韌的惡魔，會嘲諷你的敵人並承受打擊。召喚新的惡魔會驅散你目前的惡魔。你同時只能擁有一隻惡魔。',
+    '召喚一隻聽從術士命令的暮影。暮影是一種堅韌的惡魔，會嘲諷你的敵人並承受打擊。召喚新的惡魔會驅散你目前的惡魔。你同時只能擁有一隻惡魔。',
   'entities.abilities.summon_succubus.name': '召喚暮裔',
   'entities.abilities.summon_succubus.description':
     '召喚一隻聽從術士命令的暮裔。暮裔是一種脆弱的惡魔，攻擊迅速且近戰傷害強勁。召喚新的惡魔會驅散你目前的惡魔。你同時只能擁有一隻惡魔。',
@@ -3066,7 +3066,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.revive_pet.name': '修補',
   'entities.abilities.revive_pet.description':
     '修補你的寵物。若其存活，在 12 秒內每 3 秒恢復一次生命值，共恢復 {overTime} 點；若其死亡，則以 35% 生命值將其復活。',
-  'entities.abilities.holy_shock.name': '神聖震擊',
+  'entities.abilities.holy_shock.name': '聖光震顫',
   'entities.abilities.holy_shock.description':
     '以神聖能量震擊一名友方目標，為其恢復{damage}點生命值。（神聖專精招牌）',
   'entities.abilities.holy_shield.name': '神聖之盾',
@@ -3078,7 +3078,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.trueshot_aura.name': '強擊光環',
   'entities.abilities.trueshot_aura.description':
     '鼓舞附近盟友，使攻擊強度提高35點，持續5分鐘。（射擊專精招牌）',
-  'entities.abilities.wyvern_sting.name': '翼龍釘刺',
+  'entities.abilities.wyvern_sting.name': '幼龍釘刺',
   'entities.abilities.wyvern_sting.description':
     '從遠處釘刺敵人，使其癱瘓最多4秒。受到任何傷害都會打破效果。（生存專精招牌）',
   'entities.abilities.arcane_power.name': '祕法強化',
@@ -3087,7 +3087,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.combustion.name': '鳳凰出神',
   'entities.abilities.combustion.description':
     '法術致命一擊機率提高50%，持續15秒。（火焰專精招牌）',
-  'entities.abilities.icy_veins.name': '冰冷血脈',
+  'entities.abilities.icy_veins.name': '寒潮湧動',
   'entities.abilities.icy_veins.description':
     '法術加速提高30%，並防止施法被打斷或受到延遲，持續10秒。（冰霜專精招牌）',
   'entities.abilities.cold_blood.name': '冷血',
@@ -3102,7 +3102,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.power_infusion.name': '能量灌注',
   'entities.abilities.power_infusion.description':
     '向一名友方目標灌注能量，使其法術強度提高28點，持續15秒。（戒律專精招牌）',
-  'entities.abilities.holy_nova.name': '神聖新星',
+  'entities.abilities.holy_nova.name': '聖輝爆發',
   'entities.abilities.holy_nova.description':
     '引發神聖之光爆炸，為附近盟友恢復{damage}點生命值並傷害附近敵人。（神聖專精招牌）',
   'entities.abilities.shadowform.name': '暗影形態',
@@ -3123,10 +3123,10 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.feral_charge.name': '野性衝鋒',
   'entities.abilities.feral_charge.description':
     '衝向敵人並使其定身1秒。8-25碼距離。（野性專精招牌）',
-  'entities.abilities.swiftmend.name': '迅癒',
+  'entities.abilities.swiftmend.name': '輕捷癒合',
   'entities.abilities.swiftmend.description':
     '吞噬友方目標身上的持續治療效果，為其恢復{damage}點生命值。（恢復專精招牌）',
-  'entities.abilities.crusader_strike.name': '十字軍聖擊',
+  'entities.abilities.crusader_strike.name': '誓言打擊',
   'entities.abilities.crusader_strike.description':
     '打擊目標，造成武器傷害外加 {damage} 點神聖傷害。（聖騎士天賦）',
   'entities.abilities.metamorphosis.name': '惡魔變形',
@@ -3297,7 +3297,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.items.ogre_war_totem.name': '食人魔戰爭圖騰',
   'entities.items.storm_core.name': '風暴核心',
   'entities.items.kazzix_heartshard.name': '卡茲克斯的心裂片',
-  'entities.items.wyrmcult_orders.name': '龍教命令',
+  'entities.items.wyrmcult_orders.name': '龍誓命令',
   'entities.items.ritual_phylactery.name': '儀式護命匣',
   'entities.items.gravewyrm_sigil.name': '墓龍徽記',
   'entities.items.blessed_embers.name': '祝福餘燼',
@@ -3318,7 +3318,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.items.staff_of_velkhar.name': '維爾卡法杖',
   'entities.items.shadowmeld_tunic.name': '夜帷外套',
   'entities.items.gravewyrm_scale_hauberk.name': '墓龍鱗鎖甲',
-  'entities.items.wyrmcult_grand_robe.name': '龍教大長袍',
+  'entities.items.wyrmcult_grand_robe.name': '龍誓大長袍',
   'entities.items.wyrmscale_jerkin.name': '龍鱗皮甲',
   'entities.items.wyrmfang_greatblade.name': '龍牙巨刃',
   'entities.items.staff_of_the_gravewyrm.name': '墓龍法杖',
@@ -3385,7 +3385,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.items.tideguard_sabatons.name': '潮衛護靴',
   'entities.items.valeborn_spellblade.name': '谷裔法刃',
   'entities.items.voss_sanctified_mace.name': '沃斯的聖化戰錘',
-  'entities.items.wyrmcult_soulsteps.name': '龍教魂步',
+  'entities.items.wyrmcult_soulsteps.name': '龍誓魂步',
   'entities.items.wyrmshadow_harness.name': '夜牙挽具',
   'entities.items.wyrmshadow_legguards.name': '夜牙腿甲',
   'entities.items.wyrmshadow_treads.name': '夜牙足墊',
@@ -3458,8 +3458,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.warlord_drogmar.name': '督軍德羅格瑪',
   'entities.mobs.stormcrag_elemental.name': '風暴岩元素',
   'entities.mobs.shardlord_kazzix.name': '碎片領主卡茲克斯',
-  'entities.mobs.wyrmcult_zealot.name': '龍教狂熱者',
-  'entities.mobs.wyrmcult_necromancer.name': '龍教死靈法師',
+  'entities.mobs.wyrmcult_zealot.name': '龍誓狂熱者',
+  'entities.mobs.wyrmcult_necromancer.name': '龍誓死靈法師',
   'entities.mobs.boneclad_revenant.name': '骨甲亡魂',
   'entities.mobs.crypt_shambler.name': '墓穴蹣跚者',
   'entities.mobs.hollow_acolyte.name': '空洞侍僧',
@@ -3488,7 +3488,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.sister_nhalia.name': '娜莉亞修女',
   'entities.mobs.varkas_boneguard.name': '瓦爾卡斯骨衛',
   'entities.mobs.emberkin.name': '燼裔',
-  'entities.mobs.gloomshade.name': '幽蔭',
+  'entities.mobs.gloomshade.name': '暮影',
   'entities.mobs.duskborn.name': '暮裔',
   'entities.mobs.grix_the_tunnelking.name': '隧道之王葛瑞克斯',
   'entities.mobs.spellhound.name': '咒獵犬',
@@ -3921,7 +3921,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_crushers.objectives.0.label': '擊敗荊峰粉碎者',
   'entities.quests.q_drogmar.title': '督軍德羅格瑪',
   'entities.quests.q_drogmar.text':
-    '德羅格瑪收了龍教的報酬，把氏族獻給山脈甦醒。他是砸向城牆的錘，當他砸向地面時，{playerName}，別站在他附近。進營地殺了他。',
+    '德羅格瑪收了龍誓的報酬，把氏族獻給山脈甦醒。他是砸向城牆的錘，當他砸向地面時，{playerName}，別站在他附近。進營地殺了他。',
   'entities.quests.q_drogmar.completion':
     '德羅格瑪死在自己的營地。氏族會散向高山隘口，你為我的城牆買來一個冬天，{playerName}。',
   'entities.quests.q_drogmar.objectives.0.label': '擊敗督軍德羅格瑪',
@@ -3945,10 +3945,10 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_kazzix.objectives.0.label': '卡茲克斯的心裂片',
   'entities.quests.q_zealots.title': '風中聖歌',
   'entities.quests.q_zealots.text':
-    '當風從南峰吹來時，{playerName}，它帶著聖歌。龍教不再隱藏，他們在聖所下紮營，對地下沉睡之物歌唱。讓12名狂熱者閉嘴。',
+    '當風從南峰吹來時，{playerName}，它帶著聖歌。龍誓不再隱藏，他們在聖所下紮營，對地下沉睡之物歌唱。讓12名狂熱者閉嘴。',
   'entities.quests.q_zealots.completion':
     '風安靜了些。但讓我不安的不是歌聲，{playerName}，而是也許有什麼在回應。',
-  'entities.quests.q_zealots.objectives.0.label': '擊敗龍教狂熱者',
+  'entities.quests.q_zealots.objectives.0.label': '擊敗龍誓狂熱者',
   'entities.quests.q_cult_orders.title': '來自地下的命令',
   'entities.quests.q_cult_orders.text':
     '狂熱者現在有崗哨、有清點，像圍城前的士兵。會組織起來的邪教徒，就是在聽令的邪教徒，{playerName}。殺8個並帶回4份書面命令。',
@@ -3990,7 +3990,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_voice_below.completion':
     '跪拜停止了。我們沒有讓那聲音沉默，{playerName}，只是削薄了它的合唱。',
   'entities.quests.q_voice_below.objectives.0.label': '擊敗龍教狂熱者',
-  'entities.quests.q_voice_below.objectives.1.label': '擊敗龍教死靈法師',
+  'entities.quests.q_voice_below.objectives.1.label': '擊敗龍誓死靈法師',
   'entities.quests.q_sanctum_gate.title': '聖所大門',
   'entities.quests.q_sanctum_gate.text':
     '這是最後的門檻了，{playerName}。邪教把聖所門鑰石擊碎，碎片散在門前廣場。帶回3片，我會悄悄開啟道路。',
@@ -4092,7 +4092,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.zones.thornpeak_heights.pois.4.label': '德羅格瑪戰爭營地',
   'entities.zones.thornpeak_heights.pois.5.label': '風暴岩',
   'entities.zones.thornpeak_heights.pois.6.label': '微光湖',
-  'entities.zones.thornpeak_heights.pois.7.label': '龍教帳篷',
+  'entities.zones.thornpeak_heights.pois.7.label': '龍誓帳篷',
   'entities.zones.thornpeak_heights.pois.8.label': '亡魂戰場',
   'entities.zones.thornpeak_heights.pois.9.label': '墓龍聖所',
   'entities.zones.veiled_hollow.name': '帷幕幽谷',
@@ -4163,7 +4163,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.gilded_stag.name': '鎏金雄鹿',
   'entities.mobs.gloam_fox.name': '暮光狐',
   'entities.mobs.orchard_treant.name': '果園樹人',
-  'entities.mobs.harvest_sprite.name': '豐收小妖',
+  'entities.mobs.harvest_sprite.name': '拾穗小妖',
   'entities.mobs.mere_lurker.name': '湖澤潛伏者',
   'entities.mobs.bogtoad.name': '沼蟾',
   'entities.mobs.drowsy_croaker.name': '瞌睡蛙王',
@@ -4174,13 +4174,13 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '越過夜門，連空氣都在做夢。沿著花光走向月棲鎮，別忘了看看懸在天上沉睡的世界。',
   'entities.zones.nightbloom.pois.0.label': '月棲鎮',
   'entities.zones.nightbloom.pois.1.label': '夜門',
-  'entities.zones.nightbloom.pois.2.label': '月井',
+  'entities.zones.nightbloom.pois.2.label': '月泉',
   'entities.zones.nightbloom.pois.3.label': '暮光花田',
   'entities.zones.nightbloom.pois.4.label': '守望石陣',
   'entities.zones.nightbloom.pois.5.label': '不眠古塚',
   'entities.mobs.moonfleece_grazer.name': '月絨獸',
   'entities.mobs.gloam_strider.name': '幽暝疾行者',
-  'entities.mobs.nightkin_stargazer.name': '夜裔觀星者',
+  'entities.mobs.nightkin_stargazer.name': '暮裔觀星者',
   'entities.mobs.barrow_king.name': '古塚之王',
   'entities.zones.wraithwood.name': '怨靈林',
   'entities.zones.wraithwood.welcome':
@@ -4574,7 +4574,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '豐收小妖，{playerName}。牠們為了裡頭的甜味，把我的採脂嘴從樹幹上撬下來，還把桶子扔進草叢。趕走八隻小賊，再撿回四個桶子，貨車就能重新上路。',
   'entities.quests.q_af_sprites_and_spigots.completion':
     '四個桶子回到掛鉤上，果樹行也安靜了。你對付小妖的手比我重，{playerName}，而今天我很慶幸如此。',
-  'entities.quests.q_af_sprites_and_spigots.objectives.0.label': '已趕走豐收小妖',
+  'entities.quests.q_af_sprites_and_spigots.objectives.0.label': '已趕走拾穗小妖',
   'entities.quests.q_af_sprites_and_spigots.objectives.1.label': '已尋回採脂桶',
   'entities.quests.q_af_amber_from_the_herd.title': '鹿群身上的琥珀',
   'entities.quests.q_af_amber_from_the_herd.text':
@@ -4925,13 +4925,13 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_nb_night_gardens.objectives.0.label': '已採集夜綻花朵',
   'entities.quests.q_nb_eyes_on_the_vigil.title': '望向石陣的眼睛',
   'entities.quests.q_nb_eyes_on_the_vigil.text':
-    '有什麼東西讓疾行者變得大膽，讓獸群惶惶不安，{playerName}，而我從花朵裡讀不出原因。卡西安能從天上讀出來。他在東邊守望石陣旁紮著他的觀星營地，夜裔就在石柱間飄蕩。找到他，問問星星在說什麼。',
+    '有什麼東西讓疾行者變得大膽，讓獸群惶惶不安，{playerName}，而我從花朵裡讀不出原因。卡西安能從天上讀出來。他在東邊守望石陣旁紮著他的觀星營地，暮裔就在石柱間飄蕩。找到他，問問星星在說什麼。',
   'entities.quests.q_nb_eyes_on_the_vigil.completion':
     '莉拉派你來的？那麼花園也感覺到了。到望遠鏡旁坐一會兒，{playerName}。星星已經騷動了一個月，我畫的每一張星圖都朝北傾向那座古塚。',
   'entities.quests.q_nb_eyes_on_the_vigil.objectives.0.label': '在守望石陣找到天文學家卡西安',
   'entities.quests.q_nb_charts_of_the_stones.title': '石中星圖',
   'entities.quests.q_nb_charts_of_the_stones.text':
-    '守望石陣的石柱比月棲鎮古老，比照看它們的夜裔更古老，柱面上刻著我花了一生學著解讀的星圖。天空移位了，{playerName}，我必須知道移了多遠。解讀三座石柱上的星圖，把方位帶回來給我。',
+    '守望石陣的石柱比月棲鎮古老，比照看它們的暮裔更古老，柱面上刻著我花了一生學著解讀的星圖。天空移位了，{playerName}，我必須知道移了多遠。解讀三座石柱上的星圖，把方位帶回來給我。',
   'entities.quests.q_nb_charts_of_the_stones.completion':
     '再無疑問了。每一道方位都朝不眠古塚偏移，彷彿天空本身俯身在那座墳丘上窺看。古代的君王葬在對齊的星辰之下，是有原因的，{playerName}。',
   'entities.quests.q_nb_charts_of_the_stones.objectives.0.label': '已解讀星圖',
@@ -4946,7 +4946,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_nb_the_barrow_king.text':
     '每一道方位、每一顆不安的星、每一座敞開的墳丘都指向同一件事：古塚之王正在大墳丘之下甦醒，而這個國度沒有黎明能鎮住他。必須趕在他想起自己的王冠之前，送他安息，{playerName}。不要獨自前往：帶上一個朋友，讓花光始終照在你背後。',
   'entities.quests.q_nb_the_barrow_king.completion':
-    '一季以來，星星頭一次安定下來，{playerName}。墳丘閉合了，夜裔在他們的石柱旁靜止了，王也再度沉睡於地下。披上這件披風：它是月棲鎮裁下的，留給夜終於信任的那個人。',
+    '一季以來，星星頭一次安定下來，{playerName}。墳丘閉合了，暮裔在他們的石柱旁靜止了，王也再度沉睡於地下。披上這件披風：它是月棲鎮裁下的，留給夜終於信任的那個人。',
   'entities.quests.q_nb_the_barrow_king.objectives.0.label': '已讓古塚之王安息',
   'entities.quests.q_pr_down_to_drifthaven.title': '下行漂流港',
   'entities.quests.q_pr_down_to_drifthaven.text':
@@ -4980,10 +4980,10 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_pr_boars_in_the_gardens.objectives.0.label': '已趕走灌叢野豬',
   'entities.quests.q_pr_the_man_who_went_in.title': '走進林中的人',
   'entities.quests.q_pr_the_man_who_went_in.text':
-    '潛水員們不肯踏過林線一步，{playerName}，我也不會要求他們。鼓聲你如今也聽過了：到第二夜，人人都會聽見。這座島上只有一個人曾朝那聲音走去，還走了回來。奧庫。他在纏徑路深處、垂藤林的大榕樹下紮營。找到他，問問綠蔭深處藏著什麼。',
+    '潛水員們不肯踏過林線一步，{playerName}，我也不會要求他們。鼓聲你如今也聽過了：到第二夜，人人都會聽見。這座島上只有一個人曾朝那聲音走去，還走了回來。奧克里姆。他在纏徑路深處、垂藤林的大榕樹下紮營。找到他，問問綠蔭深處藏著什麼。',
   'entities.quests.q_pr_the_man_who_went_in.completion':
     '伊莎派你來的？珍珠之母已經多年不曾說起我的名字了。坐到藤蔓搆不著的地方來，{playerName}，我把我知道的告訴你：鼓聲不是危險。鼓聲是警告。',
-  'entities.quests.q_pr_the_man_who_went_in.objectives.0.label': '在垂藤林找到奧庫',
+  'entities.quests.q_pr_the_man_who_went_in.objectives.0.label': '在垂藤林找到奧克里姆',
   'entities.quests.q_pr_canopy_silk.title': '樹冠之絲',
   'entities.quests.q_pr_canopy_silk.text':
     '抬頭看，{playerName}。從這裡到神像，每一片樹冠都像漁網一樣結滿了蛛網，而織網蛛一季比一季大膽。我用牠們自己的絲橫著小徑拉線，絆線繫鈴，叢林就沒法悄悄摸到我身邊。從樹冠織網蛛身上取六束好絲，我的警線就能重新拉起來。',
@@ -6739,7 +6739,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.peaksGreeter': '瑟莎莉隊長，高守哨站',
   'guide.worldPage.peaksGreeting': '這座城牆已守了兩百年。它不會在我當值時破，但它正在呻吟。',
   'guide.worldPage.peaksPlaceNotes':
-    '高守哨站鎮守著城牆。潛行者山脊與深岩地洞屬於山脊巨貓與掘地怪；食人魔山麓與卓格瑪戰營屬於受僱的暴徒；風暴岩劈啪作響地竄動著元素，其下則是發著光的微光湖，這座山中小湖的岸邊守著那道通往溺亡神殿的蒼白之光大門；龍裔邪教帳篷與亡魂之野環繞著邪教佔據的高地，墓龍聖所就矗立於其頂峰。',
+    '高守哨站鎮守著城牆。潛行者山脊與深岩地洞屬於山脊巨貓與掘地怪；食人魔山麓與卓格瑪戰營屬於受僱的暴徒；風暴岩劈啪作響地竄動著元素，其下則是發著光的微光湖，這座山中小湖的岸邊守著那道通往溺亡神殿的蒼白之光大門；龍誓帳篷與亡魂之野環繞著邪教佔據的高地，墓龍聖所就矗立於其頂峰。',
   'guide.worldPage.duskGreeting': '你的同族鮮少踏足這片樹蔭。輕聲慢行，歡迎你的到來。',
   'guide.worldPage.duskGreeter': '守護者塞爾文，古輝鎮',
   'guide.worldPage.duskPlaceNotes':
@@ -6800,7 +6800,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.fenPlaceNotes':
     '橋湖鎮橫跨在緩流的水面上。琥珀沼石階自豐收之鄉一路而下；睡蓮澤與澤光池閃爍著鬼火與蜻蜓；垂柳灣的枝條垂進湖中；沉眠淺灘則是這片土地最溫柔的一隅。',
   'guide.worldPage.nightPlaceNotes':
-    '月棲鎮守著長夜。夜門是通往午夜之國的入口；月井盛著你能佇立其旁的星光；暮光花田在黑暗中綻放；守望石陣一動不動地注視著；不眠古塚則是這裡唯一從不做夢的地方。',
+    '月棲鎮守著長夜。夜門是通往午夜之國的入口；月泉盛著你能佇立其旁的星光；暮光花田在黑暗中綻放；守望石陣一動不動地注視著；不眠古塚則是這裡唯一從不做夢的地方。',
   'guide.worldPage.hauntPlaceNotes':
     '絞湖鎮蜷縮在自己的燈籠之中。鴉門是這片森林陰森的正門；寡婦棘叢被蛛網織得密不透風；吊影林地與哀石禮拜堂守著森林最古老的悲慟；獵手林隙則屬於那仍在其中狩獵的東西。',
   'guide.worldPage.galePlaceNotes':
@@ -6829,7 +6829,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.items.reliquary_shoulder.name': '碎裂的肩甲',
   'entities.items.reliquary_gloves_rog.name': '護骨者護手',
   'entities.items.deacon_reliquary_helm.name': '執事的聖物庫頭盔',
-  'entities.items.varric_shadow_cowl.name': '瓦瑞克的暗影兜帽',
+  'entities.items.varric_shadow_cowl.name': '凡德里克的暗影兜帽',
   'entities.items.duskwisp_essence.name': '暮光靈精華',
   'entities.items.spore_heart.name': '孢子之心',
   'entities.items.gleaming_antler.name': '輝光鹿角',
@@ -6851,7 +6851,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.items.nightweave_tunic.name': '夜織皮甲',
   'entities.items.veilcloth_robe.name': '帷紗長袍',
   'entities.mobs.acolyte_tessa.name': '侍僧泰莎',
-  'entities.mobs.deacon_varric.name': '執事瓦瑞克',
+  'entities.mobs.deacon_varric.name': '執事凡德里克',
   'entities.mobs.reliquary_bonewalker.name': '復起的骨行者',
   'entities.mobs.reliquary_funeral_ringer.name': '喪儀鳴鐘者',
   'entities.mobs.reliquary_gravecall_acolyte.name': '喚墓侍僧',
@@ -6885,21 +6885,21 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'delveUi.board.tier.heroic': '英雄',
   'delveUi.board.tier.normal': '普通',
   'delveUi.board.title': '秘探看板',
-  'delveUi.boss.varric.bell.emote': '執事瓦瑞克雙手緊握那口埋藏的喪鐘！',
+  'delveUi.boss.varric.bell.emote': '執事凡德里克雙手緊握那口埋藏的喪鐘！',
   'delveUi.boss.varric.bell.impact': '喪鐘的鳴響震裂了墓室地面！',
   'delveUi.boss.varric.bell.lesson': '喪鐘鳴響：每十二秒一次的地面重擊。在它落下前移開。',
-  'delveUi.boss.varric.bell.log': '執事瓦瑞克開始敲響葬鐘。',
-  'delveUi.boss.varric.bell.warning': '遠離執事瓦瑞克！',
+  'delveUi.boss.varric.bell.log': '執事凡德里克開始敲響葬鐘。',
+  'delveUi.boss.varric.bell.warning': '遠離執事凡德里克！',
   'delveUi.boss.varric.defeat': '不……我握有那些名字……我全都握有……',
   'delveUi.boss.varric.intro': '沒有靈魂會遺失，只是被錯置了。',
   'delveUi.boss.varric.mid30': '葬鐘回應著他唸出的每一個名字。',
-  'delveUi.boss.varric.mid60': '執事瓦瑞克以顫抖的得意從名冊中誦讀名字。',
+  'delveUi.boss.varric.mid60': '執事凡德里克以顫抖的得意從名冊中誦讀名字。',
   'delveUi.boss.varric.pull': '你以不潔之意踏上聖塵之地。跪下，接受清點。',
-  'delveUi.boss.varric.raise.emote': '執事瓦瑞克從破裂的墳墓中呼喚名字！',
-  'delveUi.boss.varric.raise.interrupt_fail': '亡者回應了執事瓦瑞克的呼喚！',
+  'delveUi.boss.varric.raise.emote': '執事凡德里克從破裂的墳墓中呼喚名字！',
+  'delveUi.boss.varric.raise.interrupt_fail': '亡者回應了執事凡德里克的呼喚！',
   'delveUi.boss.varric.raise.interrupt_ok': '葬墓儀式中斷了。',
   'delveUi.boss.varric.raise.lesson': '在五秒內打斷那座裂開的墳墓，否則亡者將回應他的呼喚而起。',
-  'delveUi.boss.varric.raise.log': '執事瓦瑞克開始施放喚醒亡者。',
+  'delveUi.boss.varric.raise.log': '執事凡德里克開始施放喚醒亡者。',
   'delveUi.boss.varric.raise.object': '裂開的墳墓隨著被竊取的氣息顫動。',
   'delveUi.boss.varric.raise.warning': '阻止葬墓儀式！',
   'delveUi.chest.flavor': '亡者已交出他們所能割捨之物。',
@@ -9082,7 +9082,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.desc_drakemaw_raptor':
     '來自龍喉火山口的馴服巢生迅猛龍，渾身筋肉、疾若奔雷，身上仍帶著淡淡的灰燼氣味。',
   'hudChrome.mounts.name_thunderstrut_gobbler': '雷霆闊步大火雞',
-  'hudChrome.mounts.name_terrorspark_groundshaker': '驚雷撼地者',
+  'hudChrome.mounts.name_terrorspark_groundshaker': '駭雷撼地者',
   'hudChrome.mounts.desc_valorsteed': '一匹堅韌穩健的駿馬，可提升旅行速度。',
   'hudChrome.mounts.desc_grag_bear': '一頭堅韌穩健的巨熊，可提升旅行速度。',
   'hudChrome.mounts.desc_stalkglider_snail': '一隻堅毅耐久的蝸牛，可提升旅行速度。',
@@ -9295,7 +9295,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '向目標區域射出散射箭，對8碼內的敵人造成{damage}點物理傷害。（獵人天賦）',
   'entities.abilities.prayer_of_healing.description':
     '為附近的盟友恢復{damage}點生命值。（牧師天賦）',
-  'entities.abilities.preparation.description': '結束疾跑、閃避和消失的冷卻時間。（潛行者天賦）',
+  'entities.abilities.preparation.description': '結束疾跑、閃避和煙遁的冷卻時間。（潛行者天賦）',
   'entities.abilities.presence_of_mind.description':
     '使你的下一個有施法時間的法術立即完成。持續 60 秒。（法師天賦）',
   'entities.abilities.psychic_scream.description':
@@ -9341,7 +9341,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.blizzard.name': '暴風雪',
   'entities.abilities.blizzard.description':
     '在目標區域召喚持續 6 秒的冰風暴，每秒造成 {damage} 點冰霜傷害並使敵人緩速 40%。每命中一名敵人，寒冰寶珠的冷卻時間縮短 0.5 秒，每次施法最多縮短 3 秒。（冰霜）',
-  'entities.abilities.glacial_spike.name': '冰川尖刺',
+  'entities.abilities.glacial_spike.name': '凝霜冰針',
   'entities.abilities.glacial_spike.description':
     '凝聚一根巨大的冰刺，消耗 5 枚冰柱，造成 {damage} 點冰霜傷害，並將目標凍結在原地 4 秒。（冰霜）',
   'entities.abilities.glacial_front.name': '冰川鋒線',
@@ -9384,7 +9384,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '以烈焰環繞自身，吸收 {damage} 點傷害，持續 60 秒。（火焰）',
   'entities.abilities.cold_snap.name': '冬之召還',
   'entities.abilities.cold_snap.description':
-    '立即結束閃爍步、霜幕與強效隱形術的冷卻時間。（法師天賦）',
+    '立即結束輕掠步、霜幕與強效隱形術的冷卻時間。（法師天賦）',
   'entities.abilities.greater_invisibility.name': '強效隱形術',
   'entities.abilities.greater_invisibility.description':
     '消失 20 秒並移除 2 個持續傷害效果。隱形結束時，受到的傷害降低 90%，持續 2 秒。（法師天賦）',
@@ -9520,7 +9520,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.sanguine': '攻擊速度提高 {hastePct}%，造成的傷害提高 {dmgPct}%',
   'hudChrome.auraEffect.battleTrance': '你的下一次劫掠打擊或致殘打擊不消耗怒氣',
   'hudChrome.auraEffect.revengeFree': '你的下一次復仇不消耗怒氣',
-  'hudChrome.auraEffect.victoryRush': '乘勝追擊已就緒',
+  'hudChrome.auraEffect.victoryRush': '勝者之勢已就緒',
   'hudChrome.auraEffect.maxHpPct': '最大生命值提高 {pct}%',
   'hud.combat.floatingParry': '招架',
   'hud.combat.parried': '你的{ability}被{target}招架了。',
@@ -9629,7 +9629,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.hearthkeeper_maeve.title': '爐火山屋看守',
   'entities.npcs.hearthkeeper_maeve.greeting':
     '快進來避避寒。只要我還有一口氣，山屋的爐火就不會熄。',
-  'entities.npcs.hermit_okku.name': '奧庫',
+  'entities.npcs.hermit_okku.name': '奧克里姆',
   'entities.npcs.hermit_okku.title': '走進林中之人',
   'entities.npcs.hermit_okku.greeting': '安靜。鼓聲數著樹下行走的一切，而它們已經數到你了。',
   'entities.npcs.huntsman_deral.name': '獵人德拉爾',
@@ -9835,7 +9835,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.the_last_keep.name': '最後的堡壘',
   'entities.dungeons.the_last_keep.enterText': '你踏入最後的堡壘那冰冷而寂靜的大廳。',
   'entities.items.last_keep_signet.name': '最後的堡壘印戒',
-  'entities.items.reins_terrorspark_groundshaker.name': '驚雷撼地者點火鑰匙',
+  'entities.items.reins_terrorspark_groundshaker.name': '駭雷撼地者點火鑰匙',
   'entities.dungeons.the_last_keep.leaveText': '你帶上堡門，重新走進龍裔荒原的寒風中。',
   'entities.items.wildheart_tuskblade.name': '荒野之心獠牙巨刃',
   'entities.items.wildheart_hexwood_staff.name': '盆地巫木法杖',
@@ -9923,7 +9923,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.items.revenantstep_treads.name': '亡魂行靴',
   'entities.items.shardfang_grips.name': '片牙護手',
   'entities.items.shardsong_mantle.name': '碎片之歌披肩',
-  'entities.items.wyrmcult_spellgrips.name': '龍教法術護手',
+  'entities.items.wyrmcult_spellgrips.name': '龍誓法術護手',
   'entities.items.thornpeak_wildwraps.name': '荊峰野性裹手',
   'entities.items.stormvotive_hauberk.name': '風暴誓願鎖甲',
   'entities.items.cryptbloom_shoulderguards.name': '墓花護肩',
@@ -10765,7 +10765,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraOverlay.procs.battleTrance': '戰鬥冥想',
   'hudChrome.auraOverlay.procs.overpowerCharge': '赤手充能',
   'hudChrome.auraOverlay.procs.suddenDeath': '猝死',
-  'hudChrome.auraOverlay.procs.victoryRush': '乘勝追擊',
+  'hudChrome.auraOverlay.procs.victoryRush': '勝者之勢',
   'hudChrome.auraOverlay.procs.enrage': '狂亂：激怒',
   'hudChrome.auraOverlay.procs.heatingUp': '熱身',
   'hudChrome.auraOverlay.procs.arcaneCharge': '秘法充能',

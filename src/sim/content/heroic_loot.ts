@@ -183,7 +183,7 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
   },
   mistforged_pauldrons: {
     id: 'mistforged_pauldrons',
-    name: 'Mistforged Pauldrons',
+    name: 'Fogforged Pauldrons',
     kind: 'armor',
     armorType: 'mail',
     slot: 'shoulder',

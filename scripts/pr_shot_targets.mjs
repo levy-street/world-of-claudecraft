@@ -540,7 +540,7 @@ export const TARGETS = [
     // matched the test file.)
     when: ['render/ability_vfx'],
     variants: [
-      // Sundering Gavel rank 2 (4s stun) rather than Storm Bolt (3s): the
+      // Sundering Gavel rank 2 (4s stun) rather than Thunderhurl (3s): the
       // capture pipeline spends ~0.7s between the aura poll and the shutter,
       // and the star alpha fades over the stun's final second, so the longer
       // stun is what keeps the shot inside the full-alpha read.

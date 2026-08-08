@@ -125,7 +125,7 @@ export function isArenaVariant(variant: DungeonInteriorVariant): boolean {
 export function dungeonDaisHasRaisedPlatform(variant: DungeonInteriorVariant): boolean {
   // Flat fighting floors: the arena pits, the Nythraxis raid, and the delve
   // trash rooms (their "dais" marker is only the exit threshold). The delve
-  // finale keeps a raised boss stage for Deacon Varric.
+  // finale keeps a raised boss stage for Deacon Vandric.
   if (isArenaVariant(variant) || variant === 'nythraxis') return false;
   if (variant === 'delve_ossuary' || variant === 'delve_bell' || variant === 'delve_hall')
     return false;
@@ -2408,7 +2408,7 @@ export class DungeonInteriors {
       p.add('skull_candle', d.x, DAIS_HEIGHT + 0.08, d.z, 0, 1.6); // the moon-idol at the altar's heart
     }
     if (variant === 'delve_finale' || variant === 'delve_marsh_apse') {
-      // Deacon Varric's bell-chamber: low ribcage trophies flanking the south
+      // Deacon Vandric's bell-chamber: low ribcage trophies flanking the south
       // (entrance-facing) edge of the stage. The reward chest is a gameplay
       // object the sim places centre-south, and the surface-exit stairs sit at
       // the north edge: keep both clear, so no idol, hoard, or back-corner chest.

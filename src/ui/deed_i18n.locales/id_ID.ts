@@ -38,9 +38,7 @@ export const table: DeedLocaleTable = {
     title: 'Sersan',
   },
   pvp_honor_knight_lieutenant: {
-    name: 'Letnan Ksatria',
     desc: 'Raih 40.000 kehormatan seumur hidupmu, satu musim perang sungguhan di belakangmu.',
-    title: 'Letnan Ksatria',
   },
   pvp_honor_field_marshal: {
     name: 'Marsekal Lapangan',
@@ -76,7 +74,6 @@ export const table: DeedLocaleTable = {
     desc: 'Panen urat bijih, tegakan kayu, dan petak herba di Nightbloom.',
   },
   chr_nightbloom_first_cast: {
-    name: 'Riak di Sumur Bulan',
     desc: 'Tangkap ikan dari perairan Nightbloom.',
   },
   chr_wraithwood_gatherer: {
@@ -289,7 +286,6 @@ export const table: DeedLocaleTable = {
     title: 'Penumbang Wyrm',
   },
   dgn_sanctum_speed: {
-    name: 'Lari Kencang Sanktum',
     desc: 'Kalahkan Korzul sang Gravewyrm dalam 15 menit sejak party-mu mengklaim Sanktum Gravewyrm.',
   },
   dgn_nythraxis_gravebreaker: {
@@ -352,7 +348,7 @@ export const table: DeedLocaleTable = {
   },
   dlv_varric_ringers: {
     name: 'Lonceng-Lonceng Terdiam',
-    desc: 'Kalahkan Diaken Varric dengan setiap Pembunyi Lonceng Pemakaman yang ia bangkitkan telah tewas lebih dulu.',
+    desc: 'Kalahkan Diaken Vandric dengan setiap Pembunyi Lonceng Pemakaman yang ia bangkitkan telah tewas lebih dulu.',
   },
   dlv_nhalia_bells: {
     name: 'Peredam Lonceng',
@@ -431,7 +427,7 @@ export const table: DeedLocaleTable = {
   },
   chr_peaks_chapter_iii: {
     name: 'Kronik Thornpeak',
-    desc: 'Tuntaskan seluruh kisah gunung: Wyrmcult dihancurkan, Sanktum dibungkam, sang Puncak yang Terjaga dirobohkan, dan setiap teror bernama di tebing-tebing ditumbangkan.',
+    desc: 'Tuntaskan seluruh kisah gunung: Broodsworn dihancurkan, Sanktum dibungkam, sang Puncak yang Terjaga dirobohkan, dan setiap teror bernama di tebing-tebing ditumbangkan.',
     title: 'dari Thornpeak',
   },
   chr_peaks_sparring: {

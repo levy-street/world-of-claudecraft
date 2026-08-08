@@ -531,7 +531,7 @@ describe('auto_attack Vanish (issue #2426): a target that escapes stealth mid-fi
   function vanishAura(sourceId: number): Aura {
     return {
       id: 'vanish',
-      name: 'Smokestep',
+      name: 'Smokefade',
       kind: 'stealth',
       remaining: 10,
       duration: 10,

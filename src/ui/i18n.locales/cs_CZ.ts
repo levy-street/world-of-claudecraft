@@ -841,8 +841,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.items.tidewrought_fishing_rod.name': 'Prut kovaný přílivem',
   'entities.items.gatherers_cache.name': 'Sběračova skrýš',
   'entities.items.artisans_eye.name': 'Řemeslníkovo oko',
-  'entities.items.reins_terrorspark_groundshaker.name':
-    'Klíček zapalování: Hrůzojiskra, otřásač země',
   'hud.options.graphicsPresetInsane': 'Extrémní',
   'hud.options.surfaceDetail': 'Detail povrchů',
   'hud.options.surfaceDetailBasic': 'Základní',
@@ -880,7 +878,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraOverlay.procs.overpowerCharge': 'Posílení Rudé ruky',
   'hudChrome.auraOverlay.procs.revenge': 'Odveta!',
   'hudChrome.auraOverlay.procs.suddenDeath': 'Náhlá smrt',
-  'hudChrome.auraOverlay.procs.victoryRush': 'Vítězný nápor',
   'hudChrome.auraOverlay.reposition': 'Nastavit pozice',
   'hudChrome.auraOverlay.reset': 'Resetovat pozici',
   'hudChrome.auraOverlay.screenPosition': 'Pozice na obrazovce',
@@ -899,7 +896,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.epic.unlink': 'Zrušit propojení s Epic',
   'hudChrome.mounts.desc_terrorspark_groundshaker':
     'Kompaktní obrněný stroj s těžkými pásy, velkorážním kanónem a sedlem pro nebojácné piloty.',
-  'hudChrome.mounts.name_terrorspark_groundshaker': 'Hrůzojiskra, otřásač země',
   'hudChrome.targetAuras.all': 'Vše',
   'hudChrome.targetAuras.buffs': 'Buffy',
   'hudChrome.targetAuras.configureRows': 'Nastavit aury cíle',
@@ -1221,8 +1217,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.arcane_surge.description':
     'Prožene nepřítelem příval surového éteru a způsobí mu {damage} poškození. Každé seslání zanechá Éterický náboj, který zvyšuje poškození a rychlost sesílání tvého příštího Přívalu éteru (o 5 % za každý) a ostře zdražuje jeho manový náklad, ukládá se až do 4; Éterické šipky náboje spotřebují. Každé seslání může také aktivovat Éterický spěch, takže tvůj příští Příval éteru nebude nic stát a budeš jej sesílat dvakrát rychleji.',
   'entities.abilities.arcane_surge.name': 'Příval éteru',
-  'entities.abilities.blizzard.description':
-    'Přivolá ledovou bouři na cílovou plochu po dobu 6 s, působí {damage} mrazivého poškození každou sekundu a zpomaluje nepřátele o 40 %. Každý zasažený nepřítel zkrátí cooldown Zmrzlé sféry o 0,5 s, nejvýše o 3 s za seslání. (Mráz)',
   'entities.abilities.blizzard.name': 'Vánice',
   'entities.abilities.brain_freeze.name': 'Zmrazení mozku',
   'entities.abilities.dragons_breath.description':
@@ -1235,13 +1229,11 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Přeměníš se v planoucí žar a zvýšíš rychlost pohybu o {buff} %. V přeměněné podobě nemůžeš útočit ani sesílat kouzla. Seslej znovu pro návrat do normální podoby.',
   'entities.abilities.fireball_form.name': 'Žárová podoba',
   'entities.abilities.flurry.name': 'Zimní bič',
-  'entities.abilities.frozen_orb.name': 'Zmrzlá sféra',
   'entities.abilities.glacial_front.description':
     'Podrž pro nabití rozšiřující se mrazivé fronty, pak ji pusť v kuželi. Delší nabití zasáhne dál a způsobí více poškození. Všichni zasažení nepřátelé jsou zpomaleni o 50 % na 4 s; maximální nabití je také ukotvuje na 1 s. (Mráz)',
   'entities.abilities.glacial_front.name': 'Ledová fronta',
   'entities.abilities.glacial_spike.description':
     'Přivoláš mohutný ledový hrot, spotřebuješ 5 Rampouchů a způsobíš {damage} mrazivého poškození a zmrazíš cíl na místě na 4 s. (Mráz)',
-  'entities.abilities.glacial_spike.name': 'Ledový hrot',
   'entities.abilities.ice_lance.description':
     'Vrhneš střep ledu, způsobíš {damage} mrazivého poškození, trojnásobný proti zmrazenému cíli. Spotřebuje Zmrzlé prsty nebo nabití Zimního chladu, aby byl cíl považován za zmrazený. (Mráz)',
   'entities.abilities.ice_lance.name': 'Ledové kopí',
@@ -1692,7 +1684,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.furious_mending.name': 'Zuřivé zacelení',
   'entities.abilities.heroic_leap.description':
     'Skočíš do cílové oblasti a při dopadu způsobíš okolním nepřátelům {damage} poškození.',
-  'entities.abilities.heroic_leap.name': 'Válečný skok',
   'entities.abilities.intimidating_shout.description':
     'Děsivý pokřik, který až 5 nepřátel do 8 yardů zažene na 8 s na útěk hrůzou. Poškození může efekt přerušit.',
   'entities.abilities.intimidating_shout.name': 'Zastrašující pokřik',
@@ -1731,7 +1722,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.seasoned_soldier.name': 'Ostřílený voják',
   'entities.abilities.storm_bolt.description':
     'Mrštíš zbraní po cíli za {damage} poškození a omráčíš ho na 3 s.',
-  'entities.abilities.storm_bolt.name': 'Bouřná střela',
   'entities.abilities.sudden_death.description':
     'Tvoje automatické útoky mají šanci ti dovolit seslat Předčasný hrob na cíl s libovolným zdravím, a to zcela bez ceny vzteku. (Arms)',
   'entities.abilities.sudden_death.name': 'Náhlá smrt',
@@ -1740,7 +1730,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sweeping_strikes.name': 'Široký oblouk',
   'entities.abilities.victory_rush.description':
     'Udeříš za poškození zbraně plus {damage} a vyléčíš se za 20 % svého maximálního zdraví. Použitelné jen do 20 s od zabití nepřítele.',
-  'entities.abilities.victory_rush.name': 'Vítězný nápor',
   'hudChrome.specPanel.complexity': 'Složitost',
   'hudChrome.specPanel.complexityHigh': 'Vysoká',
   'hudChrome.specPanel.complexityLow': 'Nízká',
@@ -1754,9 +1743,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.talentRows.tab': 'Volby',
   'hudChrome.talentRows.readoutSummary': 'Talenty: {head}, vybráno {spent}/{total} řad.',
   'entities.abilities.aspect_of_the_wild.name': 'Maska divokého tesáku',
-  'entities.abilities.avenging_wrath.name': 'Křídlo odplaty',
   'entities.abilities.berserk.name': 'Rudý opar',
-  'entities.abilities.blink.name': 'Mihokrok',
   'entities.abilities.bloodlust.name': 'Válečné bubny',
   'entities.abilities.chain_lightning.name': 'Rozvětvený blesk',
   'entities.abilities.chaos_bolt.name': 'Zkázný šíp',
@@ -1796,7 +1783,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.smoke_screen.name': 'Kouřová clona',
   'entities.abilities.smoke_screen.description':
     'Zmizíte v oblaku kouře a na 8 s zvýšíte svou šanci na úhyb o 30 %.',
-  'entities.abilities.spellsteal.name': 'Krádež kouzla',
   'entities.abilities.spellsteal.description':
     'Ukradne nepříteli prospěšný magický účinek a přenese jej na vás.',
   'entities.abilities.startle_shot.name': 'Lekavý výstřel',
@@ -2056,7 +2042,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.items.cragprowl_belt.name': 'Opasek skalního plížence',
   'entities.items.cragthorn_greatstaff.name': 'Velká hůl skalního trnu',
   'entities.items.cragward_pauldrons.name': 'Skalní nárameníky strážce',
-  'entities.items.cryptbloom_shoulderguards.name': 'Kryptkvětové chrániče ramen',
   'entities.items.cryptplate_helm.name': 'Kryptoplátová helma',
   'entities.items.deathless_greatblade.name': 'Nesmrtelná velká čepel',
   'entities.items.deathless_warguard_legmail.name': 'Nesmrtelné nohavice válečné stráže',
@@ -2079,7 +2064,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.items.medallion_of_endless_profit.name': 'Medailon nekonečného zisku',
   'entities.items.mirebloom_treads.name': 'Boty blatního květu',
   'entities.items.mistcallers_fang.name': 'Tesák poutače mlhy',
-  'entities.items.mistforged_pauldrons.name': 'Mlhou kované nárameníky',
   'entities.items.moonbark_vestments.name': 'Roucho z měsíční kůry',
   'entities.items.mosshide_vest.name': 'Vesta z mechaté kůže',
   'entities.items.morthens_cryptforged_hauberk.name': 'Morthenův kryptově kovaný hauberk',
@@ -2136,7 +2120,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.items.greatfang_of_the_basin.name': 'Velký tesák Kotliny',
   'entities.items.sunbone_oracles_crown.name': 'Slunečněkostní koruna orákula',
   'entities.items.bloodmane_war_legguards.name': 'Krvavohřívé válečné chrániče nohou',
-  'entities.items.wyrmcult_spellgrips.name': 'Kouzelné rukavice kultu dračích',
   'entities.items.yumis_keepsake_locket.name': 'Yumin památeční medailonek',
   'entities.items.zense_meridian.name': 'Zenseho meridián',
   'entities.items.zyzzs_deathless_signet.name': 'Zyzzův nesmrtelný pečetní prsten',
@@ -3508,24 +3491,24 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'delveUi.board.tier.heroic': 'Hrdinská',
   'delveUi.board.tier.normal': 'Normální',
   'delveUi.board.title': 'Tabule výprav',
-  'delveUi.boss.varric.bell.emote': 'Diákon Varric svírá pohřební zvon oběma rukama!',
+  'delveUi.boss.varric.bell.emote': 'Diákon Vandric svírá pohřební zvon oběma rukama!',
   'delveUi.boss.varric.bell.impact': 'Úder zvonu praská podlahu komnaty!',
   'delveUi.boss.varric.bell.lesson':
     'Úder zvonu: náraz do země každých dvanáct sekund. Ustup, než dopadne.',
-  'delveUi.boss.varric.bell.log': 'Diákon Varric začíná rozeznít pohřební zvon.',
-  'delveUi.boss.varric.bell.warning': 'Ustup od diákona Varrica!',
+  'delveUi.boss.varric.bell.log': 'Diákon Vandric začíná rozeznít pohřební zvon.',
+  'delveUi.boss.varric.bell.warning': 'Ustup od diákona Vandrica!',
   'delveUi.boss.varric.defeat': 'Ne... měl jsem jména... měl jsem je všechna...',
   'delveUi.boss.varric.intro': 'Žádná duše není ztracená. Jen špatně uložená.',
   'delveUi.boss.varric.mid30': 'Pohřební zvon odpovídá na každé jméno, které vysloví.',
-  'delveUi.boss.varric.mid60': 'Diákon Varric čte jména z knihy s třesoucím se triumfem.',
+  'delveUi.boss.varric.mid60': 'Diákon Vandric čte jména z knihy s třesoucím se triumfem.',
   'delveUi.boss.varric.pull':
     'Šlapeš po posvátném prachu s nečistým úmyslem. Poklekni a nech se sečíst.',
-  'delveUi.boss.varric.raise.emote': 'Diákon Varric vyvolává jména z rozbitých hrobů!',
-  'delveUi.boss.varric.raise.interrupt_fail': 'Mrtví odpovídají na volání diákona Varrica!',
+  'delveUi.boss.varric.raise.emote': 'Diákon Vandric vyvolává jména z rozbitých hrobů!',
+  'delveUi.boss.varric.raise.interrupt_fail': 'Mrtví odpovídají na volání diákona Vandrica!',
   'delveUi.boss.varric.raise.interrupt_ok': 'Hrobový rituál kolísá.',
   'delveUi.boss.varric.raise.lesson':
     'Přeruš prasklý hrob do pěti sekund, nebo mrtví povstanou na jeho volání.',
-  'delveUi.boss.varric.raise.log': 'Diákon Varric začíná sesílat Vzkříšení mrtvých.',
+  'delveUi.boss.varric.raise.log': 'Diákon Vandric začíná sesílat Vzkříšení mrtvých.',
   'delveUi.boss.varric.raise.object': 'Prasklý hrob se chvěje ukradeným dechem.',
   'delveUi.boss.varric.raise.warning': 'Zastav hrobový rituál!',
   'delveUi.chest.flavor': 'Mrtví odevzdali, co mohli postrádat.',
@@ -6067,9 +6050,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.summon_succubus.description':
     'Vyvolá Zrozence soumraku pod velením černokněžníka. Zrozenec soumraku je křehký démon, který rychle útočí a tvrdě zasahuje na blízko. Vyvolání nového démona propustí toho současného. Můžeš mít vždy jen jednoho démona.',
   'entities.abilities.summon_succubus.name': 'Vyvolat Zrozence soumraku',
-  'entities.abilities.summon_voidwalker.description':
-    'Vyvolá Stín šera pod velením černokněžníka. Stín šera je houževnatý démon, který provokuje nepřátele a vstřebává trest. Vyvolání nového démona propustí toho současného. Můžeš mít vždy jen jednoho démona.',
-  'entities.abilities.summon_voidwalker.name': 'Vyvolat Stín šera',
   'entities.abilities.sunder_armor.description':
     'Rozpoltí zbroj cíle a sníží ji o {damage} za každou aplikaci. Stakuje se až 5 krát. Vytváří velké množství hrozby.',
   'entities.abilities.sunder_armor.name': 'Seřezání zbroje',
@@ -6096,7 +6076,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.travel_form.name': 'Svižná podoba',
   'entities.abilities.vanish.description':
     'Zmizíš z dohledu a vstoupíš do Závoje šera i v boji. Když jsi skrytý, pohybuješ se o 50 % pomaleji. Trvá až 10 s.',
-  'entities.abilities.vanish.name': 'Kouřový krok',
   'entities.abilities.volley.description':
     'Sesype šípy na cílovou oblast po dobu 3 s a způsobí {damage} poškození každých 0,5 s nepřátelům uvnitř.',
   'entities.abilities.volley.name': 'Salva',
@@ -6472,7 +6451,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.items.valespun_robe.name': 'Údolně předené roucho',
   'entities.items.vanguard_azure_armor_plate.name': 'Předvojová azurová',
   'entities.items.vanguard_chrome_armor_plate.name': 'Předvojová chromová',
-  'entities.items.varric_shadow_cowl.name': 'Varricova stínová kápě',
+  'entities.items.varric_shadow_cowl.name': 'Vandricova stínová kápě',
   'entities.items.verlans_oathblade.name': 'Verlanova čepel přísahy',
   'entities.items.voss_sanctified_mace.name': 'Vossův posvěcený palcát',
   'entities.items.wanderers_chestguard.name': 'Chránič hrudi poutníka',
@@ -6513,7 +6492,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.counter_shot.name': 'Umlčující výstřel',
   'entities.abilities.counter_shot.description':
     'Rychlý výstřel, který přeruší sesílání kouzla cíle a na 4 s mu znemožní kouzla stejné školy.',
-  'entities.abilities.counterspell.name': 'Zlomení kouzla',
   'entities.abilities.counterspell.description':
     'Přeruší sesílání kouzla cíle a na 6 s mu znemožní kouzla stejné školy.',
   'entities.abilities.curse_of_exhaustion.description':
@@ -6565,8 +6543,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Vystřelí salvu na cílovou oblast a způsobí nepřátelům v okruhu 8 m {damage} bodů fyzického poškození. (lovecký talent)',
   'entities.abilities.prayer_of_healing.description':
     'Vyléčí blízké spojence o {damage}. (kněžský talent)',
-  'entities.abilities.preparation.description':
-    'Dokončí přebíjení Sprintu, Úhybu a Zmizení. (lotrovský talent)',
   'entities.abilities.presence_of_mind.description':
     'Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 s. (mágovský talent)',
   'entities.abilities.psychic_scream.description':
@@ -6590,9 +6566,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Po dobu 4 s usměrňuje léčivou energii a každou sekundu vyléčí spojence do 30 m o 42 až 52. (druidský talent)',
   'entities.items.worn_sword.name': 'Zubatý krátký meč',
   'entities.items.woven_robe.name': 'Údolně tkané roucho',
-  'entities.items.wyrmcult_grand_robe.name': 'Velké roucho kultu draka',
-  'entities.items.wyrmcult_orders.name': 'Rozkazy kultu draka',
-  'entities.items.wyrmcult_soulsteps.name': 'Dušokroky kultu draka',
   'entities.items.wyrmfang_greatblade.name': 'Velká čepel dračího tesáku',
   'entities.items.wyrmscale_jerkin.name': 'Kazajka z dračích šupin',
   'entities.items.wyrmshadow_harness.name': 'Postroj nočního tesáku',
@@ -6666,7 +6639,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.zones.thornpeak_heights.pois.4.label': 'Drogmarův válečný tábor',
   'entities.zones.thornpeak_heights.pois.5.label': 'Bouřný skalní štít',
   'entities.zones.thornpeak_heights.pois.6.label': 'Třpytivé pleso',
-  'entities.zones.thornpeak_heights.pois.7.label': 'Stany kultu draka',
   'entities.zones.thornpeak_heights.pois.8.label': 'Pole revenantů',
   'entities.zones.thornpeak_heights.pois.9.label': 'Svatyně Hrobodraka',
   'entities.zones.thornpeak_heights.welcome':
@@ -6735,7 +6707,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.zones.nightbloom.name': 'Noční květ',
   'entities.zones.nightbloom.pois.0.label': 'Měsíční klid',
   'entities.zones.nightbloom.pois.1.label': 'Noční brána',
-  'entities.zones.nightbloom.pois.2.label': 'Měsíční studna',
   'entities.zones.nightbloom.pois.3.label': 'Soumrakové pole',
   'entities.zones.nightbloom.pois.4.label': 'Stálá hlídka',
   'entities.zones.nightbloom.pois.5.label': 'Bezesná mohyla',
@@ -6752,7 +6723,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.zones.palmreach.welcome':
     'Teplý písek, hlučné ptactvo a džungle, která pohlcuje obzor. Naplavený přístav ti na pláži drží zapálený oheň.',
   'entities.zones.veiled_hollow.name': 'Zahalená kotlina',
-  'entities.zones.veiled_hollow.pois.0.label': 'Prastarý svit',
   'entities.zones.veiled_hollow.pois.1.label': 'Jeskyně Soumračného pádu',
   'entities.zones.veiled_hollow.pois.2.label': 'Vyhlídka Soumračného pádu',
   'entities.zones.veiled_hollow.pois.3.label': 'Prastarý háj',
@@ -6760,8 +6730,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.zones.veiled_hollow.pois.5.label': 'Potopené nádvoří',
   'entities.zones.veiled_hollow.pois.6.label': 'Křišťálové mělčiny',
   'entities.zones.veiled_hollow.pois.7.label': 'Zářící hlubina',
-  'entities.zones.veiled_hollow.welcome':
-    'Vzduch hučí prastarou magií. Vyhledej Strážce Saelwyna pod velkým stromem Prastarého svitu.',
   'entities.zones.willowfen.name': 'Vrbová bažina',
   'entities.zones.willowfen.pois.0.label': 'Mostojezero',
   'entities.zones.willowfen.pois.1.label': 'Schody Jantarové bažiny',
@@ -6772,14 +6740,11 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.zones.willowfen.welcome':
     'Bažina hučí vážkami a včelami. Přejdi most do Mostojezera a chvíli si odpočiň.',
   'entities.zones.wraithwood.name': 'Přízračný les',
-  'entities.zones.wraithwood.pois.0.label': 'Šibeniční jezero',
   'entities.zones.wraithwood.pois.1.label': 'Vraní brána',
   'entities.zones.wraithwood.pois.2.label': 'Vdovin houština',
   'entities.zones.wraithwood.pois.3.label': 'Visící mýtina',
   'entities.zones.wraithwood.pois.4.label': 'Kaple Truchlokamene',
   'entities.zones.wraithwood.pois.5.label': 'Lovcova mýtina',
-  'entities.zones.wraithwood.welcome':
-    'Koruny stromů se zavírají nad cestou jako víko. Drž se lucern Šibeničního jezera a neodpovídej, pokud les zavolá tvé jméno.',
   'entities.dungeons.drowned_temple.enterText':
     'Projdeš měsíční bránou: vzduch se mění ve studenou vodu a bledé světlo a zpěv se nad tebou zavírá.',
   'entities.dungeons.drowned_temple.leaveText': 'Vynoříš se měsíční bránou do horské noci.',
@@ -6951,7 +6916,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.choirmother_selthe.name': 'Matka sboru Selthe',
   'entities.mobs.corrupted_priest_malric.name': 'Zkažený kněz Malric',
   'entities.mobs.crypt_shambler.name': 'Belhavec z krypty',
-  'entities.mobs.deacon_varric.name': 'Diákon Varric',
+  'entities.mobs.deacon_varric.name': 'Diákon Vandric',
   'entities.mobs.deacon_voss.name': 'Diákon Voss',
   'entities.mobs.deathstalker_voss.name': 'Smrtostopař Voss',
   'entities.mobs.deepfen_murloc.name': 'Chňapal z Deepfenu',
@@ -6970,7 +6935,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.forest_wolf.name': 'Lesní vlk',
   'entities.mobs.glimmermere_wader.name': 'Brodivec z Třpytivého plesa',
   'entities.mobs.glimmerscale_lurker.name': 'Třpytivošupinný číhač',
-  'entities.mobs.gloomshade.name': 'Šerostín',
   'entities.mobs.gorrak.name': 'Gorrak Nemilosrdný',
   'entities.mobs.grand_necromancer_velkhar.name': 'Velký nekromant Velkhar',
   'entities.mobs.grave_silt_bulwark.name': 'Hradba z hrobového bahna',
@@ -7052,8 +7016,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.wild_boar.name': 'Divoký kanec',
   'entities.mobs.wraithbinder_maldrec.name': 'Maldrec, poutač přízraků',
   'entities.mobs.wraithborn.name': 'Zrozený z přízraku',
-  'entities.mobs.wyrmcult_necromancer.name': 'Nekromant kultu draka',
-  'entities.mobs.wyrmcult_zealot.name': 'Fanatik kultu draka',
   'entities.mobs.ysolei.name': 'Ysolei, avatar utopeného měsíce',
   'entities.quests.q_aldrics_fallen_star.completion':
     'Tohle není žádná zbraň, kterou znám. Podívej, jak se ty pláty skládají. Možná je to vzácný kus zbroje, pokud se to vůbec dá nosit. Vezmi si to a zkus to obléct, {playerName}, ale opatrně.',
@@ -7136,8 +7098,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_drogmar.completion':
     'Drogmar, mrtvý ve vlastním táboře. Klany se rozprchnou do vysokých průsmyků, koupil jsi mé zdi zimu, {playerName}.',
   'entities.quests.q_drogmar.objectives.0.label': 'Válečný vůdce Drogmar zabit',
-  'entities.quests.q_drogmar.text':
-    'Válečný vůdce Drogmar vzal mince kultu draka a přísahal klany probuzení hory. Je to kladivo, kterým chtějí udeřit do mé zdi, a až udeří do země, {playerName}, nestůj u něj. Vezmi své společníky do válečného tábora a ukonči ho, za Highwatch.',
   'entities.quests.q_drogmar.title': 'Válečný vůdce Drogmar',
   'entities.quests.q_drowned.completion':
     'Každý, koho skolíš, je ukradená duše osvobozená. Ale ten, kdo je utopil, pořád lije vodu.',
@@ -7502,7 +7462,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_voice_below.completion':
     'Klečení ustalo. Neumlčeli jsme ten hlas, {playerName}, jen jsme prořídili jeho sbor. Musí to stačit.',
   'entities.quests.q_voice_below.objectives.0.label': 'Fanatik kultu draka zabit',
-  'entities.quests.q_voice_below.objectives.1.label': 'Nekromant kultu draka zabit',
   'entities.quests.q_voice_below.text':
     'Včera v noci si celý tábor kultu najednou klekl, {playerName}, každý fanatik, každý nekromant, všichni čelem ke svatyni. Korzul k nim teď mluví ve spánku; Vael slyšel stejný hlas v močálu a Morthen před ním. Skol shromáždění, deset fanatiků, šest nekromantů, dřív než ten hlas bude mít dost rukou, aby sám otevřel bránu.',
   'entities.quests.q_voice_below.title': 'Hlas zdola',
@@ -7532,9 +7491,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_wyrm_sigils.title': 'Pečeti Hrobodraka',
   'entities.quests.q_zealots.completion':
     'Vítr je tišší. Ale netrápí mě zpěv, {playerName}, nýbrž to, že něco může zpívat zpátky.',
-  'entities.quests.q_zealots.objectives.0.label': 'Fanatik kultu draka zabit',
-  'entities.quests.q_zealots.text':
-    'Když vítr vane z jižních štítů, {playerName}, nese zpěv. Kult draka se už neskrývá, vztyčil stany pod svatyní a zpívá tomu, co pod ní spí. Umlč dvanáct fanatiků. Každý utišený hlas kupuje hoře další noc spánku.',
   'entities.quests.q_zealots.title': 'Zpěvy ve větru',
   'guide.brand': 'World of ClaudeCraft',
   'guide.brandShort': 'ClaudeCraft',
@@ -8155,8 +8111,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Eastbrook je tvoje první domovská základna. Vlčí stezka a Kančí louka jsou mírná loviště; Zrcadlové jezero je pěkná voda pro rybaření, ač se v jeho mělčinách hemží bahnoploutví; Černopavučina a Měděná štola skrývají pavouky a rudychtivé kopáče; Tábor banditů a Padlá kaple drží drsnější práci; Vrch relikviáře klesá do Zhrouceného relikviáře, první výpravy světa; Mýtina Brightwoodu je tichý, sluncem zalitý háj na severu; a Prasečí pole je hrazené kančbalové hřiště Eastbrooku, kde se pod žňovým příměřím hraje o Pohár údolí.',
   'guide.worldPage.marshPlaceNotes':
     'Fenbridge hlídá jedinou suchou cestu. Rákosiny slídilů a Mělčiny Deepfenu se hemží močálovými šelmami a bahenními ploutvemi; Vdoví houština je hustě opředená pavučinami; Utopená kaple a Trollí mohyly drží starší nebezpečí a hned severně od mohyl se otevírá Utopená litanie, vlastní výprava močálu; Tábor Hrobovolajících je zakopaný kult a Potopená bašta je instancované srdce močálu.',
-  'guide.worldPage.peaksPlaceNotes':
-    'Highwatch drží zeď. Hřeben slídilů a Hlubokamenné nory patří hřebenovým kočkám a norníkům; Zlobří podhůří a Drogmarův válečný tábor surovcům za žold; Bouřný skalní štít praská elementály a pod ním září Třpytivé pleso, tůň, jejíž břeh střeží bránu bledého světla dolů do Utopeného chrámu; Stany kultu draka a Pole revenantů obkružují vyvýšeninu kultu, se Svatyní Hrobodraka na vrcholu.',
   'guide.worldPage.gladeTitle': 'Tichý kout: Mýtina Brightwoodu',
   'guide.worldPage.gladeBody':
     'Ne každý příběh v údolí je o mrtvých. Na severu si sluncem zalitý háj zvaný Mýtina Brightwoodu drží vlastní jemnější rytmus, samé tiché stezky a skvrnité světlo pod větvemi. Je to měkký protipól cesty, po které jdeš, a stojí za vidění, když ti cesta dá prostor se toulat.',
@@ -8703,7 +8657,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'yumi.queue.leave': 'Opouštíš frontu Ochraňte Yumi.',
   'yumi.queue.teamLeave': 'Tvůj tým opouští frontu Ochraňte Yumi.',
   'yumi.respawn.title': 'K ZEMI!',
-  'entities.abilities.crusader_strike.name': 'Křižácký úder',
   'entities.abilities.crusader_strike.description':
     'Zasáhne cíl za poškození zbraně plus {damage} svatého poškození. (talent paladina)',
   'entities.abilities.metamorphosis.name': 'Děsivý zjev',
@@ -8712,7 +8665,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.aura_surge.name': 'Úsvitový odraz',
   'entities.abilities.aura_surge.description':
     'Vrhne úsvitem kovaný štít za {damage} bodů Svatého poškození, umlčí hlavní cíl na 2 sek. a poté se odrazí až ke 2 dalším nepřátelům do 10 yardů; každý odraz způsobí 75% poškození. (Paladinský talent)',
-  'entities.abilities.holy_shock.name': 'Svatý otřes',
   'entities.abilities.holy_shock.description':
     'Zasáhne spojenecký cíl svatou energií a vyléčí ho, nebo způsobí nepříteli {damage} svatého poškození. (klíčová schopnost Svaté magie)',
   'entities.abilities.holy_shield.name': 'Posvěcená hradba',
@@ -8724,7 +8676,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.trueshot_aura.name': 'Aura jistého letu',
   'entities.abilities.trueshot_aura.description':
     'Povzbudí blízké spojence a zvýší jejich sílu útoku o 10 % na 30 min. (klíčová schopnost Střelby)',
-  'entities.abilities.wyvern_sting.name': 'Žihadlo wyverny',
   'entities.abilities.wyvern_sting.description':
     'Bodne nepřítele na dálku a vyřadí ho až na 4 s. Jakékoli poškození efekt přeruší. (klíčová schopnost Přežití)',
   'entities.abilities.arcane_power.name': 'Příval éteru',
@@ -8733,7 +8684,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.combustion.name': 'Fénixův trans',
   'entities.abilities.combustion.description':
     'Zvýší šanci na kritický zásah kouzlem o 50 % na 15 s. (klíčová schopnost Ohně)',
-  'entities.abilities.icy_veins.name': 'Ledové žíly',
   'entities.abilities.icy_veins.description':
     'Zvýší rychlost sesílání o 30 % a na 10 s zabrání přerušení i zpomalení sesílání. (klíčová schopnost Mrazu)',
   'entities.abilities.cold_blood.name': 'Klid zabijáka',
@@ -8748,7 +8698,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.power_infusion.name': 'Pomazání',
   'entities.abilities.power_infusion.description':
     'Naplní spojenecký cíl mocí a zvýší jeho rychlost sesílání o 20 % na 15 s. (klíčová schopnost Kázně)',
-  'entities.abilities.holy_nova.name': 'Svatá nova',
   'entities.abilities.holy_nova.description':
     'Vyvolá výbuch svaté záře, který vyléčí blízké spojence za {damage} a poškodí blízké nepřátele. (klíčová schopnost Svaté magie)',
   'entities.abilities.shadowform.name': 'Podoba šerého závoje',
@@ -8769,7 +8718,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.feral_charge.name': 'Prvotní nápor',
   'entities.abilities.feral_charge.description':
     'Uvolní prvotní nápor. Ve vlčí podobě zvýší obnovu energie o 100 % na 10 s. V medvědí podobě okamžitě vygeneruje 50 vzteku. (klíčová schopnost Divokosti)',
-  'entities.abilities.swiftmend.name': 'Rychlé zhojení',
   'entities.abilities.swiftmend.description':
     'Spotřebuje průběžné léčení na spojeneckém cíli a vyléčí ho za {damage}. (klíčová schopnost Obnovy)',
   'entities.abilities.chain_heal.name': 'Řetězové léčení',
@@ -8891,7 +8839,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_af_orchard_call.title': 'Vozík pro sad',
   'entities.quests.q_af_sprites_and_spigots.completion':
     'Čtyři vědra zpátky na hácích a řady zase ztichly. Máš na víly tvrdší ruku než já, {playerName}, a dnes jsem tomu rád.',
-  'entities.quests.q_af_sprites_and_spigots.objectives.0.label': 'Sklizňová víla zahnána',
   'entities.quests.q_af_sprites_and_spigots.objectives.1.label': 'Vědro na sběr mízy nalezeno',
   'entities.quests.q_af_sprites_and_spigots.text':
     'Sklizňové víly, {playerName}. Vytrhávají mé mízové kohouty z kmenů kvůli sladkosti uvnitř a odhazují vědra do trávy. Zažeň osm těch malých zlodějek a přines zpátky čtyři má vědra, a vozíky se zase rozjedou.',
@@ -9083,12 +9030,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_fv_ember_caches.text':
     'Sáně se skrýšemi žhavých uhlíků se minulou noc převrhly na cestě k jezírku: železné kotle, které udrží zahrabaný oheň živý po měsíc. Tři z nich stále leží ve sněhu, {playerName}, a chata nemůže postrádat, co obsahují. Přines oheň domů.',
   'entities.quests.q_fv_ember_caches.title': 'Uhlíky na cestě k jezírku',
-  'entities.quests.q_fv_frostmane_tyrant.completion':
-    'Když se včera v noci utišil vítr, celá vesnice slyšela ticho tam, kde bývala Mrazivá hříva. Kraj ti dluží dluh, který mu bude trvat roky splatit, {playerName}. Nos tohle, a každé dveře v Ledovém plášti jsou ti otevřené.',
-  'entities.quests.q_fv_frostmane_tyrant.objectives.0.label': 'Mrazivá hříva poražena',
-  'entities.quests.q_fv_frostmane_tyrant.text':
-    'Vytci nelovili, když sešli dolů po terasách. Prchali. Yeti si nárokoval vysočinu, horský lid ho nazývá Mrazivá hříva, a ani smečky s ním nechtějí sdílet svah. Musí to skončit, {playerName}, než ho zima zažene dolů k mým hradbám. Vezmi si přítele. Vezmi si dva.',
-  'entities.quests.q_fv_frostmane_tyrant.title': 'Tyran Mrazivé hřívy',
   'entities.quests.q_fv_howl_above.completion':
     'Osm, a soumrakový chór je díky tomu tišší. Ale vytci neopouštějí vrcholky bezdůvodně. Něco tam nahoře je pohnulo, a obávám se, že to má jméno.',
   'entities.quests.q_fv_howl_above.objectives.0.label': 'Terasový vytec zabit',
@@ -9223,8 +9164,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_hollow_old_marrowshell.completion':
     'Mělčiny jsou zase jen voda. Viděla jsem ten krunýř zlomit lepší lovce, než jsem já, {playerName}. Ne tebe.',
   'entities.quests.q_hollow_old_marrowshell.objectives.0.label': 'Starý Morkoškeble zabit',
-  'entities.quests.q_hollow_old_marrowshell.text':
-    'To první jméno je Starý Morkoškeble, krab velikosti vozu, který loví ve východních mělčinách od doby, kdy Prastarý svit ještě neměl bránu. Toulá se, {playerName}, takže budeš muset projít pobřežní linii, dokud nenarazíš na jeho stopu. Nechoď sám a nedůvěřuj jeho nehybnosti.',
   'entities.quests.q_hollow_old_marrowshell.title': 'Starý krunýř mělčin',
   'entities.quests.q_hollow_the_huntsman.completion':
     'Fenna tě poslala? Dobře. Pak ti věří, a já mám dvě jména, která potřebuji škrtnout.',
@@ -9243,15 +9182,11 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_nb_charts_of_the_stones.completion':
     'Nezbývá žádná pochybnost. Každé zaměření se plíživě posunulo k Bezesné mohyle, jako by se samotná obloha nakláněla nad tu mohylu, aby ji sledovala. Staří králové byli pohřbeni pod srovnanými hvězdami z nějakého důvodu, {playerName}.',
   'entities.quests.q_nb_charts_of_the_stones.objectives.0.label': 'Hvězdná mapa přečtena',
-  'entities.quests.q_nb_charts_of_the_stones.text':
-    'Kameny Hlídky jsou starší než Měsíční klid, starší než Noční rod, který se o ně stará, a jejich plochy jsou vytesány hvězdnými mapami, které jsem se celý život učil číst. Obloha se posunula, {playerName}, a já musím vědět, o kolik. Přečti mapy na třech z kamenů a přines mi jejich zaměření.',
   'entities.quests.q_nb_charts_of_the_stones.title': 'Mapy v kamenech',
   'entities.quests.q_nb_eyes_on_the_vigil.completion':
     'Lira tě poslala? Pak to cítí i zahrady. Posaď se na chvíli u dalekohledu, {playerName}. Hvězdy jsou neklidné už měsíc, a každá mapa, kterou nakreslím, se naklání na sever směrem k mohyle.',
   'entities.quests.q_nb_eyes_on_the_vigil.objectives.0.label':
     'Najít Astronoma Cassiana u Stálé hlídky',
-  'entities.quests.q_nb_eyes_on_the_vigil.text':
-    'Něco dělá chodce odvážnými a stáda neklidnými, {playerName}, a já to nedokážu přečíst v květinách. Cassian to dokáže přečíst na obloze. Drží svůj pozorovací tábor u Stálé hlídky východně odtud, kde se Noční rod vznáší mezi kameny. Najdi ho a zeptej se, co říkají hvězdy.',
   'entities.quests.q_nb_eyes_on_the_vigil.title': 'Oči na Hlídce',
   'entities.quests.q_nb_night_gardens.completion':
     'Stále zářící, každý okvětní lístek. Svatyně bude vonět nocí celý týden, a Měsíční klid díky tomu spí lépe.',
@@ -9278,8 +9213,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_nb_striders_in_the_dark.text':
     'Soumrakoví chodci byli vždy trpěliví lovci, {playerName}, ale v poslední době se plíží přímo do záhonů a berou jehňata měsíčního rouna přímo pod našimi lucernami. Sniž jejich počet o deset a vrať stráním jejich klid.',
   'entities.quests.q_nb_striders_in_the_dark.title': 'Chodci ve tmě',
-  'entities.quests.q_nb_the_barrow_king.completion':
-    'Hvězdy se poprvé po celou sezónu uklidnily, {playerName}. Mohyly jsou uzavřeny, Noční rod znehybněl u svých kamenů, a král znovu spí dole. Nos tento plášť: Měsíční klid ho ušil pro toho, komu noc konečně důvěřovala.',
   'entities.quests.q_nb_the_barrow_king.objectives.0.label': 'Mohylový král uložen k odpočinku',
   'entities.quests.q_nb_the_barrow_king.text':
     'Každé zaměření, každá neklidná hvězda, každá otevřená mohyla ukazuje na jednu věc: Mohylový král se probouzí pod velkou mohylou, a tato říše nemá žádné svítání, které by ho zadrželo. Musí být uložen k odpočinku, než si vzpomene na svou korunu, {playerName}. Nechoď sám: vezmi si přítele a měj květinové světlo v zádech.',
@@ -9330,9 +9263,9 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_pr_the_lost_navigator.title': 'Ztracená navigátorka',
   'entities.quests.q_pr_the_man_who_went_in.completion':
     'Isha tě poslala? Perlová matka nevyslovila mé jméno už roky. Sedni si mimo dosah lián, {playerName}, a řeknu ti, co vím: bubny nejsou nebezpečí. Jsou varováním.',
-  'entities.quests.q_pr_the_man_who_went_in.objectives.0.label': 'Najít Okku u Liánového pádu',
+  'entities.quests.q_pr_the_man_who_went_in.objectives.0.label': 'Najít Okrim u Liánového pádu',
   'entities.quests.q_pr_the_man_who_went_in.text':
-    'Potápěči nechtějí vkročit za linii stromů, {playerName}, a nebudu je o to žádat. Bubny jsi už slyšel: každý je slyší, do druhé noci. Jeden muž na tomto ostrově kdy šel k tomu zvuku a vrátil se. Okku. Táboří pod velkými banyány u Liánového pádu, hluboko nahoru po Spletené cestě. Najdi ho a zeptej se ho, co zeleň skrývá.',
+    'Potápěči nechtějí vkročit za linii stromů, {playerName}, a nebudu je o to žádat. Bubny jsi už slyšel: každý je slyší, do druhé noci. Jeden muž na tomto ostrově kdy šel k tomu zvuku a vrátil se. Okrim. Táboří pod velkými banyány u Liánového pádu, hluboko nahoru po Spletené cestě. Najdi ho a zeptej se ho, co zeleň skrývá.',
   'entities.quests.q_pr_the_man_who_went_in.title': 'Muž, který vešel dovnitř',
   'entities.quests.q_pr_what_the_drums_guard.completion':
     'Mech, perlová skořápka a kančí krev, nabalené prsty. Něco v té ruině stále dodržuje své obřady, {playerName}, a Strážce drží všechno ostatní venku. Je čas, abychom o tom mluvili otevřeně.',
@@ -9457,21 +9390,12 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_wisp_lights.text':
     'Třpytivé bludičky nesou zrnka starého hvězdného světla, které sem spadlo, když byla Kotlina zapečetěna. Šest zrnek, a svatyňové lampy budou hořet celý rok. Ber jen od těch, co blednou; Kotlina dává dost i bez hrabivosti.',
   'entities.quests.q_wisp_lights.title': 'Světla mělčin',
-  'entities.quests.q_ww_bells_of_gallowmere.completion':
-    'Cobb tě poslal po cestě celého, jo? Dobrý muž. Udržuje ty branové lucerny zapálené třicet let, a les se kolem něj nikdy nedostal. Vítej v Šibeničním jezeru, {playerName}. Dávej pozor na zvony.',
   'entities.quests.q_ww_bells_of_gallowmere.objectives.0.label':
     'Ohlásit se Kostelníkovi Marrowovi',
-  'entities.quests.q_ww_bells_of_gallowmere.text':
-    'Slyšíš to zvonění, {playerName}? To je Šibeniční jezero, nahoru po severní cestě, jak ukolébává své mrtvé zvoněním ke spánku. Kostelník Marrow vede počet každé duše pod korunami stromů, živé i pohřbené. Jdi a nech se spočítat, než tě spočítá les sám.',
-  'entities.quests.q_ww_bells_of_gallowmere.title': 'Zvony Šibeničního jezera',
   'entities.quests.q_ww_candles_at_the_bounds.completion':
     'Všechny čtyři hoří? Tak si oddechni, {playerName}. Neslyšel jsi to, ale celá vesnice ano: zvony zazněly lehčeji ve chvíli, kdy chytil poslední knot.',
   'entities.quests.q_ww_candles_at_the_bounds.objectives.0.label': 'Hrobová svíce znovu zapálena',
-  'entities.quests.q_ww_candles_at_the_bounds.text':
-    'Čtyři hraniční kameny obklopují Šibeniční jezero, {playerName}, jeden na každé cestě ven, a hrobová svíce hoří na každém kameni. Dokud hoří, pohřbení zůstávají pohřbeni. Mrholení je utopilo, všechny čtyři, a já jsem příliš stará na to, abych sama obcházela hranice. Vezmi si mou svíčku a znovu je zapal, rychle.',
   'entities.quests.q_ww_candles_at_the_bounds.title': 'Svíce na hranicích',
-  'entities.quests.q_ww_horn_of_the_huntsman.completion':
-    'Roh se zastavil uprostřed tónu. Každý zvon v Šibeničním jezeru zazněl jednou, sám od sebe, a pak les ztichl víc, než jsem ho slyšela za třicet let. Vykonal jsi obřad, který já nedokázala, {playerName}. Nos tohle, a choď pod korunami stromů beze strachu.',
   'entities.quests.q_ww_horn_of_the_huntsman.objectives.0.label': 'Bledý lovec shozen z koně',
   'entities.quests.q_ww_horn_of_the_huntsman.text':
     'Už jsi ten roh slyšel, {playerName}, tenký a vzdálený, zvuk, kvůli kterému celý les zadržuje dech. Bledý lovec projíždí svou mýtinou severně odtud, a každý hrob, kolem kterého projede, se prohlubuje mělčeji. Kdysi byl člověkem, a byl pohřben špatně, a já se přestala přetvařovat, že to spraví modlitba. Vezmi si přítele, vezmi si dva, a shoď ho z koně.',
@@ -9488,10 +9412,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_ww_the_last_vicar.text':
     'Jižně odtud chátrá Kaple Truchlokamene u svého černého jezírka, a jeden muž se o ni stále stará: Vikář Creel, který neodešel, když se zřítila střecha. Zná staré obřady lépe než mé zvony, {playerName}, a měsíc neposlal žádnou zprávu. Projdi kapelní cestu a přesvědč se, že dýchá.',
   'entities.quests.q_ww_the_last_vicar.title': 'Poslední vikář',
-  'entities.quests.q_ww_walking_mosley_home.completion':
-    'Prošel bránou na vlastních nohou, přísahá, že od teď nebude kopat nic hlubšího než záhon tuřínu. Bude zpátky na hřbitově do neděle, vždycky jsou. Děkuji ti, {playerName}. Šibeniční jezero si udržuje své lidi, to je celý náš zákon.',
-  'entities.quests.q_ww_walking_mosley_home.objectives.0.label':
-    'Hrobník Mosley bezpečně doveden zpátky do Šibeničního jezera',
   'entities.quests.q_ww_walking_mosley_home.text':
     'Můj hrobník Mosley se před třemi dny vydal po kapelní cestě otevřít hrob na starém hřbitově, a výkop se na něj zřítil. Vyškrábal se ven, ten blázen žije, ale krčí se u kapelních hrobů a nechce se hnout kvůli tkalcům na cestě. Doveď ho domů, {playerName}. Nemohu zvonit na zvony pro živého muže.',
   'entities.quests.q_ww_walking_mosley_home.title': 'Doprovodit Mosleyho domů',
@@ -9499,8 +9419,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Tři duše zpátky pod poctivou zemí před setměním. Vlekouni znovu vyrostou, kůra to vždycky dělá, ale dnes v noci mýtina visí prázdná, a to stačí.',
   'entities.quests.q_ww_what_the_bark_holds.objectives.0.label': 'Rytokorý vlekoun poražen',
   'entities.quests.q_ww_what_the_bark_holds.objectives.1.label': 'Hedvábím ovinuté ostatky sřezány',
-  'entities.quests.q_ww_what_the_bark_holds.text':
-    'Ve Visící mýtině východně od Šibeničního jezera věší tkalci své hedvábím zabalené mrtvé z větví, a rytokorí vlekouni stojí na stráži pod nimi jako trpěliví nosiči rakví. To jsou naši lidé tam nahoře, {playerName}. Znič pět vlekounů, sřež tři ze zabalených mrtvých, a přines je domů do hlíny.',
   'entities.quests.q_ww_what_the_bark_holds.title': 'Co kůra drží',
   'entities.quests.q_ww_widows_skeins.completion':
     'Šest přaden, měkkých jako zadržený dech. Mrtví v tomto budou ležet lehčeji. Vezmi si tyto omotávky, ušila jsem je z poslední dávky, a les se skrze ně nikdy neprokousal.',
@@ -9851,13 +9769,8 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Každý list zde plane zlatě a rudě, přesto žádný nikdy nespadne. Lucerny jsou pro tebe rozsvíceny; dej pozor na Zlatotání na cestě nahoru.',
   'guide.worldPage.amberPlaceNotes':
     'Lucernojezero zář v srdci sklizně. Zlatotání je jantarem kluzký průsmyk dovnitř; Pozlacený sad a Sklizňová kotlina skrývají nejsladší úlovky a nejodvážnější zloděje; Velké jezero zrcadlí hořící listí; Popelojavorové návrší stojí nejvyšší a nejrudější; a Nakloněný monolit pamatuje něco staršího než podzim.',
-  'guide.worldPage.duskBlurb':
-    'Údolí trvalého soumraku pod velkým stromem Prastarého svitu, kde svítí křišťálové trosky a vzduch hučí prastarou magií.',
-  'guide.worldPage.duskGreeter': 'Strážce Saelwyn, Prastarý svit',
   'guide.worldPage.duskGreeting':
     'Málo z tvého druhu stálo pod těmito větvemi. Choď opatrně a buď vítán.',
-  'guide.worldPage.duskPlaceNotes':
-    'Prastarý svit se shromažďuje pod velkým stromem. Jeskyně Soumračného pádu a její vyhlídka jsou cestou dovnitř a prvním pohledem na údolí; Prastarý háj a Kotlina hvězdného pádu udržují tichý jih; Potopené nádvoří skrývá zarostlé trosky na východě; a Zářící hlubina s Křišťálovými mělčinami svítí přes celý sever.',
   'guide.worldPage.emberBlurb':
     'Bouří ozářené pustiny popela a krvavého skla, kde draci krouží nad kalderou a trollí ohně hoří v dunách, střežené z branného města Dračí hlídka.',
   'guide.worldPage.emberGreeter': 'Strážce brány, Dračí hlídka',
@@ -9893,13 +9806,8 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Někdo pořád stříhá živé ploty, ačkoliv zahradníka nikdo neviděl už sto let. Dej pozor na bludiště: ono dává pozor i na tebe.',
   'guide.worldPage.gardenPlaceNotes':
     'Živoplotov čeká u Zahradní brány. Parterová promenáda kvete v zastřižených barvách; Hrad Úsvitu cvičí své rytíře za novými hradbami; Okvětní rybník se rok co rok vznáší v růžové; Starý mlýn obrací své vlastní záhony; Velké bludiště přeskupuje své cesty pro každého hosta, jeho oblouky střeženy listnatými liškami; Severní hlídka střeží výjezdovou cestu; Liliová kotlina odpočívá za tím vším; a Fontánové nádvoří stále čistě protéká v srdci zahrady.',
-  'guide.worldPage.hauntBlurb':
-    'Strašidelný les pod obřími korunami, kde jsou lucerny Šibeničního jezera jediným poctivým světlem na cestě.',
-  'guide.worldPage.hauntGreeter': 'Lampář, Šibeniční jezero',
   'guide.worldPage.hauntGreeting':
     'Drž se lucern, poutníku. A pokud tě les zavolá jménem od cesty, neodpovídej mu.',
-  'guide.worldPage.hauntPlaceNotes':
-    'Šibeniční jezero se choulí uvnitř svých lucern. Vraní brána je pochmurnými předními dveřmi lesa; Vdovin houština je hustě spředena pavučinami; Visící mýtina a Kaple Truchlokamene uchovávají nejstarší žal lesa; a Lovcova mýtina patří tomu, co tam ještě pořád loví.',
   'guide.worldPage.jungleBlurb':
     'Tropický spletenec palem, bílého písku a hlučného ptactva, přičemž pobřežní město Naplavený přístav udržuje na pláži zapálený oheň.',
   'guide.worldPage.jungleGreeter': 'Přístavní velitelka, Naplavený přístav',
@@ -9912,8 +9820,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.nightGreeter': 'Strážce hlídky, Měsíční klid',
   'guide.worldPage.nightGreeting':
     'Za Noční branou sní i samotný vzduch. Následuj květinové světlo a dej pozor na spící svět, který visí na obloze.',
-  'guide.worldPage.nightPlaceNotes':
-    'Měsíční klid drží hlídku. Noční brána je cestou do půlnoční krajiny; Měsíční studna uchovává hvězdné světlo, u kterého můžeš stát; Soumrakové pole kvete ve tmě; Stálá hlídka bdí, aniž by se kdy pohnula; a Bezesná mohyla je jediným místem zde, které nikdy nesní.',
   'entities.abilities.chain_heal.description':
     'Vyléčí spojenecký cíl za velké množství zdraví, poté přeskočí až na 2 další blízké spojence. Každý další skok léčí o 50 % méně. (klíčová schopnost Obnovy)',
   'entities.abilities.holy_taunt.description':
@@ -10173,8 +10079,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.skins.hoarfrost_vigil_staff.name': 'Jinovatková stráž',
   'hudChrome.wocStore.skins.ice_fang_sword.look':
     'Zakřivená čepel z bledého ledovcového ledu, podél hřbetu zubaté krystaly jinovatky, ve žlábku zářící azurové zmrzlé jádro a záštita z rampouchů.',
-  'hudChrome.wocStore.skins.ice_fang_sword.lore':
-    'Vlajková zbraň zmrzlé kolekce a kus, po kterém každý sběratel sáhne jako první. Ledový tesák nebyl vykován, ale vyřezán z výběžku ledovce, který korunuje Thornpeak nad Highwatchem. Jeho azurové jádro plane chladem jako světlo Třpytivého plesa. Jinovatkou pokrývá i vzduch, který rozsekne. Strážci zdi přísahají, že jej jeden voják nesl v noci, kdy vysoký sníh zadržel kult draka, a „koupil zdi jednu zimu“.',
   'hudChrome.wocStore.skins.ice_fang_sword.name': 'Ledový tesák',
   'hudChrome.wocStore.skins.lacquered_wand.look':
     'Štíhlá hůlka s hluboce červeným lakem, dvěma pásky leštěné mosazi a drobnou zaoblenou mosaznou špičkou.',
@@ -10220,7 +10124,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Luk z postříbřené oceli a modrého ledu, ve středu září azurové zmrzlé jádro, na tětivě čeká šíp z pevného ledu a kolem proudí studená pára.',
   'hudChrome.wocStore.skins.winterbite.lore':
     'Luk z postříbřené oceli a thornpeakského ledu, jehož střed osvětluje studené azurové jádro, které přimrazí šíp k tětivě. S každým natažením se znovu vytvoří šíp z pevného ledovcového ledu. Lučištník na zdi nenosí toulec, jen chlad. Highwatch s podobným lukem udržel Stopařův hřeben během obléhání. Jediný lučištník, říká se, a zásoba šípů na celou zimu, které byly vždy připravené.',
-  'hudChrome.wocStore.skins.winterbite.name': 'Zimní skus',
   'hudChrome.wocStore.storeTab': 'Obchod',
   'hudChrome.wocStore.tabsLabel': 'Sekce obchodu WOC',
   'hudChrome.wocStore.title': 'Obchod WOC',
@@ -10244,8 +10147,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.blazing_barrier.description':
     'Obklopíš se plameny a pohltíš {damage} bodů poškození po dobu 60 s. (Oheň)',
   'entities.abilities.cold_snap.name': 'Volání zimy',
-  'entities.abilities.cold_snap.description':
-    'Okamžitě dokončí dobu obnovení Mžikového kroku, Mrazivého závoje a Dokonalé neviditelnosti. (mágovský talent)',
   'entities.abilities.greater_invisibility.name': 'Dokonalá neviditelnost',
   'entities.abilities.hot_streak.name': 'Žhavá série',
   'entities.abilities.hot_streak.description':
@@ -10296,7 +10197,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.emberwing_drake.name': 'Žhavokřídlý drak',
   'entities.mobs.fen_sprite.name': 'Bažinná víla',
   'entities.mobs.fisher_bram.name': 'Rybář Bram',
-  'entities.mobs.frostmane_yeti.name': 'Yeti s mrazivou hřívou',
   'entities.mobs.gale_wisp.name': 'Vichrná bludička',
   'entities.mobs.gilded_stag.name': 'Pozlacený jelen',
   'entities.mobs.gleamstag.name': 'Zářivý jelen',
@@ -10305,7 +10205,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.gloam_strider.name': 'Soumrakový chodec',
   'entities.mobs.gravedigger_mosley.name': 'Hrobník Mosley',
   'entities.mobs.gravenbark_shambler.name': 'Rytokorý vlekoun',
-  'entities.mobs.harvest_sprite.name': 'Sklizňová víla',
   'entities.mobs.hedge_gnome.name': 'Živoplotový gnóm',
   'entities.mobs.hedge_knight.name': 'Rytíř Hradu Úsvitu',
   'entities.mobs.ice_wisp.name': 'Ledová bludička',
@@ -10315,7 +10214,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.moonfleece_grazer.name': 'Spasovač měsíčního rouna',
   'entities.mobs.moor_ram.name': 'Vřesovištní beran',
   'entities.mobs.mushroom_pixie.name': 'Skřítek Zářilidu',
-  'entities.mobs.nightkin_stargazer.name': 'Hvězdopozorovatel Nočního rodu',
   'entities.mobs.old_marrowshell.name': 'Starý Morkoškeble',
   'entities.mobs.orchard_treant.name': 'Sadový stromový obr',
   'entities.mobs.pale_huntsman.name': 'Bledý lovec',
@@ -10529,7 +10427,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.battleTrance':
     'Tvůj příští Nájezdnický úder nebo Mrzačící úder nestojí žádný vztek',
   'hudChrome.auraEffect.revengeFree': 'Tvá příští Odveta nestojí žádný vztek',
-  'hudChrome.auraEffect.victoryRush': 'Vítězný nápor je připraven',
   'hudChrome.auraEffect.maxHpPct': 'Zvyšuje maximální zdraví o {pct} %',
   'hudChrome.statInfo.names.parry': 'Odražení',
   'hudChrome.statInfo.desc.parry':
@@ -10645,7 +10542,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.items.farshore_salt_moss.name': 'Slaný mech Vzdáleného pobřeží',
   'entities.items.fenway_mooring_line.name': 'Přeříznuté kotevní lano',
   'entities.items.fountain_court_mantle.name': 'Plášť Fontánového nádvoří',
-  'entities.items.frostmane_mantle.name': 'Plášť Mrazivé hřívy',
   'entities.items.galecrest_ram_wool.name': 'Mastná beraní vlna',
   'entities.items.gallowmere_grave_candle.name': 'Hrobová svíce',
   'entities.items.gilded_sap_clot.name': 'Pozlacená hrudka mízy',
@@ -10937,7 +10833,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.hearthkeeper_maeve.title': 'Strážkyně Ohnišťové chaty',
   'entities.npcs.hermit_okku.greeting':
     'Teď tiše. Bubny počítají všechno, co chodí pod stromy, a už spočítaly i tebe.',
-  'entities.npcs.hermit_okku.name': 'Okku',
+  'entities.npcs.hermit_okku.name': 'Okrim',
   'entities.npcs.hermit_okku.title': 'Muž, který vešel dovnitř',
   'entities.npcs.huntsman_deral.greeting':
     'Teď tiše. Stádo zná každý zvuk, který toto údolí vydává, a já také.',
@@ -10990,7 +10886,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.provisioner_fenna.greeting':
     'Chléb ještě teplý, voda ještě sladká. Kotlina poskytuje, a já také.',
   'entities.npcs.provisioner_fenna.name': 'Zásobovatelka Fenna',
-  'entities.npcs.provisioner_fenna.title': 'Zásobovatelka Prastarého svitu',
   'entities.npcs.quartermaster_edda.greeting':
     'Ocel a sůl, {className}, to je vše, co mi zbývá rozdávat. Vezmi si to a přiměj průlomy litovat, že se otevřely tam, kam jsem dosáhla.',
   'entities.npcs.quartermaster_edda.name': 'Intendantka Edda',
@@ -11026,7 +10921,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.sexton_marrow.greeting':
     'Pohřbíváme je tu hluboko a zvoníme na zvony, aby si pamatovali zůstat dole.',
   'entities.npcs.sexton_marrow.name': 'Kostelník Marrow',
-  'entities.npcs.sexton_marrow.title': 'Kostelník Šibeničního jezera',
   'entities.npcs.strandwatcher_pell.greeting':
     'Konečně venku z černých stromů. Dýchej, cizinče, slunce drží tuto stranu průsmyku.',
   'entities.npcs.strandwatcher_pell.name': 'Strážce pobřeží Pell',
@@ -11074,7 +10968,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.widow_tansy.greeting':
     'Svíce pro každý hrob, a ani jedna nesmí zhasnout. Ani jedna, slyšíš mě?',
   'entities.npcs.widow_tansy.name': 'Vdova Tansy',
-  'entities.npcs.widow_tansy.title': 'Svícařka Šibeničního jezera',
   'gatherEvent.ancientHeartwood': '{finder} pokácel prastaré jádrové dřevo!',
   'gatherEvent.moonlitBloom': '{finder} objevil měsíční květ!',
   'gatherEvent.pristineVein': '{finder} narazil na nedotčenou rudnou žílu!',

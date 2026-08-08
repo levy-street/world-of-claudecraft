@@ -7,7 +7,7 @@ import type { PlayerClass } from '../src/sim/types';
 // when those rows land so this guard covers every class.
 const ROW_REDESIGN_SKIP: ReadonlySet<PlayerClass> = new Set([]);
 // Abilities whose row-modifier is intentionally offered before the ability is
-// learnable (the pick banks and takes effect later). Empty: Flickerstep now
+// learnable (the pick banks and takes effect later). Empty: Flitstep now
 // joins the base kit at level 5, matching its level-5 choice-row modifiers.
 const FUTURE_ABILITY_EXCEPTIONS = new Set<string>([]);
 

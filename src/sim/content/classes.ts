@@ -1528,13 +1528,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
     description:
       "Loose three icy bolts for $d Frost damage each and plant Winter's Chill on the target: its next 2 incoming compatible spells treat it as frozen. Brain Freeze makes Winterlash instant and skips its cooldown. (Frost)",
   },
-  // Frozen Orb: the roaming Icicle generator (combat/frozen_orb.ts). Instant,
+  // Frostglobe: the roaming Icicle generator (combat/frozen_orb.ts). Instant,
   // 45s cooldown; the orb drifts forward pulsing frost damage + a 30% snare
   // once per second for 8s. Each striking pulse banks one Icicle. Blizzard
   // shortens its cooldown (below).
   frozen_orb: {
     id: 'frozen_orb',
-    name: 'Frozen Orb',
+    name: 'Frostglobe',
     class: 'mage',
     learnLevel: 15,
     specs: ['frost'],
@@ -1556,15 +1556,15 @@ export const ABILITIES: Record<string, AbilityDef> = {
     description:
       'Release an orb of swirling frost that drifts forward for 8 sec, dealing $d Frost damage each second to nearby enemies and slowing them by 30%. Each striking pulse generates one Icicle. (Frost)',
   },
-  // Glacial Spike: the frost spec's slow, heavy spender. Gated on a FULL Icicles
+  // Rimeneedle: the frost spec's slow, heavy spender. Gated on a FULL Icicles
   // stack (requiresAuraStacks 5), which the cast consumes; it lands a big frost
   // hit and freezes the target with a short root, so the follow-up Ice Lance and
   // spells Brittle Ruin even where the target was not already frozen. The Icicles
-  // build-up lives in combat/frost_mage.ts (fed by Rimelance impacts + Frozen Orb
+  // build-up lives in combat/frost_mage.ts (fed by Rimelance impacts + Frostglobe
   // pulses); the freeze reuses the shared root effect so isRooted counts it.
   glacial_spike: {
     id: 'glacial_spike',
-    name: 'Glacial Spike',
+    name: 'Rimeneedle',
     class: 'mage',
     learnLevel: 16,
     specs: ['frost'],
@@ -1596,7 +1596,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   // Blizzard: the frost AoE workhorse, a ground-aimed channel on the
   // rain_of_fire template plus a snare rider (the position-channel aoeSlow
-  // pulse) and the Frozen Orb refund (frostMageChannelPulse, 0.5s per enemy
+  // pulse) and the Frostglobe refund (frostMageChannelPulse, 0.5s per enemy
   // struck, at most 3s per cast).
   blizzard: {
     id: 'blizzard',
@@ -1612,7 +1612,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     targetMode: 'position',
     // Owner playtest 2026-07-11: no longer a channel. A 2 sec cast places the
     // storm, which then pulses on its own for 6 sec (a groundAoE with the
-    // snare + Frozen Orb refund riders; delayed skips the on-cast pulse so
+    // snare + Frostglobe refund riders; delayed skips the on-cast pulse so
     // the first wave lands as the storm visibly forms).
     castTime: 2,
     effects: [
@@ -1632,7 +1632,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Conjures an ice storm at the target area: after a 2 sec cast it rages for 6 sec, dealing 12 to 16 Frost damage each second and slowing enemies by 40%. Each enemy struck shaves 0.5 sec off Frozen Orb, up to 3 sec per cast. (Frost)',
+      'Conjures an ice storm at the target area: after a 2 sec cast it rages for 6 sec, dealing 12 to 16 Frost damage each second and slowing enemies by 40%. Each enemy struck shaves 0.5 sec off Frostglobe, up to 3 sec per cast. (Frost)',
   },
   // Frente Glacial: Frost's hold-to-charge cone. The 2.4 sec cast is the
   // authoritative maximum charge clock; releasing earlier selects one of the
@@ -2879,7 +2879,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   vanish: {
     id: 'vanish',
-    name: 'Smokestep',
+    name: 'Smokefade',
     class: 'rogue',
     learnLevel: 18,
     cost: 0,
@@ -4249,7 +4249,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   summon_voidwalker: {
     id: 'summon_voidwalker',
-    name: 'Summon Gloomshade',
+    name: 'Summon Duskmurk',
     class: 'warlock',
     learnLevel: 8,
     cost: 80,
@@ -4260,7 +4260,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [{ type: 'summonDemon', mobId: 'gloomshade' }],
     description:
-      'Summons a Gloomshade under the command of the Warlock. The Gloomshade is a sturdy demon that taunts your enemies and soaks up punishment. Summoning a new demon dismisses your current one. You may have one demon at a time.',
+      'Summons a Duskmurk under the command of the Warlock. The Duskmurk is a sturdy demon that taunts your enemies and soaks up punishment. Summoning a new demon dismisses your current one. You may have one demon at a time.',
   },
   summon_succubus: {
     id: 'summon_succubus',
@@ -5132,7 +5132,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   heroic_leap: {
     id: 'heroic_leap',
-    name: 'Heroic Leap',
+    name: 'Vaulting Charge',
     class: 'warrior',
     learnLevel: 6,
     cost: 0,
@@ -5167,7 +5167,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   // design draft, tune VALUE not SHAPE) ------
   storm_bolt: {
     id: 'storm_bolt',
-    name: 'Storm Bolt',
+    name: 'Thunderhurl',
     class: 'warrior',
     learnLevel: 11,
     cost: 10,
@@ -5230,7 +5230,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   victory_rush: {
     id: 'victory_rush',
-    name: 'Victory Rush',
+    name: "Victor's Surge",
     class: 'warrior',
     learnLevel: 8,
     cost: 0,
@@ -5348,7 +5348,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   // Not in CLASSES.*.abilities. Unlocked only via spec grants.
   crusader_strike: {
     id: 'crusader_strike',
-    name: 'Crusader Strike',
+    name: 'Oathstrike',
     class: 'paladin',
     learnLevel: 10,
     cost: 30,
@@ -5383,7 +5383,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   holy_shock: {
     id: 'holy_shock',
-    name: 'Holy Shock',
+    name: 'Lightjolt',
     class: 'paladin',
     learnLevel: 10,
     cost: 55,
@@ -5465,7 +5465,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   wyvern_sting: {
     id: 'wyvern_sting',
-    name: 'Wyvern Sting',
+    name: 'Drakesting',
     class: 'hunter',
     learnLevel: 10,
     cost: 35,
@@ -5539,7 +5539,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   icy_veins: {
     id: 'icy_veins',
     specs: ['frost'],
-    name: 'Icy Veins',
+    name: 'Coldsurge',
     class: 'mage',
     learnLevel: 12,
     cost: 0,
@@ -5623,7 +5623,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   holy_nova: {
     id: 'holy_nova',
-    name: 'Holy Nova',
+    name: 'Hallowburst',
     class: 'priest',
     learnLevel: 10,
     cost: 70,
@@ -5743,7 +5743,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   swiftmend: {
     id: 'swiftmend',
-    name: 'Swiftmend',
+    name: 'Fleetmend',
     class: 'druid',
     learnLevel: 10,
     cost: 55,
@@ -5778,7 +5778,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   blink: {
     id: 'blink',
-    name: 'Flickerstep',
+    name: 'Flitstep',
     class: 'mage',
     // Joins the base kit at 5 (see the 'blink' entry in the mage kit list): two
     // level-5 choice-row options modify it, so it must exist by then, not at 10.
@@ -5811,7 +5811,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   counterspell: {
     id: 'counterspell',
-    name: 'Spellbreak',
+    name: 'Spellsever',
     class: 'mage',
     learnLevel: 5,
     cost: 45,
@@ -6042,7 +6042,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Finishes the cooldown on Flickerstep, Frostveil, and Greater Invisibility. (Mage talent)',
+      'Finishes the cooldown on Flitstep, Frostveil, and Greater Invisibility. (Mage talent)',
   },
   mass_barrier: {
     id: 'mass_barrier',
@@ -6474,7 +6474,7 @@ function scaleEffect(
             max: Math.round(eff.max * dmgMult + flat),
           };
     case 'repositionToAim':
-      // Heroic Leap's landing hit is a groundAoE-shaped rider on the
+      // Vaulting Charge's landing hit is a groundAoE-shaped rider on the
       // reposition; scale it the same way a groundAoE pulse scales.
       return eff.landingAoe
         ? {

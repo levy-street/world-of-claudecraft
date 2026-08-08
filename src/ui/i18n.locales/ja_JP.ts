@@ -91,7 +91,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.furious_mending.name': '憤怒の癒し',
   'entities.abilities.heroic_leap.description':
     '対象地点へ跳躍し、着地時に周囲の敵へ{damage}のダメージを与えます。',
-  'entities.abilities.heroic_leap.name': '英雄的跳躍',
+  'entities.abilities.heroic_leap.name': '跳躍突撃',
   'entities.abilities.intimidating_shout.description':
     '恐ろしい叫びを上げ、8yd以内の最大5体の敵を8秒間、恐怖で逃げ惑わせます。ダメージを受けると効果が解除されることがあります。',
   'entities.abilities.intimidating_shout.name': '威圧の雄叫び',
@@ -130,7 +130,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.seasoned_soldier.name': '歴戦の兵',
   'entities.abilities.storm_bolt.description':
     '武器を対象に投げつけて{damage}のダメージを与え、3秒間スタンさせます。',
-  'entities.abilities.storm_bolt.name': '嵐の一投',
+  'entities.abilities.storm_bolt.name': '雷の一投',
   'entities.abilities.sudden_death.description':
     '通常攻撃に、体力に関係なく早すぎる墓を怒りコストなしで使用できるようになる確率があります。（武器）',
   'entities.abilities.sudden_death.name': '突然死',
@@ -139,7 +139,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sweeping_strikes.name': '広がる弧',
   'entities.abilities.victory_rush.description':
     '武器ダメージに{damage}を加えたダメージを与え、最大体力の20%を回復します。敵を倒してから20秒以内にのみ使用できます。',
-  'entities.abilities.victory_rush.name': '勝利の追撃',
+  'entities.abilities.victory_rush.name': '勝者の奔流',
   'hudChrome.specPanel.complexity': '複雑さ',
   'hudChrome.specPanel.complexityHigh': '高',
   'hudChrome.specPanel.complexityLow': '低',
@@ -153,7 +153,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.talentRows.tab': '選択',
   'hudChrome.talentRows.readoutSummary': 'タレント：{head}、{spent}/{total}行を選択済み。',
   'entities.abilities.aspect_of_the_wild.name': '野牙の装い',
-  'entities.abilities.avenging_wrath.name': '復讐の翼',
+  'entities.abilities.avenging_wrath.name': '熱誠の翼',
   'entities.abilities.berserk.name': '赤き霞',
   'entities.abilities.blink.name': '瞬き歩み',
   'entities.abilities.bloodlust.name': '戦の太鼓',
@@ -326,7 +326,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.skins.ice_fang_sword.look':
     '淡い氷河氷の湾曲刀、峰に並ぶ鋸歯状の霧氷結晶、樋で輝く青緑の凍結核、氷柱の鍔。',
   'hudChrome.wocStore.skins.ice_fang_sword.lore':
-    '凍結等級の象徴であり、収集家がまず手を伸ばす逸品。Ice Fangは鍛えられたのではなく、Highwatchの上にそびえるThornpeakの氷河の牙から削り出された。青緑の核はGlimmermereの反射光のように冷たく燃え、斬った空気そのものを霧氷で覆う。大雪がWyrmcultを退けた夜、兵士がこれを携え「城壁に一冬を買った」と衛兵たちは誓う。',
+    '凍結等級の象徴であり、収集家がまず手を伸ばす逸品。Ice Fangは鍛えられたのではなく、Highwatchの上にそびえるThornpeakの氷河の牙から削り出された。青緑の核はGlimmermereの反射光のように冷たく燃え、斬った空気そのものを霧氷で覆う。大雪がBroodswornを退けた夜、兵士がこれを携え「城壁に一冬を買った」と衛兵たちは誓う。',
   'hudChrome.wocStore.skins.glaciersplit_axe.name': 'グレイシャースプリット',
   'hudChrome.wocStore.skins.glaciersplit_axe.look':
     '半透明の青い氷河氷の斧頭、青緑に輝くひび割れた内部、逆立つ霜の結晶、冷気を引く柄。',
@@ -352,7 +352,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '輝く青緑の氷河氷の一本角、銀の口金から咲く白霜、かすかな冷たい霧。',
   'hudChrome.wocStore.skins.everwinter_wand.lore':
     '山の寒さが牙を持つSanctumの下の深い山湖から折り取られたという、輝く氷河氷の角。銀の口金から白霜が絶えず咲き、火にも夏にも溶けない。魔術師は術に貸す冷気ゆえ近くに置き、Nythraxisの地下墓所へ傾いて耳を澄ますような夜には、遠ざけておく。',
-  'hudChrome.wocStore.skins.winterbite.name': 'ウィンターバイト',
+  'hudChrome.wocStore.skins.winterbite.name': 'ウィンターグナウ',
   'hudChrome.wocStore.skins.winterbite.look':
     '銀鋼と青氷の弓、ライザーで輝く青緑の凍結核、つがえられた固い氷の矢、冷たい霧。',
   'hudChrome.wocStore.skins.winterbite.lore':
@@ -3177,9 +3177,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.summon_imp.name': 'エンバーキンの召喚',
   'entities.abilities.summon_imp.description':
     'ウォーロックの命令に従うエンバーキンを召喚します。エンバーキンは遠くから敵にアッシュボルトを放ちます。新たな悪魔を召喚すると現在の悪魔は解放されます。悪魔は一度に1体しか従えられません。',
-  'entities.abilities.summon_voidwalker.name': 'グルームシェイドの召喚',
+  'entities.abilities.summon_voidwalker.name': 'ダスクマークの召喚',
   'entities.abilities.summon_voidwalker.description':
-    'ウォーロックの命令に従うグルームシェイドを召喚します。グルームシェイドは敵を挑発し攻撃を受け止める頑強な悪魔です。新たな悪魔を召喚すると現在の悪魔は解放されます。悪魔は一度に1体しか従えられません。',
+    'ウォーロックの命令に従うダスクマークを召喚します。ダスクマークは敵を挑発し攻撃を受け止める頑強な悪魔です。新たな悪魔を召喚すると現在の悪魔は解放されます。悪魔は一度に1体しか従えられません。',
   'entities.abilities.summon_succubus.name': 'ダスクボーンの召喚',
   'entities.abilities.summon_succubus.description':
     'ウォーロックの命令に従うダスクボーンを召喚します。ダスクボーンは素早く攻撃し近接戦闘で大きなダメージを与える脆い悪魔です。新たな悪魔を召喚すると現在の悪魔は解放されます。悪魔は一度に1体しか従えられません。',
@@ -3210,7 +3210,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.revive_pet.name': '応急処置',
   'entities.abilities.revive_pet.description':
     'ペットを応急処置する。生存している場合は12秒間、3秒ごとに回復し、合計{overTime}の体力を回復する。死亡している場合は体力35%で蘇生する。',
-  'entities.abilities.holy_shock.name': 'ホーリーショック',
+  'entities.abilities.holy_shock.name': 'ライトジョルト',
   'entities.abilities.holy_shock.description':
     '聖なる力で味方を衝撃し、体力を{damage}回復します。（ホーリー特性のシグネチャ）',
   'entities.abilities.holy_shield.name': 'ホーリーシールド',
@@ -3222,7 +3222,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.trueshot_aura.name': 'トゥルーショットオーラ',
   'entities.abilities.trueshot_aura.description':
     '近くの味方を鼓舞し、5分間攻撃力を35上げます。（マークスマンシップ特性のシグネチャ）',
-  'entities.abilities.wyvern_sting.name': 'ワイバーンスティング',
+  'entities.abilities.wyvern_sting.name': 'ドレイクスティング',
   'entities.abilities.wyvern_sting.description':
     '遠距離から敵を刺し、最大4秒間行動不能にします。ダメージを受けると効果は解除されます。（サバイバル特性のシグネチャ）',
   'entities.abilities.arcane_power.name': 'アーケインパワー',
@@ -3231,7 +3231,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.combustion.name': '不死鳥のトランス',
   'entities.abilities.combustion.description':
     '15秒間、呪文クリティカル率が50%上がります。（ファイア特性のシグネチャ）',
-  'entities.abilities.icy_veins.name': 'アイシーヴェインズ',
+  'entities.abilities.icy_veins.name': 'コールドサージ',
   'entities.abilities.icy_veins.description':
     '10秒間、呪文ヘイストが30%上がり、詠唱の中断と遅延を防ぎます。（フロスト特性のシグネチャ）',
   'entities.abilities.cold_blood.name': 'コールドブラッド',
@@ -3246,7 +3246,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.power_infusion.name': 'パワーインフュージョン',
   'entities.abilities.power_infusion.description':
     '味方に力を注ぎ、15秒間呪文力を28上げます。（ディシプリン特性のシグネチャ）',
-  'entities.abilities.holy_nova.name': 'ホーリーノヴァ',
+  'entities.abilities.holy_nova.name': 'ハロウバースト',
   'entities.abilities.holy_nova.description':
     '聖なる光を爆発させ、近くの味方を{damage}回復し、近くの敵にダメージを与えます。（ホーリー特性のシグネチャ）',
   'entities.abilities.shadowform.name': 'シャドウフォーム',
@@ -3267,10 +3267,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.feral_charge.name': 'フェラルチャージ',
   'entities.abilities.feral_charge.description':
     '敵に突撃し、1秒間足止めします。射程8-25ヤード。（フェラル特性のシグネチャ）',
-  'entities.abilities.swiftmend.name': 'スウィフトメンド',
+  'entities.abilities.swiftmend.name': 'フリートメンド',
   'entities.abilities.swiftmend.description':
     '味方にかかった継続回復効果を消費し、体力を{damage}回復します。（レストレーション特性のシグネチャ）',
-  'entities.abilities.crusader_strike.name': 'クルセイダー ストライク',
+  'entities.abilities.crusader_strike.name': '誓いの一撃',
   'entities.abilities.crusader_strike.description':
     '対象を攻撃し、武器ダメージに加えて {damage} の聖なるダメージを与えます。（パラディンのタレント）',
   'entities.abilities.metamorphosis.name': '悪魔変身',
@@ -3441,7 +3441,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.ogre_war_totem.name': 'オーガ戦のトーテム',
   'entities.items.storm_core.name': '嵐の核',
   'entities.items.kazzix_heartshard.name': 'カジックスの心臓片',
-  'entities.items.wyrmcult_orders.name': 'ワーム教団の命令書',
+  'entities.items.wyrmcult_orders.name': '竜誓団の命令書',
   'entities.items.ritual_phylactery.name': '儀式の経箱',
   'entities.items.gravewyrm_sigil.name': '墓ワームの印章',
   'entities.items.blessed_embers.name': '祝福された残り火',
@@ -3462,7 +3462,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.staff_of_velkhar.name': 'ヴェルカーの杖',
   'entities.items.shadowmeld_tunic.name': '夜帳のチュニック',
   'entities.items.gravewyrm_scale_hauberk.name': '墓ワーム鱗のホーバーク',
-  'entities.items.wyrmcult_grand_robe.name': 'ワーム教団の大ローブ',
+  'entities.items.wyrmcult_grand_robe.name': '竜誓団の大ローブ',
   'entities.items.wyrmscale_jerkin.name': 'ワーム鱗のジャーキン',
   'entities.items.wyrmfang_greatblade.name': 'ワーム牙の大剣',
   'entities.items.staff_of_the_gravewyrm.name': '墓ワームの杖',
@@ -3529,7 +3529,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.tideguard_sabatons.name': '潮守りのサバトン',
   'entities.items.valeborn_spellblade.name': '谷生まれの呪文刃',
   'entities.items.voss_sanctified_mace.name': 'ヴォスの聖別メイス',
-  'entities.items.wyrmcult_soulsteps.name': 'ワーム教団の魂歩き',
+  'entities.items.wyrmcult_soulsteps.name': '竜誓団の魂歩き',
   'entities.items.wyrmshadow_harness.name': 'ナイトファングのハーネス',
   'entities.items.wyrmshadow_legguards.name': 'ナイトファングのレッグガード',
   'entities.items.wyrmshadow_treads.name': 'ナイトファングの足具',
@@ -3602,8 +3602,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.warlord_drogmar.name': '将軍ドログマー',
   'entities.mobs.stormcrag_elemental.name': 'ストームクラッグの精霊',
   'entities.mobs.shardlord_kazzix.name': '破片卿カジックス',
-  'entities.mobs.wyrmcult_zealot.name': 'ワーム教団の狂信者',
-  'entities.mobs.wyrmcult_necromancer.name': 'ワーム教団の死霊術師',
+  'entities.mobs.wyrmcult_zealot.name': '竜誓団の狂信者',
+  'entities.mobs.wyrmcult_necromancer.name': '竜誓団の死霊術師',
   'entities.mobs.boneclad_revenant.name': '骨まといの亡霊',
   'entities.mobs.crypt_shambler.name': '墓所のよろめき手',
   'entities.mobs.hollow_acolyte.name': '虚ろの侍祭',
@@ -3632,7 +3632,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.sister_nhalia.name': 'シスター・ナリア',
   'entities.mobs.varkas_boneguard.name': 'ヴァーカスの骨衛兵',
   'entities.mobs.emberkin.name': 'エンバーキン',
-  'entities.mobs.gloomshade.name': 'グルームシェイド',
+  'entities.mobs.gloomshade.name': 'ダスクマーク',
   'entities.mobs.duskborn.name': 'ダスクボーン',
   'entities.mobs.grix_the_tunnelking.name': 'トンネルキングのグリックス',
   'entities.mobs.spellhound.name': 'スペルハウンド',
@@ -4089,7 +4089,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_crushers.objectives.0.label': 'ソーンピークの粉砕者を討伐',
   'entities.quests.q_drogmar.title': '将軍ドログマー',
   'entities.quests.q_drogmar.text':
-    'ドログマーはワーム教団の金を取り、山の目覚めへ氏族を誓わせました。{playerName}、彼が地を打つときは近くに立たないように。戦営に入り、ハイウォッチのために討ってください。',
+    'ドログマーは竜誓団の金を取り、山の目覚めへ氏族を誓わせました。{playerName}、彼が地を打つときは近くに立たないように。戦営に入り、ハイウォッチのために討ってください。',
   'entities.quests.q_drogmar.completion':
     'ドログマーは自分の野営地で死にました。あなたは壁に冬を一つ買ってくれました、{playerName}。',
   'entities.quests.q_drogmar.objectives.0.label': '将軍ドログマーを討伐',
@@ -4115,7 +4115,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '南の峰からの風が詠唱を運びます。信徒を12人沈黙させてください、{playerName}。声が止まるほど山は眠れます。',
   'entities.quests.q_zealots.completion':
     '風は静かです。{playerName}、怖いのは詠唱ではなく、何かが返しているかもしれないことです。',
-  'entities.quests.q_zealots.objectives.0.label': 'ワーム教団の狂信者を討伐',
+  'entities.quests.q_zealots.objectives.0.label': '竜誓団の狂信者を討伐',
   'entities.quests.q_cult_orders.title': '下からの命令',
   'entities.quests.q_cult_orders.text':
     '信徒は攻城前の兵のように動いています。{playerName}、8人を倒し、書かれた命令を4組持ってきてください。',
@@ -4158,7 +4158,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_voice_below.completion':
     '跪きは止まりました。声を黙らせたのではなく、合唱を薄くしただけです、{playerName}。',
   'entities.quests.q_voice_below.objectives.0.label': 'ワーム教団の狂信者を討伐',
-  'entities.quests.q_voice_below.objectives.1.label': 'ワーム教団の死霊術師を討伐',
+  'entities.quests.q_voice_below.objectives.1.label': '竜誓団の死霊術師を討伐',
   'entities.quests.q_sanctum_gate.title': '聖所の門',
   'entities.quests.q_sanctum_gate.text':
     '{playerName}、最後の敷居です。教団は聖所の要石を砕き、広場に散らしました。3片を持ち帰れば、静かに開けます。',
@@ -4264,13 +4264,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.zones.thornpeak_heights.pois.4.label': 'ドログマーの戦営',
   'entities.zones.thornpeak_heights.pois.5.label': 'ストームクラッグ',
   'entities.zones.thornpeak_heights.pois.6.label': 'グリマーミア',
-  'entities.zones.thornpeak_heights.pois.7.label': 'ワーム教団の天幕',
+  'entities.zones.thornpeak_heights.pois.7.label': '竜誓団の天幕',
   'entities.zones.thornpeak_heights.pois.8.label': '亡霊の野',
   'entities.zones.thornpeak_heights.pois.9.label': '墓ワームの聖所',
   'entities.zones.veiled_hollow.name': 'ヴェールの幽谷',
   'entities.zones.veiled_hollow.welcome':
-    '大気は古の魔力に満ちて震えている。エルダーグリームの大樹の下で、守り手セルウィンを訪ねよ。',
-  'entities.zones.veiled_hollow.pois.0.label': 'エルダーグリーム',
+    '大気は古の魔力に満ちて震えている。エルダーシャインの大樹の下で、守り手セルウィンを訪ねよ。',
+  'entities.zones.veiled_hollow.pois.0.label': 'エルダーシャイン',
   'entities.zones.veiled_hollow.pois.1.label': 'ダスクフォール洞窟',
   'entities.zones.veiled_hollow.pois.2.label': 'ダスクフォールの見晴らし台',
   'entities.zones.veiled_hollow.pois.3.label': '長老樹の森',
@@ -4332,7 +4332,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.ice_wisp.name': 'アイスウィスプ',
   'entities.mobs.rime_elemental.name': '霧氷の精霊',
   'entities.mobs.fen_sprite.name': 'フェンスプライト',
-  'entities.mobs.frostmane_yeti.name': 'フロストメイン・イエティ',
+  'entities.mobs.frostmane_yeti.name': 'ライムメイン・イエティ',
   'entities.mobs.emberwing_drake.name': 'エンバーウィング・ドレイク',
   'entities.mobs.ashbone_raider.name': 'アッシュボーンの略奪者',
   'entities.mobs.ashbone_warcaller.name': 'アッシュボーンの戦呼び',
@@ -4340,7 +4340,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.gilded_stag.name': '黄金の牡鹿',
   'entities.mobs.gloam_fox.name': 'グロームフォックス',
   'entities.mobs.orchard_treant.name': '果樹園のトレント',
-  'entities.mobs.harvest_sprite.name': 'ハーベストスプライト',
+  'entities.mobs.harvest_sprite.name': '落ち穂のスプライト',
   'entities.mobs.mere_lurker.name': '湖の潜み手',
   'entities.mobs.bogtoad.name': 'ボグトード',
   'entities.mobs.drowsy_croaker.name': 'まどろみのクローカー',
@@ -4351,18 +4351,18 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '夜門の先では、大気までもが夢を見ている。花明かりをたどってムーンレストへ。空に浮かぶ眠れる世界もお見逃しなく。',
   'entities.zones.nightbloom.pois.0.label': 'ムーンレスト',
   'entities.zones.nightbloom.pois.1.label': '夜の門',
-  'entities.zones.nightbloom.pois.2.label': '月の井戸',
+  'entities.zones.nightbloom.pois.2.label': '月の泉',
   'entities.zones.nightbloom.pois.3.label': '宵闇の花野',
   'entities.zones.nightbloom.pois.4.label': '見張りの石環',
   'entities.zones.nightbloom.pois.5.label': '不眠の塚',
   'entities.mobs.moonfleece_grazer.name': 'ムーンフリース',
   'entities.mobs.gloam_strider.name': 'グロームストライダー',
-  'entities.mobs.nightkin_stargazer.name': 'ナイトキンの星読み',
+  'entities.mobs.nightkin_stargazer.name': '宵闇の星読み',
   'entities.mobs.barrow_king.name': '塚の王',
   'entities.zones.wraithwood.name': 'レイスウッド',
   'entities.zones.wraithwood.welcome':
-    '梢が棺の蓋のように道の上で閉じていく。ガロウミアの灯りから離れるな。森が名前を呼んでも、決して答えるな。',
-  'entities.zones.wraithwood.pois.0.label': 'ガロウミア',
+    '梢が棺の蓋のように道の上で閉じていく。ギベットミアの灯りから離れるな。森が名前を呼んでも、決して答えるな。',
+  'entities.zones.wraithwood.pois.0.label': 'ギベットミア',
   'entities.zones.wraithwood.pois.1.label': '鴉の門',
   'entities.zones.wraithwood.pois.2.label': '寡婦の茨',
   'entities.zones.wraithwood.pois.3.label': '吊るしの林間地',
@@ -4480,7 +4480,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.loremother_bryn.greeting':
     'この谷の光はどれも何かを覚えている、{playerName}。共に耳を澄ませておくれ。',
   'entities.npcs.provisioner_fenna.name': '補給係フェンナ',
-  'entities.npcs.provisioner_fenna.title': 'エルダーグリームの補給係',
+  'entities.npcs.provisioner_fenna.title': 'エルダーシャインの補給係',
   'entities.npcs.provisioner_fenna.greeting':
     'パンはまだ温かく、水はまだ甘い。幽谷は与えてくれる。わたしもね。',
   'entities.npcs.wardsmith_orun.name': 'ワードスミス・オルン',
@@ -4656,7 +4656,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.cryptplate_helm.name': 'クリプトプレートヘルム',
   'entities.items.shadowpulse_slippers.name': 'シャドウパルスのスリッパ',
   'entities.items.bonechill_cord.name': 'ボーンチルの帯',
-  'entities.items.mistforged_pauldrons.name': 'ミストフォージの肩当て',
+  'entities.items.mistforged_pauldrons.name': 'フォグフォージの肩当て',
   'entities.items.tideguard_faceguard.name': 'タイドガードのフェイスガード',
   'entities.items.sunken_court_mantle.name': '沈んだ宮廷のマント',
   'entities.items.lunar_choir_leggings.name': 'ルナクワイアのレギンス',
@@ -4768,7 +4768,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'ハーベストスプライトよ、{playerName}。あの小さな盗人たちは、中の甘みほしさに樹液栓を幹からこじり取って、バケツを草むらに放り投げていくの。八匹追い払って、バケツを四つ取り戻してきて。そうすれば荷車はまた走り出せるわ。',
   'entities.quests.q_af_sprites_and_spigots.completion':
     'バケツ四つが掛け釘に戻って、並木も静かになった。あなたはわたしよりスプライトへの手が重いようだけれど、{playerName}、今日ばかりはそれがありがたいわ。',
-  'entities.quests.q_af_sprites_and_spigots.objectives.0.label': 'ハーベストスプライトを追い払った',
+  'entities.quests.q_af_sprites_and_spigots.objectives.0.label': '落ち穂のスプライトを追い払った',
   'entities.quests.q_af_sprites_and_spigots.objectives.1.label': '樹液採りのバケツを回収した',
   'entities.quests.q_af_the_meredark.title': 'ミアダーク',
   'entities.quests.q_af_the_meredark.text':
@@ -4949,12 +4949,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_fv_ember_caches.completion':
     'どれもまだ温かい。この宿に、冬まるごとの慈悲を買ってくれたね、{playerName}。',
   'entities.quests.q_fv_ember_caches.objectives.0.label': '熾火の壺を回収した',
-  'entities.quests.q_fv_frostmane_tyrant.title': 'フロストメインの暴君',
+  'entities.quests.q_fv_frostmane_tyrant.title': 'ライムメインの暴君',
   'entities.quests.q_fv_frostmane_tyrant.text':
-    'ハウラーどもが段丘を下ってきたのは、狩りのためではなかった。逃げていたのだ。イエティが高地を我が物にした。山の民はフロストメインと呼ぶ。群れでさえ、あれと斜面を分かち合おうとはせん。終わらせねばならんのだ、{playerName}、冬があれをわたしの壁まで追い下ろす前に。友を連れて行け。ふたり連れて行け。',
+    'ハウラーどもが段丘を下ってきたのは、狩りのためではなかった。逃げていたのだ。イエティが高地を我が物にした。山の民はライムメインと呼ぶ。群れでさえ、あれと斜面を分かち合おうとはせん。終わらせねばならんのだ、{playerName}、冬があれをわたしの壁まで追い下ろす前に。友を連れて行け。ふたり連れて行け。',
   'entities.quests.q_fv_frostmane_tyrant.completion':
-    '昨夜、風がやんだとき、フロストメインがいたはずの場所の静けさを、村じゅうが聞いた。この果ての地は、返すのに何年もかかる借りをお前に負ったのだ、{playerName}。これをまとえ。アイスマントルの扉という扉が、お前に開かれる。',
-  'entities.quests.q_fv_frostmane_tyrant.objectives.0.label': 'フロストメインを倒した',
+    '昨夜、風がやんだとき、ライムメインがいたはずの場所の静けさを、村じゅうが聞いた。この果ての地は、返すのに何年もかかる借りをお前に負ったのだ、{playerName}。これをまとえ。アイスマントルの扉という扉が、お前に開かれる。',
+  'entities.quests.q_fv_frostmane_tyrant.objectives.0.label': 'ライムメインを倒した',
   'entities.quests.q_fv_howl_above.title': '段丘の咆哮',
   'entities.quests.q_fv_howl_above.text':
     '夕暮れに聞こえるだろう、{playerName}。咆哮のテラスから響く、スノードリフトの群れのものではない遠吠えが。もっと大きな喉だ。テラスハウラーどもが、祖母がこの持ち場を守っていた時代以来はじめて峰から下りてきた。狼どもをわたしの道へ押し出したのは奴らなのだ。八体狩って、押し返せ。',
@@ -5074,7 +5074,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_hollow_first_of_the_herd.objectives.0.label': 'アウレルホーンに安らぎを与えた',
   'entities.quests.q_hollow_old_marrowshell.title': '浅瀬の古い甲羅',
   'entities.quests.q_hollow_old_marrowshell.text':
-    'ひとつめの名はオールド・マロウシェル。エルダーグリームに門ができるより前から東の浅瀬で狩りをしてきた、荷車ほどもある蟹だ。奴は歩き回る、{playerName}。だから、その足跡に行き当たるまで岸辺を歩くしかない。ひとりで行くな。そして、奴の静けさを信じるな。',
+    'ひとつめの名はオールド・マロウシェル。エルダーシャインに門ができるより前から東の浅瀬で狩りをしてきた、荷車ほどもある蟹だ。奴は歩き回る、{playerName}。だから、その足跡に行き当たるまで岸辺を歩くしかない。ひとりで行くな。そして、奴の静けさを信じるな。',
   'entities.quests.q_hollow_old_marrowshell.completion':
     '浅瀬はまた、ただの水になった。あの甲羅がわたしより腕のいい狩人たちを砕くのを、わたしはずっと見てきたのだ、{playerName}。お前は砕かれなかった。',
   'entities.quests.q_hollow_old_marrowshell.objectives.0.label': 'オールド・マロウシェルを倒した',
@@ -5086,13 +5086,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_hollow_the_huntsman.objectives.0.label': '狩人デラルを見つけた',
   'entities.quests.q_nb_charts_of_the_stones.title': '石に刻まれた星図',
   'entities.quests.q_nb_charts_of_the_stones.text':
-    '石環の石はムーンレストより古く、石を守るナイトキンよりも古い。その面には星図が刻まれていて、わたしはそれを読むことに生涯を費やしてきた。空がずれたのだ、{playerName}。どこまでずれたのかを知らねばならん。三つの石の星図を読んで、その方位を持ち帰ってくれ。',
+    '石環の石はムーンレストより古く、石を守る宵闇の民よりも古い。その面には星図が刻まれていて、わたしはそれを読むことに生涯を費やしてきた。空がずれたのだ、{playerName}。どこまでずれたのかを知らねばならん。三つの石の星図を読んで、その方位を持ち帰ってくれ。',
   'entities.quests.q_nb_charts_of_the_stones.completion':
     'もう疑いは残っていない。どの方位も不眠の塚のほうへ這っている。まるで空そのものが、あの塚を覗き込もうと身を乗り出しているかのようだ。古き王たちが揃えられた星の下に葬られたのには、理由があるのだよ、{playerName}。',
   'entities.quests.q_nb_charts_of_the_stones.objectives.0.label': '星図を読んだ',
   'entities.quests.q_nb_eyes_on_the_vigil.title': '石環を見つめる目',
   'entities.quests.q_nb_eyes_on_the_vigil.text':
-    '何かがストライダーたちを大胆にさせ、群れを落ち着かなくさせている、{playerName}。それを、わたしは花からは読み取れない。カシアンなら空から読める。彼はここから東、ナイトキンが石々の間を漂う見張りの石環のそばに、観測の野営を構えているの。彼を見つけて、星が何を語っているのか尋ねてきて。',
+    '何かがストライダーたちを大胆にさせ、群れを落ち着かなくさせている、{playerName}。それを、わたしは花からは読み取れない。カシアンなら空から読める。彼はここから東、宵闇の民が石々の間を漂う見張りの石環のそばに、観測の野営を構えているの。彼を見つけて、星が何を語っているのか尋ねてきて。',
   'entities.quests.q_nb_eyes_on_the_vigil.completion':
     'リラの遣いか？なら、庭々もそれを感じているのだな。しばし、遠眼鏡のそばに座りたまえ、{playerName}。星々はこのひと月ずっと落ち着かず、わたしの引く星図はどれも、北の塚のほうへ傾いていくのだ。',
   'entities.quests.q_nb_eyes_on_the_vigil.objectives.0.label':
@@ -5127,7 +5127,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_nb_the_barrow_king.text':
     'すべての方位、すべての落ち着かない星、すべての開いた塚が、ひとつのことを指している。塚の王が大塚の下で目覚めつつあり、この国には彼を押しとどめる夜明けがない。彼が己の王冠を思い出す前に、眠りへ帰さねばならんのだ、{playerName}。ひとりで行くな。友を連れ、花明かりを背にして戦え。',
   'entities.quests.q_nb_the_barrow_king.completion':
-    'ひと季節ぶりに、星々がはじめて静まった、{playerName}。塚は閉じ、ナイトキンは石のそばで動きを止め、王は再び下で眠っている。このマントをまとうといい。夜がついに信を置いた者のために、ムーンレストが裁ったものだ。',
+    'ひと季節ぶりに、星々がはじめて静まった、{playerName}。塚は閉じ、宵闇の民は石のそばで動きを止め、王は再び下で眠っている。このマントをまとうといい。夜がついに信を置いた者のために、ムーンレストが裁ったものだ。',
   'entities.quests.q_nb_the_barrow_king.objectives.0.label': '塚の王を眠りに帰した',
   'entities.quests.q_nb_wool_by_moonlight.title': '月明かりの羊毛',
   'entities.quests.q_nb_wool_by_moonlight.text':
@@ -5174,10 +5174,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '航海士スリをドリフトヘイヴンまで送り届けた',
   'entities.quests.q_pr_the_man_who_went_in.title': '奥へ入った男',
   'entities.quests.q_pr_the_man_who_went_in.text':
-    '潜り手たちは木々の際から先へは踏み込まない、{playerName}。わたしも頼みはしない。太鼓はもう聞いただろう。二晩目までには、誰もが聞く。あの音へ向かって歩き、戻ってきた者はこの島にひとりしかいない。オックだ。彼は絡みの道を深く上った蔓垂の森の、大きな榕樹の下に野営している。彼を見つけて、緑が何を隠しているのか尋ねておいで。',
+    '潜り手たちは木々の際から先へは踏み込まない、{playerName}。わたしも頼みはしない。太鼓はもう聞いただろう。二晩目までには、誰もが聞く。あの音へ向かって歩き、戻ってきた者はこの島にひとりしかいない。オクリムだ。彼は絡みの道を深く上った蔓垂の森の、大きな榕樹の下に野営している。彼を見つけて、緑が何を隠しているのか尋ねておいで。',
   'entities.quests.q_pr_the_man_who_went_in.completion':
     'イーシャの遣いだと？パールマザーがわたしの名を口にするのは何年ぶりか。蔓の届かないところへお座り、{playerName}。知っていることを話そう。太鼓は危険ではない。太鼓は、警告なのだ。',
-  'entities.quests.q_pr_the_man_who_went_in.objectives.0.label': '蔓垂の森でオックを見つけた',
+  'entities.quests.q_pr_the_man_who_went_in.objectives.0.label': '蔓垂の森でオクリムを見つけた',
   'entities.quests.q_pr_what_the_drums_guard.title': '太鼓が守るもの',
   'entities.quests.q_pr_what_the_drums_guard.text':
     '生きた人間に許される限りのところまで、沈んだ神像に近づいてみた。見えたものはふたつ。ウィーバーどもが神像への道を糸の帳で覆っていたこと。そして、道沿いの古い供物鉢が、再び満たされていたことだ。それも新しく、だ、{playerName}。道からウィーバーを八体払い、供物を三つ持ってきてくれ。死んだ神に今も餌をやる手が誰のものか、知っておきたい。',
@@ -5241,15 +5241,15 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_wf_witch_of_willowweep.completion':
     'アルデンがわざわざ、いびきのことを訊きに人を寄越したのかい？なら橋の民もようやく耳を傾け始めたんだね。湿気を避けてお座り、{playerName}。あの音には名前があり、喉がある。そしてわたしは、あれを静める手伝いをしてくれる馬鹿者を、ずっと待っていたのさ。',
   'entities.quests.q_wf_witch_of_willowweep.objectives.0.label': 'マザー・セッジを見つけた',
-  'entities.quests.q_ww_bells_of_gallowmere.title': 'ガロウミアの鐘',
+  'entities.quests.q_ww_bells_of_gallowmere.title': 'ギベットミアの鐘',
   'entities.quests.q_ww_bells_of_gallowmere.text':
-    'あの鐘の音が聞こえるか、{playerName}？あれがガロウミアだ。北の道の先で、死者たちを眠りへと撞き送っている。堂守マロウが、この梢の下のすべての魂を数えている。生きている者も、葬られた者もな。行って、数えられてこい。森のほうがお前を数えてしまう前に。',
+    'あの鐘の音が聞こえるか、{playerName}？あれがギベットミアだ。北の道の先で、死者たちを眠りへと撞き送っている。堂守マロウが、この梢の下のすべての魂を数えている。生きている者も、葬られた者もな。行って、数えられてこい。森のほうがお前を数えてしまう前に。',
   'entities.quests.q_ww_bells_of_gallowmere.completion':
-    'コッブはお前を無事に道へ送り出したか。良い男だ。三十年あの門のランタンを灯し続けて、森は一度も彼を出し抜けなかった。ようこそガロウミアへ、{playerName}。鐘には気をつけてな。',
+    'コッブはお前を無事に道へ送り出したか。良い男だ。三十年あの門のランタンを灯し続けて、森は一度も彼を出し抜けなかった。ようこそギベットミアへ、{playerName}。鐘には気をつけてな。',
   'entities.quests.q_ww_bells_of_gallowmere.objectives.0.label': '堂守マロウに報告した',
   'entities.quests.q_ww_candles_at_the_bounds.title': '境界の蝋燭',
   'entities.quests.q_ww_candles_at_the_bounds.text':
-    'ガロウミアの周りには四つの境界石が立っている、{playerName}。外へ出る道の一本ごとにひとつ、そしてどの石の上でも墓前の蝋燭が燃えている。あれが燃えている限り、葬られた者は葬られたままでいる。その四つすべてが、霧雨に消されてしまった。わたしはもう、ひとりで境界を歩ける歳ではない。わたしの付け木を持って、急ぎ、灯し直してきてくれ。',
+    'ギベットミアの周りには四つの境界石が立っている、{playerName}。外へ出る道の一本ごとにひとつ、そしてどの石の上でも墓前の蝋燭が燃えている。あれが燃えている限り、葬られた者は葬られたままでいる。その四つすべてが、霧雨に消されてしまった。わたしはもう、ひとりで境界を歩ける歳ではない。わたしの付け木を持って、急ぎ、灯し直してきてくれ。',
   'entities.quests.q_ww_candles_at_the_bounds.completion':
     '四つとも燃えているか？なら息をつけ、{playerName}。お前には聞こえなかったろうが、村じゅうが聞いたのだ。最後の灯芯に火が入った瞬間、鐘の鳴りが軽くなったのを。',
   'entities.quests.q_ww_candles_at_the_bounds.objectives.0.label': '墓前の蝋燭を灯し直した',
@@ -5257,7 +5257,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_ww_horn_of_the_huntsman.text':
     'もう角笛は聞いただろう、{playerName}。細く、遠く、森全体が息を潜めるあの音だ。蒼白の狩人はここから北の広場で馬を駆っており、彼が通り過ぎるたび、墓は浅くなっていく。彼もかつては人だった。そして、誤ったやり方で葬られた。祈りで済むふりは、もう終わりにする。友をひとり、ふたり連れて、彼を馬から引きずり下ろせ。',
   'entities.quests.q_ww_horn_of_the_huntsman.completion':
-    '角笛が、音の途中で止まった。ガロウミアの鐘という鐘がひとりでに一度鳴り、それから森は、この三十年で聞いたことのないほど静かになった。わたしにできなかった儀式を、お前が果たしたのだ、{playerName}。これをまとい、梢の下を恐れず歩くがいい。',
+    '角笛が、音の途中で止まった。ギベットミアの鐘という鐘がひとりでに一度鳴り、それから森は、この三十年で聞いたことのないほど静かになった。わたしにできなかった儀式を、お前が果たしたのだ、{playerName}。これをまとい、梢の下を恐れず歩くがいい。',
   'entities.quests.q_ww_horn_of_the_huntsman.objectives.0.label': '蒼白の狩人を馬から落とした',
   'entities.quests.q_ww_silk_in_the_eaves.title': '軒先の絹糸',
   'entities.quests.q_ww_silk_in_the_eaves.text':
@@ -5275,12 +5275,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_ww_walking_mosley_home.text':
     'うちの墓掘りモズリーが三日前、古い墓地に墓穴を開けに礼拝堂の道を行ったのだが、掘った穴が上から崩れてきた。自力で這い出した。馬鹿者は生きている。だが礼拝堂の墓のそばでうずくまったきり、道のスピナーが怖くて動けんのだ。家まで歩かせてやってくれ、{playerName}。生きている男のために鐘を鳴らすわけにはいかんのでな。',
   'entities.quests.q_ww_walking_mosley_home.completion':
-    '自分の両足で門をくぐってきたよ。これからはカブの床より深い穴は掘らないと誓いながらな。日曜までには墓地へ戻っているさ、ああいう手合いはいつもそうだ。ありがとう、{playerName}。ガロウミアは己の民を手放さない。それがわたしたちの掟のすべてだ。',
+    '自分の両足で門をくぐってきたよ。これからはカブの床より深い穴は掘らないと誓いながらな。日曜までには墓地へ戻っているさ、ああいう手合いはいつもそうだ。ありがとう、{playerName}。ギベットミアは己の民を手放さない。それがわたしたちの掟のすべてだ。',
   'entities.quests.q_ww_walking_mosley_home.objectives.0.label':
-    '墓掘りモズリーをガロウミアまで送り届けた',
+    '墓掘りモズリーをギベットミアまで送り届けた',
   'entities.quests.q_ww_what_the_bark_holds.title': '樹皮が抱えるもの',
   'entities.quests.q_ww_what_the_bark_holds.text':
-    'ガロウミアの東の吊るしの林間地では、スピナーどもが絹に包んだ死者を枝から吊るし、その下ではグレイヴンバークどもが、辛抱強い棺担ぎのように見張りに立っている。あの上にあるのは、わたしたちの民なのだ、{playerName}。グレイヴンバークを五体砕き、包まれた死者を三体切り下ろして、土へ帰してやってくれ。',
+    'ギベットミアの東の吊るしの林間地では、スピナーどもが絹に包んだ死者を枝から吊るし、その下ではグレイヴンバークどもが、辛抱強い棺担ぎのように見張りに立っている。あの上にあるのは、わたしたちの民なのだ、{playerName}。グレイヴンバークを五体砕き、包まれた死者を三体切り下ろして、土へ帰してやってくれ。',
   'entities.quests.q_ww_what_the_bark_holds.completion':
     '日暮れ前に、三つの魂がまっとうな土の下へ戻った。グレイヴンバークどもはまた生えてくるだろう。樹皮とはそういうものだ。だが今夜、あの林間地には何も吊るされていない。それで十分だ。',
   'entities.quests.q_ww_what_the_bark_holds.objectives.0.label': 'グレイヴンバークを打ち倒した',
@@ -7034,17 +7034,17 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.peaksGreeting':
     'この壁は二百年立ち続けてきた。私が守る限り崩れはしないが、軋んでいる。',
   'guide.worldPage.peaksPlaceNotes':
-    'ハイウォッチは壁を守っています。ストーカー尾根とディープロックの巣穴は尾根猫と穴掘りのもの、オーガの丘陵とドログマーの戦営は雇われの荒くれ者のもの。ストームクラグはエレメンタルで弾け、その下にはグリマーミアが輝きます。その岸辺には、溺れし神殿へと下る蒼白い光の門があります。ワームカルトのテントとレヴェナントの野原がカルトの高所を囲み、その頂には墓ワームの聖所があります。',
+    'ハイウォッチは壁を守っています。ストーカー尾根とディープロックの巣穴は尾根猫と穴掘りのもの、オーガの丘陵とドログマーの戦営は雇われの荒くれ者のもの。ストームクラグはエレメンタルで弾け、その下にはグリマーミアが輝きます。その岸辺には、溺れし神殿へと下る蒼白い光の門があります。竜誓団のテントとレヴェナントの野原がカルトの高所を囲み、その頂には墓ワームの聖所があります。',
   'guide.worldPage.duskGreeting':
     'そなたの同族でこの枝の下に立った者は少ない。静かに歩み、歓迎を受けるがよい。',
-  'guide.worldPage.duskGreeter': '守り手セルウィン、エルダーグリーム',
+  'guide.worldPage.duskGreeter': '守り手セルウィン、エルダーシャイン',
   'guide.worldPage.duskPlaceNotes':
-    'エルダーグリームは大樹の下に集う。ダスクフォール洞窟とその見晴らし台が入り口であり、谷を初めて望む場所でもある。長老樹の森と星降りの盆地は静かな南を守り、沈んだ宮廷は東で草に覆われた遺跡を抱え、輝きの深みと水晶の浅瀬は北で淡く光る。',
+    'エルダーシャインは大樹の下に集う。ダスクフォール洞窟とその見晴らし台が入り口であり、谷を初めて望む場所でもある。長老樹の森と星降りの盆地は静かな南を守り、沈んだ宮廷は東で草に覆われた遺跡を抱え、輝きの深みと水晶の浅瀬は北で淡く光る。',
   'guide.family.demon.name': 'デーモン',
   'guide.family.demon.desc':
     '裂け目の彼方から来た侵略者たち。その身は炎と悪意のかたまりです。一体がいるところ、次元の裂け目は決して遠くありません。',
   'guide.worldPage.duskBlurb':
-    'エルダーグリームの大樹の下に広がる、永遠の黄昏に沈む谷。水晶の遺跡が輝き、大気は古の魔力に満ちて震えています。',
+    'エルダーシャインの大樹の下に広がる、永遠の黄昏に沈む谷。水晶の遺跡が輝き、大気は古の魔力に満ちて震えています。',
   'guide.worldPage.emberBlurb':
     '嵐の光に照らされた灰と血硝子の荒れ地。カルデラの上空をドレイクが旋回し、砂丘のあいだにはトロルの篝火が燃えています。門の町ワームウォッチから見張られています。',
   'guide.worldPage.frostBlurb':
@@ -7056,7 +7056,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.nightBlurb':
     '星降る真夜中のレルム。花々が小道を照らし、ムーンレストは夢見る空の下で静かな見張りを続けています。',
   'guide.worldPage.hauntBlurb':
-    '巨大な樹冠に覆われた呪われた森。街道でまともな光といえば、ギャロウミアのランタンだけです。',
+    '巨大な樹冠に覆われた呪われた森。街道でまともな光といえば、ギベットミアのランタンだけです。',
   'guide.worldPage.galeBlurb':
     '風のやむことのない海崖と咆哮の丘陵。古き烽火台の火は決して消えず、ウィックハーバーは扉を固く閉ざしています。',
   'guide.worldPage.jungleBlurb':
@@ -7080,7 +7080,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.nightGreeter': '不寝番の守り手、ムーンレスト',
   'guide.worldPage.hauntGreeting':
     'ランタンのそばを離れるな、旅人よ。それから、道の外から森がお前の名を呼んでも、決して答えるな。',
-  'guide.worldPage.hauntGreeter': '点灯夫、ギャロウミア',
+  'guide.worldPage.hauntGreeter': '点灯夫、ギベットミア',
   'guide.worldPage.galeGreeting':
     'ここでは風は一度たりともやんだことがなく、古き烽火台の火は一度たりとも消えたことがない。宿の扉はしっかり閉めてくれ。',
   'guide.worldPage.galeGreeter': '烽火の番人、ウィックハーバー',
@@ -7101,7 +7101,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.nightPlaceNotes':
     'ムーンレストは見張りを続けています。ナイトゲートは真夜中の国への入り口。月の泉にはそばに立てるほど近くに星明かりが湛えられ、宵闇の野は暗がりの中で花開きます。不動の見張りは微動だにせず見つめ続け、眠らずの塚はこの地でただ一つ、決して夢を見ない場所です。',
   'guide.worldPage.hauntPlaceNotes':
-    'ギャロウミアはランタンの内側に身を寄せ合っています。鴉の門は森の陰気な玄関口。寡婦蜘蛛の茂みは蜘蛛の糸が厚く張られています。首吊りの林間と嘆き石の礼拝堂は森の最も古い悲しみを抱え、狩人の空き地は、今もそこで狩りを続ける何者かのものです。',
+    'ギベットミアはランタンの内側に身を寄せ合っています。鴉の門は森の陰気な玄関口。寡婦蜘蛛の茂みは蜘蛛の糸が厚く張られています。首吊りの林間と嘆き石の礼拝堂は森の最も古い悲しみを抱え、狩人の空き地は、今もそこで狩りを続ける何者かのものです。',
   'guide.worldPage.galePlaceNotes':
     'ウィックハーバーは風に身を傾けています。風の道は崖沿いの入り口の道。咆哮の丘陵は強風の下、木一本なくうねっています。古き烽火台は誰も知らぬ昔から燃え続け、断ち崖は水面まで垂直に落ち込み、難破船の野はこの海岸の油断ならなさを物語ります。そして鏡の山湖は、このレルムでただ一つ静止しているものです。',
   'guide.worldPage.junglePlaceNotes':
@@ -7128,7 +7128,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.reliquary_shoulder.name': '崩れた肩当て',
   'entities.items.reliquary_gloves_rog.name': '骨守りの手甲',
   'entities.items.deacon_reliquary_helm.name': '助祭の聖遺物庫の兜',
-  'entities.items.varric_shadow_cowl.name': 'ヴァリックの影のフード',
+  'entities.items.varric_shadow_cowl.name': 'ヴァンドリックの影のフード',
   'entities.items.duskwisp_essence.name': 'ダスクウィスプの精髄',
   'entities.items.spore_heart.name': '胞子の心臓',
   'entities.items.gleaming_antler.name': '輝く鹿角',
@@ -7150,7 +7150,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.nightweave_tunic.name': '夜織りのチュニック',
   'entities.items.veilcloth_robe.name': 'ヴェール布のローブ',
   'entities.mobs.acolyte_tessa.name': '侍祭テッサ',
-  'entities.mobs.deacon_varric.name': '助祭ヴァリック',
+  'entities.mobs.deacon_varric.name': '助祭ヴァンドリック',
   'entities.mobs.reliquary_bonewalker.name': '蘇りし骨歩き',
   'entities.mobs.reliquary_funeral_ringer.name': '葬儀の鐘鳴らし',
   'entities.mobs.reliquary_gravecall_acolyte.name': '墓呼びの侍祭',
@@ -7185,22 +7185,22 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'delveUi.board.tier.heroic': 'ヒロイック',
   'delveUi.board.tier.normal': 'ノーマル',
   'delveUi.board.title': 'デルヴボード',
-  'delveUi.boss.varric.bell.emote': '助祭ヴァリックが埋もれた鐘を両手で握りしめる!',
+  'delveUi.boss.varric.bell.emote': '助祭ヴァンドリックが埋もれた鐘を両手で握りしめる!',
   'delveUi.boss.varric.bell.impact': '鐘の音が広間の床を砕く!',
   'delveUi.boss.varric.bell.lesson': '鐘の弔鐘。12秒ごとに地面を叩きつける。着弾する前に離れろ。',
-  'delveUi.boss.varric.bell.log': '助祭ヴァリックが埋葬の鐘を鳴らし始める。',
-  'delveUi.boss.varric.bell.warning': '助祭ヴァリックから離れろ!',
+  'delveUi.boss.varric.bell.log': '助祭ヴァンドリックが埋葬の鐘を鳴らし始める。',
+  'delveUi.boss.varric.bell.warning': '助祭ヴァンドリックから離れろ!',
   'delveUi.boss.varric.defeat': 'そんな……名簿は揃っていたのに……すべて揃っていたのに……',
   'delveUi.boss.varric.intro': '失われた魂などない。ただ置き忘れられただけだ。',
   'delveUi.boss.varric.mid30': '埋葬の鐘が、彼が口にするすべての名に応える。',
-  'delveUi.boss.varric.mid60': '助祭ヴァリックは震える勝ち誇りとともに台帳から名を読み上げる。',
+  'delveUi.boss.varric.mid60': '助祭ヴァンドリックは震える勝ち誇りとともに台帳から名を読み上げる。',
   'delveUi.boss.varric.pull': '汚れた目的で聖なる塵を踏むか。跪き、名を数えられよ。',
-  'delveUi.boss.varric.raise.emote': '助祭ヴァリックが砕けた墓から名を呼ぶ!',
-  'delveUi.boss.varric.raise.interrupt_fail': '死者が助祭ヴァリックの呼び声に応える!',
+  'delveUi.boss.varric.raise.emote': '助祭ヴァンドリックが砕けた墓から名を呼ぶ!',
+  'delveUi.boss.varric.raise.interrupt_fail': '死者が助祭ヴァンドリックの呼び声に応える!',
   'delveUi.boss.varric.raise.interrupt_ok': '墓の儀式が乱れる。',
   'delveUi.boss.varric.raise.lesson':
     '5秒以内に砕けた墓を妨害しなければ、死者が彼の呼び声に応えて立ち上がる。',
-  'delveUi.boss.varric.raise.log': '助祭ヴァリックが死者蘇生を唱え始める。',
+  'delveUi.boss.varric.raise.log': '助祭ヴァンドリックが死者蘇生を唱え始める。',
   'delveUi.boss.varric.raise.object': '砕けた墓が奪われた息吹で震える。',
   'delveUi.boss.varric.raise.warning': '墓の儀式を止めろ!',
   'delveUi.chest.flavor': '死者たちが、譲れるものを差し出した。',
@@ -9511,7 +9511,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.desc_drakemaw_raptor':
     '火口のカルデラで鞍慣らしされた巣育ちのラプトル。筋肉と疾走のかたまりで、いまなお灰の匂いをかすかに漂わせている。',
   'hudChrome.mounts.name_thunderstrut_gobbler': '大七面鳥サンダーストラット',
-  'hudChrome.mounts.name_terrorspark_groundshaker': '地揺らしのテラースパーク',
+  'hudChrome.mounts.name_terrorspark_groundshaker': '地揺らしのドレッドスパーク',
   'hudChrome.mounts.desc_valorsteed': '頑健で足取り確かな駿馬。移動速度を高める。',
   'hudChrome.mounts.desc_grag_bear': '頑健で足取り確かな熊。移動速度を高める。',
   'hudChrome.mounts.desc_stalkglider_snail': '粘り強くゆっくり燃えるカタツムリ。移動速度を高める。',
@@ -9555,7 +9555,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.pummel.description': '対象の呪文詠唱を中断し、4秒間その系統の呪文を封じる。',
   'entities.abilities.kick.name': 'ブーツ',
   'entities.abilities.kick.description': '対象の呪文詠唱を中断し、4秒間その系統の呪文を封じる。',
-  'entities.abilities.counterspell.name': 'スペルブレイク',
+  'entities.abilities.counterspell.name': '呪文断ち',
   'entities.abilities.counterspell.description':
     '対象の呪文を打ち消し、6秒間その系統の呪文を封じる。',
   'entities.abilities.counter_shot.name': '沈黙の一射',
@@ -9743,7 +9743,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.prayer_of_healing.description':
     '周囲の味方の体力を{damage}回復する。（プリーストのタレント）',
   'entities.abilities.preparation.description':
-    'スプリント、回避、バニッシュのクールダウンを完了させる。（ローグのタレント）',
+    'スプリント、回避、煙隠れのクールダウンを完了させる。（ローグのタレント）',
   'entities.abilities.presence_of_mind.description':
     '次の詠唱時間のある呪文を即時詠唱にする。効果時間 60 秒。（メイジタレント）',
   'entities.abilities.psychic_scream.description':
@@ -9789,13 +9789,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.flurry.name': 'ウィンターラッシュ',
   'entities.abilities.flurry.description':
     '3発の氷弾を放ち、それぞれ{damage}の氷ダメージを与え、対象にウィンターズ・チルを付与します。次に命中する対応呪文2回は対象を凍結状態として扱います。ブレインフリーズ発動時は即時発動となり、クールダウンを無視します。（氷）',
-  'entities.abilities.frozen_orb.name': 'フローズンオーブ',
+  'entities.abilities.frozen_orb.name': 'フロストグローブ',
   'entities.abilities.frozen_orb.description':
     '渦巻く氷球を放ち、8秒間前方へ漂わせます。周囲の敵に毎秒{damage}の氷ダメージを与え、移動速度を30%低下させます。敵に命中したパルスごとに氷柱を1つ生成します。（氷）',
   'entities.abilities.blizzard.name': 'ブリザード',
   'entities.abilities.blizzard.description':
-    '対象地点に6秒間吹雪を呼び、毎秒{damage}の氷ダメージを与えて敵の移動速度を40%低下させます。敵1体に命中するたび、フローズンオーブのクールダウンを0.5秒、1回の発動につき最大3秒短縮します。（氷）',
-  'entities.abilities.glacial_spike.name': 'グレイシャルスパイク',
+    '対象地点に6秒間吹雪を呼び、毎秒{damage}の氷ダメージを与えて敵の移動速度を40%低下させます。敵1体に命中するたび、フロストグローブのクールダウンを0.5秒、1回の発動につき最大3秒短縮します。（氷）',
+  'entities.abilities.glacial_spike.name': 'リムニードル',
   'entities.abilities.glacial_spike.description':
     '巨大な氷の槍を作り、アイシクルを5個消費して{damage}の氷ダメージを与え、対象を4秒間その場で凍結させます。（氷）',
   'entities.abilities.glacial_front.name': '氷河の前線',
@@ -9838,7 +9838,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '自身を炎で包み、{damage}ダメージを吸収します。60秒間持続します。（火）',
   'entities.abilities.cold_snap.name': '冬の呼び戻し',
   'entities.abilities.cold_snap.description':
-    'フリッカーステップ、フロストヴェール、グレーターインビジビリティのクールダウンを完了させます。（メイジタレント）',
+    '瞬き歩み、フロストヴェール、グレーターインビジビリティのクールダウンを完了させます。（メイジタレント）',
   'entities.abilities.greater_invisibility.name': 'グレーターインビジビリティ',
   'entities.abilities.greater_invisibility.description':
     '20 秒間姿を消し、継続ダメージ効果を 2 つ取り除く。透明化が終了すると、2 秒間、受けるダメージが 90% 減少する。（メイジのタレント）',
@@ -9978,7 +9978,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.battleTrance':
     '次のレイヴァーストライクまたは重傷の一撃の怒りコストが0になる',
   'hudChrome.auraEffect.revengeFree': '次の意趣返しの怒りコストが0になる',
-  'hudChrome.auraEffect.victoryRush': '勝利の追撃が使用可能',
+  'hudChrome.auraEffect.victoryRush': '勝者の奔流が使用可能',
   'hudChrome.auraEffect.maxHpPct': '最大体力を{pct}%上昇させる',
   'hud.combat.floatingParry': '受け流し',
   'hud.combat.parried': '{target}は{ability}を受け流しました。',
@@ -10094,7 +10094,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.hearthkeeper_maeve.title': '炉火の宿の主',
   'entities.npcs.hearthkeeper_maeve.greeting':
     '寒いところから、さあお入り。わたしが息をしている限り、この宿の火は消えないよ。',
-  'entities.npcs.hermit_okku.name': 'オック',
+  'entities.npcs.hermit_okku.name': 'オクリム',
   'entities.npcs.hermit_okku.title': '奥へ入った男',
   'entities.npcs.hermit_okku.greeting':
     '静かに。太鼓は木々の下を歩くものをすべて数えている。おまえのことも、もう数え終えている。',
@@ -10159,7 +10159,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.scout_yerrin.greeting':
     '身を低くしろ。硝子の上では音が妙に運ばれる。それに、下の門には耳がある。',
   'entities.npcs.sexton_marrow.name': '堂守マロウ',
-  'entities.npcs.sexton_marrow.title': 'ガロウミアの堂守',
+  'entities.npcs.sexton_marrow.title': 'ギベットミアの堂守',
   'entities.npcs.sexton_marrow.greeting':
     'ここでは死者を深くに葬る。そして鐘を鳴らすのだ。土の下にとどまることを、彼らが忘れぬようにな。',
   'entities.npcs.strandwatcher_pell.name': '浜守ペル',
@@ -10198,7 +10198,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.wickmother_sorrel.greeting':
     'お入り、お座り、火にかけた甘い酒があるよ。ただし鉄物からは手を離さないこと。近ごろのノームは手癖が悪いからね。',
   'entities.npcs.widow_tansy.name': '寡婦タンジー',
-  'entities.npcs.widow_tansy.title': 'ガロウミアの蝋燭師',
+  'entities.npcs.widow_tansy.title': 'ギベットミアの蝋燭師',
   'entities.npcs.widow_tansy.greeting':
     '墓のひとつひとつに蝋燭をひとつ。ひとつたりとも消してはいけない。ひとつたりともだよ、聞いているのかい？',
   'hudChrome.training.title': '訓練：{name}',
@@ -10314,7 +10314,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.the_last_keep.name': '最後の砦',
   'entities.dungeons.the_last_keep.enterText': '最後の砦の冷たく静まり返った広間へ足を踏み入れた。',
   'entities.items.last_keep_signet.name': '最後の砦の印章',
-  'entities.items.reins_terrorspark_groundshaker.name': 'テラースパークの始動キー',
+  'entities.items.reins_terrorspark_groundshaker.name': 'ドレッドスパークの始動キー',
   'entities.dungeons.the_last_keep.leaveText': '砦の扉を閉め、ドレイクランドの風の中へ戻った。',
   'entities.items.wildheart_tuskblade.name': 'ワイルドハートの牙大剣',
   'entities.items.wildheart_hexwood_staff.name': '盆地の呪木杖',
@@ -10339,7 +10339,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.farshore_salt_moss.name': '遠つ岸の塩苔',
   'entities.items.fenway_mooring_line.name': '切られた舫い綱',
   'entities.items.fountain_court_mantle.name': '噴水の中庭のマント',
-  'entities.items.frostmane_mantle.name': 'フロストメインのマント',
+  'entities.items.frostmane_mantle.name': 'ライムメインのマント',
   'entities.items.galecrest_ram_wool.name': '脂じみた雄羊の羊毛',
   'entities.items.gallowmere_grave_candle.name': '墓前の蝋燭',
   'entities.items.gilded_sap_clot.name': '金色の樹液の塊',
@@ -10402,7 +10402,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.revenantstep_treads.name': '亡魂歩きの靴',
   'entities.items.shardfang_grips.name': '欠片牙の篭手',
   'entities.items.shardsong_mantle.name': '欠片歌のマント',
-  'entities.items.wyrmcult_spellgrips.name': '竜教団の呪文篭手',
+  'entities.items.wyrmcult_spellgrips.name': '竜誓団の呪文篭手',
   'entities.items.thornpeak_wildwraps.name': 'ソーンピークの野生手甲',
   'entities.items.stormvotive_hauberk.name': '嵐誓願の鎖帷子',
   'entities.items.cryptbloom_shoulderguards.name': '墓花の肩当て',
@@ -11270,7 +11270,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraOverlay.procs.battleTrance': 'バトルトランス',
   'hudChrome.auraOverlay.procs.overpowerCharge': 'レッドハンドエンパワー',
   'hudChrome.auraOverlay.procs.suddenDeath': 'サドンデス',
-  'hudChrome.auraOverlay.procs.victoryRush': 'ビクトリーラッシュ',
+  'hudChrome.auraOverlay.procs.victoryRush': '勝者の奔流',
   'hudChrome.auraOverlay.procs.enrage': 'メイヘム: エンレイジ',
   'hudChrome.auraOverlay.procs.heatingUp': 'ヒーティングアップ',
   'hudChrome.auraOverlay.procs.arcaneCharge': 'アーケインチャージ',

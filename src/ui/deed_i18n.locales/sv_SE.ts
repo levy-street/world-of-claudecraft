@@ -38,9 +38,7 @@ export const table: DeedLocaleTable = {
     title: 'Sergeant',
   },
   pvp_honor_knight_lieutenant: {
-    name: 'Riddarlöjtnant',
     desc: 'Tjäna in 40 000 heder under din livstid, en säsong av verkligt krig bakom dig.',
-    title: 'Riddarlöjtnant',
   },
   pvp_honor_field_marshal: {
     name: 'Fältmarskalk',
@@ -76,7 +74,6 @@ export const table: DeedLocaleTable = {
     desc: 'Skorda en malmadra, ett tradbestand och en ortbadd i Nightbloom.',
   },
   chr_nightbloom_first_cast: {
-    name: 'En ring pa manbrunnen',
     desc: 'Fanga en fisk i Nightblooms vatten.',
   },
   chr_wraithwood_gatherer: {
@@ -271,7 +268,6 @@ export const table: DeedLocaleTable = {
     title: 'Lindormsfällaren',
   },
   dgn_sanctum_speed: {
-    name: 'Helgedomssprinten',
     desc: 'Besegra Korzul Gravlindormen inom 15 minuter efter att din grupp gjort anspråk på Gravlindormens helgedom.',
   },
   dgn_nythraxis_gravebreaker: {
@@ -337,7 +333,7 @@ export const table: DeedLocaleTable = {
   },
   dlv_varric_ringers: {
     name: 'Klockorna tystnar',
-    desc: 'Besegra Diakon Varric när varje begravningsringare han väcker redan är dräpt.',
+    desc: 'Besegra Diakon Vandric när varje begravningsringare han väcker redan är dräpt.',
   },
   dlv_nhalia_bells: {
     name: 'Klockstillare',
@@ -413,7 +409,6 @@ export const table: DeedLocaleTable = {
   },
   chr_peaks_chapter_iii: {
     name: 'Törntoppens krönika',
-    desc: 'Följ bergets hela berättelse till slutet: Lindormskulten krossad, helgedomen tystad, den vaknande toppen fälld och klippornas alla namnkunniga fasor nedlagda.',
     title: 'av Törntoppen',
   },
   chr_peaks_sparring: {

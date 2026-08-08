@@ -38,9 +38,9 @@ export const table: DeedLocaleTable = {
     title: 'Сержант',
   },
   pvp_honor_knight_lieutenant: {
-    name: 'Рыцарь-лейтенант',
+    name: 'Баннерет',
     desc: 'Заработайте 40 000 чести за все время игры: позади у вас целый сезон настоящей войны.',
-    title: 'Рыцарь-лейтенант',
+    title: 'Баннерет',
   },
   pvp_honor_field_marshal: {
     name: 'Фельдмаршал',
@@ -76,7 +76,7 @@ export const table: DeedLocaleTable = {
     desc: 'Soberi rudnuyu zhilu, lesnuyu porosl i gryadku trav v Nightbloom.',
   },
   chr_nightbloom_first_cast: {
-    name: 'Ryab na lunnom kolodtse',
+    name: 'Рябь на лунном роднике',
     desc: 'Poymay rybu v vodakh Nightbloom.',
   },
   chr_wraithwood_gatherer: {
@@ -292,7 +292,7 @@ export const table: DeedLocaleTable = {
     title: 'Вирмоборец',
   },
   dgn_sanctum_speed: {
-    name: 'Спринт по святилищу',
+    name: 'Забег по святилищу',
     desc: 'Одолейте Корзула Могильного Вирма в течение 15 минут после того, как ваша группа заняла Святилище Могильного Вирма.',
   },
   dgn_nythraxis_gravebreaker: {
@@ -358,7 +358,7 @@ export const table: DeedLocaleTable = {
   },
   dlv_varric_ringers: {
     name: 'Колокола умолкают',
-    desc: 'Одолейте Дьякона Варрика, когда все поднятые им Погребальные звонари уже перебиты.',
+    desc: 'Одолейте Дьякона Вандрика, когда все поднятые им Погребальные звонари уже перебиты.',
   },
   dlv_nhalia_bells: {
     name: 'Усмиритель колоколов',
@@ -434,7 +434,7 @@ export const table: DeedLocaleTable = {
   },
   chr_peaks_chapter_iii: {
     name: 'Летопись Терновых высот',
-    desc: 'Доведите историю горы до конца: Культ Вирма разбит, Святилище умолкло, Пробуждающийся пик низвергнут, и все именные ужасы утёсов повержены.',
+    desc: 'Доведите историю горы до конца: Клятва Выводка разбита, Святилище умолкло, Пробуждающийся пик низвергнут, и все именные ужасы утёсов повержены.',
     title: 'с Торнпика',
   },
   chr_peaks_sparring: {

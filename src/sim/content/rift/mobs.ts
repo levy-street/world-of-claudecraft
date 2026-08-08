@@ -416,7 +416,7 @@ const TRASH: Record<string, MobTemplate> = {
     loot: trashLoot(160, 'pactbound_vestments'),
     scale: 1.25,
     color: 0xc23a1a,
-    cleave: { radius: 7, mult: 0.5, name: 'Hellsteel Sweep' },
+    cleave: { radius: 7, mult: 0.5, name: 'Pitsteel Sweep' },
     smolder: { chance: 0.25, perTick: 8, interval: 2, duration: 8, name: 'Searing Brand' },
   },
   rift_pact_acolyte: {
@@ -1118,7 +1118,7 @@ const BOSSES: Record<string, MobTemplate> = {
       max: 26,
       radius: 12,
       every: 10,
-      name: 'Hellfire Ring',
+      name: 'Pitfire Ring',
       school: 'fire',
       fx: 'nova',
     },

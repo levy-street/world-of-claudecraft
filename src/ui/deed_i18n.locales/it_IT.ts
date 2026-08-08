@@ -38,9 +38,7 @@ export const table: DeedLocaleTable = {
     title: 'Sergente',
   },
   pvp_honor_knight_lieutenant: {
-    name: 'Cavaliere-Luogotenente',
     desc: 'Guadagna 40.000 Onore nel corso della tua vita, una stagione di guerra vera alle spalle.',
-    title: 'Cavaliere-Luogotenente',
   },
   pvp_honor_field_marshal: {
     name: 'Maresciallo di Campo',
@@ -76,7 +74,6 @@ export const table: DeedLocaleTable = {
     desc: 'Raccogli una vena di minerale, un gruppo di legna e un appezzamento d erbe a Nightbloom.',
   },
   chr_nightbloom_first_cast: {
-    name: 'Un increspatura sul pozzo lunare',
     desc: 'Pesca un pesce nelle acque di Nightbloom.',
   },
   chr_wraithwood_gatherer: {
@@ -304,7 +301,6 @@ export const table: DeedLocaleTable = {
     title: 'Abbattiwyrm',
   },
   dgn_sanctum_speed: {
-    name: 'Scatto nel Santuario',
     desc: 'Sconfiggi Korzul il Gravewyrm entro 15 minuti da quando il tuo gruppo rivendica il Santuario del Gravewyrm.',
   },
   dgn_nythraxis_gravebreaker: {
@@ -370,7 +366,7 @@ export const table: DeedLocaleTable = {
   },
   dlv_varric_ringers: {
     name: 'Le Campane Tacciono',
-    desc: 'Sconfiggi il Diacono Varric quando ogni Campanaro Funebre che risveglia è già stato ucciso.',
+    desc: 'Sconfiggi il Diacono Vandric quando ogni Campanaro Funebre che risveglia è già stato ucciso.',
   },
   dlv_nhalia_bells: {
     name: 'Fermacampane',
@@ -449,7 +445,6 @@ export const table: DeedLocaleTable = {
   },
   chr_peaks_chapter_iii: {
     name: 'Cronaca di Thornpeak',
-    desc: "Porta a compimento l'intera storia della montagna: il Culto del Wyrm spezzato, il Santuario ridotto al silenzio, il Picco Risvegliato abbattuto e ogni terrore famigerato delle rupi eliminato.",
     title: 'di Thornpeak',
   },
   chr_peaks_sparring: {

@@ -32,13 +32,13 @@ export const MAILBOXES: MailboxDef[] = [
   { ...EASTBROOK_LAYOUT.services.mailbox.position },
   { ...FENBRIDGE_LAYOUT.services.mailbox.position },
   { x: 6, z: 654 }, // Highwatch, beside the gate path
-  hubMailbox(REALM_ZONE, { x: 7, z: -5 }), // Eldergleam, south of the great tree
+  hubMailbox(REALM_ZONE, { x: 7, z: -5 }), // Eldershine, south of the great tree
   hubMailbox(DRAKELANDS_ZONE, { x: -7, z: 5 }), // Wyrmwatch, inside the gate lawn
   hubMailbox(FROSTVEIL_ZONE, { x: 7, z: -5 }), // Icemantle, at the pass-side square
   hubMailbox(AMBERFALL_ZONE, { x: 7, z: -5 }), // Lanternmere, by the ferry market
   hubMailbox(WILLOWFEN_ZONE, { x: 6, z: -6 }), // Bridgemere, near the island square
   hubMailbox(NIGHTBLOOM_ZONE, { x: 6, z: -5 }), // Moonrest, beside the hollow path
-  hubMailbox(WRAITHWOOD_ZONE, { x: -6, z: 6 }), // Gallowmere, under the eaves
+  hubMailbox(WRAITHWOOD_ZONE, { x: -6, z: 6 }), // Gibbetmere, under the eaves
   hubMailbox(PALMREACH_ZONE, { x: 6, z: -5 }), // Drifthaven, at the reef road
   hubMailbox(EVERGARDEN_ZONE, { x: -6, z: 6 }), // Hedgewick, facing the parterre
   hubMailbox(GALECREST_ZONE, { x: 7, z: -5 }), // Wickharbor, beside the harbor square

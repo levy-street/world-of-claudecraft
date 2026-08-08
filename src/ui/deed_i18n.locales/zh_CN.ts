@@ -38,9 +38,9 @@ export const table: DeedLocaleTable = {
     title: '中士',
   },
   pvp_honor_knight_lieutenant: {
-    name: '骑士中尉',
+    name: '方旗骑士',
     desc: '生涯累计获得40,000点荣誉，那是一整个赛季真枪实弹的战争。',
-    title: '骑士中尉',
+    title: '方旗骑士',
   },
   pvp_honor_field_marshal: {
     name: '陆军元帅',
@@ -76,7 +76,7 @@ export const table: DeedLocaleTable = {
     desc: '在Nightbloom采集一处矿脉、一片木料和一块草药地。',
   },
   chr_nightbloom_first_cast: {
-    name: '月井涟漪',
+    name: '月泉涟漪',
     desc: '在Nightbloom水域钓上一条鱼。',
   },
   chr_wraithwood_gatherer: {
@@ -248,7 +248,7 @@ export const table: DeedLocaleTable = {
   dlv_rite_flawless: { name: '一字不差', desc: '完成溺亡圣物库仪式，全程没有一处失误。' },
   dlv_varric_ringers: {
     name: '钟声止息',
-    desc: '击败执事瓦里克时，他唤起的每一个丧葬鸣钟者都已先行伏诛。',
+    desc: '击败执事万德里克时，他唤起的每一个丧葬鸣钟者都已先行伏诛。',
   },
   dlv_nhalia_bells: {
     name: '止钟人',
@@ -312,7 +312,7 @@ export const table: DeedLocaleTable = {
   },
   chr_peaks_chapter_iii: {
     name: '荆峰编年史·全卷',
-    desc: '见证高山故事的始末：击溃龙教，肃清墓龙圣所，扳倒觉醒之峰，将峭壁间每一个恶名之敌尽数讨灭。',
+    desc: '见证高山故事的始末：击溃龙誓，肃清墓龙圣所，扳倒觉醒之峰，将峭壁间每一个恶名之敌尽数讨灭。',
     title: '荆峰之子',
   },
   chr_peaks_sparring: { name: '城墙操练', desc: '对高望上方的训练假人造成总计 1,000 点伤害。' },

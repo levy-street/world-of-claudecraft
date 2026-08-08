@@ -38,9 +38,7 @@ export const table: DeedLocaleTable = {
     title: 'Sergeant',
   },
   pvp_honor_knight_lieutenant: {
-    name: 'Ridder-Luitenant',
     desc: 'Verdien 40.000 eer in je levensloop, een heus seizoen oorlog achter de rug.',
-    title: 'Ridder-Luitenant',
   },
   pvp_honor_field_marshal: {
     name: 'Veldmaarschalk',
@@ -76,7 +74,6 @@ export const table: DeedLocaleTable = {
     desc: 'Oogst een ertsader, een houtopstand en een kruidenbed in Nightbloom.',
   },
   chr_nightbloom_first_cast: {
-    name: 'Een rimpel op de maanbron',
     desc: 'Vang een vis in de wateren van Nightbloom.',
   },
   chr_wraithwood_gatherer: {
@@ -292,7 +289,6 @@ export const table: DeedLocaleTable = {
     title: 'Wurmveller',
   },
   dgn_sanctum_speed: {
-    name: 'Heiligdomssprint',
     desc: 'Versla Korzul de Grafwurm binnen 15 minuten nadat je groep het Grafwurm-Heiligdom heeft opgeëist.',
   },
   dgn_nythraxis_gravebreaker: {
@@ -358,7 +354,7 @@ export const table: DeedLocaleTable = {
   },
   dlv_varric_ringers: {
     name: 'De Klokken Verstommen',
-    desc: 'Versla Diaken Varric terwijl elke Doodsklokluider die hij doet verrijzen al gedood is.',
+    desc: 'Versla Diaken Vandric terwijl elke Doodsklokluider die hij doet verrijzen al gedood is.',
   },
   dlv_nhalia_bells: {
     name: 'Klokkenstiller',
@@ -434,7 +430,6 @@ export const table: DeedLocaleTable = {
   },
   chr_peaks_chapter_iii: {
     name: 'Kroniek van Doorntop',
-    desc: 'Breng het hele verhaal van de berg tot een einde: de Wurmcultus gebroken, het Heiligdom tot zwijgen gebracht, de Ontwakende Piek geveld en elke naamdragende verschrikking van de rotsen ten val gebracht.',
     title: 'van Doorntop',
   },
   chr_peaks_sparring: {

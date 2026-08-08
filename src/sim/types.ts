@@ -359,7 +359,7 @@ export type AuraKind =
   // `winters_chill`: TARGET debuff with 2 charges; each compatible spell
   // impact spends one to count the target as frozen.
   // `icicles`: self buff, up to 5 stacks, built by Rimelance impacts and Frozen
-  // Orb pulses. At 5 it gates Glacial Spike (requiresAuraStacks), which consumes
+  // Orb pulses. At 5 it gates Rimeneedle (requiresAuraStacks), which consumes
   // the whole stack for its slow, heavy hit + a target freeze.
   | 'fingers_of_frost'
   | 'brain_freeze'
@@ -2220,7 +2220,7 @@ export type AbilityEffect =
       hitsPrimary?: boolean;
     }
   // Removes magic-only auras in the ally/enemy direction. `steal` transfers a
-  // stripped enemy benefit to the caster (Spellsteal). `selfHealPctMaxOnDispel`
+  // stripped enemy benefit to the caster (Spellplunder). `selfHealPctMaxOnDispel`
   // heals the caster this fraction of max health ONLY when something was
   // actually devoured (Voidfeast: no free heal off an empty target).
   // `requiresDispellable` refuses the CAST at the gate (before billing mana or
@@ -2401,7 +2401,7 @@ export type AbilityEffect =
       // Blizzard: each pulse also snares everyone struck (kind 'slow').
       slowMult?: number;
       slowDuration?: number;
-      // Blizzard: each struck enemy shaves the running Frozen Orb cooldown
+      // Blizzard: each struck enemy shaves the running Frostglobe cooldown
       // (frost_mage's per-cast budget, reset when the zone is placed).
       orbCdr?: boolean;
     }
@@ -2455,7 +2455,7 @@ export type AbilityEffect =
         incapacitateDuration?: number;
       }[];
     }
-  // Frozen Orb (combat/frozen_orb.ts): releases a slow-drifting orb from the
+  // Frostglobe (combat/frozen_orb.ts): releases a slow-drifting orb from the
   // caster that pulses frost damage + a snare every `interval` for `duration`
   // seconds and banks Icicles (frost mage spec kit).
   | {
@@ -2689,10 +2689,10 @@ export interface AbilityDef {
   // raid instance. Toggle buffs may still be cancelled there to avoid trapping the
   // player in an action-locking form.
   requiresOutsideInstance?: boolean;
-  // Usable only while the caster wears an aura of this kind (Victory Rush's
+  // Usable only while the caster wears an aura of this kind (Victor's Surge's
   // on-kill window); runEffects consumes the enabling aura on a successful cast.
   requiresAuraKind?: AuraKind;
-  // Minimum stacks of requiresAuraKind needed to cast (Glacial Spike needs the
+  // Minimum stacks of requiresAuraKind needed to cast (Rimeneedle needs the
   // full 5-stack Icicles buff). Absent means any presence of the aura suffices.
   // The whole aura is still consumed on cast (consumeAuraKind removes it).
   requiresAuraStacks?: number;
@@ -3078,7 +3078,7 @@ export interface ZonePropsDef {
     arch: { x: number; z: number; dir: number };
     jumps: { x: number; z: number; dir: number; kind: 'vertical' | 'oxer' }[];
   };
-  // Hand-placed giant trees (the Eldergleam centerpiece): solid trunk
+  // Hand-placed giant trees (the Eldershine centerpiece): solid trunk
   // colliders here, rendered by render/realm_flora.ts from the same record.
   greatTrees?: { x: number; z: number; r: number }[];
   // Hand-placed one-off GLB props (the generated storybook set). `key` names a
@@ -3411,7 +3411,7 @@ export interface Entity extends ClientMirroredEntityFields {
   // pinned by the parity digest (excluded in tests/parity/trace.ts ENTITY_EXCLUDE);
   // it lives on the entity so it is dropped automatically when the entity is removed.
   damageHistory?: DamageTick[];
-  // Transient per-cast budget: how much Frozen Orb cooldown this Blizzard
+  // Transient per-cast budget: how much Frostglobe cooldown this Blizzard
   // channel has already refunded (combat/frost_mage.ts, reset at channel
   // start). Never serialized or wired.
   blizzardOrbCdr?: number;
@@ -3726,7 +3726,7 @@ export interface Entity extends ClientMirroredEntityFields {
   chargeTargetId: number | null;
   chargeTimeLeft: number; // seconds; failsafe so a blocked charge can't run forever
   chargePath: Vec3[]; // waypoints consumed front-to-back; last leg homes on the live target
-  // Authoritative Heroic Leap arc. While present, it owns movement and defers the
+  // Authoritative Vaulting Charge arc. While present, it owns movement and defers the
   // landing area hit until touchdown. Absent until first use so unrelated entity
   // snapshots and deterministic traces do not gain inert state.
   leap?: HeroicLeapFlight | null;
@@ -4922,7 +4922,7 @@ export type SimEvent = { pid?: number } & (
         | 'temporalRewindNova'
         | 'frostCone'
         | 'fireCone'
-        // A teleport step (Flickerstep / Shadowstep): the renderer SNAPS the
+        // A teleport step (Flitstep / Shadowstep): the renderer SNAPS the
         // mover instead of arcing the reposition like a leap.
         | 'blinkStep'
         // A DoT landing on its target the moment it is APPLIED (Rupture): audio-only,
@@ -4957,7 +4957,7 @@ export type SimEvent = { pid?: number } & (
   // visual-only cue anchored to a WORLD POINT rather than an entity: a
   // ground-targeted spell's impact (the burst/nova lands where it was aimed, not
   // on the caster). The renderer drapes it onto the terrain at (x, z). An 'orb'
-  // is the roaming Frozen Orb release: its flight is a straight line at fixed
+  // is the roaming Frostglobe release: its flight is a straight line at fixed
   // speed, so this ONE event carries the whole path (origin, direction, speed,
   // duration) and the client animates the sphere locally; the sim's orb state
   // (ctx.frozenOrbs) is never wired.

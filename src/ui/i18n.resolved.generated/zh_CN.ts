@@ -566,7 +566,7 @@ export const zh_CN: EnTranslations = {
         "ice_fang_sword": {
           "name": "冰牙",
           "look": "苍白冰川弯刃，刃背生着锯齿状霜晶，血槽内有发光的青蓝冰核，护手如冰柱。",
-          "lore": "这是冰封品级的旗舰，也是每位收藏家最先伸手的一件。Ice Fang 并非锻造，而是从覆盖 Highwatch 上方 Thornpeak 的冰川尖牙中雕成；青蓝核心寒冷燃烧，如 Glimmermere 水面的冷光。它劈过之处连空气都会结霜。城墙守卫发誓，大雪挡住 Wyrmcult 的那一夜，一名士兵带着它，“为城墙买下了一个冬天”。"
+          "lore": "这是冰封品级的旗舰，也是每位收藏家最先伸手的一件。Ice Fang 并非锻造，而是从覆盖 Highwatch 上方 Thornpeak 的冰川尖牙中雕成；青蓝核心寒冷燃烧，如 Glimmermere 水面的冷光。它劈过之处连空气都会结霜。城墙守卫发誓，大雪挡住 Broodsworn 的那一夜，一名士兵带着它，“为城墙买下了一个冬天”。"
         },
         "glaciersplit_axe": {
           "name": "裂冰",
@@ -594,7 +594,7 @@ export const zh_CN: EnTranslations = {
           "lore": "一根发光的冰川尖刺，据说折自 Sanctum 下方的深潭，那里的山寒长着利齿。白霜不断从银环绽放，无论烈火还是盛夏都不能使它融化。法师将它贴身携带，借寒意辅助施法；但在它似乎倾向 Nythraxis 墓室并静静聆听的夜晚，又会把它放得远远的。"
         },
         "winterbite": {
-          "name": "寒冬之噬",
+          "name": "寒冬之啮",
           "look": "镀银钢与蓝冰制成的弓，弓把内有青蓝冰核，弦上搭着实冰箭矢，寒雾缭绕。",
           "lore": "这把弓由镀银钢与 Thornpeak 寒冰制成，弓把内的青蓝冷核将箭冻结在弦上。每次拉弓都会重新凝成一支冰川实冰箭；城墙上的弓手不带箭袋，只携寒意。Highwatch 曾靠一把这样的弓守住遭围攻的 Stalker Ridge：据说只有一名弓手，以及一整个冬天取之不尽的箭。"
         },
@@ -1006,7 +1006,7 @@ export const zh_CN: EnTranslations = {
       "name_shadowjump_toad": "影跃蟾蜍卡玛影",
       "name_stormfeather_griffin": "凌天风暴之羽",
       "name_thunderstrut_gobbler": "雷霆阔步大火鸡",
-      "name_terrorspark_groundshaker": "惊雷撼地者",
+      "name_terrorspark_groundshaker": "骇雷撼地者",
       "name_drakemaw_raptor": "龙喉迅猛龙",
       "desc_valorsteed": "一匹坚韧稳健的骏马，可提升旅行速度。",
       "desc_grag_bear": "一头坚韧稳健的巨熊，可提升旅行速度。",
@@ -1487,7 +1487,7 @@ export const zh_CN: EnTranslations = {
         "battleTrance": "战斗冥想",
         "overpowerCharge": "赤手充能",
         "suddenDeath": "猝死",
-        "victoryRush": "乘胜追击",
+        "victoryRush": "胜者之势",
         "enrage": "狂乱：激怒",
         "heatingUp": "热身",
         "arcaneCharge": "奥术充能",
@@ -1970,7 +1970,7 @@ export const zh_CN: EnTranslations = {
       "sanguine": "攻击速度提高 {hastePct}%，造成的伤害提高 {dmgPct}%",
       "battleTrance": "你的下一次劫掠打击或致残打击不消耗怒气",
       "revengeFree": "你的下一次复仇不消耗怒气",
-      "victoryRush": "乘胜追击已就绪",
+      "victoryRush": "胜者之势已就绪",
       "maxHpPct": "最大生命值提高 {pct}%",
       "temporalHourglass": "免疫伤害且无法行动；恢复生命并加速冷却。右键点击可取消。",
       "tongues": "施法时间延长 {pct}%",
@@ -4069,13 +4069,13 @@ export const zh_CN: EnTranslations = {
       "gardenGreeter": "守门人，篱苑镇",
       "valePlaceNotes": "东溪镇是你的第一个大本营。狼奔谷与野猪草甸是温和的狩猎场；镜湖是供垂钓的好水域，只是浅滩处泥鳍鱼成群；墨网林与铜矿坑藏着蜘蛛和贪婪掘矿的家伙；一处强盗营地与陷落礼拜堂里有更棘手的活儿；圣物库山丘向下通往坍塌的圣物库，这是王国的第一座探秘；明木林地是北方一片宁静、阳光普照的林地；而母猪场则是东溪镇有围墙的野猪球场，溪谷杯就在丰收休战的庇护下在那里开赛。",
       "marshPlaceNotes": "芬桥守着唯一一条干燥的道路。潜行者芦苇荡与深沼浅滩里满是沼泽野兽和泥鳍；寡妇密林被蛛网织得密不透风；溺亡礼拜堂与巨魔土丘藏着更古老的危险，而这片湿地自己的探秘，溺亡连祷，就在土丘以北不远处开放；唤墓者营地是邪教的盘踞之处，沉没堡垒则是这片湿地的副本核心。",
-      "peaksPlaceNotes": "高守哨站扼守着城墙。潜猎者山脊与深岩洞穴属于山脊猫和穴居者；食人魔丘陵与卓格玛的战营属于受雇的莽夫；风暴岩中元素噼啪作响，其下方泛着微光的便是微光湖，这座山中小湖的湖畔守着一道通往溺亡神殿的苍白之光之门；蜿龙教帐篷与亡魂之野环绕着邪教的制高点，墓龙圣所则居于其巅。",
+      "peaksPlaceNotes": "高守哨站扼守着城墙。潜猎者山脊与深岩洞穴属于山脊猫和穴居者；食人魔丘陵与卓格玛的战营属于受雇的莽夫；风暴岩中元素噼啪作响，其下方泛着微光的便是微光湖，这座山中小湖的湖畔守着一道通往溺亡神殿的苍白之光之门；蜿龙誓帐篷与亡魂之野环绕着邪教的制高点，墓龙圣所则居于其巅。",
       "duskPlaceNotes": "古辉镇聚居在巨树之下。暮落洞穴与其瞭望台是入口，也是初见山谷的地方；古木林地与星落盆地守着宁静的南方；沉没王庭在东面藏着草木蔓生的废墟；辉光深处与水晶浅滩则在北方闪着微光。",
       "emberPlaceNotes": "望龙哨扼守着大门。门林是荒漠前最后一片绿意；烬沙丘随风飘着灰烬，还有更糟的东西；巨魔集会是沙丘巨魔燃起篝火聚集之处；血玻璃原野闪烁着锋利的碎片；而龙喉火山口则是群龙盘旋其上的冒烟王冠。",
       "frostPlaceNotes": "冰幔镇守着最后一座温暖的炉火。雪线隘口标记着积雪接管一切的地方；冰川湖是冰层之下漆黑而静止的水；极光台阶在舞动的光芒下向上攀升；颤栗沼泽是一片从未真正沉睡的冰封泥沼；而呼啸台地每到夜里都名副其实。",
       "amberPlaceNotes": "灯湖镇在丰收之地的中心闪着光。融金隘口是那条覆着琥珀的进山之路；鎏金果园与丰收谷藏着最甜的果实和最大胆的窃贼；大湖倒映着燃烧的秋叶；烬枫坡上的枫树最高也最红；而斜碑还记得比秋天更古老的事。",
       "fenPlaceNotes": "桥湖镇横跨在缓缓的水面上。琥珀沼石阶从丰收之乡蜿蜒而下；睡莲泽与泽光池间闪烁着鬼火与蜻蜓；垂柳湾的柳枝垂入湖中；而沉眠浅滩已是这片土地最温柔的去处。",
-      "nightPlaceNotes": "月栖镇守着长夜的警戒。夜门是通往午夜国度的入口；月井盛着可以伫立其旁的星光；暮光花田在黑暗中绽放；守望石阵一动不动地凝视着；而不眠古冢是这里唯一从不做梦的地方。",
+      "nightPlaceNotes": "月栖镇守着长夜的警戒。夜门是通往午夜国度的入口；月泉盛着可以伫立其旁的星光；暮光花田在黑暗中绽放；守望石阵一动不动地凝视着；而不眠古冢是这里唯一从不做梦的地方。",
       "hauntPlaceNotes": "绞湖镇蜷缩在自己的灯笼之间。鸦门是这片森林阴森的正门；寡妇棘丛被蛛网织得密不透风；吊影林地与哀石礼拜堂承载着森林最古老的悲恸；而猎手林隙属于至今仍在那里狩猎的东西。",
       "galePlaceNotes": "烛港迎风而立。风道是进来的悬崖之路；啸风丘陵在狂风下光秃起伏；老灯塔燃烧的岁月已无人能说清；断崖直落入海；沉船滩让人不敢小看这段海岸；而镜湖是整个国度里唯一静止的东西。",
       "junglePlaceNotes": "漂流港在海滩上燃着篝火。缠木隘口是大河汇入绿墙之处；棕榈长滩沿着浪缘铺展，洁白而温暖；翠绿丛林与垂藤林吞没了内陆；蓝宝石潟湖清澈而幽深地发着光；而沉没神像则在水下静静注视。",
@@ -6277,24 +6277,24 @@ export const zh_CN: EnTranslations = {
     "boss": {
       "varric": {
         "bell": {
-          "emote": "执事瓦里克双手紧握那口埋藏的钟！",
-          "log": "执事瓦里克开始敲响葬钟。",
-          "warning": "远离执事瓦里克！",
+          "emote": "执事万德里克双手紧握那口埋藏的钟！",
+          "log": "执事万德里克开始敲响葬钟。",
+          "warning": "远离执事万德里克！",
           "impact": "钟声轰鸣，震裂了厅堂的地面！",
           "lesson": "鸣钟：每十二秒一次的地面猛击。在它落下前移开。"
         },
         "raise": {
-          "emote": "执事瓦里克从破碎的坟墓中召唤亡者之名！",
-          "log": "执事瓦里克开始施放亡者复生。",
+          "emote": "执事万德里克从破碎的坟墓中召唤亡者之名！",
+          "log": "执事万德里克开始施放亡者复生。",
           "warning": "阻止墓葬仪式！",
           "object": "裂开的坟墓随着窃来的呼吸而颤动。",
           "interrupt_ok": "墓葬仪式被打断了。",
-          "interrupt_fail": "亡者回应了执事瓦里克的召唤！",
+          "interrupt_fail": "亡者回应了执事万德里克的召唤！",
           "lesson": "在五秒内打断那座裂开的坟墓，否则亡者将应他的召唤而起。"
         },
         "pull": "你带着不洁的目的踏上这片圣化之尘。跪下，接受清点。",
         "intro": "没有灵魂会失落，只是被错置了。",
-        "mid60": "执事瓦里克颤抖着、带着胜利的快意诵读名册上的名字。",
+        "mid60": "执事万德里克颤抖着、带着胜利的快意诵读名册上的名字。",
         "mid30": "他每念出一个名字，葬钟便回应一声。",
         "defeat": "不……那些名字……我本已将它们尽数收齐……"
       }
@@ -7980,7 +7980,7 @@ export const zh_CN: EnTranslations = {
       },
       "cold_snap": {
         "name": "冬之召还",
-        "description": "立即结束闪烁步、霜幕和强效隐形术的冷却时间。（法师天赋）"
+        "description": "立即结束轻掠步、霜幕和强效隐形术的冷却时间。（法师天赋）"
       },
       "greater_invisibility": {
         "name": "强效隐形术",
@@ -8039,7 +8039,7 @@ export const zh_CN: EnTranslations = {
         "description": "在目标区域召唤持续 6 秒的冰风暴，每秒造成 {damage} 点冰霜伤害并使敌人减速 40%。每命中一个敌人，寒冰宝珠的冷却时间缩短 0.5 秒，每次施法最多缩短 3 秒。（冰霜）"
       },
       "glacial_spike": {
-        "name": "冰川尖刺",
+        "name": "凝霜冰针",
         "description": "凝聚一根巨大的冰刺，消耗 5 枚冰刺，造成 {damage} 点冰霜伤害，并将目标冻结在原地 4 秒。（冰霜）"
       },
       "glacial_front": {
@@ -8555,7 +8555,7 @@ export const zh_CN: EnTranslations = {
         "description": "进入沸腾之怒，产生 20 点怒气。（战士天赋）"
       },
       "crusader_strike": {
-        "name": "十字军打击",
+        "name": "誓言打击",
         "description": "打击目标，造成武器伤害外加 {damage} 点神圣伤害。（圣骑士天赋）"
       },
       "chain_heal": {
@@ -8567,7 +8567,7 @@ export const zh_CN: EnTranslations = {
         "description": "化为恶魔之力，使护甲和攻击强度提高 20 秒。（术士天赋）"
       },
       "holy_shock": {
-        "name": "神圣震击",
+        "name": "圣光震颤",
         "description": "以神圣能量震击一个友方目标，为其恢复{damage}点生命值。（神圣专精招牌）"
       },
       "aura_surge": {
@@ -8587,7 +8587,7 @@ export const zh_CN: EnTranslations = {
         "description": "鼓舞附近盟友，使攻击强度提高35点，持续5分钟。（射击专精招牌）"
       },
       "wyvern_sting": {
-        "name": "翼龙钉刺",
+        "name": "幼龙钉刺",
         "description": "从远处钉刺敌人，使其瘫痪最多4秒。受到任何伤害都会打破效果。（生存专精招牌）"
       },
       "arcane_power": {
@@ -8599,7 +8599,7 @@ export const zh_CN: EnTranslations = {
         "description": "法术暴击几率提高50%，持续15秒。（火焰专精招牌）"
       },
       "icy_veins": {
-        "name": "冰冷血脉",
+        "name": "寒潮涌动",
         "description": "法术急速提高30%，并防止施法被打断或受到退条，持续10秒。（冰霜专精招牌）"
       },
       "cold_blood": {
@@ -8619,7 +8619,7 @@ export const zh_CN: EnTranslations = {
         "description": "向一个友方目标灌注能量，使其法术强度提高28点，持续15秒。（戒律专精招牌）"
       },
       "holy_nova": {
-        "name": "神圣新星",
+        "name": "圣辉爆发",
         "description": "引发神圣之光爆炸，为附近盟友恢复{damage}点生命值并伤害附近敌人。（神圣专精招牌）"
       },
       "shadowform": {
@@ -8647,7 +8647,7 @@ export const zh_CN: EnTranslations = {
         "description": "冲向敌人并使其定身1秒。8-25码距离。（野性专精招牌）"
       },
       "swiftmend": {
-        "name": "迅捷治愈",
+        "name": "轻捷愈合",
         "description": "吞噬友方目标身上的持续治疗效果，为其恢复{damage}点生命值。（恢复专精招牌）"
       },
       "summon_imp": {
@@ -8655,8 +8655,8 @@ export const zh_CN: EnTranslations = {
         "description": "召唤一只听从术士命令的烬裔。烬裔会从远处向你的敌人投掷灰烬箭。召唤新的恶魔会驱散你当前的恶魔。你同时只能拥有一只恶魔。"
       },
       "summon_voidwalker": {
-        "name": "召唤幽影",
-        "description": "召唤一只听从术士命令的幽影。幽影是一种坚韧的恶魔，会嘲讽你的敌人并承受打击。召唤新的恶魔会驱散你当前的恶魔。你同时只能拥有一只恶魔。"
+        "name": "召唤暮影",
+        "description": "召唤一只听从术士命令的暮影。暮影是一种坚韧的恶魔，会嘲讽你的敌人并承受打击。召唤新的恶魔会驱散你当前的恶魔。你同时只能拥有一只恶魔。"
       },
       "summon_succubus": {
         "name": "召唤暮裔",
@@ -8755,7 +8755,7 @@ export const zh_CN: EnTranslations = {
         "description": "你的自动攻击有几率让你对任意生命值的目标施放早赴黄泉，且不消耗怒气。（武器）"
       },
       "storm_bolt": {
-        "name": "风暴之锤",
+        "name": "雷霆投掷",
         "description": "将你的武器掷向目标，造成 {damage} 点伤害，并使其昏迷 3 秒。"
       },
       "piercing_howl": {
@@ -8775,7 +8775,7 @@ export const zh_CN: EnTranslations = {
         "description": "以敌人之血浸染你的武器：你和你的近战盟友获得 10% 攻击速度和 10% 伤害加成，持续 20 秒。"
       },
       "victory_rush": {
-        "name": "乘胜追击",
+        "name": "胜者之势",
         "description": "攻击造成武器伤害加 {damage}，并治疗相当于最大生命值 20% 的生命。仅可在击杀敌人后 20 秒内使用。"
       },
       "intimidating_shout": {
@@ -8787,7 +8787,7 @@ export const zh_CN: EnTranslations = {
         "description": "以宽阔的弧线攻击，对你前方所有敌人造成物理伤害。目标超过 5 个时伤害降低。当你躲闪或招架时，你的下一次复仇可能不消耗怒气。 (Protection)"
       },
       "heroic_leap": {
-        "name": "英勇飞跃",
+        "name": "腾跃冲锋",
         "description": "跃向目标区域，在落地时对附近的敌人造成 {damage} 点伤害。"
       },
       "rallying_cry": {
@@ -8803,7 +8803,7 @@ export const zh_CN: EnTranslations = {
         "description": "化身为巨像，持续 20 秒，解除你身上的所有控制效果，并使你造成的伤害提高 20%。"
       },
       "avenging_wrath": {
-        "name": "复仇之翼",
+        "name": "热诚之翼",
         "description": "召唤复仇之力，使你的攻击强度提高60、法术强度提高30，持续20秒。（圣骑士天赋）"
       },
       "berserk": {
@@ -8815,7 +8815,7 @@ export const zh_CN: EnTranslations = {
         "description": "化身为一道旋转的钢铁风暴，在 4 秒内每秒对 6 码内的所有敌人造成 {damage} 点伤害。"
       },
       "blink": {
-        "name": "闪烁步",
+        "name": "轻掠步",
         "description": "使你向前传送15码并解除定身效果。（法师天赋）"
       },
       "bloodlust": {
@@ -8992,7 +8992,7 @@ export const zh_CN: EnTranslations = {
       },
       "preparation": {
         "name": "应变",
-        "description": "结束疾跑、闪避和消失的冷却时间。（潜行者天赋）"
+        "description": "结束疾跑、闪避和烟遁的冷却时间。（潜行者天赋）"
       },
       "presence_of_mind": {
         "name": "疾思",
@@ -9421,7 +9421,7 @@ export const zh_CN: EnTranslations = {
         "name": "卡兹克斯的心裂片"
       },
       "wyrmcult_orders": {
-        "name": "龙教命令"
+        "name": "龙誓命令"
       },
       "ritual_phylactery": {
         "name": "仪式护命匣"
@@ -9484,7 +9484,7 @@ export const zh_CN: EnTranslations = {
         "name": "墓龙鳞锁甲"
       },
       "wyrmcult_grand_robe": {
-        "name": "龙教大长袍"
+        "name": "龙誓大长袍"
       },
       "wyrmscale_jerkin": {
         "name": "龙鳞皮甲"
@@ -10153,7 +10153,7 @@ export const zh_CN: EnTranslations = {
         "name": "碎片之歌披肩"
       },
       "wyrmcult_spellgrips": {
-        "name": "龙教法术护手"
+        "name": "龙誓法术护手"
       },
       "thornpeak_wildwraps": {
         "name": "荆峰野性裹手"
@@ -10576,7 +10576,7 @@ export const zh_CN: EnTranslations = {
         "name": "匠人之眼"
       },
       "reins_terrorspark_groundshaker": {
-        "name": "惊雷撼地者点火钥匙"
+        "name": "骇雷撼地者点火钥匙"
       },
       "reins_drakemaw_raptor": {
         "name": "龙喉迅猛龙的缰绳"
@@ -10744,7 +10744,7 @@ export const zh_CN: EnTranslations = {
         "name": "沃斯的圣化战锤"
       },
       "wyrmcult_soulsteps": {
-        "name": "龙教魂步"
+        "name": "龙誓魂步"
       },
       "wyrmshadow_harness": {
         "name": "夜牙挽具"
@@ -10975,7 +10975,7 @@ export const zh_CN: EnTranslations = {
         "name": "执事的圣物库头盔"
       },
       "varric_shadow_cowl": {
-        "name": "瓦里克的暗影兜帽"
+        "name": "万德里克的暗影兜帽"
       },
       "siltguard_helm": {
         "name": "淤卫头盔"
@@ -11466,10 +11466,10 @@ export const zh_CN: EnTranslations = {
         "name": "碎片领主卡兹克斯"
       },
       "wyrmcult_zealot": {
-        "name": "龙教狂热者"
+        "name": "龙誓狂热者"
       },
       "wyrmcult_necromancer": {
-        "name": "龙教死灵法师"
+        "name": "龙誓死灵法师"
       },
       "boneclad_revenant": {
         "name": "骨甲亡魂"
@@ -11577,7 +11577,7 @@ export const zh_CN: EnTranslations = {
         "name": "无圣徒像"
       },
       "deacon_varric": {
-        "name": "执事瓦里克"
+        "name": "执事万德里克"
       },
       "acolyte_tessa": {
         "name": "侍僧泰莎"
@@ -11817,7 +11817,7 @@ export const zh_CN: EnTranslations = {
         "name": "湖渊暗影"
       },
       "harvest_sprite": {
-        "name": "丰收小妖"
+        "name": "拾穗小妖"
       },
       "mere_lurker": {
         "name": "湖泽潜伏者"
@@ -11841,7 +11841,7 @@ export const zh_CN: EnTranslations = {
         "name": "幽暝疾行者"
       },
       "nightkin_stargazer": {
-        "name": "夜裔观星者"
+        "name": "暮裔观星者"
       },
       "barrow_king": {
         "name": "古冢之王"
@@ -11991,7 +11991,7 @@ export const zh_CN: EnTranslations = {
         "name": "烬裔"
       },
       "gloomshade": {
-        "name": "幽影"
+        "name": "暮影"
       },
       "duskborn": {
         "name": "暮裔"
@@ -12416,7 +12416,7 @@ export const zh_CN: EnTranslations = {
         "greeting": "海会给予，沙会保存，丛林只会夺取。待在沙滩上吧，陌生人。"
       },
       "hermit_okku": {
-        "name": "奥库",
+        "name": "奥克里姆",
         "title": "走进丛林的人",
         "greeting": "安静。鼓声数着树下走过的一切，而它们已经数到了你。"
       },
@@ -13064,7 +13064,7 @@ export const zh_CN: EnTranslations = {
       },
       "q_drogmar": {
         "title": "督军德罗格玛",
-        "text": "德罗格玛收了龙教的报酬，把氏族献给山脉苏醒。他是砸向城墙的锤——而当他砸向地面时，{playerName}，别站在他身边。进营地杀了他。",
+        "text": "德罗格玛收了龙誓的报酬，把氏族献给山脉苏醒。他是砸向城墙的锤——而当他砸向地面时，{playerName}，别站在他身边。进营地杀了他。",
         "completion": "德罗格玛死在自己的营地。氏族会散向高山隘口，你为我的城墙买来一个冬天，{playerName}。",
         "objectives": {
           "0": {
@@ -13104,11 +13104,11 @@ export const zh_CN: EnTranslations = {
       },
       "q_zealots": {
         "title": "风中圣歌",
-        "text": "{playerName}，南峰吹来的风带着圣歌。龙教不再隐藏，他们在圣所下扎营，对地下沉睡之物歌唱。让12名狂热者闭嘴。",
+        "text": "{playerName}，南峰吹来的风带着圣歌。龙誓不再隐藏，他们在圣所下扎营，对地下沉睡之物歌唱。让12名狂热者闭嘴。",
         "completion": "风安静了些。但让我不安的不是歌声，{playerName}，而是也许有什么在回应。",
         "objectives": {
           "0": {
-            "label": "击败龙教狂热者"
+            "label": "击败龙誓狂热者"
           }
         }
       },
@@ -13181,7 +13181,7 @@ export const zh_CN: EnTranslations = {
             "label": "击败龙教狂热者"
           },
           "1": {
-            "label": "击败龙教死灵法师"
+            "label": "击败龙誓死灵法师"
           }
         }
       },
@@ -13921,7 +13921,7 @@ export const zh_CN: EnTranslations = {
         "completion": "四只桶重新挂回了钩子，果林也安静了。你对付小妖的手比我重得多，{playerName}，而今天我为此庆幸。",
         "objectives": {
           "0": {
-            "label": "已赶走丰收小妖"
+            "label": "已赶走拾穗小妖"
           },
           "1": {
             "label": "已找回采脂桶"
@@ -14063,7 +14063,7 @@ export const zh_CN: EnTranslations = {
       },
       "q_nb_eyes_on_the_vigil": {
         "title": "望向石阵的眼睛",
-        "text": "有什么东西让疾行者变得大胆、兽群惶惶不安，{playerName}，而我从花里读不出缘由。卡西安能从天上读出来。他的观星营地就在东边的守望石阵旁，夜裔在石间飘荡的地方。找到他，问问星星都在说些什么。",
+        "text": "有什么东西让疾行者变得大胆、兽群惶惶不安，{playerName}，而我从花里读不出缘由。卡西安能从天上读出来。他的观星营地就在东边的守望石阵旁，暮裔在石间飘荡的地方。找到他，问问星星都在说些什么。",
         "completion": "莉拉派你来的？那就是说花园也感觉到了。到望远镜边坐一会儿吧，{playerName}。星星已经躁动一个月了，我画的每一张星图都朝北偏向古冢。",
         "objectives": {
           "0": {
@@ -14073,7 +14073,7 @@ export const zh_CN: EnTranslations = {
       },
       "q_nb_charts_of_the_stones": {
         "title": "石上星图",
-        "text": "石阵的立石比月栖镇古老，比照看它们的夜裔更古老，石面上刻着我用一生学着解读的星图。天空移位了，{playerName}，我必须知道移了多远。读取三座立石上的星图，把方位带回来给我。",
+        "text": "石阵的立石比月栖镇古老，比照看它们的暮裔更古老，石面上刻着我用一生学着解读的星图。天空移位了，{playerName}，我必须知道移了多远。读取三座立石上的星图，把方位带回来给我。",
         "completion": "再没有疑问了。每一个方位都朝不眠古冢挪去，仿佛天空亲自俯身盯着那座坟丘。古时的王要葬在群星连线之下，是有缘由的，{playerName}。",
         "objectives": {
           "0": {
@@ -14097,7 +14097,7 @@ export const zh_CN: EnTranslations = {
       "q_nb_the_barrow_king": {
         "title": "古冢之王苏醒",
         "text": "每一个方位、每一颗躁动的星、每一座开启的坟丘都指向同一件事：古冢之王正在大坟丘之下苏醒，而这片国度没有黎明可以拦他。必须赶在他想起自己的王冠之前送他安息，{playerName}。不要独自前往：带上一个朋友，让花光始终照在你背后。",
-        "completion": "星星安定了下来，一季以来头一回，{playerName}。坟丘闭合了，夜裔在他们的立石旁归于静止，王也重新沉睡于地下。披上这件披风吧：月栖镇裁下它，就是留给夜晚最终信任的那个人。",
+        "completion": "星星安定了下来，一季以来头一回，{playerName}。坟丘闭合了，暮裔在他们的立石旁归于静止，王也重新沉睡于地下。披上这件披风吧：月栖镇裁下它，就是留给夜晚最终信任的那个人。",
         "objectives": {
           "0": {
             "label": "已让古冢之王安息"
@@ -14239,11 +14239,11 @@ export const zh_CN: EnTranslations = {
       },
       "q_pr_the_man_who_went_in": {
         "title": "走进丛林的人",
-        "text": "采珠人不肯踏过林线一步，{playerName}，我也不会开这个口。鼓声你如今该听过了：到第二夜，人人都会听见。这座岛上只有一个人朝那声音走过去，还走了回来。奥库。他在垂藤林的大榕树下扎营，得沿缠木路走进深处。找到他，问问绿荫里藏着什么。",
+        "text": "采珠人不肯踏过林线一步，{playerName}，我也不会开这个口。鼓声你如今该听过了：到第二夜，人人都会听见。这座岛上只有一个人朝那声音走过去，还走了回来。奥克里姆。他在垂藤林的大榕树下扎营，得沿缠木路走进深处。找到他，问问绿荫里藏着什么。",
         "completion": "伊莎派你来的？珍珠之母已经多年没提过我的名字了。坐到藤蔓够不着的地方来，{playerName}，我把知道的都告诉你：鼓声不是危险。鼓声是警告。",
         "objectives": {
           "0": {
-            "label": "在垂藤林找到奥库"
+            "label": "在垂藤林找到奥克里姆"
           }
         }
       },
@@ -14722,7 +14722,7 @@ export const zh_CN: EnTranslations = {
             "label": "微光湖"
           },
           "7": {
-            "label": "龙教帐篷"
+            "label": "龙誓帐篷"
           },
           "8": {
             "label": "亡魂战场"
@@ -14875,7 +14875,7 @@ export const zh_CN: EnTranslations = {
             "label": "夜门"
           },
           "2": {
-            "label": "月井"
+            "label": "月泉"
           },
           "3": {
             "label": "暮光花田"

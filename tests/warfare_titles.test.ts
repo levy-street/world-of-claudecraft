@@ -30,7 +30,7 @@ import type { Entity, SimEvent } from '../src/sim/types';
 // value, or title text edited in content reds here too.
 const LADDER = [
   { id: 'pvp_honor_sergeant', amount: 10_000, renown: 10, title: 'Sergeant' },
-  { id: 'pvp_honor_knight_lieutenant', amount: 40_000, renown: 25, title: 'Knight-Lieutenant' },
+  { id: 'pvp_honor_knight_lieutenant', amount: 40_000, renown: 25, title: 'Banneret' },
   { id: 'pvp_honor_field_marshal', amount: 150_000, renown: 50, title: 'Field Marshal' },
 ] as const;
 

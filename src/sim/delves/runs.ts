@@ -1108,7 +1108,7 @@ export function tickDelveRaiseDeadChannel(ctx: SimContext, run: DelveRun): void 
     // interrupt-success line emitted from delveInteract on the cracked grave.
     ctx.emit({
       type: 'log',
-      text: "The dead answer Deacon Varric's call!",
+      text: "The dead answer Deacon Vandric's call!",
       color: '#f96',
       entityId: boss.id,
     });

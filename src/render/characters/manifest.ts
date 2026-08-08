@@ -848,7 +848,7 @@ export const VISUALS: Record<string, VisualDef> = {
     height: HUMANOID_H,
     // Every clip knight.glb ships is already wired somewhere in this block
     // (idle/walk/attack/hit/emotes account for the full shipped library, no
-    // spare donor pose), so Heroic Leap (issue #2889 batch, verified against
+    // spare donor pose), so Vaulting Charge (issue #2889 batch, verified against
     // the warrior's real kit in src/sim/content/classes.ts, not assumed) is
     // authored by pose-sample-and-blend (scripts/build_warrior_ability_anims.mjs)
     // instead of pointed at an unused clip.
@@ -886,7 +886,7 @@ export const VISUALS: Record<string, VisualDef> = {
         // Jawcrack is a bare-fist interrupt: the synthesized punch
         // (scripts/_add_pummel_punch_anim.mjs), not a weapon swing.
         pummel: 'Punch_A',
-        // Heroic Leap is a position-targeted jump, not a swing: the bespoke
+        // Vaulting Charge is a position-targeted jump, not a swing: the bespoke
         // pose-sample-and-blend clip (coil, airborne, driven two-hand slam on
         // landing). It carries no castFx and resolves no target entity, so it
         // completes through the renderer's generic 'selfCast' cue, which only
@@ -895,13 +895,13 @@ export const VISUALS: Record<string, VisualDef> = {
         // painter.ts's non-contact 'selfCast' branch); with no entry it plays
         // nothing at all on the body.
         heroic_leap: 'Warrior_Heroic_Leap',
-        // Victory Rush is a real weapon strike (weaponStrike effect, not a
+        // Victor's Surge is a real weapon strike (weaponStrike effect, not a
         // pure buff), so it lands through the ordinary damage-event attack
         // trigger like every entry above it: a confident decisive swing, the
         // same clip heroic_strike/overpower/hamstring already use.
         victory_rush: '1H_Melee_Attack_Slice_Diagonal',
         // Seething Fury and Recklessness are both a defiant roar of rage: no
-        // castFx, no target, so (like Heroic Leap above) the existing Cheer
+        // castFx, no target, so (like Vaulting Charge above) the existing Cheer
         // gesture only shows up once an attackByAbility entry exists for it.
         berserker_rage: 'Cheer',
         recklessness: 'Cheer',
@@ -917,7 +917,7 @@ export const VISUALS: Record<string, VisualDef> = {
         // the Cheer EMOTE and never reaches attackByAbility at all - adding
         // an entry for any of those would be dead code, so this batch leaves
         // them alone). Piercing Howl's own selfCast cue DOES reach the same
-        // gesture path Heroic Leap/berserker_rage/etc use above, and the
+        // gesture path Vaulting Charge/berserker_rage/etc use above, and the
         // painter's shout-emote call right after it is guarded on
         // isMidOneShot, so it does not stomp this gesture.
         piercing_howl: 'Spellcast_Raise',
@@ -1066,7 +1066,7 @@ export const VISUALS: Record<string, VisualDef> = {
         // 'Block' guard, no bake needed (the pattern player_warrior's
         // raised_guard already uses).
         evasion: 'Block',
-        // Cutthroat Tempo, Smokestep, Quickened Blood, and Duskveil are all
+        // Cutthroat Tempo, Smokefade, Quickened Blood, and Duskveil are all
         // self-buff/stealth toggles with no combat swing to author: rogue.
         // glb's own already-baked 'Spellcast_Raise', the pattern player_
         // warrior's sanguine_aura and the hunter batch's aspect toggles both
@@ -2036,7 +2036,7 @@ export const VISUALS: Record<string, VisualDef> = {
     tintStrength: 0.65,
   },
   delve_skel_varric: {
-    // Deacon Varric: boss mage rig with Taunt flourish on pull
+    // Deacon Vandric: boss mage rig with Taunt flourish on pull
     url: `${ENEMIES}/skeleton_mage.glb`,
     height: 2.5,
     clips: skeletonClips(['2H_Melee_Attack_Chop'], 'Taunt'),
@@ -2577,7 +2577,7 @@ const NPC_KEYS: Record<string, string> = {
   // The graveyard angel: a robed figure, rendered translucent (ethereal) with a
   // holy shimmer by the renderer (see the spirit_healer branches there).
   spirit_healer: 'npc_villager_robed',
-  // Eldergleam, the Veiled Hollow
+  // Eldershine, the Veiled Hollow
   keeper_saelwyn: 'npc_mage',
   loremother_bryn: 'npc_villager_robed',
   provisioner_fenna: 'npc_villager',

@@ -89,7 +89,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.furious_mending.name': 'Яростное исцеление',
   'entities.abilities.heroic_leap.description':
     'Прыгает в указанную область и при приземлении наносит {damage} ед. урона находящимся рядом противникам.',
-  'entities.abilities.heroic_leap.name': 'Героический прыжок',
+  'entities.abilities.heroic_leap.name': 'Прыжковый натиск',
   'entities.abilities.intimidating_shout.description':
     'Устрашающий крик, обращающий в бегство до 5 врагов в пределах 8 м на 8 сек. Урон может снять эффект.',
   'entities.abilities.intimidating_shout.name': 'Устрашающий крик',
@@ -128,7 +128,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.seasoned_soldier.name': 'Бывалый солдат',
   'entities.abilities.storm_bolt.description':
     'Метает ваше оружие в цель на {damage}, оглушая ее на 3 сек.',
-  'entities.abilities.storm_bolt.name': 'Громовой разряд',
+  'entities.abilities.storm_bolt.name': 'Громовой бросок',
   'entities.abilities.sudden_death.description':
     'Ваши автоатаки могут позволить применить Раннюю могилу к цели с любым запасом здоровья, не потратив ярости. (ветка «Оружие»)',
   'entities.abilities.sudden_death.name': 'Внезапная смерть',
@@ -137,7 +137,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sweeping_strikes.name': 'Расширяющаяся дуга',
   'entities.abilities.victory_rush.description':
     'Бьет на урон оружием плюс {damage} и исцеляет на 20% от максимального здоровья. Можно использовать только в течение 20 сек после убийства врага.',
-  'entities.abilities.victory_rush.name': 'Порыв победы',
+  'entities.abilities.victory_rush.name': 'Порыв победителя',
   'hudChrome.specPanel.complexity': 'Сложность',
   'hudChrome.specPanel.complexityHigh': 'Высокая',
   'hudChrome.specPanel.complexityLow': 'Низкая',
@@ -151,9 +151,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.talentRows.tab': 'Выбор',
   'hudChrome.talentRows.readoutSummary': 'Таланты: {head}, выбрано рядов: {spent}/{total}.',
   'entities.abilities.aspect_of_the_wild.name': 'Облик дикого клыка',
-  'entities.abilities.avenging_wrath.name': 'Крыло возмездия',
+  'entities.abilities.avenging_wrath.name': 'Крылья рвения',
   'entities.abilities.berserk.name': 'Багровая дымка',
-  'entities.abilities.blink.name': 'Мерцающий шаг',
+  'entities.abilities.blink.name': 'Порхающий шаг',
   'entities.abilities.bloodlust.name': 'Боевые барабаны',
   'entities.abilities.chain_lightning.name': 'Разветвленная молния',
   'entities.abilities.chaos_bolt.name': 'Стрела погибели',
@@ -326,7 +326,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.skins.ice_fang_sword.look':
     'Изогнутый клинок из бледного ледникового льда, зубчатые кристаллы изморози на обухе, сияющее голубое замёрзшее ядро в доле и гарда-сосулька.',
   'hudChrome.wocStore.skins.ice_fang_sword.lore':
-    'Главный образец ледяной категории и первое, к чему тянется каждый коллекционер. Ice Fang не выковали, а вырезали из клыка ледника Thornpeak над Highwatch; его голубое ядро горит холодом, словно свет на Glimmermere. Он покрывает инеем сам воздух, который разрезает. Стражи стены клянутся, что солдат нёс его в ночь, когда высокие снега сдержали Wyrmcult, и «купил стене целую зиму».',
+    'Главный образец ледяной категории и первое, к чему тянется каждый коллекционер. Ice Fang не выковали, а вырезали из клыка ледника Thornpeak над Highwatch; его голубое ядро горит холодом, словно свет на Glimmermere. Он покрывает инеем сам воздух, который разрезает. Стражи стены клянутся, что солдат нёс его в ночь, когда высокие снега сдержали Broodsworn, и «купил стене целую зиму».',
   'hudChrome.wocStore.skins.glaciersplit_axe.name': 'Глейшерсплит',
   'hudChrome.wocStore.skins.glaciersplit_axe.look':
     'Навершие из полупрозрачного синего ледникового льда, голубое свечение в треснувшей сердцевине, щетина морозных кристаллов и холодный пар за рукоятью.',
@@ -352,7 +352,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Один шип сияющего голубого ледникового льда, иней, распускающийся из серебряной муфты, и лёгкая холодная дымка.',
   'hudChrome.wocStore.skins.everwinter_wand.lore':
     'Шип сияющего ледникового льда, отколотый, как говорят, от глубокого озера под Sanctum, где у горного холода есть зубы. Иней непрерывно расцветает на серебряной муфте и не тает ни в огне, ни летом. Маги держат его близко ради холода, который он придаёт их чарам, и далеко — в ночи, когда он будто клонится к склепу Nythraxis и прислушивается.',
-  'hudChrome.wocStore.skins.winterbite.name': 'Уинтербайт',
+  'hudChrome.wocStore.skins.winterbite.name': 'Зимогрыз',
   'hudChrome.wocStore.skins.winterbite.look':
     'Лук из посеребрённой стали и синего льда, сияющее голубое замёрзшее ядро в рукояти, наложенная стрела из цельного льда и холодный пар.',
   'hudChrome.wocStore.skins.winterbite.lore':
@@ -2917,7 +2917,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rupture.name': 'Истечение кровью',
   'entities.abilities.rupture.description':
     'Завершающий прием, который ранит цель, вызывая кровотечение на {damage} в течение 16 сек.',
-  'entities.abilities.vanish.name': 'Дымный шаг',
+  'entities.abilities.vanish.name': 'Уход в дым',
   'entities.abilities.vanish.description':
     'Исчезает из виду, входя в Сумеречную завесу даже в бою. Пока вы скрыты, вы двигаетесь на 50% медленнее. Длится до 10 сек.',
   'entities.abilities.instant_poison.name': 'Укус гадюки',
@@ -3199,9 +3199,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.summon_imp.name': 'Призыв Уголька',
   'entities.abilities.summon_imp.description':
     'Призывает Уголька под командование чернокнижника. Уголёк издалека мечет зольные стрелы в ваших врагов. Призыв нового демона отпускает текущего. Одновременно у вас может быть только один демон.',
-  'entities.abilities.summon_voidwalker.name': 'Призыв Мрачной тени',
+  'entities.abilities.summon_voidwalker.name': 'Призыв Сумрачной мглы',
   'entities.abilities.summon_voidwalker.description':
-    'Призывает Мрачную тень под командование чернокнижника. Мрачная тень, крепкий демон, который провоцирует ваших врагов и принимает удары на себя. Призыв нового демона отпускает текущего. Одновременно у вас может быть только один демон.',
+    'Призывает Мрачную тень под командование чернокнижника. Сумрачная мгла, крепкий демон, который провоцирует ваших врагов и принимает удары на себя. Призыв нового демона отпускает текущего. Одновременно у вас может быть только один демон.',
   'entities.abilities.summon_succubus.name': 'Призыв Сумеречнорождённой',
   'entities.abilities.summon_succubus.description':
     'Призывает Сумеречнорождённую под командование чернокнижника. Сумеречнорождённая, хрупкий демон, который стремительно атакует и наносит тяжёлый урон в ближнем бою. Призыв нового демона отпускает текущего. Одновременно у вас может быть только один демон.',
@@ -3232,7 +3232,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.revive_pet.name': 'Подлатать',
   'entities.abilities.revive_pet.description':
     'Подлечивает питомца: если он жив, восстанавливает ему {overTime} ед. здоровья за 12 сек. с шагом в 3 сек. Если питомец мёртв, воскрешает его с 35% здоровья.',
-  'entities.abilities.holy_shock.name': 'Шок небес',
+  'entities.abilities.holy_shock.name': 'Разряд Света',
   'entities.abilities.holy_shock.description':
     'Поражает дружественную цель энергией Света и исцеляет ее на {damage}. (знаковое умение Света)',
   'entities.abilities.holy_shield.name': 'Священный щит',
@@ -3244,7 +3244,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.trueshot_aura.name': 'Аура меткого выстрела',
   'entities.abilities.trueshot_aura.description':
     'Воодушевляет ближайших союзников, повышая силу атаки на 35 на 5 мин. (знаковое умение Стрельбы)',
-  'entities.abilities.wyvern_sting.name': 'Укус виверны',
+  'entities.abilities.wyvern_sting.name': 'Драконье жало',
   'entities.abilities.wyvern_sting.description':
     'Поражает врага издалека и выводит его из строя на срок до 4 сек. Любой урон прерывает эффект. (знаковое умение Выживания)',
   'entities.abilities.arcane_power.name': 'Мощь тайной магии',
@@ -3253,7 +3253,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.combustion.name': 'Транс феникса',
   'entities.abilities.combustion.description':
     'Повышает шанс критического эффекта заклинаний на 50% на 15 сек. (знаковое умение Огня)',
-  'entities.abilities.icy_veins.name': 'Ледяные жилы',
+  'entities.abilities.icy_veins.name': 'Волна стужи',
   'entities.abilities.icy_veins.description':
     'Повышает скорость заклинаний на 30% и предотвращает прерывание и задержку произнесения на 10 сек. (знаковое умение Льда)',
   'entities.abilities.cold_blood.name': 'Хладнокровие',
@@ -3268,7 +3268,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.power_infusion.name': 'Придание сил',
   'entities.abilities.power_infusion.description':
     'Наполняет дружественную цель силой, повышая ее силу заклинаний на 28 на 15 сек. (знаковое умение Послушания)',
-  'entities.abilities.holy_nova.name': 'Кольцо света',
+  'entities.abilities.holy_nova.name': 'Всплеск святости',
   'entities.abilities.holy_nova.description':
     'Вызывает взрыв Света, исцеляя ближайших союзников на {damage} и раня ближайших врагов. (знаковое умение Света)',
   'entities.abilities.shadowform.name': 'Облик Тьмы',
@@ -3289,10 +3289,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.feral_charge.name': 'Звериная атака',
   'entities.abilities.feral_charge.description':
     'Вы бросаетесь к врагу и обездвиживаете его на 1 сек. Дистанция 8-25 м. (знаковое умение Силы зверя)',
-  'entities.abilities.swiftmend.name': 'Быстрое восстановление',
+  'entities.abilities.swiftmend.name': 'Проворное исцеление',
   'entities.abilities.swiftmend.description':
     'Поглощает эффект периодического исцеления на дружественной цели и исцеляет ее на {damage}. (знаковое умение Исцеления)',
-  'entities.abilities.crusader_strike.name': 'Удар воина Света',
+  'entities.abilities.crusader_strike.name': 'Клятвенный удар',
   'entities.abilities.crusader_strike.description':
     'Бьет цель, нанося урон оружием плюс {damage} ед. урона от Света. (талант паладина)',
   'entities.abilities.metamorphosis.name': 'Метаморфоза',
@@ -3463,7 +3463,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.ogre_war_totem.name': 'Боевой тотем огра',
   'entities.items.storm_core.name': 'Ядро бури',
   'entities.items.kazzix_heartshard.name': 'Осколок сердца Каззикса',
-  'entities.items.wyrmcult_orders.name': 'Приказы Культа Вирма',
+  'entities.items.wyrmcult_orders.name': 'Приказы Клятвы Выводка',
   'entities.items.ritual_phylactery.name': 'Ритуальная филактерия',
   'entities.items.gravewyrm_sigil.name': 'Сигил Могильного Вирма',
   'entities.items.blessed_embers.name': 'Благословенные угли',
@@ -3484,7 +3484,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.staff_of_velkhar.name': 'Посох Велхара',
   'entities.items.shadowmeld_tunic.name': 'Туника Ночной завесы',
   'entities.items.gravewyrm_scale_hauberk.name': 'Хауберк из чешуи Могильного Вирма',
-  'entities.items.wyrmcult_grand_robe.name': 'Великая роба Культа Вирма',
+  'entities.items.wyrmcult_grand_robe.name': 'Великая роба Клятвы Выводка',
   'entities.items.wyrmscale_jerkin.name': 'Куртка из вирмовой чешуи',
   'entities.items.wyrmfang_greatblade.name': 'Великий клинок Клык Вирма',
   'entities.items.staff_of_the_gravewyrm.name': 'Посох Могильного Вирма',
@@ -3551,7 +3551,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.tideguard_sabatons.name': 'Сабатоны Стража прилива',
   'entities.items.valeborn_spellblade.name': 'Долиннорожденный чароклинок',
   'entities.items.voss_sanctified_mace.name': 'Освященная булава Восса',
-  'entities.items.wyrmcult_soulsteps.name': 'Шаги души Культа вирма',
+  'entities.items.wyrmcult_soulsteps.name': 'Шаги души Клятвы Выводка',
   'entities.items.wyrmshadow_harness.name': 'Сбруя Ночного Клыка',
   'entities.items.wyrmshadow_legguards.name': 'Поножи Ночного Клыка',
   'entities.items.wyrmshadow_treads.name': 'Ступни Ночного Клыка',
@@ -3624,8 +3624,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.warlord_drogmar.name': 'Воевода Дрогмар',
   'entities.mobs.stormcrag_elemental.name': 'Элементаль Грозового Утеса',
   'entities.mobs.shardlord_kazzix.name': 'Осколочный владыка Каззикс',
-  'entities.mobs.wyrmcult_zealot.name': 'Фанатик Культа Вирма',
-  'entities.mobs.wyrmcult_necromancer.name': 'Некромант Культа Вирма',
+  'entities.mobs.wyrmcult_zealot.name': 'Фанатик Клятвы Выводка',
+  'entities.mobs.wyrmcult_necromancer.name': 'Некромант Клятвы Выводка',
   'entities.mobs.boneclad_revenant.name': 'Костепанцирный ревенант',
   'entities.mobs.crypt_shambler.name': 'Склепный шатун',
   'entities.mobs.hollow_acolyte.name': 'Послушник Пустоты',
@@ -3654,7 +3654,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.sister_nhalia.name': 'Сестра Налия',
   'entities.mobs.varkas_boneguard.name': 'Костяной страж Варкаса',
   'entities.mobs.emberkin.name': 'Уголёк',
-  'entities.mobs.gloomshade.name': 'Мрачная тень',
+  'entities.mobs.gloomshade.name': 'Сумрачная мгла',
   'entities.mobs.duskborn.name': 'Сумеречнорождённая',
   'entities.mobs.grix_the_tunnelking.name': 'Грикс, Король туннелей',
   'entities.mobs.spellhound.name': 'Гончая чар',
@@ -4114,7 +4114,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_crushers.objectives.0.label': 'Крушитель Терновых Пиков: убито',
   'entities.quests.q_drogmar.title': 'Воевода Дрогмар',
   'entities.quests.q_drogmar.text':
-    'Дрогмар взял монету Культа Вирма и присягнул кланы пробуждению горы. И когда он бьет по земле, {playerName}, не стойте рядом. Войдите в лагерь и убейте его ради Хайвотча.',
+    'Дрогмар взял монету Клятвы Выводка и присягнул кланы пробуждению горы. И когда он бьет по земле, {playerName}, не стойте рядом. Войдите в лагерь и убейте его ради Хайвотча.',
   'entities.quests.q_drogmar.completion':
     'Дрогмар мертв в собственном лагере. Вы купили моей стене зиму, {playerName}.',
   'entities.quests.q_drogmar.objectives.0.label': 'Воевода Дрогмар: убито',
@@ -4140,7 +4140,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Ветер с южных пиков несет песнопения. Заставьте 12 фанатиков умолкнуть, {playerName}; каждая тишина дает горе еще ночь сна.',
   'entities.quests.q_zealots.completion':
     'Ветер стал тише. Но меня тревожит не пение, {playerName}, а то, что кто-то может отвечать.',
-  'entities.quests.q_zealots.objectives.0.label': 'Фанатик Культа Вирма: убито',
+  'entities.quests.q_zealots.objectives.0.label': 'Фанатик Клятвы Выводка: убито',
   'entities.quests.q_cult_orders.title': 'Приказы снизу',
   'entities.quests.q_cult_orders.text':
     'Фанатики движутся как солдаты перед осадой. Фанатики, что организуются, - это фанатики, исполняющие приказы, {playerName}. Убейте еще 8 и принесите 4 комплекта приказов.',
@@ -4183,7 +4183,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_voice_below.completion':
     'Коленопреклонение прекратилось. Мы не заставили голос умолкнуть, {playerName}; лишь проредили его хор.',
   'entities.quests.q_voice_below.objectives.0.label': 'Фанатик Культа Вирма: убито',
-  'entities.quests.q_voice_below.objectives.1.label': 'Некромант Культа Вирма: убито',
+  'entities.quests.q_voice_below.objectives.1.label': 'Некромант Клятвы Выводка: убито',
   'entities.quests.q_sanctum_gate.title': 'Врата святилища',
   'entities.quests.q_sanctum_gate.text':
     'Это последний порог, {playerName}. Культ разбил ключевой камень святилища и разбросал осколки на площади. Принесите 3, и я тихо открою путь.',
@@ -4288,13 +4288,13 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.zones.thornpeak_heights.pois.4.label': 'Военный лагерь Дрогмара',
   'entities.zones.thornpeak_heights.pois.5.label': 'Грозовой Утес',
   'entities.zones.thornpeak_heights.pois.6.label': 'Глиммермир',
-  'entities.zones.thornpeak_heights.pois.7.label': 'Шатры Культа Вирма',
+  'entities.zones.thornpeak_heights.pois.7.label': 'Шатры Клятвы Выводка',
   'entities.zones.thornpeak_heights.pois.8.label': 'Поля ревенантов',
   'entities.zones.thornpeak_heights.pois.9.label': 'Святилище Могильного Вирма',
   'entities.zones.veiled_hollow.name': 'Сокрытая лощина',
   'entities.zones.veiled_hollow.welcome':
-    'Воздух гудит от древней магии. Найдите хранительницу Сэльвин под великим древом Элдерглима.',
-  'entities.zones.veiled_hollow.pois.0.label': 'Элдерглим',
+    'Воздух гудит от древней магии. Найдите хранительницу Сэльвин под великим древом Элдершайна.',
+  'entities.zones.veiled_hollow.pois.0.label': 'Элдершайн',
   'entities.zones.veiled_hollow.pois.1.label': 'Сумеречная пещера',
   'entities.zones.veiled_hollow.pois.2.label': 'Сумеречная смотровая площадка',
   'entities.zones.veiled_hollow.pois.3.label': 'Древняя роща',
@@ -4356,7 +4356,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.ice_wisp.name': 'Ледяной огонёк',
   'entities.mobs.rime_elemental.name': 'Инеевый элементаль',
   'entities.mobs.fen_sprite.name': 'Топяной дух',
-  'entities.mobs.frostmane_yeti.name': 'Морозогривый йети',
+  'entities.mobs.frostmane_yeti.name': 'Инеегривый йети',
   'entities.mobs.emberwing_drake.name': 'Углекрылый дрейк',
   'entities.mobs.ashbone_raider.name': 'Пеплокостный налётчик',
   'entities.mobs.ashbone_warcaller.name': 'Пеплокостный горлопан',
@@ -4364,7 +4364,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.gilded_stag.name': 'Золочёный олень',
   'entities.mobs.gloam_fox.name': 'Сумеречный лис',
   'entities.mobs.orchard_treant.name': 'Садовый древень',
-  'entities.mobs.harvest_sprite.name': 'Жатвенный дух',
+  'entities.mobs.harvest_sprite.name': 'Колосковый дух',
   'entities.mobs.mere_lurker.name': 'Озёрный скрытень',
   'entities.mobs.bogtoad.name': 'Топяная жаба',
   'entities.mobs.drowsy_croaker.name': 'Дремотный Квакун',
@@ -4375,18 +4375,18 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'За Ночными Вратами грезит сам воздух. Иди по цветочному свету к Лунному Приюту и не пропусти спящий мир, что висит в небе.',
   'entities.zones.nightbloom.pois.0.label': 'Лунный Приют',
   'entities.zones.nightbloom.pois.1.label': 'Ночные Врата',
-  'entities.zones.nightbloom.pois.2.label': 'Лунный Колодец',
+  'entities.zones.nightbloom.pois.2.label': 'Лунный Родник',
   'entities.zones.nightbloom.pois.3.label': 'Сумеречное Поле',
   'entities.zones.nightbloom.pois.4.label': 'Стоячий Дозор',
   'entities.zones.nightbloom.pois.5.label': 'Курган Неспящего',
   'entities.mobs.moonfleece_grazer.name': 'Лунорунный зверь',
   'entities.mobs.gloam_strider.name': 'Сумеречный бегун',
-  'entities.mobs.nightkin_stargazer.name': 'Ночерождённый звездочёт',
+  'entities.mobs.nightkin_stargazer.name': 'Сумеречнорождённый звездочёт',
   'entities.mobs.barrow_king.name': 'Курганный Король',
   'entities.zones.wraithwood.name': 'Призрачная Чаща',
   'entities.zones.wraithwood.welcome':
-    'Кроны смыкаются над дорогой, как крышка гроба. Держись фонарей Гэллоумира, и если лес позовёт тебя по имени, не отвечай.',
-  'entities.zones.wraithwood.pois.0.label': 'Гэллоумир',
+    'Кроны смыкаются над дорогой, как крышка гроба. Держись фонарей Гиббетмира, и если лес позовёт тебя по имени, не отвечай.',
+  'entities.zones.wraithwood.pois.0.label': 'Гиббетмир',
   'entities.zones.wraithwood.pois.1.label': 'Вороньи Врата',
   'entities.zones.wraithwood.pois.2.label': 'Вдовья Чаща',
   'entities.zones.wraithwood.pois.3.label': 'Висельная Поляна',
@@ -4504,7 +4504,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.loremother_bryn.greeting':
     'Каждый огонёк в этой долине что-то помнит, {playerName}. Помоги мне вслушаться.',
   'entities.npcs.provisioner_fenna.name': 'Снабженец Фенна',
-  'entities.npcs.provisioner_fenna.title': 'Снабженец Элдерглима',
+  'entities.npcs.provisioner_fenna.title': 'Снабженец Элдершайна',
   'entities.npcs.provisioner_fenna.greeting':
     'Хлеб ещё тёплый, вода всё так же сладка. Лощина даёт, и я даю.',
   'entities.npcs.wardsmith_orun.name': 'Кузнец-оберегов Орун',
@@ -4785,7 +4785,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Жатвенные духи, {playerName}. Они выковыривают мои краники из стволов ради сладости внутри, а вёдра швыряют в траву. Прогони восьмерых маленьких воришек и верни четыре моих ведёрка — и повозки снова покатятся.',
   'entities.quests.q_af_sprites_and_spigots.completion':
     'Четыре ведёрка снова на крюках, и в рядах стало тихо. Рука у тебя с духами тяжелее моей, {playerName}, и сегодня я этому рада.',
-  'entities.quests.q_af_sprites_and_spigots.objectives.0.label': 'Жатвенный дух прогнан',
+  'entities.quests.q_af_sprites_and_spigots.objectives.0.label': 'Колосковый дух прогнан',
   'entities.quests.q_af_sprites_and_spigots.objectives.1.label': 'Ведёрко для живицы возвращено',
   'entities.quests.q_af_amber_from_the_herd.title': 'Янтарь со стада',
   'entities.quests.q_af_amber_from_the_herd.text':
@@ -5038,12 +5038,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_fv_howl_above.completion':
     'Восемь — и сумеречный хор стал жиже. Но ревуны не покидают вершин просто так. Что-то их согнало, и я боюсь, что у этого есть имя.',
   'entities.quests.q_fv_howl_above.objectives.0.label': 'Террасный ревун убит',
-  'entities.quests.q_fv_frostmane_tyrant.title': 'Тиран Морозная Грива',
+  'entities.quests.q_fv_frostmane_tyrant.title': 'Тиран Инеистая Грива',
   'entities.quests.q_fv_frostmane_tyrant.text':
-    'Ревуны не охотились, когда спускались по террасам. Они бежали. Высоты забрал себе йети — горный люд зовёт его Морозной Гривой, — и даже стаи не делят с ним склона. С этим надо покончить, {playerName}, пока зима не согнала его к моим стенам. Возьми друга. А лучше двух.',
+    'Ревуны не охотились, когда спускались по террасам. Они бежали. Высоты забрал себе йети — горный люд зовёт его Инеистой Гривой, — и даже стаи не делят с ним склона. С этим надо покончить, {playerName}, пока зима не согнала его к моим стенам. Возьми друга. А лучше двух.',
   'entities.quests.q_fv_frostmane_tyrant.completion':
-    'Когда этой ночью стих ветер, вся деревня услышала тишину там, где раньше была Морозная Грива. Предел в долгу перед тобой, и платить его будут годами, {playerName}. Носи это — и каждая дверь в Ледяной Мантии открыта для тебя.',
-  'entities.quests.q_fv_frostmane_tyrant.objectives.0.label': 'Морозная Грива убита',
+    'Когда этой ночью стих ветер, вся деревня услышала тишину там, где раньше была Инеистая Грива. Предел в долгу перед тобой, и платить его будут годами, {playerName}. Носи это — и каждая дверь в Ледяной Мантии открыта для тебя.',
+  'entities.quests.q_fv_frostmane_tyrant.objectives.0.label': 'Инеистая Грива убита',
   'entities.quests.q_gc_down_the_windway.title': 'Вниз по Ветровому Проходу',
   'entities.quests.q_gc_down_the_windway.text':
     'Ты одолел подъём, {playerName}, — значит, ветер решил тебя оставить. Викхарбор лежит к востоку по дороге через холмы, укрытый в затишье своей бухты. Начальница гавани Одиль считает каждую душу, что переваливает через проход, и захочет сосчитать тебя. Скажи ей, что Ветровой Проход ещё открыт.',
@@ -5107,7 +5107,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_hollow_the_huntsman.objectives.0.label': 'Найдите охотника Дерала',
   'entities.quests.q_hollow_old_marrowshell.title': 'Старый панцирь отмелей',
   'entities.quests.q_hollow_old_marrowshell.text':
-    'Первое имя — Старый Костнопанцирь, краб размером с повозку, что охотится в восточных отмелях с тех пор, когда у Элдерглима ещё не было ворот. Он бродит, {playerName}, так что придётся идти вдоль берега, пока не пересечёшь его след. Не ходи в одиночку и не верь его неподвижности.',
+    'Первое имя — Старый Костнопанцирь, краб размером с повозку, что охотится в восточных отмелях с тех пор, когда у Элдершайна ещё не было ворот. Он бродит, {playerName}, так что придётся идти вдоль берега, пока не пересечёшь его след. Не ходи в одиночку и не верь его неподвижности.',
   'entities.quests.q_hollow_old_marrowshell.completion':
     'Отмели снова стали просто водой. Я видел, как этот панцирь ломал охотников получше меня, {playerName}. Но не тебя.',
   'entities.quests.q_hollow_old_marrowshell.objectives.0.label': 'Старый Костнопанцирь убит',
@@ -5144,14 +5144,14 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_nb_night_gardens.objectives.0.label': 'Цветок ночецвета собран',
   'entities.quests.q_nb_eyes_on_the_vigil.title': 'Глаза на Дозоре',
   'entities.quests.q_nb_eyes_on_the_vigil.text':
-    'Что-то сделало бегунов дерзкими, а стада — беспокойными, {playerName}, и по цветам мне этого не прочесть. Кассиан прочтёт по небу. Его обсерваторный лагерь стоит у Стоячего Дозора к востоку отсюда, там, где среди камней бродят ночерождённые. Найди его и спроси, что говорят звёзды.',
+    'Что-то сделало бегунов дерзкими, а стада — беспокойными, {playerName}, и по цветам мне этого не прочесть. Кассиан прочтёт по небу. Его обсерваторный лагерь стоит у Стоячего Дозора к востоку отсюда, там, где среди камней бродят сумеречнорождённые. Найди его и спроси, что говорят звёзды.',
   'entities.quests.q_nb_eyes_on_the_vigil.completion':
     'Тебя прислала Лира? Значит, и сады это чувствуют. Посиди у трубы, {playerName}. Звёзды не находят покоя уже месяц, и каждая карта, что я черчу, клонится на север, к кургану.',
   'entities.quests.q_nb_eyes_on_the_vigil.objectives.0.label':
     'Найдите астронома Кассиана у Стоячего Дозора',
   'entities.quests.q_nb_charts_of_the_stones.title': 'Карты в камнях',
   'entities.quests.q_nb_charts_of_the_stones.text':
-    'Камни Дозора старше Лунного Приюта, старше ночерождённых, что за ними ухаживают, и на их гранях высечены звёздные карты, которые я учился читать всю жизнь. Небо сдвинулось, {playerName}, и я должен знать, насколько. Прочти карты на трёх камнях и принеси мне их пеленги.',
+    'Камни Дозора старше Лунного Приюта, старше сумеречнорождённых, что за ними ухаживают, и на их гранях высечены звёздные карты, которые я учился читать всю жизнь. Небо сдвинулось, {playerName}, и я должен знать, насколько. Прочти карты на трёх камнях и принеси мне их пеленги.',
   'entities.quests.q_nb_charts_of_the_stones.completion':
     'Сомнений не осталось. Каждый пеленг сполз к Кургану Неспящего, будто само небо склонилось над этим холмом, чтобы смотреть. Старых королей не зря хоронили под выверенными звёздами, {playerName}.',
   'entities.quests.q_nb_charts_of_the_stones.objectives.0.label': 'Звёздная карта прочитана',
@@ -5166,7 +5166,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_nb_the_barrow_king.text':
     'Каждый пеленг, каждая беспокойная звезда, каждый вскрытый могильник указывают на одно: под великим курганом просыпается Курганный Король, а у этого края нет рассвета, чтобы его сдержать. Его нужно вернуть в сон, прежде чем он вспомнит свою корону, {playerName}. Не ходи в одиночку: возьми друга, и пусть цветочный свет будет у тебя за спиной.',
   'entities.quests.q_nb_the_barrow_king.completion':
-    'Звёзды улеглись впервые за сезон, {playerName}. Могильники закрыты, ночерождённые замерли у своих камней, и король снова спит внизу. Носи эту мантию: Лунный Приют скроил её для того, кому ночь наконец доверилась.',
+    'Звёзды улеглись впервые за сезон, {playerName}. Могильники закрыты, сумеречнорождённые замерли у своих камней, и король снова спит внизу. Носи эту мантию: Лунный Приют скроил её для того, кому ночь наконец доверилась.',
   'entities.quests.q_nb_the_barrow_king.objectives.0.label': 'Курганный Король упокоен',
   'entities.quests.q_pr_down_to_drifthaven.title': 'Вниз, в Дрифтхейвен',
   'entities.quests.q_pr_down_to_drifthaven.text':
@@ -5202,10 +5202,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_pr_boars_in_the_gardens.objectives.0.label': 'Чащобный вепрь прогнан',
   'entities.quests.q_pr_the_man_who_went_in.title': 'Тот, кто вошёл в чащу',
   'entities.quests.q_pr_the_man_who_went_in.text':
-    'Ныряльщицы не ступят за кромку деревьев, {playerName}, и я не стану их просить. Барабаны ты уже слышал: их слышат все — ко второй ночи. Лишь один человек на этом острове пошёл на этот звук и вернулся. Окку. Он живёт под великими баньянами у Лианопада, в глубине дороги через Заросли. Найди его и спроси, что прячет зелень.',
+    'Ныряльщицы не ступят за кромку деревьев, {playerName}, и я не стану их просить. Барабаны ты уже слышал: их слышат все — ко второй ночи. Лишь один человек на этом острове пошёл на этот звук и вернулся. Окрим. Он живёт под великими баньянами у Лианопада, в глубине дороги через Заросли. Найди его и спроси, что прячет зелень.',
   'entities.quests.q_pr_the_man_who_went_in.completion':
     'Тебя прислала Иша? Мать-Жемчужница годами не произносила моего имени. Сядь подальше от лиан, {playerName}, и я расскажу, что знаю: барабаны — не опасность. Барабаны — предупреждение.',
-  'entities.quests.q_pr_the_man_who_went_in.objectives.0.label': 'Найдите Окку у Лианопада',
+  'entities.quests.q_pr_the_man_who_went_in.objectives.0.label': 'Найдите Окрим у Лианопада',
   'entities.quests.q_pr_canopy_silk.title': 'Шёлк из крон',
   'entities.quests.q_pr_canopy_silk.text':
     'Подними голову, {playerName}. Все кроны отсюда до идола затянуты паутиной, как рыбацкой сетью, и ткачи наглеют с каждым сезоном. Я натягиваю их же шёлк поперёк троп — колокольчики на растяжках, — чтобы джунгли не подкрались ко мне. Шесть добрых мотков с кроновых ткачей — и мои линии натянуты заново.',
@@ -5275,11 +5275,11 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_wf_croakers_hush.completion':
     'Слушай, {playerName}. Ничего. Первая настоящая тишина над этой топью за тридцать лет, и полгорода сегодня не уснёт от её непривычности. Ивы благодарят тебя — по-своему. Носи это, сплетено из его собственного кувшинкового ложа, — и топь признает в тебе друга всюду, куда дотягивается вода.',
   'entities.quests.q_wf_croakers_hush.objectives.0.label': 'Дремотный Квакун убит',
-  'entities.quests.q_ww_bells_of_gallowmere.title': 'Колокола Гэллоумира',
+  'entities.quests.q_ww_bells_of_gallowmere.title': 'Колокола Гиббетмира',
   'entities.quests.q_ww_bells_of_gallowmere.text':
-    'Слышишь звон, {playerName}? Это Гэллоумир, вверх по северной дороге, убаюкивает своих мёртвых. Пономарь Марроу ведёт счёт каждой душе под этими кронами — и живой, и погребённой. Иди и будь сосчитан, пока лес не сосчитал тебя сам.',
+    'Слышишь звон, {playerName}? Это Гиббетмир, вверх по северной дороге, убаюкивает своих мёртвых. Пономарь Марроу ведёт счёт каждой душе под этими кронами — и живой, и погребённой. Иди и будь сосчитан, пока лес не сосчитал тебя сам.',
   'entities.quests.q_ww_bells_of_gallowmere.completion':
-    'Кобб отправил тебя по дороге целым, вот как? Хороший человек. Тридцать лет он держит те привратные фонари зажжёнными, и лес ни разу его не обошёл. Добро пожаловать в Гэллоумир, {playerName}. Слушайся колоколов.',
+    'Кобб отправил тебя по дороге целым, вот как? Хороший человек. Тридцать лет он держит те привратные фонари зажжёнными, и лес ни разу его не обошёл. Добро пожаловать в Гиббетмир, {playerName}. Слушайся колоколов.',
   'entities.quests.q_ww_bells_of_gallowmere.objectives.0.label': 'Доложите пономарю Марроу',
   'entities.quests.q_ww_silk_in_the_eaves.title': 'Шёлк под кронами',
   'entities.quests.q_ww_silk_in_the_eaves.text':
@@ -5295,7 +5295,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_ww_widows_skeins.objectives.0.label': 'Моток вдовьего шёлка',
   'entities.quests.q_ww_candles_at_the_bounds.title': 'Свечи на рубежах',
   'entities.quests.q_ww_candles_at_the_bounds.text':
-    'Гэллоумир окружают четыре пограничных камня, {playerName}, по одному на каждой дороге из города, и на каждом камне горит могильная свеча. Пока они горят, погребённые остаются погребёнными. Морось затопила их — все четыре, а я слишком стара, чтобы обходить рубежи одна. Возьми мою лучину и зажги их снова, скорее.',
+    'Гиббетмир окружают четыре пограничных камня, {playerName}, по одному на каждой дороге из города, и на каждом камне горит могильная свеча. Пока они горят, погребённые остаются погребёнными. Морось затопила их — все четыре, а я слишком стара, чтобы обходить рубежи одна. Возьми мою лучину и зажги их снова, скорее.',
   'entities.quests.q_ww_candles_at_the_bounds.completion':
     'Все четыре горят? Тогда выдохни, {playerName}. Ты этого не слышал, но слышала вся деревня: колокола зазвонили легче в тот самый миг, когда занялся последний фитиль.',
   'entities.quests.q_ww_candles_at_the_bounds.objectives.0.label': 'Могильная свеча зажжена вновь',
@@ -5313,7 +5313,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_ww_wraiths_of_the_tarn.objectives.0.label': 'Лесной призрак убит',
   'entities.quests.q_ww_what_the_bark_holds.title': 'Что держит кора',
   'entities.quests.q_ww_what_the_bark_holds.text':
-    'На Висельной Поляне к востоку от Гэллоумира шелкопряды развешивают по ветвям своих спелёнутых шёлком мертвецов, а гробокорые шатуны стоят на страже внизу, как терпеливые носильщики гроба. Там, наверху, наши люди, {playerName}. Свали пятерых шатунов, срежь троих спелёнутых мёртвых и верни их домой, в землю.',
+    'На Висельной Поляне к востоку от Гиббетмира шелкопряды развешивают по ветвям своих спелёнутых шёлком мертвецов, а гробокорые шатуны стоят на страже внизу, как терпеливые носильщики гроба. Там, наверху, наши люди, {playerName}. Свали пятерых шатунов, срежь троих спелёнутых мёртвых и верни их домой, в землю.',
   'entities.quests.q_ww_what_the_bark_holds.completion':
     'Три души вернулись под честную землю до наступления ночи. Шатуны отрастут — кора всегда отрастает, — но этой ночью поляна висит пустой, и этого довольно.',
   'entities.quests.q_ww_what_the_bark_holds.objectives.0.label': 'Гробокорый шатун повержен',
@@ -5322,14 +5322,14 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_ww_walking_mosley_home.text':
     'Мой могильщик Мозли три дня назад ушёл по дороге к часовне копать могилу на старом дворе, и раскоп обрушился прямо на него. Он выбрался, дурень жив, но сидит, сжавшись, у часовенных могил и не двинется с места из-за шелкопрядов на дороге. Доведи его до дома, {playerName}. Я не могу звонить в колокола по живому человеку.',
   'entities.quests.q_ww_walking_mosley_home.completion':
-    'Он вошёл в ворота на своих двоих, божась, что отныне не выкопает ничего глубже грядки под репу. К воскресенью вернётся на двор — они всегда возвращаются. Спасибо, {playerName}. Гэллоумир бережёт своих — вот и весь наш закон.',
+    'Он вошёл в ворота на своих двоих, божась, что отныне не выкопает ничего глубже грядки под репу. К воскресенью вернётся на двор — они всегда возвращаются. Спасибо, {playerName}. Гиббетмир бережёт своих — вот и весь наш закон.',
   'entities.quests.q_ww_walking_mosley_home.objectives.0.label':
-    'Могильщик Мозли благополучно доведён до Гэллоумира',
+    'Могильщик Мозли благополучно доведён до Гиббетмира',
   'entities.quests.q_ww_horn_of_the_huntsman.title': 'Рог Ловчего',
   'entities.quests.q_ww_horn_of_the_huntsman.text':
     'Ты уже слышал рог, {playerName}: тонкий, далёкий — звук, на котором весь лес задерживает дыхание. Бледный Ловчий объезжает свою поляну к северу отсюда, и каждая могила, мимо которой он проезжает, становится мельче. Когда-то он был человеком, и похоронили его неправильно, а я устал делать вид, что молитва с этим справится. Возьми друга, а лучше двух, и выбей его из седла.',
   'entities.quests.q_ww_horn_of_the_huntsman.completion':
-    'Рог оборвался на полуноте. Каждый колокол в Гэллоумире ударил по разу, сам по себе, а потом лес затих так, как не затихал на моей памяти тридцать лет. Ты совершил обряд, который был мне не по силам, {playerName}. Носи это — и ходи под кронами без страха.',
+    'Рог оборвался на полуноте. Каждый колокол в Гиббетмире ударил по разу, сам по себе, а потом лес затих так, как не затихал на моей памяти тридцать лет. Ты совершил обряд, который был мне не по силам, {playerName}. Носи это — и ходи под кронами без страха.',
   'entities.quests.q_ww_horn_of_the_huntsman.objectives.0.label': 'Бледный Ловчий выбит из седла',
   'hud.errors.silenced': 'Вы лишены дара речи!',
   'hud.pet.noPetFood': 'У вас нет пищи, чтобы покормить питомца.',
@@ -7132,17 +7132,17 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.peaksGreeting':
     'Две сотни лет держится эта стена. На моём посту она не падёт, но стонет.',
   'guide.worldPage.peaksPlaceNotes':
-    'Хайвотч держит стену. Хребет Преследователя и Глубокоскальные норы принадлежат горным котам и землекопам; Огрские предгорья и Военный лагерь Дрогмара, наёмным громилам; Бурехребет трещит от элементалей, а под ним сияет Глиммермир, горное озеро, чей берег хранит врата бледного света, ведущие вниз, в Утонувший храм; Шатры Культа Вирма и Поля ревенантов кольцом окружают высоты культа, а на самом их пике, Святилище Могильного Вирма.',
+    'Хайвотч держит стену. Хребет Преследователя и Глубокоскальные норы принадлежат горным котам и землекопам; Огрские предгорья и Военный лагерь Дрогмара, наёмным громилам; Бурехребет трещит от элементалей, а под ним сияет Глиммермир, горное озеро, чей берег хранит врата бледного света, ведущие вниз, в Утонувший храм; Шатры Клятвы Выводка и Поля ревенантов кольцом окружают высоты культа, а на самом их пике, Святилище Могильного Вирма.',
   'guide.worldPage.duskGreeting':
     'Немногие из вашего рода стояли под этими ветвями. Ступайте мягко, и добро пожаловать.',
-  'guide.worldPage.duskGreeter': 'Хранительница Сэльвин, Элдерглим',
+  'guide.worldPage.duskGreeter': 'Хранительница Сэльвин, Элдершайн',
   'guide.worldPage.duskPlaceNotes':
-    'Элдерглим собрался под великим древом. Сумеречная пещера и её смотровая площадка служат входом и первым видом на долину; Древняя роща и Котловина Звездопада хранят тихий юг; Затонувший двор скрывает заросшие руины на востоке; а Мерцающая глубь и Хрустальные отмели светятся на севере.',
+    'Элдершайн собрался под великим древом. Сумеречная пещера и её смотровая площадка служат входом и первым видом на долину; Древняя роща и Котловина Звездопада хранят тихий юг; Затонувший двор скрывает заросшие руины на востоке; а Мерцающая глубь и Хрустальные отмели светятся на севере.',
   'guide.family.demon.name': 'Демоны',
   'guide.family.demon.desc':
     'Захватчики из-за разломов, сплошь огонь и злоба. Где стоит один из них, там и прорыв недалеко.',
   'guide.worldPage.duskBlurb':
-    'Долина вечных сумерек под великим древом Элдерглима, где светятся хрустальные руины, а воздух гудит от древней магии.',
+    'Долина вечных сумерек под великим древом Элдершайна, где светятся хрустальные руины, а воздух гудит от древней магии.',
   'guide.worldPage.emberBlurb':
     'Озарённые грозами пустоши пепла и кровостекла, где дрейки кружат над кальдерой, а в дюнах горят костры троллей; за всем этим следит привратный город Змеиный дозор.',
   'guide.worldPage.frostBlurb':
@@ -7154,7 +7154,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.nightBlurb':
     'Край звёздной полуночи, где тропы освещают цветы, а Лунный Приют несёт тихий дозор под грезящим небом.',
   'guide.worldPage.hauntBlurb':
-    'Населённый призраками лес под исполинскими кронами, где фонари Гэллоумира, единственный честный свет на дороге.',
+    'Населённый призраками лес под исполинскими кронами, где фонари Гиббетмира, единственный честный свет на дороге.',
   'guide.worldPage.galeBlurb':
     'Морские утёсы и воющие холмы, где ветер не знает покоя, Старый Маяк никогда не гаснет, а Викхарбор крепко запирает свои двери.',
   'guide.worldPage.jungleBlurb':
@@ -7178,7 +7178,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.nightGreeter': 'Страж дозора, Лунный Приют',
   'guide.worldPage.hauntGreeting':
     'Держись фонарей, путник. И если лес позовёт тебя по имени откуда-то с обочины, не отвечай.',
-  'guide.worldPage.hauntGreeter': 'Фонарщик, Гэллоумир',
+  'guide.worldPage.hauntGreeter': 'Фонарщик, Гиббетмир',
   'guide.worldPage.galeGreeting':
     'Ветер здесь не стихал ни разу, и Старый Маяк ни разу не гас. Закрой за собой дверь таверны.',
   'guide.worldPage.galeGreeter': 'Смотритель маяка, Викхарбор',
@@ -7197,9 +7197,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.fenPlaceNotes':
     'Бриджмир сидит верхом на тихой воде. Янтарные Ступени спускаются из края жатвы; Кувшинковые мхи и Светлые бочаги блестят огоньками и стрекозами; Плакучая заводь опускает свои ветви в озеро; а Дремотные отмели, это самое ласковое место во всём этом краю.',
   'guide.worldPage.nightPlaceNotes':
-    'Лунный Приют несёт дозор. Ночные Врата, это путь в полуночный край; Лунный Колодец хранит звёздный свет, рядом с которым можно постоять; Сумеречное Поле цветёт в темноте; Стоячий Дозор наблюдает, не шевелясь; а Курган Неспящего, единственное место здесь, которому не снятся сны.',
+    'Лунный Приют несёт дозор. Ночные Врата, это путь в полуночный край; Лунный Родник хранит звёздный свет, рядом с которым можно постоять; Сумеречное Поле цветёт в темноте; Стоячий Дозор наблюдает, не шевелясь; а Курган Неспящего, единственное место здесь, которому не снятся сны.',
   'guide.worldPage.hauntPlaceNotes':
-    'Гэллоумир жмётся к своим фонарям. Вороньи Врата, это мрачная парадная дверь леса; Вдовья Чаща густо оплетена паутиной; Висельная Поляна и Часовня Скорбного Камня хранят самые старые скорби этого леса; а Поляна Ловчего принадлежит тому, что до сих пор там охотится.',
+    'Гиббетмир жмётся к своим фонарям. Вороньи Врата, это мрачная парадная дверь леса; Вдовья Чаща густо оплетена паутиной; Висельная Поляна и Часовня Скорбного Камня хранят самые старые скорби этого леса; а Поляна Ловчего принадлежит тому, что до сих пор там охотится.',
   'guide.worldPage.galePlaceNotes':
     'Викхарбор стоит, накренившись против ветра. Ветровой Проход, это дорога по утёсам на входе; Воющие Холмы катятся под бурей без единого дерева; Старый Маяк горит столько, сколько кто-либо может припомнить; Отвесный Срез обрывается прямо к воде; Поля Кораблекрушений держат побережье в строгости; а Зеркальное Озеро, единственная неподвижная вещь во всём этом краю.',
   'guide.worldPage.junglePlaceNotes':
@@ -7226,7 +7226,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.reliquary_shoulder.name': 'Осыпавшиеся наплечники',
   'entities.items.reliquary_gloves_rog.name': 'Рукавицы Костяного стража',
   'entities.items.deacon_reliquary_helm.name': 'Шлем реликвария дьякона',
-  'entities.items.varric_shadow_cowl.name': 'Теневой капюшон Варрика',
+  'entities.items.varric_shadow_cowl.name': 'Теневой капюшон Вандрика',
   'entities.items.duskwisp_essence.name': 'Сущность сумеречного огонька',
   'entities.items.spore_heart.name': 'Споровое сердце',
   'entities.items.gleaming_antler.name': 'Сияющий рог',
@@ -7248,7 +7248,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.nightweave_tunic.name': 'Куртка ночного плетения',
   'entities.items.veilcloth_robe.name': 'Одеяние скрытой ткани',
   'entities.mobs.acolyte_tessa.name': 'Послушница Тесса',
-  'entities.mobs.deacon_varric.name': 'Дьякон Варрик',
+  'entities.mobs.deacon_varric.name': 'Дьякон Вандрик',
   'entities.mobs.reliquary_bonewalker.name': 'Поднятый костеход',
   'entities.mobs.reliquary_funeral_ringer.name': 'Погребальный звонарь',
   'entities.mobs.reliquary_gravecall_acolyte.name': 'Аколит могильного зова',
@@ -7284,24 +7284,24 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'delveUi.board.tier.heroic': 'Героическая',
   'delveUi.board.tier.normal': 'Обычная',
   'delveUi.board.title': 'Доска Вылазок',
-  'delveUi.boss.varric.bell.emote': 'Дьякон Варрик хватает погребённый колокол обеими руками!',
+  'delveUi.boss.varric.bell.emote': 'Дьякон Вандрик хватает погребённый колокол обеими руками!',
   'delveUi.boss.varric.bell.impact': 'Звон колокола раскалывает пол зала!',
   'delveUi.boss.varric.bell.lesson':
     'Колокольный звон: удар по земле каждые двенадцать секунд. Отойдите, прежде чем он обрушится.',
-  'delveUi.boss.varric.bell.log': 'Дьякон Варрик начинает звонить в погребальный колокол.',
-  'delveUi.boss.varric.bell.warning': 'Отойдите от Дьякона Варрика!',
+  'delveUi.boss.varric.bell.log': 'Дьякон Вандрик начинает звонить в погребальный колокол.',
+  'delveUi.boss.varric.bell.warning': 'Отойдите от Дьякона Вандрика!',
   'delveUi.boss.varric.defeat': 'Нет... у меня были имена... все до единого...',
   'delveUi.boss.varric.intro': 'Ни одна душа не потеряна. Лишь забыта.',
   'delveUi.boss.varric.mid30': 'Погребальный колокол отзывается на каждое имя, что он произносит.',
-  'delveUi.boss.varric.mid60': 'Дьякон Варрик читает имена из книги с дрожащим торжеством.',
+  'delveUi.boss.varric.mid60': 'Дьякон Вандрик читает имена из книги с дрожащим торжеством.',
   'delveUi.boss.varric.pull':
     'Ты ступаешь по священному праху с нечистым умыслом. На колени, и будешь сочтён.',
-  'delveUi.boss.varric.raise.emote': 'Дьякон Варрик призывает имена из разрытых могил!',
-  'delveUi.boss.varric.raise.interrupt_fail': 'Мёртвые отзываются на зов Дьякона Варрика!',
+  'delveUi.boss.varric.raise.emote': 'Дьякон Вандрик призывает имена из разрытых могил!',
+  'delveUi.boss.varric.raise.interrupt_fail': 'Мёртвые отзываются на зов Дьякона Вандрика!',
   'delveUi.boss.varric.raise.interrupt_ok': 'Могильный обряд сорван.',
   'delveUi.boss.varric.raise.lesson':
     'Прервите растрескавшуюся могилу в течение пяти секунд, иначе мёртвые восстанут на его зов.',
-  'delveUi.boss.varric.raise.log': 'Дьякон Варрик начинает Поднятие мёртвых.',
+  'delveUi.boss.varric.raise.log': 'Дьякон Вандрик начинает Поднятие мёртвых.',
   'delveUi.boss.varric.raise.object': 'Растрескавшаяся могила содрогается от украденного дыхания.',
   'delveUi.boss.varric.raise.warning': 'Остановите могильный обряд!',
   'delveUi.chest.flavor': 'Мёртвые отдали то, без чего могут обойтись.',
@@ -9655,7 +9655,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_drakemaw_raptor': 'Раптор Дрейкмо',
   'hudChrome.mounts.desc_drakemaw_raptor': 'Приученный к седлу выводковый раптор из кальдеры Дрейкмо: сплошные жилы и бег, и от него всё ещё едва пахнет пеплом.',
   'hudChrome.mounts.name_thunderstrut_gobbler': 'Громоступ, великий индюк',
-  'hudChrome.mounts.name_terrorspark_groundshaker': 'Страхоискр, сотрясатель земли',
+  'hudChrome.mounts.name_terrorspark_groundshaker': 'Ужасоискр, сотрясатель земли',
   'hudChrome.mounts.desc_valorsteed':
     'Выносливый и твердо стоящий на ногах скакун, повышающий скорость передвижения.',
   'hudChrome.mounts.desc_grag_bear':
@@ -9890,7 +9890,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.prayer_of_healing.description':
     'Восстанавливает ближайшим союзникам {damage} ед. здоровья. (талант жреца)',
   'entities.abilities.preparation.description':
-    'Завершает восстановление «Спринта», «Уклонения» и «Исчезновения». (талант разбойника)',
+    'Завершает восстановление «Спринта», «Уклонения» и «Ухода в дым». (талант разбойника)',
   'entities.abilities.presence_of_mind.description':
     'Ваше следующее заклинание со временем произнесения становится мгновенным. Действует 60 сек. (Талант мага)',
   'entities.abilities.psychic_scream.description':
@@ -9946,13 +9946,13 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.flurry.name': 'Зимняя плеть',
   'entities.abilities.flurry.description':
     'Выпускает три ледяных снаряда, каждый из которых наносит {damage} ед. урона от магии льда, и накладывает на цель «Зимнюю стужу»: следующие 2 подходящих заклинания считают её замороженной. «Заморозка мозгов» делает «Зимнюю плеть» мгновенной и позволяет игнорировать время восстановления. (ветка «Лёд»)',
-  'entities.abilities.frozen_orb.name': 'Ледяной шар',
+  'entities.abilities.frozen_orb.name': 'Морозный шар',
   'entities.abilities.frozen_orb.description':
     'Выпускает вихревой ледяной шар, который движется вперёд 8 сек., ежесекундно наносит ближайшим противникам {damage} ед. урона от магии льда и замедляет их на 30%. Каждый импульс, попавший во врага, создаёт одну «Сосульку». (ветка «Лёд»)',
   'entities.abilities.blizzard.name': 'Снежная буря',
   'entities.abilities.blizzard.description':
-    'Обрушивает на выбранную область ледяную бурю на 6 сек., ежесекундно нанося {damage} ед. урона от магии льда и замедляя врагов на 40%. Каждый поражённый враг сокращает восстановление «Ледяного шара» на 0,5 сек., но не более чем на 3 сек. за одно применение. (ветка «Лёд»)',
-  'entities.abilities.glacial_spike.name': 'Ледяной шип',
+    'Обрушивает на выбранную область ледяную бурю на 6 сек., ежесекундно нанося {damage} ед. урона от магии льда и замедляя врагов на 40%. Каждый поражённый враг сокращает восстановление «Морозного шара» на 0,5 сек., но не более чем на 3 сек. за одно применение. (ветка «Лёд»)',
+  'entities.abilities.glacial_spike.name': 'Инеевая игла',
   'entities.abilities.glacial_spike.description':
     'Создаёт огромный ледяной шип, расходуя 5 сосулек, чтобы нанести {damage} ед. урона от магии льда и приморозить цель к месту на 4 сек. (ветка «Лёд»)',
   'entities.abilities.glacial_front.name': 'Ледниковый фронт',
@@ -9995,7 +9995,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Окутывает вас пламенем, поглощая {damage} ед. урона в течение 60 сек. (ветка «Огонь»)',
   'entities.abilities.cold_snap.name': 'Зов зимы',
   'entities.abilities.cold_snap.description':
-    'Мгновенно завершает восстановление «Мерцающего шага», «Морозной завесы» и «Великой невидимости». (талант мага)',
+    'Мгновенно завершает восстановление «Порхающего шага», «Морозной завесы» и «Великой невидимости». (талант мага)',
   'entities.abilities.greater_invisibility.name': 'Великая невидимость',
   'entities.abilities.greater_invisibility.description':
     'Исчезаете на 20 сек. и снимаете 2 эффекта периодического урона. Когда невидимость заканчивается, получаемый урон снижается на 90% на 2 сек. (Талант мага)',
@@ -10138,7 +10138,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.battleTrance':
     'Ваш следующий Удар разорителя или Калечащий удар не потребует ярости',
   'hudChrome.auraEffect.revengeFree': 'Ваша следующая Месть не потребует ярости',
-  'hudChrome.auraEffect.victoryRush': '«Порыв победы» готов',
+  'hudChrome.auraEffect.victoryRush': '«Порыв победителя» готов',
   'hudChrome.auraEffect.maxHpPct': 'Повышает максимальное здоровье на {pct}%',
   'hud.combat.floatingParry': 'Парировано',
   'hud.combat.parried': '{target} парирует ваш {ability}.',
@@ -10260,7 +10260,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.hearthkeeper_maeve.title': 'Хозяйка Очажного дома',
   'entities.npcs.hermit_okku.greeting':
     'Тихо. Барабаны считают всех, кто ходит под деревьями, — и тебя они уже сосчитали.',
-  'entities.npcs.hermit_okku.name': 'Окку',
+  'entities.npcs.hermit_okku.name': 'Окрим',
   'entities.npcs.hermit_okku.title': 'Тот, кто вошёл в чащу',
   'entities.npcs.huntsman_deral.greeting': 'Тише. Стадо знает каждый звук этой долины — и я тоже.',
   'entities.npcs.huntsman_deral.name': 'Охотник Дерал',
@@ -10324,7 +10324,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.sexton_marrow.greeting':
     'Здесь мы хороним глубоко и звоним в колокола, чтобы мёртвые не забывали лежать смирно.',
   'entities.npcs.sexton_marrow.name': 'Пономарь Марроу',
-  'entities.npcs.sexton_marrow.title': 'Пономарь Гэллоумира',
+  'entities.npcs.sexton_marrow.title': 'Пономарь Гиббетмира',
   'entities.npcs.strandwatcher_pell.greeting':
     'Наконец-то из чёрных деревьев. Дыши, странник: по эту сторону прохода правит солнце.',
   'entities.npcs.strandwatcher_pell.name': 'Береговой дозорный Пелл',
@@ -10364,7 +10364,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.widow_tansy.greeting':
     'По свече на каждую могилу, и ни одна не должна погаснуть. Ни одна, слышишь?',
   'entities.npcs.widow_tansy.name': 'Вдова Пижма',
-  'entities.npcs.widow_tansy.title': 'Свечница Гэллоумира',
+  'entities.npcs.widow_tansy.title': 'Свечница Гиббетмира',
   'hudChrome.training.title': 'Обучение: {name}',
   'hudChrome.training.close': 'Закрыть обучение',
   'hudChrome.training.empty': 'Этому мастеру нечему вас научить.',
@@ -10479,7 +10479,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.the_last_keep.name': 'Последний оплот',
   'entities.dungeons.the_last_keep.enterText': 'Вы входите в холодные безмолвные залы Последнего оплота.',
   'entities.items.last_keep_signet.name': 'Печатка Последнего оплота',
-  'entities.items.reins_terrorspark_groundshaker.name': 'Ключ зажигания Страхоискра',
+  'entities.items.reins_terrorspark_groundshaker.name': 'Ключ зажигания Ужасоискра',
   'entities.dungeons.the_last_keep.leaveText': 'Вы затворяете дверь оплота и возвращаетесь под ветер Земель Драконов.',
   'entities.items.wildheart_tuskblade.name': 'Клыкастый клинок Дикого Сердца',
   'entities.items.wildheart_hexwood_staff.name': 'Посох колдовского дерева из Котловины',
@@ -10504,7 +10504,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.farshore_salt_moss.name': 'Солёный мох Дальнего Берега',
   'entities.items.fenway_mooring_line.name': 'Перекушенный швартов',
   'entities.items.fountain_court_mantle.name': 'Мантия Фонтанного Двора',
-  'entities.items.frostmane_mantle.name': 'Мантия Морозной Гривы',
+  'entities.items.frostmane_mantle.name': 'Мантия Инеистой Гривы',
   'entities.items.galecrest_ram_wool.name': 'Жирная баранья шерсть',
   'entities.items.gallowmere_grave_candle.name': 'Могильная свеча',
   'entities.items.gilded_sap_clot.name': 'Сгусток золочёной живицы',
@@ -10567,10 +10567,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.revenantstep_treads.name': 'Сапоги шага призрака',
   'entities.items.shardfang_grips.name': 'Перчатки оскольчатого клыка',
   'entities.items.shardsong_mantle.name': 'Оплечье песни осколков',
-  'entities.items.wyrmcult_spellgrips.name': 'Перчатки заклинаний культа дракона',
+  'entities.items.wyrmcult_spellgrips.name': 'Перчатки заклинаний Клятвы Выводка',
   'entities.items.thornpeak_wildwraps.name': 'Дикие обмотки Терновых Пиков',
   'entities.items.stormvotive_hauberk.name': 'Хауберк грозового обета',
-  'entities.items.cryptbloom_shoulderguards.name': 'Наплечники склепного цветения',
+  'entities.items.cryptbloom_shoulderguards.name': 'Наплечники могильного лепестка',
   'entities.items.gravewyrm_thornmaul.name': 'Терновый молот могильного дракона',
   'entities.items.vestments_of_the_waking_grove.name': 'Облачение Пробуждающейся рощи',
   'entities.items.nightfangs_greatstaff.name': 'Большой посох Ночного клыка',
@@ -11439,7 +11439,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraOverlay.procs.battleTrance': 'Боевой транс',
   'hudChrome.auraOverlay.procs.overpowerCharge': 'Усиление красной руки',
   'hudChrome.auraOverlay.procs.suddenDeath': 'Внезапная смерть',
-  'hudChrome.auraOverlay.procs.victoryRush': 'Победный натиск',
+  'hudChrome.auraOverlay.procs.victoryRush': 'Порыв победителя',
   'hudChrome.auraOverlay.procs.enrage': 'Хаос: Ярость',
   'hudChrome.auraOverlay.procs.heatingUp': 'Разогрев',
   'hudChrome.auraOverlay.procs.arcaneCharge': 'Чародейские заряды',

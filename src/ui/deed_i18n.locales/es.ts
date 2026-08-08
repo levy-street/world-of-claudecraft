@@ -38,9 +38,7 @@ export const table: DeedLocaleTable = {
     title: 'Sargento',
   },
   pvp_honor_knight_lieutenant: {
-    name: 'Caballero Teniente',
     desc: 'Gana 40.000 de honor a lo largo de tu vida, toda una temporada de guerra real a tus espaldas.',
-    title: 'Caballero Teniente',
   },
   pvp_honor_field_marshal: {
     name: 'Mariscal de Campo',
@@ -76,7 +74,6 @@ export const table: DeedLocaleTable = {
     desc: 'Recolecta una veta de mineral, un rodal de madera y un bancal de hierbas en Nightbloom.',
   },
   chr_nightbloom_first_cast: {
-    name: 'Una onda en el pozo lunar',
     desc: 'Pesca un pez en las aguas de Nightbloom.',
   },
   chr_wraithwood_gatherer: {
@@ -292,7 +289,6 @@ export const table: DeedLocaleTable = {
     title: 'Matawyrms',
   },
   dgn_sanctum_speed: {
-    name: 'Carrera por el Santuario',
     desc: 'Derrota a Korzul el Gravewyrm en los 15 minutos siguientes a que tu grupo reclame el Santuario del Gravewyrm.',
   },
   dgn_nythraxis_gravebreaker: {
@@ -358,7 +354,7 @@ export const table: DeedLocaleTable = {
   },
   dlv_varric_ringers: {
     name: 'Las campanas enmudecen',
-    desc: 'Derrota al Diácono Varric con todos los Campaneros funerarios que alza ya abatidos.',
+    desc: 'Derrota al Diácono Vandric con todos los Campaneros funerarios que alza ya abatidos.',
   },
   dlv_nhalia_bells: {
     name: 'Acallacampanas',
@@ -437,7 +433,6 @@ export const table: DeedLocaleTable = {
   },
   chr_peaks_chapter_iii: {
     name: 'Crónica de Thornpeak',
-    desc: 'Vive la historia de la montaña hasta el final: el Culto del Wyrm quebrado, el Santuario silenciado, el Pico Despierto derribado y cada terror con nombre de los riscos abatido.',
     title: 'de Thornpeak',
   },
   chr_peaks_sparring: {

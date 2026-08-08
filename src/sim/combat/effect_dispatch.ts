@@ -327,7 +327,7 @@ export function runEffects(
     }
   }
 
-  // requiresAuraKind (Glacial Spike's Icicles, Victory Rush's kill window) is now
+  // requiresAuraKind (Rimeneedle's Icicles, Victor\'s Surge's kill window) is now
   // consumed atomically at cast commit in casting_lifecycle.ts's applyAbility,
   // alongside spendAbilityCost/armAbilityCooldown, not here: a ranged ability's
   // runEffects can run ticks after the cast committed (once its projectile
@@ -1444,11 +1444,11 @@ export function runEffects(
           school: ability.school,
           breaksOnDamage: true,
           // Fear-family members (fearDr: Harrow, Morrowlash) get the graded
-          // break; plain incapacitates (Eye Jab, Wyvern Sting) insta-break.
+          // break; plain incapacitates (Eye Jab, Drakesting) insta-break.
           breakChanceScale: ability.fearDr ? FEAR_BREAK_CHANCE_SCALE : undefined,
         });
         // Fear-flavored incapacitates (Harrow) sound at the target, distinct
-        // from plain stuns/incapacitates (Eye Jab, Wyvern Sting), which have
+        // from plain stuns/incapacitates (Eye Jab, Drakesting), which have
         // no dedicated fear audio. Gated to ability.id, not the broader
         // fearDr flag: death_coil (Morrowlash) also carries fearDr for its
         // diminishing-returns/break-chance treatment but has no fear
@@ -1739,7 +1739,7 @@ export function runEffects(
         break;
       }
       case 'frozenOrb': {
-        // Frozen Orb (combat/frozen_orb.ts): release the drifting orb from the
+        // Frostglobe (combat/frozen_orb.ts): release the drifting orb from the
         // caster, snapshotting the per-pulse spell-power rider like a groundAoE.
         spawnFrozenOrb(
           ctx,
@@ -1783,7 +1783,7 @@ export function runEffects(
           slowDuration: eff.slowDuration,
           orbCdr: eff.orbCdr,
         };
-        // A fresh Blizzard zone gets a fresh Frozen Orb refund budget (the
+        // A fresh Blizzard zone gets a fresh Frostglobe refund budget (the
         // same per-cast budget the old channel reset at channel start).
         if (eff.orbCdr) frostMageChannelStart(p, ability.id);
         // Visual riders (owner playtest): a delayed FIRE zone is a falling

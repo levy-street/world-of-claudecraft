@@ -196,7 +196,7 @@ export const VOICE_PROMPTS = [
       'I built a kingdom that should have outlived the stars. Kneel before your king. Another kingdom comes to challenge me — and you too will join the rest.',
   },
 
-  // -- Eldergleam, the Veiled Hollow (src/sim/content/realm.ts) -------------
+  // -- Eldershine, the Veiled Hollow (src/sim/content/realm.ts) -------------
   {
     npcId: 'keeper_saelwyn',
     name: 'Keeper Saelwyn',
@@ -558,7 +558,7 @@ export const VOICE_PROMPTS = [
       'war-banners in front of it, and you will understand why I stopped writing things down.',
   },
 
-  // -- The Wraithwood, Gallowmere (src/sim/content/wraithwood.ts) -----------
+  // -- The Wraithwood, Gibbetmere (src/sim/content/wraithwood.ts) -----------
   {
     npcId: 'sexton_marrow',
     name: 'Sexton Marrow',
@@ -567,7 +567,7 @@ export const VOICE_PROMPTS = [
       'sepulchral bass, patient as a tolling bell, kindly in a way that never stops sounding ' +
       'like a funeral. Takes duty to the buried and the living as one job. Age 50s to 60s. Male.',
     sampleText:
-      'We bury them deep here, and we ring the bells so they remember to stay down. Gallowmere ' +
+      'We bury them deep here, and we ring the bells so they remember to stay down. Gibbetmere ' +
       'keeps its people, that is the whole of our law. Mind the bells.',
   },
   {
@@ -826,7 +826,7 @@ export const VOICE_PROMPTS = [
   },
   {
     npcId: 'hermit_okku',
-    name: 'Okku',
+    name: 'Okrim',
     voiceDescription:
       'Hermit camped alone under jungle banyans within earshot of drums, deep green: a hushed, ' +
       'cracked male voice, whisper-taut and hyper-attentive, breaking off to count a sound. The ' +

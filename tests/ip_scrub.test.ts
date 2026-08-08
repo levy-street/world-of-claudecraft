@@ -104,6 +104,45 @@ const HARDCODED_VERBATIM: string[] = [
   'Imp',
   'Succubus',
   'Infernal',
+  // Masterwrought Phase 03 naming audit (R15, 2026-08-07): confirmed collisions
+  // renamed display-only; the old names arm here so a content edit or merge
+  // cannot quietly reintroduce them. Verdicts + evidence:
+  // docs/prd/masterwrought/naming-audit.md; map rows in ip-refactor/NAME-MAP.md.
+  'Crusader Strike',
+  'Heroic Leap',
+  'Holy Nova',
+  'Icy Veins',
+  'Victory Rush',
+  'Wyvern Sting',
+  'Glacial Spike',
+  'Frozen Orb',
+  'Holy Shock',
+  'Storm Bolt',
+  'Sanctum Sprint',
+  'Knight-Lieutenant',
+  'Harvest Sprite',
+  'Hellfire Ring',
+  'Spellsteal',
+  'Swiftmend',
+  'Smokestep',
+  'Spellbreak',
+  'Gloomshade',
+  'Wrathwing',
+  'Flickerstep',
+  'Hellsteel',
+  'Winterbite',
+  'Frostmane',
+  'Nightkin',
+  'Varric',
+  'Okku',
+  'Wyrmcult',
+  'Cryptbloom',
+  'Mistforged',
+  'Terrorspark',
+  'Gallowmere',
+  'Eldergleam',
+  'Moonwell',
+  'Spiritmend',
 ];
 
 // The explicit PROSE-SCAN set (C1-owned flavor text): word-boundary regexes
@@ -517,7 +556,7 @@ describe('ip_scrub - verbatim-WoW denylist scanner (G0)', () => {
   it("teeth: reports ZERO hits on the game's own original names", () => {
     const fixture = [
       'Gravecaller',
-      'Wyrmcult',
+      'Broodsworn',
       'Nythraxis',
       'Korzul the Gravewyrm',
       'Voskar the Emberwing',

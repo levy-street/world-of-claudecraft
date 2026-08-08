@@ -56,7 +56,7 @@ export class ProcOverlayPainter {
 
   // Frost variant: the two tail feathers, left wing, right wing, and body form
   // over stacks one to four. The fifth Icicle overlays the crystalline ready
-  // flare, making Glacial Spike readiness unmistakable without a number label.
+  // flare, making Rimeneedle readiness unmistakable without a number label.
   paintFrostCharges(n: number): void {
     this.writers.toggleClass(this.root, 'heating', false);
     this.writers.toggleClass(this.root, 'hot', false);

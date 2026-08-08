@@ -406,7 +406,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   // tradability would turn a dev grant into an economy leak.
   reins_terrorspark_groundshaker: {
     id: 'reins_terrorspark_groundshaker',
-    name: 'Ignition Key: Terrorspark Groundshaker',
+    name: 'Ignition Key: Dreadspark Groundshaker',
     kind: 'mount',
     mount: 'terrorspark_groundshaker',
     quality: 'epic',

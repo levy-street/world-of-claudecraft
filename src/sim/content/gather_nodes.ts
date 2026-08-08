@@ -652,7 +652,7 @@ export const GATHER_NODES: GatherNodeDef[] = [
     level: 17,
     tier: 3,
   },
-  // Beside the Wyrmcult Tents on the Sanctum approach.
+  // Beside the Broodsworn Tents on the Sanctum approach.
   {
     id: 'herb_thornpeak_t3b',
     zoneId: 'thornpeak_heights',
@@ -662,7 +662,7 @@ export const GATHER_NODES: GatherNodeDef[] = [
     tier: 3,
   },
 
-  // The Veiled Hollow, around Eldergleam: hub-outskirt veins, stands, and patches so every
+  // The Veiled Hollow, around Eldershine: hub-outskirt veins, stands, and patches so every
   // profession can gather without backtracking to an older zone.
   {
     id: 'ore_veiled_hollow_1',
@@ -1123,7 +1123,7 @@ export const GATHER_NODES: GatherNodeDef[] = [
     tier: 1,
   },
 
-  // The Wraithwood, around Gallowmere: hub-outskirt veins, stands, and patches so every
+  // The Wraithwood, around Gibbetmere: hub-outskirt veins, stands, and patches so every
   // profession can gather without backtracking to an older zone.
   {
     id: 'ore_wraithwood_1',

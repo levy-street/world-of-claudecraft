@@ -38,9 +38,7 @@ export const table: DeedLocaleTable = {
     title: 'Sergeant',
   },
   pvp_honor_knight_lieutenant: {
-    name: 'Ritter-Leutnant',
     desc: 'Verdiene im Laufe deines Lebens 40.000 Ehre, eine Saison echten Krieges hinter dir.',
-    title: 'Ritter-Leutnant',
   },
   pvp_honor_field_marshal: {
     name: 'Feldmarschall',
@@ -76,7 +74,6 @@ export const table: DeedLocaleTable = {
     desc: 'Ernte eine Erzader, einen Holzbestand und ein Krauterbeet in Nightbloom.',
   },
   chr_nightbloom_first_cast: {
-    name: 'Ein Ring auf dem Mondbrunnen',
     desc: 'Fange einen Fisch in den Gewassern von Nightbloom.',
   },
   chr_wraithwood_gatherer: {
@@ -287,7 +284,6 @@ export const table: DeedLocaleTable = {
     title: 'Wyrmfäller',
   },
   dgn_sanctum_speed: {
-    name: 'Sprint durchs Heiligtum',
     desc: 'Besiege Korzul den Gravewyrm binnen 15 Minuten, nachdem deine Gruppe das Gravewyrm-Heiligtum beansprucht hat.',
   },
   dgn_nythraxis_gravebreaker: {
@@ -353,7 +349,7 @@ export const table: DeedLocaleTable = {
   },
   dlv_varric_ringers: {
     name: 'Das Geläut verklingt',
-    desc: 'Besiege Diakon Varric, während jeder Begräbnisläuter, den er erweckt, bereits erschlagen ist.',
+    desc: 'Besiege Diakon Vandric, während jeder Begräbnisläuter, den er erweckt, bereits erschlagen ist.',
   },
   dlv_nhalia_bells: {
     name: 'Glockenstiller',
@@ -432,7 +428,6 @@ export const table: DeedLocaleTable = {
   },
   chr_peaks_chapter_iii: {
     name: 'Die Chronik von Thornpeak',
-    desc: 'Führe die ganze Geschichte des Berges zu Ende: der Wyrmkult zerschlagen, das Heiligtum zum Schweigen gebracht, der Erwachende Gipfel gefällt und jeder namhafte Schrecken der Felsen niedergestreckt.',
     title: 'von Thornpeak',
   },
   chr_peaks_sparring: {

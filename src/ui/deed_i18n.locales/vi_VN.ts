@@ -38,9 +38,7 @@ export const table: DeedLocaleTable = {
     title: 'Trung Sĩ',
   },
   pvp_honor_knight_lieutenant: {
-    name: 'Hiệp Sĩ Trung Úy',
     desc: 'Kiếm được 40.000 danh dự trong suốt cuộc đời nhân vật, cả một mùa chiến tranh thực sự phía sau bạn.',
-    title: 'Hiệp Sĩ Trung Úy',
   },
   pvp_honor_field_marshal: {
     name: 'Thống Chế',
@@ -76,7 +74,6 @@ export const table: DeedLocaleTable = {
     desc: 'Thu hoach mot mach quang, mot vung go va mot luong thao moc o Nightbloom.',
   },
   chr_nightbloom_first_cast: {
-    name: 'Gon song tren gieng trang',
     desc: 'Cau mot con ca trong vung nuoc Nightbloom.',
   },
   chr_wraithwood_gatherer: {
@@ -289,7 +286,6 @@ export const table: DeedLocaleTable = {
     title: 'Kẻ Đốn Long',
   },
   dgn_sanctum_speed: {
-    name: 'Nước Rút Thánh Đường',
     desc: 'Đánh bại Korzul Mộ Long trong vòng 15 phút kể từ khi tổ đội của bạn tiến chiếm Thánh Đường Mộ Long.',
   },
   dgn_nythraxis_gravebreaker: {
@@ -349,7 +345,7 @@ export const table: DeedLocaleTable = {
   },
   dlv_varric_ringers: {
     name: 'Chuông Ngừng Ngân',
-    desc: 'Đánh bại Chấp Sự Varric khi mọi Kẻ Rung Chuông Tang Lễ hắn dựng dậy đều đã bị diệt từ trước.',
+    desc: 'Đánh bại Chấp Sự Vandric khi mọi Kẻ Rung Chuông Tang Lễ hắn dựng dậy đều đã bị diệt từ trước.',
   },
   dlv_nhalia_bells: {
     name: 'Kẻ Lặng Chuông',
@@ -425,7 +421,6 @@ export const table: DeedLocaleTable = {
   },
   chr_peaks_chapter_iii: {
     name: 'Trọn Bộ Biên Niên Sử Đỉnh Gai',
-    desc: 'Theo trọn câu chuyện của ngọn núi: Long Giáo bị đập tan, Thánh Đường Mộ Long phải bặt tiếng, Đỉnh Núi Thức Giấc bị quật ngã, và mọi nỗi kinh hoàng hữu danh của vách đá đều bị hạ gục.',
     title: 'Xứ Đỉnh Gai',
   },
   chr_peaks_sparring: {

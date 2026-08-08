@@ -133,7 +133,7 @@ export interface GlobalModEffect {
   // of maximum mana spent, capped at 10 sec per 30 sec (casting_lifecycle's
   // spendAbilityCost, the Colossal Might pattern on mana).
   manaDefCdrPer10?: number;
-  // Blink While Casting: 1 when picked; Flickerstep slips through the busy
+  // Blink While Casting: 1 when picked; Flitstep slips through the busy
   // guard without touching the cast in progress (casting_lifecycle).
   blinkCast?: number;
   // Elemental Convergence: 1 when picked; alternating a Fire and a Frost cast

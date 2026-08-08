@@ -38,9 +38,9 @@ export const table: DeedLocaleTable = {
     title: '中士',
   },
   pvp_honor_knight_lieutenant: {
-    name: '騎士中尉',
+    name: '方旗騎士',
     desc: '生涯累計獲得40,000點榮譽，象徵你已歷經一季真正的戰爭。',
-    title: '騎士中尉',
+    title: '方旗騎士',
   },
   pvp_honor_field_marshal: {
     name: '元帥',
@@ -76,7 +76,7 @@ export const table: DeedLocaleTable = {
     desc: '在Nightbloom採集一處礦脈、一片木料和一塊草藥地。',
   },
   chr_nightbloom_first_cast: {
-    name: '月井漣漪',
+    name: '月泉漣漪',
     desc: '在Nightbloom水域釣上一條魚。',
   },
   chr_wraithwood_gatherer: {
@@ -206,7 +206,7 @@ export const table: DeedLocaleTable = {
     title: '屠龍者',
   },
   dgn_sanctum_speed: {
-    name: '聖所衝刺',
+    name: '聖所競走',
     desc: '在你的隊伍進駐墓龍聖所後的15分鐘內擊敗墓龍科祖爾。',
   },
   dgn_nythraxis_gravebreaker: {
@@ -251,7 +251,7 @@ export const table: DeedLocaleTable = {
   dlv_rite_flawless: { name: '一字不差', desc: '完成溺亡聖物庫儀式，全程沒有一次失誤。' },
   dlv_varric_ringers: {
     name: '鐘聲止息',
-    desc: '擊敗執事瓦瑞克時，他喚起的每一名喪儀鳴鐘者都已被斬殺。',
+    desc: '擊敗執事凡德里克時，他喚起的每一名喪儀鳴鐘者都已被斬殺。',
   },
   dlv_nhalia_bells: {
     name: '止鐘者',
@@ -315,7 +315,7 @@ export const table: DeedLocaleTable = {
   },
   chr_peaks_chapter_iii: {
     name: '荊峰編年史全卷',
-    desc: '見證山嶽故事的始末：擊潰龍教、讓聖所歸於沉寂、擊倒覺醒之峰，並剷除峭壁間每一個有名有姓的惡煞。',
+    desc: '見證山嶽故事的始末：擊潰龍誓、讓聖所歸於沉寂、擊倒覺醒之峰，並剷除峭壁間每一個有名有姓的惡煞。',
     title: '荊峰之譽',
   },
   chr_peaks_sparring: { name: '城牆操練', desc: '對高望上方的訓練假人造成總計 1,000 點傷害。' },

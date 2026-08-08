@@ -177,7 +177,7 @@ describe('casting_lifecycle: Vanish escape stealth blocks a hostile cast (issue 
   function vanishAura(sourceId: number): Aura {
     return {
       id: 'vanish',
-      name: 'Smokestep',
+      name: 'Smokefade',
       kind: 'stealth',
       remaining: 10,
       duration: 10,
@@ -284,7 +284,7 @@ describe('casting_lifecycle: auto-acquire on cast with no target (issue #2787)',
 
   it('also auto-acquires for a dual-purpose (targetType "any") ability', () => {
     const { sim, p } = makeSim('paladin', 12);
-    sim.setSpec('holy'); // Holy Shock is the Holy spec's signature ability
+    sim.setSpec('holy'); // Lightjolt is the Holy spec's signature ability
     const attacker = spawnAttacker(sim, p, 8);
     expect(p.targetId).toBeNull();
 

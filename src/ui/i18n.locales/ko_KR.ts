@@ -91,7 +91,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.furious_mending.name': '분노의 회복',
   'entities.abilities.heroic_leap.description':
     '대상 지역으로 도약하여 착지할 때 주변 적에게 {damage}의 피해를 줍니다.',
-  'entities.abilities.heroic_leap.name': '영웅의 도약',
+  'entities.abilities.heroic_leap.name': '도약 돌진',
   'entities.abilities.intimidating_shout.description':
     '무시무시한 외침으로 8yd 이내의 적 최대 5명을 8초 동안 공포에 질려 달아나게 합니다. 피해를 입으면 효과가 해제될 수 있습니다.',
   'entities.abilities.intimidating_shout.name': '위협의 외침',
@@ -130,7 +130,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.seasoned_soldier.name': '노련한 전사',
   'entities.abilities.storm_bolt.description':
     '대상에게 무기를 던져 {damage}의 피해를 입히고 3초 동안 기절시킵니다.',
-  'entities.abilities.storm_bolt.name': '폭풍 망치',
+  'entities.abilities.storm_bolt.name': '우레 투척',
   'entities.abilities.sudden_death.description':
     '자동 공격 시 일정 확률로 생명력에 관계없이 대상에게 이른 무덤을 분노 소모 없이 시전할 수 있습니다. (무기 특성)',
   'entities.abilities.sudden_death.name': '급살',
@@ -139,7 +139,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sweeping_strikes.name': '넓어지는 호',
   'entities.abilities.victory_rush.description':
     '무기 피해에 {damage}를 더한 피해로 공격하고 최대 생명력의 20%를 회복합니다. 적을 처치한 후 20초 이내에만 사용할 수 있습니다.',
-  'entities.abilities.victory_rush.name': '연전연승',
+  'entities.abilities.victory_rush.name': '승자의 쇄도',
   'hudChrome.specPanel.complexity': '복잡도',
   'hudChrome.specPanel.complexityHigh': '높음',
   'hudChrome.specPanel.complexityLow': '낮음',
@@ -153,9 +153,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.talentRows.tab': '선택',
   'hudChrome.talentRows.readoutSummary': '특성: {head}, {spent}/{total}개 줄 선택.',
   'entities.abilities.aspect_of_the_wild.name': '야생송곳니 형상',
-  'entities.abilities.avenging_wrath.name': '응징의 날개',
+  'entities.abilities.avenging_wrath.name': '열정의 날개',
   'entities.abilities.berserk.name': '붉은 안개',
-  'entities.abilities.blink.name': '섬광걸음',
+  'entities.abilities.blink.name': '날쌘걸음',
   'entities.abilities.bloodlust.name': '전쟁 북',
   'entities.abilities.chain_lightning.name': '갈래 번개',
   'entities.abilities.chaos_bolt.name': '파멸 화살',
@@ -197,7 +197,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.smoke_screen.name': '연막',
   'entities.abilities.smoke_screen.description':
     '연기 속으로 몸을 숨겨 8초 동안 회피율을 30%만큼 증가시킵니다.',
-  'entities.abilities.spellsteal.name': '마법 훔치기',
+  'entities.abilities.spellsteal.name': '마법 약탈',
   'entities.abilities.spellsteal.description':
     '적의 이로운 마법 효과 하나를 훔쳐 자신에게 옮깁니다.',
   'entities.abilities.startle_shot.name': '기습 사격',
@@ -331,7 +331,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.skins.ice_fang_sword.look':
     '옅은 빙하 얼음의 곡선 칼날, 칼등을 따라 돋은 들쭉날쭉한 서리 결정, 홈 속에서 청록빛을 내는 얼어붙은 핵, 고드름 십자 가드.',
   'hudChrome.wocStore.skins.ice_fang_sword.lore':
-    '얼어붙은 등급의 대표작이자 모든 수집가가 가장 먼저 손을 뻗는 작품입니다. 얼음 송곳니는 단조하지 않고, 하이워치 위 손피크를 덮은 빙하의 송곳니를 깎아 만들었습니다. 청록색 핵은 글리머미어에 반사된 빛처럼 차갑게 타오릅니다. 베어 가르는 공기마저 서리로 덮습니다. 성벽 수비대는 폭설이 웜컬트를 막아 세운 밤에 한 병사가 이것을 들고 “성벽에 겨울 하나를 사 주었다”고 맹세합니다.',
+    '얼어붙은 등급의 대표작이자 모든 수집가가 가장 먼저 손을 뻗는 작품입니다. 얼음 송곳니는 단조하지 않고, 하이워치 위 손피크를 덮은 빙하의 송곳니를 깎아 만들었습니다. 청록색 핵은 글리머미어에 반사된 빛처럼 차갑게 타오릅니다. 베어 가르는 공기마저 서리로 덮습니다. 성벽 수비대는 폭설이 용서약단를 막아 세운 밤에 한 병사가 이것을 들고 “성벽에 겨울 하나를 사 주었다”고 맹세합니다.',
   'hudChrome.wocStore.skins.glaciersplit_axe.name': '글레이셔스플릿',
   'hudChrome.wocStore.skins.glaciersplit_axe.look':
     '반투명한 푸른 빙하 얼음 도끼머리, 청록빛으로 빛나는 내부 균열, 솟아난 서리 결정, 한기를 흘리는 자루.',
@@ -357,7 +357,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '청록빛으로 빛나는 단 하나의 빙하 얼음 가시, 은 칼라에서 피어나는 백상, 희미한 냉기 안개.',
   'hudChrome.wocStore.skins.everwinter_wand.lore':
     '산의 추위가 이빨을 드러내는 생텀 아래 깊은 산정호수에서 부러뜨렸다고 전해지는 빛나는 빙하 얼음 가시입니다. 은 칼라에서 백상이 끝없이 피어나며, 불에도 여름에도 녹지 않습니다. 마법사들은 자신의 술법에 한기를 더하려고 가까이 두지만, 니스락시스의 지하 묘지를 향해 기울며 귀 기울이는 듯한 밤에는 멀리 둡니다.',
-  'hudChrome.wocStore.skins.winterbite.name': '윈터바이트',
+  'hudChrome.wocStore.skins.winterbite.name': '윈터그나우',
   'hudChrome.wocStore.skins.winterbite.look':
     '은빛 강철과 푸른 얼음으로 만든 활, 손잡이에서 빛나는 청록색 얼어붙은 핵, 시위에 걸린 단단한 얼음 화살, 차가운 안개.',
   'hudChrome.wocStore.skins.winterbite.lore':
@@ -2875,7 +2875,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rupture.name': '과다출혈',
   'entities.abilities.rupture.description':
     '대상에게 상처를 입혀 16초에 걸쳐 {damage}의 출혈 피해를 입히는 결정타입니다.',
-  'entities.abilities.vanish.name': '연막 걸음',
+  'entities.abilities.vanish.name': '연막 은신',
   'entities.abilities.vanish.description':
     '시야에서 사라져 전투 중에도 황혼장막 상태가 됩니다. 숨어 있는 동안 이동 속도가 50% 감소합니다. 최대 10초 동안 지속됩니다.',
   'entities.abilities.instant_poison.name': '독사의 이빨',
@@ -3187,7 +3187,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.revive_pet.name': '응급 처치',
   'entities.abilities.revive_pet.description':
     '소환수를 응급 처치합니다. 살아 있으면 12초에 걸쳐 3초마다 생명력을 회복해 총 {overTime}의 생명력을 회복합니다. 죽어 있으면 35%의 생명력으로 되살립니다.',
-  'entities.abilities.holy_shock.name': '신성 충격',
+  'entities.abilities.holy_shock.name': '빛의 충격',
   'entities.abilities.holy_shock.description':
     '신성한 기운으로 아군 대상을 충격시켜 생명력을 {damage}만큼 회복시킵니다. (신성 전문화 상징)',
   'entities.abilities.holy_shield.name': '신성한 방패',
@@ -3199,7 +3199,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.trueshot_aura.name': '정조준 오라',
   'entities.abilities.trueshot_aura.description':
     '주위 아군을 고무하여 5분 동안 전투력을 35만큼 증가시킵니다. (사격 전문화 상징)',
-  'entities.abilities.wyvern_sting.name': '비룡 쐐기',
+  'entities.abilities.wyvern_sting.name': '드레이크 쐐기',
   'entities.abilities.wyvern_sting.description':
     '원거리에서 적을 쏘아 최대 4초 동안 행동 불가로 만듭니다. 피해를 받으면 효과가 해제됩니다. (생존 전문화 상징)',
   'entities.abilities.arcane_power.name': '신비의 마법 강화',
@@ -3208,7 +3208,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.combustion.name': '불사조의 무아지경',
   'entities.abilities.combustion.description':
     '15초 동안 주문 치명타율이 50% 증가합니다. (화염 전문화 상징)',
-  'entities.abilities.icy_veins.name': '얼음 핏줄',
+  'entities.abilities.icy_veins.name': '한파 쇄도',
   'entities.abilities.icy_veins.description':
     '10초 동안 주문 가속이 30% 증가하고 시전 방해와 밀림을 막습니다. (냉기 전문화 상징)',
   'entities.abilities.cold_blood.name': '냉혈',
@@ -3223,7 +3223,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.power_infusion.name': '마력 주입',
   'entities.abilities.power_infusion.description':
     '아군 대상에게 힘을 주입하여 15초 동안 주문력을 28만큼 증가시킵니다. (수양 전문화 상징)',
-  'entities.abilities.holy_nova.name': '신성한 폭발',
+  'entities.abilities.holy_nova.name': '성광 폭발',
   'entities.abilities.holy_nova.description':
     '신성한 빛을 폭발시켜 주위 아군을 {damage}만큼 치유하고 주위 적에게 피해를 줍니다. (신성 전문화 상징)',
   'entities.abilities.shadowform.name': '어둠의 형상',
@@ -3244,10 +3244,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.feral_charge.name': '야성의 돌진',
   'entities.abilities.feral_charge.description':
     '적에게 돌진하고 1초 동안 묶습니다. 8-25미터 거리. (야성 전문화 상징)',
-  'entities.abilities.swiftmend.name': '신속한 치유',
+  'entities.abilities.swiftmend.name': '날랜 치유',
   'entities.abilities.swiftmend.description':
     '아군 대상의 지속 치유 효과를 소모하여 생명력을 {damage}만큼 회복시킵니다. (복원 전문화 상징)',
-  'entities.abilities.crusader_strike.name': '성전사의 일격',
+  'entities.abilities.crusader_strike.name': '서약의 일격',
   'entities.abilities.crusader_strike.description':
     '대상을 공격해 무기 피해에 추가로 {damage}의 신성 피해를 줍니다. (성기사 특성)',
   'entities.abilities.metamorphosis.name': '악마 변신',
@@ -3418,7 +3418,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.ogre_war_totem.name': '오우거 전쟁 토템',
   'entities.items.storm_core.name': '폭풍 핵',
   'entities.items.kazzix_heartshard.name': '카직스의 심장파편',
-  'entities.items.wyrmcult_orders.name': '고룡교단 명령서',
+  'entities.items.wyrmcult_orders.name': '용서약단 명령서',
   'entities.items.ritual_phylactery.name': '의식 성물함',
   'entities.items.gravewyrm_sigil.name': '무덤고룡 인장',
   'entities.items.blessed_embers.name': '축복받은 불씨',
@@ -3439,7 +3439,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.staff_of_velkhar.name': '벨카르의 지팡이',
   'entities.items.shadowmeld_tunic.name': '밤장막 튜닉',
   'entities.items.gravewyrm_scale_hauberk.name': '무덤고룡 비늘갑옷',
-  'entities.items.wyrmcult_grand_robe.name': '고룡교단 대로브',
+  'entities.items.wyrmcult_grand_robe.name': '용서약단 대로브',
   'entities.items.wyrmscale_jerkin.name': '고룡비늘 웃옷',
   'entities.items.wyrmfang_greatblade.name': '고룡송곳니 대검',
   'entities.items.staff_of_the_gravewyrm.name': '무덤고룡의 지팡이',
@@ -3506,7 +3506,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.tideguard_sabatons.name': '파도수호 쇠장화',
   'entities.items.valeborn_spellblade.name': '계곡태생 주문검',
   'entities.items.voss_sanctified_mace.name': '보스의 성화된 철퇴',
-  'entities.items.wyrmcult_soulsteps.name': '고룡교단 영혼걸음',
+  'entities.items.wyrmcult_soulsteps.name': '용서약단 영혼걸음',
   'entities.items.wyrmshadow_harness.name': '밤송곳니 멜빵',
   'entities.items.wyrmshadow_legguards.name': '밤송곳니 다리보호구',
   'entities.items.wyrmshadow_treads.name': '밤송곳니 발보호구',
@@ -3579,8 +3579,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.warlord_drogmar.name': '전쟁군주 드로그마르',
   'entities.mobs.stormcrag_elemental.name': '스톰크래그 정령',
   'entities.mobs.shardlord_kazzix.name': '파편군주 카직스',
-  'entities.mobs.wyrmcult_zealot.name': '고룡교단 광신도',
-  'entities.mobs.wyrmcult_necromancer.name': '고룡교단 강령술사',
+  'entities.mobs.wyrmcult_zealot.name': '용서약단 광신도',
+  'entities.mobs.wyrmcult_necromancer.name': '용서약단 강령술사',
   'entities.mobs.boneclad_revenant.name': '뼈갑옷 망령',
   'entities.mobs.crypt_shambler.name': '묘실 비틀걸음',
   'entities.mobs.hollow_acolyte.name': '공허의 수행사제',
@@ -4069,7 +4069,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_crushers.objectives.0.label': '쏜피크 분쇄자 처치',
   'entities.quests.q_drogmar.title': '전쟁군주 드로그마르',
   'entities.quests.q_drogmar.text':
-    '드로그마르는 고룡교단의 돈을 받고 부족들을 산의 깨어남에 맹세시켰습니다. 그가 땅을 내리칠 때, {playerName}이여, 곁에 서 있지 마십시오. 전쟁 야영지에 들어가 하이워치를 위해 죽이십시오.',
+    '드로그마르는 용서약단의 돈을 받고 부족들을 산의 깨어남에 맹세시켰습니다. 그가 땅을 내리칠 때, {playerName}이여, 곁에 서 있지 마십시오. 전쟁 야영지에 들어가 하이워치를 위해 죽이십시오.',
   'entities.quests.q_drogmar.completion':
     '드로그마르가 제 야영지에서 죽었습니다. 당신은 내 성벽에 겨울 하나를 사 주었습니다, {playerName}.',
   'entities.quests.q_drogmar.objectives.0.label': '전쟁군주 드로그마르 처치',
@@ -4095,7 +4095,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '남쪽 봉우리의 바람이 성가를 실어 옵니다. 광신자 12명을 침묵시키십시오, {playerName}. 멎는 목소리마다 산이 하룻밤 더 잡니다.',
   'entities.quests.q_zealots.completion':
     '바람은 조용해졌습니다. {playerName}이여, 두려운 건 노래가 아니라 무언가 대답할지도 모른다는 겁니다.',
-  'entities.quests.q_zealots.objectives.0.label': '고룡교단 광신도 처치',
+  'entities.quests.q_zealots.objectives.0.label': '용서약단 광신도 처치',
   'entities.quests.q_cult_orders.title': '아래에서 온 명령',
   'entities.quests.q_cult_orders.text':
     '광신자들은 공성 전 병사처럼 움직입니다. 조직된 광신자는 명령을 받는 광신자입니다, {playerName}이여. 8명을 더 죽이고 명령서 4묶음을 가져오십시오.',
@@ -4138,7 +4138,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_voice_below.completion':
     '무릎 꿇음은 멈췄습니다. 목소리를 침묵시킨 게 아니라 합창을 줄였을 뿐입니다, {playerName}.',
   'entities.quests.q_voice_below.objectives.0.label': '고룡교단 광신도 처치',
-  'entities.quests.q_voice_below.objectives.1.label': '고룡교단 강령술사 처치',
+  'entities.quests.q_voice_below.objectives.1.label': '용서약단 강령술사 처치',
   'entities.quests.q_sanctum_gate.title': '성소의 문',
   'entities.quests.q_sanctum_gate.text':
     '마지막 문턱입니다, {playerName}이여. 교단은 성소 열쇠돌을 깨뜨려 광장에 흩었습니다. 3조각을 가져오면 조용히 열겠습니다.',
@@ -4243,13 +4243,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.zones.thornpeak_heights.pois.4.label': '드로그마르 전쟁 야영지',
   'entities.zones.thornpeak_heights.pois.5.label': '스톰크래그',
   'entities.zones.thornpeak_heights.pois.6.label': '글리머미어',
-  'entities.zones.thornpeak_heights.pois.7.label': '고룡교단 천막',
+  'entities.zones.thornpeak_heights.pois.7.label': '용서약단 천막',
   'entities.zones.thornpeak_heights.pois.8.label': '망령 들판',
   'entities.zones.thornpeak_heights.pois.9.label': '무덤고룡 성소',
   'entities.zones.veiled_hollow.name': '장막의 골짜기',
   'entities.zones.veiled_hollow.welcome':
-    '대기가 오래된 마법으로 웅웅거린다. 엘더글림의 큰 나무 아래에서 수호자 샐윈을 찾아가라.',
-  'entities.zones.veiled_hollow.pois.0.label': '엘더글림',
+    '대기가 오래된 마법으로 웅웅거린다. 엘더샤인의 큰 나무 아래에서 수호자 샐윈을 찾아가라.',
+  'entities.zones.veiled_hollow.pois.0.label': '엘더샤인',
   'entities.zones.veiled_hollow.pois.1.label': '황혼 동굴',
   'entities.zones.veiled_hollow.pois.2.label': '황혼 전망대',
   'entities.zones.veiled_hollow.pois.3.label': '고대나무 숲',
@@ -4319,7 +4319,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.gilded_stag.name': '금빛 수사슴',
   'entities.mobs.gloam_fox.name': '어스름여우',
   'entities.mobs.orchard_treant.name': '과수원 나무정령',
-  'entities.mobs.harvest_sprite.name': '수확 요정',
+  'entities.mobs.harvest_sprite.name': '이삭줍기 요정',
   'entities.mobs.mere_lurker.name': '호수 잠복자',
   'entities.mobs.bogtoad.name': '늪두꺼비',
   'entities.mobs.drowsy_croaker.name': '졸음 개구리왕',
@@ -4330,18 +4330,18 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '밤의 문 너머에서는 공기마저 꿈을 꾼다. 꽃빛을 따라 문레스트로 가라. 하늘에 걸린 잠든 세계도 놓치지 말고.',
   'entities.zones.nightbloom.pois.0.label': '문레스트',
   'entities.zones.nightbloom.pois.1.label': '밤의 문',
-  'entities.zones.nightbloom.pois.2.label': '달우물',
+  'entities.zones.nightbloom.pois.2.label': '달샘',
   'entities.zones.nightbloom.pois.3.label': '어스름 꽃벌판',
   'entities.zones.nightbloom.pois.4.label': '불침번 선돌',
   'entities.zones.nightbloom.pois.5.label': '잠들지 않는 봉분',
   'entities.mobs.moonfleece_grazer.name': '달양털 짐승',
   'entities.mobs.gloam_strider.name': '어스름 질주자',
-  'entities.mobs.nightkin_stargazer.name': '밤일족 별지기',
+  'entities.mobs.nightkin_stargazer.name': '어스름일족 별지기',
   'entities.mobs.barrow_king.name': '봉분의 왕',
   'entities.zones.wraithwood.name': '망령숲',
   'entities.zones.wraithwood.welcome':
-    '나무우듬지가 관 뚜껑처럼 길 위로 닫힌다. 갈로미어의 등불 곁을 떠나지 마라. 숲이 네 이름을 불러도 절대 대답하지 마라.',
-  'entities.zones.wraithwood.pois.0.label': '갈로미어',
+    '나무우듬지가 관 뚜껑처럼 길 위로 닫힌다. 기빗미어의 등불 곁을 떠나지 마라. 숲이 네 이름을 불러도 절대 대답하지 마라.',
+  'entities.zones.wraithwood.pois.0.label': '기빗미어',
   'entities.zones.wraithwood.pois.1.label': '까마귀 문',
   'entities.zones.wraithwood.pois.2.label': '과부의 덤불',
   'entities.zones.wraithwood.pois.3.label': '교수대 공터',
@@ -4459,7 +4459,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.loremother_bryn.greeting':
     '이 골짜기의 빛은 저마다 무언가를 기억하고 있다네, {playerName}. 함께 귀 기울여 주게.',
   'entities.npcs.provisioner_fenna.name': '보급상 펜나',
-  'entities.npcs.provisioner_fenna.title': '엘더글림 보급상',
+  'entities.npcs.provisioner_fenna.title': '엘더샤인 보급상',
   'entities.npcs.provisioner_fenna.greeting':
     '빵은 아직 따끈하고 물은 여전히 달아요. 골짜기가 베풀고, 저도 베풀지요.',
   'entities.npcs.wardsmith_orun.name': '수호기술자 오룬',
@@ -4749,7 +4749,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '수확 요정들이라네, {playerName}. 그 안의 단맛을 노리고 나무둥치에서 수액 꼭지를 뜯어낸 다음, 양동이는 풀숲에 내던져 버리지. 그 좀도둑 여덟을 쫓아내고 내 양동이 넷을 되찾아 주면, 수레가 다시 구른다네.',
   'entities.quests.q_af_sprites_and_spigots.completion':
     '양동이 넷이 다시 고리에 걸리고 나무줄도 조용해졌군. 자네는 나보다 요정을 다루는 손이 묵직해, {playerName}. 오늘만큼은 그게 고맙네.',
-  'entities.quests.q_af_sprites_and_spigots.objectives.0.label': '수확 요정을 쫓아냈다',
+  'entities.quests.q_af_sprites_and_spigots.objectives.0.label': '이삭줍기 요정을 쫓아냈다',
   'entities.quests.q_af_sprites_and_spigots.objectives.1.label': '수액 꼭지 양동이 회수',
   'entities.quests.q_af_the_meredark.title': '호수어둠',
   'entities.quests.q_af_the_meredark.text':
@@ -5054,7 +5054,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_hollow_first_of_the_herd.objectives.0.label': '아우렐혼에게 평안을 주었다',
   'entities.quests.q_hollow_old_marrowshell.title': '얕은 물의 늙은 껍질',
   'entities.quests.q_hollow_old_marrowshell.text':
-    '첫 번째 이름은 늙은 골수껍질이네. 엘더글림에 문이 서기도 전부터 동쪽 얕은 물을 사냥해 온, 수레만 한 게지. 떠돌아다니는 놈이니, {playerName}, 물가를 따라 걸으며 그 자취를 가로지를 때까지 찾아야 할 걸세. 혼자 가지 말게. 그리고 그 고요함을 믿지 말게.',
+    '첫 번째 이름은 늙은 골수껍질이네. 엘더샤인에 문이 서기도 전부터 동쪽 얕은 물을 사냥해 온, 수레만 한 게지. 떠돌아다니는 놈이니, {playerName}, 물가를 따라 걸으며 그 자취를 가로지를 때까지 찾아야 할 걸세. 혼자 가지 말게. 그리고 그 고요함을 믿지 말게.',
   'entities.quests.q_hollow_old_marrowshell.completion':
     '얕은 물이 다시 그저 물이 되었군. 그 껍질이 나보다 나은 사냥꾼들을 꺾는 걸 지켜봐 왔네, {playerName}. 자네는 아니었어.',
   'entities.quests.q_hollow_old_marrowshell.objectives.0.label': '늙은 골수껍질 처치',
@@ -5066,13 +5066,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_hollow_the_huntsman.objectives.0.label': '사냥꾼 데랄을 찾아라',
   'entities.quests.q_nb_charts_of_the_stones.title': '돌에 새겨진 성도',
   'entities.quests.q_nb_charts_of_the_stones.text':
-    '불침번 선돌은 문레스트보다, 그 돌을 돌보는 밤일족보다도 오래되었네. 그 돌 표면에는 성도가 새겨져 있는데, 나는 그것을 읽는 법을 배우는 데 평생을 들였지. 하늘이 움직였네, {playerName}. 얼마나 멀리 움직였는지 알아야겠어. 선돌 셋의 성도를 읽고 그 방위를 내게 가져다주게.',
+    '불침번 선돌은 문레스트보다, 그 돌을 돌보는 어스름일족보다도 오래되었네. 그 돌 표면에는 성도가 새겨져 있는데, 나는 그것을 읽는 법을 배우는 데 평생을 들였지. 하늘이 움직였네, {playerName}. 얼마나 멀리 움직였는지 알아야겠어. 선돌 셋의 성도를 읽고 그 방위를 내게 가져다주게.',
   'entities.quests.q_nb_charts_of_the_stones.completion':
     '의심의 여지가 없군. 방위 하나하나가 모두 잠들지 않는 봉분 쪽으로 기울었네. 마치 하늘이 그 무덤 위로 몸을 숙여 들여다보는 것처럼 말이야. 옛 왕들이 정렬된 별 아래 묻힌 데는 이유가 있었네, {playerName}.',
   'entities.quests.q_nb_charts_of_the_stones.objectives.0.label': '성도를 읽었다',
   'entities.quests.q_nb_eyes_on_the_vigil.title': '선돌을 지켜보는 눈',
   'entities.quests.q_nb_eyes_on_the_vigil.text':
-    '무언가가 질주자들을 대담하게, 무리를 불안하게 만들고 있어요, {playerName}. 그런데 그것은 꽃으로는 읽을 수가 없네요. 카시안이라면 하늘에서 읽어 낼 수 있어요. 그는 밤일족이 돌 사이를 떠도는 동쪽 불침번 선돌 곁에 관측 야영지를 두고 있죠. 그를 찾아가서, 별들이 무어라 말하는지 물어봐 주세요.',
+    '무언가가 질주자들을 대담하게, 무리를 불안하게 만들고 있어요, {playerName}. 그런데 그것은 꽃으로는 읽을 수가 없네요. 카시안이라면 하늘에서 읽어 낼 수 있어요. 그는 어스름일족이 돌 사이를 떠도는 동쪽 불침번 선돌 곁에 관측 야영지를 두고 있죠. 그를 찾아가서, 별들이 무어라 말하는지 물어봐 주세요.',
   'entities.quests.q_nb_eyes_on_the_vigil.completion':
     '리라가 보냈다고? 그럼 정원들도 느끼고 있다는 뜻이군. 잠시 관측경 곁에 앉게, {playerName}. 별들이 한 달째 뒤척이고 있는데, 내가 그리는 성도마다 북쪽 봉분을 향해 기울고 있다네.',
   'entities.quests.q_nb_eyes_on_the_vigil.objectives.0.label':
@@ -5106,7 +5106,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_nb_the_barrow_king.text':
     '모든 방위가, 뒤척이는 모든 별이, 열린 모든 봉분이 한 가지를 가리키네. 봉분의 왕이 큰 봉분 아래에서 깨어나고 있는데, 이 땅에는 그를 막아 줄 새벽이 없어. 그가 제 왕관을 기억해 내기 전에 다시 잠재워야 하네, {playerName}. 혼자 가지 말게. 동료를 데려가고, 꽃빛을 등 뒤에 두게.',
   'entities.quests.q_nb_the_barrow_king.completion':
-    '별들이 한 계절 만에 처음으로 자리를 잡았네, {playerName}. 봉분은 닫혔고, 밤일족은 저희 돌 곁에서 고요해졌고, 왕은 다시 아래에서 잠드네. 이 어깨덮개를 걸치게. 문레스트가, 밤이 마침내 믿게 된 이를 위해 지은 것이라네.',
+    '별들이 한 계절 만에 처음으로 자리를 잡았네, {playerName}. 봉분은 닫혔고, 어스름일족은 저희 돌 곁에서 고요해졌고, 왕은 다시 아래에서 잠드네. 이 어깨덮개를 걸치게. 문레스트가, 밤이 마침내 믿게 된 이를 위해 지은 것이라네.',
   'entities.quests.q_nb_the_barrow_king.objectives.0.label': '봉분의 왕을 안식에 들였다',
   'entities.quests.q_nb_wool_by_moonlight.title': '달빛 아래의 양털',
   'entities.quests.q_nb_wool_by_moonlight.text':
@@ -5153,10 +5153,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '항해사 술리를 드리프트헤이븐까지 무사히 배웅했다',
   'entities.quests.q_pr_the_man_who_went_in.title': '안으로 들어갔던 자',
   'entities.quests.q_pr_the_man_who_went_in.text':
-    '잠수부들은 나무 그늘 너머로는 발을 들이지 않을 테고, 나도 그들에게 그것을 청하지 않겠네, {playerName}. 지금쯤 북소리는 들었겠지. 둘째 밤이면 누구나 듣게 되니까. 이 섬에서 그 소리를 향해 걸어 들어갔다가 돌아온 사람은 단 하나뿐이야. 오쿠. 그는 덩굴 길 깊숙이, 덩굴폭포 숲의 큰 반얀나무 아래 야영하고 있네. 그를 찾아가서, 초록이 무엇을 숨기고 있는지 물어보게.',
+    '잠수부들은 나무 그늘 너머로는 발을 들이지 않을 테고, 나도 그들에게 그것을 청하지 않겠네, {playerName}. 지금쯤 북소리는 들었겠지. 둘째 밤이면 누구나 듣게 되니까. 이 섬에서 그 소리를 향해 걸어 들어갔다가 돌아온 사람은 단 하나뿐이야. 오크림. 그는 덩굴 길 깊숙이, 덩굴폭포 숲의 큰 반얀나무 아래 야영하고 있네. 그를 찾아가서, 초록이 무엇을 숨기고 있는지 물어보게.',
   'entities.quests.q_pr_the_man_who_went_in.completion':
     '이샤가 보냈다고? 진주어멈이 내 이름을 입에 올리지 않은 지 여러 해인데. 덩굴 손이 닿지 않는 곳에 앉게, {playerName}. 내가 아는 것을 말해 주지. 북소리는 위험이 아니야. 경고라네.',
-  'entities.quests.q_pr_the_man_who_went_in.objectives.0.label': '덩굴폭포 숲에서 오쿠를 찾아라',
+  'entities.quests.q_pr_the_man_who_went_in.objectives.0.label': '덩굴폭포 숲에서 오크림을 찾아라',
   'entities.quests.q_pr_what_the_drums_guard.title': '북소리가 지키는 것',
   'entities.quests.q_pr_what_the_drums_guard.text':
     '산 사람이 감히 다가갈 수 있는 데까지 가라앉은 신상 곁을 걸어 봤는데, 두 가지를 보았네. 거미들이 신상 길을 거미줄 장막으로 덮었다는 것, 그리고 그 길가의 옛 공양 그릇들이 다시 채워져 있다는 것. 그것도 갓 채워졌더군, {playerName}. 길에서 거미 여덟을 베어 내고 그 공물 셋을 가져다주게. 어떤 손이 아직도 죽은 신을 먹이는지 알아야겠네.',
@@ -5219,15 +5219,15 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_wf_witch_of_willowweep.completion':
     '알든이 그 코골이를 물어보라고 예까지 보냈다고? 다리 사람들이 드디어 귀를 기울이는군. 축축한 데서 나와 앉게, {playerName}. 그 소리에는 이름이 있고, 목구멍이 있지. 그리고 나는 그것을 잠재우는 걸 도울 만큼 어리석은 이를 기다려 왔다네.',
   'entities.quests.q_wf_witch_of_willowweep.objectives.0.label': '세지 어멈을 찾아라',
-  'entities.quests.q_ww_bells_of_gallowmere.title': '갈로미어의 종소리',
+  'entities.quests.q_ww_bells_of_gallowmere.title': '기빗미어의 종소리',
   'entities.quests.q_ww_bells_of_gallowmere.text':
-    '저 종소리가 들리나, {playerName}? 북쪽 길 위 갈로미어가 제 망자들을 재우려 울리는 소리라네. 교회지기 매로우가 나무우듬지 아래 모든 영혼을 헤아리지. 산 자든 묻힌 자든 말이야. 가서 헤아림을 받게. 숲이 자네를 제멋대로 헤아리기 전에.',
+    '저 종소리가 들리나, {playerName}? 북쪽 길 위 기빗미어가 제 망자들을 재우려 울리는 소리라네. 교회지기 매로우가 나무우듬지 아래 모든 영혼을 헤아리지. 산 자든 묻힌 자든 말이야. 가서 헤아림을 받게. 숲이 자네를 제멋대로 헤아리기 전에.',
   'entities.quests.q_ww_bells_of_gallowmere.completion':
-    '콥이 자네를 성한 몸으로 올려 보냈군? 좋은 사람이지. 삼십 년을 그 문 등불을 밝혀 왔는데, 숲은 단 한 번도 그를 지나치지 못했다네. 갈로미어에 잘 왔네, {playerName}. 종소리를 조심하게.',
+    '콥이 자네를 성한 몸으로 올려 보냈군? 좋은 사람이지. 삼십 년을 그 문 등불을 밝혀 왔는데, 숲은 단 한 번도 그를 지나치지 못했다네. 기빗미어에 잘 왔네, {playerName}. 종소리를 조심하게.',
   'entities.quests.q_ww_bells_of_gallowmere.objectives.0.label': '교회지기 매로우에게 보고',
   'entities.quests.q_ww_candles_at_the_bounds.title': '경계의 초',
   'entities.quests.q_ww_candles_at_the_bounds.text':
-    '갈로미어를 두르고 경계석 넷이 서 있네, {playerName}. 바깥으로 난 길마다 하나씩, 그리고 돌마다 무덤 초가 타고 있지. 그 초가 타는 동안은 묻힌 자들이 묻힌 채로 있는다네. 그런데 가랑비가 넷을 모조리 꺼 버렸는데, 나는 혼자 경계를 돌기엔 너무 늙었어. 내 심지불을 가져가서 다시 밝혀 주게. 서둘러야 하네.',
+    '기빗미어를 두르고 경계석 넷이 서 있네, {playerName}. 바깥으로 난 길마다 하나씩, 그리고 돌마다 무덤 초가 타고 있지. 그 초가 타는 동안은 묻힌 자들이 묻힌 채로 있는다네. 그런데 가랑비가 넷을 모조리 꺼 버렸는데, 나는 혼자 경계를 돌기엔 너무 늙었어. 내 심지불을 가져가서 다시 밝혀 주게. 서둘러야 하네.',
   'entities.quests.q_ww_candles_at_the_bounds.completion':
     '넷 다 타고 있다고? 그럼 한숨 돌리게, {playerName}. 자네는 못 들었겠지만 온 마을이 들었다네. 마지막 심지에 불이 붙는 순간, 종소리가 한결 편안해졌어.',
   'entities.quests.q_ww_candles_at_the_bounds.objectives.0.label': '무덤 초를 다시 밝혔다',
@@ -5235,7 +5235,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_ww_horn_of_the_huntsman.text':
     '지금쯤 그 뿔피리 소리를 들었겠지, {playerName}. 가늘고 아득한, 온 숲이 숨을 죽이는 그 소리 말일세. 창백한 사냥꾼이 여기서 북쪽의 제 공터를 말 타고 도는데, 그가 지나는 무덤마다 조금씩 얕아진다네. 그도 한때는 사람이었고, 잘못 묻혔지. 나는 이제 기도로 될 일인 척하기를 그만두었네. 동료를 하나, 아니 둘 데려가서, 그를 말에서 끌어내리게.',
   'entities.quests.q_ww_horn_of_the_huntsman.completion':
-    '뿔피리가 음 한가운데서 멎었네. 갈로미어의 종이란 종이 저 혼자 한 번씩 울리더니, 숲이 삼십 년 만에 처음 듣는 고요에 잠겼어. 자네는 내가 못 한 의식을 해낸 걸세, {playerName}. 이걸 걸치고, 나무우듬지 아래를 두려움 없이 걷게.',
+    '뿔피리가 음 한가운데서 멎었네. 기빗미어의 종이란 종이 저 혼자 한 번씩 울리더니, 숲이 삼십 년 만에 처음 듣는 고요에 잠겼어. 자네는 내가 못 한 의식을 해낸 걸세, {playerName}. 이걸 걸치고, 나무우듬지 아래를 두려움 없이 걷게.',
   'entities.quests.q_ww_horn_of_the_huntsman.objectives.0.label':
     '창백한 사냥꾼을 말에서 끌어내렸다',
   'entities.quests.q_ww_silk_in_the_eaves.title': '처마 밑의 비단',
@@ -5254,12 +5254,12 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_ww_walking_mosley_home.text':
     '내 무덤파기꾼 모슬리가 사흘 전에 옛 묘역에 자리 하나를 파러 예배당 길을 나섰는데, 파던 구덩이가 그 위로 무너져 내렸다네. 제 손으로 기어 나왔으니 그 바보는 살아 있네만, 예배당 무덤가에 웅크린 채 길 위의 거미들이 무서워 꼼짝을 않고 있어. 집까지 데려와 주게, {playerName}. 산 사람을 위해 종을 울릴 수는 없지 않은가.',
   'entities.quests.q_ww_walking_mosley_home.completion':
-    '제 두 발로 문을 걸어 들어왔네. 앞으로는 순무밭보다 깊은 건 안 파겠다고 맹세하면서 말이야. 일요일이면 다시 묘역에 나가 있을 걸세. 늘 그러니까. 고맙네, {playerName}. 갈로미어는 제 사람을 지킨다네. 그게 우리 법의 전부일세.',
+    '제 두 발로 문을 걸어 들어왔네. 앞으로는 순무밭보다 깊은 건 안 파겠다고 맹세하면서 말이야. 일요일이면 다시 묘역에 나가 있을 걸세. 늘 그러니까. 고맙네, {playerName}. 기빗미어는 제 사람을 지킨다네. 그게 우리 법의 전부일세.',
   'entities.quests.q_ww_walking_mosley_home.objectives.0.label':
-    '무덤파기꾼 모슬리를 갈로미어까지 무사히 배웅했다',
+    '무덤파기꾼 모슬리를 기빗미어까지 무사히 배웅했다',
   'entities.quests.q_ww_what_the_bark_holds.title': '나무껍질이 품은 것',
   'entities.quests.q_ww_what_the_bark_holds.text':
-    '갈로미어 동쪽 매달린 공터에서는 거미들이 비단에 감은 망자를 가지에 매달아 두고, 그 아래에는 무덤껍질 괴목들이 참을성 있는 관잡이처럼 서서 지킨다네. 저 위에 매달린 건 우리 사람들일세, {playerName}. 괴목 다섯을 부수고, 감긴 망자 셋을 끌어 내려, 흙으로 돌려보내 주게.',
+    '기빗미어 동쪽 매달린 공터에서는 거미들이 비단에 감은 망자를 가지에 매달아 두고, 그 아래에는 무덤껍질 괴목들이 참을성 있는 관잡이처럼 서서 지킨다네. 저 위에 매달린 건 우리 사람들일세, {playerName}. 괴목 다섯을 부수고, 감긴 망자 셋을 끌어 내려, 흙으로 돌려보내 주게.',
   'entities.quests.q_ww_what_the_bark_holds.completion':
     '해 지기 전에 세 영혼이 바른 땅 밑으로 돌아갔네. 괴목이야 다시 자라겠지. 나무껍질은 늘 그러니까. 하지만 오늘 밤 그 공터는 비어 있고, 그거면 충분하네.',
   'entities.quests.q_ww_what_the_bark_holds.objectives.0.label': '무덤껍질 괴목 처치',
@@ -7025,17 +7025,17 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.peaksGreeting':
     '이 성벽이 이백 년을 버텨 왔소. 내가 지키는 한 무너지지 않겠지만, 신음하고 있긴 하지.',
   'guide.worldPage.peaksPlaceNotes':
-    '하이워치가 성벽을 지킵니다. 추적자 능선과 깊은바위 굴은 능선 들고양이와 굴착꾼의 차지이고, 오우거 산기슭과 드로그마르의 전쟁 야영지는 고용된 흉포한 자들의 것입니다. 스톰크래그는 정령들로 들끓고 그 아래에서 글리머미어가 빛나는데, 그 물가에는 익사한 신전으로 내려가는 창백한 빛의 문이 자리합니다. 고룡교단 천막과 망령의 들판이 교단의 높은 거점을 에워싸고, 그 정점에 무덤고룡 성소가 있습니다.',
+    '하이워치가 성벽을 지킵니다. 추적자 능선과 깊은바위 굴은 능선 들고양이와 굴착꾼의 차지이고, 오우거 산기슭과 드로그마르의 전쟁 야영지는 고용된 흉포한 자들의 것입니다. 스톰크래그는 정령들로 들끓고 그 아래에서 글리머미어가 빛나는데, 그 물가에는 익사한 신전으로 내려가는 창백한 빛의 문이 자리합니다. 용서약단 천막과 망령의 들판이 교단의 높은 거점을 에워싸고, 그 정점에 무덤고룡 성소가 있습니다.',
   'guide.worldPage.duskGreeting':
     '그대의 동족이 이 가지 아래 선 일은 드물다. 조심스레 걸으라, 그리고 환영받으라.',
-  'guide.worldPage.duskGreeter': '수호자 샐윈, 엘더글림',
+  'guide.worldPage.duskGreeter': '수호자 샐윈, 엘더샤인',
   'guide.worldPage.duskPlaceNotes':
-    '엘더글림은 큰 나무 아래 모여 있다. 황혼 동굴과 그 전망대는 들어가는 길이자 골짜기를 처음 내려다보는 곳이다. 고대나무 숲과 별내림 분지는 고요한 남쪽을 지키고, 가라앉은 궁정은 동쪽에 수풀 우거진 폐허를 품으며, 빛나는 심처와 수정 여울은 북쪽에서 은은히 빛난다.',
+    '엘더샤인은 큰 나무 아래 모여 있다. 황혼 동굴과 그 전망대는 들어가는 길이자 골짜기를 처음 내려다보는 곳이다. 고대나무 숲과 별내림 분지는 고요한 남쪽을 지키고, 가라앉은 궁정은 동쪽에 수풀 우거진 폐허를 품으며, 빛나는 심처와 수정 여울은 북쪽에서 은은히 빛난다.',
   'guide.family.demon.name': '악마',
   'guide.family.demon.desc':
     '균열 너머에서 온 침략자들로, 온통 불길과 악의뿐입니다. 악마 하나가 서 있는 곳이라면, 균열이 결코 멀지 않습니다.',
   'guide.worldPage.duskBlurb':
-    '수정 폐허가 빛나고 대기가 오래된 마법으로 웅웅거리는, 엘더글림의 큰 나무 아래 영원한 황혼에 잠긴 골짜기.',
+    '수정 폐허가 빛나고 대기가 오래된 마법으로 웅웅거리는, 엘더샤인의 큰 나무 아래 영원한 황혼에 잠긴 골짜기.',
   'guide.worldPage.emberBlurb':
     '드레이크가 화산구 위를 맴돌고 모래 언덕 사이에 트롤의 모닥불이 타오르는, 재와 핏빛유리로 뒤덮인 뇌우 치는 황무지. 관문 마을 와이름 감시탑이 이곳을 지켜봅니다.',
   'guide.worldPage.frostBlurb':
@@ -7047,7 +7047,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.nightBlurb':
     '꽃들이 길을 밝히는 별 가득한 한밤의 세계. 문레스트가 꿈꾸는 하늘 아래 조용히 불침번을 섭니다.',
   'guide.worldPage.hauntBlurb':
-    '거대한 나무우듬지 아래 유령 들린 숲. 길 위에서는 갈로미어의 등불만이 유일하게 정직한 빛입니다.',
+    '거대한 나무우듬지 아래 유령 들린 숲. 길 위에서는 기빗미어의 등불만이 유일하게 정직한 빛입니다.',
   'guide.worldPage.galeBlurb':
     '바람이 한시도 쉬지 않는 바다 절벽과 울부짖는 구릉. 올드 비컨은 결코 꺼지지 않고, 윅하버는 문을 굳게 걸어 잠급니다.',
   'guide.worldPage.jungleBlurb':
@@ -7071,7 +7071,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.nightGreeter': '불침번 감시관, 문레스트',
   'guide.worldPage.hauntGreeting':
     '등불 곁을 떠나지 마시오, 여행자여. 그리고 길 밖에서 숲이 그대의 이름을 부르거든, 절대 대답하지 마시오.',
-  'guide.worldPage.hauntGreeter': '등불지기, 갈로미어',
+  'guide.worldPage.hauntGreeter': '등불지기, 기빗미어',
   'guide.worldPage.galeGreeting':
     '이곳의 바람은 단 한 번도 멎은 적이 없고, 올드 비컨은 단 한 번도 꺼진 적이 없다오. 여관 문은 들어온 뒤에 꼭 닫으시오.',
   'guide.worldPage.galeGreeter': '봉화지기, 윅하버',
@@ -7090,9 +7090,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.fenPlaceNotes':
     '브리지미어는 느린 물 위에 걸터앉아 있습니다. 호박늪 돌계단은 수확의 땅에서 내려오는 길이고, 수련 습지와 늪빛 웅덩이는 위습과 잠자리로 반짝입니다. 수양버들 만은 가지를 호수에 드리우고, 나른한 여울은 이 땅에서 가장 온순한 곳입니다.',
   'guide.worldPage.nightPlaceNotes':
-    '문레스트는 불침번을 섭니다. 밤의 문은 한밤의 나라로 들어가는 길이고, 달우물은 곁에 설 수 있는 별빛을 담고 있습니다. 어스름 꽃벌판은 어둠 속에서 피어나고, 불침번 선돌은 한 발짝도 움직이지 않은 채 지켜보며, 잠들지 않는 봉분은 이곳에서 유일하게 꿈꾸지 않는 자리입니다.',
+    '문레스트는 불침번을 섭니다. 밤의 문은 한밤의 나라로 들어가는 길이고, 달샘은 곁에 설 수 있는 별빛을 담고 있습니다. 어스름 꽃벌판은 어둠 속에서 피어나고, 불침번 선돌은 한 발짝도 움직이지 않은 채 지켜보며, 잠들지 않는 봉분은 이곳에서 유일하게 꿈꾸지 않는 자리입니다.',
   'guide.worldPage.hauntPlaceNotes':
-    '갈로미어는 제 등불 안에 웅크리고 있습니다. 까마귀 문은 이 숲의 음산한 정문이고, 과부의 덤불은 거미줄로 빽빽이 얽혀 있습니다. 교수대 공터와 애도석 예배당은 숲의 가장 오래된 슬픔을 간직하며, 사냥꾼의 공터는 아직도 그곳에서 사냥하는 무언가의 차지입니다.',
+    '기빗미어는 제 등불 안에 웅크리고 있습니다. 까마귀 문은 이 숲의 음산한 정문이고, 과부의 덤불은 거미줄로 빽빽이 얽혀 있습니다. 교수대 공터와 애도석 예배당은 숲의 가장 오래된 슬픔을 간직하며, 사냥꾼의 공터는 아직도 그곳에서 사냥하는 무언가의 차지입니다.',
   'guide.worldPage.galePlaceNotes':
     '윅하버는 바람에 몸을 기울인 채 서 있습니다. 바람길은 절벽을 따라 들어오는 길이고, 울부짖는 구릉은 강풍 아래 나무 한 그루 없이 굽이칩니다. 올드 비컨은 누구도 기억하지 못할 만큼 오래 타올랐고, 절단 절벽은 물까지 곧장 떨어지며, 난파선 벌판은 이 해안을 정직하게 만듭니다. 그리고 거울 호수는 이 지역 전체에서 유일하게 고요한 것입니다.',
   'guide.worldPage.junglePlaceNotes':
@@ -7119,7 +7119,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.reliquary_shoulder.name': '부서진 어깨보호구',
   'entities.items.reliquary_gloves_rog.name': '뼈수호 손보호구',
   'entities.items.deacon_reliquary_helm.name': '부제의 성물실 투구',
-  'entities.items.varric_shadow_cowl.name': '바릭의 그림자 두건',
+  'entities.items.varric_shadow_cowl.name': '반드릭의 그림자 두건',
   'entities.items.duskwisp_essence.name': '황혼 위습의 정수',
   'entities.items.spore_heart.name': '포자 심장',
   'entities.items.gleaming_antler.name': '빛나는 가지뿔',
@@ -7141,7 +7141,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.nightweave_tunic.name': '밤엮음 튜닉',
   'entities.items.veilcloth_robe.name': '장막천 로브',
   'entities.mobs.acolyte_tessa.name': '수련사제 테사',
-  'entities.mobs.deacon_varric.name': '부제 바릭',
+  'entities.mobs.deacon_varric.name': '부제 반드릭',
   'entities.mobs.reliquary_bonewalker.name': '되살아난 해골보행자',
   'entities.mobs.reliquary_funeral_ringer.name': '장례 종지기',
   'entities.mobs.reliquary_gravecall_acolyte.name': '무덤부름 수련사제',
@@ -7176,23 +7176,23 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'delveUi.board.tier.heroic': '영웅',
   'delveUi.board.tier.normal': '일반',
   'delveUi.board.title': '탐굴 게시판',
-  'delveUi.boss.varric.bell.emote': '부제 바릭이 두 손으로 묻혀 있던 종을 움켜쥡니다!',
+  'delveUi.boss.varric.bell.emote': '부제 반드릭이 두 손으로 묻혀 있던 종을 움켜쥡니다!',
   'delveUi.boss.varric.bell.impact': '종소리가 방의 바닥을 갈라놓습니다!',
   'delveUi.boss.varric.bell.lesson':
     '종울림: 12초마다 땅을 내리치는 공격. 떨어지기 전에 벗어나세요.',
-  'delveUi.boss.varric.bell.log': '부제 바릭이 매장의 종을 울리기 시작합니다.',
-  'delveUi.boss.varric.bell.warning': '부제 바릭에게서 떨어지세요!',
+  'delveUi.boss.varric.bell.log': '부제 반드릭이 매장의 종을 울리기 시작합니다.',
+  'delveUi.boss.varric.bell.warning': '부제 반드릭에게서 떨어지세요!',
   'delveUi.boss.varric.defeat': '안 돼... 이름들을... 모두 가지고 있었는데...',
   'delveUi.boss.varric.intro': '잃어버린 영혼은 없다. 단지 자리를 잘못 둔 것뿐.',
   'delveUi.boss.varric.mid30': '매장의 종이 그가 부르는 모든 이름에 응답합니다.',
-  'delveUi.boss.varric.mid60': '부제 바릭이 떨리는 환희로 명부에서 이름을 읽어 내립니다.',
+  'delveUi.boss.varric.mid60': '부제 반드릭이 떨리는 환희로 명부에서 이름을 읽어 내립니다.',
   'delveUi.boss.varric.pull': '그대는 부정한 의도로 신성한 흙을 밟았다. 무릎 꿇고, 명부에 오르라.',
-  'delveUi.boss.varric.raise.emote': '부제 바릭이 부서진 무덤에서 이름을 불러냅니다!',
-  'delveUi.boss.varric.raise.interrupt_fail': '죽은 자들이 부제 바릭의 부름에 응답합니다!',
+  'delveUi.boss.varric.raise.emote': '부제 반드릭이 부서진 무덤에서 이름을 불러냅니다!',
+  'delveUi.boss.varric.raise.interrupt_fail': '죽은 자들이 부제 반드릭의 부름에 응답합니다!',
   'delveUi.boss.varric.raise.interrupt_ok': '무덤의 의식이 흔들립니다.',
   'delveUi.boss.varric.raise.lesson':
     '5초 안에 갈라진 무덤을 방해하지 않으면 죽은 자들이 그의 부름에 일어납니다.',
-  'delveUi.boss.varric.raise.log': '부제 바릭이 죽음의 부활을 시전하기 시작합니다.',
+  'delveUi.boss.varric.raise.log': '부제 반드릭이 죽음의 부활을 시전하기 시작합니다.',
   'delveUi.boss.varric.raise.object': '갈라진 무덤이 훔쳐 온 숨결로 떨립니다.',
   'delveUi.boss.varric.raise.warning': '무덤의 의식을 멈추세요!',
   'delveUi.chest.flavor': '죽은 자들이 내어줄 수 있는 것을 내놓았습니다.',
@@ -9495,7 +9495,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.desc_drakemaw_raptor':
     '화산구 칼데라에서 길들여진 둥지 태생 랩터. 온몸이 힘줄과 질주로 이루어졌으며, 아직도 희미한 재 냄새가 난다.',
   'hudChrome.mounts.name_thunderstrut_gobbler': '천둥활보 대왕 칠면조',
-  'hudChrome.mounts.name_terrorspark_groundshaker': '대지를 뒤흔드는 테러스파크',
+  'hudChrome.mounts.name_terrorspark_groundshaker': '대지를 뒤흔드는 드레드스파크',
   'hudChrome.mounts.desc_valorsteed': '여행 속도를 높여 주는 튼튼하고 발이 안정된 군마입니다.',
   'hudChrome.mounts.desc_grag_bear': '여행 속도를 높여 주는 튼튼하고 발이 안정된 곰입니다.',
   'hudChrome.mounts.desc_stalkglider_snail': '여행 속도를 높여 주는 끈질기고 느긋한 달팽이입니다.',
@@ -9540,7 +9540,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.kick.name': '발차기',
   'entities.abilities.kick.description':
     '대상의 주문 시전을 중단시키고 4초 동안 해당 계열의 주문을 봉쇄합니다.',
-  'entities.abilities.counterspell.name': '주문 분쇄',
+  'entities.abilities.counterspell.name': '주문 절단',
   'entities.abilities.counterspell.description':
     '대상의 주문을 무효화하고 6초 동안 해당 계열의 주문을 봉쇄합니다.',
   'entities.abilities.counter_shot.name': '침묵의 사격',
@@ -9727,7 +9727,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.prayer_of_healing.description':
     '주위 아군의 생명력을 {damage}만큼 회복합니다. (사제 특성)',
   'entities.abilities.preparation.description':
-    '질주, 회피, 소멸의 재사용 대기시간을 완료합니다. (도적 특성)',
+    '질주, 회피, 연막 은신의 재사용 대기시간을 완료합니다. (도적 특성)',
   'entities.abilities.presence_of_mind.description':
     '시전 시간이 있는 다음 주문을 즉시 시전합니다. 60초 동안 지속됩니다. (마법사 특성)',
   'entities.abilities.psychic_scream.description':
@@ -9774,13 +9774,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.flurry.name': '겨울의 채찍',
   'entities.abilities.flurry.description':
     '얼음 화살 세 발을 날려 각각 {damage}의 냉기 피해를 입히고 대상에게 혹한의 추위를 부여합니다. 다음 2회의 호환 주문은 대상을 얼어붙은 것으로 간주합니다. 두뇌 빙결이 발동하면 즉시 시전되고 재사용 대기시간을 무시합니다. (냉기)',
-  'entities.abilities.frozen_orb.name': '얼어붙은 구슬',
+  'entities.abilities.frozen_orb.name': '서리 구슬',
   'entities.abilities.frozen_orb.description':
     '소용돌이치는 얼음 구슬을 방출해 8초 동안 전방으로 이동시킵니다. 주변 적에게 매초 {damage}의 냉기 피해를 입히고 이동 속도를 30% 감소시킵니다. 적중한 파동마다 고드름 1개를 생성합니다. (냉기)',
   'entities.abilities.blizzard.name': '눈보라',
   'entities.abilities.blizzard.description':
-    '대상 지역에 6초 동안 얼음 폭풍을 불러 매초 {damage}의 냉기 피해를 입히고 적의 이동 속도를 40% 감소시킵니다. 적 한 명에게 적중할 때마다 얼어붙은 구슬의 재사용 대기시간이 0.5초, 한 번 시전할 때 최대 3초 감소합니다. (냉기)',
-  'entities.abilities.glacial_spike.name': '혹한의 쐐기',
+    '대상 지역에 6초 동안 얼음 폭풍을 불러 매초 {damage}의 냉기 피해를 입히고 적의 이동 속도를 40% 감소시킵니다. 적 한 명에게 적중할 때마다 서리 구슬의 재사용 대기시간이 0.5초, 한 번 시전할 때 최대 3초 감소합니다. (냉기)',
+  'entities.abilities.glacial_spike.name': '서리 바늘',
   'entities.abilities.glacial_spike.description':
     '거대한 얼음 쐐기를 만들어 고드름 5개를 소모하고 {damage}의 냉기 피해를 입히며 대상을 4초 동안 제자리에 얼립니다. (냉기)',
   'entities.abilities.glacial_front.name': '빙하 전선',
@@ -9823,7 +9823,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '자신을 불길로 감싸 {damage}의 피해를 흡수합니다. 60초 동안 지속됩니다. (화염)',
   'entities.abilities.cold_snap.name': '겨울의 부름',
   'entities.abilities.cold_snap.description':
-    '깜빡임 걸음, 서리장막 및 상급 투명화의 재사용 대기시간을 즉시 초기화합니다. (마법사 특성)',
+    '날쌘걸음, 서리장막 및 상급 투명화의 재사용 대기시간을 즉시 초기화합니다. (마법사 특성)',
   'entities.abilities.greater_invisibility.name': '상급 투명화',
   'entities.abilities.greater_invisibility.description':
     '20초 동안 사라지며 지속 피해 효과를 2개 제거합니다. 투명화가 끝나면 2초 동안 받는 피해가 90% 감소합니다. (마법사 특성)',
@@ -9961,7 +9961,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.battleTrance':
     '다음 약탈자의 일격 또는 불구의 일격이 분노를 소모하지 않습니다',
   'hudChrome.auraEffect.revengeFree': '다음 복수가 분노를 소모하지 않습니다',
-  'hudChrome.auraEffect.victoryRush': '연전연승을 사용할 수 있습니다',
+  'hudChrome.auraEffect.victoryRush': '승자의 쇄도를 사용할 수 있습니다',
   'hudChrome.auraEffect.maxHpPct': '최대 생명력이 {pct}% 증가합니다',
   'hud.combat.floatingParry': '무기 막기',
   'hud.combat.parried': '{target}이 당신의 {ability}을 무기로 막았습니다.',
@@ -10080,7 +10080,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.hearthkeeper_maeve.title': '화로 산장의 지기',
   'entities.npcs.hearthkeeper_maeve.greeting':
     '추운 데 있지 말고 들어와요. 내가 숨 쉬는 한 산장의 불은 꺼지지 않아요.',
-  'entities.npcs.hermit_okku.name': '오쿠',
+  'entities.npcs.hermit_okku.name': '오크림',
   'entities.npcs.hermit_okku.title': '안으로 들어갔던 자',
   'entities.npcs.hermit_okku.greeting':
     '조용히. 북소리는 나무 아래를 걷는 모든 것을 헤아리는데, 자네는 이미 헤아려졌다네.',
@@ -10145,7 +10145,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.scout_yerrin.greeting':
     '몸을 낮추게. 핏빛유리 벌판에서는 소리가 이상하게 퍼지고, 저 아래 관문에는 귀가 달려 있으니.',
   'entities.npcs.sexton_marrow.name': '교회지기 매로우',
-  'entities.npcs.sexton_marrow.title': '갈로미어의 교회지기',
+  'entities.npcs.sexton_marrow.title': '기빗미어의 교회지기',
   'entities.npcs.sexton_marrow.greeting':
     '여기서는 깊이 묻는다네. 그리고 종을 울리지. 묻힌 자들이 그대로 있어야 한다는 걸 기억하도록.',
   'entities.npcs.strandwatcher_pell.name': '백사장 감시자 펠',
@@ -10185,7 +10185,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.wickmother_sorrel.greeting':
     '들어와 앉아요. 불에 과실주가 데워지고 있어요. 다만 쇠붙이는 손에서 놓지 말아요. 요즘 노움들 손버릇이 나쁘거든요.',
   'entities.npcs.widow_tansy.name': '과부 탠지',
-  'entities.npcs.widow_tansy.title': '갈로미어의 초장인',
+  'entities.npcs.widow_tansy.title': '기빗미어의 초장인',
   'entities.npcs.widow_tansy.greeting':
     '무덤마다 초 하나, 그리고 단 하나도 꺼져서는 안 돼요. 단 하나도요, 알아들었어요?',
   'hudChrome.training.title': '훈련: {name}',
@@ -10302,7 +10302,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.the_last_keep.name': '마지막 요새',
   'entities.dungeons.the_last_keep.enterText': '마지막 요새의 차갑고 고요한 회랑에 발을 들입니다.',
   'entities.items.last_keep_signet.name': '마지막 요새의 인장',
-  'entities.items.reins_terrorspark_groundshaker.name': '테러스파크 시동 열쇠',
+  'entities.items.reins_terrorspark_groundshaker.name': '드레드스파크 시동 열쇠',
   'entities.dungeons.the_last_keep.leaveText':
     '요새의 문을 닫고 드레이크랜드의 바람 속으로 돌아갑니다.',
   'entities.items.wildheart_tuskblade.name': '야생심장 엄니대검',
@@ -10391,7 +10391,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.revenantstep_treads.name': '망령발걸음 장화',
   'entities.items.shardfang_grips.name': '파편송곳니 장갑',
   'entities.items.shardsong_mantle.name': '파편노래 어깨망토',
-  'entities.items.wyrmcult_spellgrips.name': '용교단 주문장갑',
+  'entities.items.wyrmcult_spellgrips.name': '용서약단 주문장갑',
   'entities.items.thornpeak_wildwraps.name': '쏜피크 야생손싸개',
   'entities.items.stormvotive_hauberk.name': '폭풍서원 사슬갑옷',
   'entities.items.cryptbloom_shoulderguards.name': '무덤꽃 어깨보호구',
@@ -11259,7 +11259,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraOverlay.procs.battleTrance': '전투 명상',
   'hudChrome.auraOverlay.procs.overpowerCharge': '적수 강화',
   'hudChrome.auraOverlay.procs.suddenDeath': '급사',
-  'hudChrome.auraOverlay.procs.victoryRush': '승리의 돌진',
+  'hudChrome.auraOverlay.procs.victoryRush': '승자의 쇄도',
   'hudChrome.auraOverlay.procs.enrage': '혼란: 격노',
   'hudChrome.auraOverlay.procs.heatingUp': '달아오름',
   'hudChrome.auraOverlay.procs.arcaneCharge': '비전 충전',

@@ -823,7 +823,7 @@ export const hudChromeStrings = {
     name_shadowjump_toad: 'Kama-Kage the Shadow-Jump Toad',
     name_stormfeather_griffin: 'Sky-Reach Stormfeather',
     name_thunderstrut_gobbler: 'Thunderstrut the Grand Gobbler',
-    name_terrorspark_groundshaker: 'Terrorspark Groundshaker',
+    name_terrorspark_groundshaker: 'Dreadspark Groundshaker',
     name_drakemaw_raptor: 'Drakemaw Raptor',
     desc_valorsteed: 'A hardy, sure-footed steed that provides enhanced travel speed.',
     desc_grag_bear: 'A hardy, sure-footed bear that provides enhanced travel speed.',
@@ -1519,7 +1519,7 @@ export const hudChromeStrings = {
       battleTrance: 'Battle Trance',
       overpowerCharge: 'Redhand Empowerment',
       suddenDeath: 'Sudden Death',
-      victoryRush: 'Victory Rush',
+      victoryRush: "Victor's Surge",
       enrage: 'Mayhem: Enraged',
       heatingUp: 'Heating Up',
       arcaneCharge: 'Arcane Charges',
@@ -2242,7 +2242,7 @@ export const hudChromeStrings = {
     // here; each fill uses its locale's translated names).
     battleTrance: 'Your next Reaver Strike or Brute Swing costs no Rage',
     revengeFree: 'Your next Revenge costs no Rage',
-    victoryRush: 'Victory Rush is ready',
+    victoryRush: "Victor's Surge is ready",
     maxHpPct: 'Increases maximum health by {pct}%',
     temporalHourglass:
       'Immune and unable to act; restores health and accelerates cooldown recovery. Right-click to cancel.',

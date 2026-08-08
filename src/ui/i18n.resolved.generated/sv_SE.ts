@@ -566,7 +566,7 @@ export const sv_SE: EnTranslations = {
         "ice_fang_sword": {
           "name": "Ishuggtand",
           "look": "Böjt blad av blek glaciäris, taggiga rimkristaller längs ryggraden, en glödande cyan frusen kärna i den fylligare, istappars tvärskyddet.",
-          "lore": "Flaggskeppet för den frysta sorten, och den bit som varje samlare når först. Ice Fang ristades, inte smidd, från en huggtand på glaciären som täcker Thornpeak ovanför Highwatch, dess cyankärna brinner kallt som ljuset från Glimmermere. Den rimmar själva luften den skär. Väggvakten svär att en soldat bar den natten när de höga snön höll Wyrmcult tillbaka och \"köpte muren en vinter.\""
+          "lore": "Flaggskeppet för den frysta sorten, och den bit som varje samlare når först. Ice Fang ristades, inte smidd, från en huggtand på glaciären som täcker Thornpeak ovanför Highwatch, dess cyankärna brinner kallt som ljuset från Glimmermere. Den rimmar själva luften den skär. Väggvakten svär att en soldat bar den natten när de höga snön höll Broodsworn tillbaka och \"köpte muren en vinter.\""
         },
         "glaciersplit_axe": {
           "name": "Glaciärklyvare",
@@ -594,7 +594,7 @@ export const sv_SE: EnTranslations = {
           "lore": "En spik av glödande glaciäris, som sägs vara bruten från den djupa tjärnen nedanför Sanctum, där bergets kyla har tänder. Rimfrost blommar oändligt från sin silverkrage och smälter aldrig, varken av eld eller vid sommar. Magikers håller det nära för kylan det lånar deras arbete, och håller det långt på nätterna som det verkar luta sig mot Nythraxis krypta, och lyssna."
         },
         "winterbite": {
-          "name": "Vinterbett",
+          "name": "Wintergnaw",
           "look": "Försilvrat stål och blå-is båge, en glödande cyan frusen kärna i stigaren, en nockad pil av solid is, kall ånga.",
           "lore": "En båge av försilvrat stål och Thornpeak-is, dess stigare upplyst av en kall cyan kärna som fryser pilen till snöret. Det knackar ett schakt av fast glaciär-is som reformerar varje dragning; bågskytten bär inget koger på väggen, bara kylan. Highwatch höll Smygjagaer Ridge genom en belägring med en liknande: en enda bågeskytt, säger de, och en vinter med pilar som alltid redan fanns där."
         },
@@ -1006,7 +1006,7 @@ export const sv_SE: EnTranslations = {
       "name_shadowjump_toad": "Kama-Kage, Skuggsprångspaddan",
       "name_stormfeather_griffin": "Himmelsvidd Stormfjäder",
       "name_thunderstrut_gobbler": "Åskstoltsern, Den stora kalkonen",
-      "name_terrorspark_groundshaker": "Skräckgnista, markskakaren",
+      "name_terrorspark_groundshaker": "Dreadspark Groundshaker",
       "name_drakemaw_raptor": "Drakgapsraptor",
       "desc_valorsteed": "En uthållig, säkerfotad stridshäst som ger ökad reshastighet.",
       "desc_grag_bear": "En uthållig, säkerfotad björn som ger ökad reshastighet.",
@@ -1487,7 +1487,7 @@ export const sv_SE: EnTranslations = {
         "battleTrance": "Stridstrans",
         "overpowerCharge": "Rödhandsförstärkning",
         "suddenDeath": "Plötslig död",
-        "victoryRush": "Segerrus",
+        "victoryRush": "Victor's Surge",
         "enrage": "Kalabalik: Rasande",
         "heatingUp": "Uppvärmning",
         "arcaneCharge": "Arkana laddningar",
@@ -1970,7 +1970,7 @@ export const sv_SE: EnTranslations = {
       "sanguine": "Ökar attackhastigheten med {hastePct}% och vållad skada med {dmgPct}%",
       "battleTrance": "Ditt nästa Plundrarhugg eller Stympande hugg kostar inget raseri",
       "revengeFree": "Din nästa Hämnd kostar inget raseri",
-      "victoryRush": "Segerrus är redo",
+      "victoryRush": "Victor's Surge is ready",
       "maxHpPct": "Ökar maximal hälsa med {pct}%",
       "temporalHourglass": "Immun och oförmögen att handla; återställer hälsa och accelererar nedkylningsåterhämtning. Högerklicka för att avbryta.",
       "tongues": "Erhöht Zauberzeit um {pct}%",
@@ -4031,13 +4031,13 @@ export const sv_SE: EnTranslations = {
       "valeBlurb": "Den gröna startdalen, där nya hjältar prövar sina krafter på vargar och banditer kring staden Eastbrook.",
       "marshBlurb": "Ett dränkt land av dimma och ruiner. Mudfiner svärmar i grundvattnet och något äldre rör sig under ytan, bevakat från bro-staden Fenbridge.",
       "peaksBlurb": "Vindpiskade åsar och gamla gruvverk som klättrar mot rikets kallaste, högsta faror, hållna av utposten Highwatch.",
-      "duskBlurb": "En dal i evig skymning under Fornglimmers stora träd, där kristallruiner glöder och luften surrar av gammal magi.",
+      "duskBlurb": "A valley of permanent dusk beneath the great tree of Eldershine, where crystal ruins glow and the air hums with old magic.",
       "emberBlurb": "Stormbelysta ödemarker av aska och blodglas där drakar kretsar över kaldera, och trollens eldar brinner bland dynerna, vaktade från porten Drakvakten.",
       "frostBlurb": "En tystnad av snö och mörka granar under norrskenet, där kylan själv känns vaken och Ismanteln håller sina eldar brinnande.",
       "amberBlurb": "En evig höst av guld och röda löv som aldrig faller, samlad kring den lyktupplysta staden Lyktsjön.",
       "fenBlurb": "En ljus, surrande våtmark av liljor och lugnt vatten, korsad på gamla spångar från brostaden Brosjön.",
       "nightBlurb": "Ett rike av stjärnklar midnatt där blommor lyser upp stigarna och Månvila håller en tyst vaka under en drömmande himmel.",
-      "hauntBlurb": "En hemsökt skog under jättelika lövtak, där lyktorna i Galgsjön är det enda ärliga ljuset på vägen.",
+      "hauntBlurb": "A haunted forest under giant canopies, where the lanterns of Gibbetmere are the only honest light on the road.",
       "galeBlurb": "Havsklippor och tjutande kullar där vinden aldrig vilar, Den gamla vårdkasen aldrig slocknar, och Vikhamn stänger sina dörrar hårt.",
       "jungleBlurb": "Ett tropiskt snår av palmer, vit sand och högljudda fåglar, med strandstaden Drivhamn som håller en eld tänd på stranden.",
       "gardenBlurb": "Ett labyrintträdgårdsrike som fortfarande klipps av ingen trädgårdsmästare någon har sett, du kommer in förbi Häckby och dess fontängårdar.",
@@ -4048,7 +4048,7 @@ export const sv_SE: EnTranslations = {
       "peaksGreeting": "Tvåhundra år har denna mur hållit. Den ska inte brista på min vakt, men den stönar.",
       "peaksGreeter": "Kapten Thessaly, Highwatch",
       "duskGreeting": "Få av ditt slag har stått under dessa grenar. Gå varsamt, och var välkommen.",
-      "duskGreeter": "Väktare Saelwyn, Fornglimmer",
+      "duskGreeter": "Keeper Saelwyn, Eldershine",
       "emberGreeting": "Het vind från ödemarken, drakar över Drakgapet, och trollens eldar i dynerna. Drick något innan du vandrar ut dit.",
       "emberGreeter": "Portväktaren, Drakvakten",
       "frostGreeting": "Snön sväljer varje ljud bortom muren. Om skenen börjar dansa, håll rösten låg och elden tänd.",
@@ -4060,7 +4060,7 @@ export const sv_SE: EnTranslations = {
       "nightGreeting": "Bortom Nattporten drömmer själva luften. Följ blomljuset, och se upp för den sovande världen som hänger i skyn.",
       "nightGreeter": "Vakväktaren, Månvila",
       "hauntGreeting": "Håll dig till lyktorna, resenär. Och om skogen ropar ditt namn från sidan av vägen, svara inte.",
-      "hauntGreeter": "Lykttändaren, Galgsjön",
+      "hauntGreeter": "The lamplighter, Gibbetmere",
       "galeGreeting": "Vinden har aldrig en enda gång slutat blåsa här, och Den gamla vårdkasen har aldrig en enda gång slocknat. Stäng värdshusdörren efter dig.",
       "galeGreeter": "Vårdkasväktaren, Vikhamn",
       "jungleGreeting": "Varm sand, högljudda fåglar och en djungel som äter upp horisonten. Vi håller en eld tänd på stranden; försök komma tillbaka till den.",
@@ -4069,14 +4069,14 @@ export const sv_SE: EnTranslations = {
       "gardenGreeter": "Grindvakten, Häckby",
       "valePlaceNotes": "Östbäck är din första hembas. Vargstråket och Vildsvinsängen är milda jaktmarker; Spegelsjön är gott fiskevatten, fast gyttjefenor svärmar i grunden; Sableweb och Kopparbrottet döljer spindlar och malmgiriga grävare; ett Banditläger och Det fallna kapellet rymmer hårdare arbete; Relikkullen leder ner i Det rasade relikvariet, rikets första delve; Ljusskogsgläntan är en lugn, solbelyst lund i norr; och Suggfältet är Östbäcks muromgärdade vildsvinsbollsplan, där Dalcupen spelas under ett skördestillestånd.",
       "marshPlaceNotes": "Kärrbron vaktar den enda torra vägen. Smygjägarvassen och Djupkärrsgrunden kryllar av träskbestar och Mudfiner; Änkesnåret är tjockt spunnet med väv; Det dränkta kapellet och Trollhögarna rymmer äldre faror, medan Den dränkta litanian, kärrets egen delve, öppnar strax norr om högarna; Gravkallarlägret är kulten nedgrävd, och Den sjunkna bastionen är kärrets instansierade hjärta.",
-      "peaksPlaceNotes": "Highwatch håller muren. Stalker Ridge och Deeprock Burrows tillhör åskatter och grävare; Ogre Foothills och Drogmar's War-Camp åt brutaler till salu; Stormcrag sprakar av elementarer, och nedanför den lyser Skimmertjärnen, tjärnen vars strand vaktar porten av blekt ljus ner till Det dränkta templet; Wyrmcult Tents och Revenant Fields omger kultens höglänta mark, med Gravlindormens helgedom på dess topp.",
-      "duskPlaceNotes": "Fornglimmer samlas under det stora trädet. Skymningsfallets grotta och dess utsikt är vägen in och den första blicken av dalen; Den forntida lunden och Stjärnfallsbassängen håller den tysta södern; Den sjunkna gården rymmer övervuxna ruiner i öster; och Det glittrande djupet och De kristallklara grunden glöder över norr.",
+      "peaksPlaceNotes": "Highwatch håller muren. Stalker Ridge och Deeprock Burrows tillhör åskatter och grävare; Ogre Foothills och Drogmar's War-Camp åt brutaler till salu; Stormcrag sprakar av elementarer, och nedanför den lyser Skimmertjärnen, tjärnen vars strand vaktar porten av blekt ljus ner till Det dränkta templet; Broodsworn Tents och Revenant Fields omger kultens höglänta mark, med Gravlindormens helgedom på dess topp.",
+      "duskPlaceNotes": "Eldershine gathers beneath the great tree. The Duskfall Cave and its overlook are the way in and the first sight of the valley; Elder Grove and Starfall Basin keep the quiet south; the Sunken Court holds overgrown ruins in the east; and the Gleaming Deep and Crystalline Shallows glow across the north.",
       "emberPlaceNotes": "Drakvakten håller porten. Portskogen är det sista gröna innan ödemarken; Sotdynerna drivs av aska och värre saker; Trollmötet är där dyntrollen samlar sina eldar; Blodglasfälten glittrar av rakvassa skärvor; och Drakgapets kaldera är den rykande krona som drakarna kretsar kring.",
       "frostPlaceNotes": "Ismanteln håller den sista varma härden. Snölinjen markerar var drivorna tar över; Glaciärtjärnen är svart, stilla vatten under isen; Norrskenstrapporna klättrar under de dansande skenen; Skälvkärret är en frusen myr som aldrig riktigt sover; och De tjutande terrasserna förtjänar sitt namn varje natt.",
       "amberPlaceNotes": "Lyktsjön glöder i skördens hjärta. Guldsmältan är det bärnstenshala passet in; Den förgyllda fruktlunden och Skördehålan gömmer de sötaste fynden och de djärvaste tjuvarna; Den stora sjön speglar de brinnande löven; Sotlönnshöjden står högst och rödast; och Den lutande monoliten minns något äldre än hösten.",
       "fenPlaceNotes": "Brosjön ligger tvärs över det lugna vattnet. Bärnstenskärrets trappor kommer ner från skördelandet; Liljemyrarna och Myrglansdammarna glittrar av irrbloss och trollsländor; Pilgråten släpar sina grenar ner i sjön; och De sömniga slätterna är så milda som detta land någonsin blir.",
-      "nightPlaceNotes": "Månvila håller vakan. Nattporten är vägen in i midnattslandet; Månbrunnen rymmer stjärnljus du kan stå bredvid; Skymningsfältet blommar i mörkret; Den stående vakan vakar utan att någonsin röra sig; och Den sömnlösa gravhögen är den enda platsen här som aldrig drömmer.",
-      "hauntPlaceNotes": "Galgsjön håller sig tätt inom sina lyktor. Kråkporten är skogens dystra framdörr; Änkans snår är tätt spunnet med spindelväv; Den hängande gläntan och Sorgestenskapellet bär skogens äldsta sorger; och Jägarens glänta tillhör vad det än är som fortfarande jagar där.",
+      "nightPlaceNotes": "Moonrest keeps the vigil. The Nightgate is the way into the midnight country; the Moonspring holds starlight you can stand beside; Gloamfield blooms in the dark; the Standing Vigil watches without ever moving; and the Sleepless Barrow is the one place here that never dreams.",
+      "hauntPlaceNotes": "Gibbetmere huddles inside its lanterns. The Crowgate is the wood's grim front door; Widow's Thicket is spun thick with web; the Hanging Glade and the Mournstone Chapel keep the forest's oldest griefs; and the Huntsman's Clearing belongs to whatever still hunts there.",
       "galePlaceNotes": "Vikhamn lutar sig mot vinden. Vindleden är klippvägen in; De tjutande kullarna rullar trädlösa under stormen; Den gamla vårdkasen har brunnit så länge någon kan minnas; Branten faller brant ner mot vattnet; Vrakfälten håller kusten ärlig; och Spegeltjärnen är det enda stillsamma i hela riket.",
       "junglePlaceNotes": "Drivhamn håller sin eld på stranden. Snårmynningen är där floden möter den gröna muren; Palmstranden löper vit och varm längs bränningen; Smaragdsnåret och Rankfallet sväljer inlandet; Safirlagunen glöder klar och djup; och Den sjunkna avguden vakar från vattnets djup.",
       "gardenPlaceNotes": "Häckby väntar vid Trädgårdsporten. Parterrpromenaden blommar i klippt färgprakt; Gryningsborgen drillar sina riddare bakom nya murar; Kronbladsdammen driver rosa året runt; Den gamla kvarnen vänder sina egna rabatter; Den stora labyrinten omarrangerar sina vägar för varje gäst, dess valv vaktade av lövklädda rävar; Nordvakten håller utfartsvägen; Liljebassängen vilar bortom allt detta; och Fontängården rinner fortfarande klar vid trädgårdens hjärta.",
@@ -6277,24 +6277,24 @@ export const sv_SE: EnTranslations = {
     "boss": {
       "varric": {
         "bell": {
-          "emote": "Diakon Varric griper den begravda klockan med båda händerna!",
-          "log": "Diakon Varric börjar ringa i begravningsklockan.",
-          "warning": "Förflytta dig bort från Diakon Varric!",
+          "emote": "Diakon Vandric griper den begravda klockan med båda händerna!",
+          "log": "Diakon Vandric börjar ringa i begravningsklockan.",
+          "warning": "Förflytta dig bort från Diakon Vandric!",
           "impact": "Klockans klang spräcker kammargolvet!",
           "lesson": "Klockklang: en markslagning var tolfte sekund. Förflytta dig undan innan den landar."
         },
         "raise": {
-          "emote": "Diakon Varric ropar namn ur de krossade gravarna!",
-          "log": "Diakon Varric börjar Väck de döda.",
+          "emote": "Diakon Vandric ropar namn ur de krossade gravarna!",
+          "log": "Diakon Vandric börjar Väck de döda.",
           "warning": "Stoppa gravriten!",
           "object": "Den spruckna graven skälver av stulen andedräkt.",
           "interrupt_ok": "Gravriten vacklar.",
-          "interrupt_fail": "De döda svarar på Diakon Varrics rop!",
+          "interrupt_fail": "De döda svarar på Diakon Vandrics rop!",
           "lesson": "Avbryt den spruckna graven inom fem sekunder, annars reser sig de döda på hans rop."
         },
         "pull": "Du trampar på helgat stoft med oren avsikt. Knäböj, och bli räknad.",
         "intro": "Ingen själ går förlorad. Bara bortkommen.",
-        "mid60": "Diakon Varric läser namn ur liggaren med darrande triumf.",
+        "mid60": "Diakon Vandric läser namn ur liggaren med darrande triumf.",
         "mid30": "Begravningsklockan svarar på varje namn han uttalar.",
         "defeat": "Nej... jag hade namnen... jag hade dem alla..."
       }
@@ -7980,7 +7980,7 @@ export const sv_SE: EnTranslations = {
       },
       "cold_snap": {
         "name": "Vinterns kallelse",
-        "description": "Avslutar nedkylningen för Flimmersteg, Frostslöja och Förbättrad osynlighet. (magikertalang)"
+        "description": "Finishes the cooldown on Flitstep, Frostveil, and Greater Invisibility. (Mage talent)"
       },
       "greater_invisibility": {
         "name": "Förbättrad osynlighet",
@@ -8031,15 +8031,15 @@ export const sv_SE: EnTranslations = {
         "description": "Avfyra tre isprojektiler som vardera orsakar {damage} frostskada och lägger Vinterkyla på målet: de nästa 2 kompatibla besvärjelserna mot det behandlar det som fruset. Brain Freeze gör Winterlash omedelbar och hoppar över dess nedkylning. (Frost)"
       },
       "frozen_orb": {
-        "name": "Fruset klot",
+        "name": "Frostglobe",
         "description": "Släpp ett klot av virvlande frost som driver framåt i 8 sekunder, orsakar {damage} frostskada varje sekund på fiender i närheten och saktar ner dem med 30 %. Varje träffande puls skapar en istapp. (Frost)"
       },
       "blizzard": {
         "name": "Snöstorm",
-        "description": "Kallar en isstorm över målområdet i 6 sek, orsakar {damage} Frost-skada varje sekund och saktar ner fiender med 40%. Varje träffad fiende minskar Frozen Orbs nedkylning med 0,5 sek, upp till 3 sek per kast. (Frost)"
+        "description": "Kallar en isstorm över målområdet i 6 sek, orsakar {damage} Frost-skada varje sekund och saktar ner fiender med 40%. Varje träffad fiende minskar Frostglobes nedkylning med 0,5 sek, upp till 3 sek per kast. (Frost)"
       },
       "glacial_spike": {
-        "name": "Glaciärtagg",
+        "name": "Rimeneedle",
         "description": "Frammanar en massiv istagge och förbrukar 5 Istappar för att orsaka {damage} Frost-skada och frysa målet på plats i 4 sek. (Frost)"
       },
       "glacial_front": {
@@ -8171,7 +8171,7 @@ export const sv_SE: EnTranslations = {
         "description": "Avslutande manöver som sårar målet och får det att blöda för {damage} under 16 sek."
       },
       "vanish": {
-        "name": "Rökssteg",
+        "name": "Smokefade",
         "description": "Försvinn ur sikte och gå in i Duskveil även i strid. Du rör dig 50 % långsammare medan du är dold. Varar i upp till 10 sek."
       },
       "instant_poison": {
@@ -8555,7 +8555,7 @@ export const sv_SE: EnTranslations = {
         "description": "Gå in i ett sjudande raseri och generera 20 raseri. (Krigartalang)"
       },
       "crusader_strike": {
-        "name": "Korsfararslag",
+        "name": "Oathstrike",
         "description": "Träffar målet med vapenskada plus {damage} Helig skada. (paladintalang)"
       },
       "chain_heal": {
@@ -8567,7 +8567,7 @@ export const sv_SE: EnTranslations = {
         "description": "Antar demonisk kraft och ökar rustning och attackkraft i 20 sek. (warlocktalang)"
       },
       "holy_shock": {
-        "name": "Helig chock",
+        "name": "Lightjolt",
         "description": "Chockar ett vänligt mål med helig energi och läker det för {damage}. (Helig signatur)"
       },
       "aura_surge": {
@@ -8587,7 +8587,7 @@ export const sv_SE: EnTranslations = {
         "description": "Inspirerar närliggande allierade och ökar attackkraft med 35 i 5 min. (Skytte signatur)"
       },
       "wyvern_sting": {
-        "name": "Wyvernsting",
+        "name": "Drakesting",
         "description": "Sticker fienden på avstånd och försätter den ur strid i upp till 4 sek. All skada bryter effekten. (Överlevnadssignatur)"
       },
       "arcane_power": {
@@ -8599,7 +8599,7 @@ export const sv_SE: EnTranslations = {
         "description": "Ökar kritisk chans med besvärjelser med 50% i 15 sek. (Eldsignatur)"
       },
       "icy_veins": {
-        "name": "Isiga Ådror",
+        "name": "Coldsurge",
         "description": "Ökar besvärjelsehastighet med 30% och förhindrar avbrott och pushback i 10 sek. (Frostsignatur)"
       },
       "cold_blood": {
@@ -8619,7 +8619,7 @@ export const sv_SE: EnTranslations = {
         "description": "Infuserar ett vänligt mål med kraft och ökar besvärjelsekraft med 28 i 15 sek. (Disciplin signatur)"
       },
       "holy_nova": {
-        "name": "Helig nova",
+        "name": "Hallowburst",
         "description": "Skapar en explosion av heligt ljus, läker närliggande allierade för {damage} och skadar närliggande fiender. (Helig signatur)"
       },
       "shadowform": {
@@ -8647,7 +8647,7 @@ export const sv_SE: EnTranslations = {
         "description": "Rusa mot en fiende och rota den i 1 sek. 8-25 m räckvidd. (Vildhetssignatur)"
       },
       "swiftmend": {
-        "name": "Snabb läkning",
+        "name": "Fleetmend",
         "description": "Förbrukar en läkning över tid-effekt på ett vänligt mål för att läka det för {damage}. (Återställningssignatur)"
       },
       "summon_imp": {
@@ -8655,8 +8655,8 @@ export const sv_SE: EnTranslations = {
         "description": "Frammanar en Emberkin under häxmästarens befäl. Emberkin slungar askpilar mot dina fiender från avstånd. Att frammana en ny demon avfärdar din nuvarande. Du kan ha en demon åt gången."
       },
       "summon_voidwalker": {
-        "name": "Frammana Gloomshade",
-        "description": "Frammanar en Gloomshade under häxmästarens befäl. Gloomshade är en robust demon som hånar dina fiender och suger upp stryk. Att frammana en ny demon avfärdar din nuvarande. Du kan ha en demon åt gången."
+        "name": "Frammana Duskmurk",
+        "description": "Frammanar en Duskmurk under häxmästarens befäl. Duskmurk är en robust demon som hånar dina fiender och suger upp stryk. Att frammana en ny demon avfärdar din nuvarande. Du kan ha en demon åt gången."
       },
       "summon_succubus": {
         "name": "Frammana Duskborn",
@@ -8755,7 +8755,7 @@ export const sv_SE: EnTranslations = {
         "description": "Dina autoattacker har en chans att låta dig använda Tidig grav på ett mål oavsett hälsa, utan raserikostnad. (Vapen)"
       },
       "storm_bolt": {
-        "name": "Stormbult",
+        "name": "Thunderhurl",
         "description": "Slunga ditt vapen mot målet för {damage} och bedöva det i 3 sek."
       },
       "piercing_howl": {
@@ -8775,7 +8775,7 @@ export const sv_SE: EnTranslations = {
         "description": "Besjäla ditt vapen med dina fienders blod: du och dina närstridsallierade får 10 % attackhastighet och 10 % skada i 20 sek."
       },
       "victory_rush": {
-        "name": "Segerrus",
+        "name": "Victor's Surge",
         "description": "Slå för vapenskada plus {damage} och läk 20 % av din maximala hälsa. Kan endast användas inom 20 sek efter att du dödat en fiende."
       },
       "intimidating_shout": {
@@ -8787,7 +8787,7 @@ export const sv_SE: EnTranslations = {
         "description": "Anfall i en vid båge och vålla fysisk skada mot alla fiender framför dig. Över 5 mål minskas skadan. När du väjer undan eller parerar kan din nästa Hämnd kosta inget raseri. (Protection)"
       },
       "heroic_leap": {
-        "name": "Krigssprång",
+        "name": "Vaulting Charge",
         "description": "Hoppa till målområdet och orsaka {damage} skada på närliggande fiender när du landar."
       },
       "rallying_cry": {
@@ -8803,7 +8803,7 @@ export const sv_SE: EnTranslations = {
         "description": "Förvandla dig till en koloss i 20 sek., bryt alla kontrolleffekter på dig och öka din utdelade skada med 20%."
       },
       "avenging_wrath": {
-        "name": "Hämndvinge",
+        "name": "Zealwing",
         "description": "Åkallar hämnande kraft och ökar din attackkraft med 60 och besvärjelsekraft med 30 i 20 sek. (paladintalang)"
       },
       "berserk": {
@@ -8815,7 +8815,7 @@ export const sv_SE: EnTranslations = {
         "description": "Bli en virvlande storm av stål och träffa alla fiender inom 6 meter för {damage} skada varje sekund i 4 sek."
       },
       "blink": {
-        "name": "Flimmersteg",
+        "name": "Flitstep",
         "description": "Teleporterar dig 15 m framåt och bryter rotningseffekter. (magikertalang)"
       },
       "bloodlust": {
@@ -8843,7 +8843,7 @@ export const sv_SE: EnTranslations = {
         "description": "Golpea a närliggande fiender con escarcha e inflige {damage} de daño de Frost. (magikertalang)"
       },
       "counterspell": {
-        "name": "Besvärjelsebrott",
+        "name": "Spellsever",
         "description": "Avbryter målets besvärjelse och hindrar det från att kasta besvärjelser från den magiskolan i 6 sek."
       },
       "curse_of_exhaustion": {
@@ -8992,7 +8992,7 @@ export const sv_SE: EnTranslations = {
       },
       "preparation": {
         "name": "Reservplan",
-        "description": "Avslutar nedkylningen för Spurt, Undvikande och Försvinnande. (skurktalang)"
+        "description": "Finishes the cooldown on Swift Heels, Ghostfoot, and Smokefade. (Rogue talent)"
       },
       "presence_of_mind": {
         "name": "Rusande sinne",
@@ -9023,7 +9023,7 @@ export const sv_SE: EnTranslations = {
         "description": "Du försvinner i ett rökmoln, vilket ökar din chans att undvika med 30 % i 8 sek."
       },
       "spellsteal": {
-        "name": "Besvärjelsestöld",
+        "name": "Spellplunder",
         "description": "Stjäl en gynnsam magisk effekt från en fiende och överför den till dig."
       },
       "startle_shot": {
@@ -9421,7 +9421,7 @@ export const sv_SE: EnTranslations = {
         "name": "Kazzix hjärtskärva"
       },
       "wyrmcult_orders": {
-        "name": "Lindormskultens order"
+        "name": "Broodsworn Orders"
       },
       "ritual_phylactery": {
         "name": "Ritualfylakteri"
@@ -9484,7 +9484,7 @@ export const sv_SE: EnTranslations = {
         "name": "Gravlindormsfjällbrynja"
       },
       "wyrmcult_grand_robe": {
-        "name": "Lindormskultens praktrobe"
+        "name": "Broodsworn Grand Robe"
       },
       "wyrmscale_jerkin": {
         "name": "Lindormsfjällsväst"
@@ -10153,7 +10153,7 @@ export const sv_SE: EnTranslations = {
         "name": "Skärvångmantel"
       },
       "wyrmcult_spellgrips": {
-        "name": "Lindormskultens besvärjelsegrepphandskar"
+        "name": "Broodsworn Spellgrips"
       },
       "thornpeak_wildwraps": {
         "name": "Törntoppets vildlindor"
@@ -10162,7 +10162,7 @@ export const sv_SE: EnTranslations = {
         "name": "Stormlöftesringbrynja"
       },
       "cryptbloom_shoulderguards": {
-        "name": "Kryptblomstrets axelskydd"
+        "name": "Tombpetal Shoulderguards"
       },
       "gravewyrm_thornmaul": {
         "name": "Gravlindormens törnklubba"
@@ -10417,7 +10417,7 @@ export const sv_SE: EnTranslations = {
         "name": "Härdfodrade stövlar"
       },
       "frostmane_mantle": {
-        "name": "Frostmanens mantel"
+        "name": "Rimemanens mantel"
       },
       "ashbone_war_brand": {
         "name": "Askbens krigsbrand"
@@ -10576,7 +10576,7 @@ export const sv_SE: EnTranslations = {
         "name": "Hantverkarens öga"
       },
       "reins_terrorspark_groundshaker": {
-        "name": "Tändningsnyckel: Skräckgnista, markskakaren"
+        "name": "Ignition Key: Dreadspark Groundshaker"
       },
       "reins_drakemaw_raptor": {
         "name": "Tyglar till Drakgapsraptorn"
@@ -10744,7 +10744,7 @@ export const sv_SE: EnTranslations = {
         "name": "Voss helgade stridsklubba"
       },
       "wyrmcult_soulsteps": {
-        "name": "Lindormskultens själssteg"
+        "name": "Broodsworn Soulsteps"
       },
       "wyrmshadow_harness": {
         "name": "Nightfang-sele"
@@ -10975,7 +10975,7 @@ export const sv_SE: EnTranslations = {
         "name": "Diakonens relikhjälm"
       },
       "varric_shadow_cowl": {
-        "name": "Varrics skugghuva"
+        "name": "Vandrics skugghuva"
       },
       "siltguard_helm": {
         "name": "Slamväktarhjälm"
@@ -11152,7 +11152,7 @@ export const sv_SE: EnTranslations = {
         "name": "Benfrostlina"
       },
       "mistforged_pauldrons": {
-        "name": "Dimsmidda skuldror"
+        "name": "Fogforged Pauldrons"
       },
       "tideguard_faceguard": {
         "name": "Tidvaktens visir"
@@ -11466,10 +11466,10 @@ export const sv_SE: EnTranslations = {
         "name": "Skärvherre Kazzix"
       },
       "wyrmcult_zealot": {
-        "name": "Lindormskultsfanatiker"
+        "name": "Broodsworn Zealot"
       },
       "wyrmcult_necromancer": {
-        "name": "Lindormskultsnekromantiker"
+        "name": "Broodsworn Necromancer"
       },
       "boneclad_revenant": {
         "name": "Benklädd gengångare"
@@ -11577,7 +11577,7 @@ export const sv_SE: EnTranslations = {
         "name": "Helgonlös avbild"
       },
       "deacon_varric": {
-        "name": "Diakon Varric"
+        "name": "Diakon Vandric"
       },
       "acolyte_tessa": {
         "name": "Akolyten Tessa"
@@ -11769,7 +11769,7 @@ export const sv_SE: EnTranslations = {
         "name": "Kärrälva"
       },
       "frostmane_yeti": {
-        "name": "Frostmanad yeti"
+        "name": "Rimemane Yeti"
       },
       "terrace_howler": {
         "name": "Terrassernas tjutare"
@@ -11817,7 +11817,7 @@ export const sv_SE: EnTranslations = {
         "name": "Sjömörkret"
       },
       "harvest_sprite": {
-        "name": "Skördeälva"
+        "name": "Gleaning Sprite"
       },
       "mere_lurker": {
         "name": "Sjölurkare"
@@ -11841,7 +11841,7 @@ export const sv_SE: EnTranslations = {
         "name": "Skymningsvandrare"
       },
       "nightkin_stargazer": {
-        "name": "Nattsläktets stjärnskådare"
+        "name": "Gloamkin Stargazer"
       },
       "barrow_king": {
         "name": "Gravhögskungen"
@@ -11991,7 +11991,7 @@ export const sv_SE: EnTranslations = {
         "name": "Emberkin"
       },
       "gloomshade": {
-        "name": "Gloomshade"
+        "name": "Duskmurk"
       },
       "duskborn": {
         "name": "Duskborn"
@@ -12262,7 +12262,7 @@ export const sv_SE: EnTranslations = {
       },
       "provisioner_fenna": {
         "name": "Proviantmästaren Fenna",
-        "title": "Proviantmästare i Fornglimmer",
+        "title": "Eldershine Provisioner",
         "greeting": "Bröd fortfarande varmt, vatten fortfarande sött. Hålan förser, och det gör jag också."
       },
       "wardsmith_orun": {
@@ -12387,12 +12387,12 @@ export const sv_SE: EnTranslations = {
       },
       "sexton_marrow": {
         "name": "Klockaren Marrow",
-        "title": "Klockare i Galgsjön",
+        "title": "Sexton of Gibbetmere",
         "greeting": "Vi begraver dem djupt här, och vi ringer klockorna så att de minns att stanna nere."
       },
       "widow_tansy": {
         "name": "Änkan Tansy",
-        "title": "Ljustillverkare i Galgsjön",
+        "title": "Candlewright of Gibbetmere",
         "greeting": "Ett ljus för varje grav, och inte ett enda får slockna. Inte ett enda, hör du mig?"
       },
       "vicar_creel": {
@@ -12416,7 +12416,7 @@ export const sv_SE: EnTranslations = {
         "greeting": "Havet ger, sanden behåller, och djungeln tar. Håll dig på stranden, främling."
       },
       "hermit_okku": {
-        "name": "Okku",
+        "name": "Okrim",
         "title": "Mannen som gick in",
         "greeting": "Tyst nu. Trummorna räknar allt som går under träden, och de har redan räknat dig."
       },
@@ -13064,7 +13064,7 @@ export const sv_SE: EnTranslations = {
       },
       "q_drogmar": {
         "title": "Krigsherre Drogmar",
-        "text": "Krigsherre Drogmar tog Lindormskultens mynt och svor klanerna till bergets uppvaknande. Han är hammaren de tänker svinga mot min mur - och när han slår i marken, {playerName}, stå inte nära honom. Ta dina följeslagare in i krigslägret och gör slut på honom, för Högvakt.",
+        "text": "Warlord Drogmar took the Broodsworn's coin and swore the clans to the mountain's waking. He is the hammer they mean to swing at my wall - and when he slams the ground, {playerName}, do not be standing near him. Take your companions into the war-camp and end him, for Highwatch.",
         "completion": "Drogmar, död i sitt eget läger. Klanerna kommer att skingras till de höga passen - du har köpt min mur en vinter, {playerName}.",
         "objectives": {
           "0": {
@@ -13104,11 +13104,11 @@ export const sv_SE: EnTranslations = {
       },
       "q_zealots": {
         "title": "Sånger på vinden",
-        "text": "När vinden sveper ner från de södra topparna, {playerName}, bär den med sig mässande. Lindormskulten gömmer sig inte längre - de har rest tält nedanför Helgedomen och sjunger till det som sover under den. Tysta tolv fanatiker. Varje tystad röst köper berget ännu en natts sömn.",
+        "text": "When the wind comes off the southern peaks, {playerName}, it carries chanting. The Broodsworn no longer hides - they have raised tents below the Sanctum and they sing to what sleeps beneath it. Silence twelve zealots. Every voice stilled buys the mountain another night of sleep.",
         "completion": "Vinden är tystare. Men det som oroar mig är inte mässandet, {playerName} - det är att något kanske mässar tillbaka.",
         "objectives": {
           "0": {
-            "label": "Lindormskultsfanatiker dödad"
+            "label": "Broodsworn Zealot slain"
           }
         }
       },
@@ -13181,7 +13181,7 @@ export const sv_SE: EnTranslations = {
             "label": "Lindormskultsfanatiker dödad"
           },
           "1": {
-            "label": "Lindormskultsnekromantiker dödad"
+            "label": "Broodsworn Necromancer slain"
           }
         }
       },
@@ -13621,7 +13621,7 @@ export const sv_SE: EnTranslations = {
       },
       "q_hollow_old_marrowshell": {
         "title": "Det gamla skalet i grunden",
-        "text": "Det första namnet är Gamla Märgskalet, en krabba stor som en vagn som har jagat de östra grunden sedan innan Fornglimmer hade en port. Den vandrar, {playerName}, så du får gå längs strandlinjen tills du korsar dess spår. Gå inte ensam, och lita inte på dess stillhet.",
+        "text": "The first name is Old Marrowshell, a crab the size of a cart that has hunted the eastern shallows since before Eldershine had a gate. It wanders, {playerName}, so you will have to walk the shoreline until you cross its track. Do not go alone, and do not trust its stillness.",
         "completion": "Grunden är bara vatten igen. Jag har sett det skalet krossa bättre jägare än mig, {playerName}. Inte dig.",
         "objectives": {
           "0": {
@@ -13763,12 +13763,12 @@ export const sv_SE: EnTranslations = {
         }
       },
       "q_fv_frostmane_tyrant": {
-        "title": "Frostmanens tyrann",
-        "text": "Tjutarna jagade inte när de kom ner för terrasserna. De flydde. En yeti har tagit högmarken, bergsfolket kallar den Frostmanen, och inte ens flockarna vill dela en sluttning med den. Det måste ta slut, {playerName}, innan vintern driver den ner till mina murar. Ta med en vän. Ta med två.",
-        "completion": "När vinden lade sig i natt hörde hela byn tystnaden där Frostmanen brukade vara. Vidderna är dig skyldiga en skuld som kommer ta år att betala, {playerName}. Bär detta, och varje dörr i Ismanteln står öppen för dig.",
+        "title": "Rimemanens tyrann",
+        "text": "Tjutarna jagade inte när de kom ner för terrasserna. De flydde. En yeti har tagit högmarken, bergsfolket kallar den Rimemanen, och inte ens flockarna vill dela en sluttning med den. Det måste ta slut, {playerName}, innan vintern driver den ner till mina murar. Ta med en vän. Ta med två.",
+        "completion": "När vinden lade sig i natt hörde hela byn tystnaden där Rimemanen brukade vara. Vidderna är dig skyldiga en skuld som kommer ta år att betala, {playerName}. Bär detta, och varje dörr i Ismanteln står öppen för dig.",
         "objectives": {
           "0": {
-            "label": "Frostmanen dräpt"
+            "label": "Rimemanen dräpt"
           }
         }
       },
@@ -13921,7 +13921,7 @@ export const sv_SE: EnTranslations = {
         "completion": "Fyra hinkar tillbaka på sina krokar och raderna har blivit tysta. Du har en tyngre hand med älvor än jag har, {playerName}, och idag är jag glad över det.",
         "objectives": {
           "0": {
-            "label": "Skördeälva bortjagad"
+            "label": "Gleaning Sprite driven off"
           },
           "1": {
             "label": "Savtappshink återfunnen"
@@ -14063,7 +14063,7 @@ export const sv_SE: EnTranslations = {
       },
       "q_nb_eyes_on_the_vigil": {
         "title": "Ögon på vakan",
-        "text": "Något gör vandrarna djärva och hjordarna oroliga, {playerName}, och jag kan inte läsa det i blommorna. Cassian kan läsa det i himlen. Han håller sitt observatorieläger vid Den stående vakan öster om här, där nattsläktet driver bland stenarna. Hitta honom, och fråga vad stjärnorna säger.",
+        "text": "Something has the striders bold and the herds uneasy, {playerName}, and I cannot read it in the flowers. Cassian can read it in the sky. He keeps his observatory camp by the Standing Vigil east of here, where the gloamkin drift among the stones. Find him, and ask what the stars are saying.",
         "completion": "Lira skickade dig? Då känner trädgårdarna det också. Sätt dig vid kikaren ett ögonblick, {playerName}. Stjärnorna har varit rastlösa i en månad, och varje karta jag ritar lutar norrut mot gravhögen.",
         "objectives": {
           "0": {
@@ -14073,7 +14073,7 @@ export const sv_SE: EnTranslations = {
       },
       "q_nb_charts_of_the_stones": {
         "title": "Kartorna i stenarna",
-        "text": "Vakans stenar är äldre än Månvila, äldre än nattsläktet som vårdar dem, och deras ytor är ristade med stjärnkartor jag har ägnat mitt liv åt att lära mig läsa. Himlen har förskjutits, {playerName}, och jag måste veta hur mycket. Läs kartorna på tre av stenarna och ge mig deras bäringar.",
+        "text": "The Vigil stones are older than Moonrest, older than the gloamkin who tend them, and their faces are cut with star charts I have spent my life learning to read. The sky has shifted, {playerName}, and I must know how far. Read the charts on three of the stones and bring me their bearings.",
         "completion": "Inget tvivel finns kvar. Varenda bäring har krupit mot Den sömnlösa gravhögen, som om himlen själv lutar sig över den högen för att vaka. De gamla kungarna begravdes under uppradade stjärnor av en anledning, {playerName}.",
         "objectives": {
           "0": {
@@ -14097,7 +14097,7 @@ export const sv_SE: EnTranslations = {
       "q_nb_the_barrow_king": {
         "title": "Gravhögskungen vaknar",
         "text": "Varje bäring, varje rastlös stjärna, varje öppnad hög pekar mot en sak: Gravhögskungen vaknar under den stora högen, och detta rike har ingen gryning som håller honom tillbaka. Han måste läggas till ro innan han minns sin krona, {playerName}. Gå inte ensam: ta med en vän, och håll blomljuset i ryggen.",
-        "completion": "Stjärnorna har lugnat sig för första gången på en säsong, {playerName}. Högarna är stängda, nattsläktet har blivit stilla vid sina stenar, och kungen sover därunder än en gång. Bär denna mantel: Månvila skar till den åt den som natten äntligen litade på.",
+        "completion": "The stars have settled for the first time in a season, {playerName}. The mounds are closed, the gloamkin have gone still at their stones, and the king sleeps below once more. Wear this mantle: Moonrest cut it for whoever the night finally trusted.",
         "objectives": {
           "0": {
             "label": "Gravhögskungen lagd till ro"
@@ -14105,9 +14105,9 @@ export const sv_SE: EnTranslations = {
         }
       },
       "q_ww_bells_of_gallowmere": {
-        "title": "Klockorna i Galgsjön",
-        "text": "Hör du klämtandet, {playerName}? Det är Galgsjön, uppe vid norra vägen, som ringer sina döda till sömns. Klockaren Marrow för räkning över varje själ under lövtaket, levande och begraven. Gå och bli räknad, innan skogen räknar dig själv.",
-        "completion": "Cobb skickade dig upp vägen hel, gjorde han? Bra karl. Han har hållit de portlyktorna tända i trettio år, och skogen har aldrig en enda gång kommit förbi honom. Välkommen till Galgsjön, {playerName}. Se upp med klockorna.",
+        "title": "The Bells of Gibbetmere",
+        "text": "Hear that tolling, {playerName}? That is Gibbetmere, up the north road, ringing its dead to sleep. Sexton Marrow keeps the count of every soul under the canopy, living and buried. Go and be counted, before the wood counts you itself.",
+        "completion": "Cobb sent you up the road whole, did he? Good man. He has kept those gate lanterns lit for thirty years, and the wood has never once got past him. Welcome to Gibbetmere, {playerName}. Mind the bells.",
         "objectives": {
           "0": {
             "label": "Rapportera till Klockaren Marrow"
@@ -14136,7 +14136,7 @@ export const sv_SE: EnTranslations = {
       },
       "q_ww_candles_at_the_bounds": {
         "title": "Ljus vid gränserna",
-        "text": "Fyra gränsstenar ringar in Galgsjön, {playerName}, en på varje väg ut, och ett gravljus brinner på varje sten. Medan de brinner förblir de begravda begravda. Duggregnet har släckt dem, alla fyra, och jag är för gammal för att gå gränserna ensam. Ta mitt stearinljus och tänd dem igen, fort.",
+        "text": "Four boundary stones ring Gibbetmere, {playerName}, one on each road out, and a grave-candle burns on every stone. While they burn, the buried stay buried. The drizzle has drowned them, all four, and I am too old to walk the bounds alone. Take my taper and relight them, quickly.",
         "completion": "Alla fyra brinnande? Andas då ut, {playerName}. Du hörde det inte, men hela byn gjorde det: klockorna ringde lättare i samma stund den sista veken fattade.",
         "objectives": {
           "0": {
@@ -14166,7 +14166,7 @@ export const sv_SE: EnTranslations = {
       },
       "q_ww_what_the_bark_holds": {
         "title": "Vad barken håller",
-        "text": "I Den hängande gläntan öster om Galgsjön hänger spinnarna sina sidensvepta döda från grenarna, och ristbarksraglarna står vakt därunder som tålmodiga likbärare. Det är vårt folk däruppe, {playerName}. Slå ner fem raglare, skär ner tre av de svepta döda, och för dem hem till jorden.",
+        "text": "In the Hanging Glade east of Gibbetmere the spinners hang their silk-wrapped dead from the boughs, and the gravenbark shamblers stand guard beneath like patient pallbearers. Those are our people up there, {playerName}. Break five shamblers, cut down three of the wrapped dead, and bring them home to soil.",
         "completion": "Tre själar tillbaka under ärlig jord innan mörkrets inbrott. Raglarna kommer växa tillbaka, bark gör alltid det, men i natt hänger gläntan tom, och det räcker.",
         "objectives": {
           "0": {
@@ -14180,17 +14180,17 @@ export const sv_SE: EnTranslations = {
       "q_ww_walking_mosley_home": {
         "title": "Föra Mosley hem",
         "text": "Min gravgrävare Mosley tog kapellvägen för tre dagar sedan för att öppna en grav på den gamla gården, och grävningen rasade över honom. Han klöste sig ut, dåren lever, men han sitter hopkrupen vid kapellets gravar och vägrar röra sig för spindlar på vägen. För honom hem, {playerName}. Jag kan inte ringa klockorna för en levande man.",
-        "completion": "Han kom genom porten på egna två fötter, svärandes på att han inte tänker gräva något djupare än en rovsäng från och med nu. Han är tillbaka på gården till söndag, det är de alltid. Tack, {playerName}. Galgsjön behåller sitt folk, det är hela vår lag.",
+        "completion": "He came through the gate on his own two feet, swearing he will dig nothing deeper than a turnip bed from now on. He will be back at the yard by Sunday, they always are. Thank you, {playerName}. Gibbetmere keeps its people, that is the whole of our law.",
         "objectives": {
           "0": {
-            "label": "Gravgrävaren Mosley säkert förd tillbaka till Galgsjön"
+            "label": "Gravedigger Mosley walked safely back to Gibbetmere"
           }
         }
       },
       "q_ww_horn_of_the_huntsman": {
         "title": "Jägarens horn",
         "text": "Du har hört hornet vid det här laget, {playerName}, tunt och avlägset, ljudet hela skogen håller andan för. Den bleka jägaren rider sin glänta norr om här, och varje grav han passerar blir grundare. Han var en människa en gång, och han begravdes fel, och jag är klar med att låtsas att bön räcker. Ta med en vän, ta med två, och rid av honom.",
-        "completion": "Hornet stannade mitt i tonen. Varenda klocka i Galgsjön ringde en gång, av sig själv, och sedan blev skogen tystare än jag hört den på trettio år. Du har utfört riten jag inte kunde, {playerName}. Bär detta, och vandra under lövtaket utan fruktan.",
+        "completion": "The horn stopped mid-note. Every bell in Gibbetmere rang once, on its own, and then the wood went quieter than I have heard it in thirty years. You have done the rite I could not, {playerName}. Wear this, and walk under the canopy unafraid.",
         "objectives": {
           "0": {
             "label": "Den bleka jägaren avriden"
@@ -14239,11 +14239,11 @@ export const sv_SE: EnTranslations = {
       },
       "q_pr_the_man_who_went_in": {
         "title": "Mannen som gick in",
-        "text": "Dykarna vill inte kliva förbi trädlinjen, {playerName}, och jag ber dem inte om det. Du har hört trummorna vid det här laget: alla gör det, senast andra natten. En man på denna ö gick någonsin mot det ljudet och kom tillbaka. Okku. Han lägrar sig under de stora banyanträden vid Rankfallet, djupt uppe på Snårvägen. Hitta honom, och fråga honom vad grönskan döljer.",
+        "text": "Dykarna vill inte kliva förbi trädlinjen, {playerName}, och jag ber dem inte om det. Du har hört trummorna vid det här laget: alla gör det, senast andra natten. En man på denna ö gick någonsin mot det ljudet och kom tillbaka. Okrim. Han lägrar sig under de stora banyanträden vid Rankfallet, djupt uppe på Snårvägen. Hitta honom, och fråga honom vad grönskan döljer.",
         "completion": "Isha skickade dig? Pärlmodern har inte sagt mitt namn på år. Sätt dig utom räckhåll för rankorna, {playerName}, så ska jag berätta vad jag vet: trummorna är inte faran. De är varningen.",
         "objectives": {
           "0": {
-            "label": "Hitta Okku vid Rankfallet"
+            "label": "Hitta Okrim vid Rankfallet"
           }
         }
       },
@@ -14722,7 +14722,7 @@ export const sv_SE: EnTranslations = {
             "label": "Skimmertjärnen"
           },
           "7": {
-            "label": "Lindormskultens tält"
+            "label": "Broodsworn Tents"
           },
           "8": {
             "label": "Gengångarfälten"
@@ -14734,10 +14734,10 @@ export const sv_SE: EnTranslations = {
       },
       "veiled_hollow": {
         "name": "Slöjhålan",
-        "welcome": "Luften surrar av gammal magi. Sök upp Väktare Saelwyn under det stora trädet i Fornglimmer.",
+        "welcome": "The air hums with old magic. Seek Keeper Saelwyn beneath the great tree of Eldershine.",
         "pois": {
           "0": {
-            "label": "Fornglimmer"
+            "label": "Eldershine"
           },
           "1": {
             "label": "Skymningsfallets grotta"
@@ -14875,7 +14875,7 @@ export const sv_SE: EnTranslations = {
             "label": "Nattporten"
           },
           "2": {
-            "label": "Månbrunnen"
+            "label": "The Moonspring"
           },
           "3": {
             "label": "Skymningsfältet"
@@ -14890,10 +14890,10 @@ export const sv_SE: EnTranslations = {
       },
       "wraithwood": {
         "name": "Vålnadsskogen",
-        "welcome": "Lövtaket sluter sig över vägen som ett lock. Håll dig till lyktorna i Galgsjön, och svara inte om skogen ropar ditt namn.",
+        "welcome": "The canopy closes over the road like a lid. Keep to the lanterns of Gibbetmere, and do not answer if the wood calls your name.",
         "pois": {
           "0": {
-            "label": "Galgsjön"
+            "label": "Gibbetmere"
           },
           "1": {
             "label": "Kråkporten"

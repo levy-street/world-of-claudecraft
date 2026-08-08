@@ -342,7 +342,7 @@ const BURST_SCHOOL_BY_KIND: Record<ParticleBurstKind, string> = {
 };
 
 // One FULL point-anchored sequence per (caster, ability) inside this window:
-// recurring emits of the same aimed nova (Frozen Orb's flight pulses, a
+// recurring emits of the same aimed nova (Frostglobe's flight pulses, a
 // re-triggered trap) degrade to the cheap zone re-hit instead of replaying
 // the whole release + impact anatomy every second.
 const POINT_SEQ_REFRACTORY_SEC = 3;

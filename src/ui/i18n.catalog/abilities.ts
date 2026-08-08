@@ -720,7 +720,7 @@ const classAbilityNamesEn = {
       [
         'cold_snap',
         "Winter's Recall",
-        'Finishes the cooldown on Flickerstep, Frostveil, and Greater Invisibility. (Mage talent)',
+        'Finishes the cooldown on Flitstep, Frostveil, and Greater Invisibility. (Mage talent)',
       ],
       [
         'greater_invisibility',
@@ -784,17 +784,17 @@ const classAbilityNamesEn = {
       ],
       [
         'frozen_orb',
-        'Frozen Orb',
+        'Frostglobe',
         'Release an orb of swirling frost that drifts forward for 8 sec, dealing {damage} Frost damage each second to nearby enemies and slowing them by 30%. Each striking pulse generates one Icicle. (Frost)',
       ],
       [
         'blizzard',
         'Blizzard',
-        'Calls an ice storm onto the target area for 6 sec, dealing {damage} Frost damage each second and slowing enemies by 40%. Each enemy struck shaves 0.5 sec off Frozen Orb, up to 3 sec per cast. (Frost)',
+        'Calls an ice storm onto the target area for 6 sec, dealing {damage} Frost damage each second and slowing enemies by 40%. Each enemy struck shaves 0.5 sec off Frostglobe, up to 3 sec per cast. (Frost)',
       ],
       [
         'glacial_spike',
-        'Glacial Spike',
+        'Rimeneedle',
         'Conjure a massive spike of ice, consuming 5 Icicles to deal {damage} Frost damage and freeze the target in place for 4 sec. (Frost)',
       ],
       [
@@ -931,7 +931,7 @@ const classAbilityNamesEn = {
       ],
       [
         'vanish',
-        'Smokestep',
+        'Smokefade',
         'Melt from sight, entering Duskveil even in combat. You move 50% slower while hidden. Lasts up to 10 sec.',
       ],
       [
@@ -1316,7 +1316,7 @@ const classAbilityNamesEn = {
       ],
       [
         'crusader_strike',
-        'Crusader Strike',
+        'Oathstrike',
         'Strikes the target for weapon damage plus {damage} Holy damage. (Paladin talent)',
       ],
       [
@@ -1331,7 +1331,7 @@ const classAbilityNamesEn = {
       ],
       [
         'holy_shock',
-        'Holy Shock',
+        'Lightjolt',
         'Shocks a friendly target with Holy energy to heal them, or an enemy for {damage} Holy damage. (Holy signature)',
       ],
       [
@@ -1356,7 +1356,7 @@ const classAbilityNamesEn = {
       ],
       [
         'wyvern_sting',
-        'Wyvern Sting',
+        'Drakesting',
         'Stings the enemy from range, incapacitating it for up to 4 sec. Any damage breaks the effect. (Survival signature)',
       ],
       [
@@ -1371,7 +1371,7 @@ const classAbilityNamesEn = {
       ],
       [
         'icy_veins',
-        'Icy Veins',
+        'Coldsurge',
         'Increases spell haste by 30% and prevents cast interruption and pushback for 10 sec. (Frost signature)',
       ],
       [
@@ -1396,7 +1396,7 @@ const classAbilityNamesEn = {
       ],
       [
         'holy_nova',
-        'Holy Nova',
+        'Hallowburst',
         'Causes an explosion of holy radiance, healing nearby allies for {damage} and damaging nearby enemies. (Holy signature)',
       ],
       [
@@ -1431,7 +1431,7 @@ const classAbilityNamesEn = {
       ],
       [
         'swiftmend',
-        'Swiftmend',
+        'Fleetmend',
         'Consumes a heal-over-time effect on a friendly target to heal them for {damage}. (Restoration signature)',
       ],
       [
@@ -1441,8 +1441,8 @@ const classAbilityNamesEn = {
       ],
       [
         'summon_voidwalker',
-        'Summon Gloomshade',
-        'Summons a Gloomshade under the command of the Warlock. The Gloomshade is a sturdy demon that taunts your enemies and soaks up punishment. Summoning a new demon dismisses your current one. You may have one demon at a time.',
+        'Summon Duskmurk',
+        'Summons a Duskmurk under the command of the Warlock. The Duskmurk is a sturdy demon that taunts your enemies and soaks up punishment. Summoning a new demon dismisses your current one. You may have one demon at a time.',
       ],
       [
         'summon_succubus',
@@ -1566,7 +1566,7 @@ const classAbilityNamesEn = {
       ],
       [
         'storm_bolt',
-        'Storm Bolt',
+        'Thunderhurl',
         'Hurl your weapon at the target for {damage}, stunning it for 3 sec.',
       ],
       [
@@ -1591,7 +1591,7 @@ const classAbilityNamesEn = {
       ],
       [
         'victory_rush',
-        'Victory Rush',
+        "Victor's Surge",
         'Strike for weapon damage plus {damage} and heal 20% of your maximum health. Only usable within 20 sec of killing an enemy.',
       ],
       [
@@ -1606,7 +1606,7 @@ const classAbilityNamesEn = {
       ],
       [
         'heroic_leap',
-        'Heroic Leap',
+        'Vaulting Charge',
         'Leap to the target area, dealing {damage} damage to nearby enemies on landing.',
       ],
       [
@@ -1626,7 +1626,7 @@ const classAbilityNamesEn = {
       ],
       [
         'avenging_wrath',
-        'Wrathwing',
+        'Zealwing',
         'Calls down avenging power, increasing attack power by 60 and spell power by 30 for 20 sec. (Paladin talent)',
       ],
       ['berserk', 'Red Haze', 'Increases attack power by 70 for 15 sec. (Druid talent)'],
@@ -1635,7 +1635,7 @@ const classAbilityNamesEn = {
         'Bladestorm',
         'Become a whirling storm of steel, striking all enemies within 6 yards for {damage} every second for 4 sec.',
       ],
-      ['blink', 'Flickerstep', 'Teleports you 15 yd forward and breaks roots. (Mage talent)'],
+      ['blink', 'Flitstep', 'Teleports you 15 yd forward and breaks roots. (Mage talent)'],
       [
         'bloodlust',
         'Storm Chorus',
@@ -1668,7 +1668,7 @@ const classAbilityNamesEn = {
       ],
       [
         'counterspell',
-        'Spellbreak',
+        'Spellsever',
         'Counters enemy spellcasting, preventing any spell in that school from being cast for 6 sec. (Mage talent)',
       ],
       [
@@ -1839,7 +1839,7 @@ const classAbilityNamesEn = {
       [
         'preparation',
         'Contingency',
-        'Finishes the cooldown on Swift Heels, Ghostfoot, and Smokestep. (Rogue talent)',
+        'Finishes the cooldown on Swift Heels, Ghostfoot, and Smokefade. (Rogue talent)',
       ],
       [
         'presence_of_mind',
@@ -1874,7 +1874,7 @@ const classAbilityNamesEn = {
       ],
       [
         'spellsteal',
-        'Spellsteal',
+        'Spellplunder',
         'Steals a beneficial magic effect from an enemy, transferring it to yourself.',
       ],
       [

@@ -1,4 +1,4 @@
-// Frozen Orb visual: the roaming ice sphere the frost mage releases (WoW-style
+// Frostglobe visual: the roaming ice sphere the frost mage releases (WoW-style
 // reference: a translucent blue orb drifting forward, swirling shards, frosty
 // glow, sparkling frost trail). The sim's orb is pure state (ctx.frozenOrbs,
 // never wired); the client animates the flight locally from three 'orb'

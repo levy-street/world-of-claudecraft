@@ -370,7 +370,7 @@ export function createDemonPet(
   pet.ownerId = owner.id;
   pet.petMode = 'defensive';
   pet.petTauntTimer = 0;
-  // A melee_tank demon (Gloomshade) is built to hold threat, so it comes up with
+  // A melee_tank demon (Duskmurk) is built to hold threat, so it comes up with
   // auto-taunt already on for a solo owner; every other demon keeps the old opt-in
   // default. petCanForceTaunt is the shared taunt-eligibility gate (pet_taunt_gate.ts)
   // so a future tank demon that can't taunt doesn't default on. In a party/raid,

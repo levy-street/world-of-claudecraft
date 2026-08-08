@@ -74,9 +74,9 @@ export const WARRIOR_ROWS: RowTree = [
       },
       {
         id: 'war_row_victory_rush',
-        name: 'Victory Rush',
+        name: "Victor's Surge",
         description:
-          'Grants Victory Rush: after killing an enemy, your next strike heals you for 20% of your maximum health.',
+          "Grants Victor's Surge: after killing an enemy, your next strike heals you for 20% of your maximum health.",
         // LIVE: grants the strike; the on-kill window aura is applied by
         // handleDeath and required + consumed by the cast.
         effect: { grant: { ability: 'victory_rush' } },
@@ -96,7 +96,7 @@ export const WARRIOR_ROWS: RowTree = [
       },
       {
         id: 'war_row_storm_bolt',
-        name: 'Storm Bolt',
+        name: 'Thunderhurl',
         description: 'Hurl your weapon to stun a target.',
         // LIVE: grants the thrown stun (directDamage + stun, projectile).
         effect: { grant: { ability: 'storm_bolt' } },

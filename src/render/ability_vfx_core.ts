@@ -373,7 +373,7 @@ export function planImpact(
 // sources read), and both 'stasis' ids carry a read (ice_block's shell,
 // temporal_hourglass's own visual). 'incapacitate' is NOT: that hourglass
 // read is keyed to the aura ID 'temporal_hourglass', so the other nine
-// incapacitate ids (Gouge, Sap, Blind, Fear, Hibernate, Wyvern Sting,
+// incapacitate ids (Gouge, Sap, Blind, Fear, Hibernate, Drakesting,
 // Startle Shot, Death Coil, Dragon's Breath) wear nothing persistent.
 // Giving them a band is a separate design call, not an oversight to patch
 // here: they are break-on-damage CC, and a tell that says "hit me and this

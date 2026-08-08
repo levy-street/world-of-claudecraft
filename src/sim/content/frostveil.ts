@@ -228,7 +228,7 @@ export const FROSTVEIL_MOBS: Record<string, MobTemplate> = {
   },
   frostmane_yeti: {
     id: 'frostmane_yeti',
-    name: 'Frostmane Yeti',
+    name: 'Rimemane Yeti',
     minLevel: 19,
     maxLevel: 20,
     family: 'ogre',
@@ -513,14 +513,14 @@ export const FROSTVEIL_QUESTS: Record<string, QuestDef> = {
   },
   q_fv_frostmane_tyrant: {
     id: 'q_fv_frostmane_tyrant',
-    name: 'The Frostmane Tyrant',
+    name: 'The Rimemane Tyrant',
     giverNpcId: 'warden_kaldra',
     turnInNpcId: 'warden_kaldra',
-    text: 'The howlers were not hunting when they came down the terraces. They were fleeing. A yeti has claimed the high ground, the mountain folk call it the Frostmane, and even the packs will not share a slope with it. It has to end, $N, before winter drives it down to my walls. Bring a friend. Bring two.',
+    text: 'The howlers were not hunting when they came down the terraces. They were fleeing. A yeti has claimed the high ground, the mountain folk call it the Rimemane, and even the packs will not share a slope with it. It has to end, $N, before winter drives it down to my walls. Bring a friend. Bring two.',
     completionText:
-      'When the wind dropped last night the whole village heard the silence where the Frostmane used to be. The Reach owes you a debt it will be years in paying, $N. Wear this, and every door in Icemantle is open to you.',
+      'When the wind dropped last night the whole village heard the silence where the Rimemane used to be. The Reach owes you a debt it will be years in paying, $N. Wear this, and every door in Icemantle is open to you.',
     objectives: [
-      { type: 'kill', targetMobId: 'frostmane_yeti', count: 1, label: 'The Frostmane slain' },
+      { type: 'kill', targetMobId: 'frostmane_yeti', count: 1, label: 'The Rimemane slain' },
     ],
     xpReward: 6000,
     copperReward: 3600,
@@ -597,7 +597,7 @@ export const FROSTVEIL_ITEMS: Record<string, ItemDef> = {
   },
   frostmane_mantle: {
     id: 'frostmane_mantle',
-    name: 'Mantle of the Frostmane',
+    name: 'Mantle of the Rimemane',
     kind: 'armor',
     armorType: 'cloth',
     slot: 'shoulder',

@@ -758,7 +758,7 @@ export const en_XA: AdminTranslations = {
   "poi.thornpeak_heights.4": "[Ðŕóĝɱáŕ'š Ŵáŕ-Çáɱþ]",
   "poi.thornpeak_heights.5": "[Šţóŕɱçŕáĝ]",
   "poi.thornpeak_heights.6": "[Ţĥé Ĝļíɱɱéŕɱéŕé]",
-  "poi.thornpeak_heights.7": "[Ŵýŕɱçúļţ Ţéñţš]",
+  "poi.thornpeak_heights.7": "[Ɓŕóóðšŵóŕñ Ţéñţš]",
   "poi.thornpeak_heights.8": "[Ŕéʋéñáñţ Ƒíéļðš]",
   "poi.thornpeak_heights.9": "[Ĝŕáʋéŵýŕɱ Šáñçţúɱ]",
   "location.kind.overworld": "[Óʋéŕŵóŕļð]",

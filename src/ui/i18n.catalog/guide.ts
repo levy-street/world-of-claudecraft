@@ -821,7 +821,7 @@ export const guideStrings = {
     peaksBlurb:
       "Wind-scoured ridges and old mine-works climbing to the realm's coldest, highest dangers, held by the outpost of Highwatch.",
     duskBlurb:
-      'A valley of permanent dusk beneath the great tree of Eldergleam, where crystal ruins glow and the air hums with old magic.',
+      'A valley of permanent dusk beneath the great tree of Eldershine, where crystal ruins glow and the air hums with old magic.',
     emberBlurb:
       'Storm-lit wastes of ash and bloodglass where drakes wheel over the caldera and troll fires burn among the dunes, watched from the gate-town of Wyrmwatch.',
     frostBlurb:
@@ -833,7 +833,7 @@ export const guideStrings = {
     nightBlurb:
       'A realm of starry midnight where flowers light the paths and Moonrest keeps a quiet vigil under a dreaming sky.',
     hauntBlurb:
-      'A haunted forest under giant canopies, where the lanterns of Gallowmere are the only honest light on the road.',
+      'A haunted forest under giant canopies, where the lanterns of Gibbetmere are the only honest light on the road.',
     galeBlurb:
       'Sea-cliffs and howling downs where the wind never rests, the Old Beacon never goes out, and Wickharbor shuts its doors tight.',
     jungleBlurb:
@@ -851,7 +851,7 @@ export const guideStrings = {
       'Two hundred years this wall has held. It will not break on my watch, but it groans.',
     peaksGreeter: 'Captain Thessaly, Highwatch',
     duskGreeting: 'Few of your kind have stood beneath these boughs. Walk gently, and be welcome.',
-    duskGreeter: 'Keeper Saelwyn, Eldergleam',
+    duskGreeter: 'Keeper Saelwyn, Eldershine',
     emberGreeting:
       'Hot wind off the wastes, dragons over the Drakemaw, and troll fires in the dunes. Drink before you walk out there.',
     emberGreeter: 'The gatewarden, Wyrmwatch',
@@ -869,7 +869,7 @@ export const guideStrings = {
     nightGreeter: 'The vigil-warden, Moonrest',
     hauntGreeting:
       'Keep to the lanterns, traveler. And if the wood calls your name from off the road, do not answer it.',
-    hauntGreeter: 'The lamplighter, Gallowmere',
+    hauntGreeter: 'The lamplighter, Gibbetmere',
     galeGreeting:
       'The wind has never once stopped here, and the Old Beacon has never once gone out. Close the inn door behind you.',
     galeGreeter: 'The beacon-keeper, Wickharbor',
@@ -887,9 +887,9 @@ export const guideStrings = {
     marshPlaceNotes:
       "Fenbridge guards the only dry road. The Prowler Reeds and Deepfen Shallows teem with marsh beasts and mudfins; the Widow Thicket is spun thick with web; the Drowned Chapel and the Troll Mounds keep older dangers, with The Drowned Litany, the marsh's own delve, opening just north of the mounds; the Gravecaller Encampment is the cult dug in, and the Sunken Bastion is the marsh's instanced heart.",
     peaksPlaceNotes:
-      "Highwatch holds the wall. Stalker Ridge and the Deeprock Burrows belong to ridge cats and burrowers; the Ogre Foothills and Drogmar's War-Camp to brutes for hire; Stormcrag crackles with elementals, and below it glows the Glimmermere, the tarn whose shore keeps the gate of pale light down to the Drowned Temple; the Wyrmcult Tents and Revenant Fields ring the cult's high ground, with Gravewyrm Sanctum at its peak.",
+      "Highwatch holds the wall. Stalker Ridge and the Deeprock Burrows belong to ridge cats and burrowers; the Ogre Foothills and Drogmar's War-Camp to brutes for hire; Stormcrag crackles with elementals, and below it glows the Glimmermere, the tarn whose shore keeps the gate of pale light down to the Drowned Temple; the Broodsworn Tents and Revenant Fields ring the cult's high ground, with Gravewyrm Sanctum at its peak.",
     duskPlaceNotes:
-      'Eldergleam gathers beneath the great tree. The Duskfall Cave and its overlook are the way in and the first sight of the valley; Elder Grove and Starfall Basin keep the quiet south; the Sunken Court holds overgrown ruins in the east; and the Gleaming Deep and Crystalline Shallows glow across the north.',
+      'Eldershine gathers beneath the great tree. The Duskfall Cave and its overlook are the way in and the first sight of the valley; Elder Grove and Starfall Basin keep the quiet south; the Sunken Court holds overgrown ruins in the east; and the Gleaming Deep and Crystalline Shallows glow across the north.',
     emberPlaceNotes:
       'Wyrmwatch holds the gate. The Gatewood is the last green before the waste; the Cinder Dunes drift with ash and worse; the Trollmoot is where the dune trolls gather their fires; the Bloodglass Fields glitter with razor shards; and the Drakemaw Caldera is the smoking crown the drakes circle.',
     frostPlaceNotes:
@@ -899,9 +899,9 @@ export const guideStrings = {
     fenPlaceNotes:
       'Bridgemere sits astride the slow water. The Amberfen Steps come down from the harvest country; the Lilymoors and Bogshine Pools glitter with wisps and dragonflies; Willowweep trails its branches into the mere; and the Drowsy Flats are as gentle as this land gets.',
     nightPlaceNotes:
-      'Moonrest keeps the vigil. The Nightgate is the way into the midnight country; the Moonwell holds starlight you can stand beside; Gloamfield blooms in the dark; the Standing Vigil watches without ever moving; and the Sleepless Barrow is the one place here that never dreams.',
+      'Moonrest keeps the vigil. The Nightgate is the way into the midnight country; the Moonspring holds starlight you can stand beside; Gloamfield blooms in the dark; the Standing Vigil watches without ever moving; and the Sleepless Barrow is the one place here that never dreams.',
     hauntPlaceNotes:
-      "Gallowmere huddles inside its lanterns. The Crowgate is the wood's grim front door; Widow's Thicket is spun thick with web; the Hanging Glade and the Mournstone Chapel keep the forest's oldest griefs; and the Huntsman's Clearing belongs to whatever still hunts there.",
+      "Gibbetmere huddles inside its lanterns. The Crowgate is the wood's grim front door; Widow's Thicket is spun thick with web; the Hanging Glade and the Mournstone Chapel keep the forest's oldest griefs; and the Huntsman's Clearing belongs to whatever still hunts there.",
     galePlaceNotes:
       'Wickharbor leans into the wind. The Windway is the cliff road in; the Howling Downs roll treeless under the gale; the Old Beacon has burned for as long as anyone can say; the Shear drops sheer to the water; the Wreckfields keep the coast honest; and the Mirror Tarn is the one still thing in the whole realm.',
     junglePlaceNotes:

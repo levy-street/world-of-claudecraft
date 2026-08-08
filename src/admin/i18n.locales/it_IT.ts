@@ -548,7 +548,7 @@ export const it_IT: Record<string, string> = {
   'poi.thornpeak_heights.4': 'Accampamento di Guerra di Drogmar',
   'poi.thornpeak_heights.5': 'Rupe della Tempesta',
   'poi.thornpeak_heights.6': 'Il Lago Baluginante',
-  'poi.thornpeak_heights.7': 'Tende dei Wyrmcult',
+  'poi.thornpeak_heights.7': 'Tende dei Broodsworn',
   'poi.thornpeak_heights.8': 'Campi dei Revenant',
   'poi.thornpeak_heights.9': 'Santuario del Gravewyrm',
   'location.kind.overworld': 'Mondo aperto',

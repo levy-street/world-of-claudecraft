@@ -97,7 +97,7 @@ describe('the Low vertex-color path covers every mount GLB that ships COLOR_0', 
     ),
   ].sort();
 
-  it('carries authored COLOR_0 on exactly the Terrorspark Groundshaker and the Valorsteed', () => {
+  it('carries authored COLOR_0 on exactly the Dreadspark Groundshaker and the Valorsteed', () => {
     expect(mountUrls.length).toBeGreaterThanOrEqual(8);
     const withVertexColors = mountUrls.filter((url) => glbAttributes(url).has('COLOR_0'));
     expect(withVertexColors).toEqual([

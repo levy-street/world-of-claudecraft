@@ -86,7 +86,7 @@ const CLASS_PLAN = {
       11: 'pal_r11_divine_wisdom', // Divine Wisdom (proc: instant Holy Light)
       14: 'pal_r14_holy_wrath', // Saint's Ire (grant holy_wrath)
       17: 'pal_r17_divine_shield', // Lightward (grant divine_shield)
-      20: 'pal_r20_avenging_wrath', // Wrathwing (grant avenging_wrath)
+      20: 'pal_r20_avenging_wrath', // Zealwing (grant avenging_wrath)
     },
     moment: 'avenging_wrath',
     momentIsSelfBuff: true,
@@ -97,7 +97,7 @@ const CLASS_PLAN = {
     name: 'Rowmage',
     rows: {
       5: 'mag_r5_impulse', // Impulse (fire_blast cd)
-      8: 'mag_r8_counterspell', // Spellbreak (grant counterspell)
+      8: 'mag_r8_counterspell', // Spellsever (grant counterspell)
       11: 'mag_r11_cone_of_cold', // Frostsweep (grant cone_of_cold)
       14: 'mag_r14_presence_of_mind', // Racing Mind (grant presence_of_mind)
       17: 'mag_r17_ice_block', // Cold Coffin (grant ice_block)

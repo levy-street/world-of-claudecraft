@@ -566,7 +566,7 @@ export const fr_CA: EnTranslations = {
         "ice_fang_sword": {
           "name": "Croc de glace",
           "look": "Lame incurvée en glace pâle de glacier, cristaux de givre dentelés sur le dos, cœur gelé cyan lumineux dans la gouttière et garde en stalactites.",
-          "lore": "Le fleuron de la collection gelée et la pièce que tout collectionneur convoite en premier. Croc de glace n’a pas été forgé, mais sculpté dans un croc du glacier qui coiffe Thornpeak au-dessus de Highwatch. Son cœur cyan brûle d’un froid aussi vif que la lumière sur le Glimmermere. Il couvre de givre l’air même qu’il fend. Les gardes du rempart jurent qu’un soldat le portait la nuit où les hautes neiges retinrent le Culte du Ver et qu’il « offrit un hiver au rempart »."
+          "lore": "The flagship of the frozen grade, and the piece every collector reaches for first. Ice Fang was carved, not forged, from a fang of the glacier that caps Thornpeak above Highwatch, its cyan core burning cold as the light off the Glimmermere. It rimes the very air it cuts. The wall-guard swear one soldier carried it the night the high snows held the Broodsworn back, and 'bought the wall a winter.'"
         },
         "glaciersplit_axe": {
           "name": "Fend-glacier",
@@ -594,7 +594,7 @@ export const fr_CA: EnTranslations = {
           "lore": "Une pointe de glace de glacier lumineuse, que l’on dit brisée dans le lac profond sous le Sanctuaire, là où le froid de la montagne a des crocs. Le givre blanc fleurit sans fin sur sa bague d’argent et ne fond jamais, ni devant le feu ni en été. Les mages la gardent près d’eux pour le froid qu’elle prête à leur art, mais la tiennent à distance les nuits où elle semble se pencher vers la crypte de Nythraxis pour écouter."
         },
         "winterbite": {
-          "name": "Morsure de l’hiver",
+          "name": "Wintergnaw",
           "look": "Arc d’acier argenté et de glace bleue, cœur gelé cyan lumineux dans la poignée, flèche de glace massive encochée et vapeur froide.",
           "lore": "Un arc d’acier argenté et de glace de Thornpeak, dont la poignée est éclairée par un cœur cyan glacé qui fige la flèche sur la corde. Il encoche un trait de glace de glacier massive qui se reforme à chaque tension. Sur le rempart, l’archer ne porte aucun carquois, seulement le froid. Highwatch a tenu la Crête du Traqueur durant un siège avec un arc semblable : un unique archer, dit-on, et tout un hiver de flèches qui se trouvaient toujours déjà là."
         },
@@ -1006,7 +1006,7 @@ export const fr_CA: EnTranslations = {
       "name_shadowjump_toad": "Kama-Kage, le Crapaud Saute-Ombre",
       "name_stormfeather_griffin": "Plume-d’Orage Toise-Ciel",
       "name_thunderstrut_gobbler": "Pavane-Tonnerre, le Grand Dindon",
-      "name_terrorspark_groundshaker": "Terrétincelle, l’Ébranleur de sol",
+      "name_terrorspark_groundshaker": "Dreadspark Groundshaker",
       "name_drakemaw_raptor": "Raptor du Drakemaw",
       "desc_valorsteed": "Un destrier robuste au pied sûr qui accroît la vitesse de déplacement.",
       "desc_grag_bear": "Un ours robuste au pied sûr qui accroît la vitesse de déplacement.",
@@ -1487,7 +1487,7 @@ export const fr_CA: EnTranslations = {
         "battleTrance": "Transe de combat",
         "overpowerCharge": "Renforcement de Main rouge",
         "suddenDeath": "Mort subite",
-        "victoryRush": "Ruée victorieuse",
+        "victoryRush": "Victor's Surge",
         "enrage": "Carnage : enragé",
         "heatingUp": "Montée en chaleur",
         "arcaneCharge": "Charges des Arcanes",
@@ -1970,7 +1970,7 @@ export const fr_CA: EnTranslations = {
       "sanguine": "Augmente la vitesse d'attaque de {hastePct} % et les dégâts infligés de {dmgPct} %",
       "battleTrance": "Votre prochaine Frappe du pillard ou Frappe mutilante ne coûte aucune rage",
       "revengeFree": "Votre prochaine Vengeance ne coûte aucune rage",
-      "victoryRush": "Élan de victoire est prêt",
+      "victoryRush": "Victor's Surge is ready",
       "maxHpPct": "Accroît les points de vie maximum de {pct}%",
       "temporalHourglass": "Immunisé et incapable d'agir ; restaure la vie et accélère la récupération des temps de recharge. Clic droit pour annuler.",
       "tongues": "Accroît le temps d'incantation de {pct}%",
@@ -4031,13 +4031,13 @@ export const fr_CA: EnTranslations = {
       "valeBlurb": "La verdoyante vallée de départ, où les nouveaux héros se font les dents sur les loups et les bandits autour de la ville d'Eastbrook.",
       "marshBlurb": "Une contrée noyée de brume et de ruines. Les Mudfins pullulent dans les hauts-fonds et quelque chose de plus ancien s'agite sous l'eau, surveillé depuis la ville-pont de Fenbridge.",
       "peaksBlurb": "Crêtes balayées par le vent et vieilles exploitations minières grimpant vers les dangers les plus glacials et les plus élevés du royaume, tenus par l'avant-poste de Highwatch.",
-      "duskBlurb": "Une vallée de crépuscule perpétuel sous le grand arbre d'Eldergleam, où des ruines de cristal luisent et où l'air résonne d'une magie ancienne.",
+      "duskBlurb": "Une vallée de crépuscule perpétuel sous le grand arbre d'Eldershine, où des ruines de cristal luisent et où l'air résonne d'une magie ancienne.",
       "emberBlurb": "Des étendues battues par la tempête, de cendre et de verre-de-sang, où des drakes tournoient au-dessus de la caldeira et où des feux trolls brûlent parmi les dunes, veillées depuis la ville-porte de Wyrmwatch.",
       "frostBlurb": "Un silence de neige et de pins sombres sous l'aurore, où le froid lui-même semble éveillé et où Icemantle garde ses feux allumés.",
       "amberBlurb": "Un automne éternel d'or et de rouge qui ne tombe jamais, rassemblé autour de la ville éclairée aux lanternes de Lanternmere.",
       "fenBlurb": "Un marécage lumineux et bourdonnant de lys et d'eau calme, traversé par de vieilles passerelles depuis la ville-pont de Bridgemere.",
       "nightBlurb": "Un royaume de minuit étoilé où des fleurs éclairent les chemins et où Moonrest maintient une veille silencieuse sous un ciel qui rêve.",
-      "hauntBlurb": "Une forêt hantée sous des canopées géantes, où les lanternes de Gallowmere sont la seule lumière honnête sur la route.",
+      "hauntBlurb": "Une forêt hantée sous des canopées géantes, où les lanternes de Gibbetmere sont la seule lumière honnête sur la route.",
       "galeBlurb": "Falaises marines et landes hurlantes où le vent ne se repose jamais, où le Vieux Phare ne s'éteint jamais, et où Wickharbor ferme bien ses portes.",
       "jungleBlurb": "Un enchevêtrement tropical de palmiers, de sable blanc, et d'oiseaux bruyants, où la ville de plage de Drifthaven garde un feu allumé sur la grève.",
       "gardenBlurb": "Un royaume-jardin en labyrinthe de haies, encore taillé par nul jardinier vu de quiconque, dont l'entrée passe par Hedgewick et ses cours de fontaines.",
@@ -4048,7 +4048,7 @@ export const fr_CA: EnTranslations = {
       "peaksGreeting": "Deux cents ans que ce mur tient. Il ne cédera pas sous ma garde, mais il gémit.",
       "peaksGreeter": "Capitaine Thessaly, Highwatch",
       "duskGreeting": "Peu de gens de votre espèce se sont tenus sous ces frondaisons. Marchez avec douceur : on vous accueille ici.",
-      "duskGreeter": "La Gardienne Saelwyn, Eldergleam",
+      "duskGreeter": "La Gardienne Saelwyn, Eldershine",
       "emberGreeting": "Vent brûlant venu des étendues arides, dragons au-dessus du Drakemaw, et feux trolls dans les dunes. Buvez un coup avant de sortir là-bas.",
       "emberGreeter": "Le gardien de porte, Wyrmwatch",
       "frostGreeting": "La neige engloutit tous les sons au-delà du mur. Si les lumières se mettent à danser, baissez la voix et gardez votre feu allumé.",
@@ -4060,7 +4060,7 @@ export const fr_CA: EnTranslations = {
       "nightGreeting": "Passé la Porte de la Nuit, l'air lui-même rêve. Suivez la lumière des fleurs, et prenez garde au monde endormi suspendu dans le ciel.",
       "nightGreeter": "La gardienne de la veille, Moonrest",
       "hauntGreeting": "Restez près des lanternes, voyageur. Et si le bois appelle votre nom hors de la route, ne répondez pas.",
-      "hauntGreeter": "Le lampiste, Gallowmere",
+      "hauntGreeter": "Le lampiste, Gibbetmere",
       "galeGreeting": "Le vent ne s'est jamais arrêté ici, pas une seule fois, et le Vieux Phare ne s'est jamais éteint. Refermez la porte de l'auberge derrière vous.",
       "galeGreeter": "Le gardien du phare, Wickharbor",
       "jungleGreeting": "Sable chaud, oiseaux bruyants, et une jungle qui dévore l'horizon. Nous gardons un feu allumé sur la plage ; essayez d'y revenir.",
@@ -4069,14 +4069,14 @@ export const fr_CA: EnTranslations = {
       "gardenGreeter": "Le gardien de porte, Hedgewick",
       "valePlaceNotes": "Eastbrook est votre premier camp de base. La Course du Loup et le Pré du Sanglier sont des terrains de chasse cléments ; le lac Miroir est une bonne eau de pêche, même si les mudfins grouillent dans ses bas-fonds ; le Sableweb et la Mine de cuivre cachent araignées et fouisseurs avides de minerai ; un Camp de bandits et la Chapelle déchue gardent des besognes plus rudes ; la colline du Reliquaire descend dans le Reliquaire effondré, le premier gouffre du royaume ; Brightwood Glade est un paisible bosquet ensoleillé au nord ; et le Pré de la Truie est le terrain clos de balle au sanglier d'Eastbrook, où se joue la Coupe du Val sous une trêve des moissons.",
       "marshPlaceNotes": "Fenbridge garde la seule route sèche. Les Roseaux du Rôdeur et les Hauts-fonds de Deepfen grouillent de bêtes des marais et de Mudfins ; le Fourré de la Veuve est tissé d'une épaisse toile ; la Chapelle noyée et les Tertres des trolls gardent des dangers plus anciens, avec La Litanie noyée, le gouffre propre au marais, qui s'ouvre juste au nord des tertres ; le Campement de Gravecaller est le culte retranché, et le Bastion englouti est le cœur en instance du marais.",
-      "peaksPlaceNotes": "Highwatch tient le rempart. La Crête du Traqueur et les Terriers de Deeprock appartiennent aux félins des crêtes et aux fouisseurs ; les Contreforts des ogres et le Camp de guerre de Drogmar à des brutes à gages ; Stormcrag crépite d'élémentaires, et en contrebas luit le Glimmermere, le lac de montagne dont la rive garde la porte de lumière pâle menant au Temple noyé ; les Tentes du culte du Ver et les Champs des revenants ceignent les hauteurs du culte, avec le Sanctuaire du Gravewyrm à son sommet.",
-      "duskPlaceNotes": "Eldergleam se rassemble sous le grand arbre. La Grotte du Crépuscule et son belvédère sont le chemin d'entrée et la première vue sur la vallée ; le Bosquet Ancien et le Bassin des Étoiles Filantes gardent le sud paisible ; la Cour Engloutie renferme des ruines envahies de végétation à l'est ; et les Profondeurs Scintillantes et les Hauts-fonds Cristallins luisent à travers le nord.",
+      "peaksPlaceNotes": "Highwatch holds the wall. Stalker Ridge and the Deeprock Burrows belong to ridge cats and burrowers; the Ogre Foothills and Drogmar's War-Camp to brutes for hire; Stormcrag crackles with elementals, and below it glows the Glimmermere, the tarn whose shore keeps the gate of pale light down to the Drowned Temple; the Broodsworn Tents and Revenant Fields ring the cult's high ground, with Gravewyrm Sanctum at its peak.",
+      "duskPlaceNotes": "Eldershine se rassemble sous le grand arbre. La Grotte du Crépuscule et son belvédère sont le chemin d'entrée et la première vue sur la vallée ; le Bosquet Ancien et le Bassin des Étoiles Filantes gardent le sud paisible ; la Cour Engloutie renferme des ruines envahies de végétation à l'est ; et les Profondeurs Scintillantes et les Hauts-fonds Cristallins luisent à travers le nord.",
       "emberPlaceNotes": "Wyrmwatch tient la porte. Le Gatewood est le dernier vert avant l'étendue aride ; les Dunes de Cendre dérivent de cendres et pire encore ; Trollmoot est où les trolls des dunes rassemblent leurs feux ; les Champs de Bloodglass scintillent d'éclats tranchants ; et la Caldeira de Drakemaw est la couronne fumante que les drakes survolent en cercles.",
       "frostPlaceNotes": "Icemantle garde le dernier âtre chaud. La Ligne de Neige marque où les congères prennent le dessus ; le Lac du Glacier est une eau noire et immobile sous la glace ; les Marches de l'Aurore grimpent sous les lumières dansantes ; le Shiverfen est une tourbière gelée qui ne dort jamais tout à fait ; et les Terrasses Hurlantes méritent leur nom chaque nuit.",
       "amberPlaceNotes": "Lanternmere brille au cœur de la moisson. Le Goldmelt est le col ambré qui mène ici ; le Verger doré et le Creux des Moissons gardent les meilleures cueillettes et les voleurs les plus audacieux ; le Grand Lac reflète les feuilles brûlantes ; les Hauteurs de Cindermaple se dressent, plus hautes et plus rouges que tout ; et le Monolithe penché se souvient de quelque chose de plus vieux que l'automne.",
       "fenPlaceNotes": "Bridgemere se dresse à cheval sur l'eau calme. Les Marches de l'Amberfen descendent du pays des moissons ; les Lilymoors et les Mares Chatoyantes scintillent de feux follets et de libellules ; Willowweep traîne ses branches dans le marais ; et les Étendues Somnolentes sont ce que cette terre offre de plus paisible.",
-      "nightPlaceNotes": "Moonrest tient la veille. La Porte de la Nuit est le chemin vers le pays de minuit ; le Puits de Lune retient une lumière stellaire près de laquelle on peut se tenir ; Gloamfield fleurit dans l'obscurité ; la Vigie immobile observe sans jamais bouger ; et le Tertre Sans Sommeil est le seul endroit ici qui ne rêve jamais.",
-      "hauntPlaceNotes": "Gallowmere se blottit dans ses lanternes. La Porte aux Corbeaux est la porte funeste du bois ; le Fourré des Veuves est tissé épais de toiles ; la Clairière Pendue et la Chapelle de Mournstone gardent les plus vieux chagrins de la forêt ; et la Clairière du Chasseur appartient à ce qui y chasse encore.",
+      "nightPlaceNotes": "Moonrest keeps the vigil. The Nightgate is the way into the midnight country; the Moonspring holds starlight you can stand beside; Gloamfield blooms in the dark; the Standing Vigil watches without ever moving; and the Sleepless Barrow is the one place here that never dreams.",
+      "hauntPlaceNotes": "Gibbetmere se blottit dans ses lanternes. La Porte aux Corbeaux est la porte funeste du bois ; le Fourré des Veuves est tissé épais de toiles ; la Clairière Pendue et la Chapelle de Mournstone gardent les plus vieux chagrins de la forêt ; et la Clairière du Chasseur appartient à ce qui y chasse encore.",
       "galePlaceNotes": "Wickharbor se penche dans le vent. La Voie du Vent est la route de falaise qui mène ici ; les Landes Hurlantes roulent, sans arbres, sous la tempête ; le Vieux Phare brûle depuis aussi longtemps que quiconque s'en souvienne ; le Surplomb tombe à pic vers l'eau ; les Champs d'Épaves gardent la côte honnête ; et le Lac Miroir est la seule chose immobile dans tout le royaume.",
       "junglePlaceNotes": "Drifthaven garde son feu sur la plage. L'Embouchure emmêlée est là où la rivière rencontre le mur vert ; la Grève des Palmes court blanche et chaude le long du ressac ; l'Enchevêtrement d'Émeraude et la Chute de Lianes engloutissent l'intérieur des terres ; le Lagon de Saphir luit clair et profond ; et l'Idole engloutie observe depuis sous l'eau.",
       "gardenPlaceNotes": "Hedgewick attend à la Porte du Jardin. L'Allée du Parterre fleurit en couleurs taillées ; le Château de Dawnhold entraîne ses chevaliers derrière des murs neufs ; le Bassin aux Pétales dérive en rose toute l'année ; le Vieux Moulin retourne son propre lit de fleurs ; le Grand Labyrinthe réarrange ses manières pour chaque visiteur, ses arcades surveillées par des renards feuillus ; le Guet du Nord garde la route de sortie ; le Bassin des Lys repose au-delà de tout cela ; et la Cour des Fontaines coule encore claire au cœur du jardin.",
@@ -6277,24 +6277,24 @@ export const fr_CA: EnTranslations = {
     "boss": {
       "varric": {
         "bell": {
-          "emote": "Le diacre Varric empoigne la cloche enfouie à deux mains!",
-          "log": "Le diacre Varric se met à sonner la cloche funéraire.",
-          "warning": "Éloignez-vous du diacre Varric!",
+          "emote": "Le diacre Vandric empoigne la cloche enfouie à deux mains!",
+          "log": "Le diacre Vandric se met à sonner la cloche funéraire.",
+          "warning": "Éloignez-vous du diacre Vandric!",
           "impact": "Le glas de la cloche fissure le sol de la chambre!",
           "lesson": "Glas funèbre : un choc au sol toutes les douze secondes. Éloignez-vous avant l'impact."
         },
         "raise": {
-          "emote": "Le diacre Varric appelle des noms des tombes brisées!",
-          "log": "Le diacre Varric entame Relever les morts.",
+          "emote": "Le diacre Vandric appelle des noms des tombes brisées!",
+          "log": "Le diacre Vandric entame Relever les morts.",
           "warning": "Arrêtez le rite funèbre!",
           "object": "La tombe fissurée frémit d'un souffle volé.",
           "interrupt_ok": "Le rite funèbre vacille.",
-          "interrupt_fail": "Les morts répondent à l'appel du diacre Varric!",
+          "interrupt_fail": "Les morts répondent à l'appel du diacre Vandric!",
           "lesson": "Interrompez la tombe fissurée en cinq secondes, sinon les morts se lèvent à son appel."
         },
         "pull": "Vous foulez la poussière sacrée avec des intentions impures. À genoux, et soyez compté.",
         "intro": "Aucune âme n'est perdue. Seulement égarée.",
-        "mid60": "Le diacre Varric lit des noms dans le registre avec un triomphe tremblant.",
+        "mid60": "Le diacre Vandric lit des noms dans le registre avec un triomphe tremblant.",
         "mid30": "La cloche funéraire répond à chaque nom qu'il prononce.",
         "defeat": "Non... j'avais les noms... je les avais tous..."
       }
@@ -7980,7 +7980,7 @@ export const fr_CA: EnTranslations = {
       },
       "cold_snap": {
         "name": "Rappel hivernal",
-        "description": "Réinitialise la recharge de Pas scintillant, Voile de givre et Invisibilité accrue. (Talent de mage)"
+        "description": "Finishes the cooldown on Flitstep, Frostveil, and Greater Invisibility. (Mage talent)"
       },
       "greater_invisibility": {
         "name": "Invisibilité accrue",
@@ -8031,15 +8031,15 @@ export const fr_CA: EnTranslations = {
         "description": "Lâchez trois éclairs glacés pour {damage} dégâts de Givre chacun et appliquez Winter's Chill à la cible : ses 2 prochains sorts compatibles entrants la traitent comme gelée. Brain Freeze rend Winterlash instantané et ignore son temps de recharge. (Gel)"
       },
       "frozen_orb": {
-        "name": "Orbe gelé",
+        "name": "Frostglobe",
         "description": "Libère un orbe de givre tourbillonnant qui dérive vers l'avant pendant 8 s, infligeant {damage} des dégâts de Givre chaque seconde aux ennemis proches et les ralentissant de 30%. Chaque impulsion frappante génère un glaçon. (Givre)"
       },
       "blizzard": {
         "name": "Tempête de neige",
-        "description": "Déchaîne une tempête de glace sur la zone ciblée pendant 6 s, infligeant {damage} points de dégâts de Givre par seconde et ralentissant les ennemis de 40 %. Chaque ennemi touché réduit le temps de recharge de Frozen Orb de 0,5 s, jusqu'à 3 s par incantation. (Givre)"
+        "description": "Déchaîne une tempête de glace sur la zone ciblée pendant 6 s, infligeant {damage} points de dégâts de Givre par seconde et ralentissant les ennemis de 40 %. Chaque ennemi touché réduit le temps de recharge de Frostglobe de 0,5 s, jusqu'à 3 s par incantation. (Givre)"
       },
       "glacial_spike": {
-        "name": "Pointe glaciale",
+        "name": "Rimeneedle",
         "description": "Conjurez un pic de glace massif en consumant 5 glaçons pour infliger {damage} points de dégâts de Givre et geler la cible sur place pendant 4 s. (Givre)"
       },
       "glacial_front": {
@@ -8171,7 +8171,7 @@ export const fr_CA: EnTranslations = {
         "description": "Coup de grâce qui blesse la cible, la faisant saigner de {damage} pendant 16 s."
       },
       "vanish": {
-        "name": "Pas de fumée",
+        "name": "Smokefade",
         "description": "Vous disparaissez et entrez en Duskveil, même en plein combat. Vous vous déplacez 50% plus lentement tant que vous êtes dissimulé. Dure jusqu'à 10 s."
       },
       "instant_poison": {
@@ -8555,7 +8555,7 @@ export const fr_CA: EnTranslations = {
         "description": "Entre dans une fureur bouillonnante et génère 20 points de rage. (talent de guerrier)"
       },
       "crusader_strike": {
-        "name": "Frappe du croisé",
+        "name": "Oathstrike",
         "description": "Frappe la cible et inflige les dégâts de l’arme plus {damage} points de dégâts du Sacré. (talent de paladin)"
       },
       "chain_heal": {
@@ -8567,7 +8567,7 @@ export const fr_CA: EnTranslations = {
         "description": "Vous adoptez une puissance démoniaque, ce qui augmente l’armure et la puissance d’attaque pendant 20 s. (talent de démoniste)"
       },
       "holy_shock": {
-        "name": "Horion sacré",
+        "name": "Lightjolt",
         "description": "Frappe une cible alliée avec de l’énergie sacrée et lui rend {damage} points de vie. (signature Sacré)"
       },
       "aura_surge": {
@@ -8587,7 +8587,7 @@ export const fr_CA: EnTranslations = {
         "description": "Inspire les alliés proches, augmentant leur puissance d’attaque de 35 pendant 5 min. (signature Précision)"
       },
       "wyvern_sting": {
-        "name": "Piqûre de wyverne",
+        "name": "Drakesting",
         "description": "Pique l’ennemi à distance et le rend incapable d’agir pendant un maximum de 4 s. Tout dégât interrompt l’effet. (signature Survie)"
       },
       "arcane_power": {
@@ -8599,7 +8599,7 @@ export const fr_CA: EnTranslations = {
         "description": "Augmente les chances de coup critique des sorts de 50% pendant 15 s. (signature Feu)"
       },
       "icy_veins": {
-        "name": "Veines glaciales",
+        "name": "Coldsurge",
         "description": "Augmente la hâte des sorts de 30% et empêche l’interruption et le recul des incantations pendant 10 s. (signature Givre)"
       },
       "cold_blood": {
@@ -8619,7 +8619,7 @@ export const fr_CA: EnTranslations = {
         "description": "Insuffle de la puissance à une cible alliée, augmentant sa puissance des sorts de 28 pendant 15 s. (signature Discipline)"
       },
       "holy_nova": {
-        "name": "Nova sacrée",
+        "name": "Hallowburst",
         "description": "Provoque une explosion de lumière sacrée, rend {damage} points de vie aux alliés proches et blesse les ennemis proches. (signature Sacré)"
       },
       "shadowform": {
@@ -8647,7 +8647,7 @@ export const fr_CA: EnTranslations = {
         "description": "Charge un ennemi et l’enracine pendant 1 s. Portée de 8-25 m. (signature Farouche)"
       },
       "swiftmend": {
-        "name": "Prompte guérison",
+        "name": "Fleetmend",
         "description": "Consume un effet de soins sur la durée sur une cible alliée pour lui rendre {damage} points de vie. (signature Restauration)"
       },
       "summon_imp": {
@@ -8655,8 +8655,8 @@ export const fr_CA: EnTranslations = {
         "description": "Invoque un Emberkin sous le commandement du démoniste. L'Emberkin lance des Ashbolts sur vos ennemis à distance. Invoquer un nouveau démon renvoie celui que vous avez. Vous ne pouvez avoir qu'un démon à la fois."
       },
       "summon_voidwalker": {
-        "name": "Invoquer un Gloomshade",
-        "description": "Invoque un Gloomshade sous le commandement du démoniste. Le Gloomshade est un démon robuste qui provoque vos ennemis et encaisse les coups. Invoquer un nouveau démon renvoie celui que vous avez. Vous ne pouvez avoir qu'un démon à la fois."
+        "name": "Invoquer un Duskmurk",
+        "description": "Invoque un Duskmurk sous le commandement du démoniste. Le Duskmurk est un démon robuste qui provoque vos ennemis et encaisse les coups. Invoquer un nouveau démon renvoie celui que vous avez. Vous ne pouvez avoir qu'un démon à la fois."
       },
       "summon_succubus": {
         "name": "Invoquer un Duskborn",
@@ -8755,7 +8755,7 @@ export const fr_CA: EnTranslations = {
         "description": "Vos attaques automatiques ont une chance de vous permettre de lancer Tombe précoce sur une cible quel que soit son niveau de vie, sans coût de rage. (Armes)"
       },
       "storm_bolt": {
-        "name": "Projectile-tempête",
+        "name": "Thunderhurl",
         "description": "Lancez votre arme sur la cible, infligeant {damage} et l'étourdissant pendant 3 s."
       },
       "piercing_howl": {
@@ -8775,7 +8775,7 @@ export const fr_CA: EnTranslations = {
         "description": "Imprégnez votre arme du sang de vos ennemis : vous et vos alliés de mêlée gagnez 10% de vitesse d'attaque et 10% de dégâts pendant 20 s."
       },
       "victory_rush": {
-        "name": "Ruée victorieuse",
+        "name": "Victor's Surge",
         "description": "Frappe infligeant les dégâts de l'arme plus {damage} et vous soignant de 20% de votre vie maximale. Utilisable seulement dans les 20 s suivant la mort d'un ennemi."
       },
       "intimidating_shout": {
@@ -8787,7 +8787,7 @@ export const fr_CA: EnTranslations = {
         "description": "Attaque dans un large arc et inflige des dégâts physiques à tous les ennemis devant vous. Au-delà de 5 cibles, les dégâts sont réduits. Quand vous esquivez ou parez, votre prochaine Vengeance peut ne coûter aucune rage. (Protection)"
       },
       "heroic_leap": {
-        "name": "Bond de guerre",
+        "name": "Vaulting Charge",
         "description": "Bondit vers la zone ciblée et inflige {damage} points de dégâts aux ennemis proches à l’atterrissage."
       },
       "rallying_cry": {
@@ -8803,7 +8803,7 @@ export const fr_CA: EnTranslations = {
         "description": "Vous vous transformez en colosse pendant 20 s, ce qui dissipe tous les effets de contrôle vous affectant et augmente de 20% les dégâts que vous infligez."
       },
       "avenging_wrath": {
-        "name": "Aile vengeresse",
+        "name": "Zealwing",
         "description": "Invoque une puissance vengeresse, augmentant votre puissance d'attaque de 60 et votre puissance des sorts de 30 pendant 20 s. (talent de Paladin)"
       },
       "berserk": {
@@ -8815,7 +8815,7 @@ export const fr_CA: EnTranslations = {
         "description": "Vous devenez une tempête d’acier tourbillonnante qui inflige {damage} points de dégâts chaque seconde pendant 4 s à tous les ennemis à moins de 6 mètres."
       },
       "blink": {
-        "name": "Pas scintillant",
+        "name": "Flitstep",
         "description": "Vous téléporte de 15 m vers l'avant et brise les immobilisations. (talent de Mage)"
       },
       "bloodlust": {
@@ -8843,7 +8843,7 @@ export const fr_CA: EnTranslations = {
         "description": "Golpea a proches ennemis con escarcha e inflige {damage} de daño de Givre. (talent de mage)"
       },
       "counterspell": {
-        "name": "Brise-sort",
+        "name": "Spellsever",
         "description": "Contre l’incantation de la cible et l’empêche de lancer des sorts de cette école de magie pendant 6 s."
       },
       "curse_of_exhaustion": {
@@ -8992,7 +8992,7 @@ export const fr_CA: EnTranslations = {
       },
       "preparation": {
         "name": "Contingence",
-        "description": "Met fin au temps de recharge de Sprint, Évasion et Disparition. (talent de Voleur)"
+        "description": "Finishes the cooldown on Swift Heels, Ghostfoot, and Smokefade. (Rogue talent)"
       },
       "presence_of_mind": {
         "name": "Esprit fulgurant",
@@ -9023,7 +9023,7 @@ export const fr_CA: EnTranslations = {
         "description": "Vous disparaissez dans un nuage de fumée, ce qui augmente vos chances d’esquiver de 30 % pendant 8 s."
       },
       "spellsteal": {
-        "name": "Vol de sort",
+        "name": "Spellplunder",
         "description": "Vole un effet magique bénéfique à un ennemi et vous le transfère."
       },
       "startle_shot": {
@@ -9421,7 +9421,7 @@ export const fr_CA: EnTranslations = {
         "name": "Éclat de cœur de Kazzix"
       },
       "wyrmcult_orders": {
-        "name": "Ordres du Culte du Wyrm"
+        "name": "Broodsworn Orders"
       },
       "ritual_phylactery": {
         "name": "Phylactère rituel"
@@ -9484,7 +9484,7 @@ export const fr_CA: EnTranslations = {
         "name": "Haubert d'écailles de Gravewyrm"
       },
       "wyrmcult_grand_robe": {
-        "name": "Grande robe du Culte du Wyrm"
+        "name": "Broodsworn Grand Robe"
       },
       "wyrmscale_jerkin": {
         "name": "Pourpoint en écailles de wyrm"
@@ -10153,7 +10153,7 @@ export const fr_CA: EnTranslations = {
         "name": "Manteau du chant des éclats"
       },
       "wyrmcult_spellgrips": {
-        "name": "Gantelets de sorts du culte du wyrm"
+        "name": "Broodsworn Spellgrips"
       },
       "thornpeak_wildwraps": {
         "name": "Bandelettes sauvages des épines des cimes"
@@ -10162,7 +10162,7 @@ export const fr_CA: EnTranslations = {
         "name": "Haubert votif de la tempête"
       },
       "cryptbloom_shoulderguards": {
-        "name": "Épaulières Florécrypte"
+        "name": "Tombpetal Shoulderguards"
       },
       "gravewyrm_thornmaul": {
         "name": "Marteau épineux du Gravewyrm"
@@ -10417,7 +10417,7 @@ export const fr_CA: EnTranslations = {
         "name": "Bottines doublées de l'âtre"
       },
       "frostmane_mantle": {
-        "name": "Manteau des Crins-de-givre"
+        "name": "Mantle of the Rimemane"
       },
       "ashbone_war_brand": {
         "name": "Tison de guerre Ashbone"
@@ -10576,7 +10576,7 @@ export const fr_CA: EnTranslations = {
         "name": "Œil de l'artisan"
       },
       "reins_terrorspark_groundshaker": {
-        "name": "Clé de contact : Terrétincelle, l’Ébranleur de sol"
+        "name": "Ignition Key: Dreadspark Groundshaker"
       },
       "reins_drakemaw_raptor": {
         "name": "Rênes du Raptor du Drakemaw"
@@ -10744,7 +10744,7 @@ export const fr_CA: EnTranslations = {
         "name": "Masse sanctifiée de Voss"
       },
       "wyrmcult_soulsteps": {
-        "name": "Pas-d'âme du Culte du Wyrm"
+        "name": "Broodsworn Soulsteps"
       },
       "wyrmshadow_harness": {
         "name": "Harnais Nightfang"
@@ -10975,7 +10975,7 @@ export const fr_CA: EnTranslations = {
         "name": "Heaume du reliquaire du diacre"
       },
       "varric_shadow_cowl": {
-        "name": "Cagoule d'ombre de Varric"
+        "name": "Cagoule d'ombre de Vandric"
       },
       "siltguard_helm": {
         "name": "Heaume de garde-vase"
@@ -11152,7 +11152,7 @@ export const fr_CA: EnTranslations = {
         "name": "Cordon de gel des os"
       },
       "mistforged_pauldrons": {
-        "name": "Spallières forgées dans la brume"
+        "name": "Fogforged Pauldrons"
       },
       "tideguard_faceguard": {
         "name": "Garde-visage du Gardien des marées"
@@ -11466,10 +11466,10 @@ export const fr_CA: EnTranslations = {
         "name": "Seigneur des éclats Kazzix"
       },
       "wyrmcult_zealot": {
-        "name": "Zélote du Culte du Wyrm"
+        "name": "Broodsworn Zealot"
       },
       "wyrmcult_necromancer": {
-        "name": "Nécromancien du Culte du Wyrm"
+        "name": "Broodsworn Necromancer"
       },
       "boneclad_revenant": {
         "name": "Revenant caparaçonné d'os"
@@ -11577,7 +11577,7 @@ export const fr_CA: EnTranslations = {
         "name": "Effigie sans saint"
       },
       "deacon_varric": {
-        "name": "Diacre Varric"
+        "name": "Diacre Vandric"
       },
       "acolyte_tessa": {
         "name": "Acolyte Tessa"
@@ -11769,7 +11769,7 @@ export const fr_CA: EnTranslations = {
         "name": "Lutin des tourbières"
       },
       "frostmane_yeti": {
-        "name": "Yeti Crin-de-givre"
+        "name": "Rimemane Yeti"
       },
       "terrace_howler": {
         "name": "Hurleur des terrasses"
@@ -11817,7 +11817,7 @@ export const fr_CA: EnTranslations = {
         "name": "Le Meredark"
       },
       "harvest_sprite": {
-        "name": "Lutin des moissons"
+        "name": "Gleaning Sprite"
       },
       "mere_lurker": {
         "name": "Rôdeur du lac"
@@ -11841,7 +11841,7 @@ export const fr_CA: EnTranslations = {
         "name": "Arpenteur du crépuscule"
       },
       "nightkin_stargazer": {
-        "name": "Astrologue nocturnien"
+        "name": "Gloamkin Stargazer"
       },
       "barrow_king": {
         "name": "Le Roi des tertres"
@@ -11991,7 +11991,7 @@ export const fr_CA: EnTranslations = {
         "name": "Emberkin"
       },
       "gloomshade": {
-        "name": "Gloomshade"
+        "name": "Duskmurk"
       },
       "duskborn": {
         "name": "Duskborn"
@@ -12262,7 +12262,7 @@ export const fr_CA: EnTranslations = {
       },
       "provisioner_fenna": {
         "name": "Ravitailleuse Fenna",
-        "title": "Ravitailleuse d'Eldergleam",
+        "title": "Ravitailleuse d'Eldershine",
         "greeting": "Le pain est encore chaud, l'eau encore douce. Le Creux pourvoit, et moi aussi."
       },
       "wardsmith_orun": {
@@ -12387,12 +12387,12 @@ export const fr_CA: EnTranslations = {
       },
       "sexton_marrow": {
         "name": "Sacristain Marrow",
-        "title": "Sacristain de Gallowmere",
+        "title": "Sacristain de Gibbetmere",
         "greeting": "Nous les enterrons profondément ici, et nous sonnons les cloches pour qu'ils se souviennent de rester couchés."
       },
       "widow_tansy": {
         "name": "Veuve Tansy",
-        "title": "Cirière de Gallowmere",
+        "title": "Cirière de Gibbetmere",
         "greeting": "Une bougie pour chaque tombe, et pas une ne doit s'éteindre. Pas une, vous m'entendez ?"
       },
       "vicar_creel": {
@@ -12416,7 +12416,7 @@ export const fr_CA: EnTranslations = {
         "greeting": "La mer donne, le sable garde, et la jungle prend. Restez sur la grève, étranger."
       },
       "hermit_okku": {
-        "name": "Okku",
+        "name": "Okrim",
         "title": "L'Homme qui est entré",
         "greeting": "Silence, maintenant. Les tambours comptent tout ce qui marche sous les arbres, et ils vous ont déjà compté."
       },
@@ -13064,7 +13064,7 @@ export const fr_CA: EnTranslations = {
       },
       "q_drogmar": {
         "title": "Seigneur de guerre Drogmar",
-        "text": "Drogmar a pris la monnaie du Wyrmcult et juré les clans au réveil de la montagne. Entrez dans son camp et tuez-le, {playerName}, pour Highwatch.",
+        "text": "Drogmar a pris la monnaie du Broodsworn et juré les clans au réveil de la montagne. Entrez dans son camp et tuez-le, {playerName}, pour Highwatch.",
         "completion": "Drogmar est mort dans son propre camp. Vous avez acheté un hiver à mon mur, {playerName}.",
         "objectives": {
           "0": {
@@ -13104,11 +13104,11 @@ export const fr_CA: EnTranslations = {
       },
       "q_zealots": {
         "title": "Chants sur le vent",
-        "text": "Le vent porte des chants depuis les pics du sud. Faites taire 12 zélotes, {playerName}; chaque voix tue achète une nuit de sommeil.",
+        "text": "When the wind comes off the southern peaks, {playerName}, it carries chanting. The Broodsworn no longer hides - they have raised tents below the Sanctum and they sing to what sleeps beneath it. Silence twelve zealots. Every voice stilled buys the mountain another night of sleep.",
         "completion": "Le vent est plus calme. Ce qui m'inquiète, {playerName}, c'est que quelque chose réponde peut-être.",
         "objectives": {
           "0": {
-            "label": "Zélote du Culte du Wyrm tué"
+            "label": "Broodsworn Zealot slain"
           }
         }
       },
@@ -13181,7 +13181,7 @@ export const fr_CA: EnTranslations = {
             "label": "Zélote du Culte du Wyrm tué"
           },
           "1": {
-            "label": "Nécromancien du Culte du Wyrm tué"
+            "label": "Broodsworn Necromancer slain"
           }
         }
       },
@@ -13621,7 +13621,7 @@ export const fr_CA: EnTranslations = {
       },
       "q_hollow_old_marrowshell": {
         "title": "La vieille carapace des hauts-fonds",
-        "text": "Le premier nom est Vieux Marrowshell, un crabe de la taille d'un chariot qui chasse dans les hauts-fonds de l'est depuis avant qu'Eldergleam n'ait de porte. Il erre, {playerName}, alors vous devrez parcourir le rivage jusqu'à croiser sa trace. N'y allez pas seul, et ne vous fiez pas à son immobilité.",
+        "text": "Le premier nom est Vieux Marrowshell, un crabe de la taille d'un chariot qui chasse dans les hauts-fonds de l'est depuis avant qu'Eldershine n'ait de porte. Il erre, {playerName}, alors vous devrez parcourir le rivage jusqu'à croiser sa trace. N'y allez pas seul, et ne vous fiez pas à son immobilité.",
         "completion": "Les hauts-fonds ne sont plus que de l'eau à nouveau. J'ai vu cette carapace briser de meilleurs chasseurs que moi, {playerName}. Pas vous.",
         "objectives": {
           "0": {
@@ -13763,12 +13763,12 @@ export const fr_CA: EnTranslations = {
         }
       },
       "q_fv_frostmane_tyrant": {
-        "title": "Le tyran Frostmane",
-        "text": "Les hurleurs ne chassaient pas quand ils sont descendus des terrasses. Ils fuyaient. Un yeti s'est emparé des hauteurs, les gens de la montagne l'appellent le Frostmane, et même les meutes refusent de partager une pente avec lui. Il faut en finir, {playerName}, avant que l'hiver ne le pousse jusqu'à mes murs. Amenez un ami. Amenez-en deux.",
-        "completion": "Quand le vent est tombé la nuit dernière, tout le village a entendu le silence là où se tenait autrefois le Frostmane. Le Reach vous doit une dette qu'il mettra des années à payer, {playerName}. Portez ceci, et chaque porte d'Icemantle vous sera ouverte.",
+        "title": "Le tyran Rimemane",
+        "text": "Les hurleurs ne chassaient pas quand ils sont descendus des terrasses. Ils fuyaient. Un yeti s'est emparé des hauteurs, les gens de la montagne l'appellent le Rimemane, et même les meutes refusent de partager une pente avec lui. Il faut en finir, {playerName}, avant que l'hiver ne le pousse jusqu'à mes murs. Amenez un ami. Amenez-en deux.",
+        "completion": "Quand le vent est tombé la nuit dernière, tout le village a entendu le silence là où se tenait autrefois le Rimemane. Le Reach vous doit une dette qu'il mettra des années à payer, {playerName}. Portez ceci, et chaque porte d'Icemantle vous sera ouverte.",
         "objectives": {
           "0": {
-            "label": "Le Frostmane abattu"
+            "label": "Le Rimemane abattu"
           }
         }
       },
@@ -13921,7 +13921,7 @@ export const fr_CA: EnTranslations = {
         "completion": "Quatre seaux de retour à leurs crochets, et les rangées redevenues calmes. Vous avez la main plus lourde que moi avec les lutins, {playerName}, et aujourd'hui je m'en réjouis.",
         "objectives": {
           "0": {
-            "label": "Lutin des moissons chassé"
+            "label": "Gleaning Sprite driven off"
           },
           "1": {
             "label": "Seau à sève récupéré"
@@ -14063,7 +14063,7 @@ export const fr_CA: EnTranslations = {
       },
       "q_nb_eyes_on_the_vigil": {
         "title": "Des yeux sur la Vigie",
-        "text": "Quelque chose rend les arpenteurs audacieux et les troupeaux nerveux, {playerName}, et je ne peux pas le lire dans les fleurs. Cassian, lui, peut le lire dans le ciel. Il tient son camp d'observation près de la Vigie immobile à l'est d'ici, où les nocturniens dérivent parmi les pierres. Trouvez-le, et demandez-lui ce que disent les étoiles.",
+        "text": "Something has the striders bold and the herds uneasy, {playerName}, and I cannot read it in the flowers. Cassian can read it in the sky. He keeps his observatory camp by the Standing Vigil east of here, where the gloamkin drift among the stones. Find him, and ask what the stars are saying.",
         "completion": "Lira vous envoie ? Alors les jardins le ressentent aussi. Asseyez-vous près de la lunette un instant, {playerName}. Les étoiles sont agitées depuis un mois, et chaque carte que je dresse penche vers le nord, vers le tertre.",
         "objectives": {
           "0": {
@@ -14073,7 +14073,7 @@ export const fr_CA: EnTranslations = {
       },
       "q_nb_charts_of_the_stones": {
         "title": "Les cartes dans les pierres",
-        "text": "Les pierres de la Vigie sont plus anciennes que Moonrest, plus anciennes que les nocturniens qui les entretiennent, et leurs faces sont gravées de cartes stellaires que j'ai passé ma vie à apprendre à lire. Le ciel a dérivé, {playerName}, et je dois savoir de combien. Lisez les cartes sur trois des pierres et rapportez-moi leurs relèvements.",
+        "text": "The Vigil stones are older than Moonrest, older than the gloamkin who tend them, and their faces are cut with star charts I have spent my life learning to read. The sky has shifted, {playerName}, and I must know how far. Read the charts on three of the stones and bring me their bearings.",
         "completion": "Il ne reste plus aucun doute. Chaque relèvement a dérivé vers le Tertre Sans Sommeil, comme si le ciel lui-même se penchait sur ce tertre pour observer. Les vieux rois n'ont pas été enterrés sous des étoiles alignées par hasard, {playerName}.",
         "objectives": {
           "0": {
@@ -14097,7 +14097,7 @@ export const fr_CA: EnTranslations = {
       "q_nb_the_barrow_king": {
         "title": "Le Roi des tertres s'éveille",
         "text": "Chaque relèvement, chaque étoile agitée, chaque tertre ouvert pointe vers une seule chose : le Roi des tertres s'éveille sous le grand tertre, et ce royaume n'a pas d'aube pour le retenir. Il doit être mis au repos avant qu'il ne se souvienne de sa couronne, {playerName}. N'y allez pas seul : amenez un ami, et gardez la lumière des fleurs dans votre dos.",
-        "completion": "Les étoiles se sont apaisées pour la première fois depuis une saison, {playerName}. Les tertres sont refermés, les nocturniens se sont immobilisés à leurs pierres, et le roi dort de nouveau en dessous. Portez ce manteau : Moonrest l'a taillé pour qui la nuit finirait par accorder sa confiance.",
+        "completion": "The stars have settled for the first time in a season, {playerName}. The mounds are closed, the gloamkin have gone still at their stones, and the king sleeps below once more. Wear this mantle: Moonrest cut it for whoever the night finally trusted.",
         "objectives": {
           "0": {
             "label": "Le Roi des tertres mis au repos"
@@ -14105,9 +14105,9 @@ export const fr_CA: EnTranslations = {
         }
       },
       "q_ww_bells_of_gallowmere": {
-        "title": "Les cloches de Gallowmere",
-        "text": "Vous entendez ce glas, {playerName} ? C'est Gallowmere, sur la route du nord, qui sonne pour endormir ses morts. Le Sacristain Marrow tient le compte de chaque âme sous la canopée, vivante ou enterrée. Allez vous faire compter, avant que le bois ne vous compte lui-même.",
-        "completion": "Cobb vous a envoyé sur la route entier, n'est-ce pas ? Brave homme. Il garde ces lanternes de porte allumées depuis trente ans, et le bois n'est jamais passé devant lui. Bienvenue à Gallowmere, {playerName}. Prenez garde aux cloches.",
+        "title": "Les cloches de Gibbetmere",
+        "text": "Vous entendez ce glas, {playerName} ? C'est Gibbetmere, sur la route du nord, qui sonne pour endormir ses morts. Le Sacristain Marrow tient le compte de chaque âme sous la canopée, vivante ou enterrée. Allez vous faire compter, avant que le bois ne vous compte lui-même.",
+        "completion": "Cobb vous a envoyé sur la route entier, n'est-ce pas ? Brave homme. Il garde ces lanternes de porte allumées depuis trente ans, et le bois n'est jamais passé devant lui. Bienvenue à Gibbetmere, {playerName}. Prenez garde aux cloches.",
         "objectives": {
           "0": {
             "label": "Faire un rapport au Sacristain Marrow"
@@ -14136,7 +14136,7 @@ export const fr_CA: EnTranslations = {
       },
       "q_ww_candles_at_the_bounds": {
         "title": "Des bougies aux limites",
-        "text": "Quatre pierres limitrophes entourent Gallowmere, {playerName}, une sur chaque route de sortie, et une bougie funéraire brûle sur chaque pierre. Tant qu'elles brûlent, les enterrés restent enterrés. La bruine les a noyées, toutes les quatre, et je suis trop vieux pour parcourir les limites seul. Prenez mon cierge et rallumez-les, vite.",
+        "text": "Quatre pierres limitrophes entourent Gibbetmere, {playerName}, une sur chaque route de sortie, et une bougie funéraire brûle sur chaque pierre. Tant qu'elles brûlent, les enterrés restent enterrés. La bruine les a noyées, toutes les quatre, et je suis trop vieux pour parcourir les limites seul. Prenez mon cierge et rallumez-les, vite.",
         "completion": "Toutes les quatre allumées ? Alors respirez, {playerName}. Vous ne l'avez pas entendu, mais tout le village si : les cloches ont sonné plus doucement à l'instant où la dernière mèche a pris.",
         "objectives": {
           "0": {
@@ -14166,7 +14166,7 @@ export const fr_CA: EnTranslations = {
       },
       "q_ww_what_the_bark_holds": {
         "title": "Ce que retient l'écorce",
-        "text": "Dans la Clairière Pendue à l'est de Gallowmere, les fileuses suspendent leurs morts enveloppés de soie aux branches, et les traînards à l'écorce burinée montent la garde en dessous comme de patients porteurs de cercueil. Ce sont nos gens, là-haut, {playerName}. Brisez cinq traînards, décrochez trois des morts enveloppés, et ramenez-les à la terre.",
+        "text": "Dans la Clairière Pendue à l'est de Gibbetmere, les fileuses suspendent leurs morts enveloppés de soie aux branches, et les traînards à l'écorce burinée montent la garde en dessous comme de patients porteurs de cercueil. Ce sont nos gens, là-haut, {playerName}. Brisez cinq traînards, décrochez trois des morts enveloppés, et ramenez-les à la terre.",
         "completion": "Trois âmes de retour sous une terre honnête avant la tombée de la nuit. Les traînards repousseront, l'écorce le fait toujours, mais ce soir la clairière est vide, et cela suffit.",
         "objectives": {
           "0": {
@@ -14180,17 +14180,17 @@ export const fr_CA: EnTranslations = {
       "q_ww_walking_mosley_home": {
         "title": "Ramener Mosley chez lui",
         "text": "Mon fossoyeur Mosley a pris la route de la chapelle il y a trois jours pour ouvrir une parcelle dans le vieux cimetière, et la fosse s'est effondrée sur lui. Il s'est extirpé en griffant, l'idiot est vivant, mais il est recroquevillé près des tombes de la chapelle et refuse de bouger à cause des fileuses sur la route. Ramenez-le, {playerName}. Je ne peux pas sonner les cloches pour un homme vivant.",
-        "completion": "Il a franchi la porte sur ses deux jambes, jurant qu'il ne creusera plus rien de plus profond qu'un carré de navets désormais. Il sera de retour au cimetière dimanche, ils le sont toujours. Merci, {playerName}. Gallowmere garde ses gens, c'est là toute notre loi.",
+        "completion": "Il a franchi la porte sur ses deux jambes, jurant qu'il ne creusera plus rien de plus profond qu'un carré de navets désormais. Il sera de retour au cimetière dimanche, ils le sont toujours. Merci, {playerName}. Gibbetmere garde ses gens, c'est là toute notre loi.",
         "objectives": {
           "0": {
-            "label": "Fossoyeur Mosley ramené sain et sauf à Gallowmere"
+            "label": "Fossoyeur Mosley ramené sain et sauf à Gibbetmere"
           }
         }
       },
       "q_ww_horn_of_the_huntsman": {
         "title": "Le cor du chasseur",
         "text": "Vous avez entendu le cor à présent, {playerName}, ténu et lointain, le son pour lequel tout le bois retient son souffle. Le Chasseur pâle chevauche sa clairière au nord d'ici, et chaque tombe qu'il traverse devient plus superficielle. C'était un homme autrefois, et il fut mal enterré, et j'ai cessé de prétendre que la prière suffirait. Prenez un ami, prenez-en deux, et désarçonnez-le.",
-        "completion": "Le cor s'est arrêté en pleine note. Chaque cloche de Gallowmere a sonné une fois, d'elle-même, puis le bois est devenu plus silencieux que je ne l'ai entendu depuis trente ans. Vous avez accompli le rite que je ne pouvais accomplir, {playerName}. Portez ceci, et marchez sous la canopée sans crainte.",
+        "completion": "Le cor s'est arrêté en pleine note. Chaque cloche de Gibbetmere a sonné une fois, d'elle-même, puis le bois est devenu plus silencieux que je ne l'ai entendu depuis trente ans. Vous avez accompli le rite que je ne pouvais accomplir, {playerName}. Portez ceci, et marchez sous la canopée sans crainte.",
         "objectives": {
           "0": {
             "label": "Le Chasseur pâle désarçonné"
@@ -14239,11 +14239,11 @@ export const fr_CA: EnTranslations = {
       },
       "q_pr_the_man_who_went_in": {
         "title": "L'homme qui est entré",
-        "text": "Les plongeurs refusent de dépasser la lisière des arbres, {playerName}, et je ne leur demanderai pas de le faire. Vous avez entendu les tambours à présent : tout le monde les entend, dès la deuxième nuit. Un seul homme sur cette île a jamais marché vers ce son et en est revenu. Okku. Il campe sous les grands banians de la Chute de Lianes, loin sur la route de l'Enchevêtrement. Trouvez-le, et demandez-lui ce que cache la verdure.",
+        "text": "Les plongeurs refusent de dépasser la lisière des arbres, {playerName}, et je ne leur demanderai pas de le faire. Vous avez entendu les tambours à présent : tout le monde les entend, dès la deuxième nuit. Un seul homme sur cette île a jamais marché vers ce son et en est revenu. Okrim. Il campe sous les grands banians de la Chute de Lianes, loin sur la route de l'Enchevêtrement. Trouvez-le, et demandez-lui ce que cache la verdure.",
         "completion": "Isha vous envoie ? La Mère-des-perles n'a pas prononcé mon nom depuis des années. Asseyez-vous hors de portée des lianes, {playerName}, et je vous dirai ce que je sais : les tambours ne sont pas le danger. Ils sont l'avertissement.",
         "objectives": {
           "0": {
-            "label": "Trouver Okku à la Chute de Lianes"
+            "label": "Trouver Okrim à la Chute de Lianes"
           }
         }
       },
@@ -14722,7 +14722,7 @@ export const fr_CA: EnTranslations = {
             "label": "Le Glimmermere"
           },
           "7": {
-            "label": "Tentes du Culte du Wyrm"
+            "label": "Broodsworn Tents"
           },
           "8": {
             "label": "Champs des revenants"
@@ -14734,10 +14734,10 @@ export const fr_CA: EnTranslations = {
       },
       "veiled_hollow": {
         "name": "Le Vallon Voilé",
-        "welcome": "L'air résonne d'une magie ancienne. Cherchez la Gardienne Saelwyn sous le grand arbre d'Eldergleam.",
+        "welcome": "L'air résonne d'une magie ancienne. Cherchez la Gardienne Saelwyn sous le grand arbre d'Eldershine.",
         "pois": {
           "0": {
-            "label": "Eldergleam"
+            "label": "Eldershine"
           },
           "1": {
             "label": "La Grotte du Crépuscule"
@@ -14875,7 +14875,7 @@ export const fr_CA: EnTranslations = {
             "label": "La Porte de la Nuit"
           },
           "2": {
-            "label": "Le Puits de Lune"
+            "label": "The Moonspring"
           },
           "3": {
             "label": "Gloamfield"
@@ -14890,10 +14890,10 @@ export const fr_CA: EnTranslations = {
       },
       "wraithwood": {
         "name": "Le Bois des Spectres",
-        "welcome": "La canopée se referme sur la route comme un couvercle. Restez près des lanternes de Gallowmere, et ne répondez pas si la forêt appelle votre nom.",
+        "welcome": "La canopée se referme sur la route comme un couvercle. Restez près des lanternes de Gibbetmere, et ne répondez pas si la forêt appelle votre nom.",
         "pois": {
           "0": {
-            "label": "Gallowmere"
+            "label": "Gibbetmere"
           },
           "1": {
             "label": "La Porte aux Corbeaux"

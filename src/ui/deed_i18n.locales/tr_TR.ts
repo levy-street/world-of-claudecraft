@@ -38,9 +38,7 @@ export const table: DeedLocaleTable = {
     title: 'Çavuş',
   },
   pvp_honor_knight_lieutenant: {
-    name: 'Şövalye-Teğmen',
     desc: 'Ömrün boyunca 40.000 onur kazan, arkanda gerçek bir savaş mevsimi bırak.',
-    title: 'Şövalye-Teğmen',
   },
   pvp_honor_field_marshal: {
     name: 'Saha Mareşali',
@@ -76,7 +74,6 @@ export const table: DeedLocaleTable = {
     desc: 'Nightbloom da bir cevher damari, bir odun alani ve bir ot yatagi hasat et.',
   },
   chr_nightbloom_first_cast: {
-    name: 'Ay Kuyusunda Bir Halka',
     desc: 'Nightbloom sularindan bir balik yakala.',
   },
   chr_wraithwood_gatherer: {
@@ -280,7 +277,6 @@ export const table: DeedLocaleTable = {
     title: 'Ejderdeviren',
   },
   dgn_sanctum_speed: {
-    name: 'Mabet Koşusu',
     desc: "Grubunun Mezarejderi Mabedi'ni almasından itibaren 15 dakika içinde Mezarejderi Korzul'u alt et.",
   },
   dgn_nythraxis_gravebreaker: {
@@ -346,7 +342,7 @@ export const table: DeedLocaleTable = {
   },
   dlv_varric_ringers: {
     name: 'Çanlar Susar',
-    desc: "Diyakoz Varric'i, dirilttiği her Cenaze Çancısı çoktan öldürülmüşken yen.",
+    desc: "Diyakoz Vandric'i, dirilttiği her Cenaze Çancısı çoktan öldürülmüşken yen.",
   },
   dlv_nhalia_bells: {
     name: 'Çan Susturan',
@@ -422,7 +418,6 @@ export const table: DeedLocaleTable = {
   },
   chr_peaks_chapter_iii: {
     name: "Dikenzirve'nin Vakayinamesi",
-    desc: "Dağın hikâyesini sonuna dek götür: Ejder Tarikatı'nı çökert, Mabet'i sustur, Uyanan Zirve'yi devir ve kayalıkların adı bilinen her dehşetini yere ser.",
     title: 'Dikenzirveli',
   },
   chr_peaks_sparring: {

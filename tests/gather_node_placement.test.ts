@@ -305,7 +305,7 @@ function cellKey(x: number, z: number): string {
 }
 
 // The hub CENTRE is not guaranteed walkable: several expansion hubs seat a
-// structure on the exact centre (Eldergleam's great tree, the Wyrmwatch
+// structure on the exact centre (Eldershine's great tree, the Wyrmwatch
 // brazier, Icemantle's hearth), and a player gathers from the plaza around
 // it. The flood therefore starts from the nearest passable cell inside the
 // hub circle; a hub with NO passable cell at all would return the centre and

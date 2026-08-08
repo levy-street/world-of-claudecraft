@@ -573,7 +573,7 @@ describe('delve interactables and affixes', () => {
     expect(after).toBe(before);
   });
 
-  it('an evade/wipe reset cancels Deacon Varric in-flight Raise Dead channel', () => {
+  it('an evade/wipe reset cancels Deacon Vandric in-flight Raise Dead channel', () => {
     const sim = makeSim();
     enterReliquary(sim);
     const run = sim.delveRunForPlayer(sim.playerId)!;
@@ -840,12 +840,12 @@ describe('delve interactables and affixes', () => {
     }
   });
 
-  it('Deacon Varric enrages on Heroic but not on Normal (PRD §7.4)', () => {
+  it('Deacon Vandric enrages on Heroic but not on Normal (PRD §7.4)', () => {
     for (const tier of ['normal', 'heroic'] as const) {
       const sim = makeSim();
       enterReliquary(sim, tier);
       const run = sim.delveRunForPlayer(sim.playerId)!;
-      // Register a Varric in this run so delveRunForMob resolves him to its tier.
+      // Register a Vandric in this run so delveRunForMob resolves him to its tier.
       const boss = createMob((sim as any).nextId++, MOBS.deacon_varric, 12, {
         x: run.origin.x,
         y: 0,

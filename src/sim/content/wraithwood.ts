@@ -2,7 +2,7 @@
 // slips under the Crowgate and the canopy closes overhead: a drowned-grey
 // haunted forest where giant overgrown trees shut out the sky, a drizzle
 // that never quite stops, and things between the trunks that watch the
-// road. The hamlet of Gallowmere holds the center; Widow's Thicket crawls
+// road. The hamlet of Gibbetmere holds the center; Widow's Thicket crawls
 // in the west, the Hanging Glade swings in the east, the ruined Mournstone
 // Chapel moulders by its black tarn, and the Pale Huntsman keeps his
 // clearing in the far north. Terrain: the WOOD_* tables in world.ts; the
@@ -36,7 +36,7 @@ export const WRAITHWOOD_ZONE: ZoneDef = {
   levelRange: [20, 20],
   biome: 'haunt',
   southPassX: 390, // the Crowgate: the climb up from the garden's lawns
-  hub: { x: 360, z: 1430, radius: 17, name: 'Gallowmere' },
+  hub: { x: 360, z: 1430, radius: 17, name: 'Gibbetmere' },
   graveyard: { x: 378, z: 1412 },
   lakes: [
     { x: 290, z: 1500, radius: 10 }, // the Black Looking-Glass
@@ -44,7 +44,7 @@ export const WRAITHWOOD_ZONE: ZoneDef = {
     { x: 452, z: 1444, radius: 11 }, // the Drowned Coppice
   ],
   pois: [
-    { x: 360, z: 1430, label: 'Gallowmere', id: 'gallowmere' },
+    { x: 360, z: 1430, label: 'Gibbetmere', id: 'gallowmere' },
     { x: 390, z: 1292, label: 'The Crowgate', id: 'the_crowgate' },
     { x: 280, z: 1484, label: "Widow's Thicket", id: 'widows_thicket' },
     { x: 440, z: 1530, label: 'The Hanging Glade', id: 'the_hanging_glade' },
@@ -52,7 +52,7 @@ export const WRAITHWOOD_ZONE: ZoneDef = {
     { x: 380, z: 1680, label: "The Huntsman's Clearing", id: 'the_huntsmans_clearing' },
   ],
   welcome:
-    'The canopy closes over the road like a lid. Keep to the lanterns of Gallowmere, and do not answer if the wood calls your name.',
+    'The canopy closes over the road like a lid. Keep to the lanterns of Gibbetmere, and do not answer if the wood calls your name.',
   welcomeQuestId: 'q_ww_bells_of_gallowmere',
 };
 
@@ -62,23 +62,23 @@ export const WRAITHWOOD_ROADS: { x: number; z: number }[][] = [
     { x: 384, z: 1326 },
     { x: 370, z: 1382 },
     { x: 360, z: 1430 },
-  ], // the Crowgate -> Gallowmere
+  ], // the Crowgate -> Gibbetmere
   [
     { x: 360, z: 1430 },
     { x: 322, z: 1454 },
     { x: 296, z: 1472 },
-  ], // Gallowmere -> Widow's Thicket
+  ], // Gibbetmere -> Widow's Thicket
   [
     { x: 360, z: 1430 },
     { x: 396, z: 1468 },
     { x: 422, z: 1504 },
-  ], // Gallowmere -> the Hanging Glade
+  ], // Gibbetmere -> the Hanging Glade
   [
     { x: 360, z: 1430 },
     { x: 338, z: 1500 },
     { x: 318, z: 1570 },
     { x: 306, z: 1608 },
-  ], // Gallowmere -> the Mournstone Chapel
+  ], // Gibbetmere -> the Mournstone Chapel
   [
     { x: 360, z: 1430 },
     { x: 368, z: 1510 },
@@ -87,14 +87,14 @@ export const WRAITHWOOD_ROADS: { x: number; z: number }[][] = [
     { x: 390, z: 1706 },
     { x: 398, z: 1748 },
     { x: 404, z: 1794 },
-  ], // Gallowmere -> the Huntsman's Clearing -> the Wyrmroad (into the waste)
+  ], // Gibbetmere -> the Huntsman's Clearing -> the Wyrmroad (into the waste)
   [
     { x: 360, z: 1430 },
     { x: 332, z: 1520 },
     { x: 327, z: 1620 },
     { x: 326, z: 1660 },
     { x: 306, z: 1744 },
-  ], // Gallowmere -> east of the chapel tarn -> the Ashmere's shore
+  ], // Gibbetmere -> east of the chapel tarn -> the Ashmere's shore
   [
     { x: 296, z: 1472 },
     { x: 262, z: 1496 },
@@ -191,7 +191,7 @@ export const WRAITHWOOD_MOBS: Record<string, MobTemplate> = {
     scale: 1.4,
     color: 0xc8d8c0,
   },
-  // Gallowmere's gravedigger (q_ww_walking_mosley_home). Escort-run escortee:
+  // Gibbetmere's gravedigger (q_ww_walking_mosley_home). Escort-run escortee:
   // non-hostile, never wanders (moveSpeed 0; src/sim/escort.ts drives all
   // movement), never fights back. Sturdy enough to survive an ambush wave
   // long enough for the escorting player to peel it.
@@ -215,7 +215,7 @@ export const WRAITHWOOD_MOBS: Record<string, MobTemplate> = {
   },
 };
 // The folk of the wood: a lampman minds the Crowgate waycamp, the sexton and
-// the candlewright hold Gallowmere, and the last vicar still tends the ruined
+// the candlewright hold Gibbetmere, and the last vicar still tends the ruined
 // Mournstone Chapel alone. The vicar stands far from the hub on purpose: the
 // chapel chain sends players out to find him.
 export const WRAITHWOOD_NPCS: Record<string, NpcDef> = {
@@ -232,7 +232,7 @@ export const WRAITHWOOD_NPCS: Record<string, NpcDef> = {
   sexton_marrow: {
     id: 'sexton_marrow',
     name: 'Sexton Marrow',
-    title: 'Sexton of Gallowmere',
+    title: 'Sexton of Gibbetmere',
     pos: { x: 363, z: 1436 },
     facing: -2.0,
     color: 0x6a6a72,
@@ -247,7 +247,7 @@ export const WRAITHWOOD_NPCS: Record<string, NpcDef> = {
   widow_tansy: {
     id: 'widow_tansy',
     name: 'Widow Tansy',
-    title: 'Candlewright of Gallowmere',
+    title: 'Candlewright of Gibbetmere',
     pos: { x: 357, z: 1424 },
     facing: 0.7,
     color: 0xb8a2c8,
@@ -274,12 +274,12 @@ export const WRAITHWOOD_NPCS: Record<string, NpcDef> = {
 export const WRAITHWOOD_QUESTS: Record<string, QuestDef> = {
   q_ww_bells_of_gallowmere: {
     id: 'q_ww_bells_of_gallowmere',
-    name: 'The Bells of Gallowmere',
+    name: 'The Bells of Gibbetmere',
     giverNpcId: 'lampman_cobb',
     turnInNpcId: 'sexton_marrow',
-    text: 'Hear that tolling, $N? That is Gallowmere, up the north road, ringing its dead to sleep. Sexton Marrow keeps the count of every soul under the canopy, living and buried. Go and be counted, before the wood counts you itself.',
+    text: 'Hear that tolling, $N? That is Gibbetmere, up the north road, ringing its dead to sleep. Sexton Marrow keeps the count of every soul under the canopy, living and buried. Go and be counted, before the wood counts you itself.',
     completionText:
-      'Cobb sent you up the road whole, did he? Good man. He has kept those gate lanterns lit for thirty years, and the wood has never once got past him. Welcome to Gallowmere, $N. Mind the bells.',
+      'Cobb sent you up the road whole, did he? Good man. He has kept those gate lanterns lit for thirty years, and the wood has never once got past him. Welcome to Gibbetmere, $N. Mind the bells.',
     objectives: [
       {
         type: 'interact',
@@ -339,7 +339,7 @@ export const WRAITHWOOD_QUESTS: Record<string, QuestDef> = {
     name: 'Candles at the Bounds',
     giverNpcId: 'widow_tansy',
     turnInNpcId: 'widow_tansy',
-    text: 'Four boundary stones ring Gallowmere, $N, one on each road out, and a grave-candle burns on every stone. While they burn, the buried stay buried. The drizzle has drowned them, all four, and I am too old to walk the bounds alone. Take my taper and relight them, quickly.',
+    text: 'Four boundary stones ring Gibbetmere, $N, one on each road out, and a grave-candle burns on every stone. While they burn, the buried stay buried. The drizzle has drowned them, all four, and I am too old to walk the bounds alone. Take my taper and relight them, quickly.',
     completionText:
       'All four burning? Then breathe, $N. You did not hear it, but the whole village did: the bells rang easier the moment the last wick caught.',
     objectives: [
@@ -393,7 +393,7 @@ export const WRAITHWOOD_QUESTS: Record<string, QuestDef> = {
     name: 'What the Bark Holds',
     giverNpcId: 'vicar_creel',
     turnInNpcId: 'vicar_creel',
-    text: 'In the Hanging Glade east of Gallowmere the spinners hang their silk-wrapped dead from the boughs, and the gravenbark shamblers stand guard beneath like patient pallbearers. Those are our people up there, $N. Break five shamblers, cut down three of the wrapped dead, and bring them home to soil.',
+    text: 'In the Hanging Glade east of Gibbetmere the spinners hang their silk-wrapped dead from the boughs, and the gravenbark shamblers stand guard beneath like patient pallbearers. Those are our people up there, $N. Break five shamblers, cut down three of the wrapped dead, and bring them home to soil.',
     completionText:
       'Three souls back under honest ground before nightfall. The shamblers will grow back, bark always does, but tonight the glade hangs empty, and that is enough.',
     objectives: [
@@ -422,13 +422,13 @@ export const WRAITHWOOD_QUESTS: Record<string, QuestDef> = {
     turnInNpcId: 'sexton_marrow',
     text: 'My gravedigger Mosley took the chapel road three days ago to open a plot in the old yard, and the dig came down on top of him. He clawed his way out, the fool is alive, but he is huddled by the chapel graves and will not move for spinners on the road. Walk him home, $N. I cannot ring the bells for a living man.',
     completionText:
-      'He came through the gate on his own two feet, swearing he will dig nothing deeper than a turnip bed from now on. He will be back at the yard by Sunday, they always are. Thank you, $N. Gallowmere keeps its people, that is the whole of our law.',
+      'He came through the gate on his own two feet, swearing he will dig nothing deeper than a turnip bed from now on. He will be back at the yard by Sunday, they always are. Thank you, $N. Gibbetmere keeps its people, that is the whole of our law.',
     objectives: [
       {
         type: 'escort',
         escortId: 'esc_ww_mosley',
         count: 1,
-        label: 'Gravedigger Mosley walked safely back to Gallowmere',
+        label: 'Gravedigger Mosley walked safely back to Gibbetmere',
       },
     ],
     xpReward: 5600,
@@ -444,7 +444,7 @@ export const WRAITHWOOD_QUESTS: Record<string, QuestDef> = {
     turnInNpcId: 'vicar_creel',
     text: 'You have heard the horn by now, $N, thin and far off, the sound the whole wood holds its breath for. The Pale Huntsman rides his clearing north of here, and every grave he passes grows shallower. He was a man once, and he was buried wrong, and I am done pretending prayer will do it. Take a friend, take two, and unhorse him.',
     completionText:
-      'The horn stopped mid-note. Every bell in Gallowmere rang once, on its own, and then the wood went quieter than I have heard it in thirty years. You have done the rite I could not, $N. Wear this, and walk under the canopy unafraid.',
+      'The horn stopped mid-note. Every bell in Gibbetmere rang once, on its own, and then the wood went quieter than I have heard it in thirty years. You have done the rite I could not, $N. Wear this, and walk under the canopy unafraid.',
     objectives: [
       { type: 'kill', targetMobId: 'pale_huntsman', count: 1, label: 'The Pale Huntsman unhorsed' },
     ],
@@ -534,7 +534,7 @@ export const WRAITHWOOD_OBJECTS: GroundObjectDef[] = [
   {
     itemId: 'gallowmere_grave_candle',
     name: 'Grave-Candle',
-    // The four boundary stones of Gallowmere, one on each road out of the
+    // The four boundary stones of Gibbetmere, one on each road out of the
     // hamlet (q_ww_candles_at_the_bounds).
     positions: [
       { x: 370, z: 1384 }, // the Crowgate road
@@ -558,9 +558,9 @@ export const WRAITHWOOD_OBJECTS: GroundObjectDef[] = [
 
 // Walking Mosley Home (q_ww_walking_mosley_home): the gravedigger shelters
 // among the chapel graves where his dig collapsed and walks the chapel road
-// north to Gallowmere, through the wraiths pulling at the graveyard soil and
+// north to Gibbetmere, through the wraiths pulling at the graveyard soil and
 // the spinners strung over the road. Waypoints hug the authored road curve
-// above (Gallowmere -> the Mournstone Chapel, walked in reverse).
+// above (Gibbetmere -> the Mournstone Chapel, walked in reverse).
 export const WRAITHWOOD_ESCORTS: Record<string, EscortDef> = {
   esc_ww_mosley: {
     id: 'esc_ww_mosley',
@@ -572,7 +572,7 @@ export const WRAITHWOOD_ESCORTS: Record<string, EscortDef> = {
       { x: 338, z: 1500 },
       { x: 350, z: 1462 },
       // Stops on open ground at the village edge: the lantern-ring props
-      // around Gallowmere pin the deeper approach (verified by the
+      // around Gibbetmere pin the deeper approach (verified by the
       // walkability sweep in tests/escort_quest.test.ts).
       { x: 357, z: 1447 },
     ],
@@ -593,7 +593,7 @@ export const WRAITHWOOD_ESCORTS: Record<string, EscortDef> = {
 
 export const WRAITHWOOD_PROPS: ZonePropsDef = {
   ...emptyZoneProps(),
-  // Gallowmere: a shuttered hamlet under the eaves
+  // Gibbetmere: a shuttered hamlet under the eaves
   buildings: [
     { kind: 'inn', x: 352, z: 1434, w: 6, d: 7, rot: 0.5 },
     { kind: 'house', x: 368, z: 1426, w: 6, d: 6, rot: -1.2 },

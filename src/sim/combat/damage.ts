@@ -1454,7 +1454,7 @@ export function handleDeath(
       ) {
         ctx.applyAura(creditEntity, {
           id: 'victory_rush',
-          name: 'Victory Rush',
+          name: "Victor's Surge",
           kind: 'victory_rush',
           value: 0,
           remaining: VICTORY_RUSH_WINDOW,

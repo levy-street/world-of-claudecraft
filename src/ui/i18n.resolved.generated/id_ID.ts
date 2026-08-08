@@ -566,7 +566,7 @@ export const id_ID: EnTranslations = {
         "ice_fang_sword": {
           "name": "Taring Es",
           "look": "Bilah es glasial pucat yang melengkung, kristal rime bergerigi di sepanjang tulang belakang, inti beku sian yang bersinar di pelindung es yang lebih penuh.",
-          "lore": "Unggulan dari kelas beku, dan barang yang pertama kali diraih oleh setiap kolektor. Ice Fang diukir, bukan ditempa, dari taring gletser yang menutupi Thornpeak di atas Highwatch, inti cyannya terbakar dingin seperti cahaya dari Glimmermere. Itu sama dengan udara yang dipotongnya. Penjaga tembok bersumpah bahwa seorang tentara membawanya pada malam ketika salju tinggi menahan Wyrmcult, dan 'membeli tembok itu untuk musim dingin.'"
+          "lore": "Unggulan dari kelas beku, dan barang yang pertama kali diraih oleh setiap kolektor. Ice Fang diukir, bukan ditempa, dari taring gletser yang menutupi Thornpeak di atas Highwatch, inti cyannya terbakar dingin seperti cahaya dari Glimmermere. Itu sama dengan udara yang dipotongnya. Penjaga tembok bersumpah bahwa seorang tentara membawanya pada malam ketika salju tinggi menahan Broodsworn, dan 'membeli tembok itu untuk musim dingin.'"
         },
         "glaciersplit_axe": {
           "name": "Kapak Pembelah Gletser",
@@ -594,7 +594,7 @@ export const id_ID: EnTranslations = {
           "lore": "Pecahan es gletser bercahaya yang konon berasal dari kedalaman di bawah Sanctum, tempat hawa dingin gunung memiliki taring. Embun beku terus mekar dari kerah peraknya dan tidak mencair oleh api ataupun musim panas. Para Penyihir menyimpannya dekat saat bekerja, tetapi menjauhkannya ketika tongkat itu seolah mencondongkan diri untuk mendengar ruang bawah tanah Nythraxis."
         },
         "winterbite": {
-          "name": "Busur Winterbite",
+          "name": "Busur Wintergnaw",
           "look": "Baja berwarna perak dan busur es biru, inti beku sian yang bersinar di bagian atas, panah es padat, uap dingin.",
           "lore": "Busur dari baja perak dan es Thornpeak, dengan inti biru dingin yang membekukan anak panah pada talinya. Setiap tarikan membentuk kembali sebatang es gletser, sehingga pemanah di tembok tidak membawa tabung panah, hanya hawa dingin. Konon Highwatch mempertahankan Prowler Ridge sepanjang pengepungan dengan satu pemanah dan persediaan anak panah selama musim dingin."
         },
@@ -1006,7 +1006,7 @@ export const id_ID: EnTranslations = {
       "name_shadowjump_toad": "Kama-Kage Sang Kodok Lompat-Bayangan",
       "name_stormfeather_griffin": "Stormfeather Penjelajah Langit",
       "name_thunderstrut_gobbler": "Thunderstrut Sang Kalkun Agung",
-      "name_terrorspark_groundshaker": "Percik Teror, Pengguncang Bumi",
+      "name_terrorspark_groundshaker": "Dreadspark Groundshaker",
       "name_drakemaw_raptor": "Raptor Drakemaw",
       "desc_valorsteed": "Kuda tunggangan tangguh berpijakan mantap yang memberikan kecepatan perjalanan tambahan.",
       "desc_grag_bear": "Beruang tangguh berpijakan mantap yang memberikan kecepatan perjalanan tambahan.",
@@ -1487,7 +1487,7 @@ export const id_ID: EnTranslations = {
         "battleTrance": "Kesurupan Pertempuran",
         "overpowerCharge": "Penguatan Tangan Merah",
         "suddenDeath": "Kematian Mendadak",
-        "victoryRush": "Terjangan Kemenangan",
+        "victoryRush": "Victor's Surge",
         "enrage": "Huru-hara: Murka",
         "heatingUp": "Memanas",
         "arcaneCharge": "Muatan Arkan",
@@ -1970,7 +1970,7 @@ export const id_ID: EnTranslations = {
       "sanguine": "Meningkatkan kecepatan serangan sebesar {hastePct}% dan kerusakan yang diberikan sebesar {dmgPct}%",
       "battleTrance": "Serangan Perampas atau Serangan Pelukai berikutnya tidak membutuhkan Amarah",
       "revengeFree": "Balas Dendam berikutnya tidak membutuhkan Amarah",
-      "victoryRush": "Terjangan Kemenangan siap digunakan",
+      "victoryRush": "Victor's Surge is ready",
       "maxHpPct": "Meningkatkan nyawa maksimum sebesar {pct}%",
       "temporalHourglass": "Kebal dan tidak dapat bertindak; memulihkan kesehatan dan mempercepat pemulihan jeda. Klik kanan untuk membatalkan.",
       "tongues": "Aumenta el tiempo de lanzamiento un {pct}%",
@@ -4031,13 +4031,13 @@ export const id_ID: EnTranslations = {
       "valeBlurb": "Lembah awal yang hijau, tempat para pahlawan baru mengasah diri melawan serigala dan bandit di sekitar kota Eastbrook.",
       "marshBlurb": "Negeri yang tenggelam penuh kabut dan reruntuhan. Mudfin berkerumun di perairan dangkal dan sesuatu yang lebih tua bergerak di bawah air, diawasi dari kota-jembatan Fenbridge.",
       "peaksBlurb": "Punggung bukit yang terkikis angin dan bekas tambang tua yang menanjak ke bahaya tertinggi dan terdingin di alam ini, dijaga oleh pos Highwatch.",
-      "duskBlurb": "Sebuah lembah senja abadi di bawah pohon agung Eldergleam, tempat reruntuhan kristal bersinar dan udara berdengung dengan sihir kuno.",
+      "duskBlurb": "Sebuah lembah senja abadi di bawah pohon agung Eldershine, tempat reruntuhan kristal bersinar dan udara berdengung dengan sihir kuno.",
       "emberBlurb": "Padang tandus yang diterangi badai, berisi abu dan bloodglass, tempat drake-drake berputar di atas kaldera dan api troll membara di antara gumuk pasir, diawasi dari kota gerbang Wyrmwatch.",
       "frostBlurb": "Keheningan salju dan pohon pinus gelap di bawah aurora, tempat hawa dingin itu sendiri terasa terjaga dan Icemantle menjaga apinya tetap menyala.",
       "amberBlurb": "Musim gugur abadi berisi daun-daun keemasan dan merah yang tak pernah gugur, berkumpul di sekitar kota Lanternmere yang diterangi lentera.",
       "fenBlurb": "Sebuah lahan basah yang cerah dan berdengung, berisi bunga lili dan air yang tenang, diseberangi lewat jalan papan tua dari kota jembatan Bridgemere.",
       "nightBlurb": "Sebuah alam tengah malam berbintang tempat bunga-bunga menerangi jalan setapak dan Moonrest menjaga kesunyian di bawah langit yang bermimpi.",
-      "hauntBlurb": "Sebuah hutan berhantu di bawah kanopi raksasa, tempat lentera-lentera Gallowmere adalah satu-satunya cahaya jujur di jalan.",
+      "hauntBlurb": "Sebuah hutan berhantu di bawah kanopi raksasa, tempat lentera-lentera Gibbetmere adalah satu-satunya cahaya jujur di jalan.",
       "galeBlurb": "Tebing laut dan perbukitan melolong tempat angin tak pernah beristirahat, Suar Tua tak pernah padam, dan Wickharbor menutup rapat pintu-pintunya.",
       "jungleBlurb": "Sebuah belukar tropis berisi pohon palem, pasir putih, dan burung-burung berkicau riuh, dengan kota pantai Drifthaven menjaga api tetap menyala di pesisir.",
       "gardenBlurb": "Sebuah alam taman labirin pagar yang masih rapi terpangkas tanpa tukang kebun yang pernah terlihat siapa pun, dimasuki lewat Hedgewick dan pelataran air mancurnya.",
@@ -4048,7 +4048,7 @@ export const id_ID: EnTranslations = {
       "peaksGreeting": "Dua ratus tahun tembok ini bertahan. Ia tidak akan jebol dalam tugas jagaku, tetapi ia merintih.",
       "peaksGreeter": "Captain Thessaly, Highwatch",
       "duskGreeting": "Sedikit dari bangsamu pernah berdiri di bawah dahan-dahan ini. Melangkahlah dengan lembut, dan selamat datang.",
-      "duskGreeter": "Penjaga Saelwyn, Eldergleam",
+      "duskGreeter": "Penjaga Saelwyn, Eldershine",
       "emberGreeting": "Angin panas dari padang tandus, naga-naga di atas Drakemaw, dan api troll di gumuk pasir. Minumlah dulu sebelum kau melangkah keluar ke sana.",
       "emberGreeter": "Sang penjaga gerbang, Wyrmwatch",
       "frostGreeting": "Salju menelan setiap suara di luar tembok. Jika cahaya mulai menari, tenangkan suaramu dan jaga apimu tetap menyala.",
@@ -4060,7 +4060,7 @@ export const id_ID: EnTranslations = {
       "nightGreeting": "Melewati Gerbang Malam, udara itu sendiri bermimpi. Ikuti cahaya bunga, dan waspadai dunia tidur yang tergantung di langit.",
       "nightGreeter": "Sang penjaga malam, Moonrest",
       "hauntGreeting": "Tetaplah dekat lentera, wahai pengembara. Dan jika hutan ini memanggil namamu dari luar jalan, jangan menyahutnya.",
-      "hauntGreeter": "Sang penyala lentera, Gallowmere",
+      "hauntGreeter": "Sang penyala lentera, Gibbetmere",
       "galeGreeting": "Angin di sini tak pernah berhenti barang sekali, dan Suar Tua tak pernah padam barang sekali. Tutup pintu penginapan di belakangmu.",
       "galeGreeter": "Sang penjaga suar, Wickharbor",
       "jungleGreeting": "Pasir hangat, burung-burung berkicau riuh, dan rimba yang melahap cakrawala. Kami menjaga api tetap menyala di pantai; usahakanlah untuk kembali padanya.",
@@ -4069,14 +4069,14 @@ export const id_ID: EnTranslations = {
       "gardenGreeter": "Sang penjaga gerbang, Hedgewick",
       "valePlaceNotes": "Eastbrook adalah markas pertamamu. Wolf Run dan Boar Meadow adalah lahan berburu yang lembut; Mirror Lake adalah air yang bagus untuk memancing, meski mudfin memenuhi perairan dangkalnya; Sableweb dan Copper Dig menyembunyikan laba-laba dan penggali yang rakus bijih; sebuah Bandit Camp dan Fallen Chapel menyimpan pekerjaan yang lebih kasar; Reliquary Hill menurun ke Collapsed Reliquary, delve pertama realm; Brightwood Glade adalah hutan kecil tenang yang dibasuh sinar matahari di utara; dan Sowfield adalah lapangan bola babi hutan bertembok milik Eastbrook, tempat Piala Lembah dimainkan di bawah gencatan panen.",
       "marshPlaceNotes": "Fenbridge menjaga satu-satunya jalan kering. Prowler Reeds dan Deepfen Shallows dipenuhi binatang rawa dan Mudfin; Widow Thicket dipintal tebal oleh jaring; Drowned Chapel dan Troll Mounds menyimpan bahaya yang lebih tua, dengan Litani Tenggelam, delve milik rawa ini, terbuka tepat di utara gundukan itu; Gravecaller Encampment adalah sarang kultus yang menggali masuk, dan Benteng Karam adalah jantung berinstans rawa ini.",
-      "peaksPlaceNotes": "Highwatch menjaga tembok. Stalker Ridge dan Deeprock Burrows milik kucing punggung bukit dan penggali liang; Ogre Foothills dan Drogmar's War-Camp milik para bedebah bayaran; Stormcrag berderak oleh elemental, dan di bawahnya bersinar Glimmermere, tasik yang tepiannya menyimpan gerbang cahaya pucat menuju Kuil Tenggelam; Wyrmcult Tents dan Revenant Fields mengelilingi dataran tinggi kultus, dengan Sanktum Gravewyrm di puncaknya.",
-      "duskPlaceNotes": "Eldergleam berkumpul di bawah pohon agung itu. Gua Duskfall dan titik pandangnya adalah jalan masuk sekaligus pemandangan pertama lembah ini; Rimba Elder dan Cekungan Bintang Jatuh menjaga selatan yang sunyi; Pelataran Tenggelam menyimpan reruntuhan yang ditumbuhi semak di timur; dan Kedalaman Berkilau serta Perairan Dangkal Kristal bersinar di sepanjang utara.",
+      "peaksPlaceNotes": "Highwatch menjaga tembok. Stalker Ridge dan Deeprock Burrows milik kucing punggung bukit dan penggali liang; Ogre Foothills dan Drogmar's War-Camp milik para bedebah bayaran; Stormcrag berderak oleh elemental, dan di bawahnya bersinar Glimmermere, tasik yang tepiannya menyimpan gerbang cahaya pucat menuju Kuil Tenggelam; Broodsworn Tents dan Revenant Fields mengelilingi dataran tinggi kultus, dengan Sanktum Gravewyrm di puncaknya.",
+      "duskPlaceNotes": "Eldershine berkumpul di bawah pohon agung itu. Gua Duskfall dan titik pandangnya adalah jalan masuk sekaligus pemandangan pertama lembah ini; Rimba Elder dan Cekungan Bintang Jatuh menjaga selatan yang sunyi; Pelataran Tenggelam menyimpan reruntuhan yang ditumbuhi semak di timur; dan Kedalaman Berkilau serta Perairan Dangkal Kristal bersinar di sepanjang utara.",
       "emberPlaceNotes": "Wyrmwatch menjaga gerbang itu. Hutan Gerbang adalah kehijauan terakhir sebelum padang tandus; Gumuk Pasir Abu melayang dengan abu dan hal yang lebih buruk; Trollmoot adalah tempat troll gumuk pasir mengumpulkan api mereka; Padang Bloodglass berkilauan dengan pecahan tajam bagai silet; dan Kaldera Drakemaw adalah mahkota berasap yang dikitari para drake.",
       "frostPlaceNotes": "Icemantle menjaga perapian hangat terakhir. Garis Salju menandai tempat tumpukan salju mulai menguasai; Danau Gletser adalah air hitam yang tenang di bawah es; Tangga Aurora menanjak di bawah cahaya yang menari; Shiverfen adalah rawa beku yang tak pernah benar-benar tidur; dan Teras Lolongan membuktikan namanya setiap malam.",
       "amberPlaceNotes": "Lanternmere bersinar di jantung musim panen. Goldmelt adalah jalan masuk yang licin oleh damar; Kebun Bersepuh Emas dan Ceruk Panen menyimpan hasil petik yang termanis dan pencuri yang paling berani; Danau Besar memantulkan dedaunan yang membara; Ketinggian Cindermaple berdiri paling tinggi dan paling merah; dan Monolit Condong mengingat sesuatu yang lebih tua dari musim gugur.",
       "fenPlaceNotes": "Bridgemere berdiri mengangkangi air yang tenang. Tangga Amberfen turun dari negeri panen; Paya Lili dan Kolam Bogshine berkilauan dengan kunang rawa dan capung; Willowweep menjuntaikan dahan-dahannya ke danau; dan Dataran Mengantuk adalah bagian paling lembut dari tanah ini.",
-      "nightPlaceNotes": "Moonrest menjaga kesunyian malam. Gerbang Malam adalah jalan menuju negeri tengah malam; Sumur Bulan menampung cahaya bintang yang bisa kau berdiri di sampingnya; Gloamfield mekar dalam kegelapan; Sang Penjaga Tegak mengawasi tanpa pernah bergerak; dan Gundukan Tanpa Tidur adalah satu-satunya tempat di sini yang tak pernah bermimpi.",
-      "hauntPlaceNotes": "Gallowmere meringkuk di dalam lentera-lenteranya. Gerbang Gagak adalah pintu depan hutan yang suram; Semak Janda terjalin tebal dengan jaring laba-laba; Padang Tergantung dan Kapel Mournstone menyimpan duka tertua hutan ini; dan Tanah Lapang Sang Pemburu menjadi milik apa pun yang masih berburu di sana.",
+      "nightPlaceNotes": "Moonrest keeps the vigil. The Nightgate is the way into the midnight country; the Moonspring holds starlight you can stand beside; Gloamfield blooms in the dark; the Standing Vigil watches without ever moving; and the Sleepless Barrow is the one place here that never dreams.",
+      "hauntPlaceNotes": "Gibbetmere meringkuk di dalam lentera-lenteranya. Gerbang Gagak adalah pintu depan hutan yang suram; Semak Janda terjalin tebal dengan jaring laba-laba; Padang Tergantung dan Kapel Mournstone menyimpan duka tertua hutan ini; dan Tanah Lapang Sang Pemburu menjadi milik apa pun yang masih berburu di sana.",
       "galePlaceNotes": "Wickharbor bersandar melawan angin. Jalan Angin adalah jalan tebing masuk; Perbukitan Lolongan bergulung tanpa pohon di bawah badai; Suar Tua telah menyala selama yang bisa diingat siapa pun; Tebing Curam jatuh curam ke air; Ladang Bangkai Kapal menjaga kejujuran pesisir; dan Danau Cermin adalah satu-satunya hal yang diam di seluruh alam ini.",
       "junglePlaceNotes": "Drifthaven menjaga apinya di pantai. Muara Belukar adalah tempat sungai bertemu tembok hijau; Pesisir Palem membentang putih dan hangat di sepanjang ombak; Belukar Zamrud dan Air Terjun Sulur menelan pedalaman; Laguna Safir bersinar jernih dan dalam; dan Arca Tenggelam mengawasi dari bawah air.",
       "gardenPlaceNotes": "Hedgewick menanti di Gerbang Taman. Jalan Parterre mekar dalam warna yang tertata rapi; Kastel Dawnhold melatih para ksatrianya di balik tembok baru; Kolam Kelopak melayang merah muda sepanjang tahun; Kilang Tua memutar bedengannya sendiri; Labirin Besar mengatur ulang caranya untuk setiap tamu, lengkungannya diawasi oleh rubah-rubah berdaun; Pos Jaga Utara menjaga jalan keluar; Cekungan Lili beristirahat di luar semua itu; dan Pelataran Air Mancur masih mengalir jernih di jantung taman.",
@@ -6277,24 +6277,24 @@ export const id_ID: EnTranslations = {
     "boss": {
       "varric": {
         "bell": {
-          "emote": "Diakon Varric mencengkeram lonceng terkubur itu dengan kedua tangannya!",
-          "log": "Diakon Varric mulai membunyikan lonceng pemakaman.",
-          "warning": "Menjauhlah dari Diakon Varric!",
+          "emote": "Diakon Vandric mencengkeram lonceng terkubur itu dengan kedua tangannya!",
+          "log": "Diakon Vandric mulai membunyikan lonceng pemakaman.",
+          "warning": "Menjauhlah dari Diakon Vandric!",
           "impact": "Dentang lonceng meretakkan lantai ruangan!",
           "lesson": "Dentang Lonceng: hantaman tanah setiap dua belas detik. Menyingkirlah sebelum mendarat."
         },
         "raise": {
-          "emote": "Diakon Varric memanggil nama-nama dari kuburan yang hancur!",
-          "log": "Diakon Varric mulai membangkitkan orang mati.",
+          "emote": "Diakon Vandric memanggil nama-nama dari kuburan yang hancur!",
+          "log": "Diakon Vandric mulai membangkitkan orang mati.",
           "warning": "Hentikan ritus kubur itu!",
           "object": "Kubur yang retak bergetar oleh napas yang dicuri.",
           "interrupt_ok": "Ritus kubur itu tersendat.",
-          "interrupt_fail": "Para mati menjawab panggilan Diakon Varric!",
+          "interrupt_fail": "Para mati menjawab panggilan Diakon Vandric!",
           "lesson": "Putuskan ritus pada kubur yang retak dalam lima detik atau para mati akan bangkit memenuhi panggilannya."
         },
         "pull": "Kau menginjak debu suci dengan niat kotor. Berlututlah, dan dicatat.",
         "intro": "Tak ada jiwa yang hilang. Hanya tersesat.",
-        "mid60": "Diakon Varric membaca nama-nama dari buku catatan dengan kemenangan yang gemetar.",
+        "mid60": "Diakon Vandric membaca nama-nama dari buku catatan dengan kemenangan yang gemetar.",
         "mid30": "Lonceng pemakaman menjawab setiap nama yang ia ucapkan.",
         "defeat": "Tidak... aku sudah memiliki nama-nama itu... semuanya..."
       }
@@ -7980,7 +7980,7 @@ export const id_ID: EnTranslations = {
       },
       "cold_snap": {
         "name": "Panggilan Musim Dingin",
-        "description": "Mengakhiri waktu pemulihan Langkah Kedip, Selubung Beku, dan Ketaklihatan Agung. (talenta mage)"
+        "description": "Finishes the cooldown on Flitstep, Frostveil, and Greater Invisibility. (Mage talent)"
       },
       "greater_invisibility": {
         "name": "Ketaklihatan Agung",
@@ -8031,15 +8031,15 @@ export const id_ID: EnTranslations = {
         "description": "Lepaskan tiga baut es untuk masing-masing kerusakan {damage} Frost dan terapkan Winter's Chill pada target: 2 mantra kompatibel berikutnya yang masuk akan memperlakukannya sebagai beku. Brain Freeze menjadikan Winterlash instan dan melewatkan cooldownnya. (Embun beku)"
       },
       "frozen_orb": {
-        "name": "Bola Beku",
+        "name": "Frostglobe",
         "description": "Melepaskan bola es yang berputar-putar yang melayang ke depan selama 8 detik, menimbulkan kerusakan {damage} Frost setiap detik ke musuh di sekitar dan memperlambat mereka sebesar 30%. Setiap denyut nadi menghasilkan satu es. (Embun beku)"
       },
       "blizzard": {
         "name": "Badai Salju",
-        "description": "Memanggil badai es ke area target selama 6 dtk, memberikan {damage} kerusakan Beku setiap detik dan memperlambat musuh sebesar 40%. Setiap musuh yang terkena mempersingkat Frozen Orb sebesar 0,5 dtk, hingga 3 dtk per rapalan. (Beku)"
+        "description": "Memanggil badai es ke area target selama 6 dtk, memberikan {damage} kerusakan Beku setiap detik dan memperlambat musuh sebesar 40%. Setiap musuh yang terkena mempersingkat Frostglobe sebesar 0,5 dtk, hingga 3 dtk per rapalan. (Beku)"
       },
       "glacial_spike": {
-        "name": "Pancang Glasial",
+        "name": "Rimeneedle",
         "description": "Konjur paku es raksasa, mengonsumsi 5 Jarum Es untuk memberikan {damage} kerusakan Beku dan membekukan target di tempat selama 4 dtk. (Beku)"
       },
       "glacial_front": {
@@ -8171,7 +8171,7 @@ export const id_ID: EnTranslations = {
         "description": "Gerakan penutup yang melukai target, membuatnya berdarah sebesar {damage} selama 16 detik."
       },
       "vanish": {
-        "name": "Langkah Asap",
+        "name": "Smokefade",
         "description": "Menghilang dari pandangan, masuk ke Duskveil bahkan dalam pertempuran. Kau bergerak 50% lebih lambat saat tersembunyi. Bertahan hingga 10 detik."
       },
       "instant_poison": {
@@ -8555,7 +8555,7 @@ export const id_ID: EnTranslations = {
         "description": "Memasuki amukan mendidih, menghasilkan 20 amarah. (Talenta Prajurit)"
       },
       "crusader_strike": {
-        "name": "Serangan Tentara Salib",
+        "name": "Oathstrike",
         "description": "Menyerang target dengan kerusakan senjata ditambah {damage} kerusakan Suci. (talenta Paladin)"
       },
       "chain_heal": {
@@ -8567,7 +8567,7 @@ export const id_ID: EnTranslations = {
         "description": "Mengambil kekuatan iblis, meningkatkan zirah dan daya serang selama 20 dtk. (talenta Warlock)"
       },
       "holy_shock": {
-        "name": "Kejutan Suci",
+        "name": "Lightjolt",
         "description": "Mengejutkan target kawan dengan energi Suci dan memulihkannya sebesar {damage}. (ciri khas Suci)"
       },
       "aura_surge": {
@@ -8587,7 +8587,7 @@ export const id_ID: EnTranslations = {
         "description": "Mengilhami sekutu di dekatmu, meningkatkan kekuatan serangan sebesar 35 selama 5 mnt. (ciri khas Penembakan)"
       },
       "wyvern_sting": {
-        "name": "Sengatan Wivern",
+        "name": "Drakesting",
         "description": "Menyengat musuh dari jarak jauh dan melumpuhkannya hingga 4 dtk. Kerusakan apa pun mematahkan efek ini. (ciri khas Bertahan Hidup)"
       },
       "arcane_power": {
@@ -8599,7 +8599,7 @@ export const id_ID: EnTranslations = {
         "description": "Meningkatkan peluang kritis mantra sebesar 50% selama 15 dtk. (signature Fire)"
       },
       "icy_veins": {
-        "name": "Urat Es",
+        "name": "Coldsurge",
         "description": "Meningkatkan haste mantra sebesar 30% dan mencegah interupsi serta pushback cast selama 10 dtk. (signature Frost)"
       },
       "cold_blood": {
@@ -8619,7 +8619,7 @@ export const id_ID: EnTranslations = {
         "description": "Mengisi target kawan dengan kekuatan, meningkatkan kekuatan mantra sebesar 28 selama 15 dtk. (ciri khas Disiplin)"
       },
       "holy_nova": {
-        "name": "Nova Suci",
+        "name": "Hallowburst",
         "description": "Menimbulkan ledakan cahaya Suci, memulihkan sekutu di dekatmu sebesar {damage} dan melukai musuh di dekatmu. (ciri khas Suci)"
       },
       "shadowform": {
@@ -8647,7 +8647,7 @@ export const id_ID: EnTranslations = {
         "description": "Menerjang musuh dan mengakarkannya selama 1 dtk. Jarak 8-25 m. (ciri khas Keganasan)"
       },
       "swiftmend": {
-        "name": "Pemulihan Cepat",
+        "name": "Fleetmend",
         "description": "Menghabiskan efek pemulihan berkala pada target kawan untuk memulihkannya sebesar {damage}. (ciri khas Pemulihan)"
       },
       "summon_imp": {
@@ -8655,8 +8655,8 @@ export const id_ID: EnTranslations = {
         "description": "Memanggil Emberkin di bawah perintah Penyihir Iblis. Emberkin melontarkan Ashbolt ke arah musuhmu dari kejauhan. Memanggil iblis baru akan membubarkan iblismu saat ini. Kau hanya boleh memiliki satu iblis pada satu waktu."
       },
       "summon_voidwalker": {
-        "name": "Panggil Gloomshade",
-        "description": "Memanggil Gloomshade di bawah perintah Penyihir Iblis. Gloomshade adalah iblis kokoh yang memprovokasi musuhmu dan menyerap hantaman. Memanggil iblis baru akan membubarkan iblismu saat ini. Kau hanya boleh memiliki satu iblis pada satu waktu."
+        "name": "Panggil Duskmurk",
+        "description": "Memanggil Duskmurk di bawah perintah Penyihir Iblis. Duskmurk adalah iblis kokoh yang memprovokasi musuhmu dan menyerap hantaman. Memanggil iblis baru akan membubarkan iblismu saat ini. Kau hanya boleh memiliki satu iblis pada satu waktu."
       },
       "summon_succubus": {
         "name": "Panggil Duskborn",
@@ -8755,7 +8755,7 @@ export const id_ID: EnTranslations = {
         "description": "Serangan otomatismu punya peluang membuatmu bisa merapal Ajal Dini pada target dengan kesehatan berapa pun, tanpa membutuhkan amarah. (Arms)"
       },
       "storm_bolt": {
-        "name": "Baut Badai",
+        "name": "Thunderhurl",
         "description": "Melemparkan senjatamu ke target sebesar {damage}, membuatnya terpana selama 3 detik."
       },
       "piercing_howl": {
@@ -8775,7 +8775,7 @@ export const id_ID: EnTranslations = {
         "description": "Mengisi senjatamu dengan darah musuh-musuhmu: kamu dan sekutu jarak dekatmu mendapatkan 10% kecepatan serangan dan 10% kerusakan selama 20 detik."
       },
       "victory_rush": {
-        "name": "Terjangan Kemenangan",
+        "name": "Victor's Surge",
         "description": "Menyerang sebesar kerusakan senjata ditambah {damage} dan memulihkan 20% dari nyawa maksimummu. Hanya dapat digunakan dalam 20 detik setelah membunuh musuh."
       },
       "intimidating_shout": {
@@ -8787,7 +8787,7 @@ export const id_ID: EnTranslations = {
         "description": "Menyerang dalam busur lebar, memberikan kerusakan Fisik kepada semua musuh di hadapanmu. Di atas 5 target kerusakannya berkurang. Saat kamu mengelak atau menangkis, Balas Dendam berikutnya mungkin tidak membutuhkan amarah. (Protection)"
       },
       "heroic_leap": {
-        "name": "Lompatan Perang",
+        "name": "Vaulting Charge",
         "description": "Melompat ke area target dan memberikan {damage} kerusakan kepada musuh di sekitar saat mendarat."
       },
       "rallying_cry": {
@@ -8803,7 +8803,7 @@ export const id_ID: EnTranslations = {
         "description": "Berubah menjadi kolosus selama 20 detik, melepaskan semua efek kontrol pada dirimu dan meningkatkan kerusakan yang kamu hasilkan sebesar 20%."
       },
       "avenging_wrath": {
-        "name": "Sayap Pembalas",
+        "name": "Zealwing",
         "description": "Memanggil kekuatan pembalasan, meningkatkan daya serangmu sebesar 60 dan kekuatan sihir sebesar 30 selama 20 detik. (talenta Paladin)"
       },
       "berserk": {
@@ -8815,7 +8815,7 @@ export const id_ID: EnTranslations = {
         "description": "Menjadi badai baja yang berputar, menghantam semua musuh dalam jarak 6 meter sebesar {damage} setiap detik selama 4 detik."
       },
       "blink": {
-        "name": "Langkah Kilat",
+        "name": "Flitstep",
         "description": "Menteleportasimu 15 m ke depan dan membebaskan efek pengakaran. (talenta Mage)"
       },
       "bloodlust": {
@@ -8843,7 +8843,7 @@ export const id_ID: EnTranslations = {
         "description": "Golpea a di dekat musuh con escarcha e inflige {damage} de daño de Es. (talenta mage)"
       },
       "counterspell": {
-        "name": "Penangkal Mantra",
+        "name": "Spellsever",
         "description": "Menangkal perapalan mantra target dan mencegah perapalan dari aliran sihir itu selama 6 detik."
       },
       "curse_of_exhaustion": {
@@ -8992,7 +8992,7 @@ export const id_ID: EnTranslations = {
       },
       "preparation": {
         "name": "Rencana Cadangan",
-        "description": "Mengakhiri waktu isi ulang Lari Cepat, Mengelak, dan Lenyap. (talenta Rogue)"
+        "description": "Finishes the cooldown on Swift Heels, Ghostfoot, and Smokefade. (Rogue talent)"
       },
       "presence_of_mind": {
         "name": "Pikiran Melaju",
@@ -9023,7 +9023,7 @@ export const id_ID: EnTranslations = {
         "description": "Kamu menghilang ke dalam kepulan asap, meningkatkan peluang menghindar sebesar 30% selama 8 dtk."
       },
       "spellsteal": {
-        "name": "Pencurian Mantra",
+        "name": "Spellplunder",
         "description": "Mencuri efek sihir menguntungkan dari musuh dan memindahkannya kepadamu."
       },
       "startle_shot": {
@@ -9421,7 +9421,7 @@ export const id_ID: EnTranslations = {
         "name": "Serpihan Jantung Kazzix"
       },
       "wyrmcult_orders": {
-        "name": "Titah Sekte Wyrm"
+        "name": "Broodsworn Orders"
       },
       "ritual_phylactery": {
         "name": "Filakteri Ritual"
@@ -9484,7 +9484,7 @@ export const id_ID: EnTranslations = {
         "name": "Baju Zirah Sisik Gravewyrm"
       },
       "wyrmcult_grand_robe": {
-        "name": "Jubah Agung Sekte Wyrm"
+        "name": "Broodsworn Grand Robe"
       },
       "wyrmscale_jerkin": {
         "name": "Rompi Sisik Wyrm"
@@ -10153,7 +10153,7 @@ export const id_ID: EnTranslations = {
         "name": "Mantel Nyanyian Serpihan"
       },
       "wyrmcult_spellgrips": {
-        "name": "Sarung Tangan Mantra Sekte Wyrm"
+        "name": "Broodsworn Spellgrips"
       },
       "thornpeak_wildwraps": {
         "name": "Pembalut Liar Puncak Duri"
@@ -10162,7 +10162,7 @@ export const id_ID: EnTranslations = {
         "name": "Baju Zirah Persembahan Badai"
       },
       "cryptbloom_shoulderguards": {
-        "name": "Pelindung Bahu Mekar Kripta"
+        "name": "Tombpetal Shoulderguards"
       },
       "gravewyrm_thornmaul": {
         "name": "Gada Duri Wyrm Kubur"
@@ -10417,7 +10417,7 @@ export const id_ID: EnTranslations = {
         "name": "Alas Kaki Berlapis Perapian"
       },
       "frostmane_mantle": {
-        "name": "Mantel Frostmane"
+        "name": "Mantel Rimemane"
       },
       "ashbone_war_brand": {
         "name": "Bilah Perang Ashbone"
@@ -10576,7 +10576,7 @@ export const id_ID: EnTranslations = {
         "name": "Mata Sang Perajin"
       },
       "reins_terrorspark_groundshaker": {
-        "name": "Kunci Kontak: Percik Teror, Pengguncang Bumi"
+        "name": "Ignition Key: Dreadspark Groundshaker"
       },
       "reins_drakemaw_raptor": {
         "name": "Tali Kekang Raptor Drakemaw"
@@ -10744,7 +10744,7 @@ export const id_ID: EnTranslations = {
         "name": "Gada Suci Voss"
       },
       "wyrmcult_soulsteps": {
-        "name": "Langkah Jiwa Sekte Wyrm"
+        "name": "Broodsworn Soulsteps"
       },
       "wyrmshadow_harness": {
         "name": "Tali Zirah Nightfang"
@@ -10975,7 +10975,7 @@ export const id_ID: EnTranslations = {
         "name": "Helm Relik Diakon"
       },
       "varric_shadow_cowl": {
-        "name": "Tudung Bayangan Varric"
+        "name": "Tudung Bayangan Vandric"
       },
       "siltguard_helm": {
         "name": "Helm Penjaga Lanau"
@@ -11152,7 +11152,7 @@ export const id_ID: EnTranslations = {
         "name": "Tali Pinggang Dingin Tulang"
       },
       "mistforged_pauldrons": {
-        "name": "Bahu Tempaan Kabut"
+        "name": "Fogforged Pauldrons"
       },
       "tideguard_faceguard": {
         "name": "Pelindung Wajah Penjaga Pasang"
@@ -11466,10 +11466,10 @@ export const id_ID: EnTranslations = {
         "name": "Tuan Serpihan Kazzix"
       },
       "wyrmcult_zealot": {
-        "name": "Fanatik Wyrmcult"
+        "name": "Fanatik Broodsworn"
       },
       "wyrmcult_necromancer": {
-        "name": "Nekromancer Wyrmcult"
+        "name": "Nekromancer Broodsworn"
       },
       "boneclad_revenant": {
         "name": "Revenant Berbalut Tulang"
@@ -11577,7 +11577,7 @@ export const id_ID: EnTranslations = {
         "name": "Patung Tanpa Orang Suci"
       },
       "deacon_varric": {
-        "name": "Diaken Varric"
+        "name": "Diaken Vandric"
       },
       "acolyte_tessa": {
         "name": "Akolit Tessa"
@@ -11769,7 +11769,7 @@ export const id_ID: EnTranslations = {
         "name": "Peri Rawa"
       },
       "frostmane_yeti": {
-        "name": "Yeti Frostmane"
+        "name": "Yeti Rimemane"
       },
       "terrace_howler": {
         "name": "Pelolong Teras"
@@ -11817,7 +11817,7 @@ export const id_ID: EnTranslations = {
         "name": "Sang Meredark"
       },
       "harvest_sprite": {
-        "name": "Peri Panen"
+        "name": "Gleaning Sprite"
       },
       "mere_lurker": {
         "name": "Pengintai Danau"
@@ -11841,7 +11841,7 @@ export const id_ID: EnTranslations = {
         "name": "Penjelajah Kelam"
       },
       "nightkin_stargazer": {
-        "name": "Pengamat Bintang Nightkin"
+        "name": "Pengamat Bintang Gloamkin"
       },
       "barrow_king": {
         "name": "Sang Raja Gundukan"
@@ -11991,7 +11991,7 @@ export const id_ID: EnTranslations = {
         "name": "Emberkin"
       },
       "gloomshade": {
-        "name": "Gloomshade"
+        "name": "Duskmurk"
       },
       "duskborn": {
         "name": "Duskborn"
@@ -12262,7 +12262,7 @@ export const id_ID: EnTranslations = {
       },
       "provisioner_fenna": {
         "name": "Juru Bekal Fenna",
-        "title": "Juru Bekal Eldergleam",
+        "title": "Juru Bekal Eldershine",
         "greeting": "Roti masih hangat, air masih segar. Ceruk ini menyediakan, begitu pula aku."
       },
       "wardsmith_orun": {
@@ -12387,12 +12387,12 @@ export const id_ID: EnTranslations = {
       },
       "sexton_marrow": {
         "name": "Koster Marrow",
-        "title": "Sexton Gallowmere",
+        "title": "Sexton Gibbetmere",
         "greeting": "Kami mengubur mereka dalam-dalam di sini, dan kami membunyikan lonceng agar mereka ingat untuk tetap di bawah."
       },
       "widow_tansy": {
         "name": "Janda Tansy",
-        "title": "Pembuat Lilin Gallowmere",
+        "title": "Pembuat Lilin Gibbetmere",
         "greeting": "Sebatang lilin untuk setiap makam, dan tak satu pun boleh padam. Tak satu pun, kau dengar aku?"
       },
       "vicar_creel": {
@@ -12416,7 +12416,7 @@ export const id_ID: EnTranslations = {
         "greeting": "Laut memberi, pasir menyimpan, dan rimba mengambil. Tetaplah di pesisir, wahai orang asing."
       },
       "hermit_okku": {
-        "name": "Okku",
+        "name": "Okrim",
         "title": "Sang Pria yang Masuk ke Dalam",
         "greeting": "Diamlah sekarang. Genderang itu menghitung segala yang berjalan di bawah pepohonan, dan mereka sudah menghitungmu."
       },
@@ -13064,7 +13064,7 @@ export const id_ID: EnTranslations = {
       },
       "q_drogmar": {
         "title": "Panglima Perang Drogmar",
-        "text": "Panglima Perang Drogmar mengambil keping emas Wyrmcult dan menyumpah klan-klan untuk kebangkitan sang gunung. Ia adalah palu yang hendak mereka ayunkan ke temboku, dan ketika ia menghantam tanah, {playerName}, jangan berdiri di dekatnya. Bawa rekan-rekanmu ke kemah perang dan akhiri dia, demi Highwatch.",
+        "text": "Panglima Perang Drogmar mengambil keping emas Broodsworn dan menyumpah klan-klan untuk kebangkitan sang gunung. Ia adalah palu yang hendak mereka ayunkan ke temboku, dan ketika ia menghantam tanah, {playerName}, jangan berdiri di dekatnya. Bawa rekan-rekanmu ke kemah perang dan akhiri dia, demi Highwatch.",
         "completion": "Drogmar, mati di kemahnya sendiri. Klan-klan akan tercerai ke jalur tinggi, kau telah membelikan satu musim dingin bagi temboku, {playerName}.",
         "objectives": {
           "0": {
@@ -13104,11 +13104,11 @@ export const id_ID: EnTranslations = {
       },
       "q_zealots": {
         "title": "Nyanyian di Angin",
-        "text": "Ketika angin datang dari puncak selatan, {playerName}, ia membawa nyanyian. Wyrmcult tak lagi bersembunyi, mereka telah mendirikan tenda di bawah Sanktum dan menyanyi untuk apa yang tidur di bawahnya. Bungkam dua belas fanatik. Setiap suara yang dibungkam membeli satu malam tidur lagi bagi gunung itu.",
+        "text": "Ketika angin datang dari puncak selatan, {playerName}, ia membawa nyanyian. Broodsworn tak lagi bersembunyi, mereka telah mendirikan tenda di bawah Sanktum dan menyanyi untuk apa yang tidur di bawahnya. Bungkam dua belas fanatik. Setiap suara yang dibungkam membeli satu malam tidur lagi bagi gunung itu.",
         "completion": "Angin lebih hening sekarang. Tapi yang merisaukanku bukan nyanyian itu, {playerName}, melainkan bahwa sesuatu mungkin menyahut.",
         "objectives": {
           "0": {
-            "label": "Fanatik Wyrmcult terbunuh"
+            "label": "Fanatik Broodsworn terbunuh"
           }
         }
       },
@@ -13181,7 +13181,7 @@ export const id_ID: EnTranslations = {
             "label": "Fanatik Wyrmcult terbunuh"
           },
           "1": {
-            "label": "Necromancer Wyrmcult terbunuh"
+            "label": "Necromancer Broodsworn terbunuh"
           }
         }
       },
@@ -13621,7 +13621,7 @@ export const id_ID: EnTranslations = {
       },
       "q_hollow_old_marrowshell": {
         "title": "Cangkang Tua di Perairan Dangkal",
-        "text": "Nama pertama adalah Marrowshell Tua, seekor kepiting sebesar gerobak yang telah berburu di perairan dangkal timur sejak sebelum Eldergleam memiliki gerbang. Ia mengembara, {playerName}, jadi kau harus menyusuri garis pantai hingga kau menemukan jejaknya. Jangan pergi sendirian, dan jangan percaya pada kediamannya.",
+        "text": "Nama pertama adalah Marrowshell Tua, seekor kepiting sebesar gerobak yang telah berburu di perairan dangkal timur sejak sebelum Eldershine memiliki gerbang. Ia mengembara, {playerName}, jadi kau harus menyusuri garis pantai hingga kau menemukan jejaknya. Jangan pergi sendirian, dan jangan percaya pada kediamannya.",
         "completion": "Perairan dangkal itu kembali hanya menjadi air. Aku telah menyaksikan cangkang itu menghancurkan pemburu yang lebih baik dariku, {playerName}. Tapi tidak kau.",
         "objectives": {
           "0": {
@@ -13763,12 +13763,12 @@ export const id_ID: EnTranslations = {
         }
       },
       "q_fv_frostmane_tyrant": {
-        "title": "Tiran Frostmane",
-        "text": "Para pelolong itu tidak sedang berburu saat mereka turun dari teras-teras itu. Mereka sedang melarikan diri. Seekor yeti telah menguasai dataran tinggi itu, penduduk gunung menyebutnya Frostmane, dan bahkan kawanan serigala tak mau berbagi lereng dengannya. Ini harus diakhiri, {playerName}, sebelum musim dingin mendorongnya turun ke tembokku. Ajak seorang kawan. Ajak dua.",
-        "completion": "Saat angin mereda semalam, seluruh desa mendengar keheningan di tempat Frostmane biasa berada. Reach ini berutang budi yang akan butuh bertahun-tahun untuk dibayar, {playerName}. Kenakan ini, dan setiap pintu di Icemantle akan terbuka untukmu.",
+        "title": "Tiran Rimemane",
+        "text": "Para pelolong itu tidak sedang berburu saat mereka turun dari teras-teras itu. Mereka sedang melarikan diri. Seekor yeti telah menguasai dataran tinggi itu, penduduk gunung menyebutnya Rimemane, dan bahkan kawanan serigala tak mau berbagi lereng dengannya. Ini harus diakhiri, {playerName}, sebelum musim dingin mendorongnya turun ke tembokku. Ajak seorang kawan. Ajak dua.",
+        "completion": "Saat angin mereda semalam, seluruh desa mendengar keheningan di tempat Rimemane biasa berada. Reach ini berutang budi yang akan butuh bertahun-tahun untuk dibayar, {playerName}. Kenakan ini, dan setiap pintu di Icemantle akan terbuka untukmu.",
         "objectives": {
           "0": {
-            "label": "Sang Frostmane terbunuh"
+            "label": "Sang Rimemane terbunuh"
           }
         }
       },
@@ -13921,7 +13921,7 @@ export const id_ID: EnTranslations = {
         "completion": "Empat ember kembali tergantung di kaitnya dan barisan pohon kembali sunyi. Tanganmu lebih tegas menghadapi para peri dibanding aku, {playerName}, dan hari ini aku bersyukur karenanya.",
         "objectives": {
           "0": {
-            "label": "Peri Panen diusir"
+            "label": "Gleaning Sprite driven off"
           },
           "1": {
             "label": "Ember Sadap Getah ditemukan kembali"
@@ -14063,7 +14063,7 @@ export const id_ID: EnTranslations = {
       },
       "q_nb_eyes_on_the_vigil": {
         "title": "Mata pada Sang Penjaga Tegak",
-        "text": "Sesuatu telah membuat para penjelajah berani dan kawanan gelisah, {playerName}, dan aku tak bisa membacanya dari bunga-bunga. Cassian bisa membacanya dari langit. Ia menjaga perkemahan observatoriumnya di dekat Sang Penjaga Tegak sebelah timur sini, tempat kaum nightkin melayang di antara batu-batu. Temukan dia, dan tanyakan apa yang dikatakan bintang-bintang.",
+        "text": "Something has the striders bold and the herds uneasy, {playerName}, and I cannot read it in the flowers. Cassian can read it in the sky. He keeps his observatory camp by the Standing Vigil east of here, where the gloamkin drift among the stones. Find him, and ask what the stars are saying.",
         "completion": "Lira mengirimmu? Berarti taman-taman itu juga merasakannya. Duduklah di dekat teropong sejenak, {playerName}. Bintang-bintang telah gelisah selama sebulan, dan setiap peta yang kugambar condong ke utara menuju gundukan itu.",
         "objectives": {
           "0": {
@@ -14073,7 +14073,7 @@ export const id_ID: EnTranslations = {
       },
       "q_nb_charts_of_the_stones": {
         "title": "Peta di Batu-Batu",
-        "text": "Batu-batu Vigili lebih tua dari Moonrest, lebih tua dari kaum nightkin yang merawatnya, dan permukaannya terukir peta bintang yang telah kuhabiskan seumur hidupku mempelajari cara membacanya. Langit telah bergeser, {playerName}, dan aku harus tahu seberapa jauh. Baca peta pada tiga batu dan bawakan aku arahnya.",
+        "text": "The Vigil stones are older than Moonrest, older than the gloamkin who tend them, and their faces are cut with star charts I have spent my life learning to read. The sky has shifted, {playerName}, and I must know how far. Read the charts on three of the stones and bring me their bearings.",
         "completion": "Tak ada keraguan lagi. Setiap arah telah merangkak menuju Gundukan Tanpa Tidur, seolah langit itu sendiri condong di atas gundukan itu untuk mengawasi. Raja-raja tua dulu dikubur di bawah bintang yang sejajar dengan alasan tertentu, {playerName}.",
         "objectives": {
           "0": {
@@ -14097,7 +14097,7 @@ export const id_ID: EnTranslations = {
       "q_nb_the_barrow_king": {
         "title": "Sang Raja Gundukan Terbangun",
         "text": "Setiap arah, setiap bintang yang gelisah, setiap gundukan yang terbuka menunjuk pada satu hal: Sang Raja Gundukan sedang terbangun di bawah gundukan besar itu, dan alam ini tak punya fajar untuk menahannya. Ia harus diistirahatkan sebelum ia mengingat mahkotanya, {playerName}. Jangan pergi sendirian: ajak seorang kawan, dan jaga cahaya bunga tetap di belakangmu.",
-        "completion": "Bintang-bintang telah tenang untuk pertama kalinya dalam satu musim, {playerName}. Gundukan-gundukan itu tertutup, kaum nightkin telah kembali diam di batu-batu mereka, dan sang raja tidur lagi di bawah sana. Kenakan mantel ini: Moonrest memangkasnya untuk siapa pun yang akhirnya dipercaya malam.",
+        "completion": "The stars have settled for the first time in a season, {playerName}. The mounds are closed, the gloamkin have gone still at their stones, and the king sleeps below once more. Wear this mantle: Moonrest cut it for whoever the night finally trusted.",
         "objectives": {
           "0": {
             "label": "Sang Raja Gundukan diistirahatkan"
@@ -14105,9 +14105,9 @@ export const id_ID: EnTranslations = {
         }
       },
       "q_ww_bells_of_gallowmere": {
-        "title": "Lonceng-Lonceng Gallowmere",
-        "text": "Dengar dentang itu, {playerName}? Itu Gallowmere, di jalan utara, membunyikan lonceng untuk menidurkan yang mati. Sexton Marrow menghitung setiap jiwa di bawah kanopi, yang hidup dan yang terkubur. Pergilah dan dihitung, sebelum hutan ini menghitungmu sendiri.",
-        "completion": "Cobb mengirimmu ke jalan ini utuh, begitu? Pria yang baik. Ia telah menjaga lentera gerbang itu tetap menyala selama tiga puluh tahun, dan hutan ini belum pernah sekali pun melewatinya. Selamat datang di Gallowmere, {playerName}. Perhatikan lonceng-loncengnya.",
+        "title": "Lonceng-Lonceng Gibbetmere",
+        "text": "Dengar dentang itu, {playerName}? Itu Gibbetmere, di jalan utara, membunyikan lonceng untuk menidurkan yang mati. Sexton Marrow menghitung setiap jiwa di bawah kanopi, yang hidup dan yang terkubur. Pergilah dan dihitung, sebelum hutan ini menghitungmu sendiri.",
+        "completion": "Cobb mengirimmu ke jalan ini utuh, begitu? Pria yang baik. Ia telah menjaga lentera gerbang itu tetap menyala selama tiga puluh tahun, dan hutan ini belum pernah sekali pun melewatinya. Selamat datang di Gibbetmere, {playerName}. Perhatikan lonceng-loncengnya.",
         "objectives": {
           "0": {
             "label": "Lapor kepada Sexton Marrow"
@@ -14136,7 +14136,7 @@ export const id_ID: EnTranslations = {
       },
       "q_ww_candles_at_the_bounds": {
         "title": "Lilin-Lilin di Perbatasan",
-        "text": "Empat batu perbatasan mengelilingi Gallowmere, {playerName}, satu di setiap jalan keluar, dan sebuah lilin makam menyala di setiap batu. Selama mereka menyala, yang terkubur tetap terkubur. Gerimis telah memadamkan semuanya, keempatnya, dan aku terlalu tua untuk menyusuri perbatasan sendirian. Ambil lilin panjangku dan nyalakan kembali semuanya, dengan cepat.",
+        "text": "Empat batu perbatasan mengelilingi Gibbetmere, {playerName}, satu di setiap jalan keluar, dan sebuah lilin makam menyala di setiap batu. Selama mereka menyala, yang terkubur tetap terkubur. Gerimis telah memadamkan semuanya, keempatnya, dan aku terlalu tua untuk menyusuri perbatasan sendirian. Ambil lilin panjangku dan nyalakan kembali semuanya, dengan cepat.",
         "completion": "Keempatnya menyala? Kalau begitu bernapaslah, {playerName}. Kau tak mendengarnya, tapi seluruh desa mendengarnya: lonceng-lonceng berbunyi lebih lega tepat saat sumbu terakhir menyala.",
         "objectives": {
           "0": {
@@ -14166,7 +14166,7 @@ export const id_ID: EnTranslations = {
       },
       "q_ww_what_the_bark_holds": {
         "title": "Apa yang Disimpan Kulit Kayu",
-        "text": "Di Padang Tergantung sebelah timur Gallowmere, para pemintal menggantungkan yang mati terbungkus sutra dari dahan-dahan, dan para penyaruk gravenbark berjaga di bawahnya bagai pengusung jenazah yang sabar. Mereka adalah penduduk kami di atas sana, {playerName}. Hancurkan lima penyaruk, turunkan tiga yang mati terbungkus itu, dan bawa mereka pulang ke tanah.",
+        "text": "Di Padang Tergantung sebelah timur Gibbetmere, para pemintal menggantungkan yang mati terbungkus sutra dari dahan-dahan, dan para penyaruk gravenbark berjaga di bawahnya bagai pengusung jenazah yang sabar. Mereka adalah penduduk kami di atas sana, {playerName}. Hancurkan lima penyaruk, turunkan tiga yang mati terbungkus itu, dan bawa mereka pulang ke tanah.",
         "completion": "Tiga jiwa kembali di bawah tanah yang layak sebelum malam tiba. Para penyaruk akan tumbuh kembali, kulit kayu selalu begitu, tapi malam ini padang itu tergantung kosong, dan itu sudah cukup.",
         "objectives": {
           "0": {
@@ -14180,17 +14180,17 @@ export const id_ID: EnTranslations = {
       "q_ww_walking_mosley_home": {
         "title": "Mengantar Mosley Pulang",
         "text": "Penggali kuburku Mosley mengambil jalan kapel tiga hari lalu untuk membuka petak di pekarangan tua, dan galiannya runtuh menimpanya. Ia mencakar jalan keluarnya, orang bodoh itu masih hidup, tapi ia meringkuk di dekat makam-makam kapel dan tak mau bergerak karena para pemintal di jalan. Antarkan dia pulang, {playerName}. Aku tak bisa membunyikan lonceng untuk orang yang masih hidup.",
-        "completion": "Ia melewati gerbang dengan kedua kakinya sendiri, bersumpah tak akan menggali apa pun yang lebih dalam dari bedengan lobak mulai sekarang. Ia akan kembali ke pekarangan itu sebelum hari Minggu, mereka selalu begitu. Terima kasih, {playerName}. Gallowmere menjaga penduduknya, itulah seluruh hukum kami.",
+        "completion": "Ia melewati gerbang dengan kedua kakinya sendiri, bersumpah tak akan menggali apa pun yang lebih dalam dari bedengan lobak mulai sekarang. Ia akan kembali ke pekarangan itu sebelum hari Minggu, mereka selalu begitu. Terima kasih, {playerName}. Gibbetmere menjaga penduduknya, itulah seluruh hukum kami.",
         "objectives": {
           "0": {
-            "label": "Penggali Kubur Mosley diantar dengan selamat kembali ke Gallowmere"
+            "label": "Penggali Kubur Mosley diantar dengan selamat kembali ke Gibbetmere"
           }
         }
       },
       "q_ww_horn_of_the_huntsman": {
         "title": "Terompet Sang Pemburu",
         "text": "Kau pasti sudah mendengar terompet itu sekarang, {playerName}, tipis dan jauh, suara yang membuat seluruh hutan ini menahan napas. Sang Pemburu Pucat menunggangi tanah lapangnya di sebelah utara sini, dan setiap makam yang dilewatinya semakin dangkal. Ia pernah menjadi seorang pria, dan ia dikubur dengan salah, dan aku sudah berhenti berpura-pura bahwa doa saja akan cukup. Ajak seorang kawan, ajak dua, dan jatuhkan dia dari kudanya.",
-        "completion": "Terompet itu berhenti di tengah nada. Setiap lonceng di Gallowmere berbunyi sekali, dengan sendirinya, dan kemudian hutan ini menjadi lebih sunyi dari yang pernah kudengar selama tiga puluh tahun. Kau telah melakukan ritus yang tak bisa kulakukan, {playerName}. Kenakan ini, dan berjalanlah di bawah kanopi tanpa rasa takut.",
+        "completion": "Terompet itu berhenti di tengah nada. Setiap lonceng di Gibbetmere berbunyi sekali, dengan sendirinya, dan kemudian hutan ini menjadi lebih sunyi dari yang pernah kudengar selama tiga puluh tahun. Kau telah melakukan ritus yang tak bisa kulakukan, {playerName}. Kenakan ini, dan berjalanlah di bawah kanopi tanpa rasa takut.",
         "objectives": {
           "0": {
             "label": "Sang Pemburu Pucat dijatuhkan dari kudanya"
@@ -14239,11 +14239,11 @@ export const id_ID: EnTranslations = {
       },
       "q_pr_the_man_who_went_in": {
         "title": "Pria yang Pernah Masuk",
-        "text": "Para penyelam tak mau melangkah melewati batas pepohonan, {playerName}, dan aku tak akan memintanya. Kau pasti sudah mendengar genderang itu sekarang: semua orang mendengarnya, pada malam kedua. Hanya satu pria di pulau ini yang pernah berjalan menuju suara itu dan kembali. Okku. Ia berkemah di bawah pohon-pohon beringin besar di Air Terjun Sulur, jauh di jalan Belukar. Temukan dia, dan tanyakan apa yang disembunyikan kehijauan itu.",
+        "text": "Para penyelam tak mau melangkah melewati batas pepohonan, {playerName}, dan aku tak akan memintanya. Kau pasti sudah mendengar genderang itu sekarang: semua orang mendengarnya, pada malam kedua. Hanya satu pria di pulau ini yang pernah berjalan menuju suara itu dan kembali. Okrim. Ia berkemah di bawah pohon-pohon beringin besar di Air Terjun Sulur, jauh di jalan Belukar. Temukan dia, dan tanyakan apa yang disembunyikan kehijauan itu.",
         "completion": "Isha mengirimmu? Sang Ibu Mutiara belum menyebut namaku selama bertahun-tahun. Duduklah di luar jangkauan sulur-sulur ini, {playerName}, dan aku akan mengatakan apa yang kutahu: genderang itu bukanlah bahaya. Ia adalah sebuah peringatan.",
         "objectives": {
           "0": {
-            "label": "Temukan Okku di Air Terjun Sulur"
+            "label": "Temukan Okrim di Air Terjun Sulur"
           }
         }
       },
@@ -14722,7 +14722,7 @@ export const id_ID: EnTranslations = {
             "label": "Glimmermere"
           },
           "7": {
-            "label": "Tenda Wyrmcult"
+            "label": "Tenda Broodsworn"
           },
           "8": {
             "label": "Padang Arwah Gentayangan"
@@ -14734,10 +14734,10 @@ export const id_ID: EnTranslations = {
       },
       "veiled_hollow": {
         "name": "Ceruk Terselubung",
-        "welcome": "Udara ini berdengung dengan sihir kuno. Temui Penjaga Saelwyn di bawah pohon agung Eldergleam.",
+        "welcome": "Udara ini berdengung dengan sihir kuno. Temui Penjaga Saelwyn di bawah pohon agung Eldershine.",
         "pois": {
           "0": {
-            "label": "Eldergleam"
+            "label": "Eldershine"
           },
           "1": {
             "label": "Gua Duskfall"
@@ -14875,7 +14875,7 @@ export const id_ID: EnTranslations = {
             "label": "Gerbang Malam"
           },
           "2": {
-            "label": "Sumur Bulan"
+            "label": "The Moonspring"
           },
           "3": {
             "label": "Gloamfield"
@@ -14890,10 +14890,10 @@ export const id_ID: EnTranslations = {
       },
       "wraithwood": {
         "name": "Hutan Arwah",
-        "welcome": "Kanopi menutup di atas jalan bagai sebuah tutup. Tetaplah dekat lentera-lentera Gallowmere, dan jangan menyahut bila hutan ini memanggil namamu.",
+        "welcome": "Kanopi menutup di atas jalan bagai sebuah tutup. Tetaplah dekat lentera-lentera Gibbetmere, dan jangan menyahut bila hutan ini memanggil namamu.",
         "pois": {
           "0": {
-            "label": "Gallowmere"
+            "label": "Gibbetmere"
           },
           "1": {
             "label": "Gerbang Gagak"

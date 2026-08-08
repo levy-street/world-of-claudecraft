@@ -2,8 +2,8 @@
 // Nightgate into a realm that is dreaming: violet downs under a luminous
 // lavender sky where a sleeping world hangs among the clouds, and the
 // namesake flowers glow in the dream-light. The lantern village of Moonrest,
-// the round Moonwell tarn, Gloamfield's flower downs, the Standing Vigil
-// stone circle where the hovering nightkin keep their watch, and the
+// the round Moonspring tarn, Gloamfield's flower downs, the Standing Vigil
+// stone circle where the hovering gloamkin keep their watch, and the
 // Sleepless Barrow in the far north. Terrain: the NIGHT_* tables in
 // world.ts; the glowing flora, dreambeams, and standing stones live in
 // render/night_features.ts.
@@ -36,7 +36,7 @@ export const NIGHTBLOOM_ZONE: ZoneDef = {
   hub: { x: -370, z: 1420, radius: 18, name: 'Moonrest' },
   graveyard: { x: -388, z: 1402 },
   lakes: [
-    { x: -290, z: 1380, radius: 14 }, // the Moonwell: a round mirror tarn
+    { x: -290, z: 1380, radius: 14 }, // the Moonspring: a round mirror tarn
     // the Gloamfield pools, scattered through the flower downs
     { x: -440, z: 1520, radius: 10 },
     { x: -462, z: 1492, radius: 8 },
@@ -45,7 +45,7 @@ export const NIGHTBLOOM_ZONE: ZoneDef = {
   pois: [
     { x: -370, z: 1420, label: 'Moonrest', id: 'moonrest' },
     { x: -390, z: 1292, label: 'The Nightgate', id: 'the_nightgate' },
-    { x: -290, z: 1380, label: 'The Moonwell', id: 'the_moonwell' },
+    { x: -290, z: 1380, label: 'The Moonspring', id: 'the_moonwell' },
     { x: -444, z: 1496, label: 'Gloamfield', id: 'gloamfield' },
     { x: -272, z: 1538, label: 'The Standing Vigil', id: 'the_standing_vigil' },
     { x: -360, z: 1650, label: 'The Sleepless Barrow', id: 'the_sleepless_barrow' },
@@ -66,7 +66,7 @@ export const NIGHTBLOOM_ROADS: { x: number; z: number }[][] = [
     { x: -370, z: 1420 },
     { x: -334, z: 1402 },
     { x: -308, z: 1388 },
-  ], // Moonrest -> the Moonwell's shore
+  ], // Moonrest -> the Moonspring's shore
   [
     { x: -370, z: 1420 },
     { x: -408, z: 1452 },
@@ -104,7 +104,7 @@ export const NIGHTBLOOM_ROADS: { x: number; z: number }[][] = [
 export const NIGHTBLOOM_PORTALS: PortalDef[] = [];
 
 // The realm's beasts and watchers: silver herds and their sleek hunters on
-// the downs, masked nightkin adrift at their stones, and, since the stars
+// the downs, masked gloamkin adrift at their stones, and, since the stars
 // shifted, the barrow dead walking their own grave rows.
 export const NIGHTBLOOM_MOBS: Record<string, MobTemplate> = {
   moonfleece_grazer: {
@@ -150,7 +150,7 @@ export const NIGHTBLOOM_MOBS: Record<string, MobTemplate> = {
   },
   nightkin_stargazer: {
     id: 'nightkin_stargazer',
-    name: 'Nightkin Stargazer',
+    name: 'Gloamkin Stargazer',
     minLevel: 20,
     maxLevel: 20,
     family: 'elemental',
@@ -354,7 +354,7 @@ export const NIGHTBLOOM_QUESTS: Record<string, QuestDef> = {
     name: 'Eyes on the Vigil',
     giverNpcId: 'lira_dewsong',
     turnInNpcId: 'astronomer_cassian',
-    text: 'Something has the striders bold and the herds uneasy, $N, and I cannot read it in the flowers. Cassian can read it in the sky. He keeps his observatory camp by the Standing Vigil east of here, where the nightkin drift among the stones. Find him, and ask what the stars are saying.',
+    text: 'Something has the striders bold and the herds uneasy, $N, and I cannot read it in the flowers. Cassian can read it in the sky. He keeps his observatory camp by the Standing Vigil east of here, where the gloamkin drift among the stones. Find him, and ask what the stars are saying.',
     completionText:
       'Lira sent you? Then the gardens feel it too. Sit by the glass a moment, $N. The stars have been restless for a month, and every chart I draw leans north toward the barrow.',
     objectives: [
@@ -376,7 +376,7 @@ export const NIGHTBLOOM_QUESTS: Record<string, QuestDef> = {
     name: 'The Charts in the Stones',
     giverNpcId: 'astronomer_cassian',
     turnInNpcId: 'astronomer_cassian',
-    text: 'The Vigil stones are older than Moonrest, older than the nightkin who tend them, and their faces are cut with star charts I have spent my life learning to read. The sky has shifted, $N, and I must know how far. Read the charts on three of the stones and bring me their bearings.',
+    text: 'The Vigil stones are older than Moonrest, older than the gloamkin who tend them, and their faces are cut with star charts I have spent my life learning to read. The sky has shifted, $N, and I must know how far. Read the charts on three of the stones and bring me their bearings.',
     completionText:
       'No doubt is left. Every bearing has crept toward the Sleepless Barrow, as if the sky itself leans over that mound to watch. The old kings were buried under aligned stars for a reason, $N.',
     objectives: [
@@ -422,7 +422,7 @@ export const NIGHTBLOOM_QUESTS: Record<string, QuestDef> = {
     turnInNpcId: 'astronomer_cassian',
     text: 'Every bearing, every restless star, every opened mound points to one thing: the Barrow King is waking beneath the great mound, and this realm has no dawn to hold him back. He must be put to rest before he remembers his crown, $N. Do not go alone: bring a friend, and keep the flower-light at your back.',
     completionText:
-      'The stars have settled for the first time in a season, $N. The mounds are closed, the nightkin have gone still at their stones, and the king sleeps below once more. Wear this mantle: Moonrest cut it for whoever the night finally trusted.',
+      'The stars have settled for the first time in a season, $N. The mounds are closed, the gloamkin have gone still at their stones, and the king sleeps below once more. Wear this mantle: Moonrest cut it for whoever the night finally trusted.',
     objectives: [
       { type: 'kill', targetMobId: 'barrow_king', count: 1, label: 'The Barrow King put to rest' },
     ],
@@ -532,7 +532,7 @@ export const NIGHTBLOOM_OBJECTS: GroundObjectDef[] = [
     itemId: 'vigil_star_chart',
     name: 'Star-Cut Stone',
     // Chart faces on the outer stones of the Standing Vigil ring, where the
-    // nightkin drift.
+    // gloamkin drift.
     positions: [
       { x: -262, z: 1534 },
       { x: -282, z: 1546 },
@@ -588,7 +588,7 @@ export const NIGHTBLOOM_PROPS: ZonePropsDef = {
   tents: [
     { x: -280, z: 1551, rot: 0.8, scale: 1 }, // Cassian's observatory camp
   ],
-  // the Standing Vigil: a ring of columns where the nightkin drift, and the
+  // the Standing Vigil: a ring of columns where the gloamkin drift, and the
   // Sleepless Barrow: a tighter, older ring around the king's mound
   ruinRings: [
     { x: -272, z: 1538, ringR: 9, columns: 7 },

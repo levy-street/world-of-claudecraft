@@ -38,9 +38,7 @@ export const table: DeedLocaleTable = {
     title: 'Sierżant',
   },
   pvp_honor_knight_lieutenant: {
-    name: 'Rycerz-Porucznik',
     desc: 'Zdobądź 40 000 Honoru w ciągu całej kariery, mając za sobą sezon prawdziwej wojny.',
-    title: 'Rycerz-Porucznik',
   },
   pvp_honor_field_marshal: {
     name: 'Marszałek Polny',
@@ -76,7 +74,6 @@ export const table: DeedLocaleTable = {
     desc: 'Zbierz zyle rudy, kepke drewna i grzadke ziol w Nightbloomie.',
   },
   chr_nightbloom_first_cast: {
-    name: 'Kragi na ksiezycowej studni',
     desc: 'Zlow rybe w wodach Nightbloomu.',
   },
   chr_wraithwood_gatherer: {
@@ -289,7 +286,6 @@ export const table: DeedLocaleTable = {
     title: 'Żmijobójca',
   },
   dgn_sanctum_speed: {
-    name: 'Sprint przez Sanktuarium',
     desc: 'Pokonaj Korzula Grobowego Żmija w ciągu 15 minut od zajęcia Sanktuarium Grobowego Żmija przez twoją drużynę.',
   },
   dgn_nythraxis_gravebreaker: {
@@ -355,7 +351,7 @@ export const table: DeedLocaleTable = {
   },
   dlv_varric_ringers: {
     name: 'Dzwony milkną',
-    desc: 'Pokonaj Diakona Varrica tak, aby każdy wskrzeszony przez niego Pogrzebowy Dzwonnik poległ przed nim.',
+    desc: 'Pokonaj Diakona Vandrica tak, aby każdy wskrzeszony przez niego Pogrzebowy Dzwonnik poległ przed nim.',
   },
   dlv_nhalia_bells: {
     name: 'Uciszyciel Dzwonów',
@@ -431,7 +427,6 @@ export const table: DeedLocaleTable = {
   },
   chr_peaks_chapter_iii: {
     name: 'Kronika Ciernistego Szczytu',
-    desc: 'Doprowadź historię góry do końca: Kult Żmija rozbity, Sanktuarium uciszone, Budzący się Szczyt powalony, a każda z osławionych zgróz turni pokonana.',
     title: 'z Ciernistego Szczytu',
   },
   chr_peaks_sparring: {

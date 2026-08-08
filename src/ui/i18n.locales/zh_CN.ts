@@ -92,7 +92,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.furious_mending.name': '狂怒愈合',
   'entities.abilities.heroic_leap.description':
     '跃向目标区域，在落地时对附近的敌人造成 {damage} 点伤害。',
-  'entities.abilities.heroic_leap.name': '英勇飞跃',
+  'entities.abilities.heroic_leap.name': '腾跃冲锋',
   'entities.abilities.intimidating_shout.description':
     '一声骇人的怒吼，使 8 码内至多 5 个敌人恐惧逃散 8 秒。伤害可能打破效果。',
   'entities.abilities.intimidating_shout.name': '破胆怒吼',
@@ -131,7 +131,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.seasoned_soldier.name': '沙场老兵',
   'entities.abilities.storm_bolt.description':
     '将你的武器掷向目标，造成 {damage} 点伤害，并使其昏迷 3 秒。',
-  'entities.abilities.storm_bolt.name': '风暴之锤',
+  'entities.abilities.storm_bolt.name': '雷霆投掷',
   'entities.abilities.sudden_death.description':
     '你的自动攻击有几率让你对任意生命值的目标施放早赴黄泉，且不消耗怒气。（武器）',
   'entities.abilities.sudden_death.name': '骤死',
@@ -140,7 +140,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sweeping_strikes.name': '扩弧斩',
   'entities.abilities.victory_rush.description':
     '攻击造成武器伤害加 {damage}，并治疗相当于最大生命值 20% 的生命。仅可在击杀敌人后 20 秒内使用。',
-  'entities.abilities.victory_rush.name': '乘胜追击',
+  'entities.abilities.victory_rush.name': '胜者之势',
   'hudChrome.specPanel.complexity': '复杂度',
   'hudChrome.specPanel.complexityHigh': '高',
   'hudChrome.specPanel.complexityLow': '低',
@@ -154,9 +154,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.talentRows.tab': '抉择',
   'hudChrome.talentRows.readoutSummary': '天赋：{head}，已选择 {spent}/{total} 行。',
   'entities.abilities.aspect_of_the_wild.name': '野牙伪装',
-  'entities.abilities.avenging_wrath.name': '复仇之翼',
+  'entities.abilities.avenging_wrath.name': '热诚之翼',
   'entities.abilities.berserk.name': '赤红迷雾',
-  'entities.abilities.blink.name': '闪烁步',
+  'entities.abilities.blink.name': '轻掠步',
   'entities.abilities.bloodlust.name': '战鼓',
   'entities.abilities.chain_lightning.name': '叉状闪电',
   'entities.abilities.chaos_bolt.name': '毁灭箭',
@@ -188,7 +188,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.multi_shot.name': '分裂射击',
   'entities.abilities.prayer_of_healing.name': '圣歌愈疗',
   'entities.abilities.preparation.name': '应变',
-  'entities.abilities.preparation.description': '结束疾跑、闪避和消失的冷却时间。（潜行者天赋）',
+  'entities.abilities.preparation.description': '结束疾跑、闪避和烟遁的冷却时间。（潜行者天赋）',
   'entities.abilities.presence_of_mind.name': '疾思',
   'entities.abilities.psychic_scream.name': '心灵尖啸',
   'entities.abilities.shadowstep.name': '影步',
@@ -357,7 +357,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.skins.ice_fang_sword.look':
     '苍白冰川弯刃，刃背生着锯齿状霜晶，血槽内有发光的青蓝冰核，护手如冰柱。',
   'hudChrome.wocStore.skins.ice_fang_sword.lore':
-    '这是冰封品级的旗舰，也是每位收藏家最先伸手的一件。Ice Fang 并非锻造，而是从覆盖 Highwatch 上方 Thornpeak 的冰川尖牙中雕成；青蓝核心寒冷燃烧，如 Glimmermere 水面的冷光。它劈过之处连空气都会结霜。城墙守卫发誓，大雪挡住 Wyrmcult 的那一夜，一名士兵带着它，“为城墙买下了一个冬天”。',
+    '这是冰封品级的旗舰，也是每位收藏家最先伸手的一件。Ice Fang 并非锻造，而是从覆盖 Highwatch 上方 Thornpeak 的冰川尖牙中雕成；青蓝核心寒冷燃烧，如 Glimmermere 水面的冷光。它劈过之处连空气都会结霜。城墙守卫发誓，大雪挡住 Broodsworn 的那一夜，一名士兵带着它，“为城墙买下了一个冬天”。',
   'hudChrome.wocStore.skins.glaciersplit_axe.name': '裂冰',
   'hudChrome.wocStore.skins.glaciersplit_axe.look':
     '半透明蓝色冰川斧头，裂开的内部泛着青蓝光，霜晶密布，斧柄拖曳寒雾。',
@@ -383,7 +383,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '一根发光的青蓝冰川尖刺，白霜从银环绽开，周围浮着淡淡寒雾。',
   'hudChrome.wocStore.skins.everwinter_wand.lore':
     '一根发光的冰川尖刺，据说折自 Sanctum 下方的深潭，那里的山寒长着利齿。白霜不断从银环绽放，无论烈火还是盛夏都不能使它融化。法师将它贴身携带，借寒意辅助施法；但在它似乎倾向 Nythraxis 墓室并静静聆听的夜晚，又会把它放得远远的。',
-  'hudChrome.wocStore.skins.winterbite.name': '寒冬之噬',
+  'hudChrome.wocStore.skins.winterbite.name': '寒冬之啮',
   'hudChrome.wocStore.skins.winterbite.look':
     '镀银钢与蓝冰制成的弓，弓把内有青蓝冰核，弦上搭着实冰箭矢，寒雾缭绕。',
   'hudChrome.wocStore.skins.winterbite.lore':
@@ -3031,9 +3031,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.summon_imp.name': '召唤烬裔',
   'entities.abilities.summon_imp.description':
     '召唤一只听从术士命令的烬裔。烬裔会从远处向你的敌人投掷灰烬箭。召唤新的恶魔会驱散你当前的恶魔。你同时只能拥有一只恶魔。',
-  'entities.abilities.summon_voidwalker.name': '召唤幽影',
+  'entities.abilities.summon_voidwalker.name': '召唤暮影',
   'entities.abilities.summon_voidwalker.description':
-    '召唤一只听从术士命令的幽影。幽影是一种坚韧的恶魔，会嘲讽你的敌人并承受打击。召唤新的恶魔会驱散你当前的恶魔。你同时只能拥有一只恶魔。',
+    '召唤一只听从术士命令的暮影。暮影是一种坚韧的恶魔，会嘲讽你的敌人并承受打击。召唤新的恶魔会驱散你当前的恶魔。你同时只能拥有一只恶魔。',
   'entities.abilities.summon_succubus.name': '召唤暮裔',
   'entities.abilities.summon_succubus.description':
     '召唤一只听从术士命令的暮裔。暮裔是一种脆弱的恶魔，会快速出手并在近战中造成重创。召唤新的恶魔会驱散你当前的恶魔。你同时只能拥有一只恶魔。',
@@ -3064,7 +3064,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.revive_pet.name': '修补',
   'entities.abilities.revive_pet.description':
     '修补你的宠物。若其存活，在12秒内每3秒恢复一次生命值，共恢复{overTime}点；若其死亡，则以35%生命值将其复活。',
-  'entities.abilities.holy_shock.name': '神圣震击',
+  'entities.abilities.holy_shock.name': '圣光震颤',
   'entities.abilities.holy_shock.description':
     '以神圣能量震击一个友方目标，为其恢复{damage}点生命值。（神圣专精招牌）',
   'entities.abilities.holy_shield.name': '神圣之盾',
@@ -3076,7 +3076,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.trueshot_aura.name': '强击光环',
   'entities.abilities.trueshot_aura.description':
     '鼓舞附近盟友，使攻击强度提高35点，持续5分钟。（射击专精招牌）',
-  'entities.abilities.wyvern_sting.name': '翼龙钉刺',
+  'entities.abilities.wyvern_sting.name': '幼龙钉刺',
   'entities.abilities.wyvern_sting.description':
     '从远处钉刺敌人，使其瘫痪最多4秒。受到任何伤害都会打破效果。（生存专精招牌）',
   'entities.abilities.arcane_power.name': '奥术强化',
@@ -3084,7 +3084,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '法术伤害提高20%，法术急速提高10%，持续10秒。（奥术专精招牌）',
   'entities.abilities.combustion.name': '凤凰出神',
   'entities.abilities.combustion.description': '法术暴击几率提高50%，持续15秒。（火焰专精招牌）',
-  'entities.abilities.icy_veins.name': '冰冷血脉',
+  'entities.abilities.icy_veins.name': '寒潮涌动',
   'entities.abilities.icy_veins.description':
     '法术急速提高30%，并防止施法被打断或受到退条，持续10秒。（冰霜专精招牌）',
   'entities.abilities.cold_blood.name': '冷血',
@@ -3099,7 +3099,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.power_infusion.name': '能量灌注',
   'entities.abilities.power_infusion.description':
     '向一个友方目标灌注能量，使其法术强度提高28点，持续15秒。（戒律专精招牌）',
-  'entities.abilities.holy_nova.name': '神圣新星',
+  'entities.abilities.holy_nova.name': '圣辉爆发',
   'entities.abilities.holy_nova.description':
     '引发神圣之光爆炸，为附近盟友恢复{damage}点生命值并伤害附近敌人。（神圣专精招牌）',
   'entities.abilities.shadowform.name': '暗影形态',
@@ -3120,10 +3120,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.feral_charge.name': '野性冲锋',
   'entities.abilities.feral_charge.description':
     '冲向敌人并使其定身1秒。8-25码距离。（野性专精招牌）',
-  'entities.abilities.swiftmend.name': '迅捷治愈',
+  'entities.abilities.swiftmend.name': '轻捷愈合',
   'entities.abilities.swiftmend.description':
     '吞噬友方目标身上的持续治疗效果，为其恢复{damage}点生命值。（恢复专精招牌）',
-  'entities.abilities.crusader_strike.name': '十字军打击',
+  'entities.abilities.crusader_strike.name': '誓言打击',
   'entities.abilities.crusader_strike.description':
     '打击目标，造成武器伤害外加 {damage} 点神圣伤害。（圣骑士天赋）',
   'entities.abilities.metamorphosis.name': '恶魔变形',
@@ -3294,7 +3294,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.ogre_war_totem.name': '食人魔战争图腾',
   'entities.items.storm_core.name': '风暴核心',
   'entities.items.kazzix_heartshard.name': '卡兹克斯的心裂片',
-  'entities.items.wyrmcult_orders.name': '龙教命令',
+  'entities.items.wyrmcult_orders.name': '龙誓命令',
   'entities.items.ritual_phylactery.name': '仪式护命匣',
   'entities.items.gravewyrm_sigil.name': '墓龙徽记',
   'entities.items.blessed_embers.name': '祝福余烬',
@@ -3315,7 +3315,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.staff_of_velkhar.name': '维尔卡法杖',
   'entities.items.shadowmeld_tunic.name': '夜帷外衣',
   'entities.items.gravewyrm_scale_hauberk.name': '墓龙鳞锁甲',
-  'entities.items.wyrmcult_grand_robe.name': '龙教大长袍',
+  'entities.items.wyrmcult_grand_robe.name': '龙誓大长袍',
   'entities.items.wyrmscale_jerkin.name': '龙鳞皮甲',
   'entities.items.wyrmfang_greatblade.name': '龙牙巨刃',
   'entities.items.staff_of_the_gravewyrm.name': '墓龙法杖',
@@ -3382,7 +3382,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.tideguard_sabatons.name': '潮卫护靴',
   'entities.items.valeborn_spellblade.name': '谷裔法刃',
   'entities.items.voss_sanctified_mace.name': '沃斯的圣化战锤',
-  'entities.items.wyrmcult_soulsteps.name': '龙教魂步',
+  'entities.items.wyrmcult_soulsteps.name': '龙誓魂步',
   'entities.items.wyrmshadow_harness.name': '夜牙挽具',
   'entities.items.wyrmshadow_legguards.name': '夜牙腿甲',
   'entities.items.wyrmshadow_treads.name': '夜牙足垫',
@@ -3455,8 +3455,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.warlord_drogmar.name': '督军德罗格玛',
   'entities.mobs.stormcrag_elemental.name': '风暴岩元素',
   'entities.mobs.shardlord_kazzix.name': '碎片领主卡兹克斯',
-  'entities.mobs.wyrmcult_zealot.name': '龙教狂热者',
-  'entities.mobs.wyrmcult_necromancer.name': '龙教死灵法师',
+  'entities.mobs.wyrmcult_zealot.name': '龙誓狂热者',
+  'entities.mobs.wyrmcult_necromancer.name': '龙誓死灵法师',
   'entities.mobs.boneclad_revenant.name': '骨甲亡魂',
   'entities.mobs.crypt_shambler.name': '墓穴蹒跚者',
   'entities.mobs.hollow_acolyte.name': '空洞侍僧',
@@ -3485,7 +3485,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.sister_nhalia.name': '娜莉娅修女',
   'entities.mobs.varkas_boneguard.name': '瓦尔卡斯骨卫',
   'entities.mobs.emberkin.name': '烬裔',
-  'entities.mobs.gloomshade.name': '幽影',
+  'entities.mobs.gloomshade.name': '暮影',
   'entities.mobs.duskborn.name': '暮裔',
   'entities.mobs.grix_the_tunnelking.name': '隧道之王格里克斯',
   'entities.mobs.spellhound.name': '噬法猎犬',
@@ -3918,7 +3918,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_crushers.objectives.0.label': '击败荆峰粉碎者',
   'entities.quests.q_drogmar.title': '督军德罗格玛',
   'entities.quests.q_drogmar.text':
-    '德罗格玛收了龙教的报酬，把氏族献给山脉苏醒。他是砸向城墙的锤——而当他砸向地面时，{playerName}，别站在他身边。进营地杀了他。',
+    '德罗格玛收了龙誓的报酬，把氏族献给山脉苏醒。他是砸向城墙的锤——而当他砸向地面时，{playerName}，别站在他身边。进营地杀了他。',
   'entities.quests.q_drogmar.completion':
     '德罗格玛死在自己的营地。氏族会散向高山隘口，你为我的城墙买来一个冬天，{playerName}。',
   'entities.quests.q_drogmar.objectives.0.label': '击败督军德罗格玛',
@@ -3942,10 +3942,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_kazzix.objectives.0.label': '卡兹克斯的心裂片',
   'entities.quests.q_zealots.title': '风中圣歌',
   'entities.quests.q_zealots.text':
-    '{playerName}，南峰吹来的风带着圣歌。龙教不再隐藏，他们在圣所下扎营，对地下沉睡之物歌唱。让12名狂热者闭嘴。',
+    '{playerName}，南峰吹来的风带着圣歌。龙誓不再隐藏，他们在圣所下扎营，对地下沉睡之物歌唱。让12名狂热者闭嘴。',
   'entities.quests.q_zealots.completion':
     '风安静了些。但让我不安的不是歌声，{playerName}，而是也许有什么在回应。',
-  'entities.quests.q_zealots.objectives.0.label': '击败龙教狂热者',
+  'entities.quests.q_zealots.objectives.0.label': '击败龙誓狂热者',
   'entities.quests.q_cult_orders.title': '来自地下的命令',
   'entities.quests.q_cult_orders.text':
     '狂热者现在有岗哨、有清点，像围城前的士兵。会组织的邪教徒就是在听令的邪教徒，{playerName}。杀8个并带回4份书面命令。',
@@ -3987,7 +3987,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_voice_below.completion':
     '跪拜停止了。我们没有让那声音沉默，{playerName}，只是削薄了它的合唱。',
   'entities.quests.q_voice_below.objectives.0.label': '击败龙教狂热者',
-  'entities.quests.q_voice_below.objectives.1.label': '击败龙教死灵法师',
+  'entities.quests.q_voice_below.objectives.1.label': '击败龙誓死灵法师',
   'entities.quests.q_sanctum_gate.title': '圣所大门',
   'entities.quests.q_sanctum_gate.text':
     '最后的门槛到了，{playerName}。邪教把圣所门钥石击碎，碎片散在门前广场。带回3片，我会悄悄开启道路。',
@@ -4089,7 +4089,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.zones.thornpeak_heights.pois.4.label': '德罗格玛战争营地',
   'entities.zones.thornpeak_heights.pois.5.label': '风暴岩',
   'entities.zones.thornpeak_heights.pois.6.label': '微光湖',
-  'entities.zones.thornpeak_heights.pois.7.label': '龙教帐篷',
+  'entities.zones.thornpeak_heights.pois.7.label': '龙誓帐篷',
   'entities.zones.thornpeak_heights.pois.8.label': '亡魂战场',
   'entities.zones.thornpeak_heights.pois.9.label': '墓龙圣所',
   'entities.zones.veiled_hollow.name': '帷幕幽谷',
@@ -4160,7 +4160,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.gilded_stag.name': '鎏金雄鹿',
   'entities.mobs.gloam_fox.name': '暮光狐',
   'entities.mobs.orchard_treant.name': '果园树人',
-  'entities.mobs.harvest_sprite.name': '丰收小妖',
+  'entities.mobs.harvest_sprite.name': '拾穗小妖',
   'entities.mobs.mere_lurker.name': '湖泽潜伏者',
   'entities.mobs.bogtoad.name': '沼蟾',
   'entities.mobs.drowsy_croaker.name': '瞌睡蛙王',
@@ -4171,13 +4171,13 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '越过夜门，连空气都在做梦。沿着花光走向月栖镇，别忘了看看悬在天上沉睡的世界。',
   'entities.zones.nightbloom.pois.0.label': '月栖镇',
   'entities.zones.nightbloom.pois.1.label': '夜门',
-  'entities.zones.nightbloom.pois.2.label': '月井',
+  'entities.zones.nightbloom.pois.2.label': '月泉',
   'entities.zones.nightbloom.pois.3.label': '暮光花田',
   'entities.zones.nightbloom.pois.4.label': '守望石阵',
   'entities.zones.nightbloom.pois.5.label': '不眠古冢',
   'entities.mobs.moonfleece_grazer.name': '月绒兽',
   'entities.mobs.gloam_strider.name': '幽暝疾行者',
-  'entities.mobs.nightkin_stargazer.name': '夜裔观星者',
+  'entities.mobs.nightkin_stargazer.name': '暮裔观星者',
   'entities.mobs.barrow_king.name': '古冢之王',
   'entities.zones.wraithwood.name': '怨灵林',
   'entities.zones.wraithwood.welcome':
@@ -4580,7 +4580,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_af_orchard_call.title': '果园的货车',
   'entities.quests.q_af_sprites_and_spigots.completion':
     '四只桶重新挂回了钩子，果林也安静了。你对付小妖的手比我重得多，{playerName}，而今天我为此庆幸。',
-  'entities.quests.q_af_sprites_and_spigots.objectives.0.label': '已赶走丰收小妖',
+  'entities.quests.q_af_sprites_and_spigots.objectives.0.label': '已赶走拾穗小妖',
   'entities.quests.q_af_sprites_and_spigots.objectives.1.label': '已找回采脂桶',
   'entities.quests.q_af_sprites_and_spigots.text':
     '是丰收小妖，{playerName}。它们为了里头的甜汁把采脂嘴从树干上撬下来，还把桶子扔进草丛。赶走八个小贼，找回我的四只桶，货车就能重新上路。',
@@ -4900,13 +4900,13 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '再没有疑问了。每一个方位都朝不眠古冢挪去，仿佛天空亲自俯身盯着那座坟丘。古时的王要葬在群星连线之下，是有缘由的，{playerName}。',
   'entities.quests.q_nb_charts_of_the_stones.objectives.0.label': '已读取星图',
   'entities.quests.q_nb_charts_of_the_stones.text':
-    '石阵的立石比月栖镇古老，比照看它们的夜裔更古老，石面上刻着我用一生学着解读的星图。天空移位了，{playerName}，我必须知道移了多远。读取三座立石上的星图，把方位带回来给我。',
+    '石阵的立石比月栖镇古老，比照看它们的暮裔更古老，石面上刻着我用一生学着解读的星图。天空移位了，{playerName}，我必须知道移了多远。读取三座立石上的星图，把方位带回来给我。',
   'entities.quests.q_nb_charts_of_the_stones.title': '石上星图',
   'entities.quests.q_nb_eyes_on_the_vigil.completion':
     '莉拉派你来的？那就是说花园也感觉到了。到望远镜边坐一会儿吧，{playerName}。星星已经躁动一个月了，我画的每一张星图都朝北偏向古冢。',
   'entities.quests.q_nb_eyes_on_the_vigil.objectives.0.label': '在守望石阵找到天文学者卡西安',
   'entities.quests.q_nb_eyes_on_the_vigil.text':
-    '有什么东西让疾行者变得大胆、兽群惶惶不安，{playerName}，而我从花里读不出缘由。卡西安能从天上读出来。他的观星营地就在东边的守望石阵旁，夜裔在石间飘荡的地方。找到他，问问星星都在说些什么。',
+    '有什么东西让疾行者变得大胆、兽群惶惶不安，{playerName}，而我从花里读不出缘由。卡西安能从天上读出来。他的观星营地就在东边的守望石阵旁，暮裔在石间飘荡的地方。找到他，问问星星都在说些什么。',
   'entities.quests.q_nb_eyes_on_the_vigil.title': '望向石阵的眼睛',
   'entities.quests.q_nb_night_gardens.completion':
     '每一片花瓣都还亮着。圣祠会有一整周都带着夜的香气，月栖镇也能睡得更安稳了。',
@@ -4934,7 +4934,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '幽暝疾行者向来是耐心的猎手，{playerName}，可近来它们径直溜进花床，在我们的灯笼底下叼走月绒羔羊。除掉十只，把安宁还给丘野。',
   'entities.quests.q_nb_striders_in_the_dark.title': '暗中的疾行者',
   'entities.quests.q_nb_the_barrow_king.completion':
-    '星星安定了下来，一季以来头一回，{playerName}。坟丘闭合了，夜裔在他们的立石旁归于静止，王也重新沉睡于地下。披上这件披风吧：月栖镇裁下它，就是留给夜晚最终信任的那个人。',
+    '星星安定了下来，一季以来头一回，{playerName}。坟丘闭合了，暮裔在他们的立石旁归于静止，王也重新沉睡于地下。披上这件披风吧：月栖镇裁下它，就是留给夜晚最终信任的那个人。',
   'entities.quests.q_nb_the_barrow_king.objectives.0.label': '已让古冢之王安息',
   'entities.quests.q_nb_the_barrow_king.text':
     '每一个方位、每一颗躁动的星、每一座开启的坟丘都指向同一件事：古冢之王正在大坟丘之下苏醒，而这片国度没有黎明可以拦他。必须赶在他想起自己的王冠之前送他安息，{playerName}。不要独自前往：带上一个朋友，让花光始终照在你背后。',
@@ -4983,9 +4983,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_pr_the_lost_navigator.title': '失踪的领航员',
   'entities.quests.q_pr_the_man_who_went_in.completion':
     '伊莎派你来的？珍珠之母已经多年没提过我的名字了。坐到藤蔓够不着的地方来，{playerName}，我把知道的都告诉你：鼓声不是危险。鼓声是警告。',
-  'entities.quests.q_pr_the_man_who_went_in.objectives.0.label': '在垂藤林找到奥库',
+  'entities.quests.q_pr_the_man_who_went_in.objectives.0.label': '在垂藤林找到奥克里姆',
   'entities.quests.q_pr_the_man_who_went_in.text':
-    '采珠人不肯踏过林线一步，{playerName}，我也不会开这个口。鼓声你如今该听过了：到第二夜，人人都会听见。这座岛上只有一个人朝那声音走过去，还走了回来。奥库。他在垂藤林的大榕树下扎营，得沿缠木路走进深处。找到他，问问绿荫里藏着什么。',
+    '采珠人不肯踏过林线一步，{playerName}，我也不会开这个口。鼓声你如今该听过了：到第二夜，人人都会听见。这座岛上只有一个人朝那声音走过去，还走了回来。奥克里姆。他在垂藤林的大榕树下扎营，得沿缠木路走进深处。找到他，问问绿荫里藏着什么。',
   'entities.quests.q_pr_the_man_who_went_in.title': '走进丛林的人',
   'entities.quests.q_pr_what_the_drums_guard.completion':
     '苔藓、珠贝，还有野猪血，是用手指一点点按进去的。那片废墟里还有什么在奉行它的仪式，{playerName}，而守卫把其余一切都挡在外面。是时候把话说开了。',
@@ -6739,7 +6739,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.peaksGreeter': '塞萨莉队长，高守哨站',
   'guide.worldPage.peaksGreeting': '这堵墙已守了两百年。在我当值时它绝不会破，但它在呻吟。',
   'guide.worldPage.peaksPlaceNotes':
-    '高守哨站扼守着城墙。潜猎者山脊与深岩洞穴属于山脊猫和穴居者；食人魔丘陵与卓格玛的战营属于受雇的莽夫；风暴岩中元素噼啪作响，其下方泛着微光的便是微光湖，这座山中小湖的湖畔守着一道通往溺亡神殿的苍白之光之门；蜿龙教帐篷与亡魂之野环绕着邪教的制高点，墓龙圣所则居于其巅。',
+    '高守哨站扼守着城墙。潜猎者山脊与深岩洞穴属于山脊猫和穴居者；食人魔丘陵与卓格玛的战营属于受雇的莽夫；风暴岩中元素噼啪作响，其下方泛着微光的便是微光湖，这座山中小湖的湖畔守着一道通往溺亡神殿的苍白之光之门；蜿龙誓帐篷与亡魂之野环绕着邪教的制高点，墓龙圣所则居于其巅。',
   'guide.worldPage.duskGreeting': '你的同族鲜少踏足这片树荫。轻声慢行，欢迎你的到来。',
   'guide.worldPage.duskGreeter': '守护者塞尔文，古辉镇',
   'guide.worldPage.duskPlaceNotes':
@@ -6801,7 +6801,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.fenPlaceNotes':
     '桥湖镇横跨在缓缓的水面上。琥珀沼石阶从丰收之乡蜿蜒而下；睡莲泽与泽光池间闪烁着鬼火与蜻蜓；垂柳湾的柳枝垂入湖中；而沉眠浅滩已是这片土地最温柔的去处。',
   'guide.worldPage.nightPlaceNotes':
-    '月栖镇守着长夜的警戒。夜门是通往午夜国度的入口；月井盛着可以伫立其旁的星光；暮光花田在黑暗中绽放；守望石阵一动不动地凝视着；而不眠古冢是这里唯一从不做梦的地方。',
+    '月栖镇守着长夜的警戒。夜门是通往午夜国度的入口；月泉盛着可以伫立其旁的星光；暮光花田在黑暗中绽放；守望石阵一动不动地凝视着；而不眠古冢是这里唯一从不做梦的地方。',
   'guide.worldPage.hauntPlaceNotes':
     '绞湖镇蜷缩在自己的灯笼之间。鸦门是这片森林阴森的正门；寡妇棘丛被蛛网织得密不透风；吊影林地与哀石礼拜堂承载着森林最古老的悲恸；而猎手林隙属于至今仍在那里狩猎的东西。',
   'guide.worldPage.galePlaceNotes':
@@ -6830,7 +6830,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.reliquary_shoulder.name': '碎裂的肩甲',
   'entities.items.reliquary_gloves_rog.name': '护骨者护手',
   'entities.items.deacon_reliquary_helm.name': '执事的圣物库头盔',
-  'entities.items.varric_shadow_cowl.name': '瓦里克的暗影兜帽',
+  'entities.items.varric_shadow_cowl.name': '万德里克的暗影兜帽',
   'entities.items.duskwisp_essence.name': '暮光灵精华',
   'entities.items.spore_heart.name': '孢子之心',
   'entities.items.gleaming_antler.name': '辉光鹿角',
@@ -6852,7 +6852,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.nightweave_tunic.name': '夜织皮甲',
   'entities.items.veilcloth_robe.name': '帷纱长袍',
   'entities.mobs.acolyte_tessa.name': '侍僧泰莎',
-  'entities.mobs.deacon_varric.name': '执事瓦里克',
+  'entities.mobs.deacon_varric.name': '执事万德里克',
   'entities.mobs.reliquary_bonewalker.name': '复生的骨行者',
   'entities.mobs.reliquary_funeral_ringer.name': '丧葬鸣钟者',
   'entities.mobs.reliquary_gravecall_acolyte.name': '唤墓侍僧',
@@ -6886,21 +6886,21 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'delveUi.board.tier.heroic': '英雄',
   'delveUi.board.tier.normal': '普通',
   'delveUi.board.title': '探秘面板',
-  'delveUi.boss.varric.bell.emote': '执事瓦里克双手紧握那口埋藏的钟！',
+  'delveUi.boss.varric.bell.emote': '执事万德里克双手紧握那口埋藏的钟！',
   'delveUi.boss.varric.bell.impact': '钟声轰鸣，震裂了厅堂的地面！',
   'delveUi.boss.varric.bell.lesson': '鸣钟：每十二秒一次的地面猛击。在它落下前移开。',
-  'delveUi.boss.varric.bell.log': '执事瓦里克开始敲响葬钟。',
-  'delveUi.boss.varric.bell.warning': '远离执事瓦里克！',
+  'delveUi.boss.varric.bell.log': '执事万德里克开始敲响葬钟。',
+  'delveUi.boss.varric.bell.warning': '远离执事万德里克！',
   'delveUi.boss.varric.defeat': '不……那些名字……我本已将它们尽数收齐……',
   'delveUi.boss.varric.intro': '没有灵魂会失落，只是被错置了。',
   'delveUi.boss.varric.mid30': '他每念出一个名字，葬钟便回应一声。',
-  'delveUi.boss.varric.mid60': '执事瓦里克颤抖着、带着胜利的快意诵读名册上的名字。',
+  'delveUi.boss.varric.mid60': '执事万德里克颤抖着、带着胜利的快意诵读名册上的名字。',
   'delveUi.boss.varric.pull': '你带着不洁的目的踏上这片圣化之尘。跪下，接受清点。',
-  'delveUi.boss.varric.raise.emote': '执事瓦里克从破碎的坟墓中召唤亡者之名！',
-  'delveUi.boss.varric.raise.interrupt_fail': '亡者回应了执事瓦里克的召唤！',
+  'delveUi.boss.varric.raise.emote': '执事万德里克从破碎的坟墓中召唤亡者之名！',
+  'delveUi.boss.varric.raise.interrupt_fail': '亡者回应了执事万德里克的召唤！',
   'delveUi.boss.varric.raise.interrupt_ok': '墓葬仪式被打断了。',
   'delveUi.boss.varric.raise.lesson': '在五秒内打断那座裂开的坟墓，否则亡者将应他的召唤而起。',
-  'delveUi.boss.varric.raise.log': '执事瓦里克开始施放亡者复生。',
+  'delveUi.boss.varric.raise.log': '执事万德里克开始施放亡者复生。',
   'delveUi.boss.varric.raise.object': '裂开的坟墓随着窃来的呼吸而颤动。',
   'delveUi.boss.varric.raise.warning': '阻止墓葬仪式！',
   'delveUi.chest.flavor': '亡者交出了他们尚能割舍之物。',
@@ -9083,7 +9083,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.desc_drakemaw_raptor':
     '来自龙喉火山口的驯服巢生迅猛龙，浑身筋肉、疾若奔雷，身上仍带着淡淡的灰烬气味。',
   'hudChrome.mounts.name_thunderstrut_gobbler': '雷霆阔步大火鸡',
-  'hudChrome.mounts.name_terrorspark_groundshaker': '惊雷撼地者',
+  'hudChrome.mounts.name_terrorspark_groundshaker': '骇雷撼地者',
   'hudChrome.mounts.desc_valorsteed': '一匹坚韧稳健的骏马，可提升旅行速度。',
   'hudChrome.mounts.desc_grag_bear': '一头坚韧稳健的巨熊，可提升旅行速度。',
   'hudChrome.mounts.desc_stalkglider_snail': '一只坚毅耐久的蜗牛，可提升旅行速度。',
@@ -9341,7 +9341,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.blizzard.name': '暴风雪',
   'entities.abilities.blizzard.description':
     '在目标区域召唤持续 6 秒的冰风暴，每秒造成 {damage} 点冰霜伤害并使敌人减速 40%。每命中一个敌人，寒冰宝珠的冷却时间缩短 0.5 秒，每次施法最多缩短 3 秒。（冰霜）',
-  'entities.abilities.glacial_spike.name': '冰川尖刺',
+  'entities.abilities.glacial_spike.name': '凝霜冰针',
   'entities.abilities.glacial_spike.description':
     '凝聚一根巨大的冰刺，消耗 5 枚冰刺，造成 {damage} 点冰霜伤害，并将目标冻结在原地 4 秒。（冰霜）',
   'entities.abilities.glacial_front.name': '冰川锋线',
@@ -9384,7 +9384,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '以烈焰环绕自身，吸收 {damage} 点伤害，持续 60 秒。（火焰）',
   'entities.abilities.cold_snap.name': '冬之召还',
   'entities.abilities.cold_snap.description':
-    '立即结束闪烁步、霜幕和强效隐形术的冷却时间。（法师天赋）',
+    '立即结束轻掠步、霜幕和强效隐形术的冷却时间。（法师天赋）',
   'entities.abilities.greater_invisibility.name': '强效隐形术',
   'entities.abilities.greater_invisibility.description':
     '消失 20 秒并移除 2 个持续伤害效果。隐形结束时，受到的伤害降低 90%，持续 2 秒。（法师天赋）',
@@ -9520,7 +9520,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.sanguine': '攻击速度提高 {hastePct}%，造成的伤害提高 {dmgPct}%',
   'hudChrome.auraEffect.battleTrance': '你的下一次劫掠打击或致残打击不消耗怒气',
   'hudChrome.auraEffect.revengeFree': '你的下一次复仇不消耗怒气',
-  'hudChrome.auraEffect.victoryRush': '乘胜追击已就绪',
+  'hudChrome.auraEffect.victoryRush': '胜者之势已就绪',
   'hudChrome.auraEffect.maxHpPct': '最大生命值提高 {pct}%',
   'hud.combat.floatingParry': '招架',
   'hud.combat.parried': '{target}招架了你的{ability}。',
@@ -9630,7 +9630,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.hearthkeeper_maeve.name': '炉火看守梅芙',
   'entities.npcs.hearthkeeper_maeve.title': '炉舍看守',
   'entities.npcs.hermit_okku.greeting': '安静。鼓声数着树下走过的一切，而它们已经数到了你。',
-  'entities.npcs.hermit_okku.name': '奥库',
+  'entities.npcs.hermit_okku.name': '奥克里姆',
   'entities.npcs.hermit_okku.title': '走进丛林的人',
   'entities.npcs.huntsman_deral.greeting': '别出声。鹿群熟悉这山谷里的每一种声响，我也一样。',
   'entities.npcs.huntsman_deral.name': '猎人德拉尔',
@@ -9833,7 +9833,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.the_last_keep.name': '最后的堡垒',
   'entities.dungeons.the_last_keep.enterText': '你踏入最后的堡垒那冰冷而寂静的大厅。',
   'entities.items.last_keep_signet.name': '最后的堡垒印戒',
-  'entities.items.reins_terrorspark_groundshaker.name': '惊雷撼地者点火钥匙',
+  'entities.items.reins_terrorspark_groundshaker.name': '骇雷撼地者点火钥匙',
   'entities.dungeons.the_last_keep.leaveText': '你带上堡门，重新走进龙裔荒原的寒风中。',
   'entities.items.wildheart_tuskblade.name': '荒野之心獠牙巨刃',
   'entities.items.wildheart_hexwood_staff.name': '盆地巫木法杖',
@@ -9921,7 +9921,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.revenantstep_treads.name': '亡魂行靴',
   'entities.items.shardfang_grips.name': '片牙护手',
   'entities.items.shardsong_mantle.name': '碎片之歌披肩',
-  'entities.items.wyrmcult_spellgrips.name': '龙教法术护手',
+  'entities.items.wyrmcult_spellgrips.name': '龙誓法术护手',
   'entities.items.thornpeak_wildwraps.name': '荆峰野性裹手',
   'entities.items.stormvotive_hauberk.name': '风暴誓愿锁甲',
   'entities.items.cryptbloom_shoulderguards.name': '墓花护肩',
@@ -10762,7 +10762,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraOverlay.procs.battleTrance': '战斗冥想',
   'hudChrome.auraOverlay.procs.overpowerCharge': '赤手充能',
   'hudChrome.auraOverlay.procs.suddenDeath': '猝死',
-  'hudChrome.auraOverlay.procs.victoryRush': '乘胜追击',
+  'hudChrome.auraOverlay.procs.victoryRush': '胜者之势',
   'hudChrome.auraOverlay.procs.enrage': '狂乱：激怒',
   'hudChrome.auraOverlay.procs.heatingUp': '热身',
   'hudChrome.auraOverlay.procs.arcaneCharge': '奥术充能',

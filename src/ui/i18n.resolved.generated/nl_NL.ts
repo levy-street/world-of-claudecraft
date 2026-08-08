@@ -566,7 +566,7 @@ export const nl_NL: EnTranslations = {
         "ice_fang_sword": {
           "name": "IJstand",
           "look": "Gebogen blad van bleek gletsjerijs, gekartelde rijpkristallen langs de ruggengraat, een gloeiende cyaan bevroren kern in de vollere, ijspegelpareerstang.",
-          "lore": "Het vlaggenschip van de diepvriesklasse, en het stuk waar elke verzamelaar als eerste naar reikt. Ice Fang was gesneden, niet gesmeed, uit een hoektand van de gletsjer die Thornpeak boven Highwatch afdekt, waarvan de cyaan kern koud brandde als het licht van de Glimmermere. Het rijpt de lucht die het snijdt. De muurwachter zweert dat één soldaat hem heeft gedragen op de avond dat de hoge sneeuw de Wyrmcult tegenhield, en 'de muur voor een winter heeft gekocht'."
+          "lore": "Het vlaggenschip van de diepvriesklasse, en het stuk waar elke verzamelaar als eerste naar reikt. Ice Fang was gesneden, niet gesmeed, uit een hoektand van de gletsjer die Thornpeak boven Highwatch afdekt, waarvan de cyaan kern koud brandde als het licht van de Glimmermere. Het rijpt de lucht die het snijdt. De muurwachter zweert dat één soldaat hem heeft gedragen op de avond dat de hoge sneeuw de Broodsworn tegenhield, en 'de muur voor een winter heeft gekocht'."
         },
         "glaciersplit_axe": {
           "name": "Gletsjersplijter",
@@ -594,7 +594,7 @@ export const nl_NL: EnTranslations = {
           "lore": "Een piek van gloeiend gletsjerijs, naar verluidt gebroken uit het diepe bergmeer onder het Sanctum, waar de kou van de berg tanden heeft. Rijp bloeit eindeloos uit zijn zilveren kraag en smelt nooit, niet door vuur, noch door de zomer. Magiër's houden het dichtbij vanwege de kou die het hun werk leent, en houden het ver weg op de avonden dat het naar de crypte van Nythraxis lijkt te leunen en te luisteren."
         },
         "winterbite": {
-          "name": "Winterbeet",
+          "name": "Wintergnaw",
           "look": "Boog van verzilverd staal en blauw ijs, een gloeiende cyaan bevroren kern in de stijgbuis, een nokvormige pijl van massief ijs, koude damp.",
           "lore": "Een boog van verzilverd staal en ijs uit Doorntop, met in het middenstuk een koude cyaankern die de pijl aan de pees vastvriest. De boog legt een schacht van massief gletsjerijs aan die zich bij elke trek opnieuw vormt. De schutter draagt op de muur geen pijlkoker, alleen de kou. Met zo'n boog hield Hoogwacht de Belagerrug tijdens een belegering: één schutter, zo wordt verteld, en een wintervoorraad pijlen die er altijd al waren."
         },
@@ -1006,7 +1006,7 @@ export const nl_NL: EnTranslations = {
       "name_shadowjump_toad": "Kama-Kage de Schaduwspringpad",
       "name_stormfeather_griffin": "Hemelreik Stormveder",
       "name_thunderstrut_gobbler": "Donderstap de Grote Kalkoen",
-      "name_terrorspark_groundshaker": "Schrikvonk, de Grondschudder",
+      "name_terrorspark_groundshaker": "Dreadspark Groundshaker",
       "name_drakemaw_raptor": "Drakenmuil-Raptor",
       "desc_valorsteed": "Een sterk, standvastig strijdros dat extra reissnelheid geeft.",
       "desc_grag_bear": "Een sterke, standvastige beer die extra reissnelheid geeft.",
@@ -1487,7 +1487,7 @@ export const nl_NL: EnTranslations = {
         "battleTrance": "Gevechtstrance",
         "overpowerCharge": "Roodhand-versterking",
         "suddenDeath": "Plotse Dood",
-        "victoryRush": "Overwinningsroes",
+        "victoryRush": "Victor's Surge",
         "enrage": "Amok: Razend",
         "heatingUp": "Opwarmen",
         "arcaneCharge": "Arcane ladingen",
@@ -1970,7 +1970,7 @@ export const nl_NL: EnTranslations = {
       "sanguine": "Verhoogt aanvalssnelheid met {hastePct}% en toegebrachte schade met {dmgPct}%",
       "battleTrance": "Je volgende Plunderaarsslag of Verminkende Slag kost geen woede",
       "revengeFree": "Je volgende Wraak kost geen woede",
-      "victoryRush": "Overwinningsroes is gereed",
+      "victoryRush": "Victor's Surge is ready",
       "maxHpPct": "Verhoogt maximale gezondheid met {pct}%",
       "temporalHourglass": "Immuun en niet in staat te handelen; herstelt gezondheid en versnelt afkoeltijdherstel. Klik met rechts om te annuleren.",
       "tongues": "Erhöht Zauberzeit um {pct}%",
@@ -4031,13 +4031,13 @@ export const nl_NL: EnTranslations = {
       "valeBlurb": "Het groene begindal, waar nieuwe helden hun tanden scherpen op wolven en bandieten rond de stad Eastbrook.",
       "marshBlurb": "Een verdronken land van mist en ruïnes. Mudfins zwermen door de ondiepten en iets ouders roert zich onder het water, gadegeslagen vanuit het brugdorp Fenbridge.",
       "peaksBlurb": "Door wind geschuurde bergkammen en oude mijnwerken klimmen op naar de koudste, hoogste gevaren van het rijk, in handen van de buitenpost Highwatch.",
-      "duskBlurb": "Een vallei van eeuwige schemering onder de grote boom van Ouderglans, waar kristallen ruines gloeien en de lucht zoemt van oude magie.",
+      "duskBlurb": "A valley of permanent dusk beneath the great tree of Eldershine, where crystal ruins glow and the air hums with old magic.",
       "emberBlurb": "Door onweer verlichte wildernis van as en bloedglas waar draken cirkelen boven de caldera en trollenvuren branden tussen de duinen, in de gaten gehouden vanuit het poortstadje Wurmwacht.",
       "frostBlurb": "Een stilte van sneeuw en donkere dennen onder het noorderlicht, waar de kou zelf wakker lijkt en IJsmantel zijn vuren brandend houdt.",
       "amberBlurb": "Een eeuwige herfst van gouden en rode bladeren die nooit vallen, verzameld rond het lantaarnverlichte stadje Lantaarnmeer.",
       "fenBlurb": "Een helder, zoemend moerasland van lelies en traag water, doorkruist over oude vlonderpaden vanuit het brugstadje Brugmeer.",
       "nightBlurb": "Een rijk van sterrige middernacht waar bloemen de paden verlichten en Maanrust een stille wake houdt onder een dromende hemel.",
-      "hauntBlurb": "Een spookbos onder reusachtige bladerdaken, waar de lantaarns van Galgenmeer het enige eerlijke licht op de weg zijn.",
+      "hauntBlurb": "A haunted forest under giant canopies, where the lanterns of Gibbetmere are the only honest light on the road.",
       "galeBlurb": "Zeekliffen en huilende heuvels waar de wind nooit rust, het Oude Baken nooit dooft, en Wijkhaven zijn deuren stevig sluit.",
       "jungleBlurb": "Een tropische wirwar van palmen, wit zand en luidruchtige vogels, met het strandstadje Drijfhaven dat een vuur brandend houdt op het strand.",
       "gardenBlurb": "Een doolhoftuinrijk dat nog altijd wordt gesnoeid door geen tuinman die iemand ooit heeft gezien, betreden voorbij Haagwijk en zijn fonteinhoven.",
@@ -4048,7 +4048,7 @@ export const nl_NL: EnTranslations = {
       "peaksGreeting": "Tweehonderd jaar heeft deze muur standgehouden. Hij breekt niet onder mijn wacht, maar hij kreunt.",
       "peaksGreeter": "Captain Thessaly, Highwatch",
       "duskGreeting": "Weinigen van jouw soort hebben onder deze takken gestaan. Loop zacht, en wees welkom.",
-      "duskGreeter": "Hoedster Saelwyn, Ouderglans",
+      "duskGreeter": "Keeper Saelwyn, Eldershine",
       "emberGreeting": "Hete wind uit de wildernis, draken boven de Drakenmuil, en trollenvuren in de duinen. Drink iets voor je daar naar buiten loopt.",
       "emberGreeter": "De poortwachter, Wurmwacht",
       "frostGreeting": "Sneeuw verzwelgt elk geluid voorbij de muur. Als de lichten beginnen te dansen, houd dan je stem laag en je vuur brandend.",
@@ -4060,7 +4060,7 @@ export const nl_NL: EnTranslations = {
       "nightGreeting": "Voorbij de Nachtpoort droomt de lucht zelf. Volg het bloemlicht, en let op de slapende wereld die aan de hemel hangt.",
       "nightGreeter": "De wakewachter, Maanrust",
       "hauntGreeting": "Blijf bij de lantaarns, reiziger. En als het woud je naam roept van buiten de weg, antwoord dan niet.",
-      "hauntGreeter": "De lantaarnopsteker, Galgenmeer",
+      "hauntGreeter": "The lamplighter, Gibbetmere",
       "galeGreeting": "De wind is hier nog nooit gestopt, en het Oude Baken is nog nooit gedoofd. Doe de herbergdeur achter je dicht.",
       "galeGreeter": "De bakenwachter, Wijkhaven",
       "jungleGreeting": "Warm zand, luidruchtige vogels, en een jungle die de horizon verslindt. We houden een vuur brandend op het strand; probeer erbij terug te komen.",
@@ -4069,14 +4069,14 @@ export const nl_NL: EnTranslations = {
       "gardenGreeter": "De poortwachter, Haagwijk",
       "valePlaceNotes": "Oostbeek is je eerste thuisbasis. Wolvenloop en Everweide zijn rustig jachtgebied; Spiegelmeer is fijn viswater, al krioelen modderfinnen in de ondiepten; het Sableweb en de Kopergroeve verbergen spinnen en ertsbeluste delvers; een Bandietenkamp en de Gevallen Kapel bieden ruwer werk; Reliekschrijnheuvel leidt naar het Ingestorte Reliekschrijn, de eerste delve van het rijk; Lichtwoudgaarde is een kalm, zonovergoten bosje in het noorden; en het Zeugveld is Oostbeeks ommuurde zwijnenbalveld, waar De Dalbeker onder een oogstbestand wordt gespeeld.",
       "marshPlaceNotes": "Veenbrug bewaakt de enige droge weg. Het Sluipersriet en de Diepveen-Ondiepten wemelen van moerasbeesten en mudfins; het Weduwestruweel zit dik onder het web; de Verdronken Kapel en de Trollenheuvels bergen oudere gevaren, met De Verdronken Litanie, de eigen delve van het moeras, die net ten noorden van de heuvels opengaat; het Grafroeper-Kampement is de ingegraven sekte, en het Verzonken Bastion is het instantiehart van het moeras.",
-      "peaksPlaceNotes": "Highwatch houdt de muur. Stalker Ridge en de Dieprots-Holen behoren tot bergkatten en gravers; de Ogre Foothills en Drogmar's War-Camp tot ingehuurde bruten; Stormcrag knettert van de elementalen, en daaronder gloeit De Glinstermeer, het bergmeer waarvan de oever de poort van bleek licht bewaart naar De Verdronken Tempel; de Wyrmcult Tents en Revenant Fields omsluiten het hoge terrein van de sekte, met het Grafwurm-Heiligdom op de top.",
-      "duskPlaceNotes": "Ouderglans verzamelt zich onder de grote boom. De Schemerval-Grot en haar uitkijkpunt vormen de weg naar binnen en het eerste zicht op de vallei; het Ouderwoud en het Sterrenvalbekken bewaren de stille zuidkant; het Verzonken Hof herbergt overwoekerde ruines in het oosten; en de Glanzende Diepte en de Kristallen Ondiepten gloeien door het hele noorden.",
+      "peaksPlaceNotes": "Highwatch houdt de muur. Stalker Ridge en de Dieprots-Holen behoren tot bergkatten en gravers; de Ogre Foothills en Drogmar's War-Camp tot ingehuurde bruten; Stormcrag knettert van de elementalen, en daaronder gloeit De Glinstermeer, het bergmeer waarvan de oever de poort van bleek licht bewaart naar De Verdronken Tempel; de Broodsworn Tents en Revenant Fields omsluiten het hoge terrein van de sekte, met het Grafwurm-Heiligdom op de top.",
+      "duskPlaceNotes": "Eldershine gathers beneath the great tree. The Duskfall Cave and its overlook are the way in and the first sight of the valley; Elder Grove and Starfall Basin keep the quiet south; the Sunken Court holds overgrown ruins in the east; and the Gleaming Deep and Crystalline Shallows glow across the north.",
       "emberPlaceNotes": "Wurmwacht bewaakt de poort. Het Poortwoud is het laatste groen voor de wildernis; de Sintelduinen waaien met as en erger; de Trollenraad is waar de duintrollen hun vuren verzamelen; de Bloedglasvelden glinsteren met scheermesscherven; en de Drakenmuil-Caldera is de rokende kroon waar de draken omheen cirkelen.",
       "frostPlaceNotes": "IJsmantel bewaart de laatste warme haard. De Sneeuwlijn markeert waar de sneeuwjachten het overnemen; het Gletsjermeer is zwart, stil water onder het ijs; de Aurora-Trappen klimmen onder de dansende lichten; het Rilveen is een bevroren moeras dat nooit helemaal slaapt; en de Huilende Terrassen verdienen hun naam elke nacht.",
       "amberPlaceNotes": "Lantaarnmeer gloeit in het hart van de oogst. De Goudsmelt is de amberglibberige pas naar binnen; de Vergulde Boomgaard en Oogstholte herbergen de zoetste pluk en de vrijpostigste dieven; het Grote Meer weerspiegelt de brandende bladeren; Sintelesdoorn-Heuvel staat het hoogst en het roodst; en de Hellende Monoliet herinnert zich iets ouder dan de herfst.",
       "fenPlaceNotes": "Brugmeer ligt schrijlings over het trage water. De Amberveen-Trappen dalen af vanuit het oogstland; de Liliemoerassen en Moerasglans-Poelen glinsteren van dwaallichtjes en libellen; Treurwilg laat zijn takken tot in het meer hangen; en de Sluimervlakte is zo zacht als dit land maar wordt.",
-      "nightPlaceNotes": "Maanrust houdt de wake. De Nachtpoort is de weg naar het middernachtland; de Maanbron bewaart sterrenlicht waar je naast kunt staan; Schemerveld bloeit in het duister; de Statige Wacht kijkt toe zonder ooit te bewegen; en de Slapeloze Grafheuvel is de enige plek hier die nooit droomt.",
-      "hauntPlaceNotes": "Galgenmeer klit samen binnen zijn lantaarns. De Kraaienpoort is de sombere voordeur van het woud; het Weduwenstruweel is dik verweven met web; de Hangende Open Plek en de Rouwsteen-Kapel bewaren het oudste verdriet van het woud; en de Open Plek van de Jager behoort toe aan wat daar nog altijd jaagt.",
+      "nightPlaceNotes": "Moonrest keeps the vigil. The Nightgate is the way into the midnight country; the Moonspring holds starlight you can stand beside; Gloamfield blooms in the dark; the Standing Vigil watches without ever moving; and the Sleepless Barrow is the one place here that never dreams.",
+      "hauntPlaceNotes": "Gibbetmere huddles inside its lanterns. The Crowgate is the wood's grim front door; Widow's Thicket is spun thick with web; the Hanging Glade and the Mournstone Chapel keep the forest's oldest griefs; and the Huntsman's Clearing belongs to whatever still hunts there.",
       "galePlaceNotes": "Wijkhaven leunt tegen de wind. De Windweg is de klifweg naar binnen; de Huilende Heuvels rollen boomloos onder de storm; het Oude Baken brandt al zolang niemand zich kan herinneren; de Scheur valt loodrecht naar het water; de Wrakvelden houden de kust eerlijk; en de Spiegelplas is het enige stille ding in het hele rijk.",
       "junglePlaceNotes": "Drijfhaven houdt zijn vuur brandend op het strand. De Warmond is waar de rivier de groene muur ontmoet; het Palmstrand loopt wit en warm langs de branding; de Smaragdwarboel en de Rankval verslinden het binnenland; de Saffieren Lagune gloeit helder en diep; en het Verzonken Afgodsbeeld waakt van onder het water.",
       "gardenPlaceNotes": "Haagwijk wacht bij de Tuinpoort. De Parterrewandeling bloeit in geknipte kleur; Kasteel Dageraad drilt zijn ridders achter nieuwe muren; de Bloesemvijver drijft het hele jaar door roze; de Oude Molen keert zijn eigen ringbedden om; het Grote Doolhof herschikt zijn gangen voor elke gast, zijn bogen bewaakt door loofvossen; de Noordwacht bewaakt de uitgaande weg; het Lelie-Bekken rust voorbij dat alles; en het Fonteinhof stroomt nog altijd helder in het hart van de tuin.",
@@ -6277,24 +6277,24 @@ export const nl_NL: EnTranslations = {
     "boss": {
       "varric": {
         "bell": {
-          "emote": "Diaken Varric grijpt de begraven klok met beide handen vast!",
-          "log": "Diaken Varric begint de grafklok te luiden.",
-          "warning": "Ga weg bij Diaken Varric!",
+          "emote": "Diaken Vandric grijpt de begraven klok met beide handen vast!",
+          "log": "Diaken Vandric begint de grafklok te luiden.",
+          "warning": "Ga weg bij Diaken Vandric!",
           "impact": "De galm van de klok doet de kamervloer barsten!",
           "lesson": "Klokgalm: een grondstoot om de twaalf seconden. Ga eruit voordat hij neerkomt."
         },
         "raise": {
-          "emote": "Diaken Varric roept namen uit de gebroken graven!",
-          "log": "Diaken Varric begint met Doden Verrijzen.",
+          "emote": "Diaken Vandric roept namen uit de gebroken graven!",
+          "log": "Diaken Vandric begint met Doden Verrijzen.",
           "warning": "Stop het grafritueel!",
           "object": "Het gebarsten graf huivert met gestolen adem.",
           "interrupt_ok": "Het grafritueel hapert.",
-          "interrupt_fail": "De doden geven gehoor aan Diaken Varrics oproep!",
+          "interrupt_fail": "De doden geven gehoor aan Diaken Vandrics oproep!",
           "lesson": "Onderbreek het gebarsten graf binnen vijf seconden, anders verrijzen de doden op zijn oproep."
         },
         "pull": "Je betreedt gewijd stof met onzuivere bedoelingen. Kniel, en word geteld.",
         "intro": "Geen ziel gaat verloren. Slechts zoekgeraakt.",
-        "mid60": "Diaken Varric leest namen uit het register met bevende triomf.",
+        "mid60": "Diaken Vandric leest namen uit het register met bevende triomf.",
         "mid30": "De grafklok antwoordt op elke naam die hij uitspreekt.",
         "defeat": "Nee... ik had de namen... ik had ze allemaal..."
       }
@@ -7980,7 +7980,7 @@ export const nl_NL: EnTranslations = {
       },
       "cold_snap": {
         "name": "Roep van de winter",
-        "description": "Voltooit de afkoeltijd van Flitsstap, Vorstsluier en Grotere onzichtbaarheid. (magiërstalent)"
+        "description": "Finishes the cooldown on Flitstep, Frostveil, and Greater Invisibility. (Mage talent)"
       },
       "greater_invisibility": {
         "name": "Grotere onzichtbaarheid",
@@ -8031,15 +8031,15 @@ export const nl_NL: EnTranslations = {
         "description": "Vuur drie ijsprojectielen af die elk {damage} vorstschade veroorzaken en leg Winterkou op het doelwit: de volgende 2 compatibele spreuken behandelen het als bevroren. Brain Freeze maakt Winterlash onmiddellijk en slaat de afkoelperiode over. (Vorst)"
       },
       "frozen_orb": {
-        "name": "Bevroren Bol",
+        "name": "Frostglobe",
         "description": "Laat een bol van wervelende vorst los die 8 seconden lang naar voren drijft, waarbij hij elke seconde {damage} vorstschade toebrengt aan vijanden in de buurt en ze met 30% vertraagt. Elke opvallende puls genereert één ijspegel. (Vorst)"
       },
       "blizzard": {
         "name": "Sneeuwstorm",
-        "description": "Roept een ijsstorm op over het doelgebied gedurende 6 sec, die {damage} Vorstschade per seconde toebrengt en vijanden met 40% vertraagt. Elk getroffen vijand haalt 0,5 sec af van Frozen Orb, tot 3 sec per worp. (Vorst)"
+        "description": "Roept een ijsstorm op over het doelgebied gedurende 6 sec, die {damage} Vorstschade per seconde toebrengt en vijanden met 40% vertraagt. Elk getroffen vijand haalt 0,5 sec af van Frostglobe, tot 3 sec per worp. (Vorst)"
       },
       "glacial_spike": {
-        "name": "Gletsjerspies",
+        "name": "Rimeneedle",
         "description": "Bezweer een massieve ijspiek die 5 IJsschilfers verbruikt om {damage} Vorstschade toe te brengen en het doelwit 4 sec op zijn plek te bevriezen. (Vorst)"
       },
       "glacial_front": {
@@ -8171,7 +8171,7 @@ export const nl_NL: EnTranslations = {
         "description": "Afmaakzet die het doelwit verwondt, waardoor het {damage} bloedt gedurende 16 sec."
       },
       "vanish": {
-        "name": "Rookstap",
+        "name": "Smokefade",
         "description": "Verdwijn uit het zicht en betreed Duskveil zelfs in gevecht. Je beweegt 50% trager terwijl je verborgen bent. Duurt tot 10 sec."
       },
       "instant_poison": {
@@ -8555,7 +8555,7 @@ export const nl_NL: EnTranslations = {
         "description": "Ga in een kolkende woede en genereer 20 woede. (Krijger-talent)"
       },
       "crusader_strike": {
-        "name": "Kruisvaardersslag",
+        "name": "Oathstrike",
         "description": "Treft het doel voor wapenschade plus {damage} Heilige schade. (paladijntalent)"
       },
       "chain_heal": {
@@ -8567,7 +8567,7 @@ export const nl_NL: EnTranslations = {
         "description": "Neemt demonische kracht aan en verhoogt pantser en aanvalskracht 20 sec. lang. (heksenmeestertalent)"
       },
       "holy_shock": {
-        "name": "Heilige schok",
+        "name": "Lightjolt",
         "description": "Schokt een bevriend doelwit met Heilige energie en geneest het voor {damage}. (Heilig signatuur)"
       },
       "aura_surge": {
@@ -8587,7 +8587,7 @@ export const nl_NL: EnTranslations = {
         "description": "Inspireert nabije bondgenoten, waardoor aanvalskracht 5 min met 35 toeneemt. (Scherpschutter signatuur)"
       },
       "wyvern_sting": {
-        "name": "Wyvernsteek",
+        "name": "Drakesting",
         "description": "Steekt de vijand van afstand en maakt hem tot 4 sec uitgeschakeld. Elke schade verbreekt het effect. (Overleving signatuur)"
       },
       "arcane_power": {
@@ -8599,7 +8599,7 @@ export const nl_NL: EnTranslations = {
         "description": "Verhoogt de kritieke kans van spreuken met 50% gedurende 15 sec. (Fire-signatuur)"
       },
       "icy_veins": {
-        "name": "IJzige Aders",
+        "name": "Coldsurge",
         "description": "Verhoogt spreukhaast met 30% en voorkomt onderbreking en terugslag van spreuken gedurende 10 sec. (Frost-signatuur)"
       },
       "cold_blood": {
@@ -8619,7 +8619,7 @@ export const nl_NL: EnTranslations = {
         "description": "Doordrenkt een bevriend doelwit met kracht, waardoor spreukkracht 15 sec met 28 toeneemt. (Discipline signatuur)"
       },
       "holy_nova": {
-        "name": "Heilige nova",
+        "name": "Hallowburst",
         "description": "Veroorzaakt een explosie van Heilig licht, geneest nabije bondgenoten voor {damage} en beschadigt nabije vijanden. (Heilig signatuur)"
       },
       "shadowform": {
@@ -8647,7 +8647,7 @@ export const nl_NL: EnTranslations = {
         "description": "Storm op een vijand af en wortel hem 1 sec. Bereik 8-25 m. (Wildernis signatuur)"
       },
       "swiftmend": {
-        "name": "Snelle genezing",
+        "name": "Fleetmend",
         "description": "Verbruikt een genezing-over-tijd-effect op een bevriend doelwit om het voor {damage} te genezen. (Herstel signatuur)"
       },
       "summon_imp": {
@@ -8655,8 +8655,8 @@ export const nl_NL: EnTranslations = {
         "description": "Roept een Emberkin op onder bevel van de Heksenmeester. De Emberkin slingert van veraf Ashbolts naar je vijanden. Het oproepen van een nieuwe demon stuurt je huidige weg. Je mag één demon tegelijk hebben."
       },
       "summon_voidwalker": {
-        "name": "Gloomshade Oproepen",
-        "description": "Roept een Gloomshade op onder bevel van de Heksenmeester. De Gloomshade is een stevige demon die je vijanden provoceert en klappen opvangt. Het oproepen van een nieuwe demon stuurt je huidige weg. Je mag één demon tegelijk hebben."
+        "name": "Duskmurk Oproepen",
+        "description": "Roept een Duskmurk op onder bevel van de Heksenmeester. De Duskmurk is een stevige demon die je vijanden provoceert en klappen opvangt. Het oproepen van een nieuwe demon stuurt je huidige weg. Je mag één demon tegelijk hebben."
       },
       "summon_succubus": {
         "name": "Duskborn Oproepen",
@@ -8755,7 +8755,7 @@ export const nl_NL: EnTranslations = {
         "description": "Je auto-aanvallen hebben een kans om je Vroeg Graf te laten inzetten op een doelwit ongeacht zijn gezondheid, zonder woedekosten. (Wapens)"
       },
       "storm_bolt": {
-        "name": "Stormbout",
+        "name": "Thunderhurl",
         "description": "Slinger je wapen naar het doelwit voor {damage} en verdoof het gedurende 3 sec."
       },
       "piercing_howl": {
@@ -8775,7 +8775,7 @@ export const nl_NL: EnTranslations = {
         "description": "Doordring je wapen met het bloed van je vijanden: jij en je melee-bondgenoten krijgen gedurende 20 sec 10% aanvalssnelheid en 10% schade."
       },
       "victory_rush": {
-        "name": "Overwinningsroes",
+        "name": "Victor's Surge",
         "description": "Sla toe voor wapenschade plus {damage} en genees 20% van je maximale gezondheid. Alleen bruikbaar binnen 20 sec na het doden van een vijand."
       },
       "intimidating_shout": {
@@ -8787,7 +8787,7 @@ export const nl_NL: EnTranslations = {
         "description": "Val aan in een brede boog en breng Fysieke schade toe aan alle vijanden voor je. Boven de 5 doelwitten wordt de schade verminderd. Wanneer je ontwijkt of pareert, kan je volgende Wraak geen woede kosten. (Protection)"
       },
       "heroic_leap": {
-        "name": "Oorlogssprong",
+        "name": "Vaulting Charge",
         "description": "Spring naar het doelgebied en breng bij de landing {damage} schade toe aan vijanden in de buurt."
       },
       "rallying_cry": {
@@ -8803,7 +8803,7 @@ export const nl_NL: EnTranslations = {
         "description": "Verander 20 sec. lang in een kolos, verbreek alle controle-effecten op jezelf en verhoog je toegebrachte schade met 20%."
       },
       "avenging_wrath": {
-        "name": "Wraakvleugel",
+        "name": "Zealwing",
         "description": "Roept wrekende kracht op en verhoogt je aanvalskracht met 60 en spreukkracht met 30 gedurende 20 sec. (paladijntalent)"
       },
       "berserk": {
@@ -8815,7 +8815,7 @@ export const nl_NL: EnTranslations = {
         "description": "Word een wervelende storm van staal en tref 4 sec. lang elke seconde alle vijanden binnen 6 meter voor {damage} schade."
       },
       "blink": {
-        "name": "Flikkerstap",
+        "name": "Flitstep",
         "description": "Teleporteert je 15 m vooruit en verbreekt worteleffecten. (magiërtalent)"
       },
       "bloodlust": {
@@ -8843,7 +8843,7 @@ export const nl_NL: EnTranslations = {
         "description": "Golpea a nabije vijanden con escarcha e inflige {damage} de daño de Vorst. (magiertalent)"
       },
       "counterspell": {
-        "name": "Spreukbreuk",
+        "name": "Spellsever",
         "description": "Onderbreekt de spreuk van het doelwit en verhindert het 6 sec lang spreuken uit die magieschool uit te spreken."
       },
       "curse_of_exhaustion": {
@@ -8992,7 +8992,7 @@ export const nl_NL: EnTranslations = {
       },
       "preparation": {
         "name": "Noodplan",
-        "description": "Beëindigt de afkoeltijd van Sprint, Ontwijking en Verdwijning. (schurkentalent)"
+        "description": "Finishes the cooldown on Swift Heels, Ghostfoot, and Smokefade. (Rogue talent)"
       },
       "presence_of_mind": {
         "name": "Razende geest",
@@ -9023,7 +9023,7 @@ export const nl_NL: EnTranslations = {
         "description": "Je verdwijnt in een rookwolk, waardoor je ontwijkingskans 8 sec. lang met 30% toeneemt."
       },
       "spellsteal": {
-        "name": "Spreukroof",
+        "name": "Spellplunder",
         "description": "Steelt een gunstig magisch effect van een vijand en draagt het op jou over."
       },
       "startle_shot": {
@@ -9421,7 +9421,7 @@ export const nl_NL: EnTranslations = {
         "name": "Kazzix' Hartscherf"
       },
       "wyrmcult_orders": {
-        "name": "Bevelen van de Wurmcultus"
+        "name": "Broodsworn Orders"
       },
       "ritual_phylactery": {
         "name": "Rituele Zielenbus"
@@ -9484,7 +9484,7 @@ export const nl_NL: EnTranslations = {
         "name": "Grafwurm-Schubmaliënkolder"
       },
       "wyrmcult_grand_robe": {
-        "name": "Groot Gewaad van de Wurmcultus"
+        "name": "Broodsworn Grand Robe"
       },
       "wyrmscale_jerkin": {
         "name": "Wurmschub-Wambuis"
@@ -10153,7 +10153,7 @@ export const nl_NL: EnTranslations = {
         "name": "Scherflied-Mantel"
       },
       "wyrmcult_spellgrips": {
-        "name": "Wurmcultus-Spreukhoudsters"
+        "name": "Broodsworn Spellgrips"
       },
       "thornpeak_wildwraps": {
         "name": "Doornkam-Wildwindsels"
@@ -10162,7 +10162,7 @@ export const nl_NL: EnTranslations = {
         "name": "Stormgelofte-Maliënkolder"
       },
       "cryptbloom_shoulderguards": {
-        "name": "Kryptbloei-Schouderbeschermers"
+        "name": "Tombpetal Shoulderguards"
       },
       "gravewyrm_thornmaul": {
         "name": "Grafwurm-Doornknuppel"
@@ -10417,7 +10417,7 @@ export const nl_NL: EnTranslations = {
         "name": "Haardgevoerde Zolen"
       },
       "frostmane_mantle": {
-        "name": "Mantel van de Vorstmanen"
+        "name": "Mantle of the Rimemane"
       },
       "ashbone_war_brand": {
         "name": "Asbeen-Oorlogsmerk"
@@ -10576,7 +10576,7 @@ export const nl_NL: EnTranslations = {
         "name": "Oog van de Ambachtsman"
       },
       "reins_terrorspark_groundshaker": {
-        "name": "Contactsleutel: Schrikvonk, de Grondschudder"
+        "name": "Ignition Key: Dreadspark Groundshaker"
       },
       "reins_drakemaw_raptor": {
         "name": "Teugels van de Drakenmuil-Raptor"
@@ -10744,7 +10744,7 @@ export const nl_NL: EnTranslations = {
         "name": "Voss' Gewijde Knots"
       },
       "wyrmcult_soulsteps": {
-        "name": "Zielstappen van de Wurmcultus"
+        "name": "Broodsworn Soulsteps"
       },
       "wyrmshadow_harness": {
         "name": "Nightfang-Harnas"
@@ -10975,7 +10975,7 @@ export const nl_NL: EnTranslations = {
         "name": "Diakens Relikwiehelm"
       },
       "varric_shadow_cowl": {
-        "name": "Varrics Schaduwkap"
+        "name": "Vandrics Schaduwkap"
       },
       "siltguard_helm": {
         "name": "Slibwacht-Helm"
@@ -11152,7 +11152,7 @@ export const nl_NL: EnTranslations = {
         "name": "Beenvorst-Koord"
       },
       "mistforged_pauldrons": {
-        "name": "Mistgesmede Schouderplaten"
+        "name": "Fogforged Pauldrons"
       },
       "tideguard_faceguard": {
         "name": "Tijwacht-Vizier"
@@ -11466,10 +11466,10 @@ export const nl_NL: EnTranslations = {
         "name": "Scherfheer Kazzix"
       },
       "wyrmcult_zealot": {
-        "name": "Wurmsekte-Dweper"
+        "name": "Broodsworn Zealot"
       },
       "wyrmcult_necromancer": {
-        "name": "Wurmsekte-Necromantiër"
+        "name": "Broodsworn Necromancer"
       },
       "boneclad_revenant": {
         "name": "Botgepantserde Weerganger"
@@ -11577,7 +11577,7 @@ export const nl_NL: EnTranslations = {
         "name": "Heiligloze Beeltenis"
       },
       "deacon_varric": {
-        "name": "Diaken Varric"
+        "name": "Diaken Vandric"
       },
       "acolyte_tessa": {
         "name": "Acoliet Tessa"
@@ -11769,7 +11769,7 @@ export const nl_NL: EnTranslations = {
         "name": "Veengeestje"
       },
       "frostmane_yeti": {
-        "name": "Vorstmanen-Yeti"
+        "name": "Rimemane Yeti"
       },
       "terrace_howler": {
         "name": "Terrashuiler"
@@ -11817,7 +11817,7 @@ export const nl_NL: EnTranslations = {
         "name": "Het Meerduister"
       },
       "harvest_sprite": {
-        "name": "Oogstgeestje"
+        "name": "Gleaning Sprite"
       },
       "mere_lurker": {
         "name": "Meerloerder"
@@ -11841,7 +11841,7 @@ export const nl_NL: EnTranslations = {
         "name": "Schemerschrijder"
       },
       "nightkin_stargazer": {
-        "name": "Nachtvolk-Sterrenkijker"
+        "name": "Gloamkin Stargazer"
       },
       "barrow_king": {
         "name": "De Grafheuvelkoning"
@@ -11991,7 +11991,7 @@ export const nl_NL: EnTranslations = {
         "name": "Emberkin"
       },
       "gloomshade": {
-        "name": "Gloomshade"
+        "name": "Duskmurk"
       },
       "duskborn": {
         "name": "Duskborn"
@@ -12262,7 +12262,7 @@ export const nl_NL: EnTranslations = {
       },
       "provisioner_fenna": {
         "name": "Proviandmeester Fenna",
-        "title": "Proviandmeester van Ouderglans",
+        "title": "Eldershine Provisioner",
         "greeting": "Brood nog warm, water nog zoet. De Holte voorziet, en ik ook."
       },
       "wardsmith_orun": {
@@ -12387,12 +12387,12 @@ export const nl_NL: EnTranslations = {
       },
       "sexton_marrow": {
         "name": "Doodgraver Marrow",
-        "title": "Doodgraver van Galgenmeer",
+        "title": "Sexton of Gibbetmere",
         "greeting": "We begraven ze hier diep, en we luiden de klokken zodat ze onthouden om te blijven liggen."
       },
       "widow_tansy": {
         "name": "Weduwe Tansy",
-        "title": "Kaarsenmaakster van Galgenmeer",
+        "title": "Candlewright of Gibbetmere",
         "greeting": "Een kaars voor elk graf, en niet een mag doven. Niet een, hoor je me?"
       },
       "vicar_creel": {
@@ -12416,7 +12416,7 @@ export const nl_NL: EnTranslations = {
         "greeting": "De zee geeft, het zand bewaart, en de jungle neemt. Blijf op het strand, vreemdeling."
       },
       "hermit_okku": {
-        "name": "Okku",
+        "name": "Okrim",
         "title": "De Man die Naar Binnen Ging",
         "greeting": "Stil nu. De trommels tellen alles wat onder de bomen loopt, en ze hebben jou al geteld."
       },
@@ -13064,7 +13064,7 @@ export const nl_NL: EnTranslations = {
       },
       "q_drogmar": {
         "title": "Krijgsheer Drogmar",
-        "text": "Krijgsheer Drogmar nam het goud van de Wurmsekte aan en zwoer de clans toe aan het ontwaken van de berg. Hij is de hamer die ze willen zwaaien tegen mijn muur, en als hij de grond beukt, {playerName}, sta dan niet dicht bij hem. Neem je metgezellen mee het oorlogskamp in en maak een eind aan hem, voor Hoogwacht.",
+        "text": "Warlord Drogmar took the Broodsworn's coin and swore the clans to the mountain's waking. He is the hammer they mean to swing at my wall - and when he slams the ground, {playerName}, do not be standing near him. Take your companions into the war-camp and end him, for Highwatch.",
         "completion": "Drogmar, dood in zijn eigen kamp. De clans zullen zich verstrooien naar de hoge passen, je hebt mijn muur een winter gekocht, {playerName}.",
         "objectives": {
           "0": {
@@ -13104,11 +13104,11 @@ export const nl_NL: EnTranslations = {
       },
       "q_zealots": {
         "title": "Gezangen op de Wind",
-        "text": "Wanneer de wind van de zuidelijke toppen komt, {playerName}, draagt hij gezang met zich mee. De Wyrmcultus verbergt zich niet langer, ze hebben tenten opgeslagen onder het Heiligdom en zingen tot wat eronder slaapt. Breng twaalf dwepers tot zwijgen. Elke gestilde stem koopt de berg nog een nacht slaap.",
+        "text": "Wanneer de wind van de zuidelijke toppen komt, {playerName}, draagt hij gezang met zich mee. De Broodswornus verbergt zich niet langer, ze hebben tenten opgeslagen onder het Heiligdom en zingen tot wat eronder slaapt. Breng twaalf dwepers tot zwijgen. Elke gestilde stem koopt de berg nog een nacht slaap.",
         "completion": "De wind is stiller. Maar wat me verontrust is niet het gezang, {playerName}, het is dat iets misschien terugzingt.",
         "objectives": {
           "0": {
-            "label": "Wyrmcultus-Dweper gedood"
+            "label": "Broodswornus-Dweper gedood"
           }
         }
       },
@@ -13181,7 +13181,7 @@ export const nl_NL: EnTranslations = {
             "label": "Wyrmcultus-Dweper gedood"
           },
           "1": {
-            "label": "Wyrmcultus-Necromancer gedood"
+            "label": "Broodswornus-Necromancer gedood"
           }
         }
       },
@@ -13621,7 +13621,7 @@ export const nl_NL: EnTranslations = {
       },
       "q_hollow_old_marrowshell": {
         "title": "De Oude Schelp van de Ondiepten",
-        "text": "De eerste naam is Oude Mergschelp, een krab zo groot als een kar die de oostelijke ondiepten heeft bejaagd sinds voordat Ouderglans een poort had. Hij zwerft, {playerName}, dus zul je de kustlijn moeten aflopen tot je zijn spoor kruist. Ga niet alleen, en vertrouw zijn stilte niet.",
+        "text": "The first name is Old Marrowshell, a crab the size of a cart that has hunted the eastern shallows since before Eldershine had a gate. It wanders, {playerName}, so you will have to walk the shoreline until you cross its track. Do not go alone, and do not trust its stillness.",
         "completion": "De ondiepten zijn weer gewoon water. Ik heb die schelp betere jagers dan ik zien breken, {playerName}. Jou niet.",
         "objectives": {
           "0": {
@@ -13763,12 +13763,12 @@ export const nl_NL: EnTranslations = {
         }
       },
       "q_fv_frostmane_tyrant": {
-        "title": "De Tiran van de Vorstmanen",
-        "text": "De huilers jaagden niet toen ze de terrassen afkwamen. Ze vluchtten. Een yeti heeft de hoge grond opgeeist, de bergbewoners noemen hem de Vorstmanen, en zelfs de roedels willen geen helling met hem delen. Er moet een einde aan komen, {playerName}, voordat de winter hem naar mijn muren drijft. Neem een vriend mee. Neem er twee.",
-        "completion": "Toen de wind vannacht ging liggen, hoorde het hele dorp de stilte waar de Vorstmanen ooit was. De Sluier is je een schuld verschuldigd die ze jaren zal doen om af te betalen, {playerName}. Draag dit, en elke deur in IJsmantel staat voor je open.",
+        "title": "The Rimemane Tyrant",
+        "text": "The howlers were not hunting when they came down the terraces. They were fleeing. A yeti has claimed the high ground, the mountain folk call it the Rimemane, and even the packs will not share a slope with it. It has to end, {playerName}, before winter drives it down to my walls. Bring a friend. Bring two.",
+        "completion": "When the wind dropped last night the whole village heard the silence where the Rimemane used to be. The Reach owes you a debt it will be years in paying, {playerName}. Wear this, and every door in Icemantle is open to you.",
         "objectives": {
           "0": {
-            "label": "De Vorstmanen gedood"
+            "label": "The Rimemane slain"
           }
         }
       },
@@ -13921,7 +13921,7 @@ export const nl_NL: EnTranslations = {
         "completion": "Vier emmers terug aan hun haken en de rijen weer stil. Je hebt een zwaardere hand met geestjes dan ik, {playerName}, en vandaag ben ik daar blij om.",
         "objectives": {
           "0": {
-            "label": "Oogstgeestje verjaagd"
+            "label": "Gleaning Sprite driven off"
           },
           "1": {
             "label": "Sapaftap-Emmer geborgen"
@@ -14063,7 +14063,7 @@ export const nl_NL: EnTranslations = {
       },
       "q_nb_eyes_on_the_vigil": {
         "title": "Ogen op de Wake",
-        "text": "Iets maakt de schrijders brutaal en de kuddes onrustig, {playerName}, en ik kan het niet aflezen in de bloemen. Cassian kan het aflezen in de hemel. Hij houdt zijn observatoriumkamp bij de Statige Wacht ten oosten van hier, waar het nachtvolk tussen de stenen drijft. Zoek hem op, en vraag wat de sterren zeggen.",
+        "text": "Something has the striders bold and the herds uneasy, {playerName}, and I cannot read it in the flowers. Cassian can read it in the sky. He keeps his observatory camp by the Standing Vigil east of here, where the gloamkin drift among the stones. Find him, and ask what the stars are saying.",
         "completion": "Lira stuurde je? Dan voelen de tuinen het ook. Ga even bij de kijker zitten, {playerName}. De sterren zijn al een maand onrustig, en elke kaart die ik teken helt noordwaarts naar de grafheuvel.",
         "objectives": {
           "0": {
@@ -14073,7 +14073,7 @@ export const nl_NL: EnTranslations = {
       },
       "q_nb_charts_of_the_stones": {
         "title": "De Kaarten in de Stenen",
-        "text": "De Wake-stenen zijn ouder dan Maanrust, ouder dan het nachtvolk dat ze verzorgt, en hun vlakken zijn gesneden met sterrenkaarten die ik mijn hele leven heb besteed te leren lezen. De hemel is verschoven, {playerName}, en ik moet weten hoe ver. Lees de kaarten op drie van de stenen en breng me hun standen.",
+        "text": "The Vigil stones are older than Moonrest, older than the gloamkin who tend them, and their faces are cut with star charts I have spent my life learning to read. The sky has shifted, {playerName}, and I must know how far. Read the charts on three of the stones and bring me their bearings.",
         "completion": "Er blijft geen twijfel over. Elke stand is naar de Slapeloze Grafheuvel gekropen, alsof de hemel zelf over die heuvel buigt om toe te kijken. De oude koningen werden niet zonder reden onder uitgelijnde sterren begraven, {playerName}.",
         "objectives": {
           "0": {
@@ -14097,7 +14097,7 @@ export const nl_NL: EnTranslations = {
       "q_nb_the_barrow_king": {
         "title": "De Grafheuvelkoning Ontwaakt",
         "text": "Elke stand, elke onrustige ster, elke geopende heuvel wijst naar een ding: de Grafheuvelkoning ontwaakt onder de grote heuvel, en dit rijk heeft geen dageraad om hem tegen te houden. Hij moet ter ruste worden gelegd voordat hij zich zijn kroon herinnert, {playerName}. Ga niet alleen: neem een vriend mee, en houd het bloemlicht achter je.",
-        "completion": "De sterren zijn voor het eerst in een seizoen tot rust gekomen, {playerName}. De heuvels zijn gesloten, het nachtvolk is stil geworden bij hun stenen, en de koning slaapt weer beneden. Draag deze mantel: Maanrust sneed hem voor wie de nacht uiteindelijk vertrouwde.",
+        "completion": "The stars have settled for the first time in a season, {playerName}. The mounds are closed, the gloamkin have gone still at their stones, and the king sleeps below once more. Wear this mantle: Moonrest cut it for whoever the night finally trusted.",
         "objectives": {
           "0": {
             "label": "De Grafheuvelkoning ter ruste gelegd"
@@ -14105,9 +14105,9 @@ export const nl_NL: EnTranslations = {
         }
       },
       "q_ww_bells_of_gallowmere": {
-        "title": "De Klokken van Galgenmeer",
-        "text": "Hoor je dat geluid, {playerName}? Dat is Galgenmeer, de noordweg op, dat haar doden in slaap luidt. Doodgraver Marrow houdt de telling bij van elke ziel onder het bladerdak, levend en begraven. Ga en laat je tellen, voordat het woud jou zelf telt.",
-        "completion": "Cobb stuurde je heel de weg op, he? Goede man. Hij houdt die poortlantaarns al dertig jaar brandend, en het woud is nooit langs hem heen gekomen. Welkom in Galgenmeer, {playerName}. Let op de klokken.",
+        "title": "The Bells of Gibbetmere",
+        "text": "Hear that tolling, {playerName}? That is Gibbetmere, up the north road, ringing its dead to sleep. Sexton Marrow keeps the count of every soul under the canopy, living and buried. Go and be counted, before the wood counts you itself.",
+        "completion": "Cobb sent you up the road whole, did he? Good man. He has kept those gate lanterns lit for thirty years, and the wood has never once got past him. Welcome to Gibbetmere, {playerName}. Mind the bells.",
         "objectives": {
           "0": {
             "label": "Meld je bij Doodgraver Marrow"
@@ -14136,7 +14136,7 @@ export const nl_NL: EnTranslations = {
       },
       "q_ww_candles_at_the_bounds": {
         "title": "Kaarsen bij de Grenzen",
-        "text": "Vier grenzenstenen omringen Galgenmeer, {playerName}, een op elke weg naar buiten, en op elke steen brandt een grafkaars. Zolang ze branden, blijven de begravenen begraven. De motregen heeft ze alle vier gedoofd, en ik ben te oud om de grenzen alleen te belopen. Neem mijn kaars en steek ze snel weer aan.",
+        "text": "Four boundary stones ring Gibbetmere, {playerName}, one on each road out, and a grave-candle burns on every stone. While they burn, the buried stay buried. The drizzle has drowned them, all four, and I am too old to walk the bounds alone. Take my taper and relight them, quickly.",
         "completion": "Alle vier branden? Adem dan, {playerName}. Jij hoorde het niet, maar het hele dorp wel: de klokken luidden lichter op het moment dat de laatste pit vlam vatte.",
         "objectives": {
           "0": {
@@ -14166,7 +14166,7 @@ export const nl_NL: EnTranslations = {
       },
       "q_ww_what_the_bark_holds": {
         "title": "Wat de Bast Vasthoudt",
-        "text": "In de Hangende Open Plek ten oosten van Galgenmeer hangen de spinners hun in zijde gewikkelde doden aan de takken, en de grafbast-schuifelaars houden er beneden de wacht als geduldige lijkdragers. Dat zijn onze mensen daarboven, {playerName}. Breek vijf schuifelaars, snijd drie van de gewikkelde doden los, en breng ze naar huis, naar de grond.",
+        "text": "In the Hanging Glade east of Gibbetmere the spinners hang their silk-wrapped dead from the boughs, and the gravenbark shamblers stand guard beneath like patient pallbearers. Those are our people up there, {playerName}. Break five shamblers, cut down three of the wrapped dead, and bring them home to soil.",
         "completion": "Drie zielen terug onder eerlijke grond voor het invallen van de nacht. De schuifelaars zullen weer aangroeien, bast doet dat altijd, maar vanavond hangt de open plek leeg, en dat is genoeg.",
         "objectives": {
           "0": {
@@ -14180,17 +14180,17 @@ export const nl_NL: EnTranslations = {
       "q_ww_walking_mosley_home": {
         "title": "Mosley Naar Huis Brengen",
         "text": "Mijn doodgraver Mosley nam drie dagen geleden de kapelweg om een plek te openen op de oude begraafplaats, en de opgraving stortte boven op hem in. Hij heeft zich naar buiten gekrabbeld, de dwaas leeft nog, maar hij zit ineengedoken bij de kapelgraven en durft niet te bewegen vanwege de spinners op de weg. Breng hem lopend naar huis, {playerName}. Ik kan de klokken niet luiden voor een levende man.",
-        "completion": "Hij kwam op eigen benen door de poort, en zwoer dat hij van nu af aan niets dieper dan een raapbed meer zal graven. Hij zal zondag alweer op de begraafplaats staan, dat doen ze altijd. Dank je wel, {playerName}. Galgenmeer houdt haar mensen vast, dat is onze hele wet.",
+        "completion": "He came through the gate on his own two feet, swearing he will dig nothing deeper than a turnip bed from now on. He will be back at the yard by Sunday, they always are. Thank you, {playerName}. Gibbetmere keeps its people, that is the whole of our law.",
         "objectives": {
           "0": {
-            "label": "Doodgraver Mosley veilig terug naar Galgenmeer gebracht"
+            "label": "Gravedigger Mosley walked safely back to Gibbetmere"
           }
         }
       },
       "q_ww_horn_of_the_huntsman": {
         "title": "De Hoorn van de Jager",
         "text": "Je hebt de hoorn nu wel gehoord, {playerName}, dun en ver weg, het geluid waarvoor het hele woud zijn adem inhoudt. De Bleke Jager rijdt door zijn open plek ten noorden van hier, en elk graf dat hij passeert wordt ondieper. Hij was ooit een man, en hij is verkeerd begraven, en ik doe niet langer alsof gebed het zal oplossen. Neem een vriend mee, neem er twee, en werp hem uit het zadel.",
-        "completion": "De hoorn stopte halverwege een noot. Elke klok in Galgenmeer luidde eenmaal, uit zichzelf, en toen werd het woud stiller dan ik het in dertig jaar heb gehoord. Je hebt het ritueel voltrokken dat ik niet kon, {playerName}. Draag dit, en loop onbevreesd onder het bladerdak.",
+        "completion": "The horn stopped mid-note. Every bell in Gibbetmere rang once, on its own, and then the wood went quieter than I have heard it in thirty years. You have done the rite I could not, {playerName}. Wear this, and walk under the canopy unafraid.",
         "objectives": {
           "0": {
             "label": "De Bleke Jager uit het zadel geworpen"
@@ -14239,11 +14239,11 @@ export const nl_NL: EnTranslations = {
       },
       "q_pr_the_man_who_went_in": {
         "title": "De Man die Naar Binnen Ging",
-        "text": "De duikers zullen de bomengrens niet oversteken, {playerName}, en ik zal het ze niet vragen. Je hebt de trommels inmiddels gehoord: iedereen hoort ze, tegen de tweede nacht. Een man op dit eiland is ooit naar dat geluid toe gelopen en teruggekomen. Okku. Hij kampeert onder de grote banyanbomen bij de Rankval, diep de Warboel-weg op. Zoek hem op, en vraag hem wat het groen verbergt.",
+        "text": "De duikers zullen de bomengrens niet oversteken, {playerName}, en ik zal het ze niet vragen. Je hebt de trommels inmiddels gehoord: iedereen hoort ze, tegen de tweede nacht. Een man op dit eiland is ooit naar dat geluid toe gelopen en teruggekomen. Okrim. Hij kampeert onder de grote banyanbomen bij de Rankval, diep de Warboel-weg op. Zoek hem op, en vraag hem wat het groen verbergt.",
         "completion": "Isha stuurde je? De Parelmoeder heeft mijn naam in jaren niet uitgesproken. Ga zitten, buiten het bereik van de ranken, {playerName}, en ik zal je vertellen wat ik weet: de trommels zijn niet het gevaar. Ze zijn de waarschuwing.",
         "objectives": {
           "0": {
-            "label": "Zoek Okku bij de Rankval"
+            "label": "Zoek Okrim bij de Rankval"
           }
         }
       },
@@ -14722,7 +14722,7 @@ export const nl_NL: EnTranslations = {
             "label": "De Glinstermeer"
           },
           "7": {
-            "label": "Wyrmcultus-Tenten"
+            "label": "Broodswornus-Tenten"
           },
           "8": {
             "label": "Revenantenvelden"
@@ -14734,10 +14734,10 @@ export const nl_NL: EnTranslations = {
       },
       "veiled_hollow": {
         "name": "De Sluierholte",
-        "welcome": "De lucht zoemt van oude magie. Zoek Hoedster Saelwyn onder de grote boom van Ouderglans.",
+        "welcome": "The air hums with old magic. Seek Keeper Saelwyn beneath the great tree of Eldershine.",
         "pois": {
           "0": {
-            "label": "Ouderglans"
+            "label": "Eldershine"
           },
           "1": {
             "label": "De Schemerval-Grot"
@@ -14875,7 +14875,7 @@ export const nl_NL: EnTranslations = {
             "label": "De Nachtpoort"
           },
           "2": {
-            "label": "De Maanbron"
+            "label": "The Moonspring"
           },
           "3": {
             "label": "Schemerveld"
@@ -14890,10 +14890,10 @@ export const nl_NL: EnTranslations = {
       },
       "wraithwood": {
         "name": "Het Schimmenwoud",
-        "welcome": "Het bladerdak sluit zich als een deksel over de weg. Blijf bij de lantaarns van Galgenmeer, en antwoord niet als het woud je naam roept.",
+        "welcome": "The canopy closes over the road like a lid. Keep to the lanterns of Gibbetmere, and do not answer if the wood calls your name.",
         "pois": {
           "0": {
-            "label": "Galgenmeer"
+            "label": "Gibbetmere"
           },
           "1": {
             "label": "De Kraaienpoort"

@@ -110,7 +110,7 @@ export const DELVE_MOBS: Record<string, MobTemplate> = {
   // --- Boss ---
   deacon_varric: {
     id: 'deacon_varric',
-    name: 'Deacon Varric',
+    name: 'Deacon Vandric',
     minLevel: 9,
     maxLevel: 9,
     family: 'undead',

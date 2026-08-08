@@ -239,7 +239,7 @@ const SPIN_ATTACK_TIMESCALE = 1.6;
 const SPIN_ONCE_DURATION = 0.55;
 const SPIN_ONCE_RATE = 18;
 const GHOST_OPACITY = 0.34;
-// Stealth (Duskveil/Smokestep) reads as a faded-but-solid silhouette, a touch
+// Stealth (Duskveil/Smokefade) reads as a faded-but-solid silhouette, a touch
 // denser than the spirit run's 0.34 (owner: stealth was "too transparent").
 const STEALTH_OPACITY = 0.45;
 const SOUL_REND_OPACITY = 0.58;

@@ -869,7 +869,7 @@ const NIGHT_ZMAX = 1820; // ...and zMax
 const NIGHT_LAND_LOBES = [
   { x: -390, z: 1300, r: 60 }, // the Nightgate's shelf
   { x: -330, z: 1298, r: 46 }, // ...and the crossing's dark-side shoulder
-  { x: -340, z: 1380, r: 90 }, // the realm's heart: Moonrest and the Moonwell
+  { x: -340, z: 1380, r: 90 }, // the realm's heart: Moonrest and the Moonspring
   { x: -440, z: 1480, r: 80 }, // Gloamfield's flower downs
   { x: -280, z: 1550, r: 70 }, // the Standing Vigil's rise
   { x: -360, z: 1660, r: 85 }, // the barrow downs
@@ -936,7 +936,7 @@ const WOOD_LAND_LOBES = [
   { x: 390, z: 1300, r: 55 }, // the Crowgate's shelf
   { x: 398, z: 1742, r: 46 }, // the Wyrmroad's wood-side shoulder...
   { x: 404, z: 1790, r: 46 }, // ...carried to the waste's border
-  { x: 360, z: 1420, r: 90 }, // the realm's heart: Gallowmere under the eaves
+  { x: 360, z: 1420, r: 90 }, // the realm's heart: Gibbetmere under the eaves
   { x: 280, z: 1490, r: 80 }, // Widow's Thicket
   { x: 440, z: 1530, r: 75 }, // the Hanging Glade
   { x: 410, z: 1488, r: 40 }, // the glade road's shoulder
@@ -4564,7 +4564,7 @@ function terrainHeightUnpadded(x: number, z: number, seed: number, skipEdits = f
     }
   }
   // The Huntsman's Bluff: the Pale Huntsman's clearing sits on a flat-top
-  // rise; his road from Gallowmere climbs the blended rim as the ramp.
+  // rise; his road from Gibbetmere climbs the blended rim as the ramp.
   if (z > 1620 && z < 1750) {
     const dBluff = Math.hypot(x - 380, z - 1680);
     if (dBluff < 32) {

@@ -220,7 +220,7 @@ export const PALMREACH_MOBS: Record<string, MobTemplate> = {
 // The folk of the strand: a watcher keeps the Tanglemouth waycamp, the
 // salvage-boss and the Pearl-Mother hold Drifthaven, and one hermit camps
 // alone under the Vinefall banyans, the only local who ever walked toward
-// the drums. Okku stands far from the hub on purpose: the jungle chain
+// the drums. Okrim stands far from the hub on purpose: the jungle chain
 // sends players out to find him.
 export const PALMREACH_NPCS: Record<string, NpcDef> = {
   strandwatcher_pell: {
@@ -262,7 +262,7 @@ export const PALMREACH_NPCS: Record<string, NpcDef> = {
   },
   hermit_okku: {
     id: 'hermit_okku',
-    name: 'Okku',
+    name: 'Okrim',
     title: 'The Man Who Went In',
     // 12.4 yd out from the great banyan at (-400, 1080), on the shoulder of
     // the Tangle road's last waypoint (2.2 yd from it, 2.4 yd off the road
@@ -390,7 +390,7 @@ export const PALMREACH_QUESTS: Record<string, QuestDef> = {
     name: 'The Man Who Went In',
     giverNpcId: 'pearlmother_isha',
     turnInNpcId: 'hermit_okku',
-    text: 'The divers will not step past the treeline, $N, and I will not ask them to. You have heard the drums by now: everyone does, by the second night. One man on this island ever walked toward that sound and came back. Okku. He camps under the great banyans at the Vinefall, deep up the Tangle road. Find him, and ask him what the green is hiding.',
+    text: 'The divers will not step past the treeline, $N, and I will not ask them to. You have heard the drums by now: everyone does, by the second night. One man on this island ever walked toward that sound and came back. Okrim. He camps under the great banyans at the Vinefall, deep up the Tangle road. Find him, and ask him what the green is hiding.',
     completionText:
       "Isha sent you? The Pearl-Mother has not spoken my name in years. Sit out of the vines' reach, $N, and I will tell you what I know: the drums are not the danger. They are the warning.",
     objectives: [
@@ -398,7 +398,7 @@ export const PALMREACH_QUESTS: Record<string, QuestDef> = {
         type: 'interact',
         targetNpcId: 'hermit_okku',
         count: 1,
-        label: 'Find Okku at the Vinefall',
+        label: 'Find Okrim at the Vinefall',
       },
     ],
     xpReward: 2800,

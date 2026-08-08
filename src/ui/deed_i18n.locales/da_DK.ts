@@ -38,9 +38,7 @@ export const table: DeedLocaleTable = {
     title: 'Sergent',
   },
   pvp_honor_knight_lieutenant: {
-    name: 'Ridderløjtnant',
     desc: 'Optjen 40.000 Ære i din levetid, en hel sæsons rigtig krig bag dig.',
-    title: 'Ridderløjtnant',
   },
   pvp_honor_field_marshal: {
     name: 'Feltmarskal',
@@ -76,7 +74,6 @@ export const table: DeedLocaleTable = {
     desc: 'Host en malmare, en traestand og et urtebed i Nightbloom.',
   },
   chr_nightbloom_first_cast: {
-    name: 'En ring pa manebronden',
     desc: 'Fang en fisk i Nightblooms vande.',
   },
   chr_wraithwood_gatherer: {
@@ -267,7 +264,6 @@ export const table: DeedLocaleTable = {
     title: 'Ormefælder',
   },
   dgn_sanctum_speed: {
-    name: 'Helligdomsspurt',
     desc: 'Besejr Korzul Gravormen inden for 15 minutter efter, at din gruppe har gjort krav på Gravormens Helligdom.',
   },
   dgn_nythraxis_gravebreaker: {
@@ -330,7 +326,7 @@ export const table: DeedLocaleTable = {
   },
   dlv_varric_ringers: {
     name: 'Klokkerne Forstummer',
-    desc: 'Fæld hver Ligklokkeringer, Diakon Varric genopvækker, før han selv falder.',
+    desc: 'Fæld hver Ligklokkeringer, Diakon Vandric genopvækker, før han selv falder.',
   },
   dlv_nhalia_bells: {
     name: 'Klokkestiller',
@@ -403,7 +399,6 @@ export const table: DeedLocaleTable = {
   },
   chr_peaks_chapter_iii: {
     name: 'Krøniken om Tornetop',
-    desc: 'Følg bjergets fulde fortælling til ende: Ormekulten knust, Helligdommen bragt til tavshed, den Vågnende Tinde styrtet og hver navngiven rædsel i klipperne fældet.',
     title: 'af Tornetop',
   },
   chr_peaks_sparring: {

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { Sim } from '../src/sim/sim';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
+import { Sim } from '../src/sim/sim';
 import type { PlayerClass } from '../src/sim/types';
 
 const SEED = 42;
@@ -30,7 +30,7 @@ const swingUntilCursed = (sim: Sim, mob: any, target: any, max = 300) => {
 };
 
 describe('mob enfeebling curse (Maddening Whisper)', () => {
-  it('Wyrmcult Zealot template carries the enfeeble mechanic', () => {
+  it('Broodsworn Zealot template carries the enfeeble mechanic', () => {
     expect(MOBS.wyrmcult_zealot.enfeeble).toBeDefined();
     expect(MOBS.wyrmcult_zealot.enfeeble!.name).toBe('Maddening Whisper');
   });
@@ -97,7 +97,10 @@ describe('mob enfeebling curse (Maddening Whisper)', () => {
     const old = enfeeble.chance;
     enfeeble.chance = 1;
     try {
-      for (let i = 0; i < 80; i++) { player.hp = player.maxHp; (sim as any).mobSwing(mob, player); }
+      for (let i = 0; i < 80; i++) {
+        player.hp = player.maxHp;
+        (sim as any).mobSwing(mob, player);
+      }
     } finally {
       enfeeble.chance = old;
     }
@@ -113,7 +116,10 @@ describe('mob enfeebling curse (Maddening Whisper)', () => {
     const old = enfeeble.chance;
     enfeeble.chance = 1;
     try {
-      for (let i = 0; i < 80; i++) { player.hp = player.maxHp; (sim as any).mobSwing(mob, player); }
+      for (let i = 0; i < 80; i++) {
+        player.hp = player.maxHp;
+        (sim as any).mobSwing(mob, player);
+      }
     } finally {
       enfeeble.chance = old;
     }

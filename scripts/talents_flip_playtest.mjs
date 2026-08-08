@@ -573,7 +573,7 @@ async function mageFlow() {
 
   if (snap.spellbookDisplay === 'block') await closeWindow(page, '#spellbook');
   const target = await setupTarget(page);
-  const icy = await realCastByName(page, 'Icy Veins');
+  const icy = await realCastByName(page, 'Coldsurge');
   const pyrelance = await castAtTarget(page, 'Pyrelance');
   const nova = await castAtTarget(page, 'Frost Nova');
   await shot(page, 8, 'mage-freeplay-combat');
@@ -587,7 +587,7 @@ async function mageFlow() {
   verdict(
     8,
     freeplayOk,
-    `Mage free-play target=${target.name}; Icy Veins=${icy.ok}; Pyrelance hp ${pyrelance.before.hp} -> ${pyrelance.after?.hp}; Frost Nova cast=${nova.cast.ok}`,
+    `Mage free-play target=${target.name}; Coldsurge=${icy.ok}; Pyrelance hp ${pyrelance.before.hp} -> ${pyrelance.after?.hp}; Frost Nova cast=${nova.cast.ok}`,
     {
       defect: freeplayOk
         ? null

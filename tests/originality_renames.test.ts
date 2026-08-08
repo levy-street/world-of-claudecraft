@@ -8,9 +8,12 @@
 import { describe, expect, it } from 'vitest';
 import { DEEDS } from '../src/sim/content/deeds';
 import { ENCHANTS } from '../src/sim/content/enchants';
+import { MOUNTS } from '../src/sim/content/mounts';
 import { TOOL_EFFECTS } from '../src/sim/content/professions';
+import { TALENTS } from '../src/sim/content/talents';
 import { ZONE3_NPCS, ZONE3_QUESTS } from '../src/sim/content/zone3';
-import { ITEMS } from '../src/sim/data';
+import { ABILITIES, ITEMS, MOBS, NPCS, QUESTS, ZONES } from '../src/sim/data';
+import { en } from '../src/ui/i18n.resolved.generated/en';
 
 describe('originality-sweep display literals stay renamed', () => {
   it('pins the renamed enchant display names', () => {
@@ -41,5 +44,92 @@ describe('originality-sweep display literals stay renamed', () => {
 
   it('zone3 NPC display names were ruled keeps, not renames', () => {
     expect(ZONE3_NPCS.quartermaster_bree.name).toBe('Quartermaster Bree');
+  });
+});
+
+// Masterwrought Phase 03 naming audit (R15, 2026-08-07): every confirmed
+// collision renamed display-only. Old names additionally arm the ip_scrub
+// denylist; verdicts + evidence live in docs/prd/masterwrought/naming-audit.md.
+describe('phase 03 naming-audit display literals stay renamed', () => {
+  it('pins the renamed ability display names', () => {
+    expect(ABILITIES.crusader_strike.name).toBe('Oathstrike');
+    expect(ABILITIES.heroic_leap.name).toBe('Vaulting Charge');
+    expect(ABILITIES.holy_nova.name).toBe('Hallowburst');
+    expect(ABILITIES.icy_veins.name).toBe('Coldsurge');
+    expect(ABILITIES.victory_rush.name).toBe("Victor's Surge");
+    expect(ABILITIES.wyvern_sting.name).toBe('Drakesting');
+    expect(ABILITIES.glacial_spike.name).toBe('Rimeneedle');
+    expect(ABILITIES.frozen_orb.name).toBe('Frostglobe');
+    expect(ABILITIES.holy_shock.name).toBe('Lightjolt');
+    expect(ABILITIES.storm_bolt.name).toBe('Thunderhurl');
+    expect(ABILITIES.vanish.name).toBe('Smokefade');
+    expect(ABILITIES.counterspell.name).toBe('Spellsever');
+    expect(ABILITIES.spellsteal.name).toBe('Spellplunder');
+    expect(ABILITIES.swiftmend.name).toBe('Fleetmend');
+    expect(ABILITIES.summon_voidwalker.name).toBe('Summon Duskmurk');
+    expect(ABILITIES.avenging_wrath.name).toBe('Zealwing');
+    expect(ABILITIES.blink.name).toBe('Flitstep');
+  });
+
+  it('pins the renamed item display names', () => {
+    expect(ITEMS.wyrmcult_grand_robe.name).toBe('Broodsworn Grand Robe');
+    expect(ITEMS.wyrmcult_orders.name).toBe('Broodsworn Orders');
+    expect(ITEMS.wyrmcult_soulsteps.name).toBe('Broodsworn Soulsteps');
+    expect(ITEMS.wyrmcult_spellgrips.name).toBe('Broodsworn Spellgrips');
+    expect(ITEMS.cryptbloom_shoulderguards.name).toBe('Tombpetal Shoulderguards');
+    expect(ITEMS.frostmane_mantle.name).toBe('Mantle of the Rimemane');
+    expect(ITEMS.varric_shadow_cowl.name).toBe("Vandric's Shadow Cowl");
+    expect(ITEMS.mistforged_pauldrons.name).toBe('Fogforged Pauldrons');
+    expect(ITEMS.reins_terrorspark_groundshaker.name).toBe('Ignition Key: Dreadspark Groundshaker');
+  });
+
+  it('pins the renamed mob, pet, and mechanic display names', () => {
+    expect(MOBS.wyrmcult_zealot.name).toBe('Broodsworn Zealot');
+    expect(MOBS.wyrmcult_necromancer.name).toBe('Broodsworn Necromancer');
+    expect(MOBS.frostmane_yeti.name).toBe('Rimemane Yeti');
+    expect(MOBS.nightkin_stargazer.name).toBe('Gloamkin Stargazer');
+    expect(MOBS.deacon_varric.name).toBe('Deacon Vandric');
+    expect(MOBS.harvest_sprite.name).toBe('Gleaning Sprite');
+    expect(MOBS.gloomshade.name).toBe('Duskmurk');
+    expect((MOBS.rift_hellguard as { cleave?: { name?: string } }).cleave?.name).toBe(
+      'Pitsteel Sweep',
+    );
+    expect((MOBS.rift_boss_pitlord as { aoePulse?: { name?: string } }).aoePulse?.name).toBe(
+      'Pitfire Ring',
+    );
+    expect((MOBS.shardlord_kazzix as { frostbite?: { name?: string } }).frostbite?.name).toBe(
+      'Wintergnaw',
+    );
+  });
+
+  it('pins the renamed NPC, town, and POI display names', () => {
+    expect(NPCS.hermit_okku.name).toBe('Okrim');
+    expect(NPCS.provisioner_fenna.title).toBe('Eldershine Provisioner');
+    expect(NPCS.sexton_marrow.title).toBe('Sexton of Gibbetmere');
+    expect(NPCS.widow_tansy.title).toBe('Candlewright of Gibbetmere');
+    const wraithwood = ZONES.find((z) => z.id === 'wraithwood');
+    const veiled = ZONES.find((z) => z.id === 'veiled_hollow');
+    const nightbloom = ZONES.find((z) => z.id === 'nightbloom');
+    const thornpeak = ZONES.find((z) => z.id === 'thornpeak_heights');
+    expect(wraithwood?.hub.name).toBe('Gibbetmere');
+    expect(wraithwood?.pois?.[0]?.label).toBe('Gibbetmere');
+    expect(veiled?.hub.name).toBe('Eldershine');
+    expect(veiled?.pois?.[0]?.label).toBe('Eldershine');
+    expect(nightbloom?.pois?.[2]?.label).toBe('The Moonspring');
+    expect(thornpeak?.pois?.[7]?.label).toBe('Broodsworn Tents');
+  });
+
+  it('pins the renamed quest, deed, spec, mount, and skin display names', () => {
+    expect(QUESTS.q_ww_bells_of_gallowmere.name).toBe('The Bells of Gibbetmere');
+    expect(QUESTS.q_fv_frostmane_tyrant.name).toBe('The Rimemane Tyrant');
+    expect(DEEDS.dgn_sanctum_speed.name).toBe('Sanctum Footrace');
+    expect(DEEDS.chr_nightbloom_first_cast.name).toBe('A Ripple on the Moonspring');
+    expect(DEEDS.pvp_honor_knight_lieutenant.name).toBe('Banneret');
+    expect(DEEDS.pvp_honor_knight_lieutenant.reward).toEqual({ kind: 'title', text: 'Banneret' });
+    const resto = TALENTS.shaman.specs.find((s) => s.id === 'restoration');
+    expect(resto?.name).toBe('Spiritcall');
+    expect(MOUNTS.terrorspark_groundshaker.name).toBe('Dreadspark Groundshaker');
+    expect(en.hudChrome.wocStore.skins.winterbite.name).toBe('Wintergnaw');
+    expect(en.hudChrome.mounts.name_terrorspark_groundshaker).toBe('Dreadspark Groundshaker');
   });
 });

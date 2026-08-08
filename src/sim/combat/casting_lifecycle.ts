@@ -720,7 +720,7 @@ export function castAbility(
     ctx.error(p.id, 'You are stunned!');
     return;
   }
-  // Blink While Casting (mage choice row): Flickerstep slips through the busy
+  // Blink While Casting (mage choice row): Flitstep slips through the busy
   // guard AND the GCD, an escape button that never touches the cast in
   // progress (the cast survives the relocation: player_motion only breaks
   // casts on MOVE INPUT). Everything else keeps the classic rules. No rng.
@@ -807,11 +807,11 @@ export function castAbility(
     ctx.error(p.id, 'Your target must dodge first.');
     return;
   }
-  // Kill-window abilities (Victory Rush): usable only while the enabling aura
+  // Kill-window abilities (Victor's Surge): usable only while the enabling aura
   // is worn; applyAbility consumes it atomically at cast commit, right before the
   // cost/cooldown billing, so no early-return path can eat the aura without also
   // committing the cast. Reuses the existing not-ready error literal so no new
-  // client matcher is needed. requiresAuraStacks (Glacial Spike's full 5-stack
+  // client matcher is needed. requiresAuraStacks (Rimeneedle's full 5-stack
   // Icicles) additionally gates on the stack count.
   if (
     ability.requiresAuraKind &&
@@ -1088,7 +1088,7 @@ export function castAbility(
     p.mountCastKey = '';
   }
   // An instant slipping through a RUNNING cast (usableWhileCasting /
-  // Flickerstep) must not disturb that cast's aim: castTargetId/castAim belong
+  // Flitstep) must not disturb that cast's aim: castTargetId/castAim belong
   // to the spell in progress (its finish path re-validates them), so they are
   // stashed here and restored after the interleaved resolution below. Without
   // this the running Fireball lost its target (fizzling at completion, the
@@ -1158,7 +1158,7 @@ export function castAbility(
   if (ability.channel) {
     spendAbilityCost(ctx, p, meta, res);
     armAbilityCooldown(p, ability.id, res.cooldown, false, res.bonusCharges ?? 0);
-    // Blizzard's Frozen Orb refund budget resets per cast (combat/frost_mage.ts).
+    // Blizzard's Frostglobe refund budget resets per cast (combat/frost_mage.ts).
     frostMageChannelStart(p, ability.id);
     // Aether Darts arms its one-time Arcane Charge consume for THIS channel
     // (combat/chronomancy.ts); inert for every other channel.
@@ -1453,7 +1453,7 @@ function applyChannelTick(
       ability: res.def.id,
     });
     const channelSp = channelTickBonus(abilityScalingPower(p, res.def), res.def, talentDmgMult);
-    // How many enemies this pulse actually struck: Blizzard's Frozen Orb
+    // How many enemies this pulse actually struck: Blizzard's Frostglobe
     // refund (frostMageChannelPulse below) scales with it.
     let struck = 0;
     for (const eff of res.effects) {
@@ -1884,7 +1884,7 @@ function applyAbility(
   }
 
   // The cast is committed from this point on (target resolved, cost payable):
-  // consume the gating aura (Glacial Spike's full Icicles stack, Victory Rush's
+  // consume the gating aura (Rimeneedle's full Icicles stack, Victor\'s Surge's
   // kill window) HERE, atomically with the cost/cooldown billing below, rather
   // than inside runEffects. A ranged ability's runEffects can run ticks later,
   // once its projectile lands (projectile_travel.ts); leaving the consume there

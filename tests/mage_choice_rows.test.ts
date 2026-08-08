@@ -85,7 +85,7 @@ function applyControl(
 }
 
 describe('mage base kit', () => {
-  it('Flickerstep (blink) is a BASE ability from level 5, matching its level-5 row modifiers', () => {
+  it('Flitstep (blink) is a BASE ability from level 5, matching its level-5 row modifiers', () => {
     // The level-5 choice row offers two blink-modifying picks (Double Blink, Blink
     // cast), so Blink must exist by level 5, not 10: they must not bank against an
     // ability the player cannot yet learn.
@@ -388,7 +388,7 @@ describe('mage choice rows (owner tree)', () => {
     expect(p.auras.some((a) => a.kind === 'next_cast_instant')).toBe(true);
   });
 
-  it('Cold Snap finishes the cooldowns of Flickerstep, Frostveil and Greater Invisibility', () => {
+  it('Cold Snap finishes the cooldowns of Flitstep, Frostveil and Greater Invisibility', () => {
     const { sim, p } = rig({ 8: 'mag_r8_greater_invis', 17: 'mag_r17_cold_snap' });
     p.cooldowns.set('blink', 12);
     p.cooldowns.set('ice_barrier', 25);
@@ -465,7 +465,7 @@ describe('mage choice rows (owner tree)', () => {
     expect(p.resource - 10).toBeGreaterThanOrEqual(6 * 40); // the flat mana floor
   });
 
-  it('Blink While Casting slips Flickerstep through the busy guard, keeping the cast', () => {
+  it('Blink While Casting slips Flitstep through the busy guard, keeping the cast', () => {
     const { sim, p } = rig({ 5: 'mag_r5_blink_cast' });
     addTargetMob(sim);
     sim.castAbility('fireball');
@@ -478,7 +478,7 @@ describe('mage choice rows (owner tree)', () => {
     expect(p.pos.z).not.toBe(z0); // and actually moved
   });
 
-  it('without the pick, a mid-cast Flickerstep press stays blocked', () => {
+  it('without the pick, a mid-cast Flitstep press stays blocked', () => {
     const { sim, p } = rig({ 5: 'mag_r5_double_blink' });
     addTargetMob(sim);
     sim.castAbility('fireball');

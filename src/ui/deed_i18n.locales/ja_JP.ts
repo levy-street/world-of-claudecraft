@@ -38,9 +38,9 @@ export const table: DeedLocaleTable = {
     title: '軍曹',
   },
   pvp_honor_knight_lieutenant: {
-    name: '騎士中尉',
+    name: 'バナレット',
     desc: '生涯名誉40,000を獲得する。本物の戦を一シーズン戦い抜いてきた証だ。',
-    title: '騎士中尉',
+    title: 'バナレット',
   },
   pvp_honor_field_marshal: {
     name: '元帥',
@@ -76,7 +76,7 @@ export const table: DeedLocaleTable = {
     desc: 'Nightbloomで鉱脈、木立、薬草畑を収穫する。',
   },
   chr_nightbloom_first_cast: {
-    name: '月の井戸の波紋',
+    name: '月の泉の波紋',
     desc: 'Nightbloomの水辺で魚を釣る。',
   },
   chr_wraithwood_gatherer: {
@@ -293,7 +293,7 @@ export const table: DeedLocaleTable = {
   },
   dlv_varric_ringers: {
     name: '鳴りやむ鐘',
-    desc: '彼が甦らせる葬儀の鐘鳴らしをすべて先に仕留めてから、助祭ヴァリックを倒す。',
+    desc: '彼が甦らせる葬儀の鐘鳴らしをすべて先に仕留めてから、助祭ヴァンドリックを倒す。',
   },
   dlv_nhalia_bells: {
     name: '鐘鎮め',
@@ -369,7 +369,7 @@ export const table: DeedLocaleTable = {
   },
   chr_peaks_chapter_iii: {
     name: 'ソーンピークの年代記',
-    desc: '山の物語を最後まで見届ける：ワーム教団を壊滅させ、聖所を鎮め、目覚めし峰を打ち倒し、岩山に名だたる恐怖をことごとく討ち倒す。',
+    desc: '山の物語を最後まで見届ける：竜誓団を壊滅させ、聖所を鎮め、目覚めし峰を打ち倒し、岩山に名だたる恐怖をことごとく討ち倒す。',
     title: 'ソーンピークの語り部',
   },
   chr_peaks_sparring: {

@@ -80,14 +80,14 @@ export const MAGE_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'mag_r5_double_blink',
           name: 'Double Blink',
-          description: 'Flickerstep stores 2 charges, but each recharges 30% more slowly.',
+          description: 'Flitstep stores 2 charges, but each recharges 30% more slowly.',
           icon: 'double_blink',
           effect: { ability: [{ ability: 'blink', bonusCharges: 1, cooldownPct: 0.3 }] },
         },
         {
           id: 'mag_r5_blink_cast',
           name: 'Blink While Casting',
-          description: 'You can use Flickerstep in the middle of a cast without interrupting it.',
+          description: 'You can use Flitstep in the middle of a cast without interrupting it.',
           icon: 'blink_while_casting',
           effect: { global: { blinkCast: 1 } },
         },
@@ -218,7 +218,7 @@ export const MAGE_CHOICE_ROWS: ClassChoiceRows = {
           id: 'mag_r17_cold_snap',
           name: "Winter's Recall",
           description:
-            "Grants Winter's Recall: instantly finishes the cooldown of Flickerstep, Frostveil and Greater Invisibility.",
+            "Grants Winter's Recall: instantly finishes the cooldown of Flitstep, Frostveil and Greater Invisibility.",
           icon: 'cold_snap',
           effect: { grant: { ability: 'cold_snap' } },
         },
@@ -490,8 +490,8 @@ export const PALADIN_CHOICE_ROWS: ClassChoiceRows = {
       options: [
         {
           id: 'pal_r20_avenging_wrath',
-          name: 'Wrathwing',
-          description: 'Grants Wrathwing.',
+          name: 'Zealwing',
+          description: 'Grants Zealwing.',
           icon: 'avenging_wrath',
           effect: { grant: { ability: 'avenging_wrath' } },
         },

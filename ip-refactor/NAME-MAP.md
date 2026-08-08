@@ -1157,3 +1157,56 @@ coverage with zero residual:
 - **Three WoW-adjacent mob names KEPT** by operator (generic/original, whole-value clears them):
   Static Charge, Blood Frenzy, Deathstalker Cleave (mob `deathstalker_voss`).
 The scanner is GREEN after this change - the whole IP scrub is verified complete.
+
+## MASTERWROUGHT PHASE 03 AMENDMENT (2026-08-07, the R15 naming audit)
+
+Authorized by the R15 maintainer directive (docs/prd/masterwrought/state.md: pre-existing
+shipped collisions get display-name-only renames in the dedicated naming phase). A
+web-verified audit of all 2605 shipped player-visible proper nouns (workflow: 20 sweep
+agents, adversarial verify, 4 hunters) confirmed the collisions below; every replacement
+name was itself web-verified before adoption. Per-name verdicts and evidence:
+docs/prd/masterwrought/naming-audit.md. Two of these (Gloomshade, Winterbite) were
+SEO-pass adoptions at the 2026-07-02 lock whose screening missed the collision; the
+"Factions: ... Wyrmcult" context note above predates this amendment (that faction is now
+the Broodsworn). Ids stay frozen as always; new literals pin in
+tests/originality_renames.test.ts and the old names arm the scanner via the rows here
+plus the hardcoded list.
+
+| id | old | new | kind | flag |
+|----|-----|-----|------|------|
+| crusader_strike | Crusader Strike | Oathstrike | ability | rename |
+| heroic_leap | Heroic Leap | Vaulting Charge | ability | rename |
+| holy_nova | Holy Nova | Hallowburst | ability | rename |
+| icy_veins | Icy Veins | Coldsurge | ability | rename |
+| victory_rush | Victory Rush | Victor's Surge | ability | rename |
+| wyvern_sting | Wyvern Sting | Drakesting | ability | rename |
+| glacial_spike | Glacial Spike | Rimeneedle | ability | rename |
+| frozen_orb | Frozen Orb | Frostglobe | ability | rename |
+| holy_shock | Holy Shock | Lightjolt | ability | rename |
+| storm_bolt | Storm Bolt | Thunderhurl | ability | rename |
+| vanish | Smokestep | Smokefade | ability | rename |
+| counterspell | Spellbreak | Spellsever | ability | rename |
+| spellsteal | Spellsteal | Spellplunder | ability | rename |
+| swiftmend | Swiftmend | Fleetmend | ability | rename |
+| summon_voidwalker | Summon Gloomshade | Summon Duskmurk | ability | rename |
+| gloomshade | Gloomshade | Duskmurk | mob | rename |
+| avenging_wrath | Wrathwing | Zealwing | ability | rename |
+| blink | Flickerstep | Flitstep | ability | rename |
+| restoration_shaman_spec | Spiritmend | Spiritcall | spec-name | rename |
+| wyrmcult_family | Wyrmcult | Broodsworn | faction | rename |
+| frostmane_family | Frostmane | Rimemane | mob-family | rename |
+| nightkin_stargazer | Nightkin Stargazer | Gloamkin Stargazer | mob | rename |
+| harvest_sprite | Harvest Sprite | Gleaning Sprite | mob | rename |
+| deacon_varric | Varric | Vandric | npc-name | rename |
+| hermit_okku | Okku | Okrim | npc-name | rename |
+| gallowmere_town | Gallowmere | Gibbetmere | hub-town | rename |
+| eldergleam_town | Eldergleam | Eldershine | hub-town | rename |
+| nightbloom_poi | Moonwell | Moonspring | poi | rename |
+| cryptbloom_shoulderguards | Cryptbloom Shoulderguards | Tombpetal Shoulderguards | item | rename |
+| mistforged_pauldrons | Mistforged Pauldrons | Fogforged Pauldrons | item | rename |
+| terrorspark_groundshaker | Terrorspark | Dreadspark | mount | rename |
+| winterbite_skin | Winterbite | Wintergnaw | skin | rename |
+| rift_hellguard_cleave | Hellsteel Sweep | Pitsteel Sweep | mechanic | rename |
+| rift_pitlord_pulse | Hellfire Ring | Pitfire Ring | mechanic | rename |
+| dgn_sanctum_speed | Sanctum Sprint | Sanctum Footrace | deed | rename |
+| pvp_honor_knight_lieutenant | Knight-Lieutenant | Banneret | deed-title | rename |

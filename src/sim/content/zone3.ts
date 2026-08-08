@@ -1,7 +1,7 @@
 // Zone 3 — Thornpeak Heights (levels 13-20). The Gravecallers serve Korzul
 // the Gravewyrm, an ancient dragon sealed beneath the peaks. Highwatch holds
 // the wall against ogres, waking elementals, and the open chanting of the
-// Wyrmcult at the Gravewyrm Sanctum gates.
+// Broodsworn at the Gravewyrm Sanctum gates.
 
 import { WORK_ORDER_CADENCE_TICKS } from '../professions/cadence';
 import type {
@@ -36,7 +36,7 @@ export const ZONE3_ZONE: ZoneDef = {
     { x: -130, z: 740, label: "Drogmar's War-Camp", id: 'drogmars_war_camp' },
     { x: 110, z: 760, label: 'Stormcrag', id: 'stormcrag' },
     { x: -70, z: 770, label: 'The Glimmermere', id: 'the_glimmermere' },
-    { x: 55, z: 820, label: 'Wyrmcult Tents', id: 'wyrmcult_tents' },
+    { x: 55, z: 820, label: 'Broodsworn Tents', id: 'wyrmcult_tents' },
     { x: -40, z: 830, label: 'Revenant Fields', id: 'revenant_fields' },
     { x: 0, z: 880, label: 'Gravewyrm Sanctum', id: 'gravewyrm_sanctum' },
   ],
@@ -510,7 +510,7 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
       perTick: 6,
       interval: 3,
       duration: 12,
-      name: 'Winterbite',
+      name: 'Wintergnaw',
       school: 'frost',
     },
     scale: 1.3,
@@ -518,7 +518,7 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
   },
   wyrmcult_zealot: {
     id: 'wyrmcult_zealot',
-    name: 'Wyrmcult Zealot',
+    name: 'Broodsworn Zealot',
     minLevel: 17,
     maxLevel: 19,
     family: 'humanoid',
@@ -539,7 +539,7 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
     // The zealot's fevered chanting claws at a caster's mind, draining Intellect
     // and shrinking their mana pool for a while.
     enfeeble: { chance: 0.3, int: 12, duration: 12, name: 'Maddening Whisper', school: 'shadow' },
-    // The Wyrmcult hoards their master's flame: a branding strike seals away the
+    // The Broodsworn hoards their master's flame: a branding strike seals away the
     // victim's fire magic so it can never rival the wyrm's, while leaving every
     // other school free (a single-school counterspell, distinct from a full silence).
     lockout: { chance: 0.25, duration: 6, name: 'Wyrmward Sigil', school: 'fire' },
@@ -549,7 +549,7 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
   },
   wyrmcult_necromancer: {
     id: 'wyrmcult_necromancer',
-    name: 'Wyrmcult Necromancer',
+    name: 'Broodsworn Necromancer',
     minLevel: 18,
     maxLevel: 19,
     family: 'humanoid',
@@ -891,7 +891,7 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
     scale: 1.0,
     color: 0xc9c2b5,
   },
-  // Voskar the Emberwing — a young drake the Wyrmcult chained above the Sanctum
+  // Voskar the Emberwing — a young drake the Broodsworn chained above the Sanctum
   // and starved into a weapon. The only dragonkin rare on the peaks: it breathes
   // fire in a wide cone, and its searing bite leaves wounds that refuse to close.
   voskar_emberwing: {
@@ -1644,7 +1644,7 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
     name: 'Warlord Drogmar',
     giverNpcId: 'captain_thessaly',
     turnInNpcId: 'captain_thessaly',
-    text: "Warlord Drogmar took the Wyrmcult's coin and swore the clans to the mountain's waking. He is the hammer they mean to swing at my wall — and when he slams the ground, $N, do not be standing near him. Take your companions into the war-camp and end him, for Highwatch.",
+    text: "Warlord Drogmar took the Broodsworn's coin and swore the clans to the mountain's waking. He is the hammer they mean to swing at my wall — and when he slams the ground, $N, do not be standing near him. Take your companions into the war-camp and end him, for Highwatch.",
     completionText:
       'Drogmar, dead in his own camp. The clans will scatter to the high passes — you have bought my wall a winter, $N.',
     objectives: [
@@ -1720,11 +1720,11 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
     name: 'Chants on the Wind',
     giverNpcId: 'brother_aldric_highwatch',
     turnInNpcId: 'brother_aldric_highwatch',
-    text: 'When the wind comes off the southern peaks, $N, it carries chanting. The Wyrmcult no longer hides — they have raised tents below the Sanctum and they sing to what sleeps beneath it. Silence twelve zealots. Every voice stilled buys the mountain another night of sleep.',
+    text: 'When the wind comes off the southern peaks, $N, it carries chanting. The Broodsworn no longer hides — they have raised tents below the Sanctum and they sing to what sleeps beneath it. Silence twelve zealots. Every voice stilled buys the mountain another night of sleep.',
     completionText:
       'The wind is quieter. But what troubles me is not the chanting, $N — it is that something may be chanting back.',
     objectives: [
-      { type: 'kill', targetMobId: 'wyrmcult_zealot', count: 12, label: 'Wyrmcult Zealot slain' },
+      { type: 'kill', targetMobId: 'wyrmcult_zealot', count: 12, label: 'Broodsworn Zealot slain' },
     ],
     xpReward: 4000,
     copperReward: 2000,
@@ -1864,7 +1864,7 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
         type: 'kill',
         targetMobId: 'wyrmcult_necromancer',
         count: 6,
-        label: 'Wyrmcult Necromancer slain',
+        label: 'Broodsworn Necromancer slain',
       },
     ],
     xpReward: 4400,
@@ -2217,7 +2217,7 @@ export const ZONE3_CAMPS: CampDef[] = [
   { mobId: 'stormcrag_elemental', center: { x: 110, z: 760 }, radius: 20, count: 8 },
   { mobId: 'stormcrag_elemental', center: { x: 135, z: 795 }, radius: 16, count: 6 },
   { mobId: 'shardlord_kazzix', center: { x: 145, z: 815 }, radius: 8, count: 1 },
-  // Wyrmcult: tents below the Sanctum. The (25, 845) pack's radius clipped the
+  // Broodsworn: tents below the Sanctum. The (25, 845) pack's radius clipped the
   // x=0 approach road, so it is nudged east to keep the central path clear; the
   // tents still flank the gate.
   { mobId: 'wyrmcult_zealot', center: { x: 55, z: 820 }, radius: 20, count: 8 },
@@ -2361,7 +2361,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
   },
   wyrmcult_orders: {
     id: 'wyrmcult_orders',
-    name: 'Wyrmcult Orders',
+    name: 'Broodsworn Orders',
     kind: 'quest',
     sellValue: 0,
     questId: 'q_cult_orders',
@@ -2832,7 +2832,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
   },
   wyrmcult_grand_robe: {
     id: 'wyrmcult_grand_robe',
-    name: 'Wyrmcult Grand Robe',
+    name: 'Broodsworn Grand Robe',
     kind: 'armor',
     armorType: 'cloth',
     slot: 'chest',
@@ -2876,7 +2876,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
   },
   wyrmcult_soulsteps: {
     id: 'wyrmcult_soulsteps',
-    name: 'Wyrmcult Soulsteps',
+    name: 'Broodsworn Soulsteps',
     kind: 'armor',
     armorType: 'cloth',
     slot: 'feet',
@@ -3832,18 +3832,18 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     armorType: 'cloth',
     slot: 'shoulder',
     quality: 'rare',
-    // Wyrmcult Zealots (level 19) -> item level 22, shoulder budget 9.
+    // Broodsworn Zealots (level 19) -> item level 22, shoulder budget 9.
     stats: { armor: 32, int: 5, spi: 4 },
     sellValue: 1900,
   },
   wyrmcult_spellgrips: {
     id: 'wyrmcult_spellgrips',
-    name: 'Wyrmcult Spellgrips',
+    name: 'Broodsworn Spellgrips',
     kind: 'armor',
     armorType: 'cloth',
     slot: 'gloves',
     quality: 'rare',
-    // Wyrmcult Necromancers (level 19) -> item level 22, gloves budget 9.
+    // Broodsworn Necromancers (level 19) -> item level 22, gloves budget 9.
     stats: { armor: 36, int: 5, spi: 4 },
     sellValue: 1850,
   },
@@ -3871,7 +3871,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
   },
   cryptbloom_shoulderguards: {
     id: 'cryptbloom_shoulderguards',
-    name: 'Cryptbloom Shoulderguards',
+    name: 'Tombpetal Shoulderguards',
     kind: 'armor',
     armorType: 'leather',
     slot: 'shoulder',
@@ -4032,7 +4032,7 @@ export const ZONE3_PROPS: ZonePropsDef = {
     { x: -120, z: 733, rot: 0.5, scale: 1.3 },
     { x: -128, z: 744, rot: 2.0, scale: 1.3 },
     { x: -136, z: 752, rot: 1.0, scale: 1.5 },
-    // Wyrmcult tents below the Sanctum
+    // Broodsworn tents below the Sanctum
     { x: 50, z: 815, rot: 0.8, scale: 1 },
     { x: 58, z: 823, rot: -0.5, scale: 1 },
     { x: 60, z: 812, rot: 2.2, scale: 1 },

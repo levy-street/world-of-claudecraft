@@ -566,7 +566,7 @@ export const cs_CZ: EnTranslations = {
         "ice_fang_sword": {
           "name": "Ledový tesák",
           "look": "Zakřivená čepel z bledého ledovcového ledu, podél hřbetu zubaté krystaly jinovatky, ve žlábku zářící azurové zmrzlé jádro a záštita z rampouchů.",
-          "lore": "Vlajková zbraň zmrzlé kolekce a kus, po kterém každý sběratel sáhne jako první. Ledový tesák nebyl vykován, ale vyřezán z výběžku ledovce, který korunuje Thornpeak nad Highwatchem. Jeho azurové jádro plane chladem jako světlo Třpytivého plesa. Jinovatkou pokrývá i vzduch, který rozsekne. Strážci zdi přísahají, že jej jeden voják nesl v noci, kdy vysoký sníh zadržel kult draka, a „koupil zdi jednu zimu“."
+          "lore": "The flagship of the frozen grade, and the piece every collector reaches for first. Ice Fang was carved, not forged, from a fang of the glacier that caps Thornpeak above Highwatch, its cyan core burning cold as the light off the Glimmermere. It rimes the very air it cuts. The wall-guard swear one soldier carried it the night the high snows held the Broodsworn back, and 'bought the wall a winter.'"
         },
         "glaciersplit_axe": {
           "name": "Štěpič ledovců",
@@ -594,7 +594,7 @@ export const cs_CZ: EnTranslations = {
           "lore": "Hrot zářícího ledovcového ledu, údajně odlomený z hlubokého plesa pod Svatyní, kde má horský chlad zuby. Ze stříbrné objímky bez ustání kvete jinovatka a nikdy netaje, ani v ohni, ani v létě. Mágové jej drží blízko kvůli chladu, který propůjčuje jejich kouzlům. Za nocí, kdy se zdá, že se naklání k Nythraxisově kryptě a naslouchá, jej raději drží dál od sebe."
         },
         "winterbite": {
-          "name": "Zimní skus",
+          "name": "Wintergnaw",
           "look": "Luk z postříbřené oceli a modrého ledu, ve středu září azurové zmrzlé jádro, na tětivě čeká šíp z pevného ledu a kolem proudí studená pára.",
           "lore": "Luk z postříbřené oceli a thornpeakského ledu, jehož střed osvětluje studené azurové jádro, které přimrazí šíp k tětivě. S každým natažením se znovu vytvoří šíp z pevného ledovcového ledu. Lučištník na zdi nenosí toulec, jen chlad. Highwatch s podobným lukem udržel Stopařův hřeben během obléhání. Jediný lučištník, říká se, a zásoba šípů na celou zimu, které byly vždy připravené."
         },
@@ -1006,7 +1006,7 @@ export const cs_CZ: EnTranslations = {
       "name_shadowjump_toad": "Kama-Kage, stínoskákací ropucha",
       "name_stormfeather_griffin": "Nebeský Bouřepero",
       "name_thunderstrut_gobbler": "Hromokrok, Velký krocan",
-      "name_terrorspark_groundshaker": "Hrůzojiskra, otřásač země",
+      "name_terrorspark_groundshaker": "Dreadspark Groundshaker",
       "name_drakemaw_raptor": "Raptor z Dračí tlamy",
       "desc_valorsteed": "Otužilý, jistonohý oř poskytující zvýšenou rychlost cestování.",
       "desc_grag_bear": "Otužilý, jistonohý medvěd poskytující zvýšenou rychlost cestování.",
@@ -1487,7 +1487,7 @@ export const cs_CZ: EnTranslations = {
         "battleTrance": "Bojový trans",
         "overpowerCharge": "Posílení Rudé ruky",
         "suddenDeath": "Náhlá smrt",
-        "victoryRush": "Vítězný nápor",
+        "victoryRush": "Victor's Surge",
         "enrage": "Vřava: rozzuřen",
         "heatingUp": "Zahřívání",
         "arcaneCharge": "Arkánové náboje",
@@ -1970,7 +1970,7 @@ export const cs_CZ: EnTranslations = {
       "sanguine": "Zvyšuje rychlost útoku o {hastePct} % a způsobené poškození o {dmgPct} %",
       "battleTrance": "Tvůj příští Nájezdnický úder nebo Mrzačící úder nestojí žádný vztek",
       "revengeFree": "Tvá příští Odveta nestojí žádný vztek",
-      "victoryRush": "Vítězný nápor je připraven",
+      "victoryRush": "Victor's Surge is ready",
       "maxHpPct": "Zvyšuje maximální zdraví o {pct} %",
       "temporalHourglass": "Nezranitelný/á a neschopný/á jednat; obnovuje zdraví a urychluje obnovu cooldownu. Klikni pravým tlačítkem pro zrušení.",
       "tongues": "Zvyšuje dobu sesílání o {pct} %",
@@ -4031,13 +4031,13 @@ export const cs_CZ: EnTranslations = {
       "valeBlurb": "Zelené počáteční údolí, kde si noví hrdinové brousí zuby na vlcích a banditech kolem města Eastbrook.",
       "marshBlurb": "Utopená země mlhy a ruin. Bahenní ploutve se rojí v mělčinách a pod vodou se hýbe něco staršího, hlídané z mostního města Fenbridge.",
       "peaksBlurb": "Větrem bičované hřebeny a stará důlní díla stoupající k nejchladnějším a nejvyšším hrozbám světa, držené výspou Highwatch.",
-      "duskBlurb": "Údolí trvalého soumraku pod velkým stromem Prastarého svitu, kde svítí křišťálové trosky a vzduch hučí prastarou magií.",
+      "duskBlurb": "A valley of permanent dusk beneath the great tree of Eldershine, where crystal ruins glow and the air hums with old magic.",
       "emberBlurb": "Bouří ozářené pustiny popela a krvavého skla, kde draci krouží nad kalderou a trollí ohně hoří v dunách, střežené z branného města Dračí hlídka.",
       "frostBlurb": "Ticho sněhu a temných borovic pod polární září, kde se sám chlad zdá být vzhůru a Ledový plášť udržuje své ohně hořící.",
       "amberBlurb": "Věčný podzim zlata a rudých listů, které nikdy nespadnou, shromážděný kolem lucernami osvětleného města Lucernojezero.",
       "fenBlurb": "Jasná, hučící mokřina lilií a klidné vody, protínaná starými lávkami z mostního města Mostojezero.",
       "nightBlurb": "Říše hvězdné půlnoci, kde květy osvětlují stezky a Měsíční klid udržuje tichou hlídku pod snící oblohou.",
-      "hauntBlurb": "Strašidelný les pod obřími korunami, kde jsou lucerny Šibeničního jezera jediným poctivým světlem na cestě.",
+      "hauntBlurb": "A haunted forest under giant canopies, where the lanterns of Gibbetmere are the only honest light on the road.",
       "galeBlurb": "Mořské útesy a kvílivé stráně, kde vítr nikdy neustává, Starý maják nikdy nezhasíná a Osadní přístav pevně zavírá své dveře.",
       "jungleBlurb": "Tropický spletenec palem, bílého písku a hlučného ptactva, přičemž pobřežní město Naplavený přístav udržuje na pláži zapálený oheň.",
       "gardenBlurb": "Zahradní říše živoplotového bludiště, stále stříhaná nikým, koho kdo viděl, do níž se vchází kolem Živoplotova a jeho fontánových nádvoří.",
@@ -4048,7 +4048,7 @@ export const cs_CZ: EnTranslations = {
       "peaksGreeting": "Dvě stě let tahle zeď drží. Na mé hlídce se nezlomí, ale sténá.",
       "peaksGreeter": "Kapitánka Thessaly, Highwatch",
       "duskGreeting": "Málo z tvého druhu stálo pod těmito větvemi. Choď opatrně a buď vítán.",
-      "duskGreeter": "Strážce Saelwyn, Prastarý svit",
+      "duskGreeter": "Keeper Saelwyn, Eldershine",
       "emberGreeting": "Horký vítr z pustin, draci nad Dračí tlamou a trollí ohně v dunách. Napij se, než tam vyrazíš.",
       "emberGreeter": "Strážce brány, Dračí hlídka",
       "frostGreeting": "Sníh pohlcuje každý zvuk za hradbou. Pokud se světla rozzáří tancem, ztiš hlas a udržuj oheň.",
@@ -4060,7 +4060,7 @@ export const cs_CZ: EnTranslations = {
       "nightGreeting": "Za Noční branou sní i samotný vzduch. Následuj květinové světlo a dej pozor na spící svět, který visí na obloze.",
       "nightGreeter": "Strážce hlídky, Měsíční klid",
       "hauntGreeting": "Drž se lucern, poutníku. A pokud tě les zavolá jménem od cesty, neodpovídej mu.",
-      "hauntGreeter": "Lampář, Šibeniční jezero",
+      "hauntGreeter": "The lamplighter, Gibbetmere",
       "galeGreeting": "Vítr tu nikdy ani na chvíli neustal a Starý maják nikdy ani na okamžik nezhasl. Zavři za sebou dveře hospody.",
       "galeGreeter": "Strážce majáku, Osadní přístav",
       "jungleGreeting": "Teplý písek, hlučné ptactvo a džungle, která pohlcuje obzor. Udržujeme na pláži zapálený oheň; snaž se k němu vrátit.",
@@ -4069,14 +4069,14 @@ export const cs_CZ: EnTranslations = {
       "gardenGreeter": "Strážce brány, Živoplotov",
       "valePlaceNotes": "Eastbrook je tvoje první domovská základna. Vlčí stezka a Kančí louka jsou mírná loviště; Zrcadlové jezero je pěkná voda pro rybaření, ač se v jeho mělčinách hemží bahnoploutví; Černopavučina a Měděná štola skrývají pavouky a rudychtivé kopáče; Tábor banditů a Padlá kaple drží drsnější práci; Vrch relikviáře klesá do Zhrouceného relikviáře, první výpravy světa; Mýtina Brightwoodu je tichý, sluncem zalitý háj na severu; a Prasečí pole je hrazené kančbalové hřiště Eastbrooku, kde se pod žňovým příměřím hraje o Pohár údolí.",
       "marshPlaceNotes": "Fenbridge hlídá jedinou suchou cestu. Rákosiny slídilů a Mělčiny Deepfenu se hemží močálovými šelmami a bahenními ploutvemi; Vdoví houština je hustě opředená pavučinami; Utopená kaple a Trollí mohyly drží starší nebezpečí a hned severně od mohyl se otevírá Utopená litanie, vlastní výprava močálu; Tábor Hrobovolajících je zakopaný kult a Potopená bašta je instancované srdce močálu.",
-      "peaksPlaceNotes": "Highwatch drží zeď. Hřeben slídilů a Hlubokamenné nory patří hřebenovým kočkám a norníkům; Zlobří podhůří a Drogmarův válečný tábor surovcům za žold; Bouřný skalní štít praská elementály a pod ním září Třpytivé pleso, tůň, jejíž břeh střeží bránu bledého světla dolů do Utopeného chrámu; Stany kultu draka a Pole revenantů obkružují vyvýšeninu kultu, se Svatyní Hrobodraka na vrcholu.",
-      "duskPlaceNotes": "Prastarý svit se shromažďuje pod velkým stromem. Jeskyně Soumračného pádu a její vyhlídka jsou cestou dovnitř a prvním pohledem na údolí; Prastarý háj a Kotlina hvězdného pádu udržují tichý jih; Potopené nádvoří skrývá zarostlé trosky na východě; a Zářící hlubina s Křišťálovými mělčinami svítí přes celý sever.",
+      "peaksPlaceNotes": "Highwatch holds the wall. Stalker Ridge and the Deeprock Burrows belong to ridge cats and burrowers; the Ogre Foothills and Drogmar's War-Camp to brutes for hire; Stormcrag crackles with elementals, and below it glows the Glimmermere, the tarn whose shore keeps the gate of pale light down to the Drowned Temple; the Broodsworn Tents and Revenant Fields ring the cult's high ground, with Gravewyrm Sanctum at its peak.",
+      "duskPlaceNotes": "Eldershine gathers beneath the great tree. The Duskfall Cave and its overlook are the way in and the first sight of the valley; Elder Grove and Starfall Basin keep the quiet south; the Sunken Court holds overgrown ruins in the east; and the Gleaming Deep and Crystalline Shallows glow across the north.",
       "emberPlaceNotes": "Dračí hlídka drží bránu. Branní les je poslední zelení před pustinou; Popelové duny se ženou popelem a horšími věcmi; Trollí sněm je místem, kde dyntrollové shromažďují své ohně; Pole krvavého skla se třpytí ostrými střepy; a Kaldera Dračí tlamy je kouřící korunou, kolem které draci krouží.",
       "frostPlaceNotes": "Ledový plášť udržuje poslední teplé ohniště. Sněžná hranice značí, kde přebírají vládu závěje; Ledovcové jezírko je černá, tichá voda pod ledem; Schody polární záře stoupají pod tančícími světly; Chvějivá bažina je zmrzlá slatina, která nikdy docela neusíná; a Kvílivé terasy si své jméno zaslouží každou noc.",
       "amberPlaceNotes": "Lucernojezero zář v srdci sklizně. Zlatotání je jantarem kluzký průsmyk dovnitř; Pozlacený sad a Sklizňová kotlina skrývají nejsladší úlovky a nejodvážnější zloděje; Velké jezero zrcadlí hořící listí; Popelojavorové návrší stojí nejvyšší a nejrudější; a Nakloněný monolit pamatuje něco staršího než podzim.",
       "fenPlaceNotes": "Mostojezero leží obkročmo nad klidnou vodou. Schody Jantarové bažiny sestupují ze sklizňové krajiny; Liliové vřesoviště a Bažinolesklé tůně se třpytí bludičkami a vážkami; Vrbí pláč noří své větve do jezera; a Ospalé pláně jsou tak mírné, jak jen tato zem dovede být.",
-      "nightPlaceNotes": "Měsíční klid drží hlídku. Noční brána je cestou do půlnoční krajiny; Měsíční studna uchovává hvězdné světlo, u kterého můžeš stát; Soumrakové pole kvete ve tmě; Stálá hlídka bdí, aniž by se kdy pohnula; a Bezesná mohyla je jediným místem zde, které nikdy nesní.",
-      "hauntPlaceNotes": "Šibeniční jezero se choulí uvnitř svých lucern. Vraní brána je pochmurnými předními dveřmi lesa; Vdovin houština je hustě spředena pavučinami; Visící mýtina a Kaple Truchlokamene uchovávají nejstarší žal lesa; a Lovcova mýtina patří tomu, co tam ještě pořád loví.",
+      "nightPlaceNotes": "Moonrest keeps the vigil. The Nightgate is the way into the midnight country; the Moonspring holds starlight you can stand beside; Gloamfield blooms in the dark; the Standing Vigil watches without ever moving; and the Sleepless Barrow is the one place here that never dreams.",
+      "hauntPlaceNotes": "Gibbetmere huddles inside its lanterns. The Crowgate is the wood's grim front door; Widow's Thicket is spun thick with web; the Hanging Glade and the Mournstone Chapel keep the forest's oldest griefs; and the Huntsman's Clearing belongs to whatever still hunts there.",
       "galePlaceNotes": "Osadní přístav se opírá o vítr. Větrná cesta je cesta útesem dovnitř; Kvílivé stráně se táhnou bez stromů pod vichrem; Starý maják hoří tak dlouho, jak si kdo pamatuje; Sráz padá strmě k vodě; Vraková pole udržují pobřeží poctivé; a Zrcadlové jezírko je tou jedinou tichou věcí v celé říši.",
       "junglePlaceNotes": "Naplavený přístav udržuje svůj oheň na pláži. Spletené ústí je místem, kde řeka narazí na zelenou hráz; Palmová pláž se táhne bílá a teplá podél příboje; Smaragdová spleť a Liánový pád pohlcují vnitrozemí; Safírová laguna svítí čirá a hluboká; a Potopená modla vyhlíží zpod hladiny.",
       "gardenPlaceNotes": "Živoplotov čeká u Zahradní brány. Parterová promenáda kvete v zastřižených barvách; Hrad Úsvitu cvičí své rytíře za novými hradbami; Okvětní rybník se rok co rok vznáší v růžové; Starý mlýn obrací své vlastní záhony; Velké bludiště přeskupuje své cesty pro každého hosta, jeho oblouky střeženy listnatými liškami; Severní hlídka střeží výjezdovou cestu; Liliová kotlina odpočívá za tím vším; a Fontánové nádvoří stále čistě protéká v srdci zahrady.",
@@ -6277,24 +6277,24 @@ export const cs_CZ: EnTranslations = {
     "boss": {
       "varric": {
         "bell": {
-          "emote": "Diákon Varric svírá pohřební zvon oběma rukama!",
-          "log": "Diákon Varric začíná rozeznít pohřební zvon.",
-          "warning": "Ustup od diákona Varrica!",
+          "emote": "Diákon Vandric svírá pohřební zvon oběma rukama!",
+          "log": "Diákon Vandric začíná rozeznít pohřební zvon.",
+          "warning": "Ustup od diákona Vandrica!",
           "impact": "Úder zvonu praská podlahu komnaty!",
           "lesson": "Úder zvonu: náraz do země každých dvanáct sekund. Ustup, než dopadne."
         },
         "raise": {
-          "emote": "Diákon Varric vyvolává jména z rozbitých hrobů!",
-          "log": "Diákon Varric začíná sesílat Vzkříšení mrtvých.",
+          "emote": "Diákon Vandric vyvolává jména z rozbitých hrobů!",
+          "log": "Diákon Vandric začíná sesílat Vzkříšení mrtvých.",
           "warning": "Zastav hrobový rituál!",
           "object": "Prasklý hrob se chvěje ukradeným dechem.",
           "interrupt_ok": "Hrobový rituál kolísá.",
-          "interrupt_fail": "Mrtví odpovídají na volání diákona Varrica!",
+          "interrupt_fail": "Mrtví odpovídají na volání diákona Vandrica!",
           "lesson": "Přeruš prasklý hrob do pěti sekund, nebo mrtví povstanou na jeho volání."
         },
         "pull": "Šlapeš po posvátném prachu s nečistým úmyslem. Poklekni a nech se sečíst.",
         "intro": "Žádná duše není ztracená. Jen špatně uložená.",
-        "mid60": "Diákon Varric čte jména z knihy s třesoucím se triumfem.",
+        "mid60": "Diákon Vandric čte jména z knihy s třesoucím se triumfem.",
         "mid30": "Pohřební zvon odpovídá na každé jméno, které vysloví.",
         "defeat": "Ne... měl jsem jména... měl jsem je všechna..."
       }
@@ -7980,7 +7980,7 @@ export const cs_CZ: EnTranslations = {
       },
       "cold_snap": {
         "name": "Volání zimy",
-        "description": "Okamžitě dokončí dobu obnovení Mžikového kroku, Mrazivého závoje a Dokonalé neviditelnosti. (mágovský talent)"
+        "description": "Finishes the cooldown on Flitstep, Frostveil, and Greater Invisibility. (Mage talent)"
       },
       "greater_invisibility": {
         "name": "Dokonalá neviditelnost",
@@ -8031,15 +8031,15 @@ export const cs_CZ: EnTranslations = {
         "description": "Vypustíš tři ledové střely, z nichž každá způsobí {damage} mrazivého poškození, a uvalíš na cíl Zimní chlad: další 2 kompatibilní kouzla jej považují za zmrazený. Brain Freeze učiní Winterlash okamžitým a obejde jeho dobu obnovení. (Mráz)"
       },
       "frozen_orb": {
-        "name": "Zmrzlá sféra",
+        "name": "Frostglobe",
         "description": "Vypustíš kouli vířícího mrazu, která se 8 s pohybuje vpřed, každou sekundu způsobí okolním nepřátelům {damage} mrazivého poškození a zpomalí je o 30 %. Každý zásah vytvoří jeden rampouch. (Mráz)"
       },
       "blizzard": {
         "name": "Vánice",
-        "description": "Přivolá ledovou bouři na cílovou plochu po dobu 6 s, působí {damage} mrazivého poškození každou sekundu a zpomaluje nepřátele o 40 %. Každý zasažený nepřítel zkrátí cooldown Zmrzlé sféry o 0,5 s, nejvýše o 3 s za seslání. (Mráz)"
+        "description": "Calls an ice storm onto the target area for 6 sec, dealing {damage} Frost damage each second and slowing enemies by 40%. Each enemy struck shaves 0.5 sec off Frostglobe, up to 3 sec per cast. (Frost)"
       },
       "glacial_spike": {
-        "name": "Ledový hrot",
+        "name": "Rimeneedle",
         "description": "Přivoláš mohutný ledový hrot, spotřebuješ 5 Rampouchů a způsobíš {damage} mrazivého poškození a zmrazíš cíl na místě na 4 s. (Mráz)"
       },
       "glacial_front": {
@@ -8171,7 +8171,7 @@ export const cs_CZ: EnTranslations = {
         "description": "Dokončovací útok, který zraní cíl a způsobí krvácení za {damage} během 16 s."
       },
       "vanish": {
-        "name": "Kouřový krok",
+        "name": "Smokefade",
         "description": "Zmizíš z dohledu a vstoupíš do Závoje šera i v boji. Když jsi skrytý, pohybuješ se o 50 % pomaleji. Trvá až 10 s."
       },
       "instant_poison": {
@@ -8555,7 +8555,7 @@ export const cs_CZ: EnTranslations = {
         "description": "Vstoupíš do vroucí zuřivosti a získáš 20 vzteku. (Talent válečníka)"
       },
       "crusader_strike": {
-        "name": "Křižácký úder",
+        "name": "Oathstrike",
         "description": "Zasáhne cíl za poškození zbraně plus {damage} svatého poškození. (talent paladina)"
       },
       "chain_heal": {
@@ -8567,7 +8567,7 @@ export const cs_CZ: EnTranslations = {
         "description": "Na 20 s se proměníš v děsivého démona, zvýšíš svoje poškození kouzly o 20 % a rychlost sesílání o 20 %. Tvůj démon způsobuje o 50 % více poškození a sesílá o 20 % rychleji. (klíčová schopnost Démonologie)"
       },
       "holy_shock": {
-        "name": "Svatý otřes",
+        "name": "Lightjolt",
         "description": "Zasáhne spojenecký cíl svatou energií a vyléčí ho, nebo způsobí nepříteli {damage} svatého poškození. (klíčová schopnost Svaté magie)"
       },
       "aura_surge": {
@@ -8587,7 +8587,7 @@ export const cs_CZ: EnTranslations = {
         "description": "Povzbudí blízké spojence a zvýší jejich sílu útoku o 10 % na 30 min. (klíčová schopnost Střelby)"
       },
       "wyvern_sting": {
-        "name": "Žihadlo wyverny",
+        "name": "Drakesting",
         "description": "Bodne nepřítele na dálku a vyřadí ho až na 4 s. Jakékoli poškození efekt přeruší. (klíčová schopnost Přežití)"
       },
       "arcane_power": {
@@ -8599,7 +8599,7 @@ export const cs_CZ: EnTranslations = {
         "description": "Zvýší šanci na kritický zásah kouzlem o 50 % na 15 s. (klíčová schopnost Ohně)"
       },
       "icy_veins": {
-        "name": "Ledové žíly",
+        "name": "Coldsurge",
         "description": "Zvýší rychlost sesílání o 30 % a na 10 s zabrání přerušení i zpomalení sesílání. (klíčová schopnost Mrazu)"
       },
       "cold_blood": {
@@ -8619,7 +8619,7 @@ export const cs_CZ: EnTranslations = {
         "description": "Naplní spojenecký cíl mocí a zvýší jeho rychlost sesílání o 20 % na 15 s. (klíčová schopnost Kázně)"
       },
       "holy_nova": {
-        "name": "Svatá nova",
+        "name": "Hallowburst",
         "description": "Vyvolá výbuch svaté záře, který vyléčí blízké spojence za {damage} a poškodí blízké nepřátele. (klíčová schopnost Svaté magie)"
       },
       "shadowform": {
@@ -8647,7 +8647,7 @@ export const cs_CZ: EnTranslations = {
         "description": "Uvolní prvotní nápor. Ve vlčí podobě zvýší obnovu energie o 100 % na 10 s. V medvědí podobě okamžitě vygeneruje 50 vzteku. (klíčová schopnost Divokosti)"
       },
       "swiftmend": {
-        "name": "Rychlé zhojení",
+        "name": "Fleetmend",
         "description": "Spotřebuje průběžné léčení na spojeneckém cíli a vyléčí ho za {damage}. (klíčová schopnost Obnovy)"
       },
       "summon_imp": {
@@ -8655,8 +8655,8 @@ export const cs_CZ: EnTranslations = {
         "description": "Vyvolá Žhavorozeného pod velením černokněžníka. Žhavorozený vrhá na nepřátele z dálky popelavé šípy. Vyvolání nového démona propustí toho současného. Můžeš mít vždy jen jednoho démona."
       },
       "summon_voidwalker": {
-        "name": "Vyvolat Stín šera",
-        "description": "Vyvolá Stín šera pod velením černokněžníka. Stín šera je houževnatý démon, který provokuje nepřátele a vstřebává trest. Vyvolání nového démona propustí toho současného. Můžeš mít vždy jen jednoho démona."
+        "name": "Summon Duskmurk",
+        "description": "Summons a Duskmurk under the command of the Warlock. The Duskmurk is a sturdy demon that taunts your enemies and soaks up punishment. Summoning a new demon dismisses your current one. You may have one demon at a time."
       },
       "summon_succubus": {
         "name": "Vyvolat Zrozence soumraku",
@@ -8755,7 +8755,7 @@ export const cs_CZ: EnTranslations = {
         "description": "Tvoje automatické útoky mají šanci ti dovolit seslat Předčasný hrob na cíl s libovolným zdravím, a to zcela bez ceny vzteku. (Arms)"
       },
       "storm_bolt": {
-        "name": "Bouřná střela",
+        "name": "Thunderhurl",
         "description": "Mrštíš zbraní po cíli za {damage} poškození a omráčíš ho na 3 s."
       },
       "piercing_howl": {
@@ -8775,7 +8775,7 @@ export const cs_CZ: EnTranslations = {
         "description": "Naplň svou zbraň krví nepřátel: ty a tvoji spojenci na blízko získáte na 20 s o 10 % vyšší rychlost útoku a o 10 % vyšší poškození."
       },
       "victory_rush": {
-        "name": "Vítězný nápor",
+        "name": "Victor's Surge",
         "description": "Udeříš za poškození zbraně plus {damage} a vyléčíš se za 20 % svého maximálního zdraví. Použitelné jen do 20 s od zabití nepřítele."
       },
       "intimidating_shout": {
@@ -8787,7 +8787,7 @@ export const cs_CZ: EnTranslations = {
         "description": "Zaútočíš širokým obloukem a způsobíš fyzické poškození všem nepřátelům před tebou. Při více než 5 cílech je poškození sníženo. Když se vyhneš útoku nebo ho odrazíš, tvá příští Odveta nemusí stát žádný vztek. (Protection)"
       },
       "heroic_leap": {
-        "name": "Válečný skok",
+        "name": "Vaulting Charge",
         "description": "Skočíš do cílové oblasti a při dopadu způsobíš okolním nepřátelům {damage} poškození."
       },
       "rallying_cry": {
@@ -8803,7 +8803,7 @@ export const cs_CZ: EnTranslations = {
         "description": "Na 20 s se proměníš v kolosa, zrušíš všechny ovládací efekty a zvýšíš své způsobené poškození o 20 %."
       },
       "avenging_wrath": {
-        "name": "Křídlo odplaty",
+        "name": "Zealwing",
         "description": "Přivolá moc pomsty a na 20 s vám zvýší útočnou sílu o 60 a sílu kouzel o 30. (paladinský talent)"
       },
       "berserk": {
@@ -8815,7 +8815,7 @@ export const cs_CZ: EnTranslations = {
         "description": "Proměníš se ve vířící bouři oceli a po dobu 4 s každou sekundu zasáhneš všechny nepřátele do 6 metrů za {damage} poškození."
       },
       "blink": {
-        "name": "Mihokrok",
+        "name": "Flitstep",
         "description": "Teleportuje vás o 15 m vpřed a zruší účinky zakořenění. (mágský talent)"
       },
       "bloodlust": {
@@ -8843,7 +8843,7 @@ export const cs_CZ: EnTranslations = {
         "description": "Golpea a blízké nepřátele con escarcha e inflige {damage} de daño de Mrazu. (mágovský talent)"
       },
       "counterspell": {
-        "name": "Zlomení kouzla",
+        "name": "Spellsever",
         "description": "Přeruší sesílání kouzla cíle a na 6 s mu znemožní kouzla stejné školy."
       },
       "curse_of_exhaustion": {
@@ -8992,7 +8992,7 @@ export const cs_CZ: EnTranslations = {
       },
       "preparation": {
         "name": "Záložní plán",
-        "description": "Dokončí přebíjení Sprintu, Úhybu a Zmizení. (lotrovský talent)"
+        "description": "Finishes the cooldown on Swift Heels, Ghostfoot, and Smokefade. (Rogue talent)"
       },
       "presence_of_mind": {
         "name": "Zrychlená mysl",
@@ -9023,7 +9023,7 @@ export const cs_CZ: EnTranslations = {
         "description": "Zmizíte v oblaku kouře a na 8 s zvýšíte svou šanci na úhyb o 30 %."
       },
       "spellsteal": {
-        "name": "Krádež kouzla",
+        "name": "Spellplunder",
         "description": "Ukradne nepříteli prospěšný magický účinek a přenese jej na vás."
       },
       "startle_shot": {
@@ -9421,7 +9421,7 @@ export const cs_CZ: EnTranslations = {
         "name": "Kazzixův srdeční střep"
       },
       "wyrmcult_orders": {
-        "name": "Rozkazy kultu draka"
+        "name": "Broodsworn Orders"
       },
       "ritual_phylactery": {
         "name": "Rituální fylakterie"
@@ -9484,7 +9484,7 @@ export const cs_CZ: EnTranslations = {
         "name": "Hauberk ze šupin Hrobodraka"
       },
       "wyrmcult_grand_robe": {
-        "name": "Velké roucho kultu draka"
+        "name": "Broodsworn Grand Robe"
       },
       "wyrmscale_jerkin": {
         "name": "Kazajka z dračích šupin"
@@ -10153,7 +10153,7 @@ export const cs_CZ: EnTranslations = {
         "name": "Plášť střepinového zpěvu"
       },
       "wyrmcult_spellgrips": {
-        "name": "Kouzelné rukavice kultu dračích"
+        "name": "Broodsworn Spellgrips"
       },
       "thornpeak_wildwraps": {
         "name": "Divoké obvazy z Thornpeak"
@@ -10162,7 +10162,7 @@ export const cs_CZ: EnTranslations = {
         "name": "Kyrys zasvěcený bouři"
       },
       "cryptbloom_shoulderguards": {
-        "name": "Kryptkvětové chrániče ramen"
+        "name": "Tombpetal Shoulderguards"
       },
       "gravewyrm_thornmaul": {
         "name": "Trnová palice Hrobodraka"
@@ -10417,7 +10417,7 @@ export const cs_CZ: EnTranslations = {
         "name": "Boty podšité ohništěm"
       },
       "frostmane_mantle": {
-        "name": "Plášť Mrazivé hřívy"
+        "name": "Mantle of the Rimemane"
       },
       "ashbone_war_brand": {
         "name": "Popelokostní válečný cejch"
@@ -10576,7 +10576,7 @@ export const cs_CZ: EnTranslations = {
         "name": "Řemeslníkovo oko"
       },
       "reins_terrorspark_groundshaker": {
-        "name": "Klíček zapalování: Hrůzojiskra, otřásač země"
+        "name": "Ignition Key: Dreadspark Groundshaker"
       },
       "reins_drakemaw_raptor": {
         "name": "Otěže raptora z Dračí tlamy"
@@ -10744,7 +10744,7 @@ export const cs_CZ: EnTranslations = {
         "name": "Vossův posvěcený palcát"
       },
       "wyrmcult_soulsteps": {
-        "name": "Dušokroky kultu draka"
+        "name": "Broodsworn Soulsteps"
       },
       "wyrmshadow_harness": {
         "name": "Postroj nočního tesáku"
@@ -10975,7 +10975,7 @@ export const cs_CZ: EnTranslations = {
         "name": "Relikviářová helma diákona"
       },
       "varric_shadow_cowl": {
-        "name": "Varricova stínová kápě"
+        "name": "Vandricova stínová kápě"
       },
       "siltguard_helm": {
         "name": "Helma bahenní stráže"
@@ -11152,7 +11152,7 @@ export const cs_CZ: EnTranslations = {
         "name": "Kostimrazá šňůra"
       },
       "mistforged_pauldrons": {
-        "name": "Mlhou kované nárameníky"
+        "name": "Fogforged Pauldrons"
       },
       "tideguard_faceguard": {
         "name": "Hledí přílivové stráže"
@@ -11466,10 +11466,10 @@ export const cs_CZ: EnTranslations = {
         "name": "Pán střepů Kazzix"
       },
       "wyrmcult_zealot": {
-        "name": "Fanatik kultu draka"
+        "name": "Broodsworn Zealot"
       },
       "wyrmcult_necromancer": {
-        "name": "Nekromant kultu draka"
+        "name": "Broodsworn Necromancer"
       },
       "boneclad_revenant": {
         "name": "Kostmi obrněný revenant"
@@ -11577,7 +11577,7 @@ export const cs_CZ: EnTranslations = {
         "name": "Bezsvatá podobizna"
       },
       "deacon_varric": {
-        "name": "Diákon Varric"
+        "name": "Diákon Vandric"
       },
       "acolyte_tessa": {
         "name": "Akolytka Tessa"
@@ -11769,7 +11769,7 @@ export const cs_CZ: EnTranslations = {
         "name": "Bažinná víla"
       },
       "frostmane_yeti": {
-        "name": "Yeti s mrazivou hřívou"
+        "name": "Rimemane Yeti"
       },
       "terrace_howler": {
         "name": "Terasový vytec"
@@ -11817,7 +11817,7 @@ export const cs_CZ: EnTranslations = {
         "name": "Jezerotma"
       },
       "harvest_sprite": {
-        "name": "Sklizňová víla"
+        "name": "Gleaning Sprite"
       },
       "mere_lurker": {
         "name": "Jezerní číhal"
@@ -11841,7 +11841,7 @@ export const cs_CZ: EnTranslations = {
         "name": "Soumrakový chodec"
       },
       "nightkin_stargazer": {
-        "name": "Hvězdopozorovatel Nočního rodu"
+        "name": "Gloamkin Stargazer"
       },
       "barrow_king": {
         "name": "Mohylový král"
@@ -11991,7 +11991,7 @@ export const cs_CZ: EnTranslations = {
         "name": "Žhavorodý"
       },
       "gloomshade": {
-        "name": "Šerostín"
+        "name": "Duskmurk"
       },
       "duskborn": {
         "name": "Zrozený ze soumraku"
@@ -12262,7 +12262,7 @@ export const cs_CZ: EnTranslations = {
       },
       "provisioner_fenna": {
         "name": "Zásobovatelka Fenna",
-        "title": "Zásobovatelka Prastarého svitu",
+        "title": "Eldershine Provisioner",
         "greeting": "Chléb ještě teplý, voda ještě sladká. Kotlina poskytuje, a já také."
       },
       "wardsmith_orun": {
@@ -12387,12 +12387,12 @@ export const cs_CZ: EnTranslations = {
       },
       "sexton_marrow": {
         "name": "Kostelník Marrow",
-        "title": "Kostelník Šibeničního jezera",
+        "title": "Sexton of Gibbetmere",
         "greeting": "Pohřbíváme je tu hluboko a zvoníme na zvony, aby si pamatovali zůstat dole."
       },
       "widow_tansy": {
         "name": "Vdova Tansy",
-        "title": "Svícařka Šibeničního jezera",
+        "title": "Candlewright of Gibbetmere",
         "greeting": "Svíce pro každý hrob, a ani jedna nesmí zhasnout. Ani jedna, slyšíš mě?"
       },
       "vicar_creel": {
@@ -12416,7 +12416,7 @@ export const cs_CZ: EnTranslations = {
         "greeting": "Moře dává, písek uchovává a džungle bere. Zůstaň na pláži, cizinče."
       },
       "hermit_okku": {
-        "name": "Okku",
+        "name": "Okrim",
         "title": "Muž, který vešel dovnitř",
         "greeting": "Teď tiše. Bubny počítají všechno, co chodí pod stromy, a už spočítaly i tebe."
       },
@@ -13064,7 +13064,7 @@ export const cs_CZ: EnTranslations = {
       },
       "q_drogmar": {
         "title": "Válečný vůdce Drogmar",
-        "text": "Válečný vůdce Drogmar vzal mince kultu draka a přísahal klany probuzení hory. Je to kladivo, kterým chtějí udeřit do mé zdi, a až udeří do země, {playerName}, nestůj u něj. Vezmi své společníky do válečného tábora a ukonči ho, za Highwatch.",
+        "text": "Warlord Drogmar took the Broodsworn's coin and swore the clans to the mountain's waking. He is the hammer they mean to swing at my wall - and when he slams the ground, {playerName}, do not be standing near him. Take your companions into the war-camp and end him, for Highwatch.",
         "completion": "Drogmar, mrtvý ve vlastním táboře. Klany se rozprchnou do vysokých průsmyků, koupil jsi mé zdi zimu, {playerName}.",
         "objectives": {
           "0": {
@@ -13104,11 +13104,11 @@ export const cs_CZ: EnTranslations = {
       },
       "q_zealots": {
         "title": "Zpěvy ve větru",
-        "text": "Když vítr vane z jižních štítů, {playerName}, nese zpěv. Kult draka se už neskrývá, vztyčil stany pod svatyní a zpívá tomu, co pod ní spí. Umlč dvanáct fanatiků. Každý utišený hlas kupuje hoře další noc spánku.",
+        "text": "When the wind comes off the southern peaks, {playerName}, it carries chanting. The Broodsworn no longer hides - they have raised tents below the Sanctum and they sing to what sleeps beneath it. Silence twelve zealots. Every voice stilled buys the mountain another night of sleep.",
         "completion": "Vítr je tišší. Ale netrápí mě zpěv, {playerName}, nýbrž to, že něco může zpívat zpátky.",
         "objectives": {
           "0": {
-            "label": "Fanatik kultu draka zabit"
+            "label": "Broodsworn Zealot slain"
           }
         }
       },
@@ -13181,7 +13181,7 @@ export const cs_CZ: EnTranslations = {
             "label": "Fanatik kultu draka zabit"
           },
           "1": {
-            "label": "Nekromant kultu draka zabit"
+            "label": "Broodsworn Necromancer slain"
           }
         }
       },
@@ -13621,7 +13621,7 @@ export const cs_CZ: EnTranslations = {
       },
       "q_hollow_old_marrowshell": {
         "title": "Starý krunýř mělčin",
-        "text": "To první jméno je Starý Morkoškeble, krab velikosti vozu, který loví ve východních mělčinách od doby, kdy Prastarý svit ještě neměl bránu. Toulá se, {playerName}, takže budeš muset projít pobřežní linii, dokud nenarazíš na jeho stopu. Nechoď sám a nedůvěřuj jeho nehybnosti.",
+        "text": "The first name is Old Marrowshell, a crab the size of a cart that has hunted the eastern shallows since before Eldershine had a gate. It wanders, {playerName}, so you will have to walk the shoreline until you cross its track. Do not go alone, and do not trust its stillness.",
         "completion": "Mělčiny jsou zase jen voda. Viděla jsem ten krunýř zlomit lepší lovce, než jsem já, {playerName}. Ne tebe.",
         "objectives": {
           "0": {
@@ -13763,12 +13763,12 @@ export const cs_CZ: EnTranslations = {
         }
       },
       "q_fv_frostmane_tyrant": {
-        "title": "Tyran Mrazivé hřívy",
-        "text": "Vytci nelovili, když sešli dolů po terasách. Prchali. Yeti si nárokoval vysočinu, horský lid ho nazývá Mrazivá hříva, a ani smečky s ním nechtějí sdílet svah. Musí to skončit, {playerName}, než ho zima zažene dolů k mým hradbám. Vezmi si přítele. Vezmi si dva.",
-        "completion": "Když se včera v noci utišil vítr, celá vesnice slyšela ticho tam, kde bývala Mrazivá hříva. Kraj ti dluží dluh, který mu bude trvat roky splatit, {playerName}. Nos tohle, a každé dveře v Ledovém plášti jsou ti otevřené.",
+        "title": "The Rimemane Tyrant",
+        "text": "The howlers were not hunting when they came down the terraces. They were fleeing. A yeti has claimed the high ground, the mountain folk call it the Rimemane, and even the packs will not share a slope with it. It has to end, {playerName}, before winter drives it down to my walls. Bring a friend. Bring two.",
+        "completion": "When the wind dropped last night the whole village heard the silence where the Rimemane used to be. The Reach owes you a debt it will be years in paying, {playerName}. Wear this, and every door in Icemantle is open to you.",
         "objectives": {
           "0": {
-            "label": "Mrazivá hříva poražena"
+            "label": "The Rimemane slain"
           }
         }
       },
@@ -13921,7 +13921,7 @@ export const cs_CZ: EnTranslations = {
         "completion": "Čtyři vědra zpátky na hácích a řady zase ztichly. Máš na víly tvrdší ruku než já, {playerName}, a dnes jsem tomu rád.",
         "objectives": {
           "0": {
-            "label": "Sklizňová víla zahnána"
+            "label": "Gleaning Sprite driven off"
           },
           "1": {
             "label": "Vědro na sběr mízy nalezeno"
@@ -14063,7 +14063,7 @@ export const cs_CZ: EnTranslations = {
       },
       "q_nb_eyes_on_the_vigil": {
         "title": "Oči na Hlídce",
-        "text": "Něco dělá chodce odvážnými a stáda neklidnými, {playerName}, a já to nedokážu přečíst v květinách. Cassian to dokáže přečíst na obloze. Drží svůj pozorovací tábor u Stálé hlídky východně odtud, kde se Noční rod vznáší mezi kameny. Najdi ho a zeptej se, co říkají hvězdy.",
+        "text": "Something has the striders bold and the herds uneasy, {playerName}, and I cannot read it in the flowers. Cassian can read it in the sky. He keeps his observatory camp by the Standing Vigil east of here, where the gloamkin drift among the stones. Find him, and ask what the stars are saying.",
         "completion": "Lira tě poslala? Pak to cítí i zahrady. Posaď se na chvíli u dalekohledu, {playerName}. Hvězdy jsou neklidné už měsíc, a každá mapa, kterou nakreslím, se naklání na sever směrem k mohyle.",
         "objectives": {
           "0": {
@@ -14073,7 +14073,7 @@ export const cs_CZ: EnTranslations = {
       },
       "q_nb_charts_of_the_stones": {
         "title": "Mapy v kamenech",
-        "text": "Kameny Hlídky jsou starší než Měsíční klid, starší než Noční rod, který se o ně stará, a jejich plochy jsou vytesány hvězdnými mapami, které jsem se celý život učil číst. Obloha se posunula, {playerName}, a já musím vědět, o kolik. Přečti mapy na třech z kamenů a přines mi jejich zaměření.",
+        "text": "The Vigil stones are older than Moonrest, older than the gloamkin who tend them, and their faces are cut with star charts I have spent my life learning to read. The sky has shifted, {playerName}, and I must know how far. Read the charts on three of the stones and bring me their bearings.",
         "completion": "Nezbývá žádná pochybnost. Každé zaměření se plíživě posunulo k Bezesné mohyle, jako by se samotná obloha nakláněla nad tu mohylu, aby ji sledovala. Staří králové byli pohřbeni pod srovnanými hvězdami z nějakého důvodu, {playerName}.",
         "objectives": {
           "0": {
@@ -14097,7 +14097,7 @@ export const cs_CZ: EnTranslations = {
       "q_nb_the_barrow_king": {
         "title": "Mohylový král se probouzí",
         "text": "Každé zaměření, každá neklidná hvězda, každá otevřená mohyla ukazuje na jednu věc: Mohylový král se probouzí pod velkou mohylou, a tato říše nemá žádné svítání, které by ho zadrželo. Musí být uložen k odpočinku, než si vzpomene na svou korunu, {playerName}. Nechoď sám: vezmi si přítele a měj květinové světlo v zádech.",
-        "completion": "Hvězdy se poprvé po celou sezónu uklidnily, {playerName}. Mohyly jsou uzavřeny, Noční rod znehybněl u svých kamenů, a král znovu spí dole. Nos tento plášť: Měsíční klid ho ušil pro toho, komu noc konečně důvěřovala.",
+        "completion": "The stars have settled for the first time in a season, {playerName}. The mounds are closed, the gloamkin have gone still at their stones, and the king sleeps below once more. Wear this mantle: Moonrest cut it for whoever the night finally trusted.",
         "objectives": {
           "0": {
             "label": "Mohylový král uložen k odpočinku"
@@ -14105,9 +14105,9 @@ export const cs_CZ: EnTranslations = {
         }
       },
       "q_ww_bells_of_gallowmere": {
-        "title": "Zvony Šibeničního jezera",
-        "text": "Slyšíš to zvonění, {playerName}? To je Šibeniční jezero, nahoru po severní cestě, jak ukolébává své mrtvé zvoněním ke spánku. Kostelník Marrow vede počet každé duše pod korunami stromů, živé i pohřbené. Jdi a nech se spočítat, než tě spočítá les sám.",
-        "completion": "Cobb tě poslal po cestě celého, jo? Dobrý muž. Udržuje ty branové lucerny zapálené třicet let, a les se kolem něj nikdy nedostal. Vítej v Šibeničním jezeru, {playerName}. Dávej pozor na zvony.",
+        "title": "The Bells of Gibbetmere",
+        "text": "Hear that tolling, {playerName}? That is Gibbetmere, up the north road, ringing its dead to sleep. Sexton Marrow keeps the count of every soul under the canopy, living and buried. Go and be counted, before the wood counts you itself.",
+        "completion": "Cobb sent you up the road whole, did he? Good man. He has kept those gate lanterns lit for thirty years, and the wood has never once got past him. Welcome to Gibbetmere, {playerName}. Mind the bells.",
         "objectives": {
           "0": {
             "label": "Ohlásit se Kostelníkovi Marrowovi"
@@ -14136,7 +14136,7 @@ export const cs_CZ: EnTranslations = {
       },
       "q_ww_candles_at_the_bounds": {
         "title": "Svíce na hranicích",
-        "text": "Čtyři hraniční kameny obklopují Šibeniční jezero, {playerName}, jeden na každé cestě ven, a hrobová svíce hoří na každém kameni. Dokud hoří, pohřbení zůstávají pohřbeni. Mrholení je utopilo, všechny čtyři, a já jsem příliš stará na to, abych sama obcházela hranice. Vezmi si mou svíčku a znovu je zapal, rychle.",
+        "text": "Four boundary stones ring Gibbetmere, {playerName}, one on each road out, and a grave-candle burns on every stone. While they burn, the buried stay buried. The drizzle has drowned them, all four, and I am too old to walk the bounds alone. Take my taper and relight them, quickly.",
         "completion": "Všechny čtyři hoří? Tak si oddechni, {playerName}. Neslyšel jsi to, ale celá vesnice ano: zvony zazněly lehčeji ve chvíli, kdy chytil poslední knot.",
         "objectives": {
           "0": {
@@ -14166,7 +14166,7 @@ export const cs_CZ: EnTranslations = {
       },
       "q_ww_what_the_bark_holds": {
         "title": "Co kůra drží",
-        "text": "Ve Visící mýtině východně od Šibeničního jezera věší tkalci své hedvábím zabalené mrtvé z větví, a rytokorí vlekouni stojí na stráži pod nimi jako trpěliví nosiči rakví. To jsou naši lidé tam nahoře, {playerName}. Znič pět vlekounů, sřež tři ze zabalených mrtvých, a přines je domů do hlíny.",
+        "text": "In the Hanging Glade east of Gibbetmere the spinners hang their silk-wrapped dead from the boughs, and the gravenbark shamblers stand guard beneath like patient pallbearers. Those are our people up there, {playerName}. Break five shamblers, cut down three of the wrapped dead, and bring them home to soil.",
         "completion": "Tři duše zpátky pod poctivou zemí před setměním. Vlekouni znovu vyrostou, kůra to vždycky dělá, ale dnes v noci mýtina visí prázdná, a to stačí.",
         "objectives": {
           "0": {
@@ -14180,17 +14180,17 @@ export const cs_CZ: EnTranslations = {
       "q_ww_walking_mosley_home": {
         "title": "Doprovodit Mosleyho domů",
         "text": "Můj hrobník Mosley se před třemi dny vydal po kapelní cestě otevřít hrob na starém hřbitově, a výkop se na něj zřítil. Vyškrábal se ven, ten blázen žije, ale krčí se u kapelních hrobů a nechce se hnout kvůli tkalcům na cestě. Doveď ho domů, {playerName}. Nemohu zvonit na zvony pro živého muže.",
-        "completion": "Prošel bránou na vlastních nohou, přísahá, že od teď nebude kopat nic hlubšího než záhon tuřínu. Bude zpátky na hřbitově do neděle, vždycky jsou. Děkuji ti, {playerName}. Šibeniční jezero si udržuje své lidi, to je celý náš zákon.",
+        "completion": "He came through the gate on his own two feet, swearing he will dig nothing deeper than a turnip bed from now on. He will be back at the yard by Sunday, they always are. Thank you, {playerName}. Gibbetmere keeps its people, that is the whole of our law.",
         "objectives": {
           "0": {
-            "label": "Hrobník Mosley bezpečně doveden zpátky do Šibeničního jezera"
+            "label": "Gravedigger Mosley walked safely back to Gibbetmere"
           }
         }
       },
       "q_ww_horn_of_the_huntsman": {
         "title": "Roh lovce",
         "text": "Už jsi ten roh slyšel, {playerName}, tenký a vzdálený, zvuk, kvůli kterému celý les zadržuje dech. Bledý lovec projíždí svou mýtinou severně odtud, a každý hrob, kolem kterého projede, se prohlubuje mělčeji. Kdysi byl člověkem, a byl pohřben špatně, a já se přestala přetvařovat, že to spraví modlitba. Vezmi si přítele, vezmi si dva, a shoď ho z koně.",
-        "completion": "Roh se zastavil uprostřed tónu. Každý zvon v Šibeničním jezeru zazněl jednou, sám od sebe, a pak les ztichl víc, než jsem ho slyšela za třicet let. Vykonal jsi obřad, který já nedokázala, {playerName}. Nos tohle, a choď pod korunami stromů beze strachu.",
+        "completion": "The horn stopped mid-note. Every bell in Gibbetmere rang once, on its own, and then the wood went quieter than I have heard it in thirty years. You have done the rite I could not, {playerName}. Wear this, and walk under the canopy unafraid.",
         "objectives": {
           "0": {
             "label": "Bledý lovec shozen z koně"
@@ -14239,11 +14239,11 @@ export const cs_CZ: EnTranslations = {
       },
       "q_pr_the_man_who_went_in": {
         "title": "Muž, který vešel dovnitř",
-        "text": "Potápěči nechtějí vkročit za linii stromů, {playerName}, a nebudu je o to žádat. Bubny jsi už slyšel: každý je slyší, do druhé noci. Jeden muž na tomto ostrově kdy šel k tomu zvuku a vrátil se. Okku. Táboří pod velkými banyány u Liánového pádu, hluboko nahoru po Spletené cestě. Najdi ho a zeptej se ho, co zeleň skrývá.",
+        "text": "Potápěči nechtějí vkročit za linii stromů, {playerName}, a nebudu je o to žádat. Bubny jsi už slyšel: každý je slyší, do druhé noci. Jeden muž na tomto ostrově kdy šel k tomu zvuku a vrátil se. Okrim. Táboří pod velkými banyány u Liánového pádu, hluboko nahoru po Spletené cestě. Najdi ho a zeptej se ho, co zeleň skrývá.",
         "completion": "Isha tě poslala? Perlová matka nevyslovila mé jméno už roky. Sedni si mimo dosah lián, {playerName}, a řeknu ti, co vím: bubny nejsou nebezpečí. Jsou varováním.",
         "objectives": {
           "0": {
-            "label": "Najít Okku u Liánového pádu"
+            "label": "Najít Okrim u Liánového pádu"
           }
         }
       },
@@ -14722,7 +14722,7 @@ export const cs_CZ: EnTranslations = {
             "label": "Třpytivé pleso"
           },
           "7": {
-            "label": "Stany kultu draka"
+            "label": "Broodsworn Tents"
           },
           "8": {
             "label": "Pole revenantů"
@@ -14734,10 +14734,10 @@ export const cs_CZ: EnTranslations = {
       },
       "veiled_hollow": {
         "name": "Zahalená kotlina",
-        "welcome": "Vzduch hučí prastarou magií. Vyhledej Strážce Saelwyna pod velkým stromem Prastarého svitu.",
+        "welcome": "The air hums with old magic. Seek Keeper Saelwyn beneath the great tree of Eldershine.",
         "pois": {
           "0": {
-            "label": "Prastarý svit"
+            "label": "Eldershine"
           },
           "1": {
             "label": "Jeskyně Soumračného pádu"
@@ -14875,7 +14875,7 @@ export const cs_CZ: EnTranslations = {
             "label": "Noční brána"
           },
           "2": {
-            "label": "Měsíční studna"
+            "label": "The Moonspring"
           },
           "3": {
             "label": "Soumrakové pole"
@@ -14890,10 +14890,10 @@ export const cs_CZ: EnTranslations = {
       },
       "wraithwood": {
         "name": "Přízračný les",
-        "welcome": "Koruny stromů se zavírají nad cestou jako víko. Drž se lucern Šibeničního jezera a neodpovídej, pokud les zavolá tvé jméno.",
+        "welcome": "The canopy closes over the road like a lid. Keep to the lanterns of Gibbetmere, and do not answer if the wood calls your name.",
         "pois": {
           "0": {
-            "label": "Šibeniční jezero"
+            "label": "Gibbetmere"
           },
           "1": {
             "label": "Vraní brána"

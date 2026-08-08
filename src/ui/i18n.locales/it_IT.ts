@@ -867,8 +867,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.items.tidewrought_fishing_rod.name': 'Canna forgiata dalla marea',
   'entities.items.gatherers_cache.name': 'Riserva del Raccoglitore',
   'entities.items.artisans_eye.name': 'Occhio dell’Artigiano',
-  'entities.items.reins_terrorspark_groundshaker.name':
-    'Chiave d’accensione: Terrorscintilla, Scuoteterra',
   'hudChrome.auraOverlay.allOff': 'Disattiva tutto',
   'hudChrome.auraOverlay.allOn': 'Attiva tutto',
   'hudChrome.auraOverlay.arcs': 'Mezzelune laterali',
@@ -902,7 +900,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraOverlay.procs.overpowerCharge': 'Potenziamento di Mano Rossa',
   'hudChrome.auraOverlay.procs.revenge': 'Vendetta!',
   'hudChrome.auraOverlay.procs.suddenDeath': 'Morte Improvvisa',
-  'hudChrome.auraOverlay.procs.victoryRush': 'Impeto della Vittoria',
   'hudChrome.auraOverlay.reposition': 'Configura posizioni',
   'hudChrome.auraOverlay.reset': 'Ripristina posizione',
   'hudChrome.auraOverlay.screenPosition': 'Posizione sullo schermo',
@@ -921,7 +918,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.epic.unlink': 'Scollega Epic',
   'hudChrome.mounts.desc_terrorspark_groundshaker':
     'Una macchina corazzata compatta con cingoli pesanti, un cannone di grosso calibro e una sella costruita per piloti impavidi.',
-  'hudChrome.mounts.name_terrorspark_groundshaker': 'Terrorscintilla, Scuoteterra',
   'hudChrome.targetAuras.all': 'Tutti',
   'hudChrome.targetAuras.buffs': 'Potenziamenti',
   'hudChrome.targetAuras.configureRows': 'Configura le aure del bersaglio',
@@ -1254,7 +1250,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "Convoglia un'ondata di etere grezzo attraverso il nemico infliggendo {damage} danni. Ogni lancio lascia una Carica Arcana che aumenta i danni e la velocità di lancio della prossima Potere d'Etere del 5%, ma ne aumenta considerevolmente il costo in mana, fino a 4 accumuli; Dardi d'Etere consuma le cariche. Ogni lancio può armare Corsa d'Etere, rendendo la prossima Potere d'Etere gratuita e due volte più veloce da lanciare.",
   'entities.abilities.arcane_surge.name': "Potere d'Etere",
   'entities.abilities.blizzard.description':
-    "Scatena una tempesta di ghiaccio sull'area bersaglio per 6 secondi, infliggendo {damage} danni da Gelo al secondo e rallentando i nemici del 40%. Ogni nemico colpito riduce di 0,5 secondi il recupero di Frozen Orb, fino a 3 secondi per lancio. (Gelo)",
+    "Scatena una tempesta di ghiaccio sull'area bersaglio per 6 secondi, infliggendo {damage} danni da Gelo al secondo e rallentando i nemici del 40%. Ogni nemico colpito riduce di 0,5 secondi il recupero di Frostglobe, fino a 3 secondi per lancio. (Gelo)",
   'entities.abilities.blizzard.name': 'Bufera di Neve',
   'entities.abilities.brain_freeze.name': 'Gelo Mentale',
   'entities.abilities.dragons_breath.description':
@@ -1267,13 +1263,11 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Ti trasformi in una brace ardente, aumentando la velocità di movimento del {buff}%. Non puoi attaccare né lanciare incantesimi mentre sei trasformato. Rilancia per tornare alla tua forma normale.',
   'entities.abilities.fireball_form.name': 'Forma Brace',
   'entities.abilities.flurry.name': "Sferza d'Inverno",
-  'entities.abilities.frozen_orb.name': 'Sfera Congelata',
   'entities.abilities.glacial_front.description':
     'Tieni premuto per raccogliere un fronte di gelo sempre più ampio, poi rilascialo a cono. Cariche più lunghe raggiungono più lontano e infliggono più danni. Tutti i nemici colpiti vengono rallentati del 50% per 4 secondi; la carica massima li radica anche per 1 secondo. (Gelo)',
   'entities.abilities.glacial_front.name': 'Fronte Glaciale',
   'entities.abilities.glacial_spike.description':
     "Evoca un'enorme stalattite di ghiaccio, consumando 5 Stalattiti per infliggere {damage} danni da Gelo e congelare il bersaglio sul posto per 4 secondi. (Gelo)",
-  'entities.abilities.glacial_spike.name': 'Spuntone Glaciale',
   'entities.abilities.ice_lance.description':
     'Scaglia un frammento di ghiaccio infliggendo {damage} danni da Gelo, triplicati contro un bersaglio congelato. Spende Fingers of Frost oppure una carica di Gelo Invernale per trattare il bersaglio come congelato. (Gelo)',
   'entities.abilities.ice_lance.name': 'Lancia di Ghiaccio',
@@ -1805,7 +1799,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.furious_mending.name': 'Rammendo Furioso',
   'entities.abilities.heroic_leap.description':
     'Balza nell’area bersaglio, infliggendo {damage} danni ai nemici vicini all’atterraggio.',
-  'entities.abilities.heroic_leap.name': 'Balzo di Guerra',
   'entities.abilities.intimidating_shout.description':
     "Un urlo terrificante che fa fuggire in preda alla paura fino a 5 nemici entro 8 metri per 8 sec. I danni possono interrompere l'effetto.",
   'entities.abilities.intimidating_shout.name': 'Urlo Intimidatorio',
@@ -1844,7 +1837,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.seasoned_soldier.name': 'Soldato Veterano',
   'entities.abilities.storm_bolt.description':
     'Scagli la tua arma contro il bersaglio, infliggendo {damage} danni e stordendolo per 3 sec.',
-  'entities.abilities.storm_bolt.name': 'Dardo della Tempesta',
   'entities.abilities.sudden_death.description':
     'I tuoi attacchi automatici hanno una probabilità di permetterti di lanciare Tomba Prematura su un bersaglio a qualsiasi livello di salute, senza costo di rabbia. (Armi)',
   'entities.abilities.sudden_death.name': 'Morte Improvvisa',
@@ -1853,7 +1845,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sweeping_strikes.name': 'Arco Crescente',
   'entities.abilities.victory_rush.description':
     "Colpisci per danni dell'arma più {damage} e recuperi il 20% della tua salute massima. Utilizzabile solo entro 20 sec dall'uccisione di un nemico.",
-  'entities.abilities.victory_rush.name': 'Impeto della Vittoria',
   'hudChrome.specPanel.complexity': 'Complessità',
   'hudChrome.specPanel.complexityHigh': 'Alta',
   'hudChrome.specPanel.complexityLow': 'Bassa',
@@ -1867,9 +1858,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.talentRows.tab': 'Scelte',
   'hudChrome.talentRows.readoutSummary': 'Talenti: {head}, {spent}/{total} righe selezionate.',
   'entities.abilities.aspect_of_the_wild.name': 'Aspetto Zannaferina',
-  'entities.abilities.avenging_wrath.name': 'Alavendetta',
   'entities.abilities.berserk.name': 'Bruma Rossa',
-  'entities.abilities.blink.name': 'Passo Baleno',
   'entities.abilities.bloodlust.name': 'Tamburi di Guerra',
   'entities.abilities.chain_lightning.name': 'Fulmine Biforcuto',
   'entities.abilities.chaos_bolt.name': 'Dardo della Rovina',
@@ -1909,7 +1898,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.smoke_screen.name': 'Cortina Fumogena',
   'entities.abilities.smoke_screen.description':
     'Scompari in una nube di fumo, aumentando del 30% la probabilità di schivare per 8 s.',
-  'entities.abilities.spellsteal.name': 'Rubamagie',
   'entities.abilities.spellsteal.description':
     'Ruba un effetto magico benefico da un nemico e lo trasferisce su di te.',
   'entities.abilities.startle_shot.name': 'Tiro Sconcertante',
@@ -2184,7 +2172,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.items.lunar_tide_greatstaff.name': 'Grande bastone della marea lunare',
   'entities.items.medallion_of_endless_profit.name': 'Medaglione del profitto infinito',
   'entities.items.mistcallers_fang.name': "Zanna dell'evocanebbia",
-  'entities.items.mistforged_pauldrons.name': 'Spallacci forgiati nella nebbia',
   'entities.items.morthens_cryptforged_hauberk.name': 'Usbergo forgiacripta di Morthen',
   'entities.items.nielas_coldlight_band.name': 'Anello lucegelida di Niela',
   'entities.items.oath_of_the_round_table.name': 'Giuramento della Tavola Rotonda',
@@ -4776,8 +4763,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.blazing_barrier.description':
     'Ti avvolge nelle fiamme, assorbendo {damage} danni per 60 s. (Fuoco)',
   'entities.abilities.cold_snap.name': "Richiamo dell'inverno",
-  'entities.abilities.cold_snap.description':
-    'Termina il tempo di recupero di Passo fulmineo, Velo di Gelo e Invisibilità superiore. (Talento del mago)',
   'entities.abilities.greater_invisibility.name': 'Invisibilità superiore',
   'entities.abilities.hot_streak.name': 'Vampata',
   'entities.abilities.hot_streak.description':
@@ -4885,7 +4870,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rupture.name': 'Dissanguamento',
   'entities.abilities.rupture.description':
     'Mossa finale che ferisce il bersaglio, provocando sanguinamento per {damage} in 16 sec.',
-  'entities.abilities.vanish.name': 'Passo di Fumo',
   'entities.abilities.vanish.description':
     'Scompari dalla vista, entrando in Duskveil anche in combattimento. Ti muovi il 50% più lentamente mentre sei nascosto. Dura fino a 10 sec.',
   'entities.abilities.instant_poison.name': 'Morso della Vipera',
@@ -5157,9 +5141,9 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.summon_imp.name': 'Evoca Emberkin',
   'entities.abilities.summon_imp.description':
     "Evoca un Emberkin al comando dello stregone. L'Emberkin scaglia Dardi di cenere contro i tuoi nemici a distanza. Evocare un nuovo demone congeda quello attuale. Puoi avere un solo demone alla volta.",
-  'entities.abilities.summon_voidwalker.name': 'Evoca Gloomshade',
+  'entities.abilities.summon_voidwalker.name': 'Evoca Duskmurk',
   'entities.abilities.summon_voidwalker.description':
-    'Evoca un Gloomshade al comando dello stregone. Il Gloomshade è un demone robusto che provoca i tuoi nemici e assorbe i colpi. Evocare un nuovo demone congeda quello attuale. Puoi avere un solo demone alla volta.',
+    'Evoca un Duskmurk al comando dello stregone. Il Duskmurk è un demone robusto che provoca i tuoi nemici e assorbe i colpi. Evocare un nuovo demone congeda quello attuale. Puoi avere un solo demone alla volta.',
   'entities.abilities.summon_succubus.name': 'Evoca Duskborn',
   'entities.abilities.summon_succubus.description':
     'Evoca un Duskborn al comando dello stregone. Il Duskborn è un demone fragile che colpisce rapidamente e infligge gravi danni in mischia. Evocare un nuovo demone congeda quello attuale. Puoi avere un solo demone alla volta.',
@@ -5190,7 +5174,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.revive_pet.name': 'Rattoppare',
   'entities.abilities.revive_pet.description':
     'Rattoppa il tuo famiglio, ripristinando {overTime} salute in 12 sec con impulsi ogni 3 sec se è vivo. Se è morto, lo rianima con il 35% della salute.',
-  'entities.abilities.holy_shock.name': 'Shock Sacro',
   'entities.abilities.holy_shock.description':
     'Colpisce un bersaglio alleato con energia Sacra, curandolo di {damage}. (firma Sacro)',
   'entities.abilities.holy_shield.name': 'Scudo Sacro',
@@ -5202,7 +5185,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.trueshot_aura.name': 'Aura di Precisione',
   'entities.abilities.trueshot_aura.description':
     'Ispira gli alleati vicini, aumentando la potenza d’attacco di 35 per 5 min. (firma Precisione)',
-  'entities.abilities.wyvern_sting.name': 'Morso della Viverna',
   'entities.abilities.wyvern_sting.description':
     'Punzecchia il nemico a distanza, incapacitandolo per un massimo di 4 s. Qualsiasi danno interrompe l’effetto. (firma Sopravvivenza)',
   'entities.abilities.arcane_power.name': 'Potere Arcano',
@@ -5211,7 +5193,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.combustion.name': 'Trance della fenice',
   'entities.abilities.combustion.description':
     'Aumenta la probabilità di critico magico del 50% per 15 s. (firma Fuoco)',
-  'entities.abilities.icy_veins.name': 'Vene Gelide',
   'entities.abilities.icy_veins.description':
     'Aumenta la celerità magica del 30% e impedisce l’interruzione e il contraccolpo dei lanci per 10 s. (firma Gelo)',
   'entities.abilities.cold_blood.name': 'Sangue Freddo',
@@ -5226,7 +5207,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.power_infusion.name': 'Infusione di Potere',
   'entities.abilities.power_infusion.description':
     'Infone potere in un bersaglio alleato, aumentando la potenza magica di 28 per 15 s. (firma Disciplina)',
-  'entities.abilities.holy_nova.name': 'Nova Sacra',
   'entities.abilities.holy_nova.description':
     'Provoca un’esplosione di luce Sacra, curando gli alleati vicini di {damage} e danneggiando i nemici vicini. (firma Sacro)',
   'entities.abilities.shadowform.name': "Forma d'Ombra",
@@ -5247,10 +5227,8 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.feral_charge.name': 'Carica Ferina',
   'entities.abilities.feral_charge.description':
     'Carica un nemico e lo immobilizza per 1 s. Portata 8-25 m. (firma Aggressore Ferino)',
-  'entities.abilities.swiftmend.name': 'Rapidità di Guarigione',
   'entities.abilities.swiftmend.description':
     'Consuma un effetto di cura periodica su un bersaglio alleato per curarlo di {damage}. (firma Guarigione)',
-  'entities.abilities.crusader_strike.name': 'Assalto del Crociato',
   'entities.abilities.crusader_strike.description':
     'Colpisce il bersaglio infliggendo danni dell’arma più {damage} danni sacri. (talento da paladino)',
   'entities.abilities.metamorphosis.name': 'Metamorfosi',
@@ -5407,7 +5385,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.items.ogre_war_totem.name': 'Totem da guerra ogre',
   'entities.items.storm_core.name': 'Nucleo di tempesta',
   'entities.items.kazzix_heartshard.name': 'Scheggia del cuore di Kazzix',
-  'entities.items.wyrmcult_orders.name': 'Ordini del Culto del Wyrm',
   'entities.items.ritual_phylactery.name': 'Filatterio rituale',
   'entities.items.gravewyrm_sigil.name': 'Sigillo del Gravewyrm',
   'entities.items.blessed_embers.name': 'Braci benedette',
@@ -5428,7 +5405,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.items.staff_of_velkhar.name': 'Bastone di Velkhar',
   'entities.items.shadowmeld_tunic.name': 'Tunica Nightveil',
   'entities.items.gravewyrm_scale_hauberk.name': 'Usbergo di scaglie di Gravewyrm',
-  'entities.items.wyrmcult_grand_robe.name': 'Grande veste del Culto del Wyrm',
   'entities.items.wyrmscale_jerkin.name': 'Giaco di scaglie di wyrm',
   'entities.items.wyrmfang_greatblade.name': 'Spadone Zanna di Wyrm',
   'entities.items.staff_of_the_gravewyrm.name': 'Bastone del Gravewyrm',
@@ -5494,7 +5470,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.items.tideguard_sabatons.name': 'Calzari Guardiamarea',
   'entities.items.valeborn_spellblade.name': 'Lama magica Natavalle',
   'entities.items.voss_sanctified_mace.name': 'Mazza santificata di Voss',
-  'entities.items.wyrmcult_soulsteps.name': "Passi d'anima del Culto del Wyrm",
   'entities.items.wyrmshadow_harness.name': 'Finimenti Nightfang',
   'entities.items.wyrmshadow_legguards.name': 'Gambiere Nightfang',
   'entities.items.wyrmshadow_treads.name': 'Calzari Nightfang',
@@ -5557,8 +5532,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.warlord_drogmar.name': 'Signore della guerra Drogmar',
   'entities.mobs.stormcrag_elemental.name': 'Elementale di Stormcrag',
   'entities.mobs.shardlord_kazzix.name': 'Signore dei frammenti Kazzix',
-  'entities.mobs.wyrmcult_zealot.name': 'Zelota del Culto del Wyrm',
-  'entities.mobs.wyrmcult_necromancer.name': 'Negromante del Culto del Wyrm',
   'entities.mobs.boneclad_revenant.name': 'Revenant corazzato di ossa',
   'entities.mobs.crypt_shambler.name': 'Barcollante della cripta',
   'entities.mobs.hollow_acolyte.name': 'Accolito del Vuoto',
@@ -5587,7 +5560,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.sister_nhalia.name': 'Sorella Nhalia',
   'entities.mobs.varkas_boneguard.name': "Guardia d'ossa di Varkas",
   'entities.mobs.emberkin.name': 'Emberkin',
-  'entities.mobs.gloomshade.name': 'Gloomshade',
+  'entities.mobs.gloomshade.name': 'Duskmurk',
   'entities.mobs.duskborn.name': 'Duskborn',
   'entities.mobs.grix_the_tunnelking.name': 'Grix il Re dei Cunicoli',
   'entities.mobs.spellhound.name': 'Spellhound',
@@ -5986,7 +5959,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_crushers.objectives.0.label': 'Frantumatore ogre ucciso',
   'entities.quests.q_drogmar.title': 'Signore della guerra Drogmar',
   'entities.quests.q_drogmar.text':
-    'Drogmar ha preso la moneta del Wyrmcult e giurato i clan al risveglio della montagna. Quando colpisce il suolo, {playerName}, non restargli vicino. Entra nel campo e uccidilo per Highwatch.',
+    'Drogmar ha preso la moneta del Broodsworn e giurato i clan al risveglio della montagna. Quando colpisce il suolo, {playerName}, non restargli vicino. Entra nel campo e uccidilo per Highwatch.',
   'entities.quests.q_drogmar.completion':
     'Drogmar giace morto nel suo campo. Hai comprato un inverno al mio muro, {playerName}.',
   'entities.quests.q_drogmar.objectives.0.label': 'Signore della guerra Drogmar ucciso',
@@ -6009,11 +5982,8 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Il frammento crepita ancora! Magnifico. Prendi questi gambali.',
   'entities.quests.q_kazzix.objectives.0.label': 'Frammento del cuore di Kazzix',
   'entities.quests.q_zealots.title': 'Canti nel vento',
-  'entities.quests.q_zealots.text':
-    "Il vento porta canti dai picchi del sud. Zittisci 12 zeloti, {playerName}; ogni voce fermata compra un'altra notte di sonno.",
   'entities.quests.q_zealots.completion':
     'Il vento è più quieto. Ma ciò che mi turba non è il canto, {playerName}: è che qualcosa possa rispondere al canto.',
-  'entities.quests.q_zealots.objectives.0.label': 'Zelota del Culto del Wyrm ucciso',
   'entities.quests.q_cult_orders.title': 'Ordini dal basso',
   'entities.quests.q_cult_orders.text':
     'Gli zeloti si muovono come soldati prima di un assedio. Chi si organizza prende ordini, {playerName}. Uccidine altri 8 e portami 4 ordini scritti.',
@@ -6056,7 +6026,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_voice_below.completion':
     "L'inginocchiarsi è finito. Non abbiamo zittito la voce, {playerName}; solo ridotto il suo coro.",
   'entities.quests.q_voice_below.objectives.0.label': 'Zelota del Culto del Wyrm ucciso',
-  'entities.quests.q_voice_below.objectives.1.label': 'Negromante del Culto del Wyrm ucciso',
   'entities.quests.q_sanctum_gate.title': 'La porta del Santuario',
   'entities.quests.q_sanctum_gate.text':
     "Questa è l'ultima soglia, {playerName}. La chiave del Santuario fu spezzata sotto gli occhi dei morti corazzati d'ossa. Portami 3 frammenti e aprirò la via in silenzio.",
@@ -6155,7 +6124,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.zones.thornpeak_heights.pois.4.label': 'Campo di guerra di Drogmar',
   'entities.zones.thornpeak_heights.pois.5.label': 'Stormcrag',
   'entities.zones.thornpeak_heights.pois.6.label': 'Il Glimmermere',
-  'entities.zones.thornpeak_heights.pois.7.label': 'Tende del Culto del Wyrm',
   'entities.zones.thornpeak_heights.pois.8.label': 'Campi dei revenant',
   'entities.zones.thornpeak_heights.pois.9.label': 'Santuario del Gravewyrm',
   'entities.dungeons.hollow_crypt.name': 'La Cripta Vuota',
@@ -7852,8 +7820,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.peaksGreeter': 'Capitano Thessaly, Highwatch',
   'guide.worldPage.peaksGreeting':
     'Duecento anni ha retto questo muro. Non cederà sotto la mia guardia, ma geme.',
-  'guide.worldPage.peaksPlaceNotes':
-    "Highwatch tiene il muro. La Cresta del Cacciatore e le Tane di Deeprock appartengono ai felini di cresta e agli scavatori; le Pendici degli Ogre e l'Accampamento di Guerra di Drogmar ai bruti a pagamento; Stormcrag crepita di elementali, e sotto di esso risplende il Glimmermere, il laghetto la cui riva custodisce il portale di luce pallida che scende al Tempio Annegato; le Tende del Culto del Wyrm e i Campi dei Revenant cingono l'altura del culto, con il Santuario del Gravewyrm alla sua sommità.",
   'guide.worldPage.valeGreeter': 'Maresciallo Redbrook, Eastbrook',
   'guide.worldPage.valeGreeting': 'Tieni la lama a portata. La Valle non è più quella di un tempo.',
   'guide.worldPage.valePlaceNotes':
@@ -7981,7 +7947,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.zones.nightbloom.name': 'Nightbloom',
   'entities.zones.nightbloom.pois.0.label': 'Moonrest',
   'entities.zones.nightbloom.pois.1.label': 'La Porta della Notte',
-  'entities.zones.nightbloom.pois.2.label': 'Il Pozzo della Luna',
   'entities.zones.nightbloom.pois.3.label': 'Gloamfield',
   'entities.zones.nightbloom.pois.4.label': 'La Veglia Perenne',
   'entities.zones.nightbloom.pois.5.label': 'Il Tumulo Insonne',
@@ -7998,7 +7963,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.zones.palmreach.welcome':
     "Sabbia calda, uccelli chiassosi, e una giungla che divora l'orizzonte. Drifthaven tiene un fuoco acceso sulla spiaggia per te.",
   'entities.zones.veiled_hollow.name': 'La Valletta Velata',
-  'entities.zones.veiled_hollow.pois.0.label': 'Eldergleam',
+  'entities.zones.veiled_hollow.pois.0.label': 'Eldershine',
   'entities.zones.veiled_hollow.pois.1.label': 'Grotta di Duskfall',
   'entities.zones.veiled_hollow.pois.2.label': 'Belvedere di Duskfall',
   'entities.zones.veiled_hollow.pois.3.label': 'Il Boschetto Antico',
@@ -8007,7 +7972,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.zones.veiled_hollow.pois.6.label': 'Bassifondi Cristallini',
   'entities.zones.veiled_hollow.pois.7.label': 'Il Profondo Splendente',
   'entities.zones.veiled_hollow.welcome':
-    "L'aria vibra di antica magia. Cerca la Custode Saelwyn sotto il grande albero di Eldergleam.",
+    "L'aria vibra di antica magia. Cerca la Custode Saelwyn sotto il grande albero di Eldershine.",
   'entities.zones.willowfen.name': 'Willowfen',
   'entities.zones.willowfen.pois.0.label': 'Bridgemere',
   'entities.zones.willowfen.pois.1.label': 'La Scalinata di Amberfen',
@@ -8018,14 +7983,14 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.zones.willowfen.welcome':
     "La palude ronza di libellule e api. Attraversa il ponte fino a Bridgemere e riposa i piedi per un po'.",
   'entities.zones.wraithwood.name': 'Wraithwood',
-  'entities.zones.wraithwood.pois.0.label': 'Gallowmere',
+  'entities.zones.wraithwood.pois.0.label': 'Gibbetmere',
   'entities.zones.wraithwood.pois.1.label': 'La Porta dei Corvi',
   'entities.zones.wraithwood.pois.2.label': 'Il Boschetto della Vedova',
   'entities.zones.wraithwood.pois.3.label': 'La Radura degli Impiccati',
   'entities.zones.wraithwood.pois.4.label': 'La Cappella di Mournstone',
   'entities.zones.wraithwood.pois.5.label': 'La Radura del Cacciatore',
   'entities.zones.wraithwood.welcome':
-    'La chioma si richiude sulla strada come un coperchio. Resta vicino alle lanterne di Gallowmere, e non rispondere se il bosco chiama il tuo nome.',
+    'La chioma si richiude sulla strada come un coperchio. Resta vicino alle lanterne di Gibbetmere, e non rispondere se il bosco chiama il tuo nome.',
   'entities.items.reliquary_plate_chest.name': 'Usbergo della guardia del reliquiario',
   'entities.items.reliquary_leather_chest.name': 'Giaco del guardiano della polvere',
   'entities.items.reliquary_cloth_chest.name': 'Sudario del reliquiario',
@@ -8034,7 +7999,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.items.reliquary_shoulder.name': 'Spallacci sgretolati',
   'entities.items.reliquary_gloves_rog.name': 'Manopole del guardiano delle ossa',
   'entities.items.deacon_reliquary_helm.name': 'Elmo del reliquiario del diacono',
-  'entities.items.varric_shadow_cowl.name': "Cappuccio d'ombra di Varric",
+  'entities.items.varric_shadow_cowl.name': "Cappuccio d'ombra di Vandric",
   'entities.items.duskwisp_essence.name': 'Essenza di fuoco fatuo del crepuscolo',
   'entities.items.spore_heart.name': 'Cuore di spora',
   'entities.items.gleaming_antler.name': 'Palco luccicante',
@@ -8056,7 +8021,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.items.nightweave_tunic.name': 'Tunica di tessuto notturno',
   'entities.items.veilcloth_robe.name': 'Veste di tela velata',
   'entities.mobs.acolyte_tessa.name': 'Accolita Tessa',
-  'entities.mobs.deacon_varric.name': 'Diacono Varric',
+  'entities.mobs.deacon_varric.name': 'Diacono Vandric',
   'entities.mobs.reliquary_bonewalker.name': 'Camminaossa Risorto',
   'entities.mobs.reliquary_funeral_ringer.name': 'Campanaro Funebre',
   'entities.mobs.reliquary_gravecall_acolyte.name': 'Accolito del Richiamo Sepolcrale',
@@ -8100,24 +8065,24 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'delveUi.board.tabDelve': 'Incursione',
   'delveUi.board.tabShop': 'Negozio',
   'delveUi.boss.varric.bell.emote':
-    'Il Diacono Varric afferra la campana sepolta con entrambe le mani!',
+    'Il Diacono Vandric afferra la campana sepolta con entrambe le mani!',
   'delveUi.boss.varric.bell.impact': 'Il rintocco della campana spacca il pavimento della camera!',
   'delveUi.boss.varric.bell.lesson':
     'Rintocco della Campana: un colpo al suolo ogni dodici secondi. Allontanati prima che cada.',
-  'delveUi.boss.varric.bell.log': 'Il Diacono Varric inizia a far rintoccare la campana funebre.',
-  'delveUi.boss.varric.bell.warning': 'Allontanati dal Diacono Varric!',
+  'delveUi.boss.varric.bell.log': 'Il Diacono Vandric inizia a far rintoccare la campana funebre.',
+  'delveUi.boss.varric.bell.warning': 'Allontanati dal Diacono Vandric!',
   'delveUi.boss.varric.defeat': 'No... avevo i nomi... li avevo tutti...',
   'delveUi.boss.varric.intro': "Nessun'anima è perduta. Solo smarrita.",
   'delveUi.boss.varric.mid30': 'La campana funebre risponde a ogni nome che pronuncia.',
-  'delveUi.boss.varric.mid60': 'Il Diacono Varric legge i nomi dal registro con tremante trionfo.',
+  'delveUi.boss.varric.mid60': 'Il Diacono Vandric legge i nomi dal registro con tremante trionfo.',
   'delveUi.boss.varric.pull':
     'Calpesti la polvere consacrata con propositi immondi. Inginocchiati, e fatti contare.',
-  'delveUi.boss.varric.raise.emote': 'Il Diacono Varric richiama i nomi dalle tombe spezzate!',
-  'delveUi.boss.varric.raise.interrupt_fail': 'I morti rispondono al richiamo del Diacono Varric!',
+  'delveUi.boss.varric.raise.emote': 'Il Diacono Vandric richiama i nomi dalle tombe spezzate!',
+  'delveUi.boss.varric.raise.interrupt_fail': 'I morti rispondono al richiamo del Diacono Vandric!',
   'delveUi.boss.varric.raise.interrupt_ok': 'Il rito sepolcrale vacilla.',
   'delveUi.boss.varric.raise.lesson':
     'Interrompi la tomba incrinata entro cinque secondi o i morti si leveranno al suo richiamo.',
-  'delveUi.boss.varric.raise.log': 'Il Diacono Varric inizia a evocare i morti.',
+  'delveUi.boss.varric.raise.log': 'Il Diacono Vandric inizia a evocare i morti.',
   'delveUi.boss.varric.raise.object': 'La tomba incrinata freme di un respiro rubato.',
   'delveUi.boss.varric.raise.warning': 'Ferma il rito sepolcrale!',
   'delveUi.chest.flavor': 'I morti hanno ceduto ciò che potevano risparmiare.',
@@ -8998,7 +8963,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.emberwing_drake.name': 'Drago Ala di Brace',
   'entities.mobs.fen_sprite.name': 'Folletto di Palude',
   'entities.mobs.fisher_bram.name': 'Pescatore Bram',
-  'entities.mobs.frostmane_yeti.name': 'Yeti dalla Criniera di Gelo',
   'entities.mobs.gale_wisp.name': 'Fuoco Fatuo della Raffica',
   'entities.mobs.gilded_stag.name': 'Cervo Dorato',
   'entities.mobs.gleamstag.name': 'Il Cervo Splendente',
@@ -9007,7 +8971,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.gloam_strider.name': 'Vagabondo del Crepuscolo',
   'entities.mobs.gravedigger_mosley.name': 'Becchino Mosley',
   'entities.mobs.gravenbark_shambler.name': 'Vagante dalla Corteccia Incisa',
-  'entities.mobs.harvest_sprite.name': 'Folletto del Raccolto',
   'entities.mobs.hedge_gnome.name': 'Gnomo delle Siepi',
   'entities.mobs.hedge_knight.name': 'Cavaliere di Dawnhold',
   'entities.mobs.ice_wisp.name': 'Fuoco Fatuo di Ghiaccio',
@@ -9017,7 +8980,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.moonfleece_grazer.name': 'Pascolatore dal Vello Lunare',
   'entities.mobs.moor_ram.name': 'Montone della Brughiera',
   'entities.mobs.mushroom_pixie.name': 'Fata Gleamfolk',
-  'entities.mobs.nightkin_stargazer.name': 'Astrologo Nightkin',
+  'entities.mobs.nightkin_stargazer.name': 'Astrologo Gloamkin',
   'entities.mobs.old_marrowshell.name': 'Vecchio Marrowshell',
   'entities.mobs.orchard_treant.name': 'Treant del Frutteto',
   'entities.mobs.pale_huntsman.name': 'Il Cacciatore Pallido',
@@ -9315,7 +9278,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_af_sprites_and_spigots.title': 'Folletti e Spilli',
   'entities.quests.q_af_sprites_and_spigots.text':
     'Folletti del raccolto, {playerName}. Strappano i miei spilli di linfa dai tronchi per la dolcezza al loro interno e scagliano i secchi nell’erba. Scaccia otto di questi piccoli ladri e riportami quattro dei miei secchi, e i carri torneranno a muoversi.',
-  'entities.quests.q_af_sprites_and_spigots.objectives.0.label': 'Folletto del Raccolto scacciato',
   'entities.quests.q_af_sprites_and_spigots.objectives.1.label':
     'Secchio Raccogli-Linfa recuperato',
   'entities.quests.q_af_sprites_and_spigots.completion':
@@ -9511,12 +9473,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_fv_ember_caches.objectives.0.label': 'Scorta di Braci recuperata',
   'entities.quests.q_fv_ember_caches.completion':
     'Ancora calde, tutte quante. Hai regalato al rifugio un intero inverno di grazia, {playerName}.',
-  'entities.quests.q_fv_frostmane_tyrant.title': 'Il Tiranno dalla Criniera di Gelo',
-  'entities.quests.q_fv_frostmane_tyrant.text':
-    "Gli ululatori non stavano cacciando quando sono scesi dalle terrazze. Stavano fuggendo. Uno yeti ha rivendicato le alture, la gente di montagna lo chiama la Criniera di Gelo, e nemmeno i branchi vogliono condividere un pendio con lui. Deve finire, {playerName}, prima che l'inverno lo spinga fino alle mie mura. Porta un amico. Portane due.",
-  'entities.quests.q_fv_frostmane_tyrant.objectives.0.label': 'La Criniera di Gelo sconfitta',
-  'entities.quests.q_fv_frostmane_tyrant.completion':
-    "Quando il vento è calato la notte scorsa, tutto il villaggio ha sentito il silenzio dove prima c'era la Criniera di Gelo. La Distesa ti deve un debito che impiegherà anni a ripagare, {playerName}. Indossa questo, e ogni porta a Icemantle ti sarà aperta.",
   'entities.quests.q_fv_howl_above.title': "L'Ululato sulle Terrazze",
   'entities.quests.q_fv_howl_above.text':
     'Lo senti al crepuscolo, {playerName}: un ululato dalle Terrazze Ululanti che non è dei branchi dei cumuli di neve. Gole più grandi. Gli ululatori delle terrazze sono scesi dalle vette per la prima volta da quando mia nonna teneva questo posto, e sono loro ad aver spinto i lupi sulla mia strada. Abbattine otto e ricacciali indietro.',
@@ -9652,7 +9608,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "Così il Primo cade per mano dell'ultimo arrivato. La mandria è già più calma, lo senti? Hai fatto un favore alla Valletta oggi, anche se non sembra tale.",
   'entities.quests.q_hollow_old_marrowshell.title': 'Il Vecchio Guscio dei Bassifondi',
   'entities.quests.q_hollow_old_marrowshell.text':
-    'Il primo nome è Vecchio Marrowshell, un granchio grande come un carro che caccia nei bassifondi orientali da prima che Eldergleam avesse un cancello. Vaga, {playerName}, quindi dovrai percorrere la riva finché non incroci le sue tracce. Non andare da solo, e non fidarti della sua immobilità.',
+    'Il primo nome è Vecchio Marrowshell, un granchio grande come un carro che caccia nei bassifondi orientali da prima che Eldershine avesse un cancello. Vaga, {playerName}, quindi dovrai percorrere la riva finché non incroci le sue tracce. Non andare da solo, e non fidarti della sua immobilità.',
   'entities.quests.q_hollow_old_marrowshell.objectives.0.label': 'Vecchio Marrowshell ucciso',
   'entities.quests.q_hollow_old_marrowshell.completion':
     'I bassifondi sono di nuovo solo acqua. Ho visto quel guscio spezzare cacciatori migliori di me, {playerName}. Non te.',
@@ -9671,14 +9627,10 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_monument_tour.completion':
     'Un belvedere, una corte, e un angolo dimenticato... e tutti e tre i versi del canto di sigillatura, insieme per la prima volta da quando fu cantato. Hai reso una vecchia lettrice molto felice.',
   'entities.quests.q_nb_charts_of_the_stones.title': 'Le Mappe nelle Pietre',
-  'entities.quests.q_nb_charts_of_the_stones.text':
-    'Le pietre della Veglia sono più antiche di Moonrest, più antiche dei nightkin che le curano, e le loro facce sono incise con mappe stellari che ho passato la vita a imparare a leggere. Il cielo si è spostato, {playerName}, e devo sapere di quanto. Leggi le mappe su tre delle pietre e portami i loro rilevamenti.',
   'entities.quests.q_nb_charts_of_the_stones.objectives.0.label': 'Mappa stellare letta',
   'entities.quests.q_nb_charts_of_the_stones.completion':
     'Non resta alcun dubbio. Ogni rilevamento si è spostato verso il Tumulo Insonne, come se il cielo stesso si sporgesse su quel tumulo per osservare. Gli antichi re furono sepolti sotto stelle allineate per una ragione, {playerName}.',
   'entities.quests.q_nb_eyes_on_the_vigil.title': 'Occhi sulla Veglia',
-  'entities.quests.q_nb_eyes_on_the_vigil.text':
-    'Qualcosa rende i vagabondi audaci e le mandrie inquiete, {playerName}, e non riesco a leggerlo nei fiori. Cassian può leggerlo nel cielo. Tiene il suo campo osservatorio vicino alla Veglia Perenne a est di qui, dove i nightkin vagano tra le pietre. Trovalo, e chiedigli cosa dicono le stelle.',
   'entities.quests.q_nb_eyes_on_the_vigil.objectives.0.label':
     "Trova l'Astronomo Cassian alla Veglia Perenne",
   'entities.quests.q_nb_eyes_on_the_vigil.completion':
@@ -9712,8 +9664,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_nb_the_barrow_king.text':
     "Ogni rilevamento, ogni stella inquieta, ogni tumulo aperto indica una sola cosa: il Re del Tumulo si sta risvegliando sotto il grande tumulo, e questo regno non ha un'alba per trattenerlo. Deve essere messo a riposo prima che ricordi la sua corona, {playerName}. Non andare da solo: porta un amico, e tieni la luce dei fiori alle tue spalle.",
   'entities.quests.q_nb_the_barrow_king.objectives.0.label': 'Il Re del Tumulo messo a riposo',
-  'entities.quests.q_nb_the_barrow_king.completion':
-    'Le stelle si sono placate per la prima volta in una stagione, {playerName}. I tumuli sono chiusi, i nightkin si sono acquietati presso le loro pietre, e il re dorme di nuovo sottoterra. Indossa questo mantello: Moonrest lo ha tagliato per chiunque la notte finalmente si fidasse.',
   'entities.quests.q_nb_wool_by_moonlight.title': 'Lana al Chiaro di Luna',
   'entities.quests.q_nb_wool_by_moonlight.text':
     'Niente scalda come il vello lunare, {playerName}, e niente si fila così fine. I pascolatori portano la loro lana argentata sciolta in ciuffi mentre vagano per le colline. Portami sei buoni ciuffi dalle mandrie e ti tesserò qualcosa che valga la camminata.',
@@ -9760,8 +9710,8 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "Suli è vicino al fuoco, e giura ancora che ce l'avrebbe fatta a nuoto. Hai riportato l'unica lettrice di mappe di questa costa, {playerName}. Questi vengono dal suo baule marino, con la sua benedizione.",
   'entities.quests.q_pr_the_man_who_went_in.title': "L'Uomo che Entrò",
   'entities.quests.q_pr_the_man_who_went_in.text':
-    'I sommozzatori non metteranno piede oltre la linea degli alberi, {playerName}, e non glielo chiederò. Ormai avrai sentito i tamburi: tutti li sentono, entro la seconda notte. Un solo uomo su quest’isola ha mai camminato verso quel suono ed è tornato. Okku. Si accampa sotto i grandi banyan al Vinefall, in fondo alla strada del Groviglio. Trovalo, e chiedigli cosa nasconde il verde.',
-  'entities.quests.q_pr_the_man_who_went_in.objectives.0.label': 'Trova Okku al Vinefall',
+    'I sommozzatori non metteranno piede oltre la linea degli alberi, {playerName}, e non glielo chiederò. Ormai avrai sentito i tamburi: tutti li sentono, entro la seconda notte. Un solo uomo su quest’isola ha mai camminato verso quel suono ed è tornato. Okrim. Si accampa sotto i grandi banyan al Vinefall, in fondo alla strada del Groviglio. Trovalo, e chiedigli cosa nasconde il verde.',
+  'entities.quests.q_pr_the_man_who_went_in.objectives.0.label': 'Trova Okrim al Vinefall',
   'entities.quests.q_pr_the_man_who_went_in.completion':
     'Ti ha mandato Isha? La Madre delle Perle non pronuncia il mio nome da anni. Siediti fuori dalla portata delle liane, {playerName}, e ti dirò ciò che so: i tamburi non sono il pericolo. Sono l’avvertimento.',
   'entities.quests.q_pr_what_the_drums_guard.title': 'Ciò che i Tamburi Custodiscono',
@@ -9890,15 +9840,15 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_wisp_lights.objectives.0.label': 'Granello di Fuoco Fatuo',
   'entities.quests.q_wisp_lights.completion':
     "Delicati come le prime stelle. Mettili qui vicino all'altare; il santuario farà il resto.",
-  'entities.quests.q_ww_bells_of_gallowmere.title': 'Le Campane di Gallowmere',
+  'entities.quests.q_ww_bells_of_gallowmere.title': 'Le Campane di Gibbetmere',
   'entities.quests.q_ww_bells_of_gallowmere.text':
-    'Senti quel rintocco, {playerName}? È Gallowmere, su per la strada nord, che culla i suoi morti nel sonno a suon di campane. Il Sagrestano Marrow tiene il conto di ogni anima sotto la chioma, vivi e sepolti. Vai a farti contare, prima che il bosco ti conti da solo.',
+    'Senti quel rintocco, {playerName}? È Gibbetmere, su per la strada nord, che culla i suoi morti nel sonno a suon di campane. Il Sagrestano Marrow tiene il conto di ogni anima sotto la chioma, vivi e sepolti. Vai a farti contare, prima che il bosco ti conti da solo.',
   'entities.quests.q_ww_bells_of_gallowmere.objectives.0.label': 'Riferisci al Sagrestano Marrow',
   'entities.quests.q_ww_bells_of_gallowmere.completion':
-    "Cobb ti ha mandato su per la strada tutto intero, vero? Bravo uomo. Ha tenuto accese quelle lanterne del cancello per trent'anni, e il bosco non gli è mai passato oltre nemmeno una volta. Benvenuto a Gallowmere, {playerName}. Fai attenzione alle campane.",
+    "Cobb ti ha mandato su per la strada tutto intero, vero? Bravo uomo. Ha tenuto accese quelle lanterne del cancello per trent'anni, e il bosco non gli è mai passato oltre nemmeno una volta. Benvenuto a Gibbetmere, {playerName}. Fai attenzione alle campane.",
   'entities.quests.q_ww_candles_at_the_bounds.title': 'Candele ai Confini',
   'entities.quests.q_ww_candles_at_the_bounds.text':
-    'Quattro pietre di confine circondano Gallowmere, {playerName}, una su ogni strada in uscita, e una candela funebre arde su ogni pietra. Finché ardono, i sepolti restano sepolti. La pioggerella le ha spente, tutte e quattro, e sono troppo vecchio per percorrere i confini da solo. Prendi la mia candela e riaccendile, in fretta.',
+    'Quattro pietre di confine circondano Gibbetmere, {playerName}, una su ogni strada in uscita, e una candela funebre arde su ogni pietra. Finché ardono, i sepolti restano sepolti. La pioggerella le ha spente, tutte e quattro, e sono troppo vecchio per percorrere i confini da solo. Prendi la mia candela e riaccendile, in fretta.',
   'entities.quests.q_ww_candles_at_the_bounds.objectives.0.label': 'Candela funebre riaccesa',
   'entities.quests.q_ww_candles_at_the_bounds.completion':
     "Tutte e quattro ardono? Allora respira, {playerName}. Non lo hai sentito, ma tutto il villaggio sì: le campane hanno suonato più leggere nell'istante in cui l'ultimo stoppino ha preso fuoco.",
@@ -9908,7 +9858,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_ww_horn_of_the_huntsman.objectives.0.label':
     'Il Cacciatore Pallido disarcionato',
   'entities.quests.q_ww_horn_of_the_huntsman.completion':
-    "Il corno si è fermato a metà nota. Ogni campana a Gallowmere ha suonato una volta, da sola, e poi il bosco è diventato più silenzioso di quanto lo abbia mai sentito in trent'anni. Hai compiuto il rito che io non potevo, {playerName}. Indossa questo, e cammina sotto la chioma senza paura.",
+    "Il corno si è fermato a metà nota. Ogni campana a Gibbetmere ha suonato una volta, da sola, e poi il bosco è diventato più silenzioso di quanto lo abbia mai sentito in trent'anni. Hai compiuto il rito che io non potevo, {playerName}. Indossa questo, e cammina sotto la chioma senza paura.",
   'entities.quests.q_ww_silk_in_the_eaves.title': 'Seta sotto le Grondaie',
   'entities.quests.q_ww_silk_in_the_eaves.text':
     'Guarda in alto mentre percorri la strada ovest, {playerName}, e le vedrai: forme avvolte nella chioma, che oscillano dove nessun vento arriva. Le filatrici di seta della vedova sono strisciate fuori dal Boschetto e hanno teso le loro dispense sopra le mie lanterne. Uccidine dieci, e la strada tornerà a essere una strada.',
@@ -9926,12 +9876,12 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_ww_walking_mosley_home.text':
     "Il mio becchino Mosley ha preso la strada della cappella tre giorni fa per aprire una fossa nel vecchio cimitero, e lo scavo gli è crollato addosso. Si è scavato una via d'uscita a forza di unghie, lo sciocco è vivo, ma è raggomitolato vicino alle tombe della cappella e non si muove per via delle filatrici sulla strada. Riportalo a casa, {playerName}. Non posso suonare le campane per un uomo vivo.",
   'entities.quests.q_ww_walking_mosley_home.objectives.0.label':
-    'Becchino Mosley riportato sano e salvo a Gallowmere',
+    'Becchino Mosley riportato sano e salvo a Gibbetmere',
   'entities.quests.q_ww_walking_mosley_home.completion':
-    "È entrato dal cancello con le sue stesse gambe, giurando che d'ora in poi non scaverà nulla di più profondo di un'aiuola di rape. Sarà di nuovo al cimitero entro domenica, lo sono sempre. Grazie, {playerName}. Gallowmere custodisce la sua gente, questa è tutta la nostra legge.",
+    "È entrato dal cancello con le sue stesse gambe, giurando che d'ora in poi non scaverà nulla di più profondo di un'aiuola di rape. Sarà di nuovo al cimitero entro domenica, lo sono sempre. Grazie, {playerName}. Gibbetmere custodisce la sua gente, questa è tutta la nostra legge.",
   'entities.quests.q_ww_what_the_bark_holds.title': 'Ciò che la Corteccia Custodisce',
   'entities.quests.q_ww_what_the_bark_holds.text':
-    'Nella Radura degli Impiccati a est di Gallowmere le filatrici appendono ai rami i loro morti avvolti nella seta, e i vaganti dalla corteccia incisa fanno la guardia sotto come pazienti portatori di bara. Quella è la nostra gente lassù, {playerName}. Abbatti cinque vaganti, taglia giù tre dei morti avvolti, e riportali a casa nella terra.',
+    'Nella Radura degli Impiccati a est di Gibbetmere le filatrici appendono ai rami i loro morti avvolti nella seta, e i vaganti dalla corteccia incisa fanno la guardia sotto come pazienti portatori di bara. Quella è la nostra gente lassù, {playerName}. Abbatti cinque vaganti, taglia giù tre dei morti avvolti, e riportali a casa nella terra.',
   'entities.quests.q_ww_what_the_bark_holds.objectives.0.label':
     'Vagante dalla Corteccia Incisa abbattuto',
   'entities.quests.q_ww_what_the_bark_holds.objectives.1.label':
@@ -10166,12 +10116,12 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.amberPlaceNotes':
     'Lanternmere risplende nel cuore del raccolto. Il Goldmelt è il passaggio scivoloso d’ambra che vi conduce; il Frutteto Dorato e la Valletta del Raccolto custodiscono i frutti più dolci e i ladri più audaci; il Grande Stagno riflette le foglie ardenti; il Poggio di Cindermaple si erge più alto e più rosso di tutti; e il Monolito Pendente ricorda qualcosa di più antico dell’autunno.',
   'guide.worldPage.duskBlurb':
-    'Una valle di crepuscolo perenne sotto il grande albero di Eldergleam, dove rovine di cristallo risplendono e l’aria vibra di antica magia.',
-  'guide.worldPage.duskGreeter': 'Custode Saelwyn, Eldergleam',
+    'Una valle di crepuscolo perenne sotto il grande albero di Eldershine, dove rovine di cristallo risplendono e l’aria vibra di antica magia.',
+  'guide.worldPage.duskGreeter': 'Custode Saelwyn, Eldershine',
   'guide.worldPage.duskGreeting':
     'Pochi della tua specie si sono fermati sotto questi rami. Cammina con delicatezza, e sii il benvenuto.',
   'guide.worldPage.duskPlaceNotes':
-    'Eldergleam si raduna sotto il grande albero. La Grotta di Duskfall e il suo belvedere sono la via d’accesso e il primo sguardo sulla valle; il Boschetto Antico e il Bacino delle Stelle Cadenti custodiscono il quieto sud; la Corte Sommersa custodisce rovine invase dalla vegetazione a est; e il Profondo Splendente e i Bassifondi Cristallini risplendono a nord.',
+    'Eldershine si raduna sotto il grande albero. La Grotta di Duskfall e il suo belvedere sono la via d’accesso e il primo sguardo sulla valle; il Boschetto Antico e il Bacino delle Stelle Cadenti custodiscono il quieto sud; la Corte Sommersa custodisce rovine invase dalla vegetazione a est; e il Profondo Splendente e i Bassifondi Cristallini risplendono a nord.',
   'guide.worldPage.emberBlurb':
     'Lande desolate illuminate dalla tempesta, di cenere e vetro di sangue, dove i draghi volteggiano sopra la caldera e i fuochi dei troll ardono tra le dune, vegliate dalla città-cancello di Wyrmwatch.',
   'guide.worldPage.emberGreeter': 'Il guardiano del cancello, Wyrmwatch',
@@ -10208,12 +10158,12 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.gardenPlaceNotes':
     'Hedgewick attende al Cancello del Giardino. Il Viale del Parterre fiorisce in colori ben potati; il Castello di Dawnhold addestra i suoi cavalieri dietro mura nuove; lo Stagno dei Petali fluttua rosa tutto l’anno; il Vecchio Mulino gira sopra le proprie aiuole ad anello; il Grande Labirinto cambia le sue vie per ogni ospite, i suoi archi vegliati da volpi di foglie; la Vedetta del Nord custodisce la strada d’uscita; il Bacino dei Gigli riposa oltre ogni cosa; e la Corte della Fontana scorre ancora limpida nel cuore del giardino.',
   'guide.worldPage.hauntBlurb':
-    'Una foresta infestata sotto chiome gigantesche, dove le lanterne di Gallowmere sono l’unica luce onesta sulla strada.',
-  'guide.worldPage.hauntGreeter': 'Il lampionaio, Gallowmere',
+    'Una foresta infestata sotto chiome gigantesche, dove le lanterne di Gibbetmere sono l’unica luce onesta sulla strada.',
+  'guide.worldPage.hauntGreeter': 'Il lampionaio, Gibbetmere',
   'guide.worldPage.hauntGreeting':
     'Resta vicino alle lanterne, viandante. E se il bosco chiama il tuo nome da fuori la strada, non rispondere.',
   'guide.worldPage.hauntPlaceNotes':
-    'Gallowmere si raccoglie tra le sue lanterne. La Porta dei Corvi è la tetra porta d’ingresso del bosco; il Boschetto della Vedova è fitto di ragnatele; la Radura degli Impiccati e la Cappella di Mournstone custodiscono i lutti più antichi della foresta; e la Radura del Cacciatore appartiene a qualunque cosa cacci ancora lì.',
+    'Gibbetmere si raccoglie tra le sue lanterne. La Porta dei Corvi è la tetra porta d’ingresso del bosco; il Boschetto della Vedova è fitto di ragnatele; la Radura degli Impiccati e la Cappella di Mournstone custodiscono i lutti più antichi della foresta; e la Radura del Cacciatore appartiene a qualunque cosa cacci ancora lì.',
   'guide.worldPage.jungleBlurb':
     'Un intreccio tropicale di palme, sabbia bianca e uccelli chiassosi, con la città-spiaggia di Drifthaven che tiene un fuoco acceso sulla riva.',
   'guide.worldPage.jungleGreeter': 'La capitana del porto, Drifthaven',
@@ -10226,8 +10176,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.nightGreeter': 'La guardiana della veglia, Moonrest',
   'guide.worldPage.nightGreeting':
     'Oltre la Porta della Notte, l’aria stessa sogna. Segui la luce dei fiori, e fai attenzione al mondo addormentato che pende nel cielo.',
-  'guide.worldPage.nightPlaceNotes':
-    'Moonrest mantiene la veglia. La Porta della Notte è la via d’accesso alla terra di mezzanotte; il Pozzo della Luna custodisce una luce stellare accanto alla quale puoi restare; Gloamfield fiorisce nel buio; la Veglia Perenne osserva senza mai muoversi; e il Tumulo Insonne è l’unico luogo qui che non sogna mai.',
   'entities.abilities.chain_heal.description':
     'Cura abbondantemente un bersaglio alleato, poi si propaga a un massimo di altri 2 alleati vicini, curando il 50% in meno a ogni salto. (Abilità distintiva di Rigenerazione)',
   'entities.abilities.chain_heal.name': 'Guarigione a Catena',
@@ -10236,7 +10184,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.counter_shot.name': 'Tiro Silenziante',
   'entities.abilities.counterspell.description':
     "Interrompe il lancio dell'incantesimo del bersaglio e impedisce di lanciare incantesimi di quella scuola per 6 s.",
-  'entities.abilities.counterspell.name': 'Spezzaincantesimi',
   'entities.abilities.holy_taunt.description':
     'Provoca il bersaglio: la tua minaccia sale al livello del suo nemico più odiato e lo costringe ad attaccarti per 3 s.',
   'entities.abilities.holy_taunt.name': 'Pungolo Sacro',
@@ -10512,8 +10459,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.skins.hoarfrost_vigil_staff.name': 'Veglia della brina',
   'hudChrome.wocStore.skins.ice_fang_sword.look':
     'Lama curva di ghiaccio glaciale pallido, cristalli di brina frastagliati lungo la spina dorsale, un nucleo ghiacciato di colore ciano brillante nella guardia trasversale di ghiacciolo più piena.',
-  'hudChrome.wocStore.skins.ice_fang_sword.lore':
-    'Il pezzo forte della serie gelata, il primo che ogni collezionista desidera. Zanna di Ghiaccio fu scolpita, non forgiata, da una zanna del ghiacciaio che corona Thornpeak sopra Highwatch; il nucleo ciano arde di un freddo pari alla luce del Glimmermere. Ricopre di brina persino l\'aria che taglia. Le guardie della muraglia giurano che un soldato la portasse la notte in cui le alte nevi respinsero il Culto del Wyrm e "regalò alla muraglia un altro inverno".',
   'hudChrome.wocStore.skins.ice_fang_sword.name': 'Zanna di ghiaccio',
   'hudChrome.wocStore.skins.lacquered_wand.look':
     'Bacchetta sottile laccata rosso intenso, due fasce in ottone lucido, piccola punta arrotondata in ottone.',
@@ -10559,7 +10504,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "Arco di acciaio argentato e ghiaccio azzurro, nucleo ciano ghiacciato e luminoso nell'impugnatura, freccia di ghiaccio massiccio incoccata e vapore freddo.",
   'hudChrome.wocStore.skins.winterbite.lore':
     "Un arco di acciaio argentato e ghiaccio di Thornpeak, con l'impugnatura illuminata da un freddo nucleo ciano che congela la freccia alla corda. Incocca un dardo di ghiaccio glaciale che si riforma a ogni tiro; sulla muraglia l'arciere non porta una faretra, soltanto il freddo. Highwatch resistette a un assedio sulla Cresta del braccatore grazie a un arco simile: un solo arciere, si dice, e frecce per un intero inverno, sempre già pronte.",
-  'hudChrome.wocStore.skins.winterbite.name': 'Morso invernale',
   'hudChrome.wocStore.storeTab': 'Negozio',
   'hudChrome.wocStore.tabsLabel': 'Sezioni del negozio WOC',
   'hudChrome.wocStore.title': 'Negozio WOC',
@@ -10655,8 +10599,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Scaglia una raffica sull’area bersaglio, infliggendo {damage} danni fisici ai nemici entro un raggio di 8 m. (talento del Cacciatore)',
   'entities.abilities.prayer_of_healing.description':
     'Cura gli alleati vicini di {damage}. (talento del Sacerdote)',
-  'entities.abilities.preparation.description':
-    'Azzera il tempo di recupero di Scatto, Evasione e Sparizione. (talento del Ladro)',
   'entities.abilities.presence_of_mind.description':
     'Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 s. (talento da mago)',
   'entities.abilities.psychic_scream.description':
@@ -10829,7 +10771,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.battleTrance':
     'Il tuo prossimo Colpo del Predone o Colpo Mutilante non costa rabbia',
   'hudChrome.auraEffect.revengeFree': 'La tua prossima Vendetta non costa rabbia',
-  'hudChrome.auraEffect.victoryRush': 'Impeto della Vittoria è pronto',
   'hudChrome.auraEffect.maxHpPct': 'Aumenta la salute massima del {pct}%',
   'hudChrome.statInfo.names.parry': 'Parata',
   'hudChrome.statInfo.desc.parry':
@@ -10922,7 +10863,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.items.cragprowl_belt.name': 'Cintura del Predatore della Roccia',
   'entities.items.cragthorn_greatstaff.name': 'Grande Bastone di Spinorupe',
   'entities.items.cragward_pauldrons.name': 'Spallacci della Guardia della Rupe',
-  'entities.items.cryptbloom_shoulderguards.name': 'Guardaspalle di Criptafiore',
   'entities.items.dreamroot_boots.name': 'Stivali di Radicesogno',
   'entities.items.duskthorn_mantle.name': 'Mantello di Crepuspina',
   'entities.items.fenbark_leggings.name': 'Gambali di Corteciamarcita',
@@ -10962,7 +10902,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.items.wildgrove_cinch.name': 'Cintura del Bosco Selvaggio',
   'entities.items.wildgrowth_leggings.name': 'Gambali della Crescita Selvatica',
   'entities.items.wildsoul_maul.name': "Maglio dell'Anima Selvaggia",
-  'entities.items.wyrmcult_spellgrips.name': 'Guanti da Incantesimo del Culto del Wyrm',
   'entities.items.abyssal_loop.name': 'Anello Abissale',
   'entities.items.abysswrought_band.name': 'Anello Forgiato nell’Abisso',
   'entities.items.amberfall_sap_bucket.name': 'Secchio Raccogli-Linfa',
@@ -10985,7 +10924,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.items.farshore_salt_moss.name': 'Muschio Salino di Farshore',
   'entities.items.fenway_mooring_line.name': 'Cima d’Ormeggio Tagliata',
   'entities.items.fountain_court_mantle.name': 'Mantello della Corte della Fontana',
-  'entities.items.frostmane_mantle.name': 'Mantello della Criniera di Gelo',
   'entities.items.galecrest_ram_wool.name': 'Lana Untuosa di Montone',
   'entities.items.gallowmere_grave_candle.name': 'Candela Funebre',
   'entities.items.gilded_sap_clot.name': 'Grumo di Linfa Dorata',
@@ -11261,7 +11199,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.hearthkeeper_maeve.title': 'Custode del Rifugio del Focolare',
   'entities.npcs.hearthkeeper_maeve.greeting':
     'Entra, ripara dal freddo. Il fuoco del rifugio non si spegne mai, finché ho fiato in corpo.',
-  'entities.npcs.hermit_okku.name': 'Okku',
+  'entities.npcs.hermit_okku.name': 'Okrim',
   'entities.npcs.hermit_okku.title': 'Uomo che Entrò',
   'entities.npcs.hermit_okku.greeting':
     'Silenzio ora. I tamburi contano tutto ciò che cammina sotto gli alberi, e ti hanno già contato.',
@@ -11314,7 +11252,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.pearlmother_isha.greeting':
     'Il mare dona, la sabbia custodisce, e la giungla prende. Resta sulla spiaggia, straniero.',
   'entities.npcs.provisioner_fenna.name': 'Fornitrice Fenna',
-  'entities.npcs.provisioner_fenna.title': 'Fornitrice di Eldergleam',
+  'entities.npcs.provisioner_fenna.title': 'Fornitrice di Eldershine',
   'entities.npcs.provisioner_fenna.greeting':
     "Pane ancora caldo, acqua ancora dolce. La Valletta provvede, e anch'io.",
   'entities.npcs.quartermaster_edda.name': 'Furiere Edda',
@@ -11350,7 +11288,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.scout_yerrin.greeting':
     'Resta basso. Il suono si propaga in modo strano sul vetro, e il cancello sottostante ha orecchie.',
   'entities.npcs.sexton_marrow.name': 'Sagrestano Marrow',
-  'entities.npcs.sexton_marrow.title': 'Sagrestano di Gallowmere',
+  'entities.npcs.sexton_marrow.title': 'Sagrestano di Gibbetmere',
   'entities.npcs.sexton_marrow.greeting':
     'Qui li seppelliamo in profondità, e suoniamo le campane perché ricordino di restare giù.',
   'entities.npcs.strandwatcher_pell.name': 'Guardiano della Riva Pell',
@@ -11398,7 +11336,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.wickmother_sorrel.greeting':
     "Entra, siediti, c'è del cordiale sul fuoco. Tieni solo una mano su tutto ciò che è di ferro: gli gnomi hanno le mani leggere ultimamente.",
   'entities.npcs.widow_tansy.name': 'Vedova Tansy',
-  'entities.npcs.widow_tansy.title': 'Fabbricante di Candele di Gallowmere',
+  'entities.npcs.widow_tansy.title': 'Fabbricante di Candele di Gibbetmere',
   'entities.npcs.widow_tansy.greeting':
     'Una candela per ogni tomba, e nemmeno una deve spegnersi. Nemmeno una, mi senti?',
   'gatherEvent.ancientHeartwood': '{finder} ha abbattuto un antico durame!',

@@ -589,7 +589,7 @@ export const id_ID: Record<string, string> = {
   'poi.thornpeak_heights.4': 'Kamp Perang Drogmar',
   'poi.thornpeak_heights.5': 'Tebing Badai',
   'poi.thornpeak_heights.6': 'Glimmermere',
-  'poi.thornpeak_heights.7': 'Tenda Wyrmcult',
+  'poi.thornpeak_heights.7': 'Tenda Broodsworn',
   'poi.thornpeak_heights.8': 'Padang Revenant',
   'poi.thornpeak_heights.9': 'Sanktum Gravewyrm',
   'location.kind.overworld': 'Dunia Terbuka',

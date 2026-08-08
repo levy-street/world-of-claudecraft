@@ -2703,7 +2703,7 @@ export class Renderer {
 
     // particle system: projectiles, impacts, heal glows, ambience
     this.lightPulses = new LightPulses(this.scene);
-    // Frozen Orb: the roaming ice-sphere visual, animated locally from the one
+    // Frostglobe: the roaming ice-sphere visual, animated locally from the one
     // 'orb' release event (see src/render/frozen_orb_fx.ts).
     this.frozenOrbFx = new FrozenOrbFx(this.scene, (x, z) => groundHeight(x, z, this.sim.cfg.seed));
     this.glacialFrontVisual = new GlacialFrontVisual(this.scene, (x, z) =>
@@ -6360,7 +6360,7 @@ export class Renderer {
         // reachable case today).
         if (ev.fx === 'selfCast') break;
         if (ev.fx === 'blinkStep') {
-          // A teleport step (Flickerstep / Shadowstep): reset the cached self
+          // A teleport step (Flitstep / Shadowstep): reset the cached self
           // position so the body snaps to the authoritative destination. A
           // short pulse sells the pop.
           if (ev.sourceId === this.sim.player.id) {
@@ -6520,7 +6520,7 @@ export class Renderer {
         // roaming orb) that its one-shot sequences would read worse than, so
         // their dedicated arms below stay authoritative.
         if (this.abilityVfx.handleSpellfxAt(ev)) break;
-        // The Frozen Orb flight, animated locally from its three moments:
+        // The Frostglobe flight, animated locally from its three moments:
         // 'release' starts the drift, 'halt'/'resume' freeze and restart it at
         // the server's real coordinates when the orb latches onto an enemy.
         // The pulse novas below stay the area telegraph, so no actionable
@@ -9637,7 +9637,7 @@ export class Renderer {
         e.templateId.startsWith('vision_') ||
         e.ghost || // a released player spirit renders translucent (the ghost run)
         e.templateId === 'spirit_healer'; // the graveyard angel is an ethereal figure
-      // Duskveil/Smokestep wear the denser stealth fade; every spirit read
+      // Duskveil/Smokefade wear the denser stealth fade; every spirit read
       // (ghost run, ghost wolf, visions, the graveyard angel) keeps the thin
       // ethereal one. A dead stealther is a spirit first.
       const ghostStyle =

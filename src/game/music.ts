@@ -1489,11 +1489,11 @@ function composeFarshore(): Theme {
   return { bpm: 72, bars: 24, events: ev };
 }
 
-/** Veiled Hollow: "Under the Eldergleam". F lydian, 66 bpm, 24 bars, ABA'.
+/** Veiled Hollow: "Under the Eldershine". F lydian, 66 bpm, 24 bars, ABA'.
  *  A valley sealed beneath the mountains in permanent dusk, glowing flora,
  *  a town grown around the roots of a great tree. The lydian fourth keeps
  *  the air raised and wondering: dulcimer-and-bell glimmer for the wisps, a
- *  serene flute hymn for Eldergleam, and a middle eight that sinks to D
+ *  serene flute hymn for Eldershine, and a middle eight that sinks to D
  *  minor for the corrupted fringe (the Sunken Court), where a reed grieves
  *  over a wounded choir drone before the seal holds and the light returns. */
 function composeDusk(): Theme {
@@ -1548,7 +1548,7 @@ function composeDusk(): Theme {
     }
   });
 
-  // the Eldergleam hymn, floating on the lydian fourth
+  // the Eldershine hymn, floating on the lydian fourth
   const hymn: Phrase = [
     [0, 65, 1],
     [1, 69, 1],
@@ -2134,7 +2134,7 @@ function composeFen(): Theme {
  *  Violet downs under a luminous sky; the air itself dreams. A weightless
  *  nocturne: drifting choir, constellation bells on the pentatonic, harp
  *  rolls, piano fragments, and a flute that moves in long floating arcs.
- *  The middle eight lifts to D major over the Moonwell before settling
+ *  The middle eight lifts to D major over the Moonspring before settling
  *  back; a deep drum stirs once in a while under the Sleepless Barrow. */
 function composeNight(): Theme {
   const ev: NoteEvent[] = [];
@@ -2204,7 +2204,7 @@ function composeNight(): Theme {
     [28, 66, 3.5],
   ];
   pushPhrase(ev, 0, dream, 0.2, 'flute');
-  // the Moonwell: the same soul in D major, strings underneath
+  // the Moonspring: the same soul in D major, strings underneath
   const moonwell: Phrase = [
     [0, 74, 2],
     [2, 78, 1],

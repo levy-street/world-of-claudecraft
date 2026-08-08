@@ -758,7 +758,7 @@ export const en_CA: AdminTranslations = {
   "poi.thornpeak_heights.4": "Drogmar's War-Camp",
   "poi.thornpeak_heights.5": "Stormcrag",
   "poi.thornpeak_heights.6": "The Glimmermere",
-  "poi.thornpeak_heights.7": "Wyrmcult Tents",
+  "poi.thornpeak_heights.7": "Broodsworn Tents",
   "poi.thornpeak_heights.8": "Revenant Fields",
   "poi.thornpeak_heights.9": "Gravewyrm Sanctum",
   "location.kind.overworld": "Overworld",

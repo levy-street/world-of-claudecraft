@@ -1,6 +1,6 @@
 // Build the warrior's remaining bespoke movement clip (issue #2889).
 // player_warrior in src/render/characters/manifest.ts already carries an
-// 18-entry attackByAbility block from earlier PRs; Heroic Leap is the real
+// 18-entry attackByAbility block from earlier PRs; Vaulting Charge is the real
 // remaining gap that both (a) has no matching donor pose in the existing
 // entries and (b) actually reaches attackByAbility at runtime, verified by
 // tracing the render dispatch, not assumed:
@@ -21,7 +21,7 @@
 //   Cheer emote (playShoutAnim) and never calls triggerAttack with an
 //   ability id either.
 //
-// Heroic Leap has none of that: it carries no castFx, resolves no target
+// Vaulting Charge has none of that: it carries no castFx, resolves no target
 // entity (targetMode: 'position'), and its selfCast completion cue only
 // draws body motion via CharacterVisual.hasAttackClipOverride /
 // triggerAttack(id, abilityId) IF an attackByAbility entry exists (the exact

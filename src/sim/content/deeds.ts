@@ -507,7 +507,7 @@ export const DEEDS: Record<string, DeedDef> = {
   },
   dgn_sanctum_speed: {
     id: 'dgn_sanctum_speed',
-    name: 'Sanctum Sprint',
+    name: 'Sanctum Footrace',
     desc: 'Defeat Korzul the Gravewyrm within 15 minutes of your party claiming Gravewyrm Sanctum.',
     category: 'dungeon',
     renown: 25,
@@ -654,7 +654,7 @@ export const DEEDS: Record<string, DeedDef> = {
   dlv_varric_ringers: {
     id: 'dlv_varric_ringers',
     name: 'The Bells Fall Silent',
-    desc: 'Defeat Deacon Varric with every Funeral Ringer he raises already slain.',
+    desc: 'Defeat Deacon Vandric with every Funeral Ringer he raises already slain.',
     category: 'delve',
     renown: 10,
     trigger: { kind: 'manual' },
@@ -932,7 +932,7 @@ export const DEEDS: Record<string, DeedDef> = {
   chr_peaks_chapter_iii: {
     id: 'chr_peaks_chapter_iii',
     name: 'Chronicle of Thornpeak',
-    desc: "See the mountain's whole story through: the Wyrmcult broken, the Sanctum silenced, the Waking Peak felled, and every named terror of the crags laid low.",
+    desc: "See the mountain's whole story through: the Broodsworn broken, the Sanctum silenced, the Waking Peak felled, and every named terror of the crags laid low.",
     category: 'chronicle',
     renown: 50,
     trigger: {
@@ -2596,7 +2596,7 @@ export const DEEDS: Record<string, DeedDef> = {
   },
   chr_nightbloom_first_cast: {
     id: 'chr_nightbloom_first_cast',
-    name: 'A Ripple on the Moonwell',
+    name: 'A Ripple on the Moonspring',
     desc: 'Catch a fish from the waters of the Nightbloom.',
     category: 'chronicle',
     renown: 5,
@@ -2686,12 +2686,12 @@ export const DEEDS: Record<string, DeedDef> = {
   },
   pvp_honor_knight_lieutenant: {
     id: 'pvp_honor_knight_lieutenant',
-    name: 'Knight-Lieutenant',
+    name: 'Banneret',
     desc: 'Earn 40,000 honor in your lifetime, a season of real war behind you.',
     category: 'pvp',
     renown: 25,
     trigger: { kind: 'meter', meter: 'lifetimeHonor', amount: 40_000 },
-    reward: { kind: 'title', text: 'Knight-Lieutenant' },
+    reward: { kind: 'title', text: 'Banneret' },
   },
   pvp_honor_field_marshal: {
     id: 'pvp_honor_field_marshal',

@@ -79,7 +79,7 @@ export const MOUNTS: Record<MountKey, MountDef> = {
     moveSpeedPct: 0.75,
   },
   // Epic tier (80%): the hover-cycle and the gobbler come from Rift S clears.
-  // The Terrorspark Groundshaker is developer-only for now and has no
+  // The Dreadspark Groundshaker is developer-only for now and has no
   // player-facing acquisition, and stays LAST in the catalog (the tests pin the
   // developer mount as the tail, so a new player-facing mount lands above it).
   aether_hover_cycle: {
@@ -105,7 +105,7 @@ export const MOUNTS: Record<MountKey, MountDef> = {
   },
   terrorspark_groundshaker: {
     key: 'terrorspark_groundshaker',
-    name: 'Terrorspark Groundshaker',
+    name: 'Dreadspark Groundshaker',
     rarity: 'epic',
     moveSpeedPct: 0.8,
   },

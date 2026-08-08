@@ -38,9 +38,7 @@ export const table: DeedLocaleTable = {
     title: 'Sargento',
   },
   pvp_honor_knight_lieutenant: {
-    name: 'Cavaleiro-Tenente',
     desc: 'Ganhe 40.000 de Honra ao longo da vida, uma temporada de guerra de verdade nas costas.',
-    title: 'Cavaleiro-Tenente',
   },
   pvp_honor_field_marshal: {
     name: 'Marechal de Campo',
@@ -76,7 +74,6 @@ export const table: DeedLocaleTable = {
     desc: 'Colha um veio de minerio, um bosque de madeira e um canteiro de ervas em Nightbloom.',
   },
   chr_nightbloom_first_cast: {
-    name: 'Uma ondulacao no poco lunar',
     desc: 'Pesque um peixe nas aguas de Nightbloom.',
   },
   chr_wraithwood_gatherer: {
@@ -292,7 +289,6 @@ export const table: DeedLocaleTable = {
     title: 'Mata-Wyrm',
   },
   dgn_sanctum_speed: {
-    name: 'Corrida no Santuário',
     desc: 'Derrote Korzul o Gravewyrm em até 15 minutos após seu grupo reivindicar o Santuário do Gravewyrm.',
   },
   dgn_nythraxis_gravebreaker: {
@@ -358,7 +354,7 @@ export const table: DeedLocaleTable = {
   },
   dlv_varric_ringers: {
     name: 'Os Sinos Emudecem',
-    desc: 'Derrote o Diácono Varric com todos os Sineiros Fúnebres que ele ergue já abatidos.',
+    desc: 'Derrote o Diácono Vandric com todos os Sineiros Fúnebres que ele ergue já abatidos.',
   },
   dlv_nhalia_bells: {
     name: 'Aquieta-Sinos',
@@ -437,7 +433,6 @@ export const table: DeedLocaleTable = {
   },
   chr_peaks_chapter_iii: {
     name: 'Crônica de Thornpeak',
-    desc: 'Acompanhe a história da montanha até o fim: o Culto do Wyrm desfeito, o Santuário silenciado, o Pico Desperto derrubado e cada terror nomeado dos penhascos abatido.',
     title: 'de Thornpeak',
   },
   chr_peaks_sparring: {

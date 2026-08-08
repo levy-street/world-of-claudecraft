@@ -104,7 +104,7 @@ describe('warlock demon pets', () => {
 
   it('gloomshade, the tank demon, auto-taunts by default on summon', () => {
     // Bug #1356: createDemonPet unconditionally set petAutoTaunt=false for every
-    // demon, so Gloomshade (a "sturdy melee tank that taunts to hold threat", per
+    // demon, so Duskmurk (a "sturdy melee tank that taunts to hold threat", per
     // this file's header comment) never held aggro unless the owner manually
     // toggled auto-taunt every session. A melee_tank demon should come up with
     // auto-taunt already on.

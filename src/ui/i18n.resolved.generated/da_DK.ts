@@ -566,7 +566,7 @@ export const da_DK: EnTranslations = {
         "ice_fang_sword": {
           "name": "Istænd",
           "look": "Buet klinge af bleg gletsjeris, takkede rimkrystaller langs ryggen, en glødende cyan kerne i blodrillen og et korsgreb af istapper.",
-          "lore": "Flagskibet for den frosne kvalitet, og det stykke, hver samler rækker efter først. Ice Fang blev skåret, ikke smedet, fra en hugtænd på gletsjeren, der dækker Thornpeak over Highwatch, og dens cyan kerne brænder kold som lyset fra Glimmermere. Den rimer selve luften, den skærer. Vægvagten sværger, at en soldat bar den den nat, hvor høje snevejr holdt Wyrmcult tilbage, og 'købte muren en vinter'."
+          "lore": "Flagskibet for den frosne kvalitet, og det stykke, hver samler rækker efter først. Ice Fang blev skåret, ikke smedet, fra en hugtænd på gletsjeren, der dækker Thornpeak over Highwatch, og dens cyan kerne brænder kold som lyset fra Glimmermere. Den rimer selve luften, den skærer. Vægvagten sværger, at en soldat bar den den nat, hvor høje snevejr holdt Broodsworn tilbage, og 'købte muren en vinter'."
         },
         "glaciersplit_axe": {
           "name": "Gletsjerspalter",
@@ -594,7 +594,7 @@ export const da_DK: EnTranslations = {
           "lore": "En spids af glødende gletsjer-is, som siges at være brudt fra den dybe tjerne under Sanctum, hvor bjergets kulde har tænder. Rimfrost blomstrer uendeligt fra sin sølvkrave og smelter aldrig, hverken ved ild eller om sommeren. Magikers holder det tæt på for kulden, det giver deres arbejde, og holder det langt om nætterne, det ser ud til at læne sig mod Nythraxis' krypt, og lytte."
         },
         "winterbite": {
-          "name": "Vinterbid",
+          "name": "Wintergnaw",
           "look": "Bue af forsølvet stål og blå is, en glødende cyan kerne i grebet, en pil af massiv is og kold damp.",
           "lore": "En bue af forsølvet stål og Thornpeak-is, dens stigrør oplyst af en kold cyan kerne, der fryser pilen til strengen. Det knækker en skaft af fast gletsjer-is, der reformerer hvert træk; bueskytten bærer ingen kogger på væggen, kun kulden. Highwatch holdt Sniger Ridge gennem en belejring med en lignende: en enkelt buemand, siger de, og en vinters værdi af pile, der altid allerede var der."
         },
@@ -1006,7 +1006,7 @@ export const da_DK: EnTranslations = {
       "name_shadowjump_toad": "Kama-Kage Skyggehop-Tudsen",
       "name_stormfeather_griffin": "Himmelrækkende Stormfjer",
       "name_thunderstrut_gobbler": "Tordenspanker den Store Kalkun",
-      "name_terrorspark_groundshaker": "Skrækgnist, jordrysteren",
+      "name_terrorspark_groundshaker": "Dreadspark Groundshaker",
       "name_drakemaw_raptor": "Dragegabets Raptor",
       "desc_valorsteed": "En hårdfør, sikker ganger, der giver øget rejsehastighed.",
       "desc_grag_bear": "En hårdfør, sikker bjørn, der giver øget rejsehastighed.",
@@ -1487,7 +1487,7 @@ export const da_DK: EnTranslations = {
         "battleTrance": "Kamptrance",
         "overpowerCharge": "Rødhånd-forstærkning",
         "suddenDeath": "Pludselig Død",
-        "victoryRush": "Sejrsrus",
+        "victoryRush": "Victor's Surge",
         "enrage": "Amok: Rasende",
         "heatingUp": "Opvarmning",
         "arcaneCharge": "Arkane ladninger",
@@ -1970,7 +1970,7 @@ export const da_DK: EnTranslations = {
       "sanguine": "Øger angrebshastighed med {hastePct}% og den skade, du volder, med {dmgPct}%",
       "battleTrance": "Dit næste Plyndrerslag eller Lemlæstende Slag koster intet raseri",
       "revengeFree": "Din næste Hævn koster intet raseri",
-      "victoryRush": "Sejrsrus er klar",
+      "victoryRush": "Victor's Surge is ready",
       "maxHpPct": "Øger maksimalt helbred med {pct}%",
       "temporalHourglass": "Immun og ude af stand til at handle; gendanner helbred og fremskynder nedkølingsgendannelse. Højreklik for at annullere.",
       "tongues": "Erhöht Zauberzeit um {pct}%",
@@ -4031,13 +4031,13 @@ export const da_DK: EnTranslations = {
       "valeBlurb": "Den grønne startdal, hvor nye helte prøver kræfter med ulve og banditter omkring byen Eastbrook.",
       "marshBlurb": "Et druknet land af tåge og ruiner. Mudfiner vrimler i lavvandet, og noget ældre rører på sig under vandet, holdt under opsyn fra brobyen Fenbridge.",
       "peaksBlurb": "Vindskurede rygge og gamle minegange, der klatrer mod rigets koldeste og højeste farer, holdt af forposten Highwatch.",
-      "duskBlurb": "En dal af evig skumring under Ældreglans store træ, hvor krystalruiner gløder og luften summer af gammel magi.",
+      "duskBlurb": "A valley of permanent dusk beneath the great tree of Eldershine, where crystal ruins glow and the air hums with old magic.",
       "emberBlurb": "Stormlyste ødemarker af aske og blodglas, hvor drager kredser over calderaen og troldeild brænder mellem klitterne, overvåget fra portbyen Ormevagt.",
       "frostBlurb": "En stilhed af sne og mørke fyrretræer under nordlyset, hvor kulden selv føles vågen, og Iskappe holder sine ild brændende.",
       "amberBlurb": "Et evigt efterår af gyldne og røde blade, der aldrig falder, samlet omkring den lygtebelyste by Lygtesø.",
       "fenBlurb": "Et lyst, summende vådområde af liljer og langsomt vand, krydset på gamle plankestier fra brobyen Brosø.",
       "nightBlurb": "Et rige af stjerneklar midnat, hvor blomster lyser stierne op, og Månero holder en stille vagt under en drømmende himmel.",
-      "hauntBlurb": "En hjemsøgt skov under kæmpe bladerdag, hvor Galgesøs lygter er det eneste ærlige lys på vejen.",
+      "hauntBlurb": "A haunted forest under giant canopies, where the lanterns of Gibbetmere are the only honest light on the road.",
       "galeBlurb": "Havklipper og hylende bakker, hvor vinden aldrig hviler, Det Gamle Fyr aldrig slukkes, og Vighavn lukker sine døre tæt i.",
       "jungleBlurb": "Et tropisk virvar af palmer, hvidt sand og larmende fugle, med strandbyen Drivhavn, der holder et bål tændt på stranden.",
       "gardenBlurb": "Et hækkelabyrint-haverige, stadig klippet af ingen gartner, nogen har set, betrådt forbi Hækvig og dens fontænegårde.",
@@ -4048,7 +4048,7 @@ export const da_DK: EnTranslations = {
       "peaksGreeting": "I to hundrede år har denne mur holdt. Den brister ikke på min vagt, men den knager.",
       "peaksGreeter": "Kaptajn Thessaly, Highwatch",
       "duskGreeting": "Få af din slags har stået under disse grene. Gå forsigtigt, og vær velkommen.",
-      "duskGreeter": "Vogter Saelwyn, Ældreglans",
+      "duskGreeter": "Keeper Saelwyn, Eldershine",
       "emberGreeting": "Varm vind fra ødemarken, drager over Dragegabet, og troldeild i klitterne. Drik noget, før du går derud.",
       "emberGreeter": "Portvagten, Ormevagt",
       "frostGreeting": "Sneen opsluger hver lyd uden for muren. Hvis lysene begynder at danse, så hold din stemme lav og din ild tændt.",
@@ -4060,7 +4060,7 @@ export const da_DK: EnTranslations = {
       "nightGreeting": "Forbi Natporten drømmer selve luften. Følg blomsterlyset, og pas på den sovende verden, der hænger i himlen.",
       "nightGreeter": "Vagtvogteren, Månero",
       "hauntGreeting": "Hold dig til lygterne, rejsende. Og hvis skoven kalder dit navn fra vejen, så svar ikke.",
-      "hauntGreeter": "Lygtetænderen, Galgesø",
+      "hauntGreeter": "The lamplighter, Gibbetmere",
       "galeGreeting": "Vinden er aldrig stoppet her, og Det Gamle Fyr er aldrig slukket. Luk kroens dør bag dig.",
       "galeGreeter": "Fyrvogteren, Vighavn",
       "jungleGreeting": "Varmt sand, larmende fugle, og en jungle, der æder horisonten. Vi holder et bål tændt på stranden; prøv at komme tilbage til det.",
@@ -4069,14 +4069,14 @@ export const da_DK: EnTranslations = {
       "gardenGreeter": "Portvagten, Hækvig",
       "valePlaceNotes": "Eastbrook er din første hjemmebase. Wolf Run og Boar Meadow er milde jagtmarker; Spejlsøen er fint vand at fiske i, selvom mudderfinner myldrer i dens lavvande; Sableweb og Copper Dig skjuler edderkopper og malmgriske gravere; en Bandit Camp og Fallen Chapel rummer barskere arbejde; Reliquary Hill falder ned i Collapsed Reliquary, rigets første delve; Brightwood Glade er en rolig, solbeskinnet lund i nord; og Somarken er Eastbrooks indhegnede vildsvineboldbane, hvor Dalpokalen spilles under en høstfred.",
       "marshPlaceNotes": "Fenbridge bevogter den eneste tørre vej. Prowler Reeds og Deepfen Shallows myldrer med mosebæster og mudfiner; Widow Thicket er spundet tæt med spind; Drowned Chapel og Troll Mounds rummer ældre farer, med Det Druknede Litani, mosens egen delve, der åbner lige nord for højene; Gravecaller Encampment er kulten gravet ind, og Den Sunkne Bastion er mosens instans-hjerte.",
-      "peaksPlaceNotes": "Highwatch holder muren. Stalker Ridge og Deeprock Burrows tilhører ryg-katte og gravere; Ogre Foothills og Drogmar's War-Camp tilhører lejede bøller; Stormcrag knitrer med elementaler, og nedenfor gløder Glimmersøen, tjernet hvis bred holder porten af blegt lys ned til Det Druknede Tempel; Wyrmcult Tents og Revenant Fields omkranser kultens høje grund, med Gravormens Helligdom på dens top.",
-      "duskPlaceNotes": "Ældreglans samles under det store træ. Skumringsfald-Grotten og dens udkigspunkt er vejen ind og det første syn af dalen; Ældrelunden og Stjerneskudsbassinet rummer den stille syd; Den Sunkne Gård huser overgroede ruiner i øst; og Den Glødende Dybde og De Krystalklare Lavvande gløder over hele nord.",
+      "peaksPlaceNotes": "Highwatch holder muren. Stalker Ridge og Deeprock Burrows tilhører ryg-katte og gravere; Ogre Foothills og Drogmar's War-Camp tilhører lejede bøller; Stormcrag knitrer med elementaler, og nedenfor gløder Glimmersøen, tjernet hvis bred holder porten af blegt lys ned til Det Druknede Tempel; Broodsworn Tents og Revenant Fields omkranser kultens høje grund, med Gravormens Helligdom på dens top.",
+      "duskPlaceNotes": "Eldershine gathers beneath the great tree. The Duskfall Cave and its overlook are the way in and the first sight of the valley; Elder Grove and Starfall Basin keep the quiet south; the Sunken Court holds overgrown ruins in the east; and the Gleaming Deep and Crystalline Shallows glow across the north.",
       "emberPlaceNotes": "Ormevagt vogter porten. Portskoven er det sidste grønne før ødemarken; Askeklitterne driver med aske og værre; Troldetinget er, hvor klittroldene samler deres ild; Blodglasmarkerne glitrer med barberskarpe skår; og Dragegabets Caldera er den rygende krone, dragerne kredser om.",
       "frostPlaceNotes": "Iskappe rummer det sidste varme ildsted. Snegrænsen markerer, hvor snedriverne overtager; Gletsjertjørnet er sort, stille vand under isen; Nordlys-Trapperne klatrer under de dansende lys; Kuldekæret er en frossen mose, der aldrig helt sover; og De Hylende Terrasser fortjener deres navn hver nat.",
       "amberPlaceNotes": "Lygtesø gløder i hjertet af høsten. Guldsmeltet er den ravglatte pas ind; Den Forgyldte Frugthave og Høstkløften rummer den sødeste plukning og de dristigste tyve; Den Store Sø spejler de brændende blade; Askelønbakken står højest og rødest; og Den Skæve Monolit husker noget ældre end efteråret.",
       "fenPlaceNotes": "Brosø ligger overskrævs det langsomme vand. Ravkær-Trapperne kommer ned fra høstlandet; Liljemoserne og Mosglans-Pytterne glitrer af lygtemænd og guldsmede; Sørgepilen lader sine grene hænge ned i søen; og De Søvnige Flader er så milde, som dette land bliver.",
-      "nightPlaceNotes": "Månero holder vagten. Natporten er vejen ind i midnatslandet; Månebrønden rummer stjernelys, du kan stå ved siden af; Skumringsmarken blomstrer i mørket; Den Stående Vagt våger uden nogensinde at bevæge sig; og Den Søvnløse Gravhøj er det ene sted her, der aldrig drømmer.",
-      "hauntPlaceNotes": "Galgesø klumper sig sammen inde i sine lygter. Kragporten er skovens dystre fordør; Enkekrattet er tæt spundet med spind; Den Hængende Lysning og Sorgstens-Kapellet rummer skovens ældste sorger; og Jægerens Lysning tilhører hvad end der stadig jager der.",
+      "nightPlaceNotes": "Moonrest keeps the vigil. The Nightgate is the way into the midnight country; the Moonspring holds starlight you can stand beside; Gloamfield blooms in the dark; the Standing Vigil watches without ever moving; and the Sleepless Barrow is the one place here that never dreams.",
+      "hauntPlaceNotes": "Gibbetmere huddles inside its lanterns. The Crowgate is the wood's grim front door; Widow's Thicket is spun thick with web; the Hanging Glade and the Mournstone Chapel keep the forest's oldest griefs; and the Huntsman's Clearing belongs to whatever still hunts there.",
       "galePlaceNotes": "Vighavn læner sig ind i vinden. Vindvejen er klippevejen ind; De Hylende Bakker ruller træløst under kulingen; Det Gamle Fyr har brændt så langt tilbage som nogen kan huske; Klippeskæret falder lodret mod vandet; Vragmarkerne holder kysten ærlig; og Spejltjørnet er det ene stille sted i hele riget.",
       "junglePlaceNotes": "Drivhavn holder sit bål på stranden. Filtmundingen er, hvor floden møder den grønne mur; Palmestranden løber hvid og varm langs brændingen; Smaragdfiltret og Rankefaldet opsluger det indre; Safirlagunen gløder klar og dyb; og Den Sunkne Afgud våger fra under vandet.",
       "gardenPlaceNotes": "Hækvig venter ved Havelågen. Parterrestien blomstrer i klippede farver; Daggryslottet eksercerer sine riddere bag nye mure; Kronbladdammen driver lyserødt året rundt; Den Gamle Mølle vender sine egne ringbede; Den Store Labyrint omordner sine gange for hver gæst, dens buer bevogtet af løvræve; Nordvagten holder udgangsvejen; Liljebassinet hviler bag det hele; og Fontænegården løber stadig klart i havens hjerte.",
@@ -6277,24 +6277,24 @@ export const da_DK: EnTranslations = {
     "boss": {
       "varric": {
         "bell": {
-          "emote": "Diakon Varric griber den begravede klokke med begge hænder!",
-          "log": "Diakon Varric begynder at ringe med gravklokken.",
-          "warning": "Flyt dig væk fra Diakon Varric!",
+          "emote": "Diakon Vandric griber den begravede klokke med begge hænder!",
+          "log": "Diakon Vandric begynder at ringe med gravklokken.",
+          "warning": "Flyt dig væk fra Diakon Vandric!",
           "impact": "Klokkens klang sprænger revner i kammergulvet!",
           "lesson": "Klokkeklang: et jordsmæk hvert tolvte sekund. Flyt dig væk, før det rammer."
         },
         "raise": {
-          "emote": "Diakon Varric kalder navne fra de brudte grave!",
-          "log": "Diakon Varric begynder Vækning af Døde.",
+          "emote": "Diakon Vandric kalder navne fra de brudte grave!",
+          "log": "Diakon Vandric begynder Vækning af Døde.",
           "warning": "Stop gravritualet!",
           "object": "Den revnede grav skælver af stjålet ånde.",
           "interrupt_ok": "Gravritualet vakler.",
-          "interrupt_fail": "De døde svarer på Diakon Varrics kald!",
+          "interrupt_fail": "De døde svarer på Diakon Vandrics kald!",
           "lesson": "Afbryd den revnede grav inden for fem sekunder, ellers rejser de døde sig på hans kald."
         },
         "pull": "Du træder på helligt støv med uren hensigt. Knæl, og bliv talt.",
         "intro": "Ingen sjæl går tabt. Kun på afveje.",
-        "mid60": "Diakon Varric læser navne fra protokollen med skælvende triumf.",
+        "mid60": "Diakon Vandric læser navne fra protokollen med skælvende triumf.",
         "mid30": "Gravklokken svarer på hvert navn, han nævner.",
         "defeat": "Nej... Jeg havde navnene... Jeg havde dem alle..."
       }
@@ -7980,7 +7980,7 @@ export const da_DK: EnTranslations = {
       },
       "cold_snap": {
         "name": "Vinterens kalden",
-        "description": "Afslutter nedkølingen for Flimmertrin, Frostslør og Større usynlighed. (magikertalent)"
+        "description": "Finishes the cooldown on Flitstep, Frostveil, and Greater Invisibility. (Mage talent)"
       },
       "greater_invisibility": {
         "name": "Større usynlighed",
@@ -8031,15 +8031,15 @@ export const da_DK: EnTranslations = {
         "description": "Affyr tre iskolde projektiler, der hver giver {damage} frostskade, og påfør målet Vinterkulde: de næste 2 kompatible besværgelser mod det behandler det som frossent. Brain Freeze gør Winterlash øjeblikkelig og springer dens nedkøling over. (Frost)"
       },
       "frozen_orb": {
-        "name": "Frossen Kugle",
+        "name": "Frostglobe",
         "description": "Slip en kule af hvirvlende frost, der driver fremad i 8 sekunder, og giver {damage} frostskade hvert sekund til nærliggende fjender og bremser dem med 30%. Hver slående puls genererer en istap. (Frost)"
       },
       "blizzard": {
         "name": "Snestorm",
-        "description": "Kalder en isstorm ned over målområdet i 6 sek., gør {damage} Frost-skade hvert sekund og sætter fjenders hast ned med 40%. Hver fjende ramt reducerer Frozen Orb med 0,5 sek., op til 3 sek. pr. kast. (Frost)"
+        "description": "Kalder en isstorm ned over målområdet i 6 sek., gør {damage} Frost-skade hvert sekund og sætter fjenders hast ned med 40%. Hver fjende ramt reducerer Frostglobe med 0,5 sek., op til 3 sek. pr. kast. (Frost)"
       },
       "glacial_spike": {
-        "name": "Gletsjerspyd",
+        "name": "Rimeneedle",
         "description": "Fremkald en massiv isspids og forbrug 5 Istapper for at gøre {damage} Frost-skade og fryse målet på stedet i 4 sek. (Frost)"
       },
       "glacial_front": {
@@ -8171,7 +8171,7 @@ export const da_DK: EnTranslations = {
         "description": "Afslutningsangreb der sårer målet og får det til at bløde for {damage} over 16 sek."
       },
       "vanish": {
-        "name": "Røgskridt",
+        "name": "Smokefade",
         "description": "Forsvind fra syne og træd ind i Duskveil selv i kamp. Du bevæger dig 50 % langsommere mens du er skjult. Varer op til 10 sek."
       },
       "instant_poison": {
@@ -8555,7 +8555,7 @@ export const da_DK: EnTranslations = {
         "description": "Gå i et sydende raseri, og generér 20 raseri. (Krigertalent)"
       },
       "crusader_strike": {
-        "name": "Korsfarerslag",
+        "name": "Oathstrike",
         "description": "Slår målet for våbenskade plus {damage} hellig skade. (Paladin-talent)"
       },
       "chain_heal": {
@@ -8567,7 +8567,7 @@ export const da_DK: EnTranslations = {
         "description": "Antag dæmonisk kraft og øg rustning og angrebskraft i 20 sek. (Warlock-talent)"
       },
       "holy_shock": {
-        "name": "Hellig chok",
+        "name": "Lightjolt",
         "description": "Chokerer et venligt mål med hellig energi og helbreder det for {damage}. (Hellig signatur)"
       },
       "aura_surge": {
@@ -8587,7 +8587,7 @@ export const da_DK: EnTranslations = {
         "description": "Inspirerer nærliggende allierede og øger angrebskraft med 35 i 5 min. (Skytte signatur)"
       },
       "wyvern_sting": {
-        "name": "Wyvernstik",
+        "name": "Drakesting",
         "description": "Stikker fjenden på afstand og gør den ukampdygtig i op til 4 sek. Enhver skade bryder effekten. (Overlevelsessignatur)"
       },
       "arcane_power": {
@@ -8599,7 +8599,7 @@ export const da_DK: EnTranslations = {
         "description": "Øger kritisk chance med besværgelser med 50% i 15 sek. (Fire-signatur)"
       },
       "icy_veins": {
-        "name": "Iskolde Årer",
+        "name": "Coldsurge",
         "description": "Øger besværgelseshast med 30% og forhindrer afbrydelse og tilbageslag i 10 sek. (Frost-signatur)"
       },
       "cold_blood": {
@@ -8619,7 +8619,7 @@ export const da_DK: EnTranslations = {
         "description": "Indgyder et venligt mål med kraft og øger besværgelseskraft med 28 i 15 sek. (Disciplin signatur)"
       },
       "holy_nova": {
-        "name": "Hellig nova",
+        "name": "Hallowburst",
         "description": "Udløser en eksplosion af helligt lys, helbreder nærliggende allierede for {damage} og skader nærliggende fjender. (Hellig signatur)"
       },
       "shadowform": {
@@ -8647,7 +8647,7 @@ export const da_DK: EnTranslations = {
         "description": "Storm mod en fjende og rodfæst den i 1 sek. 8-25 m rækkevidde. (Vildskabssignatur)"
       },
       "swiftmend": {
-        "name": "Hurtig heling",
+        "name": "Fleetmend",
         "description": "Forbruger en helbredelse over tid-effekt på et venligt mål for at helbrede det for {damage}. (Genoprettelsessignatur)"
       },
       "summon_imp": {
@@ -8655,8 +8655,8 @@ export const da_DK: EnTranslations = {
         "description": "Tilkalder en Emberkin under Heksemesterens kommando. Emberkinen slynger Askelyn mod dine fjender fra det fjerne. At tilkalde en ny dæmon bortsender din nuværende. Du kan have én dæmon ad gangen."
       },
       "summon_voidwalker": {
-        "name": "Tilkald Gloomshade",
-        "description": "Tilkalder en Gloomshade under Heksemesterens kommando. Gloomshaden er en robust dæmon, der håner dine fjender og opsuger tæsk. At tilkalde en ny dæmon bortsender din nuværende. Du kan have én dæmon ad gangen."
+        "name": "Tilkald Duskmurk",
+        "description": "Tilkalder en Duskmurk under Heksemesterens kommando. Duskmurkn er en robust dæmon, der håner dine fjender og opsuger tæsk. At tilkalde en ny dæmon bortsender din nuværende. Du kan have én dæmon ad gangen."
       },
       "summon_succubus": {
         "name": "Tilkald Duskborn",
@@ -8755,7 +8755,7 @@ export const da_DK: EnTranslations = {
         "description": "Dine autoangreb har en chance for at lade dig kaste Tidlig Grav på et mål uanset helbred, uden at det koster raseri. (Arms)"
       },
       "storm_bolt": {
-        "name": "Stormbolt",
+        "name": "Thunderhurl",
         "description": "Slyng dit våben mod målet for {damage} og bedøv det i 3 sek."
       },
       "piercing_howl": {
@@ -8775,7 +8775,7 @@ export const da_DK: EnTranslations = {
         "description": "Gennemtræng dit våben med dine fjenders blod: du og dine nærkampsallierede får 10% angrebshastighed og 10% skade i 20 sek."
       },
       "victory_rush": {
-        "name": "Sejrsrus",
+        "name": "Victor's Surge",
         "description": "Slå for våbenskade plus {damage}, og helbred 20% af dit maksimale helbred. Kan kun bruges inden for 20 sek efter at have dræbt en fjende."
       },
       "intimidating_shout": {
@@ -8787,7 +8787,7 @@ export const da_DK: EnTranslations = {
         "description": "Angrib i en bred bue og vold fysisk skade på alle fjender foran dig. Over 5 mål reduceres skaden. Når du undviger eller parerer, koster din næste Hævn muligvis intet raseri. (Protection)"
       },
       "heroic_leap": {
-        "name": "Krigsspring",
+        "name": "Vaulting Charge",
         "description": "Spring til målområdet og påfør {damage} skade på fjender i nærheden, når du lander."
       },
       "rallying_cry": {
@@ -8803,7 +8803,7 @@ export const da_DK: EnTranslations = {
         "description": "Forvandl dig til en kolos i 20 sek., bryd alle kontroleffekter på dig, og øg din skade med 20%."
       },
       "avenging_wrath": {
-        "name": "Hævnerfløj",
+        "name": "Zealwing",
         "description": "Påkalder hævnende kraft og øger din angrebskraft med 60 og magikraft med 30 i 20 sek. (paladintalent)"
       },
       "berserk": {
@@ -8815,7 +8815,7 @@ export const da_DK: EnTranslations = {
         "description": "Bliv til en hvirvlende storm af stål, og ram alle fjender inden for 6 meter for {damage} skade hvert sekund i 4 sek."
       },
       "blink": {
-        "name": "Flimmertrin",
+        "name": "Flitstep",
         "description": "Teleporterer dig 15 m fremad og bryder forankringseffekter. (magikertalent)"
       },
       "bloodlust": {
@@ -8843,7 +8843,7 @@ export const da_DK: EnTranslations = {
         "description": "Golpea a nærliggende fjender con escarcha e inflige {damage} de daño de Frost. (magikertalent)"
       },
       "counterspell": {
-        "name": "Besværgelsesbrud",
+        "name": "Spellsever",
         "description": "Afbryder målets besværgelse og forhindrer det i at kaste besværgelser fra den pågældende magiskole i 6 sek."
       },
       "curse_of_exhaustion": {
@@ -8992,7 +8992,7 @@ export const da_DK: EnTranslations = {
       },
       "preparation": {
         "name": "Nødplan",
-        "description": "Afslutter nedkølingen på Sprint, Undvigelse og Forsvinden. (slyngeltalent)"
+        "description": "Finishes the cooldown on Swift Heels, Ghostfoot, and Smokefade. (Rogue talent)"
       },
       "presence_of_mind": {
         "name": "Ræsende sind",
@@ -9023,7 +9023,7 @@ export const da_DK: EnTranslations = {
         "description": "Du forsvinder i en røgsky, hvilket øger din undvigelseschance med 30 % i 8 sek."
       },
       "spellsteal": {
-        "name": "Magityveri",
+        "name": "Spellplunder",
         "description": "Stjæler en gavnlig magisk effekt fra en fjende og overfører den til dig."
       },
       "startle_shot": {
@@ -9421,7 +9421,7 @@ export const da_DK: EnTranslations = {
         "name": "Kazzix' Hjertesplint"
       },
       "wyrmcult_orders": {
-        "name": "Ormekultens Ordrer"
+        "name": "Broodsworn Orders"
       },
       "ritual_phylactery": {
         "name": "Rituel Sjælebeholder"
@@ -9484,7 +9484,7 @@ export const da_DK: EnTranslations = {
         "name": "Gravorm-Skælbrynje"
       },
       "wyrmcult_grand_robe": {
-        "name": "Ormekultens Storkjortel"
+        "name": "Broodsworn Grand Robe"
       },
       "wyrmscale_jerkin": {
         "name": "Ormeskæl-Vams"
@@ -10153,7 +10153,7 @@ export const da_DK: EnTranslations = {
         "name": "Skærvlyd-Skulderkappe"
       },
       "wyrmcult_spellgrips": {
-        "name": "Ormekultens Besværgelsesgreb"
+        "name": "Broodsworn Spellgrips"
       },
       "thornpeak_wildwraps": {
         "name": "Tornspids-Vildvindinger"
@@ -10162,7 +10162,7 @@ export const da_DK: EnTranslations = {
         "name": "Stormoffers Brynjetrøje"
       },
       "cryptbloom_shoulderguards": {
-        "name": "Kryptblomst-Skulderværn"
+        "name": "Tombpetal Shoulderguards"
       },
       "gravewyrm_thornmaul": {
         "name": "Gravorm-Tornhammer"
@@ -10417,7 +10417,7 @@ export const da_DK: EnTranslations = {
         "name": "Ildstedsforede Såler"
       },
       "frostmane_mantle": {
-        "name": "Kappe af Frostmanken"
+        "name": "Mantle of the Rimemane"
       },
       "ashbone_war_brand": {
         "name": "Askeben-Krigsmærke"
@@ -10576,7 +10576,7 @@ export const da_DK: EnTranslations = {
         "name": "Håndværkerens Øje"
       },
       "reins_terrorspark_groundshaker": {
-        "name": "Tændingsnøgle: Skrækgnist, jordrysteren"
+        "name": "Ignition Key: Dreadspark Groundshaker"
       },
       "reins_drakemaw_raptor": {
         "name": "Tøjler til Dragegabets Raptor"
@@ -10744,7 +10744,7 @@ export const da_DK: EnTranslations = {
         "name": "Voss' Helligede Kølle"
       },
       "wyrmcult_soulsteps": {
-        "name": "Ormekultens Sjælestøvler"
+        "name": "Broodsworn Soulsteps"
       },
       "wyrmshadow_harness": {
         "name": "Nightfang-Sele"
@@ -10975,7 +10975,7 @@ export const da_DK: EnTranslations = {
         "name": "Diakonens Relikviehjelm"
       },
       "varric_shadow_cowl": {
-        "name": "Varrics Skyggehætte"
+        "name": "Vandrics Skyggehætte"
       },
       "siltguard_helm": {
         "name": "Dyndvogter-Hjelm"
@@ -11152,7 +11152,7 @@ export const da_DK: EnTranslations = {
         "name": "Benkulde-Snor"
       },
       "mistforged_pauldrons": {
-        "name": "Tågesmedede Skulderplader"
+        "name": "Fogforged Pauldrons"
       },
       "tideguard_faceguard": {
         "name": "Tidevandsvagt-Ansigtsværn"
@@ -11466,10 +11466,10 @@ export const da_DK: EnTranslations = {
         "name": "Skårherre Kazzix"
       },
       "wyrmcult_zealot": {
-        "name": "Ormekult-Zelot"
+        "name": "Broodsworn Zealot"
       },
       "wyrmcult_necromancer": {
-        "name": "Ormekult-Nekromantør"
+        "name": "Broodsworn Necromancer"
       },
       "boneclad_revenant": {
         "name": "Benklædt Genganger"
@@ -11577,7 +11577,7 @@ export const da_DK: EnTranslations = {
         "name": "Helgenløst Billede"
       },
       "deacon_varric": {
-        "name": "Diakon Varric"
+        "name": "Diakon Vandric"
       },
       "acolyte_tessa": {
         "name": "Akolyt Tessa"
@@ -11769,7 +11769,7 @@ export const da_DK: EnTranslations = {
         "name": "Kærånd"
       },
       "frostmane_yeti": {
-        "name": "Frostmanke-Yeti"
+        "name": "Rimemane Yeti"
       },
       "terrace_howler": {
         "name": "Terrassehyler"
@@ -11817,7 +11817,7 @@ export const da_DK: EnTranslations = {
         "name": "Sømørket"
       },
       "harvest_sprite": {
-        "name": "Høståand"
+        "name": "Gleaning Sprite"
       },
       "mere_lurker": {
         "name": "Sølurer"
@@ -11841,7 +11841,7 @@ export const da_DK: EnTranslations = {
         "name": "Skumringsvandrer"
       },
       "nightkin_stargazer": {
-        "name": "Natfolk-Stjernekigger"
+        "name": "Gloamkin Stargazer"
       },
       "barrow_king": {
         "name": "Gravhøjkongen"
@@ -11991,7 +11991,7 @@ export const da_DK: EnTranslations = {
         "name": "Emberkin"
       },
       "gloomshade": {
-        "name": "Gloomshade"
+        "name": "Duskmurk"
       },
       "duskborn": {
         "name": "Duskborn"
@@ -12262,7 +12262,7 @@ export const da_DK: EnTranslations = {
       },
       "provisioner_fenna": {
         "name": "Proviantmester Fenna",
-        "title": "Ældreglans' Proviantmester",
+        "title": "Eldershine Provisioner",
         "greeting": "Brød stadig varmt, vand stadig sødt. Hulen forsyner, og det gør jeg også."
       },
       "wardsmith_orun": {
@@ -12387,12 +12387,12 @@ export const da_DK: EnTranslations = {
       },
       "sexton_marrow": {
         "name": "Graver Marrow",
-        "title": "Graver af Galgesø",
+        "title": "Sexton of Gibbetmere",
         "greeting": "Vi begraver dem dybt her, og vi ringer med klokkerne, så de husker at blive nede."
       },
       "widow_tansy": {
         "name": "Enke Tansy",
-        "title": "Lysstøber af Galgesø",
+        "title": "Candlewright of Gibbetmere",
         "greeting": "Et lys for hver grav, og ikke et må gå ud. Ikke et, hører du mig?"
       },
       "vicar_creel": {
@@ -12416,7 +12416,7 @@ export const da_DK: EnTranslations = {
         "greeting": "Havet giver, sandet bevarer, og junglen tager. Bliv på stranden, fremmede."
       },
       "hermit_okku": {
-        "name": "Okku",
+        "name": "Okrim",
         "title": "Manden Der Gik Ind",
         "greeting": "Stille nu. Trommerne tæller alt, hvad der går under træerne, og de har allerede talt dig."
       },
@@ -13064,7 +13064,7 @@ export const da_DK: EnTranslations = {
       },
       "q_drogmar": {
         "title": "Krigsherre Drogmar",
-        "text": "Krigsherre Drogmar tog Ormekultens mønter og svor klanerne til bjergets opvågnen. Han er den hammer, de agter at svinge mod min mur - og når han slår jorden, {playerName}, så stå ikke i nærheden af ham. Tag dine følgesvende ind i krigslejren og gør ende på ham, for Højvagten.",
+        "text": "Warlord Drogmar took the Broodsworn's coin and swore the clans to the mountain's waking. He is the hammer they mean to swing at my wall - and when he slams the ground, {playerName}, do not be standing near him. Take your companions into the war-camp and end him, for Highwatch.",
         "completion": "Drogmar, død i sin egen lejr. Klanerne vil spredes til de høje pas - du har købt min mur en vinter, {playerName}.",
         "objectives": {
           "0": {
@@ -13104,11 +13104,11 @@ export const da_DK: EnTranslations = {
       },
       "q_zealots": {
         "title": "Sange på Vinden",
-        "text": "Når vinden kommer ned fra de sydlige tinder, {playerName}, bærer den sang med sig. Ormekulten skjuler sig ikke længere, de har rejst telte under Helligdommen, og de synger til det, der sover under den. Bring tolv zeloter til tavshed. Hver stemme, der stilnes, køber bjerget endnu en nats søvn.",
+        "text": "When the wind comes off the southern peaks, {playerName}, it carries chanting. The Broodsworn no longer hides - they have raised tents below the Sanctum and they sing to what sleeps beneath it. Silence twelve zealots. Every voice stilled buys the mountain another night of sleep.",
         "completion": "Vinden er stillere. Men det, der bekymrer mig, er ikke sangen, {playerName}, det er at noget måske synger tilbage.",
         "objectives": {
           "0": {
-            "label": "Ormekult-Zelot dræbt"
+            "label": "Broodsworn Zealot slain"
           }
         }
       },
@@ -13181,7 +13181,7 @@ export const da_DK: EnTranslations = {
             "label": "Ormekult-Zelot dræbt"
           },
           "1": {
-            "label": "Ormekult-Nekromantiker dræbt"
+            "label": "Broodsworn Necromancer slain"
           }
         }
       },
@@ -13621,7 +13621,7 @@ export const da_DK: EnTranslations = {
       },
       "q_hollow_old_marrowshell": {
         "title": "Den Gamle Skal fra Lavvandet",
-        "text": "Det første navn er Gamle Margskal, en krabbe på størrelse med en kærre, der har jaget de østlige lavvande siden før Ældreglans havde en port. Den vandrer, {playerName}, så du bliver nødt til at gå kystlinjen igennem, til du krydser dens spor. Gå ikke alene, og stol ikke på dens stilhed.",
+        "text": "The first name is Old Marrowshell, a crab the size of a cart that has hunted the eastern shallows since before Eldershine had a gate. It wanders, {playerName}, so you will have to walk the shoreline until you cross its track. Do not go alone, and do not trust its stillness.",
         "completion": "Lavvandet er blot vand igen. Jeg har set den skal knuse bedre jægere end mig, {playerName}. Ikke dig.",
         "objectives": {
           "0": {
@@ -13763,12 +13763,12 @@ export const da_DK: EnTranslations = {
         }
       },
       "q_fv_frostmane_tyrant": {
-        "title": "Frostmankens Tyran",
-        "text": "Hylerne jagede ikke, da de kom ned ad terrasserne. De flygtede. En yeti har erobret den høje grund, bjergfolket kalder den Frostmanken, og selv flokkene vil ikke dele en skråning med den. Det må ende, {playerName}, før vinteren driver den ned til mine mure. Tag en ven med. Tag to.",
-        "completion": "Da vinden lagde sig i nat, hørte hele landsbyen stilheden, hvor Frostmanken plejede at være. Sløret skylder dig en gæld, det vil tage år at betale, {playerName}. Bær dette, og hver dør i Iskappe står åben for dig.",
+        "title": "The Rimemane Tyrant",
+        "text": "The howlers were not hunting when they came down the terraces. They were fleeing. A yeti has claimed the high ground, the mountain folk call it the Rimemane, and even the packs will not share a slope with it. It has to end, {playerName}, before winter drives it down to my walls. Bring a friend. Bring two.",
+        "completion": "When the wind dropped last night the whole village heard the silence where the Rimemane used to be. The Reach owes you a debt it will be years in paying, {playerName}. Wear this, and every door in Icemantle is open to you.",
         "objectives": {
           "0": {
-            "label": "Frostmanken dræbt"
+            "label": "The Rimemane slain"
           }
         }
       },
@@ -13921,7 +13921,7 @@ export const da_DK: EnTranslations = {
         "completion": "Fire spande tilbage på deres kroge, og rækkerne er blevet stille. Du har en hårdere hånd med ånder end jeg har, {playerName}, og i dag er jeg glad for det.",
         "objectives": {
           "0": {
-            "label": "Høståand jaget væk"
+            "label": "Gleaning Sprite driven off"
           },
           "1": {
             "label": "Safttapnings-Spand bjærget"
@@ -14063,7 +14063,7 @@ export const da_DK: EnTranslations = {
       },
       "q_nb_eyes_on_the_vigil": {
         "title": "Øjne på Vagten",
-        "text": "Noget gør skrejderne dristige og flokkene urolige, {playerName}, og jeg kan ikke aflæse det i blomsterne. Cassian kan aflæse det i himlen. Han holder sin observatorielejr ved Den Stående Vagt øst for her, hvor natfolket driver mellem stenene. Find ham, og spørg, hvad stjernerne siger.",
+        "text": "Something has the striders bold and the herds uneasy, {playerName}, and I cannot read it in the flowers. Cassian can read it in the sky. He keeps his observatory camp by the Standing Vigil east of here, where the gloamkin drift among the stones. Find him, and ask what the stars are saying.",
         "completion": "Lira sendte dig? Så mærker haverne det også. Sæt dig ved kikkerten et øjeblik, {playerName}. Stjernerne har været rastløse i en måned, og hvert kort, jeg tegner, hælder mod nord, mod gravhøjen.",
         "objectives": {
           "0": {
@@ -14073,7 +14073,7 @@ export const da_DK: EnTranslations = {
       },
       "q_nb_charts_of_the_stones": {
         "title": "Kortene i Stenene",
-        "text": "Vagtstenene er ældre end Månero, ældre end natfolket, der passer dem, og deres flader er skåret med stjernekort, jeg har brugt mit liv på at lære at læse. Himlen har forskudt sig, {playerName}, og jeg må vide hvor meget. Læs kortene på tre af stenene og bring mig deres pejlinger.",
+        "text": "The Vigil stones are older than Moonrest, older than the gloamkin who tend them, and their faces are cut with star charts I have spent my life learning to read. The sky has shifted, {playerName}, and I must know how far. Read the charts on three of the stones and bring me their bearings.",
         "completion": "Der er ingen tvivl tilbage. Hver pejling har krøbet mod Den Søvnløse Gravhøj, som om himlen selv læner sig over den høj for at holde øje. De gamle konger blev begravet under justerede stjerner af en grund, {playerName}.",
         "objectives": {
           "0": {
@@ -14097,7 +14097,7 @@ export const da_DK: EnTranslations = {
       "q_nb_the_barrow_king": {
         "title": "Gravhøjkongen Vågner",
         "text": "Hver pejling, hver rastløs stjerne, hver åbnet høj peger mod en ting: Gravhøjkongen vågner under den store høj, og dette rige har ingen daggry til at holde ham tilbage. Han skal lægges til hvile, før han husker sin krone, {playerName}. Gå ikke alene: tag en ven med, og hold blomsterlyset i ryggen.",
-        "completion": "Stjernerne har fundet ro for første gang i en sæson, {playerName}. Højene er lukket, natfolket er blevet stille ved deres sten, og kongen sover atter dernede. Bær denne kappe: Månero skar den til den, som natten endelig stolede på.",
+        "completion": "The stars have settled for the first time in a season, {playerName}. The mounds are closed, the gloamkin have gone still at their stones, and the king sleeps below once more. Wear this mantle: Moonrest cut it for whoever the night finally trusted.",
         "objectives": {
           "0": {
             "label": "Gravhøjkongen lagt til hvile"
@@ -14105,9 +14105,9 @@ export const da_DK: EnTranslations = {
         }
       },
       "q_ww_bells_of_gallowmere": {
-        "title": "Klokkerne i Galgesø",
-        "text": "Hører du den kimen, {playerName}? Det er Galgesø, vejen op mod nord, der ringer sine døde i søvn. Graver Marrow holder tal på hver sjæl under bladerdaget, levende og begravet. Gå hen og bliv talt, før skoven tæller dig selv.",
-        "completion": "Cobb sendte dig helskindet op ad vejen, gjorde han? God mand. Han har holdt de portlygter tændt i tredive år, og skoven er aldrig kommet forbi ham. Velkommen til Galgesø, {playerName}. Pas på klokkerne.",
+        "title": "The Bells of Gibbetmere",
+        "text": "Hear that tolling, {playerName}? That is Gibbetmere, up the north road, ringing its dead to sleep. Sexton Marrow keeps the count of every soul under the canopy, living and buried. Go and be counted, before the wood counts you itself.",
+        "completion": "Cobb sent you up the road whole, did he? Good man. He has kept those gate lanterns lit for thirty years, and the wood has never once got past him. Welcome to Gibbetmere, {playerName}. Mind the bells.",
         "objectives": {
           "0": {
             "label": "Meld dig til Graver Marrow"
@@ -14136,7 +14136,7 @@ export const da_DK: EnTranslations = {
       },
       "q_ww_candles_at_the_bounds": {
         "title": "Lys ved Grænsestenene",
-        "text": "Fire grænsesten omringer Galgesø, {playerName}, en på hver vej ud, og et gravlys brænder på hver sten. Mens de brænder, forbliver de begravede begravet. Silen har druknet dem, alle fire, og jeg er for gammel til at gå grænserne alene. Tag min tændstok og tænd dem igen, hurtigt.",
+        "text": "Four boundary stones ring Gibbetmere, {playerName}, one on each road out, and a grave-candle burns on every stone. While they burn, the buried stay buried. The drizzle has drowned them, all four, and I am too old to walk the bounds alone. Take my taper and relight them, quickly.",
         "completion": "Brænder alle fire? Så træk vejret, {playerName}. Du hørte det ikke, men hele landsbyen gjorde: klokkerne ringede lettere, i det øjeblik den sidste væge fangede ild.",
         "objectives": {
           "0": {
@@ -14166,7 +14166,7 @@ export const da_DK: EnTranslations = {
       },
       "q_ww_what_the_bark_holds": {
         "title": "Hvad Barken Rummer",
-        "text": "I Den Hængende Lysning øst for Galgesø hænger spinderne deres silkeviklede døde fra grenene, og gravbark-sjokkerne står vagt derunder som tålmodige ligbærere. Det er vores folk deroppe, {playerName}. Bryd fem sjokkere, skær tre af de viklede døde ned, og bring dem hjem til jord.",
+        "text": "In the Hanging Glade east of Gibbetmere the spinners hang their silk-wrapped dead from the boughs, and the gravenbark shamblers stand guard beneath like patient pallbearers. Those are our people up there, {playerName}. Break five shamblers, cut down three of the wrapped dead, and bring them home to soil.",
         "completion": "Tre sjæle tilbage under ærlig jord før mørkets frembrud. Sjokkerne vokser ud igen, det gør bark altid, men i aften hænger lysningen tom, og det er nok.",
         "objectives": {
           "0": {
@@ -14180,17 +14180,17 @@ export const da_DK: EnTranslations = {
       "q_ww_walking_mosley_home": {
         "title": "Mosley Bragt Hjem",
         "text": "Min graver Mosley tog kapelvejen for tre dage siden for at åbne en grav på den gamle kirkegård, og udgravningen styrtede sammen over ham. Han krabbede sig ud, den tåbe lever, men han sidder sammenkrøbet ved kapelgravene og vil ikke bevæge sig for spindere på vejen. Følg ham hjem, {playerName}. Jeg kan ikke ringe med klokkerne for en levende mand.",
-        "completion": "Han kom gennem porten på sine egne to ben, sværgende på at han fra nu af ikke vil grave dybere end en majroeseng. Han er tilbage på kirkegården til søndag, det er de altid. Tak, {playerName}. Galgesø holder på sit folk, det er hele vores lov.",
+        "completion": "He came through the gate on his own two feet, swearing he will dig nothing deeper than a turnip bed from now on. He will be back at the yard by Sunday, they always are. Thank you, {playerName}. Gibbetmere keeps its people, that is the whole of our law.",
         "objectives": {
           "0": {
-            "label": "Graver Mosley bragt sikkert tilbage til Galgesø"
+            "label": "Gravedigger Mosley walked safely back to Gibbetmere"
           }
         }
       },
       "q_ww_horn_of_the_huntsman": {
         "title": "Jægerens Horn",
         "text": "Du har hørt hornet nu, {playerName}, tyndt og fjernt, lyden hele skoven holder vejret for. Den Blege Jæger rider gennem sin lysning nord for her, og hvert grav han passerer, bliver mere lavvandet. Han var engang et menneske, og han blev begravet forkert, og jeg er færdig med at lade som om, bøn kan klare det. Tag en ven med, tag to, og kast ham af hesten.",
-        "completion": "Hornet stoppede midt i en tone. Hver klokke i Galgesø ringede en gang, af sig selv, og så blev skoven mere stille, end jeg har hørt den i tredive år. Du har fuldført det ritual, jeg ikke kunne, {playerName}. Bær dette, og gå under bladerdaget uden frygt.",
+        "completion": "The horn stopped mid-note. Every bell in Gibbetmere rang once, on its own, and then the wood went quieter than I have heard it in thirty years. You have done the rite I could not, {playerName}. Wear this, and walk under the canopy unafraid.",
         "objectives": {
           "0": {
             "label": "Den Blege Jæger kastet af hesten"
@@ -14239,11 +14239,11 @@ export const da_DK: EnTranslations = {
       },
       "q_pr_the_man_who_went_in": {
         "title": "Manden Der Gik Ind",
-        "text": "Dykkerne vil ikke træde forbi trælinjen, {playerName}, og jeg vil ikke bede dem om det. Du har hørt trommerne nu: det gør alle, inden den anden nat. En mand på denne ø er nogensinde gået mod den lyd og kommet tilbage. Okku. Han kampere under de store banyantræer ved Rankefaldet, dybt oppe ad Filtvejen. Find ham, og spørg ham, hvad det grønne skjuler.",
+        "text": "Dykkerne vil ikke træde forbi trælinjen, {playerName}, og jeg vil ikke bede dem om det. Du har hørt trommerne nu: det gør alle, inden den anden nat. En mand på denne ø er nogensinde gået mod den lyd og kommet tilbage. Okrim. Han kampere under de store banyantræer ved Rankefaldet, dybt oppe ad Filtvejen. Find ham, og spørg ham, hvad det grønne skjuler.",
         "completion": "Isha sendte dig? Perlemoderen har ikke sagt mit navn i årevis. Sæt dig uden for rankernes rækkevidde, {playerName}, så vil jeg fortælle dig, hvad jeg ved: trommerne er ikke faren. De er advarslen.",
         "objectives": {
           "0": {
-            "label": "Find Okku ved Rankefaldet"
+            "label": "Find Okrim ved Rankefaldet"
           }
         }
       },
@@ -14722,7 +14722,7 @@ export const da_DK: EnTranslations = {
             "label": "Glimmersøen"
           },
           "7": {
-            "label": "Ormekultens Telte"
+            "label": "Broodsworn Tents"
           },
           "8": {
             "label": "Genfærdsmarkerne"
@@ -14734,10 +14734,10 @@ export const da_DK: EnTranslations = {
       },
       "veiled_hollow": {
         "name": "Den Tilslørede Hule",
-        "welcome": "Luften summer af gammel magi. Opsøg Vogter Saelwyn under Ældreglans store træ.",
+        "welcome": "The air hums with old magic. Seek Keeper Saelwyn beneath the great tree of Eldershine.",
         "pois": {
           "0": {
-            "label": "Ældreglans"
+            "label": "Eldershine"
           },
           "1": {
             "label": "Skumringsfald-Grotten"
@@ -14875,7 +14875,7 @@ export const da_DK: EnTranslations = {
             "label": "Natporten"
           },
           "2": {
-            "label": "Månebrønden"
+            "label": "The Moonspring"
           },
           "3": {
             "label": "Skumringsmarken"
@@ -14890,10 +14890,10 @@ export const da_DK: EnTranslations = {
       },
       "wraithwood": {
         "name": "Genfærdsskoven",
-        "welcome": "Bladerdaget lukker sig over vejen som et låg. Hold dig til Galgesøs lygter, og svar ikke, hvis skoven kalder dit navn.",
+        "welcome": "The canopy closes over the road like a lid. Keep to the lanterns of Gibbetmere, and do not answer if the wood calls your name.",
         "pois": {
           "0": {
-            "label": "Galgesø"
+            "label": "Gibbetmere"
           },
           "1": {
             "label": "Kragporten"

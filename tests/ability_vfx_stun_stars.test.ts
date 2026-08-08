@@ -531,7 +531,7 @@ describe('online mirror parity', () => {
           f: 0,
           hp: 100,
           mhp: 100,
-          auras: [{ id: 'storm_bolt_stun', name: 'Storm Bolt', kind: 'stun', rem: 2.5, dur: 3 }],
+          auras: [{ id: 'storm_bolt_stun', name: 'Thunderhurl', kind: 'stun', rem: 2.5, dur: 3 }],
         },
       ],
     });
