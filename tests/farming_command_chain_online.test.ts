@@ -260,13 +260,13 @@ describe('the captured client frames reach the sim through the real dispatch', (
 // The self-mirror convergence contract for the plant command.
 //
 // A successful plant SPENDS the seed through ctx.removeItem, which emits no
-// loot event, and 'plant_crop' is deliberately absent from HEAVY_SELF_CMDS, so
-// the ONLY thing that can re-diff the planter's bags is 'farmPlanted' being a
-// HEAVY_SELF_EVENTS member. Drop that membership and every other assertion in
-// this file stays green while the planter's client keeps showing a seed it no
-// longer owns until the staggered refresh, and their next plant is refused
-// sim-side for a seed the mirror still shows: a spurious no_seed bug. This flag
-// IS the membership. (The toolEffectResult precedent in
+// loot event. 'plant_crop' IS a HEAVY_SELF_CMDS member (belt and braces; see
+// the WHAT THEY DO NOT PIN block below), so these arms isolate the EVENT
+// membership by clearing the receipt-time dirty flag after handleMessage and
+// before the routing tick: any dirty state observed after that clear is the
+// routed farmPlanted event's doing alone. Drop the HEAVY_SELF_EVENTS
+// membership and the positive arm reds, exactly as checked the hard way when
+// it was written. (The toolEffectResult precedent in
 // tests/professions_tool_effect_slot_online.test.ts.)
 function routeTick(server: GameServer): void {
   (server as unknown as { routeEvents(e: SimEvent[]): void }).routeEvents(server.sim.tick());
@@ -310,8 +310,10 @@ describe('farmPlanted is a HEAVY_SELF_EVENTS member: the planter self-mirror re-
       session,
       JSON.stringify({ t: 'cmd', cmd: 'plant_crop', bed: BED, crop: CROP }),
     );
-    // plant_crop is NOT in HEAVY_SELF_CMDS, so any dirty flag below is the
-    // EVENT's doing and not the command's receipt.
+    // plant_crop IS in HEAVY_SELF_CMDS, and its receipt has already set the
+    // flag by now: clearing here is what isolates the EVENT membership, so
+    // the dirty state asserted below is the routed farmPlanted's doing and
+    // never the command receipt's.
     clearHeavyDirty(session);
     routeTick(server);
 
@@ -441,5 +443,117 @@ describe('a plot change reaches the planter in the very next snapshot', () => {
     // member: harvest_crop needs its own entry, and this is what proves it.
     expect(server.sim.meta(pid)?.farmPlots.has(BED)).toBe(false);
     expect(lastSnap(fc.sent).self.fplot).toEqual([]);
+  });
+});
+
+// EVENT DELIVERY over the real routing path (QA round). Farming's ENTIRE
+// online feedback channel (the chat lines, the husk line, every refusal toast)
+// is these four personal events reaching the actor's socket: nothing else in
+// this suite proved delivery, so a future interest-scope or suppression filter
+// quietly swallowing non-combat personal events would have shipped a silently
+// mute farming loop. Frames are read off the same fake sockets the broadcast
+// suite uses; farm events are pid-scoped personal, so a bystander standing at
+// the SAME bed must receive nothing.
+describe('the four farm events reach the actor, and only the actor', () => {
+  function joinWithSocket(server: GameServer, id: number, name: string) {
+    const fc = fakeWs();
+    const session = server.join(fc.ws as never, id, id, name, 'warrior', null);
+    if ('error' in session) throw new Error(session.error);
+    session.blockListLoaded = true;
+    return { session, fc };
+  }
+
+  function farmEvents(sent: unknown[], type: string): { pid?: number }[] {
+    return (sent as { t?: string; list?: { type?: string; pid?: number }[] }[])
+      .filter((m) => m.t === 'events')
+      .flatMap((m) => m.list ?? [])
+      .filter((e) => e.type === type) as { pid?: number }[];
+  }
+
+  it('delivers farmPlanted and farmDenied to the planter, never to a bystander', () => {
+    const server = new GameServer();
+    const { session, fc } = joinWithSocket(server, 1, 'Actor');
+    const { session: bystander, fc: bystanderFc } = joinWithSocket(server, 2, 'Bystander');
+    const pid = session.pid as number;
+    standAtBed(server, pid, BED);
+    standAtBed(server, bystander.pid as number, BED);
+    server.sim.addItem('vale_wheat_seed', 1, pid);
+    routeTick(server);
+    fc.sent.length = 0;
+    bystanderFc.sent.length = 0;
+
+    server.handleMessage(
+      session,
+      JSON.stringify({ t: 'cmd', cmd: 'plant_crop', bed: BED, crop: CROP }),
+    );
+    routeTick(server);
+    expect(farmEvents(fc.sent, 'farmPlanted')).toHaveLength(1);
+    expect(farmEvents(fc.sent, 'farmPlanted')[0].pid).toBe(pid);
+    // Personal means personal: the bystander at the same bed sees nothing.
+    expect(farmEvents(bystanderFc.sent, 'farmPlanted')).toHaveLength(0);
+
+    // A refusal reaches the actor the same way (the empty pouch: gate 8). The
+    // flavor cast from the plant above must clear first, or the busy gate
+    // answers through the shared error line instead of farmDenied.
+    const actor = server.sim.entities.get(pid);
+    if (actor) {
+      actor.castingAbility = null;
+      actor.castRemaining = 0;
+    }
+    fc.sent.length = 0;
+    server.handleMessage(
+      session,
+      JSON.stringify({ t: 'cmd', cmd: 'plant_crop', bed: 'bed_eastbrook_2', crop: CROP }),
+    );
+    routeTick(server);
+    expect(farmEvents(fc.sent, 'farmDenied')).toHaveLength(1);
+    expect(farmEvents(bystanderFc.sent, 'farmDenied')).toHaveLength(0);
+  });
+
+  it('delivers farmHarvested for a ready plot and farmWithered for a doomed one', () => {
+    const server = new GameServer();
+    const { session, fc } = joinWithSocket(server, 1, 'Reaper');
+    const pid = session.pid as number;
+    standAtBed(server, pid, BED);
+    server.sim.addItem('vale_wheat_seed', 2, pid);
+    server.handleMessage(
+      session,
+      JSON.stringify({ t: 'cmd', cmd: 'plant_crop', bed: BED, crop: CROP }),
+    );
+    const meta = server.sim.meta(pid);
+    const plot = meta?.farmPlots.get(BED);
+    if (!plot) throw new Error('the plant did not land');
+    plot.readyAtMs = 0;
+    plot.survivalRoll = 0; // survives at any skill
+    const player = server.sim.entities.get(pid);
+    if (player) {
+      player.castingAbility = null;
+      player.castRemaining = 0;
+    }
+    routeTick(server);
+    fc.sent.length = 0;
+    server.handleMessage(session, JSON.stringify({ t: 'cmd', cmd: 'harvest_crop', bed: BED }));
+    routeTick(server);
+    expect(farmEvents(fc.sent, 'farmHarvested')).toHaveLength(1);
+
+    // And the withered twin, through the same live path.
+    server.handleMessage(
+      session,
+      JSON.stringify({ t: 'cmd', cmd: 'plant_crop', bed: BED, crop: CROP }),
+    );
+    const doomed = meta?.farmPlots.get(BED);
+    if (!doomed) throw new Error('the second plant did not land');
+    doomed.readyAtMs = 0;
+    doomed.survivalRoll = 0.99; // loses to the 0.85 chance at skill 0
+    if (player) {
+      player.castingAbility = null;
+      player.castRemaining = 0;
+    }
+    routeTick(server);
+    fc.sent.length = 0;
+    server.handleMessage(session, JSON.stringify({ t: 'cmd', cmd: 'harvest_crop', bed: BED }));
+    routeTick(server);
+    expect(farmEvents(fc.sent, 'farmWithered')).toHaveLength(1);
+    expect(farmEvents(fc.sent, 'farmHarvested')).toHaveLength(0);
   });
 });
