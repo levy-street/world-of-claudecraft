@@ -122,7 +122,10 @@ export function completeSunderCast(ctx: SimContext, p: Entity, meta: PlayerMeta)
   // The phase 03 QA amendment's re-check: re-resolve the selected copy at
   // completion and refuse if it moved or merged (inv_sort's consolidation
   // splice shifts indices exactly when it empties a donor stack).
-  if (slotIndex !== undefined && disenchantVictimPin(meta.inventory[slotIndex]) !== session.targetPin) {
+  if (
+    slotIndex !== undefined &&
+    disenchantVictimPin(meta.inventory[slotIndex]) !== session.targetPin
+  ) {
     ctx.error(meta.entityId, 'The item moved; sundering canceled.');
     return;
   }
@@ -136,6 +139,13 @@ export function completeSunderCast(ctx: SimContext, p: Entity, meta: PlayerMeta)
     return;
   }
   const def = ITEMS[itemId];
-  ctx.addItem(SUNDERED_ESSENCE_ITEM_ID, SUNDERED_ESSENCE_YIELD, meta.entityId, { callerLogs: true });
-  ctx.emit({ type: 'log', text: `You sunder ${def?.name ?? itemId} into Sundered Essence.`, color: '#c9f', pid: meta.entityId });
+  ctx.addItem(SUNDERED_ESSENCE_ITEM_ID, SUNDERED_ESSENCE_YIELD, meta.entityId, {
+    callerLogs: true,
+  });
+  ctx.emit({
+    type: 'log',
+    text: `You sunder ${def?.name ?? itemId} into Sundered Essence.`,
+    color: '#c9f',
+    pid: meta.entityId,
+  });
 }

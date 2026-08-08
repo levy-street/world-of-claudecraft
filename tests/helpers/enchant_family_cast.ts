@@ -14,13 +14,6 @@ import {
   TOOL_RECHARGE_CAST_ID,
 } from '../../src/sim/types';
 
-function playerPair(sim: Sim, pid: number): { meta: PlayerMeta; p: Entity } {
-  const meta = sim.players.get(pid) as PlayerMeta | undefined;
-  const p = (sim as unknown as { entities: Map<number, Entity> }).entities.get(pid);
-  if (!meta || !p) throw new Error('player missing for cast complete');
-  return { meta, p };
-}
-
 export function completeCraftCast(sim: Sim, pid = sim.playerId): void {
   const meta = sim.players.get(pid) as PlayerMeta | undefined;
   const p = (sim as unknown as { entities: Map<number, Entity> }).entities.get(pid);

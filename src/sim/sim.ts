@@ -386,8 +386,6 @@ import {
   isEnchantedInstance,
 } from './professions/enchanting';
 import * as fishing from './professions/fishing';
-import * as masterwroughtMaterials from './professions/masterwrought_materials';
-import * as sundering from './professions/sundering';
 import type { RespecPaymentTier } from './professions/focus';
 import * as professionsFocus from './professions/focus';
 import {
@@ -407,6 +405,7 @@ import {
   normalizeHobbyMemoryOnLoad,
 } from './professions/hobby_memory';
 import type { MasterworkProc } from './professions/masterwork';
+import * as masterwroughtMaterials from './professions/masterwrought_materials';
 import { applyMasteryReset, updateMasteryResetNotices } from './professions/mastery_reset';
 import {
   isStationActive,
@@ -426,6 +425,7 @@ import {
   salvageItem as salvageItemImpl,
 } from './professions/salvage';
 import { cancelProfessionSessionOnDisplacement } from './professions/session_teardown';
+import * as sundering from './professions/sundering';
 import {
   applyPairTransitionTierMail,
   normalizeTierMailOnLoad,

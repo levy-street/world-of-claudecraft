@@ -25,7 +25,6 @@ import {
   WELCOME_LETTER,
   WYRMFALL_CORE_LETTER,
 } from '../content/letters';
-import { WYRMFALL_CORE_ITEM_ID } from '../professions/masterwrought_materials';
 import { ITEMS } from '../data';
 import { boundCraftedRecipeIdOnLoad, warnDroppedInstanceKeys } from '../item_instance_load';
 import { itemInstancePayloadsEqual } from '../item_instance_merge';
@@ -38,6 +37,7 @@ import {
   sanitizeEscrowSlot,
 } from '../item_instance_transfer';
 import { removeVendorSellUnits } from '../items';
+import { WYRMFALL_CORE_ITEM_ID } from '../professions/masterwrought_materials';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import {
