@@ -428,7 +428,7 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       },
       {
         "id": "heroic_leap",
-        "name": "Heroic Leap"
+        "name": "Vaulting Charge"
       },
       {
         "id": "cleave",
@@ -876,7 +876,7 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       },
       {
         "id": "vanish",
-        "name": "Smokestep"
+        "name": "Smokefade"
       },
       {
         "id": "instant_poison",
@@ -1030,7 +1030,7 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       },
       {
         "id": "restoration",
-        "name": "Spiritmend",
+        "name": "Spiritcall",
         "role": "healer",
         "signature": "chain_heal"
       }
@@ -1163,7 +1163,7 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       },
       {
         "id": "blink",
-        "name": "Flickerstep"
+        "name": "Flitstep"
       }
     ],
     "abilities": [
@@ -1189,7 +1189,7 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       },
       {
         "id": "blink",
-        "name": "Flickerstep"
+        "name": "Flitstep"
       },
       {
         "id": "ice_block",
@@ -1241,7 +1241,7 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       },
       {
         "id": "counterspell",
-        "name": "Spellbreak"
+        "name": "Spellsever"
       },
       {
         "id": "fire_blast",
@@ -1265,7 +1265,7 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       },
       {
         "id": "frozen_orb",
-        "name": "Frozen Orb"
+        "name": "Frostglobe"
       },
       {
         "id": "blizzard",
@@ -1273,11 +1273,11 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       },
       {
         "id": "icy_veins",
-        "name": "Icy Veins"
+        "name": "Coldsurge"
       },
       {
         "id": "glacial_spike",
-        "name": "Glacial Spike"
+        "name": "Rimeneedle"
       },
       {
         "id": "glacial_front",
@@ -1435,7 +1435,7 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       },
       {
         "id": "summon_voidwalker",
-        "name": "Summon Gloomshade"
+        "name": "Summon Duskmurk"
       },
       {
         "id": "curse_of_agony",
@@ -1763,7 +1763,7 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
       "Drogmar's War-Camp",
       "Stormcrag",
       "The Glimmermere",
-      "Wyrmcult Tents",
+      "Broodsworn Tents",
       "Revenant Fields",
       "Gravewyrm Sanctum"
     ],
@@ -1785,9 +1785,9 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
     "min": 15,
     "max": 20,
     "biome": "dusk",
-    "hub": "Eldergleam",
+    "hub": "Eldershine",
     "pois": [
-      "Eldergleam",
+      "Eldershine",
       "Duskfall Cave",
       "Duskfall Overlook",
       "Elder Grove",
@@ -1796,7 +1796,7 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
       "Crystalline Shallows",
       "The Gleaming Deep"
     ],
-    "welcome": "The air hums with old magic. Seek Keeper Saelwyn beneath the great tree of Eldergleam.",
+    "welcome": "The air hums with old magic. Seek Keeper Saelwyn beneath the great tree of Eldershine.",
     "families": [
       "beast",
       "burrower",
@@ -1903,7 +1903,7 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
     "pois": [
       "Moonrest",
       "The Nightgate",
-      "The Moonwell",
+      "The Moonspring",
       "Gloamfield",
       "The Standing Vigil",
       "The Sleepless Barrow"
@@ -1922,16 +1922,16 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
     "min": 20,
     "max": 20,
     "biome": "haunt",
-    "hub": "Gallowmere",
+    "hub": "Gibbetmere",
     "pois": [
-      "Gallowmere",
+      "Gibbetmere",
       "The Crowgate",
       "Widow's Thicket",
       "The Hanging Glade",
       "The Mournstone Chapel",
       "The Huntsman's Clearing"
     ],
-    "welcome": "The canopy closes over the road like a lid. Keep to the lanterns of Gallowmere, and do not answer if the wood calls your name.",
+    "welcome": "The canopy closes over the road like a lid. Keep to the lanterns of Gibbetmere, and do not answer if the wood calls your name.",
     "families": [
       "spider",
       "ogre",
@@ -2095,7 +2095,7 @@ export const GUIDE_WARLOCK_PETS: GuideWarlockPet[] = [
   },
   {
     "id": "gloomshade",
-    "name": "Gloomshade",
+    "name": "Duskmurk",
     "model": "mob_demon",
     "tint": "#3a3a6e",
     "tintStrength": 0.5,
@@ -2582,7 +2582,7 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "still": "/guide-stills/mob_kobold__cfe0ea__s20.webp"
       },
       {
-        "name": "Harvest Sprite",
+        "name": "Gleaning Sprite",
         "min": 18,
         "max": 19,
         "rare": false,
@@ -2686,7 +2686,7 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "still": "/guide-stills/mob_dark_caster__884ea0__s50.webp"
       },
       {
-        "name": "Wyrmcult Zealot",
+        "name": "Broodsworn Zealot",
         "min": 17,
         "max": 19,
         "rare": false,
@@ -2697,7 +2697,7 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "still": "/guide-stills/mob_bandit__6b3a32__s30.webp"
       },
       {
-        "name": "Wyrmcult Necromancer",
+        "name": "Broodsworn Necromancer",
         "min": 18,
         "max": 19,
         "rare": false,
@@ -2964,7 +2964,7 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "still": "/guide-stills/mob_elemental__bfe0e8.webp"
       },
       {
-        "name": "Nightkin Stargazer",
+        "name": "Gloamkin Stargazer",
         "min": 20,
         "max": 20,
         "rare": false,
@@ -3564,7 +3564,7 @@ export const GUIDE_DEEDS: GuideDeed[] = [
   },
   {
     "id": "dgn_sanctum_speed",
-    "name": "Sanctum Sprint",
+    "name": "Sanctum Footrace",
     "category": "dungeon",
     "renown": 25,
     "feat": false,
@@ -5073,7 +5073,7 @@ export const GUIDE_DEEDS: GuideDeed[] = [
   },
   {
     "id": "chr_nightbloom_first_cast",
-    "name": "A Ripple on the Moonwell",
+    "name": "A Ripple on the Moonspring",
     "category": "chronicle",
     "renown": 5,
     "feat": false
@@ -5130,11 +5130,11 @@ export const GUIDE_DEEDS: GuideDeed[] = [
   },
   {
     "id": "pvp_honor_knight_lieutenant",
-    "name": "Knight-Lieutenant",
+    "name": "Banneret",
     "category": "pvp",
     "renown": 25,
     "feat": false,
-    "rewardTitle": "Knight-Lieutenant"
+    "rewardTitle": "Banneret"
   },
   {
     "id": "pvp_honor_field_marshal",
