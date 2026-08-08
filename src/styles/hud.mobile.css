@@ -2673,18 +2673,22 @@
   body.mobile-touch #daily-rewards-window {
     z-index: 95;
   }
-  /* Issue 1577 round 2 (5): the Daily Rewards window's entries (intro, the daily
-     summary, the spin section, the Verify Wallet card, tasks, leaderboard) used
-     to stack in a single tall column, wasting the wide landscape viewport and
-     forcing a long scroll. Flow them into 2 balanced columns; break-inside:avoid
-     keeps each card whole across the column break. */
-  body.mobile-touch #daily-rewards-window:not(.store-active) .dr-body {
-    column-count: 2;
-    column-gap: 12px;
+  /* Keep Daily Rewards in one vertical flow on touch. The rewards-only window
+     is width-capped for readability, while its body scrolls vertically and
+     suppresses horizontal overflow so no content is stranded off-screen. */
+  body.mobile-touch #daily-rewards-window:not(.store-active) {
+    width: min(560px, calc(var(--app-vw) / var(--ui-scale, 1) - 20px));
   }
-  body.mobile-touch #daily-rewards-window:not(.store-active) .dr-body > * {
-    break-inside: avoid;
-    margin-bottom: 10px;
+  body.mobile-touch #daily-rewards-window:not(.store-active) .dr-body {
+    columns: initial;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  /* The spin overlay is appended directly to body. Keep it above the raised
+    mobile #ui window layer and the mobile window backdrop. */
+  body.mobile-touch .dr-spin-overlay {
+    z-index: 101;
   }
   body.mobile-touch #daily-rewards-window {
     max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 20px);
@@ -2694,6 +2698,28 @@
     max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 116px);
     padding: 10px;
   }
+  body.mobile-touch .dr-spin-stage {
+    width: min(360px, calc(var(--app-vw, 100vw) - 24px), calc(var(--app-vh, 100dvh) - 24px));
+  }
+  body.mobile-touch .dr-spin-wheel-big {
+    width: 300px;
+    max-width: 84%;
+  }
+  body.mobile-touch .dr-spin-wheel-big span {
+    transform: rotate(calc(var(--i) * 45deg + 22.5deg)) translateY(-106px)
+      rotate(calc(var(--i) * -45deg - 22.5deg));
+  }
+  body.mobile-touch .dr-spin-result {
+    width: 120px;
+    height: 120px;
+    font-size: 18px;
+  }
+  body.mobile-touch .dr-spin-pointer {
+    border-left-width: 13px;
+    border-right-width: 13px;
+    border-top-width: 24px;
+  }
+  /* Mobile touch store */
   body.mobile-touch .woc-store-tabs button {
     min-width: 112px;
     min-height: 44px;
