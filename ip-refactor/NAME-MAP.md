@@ -1211,4 +1211,6 @@ plus the hardcoded list.
 | dgn_sanctum_speed | Sanctum Sprint | Sanctum Footrace | deed | rename |
 | pvp_honor_knight_lieutenant | Knight-Lieutenant | Banneret | deed-title | rename |
 | pvp_honor_knight_lieutenant | Banneret | Fieldreaver | deed-title | release supersede (v0.36.0 merge, PR #3133; the release also re-cut Sergeant to Linebreaker and Field Marshal to Warcrowned) |
+| infernal_nouns (INFERNAL_NOUNS pool) | Hellfire Citadel | Pitfire Citadel | rift-name | rename (QA round; composed display name, pool value display-only) |
+| detonate_hellfire_brand | Hellfire Brand | (key stripped, dead) | catalog | strip (QA round; no emit existed) |
 | shardlord_kazzix_frostbite | Winterbite | Wintergnaw | mechanic | rename |

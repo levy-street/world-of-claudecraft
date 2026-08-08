@@ -121,6 +121,42 @@ lowercase generic vocabulary in dev comments ("imp") are id or dev surfaces,
 not display names, and stay frozen by the same rule that keeps
 Nightkin_Attack.
 
+## QA addendum: the domains the enumerator missed (phase 03 QA, 2026-08-08)
+
+The inventory swept content-table and resolved-catalog NAME ROWS, so proper
+nouns living in code constants, UI catalogs, and system-message text were never
+enumerated: composed rift set-piece names (a noun POOL, not a name row), venue
+and event names, service and system brands, and bot opponent name pools. The QA
+coverage agent found the class and one live collision in it; every name below
+was web-verified at QA (quoted exact-phrase searches, 2026-08-08). These rows
+extend the appendix counts.
+
+| Name | Verdict | Detail | Refs |
+|---|---|---|---|
+| Hellfire Citadel (composed set-piece rift name) | RENAMED | -> Pitfire Citadel (WoW's Hellfire Citadel: the TBC instanced dungeon complex and the 6.2 raid, verbatim, same instanced-PvE role; the Pitfire Ring / Pitsteel Sweep family mapping; pool value display-only, seed math unchanged; pinned in originality_renames) | riftName:infernal (INFERNAL_NOUNS) |
+| Infernal Citadel (theme name + composed name) | BORDERLINE (maintainer) | multi-property shared composition, kept under bar rule 2, RECORDED because one hit is same-role: Neverwinter's Infernal Citadel dungeon (Infernal Descent), plus TWW3's Infernal Citadel building and a Roblox map | riftTheme:infernal |
+| Brimstone Citadel (composed) | CLEAR | near-hit noted: WoW quest 'Hellfire Citadel: Hellfire and Brimstone'; no game claims the composed name | riftName:infernal |
+| Pactbound Citadel (composed) | CLEAR | Warhammer 40k ships a 'Pactbound Zealots' detachment; single-word overlap only | riftName:infernal |
+| Ashen Coliseum | CLEAR | the 2018 game 'Ashen' claims no coliseum | venue:arena |
+| Thornhollow Fields | CLEAR | Forgotten Realms' two-word 'Thorn Hollow' noted; composed name unclaimed | venue:battleground |
+| The Vale Cup | CLEAR |  | event:vale_cup |
+| Protect Yumi | GENERIC | escort-mode phrasing over the audited NPC Yumi | mode:yumi |
+| Ravenpost | CLEAR | nearest: the unrelated indie 'Ravenhaul'; unclaimed | brand:mail |
+| Book of Deeds | GENERIC | plain-English deed-book vocabulary | system:deeds |
+| Claudium | CLEAR | own-brand coin | brand:currency |
+| Claudemoon | CLEAR | own-brand coin | brand:world |
+| Vale Cup bot names (Old Hobb, Reeve Marlow, Tally Cooper, Bess Furrow, Wick Thatcher, Sorrel Dray, Hen Barrow, Pip Osier, Mott Granger) | GENERIC | rustic English trade-name vocabulary; one group row for nine names | bots:vale_cup |
+| Fiesta bot names (Sir Botsworth, Botzo the Arcane, Sneakbot) | GENERIC | joke coinages; one group row for three names | bots:fiesta |
+
+Also recorded at QA: the dead `detonateHellfireBrand` catalog key (no emit
+anywhere in sim or server) was stripped with its matcher rule and locale rows
+under the residual-coin precedent; its three dead siblings (detonatePactSeal,
+detonateBloodRite, detonatePitSentence) carry no coin and are left for a
+cleanup phase. The non-English overlay surfaces gained their own guard,
+tests/overlay_ip_scrub.test.ts (coin denylist over every overlay, deed chunk,
+and sim matcher value, plus per-locale script-family checks), because both QA
+blockers lived where ip_scrub and originality_renames cannot see.
+
 ## Registry verdicts (the packet's new names)
 
 Confirmed as authored (20 of 23): Masterwrought, Perfecting, Wyrmfall Core,
@@ -220,15 +256,23 @@ Amberfall Harvest, Wrathwing... (renamed), Hellfire... (renamed).
   protocol; several replaced non-Latin values were the other game's official
   localized coins (see the rename table note).
 
-## Appendix: per-name dispositions (2609 rows)
+## Appendix: per-name dispositions (2623 rows)
 
-2609 rows = the 2605 unique inventory names plus one sweep-emitted variant
+2623 rows = the 2605 unique inventory names plus one sweep-emitted variant
 ('Wildheart Basin', shard 10's un-articled duplicate of 'The Wildheart Basin';
 kept as its own row so the sweep output reconciles exactly), plus the three
 release-minted honor titles adopted at the v0.36.0 merge (Linebreaker,
-Fieldreaver, Warcrowned; see the merge supersession section).
-Counts: RENAMED 52 | BORDERLINE (maintainer) 15 | KEEP (flagged, kept) 92 |
-CLEAR 293 | GENERIC 2157. GENERIC = shared/plain vocabulary (no search hit
+Fieldreaver, Warcrowned; see the merge supersession section), plus the 14 QA
+addendum rows (two of them group rows covering the twelve bot names; see the
+QA addendum section).
+Counts: RENAMED 53 | BORDERLINE (maintainer) 16 | KEEP (flagged, kept) 95 |
+CLEAR 300 | GENERIC 2159. Three pre-QA rows were relabeled at QA with no
+rename: Splitshot CLEAR to KEEP and the two Mistveil items GENERIC to KEEP
+(known multi-property hits recorded on the rows). The body's Recorded for the
+maintainer items now carry the note on their appendix rows too (Aetherwell,
+Brother Halven, Brutok Skullsmasher, Gravelight, Summon Emberkin, Voidscar);
+the 42 'Enchant <Slot> - <Stat>' GENERIC rows are all covered by the scheme-wide
+maintainer record in the body and are not annotated row by row. GENERIC = shared/plain vocabulary (no search hit
 claimed); CLEAR = distinctive or coined, web-verified unclaimed by any other
 game; KEEP = flagged by a sweep or hunter agent and kept after adversarial
 verification plus hand judgment; refs are `domain:id` (display-only, ids
@@ -398,7 +442,7 @@ frozen).
 | Abysswrought Band | CLEAR |  | item:abysswrought_band |
 | Aether-Jouster Hover-Cycle | CLEAR |  | mount:aether_hover_cycle |
 | Aetherburst | CLEAR |  | ability:arcane_explosion |
-| Aetherwell | CLEAR |  | ability:evocation choiceRow:mag_r20_evocation |
+| Aetherwell | CLEAR | maintainer-recorded: see the Recorded for the maintainer section (timing-parallel / contemporaneous coin) | ability:evocation choiceRow:mag_r20_evocation |
 | Alchemist Verane | CLEAR |  | npc:alchemist_verane |
 | Archon Nyxaris | CLEAR |  | mob:rift_boss_arcane |
 | Ashspark Shiv | CLEAR |  | weaponSkin:ashspark_dagger |
@@ -418,8 +462,8 @@ frozen).
 | Bristleguard | CLEAR |  | ability:deterrence choiceRow:hun_r17_deterrence |
 | Brittlebreak | CLEAR |  | talentMastery:frost |
 | Broodmother Vysska | CLEAR |  | mob:rift_boss_venom |
-| Brother Halven | CLEAR |  | npc:brother_halven npc:brother_halven_marsh |
-| Brutok Skullsmasher | CLEAR |  | mob:brutok_skullsmasher |
+| Brother Halven | CLEAR | maintainer-recorded: see the Recorded for the maintainer section (timing-parallel / contemporaneous coin) | npc:brother_halven npc:brother_halven_marsh |
+| Brutok Skullsmasher | CLEAR | maintainer-recorded: see the Recorded for the maintainer section (timing-parallel / contemporaneous coin) | mob:brutok_skullsmasher |
 | Candleblind | CLEAR |  | delveAffix:candleblind |
 | Choirmend | CLEAR |  | ability:prayer_of_healing choiceRow:pri_r20_prayer_of_healing |
 | Choirmother Selthe | CLEAR |  | mob:choirmother_selthe |
@@ -498,7 +542,7 @@ frozen).
 | Graskbreaker Girdle | CLEAR |  | item:graskbreaker_girdle |
 | Grave of Captain Aldren | CLEAR |  | item:grave_sir_aldren |
 | Grave of High Priest Malric | CLEAR |  | item:grave_high_priest_malric |
-| Gravelight | CLEAR |  | augment:12 |
+| Gravelight | CLEAR | maintainer-recorded: see the Recorded for the maintainer section (timing-parallel / contemporaneous coin) | augment:12 |
 | Gravewyrm Sanctum | CLEAR |  | poi:2.9 dungeon:gravewyrm_sanctum |
 | Grubjaw the Glutton | CLEAR |  | mob:grubjaw |
 | Guisecraft | CLEAR |  | choiceRow:hun_r5_aspect_mastery |
@@ -611,11 +655,11 @@ frozen).
 | Snapdread | CLEAR |  | choiceRow:wlk_r17_improved_fear |
 | Spellgnaw | CLEAR |  | mobMechanic:grubjaw.purgeOnHit |
 | Spirit of Aldren | CLEAR |  | mob:nythraxis_heroic_warrior_add |
-| Splitshot | CLEAR |  | ability:multi_shot choiceRow:hun_r14_multi_shot |
+| Splitshot | KEEP | relabeled at QA: 'Split Shot' is a genre-wide ranged skill (FFXIV Machinist, Heroes of Hammerwatch); the fused token keeps it under bar rule 2 | ability:multi_shot choiceRow:hun_r14_multi_shot |
 | Springwell | CLEAR |  | ability:healing_stream choiceRow:sha_r11_healing_stream |
 | Staff of Velkhar | CLEAR |  | item:staff_of_velkhar item:heroic_staff_of_velkhar |
 | Stormcrag | CLEAR |  | poi:2.5 |
-| Summon Emberkin | CLEAR |  | ability:summon_imp |
+| Summon Emberkin | CLEAR | maintainer-recorded: see the Recorded for the maintainer section (timing-parallel / contemporaneous coin) | ability:summon_imp |
 | Summon Spellhound | CLEAR |  | ability:summon_felhunter |
 | Summon Warfiend | CLEAR |  | ability:summon_felguard |
 | Summon Wraithborn | CLEAR |  | ability:summon_doomguard |
@@ -659,7 +703,7 @@ frozen).
 | Viperfletch | CLEAR |  | choiceRow:hun_r14_serpents_venom |
 | Vision of Captain Aldren | CLEAR |  | mob:vision_aldren_warrior |
 | Voidfeast | CLEAR |  | ability:voidfeast choiceRow:wlk_r8_voidfeast |
-| Voidscar | CLEAR |  | riftTheme:5 |
+| Voidscar | CLEAR | maintainer-recorded: WoW Midnight Voidscar Arena is contemporaneous, ours shipped 2026-07-07; see the maintainer section | riftTheme:5 |
 | Voskar the Emberwing | CLEAR |  | mob:voskar_emberwing |
 | Warcrowned | CLEAR | release-minted (PR #3133 ip-safe re-cut, maintainer ruling); replaced the Field Marshal GENERIC keep at the v0.36.0 merge | deed:pvp_honor_field_marshal deedTitle:pvp_honor_field_marshal |
 | Warden Coalfast | CLEAR |  | npc:warden_coalfast |
@@ -1826,8 +1870,8 @@ frozen).
 | Mistbinder Kris | GENERIC |  | item:mistbinder_kris |
 | Mistcaller's Fang | GENERIC |  | item:mistcallers_fang |
 | Mistress of the Wreck Line | GENERIC |  | npcTitle:salvage_boss_ryna |
-| Mistveil Cord | GENERIC |  | item:mistveil_cord |
-| Mistveil Grips | GENERIC |  | item:mistveil_grips |
+| Mistveil Cord | KEEP | relabeled at QA: Mistveil is a known coin in Skyrim (Mistveil Keep) and MTG (Mistveil Plains); multi-property, kept under bar rule 2 | item:mistveil_cord |
+| Mistveil Grips | KEEP | relabeled at QA: same Mistveil multi-property record as Mistveil Cord | item:mistveil_grips |
 | Monarch's Crown | GENERIC |  | item:monarch_crown_helm |
 | Moon Boots | GENERIC |  | powerup:2 |
 | Moonbark Vestments | GENERIC |  | item:moonbark_vestments |
@@ -2293,7 +2337,7 @@ frozen).
 | Stalkers on the Ridge | GENERIC |  | quest:q_stalkers |
 | Starfall Basin | GENERIC |  | poi:3.4 |
 | Starfall Shard | GENERIC |  | item:starfall_shard |
-| Starfall, Judgment of the Heavens | GENERIC |  | weaponSkin:starfall_mace |
+| Starfall, Judgment of the Heavens | GENERIC | QA note: Starfall token shared with two Blizzard abilities, different role (skin/place vs star-rain spell); GENERIC stands under bar rule 2 | weaponSkin:starfall_mace |
 | Startle Shot | GENERIC |  | ability:startle_shot choiceRow:hun_r8_startle_shot |
 | Static Charge | GENERIC |  | mobMechanic:stormcrag_elemental.spellVuln |
 | Static Field | GENERIC |  | mobMechanic:rift_boss_storm.aoeSlow |

@@ -410,7 +410,10 @@ registry names verified CLEAR or GENERIC. Full verdicts: naming-audit.md.
   non-Latin renderings deliberately KEPT (87 rows: zh 绞湖镇/古辉镇/霜鬃/雾铸/墓花 etc.,
   recorded as intentional); guide regenerated; new literals pinned in
   tests/originality_renames.test.ts ("phase 03" describe); old names armed in
-  tests/ip_scrub.test.ts HARDCODED_VERBATIM + a NAME-MAP amendment section (36 rows).
+  tests/ip_scrub.test.ts HARDCODED_VERBATIM + a NAME-MAP amendment section (40 id rows:
+  the phase's 37, which encode 36 unique old-to-new pairs since Winterbite maps to
+  Wintergnaw at two ids, plus the three QA-round rows: the Fieldreaver supersede, the
+  Pitfire Citadel rename, and the dead Hellfire Brand strip).
 - Parity: 5 goldens legitimately shifted (frost_proc_orb, warlock_pet, pet_commands,
   talents_progression, warrior_row_capstones); re-minted via UPDATE_PARITY=1 and proven
   display-only by the rename state proof with the NEW slice-scoping mode
@@ -467,6 +470,26 @@ registry names verified CLEAR or GENERIC. Full verdicts: naming-audit.md.
   paths avoid them; the masterwrought suites (masterwrought_cap, recipe_pattern_items,
   recipe_pattern_tooltip_view) predate the EMPTY_TEST_WORLD gate-perf trim and could
   adopt it with per-suite validation.
+- Phase 03 QA round 2 (the QA fan-out over the phase + merge, 4 auditors + the
+  cross-platform-sync and qa-checklist reviewers; 25 + 3 + 6 findings, all triaged,
+  every fix applied). BLOCKERS found and fixed: the rift set-piece pool composed 'The
+  Hellfire Citadel' (WoW verbatim, same role) for 1 in 4 seeds, renamed to Pitfire and
+  pinned over pool AND composed surface; four Latin overlay rows still carried Wyrmcult
+  verbatim (id_ID x3, nl_NL fused), fixed in place per the sibling-row precedent; the
+  zh_TW/ja_JP sim matcher frostbite renderings were swapped (review-round regression),
+  unswapped. Also applied: legacy aliases for the two wire-carried renamed strings
+  (Winterbite, the Varric delve line; the Venomfire precedent, drop after v0.36.0),
+  Spiritcall's five non-Latin talent renderings, the dead Punishing Blows talent rows
+  (Crusader Strike coins) and the dead detonateHellfireBrand key stripped, the inert
+  abilities.ts locale arms refreshed, wrapped-comment and living-doc stragglers swept.
+  NEW GUARD: tests/overlay_ip_scrub.test.ts (coin denylist over every non-English
+  overlay/deed/matcher value + per-locale script-family checks, locale sets derived
+  from the live registries; both blockers proven red under it by mutation probe, and
+  the originality pin proven decisive the same way). Cleanup-phase notes: the three
+  dead detonate siblings (PactSeal/BloodRite/PitSentence, no coin); the pre-phase
+  shaman-kit old-name residue in comments and test fixtures (~20 files, earlier rename
+  wave, none player-visible); talent_i18n Latin semantic staleness for
+  Thunderhurl/Zealwing stays under obligation 3.
 - Standing rule codified per the maintainer's mid-phase instruction: every NEW
   player-visible proper noun is IP-checked at authoring time in the same change (root
   CLAUDE.md content bullet + src/sim/content/CLAUDE.md "Naming originality" section).

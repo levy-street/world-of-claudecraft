@@ -7,7 +7,7 @@
 | 02 | Pattern items and recipe learning | complete | 2026-08-07 | 2026-08-07 |
 | 02 QA | verify | complete | 2026-08-07 | 2026-08-07 |
 | 03 | IP naming sweep | complete | 2026-08-07 | 2026-08-07 |
-| 03 QA | verify | pending | | |
+| 03 QA | verify | complete | 2026-08-08 | 2026-08-08 |
 | 04 | Materials backbone | pending | | |
 | 04 QA | verify | pending | | |
 | 05 | Jewelcrafting base catalog | pending | | |
@@ -128,3 +128,20 @@ never future-PR items, per the delivery contract in `state.md`).
   arming + originality pins, parity re-mint proven by the slice-scoped rename state
   proof, wiki regenerated, and the standing authoring-time IP check codified in the
   root and src/sim/content CLAUDE.md files. Full ledger in state.md.
+
+- Phase 03 QA (verify): PASS-WITH-FOLLOWUPS. Release/v0.36.0 synced first (merge
+  ed51716964, 30 conflicts; the release's own honor-title re-cut supersedes the
+  phase's ladder verdicts: Linebreaker / Fieldreaver / Warcrowned adopted, docs
+  amended; 9-agent merge audit, 32 findings triaged). QA fan-out (4 auditors +
+  cross-platform-sync + qa-checklist) found and fixed two blockers the English-only
+  guards could not see: the composed 'The Hellfire Citadel' rift name (renamed
+  Pitfire, pinned) and residual Wyrmcult coins in four Latin overlay rows; plus the
+  swapped zh_TW/ja_JP frostbite renderings, deploy-window aliases, Spiritcall
+  non-Latin fills, dead-key strips, and the straggler sweep. New standing guard:
+  tests/overlay_ip_scrub.test.ts (non-English coin denylist + script-family checks,
+  probe-proven). Audit extended with the missed venue/brand/pool domain (14 addendum
+  rows, web-verified; appendix reconciled to 2623). Id-safety proven mechanically
+  (id-field inventory byte-identical base vs tip; shipped_item_ids untouched-green;
+  parity + slice-scoped rename proof green). Follow-ups are recorded in the state.md
+  QA bullets (upstream items and cleanup-phase notes), none blocking. Full ledger in
+  state.md.
