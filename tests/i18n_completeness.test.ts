@@ -171,6 +171,7 @@ describe('i18n whole-catalog completeness', () => {
       'hudChrome.claudium.balanceUnit', // "{amount} Claudium" - currency brand
       'hudChrome.claudium.storeCost', // "{amount} Claudium" - currency brand
       'guide.controls.discord', // "Discord" - brand (Guide controls-page action label)
+      'guide.glossary.claudiumTerm', // "Claudium" - the same currency brand as hudChrome.claudium.*
       'desktop.crash.title', // "World of ClaudeCraft" - brand (desktop crash dialog title)
       'auth.emailPlaceholder', // "you@example.com" - RFC 2606 example address, kept verbatim
       // Rift boss mechanic names: authored fantasy proper nouns that do not translate.

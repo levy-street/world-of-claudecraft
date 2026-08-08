@@ -3,6 +3,11 @@
 // affix names) is generated from the sim COLLAPSED_RELIQUARY_DELVE so it never drifts; the
 // explainer copy is curated guide prose. Spoiler-safe: no balance numbers, lock-grid layouts,
 // Marks prices, loot, or boss script. Modeled on dungeons.ts.
+//
+// The lock and rite sections describe the up-front bargain both finales ask for (the pick
+// ante in src/sim/lockpick.ts, the intensity choice in src/sim/delves/rite_tuning.ts) in
+// player terms only: which way the trade runs, never the step clocks, try counts, or the
+// reward table behind it.
 
 import { esc } from '../../ui/esc';
 import { formatNumber, t } from '../../ui/i18n';
@@ -71,13 +76,18 @@ export const delves: GuidePage = {
         ${section('guide.delvesPage.howHeading', p('guide.delvesPage.howBody'))}
         <div class="guide-dungeon-grid">${cards}</div>
         ${section('guide.delvesPage.companionHeading', p('guide.delvesPage.companionBody'))}
-        ${section('guide.delvesPage.lockpickHeading', p('guide.delvesPage.lockpickBody'))}
+        ${section(
+          'guide.delvesPage.lockpickHeading',
+          p('guide.delvesPage.lockpickBody') + p('guide.delvesPage.lockpickAnteBody'),
+        )}
+        ${section('guide.delvesPage.riteHeading', p('guide.delvesPage.riteBody'))}
         ${section('guide.delvesPage.tiersHeading', p('guide.delvesPage.tiersBody'))}
         ${section('guide.delvesPage.affixesHeading', `${p('guide.delvesPage.affixesBody')}${affixRow}`)}
         ${section('guide.delvesPage.marksHeading', p('guide.delvesPage.marksBody'))}
         ${section('guide.delvesPage.whereHeading', callout(p('guide.delvesPage.whereBody'), { variant: 'note' }))}
         ${related([
           { href: hrefFor('dungeons'), key: 'guide.nav.dungeons' },
+          { href: hrefFor('rifts'), key: 'guide.nav.rifts' },
           { href: hrefFor('world'), key: 'guide.nav.world' },
           { href: hrefFor('gear'), key: 'guide.nav.gear' },
           { href: hrefFor('classes'), key: 'guide.nav.classes' },
