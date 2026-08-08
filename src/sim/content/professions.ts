@@ -24,7 +24,7 @@ import { ZONE1_ZONE } from './zone1';
 import { ZONE2_ZONE } from './zone2';
 import { ZONE3_ZONE } from './zone3';
 
-export type GatheringProfessionId = 'mining' | 'logging' | 'herbalism' | 'fishing';
+export type GatheringProfessionId = 'mining' | 'logging' | 'herbalism' | 'fishing' | 'farming';
 
 export interface GatheringProfessionDef extends ProfessionRecord {
   id: GatheringProfessionId;
@@ -66,17 +66,27 @@ export const GATHERING_PROFESSIONS: Record<GatheringProfessionId, GatheringProfe
     icon: 'fishing',
     description: 'Reeling catches from the rivers and lakes across the zones.',
   },
+  farming: {
+    id: 'farming',
+    category: 'gathering',
+    maxSkill: 100,
+    name: 'Farming',
+    icon: 'farming',
+    description: 'Raising crops from seed in tended beds and harvesting them by hand.',
+  },
 };
 
 // Stable iteration order, used for defaulting/normalizing a per-player
-// proficiency record. Keep in sync with GATHERING_PROFESSIONS above. Fishing is
-// appended LAST (Professions 2.0) so the pre-existing iteration order
-// of the starter three is preserved for every consumer that walks this list.
+// proficiency record. Keep in sync with GATHERING_PROFESSIONS above. Fishing
+// (Professions 2.0) and then Farming are each appended LAST when they ship, so
+// the pre-existing iteration order of everything already in this list is
+// preserved for every consumer that walks it.
 export const GATHERING_PROFESSION_IDS: GatheringProfessionId[] = [
   'mining',
   'logging',
   'herbalism',
   'fishing',
+  'farming',
 ];
 
 // Tool effect slotting (#1136): a slottable bonus layered on top of a base

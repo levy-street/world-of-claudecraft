@@ -9219,6 +9219,18 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         }
       ]
     }
+  },
+  {
+    "id": "farming",
+    "name": "Farming",
+    "maxSkill": 100,
+    "bands": [
+      0,
+      100,
+      200
+    ],
+    "tools": [],
+    "nodes": []
   }
 ];
 
@@ -10337,6 +10349,7 @@ export const GUIDE_PROF_PAGES: string[] = [
   "logging",
   "herbalism",
   "fishing",
+  "farming",
   "economy",
   "faq"
 ];

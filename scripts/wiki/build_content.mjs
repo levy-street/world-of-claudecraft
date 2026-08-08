@@ -769,10 +769,15 @@ const profGathering = GATHERING_PROFESSION_IDS.map((id) => {
   const nodeType = Object.keys(NODE_HARVEST_TABLE).find(
     (type) => NODE_HARVEST_TABLE[type].professionId === id,
   );
+  // A gathering profession can be registered before its harvest nodes exist
+  // (farming ships its beds in a later phase). Emit the row with empty tables
+  // and no respawn number instead of failing the build; respawnSeconds is
+  // optional in the emitted type and the page reads it as `?? 0`.
+  const harvest = nodeType ? NODE_HARVEST_TABLE[nodeType] : null;
   return {
     ...base,
     nodes: nodeRowsFor(id),
-    respawnSeconds: NODE_HARVEST_TABLE[nodeType].respawnSeconds,
+    ...(harvest ? { respawnSeconds: harvest.respawnSeconds } : {}),
   };
 });
 
