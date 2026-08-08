@@ -17,7 +17,7 @@ import {
   type PersistedFarmPlot,
   serializeFarmPlots,
 } from '../src/sim/professions/farm_persist';
-import type { PlotState } from '../src/sim/professions/farm_projection';
+import { type PlotState, projectFarmPlots } from '../src/sim/professions/farm_projection';
 import { type CharacterState, type PlayerMeta, Sim } from '../src/sim/sim';
 
 // Fixture allowlists for the pure arms: the leaf takes its allowlists as
@@ -122,6 +122,31 @@ describe('the pure farm-plot round trip (no Sim)', () => {
     expect(serializeFarmPlots(new Map())).toBeUndefined();
   });
 
+  it('omits a non-finite hidden slot at write time, the JSON hygiene arm', () => {
+    // NaN and Infinity are not representable in JSON and would round-trip as
+    // null; the writer drops the SLOT (never the row) so the persisted bytes
+    // stay honest.
+    const live = new Map<string, PlotState>([
+      [
+        'bed_alpha',
+        {
+          cropId: 'turnip',
+          plantedAtMs: 1_000,
+          readyAtMs: 5_000,
+          survivalRoll: Number.NaN,
+          yieldSeed: 7,
+          compost: false,
+          watch: false,
+          tonic: false,
+          notified: false,
+        },
+      ],
+    ]);
+    const saved = serializeFarmPlots(live) as Record<string, PersistedFarmPlot>;
+    expect(Object.keys(saved.bed_alpha)).not.toContain('survivalRoll');
+    expect(saved.bed_alpha.yieldSeed).toBe(7);
+  });
+
   it('loads an absent field as the no-plots default, always a fresh map', () => {
     const a = normalizeFarmPlots(undefined, {
       validBedIds: BEDS,
@@ -135,6 +160,57 @@ describe('the pure farm-plot round trip (no Sim)', () => {
     });
     expect(a.size).toBe(0);
     expect(b).not.toBe(a);
+  });
+});
+
+describe('the public projection, driven directly (the pure-leaf contract)', () => {
+  // The module header promises "a Vitest imports it directly"; this suite is
+  // that import. The wire-path twin lives in tests/snapshots.test.ts.
+  const plot = (over: Partial<PlotState> = {}): PlotState => ({
+    cropId: 'turnip',
+    plantedAtMs: 1_000,
+    readyAtMs: 5_000,
+    compost: false,
+    watch: false,
+    tonic: false,
+    notified: false,
+    ...over,
+  });
+
+  it('sorts rows by bed id regardless of map insertion order', () => {
+    const m = new Map<string, PlotState>([
+      ['bed_beta', plot()],
+      ['bed_alpha', plot()],
+    ]);
+    expect(projectFarmPlots(m, 10_000).map((r) => r.bedId)).toEqual(['bed_alpha', 'bed_beta']);
+  });
+
+  it('turns ready EXACTLY at readyAtMs, growing one ms before', () => {
+    // The boundary frame is a stated contract (src/world_api/farming.ts:
+    // withered may surface only AT or after readyAtMs), so the growth phase
+    // builds on "at readyAtMs the plot is already ready". A drift from < to <=
+    // in the projector must red here.
+    const m = new Map<string, PlotState>([['bed_alpha', plot({ readyAtMs: 5_000 })]]);
+    expect(projectFarmPlots(m, 4_999)[0]?.status).toBe('growing');
+    expect(projectFarmPlots(m, 5_000)[0]?.status).toBe('ready');
+  });
+
+  it('picks the nine public fields explicitly, never the hidden slots', () => {
+    const m = new Map<string, PlotState>([
+      ['bed_alpha', plot({ survivalRoll: 0.5, yieldSeed: 9 })],
+    ]);
+    const row = projectFarmPlots(m, 10_000)[0] as Record<string, unknown>;
+    expect(Object.keys(row).sort()).toEqual([
+      'bedId',
+      'compost',
+      'cropId',
+      'notified',
+      'plantedAtMs',
+      'readyAtMs',
+      'status',
+      'tonic',
+      'watch',
+    ]);
   });
 });
 
@@ -224,11 +300,21 @@ describe('load-side anti-tamper (one corrupt dimension per arm)', () => {
   });
 
   it('normalizes every flag through === true', () => {
+    // Every flag gets its own junk arm so dropping the coercion on any ONE of
+    // the four is a red, not just on compost.
     const loaded = norm({
-      bed_alpha: { ...VALID, compost: 1 as unknown as boolean, watch: true },
+      bed_alpha: {
+        ...VALID,
+        compost: 1 as unknown as boolean,
+        watch: true,
+        tonic: 'yes' as unknown as boolean,
+        notified: 0 as unknown as boolean,
+      },
     });
     expect(loaded.get('bed_alpha')?.compost).toBe(false);
     expect(loaded.get('bed_alpha')?.watch).toBe(true);
+    expect(loaded.get('bed_alpha')?.tonic).toBe(false);
+    expect(loaded.get('bed_alpha')?.notified).toBe(false);
   });
 
   it('loads a malformed container shape to the no-plots default without throwing', () => {
@@ -362,6 +448,40 @@ describe('the save round trip through a real Sim', () => {
     expect(sim.myFarmPlots).toEqual(sim.farmPlotsFor(pid));
     // An unknown pid is empty, never a throw (the toolEffectSlotsFor arm).
     expect(sim.farmPlotsFor(987_654)).toEqual([]);
+  });
+
+  it('pins the persisted bed-id roster to its literals', () => {
+    // Bed ids are SAVE KEYS: the load allowlist destroys any plot whose id
+    // leaves this list, so a rename is a deliberate destroy-on-load decision.
+    // Uniqueness and set-size pins cannot see a rename; only literals can.
+    expect([...FARM_BED_IDS].sort()).toEqual([
+      'bed_eastbrook_1',
+      'bed_eastbrook_2',
+      'bed_eastbrook_3',
+      'bed_eastbrook_4',
+      'bed_evergarden_1',
+      'bed_evergarden_2',
+      'bed_evergarden_3',
+      'bed_evergarden_4',
+      'bed_evergarden_5',
+      'bed_evergarden_6',
+      'bed_evergarden_7',
+      'bed_evergarden_8',
+      'bed_mirefen_1',
+      'bed_mirefen_2',
+      'bed_mirefen_3',
+      'bed_mirefen_4',
+      'bed_mirefen_5',
+      'bed_thornpeak_1',
+      'bed_thornpeak_2',
+      'bed_thornpeak_3',
+      'bed_thornpeak_4',
+      'bed_thornpeak_5',
+      'bed_thornpeak_6',
+    ]);
+    // The crop allowlist is a save-key roster too (deviation (h): one
+    // pre-declared crop until the growth phase ships the catalog).
+    expect([...FARM_CROP_IDS]).toEqual(['wheat']);
   });
 
   it('serves the static patch table by reference, deep-frozen', () => {
