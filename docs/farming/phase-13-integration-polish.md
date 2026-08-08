@@ -122,7 +122,7 @@ Run, in order, and record each result:
   spot-check it yourself)
 - npm run ci:changed
 - npm run gate (the deep check; the armory browser red is the standing environmental
-  exception; grep the log for "[gate] FAIL")
+  exception; grep the log for "FAIL" (the selective gate prints "[gate:select] FAIL", the full gate "[gate] FAIL") plus the GATE EXIT marker)
 Then check git diff --name-only against the phase-start commit and dispatch
 qa-checklist (the phase-completion gate) plus any Review Dispatch Matrix row in
 docs/farming/implementation-plan.md the residual diff matches; if the diff is
@@ -184,7 +184,7 @@ STOPPING RULES
 - Stop while any review BLOCKING stands.
 
 Close: gate via node scripts/gate_select.mjs (the armory browser red is the standing
-environmental exception; grep the log for "[gate] FAIL", never trust a piped exit code;
+environmental exception; grep the log for "FAIL" (the selective gate prints "[gate:select] FAIL", the full gate "[gate] FAIL") plus the GATE EXIT marker, never trust a piped exit code;
 PR CI is the arbiter). Push and open the PR against the release branch this phase was
 based on, following .github/PULL_REQUEST_TEMPLATE.md. Screenshots via the pr-screenshots
 skill apply to the visual phases (12 and 13); this phase IS one, so the PR body

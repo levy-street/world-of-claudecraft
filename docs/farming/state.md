@@ -4,10 +4,12 @@ Read this file first in every phase session. It is the single authority for lock
 decisions. If a phase file contradicts this file, this file wins and the phase file
 gets swept in the same pass (amend the QA twin too, always).
 
-Current phase: Phase 1 done, QA passed 2026-08-08 (PASS-WITH-FOLLOWUPS); Phase 2
-next. Packet authored 2026-08-07 off release/v0.36.0; the branch has absorbed
-release/v0.36.0 through 6ed4d7e12c (second absorb 2026-08-08, release-merge-audit
-clean, parity re-proven byte-identical on the merged HEAD).
+Current phase: Phase 2 done, QA passed 2026-08-08 (PASS-WITH-FOLLOWUPS); Phase 3
+(growth engine) next. Packet authored 2026-08-07 off release/v0.36.0; the branch
+has absorbed release/v0.36.0 through 81804a179e (fourth absorb, at Phase 2 QA
+2026-08-08: the guide-only wiki accuracy round 2; release-merge-audit clean,
+parity and snapshots re-proven green on the merged HEAD; the third absorb
+e5c16ca398 opened Phase 2 itself).
 Working tree: ALL farming work happens in the persistent worktree
 `~/Documents/woc-farming-plan`. Other sessions share the main checkout; never work there.
 
@@ -423,7 +425,7 @@ question does not arise (farming has no station).
   a mobile screenshot script against a phone viewport.
 - Phase end: `node scripts/gate_select.mjs` (the fast pre-merge gate);
   `npm run gate` for the deep check. Known environmental red: the armory browser
-  pixel test; grep the log for "[gate] FAIL", never trust a piped exit code, and PR CI
+  pixel test; grep the log for "FAIL" (the selective gate prints "[gate:select] FAIL", the full gate "[gate] FAIL") plus the GATE EXIT marker, never trust a piped exit code, and PR CI
   is the arbiter.
 
 ## Key planned files (working names; a phase may refine with a note here)
@@ -532,25 +534,61 @@ question does not arise (farming has no station).
     continuing through logout; the reviewers' concrete direction is re-anchor to
     max(nowMs, 1) or an epoch-based offline clock, pinned by BOTH a fresh-Sim load
     and a post-tick load. The mirror hazard (an absurdly PAST anchor loading on a
-    wall-clock host reads instantly ready) needs no code now: the scan pin in
-    tests/professions_farming_state.test.ts holds the no-caller-outside-server
-    premise, and a save editor can craft instant-ready with legit-looking values
-    anyway, so an epoch floor buys no anti-tamper value.
+    wall-clock host reads instantly ready) needs no code now: since Phase 2 QA the
+    scan pin in tests/professions_farming_state.test.ts holds the CLOCK-BASE
+    premise directly (every serializeCharacter caller lives in server/ AND injects
+    lockoutNowMs; the three scratch-sim builders, creation / PBE boost / community
+    templates, were fixed to pass () => Date.now() after passing the old
+    directory-only scan on the sim-clock default), and a save editor can craft
+    instant-ready with legit-looking values anyway, so an epoch floor buys no
+    anti-tamper value.
   - The derived-duration wire field (RaidLockout msRemaining template) lands with
     the first timer UI; until then the clock-base contract comment in
     src/world_api/farming.ts is the only guard.
   - Absent/corrupt hidden slots: prefer DERIVING a replacement deterministically
     (bed id plus plantedAtMs) over re-rolling at harvest, so a dropped slot is not
-    a reroll primitive.
+    a reroll primitive. Since Phase 2 QA a dropped slot is visible to operators
+    (countDroppedHiddenSlots feeds the load warn; the row count alone could not
+    see a surviving row lose a slot).
+  - HARD GATE from the privacy review: clamp survivalRoll into its real interval
+    and yieldSeed to a bounded integer IN THE SAME CHANGE that gives the slots
+    meaning; today they pass the load on a bare finite() check while every
+    neighbouring field has an allowlist, a positivity check, a ceiling, or a
+    coercion, which is fine only while their value domain does not exist.
+  - Iteration order is now guaranteed: normalizeFarmPlots inserts in sorted bed
+    order (Phase 2 QA), so per-tick iteration over meta.farmPlots can draw rng
+    without the stream position depending on JSONB key order. Do not regress this
+    with an unsorted bulk insert.
+  - Read-identity asymmetry at the seam: Sim.farmPlotsFor allocates a fresh array
+    per NON-EMPTY read (the empty arms return the shared frozen
+    EMPTY_FARM_PLOT_VIEWS since Phase 2 QA) while ClientWorld.myFarmPlots keeps
+    one array until the next fplot delta; the first UI consumer must not memoize
+    by reference or === -diff rows across reads.
   - Admin visibility: serializeCharacter snapshots (server/admin.ts character
     inspection) will expose filled survivalRoll/yieldSeed to operators; decide
-    whether that is acceptable when the slots go live.
+    whether that is acceptable when the slots go live. The R35 professions
+    inspector shapes output through characterProfessionsSheet's explicit field
+    picks and never touches state.farmPlots today; a farm section added there
+    must field-pick the way the wire projection does, never dump the record.
+  - The crop content table ships to the browser (src/net/online.ts imports
+    farm_patches.ts): patch/bed geography and ids are safe, and published
+    per-crop base rates would be too, but the moment a rate column lands in
+    that table re-check what a client can compute (the per-plot pre-roll stays
+    the only real secret).
   - Deploy-order constraint (mixed fleet): an old server process autosaves the
     whole blob WITHOUT farmPlots, so this build must be fully rolled out before
     any build that can PLANT ships; a rollback past this phase after plants exist
-    destroys plot state on the next autosave.
+    destroys plot state on the next autosave. Carry this into DEPLOY.md in the
+    phase that makes plots plantable; it lives only here until then.
   - The per-tick fplot emit stringifies every planted player's rows at 20 Hz
     (tslot-consistent, bounded at 23 beds); revisit if rows grow.
+  - Stored-data growth at fleet scale (the database row, recorded at Phase 2 QA):
+    a fully planted character adds about 4.4 KiB of JSONB to characters.state
+    (23 beds at about 193 bytes; blob ceiling re-minted 14336), which is about
+    44 MB of extra storage per 10k fully planted characters AND rides every
+    autosave UPDATE payload and its WAL, not just storage. Content-scaled and
+    bounded (the bed allowlist caps the map at 23 after normalize); no new
+    table, no retention story owed.
   - Spectator sessions mirror the spectated player's plots into myFarmPlots (the
     whole self block does this); do not hang plant/harvest UI off it while
     spectating.

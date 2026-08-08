@@ -255,7 +255,7 @@ STOPPING RULES
 
 When every step above is done and no BLOCKING stands: gate via
 BROWSER_PATH=$HOME/.cache/ms-playwright/chromium-1228/chrome-linux64/chrome
-node scripts/gate_select.mjs (grep the log for "[gate] FAIL"), then, per D22
+node scripts/gate_select.mjs (grep the log for "FAIL" (the selective gate prints "[gate:select] FAIL", the full gate "[gate] FAIL") plus the GATE EXIT marker), then, per D22
 (supersedes the original push-and-open-a-PR line here): merge the phase branch
 --no-ff into feature/farming-plan and delete it. Do NOT push and do NOT open a
 PR; the would-be PR body goes in progress.md's Phase 2 Notes. Deviations decided

@@ -119,7 +119,7 @@ STEP 3 - FIX
 - Separate fix commits with explicit paths, Conventional Commits with bodies, never
   git add -A, no session links or Claude attribution.
 - After fixes: node scripts/gate_select.mjs (the armory browser red is the standing
-  environmental exception; grep the log for "[gate] FAIL"), then, per D22, merge the
+  environmental exception; grep the log for "FAIL" (the selective gate prints "[gate:select] FAIL", the full gate "[gate] FAIL") plus the GATE EXIT marker), then, per D22, merge the
   local QA fix branch --no-ff into feature/farming-plan; never push, never open a PR.
 
 STEP 4 - DOC UPDATES
