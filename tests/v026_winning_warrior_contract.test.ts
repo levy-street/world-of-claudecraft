@@ -146,8 +146,12 @@ describe('v0.26 winning Warrior release contracts', () => {
       cooldown: 8,
       maxCharges: 2,
       effects: [
-        { type: 'weaponStrike', bonus: 14, weaponMult: 0.4 },
-        { type: 'weaponStrike', bonus: 14, weaponMult: 0.4 },
+        // Third cut in the same direction (0.6 -> 0.45 -> 0.4 -> 0.35): Twinstrike
+        // is the FILLER but measured as the number two damage source while costing
+        // no rage. The RESOURCE half of this contract (free, 2 charges, 4 rage) is
+        // what v0.26 pinned and is unchanged.
+        { type: 'weaponStrike', bonus: 12, weaponMult: 0.35 },
+        { type: 'weaponStrike', bonus: 12, weaponMult: 0.35 },
         // v0.27.1 rage fix: halved from 8; Bloodletting is the generating builder.
         { type: 'gainResource', amount: 4 },
       ],
