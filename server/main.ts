@@ -464,7 +464,15 @@ function initialCharacterState(
   name: string,
   skin: number,
 ): import('../src/sim/sim').CharacterState {
-  const sim = new Sim({ seed: WORLD_SEED, playerClass: cls, playerName: name });
+  // Wall-clock injection is load-bearing for persistence: every blob that
+  // reaches Postgres must be written on the epoch base (farm_persist.ts
+  // clock-base doctrine), never the sim-clock default that starts at zero.
+  const sim = new Sim({
+    seed: WORLD_SEED,
+    playerClass: cls,
+    playerName: name,
+    lockoutNowMs: () => Date.now(),
+  });
   sim.setPlayerSkin(sim.playerId, skin);
   const character = sim.serializeCharacter(sim.playerId);
   if (!character) throw new Error('failed to serialize initial character');

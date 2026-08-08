@@ -530,34 +530,45 @@ describe('the save round trip through a real Sim', () => {
 });
 
 describe('the cross-clock-base save assumption', () => {
-  it('serializeCharacter has no caller outside server/, the epoch-anchor premise', () => {
+  it('every serializeCharacter caller lives in server/ and injects the wall clock', () => {
     // farm_persist.ts stores ABSOLUTE deadlines and its normalize guard only
     // re-anchors future rows, which is safe solely because every persisted
-    // blob is written AND read by a wall-clock host: serializeCharacter is
-    // called nowhere outside server/. If an offline host (sim-clock ms from
-    // zero) ever wrote a blob a server later loads, every crop would read
-    // decades past ready with no arm firing. This scan turns that prose
-    // premise into a pin (the deeds_content producer-site idiom): a new
-    // caller outside server/ must revisit farm_persist.ts's clock-base
-    // doctrine before it lands.
+    // blob is written AND read by a WALL-CLOCK host. That is two properties,
+    // and the directory scan alone only proved the weaker one: three
+    // server-side scratch sims (character creation, the PBE boost builder,
+    // the community test-account templates) sat inside server/ while
+    // building on the sim-clock default (0 before the first tick), which is
+    // exactly the anchor family normalize can never repair (a t=0 anchor on
+    // a wall-clock host reads decades past ready with no arm firing). So the
+    // scan pins BOTH: no caller outside server/, and every caller file
+    // injects lockoutNowMs. The file-level token check is a tripwire, not
+    // proof (the deeds_content producer-site idiom): the decisive fact is
+    // each scratch-sim constructor passing () => Date.now(). A caller that
+    // cannot inject the wall clock must revisit farm_persist.ts's clock-base
+    // doctrine before it lands. (scripts/*.mjs probes stay out of scope:
+    // they never reach Postgres.)
     const roots = ['src', 'server', 'headless'].map((d) => path.join(__dirname, '..', d));
-    const callers = new Set<string>();
+    const callers = new Map<string, string>();
     const walk = (dir: string): void => {
       for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
         const p = path.join(dir, entry.name);
         if (entry.isDirectory()) walk(p);
-        else if (
-          entry.name.endsWith('.ts') &&
-          /\.serializeCharacter\(/.test(fs.readFileSync(p, 'utf8'))
-        ) {
-          callers.add(path.relative(path.join(__dirname, '..'), p));
+        else if (entry.name.endsWith('.ts')) {
+          const content = fs.readFileSync(p, 'utf8');
+          if (/\.serializeCharacter\(/.test(content)) {
+            callers.set(path.relative(path.join(__dirname, '..'), p), content);
+          }
         }
       }
     };
     for (const root of roots) walk(root);
     expect(callers.size).toBeGreaterThan(0); // the scan itself must see the real call sites
-    for (const caller of callers) {
+    for (const [caller, content] of callers) {
       expect(caller.startsWith('server/'), `${caller} calls serializeCharacter`).toBe(true);
+      expect(
+        /lockoutNowMs/.test(content),
+        `${caller} persists character blobs without injecting the wall clock (lockoutNowMs)`,
+      ).toBe(true);
     }
   });
 });

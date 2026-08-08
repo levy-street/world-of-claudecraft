@@ -554,7 +554,15 @@ export function buildBoostedCharacterState(
   name: string,
   skin: number,
 ): CharacterState {
-  const sim = new Sim({ seed: BOOST_SEED, playerClass: cls, playerName: name });
+  // Wall-clock injection is load-bearing for persistence (farm_persist.ts
+  // clock-base doctrine): boosted blobs reach Postgres, so they must be
+  // written on the epoch base, never the sim-clock default.
+  const sim = new Sim({
+    seed: BOOST_SEED,
+    playerClass: cls,
+    playerName: name,
+    lockoutNowMs: () => Date.now(),
+  });
   const pid = sim.playerId;
   sim.setPlayerSkin(pid, skin);
   if (!applyBoostKitToPlayer(sim, pid)) {
