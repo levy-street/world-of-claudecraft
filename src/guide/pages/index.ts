@@ -8,20 +8,25 @@ import { arena } from './arena';
 import { bestiary } from './bestiary';
 import { classes } from './classes';
 import { combat } from './combat';
+import { commands } from './commands';
 import { controls } from './controls';
 import { deeds } from './deeds';
 import { delves } from './delves';
 import { dungeons } from './dungeons';
 import { economy } from './economy';
+import { editor } from './editor';
 import { faq } from './faq';
 import { gear } from './gear';
 import { glossary } from './glossary';
 import { home } from './home';
 import { howToPlay } from './how_to_play';
+import { interfacePage } from './interface';
 import { models } from './models';
+import { mounts } from './mounts';
 import { professions } from './professions';
 import { progression } from './progression';
 import { quests } from './quests';
+import { rifts } from './rifts';
 import { settings } from './settings';
 import { social } from './social';
 import { stats } from './stats';
@@ -49,6 +54,8 @@ const PAGES: Record<string, GuidePage> = {
   quests,
   dungeons,
   delves,
+  rifts,
+  mounts,
   arena,
   'thornhollow-fields': thornhollowFields,
   'vale-cup': valeCup,
@@ -57,9 +64,12 @@ const PAGES: Record<string, GuidePage> = {
   stats,
   progression,
   controls,
+  commands,
+  interface: interfacePage,
   settings,
   talents,
   glossary,
+  editor,
   faq,
 };
 

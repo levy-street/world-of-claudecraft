@@ -1,7 +1,9 @@
 // Talents and Specializations: a concept explainer plus a spoiler-safe specializations
 // overview for all nine classes (name, role, one-liner, mastery name, from talent_i18n).
-// Deliberately no numeric talent trees or point allocations: that is build-guide territory
-// our guide does not ship. The spec cards reuse the shared class_view component.
+// The explainer tracks the live model (src/sim/content/talent_rows.ts: six rows at
+// ROW_LEVELS, OPTIONS_PER_ROW options each, one pick per row) and deliberately stops there:
+// per-option effects and numbers are build-guide territory our guide does not ship. The spec
+// cards reuse the shared class_view component.
 
 import { esc } from '../../ui/esc';
 import { t } from '../../ui/i18n';
@@ -32,7 +34,7 @@ export const talents: GuidePage = {
       <article class="guide-article guide-talents">
         ${pageHeader('guide.talentsPage.heading', 'guide.talentsPage.intro')}
         ${section('guide.talentsPage.whatHeading', `<p>${esc(t('guide.talentsPage.whatBody'))}</p>`)}
-        ${section('guide.talentsPage.howHeading', `<p>${esc(t('guide.talentsPage.howBody'))}</p><p>${esc(t('guide.talentsPage.choiceNote'))}</p><p>${esc(t('guide.talentsPage.shareNote'))}</p>`)}
+        ${section('guide.talentsPage.howHeading', `<p>${esc(t('guide.talentsPage.howBody'))}</p><p>${esc(t('guide.talentsPage.choiceNote'))}</p><p>${esc(t('guide.talentsPage.loadoutNote'))}</p><p>${esc(t('guide.talentsPage.shareNote'))}</p>`)}
         ${callout(esc(t('guide.talentsPage.resetNote')), { variant: 'note', titleKey: 'guide.talentsPage.resetTitle' })}
         ${section('guide.talentsPage.specsHeading', specOverview)}
         ${related([

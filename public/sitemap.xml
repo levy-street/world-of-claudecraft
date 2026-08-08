@@ -216,6 +216,16 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://worldofclaudecraft.com/wiki/rifts</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://worldofclaudecraft.com/wiki/mounts</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://worldofclaudecraft.com/wiki/arena</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -237,6 +247,11 @@
   </url>
   <url>
     <loc>https://worldofclaudecraft.com/wiki/reference/controls</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://worldofclaudecraft.com/wiki/reference/interface</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -266,7 +281,17 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://worldofclaudecraft.com/wiki/reference/commands</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://worldofclaudecraft.com/wiki/reference/glossary</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://worldofclaudecraft.com/wiki/reference/editor</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>

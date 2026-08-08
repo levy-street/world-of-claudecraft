@@ -168,7 +168,19 @@ describe('Guide routes', () => {
     expect(topbarRoutes().some((r) => r.id === 'classes')).toBe(true);
     expect(topbarRoutes().some((r) => r.id === 'home')).toBe(false);
     const groups = groupedRoutes();
-    expect(groups.map((g) => g.group)).toEqual(['start', 'compendium', 'reference']);
+    // The old single 'compendium' bucket reached seventeen entries once Rifts and Mounts
+    // landed; it is split by what a reader came for. Every group must be non-empty (a
+    // group with no routes is dropped by groupedRoutes, so a typo would silently vanish).
+    expect(groups.map((g) => g.group)).toEqual([
+      'start',
+      'world',
+      'character',
+      'endgame',
+      'compete',
+      'reference',
+    ]);
+    for (const g of groups)
+      expect(g.routes.length, `group "${g.group}" is empty`).toBeGreaterThan(0);
     expect(hrefFor('')).toBe(GUIDE_BASE);
     expect(hrefFor('classes')).toBe('/wiki/classes');
   });
@@ -214,6 +226,11 @@ describe('Guide entry wiring', () => {
       expect(pageFor(r.id), `route "${r.id}" has no registered page module`).toBeTruthy();
     }
   });
+
+  // Registration only proves a module exists. tests/guide_route_render.test.ts renders
+  // every route and checks it produces a readable page (one h1, no unresolved key, no
+  // stray placeholder); it lives in its own file because the bestiary and models pages
+  // paint procedural icons through a canvas and so need a DOM environment.
 
   it('lists every route and class-detail page in the sitemap', () => {
     const origin = 'https://worldofclaudecraft.com';
@@ -524,6 +541,34 @@ describe('Guide bestiary completeness', () => {
     expect(marshCard).not.toContain('#fam-burrower');
     expect(html).toContain('#fam-burrower');
   });
+
+  // The bug this pins actually shipped. The page keyed every curated string AND the card's
+  // DOM id off z.biome, which is not unique: The Farshore renders in the vale biome, so it
+  // inherited Eastbrook Vale's blurb, hub greeting, speaker and place notes, and minted a
+  // second id="zone-vale" that broke the map anchor. world.ts now resolves a per-zone key
+  // stem (ZONE_KEY_STEM, biome as the fallback). A stem collision is invisible by eye once
+  // there are fourteen zones, so it is pinned here instead: one anchor per zone, all distinct.
+  it('gives every zone its own card anchor, so no zone can inherit another zone copy', () => {
+    setLanguage('en');
+    const html = worldPage.render({ params: [], sub: 'world', titleKey: 'guide.nav.world' });
+    const ids = [...html.matchAll(/id="(zone-[a-z0-9_]+)"/g)].map((m) => m[1]);
+    expect(ids.length, 'one card anchor per zone').toBe(GUIDE_ZONES.length);
+    expect(new Set(ids).size, `duplicate zone anchor: ${ids.join(', ')}`).toBe(ids.length);
+    // Every map band links to an anchor that exists on the page (a stem typo would
+    // otherwise scroll nowhere).
+    for (const href of [...html.matchAll(/href="#(zone-[a-z0-9_]+)"/g)].map((m) => m[1])) {
+      expect(ids, `map band links to a missing anchor #${href}`).toContain(href);
+    }
+    // The two vale-biome zones are the regression case: distinct anchors, distinct blurbs.
+    expect(ids).toContain('zone-vale');
+    expect(ids).toContain('zone-farshore');
+    const vale = html.slice(html.indexOf('id="zone-vale"'));
+    const farshore = html.slice(html.indexOf('id="zone-farshore"'));
+    const blurbOf = (s: string) => /class="guide-zone-blurb">([^<]*)</.exec(s)?.[1] ?? '';
+    expect(blurbOf(vale)).not.toBe('');
+    expect(blurbOf(farshore)).not.toBe('');
+    expect(blurbOf(farshore)).not.toBe(blurbOf(vale));
+  });
 });
 
 // The Book of Deeds page renders entirely from GUIDE_DEEDS, derived from the sim DEEDS table.
@@ -730,7 +775,9 @@ describe('Guide deeds spoiler safety', () => {
     const route = GUIDE_ROUTES.find((r) => r.id === 'deeds');
     expect(route?.sub).toBe('deeds');
     expect(route?.navKey).toBe('guide.nav.deeds');
-    expect(route?.group).toBe('compendium');
+    // 'compendium' was retired when it grew to seventeen entries and split; the Book of
+    // Deeds is endgame content, so it sits with the dungeons, delves and rifts.
+    expect(route?.group).toBe('endgame');
   });
 
   it('renders the whole page: correct per-category counts, no hidden or boss leak', () => {
@@ -1136,6 +1183,39 @@ describe('Guide controls reference completeness', () => {
     expect(html).toContain('<kbd>Shift+I</kbd></td><td>Dungeon Finder</td>');
     expect(html).toContain('<kbd>`</kbd></td><td>Mount / Dismount</td>');
     expect(html).toContain('<kbd>Z</kbd></td><td>Sheathe/Unsheathe Weapon</td>');
+  });
+
+  // Second wave of absent rows, found by auditing the whole table against BIND_ACTIONS:
+  // swimming had no key at all, the battleground flag action was undocumented on a page
+  // that describes flag play, damage meters were missing, and the Pet group showed five
+  // of six binds. Same contract as above: a changed shipped default reds this test rather
+  // than silently drifting the public reference.
+  it('documents Swim Down, the arrow-key alternates, the flag action, meters, and Pet: Mark', () => {
+    setLanguage('en');
+    const html = controlsPage.render({
+      params: [],
+      sub: 'reference/controls',
+      titleKey: 'guide.nav.controls',
+    });
+    expect(html).toContain('<kbd>LCtrl</kbd></td><td>Swim down while you are in the water (hold)');
+    expect(html).toContain('<kbd>Arrow Keys</kbd>');
+    expect(html).toContain('<kbd>Shift+F</kbd></td><td>Take the enemy flag in Thornhollow Fields');
+    expect(html).toContain('<kbd>Shift+H</kbd></td><td>Damage meters');
+    expect(html).toContain('<kbd>Ctrl+6</kbd></td><td>Pet: Mark');
+  });
+
+  it('keeps the second-wave binds in step with the game defaults', () => {
+    const defaults = new Map(BIND_ACTIONS.map((a) => [a.id, a.defaults]));
+    expect(defaults.get('dive')).toEqual(['ControlLeft']);
+    expect(defaults.get('bgFlag')).toEqual(['Shift+KeyF']);
+    expect(defaults.get('meters')).toEqual(['Shift+KeyH']);
+    expect(defaults.get('targetPet')).toEqual(['Ctrl+Digit6']);
+    // The arrow keys are the SECOND default of the four movement actions, which is the
+    // whole claim the Arrow Keys row makes.
+    expect(defaults.get('forward')).toEqual(['KeyW', 'ArrowUp']);
+    expect(defaults.get('back')).toEqual(['KeyS', 'ArrowDown']);
+    expect(defaults.get('turnLeft')).toEqual(['KeyA', 'ArrowLeft']);
+    expect(defaults.get('turnRight')).toEqual(['KeyD', 'ArrowRight']);
   });
 
   it('keeps those five binds in step with the game defaults', () => {
