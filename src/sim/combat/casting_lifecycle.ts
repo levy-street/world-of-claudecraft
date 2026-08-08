@@ -73,6 +73,7 @@ import {
   hasUnbreakableMovementLock,
   isInStasis,
   isLockedOut,
+  isRooted,
   isSilenced,
   isStunned,
   isUnbreakableControlAura,
@@ -800,6 +801,26 @@ export function castAbility(
       ctx.error(p.id, 'You must have a shield equipped.');
       return;
     }
+  }
+  // A charge is a RUN, so refuse it while the caster cannot run, and refuse it
+  // HERE, above the cost and cooldown billing further down.
+  //
+  // Reported in play (a druid roots a warrior, Onrush is consumed and moves
+  // nobody). The effect already had a guard, but the two sides disagreed about
+  // what "cannot move" means: `runEffects` asked hasUnbreakableMovementLock,
+  // which only matches an aura flagged `unbreakableControl`, while the mover
+  // `updateChargeMovement` asks isRooted. An ordinary breakable root answers no
+  // to the first and yes to the second, so the charge was set up, billed, and
+  // then killed on the next tick. Asking the MOVER's question is the fix; the
+  // effect-side guard stays as the belt to this pair of braces.
+  //
+  // Gated on the effect, never on an ability id, so every charge in the game is
+  // covered (warrior Onrush, the druid Bruin-Form charge, Intervene) and a
+  // fourth added later inherits it. isRooted folds in stun, which the ladder
+  // above has already refused, so what reaches here is a genuine root.
+  if (ability.effects?.some((effect) => effect.type === 'charge') && isRooted(p)) {
+    ctx.error(p.id, "Can't move!");
+    return;
   }
   // casting is deliberate action — drop any active follow so you don't drift
   ctx.stopFollow(p);
