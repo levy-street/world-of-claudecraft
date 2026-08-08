@@ -109,6 +109,12 @@ import { ensureWarriorStance } from './combat/warrior_stances';
 // moved to social/fiesta.ts with that logic; sim.ts keeps only the type used by
 // the PlayerMeta interface + the power-up catalog the fiestaMatchInfo accessor reads.
 import { type AugmentSpecial, type AugmentTier, POWERUPS_BY_ID } from './content/augments';
+import {
+  FARM_BED_IDS,
+  FARM_CROP_IDS,
+  FARM_PATCHES,
+  type FarmPatchDef,
+} from './content/farm_patches';
 import { DEFAULT_MOUNT, type MountKey } from './content/mounts';
 import { GATHERING_PROFESSION_IDS, type GatheringProfessionId } from './content/professions';
 import { PTR_DEV_VENDOR_DEF } from './content/ptr_dev_vendor';
@@ -379,6 +385,12 @@ import {
   disenchantItem as disenchantItemImpl,
   isEnchantedInstance,
 } from './professions/enchanting';
+import {
+  normalizeFarmPlots,
+  type PersistedFarmPlot,
+  serializeFarmPlots,
+} from './professions/farm_persist';
+import { type FarmPlotView, type PlotState, projectFarmPlots } from './professions/farm_projection';
 import * as fishing from './professions/fishing';
 import type { RespecPaymentTier } from './professions/focus';
 import * as professionsFocus from './professions/focus';
@@ -1489,6 +1501,13 @@ export interface PlayerMeta {
   // not an award), and empty at construction and on load, so the parity sampler
   // sees an inert `[]`. Keyed by professions/prof_nudges.ts TREND_NUDGE_KEY.
   profNudgeCadence: CadenceMap;
+  // Per-player farm plot state (Farming): bed id -> the full PlotState record
+  // (professions/farm_projection.ts). A Map so an empty default canonicalizes
+  // to an inert `[]` in the parity sampler (no golden churn). Persisted in
+  // CharacterState with zero-default omission through
+  // professions/farm_persist.ts; render/ui and the wire see only the
+  // FarmPlotView projection, never this record.
+  farmPlots: Map<string, PlotState>;
   // Delve meta progression (persisted in CharacterState).
   delveMarks: number;
   delveClears: Record<string, number>;
@@ -1735,6 +1754,14 @@ export interface CharacterState {
   // so older saves load cleanly and fire it once when they first qualify).
   // Written only when true (zero-default omission).
   profTierTutorialSent?: boolean;
+  // Per-player farm plots (Farming; JSONB, bed id -> the persisted row shape
+  // in professions/farm_persist.ts). Optional with zero-default omission:
+  // absent for every pre-farming save and whenever no bed is planted, so
+  // unchanged characters stay byte-equal. Loaded through normalizeFarmPlots,
+  // which drops unknown bed/crop ids and clamps deadlines (growth deadlines
+  // are absolute epoch ms, the raidLockouts idiom, not remaining deltas: a
+  // crop keeps growing while its owner is logged out).
+  farmPlots?: Record<string, PersistedFarmPlot>;
   // World-boss loot lockouts now ride `raidLockouts` (keyed worldboss:<mobId>). The
   // legacy per-day `worldBossDaily` field is intentionally dropped: pre-migration saves
   // that still carry it just ignore it (a player locked at deploy may loot once more, a
@@ -2857,6 +2884,7 @@ export class Sim {
       questCadence: new Map(),
       tierMailSent: new Map(),
       questedHobbies: new Map(),
+      farmPlots: new Map(),
       profTierTutorialSent: false,
       profNudgeCadence: new Map(),
       archetype: emptyArchetypeState(),
@@ -3254,6 +3282,25 @@ export class Sim {
       // outlive the dormant period, since restoring a hobby quested BEFORE the
       // character left the pair is the entire point (professions/hobby_memory.ts).
       meta.questedHobbies = normalizeHobbyMemoryOnLoad(s.questedHobbies);
+      // Farm plots resume against their ABSOLUTE saved deadlines (crops keep
+      // growing through a logout), re-validated on the way in rather than
+      // trusted: a bed or crop id the shipped content no longer carries drops,
+      // and a hand-edited growth duration clamps to FARM_MAX_GROW_MS
+      // (professions/farm_persist.ts). An absent field loads to the no-plots
+      // default, so a pre-farming save round-trips byte-equal.
+      meta.farmPlots = normalizeFarmPlots(s.farmPlots, {
+        validBedIds: FARM_BED_IDS,
+        validCropIds: FARM_CROP_IDS,
+        nowMs: this.lockoutNowMs(),
+      });
+      // Dev-channel visibility for the silent-drop arms (the knownRecipes
+      // precedent): a retired bed id or a tampered row vanishes on load by
+      // design, but an operator reading server logs should see it happen.
+      if (s.farmPlots && Object.keys(s.farmPlots).length > meta.farmPlots.size) {
+        console.warn(
+          `[load] dropped ${Object.keys(s.farmPlots).length - meta.farmPlots.size} farmPlots row(s) for ${meta.name} (unknown bed/crop id or invalid deadline)`,
+        );
+      }
       meta.profTierTutorialSent = s.profTierTutorialSent === true;
       meta.delveMarks = s.delveMarks ?? 0;
       meta.delveClears = { ...(s.delveClears ?? {}) };
@@ -4042,6 +4089,13 @@ export class Sim {
           }
         : {}),
       ...(meta.profTierTutorialSent ? { profTierTutorialSent: true } : {}),
+      ...(() => {
+        // Zero-default omission plus key-sorted rows; the write side neither
+        // clamps nor filters, since both anti-tamper arms live on the load
+        // side (professions/farm_persist.ts).
+        const fp = serializeFarmPlots(meta.farmPlots);
+        return fp ? { farmPlots: fp } : {};
+      })(),
       townFocus: { ...meta.townFocus },
       // World-boss lockouts serialize via raidLockouts (above), not a separate field.
       // Book of Deeds: every field conditional (absent while empty/null/zero)
@@ -11841,6 +11895,30 @@ export class Sim {
 
   get toolEffectSlots(): readonly ToolEffectSlotView[] {
     return this.toolEffectSlotsFor(this.primaryId);
+  }
+
+  // The static garden-bed geography (content/farm_patches.ts). Handed back by
+  // reference like the other static content reads: the table is a shared
+  // module constant typed readonly all the way down, so a defensive copy would
+  // allocate every patch and bed per call for data no consumer may mutate.
+  get farmPatches(): readonly FarmPatchDef[] {
+    return FARM_PATCHES;
+  }
+
+  // The viewer's farm plots, projected for the seam. Takes an explicit pid
+  // (the toolEffectSlotsFor precedent) so the server can build one player's
+  // delta while the offline getter below reads the primary. Returns [] for an
+  // unknown pid and for a player with no planted bed, which is the default and
+  // the overwhelming majority. The projection owns the bed-id sort and the
+  // hidden-slot leak barrier (professions/farm_projection.ts).
+  farmPlotsFor(pid: number): FarmPlotView[] {
+    const meta = this.players.get(pid);
+    if (!meta) return [];
+    return projectFarmPlots(meta.farmPlots, this.lockoutNowMs());
+  }
+
+  get myFarmPlots(): FarmPlotView[] {
+    return this.farmPlotsFor(this.primaryId);
   }
 
   // Slot an effect onto one gathering profession's tool, consuming one charm
