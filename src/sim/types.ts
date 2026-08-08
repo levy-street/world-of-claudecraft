@@ -5679,9 +5679,11 @@ export type SimEvent = { pid?: number } & (
   | { type: 'farmWithered'; pid: number; bedId: string; cropId: string; count: number }
   // Farming: a plant or harvest was refused. Personal and text-free (the
   // gatherDenied idiom): the client composes its own localized copy off
-  // `reason`. `bedId` and `cropId` are present exactly when the refused
-  // command named them, so the earliest arms (a bed id that is not a bed) can
-  // still say which id was rejected.
+  // `reason`. `bedId` and `cropId` are present when the refusing arm KNOWS
+  // them: usually because the refused command named them, and on harvest's
+  // not_ready arm the cropId comes from the STORED plot (harvest_crop names
+  // only the bed). Do not prune a field to match the named-by-the-command
+  // reading; the wire and the goldens carry the stored-plot case today.
   | {
       type: 'farmDenied';
       pid: number;

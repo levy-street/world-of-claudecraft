@@ -219,11 +219,24 @@ export function resolveFarmHarvest(yieldSeed: number, skill: number): FarmHarves
 
 /** The four derived visual growth stages (see the banner). Pure, stateless,
  *  and exported so the render phase reads THIS definition rather than
- *  re-deriving the thirds. A zero or negative duration (only reachable
- *  through a row the load side would have dropped) reads as ready. */
+ *  re-deriving the thirds. A zero-length window (the grow-now mint) or a
+ *  negative one reads as ready.
+ *
+ *  CLOCK-BASE CONTRACT for the future render/ui consumer: `nowMs` MUST be the
+ *  same world's lockoutNowMs-base clock the plot's own timestamps were written
+ *  in (epoch ms online, sim-clock ms on the offline and headless hosts).
+ *  Feeding Date.now() to an offline plot makes every bed render ready the
+ *  instant it is planted; there is no cross-base conversion. The parameter is
+ *  a structural minimum (the two timestamps), so both the public FarmPlotView
+ *  and the sim-side PlotState fit without ever needing the hidden slots. The
+ *  derived msRemaining wire field (the RaidLockout template) stays owed to the
+ *  first timer surface, Phase 8. */
 export type FarmGrowthStage = 'sprout' | 'seedling' | 'maturing' | 'ready';
 
-export function farmGrowthStage(plot: PlotState, nowMs: number): FarmGrowthStage {
+export function farmGrowthStage(
+  plot: Pick<PlotState, 'plantedAtMs' | 'readyAtMs'>,
+  nowMs: number,
+): FarmGrowthStage {
   const duration = plot.readyAtMs - plot.plantedAtMs;
   if (duration <= 0) return 'ready';
   const elapsed = (nowMs - plot.plantedAtMs) / duration;
