@@ -1,5 +1,6 @@
 import * as THREE from 'three';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
+import type { TerrainView } from '../src/render/terrain';
 
 function mockEmptyAssetLoads(): void {
   vi.doMock('../src/render/assets/loader', () => ({
@@ -381,54 +382,60 @@ describe('terrain covers the whole world, gaps between zone rectangles included'
     terrain.cancelStreaming();
   });
 
-  it('leaves no uncovered cell anywhere once every zone is built', async () => {
-    vi.resetModules();
-    mockEmptyAssetLoads();
-    const { buildTerrain } = await import('../src/render/terrain');
-    const { ZONES, WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z } = await import('../src/sim/data');
+  // These two tests both build every zone across the whole map (the most
+  // expensive shape in this file, ~800 chunk cells of real geometry) and only
+  // ever READ terrain.group afterward, so building it once in a beforeAll and
+  // sharing it is byte-identical to each test rebuilding its own copy: same
+  // seed, same deterministic zone-order build, no test mutates the result.
+  describe('with every zone built', () => {
+    let terrain: TerrainView;
 
-    const terrain = buildTerrain(WORLD_SEED);
-    for (const zone of ZONES) {
-      const task = terrain.ensureZone(zone);
-      await vi.runAllTimersAsync();
-      await task;
-    }
+    beforeAll(async () => {
+      vi.useFakeTimers();
+      vi.resetModules();
+      mockEmptyAssetLoads();
+      const { buildTerrain } = await import('../src/render/terrain');
+      const { ZONES } = await import('../src/sim/data');
 
-    // Sample every 60u chunk cell's centre across the whole world box. Before
-    // the gap-cell fix this found 96 uncovered cells (the south-west quadrant,
-    // the centre column north of Frostveil, and the overhanging north row).
-    const CHUNK = 60;
-    const uncovered: [number, number][] = [];
-    for (let z = WORLD_MIN_Z + CHUNK / 2; z < WORLD_MAX_Z; z += CHUNK) {
-      for (let x = -WORLD_MAX_X + CHUNK / 2; x < WORLD_MAX_X; x += CHUNK) {
-        if (!coversPoint(terrain.group, x, z)) uncovered.push([x, z]);
+      terrain = buildTerrain(WORLD_SEED);
+      for (const zone of ZONES) {
+        const task = terrain.ensureZone(zone);
+        await vi.runAllTimersAsync();
+        await task;
       }
-    }
-    expect(uncovered).toEqual([]);
-    terrain.cancelStreaming();
-  });
-
-  it('builds every cell exactly once across all zones', async () => {
-    vi.resetModules();
-    mockEmptyAssetLoads();
-    const { buildTerrain } = await import('../src/render/terrain');
-    const { ZONES } = await import('../src/sim/data');
-
-    // Nearest-rect ownership must stay single-owner: a cell claimed by two
-    // zones would mesh twice and z-fight, which is the failure mode a plain
-    // "nearest zone" fallback in each zone's own loop would have.
-    const terrain = buildTerrain(WORLD_SEED);
-    for (const zone of ZONES) {
-      const task = terrain.ensureZone(zone);
-      await vi.runAllTimersAsync();
-      await task;
-    }
-
-    const footprints = terrain.group.children.map((mesh) => {
-      const box = new THREE.Box3().setFromObject(mesh);
-      return `${box.min.x.toFixed(2)},${box.min.z.toFixed(2)},${box.max.x.toFixed(2)},${box.max.z.toFixed(2)}`;
+      vi.useRealTimers();
     });
-    expect(new Set(footprints).size).toBe(footprints.length);
-    terrain.cancelStreaming();
+
+    afterAll(() => {
+      terrain.cancelStreaming();
+    });
+
+    it('leaves no uncovered cell anywhere once every zone is built', async () => {
+      const { WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z } = await import('../src/sim/data');
+
+      // Sample every 60u chunk cell's centre across the whole world box.
+      // Before the gap-cell fix this found 96 uncovered cells (the
+      // south-west quadrant, the centre column north of Frostveil, and the
+      // overhanging north row).
+      const CHUNK = 60;
+      const uncovered: [number, number][] = [];
+      for (let z = WORLD_MIN_Z + CHUNK / 2; z < WORLD_MAX_Z; z += CHUNK) {
+        for (let x = -WORLD_MAX_X + CHUNK / 2; x < WORLD_MAX_X; x += CHUNK) {
+          if (!coversPoint(terrain.group, x, z)) uncovered.push([x, z]);
+        }
+      }
+      expect(uncovered).toEqual([]);
+    });
+
+    it('builds every cell exactly once across all zones', () => {
+      // Nearest-rect ownership must stay single-owner: a cell claimed by two
+      // zones would mesh twice and z-fight, which is the failure mode a plain
+      // "nearest zone" fallback in each zone's own loop would have.
+      const footprints = terrain.group.children.map((mesh) => {
+        const box = new THREE.Box3().setFromObject(mesh);
+        return `${box.min.x.toFixed(2)},${box.min.z.toFixed(2)},${box.max.x.toFixed(2)},${box.max.z.toFixed(2)}`;
+      });
+      expect(new Set(footprints).size).toBe(footprints.length);
+    });
   });
 });

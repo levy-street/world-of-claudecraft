@@ -2,7 +2,24 @@ import { isPartyFrameRelevantAura } from '../sim/aura_classify';
 import type { PartyInfo, PartyMemberInfo } from '../world_api';
 import type { PartyPetInfo } from './pet_frame_view';
 
-export const PARTY_FRAME_RANGE_YD = 100;
+/**
+ * The distance past which a party/raid row is badged out of range.
+ *
+ * This is the healer's ONLY signal for "can I reach them", so it has to be the
+ * range they can actually cast at, not the range at which the client still knows
+ * the body exists. It was 100, close to the interest radius, while every
+ * friendly-targeted ability in the game is 30: a member anywhere from 30 to 100
+ * yards away showed a clean row and refused every heal with "Out of range",
+ * which is exactly what battleground healers reported.
+ *
+ * Pinned against the real ability table by `tests/party_frames.test.ts`, so
+ * retuning heal range fails the test rather than silently desyncing the badge.
+ *
+ * What it still cannot tell you is LINE OF SIGHT: a member in range behind a
+ * wall reads as reachable and the cast refuses. That is a separate surface, not
+ * something a distance threshold can express.
+ */
+export const PARTY_FRAME_RANGE_YD = 30;
 
 /** A member row's data. `pet` is attached CLIENT-SIDE from the entity roster
  *  (findPetsByOwner), not from the party wire: absent when the member has no pet,

@@ -10,8 +10,13 @@
 //
 // Renderer contract: construct once with the scene + a terrain-height
 // resolver, spawn from the events, update(dt) once per frame beside the other
-// transient systems. Geometries are shared; materials are per instance (they
-// animate) and disposed on expiry. Math.random is fine here (render-only).
+// transient systems. Geometries are shared or per instance (spawn position
+// bakes into their vertices, so those still dispose on expiry); materials
+// only vary in animated uniforms (opacity), so every material config is
+// pooled by kind and returned to its free list on expiry instead of
+// disposed, so a burst of casts (a raid boss Meteor Shower) reuses the same
+// Material instances instead of allocating and disposing a fresh batch per
+// cast. Math.random is fine here (render-only).
 
 import * as THREE from 'three';
 import { SCHOOL_COLORS } from './vfx';
@@ -82,6 +87,7 @@ interface RuneFx {
   group: THREE.Group;
   orbit: THREE.Group;
   mats: THREE.Material[];
+  matKinds: string[];
   ownedGeometries: THREE.BufferGeometry[];
   duration: number;
   elapsed: number;
@@ -117,6 +123,10 @@ export class MageGroundFx {
   private meteorTrailGeo: THREE.ConeGeometry | null = null;
   private meteorFlameGeo: THREE.BufferGeometry | null = null;
   private runeRingGeo: THREE.RingGeometry | null = null;
+  /** Free list of retired materials, bucketed by their fixed config kind
+   *  (color/blending/transparency never change after construction here,
+   *  only opacity animates per instance). */
+  private readonly materialPool = new Map<string, THREE.Material[]>();
 
   constructor(
     scene: THREE.Scene,
@@ -128,6 +138,33 @@ export class MageGroundFx {
     this.onMeteorLand = onMeteorLand;
   }
 
+  /** Reuse a retired material of this kind if the pool has one (resetting the
+   *  one animated field, opacity, back to its config baseline), otherwise
+   *  build a fresh one. `kind` identifies the fixed config, never per-spawn
+   *  data (spawn radius/duration/position never feed a material here). */
+  private acquireMaterial<TMat extends THREE.Material>(
+    kind: string,
+    baseOpacity: number,
+    build: () => TMat,
+  ): TMat {
+    const bucket = this.materialPool.get(kind);
+    const pooled = bucket?.pop() as TMat | undefined;
+    if (pooled) {
+      pooled.opacity = baseOpacity;
+      return pooled;
+    }
+    return build();
+  }
+
+  private releaseMaterial(kind: string, material: THREE.Material): void {
+    let bucket = this.materialPool.get(kind);
+    if (!bucket) {
+      bucket = [];
+      this.materialPool.set(kind, bucket);
+    }
+    bucket.push(material);
+  }
+
   spawnMeteor(opts: MeteorFallSpawn): void {
     const geometry = this.ensureMeteorGeometry();
     const fire = new THREE.Color(SCHOOL_COLORS.fire);
@@ -137,25 +174,35 @@ export class MageGroundFx {
 
     const body = new THREE.Group();
     body.name = 'mage-meteor-body';
-    const rockMat = new THREE.MeshStandardMaterial({
-      color: 0x111013,
-      emissive: 0x210600,
-      emissiveIntensity: 0.42,
-      roughness: 0.9,
-      metalness: 0.04,
-    });
+    const rockMat = this.acquireMaterial(
+      'meteor-rock',
+      1,
+      () =>
+        new THREE.MeshStandardMaterial({
+          color: 0x111013,
+          emissive: 0x210600,
+          emissiveIntensity: 0.42,
+          roughness: 0.9,
+          metalness: 0.04,
+        }),
+    );
     const rock = new THREE.Mesh(geometry.rock, rockMat);
     rock.name = 'mage-meteor-rock';
     rock.castShadow = true;
     body.add(rock);
 
-    const magmaMat = new THREE.MeshBasicMaterial({
-      color: magma.clone().multiplyScalar(1.75),
-      transparent: true,
-      opacity: 0.98,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-    });
+    const magmaMat = this.acquireMaterial(
+      'meteor-magma',
+      0.98,
+      () =>
+        new THREE.MeshBasicMaterial({
+          color: magma.clone().multiplyScalar(1.75),
+          transparent: true,
+          opacity: 0.98,
+          blending: THREE.AdditiveBlending,
+          depthWrite: false,
+        }),
+    );
     const cracks = new THREE.Group();
     cracks.name = 'mage-meteor-cracks';
     for (const crackGeometry of geometry.cracks) {
@@ -165,14 +212,19 @@ export class MageGroundFx {
     }
     body.add(cracks);
 
-    const coronaMat = new THREE.MeshBasicMaterial({
-      color: fire.clone().multiplyScalar(1.5),
-      transparent: true,
-      opacity: 0.16,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-      side: THREE.BackSide,
-    });
+    const coronaMat = this.acquireMaterial(
+      'meteor-corona',
+      0.16,
+      () =>
+        new THREE.MeshBasicMaterial({
+          color: fire.clone().multiplyScalar(1.5),
+          transparent: true,
+          opacity: 0.16,
+          blending: THREE.AdditiveBlending,
+          depthWrite: false,
+          side: THREE.BackSide,
+        }),
+    );
     const corona = new THREE.Mesh(geometry.corona, coronaMat);
     corona.name = 'mage-meteor-corona';
     corona.scale.set(1.18, 1.18, 1.18);
@@ -181,22 +233,32 @@ export class MageGroundFx {
 
     const trail = new THREE.Group();
     trail.name = 'mage-meteor-trail';
-    const trailOuterMat = new THREE.MeshBasicMaterial({
-      color: 0xd63708,
-      transparent: true,
-      opacity: 0.48,
-      blending: THREE.NormalBlending,
-      depthWrite: false,
-      side: THREE.DoubleSide,
-    });
-    const trailInnerMat = new THREE.MeshBasicMaterial({
-      color: 0xff7a12,
-      transparent: true,
-      opacity: 0.3,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-      side: THREE.DoubleSide,
-    });
+    const trailOuterMat = this.acquireMaterial(
+      'meteor-trail-outer',
+      0.48,
+      () =>
+        new THREE.MeshBasicMaterial({
+          color: 0xd63708,
+          transparent: true,
+          opacity: 0.48,
+          blending: THREE.NormalBlending,
+          depthWrite: false,
+          side: THREE.DoubleSide,
+        }),
+    );
+    const trailInnerMat = this.acquireMaterial(
+      'meteor-trail-inner',
+      0.3,
+      () =>
+        new THREE.MeshBasicMaterial({
+          color: 0xff7a12,
+          transparent: true,
+          opacity: 0.3,
+          blending: THREE.AdditiveBlending,
+          depthWrite: false,
+          side: THREE.DoubleSide,
+        }),
+    );
     const outerTrail = new THREE.Mesh(geometry.trail, trailOuterMat);
     outerTrail.name = 'mage-meteor-trail-outer';
     outerTrail.scale.set(1.08, 0.96, 1.08);
@@ -220,15 +282,20 @@ export class MageGroundFx {
     }
     const emberGeo = new THREE.BufferGeometry();
     emberGeo.setAttribute('position', new THREE.BufferAttribute(emberPositions, 3));
-    const emberMat = new THREE.PointsMaterial({
-      color: 0xffb33c,
-      size: 0.18,
-      transparent: true,
-      opacity: 0.9,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-      sizeAttenuation: true,
-    });
+    const emberMat = this.acquireMaterial(
+      'meteor-ember',
+      0.9,
+      () =>
+        new THREE.PointsMaterial({
+          color: 0xffb33c,
+          size: 0.18,
+          transparent: true,
+          opacity: 0.9,
+          blending: THREE.AdditiveBlending,
+          depthWrite: false,
+          sizeAttenuation: true,
+        }),
+    );
     const embers = new THREE.Points(emberGeo, emberMat);
     embers.name = 'mage-meteor-trail-embers';
     trail.add(embers);
@@ -402,13 +469,18 @@ export class MageGroundFx {
     }
     const boundaryGeo = new THREE.BufferGeometry();
     boundaryGeo.setAttribute('position', new THREE.BufferAttribute(boundaryPositions, 3));
-    const boundaryMat = new THREE.LineBasicMaterial({
-      color: 0xff6a12,
-      transparent: true,
-      opacity: 0.42,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-    });
+    const boundaryMat = this.acquireMaterial(
+      'meteor-boundary',
+      0.42,
+      () =>
+        new THREE.LineBasicMaterial({
+          color: 0xff6a12,
+          transparent: true,
+          opacity: 0.42,
+          blending: THREE.AdditiveBlending,
+          depthWrite: false,
+        }),
+    );
     const boundary = new THREE.LineLoop(boundaryGeo, boundaryMat);
     boundary.name = 'mage-meteor-telegraph-boundary';
     boundary.renderOrder = 8;
@@ -416,13 +488,18 @@ export class MageGroundFx {
 
     const innerGeo = new THREE.BufferGeometry();
     innerGeo.setAttribute('position', new THREE.BufferAttribute(innerPositions, 3));
-    const innerRingMat = new THREE.LineBasicMaterial({
-      color: 0xffb02e,
-      transparent: true,
-      opacity: 0.22,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-    });
+    const innerRingMat = this.acquireMaterial(
+      'meteor-inner-ring',
+      0.22,
+      () =>
+        new THREE.LineBasicMaterial({
+          color: 0xffb02e,
+          transparent: true,
+          opacity: 0.22,
+          blending: THREE.AdditiveBlending,
+          depthWrite: false,
+        }),
+    );
     const innerRing = new THREE.LineLoop(innerGeo, innerRingMat);
     innerRing.name = 'mage-meteor-telegraph-inner-ring';
     innerRing.renderOrder = 8;
@@ -447,26 +524,36 @@ export class MageGroundFx {
     }
     const veinGeo = new THREE.BufferGeometry();
     veinGeo.setAttribute('position', new THREE.Float32BufferAttribute(veinVertices, 3));
-    const veinMat = new THREE.LineBasicMaterial({
-      color: 0xff3d06,
-      transparent: true,
-      opacity: 0.18,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-    });
+    const veinMat = this.acquireMaterial(
+      'meteor-vein',
+      0.18,
+      () =>
+        new THREE.LineBasicMaterial({
+          color: 0xff3d06,
+          transparent: true,
+          opacity: 0.18,
+          blending: THREE.AdditiveBlending,
+          depthWrite: false,
+        }),
+    );
     const veins = new THREE.LineSegments(veinGeo, veinMat);
     veins.name = 'mage-meteor-telegraph-veins';
     veins.renderOrder = 7;
     group.add(veins);
 
-    const flameMat = new THREE.MeshBasicMaterial({
-      color: 0xff5f0b,
-      transparent: true,
-      opacity: 0.44,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-      side: THREE.DoubleSide,
-    });
+    const flameMat = this.acquireMaterial(
+      'meteor-flame',
+      0.44,
+      () =>
+        new THREE.MeshBasicMaterial({
+          color: 0xff5f0b,
+          transparent: true,
+          opacity: 0.44,
+          blending: THREE.AdditiveBlending,
+          depthWrite: false,
+          side: THREE.DoubleSide,
+        }),
+    );
     const flames = new THREE.InstancedMesh(flameGeometry, flameMat, METEOR_FLAME_COUNT);
     flames.name = 'mage-meteor-telegraph-flames';
     flames.frustumCulled = false;
@@ -506,6 +593,7 @@ export class MageGroundFx {
     const group = new THREE.Group();
     group.name = 'mage-rune-power';
     const mats: THREE.Material[] = [];
+    const matKinds: string[] = [];
     const ownedGeometries: THREE.BufferGeometry[] = [];
     const baseOpacities: number[] = [];
     // Outer ring at the zone edge, inner ring at half, both additive.
@@ -513,33 +601,44 @@ export class MageGroundFx {
       ['mage-rune-power-outer-ring', opts.radius, 0.75],
       ['mage-rune-power-inner-ring', opts.radius * 0.55, 0.45],
     ] as const) {
-      const mat = new THREE.MeshBasicMaterial({
-        color: arcane.clone().multiplyScalar(1.6),
-        transparent: true,
+      const mat = this.acquireMaterial(
+        name,
         opacity,
-        blending: THREE.AdditiveBlending,
-        depthWrite: false,
-        side: THREE.DoubleSide,
-      });
+        () =>
+          new THREE.MeshBasicMaterial({
+            color: arcane.clone().multiplyScalar(1.6),
+            transparent: true,
+            opacity,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false,
+            side: THREE.DoubleSide,
+          }),
+      );
       const ringGeo = this.createTerrainRing(opts.x, opts.z, radius * 0.82, radius);
       const ring = new THREE.Mesh(ringGeo, mat);
       ring.name = name;
       ring.renderOrder = 7;
       group.add(ring);
       mats.push(mat);
+      matKinds.push(name);
       ownedGeometries.push(ringGeo);
       baseOpacities.push(opacity);
     }
     // Four spokes so the circle reads as an inscribed rune, not a plain ring.
     for (let i = 0; i < 4; i++) {
-      const mat = new THREE.MeshBasicMaterial({
-        color: arcane.clone().multiplyScalar(1.3),
-        transparent: true,
-        opacity: 0.4,
-        blending: THREE.AdditiveBlending,
-        depthWrite: false,
-        side: THREE.DoubleSide,
-      });
+      const mat = this.acquireMaterial(
+        'mage-rune-power-spoke',
+        0.4,
+        () =>
+          new THREE.MeshBasicMaterial({
+            color: arcane.clone().multiplyScalar(1.3),
+            transparent: true,
+            opacity: 0.4,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false,
+            side: THREE.DoubleSide,
+          }),
+      );
       const spokeGeo = this.createTerrainSpoke(
         opts.x,
         opts.z,
@@ -552,25 +651,32 @@ export class MageGroundFx {
       spoke.renderOrder = 7;
       group.add(spoke);
       mats.push(mat);
+      matKinds.push('mage-rune-power-spoke');
       ownedGeometries.push(spokeGeo);
       baseOpacities.push(0.4);
     }
     // A soft filled glow at the center plus a ring of orbiting motes: the
     // inscription reads as living magic, not a chalk outline (owner playtest).
     const glowGeo = this.createTerrainDisc(opts.x, opts.z, opts.radius * 0.5, 32);
-    const glowMat = new THREE.MeshBasicMaterial({
-      color: arcane.clone().multiplyScalar(0.9),
-      transparent: true,
-      opacity: 0.18,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-      side: THREE.DoubleSide,
-    });
+    const glowMat = this.acquireMaterial(
+      'mage-rune-power-glow',
+      0.18,
+      () =>
+        new THREE.MeshBasicMaterial({
+          color: arcane.clone().multiplyScalar(0.9),
+          transparent: true,
+          opacity: 0.18,
+          blending: THREE.AdditiveBlending,
+          depthWrite: false,
+          side: THREE.DoubleSide,
+        }),
+    );
     const glow = new THREE.Mesh(glowGeo, glowMat);
     glow.name = 'mage-rune-power-glow';
     glow.renderOrder = 6;
     group.add(glow);
     mats.push(glowMat);
+    matKinds.push('mage-rune-power-glow');
     ownedGeometries.push(glowGeo);
     baseOpacities.push(0.18);
 
@@ -580,18 +686,24 @@ export class MageGroundFx {
     const moteGeo = new THREE.SphereGeometry(0.12, 8, 6);
     ownedGeometries.push(moteGeo);
     for (let i = 0; i < 6; i++) {
-      const moteMat = new THREE.MeshBasicMaterial({
-        color: arcane.clone().multiplyScalar(1.9),
-        transparent: true,
-        opacity: 0.85,
-        blending: THREE.AdditiveBlending,
-        depthWrite: false,
-      });
+      const moteMat = this.acquireMaterial(
+        'mage-rune-power-mote',
+        0.85,
+        () =>
+          new THREE.MeshBasicMaterial({
+            color: arcane.clone().multiplyScalar(1.9),
+            transparent: true,
+            opacity: 0.85,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false,
+          }),
+      );
       const mote = new THREE.Mesh(moteGeo, moteMat);
       const a = (i / 6) * Math.PI * 2;
       mote.position.set(Math.cos(a) * opts.radius * 0.8, 0.5, Math.sin(a) * opts.radius * 0.8);
       orbit.add(mote);
       mats.push(moteMat);
+      matKinds.push('mage-rune-power-mote');
       baseOpacities.push(0.85);
     }
     group.add(orbit);
@@ -600,6 +712,7 @@ export class MageGroundFx {
       group,
       orbit,
       mats,
+      matKinds,
       ownedGeometries,
       duration: opts.duration,
       elapsed: 0,
@@ -710,14 +823,19 @@ export class MageGroundFx {
     }
     const geo = new THREE.BufferGeometry();
     geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-    const mat = new THREE.PointsMaterial({
-      color: frost.clone().lerp(new THREE.Color(0xffffff), 0.6),
-      size: 0.18,
-      transparent: true,
-      opacity: 0.9,
-      depthWrite: false,
-      sizeAttenuation: true,
-    });
+    const mat = this.acquireMaterial(
+      'snow-flake',
+      0.9,
+      () =>
+        new THREE.PointsMaterial({
+          color: frost.clone().lerp(new THREE.Color(0xffffff), 0.6),
+          size: 0.18,
+          transparent: true,
+          opacity: 0.9,
+          depthWrite: false,
+          sizeAttenuation: true,
+        }),
+    );
     const points = new THREE.Points(geo, mat);
     points.name = 'mage-blizzard-snow';
     points.frustumCulled = false;
@@ -725,14 +843,19 @@ export class MageGroundFx {
     // The perimeter: a crisp frost ring at the zone edge so the player reads
     // the storm's exact reach at a glance (reuses the rune ring geometry).
     this.runeRingGeo ??= new THREE.RingGeometry(0.82, 1, 48);
-    const ringMat = new THREE.MeshBasicMaterial({
-      color: frost.clone().lerp(new THREE.Color(0xffffff), 0.45).multiplyScalar(1.4),
-      transparent: true,
-      opacity: 0.55,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-      side: THREE.DoubleSide,
-    });
+    const ringMat = this.acquireMaterial(
+      'snow-ring',
+      0.55,
+      () =>
+        new THREE.MeshBasicMaterial({
+          color: frost.clone().lerp(new THREE.Color(0xffffff), 0.45).multiplyScalar(1.4),
+          transparent: true,
+          opacity: 0.55,
+          blending: THREE.AdditiveBlending,
+          depthWrite: false,
+          side: THREE.DoubleSide,
+        }),
+    );
     const ring = new THREE.Mesh(this.runeRingGeo, ringMat);
     ring.name = 'mage-blizzard-boundary';
     ring.rotation.x = -Math.PI / 2;
@@ -778,16 +901,16 @@ export class MageGroundFx {
           continue;
         }
         this.scene.remove(m.root);
-        m.rockMat.dispose();
-        m.magmaMat.dispose();
-        m.coronaMat.dispose();
-        m.trailOuterMat.dispose();
-        m.trailInnerMat.dispose();
-        m.emberMat.dispose();
-        m.boundaryMat.dispose();
-        m.innerRingMat.dispose();
-        m.veinMat.dispose();
-        m.flameMat.dispose();
+        this.releaseMaterial('meteor-rock', m.rockMat);
+        this.releaseMaterial('meteor-magma', m.magmaMat);
+        this.releaseMaterial('meteor-corona', m.coronaMat);
+        this.releaseMaterial('meteor-trail-outer', m.trailOuterMat);
+        this.releaseMaterial('meteor-trail-inner', m.trailInnerMat);
+        this.releaseMaterial('meteor-ember', m.emberMat);
+        this.releaseMaterial('meteor-boundary', m.boundaryMat);
+        this.releaseMaterial('meteor-inner-ring', m.innerRingMat);
+        this.releaseMaterial('meteor-vein', m.veinMat);
+        this.releaseMaterial('meteor-flame', m.flameMat);
         m.flames.dispose();
         for (const geometry of m.ownedGeometries) geometry.dispose();
         this.meteors.splice(i, 1);
@@ -829,7 +952,9 @@ export class MageGroundFx {
       r.elapsed += dt;
       if (r.elapsed >= r.duration) {
         this.scene.remove(r.group);
-        for (const mat of r.mats) mat.dispose();
+        r.mats.forEach((mat, idx) => {
+          this.releaseMaterial(r.matKinds[idx], mat);
+        });
         for (const geometry of r.ownedGeometries) geometry.dispose();
         this.runes.splice(i, 1);
         continue;
@@ -847,10 +972,10 @@ export class MageGroundFx {
       sfx.elapsed += dt;
       if (sfx.elapsed >= sfx.duration) {
         this.scene.remove(sfx.points);
-        sfx.mat.dispose();
+        this.releaseMaterial('snow-flake', sfx.mat);
         sfx.points.geometry.dispose();
         this.scene.remove(sfx.ring);
-        sfx.ringMat.dispose();
+        this.releaseMaterial('snow-ring', sfx.ringMat);
         this.snows.splice(i, 1);
         continue;
       }

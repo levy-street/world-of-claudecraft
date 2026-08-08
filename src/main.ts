@@ -137,7 +137,7 @@ import {
 import { safeStartupGraphicsPreset } from './game/startup_graphics_safety';
 import { shouldClearTargetOnGroundClick } from './game/target_click';
 import { loadingCurtainFadeMs, resolveUiEffectsProfile } from './game/ui_effects_profile';
-import { currentUtcDay } from './game/utc_day';
+import { currentResetDay, currentUtcDay } from './game/utc_day';
 import { voice } from './game/voice';
 import { telemetryZoneId } from './game/world_telemetry';
 import { zoneWarmupMode } from './game/zone_transition';
@@ -1193,7 +1193,7 @@ async function startGame(
       ...baseEntryDiagnostics(),
       tier: stats.tier,
       constrainedMemory: GFX.constrainedMemory,
-      nativeIosMemoryProfile: GFX.nativeIosMemoryProfile,
+      iosMemoryProfile: GFX.iosMemoryProfile,
       tightMemory: GFX.tightMemory,
       dynamicShadows: GFX.dynamicShadows,
       shadowMap: GFX.shadowMap,
@@ -1384,7 +1384,7 @@ async function startGame(
     // was ACTUALLY built at (vs the preset logged above), plus the memory-profile knobs.
     console.info(
       `[entry-guard] scene built: tier=${GFX.tier} constrainedMemory=${GFX.constrainedMemory} ` +
-        `nativeIosMemoryProfile=${GFX.nativeIosMemoryProfile} ` +
+        `iosMemoryProfile=${GFX.iosMemoryProfile} ` +
         `pooledVisualCap=${GFX.maxPooledCharacterVisuals} ` +
         `dynamicShadows=${GFX.dynamicShadows} shadowMap=${GFX.shadowMap} ` +
         `msaa=${GFX.msaaSamples} dprCap=${GFX.pixelRatioCap}`,
@@ -1922,6 +1922,7 @@ async function startGame(
     onSocial: () => hud.toggleSocial(),
     onDiscord: () => openDiscordEntry(),
     onDonate: () => window.open(DONATE_URL, '_blank', 'noopener,noreferrer'),
+    onWiki: () => hud.openWiki(),
     onEmotes: () => hud.toggleEmoteWheel(),
     onArena: () => hud.toggleArena(),
     onDungeonFinder: () => hud.toggleDungeonFinder(),
@@ -2422,6 +2423,14 @@ async function startGame(
     }
     if (key === 'showWalletOnPlayerCard') {
       settings.set('showWalletOnPlayerCard', !!value);
+      return;
+    }
+    if (key === 'showPlaytime') {
+      settings.set('showPlaytime', !!value);
+      // The character sheet is a cold window (no repeating driver), so repaint
+      // it now; this is also the repaint the sheet's own privacy eye relies on
+      // (its toggle routes through this arm).
+      hud.renderCharIfOpen();
       return;
     }
     if (key === 'showDevBadges') {
@@ -4167,6 +4176,7 @@ async function startGame(
       // Supply the UTC day for the delve daily reset (the sim never reads the wall
       // clock itself, to stay deterministic).
       offlineSim.utcDay = currentUtcDay();
+      offlineSim.resetDay = currentResetDay();
       while (acc >= DT) {
         const { mi, facing } = resolveMove(
           mouselook,
@@ -4611,7 +4621,6 @@ async function startGame(
     seen: introSeen,
     playerLevel: world.player.level,
     reducedMotion: settings.get('reduceMotion') || osReducedMotion,
-    native: isNativeRuntime(),
     platform: mobilePlatform(),
     engine: startupBrowserEnv.engine,
     constrainedMemory: GFX.constrainedMemory,
@@ -4632,7 +4641,7 @@ async function startGame(
   } else {
     if (introPolicy.reason === 'constrained-ios-webkit') {
       console.info(
-        `[entry-guard] spawn cinematic suppressed: constrained native iOS WebKit ` +
+        `[entry-guard] spawn cinematic suppressed: constrained iOS WebKit ` +
           `preset=${settings.get('graphicsPreset')} tier=${GFX.tier}`,
       );
     }
@@ -4696,10 +4705,10 @@ async function startGame(
     console.warn('Renderer prewarm failed', err);
   }
   // The entry allocation spike is over: start streaming the mob bodies the
-  // packaged iOS boot gate deliberately excluded (empty everywhere else). A mob
-  // whose GLB is still arriving renders a beat late through the fail-soft
-  // view-create path, instead of its decode competing with the scene build for
-  // the WebContent memory ceiling.
+  // iOS WebKit boot gate deliberately excluded (Safari, other iOS browsers, and
+  // the packaged app; empty everywhere else). A mob whose GLB is still arriving
+  // renders a beat late through the fail-soft view-create path, instead of its
+  // decode competing with the scene build for the WebContent memory ceiling.
   const streamedCount = startStreamedCharacterPreloads();
   if (streamedCount > 0) {
     console.info(`[entry-guard] streaming ${streamedCount} deferred character assets`);
@@ -6684,7 +6693,7 @@ const activeClassDetailsTimeouts: Record<string, number | null> = {};
 
 // The char-select roster row's real, in-world appearance for the 3D preview.
 function charselectAppearance(c: CharacterSummary): PreviewAppearance {
-  // The packaged iOS shell streams the Armory weapon-skin GLBs after world
+  // Every iOS WebKit host streams the Armory weapon-skin GLBs after world
   // entry instead of holding all of them at the launcher, so the preview of a
   // character wearing one needs ITS skin fetched on demand (the mech lazy-load
   // pattern). Memoized and a no-op when resident or on eager platforms; a
@@ -10846,7 +10855,12 @@ function wireStartScreens(): void {
       const canvas = $('#char-preview-canvas') as HTMLCanvasElement | null;
       if (container && canvas) {
         characterPreview = new CharacterPreview(container, canvas, {
-          constrainedMemory: NATIVE_APP,
+          // GFX.constrainedMemory covers every iOS WebKit host (Safari and other iOS
+          // browsers, not just the packaged app) plus the general touch/coarse-pointer
+          // detector, not just NATIVE_APP: the launcher's char-select preview sits in the
+          // same entry-allocation window the boot preload defers/streams for
+          // (assets/preload.ts: "a 12 GB iPhone 17 Pro was killed 1.6s into the LAUNCHER").
+          constrainedMemory: GFX.constrainedMemory,
         });
         // If a token auto-login already rendered the roster and selected a
         // character before assets finished, show its real appearance; otherwise

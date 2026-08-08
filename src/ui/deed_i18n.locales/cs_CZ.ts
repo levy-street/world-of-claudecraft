@@ -33,17 +33,19 @@ export const table: DeedLocaleTable = {
     desc: 'Vyčisti Trhlinu stupně S, nejtěžší úroveň, na jakou se může objevit trhlinový portál.',
   },
   pvp_honor_sergeant: {
-    name: 'Seržant',
+    name: 'Prolamovač šiků',
     desc: 'Získej za celý svůj život 10 000 cti. Její utrácení tě o hodnost nikdy nepřipraví.',
-    title: 'Seržant',
+    title: 'Prolamovač šiků',
   },
   pvp_honor_knight_lieutenant: {
+    name: 'Plenitel polí',
     desc: 'Získej za celý svůj život 40 000 cti, celou sezónu skutečné války za sebou.',
+    title: 'Plenitel polí',
   },
   pvp_honor_field_marshal: {
-    name: 'Polní maršál',
+    name: 'Korunovaný válkou',
     desc: 'Získej za celý svůj život 150 000 cti. Na kterémkoli realmu vzácnost, a taková i má být.',
-    title: 'Polní maršál',
+    title: 'Korunovaný válkou',
   },
   chr_drakemaw_broodlord: {
     name: 'Lamač líhně',

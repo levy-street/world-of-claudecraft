@@ -3,6 +3,7 @@
 // .bag-fine class and corner seal; these tests own the on/off decision only
 // (DOM/CSS contracts live next to the instance-marker suite).
 import { describe, expect, it } from 'vitest';
+import { ITEMS } from '../src/sim/data';
 import { MATERIAL_GRADES } from '../src/sim/professions/material_grades';
 import { bagFineMark } from '../src/ui/bag_fine_mark_view';
 
@@ -43,5 +44,17 @@ describe('bag_fine_mark_view: fine grade mark', () => {
     // Only reverse-index ids from material_grades count; a future free-form
     // fine_* content row without a MATERIAL_GRADES pairing stays unmarked.
     expect(bagFineMark('fine_not_a_real_material')).toBe(false);
+  });
+
+  it('every grade-table id resolves to a live ItemDef', () => {
+    // The cross-table invariant the marked-cell surfaces lean on: a markable
+    // id always has a def, so the mark's rim half (className, def-independent)
+    // and its cell content can never split across a known/unknown branch (the
+    // guild bank's unknown arm reasons from exactly this). A grade row whose
+    // item was removed from ITEMS breaks here, not in a painter.
+    for (const [baseId, row] of Object.entries(MATERIAL_GRADES)) {
+      expect(ITEMS[baseId]?.name, baseId).toBeTypeOf('string');
+      expect(ITEMS[row.fineItemId]?.name, row.fineItemId).toBeTypeOf('string');
+    }
   });
 });

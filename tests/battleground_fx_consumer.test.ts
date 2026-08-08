@@ -2,13 +2,18 @@
 // from buildBattlegroundObject, with a burst-recording Vfx stub and a
 // hand-rolled BgInfo. This is the consumer-side coverage the pure-core test
 // (tests/battleground_fx.test.ts) cannot give: the userData.bg handshake, the
-// carrier ring toggling, lean apply/reset, gem pose application, burst
+// lean apply/reset, gem pose application, burst
 // anchors/colors per transition, and the track-invalidation rules. The BgInfo
 // fixture shape is identical for the offline Sim and the wire mirror (one
 // facet type), so a single fixture covers both worlds.
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
-import { BattlegroundFx, BG_RING_ALLY, BG_RING_ENEMY } from '../src/render/battleground_fx';
+import {
+  BattlegroundFx,
+  BG_RING_ALLY,
+  BG_RING_DASH_SPEC,
+  BG_RING_ENEMY,
+} from '../src/render/battleground_fx';
 import { BG_RUNE_BOB_AMP } from '../src/render/battleground_fx_core';
 import { type BgObjectRefs, buildBattlegroundObject } from '../src/render/battleground_props';
 import type { Vfx } from '../src/render/vfx';
@@ -132,11 +137,10 @@ describe('BattlegroundFx.update', () => {
     expect(gem.rotation.y).toBe(spun); // early return: untouched
   });
 
-  it('toggles the carrier ring and lean with the carried state, yawed to the carrier', () => {
+  it('leans the pole over the carrier and resets it on drop, yawed to the carrier', () => {
     const h = makeHarness();
     const crimson = h.refs(h.crimsonFlag.group);
     h.fx.update(0.1);
-    expect(crimson.ring.visible).toBe(false);
     expect(crimson.lean.rotation.x).toBe(0);
     // an azure raider (pid 55) picks up the crimson flag
     const carrier = {
@@ -145,7 +149,8 @@ describe('BattlegroundFx.update', () => {
     h.views.set(55, carrier as never);
     h.sim.bgInfo = bgInfo([flagInfo('carried', 55), flagInfo('home')]);
     h.fx.update(0.2);
-    expect(crimson.ring.visible).toBe(true);
+    // The lean IS the carry tell now: the pole tips over the carrier's shoulder
+    // and there is no ground ring beneath them any more.
     expect(crimson.lean.rotation.x).toBeLessThan(0);
     expect(crimson.lean.rotation.y).toBeCloseTo(1.2, 5);
     // the pole mounts BEHIND the carrier along their facing, slightly raised
@@ -159,7 +164,6 @@ describe('BattlegroundFx.update', () => {
     // dropped: everything resets
     h.sim.bgInfo = bgInfo([flagInfo('dropped'), flagInfo('home')]);
     h.fx.update(0.4);
-    expect(crimson.ring.visible).toBe(false);
     expect(crimson.lean.rotation.x).toBe(0);
     expect(crimson.lean.rotation.y).toBe(0);
     expect(crimson.lean.position.x).toBe(0);
@@ -221,6 +225,32 @@ describe('BattlegroundFx.update', () => {
     );
     expect(ring70.children).toHaveLength(2); // dark underlay + color ring
     expect(ring70.visible).toBe(true);
+    // The identity ring is DASHED, never the solid annulus the target reticle
+    // owns, and it stays flat (rotation.x = -PI/2) with the underlay beneath.
+    for (const mesh of [colorMesh(ring70), ring70.children[0] as THREE.Mesh]) {
+      expect(mesh.rotation.x).toBeCloseTo(-Math.PI / 2, 6);
+      const index = mesh.geometry.getIndex();
+      expect(index?.count).toBe(BG_RING_DASH_SPEC.dashes * BG_RING_DASH_SPEC.segments * 6);
+    }
+    // Both layers share the pooled geometry across every player's ring.
+    expect(colorMesh(ring71).geometry).toBe(colorMesh(ring70).geometry);
+    expect((ring71.children[0] as THREE.Mesh).geometry).toBe(
+      (ring70.children[0] as THREE.Mesh).geometry,
+    );
+    // The dark underlay is dashed on the same cadence, NOT a solid ring behind
+    // the dashes: it overhangs each dash end (a full rim) yet still leaves a
+    // gap, or the solid silhouette the dashes exist to break comes right back.
+    const firstDashArc = (mesh: THREE.Mesh): number => {
+      const pos = mesh.geometry.getAttribute('position');
+      const angle = (i: number) => Math.atan2(pos.getY(i), pos.getX(i));
+      return angle(BG_RING_DASH_SPEC.segments * 2) - angle(0);
+    };
+    const cell = (Math.PI * 2) / BG_RING_DASH_SPEC.dashes;
+    const colorArc = firstDashArc(colorMesh(ring70));
+    const underArc = firstDashArc(ring70.children[0] as THREE.Mesh);
+    expect(colorArc).toBeCloseTo(cell * BG_RING_DASH_SPEC.duty, 6);
+    expect(underArc).toBeGreaterThan(colorArc);
+    expect(underArc).toBeLessThan(cell);
     expect(ring71.visible).toBe(false); // a corpse shows no ring
     // match over: every ring leaves the scene graph
     h.sim.bgInfo = null;
@@ -306,7 +336,8 @@ describe('BattlegroundFx.update', () => {
     h.sim.bgInfo = bgInfo([flagInfo('carried', 55), flagInfo('home')]);
     h.fx.update(0.3);
     expect(h.bursts).toHaveLength(0); // first sighting after the gap, silent
-    expect(h.refs(h.crimsonFlag.group).ring.visible).toBe(true); // but the ring shows
+    // but the lean applies, which is the carry tell
+    expect(h.refs(h.crimsonFlag.group).lean.rotation.x).toBeLessThan(0);
   });
 
   it('leaving the match resets tracks: re-entry never replays a stale transition', () => {

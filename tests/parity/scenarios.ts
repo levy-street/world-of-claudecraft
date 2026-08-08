@@ -2896,8 +2896,12 @@ function delveProgression(): Scenario {
       meta.copper = 100000;
       sim.delveBuyShopItem('collapsed_reliquary', 'reliquary_legs');
       sim.companionUpgrade('companion_tessa');
-      // Daily rollover: a fresh UTC day resets firstClearXp/markClears.
+      // Daily rollover: a fresh reset window resets firstClearXp/markClears.
+      // `resetDay` is the realm's own daily boundary, which is what every daily
+      // window now reads; `utcDay` stays the calendar stamp beside it, moved in
+      // step so the scenario keeps describing one instant rather than two.
       meta.delveDaily = { date: '2099-01-01', firstClearXp: new Set(['seed']), markClears: 2 };
+      sim.resetDay = '2099-06-25';
       sim.utcDay = '2099-06-25';
       sim.delveDailyWire(sim.playerId);
       rec.snapshot('shop-daily');

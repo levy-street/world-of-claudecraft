@@ -6,7 +6,8 @@
 // texture bytes (compressed mip chains counted as stored, bitmaps as w*h*4,
 // deduped by source), and the parsed-GLTF retention maps. English console
 // output by design. The one caller is the Renderer constructor's build
-// summary, gated to dev browsers and the native iOS profile. Known
+// summary, gated to dev browsers and the iOS WebKit profile (every iOS host, not
+// just the packaged app). Known
 // under-count: only the six common material map slots are walked; alphaMap,
 // envMap, scene.background and the standalone texture cache are not.
 import type * as THREE from 'three';

@@ -222,6 +222,17 @@ describe('Settings', () => {
     expect(new Settings().get('showOwnNameplate')).toBe(false);
   });
 
+  it('defaults Time Played revealed and persists concealing it across instances', () => {
+    // The character sheet's privacy eye and the Options row both write this
+    // per-device display preference; a blob saved before the setting existed
+    // resolves the same default-on path.
+    const fresh = new Settings();
+    expect(fresh.get('showPlaytime')).toBe(true);
+
+    fresh.set('showPlaytime', false);
+    expect(new Settings().get('showPlaytime')).toBe(false);
+  });
+
   it('defaults other-player nameplates off for fresh mobile sessions', () => {
     installTouchDefault(true);
 

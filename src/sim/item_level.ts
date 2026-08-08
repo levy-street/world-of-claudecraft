@@ -48,8 +48,10 @@ import {
   QUALITY_STAT_MULT,
   SLOT_STAT_MULT,
   STAT_PER_ILVL,
+  slotStatMultForItem,
   TWOHAND_DPS_MULT,
   TWOHAND_STAT_MULT,
+  WORN_OFFHAND_STAT_MULT,
 } from './item_budget';
 import type { ItemDef } from './types';
 
@@ -63,8 +65,10 @@ export {
   QUALITY_STAT_MULT,
   SLOT_STAT_MULT,
   STAT_PER_ILVL,
+  slotStatMultForItem,
   TWOHAND_DPS_MULT,
   TWOHAND_STAT_MULT,
+  WORN_OFFHAND_STAT_MULT,
 };
 
 // Raid loot is one tier above same-level 5-player dungeon loot: a 10-player raid
@@ -296,7 +300,7 @@ export function itemLevel(item: ItemDef): number | undefined {
 export function expectedStatBudget(item: ItemDef): number | undefined {
   const level = itemLevel(item);
   if (level === undefined) return undefined;
-  const base = primaryStatBudget(level, item.quality, item.slot);
+  const base = primaryStatBudget(level, item.quality, item.slot, slotStatMultForItem(item));
   return item.kind === 'weapon' && item.hand === 'twohand'
     ? Math.round(base * TWOHAND_STAT_MULT)
     : base;

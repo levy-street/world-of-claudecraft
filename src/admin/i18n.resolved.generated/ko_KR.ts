@@ -217,6 +217,7 @@ export const ko_KR: AdminTranslations = {
   "tickPerf.overBudget": "50ms 예산 초과",
   "tickPerf.loopHeading": "루프 단계",
   "tickPerf.simHeading": "sim.tick() 내부 단계",
+  "tickPerf.selfHeading": "셀프 스냅샷 키 그룹 (bcastSelf)",
   "tickPerf.colPhase": "단계",
   "tickPerf.colMean": "평균",
   "tickPerf.colP95": "p95",

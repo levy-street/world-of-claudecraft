@@ -20,10 +20,10 @@
 // is fighting unravels on its own while an engaged one is untouched.
 
 import { describe, expect, it } from 'vitest';
-import { MOBS } from '../src/sim/data';
+import { BUILTIN_WORLD, MOBS } from '../src/sim/data';
 import { DAMAGE_IDLE_DESPAWN_MOB_IDS, DAMAGE_IDLE_DESPAWN_SECONDS } from '../src/sim/entity_roster';
 import { Sim } from '../src/sim/sim';
-import type { Entity } from '../src/sim/types';
+import type { Entity, WorldContent } from '../src/sim/types';
 import { WORLD_SEED } from '../src/sim/world_seed';
 
 type AnySim = Sim & Record<string, unknown>;
@@ -31,8 +31,31 @@ type AnySim = Sim & Record<string, unknown>;
 const WHELP = 'dragonkin_whelp';
 const EGG = 'dragonkin_egg';
 
+// The suite only ever walks the Drakelands brood belt (the dragonkin_egg
+// clutches) and asserts on whelp/egg counts; it never touches an npc or a
+// ground object, so the rest of the built-in world is dead weight during Sim
+// construction. Every dragonkin_egg camp is authored offStream
+// (src/sim/content/drakelands.ts), and Sim.campPrivateRng seeds an offStream
+// camp's scatter from the world seed plus the camp's own mobId/center/radius/
+// count (never its position in the camps array, per the comment on
+// campPrivateRng), so dropping every other camp draws no shared rng and moves
+// no egg's spawn position, level, or facing. Every assertion below is
+// structural (greaterThan/toBe(0)/toEqual([0,0,0])), never a value pinned to
+// a specific seed's outcome, so this is safe unlike the corpse_harvest_sim
+// empty-world attempt (docs/local-gate-perf/baselines.md, Phase 9).
+const BROOD_BELT_TEST_WORLD: WorldContent = {
+  ...BUILTIN_WORLD,
+  camps: BUILTIN_WORLD.camps.filter((camp) => camp.mobId === EGG),
+  npcs: {},
+  groundObjects: [],
+};
+
 function beltWorld(): { sim: AnySim; player: Entity } {
-  const sim = new Sim({ seed: WORLD_SEED, playerClass: 'warrior' }) as AnySim;
+  const sim = new Sim({
+    seed: WORLD_SEED,
+    playerClass: 'warrior',
+    world: BROOD_BELT_TEST_WORLD,
+  }) as AnySim;
   const player = sim.player;
   sim.setPlayerLevel(60); // the walker must survive the clutch, not fight it
   return { sim, player };

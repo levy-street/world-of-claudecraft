@@ -3,8 +3,8 @@ export type GfxPostAa = 'none' | 'smaa';
 
 export interface GfxAaDeviceHints {
   readonly constrainedMemory?: boolean;
-  readonly nativeIosMemoryProfile?: boolean;
-  /** 4 GB-class WebKit rung: the strictest DPR cap, below native iOS. */
+  readonly iosMemoryProfile?: boolean;
+  /** 4 GB-class WebKit rung: the strictest DPR cap, below the iOS WebKit profile. */
   readonly tightMemory?: boolean;
 }
 
@@ -37,12 +37,12 @@ const STANDARD_POLICIES: Record<GfxAaTier, GfxAaPolicy> = {
  * outside the active region. Low keeps its existing no-AA path.
  */
 export function gfxAaPolicy(tier: GfxAaTier, hints: GfxAaDeviceHints = {}): GfxAaPolicy {
-  // The 4 GB-class rung is stricter than the native iOS profile: both WebKit
-  // hosts share the WebContent ceiling, and DPR is the largest single lever.
+  // The 4 GB-class rung is stricter than the general iOS WebKit profile: every
+  // WebKit host shares the WebContent ceiling, and DPR is the largest single lever.
   if (hints.tightMemory) {
     return { pixelRatioCap: 1, msaaSamples: 0, postAa: 'none' };
   }
-  if (hints.nativeIosMemoryProfile) {
+  if (hints.iosMemoryProfile) {
     return { pixelRatioCap: 1.25, msaaSamples: 0, postAa: 'none' };
   }
   const policy = STANDARD_POLICIES[tier];

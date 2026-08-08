@@ -509,6 +509,7 @@ const GENERAL_KEYS = [
   'showDevBadges',
   'showWalletOnCharacterScreen',
   'showWalletOnPlayerCard',
+  'showPlaytime',
   'showDailyRewardsChest',
   'showItemLevel',
   'showOwnNameplate',
@@ -715,6 +716,7 @@ describe('options_view: main menu routing', () => {
       'hudChrome.auraOverlay.title',
       'hud.options.audio',
       'hudChrome.perf.title',
+      'nav.wiki',
       'hudChrome.unstuck.menuButton',
       'hud.options.logout',
       'hud.options.returnToGame',
@@ -730,12 +732,19 @@ describe('options_view: main menu routing', () => {
       kind: 'goto',
       view: 'auras',
     });
+    // The Wiki row is unconditional (offline play has a wiki too) and routes to
+    // the confirm-first external hop, never a sub-view.
+    const wikiRows = offline.filter((e) => e.labelKey === 'nav.wiki');
+    expect(wikiRows).toHaveLength(1);
+    expect(wikiRows[0].action).toEqual({ kind: 'wiki' });
   });
 
   it('adds the online-only Report a Bug row when bug reporting is available', () => {
     const online = buildOptionsMenu({ bugReportAvailable: true });
     const bug = online.find((e) => e.labelKey === 'hudChrome.bugReport.menuButton');
     expect(bug?.action).toEqual({ kind: 'goto', view: 'bugreport' });
+    // The Wiki row keeps its place above the report row in both modes.
+    expect(online.find((e) => e.labelKey === 'nav.wiki')?.action).toEqual({ kind: 'wiki' });
     expect(online.slice(-4)).toEqual([
       { labelKey: 'hudChrome.bugReport.menuButton', action: { kind: 'goto', view: 'bugreport' } },
       { labelKey: 'hudChrome.unstuck.menuButton', action: { kind: 'unstuck' } },

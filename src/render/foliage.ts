@@ -275,6 +275,12 @@ function prepareFoliageSource(url: string): Promise<void> {
 
 /** Prepare the foliage source set selected by an explicit target profile. */
 export function prepareFoliageProfileAssets(target: Readonly<GfxSettings>): Promise<void> {
+  // Unlike the deferred BOOT lane below (unconditional on purpose: see the P0 comment
+  // there), filtering by `target` here is safe: this only runs from a live graphics
+  // rebuild (src/render/assets/graphics_profile.ts), which the coordinator always
+  // AWAITS before activating `target` and letting placement run against it - there is
+  // no "placement outruns this guess" window the way there is at boot.
+  //
   // Existing extracted URLs belong to the active renderer. Reload their
   // released source scenes before the coordinator clears derived caches, so
   // its old-profile rollback arm can still rebuild after a target failure.
@@ -289,23 +295,51 @@ const ALL_FOLIAGE_MODEL_URLS = new Set([
   ...Object.values(FOLIAGE_MODEL_URLS_HIGH).flat(),
   ...Object.values(FOLIAGE_MODEL_URLS_LOW).flat(),
 ]);
-let deferredFoliageModelUrls: ReadonlySet<string> | null = null;
-function deferredFoliageUrlsForBoot(): ReadonlySet<string> {
-  deferredFoliageModelUrls ??= new Set(Object.values(foliageModelUrlsFor(GFX)).flat());
-  return deferredFoliageModelUrls;
-}
+// Tier-INDEPENDENT on purpose (the v0.16.0 farmCrate P0; see
+// tests/render_asset_preload.test.ts): buildTrees() resolves modelUrls against the LIVE
+// GFX inside the Renderer constructor, which runs AFTER initGfxTier() re-resolves GFX
+// from the real WebGL gpuRenderer string (module-load GFX is only a pre-WebGL best
+// guess). The deferred lane opens (main.ts calls beginDeferredPreloads()) BEFORE that
+// renderer/initGfxTier exists, so a preload filtered to the import-time tier guess (this
+// used to gate on a `deferredFoliageUrlsForBoot()` snapshot frozen at whichever
+// leanFoliage value was live when the FIRST deferred thunk ran) can disagree with the
+// tier placement resolves moments later: buildTrees then asks for a HIGH-only variant
+// (pine_2/4/5, oak_2..5, ...) a LOW-guessed boot never fetched, and the synchronous
+// resolver throws "foliage model not preloaded: models/foliage/pine_2.glb", crashing
+// world entry. Every url is unconditionally prepared instead, so the set placement can
+// ever ask for is always already resident, at every tier, regardless of which guess was
+// live when the deferred lane opened.
 for (const url of ALL_FOLIAGE_MODEL_URLS) {
-  registerDeferredPreload(() => {
-    // Read GFX when the deferred lane opens, after startup safety and device
-    // defaults have settled. Non-target recipes stay cheap no-op tasks.
-    if (!deferredFoliageUrlsForBoot().has(url)) return Promise.resolve();
-    return prepareFoliageSource(url).then(() => {
-      // Packaged iOS still extracts each source as it lands so parsed scenes
-      // do not accumulate before the renderer build.
-      if (GFX.nativeIosMemoryProfile) extractParts(url);
-    });
-  });
+  registerDeferredPreload(() =>
+    prepareFoliageSource(url).then(() => {
+      // Every iOS WebKit host (Safari, other iOS browsers, and the packaged app) still
+      // extracts each source as it lands so parsed scenes do not accumulate before the
+      // renderer build - but only for a url the CURRENT tier guess actually places.
+      // extractParts bakes to float geometry and a converted material, which can
+      // OUTWEIGH the compressed source it replaces, so eagerly extracting every
+      // HIGH-only variant on a device that guessed lean would trade the crash this
+      // preload set exists to prevent for a permanent (session-long) memory cost on
+      // exactly the devices this profile protects. A url the guess excludes stays an
+      // un-extracted, un-released parsed source: cheaper than baking it for nothing,
+      // and still safe if the guess turns out wrong, because buildTrees() calls
+      // extractParts(url) itself (idempotent, cached) the moment placement actually
+      // needs it, same as it always has for every non-iOS profile.
+      if (GFX.iosMemoryProfile && Object.values(foliageModelUrlsFor(GFX)).flat().includes(url)) {
+        extractParts(url);
+      }
+    }),
+  );
 }
+
+/** Test-only view of the preload/placement tier-independence invariant above
+ *  (tests/render_asset_preload.test.ts). */
+export const foliagePreloadInternalsForTest = {
+  allFoliageModelUrls: (): ReadonlySet<string> => ALL_FOLIAGE_MODEL_URLS,
+  lowTierFoliageModelUrls: (): ReadonlySet<string> =>
+    new Set(Object.values(FOLIAGE_MODEL_URLS_LOW).flat()),
+  highTierFoliageModelUrls: (): ReadonlySet<string> =>
+    new Set(Object.values(FOLIAGE_MODEL_URLS_HIGH).flat()),
+};
 
 // Desaturated biome tints riding instanceColor. The textured models carry
 // their own hue, so tints are lerped most of the way to white before use

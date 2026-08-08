@@ -224,15 +224,33 @@ describe('/dev bg (Thornhollow Fields force-start)', () => {
     expect(errors).toContain('[dev] You are already in a battleground.');
   });
 
-  it('a refused queue join (dead caller) starts nothing and leaks no bot', () => {
+  it('a refused queue join (not the party leader) starts nothing and leaks no bot', () => {
+    const sim = devSim();
+    // A dead caller used to be the refusal this pinned. Dying no longer cancels
+    // a queue, so the bail-before-padding path is exercised through a refusal
+    // that survives: only a party's leader may commit it to the queue.
+    const leader = sim.addPlayer('priest', 'Leader');
+    sim.partyInvite(sim.playerId, leader);
+    sim.partyAccept(sim.playerId);
+    expect(sim.partyOf(sim.playerId)!.leader).not.toBe(sim.playerId);
+
+    sim.chat('/dev bg');
+
+    expect(sim.bgMatchFor(sim.playerId)).toBeNull();
+    expect([...sim.players.values()].filter((m) => m.isDevBot)).toHaveLength(0);
+  });
+
+  it('force-starts for a dead caller, who is seated alive', () => {
     const sim = devSim();
     sim.player.hp = 0;
     sim.player.dead = true;
 
     sim.chat('/dev bg');
 
-    expect(sim.bgMatchFor(sim.playerId)).toBeNull();
-    expect([...sim.players.values()].filter((m) => m.isDevBot)).toHaveLength(0);
+    expect(sim.bgMatchFor(sim.playerId), 'dying must not cancel the queue').toBeTruthy();
+    expect(sim.player.dead).toBe(false);
+    expect(sim.player.ghost).toBe(false);
+    expect(sim.player.hp).toBe(sim.player.maxHp);
   });
 
   it('reuses an idle leftover dev bot instead of spawning another', () => {

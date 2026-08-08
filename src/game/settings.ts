@@ -283,6 +283,11 @@ export const BOOL_SETTINGS = {
   // Purely a local display preference: the badge is still earned and broadcast
   // either way, this only controls whether THIS client renders it.
   showDevBadges: { def: true },
+  // on by default: reveal the lifetime "Time Played" value on the character
+  // sheet. The sheet's eye button flips this per device (screenshot / stream
+  // privacy); the total keeps accruing either way, this only controls whether
+  // THIS client displays it.
+  showPlaytime: { def: true },
   // on by default: render your OWN overhead nameplate (name, level, guild, hp,
   // $WOC holder tier, dev badge, linked-Discord PFP) exactly as other players see
   // it, so Discord linking and other flair changes have immediate visual feedback.

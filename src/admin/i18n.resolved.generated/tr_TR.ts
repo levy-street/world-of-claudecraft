@@ -217,6 +217,7 @@ export const tr_TR: AdminTranslations = {
   "tickPerf.overBudget": "50ms bütçesinin üzerinde",
   "tickPerf.loopHeading": "Döngü fazları",
   "tickPerf.simHeading": "sim.tick() dahili fazları",
+  "tickPerf.selfHeading": "Kendi anlık görüntüsünün anahtar grupları (bcastSelf)",
   "tickPerf.colPhase": "Faz",
   "tickPerf.colMean": "Ortalama",
   "tickPerf.colP95": "p95",

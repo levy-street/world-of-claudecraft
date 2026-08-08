@@ -336,6 +336,12 @@ export const zh_CN: EnTranslations = {
       "healerConfirmAccept": "复活",
       "healerConfirmCancel": "取消"
     },
+    "wiki": {
+      "confirmTitle": "打开维基？",
+      "confirmBody": "将在浏览器中打开 World of ClaudeCraft 维基，游戏会继续运行。",
+      "confirmOpen": "打开维基",
+      "confirmCancel": "取消"
+    },
     "unstuck": {
       "menuButton": "脱困",
       "help": "脱困：/unstuck 会启动原地倒计时，随后将你移动到附近可到达的安全位置。",
@@ -1313,6 +1319,7 @@ export const zh_CN: EnTranslations = {
       "keybindHelpLockCursorOnRotate": "拖动旋转镜头时将鼠标光标保持在窗口内，使其无法到达屏幕边缘或移动到另一台显示器。如果你喜欢自由光标，请关闭此选项。",
       "showWalletOnCharacterScreen": "在角色界面显示钱包",
       "showWalletOnPlayerCard": "在玩家卡片显示钱包",
+      "showPlaytime": "在角色界面显示游戏时长",
       "showDevBadges": "显示开发者徽章",
       "showOwnNameplate": "显示我的姓名板",
       "showPlayerNameplates": "显示玩家姓名板",
@@ -1545,7 +1552,13 @@ export const zh_CN: EnTranslations = {
     },
     "charSheet": {
       "offense": "攻击",
-      "defense": "防御"
+      "defense": "防御",
+      "playtimeLabel": "游戏时长",
+      "playtimeParts": "{major}{minor}",
+      "playtimeUnderMinute": "不到一分钟",
+      "playtimeHidden": "已隐藏",
+      "showPlaytimeAria": "显示游戏时长",
+      "hidePlaytimeAria": "隐藏游戏时长"
     },
     "statInfo": {
       "fromYour": "来自你的 {value} 点{stat}：",
@@ -1667,6 +1680,24 @@ export const zh_CN: EnTranslations = {
         "few": "剩余 {count} 秒",
         "many": "剩余 {count} 秒",
         "other": "剩余 {count} 秒"
+      },
+      "playtimeDays": {
+        "one": "{count} 天",
+        "few": "{count} 天",
+        "many": "{count} 天",
+        "other": "{count} 天"
+      },
+      "playtimeHours": {
+        "one": "{count} 小时",
+        "few": "{count} 小时",
+        "many": "{count} 小时",
+        "other": "{count} 小时"
+      },
+      "playtimeMinutes": {
+        "one": "{count} 分钟",
+        "few": "{count} 分钟",
+        "many": "{count} 分钟",
+        "other": "{count} 分钟"
       },
       "playersOnline": {
         "one": "查询：{realm}上有{count}名玩家在线。",
@@ -1921,6 +1952,9 @@ export const zh_CN: EnTranslations = {
       "sortRecent": "最近",
       "sortQuality": "品质",
       "sortName": "名称",
+      "sortButton": "整理",
+      "sortButtonAria": "整理背包",
+      "sortButtonHint": "合并堆叠并按类型分组物品",
       "searchPlaceholder": "搜索物品",
       "searchAria": "按名称搜索背包物品",
       "noMatch": "没有符合筛选条件的物品。",

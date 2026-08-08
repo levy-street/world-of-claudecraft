@@ -1238,6 +1238,48 @@ export const TARGETS = [
     },
   },
   {
+    key: 'inventory-sort',
+    label: 'Bags after the one-shot Sort (stacks consolidated, ladder order)',
+    when: ['sim/inventory_sort', 'ui/bags_window'],
+    // A deliberately messy bag (scattered partial stacks of the same material,
+    // fine grades split from their base, gear and trash interleaved), then the
+    // REAL Sort button press. On a base checkout the button does not exist and
+    // the click is skipped, so the same recipe shoots the honest BEFORE state.
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    async capture(page) {
+      await page.evaluate(() => {
+        const sim = window.__game?.sim;
+        const meta = sim?.players?.values?.().next?.()?.value;
+        const scramble = [
+          { itemId: 'copper_ore', count: 12 },
+          { itemId: 'baked_bread', count: 3 },
+          { itemId: 'copper_ore', count: 7 },
+          { itemId: 'fine_copper_ore', count: 4 },
+          { itemId: 'silverleaf_herb', count: 9 },
+          { itemId: 'copper_ore', count: 5 },
+          { itemId: 'fine_silverleaf_herb', count: 2 },
+          { itemId: 'silverleaf_herb', count: 6 },
+        ];
+        if (meta) for (const s of scramble) meta.inventory.push({ ...s });
+        for (const id of ['eastbrook_arming_sword', 'cryptbone_helm', 'minor_healing_potion']) {
+          try {
+            sim?.addItem(id, 1);
+          } catch {}
+        }
+        const el = document.querySelector('#bags');
+        if (el) el.style.display = 'none';
+        window.__game?.hud?.toggleBags?.();
+      });
+      await wait(500);
+      await page.evaluate(() => {
+        document.querySelector('button.bag-sort-btn')?.click();
+      });
+      // Past the settle ripple (160ms + capped stagger) so the shot is stable.
+      await wait(900);
+      return { clip: '#bags' };
+    },
+  },
+  {
     key: 'bank-chips',
     label: 'Bank window with its bags companion: category chips and Deposit materials',
     when: ['ui/bank', 'ui/bag_filter', 'sim/material_taxonomy'],
@@ -1311,8 +1353,14 @@ export const TARGETS = [
   },
   {
     key: 'bank-instance-marks',
-    label: 'Bank grid corner marks: masterwork seal and per-copy glyphs on banked slots',
-    when: ['ui/bank_window', 'ui/guild_bank_window', 'ui/item_instance_glyph_mark'],
+    label: 'Bank grid corner marks: masterwork seal, per-copy glyphs, and the fine-grade mark',
+    when: [
+      'ui/bank_window',
+      'ui/guild_bank_window',
+      'ui/item_instance_glyph_mark',
+      'ui/bag_fine_mark',
+      'ui/bag_corner_mark',
+    ],
     variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
     async capture(page) {
       await page.evaluate(() => {
@@ -1321,7 +1369,9 @@ export const TARGETS = [
         // One copy per corner-mark kind plus a plain control stack, so the
         // vault shows the masterwork seal and the enchanted / signed / bound
         // glyphs beside an unmarked cell. The personal bank has no transfer
-        // lock, so every copy deposits.
+        // lock, so every copy deposits. A fine grade beside its base material
+        // shows the fine rim/wash/seal surviving deposit against the unmarked
+        // base stack (the bags `inventory` target's contrast idiom).
         try {
           sim?.addItemInstance?.('worn_sword', {
             signer: 'Thorgar',
@@ -1333,6 +1383,8 @@ export const TARGETS = [
           // so a quest-flagged fixture would silently drop the bound cell.
           sim?.addItemInstance?.('rough_hide', { bindOnTrade: true });
           sim?.addItem?.('baked_bread', 3);
+          sim?.addItem?.('copper_ore', 2);
+          sim?.addItem?.('fine_copper_ore', 2);
         } catch {}
         // Stand beside the banker so the proximity-gated bank snapshot is
         // live (bankInfo is null out of reach; the bank-chips recipe idiom).
@@ -1362,8 +1414,10 @@ export const TARGETS = [
           if (idx < 0) break;
           world.bankDeposit(idx);
         }
-        const plain = world.inventory.findIndex((s) => s?.itemId === 'baked_bread');
-        if (plain >= 0) world.bankDeposit(plain);
+        for (const id of ['baked_bread', 'copper_ore', 'fine_copper_ore']) {
+          const at = world.inventory.findIndex((s) => s?.itemId === id);
+          if (at >= 0) world.bankDeposit(at);
+        }
       });
       // Poll for the deposited cells, not the marks: the same recipe shoots
       // the BEFORE tree, where the bank paints no corner mark at all.
@@ -3534,11 +3588,17 @@ export const TARGETS = [
   },
   {
     key: 'hunter-quiver-paperdoll',
-    label: 'Hunter paperdoll with a quiver in the off-hand',
+    label: 'Hunter paperdoll: a two-hander and a quiver worn together',
     // Quivers are the first items that put anything in a hunter's off-hand, so
     // the paperdoll is the view that shows the change. Keyed on the quiver
     // records themselves rather than a ui/ path: the diff is content-only.
-    when: ['content/zone3', 'content/items'],
+    //
+    // The recipe equips a TWO-HANDER before the quiver on purpose. A quiver on
+    // its own paints the same paperdoll either way, so it cannot show the
+    // two-hand exclusion: on the base tree the quiver benches the greatblade and
+    // the main hand shoots up EMPTY, which is the reported bug. Both slots
+    // filled is the fix.
+    when: ['content/zone3', 'content/items', 'equipment_rules', 'item_budget'],
     variants: [
       { key: 'desktop', charClass: 'hunter', charName: 'Fletcher' },
       { key: 'mobile', mobile: true, charClass: 'hunter', charName: 'Fletcher' },
@@ -3557,11 +3617,18 @@ export const TARGETS = [
           'cragmaw_huntquiver',
           'gravewyrm_bone_quiver',
           'direfang_quiver',
+          'direfang_greatblade',
         ]) {
           try {
             sim?.addItem(id, 1);
           } catch {}
         }
+        // Two-hander FIRST, then the quiver: this is the exact order a player
+        // hits the bug in, and the order that leaves the main hand empty on the
+        // base tree.
+        try {
+          sim?.equipItem('direfang_greatblade');
+        } catch {}
         try {
           sim?.equipItem('direfang_quiver');
         } catch {}
@@ -8001,6 +8068,51 @@ export const TARGETS = [
       );
       if (!proof) throw new Error('click did not resolve to the live mob over the corpse');
       return {};
+    },
+  },
+  {
+    key: 'wiki-launcher',
+    label: 'Wiki launcher: micro-bar button, Esc game-menu row, confirm dialog, mobile More tray',
+    when: ['ui/wiki_link'],
+    variants: [
+      { key: 'microbar' },
+      { key: 'game-menu' },
+      { key: 'confirm' },
+      { key: 'more-tray', mobile: true },
+    ],
+    async capture(page, variant) {
+      const scene = variant?.key ?? 'microbar';
+      if (scene === 'microbar') {
+        const ready = await pollForSize(page, '#side-buttons');
+        if (!ready) return { skip: 'the micro-button bar never became visible' };
+        return { clip: '#side-buttons' };
+      }
+      if (scene === 'game-menu') {
+        await page.evaluate(() => window.__game?.hud?.toggleOptionsMenu?.());
+        const ready = await pollForSize(page, '#options-menu');
+        if (!ready) return { skip: 'the game menu never became visible' };
+        return { clip: '#options-menu' };
+      }
+      if (scene === 'confirm') {
+        // Guarded so a BEFORE capture on the base build (no hud.openWiki yet)
+        // skips cleanly instead of throwing.
+        const opened = await page.evaluate(() => {
+          const hud = window.__game?.hud;
+          if (!hud?.openWiki) return { ok: false, reason: 'hud.openWiki is not present' };
+          hud.openWiki();
+          return { ok: true };
+        });
+        if (!opened.ok) return { skip: opened.reason };
+        const ready = await pollForSize(page, '#confirm-dialog');
+        if (!ready) return { skip: 'the wiki confirm dialog never became visible' };
+        return { clip: '#confirm-dialog' };
+      }
+      // more-tray (mobile): open the tray through the real More button handler,
+      // the same path a player taps, so the shot proves the binding is live.
+      await page.evaluate(() => document.getElementById('mobile-more')?.click());
+      const ready = await pollForSize(page, '#mobile-extra-controls');
+      if (!ready) return { skip: 'the mobile More tray never opened' };
+      return { clip: '#mobile-extra-controls' };
     },
   },
 ];

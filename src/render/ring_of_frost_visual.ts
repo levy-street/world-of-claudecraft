@@ -10,6 +10,9 @@ const SHARD_COUNT = 30;
 const MOTE_COUNT = 64;
 const GROW_SECONDS = 0.35;
 const FADE_SECONDS = 0.7;
+// Per-role material pool cap: generous headroom over any plausible concurrent
+// ring count so a pool bounds memory without ever binding in normal play.
+const MAX_POOL_SIZE = 32;
 
 export interface RingOfFrostSpawn {
   x: number;
@@ -49,6 +52,15 @@ export class RingOfFrostVisuals {
   private readonly rings = new Map<string, RingVisual>();
   private shardGeometry: THREE.ConeGeometry | null = null;
   private nextLocalId = 1;
+  // Per-role free lists: a disposed ring's materials are returned here
+  // instead of being disposed, and popped by the next ring instead of
+  // constructed fresh (Ring of Frost can be up concurrently in mage-heavy
+  // fights, spawning and expiring in bursts).
+  private readonly outerPool: THREE.LineBasicMaterial[] = [];
+  private readonly innerPool: THREE.LineBasicMaterial[] = [];
+  private readonly bandPool: THREE.MeshBasicMaterial[] = [];
+  private readonly shardMatPool: THREE.MeshStandardMaterial[] = [];
+  private readonly motePool: THREE.PointsMaterial[] = [];
 
   constructor(
     private readonly scene: THREE.Scene,
@@ -90,8 +102,8 @@ export class RingOfFrostVisuals {
 
     const outerGeometry = this.buildEdgeGeometry(opts.x, opts.z, radius);
     const innerGeometry = this.buildEdgeGeometry(opts.x, opts.z, innerRadius);
-    const outerMat = this.edgeMaterial(0.9);
-    const innerMat = this.edgeMaterial(0.7);
+    const outerMat = this.acquireEdgeMat(this.outerPool, 0.9);
+    const innerMat = this.acquireEdgeMat(this.innerPool, 0.7);
     const outer = new THREE.LineLoop(outerGeometry, outerMat);
     outer.name = 'ring-of-frost-outer-edge';
     outer.renderOrder = 9;
@@ -101,29 +113,14 @@ export class RingOfFrostVisuals {
     root.add(outer, inner);
 
     const bandGeometry = this.buildBandGeometry(opts.x, opts.z, innerRadius, radius);
-    const bandMat = new THREE.MeshBasicMaterial({
-      color: 0x5fd8ff,
-      transparent: true,
-      opacity: 0.2,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-      side: THREE.DoubleSide,
-    });
+    const bandMat = this.acquireBandMat();
     const band = new THREE.Mesh(bandGeometry, bandMat);
     band.name = 'ring-of-frost-band';
     band.renderOrder = 7;
     root.add(band);
 
     this.shardGeometry ??= new THREE.ConeGeometry(0.3, 1.4, 5, 1);
-    const shardMat = new THREE.MeshStandardMaterial({
-      color: 0x8de8ff,
-      emissive: 0x1d8dca,
-      emissiveIntensity: 1.35,
-      roughness: 0.24,
-      metalness: 0.04,
-      transparent: true,
-      opacity: 0.92,
-    });
+    const shardMat = this.acquireShardMat();
     const shards = new THREE.InstancedMesh(this.shardGeometry, shardMat, SHARD_COUNT);
     shards.name = 'ring-of-frost-shards';
     shards.frustumCulled = true;
@@ -164,15 +161,7 @@ export class RingOfFrostVisuals {
       motePositions[i * 3 + 2] = z;
     }
     moteGeometry.setAttribute('position', new THREE.BufferAttribute(motePositions, 3));
-    const moteMat = new THREE.PointsMaterial({
-      color: 0xc9f7ff,
-      size: 0.12,
-      transparent: true,
-      opacity: 0.8,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-      sizeAttenuation: true,
-    });
+    const moteMat = this.acquireMoteMat();
     const motes = new THREE.Points(moteGeometry, moteMat);
     motes.name = 'ring-of-frost-motes';
     motes.renderOrder = 10;
@@ -215,6 +204,14 @@ export class RingOfFrostVisuals {
     this.rings.clear();
     this.shardGeometry?.dispose();
     this.shardGeometry = null;
+    for (const pool of [this.outerPool, this.innerPool, this.bandPool] as const) {
+      for (const mat of pool) mat.dispose();
+      pool.length = 0;
+    }
+    for (const mat of this.shardMatPool) mat.dispose();
+    this.shardMatPool.length = 0;
+    for (const mat of this.motePool) mat.dispose();
+    this.motePool.length = 0;
   }
 
   private buildEdgeGeometry(x: number, z: number, radius: number): THREE.BufferGeometry {
@@ -264,7 +261,16 @@ export class RingOfFrostVisuals {
     return geometry;
   }
 
-  private edgeMaterial(opacity: number): THREE.LineBasicMaterial {
+  private acquireEdgeMat(
+    pool: THREE.LineBasicMaterial[],
+    opacity: number,
+  ): THREE.LineBasicMaterial {
+    const pooled = pool.pop();
+    if (pooled) {
+      pooled.color.setHex(0xa7efff);
+      pooled.opacity = opacity;
+      return pooled;
+    }
     return new THREE.LineBasicMaterial({
       color: 0xa7efff,
       transparent: true,
@@ -272,6 +278,67 @@ export class RingOfFrostVisuals {
       blending: THREE.AdditiveBlending,
       depthWrite: false,
     });
+  }
+
+  private acquireBandMat(): THREE.MeshBasicMaterial {
+    const pooled = this.bandPool.pop();
+    if (pooled) {
+      pooled.color.setHex(0x5fd8ff);
+      pooled.opacity = 0.2;
+      return pooled;
+    }
+    return new THREE.MeshBasicMaterial({
+      color: 0x5fd8ff,
+      transparent: true,
+      opacity: 0.2,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      side: THREE.DoubleSide,
+    });
+  }
+
+  private acquireShardMat(): THREE.MeshStandardMaterial {
+    const pooled = this.shardMatPool.pop();
+    if (pooled) {
+      pooled.color.setHex(0x8de8ff);
+      pooled.emissive.setHex(0x1d8dca);
+      pooled.opacity = 0.92;
+      return pooled;
+    }
+    return new THREE.MeshStandardMaterial({
+      color: 0x8de8ff,
+      emissive: 0x1d8dca,
+      emissiveIntensity: 1.35,
+      roughness: 0.24,
+      metalness: 0.04,
+      transparent: true,
+      opacity: 0.92,
+    });
+  }
+
+  private acquireMoteMat(): THREE.PointsMaterial {
+    const pooled = this.motePool.pop();
+    if (pooled) {
+      pooled.color.setHex(0xc9f7ff);
+      pooled.opacity = 0.8;
+      return pooled;
+    }
+    return new THREE.PointsMaterial({
+      color: 0xc9f7ff,
+      size: 0.12,
+      transparent: true,
+      opacity: 0.8,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      sizeAttenuation: true,
+    });
+  }
+
+  // Return a released material to its role's pool, up to the fixed cap; past
+  // the cap it is disposed like before, so pool memory stays bounded.
+  private release<T extends THREE.Material>(pool: T[], mat: T): void {
+    if (pool.length < MAX_POOL_SIZE) pool.push(mat);
+    else mat.dispose();
   }
 
   private animate(ring: RingVisual): void {
@@ -301,11 +368,11 @@ export class RingOfFrostVisuals {
 
   private disposeRing(ring: RingVisual): void {
     this.scene.remove(ring.root);
-    ring.outerMat.dispose();
-    ring.innerMat.dispose();
-    ring.bandMat.dispose();
-    ring.shardMat.dispose();
-    ring.moteMat.dispose();
+    this.release(this.outerPool, ring.outerMat);
+    this.release(this.innerPool, ring.innerMat);
+    this.release(this.bandPool, ring.bandMat);
+    this.release(this.shardMatPool, ring.shardMat);
+    this.release(this.motePool, ring.moteMat);
     ring.shards.dispose();
     for (const geometry of ring.ownedGeometries) geometry.dispose();
   }

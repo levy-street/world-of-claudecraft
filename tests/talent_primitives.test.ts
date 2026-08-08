@@ -7,6 +7,7 @@ import { createMob } from '../src/sim/entity';
 import type { PlayerMeta, ResolvedAbility } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 import type { AbilityDef, Aura, Entity, PlayerClass } from '../src/sim/types';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 type TestSim = Sim & {
   nextId: number;
@@ -19,7 +20,9 @@ function harness(sim: Sim): TestSim {
 }
 
 function makeSim(cls: PlayerClass, level = 20, seed = 77): { sim: TestSim; p: Entity } {
-  const sim = harness(new Sim({ seed, playerClass: cls, autoEquip: true }));
+  const sim = harness(
+    new Sim({ seed, playerClass: cls, autoEquip: true, world: EMPTY_TEST_WORLD }),
+  );
   sim.setPlayerLevel(level);
   const p = sim.player;
   p.resource = p.maxResource;

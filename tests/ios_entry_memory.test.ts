@@ -73,10 +73,10 @@ describe('tight-memory residency diet', () => {
   });
 });
 
-describe('deferred skin atlases on the packaged iOS shell', () => {
-  it('gates the boot atlas sweep on the hint-stable native profile', () => {
+describe('deferred skin atlases on every iOS WebKit host', () => {
+  it('gates the boot atlas sweep on the hint-stable iOS profile', () => {
     expect(assetsSource).toContain(
-      'const eagerSkinAtlases = !(GFX.nativeIosMemoryProfile || GFX.tightMemory);',
+      'const eagerSkinAtlases = !(GFX.iosMemoryProfile || GFX.tightMemory);',
     );
     // The character-preview gate must not re-await atlases the boot deferred.
     expect(assetsSource).toContain('const missingSkins = eagerSkinAtlases');
@@ -190,10 +190,11 @@ describe('preload registry retains no resolution values', () => {
   });
 });
 
-describe('post-entry mob-body streaming (packaged iOS)', () => {
+describe('post-entry mob-body streaming (every iOS WebKit host)', () => {
   // The heaviest character content (creatures + the skeleton family, embedded
-  // 1024-class atlases) is carved out of the boot gate on the packaged shell and
-  // streamed after prewarm, through the fail-soft view-create seam (#2079).
+  // 1024-class atlases) is carved out of the boot gate on every iOS WebKit host
+  // (Safari, other iOS browsers, and the packaged app) and streamed after prewarm,
+  // through the fail-soft view-create seam (#2079).
   // Measured before this: WebContent at 1.54 GB pre-renderer on an iPhone 17 Pro.
   it('streams mob bodies and Armory skin models; base weapons stay in the gate', () => {
     expect(assetsSource).toContain(
@@ -264,10 +265,18 @@ describe('post-entry mob-body streaming (packaged iOS)', () => {
     expect(streamAt).toBeGreaterThan(assetsAwaitAt);
   });
 
-  it('extracts props and foliage as they land on the packaged shell', () => {
+  it('extracts props and foliage as they land on every iOS WebKit host', () => {
     const propsSource = read('../src/render/props.ts');
     const foliageSource = read('../src/render/foliage.ts');
-    expect(propsSource).toContain('if (GFX.nativeIosMemoryProfile) propAsset(key);');
-    expect(foliageSource).toContain('if (GFX.nativeIosMemoryProfile) extractParts(url);');
+    expect(propsSource).toContain('if (GFX.iosMemoryProfile) propAsset(key);');
+    // Foliage additionally gates extraction on live-tier membership (see
+    // tests/foliage_preload_boot.test.ts): the FETCH stays unconditional (the
+    // pine_2.glb crash fix), but eagerly baking a HIGH-only variant the current
+    // tier guess will never place would cost exactly the iOS memory this profile
+    // protects, for nothing.
+    expect(foliageSource).toContain(
+      'if (GFX.iosMemoryProfile && Object.values(foliageModelUrlsFor(GFX)).flat().includes(url)) {',
+    );
+    expect(foliageSource).toContain('extractParts(url);');
   });
 });

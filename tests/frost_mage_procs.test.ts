@@ -23,6 +23,7 @@ import type { PlayerMeta } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
 import type { Aura, Entity, SimEvent } from '../src/sim/types';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 // Frost mage proc engine (owner design 2026-07-11, combat/frost_mage.ts):
 // Rimelance (frostbolt) impacts roll Fingers of Frost (15%, 2 stacks) and
@@ -36,11 +37,18 @@ type TestSim = Sim & {
   addEntity(entity: Entity): void;
 };
 
+// This suite never reads ambient camps, npcs, or ground objects: the target
+// is always a hand-spawned training dummy (spawnTarget) and the only other
+// player is a hand-added druid (sim.addPlayer). EMPTY_TEST_WORLD (same
+// fixture as tests/sim_shared.ts) skips the full built-in world's camp/npc
+// spawns, which is what made Sim construction and every sim.tick() call in
+// the long proc-hunting loops below expensive (Phase 9, subsystem worlds).
 function makeSim(opts?: { spec?: string | null; seed?: number }): { sim: TestSim; p: Entity } {
   const sim = new Sim({
     seed: opts?.seed ?? 1,
     playerClass: 'mage',
     autoEquip: true,
+    world: EMPTY_TEST_WORLD,
   }) as unknown as TestSim;
   sim.setPlayerLevel(20);
   const spec = opts?.spec === undefined ? 'frost' : opts.spec;

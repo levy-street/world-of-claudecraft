@@ -336,6 +336,12 @@ export const pl_PL: EnTranslations = {
       "healerConfirmAccept": "Ożyw mnie",
       "healerConfirmCancel": "Anulować"
     },
+    "wiki": {
+      "confirmTitle": "Open the Wiki?",
+      "confirmBody": "This opens the World of ClaudeCraft wiki in your browser. The game keeps running.",
+      "confirmOpen": "Open Wiki",
+      "confirmCancel": "Cancel"
+    },
     "unstuck": {
       "menuButton": "Wyzwolenie",
       "help": "Ratunek: /unstuck rozpoczyna nieruchome odliczanie, które przeniesie cię do pobliskiego, osiągalnego bezpiecznego miejsca.",
@@ -1313,6 +1319,7 @@ export const pl_PL: EnTranslations = {
       "keybindHelpLockCursorOnRotate": "Utrzymuje kursor myszy wewnątrz okna podczas przeciągania w celu obracania kamery, aby nie mógł dotrzeć do krawędzi ekranu ani przejść na inny monitor. Wyłącz, jeśli wolisz swobodny kursor.",
       "showWalletOnCharacterScreen": "Pokaż sakiewkę na ekranie postaci",
       "showWalletOnPlayerCard": "Pokaż sakiewkę na karcie gracza",
+      "showPlaytime": "Show Time Played on Character Screen",
       "showDevBadges": "Pokaż odznaki deweloperów",
       "showOwnNameplate": "Pokaż moją plakietkę",
       "showPlayerNameplates": "Pokaż plakietki graczy",
@@ -1545,7 +1552,13 @@ export const pl_PL: EnTranslations = {
     },
     "charSheet": {
       "offense": "Atak",
-      "defense": "Obrona"
+      "defense": "Obrona",
+      "playtimeLabel": "Time Played",
+      "playtimeParts": "{major}, {minor}",
+      "playtimeUnderMinute": "Less than a minute",
+      "playtimeHidden": "Hidden",
+      "showPlaytimeAria": "Show time played",
+      "hidePlaytimeAria": "Hide time played"
     },
     "statInfo": {
       "fromYour": "Z twoich {value} pkt. cechy {stat}:",
@@ -1667,6 +1680,24 @@ export const pl_PL: EnTranslations = {
         "few": "pozostały {count} sekundy",
         "many": "pozostało {count} sekund",
         "other": "pozostało {count} sekund"
+      },
+      "playtimeDays": {
+        "one": "{count} day",
+        "few": "{count} days",
+        "many": "{count} days",
+        "other": "{count} days"
+      },
+      "playtimeHours": {
+        "one": "{count} hour",
+        "few": "{count} hours",
+        "many": "{count} hours",
+        "other": "{count} hours"
+      },
+      "playtimeMinutes": {
+        "one": "{count} minute",
+        "few": "{count} minutes",
+        "many": "{count} minutes",
+        "other": "{count} minutes"
       },
       "playersOnline": {
         "one": "Kto: {count} gracz online na realmie {realm}.",
@@ -1921,6 +1952,9 @@ export const pl_PL: EnTranslations = {
       "sortRecent": "Ostatnie",
       "sortQuality": "Jakość",
       "sortName": "Nazwa",
+      "sortButton": "Sort",
+      "sortButtonAria": "Sort your bags",
+      "sortButtonHint": "Combine stacks and group items by type",
       "searchPlaceholder": "Szukaj przedmiotów",
       "searchAria": "Szukaj przedmiotów w torbie według nazwy",
       "noMatch": "Żaden przedmiot nie pasuje do filtrów.",

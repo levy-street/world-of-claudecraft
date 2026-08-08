@@ -665,10 +665,18 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // Re-minted for the VFX per-frame cost work: the rendererIntegration leaf
 // follows the anchor seam, the weapon-skin fade and the census tag. No capture
 // was retaken; every measured value is adopted verbatim.
+// Re-minted for the iOS WebKit memory-profile fix (renderer.ts's
+// nativeIosMemoryProfile -> iosMemoryProfile rename) landing on top of the VFX
+// per-frame cost work already on this release branch. No capture was retaken.
+// Re-minted for the merge of release/v0.36.0 into feature/masterwrought: both
+// sides re-minted since the common base (the release's VFX and iOS memory
+// work, this branch's phase 03 naming re-mint), moving renderer.ts, the prop
+// GLBs, and the lockfile leaves, so all three literals mint to values matching
+// neither parent. No capture was retaken on either side.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '0f836d3084e6cb6ada7b8197a5f1873ae61a79a70caaac817d740f80d838abe5';
+  'f630a9e8e7bc4fefd44e604a0acdcd4d0ca893ac0e6cb8d58a21c707647c34c6';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '24eeefb615e27cefec5ce7e948817b7273dcd6bca65160bdf6d27480deb73317';
+  'df1c9b32af7f0e1bcfe6c1a8b61e7f4ed7d3194f6196c1b156635f9ed42163de';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1558,10 +1566,15 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // follows the renderer's anchor seam, weapon-skin fade and census tag,
     // then this second-order seal follows the swept evidence bytes. No capture
     // was retaken.
+    // Re-pinned for the iOS WebKit memory-profile fix: the first-order composite
+    // follows renderer.ts's nativeIosMemoryProfile -> iosMemoryProfile rename,
+    // landing on top of the VFX per-frame cost work already on this release
+    // branch, then this second-order performance seal follows the swept
+    // evidence bytes. No capture was retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('adba1d3257b0a51ace5d61be934a27344b8f906d7f202a279f6e7c93f6ed37d0');
+    ).toBe('281b3e7a42bf262a6e2290bbe0d1e87bfc9a16e79749e1f64679b1b1cc974041');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

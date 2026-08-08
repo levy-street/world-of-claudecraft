@@ -55,7 +55,9 @@ insignia language and the same field palette, gaining metal and rank as they
 climb (weathered iron, then steel and gold, then full gilt). Each carries a
 title, so the crest is what a player displays their rank with.
 
-PvP:
-- [v1] `pvp_honor_sergeant`, Sergeant: a plain iron rank chevron over crossed campaign spears, worn leather strap behind it, muddied field browns.
-- [v1] `pvp_honor_knight_lieutenant`, Knight-Lieutenant: a steel gorget with a single gold rank star at the throat, a lieutenant's pennant furled behind, steel blue and gold.
-- [v1] `pvp_honor_field_marshal`, Field Marshal: a gilded marshal's baton crossed with a battle standard over a laurel half-wreath, deep crimson field, high gold gleam.
+PvP: the three deed IDS below are FROZEN (an earned title is stored as its deed id,
+so a rename is display-only); their display names were re-cut off the classic-era
+ranks they originally copied, hence id and name no longer match.
+- [v1] `pvp_honor_sergeant`, Linebreaker: a splintered shield wall breached at its centre, one iron-shod boot planted through the gap, worn leather and muddied field browns.
+- [v1] `pvp_honor_knight_lieutenant`, Fieldreaver: a reaping blade dragged low over trampled banners and broken shafts, a season of campaign behind it, steel blue and tarnished gold.
+- [v1] `pvp_honor_field_marshal`, Warcrowned: a battered circlet forged from broken weapons, seated on a bare war standard, deep crimson field, high gold gleam.

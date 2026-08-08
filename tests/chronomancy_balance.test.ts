@@ -280,11 +280,19 @@ describe('Chronomancy Phase 3 balance targets', () => {
     // record (the consReact floor above documents the same
     // flagged-adjustment precedent).
     for (const seed of [1, 2, 3]) {
-      const off = runRotation('arcane', conservativeOffensive, 200, false, seed);
-      const weave = runRotation('fire', fireRotation, 200, false, seed);
-      const scorch = runRotation('fire', nukeSpam('scorch'), 200, false, seed);
+      // Seed 2 matches the default `runRotation` seed, so it is the exact same
+      // seed/spec/policy/cap/pinAllyLow the describe-level consOff/piroWeave/
+      // piroScorch/cryo measurements above already ran. The sim is deterministic,
+      // so re-driving those four 200-second rotations here is pure duplicate work:
+      // reuse the precomputed results instead.
+      const off =
+        seed === 2 ? consOff : runRotation('arcane', conservativeOffensive, 200, false, seed);
+      const weave = seed === 2 ? piroWeave : runRotation('fire', fireRotation, 200, false, seed);
+      const scorch =
+        seed === 2 ? piroScorch : runRotation('fire', nukeSpam('scorch'), 200, false, seed);
       const bestPiro = weave.dps >= scorch.dps ? weave : scorch;
-      const frost = runRotation('frost', nukeSpam('frostbolt'), 200, false, seed);
+      const frost =
+        seed === 2 ? cryo : runRotation('frost', nukeSpam('frostbolt'), 200, false, seed);
       expect(bestPiro.dps, `piro seed ${seed}`).toBeGreaterThanOrEqual(off.dps * 1.12);
       expect(frost.dps, `cryo seed ${seed}`).toBeGreaterThanOrEqual(off.dps * 1.12);
     }

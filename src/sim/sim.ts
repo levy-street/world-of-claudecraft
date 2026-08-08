@@ -327,6 +327,7 @@ import {
 import * as petAi from './pet/pet_ai';
 import * as petCommands from './pet/pet_commands';
 import type { MatchPetSnapshot } from './pet/pet_match_return';
+import { floorHeightAt } from './physics/character';
 import {
   isSwimming as isSwimmingImpl,
   moveSpeedMult as moveSpeedMultImpl,
@@ -335,6 +336,7 @@ import {
   stepPlayerMotion,
   swimSurfaceY,
 } from './player_motion';
+import { livePlaytimeSeconds } from './playtime';
 import {
   type ArchetypeState,
   acceptArchetypeQuest as acceptArchetypeQuestImpl,
@@ -1999,6 +2001,13 @@ export class Sim {
   // "no calendar known" (headless/replay), the daily window then never rolls over,
   // keeping same-seed runs reproducible. Tests may set it to pin a date.
   utcDay = '';
+  // The daily-reset WINDOW key ('YYYY-MM-DD' of the reset that opened it), set by
+  // the host each tick alongside utcDay. Every daily rollover reads THIS, not the
+  // calendar date: the server derives it from the realm's own 3 AM reset boundary
+  // (server/raid_reset.ts `resetDayKey`), the offline client from the player's
+  // local one, so a daily never rolls over mid-evening the way midnight UTC did.
+  // Empty string = "no calendar known" (headless/replay), same contract as utcDay.
+  resetDay = '';
   // the World Market (the Merchant's auction house): the Market instance owns the
   // listing book, per-seller collections, the id counter, and the Merchant entity
   // id. Constructed in the ctor after the SimContext (it consumes the seam); Sim
@@ -2023,6 +2032,16 @@ export class Sim {
   // In-memory only, like trades/duels, swept by updateCommissionOrders in
   // the end-of-tick block.
   commissionOrderBoard: CommissionOrder[] = [];
+  // Change signal for the server's corder snapshot gate (the market
+  // browseRevFor pattern). The counter lives here (state stays on Sim) but
+  // every WRITER lives in professions/commission_order.ts, reaching it
+  // through the ctx.bumpCommissionOrderBoardRev callback at each board
+  // mutation site (open/accept/cancel/deliver on success, the retention
+  // sweep per settled or dropped row); a future mutation site must bump the
+  // same way or the server gate serves a stale projection until its
+  // staleness backstop. Never persisted; the board is in-memory only, so
+  // both reset together on boot.
+  commissionOrderBoardRev = 0;
   private nextCommissionOrderId = 1;
   // Guild Bank books: guild id -> live GuildBankState, loaded by the server per
   // realm through loadGuildBank (guild_bank.ts owns the shape; Phase 3 wires the
@@ -2775,7 +2794,12 @@ export class Sim {
       counters: freshCounters(),
       autoEquip: opts?.autoEquip ?? false,
       joinedAt: this.time,
-      totalPlayedSeconds: Math.max(0, savedState?.totalPlayedSeconds ?? 0),
+      // Finite-clamped like the bg standings below: Math.max passes NaN
+      // through, and a corrupt non-finite save would otherwise poison every
+      // future fold and ship null on the ptime wire.
+      totalPlayedSeconds: Number.isFinite(savedState?.totalPlayedSeconds)
+        ? Math.max(0, savedState?.totalPlayedSeconds as number)
+        : 0,
       lastActiveTick: this.tickCount,
       pendingUnstuck: null,
       arenaRating: savedArena1v1.rating,
@@ -3835,9 +3859,9 @@ export class Sim {
       unlockedMilestones: [...meta.unlockedMilestones],
       restedXp: meta.restedXp,
       // Fold this session's elapsed time into the persisted baseline (see
-      // PlayerMeta.totalPlayedSeconds); /playtime reads the running total the
-      // same way without waiting for a save.
-      totalPlayedSeconds: meta.totalPlayedSeconds + Math.max(0, this.time - meta.joinedAt),
+      // PlayerMeta.totalPlayedSeconds); /playtime and the playtimeSeconds
+      // facade read the running total the same way without waiting for a save.
+      totalPlayedSeconds: livePlaytimeSeconds(meta, this.time),
       // Legacy dual-write plus the current key, both off the one fold above
       // (separate objects on purpose, so no caller can alias one through the
       // other).
@@ -4461,6 +4485,14 @@ export class Sim {
   get restedXp(): number {
     return this.primary.restedXp;
   }
+  // IWorldProgressionXp.playtimeSeconds: the running lifetime played total
+  // (persisted baseline + this session's elapsed sim time), the same figure
+  // /playtime reports and serializeCharacter folds at save. Sim-clock derived,
+  // so it stays deterministic in every host; offline (no save loads a
+  // baseline) it equals this session's time in world.
+  get playtimeSeconds(): number {
+    return livePlaytimeSeconds(this.primary, this.time);
+  }
   get prestigeRank(): number {
     return this.primary.prestigeRank;
   }
@@ -4950,6 +4982,9 @@ export class Sim {
       get delvePetStash() {
         return sim.delvePetStash;
       },
+      get resetDay() {
+        return sim.resetDay;
+      },
       get utcDay() {
         return sim.utcDay;
       },
@@ -5420,6 +5455,11 @@ export class Sim {
       mailAuthoredLetter: (meta, letter) =>
         sim.postOffice.sendLetter(sim.postOffice.mailKeyFor(meta), meta.name, letter, 'system'),
       mailboxHoldsItem: (meta, itemId) => sim.postOffice.mailboxHoldsItem(meta, itemId),
+      // Commission order board change signal: the module's mutation sites
+      // advance the counter the server's corder gate polls.
+      bumpCommissionOrderBoardRev: () => {
+        sim.commissionOrderBoardRev++;
+      },
       // Book of Deeds seam callbacks (owned by deeds.ts). Late-bound arrows so
       // sim.ctx resolves at call time (the Q1 pattern).
       bumpDeedStat: (meta, stat, delta) => deedsMod.bumpDeedStat(sim.ctx, meta, stat, delta),
@@ -5842,7 +5882,9 @@ export class Sim {
     resurrectionOfferMod.updateResurrectionOffers(this.ctx);
     // Commission order board retention sweep (issue #1298): draws no rng, so
     // appending here is safe (the Vale Cup zero-rng-phase precedent); expires
-    // stale open orders and prunes terminal ones past their retain window.
+    // stale open orders and prunes terminal ones past their retain window
+    // (each mutation advances the board revision through the module's own
+    // bump sites).
     updateCommissionOrders(this.ctx);
     lap?.('trades');
     this.updateLootRolls();
@@ -7731,7 +7773,22 @@ export class Sim {
     }
     e.pos.x = bestX;
     e.pos.z = bestZ;
-    const g = groundHeight(bestX, bestZ, this.cfg.seed);
+    // The floor a body rests on, which for a PLAYER includes the standable prop
+    // top underfoot, not just the terrain. Feared players are moved through here
+    // and return early from the player step, so `stepPlayerMotion` and its whole
+    // vertical pass never run for the duration: snapping to raw terrain dropped
+    // anyone feared off a rampart deck several yards INSIDE the rampart, where
+    // swept collision then refused every direction once the fear ended (from
+    // inside a volume every direction is a surface). Same expression the vertical
+    // pass and climb.ts already land against.
+    //
+    // Scoped to players deliberately: mobs and pets keep the terrain snap they
+    // have always had, so their movement, and the parity draw order with it, is
+    // untouched.
+    const g =
+      e.kind === 'player'
+        ? floorHeightAt(this.cfg.seed, bestX, bestZ, BODY_RADIUS, e.pos.y + 1e-3)
+        : groundHeight(bestX, bestZ, this.cfg.seed);
     e.pos.y =
       canSwim && g < waterLevelAt(bestX, bestZ, this.cfg.seed) - SWIM_DEPTH
         ? swimSurfaceY(bestX, bestZ, this.cfg.seed)
@@ -8528,6 +8585,10 @@ export class Sim {
     items.moveInventoryItem(this.ctx, from, to, pid);
   }
 
+  sortInventory(pid?: number): void {
+    items.sortInventory(this.ctx, pid);
+  }
+
   // Equip into the exact slot the player aimed at (the paperdoll drop target),
   // rather than letting the resolver pick. items.equipItem re-validates the slot
   // against the item, so this is a request, never a bypass.
@@ -8882,8 +8943,12 @@ export class Sim {
   }
 
   /** Per-player form of `commissionOrders`, for the server's `corder`
-   *  self-delta (server/game.ts): a small per-player read, diffed per tick
-   *  like `prof`/`cprof`. */
+   *  self-delta (server/game.ts). NOT a small read: it walks the whole
+   *  realm-global board and every open-scope order lands in EVERY viewer's
+   *  projection, so its cost is O(board) per call and the board grows with
+   *  realm activity (24 h open TTL). The server therefore rebuilds it only
+   *  behind the commissionOrderBoardRev change gate plus a wire cadence,
+   *  never per tick. */
   commissionOrdersFor(pid: number): readonly CommissionOrderRow[] {
     return commissionOrderRowsFor(this.ctx, pid);
   }
@@ -10726,6 +10791,13 @@ export class Sim {
 
   mailInfoFor(pid: number): import('../world_api').MailInfo | null {
     return this.postOffice.mailInfoFor(pid);
+  }
+
+  // Server-only broadcast helper (never IWorld, the marketBrowseRevFor shape):
+  // the cheap change signal server/game.ts polls before paying for a
+  // mailInfoFor rebuild. Null while the player is not at a raven pillar.
+  mailRevFor(pid: number): number | null {
+    return this.postOffice.mailRevFor(pid);
   }
 
   mailUnreadFor(pid: number): number {

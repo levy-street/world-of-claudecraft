@@ -347,8 +347,10 @@ export function handleDevChat(
       return null;
     }
     bgQueueJoin(ctx, pid, { bypassLevel: true });
-    // The join can refuse (dead, inside an instance, oversize party); it
-    // already told the caller why, so bail before padding leaks a bot.
+    // The join can still refuse (an arena match, an oversize party, queueing a
+    // party you do not lead); it already told the caller why, so bail before
+    // padding leaks a bot. Dying and standing inside a dungeon are no longer
+    // among them: a queue now survives both.
     if (!ctx.bgQueue.some((g) => g.pids.includes(pid))) return null;
     if (bgQueueSize(ctx) < 2) {
       // Solo walk-around: pad the queue with one stationary dev bot (reusing an

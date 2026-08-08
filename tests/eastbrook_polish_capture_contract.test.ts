@@ -81,8 +81,16 @@ interface AttributionTargetFixture {
 // Re-minted for the VFX per-frame cost work: the rendererIntegration leaf
 // follows the anchor seam, the weapon-skin fade and the census tag. No capture
 // was retaken; every measured value is adopted verbatim.
+// Re-minted for the iOS WebKit memory-profile fix (renderer.ts's
+// nativeIosMemoryProfile -> iosMemoryProfile rename) landing on top of the VFX
+// per-frame cost work already on this release branch. No capture was retaken.
+// Re-minted for the merge of release/v0.36.0 into feature/masterwrought: both
+// sides re-minted since the common base (the release's VFX and iOS memory
+// work, this branch's phase 03 naming re-mint), moving renderer.ts, the prop
+// GLBs, and the lockfile leaves, so the merged tree mints a value matching
+// neither parent. No capture was retaken on either side.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '24eeefb615e27cefec5ce7e948817b7273dcd6bca65160bdf6d27480deb73317';
+  'df1c9b32af7f0e1bcfe6c1a8b61e7f4ed7d3194f6196c1b156635f9ed42163de';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

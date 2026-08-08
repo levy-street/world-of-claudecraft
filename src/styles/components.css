@@ -1736,6 +1736,86 @@
     color: #7c7256;
     font-style: italic;
   }
+  /* The lifetime "Time Played" line footing the character sheet: the shared
+     inset-card treatment laid out as one slim row (label, value, then the
+     reveal/conceal eye pushed to the far edge). */
+  .char-playtime {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .char-playtime .cp-title {
+    margin-bottom: 0;
+  }
+  .char-playtime-value {
+    font-size: 13px;
+    color: #fff;
+    font-weight: normal;
+    font-variant-numeric: tabular-nums;
+  }
+  .char-playtime-value-hidden {
+    /* Information-bearing text (the concealed state's only signal), so the
+       readable muted token, not the fainter .cp-none gray. */
+    color: var(--color-text-muted);
+    font-style: italic;
+  }
+  /* The value's privacy eye: the helm eye's circle chrome, seated inline at
+     the row's far edge instead of on a socket corner. */
+  .char-playtime-eye {
+    position: relative;
+    flex: none;
+    margin-left: auto;
+    width: 26px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border-radius: 50%;
+    border: 1px solid rgba(202, 164, 114, 0.5);
+    background: rgba(40, 26, 20, 0.85);
+    color: var(--color-text-secondary, #d6c1a0);
+    cursor: var(--cursor-point);
+    transition:
+      border-color 0.12s,
+      box-shadow 0.12s,
+      color 0.12s;
+  }
+  .char-playtime-eye .ui-icon {
+    width: 14px;
+    height: 14px;
+  }
+  /* Invisible hit extension to the 36px desktop / 40px mobile floors
+     (DESIGN.md 10.1: padding where the visual is smaller). */
+  .char-playtime-eye::after {
+    content: "";
+    position: absolute;
+    inset: -6px;
+    border-radius: 50%;
+  }
+  body.mobile-touch .char-playtime-eye::after {
+    inset: -8px;
+  }
+  .char-playtime-eye[aria-pressed="true"] {
+    color: rgba(214, 193, 160, 0.55);
+  }
+  .char-playtime-eye:hover,
+  .char-playtime-eye:focus-visible {
+    border-color: rgba(255, 218, 160, 0.8);
+    color: #fff;
+    box-shadow: 0 0 7px rgba(202, 164, 114, 0.4);
+  }
+  /* Steady keyboard ring, distinct from hover (the HUD-chrome WCAG contract):
+     never transitioned (the transition list above excludes outline). */
+  .char-playtime-eye:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .char-playtime-eye {
+      transition: none;
+    }
+  }
   .ms-badge {
     display: inline-block;
     font-size: 10.5px;
@@ -6530,25 +6610,12 @@
       inset 0 1px 4px #000c,
       0 0 5px color-mix(in srgb, var(--color-bag-quest-rim) 28%, transparent);
   }
-  /* Fine-grade material cells (material_grades fine_* ids): cool refined
-     teal-silver rim + soft wash so craft reagents stand apart from plain
-     white common stacks. Grade class, not a rarity tier: never reuses
-     green/blue/purple quality borders or quest gold. Placed after the
-     common/poor neutral reset so the fine rim wins at equal specificity;
-     the rim glow is a deliberate, nine-id exception to that reset's
-     no-glow-on-commons rule (the whole point of the mark). Purpose outranks
-     grade: the painter (bag_corner_mark_view.ts bagRimClasses) never emits
-     .bag-fine together with .bag-quest, so this block's source order against
-     .bag-quest above is not load-bearing. Always-on, no --fx-* gate
-     (fairness). */
-  .bag-item.bag-fine {
-    border-color: var(--color-bag-fine-rim) !important;
-    box-shadow:
-      inset 0 0 10px var(--color-bag-fine-wash),
-      inset 0 0 0 1px color-mix(in srgb, var(--color-bag-fine-rim) 45%, transparent),
-      inset 0 1px 4px #000c,
-      0 0 6px color-mix(in srgb, var(--color-bag-fine-rim) 32%, transparent);
-  }
+  /* The fine-grade rim/wash block lives BELOW the bank grid's common/poor
+     neutral reset as one dual-selector cell rule (search for the bag-fine
+     class): it must sit after BOTH commons resets to win them at equal
+     specificity, and the bag reset is above while the bank reset is far
+     below. Order against the cell focus rings is not load-bearing (they are
+     outline-based). */
   .bag-item .bi-count {
     position: absolute;
     right: 2px;
@@ -6588,14 +6655,15 @@
      quest seal, fine seal): top-left, clear of the bottom-right count badge,
      one dark drop-shadow for contrast; each kind carries only its color below.
      The masterwork seal is the one outlier (a 16px authored image).
-     Bank cells share the per-copy glyph mark so a banked masterwork keeps its
-     seal: the payload always survived deposit in the sim, but the bank grids
-     never painted the mark bags already had. Quest and fine seals stay
-     bag-only (quest items cannot enter the bank; fine needs the def). */
+     Bank cells share the per-copy glyph mark AND the fine seal so a banked
+     masterwork or fine stack keeps the mark bags gave it (marks are an
+     all-surfaces family, see item_instance_glyph_mark.ts). Only the quest
+     seal stays bag-only: quest items cannot enter either bank. */
   .bag-item .bi-glyph,
   .bank-item .bi-glyph,
   .bag-item .bi-quest-seal,
-  .bag-item .bi-fine-seal {
+  .bag-item .bi-fine-seal,
+  .bank-item .bi-fine-seal {
     position: absolute;
     top: 1px;
     left: 1px;
@@ -6608,7 +6676,8 @@
   .bag-item .bi-glyph .ui-icon,
   .bank-item .bi-glyph .ui-icon,
   .bag-item .bi-quest-seal .ui-icon,
-  .bag-item .bi-fine-seal .ui-icon {
+  .bag-item .bi-fine-seal .ui-icon,
+  .bank-item .bi-fine-seal .ui-icon {
     display: block;
     width: 100%;
     height: 100%;
@@ -6644,10 +6713,12 @@
     color: var(--color-bag-quest-seal);
   }
   /* Fine-grade corner seal: small crafting glyph in refined teal (box shared
-     with .bi-glyph above). Aria-hidden; the item NAME carries the grade word,
-     so the cell accessible name needs no dedicated sentence. Glyph priority:
-     masterwork > quest > fine > instance marks (bag_corner_mark_view.ts). */
-  .bag-item .bi-fine-seal {
+     with .bi-glyph above), identical in bags and both banks. Aria-hidden; the
+     item NAME carries the grade word, so the cell accessible name needs no
+     dedicated sentence. Glyph priority: masterwork > quest > fine > instance
+     marks (bag_corner_mark_view.ts). */
+  .bag-item .bi-fine-seal,
+  .bank-item .bi-fine-seal {
     color: var(--color-bag-fine-seal);
   }
   /* Ready-to-turn-in: brighter static seal (shape stays primary). Optional
@@ -6833,12 +6904,16 @@
   }
   .bag-tools {
     display: flex;
+    /* Wrap rather than clip: in the half-width mobile pairings (char/vendor/
+       bank/market) the row is too narrow for search + sort + Sort button, and
+       overflow:hidden on the sheet would silently eat the last control. */
+    flex-wrap: wrap;
     gap: 6px;
     align-items: center;
   }
   .bag-search {
     flex: 1 1 auto;
-    min-width: 0;
+    min-width: 96px;
     font-family: var(--ui-font);
     font-size: 16px;
     padding: 4px 7px;
@@ -6861,6 +6936,62 @@
     background: #14110b;
     color: inherit;
     cursor: var(--cursor-point);
+  }
+  /* The one-shot clean-up button beside the view dropdown (the
+     .bank-deposit-all action-button shape: same row, same gold treatment). */
+  .bag-sort-btn {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-family: var(--ui-font);
+    font-size: 12px;
+    padding: 4px 9px;
+    border-radius: 4px;
+    border: 1px solid #6a5320;
+    background: linear-gradient(#8a6a26, #5a4413 55%, #473409);
+    color: #ffe6a8;
+    cursor: var(--cursor-point);
+    white-space: nowrap;
+  }
+  .bag-sort-btn:hover {
+    filter: brightness(1.12);
+  }
+  .bag-sort-btn:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 1px;
+  }
+  .bag-sort-btn .ui-icon {
+    width: 14px;
+    height: 14px;
+  }
+  body.mobile-touch .bag-sort-btn {
+    min-height: 40px;
+  }
+  /* One-shot settle ripple after a clean-up: each square eases in with a
+     small per-cell stagger (--settle-i, capped painter-side). Opacity plus a
+     3px drop only (DESIGN.md motion rules); reduced motion turns it off. */
+  .bag-grid-settle > * {
+    animation: bag-sort-settle calc(160ms * var(--motion-scale, 1)) ease-out backwards;
+    animation-delay: calc(var(--settle-i, 0) * 14ms * var(--motion-scale, 1));
+  }
+  @keyframes bag-sort-settle {
+    from {
+      opacity: 0.35;
+      transform: translateY(-3px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .bag-grid-settle > * {
+      animation: none;
+    }
+  }
+  body.reduce-motion .bag-grid-settle > * {
+    animation: none;
   }
   .money {
     margin-top: 8px;
@@ -7018,6 +7149,32 @@
   .bank-item.q-common {
     border-color: #4a3d26 !important;
     box-shadow: inset 0 1px 4px #000c;
+  }
+  /* Fine-grade material cells (material_grades fine_* ids): cool refined
+     teal-silver rim + soft wash so craft reagents stand apart from plain
+     white common stacks, in bags AND both banks (one dual-selector rule so
+     the treatment cannot drift per surface). Grade class, not a rarity tier:
+     never reuses green/blue/purple quality borders or quest gold. Placed
+     after BOTH common/poor neutral resets (the bag reset sits in the bags
+     section far above) so the fine rim wins them at equal specificity; the
+     rim glow is a deliberate, nine-id exception to those resets'
+     no-glow-on-commons rule (the whole point of the mark). Purpose outranks
+     grade: the painter (bag_corner_mark_view.ts bagRimClasses) never emits
+     .bag-fine together with .bag-quest, so source order against .bag-quest
+     is not load-bearing; nor is order against the cell focus rings, which
+     are outline-based. This box-shadow REPLACES the quality-glow rule at the
+     same specificity, which is inert while every fine id is common quality
+     (the commons resets kill that glow anyway); a future non-common fine
+     grade must revisit this composition or lose its quality glow. Always-on,
+     no --fx-* gate (fairness). */
+  .bag-item.bag-fine,
+  .bank-item.bag-fine {
+    border-color: var(--color-bag-fine-rim) !important;
+    box-shadow:
+      inset 0 0 10px var(--color-bag-fine-wash),
+      inset 0 0 0 1px color-mix(in srgb, var(--color-bag-fine-rim) 45%, transparent),
+      inset 0 1px 4px #000c,
+      0 0 6px color-mix(in srgb, var(--color-bag-fine-rim) 32%, transparent);
   }
   .bank-count {
     position: absolute;

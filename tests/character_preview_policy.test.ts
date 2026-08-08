@@ -37,8 +37,11 @@ describe('character preview memory policy', () => {
     );
     expect(hud).toContain('constrainedMemory: this.features.constrainedMemory === true');
     const main = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8');
+    // Every iOS WebKit host (Safari, other iOS browsers, and the packaged app), not just
+    // NATIVE_APP: GFX.constrainedMemory already folds in platform === 'ios' (iosMemoryProfile)
+    // alongside the generic touch/coarse-pointer detector.
     expect(main).toMatch(
-      /new CharacterPreview\(container, canvas, \{\s*constrainedMemory: NATIVE_APP,?\s*\}\)/,
+      /new CharacterPreview\(container, canvas, \{[\s\S]*?constrainedMemory: GFX\.constrainedMemory,?\s*\}\)/,
     );
     expect(preview).toContain('resolveCharacterPreviewPolicy(options.constrainedMemory === true)');
     expect(preview).toContain('antialias: policy.antialias');

@@ -132,8 +132,14 @@ describe('phase 03 naming-audit display literals stay renamed', () => {
     expect(QUESTS.q_fv_frostmane_tyrant.name).toBe('The Rimemane Tyrant');
     expect(DEEDS.dgn_sanctum_speed.name).toBe('Sanctum Footrace');
     expect(DEEDS.chr_nightbloom_first_cast.name).toBe('A Ripple on the Moonspring');
-    expect(DEEDS.pvp_honor_knight_lieutenant.name).toBe('Banneret');
-    expect(DEEDS.pvp_honor_knight_lieutenant.reward).toEqual({ kind: 'title', text: 'Banneret' });
+    // Phase 03 renamed this title Banneret; release/v0.36.0's own IP-safe
+    // honor-title re-cut (PR #3133) landed Fieldreaver for the same deed and
+    // supersedes the phase name, so the pin follows the release.
+    expect(DEEDS.pvp_honor_knight_lieutenant.name).toBe('Fieldreaver');
+    expect(DEEDS.pvp_honor_knight_lieutenant.reward).toEqual({
+      kind: 'title',
+      text: 'Fieldreaver',
+    });
     const resto = TALENTS.shaman.specs.find((s) => s.id === 'restoration');
     expect(resto?.name).toBe('Spiritcall');
     expect(MOUNTS.terrorspark_groundshaker.name).toBe('Dreadspark Groundshaker');

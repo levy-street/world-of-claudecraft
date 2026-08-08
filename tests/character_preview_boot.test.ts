@@ -20,6 +20,7 @@ function mockGltfLoad(failFirstNCalls: number): { calls: Map<string, number> } {
     }),
     loadHdr: vi.fn(() => new Promise(() => undefined)),
     loadTexture: vi.fn(() => Promise.resolve({})),
+    loadKtx2Texture: vi.fn(() => Promise.resolve({})),
     releaseGltf: vi.fn(),
   }));
   return { calls };

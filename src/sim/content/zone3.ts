@@ -2534,9 +2534,10 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     quality: 'rare',
     // The quiver ladder's early-Thornpeak rung, off the same beast that already
     // anchors the zone's agi-leather line (Huntcord above, Prowlboots): Old
-    // Cragmaw (level 14) -> item level 17, offhand budget 7. Fills the long
+    // Cragmaw (level 14) -> item level 17, worn-offhand budget 4. Fills the long
     // stretch between Mogger's uncommon (item level 7) and Korzul's rare (23).
-    stats: { agi: 4, sta: 3 },
+    occupiesHand: false,
+    stats: { agi: 3, sta: 1 },
     sellValue: 240,
     requiredClass: HUNTER_ONLY,
   },
@@ -3478,11 +3479,12 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     kind: 'held_offhand',
     slot: 'offhand',
     quality: 'rare',
-    // Korzul the Gravewyrm (level 20) -> item level 23, stats on the exact
-    // offhand budget, primaryStatBudget(23, rare, offhand) = 10. The mid rung of
-    // the quiver ladder, between Mogger's uncommon and the raid epic; agi/sta is
-    // the hunter identity the nighttalon leather set already carries.
-    stats: { agi: 6, sta: 4 },
+    // Korzul the Gravewyrm (level 20) -> item level 23, stats on the exact worn
+    // budget, primaryStatBudget(23, rare, offhand, WORN_OFFHAND_STAT_MULT) = 6.
+    // The mid rung of the quiver ladder, between Mogger's uncommon and the raid
+    // epic; agi/sta is the hunter identity the nighttalon leather set carries.
+    occupiesHand: false,
+    stats: { agi: 4, sta: 2 },
     sellValue: 360,
     requiredClass: HUNTER_ONLY,
   },
@@ -3492,11 +3494,14 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     kind: 'held_offhand',
     slot: 'offhand',
     quality: 'epic',
-    // The hunter counterpart to wraithfire_orb, off the same raid boss and on
-    // the same line: primaryStatBudget(29, epic, offhand) = 15. Setless, despite
-    // sharing the Direfang display name with the nighttalon set pieces, so it
-    // cannot shift that set's bonus thresholds.
-    stats: { agi: 9, sta: 6 },
+    // The hunter counterpart to wraithfire_orb, off the same raid boss, but on
+    // the WORN line rather than the orb's held one: the orb costs you the
+    // two-hander and this does not, so it prices at
+    // primaryStatBudget(29, epic, offhand, WORN_OFFHAND_STAT_MULT) = 9 against
+    // the orb's 15. Setless, despite sharing the Direfang display name with the
+    // nighttalon set pieces, so it cannot shift that set's bonus thresholds.
+    occupiesHand: false,
+    stats: { agi: 5, sta: 4 },
     // Physical ranged DPS identity: Hit, matching the nighttalon leather set
     // (attacks miss, so Hit is the throughput rating); never crit-first like the
     // caster orb, whose heals are not resisted.

@@ -13,6 +13,7 @@ import { TALENTS } from '../src/sim/content/talents';
 import { CLASSES } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import { ALL_CLASSES, MAX_LEVEL, type PlayerClass } from '../src/sim/types';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 // The row sweep used to walk every class to melee reach, which put the hunter inside
 // the 8 yard dead zone its whole ranged kit refuses to fire from, so the sweep
@@ -77,7 +78,13 @@ describe('engagementDistance against the kits the sweep actually runs', () => {
   // sweep sees (spec-gated and talent-granted ones), so evaluating the rule against
   // it would verify a different kit than the one being measured.
   function sweptKit(cls: PlayerClass, rows: Record<number, string> = {}) {
-    const sim = new Sim({ seed: 7300, playerClass: 'warrior', noPlayer: true, autoEquip: true });
+    const sim = new Sim({
+      seed: 7300,
+      playerClass: 'warrior',
+      noPlayer: true,
+      autoEquip: true,
+      world: EMPTY_TEST_WORLD,
+    });
     const pid = sim.addPlayer(cls, 'Sweep') as number;
     sim.setPlayerLevel(MAX_LEVEL, pid);
     sim.applyTalents({ spec: TALENTS[cls].specs[0]?.id ?? null, rows }, pid);

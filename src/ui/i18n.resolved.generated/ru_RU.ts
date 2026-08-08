@@ -336,6 +336,12 @@ export const ru_RU: EnTranslations = {
       "healerConfirmAccept": "Воскресить",
       "healerConfirmCancel": "Отмена"
     },
+    "wiki": {
+      "confirmTitle": "Открыть вики?",
+      "confirmBody": "Вики World of ClaudeCraft откроется в браузере. Игра продолжит работать.",
+      "confirmOpen": "Открыть вики",
+      "confirmCancel": "Отмена"
+    },
     "unstuck": {
       "menuButton": "Выбраться",
       "help": "Спасение: /unstuck запускает неподвижный отсчёт, после которого вы окажетесь в ближайшем доступном безопасном месте.",
@@ -1313,6 +1319,7 @@ export const ru_RU: EnTranslations = {
       "keybindHelpLockCursorOnRotate": "Удерживает курсор мыши внутри окна, пока вы вращаете камеру перетаскиванием, чтобы он не достигал края экрана и не переходил на другой монитор. Отключите, если предпочитаете свободный курсор.",
       "showWalletOnCharacterScreen": "Показывать кошелек на экране персонажей",
       "showWalletOnPlayerCard": "Показывать кошелек на карточке игрока",
+      "showPlaytime": "Показывать время в игре на экране персонажей",
       "showDevBadges": "Показывать значки разработчика",
       "showOwnNameplate": "Показывать свою табличку с именем",
       "showPlayerNameplates": "Показывать таблички с именами игроков",
@@ -1545,7 +1552,13 @@ export const ru_RU: EnTranslations = {
     },
     "charSheet": {
       "offense": "Атака",
-      "defense": "Защита"
+      "defense": "Защита",
+      "playtimeLabel": "Время в игре",
+      "playtimeParts": "{major}, {minor}",
+      "playtimeUnderMinute": "Меньше минуты",
+      "playtimeHidden": "Скрыто",
+      "showPlaytimeAria": "Показать время в игре",
+      "hidePlaytimeAria": "Скрыть время в игре"
     },
     "statInfo": {
       "fromYour": "От вашей характеристики ({value} {stat}):",
@@ -1667,6 +1680,24 @@ export const ru_RU: EnTranslations = {
         "few": "Осталось {count} сек.",
         "many": "Осталось {count} сек.",
         "other": "Осталось {count} сек."
+      },
+      "playtimeDays": {
+        "one": "{count} день",
+        "few": "{count} дня",
+        "many": "{count} дней",
+        "other": "{count} дня"
+      },
+      "playtimeHours": {
+        "one": "{count} час",
+        "few": "{count} часа",
+        "many": "{count} часов",
+        "other": "{count} часа"
+      },
+      "playtimeMinutes": {
+        "one": "{count} минута",
+        "few": "{count} минуты",
+        "many": "{count} минут",
+        "other": "{count} минуты"
       },
       "playersOnline": {
         "one": "Список игроков: на {realm} в сети {count} игрок.",
@@ -1921,6 +1952,9 @@ export const ru_RU: EnTranslations = {
       "sortRecent": "Недавние",
       "sortQuality": "Качество",
       "sortName": "Название",
+      "sortButton": "Уборка",
+      "sortButtonAria": "Навести порядок в сумках",
+      "sortButtonHint": "Объединяет стопки и группирует предметы по типу",
       "searchPlaceholder": "Поиск предметов",
       "searchAria": "Поиск предметов в сумках по названию",
       "noMatch": "Нет предметов, соответствующих фильтрам.",

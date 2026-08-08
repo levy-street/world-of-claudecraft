@@ -186,6 +186,7 @@ export const pl_PL: Record<string, string> = {
   'tickPerf.ms': '{value} ms',
   'tickPerf.noCapture': 'Brak przechwytywania. Wybierz okno i je rozpocznij.',
   'tickPerf.overBudget': 'ponad budżet 50ms',
+  'tickPerf.selfHeading': 'Grupy kluczy własnej migawki (bcastSelf)',
   'tickPerf.simHeading': 'wewnętrzne fazy sim.tick()',
   'tickPerf.title': 'Profiler taktów serwera',
   'calibration.autoRefresh': 'Autoodświeżanie ({seconds}s)',

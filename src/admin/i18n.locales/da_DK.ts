@@ -184,6 +184,7 @@ export const da_DK: Record<string, string> = {
   'tickPerf.ms': '{value} ms',
   'tickPerf.noCapture': 'Ingen optagelse endnu. Vælg et vindue, og start en.',
   'tickPerf.overBudget': 'over 50ms-budgettet',
+  'tickPerf.selfHeading': 'Nøglegrupper i selv-snapshottet (bcastSelf)',
   'tickPerf.simHeading': 'sim.tick() interne faser',
   'tickPerf.title': 'Serverens tick-profilering',
   'calibration.autoRefresh': 'Auto-genindlæs ({seconds}s)',

@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
+import { ABILITIES } from '../src/sim/data';
 import {
   DEFAULT_PARTY_FRAME_DISPLAY,
+  PARTY_FRAME_RANGE_YD,
   partyFrameAuraIsRelevant,
   partyFrameHealthText,
   partyFrameSignature,
@@ -350,14 +352,16 @@ describe('ClientWorld-vs-Sim out-of-range parity', () => {
     }
   });
 
-  it('pins the accepted divergence at the exact 100yd boundary (sub-cm rounding flips oor)', () => {
-    // dist 100.003: the full-precision Sim is out of range (100.003 > 100); the mirror
-    // rounds the coordinate to 100.00, which is NOT > 100, so it reads in range. This
+  it('pins the accepted divergence at the exact range boundary (sub-cm rounding flips oor)', () => {
+    // Just past the threshold: the full-precision Sim is out of range; the mirror
+    // rounds the coordinate back onto it, which is NOT > the threshold, so it reads
+    // in range. Taken FROM the constant rather than spelled as a literal, which is how
+    // this test came to pin a 100yd boundary that no ability could reach. This
     // ~2cm knife-edge disagreement at the threshold is the accepted
     // tolerance (like the absorb case). Pinning it gives the parity block teeth: a change
     // to the comparison (> vs >=), the range constant, or the mirror's rounding model
     // would move this boundary and fail here, where the ~50yd cases cannot.
-    const dist = 100.003;
+    const dist = PARTY_FRAME_RANGE_YD + 0.003;
     const sim: PartyInfo = {
       leader: 1,
       raid: false,
@@ -532,5 +536,35 @@ describe('party pets in the selector and the signature', () => {
     expect(partyFrameSignature(party, 1, pos, undefined, DEFAULT_PARTY_FRAME_DISPLAY, pets())).toBe(
       partyFrameSignature(party, 1, pos, undefined, DEFAULT_PARTY_FRAME_DISPLAY, pets()),
     );
+  });
+
+  it('badges at the range a helpful spell actually reaches, taken from the ability table', () => {
+    // The bug this fixes: the badge fired at 100 yards while every friendly cast
+    // is 30, so a member from 30 to 100 yards out showed a clean row and refused
+    // every heal. Derived from the real table, never a second copy of the number,
+    // so retuning heal range fails HERE instead of silently desyncing the badge.
+    const castable = Object.values(ABILITIES).filter(
+      (a) => a.requiresTarget && (a.targetType === 'friendly' || a.targetType === 'any'),
+    );
+    expect(castable.length, 'the table really does declare friendly targets').toBeGreaterThan(10);
+    const longest = Math.max(...castable.map((a) => a.range));
+    expect(PARTY_FRAME_RANGE_YD).toBe(longest);
+  });
+
+  it('badges a member past that range, and does not badge one inside it', () => {
+    const pos = { x: 0, z: 0 };
+    const at = (d: number) => {
+      const info: PartyInfo = {
+        leader: 1,
+        raid: false,
+        master: { enabled: false, looter: 0, threshold: 'uncommon' },
+        members: [member(1, 1), member(2, 1, d, 0)],
+      };
+      return selectPartyFrameMembers(info, 1, pos).find((m) => m.pid === 2)?.oor;
+    };
+    expect(at(PARTY_FRAME_RANGE_YD - 1), 'inside the cast range: reachable').toBe(false);
+    expect(at(PARTY_FRAME_RANGE_YD + 1), 'past it: badged').toBe(true);
+    // The old threshold, which is the middle of the reported dead zone.
+    expect(at(60), 'the 60yd case healers complained about now badges').toBe(true);
   });
 });

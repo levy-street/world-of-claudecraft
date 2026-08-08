@@ -53,10 +53,11 @@ describe('Vineclaw Stalker bespoke attack (issue #2889 round 2)', () => {
     const rigConstBlock = manifestBlock('const TRIPO_BIPED_FULL_RIG: ClipMap = {', '};');
     expect(rigConstBlock).toContain("attack: ['Attack']");
 
-    // Every other VisualDef still pointing at the shared constant is untouched: exactly 4
+    // Every other VisualDef still pointing at the shared constant is untouched: exactly 3
     // remaining direct `clips: TRIPO_BIPED_FULL_RIG,` usages (5 originally, minus the one
-    // migrated to WILDHEART_STALKER above).
+    // migrated to WILDHEART_STALKER above and the one migrated to WILDHEART_HEXCALLER by
+    // issue #2889 round 2's parallel Sunbone Hexcaller change).
     const remaining = [...MANIFEST_SRC.matchAll(/clips: TRIPO_BIPED_FULL_RIG,/g)].length;
-    expect(remaining).toBe(4);
+    expect(remaining).toBe(3);
   });
 });

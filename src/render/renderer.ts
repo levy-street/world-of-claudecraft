@@ -2292,8 +2292,8 @@ export class Renderer {
     const bd = (phase: string): void => {
       const now = performance.now();
       // Gated like [load-diag] and the residency table: dev browsers plus the
-      // native iOS profile under diagnosis, never the production web console.
-      if (import.meta.env.DEV || GFX.nativeIosMemoryProfile) {
+      // iOS WebKit profile under diagnosis, never the production web console.
+      if (import.meta.env.DEV || GFX.iosMemoryProfile) {
         console.info(
           `[build-diag] ${phase} +${(now - bdLast).toFixed(0)}ms (total ${(now - bdStart).toFixed(0)}ms)`,
         );
@@ -2537,10 +2537,10 @@ export class Renderer {
     // decoded bytes sit at exactly the point the iPhone 17 Pro is killed.
     // Scene first so shared buffers/images attribute to the live world, then
     // the caches so only their EXCLUSIVE retention shows as theirs. Gated to
-    // dev browsers and the native iOS profile under diagnosis: the walk
+    // dev browsers and the iOS WebKit profile under diagnosis: the walk
     // allocates identity sets over every buffer at the peak-memory instant,
     // which the production web population must not pay.
-    if (import.meta.env.DEV || GFX.nativeIosMemoryProfile) {
+    if (import.meta.env.DEV || GFX.iosMemoryProfile) {
       console.info(
         formatResidencyBudget(
           residencyBudget([
@@ -3921,7 +3921,7 @@ export class Renderer {
         maxPointLights: number;
         activePointLights: number;
         shadowMap: number;
-        nativeIosMemoryProfile: boolean;
+        iosMemoryProfile: boolean;
       };
     };
     autoGovernor: boolean;
@@ -3971,7 +3971,7 @@ export class Renderer {
           maxPointLights: GFX.maxPointLights,
           activePointLights: this.effectivePointLights || GFX.maxPointLights,
           shadowMap: GFX.shadowMap,
-          nativeIosMemoryProfile: GFX.nativeIosMemoryProfile,
+          iosMemoryProfile: GFX.iosMemoryProfile,
         },
       },
       autoGovernor: GFX.autoGovernor,

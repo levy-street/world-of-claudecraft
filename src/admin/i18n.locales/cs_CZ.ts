@@ -183,6 +183,7 @@ export const cs_CZ: Record<string, string> = {
   'tickPerf.ms': '{value} ms',
   'tickPerf.noCapture': 'Zatím žádné zachycení. Vyber okno a spusť ho.',
   'tickPerf.overBudget': 'nad rozpočtem 50ms',
+  'tickPerf.selfHeading': 'Skupiny klíčů vlastního snímku (bcastSelf)',
   'tickPerf.simHeading': 'vnitřní fáze sim.tick()',
   'tickPerf.title': 'Profiler ticků serveru',
   'accountModal.close': 'Zavřít detaily účtu',

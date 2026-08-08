@@ -217,6 +217,7 @@ export const cs_CZ: AdminTranslations = {
   "tickPerf.overBudget": "nad rozpočtem 50ms",
   "tickPerf.loopHeading": "Fáze smyčky",
   "tickPerf.simHeading": "vnitřní fáze sim.tick()",
+  "tickPerf.selfHeading": "Skupiny klíčů vlastního snímku (bcastSelf)",
   "tickPerf.colPhase": "Fáze",
   "tickPerf.colMean": "Průměr",
   "tickPerf.colP95": "p95",

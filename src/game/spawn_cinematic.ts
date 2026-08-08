@@ -25,7 +25,6 @@ export interface SpawnCinematicPolicyInput {
   seen: boolean;
   playerLevel: number;
   reducedMotion: boolean;
-  native: boolean;
   platform: string;
   engine: string;
   constrainedMemory: boolean;
@@ -42,12 +41,14 @@ export interface SpawnCinematicPolicyDecision {
 /**
  * Decide whether to run the first-spawn pan before any DOM or camera mutation.
  *
- * Native iOS WebKit has a strict WebContent-process memory ceiling that does
- * not scale with the phone's total RAM. On Medium and above, the long camera
- * sweep streams the crowded spawn view while the hidden HUD is revealed at
- * landing. Retained device diagnostics show that combination can terminate
- * the process even after scene construction and prewarm succeeded. Low keeps
- * the cinematic, and ordinary gameplay remains at the player's chosen tier.
+ * Every iOS WebKit host (Mobile Safari, other iOS browsers, and the packaged
+ * native app alike: they share the engine and its WebContent-process memory
+ * ceiling, which does not scale with the phone's total RAM) is at risk here,
+ * not just the packaged app. On Medium and above, the long camera sweep
+ * streams the crowded spawn view while the hidden HUD is revealed at landing.
+ * Retained device diagnostics show that combination can terminate the process
+ * even after scene construction and prewarm succeeded. Low keeps the
+ * cinematic, and ordinary gameplay remains at the player's chosen tier.
  */
 export function decideSpawnCinematic(
   input: SpawnCinematicPolicyInput,
@@ -56,7 +57,6 @@ export function decideSpawnCinematic(
     return { play: false, reason: 'ineligible' };
   }
   if (
-    input.native &&
     input.platform === 'ios' &&
     input.engine === 'webkit' &&
     input.constrainedMemory &&

@@ -16,7 +16,14 @@
 // `src/sim`-pure: no DOM/Three/render-ui-game-net imports, no Math.random/Date.now
 // (enforced by tests/architecture.test.ts). This region draws NO rng.
 
-import { addStacked, bagCapacity, bagsFullError, countFit, equipBag as equipBagCmd } from './bags';
+import {
+  addStacked,
+  bagCapacity,
+  bagsFullError,
+  countFit,
+  equipBag as equipBagCmd,
+  stackSizeOf,
+} from './bags';
 import { isRawCookingCatch } from './content/items';
 import { ITEMS } from './data';
 import { recalcPlayerStats } from './entity';
@@ -39,6 +46,7 @@ import {
 import { formatMoney } from './format_money';
 import { throwFirebottleAtNearestHut } from './interactions/firebottle_hut';
 import { moveStackToCell } from './inventory_order';
+import { sortInventoryStacks } from './inventory_sort';
 import { canStackInstancePayloads, itemInstancePayloadsEqual } from './item_instance_merge';
 import { meetsLevelRequirement, requiredLevelFor } from './item_level_req';
 import { mountOwned, summonMountItem } from './mounts';
@@ -373,6 +381,17 @@ export function moveInventoryItem(ctx: SimContext, from: number, to: number, pid
   if (!r) return;
   const { meta } = r;
   moveStackToCell(meta.inventory, from, to, bagCapacity(meta.bags));
+}
+
+// One-shot bag clean-up (the sort button). Consolidates partial stacks and
+// restamps every cell hint into the canonical ladder; the array order itself
+// is untouched, so removal walks and recency keep their meaning (the why
+// lives in inventory_sort.ts). No arguments to validate and no rng drawn;
+// an empty inventory is a no-op.
+export function sortInventory(ctx: SimContext, pid?: number): void {
+  const r = ctx.resolve(pid);
+  if (!r) return;
+  sortInventoryStacks(r.meta.inventory, (id) => ITEMS[id], stackSizeOf);
 }
 
 // `targetSlot` names the exact equipment key the player aimed at (the paperdoll

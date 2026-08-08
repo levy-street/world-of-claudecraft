@@ -226,6 +226,7 @@ export const tr_TR: Record<string, string> = {
   'tickPerf.ms': '{value} ms',
   'tickPerf.noCapture': 'Henüz yakalama yok. Bir pencere seç ve bir tane başlat.',
   'tickPerf.overBudget': '50ms bütçesinin üzerinde',
+  'tickPerf.selfHeading': 'Kendi anlık görüntüsünün anahtar grupları (bcastSelf)',
   'tickPerf.simHeading': 'sim.tick() dahili fazları',
   'tickPerf.title': 'Sunucu tik profilcisi',
   'calibration.autoRefresh': 'Otomatik yenile ({seconds}sn)',

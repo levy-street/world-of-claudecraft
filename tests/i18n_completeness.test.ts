@@ -238,6 +238,9 @@ describe('i18n CLDR pluralization', () => {
       'guildMembers',
       'playersMatching',
       'playersOnline',
+      'playtimeDays',
+      'playtimeHours',
+      'playtimeMinutes',
       'secondsRemaining',
     ]);
     for (const base of bases) {

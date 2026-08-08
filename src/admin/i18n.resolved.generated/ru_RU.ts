@@ -217,6 +217,7 @@ export const ru_RU: AdminTranslations = {
   "tickPerf.overBudget": "превышен бюджет 50ms",
   "tickPerf.loopHeading": "Фазы цикла",
   "tickPerf.simHeading": "внутренние фазы sim.tick()",
+  "tickPerf.selfHeading": "Группы ключей собственного снимка (bcastSelf)",
   "tickPerf.colPhase": "Фаза",
   "tickPerf.colMean": "Среднее",
   "tickPerf.colP95": "p95",

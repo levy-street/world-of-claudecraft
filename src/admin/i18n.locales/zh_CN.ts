@@ -222,6 +222,7 @@ export const zh_CN: Record<string, string> = {
   'tickPerf.ms': '{value} 毫秒',
   'tickPerf.noCapture': '尚无采集记录。请选择一个窗口并开始采集。',
   'tickPerf.overBudget': '超出 50ms 预算',
+  'tickPerf.selfHeading': '自身快照键分组 (bcastSelf)',
   'tickPerf.simHeading': 'sim.tick() 内部阶段',
   'tickPerf.title': '服务器 tick 性能分析器',
   'calibration.autoRefresh': '自动刷新（{seconds}秒）',

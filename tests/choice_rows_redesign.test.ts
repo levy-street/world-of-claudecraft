@@ -4,6 +4,7 @@ import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
 import { expectDefined } from './helpers/defined';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 // The priest/shaman/paladin row redesign (docs/design/choice-row-quality-pass.md):
 // each proc-engine primitive proven end to end through the live content that
@@ -16,7 +17,7 @@ function rig(
   rows: Record<number, string>,
   seed = 11,
 ) {
-  const sim = new Sim({ seed, playerClass: cls, autoEquip: true });
+  const sim = new Sim({ seed, playerClass: cls, autoEquip: true, world: EMPTY_TEST_WORLD });
   sim.setPlayerLevel(level);
   expect(sim.applyTalents({ spec: null, rows })).toBe(true);
   const p = sim.player;
@@ -322,7 +323,12 @@ describe('paladin redesign', () => {
 
 describe('druid Lifesap redesign', () => {
   it('restores 30 resource per classic tick for 10 sec, in combat', () => {
-    const sim = new Sim({ seed: 11, playerClass: 'druid', autoEquip: true });
+    const sim = new Sim({
+      seed: 11,
+      playerClass: 'druid',
+      autoEquip: true,
+      world: EMPTY_TEST_WORLD,
+    });
     sim.setPlayerLevel(20);
     expect(sim.applyTalents({ spec: null, rows: { 11: 'dru_r11_innervate' } })).toBe(true);
     const p = sim.player;
@@ -343,7 +349,12 @@ describe('druid Lifesap redesign', () => {
   });
 
   it('carries across a form shift and fills Rage in Bruin Form', () => {
-    const sim = new Sim({ seed: 11, playerClass: 'druid', autoEquip: true });
+    const sim = new Sim({
+      seed: 11,
+      playerClass: 'druid',
+      autoEquip: true,
+      world: EMPTY_TEST_WORLD,
+    });
     sim.setPlayerLevel(20);
     expect(sim.applyTalents({ spec: null, rows: { 11: 'dru_r11_innervate' } })).toBe(true);
     const p = sim.player;
