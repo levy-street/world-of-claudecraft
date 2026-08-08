@@ -3590,7 +3590,7 @@ export const ko_KR: EnTranslations = {
         "nightName": "밤꽃 평원",
         "nightBlurb": "꽃이 길을 밝히고 문레스트가 밤을 지새우는, 별이 쏟아지는 한밤의 나라.",
         "hauntName": "망령숲",
-        "hauntBlurb": "거대한 우듬지 아래 유령이 깃든 숲, 길 위의 정직한 빛이라고는 갈로미어의 등불뿐인 곳.",
+        "hauntBlurb": "거대한 우듬지 아래 유령이 깃든 숲, 길 위의 정직한 빛이라고는 기빗미어의 등불뿐인 곳.",
         "jungleName": "야자 해안",
         "jungleBlurb": "야자수와 흰 모래, 시끄러운 새들, 그리고 백사장에 불을 밝혀 두는 해변 마을 드리프트헤이븐.",
         "gardenName": "상록 정원",

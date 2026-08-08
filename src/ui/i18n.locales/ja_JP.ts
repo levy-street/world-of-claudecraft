@@ -11802,7 +11802,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.home.world.galeName': 'ゲイルクレスト',
   'guide.home.world.gardenBlurb': '誰ひとり姿を見たことのない庭師が、今も刈り込みを続ける生け垣の迷路の領域。ヘッジウィックと噴水の中庭を抜けた先にある。',
   'guide.home.world.gardenName': 'エバーガーデン',
-  'guide.home.world.hauntBlurb': '巨大な梢の下に横たわる、呪われた森。ガロウミアの灯りだけが、この道で信じられる唯一の光だ。',
+  'guide.home.world.hauntBlurb': '巨大な梢の下に横たわる、呪われた森。ギベットミアの灯りだけが、この道で信じられる唯一の光だ。',
   'guide.home.world.hauntName': 'レイスウッド',
   'guide.home.world.jungleBlurb': '椰子と白い砂、そして騒がしい鳥たち。浜辺の町ドリフトヘイヴンが、砂州に火を絶やさず待っている。',
   'guide.home.world.jungleName': 'パームリーチ',

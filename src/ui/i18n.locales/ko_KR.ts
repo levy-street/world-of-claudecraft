@@ -11791,7 +11791,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.home.world.galeName': '게일크레스트',
   'guide.home.world.gardenBlurb': '헤지윅과 분수 안뜰을 지나 들어서는, 아무도 본 적 없는 정원사가 여태 다듬고 있는 미로 정원의 나라.',
   'guide.home.world.gardenName': '상록 정원',
-  'guide.home.world.hauntBlurb': '거대한 우듬지 아래 유령이 깃든 숲, 길 위의 정직한 빛이라고는 갈로미어의 등불뿐인 곳.',
+  'guide.home.world.hauntBlurb': '거대한 우듬지 아래 유령이 깃든 숲, 길 위의 정직한 빛이라고는 기빗미어의 등불뿐인 곳.',
   'guide.home.world.hauntName': '망령숲',
   'guide.home.world.jungleBlurb': '야자수와 흰 모래, 시끄러운 새들, 그리고 백사장에 불을 밝혀 두는 해변 마을 드리프트헤이븐.',
   'guide.home.world.jungleName': '야자 해안',

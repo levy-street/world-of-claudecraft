@@ -11970,7 +11970,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.home.world.galeName': 'Гейлкрест',
   'guide.home.world.gardenBlurb': 'Царство живых изгородей, которые до сих пор подстригает садовник, которого никто и никогда не видел; вход туда лежит за Хеджвиком и его фонтанными дворами.',
   'guide.home.world.gardenName': 'Вечный Сад',
-  'guide.home.world.hauntBlurb': 'Лес с призраками под исполинскими кронами, где фонари Гэллоумира — единственный честный свет на дороге.',
+  'guide.home.world.hauntBlurb': 'Лес с призраками под исполинскими кронами, где фонари Гиббетмира — единственный честный свет на дороге.',
   'guide.home.world.hauntName': 'Призрачная Чаща',
   'guide.home.world.jungleBlurb': 'Пальмы, белый песок и крикливые птицы, а пляжный городок Дрифтхейвен держит на берегу зажжённый костёр.',
   'guide.home.world.jungleName': 'Пальмовый Берег',

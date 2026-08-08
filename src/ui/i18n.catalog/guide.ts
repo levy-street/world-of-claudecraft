@@ -201,7 +201,7 @@ export const guideStrings = {
         'A country of starry midnight where the flowers light the paths and Moonrest keeps its vigil.',
       hauntName: 'The Wraithwood',
       hauntBlurb:
-        'A haunted forest under giant canopies, where the lanterns of Gallowmere are the only honest light on the road.',
+        'A haunted forest under giant canopies, where the lanterns of Gibbetmere are the only honest light on the road.',
       jungleName: 'The Palmreach',
       jungleBlurb:
         'Palms, white sand, and loud birds, with the beach-town of Drifthaven keeping a fire lit on the strand.',

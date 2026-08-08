@@ -87,6 +87,15 @@ const OLD_COINS = [
   'Moonwell',
   'Cryptbloom',
   'Mistforged',
+  // Transliterated coins: the Latin arms above cannot see a translator-minted
+  // rendering of an old coin. The v0.36.0 wiki-refresh fills reintroduced
+  // Gallowmere through fresh ja/ko/ru transliterations that no Latin substring
+  // hits (found by release-merge audit, not by this guard); arm the renderings
+  // themselves so a future release fill cannot bring them back. The ru arm is
+  // the stem, so inflected forms still hit.
+  'ガロウミア',
+  '갈로미어',
+  'Гэллоумир',
 ] as const;
 
 // Values a coin legitimately appears in: native vocabulary that only spells
