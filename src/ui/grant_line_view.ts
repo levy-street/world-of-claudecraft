@@ -35,6 +35,7 @@
 //
 // DOM/Three-free (registered in tests/architecture.test.ts UI_PURE_CORES).
 
+import { farmCropById } from '../sim/content/farm_crops';
 import { ITEMS } from '../sim/data';
 import type { HarvestYieldKind } from '../sim/professions/harvest_yields';
 import { itemDisplayName } from './entity_i18n';
@@ -111,6 +112,53 @@ export function craftedLineKey(count: number | undefined): TranslationKey {
   return isMultiUnitGrant(count)
     ? 'hudChrome.crafting.craftedToastQty'
     : 'hudChrome.crafting.craftedToast';
+}
+
+/** The item id whose token a farm PLANT line splices. A plant event carries
+ *  the crop id, and what the player actually spent is that crop's seed, so
+ *  this is the one hop between them: the disenchant/salvage precedent of a
+ *  line naming the item it consumed, which is what tells a farmer carrying
+ *  several seeds which one went into the bed.
+ *
+ *  A crop id the catalog does not carry (or a row with no seed) falls back to
+ *  the crop id itself rather than to nothing. That is the honest degrade, not
+ *  a nicety: `grantItemToken` turns an id absent from ITEMS into the raw id,
+ *  so the line still names SOMETHING instead of rendering an empty splice.
+ *  Unreachable through the plant path (plantCrop refuses an unknown crop id
+ *  before it emits), so this arm exists for content drift between a client
+ *  and a newer server, and is pinned in both directions. */
+export function farmPlantedTokenId(cropId: string): string {
+  return farmCropById(cropId)?.seedItemId ?? cropId;
+}
+
+/** The produce line for one farm harvest: the quantity variant only past one
+ *  unit, exactly like its gather and corpse-harvest siblings above. Farming
+ *  grants can and normally do land several units (the harvest-lives roll has a
+ *  guaranteed floor of picks), so unlike `catchLine` this family needs the
+ *  quantity sibling. */
+export function farmHarvestLineKey(count: number | undefined): TranslationKey {
+  return isMultiUnitGrant(count)
+    ? 'hudChrome.farming.harvestLineQty'
+    : 'hudChrome.farming.harvestLine';
+}
+
+/** The line for the FINE-grade twin a farm harvest also granted. Its own line
+ *  for the reason `harvestSpecimenLine` takes one (a different item granted
+ *  BESIDE the plain produce, so a shared line would read as one yield counted
+ *  twice), but with a quantity sibling, because several picks in one harvest
+ *  can upgrade. */
+export function farmFineLineKey(count: number | undefined): TranslationKey {
+  return isMultiUnitGrant(count)
+    ? 'hudChrome.farming.harvestFineLineQty'
+    : 'hudChrome.farming.harvestFineLine';
+}
+
+/** The line a withered plot's husk payout renders: the same quantity split as
+ *  the produce family, so a one-husk clear never reads "x1". */
+export function farmWitheredLineKey(count: number | undefined): TranslationKey {
+  return isMultiUnitGrant(count)
+    ? 'hudChrome.farming.witheredLineQty'
+    : 'hudChrome.farming.witheredLine';
 }
 
 // The three enchanting-action lines (disenchant / salvage / apply-enchant)

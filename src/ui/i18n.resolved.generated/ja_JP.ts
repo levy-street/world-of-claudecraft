@@ -2715,6 +2715,25 @@ export const ja_JP: EnTranslations = {
       "respawnClock": "{minutes}:{seconds}",
       "fineGradePreview": "あなたの道具なら、ここの採取物は上質な等級になります。"
     },
+    "farming": {
+      "plantLine": "{name}を植えた。",
+      "harvestLine": "{name}を収穫した。",
+      "harvestLineQty": "{name} x{qty}を収穫した。",
+      "harvestFineLine": "さらに{name}も収穫した。",
+      "harvestFineLineQty": "さらに{name} x{qty}も収穫した。",
+      "witheredLine": "作物が枯れた。畑を片づけた：{name}。",
+      "witheredLineQty": "作物が枯れた。畑を片づけた：{name} x{qty}。",
+      "denied": {
+        "bad_bed": "そこに作物畑はありません。",
+        "bad_crop": "それはここには植えられません。",
+        "range": "その作物畑から離れすぎています。",
+        "bed_taken": "そこにはすでに作物が育っています。",
+        "skill": "その作物を育てるには農耕スキルが足りません。",
+        "no_seed": "その作物の種を持っていません。",
+        "not_ready": "その作物はまだ育っています。",
+        "no_plot": "その畑には何も植えられていません。"
+      }
+    },
     "archetypeTitle": {
       "label": "称号",
       "none": "なし",
@@ -8054,6 +8073,7 @@ export const ja_JP: EnTranslations = {
     },
     "cast": {
       "fishing": "釣り",
+      "farming": "種まき",
       "gathering": "採集",
       "crafting": "製作",
       "disenchanting": "分解",
@@ -11195,6 +11215,18 @@ export const ja_JP: EnTranslations = {
       },
       "pristine_claw": {
         "name": "無傷の鉤爪"
+      },
+      "vale_wheat_seed": {
+        "name": "渓谷小麦の種"
+      },
+      "vale_wheat": {
+        "name": "渓谷小麦"
+      },
+      "fine_vale_wheat": {
+        "name": "上質な渓谷小麦"
+      },
+      "withered_husks": {
+        "name": "枯れた籾殻"
       },
       "conjured_water4": {
         "name": "魔法の湧き水"

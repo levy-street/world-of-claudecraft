@@ -2427,6 +2427,10 @@ const ITEM_ENTITY_IDS = [
   'sharp_claw',
   'curved_tusk',
   'pristine_claw',
+  'vale_wheat_seed',
+  'vale_wheat',
+  'fine_vale_wheat',
+  'withered_husks',
 ] as const;
 
 type ItemEntityId = (typeof ITEM_ENTITY_IDS)[number];
@@ -2551,6 +2555,16 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   thornhide_leggings: 'Thornhide Leggings',
   thornhide_gloves: 'Thornhide Gloves',
   thornhide_boots: 'Thornhide Boots',
+  // Farming's tier-1 crop line (the growth-engine phase): the seed, its
+  // produce, the fine twin a skill-scaled harvest roll upgrades a pick into,
+  // and the husks a failed crop pays. Same English-appended treatment as the
+  // quivers and the Thornhide family above. These names must stay in step with
+  // the ItemDef `name` fields in src/sim/content/items.ts, which is what the
+  // sim splices into its own English text for the matchers to re-localize.
+  vale_wheat_seed: 'Vale Wheat Seed',
+  vale_wheat: 'Vale Wheat',
+  fine_vale_wheat: 'Fine Vale Wheat',
+  withered_husks: 'Withered Husks',
 };
 
 function itemTranslations(names: readonly string[]): ItemEntityTranslations {

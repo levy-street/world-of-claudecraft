@@ -2715,6 +2715,25 @@ export const ru_RU: EnTranslations = {
       "respawnClock": "{minutes}:{seconds}",
       "fineGradePreview": "Ваш инструмент даёт здесь отборный сорт добычи."
     },
+    "farming": {
+      "plantLine": "Вы сажаете: {name}.",
+      "harvestLine": "Вы собираете урожай: {name}.",
+      "harvestLineQty": "Вы собираете урожай: {name} x{qty}.",
+      "harvestFineLine": "Вы также собираете: {name}.",
+      "harvestFineLineQty": "Вы также собираете: {name} x{qty}.",
+      "witheredLine": "Урожай засох. Вы расчищаете грядку: {name}.",
+      "witheredLineQty": "Урожай засох. Вы расчищаете грядку: {name} x{qty}.",
+      "denied": {
+        "bad_bed": "Там нет грядки.",
+        "bad_crop": "Это здесь посадить нельзя.",
+        "range": "Вы слишком далеко от этой грядки.",
+        "bed_taken": "Там у вас уже растет урожай.",
+        "skill": "Ваш навык земледелия слишком низок для этой культуры.",
+        "no_seed": "У вас нет семян этой культуры.",
+        "not_ready": "Этот урожай еще растет.",
+        "no_plot": "На этой грядке ничего не посажено."
+      }
+    },
     "archetypeTitle": {
       "label": "Титул",
       "none": "Нет",
@@ -8054,6 +8073,7 @@ export const ru_RU: EnTranslations = {
     },
     "cast": {
       "fishing": "Рыбная ловля",
+      "farming": "Посадка",
       "gathering": "Сбор ресурсов",
       "crafting": "Изготовление",
       "disenchanting": "Распыление",
@@ -11195,6 +11215,18 @@ export const ru_RU: EnTranslations = {
       },
       "pristine_claw": {
         "name": "Безупречный коготь"
+      },
+      "vale_wheat_seed": {
+        "name": "Семена долинной пшеницы"
+      },
+      "vale_wheat": {
+        "name": "Долинная пшеница"
+      },
+      "fine_vale_wheat": {
+        "name": "Отборная долинная пшеница"
+      },
+      "withered_husks": {
+        "name": "Засохшая шелуха"
       },
       "conjured_water4": {
         "name": "Сотворённая родниковая вода"

@@ -2715,6 +2715,25 @@ export const en_XA: EnTranslations = {
       "respawnClock": "[{minutes}:{seconds}]",
       "fineGradePreview": "[Ýóúŕ ţóóļ ŕéƒíñéš ţĥíš ýíéļð ţó ƒíñé ĝŕáðé.]"
     },
+    "farming": {
+      "plantLine": "[Ýóú þļáñţ: {name}.]",
+      "harvestLine": "[Ýóú ƀŕíñĝ íñ: {name}.]",
+      "harvestLineQty": "[Ýóú ƀŕíñĝ íñ: {name} ẋ{qty}.]",
+      "harvestFineLine": "[Ýóú áļšó ƀŕíñĝ íñ: {name}.]",
+      "harvestFineLineQty": "[Ýóú áļšó ƀŕíñĝ íñ: {name} ẋ{qty}.]",
+      "witheredLine": "[Ţĥé çŕóþ ŵíţĥéŕéð. Ýóú çļéáŕ ţĥé ƀéð: {name}.]",
+      "witheredLineQty": "[Ţĥé çŕóþ ŵíţĥéŕéð. Ýóú çļéáŕ ţĥé ƀéð: {name} ẋ{qty}.]",
+      "denied": {
+        "bad_bed": "[Ţĥéŕé íš ñó çŕóþ ƀéð ţĥéŕé.]",
+        "bad_crop": "[Ýóú çáññóţ þļáñţ ţĥáţ ĥéŕé.]",
+        "range": "[Ýóú áŕé ţóó ƒáŕ ƒŕóɱ ţĥáţ çŕóþ ƀéð.]",
+        "bed_taken": "[Ýóú áļŕéáðý ĥáʋé á çŕóþ ĝŕóŵíñĝ ţĥéŕé.]",
+        "skill": "[Ýóúŕ Ƒáŕɱíñĝ šķíļļ íš ţóó ļóŵ ƒóŕ ţĥáţ çŕóþ.]",
+        "no_seed": "[Ýóú ĥáʋé ñó šééð ƒóŕ ţĥáţ çŕóþ.]",
+        "not_ready": "[Ţĥáţ çŕóþ íš šţíļļ ĝŕóŵíñĝ.]",
+        "no_plot": "[Ñóţĥíñĝ íš þļáñţéð íñ ţĥáţ ƀéð.]"
+      }
+    },
     "archetypeTitle": {
       "label": "[Ţíţļé]",
       "none": "[Ñóñé]",
@@ -8054,6 +8073,7 @@ export const en_XA: EnTranslations = {
     },
     "cast": {
       "fishing": "[Ƒíšĥíñĝ]",
+      "farming": "[Þļáñţíñĝ]",
       "gathering": "[Ĝáţĥéŕíñĝ]",
       "crafting": "[Çŕáƒţíñĝ]",
       "disenchanting": "[Ðíšéñçĥáñţíñĝ]",
@@ -11195,6 +11215,18 @@ export const en_XA: EnTranslations = {
       },
       "pristine_claw": {
         "name": "[Þŕíšţíñé Çļáŵ]"
+      },
+      "vale_wheat_seed": {
+        "name": "[Ʋáļé Ŵĥéáţ Šééð]"
+      },
+      "vale_wheat": {
+        "name": "[Ʋáļé Ŵĥéáţ]"
+      },
+      "fine_vale_wheat": {
+        "name": "[Ƒíñé Ʋáļé Ŵĥéáţ]"
+      },
+      "withered_husks": {
+        "name": "[Ŵíţĥéŕéð Ĥúšķš]"
       },
       "conjured_water4": {
         "name": "[Çóñĵúŕéð Šþŕíñĝŵáţéŕ]"

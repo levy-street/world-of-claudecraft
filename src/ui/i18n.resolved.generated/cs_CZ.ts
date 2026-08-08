@@ -2715,6 +2715,25 @@ export const cs_CZ: EnTranslations = {
       "respawnClock": "{minutes}:{seconds}",
       "fineGradePreview": "Tvůj nástroj povyšuje tento výnos na jemnou jakost."
     },
+    "farming": {
+      "plantLine": "You plant: {name}.",
+      "harvestLine": "You bring in: {name}.",
+      "harvestLineQty": "You bring in: {name} x{qty}.",
+      "harvestFineLine": "You also bring in: {name}.",
+      "harvestFineLineQty": "You also bring in: {name} x{qty}.",
+      "witheredLine": "The crop withered. You clear the bed: {name}.",
+      "witheredLineQty": "The crop withered. You clear the bed: {name} x{qty}.",
+      "denied": {
+        "bad_bed": "There is no crop bed there.",
+        "bad_crop": "You cannot plant that here.",
+        "range": "You are too far from that crop bed.",
+        "bed_taken": "You already have a crop growing there.",
+        "skill": "Your Farming skill is too low for that crop.",
+        "no_seed": "You have no seed for that crop.",
+        "not_ready": "That crop is still growing.",
+        "no_plot": "Nothing is planted in that bed."
+      }
+    },
     "archetypeTitle": {
       "label": "Titul",
       "none": "Žádný",
@@ -8054,6 +8073,7 @@ export const cs_CZ: EnTranslations = {
     },
     "cast": {
       "fishing": "Rybaření",
+      "farming": "Planting",
       "gathering": "Sběr",
       "crafting": "Výroba",
       "disenchanting": "Rozzačarování",
@@ -11195,6 +11215,18 @@ export const cs_CZ: EnTranslations = {
       },
       "pristine_claw": {
         "name": "Nedotčený dráp"
+      },
+      "vale_wheat_seed": {
+        "name": "Vale Wheat Seed"
+      },
+      "vale_wheat": {
+        "name": "Vale Wheat"
+      },
+      "fine_vale_wheat": {
+        "name": "Fine Vale Wheat"
+      },
+      "withered_husks": {
+        "name": "Withered Husks"
       },
       "conjured_water4": {
         "name": "Vyčarovaná pramenitá voda"

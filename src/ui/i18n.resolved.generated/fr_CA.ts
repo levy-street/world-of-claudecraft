@@ -2715,6 +2715,25 @@ export const fr_CA: EnTranslations = {
       "respawnClock": "{minutes}:{seconds}",
       "fineGradePreview": "Votre outil affine cette récolte en qualité fine."
     },
+    "farming": {
+      "plantLine": "You plant: {name}.",
+      "harvestLine": "You bring in: {name}.",
+      "harvestLineQty": "You bring in: {name} x{qty}.",
+      "harvestFineLine": "You also bring in: {name}.",
+      "harvestFineLineQty": "You also bring in: {name} x{qty}.",
+      "witheredLine": "The crop withered. You clear the bed: {name}.",
+      "witheredLineQty": "The crop withered. You clear the bed: {name} x{qty}.",
+      "denied": {
+        "bad_bed": "There is no crop bed there.",
+        "bad_crop": "You cannot plant that here.",
+        "range": "You are too far from that crop bed.",
+        "bed_taken": "You already have a crop growing there.",
+        "skill": "Your Farming skill is too low for that crop.",
+        "no_seed": "You have no seed for that crop.",
+        "not_ready": "That crop is still growing.",
+        "no_plot": "Nothing is planted in that bed."
+      }
+    },
     "archetypeTitle": {
       "label": "Titre",
       "none": "Aucun",
@@ -8054,6 +8073,7 @@ export const fr_CA: EnTranslations = {
     },
     "cast": {
       "fishing": "Pêche",
+      "farming": "Planting",
       "gathering": "Collecte",
       "crafting": "Fabrication",
       "disenchanting": "Désenchantement",
@@ -11195,6 +11215,18 @@ export const fr_CA: EnTranslations = {
       },
       "pristine_claw": {
         "name": "Griffe immaculée"
+      },
+      "vale_wheat_seed": {
+        "name": "Vale Wheat Seed"
+      },
+      "vale_wheat": {
+        "name": "Vale Wheat"
+      },
+      "fine_vale_wheat": {
+        "name": "Fine Vale Wheat"
+      },
+      "withered_husks": {
+        "name": "Withered Husks"
       },
       "conjured_water4": {
         "name": "Eau de source conjurée"

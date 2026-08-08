@@ -139,6 +139,15 @@ const baseEnTable = {
   // dragged piece, e.g. a helm dropped on a ring finger (src/sim/items.ts equipItem).
   'error.wrongEquipSlot': 'That does not go in that slot.',
   'error.faceWater': 'You need to face fishable water.',
+  // The /cast self-readout while the planting cast runs (castingReadout in
+  // src/sim/social/chat_readouts.ts, routed through ctx.error like every other
+  // readout). Registered here rather than parked in the v0.7 English backstop
+  // that still carries its fishing and gathering neighbours: a new string gets
+  // a real row. It carries no countdown BY DESIGN (plantCrop already resolved
+  // the whole plant, so the seconds left decide nothing), which is also why it
+  // has no placeholders and belongs in this exact-match table rather than in
+  // RULES.
+  'error.castingPlanting': 'You are planting.',
   'error.potionNotReady': 'That potion is not ready yet.',
   // Firebottle hut burns (src/sim/interactions/firebottle_hut.ts REASON_MESSAGE).
   'error.firebottleNeeded': 'You need a firebottle to torch that.',

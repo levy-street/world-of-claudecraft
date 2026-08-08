@@ -3315,6 +3315,54 @@ export const hudChromeStrings = {
     // read the grant runs.
     fineGradePreview: 'Your tool refines this yield to fine grade.',
   },
+  // Farming (the growth-engine phase): the chat lines and refusal toasts for
+  // the plant / grow / harvest loop, rendered from the text-free, id-carrying
+  // farmPlanted / farmHarvested / farmWithered / farmDenied SimEvents. Its own
+  // namespace rather than more arms under `gathering` above, because those are
+  // per-profession arms of TOOL keys every gathering profession shares, while
+  // these are farming's own event family. The line keys follow the shipped
+  // grant-line shape (a plain variant plus a {qty} sibling, selected by
+  // grant_line_view.ts isMultiUnitGrant) and stay worded APART from both the
+  // gather and the corpse-harvest families, whose "You gather:" / "You
+  // harvest:" wording those matchers still own.
+  farming: {
+    // The plant confirmation. Names the SEED that was consumed, the
+    // disenchant/salvage precedent for a line about a spent item, so the
+    // player can tell which of several seeds went into the bed.
+    plantLine: 'You plant: {name}.',
+    // The produce a ready plot paid. The sole line for the grant (the farming
+    // resolver emits its hub grants callerLogs, the #2430 one-line rule), so
+    // it carries the quantity.
+    harvestLine: 'You bring in: {name}.',
+    harvestLineQty: 'You bring in: {name} x{qty}.',
+    // The fine-grade twin, on its own line for the reason
+    // harvestSpecimenLine takes one: it is a DIFFERENT item granted beside
+    // the plain produce, so folding it in would read as one yield counted
+    // twice. Unlike a specimen it can land several units, so it keeps a
+    // {qty} sibling.
+    harvestFineLine: 'You also bring in: {name}.',
+    harvestFineLineQty: 'You also bring in: {name} x{qty}.',
+    // The failed-crop payout. A plot that lost its survival roll pays husks
+    // instead of produce, and the player learns it HERE, at the harvest:
+    // nothing rots and no timer fires, so this line is the whole of the bad
+    // news and says plainly that the crop, not the bed, was lost.
+    witheredLine: 'The crop withered. You clear the bed: {name}.',
+    witheredLineQty: 'The crop withered. You clear the bed: {name} x{qty}.',
+    // Refusal toasts, one per farmDenied reason, keyed by the reason id
+    // itself so gathering_view.ts resolves them by template literal and no
+    // second map can drift. Error toasts only: no line, no cue, no other
+    // state (the gatherDenied pattern).
+    denied: {
+      bad_bed: 'There is no crop bed there.',
+      bad_crop: 'You cannot plant that here.',
+      range: 'You are too far from that crop bed.',
+      bed_taken: 'You already have a crop growing there.',
+      skill: 'Your Farming skill is too low for that crop.',
+      no_seed: 'You have no seed for that crop.',
+      not_ready: 'That crop is still growing.',
+      no_plot: 'Nothing is planted in that bed.',
+    },
+  },
   // Archetype title chrome (#1130, pair-named under Professions 2.0):
   // `label` heads the character-sheet title line, `none` is shown before the
   // zone-1 acceptance quest has ever been completed (no "Jack of All Trades"

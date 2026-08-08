@@ -2715,6 +2715,25 @@ export const zh_TW: EnTranslations = {
       "respawnClock": "{minutes}:{seconds}",
       "fineGradePreview": "使用當前工具採集可獲得優質品級。"
     },
+    "farming": {
+      "plantLine": "你播下了：{name}。",
+      "harvestLine": "你收穫了：{name}。",
+      "harvestLineQty": "你收穫了：{name} x{qty}。",
+      "harvestFineLine": "你還收穫了：{name}。",
+      "harvestFineLineQty": "你還收穫了：{name} x{qty}。",
+      "witheredLine": "作物枯萎了。你清理了田畦：{name}。",
+      "witheredLineQty": "作物枯萎了。你清理了田畦：{name} x{qty}。",
+      "denied": {
+        "bad_bed": "那裡沒有田畦。",
+        "bad_crop": "你無法在這裡種植它。",
+        "range": "你離那片田畦太遠了。",
+        "bed_taken": "你已經在那裡種下了作物。",
+        "skill": "你的耕作技能不足以種植該作物。",
+        "no_seed": "你沒有該作物的種子。",
+        "not_ready": "那株作物還在生長。",
+        "no_plot": "那片田畦裡什麼也沒種。"
+      }
+    },
     "archetypeTitle": {
       "label": "稱號",
       "none": "無",
@@ -8054,6 +8073,7 @@ export const zh_TW: EnTranslations = {
     },
     "cast": {
       "fishing": "釣魚",
+      "farming": "播種",
       "gathering": "採集",
       "crafting": "製作",
       "disenchanting": "分解",
@@ -11195,6 +11215,18 @@ export const zh_TW: EnTranslations = {
       },
       "pristine_claw": {
         "name": "完美的爪"
+      },
+      "vale_wheat_seed": {
+        "name": "谷地小麥種子"
+      },
+      "vale_wheat": {
+        "name": "谷地小麥"
+      },
+      "fine_vale_wheat": {
+        "name": "優質谷地小麥"
+      },
+      "withered_husks": {
+        "name": "枯萎的穀殼"
       },
       "conjured_water4": {
         "name": "魔法泉水"
