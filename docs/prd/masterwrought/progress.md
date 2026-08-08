@@ -8,7 +8,7 @@
 | 02 QA | verify | complete | 2026-08-07 | 2026-08-07 |
 | 03 | IP naming sweep | complete | 2026-08-07 | 2026-08-07 |
 | 03 QA | verify | complete | 2026-08-08 | 2026-08-08 |
-| 04 | Materials backbone | pending | | |
+| 04 | Materials backbone | complete | 2026-08-08 | 2026-08-08 |
 | 04 QA | verify | pending | | |
 | 05 | Jewelcrafting base catalog | pending | | |
 | 05 QA | verify | pending | | |
@@ -129,6 +129,26 @@ never future-PR items, per the delivery contract in `state.md`).
   proof, wiki regenerated, and the standing authoring-time IP check codified in the
   root and src/sim/content CLAUDE.md files. Full ledger in state.md.
 
+- Phase 04 (2026-08-08): the three chase materials shipped with faucets, gates, and
+  persistence in both hosts. Wyrmfall Core: one shared 1-3 roll per credited eligible
+  final-boss kill (heroic instances plus the normal raid), appended after rollLoot so
+  loot draws never reorder, per-character per-source reset-day gate, marks-style
+  present/absent delivery with the new wyrmfall_core_reward letter, the draw-free
+  rift A/S first-clear arm (A 1, S 2, R9's daily cap), and the 12-mark quartermaster
+  catch-up row. Maker's Ember: weekly bankable accrual anchored on the most recent
+  Tuesday DERIVED from ctx.resetDay by pure civil math (no second clock; the
+  stopping rule satisfied without stopping), granted on the first eligible
+  completion of the week, uncapped accrual per R4, losing A/S rift crews included.
+  Sundered Essence: the sundering cast on the enchant-family seam, raid-epic-only
+  via the item_level source index, deterministic 1:1 yield, the amendment's
+  pinned-slot re-check (splice AND sort-consolidation cases pinned), bag-menu
+  Sunder row through the shared destroy-confirm family, extractEssence IWorld
+  member + extract_essence wire command. Parity re-minted deliberately with the
+  movement characterized (59 state-shape-only, one draw-append in
+  nythraxis_full_pull). The pre-flight release sync caught and fixed the release
+  wiki-refresh's Gallowmere reintroduction (en + 3 transliterations, guard armed).
+  All decisions, numbers, obligations, and the review record in the state.md
+  Phase 04 ledger.
 - Phase 03 QA (verify): PASS-WITH-FOLLOWUPS. Release/v0.36.0 synced first (merge
   ed51716964, 30 conflicts; the release's own honor-title re-cut supersedes the
   phase's ladder verdicts: Linebreaker / Fieldreaver / Warcrowned adopted, docs

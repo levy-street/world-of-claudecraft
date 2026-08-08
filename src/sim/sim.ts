@@ -3308,13 +3308,19 @@ export class Sim {
       // character class) and never poison the gate with junk entries. A
       // malformed emberWeekAnchor would otherwise stall the weekly grant
       // forever: emberWeeksBetween returns 0 for unparseable input, which is
-      // indistinguishable from same-week.
+      // indistinguishable from same-week. The clamps bound the blob too
+      // (this field is outside the professions byte ceiling, so the load
+      // clamp is what bounds it, the knownRecipes doctrine): real source
+      // tokens are short (dungeonId:difficulty, 'rift') and the live set is
+      // content-bounded near ten, so oversized junk simply drops here.
       if (s.wyrmfallDaily) {
         meta.wyrmfallDaily = {
           date: typeof s.wyrmfallDaily.date === 'string' ? s.wyrmfallDaily.date : '',
           sources: new Set(
             Array.isArray(s.wyrmfallDaily.sources)
-              ? s.wyrmfallDaily.sources.filter((x) => typeof x === 'string')
+              ? s.wyrmfallDaily.sources
+                  .filter((x) => typeof x === 'string' && x.length <= 64)
+                  .slice(0, 32)
               : [],
           ),
         };

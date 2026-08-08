@@ -7,13 +7,14 @@
 // tests/CLAUDE.md convention.
 
 import { beforeEach, describe, expect, it } from 'vitest';
-import { BUILTIN_WORLD, ITEMS } from '../src/sim/data';
+import { BUILTIN_WORLD, ITEMS, MOBS } from '../src/sim/data';
 import { enterDungeon } from '../src/sim/instances/dungeons';
 import {
   awardRiftFirstClearMaterials,
+  EMBER_ACCRUAL_GRANT_CAP,
   emberWeekAnchorOf,
-  emberWeekAnchorPlusWeeks,
   emberWeeksBetween,
+  FINAL_BOSS_TEMPLATE_IDS,
   grantRiftClearEmbers,
   MAKERS_EMBER_ITEM_ID,
   SUNDERED_ESSENCE_ITEM_ID,
@@ -264,6 +265,23 @@ describe('wyrmfall cores: the boss faucet', () => {
     expect(sim.countItem(WYRMFALL_CORE_ITEM_ID, pid)).toBe(0);
   });
 
+  it('no world-boss template is a faucet template (the death-hub placement invariant)', () => {
+    // The moved death-hub call sits below rollWorldBossLoot with the comment
+    // "no kill reaches both a wyrmfall draw and a world-boss roll". That
+    // rests on this disjointness; a worldBoss template entering the faucet
+    // set would put a draw above every contributor's personal loot roll.
+    const worldBossIds = Object.values(MOBS)
+      .filter((t: any) => t.worldBoss)
+      .map((t: any) => t.id);
+    expect(worldBossIds.length).toBeGreaterThan(0);
+    for (const id of worldBossIds) {
+      expect(FINAL_BOSS_TEMPLATE_IDS.has(id), id).toBe(false);
+    }
+    // Positive controls: the set genuinely carries both faucet arms.
+    expect(FINAL_BOSS_TEMPLATE_IDS.has('morthen')).toBe(true);
+    expect(FINAL_BOSS_TEMPLATE_IDS.has('nythraxis_scourge_of_thornpeak')).toBe(true);
+  });
+
   it('a participant absent from the corpse but on the claim is paid by raven, not bags', () => {
     const { sim, leader, member, boss } = heroicMorthenRig();
     const leaderMeta = sim.players.get(leader)! as PlayerMeta;
@@ -397,7 +415,9 @@ describe('wyrmfall cores: the rift first-clear arm', () => {
     // Next reset day: the rift source pays again.
     (sim as any).resetDay = '2026-08-13';
     awardRiftFirstClearMaterials(sim.ctx, 'A', [winner]);
-    expect(sim.countItem(WYRMFALL_CORE_ITEM_ID, winner)).toBe(2 * (WYRMFALL_RIFT_COUNT.A ?? 0));
+    // The literal, not 2 * WYRMFALL_RIFT_COUNT.A: a deleted A row would move
+    // the derived expectation to 0 and pass this arm vacuously.
+    expect(sim.countItem(WYRMFALL_CORE_ITEM_ID, winner)).toBe(2);
   });
 
   it('an S-rank first clear pays the risk premium; B pays nothing', () => {
@@ -472,7 +492,9 @@ describe("maker's ember: the weekly bankable keystone", () => {
     expect(emberWeeksBetween(TUESDAY, '2027-02-02')).toBe(25);
     tryGrantMakersEmber(sim.ctx, meta);
     expect(sim.countItem(MAKERS_EMBER_ITEM_ID, pid)).toBe(21);
-    expect(meta.emberWeekAnchor).toBe(emberWeekAnchorPlusWeeks(TUESDAY, 20));
+    // The literal, not emberWeekAnchorPlusWeeks(TUESDAY, 20): re-running the
+    // production helper would move both sides of a broken helper together.
+    expect(meta.emberWeekAnchor).toBe('2026-12-29');
     tryGrantMakersEmber(sim.ctx, meta);
     expect(sim.countItem(MAKERS_EMBER_ITEM_ID, pid)).toBe(26);
     expect(meta.emberWeekAnchor).toBe('2027-02-02');
@@ -521,6 +543,9 @@ describe("maker's ember: the weekly bankable keystone", () => {
       expect(ITEMS[id].stackSize, id).toBe(20);
       expect(ITEMS[id].sellValue, id).toBe(0);
     }
+    // The accrual payout cap IS "one full stack": tie the two so a stack
+    // retune cannot silently falsify the cap's stated meaning.
+    expect(EMBER_ACCRUAL_GRANT_CAP).toBe(ITEMS[MAKERS_EMBER_ITEM_ID].stackSize);
   });
 });
 
@@ -745,6 +770,26 @@ describe('persistence: the two new PlayerMeta fields', () => {
     const sim3 = makeDungeonSim(3);
     const pid3 = sim3.addPlayer('warrior', 'Bad', { state });
     expect((sim3.players.get(pid3)! as PlayerMeta).emberWeekAnchor).toBe(TUESDAY);
+  });
+
+  it('oversized junk in the sources array drops at the load clamp', () => {
+    const sim = makeDungeonSim(3);
+    const pid = sim.addPlayer('warrior', 'Fat');
+    const state = JSON.parse(JSON.stringify(sim.serializeCharacter(pid)));
+    // This field sits outside the professions byte ceiling, so the load
+    // clamp is what bounds the blob (the knownRecipes doctrine): oversized
+    // tokens drop, and the set caps well above the content-bounded real
+    // cardinality (about ten sources).
+    state.wyrmfallDaily = {
+      date: TUESDAY,
+      sources: ['rift', 'x'.repeat(65), ...Array.from({ length: 60 }, (_, i) => `s${i}`)],
+    };
+    const sim2 = makeDungeonSim(3);
+    const pid2 = sim2.addPlayer('warrior', 'Fat', { state });
+    const meta2 = sim2.players.get(pid2)! as PlayerMeta;
+    expect(meta2.wyrmfallDaily.sources.has('rift')).toBe(true);
+    expect(meta2.wyrmfallDaily.sources.has('x'.repeat(65))).toBe(false);
+    expect(meta2.wyrmfallDaily.sources.size).toBeLessThanOrEqual(32);
   });
 
   it('zero-default omission: an untouched character serializes without the keys', () => {

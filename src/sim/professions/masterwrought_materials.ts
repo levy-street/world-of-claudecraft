@@ -67,7 +67,11 @@ export const WYRMFALL_RIFT_SOURCE = 'rift';
 // Every final-boss template the boss faucet can ever pay on: the heroic
 // tuning table's finalBossIds (which include the raid arena's) plus the raid
 // boss for its normal-difficulty arm. Derived once from data-as-code.
-const FINAL_BOSS_TEMPLATE_IDS: ReadonlySet<string> = new Set([
+// Exported for the disjointness pin in tests/masterwrought_materials.test.ts:
+// the death hub calls awardWyrmfallCores ABOVE nothing but BELOW every loot
+// roll, and the "no kill reaches both a wyrmfall draw and a world-boss roll"
+// invariant rests on no worldBoss template ever entering this set.
+export const FINAL_BOSS_TEMPLATE_IDS: ReadonlySet<string> = new Set([
   ...Object.values(HEROIC_DUNGEON_TUNING).map((t) => t.finalBossId),
   NYTHRAXIS_BOSS_ID,
 ]);
