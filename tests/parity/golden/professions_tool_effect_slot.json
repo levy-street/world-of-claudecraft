@@ -23,7 +23,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "e836976c",
+      "state": "8a90034f",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -82,7 +82,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -155,7 +156,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "f7b3a426",
+      "state": "3a93ca89",
       "events": "df133d2d",
       "rng": {
         "draws": 0,
@@ -234,7 +235,8 @@
               "maxDurability": 30
             }
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -307,7 +309,7 @@
       "tick": 51,
       "time": 2.55,
       "nextId": 964,
-      "state": "79171eeb",
+      "state": "073447a4",
       "events": "a10631da",
       "rng": {
         "draws": 2,
@@ -413,6 +415,7 @@
             }
           },
           "townFocus": {},
+          "wyrmfallDaily": {},
           "xp": 36
         }
       ],
@@ -487,7 +490,7 @@
       "tick": 53,
       "time": 2.65,
       "nextId": 964,
-      "state": "db92da10",
+      "state": "120135d9",
       "events": "414479fe",
       "rng": {
         "draws": 2,
@@ -593,6 +596,7 @@
             }
           },
           "townFocus": {},
+          "wyrmfallDaily": {},
           "xp": 36
         }
       ],
@@ -667,7 +671,7 @@
       "tick": 55,
       "time": 2.75,
       "nextId": 964,
-      "state": "2ab38680",
+      "state": "cac79509",
       "events": "1796b529",
       "rng": {
         "draws": 2,
@@ -773,6 +777,7 @@
             }
           },
           "townFocus": {},
+          "wyrmfallDaily": {},
           "xp": 36
         }
       ],
@@ -847,7 +852,7 @@
       "tick": 106,
       "time": 5.3,
       "nextId": 964,
-      "state": "824e44a9",
+      "state": "0157a5da",
       "events": "4be0fb68",
       "rng": {
         "draws": 4,
@@ -962,6 +967,7 @@
             }
           },
           "townFocus": {},
+          "wyrmfallDaily": {},
           "xp": 72
         }
       ],
@@ -1036,7 +1042,7 @@
       "tick": 157,
       "time": 7.85,
       "nextId": 964,
-      "state": "947a4856",
+      "state": "afb0f391",
       "events": "7f087928",
       "rng": {
         "draws": 6,
@@ -1159,6 +1165,7 @@
             }
           },
           "townFocus": {},
+          "wyrmfallDaily": {},
           "xp": 108
         }
       ],
@@ -1233,7 +1240,7 @@
       "tick": 159,
       "time": 7.95,
       "nextId": 964,
-      "state": "0b65a053",
+      "state": "902b15a6",
       "events": "741638a5",
       "rng": {
         "draws": 6,
@@ -1356,6 +1363,7 @@
             }
           },
           "townFocus": {},
+          "wyrmfallDaily": {},
           "xp": 108
         }
       ],

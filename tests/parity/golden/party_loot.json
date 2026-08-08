@@ -28,7 +28,7 @@
       "tick": 3,
       "time": 0.15,
       "nextId": 966,
-      "state": "ebf29f7d",
+      "state": "2d143c07",
       "events": "1bad28d0",
       "rng": {
         "draws": 2,
@@ -95,7 +95,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {}
         },
         {
           "activeLoadout": -1,
@@ -164,7 +165,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [

@@ -13,8 +13,8 @@
     "Final Stand enrage at 5% + grantNythraxisLockout (raidLockouts) + onBossDeath death dialogue",
     "class:warrior"
   ],
-  "draws": 6074,
-  "drawDigest": "98e5302e",
+  "draws": 6087,
+  "drawDigest": "1fae9376",
   "frames": [
     {
       "tick": 0,
@@ -34,7 +34,7 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 973,
-      "state": "b82a2b9a",
+      "state": "f4760ac1",
       "events": "89a3b755",
       "rng": {
         "draws": 4,
@@ -136,7 +136,8 @@
             "rows": {},
             "spec": "prot"
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {}
         },
         {
           "activeLoadout": -1,
@@ -225,7 +226,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {}
         },
         {
           "activeLoadout": -1,
@@ -314,7 +316,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {}
         },
         {
           "activeLoadout": -1,
@@ -403,7 +406,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {}
         },
         {
           "activeLoadout": -1,
@@ -492,7 +496,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -815,7 +820,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 973,
-      "state": "dee1ca92",
+      "state": "c4757079",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -826,7 +831,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 973,
-      "state": "069129bd",
+      "state": "c40ba1e8",
       "events": "294656fd",
       "rng": {
         "draws": 4,
@@ -837,7 +842,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 973,
-      "state": "6b91ade7",
+      "state": "f5f481ba",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -848,7 +853,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 973,
-      "state": "fc35a0e2",
+      "state": "78367cc9",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -859,7 +864,7 @@
       "tick": 42,
       "time": 2.1,
       "nextId": 975,
-      "state": "9c7821e7",
+      "state": "d7b6bdba",
       "events": "1b2c0641",
       "rng": {
         "draws": 18,
@@ -961,7 +966,8 @@
             "rows": {},
             "spec": "prot"
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {}
         },
         {
           "activeLoadout": -1,
@@ -1050,7 +1056,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {}
         },
         {
           "activeLoadout": -1,
@@ -1139,7 +1146,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {}
         },
         {
           "activeLoadout": -1,
@@ -1228,7 +1236,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {}
         },
         {
           "activeLoadout": -1,
@@ -1317,7 +1326,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -1753,7 +1763,7 @@
       "tick": 43,
       "time": 2.15,
       "nextId": 976,
-      "state": "45b9b0b3",
+      "state": "5ba9cfa6",
       "events": "b8e50ae9",
       "rng": {
         "draws": 28,
@@ -1855,7 +1865,8 @@
             "rows": {},
             "spec": "prot"
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {}
         },
         {
           "activeLoadout": -1,
@@ -1944,7 +1955,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {}
         },
         {
           "activeLoadout": -1,
@@ -2033,7 +2045,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {}
         },
         {
           "activeLoadout": -1,
@@ -2122,7 +2135,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {}
         },
         {
           "activeLoadout": -1,
@@ -2211,7 +2225,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -2927,7 +2942,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 976,
-      "state": "0165fd7c",
+      "state": "e45b2d5b",
       "events": "741638a5",
       "rng": {
         "draws": 70,
@@ -2938,7 +2953,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 976,
-      "state": "32d94a3c",
+      "state": "3ca8d01b",
       "events": "741638a5",
       "rng": {
         "draws": 131,
@@ -2949,7 +2964,7 @@
       "tick": 70,
       "time": 3.5,
       "nextId": 976,
-      "state": "7f511793",
+      "state": "54ec8346",
       "events": "741638a5",
       "rng": {
         "draws": 231,
@@ -2960,7 +2975,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 976,
-      "state": "a98de71a",
+      "state": "a8d65141",
       "events": "3c206177",
       "rng": {
         "draws": 325,
@@ -2971,7 +2986,7 @@
       "tick": 90,
       "time": 4.5,
       "nextId": 976,
-      "state": "484ac2d6",
+      "state": "9e490b3d",
       "events": "ecdc40f9",
       "rng": {
         "draws": 409,
@@ -2982,7 +2997,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 976,
-      "state": "7404c80a",
+      "state": "124fddb1",
       "events": "741638a5",
       "rng": {
         "draws": 523,
@@ -2993,7 +3008,7 @@
       "tick": 110,
       "time": 5.5,
       "nextId": 976,
-      "state": "be1ccda2",
+      "state": "bffe6189",
       "events": "741638a5",
       "rng": {
         "draws": 629,
@@ -3004,7 +3019,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 976,
-      "state": "3666d362",
+      "state": "ddf95049",
       "events": "741638a5",
       "rng": {
         "draws": 750,
@@ -3015,7 +3030,7 @@
       "tick": 130,
       "time": 6.5,
       "nextId": 976,
-      "state": "bd1aee7d",
+      "state": "c6dc83a8",
       "events": "611a1ada",
       "rng": {
         "draws": 863,
@@ -3026,7 +3041,7 @@
       "tick": 140,
       "time": 7,
       "nextId": 976,
-      "state": "a5bf4857",
+      "state": "14066dea",
       "events": "bd2269ff",
       "rng": {
         "draws": 978,
@@ -3037,7 +3052,7 @@
       "tick": 150,
       "time": 7.5,
       "nextId": 976,
-      "state": "3f8a926b",
+      "state": "12a34bbe",
       "events": "741638a5",
       "rng": {
         "draws": 1073,
@@ -3048,7 +3063,7 @@
       "tick": 160,
       "time": 8,
       "nextId": 976,
-      "state": "31a77f59",
+      "state": "58bec5d4",
       "events": "741638a5",
       "rng": {
         "draws": 1191,
@@ -3059,7 +3074,7 @@
       "tick": 170,
       "time": 8.5,
       "nextId": 976,
-      "state": "9521c078",
+      "state": "db8265a7",
       "events": "fdcbca5f",
       "rng": {
         "draws": 1309,
@@ -3070,7 +3085,7 @@
       "tick": 180,
       "time": 9,
       "nextId": 976,
-      "state": "1124a728",
+      "state": "1e7e11d7",
       "events": "59d3587a",
       "rng": {
         "draws": 1460,
@@ -3081,7 +3096,7 @@
       "tick": 190,
       "time": 9.5,
       "nextId": 976,
-      "state": "5dd5afa3",
+      "state": "b9fb8656",
       "events": "4affb78c",
       "rng": {
         "draws": 1606,
@@ -3092,7 +3107,7 @@
       "tick": 200,
       "time": 10,
       "nextId": 976,
-      "state": "fb7b6e9f",
+      "state": "9143e4b2",
       "events": "741638a5",
       "rng": {
         "draws": 1731,
@@ -3103,7 +3118,7 @@
       "tick": 203,
       "time": 10.15,
       "nextId": 976,
-      "state": "2d9277ab",
+      "state": "0c7b9afe",
       "events": "741638a5",
       "rng": {
         "draws": 1751,
@@ -3205,7 +3220,8 @@
             "rows": {},
             "spec": "prot"
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {}
         },
         {
           "activeLoadout": -1,
@@ -3294,7 +3310,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {}
         },
         {
           "activeLoadout": -1,
@@ -3383,7 +3400,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {}
         },
         {
           "activeLoadout": -1,
@@ -3472,7 +3490,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {}
         },
         {
           "activeLoadout": -1,
@@ -3561,7 +3580,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -4233,7 +4253,7 @@
       "tick": 204,
       "time": 10.2,
       "nextId": 976,
-      "state": "5ed8e74d",
+      "state": "e9a81278",
       "events": "4dcb3fd9",
       "rng": {
         "draws": 1759,
@@ -4335,7 +4355,8 @@
             "rows": {},
             "spec": "prot"
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {}
         },
         {
           "activeLoadout": -1,
@@ -4424,7 +4445,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {}
         },
         {
           "activeLoadout": -1,
@@ -4513,7 +4535,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {}
         },
         {
           "activeLoadout": -1,
@@ -4602,7 +4625,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {}
         },
         {
           "activeLoadout": -1,
@@ -4691,7 +4715,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -5374,7 +5399,7 @@
       "tick": 210,
       "time": 10.5,
       "nextId": 976,
-      "state": "19725c24",
+      "state": "02406b23",
       "events": "741638a5",
       "rng": {
         "draws": 1801,
@@ -5385,7 +5410,7 @@
       "tick": 220,
       "time": 11,
       "nextId": 976,
-      "state": "1da06a49",
+      "state": "22009884",
       "events": "0bb5756e",
       "rng": {
         "draws": 1879,
@@ -5396,7 +5421,7 @@
       "tick": 230,
       "time": 11.5,
       "nextId": 976,
-      "state": "501e84b5",
+      "state": "a0d5cc80",
       "events": "741638a5",
       "rng": {
         "draws": 1949,
@@ -5407,7 +5432,7 @@
       "tick": 240,
       "time": 12,
       "nextId": 976,
-      "state": "ff84ba76",
+      "state": "701e259d",
       "events": "7bbc778b",
       "rng": {
         "draws": 2039,
@@ -5418,7 +5443,7 @@
       "tick": 250,
       "time": 12.5,
       "nextId": 976,
-      "state": "c6374667",
+      "state": "eae4173a",
       "events": "741638a5",
       "rng": {
         "draws": 2123,
@@ -5429,7 +5454,7 @@
       "tick": 260,
       "time": 13,
       "nextId": 976,
-      "state": "02e65407",
+      "state": "852ce31a",
       "events": "741638a5",
       "rng": {
         "draws": 2211,
@@ -5440,7 +5465,7 @@
       "tick": 270,
       "time": 13.5,
       "nextId": 976,
-      "state": "ca3be227",
+      "state": "b95014fa",
       "events": "5adc3d89",
       "rng": {
         "draws": 2310,
@@ -5451,7 +5476,7 @@
       "tick": 280,
       "time": 14,
       "nextId": 976,
-      "state": "a4d8a2da",
+      "state": "e0eb3501",
       "events": "741638a5",
       "rng": {
         "draws": 2400,
@@ -5462,7 +5487,7 @@
       "tick": 290,
       "time": 14.5,
       "nextId": 976,
-      "state": "9f982ee8",
+      "state": "db92ee97",
       "events": "a368ee15",
       "rng": {
         "draws": 2512,
@@ -5473,7 +5498,7 @@
       "tick": 300,
       "time": 15,
       "nextId": 976,
-      "state": "89f57773",
+      "state": "6a204566",
       "events": "741638a5",
       "rng": {
         "draws": 2603,
@@ -5484,7 +5509,7 @@
       "tick": 310,
       "time": 15.5,
       "nextId": 976,
-      "state": "2740545f",
+      "state": "b5a48172",
       "events": "6b127005",
       "rng": {
         "draws": 2717,
@@ -5495,7 +5520,7 @@
       "tick": 320,
       "time": 16,
       "nextId": 976,
-      "state": "e38f2eea",
+      "state": "483a8c51",
       "events": "741638a5",
       "rng": {
         "draws": 2817,
@@ -5506,7 +5531,7 @@
       "tick": 330,
       "time": 16.5,
       "nextId": 976,
-      "state": "d74ca04b",
+      "state": "48c5e15e",
       "events": "fd31a2c8",
       "rng": {
         "draws": 2911,
@@ -5517,7 +5542,7 @@
       "tick": 340,
       "time": 17,
       "nextId": 976,
-      "state": "bc236652",
+      "state": "0582bf39",
       "events": "7c87f4c6",
       "rng": {
         "draws": 3013,
@@ -5528,7 +5553,7 @@
       "tick": 350,
       "time": 17.5,
       "nextId": 976,
-      "state": "c6806bfa",
+      "state": "ee985461",
       "events": "741638a5",
       "rng": {
         "draws": 3083,
@@ -5539,7 +5564,7 @@
       "tick": 360,
       "time": 18,
       "nextId": 976,
-      "state": "7958f0f0",
+      "state": "b3aa965f",
       "events": "d760e8b7",
       "rng": {
         "draws": 3172,
@@ -5550,7 +5575,7 @@
       "tick": 370,
       "time": 18.5,
       "nextId": 976,
-      "state": "6a631898",
+      "state": "b566a0db",
       "events": "adfc75e2",
       "rng": {
         "draws": 3261,
@@ -5561,7 +5586,7 @@
       "tick": 380,
       "time": 19,
       "nextId": 976,
-      "state": "164f317a",
+      "state": "e41eb2ed",
       "events": "741638a5",
       "rng": {
         "draws": 3361,
@@ -5572,7 +5597,7 @@
       "tick": 386,
       "time": 19.3,
       "nextId": 976,
-      "state": "a1f5f23d",
+      "state": "82420efc",
       "events": "10c34a83",
       "rng": {
         "draws": 3416,
@@ -5683,7 +5708,8 @@
             "rows": {},
             "spec": "prot"
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {}
         },
         {
           "activeLoadout": -1,
@@ -5780,7 +5806,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {}
         },
         {
           "activeLoadout": -1,
@@ -5877,7 +5904,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {}
         },
         {
           "activeLoadout": -1,
@@ -5974,7 +6002,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {}
         },
         {
           "activeLoadout": -1,
@@ -6070,7 +6099,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -6722,7 +6752,7 @@
       "tick": 390,
       "time": 19.5,
       "nextId": 976,
-      "state": "258ba25a",
+      "state": "9ee03de5",
       "events": "b7d380c4",
       "rng": {
         "draws": 3457,
@@ -6733,7 +6763,7 @@
       "tick": 400,
       "time": 20,
       "nextId": 976,
-      "state": "71f440a2",
+      "state": "1897b4ed",
       "events": "c73fbafb",
       "rng": {
         "draws": 3533,
@@ -6744,7 +6774,7 @@
       "tick": 410,
       "time": 20.5,
       "nextId": 976,
-      "state": "2654d0b7",
+      "state": "084a3dbe",
       "events": "c73fbafb",
       "rng": {
         "draws": 3606,
@@ -6755,7 +6785,7 @@
       "tick": 420,
       "time": 21,
       "nextId": 976,
-      "state": "c8c3b9f9",
+      "state": "40e50ef8",
       "events": "c73fbafb",
       "rng": {
         "draws": 3675,
@@ -6766,7 +6796,7 @@
       "tick": 430,
       "time": 21.5,
       "nextId": 976,
-      "state": "4039e249",
+      "state": "74dd9ec8",
       "events": "c73fbafb",
       "rng": {
         "draws": 3760,
@@ -6777,7 +6807,7 @@
       "tick": 440,
       "time": 22,
       "nextId": 976,
-      "state": "b5853e7d",
+      "state": "81b82c3c",
       "events": "c73fbafb",
       "rng": {
         "draws": 3857,
@@ -6788,7 +6818,7 @@
       "tick": 450,
       "time": 22.5,
       "nextId": 976,
-      "state": "28613fc5",
+      "state": "2958a904",
       "events": "c73fbafb",
       "rng": {
         "draws": 3952,
@@ -6799,7 +6829,7 @@
       "tick": 460,
       "time": 23,
       "nextId": 976,
-      "state": "74b99a7d",
+      "state": "1999e03c",
       "events": "c73fbafb",
       "rng": {
         "draws": 4047,
@@ -6810,7 +6840,7 @@
       "tick": 470,
       "time": 23.5,
       "nextId": 976,
-      "state": "2e79f6cc",
+      "state": "36f903bf",
       "events": "c73fbafb",
       "rng": {
         "draws": 4152,
@@ -6821,7 +6851,7 @@
       "tick": 480,
       "time": 24,
       "nextId": 976,
-      "state": "a96bf980",
+      "state": "16a26543",
       "events": "c73fbafb",
       "rng": {
         "draws": 4239,
@@ -6832,7 +6862,7 @@
       "tick": 490,
       "time": 24.5,
       "nextId": 976,
-      "state": "5b985ffc",
+      "state": "0cbee2af",
       "events": "39020b44",
       "rng": {
         "draws": 4317,
@@ -6843,7 +6873,7 @@
       "tick": 500,
       "time": 25,
       "nextId": 976,
-      "state": "49bb2781",
+      "state": "fdd8f8c0",
       "events": "741638a5",
       "rng": {
         "draws": 4429,
@@ -6854,7 +6884,7 @@
       "tick": 506,
       "time": 25.3,
       "nextId": 976,
-      "state": "64da1ca2",
+      "state": "75b1e8ed",
       "events": "741638a5",
       "rng": {
         "draws": 4494,
@@ -6965,7 +6995,8 @@
             "rows": {},
             "spec": "prot"
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {}
         },
         {
           "activeLoadout": -1,
@@ -7062,7 +7093,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {}
         },
         {
           "activeLoadout": -1,
@@ -7159,7 +7191,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {}
         },
         {
           "activeLoadout": -1,
@@ -7256,7 +7289,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {}
         },
         {
           "activeLoadout": -1,
@@ -7352,7 +7386,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -8015,7 +8050,7 @@
       "tick": 510,
       "time": 25.5,
       "nextId": 976,
-      "state": "198b4777",
+      "state": "37758e7e",
       "events": "741638a5",
       "rng": {
         "draws": 4527,
@@ -8026,7 +8061,7 @@
       "tick": 520,
       "time": 26,
       "nextId": 976,
-      "state": "adc097ae",
+      "state": "ab3680b9",
       "events": "741638a5",
       "rng": {
         "draws": 4615,
@@ -8037,7 +8072,7 @@
       "tick": 530,
       "time": 26.5,
       "nextId": 976,
-      "state": "c59a2f26",
+      "state": "ed9bd891",
       "events": "741638a5",
       "rng": {
         "draws": 4705,
@@ -8048,7 +8083,7 @@
       "tick": 540,
       "time": 27,
       "nextId": 976,
-      "state": "9df79ae3",
+      "state": "42c69d5a",
       "events": "741638a5",
       "rng": {
         "draws": 4785,
@@ -8059,7 +8094,7 @@
       "tick": 550,
       "time": 27.5,
       "nextId": 976,
-      "state": "30069271",
+      "state": "0ef2ecf0",
       "events": "741638a5",
       "rng": {
         "draws": 4846,
@@ -8070,7 +8105,7 @@
       "tick": 560,
       "time": 28,
       "nextId": 976,
-      "state": "e2eb2c98",
+      "state": "67352e1b",
       "events": "741638a5",
       "rng": {
         "draws": 4933,
@@ -8081,7 +8116,7 @@
       "tick": 570,
       "time": 28.5,
       "nextId": 976,
-      "state": "83b48410",
+      "state": "0c51b5d3",
       "events": "741638a5",
       "rng": {
         "draws": 5032,
@@ -8092,7 +8127,7 @@
       "tick": 580,
       "time": 29,
       "nextId": 976,
-      "state": "2e92b053",
+      "state": "0d8d4e8a",
       "events": "741638a5",
       "rng": {
         "draws": 5114,
@@ -8103,7 +8138,7 @@
       "tick": 590,
       "time": 29.5,
       "nextId": 976,
-      "state": "522790b0",
+      "state": "57e1cab3",
       "events": "53d060b3",
       "rng": {
         "draws": 5215,
@@ -8114,7 +8149,7 @@
       "tick": 600,
       "time": 30,
       "nextId": 976,
-      "state": "70084a72",
+      "state": "16cef43d",
       "events": "750cb5b0",
       "rng": {
         "draws": 5286,
@@ -8125,7 +8160,7 @@
       "tick": 610,
       "time": 30.5,
       "nextId": 976,
-      "state": "cfd2ea8f",
+      "state": "7ee444d6",
       "events": "741638a5",
       "rng": {
         "draws": 5385,
@@ -8136,7 +8171,7 @@
       "tick": 620,
       "time": 31,
       "nextId": 976,
-      "state": "af9e5874",
+      "state": "5b29cc47",
       "events": "741638a5",
       "rng": {
         "draws": 5484,
@@ -8147,7 +8182,7 @@
       "tick": 627,
       "time": 31.35,
       "nextId": 976,
-      "state": "64cb56c2",
+      "state": "02dd434d",
       "events": "cd505674",
       "rng": {
         "draws": 5538,
@@ -8258,7 +8293,8 @@
             "rows": {},
             "spec": "prot"
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {}
         },
         {
           "activeLoadout": -1,
@@ -8355,7 +8391,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {}
         },
         {
           "activeLoadout": -1,
@@ -8452,7 +8489,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {}
         },
         {
           "activeLoadout": -1,
@@ -8549,7 +8587,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {}
         },
         {
           "activeLoadout": -1,
@@ -8645,7 +8684,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -9309,11 +9349,11 @@
       "tick": 628,
       "time": 31.4,
       "nextId": 976,
-      "state": "72960c95",
-      "events": "46062320",
+      "state": "dd171a7f",
+      "events": "c4b9ca9c",
       "rng": {
-        "draws": 5552,
-        "digest": "3746b786"
+        "draws": 5553,
+        "digest": "75fd62ad"
       },
       "label": "death",
       "players": [
@@ -9353,12 +9393,20 @@
               "baked_bread",
               "eastbrook_buckler",
               "recruit_tunic",
-              "worn_sword"
+              "worn_sword",
+              "wyrmfall_core"
+            ],
+            "visited": [
+              "quality:rare"
             ]
           },
           "deedsEarned": [
             [
               "cmb_first_blood",
+              ""
+            ],
+            [
+              "col_first_rare",
               ""
             ],
             [
@@ -9421,6 +9469,10 @@
             {
               "count": 5,
               "itemId": "baked_bread"
+            },
+            {
+              "count": 2,
+              "itemId": "wyrmfall_core"
             }
           ],
           "lifetimeXp": 167449,
@@ -9441,7 +9493,12 @@
             "rows": {},
             "spec": "prot"
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {
+            "sources": [
+              "nythraxis_boss_arena:normal"
+            ]
+          }
         },
         {
           "activeLoadout": -1,
@@ -9476,12 +9533,20 @@
               "apprentice_robe",
               "baked_bread",
               "gnarled_staff",
-              "spring_water"
+              "spring_water",
+              "wyrmfall_core"
+            ],
+            "visited": [
+              "quality:rare"
             ]
           },
           "deedsEarned": [
             [
               "cmb_first_blood",
+              ""
+            ],
+            [
+              "col_first_rare",
               ""
             ],
             [
@@ -9543,6 +9608,10 @@
             {
               "count": 5,
               "itemId": "spring_water"
+            },
+            {
+              "count": 2,
+              "itemId": "wyrmfall_core"
             }
           ],
           "lifetimeXp": 167449,
@@ -9559,7 +9628,12 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {
+            "sources": [
+              "nythraxis_boss_arena:normal"
+            ]
+          }
         },
         {
           "activeLoadout": -1,
@@ -9594,12 +9668,20 @@
               "apprentice_robe",
               "baked_bread",
               "gnarled_staff",
-              "spring_water"
+              "spring_water",
+              "wyrmfall_core"
+            ],
+            "visited": [
+              "quality:rare"
             ]
           },
           "deedsEarned": [
             [
               "cmb_first_blood",
+              ""
+            ],
+            [
+              "col_first_rare",
               ""
             ],
             [
@@ -9661,6 +9743,10 @@
             {
               "count": 5,
               "itemId": "spring_water"
+            },
+            {
+              "count": 2,
+              "itemId": "wyrmfall_core"
             }
           ],
           "lifetimeXp": 167449,
@@ -9677,7 +9763,12 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {
+            "sources": [
+              "nythraxis_boss_arena:normal"
+            ]
+          }
         },
         {
           "activeLoadout": -1,
@@ -9712,12 +9803,20 @@
               "apprentice_robe",
               "baked_bread",
               "gnarled_staff",
-              "spring_water"
+              "spring_water",
+              "wyrmfall_core"
+            ],
+            "visited": [
+              "quality:rare"
             ]
           },
           "deedsEarned": [
             [
               "cmb_first_blood",
+              ""
+            ],
+            [
+              "col_first_rare",
               ""
             ],
             [
@@ -9779,6 +9878,10 @@
             {
               "count": 5,
               "itemId": "spring_water"
+            },
+            {
+              "count": 2,
+              "itemId": "wyrmfall_core"
             }
           ],
           "lifetimeXp": 167449,
@@ -9795,7 +9898,12 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {
+            "sources": [
+              "nythraxis_boss_arena:normal"
+            ]
+          }
         },
         {
           "activeLoadout": -1,
@@ -9829,12 +9937,20 @@
               "apprentice_robe",
               "baked_bread",
               "gnarled_staff",
-              "spring_water"
+              "spring_water",
+              "wyrmfall_core"
+            ],
+            "visited": [
+              "quality:rare"
             ]
           },
           "deedsEarned": [
             [
               "cmb_first_blood",
+              ""
+            ],
+            [
+              "col_first_rare",
               ""
             ],
             [
@@ -9896,6 +10012,10 @@
             {
               "count": 5,
               "itemId": "spring_water"
+            },
+            {
+              "count": 2,
+              "itemId": "wyrmfall_core"
             }
           ],
           "lifetimeXp": 167449,
@@ -9912,7 +10032,12 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {
+            "sources": [
+              "nythraxis_boss_arena:normal"
+            ]
+          }
         }
       ],
       "entities": [
@@ -10593,77 +10718,77 @@
       "tick": 630,
       "time": 31.5,
       "nextId": 976,
-      "state": "ea73781b",
+      "state": "86003e39",
       "events": "741638a5",
       "rng": {
-        "draws": 5573,
-        "digest": "ba965f50"
+        "draws": 5574,
+        "digest": "739d878f"
       }
     },
     {
       "tick": 640,
       "time": 32,
       "nextId": 976,
-      "state": "ccc60311",
+      "state": "c98d26bb",
       "events": "741638a5",
       "rng": {
-        "draws": 5669,
-        "digest": "42f8c2db"
+        "draws": 5672,
+        "digest": "aa907469"
       }
     },
     {
       "tick": 650,
       "time": 32.5,
       "nextId": 976,
-      "state": "a94e448b",
+      "state": "cdc6aae9",
       "events": "741638a5",
       "rng": {
-        "draws": 5740,
-        "digest": "156f1d36"
+        "draws": 5744,
+        "digest": "b72521f6"
       }
     },
     {
       "tick": 660,
       "time": 33,
       "nextId": 976,
-      "state": "5c363009",
+      "state": "f0a21813",
       "events": "741638a5",
       "rng": {
-        "draws": 5824,
-        "digest": "837eb882"
+        "draws": 5831,
+        "digest": "6a99fb2a"
       }
     },
     {
       "tick": 670,
       "time": 33.5,
       "nextId": 976,
-      "state": "6102d537",
+      "state": "f1d789f5",
       "events": "741638a5",
       "rng": {
-        "draws": 5911,
-        "digest": "1e0aaf59"
+        "draws": 5914,
+        "digest": "81d0cac2"
       }
     },
     {
       "tick": 680,
       "time": 34,
       "nextId": 976,
-      "state": "9158ada9",
+      "state": "743d9d33",
       "events": "741638a5",
       "rng": {
-        "draws": 6005,
-        "digest": "302af3a2"
+        "draws": 6009,
+        "digest": "c8877e20"
       }
     },
     {
       "tick": 688,
       "time": 34.4,
       "nextId": 976,
-      "state": "ba4c1c5b",
+      "state": "d97cdff9",
       "events": "bf637b24",
       "rng": {
-        "draws": 6074,
-        "digest": "98e5302e"
+        "draws": 6087,
+        "digest": "1fae9376"
       },
       "label": "final",
       "players": [
@@ -10703,12 +10828,20 @@
               "baked_bread",
               "eastbrook_buckler",
               "recruit_tunic",
-              "worn_sword"
+              "worn_sword",
+              "wyrmfall_core"
+            ],
+            "visited": [
+              "quality:rare"
             ]
           },
           "deedsEarned": [
             [
               "cmb_first_blood",
+              ""
+            ],
+            [
+              "col_first_rare",
               ""
             ],
             [
@@ -10771,6 +10904,10 @@
             {
               "count": 5,
               "itemId": "baked_bread"
+            },
+            {
+              "count": 2,
+              "itemId": "wyrmfall_core"
             }
           ],
           "lifetimeXp": 167449,
@@ -10791,7 +10928,12 @@
             "rows": {},
             "spec": "prot"
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {
+            "sources": [
+              "nythraxis_boss_arena:normal"
+            ]
+          }
         },
         {
           "activeLoadout": -1,
@@ -10826,12 +10968,20 @@
               "apprentice_robe",
               "baked_bread",
               "gnarled_staff",
-              "spring_water"
+              "spring_water",
+              "wyrmfall_core"
+            ],
+            "visited": [
+              "quality:rare"
             ]
           },
           "deedsEarned": [
             [
               "cmb_first_blood",
+              ""
+            ],
+            [
+              "col_first_rare",
               ""
             ],
             [
@@ -10893,6 +11043,10 @@
             {
               "count": 5,
               "itemId": "spring_water"
+            },
+            {
+              "count": 2,
+              "itemId": "wyrmfall_core"
             }
           ],
           "lifetimeXp": 167449,
@@ -10909,7 +11063,12 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {
+            "sources": [
+              "nythraxis_boss_arena:normal"
+            ]
+          }
         },
         {
           "activeLoadout": -1,
@@ -10944,12 +11103,20 @@
               "apprentice_robe",
               "baked_bread",
               "gnarled_staff",
-              "spring_water"
+              "spring_water",
+              "wyrmfall_core"
+            ],
+            "visited": [
+              "quality:rare"
             ]
           },
           "deedsEarned": [
             [
               "cmb_first_blood",
+              ""
+            ],
+            [
+              "col_first_rare",
               ""
             ],
             [
@@ -11011,6 +11178,10 @@
             {
               "count": 5,
               "itemId": "spring_water"
+            },
+            {
+              "count": 2,
+              "itemId": "wyrmfall_core"
             }
           ],
           "lifetimeXp": 167449,
@@ -11027,7 +11198,12 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {
+            "sources": [
+              "nythraxis_boss_arena:normal"
+            ]
+          }
         },
         {
           "activeLoadout": -1,
@@ -11062,12 +11238,20 @@
               "apprentice_robe",
               "baked_bread",
               "gnarled_staff",
-              "spring_water"
+              "spring_water",
+              "wyrmfall_core"
+            ],
+            "visited": [
+              "quality:rare"
             ]
           },
           "deedsEarned": [
             [
               "cmb_first_blood",
+              ""
+            ],
+            [
+              "col_first_rare",
               ""
             ],
             [
@@ -11129,6 +11313,10 @@
             {
               "count": 5,
               "itemId": "spring_water"
+            },
+            {
+              "count": 2,
+              "itemId": "wyrmfall_core"
             }
           ],
           "lifetimeXp": 167449,
@@ -11145,7 +11333,12 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {
+            "sources": [
+              "nythraxis_boss_arena:normal"
+            ]
+          }
         },
         {
           "activeLoadout": -1,
@@ -11179,12 +11372,20 @@
               "apprentice_robe",
               "baked_bread",
               "gnarled_staff",
-              "spring_water"
+              "spring_water",
+              "wyrmfall_core"
+            ],
+            "visited": [
+              "quality:rare"
             ]
           },
           "deedsEarned": [
             [
               "cmb_first_blood",
+              ""
+            ],
+            [
+              "col_first_rare",
               ""
             ],
             [
@@ -11246,6 +11447,10 @@
             {
               "count": 5,
               "itemId": "spring_water"
+            },
+            {
+              "count": 2,
+              "itemId": "wyrmfall_core"
             }
           ],
           "lifetimeXp": 167449,
@@ -11262,7 +11467,12 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {
+            "sources": [
+              "nythraxis_boss_arena:normal"
+            ]
+          }
         }
       ],
       "entities": [

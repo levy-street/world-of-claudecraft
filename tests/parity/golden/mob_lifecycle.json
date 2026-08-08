@@ -31,7 +31,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 968,
-      "state": "0237849c",
+      "state": "4fd81ab7",
       "events": "3b7fb98a",
       "rng": {
         "draws": 5,
@@ -98,6 +98,7 @@
             "rows": {}
           },
           "townFocus": {},
+          "wyrmfallDaily": {},
           "xp": 84
         }
       ],
@@ -410,7 +411,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 969,
-      "state": "4d977f1a",
+      "state": "022c17bb",
       "events": "640dd8c6",
       "rng": {
         "draws": 8,
@@ -484,6 +485,7 @@
             "rows": {}
           },
           "townFocus": {},
+          "wyrmfallDaily": {},
           "xp": 198
         }
       ],
@@ -849,7 +851,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 969,
-      "state": "d5bce1b2",
+      "state": "76944cd3",
       "events": "62c2b0f9",
       "rng": {
         "draws": 9,
@@ -924,6 +926,7 @@
             "rows": {}
           },
           "townFocus": {},
+          "wyrmfallDaily": {},
           "xp": 198
         }
       ],
@@ -1290,7 +1293,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 971,
-      "state": "1a11d9bf",
+      "state": "1550adf8",
       "events": "eb7d7808",
       "rng": {
         "draws": 15,
@@ -1365,6 +1368,7 @@
             "rows": {}
           },
           "townFocus": {},
+          "wyrmfallDaily": {},
           "xp": 282
         }
       ],
@@ -1774,7 +1778,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 972,
-      "state": "e5149800",
+      "state": "e0e1a4ab",
       "events": "db94afe1",
       "rng": {
         "draws": 20,
@@ -1853,6 +1857,7 @@
             "rows": {}
           },
           "townFocus": {},
+          "wyrmfallDaily": {},
           "xp": 366
         }
       ],
@@ -2317,7 +2322,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 972,
-      "state": "e5149800",
+      "state": "e0e1a4ab",
       "events": "741638a5",
       "rng": {
         "draws": 20,
@@ -2396,6 +2401,7 @@
             "rows": {}
           },
           "townFocus": {},
+          "wyrmfallDaily": {},
           "xp": 366
         }
       ],

@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "7e4e40e7",
+      "state": "4407bee2",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -78,7 +78,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -138,7 +139,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 965,
-      "state": "9f28519d",
+      "state": "6c28be00",
       "events": "e2ae7d45",
       "rng": {
         "draws": 1,
@@ -149,7 +150,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 965,
-      "state": "c07fa1a7",
+      "state": "ba8dd8a2",
       "events": "914f58d2",
       "rng": {
         "draws": 2,
@@ -160,7 +161,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 965,
-      "state": "eb11d4fc",
+      "state": "4e9a691f",
       "events": "caa58fde",
       "rng": {
         "draws": 150,
@@ -171,7 +172,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 965,
-      "state": "096e9152",
+      "state": "e4986425",
       "events": "bf89dc67",
       "rng": {
         "draws": 316,
@@ -182,7 +183,7 @@
       "tick": 84,
       "time": 4.2,
       "nextId": 965,
-      "state": "dae1593b",
+      "state": "882a5226",
       "events": "7b765a8e",
       "rng": {
         "draws": 356,
@@ -284,7 +285,8 @@
             "rows": {},
             "spec": "frost"
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -436,7 +438,7 @@
       "tick": 84,
       "time": 4.2,
       "nextId": 965,
-      "state": "dae1593b",
+      "state": "882a5226",
       "events": "741638a5",
       "rng": {
         "draws": 356,
@@ -538,7 +540,8 @@
             "rows": {},
             "spec": "frost"
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [

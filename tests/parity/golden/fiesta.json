@@ -30,7 +30,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 967,
-      "state": "18feeb15",
+      "state": "9d985dcb",
       "events": "6a2f178b",
       "rng": {
         "draws": 0,
@@ -41,7 +41,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 967,
-      "state": "62cb6bec",
+      "state": "dc1f3796",
       "events": "224cbfd9",
       "rng": {
         "draws": 66,
@@ -52,7 +52,7 @@
       "tick": 75,
       "time": 3.75,
       "nextId": 967,
-      "state": "def24ac2",
+      "state": "8f3b1b34",
       "events": "969ec561",
       "rng": {
         "draws": 247,
@@ -63,7 +63,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 967,
-      "state": "186085ad",
+      "state": "d6f5fd63",
       "events": "507341c9",
       "rng": {
         "draws": 485,
@@ -74,7 +74,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 967,
-      "state": "1de455b2",
+      "state": "b7aa332c",
       "events": "ada54ef3",
       "rng": {
         "draws": 755,
@@ -85,7 +85,7 @@
       "tick": 150,
       "time": 7.5,
       "nextId": 967,
-      "state": "2b5b2011",
+      "state": "a12b3757",
       "events": "741638a5",
       "rng": {
         "draws": 1038,
@@ -96,7 +96,7 @@
       "tick": 163,
       "time": 8.15,
       "nextId": 967,
-      "state": "c533fd2a",
+      "state": "4ef9b524",
       "events": "8945b220",
       "rng": {
         "draws": 1176,
@@ -174,7 +174,8 @@
             },
             "spec": "arms"
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {}
         },
         {
           "activeLoadout": -1,
@@ -243,7 +244,8 @@
             },
             "spec": "arcane"
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {}
         },
         {
           "activeLoadout": -1,
@@ -313,7 +315,8 @@
             },
             "spec": "assassination"
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {}
         },
         {
           "activeLoadout": -1,
@@ -382,7 +385,8 @@
             },
             "spec": "beast_mastery"
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
