@@ -151,10 +151,17 @@ describe('assertLoopbackDatabaseUrl', () => {
 const GUARDED_SCRIPTS = [
   'scripts/admin_guild_bank_shot.mjs',
   'scripts/admin_professions_shot.mjs',
+  'scripts/catalog_program_census.mjs',
+  'scripts/geared_arrival_bench.mjs',
   'scripts/load_players.mjs',
   'scripts/load_professions.mjs',
   'scripts/mob_stall_repro.mjs',
 ] as const;
+
+// Scripts that drive /dev cheats over the wire but never open Postgres: they
+// guard the server target only. A script that grows a pg import graduates to
+// GUARDED_SCRIPTS (the discovery arm below reddens until it does).
+const URL_GUARDED_SCRIPTS = ['scripts/crowd_fps_bench.mjs'] as const;
 
 // Full-line // comments are stripped before the scan: this file's own subject
 // matter means the phrase "assertLoopbackUrl" appears in prose inside these
@@ -186,11 +193,20 @@ describe('loopback guard call sites', () => {
     expect(code).toContain('assertLoopbackDatabaseUrl(');
   });
 
+  it.each(URL_GUARDED_SCRIPTS)('%s imports the shared guard and calls the URL arm', (relPath) => {
+    const code = codeWithoutLineComments(relPath);
+    expect(code).toContain("from './lib/loopback_guard.mjs'");
+    expect(code).toContain('assertLoopbackUrl(');
+    // No pg import means no database arm; the discovery arm below enforces
+    // the graduation the moment one appears.
+    expect(code).not.toContain("from 'pg'");
+  });
+
   it('pins the guarded set exhaustively so a new adopter joins the scan', () => {
     const importers = scriptSources(join(ROOT, 'scripts'))
       .filter((relPath) => codeWithoutLineComments(relPath).includes('loopback_guard.mjs'))
       .sort();
-    expect(importers).toEqual([...GUARDED_SCRIPTS].sort());
+    expect(importers).toEqual([...GUARDED_SCRIPTS, ...URL_GUARDED_SCRIPTS].sort());
   });
 
   it('classifies every script that talks to Postgres (the discovery arm)', () => {

@@ -229,7 +229,9 @@ describe('resumeDroppedPrewarmEntries', () => {
     expect(resumeSlice).not.toContain('Promise.race');
     expect(source).toContain('void settlePrewarmBeforePublish(');
     expect(source).toContain('resumeDroppedPrewarmEntries(resume, {');
-    expect(source).toContain('this.backgroundGpuWork.run(unit.run, GPU_WORK_PRIORITY.BOOT_RESUME)');
+    expect(source).toContain(
+      'this.backgroundGpuWork.run(unit.run, GPU_WORK_PRIORITY.BOOT_RESUME, unit.id)',
+    );
     expect(source).toContain('const units = entry.resumeUnits?.() ?? [];');
     expect(source).toContain('droppedEntries.push({ id: entry.id, units })');
     expect(resumeSlice).toContain('deferPoolPublication =');

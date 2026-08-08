@@ -111,6 +111,7 @@ import {
   reorderInstanceDataByStableRank,
 } from './perceptual_lod_core';
 import { collectBuildingImpostors } from './props';
+import { makeShadowOnlyMaterial } from './shadow_only_material';
 import { freezeStaticMatrices } from './static_matrix';
 import { groundGrassColorAt, groundLushnessAt } from './terrain_chunk_build';
 import { type FlowerKind, flowerTuftTexture, grassTuftTexture } from './textures';
@@ -1225,17 +1226,6 @@ const v = new THREE.Vector3();
 const sv = new THREE.Vector3();
 const c = new THREE.Color();
 const zeroScale = new THREE.Vector3(0, 0, 0);
-const shadowOnlyMaterialCache = new WeakMap<THREE.Material, THREE.Material>();
-
-function makeShadowOnlyMaterial(src: THREE.Material): THREE.Material {
-  const cached = shadowOnlyMaterialCache.get(src);
-  if (cached) return cached;
-  const mat = src.clone();
-  mat.colorWrite = false;
-  mat.depthWrite = false;
-  shadowOnlyMaterialCache.set(src, mat);
-  return mat;
-}
 
 type MutableShadowVolume = {
   -readonly [K in keyof ShadowVolumeInput]: ShadowVolumeInput[K];

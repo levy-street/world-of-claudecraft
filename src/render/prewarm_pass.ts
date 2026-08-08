@@ -53,14 +53,28 @@ export interface BackgroundPrewarmHooks {
    *  real offscreen render with only this child visible, one idle slot after
    *  compile, so geometry/textures do not accumulate into the final pass. */
   warmChild?: (group: PrewarmGroupLike, child: unknown) => void;
+  /**
+   * Finer-grained alternative to warmChild, preferred when both are supplied:
+   * decompose one child's upload into SEVERAL units (texture batches first,
+   * then the bounded render), each granted its own idle slot and arbiter unit.
+   * A whole-child unit was a measured 100-345ms main-thread block; per-unit
+   * splitting is what keeps any single grant under a frame budget. Visibility
+   * is the units' own business (the bounded render manages scene and group
+   * visibility itself; texture uploads need none).
+   */
+  warmChildUnits?: (
+    group: PrewarmGroupLike,
+    child: unknown,
+  ) => Array<{ label?: string; run: () => void }>;
   /** Fallback pass used only after async compile when isolated uploads are unavailable. */
   renderWarmPass: () => void;
   /**
    * Schedules one synchronous upload/render unit on the shared GPU arbiter.
    * Visibility changes happen inside this callback after the arbiter grants
-   * the unit, never while it is waiting behind another lane.
+   * the unit, never while it is waiting behind another lane. The label names
+   * the unit in the arbiter's per-unit timing stats.
    */
-  runUpload?: (work: () => void) => void | Promise<void>;
+  runUpload?: (work: () => void, label?: string) => void | Promise<void>;
   /** Records the deliberate one-unit fallback after idle timeout deferrals. */
   onForcedProgress?: (phase: 'compile' | 'upload', child: unknown) => void;
 }
@@ -84,6 +98,13 @@ export async function runBackgroundPrewarm(
           const prepare = (): void => hooks.prepareChildAssets?.(child);
           if (hooks.runUpload) await hooks.runUpload(prepare);
           else prepare();
+        } else if (hooks.supportsAsyncCompile && hooks.warmChildUnits) {
+          for (const unit of hooks.warmChildUnits(group, child)) {
+            const unitSlot = await hooks.idleSlot();
+            if (unitSlot.forcedProgress) hooks.onForcedProgress?.('upload', child);
+            if (hooks.runUpload) await hooks.runUpload(unit.run, unit.label);
+            else unit.run();
+          }
         } else if (hooks.supportsAsyncCompile && hooks.warmChild) {
           const uploadSlot = await hooks.idleSlot();
           if (uploadSlot.forcedProgress) hooks.onForcedProgress?.('upload', child);
@@ -103,7 +124,7 @@ export async function runBackgroundPrewarm(
     // Each isolated child upload is an exact replacement for the old final
     // whole-group render. Do not submit the live world and the whole prewarm
     // grid once more after the bounded units are already warm.
-    if (hooks.warmChild || hooks.prepareChildAssets) return;
+    if (hooks.warmChildUnits || hooks.warmChild || hooks.prepareChildAssets) return;
     // Without parallel compile there is no safe reason to aggregate every
     // child into one synchronous live-scene pass. Leave the debt lazy instead.
     if (!hooks.supportsAsyncCompile) return;

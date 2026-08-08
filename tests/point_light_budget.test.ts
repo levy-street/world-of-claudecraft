@@ -156,6 +156,116 @@ describe('applyPointLightBudget', () => {
     expect(outOfRange.light.intensity).toBe(0);
   });
 
+  // The pin's blind spot (found via BENCH_LIGHT_AUDIT on the geared-arrival
+  // bench): three's render counts a point light iff its WHOLE ancestor chain
+  // is visible, but the budget only drove light.visible. A budget-chosen
+  // light under a group the world hid (zone streaming, far-LOD wrap, a
+  // compile gate) kept its counted slot while the render dropped it, so the
+  // drawn numPointLights wandered 4..10 and every new value relinked every
+  // lit material in view.
+  describe('drawn-eligibility (hidden ancestors, detached lights)', () => {
+    function inScene(scene: THREE.Object3D, entry: RankedPointLight, parent?: THREE.Object3D) {
+      (parent ?? scene).add(entry.light);
+      return entry;
+    }
+
+    it('a light under a hidden ancestor gives its slot to the next eligible light', () => {
+      const scene = new THREE.Scene();
+      const hiddenGroup = new THREE.Group();
+      hiddenGroup.visible = false;
+      scene.add(hiddenGroup);
+      const near = inScene(scene, rankedLight(1, 0), hiddenGroup);
+      const mid = inScene(scene, rankedLight(5, 0));
+      const far = inScene(scene, rankedLight(9, 0));
+      const ranked = [near, mid, far];
+
+      const drawn = applyPointLightBudget(ranked, 0, 0, 2, 2, RANGE_SQ, scene);
+
+      expect(drawn).toBe(2);
+      expect(mid.light.visible).toBe(true);
+      expect(far.light.visible).toBe(true);
+      expect(near.light.visible).toBe(false);
+    });
+
+    it('a light not attached under the scene root is not drawn-eligible', () => {
+      const scene = new THREE.Scene();
+      const attached = inScene(scene, rankedLight(2, 0));
+      const detached = rankedLight(1, 0); // never added to the scene
+      const ranked = [detached, attached];
+
+      const drawn = applyPointLightBudget(ranked, 0, 0, 2, 2, RANGE_SQ, scene);
+
+      expect(drawn).toBe(1);
+      expect(attached.light.visible).toBe(true);
+      expect(detached.light.visible).toBe(false);
+    });
+
+    it('returns the drawn count so pads can pin the render-visible total', () => {
+      const scene = new THREE.Scene();
+      const hidden = new THREE.Group();
+      hidden.visible = false;
+      scene.add(hidden);
+      const ranked = [
+        inScene(scene, rankedLight(1, 0), hidden),
+        inScene(scene, rankedLight(2, 0), hidden),
+        inScene(scene, rankedLight(3, 0)),
+      ];
+
+      const drawn = applyPointLightBudget(ranked, 0, 0, 6, 6, RANGE_SQ, scene);
+
+      // One eligible light drawn; pads must fill the remaining five so the
+      // scene's traverseVisible point-light count stays exactly visibleCount.
+      expect(drawn).toBe(1);
+      expect(pointLightPadCount(drawn, 6)).toBe(5);
+    });
+
+    it('re-admits a light the frame its ancestor is revealed', () => {
+      const scene = new THREE.Scene();
+      const group = new THREE.Group();
+      group.visible = false;
+      scene.add(group);
+      const gated = inScene(scene, rankedLight(1, 0), group);
+      const other = inScene(scene, rankedLight(5, 0));
+      const ranked = [gated, other];
+
+      expect(applyPointLightBudget(ranked, 0, 0, 1, 1, RANGE_SQ, scene)).toBe(1);
+      expect(other.light.visible).toBe(true);
+      expect(gated.light.visible).toBe(false);
+
+      group.visible = true;
+      expect(applyPointLightBudget(ranked, 0, 0, 1, 1, RANGE_SQ, scene)).toBe(1);
+      expect(gated.light.visible).toBe(true);
+      expect(other.light.visible).toBe(false);
+    });
+
+    it('without a scene root every ranked light stays eligible (legacy shape)', () => {
+      const ranked = [rankedLight(1, 0), rankedLight(2, 0)];
+      const drawn = applyPointLightBudget(ranked, 0, 0, 6, 6, RANGE_SQ);
+      expect(drawn).toBe(2);
+      expect(visibleCount(ranked)).toBe(2);
+    });
+  });
+
+  it('wires the drawn-count pin: scene root in, pads on the drawn count out', () => {
+    // The whole-scene relink fix has two wiring halves that no unit case can
+    // see: the renderer must pass its scene so ancestry is checked against the
+    // real root, and the pads must fill against the DRAWN count, not the
+    // chosen count. Dropping either silently reinstates the arrival freeze.
+    const source = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    const methodStart = source.indexOf('private budgetFireLights(');
+    const methodEnd = source.indexOf('// light shafts fade', methodStart);
+    // A renamed end marker must fail here, never silently widen the slice to
+    // the rest of the file (which would let the pins match anywhere).
+    expect(methodStart).toBeGreaterThan(-1);
+    expect(methodEnd).toBeGreaterThan(methodStart);
+    const method = source.slice(methodStart, methodEnd);
+
+    expect(method).toContain('const drawnCount = applyPointLightBudget(');
+    expect(method).toContain('this.scene,');
+    expect(method).toContain('pointLightPadCount(drawnCount, visibleCount)');
+    expect(method).not.toContain('pointLightPadCount(ranked.length');
+  });
+
   it('wires contributor flicker after the renderer completes selection', () => {
     const source = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
     const methodStart = source.indexOf('private budgetFireLights(');

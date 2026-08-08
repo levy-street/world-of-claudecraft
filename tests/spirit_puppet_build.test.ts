@@ -123,6 +123,8 @@ describe('the renderer runs each build on an idle slot behind the GPU arbiter', 
     const method = renderer.slice(start, renderer.indexOf('\n  }', start));
     expect(method).toContain('this.spiritBuildLane = this.spiritBuildLane');
     expect(method).toContain('idleSlot(IDLE_PREWARM_TIMEOUT_MS)');
-    expect(method).toContain('this.backgroundGpuWork.run(build, GPU_WORK_PRIORITY.BACKGROUND)');
+    expect(method).toContain(
+      "this.backgroundGpuWork.run(build, GPU_WORK_PRIORITY.BACKGROUND, 'spirit-puppet')",
+    );
   });
 });

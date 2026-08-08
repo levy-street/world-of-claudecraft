@@ -1580,9 +1580,15 @@ export class CharacterVisual {
     );
     if (offhandMirrorsWeaponSkin(this.weaponSkinId, this.offhandItemId)) {
       payloads.push(...offPayloads);
+      this.finishWeaponAttach(payloads);
+      return payloads;
     }
+    // The non-mirrored offhand stays OUT of the skin material/VFX set
+    // (pixel-untouched), but its freshly attached nodes must still reach the
+    // caller's compile gate: dropped from the return, a re-attached shield's
+    // first draw linked its programs synchronously.
     this.finishWeaponAttach(payloads);
-    return payloads;
+    return [...payloads, ...offPayloads];
   }
 
   /** The shared tail of every re-attach (slot swap, skin change, sheathe swap):

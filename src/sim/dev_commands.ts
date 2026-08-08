@@ -345,15 +345,27 @@ export function handleDevChat(
     const meta = ctx.players.get(pid);
     if (!meta) return null;
     const bedId = farmGrowMatch[1];
-    const nowMs = ctx.lockoutNowMs();
+    // The write-side anchor rule's third statement (plantCrop floors its
+    // plant time and the loader floors its re-anchor the same way): an
+    // unfloored 0 from a fresh never-ticked offline Sim would write a
+    // readyAtMs the loader's positivity arm destroys as tampered.
+    const nowMs = Math.max(ctx.lockoutNowMs(), 1);
     if (bedId !== undefined) {
       const plot = meta.farmPlots.get(bedId);
       if (!plot) {
         ctx.error(pid, `[dev] No plot on bed '${bedId}'.`);
         return null;
       }
-      if (plot.readyAtMs > nowMs) plot.readyAtMs = nowMs;
-      emitDevLog(ctx, pid, `[dev] Bed ${bedId} is ready.`);
+      if (plot.readyAtMs > nowMs) {
+        plot.readyAtMs = nowMs;
+        emitDevLog(ctx, pid, `[dev] Bed ${bedId} is ready.`);
+      } else {
+        // Honest no-work reply, matching the all-plots arm's advanced count: a
+        // settled plot is left alone, and its pre-rolled outcome may well be
+        // withered, so claiming "is ready" here could mislead a dev testing
+        // wither flows.
+        emitDevLog(ctx, pid, `[dev] Bed ${bedId} was already settled; nothing to advance.`);
+      }
       return null;
     }
     if (meta.farmPlots.size === 0) {

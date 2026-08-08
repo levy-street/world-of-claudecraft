@@ -74,9 +74,14 @@ export function farmCropById(cropId: string): FarmCropDef | undefined {
 }
 
 /** The minimum farming proficiency a crop of this tier may be planted at: the
- *  shared 25-point band math, so tier 1 gates at 0, tier 2 at 25, tier 3 at 50
- *  and tier 4 at 75. THE one definition; the plant gate and the survival ramp
- *  both read it, so they can never disagree about where a band starts. */
+ *  25-point band math, so tier 1 gates at 0, tier 2 at 25, tier 3 at 50 and
+ *  tier 4 at 75. The PLANT GATE reads this; the survival ramp
+ *  (farmSurvivalChance in professions/farm_projection.ts) re-derives the same
+ *  threshold from its own FARM_SURVIVAL_BAND_SPAN, because that pure leaf may
+ *  not import content. Two 25s therefore exist, and the binding pin in
+ *  tests/professions_farming.test.ts ("binds the catalog band math to the
+ *  survival ramp span") is what keeps them from drifting apart: tune either
+ *  one alone and that pin reds. */
 export function farmCropSkillThreshold(cropTier: number): number {
   return (cropTier - 1) * 25;
 }

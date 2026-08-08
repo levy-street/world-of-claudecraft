@@ -112,10 +112,13 @@ visit or a punishment for lateness is violating the design, not tuning it.
   one renders then refuses); tiers 3 and 4 come from harvest seed-back rolls and the
   rare event, so high-tier seeds are market goods. Planting consumes the seed.
   Sanctioned same-phase-consumer exception: Phase 3 lands a minimal testable slice
-  (vale_wheat seed and produce plus the fine_vale_wheat twin and its grades row, and
-  withered_husks) with consumers explicitly deferred (husks to the Phase 4
-  convertHusks command, produce to the Phase 6 dishes); the rule is then enforced for
-  the full crop set by the Phase 5 rollout arms and closed by Phase 6.
+  (vale_wheat seed and produce plus the fine_vale_wheat twin, and withered_husks)
+  with consumers explicitly deferred (husks to the Phase 4 convertHusks command,
+  produce to the Phase 6 dishes); the rule is then enforced for the full crop set by
+  the Phase 5 rollout arms and closed by Phase 6. [The original "and its grades row"
+  clause here is AMENDED by deviation (o): fine twins ship as ordinary items with NO
+  MATERIAL_GRADES row; that table is pinned as exactly the nine node yields, and the
+  fine roll lives in farming's own harvest resolver.]
 - D12: The rare event is `golden_harvest`: a fourth flavor on the existing
   `gatherRareEvent` SimEvent shape, rolled at harvest (1/90, the shared constant),
   five-fold yield, always signed, zone-announced through `announceGatherRareEvent`'s
@@ -593,6 +596,28 @@ question does not arise (farming has no station).
   in-phase: the taxonomy gained the derived FARM_MATERIAL_ITEM_IDS source, the
   affinity census gained the self-clearing CONSUMER_DEFERRED_MATERIALS list,
   and ITEM_ART_PENDING's size-0 pin became an exact-set pin.
+  Phase 3 QA: (u) normalizeFarmPlots ADMITS a duration of exactly ZERO as a
+  permanently-ready row (only a NEGATIVE duration drops): /dev farmgrow writes
+  readyAtMs to the grow instant, so a plot grown in the same tick (offline) or
+  millisecond (server) as its plant minted a duration-0 row the old
+  duration <= 0 arm silently destroyed on the next load; "instantly ready AND
+  loadable" is impossible under the strict arm, admitting zero concedes nothing
+  to a blob editor (duration 1 was always equally instantly ready), and
+  farmGrowthStage/the projection already read zero-length windows as ready.
+  Migration-safety reviewed the rollback residual (an OLD loader still drops
+  duration-0 rows) and ACCEPTED it dev-only with no DEPLOY.md note: no
+  production minter exists until Phase 9. The farmgrow clock also floors at 1
+  now (the write-side anchor rule's third statement), and the crop catalog
+  pins every durationMs as a positive integer under FARM_MAX_GROW_MS, the
+  guard the admission removed for mis-authored crops. (v) harvestCrop
+  deliberately performs NO deliberate-action trio (no breakStealth, no
+  standUp, no forceDismount), unlike plantCrop and every gather/fish cast:
+  the harvest is the instant second visit of the two a cycle ever gets, a
+  per-bed dismount or reveal would tax exactly the walk-the-row pattern the
+  anti-chore thesis protects, and personal plots are uncontested so neither
+  state buys anything against another player. Pinned ("keeps stealth, the
+  seat and the mount" in tests/professions_farming.test.ts); flipping it is a
+  one-trio change plus that pin.
 - Dev command surface: Phase 3 registers /dev farmgrow [bedId] (alias
   /devfarmgrow [bedId]) in src/sim/dev_commands.ts behind ALLOW_DEV_COMMANDS:
   with a bed id it advances that plot, without one it advances ALL of the
@@ -711,7 +736,47 @@ question does not arise (farming has no station).
     spectating.
   - Stale beds-arrive-later comments to sweep when farming's guide content lands:
     scripts/wiki/build_content.mjs:773 and src/guide/pages/professions_gathering.ts
-    header prose (release-side files, deliberately untouched this phase).
+    header prose (release-side files, deliberately untouched this phase), PLUS the
+    two PLAYER-VISIBLE guide prose keys (Phase 3 QA addition, the qa-checklist
+    catch): guide.profPages.gatherIntro.farming ("Its beds, seeds, and tools arrive
+    in a later patch...") and guide.profPages.gatherDeeds.farming ("its beds are
+    still to come") in src/ui/i18n.catalog/guide.ts, which otherwise keep telling
+    players in every locale that farming has not shipped while they are planting.
+
+- Phase 3 QA addenda (2026-08-08), carried for later phases:
+  - The disposable-PG TOAST/WAL measurement is DEFERRED to Phase 9 (go-live) as a
+    HARD gate there, by the database-performance reviewer's explicit ruling this
+    QA: the phase's whole functional DB delta is the warn-only blob-size call at
+    the characterUpdateStatement chokepoint, farming is dormant online (no seed
+    faucet), and the blob ceiling suite already bounds the serialized size.
+  - Blob byte model re-measured this QA: settled 13,994 bytes (about 196 per bed),
+    342 under the 14336 ceiling; pins stand; the Phase 5 crop ladder re-measures.
+  - Phase 9 hardening notes from the second review round, deliberate deferrals:
+    (1) farmDenied echoes the raw length-unbounded bed/crop strings back to the
+    actor (pid-scoped, ws maxPayload 16 KiB + rate limits bound it, the HUD
+    renders only the reason enum; bound the string length at dispatch or drop the
+    ids from the bad_bed arm if go-live load review wants the allocation closed).
+    (2) plant_crop/harvest_crop mark HEAVY_SELF on receipt, so a spammed refusal
+    buys a heavy self re-serialize whose fplot arm is O(authored beds); confirm
+    the command rate limiter bounds refusal spam at go-live, or mark on success
+    only (farmPlanted membership plus the wireRev bump already cover success).
+  - Admin exposure VERIFIED clean this QA: both R35 inspector route arms shape
+    the raw adminCharacterState snapshot through characterProfessionsSheetFromRow
+    (explicit field picks, no farmPlots today), so the hidden slots never leave
+    the server over HTTP; the field-pick rule stands for whoever adds a farm
+    section. Work orders verified N/A: the commission modules carry zero
+    gathering-profession references, so no farming order can mint before the
+    phase that wires crops in deliberately.
+  - The next farming UI addition extracts src/ui/farming_view.ts (UI_PURE_CORES)
+    and moves farmDeniedLineKey plus the three farm grant-line selectors into it:
+    farming's view logic currently spans gathering_view.ts and grant_line_view.ts
+    by adjacency, one addition short of the rule of three.
+  - The command-level 'skill' deny emit is unreachable until a tier-2 crop ships;
+    the Phase 5 crop ladder inherits driving it (one plant below a real
+    threshold) deliberately.
+  - farmGrowthStage now takes the structural minimum (plantedAtMs/readyAtMs pick)
+    and documents the clock-base contract in its banner; the msRemaining wire
+    field stays owed to Phase 8 (the first timer surface).
 
 ## OPEN items (maintainer decisions or later-phase calls, never guess)
 

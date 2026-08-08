@@ -13,6 +13,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { FARM_BED_IDS, FARM_CROP_IDS, FARM_PATCHES } from '../src/sim/content/farm_patches';
 import {
   countDroppedHiddenSlots,
+  deriveHiddenSlots,
   FARM_MAX_GROW_MS,
   normalizeFarmPlots,
   type PersistedFarmPlot,
@@ -292,9 +293,41 @@ describe('load-side anti-tamper (one corrupt dimension per arm)', () => {
     expect([...loaded.keys()]).toEqual(['bed_beta']);
   });
 
-  it('drops a deadline at or before its plant time', () => {
-    expect(norm({ bed_alpha: { ...VALID, readyAtMs: 1_000 } }).size).toBe(0);
+  it('drops a deadline BEFORE its plant time, and keeps the grow-now instant', () => {
+    // Negative duration is malformed (nothing can mint it) and drops. Exactly
+    // zero is the legitimate /dev farmgrow mint (readyAtMs written to the
+    // plant instant; on the server, a plant and a grow inside one ms): the row
+    // must survive the round trip as a permanently-ready plot rather than be
+    // destroyed as tampered (the QA-round zero-duration finding).
     expect(norm({ bed_alpha: { ...VALID, readyAtMs: 900 } }).size).toBe(0);
+    const grown = norm({ bed_alpha: { ...VALID, readyAtMs: VALID.plantedAtMs } });
+    expect([...grown.keys()]).toEqual(['bed_alpha']);
+    expect(grown.get('bed_alpha')?.readyAtMs).toBe(VALID.plantedAtMs);
+  });
+
+  it('derives deterministic in-domain slots, and a derived row is a load fixed point', () => {
+    // The exported derivation contract, pinned THROUGH the export (it had only
+    // indirect coverage via normalizeFarmPlots before the QA round).
+    const a = deriveHiddenSlots('bed_alpha', 4_242);
+    expect(deriveHiddenSlots('bed_alpha', 4_242)).toEqual(a);
+    expect(a.survivalRoll).toBeGreaterThanOrEqual(0);
+    expect(a.survivalRoll).toBeLessThan(1);
+    expect(Number.isInteger(a.yieldSeed)).toBe(true);
+    expect(a.yieldSeed).toBeGreaterThanOrEqual(0);
+    expect(a.yieldSeed).toBeLessThan(0x100000000);
+    // The identity key does real work: a different bed or anchor answers
+    // differently, so no two plots share a derived fate.
+    expect(deriveHiddenSlots('bed_beta', 4_242)).not.toEqual(a);
+    expect(deriveHiddenSlots('bed_alpha', 4_243)).not.toEqual(a);
+    // The doc's fixed-point claim: a row that lost both slots loads to exactly
+    // this derivation, and a second round trip of the loaded map changes
+    // nothing (the derived values persist and then clamp to themselves).
+    const loaded = norm({ bed_alpha: { cropId: 'turnip', plantedAtMs: 4_242, readyAtMs: 8_242 } });
+    const row = loaded.get('bed_alpha') as PlotState;
+    expect(row.survivalRoll).toBe(a.survivalRoll);
+    expect(row.yieldSeed).toBe(a.yieldSeed);
+    const again = norm(serializeFarmPlots(loaded) as Record<string, PersistedFarmPlot>);
+    expect(again.get('bed_alpha')).toEqual(row);
   });
 
   it('drops non-finite and non-positive timestamps', () => {

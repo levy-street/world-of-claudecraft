@@ -11857,7 +11857,13 @@ export class Hud {
             }),
             '#7fdc4f',
           );
-          if (ev.fineItemId !== undefined) {
+          // Both halves demanded, not just the id: the emitter always writes
+          // the pair together (a present pair means a MIXED harvest), but the
+          // wire type declares them as independent optionals, and a half-pair
+          // from a stale or foreign server would otherwise render an implicit
+          // "x1" for a real multi-unit fine yield. A malformed half-pair
+          // renders nothing rather than something wrong.
+          if (ev.fineItemId !== undefined && ev.fineCount !== undefined) {
             this.log(
               t(farmFineLineKey(ev.fineCount), {
                 name: grantItemToken(ev.fineItemId),

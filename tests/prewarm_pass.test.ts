@@ -112,6 +112,64 @@ describe('runBackgroundPrewarm', () => {
     ]);
   });
 
+  it('splits a child into labeled upload units, one idle slot and one arbiter grant each', async () => {
+    const groups = [group(2)];
+    const events: string[] = [];
+    await runBackgroundPrewarm(groups, {
+      supportsAsyncCompile: true,
+      idleSlot: async () => {
+        events.push('idle');
+        return { forcedProgress: false, source: 'idle', timeRemainingMs: 5 };
+      },
+      compileChild: async (child) => {
+        events.push(`compile:${child}`);
+      },
+      warmChildUnits: (_group, child) => [
+        { label: 'tex', run: () => events.push(`tex:${child}`) },
+        { label: `render:${child}`, run: () => events.push(`render:${child}`) },
+      ],
+      renderWarmPass: () => events.push('final'),
+      runUpload: async (work, label) => {
+        events.push(`grant:${label ?? 'unlabeled'}`);
+        work();
+      },
+    });
+    // Per child: one compile slot, then one slot + one grant PER UNIT, and no
+    // redundant final whole-group pass afterward.
+    expect(events).toEqual([
+      'idle',
+      'compile:0',
+      'idle',
+      'grant:tex',
+      'tex:0',
+      'idle',
+      'grant:render:0',
+      'render:0',
+      'idle',
+      'compile:1',
+      'idle',
+      'grant:tex',
+      'tex:1',
+      'idle',
+      'grant:render:1',
+      'render:1',
+    ]);
+  });
+
+  it('prefers warmChildUnits over warmChild when both hooks are supplied', async () => {
+    const groups = [group(1)];
+    const events: string[] = [];
+    await runBackgroundPrewarm(groups, {
+      supportsAsyncCompile: true,
+      idleSlot: idle(),
+      compileChild: async () => {},
+      warmChild: () => events.push('whole-child'),
+      warmChildUnits: () => [{ run: () => events.push('unit') }],
+      renderWarmPass: () => events.push('final'),
+    });
+    expect(events).toEqual(['unit']);
+  });
+
   it('keeps a child hidden while its upload waits for the shared GPU arbiter', async () => {
     const groups = [group(1)];
     let releaseUpload!: () => void;
@@ -292,7 +350,10 @@ describe('runBackgroundPrewarm', () => {
 
     expect(zoneMethod).toContain('() => this.compilePrewarmColorPrograms(childRoot, true)');
     expect(zoneMethod).toContain('() => this.compileSkinnedShadowPrograms(childRoot)');
-    expect(zoneMethod).toContain('runUpload: (work) =>');
+    expect(zoneMethod).toContain('runUpload: (work, label) =>');
+    // The decomposed upload: texture batches first, then the bounded render.
+    expect(zoneMethod).toContain('warmChildUnits: (groupLike, child) =>');
+    expect(zoneMethod).toContain('this.webgl.initTexture(texture)');
     expect(zoneMethod).toContain('this.renderBoundedPrewarmRoot(group, childRoot)');
     expect(prepareMethod).toContain('const featureGroups = this.lastAttachedFeatureGroups.slice()');
     const hideAt = prepareMethod.indexOf('withHiddenPrewarmGroups(featureGroups');

@@ -291,6 +291,25 @@ describe('item webp icons', () => {
     expect(itemImageUrl('linen_pouch')).toBe('/ui/items/linen_pouch.webp');
   });
 
+  it('A4) every art-pending id serves a deliberate, DISTINCT procedural recipe', () => {
+    // A3 proves the four ids decline static art; this arm proves what they get
+    // instead is usable. Without explicit ITEM_RECIPES rows all four fell to
+    // the trinket default (scroll on leather), so a farmer's bag showed the
+    // seed, the produce, its fine twin and the husks as four identical
+    // glyphs. The recipes must exist (never the shared unknown fallback) and
+    // must differ pairwise, so the fine twin is tellable from the base grade
+    // at a glance.
+    const seen = new Map<string, string>();
+    for (const id of ITEM_ART_PENDING) {
+      const recipe = itemIconRecipe(id);
+      expect(isUnknownIconRecipe(recipe), `${id} must resolve a real recipe`).toBe(false);
+      const key = JSON.stringify(recipe);
+      const clash = seen.get(key);
+      expect(clash, `${id} must not share its whole recipe with ${clash}`).toBeUndefined();
+      seen.set(key, id);
+    }
+  });
+
   it('B) commits only webp art (+ mapping.json) under public/ui/items', () => {
     const stray = walk(itemsDir)
       .filter((p) => !isDotfile(p) && !isMapping(p) && path.extname(p).toLowerCase() !== '.webp')

@@ -20,11 +20,13 @@ export interface CompileGateResult {
 export interface CompileGateOptions {
   onTimeout?: () => void;
   priority?: number;
+  /** Names this gate's unit in the shared queue's per-unit timing stats. */
+  label?: string;
   scheduler?: CompileGateScheduler;
 }
 
 export interface CompileGateWorkQueue {
-  run<T>(work: () => T | Promise<T>, priority?: number): Promise<T>;
+  run<T>(work: () => T | Promise<T>, priority?: number, label?: string): Promise<T>;
 }
 
 const defaultScheduler: CompileGateScheduler = {
@@ -81,7 +83,7 @@ export class CompileGateQueue {
     options: CompileGateOptions = {},
   ): Promise<CompileGateResult> {
     const work = () => awaitCompileGate(compile, timeoutMs, options);
-    if (this.sharedQueue) return this.sharedQueue.run(work, options.priority);
+    if (this.sharedQueue) return this.sharedQueue.run(work, options.priority, options.label);
     const result = this.tail.then(work);
     this.tail = result;
     return result;
