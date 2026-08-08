@@ -12,6 +12,7 @@ import { enterDungeon } from '../src/sim/instances/dungeons';
 import {
   awardRiftFirstClearMaterials,
   emberWeekAnchorOf,
+  emberWeekAnchorPlusWeeks,
   emberWeeksBetween,
   grantRiftClearEmbers,
   MAKERS_EMBER_ITEM_ID,
@@ -357,6 +358,22 @@ describe("maker's ember: the weekly bankable keystone", () => {
     expect(sim.countItem(MAKERS_EMBER_ITEM_ID, pid)).toBe(5);
   });
 
+  it('one completion pays at most a stack; the over-cap backlog stays banked', () => {
+    (sim as any).resetDay = TUESDAY;
+    tryGrantMakersEmber(sim.ctx, meta);
+    expect(sim.countItem(MAKERS_EMBER_ITEM_ID, pid)).toBe(1);
+    // 25 weeks pass: the payout caps at one stack (20) and the anchor only
+    // advances 20 weeks, so the remaining 5 pay on the very next completion.
+    (sim as any).resetDay = '2027-02-02'; // a Tuesday 25 weeks after TUESDAY
+    expect(emberWeeksBetween(TUESDAY, '2027-02-02')).toBe(25);
+    tryGrantMakersEmber(sim.ctx, meta);
+    expect(sim.countItem(MAKERS_EMBER_ITEM_ID, pid)).toBe(21);
+    expect(meta.emberWeekAnchor).toBe(emberWeekAnchorPlusWeeks(TUESDAY, 20));
+    tryGrantMakersEmber(sim.ctx, meta);
+    expect(sim.countItem(MAKERS_EMBER_ITEM_ID, pid)).toBe(26);
+    expect(meta.emberWeekAnchor).toBe('2027-02-02');
+  });
+
   it('no calendar means no grant, and a future-dated anchor self-heals silently', () => {
     (sim as any).resetDay = '';
     tryGrantMakersEmber(sim.ctx, meta);
@@ -429,10 +446,11 @@ describe('sundered essence: the extraction', () => {
     // The id is frozen; the DISPLAY name is what the line carries (the phase
     // 03 rename discipline: crownforged_dreadhelm renders Bonewrought).
     expect(line?.text).toBe('You sunder Bonewrought Dreadhelm into Sundered Essence.');
-    // callerLogs elides the hub's generic receive line for the essence grant.
+    // silent + callerLogs: the sunder line above owns both halves of the
+    // grant feedback (the #2458 stand-down rule; no generic hub line or ding).
     expect(
       events.filter((e) => e.type === 'loot' && /Sundered Essence/.test(e.text ?? '')),
-    ).toEqual([expect.objectContaining({ callerLogs: true })]);
+    ).toEqual([expect.objectContaining({ callerLogs: true, silent: true })]);
   });
 
   it('refuses a non-raid epic, an unknown id, and an unheld item, consuming nothing', () => {
@@ -597,6 +615,26 @@ describe('persistence: the two new PlayerMeta fields', () => {
     const meta2 = sim2.players.get(pid2)! as PlayerMeta;
     expect(meta2.wyrmfallDaily).toEqual({ date: '', sources: new Set() });
     expect(meta2.emberWeekAnchor).toBe('');
+  });
+
+  it('a corrupt row degrades to defaults instead of throwing or stalling', () => {
+    const sim = makeDungeonSim(3);
+    const pid = sim.addPlayer('warrior', 'Bad');
+    const state = JSON.parse(JSON.stringify(sim.serializeCharacter(pid)));
+    // A malformed anchor would stall the weekly grant forever (weeksBetween
+    // reads unparseable as 0 = same week); a non-array sources would throw in
+    // addPlayer or poison the gate with per-character junk entries.
+    state.emberWeekAnchor = 42;
+    state.wyrmfallDaily = { date: 7, sources: 'rift' };
+    const sim2 = makeDungeonSim(3);
+    const pid2 = sim2.addPlayer('warrior', 'Bad', { state });
+    const meta2 = sim2.players.get(pid2)! as PlayerMeta;
+    expect(meta2.emberWeekAnchor).toBe('');
+    expect(meta2.wyrmfallDaily).toEqual({ date: '', sources: new Set() });
+    // The degraded anchor takes the first-grant arm again: no permanent stall.
+    (sim2 as any).resetDay = TUESDAY;
+    tryGrantMakersEmber(sim2.ctx, meta2);
+    expect(sim2.countItem(MAKERS_EMBER_ITEM_ID, pid2)).toBe(1);
   });
 
   it('zero-default omission: an untouched character serializes without the keys', () => {

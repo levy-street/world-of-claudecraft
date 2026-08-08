@@ -472,6 +472,12 @@ describe('every professions grant site is accounted for (#2430)', () => {
     'enchanting.ts': 4,
     'fishing.ts': 2,
     'gathering.ts': 2,
+    // Masterwrought phase 04: the two core delivery arms (heroic/raid kill
+    // and rift first clear) and the two ember accrual arms, all documented
+    // NO_RESULT_EVENT_GRANTS; plus the sundering essence grant, whose sunder
+    // line owns the feedback (silent + callerLogs).
+    'masterwrought_materials.ts': 4,
+    'sundering.ts': 1,
     'salvage.ts': 2,
     'interaction.ts:harvestCorpse': 6,
   };
@@ -493,6 +499,17 @@ describe('every professions grant site is accounted for (#2430)', () => {
     // completed trade (trade.ts's grantOffer, outside this directory, stays
     // loud for the identical reason).
     'order.requesterId',
+    // masterwrought_materials.ts (phase 04): the Wyrmfall Core and Maker's
+    // Ember participation awards follow the heroic-marks precedent (which
+    // lives in instances/dungeons.ts, outside this sweep): no result event
+    // exists, so the hub's "You receive:" line and the loot ding ARE the
+    // player's whole notification that a kill or completion paid out. One
+    // marker per delivery arm (boss kill, rift first clear, ember first
+    // grant, ember accrual), each pinned to its own call.
+    'WYRMFALL_CORE_ITEM_ID, count',
+    'WYRMFALL_CORE_ITEM_ID, riftCount',
+    'MAKERS_EMBER_ITEM_ID, 1',
+    'MAKERS_EMBER_ITEM_ID, granted',
   ];
 
   // Source with comments removed (`://` protocol slashes preserved), the repo's

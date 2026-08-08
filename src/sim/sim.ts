@@ -3297,13 +3297,23 @@ export class Sim {
       if (s.heroicDaily) {
         meta.heroicDaily = { date: s.heroicDaily.date, marked: new Set(s.heroicDaily.marked) };
       }
+      // Load hardening (migration review): a tampered or corrupt row must
+      // degrade to defaults, never throw inside addPlayer (the unloadable-
+      // character class) and never poison the gate with junk entries. A
+      // malformed emberWeekAnchor would otherwise stall the weekly grant
+      // forever: emberWeeksBetween returns 0 for unparseable input, which is
+      // indistinguishable from same-week.
       if (s.wyrmfallDaily) {
         meta.wyrmfallDaily = {
-          date: s.wyrmfallDaily.date,
-          sources: new Set(s.wyrmfallDaily.sources),
+          date: typeof s.wyrmfallDaily.date === 'string' ? s.wyrmfallDaily.date : '',
+          sources: new Set(
+            Array.isArray(s.wyrmfallDaily.sources)
+              ? s.wyrmfallDaily.sources.filter((x) => typeof x === 'string')
+              : [],
+          ),
         };
       }
-      meta.emberWeekAnchor = s.emberWeekAnchor ?? '';
+      meta.emberWeekAnchor = typeof s.emberWeekAnchor === 'string' ? s.emberWeekAnchor : '';
       // The Book of Deeds. Earned days load verbatim; the legacy milestone set
       // unions into the earned map (milestone unification); renown is
       // RECOMPUTED from the earned set below (the sim is authoritative, the

@@ -57,6 +57,13 @@ export const WYRMFALL_RIFT_SOURCE = 'rift';
 // reset day. Sunday = 0 to match the (days + 4) % 7 epoch arithmetic below.
 export const EMBER_WEEK_RESET_DOW = 2;
 
+// The most embers ONE completion pays out (one full stack): R4's accrual
+// stays uncapped in TOTAL, but a multi-year backlog lands a stack at a time
+// (the anchor only advances by the granted weeks, so the remainder keeps
+// accruing and pays on the next completion), instead of one addItem pushing
+// the bags arbitrarily far past capacity (migration review).
+export const EMBER_ACCRUAL_GRANT_CAP = 20;
+
 // --- Pure calendar math (no Date, no clock, no Intl) -----------------------
 // Howard Hinnant's days_from_civil: days since 1970-01-01 for a civil date.
 // Pure integer arithmetic so the sim never touches the host Date machinery.
@@ -119,6 +126,16 @@ export function emberWeeksBetween(from: string, to: string): number {
   return Math.floor((b - a) / 7);
 }
 
+/** An anchor advanced by `weeks` whole weeks ('' for unparseable input), for
+ *  the capped accrual payout: the stored anchor moves exactly as far as the
+ *  grant paid, so an over-cap backlog stays banked. */
+export function emberWeekAnchorPlusWeeks(anchor: string, weeks: number): string {
+  const dayNum = resetDayToDayNumber(anchor);
+  if (dayNum === null) return '';
+  const { y, m, d } = civilFromDays(dayNum + weeks * 7);
+  return `${y}-${pad2(m)}-${pad2(d)}`;
+}
+
 // --- The daily gate ---------------------------------------------------------
 
 /** Roll the wyrmfall daily window forward when the realm's reset day has
@@ -148,8 +165,13 @@ export function tryGrantMakersEmber(ctx: SimContext, meta: PlayerMeta): void {
   }
   const weeks = emberWeeksBetween(meta.emberWeekAnchor, anchor);
   if (weeks <= 0) return;
-  meta.emberWeekAnchor = anchor;
-  ctx.addItem(MAKERS_EMBER_ITEM_ID, weeks, meta.entityId);
+  // One completion pays at most a stack; the anchor advances only as far as
+  // the grant paid, so an over-cap backlog keeps accruing (R4: uncapped in
+  // total, bounded per payout so one addItem never floods the bags).
+  const granted = Math.min(weeks, EMBER_ACCRUAL_GRANT_CAP);
+  meta.emberWeekAnchor =
+    granted === weeks ? anchor : emberWeekAnchorPlusWeeks(meta.emberWeekAnchor, granted);
+  ctx.addItem(MAKERS_EMBER_ITEM_ID, granted, meta.entityId);
 }
 
 // --- The boss faucet --------------------------------------------------------
@@ -214,15 +236,15 @@ export function awardRiftFirstClearMaterials(
   tier: string,
   participants: readonly number[],
 ): void {
-  const count = WYRMFALL_RIFT_COUNT[tier] ?? 0;
-  if (count === 0) return;
+  const riftCount = WYRMFALL_RIFT_COUNT[tier] ?? 0;
+  if (riftCount === 0) return;
   for (const pid of participants) {
     const meta = ctx.players.get(pid);
     if (!meta) continue;
     refreshWyrmfallDaily(ctx, meta);
     if (!meta.wyrmfallDaily.sources.has(WYRMFALL_RIFT_SOURCE)) {
       meta.wyrmfallDaily.sources.add(WYRMFALL_RIFT_SOURCE);
-      ctx.addItem(WYRMFALL_CORE_ITEM_ID, count, meta.entityId);
+      ctx.addItem(WYRMFALL_CORE_ITEM_ID, riftCount, meta.entityId);
     }
     tryGrantMakersEmber(ctx, meta);
   }

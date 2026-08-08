@@ -143,6 +143,10 @@ const NON_PROFESSIONS_BLOB_FIELDS = [
   'delveLoreUnlocked',
   'delveDaily',
   'heroicDaily',
+  // Masterwrought phase 04: the material income gates (content-cardinality
+  // bounded, reset per reset day) and the ember week anchor (a fixed date).
+  'wyrmfallDaily',
+  'emberWeekAnchor',
   'mailWelcomed',
   'deeds',
   'deedStats',

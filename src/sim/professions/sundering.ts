@@ -139,7 +139,12 @@ export function completeSunderCast(ctx: SimContext, p: Entity, meta: PlayerMeta)
     return;
   }
   const def = ITEMS[itemId];
+  // silent + callerLogs: the sunder line below owns BOTH halves of the grant
+  // feedback (the #2458 rule: a grant that stands its hub line down stands
+  // the generic ding down too). A dedicated sunder cue is a phase 14 UX
+  // candidate; the cast start already plays the workbench wind-up.
   ctx.addItem(SUNDERED_ESSENCE_ITEM_ID, SUNDERED_ESSENCE_YIELD, meta.entityId, {
+    silent: true,
     callerLogs: true,
   });
   ctx.emit({
