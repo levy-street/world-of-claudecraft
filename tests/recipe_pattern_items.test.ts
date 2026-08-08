@@ -633,11 +633,14 @@ describe('shipped pattern content shape', () => {
     // The def-level claims RecipeItemDef's doc rests on, none of which the
     // TYPE can enforce: quality 'poor' would let one Sell Junk click vendor
     // the pattern (junkSellableSlot gates on quality, not kind), and
-    // soulbound / noMarketList would contradict bind-by-consumption. Vacuous
-    // today like the sweep above; live the moment phase 11 ships a def.
-    for (const [id, def] of Object.entries(ITEMS)) {
+    // soulbound / noMarketList would contradict bind-by-consumption. NO
+    // synthetic-id skip, deliberately unlike the sweep above: this suite's
+    // four fixtures all satisfy these three assertions, so sweeping them too
+    // keeps the loop and its field reads provably live today instead of
+    // vacuous until phase 11.
+    for (const def of Object.values(ITEMS)) {
       if (def.kind !== 'recipe') continue;
-      if (id.startsWith(SYNTHETIC_ID_PREFIX)) continue;
+      const id = def.id;
       expect(def.quality, `${id}: a poor-quality pattern is swept by Sell Junk`).not.toBe('poor');
       expect(def.soulbound ?? false, `${id}: soulbound contradicts bind-by-consumption`).toBe(
         false,

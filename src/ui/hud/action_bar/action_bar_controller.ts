@@ -249,9 +249,10 @@ export class ActionBarController {
     // reins are placeable for the same reason a potion is. Without this arm the
     // bag drag never writes a hotbar payload and the bar cannot accept them.
     // Recipe patterns (kind 'recipe') ride that same dispatch but are DELIBERATELY
-    // not placeable, like elixirs: a pattern is a one-shot unlock consumed on its
-    // first successful use, so a hotbar slot would hold a dead button from the
-    // first press on; the bags are its home.
+    // not placeable (elixirs are the precedent that riding useItem does not imply
+    // a slot, though their reason differs): a pattern is a one-shot unlock consumed
+    // on its first successful use, so a hotbar slot would hold a dead button from
+    // the first press on; the bags are its home.
     const item = ITEMS[itemId];
     return (
       item?.kind === 'food' ||

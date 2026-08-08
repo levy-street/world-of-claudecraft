@@ -337,9 +337,12 @@ Arcanite (new uses), Quintessent, Grand Banquet, Colossus Splitter, Aetherlens, 
   instance payloads, classic-correct); PatternLearnResult stays exported with zero external
   consumers (it names the public resolver's return type, the training.ts TrainResult idiom);
   removeItem-by-dispatch-itemId vs def.id is unpinnable without an unshippable
-  table-key-vs-def-id mismatch fixture (recorded, no change); the frozen-id golden is a
-  DELETION guard only, so "no shipped pattern ids" is actually held by the zero
-  kind:'recipe' content greps plus the content-shape sweep, not the golden.
+  table-key-vs-def-id mismatch fixture (recorded, no change); the frozen-id golden
+  (tests/shipped_item_ids.test.ts over shipped_item_ids.golden.json, a .json golden a
+  .snap-only search misses) is a DELETION guard only, so "no shipped pattern ids" is
+  actually held by the zero kind:'recipe' content greps plus the content-shape sweep,
+  not the golden; the stale_client_rollout snapshot is a separate golden scoped to
+  HEROIC_BOSS_LOOT and does not cover the catalog either.
 - Docs/comment corrections: the Key existing seams recipes row (the phase itself
   superseded its zero-users/no-kind premise); the professions CLAUDE.md module map gained
   its pattern_items.ts row; the hud.ts tooltip gate comment now says WHICH host pays the
