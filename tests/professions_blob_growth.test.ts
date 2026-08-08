@@ -288,7 +288,7 @@ function ceilingSim(): Sim {
       cropId: 'wheat',
       plantedAtMs: 1_000,
       readyAtMs: 1_000 + FARM_MAX_GROW_MS,
-      survivalRoll: 0.12345678901234567,
+      survivalRoll: 0.12345678901234566,
       yieldSeed: 4_294_967_295,
       compost: true,
       watch: true,
