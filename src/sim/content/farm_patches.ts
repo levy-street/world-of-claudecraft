@@ -169,13 +169,32 @@ export const FARM_BED_IDS: ReadonlySet<string> = new Set(
   FARM_PATCHES.flatMap((p) => p.beds.map((b) => b.id)),
 );
 
-// The crop registry the persistence allowlist reads. The growth phase owns
-// the real catalog; `wheat` is pre-declared now because it is packet-locked
-// (the intro quest plants one wheat) and a real id lets the save round trip
-// prove a surviving row end to end. Nothing can plant yet, so no live save
-// can carry a row before the growth phase lands.
-// Crop ids are PERSISTED SAVE KEYS like bed ids: removing or renaming one
-// destroys every player's plot of that crop at their next load (the
-// allowlist drop). Never rename a shipped crop id; retiring one is a
-// deliberate destroy-on-load decision.
-export const FARM_CROP_IDS: ReadonlySet<string> = new Set(['wheat']);
+// Bed id to its row, built once at module load. The plant and harvest commands
+// range-check against a bed's position on every call, so a linear walk of four
+// patches would be a per-command scan of the whole table for a lookup the
+// shape of this data makes free.
+const FARM_BEDS_BY_ID: ReadonlyMap<string, FarmBedDef> = new Map(
+  FARM_PATCHES.flatMap((p) => p.beds.map((b) => [b.id, b] as const)),
+);
+
+/** The bed this id names, or undefined. Returns the SHARED frozen row, never
+ *  a copy: callers read x/z and must not mutate (the FARM_PATCHES contract). */
+export function farmBedById(bedId: string): FarmBedDef | undefined {
+  return FARM_BEDS_BY_ID.get(bedId);
+}
+
+// The crop registry the persistence allowlist reads, now DERIVED from the
+// real catalog (content/farm_crops.ts) rather than declared here: the growth
+// phase brought the catalog, so a second hand-maintained list would only be a
+// way for the two to drift. Re-exported from this module because every
+// persistence call site already imports its allowlists from here beside
+// FARM_BED_IDS.
+//
+// The placeholder id this held before the catalog landed was `wheat`; the
+// shipped id is `vale_wheat`. That rename was free exactly once, because
+// nothing could plant before the growth phase and so no live save could carry
+// a row. Crop ids are PERSISTED SAVE KEYS like bed ids from here on: removing
+// or renaming one destroys every player's plot of that crop at their next
+// load (the allowlist drop). Never rename a shipped crop id; retiring one is
+// a deliberate destroy-on-load decision.
+export { FARM_CROP_IDS } from './farm_crops';

@@ -44,6 +44,7 @@ import {
   ENCHANT_CAST_ID,
   type Entity,
   type EquipSlot,
+  FARMING_CAST_ID,
   FISHING_CAST_ID,
   GATHER_CAST_ID,
   isFormAuraKind,
@@ -596,6 +597,13 @@ export function castingReadout(e: Entity): string {
   }
   if (e.castingAbility === TOOL_RECHARGE_CAST_ID) {
     return `You are recharging a tool effect: ${remaining}s of ${total}s remaining.`;
+  }
+  if (e.castingAbility === FARMING_CAST_ID) {
+    // No countdown, and for a different reason than fishing's: the plant
+    // already RESOLVED at command time, so the seconds left on this cast
+    // decide nothing a player could act on. Naming the state is the whole
+    // truth there is to tell.
+    return 'You are planting.';
   }
   const name = ABILITIES[e.castingAbility]?.name ?? e.castingAbility;
   const verb = e.channeling ? 'Channeling' : 'Casting';

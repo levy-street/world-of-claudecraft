@@ -109,6 +109,7 @@ import { ensureWarriorStance } from './combat/warrior_stances';
 // moved to social/fiesta.ts with that logic; sim.ts keeps only the type used by
 // the PlayerMeta interface + the power-up catalog the fiestaMatchInfo accessor reads.
 import { type AugmentSpecial, type AugmentTier, POWERUPS_BY_ID } from './content/augments';
+import { farmCropTier } from './content/farm_crops';
 import {
   FARM_BED_IDS,
   FARM_CROP_IDS,
@@ -397,6 +398,11 @@ import {
   type PlotState,
   projectFarmPlots,
 } from './professions/farm_projection';
+import {
+  harvestCrop as harvestCropAction,
+  plantCrop as plantCropAction,
+  updateFarming,
+} from './professions/farming';
 import * as fishing from './professions/fishing';
 import type { RespecPaymentTier } from './professions/focus';
 import * as professionsFocus from './professions/focus';
@@ -3301,15 +3307,15 @@ export class Sim {
       });
       // Dev-channel visibility for the silent-drop arms (the knownRecipes
       // precedent): a retired bed id or a tampered row vanishes on load by
-      // design, and a corrupt hidden slot drops while its row SURVIVES (so
-      // the row count alone cannot see it), but an operator reading server
-      // logs should see both happen.
+      // design, and a corrupt hidden slot is REPLACED by a derived one while
+      // its row SURVIVES (so the row count alone cannot see it), but an
+      // operator reading server logs should see both happen.
       {
         const droppedRows = s.farmPlots ? Object.keys(s.farmPlots).length - meta.farmPlots.size : 0;
         const droppedSlots = countDroppedHiddenSlots(s.farmPlots, meta.farmPlots);
         if (droppedRows > 0 || droppedSlots > 0) {
           console.warn(
-            `[load] dropped ${droppedRows} farmPlots row(s) and ${droppedSlots} hidden slot(s) for ${meta.name} (unknown bed/crop id, invalid deadline, or non-finite slot)`,
+            `[load] dropped ${droppedRows} farmPlots row(s) and re-derived ${droppedSlots} hidden slot(s) for ${meta.name} (unknown bed/crop id, invalid deadline, or non-finite slot)`,
           );
         }
       }
@@ -6007,6 +6013,16 @@ export class Sim {
     lap?.('postOffice');
     drainDelayedEvents(this.ctx);
     lap?.('delayedEv');
+    // The farming sweep (the growth-engine phase): APPENDED here, never
+    // inserted, because the shared rng stream makes any reorder of the tail
+    // fork every golden. Draws ZERO rng and emits nothing (it is the
+    // ready-notice phase's placeholder, behind its own internal 1 Hz guard),
+    // so its position cannot fork the draw order, exactly like the
+    // updateProfNudges and updateDeeds neighbours. Farming growth itself is
+    // NOT ticked: a plot is an absolute deadline the projection compares
+    // against, so there is no timer here to fire.
+    updateFarming(this.ctx);
+    lap?.('farming');
     // The Book of Deeds evaluator runs at the very end of the tail: it sees
     // same-tick delayed-event results, and because it draws ZERO rng (pure
     // predicate checks over dirty players plus a 1 Hz proximity sweep) its
@@ -11927,11 +11943,38 @@ export class Sim {
   farmPlotsFor(pid: number): readonly FarmPlotView[] {
     const meta = this.players.get(pid);
     if (!meta) return EMPTY_FARM_PLOT_VIEWS;
-    return projectFarmPlots(meta.farmPlots, this.lockoutNowMs());
+    // The farmer's CURRENT proficiency decides `withered` versus `ready`
+    // (farm_projection.ts farmSurvivalChance), which is why the skill is
+    // threaded in rather than baked into the plot: out-levelling a crop
+    // retires its risk retroactively, and proficiency never falls, so this can
+    // only ever turn a withered row into a ready one.
+    return projectFarmPlots(
+      meta.farmPlots,
+      this.lockoutNowMs(),
+      meta.gatheringProficiency.farming ?? 0,
+      farmCropTier,
+    );
   }
 
   get myFarmPlots(): readonly FarmPlotView[] {
     return this.farmPlotsFor(this.primaryId);
+  }
+
+  // Plant a crop in a garden bed. Thin delegate: the whole decision (the
+  // stated gate order, the seed spend, the one two-draw pre-roll block, the
+  // plot write) lives in professions/farming.ts, which owns the draw contract.
+  plantCrop(bedId: string, cropId: string, pid?: number): void {
+    const r = this.ctx.resolve(pid);
+    if (!r) return;
+    plantCropAction(this.ctx, r.e, r.meta, bedId, cropId);
+  }
+
+  // Harvest a finished plot. Thin delegate like plantCrop above; draw-free on
+  // every path (the yield expands from the plant-time seed).
+  harvestCrop(bedId: string, pid?: number): void {
+    const r = this.ctx.resolve(pid);
+    if (!r) return;
+    harvestCropAction(this.ctx, r.e, r.meta, bedId);
   }
 
   // Slot an effect onto one gathering profession's tool, consuming one charm

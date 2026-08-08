@@ -44,11 +44,71 @@ export interface PlotState {
   notified: boolean;
 }
 
-// Server-derived plot status. `withered` joins in the growth phase and may
-// surface only at or after readyAtMs (a crop that is going to fail still
-// LOOKS like it is growing until its timer runs out, so the hidden survival
-// pre-roll stays unobservable while the plot grows).
+// Server-derived plot status. `withered` may surface only at or after
+// readyAtMs (a crop that is going to fail still LOOKS like it is growing
+// until its timer runs out, so the hidden survival pre-roll stays
+// unobservable while the plot grows).
 export type FarmPlotStatus = 'growing' | 'ready' | 'withered';
+
+// The survival ramp (the growth-engine phase). Pure arithmetic, no rng, no
+// content import: the caller supplies the crop's tier, which keeps this file
+// the pure leaf its banner promises.
+//
+// TUNING, PROVISIONAL, FLAGGED FOR THE MAINTAINER. Base survival is 85 percent
+// at the crop's own gate and ramps to 100 percent at the top of its 25-point
+// band, so one full band above the threshold retires the crop's risk
+// permanently. Compost and the farmer's watch each add 10 points on top (both
+// are always false this phase; the knobs phase wires them), and the whole
+// thing caps at 1.
+export const FARM_SURVIVAL_AT_GATE = 0.85;
+export const FARM_SURVIVAL_BAND_SPAN = 25;
+export const FARM_SURVIVAL_COMPOST_BONUS = 0.1;
+export const FARM_SURVIVAL_WATCH_BONUS = 0.1;
+
+/** The chance a crop of this tier survives for a farmer at this proficiency.
+ *
+ *  EVALUATED AT READ TIME against CURRENT skill, never at plant time, which is
+ *  what makes "out-levelling a crop permanently retires its risk" literally
+ *  true: a plot planted at the gate and harvested a band later survives. That
+ *  is only ever player-favorable because gathering proficiency is a monotonic
+ *  additive-only counter with no decrement path, so this number can never fall
+ *  between planting and harvesting.
+ *
+ *  The band position is CLAMPED into [0, 1] rather than branched: at or above
+ *  the band top the chance is exactly 1, and below the gate (unreachable
+ *  through the plant gate, but reachable by a hand-edited save naming a crop
+ *  above the farmer's skill) it floors at the gate value rather than dipping
+ *  under it. A non-finite skill reads as 0. */
+export function farmSurvivalChance(
+  skill: number,
+  cropTier: number,
+  compost: boolean,
+  watch: boolean,
+): number {
+  const threshold = (cropTier - 1) * FARM_SURVIVAL_BAND_SPAN;
+  const s = Number.isFinite(skill) ? skill : 0;
+  const band = Math.max(0, Math.min(1, (s - threshold) / FARM_SURVIVAL_BAND_SPAN));
+  const base = FARM_SURVIVAL_AT_GATE + (1 - FARM_SURVIVAL_AT_GATE) * band;
+  const bonuses =
+    (compost ? FARM_SURVIVAL_COMPOST_BONUS : 0) + (watch ? FARM_SURVIVAL_WATCH_BONUS : 0);
+  return Math.min(1, base + bonuses);
+}
+
+/** Whether a plot's pre-rolled outcome beats the ramp above. THE one
+ *  definition: the projection's `withered` status and the harvest's payout
+ *  both call it, so a plot can never read as ready and then pay husks.
+ *
+ *  An ABSENT survivalRoll survives. That case is unreachable for a plot this
+ *  engine planted (plantCrop always writes both hidden slots, and the load
+ *  side DERIVES a replacement for a missing one rather than dropping it), and
+ *  where it is reachable at all the player-favorable answer is the right one:
+ *  a bug in our own hidden state must never destroy a real crop. */
+export function farmPlotSurvived(plot: PlotState, skill: number, cropTier: number): boolean {
+  if (!Number.isFinite(plot.survivalRoll)) return true;
+  return (
+    (plot.survivalRoll as number) < farmSurvivalChance(skill, cropTier, plot.compost, plot.watch)
+  );
+}
 
 // The public projection: the ONLY plot shape render/ui or the wire ever see.
 // Ids, flags and epoch-ms numbers only, never localized text.
@@ -76,9 +136,17 @@ export const EMPTY_FARM_PLOT_VIEWS: readonly FarmPlotView[] = Object.freeze([]);
 // key-set test. Rows are SORTED by bed id so the JSON form is a stable fplot
 // delta signature (the cprof sorted-signature precedent): Map insertion order
 // would otherwise vary with plant order and re-broadcast unchanged state.
+// `farmingSkill` and `cropTierOf` arrive as explicit arguments for the same
+// reason the allowlists do in farm_persist.ts: this stays a pure leaf, with no
+// content-table import, so a Vitest drives it without shipped content.
+// `cropTierOf` is passed as a module-level function reference (the caller uses
+// content/farm_crops.ts farmCropTier), never a fresh closure, because this
+// runs per session per tick on the snapshot path.
 export function projectFarmPlots(
   plots: ReadonlyMap<string, PlotState>,
   nowMs: number,
+  farmingSkill: number,
+  cropTierOf: (cropId: string) => number,
 ): readonly FarmPlotView[] {
   if (plots.size === 0) return EMPTY_FARM_PLOT_VIEWS;
   const rows: FarmPlotView[] = [];
@@ -92,7 +160,15 @@ export function projectFarmPlots(
       watch: p.watch,
       tonic: p.tonic,
       notified: p.notified,
-      status: nowMs < p.readyAtMs ? 'growing' : 'ready',
+      // The survival read is gated behind the deadline so the hidden pre-roll
+      // stays unobservable while the plot grows: a doomed crop is
+      // indistinguishable from a healthy one right up to its ready time.
+      status:
+        nowMs < p.readyAtMs
+          ? 'growing'
+          : farmPlotSurvived(p, farmingSkill, cropTierOf(p.cropId))
+            ? 'ready'
+            : 'withered',
     });
   }
   rows.sort((a, b) => (a.bedId < b.bedId ? -1 : a.bedId > b.bedId ? 1 : 0));

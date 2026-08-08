@@ -53,6 +53,73 @@ export const FARM_MAX_GROW_MS = 7 * 24 * 60 * 60 * 1000;
 
 const finite = (n: number | undefined): n is number => typeof n === 'number' && Number.isFinite(n);
 
+// The hidden-slot domains, stated once so the write side, the load-side clamp
+// and the derivation below cannot disagree about them. survivalRoll is a
+// uniform [0, 1) exactly like ctx.rng.next() produces; yieldSeed is a uint32.
+const SURVIVAL_ROLL_MAX = 1 - Number.EPSILON;
+const YIELD_SEED_MODULUS = 0x100000000;
+
+/** FNV-1a over a short ASCII key, as a uint32. Not a hash for security and
+ *  not a source of randomness: it is a deterministic EXPANSION used to replace
+ *  a hidden slot a save lost, so that loss can never become a reroll
+ *  primitive (see deriveHiddenSlots). */
+function fnv1a(s: string): number {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < s.length; i++) {
+    h ^= s.charCodeAt(i);
+    h = Math.imul(h, 0x01000193);
+  }
+  return h >>> 0;
+}
+
+/** The replacement hidden slots for a row that lost one, derived from the
+ *  plot's own identity (bed id plus its final plant time).
+ *
+ *  DERIVED, NEVER RE-ROLLED. A fresh ctx.rng draw here would break the
+ *  determinism contract outright: it would put a draw on the LOAD path, where
+ *  the contract says zero, and every reload of the same save would answer
+ *  differently.
+ *
+ *  BE PRECISE ABOUT WHAT THIS DEFENDS, because the obvious stronger claim is
+ *  false. What derivation buys is that ACCIDENTAL slot loss (a JSON null, a
+ *  truncated write, a legacy row) resolves deterministically and cannot be
+ *  farmed by REPLAY: reloading the same bytes forever returns the same
+ *  outcome. It does NOT make a plot tamper-proof against a writer with direct
+ *  blob access, and it was wrong to imply it did. The key includes
+ *  plantedAtMs, so someone who can blank a slot can also nudge the anchor by a
+ *  millisecond and draw again, as often as they like. That is not a hole this
+ *  function can close: an attacker editing the JSONB has already fully
+ *  compromised the character, and what actually bounds them is the surrounding
+ *  anti-tamper set (the bed and crop allowlists, the duration ceiling, the
+ *  domain clamps below), not the derivation.
+ *
+ *  Keyed off the FINAL plantedAtMs (post re-anchor), which is the anchor
+ *  actually stored, so a save/load round trip of a derived row is a fixed
+ *  point. The two slots use different key suffixes so they cannot correlate. */
+export function deriveHiddenSlots(
+  bedId: string,
+  plantedAtMs: number,
+): { survivalRoll: number; yieldSeed: number } {
+  return {
+    survivalRoll: fnv1a(`${bedId}:${plantedAtMs}:survival`) / YIELD_SEED_MODULUS,
+    yieldSeed: fnv1a(`${bedId}:${plantedAtMs}:yield`),
+  };
+}
+
+/** Clamp a saved survivalRoll into [0, 1), the domain ctx.rng.next() draws
+ *  from. A hand-edited -5 or 2 would otherwise make a crop deterministically
+ *  survive or fail regardless of skill. */
+function clampSurvivalRoll(v: number): number {
+  return Math.min(SURVIVAL_ROLL_MAX, Math.max(0, v));
+}
+
+/** Floor a saved yieldSeed to an integer and clamp it into [0, 2^32). The
+ *  harvest expands it through a uint32 generator, so a fractional or
+ *  out-of-range value would silently alias onto another seed's stream. */
+function clampYieldSeed(v: number): number {
+  return Math.min(YIELD_SEED_MODULUS - 1, Math.max(0, Math.floor(v)));
+}
+
 /** Snapshot the live plot map as persisted rows. Returns undefined when no bed
  *  is planted (zero-default omission), so a character who has never farmed
  *  serializes byte-identically to a save made before the field existed.
@@ -103,14 +170,26 @@ export function serializeFarmPlots(
  *
  *  Always returns a FRESH map, so an absent field loads to the no-plots
  *  default and no caller can alias the saved object. */
-/** Count hidden slots (survivalRoll / yieldSeed) that normalizeFarmPlots
- *  dropped from SURVIVING rows: present in the saved row but non-finite (a
- *  JSON null, a string, NaN), so the row loads clean while the slot silently
- *  vanishes. Operator signal only, consumed by the load-site console.warn:
- *  the row counter cannot see this family, and the growth phase needs slot
- *  loss visible in logs before it derives replacements (the state.md
- *  handoff rule: derive deterministically, never re-roll). Rows normalize
- *  dropped entirely are the row counter's job, not this one's. */
+/** Count hidden slots (survivalRoll / yieldSeed) that normalizeFarmPlots could
+ *  not take at face value on a SURVIVING row, so the row loads clean while the
+ *  outcome it carried is no longer the one originally rolled. Two families,
+ *  both of which the row counter is blind to:
+ *
+ *  1. UNUSABLE: present but non-finite (a JSON null, a string, NaN). Replaced
+ *     by deriveHiddenSlots.
+ *  2. OUT OF DOMAIN: present, finite, and outside the range the live draw can
+ *     produce (a survivalRoll of 5 or -1, a fractional or 2^40 yieldSeed).
+ *     Silently corrected by the clamps. This family is the one the clamps
+ *     EXIST to defeat, which makes it the likeliest deliberate tamper of the
+ *     two, so leaving it out of the operator signal would have hidden exactly
+ *     the case worth seeing.
+ *
+ *  Operator signal only, consumed by the load-site console.warn.
+ *
+ *  An ABSENT slot is deliberately NOT counted, and that asymmetry is the
+ *  point: it derives exactly like a corrupt one, but absence is also the shape
+ *  of every row written before the growth phase existed, so counting it would
+ *  turn an ordinary legacy load into a tamper warning on every boot. */
 export function countDroppedHiddenSlots(
   saved: Record<string, PersistedFarmPlot> | undefined,
   loaded: ReadonlyMap<string, PlotState>,
@@ -119,10 +198,21 @@ export function countDroppedHiddenSlots(
   let dropped = 0;
   for (const [bedId, row] of Object.entries(saved)) {
     if (!row || typeof row !== 'object' || !loaded.has(bedId)) continue;
-    if (row.survivalRoll !== undefined && !finite(row.survivalRoll)) dropped++;
-    if (row.yieldSeed !== undefined && !finite(row.yieldSeed)) dropped++;
+    if (slotWasReplaced(row.survivalRoll, clampSurvivalRoll)) dropped++;
+    if (slotWasReplaced(row.yieldSeed, clampYieldSeed)) dropped++;
   }
   return dropped;
+}
+
+/** True when a saved slot did not survive the load AS WRITTEN: absent slots
+ *  are excluded (see the doctrine above), non-finite ones were derived, and a
+ *  finite one counts exactly when the clamp CHANGED it. Asking the clamp
+ *  itself, rather than restating its bounds, is what keeps this counter honest
+ *  if a domain ever moves. */
+function slotWasReplaced(v: number | undefined, clamp: (n: number) => number): boolean {
+  if (v === undefined) return false;
+  if (!finite(v)) return true;
+  return clamp(v) !== v;
 }
 
 export function normalizeFarmPlots(
@@ -147,26 +237,57 @@ export function normalizeFarmPlots(
     // anchor moves, so a row that is both over-long and future-dated cannot
     // launder its excess duration past the ceiling.
     //
-    // The `nowMs > 0` guard keeps the re-anchor from writing an anchor this
-    // same function would drop on the NEXT load: a fresh offline Sim reports
-    // lockoutNowMs 0 before it has ticked, and clamping to 0 would make every
-    // row survive exactly one round trip. A non-positive (or non-finite)
-    // clock skips the re-anchor and the row keeps its saved anchor, which
-    // still reads as growing; nothing can have been planted on that host yet.
+    // ONE anchor rule for every host with a REAL clock, resolved deliberately
+    // by the growth phase. The re-anchor floors at 1 rather than skipping on a
+    // non-positive clock, which is what the `nowMs > 0` guard used to do. That
+    // guard existed to stop the re-anchor writing an anchor this same function
+    // would drop on the NEXT load (a fresh offline Sim reports lockoutNowMs 0
+    // before it has ticked, and a plantedAtMs of 0 fails the positivity arm
+    // above), but it bought that at the price of two DISAGREEING load paths: a
+    // fresh-Sim load kept a future-dated anchor while a post-tick load of the
+    // same bytes re-anchored it. Flooring at 1 keeps the round-trip property
+    // the guard was protecting (1 is positive, so the row survives every
+    // subsequent load, and an already-re-anchored row is not > 1 and so stays
+    // put) while giving both paths the same semantics: a future plant time
+    // always re-anchors and keeps its already-clamped duration.
+    //
+    // A NON-FINITE CLOCK SKIPS THE RE-ANCHOR ENTIRELY, and that arm is not
+    // symmetry for its own sake. Folding NaN into the floor would re-anchor
+    // EVERY row to 1 and persist it, which on any host reading a real epoch
+    // clock puts readyAtMs back in 1970 and makes every crop in the world
+    // instantly ready: a silent, saved, total loss of growth state. Preserving
+    // the saved anchors is the strictly safer answer when the clock cannot be
+    // trusted, and it is what the old guard did by accident in exactly these
+    // cases. Defensive only, and unreachable today: all four server injections
+    // pass Date.now, and the offline default counts from zero.
+    const anchorNow = finite(opts.nowMs) ? Math.max(opts.nowMs, 1) : null;
     const plantedAtMs =
-      opts.nowMs > 0 && row.plantedAtMs > opts.nowMs ? opts.nowMs : row.plantedAtMs;
+      anchorNow !== null && row.plantedAtMs > anchorNow ? anchorNow : row.plantedAtMs;
+    // Hidden slots are HARD-GATED here, the one place hand-edited JSONB
+    // enters. A present slot clamps into its domain; an absent or unusable one
+    // DERIVES a deterministic replacement from the row's own identity
+    // (deriveHiddenSlots above), never a fresh roll, so a blanked slot is not
+    // a reroll primitive. The row is never dropped for a bad slot: that would
+    // destroy a real crop over a field the player cannot see.
+    //
+    // Derived LAZILY: the overwhelming case is a row whose two slots are both
+    // finite, where the derivation would be two FNV walks plus an allocation
+    // per plot, computed and thrown away. Every load of every character with
+    // plots pays that, so the one-shot memo keeps the common path free while
+    // the two arms below still share ONE derivation when either needs it.
+    let derived: { survivalRoll: number; yieldSeed: number } | null = null;
+    const derive = () => {
+      derived ??= deriveHiddenSlots(bedId, plantedAtMs);
+      return derived;
+    };
     out.set(bedId, {
       cropId: row.cropId,
       plantedAtMs,
       readyAtMs: plantedAtMs + duration,
-      // A corrupt hidden slot drops the SLOT, never the row: dropping the
-      // plot instead would destroy a real crop over a field the player cannot
-      // see. The growth phase fills an absent slot by DERIVING a
-      // deterministic replacement (bed id plus plantedAtMs, the state.md
-      // handoff rule), never a fresh roll, so a dropped slot is not a reroll
-      // primitive.
-      ...(finite(row.survivalRoll) ? { survivalRoll: row.survivalRoll } : {}),
-      ...(finite(row.yieldSeed) ? { yieldSeed: row.yieldSeed } : {}),
+      survivalRoll: finite(row.survivalRoll)
+        ? clampSurvivalRoll(row.survivalRoll)
+        : derive().survivalRoll,
+      yieldSeed: finite(row.yieldSeed) ? clampYieldSeed(row.yieldSeed) : derive().yieldSeed,
       compost: row.compost === true,
       watch: row.watch === true,
       tonic: row.tonic === true,

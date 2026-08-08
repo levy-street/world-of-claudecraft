@@ -57,6 +57,7 @@ import {
   dist2d,
   ENCHANT_CAST_ID,
   FACING_HOLD_DIST,
+  FARMING_CAST_ID,
   FISHING_CAST_ID,
   GATHER_CAST_ID,
   isFormAuraKind,
@@ -455,6 +456,17 @@ export function updateCasting(ctx: SimContext, p: Entity, meta: PlayerMeta): voi
       ctx.completeRechargeCast(p, meta);
       return;
     }
+    // Planting cast completion (Farming): DELIBERATELY DISPATCHES NOTHING.
+    // Every other arm above routes to the module that resolves its outcome;
+    // farming's plant resolves at COMMAND time (professions/farming.ts
+    // plantCrop writes the plot, consumes the seed and pre-rolls the growth
+    // script before the cast even starts), so the cast is pure flavor and
+    // this arm exists only to return before fireQueuedCast, exactly like its
+    // neighbours. The generic cast-field clearing above (castingAbility,
+    // castRemaining) plus the castStop already emitted is the whole
+    // completion. The consequence is the point: damage cancelling the cast
+    // leaves the plant standing, because the crop was already in the ground.
+    if (castId === FARMING_CAST_ID) return;
     // Ice Floes (mage choice row): a COMPLETED hard cast spends one protected
     // use whether or not the caster actually moved (the buff is a banked
     // window, not a refund). Fishing above never spends one. Draws no rng.
