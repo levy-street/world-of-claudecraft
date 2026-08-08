@@ -137,6 +137,15 @@ export const SALVAGE_CAST_ID = 'salvaging';
 // activity-marker shape as craft/enchant-family. Separate id keeps cast-bar
 // labels and audio routing clean.
 export const TOOL_RECHARGE_CAST_ID = 'tool_recharge';
+// The planting cast sentinel (Farming, the growth-engine phase): same
+// activity-marker shape as the craft/gather family. UNLIKE every other
+// sentinel here, this cast decides NOTHING: plantCrop resolves the whole
+// plant at command time and the cast is pure flavor, so its completion arm in
+// combat/casting_lifecycle.ts dispatches no work (see the comment there).
+// Membership in isNonSpellCast below is what buys it the shared bundle
+// (silence exemption, no spell queue, damage cancels instead of pushing back,
+// item use blocked while it runs).
+export const FARMING_CAST_ID = 'farming';
 // The non-spell casts: castingAbility sentinels that are activities, not
 // abilities. They share one semantics bundle at the casting choke points:
 // exempt from silence and school lockouts, no blink-through, no spell queue,
@@ -152,7 +161,8 @@ export function isNonSpellCast(castId: string | null): boolean {
     castId === DISENCHANT_CAST_ID ||
     castId === ENCHANT_CAST_ID ||
     castId === SALVAGE_CAST_ID ||
-    castId === TOOL_RECHARGE_CAST_ID
+    castId === TOOL_RECHARGE_CAST_ID ||
+    castId === FARMING_CAST_ID
   );
 }
 // Seconds an empty instance idles before it resets. Shared by the dungeon instance
@@ -5639,6 +5649,53 @@ export type SimEvent = { pid?: number } & (
       celebrantName: string;
       pairId: string;
       zoneId: string;
+    }
+  // Farming: a crop went into a bed (the growth-engine phase). Personal
+  // (pid = the farmer) and text-free on purpose (the gatherResult idiom): the
+  // client logs its own localized line off the ids. Carries no timing, because
+  // the plot projection (the fplot wire key) already serves readyAtMs and is
+  // the ONE place growth deadlines reach a client.
+  | { type: 'farmPlanted'; pid: number; bedId: string; cropId: string }
+  // Farming: a ready plot was harvested. `count` is the base-grade produce
+  // granted and `fineCount` the fine-grade twin; the two together are the
+  // picks the harvest-lives roll resolved, since a fine roll UPGRADES a pick
+  // rather than adding one. Both fine fields are absent when no pick upgraded
+  // (the effectDepleted precedent: an absent optional keeps the common event
+  // byte-identical to the pre-field wire). Text-free (the gatherResult idiom).
+  | {
+      type: 'farmHarvested';
+      pid: number;
+      bedId: string;
+      cropId: string;
+      itemId: string;
+      count: number;
+      fineItemId?: string;
+      fineCount?: number;
+    }
+  // Farming: a plot that lost its survival pre-roll was cleared, paying
+  // `count` withered husks instead of produce. Emitted at HARVEST, never at
+  // the growth deadline: nothing rots and no timer fires, so the player learns
+  // the outcome when they come to collect. Text-free (the gatherResult idiom).
+  | { type: 'farmWithered'; pid: number; bedId: string; cropId: string; count: number }
+  // Farming: a plant or harvest was refused. Personal and text-free (the
+  // gatherDenied idiom): the client composes its own localized copy off
+  // `reason`. `bedId` and `cropId` are present exactly when the refused
+  // command named them, so the earliest arms (a bed id that is not a bed) can
+  // still say which id was rejected.
+  | {
+      type: 'farmDenied';
+      pid: number;
+      reason:
+        | 'bad_bed'
+        | 'bad_crop'
+        | 'range'
+        | 'bed_taken'
+        | 'skill'
+        | 'no_seed'
+        | 'not_ready'
+        | 'no_plot';
+      bedId?: string;
+      cropId?: string;
     }
 );
 

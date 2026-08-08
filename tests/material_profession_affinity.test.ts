@@ -11,6 +11,27 @@ import { craftIdsForMaterialItem } from '../src/sim/material_profession_affinity
 import { MATERIAL_ITEM_IDS } from '../src/sim/material_taxonomy';
 import { baseMaterialFor, MATERIAL_GRADES } from '../src/sim/professions/material_grades';
 
+// The ONE sanctioned exception to the no-orphan-reagents census below:
+// farming's four items are honest materials whose craft consumers are
+// DELIBERATELY deferred, under the packet's same-phase-consumer ruling (D11).
+// The growth-engine phase ships a minimal crop slice so the engine can be
+// driven end to end; the husks are consumed by the knobs phase's convert
+// command, and the produce by the dishes phase, which closes this list. Until
+// then the items are still market-listable and vendor-sellable, so no stack is
+// truly unexplained, only uncrafted.
+//
+// Enumerated rather than silenced, the ITEM_ART_PENDING discipline: the two
+// arms after the census hold the line from both sides (a stale entry reds once
+// its consumer lands, and the set is pinned exactly so it cannot grow quietly
+// to absorb a genuinely orphaned material). Do NOT add an id here to make a
+// red go away; author its consumer, or argue the classification.
+const CONSUMER_DEFERRED_MATERIALS: readonly string[] = [
+  'fine_vale_wheat',
+  'vale_wheat',
+  'vale_wheat_seed',
+  'withered_husks',
+];
+
 describe('craftIdsForMaterialItem', () => {
   it('names the crafts that consume Rough Hide (the player-facing exemplar)', () => {
     // Leatherworking is the home craft; armorcrafting and weaponcrafting also
@@ -72,11 +93,40 @@ describe('craftIdsForMaterialItem', () => {
     // reagent union; if a material has zero craft consumers the Used-by line
     // cannot fire and the bag stack is unexplained. Pin completeness here.
     for (const itemId of MATERIAL_ITEM_IDS) {
+      if (CONSUMER_DEFERRED_MATERIALS.includes(itemId)) continue;
       expect(
         craftIdsForMaterialItem(itemId).length,
         `${itemId} must have a craft consumer`,
       ).toBeGreaterThan(0);
     }
+  });
+
+  // The two arms that keep the exception list above honest, in BOTH
+  // directions. Without them an id could be parked here forever, or a
+  // genuinely orphaned material could be added to silence a real failure.
+  it('every consumer-deferred id is a real material that genuinely has none yet', () => {
+    for (const itemId of CONSUMER_DEFERRED_MATERIALS) {
+      // Still a material: an id that fell out of the taxonomy has no business
+      // holding an exemption from a census it is no longer subject to.
+      expect(MATERIAL_ITEM_IDS.has(itemId), `${itemId} is no longer a material`).toBe(true);
+      // Still consumerless: the moment its owning phase lands a recipe, this
+      // reds and the id must leave the list rather than keep a free pass.
+      expect(
+        craftIdsForMaterialItem(itemId),
+        `${itemId} HAS a consumer now: drop it from CONSUMER_DEFERRED_MATERIALS`,
+      ).toEqual([]);
+    }
+  });
+
+  it('pins the deferred set exactly, so it can never grow quietly', () => {
+    // An exact-set pin rather than a size floor: absorbing a future orphan
+    // into this list must be a deliberate, reviewed edit naming its phase.
+    expect([...CONSUMER_DEFERRED_MATERIALS].sort()).toEqual([
+      'fine_vale_wheat',
+      'vale_wheat',
+      'vale_wheat_seed',
+      'withered_husks',
+    ]);
   });
 
   it('every recipe professionId is a craft the affinity can name', () => {

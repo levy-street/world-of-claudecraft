@@ -10,6 +10,10 @@ import { ITEMS } from '../src/sim/data';
 import { itemDisplayName } from '../src/ui/entity_i18n';
 import {
   craftedLineKey,
+  farmFineLineKey,
+  farmHarvestLineKey,
+  farmPlantedTokenId,
+  farmWitheredLineKey,
   gatherLineKey,
   grantItemToken,
   grantQtyText,
@@ -164,5 +168,75 @@ describe('the quantity-variant key selectors', () => {
     expect(new Set(harvestKeys).size).toBe(3);
     expect(harvestKeys).not.toContain(gatherLineKey(1));
     expect(harvestKeys).not.toContain(gatherLineKey(2));
+  });
+
+  it('farmPlantedTokenId resolves a crop to the SEED it consumed, not to the crop id', () => {
+    // The happy path, pinned to the shipped literal: the plant line must name
+    // the seed. `not.toBe(cropId)` is the arm that matters as much as the
+    // literal, because the fallback below returns the crop id unchanged, so an
+    // implementation that lost the lookup entirely would still satisfy a
+    // fallback-only test.
+    expect(farmPlantedTokenId('vale_wheat')).toBe('vale_wheat_seed');
+    expect(farmPlantedTokenId('vale_wheat')).not.toBe('vale_wheat');
+    // And the resolved id is a REAL item, which is what keeps grantItemToken
+    // on its link path instead of degrading to a raw id in a player's log.
+    expect(ITEMS[farmPlantedTokenId('vale_wheat')]).toBeTruthy();
+  });
+
+  it('farmPlantedTokenId falls back to the crop id itself for an unknown crop', () => {
+    // Content drift between a client and a newer server. The fallback names
+    // SOMETHING rather than splicing an empty string, which is the whole
+    // reason it is not `?? ''`. The prototype key is included because
+    // farmCropById guards with Object.hasOwn precisely so 'constructor' cannot
+    // resolve to a function and pass a truthiness gate.
+    expect(farmPlantedTokenId('not_a_crop')).toBe('not_a_crop');
+    expect(farmPlantedTokenId('constructor')).toBe('constructor');
+    expect(farmPlantedTokenId('')).toBe('');
+    // Anti-vacuous: this arm really is the degrade path, i.e. the id it
+    // returns is NOT a real item, which is what grantItemToken then renders as
+    // plain text instead of a link.
+    expect(ITEMS.not_a_crop).toBeFalsy();
+  });
+
+  it('the three farming selectors switch families exactly at 2, absent included', () => {
+    // Same boundary as every sibling family above. An absent count reads as
+    // one unit, which is the arm that would otherwise render a bare "x" from
+    // grantQtyText's own default.
+    expect(farmHarvestLineKey(undefined)).toBe('hudChrome.farming.harvestLine');
+    expect(farmHarvestLineKey(1)).toBe('hudChrome.farming.harvestLine');
+    expect(farmHarvestLineKey(2)).toBe('hudChrome.farming.harvestLineQty');
+    expect(farmHarvestLineKey(12)).toBe('hudChrome.farming.harvestLineQty');
+    expect(farmFineLineKey(undefined)).toBe('hudChrome.farming.harvestFineLine');
+    expect(farmFineLineKey(1)).toBe('hudChrome.farming.harvestFineLine');
+    expect(farmFineLineKey(2)).toBe('hudChrome.farming.harvestFineLineQty');
+    expect(farmWitheredLineKey(1)).toBe('hudChrome.farming.witheredLine');
+    expect(farmWitheredLineKey(2)).toBe('hudChrome.farming.witheredLineQty');
+  });
+
+  it('farming produce, its fine twin, and the husk payout never share a key', () => {
+    // Three DIFFERENT items land from one crop cycle, and the whole reason
+    // the fine twin and the husks have their own lines is that folding any
+    // two together reads as one yield reported twice (or, for the husks, as
+    // a reward). A copy/paste that pointed two of these at one family would
+    // leave every other pin in this file green.
+    const farmKeys = [
+      farmHarvestLineKey(1),
+      farmHarvestLineKey(2),
+      farmFineLineKey(1),
+      farmFineLineKey(2),
+      farmWitheredLineKey(1),
+      farmWitheredLineKey(2),
+    ];
+    expect(new Set(farmKeys).size).toBe(6);
+    // And never the gather or corpse-harvest families either: those matchers
+    // still own "You gather:" / "You harvest:" for their own surfaces.
+    for (const shared of [
+      gatherLineKey(1),
+      gatherLineKey(2),
+      harvestLineKey({ kind: 'plain', qty: 1 }),
+      harvestLineKey({ kind: 'specimen', qty: 1 }),
+    ]) {
+      expect(farmKeys).not.toContain(shared);
+    }
   });
 });

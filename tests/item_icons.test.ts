@@ -277,9 +277,16 @@ describe('item webp icons', () => {
     for (const id of ITEM_ART_PENDING) {
       expect(itemImageUrl(id), `${id} must not resolve to uncommitted art`).toBeNull();
     }
-    expect(ITEM_ART_PENDING.size, 'the accepted painted-art wave clears all enumerated debt').toBe(
-      0,
-    );
+    // The size pin is what stops the list becoming a dumping ground: it must be
+    // re-pinned deliberately, in the change that enumerates the debt, never
+    // grown quietly. The painted-art wave cleared this to 0; the farming
+    // growth-engine phase re-opened it for its four items, which are dormant
+    // online (no seed faucet exists yet) and whose art is scheduled as its own
+    // later phase. It must fall back to 0 as that art lands.
+    expect(
+      [...ITEM_ART_PENDING].sort(),
+      'art debt is enumerated and re-pinned deliberately, never grown quietly',
+    ).toEqual(['fine_vale_wheat', 'vale_wheat', 'vale_wheat_seed', 'withered_husks']);
     // And the inverse: an id with committed art must still win the static url.
     expect(itemImageUrl('linen_pouch')).toBe('/ui/items/linen_pouch.webp');
   });

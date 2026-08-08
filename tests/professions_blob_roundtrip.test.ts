@@ -129,13 +129,18 @@ const populatedSim = (): Sim => {
   meta.guildLetterSent = true;
   // One fully-populated plot on a REAL bed and crop id (the load-side
   // allowlists are shipped content, so a fixture id would be dropped and
-  // fail the presence pin). Anchors below the sim's zero clock are safe for
-  // the layer-2 fixed point: these arms load at sim.time 0, where the
-  // re-anchor guard in normalizeFarmPlots is a documented no-op.
+  // fail the presence pin). The anchor is 1, not a round number, and that is
+  // load-bearing for the FIXED POINT: these arms load at sim.time 0, where
+  // normalizeFarmPlots re-anchors any plant time above its floor of 1 (the
+  // growth phase's one anchor rule, which replaced a zero-clock guard that
+  // used to let a future-dated row through unchanged on this path alone). At
+  // exactly 1 the row is already at rest, so the blob crosses the load bound
+  // byte-faithfully; anything higher would re-anchor on the FIRST load and
+  // only settle on the second.
   meta.farmPlots.set('bed_eastbrook_1', {
-    cropId: 'wheat',
-    plantedAtMs: 1_000,
-    readyAtMs: 4_000,
+    cropId: 'vale_wheat',
+    plantedAtMs: 1,
+    readyAtMs: 3_001,
     survivalRoll: 0.25,
     yieldSeed: 123456,
     compost: true,

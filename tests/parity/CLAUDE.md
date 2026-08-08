@@ -104,18 +104,20 @@ confirmed each):
   else that must pin an unresolved roll needs the same trick. Extracting one of these should add a scenario that drives it (the
   precedents: `market_round_trip`, `bank_round_trip`, `dungeon_instances`) or sample
   the collection directly.
-- **A fishing SESSION is never driven.** Every fishing reference in this directory
-  hand-assigns `castingAbility = FISHING_CAST_ID` to exercise the `cancelCast` arm;
-  `startFishing` and `completeFishing` are called nowhere here, so no golden covers
-  the bite delay draw, the catch table draw, or the deny arms. Fishing IS
-  stream-visible (its table draws sit in the shared `sim.rng`), so a change to the
-  catch tables or the cast gates moves other subsystems' draw indices while every
-  golden here stays byte-identical. Read a green parity run as saying nothing about
-  fishing, and when you extract or re-tune it, add a scenario that runs a real cast,
-  bite and reel plus one denied cast. The live coverage today is
-  `tests/professions_fishing.test.ts` (literal catch sequences off a fixed seed) and
+- **Profession SESSIONS: two are driven, the rest are not.** `professions_fishing_session`
+  drives a real cast, bite and reel through `startFishing`/`completeFishing`, and
+  `farming_session` drives real plants and harvests through `plantCrop`/`harvestCrop`
+  (its growth window writes `readyAtMs` down rather than ticking 45 minutes, the
+  draw-free `/dev farmgrow` equivalence). Both pin their own draws. What is still
+  NOT driven is every other reference: the two casting-lifecycle scenarios hand-assign
+  `castingAbility = FISHING_CAST_ID` to exercise the `cancelCast` arm only, and no
+  scenario drives a profession's DENY arms. Those denials are draw-free by contract,
+  which is exactly why nothing here would notice one starting to draw, so a change to a
+  gate order still needs its own suite. The per-profession live coverage is
+  `tests/professions_fishing.test.ts` (literal catch sequences off a fixed seed),
+  `tests/professions_farming.test.ts` (the lifecycle plus the draw-count pins), and
   `tests/professions_deeds_playthrough.test.ts` (hunted indices across one shared
-  stream), not this gate.
+  stream); this gate pins the sessions, not the surface around them.
 - **Construction-time draws + ambient world mobs.** The `Rng` is born inside the Sim
   ctor, so ctor draws are not in the draw digest; ambient camp mobs are spawned but
   never tracked. A same-draw-count reorder of ctor spawns that changes only

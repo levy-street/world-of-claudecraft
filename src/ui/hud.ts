@@ -77,6 +77,7 @@ import { isItemLevelEligible, itemLevel, itemScore } from '../sim/item_level';
 import { requiredLevelFor } from '../sim/item_level_req';
 import type { Ante, PickAction } from '../sim/lockpick';
 import { petCanForceTaunt } from '../sim/pet/pet_taunt_gate';
+import { FARM_WITHERED_HUSK_ITEM_ID } from '../sim/professions/farming';
 import {
   computeRespecCost,
   FOCUS_POINT_BUDGET,
@@ -113,6 +114,7 @@ import {
   ENCHANT_CAST_ID,
   type Entity,
   FAERIE_FIRE_ARMOR_PCT,
+  FARMING_CAST_ID,
   FISHING_CAST_ID,
   GATHER_CAST_ID,
   type ItemDef,
@@ -298,6 +300,7 @@ import { gatheringProfessionNameKey } from './gathering_profession_name';
 import {
   buildGatheringProficiencyRows,
   buildGatherNodeTooltip,
+  farmDeniedLineKey,
   gatherDeniedLineKey,
   gatherDowngradeLineKey,
   gatherRareTierFor,
@@ -305,6 +308,10 @@ import {
 } from './gathering_view';
 import {
   craftedLineKey,
+  farmFineLineKey,
+  farmHarvestLineKey,
+  farmPlantedTokenId,
+  farmWitheredLineKey,
   gatherLineKey,
   grantItemToken,
   grantQtyText,
@@ -929,6 +936,7 @@ const PLAYER_TOOLTIP_VIEW_DEPS: PlayerTooltipI18n = {
 };
 const castDisplayName = (id: string): string => {
   if (id === FISHING_CAST_ID) return t('abilityUi.cast.fishing');
+  if (id === FARMING_CAST_ID) return t('abilityUi.cast.farming');
   if (id === GATHER_CAST_ID) return t('abilityUi.cast.gathering');
   if (id === CRAFT_CAST_ID) return t('abilityUi.cast.crafting');
   if (id === DISENCHANT_CAST_ID) return t('abilityUi.cast.disenchanting');
@@ -11818,6 +11826,67 @@ export class Hud {
           // fishingResult are mutually exclusive).
           this.showSelfNote(t('hudChrome.gathering.emptyHookNote'));
           audio.fishReel();
+          break;
+        }
+        case 'farmPlanted': {
+          // A crop went into a bed (Farming, the growth-engine phase). The
+          // event is text-free and id-carrying, so the pure core resolves
+          // which item the line names (the crop's seed, the one it consumed)
+          // and the crop-drift fallback with it. No cue: the plant cast has no
+          // recorded sound yet and the render / juice phase owns that, so a
+          // borrowed one would have to be undone.
+          this.log(
+            t('hudChrome.farming.plantLine', {
+              name: grantItemToken(farmPlantedTokenId(ev.cropId)),
+            }),
+            '#c8f7c5',
+          );
+          break;
+        }
+        case 'farmHarvested': {
+          // The produce a ready plot paid. These are the ONLY lines for the
+          // grant (the farming resolver emits its hub grants callerLogs, the
+          // #2430 one-line rule), so they carry the quantity. The fine-grade
+          // twin takes a second line for the same reason a Pristine specimen
+          // does: it is a different item granted BESIDE the plain produce, so
+          // one line would read as the same yield reported twice.
+          this.log(
+            t(farmHarvestLineKey(ev.count), {
+              name: grantItemToken(ev.itemId),
+              qty: grantQtyText(ev.count),
+            }),
+            '#7fdc4f',
+          );
+          if (ev.fineItemId !== undefined) {
+            this.log(
+              t(farmFineLineKey(ev.fineCount), {
+                name: grantItemToken(ev.fineItemId),
+                qty: grantQtyText(ev.fineCount),
+              }),
+              '#7fdc4f',
+            );
+          }
+          break;
+        }
+        case 'farmWithered': {
+          // The plot lost its survival pre-roll and paid husks instead. Grey,
+          // the no-cost-miss register (gotAwayLine): a withered crop costs the
+          // seed and the wait, never the bed, and the line says so plainly
+          // rather than dressing a failure as a yield.
+          this.log(
+            t(farmWitheredLineKey(ev.count), {
+              name: grantItemToken(FARM_WITHERED_HUSK_ITEM_ID),
+              qty: grantQtyText(ev.count),
+            }),
+            '#a8a8a8',
+          );
+          break;
+        }
+        case 'farmDenied': {
+          // A refused plant or harvest: an error toast ONLY, no line, no cue,
+          // no other state (the gatherDenied pattern). The sim event is
+          // text-free, so the pure core resolves one key per reason.
+          this.showError(t(farmDeniedLineKey(ev.reason)));
           break;
         }
         case 'gatherRareEvent': {

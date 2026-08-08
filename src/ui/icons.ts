@@ -4513,7 +4513,21 @@ export const UI_ITEM_IMAGE_IDS = new Set<string>(['backpack']);
 // the line from both sides: it rejects stale entries after art lands and unenumerated art
 // debt. Do not add to this list merely to silence that failure; commission the art.
 // Empty again after the hunter quiver art landed in the same branch that enumerated it.
-export const ITEM_ART_PENDING = new Set<string>();
+//
+// Re-opened by the farming growth-engine phase for its four items. This is the
+// "development-only item" case the paragraph above reserves the mechanism for, not a way to
+// silence the gate: farming is DORMANT ONLINE at this phase (no seed faucet exists, so no
+// player can hold any of these), the packet schedules farming art as its own later phase, and
+// committing placeholder binaries to turn the guard green would be the dishonest fix. Each id
+// therefore serves its procedural recipe through iconDataUrl instead of pointing an <img> at a
+// 404, and A2/A3 in tests/item_icons.test.ts keep the debt from outliving the art: A2 reds the
+// moment a .webp lands, and A3's size pin reds if this set grows without a deliberate re-pin.
+export const ITEM_ART_PENDING = new Set<string>([
+  'fine_vale_wheat',
+  'vale_wheat',
+  'vale_wheat_seed',
+  'withered_husks',
+]);
 
 /** Static URL of an item's (or a UI pseudo-item's) image icon, or null if it uses a recipe. */
 export function itemImageUrl(id: string): string | null {

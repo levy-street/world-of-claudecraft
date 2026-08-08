@@ -4,9 +4,9 @@ import type { FarmPlotStatus, FarmPlotView } from '../sim/professions/farm_proje
 export type { FarmPatchDef, FarmPlotStatus, FarmPlotView };
 
 // Farming, the fifth gathering profession: the static garden-bed geography
-// plus the caller's OWN plot state. READS ONLY as of the patches-and-plots
-// phase: planting, harvesting, growth and knobs land in later phases, so no
-// commands or events belong here yet.
+// plus the caller's OWN plot state, and the two growth-phase commands that
+// mutate it. The knob commands (compost, farmer's watch, growth tonic) land
+// in the knobs phase, so nothing but plant and harvest belongs here yet.
 //
 // THE WIRE PROJECTION NEVER CARRIES THE HIDDEN OUTCOME SLOTS OR THE YIELD
 // SEED. A plot's survival outcome and yield are pre-rolled server secrets
@@ -34,4 +34,26 @@ export interface IWorldFarming {
   // duration field (the RaidLockout msRemaining template), which lands with
   // the first timer surface.
   myFarmPlots: readonly FarmPlotView[];
+  // Sow `cropId` into the garden bed `bedId`. Server-authoritative in the
+  // strongest sense this profession has: the Sim re-validates the bed id
+  // against FARM_BED_IDS, the crop id against the crop catalog, that the bed
+  // is free FOR THIS PLAYER, the farming skill threshold, and that a seed is
+  // actually in the sender's bags (the hoe-tier and wield gates are DEFERRED
+  // to the crop-ladder phase: no farming tool kind exists yet),
+  // then consumes the seed and pre-rolls the WHOLE growth script (the hidden
+  // survival outcomes and the yield seed) in one contiguous rng block. The
+  // wire carries two ids and nothing else: no item payload, no roll, no
+  // deadline, so a client can neither choose its own outcome nor learn it.
+  // ClientWorld sends the plant_crop command and never predicts: the new plot
+  // row arrives on the `fplot` self delta and the outcome as a text-free
+  // id-carrying SimEvent.
+  plantCrop(bedId: string, cropId: string): void;
+  // Pull the crop out of the garden bed `bedId`. Same authority split: the
+  // Sim re-validates the bed id, that the plot is the SENDER'S, and that it
+  // is ready or withered, then resolves the yield from the pre-rolled hidden
+  // slots and grants produce (or withered husks) plus farming skill. Nothing
+  // about the yield is decided or previewed client-side, so a harvest cannot
+  // be re-rolled by replaying the command: the pre-roll happened at plant
+  // time and the plot is gone once this resolves.
+  harvestCrop(bedId: string): void;
 }

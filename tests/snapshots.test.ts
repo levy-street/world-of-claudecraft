@@ -3081,7 +3081,7 @@ describe('farm plot wire (fplot)', () => {
     const session = joinServer(server, fc, 1, 'Rowan');
     const meta = server.sim.meta(session.pid)!;
     meta.farmPlots.set('bed_eastbrook_1', {
-      cropId: 'wheat',
+      cropId: 'vale_wheat',
       plantedAtMs: 1_700_000_000_000,
       readyAtMs: FAR_FUTURE_MS,
       survivalRoll: 0.42,
@@ -3101,7 +3101,7 @@ describe('farm plot wire (fplot)', () => {
     // Positive first: the public fields carry what was planted, so the absence
     // assertions below cannot pass on an empty or defaulted payload.
     expect(row.bedId).toBe('bed_eastbrook_1');
-    expect(row.cropId).toBe('wheat');
+    expect(row.cropId).toBe('vale_wheat');
     expect(row.plantedAtMs).toBe(1_700_000_000_000);
     expect(row.readyAtMs).toBe(FAR_FUTURE_MS);
     expect(row.compost).toBe(true);
@@ -3779,7 +3779,7 @@ function dirtyEveryDeltaField(): {
   // readyAtMs sits far past the fixture's clock (the sim-time lockoutNowMs
   // seam, single-digit seconds in), so `status` is deterministically 'growing'.
   meta.farmPlots.set('bed_eastbrook_1', {
-    cropId: 'wheat',
+    cropId: 'vale_wheat',
     plantedAtMs: 1_700_000_000_000,
     readyAtMs: FAR_FUTURE_MS,
     survivalRoll: 0.42,
@@ -4210,7 +4210,7 @@ describe('full self-state snapshot delta fixture', () => {
     expect(client.myFarmPlots).toEqual([
       {
         bedId: 'bed_eastbrook_1',
-        cropId: 'wheat',
+        cropId: 'vale_wheat',
         plantedAtMs: 1_700_000_000_000,
         readyAtMs: FAR_FUTURE_MS,
         compost: true,

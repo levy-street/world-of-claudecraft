@@ -2715,6 +2715,25 @@ export const ko_KR: EnTranslations = {
       "respawnClock": "{minutes}:{seconds}",
       "fineGradePreview": "현재 도구로 채집하면 상급 등급을 얻습니다."
     },
+    "farming": {
+      "plantLine": "{name}을(를) 심었습니다.",
+      "harvestLine": "{name}을(를) 수확했습니다.",
+      "harvestLineQty": "{name} x{qty}을(를) 수확했습니다.",
+      "harvestFineLine": "또한 {name}을(를) 수확했습니다.",
+      "harvestFineLineQty": "또한 {name} x{qty}을(를) 수확했습니다.",
+      "witheredLine": "작물이 시들었습니다. 밭을 정리했습니다: {name}.",
+      "witheredLineQty": "작물이 시들었습니다. 밭을 정리했습니다: {name} x{qty}.",
+      "denied": {
+        "bad_bed": "그곳에는 작물밭이 없습니다.",
+        "bad_crop": "그것은 여기에 심을 수 없습니다.",
+        "range": "그 작물밭에서 너무 멀리 떨어져 있습니다.",
+        "bed_taken": "그곳에는 이미 작물이 자라고 있습니다.",
+        "skill": "그 작물을 재배하기에는 농사 숙련도가 부족합니다.",
+        "no_seed": "그 작물의 씨앗이 없습니다.",
+        "not_ready": "그 작물은 아직 자라는 중입니다.",
+        "no_plot": "그 밭에는 아무것도 심겨 있지 않습니다."
+      }
+    },
     "archetypeTitle": {
       "label": "칭호",
       "none": "없음",
@@ -8054,6 +8073,7 @@ export const ko_KR: EnTranslations = {
     },
     "cast": {
       "fishing": "낚시",
+      "farming": "파종",
       "gathering": "채집",
       "crafting": "제작",
       "disenchanting": "마력 추출",
@@ -11195,6 +11215,18 @@ export const ko_KR: EnTranslations = {
       },
       "pristine_claw": {
         "name": "온전한 발톱"
+      },
+      "vale_wheat_seed": {
+        "name": "골짜기 밀 씨앗"
+      },
+      "vale_wheat": {
+        "name": "골짜기 밀"
+      },
+      "fine_vale_wheat": {
+        "name": "상급 골짜기 밀"
+      },
+      "withered_husks": {
+        "name": "시든 껍질"
       },
       "conjured_water4": {
         "name": "창조된 샘물"

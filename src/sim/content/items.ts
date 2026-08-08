@@ -907,6 +907,61 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     quality: 'common',
     sellValue: 4,
   },
+  // Farming's tier-1 crop, the minimal end-to-end slice (the growth-engine
+  // phase): one seed, its produce, the fine twin a skill-scaled harvest roll
+  // upgrades a pick into, and the withered husks a failed crop pays out.
+  //
+  // VALUES ARE PROVISIONAL and flagged for the maintainer. The crop-ladder
+  // phase authors the other seven crops against this row's pricing and may
+  // re-tune it; the dishes phase prices produce against what it cooks into.
+  //
+  // CONSUMERS ARE DELIBERATELY DEFERRED, the packet's one sanctioned
+  // same-phase-consumer exception: husks feed the convert command in the knobs
+  // phase, produce feeds the dishes phase. Everything here is market-listable
+  // and vendor-sellable in the meantime, so nothing is a dead row.
+  //
+  // Seeds and husks carry NO buyValue on purpose: a vendor row without one
+  // renders and then refuses, and neither is meant to be vendor-obtainable
+  // yet. Seed stocking lands with the farmer NPCs. Produce follows the node
+  // materials' convention exactly (kind junk so it browses under the market's
+  // material filter, common quality so sellAllJunk never vendors it).
+  vale_wheat_seed: {
+    id: 'vale_wheat_seed',
+    name: 'Vale Wheat Seed',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 1,
+  },
+  vale_wheat: {
+    id: 'vale_wheat',
+    name: 'Vale Wheat',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 4,
+  },
+  // The fine twin, priced on the fine-material convention below: twice the
+  // base sellValue, with the 4x buyValue economy basis on top. It is NOT a
+  // MATERIAL_GRADES row (that table is the nine node yields and its suites pin
+  // it to exactly those); farming mints this through its own harvest roll.
+  fine_vale_wheat: {
+    id: 'fine_vale_wheat',
+    name: 'Fine Vale Wheat',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 8,
+    buyValue: 32,
+  },
+  // The failure payout: a crop that loses its survival roll pays these instead
+  // of produce, so a failed plot is a smaller reward rather than a punishment
+  // (the anti-chore thesis). The knobs phase turns them into the next
+  // attempt's insurance.
+  withered_husks: {
+    id: 'withered_husks',
+    name: 'Withered Husks',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 1,
+  },
   // Fine grades of the nine node materials (D8, the fine-material axis). A
   // harvest yields one of these INSTEAD of its base id when the player's tool
   // is strictly above the material's zone tier at a full-grade vein

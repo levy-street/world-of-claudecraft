@@ -468,13 +468,20 @@ describe('gathering profession proficiency (#1119)', () => {
   });
 });
 
-describe('farming is ungainable until its growth phase', () => {
-  // The phase 1 contract, frozen structurally: farming is registered
-  // everywhere the chassis looks but has NO gain path. The node grant path is
-  // keyed by NODE_HARVEST_TABLE (which must carry no farming node type), the
-  // tool path scans gatherTool items (none may name farming), and the fishing
-  // grant site hardcodes fishing. The growth phase deletes or inverts this
-  // pin when it ships the first farming gain path.
+describe('farming stays node-free and tool-free', () => {
+  // BOTH assertions still hold after the growth phase, and both are still
+  // worth pinning; only the reason changed. Farming's gain path is its own
+  // harvest command (professions/farming.ts queues through
+  // queueGatheringGrant), NOT a gather node and NOT a tool, which is the
+  // fishing-shaped rather than node-shaped integration the packet locked: a
+  // farming GatherNodeType would be conscripted into every zone by the R37
+  // coverage rule and the node placement suites.
+  //
+  // The no-gatherTool arm is now also what documents the DEFERRED hoe gate:
+  // plantCrop omits its canGatherTier call precisely because no farming
+  // gatherTool ships, so the honest ownership scan reports NO_TOOL_OWNED and
+  // a tier-1 check would refuse every plant. The crop-ladder phase adds the
+  // four hoes and the gate together, and inverts this arm's second half then.
   it('has no node type and no gather tool that could grant farming skill', () => {
     const nodeProfessions = Object.values(NODE_HARVEST_TABLE).map((e) => e.professionId);
     expect(nodeProfessions).not.toContain('farming');

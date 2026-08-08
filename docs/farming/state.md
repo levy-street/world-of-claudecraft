@@ -454,14 +454,31 @@ question does not arise (farming has no station).
   tests/snapshots.test.ts after EVERY release absorb into this branch: identical
   count-pin bumps on both sides auto-merge to a wrong total with no textual conflict
   (the char-sheet playtime precedent).
-- New SimEvents: (none yet; Phase 2 deliberately adds none, and NO plot state may
-  ever ride an event payload: the parity omit-defaults shield does not cover event
-  digests)
+  Phase 3: plantCrop(bedId, cropId) and harvestCrop(bedId) as method members on
+  IWorldFarming (both worlds; wire tokens plant_crop / harvest_crop); parity pins
+  moved 304 to 306 members, 225 to 227 methods (data 79 and facet count 33
+  unchanged; the two extra 304 literals near the union pins moved with them).
+- New SimEvents: Phase 3: farmPlanted { pid, bedId, cropId }, farmHarvested
+  { pid, bedId, cropId, itemId, count, fineItemId?, fineCount? } (an all-fine
+  harvest collapses the fine grant INTO the base fields so count is always
+  positive and the fine pair present means a genuinely mixed harvest),
+  farmWithered { pid, bedId, cropId, count }, farmDenied { pid, reason, bedId?,
+  cropId? } with reason 'bad_bed' | 'bad_crop' | 'range' | 'bed_taken' | 'skill'
+  | 'no_seed' | 'not_ready' | 'no_plot'. All text-free and pid-scoped; NO plot
+  state rides any payload (ids and counts only; the parity omit-defaults shield
+  does not cover event digests, and the farming_session golden digests these).
 - New wire keys: Phase 2: fplot (the self delta mirroring myFarmPlots; tslot-shaped
   emit with the pre-serialized empty arm; registered in ALL_DELTA_KEYS and
   TERSE_TO_IWORLD, count pin 67 to 68). The projection NEVER carries
   PlotState.survivalRoll or yieldSeed; the negative leak pin in tests/snapshots.test.ts
   drives the real selfWireJson broadcast with an exhaustive nine-key set assertion.
+  Phase 3: no new wire keys; the fplot EMIT moved behind the heavy-self gate now
+  that its non-empty arm is live (the "revisit if rows grow" trigger below,
+  tripped and resolved in-phase): plant_crop and harvest_crop joined
+  HEAVY_SELF_CMDS and farmPlanted joined HEAVY_SELF_EVENTS (kept deliberately
+  redundant with honest comments: wireRev already covers the successful paths
+  because both commands touch bags, but Phase 4's knob commands will mutate
+  plots WITHOUT an inventory change and need the command-side marking).
 - New i18n keys and matcher rows: Phase 1 added, all English-only catalog rows with
   five non-Latin overlay fills each (M16): hudChrome.gathering.farming,
   hudChrome.gathering.toolTierUnmet.farming, hudChrome.gathering.toolRequired.farming,
@@ -473,7 +490,25 @@ question does not arise (farming has no station).
   locale desc fills DROPPED per the deed_i18n release-refill protocol:
   prog_master_gatherer desc (18 locales). No matcher rows (nothing sim-side emits
   farming English).
-- New items/recipes/deeds: (none yet; Phase 1 deliberately adds none)
+  Phase 3 i18n: hudChrome.farming.* (15 keys: plantLine, harvestLine/Qty,
+  harvestFineLine/Qty, witheredLine/Qty, denied.{eight reason leaves keyed
+  VERBATIM off the farmDenied reason union by template literal, so a new reason
+  is a tsc error until its leaf exists}), abilityUi.cast.farming, four item-name
+  rows in the items catalog with full locale coverage, and the matcher row
+  error.castingPlanting for the one sim-side English sentence 'You are
+  planting.' (BASE_DICT locale fill deferred to release-time per the
+  contributor contract). All wordy values carry the five non-Latin fills (M16).
+- New items/recipes/deeds: Phase 3 items: vale_wheat_seed (sellValue 1, no
+  buyValue: seeds stay vendor-unobtainable until go-live), vale_wheat
+  (sellValue 4), fine_vale_wheat (sellValue 8, buyValue 32, fine-material
+  convention; deliberately NO MATERIAL_GRADES row, see deviation (o)),
+  withered_husks (sellValue 1). All kind junk quality common, classified as
+  materials via the derived FARM_MATERIAL_ITEM_IDS taxonomy source, sitting in
+  the affinity census's self-clearing CONSUMER_DEFERRED_MATERIALS list until
+  their consumers land (husks: Phase 4 convertHusks; produce: Phase 6 dishes).
+  Icons ride ITEM_ART_PENDING re-pinned as an exact four-id set. No recipes, no
+  deeds (deeds deferral verified sound against docs/design/deeds.md by the QA
+  gate: a growth engine is none of the conquerable-content kinds).
 - Locked deviations from phase files: Phase 1: (a) PENDING_ART_IDS allowlist in
   tests/profession_icons.test.ts (E2 demands art-backed production ids the packet
   did not anticipate; inverted assertions self-clear when the phase 13 art batch
@@ -524,10 +559,74 @@ question does not arise (farming has no station).
   re-mints the byte ceiling 10240 to 14336 and the floor 9280 to 13696 per that
   file's doctrine. ANY future phase touching PROFESSIONS_BLOB_FIELDS must edit
   BOTH suites in the same change.
-- Dev command surface: (Phase 3 records the exact /dev farm cheat names here at
-  completion; Phases 7 and 8 depend on them for dev-created crops)
+  Phase 3: (n) the crop id shipped as vale_wheat, closing (h): D11 wins over the
+  Phase 2 'wheat' placeholder, data-safe because nothing could plant; the three
+  fixture literals and FARM_CROP_IDS (now derived from the FARM_CROPS catalog in
+  the new src/sim/content/farm_crops.ts leaf) swept in the same change. (o) the
+  fine twin ships as an ordinary item with NO MATERIAL_GRADES row: that table is
+  pinned as exactly the nine NODE_MATERIAL_TABLE yields and its suite derives
+  from live node content, so D11's "(the MATERIAL_GRADES requirement)" clause is
+  unsatisfiable for a fishing-shaped profession; the fine roll lives in
+  farming's own harvest resolver. (p) the hoe-tier and wield gates are DEFERRED
+  to Phase 5, verified not assumed: farming registers no gatherTool,
+  bestOwnedGatherToolTierOrNone returns NO_TOOL_OWNED, canGatherTier(0, 1)
+  would refuse EVERY plant, and the R22 banner forbids the bare-hands-floored
+  scan for access decisions; the phase file's gate list and acceptance text
+  claiming the hoe gate are amended, and all three seam comments say deferred.
+  (q) the plant cast resolves AT COMMAND TIME and the cast is pure flavor (the
+  D4 command-body draw rule forces it; the completion-routing arm is
+  return-only; damage cancelling the cast leaves the plant standing); no
+  SimContext callback was added. (r) survival is evaluated against CURRENT
+  farming skill at read time (out-leveling retroactively retires risk, monotone
+  player-favorable; the locked PlotState shape has no room for plant-time
+  skill); projectFarmPlots takes farmingSkill and a cropTierOf function
+  reference to stay a pure leaf. (s) the farming_session golden was re-minted
+  TWICE in-phase, both for cause: the addItem silent/callerLogs fix moved the
+  event digest (the #2430 double-loot-line finding), and the write-side anchor
+  floor changed the tick-0 plant's plantedAtMs from the sampler-dropped 0 (a
+  recording of the destroy-on-load defect) to 1; zero pre-existing goldens
+  moved at any point. (t) the phase ran EIGHT reviewer verdicts (six domain
+  reviews, the QA gate, plus the full-suite gate fallback) and the census
+  suites the fallback caught (material_taxonomy, bag_filter, item_icons,
+  professions_silent_loot, localization_coverage, tick_perf_capture,
+  material_profession_affinity, material_taxonomy_bootstrap) were absorbed
+  in-phase: the taxonomy gained the derived FARM_MATERIAL_ITEM_IDS source, the
+  affinity census gained the self-clearing CONSUMER_DEFERRED_MATERIALS list,
+  and ITEM_ART_PENDING's size-0 pin became an exact-set pin.
+- Dev command surface: Phase 3 registers /dev farmgrow [bedId] (alias
+  /devfarmgrow [bedId]) in src/sim/dev_commands.ts behind ALLOW_DEV_COMMANDS:
+  with a bed id it advances that plot, without one it advances ALL of the
+  caller's plots; it sets readyAtMs to ctx.lockoutNowMs() only (plantedAtMs and
+  the hidden slots untouched, so it is not a reroll primitive), leaves
+  already-settled plots alone, counts only work actually done in its [dev]
+  summary, and draws nothing (pinned). /dev gather farming N already works
+  (Phase 1). The /dev GUI row (src/ui/dev_command_view.ts) is a Phase 7
+  deferral. Phases 7 and 8 depend on these for dev-created crops.
 - Growth-phase (Phase 3) handoff from the Phase 2 review round, decide these ON
-  PURPOSE rather than inherit them:
+  PURPOSE rather than inherit them. PHASE 3 RESOLUTION (2026-08-08), each item
+  below marked here rather than rewritten in place: anchor semantics DONE in
+  a8560344a2 (one-rule max(nowMs, 1) re-anchor pinned on BOTH load paths;
+  non-finite clocks SKIP the re-anchor entirely per the migration review; the
+  WRITE side floors its anchor at 1, the pair discovered in review); hidden-slot
+  clamps DONE in a8560344a2 (survivalRoll [0,1), yieldSeed uint32, absent slots
+  derive via FNV-1a over bedId:plantedAtMs, clamp-CHANGED slots feed the
+  operator warn, the derivation comment states the accidental-loss guarantee
+  honestly); plant-time bed-id validation DONE in a8560344a2 with the refusal
+  pinned; the runtime size signal DONE in 5e0e9ab766 (CHARACTER_BLOB_WARN_BYTES
+  131072 measured not guessed, warn-only, rate-limited, attempt-worded, at the
+  characterUpdateStatement chokepoint all three save paths share; the
+  disposable-PG TOAST/WAL measurement recipe was NOT run this phase, deferred
+  to Phase 3 QA if the db reviewer demands it); the per-tick fplot emit
+  RESOLVED in 5e0e9ab766 (moved behind the heavy-self gate, see the wire-keys
+  ledger); the deploy-order constraint CARRIED into DEPLOY.md in the docs
+  commit; the derived-duration msRemaining field STAYS DEFERRED to the first
+  timer UI (Phase 8; this phase ships no UI, the clock-base contract comment
+  remains the guard); admin visibility UNCHANGED (no farm section was added to
+  the inspector; the field-pick rule stands for whoever adds one); the
+  crop-table client-shipping check HOLDS (FARM_CROPS ships durationMs and tier,
+  both derivable from public wire state; the pre-rolls stay the only secret);
+  iteration order, read-identity asymmetry, and spectator notes all HELD
+  (nothing regressed them; the parity scenario and suites pin the first two).
   - The anchor semantics family: the farm_persist nowMs > 0 guard means an offline
     load at sim.time 0 keeps saved anchors while a post-tick load re-anchors (two
     offline load paths disagree), and offline growth restarts inflated rather than

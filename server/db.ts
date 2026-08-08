@@ -15,6 +15,7 @@ import { ADMIN_GUILDS_SCHEMA } from './admin_guilds_schema';
 import { APPLE_AUTH_SCHEMA } from './apple_auth_db';
 import { validCharName } from './auth';
 import type { BankBonusFacts } from './bank_entitlements';
+import { reportCharacterBlobSize } from './character_blob_size';
 import { seedChatFilterDefaults } from './chat_filter_db';
 import type { ChatLogRow } from './chat_log';
 import {
@@ -3218,6 +3219,35 @@ function characterUpdateStatement(
   stateJson: string,
   leaseNonce: string | undefined,
 ): { text: string; values: unknown[] } {
+  // The blob size signal lives HERE rather than in each caller, for the same
+  // reason the lease fence does: this is the one statement the whole save family
+  // issues, so measuring at the chokepoint covers the autosave, the market/mail
+  // escrow flush and the guild bank escrow flush at once, and a future fourth
+  // save path inherits it instead of quietly becoming a blind spot. Putting it
+  // in the callers would mean N places to remember and N chances to miss one.
+  //
+  // Yes, this makes an otherwise pure statement builder log. That is the
+  // deliberate trade: every call site is a real write attempt (there is no path
+  // that builds this statement and discards it unused).
+  //
+  // What a line here does NOT promise is that the row landed. The statement can
+  // still be rolled back for reasons unrelated to size: a lease-fence miss rolls
+  // back both escrow transactions below, a refused guild bank escrow aborts the
+  // whole transaction, and saveCharacterOnLeave retries up to
+  // LEAVE_SAVE_MAX_ATTEMPTS times with every attempt but the last having failed.
+  // The message says "attempted" for exactly that reason.
+  //
+  // WARN-ONLY, and the write is never gated on size: see
+  // server/character_blob_size.ts for why a character blob gets a signal where a
+  // guild bank book gets a hard bound. Nothing about the size can refuse,
+  // truncate, or skip the write. The reporter also dampens to one line per
+  // window, so a fleet-wide crossing cannot drown the log.
+  const sizeWarning = reportCharacterBlobSize(
+    characterId,
+    Buffer.byteLength(stateJson, 'utf8'),
+    Date.now(),
+  );
+  if (sizeWarning !== null) console.warn(sizeWarning);
   return leaseNonce === undefined
     ? {
         text: 'UPDATE characters SET level = $2, state = $3, updated_at = now() WHERE id = $1',

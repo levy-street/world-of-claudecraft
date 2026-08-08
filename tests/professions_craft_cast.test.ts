@@ -35,6 +35,7 @@ import {
   DISENCHANT_CAST_ID,
   ENCHANT_CAST_ID,
   type Entity,
+  FARMING_CAST_ID,
   isNonSpellCast,
   SALVAGE_CAST_ID,
   type SimEvent,
@@ -104,12 +105,20 @@ describe('profession cast sentinels', () => {
     expect(ENCHANT_CAST_ID).toBe('enchanting_apply');
     expect(SALVAGE_CAST_ID).toBe('salvaging');
     expect(TOOL_RECHARGE_CAST_ID).toBe('tool_recharge');
+    // The farming plant cast joins the same family: it is an activity marker,
+    // never an ability id, and its membership is what buys it the shared
+    // bundle (damage cancels instead of pushing back, no spell queue, item
+    // use blocked). Its completion arm dispatches nothing, because a plant
+    // resolves at command time, which is exactly why membership rather than
+    // routing is the load-bearing part here.
+    expect(FARMING_CAST_ID).toBe('farming');
     for (const id of [
       CRAFT_CAST_ID,
       DISENCHANT_CAST_ID,
       ENCHANT_CAST_ID,
       SALVAGE_CAST_ID,
       TOOL_RECHARGE_CAST_ID,
+      FARMING_CAST_ID,
     ]) {
       expect(isNonSpellCast(id), id).toBe(true);
     }

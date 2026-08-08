@@ -41,7 +41,7 @@ import {
   bestWieldableGatherToolTierOrNone,
   minWieldRequirementToWork,
 } from '../sim/professions/wield_gate';
-import { type GatherNodeDef, isConsuming } from '../sim/types';
+import { type GatherNodeDef, isConsuming, type SimEvent } from '../sim/types';
 import type { IWorld } from '../world_api';
 import type { TranslationKey } from './i18n.catalog';
 
@@ -362,6 +362,23 @@ export function gatherDowngradeLineKey(lost: 'mark' | 'find'): TranslationKey {
   return lost === 'find'
     ? 'hudChrome.gathering.downgradeFind'
     : 'hudChrome.gathering.downgradeMark';
+}
+
+/** Every reason a farming plant or harvest can be refused, taken FROM the
+ *  event rather than restated, so a reason added to the sim's union cannot
+ *  quietly miss its line: the selector below stops compiling until the catalog
+ *  carries a leaf named for it. */
+export type FarmDeniedReason = Extract<SimEvent, { type: 'farmDenied' }>['reason'];
+
+/** The i18n key a farmDenied SimEvent's error toast resolves. The sim is
+ *  text-free (the gatherDenied contract), and every reason has exactly one
+ *  line, so this is a template literal over the reason id itself rather than a
+ *  hand-written map: a map would be a second list free to drift from the
+ *  union, and this one cannot be. The catalog leaves are therefore named for
+ *  the reasons verbatim (snake_case, the `abilityUi.cast.tool_recharge`
+ *  precedent), not re-cased. */
+export function farmDeniedLineKey(reason: FarmDeniedReason): TranslationKey {
+  return `hudChrome.farming.denied.${reason}`;
 }
 
 /** Which layered rarity stinger (if any) a gather's loot event should play on

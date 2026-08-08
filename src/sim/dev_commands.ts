@@ -323,6 +323,57 @@ export function handleDevChat(
     return null;
   }
 
+  // Farming grow-now: bring a growing plot's deadline forward to right now, so
+  // a whole plant-grow-harvest cycle is walkable (and testable) without waiting
+  // out a real crop duration. WRITES STATE AND DRAWS NOTHING: it moves
+  // readyAtMs only, leaving plantedAtMs and the hidden pre-rolled outcome slots
+  // (survivalRoll, yieldSeed) exactly as plant time left them. That is the
+  // whole point, and it is load-bearing beyond convenience: the growth script
+  // is rolled ONCE at plant time, so "grow now" and "wait it out" must resolve
+  // to the identical harvest. The parity scenario states that equivalence, and
+  // the ready-notice and journal phases lean on this cheat to reach a ready
+  // plot in one step.
+  //
+  // A plot already at or past its deadline is left ALONE rather than restamped:
+  // it is already ready, and rewriting a settled timestamp would be a state
+  // change that buys nothing. With a bed argument the lookup is against the
+  // CALLER'S OWN plots, not FARM_BED_IDS: a perfectly real bed with nothing
+  // planted in it is the interesting refusal, and a bed allowlist would answer
+  // "fine" to it.
+  const farmGrowMatch = /^\/(?:dev\s+farmgrow|devfarmgrow)(?:\s+(\S+))?\s*$/i.exec(raw);
+  if (farmGrowMatch) {
+    const meta = ctx.players.get(pid);
+    if (!meta) return null;
+    const bedId = farmGrowMatch[1];
+    const nowMs = ctx.lockoutNowMs();
+    if (bedId !== undefined) {
+      const plot = meta.farmPlots.get(bedId);
+      if (!plot) {
+        ctx.error(pid, `[dev] No plot on bed '${bedId}'.`);
+        return null;
+      }
+      if (plot.readyAtMs > nowMs) plot.readyAtMs = nowMs;
+      emitDevLog(ctx, pid, `[dev] Bed ${bedId} is ready.`);
+      return null;
+    }
+    if (meta.farmPlots.size === 0) {
+      ctx.error(pid, '[dev] You have no planted beds.');
+      return null;
+    }
+    let advanced = 0;
+    for (const plot of meta.farmPlots.values()) {
+      if (plot.readyAtMs <= nowMs) continue;
+      plot.readyAtMs = nowMs;
+      advanced++;
+    }
+    emitDevLog(
+      ctx,
+      pid,
+      `[dev] Advanced ${advanced} farm plot${advanced === 1 ? '' : 's'} to ready (${meta.farmPlots.size} planted).`,
+    );
+    return null;
+  }
+
   const botMatch = /^\/(?:dev\s+bot|devbot)\s+(\S+)\s*$/i.exec(raw);
   if (botMatch) {
     const botName = botMatch[1];

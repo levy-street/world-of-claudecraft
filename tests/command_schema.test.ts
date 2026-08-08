@@ -47,8 +47,13 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // helmet-visibility eye; helmHidden persists per character like weaponStowed),
 // and inv_sort as a send + dispatch pair (the one-shot bag clean-up; no
 // payload, the sim re-derives the whole arrangement deterministically).
-const EXPECTED_SEND_COUNT = 192;
-const EXPECTED_DISPATCH_COUNT = 205;
+// This branch adds farming's growth phase as two send + dispatch pairs,
+// plant_crop and harvest_crop (sow a crop into a garden bed and pull it back
+// out). Both carry ids only: the seed cost, the pre-rolled growth script, the
+// deadline and the yield resolve sim-side, so neither frame has an item payload
+// for a client to forge.
+const EXPECTED_SEND_COUNT = 194;
+const EXPECTED_DISPATCH_COUNT = 207;
 const EXPECTED_DISPATCH_ONLY_COUNT = 13;
 
 // The chat sub-channel routing switch (server/game.ts `switch

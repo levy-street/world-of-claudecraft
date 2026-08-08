@@ -475,6 +475,12 @@ export const SIM_LAP_PHASES = [
   'market',
   'postOffice',
   'delayedEv',
+  // Farming's per-tick sweep (src/sim/professions/farming.ts updateFarming),
+  // appended in Sim.tick between delayedEv and deeds. Registered here in the
+  // SAME order the tick runs them: without the marker the profiler silently
+  // drops the phase's timing instead of erroring, so a regression in it would
+  // be invisible in the capture.
+  'farming',
   'deeds',
   'gridRefresh',
   // Per-family mob.update buckets, appended after the base lap names so those
@@ -797,6 +803,25 @@ const HEAVY_SELF_CMDS = new Set<string>([
   'sell',
   'buyback',
   'vcup_bet', // debits copper: refresh the self snapshot so the purse updates
+  // Farming's two plot mutations, added when `fplot` moved behind the heavy
+  // gate. BELT AND BRACES, stated honestly rather than overclaimed: every
+  // SUCCESSFUL plant spends a seed and every successful harvest grants produce
+  // or husks, both of which route through ctx.removeItem/addItem into
+  // onInventoryChangedForQuests, which bumps meta.wireRev, which is itself a
+  // heavyDue input. So freshness on the paths that change anything is already
+  // guaranteed without these two lines (verified by deleting each and watching
+  // the end-to-end snapshot arms stay green).
+  //
+  // They earn their place by making that guarantee LOCAL to the command instead
+  // of resting on the incidental fact that both commands happen to touch bags:
+  // a future arm that mutates a plot without an inventory change (the knob
+  // commands sketched for the next phase) would otherwise go stale for up to
+  // one backstop interval with nothing in this file hinting why. The cost is
+  // one spurious heavy re-serialize per REFUSED plant or harvest, the same
+  // trade every member here makes ('use', 'equip' and friends all mark on
+  // receipt regardless of outcome).
+  'plant_crop',
+  'harvest_crop',
   'loot',
   'harvestCorpse',
   'pickup',
@@ -893,6 +918,26 @@ const HEAVY_SELF_EVENTS = new Set<string>([
   // inv mirror goes stale until the staggered refresh. The requester's side
   // already gets a loot event from the ordinary addItemInstance grant.
   'commissionOrderResult',
+  // Farming's plant (the growth phase): a successful plant CONSUMES the seed
+  // through ctx.removeItem, which emits no loot event, so without a mark the
+  // spent seed would linger in the planter's mirror until the staggered
+  // refresh and a quick second plant would read as a spurious no_seed bug.
+  //
+  // KEPT DELIBERATELY REDUNDANT with `plant_crop`'s HEAVY_SELF_CMDS membership,
+  // which already covers every wire plant on receipt. This is the EVENT-side
+  // guarantee, and it is what holds for any planting that does not arrive as
+  // that command: a scripted or admin-driven plant, or a future quest step.
+  // Setting an already-true boolean costs nothing, it fires ONLY on success
+  // (every refusal rides the separate farmDenied event, deliberately NOT a
+  // member), and tests/farming_command_chain_online.test.ts exercises it in
+  // isolation by clearing the command-side mark before the tick, so the
+  // redundancy stays live rather than rotting into a comment.
+  //
+  // The HARVEST side needs no entry: its produce and withered-husk grants go
+  // through ctx.addItem, whose `loot` event is a member above and fires
+  // unconditionally (the silent/callerLogs opts are payload flags for client
+  // logging, not emission gates).
+  'farmPlanted',
 ]);
 
 // How often to re-broadcast online players' $WOC holder-tier flair. Each wallet
@@ -6678,6 +6723,34 @@ export class GameServer {
           sim.rechargeToolEffect(msg.profession, pid);
         }
         break;
+      case 'plant_crop':
+        // Farming's growth phase. TYPE boundary only: the sim is the single
+        // definition of legality, and it re-validates the bed id against
+        // FARM_BED_IDS, the crop id against the crop catalog, that the bed is
+        // free for THIS player, the skill threshold, and the seed in the
+        // sender's own bags (the hoe-tier gate is deferred to the crop-ladder
+        // phase). Nothing here normalizes or defaults an
+        // id, for the slot_tool_effect reason above: laundering an unknown id
+        // would hand the sim a value it never saw and make the two hosts
+        // disagree about the same message. Every refusal answers with a
+        // pid-scoped text-free SimEvent. `fplot` sits behind the heavy self
+        // gate since the growth phase made its non-empty arm live, so the new
+        // plot row reaches this client on the next snapshot rather than a
+        // per-tick diff: the seed spend bumps meta.wireRev (a heavyDue input)
+        // and `plant_crop` is also a HEAVY_SELF_CMDS member, either of which is
+        // sufficient. See the HEAVY_SELF_CMDS entry for which does the work.
+        if (typeof msg.bed === 'string' && typeof msg.crop === 'string') {
+          sim.plantCrop(msg.bed, msg.crop, pid);
+        }
+        break;
+      case 'harvest_crop':
+        // The other half of the same pair. The yield comes entirely from the
+        // hidden slots pre-rolled at plant time, so this frame cannot
+        // influence what it pays out: it names a bed and nothing else.
+        if (typeof msg.bed === 'string') {
+          sim.harvestCrop(msg.bed, pid);
+        }
+        break;
       case 'sell_all_junk':
         sim.sellAllJunk(pid);
         break;
@@ -8779,20 +8852,6 @@ export class GameServer {
     const tslotRows = this.sim.toolEffectSlotsFor(anchorSession.pid);
     if (tslotRows.length === 0) maybeSerialized('tslot', '[]');
     else maybe('tslot', tslotRows);
-    // The viewer's own farm plots (IWorld `myFarmPlots`). Wire key `fplot`; see
-    // TERSE_TO_IWORLD/ALL_DELTA_KEYS in tests/snapshots.test.ts. The projection
-    // (src/sim/professions/farm_projection.ts) picks its fields explicitly, so
-    // the hidden pre-rolled outcome slots (survivalRoll, yieldSeed) never reach
-    // a client; tests/snapshots.test.ts pins that absence over this path. Empty
-    // for every player with no planted bed, so after the first snapshot of a
-    // session the key delta-elides away for almost everyone. The empty arm
-    // compares the constant '[]' directly (byte-identical to maybe(...)):
-    // the empty read is the shared frozen EMPTY_FARM_PLOT_VIEWS (no per-call
-    // allocation since the Phase 2 QA fix), and skipping the stringify of an
-    // empty projection per player per tick is still the cheaper arm.
-    const fplotRows = this.sim.farmPlotsFor(anchorSession.pid);
-    if (fplotRows.length === 0) maybeSerialized('fplot', '[]');
-    else maybe('fplot', fplotRows);
     // Riding skill: persisted, so the client knows whether to show the riding
     // trainer UI without waiting on a mount/select command to fail. Wire key
     // `mntRtd`; delta-guarded, only changes once (false to true, never back).
@@ -8841,6 +8900,38 @@ export class GameServer {
       // flag, not the modulo, is what carries correctness here. Wire key
       // `mntOwn`.
       maybe('mntOwn', this.sim.ownedMountsFor(anchorSession.pid));
+      // The viewer's own farm plots (IWorld `myFarmPlots`). Wire key `fplot`;
+      // see TERSE_TO_IWORLD/ALL_DELTA_KEYS in tests/snapshots.test.ts. The
+      // projection (src/sim/professions/farm_projection.ts) picks its fields
+      // explicitly, so the hidden pre-rolled outcome slots (survivalRoll,
+      // yieldSeed) never reach a client; tests/snapshots.test.ts pins that
+      // absence over this path.
+      //
+      // HEAVY-GATED as of the growth phase, which is when this stopped being
+      // free. While no one could plant, the read returned the shared frozen
+      // empty projection and the whole cost was a constant compare. Now a
+      // farming session rebuilds, sorts and survival-evaluates up to one row
+      // PER AUTHORED BED and stringifies the result at 20 Hz, purely to
+      // discover that the bytes are identical to last tick's between the two
+      // transitions that can actually move them. That is the "revisit if the
+      // rows grow" trigger the patches-and-plots phase wrote down.
+      //
+      // Both writers are covered on the command side: plant_crop and
+      // harvest_crop are HEAVY_SELF_CMDS members, so the row set is fresh in
+      // the very next snapshot after either. The one mutation with no command
+      // behind it is a plot ripening on its own timer (growing to ready), and
+      // that rides the staggered HEAVY_SELF_REFRESH_TICKS backstop: about two
+      // seconds of latency on a timer measured in minutes, which no player can
+      // perceive and no decision depends on. `status` is still computed by the
+      // authority at send time either way, so nothing here is predicted.
+      //
+      // The empty arm compares the constant '[]' directly (byte-identical to
+      // maybe(...)): the empty read is the shared frozen EMPTY_FARM_PLOT_VIEWS
+      // (no per-call allocation since the Phase 2 QA fix), and skipping the
+      // stringify of an empty projection is still the cheaper arm.
+      const fplotRows = this.sim.farmPlotsFor(anchorSession.pid);
+      if (fplotRows.length === 0) maybeSerialized('fplot', '[]');
+      else maybe('fplot', fplotRows);
       maybe('buyback', meta.vendorBuyback);
       maybe('equip', meta.equipment);
       maybe('einst', meta.equipmentInstance);
