@@ -352,8 +352,16 @@ export function handleDevChat(
         ctx.error(pid, `[dev] No plot on bed '${bedId}'.`);
         return null;
       }
-      if (plot.readyAtMs > nowMs) plot.readyAtMs = nowMs;
-      emitDevLog(ctx, pid, `[dev] Bed ${bedId} is ready.`);
+      if (plot.readyAtMs > nowMs) {
+        plot.readyAtMs = nowMs;
+        emitDevLog(ctx, pid, `[dev] Bed ${bedId} is ready.`);
+      } else {
+        // Honest no-work reply, matching the all-plots arm's advanced count: a
+        // settled plot is left alone, and its pre-rolled outcome may well be
+        // withered, so claiming "is ready" here could mislead a dev testing
+        // wither flows.
+        emitDevLog(ctx, pid, `[dev] Bed ${bedId} was already settled; nothing to advance.`);
+      }
       return null;
     }
     if (meta.farmPlots.size === 0) {

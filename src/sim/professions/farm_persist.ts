@@ -158,9 +158,10 @@ export function serializeFarmPlots(
 /** Rebuild saved rows into a fresh live plot map. This is where hand-edited
  *  JSONB enters, so it owns every anti-tamper arm: a bed id or crop id outside
  *  the allowlists drops (a retired bed self-heals out of the save on the next
- *  round trip), non-finite and non-positive timestamps drop, a deadline at or
- *  before its plant time drops (it would read as permanently ready), and a
- *  duration over FARM_MAX_GROW_MS clamps to the ceiling.
+ *  round trip), non-finite and non-positive timestamps drop, a deadline
+ *  strictly BEFORE its plant time drops (a duration of exactly zero is the
+ *  legitimate grow-now mint and loads as permanently ready; see the arm
+ *  below), and a duration over FARM_MAX_GROW_MS clamps to the ceiling.
  *
  *  A plantedAtMs in the FUTURE relative to the loading host's clock re-anchors
  *  to nowMs and keeps its (already clamped) duration, so growth restarts
@@ -232,7 +233,16 @@ export function normalizeFarmPlots(
     if (!finite(row.plantedAtMs) || !finite(row.readyAtMs)) continue;
     if (row.plantedAtMs <= 0 || row.readyAtMs <= 0) continue;
     const duration = Math.min(row.readyAtMs - row.plantedAtMs, FARM_MAX_GROW_MS);
-    if (duration <= 0) continue;
+    // Only a NEGATIVE duration drops (a deadline before its own plant time is
+    // a malformed row nothing can mint). A duration of exactly ZERO is the
+    // legitimate grow-now mint: /dev farmgrow (or a server plant and grow in
+    // the same millisecond) writes readyAtMs to the plant instant, and the row
+    // must come back as the permanently-ready plot it is rather than being
+    // destroyed as tampered. Zero-length windows are first-class everywhere
+    // downstream (farmGrowthStage and the projection both read them as ready),
+    // and admitting them concedes nothing to a blob editor: a duration of 1 ms
+    // was always just as instantly ready as 0.
+    if (duration < 0) continue;
     // Clamp order is load-bearing: the duration is bounded FIRST, then the
     // anchor moves, so a row that is both over-long and future-dated cannot
     // launder its excess duration past the ceiling.
