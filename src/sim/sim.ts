@@ -3305,9 +3305,7 @@ export class Sim {
       // the row count alone cannot see it), but an operator reading server
       // logs should see both happen.
       {
-        const droppedRows = s.farmPlots
-          ? Object.keys(s.farmPlots).length - meta.farmPlots.size
-          : 0;
+        const droppedRows = s.farmPlots ? Object.keys(s.farmPlots).length - meta.farmPlots.size : 0;
         const droppedSlots = countDroppedHiddenSlots(s.farmPlots, meta.farmPlots);
         if (droppedRows > 0 || droppedSlots > 0) {
           console.warn(
