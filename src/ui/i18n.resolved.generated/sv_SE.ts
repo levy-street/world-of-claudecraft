@@ -5982,8 +5982,7 @@ export const sv_SE: EnTranslations = {
       "detonateCrushingDepth": "Krossande djup krossar!",
       "detonatePactSeal": "Paktförseglingen detonerar!",
       "detonateBloodRite": "Blodriten faller!",
-      "detonatePitSentence": "Gropdomen detonerar!",
-      "detonateHellfireBrand": "Helvetesbranden detonerar!"
+      "detonatePitSentence": "Gropdomen detonerar!"
     },
     "delve": {
       "cannotEnterNow": "Du kan inte gå in i en fördjupning just nu.",

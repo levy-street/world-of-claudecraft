@@ -5982,8 +5982,7 @@ export const pl_PL: EnTranslations = {
       "detonateCrushingDepth": "Miażdżąca Głębia miażdży!",
       "detonatePactSeal": "Pieczęć Paktu eksploduje!",
       "detonateBloodRite": "Krwawy Rytuał spada!",
-      "detonatePitSentence": "Wyrok Otchłani eksploduje!",
-      "detonateHellfireBrand": "Piekielny Płomień eksploduje!"
+      "detonatePitSentence": "Wyrok Otchłani eksploduje!"
     },
     "delve": {
       "cannotEnterNow": "Nie możesz teraz wejść do eskapady.",

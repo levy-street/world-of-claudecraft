@@ -5982,8 +5982,7 @@ export const tr_TR: EnTranslations = {
       "detonateCrushingDepth": "Ezici Derinlik eziyor!",
       "detonatePactSeal": "Antlaşma Mührü patlıyor!",
       "detonateBloodRite": "Kan Ayini düşüyor!",
-      "detonatePitSentence": "Çukur Fermanı patlıyor!",
-      "detonateHellfireBrand": "Cehennem Ateşi Damgası patlıyor!"
+      "detonatePitSentence": "Çukur Fermanı patlıyor!"
     },
     "delve": {
       "cannotEnterNow": "Şu anda bir delveye giremezsin.",

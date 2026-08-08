@@ -124,6 +124,7 @@ const HARDCODED_VERBATIM: string[] = [
   'Knight-Lieutenant',
   'Harvest Sprite',
   'Hellfire Ring',
+  'Hellfire Citadel',
   'Spellsteal',
   'Swiftmend',
   'Smokestep',

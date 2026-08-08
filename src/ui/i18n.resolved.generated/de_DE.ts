@@ -5982,8 +5982,7 @@ export const de_DE: EnTranslations = {
       "detonateCrushingDepth": "Erdrückende Tiefe zermalmt!",
       "detonatePactSeal": "Paktsiegel detoniert!",
       "detonateBloodRite": "Blutritus fällt!",
-      "detonatePitSentence": "Grubenurteil detoniert!",
-      "detonateHellfireBrand": "Höllenfeuerbrand detoniert!"
+      "detonatePitSentence": "Grubenurteil detoniert!"
     },
     "delve": {
       "cannotEnterNow": "Du kannst jetzt keinen Tiefgang betreten.",

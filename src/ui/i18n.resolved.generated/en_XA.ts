@@ -5982,8 +5982,7 @@ export const en_XA: EnTranslations = {
       "detonateCrushingDepth": "[Çŕúšĥíñĝ Ðéþţĥ çŕúšĥéš!]",
       "detonatePactSeal": "[Þáçţ Šéáļ ðéţóñáţéš!]",
       "detonateBloodRite": "[Ɓļóóð Ŕíţé ƒáļļš!]",
-      "detonatePitSentence": "[Þíţ Šéñţéñçé ðéţóñáţéš!]",
-      "detonateHellfireBrand": "[Ĥéļļƒíŕé Ɓŕáñð ðéţóñáţéš!]"
+      "detonatePitSentence": "[Þíţ Šéñţéñçé ðéţóñáţéš!]"
     },
     "delve": {
       "cannotEnterNow": "[Ýóú çáññóţ éñţéŕ á ðéļʋé ŕíĝĥţ ñóŵ.]",

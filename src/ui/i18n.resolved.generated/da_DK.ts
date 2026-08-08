@@ -5982,8 +5982,7 @@ export const da_DK: EnTranslations = {
       "detonateCrushingDepth": "Knusende Dybde knuser!",
       "detonatePactSeal": "Paktsegl detonerer!",
       "detonateBloodRite": "Blodrite falder!",
-      "detonatePitSentence": "Kuledom detonerer!",
-      "detonateHellfireBrand": "Helvedesildsmærke detonerer!"
+      "detonatePitSentence": "Kuledom detonerer!"
     },
     "delve": {
       "cannotEnterNow": "Du kan ikke gå ind i et delve lige nu.",

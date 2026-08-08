@@ -5982,8 +5982,7 @@ export const ja_JP: EnTranslations = {
       "detonateCrushingDepth": "粉砕の深淵が押しつぶす！",
       "detonatePactSeal": "契約の封印が炸裂する！",
       "detonateBloodRite": "血の儀式が落ちる！",
-      "detonatePitSentence": "奈落の判決が炸裂する！",
-      "detonateHellfireBrand": "地獄の焼き印が炸裂する！"
+      "detonatePitSentence": "奈落の判決が炸裂する！"
     },
     "delve": {
       "cannotEnterNow": "今はデルヴに入れない。",

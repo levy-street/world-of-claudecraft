@@ -5982,8 +5982,7 @@ export const it_IT: EnTranslations = {
       "detonateCrushingDepth": "Profondità Schiacciante schiaccia!",
       "detonatePactSeal": "Il Sigillo del Patto detona!",
       "detonateBloodRite": "Rito di Sangue cala!",
-      "detonatePitSentence": "La Sentenza della Fossa detona!",
-      "detonateHellfireBrand": "Marchio del Fuoco Infernale detona!"
+      "detonatePitSentence": "La Sentenza della Fossa detona!"
     },
     "delve": {
       "cannotEnterNow": "Non puoi entrare in un'incursione in questo momento.",

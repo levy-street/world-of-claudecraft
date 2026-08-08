@@ -8177,7 +8177,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'sim.rift.detonateEarthshatter': '¡Quiebratierra detona!',
   'sim.rift.detonateFinalJudgment': '¡Cae el Juicio Final!',
   'sim.rift.detonateGlacialGrave': '¡La Tumba Glacial detona!',
-  'sim.rift.detonateHellfireBrand': '¡La Marca de Fuego Infernal detona!',
   'sim.rift.detonateLightningRod': '¡La Vara de Rayo golpea!',
   'sim.rift.detonateMagmaWell': '¡El Pozo de Magma estalla!',
   'sim.rift.detonatePactSeal': '¡El Sello del Pacto detona!',

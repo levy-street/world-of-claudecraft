@@ -899,7 +899,6 @@ export const en = {
       detonatePactSeal: 'Pact Seal detonates!',
       detonateBloodRite: 'Blood Rite falls!',
       detonatePitSentence: 'Pit Sentence detonates!',
-      detonateHellfireBrand: 'Hellfire Brand detonates!',
     },
     delve: {
       cannotEnterNow: 'You cannot enter a delve right now.',

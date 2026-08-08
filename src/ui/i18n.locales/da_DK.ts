@@ -11218,7 +11218,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'sim.rift.detonateEarthshatter': 'Jordknuser detonerer!',
   'sim.rift.detonateFinalJudgment': 'Endelig Dom rammer!',
   'sim.rift.detonateGlacialGrave': 'Iskold Grav detonerer!',
-  'sim.rift.detonateHellfireBrand': 'Helvedesildsmærke detonerer!',
   'sim.rift.detonateLightningRod': 'Lynstav slår ned!',
   'sim.rift.detonateMagmaWell': 'Magmakilde bryder ud!',
   'sim.rift.detonatePactSeal': 'Paktsegl detonerer!',

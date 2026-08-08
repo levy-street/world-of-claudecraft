@@ -5982,8 +5982,7 @@ export const nl_NL: EnTranslations = {
       "detonateCrushingDepth": "Verpletterende Diepte verplettert!",
       "detonatePactSeal": "Verbondszegel ontploft!",
       "detonateBloodRite": "Bloedrite valt!",
-      "detonatePitSentence": "Kuilvonnis ontploft!",
-      "detonateHellfireBrand": "Hellevuurmerk ontploft!"
+      "detonatePitSentence": "Kuilvonnis ontploft!"
     },
     "delve": {
       "cannotEnterNow": "Je kunt nu geen delve betreden.",
@@ -13212,7 +13211,7 @@ export const nl_NL: EnTranslations = {
         "completion": "Het knielen is gestopt. We hebben de stem niet tot zwijgen gebracht, {playerName}, alleen haar koor uitgedund. Het moet genoeg zijn.",
         "objectives": {
           "0": {
-            "label": "Wyrmcultus-Dweper gedood"
+            "label": "Broodswornus-Dweper gedood"
           },
           "1": {
             "label": "Broodswornus-Necromancer gedood"

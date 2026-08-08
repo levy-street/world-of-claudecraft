@@ -8763,7 +8763,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'sim.rift.detonateEarthshatter': 'Brise-Terre explose !',
   'sim.rift.detonateFinalJudgment': "Le Jugement final s'abat !",
   'sim.rift.detonateGlacialGrave': 'La Tombe glaciale explose !',
-  'sim.rift.detonateHellfireBrand': 'Le Brandon infernal explose !',
   'sim.rift.detonateLightningRod': 'Paratonnerre frappe !',
   'sim.rift.detonateMagmaWell': 'Le Puits de magma jaillit !',
   'sim.rift.detonatePactSeal': 'Le Sceau du pacte explose !',

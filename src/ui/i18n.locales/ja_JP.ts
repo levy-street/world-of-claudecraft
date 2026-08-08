@@ -9270,7 +9270,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'sim.rift.detonatePactSeal': '契約の封印が炸裂する！',
   'sim.rift.detonateBloodRite': '血の儀式が落ちる！',
   'sim.rift.detonatePitSentence': '奈落の判決が炸裂する！',
-  'sim.rift.detonateHellfireBrand': '地獄の焼き印が炸裂する！',
   'entities.items.rift_essence.name': 'リフトエッセンス',
   'entities.items.rift_gem_crimson.name': '深紅のリフト宝石',
   'entities.items.rift_gem_azure.name': '紺碧のリフト宝石',

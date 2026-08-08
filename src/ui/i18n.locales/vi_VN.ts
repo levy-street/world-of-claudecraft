@@ -11378,7 +11378,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'sim.rift.detonateEarthshatter': 'Đại Địa Chấn phát nổ!',
   'sim.rift.detonateFinalJudgment': 'Phán Quyết Cuối Cùng giáng xuống!',
   'sim.rift.detonateGlacialGrave': 'Nấm Mồ Băng Hà phát nổ!',
-  'sim.rift.detonateHellfireBrand': 'Ấn Hỏa Ngục phát nổ!',
   'sim.rift.detonateLightningRod': 'Cột Thu Lôi giáng xuống!',
   'sim.rift.detonateMagmaWell': 'Giếng Dung Nham bùng nổ!',
   'sim.rift.detonatePactSeal': 'Ấn Khế Ước phát nổ!',

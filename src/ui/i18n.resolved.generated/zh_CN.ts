@@ -5982,8 +5982,7 @@ export const zh_CN: EnTranslations = {
       "detonateCrushingDepth": "粉碎深渊碾压！",
       "detonatePactSeal": "契约封印引爆！",
       "detonateBloodRite": "血液仪式降临！",
-      "detonatePitSentence": "深坑判决引爆！",
-      "detonateHellfireBrand": "地狱烙印引爆！"
+      "detonatePitSentence": "深坑判决引爆！"
     },
     "delve": {
       "cannotEnterNow": "你现在无法进入探秘。",

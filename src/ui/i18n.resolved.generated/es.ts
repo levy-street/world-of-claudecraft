@@ -5982,8 +5982,7 @@ export const es: EnTranslations = {
       "detonateCrushingDepth": "¡La Profundidad Aplastante aplasta!",
       "detonatePactSeal": "¡El Sello del Pacto detona!",
       "detonateBloodRite": "¡Cae el Rito de Sangre!",
-      "detonatePitSentence": "¡La Sentencia del Pozo detona!",
-      "detonateHellfireBrand": "¡La Marca de Fuego Infernal detona!"
+      "detonatePitSentence": "¡La Sentencia del Pozo detona!"
     },
     "delve": {
       "cannotEnterNow": "No puedes entrar a una expedición ahora mismo.",

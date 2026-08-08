@@ -8853,7 +8853,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'sim.rift.detonatePactSeal': '契约封印引爆！',
   'sim.rift.detonateBloodRite': '血液仪式降临！',
   'sim.rift.detonatePitSentence': '深坑判决引爆！',
-  'sim.rift.detonateHellfireBrand': '地狱烙印引爆！',
   'entities.items.rift_essence.name': '裂隙精华',
   'entities.items.rift_gem_crimson.name': '猩红裂隙宝石',
   'entities.items.rift_gem_azure.name': '蔚蓝裂隙宝石',

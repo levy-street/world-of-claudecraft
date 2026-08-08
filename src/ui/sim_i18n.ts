@@ -10815,10 +10815,6 @@ const RULES: Rule[] = [
     re: /^Pit Sentence detonates!$/,
     build: () => t('sim.rift.detonatePitSentence'),
   },
-  {
-    re: /^Hellfire Brand detonates!$/,
-    build: () => t('sim.rift.detonateHellfireBrand'),
-  },
   { re: /^You cannot enter a delve right now\.$/, build: () => t('sim.delve.cannotEnterNow') },
   { re: /^Leave the dungeon first\.$/, build: () => t('sim.delve.leaveDungeonFirst') },
   { re: /^Leave the arena first\.$/, build: () => t('sim.delve.leaveArenaFirst') },

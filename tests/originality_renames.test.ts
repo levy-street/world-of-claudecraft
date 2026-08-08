@@ -11,6 +11,7 @@ import { ENCHANTS } from '../src/sim/content/enchants';
 import { OVERWORLD_GRAVEYARDS } from '../src/sim/content/graveyards';
 import { MOUNTS } from '../src/sim/content/mounts';
 import { TOOL_EFFECTS } from '../src/sim/content/professions';
+import { INFERNAL_NOUNS, infernalCitadelName } from '../src/sim/content/rift/infernal_citadel';
 import { TALENTS } from '../src/sim/content/talents';
 import { ZONE3_NPCS, ZONE3_QUESTS } from '../src/sim/content/zone3';
 import { ABILITIES, ITEMS, MOBS, NPCS, QUESTS, ZONES } from '../src/sim/data';
@@ -103,6 +104,19 @@ describe('phase 03 naming-audit display literals stay renamed', () => {
     expect((MOBS.shardlord_kazzix as { frostbite?: { name?: string } }).frostbite?.name).toBe(
       'Wintergnaw',
     );
+  });
+
+  it('pins the rift set-piece noun pool past the Hellfire Citadel collision (QA round)', () => {
+    // The composed rift name is built from INFERNAL_NOUNS, a code constant no
+    // content-row scan can see: with 'Hellfire' in the pool, 1 in 4 set-piece
+    // seeds rendered 'The Hellfire Citadel', another game's instanced-dungeon
+    // name verbatim. Pin the pool AND the composed surface, because a future
+    // pool edit could reintroduce the collision without touching any name row.
+    expect(INFERNAL_NOUNS).toContain('Pitfire');
+    expect(INFERNAL_NOUNS).not.toContain('Hellfire');
+    for (let seed = 0; seed < 256; seed++) {
+      expect(infernalCitadelName(seed)).not.toContain('Hellfire');
+    }
   });
 
   it('pins the renamed NPC, town, and POI display names', () => {

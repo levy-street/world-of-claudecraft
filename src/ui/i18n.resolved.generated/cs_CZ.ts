@@ -5982,8 +5982,7 @@ export const cs_CZ: EnTranslations = {
       "detonateCrushingDepth": "Drtivá hlubina drtí!",
       "detonatePactSeal": "Pečeť paktu detonuje!",
       "detonateBloodRite": "Krvavý rituál dopadá!",
-      "detonatePitSentence": "Rozsudek jámy detonuje!",
-      "detonateHellfireBrand": "Pekelný cejch detonuje!"
+      "detonatePitSentence": "Rozsudek jámy detonuje!"
     },
     "delve": {
       "cannotEnterNow": "Teď nemůžeš vstoupit do výpravy.",

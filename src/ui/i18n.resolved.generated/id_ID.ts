@@ -5982,8 +5982,7 @@ export const id_ID: EnTranslations = {
       "detonateCrushingDepth": "Kedalaman Penghancur menghancurkan!",
       "detonatePactSeal": "Segel Pakta meledak!",
       "detonateBloodRite": "Ritus Darah turun!",
-      "detonatePitSentence": "Vonis Jurang meledak!",
-      "detonateHellfireBrand": "Cap Api Neraka meledak!"
+      "detonatePitSentence": "Vonis Jurang meledak!"
     },
     "delve": {
       "cannotEnterNow": "Kamu tidak dapat memasuki delve saat ini.",
@@ -13152,7 +13151,7 @@ export const id_ID: EnTranslations = {
         "completion": "Aksara ini... terakhir kulihat yang serupa di grimoir Morthen, di Eastbrook. Tangan yang sama telah menuntun setiap makam yang kita perebutkan, {playerName}.",
         "objectives": {
           "0": {
-            "label": "Fanatik Wyrmcult terbunuh"
+            "label": "Fanatik Broodsworn terbunuh"
           }
         }
       },
@@ -13162,7 +13161,7 @@ export const id_ID: EnTranslations = {
         "completion": "Semoga Cahaya mengampuni kita. Ini menampung para mati dari Lembah dan rawa - setiap mayat yang pernah dibangkitkan para Gravecaller, dipanen. Mereka tidak pernah membangun pasukan, {playerName}. Mereka sedang mengumpulkan upeti.",
         "objectives": {
           "0": {
-            "label": "Wyrmcult Necromancer dibunuh"
+            "label": "Necromancer Broodsworn dibunuh"
           }
         }
       },
@@ -13212,7 +13211,7 @@ export const id_ID: EnTranslations = {
         "completion": "Berlututnya telah berhenti. Kita belum membungkam suara itu, {playerName}, hanya menipiskan paduan suaranya. Itu harus cukup.",
         "objectives": {
           "0": {
-            "label": "Fanatik Wyrmcult terbunuh"
+            "label": "Fanatik Broodsworn terbunuh"
           },
           "1": {
             "label": "Necromancer Broodsworn terbunuh"

@@ -5982,8 +5982,7 @@ export const ru_RU: EnTranslations = {
       "detonateCrushingDepth": "Сокрушающая глубина давит!",
       "detonatePactSeal": "Печать пакта взрывается!",
       "detonateBloodRite": "Кровавый обряд падает!",
-      "detonatePitSentence": "Приговор ямы взрывается!",
-      "detonateHellfireBrand": "Адское клеймо взрывается!"
+      "detonatePitSentence": "Приговор ямы взрывается!"
     },
     "delve": {
       "cannotEnterNow": "Сейчас вы не можете войти в вылазку.",

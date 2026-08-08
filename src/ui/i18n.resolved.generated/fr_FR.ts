@@ -5982,8 +5982,7 @@ export const fr_FR: EnTranslations = {
       "detonateCrushingDepth": "La Profondeur écrasante écrase !",
       "detonatePactSeal": "Le Sceau du pacte explose !",
       "detonateBloodRite": "Le Rite du sang s'abat !",
-      "detonatePitSentence": "La Sentence de la fosse explose !",
-      "detonateHellfireBrand": "Le Brandon infernal explose !"
+      "detonatePitSentence": "La Sentence de la fosse explose !"
     },
     "delve": {
       "cannotEnterNow": "Vous ne pouvez pas entrer dans une plongée pour le moment.",

@@ -9257,7 +9257,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'sim.rift.detonatePactSeal': '서약 봉인이 폭발합니다!',
   'sim.rift.detonateBloodRite': '피의 의식이 내려집니다!',
   'sim.rift.detonatePitSentence': '구렁텅이 판결이 폭발합니다!',
-  'sim.rift.detonateHellfireBrand': '지옥불 낙인이 폭발합니다!',
   'entities.items.rift_essence.name': '균열 정수',
   'entities.items.rift_gem_crimson.name': '진홍빛 균열 보석',
   'entities.items.rift_gem_azure.name': '푸른빛 균열 보석',

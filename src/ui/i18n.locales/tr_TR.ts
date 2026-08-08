@@ -8586,7 +8586,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'sim.rift.detonateEarthshatter': 'Yer Yarılması patlıyor!',
   'sim.rift.detonateFinalJudgment': 'Son Yargı iniyor!',
   'sim.rift.detonateGlacialGrave': 'Buzul Mezarı patlıyor!',
-  'sim.rift.detonateHellfireBrand': 'Cehennem Ateşi Damgası patlıyor!',
   'sim.rift.detonateLightningRod': 'Yıldırım Çubuğu çarpıyor!',
   'sim.rift.detonateMagmaWell': 'Magma Kuyusu patlıyor!',
   'sim.rift.detonatePactSeal': 'Antlaşma Mührü patlıyor!',

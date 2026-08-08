@@ -5148,7 +5148,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_velkhar.title': 'De Grootnecromancer',
   'entities.quests.q_voice_below.completion':
     'Het knielen is gestopt. We hebben de stem niet tot zwijgen gebracht, {playerName}, alleen haar koor uitgedund. Het moet genoeg zijn.',
-  'entities.quests.q_voice_below.objectives.0.label': 'Wyrmcultus-Dweper gedood',
+  'entities.quests.q_voice_below.objectives.0.label': 'Broodswornus-Dweper gedood',
   'entities.quests.q_voice_below.objectives.1.label': 'Broodswornus-Necromancer gedood',
   'entities.quests.q_voice_below.text':
     'Vannacht knielde het hele cultuskamp ineens, {playerName}, elke dweper, elke necromancer, allen gericht naar het Heiligdom. Korzul spreekt nu tot hen in hun slaap; Vael hoorde dezelfde stem in het veen, en Morthen voor hem. Vel de gemeente, tien dwepers, zes necromancers, voordat die stem genoeg handen heeft om de poort zelf open te trekken.',
@@ -11376,7 +11376,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'sim.rift.detonateEarthshatter': 'Aardschok ontploft!',
   'sim.rift.detonateFinalJudgment': 'Laatste Oordeel slaat neer!',
   'sim.rift.detonateGlacialGrave': 'IJzig Graf ontploft!',
-  'sim.rift.detonateHellfireBrand': 'Hellevuurmerk ontploft!',
   'sim.rift.detonateLightningRod': 'Bliksemstaaf slaat in!',
   'sim.rift.detonateMagmaWell': 'Magmabron barst los!',
   'sim.rift.detonatePactSeal': 'Verbondszegel ontploft!',

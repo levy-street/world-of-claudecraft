@@ -9398,7 +9398,6 @@ export type TranslationKeyFlat =
   | 'sim.rift.detonateEarthshatter'
   | 'sim.rift.detonateFinalJudgment'
   | 'sim.rift.detonateGlacialGrave'
-  | 'sim.rift.detonateHellfireBrand'
   | 'sim.rift.detonateLightningRod'
   | 'sim.rift.detonateMagmaWell'
   | 'sim.rift.detonatePactSeal'

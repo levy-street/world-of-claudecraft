@@ -7866,7 +7866,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'sim.rift.detonateEarthshatter': 'Jordkrossen detonerar!',
   'sim.rift.detonateFinalJudgment': 'Den slutgiltiga domen slår ner!',
   'sim.rift.detonateGlacialGrave': 'Glaciärgraven detonerar!',
-  'sim.rift.detonateHellfireBrand': 'Helvetesbranden detonerar!',
   'sim.rift.detonateLightningRod': 'Åskledaren slår till!',
   'sim.rift.detonateMagmaWell': 'Magmakällan bryter ut!',
   'sim.rift.detonatePactSeal': 'Paktförseglingen detonerar!',

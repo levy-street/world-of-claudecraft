@@ -3723,7 +3723,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'sim.rift.detonateEarthshatter': 'Zemětřas detonuje!',
   'sim.rift.detonateFinalJudgment': 'Poslední soud dopadá!',
   'sim.rift.detonateGlacialGrave': 'Ledovcový hrob detonuje!',
-  'sim.rift.detonateHellfireBrand': 'Pekelný cejch detonuje!',
   'sim.rift.detonateLightningRod': 'Hromosvod udeří!',
   'sim.rift.detonateMagmaWell': 'Magmová studna vybuchuje!',
   'sim.rift.detonatePactSeal': 'Pečeť paktu detonuje!',

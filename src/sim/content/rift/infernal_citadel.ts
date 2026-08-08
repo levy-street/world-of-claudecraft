@@ -29,8 +29,13 @@ import type { RiftFloorPlan, RiftObjectPlan, RiftSpawn } from '../../rift/types'
 import { Rng } from '../../rng';
 import type { DelveHazardZone } from '../../types';
 
-/** Rift proper nouns this set-piece names itself from. */
-export const INFERNAL_NOUNS = ['Infernal', 'Brimstone', 'Hellfire', 'Pactbound'] as const;
+/** Rift proper nouns this set-piece names itself from. Values are display-only
+ * (the seed math picks by index, so swapping a value never moves a pick):
+ * 'Hellfire' became 'Pitfire' at phase 03 QA because the composed name
+ * 'The Hellfire Citadel' is another game's instanced-dungeon name verbatim,
+ * the same collision family as the Pitfire Ring / Pitsteel Sweep renames
+ * (docs/prd/masterwrought/naming-audit.md, QA addendum). */
+export const INFERNAL_NOUNS = ['Infernal', 'Brimstone', 'Pitfire', 'Pactbound'] as const;
 export const INFERNAL_THEME_ID = 'infernal';
 export const INFERNAL_THEME_NAME = 'Infernal Citadel';
 

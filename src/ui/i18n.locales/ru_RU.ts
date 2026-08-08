@@ -9413,7 +9413,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'sim.rift.detonatePactSeal': 'Печать пакта взрывается!',
   'sim.rift.detonateBloodRite': 'Кровавый обряд падает!',
   'sim.rift.detonatePitSentence': 'Приговор ямы взрывается!',
-  'sim.rift.detonateHellfireBrand': 'Адское клеймо взрывается!',
   'entities.items.rift_essence.name': 'Эссенция разлома',
   'entities.items.rift_gem_crimson.name': 'Багровый самоцвет разлома',
   'entities.items.rift_gem_azure.name': 'Лазурный самоцвет разлома',

@@ -5982,8 +5982,7 @@ export const vi_VN: EnTranslations = {
       "detonateCrushingDepth": "Nghiền Nát Vực Sâu nghiền nát!",
       "detonatePactSeal": "Ấn Khế Ước phát nổ!",
       "detonateBloodRite": "Nghi Lễ Máu sập xuống!",
-      "detonatePitSentence": "Án Phạt Vực Ngục phát nổ!",
-      "detonateHellfireBrand": "Ấn Hỏa Ngục phát nổ!"
+      "detonatePitSentence": "Án Phạt Vực Ngục phát nổ!"
     },
     "delve": {
       "cannotEnterNow": "Bạn không thể vào hầm thám hiểm lúc này.",

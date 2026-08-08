@@ -4671,7 +4671,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_cult_camp.title': 'Jubah di Antara Gelagah',
   'entities.quests.q_cult_orders.completion':
     'Aksara ini... terakhir kulihat yang serupa di grimoir Morthen, di Eastbrook. Tangan yang sama telah menuntun setiap makam yang kita perebutkan, {playerName}.',
-  'entities.quests.q_cult_orders.objectives.0.label': 'Fanatik Wyrmcult terbunuh',
+  'entities.quests.q_cult_orders.objectives.0.label': 'Fanatik Broodsworn terbunuh',
   'entities.quests.q_cult_orders.text':
     'Para fanatik kini bergerak dengan tujuan, jaga ditempatkan, perbekalan dihitung, bagai prajurit sebelum pengepungan. Pengikut yang terorganisir adalah pengikut yang menerima perintah, {playerName}. Bunuh delapan lagi dan bawakan padaku empat berkas perintah tertulis mereka. Aku ingin tahu tangan yang memimpin mereka.',
   'entities.quests.q_cult_orders.title': 'Perintah dari Kedalaman',
@@ -4846,7 +4846,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_names_of_the_dead.title': 'Nama-Nama Para Mati',
   'entities.quests.q_necromancers.completion':
     'Semoga Cahaya mengampuni kita. Ini menampung para mati dari Lembah dan rawa - setiap mayat yang pernah dibangkitkan para Gravecaller, dipanen. Mereka tidak pernah membangun pasukan, {playerName}. Mereka sedang mengumpulkan upeti.',
-  'entities.quests.q_necromancers.objectives.0.label': 'Wyrmcult Necromancer dibunuh',
+  'entities.quests.q_necromancers.objectives.0.label': 'Necromancer Broodsworn dibunuh',
   'entities.quests.q_necromancers.text':
     'Perintah-perintah itu menyebut sebuah "cincin filakteri" - bejana jiwa, {playerName}, yang ditempatkan mengelilingi Sanktum untuk memberinya makan. Para necromancer sekte itu membawanya seperti relik suci. Bunuh delapan necromancer dan bawakan aku tiga filakteri yang utuh. Aku harus tahu jiwa siapa yang mereka tampung.',
   'entities.quests.q_necromancers.title': 'Cincin Filakteri',
@@ -5049,7 +5049,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_velkhar.title': 'Sang Necromancer Agung',
   'entities.quests.q_voice_below.completion':
     'Berlututnya telah berhenti. Kita belum membungkam suara itu, {playerName}, hanya menipiskan paduan suaranya. Itu harus cukup.',
-  'entities.quests.q_voice_below.objectives.0.label': 'Fanatik Wyrmcult terbunuh',
+  'entities.quests.q_voice_below.objectives.0.label': 'Fanatik Broodsworn terbunuh',
   'entities.quests.q_voice_below.objectives.1.label': 'Necromancer Broodsworn terbunuh',
   'entities.quests.q_voice_below.text':
     'Tadi malam seluruh perkemahan kultus berlutut serentak, {playerName}, setiap fanatik, setiap necromancer, semua menghadap Sanktum. Korzul kini berbicara kepada mereka dalam tidur; Vael mendengar suara yang sama di rawa, dan Morthen sebelumnya. Tumpas jemaah itu, sepuluh fanatik, enam necromancer, sebelum suara itu punya tangan yang cukup untuk membuka gerbang itu sendiri.',
@@ -11616,7 +11616,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'sim.rift.detonateEarthshatter': 'Guncangan Bumi meledak!',
   'sim.rift.detonateFinalJudgment': 'Penghakiman Akhir menghantam!',
   'sim.rift.detonateGlacialGrave': 'Makam Glasial meledak!',
-  'sim.rift.detonateHellfireBrand': 'Cap Api Neraka meledak!',
   'sim.rift.detonateLightningRod': 'Penangkal Petir menyambar!',
   'sim.rift.detonateMagmaWell': 'Sumur Magma meletus!',
   'sim.rift.detonatePactSeal': 'Segel Pakta meledak!',

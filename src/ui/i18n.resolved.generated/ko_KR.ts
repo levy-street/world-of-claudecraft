@@ -5982,8 +5982,7 @@ export const ko_KR: EnTranslations = {
       "detonateCrushingDepth": "분쇄의 심연이 짓누릅니다!",
       "detonatePactSeal": "서약 봉인이 폭발합니다!",
       "detonateBloodRite": "피의 의식이 내려집니다!",
-      "detonatePitSentence": "구렁텅이 판결이 폭발합니다!",
-      "detonateHellfireBrand": "지옥불 낙인이 폭발합니다!"
+      "detonatePitSentence": "구렁텅이 판결이 폭발합니다!"
     },
     "delve": {
       "cannotEnterNow": "지금은 탐굴에 진입할 수 없습니다.",

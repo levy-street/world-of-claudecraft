@@ -5982,8 +5982,7 @@ export const en_CA: EnTranslations = {
       "detonateCrushingDepth": "Crushing Depth crushes!",
       "detonatePactSeal": "Pact Seal detonates!",
       "detonateBloodRite": "Blood Rite falls!",
-      "detonatePitSentence": "Pit Sentence detonates!",
-      "detonateHellfireBrand": "Hellfire Brand detonates!"
+      "detonatePitSentence": "Pit Sentence detonates!"
     },
     "delve": {
       "cannotEnterNow": "You cannot enter a delve right now.",
