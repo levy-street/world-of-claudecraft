@@ -355,9 +355,11 @@ describe('the professions blob growth bound (phase 16)', () => {
     // the measured settled value (9,497 at the Farming re-measure) minus a
     // small band, so the headroom note above cannot rot silently in either
     // direction: a measurement drifting more than a couple hundred bytes
-    // reds here and forces the note to be re-read.
+    // reds here and forces the note to be re-read. Re-minted 9216 to 9280
+    // with the ceiling: the old floor tracked the pre-Farming 9,451 measure
+    // and its window had silently widened to 281 bytes.
     const bytes = professionsBytes(s2);
-    expect(bytes).toBeGreaterThan(9216);
+    expect(bytes).toBeGreaterThan(9280);
     expect(bytes).toBeLessThanOrEqual(PROFESSIONS_BYTE_CEILING);
   });
 
