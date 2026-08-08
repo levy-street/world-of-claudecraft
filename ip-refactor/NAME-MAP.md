@@ -1210,4 +1210,5 @@ plus the hardcoded list.
 | rift_pitlord_pulse | Hellfire Ring | Pitfire Ring | mechanic | rename |
 | dgn_sanctum_speed | Sanctum Sprint | Sanctum Footrace | deed | rename |
 | pvp_honor_knight_lieutenant | Knight-Lieutenant | Banneret | deed-title | rename |
+| pvp_honor_knight_lieutenant | Banneret | Fieldreaver | deed-title | release supersede (v0.36.0 merge, PR #3133; the release also re-cut Sergeant to Linebreaker and Field Marshal to Warcrowned) |
 | shardlord_kazzix_frostbite | Winterbite | Wintergnaw | mechanic | rename |

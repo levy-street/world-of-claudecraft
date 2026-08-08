@@ -90,7 +90,7 @@ bullet.
 | Eldergleam (hub town, title, graveyard + prose) | Eldershine | Skyrim's Eldergleam sanctuary tree |
 | The Moonwell (POI) / A Ripple on the Moonwell (deed) | The Moonspring / ... Moonspring | Warcraft's night-elf moonwell (caveat: Forgotten Realms moonwells predate WC3 by 15 years, Darkwalker on Moonshae 1987; renamed anyway under maintainer strictness) |
 | Sanctum Sprint (deed) | Sanctum Footrace | GW2's Sanctum Sprint activity (Sanctum Scramble rejected: also GW2) |
-| Knight-Lieutenant (deed + title) | Banneret | WoW Alliance honor rank 7, same honor-ladder role (Feist/Dragon Age uses noted; the Sergeant -> Knight-Lieutenant -> Field Marshal ladder subset was WoW's) |
+| Knight-Lieutenant (deed + title) | Banneret, superseded at the v0.36.0 merge by Fieldreaver (see the merge supersession section below) | WoW Alliance honor rank 7, same honor-ladder role (Feist/Dragon Age uses noted; the Sergeant -> Knight-Lieutenant -> Field Marshal ladder subset was WoW's) |
 
 Every rename landed as: content def + English catalog together, sim_i18n matcher
 rows in the same change (single-line emits preserved), the five non-Latin
@@ -101,6 +101,25 @@ rows carried the other game's OFFICIAL localized coins: zh 十字军打击 / 迅
 fill, guide content regenerated, parity goldens re-minted under the inspector +
 state-proof protocol, new literals pinned in `tests/originality_renames.test.ts`,
 and the old names armed in `tests/ip_scrub.test.ts` plus the NAME-MAP amendment.
+
+## v0.36.0 merge supersession (recorded at phase 03 QA)
+
+Release/v0.36.0 landed its own IP-safe honor-title re-cut (PR #3133,
+maintainer-merged) while this phase was in flight: the whole classic PvP
+ladder was re-cut upstream as Sergeant -> Linebreaker, Knight-Lieutenant ->
+Fieldreaver, Field Marshal -> Warcrowned, ids unchanged. The release ruling
+supersedes this audit's three ladder verdicts: the phase's Banneret never
+ships (replaced at the merge by Fieldreaver), and the Sergeant / Field
+Marshal GENERIC keeps lost their subjects (both now ship under release-minted
+CLEAR names). The three release names carry the maintainer's own ruling and
+enter the appendix as CLEAR rows; the release also shipped real translations
+for all three in every locale, which refills the 26 knight-lieutenant Latin
+deed rows this phase had stripped (ledger obligation counts amended in
+state.md). Recorded id-rule keeps from the same merge: the release-baked
+shaman clip id Storm_Strike, the murloc/kobold GLB filename families, and
+lowercase generic vocabulary in dev comments ("imp") are id or dev surfaces,
+not display names, and stay frozen by the same rule that keeps
+Nightkin_Attack.
 
 ## Registry verdicts (the packet's new names)
 
@@ -201,13 +220,15 @@ Amberfall Harvest, Wrathwing... (renamed), Hellfire... (renamed).
   protocol; several replaced non-Latin values were the other game's official
   localized coins (see the rename table note).
 
-## Appendix: per-name dispositions (2606 rows)
+## Appendix: per-name dispositions (2609 rows)
 
-2606 rows = the 2605 unique inventory names plus one sweep-emitted variant
+2609 rows = the 2605 unique inventory names plus one sweep-emitted variant
 ('Wildheart Basin', shard 10's un-articled duplicate of 'The Wildheart Basin';
-kept as its own row so the sweep output reconciles exactly).
+kept as its own row so the sweep output reconciles exactly), plus the three
+release-minted honor titles adopted at the v0.36.0 merge (Linebreaker,
+Fieldreaver, Warcrowned; see the merge supersession section).
 Counts: RENAMED 52 | BORDERLINE (maintainer) 15 | KEEP (flagged, kept) 92 |
-CLEAR 290 | GENERIC 2157. GENERIC = shared/plain vocabulary (no search hit
+CLEAR 293 | GENERIC 2157. GENERIC = shared/plain vocabulary (no search hit
 claimed); CLEAR = distinctive or coined, web-verified unclaimed by any other
 game; KEEP = flagged by a sweep or hunter agent and kept after adversarial
 verification plus hand judgment; refs are `domain:id` (display-only, ids
@@ -237,7 +258,7 @@ frozen).
 | Holy Shock | RENAMED | -> Lightjolt (World of Warcraft) | ability:holy_shock |
 | Icy Veins | RENAMED | -> Coldsurge (World of Warcraft) | ability:icy_veins |
 | Ignition Key: Terrorspark Groundshaker | RENAMED | -> Ignition Key: Dreadspark Groundshaker (World of Warcraft) | item:reins_terrorspark_groundshaker |
-| Knight-Lieutenant | RENAMED | -> Banneret (World of Warcraft) | deed:pvp_honor_knight_lieutenant deedTitle:pvp_honor_knight_lieutenant |
+| Knight-Lieutenant | RENAMED | -> Banneret (World of Warcraft); superseded at the v0.36.0 merge by the release's Fieldreaver (PR #3133) | deed:pvp_honor_knight_lieutenant deedTitle:pvp_honor_knight_lieutenant |
 | Mantle of the Frostmane | RENAMED | -> Mantle of the Rimemane (World of Warcraft) | item:frostmane_mantle |
 | Mistforged Pauldrons | RENAMED | -> Fogforged Pauldrons (Guild Wars 2) | item:mistforged_pauldrons |
 | Nightkin Stargazer | RENAMED | -> Gloamkin Stargazer (Fallout) | mob:nightkin_stargazer |
@@ -445,6 +466,7 @@ frozen).
 | Fangknife of Zulgar | CLEAR |  | item:wildheart_fangknife item:heroic_wildheart_fangknife |
 | Fen-Witch of Willowweep | CLEAR |  | npcTitle:mother_sedge |
 | Fieldhardy | CLEAR |  | choiceRow:hun_r17_thick_hide |
+| Fieldreaver | CLEAR | release-minted (PR #3133 ip-safe re-cut, maintainer ruling); adopted at the v0.36.0 merge over the phase's Banneret | deed:pvp_honor_knight_lieutenant deedTitle:pvp_honor_knight_lieutenant |
 | Fiendhide | CLEAR |  | ability:demon_skin |
 | Fiendlore | CLEAR |  | talentMastery:demonology |
 | Fiendward | CLEAR |  | choiceRow:wlk_r11_demon_armor |
@@ -504,6 +526,7 @@ frozen).
 | Lanternmere | CLEAR |  | poi:6.0 |
 | Lifesap | CLEAR |  | ability:innervate choiceRow:dru_r11_innervate |
 | Lightmend | CLEAR |  | ability:flash_of_light |
+| Linebreaker | CLEAR | release-minted (PR #3133 ip-safe re-cut, maintainer ruling); replaced the Sergeant GENERIC keep at the v0.36.0 merge | deed:pvp_honor_sergeant deedTitle:pvp_honor_sergeant |
 | Lira Dewsong | CLEAR |  | npc:lira_dewsong |
 | Magus Vel'Kor the Pactbound | CLEAR |  | mob:rift_boss_ritualist |
 | Maldrec's Soulbinder | CLEAR |  | item:maldrecs_soulbinder |
@@ -638,6 +661,7 @@ frozen).
 | Voidfeast | CLEAR |  | ability:voidfeast choiceRow:wlk_r8_voidfeast |
 | Voidscar | CLEAR |  | riftTheme:5 |
 | Voskar the Emberwing | CLEAR |  | mob:voskar_emberwing |
+| Warcrowned | CLEAR | release-minted (PR #3133 ip-safe re-cut, maintainer ruling); replaced the Field Marshal GENERIC keep at the v0.36.0 merge | deed:pvp_honor_field_marshal deedTitle:pvp_honor_field_marshal |
 | Warden Coalfast | CLEAR |  | npc:warden_coalfast |
 | Warden of Icemantle | CLEAR |  | npcTitle:warden_kaldra |
 | Warlord Drogmar | CLEAR |  | mob:warlord_drogmar quest:q_drogmar |
@@ -1299,7 +1323,7 @@ frozen).
 | Fetish and Bone | GENERIC |  | quest:q_troll_fetishes |
 | Fettering Slash | GENERIC |  | ability:wing_clip |
 | Fevered Draw | GENERIC |  | ability:rapid_fire |
-| Field Marshal | GENERIC |  | deed:pvp_honor_field_marshal deedTitle:pvp_honor_field_marshal |
+| Field Marshal | GENERIC | superseded: ships as Warcrowned since the v0.36.0 merge (release PR #3133) | deed:pvp_honor_field_marshal deedTitle:pvp_honor_field_marshal |
 | Field Surgeon | GENERIC |  | npcTitle:mender_saul |
 | Fieldcraft | GENERIC |  | talentSpec:survival |
 | Fifty Doors Down | GENERIC |  | deed:dgn_boss_clears_50 |
@@ -2156,7 +2180,7 @@ frozen).
 | Seeing Wren Home | GENERIC |  | quest:q_fv_seeing_wren_home |
 | Seething Fury | GENERIC |  | ability:berserker_rage |
 | Seismic Stomp | GENERIC |  | mobMechanic:thunzharr_waking_peak.stomp mobMechanic:rift_boss_brute.stomp |
-| Sergeant | GENERIC |  | deed:pvp_honor_sergeant deedTitle:pvp_honor_sergeant |
+| Sergeant | GENERIC | superseded: ships as Linebreaker since the v0.36.0 merge (release PR #3133) | deed:pvp_honor_sergeant deedTitle:pvp_honor_sergeant |
 | Serration | GENERIC |  | mobMechanic:rift_thornback.bleed |
 | Settle It Outside | GENERIC |  | deed:pvp_duel_first_win |
 | Sexton Marrow | GENERIC |  | mob:sexton_marrow npc:sexton_marrow |

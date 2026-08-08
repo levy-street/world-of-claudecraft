@@ -46,10 +46,21 @@ Agent 1 (Wyrmfall Core):
   once per character per day (R9; a new daily gate on PlayerMeta); sold by the Heroic
   Quartermaster for Heroic Marks (pick the price from the existing mark-price family,
   record it in state.md).
+  AMENDED AT PHASE 03 QA (v0.36.0 merge): the daily boundary seam changed under this
+  plan. Every daily rollover now keys on `ctx.resetDay` (the realm-local reset window;
+  see src/sim/sim_context.ts); `utcDay` is demoted to a calendar stamp. The R9 daily
+  gate MUST key on `ctx.resetDay`, never `utcDay`, or it creates the second,
+  disagreeing daily boundary the release explicitly eliminated.
 Agent 2 (Sundered Essence + Maker's Ember):
 - Sundered Essence: soulbound; a new disenchant-adjacent extraction action available on
   any RAID-sourced epic of the tier (source-level check), cast-paced on the shared
   profession cast seam; yields recorded in state.md.
+  AMENDED AT PHASE 03 QA (v0.36.0 merge): the release's bag Sort (`inv_sort`) splices
+  and consolidates inventory cells at any time, including mid-cast, and the release had
+  to extend disenchant's pinned-slot re-check to survive it. The extraction's cast MUST
+  ship the same pinned-slot re-check (re-resolve the selected copy at cast completion,
+  refuse if it moved or merged), or a mid-cast sort can destroy a copy the player never
+  selected.
 - Maker's Ember: soulbound keystone, 1 per week per character, BANKABLE (missed weeks
   accrue, R4): an accrual field on PlayerMeta, persisted; the weekly grant fires on the
   first eligible endgame completion of the week (raid boss, heroic final boss, or rift

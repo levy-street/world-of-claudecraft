@@ -87,7 +87,11 @@ Lucent Infusion (Perfected-only enchant). Rejected for collisions: Vanquisher, R
 Arcanite (new uses), Quintessent, Grand Banquet, Colossus Splitter, Aetherlens, Apex (tag).
 Phase 03 amendments: Prismstone Setting RENAMED to Prismglass Setting (FFXIV ships a real
 'Prismstone' crafting material in the same component role, plus WoW's Prismstone Ring;
-Prismglass verified zero-hit). Wyrmhide Cording and Sunspun Bolt KEPT with recorded
+Prismglass verified zero-hit). Phase 03 QA amendment (v0.36.0 merge supersession): the
+release's own IP-safe honor-title re-cut (PR #3133, maintainer-merged) supersedes the
+phase's honor-ladder verdicts: the ladder ships as Linebreaker / Fieldreaver / Warcrowned
+(ids unchanged); the phase's Banneret never ships, and the Sergeant / Field Marshal keeps
+lost their subjects. Later phases author against the release names. Wyrmhide Cording and Sunspun Bolt KEPT with recorded
 caveats (Wyrmhide is a D2 armor base and a WoW arena-set family, cross-franchise material
 vocabulary; Sunspun's only use is FFXIV's cash-shop Sunspun Cumulus mount); all other
 registry names verified CLEAR or GENERIC. Full verdicts: naming-audit.md.
@@ -105,6 +109,19 @@ registry names verified CLEAR or GENERIC. Full verdicts: naming-audit.md.
 - pre-merge / phase close: `node scripts/gate_select.mjs`; full `npm run gate` before the PR.
 
 ## Key existing seams (from the research; verified against v0.35.0, re-verify on v0.36.0 drift)
+- v0.36.0 re-verify (phase 03 QA merge audit): the drift check ran; two NEW mandatory
+  seams landed with the merge that later phases must obey: (a) `src/sim/inventory_sort.ts`
+  KIND_RANK / QUALITY_RANK are TOTAL Records, so any new ItemKind or quality tier fails
+  tsc until ranked there in the same change (the merge ranked 'recipe' at 10 with a test
+  fixture); (b) SimContext gained `bumpCommissionOrderBoardRev`, which every
+  commission-board mutation site must call. Also from the merge: every daily rollover now
+  keys on `ctx.resetDay` (realm-local reset window); `utcDay` is a calendar stamp only.
+  The two-hand/offhand displacement rule gained a worn arm: a worn offhand
+  (`occupiesHand: false`, the hunter quivers) COEXISTS with a two-hander in both
+  directions and budgets on WORN_OFFHAND_STAT_MULT (0.45), so the phase 01 ledger's
+  "a two-hander equip empties the offhand" exemption is now conditional on
+  `occupiesHand`, and the phase 06/09 offhand authoring must decide the worn arm
+  explicitly.
 - Recipes: `src/sim/content/recipes.ts` (`ALL_RECIPES`), shape `ProfessionRecipeRecord`
   (`src/sim/professions/types.ts`). SUPERSEDED BY PHASE 02 (the research-era premise said
   zero users and no kind): `acquireRecipe` now has its first real caller (source 'drop',
@@ -385,8 +402,11 @@ registry names verified CLEAR or GENERIC. Full verdicts: naming-audit.md.
   Wintergnaw aura rows; single-line emits preserved); the 5 non-Latin overlays refreshed
   with REAL translations of the new name (several old rows were the other game's
   OFFICIAL localized coins: zh 十字军打击/迅捷治愈/神圣新星/乘胜追击, ko 성전사의
-  일격/신성 충격/폭풍 망치/마법 훔치기, ru Ледяные жилы); stale Latin overlay rows
-  stripped to pending (720 rows) for the release fill; semantically-still-valid
+  일격/신성 충격/폭풍 망치/마법 훔치기, ru Ледяные жилы; the knight-lieutenant
+  renderings among these, the phase's Banneret set, were themselves replaced wholesale
+  at the v0.36.0 merge by the release's Fieldreaver renderings); stale Latin overlay rows
+  stripped to pending (720 rows at phase close; 694 after the v0.36.0 merge refill, see
+  obligation 1) for the release fill; semantically-still-valid
   non-Latin renderings deliberately KEPT (87 rows: zh 绞湖镇/古辉镇/霜鬃/雾铸/墓花 etc.,
   recorded as intentional); guide regenerated; new literals pinned in
   tests/originality_renames.test.ts ("phase 03" describe); old names armed in
@@ -404,12 +424,16 @@ registry names verified CLEAR or GENERIC. Full verdicts: naming-audit.md.
   Arkanit/Arcanite/Arcanita loanwords; it_IT Fogliaargento/Polvere Arcana; 17 collision
   prose rows); stripped to pending.
 - RELEASE-FILL OBLIGATIONS recorded for the i18n-locale-fill pass: (1) the 720 Latin
-  rows this phase stripped (they list under pending); (2) the 219 stale-calque item rows
+  rows this phase stripped (they list under pending; 694 remain after the v0.36.0 merge:
+  the release's honor-title re-cut refilled the 26 pvp_honor_knight_lieutenant name and
+  title rows across the 13 Latin deed locales with real Fieldreaver translations);
+  (2) the 219 stale-calque item rows
   + 23 calque prose rows from the OLD rename wave (translations of pre-rename names, no
   foreign coin; per-locale list in the residual audit, tr/vi/cs/da/nl/pl/sv/id/it/fr/es
   worst); (3) talent_i18n Latin values for the four renamed rows (Victor's Surge,
   Thunderhurl, Zealwing, Spiritcall) carried over as closest-translations, REVIEW at
-  fill; (4) deed_i18n Latin rows stripped for the 5 touched deeds (64 rows); (5) the
+  fill; (4) deed_i18n Latin rows stripped for the 5 touched deeds (64 rows at phase
+  close; 38 remain, the v0.36.0 merge refilled knight-lieutenant's 26); (5) the
   ru_RU chr_nightbloom_first_cast DESC row is pre-existing romanized junk ("Poymay
   rybu..."), name row fixed here, desc left for the fill; (6) sv_SE split-vintage rows
   and the register-clash trio (de/pl/tr) remain from earlier ledgers.
@@ -425,6 +449,24 @@ registry names verified CLEAR or GENERIC. Full verdicts: naming-audit.md.
   Blazing Barrier, Ice Lance, Fingers of Frost, Bladestorm, Barrow Wight (1869
   folklore), Hat Trick Hero, Anger Management and the other idiom/multi-property rows in
   naming-audit.md "Notable keeps"; do not re-raise without NEW evidence.
+- Phase 03 QA: v0.36.0 merge audit (merge ed51716964; 9-agent sweep, 32 findings, all
+  triaged). Fixed on the branch: the honor-title supersession (docs above), three
+  release-side old-name reintroductions (shaman attackByAbility comment block,
+  frozen_orb_fx describe title, shaman anim spec-name comment), the recipe kind ranked
+  into the release's new inventory_sort ladder, the eastbrook seals re-minted on the
+  merged tree. Recorded UPSTREAM follow-ups (release-owned, out of this branch's scope,
+  do not fix here): server/pbe_boost.ts fillHands still hardcodes the pre-quiver
+  displacement rule (and tests/server/pbe_boost.test.ts:196 pins the old behavior);
+  tests/visual_manifest.test.ts wildheart re-cut reads donor GLBs twice with a stale
+  comment; tests/delves.test.ts:1226 + tests/honor.test.ts:210,234 titles still say UTC
+  day while bodies drive resetDay; the release's hudChrome.fct.absorbed reword left all
+  18 translated overlays stale (the reword-staleness blind spot: rows are translated,
+  not pending, so no gate or worklist lists them). PACKET follow-ups: the branch-added
+  tests/recipe_pattern_items.test.ts db mock (like the release's wire-cadence siblings)
+  carries fewer './db' keys than the canonical shape and stays green only while its
+  paths avoid them; the masterwrought suites (masterwrought_cap, recipe_pattern_items,
+  recipe_pattern_tooltip_view) predate the EMPTY_TEST_WORLD gate-perf trim and could
+  adopt it with per-suite validation.
 - Standing rule codified per the maintainer's mid-phase instruction: every NEW
   player-visible proper noun is IP-checked at authoring time in the same change (root
   CLAUDE.md content bullet + src/sim/content/CLAUDE.md "Naming originality" section).
