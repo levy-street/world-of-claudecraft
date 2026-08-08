@@ -2979,7 +2979,8 @@ export const da_DK: EnTranslations = {
       "equip": "Udrust",
       "disenchant": "Affortrylle",
       "salvage": "Bjærg",
-      "applyEnchant": "Anvend fortryllelse"
+      "applyEnchant": "Anvend fortryllelse",
+      "sunder": "Sunder"
     },
     "enchanting": {
       "disenchantedLine": "Du affortrylles {item}.",
@@ -3009,6 +3010,9 @@ export const da_DK: EnTranslations = {
       "salvageConfirmTitle": "Bjærg {item}?",
       "salvageConfirmBody": "Dette ødelægger {item} og giver håndværksmaterialer. Dette kan ikke fortrydes.",
       "salvageConfirmBodySpecial": "Dette ødelægger et særligt eksemplar af {item} (signeret, mesterværk eller fortryllet) og giver håndværksmaterialer. Dette kan ikke fortrydes.",
+      "sunderConfirmTitle": "Sunder {item}?",
+      "sunderConfirmBody": "This destroys {item} and yields Sundered Essence. This cannot be undone.",
+      "sunderConfirmBodySpecial": "This destroys a special copy of {item} (signed, masterwork, or enchanted) and yields Sundered Essence. This cannot be undone.",
       "pickerTitle": "Anvend fortryllelse",
       "targetTitle": "Vælg en genstand at fortryle",
       "noEnchants": "Ingen fortryllelse bruger dette reagens.",
@@ -8054,6 +8058,7 @@ export const da_DK: EnTranslations = {
       "disenchanting": "Affortryllelse",
       "enchanting_apply": "Fortryllelse",
       "salvaging": "Bjærgning",
+      "sundering": "Sundering",
       "tool_recharge": "Genopladning",
       "demonHeal": "Dæmonhelbredelse",
       "thunzharrStormcall": "Stormkald",

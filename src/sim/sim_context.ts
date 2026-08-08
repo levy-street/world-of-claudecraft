@@ -837,6 +837,8 @@ export interface SimContextCallbacks {
   completeDisenchantCast(p: Entity, meta: PlayerMeta): void;
   completeApplyEnchantCast(p: Entity, meta: PlayerMeta): void;
   completeSalvageCast(p: Entity, meta: PlayerMeta): void;
+  // Sunder cast completion (Masterwrought phase 04, professions/sundering.ts).
+  completeSunderCast(p: Entity, meta: PlayerMeta): void;
   // Tool-effect recharge cast completion (Craft Cast System Phase 5).
   completeRechargeCast(p: Entity, meta: PlayerMeta): void;
   applyDemonHealTick(owner: Entity): void;
@@ -1538,6 +1540,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     completeDisenchantCast: host.completeDisenchantCast,
     completeApplyEnchantCast: host.completeApplyEnchantCast,
     completeSalvageCast: host.completeSalvageCast,
+    completeSunderCast: host.completeSunderCast,
     completeRechargeCast: host.completeRechargeCast,
     applyDemonHealTick: host.applyDemonHealTick,
     awardCombo: host.awardCombo,

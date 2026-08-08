@@ -135,6 +135,7 @@ export class BagItemActionMenu {
       if (id === 'default') runDefault();
       else if (id === 'disenchant') this.confirmDestroy('disenchant', itemId, slotIndex);
       else if (id === 'salvage') this.confirmDestroy('salvage', itemId);
+      else if (id === 'sunder') this.confirmDestroy('sunder', itemId, slotIndex);
       else if (id === 'applyEnchant') this.openEnchantPicker(itemId, x, y);
     });
   }
@@ -143,7 +144,7 @@ export class BagItemActionMenu {
   // the stronger warning body when the copy that would actually be consumed is
   // special (signed / masterwork / enchanted). The OK label reuses the menu verb.
   private confirmDestroy(
-    action: 'disenchant' | 'salvage',
+    action: 'disenchant' | 'salvage' | 'sunder',
     itemId: string,
     slotIndex?: number,
   ): void {
@@ -152,7 +153,7 @@ export class BagItemActionMenu {
     const name = def ? itemDisplayName(def) : itemId;
     const selected = slotIndex === undefined ? undefined : world.inventory[slotIndex];
     const copies =
-      action === 'disenchant' && selected?.itemId === itemId
+      (action === 'disenchant' || action === 'sunder') && selected?.itemId === itemId
         ? [selected]
         : world.inventory.filter((slot) => slot.itemId === itemId);
     const special = destroyConsumesSpecialCopy(action, copies);
@@ -165,13 +166,21 @@ export class BagItemActionMenu {
               : ('hudChrome.enchanting.disenchantConfirmBody' as const),
             ok: 'hudChrome.itemMenu.disenchant' as const,
           }
-        : {
-            title: 'hudChrome.enchanting.salvageConfirmTitle' as const,
-            body: special
-              ? ('hudChrome.enchanting.salvageConfirmBodySpecial' as const)
-              : ('hudChrome.enchanting.salvageConfirmBody' as const),
-            ok: 'hudChrome.itemMenu.salvage' as const,
-          };
+        : action === 'sunder'
+          ? {
+              title: 'hudChrome.enchanting.sunderConfirmTitle' as const,
+              body: special
+                ? ('hudChrome.enchanting.sunderConfirmBodySpecial' as const)
+                : ('hudChrome.enchanting.sunderConfirmBody' as const),
+              ok: 'hudChrome.itemMenu.sunder' as const,
+            }
+          : {
+              title: 'hudChrome.enchanting.salvageConfirmTitle' as const,
+              body: special
+                ? ('hudChrome.enchanting.salvageConfirmBodySpecial' as const)
+                : ('hudChrome.enchanting.salvageConfirmBody' as const),
+              ok: 'hudChrome.itemMenu.salvage' as const,
+            };
     // The disenchant arm also states what the destroy PAYS OUT (the sim's own
     // yield functions, via the pure view core), so an irreversible action is
     // not a blind trade. Salvage keeps its existing body: its generic yield is
@@ -187,6 +196,9 @@ export class BagItemActionMenu {
         if (action === 'disenchant') {
           if (slotIndex === undefined) world.disenchantItem(itemId);
           else world.disenchantItem(itemId, { slotIndex });
+        } else if (action === 'sunder') {
+          if (slotIndex === undefined) world.extractEssence(itemId);
+          else world.extractEssence(itemId, { slotIndex });
         } else world.salvageItem(itemId);
         this.deps.afterAction();
       },

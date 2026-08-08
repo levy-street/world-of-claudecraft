@@ -2979,7 +2979,8 @@ export const cs_CZ: EnTranslations = {
       "equip": "Vybavit",
       "disenchant": "Rozzačarovat",
       "salvage": "Rozebrat",
-      "applyEnchant": "Aplikovat okouzlení"
+      "applyEnchant": "Aplikovat okouzlení",
+      "sunder": "Sunder"
     },
     "enchanting": {
       "disenchantedLine": "Rozzačaruješ {item}.",
@@ -3009,6 +3010,9 @@ export const cs_CZ: EnTranslations = {
       "salvageConfirmTitle": "Rozebrat {item}?",
       "salvageConfirmBody": "Tímto se {item} zničí a získáš řemeslné materiály. Tuto akci nelze vrátit.",
       "salvageConfirmBodySpecial": "Tímto se zvláštní kopie {item} (podepsaná, mistrovská nebo okouzlená) zničí a získáš řemeslné materiály. Tuto akci nelze vrátit.",
+      "sunderConfirmTitle": "Sunder {item}?",
+      "sunderConfirmBody": "This destroys {item} and yields Sundered Essence. This cannot be undone.",
+      "sunderConfirmBodySpecial": "This destroys a special copy of {item} (signed, masterwork, or enchanted) and yields Sundered Essence. This cannot be undone.",
       "pickerTitle": "Aplikovat okouzlení",
       "targetTitle": "Vybrat předmět",
       "noEnchants": "Žádné okouzlení nepoužívá tuto reagencii.",
@@ -8054,6 +8058,7 @@ export const cs_CZ: EnTranslations = {
       "disenchanting": "Rozzačarování",
       "enchanting_apply": "Okouzlování",
       "salvaging": "Rozebrání",
+      "sundering": "Sundering",
       "tool_recharge": "Dobíjení",
       "demonHeal": "Léčení démona",
       "thunzharrStormcall": "Volání bouře",

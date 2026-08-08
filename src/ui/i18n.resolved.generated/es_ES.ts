@@ -2979,7 +2979,8 @@ export const es_ES: EnTranslations = {
       "equip": "Equipar",
       "disenchant": "Desencatar",
       "salvage": "Desguazar",
-      "applyEnchant": "Aplicar encantamiento"
+      "applyEnchant": "Aplicar encantamiento",
+      "sunder": "Sunder"
     },
     "enchanting": {
       "disenchantedLine": "Desencatas {item}.",
@@ -3009,6 +3010,9 @@ export const es_ES: EnTranslations = {
       "salvageConfirmTitle": "¿Desguazar {item}?",
       "salvageConfirmBody": "Esto destruye {item} y produce materiales de artesanía. No se puede deshacer.",
       "salvageConfirmBodySpecial": "Esto destruye una copia especial de {item} (firmada, obra maestra o encantada) y produce materiales de artesanía. No se puede deshacer.",
+      "sunderConfirmTitle": "Sunder {item}?",
+      "sunderConfirmBody": "This destroys {item} and yields Sundered Essence. This cannot be undone.",
+      "sunderConfirmBodySpecial": "This destroys a special copy of {item} (signed, masterwork, or enchanted) and yields Sundered Essence. This cannot be undone.",
       "pickerTitle": "Aplicar encantamiento",
       "targetTitle": "Elige un objeto para encantar",
       "noEnchants": "Ningún encantamiento usa este reactivo.",
@@ -8054,6 +8058,7 @@ export const es_ES: EnTranslations = {
       "disenchanting": "Desencantando",
       "enchanting_apply": "Encantando",
       "salvaging": "Desguazando",
+      "sundering": "Sundering",
       "tool_recharge": "Recargando",
       "demonHeal": "Sanación demoníaca",
       "thunzharrStormcall": "Llamada de la tormenta",

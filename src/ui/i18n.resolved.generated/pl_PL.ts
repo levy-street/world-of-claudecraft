@@ -2979,7 +2979,8 @@ export const pl_PL: EnTranslations = {
       "equip": "Załóż",
       "disenchant": "Rozbroić",
       "salvage": "Odzyskaj",
-      "applyEnchant": "Zastosuj zaklinanie"
+      "applyEnchant": "Zastosuj zaklinanie",
+      "sunder": "Sunder"
     },
     "enchanting": {
       "disenchantedLine": "Rozbrajasz {item}.",
@@ -3009,6 +3010,9 @@ export const pl_PL: EnTranslations = {
       "salvageConfirmTitle": "Odzyskać {item}?",
       "salvageConfirmBody": "To niszczy {item} i daje materiały rzemieślnicze. Nie można tego cofnąć.",
       "salvageConfirmBodySpecial": "To niszczy specjalną kopię {item} (podpisaną, mistrzowską lub zaklinowaną) i daje materiały rzemieślnicze. Nie można tego cofnąć.",
+      "sunderConfirmTitle": "Sunder {item}?",
+      "sunderConfirmBody": "This destroys {item} and yields Sundered Essence. This cannot be undone.",
+      "sunderConfirmBodySpecial": "This destroys a special copy of {item} (signed, masterwork, or enchanted) and yields Sundered Essence. This cannot be undone.",
       "pickerTitle": "Zastosuj zaklinanie",
       "targetTitle": "Wybierz przedmiot do zaklinania",
       "noEnchants": "Brak zaklinania używającego tego składnika.",
@@ -8054,6 +8058,7 @@ export const pl_PL: EnTranslations = {
       "disenchanting": "Rozbrajanie",
       "enchanting_apply": "Zaklinanie",
       "salvaging": "Odzyskiwanie",
+      "sundering": "Sundering",
       "tool_recharge": "Ładowanie",
       "demonHeal": "Demoniczne leczenie",
       "thunzharrStormcall": "Zew burzy",

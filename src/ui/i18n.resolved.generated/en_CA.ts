@@ -2979,7 +2979,8 @@ export const en_CA: EnTranslations = {
       "equip": "Equip",
       "disenchant": "Disenchant",
       "salvage": "Salvage",
-      "applyEnchant": "Apply Enchant"
+      "applyEnchant": "Apply Enchant",
+      "sunder": "Sunder"
     },
     "enchanting": {
       "disenchantedLine": "You disenchant {item}.",
@@ -3009,6 +3010,9 @@ export const en_CA: EnTranslations = {
       "salvageConfirmTitle": "Salvage {item}?",
       "salvageConfirmBody": "This destroys {item} and yields crafting materials. This cannot be undone.",
       "salvageConfirmBodySpecial": "This destroys a special copy of {item} (signed, masterwork, or enchanted) and yields crafting materials. This cannot be undone.",
+      "sunderConfirmTitle": "Sunder {item}?",
+      "sunderConfirmBody": "This destroys {item} and yields Sundered Essence. This cannot be undone.",
+      "sunderConfirmBodySpecial": "This destroys a special copy of {item} (signed, masterwork, or enchanted) and yields Sundered Essence. This cannot be undone.",
       "pickerTitle": "Apply Enchant",
       "targetTitle": "Choose an item to enchant",
       "noEnchants": "No enchant uses this reagent.",
@@ -8054,6 +8058,7 @@ export const en_CA: EnTranslations = {
       "disenchanting": "Disenchanting",
       "enchanting_apply": "Enchanting",
       "salvaging": "Salvaging",
+      "sundering": "Sundering",
       "tool_recharge": "Recharging",
       "demonHeal": "Demon Heal",
       "thunzharrStormcall": "Stormcall",

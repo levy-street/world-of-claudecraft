@@ -333,6 +333,8 @@ export const IWORLD_MEMBERS = [
   { name: 'activeMobileStationCraft', kind: 'data' },
   // Enchanting profession commands + result reads (Professions 2.0).
   { name: 'disenchantItem', kind: 'method' },
+  // The Sundered Essence extraction (Masterwrought phase 04).
+  { name: 'extractEssence', kind: 'method' },
   { name: 'applyEnchant', kind: 'method' },
   { name: 'salvageItem', kind: 'method' },
   { name: 'lastDisenchantResult', kind: 'data' },
@@ -558,10 +560,12 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // (IWorldCosmetics, a method), leaving 300. The bag clean-up button adds
     // sortInventory (IWorldInventory, a method), leaving 301. The character
     // sheet's Time Played line adds playtimeSeconds (IWorldProgressionXp,
-    // data), leaving 302.
-    expect(IWORLD_MEMBERS.length).toBe(302);
+    // data), leaving 302. The Masterwrought materials backbone adds the
+    // Sundered Essence extraction command extractEssence (IWorldProfessions,
+    // a method), leaving 303.
+    expect(IWORLD_MEMBERS.length).toBe(303);
     expect(DATA_MEMBERS.length).toBe(77);
-    expect(METHOD_MEMBERS.length).toBe(225);
+    expect(METHOD_MEMBERS.length).toBe(226);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -681,6 +685,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'equipItemToSlot',
       'equipment',
       'equipmentInstances',
+      'extractEssence',
       'feedPet',
       'forfeitCardDuel',
       'friendAdd',
@@ -1038,6 +1043,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'equipBag',
       'equipItem',
       'equipItemToSlot',
+      'extractEssence',
       'feedPet',
       'forfeitCardDuel',
       'friendAdd',
@@ -1661,6 +1667,7 @@ const FACET_PROFESSIONS = [
   'trainRecipe',
   'activeMobileStationCraft',
   'disenchantItem',
+  'extractEssence',
   'applyEnchant',
   'salvageItem',
   'lastDisenchantResult',
@@ -1766,8 +1773,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(302);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(302);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(303);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(303);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

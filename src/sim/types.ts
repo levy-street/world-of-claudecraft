@@ -133,6 +133,11 @@ export const CRAFT_CAST_ID = 'crafting';
 export const DISENCHANT_CAST_ID = 'disenchanting';
 export const ENCHANT_CAST_ID = 'enchanting_apply';
 export const SALVAGE_CAST_ID = 'salvaging';
+// The Sundered Essence extraction cast (Masterwrought phase 04): breaks a
+// raid-won epic into the bound ceiling material. Same enchant-family session
+// shape (professions/sundering.ts reuses the enchantCast* fields and the
+// pinned-slot re-check).
+export const SUNDER_CAST_ID = 'sundering';
 // Tool-effect recharge cast sentinel (Craft Cast System Phase 5): same
 // activity-marker shape as craft/enchant-family. Separate id keeps cast-bar
 // labels and audio routing clean.
@@ -152,6 +157,7 @@ export function isNonSpellCast(castId: string | null): boolean {
     castId === DISENCHANT_CAST_ID ||
     castId === ENCHANT_CAST_ID ||
     castId === SALVAGE_CAST_ID ||
+    castId === SUNDER_CAST_ID ||
     castId === TOOL_RECHARGE_CAST_ID
   );
 }

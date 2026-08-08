@@ -2979,7 +2979,8 @@ export const de_DE: EnTranslations = {
       "equip": "Anlegen",
       "disenchant": "Entzaubern",
       "salvage": "Zerlegen",
-      "applyEnchant": "Verzauberung anwenden"
+      "applyEnchant": "Verzauberung anwenden",
+      "sunder": "Sunder"
     },
     "enchanting": {
       "disenchantedLine": "Du entzauberst {item}.",
@@ -3009,6 +3010,9 @@ export const de_DE: EnTranslations = {
       "salvageConfirmTitle": "{item} zerlegen?",
       "salvageConfirmBody": "Dies zerstört {item} und ergibt Handwerksmaterialien. Dies kann nicht rückgängig gemacht werden.",
       "salvageConfirmBodySpecial": "Dies zerstört eine besondere Kopie von {item} (signiert, Meisterwerk oder verzaubert) und ergibt Handwerksmaterialien. Dies kann nicht rückgängig gemacht werden.",
+      "sunderConfirmTitle": "Sunder {item}?",
+      "sunderConfirmBody": "This destroys {item} and yields Sundered Essence. This cannot be undone.",
+      "sunderConfirmBodySpecial": "This destroys a special copy of {item} (signed, masterwork, or enchanted) and yields Sundered Essence. This cannot be undone.",
       "pickerTitle": "Verzauberung anwenden",
       "targetTitle": "Wähle einen Gegenstand zum Verzaubern",
       "noEnchants": "Keine Verzauberung verwendet dieses Reagenz.",
@@ -8054,6 +8058,7 @@ export const de_DE: EnTranslations = {
       "disenchanting": "Entzaubern",
       "enchanting_apply": "Verzaubern",
       "salvaging": "Zerlegen",
+      "sundering": "Sundering",
       "tool_recharge": "Aufladen",
       "demonHeal": "Dämonenheilung",
       "thunzharrStormcall": "Sturmruf",

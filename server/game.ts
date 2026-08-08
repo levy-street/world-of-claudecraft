@@ -6558,6 +6558,15 @@ export class GameServer {
           sim.disenchantItem(msg.item, pid, slot);
         }
         break;
+      case 'extract_essence':
+        // The Sundered Essence extraction (Masterwrought phase 04): same
+        // untrusted-slot rule as disenchant_item above; the sim re-validates
+        // the target and pins the selected copy against mid-cast splices.
+        if (typeof msg.item === 'string') {
+          const slot = Number.isInteger(msg.slot) ? Number(msg.slot) : undefined;
+          sim.extractEssence(msg.item, pid, slot);
+        }
+        break;
       case 'apply_enchant':
         if (typeof msg.item === 'string' && typeof msg.enchant === 'string') {
           // The optional worn target (the in-place enchant arm) is accepted only

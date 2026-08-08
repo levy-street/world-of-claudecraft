@@ -10071,6 +10071,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemMenu.use': '使用',
   'hudChrome.itemMenu.disenchant': '分解',
   'hudChrome.itemMenu.salvage': '拆解',
+  'hudChrome.itemMenu.sunder': '裂斷',
   'hudChrome.itemMenu.applyEnchant': '施加附魔',
   'hudChrome.enchanting.disenchantedLine': '你分解了 {item}。',
   'hudChrome.enchanting.disenchantedYield': '你將 {item} 分解為 {material}。',
@@ -10098,6 +10099,10 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.salvageConfirmBody': '這會摧毀 {item} 並產出製作材料。此操作無法復原。',
   'hudChrome.enchanting.salvageConfirmBodySpecial':
     '這會摧毀一件特殊的 {item}（署名、傑作或已附魔）並產出製作材料。此操作無法復原。',
+  'hudChrome.enchanting.sunderConfirmTitle': '裂斷 {item}？',
+  'hudChrome.enchanting.sunderConfirmBody': '這會摧毀 {item} 並產出斷裂精華。此操作無法復原。',
+  'hudChrome.enchanting.sunderConfirmBodySpecial':
+    '這會摧毀一件特殊的 {item}（署名、傑作或已附魔）並產出斷裂精華。此操作無法復原。',
   'hudChrome.enchanting.pickerTitle': '施加附魔',
   'hudChrome.enchanting.targetTitle': '選擇要附魔的物品',
   'hudChrome.enchanting.noEnchants': '沒有附魔會用到此材料。',
@@ -10814,6 +10819,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.disenchanting': '分解',
   'abilityUi.cast.enchanting_apply': '附魔',
   'abilityUi.cast.salvaging': '拆解',
+  'abilityUi.cast.sundering': '裂斷',
   'abilityUi.cast.tool_recharge': '充能',
   'hudChrome.crafting.crafting': '製作中',
   'hudChrome.crafting.create': '製作',

@@ -10719,6 +10719,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemMenu.use': 'Использовать',
   'hudChrome.itemMenu.disenchant': 'Распылить',
   'hudChrome.itemMenu.salvage': 'Разобрать',
+  'hudChrome.itemMenu.sunder': 'Расколоть',
   'hudChrome.itemMenu.applyEnchant': 'Наложить чары',
   'hudChrome.enchanting.disenchantedLine': 'Вы распыляете {item}.',
   'hudChrome.enchanting.disenchantedYield': 'Вы распыляете {item} в {material}.',
@@ -10748,6 +10749,11 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Это уничтожит {item} и даст ремесленные материалы. Действие необратимо.',
   'hudChrome.enchanting.salvageConfirmBodySpecial':
     'Это уничтожит особый экземпляр предмета {item} (подписанный, шедевр или зачарованный) и даст ремесленные материалы. Действие необратимо.',
+  'hudChrome.enchanting.sunderConfirmTitle': 'Расколоть {item}?',
+  'hudChrome.enchanting.sunderConfirmBody':
+    'Это уничтожит {item} и даст расколотую эссенцию. Действие необратимо.',
+  'hudChrome.enchanting.sunderConfirmBodySpecial':
+    'Это уничтожит особый экземпляр предмета {item} (подписанный, шедевр или зачарованный) и даст расколотую эссенцию. Действие необратимо.',
   'hudChrome.enchanting.pickerTitle': 'Наложить чары',
   'hudChrome.enchanting.targetTitle': 'Выберите предмет для зачарования',
   'hudChrome.enchanting.noEnchants': 'Нет чар, использующих этот реагент.',
@@ -11489,6 +11495,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.disenchanting': 'Распыление',
   'abilityUi.cast.enchanting_apply': 'Наложение чар',
   'abilityUi.cast.salvaging': 'Разбор',
+  'abilityUi.cast.sundering': 'Раскалывание',
   'abilityUi.cast.tool_recharge': 'Перезарядка',
   'hudChrome.crafting.crafting': 'Изготовление',
   'hudChrome.crafting.create': 'Создать',

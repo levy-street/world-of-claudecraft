@@ -2979,7 +2979,8 @@ export const sv_SE: EnTranslations = {
       "equip": "Utrusta",
       "disenchant": "Avförtrylla",
       "salvage": "Bärga",
-      "applyEnchant": "Applicera förtrollning"
+      "applyEnchant": "Applicera förtrollning",
+      "sunder": "Sunder"
     },
     "enchanting": {
       "disenchantedLine": "Du avförtrollar {item}.",
@@ -3009,6 +3010,9 @@ export const sv_SE: EnTranslations = {
       "salvageConfirmTitle": "Bärga {item}?",
       "salvageConfirmBody": "Detta förstör {item} och ger hantverksmaterial. Det kan inte ångras.",
       "salvageConfirmBodySpecial": "Detta förstör en särskild kopia av {item} (signerad, mästerverk eller förtrollad) och ger hantverksmaterial. Det kan inte ångras.",
+      "sunderConfirmTitle": "Sunder {item}?",
+      "sunderConfirmBody": "This destroys {item} and yields Sundered Essence. This cannot be undone.",
+      "sunderConfirmBodySpecial": "This destroys a special copy of {item} (signed, masterwork, or enchanted) and yields Sundered Essence. This cannot be undone.",
       "pickerTitle": "Applicera förtrollning",
       "targetTitle": "Välj ett föremål att förtrylla",
       "noEnchants": "Inget förtrollning använder det reagnset.",
@@ -8054,6 +8058,7 @@ export const sv_SE: EnTranslations = {
       "disenchanting": "Avförtrollning",
       "enchanting_apply": "Förtrollning",
       "salvaging": "Bärgning",
+      "sundering": "Sundering",
       "tool_recharge": "Omladdning",
       "demonHeal": "Demonläkning",
       "thunzharrStormcall": "Stormrop",

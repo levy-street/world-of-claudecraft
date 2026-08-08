@@ -2979,7 +2979,8 @@ export const it_IT: EnTranslations = {
       "equip": "Equipaggia",
       "disenchant": "Disincanta",
       "salvage": "Smantella",
-      "applyEnchant": "Applica Incantesimo"
+      "applyEnchant": "Applica Incantesimo",
+      "sunder": "Sunder"
     },
     "enchanting": {
       "disenchantedLine": "Disincanti {item}.",
@@ -3009,6 +3010,9 @@ export const it_IT: EnTranslations = {
       "salvageConfirmTitle": "Smantella {item}?",
       "salvageConfirmBody": "Questo distrugge {item} e produce materiali artigianali. Questa azione non puo essere annullata.",
       "salvageConfirmBodySpecial": "Questo distrugge una copia speciale di {item} (firmata, capolavoro o incantata) e produce materiali artigianali. Questa azione non puo essere annullata.",
+      "sunderConfirmTitle": "Sunder {item}?",
+      "sunderConfirmBody": "This destroys {item} and yields Sundered Essence. This cannot be undone.",
+      "sunderConfirmBodySpecial": "This destroys a special copy of {item} (signed, masterwork, or enchanted) and yields Sundered Essence. This cannot be undone.",
       "pickerTitle": "Applica Incantesimo",
       "targetTitle": "Scegli un oggetto da incantare",
       "noEnchants": "Nessun incantesimo utilizza questo reagente.",
@@ -8054,6 +8058,7 @@ export const it_IT: EnTranslations = {
       "disenchanting": "Disincantamento",
       "enchanting_apply": "Incantamento",
       "salvaging": "Smantellamento",
+      "sundering": "Sundering",
       "tool_recharge": "Ricarica",
       "demonHeal": "Cura demoniaca",
       "thunzharrStormcall": "Richiamo della tempesta",

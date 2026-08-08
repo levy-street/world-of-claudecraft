@@ -2979,7 +2979,8 @@ export const ko_KR: EnTranslations = {
       "equip": "장착",
       "disenchant": "마력 추출",
       "salvage": "분해",
-      "applyEnchant": "마법부여 적용"
+      "applyEnchant": "마법부여 적용",
+      "sunder": "가르기"
     },
     "enchanting": {
       "disenchantedLine": "{item}의 마력을 추출했습니다.",
@@ -3009,6 +3010,9 @@ export const ko_KR: EnTranslations = {
       "salvageConfirmTitle": "{item}을(를) 분해하시겠습니까?",
       "salvageConfirmBody": "{item}을(를) 파괴하고 제작 재료를 얻습니다. 되돌릴 수 없습니다.",
       "salvageConfirmBodySpecial": "특별한 {item} 사본(서명됨, 걸작 또는 마법부여됨)을 파괴하고 제작 재료를 얻습니다. 되돌릴 수 없습니다.",
+      "sunderConfirmTitle": "{item}을(를) 가르시겠습니까?",
+      "sunderConfirmBody": "{item}을(를) 파괴하고 갈라진 정수를 얻습니다. 되돌릴 수 없습니다.",
+      "sunderConfirmBodySpecial": "특별한 {item} 사본(서명됨, 걸작 또는 마법부여됨)을 파괴하고 갈라진 정수를 얻습니다. 되돌릴 수 없습니다.",
       "pickerTitle": "마법부여 적용",
       "targetTitle": "마법부여할 아이템을 선택하세요",
       "noEnchants": "이 재료를 사용하는 마법부여가 없습니다.",
@@ -8054,6 +8058,7 @@ export const ko_KR: EnTranslations = {
       "disenchanting": "마력 추출",
       "enchanting_apply": "마법부여",
       "salvaging": "분해",
+      "sundering": "가르기",
       "tool_recharge": "충전",
       "demonHeal": "악마 치유",
       "thunzharrStormcall": "폭풍의 부름",

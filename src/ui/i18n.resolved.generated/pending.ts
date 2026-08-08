@@ -10,6 +10,7 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "abilityUi.cast.sundering",
     "entities.abilities.avenging_wrath.name",
     "entities.abilities.blink.name",
     "entities.abilities.blizzard.description",
@@ -611,7 +612,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.charSheet.playtimeParts",
     "hudChrome.charSheet.playtimeUnderMinute",
     "hudChrome.charSheet.showPlaytimeAria",
+    "hudChrome.enchanting.sunderConfirmBody",
+    "hudChrome.enchanting.sunderConfirmBodySpecial",
+    "hudChrome.enchanting.sunderConfirmTitle",
     "hudChrome.itemMasterwrought",
+    "hudChrome.itemMenu.sunder",
     "hudChrome.mounts.name_terrorspark_groundshaker",
     "hudChrome.options.showPlaytime",
     "hudChrome.pattern.teaches",
@@ -634,6 +639,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.skins.winterbite.name"
   ],
   "es_ES": [
+    "abilityUi.cast.sundering",
     "entities.abilities.avenging_wrath.name",
     "entities.abilities.blink.name",
     "entities.abilities.blizzard.description",
@@ -1235,7 +1241,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.charSheet.playtimeParts",
     "hudChrome.charSheet.playtimeUnderMinute",
     "hudChrome.charSheet.showPlaytimeAria",
+    "hudChrome.enchanting.sunderConfirmBody",
+    "hudChrome.enchanting.sunderConfirmBodySpecial",
+    "hudChrome.enchanting.sunderConfirmTitle",
     "hudChrome.itemMasterwrought",
+    "hudChrome.itemMenu.sunder",
     "hudChrome.mounts.name_terrorspark_groundshaker",
     "hudChrome.options.showPlaytime",
     "hudChrome.pattern.teaches",
@@ -1258,6 +1268,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.skins.winterbite.name"
   ],
   "fr_FR": [
+    "abilityUi.cast.sundering",
     "entities.abilities.avenging_wrath.name",
     "entities.abilities.blink.name",
     "entities.abilities.cold_snap.description",
@@ -1872,7 +1883,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.charSheet.playtimeParts",
     "hudChrome.charSheet.playtimeUnderMinute",
     "hudChrome.charSheet.showPlaytimeAria",
+    "hudChrome.enchanting.sunderConfirmBody",
+    "hudChrome.enchanting.sunderConfirmBodySpecial",
+    "hudChrome.enchanting.sunderConfirmTitle",
     "hudChrome.itemMasterwrought",
+    "hudChrome.itemMenu.sunder",
     "hudChrome.mounts.name_terrorspark_groundshaker",
     "hudChrome.options.showPlaytime",
     "hudChrome.pattern.teaches",
@@ -1896,6 +1911,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.skins.winterbite.name"
   ],
   "fr_CA": [
+    "abilityUi.cast.sundering",
     "entities.abilities.avenging_wrath.name",
     "entities.abilities.blink.name",
     "entities.abilities.cold_snap.description",
@@ -2510,7 +2526,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.charSheet.playtimeParts",
     "hudChrome.charSheet.playtimeUnderMinute",
     "hudChrome.charSheet.showPlaytimeAria",
+    "hudChrome.enchanting.sunderConfirmBody",
+    "hudChrome.enchanting.sunderConfirmBodySpecial",
+    "hudChrome.enchanting.sunderConfirmTitle",
     "hudChrome.itemMasterwrought",
+    "hudChrome.itemMenu.sunder",
     "hudChrome.mounts.name_terrorspark_groundshaker",
     "hudChrome.options.showPlaytime",
     "hudChrome.pattern.teaches",
@@ -2535,6 +2555,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
+    "abilityUi.cast.sundering",
     "entities.abilities.avenging_wrath.name",
     "entities.abilities.blink.name",
     "entities.abilities.cold_snap.description",
@@ -3155,7 +3176,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.charSheet.playtimeParts",
     "hudChrome.charSheet.playtimeUnderMinute",
     "hudChrome.charSheet.showPlaytimeAria",
+    "hudChrome.enchanting.sunderConfirmBody",
+    "hudChrome.enchanting.sunderConfirmBodySpecial",
+    "hudChrome.enchanting.sunderConfirmTitle",
     "hudChrome.itemMasterwrought",
+    "hudChrome.itemMenu.sunder",
     "hudChrome.mounts.name_terrorspark_groundshaker",
     "hudChrome.options.showPlaytime",
     "hudChrome.pattern.teaches",
@@ -3179,6 +3204,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.skins.winterbite.name"
   ],
   "de_DE": [
+    "abilityUi.cast.sundering",
     "entities.abilities.avenging_wrath.name",
     "entities.abilities.blink.name",
     "entities.abilities.cold_snap.description",
@@ -3806,7 +3832,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.charSheet.playtimeParts",
     "hudChrome.charSheet.playtimeUnderMinute",
     "hudChrome.charSheet.showPlaytimeAria",
+    "hudChrome.enchanting.sunderConfirmBody",
+    "hudChrome.enchanting.sunderConfirmBodySpecial",
+    "hudChrome.enchanting.sunderConfirmTitle",
     "hudChrome.itemMasterwrought",
+    "hudChrome.itemMenu.sunder",
     "hudChrome.mounts.name_terrorspark_groundshaker",
     "hudChrome.options.showPlaytime",
     "hudChrome.pattern.teaches",
@@ -3870,6 +3900,7 @@ export const pending: Record<string, readonly string[]> = {
     "guide.riftsPage.rankFmt"
   ],
   "pt_BR": [
+    "abilityUi.cast.sundering",
     "entities.abilities.avenging_wrath.name",
     "entities.abilities.blink.name",
     "entities.abilities.blizzard.description",
@@ -4487,7 +4518,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.charSheet.playtimeParts",
     "hudChrome.charSheet.playtimeUnderMinute",
     "hudChrome.charSheet.showPlaytimeAria",
+    "hudChrome.enchanting.sunderConfirmBody",
+    "hudChrome.enchanting.sunderConfirmBodySpecial",
+    "hudChrome.enchanting.sunderConfirmTitle",
     "hudChrome.itemMasterwrought",
+    "hudChrome.itemMenu.sunder",
     "hudChrome.mounts.name_terrorspark_groundshaker",
     "hudChrome.options.showPlaytime",
     "hudChrome.pattern.teaches",
@@ -4521,6 +4556,7 @@ export const pending: Record<string, readonly string[]> = {
     "guide.riftsPage.rankFmt"
   ],
   "cs_CZ": [
+    "abilityUi.cast.sundering",
     "entities.abilities.avenging_wrath.name",
     "entities.abilities.blink.name",
     "entities.abilities.blizzard.description",
@@ -5155,7 +5191,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.charSheet.playtimeParts",
     "hudChrome.charSheet.playtimeUnderMinute",
     "hudChrome.charSheet.showPlaytimeAria",
+    "hudChrome.enchanting.sunderConfirmBody",
+    "hudChrome.enchanting.sunderConfirmBodySpecial",
+    "hudChrome.enchanting.sunderConfirmTitle",
     "hudChrome.itemMasterwrought",
+    "hudChrome.itemMenu.sunder",
     "hudChrome.mounts.name_terrorspark_groundshaker",
     "hudChrome.options.showPlaytime",
     "hudChrome.pattern.teaches",
@@ -5179,6 +5219,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.skins.winterbite.name"
   ],
   "nl_NL": [
+    "abilityUi.cast.sundering",
     "entities.abilities.avenging_wrath.name",
     "entities.abilities.blink.name",
     "entities.abilities.cold_snap.description",
@@ -5807,7 +5848,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.charSheet.playtimeParts",
     "hudChrome.charSheet.playtimeUnderMinute",
     "hudChrome.charSheet.showPlaytimeAria",
+    "hudChrome.enchanting.sunderConfirmBody",
+    "hudChrome.enchanting.sunderConfirmBodySpecial",
+    "hudChrome.enchanting.sunderConfirmTitle",
     "hudChrome.itemMasterwrought",
+    "hudChrome.itemMenu.sunder",
     "hudChrome.mounts.name_terrorspark_groundshaker",
     "hudChrome.options.showPlaytime",
     "hudChrome.pattern.teaches",
@@ -5830,6 +5875,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.skins.winterbite.name"
   ],
   "pl_PL": [
+    "abilityUi.cast.sundering",
     "entities.abilities.avenging_wrath.name",
     "entities.abilities.blink.name",
     "entities.abilities.cold_snap.description",
@@ -6445,7 +6491,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.charSheet.playtimeParts",
     "hudChrome.charSheet.playtimeUnderMinute",
     "hudChrome.charSheet.showPlaytimeAria",
+    "hudChrome.enchanting.sunderConfirmBody",
+    "hudChrome.enchanting.sunderConfirmBodySpecial",
+    "hudChrome.enchanting.sunderConfirmTitle",
     "hudChrome.itemMasterwrought",
+    "hudChrome.itemMenu.sunder",
     "hudChrome.mounts.name_terrorspark_groundshaker",
     "hudChrome.options.showPlaytime",
     "hudChrome.pattern.teaches",
@@ -6469,6 +6519,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.skins.winterbite.name"
   ],
   "id_ID": [
+    "abilityUi.cast.sundering",
     "entities.abilities.avenging_wrath.name",
     "entities.abilities.blink.name",
     "entities.abilities.cold_snap.description",
@@ -7073,7 +7124,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.charSheet.playtimeParts",
     "hudChrome.charSheet.playtimeUnderMinute",
     "hudChrome.charSheet.showPlaytimeAria",
+    "hudChrome.enchanting.sunderConfirmBody",
+    "hudChrome.enchanting.sunderConfirmBodySpecial",
+    "hudChrome.enchanting.sunderConfirmTitle",
     "hudChrome.itemMasterwrought",
+    "hudChrome.itemMenu.sunder",
     "hudChrome.mounts.name_terrorspark_groundshaker",
     "hudChrome.options.showPlaytime",
     "hudChrome.pattern.teaches",
@@ -7095,6 +7150,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wiki.confirmTitle"
   ],
   "tr_TR": [
+    "abilityUi.cast.sundering",
     "entities.abilities.avenging_wrath.name",
     "entities.abilities.blink.name",
     "entities.abilities.blizzard.description",
@@ -7708,7 +7764,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.charSheet.playtimeParts",
     "hudChrome.charSheet.playtimeUnderMinute",
     "hudChrome.charSheet.showPlaytimeAria",
+    "hudChrome.enchanting.sunderConfirmBody",
+    "hudChrome.enchanting.sunderConfirmBodySpecial",
+    "hudChrome.enchanting.sunderConfirmTitle",
     "hudChrome.itemMasterwrought",
+    "hudChrome.itemMenu.sunder",
     "hudChrome.mounts.name_terrorspark_groundshaker",
     "hudChrome.options.showPlaytime",
     "hudChrome.pattern.teaches",
@@ -7732,6 +7792,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.skins.winterbite.name"
   ],
   "sv_SE": [
+    "abilityUi.cast.sundering",
     "entities.abilities.avenging_wrath.name",
     "entities.abilities.blink.name",
     "entities.abilities.cold_snap.description",
@@ -8359,7 +8420,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.charSheet.playtimeParts",
     "hudChrome.charSheet.playtimeUnderMinute",
     "hudChrome.charSheet.showPlaytimeAria",
+    "hudChrome.enchanting.sunderConfirmBody",
+    "hudChrome.enchanting.sunderConfirmBodySpecial",
+    "hudChrome.enchanting.sunderConfirmTitle",
     "hudChrome.itemMasterwrought",
+    "hudChrome.itemMenu.sunder",
     "hudChrome.mounts.name_terrorspark_groundshaker",
     "hudChrome.options.showPlaytime",
     "hudChrome.pattern.teaches",
@@ -8382,6 +8447,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.skins.winterbite.name"
   ],
   "vi_VN": [
+    "abilityUi.cast.sundering",
     "entities.abilities.avenging_wrath.name",
     "entities.abilities.blink.name",
     "entities.abilities.cold_snap.description",
@@ -8990,7 +9056,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.charSheet.playtimeParts",
     "hudChrome.charSheet.playtimeUnderMinute",
     "hudChrome.charSheet.showPlaytimeAria",
+    "hudChrome.enchanting.sunderConfirmBody",
+    "hudChrome.enchanting.sunderConfirmBodySpecial",
+    "hudChrome.enchanting.sunderConfirmTitle",
     "hudChrome.itemMasterwrought",
+    "hudChrome.itemMenu.sunder",
     "hudChrome.mounts.name_terrorspark_groundshaker",
     "hudChrome.options.showPlaytime",
     "hudChrome.pattern.teaches",
@@ -9013,6 +9083,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.skins.winterbite.name"
   ],
   "da_DK": [
+    "abilityUi.cast.sundering",
     "entities.abilities.avenging_wrath.name",
     "entities.abilities.blink.name",
     "entities.abilities.cold_snap.description",
@@ -9648,7 +9719,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.charSheet.playtimeParts",
     "hudChrome.charSheet.playtimeUnderMinute",
     "hudChrome.charSheet.showPlaytimeAria",
+    "hudChrome.enchanting.sunderConfirmBody",
+    "hudChrome.enchanting.sunderConfirmBodySpecial",
+    "hudChrome.enchanting.sunderConfirmTitle",
     "hudChrome.itemMasterwrought",
+    "hudChrome.itemMenu.sunder",
     "hudChrome.mounts.name_terrorspark_groundshaker",
     "hudChrome.options.showPlaytime",
     "hudChrome.pattern.teaches",

@@ -337,6 +337,13 @@ export interface IWorldProfessions {
   // the client; ClientWorld sends the disenchant_item/apply_enchant/salvage_item
   // wire command and never decides the outcome.
   disenchantItem(itemId: string, target?: { slotIndex: number }): void;
+  // The Sundered Essence extraction (Masterwrought phase 04): a cast-paced,
+  // disenchant-adjacent break of a RAID-sourced epic into the bound ceiling
+  // material. Same slotIndex contract as disenchantItem above (a REQUEST the
+  // sim re-validates and pins; a mid-cast bag splice denies rather than
+  // redirecting the destroy). Server-authoritative: ClientWorld sends the
+  // extract_essence wire command and never decides the outcome.
+  extractEssence(itemId: string, target?: { slotIndex: number }): void;
   // `slot` targets the copy WORN in that equipment slot, enchanting it in place
   // (no unequip / enchant / re-equip round trip). Omitted, the enchant applies to
   // a bagged copy exactly as before. It is a SLOT and not an item id because

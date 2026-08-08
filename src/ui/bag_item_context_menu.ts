@@ -18,6 +18,7 @@
 import { ENCHANTS } from '../sim/content/enchants';
 import { isDisenchantable, isEnchantedInstance } from '../sim/professions/enchanting';
 import { isSalvageable } from '../sim/professions/salvage';
+import { isSunderable } from '../sim/professions/sundering';
 import type { ItemDef, ItemInstancePayload } from '../sim/types';
 import type { TranslationKey } from './i18n.catalog';
 
@@ -34,7 +35,7 @@ export function isEnchantReagentItem(itemId: string): boolean {
   return ENCHANT_REAGENT_IDS.has(itemId);
 }
 
-export type BagItemNewActionId = 'disenchant' | 'salvage' | 'applyEnchant';
+export type BagItemNewActionId = 'disenchant' | 'salvage' | 'sunder' | 'applyEnchant';
 export type BagItemContextActionId = 'default' | BagItemNewActionId;
 
 export interface BagItemContextAction {
@@ -45,6 +46,7 @@ export interface BagItemContextAction {
 const NEW_ACTION_LABEL_KEY: Record<BagItemNewActionId, TranslationKey> = {
   disenchant: 'hudChrome.itemMenu.disenchant',
   salvage: 'hudChrome.itemMenu.salvage',
+  sunder: 'hudChrome.itemMenu.sunder',
   applyEnchant: 'hudChrome.itemMenu.applyEnchant',
 };
 
@@ -61,12 +63,13 @@ function defaultActionLabelKey(def: ItemDef): TranslationKey {
 }
 
 /** The eligible new actions for this item, in fixed order (disenchant,
- *  salvage, apply-enchant). Empty when none apply, which is what keeps a plain
- *  item's right-click byte-identical to today. */
+ *  salvage, sunder, apply-enchant). Empty when none apply, which is what keeps
+ *  a plain item's right-click byte-identical to today. */
 export function bagItemNewActions(def: ItemDef, itemId: string): BagItemNewActionId[] {
   const out: BagItemNewActionId[] = [];
   if (isDisenchantable(def)) out.push('disenchant');
   if (isSalvageable(def)) out.push('salvage');
+  if (isSunderable(def)) out.push('sunder');
   if (isEnchantReagentItem(itemId)) out.push('applyEnchant');
   return out;
 }
@@ -117,16 +120,20 @@ export function isSpecialCopy(instance: ItemInstancePayload | undefined): boolea
  *     highest-index NON-enchanted instanced copy is taken first
  *     (removeEnchantableItem); once every remaining copy is enchanted, the
  *     highest-index enchanted copy is the victim (issue #2340), which is
- *     always special, so that arm always warns. */
+ *     always special, so that arm always warns.
+ *   - sunder (professions/sundering.ts): consumes through the SAME preference
+ *     helper as disenchant (consumePreferredDisenchantVictim), so it shares
+ *     the disenchant arm's skip-enchanted-first order exactly. */
 export function destroyConsumesSpecialCopy(
-  action: 'disenchant' | 'salvage',
+  action: 'disenchant' | 'salvage' | 'sunder',
   copies: readonly BagCopy[],
 ): boolean {
   if (copies.some((copy) => !copy.instance)) return false;
+  const skipsEnchanted = action === 'disenchant' || action === 'sunder';
   for (let i = copies.length - 1; i >= 0; i--) {
     const instance = copies[i].instance;
     if (!instance) continue;
-    if (action === 'disenchant' && isEnchantedInstance(instance)) continue;
+    if (skipsEnchanted && isEnchantedInstance(instance)) continue;
     return isSpecialCopy(instance);
   }
   // Reachable with held copies only on the disenchant arm with every copy

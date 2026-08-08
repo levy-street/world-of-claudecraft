@@ -387,6 +387,7 @@ import {
 } from './professions/enchanting';
 import * as fishing from './professions/fishing';
 import * as masterwroughtMaterials from './professions/masterwrought_materials';
+import * as sundering from './professions/sundering';
 import type { RespecPaymentTier } from './professions/focus';
 import * as professionsFocus from './professions/focus';
 import {
@@ -5428,6 +5429,7 @@ export class Sim {
       completeDisenchantCast: (p, meta) => completeDisenchantCastImpl(sim.ctx, p, meta),
       completeApplyEnchantCast: (p, meta) => completeApplyEnchantCastImpl(sim.ctx, p, meta),
       completeSalvageCast: (p, meta) => completeSalvageCastImpl(sim.ctx, p, meta),
+      completeSunderCast: (p, meta) => sundering.completeSunderCast(sim.ctx, p, meta),
       completeRechargeCast: (p, meta) => completeRechargeCastImpl(sim.ctx, p, meta),
       applyDemonHealTick: sim.applyDemonHealTick.bind(sim),
       // C4b effect-dispatch surface: the per-effect switch the cast lifecycle hands
@@ -9075,6 +9077,21 @@ export class Sim {
 
   socketRiftGem(itemId: string, gemId: string, pid?: number): RiftForgeResult {
     return socketRiftGemImpl(this.ctx, itemId, gemId, pid);
+  }
+
+  // The Sundered Essence extraction (IWorldProfessions, Masterwrought phase
+  // 04): same dual-shape signature as disenchantItem below (the offline UI
+  // passes a target object, the server passes pid + slot). All feedback is
+  // ctx.error lines and the completion log line; there is no result event.
+  extractEssence(
+    itemId: string,
+    pidOrTarget?: number | { slotIndex: number },
+    slotIndex?: number,
+  ): void {
+    const pid = typeof pidOrTarget === 'number' ? pidOrTarget : undefined;
+    const targetSlotIndex = typeof pidOrTarget === 'object' ? pidOrTarget.slotIndex : slotIndex;
+    if (refusedWhileDead(this.ctx, pid)) return;
+    sundering.extractEssence(this.ctx, itemId, pid, targetSlotIndex);
   }
 
   // Enchanting profession commands (IWorldProfessions): same thin-

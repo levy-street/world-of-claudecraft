@@ -2979,7 +2979,8 @@ export const ru_RU: EnTranslations = {
       "equip": "Надеть",
       "disenchant": "Распылить",
       "salvage": "Разобрать",
-      "applyEnchant": "Наложить чары"
+      "applyEnchant": "Наложить чары",
+      "sunder": "Расколоть"
     },
     "enchanting": {
       "disenchantedLine": "Вы распыляете {item}.",
@@ -3009,6 +3010,9 @@ export const ru_RU: EnTranslations = {
       "salvageConfirmTitle": "Разобрать {item}?",
       "salvageConfirmBody": "Это уничтожит {item} и даст ремесленные материалы. Действие необратимо.",
       "salvageConfirmBodySpecial": "Это уничтожит особый экземпляр предмета {item} (подписанный, шедевр или зачарованный) и даст ремесленные материалы. Действие необратимо.",
+      "sunderConfirmTitle": "Расколоть {item}?",
+      "sunderConfirmBody": "Это уничтожит {item} и даст расколотую эссенцию. Действие необратимо.",
+      "sunderConfirmBodySpecial": "Это уничтожит особый экземпляр предмета {item} (подписанный, шедевр или зачарованный) и даст расколотую эссенцию. Действие необратимо.",
       "pickerTitle": "Наложить чары",
       "targetTitle": "Выберите предмет для зачарования",
       "noEnchants": "Нет чар, использующих этот реагент.",
@@ -8054,6 +8058,7 @@ export const ru_RU: EnTranslations = {
       "disenchanting": "Распыление",
       "enchanting_apply": "Наложение чар",
       "salvaging": "Разбор",
+      "sundering": "Раскалывание",
       "tool_recharge": "Перезарядка",
       "demonHeal": "Исцеление демона",
       "thunzharrStormcall": "Зов бури",

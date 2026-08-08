@@ -66,6 +66,7 @@ import {
   MIN_GCD,
   normAngle,
   SALVAGE_CAST_ID,
+  SUNDER_CAST_ID,
   TOOL_RECHARGE_CAST_ID,
 } from '../types';
 import { drawWeapon } from '../weapon_stow';
@@ -449,6 +450,13 @@ export function updateCasting(ctx: SimContext, p: Entity, meta: PlayerMeta): voi
     }
     if (castId === SALVAGE_CAST_ID) {
       ctx.completeSalvageCast(p, meta);
+      return;
+    }
+    // Sunder cast completion (Masterwrought phase 04): rides the enchant-family
+    // session, so the same route-then-return shape; refusals re-emit through
+    // their own error lines.
+    if (castId === SUNDER_CAST_ID) {
+      ctx.completeSunderCast(p, meta);
       return;
     }
     if (castId === TOOL_RECHARGE_CAST_ID) {

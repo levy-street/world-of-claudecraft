@@ -129,6 +129,7 @@ import {
   SALVAGE_CAST_ID,
   type SimEvent,
   SUNDER_ARMOR_PCT_PER_STACK,
+  SUNDER_CAST_ID,
   TICK_RATE,
   TOOL_RECHARGE_CAST_ID,
   virtualLevel,
@@ -940,6 +941,7 @@ const castDisplayName = (id: string): string => {
   if (id === DISENCHANT_CAST_ID) return t('abilityUi.cast.disenchanting');
   if (id === ENCHANT_CAST_ID) return t('abilityUi.cast.enchanting_apply');
   if (id === SALVAGE_CAST_ID) return t('abilityUi.cast.salvaging');
+  if (id === SUNDER_CAST_ID) return t('abilityUi.cast.sundering');
   if (id === TOOL_RECHARGE_CAST_ID) return t('abilityUi.cast.tool_recharge');
   if (id === 'demon_heal') return t('abilityUi.cast.demonHeal');
   if (id === 'thunzharr_stormcall') return t('abilityUi.cast.thunzharrStormcall');
@@ -13067,6 +13069,7 @@ export class Hud {
               ev.ability === DISENCHANT_CAST_ID ||
               ev.ability === ENCHANT_CAST_ID ||
               ev.ability === SALVAGE_CAST_ID ||
+              ev.ability === SUNDER_CAST_ID ||
               ev.ability === TOOL_RECHARGE_CAST_ID
             ) {
               audio.craftCast();

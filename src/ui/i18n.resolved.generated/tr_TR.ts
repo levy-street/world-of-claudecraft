@@ -2979,7 +2979,8 @@ export const tr_TR: EnTranslations = {
       "equip": "Kuşan",
       "disenchant": "Büyüyü Boz",
       "salvage": "Kurtar",
-      "applyEnchant": "Büyü Uygula"
+      "applyEnchant": "Büyü Uygula",
+      "sunder": "Sunder"
     },
     "enchanting": {
       "disenchantedLine": "{item} büyüsünü bozdunuz.",
@@ -3009,6 +3010,9 @@ export const tr_TR: EnTranslations = {
       "salvageConfirmTitle": "{item} parçalansın mı?",
       "salvageConfirmBody": "{item} yok edilir ve zanaat malzemesi verir. Bu geri alınamaz.",
       "salvageConfirmBodySpecial": "{item}'nin özel bir kopyası (imzalı, şaheser veya büyülü) yok edilir ve zanaat malzemesi verir. Bu geri alınamaz.",
+      "sunderConfirmTitle": "Sunder {item}?",
+      "sunderConfirmBody": "This destroys {item} and yields Sundered Essence. This cannot be undone.",
+      "sunderConfirmBodySpecial": "This destroys a special copy of {item} (signed, masterwork, or enchanted) and yields Sundered Essence. This cannot be undone.",
       "pickerTitle": "Büyü Uygula",
       "targetTitle": "Büyülenecek eşya seçin",
       "noEnchants": "Hiçbir büyü bu malzemeyi kullanmıyor.",
@@ -8054,6 +8058,7 @@ export const tr_TR: EnTranslations = {
       "disenchanting": "Büyü Bozma",
       "enchanting_apply": "Büyüleme",
       "salvaging": "Parçalama",
+      "sundering": "Sundering",
       "tool_recharge": "Şarj Etme",
       "demonHeal": "Şeytan İyileştirmesi",
       "thunzharrStormcall": "Fırtına Çağrısı",

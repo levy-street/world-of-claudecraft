@@ -10554,6 +10554,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemMenu.use': '使用する',
   'hudChrome.itemMenu.disenchant': '魔力分解',
   'hudChrome.itemMenu.salvage': '解体',
+  'hudChrome.itemMenu.sunder': '断つ',
   'hudChrome.itemMenu.applyEnchant': 'エンチャントを付与',
   'hudChrome.enchanting.disenchantedLine': '{item}を魔力分解した。',
   'hudChrome.enchanting.disenchantedYield': '{item}を魔力分解して{material}にした。',
@@ -10584,6 +10585,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '{item}を破壊し、製作素材を得ます。この操作は元に戻せません。',
   'hudChrome.enchanting.salvageConfirmBodySpecial':
     '特別な{item}（銘入り、傑作、またはエンチャント済み）を破壊し、製作素材を得ます。この操作は元に戻せません。',
+  'hudChrome.enchanting.sunderConfirmTitle': '{item}を断ちますか？',
+  'hudChrome.enchanting.sunderConfirmBody':
+    '{item}を破壊し、断たれし精髄を得ます。この操作は元に戻せません。',
+  'hudChrome.enchanting.sunderConfirmBodySpecial':
+    '特別な{item}（銘入り、傑作、またはエンチャント済み）を破壊し、断たれし精髄を得ます。この操作は元に戻せません。',
   'hudChrome.enchanting.pickerTitle': 'エンチャントを付与',
   'hudChrome.enchanting.targetTitle': 'エンチャントするアイテムを選択',
   'hudChrome.enchanting.noEnchants': 'この素材を使うエンチャントはありません。',
@@ -11320,6 +11326,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.disenchanting': '分解',
   'abilityUi.cast.enchanting_apply': '付魔',
   'abilityUi.cast.salvaging': '解体',
+  'abilityUi.cast.sundering': '断ち',
   'abilityUi.cast.tool_recharge': '充填',
   'hudChrome.crafting.crafting': '製作中',
   'hudChrome.crafting.create': '作成',

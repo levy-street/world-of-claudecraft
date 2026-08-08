@@ -2979,7 +2979,8 @@ export const id_ID: EnTranslations = {
       "equip": "Pakai",
       "disenchant": "Hancurkan Pemantraan",
       "salvage": "Salvasi",
-      "applyEnchant": "Terapkan Mantrai"
+      "applyEnchant": "Terapkan Mantrai",
+      "sunder": "Sunder"
     },
     "enchanting": {
       "disenchantedLine": "Kamu menghancurkan pemantraan {item}.",
@@ -3009,6 +3010,9 @@ export const id_ID: EnTranslations = {
       "salvageConfirmTitle": "Salvasi {item}?",
       "salvageConfirmBody": "Ini menghancurkan {item} dan menghasilkan bahan kerajinan. Tindakan ini tidak dapat dibatalkan.",
       "salvageConfirmBodySpecial": "Ini menghancurkan salinan khusus dari {item} (bertanda tangan, karya besar, atau terpesonan) dan menghasilkan bahan kerajinan. Tindakan ini tidak dapat dibatalkan.",
+      "sunderConfirmTitle": "Sunder {item}?",
+      "sunderConfirmBody": "This destroys {item} and yields Sundered Essence. This cannot be undone.",
+      "sunderConfirmBodySpecial": "This destroys a special copy of {item} (signed, masterwork, or enchanted) and yields Sundered Essence. This cannot be undone.",
       "pickerTitle": "Terapkan Mantrai",
       "targetTitle": "Pilih barang untuk dimantrai",
       "noEnchants": "Tidak ada mantrai yang menggunakan reagen ini.",
@@ -8054,6 +8058,7 @@ export const id_ID: EnTranslations = {
       "disenchanting": "Menghancurkan Pemantraan",
       "enchanting_apply": "Memantrai",
       "salvaging": "Menyalvasi",
+      "sundering": "Sundering",
       "tool_recharge": "Mengisi Ulang",
       "demonHeal": "Penyembuhan Iblis",
       "thunzharrStormcall": "Panggilan Badai",

@@ -78,6 +78,7 @@ import {
   type ItemDef,
   type ItemInstancePayload,
   isConsuming,
+  SUNDER_CAST_ID,
 } from '../types';
 import { enchantingGainMultiplier } from './archetype';
 import { DISENCHANT_MATERIAL_BY_QUALITY, typedSecondaryFor } from './disenchant_reagents';
@@ -311,7 +312,9 @@ export interface DisenchantResult {
     | 'busy';
 }
 
-function consumeSelectedInventorySlot(
+// Exported for professions/sundering.ts, which consumes copies under the same
+// selected-slot / preferred-victim discipline as disenchant.
+export function consumeSelectedInventorySlot(
   inventory: InvSlot[],
   itemId: string,
   slotIndex: number | undefined,
@@ -328,7 +331,7 @@ function consumeSelectedInventorySlot(
   return { instance, craftedRecipeId };
 }
 
-function consumePreferredDisenchantVictim(
+export function consumePreferredDisenchantVictim(
   inventory: InvSlot[],
   itemId: string,
 ): ConsumedDisenchantUnit | undefined {
@@ -554,10 +557,12 @@ export function disenchantVictimPin(slot: InvSlot | undefined): string {
   });
 }
 
-function beginEnchantFamilyCast(
+// Exported for professions/sundering.ts: the sunder cast rides the same
+// enchant-family session fields (and so the same cancel semantics).
+export function beginEnchantFamilyCast(
   ctx: SimContext,
   p: Entity,
-  castId: typeof DISENCHANT_CAST_ID | typeof ENCHANT_CAST_ID,
+  castId: typeof DISENCHANT_CAST_ID | typeof ENCHANT_CAST_ID | typeof SUNDER_CAST_ID,
   session: {
     itemId: string;
     bagSlot: number;
@@ -598,7 +603,7 @@ function beginEnchantFamilyCast(
   });
 }
 
-function clearEnchantCastSession(p: Entity): {
+export function clearEnchantCastSession(p: Entity): {
   itemId: string;
   bagSlot: number;
   enchantId: string;

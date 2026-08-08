@@ -10543,6 +10543,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemMenu.use': '사용',
   'hudChrome.itemMenu.disenchant': '마력 추출',
   'hudChrome.itemMenu.salvage': '분해',
+  'hudChrome.itemMenu.sunder': '가르기',
   'hudChrome.itemMenu.applyEnchant': '마법부여 적용',
   'hudChrome.enchanting.disenchantedLine': '{item}의 마력을 추출했습니다.',
   'hudChrome.enchanting.disenchantedYield':
@@ -10575,6 +10576,11 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '{item}을(를) 파괴하고 제작 재료를 얻습니다. 되돌릴 수 없습니다.',
   'hudChrome.enchanting.salvageConfirmBodySpecial':
     '특별한 {item} 사본(서명됨, 걸작 또는 마법부여됨)을 파괴하고 제작 재료를 얻습니다. 되돌릴 수 없습니다.',
+  'hudChrome.enchanting.sunderConfirmTitle': '{item}을(를) 가르시겠습니까?',
+  'hudChrome.enchanting.sunderConfirmBody':
+    '{item}을(를) 파괴하고 갈라진 정수를 얻습니다. 되돌릴 수 없습니다.',
+  'hudChrome.enchanting.sunderConfirmBodySpecial':
+    '특별한 {item} 사본(서명됨, 걸작 또는 마법부여됨)을 파괴하고 갈라진 정수를 얻습니다. 되돌릴 수 없습니다.',
   'hudChrome.enchanting.pickerTitle': '마법부여 적용',
   'hudChrome.enchanting.targetTitle': '마법부여할 아이템을 선택하세요',
   'hudChrome.enchanting.noEnchants': '이 재료를 사용하는 마법부여가 없습니다.',
@@ -11309,6 +11315,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.disenchanting': '마력 추출',
   'abilityUi.cast.enchanting_apply': '마법부여',
   'abilityUi.cast.salvaging': '분해',
+  'abilityUi.cast.sundering': '가르기',
   'abilityUi.cast.tool_recharge': '충전',
   'hudChrome.crafting.crafting': '제작 중',
   'hudChrome.crafting.create': '제작',

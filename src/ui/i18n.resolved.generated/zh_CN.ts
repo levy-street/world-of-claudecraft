@@ -2979,7 +2979,8 @@ export const zh_CN: EnTranslations = {
       "equip": "装备",
       "disenchant": "分解",
       "salvage": "拆解",
-      "applyEnchant": "施加附魔"
+      "applyEnchant": "施加附魔",
+      "sunder": "裂断"
     },
     "enchanting": {
       "disenchantedLine": "你分解了{item}。",
@@ -3009,6 +3010,9 @@ export const zh_CN: EnTranslations = {
       "salvageConfirmTitle": "拆解{item}？",
       "salvageConfirmBody": "这会摧毁{item}并产出制作材料。此操作无法撤销。",
       "salvageConfirmBodySpecial": "这会摧毁一件特殊的{item}（署名、杰作或已附魔）并产出制作材料。此操作无法撤销。",
+      "sunderConfirmTitle": "裂断{item}？",
+      "sunderConfirmBody": "这会摧毁{item}并产出断裂精华。此操作无法撤销。",
+      "sunderConfirmBodySpecial": "这会摧毁一件特殊的{item}（署名、杰作或已附魔）并产出断裂精华。此操作无法撤销。",
       "pickerTitle": "施加附魔",
       "targetTitle": "选择要附魔的物品",
       "noEnchants": "没有附魔会用到这种材料。",
@@ -8054,6 +8058,7 @@ export const zh_CN: EnTranslations = {
       "disenchanting": "分解",
       "enchanting_apply": "附魔",
       "salvaging": "拆解",
+      "sundering": "裂断",
       "tool_recharge": "充能",
       "demonHeal": "恶魔治疗",
       "thunzharrStormcall": "风暴召唤",

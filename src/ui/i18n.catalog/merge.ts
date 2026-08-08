@@ -500,6 +500,7 @@ const mergeStringsEn = {
       disenchanting: 'Disenchanting',
       enchanting_apply: 'Enchanting',
       salvaging: 'Salvaging',
+      sundering: 'Sundering',
       tool_recharge: 'Recharging',
       demonHeal: 'Demon Heal',
       thunzharrStormcall: 'Stormcall',

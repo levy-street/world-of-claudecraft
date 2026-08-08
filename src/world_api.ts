@@ -511,6 +511,7 @@ export const COMMAND_NAMES = [
   // held piece into generic materials (Sim.disenchantItem/applyEnchant/salvageItem
   // via src/sim/professions/enchanting.ts and salvage.ts).
   'disenchant_item',
+  'extract_essence',
   'apply_enchant',
   'salvage_item',
   // Maker's Bond unbind service (Professions 2.0): clear the

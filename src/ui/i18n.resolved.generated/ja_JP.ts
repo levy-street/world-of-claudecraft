@@ -2979,7 +2979,8 @@ export const ja_JP: EnTranslations = {
       "equip": "装備する",
       "disenchant": "魔力分解",
       "salvage": "解体",
-      "applyEnchant": "エンチャントを付与"
+      "applyEnchant": "エンチャントを付与",
+      "sunder": "断つ"
     },
     "enchanting": {
       "disenchantedLine": "{item}を魔力分解した。",
@@ -3009,6 +3010,9 @@ export const ja_JP: EnTranslations = {
       "salvageConfirmTitle": "{item}を解体しますか？",
       "salvageConfirmBody": "{item}を破壊し、製作素材を得ます。この操作は元に戻せません。",
       "salvageConfirmBodySpecial": "特別な{item}（銘入り、傑作、またはエンチャント済み）を破壊し、製作素材を得ます。この操作は元に戻せません。",
+      "sunderConfirmTitle": "{item}を断ちますか？",
+      "sunderConfirmBody": "{item}を破壊し、断たれし精髄を得ます。この操作は元に戻せません。",
+      "sunderConfirmBodySpecial": "特別な{item}（銘入り、傑作、またはエンチャント済み）を破壊し、断たれし精髄を得ます。この操作は元に戻せません。",
       "pickerTitle": "エンチャントを付与",
       "targetTitle": "エンチャントするアイテムを選択",
       "noEnchants": "この素材を使うエンチャントはありません。",
@@ -8054,6 +8058,7 @@ export const ja_JP: EnTranslations = {
       "disenchanting": "分解",
       "enchanting_apply": "付魔",
       "salvaging": "解体",
+      "sundering": "断ち",
       "tool_recharge": "充填",
       "demonHeal": "悪魔の治癒",
       "thunzharrStormcall": "嵐の呼び声",

@@ -2979,7 +2979,8 @@ export const fr_FR: EnTranslations = {
       "equip": "Équiper",
       "disenchant": "Désenchanter",
       "salvage": "Récupérer",
-      "applyEnchant": "Appliquer un enchantement"
+      "applyEnchant": "Appliquer un enchantement",
+      "sunder": "Sunder"
     },
     "enchanting": {
       "disenchantedLine": "Vous désenchantez {item}.",
@@ -3009,6 +3010,9 @@ export const fr_FR: EnTranslations = {
       "salvageConfirmTitle": "Récupérer {item} ?",
       "salvageConfirmBody": "Cela détruit {item} et donne des matériaux d'artisanat. Cette action est irréversible.",
       "salvageConfirmBodySpecial": "Cela détruit une copie spéciale de {item} (signée, de maître ou enchantée) et donne des matériaux d'artisanat. Cette action est irréversible.",
+      "sunderConfirmTitle": "Sunder {item}?",
+      "sunderConfirmBody": "This destroys {item} and yields Sundered Essence. This cannot be undone.",
+      "sunderConfirmBodySpecial": "This destroys a special copy of {item} (signed, masterwork, or enchanted) and yields Sundered Essence. This cannot be undone.",
       "pickerTitle": "Appliquer un enchantement",
       "targetTitle": "Choisissez un objet à enchanter",
       "noEnchants": "Aucun enchantement n'utilise ce réactif.",
@@ -8054,6 +8058,7 @@ export const fr_FR: EnTranslations = {
       "disenchanting": "Désenchantement",
       "enchanting_apply": "Enchantement",
       "salvaging": "Récupération",
+      "sundering": "Sundering",
       "tool_recharge": "Recharge",
       "demonHeal": "Soin démoniaque",
       "thunzharrStormcall": "Appel de la tempête",

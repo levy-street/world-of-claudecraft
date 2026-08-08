@@ -360,6 +360,7 @@ function makeCtx() {
     completeDisenchantCast: vi.fn(),
     completeApplyEnchantCast: vi.fn(),
     completeSalvageCast: vi.fn(),
+    completeSunderCast: vi.fn(),
     completeRechargeCast: vi.fn(),
     applyDemonHealTick: vi.fn(),
     awardCombo: vi.fn(),

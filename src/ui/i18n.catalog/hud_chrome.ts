@@ -3773,6 +3773,9 @@ export const hudChromeStrings = {
     disenchant: 'Disenchant',
     salvage: 'Salvage',
     applyEnchant: 'Apply Enchant',
+    // The Sundered Essence extraction row (Masterwrought phase 04), offered
+    // on raid-won epics only (bag_item_context_menu.ts isSunderable).
+    sunder: 'Sunder',
   },
   // Enchanting actions (Professions 2.0): the result toasts for the
   // disenchant / apply-enchant / salvage commands (enchanting_view.ts maps each
@@ -3830,6 +3833,13 @@ export const hudChromeStrings = {
       'This destroys {item} and yields crafting materials. This cannot be undone.',
     salvageConfirmBodySpecial:
       'This destroys a special copy of {item} (signed, masterwork, or enchanted) and yields crafting materials. This cannot be undone.',
+    // The Sundered Essence extraction confirm (Masterwrought phase 04): same
+    // destroy-confirm family as disenchant/salvage above, stronger body when
+    // the consumed copy is special.
+    sunderConfirmTitle: 'Sunder {item}?',
+    sunderConfirmBody: 'This destroys {item} and yields Sundered Essence. This cannot be undone.',
+    sunderConfirmBodySpecial:
+      'This destroys a special copy of {item} (signed, masterwork, or enchanted) and yields Sundered Essence. This cannot be undone.',
     pickerTitle: 'Apply Enchant',
     targetTitle: 'Choose an item to enchant',
     noEnchants: 'No enchant uses this reagent.',

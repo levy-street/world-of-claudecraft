@@ -4031,6 +4031,16 @@ export class ClientWorld implements IWorld {
       this.cmd({ cmd: 'disenchant_item', item: itemId, slot: target.slotIndex });
     }
   }
+  // The Sundered Essence extraction (Masterwrought phase 04): same command-only
+  // shape as disenchantItem above; feedback is error/log lines plus the
+  // inventory delta, no result event.
+  extractEssence(itemId: string, target?: { slotIndex: number }): void {
+    if (target === undefined) {
+      this.cmd({ cmd: 'extract_essence', item: itemId });
+    } else {
+      this.cmd({ cmd: 'extract_essence', item: itemId, slot: target.slotIndex });
+    }
+  }
   // `slot` rides only when the target is a WORN piece (the in-place arm); a
   // bagged target sends a message byte-identical to the pre-feature form. The
   // server re-validates the token against ALL_EQUIP_SLOTS and the sim re-checks

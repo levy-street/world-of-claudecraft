@@ -2979,7 +2979,8 @@ export const vi_VN: EnTranslations = {
       "equip": "Trang Bị",
       "disenchant": "Hủy Pháp Khắc",
       "salvage": "Tháo Dỡ",
-      "applyEnchant": "Áp Dụng Pháp Khắc"
+      "applyEnchant": "Áp Dụng Pháp Khắc",
+      "sunder": "Sunder"
     },
     "enchanting": {
       "disenchantedLine": "Bạn hủy pháp khắc {item}.",
@@ -3009,6 +3010,9 @@ export const vi_VN: EnTranslations = {
       "salvageConfirmTitle": "Tháo Dỡ {item}?",
       "salvageConfirmBody": "Thao tác này phá hủy {item} và thu được nguyên liệu chế tác. Không thể hoàn tác.",
       "salvageConfirmBodySpecial": "Thao tác này phá hủy một bản đặc biệt của {item} (có chữ ký, kiệt tác hoặc đã pháp khắc) và thu được nguyên liệu chế tác. Không thể hoàn tác.",
+      "sunderConfirmTitle": "Sunder {item}?",
+      "sunderConfirmBody": "This destroys {item} and yields Sundered Essence. This cannot be undone.",
+      "sunderConfirmBodySpecial": "This destroys a special copy of {item} (signed, masterwork, or enchanted) and yields Sundered Essence. This cannot be undone.",
       "pickerTitle": "Áp Dụng Pháp Khắc",
       "targetTitle": "Chọn vật phẩm để pháp khắc",
       "noEnchants": "Không có phép khắc nào dùng nguyên liệu này.",
@@ -8054,6 +8058,7 @@ export const vi_VN: EnTranslations = {
       "disenchanting": "Hủy Pháp Khắc",
       "enchanting_apply": "Pháp Khắc",
       "salvaging": "Tháo Dỡ",
+      "sundering": "Sundering",
       "tool_recharge": "Nạp Lại",
       "demonHeal": "Quỷ Trị Liệu",
       "thunzharrStormcall": "Tiếng Gọi Bão",

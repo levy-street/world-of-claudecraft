@@ -2979,7 +2979,8 @@ export const nl_NL: EnTranslations = {
       "equip": "Uitrusten",
       "disenchant": "Onbetoveren",
       "salvage": "Salvagen",
-      "applyEnchant": "Betovering aanbrengen"
+      "applyEnchant": "Betovering aanbrengen",
+      "sunder": "Sunder"
     },
     "enchanting": {
       "disenchantedLine": "Je onbetoverd {item}.",
@@ -3009,6 +3010,9 @@ export const nl_NL: EnTranslations = {
       "salvageConfirmTitle": "{item} salvagen?",
       "salvageConfirmBody": "Dit vernietigt {item} en levert knutselmaterialen op. Dit kan niet ongedaan worden gemaakt.",
       "salvageConfirmBodySpecial": "Dit vernietigt een speciaal exemplaar van {item} (gesigneerd, meesterwerk of betoverd) en levert knutselmaterialen op. Dit kan niet ongedaan worden gemaakt.",
+      "sunderConfirmTitle": "Sunder {item}?",
+      "sunderConfirmBody": "This destroys {item} and yields Sundered Essence. This cannot be undone.",
+      "sunderConfirmBodySpecial": "This destroys a special copy of {item} (signed, masterwork, or enchanted) and yields Sundered Essence. This cannot be undone.",
       "pickerTitle": "Betovering aanbrengen",
       "targetTitle": "Kies een voorwerp om te betoveren",
       "noEnchants": "Geen betovering gebruikt dit reagens.",
@@ -8054,6 +8058,7 @@ export const nl_NL: EnTranslations = {
       "disenchanting": "Onttoveren",
       "enchanting_apply": "Betoveren",
       "salvaging": "Bergen",
+      "sundering": "Sundering",
       "tool_recharge": "Opladen",
       "demonHeal": "Demonengenezing",
       "thunzharrStormcall": "Stormroep",

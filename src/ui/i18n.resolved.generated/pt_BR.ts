@@ -2979,7 +2979,8 @@ export const pt_BR: EnTranslations = {
       "equip": "Equipar",
       "disenchant": "Desencantar",
       "salvage": "Recuperar",
-      "applyEnchant": "Aplicar Encantamento"
+      "applyEnchant": "Aplicar Encantamento",
+      "sunder": "Sunder"
     },
     "enchanting": {
       "disenchantedLine": "Você desencanta {item}.",
@@ -3009,6 +3010,9 @@ export const pt_BR: EnTranslations = {
       "salvageConfirmTitle": "Recuperar {item}?",
       "salvageConfirmBody": "Isso destrói {item} e produz materiais de artesanato. Não pode ser desfeito.",
       "salvageConfirmBodySpecial": "Isso destrói uma cópia especial de {item} (assinada, obra-prima ou encantada) e produz materiais de artesanato. Não pode ser desfeito.",
+      "sunderConfirmTitle": "Sunder {item}?",
+      "sunderConfirmBody": "This destroys {item} and yields Sundered Essence. This cannot be undone.",
+      "sunderConfirmBodySpecial": "This destroys a special copy of {item} (signed, masterwork, or enchanted) and yields Sundered Essence. This cannot be undone.",
       "pickerTitle": "Aplicar Encantamento",
       "targetTitle": "Escolha um item para encantar",
       "noEnchants": "Nenhum encantamento usa esse reagente.",
@@ -8054,6 +8058,7 @@ export const pt_BR: EnTranslations = {
       "disenchanting": "Desencantando",
       "enchanting_apply": "Encantando",
       "salvaging": "Recuperando",
+      "sundering": "Sundering",
       "tool_recharge": "Recarregando",
       "demonHeal": "Cura demoníaca",
       "thunzharrStormcall": "Chamado da Tempestade",

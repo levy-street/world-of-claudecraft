@@ -2979,7 +2979,8 @@ export const en_XA: EnTranslations = {
       "equip": "[Éɋúíþ]",
       "disenchant": "[Ðíšéñçĥáñţ]",
       "salvage": "[Šáļʋáĝé]",
-      "applyEnchant": "[Áþþļý Éñçĥáñţ]"
+      "applyEnchant": "[Áþþļý Éñçĥáñţ]",
+      "sunder": "[Šúñðéŕ]"
     },
     "enchanting": {
       "disenchantedLine": "[Ýóú ðíšéñçĥáñţ {item}.]",
@@ -3009,6 +3010,9 @@ export const en_XA: EnTranslations = {
       "salvageConfirmTitle": "[Šáļʋáĝé {item}?]",
       "salvageConfirmBody": "[Ţĥíš ðéšţŕóýš {item} áñð ýíéļðš çŕáƒţíñĝ ɱáţéŕíáļš. Ţĥíš çáññóţ ƀé úñðóñé.]",
       "salvageConfirmBodySpecial": "[Ţĥíš ðéšţŕóýš á šþéçíáļ çóþý óƒ {item} (šíĝñéð, ɱášţéŕŵóŕķ, óŕ éñçĥáñţéð) áñð ýíéļðš çŕáƒţíñĝ ɱáţéŕíáļš. Ţĥíš çáññóţ ƀé úñðóñé.]",
+      "sunderConfirmTitle": "[Šúñðéŕ {item}?]",
+      "sunderConfirmBody": "[Ţĥíš ðéšţŕóýš {item} áñð ýíéļðš Šúñðéŕéð Éššéñçé. Ţĥíš çáññóţ ƀé úñðóñé.]",
+      "sunderConfirmBodySpecial": "[Ţĥíš ðéšţŕóýš á šþéçíáļ çóþý óƒ {item} (šíĝñéð, ɱášţéŕŵóŕķ, óŕ éñçĥáñţéð) áñð ýíéļðš Šúñðéŕéð Éššéñçé. Ţĥíš çáññóţ ƀé úñðóñé.]",
       "pickerTitle": "[Áþþļý Éñçĥáñţ]",
       "targetTitle": "[Çĥóóšé áñ íţéɱ ţó éñçĥáñţ]",
       "noEnchants": "[Ñó éñçĥáñţ úšéš ţĥíš ŕéáĝéñţ.]",
@@ -8054,6 +8058,7 @@ export const en_XA: EnTranslations = {
       "disenchanting": "[Ðíšéñçĥáñţíñĝ]",
       "enchanting_apply": "[Éñçĥáñţíñĝ]",
       "salvaging": "[Šáļʋáĝíñĝ]",
+      "sundering": "[Šúñðéŕíñĝ]",
       "tool_recharge": "[Ŕéçĥáŕĝíñĝ]",
       "demonHeal": "[Ðéɱóñ Ĥéáļ]",
       "thunzharrStormcall": "[Šţóŕɱçáļļ]",
