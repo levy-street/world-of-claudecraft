@@ -4529,7 +4529,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.concussiveBlow': '震盪打擊',
     'aura.disarmingSmash': '繳械重擊',
     'aura.staticCharge': '靜電充能',
-    'aura.frostbite': 'ウィンターグナウ',
+    'aura.frostbite': '寒冬之嚙',
     'aura.maddeningWhisper': '瘋狂低語',
     'aura.wyrmwardSigil': '禦龍印記',
     'aura.soulSiphon': '靈魂虹吸',
@@ -5418,7 +5418,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.concussiveBlow': '脳震盪の一撃',
     'aura.disarmingSmash': '武装解除の強打',
     'aura.staticCharge': '帯電',
-    'aura.frostbite': '寒冬之嚙',
+    'aura.frostbite': 'ウィンターグナウ',
     'aura.maddeningWhisper': '狂気の囁き',
     'aura.wyrmwardSigil': '竜避けの印',
     'aura.soulSiphon': '魂吸収',
@@ -8306,6 +8306,9 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   'Disarming Smash': 'aura.disarmingSmash',
   'Static Charge': 'aura.staticCharge',
   Wintergnaw: 'aura.frostbite',
+  // Legacy alias for mixed-fleet deploy windows: a not-yet-restarted server
+  // still emits the pre-rename aura string. Drop after v0.36.0 ships.
+  Winterbite: 'aura.frostbite',
   'Maddening Whisper': 'aura.maddeningWhisper',
   'Wyrmward Sigil': 'aura.wyrmwardSigil',
   'Soul Siphon': 'aura.soulSiphon',
@@ -10834,6 +10837,12 @@ const RULES: Rule[] = [
   { re: /^The grave rite falters\.$/, build: () => t('sim.delve.graveFalters') },
   {
     re: /^The dead answer Deacon Vandric's call!$/,
+    build: () => t('delveUi.boss.varric.raise.interrupt_fail'),
+  },
+  {
+    // Legacy alias for mixed-fleet deploy windows: a not-yet-restarted server
+    // still emits the pre-rename line. Drop after v0.36.0 ships.
+    re: /^The dead answer Deacon Varric's call!$/,
     build: () => t('delveUi.boss.varric.raise.interrupt_fail'),
   },
   { re: /^The door is already open\.$/, build: () => t('sim.delve.doorAlreadyOpen') },

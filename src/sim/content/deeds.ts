@@ -2664,7 +2664,7 @@ export const DEEDS: Record<string, DeedDef> = {
   // bought. The meter reads PlayerMeta.lifetimeHonor, which is monotonic
   // (grantHonor only ever adds), so spending at the quartermaster can never
   // take a rank back, and a veteran who earned the honor before these deeds
-  // shipped is credited by the join-time retro pass. Rank names follow the
+  // shipped is credited by the join-time retro pass.
   // Rank names are IP-SAFE COINAGES in this world's title voice (the
   // Peakbreaker / Wyrmfeller / Craftsworn shape), NOT the classic-era PvP ladder
   // they originally copied: Sergeant, Knight-Lieutenant and Field Marshal are
