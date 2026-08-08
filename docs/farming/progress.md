@@ -305,6 +305,12 @@ Notes:
   BED_SPACING = INTERACT_RANGE inclusive, with the tightest real pair sitting
   exactly on the floor and pinned with toBe. Two arms beyond the brief: road
   clearance (5 yd, the world.ts screen) and bed-vs-gather-node clearance (5 yd).
+- The gate's full-suite fallback caught one post-review red the targeted runs
+  cannot see: the blob GROWTH suite mirrors PROFESSIONS_BLOB_FIELDS from the
+  roundtrip sweep by source scrape, so registering farmPlots there demanded the
+  growth fixture plant every bed and the byte bounds re-mint (ceiling 10240 to
+  14336, floor 9280 to 13696, measured 13948); edit both suites together from
+  now on (ledgered in state.md deviation (m)).
 - The review round (cross-platform-sync, architecture-reviewer, migration-safety,
   qa-checklist: 0 BLOCKING everywhere) added: the deep freeze of FARM_PATCHES with
   a frozen pin, farmPlots registration in PROFESSIONS_BLOB_FIELDS, readonly content

@@ -512,9 +512,16 @@ question does not arise (farming has no station).
   question (host-clock absolutes: epoch ms online, sim-clock ms offline) is
   DOCUMENTED as a seam contract this phase (no render/ui consumer may subtract
   Date.now; rely on status), and the RaidLockout-style derived duration field is
-  deferred to the growth phase, which owns the first timer surface. (m) Four code
-  commits, not five: the parity regen was proven a byte-identical no-op again (the
-  (b) precedent), so no goldens commit exists.
+  deferred to the growth phase, which owns the first timer surface. (m) No parity goldens
+  commit: the regen was proven a byte-identical no-op again (the (b) precedent).
+  The gate's full-suite fallback then caught a mirror pin the targeted runs
+  cannot see: tests/professions_blob_growth.test.ts keeps its OWN copy of
+  PROFESSIONS_BLOB_FIELDS and scrapes the roundtrip sweep's source, so adding a
+  field to one list reds the other; the fix commit teaches the growth bound
+  farmPlots (every bed planted at full width, about 193 bytes per bed) and
+  re-mints the byte ceiling 10240 to 14336 and the floor 9280 to 13696 per that
+  file's doctrine. ANY future phase touching PROFESSIONS_BLOB_FIELDS must edit
+  BOTH suites in the same change.
 - Dev command surface: (Phase 3 records the exact /dev farm cheat names here at
   completion; Phases 7 and 8 depend on them for dev-created crops)
 - Growth-phase (Phase 3) handoff from the Phase 2 review round, decide these ON
