@@ -486,3 +486,10 @@ registry names verified CLEAR or GENERIC. Full verdicts: naming-audit.md.
   bundles the local regen cannot reproduce; run the gate with TURBO_FORCE=1 on this
   branch until the input-list fix (on feature/bank-storage) merges. Memory updated
   ([[turbo-i18n-gen-stale-dict-cache]]).
+- Phase 03 close: the full-suite gate went green at tip 1bcb55ae75 (gate_select with
+  TURBO_FORCE=1: 2341 passed / 10 skipped, zero red). The last two fallout commits:
+  the accepted-art provenance manifest took the same 36 token swaps its paired
+  public mapping.json files did (missing_painted_icons_wave holds them byte-equal),
+  and the eastbrook artifact-integrity suite's three remaining pin literals were
+  applied from the re-mint script's printed values (its town source fingerprint
+  untouched per the script's own warning).
