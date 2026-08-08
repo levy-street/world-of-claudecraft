@@ -15706,6 +15706,11 @@ export const cs_CZ: EnTranslations = {
         "subject": "Vaše hrdinské marky",
         "body": "Vaše skupina zdolala hrdinskou zkoušku, zatímco jste bojovali v týlu nebo leželi poraženi. Také vaše uzamčení bylo zaznamenáno, takže váš podíl hrdinských marek dorazil sem, místo aby se ztratil. Využijte je dobře.\n\n- Hrdinský zásobovač"
       },
+      "wyrmfall_core_reward": {
+        "sender": "The Heroic Quartermaster",
+        "subject": "Your Wyrmfall Cores",
+        "body": "The beast fell while you fought from the back, or from the dirt. Your share of its Wyrmfall Cores flies to you here rather than being lost to the corpse-pickers. Put them to good work at a bench.\n\n- The Heroic Quartermaster"
+      },
       "guild_trend_engineering_alchemy": {
         "sender": "Řemeslnický cech",
         "subject": "Tvá práce ve strojírenství a alchymii",

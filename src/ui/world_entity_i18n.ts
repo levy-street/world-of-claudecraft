@@ -6,6 +6,7 @@ import {
   MASTERY_RESET_LETTER,
   QUEST_LETTERS,
   WELCOME_LETTER,
+  WYRMFALL_CORE_LETTER,
 } from '../sim/content/letters';
 import { DELVES, DUNGEONS, MOBS, NPCS, QUESTS, ZONES } from '../sim/data';
 
@@ -579,6 +580,9 @@ const LETTER_IDS = [
   'letter_q_greyjaw',
   'letter_q_hollow',
   'heroic_marks_reward',
+  // The absent-participant Wyrmfall Core delivery (Masterwrought phase 04,
+  // WYRMFALL_CORE_LETTER in src/sim/content/letters.ts).
+  'wyrmfall_core_reward',
   // Guild trend letters (Professions 2.0), one per canonical adjacent
   // pair in CRAFT_RING order (GUILD_TREND_LETTERS in src/sim/content/letters.ts).
   'guild_trend_engineering_alchemy',
@@ -752,6 +756,7 @@ function makeEnglishWorldEntities(): WorldEntityTranslations {
   const lettersById: Record<string, LetterDef> = {
     [WELCOME_LETTER.letterId]: WELCOME_LETTER,
     [HEROIC_MARK_LETTER.letterId]: HEROIC_MARK_LETTER,
+    [WYRMFALL_CORE_LETTER.letterId]: WYRMFALL_CORE_LETTER,
     [MASTERY_RESET_LETTER.letterId]: MASTERY_RESET_LETTER,
   };
   for (const letter of Object.values(QUEST_LETTERS)) lettersById[letter.letterId] = letter;

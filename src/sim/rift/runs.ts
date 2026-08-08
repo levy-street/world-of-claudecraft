@@ -31,6 +31,10 @@ import {
 import type { LootTier } from '../lockpick';
 import { RIFT_MECHANIC_SPACING_SEC } from '../mob/mechanic_spacing';
 import { retargetMob } from '../mob/targeting';
+import {
+  awardRiftFirstClearMaterials,
+  grantRiftClearEmbers,
+} from '../professions/masterwrought_materials';
 import { cancelProfessionSessionOnDisplacement } from '../professions/session_teardown';
 import type { SimContext } from '../sim_context';
 import { DT, dist2d, type Entity, type Vec3 } from '../types';
@@ -1374,6 +1378,10 @@ function completeRiftClear(ctx: SimContext, inst: RiftInstance, boss: Entity | n
   creditRiftClearDeeds(ctx, inst, participants);
   const claim = claimRiftFirstClear(ctx, inst, participants);
   if (!claim.won) {
+    // Masterwrought (phase 04): losing the race forfeits the first-clear
+    // cores, but an A/S clear still counts as the week's eligible endgame
+    // completion for the Maker's Ember keystone. Draw-free.
+    grantRiftClearEmbers(ctx, riftRankForBaseLevel(inst.baseLevel), participants);
     completeLosingRun(ctx, inst);
     return true;
   }
@@ -1407,6 +1415,11 @@ function completeRiftClear(ctx: SimContext, inst: RiftInstance, boss: Entity | n
         inst.upgrade?.rewards.craftingMaterialBias,
       );
     }
+    // Masterwrought (phase 04): A/S first-clear cores (daily-gated per
+    // character, ruling R9) plus the weekly ember check. Deliberately outside
+    // the boss guard: the grant pays the CLEAR, not the corpse, and it draws
+    // no rng, honoring addRiftProgressionLoot's draw-free contract above.
+    awardRiftFirstClearMaterials(ctx, claim.event.tier, participants);
     const portalId = claim.event.portalId ?? inst.portalId;
     if (portalId !== null) closeNaturalRiftPortal(ctx, portalId, 'sealed');
     const firstClear = claim.event.firstClear;

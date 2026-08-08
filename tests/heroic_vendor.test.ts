@@ -37,9 +37,16 @@ function errorTexts(sim: AnySim): string[] {
 }
 
 describe('heroic vendor stock: item-level and budget pins', () => {
-  it('every offer is a real epic level-20 jewelry item at item level 26', () => {
-    expect(HEROIC_VENDOR_STOCK.length).toBe(10);
-    for (const offer of HEROIC_VENDOR_STOCK) {
+  // Masterwrought phase 04 re-cut this pin deliberately: the stock gained the
+  // wyrmfall_core material row (the ruling R8 catch-up valve), so the
+  // gear-shape assertions now run over the stock MINUS that row, and the
+  // material row gets its own pins below. The exact-count floors keep both
+  // halves honest: a new gear row or a second material row moves a literal.
+  it('every gear offer is a real epic level-20 jewelry item at item level 26', () => {
+    expect(HEROIC_VENDOR_STOCK.length).toBe(11);
+    const gearOffers = HEROIC_VENDOR_STOCK.filter((o) => o.itemId !== 'wyrmfall_core');
+    expect(gearOffers.length).toBe(10);
+    for (const offer of gearOffers) {
       const item = ITEMS[offer.itemId];
       expect(item, offer.itemId).toBeTruthy();
       expect(item.quality, offer.itemId).toBe('epic');
@@ -48,6 +55,17 @@ describe('heroic vendor stock: item-level and budget pins', () => {
       expect(offer.marks).toBeGreaterThan(0);
       expect(itemLevel(item), offer.itemId).toBe(26);
     }
+  });
+
+  it('sells the Wyrmfall Core catch-up row at the ring price point', () => {
+    const core = HEROIC_VENDOR_STOCK.find((o) => o.itemId === 'wyrmfall_core');
+    expect(core?.marks).toBe(12);
+    expect(ITEMS.wyrmfall_core.kind).toBe('junk');
+    expect(ITEMS.wyrmfall_core.quality).toBe('rare');
+    expect(ITEMS.wyrmfall_core.soulbound).toBeUndefined();
+    // A material is not item-level eligible: the stock source-level bump must
+    // stay a no-op for it (no phantom item-level line in the tooltip).
+    expect(itemLevel(ITEMS.wyrmfall_core)).toBeUndefined();
   });
 
   it('pins the ring and neck stat budgets (11 and 12) and every stat sum matches', () => {

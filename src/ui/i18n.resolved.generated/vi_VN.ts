@@ -15706,6 +15706,11 @@ export const vi_VN: EnTranslations = {
         "subject": "Dấu Ấn Anh Hùng của bạn",
         "body": "Đội của bạn đã vượt qua thử thách Anh Hùng khi bạn chiến đấu ở hậu tuyến hoặc đã ngã xuống. Khóa lượt của bạn vẫn được ghi nhận, vì vậy phần Dấu Ấn Anh Hùng của bạn được gửi đến đây thay vì thất lạc. Hãy sử dụng chúng thật tốt.\n\n- Quân nhu Anh Hùng"
       },
+      "wyrmfall_core_reward": {
+        "sender": "The Heroic Quartermaster",
+        "subject": "Your Wyrmfall Cores",
+        "body": "The beast fell while you fought from the back, or from the dirt. Your share of its Wyrmfall Cores flies to you here rather than being lost to the corpse-pickers. Put them to good work at a bench.\n\n- The Heroic Quartermaster"
+      },
       "guild_trend_engineering_alchemy": {
         "sender": "Hội chế tạo",
         "subject": "Công việc của bạn trong Kỹ thuật và Giả kim thuật",

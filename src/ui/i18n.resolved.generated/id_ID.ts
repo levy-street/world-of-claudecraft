@@ -15706,6 +15706,11 @@ export const id_ID: EnTranslations = {
         "subject": "Tanda Heroik milikmu",
         "body": "Kelompokmu menuntaskan ujian heroik saat kamu bertempur di barisan belakang atau telah tumbang. Penguncianmu juga tercatat, jadi bagian Tanda Heroik milikmu dikirim ke sini alih-alih hilang. Gunakan dengan baik.\n\n- Perbekal heroik"
       },
+      "wyrmfall_core_reward": {
+        "sender": "The Heroic Quartermaster",
+        "subject": "Your Wyrmfall Cores",
+        "body": "The beast fell while you fought from the back, or from the dirt. Your share of its Wyrmfall Cores flies to you here rather than being lost to the corpse-pickers. Put them to good work at a bench.\n\n- The Heroic Quartermaster"
+      },
       "guild_trend_engineering_alchemy": {
         "sender": "Persatuan Perajin",
         "subject": "Pekerjaan Anda di bidang Teknik dan Alkimia",

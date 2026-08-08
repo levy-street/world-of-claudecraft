@@ -15706,6 +15706,11 @@ export const zh_CN: EnTranslations = {
         "subject": "你的英勇印记",
         "body": "你的部队清剿了英勇试炼，而你在后排作战，或已倒在尘土之中。你的锁定同样已经生效，因此你那一份英勇印记飞到了这里，而非就此遗失。好好使用它们。\n\n- 英勇军需官"
       },
+      "wyrmfall_core_reward": {
+        "sender": "英勇军需官",
+        "subject": "你的坠龙核心",
+        "body": "巨兽倒下时，你在后排作战，或已倒在尘土之中。你那一份坠龙核心飞到了这里，而没有落入拾荒者之手。把它们用在工作台上吧。\n\n- 英勇军需官"
+      },
       "guild_trend_engineering_alchemy": {
         "sender": "工匠公会",
         "subject": "关于你的工程学与炼金术",

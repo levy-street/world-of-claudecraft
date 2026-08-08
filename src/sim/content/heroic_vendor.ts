@@ -153,4 +153,11 @@ export const HEROIC_VENDOR_STOCK: readonly HeroicVendorOffer[] = [
   { itemId: 'zense_meridian', marks: 16 },
   { itemId: 'swiftfang_talisman', marks: 16 },
   { itemId: 'medallion_of_endless_profit', marks: 16 },
+  // Masterwrought phase 04: the deterministic Wyrmfall Core catch-up valve
+  // (ruling R8's day-one vendor channel). Deliberately priced at the ring
+  // point of the mark family: a bad-luck backstop for the last core, never a
+  // farm that outpaces the boss faucet (1 to 3 per kill). The def lives in
+  // content/items.ts with the other materials; the item_level stock bump
+  // no-ops for it (junk is not item-level eligible).
+  { itemId: 'wyrmfall_core', marks: 12 },
 ];

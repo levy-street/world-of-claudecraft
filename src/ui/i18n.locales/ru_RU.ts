@@ -8714,6 +8714,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.letters.heroic_marks_reward.subject': 'Ваши героические знаки',
   'entities.letters.heroic_marks_reward.body':
     'Ваш отряд прошёл героическое испытание, пока вы сражались в тылу или лежали в пыли. Блокировка была наложена всё равно, поэтому ваша доля героических знаков прилетела к вам сюда, а не пропала. Расходуйте их с умом.\n\n- Героический интендант',
+  'entities.letters.wyrmfall_core_reward.sender': 'Героический интендант',
+  'entities.letters.wyrmfall_core_reward.subject': 'Ваши ядра драконопада',
+  'entities.letters.wyrmfall_core_reward.body':
+    'Зверь пал, пока вы сражались в тылу или лежали в пыли. Ваша доля ядер драконопада прилетела к вам сюда, а не досталась мародёрам. Пустите их в дело у верстака.\n\n- Героический интендант',
   'entities.letters.guild_trend_engineering_alchemy.sender': 'Гильдия ремесленников',
   'entities.letters.guild_trend_engineering_alchemy.subject':
     'О вашей работе: инженерное дело и алхимия',

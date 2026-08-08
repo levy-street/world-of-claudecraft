@@ -15706,6 +15706,11 @@ export const it_IT: EnTranslations = {
         "subject": "I tuoi Marchi eroici",
         "body": "Il tuo gruppo ha superato la prova eroica mentre combattevi nelle retrovie o giacevi a terra. Anche il tuo vincolo è stato registrato, quindi la tua parte di Marchi eroici è arrivata qui invece di andare perduta. Usali bene.\n\n- Quartiermastro eroico"
       },
+      "wyrmfall_core_reward": {
+        "sender": "The Heroic Quartermaster",
+        "subject": "Your Wyrmfall Cores",
+        "body": "The beast fell while you fought from the back, or from the dirt. Your share of its Wyrmfall Cores flies to you here rather than being lost to the corpse-pickers. Put them to good work at a bench.\n\n- The Heroic Quartermaster"
+      },
       "guild_trend_engineering_alchemy": {
         "sender": "La Gilda degli Artigiani",
         "subject": "Il tuo lavoro in Ingegneria e Alchimia",

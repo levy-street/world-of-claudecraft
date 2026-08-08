@@ -386,6 +386,7 @@ import {
   isEnchantedInstance,
 } from './professions/enchanting';
 import * as fishing from './professions/fishing';
+import * as masterwroughtMaterials from './professions/masterwrought_materials';
 import type { RespecPaymentTier } from './professions/focus';
 import * as professionsFocus from './professions/focus';
 import {
@@ -1520,6 +1521,14 @@ export interface PlayerMeta {
   // is gated only by raidLockouts; this persisted field records which distinct
   // heroic clears contributed to one authoritative reset window without gating rewards.
   heroicDaily: { date: string; marked: Set<string> };
+  // Masterwrought materials (phase 04). wyrmfallDaily is the Wyrmfall Core
+  // income gate: which faucet sources (dungeonId:difficulty, or 'rift') paid
+  // this character inside the current reset-day window. emberWeekAnchor is
+  // the week-anchor date of the last Maker's Ember grant ('' = never), the
+  // bankable weekly accrual's high-water mark. Both roll on ctx.resetDay
+  // (professions/masterwrought_materials.ts).
+  wyrmfallDaily: { date: string; sources: Set<string> };
+  emberWeekAnchor: string;
   // Set synchronously when authoritative leave teardown begins, before its
   // first persistence await. Session-only: reward and lockout snapshots ignore
   // the departing player so no post-save mutation is discarded on removal.
@@ -1718,6 +1727,11 @@ export interface CharacterState {
   delveLoreUnlocked?: string[];
   delveDaily?: { date: string; firstClearXp: string[]; markClears: number };
   heroicDaily?: { date: string; marked: string[] };
+  // Masterwrought materials (phase 04): both optional so pre-materials saves
+  // load with the fields at their fresh defaults, and both omitted from
+  // serialization while at those defaults so untouched rows stay byte-equal.
+  wyrmfallDaily?: { date: string; sources: string[] };
+  emberWeekAnchor?: string;
   // Ravenpost welcome letter already sent (optional so pre-mail saves load
   // cleanly and receive the announcement letter once on their next login).
   mailWelcomed?: boolean;
@@ -2873,6 +2887,8 @@ export class Sim {
       delveDaily: { date: '', firstClearXp: new Set(), markClears: 0 },
       townFocus: {},
       heroicDaily: { date: '', marked: new Set() },
+      wyrmfallDaily: { date: '', sources: new Set() },
+      emberWeekAnchor: '',
       deedsEarned: new Map(),
       deedStats: freshDeedStats(),
       activeTitle: null,
@@ -3280,6 +3296,13 @@ export class Sim {
       if (s.heroicDaily) {
         meta.heroicDaily = { date: s.heroicDaily.date, marked: new Set(s.heroicDaily.marked) };
       }
+      if (s.wyrmfallDaily) {
+        meta.wyrmfallDaily = {
+          date: s.wyrmfallDaily.date,
+          sources: new Set(s.wyrmfallDaily.sources),
+        };
+      }
+      meta.emberWeekAnchor = s.emberWeekAnchor ?? '';
       // The Book of Deeds. Earned days load verbatim; the legacy milestone set
       // unions into the earned map (milestone unification); renown is
       // RECOMPUTED from the earned set below (the sim is authoritative, the
@@ -4021,6 +4044,18 @@ export class Sim {
         markClears: meta.delveDaily.markClears,
       },
       heroicDaily: { date: meta.heroicDaily.date, marked: [...meta.heroicDaily.marked] },
+      // Masterwrought materials: zero-default omission (the honor idiom), so
+      // a character the faucets never paid serializes byte-identically to a
+      // pre-materials save.
+      ...(meta.wyrmfallDaily.date !== '' || meta.wyrmfallDaily.sources.size > 0
+        ? {
+            wyrmfallDaily: {
+              date: meta.wyrmfallDaily.date,
+              sources: [...meta.wyrmfallDaily.sources],
+            },
+          }
+        : {}),
+      ...(meta.emberWeekAnchor !== '' ? { emberWeekAnchor: meta.emberWeekAnchor } : {}),
       mailWelcomed: meta.mailWelcomed,
       guildLetterSent: meta.guildLetterSent,
       // All three written only when non-empty/true (zero-default
@@ -5230,6 +5265,11 @@ export class Sim {
       dungeonDifficulty: sim.dungeonDifficulty.bind(sim),
       setDungeonDifficulty: sim.setDungeonDifficulty.bind(sim),
       awardHeroicMarks: sim.awardHeroicMarks.bind(sim),
+      // Masterwrought materials (phase 04): owned by
+      // professions/masterwrought_materials; late-bound arrow so the module
+      // reads the live ctx at call time (the N1 grantNythraxisLockout idiom).
+      awardWyrmfallCores: (mob, recipients) =>
+        masterwroughtMaterials.awardWyrmfallCores(sim.ctx, mob, recipients),
       addEntity: sim.addEntity.bind(sim),
       dropEntity: sim.dropEntity.bind(sim),
       rebucket: sim.rebucket.bind(sim),
@@ -5452,6 +5492,7 @@ export class Sim {
       marketListingBelongsTo: (listing, meta) => sim.market.marketListingBelongsTo(listing, meta),
       queueQuestLetter: (questId, pid) => sim.postOffice.queueQuestLetter(questId, pid),
       mailHeroicMarks: (pid, itemId, count) => sim.postOffice.mailHeroicMarks(pid, itemId, count),
+      mailWyrmfallCores: (pid, count) => sim.postOffice.mailWyrmfallCores(pid, count),
       mailAuthoredLetter: (meta, letter) =>
         sim.postOffice.sendLetter(sim.postOffice.mailKeyFor(meta), meta.name, letter, 'system'),
       mailboxHoldsItem: (meta, itemId) => sim.postOffice.mailboxHoldsItem(meta, itemId),

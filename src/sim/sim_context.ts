@@ -375,6 +375,11 @@ export interface SimContextCallbacks {
   dungeonDifficulty(pid?: number): DungeonDifficulty;
   setDungeonDifficulty(difficulty: DungeonDifficulty, pid?: number): void;
   awardHeroicMarks(mob: Entity, recipients: PlayerMeta[]): void;
+  // awardWyrmfallCores is owned by professions/masterwrought_materials: the C1
+  // death hub calls it right after awardHeroicMarks with the same death-time
+  // participation snapshot (one rng draw per credited eligible kill, appended
+  // after rollLoot returns).
+  awardWyrmfallCores(mob: Entity, recipients: PlayerMeta[]): void;
 
   // C1 damage/death hub + the casting/leash/arena/duel/fiesta/loot teardown it
   // drives mid-tick. `dealDamage` is the post-mitigation entry (crit/dodge/miss and
@@ -964,6 +969,12 @@ export interface SimContextCallbacks {
   // instances/dungeons.ts). Binding points at the PostOffice instance on Sim.
   mailHeroicMarks(pid: number, itemId: string, count: number): void;
 
+  // Ravenpost mail: posts Wyrmfall Cores to a final-boss participant who entered
+  // the run but was absent at the corpse (awardWyrmfallCores in
+  // professions/masterwrought_materials.ts). Binding points at the PostOffice
+  // instance on Sim.
+  mailWyrmfallCores(pid: number, count: number): void;
+
   // Ravenpost mail: books an authored letter to a character through the standard
   // system-mail path (mailKeyFor recipient key, 'system' kind, the letter's own
   // delivery delay). The Guild trend letter sweep (professions/guild_letter.ts)
@@ -1352,6 +1363,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     dungeonDifficulty: host.dungeonDifficulty,
     setDungeonDifficulty: host.setDungeonDifficulty,
     awardHeroicMarks: host.awardHeroicMarks,
+    awardWyrmfallCores: host.awardWyrmfallCores,
     dealDamage: host.dealDamage,
     handleDeath: host.handleDeath,
     cancelCast: host.cancelCast,
@@ -1562,6 +1574,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     // Ravenpost mail: the quest turn-in letter hook (points at the PostOffice on Sim).
     queueQuestLetter: host.queueQuestLetter,
     mailHeroicMarks: host.mailHeroicMarks,
+    mailWyrmfallCores: host.mailWyrmfallCores,
     mailAuthoredLetter: host.mailAuthoredLetter,
     mailboxHoldsItem: host.mailboxHoldsItem,
     applySetProcs: host.applySetProcs,

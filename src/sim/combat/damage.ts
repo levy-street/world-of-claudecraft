@@ -1494,6 +1494,11 @@ export function handleDeath(
     // only the participation snapshot above receives marks.
     lockNormalDungeonResetOnBossKill(ctx, e);
     ctx.awardHeroicMarks(e, heroicRewardRecipients);
+    // Masterwrought materials (phase 04): Wyrmfall Cores and the weekly ember
+    // check for the same participation snapshot. Runs AFTER rollLoot returned
+    // above, so its single count draw appends to the tick's rng sequence and
+    // can never reorder loot rolls.
+    ctx.awardWyrmfallCores(e, heroicRewardRecipients);
     // A bossExitPortal dungeon opens its far-end exit the moment the final
     // boss falls (both difficulties; no-op everywhere else).
     spawnBossExitPortal(ctx, e);

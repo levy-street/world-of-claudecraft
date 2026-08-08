@@ -15706,6 +15706,11 @@ export const en: EnTranslations = {
         "subject": "Your Heroic Marks",
         "body": "Your warband cleared the heroic trial while you fought from the back, or from the dirt. Your lockout was struck all the same, so your share of Heroic Marks flies to you here rather than being lost. Spend them well.\n\n- The Heroic Quartermaster"
       },
+      "wyrmfall_core_reward": {
+        "sender": "The Heroic Quartermaster",
+        "subject": "Your Wyrmfall Cores",
+        "body": "The beast fell while you fought from the back, or from the dirt. Your share of its Wyrmfall Cores flies to you here rather than being lost to the corpse-pickers. Put them to good work at a bench.\n\n- The Heroic Quartermaster"
+      },
       "guild_trend_engineering_alchemy": {
         "sender": "The Crafting Guild",
         "subject": "Your work in Engineering and Alchemy",

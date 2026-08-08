@@ -233,6 +233,7 @@ function makeCtx() {
     dungeonDifficulty: vi.fn(() => 'normal' as const),
     setDungeonDifficulty: vi.fn(),
     awardHeroicMarks: vi.fn(),
+    awardWyrmfallCores: vi.fn(),
     addEntity: vi.fn(),
     dropEntity: vi.fn(),
     rebucket: vi.fn(),
@@ -393,6 +394,7 @@ function makeCtx() {
     // Ravenpost mail: the quest turn-in letter hook.
     queueQuestLetter: vi.fn(),
     mailHeroicMarks: vi.fn(),
+    mailWyrmfallCores: vi.fn(),
     mailAuthoredLetter: vi.fn(),
     mailboxHoldsItem: vi.fn(() => false),
     applySetProcs: vi.fn(),

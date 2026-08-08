@@ -1384,7 +1384,12 @@ describe('dungeons: heroic marks', () => {
     expect(morthen.dead).toBe(true);
     expect(sim.countItem(HEROIC_MARK_ITEM_ID, leader)).toBe(1);
     expect(sim.countItem(HEROIC_MARK_ITEM_ID, member)).toBe(1);
-    expect(sim.players.get(leader)!.inventory).toHaveLength(fullCapacity + 1);
+    // Two direct kill-time grants land together: the marks stack plus the
+    // Masterwrought phase 04 Wyrmfall Core stack (awardWyrmfallCores rides the
+    // same death-hub call). No ember here: the bare test Sim has no resetDay,
+    // so the weekly check stays closed, like every other calendar gate.
+    expect(sim.players.get(leader)!.inventory).toHaveLength(fullCapacity + 2);
+    expect(sim.countItem('wyrmfall_core', leader)).toBeGreaterThanOrEqual(1);
     const markSlots = ((morthen.loot?.items ?? []) as any[]).filter(
       (s) => s.itemId === HEROIC_MARK_ITEM_ID,
     );

@@ -15706,6 +15706,11 @@ export const da_DK: EnTranslations = {
         "subject": "Dine heroiske mærker",
         "body": "Din gruppe klarede den heroiske prøve, mens du kæmpede i bagtroppen eller lå faldet. Din låsning blev også registreret, så din andel af de heroiske mærker blev sendt hertil i stedet for at gå tabt. Brug dem godt.\n\n- Heroisk kvartermester"
       },
+      "wyrmfall_core_reward": {
+        "sender": "The Heroic Quartermaster",
+        "subject": "Your Wyrmfall Cores",
+        "body": "The beast fell while you fought from the back, or from the dirt. Your share of its Wyrmfall Cores flies to you here rather than being lost to the corpse-pickers. Put them to good work at a bench.\n\n- The Heroic Quartermaster"
+      },
       "guild_trend_engineering_alchemy": {
         "sender": "Håndværkerlauget",
         "subject": "Dit arbejde inden for teknik og alkymi",

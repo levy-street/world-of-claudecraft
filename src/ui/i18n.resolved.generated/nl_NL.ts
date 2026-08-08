@@ -15706,6 +15706,11 @@ export const nl_NL: EnTranslations = {
         "subject": "Je heroïsche marken",
         "body": "Je groep heeft de heroïsche beproeving doorstaan terwijl jij in de achterhoede vocht of verslagen op de grond lag. Ook jouw binding is vastgelegd, dus je aandeel heroïsche marken is hierheen gestuurd in plaats van verloren te gaan. Gebruik ze goed.\n\n- Heroïsche kwartiermeester"
       },
+      "wyrmfall_core_reward": {
+        "sender": "The Heroic Quartermaster",
+        "subject": "Your Wyrmfall Cores",
+        "body": "The beast fell while you fought from the back, or from the dirt. Your share of its Wyrmfall Cores flies to you here rather than being lost to the corpse-pickers. Put them to good work at a bench.\n\n- The Heroic Quartermaster"
+      },
       "guild_trend_engineering_alchemy": {
         "sender": "Het Ambachtsgilde",
         "subject": "Jouw werk in techniek en alchemie",

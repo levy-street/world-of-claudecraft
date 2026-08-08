@@ -156,6 +156,8 @@ const CALLBACK_KEYS = [
   'dungeonDifficulty',
   'setDungeonDifficulty',
   'awardHeroicMarks',
+  // Masterwrought phase 04 materials surface (professions/masterwrought_materials).
+  'awardWyrmfallCores',
   // M3 mob-swing affix cascade surface.
   'effectiveArmor',
   'recalcPlayer',
@@ -235,6 +237,7 @@ const CALLBACK_KEYS = [
   // Ravenpost mail: the quest turn-in letter hook.
   'queueQuestLetter',
   'mailHeroicMarks',
+  'mailWyrmfallCores',
   'mailAuthoredLetter',
   'mailboxHoldsItem',
   // Commission order board change signal (professions/commission_order.ts
@@ -438,6 +441,7 @@ function makeFakeHost() {
     dungeonDifficulty: vi.fn(() => 'normal' as const),
     setDungeonDifficulty: vi.fn(),
     awardHeroicMarks: vi.fn(),
+    awardWyrmfallCores: vi.fn(),
     addEntity: vi.fn(),
     dropEntity: vi.fn(),
     rebucket: vi.fn(),
@@ -575,6 +579,7 @@ function makeFakeHost() {
     // Ravenpost mail: the quest turn-in letter hook.
     queueQuestLetter: vi.fn(),
     mailHeroicMarks: vi.fn(),
+    mailWyrmfallCores: vi.fn(),
     mailAuthoredLetter: vi.fn(),
     mailboxHoldsItem: vi.fn(() => false),
     applySetProcs: vi.fn(),

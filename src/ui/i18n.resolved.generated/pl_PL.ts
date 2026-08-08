@@ -15706,6 +15706,11 @@ export const pl_PL: EnTranslations = {
         "subject": "Twoje heroiczne znaki",
         "body": "Twoja grupa pokonała heroiczną próbę, gdy walczyłeś na tyłach lub leżałeś pokonany. Twoja blokada również została zapisana, dlatego należna część heroicznych znaków trafiła tutaj, zamiast przepaść. Dobrze je wykorzystaj.\n\n- Heroiczny kwatermistrz"
       },
+      "wyrmfall_core_reward": {
+        "sender": "The Heroic Quartermaster",
+        "subject": "Your Wyrmfall Cores",
+        "body": "The beast fell while you fought from the back, or from the dirt. Your share of its Wyrmfall Cores flies to you here rather than being lost to the corpse-pickers. Put them to good work at a bench.\n\n- The Heroic Quartermaster"
+      },
       "guild_trend_engineering_alchemy": {
         "sender": "Gildia Rzemieślnicza",
         "subject": "Twoja praca w inżynierii i alchemii",

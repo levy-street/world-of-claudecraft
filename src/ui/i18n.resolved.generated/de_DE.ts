@@ -15706,6 +15706,11 @@ export const de_DE: EnTranslations = {
         "subject": "Deine heroischen Marken",
         "body": "Deine Gruppe hat die heroische Prüfung gemeistert, während du in der Nachhut gekämpft hast oder bereits am Boden lagst. Auch deine Instanzbindung wurde aktiviert, daher ist dein Anteil an heroischen Marken hier angekommen, statt verloren zu gehen. Setze sie klug ein.\n\n- Heroischer Quartiermeister"
       },
+      "wyrmfall_core_reward": {
+        "sender": "The Heroic Quartermaster",
+        "subject": "Your Wyrmfall Cores",
+        "body": "The beast fell while you fought from the back, or from the dirt. Your share of its Wyrmfall Cores flies to you here rather than being lost to the corpse-pickers. Put them to good work at a bench.\n\n- The Heroic Quartermaster"
+      },
       "guild_trend_engineering_alchemy": {
         "sender": "Die Handwerksgilde",
         "subject": "Ihre Arbeit in Ingenieurwesen und Alchemie",

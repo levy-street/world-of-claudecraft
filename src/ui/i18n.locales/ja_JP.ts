@@ -8594,6 +8594,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.letters.heroic_marks_reward.subject': 'あなたの英雄の印',
   'entities.letters.heroic_marks_reward.body':
     'あなたが後方で、あるいは倒れて戦っている間に、あなたの部隊が英雄級の試練を突破しました。ロックアウトは同じように科されたので、あなたの分の英雄の印は失われることなく、ここへ飛んできました。大切に使ってください。\n\n- 英雄級補給官',
+  'entities.letters.wyrmfall_core_reward.sender': '英雄級補給官',
+  'entities.letters.wyrmfall_core_reward.subject': 'あなたの竜墜の核',
+  'entities.letters.wyrmfall_core_reward.body':
+    'あなたが後方で、あるいは倒れて戦っている間に、あの巨獣は討ち取られました。あなたの分の竜墜の核は、漁り屋の手に渡ることなく、ここへ飛んできました。作業台で役立ててください。\n\n- 英雄級補給官',
   'entities.letters.guild_trend_engineering_alchemy.sender': '製作ギルド',
   'entities.letters.guild_trend_engineering_alchemy.subject': '工作と錬金術の腕前について',
   'entities.letters.guild_trend_engineering_alchemy.body':

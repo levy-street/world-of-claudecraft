@@ -8207,6 +8207,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.letters.heroic_marks_reward.subject': '你的英勇印记',
   'entities.letters.heroic_marks_reward.body':
     '你的部队清剿了英勇试炼，而你在后排作战，或已倒在尘土之中。你的锁定同样已经生效，因此你那一份英勇印记飞到了这里，而非就此遗失。好好使用它们。\n\n- 英勇军需官',
+  'entities.letters.wyrmfall_core_reward.sender': '英勇军需官',
+  'entities.letters.wyrmfall_core_reward.subject': '你的坠龙核心',
+  'entities.letters.wyrmfall_core_reward.body':
+    '巨兽倒下时，你在后排作战，或已倒在尘土之中。你那一份坠龙核心飞到了这里，而没有落入拾荒者之手。把它们用在工作台上吧。\n\n- 英勇军需官',
   'entities.letters.guild_trend_engineering_alchemy.sender': '工匠公会',
   'entities.letters.guild_trend_engineering_alchemy.subject': '关于你的工程学与炼金术',
   'entities.letters.guild_trend_engineering_alchemy.body':

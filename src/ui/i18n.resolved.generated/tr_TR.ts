@@ -15706,6 +15706,11 @@ export const tr_TR: EnTranslations = {
         "subject": "Kahramanlık Nişanların",
         "body": "Birliğin kahramanlık sınavını temizlerken sen arka saflarda savaşıyor ya da yerde yatıyordun. Kilidin yine de kaydedildi, bu yüzden Kahramanlık Nişanlarından payın kaybolmak yerine buraya gönderildi. Onları iyi kullan.\n\n- Kahraman levazım subayı"
       },
+      "wyrmfall_core_reward": {
+        "sender": "The Heroic Quartermaster",
+        "subject": "Your Wyrmfall Cores",
+        "body": "The beast fell while you fought from the back, or from the dirt. Your share of its Wyrmfall Cores flies to you here rather than being lost to the corpse-pickers. Put them to good work at a bench.\n\n- The Heroic Quartermaster"
+      },
       "guild_trend_engineering_alchemy": {
         "sender": "Üretim Loncası",
         "subject": "Mühendislik ve Simya alanındaki çalışmalarınız",
