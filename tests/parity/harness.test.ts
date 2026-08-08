@@ -113,7 +113,11 @@ describe('samplePlayerMeta', () => {
     );
     const before = digest(samplePlayerMeta(meta));
     meta.farmPlots.set('bed_eastbrook_1', {
-      cropId: 'wheat',
+      // A REAL shipped crop id (content/farm_crops.ts), not the 'wheat'
+      // placeholder this fixture carried while the catalog was still empty.
+      // Nothing here crosses the load-side allowlist, so the placeholder
+      // passed; it just described a plot that could never exist.
+      cropId: 'vale_wheat',
       plantedAtMs: 1_000,
       readyAtMs: 5_000,
       compost: false,

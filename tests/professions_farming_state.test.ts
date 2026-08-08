@@ -97,15 +97,24 @@ describe('the pure farm-plot round trip (no Sim)', () => {
       tonic: true,
       notified: true,
     });
-    expect(loaded.get('bed_beta')).toEqual({
+    // The minimal row comes back with DERIVED hidden slots rather than none:
+    // the load side never leaves a plot slotless, because an absent slot would
+    // otherwise resolve at harvest time (see the derivation arms below). Every
+    // other field round-trips verbatim.
+    const beta = loaded.get('bed_beta') as PlotState;
+    expect({ ...beta, survivalRoll: undefined, yieldSeed: undefined }).toEqual({
       cropId: 'wheat',
       plantedAtMs: 2_000,
       readyAtMs: 3_000,
+      survivalRoll: undefined,
+      yieldSeed: undefined,
       compost: false,
       watch: false,
       tonic: false,
       notified: false,
     });
+    expect(Number.isFinite(beta.survivalRoll)).toBe(true);
+    expect(Number.isInteger(beta.yieldSeed)).toBe(true);
   });
 
   it('writes key-sorted rows so persisted blob diffs stay readable', () => {
@@ -167,6 +176,23 @@ describe('the pure farm-plot round trip (no Sim)', () => {
 describe('the public projection, driven directly (the pure-leaf contract)', () => {
   // The module header promises "a Vitest imports it directly"; this suite is
   // that import. The wire-path twin lives in tests/snapshots.test.ts.
+  //
+  // The growth phase gave projectFarmPlots two more explicit arguments (the
+  // farmer's current skill and a crop-tier resolver) so it can derive the
+  // `withered` status without importing a content table. Both fixtures below
+  // keep the leaf contract: a literal skill and a local resolver, never
+  // shipped content.
+  const TIER_1 = () => 1;
+  // A skill a full band above every tier-1 gate, so survival is 1 and the
+  // projection's status is decided by the DEADLINE alone in these arms; the
+  // survival-driven arms name their own skill.
+  const OUTLEVELLED = 25;
+  const project = (
+    m: ReadonlyMap<string, PlotState>,
+    nowMs: number,
+    skill = OUTLEVELLED,
+    tierOf: (cropId: string) => number = TIER_1,
+  ) => projectFarmPlots(m, nowMs, skill, tierOf);
   const plot = (over: Partial<PlotState> = {}): PlotState => ({
     cropId: 'turnip',
     plantedAtMs: 1_000,
@@ -184,9 +210,9 @@ describe('the public projection, driven directly (the pure-leaf contract)', () =
     // EMPTY_TOOL_EFFECT_SLOT_VIEWS precedent, identity-pinned so a fresh []
     // regression reds here.
     const m = new Map<string, PlotState>();
-    expect(projectFarmPlots(m, 1_000)).toBe(projectFarmPlots(m, 2_000));
-    expect(projectFarmPlots(m, 1_000)).toEqual([]);
-    expect(Object.isFrozen(projectFarmPlots(m, 1_000))).toBe(true);
+    expect(project(m, 1_000)).toBe(project(m, 2_000));
+    expect(project(m, 1_000)).toEqual([]);
+    expect(Object.isFrozen(project(m, 1_000))).toBe(true);
   });
 
   it('sorts rows by bed id regardless of map insertion order', () => {
@@ -194,7 +220,7 @@ describe('the public projection, driven directly (the pure-leaf contract)', () =
       ['bed_beta', plot()],
       ['bed_alpha', plot()],
     ]);
-    expect(projectFarmPlots(m, 10_000).map((r) => r.bedId)).toEqual(['bed_alpha', 'bed_beta']);
+    expect(project(m, 10_000).map((r) => r.bedId)).toEqual(['bed_alpha', 'bed_beta']);
   });
 
   it('turns ready EXACTLY at readyAtMs, growing one ms before', () => {
@@ -203,15 +229,44 @@ describe('the public projection, driven directly (the pure-leaf contract)', () =
     // builds on "at readyAtMs the plot is already ready". A drift from < to <=
     // in the projector must red here.
     const m = new Map<string, PlotState>([['bed_alpha', plot({ readyAtMs: 5_000 })]]);
-    expect(projectFarmPlots(m, 4_999)[0]?.status).toBe('growing');
-    expect(projectFarmPlots(m, 5_000)[0]?.status).toBe('ready');
+    expect(project(m, 4_999)[0]?.status).toBe('growing');
+    expect(project(m, 5_000)[0]?.status).toBe('ready');
+  });
+
+  it('keeps a doomed crop indistinguishable from a healthy one WHILE it grows', () => {
+    // The hidden pre-roll must stay unobservable until the deadline, or a
+    // client could read a failure the moment it was planted. A roll that is
+    // certain to fail still projects as `growing` right up to readyAtMs.
+    const doomed = new Map<string, PlotState>([['bed_alpha', plot({ survivalRoll: 0.99 })]]);
+    expect(project(doomed, 4_999, 0)[0]?.status).toBe('growing');
+    expect(project(doomed, 5_000, 0)[0]?.status).toBe('withered');
+  });
+
+  it('re-reads survival against CURRENT skill, so out-levelling retires the risk', () => {
+    // Same plot, same clock, same roll: only the farmer's proficiency differs.
+    // At the gate the 0.99 roll loses (survival 0.85); a full band above it
+    // survives (1.0), which is D6's "out-levelling a crop permanently retires
+    // its risk" read retroactively. Monotone player-favorable, because
+    // gathering proficiency has no decrement path.
+    const m = new Map<string, PlotState>([['bed_alpha', plot({ survivalRoll: 0.99 })]]);
+    expect(project(m, 5_000, 0)[0]?.status).toBe('withered');
+    expect(project(m, 5_000, 25)[0]?.status).toBe('ready');
+  });
+
+  it('reads the crop tier through the resolver, never a hardcoded band', () => {
+    // A tier-2 crop gates at 25, so skill 25 is only AT its gate (survival
+    // 0.85) where the same skill was a full band above a tier-1 crop. The
+    // resolver argument is what carries that difference in.
+    const m = new Map<string, PlotState>([['bed_alpha', plot({ survivalRoll: 0.9 })]]);
+    expect(project(m, 5_000, 25, () => 1)[0]?.status).toBe('ready');
+    expect(project(m, 5_000, 25, () => 2)[0]?.status).toBe('withered');
   });
 
   it('picks the nine public fields explicitly, never the hidden slots', () => {
     const m = new Map<string, PlotState>([
       ['bed_alpha', plot({ survivalRoll: 0.5, yieldSeed: 9 })],
     ]);
-    const row = projectFarmPlots(m, 10_000)[0] as unknown as Record<string, unknown>;
+    const row = project(m, 10_000)[0] as unknown as Record<string, unknown>;
     expect(Object.keys(row).sort()).toEqual([
       'bedId',
       'compost',
@@ -285,30 +340,133 @@ describe('load-side anti-tamper (one corrupt dimension per arm)', () => {
     expect(loaded.get('bed_alpha')?.readyAtMs).toBe(NOW + FARM_MAX_GROW_MS);
   });
 
-  it('keeps the saved anchor when the loading clock is at or below zero', () => {
-    // A fresh offline Sim reports lockoutNowMs 0 before it has ticked.
-    // Re-anchoring to 0 would write an anchor this same function drops on the
-    // NEXT load, so a row would survive exactly one round trip.
+  it('re-anchors on a zero clock too, to the floor of 1, and settles there', () => {
+    // THE ANCHOR SEMANTICS the growth phase resolved on purpose. A fresh
+    // offline Sim reports lockoutNowMs 0 before it has ticked, and the old
+    // `nowMs > 0` guard skipped the re-anchor entirely on that path, which
+    // left the fresh-Sim load and the post-tick load DISAGREEING about the
+    // same bytes. Flooring the anchor at 1 gives both paths one rule while
+    // keeping the property the guard existed for: 1 is positive, so the row
+    // survives every subsequent load rather than being dropped by the
+    // positivity arm.
     const loaded = norm({ bed_alpha: { ...VALID } }, 0);
-    expect(loaded.get('bed_alpha')?.plantedAtMs).toBe(1_000);
-    expect(loaded.get('bed_alpha')?.readyAtMs).toBe(5_000);
+    expect(loaded.get('bed_alpha')?.plantedAtMs).toBe(1);
+    expect(loaded.get('bed_alpha')?.readyAtMs).toBe(1 + 4_000);
+    // The fixed point: re-loading what that load would save changes nothing.
+    const resaved = serializeFarmPlots(loaded) as Record<string, PersistedFarmPlot>;
+    const again = norm(resaved, 0);
+    expect(again.get('bed_alpha')?.plantedAtMs).toBe(1);
+    expect(again.get('bed_alpha')?.readyAtMs).toBe(1 + 4_000);
   });
 
-  it('drops a corrupt hidden slot without dropping the row', () => {
+  it('SKIPS the re-anchor entirely when the clock is not a finite number', () => {
+    // The destructive branch, pinned so a mutation of the ternary dies here.
+    // Folding a non-finite clock into the floor of 1 would re-anchor EVERY row
+    // to 1 and PERSIST it, which on any host reading a real epoch clock puts
+    // readyAtMs back in 1970 and makes every crop in the world instantly
+    // ready: a silent, saved, total loss of growth state. When the clock
+    // cannot be trusted, preserving the saved anchors is strictly safer.
+    const saved = {
+      bed_alpha: { ...VALID, plantedAtMs: 1_700_000_000_000, readyAtMs: 1_700_000_060_000 },
+    };
+    for (const clock of [Number.NaN, Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY]) {
+      const loaded = norm(saved, clock);
+      const row = loaded.get('bed_alpha') as PlotState;
+      // Byte-for-byte: the anchor and the deadline both ride through untouched.
+      expect(row.plantedAtMs, String(clock)).toBe(1_700_000_000_000);
+      expect(row.readyAtMs, String(clock)).toBe(1_700_000_060_000);
+    }
+    // Anti-vacuous: the very same row DOES re-anchor under a finite clock, so
+    // the arm above is proving a skip rather than a row that never moves.
+    expect(norm(saved, 0).get('bed_alpha')?.plantedAtMs).toBe(1);
+    expect(norm(saved, NOW).get('bed_alpha')?.plantedAtMs).toBe(NOW);
+  });
+
+  it('gives the fresh-Sim and post-tick load paths the SAME semantics', () => {
+    // The disagreement the fix removes, asserted as an agreement: a row whose
+    // anchor is in the future re-anchors on BOTH clocks, and the two loads
+    // preserve the identical duration. Before the fix the zero-clock arm kept
+    // the future anchor and the ticked arm moved it.
+    const future = { bed_alpha: { ...VALID, plantedAtMs: 9_000_000, readyAtMs: 9_060_000 } };
+    const fresh = norm(future, 0);
+    const ticked = norm(future, NOW);
+    expect(fresh.get('bed_alpha')?.plantedAtMs).toBe(1);
+    expect(ticked.get('bed_alpha')?.plantedAtMs).toBe(NOW);
+    const durationOf = (m: Map<string, PlotState>) => {
+      const row = m.get('bed_alpha') as PlotState;
+      return row.readyAtMs - row.plantedAtMs;
+    };
+    expect(durationOf(fresh)).toBe(60_000);
+    expect(durationOf(ticked)).toBe(60_000);
+  });
+
+  it('REPLACES a corrupt hidden slot with a derived one, never dropping the row', () => {
+    // The growth phase turned the drop into a derivation: a lost slot must not
+    // become a reroll primitive, so the replacement is a pure function of the
+    // row's own identity rather than a fresh draw.
     const loaded = norm({
       bed_alpha: { ...VALID, survivalRoll: Number.NaN, yieldSeed: 42 },
     });
-    expect(loaded.get('bed_alpha')).toEqual({
+    const row = loaded.get('bed_alpha') as PlotState;
+    expect(row.yieldSeed).toBe(42);
+    // The finite slot rode through untouched; the corrupt one came back as a
+    // real number in the draw's own domain.
+    expect(row.survivalRoll).toEqual(expect.any(Number));
+    expect(row.survivalRoll).toBeGreaterThanOrEqual(0);
+    expect(row.survivalRoll).toBeLessThan(1);
+    expect({ ...row, survivalRoll: undefined }).toEqual({
       cropId: 'turnip',
       plantedAtMs: 1_000,
       readyAtMs: 5_000,
+      survivalRoll: undefined,
       yieldSeed: 42,
       compost: false,
       watch: false,
       tonic: false,
       notified: false,
     });
-    expect(loaded.get('bed_alpha')?.survivalRoll).toBeUndefined();
+  });
+
+  it('derives a missing slot deterministically, and differently per bed', () => {
+    // Same inputs, same answer, twice: derivation is a pure expansion, so a
+    // tamperer who blanks a slot and reloads gets the SAME outcome back rather
+    // than a resample.
+    const saved = { bed_alpha: { ...VALID }, bed_beta: { ...VALID } };
+    const first = norm(saved);
+    const second = norm(saved);
+    const a1 = first.get('bed_alpha') as PlotState;
+    const a2 = second.get('bed_alpha') as PlotState;
+    expect(a1.survivalRoll).toBe(a2.survivalRoll);
+    expect(a1.yieldSeed).toBe(a2.yieldSeed);
+    // Keyed off the bed, so two beds saved from the same bytes do not share an
+    // outcome (which would make every plot in a patch succeed or fail as one).
+    const b1 = first.get('bed_beta') as PlotState;
+    expect(b1.survivalRoll).not.toBe(a1.survivalRoll);
+    expect(b1.yieldSeed).not.toBe(a1.yieldSeed);
+    // Both land in the domain the live draws use.
+    for (const row of [a1, b1]) {
+      expect(row.survivalRoll as number).toBeGreaterThanOrEqual(0);
+      expect(row.survivalRoll as number).toBeLessThan(1);
+      expect(Number.isInteger(row.yieldSeed)).toBe(true);
+      expect(row.yieldSeed as number).toBeGreaterThanOrEqual(0);
+      expect(row.yieldSeed as number).toBeLessThan(0x100000000);
+    }
+  });
+
+  it('clamps a present hidden slot into its domain rather than trusting it', () => {
+    // Hand-edited JSONB is the threat model: an out-of-range survivalRoll would
+    // otherwise make a crop deterministically survive or fail regardless of
+    // skill, and a fractional or huge yieldSeed would alias onto another
+    // seed's stream.
+    const low = norm({ bed_alpha: { ...VALID, survivalRoll: -5, yieldSeed: -3 } });
+    expect(low.get('bed_alpha')?.survivalRoll).toBe(0);
+    expect(low.get('bed_alpha')?.yieldSeed).toBe(0);
+    const high = norm({ bed_alpha: { ...VALID, survivalRoll: 2, yieldSeed: 1e30 } });
+    expect(high.get('bed_alpha')?.survivalRoll).toBeLessThan(1);
+    expect(high.get('bed_alpha')?.yieldSeed).toBe(0x100000000 - 1);
+    const fractional = norm({ bed_alpha: { ...VALID, survivalRoll: 0.5, yieldSeed: 7.9 } });
+    expect(fractional.get('bed_alpha')?.survivalRoll).toBe(0.5);
+    expect(fractional.get('bed_alpha')?.yieldSeed).toBe(7);
   });
 
   it('normalizes every flag through === true', () => {
@@ -390,6 +548,47 @@ describe('hidden-slot drop counting (the operator signal)', () => {
     const junk = 'bed_alpha' as unknown as Record<string, PersistedFarmPlot>;
     expect(countDroppedHiddenSlots(junk, norm(junk))).toBe(0);
   });
+
+  it('counts a CLAMPED slot too, which is the likeliest deliberate tamper', () => {
+    // An out-of-domain slot is exactly what the clamps exist to defeat, so a
+    // silent correction was the one family most worth an operator line and the
+    // one the counter used to miss.
+    for (const survivalRoll of [5, -1, 1e9]) {
+      const saved = { bed_alpha: { ...VALID, survivalRoll } };
+      expect(countDroppedHiddenSlots(saved, norm(saved)), `survivalRoll ${survivalRoll}`).toBe(1);
+    }
+    for (const yieldSeed of [-3, 7.9, 1e30]) {
+      const saved = { bed_alpha: { ...VALID, yieldSeed } };
+      expect(countDroppedHiddenSlots(saved, norm(saved)), `yieldSeed ${yieldSeed}`).toBe(1);
+    }
+    // Both dimensions on one row count separately.
+    const both = { bed_alpha: { ...VALID, survivalRoll: 5, yieldSeed: -3 } };
+    expect(countDroppedHiddenSlots(both, norm(both))).toBe(2);
+  });
+
+  it('stays silent for a LEGACY row whose slots are simply absent', () => {
+    // The deliberate asymmetry: an absent slot derives exactly like a corrupt
+    // one, but absence is also the shape of every row written before the
+    // growth phase, so counting it would warn on every ordinary boot.
+    const legacy = { bed_alpha: { ...VALID } };
+    expect('survivalRoll' in legacy.bed_alpha).toBe(false);
+    expect('yieldSeed' in legacy.bed_alpha).toBe(false);
+    const loaded = norm(legacy);
+    // The slots really were filled by derivation, so this is silence about
+    // work that happened, not silence because nothing happened.
+    expect(Number.isFinite(loaded.get('bed_alpha')?.survivalRoll)).toBe(true);
+    expect(countDroppedHiddenSlots(legacy, loaded)).toBe(0);
+  });
+
+  it('stays silent for an IN-DOMAIN slot that rode through untouched', () => {
+    // The boundary values the clamp accepts unchanged must not warn either.
+    const edge = { bed_alpha: { ...VALID, survivalRoll: 0, yieldSeed: 0 } };
+    expect(countDroppedHiddenSlots(edge, norm(edge))).toBe(0);
+    const top = {
+      bed_alpha: { ...VALID, survivalRoll: 1 - Number.EPSILON, yieldSeed: 0xffffffff },
+    };
+    expect(countDroppedHiddenSlots(top, norm(top))).toBe(0);
+  });
 });
 
 describe('the save round trip through a real Sim', () => {
@@ -423,18 +622,33 @@ describe('the save round trip through a real Sim', () => {
 
   it('keeps a valid row against shipped content and drops a bogus bed', () => {
     expect(FARM_BED_IDS.has(BED)).toBe(true);
-    expect(FARM_CROP_IDS.has('wheat')).toBe(true);
+    expect(FARM_CROP_IDS.has('vale_wheat')).toBe(true);
     const state = baseState();
+    // Both hidden slots are written explicitly so this arm tests the BED
+    // allowlist and the round trip and nothing else; the derivation of an
+    // absent slot has its own arms above and below.
     state.farmPlots = {
-      bed_not_a_real_bed: { cropId: 'wheat', plantedAtMs: NOW_MS - 1_000, readyAtMs: NOW_MS + 1 },
-      [BED]: { cropId: 'wheat', plantedAtMs: NOW_MS - 30_000, readyAtMs: NOW_MS + 60_000 },
+      bed_not_a_real_bed: {
+        cropId: 'vale_wheat',
+        plantedAtMs: NOW_MS - 1_000,
+        readyAtMs: NOW_MS + 1,
+      },
+      [BED]: {
+        cropId: 'vale_wheat',
+        plantedAtMs: NOW_MS - 30_000,
+        readyAtMs: NOW_MS + 60_000,
+        survivalRoll: 0.25,
+        yieldSeed: 77,
+      },
     };
     const { sim, pid, meta } = load(state);
     expect([...meta.farmPlots.keys()]).toEqual([BED]);
     expect(meta.farmPlots.get(BED)).toEqual({
-      cropId: 'wheat',
+      cropId: 'vale_wheat',
       plantedAtMs: NOW_MS - 30_000,
       readyAtMs: NOW_MS + 60_000,
+      survivalRoll: 0.25,
+      yieldSeed: 77,
       compost: false,
       watch: false,
       tonic: false,
@@ -442,8 +656,35 @@ describe('the save round trip through a real Sim', () => {
     });
     // And the surviving row rides back out, with the bogus bed self-healed away.
     expect(sim.serializeCharacter(pid)?.farmPlots).toEqual({
-      [BED]: { cropId: 'wheat', plantedAtMs: NOW_MS - 30_000, readyAtMs: NOW_MS + 60_000 },
+      [BED]: {
+        cropId: 'vale_wheat',
+        plantedAtMs: NOW_MS - 30_000,
+        readyAtMs: NOW_MS + 60_000,
+        survivalRoll: 0.25,
+        yieldSeed: 77,
+      },
     });
+  });
+
+  it('fills the hidden slots of a slotless saved row, and settles on re-save', () => {
+    // A row with no hidden slots is only reachable by hand-editing the JSONB
+    // (the live writer always mints both). It loads with DERIVED slots rather
+    // than empty ones, and the derivation is a fixed point: what the load
+    // saves is what the next load reads back, so blanking a slot cannot be
+    // used as a reroll.
+    const state = baseState();
+    state.farmPlots = {
+      [BED]: { cropId: 'vale_wheat', plantedAtMs: NOW_MS - 30_000, readyAtMs: NOW_MS + 60_000 },
+    };
+    const { sim, pid, meta } = load(state);
+    const row = meta.farmPlots.get(BED) as PlotState;
+    expect(Number.isFinite(row.survivalRoll)).toBe(true);
+    expect(Number.isInteger(row.yieldSeed)).toBe(true);
+    const resaved = sim.serializeCharacter(pid)?.farmPlots as Record<string, PersistedFarmPlot>;
+    expect(resaved[BED].survivalRoll).toBe(row.survivalRoll);
+    expect(resaved[BED].yieldSeed).toBe(row.yieldSeed);
+    const second = load({ ...state, farmPlots: resaved });
+    expect(second.meta.farmPlots.get(BED)).toEqual(row);
   });
 
   it('warns the operator once when a load drops rows or hidden slots', () => {
@@ -452,12 +693,12 @@ describe('the save round trip through a real Sim', () => {
       const state = baseState();
       state.farmPlots = {
         bed_not_a_real_bed: {
-          cropId: 'wheat',
+          cropId: 'vale_wheat',
           plantedAtMs: NOW_MS - 1_000,
           readyAtMs: NOW_MS + 1,
         },
         [BED]: {
-          cropId: 'wheat',
+          cropId: 'vale_wheat',
           plantedAtMs: NOW_MS - 30_000,
           readyAtMs: NOW_MS + 60_000,
           survivalRoll: Number.NaN,
@@ -489,15 +730,30 @@ describe('the save round trip through a real Sim', () => {
   it('projects the loaded plots for the seam, sorted, with clock-derived status', () => {
     const state = baseState();
     // BED2 first in the record so the sorted projection cannot be load order.
+    // A winning survivalRoll on the finished plot keeps this arm about the
+    // CLOCK: a plot past its deadline whose roll succeeds is `ready`. The
+    // survival half has its own arms in the pure-projection block above.
     state.farmPlots = {
-      [BED2]: { cropId: 'wheat', plantedAtMs: NOW_MS - 120_000, readyAtMs: NOW_MS - 60_000 },
-      [BED]: { cropId: 'wheat', plantedAtMs: NOW_MS - 30_000, readyAtMs: NOW_MS + 60_000 },
+      [BED2]: {
+        cropId: 'vale_wheat',
+        plantedAtMs: NOW_MS - 120_000,
+        readyAtMs: NOW_MS - 60_000,
+        survivalRoll: 0.1,
+        yieldSeed: 5,
+      },
+      [BED]: {
+        cropId: 'vale_wheat',
+        plantedAtMs: NOW_MS - 30_000,
+        readyAtMs: NOW_MS + 60_000,
+        survivalRoll: 0.1,
+        yieldSeed: 5,
+      },
     };
     const { sim, pid } = load(state);
     expect(sim.farmPlotsFor(pid)).toEqual([
       {
         bedId: BED,
-        cropId: 'wheat',
+        cropId: 'vale_wheat',
         plantedAtMs: NOW_MS - 30_000,
         readyAtMs: NOW_MS + 60_000,
         compost: false,
@@ -508,7 +764,7 @@ describe('the save round trip through a real Sim', () => {
       },
       {
         bedId: BED2,
-        cropId: 'wheat',
+        cropId: 'vale_wheat',
         plantedAtMs: NOW_MS - 120_000,
         readyAtMs: NOW_MS - 60_000,
         compost: false,
@@ -566,7 +822,7 @@ describe('the save round trip through a real Sim', () => {
     ]);
     // The crop allowlist is a save-key roster too (deviation (h): one
     // pre-declared crop until the growth phase ships the catalog).
-    expect([...FARM_CROP_IDS]).toEqual(['wheat']);
+    expect([...FARM_CROP_IDS]).toEqual(['vale_wheat']);
   });
 
   it('serves the static patch table by reference, deep-frozen', () => {

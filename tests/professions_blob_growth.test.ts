@@ -278,14 +278,15 @@ function ceilingSim(): Sim {
   // Every garden bed planted at full row width: hidden slots at their widest
   // JSON forms (a full-precision roll, a 32-bit seed), every knob and the
   // notice flag true, and the duration EXACTLY at the tamper ceiling so the
-  // load-side clamp is a no-op and the settle stays a fixed point (the
-  // fresh-Sim load runs at time 0, where the zero-clock guard keeps the
-  // saved anchors). Content-scaled like nodeHarvestCooldowns: about 206
+  // load-side clamp is a no-op and the settle stays a fixed point. The
+  // fresh-Sim load runs at time 0, where the growth phase's anchor rule
+  // re-anchors any positive plant time to the floor of 1 and leaves it there
+  // on every later load. Content-scaled like nodeHarvestCooldowns: about 206
   // bytes per authored bed.
   if (FARM_BED_IDS.size !== 23) throw new Error('farm bed set changed; re-mint the ceiling');
   for (const bedId of FARM_BED_IDS) {
     meta.farmPlots.set(bedId, {
-      cropId: 'wheat',
+      cropId: 'vale_wheat',
       plantedAtMs: 1_000,
       readyAtMs: 1_000 + FARM_MAX_GROW_MS,
       survivalRoll: 0.12345678901234566,

@@ -34,6 +34,8 @@ import { createMob } from '../../src/sim/entity';
 import type { DelayedEvent } from '../../src/sim/entity_roster';
 import { solveLockActions } from '../../src/sim/lockpick';
 import type { PendingLootRoll } from '../../src/sim/loot/loot_roll';
+import type { PlotState } from '../../src/sim/professions/farm_projection';
+import { FARM_PLANT_CAST_SEC, harvestCrop, plantCrop } from '../../src/sim/professions/farming';
 import { startFishing } from '../../src/sim/professions/fishing';
 import { gatherCastDurationSec, gatherNodeById } from '../../src/sim/professions/gathering';
 import { type ArenaMatch, type PlayerMeta, Sim } from '../../src/sim/sim';
@@ -5105,6 +5107,115 @@ function professionsToolEffectSlot(seed = 1): Scenario {
   };
 }
 
+// The farming SESSION end to end through the real command bodies: two plants
+// (two rng draws each, pre-rolled contiguously), a growth window that draws
+// NOTHING, and both harvest payouts (a survived plot's produce plus its queued
+// proficiency grant, and a withered plot's husks). Farming's whole determinism
+// contract is that randomness happens only at the two player-action moments,
+// so a scenario that plants and harvests for real is the only thing that can
+// pin it: a draw added at the growth deadline, in the tick sweep, or on a deny
+// path moves this golden's draw digest and nothing else in the suite would.
+//
+// TIME IS WRITTEN, NOT TICKED, and that is the sanctioned route rather than a
+// shortcut: vale_wheat takes 45 minutes, which is 54,000 ticks, and no golden
+// can carry that. Setting readyAtMs down to the sim's current lockout clock is
+// exactly what the /dev farmgrow cheat does, and the reason it is safe
+// here is the reason it is safe there: it writes state and draws nothing, so
+// the draw digest stays honest about the window it is standing in for.
+//
+// BOTH survival rolls are overwritten too, one each way. The pre-rolled values
+// are already pinned (they are the plant's own two draws, in the digest), and
+// forcing the stored outcomes is what makes each harvest beat unambiguous:
+// without it, one 15% roll at proficiency 0 decides whether the produce path
+// or the husk path runs, and a future re-tune of the survival ramp could flip
+// a beat while the scenario still looked green.
+function professionsFarmingSession(seed = 1): Scenario {
+  // The two northern beds of the Eastbrook allotments (content/farm_patches.ts
+  // bed_eastbrook_1 at 16,30 and bed_eastbrook_2 at 21,30). Beds sit on a 5
+  // yard pitch, which is INTERACT_RANGE, so the midpoint below is 2.5yd from
+  // each and one stand point reaches both: no teleport between the plants, and
+  // none between the harvests.
+  const BED_READY = 'bed_eastbrook_1';
+  const BED_WITHERED = 'bed_eastbrook_2';
+  const CROP = 'vale_wheat';
+  return {
+    name: 'farming_session',
+    coverage: [
+      'class:warrior (farmer)',
+      'plantCrop gate order passed: alive, range, bed free, crop known, skill, seed in bags',
+      'plant pre-roll: exactly two contiguous rng draws per plant (survival, yield seed)',
+      'plant consumes the seed and starts the flavor cast (FARMING_CAST_ID)',
+      'busy gate: the second plant waits out the first plant cast',
+      'growth window: readyAtMs reached with ZERO rng draws and zero events',
+      'harvestCrop survived path: zero draws, produce granted from the stored yield seed',
+      'harvestCrop withered path: zero draws, withered husks paid instead of produce',
+      'both harvests free their bed (farmPlots empty at the end)',
+      'gathering grant drain: the queued farming proficiency lands on the next tick',
+    ],
+    build: () => new Sim({ seed, playerClass: 'warrior', autoEquip: true }),
+    drive(rec: Recorder) {
+      const sim = rec.sim;
+      const pid = sim.playerId as number;
+      const meta = sim.players.get(pid) as PlayerMeta;
+      const p = sim.player as AnyEntity;
+
+      // No mob interference: a landed hit cancels the plant cast mid-drive,
+      // which would move the second plant's gate result (the
+      // professionsFishingSession / professionsGather despawn idiom).
+      for (const e of (sim.entities as Map<number, AnyEntity>).values()) {
+        if (e.kind !== 'mob') continue;
+        e.dead = true;
+        e.hp = 0;
+        e.aiState = 'dead';
+        e.respawnTimer = 9999;
+        e.corpseTimer = 9999;
+        e.inCombat = false;
+      }
+
+      // One seed per bed. addItem draws no rng, so the grant is
+      // digest-invisible beyond the sampled inventory contents.
+      sim.addItem('vale_wheat_seed', 2, pid);
+      teleport(sim, p, 18.5, 30); // midway between the two beds, both in reach
+
+      // Plant one: the first two draws of the session.
+      plantCrop(sim.ctx, p, meta, BED_READY, CROP);
+      rec.snapshot('planted-first');
+      // Ride out the flavor cast. plantCrop's busy gate refuses a second plant
+      // while one runs, so this window is what makes the second plant land
+      // rather than emitting a busy error.
+      rec.tick(Math.ceil(FARM_PLANT_CAST_SEC / DT) + 1);
+      // Plant two: two more draws, and the plot map stays in sorted bed order.
+      plantCrop(sim.ctx, p, meta, BED_WITHERED, CROP);
+      rec.snapshot('planted');
+      rec.tick(20);
+
+      // The /dev farmgrow equivalence: state written, nothing drawn.
+      const now = sim.ctx.lockoutNowMs();
+      const readyPlot = meta.farmPlots.get(BED_READY) as PlotState;
+      const witheredPlot = meta.farmPlots.get(BED_WITHERED) as PlotState;
+      readyPlot.readyAtMs = now;
+      witheredPlot.readyAtMs = now;
+      // The survival test is `survivalRoll < chance`, and chance at
+      // proficiency 0 on a tier-1 crop is the at-gate 0.85, so these two
+      // literals sit either side of it and pin one plot to each outcome.
+      readyPlot.survivalRoll = 0.01;
+      witheredPlot.survivalRoll = 0.99;
+      rec.snapshot('grown');
+
+      // Both harvests, back to back from the one stand point: the survived
+      // plot pays produce and queues proficiency, the withered plot pays
+      // husks and queues nothing. Neither draws.
+      harvestCrop(sim.ctx, p, meta, BED_READY);
+      harvestCrop(sim.ctx, p, meta, BED_WITHERED);
+      rec.snapshot('harvested');
+      // drainGatheringGrants runs EARLIER in the tick than any command, so the
+      // grant queued above lands on the next tick; this tail is what puts the
+      // raised proficiency into the final sample.
+      rec.tick(8);
+    },
+  };
+}
+
 export const SCENARIOS: Scenario[] = [
   soloWarrior(),
   soloMage(),
@@ -5166,4 +5277,5 @@ export const SCENARIOS: Scenario[] = [
   professionsGatherFine(),
   professionsFishingSession(),
   professionsToolEffectSlot(),
+  professionsFarmingSession(),
 ];

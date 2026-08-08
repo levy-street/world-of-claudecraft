@@ -14,6 +14,7 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { ENCHANTS } from '../src/sim/content/enchants';
+import { FARM_MATERIAL_ITEM_IDS } from '../src/sim/content/farm_crops';
 import {
   HARVEST_COMPONENT_ITEMS,
   HARVEST_COMPONENT_SPECIMENS,
@@ -59,6 +60,7 @@ const HONEST_MATERIALS = [
   'fine_silverleaf_herb',
   'fine_sunpetal_herb',
   'fine_thorium_ore',
+  'fine_vale_wheat',
   'game_meat',
   'glass_vial',
   'glimmerfin_koi',
@@ -93,7 +95,14 @@ const HONEST_MATERIALS = [
   'sunpetal_herb',
   'tanning_agent',
   'thorium_ore',
+  // The farming yields (content/farm_crops.ts): produce, its fine twin, the
+  // seed a plant consumes, and the husks a failed crop pays. IN as materials
+  // for the same reason node yields are, and the seed because it is the
+  // tradeable input side of the same gathering loop.
+  'vale_wheat',
+  'vale_wheat_seed',
   'venom_gland',
+  'withered_husks',
   'wolf_fang',
 ] as const;
 
@@ -257,6 +266,25 @@ describe('MATERIAL_ITEM_IDS: every source table is fully represented', () => {
     expect(rows).toBeGreaterThan(0);
   });
 
+  it('contains every farming yield: produce, fine twin, seed, and husks', () => {
+    // Farming is fishing-shaped, not node-shaped: nothing it yields is in
+    // NODE_MATERIAL_TABLE and its fine grade is deliberately not a
+    // MATERIAL_GRADES row, so without its own source loop every crop the
+    // ladder phase adds would land unclassified.
+    for (const id of FARM_MATERIAL_ITEM_IDS) {
+      expect(MATERIAL_ITEM_IDS.has(id), id).toBe(true);
+    }
+    // Anti-vacuous: the derived list is not empty and really does span all
+    // four families, so a crop table that stopped exporting would red here
+    // instead of passing over nothing.
+    expect([...FARM_MATERIAL_ITEM_IDS].sort()).toEqual([
+      'fine_vale_wheat',
+      'vale_wheat',
+      'vale_wheat_seed',
+      'withered_husks',
+    ]);
+  });
+
   it('contains every salvage return', () => {
     let rows = 0;
     for (const id of Object.values(SALVAGE_MATERIAL_BY_QUALITY)) {
@@ -318,6 +346,7 @@ describe('deriveMaterialItemIds: every source table is actually consulted (injec
     harvestComponentItems: HARVEST_COMPONENT_ITEMS,
     harvestComponentSpecimens: HARVEST_COMPONENT_SPECIMENS,
     salvageMaterialByQuality: SALVAGE_MATERIAL_BY_QUALITY,
+    farmMaterialItemIds: FARM_MATERIAL_ITEM_IDS,
     recipes: ALL_RECIPES,
     enchants: ENCHANTS,
     items: ITEMS,
@@ -361,6 +390,7 @@ describe('deriveMaterialItemIds: every source table is actually consulted (injec
       'salvage return',
       { salvageMaterialByQuality: { ...SALVAGE_MATERIAL_BY_QUALITY, zzz_probe_quality: PROBE } },
     ],
+    ['farming yield', { farmMaterialItemIds: [...FARM_MATERIAL_ITEM_IDS, PROBE] }],
     [
       'recipe reagent',
       { recipes: [...ALL_RECIPES, { ...ALL_RECIPES[0], reagents: [{ itemId: PROBE, count: 1 }] }] },

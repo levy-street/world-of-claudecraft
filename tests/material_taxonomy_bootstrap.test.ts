@@ -16,9 +16,20 @@ import type { ItemDef } from '../src/sim/types';
 
 describe('material_taxonomy as the first-evaluated sim module', () => {
   it('derives the full set with no import of data.ts ahead of it', () => {
-    expect(MATERIAL_ITEM_IDS.size).toBe(55);
+    // 55 before the farming growth-engine phase added its four yields as a new
+    // derivation source (content/farm_crops.ts). The count is a literal
+    // because this file may not import the tables to derive it: importing
+    // anything else from src/sim is exactly what the premise arm below
+    // forbids, so the number is re-pinned by hand whenever the set moves.
+    expect(MATERIAL_ITEM_IDS.size).toBe(59);
     expect(MATERIAL_ITEM_IDS.has('iron_ore')).toBe(true);
     expect(MATERIAL_ITEM_IDS.has('arcanite_bar')).toBe(true);
+    // The farming source specifically, because it is the newest and the one
+    // whose own module is reached FIRST on this path: a source that failed to
+    // derive during bootstrap would leave the size short, but naming an id
+    // says WHICH loop broke instead of only that the total drifted.
+    expect(MATERIAL_ITEM_IDS.has('vale_wheat')).toBe(true);
+    expect(MATERIAL_ITEM_IDS.has('withered_husks')).toBe(true);
     expect(isMaterialItem({ id: 'iron_ore' } as ItemDef)).toBe(true);
   });
 

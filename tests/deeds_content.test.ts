@@ -755,13 +755,19 @@ describe('table shape', () => {
 });
 
 describe('count-form gathering deeds stay earnable', () => {
-  // Farming joined GATHERING_PROFESSION_IDS in farming Phase 1 but stays
-  // ungainable until its growth phase ships, so an any-N gathering trigger
-  // demanding more professions than are actually gainable would ship an
-  // unearnable deed. Today that safety is a property of the catalog, not the
-  // engine, so this guard pins it: when farming becomes gainable, raise
-  // GAINABLE_GATHERING_PROFESSIONS to GATHERING_PROFESSION_IDS.length.
-  const GAINABLE_GATHERING_PROFESSIONS = 4;
+  // An any-N gathering trigger demanding more professions than are actually
+  // gainable would ship an unearnable deed, so this guard caps every one of
+  // them at the gainable count. Farming was the exception for two phases: it
+  // joined GATHERING_PROFESSION_IDS with no gain path at all. The growth phase
+  // gave it one (a harvest queues through queueGatheringGrant like any other
+  // gathering harvest), so all five are gainable and the count is simply the
+  // roster length again. CAVEAT this guard cannot see: farming teaches only
+  // to proficiency 50 until the crop-ladder phase ships tier 2+ crops (the
+  // tier-1 teaching ceiling), and this guard compares COUNT only, never
+  // amount. A future {kind:'gathering', amount:100, count:5} deed, or any
+  // farming trigger above 50, would ship unearnable with this guard green;
+  // add an amount-aware arm in the phase that authors one.
+  const GAINABLE_GATHERING_PROFESSIONS = GATHERING_PROFESSION_IDS.length;
   it('caps every any-N gathering trigger at the gainable profession count', () => {
     expect(GATHERING_PROFESSION_IDS.length).toBe(5);
     let countForm = 0;
