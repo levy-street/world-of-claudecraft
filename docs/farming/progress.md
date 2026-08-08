@@ -11,7 +11,7 @@
 | Phase 2 (patches and plots) | done | 2026-08-08 | 2026-08-08 |
 | Phase 2 QA | done (PASS-WITH-FOLLOWUPS) | 2026-08-08 | 2026-08-08 |
 | Phase 3 (growth engine) | done | 2026-08-08 | 2026-08-08 |
-| Phase 3 QA | not started | | |
+| Phase 3 QA | done | 2026-08-08 | 2026-08-08 |
 | Phase 4 (knobs) | not started | | |
 | Phase 4 QA | not started | | |
 | Phase 5 (crops and tools) | not started | | |
@@ -521,6 +521,58 @@ Would-be PR body (D22 record):
   non-finite clock anchor). Maintainer attention requested on: the tuning
   block above, the proficiency-50 ceiling until Phase 5, and the pending item
   art (exact-set ITEM_ART_PENDING).
+
+Phase 3 QA notes (2026-08-08, verdict PASS-WITH-FOLLOWUPS, executed local-only
+per D22 on fix/farming-phase-03-qa):
+- Pre-audit: fifth v0.36.0 absorb (merge 5741294b44, tip 4d52f151eb, the PR 3161
+  client-perf branch, 53 render/game/scripts files); release-merge-audit CLEAN
+  (empty intersection with the whole farming footprint, no new routes or db-mock
+  sites, no injected-helper drift); world_api_parity + snapshots re-proven green
+  on the merged HEAD (499 tests). Phase diff identified cleanly: merge
+  d992d31b7f, exactly the five documented commits, 88 files.
+- Audit: ten reviewers round one (three packet audits plus seven matrix rows;
+  the four custom-agent rows died report-less at their turn limits and were
+  redispatched with hard report-first budgets, all four then delivered), plus
+  the live lifecycle probe (2/2: facade plant, real ticks past ready-at,
+  produce + next-tick XP; live not_ready deny; forced wither pays exactly 2
+  husks, no XP) run serially after the read-only fan-out.
+- MUTATION PROBES 3/3 KILLED, each with landing proof, nonzero exit, named
+  failing tests, and a verified clean revert: (a) extra ctx.rng draw in the
+  plant pre-roll block: 4 named reds (the three draw pins plus coverage_c's
+  farming_session ledger); (b) survivalRoll clamp dropped on the load path:
+  the state suite's clamp arm red; (c) callerLogs stripped from the produce
+  grant: all three predicted suites red (the sim flags pin, the silent-loot
+  sweep, coverage_c).
+- Findings: 0 BLOCKING anywhere. Round one: 8 SHOULD-FIX / 28 NICE-TO-HAVE;
+  round two: 1 SHOULD-FIX / 17 NICE-TO-HAVE. Fixed (six commits): the
+  grow-now zero-duration destroy-on-load (loader admits duration 0 now,
+  deviation (u), with the farmgrow clock floor and the catalog durationMs
+  pin); refusal-preserves-stealth/sit/mount arm; two gate-precedence proofs;
+  executed fine-grant flag coverage via the all-fine harvest; the
+  retired-crop arm executed; FARM_PLANT_CAST_SEC literal pin; the band-span
+  binding pin (two independent 25s); deriveHiddenSlots direct pins; four
+  distinct procedural item icons plus the A4 distinctness pin (all four had
+  collapsed to one scroll-on-leather glyph); the hud fine-pair guard; online
+  event-delivery pins for all four farm events plus the bystander negative;
+  two self-contradicting HEAVY_SELF comments corrected; farmGrowthStage
+  narrowed to the structural minimum with the clock-base contract stated;
+  comment accuracy (band-math overclaim, farmDenied field rule); the blob
+  ledger re-measured (13,994 settled, pins stand); the droppedRows
+  typeof-object guard; the honest farmgrow already-settled reply.
+- Declined with reasons (recorded, not fixed): the SURVIVAL_ROLL_MAX top-ulp
+  false tamper count (2^-52 per plant, outcome unaffected); the farmDenied
+  raw-string echo and the heavy-self refusal amplification (Phase 9 hardening
+  notes in state.md); the retired-crop farmWithered semantic (unreachable,
+  player-protective); per-arm it() split for the harvest deny arms
+  (diagnostics nicety); frozen clocks in two non-ticking round-trip rigs.
+- Rulings recorded: TOAST/WAL measurement deferred to Phase 9 as a HARD gate
+  (db reviewer's explicit ruling); duration-0 rollback residual accepted
+  dev-only with no DEPLOY.md note (migration reviewer, four verified
+  grounds); admin exposure verified clean (both R35 route arms field-pick);
+  work orders verified N/A (commission modules carry no gathering roster).
+- Golden discipline: zero pre-existing goldens moved at any point;
+  farming_session md5 29a11d98bda17f9c38bd8e9016df7fc7 unchanged through the
+  whole QA round.
 
 ### Phase 4
 (not started)

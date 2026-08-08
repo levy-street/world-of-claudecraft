@@ -99,8 +99,11 @@ Agent A, the sim driver and its suite:
   on sim.ts:
   - plantCrop with gates in this STATED order, checked top to bottom: alive, range to
     a bed, bed free for this player, farming skill at or above the crop tier
-    threshold, seed in bags, hoe of the required tier via canGatherTier plus the
-    wield gate. Every deny path returns a typed deny result and draws ZERO rng.
+    threshold, seed in bags. (AMENDED, deviation (p) in state.md: the hoe-tier and
+    wield gates are DEFERRED to Phase 5, verified not assumed; no farming
+    gatherTool exists, so canGatherTier(0, 1) would refuse every plant, and the
+    R22 banner forbids the bare-hands-floored scan for access decisions.) Every
+    deny path returns a typed deny result and draws ZERO rng.
   - Seed consumption on success.
   - The growth script pre-rolled in ONE contiguous ctx.rng block: the per-stage
     survival outcomes per D6 (base ramp roughly 85 percent at the gate to 100 percent
@@ -119,10 +122,13 @@ Agent A, the sim driver and its suite:
   farming-owned FARMING_GAIN_SCHEDULE (the fishing pattern; the drain runs earlier in
   the tick, so an end-of-tick grant lands next tick: expected, documented).
 - Minimal item defs so the phase is testable end to end: vale_wheat_seed, vale_wheat,
-  the fine_vale_wheat twin with its MATERIAL_GRADES row, and withered_husks, per the
-  D11 sanctioned same-phase-consumer exception (consumers explicitly deferred: husks
-  to the Phase 4 convertHusks command, produce to the Phase 6 dishes), with an
-  explicit comment that Phase 5 completes the ladder and may adjust values.
+  the fine_vale_wheat twin (AMENDED, deviation (o) in state.md: an ordinary item
+  with NO MATERIAL_GRADES row; that table is pinned as exactly the nine node
+  yields, so the fine roll lives in farming's own harvest resolver), and
+  withered_husks, per the D11 sanctioned same-phase-consumer exception (consumers
+  explicitly deferred: husks to the Phase 4 convertHusks command, produce to the
+  Phase 6 dishes), with an explicit comment that Phase 5 completes the ladder and
+  may adjust values.
 - The draw-count contract STATED in a comment block at the top of farming.ts AND
   PINNED in the suite: the exact number of draws at plant, the exact number at
   harvest, zero on every deny path, zero at expiry, zero at login, zero in the tick.

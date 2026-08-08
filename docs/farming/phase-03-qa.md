@@ -74,8 +74,10 @@ Agent 1, correctness:
 - Edge cases: empty (no plots, harvest on an empty bed), boundary (skill exactly at
   the tier threshold, exactly at band top, harvest exactly at ready-at), and every
   deny arm.
-- Phase 3 emphasis, the D11 minimal slice: verify the fine_vale_wheat twin and its
-  MATERIAL_GRADES row landed beside vale_wheat, and that
+- Phase 3 emphasis, the D11 minimal slice (AMENDED, deviation (o) in state.md):
+  verify fine_vale_wheat landed beside vale_wheat as an ordinary item with NO
+  MATERIAL_GRADES row (that table is pinned as exactly the nine node yields; the
+  fine roll lives in farming's own harvest resolver), and that
   npx vitest run tests/recipe_economy.test.ts ran green over the new rows.
 - Verify the exact /dev farm cheat names were recorded in the state.md "Dev command
   surface" ledger row.
