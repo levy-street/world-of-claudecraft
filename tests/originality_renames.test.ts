@@ -8,12 +8,15 @@
 import { describe, expect, it } from 'vitest';
 import { DEEDS } from '../src/sim/content/deeds';
 import { ENCHANTS } from '../src/sim/content/enchants';
+import { OVERWORLD_GRAVEYARDS } from '../src/sim/content/graveyards';
 import { MOUNTS } from '../src/sim/content/mounts';
 import { TOOL_EFFECTS } from '../src/sim/content/professions';
 import { TALENTS } from '../src/sim/content/talents';
 import { ZONE3_NPCS, ZONE3_QUESTS } from '../src/sim/content/zone3';
 import { ABILITIES, ITEMS, MOBS, NPCS, QUESTS, ZONES } from '../src/sim/data';
+import { armorySkinStrings } from '../src/ui/i18n.catalog/armory';
 import { en } from '../src/ui/i18n.resolved.generated/en';
+import { DICT } from '../src/ui/sim_i18n';
 
 describe('originality-sweep display literals stay renamed', () => {
   it('pins the renamed enchant display names', () => {
@@ -112,11 +115,16 @@ describe('phase 03 naming-audit display literals stay renamed', () => {
     const nightbloom = ZONES.find((z) => z.id === 'nightbloom');
     const thornpeak = ZONES.find((z) => z.id === 'thornpeak_heights');
     expect(wraithwood?.hub.name).toBe('Gibbetmere');
-    expect(wraithwood?.pois?.[0]?.label).toBe('Gibbetmere');
+    // POIs resolve by frozen poi id, not index, so a reordered list cannot
+    // misattribute a rename regression to the wrong point.
+    expect(wraithwood?.pois?.find((p) => p.id === 'gallowmere')?.label).toBe('Gibbetmere');
     expect(veiled?.hub.name).toBe('Eldershine');
-    expect(veiled?.pois?.[0]?.label).toBe('Eldershine');
-    expect(nightbloom?.pois?.[2]?.label).toBe('The Moonspring');
-    expect(thornpeak?.pois?.[7]?.label).toBe('Broodsworn Tents');
+    expect(veiled?.pois?.find((p) => p.id === 'eldergleam')?.label).toBe('Eldershine');
+    expect(nightbloom?.pois?.find((p) => p.id === 'the_moonwell')?.label).toBe('The Moonspring');
+    expect(thornpeak?.pois?.find((p) => p.id === 'wyrmcult_tents')?.label).toBe('Broodsworn Tents');
+    expect(OVERWORLD_GRAVEYARDS.find((g) => g.id === 'gy_veiled_hollow')?.name).toBe(
+      'Eldershine Rest',
+    );
   });
 
   it('pins the renamed quest, deed, spec, mount, and skin display names', () => {
@@ -129,7 +137,13 @@ describe('phase 03 naming-audit display literals stay renamed', () => {
     const resto = TALENTS.shaman.specs.find((s) => s.id === 'restoration');
     expect(resto?.name).toBe('Spiritcall');
     expect(MOUNTS.terrorspark_groundshaker.name).toBe('Dreadspark Groundshaker');
+    // Both layers for the skin: the catalog source of truth AND the resolved
+    // artifact (the latter is only decisive after an i18n regen).
+    expect(armorySkinStrings.winterbite.name).toBe('Wintergnaw');
     expect(en.hudChrome.wocStore.skins.winterbite.name).toBe('Wintergnaw');
     expect(en.hudChrome.mounts.name_terrorspark_groundshaker).toBe('Dreadspark Groundshaker');
+    // The sim matcher's English aura label is its own surface (sim_i18n is not
+    // part of the resolved catalog): pin it beside the mechanic def pin above.
+    expect(DICT.en['aura.frostbite']).toBe('Wintergnaw');
   });
 });

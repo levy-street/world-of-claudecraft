@@ -36,7 +36,15 @@
 // Freshly Baked Bread, pet id gloomshade -> voidwalker). Set
 // RENAME_PROOF_SECTION=<heading substring> to restrict the display pairs to
 // the map rows AFTER the first heading containing that substring, and to skip
-// the coined-id pairs (they belong to the original wave).
+// the coined-id pairs (they belong to the original wave). Any heading line
+// closes the section again, so keep an amendment section free of subheadings.
+//
+// Worked example (the Masterwrought Phase 03 slice; its goldens were minted in
+// commit 233bd5bed0, so after that slice is committed the base is that
+// commit's parent, NOT HEAD~1):
+//   RENAME_PROOF=1 RENAME_PROOF_SECTION="MASTERWROUGHT PHASE 03" \
+//     RENAME_PROOF_BASE=233bd5bed0~1 \
+//     npx vitest run tests/parity/rename_state_proof.test.ts
 
 import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
@@ -194,6 +202,12 @@ const d = RUN ? describe : describe.skip;
 
 d(`rename state proof (reverse-map re-digest vs ${BASE_REF})`, () => {
   const mapStr = makeReverseMapper();
+
+  if (PROOF_SECTION) {
+    it('section scoping matched at least one map row (a typo would otherwise surface as opaque hash mismatches)', () => {
+      expect(loadReverseDisplayPairs().length).toBeGreaterThan(0);
+    });
+  }
 
   // Scope to the goldens that actually differ from the baseline ref.
   const changed = SCENARIOS.filter((s) => {

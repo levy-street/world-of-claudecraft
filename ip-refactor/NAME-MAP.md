@@ -1210,3 +1210,4 @@ plus the hardcoded list.
 | rift_pitlord_pulse | Hellfire Ring | Pitfire Ring | mechanic | rename |
 | dgn_sanctum_speed | Sanctum Sprint | Sanctum Footrace | deed | rename |
 | pvp_honor_knight_lieutenant | Knight-Lieutenant | Banneret | deed-title | rename |
+| shardlord_kazzix_frostbite | Winterbite | Wintergnaw | mechanic | rename |
