@@ -27,11 +27,13 @@ STEP 0 - PRE-FLIGHT
   main checkout. Use git -C /home/fernandoramirez/Documents/woc-farming-plan for every
   git command (the Bash cwd drifts).
 - git status must be clean. If it is not, stop and surface it.
-- Re-resolve the NEWEST release branch: git fetch origin --prune, then
-  git branch -r --list 'origin/release/*' | sort -V and take the last row. Create
-  branch fix/farming-phase-02-patches-and-plots off its tip. Record the phase-start
-  commit hash for the STEP 3 diff. If release moves mid-phase and this branch goes
-  long-lived, merge release in and run the release-merge-audit skill.
+- D22 SWEEP (state.md wins on contradiction): branch
+  fix/farming-phase-02-patches-and-plots off the LOCAL feature/farming-plan, never
+  off a bare release tip (which lacks the packet). git fetch origin --prune; if a
+  newer origin/release/** tip exists than the branch has absorbed, merge it INTO the
+  phase branch FIRST, resolve generated i18n bundles by regen, and run the
+  release-merge-audit skill. Record the phase-start commit hash (the absorb merge)
+  for the STEP 3 diff. EXECUTED 2026-08-08: absorb merge 743a1ee6ad (tip e5c16ca398).
 - Scan Claude Code memory: the MEMORY.md index, the farming-skill-program entry, plus
   these phase-relevant topics: round-trip-pins-reference-aliasing (build expectation
   literals fresh, never compare an object to itself), wire-name-constant-pins-need-
@@ -238,8 +240,8 @@ STEP 7 - FINAL RESPONSE FORMAT
 Report exactly: phase status (complete or partial, with reasons); files touched
 (grouped by commit); validation results (each command, pass or fail); review verdicts
 (per agent, with the BLOCKING count at zero); deferrals (each with a reason and owning
-phase); and a one-line handoff for the QA session (branch, PR number, base release
-branch).
+phase); and a one-line handoff for the QA session (per D22: the merge commit into
+feature/farming-plan and the release tip absorbed; there is no PR).
 
 STOPPING RULES
 - STOP if the public projection cannot avoid leaking the hidden outcome slots or the
@@ -252,8 +254,10 @@ STOPPING RULES
   fixed without leaving this phase's scope; surface to the user.
 
 When every step above is done and no BLOCKING stands: gate via
-node scripts/gate_select.mjs (the armory browser red is the standing environmental
-exception; grep the log for "[gate] FAIL"; PR CI is the arbiter), push, and open the
-PR against the release branch this phase was based on per
-.github/PULL_REQUEST_TEMPLATE.md.
+BROWSER_PATH=$HOME/.cache/ms-playwright/chromium-1228/chrome-linux64/chrome
+node scripts/gate_select.mjs (grep the log for "[gate] FAIL"), then, per D22
+(supersedes the original push-and-open-a-PR line here): merge the phase branch
+--no-ff into feature/farming-plan and delete it. Do NOT push and do NOT open a
+PR; the would-be PR body goes in progress.md's Phase 2 Notes. Deviations decided
+in-phase are lettered (h) to (m) in state.md's CANONICAL ledger.
 ```

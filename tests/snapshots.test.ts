@@ -3066,6 +3066,74 @@ describe('equipped instance wire (eqi)', () => {
   });
 });
 
+// The farming own-plot delta. A plot's survival outcome and yield are pre-rolled
+// at plant time and stored in hidden PlotState slots; shipping either would let a
+// client know a crop's fate before its timer runs out, so the projection
+// (src/sim/professions/farm_projection.ts) picks its fields explicitly. This is
+// the gate over the REAL wire: a GameServer broadcast, JSON-encoded and parsed
+// back, so an accidental spread reddens here rather than in a unit test of the
+// projection alone.
+describe('farm plot wire (fplot)', () => {
+  it('never carries the hidden pre-rolled outcome slots to a client', () => {
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 1, 'Rowan');
+    const meta = server.sim.meta(session.pid)!;
+    meta.farmPlots.set('bed_eastbrook_1', {
+      cropId: 'wheat',
+      plantedAtMs: 1_700_000_000_000,
+      readyAtMs: FAR_FUTURE_MS,
+      survivalRoll: 0.42,
+      yieldSeed: 987654,
+      compost: true,
+      watch: false,
+      tonic: true,
+      notified: false,
+    });
+    broadcast(server);
+    const snap = lastSnap(fc.sent);
+    // The wire key is pinned as a literal: renaming it silently would strip the
+    // plots from every online client while every projection test stayed green.
+    const rows = snap.self.fplot as Record<string, unknown>[];
+    expect(rows).toHaveLength(1);
+    const row = rows[0];
+    // Positive first: the public fields carry what was planted, so the absence
+    // assertions below cannot pass on an empty or defaulted payload.
+    expect(row.bedId).toBe('bed_eastbrook_1');
+    expect(row.cropId).toBe('wheat');
+    expect(row.plantedAtMs).toBe(1_700_000_000_000);
+    expect(row.readyAtMs).toBe(FAR_FUTURE_MS);
+    expect(row.compost).toBe(true);
+    expect(row.watch).toBe(false);
+    expect(row.tonic).toBe(true);
+    expect(row.notified).toBe(false);
+    expect(row.status).toBe('growing');
+    // The leak pin, both ways: named absence for a reader, then the exhaustive
+    // key set so a NEW hidden PlotState field cannot ride along unnoticed.
+    expect(row.survivalRoll).toBeUndefined();
+    expect(row.yieldSeed).toBeUndefined();
+    expect(Object.keys(row).sort()).toEqual([
+      'bedId',
+      'compost',
+      'cropId',
+      'notified',
+      'plantedAtMs',
+      'readyAtMs',
+      'status',
+      'tonic',
+      'watch',
+    ]);
+  });
+
+  it('rides the wire as [] for a player with no planted bed', () => {
+    const server = new GameServer();
+    const fc = fakeWs();
+    joinServer(server, fc, 1, 'Bramble');
+    broadcast(server);
+    expect(lastSnap(fc.sent).self.fplot).toEqual([]);
+  });
+});
+
 describe('delve self-state mirrors over the wire', () => {
   let server: GameServer;
   let fc: FakeClient;
@@ -3432,6 +3500,7 @@ const ALL_DELTA_KEYS = [
   'einst',
   'ench',
   'equip',
+  'fplot',
   'gprof',
   'guildBank',
   'hbl',
@@ -3509,6 +3578,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   einst: 'equipmentInstances',
   ench: 'lastEnchantResult',
   equip: 'equipment',
+  fplot: 'myFarmPlots',
   gprof: 'gatheringProficiency',
   guildBank: 'guildBankInfo',
   inv: 'inventory',
@@ -3667,6 +3737,27 @@ function dirtyEveryDeltaField(): {
       confirmMode: 'always',
     },
   };
+  // fplot: a REAL planted plot, not the empty default. Without this the key
+  // rides the first snapshot as `[]`, which is not null, so it passes the
+  // "dirtied to a non-default value" loop below vacuously and nothing anywhere
+  // proves a plot row reaches a client. Written straight onto meta (the plant
+  // command lands in the growth phase; the wire shape under test is the DELTA,
+  // not the mint). The hidden pre-rolled outcome slots are FILLED here on
+  // purpose: they are what the 'farm plot wire (fplot)' leak pin proves never
+  // crosses the wire.
+  // readyAtMs sits far past the fixture's clock (the sim-time lockoutNowMs
+  // seam, single-digit seconds in), so `status` is deterministically 'growing'.
+  meta.farmPlots.set('bed_eastbrook_1', {
+    cropId: 'wheat',
+    plantedAtMs: 1_700_000_000_000,
+    readyAtMs: FAR_FUTURE_MS,
+    survivalRoll: 0.42,
+    yieldSeed: 987654,
+    compost: true,
+    watch: true,
+    tonic: false,
+    notified: false,
+  });
   meta.craftSkills.armorcrafting = 31;
   meta.craftSkills.weaponcrafting = 29;
   meta.archetype = {
@@ -4081,6 +4172,23 @@ describe('full self-state snapshot delta fixture', () => {
         selfCrafted: false,
       },
     ]);
+    // fplot -> myFarmPlots: the projected row shape, written out fresh here
+    // rather than compared against the fixture's PlotState, which carries the
+    // hidden slots and no status. The knob flags are deliberately mixed so a
+    // decode that dropped or transposed one reddens.
+    expect(client.myFarmPlots).toEqual([
+      {
+        bedId: 'bed_eastbrook_1',
+        cropId: 'wheat',
+        plantedAtMs: 1_700_000_000_000,
+        readyAtMs: FAR_FUTURE_MS,
+        compost: true,
+        watch: true,
+        tonic: false,
+        notified: false,
+        status: 'growing',
+      },
+    ]);
     // ncd -> nodeHarvestableByMe: the cooling-down node reads not-ready, an
     // untouched node (never in the map) still reads ready.
     expect(client.nodeHarvestableByMe(GATHER_NODES[0].id)).toBe(false);
@@ -4344,12 +4452,12 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 67 unique keys in sorted order', () => {
+  it('ALL_DELTA_KEYS contains exactly 68 unique keys in sorted order', () => {
     // +1: guildBank (Guild Bank Phase 2), +1: the battleground bg key, +1: the
     // commission order board's corder key (issue #1298), +1: the character
-    // sheet's lifetime played-time key ptime.
-    expect(ALL_DELTA_KEYS).toHaveLength(67);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(67);
+    // sheet's lifetime played-time key ptime, +1: farming's own-plot key fplot.
+    expect(ALL_DELTA_KEYS).toHaveLength(68);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(68);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -4374,9 +4482,9 @@ describe('delta-key contract pins (anti-drift)', () => {
     // plus the packet's slotted-tool-effects key tslot for 63, the
     // battleground's bg self key for 64, guildBank (Guild Bank Phase 2)
     // for 65, this branch's commission order board key corder
-    // (issue #1298) for 66, and the character sheet's lifetime played-time
-    // key ptime for 67.
-    expect(scraped.size).toBe(67);
+    // (issue #1298) for 66, the character sheet's lifetime played-time
+    // key ptime for 67, and farming's own-plot key fplot for 68.
+    expect(scraped.size).toBe(68);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -4447,6 +4555,9 @@ describe('delta-key contract pins (anti-drift)', () => {
       // right-hand side would pass every other check in this test.
       lroll: 'lootRollPrompts',
       mloot: 'masterLootPrompts',
+      // The farming own-plot delta: the wire key and the IWorld name share no
+      // stem, so a typo on either side would decode onto nothing at all.
+      fplot: 'myFarmPlots',
     };
     for (const [terse, iworld] of Object.entries(required)) {
       expect(TERSE_TO_IWORLD[terse], `rename ${terse} -> ${iworld} drifted`).toBe(iworld);

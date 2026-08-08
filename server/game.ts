@@ -8779,6 +8779,19 @@ export class GameServer {
     const tslotRows = this.sim.toolEffectSlotsFor(anchorSession.pid);
     if (tslotRows.length === 0) maybeSerialized('tslot', '[]');
     else maybe('tslot', tslotRows);
+    // The viewer's own farm plots (IWorld `myFarmPlots`). Wire key `fplot`; see
+    // TERSE_TO_IWORLD/ALL_DELTA_KEYS in tests/snapshots.test.ts. The projection
+    // (src/sim/professions/farm_projection.ts) picks its fields explicitly, so
+    // the hidden pre-rolled outcome slots (survivalRoll, yieldSeed) never reach
+    // a client; tests/snapshots.test.ts pins that absence over this path. Empty
+    // for every player with no planted bed, so after the first snapshot of a
+    // session the key delta-elides away for almost everyone. The empty arm
+    // compares the constant '[]' directly (byte-identical to maybe(...)):
+    // farmPlotsFor allocates a fresh array per call, so stringifying an empty
+    // projection per player per tick would buy nothing.
+    const fplotRows = this.sim.farmPlotsFor(anchorSession.pid);
+    if (fplotRows.length === 0) maybeSerialized('fplot', '[]');
+    else maybe('fplot', fplotRows);
     // Riding skill: persisted, so the client knows whether to show the riding
     // trainer UI without waiting on a mount/select command to fail. Wire key
     // `mntRtd`; delta-guarded, only changes once (false to true, never back).

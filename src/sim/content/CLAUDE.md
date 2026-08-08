@@ -17,8 +17,13 @@ system directly instead of the `data.ts` spread: `mailboxes.ts`/`letters.ts`
 `enchants.ts` (`src/sim/professions/enchanting.ts`), `dungeon_difficulty.ts`
 (`src/sim/instances/`), `vendor_row_gates.ts` (the vendor buy path in
 `src/sim/items.ts` and, sharing the one resolver, the vendor window's pure view
-core). All shapes are typed in `../types.ts`: add a field
-there first if you need one.
+core), `farm_patches.ts` (garden-bed geography plus the farming persistence
+allowlists, read directly by `sim.ts` and, as a static IWorld read, by
+`src/net/online.ts`; deliberately fishing-shaped, never a `GatherNodeType`).
+All shapes are typed in `../types.ts`: add a field
+there first if you need one. (`farm_patches.ts` is the exception: its defs are
+its own persisted-key contract, typed in-file with the destroy-on-load rename
+warnings.)
 
 ## Where a new thing lands
 - **New content RECORD** (mob/quest/item/ability/zone/recipe/node): a declarative
@@ -54,8 +59,11 @@ there first if you need one.
   `CASTER_HUB_RECIPES`/`COMBO_RECIPES`, merged into `ALL_RECIPES`),
   `gather_nodes.ts`, `enchants.ts`, `vendor_row_gates.ts` (per-item proficiency
   requirements on NPC vendor rows, plus the one resolver both the authoritative
-  buy path and the vendor view call). Mechanics live in `src/sim/professions/`,
-  never here.
+  buy path and the vendor view call), `farm_patches.ts` (`FARM_PATCHES` garden-bed
+  sites, deep-frozen, plus the `FARM_BED_IDS`/`FARM_CROP_IDS` persistence
+  allowlists; bed and crop ids are PERSISTED SAVE KEYS, never rename; placement
+  guarded by `tests/farm_patch_placement.test.ts`). Mechanics live in
+  `src/sim/professions/`, never here.
 - **Events + world systems:** `augments.ts` (2v2 Fiesta) and `skins.ts` (cosmetic
   skin events), `vale_cup.ts`, `yumi.ts`, `item_sets.ts` (set bonuses),
   `graveyards.ts` (death loop), `letters.ts` + `mailboxes.ts` (mail), `tunnels.ts`

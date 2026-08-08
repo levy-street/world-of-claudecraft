@@ -1,11 +1,13 @@
 # Phase 2 QA: Verify Patches and plot state
 
-This session audits the Phase 2 PR after it is open: the patch content and its
+This session audits Phase 2 after it lands (AMENDED per D22, 2026-08-08: there is
+NO PR; audit the merge commit into feature/farming-plan): the patch content and its
 placement guard, the persistence shape and its anti-tamper load path, the read-only
 facet, and above all the wire boundary (the public projection must provably never
-carry the hidden outcome slots or the yield seed). Fixes ride the same PR branch as
-separate commits. The design authority is `docs/farming/state.md`; the promises under
-audit are `docs/farming/phase-02-patches-and-plots.md`.
+carry the hidden outcome slots or the yield seed). Fixes ride a local
+fix/farming-phase-02-qa branch merged --no-ff, the Phase 1 QA precedent. The design
+authority is `docs/farming/state.md` (Phase 2 deviations lettered (h) to (m) there);
+the promises under audit are `docs/farming/phase-02-patches-and-plots.md`.
 
 ### QA Starter Prompt
 
@@ -20,13 +22,16 @@ parity, i18n completeness, and the phase's own acceptance criteria.
 STEP 0 - PRE-FLIGHT
 - Work ONLY in the persistent worktree ~/Documents/woc-farming-plan; git status must
   be clean; use git -C with the absolute path on every git command.
-- git fetch origin --prune, then check out the phase PR branch
-  fix/farming-phase-02-patches-and-plots.
-- Identify the phase diff: the PR's commits against its base, NEVER
-  everything-since-phase-start (the release tip may have moved concurrently).
-  Preferred: gh pr diff <PR-number> --name-only and gh pr view <PR-number> --json
-  baseRefName,commits. Fallback: BASE=$(git merge-base origin/<base-release-branch>
-  HEAD); git log --oneline $BASE..HEAD; git diff --name-only $BASE..HEAD.
+- AMENDED per D22: no PR exists. git fetch origin --prune, then check out the LOCAL
+  feature/farming-plan and locate the Phase 2 merge commit (git log --merges
+  --grep "phase 2" -i). The phase diff is the merge's second-parent range:
+  git diff --name-only <merge>^1..<merge>. The phase-start absorb is 743a1ee6ad
+  (release tip e5c16ca398), so phase work is 743a1ee6ad..<merge>^2.
+- If a NEWER origin/release/** tip exists than the branch has absorbed, merge it in
+  FIRST (regen-resolve the generated i18n bundles) and run the release-merge-audit
+  skill; then RE-RUN tests/world_api_parity.test.ts and tests/snapshots.test.ts
+  (identical count-pin bumps on both sides auto-merge to a wrong total with no
+  textual conflict).
 - Scan Claude Code memory: the MEMORY.md index, the farming-skill-program entry, plus
   round-trip-pins-reference-aliasing, wire-name-constant-pins-need-literals,
   vacuous-bound-pin-trap, mutation-checks-commit-first,
@@ -114,8 +119,8 @@ STEP 3 - FIX
 - Separate fix commits with explicit paths, Conventional Commits with bodies, never
   git add -A, no session links or Claude attribution.
 - After fixes: node scripts/gate_select.mjs (the armory browser red is the standing
-  environmental exception; grep the log for "[gate] FAIL"; PR CI is the arbiter), then
-  push the fix commits to the phase PR branch.
+  environmental exception; grep the log for "[gate] FAIL"), then, per D22, merge the
+  local QA fix branch --no-ff into feature/farming-plan; never push, never open a PR.
 
 STEP 4 - DOC UPDATES
 - docs/farming/progress.md: fill the Phase 2 QA row (status, dates) and append QA

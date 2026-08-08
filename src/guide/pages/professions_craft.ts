@@ -215,7 +215,7 @@ function enchantingSections(): string {
     </section>
     <section class="guide-block" id="prof-enchants">
       <h2>${esc(t('guide.profPages.ench.enchantsHeading'))}</h2>
-      ${paras('guide.profPages.ench.enchantsNote')}
+      ${paras('guide.profPages.ench.enchantsNoteOffhand')}
       <div class="guide-table-scroll"><table class="guide-keytable guide-prof-table">
         <thead><tr>
           <th scope="col">${esc(t('guide.profPages.ench.colEnchant'))}</th>
@@ -226,6 +226,10 @@ function enchantingSections(): string {
         </tr></thead>
         <tbody>${enchantRows}</tbody>
       </table></div>
+    </section>
+    <section class="guide-block" id="prof-charms">
+      <h2>${esc(t('guide.profPages.ench.charmsHeading'))}</h2>
+      ${paras('guide.profPages.ench.charmsBody')}
     </section>
     <section class="guide-block" id="prof-salvage">
       <h2>${esc(t('guide.profPages.ench.salvageHeading'))}</h2>

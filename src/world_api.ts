@@ -50,6 +50,8 @@
 //   dungeon_finder.ts   IWorldDungeonFinder  Dungeon Finder queue/proposals/premade board
 //   deeds.ts            IWorldDeeds          earned deeds, lifetime stats, renown, active title,
 //                                            rarity + the account-Renown leaderboard reads
+//   farming.ts          IWorldFarming        the static garden-bed geography + the caller's own
+//                                            plot rows (reads only in the patches-and-plots phase)
 //
 // THREE GATES pin this seam (run before any facet edit; the literal counts are
 // pinned THERE and re-stale here, so this prose stays count-free):
@@ -76,6 +78,7 @@ import type { IWorldDuelArena } from './world_api/duel_arena';
 import type { IWorldDungeonFinder } from './world_api/dungeon_finder';
 import type { IWorldDungeons } from './world_api/dungeons';
 import type { IWorldEntityRoster } from './world_api/entity_roster';
+import type { IWorldFarming } from './world_api/farming';
 import type { IWorldGuildBank } from './world_api/guild_bank';
 import type { IWorldInteraction } from './world_api/interaction';
 import type { IWorldInventory } from './world_api/inventory';
@@ -200,6 +203,7 @@ export type {
   DungeonFinderQueueView,
 } from './world_api/dungeon_finder';
 export type { RaidLockout, RiftFloorView } from './world_api/dungeons';
+export type { FarmPatchDef, FarmPlotStatus, FarmPlotView } from './world_api/farming';
 export {
   GUILD_BANK_LOG_LIMIT,
   type GuildBankInfo,
@@ -287,7 +291,8 @@ export interface IWorld
     IWorldDungeonFinder,
     IWorldActionBar,
     IWorldDeeds,
-    IWorldMounts {}
+    IWorldMounts,
+    IWorldFarming {}
 
 // ---------------------------------------------------------------------------
 // Command schema (W0b): the shared wire-token vocabulary.

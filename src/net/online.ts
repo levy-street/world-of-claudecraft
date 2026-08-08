@@ -12,6 +12,7 @@ import {
 } from '../sim/account_flair';
 import { bagCapacity } from '../sim/bags';
 import { signChallenge } from '../sim/client_challenge';
+import { FARM_PATCHES } from '../sim/content/farm_patches';
 import { MOUNT_RACE_COURSE, type MountKey, normalizeMountKey } from '../sim/content/mounts';
 import { mechChromaItemId, mechChromaSkinIndex } from '../sim/content/skins';
 import {
@@ -104,6 +105,8 @@ import {
   type DelveShopOfferView,
   type DevLeaderboardPage,
   type DuelInfo,
+  type FarmPatchDef,
+  type FarmPlotView,
   type FriendInfo,
   type GuildBankInfo,
   type GuildBankLogEntry,
@@ -1646,6 +1649,17 @@ export class ClientWorld implements IWorld {
   // never slotted an effect, which is the server's own default: the sim leaves
   // the backing PlayerMeta field absent and projects [] for it.
   toolEffectSlots: readonly ToolEffectSlotView[] = [];
+  // Static content read (the recipeList precedent below): the garden-bed
+  // geography ships with the client bundle like every other content table, so
+  // this needs no wire round-trip. See src/world_api/farming.ts.
+  farmPatches: readonly FarmPatchDef[] = FARM_PATCHES;
+  // The viewer's own farm plots, one row per planted bed sorted by bed id,
+  // mirrored from the `fplot` self-wire delta. Empty for every player with no
+  // planted bed, which is the server's own default (the sim projects [] for an
+  // empty plot map). `status` arrives server-computed and is never re-derived
+  // here: the authority owns it, and the hidden pre-rolled outcome slots that
+  // decide a crop's fate never cross the wire at all.
+  myFarmPlots: readonly FarmPlotView[] = [];
   // Per-delve clears (key `${delveId}:${tierId}`), mirrored from the self-wire so
   // delveShopOffers can resolve the shop lock badge client-side.
   delveClears: Record<string, number> = {};
@@ -3470,6 +3484,7 @@ export class ClientWorld implements IWorld {
       if (s.salv !== undefined) this.lastSalvageResult = s.salv ?? null;
       if (s.gprof !== undefined) this.gatheringProficiency = s.gprof ?? {};
       if (s.tslot !== undefined) this.toolEffectSlots = s.tslot ?? [];
+      if (s.fplot !== undefined) this.myFarmPlots = s.fplot ?? [];
       if (s.prof !== undefined) this.professionsState = s.prof ?? { skills: [] };
       if (s.cprof !== undefined && s.cprof) {
         const cprof = s.cprof as CraftingIdentityView;

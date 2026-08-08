@@ -22,10 +22,13 @@ const QUALITY_TIERS = [
   ['legendary', 'guide.gear.qualityLegendary'],
 ] as const;
 
-// The eleven equip slots, paired with their catalog label key (paperdoll order; the
-// two ring slots share the one Finger label, listed once each).
+// The twelve equip slots, paired with their catalog label key (paperdoll order; the
+// two ring slots share the one Finger label, listed once each). The live surface is
+// ALL_EQUIP_SLOTS in src/sim/types.ts, which includes the additive off hand; the
+// eleven-slot list in src/sim/launch_paperdoll_slots.ts is a frozen historical record.
 const SLOTS = [
   'guide.gear.slotMainhand',
+  'guide.gear.slotOffhand',
   'guide.gear.slotHelmet',
   'guide.gear.slotNeck',
   'guide.gear.slotShoulder',
@@ -60,17 +63,31 @@ export const gear: GuidePage = {
         <h1>${esc(t('guide.nav.gear'))}</h1>
         ${lead('guide.gear.intro')}
 
-        ${section('guide.gear.slotsTitle', p('guide.gear.slotsBody') + slotList())}
+        ${section(
+          'guide.gear.slotsTitle',
+          p('guide.gear.slotsBody') + slotList() + p('guide.gear.offhandBody'),
+        )}
 
-        ${section('guide.gear.bagsTitle', p('guide.gear.bagsBody'))}
+        ${section('guide.gear.bagsTitle', p('guide.gear.bagsBody') + p('guide.gear.bagsSort'))}
 
         ${section('guide.gear.qualityTitle', p('guide.gear.qualityBody') + qualityList() + p('guide.gear.qualityNote'))}
 
-        ${section('guide.gear.upgradeTitle', p('guide.gear.upgradeBody') + p('guide.gear.itemLevelBody'))}
+        ${section(
+          'guide.gear.upgradeTitle',
+          p('guide.gear.upgradeBody') +
+            p('guide.gear.itemLevelBody') +
+            p('guide.gear.requiredLevelBody'),
+        )}
 
-        ${section('guide.gear.sourcesTitle', p('guide.gear.sourcesBody'))}
+        ${section(
+          'guide.gear.sourcesTitle',
+          p('guide.gear.sourcesBody') + p('guide.gear.sourcesHonor') + p('guide.gear.sourcesRifts'),
+        )}
 
-        ${section('guide.gear.soulboundTitle', p('guide.gear.soulboundBody'))}
+        ${section(
+          'guide.gear.soulboundTitle',
+          p('guide.gear.soulboundBodyBound') + p('guide.gear.bindOnTradeBody'),
+        )}
 
         ${section('guide.gear.uniqueTitle', p('guide.gear.uniqueBody'))}
 
@@ -95,12 +112,15 @@ export const gear: GuidePage = {
             p('guide.gear.cosmeticsSkins') +
             p('guide.gear.cosmeticsRanks') +
             p('guide.gear.cosmeticsCache') +
-            p('guide.gear.cosmeticsApply'),
+            p('guide.gear.cosmeticsApply') +
+            p('guide.gear.cosmeticsWeapons'),
         )}
 
         ${related([
           { href: hrefFor('classes'), key: 'guide.nav.classes' },
           { href: hrefFor('economy'), key: 'guide.nav.economy' },
+          { href: hrefFor('arena'), key: 'guide.nav.arena' },
+          { href: hrefFor('rifts'), key: 'guide.nav.rifts' },
           { href: hrefFor('how-to-play'), key: 'guide.nav.howToPlay' },
         ])}
       </article>`;

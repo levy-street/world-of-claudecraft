@@ -137,6 +137,21 @@ or pure leaves, never a `Sim` import, randomness only via `ctx.rng` (guarded by
   water gated by the WATER's zone) the cast gate and the vendor rows read;
   since R19 the SAME column also caps how far each water teaches
   (`fishingTeachingCeilingFor` in `fishing.ts` reads it at the gain site).
+- `farming_zones.ts`: farming's OWN per-zone tier ladder (`farmingZoneTierFor`),
+  the fishing_zones-shaped pure leaf; deliberately DIVERGES from the shipped
+  progression column at evergarden (farming tier 4 showcase vs the named
+  inversion's tier 1), so its guards are literal pins plus the one-ladder arm
+  against `FARM_PATCHES[].tier`, never a GATHER_NODES derivation. First runtime
+  consumer is the growth phase's crop gating.
+- `farm_projection.ts`: pure leaf owning `PlotState` (the full per-player plot
+  record incl the hidden pre-rolled outcome slots) and `projectFarmPlots`, the
+  ONLY public projection: explicit field picks are the wire leak barrier, and
+  timestamps are absolutes in the host's own `lockoutNowMs` base.
+- `farm_persist.ts`: pure leaf bridging `PlayerMeta.farmPlots` and the optional
+  `CharacterState.farmPlots` row (`serializeFarmPlots`/`normalizeFarmPlots`);
+  the `node_persist.ts` anti-tamper doctrine with ABSOLUTE deadlines (allowlists
+  and the `FARM_MAX_GROW_MS` duration clamp on the load side; clamp before the
+  future re-anchor; the zero-clock offline guard).
 - `wield_gate.ts`: the R22 land-tool USE requirements, a pure leaf like
   `tools.ts` (items table as a parameter, no player-state import): the one
   frozen threshold table (40/70/85/100), the wield-filtered bag scans the

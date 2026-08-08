@@ -57,6 +57,7 @@ import type { IWorldDuelArena } from '../src/world_api/duel_arena';
 import type { IWorldDungeonFinder } from '../src/world_api/dungeon_finder';
 import type { IWorldDungeons } from '../src/world_api/dungeons';
 import type { IWorldEntityRoster } from '../src/world_api/entity_roster';
+import type { IWorldFarming } from '../src/world_api/farming';
 import type { IWorldGuildBank } from '../src/world_api/guild_bank';
 import type { IWorldInteraction } from '../src/world_api/interaction';
 import type { IWorldInventory } from '../src/world_api/inventory';
@@ -421,6 +422,11 @@ export const IWORLD_MEMBERS = [
   // IWorldActionBar: per-character action-bar layout persistence + login restore.
   { name: 'saveActionBarLayout', kind: 'method' },
   { name: 'takeActionBarLayoutRestore', kind: 'method' },
+  // IWorldFarming: the static garden-bed geography plus the viewer's own plot
+  // rows. Reads only in the patches-and-plots phase (no plant/harvest command
+  // exists yet), so both members are data.
+  { name: 'farmPatches', kind: 'data' },
+  { name: 'myFarmPlots', kind: 'data' },
 ] as const satisfies readonly IWorldMember[];
 
 const DATA_MEMBERS = IWORLD_MEMBERS.filter((m) => m.kind === 'data');
@@ -558,9 +564,10 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // (IWorldCosmetics, a method), leaving 300. The bag clean-up button adds
     // sortInventory (IWorldInventory, a method), leaving 301. The character
     // sheet's Time Played line adds playtimeSeconds (IWorldProgressionXp,
-    // data), leaving 302.
-    expect(IWORLD_MEMBERS.length).toBe(302);
-    expect(DATA_MEMBERS.length).toBe(77);
+    // data), leaving 302. Farming's patches-and-plots phase adds farmPatches
+    // and myFarmPlots (IWorldFarming, data), leaving 304.
+    expect(IWORLD_MEMBERS.length).toBe(304);
+    expect(DATA_MEMBERS.length).toBe(79);
     expect(METHOD_MEMBERS.length).toBe(225);
   });
   it('has no duplicate member names', () => {
@@ -681,6 +688,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'equipItemToSlot',
       'equipment',
       'equipmentInstances',
+      'farmPatches',
       'feedPet',
       'forfeitCardDuel',
       'friendAdd',
@@ -761,6 +769,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'moveInput',
       'moveInventoryItem',
       'moveRaidMember',
+      'myFarmPlots',
       'nodeHarvestableByMe',
       'nodeRespawnSeconds',
       'openCommissionOrder',
@@ -911,6 +920,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'entities',
       'equipment',
       'equipmentInstances',
+      'farmPatches',
       'gatheringProficiency',
       'guildBankInfo',
       'hobbyCraft',
@@ -931,6 +941,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'marketCollectPending',
       'marketInfo',
       'moveInput',
+      'myFarmPlots',
       'partyInfo',
       'player',
       'playerId',
@@ -1700,6 +1711,12 @@ type _ExhaustActionBar = AssertNever<
   Exclude<keyof IWorldActionBar, (typeof FACET_ACTION_BAR)[number]>
 >;
 
+const FACET_FARMING = [
+  'farmPatches',
+  'myFarmPlots',
+] as const satisfies readonly (keyof IWorldFarming)[];
+type _ExhaustFarming = AssertNever<Exclude<keyof IWorldFarming, (typeof FACET_FARMING)[number]>>;
+
 // The facet partition, keyed by facet for legible failure messages.
 const FACET_MEMBER_ARRAYS: Readonly<Record<string, readonly string[]>> = {
   entityRoster: FACET_ENTITY_ROSTER,
@@ -1734,11 +1751,12 @@ const FACET_MEMBER_ARRAYS: Readonly<Record<string, readonly string[]>> = {
   dungeonFinder: FACET_DUNGEON_FINDER,
   deeds: FACET_DEEDS,
   actionBar: FACET_ACTION_BAR,
+  farming: FACET_FARMING,
 };
 
 describe('W1: aggregate IWorld member set equals the disjoint union of the facets', () => {
   it('pins the facet count', () => {
-    expect(Object.keys(FACET_MEMBER_ARRAYS).length).toBe(32);
+    expect(Object.keys(FACET_MEMBER_ARRAYS).length).toBe(33);
   });
 
   it('each facet array is non-empty and internally duplicate-free', () => {
@@ -1748,7 +1766,7 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
     }
   });
 
-  it('the 28 facet arrays are pairwise disjoint (no member filed in two facets)', () => {
+  it('the facet arrays are pairwise disjoint (no member filed in two facets)', () => {
     const entries = Object.entries(FACET_MEMBER_ARRAYS);
     const overlaps: string[] = [];
     for (let i = 0; i < entries.length; i++) {
@@ -1766,8 +1784,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(302);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(302);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(304);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(304);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

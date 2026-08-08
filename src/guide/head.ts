@@ -18,7 +18,7 @@ import {
   t,
 } from '../ui/i18n';
 import { GUIDE_CLASSES, GUIDE_PROF_PAGES } from './content.generated';
-import { LEVEL_CAP } from './data';
+import { LEVEL_CAP, ZONE_COUNT } from './data';
 import { GLOSSARY_TERMS } from './pages/glossary';
 import { craftById, craftLabel } from './pages/professions_craft';
 import { gatheringById, gatheringLabel } from './pages/professions_gathering';
@@ -33,13 +33,13 @@ const DISCORD_URL = 'https://discord.com/invite/worldofclaudecraft';
 // The newcomer FAQ on /guide/faq, kept in lockstep with pages/faq.ts so the FAQPage
 // JSON-LD answers the same questions the visible page does. cap rows splice the level
 // cap, exactly like the page (the cap value is resolved by the caller via the same key).
-const FAQ_QA: { q: TranslationKey; a: TranslationKey; cap?: boolean }[] = [
+const FAQ_QA: { q: TranslationKey; a: TranslationKey; cap?: boolean; zones?: boolean }[] = [
   { q: 'guide.faqPage.q1', a: 'guide.faqPage.a1' },
   { q: 'guide.faqPage.q2', a: 'guide.faqPage.a2' },
   { q: 'guide.faqPage.q3', a: 'guide.faqPage.a3' },
   { q: 'guide.faqPage.q4', a: 'guide.faqPage.a4' },
   { q: 'guide.faqPage.q5', a: 'guide.faqPage.a5' },
-  { q: 'guide.faqPage.q6', a: 'guide.faqPage.a6', cap: true },
+  { q: 'guide.faqPage.q6', a: 'guide.faqPage.a6Count', cap: true, zones: true },
   { q: 'guide.faqPage.q7', a: 'guide.faqPage.a7' },
   { q: 'guide.faqPage.q8', a: 'guide.faqPage.a8' },
   { q: 'guide.faqPage.q9', a: 'guide.faqPage.a9' },
@@ -299,14 +299,18 @@ function crumb(position: number, name: string, item: string | null): Record<stri
 // engine can lift the questions and answers verbatim.
 function faqNode(): Record<string, unknown> {
   const cap = formatNumber(LEVEL_CAP);
+  const zones = formatNumber(ZONE_COUNT);
   return {
     '@type': 'FAQPage',
-    mainEntity: FAQ_QA.map(({ q, a, cap: hasCap }) => ({
+    mainEntity: FAQ_QA.map(({ q, a, cap: hasCap, zones: hasZones }) => ({
       '@type': 'Question',
       name: t(q),
       acceptedAnswer: {
         '@type': 'Answer',
-        text: hasCap ? t(a, { cap }) : t(a),
+        text:
+          hasCap || hasZones
+            ? t(a, { ...(hasCap ? { cap } : {}), ...(hasZones ? { zones } : {}) })
+            : t(a),
       },
     })),
   };

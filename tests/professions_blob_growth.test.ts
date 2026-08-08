@@ -20,6 +20,7 @@
 // precedent), rather than loosening it ahead of need.
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { FARM_BED_IDS } from '../src/sim/content/farm_patches';
 import { GATHER_NODES } from '../src/sim/content/gather_nodes';
 import {
   CRAFT_RING,
@@ -32,6 +33,7 @@ import {
   craftsForPairTarget,
   hobbyCandidatesForPair,
 } from '../src/sim/professions/archetype';
+import { FARM_MAX_GROW_MS } from '../src/sim/professions/farm_persist';
 import { NODE_HARVEST_TABLE } from '../src/sim/professions/gathering';
 import { MAX_CRAFTED_BY_LENGTH } from '../src/sim/professions/tools';
 import { MAX_KNOWN_RECIPE_ID_LENGTH, MAX_KNOWN_RECIPE_IDS } from '../src/sim/professions/training';
@@ -61,6 +63,7 @@ const PROFESSIONS_BLOB_FIELDS = [
   'questedHobbies',
   'profTierTutorialSent',
   'guildLetterSent',
+  'farmPlots',
 ] as const;
 
 // Every CharacterState key this serializer writes that is NOT professions
@@ -170,7 +173,13 @@ const NON_PROFESSIONS_BLOB_FIELDS = [
 // 231 bytes of headroom. The fixture itself needed no edit: it caps every
 // id in GATHERING_PROFESSIONS, so a new profession joins the worst case
 // automatically.
-const PROFESSIONS_BYTE_CEILING = 10240;
+// The farm-plots phase is the next authored growth: CharacterState.farmPlots
+// is content-scaled at one row per authored bed (about 193 bytes per bed at
+// full width; 23 beds today), and the settled ceiling re-measured 13,948
+// bytes with every bed planted. Re-minted a grid step up to 14 KiB, and the
+// floor re-tracked to 13,696 (the same couple-hundred-byte band as the
+// previous mint), per this file's own doctrine.
+const PROFESSIONS_BYTE_CEILING = 14336;
 
 function ceilingSim(): Sim {
   const sim = makeSim();
@@ -266,6 +275,27 @@ function ceilingSim(): Sim {
   meta.tierMailSent.set(firstPair[1], 2);
   meta.profTierTutorialSent = true;
   meta.guildLetterSent = true;
+  // Every garden bed planted at full row width: hidden slots at their widest
+  // JSON forms (a full-precision roll, a 32-bit seed), every knob and the
+  // notice flag true, and the duration EXACTLY at the tamper ceiling so the
+  // load-side clamp is a no-op and the settle stays a fixed point (the
+  // fresh-Sim load runs at time 0, where the zero-clock guard keeps the
+  // saved anchors). Content-scaled like nodeHarvestCooldowns: about 206
+  // bytes per authored bed.
+  if (FARM_BED_IDS.size !== 23) throw new Error('farm bed set changed; re-mint the ceiling');
+  for (const bedId of FARM_BED_IDS) {
+    meta.farmPlots.set(bedId, {
+      cropId: 'wheat',
+      plantedAtMs: 1_000,
+      readyAtMs: 1_000 + FARM_MAX_GROW_MS,
+      survivalRoll: 0.12345678901234566,
+      yieldSeed: 4_294_967_295,
+      compost: true,
+      watch: true,
+      tonic: true,
+      notified: true,
+    });
+  }
   return sim;
 }
 
@@ -350,16 +380,18 @@ describe('the professions blob growth bound (phase 16)', () => {
       Object.values(QUESTS).filter((q) => q.repeatCadenceTicks).length,
     );
     expect(Object.keys(s2.equipmentInstance ?? {})).toHaveLength(ALL_EQUIP_SLOTS.length);
+    // Content-scaled like the node cooldowns: one row per authored bed, so
+    // the field grows with the FARM_PATCHES table, never per player action.
+    expect(Object.keys(s2.farmPlots ?? {})).toHaveLength(FARM_BED_IDS.size);
 
     // The byte bound itself, on the settled state. The lower bound tracks
-    // the measured settled value (9,497 at the Farming re-measure) minus a
-    // small band, so the headroom note above cannot rot silently in either
-    // direction: a measurement drifting more than a couple hundred bytes
-    // reds here and forces the note to be re-read. Re-minted 9216 to 9280
-    // with the ceiling: the old floor tracked the pre-Farming 9,451 measure
-    // and its window had silently widened to 281 bytes.
+    // the measured settled value (13,948 at the farm-plots re-measure, every
+    // bed planted at full row width) minus a small band, so the headroom
+    // note above cannot rot silently in either direction: a measurement
+    // drifting more than a couple hundred bytes reds here and forces the
+    // note to be re-read. Re-minted 9280 to 13,696 with the ceiling.
     const bytes = professionsBytes(s2);
-    expect(bytes).toBeGreaterThan(9280);
+    expect(bytes).toBeGreaterThan(13696);
     expect(bytes).toBeLessThanOrEqual(PROFESSIONS_BYTE_CEILING);
   });
 
