@@ -1,11 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import { GATHERING_PROFESSIONS } from '../src/sim/content/professions';
+import { ITEMS } from '../src/sim/data';
 import {
   drainGatheringGrants,
   emptyGatheringProficiency,
   foldPendingGatherGrants,
   GATHER_GAIN_TIER_STEP,
   gatherNodeGainMultiplier,
+  NODE_HARVEST_TABLE,
   normalizeGatheringProficiency,
   queueGatheringGrant,
 } from '../src/sim/professions/gathering';
@@ -463,5 +465,30 @@ describe('gathering profession proficiency (#1119)', () => {
       fishing: 0,
       farming: 0,
     });
+  });
+});
+
+describe('farming is ungainable until its growth phase', () => {
+  // The phase 1 contract, frozen structurally: farming is registered
+  // everywhere the chassis looks but has NO gain path. The node grant path is
+  // keyed by NODE_HARVEST_TABLE (which must carry no farming node type), the
+  // tool path scans gatherTool items (none may name farming), and the fishing
+  // grant site hardcodes fishing. The growth phase deletes or inverts this
+  // pin when it ships the first farming gain path.
+  it('has no node type and no gather tool that could grant farming skill', () => {
+    const nodeProfessions = Object.values(NODE_HARVEST_TABLE).map((e) => e.professionId);
+    expect(nodeProfessions).not.toContain('farming');
+    // Anti-vacuous: the table still carries the three real node professions.
+    expect([...nodeProfessions].sort()).toEqual(['herbalism', 'logging', 'mining']);
+    const farmingTools = Object.entries(ITEMS).filter(
+      ([, item]) => item.use?.type === 'gatherTool' && item.use.professionId === 'farming',
+    );
+    expect(farmingTools).toEqual([]);
+    // Anti-vacuous: the same scan finds the tools of a shipped profession.
+    expect(
+      Object.values(ITEMS).some(
+        (item) => item.use?.type === 'gatherTool' && item.use.professionId === 'mining',
+      ),
+    ).toBe(true);
   });
 });

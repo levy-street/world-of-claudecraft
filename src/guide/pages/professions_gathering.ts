@@ -1,6 +1,9 @@
 // Per-gathering-profession reference page (/wiki/professions/<id>), one module
-// for mining, logging, herbalism, and fishing (the classes-page parameterized
-// precedent). Renders entirely from GUIDE_PROF_* generated data plus guide.*
+// for every gathering trade (the classes-page parameterized precedent). A
+// trade with no shipped tools or nodes yet (farming, until its content
+// phases land) renders only the sections whose data exists; the tools and
+// nodes sections length-guard rather than print prose over an empty table.
+// Renders entirely from GUIDE_PROF_* generated data plus guide.*
 // t() keys; item/vendor names are baked English proper nouns and
 // profession/quality labels localize via their existing catalog keys.
 // TRANSPARENCY POLICY: professions pages publish EXACT
@@ -72,6 +75,11 @@ function toolRow(tool: GuideProfTool): string {
 }
 
 function toolsSection(g: GuideProfGathering): string {
+  // A trade with no tool ladder yet (farming pre-content) must render
+  // NOTHING here: the note interpolates the live gate constants, and prose
+  // about a vendor ladder that does not exist reads as invented content on a
+  // public page.
+  if (!g.tools.length) return '';
   return `<section class="guide-block" id="prof-tools">
       <h2>${esc(t('guide.profPages.toolsHeading'))}</h2>
       ${paras('guide.profPages.toolsNote', {
@@ -103,7 +111,10 @@ function toolsSection(g: GuideProfGathering): string {
 }
 
 function nodesSection(g: GuideProfGathering): string {
-  if (!g.nodes) return '';
+  // Length-guarded, not just presence-guarded: an EMPTY nodes array (farming
+  // pre-content) once rendered "respawns for you 0 seconds" from the
+  // `?? 0` fallback below, a fabricated number on a public page.
+  if (!g.nodes?.length) return '';
   const rows = g.nodes
     .map(
       (n) => `<tr>

@@ -108,8 +108,8 @@ Notes (surprises, deviations, deferrals):
 - DEVIATION, parity: no golden regen commit exists (byte-identical regen, above).
   The growth phase (first nonzero farming proficiency) inherits the full-regen duty;
   state.md records the omit-defaults shield and the event-digest constraint.
-- DEVIATION, commit cadence: six commits instead of five (a review round landed as
-  its own fix(professions) commit; the parity commit does not exist).
+- DEVIATION, commit cadence: six commits instead of five (two review rounds
+  landed as their own fix commits; the parity commit does not exist).
 - DEVIATION, scope pull-in: the Master Gatherer desc and three guide deed bodies
   still enumerated the pre-farming roster while the any-three trigger now counts
   farming. All three reviewers flagged it and the desc's own comment records the
@@ -141,7 +141,20 @@ Notes (surprises, deviations, deferrals):
 - Reviews: architecture 0 blocking (rng/tick/seam/purity explicitly clean),
   cross-platform-sync 0 blocking (three hosts and both worlds verified, RL obs
   shape unchanged), frontend-seam 0 blocking (M16 fills verified line by line,
-  PENDING_ART amendment confirmed self-clearing), qa-checklist recorded below.
+  PENDING_ART amendment confirmed self-clearing). qa-checklist returned NOT
+  READY with two SHOULD-FIXes all three domain reviews missed, both fixed in
+  the second review round: (1) the farming wiki page rendered "respawns for
+  you 0 seconds" (the ?? 0 fallback over an empty nodes array) and the full
+  vendor-ladder prose over an empty tools table; both sections length-guard
+  now, with a render test driving the REAL page on both sides of the guard
+  (data pins are not page pins: that is why three reviews missed it). (2)
+  slotToolEffectRefused accepted farming pairs on the admin restore path
+  (junk-audit-row class); farming is now statically refused like fishing,
+  pinned in the tooltip suite and the admin-restore refused-pairs arm, and
+  the hoe phase lifts the refusal. Also from the QA round: a structural
+  ungainability pin (no farming node type, no farming gatherTool, anti-vacuous
+  both ways), the count guard extended to digit counts, and a verified
+  negative recorded: headless/ and python/ carry zero profession surface.
 
 Would-be PR body (D22 keeps this local): "Registers Farming as the fifth gathering
 profession: the content row (cap 100), append-last id registration, every UI

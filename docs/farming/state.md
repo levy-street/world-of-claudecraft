@@ -272,7 +272,17 @@ each bites the phase that ships the named feature):
   sites guard undefined, lines just drop); `useGatherToolItem` returns a SILENT false
   for farming (`NODE_TYPE_BY_PROFESSION` has no farming row, guard at
   `src/sim/professions/gathering.ts` tool-use path), so the noNodeNearby.farming
-  denial line stays unreachable until the beds phase decides farming's tool-use path.
+  denial line stays unreachable until the beds phase decides farming's tool-use path;
+  and `slotToolEffectRefused` (`src/sim/professions/tools.ts`) statically REFUSES
+  every farming pair (Phase 1 QA finding: without it the admin restore path accepted
+  farming pairs it could never grant); the hoe phase LIFTS that refusal arm and its
+  pins (tool_effect_tooltip and professions_admin_restore suites) when the first
+  farming gatherTool lands. The growth phase also deletes or inverts the structural
+  ungainability pin in tests/professions_gathering.test.ts. The wiki page's tools and
+  nodes sections length-guard (Phase 1 QA finding: an empty nodes array rendered
+  "respawns for you 0 seconds"); the phase that ships farming tools or beds gets those
+  sections back automatically, with the render test in tests/guide.test.ts flipping
+  to demand them.
 - The beds phase: `TIER_REQUIRED_KEYS`, `REQUIRES_TOOL_KEYS`, `NODE_NAME_KEYS` in
   `src/ui/gather_node_tooltip_controller.ts` (hover surface must match the click
   toast); the `gatherDeniedLineKey` comment promise that the beds phase decides which

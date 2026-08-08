@@ -70,6 +70,11 @@ describe('toolEffectTooltipLines: live charms', () => {
     // ever wired for real, this pin drags the landOnly copy along.
     expect(slotToolEffectRefused('fishing', 'gatherers_cache')).toBe(true);
     expect(slotToolEffectRefused('fishing', 'artisans_eye')).toBe(true);
+    // Farming is registered but shipless (no hoe until its tool phase), so
+    // the pair policy refuses it the same static way, ahead of the admin
+    // audit write; the hoe phase lifts the refusal arm and these pins with it.
+    expect(slotToolEffectRefused('farming', 'gatherers_cache')).toBe(true);
+    expect(slotToolEffectRefused('farming', 'artisans_eye')).toBe(true);
   });
 });
 

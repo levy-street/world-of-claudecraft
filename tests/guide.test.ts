@@ -31,6 +31,7 @@ import { controls as controlsPage } from '../src/guide/pages/controls';
 import { catalogSections, deeds as deedsPage } from '../src/guide/pages/deeds';
 import { dungeons as dungeonsPage } from '../src/guide/pages/dungeons';
 import { professions as professionsPage } from '../src/guide/pages/professions';
+import { gatheringDetailHtml } from '../src/guide/pages/professions_gathering';
 import { world as worldPage } from '../src/guide/pages/world';
 import {
   GUIDE_BASE,
@@ -1457,7 +1458,7 @@ describe('Guide professions gathering accuracy', () => {
     ] as const;
     for (const [key, value] of bodies) {
       expect(value.length, key).toBeGreaterThan(0);
-      expect(value, `${key} spells a gathering-trade count`).not.toMatch(/\b(four|five)\b/i);
+      expect(value, `${key} spells a gathering-trade count`).not.toMatch(/\b(four|five|[45])\b/i);
     }
     const gatherHubBody = t('guide.professions.gatherHubBody');
     for (const id of GATHERING_PROFESSION_IDS) {
@@ -1466,6 +1467,33 @@ describe('Guide professions gathering accuracy', () => {
     }
     // Literal, so the loop above cannot pass vacuously on an empty id list.
     expect(gatherHubBody).toContain('Farming');
+  });
+
+  // The farming page once rendered "respawns for you 0 seconds" (the `?? 0`
+  // fallback over an empty nodes array) and the full vendor-ladder prose over
+  // an empty tools table: invented content on a public page that three data
+  // pins and a full gate never saw, because data pins are not page pins. This
+  // drives the REAL page render on both sides of the length guard.
+  it('renders a tableless trade without tool or node prose, and a full trade with both', () => {
+    setLanguage('en');
+    const farming = GUIDE_PROF_GATHERING.find((g) => g.id === 'farming');
+    expect(farming).toBeDefined();
+    const html = gatheringDetailHtml(farming as (typeof GUIDE_PROF_GATHERING)[number]);
+    expect(html, 'tools prose must not render for a toolless trade').not.toContain(
+      'id="prof-tools"',
+    );
+    expect(html, 'nodes prose must not render for a nodeless trade').not.toContain(
+      'id="prof-nodes"',
+    );
+    expect(html).toContain('id="prof-rhythm"');
+    const mining = GUIDE_PROF_GATHERING.find((g) => g.id === 'mining');
+    const miningHtml = gatheringDetailHtml(mining as (typeof GUIDE_PROF_GATHERING)[number]);
+    expect(miningHtml, 'the guard is length-based: a full trade keeps tools').toContain(
+      'id="prof-tools"',
+    );
+    expect(miningHtml, 'the guard is length-based: a full trade keeps nodes').toContain(
+      'id="prof-nodes"',
+    );
   });
 
   // Master Gatherer's trigger counts every registered trade (src/sim/deeds.ts
