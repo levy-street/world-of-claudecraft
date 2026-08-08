@@ -13,7 +13,7 @@ function orbs(fx: FrozenOrbFx): OrbInternals[] {
   return (fx as unknown as { orbs: OrbInternals[] }).orbs;
 }
 
-describe('Frozen Orb visual', () => {
+describe('Frostglobe visual', () => {
   it("reuses a released orb's materials for the next spawn and resets its faded opacity", () => {
     const scene = new THREE.Scene();
     const fx = new FrozenOrbFx(scene, () => 0);

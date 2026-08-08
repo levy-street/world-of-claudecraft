@@ -1219,20 +1219,20 @@ export const VISUALS: Record<string, VisualDef> = {
       // issue #2889): the shaman had zero attackByAbility overrides across
       // its kit, so every spell played the same melee chop/slice. Mapped by
       // school (src/sim/content/classes.ts): Cast_Bolt is the class's
-      // signature nature bolt (its longest cast, 1.5 to 3.0s); Earth/Flame/
-      // Frost Shock are all instant (0s cast) and differ only in damage
+      // signature nature bolt (its longest cast, 1.5 to 3.0s); Earthen/
+      // Cinder/Rime Jolt are all instant (0s cast) and differ only in damage
       // school, so they share Cast_Shock's snappy point-and-release;
-      // Healing Wave and the Restoration signature Chain Heal share
+      // Mending Waters and the Spiritcall signature Chain Heal share
       // Cast_Heal's sustained mending channel instead of a sharp release;
       // Earthquake borrows the two-hand chop's committed downswing energy
       // for Cast_Quake, the same "slam and radiate outward" read the mage's
-      // Cast_Nova makes; Stormstrike (physical) gets its own charged
-      // diagonal slice, Storm_Strike. The weapon imbues (Rockbiter,
-      // Flametongue, Frostbrand) and the short self buffs (Ghost Wolf,
-      // Elemental Mastery) have no swing to author, so they read fine on the
+      // Cast_Nova makes; Ancestral Strike (physical) gets its own charged
+      // diagonal slice, Storm_Strike. The weapon imbues (Stonebound,
+      // Pyrebrand, Rimebound Weapon) and the short self buffs (Shadewolf,
+      // Primal Mastery) have no swing to author, so they read fine on the
       // rig's existing Spellcast_Raise gesture, the same no-bake call the
-      // priest's renew and the warlock's sanguine_aura make; Lightning
-      // Shield reads as a defensive ward instead, so it reuses Block, the
+      // priest's renew and the warlock's sanguine_aura make; Thunder
+      // Ward reads as a defensive ward instead, so it reuses Block, the
       // same call the warrior's raised_guard makes. This covers every
       // ability tagged class: 'shaman' in classes.ts.
       attackByAbility: {
@@ -2147,10 +2147,7 @@ export const VISUALS: Record<string, VisualDef> = {
     // Treant_Attack clip donor (scripts/build_treant_anims.mjs): mesh-free,
     // baked off this same rig's own poses. Loads alongside the yeti's
     // hit-variety donor GLB; both are mesh-free so their clips just merge in.
-    animUrls: [
-      `${CREATURES}/yeti_hit_variety_anims.glb`,
-      `${CREATURES}/treant_ability_anims.glb`,
-    ],
+    animUrls: [`${CREATURES}/yeti_hit_variety_anims.glb`, `${CREATURES}/treant_ability_anims.glb`],
     tint: 'entity',
     tintStrength: 0.72, // the white pelt needs a heavy wash to read as moss
   },
