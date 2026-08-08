@@ -6,7 +6,7 @@
 | 01 QA | verify | complete | 2026-08-07 | 2026-08-07 |
 | 02 | Pattern items and recipe learning | complete | 2026-08-07 | 2026-08-07 |
 | 02 QA | verify | complete | 2026-08-07 | 2026-08-07 |
-| 03 | IP naming sweep | pending | | |
+| 03 | IP naming sweep | complete | 2026-08-07 | 2026-08-07 |
 | 03 QA | verify | pending | | |
 | 04 | Materials backbone | pending | | |
 | 04 QA | verify | pending | | |
@@ -118,3 +118,13 @@ never future-PR items, per the delivery contract in `state.md`).
   world_api_parity, hud_perf_budget, weapon_type_tooltip, i18n_completeness, parity,
   ci:changed (single-file reruns where local contention timed out; no assertion
   failures anywhere).
+
+- Phase 03 (IP naming sweep): 2605 unique shipped proper nouns web-verified (20-agent
+  workflow + adversarial verify + 4 hunters); 52 display strings renamed (ids frozen),
+  15 maintainer borderlines recorded, 92 flagged-kept; registry confirmed with one
+  amendment (Prismglass Setting). Deliverables: naming-audit.md (per-name verdicts +
+  evidence), the residual-locale coin strip (91 rows, commit 6e93deadc1), non-Latin
+  refills + 720 Latin strips per the rename protocol, NAME-MAP amendment + ip_scrub
+  arming + originality pins, parity re-mint proven by the slice-scoped rename state
+  proof, wiki regenerated, and the standing authoring-time IP check codified in the
+  root and src/sim/content CLAUDE.md files. Full ledger in state.md.

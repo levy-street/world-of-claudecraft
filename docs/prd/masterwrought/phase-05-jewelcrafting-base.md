@@ -61,7 +61,7 @@ invented balance numbers; data-as-code is exempt from module-first but any new L
 (station machinery) is its own module; new item ids append-only against the frozen-id
 golden; English-only catalog keys; wiki regenerated, never hand-edited.
 
-Out of scope: apex jewelry (phase 09); the Prismstone Setting intermediate (phase 07);
+Out of scope: apex jewelry (phase 09); the Prismglass Setting intermediate (phase 07);
 anything above skill 50; the inscription station decision (phase 06 records its own).
 
 STEP 3 - VALIDATION + REVIEW (matrix in state.md, content-only row):

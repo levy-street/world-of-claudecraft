@@ -57,7 +57,7 @@ cliff), which is WHY Perfecting is a new module and `masterwork.ts` is untouched
 
 ## The catalog (summary; authored in phases 05 to 10)
 Every profession: one intermediate (skill 75), three apex products (100), one capstone
-role (125). Gear crafts make cap-pool pieces and Perfect them; jewelcrafting's Prismstone
+role (125). Gear crafts make cap-pool pieces and Perfect them; jewelcrafting's Prismglass
 Setting is consumed by every Perfecting attempt; inscription's Deed of Making names every
 orange; enchanting finishes everyone's gear (Lucent line) and Perfected pieces (Lucent
 Infusion); alchemy's Quickening Catalyst is the daily time gate under every intermediate,

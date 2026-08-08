@@ -1,6 +1,6 @@
 # Masterwrought: cross-phase state
 
-Current phase: 02 COMPLETE including QA (PASS, fix round 6175c95836, 2026-08-07); next is phase 03 (IP naming sweep, phase-03-naming-sweep.md). Packet authored 2026-08-07.
+Current phase: 03 COMPLETE (IP naming sweep, 2026-08-07; audit + 52 display renames, see the Phase 03 ledger and naming-audit.md); next is phase 03 QA (phase-03-qa.md). Packet authored 2026-08-07.
 Branch: `feature/masterwrought` (worktree `~/Documents/wocc-masterwrought`), based on `origin/release/v0.36.0`.
 
 ## Delivery contract (non-negotiable)
@@ -18,8 +18,8 @@ Branch: `feature/masterwrought` (worktree `~/Documents/wocc-masterwrought`), bas
 
 ## Locked design rulings (settled with the maintainer 2026-08-07; do not re-litigate)
 1. R1 The above-raid step is the PERFECTING STAGE (fork B): a deliberate upgrade performed
-   on an existing apex piece, consuming 1 Maker's Ember + Sundered Essence + 1 Prismstone
-   Setting per attempt. It BINDS the piece, is fail-forward only (failure consumes
+   on an existing apex piece, consuming 1 Maker's Ember + Sundered Essence + 1 Prismglass
+   Setting per attempt (registry name amended by the Phase 03 audit; same material). It BINDS the piece, is fail-forward only (failure consumes
    materials, never harms or downgrades the piece), and the existing craft-time masterwork
    proc on an apex craft grants a head start on the stage instead of a quality bump.
    `src/sim/professions/masterwork.ts` and its locked constants are NOT modified.
@@ -74,16 +74,22 @@ Branch: `feature/masterwrought` (worktree `~/Documents/wocc-masterwrought`), bas
   heroic-vendor equivalent in tests. This is the throttle-proof surface; treat it as
   budgeted even though the formula does not.
 
-## Naming registry (provisional until each phase's web verification)
+## Naming registry (web-verified by the Phase 03 audit, 2026-08-07)
 Cap tag: "Unique-Equipped: Masterwrought (2)". Stage: "Perfecting".
 Shared items: Wyrmfall Core (tradable making-core), Sundered Essence (bound, from breaking
 down any raid epic of the tier), Maker's Ember (keystone), Apex Patterns (recipe items).
 Per profession: Duskforged Billet / Forgefold Plating / Wyrmhide Cording / Sunspun Bolt /
-Prismstone Setting / Precision Chassis / Quickening Catalyst / Seasoned Stock / Lucent
+Prismglass Setting / Precision Chassis / Quickening Catalyst / Seasoned Stock / Lucent
 Reagent (intermediates); Ridgebreaker (2H), Gyrelens Array (gadget), Master's Field Forge,
 Voidbound Grimoire, Grand Cauldron, The Laden Hearth (feast), Deed of Making (codex),
 Lucent Infusion (Perfected-only enchant). Rejected for collisions: Vanquisher, Radiant,
 Arcanite (new uses), Quintessent, Grand Banquet, Colossus Splitter, Aetherlens, Apex (tag).
+Phase 03 amendments: Prismstone Setting RENAMED to Prismglass Setting (FFXIV ships a real
+'Prismstone' crafting material in the same component role, plus WoW's Prismstone Ring;
+Prismglass verified zero-hit). Wyrmhide Cording and Sunspun Bolt KEPT with recorded
+caveats (Wyrmhide is a D2 armor base and a WoW arena-set family, cross-franchise material
+vocabulary; Sunspun's only use is FFXIV's cash-shop Sunspun Cumulus mount); all other
+registry names verified CLEAR or GENERIC. Full verdicts: naming-audit.md.
 
 ## Validation matrix (per change type)
 - sim-only: `npx tsc --noEmit` + affected `npx vitest run tests/<file>.ts` +
@@ -362,3 +368,71 @@ Arcanite (new uses), Quintessent, Grand Banquet, Colossus Splitter, Aetherlens, 
   blocker (ITEM_IMAGE_IDS auto-enters every non-weapon id and ITEM_ART_PENDING is
   deliberately empty, so a shipped pattern with no art 404s and reds item_icons; the
   procedural parchment arm serves only ids parked in ITEM_ART_PENDING).
+
+## Phase 03 ledger (IP naming sweep; audited and renamed 2026-08-07)
+- Scope executed per phase-03-naming-sweep.md: 2846 name rows / 2605 unique shipped
+  proper nouns enumerated programmatically (33 domains) and web-verified by a 20-agent
+  ultracode workflow (19 shards + the registry) against the WoW/RuneScape/FFXIV/GW2/ESO/
+  Diablo/PoE wikis, then an adversarial verify pass (two lenses per flagged name) and 4
+  hunter re-sweeps of the CLEAR set. Final dispositions: 52 RENAMED display strings, 15
+  maintainer borderlines (recorded, not renamed), 92 flagged-kept, 290 CLEAR, 2157
+  GENERIC. Every verdict, with evidence and the applied bar, is in naming-audit.md (the
+  acceptance deliverable); replacement names were themselves web-verified (8 first
+  candidates were taken; verified alternates adopted).
+- The rename protocol per rename: content def + English catalog moved together;
+  sim_i18n matcher rows in the same change (the Vandric dialogue RULES regex + the
+  Wintergnaw aura rows; single-line emits preserved); the 5 non-Latin overlays refreshed
+  with REAL translations of the new name (several old rows were the other game's
+  OFFICIAL localized coins: zh 十字军打击/迅捷治愈/神圣新星/乘胜追击, ko 성전사의
+  일격/신성 충격/폭풍 망치/마법 훔치기, ru Ледяные жилы); stale Latin overlay rows
+  stripped to pending (720 rows) for the release fill; semantically-still-valid
+  non-Latin renderings deliberately KEPT (87 rows: zh 绞湖镇/古辉镇/霜鬃/雾铸/墓花 etc.,
+  recorded as intentional); guide regenerated; new literals pinned in
+  tests/originality_renames.test.ts ("phase 03" describe); old names armed in
+  tests/ip_scrub.test.ts HARDCODED_VERBATIM + a NAME-MAP amendment section (36 rows).
+- Parity: 5 goldens legitimately shifted (frost_proc_orb, warlock_pet, pet_commands,
+  talents_progression, warrior_row_capstones); re-minted via UPDATE_PARITY=1 and proven
+  display-only by the rename state proof with the NEW slice-scoping mode
+  (RENAME_PROOF_SECTION="MASTERWROUGHT PHASE 03"; the proof harness previously reversed
+  the WHOLE locked map + C2 pet ids, which only works for the original pivot wave; the
+  scoping change is documented in tests/parity/rename_state_proof.test.ts). The golden
+  token inspector passes with 0 violations under --allow-state-hashes (proof-gated).
+- Residual-coin strip (pre-rename commit 6e93deadc1): the v0.29.0-era locale fills had
+  reintroduced 91 collision-carrying overlay rows across 11 Latin locales after the
+  c55bf057c2 rename (de_DE Arkanit/Silberblatt/Thoriumerz officials; fused
+  Arkanit/Arcanite/Arcanita loanwords; it_IT Fogliaargento/Polvere Arcana; 17 collision
+  prose rows); stripped to pending.
+- RELEASE-FILL OBLIGATIONS recorded for the i18n-locale-fill pass: (1) the 720 Latin
+  rows this phase stripped (they list under pending); (2) the 219 stale-calque item rows
+  + 23 calque prose rows from the OLD rename wave (translations of pre-rename names, no
+  foreign coin; per-locale list in the residual audit, tr/vi/cs/da/nl/pl/sv/id/it/fr/es
+  worst); (3) talent_i18n Latin values for the four renamed rows (Victor's Surge,
+  Thunderhurl, Zealwing, Spiritcall) carried over as closest-translations, REVIEW at
+  fill; (4) deed_i18n Latin rows stripped for the 5 touched deeds (64 rows); (5) the
+  ru_RU chr_nightbloom_first_cast DESC row is pre-existing romanized junk ("Poymay
+  rybu..."), name row fixed here, desc left for the fill; (6) sv_SE split-vintage rows
+  and the register-clash trio (de/pl/tr) remain from earlier ledgers.
+- Maintainer borderlines recorded in naming-audit.md (stopping rule, no unilateral
+  rename): the zones The Amberfall / The Frostveil Reach / The Nightbloom, the Galecrest
+  zone family (verifiers confirmed Stonemaier's Libertalia: Winds of Galecrest coined
+  the word), the Highwatch town family (refuted as TERA-distinctive), the Voidscar zone
+  family (WoW Midnight's Voidscar Arena is contemporaneous; ours shipped 2026-07-07),
+  Moonrest, the 'Enchant <Slot> - <Stat>' formula scheme (verbatim WoW formula names;
+  scheme-wide convention call), and the timing-parallel coins Brutok / Brother Halven /
+  Aetherwell / Gravelight / Emberkin.
+- Known intentional keeps that will look like misses to a future auditor: Chain Heal,
+  Blazing Barrier, Ice Lance, Fingers of Frost, Bladestorm, Barrow Wight (1869
+  folklore), Hat Trick Hero, Anger Management and the other idiom/multi-property rows in
+  naming-audit.md "Notable keeps"; do not re-raise without NEW evidence.
+- Standing rule codified per the maintainer's mid-phase instruction: every NEW
+  player-visible proper noun is IP-checked at authoring time in the same change (root
+  CLAUDE.md content bullet + src/sim/content/CLAUDE.md "Naming originality" section).
+- Traps hit this phase, on record: the locale transformer is NOT idempotent (a second
+  pass re-strips Latin rows it already swapped; recovered by resetting locale files to
+  HEAD and running ONE fresh pass); ability display names live at ids that do not match
+  (vanish='Smokefade', counterspell='Spellsever', blink='Flitstep', avenging_wrath=
+  'Zealwing', ice_barrier='Frostveil'); the mediawiki seed (mediawiki/seed/pages.xml)
+  has NO freshness gate and now carries pre-rename names (staleness predates this phase
+  for the c55bf057c2 wave; regen is `npm run wiki:seed`, deferred with the phase 11
+  build_seed.mjs obligation); sim_i18n.ts:8240's 'Venomfire Vigor' legacy alias ("drop
+  after v0.29.0") is overdue dead code, left for a cleanup phase.

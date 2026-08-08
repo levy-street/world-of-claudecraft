@@ -44,7 +44,7 @@ where craft refusal text emits today.
 
 STEP 2 - EXECUTE (ultracode Workflow; fan out explicitly by vertical slice):
 Resolve BEFORE fan-out: the profession-to-intermediate mapping. The registry names
-Duskforged Billet, Forgefold Plating, Wyrmhide Cording, Sunspun Bolt, Prismstone
+Duskforged Billet, Forgefold Plating, Wyrmhide Cording, Sunspun Bolt, Prismglass
 Setting, Precision Chassis, Seasoned Stock, Lucent Reagent; the Quickening Catalyst IS
 alchemy's 75 rung; inscription's intermediate has no registry name yet. Author the
 missing name, web-verify every new proper noun per R15, and record the full ten-row

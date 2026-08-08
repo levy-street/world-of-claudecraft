@@ -10,7 +10,7 @@ against exactly what it ships.
 Model: xhigh effort. Harness: Claude Code. Worktree: ~/Documents/wocc-masterwrought
 (branch feature/masterwrought). ULTRACODE: not needed for this phase.
 
-Goal: a wearer pays 1 Maker's Ember + Sundered Essence + 1 Prismstone Setting per
+Goal: a wearer pays 1 Maker's Ember + Sundered Essence + 1 Prismglass Setting per
 attempt to walk an apex piece up a rank track to Perfected (R1), binding the piece the
 moment Perfecting begins (R2), fail-forward only, with bonus stats worth exactly the
 R5-safe delta, in both hosts, persisted, with a parity scenario.
@@ -33,7 +33,7 @@ STEP 1 - LOAD CONTEXT (Explore agent; do not read planning docs in the main loop
 - docs/prd/masterwrought/state.md (R1, R2, R5, R13; the Power placement numbers; Key
   seams: masterwork, commission boundTo, ItemInstancePayload)
 - docs/prd/masterwrought/progress.md (Phase 12 row; the phase 01/04/07 ledger entries:
-  cap machinery, Maker's Ember accrual, Prismstone Setting)
+  cap machinery, Maker's Ember accrual, Prismglass Setting)
 - src/sim/sim_context.ts, src/sim/professions/masterwork.ts (READ ONLY: locked, NOT
   modified this phase, R1), src/sim/professions/crafting.ts (the masterwork proc site
   and its single rng draw per successful craft), src/sim/professions/commission.ts
@@ -51,7 +51,7 @@ Agent 1 (sim module + tests):
 - New module src/sim/professions/perfecting.ts behind SimContext; masterwork.ts and its
   locked constants stay untouched (R1). Eligibility: an apex (masterwrought-flagged)
   piece, crafter skill 125 in the craft that made it (R13), the wearer supplies the
-  materials. Per-attempt consume: 1 Maker's Ember + Sundered Essence + 1 Prismstone
+  materials. Per-attempt consume: 1 Maker's Ember + Sundered Essence + 1 Prismglass
   Setting. A rank track up to Perfected: decide the rank/attempt counts and record them
   in state.md. Fail-forward ONLY: failure consumes materials and never harms or
   downgrades the piece (R1). The piece binds on the FIRST attempt via the Maker's Bond

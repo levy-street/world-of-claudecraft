@@ -165,6 +165,29 @@ guard `tests/localization_fixes.test.ts` enforces it):
   (e.g. "15% harder") are part of the copy; don't hand-build money/number strings as
   gameplay data: the engine formats those for display.
 
+## Naming originality (the IP rule): verify BEFORE a name ships
+Every new player-visible proper noun authored in this directory (item, material,
+recipe output, mob, NPC name or title, quest name, zone, POI label, graveyard label,
+dungeon, delve, ability, talent/spec/mastery name, choice-row option, deed name or
+title, enchant, mount, weapon skin, augment, rift theme noun) is checked for
+collisions with other games in the SAME change that adds it, never retroactively:
+- **The bar:** never reuse a coined term (an invented token: "Arcanite",
+  "Eldershine", "Gloamkin") or a full name distinctive to another game or franchise
+  in the same role ("Fleetmend" as a heal, "Tombpetal" as armor). Generic words and
+  shared fantasy English never count ("Iron Sword", "Fireball"); a term used across
+  many unrelated properties is shared vocabulary, not a collision.
+- **The check:** for any coined-looking token or distinctive multi-word name, run a
+  quoted exact-phrase web search plus a coined-token search against the major game
+  wikis (WoW, RuneScape, FFXIV, GW2, ESO, Diablo, PoE at minimum). Record borderline
+  verdicts in the PR so the reviewer sees the call.
+- **If a shipped name collides anyway:** the rename is DISPLAY-ONLY (ids are frozen
+  and never change). The English moves in the content def and the i18n catalog
+  together, sim_i18n matcher rows update in the same change (S3 guard), the five
+  non-Latin overlays get real fills of the new name (M16), stale Latin overlay rows
+  strip to pending for the release fill, guide content is regenerated, and the new
+  literal gets a pin in `tests/originality_renames.test.ts`. The audited catalog of
+  every shipped name and the worked protocol: `docs/prd/masterwrought/naming-audit.md`.
+
 ## This data also feeds the public Guide/wiki
 The Guide at `/wiki` (`src/guide/`) is generated from THIS directory, so player-facing
 content you add here should reach it in the same change:

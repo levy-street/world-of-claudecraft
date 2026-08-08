@@ -201,7 +201,7 @@ Goal: the skill-75 rung for all ten professions.
 
 Deliverables:
 - One intermediate per profession (naming registry in `state.md`): Duskforged Billet,
-  Forgefold Plating, Wyrmhide Cording, Sunspun Bolt, Prismstone Setting, Precision
+  Forgefold Plating, Wyrmhide Cording, Sunspun Bolt, Prismglass Setting, Precision
   Chassis, Seasoned Stock, Lucent Reagent, plus cooking/alchemy inputs; each consumes
   gathered mats + 1 Quickening Catalyst; each is consumed by that profession's apex
   recipes (every material has a consumer, per `docs/design/professions.md`).
@@ -294,7 +294,7 @@ Deliverables:
 - New sim module `src/sim/professions/perfecting.ts` behind `SimContext` (masterwork.ts
   untouched): eligibility (apex piece, crafter skill 125 in the making craft, wearer
   supplies materials), per-attempt consume (1 Maker's Ember + Sundered Essence + 1
-  Prismstone Setting), a rank track to Perfected (counts recorded in `state.md`),
+  Prismglass Setting), a rank track to Perfected (counts recorded in `state.md`),
   fail-forward only, binds the piece on the first attempt (Maker's Bond `boundTo` reuse),
   bonus stats via `rolled.stats` at the R5 delta, masterwork-proc head start hook.
 - `IWorld` facet members for the flow (read state + command), both hosts, wire fields,
