@@ -4802,6 +4802,15 @@ const PROFESSION_RECIPES: Record<string, IconRecipe> = {
     ['sparkle'],
   ),
   gather_fishing: r('drink', 'sky', [{ p: 'fish' }], ['glow']),
+  // Farming, the fifth gathering skill: a seed sack faded into tilled-earth
+  // ground behind a crisp sprout, the tailoring/enchanting backdrop idiom. Read
+  // deliberately apart from herbalism, whose twin wild leaves sit on a nature
+  // ground: farming is the CULTIVATED skill, so the soil and the sack carry the
+  // silhouette and the foliage is only the payoff on top.
+  gather_farming: r('earth', 'leafGreen', [
+    { p: 'sack', ...BIG, pal: 'earthBrown' },
+    { p: 'leaf' },
+  ]),
 };
 
 /** True when `id` has an explicit profession recipe, as opposed to falling

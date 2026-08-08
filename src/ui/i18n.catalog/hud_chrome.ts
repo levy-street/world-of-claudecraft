@@ -3093,6 +3093,7 @@ export const hudChromeStrings = {
     logging: 'Logging',
     herbalism: 'Herbalism',
     fishing: 'Fishing',
+    farming: 'Farming',
     // #1866: click/tap/interact-key error when a targeted node's per-viewer
     // respawn timer has not elapsed yet (IWorldProfessions#nodeHarvestableByMe).
     notReady: 'This resource node has not respawned for you yet.',
@@ -3178,6 +3179,7 @@ export const hudChromeStrings = {
       logging: 'You need a tier {tier} logging axe to fell this stand.',
       herbalism: 'You need a tier {tier} herbalism sickle to gather this patch.',
       fishing: 'You need a tier {tier} fishing rod to fish these waters.',
+      farming: 'You need a tier {tier} farming hoe to work this bed.',
     },
     // gatherDenied error toast for requiredTier 1 (#2343): the player owns no
     // matching tool at all, so no tier number is named. The fishing arm is
@@ -3187,13 +3189,18 @@ export const hudChromeStrings = {
       logging: 'You need a logging axe to fell this stand.',
       herbalism: 'You need a herbalism sickle to gather this patch.',
       fishing: 'You need a fishing pole to cast a line.',
+      farming: 'You need a farming hoe to work this bed.',
     },
     // gatherToolNoNode error toast (#2343): the player used a gathering tool
     // from the bags with no matching resource node within interact range.
+    // Node professions only, so fishing has no arm here (a rod routes to
+    // startFishing and never emits the event); farming does, because a crop
+    // bed is a world node like a vein, a stand, or a patch.
     noNodeNearby: {
       mining: 'There is no ore vein within reach.',
       logging: 'There is no timber stand within reach.',
       herbalism: 'There is no herb patch within reach.',
+      farming: 'There is no crop bed within reach.',
     },
     // gatherDenied error toast, the R22 wield arm: a covering tool IS in the
     // bags and only its proficiency requirement is short, so the line names
@@ -3204,6 +3211,7 @@ export const hudChromeStrings = {
       mining: 'You need Mining {skill} to swing the pick already in your bags.',
       logging: 'You need Logging {skill} to swing the axe already in your bags.',
       herbalism: 'You need Herbalism {skill} to work the sickle already in your bags.',
+      farming: 'You need Farming {skill} to swing the hoe already in your bags.',
     },
     // The corpse flavor of the wield arm: profession-neutral like its
     // tier-based sibling below.
@@ -3222,6 +3230,7 @@ export const hudChromeStrings = {
         logging: 'Logging tool (tier {tier})',
         herbalism: 'Herbalism tool (tier {tier})',
         fishing: 'Fishing rod (tier {tier})',
+        farming: 'Farming tool (tier {tier})',
       },
       unlocks: {
         mining: 'Required to mine ore veins up to tier {tier}.',

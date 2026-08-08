@@ -2602,6 +2602,7 @@ export const id_ID: EnTranslations = {
       "logging": "Penebangan",
       "herbalism": "Herbalisme",
       "fishing": "Memancing",
+      "farming": "Farming",
       "notReady": "Simpul sumber daya ini belum muncul kembali untukmu.",
       "gatherLine": "Anda mengumpulkan: {name}.",
       "gatherLineQty": "Anda mengumpulkan: {name} x{qty}.",
@@ -2631,23 +2632,27 @@ export const id_ID: EnTranslations = {
         "mining": "Kamu membutuhkan beliung pertambangan tingkat {tier} untuk memanen urat ini.",
         "logging": "Kamu membutuhkan kapak penebangan tingkat {tier} untuk menebang rumpun ini.",
         "herbalism": "Kamu membutuhkan arit herbalisme tingkat {tier} untuk mengumpulkan petak ini.",
-        "fishing": "Kamu membutuhkan joran pancing tingkat {tier} untuk memancing di perairan ini."
+        "fishing": "Kamu membutuhkan joran pancing tingkat {tier} untuk memancing di perairan ini.",
+        "farming": "You need a tier {tier} farming hoe to work this bed."
       },
       "toolRequired": {
         "mining": "Kamu membutuhkan beliung penambangan untuk menambang urat ini.",
         "logging": "Kamu membutuhkan kapak penebangan untuk menebang tegakan ini.",
         "herbalism": "Kamu membutuhkan sabit herbalisme untuk mengumpulkan petak ini.",
-        "fishing": "Kamu membutuhkan joran pancing untuk melempar kail."
+        "fishing": "Kamu membutuhkan joran pancing untuk melempar kail.",
+        "farming": "You need a farming hoe to work this bed."
       },
       "noNodeNearby": {
         "mining": "Tidak ada urat bijih dalam jangkauan.",
         "logging": "Tidak ada tegakan pohon dalam jangkauan.",
-        "herbalism": "Tidak ada petak herba dalam jangkauan."
+        "herbalism": "Tidak ada petak herba dalam jangkauan.",
+        "farming": "There is no crop bed within reach."
       },
       "wieldUnmet": {
         "mining": "Kamu membutuhkan Penambangan {skill} untuk mengayunkan beliung yang sudah ada di tasmu.",
         "logging": "Kamu membutuhkan Penebangan {skill} untuk mengayunkan kapak yang sudah ada di tasmu.",
-        "herbalism": "Kamu membutuhkan Herbalisme {skill} untuk memakai sabit yang sudah ada di tasmu."
+        "herbalism": "Kamu membutuhkan Herbalisme {skill} untuk memakai sabit yang sudah ada di tasmu.",
+        "farming": "You need Farming {skill} to swing the hoe already in your bags."
       },
       "wieldUnmetCorpse": "Kamu membutuhkan keahlian pengumpulan {skill} untuk memakai alat terbaikmu.",
       "toolTierUnmetCorpse": "Kamu membutuhkan alat pengumpul tingkat {tier} untuk mendapatkan bahan terbaik.",
@@ -2656,7 +2661,8 @@ export const id_ID: EnTranslations = {
           "mining": "Alat penambangan (tingkat {tier})",
           "logging": "Alat penebangan (tingkat {tier})",
           "herbalism": "Alat herbalisme (tingkat {tier})",
-          "fishing": "Joran pancing (tingkat {tier})"
+          "fishing": "Joran pancing (tingkat {tier})",
+          "farming": "Farming tool (tier {tier})"
         },
         "unlocks": {
           "mining": "Diperlukan untuk menambang urat bijih hingga tingkat {tier}.",
@@ -4603,7 +4609,8 @@ export const id_ID: EnTranslations = {
         "mining": "Penambangan menarik bijih langsung dari batuan dunia: tembaga di Lembah Eastbrook, besi di Rawa Mirefen, dan osmium di ketinggian Dataran Tinggi Thornpeak, dengan urat pemula tersebar di setiap zona yang lebih muda di luarnya, memberi makan kerajinan tempa. Terbuka untuk semua orang sejak level 1: beliung penambangan seharga 20 tembaga dari konter Eastbrook, Fenbridge, atau Highwatch membuka setiap urat pemula, dan anak tangga beliung yang lebih tinggi terbangun saat penghitungmu sendiri meraihnya. Dilacak pada penghitungnya sendiri hingga batas 100.",
         "logging": "Penebangan menumbangkan kayu dari rumpun pohon di seluruh dunia: ironbark di Lembah Eastbrook, ashwood di Rawa Mirefen, highpine di Dataran Tinggi Thornpeak, dan rumpun pemula di setiap zona yang lebih muda, bahan mentah untuk gagang, staf, dan bangku sang insinyur. Terbuka untuk semua orang sejak level 1 dengan kapak penebangan di tasmu (20 tembaga di konter Eastbrook, Fenbridge, dan Highwatch), dilacak pada penghitungnya sendiri hingga batas 100.",
         "herbalism": "Herbalisme mengumpulkan apa yang tumbuh liar: sheenleaf di Lembah Eastbrook, goldleaf di Rawa Mirefen, sunpetal di Dataran Tinggi Thornpeak, dan petak pemula di setiap zona yang lebih muda, daun dan batang yang membuat perdagangan apoteker terus menyeduh. Terbuka untuk semua orang sejak level 1 dengan sabit herbalisme di tasmu (20 tembaga di konter Eastbrook, Fenbridge, dan Highwatch), dilacak pada penghitungnya sendiri hingga batas 100.",
-        "fishing": "Memancing adalah yang paling berbeda di antara perdagangan pengumpulan, sekaligus yang paling dalam: minigame gigit-dan-tarik yang sungguhan, tabel tangkapan tersendiri di masing-masing tiga zona tanah inti (perairan muda di luar itu semuanya menyajikan tabel Lembah untuk saat ini), dan batas kecakapan 200, dua kali lipat yang lain. Beli joran, hadapi air terbuka, dan lemparkan kailmu."
+        "fishing": "Memancing adalah yang paling berbeda di antara perdagangan pengumpulan, sekaligus yang paling dalam: minigame gigit-dan-tarik yang sungguhan, tabel tangkapan tersendiri di masing-masing tiga zona tanah inti (perairan muda di luar itu semuanya menyajikan tabel Lembah untuk saat ini), dan batas kecakapan 200, dua kali lipat yang lain. Beli joran, hadapi air terbuka, dan lemparkan kailmu.",
+        "farming": "Farming is the one gathering trade you tend rather than take: crops raised from seed in worked beds, then pulled up ripe for the kitchens and the apothecary benches. Its beds, seeds, and tools arrive in a later patch, so the tables below stand empty for now. That is deliberate rather than an oversight: the trade holds its seat on the gathering counter, tracked to a cap of 100, and fills in as its content lands."
       },
       "rhythmHeading": "Ritme pengumpulan",
       "rhythmBody": "Panen adalah rapal singkat yang terlihat, bukan comotan instan: {base} detik dasar, tidak pernah di bawah lantai {floor} detik. Membawa alat di atas tingkat simpul, yang kecakapanmu izinkan untuk kamu gunakan, mempercepatmu {tool} detik per tingkat di atasnya, dan setiap band kecakapan yang kamu lewati memangkas {band} detik lagi; sekadar menyamai tingkat simpul hanya membuatmu masuk pintu, tingkat-tingkat di atasnyalah yang membuatmu cepat.\n\nTas yang penuh menolak rapal itu dengan sopan sebelum dimulai, sehingga tidak ada yang terbuang di tengah ayunan, dan setiap panen membayar sepotong kecil XP karakter, diskalakan berdasarkan level simpul terhadap levelmu sendiri seperti XP dari membunuh: simpul abu-abu yang remeh tidak mengajarkan apa pun kepada karakter yang sudah mentok.",
@@ -4634,7 +4641,8 @@ export const id_ID: EnTranslations = {
         "mining": "Simpul pertamamu dari perdagangan mana pun meraih jasa Buah dari Ladang, dan batas 100 dalam Penambangan mengukir jasa Bijih dalam Darah. Mencapai 100 dalam tiga dari Penambangan, Penebangan, Herbalisme, dan Memancing menambahkan jasa Pengumpul Mahir di 25 Kemasyhuran, dan memecahkan urat bijih pilihan mencatat tanda kolektor tersendiri. Tidak satu pun dari ini memberikan kekuatan: jasa adalah gelar dan Kemasyhuran, catatan jalan yang telah kamu lalui.",
         "logging": "Simpul pertamamu dari perdagangan mana pun meraih jasa Buah dari Ladang, dan batas 100 dalam Penebangan mengukir Penebang Kayu Inti. Mencapai 100 dalam tiga dari Penambangan, Penebangan, Herbalisme, dan Memancing menambahkan jasa Pengumpul Mahir di 25 Kemasyhuran, dan satu pukulan pada kayu inti kuno mencatat tanda kolektor tersendiri. Jasa adalah gelar dan Kemasyhuran saja, tidak pernah memberikan kekuatan.",
         "herbalism": "Simpul pertamamu dari perdagangan mana pun meraih jasa Buah dari Ladang, dan batas 100 dalam Herbalisme mengukir Penguasa Padang. Mencapai 100 dalam tiga dari Penambangan, Penebangan, Herbalisme, dan Memancing menambahkan jasa Pengumpul Mahir di 25 Kemasyhuran, dan mekar yang bersinar di bawah sinar bulan mencatat tanda kolektor tersendiri. Jasa adalah gelar dan Kemasyhuran saja, tidak pernah memberikan kekuatan.",
-        "fishing": "Tonggak 100 mengukir Garam Tua dan 200 mengukir Pemancing Mahir beserta gelarnya, puncak tertinggi seni sang pemancing; Memancing juga dihitung untuk Pengumpul Mahir, yang diraih pada 100 di tiga perdagangan pengumpulan mana pun. Ikan pertama dari perairan masing-masing enam zona mengisi halamannya sendiri, tiga zona tanah inti ditambah Paya Willow, Puncak Angin, dan Pesisir Jauh di luar sana, dan Koi Kerlip Surya mencatat Kilau Harapan, sehingga para pengelana yang membawa joran di ranselnya mengisi kitab mereka lebih cepat daripada yang mereka kira."
+        "fishing": "Tonggak 100 mengukir Garam Tua dan 200 mengukir Pemancing Mahir beserta gelarnya, puncak tertinggi seni sang pemancing; Memancing juga dihitung untuk Pengumpul Mahir, yang diraih pada 100 di tiga perdagangan pengumpulan mana pun. Ikan pertama dari perairan masing-masing enam zona mengisi halamannya sendiri, tiga zona tanah inti ditambah Paya Willow, Puncak Angin, dan Pesisir Jauh di luar sana, dan Koi Kerlip Surya mencatat Kilau Harapan, sehingga para pengelana yang membawa joran di ranselnya mengisi kitab mereka lebih cepat daripada yang mereka kira.",
+        "farming": "Farming keeps no deeds of its own yet: its beds are still to come, and the milestone and cap deeds that mark the other trades arrive alongside them. Proficiency in it already counts toward Master Gatherer, which is earned at 100 in any three gathering trades, so a farmer will fill that page the same way everyone else does. Deeds are titles and Renown only, never power."
       },
       "fish": {
         "startHeading": "Memulai",

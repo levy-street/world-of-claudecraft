@@ -2602,6 +2602,7 @@ export const pl_PL: EnTranslations = {
       "logging": "Wyrąb",
       "herbalism": "Zielarstwo",
       "fishing": "Wędkarstwo",
+      "farming": "Farming",
       "notReady": "Ten węzeł zasobu jeszcze nie odrósł dla ciebie.",
       "gatherLine": "Zbierasz: {name}.",
       "gatherLineQty": "Zbierasz: {name} x{qty}.",
@@ -2631,23 +2632,27 @@ export const pl_PL: EnTranslations = {
         "mining": "Potrzebujesz kilofika górniczego {tier} poziomu, by zebrać tę żyłę.",
         "logging": "Potrzebujesz siekiery drwala {tier} poziomu, by ściąć ten drzewostan.",
         "herbalism": "Potrzebujesz sierpa zielarskiego {tier} poziomu, by zebrać ten łan.",
-        "fishing": "Potrzebujesz wędki {tier} poziomu, by łowić w tych wodach."
+        "fishing": "Potrzebujesz wędki {tier} poziomu, by łowić w tych wodach.",
+        "farming": "You need a tier {tier} farming hoe to work this bed."
       },
       "toolRequired": {
         "mining": "Potrzebujesz kilofa górniczego, aby wydobyć rudę z tej żyły.",
         "logging": "Potrzebujesz siekiery drwala, aby ściąć ten drzewostan.",
         "herbalism": "Potrzebujesz sierpa zielarskiego, aby zebrać tę kępę ziół.",
-        "fishing": "Potrzebujesz wędki, aby zarzucić żyłkę."
+        "fishing": "Potrzebujesz wędki, aby zarzucić żyłkę.",
+        "farming": "You need a farming hoe to work this bed."
       },
       "noNodeNearby": {
         "mining": "W zasięgu nie ma żadnej żyły rudy.",
         "logging": "W zasięgu nie ma żadnego drzewostanu.",
-        "herbalism": "W zasięgu nie ma żadnej kępy ziół."
+        "herbalism": "W zasięgu nie ma żadnej kępy ziół.",
+        "farming": "There is no crop bed within reach."
       },
       "wieldUnmet": {
         "mining": "Potrzebujesz Górnictwa {skill}, by machnąć kilofem, który masz już w torbach.",
         "logging": "Potrzebujesz Wyrębu {skill}, by machnąć siekierą, którą masz już w torbach.",
-        "herbalism": "Potrzebujesz Zielarstwa {skill}, by pracować sierpem, który masz już w torbach."
+        "herbalism": "Potrzebujesz Zielarstwa {skill}, by pracować sierpem, który masz już w torbach.",
+        "farming": "You need Farming {skill} to swing the hoe already in your bags."
       },
       "wieldUnmetCorpse": "Potrzebujesz umiejętności zbieractwa {skill}, by wykorzystać swoje najlepsze narzędzie.",
       "toolTierUnmetCorpse": "Potrzebujesz narzędzia zbieracza {tier} poziomu, by odzyskać najlepsze materiały.",
@@ -2656,7 +2661,8 @@ export const pl_PL: EnTranslations = {
           "mining": "Narzędzie górnicze (poziom {tier})",
           "logging": "Narzędzie drwalskie (poziom {tier})",
           "herbalism": "Narzędzie zielarskie (poziom {tier})",
-          "fishing": "Wędka (poziom {tier})"
+          "fishing": "Wędka (poziom {tier})",
+          "farming": "Farming tool (tier {tier})"
         },
         "unlocks": {
           "mining": "Wymagany do wydobywania żył rudy do poziomu {tier}.",
@@ -4603,7 +4609,8 @@ export const pl_PL: EnTranslations = {
         "mining": "Górnictwo wyciąga rudę prosto ze skał świata: miedź w Dolinie Wschodniego Strumienia, żelazo na Trzęsawisku Mokrzawia i osmium wysoko na Wyżynach Ciernistego Szczytu, ze startowymi żyłami rozsianymi po każdej młodszej strefie poza nimi, karmiąc rzemiosła kuźni. Otwarte dla każdego od 1 poziomu: kilof górniczy za 20 miedziaków z lady w Eastbrook, Fenbridge lub Highwatch otwiera każdą startową żyłę, a wyższe szczeble drabinki kilofów budzą się w miarę, jak zapracuje na nie twój własny licznik. Liczone na własnym liczniku do pułapu 100.",
         "logging": "Drwalstwo ścina drewno z drzewostanów w całym świecie: żelazną korę w Dolinie Wschodniego Strumienia, jesion popiołowy na Trzęsawisku Mokrzawia, wysoką sosnę na Wyżynach Ciernistego Szczytu i startowe drzewostany w każdej młodszej strefie, surowiec na trzonki, kostury i warsztat inżyniera. Otwarte dla każdego od 1 poziomu, o ile masz w torbach siekierę drwala (20 miedziaków przy ladach w Eastbrook, Fenbridge i Highwatch), liczone na własnym liczniku do pułapu 100.",
         "herbalism": "Zielarstwo zbiera to, co rośnie dziko: lśnolist w Dolinie Wschodniego Strumienia, złotolist na Trzęsawisku Mokrzawia, słonecznopłatek na Wyżynach Ciernistego Szczytu i startowe łany w każdej młodszej strefie, liść i łodygę, dzięki którym fachy aptekarskie wciąż warzą. Otwarte dla każdego od 1 poziomu, o ile masz w torbach sierp zielarski (20 miedziaków przy ladach w Eastbrook, Fenbridge i Highwatch), liczone na własnym liczniku do pułapu 100.",
-        "fishing": "Wędkarstwo to wyjątek wśród fachów zbierackich i zarazem najgłębszy z nich: prawdziwa minigra brania i wyciągania, własne tabele połowów w każdej z trzech stref serca królestwa (młode wody poza nimi na razie korzystają z tabeli Doliny) i pułap biegłości 200, dwa razy wyższy niż u pozostałych. Kup wędkę, stań twarzą do otwartej wody i zarzuć."
+        "fishing": "Wędkarstwo to wyjątek wśród fachów zbierackich i zarazem najgłębszy z nich: prawdziwa minigra brania i wyciągania, własne tabele połowów w każdej z trzech stref serca królestwa (młode wody poza nimi na razie korzystają z tabeli Doliny) i pułap biegłości 200, dwa razy wyższy niż u pozostałych. Kup wędkę, stań twarzą do otwartej wody i zarzuć.",
+        "farming": "Farming is the one gathering trade you tend rather than take: crops raised from seed in worked beds, then pulled up ripe for the kitchens and the apothecary benches. Its beds, seeds, and tools arrive in a later patch, so the tables below stand empty for now. That is deliberate rather than an oversight: the trade holds its seat on the gathering counter, tracked to a cap of 100, and fills in as its content lands."
       },
       "rhythmHeading": "Rytm zbierania",
       "rhythmBody": "Zbiór to krótkie, widoczne rzucanie, a nie natychmiastowe chwycenie: {base} sekund podstawy, nigdy poniżej podłogi {floor} sekund. Noszenie narzędzia powyżej poziomu węzła, takiego, które twoja biegłość pozwala ci dzierżyć, przyspiesza cię o {tool} sekund za każdy poziom ponad nim, a każde przekroczone pasmo biegłości ścina kolejne {band} sekund; samo dorównanie poziomowi węzła wpuszcza cię przez drzwi, to poziomy powyżej niego czynią cię szybkim.\n\nPełna torba grzecznie odmawia rzucania, zanim się ono zacznie, więc nic nie marnuje się w połowie zamachu, a każdy zbiór płaci małą porcję PD postaci, skalowaną poziomem węzła względem twojego tak samo, jak skaluje się PD za zabójstwa: banalny szary węzeł nie uczy postaci na pułapie niczego.",
@@ -4634,7 +4641,8 @@ export const pl_PL: EnTranslations = {
         "mining": "Pierwszy węzeł jakiegokolwiek zawodu przynosi czyn Plony Pola, a osiągnięcie limitu 100 w górnictwie wpisuje tytuł Ruda we Krwi. Osiągnięcie 100 w dowolnych trzech spośród górnictwa, drwalstwa, zielarstwa i wędkarstwa daje Mistrza Zbieracza za 25 Renomy, a odkucie pierwotnej żyły zapisuje własny znak kolekcjonera. Żaden z tych czynów nie daje mocy: to tytuły i Renoma, zapis dróg, którymi kroczyłeś.",
         "logging": "Pierwszy węzeł jakiegokolwiek zawodu przynosi czyn Plony Pola, a osiągnięcie limitu 100 w drwalstwie wpisuje tytuł Rąbiarz Twardego Drewna. Osiągnięcie 100 w dowolnych trzech spośród górnictwa, drwalstwa, zielarstwa i wędkarstwa daje Mistrza Zbieracza za 25 Renomy, a uderzenie w starożytne twarde drewno zapisuje własny znak kolekcjonera. Czyny to wyłącznie tytuły i Renoma, nigdy moc.",
         "herbalism": "Pierwszy węzeł jakiegokolwiek zawodu przynosi czyn Plony Pola, a osiągnięcie limitu 100 w zielarstwie wpisuje tytuł Mistrz Łąki. Osiągnięcie 100 w dowolnych trzech spośród górnictwa, drwalstwa, zielarstwa i wędkarstwa daje Mistrza Zbieracza za 25 Renomy, a zebranie rozkwitłego w blasku księżyca ziela zapisuje własny znak kolekcjonera. Czyny to wyłącznie tytuły i Renoma, nigdy moc.",
-        "fishing": "Kamień milowy 100 wpisuje Starego Solonego, a 200 wpisuje Mistrza Wędkarstwa wraz z jego tytułem, absolutny szczyt sztuki wędkarskiej; Wędkarstwo liczy się też do Mistrza Zbieracza, zdobywanego przy 100 w dowolnych trzech fachach zbierackich. Pierwsza ryba z wód każdej z sześciu stref wypełnia własną stronę, trzy strefy serca królestwa oraz Wierzbowe Mokradła, Wichrowy Grzbiet i Dalekie Wybrzeże poza nimi, a Karpik Słonecznoblask zapisuje Przebłysk Nadziei, więc podróżnicy z wędką w plecaku zapełniają swoją księgę szybciej, niż się spodziewają."
+        "fishing": "Kamień milowy 100 wpisuje Starego Solonego, a 200 wpisuje Mistrza Wędkarstwa wraz z jego tytułem, absolutny szczyt sztuki wędkarskiej; Wędkarstwo liczy się też do Mistrza Zbieracza, zdobywanego przy 100 w dowolnych trzech fachach zbierackich. Pierwsza ryba z wód każdej z sześciu stref wypełnia własną stronę, trzy strefy serca królestwa oraz Wierzbowe Mokradła, Wichrowy Grzbiet i Dalekie Wybrzeże poza nimi, a Karpik Słonecznoblask zapisuje Przebłysk Nadziei, więc podróżnicy z wędką w plecaku zapełniają swoją księgę szybciej, niż się spodziewają.",
+        "farming": "Farming keeps no deeds of its own yet: its beds are still to come, and the milestone and cap deeds that mark the other trades arrive alongside them. Proficiency in it already counts toward Master Gatherer, which is earned at 100 in any three gathering trades, so a farmer will fill that page the same way everyone else does. Deeds are titles and Renown only, never power."
       },
       "fish": {
         "startHeading": "Pierwsze kroki",

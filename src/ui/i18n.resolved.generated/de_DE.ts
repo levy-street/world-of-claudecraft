@@ -2602,6 +2602,7 @@ export const de_DE: EnTranslations = {
       "logging": "Holzfällen",
       "herbalism": "Kräuterkunde",
       "fishing": "Angeln",
+      "farming": "Farming",
       "notReady": "Dieser Ressourcenknoten ist fur dich noch nicht nachgewachsen.",
       "gatherLine": "Sie sammeln: {name}.",
       "gatherLineQty": "Sie sammeln: {name} x{qty}.",
@@ -2631,23 +2632,27 @@ export const de_DE: EnTranslations = {
         "mining": "Du brauchst eine Bergbau-Spitzhacke der Stufe {tier}, um diese Ader abzubauen.",
         "logging": "Du brauchst eine Holzfäller-Axt der Stufe {tier}, um diesen Stand zu fällen.",
         "herbalism": "Du brauchst eine Kräuterkunde-Sichel der Stufe {tier}, um diese Pflanze zu sammeln.",
-        "fishing": "Du brauchst eine Angelrute der Stufe {tier}, um in diesen Gewässern zu angeln."
+        "fishing": "Du brauchst eine Angelrute der Stufe {tier}, um in diesen Gewässern zu angeln.",
+        "farming": "You need a tier {tier} farming hoe to work this bed."
       },
       "toolRequired": {
         "mining": "Du brauchst eine Bergbau-Spitzhacke, um diese Ader abzubauen.",
         "logging": "Du brauchst eine Holzfäller-Axt, um diese Baumgruppe zu fällen.",
         "herbalism": "Du brauchst eine Kräuterkunde-Sichel, um diese Pflanze zu sammeln.",
-        "fishing": "Du brauchst eine Angel, um die Schnur auszuwerfen."
+        "fishing": "Du brauchst eine Angel, um die Schnur auszuwerfen.",
+        "farming": "You need a farming hoe to work this bed."
       },
       "noNodeNearby": {
         "mining": "In Reichweite ist keine Erzader.",
         "logging": "In Reichweite ist keine Baumgruppe.",
-        "herbalism": "In Reichweite ist keine Kräuterpflanze."
+        "herbalism": "In Reichweite ist keine Kräuterpflanze.",
+        "farming": "There is no crop bed within reach."
       },
       "wieldUnmet": {
         "mining": "Du brauchst Bergbau {skill}, um die Spitzhacke in deinen Taschen zu schwingen.",
         "logging": "Du brauchst Holzfällen {skill}, um die Axt in deinen Taschen zu schwingen.",
-        "herbalism": "Du brauchst Kräuterkunde {skill}, um die Sichel in deinen Taschen zu führen."
+        "herbalism": "Du brauchst Kräuterkunde {skill}, um die Sichel in deinen Taschen zu führen.",
+        "farming": "You need Farming {skill} to swing the hoe already in your bags."
       },
       "wieldUnmetCorpse": "Du brauchst Sammelfertigkeit {skill}, um dein bestes Werkzeug einzusetzen.",
       "toolTierUnmetCorpse": "Du brauchst ein Sammelwerkzeug der Stufe {tier}, um die feinsten Materialien zu gewinnen.",
@@ -2656,7 +2661,8 @@ export const de_DE: EnTranslations = {
           "mining": "Bergbau-Werkzeug (Stufe {tier})",
           "logging": "Holzfäller-Werkzeug (Stufe {tier})",
           "herbalism": "Kräuterkunde-Werkzeug (Stufe {tier})",
-          "fishing": "Angelrute (Stufe {tier})"
+          "fishing": "Angelrute (Stufe {tier})",
+          "farming": "Farming tool (tier {tier})"
         },
         "unlocks": {
           "mining": "Erforderlich, um Erzadern bis Stufe {tier} abzubauen.",
@@ -4603,7 +4609,8 @@ export const de_DE: EnTranslations = {
         "mining": "Bergbau holt Erz direkt aus dem Fels der Welt: Kupfer im Eastbrook-Tal, Eisen im Mirefen-Moor und Thorium oben in den Thornpeak-Höhen, dazu Anfängeradern, verstreut über jede jüngere Zone dahinter, und speist damit die Schmiedeberufe. Ab Stufe 1 für jeden offen: Eine Bergbau-Spitzhacke für 20 Kupfer von einem Tresen in Eastbrook, Fenbridge oder Highwatch öffnet jede Anfängerader, und die höheren Sprossen der Spitzhacken-Leiter erwachen, sobald dein eigener Zähler sie verdient. Auf einem eigenen Zähler bis zu einer Obergrenze von 100 verfolgt.",
         "logging": "Holzfällen schlägt Holz aus Baumgruppen in der ganzen Welt: Eisenrinde im Eastbrook-Tal, Aschenholz im Mirefen-Moor, Altholz in den Thornpeak-Höhen und Anfänger-Baumgruppen in jeder jüngeren Zone, das Rohmaterial für Schäfte, Stäbe und die Werkbank des Ingenieurs. Ab Stufe 1 für jeden offen, sofern eine Holzfäller-Axt in deinen Taschen liegt (20 Kupfer an den Tresen von Eastbrook, Fenbridge und Highwatch), auf einem eigenen Zähler bis zu einer Obergrenze von 100 verfolgt.",
         "herbalism": "Kräuterkunde sammelt, was wild wächst: Silberblatt im Eastbrook-Tal, Goldblatt im Mirefen-Moor, Sonnenblüte in den Thornpeak-Höhen und Anfängerpflanzen in jeder jüngeren Zone, Blatt und Stängel, die die Apothekerberufe am Brauen halten. Ab Stufe 1 für jeden offen, sofern eine Kräuterkunde-Sichel in deinen Taschen liegt (20 Kupfer an den Tresen von Eastbrook, Fenbridge und Highwatch), auf einem eigenen Zähler bis zu einer Obergrenze von 100 verfolgt.",
-        "fishing": "Angeln ist der Sonderling unter den Sammelberufen und zugleich der tiefgründigste: ein echtes Biss-und-Einhol-Minispiel, eigene Fangtabellen in jeder der drei Kernlandzonen (die jungen Gewässer dahinter bedienen vorerst alle die Tabelle des Tals) und eine Fertigkeitsobergrenze von 200, doppelt so hoch wie bei den anderen. Kauf eine Angel, stell dich mit Blick aufs offene Wasser und wirf aus."
+        "fishing": "Angeln ist der Sonderling unter den Sammelberufen und zugleich der tiefgründigste: ein echtes Biss-und-Einhol-Minispiel, eigene Fangtabellen in jeder der drei Kernlandzonen (die jungen Gewässer dahinter bedienen vorerst alle die Tabelle des Tals) und eine Fertigkeitsobergrenze von 200, doppelt so hoch wie bei den anderen. Kauf eine Angel, stell dich mit Blick aufs offene Wasser und wirf aus.",
+        "farming": "Farming is the one gathering trade you tend rather than take: crops raised from seed in worked beds, then pulled up ripe for the kitchens and the apothecary benches. Its beds, seeds, and tools arrive in a later patch, so the tables below stand empty for now. That is deliberate rather than an oversight: the trade holds its seat on the gathering counter, tracked to a cap of 100, and fills in as its content lands."
       },
       "rhythmHeading": "Der Sammelrhythmus",
       "rhythmBody": "Eine Ernte ist ein kurzer sichtbarer Vorgang, kein sofortiger Griff: {base} Sekunden Basis, nie unter einem Minimum von {floor} Sekunden. Ein Werkzeug über der Stufe des Knotens mitzuführen, eines, das deine Fertigkeit dich auch führen lässt, beschleunigt dich um {tool} Sekunden je Stufe darüber, und jede Fertigkeitsstufe, die du überschreitest, kürzt weitere {band} Sekunden; die Stufe des Knotens bloß zu treffen bringt dich durch die Tür, schnell machen dich erst die Stufen darüber.\n\nEine volle Tasche lehnt den Vorgang höflich ab, bevor er beginnt, sodass mitten im Schwung nichts verschwendet wird, und jede Ernte zahlt ein kleines Stück Charakter-EP, skaliert nach der Stufe des Knotens gegen deine eigene, so wie die EP für Kills skalieren: Ein trivialer grauer Knoten lehrt einen Charakter am Maximum nichts.",
@@ -4634,7 +4641,8 @@ export const de_DE: EnTranslations = {
         "mining": "Dein erster Knoten eines beliebigen Berufs bringt Früchte des Feldes ein, und die Fertigkeit 100 in Bergbau verewigt Erz im Blut. Wenn du in beliebigen drei von Bergbau, Holzfällen, Kräuterkunde und Angeln 100 erreichst, wird Meistersammler mit 25 Ansehen hinzugefügt, und das Aufbrechen einer makellosen Ader verzeichnet ihr eigenes Sammlerzeichen. Keines davon verleiht Macht: Taten sind Titel und Ansehen, ein Zeugnis der Wege, die du gegangen bist.",
         "logging": "Dein erster Knoten eines beliebigen Berufs bringt Früchte des Feldes ein, und die Fertigkeit 100 in Holzfällen verewigt Kernholzhauer. Wenn du in beliebigen drei von Bergbau, Holzfällen, Kräuterkunde und Angeln 100 erreichst, wird Meistersammler mit 25 Ansehen hinzugefügt, und ein Hieb in uraltes Kernholz verzeichnet sein eigenes Sammlerzeichen. Taten sind nur Titel und Ansehen, niemals Macht.",
         "herbalism": "Dein erster Knoten eines beliebigen Berufs bringt Früchte des Feldes ein, und die Fertigkeit 100 in Kräuterkunde verewigt Meister der Aue. Wenn du in beliebigen drei von Bergbau, Holzfällen, Kräuterkunde und Angeln 100 erreichst, wird Meistersammler mit 25 Ansehen hinzugefügt, und eine mondscheinbeleuchtete Blüte verzeichnet ihr eigenes Sammlerzeichen. Taten sind nur Titel und Ansehen, niemals Macht.",
-        "fishing": "Der Meilenstein 100 verewigt den Alten Salzfisch und 200 den Meisterangler samt seinem Titel, die absolute Spitze der Anglerkunst; Angeln zählt außerdem für Meistersammler, errungen mit 100 in beliebigen drei Sammelberufen. Ein erster Fisch aus den Gewässern jeder von sechs Zonen füllt eine eigene Seite, die drei Kernlandzonen sowie das Weidenmoor, der Windkamm und die Fernküste dahinter, und der Sonnenschimmer-Koi verzeichnet Schimmer der Hoffnung, sodass Reisende mit einer Angel im Gepäck ihr Buch schneller füllen, als sie erwarten."
+        "fishing": "Der Meilenstein 100 verewigt den Alten Salzfisch und 200 den Meisterangler samt seinem Titel, die absolute Spitze der Anglerkunst; Angeln zählt außerdem für Meistersammler, errungen mit 100 in beliebigen drei Sammelberufen. Ein erster Fisch aus den Gewässern jeder von sechs Zonen füllt eine eigene Seite, die drei Kernlandzonen sowie das Weidenmoor, der Windkamm und die Fernküste dahinter, und der Sonnenschimmer-Koi verzeichnet Schimmer der Hoffnung, sodass Reisende mit einer Angel im Gepäck ihr Buch schneller füllen, als sie erwarten.",
+        "farming": "Farming keeps no deeds of its own yet: its beds are still to come, and the milestone and cap deeds that mark the other trades arrive alongside them. Proficiency in it already counts toward Master Gatherer, which is earned at 100 in any three gathering trades, so a farmer will fill that page the same way everyone else does. Deeds are titles and Renown only, never power."
       },
       "fish": {
         "startHeading": "Erste Schritte",

@@ -8264,6 +8264,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.logging': '伐木',
   'hudChrome.gathering.herbalism': '藥草學',
   'hudChrome.gathering.fishing': '釣魚',
+  'hudChrome.gathering.farming': '耕作',
   'hudChrome.gathering.notReady': '這個資源節點尚未為你重新生成。',
   'hudChrome.gathering.gatherLine': '你採集了：{name}。',
   'hudChrome.gathering.gatherLineQty': '你採集了：{name} x{qty}。',
@@ -8284,10 +8285,12 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.toolTierUnmet.logging': '你需要{tier}階伐木斧才能砍伐這片林木。',
   'hudChrome.gathering.toolTierUnmet.herbalism': '你需要{tier}階草藥鐮才能採集這片草藥叢。',
   'hudChrome.gathering.toolTierUnmet.fishing': '你需要{tier}階釣竿才能在這片水域垂釣。',
+  'hudChrome.gathering.toolTierUnmet.farming': '你需要{tier}階耕作鋤才能打理這片田畦。',
   'hudChrome.gathering.toolTierUnmetCorpse': '你需要{tier}階採集工具才能取得最上等的材料。',
   'hudChrome.gathering.wieldUnmet.mining': '你需要採礦{skill}才能揮動背包裡已有的採礦鎬。',
   'hudChrome.gathering.wieldUnmet.logging': '你需要伐木{skill}才能揮動背包裡已有的伐木斧。',
   'hudChrome.gathering.wieldUnmet.herbalism': '你需要藥草學{skill}才能使用背包裡已有的草藥鐮。',
+  'hudChrome.gathering.wieldUnmet.farming': '你需要耕作{skill}才能揮動背包裡已有的耕作鋤。',
   'hudChrome.gathering.wieldUnmetCorpse': '你需要採集技能{skill}才能讓最上等的工具派上用場。',
   'hudChrome.gathering.requiresTool.mining': '需要採礦鎬',
   'hudChrome.gathering.requiresTool.logging': '需要伐木斧',
@@ -8296,13 +8299,16 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.toolRequired.logging': '你需要伐木斧才能砍伐這片林木。',
   'hudChrome.gathering.toolRequired.herbalism': '你需要草藥鐮才能採集這片草藥叢。',
   'hudChrome.gathering.toolRequired.fishing': '你需要釣竿才能拋竿垂釣。',
+  'hudChrome.gathering.toolRequired.farming': '你需要耕作鋤才能打理這片田畦。',
   'hudChrome.gathering.noNodeNearby.mining': '附近沒有礦脈可供開採。',
   'hudChrome.gathering.noNodeNearby.logging': '附近沒有林木可供砍伐。',
   'hudChrome.gathering.noNodeNearby.herbalism': '附近沒有草藥叢可供採集。',
+  'hudChrome.gathering.noNodeNearby.farming': '附近沒有田畦可供打理。',
   'hudChrome.gathering.toolTooltip.kind.mining': '採礦工具（{tier}階）',
   'hudChrome.gathering.toolTooltip.kind.logging': '伐木工具（{tier}階）',
   'hudChrome.gathering.toolTooltip.kind.herbalism': '草藥工具（{tier}階）',
   'hudChrome.gathering.toolTooltip.kind.fishing': '釣魚竿（{tier}階）',
+  'hudChrome.gathering.toolTooltip.kind.farming': '耕作工具（{tier}階）',
   'hudChrome.gathering.toolTooltip.unlocks.mining': '開採最高{tier}階的礦脈所需。',
   'hudChrome.gathering.toolTooltip.unlocks.logging': '砍伐最高{tier}階的林木所需。',
   'hudChrome.gathering.toolTooltip.unlocks.herbalism': '採集最高{tier}階的草藥叢所需。',
@@ -10320,7 +10326,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.professions.comingSoon': '暫無配方',
   'guide.professions.gatherHubHeading': '採集',
   'guide.professions.gatherHubBody':
-    '四種採集行業為製作供給材料：採礦、伐木與藥草學的上限為100，釣魚為200。',
+    '採集行業為製作供給材料：採礦、伐木與藥草學的上限為100，耕作在照料的田畦中從種子育出作物，上限同為100，釣魚為200。',
   'guide.professions.archetypesHeading': '十大命途',
   'guide.professions.archetypesBody':
     '調諧到兩個相鄰行業即可獲得一個成對頭銜：兩門主修可以一路練到最高層級，對側的一門行業作為愛好保留在精良層級，其餘行業則停留在普通層級。',
@@ -10431,6 +10437,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '藥草學採集野地所生的草藥：東溪谷產潤光葉，泥沼濕地產金葉，荊峰高地產日瓣草，這些葉與莖讓藥劑類行業得以持續調製。從1級起人人皆可採集，只需背包中備有一把草藥鐮（各區域主城20銅幣），以獨立計數器追蹤，上限為100。',
   'guide.profPages.gatherIntro.fishing':
     '釣魚通過咬鉤與收線的節奏，在每個區域的開闊水面垂釣，上限為200。',
+  'guide.profPages.gatherIntro.farming':
+    '耕作在整治好的田畦中從種子育出作物，上限為100；它的田畦、種子與工具將隨後續更新到來，因此下方表格暫時為空。',
   'guide.profPages.rhythmHeading': '採集節奏',
   'guide.profPages.rhythmBody':
     '採集是一段可見的施法：基礎{base}秒，最短不低於{floor}秒；工具每高於節點一階縮短{tool}秒，每個熟練度區間再縮短{band}秒。',
@@ -10536,7 +10544,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   // proper-noun precedent).
   'guide.professions.whatHeading': '劍之外的一門手藝',
   'guide.professions.whatBody':
-    '專業是這個世界的營生：四種採集行業從大地中獲取原料，十種製作行業把它們變成裝備、飯菜、藥水與工具。萬物環環相扣：你挖出的礦石成為刀劍，刀劍接受附魔，而附魔又需要從舊裝備中分解出的粉塵。這裡沒有專業數量限制：每個角色都能同時修習全部八種已有內容的製作行業與全部四種採集行業，唯一的排他選擇是你最終宣誓的命途，而一旦宣誓，落入休眠的製作行業便不再上升。技能永不下降，學會的東西也永遠不會被奪走。',
+    '專業是這個世界的營生：採集行業從大地中獲取原料，十種製作行業把它們變成裝備、飯菜、藥水與工具。萬物環環相扣：你挖出的礦石成為刀劍，刀劍接受附魔，而附魔又需要從舊裝備中分解出的粉塵。這裡沒有專業數量限制：每個角色都能同時修習全部八種已有內容的製作行業與全部採集行業，唯一的排他選擇是你最終宣誓的命途，而一旦宣誓，落入休眠的製作行業便不再上升。技能永不下降，學會的東西也永遠不會被奪走。',
   'guide.professions.deedsHeading': '銘記旅程的功業',
   'guide.professions.deedsBody':
     '功業之書伴隨這一切：首次調諧獲得Craftsworn，首次傑作獲得Masterwright，均可作為頭銜佩戴。八種可修行業各在技能50設有里程碑功業，並在上限125加冕Grandmaster頭銜；釣魚在100熟練獲得Old Salt，200獲得Master Angler頭銜。此外還有首次採集、首次製作、野外奇遇與拆解回收的功業。這一切皆為裝飾：只有頭銜與聲望，功業永不賦予力量。',
@@ -10555,6 +10563,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '任意行業的第一次採集獲得Fruits of the Field，藥草學100上限銘刻Master of the Meadow。四種採集行業中任意三項達到100可得Master Gatherer（25聲望），採下月光綻放另有收藏印記。功業只有頭銜與聲望，永不賦予力量。',
   'guide.profPages.gatherDeeds.fishing':
     '釣魚100熟練銘刻Old Salt，200銘刻Master Angler及其頭銜，垂釣技藝的頂點；釣魚同樣計入Master Gatherer（任意三項採集達到100）。在每個區域的水域釣起第一條魚各有其頁，釣起日輝錦鯉則記下Glimmer of Hope。',
+  'guide.profPages.gatherDeeds.farming':
+    '耕作暫無專屬功業：田畦尚未到來，標記其他行業的里程碑與上限功業也將隨之而來。它的熟練已經計入Master Gatherer（任意三項採集達到100）。功業只給頭銜與名望，絕不給予力量。',
   'guide.profPages.fish.startHeading': '入門',
   'guide.profPages.fish.startBody':
     '一根Simple Fishing Pole在Eastbrook的Fisherman Brandt處只賣20銅（他在鎮東緣望著Mirror Lake）；Tinker Gizzel、Fenbridge的Provisioner Hale和Highwatch的Quartermaster Bree也有存貨。面向前方約24碼內足夠深的水面使用魚竿即可拋竿。戰鬥中、游泳時或死亡時無法拋竿：站在岸上釣才是正途，任何區域的可釣水域都行。',

@@ -8636,6 +8636,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.logging': '벌목',
   'hudChrome.gathering.herbalism': '약초학',
   'hudChrome.gathering.fishing': '낚시',
+  'hudChrome.gathering.farming': '농사',
   'hudChrome.gathering.notReady': '이 자원 채집지는 아직 당신을 위해 재생성되지 않았습니다.',
   'hudChrome.gathering.gatherLine': '{name}을(를) 채집했습니다.',
   'hudChrome.gathering.gatherLineQty': '{name}을(를) {qty}개 채집했습니다.',
@@ -8661,6 +8662,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '이 군락을 채집하려면 {tier}티어 약초 낫이 필요합니다.',
   'hudChrome.gathering.toolTierUnmet.fishing':
     '이 수역에서 낚시하려면 {tier}티어 낚싯대가 필요합니다.',
+  'hudChrome.gathering.toolTierUnmet.farming':
+    '이 작물밭을 일구려면 {tier}티어 농사 괭이가 필요합니다.',
   'hudChrome.gathering.toolTierUnmetCorpse':
     '최상급 재료를 회수하려면 {tier}티어 채집 도구가 필요합니다.',
   'hudChrome.gathering.wieldUnmet.mining':
@@ -8669,6 +8672,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '가방에 있는 도끼를 휘두르려면 벌목 {skill}이(가) 필요합니다.',
   'hudChrome.gathering.wieldUnmet.herbalism':
     '가방에 있는 낫을 다루려면 약초학 {skill}이(가) 필요합니다.',
+  'hudChrome.gathering.wieldUnmet.farming':
+    '가방에 있는 괭이를 휘두르려면 농사 {skill}이(가) 필요합니다.',
   'hudChrome.gathering.wieldUnmetCorpse':
     '최상급 도구를 제대로 다루려면 채집 기술 {skill}이(가) 필요합니다.',
   'hudChrome.gathering.requiresTool.mining': '채광 곡괭이 필요',
@@ -8678,13 +8683,16 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.toolRequired.logging': '이 나무를 베려면 벌목 도끼가 필요합니다.',
   'hudChrome.gathering.toolRequired.herbalism': '이 군락을 채집하려면 약초 낫이 필요합니다.',
   'hudChrome.gathering.toolRequired.fishing': '낚싯대가 있어야 낚싯줄을 드리울 수 있습니다.',
+  'hudChrome.gathering.toolRequired.farming': '이 작물밭을 일구려면 농사 괭이가 필요합니다.',
   'hudChrome.gathering.noNodeNearby.mining': '손이 닿는 곳에 광맥이 없습니다.',
   'hudChrome.gathering.noNodeNearby.logging': '손이 닿는 곳에 벌목 나무가 없습니다.',
   'hudChrome.gathering.noNodeNearby.herbalism': '손이 닿는 곳에 약초 군락이 없습니다.',
+  'hudChrome.gathering.noNodeNearby.farming': '손이 닿는 곳에 작물밭이 없습니다.',
   'hudChrome.gathering.toolTooltip.kind.mining': '채광 도구 ({tier}티어)',
   'hudChrome.gathering.toolTooltip.kind.logging': '벌목 도구 ({tier}티어)',
   'hudChrome.gathering.toolTooltip.kind.herbalism': '약초 도구 ({tier}티어)',
   'hudChrome.gathering.toolTooltip.kind.fishing': '낚싯대 ({tier}티어)',
+  'hudChrome.gathering.toolTooltip.kind.farming': '농사 도구 ({tier}티어)',
   'hudChrome.gathering.toolTooltip.unlocks.mining': '{tier}티어까지의 광맥을 캐는 데 필요합니다.',
   'hudChrome.gathering.toolTooltip.unlocks.logging':
     '{tier}티어까지의 벌목 나무를 베는 데 필요합니다.',
@@ -10804,7 +10812,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.professions.comingSoon': '제조법 없음',
   'guide.professions.gatherHubHeading': '채집',
   'guide.professions.gatherHubBody':
-    '네 가지 채집 전문직이 제작에 재료를 공급한다. 채광, 벌목, 약초학은 상한이 100이고 낚시는 200이다.',
+    '채집 전문직이 제작에 재료를 공급한다. 채광, 벌목, 약초학은 상한이 100이고, 농사는 가꾼 밭에서 씨앗으로 작물을 길러 상한이 마찬가지로 100이며, 낚시는 200이다.',
   'guide.professions.archetypesHeading': '열 가지 원형',
   'guide.professions.archetypesBody':
     '이웃한 두 전문직에 조율하면 짝 칭호를 얻는다. 두 전공은 최고 한계까지 오르고, 반대편 하나는 취미로 남아 희귀 단계까지 오르며, 나머지 전문직은 일반 단계에 머문다.',
@@ -10917,6 +10925,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '약초학은 야생에서 자라는 것을 캔다. 이스트브룩 골짜기의 윤기잎, 마이어펜 습지의 금빛잎, 쏜피크 고지의 태양꽃잎, 연금술 계열 전문직의 조제를 이어 주는 잎과 줄기다. 레벨 1부터 누구나 할 수 있고, 가방에 약초 낫(어느 거점 마을에서나 20동)만 있으면 된다. 자체 수치로 기록되며 상한은 100이다.',
   'guide.profPages.gatherIntro.fishing':
     '낚시는 입질과 릴 감기의 흐름으로 모든 지역의 트인 물가에서 어획물을 낚으며, 상한은 200이다.',
+  'guide.profPages.gatherIntro.farming':
+    '농사는 손질한 밭에서 씨앗으로 작물을 길러 상한이 100이며, 밭과 씨앗, 도구는 이후 업데이트로 들어오므로 아래 표는 지금은 비어 있다.',
   'guide.profPages.rhythmHeading': '채집의 리듬',
   'guide.profPages.rhythmBody':
     '채집은 눈에 보이는 시전이다. 기본 {base}초에 최소 {floor}초까지, 도구가 채집물보다 한 티어 높을 때마다 {tool}초, 숙련도 구간마다 {band}초씩 짧아진다.',
@@ -11025,7 +11035,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   // proper-noun precedent).
   'guide.professions.whatHeading': '검 곁의 생업',
   'guide.professions.whatBody':
-    '전문 기술은 이 세계의 생활이다. 네 가지 채집 기술이 땅에서 원료를 캐내고, 열 가지 제작 기술이 그것을 장비와 음식, 물약, 도구로 바꾼다. 모든 것이 맞물린다. 캐낸 광석은 검이 되고, 검은 마법부여를 받으며, 그 마법부여는 낡은 장비를 분해한 가루를 필요로 한다. 전문 기술 수 제한은 없다. 콘텐츠가 있는 여덟 제작 기술과 네 채집 기술을 모두 나란히 올릴 수 있고, 유일한 배타적 선택은 언젠가 맹세할 원형뿐이며, 일단 맹세하고 나면 그 뒤로 휴면에 든 제작 기술은 더 이상 오르지 않는다. 기술은 절대 내려가지 않고, 배운 것을 빼앗기지도 않는다.',
+    '전문 기술은 이 세계의 생활이다. 채집 기술이 땅에서 원료를 캐내고, 열 가지 제작 기술이 그것을 장비와 음식, 물약, 도구로 바꾼다. 모든 것이 맞물린다. 캐낸 광석은 검이 되고, 검은 마법부여를 받으며, 그 마법부여는 낡은 장비를 분해한 가루를 필요로 한다. 전문 기술 수 제한은 없다. 콘텐츠가 있는 여덟 제작 기술과 채집 기술을 모두 나란히 올릴 수 있고, 유일한 배타적 선택은 언젠가 맹세할 원형뿐이며, 일단 맹세하고 나면 그 뒤로 휴면에 든 제작 기술은 더 이상 오르지 않는다. 기술은 절대 내려가지 않고, 배운 것을 빼앗기지도 않는다.',
   'guide.professions.deedsHeading': '여정을 새기는 업적',
   'guide.professions.deedsBody':
     '업적의 서가 모든 걸음에 함께한다. 첫 조율은 Craftsworn을, 첫 걸작은 Masterwright를 주며 둘 다 칭호로 착용할 수 있다. 여덟 제작 기술은 각각 기술 50에 이정표 업적을, 상한 125에 Grandmaster 칭호를 두고, 낚시는 숙련 100에 Old Salt를, 200에 Master Angler 칭호를 준다.\n\n첫 채집과 첫 제작, 야외의 희귀한 발견, 분해 회수의 조용한 페이지도 있다. 전부 장식일 뿐이다. 칭호와 명성만 있을 뿐, 업적은 결코 힘을 주지 않는다.',
@@ -11044,6 +11054,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '어느 채집이든 첫 채집은 Fruits of the Field를, 약초학 100 상한은 Master of the Meadow를 새긴다. 네 채집 기술 중 셋이 100에 이르면 Master Gatherer(명성 25)를 얻고, 달빛 개화를 꺾으면 전용 수집 표식도 남는다. 업적은 칭호와 명성뿐, 힘을 주지 않는다.',
   'guide.profPages.gatherDeeds.fishing':
     '숙련 100은 Old Salt를, 200은 Master Angler와 그 칭호를 새긴다. 낚시꾼 기예의 정점이다. 낚시도 Master Gatherer(세 기술 100)에 포함된다. 각 지역의 물에서 낚는 첫 물고기가 저마다의 페이지를 채우고, 윤슬 코이를 낚으면 Glimmer of Hope가 기록된다.',
+  'guide.profPages.gatherDeeds.farming':
+    '농사에는 아직 고유 업적이 없다. 밭이 앞으로 들어오고, 다른 전문직을 장식하는 이정표와 상한 업적도 함께 들어온다. 숙련은 이미 Master Gatherer(세 기술 100)에 포함된다. 업적은 칭호와 명성만 줄 뿐, 결코 힘을 주지 않는다.',
   'guide.profPages.fish.startHeading': '시작하기',
   'guide.profPages.fish.startBody':
     'Simple Fishing Pole은 Eastbrook의 Fisherman Brandt가 20동에 판다(마을 동쪽 끝에서 Mirror Lake를 노려보는 노련한 낚시꾼이다). Tinker Gizzel, Fenbridge의 Provisioner Hale, Highwatch의 Quartermaster Bree도 재고가 있다. 전방 약 24야드 안의 충분히 깊은 물을 바라보고 낚싯대를 쓰면 찌가 날아간다. 전투 중, 수영 중, 사망 중에는 던질 수 없다. 물가에서 던지는 것이 정석이고, 어느 지역의 낚시 가능한 물이든 좋다.',

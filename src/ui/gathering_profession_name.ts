@@ -20,6 +20,7 @@ export const GATHERING_PROFESSION_NAME_KEYS: Record<string, TranslationKey> = {
   logging: 'hudChrome.gathering.logging',
   herbalism: 'hudChrome.gathering.herbalism',
   fishing: 'hudChrome.gathering.fishing',
+  farming: 'hudChrome.gathering.farming',
 };
 
 /** hasOwn-safe read of the table above: the map is a plain object literal, so

@@ -2602,6 +2602,7 @@ export const vi_VN: EnTranslations = {
       "logging": "Đốn gỗ",
       "herbalism": "Thảo dược học",
       "fishing": "Câu Cá",
+      "farming": "Farming",
       "notReady": "Điểm tài nguyên này chưa hồi sinh lại dành cho bạn.",
       "gatherLine": "Bạn tập hợp: {name}.",
       "gatherLineQty": "Bạn tập hợp: {name} x{qty}.",
@@ -2631,23 +2632,27 @@ export const vi_VN: EnTranslations = {
         "mining": "Bạn cần cuốc khai khoáng bậc {tier} để khai thác mạch này.",
         "logging": "Bạn cần rìu đốn gỗ bậc {tier} để đốn bãi này.",
         "herbalism": "Bạn cần liềm hái thảo dược bậc {tier} để thu hoạch bụi này.",
-        "fishing": "Bạn cần cần câu bậc {tier} để câu ở vùng nước này."
+        "fishing": "Bạn cần cần câu bậc {tier} để câu ở vùng nước này.",
+        "farming": "You need a tier {tier} farming hoe to work this bed."
       },
       "toolRequired": {
         "mining": "Bạn cần cuốc khai khoáng để khai thác mạch quặng này.",
         "logging": "Bạn cần rìu đốn gỗ để đốn hạ cụm cây này.",
         "herbalism": "Bạn cần liềm thảo dược để thu hái khóm thảo dược này.",
-        "fishing": "Bạn phải có cần câu mới buông câu được."
+        "fishing": "Bạn phải có cần câu mới buông câu được.",
+        "farming": "You need a farming hoe to work this bed."
       },
       "noNodeNearby": {
         "mining": "Không có mạch quặng nào trong tầm với.",
         "logging": "Không có cụm cây gỗ nào trong tầm với.",
-        "herbalism": "Không có khóm thảo dược nào trong tầm với."
+        "herbalism": "Không có khóm thảo dược nào trong tầm với.",
+        "farming": "There is no crop bed within reach."
       },
       "wieldUnmet": {
         "mining": "Bạn cần Khai mỏ {skill} để vung chiếc cuốc đã có trong túi.",
         "logging": "Bạn cần Đốn gỗ {skill} để vung chiếc rìu đã có trong túi.",
-        "herbalism": "Bạn cần Thảo dược học {skill} để dùng chiếc liềm đã có trong túi."
+        "herbalism": "Bạn cần Thảo dược học {skill} để dùng chiếc liềm đã có trong túi.",
+        "farming": "You need Farming {skill} to swing the hoe already in your bags."
       },
       "wieldUnmetCorpse": "Bạn cần kỹ năng thu thập {skill} để dùng được công cụ tốt nhất của mình.",
       "toolTierUnmetCorpse": "Bạn cần công cụ thu thập bậc {tier} để lấy được nguyên liệu tốt nhất.",
@@ -2656,7 +2661,8 @@ export const vi_VN: EnTranslations = {
           "mining": "Công cụ khai khoáng (bậc {tier})",
           "logging": "Công cụ đốn gỗ (bậc {tier})",
           "herbalism": "Công cụ thảo dược (bậc {tier})",
-          "fishing": "Cần câu (bậc {tier})"
+          "fishing": "Cần câu (bậc {tier})",
+          "farming": "Farming tool (tier {tier})"
         },
         "unlocks": {
           "mining": "Cần thiết để khai thác các mạch quặng đến bậc {tier}.",
@@ -4603,7 +4609,8 @@ export const vi_VN: EnTranslations = {
         "mining": "Khai Khoáng moi quặng thẳng ra khỏi đá của thế giới: đồng ở Thung Lũng Đông Khê, sắt ở Đầm Lầy Bùn Sâu, và osmium trên Cao Nguyên Đỉnh Gai, cùng những mạch quặng khởi đầu rải khắp mọi khu vực non trẻ hơn ở xa hơn, nuôi các nghề lò rèn. Mở cho tất cả mọi người từ cấp 1: một cây cuốc khai khoáng giá 20 đồng từ quầy Eastbrook, Fenbridge, hoặc Highwatch mở được mọi mạch quặng khởi đầu, còn những nấc cao hơn của thang cuốc sẽ thức dậy khi chính bộ đếm của bạn kiếm được chúng. Được theo dõi trên bộ đếm riêng của nó tới giới hạn 100.",
         "logging": "Đốn Gỗ hạ cây lấy gỗ từ những cụm cây khắp cả thế giới: vỏ sắt ở Thung Lũng Đông Khê, tần bì tro ở Đầm Lầy Bùn Sâu, gỗ cổ thụ ở Cao Nguyên Đỉnh Gai, và các cụm cây khởi đầu ở mọi khu vực non trẻ hơn, nguồn gỗ thô cho cán vũ khí, trượng, và bàn làm việc của kỹ sư. Mở cho tất cả mọi người từ cấp 1 chỉ cần có một cây rìu đốn gỗ trong túi (20 đồng tại các quầy Eastbrook, Fenbridge, và Highwatch), được theo dõi trên bộ đếm riêng của nó tới giới hạn 100.",
         "herbalism": "Thảo Dược Học thu hái những gì mọc hoang: lá bạc ở Thung Lũng Đông Khê, lá vàng ở Đầm Lầy Bùn Sâu, cánh mặt trời ở Cao Nguyên Đỉnh Gai, và các khóm khởi đầu ở mọi khu vực non trẻ hơn, thứ lá và thân giữ cho các nghề bào chế luôn có gì để nấu. Mở cho tất cả mọi người từ cấp 1 chỉ cần có một cây liềm thảo dược trong túi (20 đồng tại các quầy Eastbrook, Fenbridge, và Highwatch), được theo dõi trên bộ đếm riêng của nó tới giới hạn 100.",
-        "fishing": "Câu Cá là kẻ khác biệt giữa các nghề thu thập, và cũng là nghề sâu nhất: một trò nhỏ cắn mồi và giật cần thực thụ, có bảng cá riêng ở mỗi khu vực trong ba vùng lõi (những vùng nước non trẻ xa hơn hiện đều dùng bảng của Thung Lũng), và giới hạn thành thạo 200, gấp đôi các nghề khác. Hãy mua một cần câu, quay mặt ra vùng nước rộng, và buông câu."
+        "fishing": "Câu Cá là kẻ khác biệt giữa các nghề thu thập, và cũng là nghề sâu nhất: một trò nhỏ cắn mồi và giật cần thực thụ, có bảng cá riêng ở mỗi khu vực trong ba vùng lõi (những vùng nước non trẻ xa hơn hiện đều dùng bảng của Thung Lũng), và giới hạn thành thạo 200, gấp đôi các nghề khác. Hãy mua một cần câu, quay mặt ra vùng nước rộng, và buông câu.",
+        "farming": "Farming is the one gathering trade you tend rather than take: crops raised from seed in worked beds, then pulled up ripe for the kitchens and the apothecary benches. Its beds, seeds, and tools arrive in a later patch, so the tables below stand empty for now. That is deliberate rather than an oversight: the trade holds its seat on the gathering counter, tracked to a cap of 100, and fills in as its content lands."
       },
       "rhythmHeading": "Nhịp thu hoạch",
       "rhythmBody": "Một lần thu hoạch là một thao tác niệm ngắn nhìn thấy được, không phải cú chộp tức thì: {base} giây cơ bản, không bao giờ xuống dưới cái sàn {floor} giây. Mang theo một công cụ trên bậc của điểm tài nguyên, loại mà thành thạo của bạn cho phép sử dụng, sẽ làm bạn nhanh thêm {tool} giây cho mỗi bậc cao hơn nó, và mỗi dải thành thạo bạn vượt qua lại gọt thêm {band} giây nữa; chỉ khớp đúng bậc của điểm tài nguyên thì mới lọt được vào cửa, chính những bậc cao hơn nó mới làm bạn nhanh.\n\nMột chiếc túi đầy sẽ lịch sự từ chối thao tác trước khi nó bắt đầu, nên không có gì bị phí giữa chừng, và mỗi lần thu hoạch đều trả một lát kinh nghiệm nhân vật nho nhỏ, co giãn theo cấp của điểm tài nguyên đối chiếu với cấp của chính bạn, giống hệt cách kinh nghiệm giết quái co giãn: một điểm tài nguyên xám tầm thường chẳng dạy được gì cho một nhân vật đã đạt trần.",
@@ -4634,7 +4641,8 @@ export const vi_VN: EnTranslations = {
         "mining": "Lần đầu tiên bạn thu hoạch điểm tài nguyên của bất kỳ nghề nào sẽ đạt được thành tích Hoa Quả Của Đồng Ruộng, và giới hạn 100 trong Khai Khoáng khắc ghi danh hiệu Quặng Trong Máu. Đạt 100 trong bất kỳ ba trong số Khai Khoáng, Đốn Gỗ, Thảo Dược Học, và Câu Cá thêm danh hiệu Thợ Thu Thập Thành Thạo với 25 Danh Vọng, và việc khai phá một mạch quặng nguyên sơ sẽ ghi lại dấu ấn sưu tập riêng của nó. Không có gì trong số này ban sức mạnh: thành tích là danh hiệu và Danh Vọng, bằng chứng về những con đường bạn đã đi qua.",
         "logging": "Lần đầu tiên bạn thu hoạch điểm tài nguyên của bất kỳ nghề nào sẽ đạt được thành tích Hoa Quả Của Đồng Ruộng, và giới hạn 100 trong Đốn Gỗ khắc ghi danh hiệu Thợ Chặt Cốt Lõi. Đạt 100 trong bất kỳ ba trong số Khai Khoáng, Đốn Gỗ, Thảo Dược Học, và Câu Cá thêm danh hiệu Thợ Thu Thập Thành Thạo với 25 Danh Vọng, và một khúc gỗ cốt lõi cổ xưa sẽ ghi lại dấu ấn sưu tập riêng của nó. Thành tích chỉ là danh hiệu và Danh Vọng, không bao giờ là sức mạnh.",
         "herbalism": "Lần đầu tiên bạn thu hoạch điểm tài nguyên của bất kỳ nghề nào sẽ đạt được thành tích Hoa Quả Của Đồng Ruộng, và giới hạn 100 trong Thảo Dược Học khắc ghi danh hiệu Người Thành Thạo Đồng Nội. Đạt 100 trong bất kỳ ba trong số Khai Khoáng, Đốn Gỗ, Thảo Dược Học, và Câu Cá thêm danh hiệu Thợ Thu Thập Thành Thạo với 25 Danh Vọng, và một bông hoa nở dưới ánh trăng sẽ ghi lại dấu ấn sưu tập riêng của nó. Thành tích chỉ là danh hiệu và Danh Vọng, không bao giờ là sức mạnh.",
-        "fishing": "Cột mốc 100 khắc ghi Lão Muối và 200 khắc ghi Ngư Sư Thành Thạo cùng danh hiệu của nó, đỉnh cao nhất của nghệ thuật câu cá; Câu Cá cũng tính cho Thợ Thu Thập Thành Thạo, kiếm được khi đạt 100 ở bất kỳ ba nghề thu thập nào. Con cá đầu tiên từ vùng nước của mỗi khu vực trong sáu khu vực lấp đầy một trang riêng, ba vùng lõi cùng Đầm Liễu, Đỉnh Gió Lộng, và Bờ Biển Xa Xôi ở xa hơn, còn Cá Koi Ánh Nắng thì ghi Tia Hy Vọng, nên những lữ khách mang theo cần câu trong hành trang lấp đầy sách của mình nhanh hơn họ tưởng."
+        "fishing": "Cột mốc 100 khắc ghi Lão Muối và 200 khắc ghi Ngư Sư Thành Thạo cùng danh hiệu của nó, đỉnh cao nhất của nghệ thuật câu cá; Câu Cá cũng tính cho Thợ Thu Thập Thành Thạo, kiếm được khi đạt 100 ở bất kỳ ba nghề thu thập nào. Con cá đầu tiên từ vùng nước của mỗi khu vực trong sáu khu vực lấp đầy một trang riêng, ba vùng lõi cùng Đầm Liễu, Đỉnh Gió Lộng, và Bờ Biển Xa Xôi ở xa hơn, còn Cá Koi Ánh Nắng thì ghi Tia Hy Vọng, nên những lữ khách mang theo cần câu trong hành trang lấp đầy sách của mình nhanh hơn họ tưởng.",
+        "farming": "Farming keeps no deeds of its own yet: its beds are still to come, and the milestone and cap deeds that mark the other trades arrive alongside them. Proficiency in it already counts toward Master Gatherer, which is earned at 100 in any three gathering trades, so a farmer will fill that page the same way everyone else does. Deeds are titles and Renown only, never power."
       },
       "fish": {
         "startHeading": "Bắt đầu",

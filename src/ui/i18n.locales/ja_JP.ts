@@ -8659,6 +8659,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.logging': '伐採',
   'hudChrome.gathering.herbalism': '薬草学',
   'hudChrome.gathering.fishing': '釣り',
+  'hudChrome.gathering.farming': '農耕',
   'hudChrome.gathering.notReady': 'この資源ノードはまだあなたのために再生していません。',
   'hudChrome.gathering.gatherLine': '{name}を採集した。',
   'hudChrome.gathering.gatherLineQty': '{name}を{qty}個採集した。',
@@ -8682,6 +8683,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.toolTierUnmet.herbalism':
     'この群生地を採取するにはティア{tier}の薬草鎌が必要です。',
   'hudChrome.gathering.toolTierUnmet.fishing': 'この水域で釣るにはティア{tier}の釣り竿が必要です。',
+  'hudChrome.gathering.toolTierUnmet.farming':
+    'この作物畑を耕すにはティア{tier}の農耕鍬が必要です。',
   'hudChrome.gathering.toolTierUnmetCorpse':
     '最高の素材を回収するにはティア{tier}の採集道具が必要です。',
   'hudChrome.gathering.wieldUnmet.mining':
@@ -8689,6 +8692,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.wieldUnmet.logging': 'バッグにある伐採斧を振るうには伐採{skill}が必要です。',
   'hudChrome.gathering.wieldUnmet.herbalism':
     'バッグにある薬草鎌を扱うには薬草学{skill}が必要です。',
+  'hudChrome.gathering.wieldUnmet.farming': 'バッグにある農耕鍬を振るうには農耕{skill}が必要です。',
   'hudChrome.gathering.wieldUnmetCorpse': '最高の道具を使いこなすには採集スキル{skill}が必要です。',
   'hudChrome.gathering.requiresTool.mining': '採掘ピッケルが必要',
   'hudChrome.gathering.requiresTool.logging': '伐採斧が必要',
@@ -8697,13 +8701,16 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.toolRequired.logging': 'この立木を伐り倒すには伐採斧が必要です。',
   'hudChrome.gathering.toolRequired.herbalism': 'この群生地を採取するには薬草鎌が必要です。',
   'hudChrome.gathering.toolRequired.fishing': '釣り糸を垂らすには釣り竿が必要です。',
+  'hudChrome.gathering.toolRequired.farming': 'この作物畑を耕すには農耕鍬が必要です。',
   'hudChrome.gathering.noNodeNearby.mining': '手の届く範囲に鉱脈がありません。',
   'hudChrome.gathering.noNodeNearby.logging': '手の届く範囲に立木がありません。',
   'hudChrome.gathering.noNodeNearby.herbalism': '手の届く範囲に薬草の群生地がありません。',
+  'hudChrome.gathering.noNodeNearby.farming': '手の届く範囲に作物畑がありません。',
   'hudChrome.gathering.toolTooltip.kind.mining': '採掘道具（ティア{tier}）',
   'hudChrome.gathering.toolTooltip.kind.logging': '伐採道具（ティア{tier}）',
   'hudChrome.gathering.toolTooltip.kind.herbalism': '薬草道具（ティア{tier}）',
   'hudChrome.gathering.toolTooltip.kind.fishing': '釣り竿（ティア{tier}）',
+  'hudChrome.gathering.toolTooltip.kind.farming': '農耕道具（ティア{tier}）',
   'hudChrome.gathering.toolTooltip.unlocks.mining': 'ティア{tier}までの鉱脈の採掘に必要です。',
   'hudChrome.gathering.toolTooltip.unlocks.logging': 'ティア{tier}までの立木の伐採に必要です。',
   'hudChrome.gathering.toolTooltip.unlocks.herbalism':
@@ -10812,7 +10819,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.professions.comingSoon': 'レシピ未実装',
   'guide.professions.gatherHubHeading': '採集',
   'guide.professions.gatherHubBody':
-    '四つの採集職が製作に素材を供給します。採掘・伐採・薬草学の上限は100、釣りは200です。',
+    '採集職が製作に素材を供給します。採掘・伐採・薬草学の上限は100、農耕は手入れした畑で種から作物を育て上限は同じく100、釣りは200です。',
   'guide.professions.archetypesHeading': '十の生き方',
   'guide.professions.archetypesBody':
     '隣り合う二つの職に調律すると対の称号を得ます。二つの主専攻は上限まで伸ばせ、反対側の一つは趣味としてレア段階まで残り、その他の職はコモン段階に留まります。',
@@ -10925,6 +10932,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '薬草学は三つのゾーンで薬草を摘み、調合系の職に素材を供給します。艶葉草はイーストブルック渓谷、金葉草はマイアフェン湿地、陽花草はソーンピーク高地に育ちます。レベル1から誰でも始められ、バッグに薬草鎌（どのゾーンの拠点でも銅貨20枚）があれば摘み取れます。専用のカウンターで記録され、上限は100です。',
   'guide.profPages.gatherIntro.fishing':
     '釣りはアタリとリールの呼吸で各ゾーンの開けた水辺から獲物を釣り上げます。上限は200です。',
+  'guide.profPages.gatherIntro.farming':
+    '農耕は手入れした畑で種から作物を育て、上限は100です。畑と種、道具は今後の更新で実装されるため、下の表は今のところ空です。',
   'guide.profPages.rhythmHeading': '採集のリズム',
   'guide.profPages.rhythmBody':
     '採集は目に見える詠唱です。基本{base}秒、最短{floor}秒で、道具がノードより1ティア高いごとに{tool}秒、熟練度バンドごとに{band}秒短くなります。',
@@ -11033,7 +11042,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   // proper-noun precedent).
   'guide.professions.whatHeading': '剣のかたわらの生業',
   'guide.professions.whatBody':
-    '専門技能はこの世界の暮らしそのものです。四つの採集職が大地から素材を引き出し、十の製作職がそれを装備や食事、薬、道具に変えます。すべてが連鎖します。掘った鉱石は剣になり、剣はエンチャントを受け、そのエンチャントは古い装備を砕いた粉を必要とします。職業数の制限はありません。今内容のある八つの製作職と四つの採集職をすべて並行して伸ばせます。唯一の排他的な選択は、いずれ誓う生き方だけです。ただし、いったん誓いを立てると、その陰で休眠に入った製作職は伸びが止まります。スキルは決して下がらず、学んだことが失われることもありません。',
+    '専門技能はこの世界の暮らしそのものです。採集職が大地から素材を引き出し、十の製作職がそれを装備や食事、薬、道具に変えます。すべてが連鎖します。掘った鉱石は剣になり、剣はエンチャントを受け、そのエンチャントは古い装備を砕いた粉を必要とします。職業数の制限はありません。今内容のある八つの製作職と採集職をすべて並行して伸ばせます。唯一の排他的な選択は、いずれ誓う生き方だけです。ただし、いったん誓いを立てると、その陰で休眠に入った製作職は伸びが止まります。スキルは決して下がらず、学んだことが失われることもありません。',
   'guide.professions.deedsHeading': '旅路を刻む功績',
   'guide.professions.deedsBody':
     '功績の書が歩みに寄り添います。初めての調律で技巧に誓いし者、初めての傑作でMasterwrightを獲得し、どちらも称号として身につけられます。八つの製作職はそれぞれスキル50で節目の功績、上限125でGrandmaster称号を戴き、釣りは熟練100でOld Salt、200でMaster Angler称号を得ます。初めての採集や製作、野外の幸運な発見、サルベージにも静かなページがあります。すべて装飾のみ。称号と名声だけで、功績が力を与えることはありません。',
@@ -11052,6 +11061,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'どの採集職でも最初の採取でFruits of the Fieldを、薬草学100でMaster of the Meadowを刻みます。四採集職のうち三つで100に達するとMaster Gatherer（名声25）。moonlit bloomを摘めば専用の収集印も。功績は称号と名声のみで、力は与えません。',
   'guide.profPages.gatherDeeds.fishing':
     '熟練100でOld Saltを、200でMaster Anglerとその称号を刻みます。釣り人の頂点です。釣りもMaster Gatherer（三職100）に数えられます。各地方の水域で最初の一匹を釣ればそれぞれのページが埋まり、日映えの錦鯉を釣ればGlimmer of Hopeが記されます。杖を荷物に忍ばせる旅人は、思いのほか早く功績の書を満たします。',
+  'guide.profPages.gatherDeeds.farming':
+    '農耕には専用の功績がまだありません。畑がこれから実装され、他の職を彩る到達と上限の功績もそれに合わせて加わります。熟練はすでにMaster Gatherer（三職100）に数えられます。功績は称号と名声だけを与え、力を与えることはありません。',
   'guide.profPages.fish.startHeading': 'はじめかた',
   'guide.profPages.fish.startBody':
     'Simple Fishing PoleはEastbrookのFisherman Brandtが20銅で売っています（町の東端でMirror Lakeを睨む老練の釣り師です）。Tinker Gizzel、FenbridgeのProvisioner Hale、HighwatchのQuartermaster Breeにも在庫があります。前方約24ヤード以内の十分に深い水面に向かって竿を使えば、浮きが飛んでいきます。戦闘中、泳いでいる間、死亡中は投げられません。岸から釣るのが本来の姿で、どの地方の釣れる水域でも構いません。',

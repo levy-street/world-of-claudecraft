@@ -2602,6 +2602,7 @@ export const da_DK: EnTranslations = {
       "logging": "Skovhugst",
       "herbalism": "Urtekundskab",
       "fishing": "Fiskeri",
+      "farming": "Farming",
       "notReady": "Denne ressourcekilde er endnu ikke genskabt for dig.",
       "gatherLine": "Du samler: {name}.",
       "gatherLineQty": "Du samler: {name} x{qty}.",
@@ -2631,23 +2632,27 @@ export const da_DK: EnTranslations = {
         "mining": "Du har brug for en niveau {tier} mineøkse for at høste denne åre.",
         "logging": "Du har brug for en niveau {tier} skovhuggeøkse for at fælde denne lund.",
         "herbalism": "Du har brug for en niveau {tier} urtesegl for at samle denne plette.",
-        "fishing": "Du har brug for en niveau {tier} fiskestang for at fiske i disse vande."
+        "fishing": "Du har brug for en niveau {tier} fiskestang for at fiske i disse vande.",
+        "farming": "You need a tier {tier} farming hoe to work this bed."
       },
       "toolRequired": {
         "mining": "Du har brug for en minehakke for at høste denne åre.",
         "logging": "Du har brug for en skovhuggeøkse for at fælde denne lund.",
         "herbalism": "Du har brug for en urtesegl for at samle denne plette.",
-        "fishing": "Du har brug for en fiskestang for at kaste linen ud."
+        "fishing": "Du har brug for en fiskestang for at kaste linen ud.",
+        "farming": "You need a farming hoe to work this bed."
       },
       "noNodeNearby": {
         "mining": "Der er ingen malmåre inden for rækkevidde.",
         "logging": "Der er ingen tømmerlund inden for rækkevidde.",
-        "herbalism": "Der er ingen urteplette inden for rækkevidde."
+        "herbalism": "Der er ingen urteplette inden for rækkevidde.",
+        "farming": "There is no crop bed within reach."
       },
       "wieldUnmet": {
         "mining": "Du har brug for Minedrift {skill} for at svinge den hakke, du allerede har i taskerne.",
         "logging": "Du har brug for Skovhugst {skill} for at svinge den økse, du allerede har i taskerne.",
-        "herbalism": "Du har brug for Urtekundskab {skill} for at bruge den segl, du allerede har i taskerne."
+        "herbalism": "Du har brug for Urtekundskab {skill} for at bruge den segl, du allerede har i taskerne.",
+        "farming": "You need Farming {skill} to swing the hoe already in your bags."
       },
       "wieldUnmetCorpse": "Du har brug for indsamlingsfærdighed {skill} for at sætte dit fineste værktøj i arbejde.",
       "toolTierUnmetCorpse": "Du har brug for et niveau {tier} indsamlingsværktøj for at genvinde de fineste materialer.",
@@ -2656,7 +2661,8 @@ export const da_DK: EnTranslations = {
           "mining": "Minedriftsværktøj (niveau {tier})",
           "logging": "Skovhugstværktøj (niveau {tier})",
           "herbalism": "Urtekundskabsværktøj (niveau {tier})",
-          "fishing": "Fiskestang (niveau {tier})"
+          "fishing": "Fiskestang (niveau {tier})",
+          "farming": "Farming tool (tier {tier})"
         },
         "unlocks": {
           "mining": "Kræves for at høste malmårer op til niveau {tier}.",
@@ -4603,7 +4609,8 @@ export const da_DK: EnTranslations = {
         "mining": "Minedrift trækker malm direkte ud af verdens klippe: kobber i Østbæk Dal, jern i Mosekær Sump og osmium oppe i Tornetop Højder, med startårer spredt ud over hver eneste yngre zone hinsides dem, som føde til smedjehåndværkene. Åben for alle fra niveau 1: en minehakke til 20 kobber fra en disk i Østbæk, Fenbridge eller Højvagt åbner hver eneste startåre, og de højere trin på hakkestigen vågner, efterhånden som din egen tæller optjener dem. Sporet på sin egen tæller op til en grænse på 100.",
         "logging": "Skovhugst fælder tømmer fra trælunde over hele verden: jernbark i Østbæk Dal, askeved i Mosekær Sump, højfyr i Tornetop Højder og startlunde i hver eneste yngre zone, råvaren til skafter, stave og ingeniørens bænk. Åben for alle fra niveau 1 med en skovhuggeøkse i dine tasker (20 kobber ved diskene i Østbæk, Fenbridge og Højvagt), sporet på sin egen tæller op til en grænse på 100.",
         "herbalism": "Urtekundskab samler det, der gror vildt: glansblad i Østbæk Dal, guldblad i Mosekær Sump, solkrone i Tornetop Højder og startpletter i hver eneste yngre zone, det blad og den stængel, der holder apotekerfagene i gang med at brygge. Åben for alle fra niveau 1 med en urtesegl i dine tasker (20 kobber ved diskene i Østbæk, Fenbridge og Højvagt), sporet på sin egen tæller op til en grænse på 100.",
-        "fishing": "Fiskeri er den, der stikker ud blandt indsamlingsfagene, og den dybeste: et rigtigt bid-og-hiv-minispil, sine egne fangsttabeller i hver af de tre kernelandszoner (de unge vande hinsides dem serverer alle Dalens tabel indtil videre) og en proficiensgrænse på 200, det dobbelte af de andres. Køb en stang, vend dig mod åbent vand, og kast ud."
+        "fishing": "Fiskeri er den, der stikker ud blandt indsamlingsfagene, og den dybeste: et rigtigt bid-og-hiv-minispil, sine egne fangsttabeller i hver af de tre kernelandszoner (de unge vande hinsides dem serverer alle Dalens tabel indtil videre) og en proficiensgrænse på 200, det dobbelte af de andres. Køb en stang, vend dig mod åbent vand, og kast ud.",
+        "farming": "Farming is the one gathering trade you tend rather than take: crops raised from seed in worked beds, then pulled up ripe for the kitchens and the apothecary benches. Its beds, seeds, and tools arrive in a later patch, so the tables below stand empty for now. That is deliberate rather than an oversight: the trade holds its seat on the gathering counter, tracked to a cap of 100, and fills in as its content lands."
       },
       "rhythmHeading": "Indsamlingsrytmen",
       "rhythmBody": "En høst er et kort, synligt kast, ikke et øjeblikkeligt greb: {base} sekunder i basis, aldrig under et gulv på {floor} sekunder. At bære et værktøj over ressourcekildens niveau, et som din proficiens tillader dig at håndtere, gør dig hurtigere med {tool} sekunder pr. niveau over den, og hvert proficiensbånd, du krydser, trimmer yderligere {band} sekunder; blot at matche ressourcekildens niveau får dig ind ad døren, det er niveauerne over den, der gør dig hurtig.\n\nEn fuld taske afviser høfligt kastet, før det begynder, så intet spildes midt i svinget, og hver høst betaler en lille skive karakter-XP, skaleret efter ressourcekildens niveau mod dit eget, ligesom drabs-XP skalerer: en triviel grå ressourcekilde lærer en karakter ved grænsen ingenting.",
@@ -4634,7 +4641,8 @@ export const da_DK: EnTranslations = {
         "mining": "Din første ressourcekilde i et fag optjener Markens Frugter, og 100-grænsen i Minedrift indskriver Malm i Blodet. At nå 100 i tre af Minedrift, Skovhugst, Urtekundskab og Fiskeri tilføjer Mesterindsamler ved 25 Hæder, og at knække en uberørt åre optegner sit eget samlerensmærke. Ingen af disse giver magt: bedrifter er titler og Hæder, et minde om de veje, du har vandret.",
         "logging": "Din første ressourcekilde i et fag optjener Markens Frugter, og 100-grænsen i Skovhugst indskriver Kernevedhugger. At nå 100 i tre af Minedrift, Skovhugst, Urtekundskab og Fiskeri tilføjer Mesterindsamler ved 25 Hæder, og et hugget stykke gammelt kernetræ optegner sit eget samlerensmærke. Bedrifter er titler og Hæder alene, aldrig magt.",
         "herbalism": "Din første ressourcekilde i et fag optjener Markens Frugter, og 100-grænsen i Urtekundskab indskriver Engmarksmesters. At nå 100 i tre af Minedrift, Skovhugst, Urtekundskab og Fiskeri tilføjer Mesterindsamler ved 25 Hæder, og en måneskinsblomst optegner sit eget samlerensmærke. Bedrifter er titler og Hæder alene, aldrig magt.",
-        "fishing": "Milepælen ved 100 indskriver Gammel Søulk, og 200 indskriver Mesterangler med sin titel, det allerhøjeste i anglerens kunst; Fiskeri tæller også mod Mesterindsamler, som optjenes ved 100 i tre vilkårlige indsamlingsfag. En første fisk fra hvert af seks zoners vande udfylder sin egen side, de tre kernelandszoner samt Pilekæret, Stormkammen og Fjernkysten hinsides dem, og Solglimt-Koikarpen optegner Et Glimt af Håb, så rejsende med en stang i oppakningen fylder deres bog hurtigere, end de venter."
+        "fishing": "Milepælen ved 100 indskriver Gammel Søulk, og 200 indskriver Mesterangler med sin titel, det allerhøjeste i anglerens kunst; Fiskeri tæller også mod Mesterindsamler, som optjenes ved 100 i tre vilkårlige indsamlingsfag. En første fisk fra hvert af seks zoners vande udfylder sin egen side, de tre kernelandszoner samt Pilekæret, Stormkammen og Fjernkysten hinsides dem, og Solglimt-Koikarpen optegner Et Glimt af Håb, så rejsende med en stang i oppakningen fylder deres bog hurtigere, end de venter.",
+        "farming": "Farming keeps no deeds of its own yet: its beds are still to come, and the milestone and cap deeds that mark the other trades arrive alongside them. Proficiency in it already counts toward Master Gatherer, which is earned at 100 in any three gathering trades, so a farmer will fill that page the same way everyone else does. Deeds are titles and Renown only, never power."
       },
       "fish": {
         "startHeading": "Kom i gang",
