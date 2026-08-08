@@ -9691,7 +9691,7 @@ export const nl_NL: EnTranslations = {
         "name": "Thorium Mijnpik"
       },
       "arcanite_mining_pick": {
-        "name": "Arcaniet Mijnpik"
+        "name": "Glyphsteel Mining Pick"
       },
       "ashwood_axe": {
         "name": "Essenhouten Bijl"
@@ -9709,7 +9709,7 @@ export const nl_NL: EnTranslations = {
         "name": "Thoriumerts"
       },
       "arcanite_bar": {
-        "name": "Arcanietstaaf"
+        "name": "Glyphsteel Bar"
       },
       "ashwood_log": {
         "name": "Essenhout Blok"
@@ -9940,7 +9940,7 @@ export const nl_NL: EnTranslations = {
         "name": "Thorium Strijdkling"
       },
       "arcanite_war_axe": {
-        "name": "Arcaniet Oorlogsbijl"
+        "name": "Glyphsteel War Axe"
       },
       "elderwood_battle_staff": {
         "name": "Ouderhout Gevechts-Staf"

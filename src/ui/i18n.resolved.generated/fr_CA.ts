@@ -9667,7 +9667,7 @@ export const fr_CA: EnTranslations = {
         "name": "Pic de Minage en Fer"
       },
       "mithril_mining_pick": {
-        "name": "Pic de mineur en mithril"
+        "name": "Skysilver Mining Pick"
       },
       "handaxe": {
         "name": "Hachette"
@@ -9688,10 +9688,10 @@ export const fr_CA: EnTranslations = {
         "name": "Faucille Feuille d'Argent"
       },
       "thorium_mining_pick": {
-        "name": "Pic de mineur en thorium"
+        "name": "Osmium Mining Pick"
       },
       "arcanite_mining_pick": {
-        "name": "Pic de mineur en arcanite"
+        "name": "Glyphsteel Mining Pick"
       },
       "ashwood_axe": {
         "name": "Hache en Bois de Frêne"
@@ -9706,10 +9706,10 @@ export const fr_CA: EnTranslations = {
         "name": "Faucille Pétale de Soleil"
       },
       "thorium_ore": {
-        "name": "Minerai de thorium"
+        "name": "Osmium Ore"
       },
       "arcanite_bar": {
-        "name": "Lingot d'arcanite"
+        "name": "Glyphsteel Bar"
       },
       "ashwood_log": {
         "name": "Bûche de Frêne Gris"
@@ -9937,10 +9937,10 @@ export const fr_CA: EnTranslations = {
         "name": "Dague en fer aiguisé"
       },
       "thorium_warblade": {
-        "name": "Lame de guerre en thorium"
+        "name": "Osmium Warblade"
       },
       "arcanite_war_axe": {
-        "name": "Hache de guerre en arcanite"
+        "name": "Glyphsteel War Axe"
       },
       "elderwood_battle_staff": {
         "name": "Bâton de bataille en bois ancien"
@@ -9964,13 +9964,13 @@ export const fr_CA: EnTranslations = {
         "name": "Spallières Ligefer"
       },
       "thoriumscale_greathelm": {
-        "name": "Grand heaume en écailles de thorium"
+        "name": "Osmiumscale Greathelm"
       },
       "thoriumscale_cuirass": {
-        "name": "Cuirasse en écailles de thorium"
+        "name": "Osmiumscale Cuirass"
       },
       "thoriumscale_leggings": {
-        "name": "Jambières en écailles de thorium"
+        "name": "Osmiumscale Leggings"
       },
       "homespun_hood": {
         "name": "Cagoule filée à la maison"
@@ -10225,7 +10225,7 @@ export const fr_CA: EnTranslations = {
         "name": "Minerai de fer fin"
       },
       "fine_thorium_ore": {
-        "name": "Minerai de thorium fin"
+        "name": "Fine Osmium Ore"
       },
       "fine_ironbark_log": {
         "name": "Bûche d'écorce de fer fine"

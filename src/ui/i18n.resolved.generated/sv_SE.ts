@@ -9691,7 +9691,7 @@ export const sv_SE: EnTranslations = {
         "name": "Toriumhacka"
       },
       "arcanite_mining_pick": {
-        "name": "Arkanithacka"
+        "name": "Glyphsteel Mining Pick"
       },
       "ashwood_axe": {
         "name": "Askträdsyxa"
@@ -9709,7 +9709,7 @@ export const sv_SE: EnTranslations = {
         "name": "Toriummalm"
       },
       "arcanite_bar": {
-        "name": "Arkanitbalk"
+        "name": "Glyphsteel Bar"
       },
       "ashwood_log": {
         "name": "Askvedstock"
@@ -9940,7 +9940,7 @@ export const sv_SE: EnTranslations = {
         "name": "Toriumkrigsklinga"
       },
       "arcanite_war_axe": {
-        "name": "Arkanitkrigsyxa"
+        "name": "Glyphsteel War Axe"
       },
       "elderwood_battle_staff": {
         "name": "Äldrevedsstridsstav"

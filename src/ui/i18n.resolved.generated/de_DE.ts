@@ -4595,9 +4595,9 @@ export const de_DE: EnTranslations = {
         "bonusFmt": "+{value} {stat}"
       },
       "gatherIntro": {
-        "mining": "Bergbau holt Erz direkt aus dem Fels der Welt: Kupfer im Eastbrook-Tal, Eisen im Mirefen-Moor und Thorium oben in den Thornpeak-Höhen, dazu Anfängeradern, verstreut über jede jüngere Zone dahinter, und speist damit die Schmiedeberufe. Ab Stufe 1 für jeden offen: Eine Bergbau-Spitzhacke für 20 Kupfer von einem Tresen in Eastbrook, Fenbridge oder Highwatch öffnet jede Anfängerader, und die höheren Sprossen der Spitzhacken-Leiter erwachen, sobald dein eigener Zähler sie verdient. Auf einem eigenen Zähler bis zu einer Obergrenze von 100 verfolgt.",
+        "mining": "Mining pulls ore straight out of the world's rock: copper in Eastbrook Vale, iron in Mirefen Marsh, and osmium up in Thornpeak Heights, with starter veins scattered through every younger zone beyond them, feeding the forge crafts. Open to everyone from level 1: a 20 copper mining pick from an Eastbrook, Fenbridge, or Highwatch counter opens every starter vein, and the higher rungs of the pick ladder wake as your own counter earns them. Tracked on its own counter to a cap of 100.",
         "logging": "Holzfällen schlägt Holz aus Baumgruppen in der ganzen Welt: Eisenrinde im Eastbrook-Tal, Aschenholz im Mirefen-Moor, Altholz in den Thornpeak-Höhen und Anfänger-Baumgruppen in jeder jüngeren Zone, das Rohmaterial für Schäfte, Stäbe und die Werkbank des Ingenieurs. Ab Stufe 1 für jeden offen, sofern eine Holzfäller-Axt in deinen Taschen liegt (20 Kupfer an den Tresen von Eastbrook, Fenbridge und Highwatch), auf einem eigenen Zähler bis zu einer Obergrenze von 100 verfolgt.",
-        "herbalism": "Kräuterkunde sammelt, was wild wächst: Silberblatt im Eastbrook-Tal, Goldblatt im Mirefen-Moor, Sonnenblüte in den Thornpeak-Höhen und Anfängerpflanzen in jeder jüngeren Zone, Blatt und Stängel, die die Apothekerberufe am Brauen halten. Ab Stufe 1 für jeden offen, sofern eine Kräuterkunde-Sichel in deinen Taschen liegt (20 Kupfer an den Tresen von Eastbrook, Fenbridge und Highwatch), auf einem eigenen Zähler bis zu einer Obergrenze von 100 verfolgt.",
+        "herbalism": "Herbalism gathers what grows wild: sheenleaf in Eastbrook Vale, goldleaf in Mirefen Marsh, sunpetal in Thornpeak Heights, and starter patches in every younger zone, the leaf and stem that keep the apothecary trades brewing. Open to everyone from level 1 with a herbalism sickle in your bags (20 copper at the Eastbrook, Fenbridge, and Highwatch counters), tracked on its own counter to a cap of 100.",
         "fishing": "Angeln ist der Sonderling unter den Sammelberufen und zugleich der tiefgründigste: ein echtes Biss-und-Einhol-Minispiel, eigene Fangtabellen in jeder der drei Kernlandzonen (die jungen Gewässer dahinter bedienen vorerst alle die Tabelle des Tals) und eine Fertigkeitsobergrenze von 200, doppelt so hoch wie bei den anderen. Kauf eine Angel, stell dich mit Blick aufs offene Wasser und wirf aus."
       },
       "rhythmHeading": "Der Sammelrhythmus",
@@ -9259,7 +9259,7 @@ export const de_DE: EnTranslations = {
         "name": "Leinenfetzen"
       },
       "arcane_dust": {
-        "name": "Arkanstaub"
+        "name": "Chime Dust"
       },
       "arcane_essence": {
         "name": "Arkanessenz"
@@ -9667,7 +9667,7 @@ export const de_DE: EnTranslations = {
         "name": "Eisen-Grabpickel"
       },
       "mithril_mining_pick": {
-        "name": "Mithril-Grabpickel"
+        "name": "Skysilver Mining Pick"
       },
       "handaxe": {
         "name": "Handaxt"
@@ -9685,13 +9685,13 @@ export const de_DE: EnTranslations = {
         "name": "Bronzesichel"
       },
       "silverleaf_sickle": {
-        "name": "Silberblatt-Sichel"
+        "name": "Sheenleaf Sickle"
       },
       "thorium_mining_pick": {
-        "name": "Thorium-Grabpickel"
+        "name": "Osmium Mining Pick"
       },
       "arcanite_mining_pick": {
-        "name": "Arkanit-Grabpickel"
+        "name": "Glyphsteel Mining Pick"
       },
       "ashwood_axe": {
         "name": "Eschenholzaxt"
@@ -9706,10 +9706,10 @@ export const de_DE: EnTranslations = {
         "name": "Sonnenblütensichel"
       },
       "thorium_ore": {
-        "name": "Thoriumerz"
+        "name": "Osmium Ore"
       },
       "arcanite_bar": {
-        "name": "Arkanitbarren"
+        "name": "Glyphsteel Bar"
       },
       "ashwood_log": {
         "name": "Aschenholzscheit"
@@ -9874,7 +9874,7 @@ export const de_DE: EnTranslations = {
         "name": "Eisenrindenholz"
       },
       "silverleaf_herb": {
-        "name": "Silberblattkraut"
+        "name": "Sheenleaf Herb"
       },
       "rough_hide": {
         "name": "Raues Fell"
@@ -9937,10 +9937,10 @@ export const de_DE: EnTranslations = {
         "name": "Geschärfter Eisendolch"
       },
       "thorium_warblade": {
-        "name": "Thorium-Kriegsklinge"
+        "name": "Osmium Warblade"
       },
       "arcanite_war_axe": {
-        "name": "Arkanit-Kriegsaxt"
+        "name": "Glyphsteel War Axe"
       },
       "elderwood_battle_staff": {
         "name": "Altholz-Kampfstab"
@@ -9964,13 +9964,13 @@ export const de_DE: EnTranslations = {
         "name": "Eisenglieder-Schulterstücke"
       },
       "thoriumscale_greathelm": {
-        "name": "Thoriumschuppen-Großhelm"
+        "name": "Osmiumscale Greathelm"
       },
       "thoriumscale_cuirass": {
-        "name": "Thoriumschuppen-Küraß"
+        "name": "Osmiumscale Cuirass"
       },
       "thoriumscale_leggings": {
-        "name": "Thoriumschuppen-Beinlinge"
+        "name": "Osmiumscale Leggings"
       },
       "homespun_hood": {
         "name": "Selbstgesponnene Kapuze"
@@ -10054,10 +10054,10 @@ export const de_DE: EnTranslations = {
         "name": "Marlows Festtagsbraten"
       },
       "silverleaf_healing_draught": {
-        "name": "Silberblatt-Heiltrank"
+        "name": "Sheenleaf Healing Draught"
       },
       "silverleaf_mana_draught": {
-        "name": "Silberblatt-Manatrank"
+        "name": "Sheenleaf Mana Draught"
       },
       "elixir_of_the_boar": {
         "name": "Elixier des Ebers"
@@ -10225,7 +10225,7 @@ export const de_DE: EnTranslations = {
         "name": "Feines Eisenerz"
       },
       "fine_thorium_ore": {
-        "name": "Feines Thoriumerz"
+        "name": "Fine Osmium Ore"
       },
       "fine_ironbark_log": {
         "name": "Feines Eisenrindenholz"
@@ -10237,7 +10237,7 @@ export const de_DE: EnTranslations = {
         "name": "Feines Altholzscheit"
       },
       "fine_silverleaf_herb": {
-        "name": "Feines Silberblattkraut"
+        "name": "Fine Sheenleaf Herb"
       },
       "fine_goldleaf_herb": {
         "name": "Feines Goldblattkraut"

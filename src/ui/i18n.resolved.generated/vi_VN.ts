@@ -9691,7 +9691,7 @@ export const vi_VN: EnTranslations = {
         "name": "Cuốc Khai Khoáng Thorium"
       },
       "arcanite_mining_pick": {
-        "name": "Cuốc Khai Khoáng Arcanite"
+        "name": "Glyphsteel Mining Pick"
       },
       "ashwood_axe": {
         "name": "Rìu Gỗ Tần Bì"
@@ -9709,7 +9709,7 @@ export const vi_VN: EnTranslations = {
         "name": "Quặng Thorium"
       },
       "arcanite_bar": {
-        "name": "Thỏi Arcanite"
+        "name": "Glyphsteel Bar"
       },
       "ashwood_log": {
         "name": "Khúc Gỗ Tần Bì Tro"
@@ -9940,7 +9940,7 @@ export const vi_VN: EnTranslations = {
         "name": "Chiến Đao Thorium"
       },
       "arcanite_war_axe": {
-        "name": "Chiến Rìu Arcanite"
+        "name": "Glyphsteel War Axe"
       },
       "elderwood_battle_staff": {
         "name": "Chiến Trượng Gỗ Cổ Thụ"

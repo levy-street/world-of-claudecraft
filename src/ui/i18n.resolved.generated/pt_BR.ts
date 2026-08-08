@@ -9688,10 +9688,10 @@ export const pt_BR: EnTranslations = {
         "name": "Foice de Folha de Prata"
       },
       "thorium_mining_pick": {
-        "name": "Picareta de Tório"
+        "name": "Osmium Mining Pick"
       },
       "arcanite_mining_pick": {
-        "name": "Picareta de Arcanita"
+        "name": "Glyphsteel Mining Pick"
       },
       "ashwood_axe": {
         "name": "Machado de Freixo"
@@ -9706,10 +9706,10 @@ export const pt_BR: EnTranslations = {
         "name": "Foice Pétala Solar"
       },
       "thorium_ore": {
-        "name": "Minério de Tório"
+        "name": "Osmium Ore"
       },
       "arcanite_bar": {
-        "name": "Barra de Arcanita"
+        "name": "Glyphsteel Bar"
       },
       "ashwood_log": {
         "name": "Tora de Freixo Cinza"
@@ -9937,10 +9937,10 @@ export const pt_BR: EnTranslations = {
         "name": "Punhal de Ferro Afiado"
       },
       "thorium_warblade": {
-        "name": "Lâmina de Guerra de Tório"
+        "name": "Osmium Warblade"
       },
       "arcanite_war_axe": {
-        "name": "Machado de Guerra de Arcanita"
+        "name": "Glyphsteel War Axe"
       },
       "elderwood_battle_staff": {
         "name": "Cajado de Batalha de Madeira Antiga"
@@ -9964,13 +9964,13 @@ export const pt_BR: EnTranslations = {
         "name": "Espaldares Ironlink"
       },
       "thoriumscale_greathelm": {
-        "name": "Grande Elmo de Escama de Tório"
+        "name": "Osmiumscale Greathelm"
       },
       "thoriumscale_cuirass": {
-        "name": "Couraça de Escama de Tório"
+        "name": "Osmiumscale Cuirass"
       },
       "thoriumscale_leggings": {
-        "name": "Perneiras de Escama de Tório"
+        "name": "Osmiumscale Leggings"
       },
       "homespun_hood": {
         "name": "Capuz caseiro"
@@ -10225,7 +10225,7 @@ export const pt_BR: EnTranslations = {
         "name": "Minério de Ferro Fino"
       },
       "fine_thorium_ore": {
-        "name": "Minério de Tório Fino"
+        "name": "Fine Osmium Ore"
       },
       "fine_ironbark_log": {
         "name": "Tora de Casca de Ferro Fina"
