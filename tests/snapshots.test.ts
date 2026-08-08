@@ -27,8 +27,9 @@ vi.mock('../server/db', () => ({
 import { saveCharacterState } from '../server/db';
 import { type ClientSession, GameServer, wireEntity } from '../server/game';
 import { corpseLootAvailability } from '../src/game/corpse_loot_availability';
-import type { ClientWorld } from '../src/net/online';
+import { ClientWorld } from '../src/net/online';
 import { mechHeldWeaponOverride, visualKeyFor } from '../src/render/characters/manifest';
+import { FARM_PATCHES } from '../src/sim/content/farm_patches';
 import { MOUNT_RACE_START_PLATFORM, type MountKey } from '../src/sim/content/mounts';
 import { COMBO_RECIPES } from '../src/sim/content/recipes';
 import { BUILTIN_WORLD, DELVES, GATHER_NODES, ITEMS, MOBS } from '../src/sim/data';
@@ -3131,6 +3132,36 @@ describe('farm plot wire (fplot)', () => {
     joinServer(server, fc, 1, 'Bramble');
     broadcast(server);
     expect(lastSnap(fc.sent).self.fplot).toEqual([]);
+  });
+
+  it('a real ClientWorld serves the frozen patch table by reference from construction', () => {
+    // The static-content arm of IWorldFarming: farmPatches never rides the
+    // wire, so only a REAL construction (not the bareClient fixture, which
+    // stamps its own copy of the default) can pin src/net/online.ts against
+    // an accidental [] or defensive copy. DOM/network-free construction via
+    // the withDomStubs idiom (target_echo_client.test.ts /
+    // account_flair_client.test.ts).
+    class StubWebSocket {
+      static readonly OPEN = 1;
+      onopen: (() => void) | null = null;
+      readyState = StubWebSocket.OPEN;
+      constructor(public readonly url: string) {}
+      send(): void {}
+      close(): void {}
+    }
+    const g = globalThis as Record<string, unknown>;
+    const prevWebSocket = g.WebSocket;
+    const prevWindow = g.window;
+    g.WebSocket = StubWebSocket as unknown;
+    g.window = { setInterval: () => 0, clearInterval: () => undefined };
+    try {
+      const w = new ClientWorld('farm-statics-probe', 1, 'warrior', 'http://localhost');
+      expect(w.farmPatches).toBe(FARM_PATCHES);
+      expect(w.myFarmPlots).toEqual([]);
+    } finally {
+      g.WebSocket = prevWebSocket;
+      g.window = prevWindow;
+    }
   });
 });
 
