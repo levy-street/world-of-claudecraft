@@ -306,6 +306,7 @@ describe('/dev farmgrow (farming grow-now)', () => {
 
   it('brings every growing plot ready, drawing zero rng and disturbing nothing else', () => {
     const sim = devSim();
+    sim.tick(); // a real positive clock, so the floored grow-now instant IS now
     plant(sim, 'bed_eastbrook_1', FAR);
     plant(sim, 'bed_eastbrook_2', FAR + 90_000);
     let draws = 0;

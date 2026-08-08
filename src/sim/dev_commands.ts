@@ -345,7 +345,11 @@ export function handleDevChat(
     const meta = ctx.players.get(pid);
     if (!meta) return null;
     const bedId = farmGrowMatch[1];
-    const nowMs = ctx.lockoutNowMs();
+    // The write-side anchor rule's third statement (plantCrop floors its
+    // plant time and the loader floors its re-anchor the same way): an
+    // unfloored 0 from a fresh never-ticked offline Sim would write a
+    // readyAtMs the loader's positivity arm destroys as tampered.
+    const nowMs = Math.max(ctx.lockoutNowMs(), 1);
     if (bedId !== undefined) {
       const plot = meta.farmPlots.get(bedId);
       if (!plot) {

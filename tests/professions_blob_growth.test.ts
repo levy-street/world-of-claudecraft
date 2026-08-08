@@ -179,6 +179,12 @@ const NON_PROFESSIONS_BLOB_FIELDS = [
 // bytes with every bed planted. Re-minted a grid step up to 14 KiB, and the
 // floor re-tracked to 13,696 (the same couple-hundred-byte band as the
 // previous mint), per this file's own doctrine.
+// The growth engine (Phase 3) then renamed the fixture's crop id to the
+// shipped vale_wheat; the Phase 3 QA re-measure settled at 13,994 bytes
+// (about 196 bytes per bed), 342 bytes under the ceiling and 298 over the
+// floor, inside the doctrine's couple-hundred-byte band, so both pins stand
+// un-re-minted. The next authored growth (the Phase 5 crop ladder, or a new
+// patch site) re-measures again and re-mints if the band shrinks.
 const PROFESSIONS_BYTE_CEILING = 14336;
 
 function ceilingSim(): Sim {
@@ -281,8 +287,9 @@ function ceilingSim(): Sim {
   // load-side clamp is a no-op and the settle stays a fixed point. The
   // fresh-Sim load runs at time 0, where the growth phase's anchor rule
   // re-anchors any positive plant time to the floor of 1 and leaves it there
-  // on every later load. Content-scaled like nodeHarvestCooldowns: about 206
-  // bytes per authored bed.
+  // on every later load. Content-scaled like nodeHarvestCooldowns: about 196
+  // bytes per authored bed at the Phase 3 QA re-measure (the settled total
+  // lives in the ceiling ledger above).
   if (FARM_BED_IDS.size !== 23) throw new Error('farm bed set changed; re-mint the ceiling');
   for (const bedId of FARM_BED_IDS) {
     meta.farmPlots.set(bedId, {
@@ -386,7 +393,7 @@ describe('the professions blob growth bound (phase 16)', () => {
     expect(Object.keys(s2.farmPlots ?? {})).toHaveLength(FARM_BED_IDS.size);
 
     // The byte bound itself, on the settled state. The lower bound tracks
-    // the measured settled value (13,948 at the farm-plots re-measure, every
+    // the measured settled value (13,994 at the Phase 3 QA re-measure, every
     // bed planted at full row width) minus a small band, so the headroom
     // note above cannot rot silently in either direction: a measurement
     // drifting more than a couple hundred bytes reds here and forces the

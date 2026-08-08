@@ -22,6 +22,7 @@ import {
 } from '../src/sim/content/farm_crops';
 import { FARM_BED_IDS, farmBedById } from '../src/sim/content/farm_patches';
 import { DEFAULT_MOUNT } from '../src/sim/content/mounts';
+import { FARM_MAX_GROW_MS } from '../src/sim/professions/farm_persist';
 import type { PlotState } from '../src/sim/professions/farm_projection';
 import {
   canPlantCrop,
@@ -192,6 +193,21 @@ describe('the crop catalog and the cast sentinel', () => {
     // together; tuning either alone reds here (QA-round finding).
     for (const tier of [1, 2, 3, 4]) {
       expect(farmCropSkillThreshold(tier)).toBe((tier - 1) * FARM_SURVIVAL_BAND_SPAN);
+    }
+  });
+
+  it('keeps every crop duration a positive integer under the tamper ceiling', () => {
+    // The loader admits duration-0 rows since the QA round (the grow-now
+    // mint), so no downstream arm catches a mis-authored durationMs any more:
+    // a 0 would mint instantly-ready plots, and a negative one is worse (the
+    // plant succeeds and spends the seed, then the next load drops the row as
+    // malformed). The catalog is the one authoring surface, so the bound is
+    // pinned here for every crop the Phase 5 ladder will ever add; the
+    // ceiling arm keeps an authored duration out of the load-side clamp.
+    for (const crop of Object.values(FARM_CROPS)) {
+      expect(Number.isInteger(crop.durationMs), crop.id).toBe(true);
+      expect(crop.durationMs, crop.id).toBeGreaterThan(0);
+      expect(crop.durationMs, crop.id).toBeLessThanOrEqual(FARM_MAX_GROW_MS);
     }
   });
 

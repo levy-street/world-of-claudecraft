@@ -3311,7 +3311,14 @@ export class Sim {
       // its row SURVIVES (so the row count alone cannot see it), but an
       // operator reading server logs should see both happen.
       {
-        const droppedRows = s.farmPlots ? Object.keys(s.farmPlots).length - meta.farmPlots.size : 0;
+        // typeof-object gated like countDroppedHiddenSlots: Object.keys of a
+        // tampered scalar ("farmPlots": "junk") returns index keys, which
+        // would fabricate a row count in the very tamper signal this line
+        // exists to report.
+        const droppedRows =
+          s.farmPlots && typeof s.farmPlots === 'object'
+            ? Object.keys(s.farmPlots).length - meta.farmPlots.size
+            : 0;
         const droppedSlots = countDroppedHiddenSlots(s.farmPlots, meta.farmPlots);
         if (droppedRows > 0 || droppedSlots > 0) {
           console.warn(
