@@ -1,9 +1,13 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
   type FeatureFootprint,
   featureEdgeDistance,
   hasUnseededInstanceMatrix,
+  isZoneFeatureShadowCasting,
   isZoneFeatureVisible,
+  ZONE_FEATURE_SHADOW_HYSTERESIS,
+  ZONE_FEATURE_SHADOW_RANGE,
 } from '../src/render/zone_feature_visibility_core';
 
 // The Willowfen's feature group, roughly: a zone-spanning band of geometry in
@@ -66,6 +70,66 @@ describe('zone feature distance visibility', () => {
     for (const far of [45, 100, 165, 630]) {
       expect(isZoneFeatureVisible(FEN, FEN.centerX, FEN.centerZ, far)).toBe(true);
     }
+  });
+});
+
+describe('zone-feature shadow casting range', () => {
+  // A neighbour town's footprint, well outside the 105 yd sun shadow volume.
+  const farTown: FeatureFootprint = { centerX: 0, centerZ: 300, halfX: 40, halfZ: 40 };
+
+  it('pins the shipped range and hysteresis to their literals', () => {
+    // Every camera position below derives from these constants, so without
+    // the literal pins the band tests hold under ANY values, including a
+    // zero-width band that flaps castShadow across a whole town every frame.
+    expect(ZONE_FEATURE_SHADOW_RANGE).toBe(220);
+    expect(ZONE_FEATURE_SHADOW_HYSTERESIS).toBe(20);
+  });
+
+  it('casts inside the range and stops beyond it', () => {
+    // Standing next to the town: edge distance ~0.
+    expect(isZoneFeatureShadowCasting(farTown, 0, 320, true)).toBe(true);
+    // Standing a valley away: nothing this group casts can land inside the
+    // 105 yd shadow volume, so the shadow pass must not redraw it.
+    expect(isZoneFeatureShadowCasting(farTown, 0, 900, true)).toBe(false);
+    expect(isZoneFeatureShadowCasting(farTown, 0, 900, false)).toBe(false);
+  });
+
+  it('holds the prior state inside the hysteresis band', () => {
+    // Edge distance exactly ZONE_FEATURE_SHADOW_RANGE: inside the band, so
+    // both prior states persist rather than flapping per frame.
+    const camZ = farTown.centerZ + farTown.halfZ + ZONE_FEATURE_SHADOW_RANGE;
+    expect(isZoneFeatureShadowCasting(farTown, 0, camZ, true)).toBe(true);
+    expect(isZoneFeatureShadowCasting(farTown, 0, camZ, false)).toBe(false);
+    // Strictly inside the band on the far side: both prior states must still
+    // persist (a zero-width band would already commit here).
+    const midBand = camZ + ZONE_FEATURE_SHADOW_HYSTERESIS / 2;
+    expect(isZoneFeatureShadowCasting(farTown, 0, midBand, true)).toBe(true);
+    expect(isZoneFeatureShadowCasting(farTown, 0, midBand, false)).toBe(false);
+    // Past the band edge the state commits regardless of history.
+    const beyond = camZ + ZONE_FEATURE_SHADOW_HYSTERESIS + 1;
+    expect(isZoneFeatureShadowCasting(farTown, 0, beyond, true)).toBe(false);
+    const inside =
+      farTown.centerZ +
+      farTown.halfZ +
+      ZONE_FEATURE_SHADOW_RANGE -
+      ZONE_FEATURE_SHADOW_HYSTERESIS -
+      1;
+    expect(isZoneFeatureShadowCasting(farTown, 0, inside, false)).toBe(true);
+  });
+
+  it('always casts when the footprint could not be measured', () => {
+    expect(isZoneFeatureShadowCasting(null, 0, 9999, false)).toBe(true);
+  });
+
+  it('is consumed by the per-frame feature sweep, toggling castShadow on state flips only', () => {
+    const source = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    const start = source.indexOf('private updateZoneFeatureVisibility(');
+    expect(start).toBeGreaterThan(-1);
+    const method = source.slice(start, source.indexOf('\n  private ensureZoneFeatures(', start));
+    expect(method).toContain('isZoneFeatureShadowCasting(');
+    // The per-mesh castShadow writes happen only on a state flip, never as a
+    // steady per-frame traversal.
+    expect(method).toContain('if (casting !== entry.shadowCasting)');
   });
 });
 

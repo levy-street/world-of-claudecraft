@@ -19,18 +19,21 @@
 // returns the already-linked program.
 
 import type * as THREE from 'three';
+import { reattachBiomeHazeToClone } from './biome_haze_field';
 import { addRimGlow, hasRimGlow } from './gfx';
 import { reapplySurfaceDetailToClone } from './worn_stone';
 
 /**
  * Re-attach to `clone` the onBeforeCompile layers `source` carried, in the
- * order tintedMaterial applies them (rim glow first, then surface detail: the
- * detail layer chains the previous hook into its own cache key). Only layers
- * the source actually had are re-attached, so a clone never gains a patch its
- * source never carried, which would break program identity just as badly.
+ * order the material factories apply them (rim glow first, zone haze next as
+ * surfaceMat attaches it at creation, then surface detail: each later layer
+ * chains the previous hook into its own cache key). Only layers the source
+ * actually had are re-attached, so a clone never gains a patch its source
+ * never carried, which would break program identity just as badly.
  */
 export function reattachClonedMaterialHooks(source: THREE.Material, clone: THREE.Material): void {
   if (hasRimGlow(source)) addRimGlow(clone);
+  reattachBiomeHazeToClone(source, clone);
   // Reads the JSON spec applySurfaceDetail records in userData, which clone()
   // did copy; a no-op for clones of undetailed materials.
   reapplySurfaceDetailToClone(clone);

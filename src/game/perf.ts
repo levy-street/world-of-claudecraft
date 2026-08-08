@@ -7,6 +7,11 @@ import {
   type SceneCensusReport,
 } from '../render/scene_census_core';
 import { createHeapSawtooth, type HeapSawtoothSummary } from './heap_sawtooth';
+import {
+  createHitchForensics,
+  type HitchForensicsRecord,
+  type HitchForensicsState,
+} from './hitch_forensics';
 import { NumberSampleRing, TimedNumberSampleRing } from './sample_ring';
 import { createWorstWindow, type WorstWindowSummary } from './worst_window';
 
@@ -34,6 +39,11 @@ export interface PerfSnapshot {
   netPipeline: NetPipelineSummary | null;
   // Always-on 1 Hz heap sawtooth (ruling R10); null off Chromium.
   heapSawtooth: HeapSawtoothSummary | null;
+  // Always-on hitch forensics (same ruling family as R10): every ~5 s the
+  // monitor snapshots a compact state vector, and an interval whose worst
+  // frame crossed the hitch threshold stores the DIFF between its two
+  // bracketing snapshots, so a production hitch carries its own diagnosis.
+  hitchForensics: HitchForensicsRecord[];
   input: {
     intents: number;
     lastKind: string;
@@ -384,6 +394,8 @@ export class PerfMonitor {
   private heapSawtooth = createHeapSawtooth({
     readUsedHeapBytes: () => this.memorySnapshot()?.usedJSHeapSize ?? null,
   });
+  private hitchForensics = createHitchForensics();
+  private lastForensicsAt = 0;
   private worstWindow = createWorstWindow();
   private inputIntents = 0;
   private lastInputAt = 0;
@@ -628,6 +640,47 @@ export class PerfMonitor {
     }
   }
 
+  /**
+   * The compact state vector the hitch forensics diffs. Scalars only; every
+   * field here is a candidate diagnosis dimension (a views/programs jump reads
+   * as a crowd arrival compiling gear, textures/geometries without programs as
+   * an asset parse/upload, an empty diff as GC/driver/tab contention).
+   */
+  private forensicsState(): HitchForensicsState {
+    const memory = this.memorySnapshot();
+    const state: HitchForensicsState = {
+      heapUsedMb: memory ? Math.round(memory.usedMB) : -1,
+      longTasks: this.longTaskMs.length,
+      longTaskTotalMs: Math.round(this.longTaskTotalMs),
+    };
+    const r = this.renderer?.perfStats() ?? null;
+    if (r) {
+      state.programs = r.programs;
+      state.textures = r.textures;
+      state.geometries = r.geometries;
+      state.calls = r.calls;
+      state.triangles = r.triangles;
+      state.views = r.views;
+      state.gpuQueueUnits = r.gpuQueue.units;
+      state.gpuQueueSyncMs = Math.round(r.gpuQueue.totalSyncMs);
+      state.effectiveRenderScale = r.effectiveRenderScale;
+      state.budgetMode = r.renderBudget.mode;
+      // Day/night dimension: a hitch cluster that only appears with
+      // nightAmount high (streetlamps lit, more active point lights) reads
+      // differently from the same cluster at noon.
+      state.nightAmount = r.nightAmount;
+      state.activePointLights = r.qualityBuckets.features.activePointLights;
+      const frame = r.lastFrame;
+      if (frame) {
+        state.biome = frame.biome;
+        state.px = Math.round(frame.playerPosition.x);
+        state.pz = Math.round(frame.playerPosition.z);
+        state.activeViews = frame.activeViews;
+      }
+    }
+    return state;
+  }
+
   private memorySnapshot(): PerfSnapshot['browser']['memory'] {
     const memory = (
       performance as Performance & {
@@ -811,6 +864,15 @@ export class PerfMonitor {
       this.frameWindow.entries().map((entry) => ({ at: entry.at, ms: entry.value })),
       now,
     );
+    // Hitch forensics: one compact state snapshot every ~5 s, ungated like the
+    // two trackers above. The state vector is assembled at 0.2 Hz only, so the
+    // no-overlay tick stays as cheap as ruling R9 asked.
+    if (now - this.lastForensicsAt >= 5000) {
+      const sinceBaseline = this.frameWindow.snapshotSince(this.lastForensicsAt);
+      const worstFrameMs = sinceBaseline.values.length ? Math.max(...sinceBaseline.values) : 0;
+      this.hitchForensics.sample(now, worstFrameMs, this.forensicsState());
+      this.lastForensicsAt = now;
+    }
     // Production telemetry reports on its own 75 s / 5 min cadence. Without a
     // visible diagnostic overlay there is nothing to ASSEMBLE every second:
     // doing so sorted every history and copied renderer stats for no consumer.
@@ -860,6 +922,7 @@ export class PerfMonitor {
       network: this.network,
       netPipeline: this.netPipelineSource?.summary() ?? null,
       heapSawtooth: this.heapSawtooth.summary(),
+      hitchForensics: this.hitchForensics.records(),
       input: {
         intents: this.inputIntents,
         lastKind: this.lastInputKind,
@@ -955,6 +1018,8 @@ export class PerfMonitor {
     this.lastSnapshot = null;
     this.netPipelineSource = null;
     this.heapSawtooth.reset();
+    this.hitchForensics.reset();
+    this.lastForensicsAt = 0;
     this.worstWindow.drain();
     this.inputIntents = 0;
     this.lastInputAt = 0;

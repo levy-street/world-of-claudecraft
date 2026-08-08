@@ -27,6 +27,10 @@ const AUTHENTICATED_NODE_CLIENTS = [
     authSend: 'this.send(worldAuthMessage(token, characterId));',
   },
   {
+    path: 'scripts/catalog_program_census.mjs',
+    authSend: 'this.ws.send(JSON.stringify(worldAuthMessage(this.token, this.charId)))',
+  },
+  {
     path: 'scripts/chat_e2e.mjs',
     authSend: 'this.ws.send(JSON.stringify(worldAuthMessage(token, characterId)))',
   },
@@ -45,6 +49,10 @@ const AUTHENTICATED_NODE_CLIENTS = [
   {
     path: 'scripts/crypt_raid.mjs',
     authSend: 'this.ws.send(JSON.stringify(worldAuthMessage(this.token, this.charId)));',
+  },
+  {
+    path: 'scripts/geared_arrival_bench.mjs',
+    authSend: 'this.ws.send(JSON.stringify(worldAuthMessage(this.token, this.charId)))',
   },
   {
     path: 'scripts/load_players.mjs',

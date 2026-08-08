@@ -44,10 +44,11 @@ import {
   isFenbridgeRebuildWell,
 } from './fenbridge_town';
 import { EMISSIVE_LIGHT, GFX, type GfxSettings, sharedUniforms, surfaceMat } from './gfx';
+import { cloneMaterialWithHooks } from './material_clone_hooks';
 import { applyOccluderFade, type OccluderFadeMat, occluderFadeMat } from './occluder_fade';
 import { occluderFadeSettled, stepOccluderFade } from './occluder_fade_core';
 import { type PropCellBounds, propCellKey, updatePropCell } from './prop_cell_core';
-import { applySurfaceDetail, reapplySurfaceDetailToClone, wornFamilyFor } from './worn_stone';
+import { applySurfaceDetail, wornFamilyFor } from './worn_stone';
 
 // Static world props: buildings, tents, campfires, mines, ruins, docks,
 // fences, graveyards — all real CC0 glTF assets (Quaternius medieval village +
@@ -1172,10 +1173,14 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
       const src = mesh.material as THREE.Material;
       let tm = matMap.get(src);
       if (!tm) {
-        const ghostSrc = src.clone();
-        // Material.clone drops onBeforeCompile: re-attach the recorded
-        // surface-detail layer so ghostable buildings keep their texture.
-        reapplySurfaceDetailToClone(ghostSrc);
+        // The hook-preserving clone: a bare clone dropped BOTH own-property
+        // hooks, so the ghost lost the zone-haze layer AND minted a new
+        // program cache key, linking a program per ghosted kit material the
+        // first time a crowd arrival whipped the camera across town (the
+        // measured first-contact burst). With the hooks carried over the
+        // ghost's OPAQUE program is the source's own; only the transparent
+        // fade variant remains a distinct (prewarmable) key.
+        const ghostSrc = cloneMaterialWithHooks(src);
         tm = occluderFadeMat(ghostSrc);
         matMap.set(src, tm);
       }

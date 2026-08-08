@@ -201,6 +201,7 @@ function snapshot(): PerfSnapshot {
     seconds: 80,
     frames: 4800,
     fps: 60,
+    hitchForensics: [],
     frameMs: { avg: 16.6, p50: 16, p95: 19, p99: 28, max: 52, long50: 1 },
     windows: {
       last10s: {
@@ -222,6 +223,8 @@ function snapshot(): PerfSnapshot {
       graphicsConfigVersion: 16,
       tier: 'high',
       qualityBuckets: qualityBuckets(),
+      gpuQueue: { units: 0, totalSyncMs: 0, worstSyncMs: 0, slowest: [] },
+      nightAmount: 0,
       autoGovernor: true,
       budget: {
         targetFps: 60,

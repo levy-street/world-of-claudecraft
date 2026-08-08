@@ -167,3 +167,38 @@ describe('perf monitor worst-10s window', () => {
     expect(perf.snapshot(141_000).windows.worst10s).toBeNull();
   });
 });
+
+describe('perf monitor forensics state assembly', () => {
+  // The day-night commit's claim: the forensics vector carries the dimensions
+  // that separate a night hitch cluster (streetlamps lit, more active point
+  // lights) from the same cluster at noon. Stub renderer, real assembly path.
+  it('assembles the day-night and light dimensions from the renderer stats', () => {
+    const perf = new PerfMonitor(null);
+    const stats = {
+      programs: 700,
+      textures: 900,
+      geometries: 800,
+      calls: 1200,
+      triangles: 9_000_000,
+      views: 40,
+      gpuQueue: { units: 3, totalSyncMs: 12.6 },
+      effectiveRenderScale: 1,
+      renderBudget: { mode: 'steady' },
+      nightAmount: 0.85,
+      qualityBuckets: { features: { activePointLights: 6 } },
+      lastFrame: { biome: 'marsh', playerPosition: { x: 123.4, z: -55.6 }, activeViews: 33 },
+    };
+    perf.setRenderer({ perfStats: () => stats, setHitchLogEnabled: () => {} } as never);
+
+    const state = (perf as never as { forensicsState(): Record<string, unknown> }).forensicsState();
+
+    expect(state.nightAmount).toBe(0.85);
+    expect(state.activePointLights).toBe(6);
+    expect(state.programs).toBe(700);
+    expect(state.gpuQueueSyncMs).toBe(13);
+    expect(state.biome).toBe('marsh');
+    expect(state.px).toBe(123);
+    expect(state.pz).toBe(-56);
+    expect(state.activeViews).toBe(33);
+  });
+});

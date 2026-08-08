@@ -30,6 +30,7 @@ import {
   newFenbridgeBuildingVisibilityPlan,
 } from './fenbridge_town_visibility_core';
 import { EMISSIVE_GLOW, GFX, surfaceMat } from './gfx';
+import { cloneMaterialWithHooks } from './material_clone_hooks';
 import { applyOccluderFade, type OccluderFadeMat, occluderFadeMat } from './occluder_fade';
 import { occluderFadeSettled, stepOccluderFade } from './occluder_fade_core';
 import { modulateEmissiveByVertexColor } from './vertex_color_emissive';
@@ -358,7 +359,10 @@ function townMaterial(
     shared.metalness = 1;
     shared.metalnessMap = shared.roughnessMap;
   }
-  const material = independent ? shared.clone() : shared;
+  // Hook-preserving clone: a bare clone dropped the zone-haze hook and split
+  // the program cache key, so each independent building material linked a new
+  // program at first sight (the town's share of the first-contact burst).
+  const material = independent ? cloneMaterialWithHooks(shared) : shared;
   return emissive
     ? modulateEmissiveByVertexColor(material)
     : applyFenbridgeTownSurfaceDetail(material);

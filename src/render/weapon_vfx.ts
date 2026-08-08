@@ -3059,54 +3059,6 @@ export function createWeaponVfx(
 // builds one any more.
 // ---------------------------------------------------------------------------
 
-/** Every component family in one rig, with the smallest counts that still
- *  produce a real draw. The authored values are irrelevant to the program
- *  keys; covering the KINDS is the whole point. */
-const PREWARM_SPEC: WeaponVfxSpec = {
-  tier: 'legendary',
-  name: 'prewarm',
-  type: 'prewarm',
-  lore: '',
-  fx: [
-    { kind: 'coreSprite', at: { yF: 0.6 }, size: 0.2, color: 0xffffff },
-    {
-      kind: 'motes',
-      at: { yF: 0.5 },
-      radius: [0.12, 0.2],
-      count: 2,
-      size: [0.02, 0.03],
-      speed: [0.6, 0.9],
-      tilt: 0.2,
-      colorA: 0xffffff,
-      colorB: 0xffffff,
-    },
-    {
-      kind: 'drift',
-      line: [{ yF: 0.1 }, { yF: 0.9 }],
-      count: 2,
-      vel: [0, 0.1, 0],
-      spread: [0.02, 0.02, 0.02],
-      life: [1, 2],
-      size: [0.02, 0.03],
-      colorA: 0xffffff,
-      colorB: 0xffffff,
-    },
-    {
-      kind: 'twinkles',
-      surface: { count: 2 },
-      size: [0.02, 0.03],
-      rate: [0.5, 1],
-      color: 0xffffff,
-      star: true,
-    },
-    {
-      kind: 'aurora',
-      helix: { from: { yF: 0.1 }, to: { yF: 0.9 }, radius: 0.1, turns: 1 },
-      width: 0.06,
-    },
-  ],
-};
-
 /** The shared sprite textures every weapon-VFX rig samples, created on first
  *  ask and cached for the page. Uploading them at boot keeps the first sighting
  *  of a skin off the synchronous texture-upload path. */
@@ -3115,31 +3067,38 @@ export function weaponVfxPrewarmTextures(): THREE.Texture[] {
 }
 
 /**
- * One hidden rig exercising every weapon-VFX component family, for the boot
- * prewarm scene. Off-screen (y = -1000) and frustum-culling-exempt like the
- * other prewarm groups; the caller adds it to the scene, lets the compile
- * entry link it, then removes it (never disposes: disposing a material
- * releases its linked program, which is the thing being warmed).
+ * One hidden rig per REAL catalog spec, for the boot prewarm scene, built
+ * through the exact worn-skin path (grounded: false) so every program cache
+ * key a live arrival can ask for is linked at boot. A single synthetic spec
+ * exercising each component FAMILY was not enough: the first skin sighted in
+ * the world still linked ~108 programs inside one frame (the measured
+ * geared-arrival freeze). Off-screen (y = -1000) and frustum-culling-exempt
+ * like the other prewarm groups; the caller adds it to the scene, lets the
+ * compile entry link it, then removes it (never disposes: disposing a
+ * material releases its linked program, which is the thing being warmed).
  */
 export function buildWeaponVfxPrewarmGroup(): THREE.Group {
   const group = new THREE.Group();
   group.name = 'weapon-vfx-program-prewarm';
   group.position.set(0, -1000, 0); // off-screen; compile ignores position
-  const host = new THREE.Mesh(
-    new THREE.BoxGeometry(0.1, 1, 0.1),
-    new THREE.MeshStandardMaterial({ color: 0xffffff }),
-  );
-  host.frustumCulled = false;
-  const handle = createWeaponVfx(host, PREWARM_SPEC, { grounded: true, backdrop: false });
-  // A visible light would change the scene's light counts, and those counts
-  // are part of every program cache key: one extra point light here and the
-  // whole boot compile warms keys no live frame ever asks for.
-  handle.light.visible = false;
-  // The boot prewarm group is census-tagged 'prewarm' as a whole; keep this
-  // synthetic rig inside that bucket rather than reporting as a live skin.
-  handle.group.userData.renderCategory = 'prewarm';
-  handle.sceneExtras.userData.renderCategory = 'prewarm';
-  group.add(host);
-  group.add(handle.sceneExtras);
+  for (const [key, spec] of Object.entries(WEAPON_VFX)) {
+    const host = new THREE.Mesh(
+      new THREE.BoxGeometry(0.1, 1, 0.1),
+      new THREE.MeshStandardMaterial({ color: 0xffffff }),
+    );
+    host.name = `prewarm-skin-host:${key}`;
+    host.frustumCulled = false;
+    const handle = createWeaponVfx(host, spec, { grounded: false });
+    // A visible light would change the scene's light counts, and those counts
+    // are part of every program cache key: one extra point light here and the
+    // whole boot compile warms keys no live frame ever asks for.
+    handle.light.visible = false;
+    // The boot prewarm group is census-tagged 'prewarm' as a whole; keep the
+    // rigs inside that bucket rather than reporting as live skins.
+    handle.group.userData.renderCategory = 'prewarm';
+    handle.sceneExtras.userData.renderCategory = 'prewarm';
+    group.add(host);
+    group.add(handle.sceneExtras);
+  }
   return group;
 }
