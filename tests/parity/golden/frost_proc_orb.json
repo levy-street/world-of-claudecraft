@@ -5,7 +5,7 @@
   "ticks": 84,
   "coverage": [
     "class:mage (committed frost)",
-    "Frozen Orb pulse damage + Icicle generation",
+    "Frostglobe pulse damage + Icicle generation",
     "Fingers of Frost proc draw from frostbolt",
     "Brain Freeze proc draw from frostbolt"
   ],
@@ -138,8 +138,8 @@
       "tick": 20,
       "time": 1,
       "nextId": 965,
-      "state": "97b063cd",
-      "events": "1483a910",
+      "state": "9f28519d",
+      "events": "e2ae7d45",
       "rng": {
         "draws": 1,
         "digest": "cf5e57a1"
@@ -149,8 +149,8 @@
       "tick": 40,
       "time": 2,
       "nextId": 965,
-      "state": "139b2c97",
-      "events": "02c127b6",
+      "state": "c07fa1a7",
+      "events": "914f58d2",
       "rng": {
         "draws": 2,
         "digest": "6d172bb5"
@@ -160,8 +160,8 @@
       "tick": 60,
       "time": 3,
       "nextId": 965,
-      "state": "9bebb3c8",
-      "events": "0323ce72",
+      "state": "eb11d4fc",
+      "events": "caa58fde",
       "rng": {
         "draws": 150,
         "digest": "478ace8d"
@@ -171,8 +171,8 @@
       "tick": 80,
       "time": 4,
       "nextId": 965,
-      "state": "676ce292",
-      "events": "c2f7f197",
+      "state": "096e9152",
+      "events": "bf89dc67",
       "rng": {
         "draws": 316,
         "digest": "650546d2"
@@ -182,7 +182,7 @@
       "tick": 84,
       "time": 4.2,
       "nextId": 965,
-      "state": "73afcc07",
+      "state": "dae1593b",
       "events": "7b765a8e",
       "rng": {
         "draws": 356,
@@ -366,7 +366,7 @@
               "duration": 2.5,
               "id": "frozen_orb_slow",
               "kind": "slow",
-              "name": "Frozen Orb",
+              "name": "Frostglobe",
               "remaining": 2.25,
               "school": "frost",
               "sourceId": 959,
@@ -436,7 +436,7 @@
       "tick": 84,
       "time": 4.2,
       "nextId": 965,
-      "state": "73afcc07",
+      "state": "dae1593b",
       "events": "741638a5",
       "rng": {
         "draws": 356,
@@ -620,7 +620,7 @@
               "duration": 2.5,
               "id": "frozen_orb_slow",
               "kind": "slow",
-              "name": "Frozen Orb",
+              "name": "Frostglobe",
               "remaining": 2.25,
               "school": "frost",
               "sourceId": 959,

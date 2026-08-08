@@ -5,7 +5,7 @@
 //  - multiple classes:        warrior / mage / rogue / hunter / warlock / paladin
 //  - meleeSwing weaponStrike:  heroic_strike (warrior), sinister_strike (rogue)
 //  - auto-attack + mobSwing:   solo_warrior (mob swings back)
-//  - frost proc draw order:    frost_proc_orb (Frozen Orb pulses + one proc-producing frostbolt)
+//  - frost proc draw order:    frost_proc_orb (Frostglobe pulses + one proc-producing frostbolt)
 //  - frenzy + on-hit affix:    affix_mob (old_greyjaw frenzyOnHit + ridge_stalker bleed)
 //  - mob-swing affix cascade:  mob_swing_affixes (stun/venom/silence/rampage + friendly-pet short-circuit, M3)
 //  - pets:                     hunter_pet (updateRangedPetAttack), warlock_pet (mobSwing pet arm + applyTaunt)
@@ -259,7 +259,7 @@ function soloMage(): Scenario {
   };
 }
 
-// Committed-Frost draw coverage: Frozen Orb reaches its pulse damage and Icicle
+// Committed-Frost draw coverage: Frostglobe reaches its pulse damage and Icicle
 // path, then the seed-pinned Rimelance impact grants both random procs. The
 // shared-rng digest therefore catches either proc draw moving or disappearing.
 function frostProcOrb(): Scenario {
@@ -267,7 +267,7 @@ function frostProcOrb(): Scenario {
     name: 'frost_proc_orb',
     coverage: [
       'class:mage (committed frost)',
-      'Frozen Orb pulse damage + Icicle generation',
+      'Frostglobe pulse damage + Icicle generation',
       'Fingers of Frost proc draw from frostbolt',
       'Brain Freeze proc draw from frostbolt',
     ],
@@ -645,7 +645,7 @@ function petAi(): Scenario {
       imp.aggroTargetId = impTarget.id;
       rec.track(impTarget.id);
 
-      // Gloomshade (melee tank): NO pre-set target, so petPickTarget runs the
+      // Duskmurk (melee tank): NO pre-set target, so petPickTarget runs the
       // aggressive auto-pull to acquire a beefed wolf in range, then the melee arm
       // closes, auto-taunts the mob, and swings via mobSwing.
       const tank = spawnMob(sim, 'gloomshade', 12, p.pos.x - 2, p.pos.y, p.pos.z);
@@ -2358,7 +2358,7 @@ function talentsProgression(): Scenario {
 // sites in global stream order: Double Charge's spend + sequential recharge
 // bookkeeping (abilityCharges via casting_lifecycle / updateTimers),
 // Intimidating Shout's aoeFear flee-heading draws with Lingering Dread's break
-// threshold armed, Victory Rush's on-kill window aura + selfHealPctMax heal,
+// threshold armed, Victor's Surge's on-kill window aura + selfHealPctMax heal,
 // and Bladestorm's self-centered channel (per-tick position pulse + damage
 // draws). Restored from the pre-revert payload (f274835b1^): pickRowTalent(row
 // index) became selectTalentRow(row LEVEL), and the payload's
@@ -2424,7 +2424,7 @@ function warriorRowCapstones(): Scenario {
       sim.castAbility('intimidating_shout');
       rec.snapshot('feared');
       rec.tick(8);
-      // Victory Rush: a lethal blow opens the window; the strike on a fresh
+      // Victor's Surge: a lethal blow opens the window; the strike on a fresh
       // dummy heals 20% of max health and consumes it.
       const prey = spawnMob(sim, 'forest_wolf', 2, p.pos.x + 2, p.pos.y, p.pos.z);
       rec.track(prey.id);

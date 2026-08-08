@@ -26,6 +26,17 @@
 //        after the rename slice is committed, re-run with
 //        RENAME_PROOF_BASE=HEAD~1 to verify the committed slice.)
 // Skipped entirely (env-gated) unless RENAME_PROOF=1.
+//
+// SLICE SCOPING (Masterwrought Phase 03): the default reverse map spans the
+// WHOLE locked NAME-MAP plus the C1/C2 coined-id pairs, which is correct only
+// for the original pivot wave (whose baseline predates every row). A LATER
+// rename slice must reverse ONLY its own rows: the baseline already carries the
+// earlier waves' new names, so reversing those too un-renames strings the
+// baseline never had old (observed: Frostveil -> Ice Barrier, Cottage Loaf ->
+// Freshly Baked Bread, pet id gloomshade -> voidwalker). Set
+// RENAME_PROOF_SECTION=<heading substring> to restrict the display pairs to
+// the map rows AFTER the first heading containing that substring, and to skip
+// the coined-id pairs (they belong to the original wave).
 
 import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
@@ -86,10 +97,18 @@ const REVERSE_ID_PAIRS: ReadonlyArray<readonly [string, string]> = [
 
 // Display renames parsed from the locked map (same row filters as the
 // inspector), reversed new->old and applied longest-new-first, word-bounded.
+const PROOF_SECTION = process.env.RENAME_PROOF_SECTION || '';
+
 function loadReverseDisplayPairs(): Array<[string, string]> {
   const mapPath = join(ROOT, 'ip-refactor', 'NAME-MAP.md');
   const pairs: Array<[string, string]> = [];
+  let inSection = PROOF_SECTION === '';
   for (const line of readFileSync(mapPath, 'utf8').split('\n')) {
+    if (PROOF_SECTION && line.startsWith('#')) {
+      inSection = line.includes(PROOF_SECTION);
+      continue;
+    }
+    if (!inSection) continue;
     if (!line.trim().startsWith('|')) continue;
     const c = line.split('|').map((x) => x.trim());
     if (c.length !== 7) continue;
@@ -112,7 +131,8 @@ const esc = (s: string): string => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 function makeReverseMapper(): (s: string) => string {
   const displayPairs = loadReverseDisplayPairs();
   return (s: string): string => {
-    const idHit = REVERSE_ID_PAIRS.find(([n]) => s === n);
+    // Coined-id pairs are the original wave's; a scoped slice never maps ids.
+    const idHit = PROOF_SECTION ? undefined : REVERSE_ID_PAIRS.find(([n]) => s === n);
     if (idHit) return idHit[1];
     let out = s;
     for (const [n, o] of displayPairs) {
