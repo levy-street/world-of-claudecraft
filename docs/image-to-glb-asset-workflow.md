@@ -462,7 +462,7 @@ future asset genuinely needs a patterned finish, add a cell to the shared atlas 
 sibling shared atlas) with the same derivation-and-pin treatment; per-asset embedded
 textures remain the last resort and need a fresh performance case.
 
-**The one asset that made that case: the Terrorspark Groundshaker mount.** It is a rideable hero mount the
+**The one asset that made that case: the Dreadspark Groundshaker mount.** It is a rideable hero mount the
 player looks at from the chase camera for the whole session, so a shared grayscale grain
 cell could not carry it: it needs an independent roughness and normal response per material
 family, which vertex colors cannot express at all. It embeds six procedurally generated maps
@@ -490,7 +490,7 @@ the shape of that solution before copying it:
 
 Cost: 275 KiB to 572 KiB, which sits alongside the other authored mounts (valorsteed 562 KiB,
 gobbler 555 KiB) rather than above them, and mounts load lazily per visual key. A prop or a
-building still has no case for this; do not read the Terrorspark Groundshaker as a general licence.
+building still has no case for this; do not read the Dreadspark Groundshaker as a general licence.
 
 ### Budgets that held up
 

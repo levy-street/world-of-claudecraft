@@ -327,7 +327,7 @@ export function runEffects(
     }
   }
 
-  // requiresAuraKind (Rimeneedle's Icicles, Victor\'s Surge's kill window) is now
+  // requiresAuraKind (Rimeneedle's Icicles, Victor's Surge's kill window) is now
   // consumed atomically at cast commit in casting_lifecycle.ts's applyAbility,
   // alongside spendAbilityCost/armAbilityCooldown, not here: a ranged ability's
   // runEffects can run ticks after the cast committed (once its projectile

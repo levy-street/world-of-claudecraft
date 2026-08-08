@@ -358,8 +358,8 @@ export type AuraKind =
   // cooldown, and keeps its base damage (consumed in castAbility's override).
   // `winters_chill`: TARGET debuff with 2 charges; each compatible spell
   // impact spends one to count the target as frozen.
-  // `icicles`: self buff, up to 5 stacks, built by Rimelance impacts and Frozen
-  // Orb pulses. At 5 it gates Rimeneedle (requiresAuraStacks), which consumes
+  // `icicles`: self buff, up to 5 stacks, built by Rimelance impacts and
+  // Frostglobe pulses. At 5 it gates Rimeneedle (requiresAuraStacks), which consumes
   // the whole stack for its slow, heavy hit + a target freeze.
   | 'fingers_of_frost'
   | 'brain_freeze'

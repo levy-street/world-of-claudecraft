@@ -111,7 +111,7 @@ unchanged. All numbers are level-20 baselines, PTR-tunable.
 | 17 | Lightward | KEEP the grant; divine_shield absorb retuned 5000 -> level-scaled (roughly 2x max hp at 20). |
 | 17 | Sacred Ward | Lay on Hands also shields every nearby ally for 60. |
 | 17 | Deathless Ardor | Cheat death: a killing blow leaves you at 1 hp instead (3 min internal cooldown). |
-| 20 | Wrathwing / Tolling Hammer | KEEP. |
+| 20 | Wrathwing / Tolling Hammer | KEEP. (Wrathwing later renamed Zealwing by the phase 03 IP sweep; this row records the era's verdict.) |
 | 20 | Aura Mastery | Activate: your aura's effect is doubled for 10 sec (2 min cooldown), granted as an active ability. |
 
 ## Constraints carried from the repo rules

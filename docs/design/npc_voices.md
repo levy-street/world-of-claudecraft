@@ -368,7 +368,7 @@ guttural rasp of decay. Ancient, male. Encounter dialogue is voiced through
 
 ---
 
-## Eldergleam, the Veiled Hollow
+## Eldershine, the Veiled Hollow
 
 ### Keeper Saelwyn: *Keeper of the Hollow*
 **Visual:** `npc_mage`, pale lilac (#d8c4f0).
@@ -390,7 +390,7 @@ gently insistent that grim work is still mending work. Age 60s to 70s, female.
 
 **Voice test:** *"Every light in this valley remembers something. Help me listen."*
 
-### Provisioner Fenna: *Eldergleam Provisioner*
+### Provisioner Fenna: *Eldershine Provisioner*
 **Visual:** `npc_villager`, soft green (#8fbf8a).
 
 Bright, generous mezzo with an open smile in it, brisk market cadence, always
@@ -507,9 +507,9 @@ female.
 
 ---
 
-## The Wraithwood (Gallowmere)
+## The Wraithwood (Gibbetmere)
 
-### Sexton Marrow: *Sexton of Gallowmere*
+### Sexton Marrow: *Sexton of Gibbetmere*
 **Visual:** villager, slate grey (#6a6a72). (Defined in `src/sim/content/dungeons.ts`.)
 
 Deep, measured, sepulchral bass, patient as a tolling bell, kindly in a way that
@@ -537,7 +537,7 @@ sorrowing devotion: Creel has stopped expecting help.
 
 **Voice test:** *"The chapel fell years ago. The dead beneath it did not notice, and so I stayed."*
 
-### Widow Tansy: *Candlewright of Gallowmere*
+### Widow Tansy: *Candlewright of Gibbetmere*
 **Visual:** villager, mourning mauve (#b8a2c8).
 
 Brittle, tremulous old voice that thins upward when she insists, with unbending
@@ -738,7 +738,7 @@ female.
 
 **Voice test:** *"The sea gives, the sand keeps, and the jungle takes. Stay on the strand, stranger."*
 
-### Okku: *The Man Who Went In*
+### Okrim: *The Man Who Went In*
 **Visual:** villager, deep jungle green (#6f8a5a), banyan camp.
 
 Hushed, cracked voice, whisper-taut and hyper-attentive, breaking off to count a

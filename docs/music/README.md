@@ -12,12 +12,12 @@ Overworld zones (played by `musicZoneForLocation` via the zone's biome, or the
 | Theme | Zone | Title and register |
 |---|---|---|
 | `farshore` | Farshore Isle | "The Bell of Gullhaven": A minor vigil; harp surf, oboe lament, the warning bell tolling one, two, three across the form |
-| `dusk` | Veiled Hollow | "Under the Eldergleam": F lydian hymn; wisp-glimmer dulcimer, corrupted D minor middle for the Sunken Court |
+| `dusk` | Veiled Hollow | "Under the Eldershine": F lydian hymn; wisp-glimmer dulcimer, corrupted D minor middle for the Sunken Court |
 | `ember` | Drakelands | "Ash and Wingbeat": E phrygian dominant gallop; snake-charmer reed, wide horn call over the caldera |
 | `frost` | Frostveil Reach | "The Aurora Steps": G lydian hush; piano snowflakes, aurora bells, one heartbeat drum in the reprise |
 | `amber` | The Amberfall | "The Leaves That Stay": F major 12/8 harvest pastoral with a relative-minor catch |
 | `fen` | The Willowfen | "Dragonfly Morning": E major 12/8 idyll; barcarolle lute, whistled pipe tune, shaker wings |
-| `night` | The Nightbloom | "The Realm Is Dreaming": B aeolian nocturne; constellation bells, D major Moonwell lift |
+| `night` | The Nightbloom | "The Realm Is Dreaming": B aeolian nocturne; constellation bells, D major Moonspring lift |
 | `haunt` | The Wraithwood | "Do Not Answer": F# phrygian dread; half-step creep, knocks, the hymn that keeps breaking off |
 | `jungle` | The Palmreach | "The Emerald Tangle": G mixolydian groove; three-hand percussion, marimba-style dulcimer, bird flourishes |
 | `garden` | The Evergarden | "Still Trimmed": A major minuet gone uncanny; F# minor Great Maze middle with shear-snip percussion |

@@ -236,7 +236,7 @@ function runShortFight(spec: Spec, seconds: number, seed = 41, rows?: Rows): Bur
       // Frost plays its real kit: Coldsurge opener, Rimeneedle at five
       // icicles, Brain Freeze Flurry, proc-fed Ice Lance, Frostglobe on
       // cooldown, Rimelance filler; with rows, Rune uptime and Racing Mind
-      // Glacial Spikes.
+      // Rimeneedles.
       const icicles = p.auras.find((a) => a.kind === 'icicles');
       if (hasRune && offCooldown(p, 'rune_of_power')) sim.castAbility('rune_of_power');
       else if (offCooldown(p, 'icy_veins')) sim.castAbility('icy_veins');

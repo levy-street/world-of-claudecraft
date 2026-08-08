@@ -1301,8 +1301,8 @@ export class ArchetypeSequencer {
           host.countPrimitive(slot.abilityId, 1);
           // An earthbound charge tears up the ground it crosses: dusty puffs
           // kicked along the gallop, not just at the landing. Gated on an
-          // earthy dash (physical debris kit - Onrush, Bruin Charge, Heroic
-          // Leap) so airy/arcane blinks stay clean.
+          // earthy dash (physical debris kit - Onrush, Bruin Charge, Vaulting
+          // Charge) so airy/arcane blinks stay clean.
           if (spec.impact?.debris && spec.palette === 'physical' && slot.tier === 0) {
             const puffs = 4;
             for (let k = 1; k <= puffs; k++) {

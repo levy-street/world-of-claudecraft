@@ -50,8 +50,8 @@ export interface IWorldDungeons {
   riftFloor: RiftFloorView | null;
   // Key into the per-Sim rift collision registry (sim/colliders.ts). The client
   // threads this through findPlayerPath/resolvePlayerDestination (click-to-move)
-  // and the swept-landing crest re-resolve behind Blink, Shadowstep, and Heroic
-  // Leap (src/sim/combat/heroic_leap.ts), so those routes treat a rift wall as
+  // and the swept-landing crest re-resolve behind Blink, Shadowstep, and Vaulting
+  // Charge (src/sim/combat/heroic_leap.ts), so those routes treat a rift wall as
   // solid instead of open floor. Per world INSTANCE, not per seed; 0 (inert,
   // matching outside-a-rift behavior) where no rift regions are registered, which
   // is always true for the online ClientWorld: collision resolution there is

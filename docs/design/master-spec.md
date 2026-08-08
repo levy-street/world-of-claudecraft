@@ -12,7 +12,7 @@ The hook is already planted in `q_whispers` (data.ts:1177): *"the mark of the Gr
 
 - **Act I — Eastbrook Vale (1–10, exists + enhancements).** The dead won't rest. Players uncover the Gravecaller sigil, perform the Binding Rite, and kill Morthen the Gravecaller in the Hollow Crypt. NEW build-up quests (below) establish that Morthen was raising the chapel's own buried congregation — and his correspondence reveals he answered to a master in the marsh.
 - **Act II — Mirefen Marsh (6–13).** Morthen was only an acolyte. The cult's **Vael the Mistcaller** is drowning travelers in the fen and raising them as an army — the Drowned Dead. The marsh trolls dug too deep into old burial mounds and woke things; the murlocs are dredging up cult idols from the lakebed. The chain runs: muster at Fenbridge → trace the idols → the Drowned Chapel → break the cult camp → kill Deacon Voss → storm **The Sunken Bastion** (5-player, L13) and kill Vael. His final words name the true master: *"The Wyrm stirs beneath the peaks."*
-- **Act III — Thornpeak Heights (13–20).** The Gravecallers serve **Korzul the Gravewyrm**, an ancient dragon the sect has spent generations trying to wake — every raised corpse in the Vale and the fen was a tithe of souls. The ogre clans have been bought as muscle (Warlord Drogmar), elementals shake loose from the mountain as the Wyrm turns in its sleep, and the Wyrmcult openly chants at the **Gravewyrm Sanctum** gates. The finale: a solo-able lead-up chain (18–19) breaks the seal, then a 5-player dungeon kills Grand Necromancer Velkhar, Korgath the Bound, and finally Korzul at level 20.
+- **Act III — Thornpeak Heights (13–20).** The Gravecallers serve **Korzul the Gravewyrm**, an ancient dragon the sect has spent generations trying to wake — every raised corpse in the Vale and the fen was a tithe of souls. The ogre clans have been bought as muscle (Warlord Drogmar), elementals shake loose from the mountain as the Wyrm turns in its sleep, and the Broodsworn openly chants at the **Gravewyrm Sanctum** gates. The finale: a solo-able lead-up chain (18–19) breaks the seal, then a 5-player dungeon kills Grand Necromancer Velkhar, Korgath the Bound, and finally Korzul at level 20.
 
 ## Hollow Crypt build-up quests (zone 1 additions, L7–9)
 
@@ -141,7 +141,7 @@ vael_the_mistcaller (0,98)  tidebound_acolyte (-4,96)  bastion_revenant (4,96)
 
 **ZoneDef:** `{ id: 'thornpeak_heights', name: 'Thornpeak Heights', zMin: 540, zMax: 900, levelRange: [13,20], biome: 'peaks', hub: { x: 0, z: 660, radius: 20, name: 'Highwatch' }, graveyard: { x: 15, z: 645 }, lakes: [{x:-70,z:760,radius:18}], welcome: 'Captain Thessaly holds the wall at Highwatch — barely.' }`
 
-**POIs:** Highwatch (0,660); Stalker Ridge (-50,590); Deeprock Burrows (85,615); Ogre Foothills (-90,700); Drogmar's War-Camp (-130,740); Stormcrag (110,760); Wyrmcult Tents (55,820); Revenant Fields (-40,830); Sanctum Approach (0,860); Gravewyrm Sanctum (0,880).
+**POIs:** Highwatch (0,660); Stalker Ridge (-50,590); Deeprock Burrows (85,615); Ogre Foothills (-90,700); Drogmar's War-Camp (-130,740); Stormcrag (110,760); Broodsworn Tents (55,820); Revenant Fields (-40,830); Sanctum Approach (0,860); Gravewyrm Sanctum (0,880).
 
 **Roads:** Fenbridge→Highwatch: (0,320)→(10,450)→(0,540)→(0,660). Highwatch spokes: →(-60,700)→(-110,735) [ogres]; →(70,720)→(110,760) [crags]; →(0,780)→(0,860) [Sanctum Approach].
 
@@ -167,8 +167,8 @@ vael_the_mistcaller (0,98)  tidebound_acolyte (-4,96)  bastion_revenant (4,96)
 | warlord_drogmar | Warlord Drogmar | ogre | 17 | elite, boss | 200/30 | 12/2.7 | 2.6 | aoePulse {22,30,r10,every12,'Ground Slam'}; copper 2000 |
 | stormcrag_elemental | Stormcrag Elemental | **elemental** (new) | 17–18 | — | 62/22 | 12/2.7 | 2.2 | copper 80; storm_core 0.55 (q_shard_cores); blessed_embers 0.55 (q_breaking_the_seal); inert_storm_shard 0.4 |
 | shardlord_kazzix | Shardlord Kazzix | elemental | 18 | rare | 160/28 | 13/2.8 | 2.2 | kazzix_heartshard 1.0 (q_kazzix); copper 500 |
-| wyrmcult_zealot | Wyrmcult Zealot | humanoid | 17–19 | — | 62/22 | 12/2.7 | 2.0 | copper 90; wyrmcult_orders 0.5 (q_cult_orders); frayed_prayer_beads 0.35 |
-| wyrmcult_necromancer | Wyrmcult Necromancer | humanoid | 18–19 | — | 58/21 | 13/2.8 | 2.0 | copper 100; ritual_phylactery 0.55 (q_necromancers) |
+| wyrmcult_zealot | Broodsworn Zealot | humanoid | 17–19 | — | 62/22 | 12/2.7 | 2.0 | copper 90; wyrmcult_orders 0.5 (q_cult_orders); frayed_prayer_beads 0.35 |
+| wyrmcult_necromancer | Broodsworn Necromancer | humanoid | 18–19 | — | 58/21 | 13/2.8 | 2.0 | copper 100; ritual_phylactery 0.55 (q_necromancers) |
 | boneclad_revenant | Boneclad Revenant | undead | 18–19 | — | 66/23 | 12/2.7 | 2.3 | copper 100; bone_fragments 0.6 |
 | sanctum_boneguard | Sanctum Boneguard | undead | 19 | elite | 64/23 | 12/2.7 | 2.3 | copper 300 |
 | sanctum_drakonid | Sanctum Drakonid | **dragonkin** (new, reuses boss rig scaled 0.8) | 19–20 | elite | 68/24 | 13/2.8 | 2.2 | copper 350; cracked_wyrm_scale 0.5 |
@@ -352,7 +352,7 @@ All ids verified non-colliding with existing ITEMS. `requiredClass` shown where 
 | ogre_war_totem | Ogre War Totem | sparkles (war-camp) |
 | storm_core | Storm Core | stormcrag_elemental 0.55 |
 | kazzix_heartshard | Kazzix's Heartshard | shardlord_kazzix 1.0 |
-| wyrmcult_orders | Wyrmcult Orders | wyrmcult_zealot 0.5 |
+| wyrmcult_orders | Broodsworn Orders | wyrmcult_zealot 0.5 |
 | ritual_phylactery | Ritual Phylactery | wyrmcult_necromancer 0.55 |
 | gravewyrm_sigil | Gravewyrm Sigil | sparkles (Sanctum Approach) |
 | blessed_embers | Blessed Embers | stormcrag_elemental 0.55 |
@@ -404,7 +404,7 @@ All ids verified non-colliding with existing ITEMS. `requiredClass` shown where 
 | staff_of_velkhar | Staff of Velkhar | weapon/mainhand | rare | 27–43 spd 3.0, int 10 spi 5 | 2500 | mage |
 | shadowmeld_tunic | Shadowmeld Tunic | armor/chest | rare | armor 130, agi 9 sta 4 | 2500 | rogue |
 | gravewyrm_scale_hauberk | Gravewyrm Scale Hauberk | armor/chest | rare | armor 230, sta 8 str 5 | 3000 | warrior |
-| wyrmcult_grand_robe | Wyrmcult Grand Robe | armor/chest | rare | armor 75, int 11 spi 5 | 3000 | mage |
+| wyrmcult_grand_robe | Broodsworn Grand Robe | armor/chest | rare | armor 75, int 11 spi 5 | 3000 | mage |
 | wyrmscale_jerkin | Wyrmscale Jerkin | armor/chest | rare | armor 145, agi 10 sta 5 | 3000 | rogue |
 | wyrmfang_greatblade | Wyrmfang Greatblade | weapon/mainhand | **epic** | 30–48 spd 2.6, str 10 sta 6 | 8000 | warrior |
 | staff_of_the_gravewyrm | Staff of the Gravewyrm | weapon/mainhand | **epic** | 32–52 spd 3.0, int 12 spi 6 | 8000 | mage |

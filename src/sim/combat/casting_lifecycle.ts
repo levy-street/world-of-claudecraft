@@ -1884,7 +1884,7 @@ function applyAbility(
   }
 
   // The cast is committed from this point on (target resolved, cost payable):
-  // consume the gating aura (Rimeneedle's full Icicles stack, Victor\'s Surge's
+  // consume the gating aura (Rimeneedle's full Icicles stack, Victor's Surge's
   // kill window) HERE, atomically with the cost/cooldown billing below, rather
   // than inside runEffects. A ranged ability's runEffects can run ticks later,
   // once its projectile lands (projectile_travel.ts); leaving the consume there
