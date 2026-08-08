@@ -120,11 +120,16 @@ const SECONDARY_CONTROLS: UiIconName[] = [
   'next',
   'prev',
   'skull',
+  'sort',
   'swap',
   'target',
   'trash',
   'vibrate',
   'whisper',
+  // The Wiki launcher: a help affordance kept as a thin-line glyph on purpose
+  // (the rail tail and the More tray's utility entries are glyphs too); painting
+  // it means moving it to CHROME_ART_IDS, a deliberate reclassification.
+  'wiki',
 ];
 const BRAND_MARKS: UiIconName[] = ['discord', 'kick', 'twitch', 'x', 'youtube'];
 

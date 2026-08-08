@@ -303,7 +303,10 @@ export function buildGatherNodeTooltip(
  *  up is the zone rod gate (D9, this water takes a better rod, so the tier IS
  *  named). Without the split a player standing in Thornpeak holding a tier-2
  *  rod would be told to go and get a fishing pole they are already carrying.
- *  Surface 'node' splits the same way; anything unexpected falls back to the
+ *  Surface 'node' splits the same way across four professions: mining,
+ *  logging, herbalism, and farming, whose denial lines are pre-wired here
+ *  ahead of its crop beds shipping (the phase that ships them decides the
+ *  exact surface its patches emit); anything unexpected falls back to the
  *  profession-neutral corpse line. */
 export function gatherDeniedLineKey(
   surface: 'node' | 'corpse' | 'fishing',
@@ -317,7 +320,12 @@ export function gatherDeniedLineKey(
       : 'hudChrome.gathering.toolRequired.fishing';
   }
   if (surface === 'node') {
-    if (professionId === 'mining' || professionId === 'logging' || professionId === 'herbalism') {
+    if (
+      professionId === 'mining' ||
+      professionId === 'logging' ||
+      professionId === 'herbalism' ||
+      professionId === 'farming'
+    ) {
       // The R22 wield arm outranks the tier arms: when the event carries a
       // wield requirement, the player already OWNS a covering tool and the
       // actionable fact is the counter, not the tier.
@@ -338,9 +346,10 @@ export function gatherDeniedLineKey(
 /** The i18n key the gatherToolNoNode SimEvent's error toast resolves (#2343:
  *  a gathering tool was used from the bags with no matching node within
  *  reach). Fishing never emits it (rods route to startFishing), so anything
- *  but the three node professions takes a safe fallback. */
+ *  but the four node professions (mining, logging, herbalism, and farming)
+ *  takes the mining fallback rather than reaching t() with an untracked key. */
 export function gatherToolNoNodeKey(professionId: GatheringProfessionId): TranslationKey {
-  if (professionId === 'logging' || professionId === 'herbalism') {
+  if (professionId === 'logging' || professionId === 'herbalism' || professionId === 'farming') {
     return `hudChrome.gathering.noNodeNearby.${professionId}`;
   }
   return 'hudChrome.gathering.noNodeNearby.mining';

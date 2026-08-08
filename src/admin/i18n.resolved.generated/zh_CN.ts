@@ -217,6 +217,7 @@ export const zh_CN: AdminTranslations = {
   "tickPerf.overBudget": "超出 50ms 预算",
   "tickPerf.loopHeading": "循环阶段",
   "tickPerf.simHeading": "sim.tick() 内部阶段",
+  "tickPerf.selfHeading": "自身快照键分组 (bcastSelf)",
   "tickPerf.colPhase": "阶段",
   "tickPerf.colMean": "平均值",
   "tickPerf.colP95": "p95",

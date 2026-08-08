@@ -134,7 +134,6 @@ export const table: DeedLocaleTable = {
   prog_herbalism_100: { name: '百草宗師', desc: '草藥學熟練度達到100。' },
   prog_master_gatherer: {
     name: '採集大師',
-    desc: '採礦、伐木、草藥學與釣魚中，任意三項熟練度達到100。',
   },
   prog_first_craft: { name: '親手打造', desc: '完成你的第一次成功製作。' },
   prog_craft_specialist: { name: '不傳之秘', desc: '任一工藝技能達到75，並解鎖其專精特長。' },

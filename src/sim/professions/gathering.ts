@@ -780,6 +780,9 @@ export function harvestNode(
 // Inverse of NODE_HARVEST_TABLE for the tool-use path below: which node type
 // a gathering tool works. Fishing has no world nodes (its gatherTool rods
 // route to startFishing at the items.ts boundary), so it never appears here.
+// Farming is absent for a different reason: nothing of it has shipped yet,
+// and its planned crop beds ride their own patch path rather than a
+// GatherNodeType, so like fishing it stays out of this table by design.
 export const NODE_TYPE_BY_PROFESSION: Partial<Record<GatheringProfessionId, GatherNodeType>> = {
   mining: 'ore',
   logging: 'wood',
@@ -1030,7 +1033,7 @@ export interface PendingGatherGrant {
 }
 
 export function emptyGatheringProficiency(): GatheringProficiency {
-  return { mining: 0, logging: 0, herbalism: 0, fishing: 0 };
+  return { mining: 0, logging: 0, herbalism: 0, fishing: 0, farming: 0 };
 }
 
 export function isGatheringProfessionId(id: string): id is GatheringProfessionId {

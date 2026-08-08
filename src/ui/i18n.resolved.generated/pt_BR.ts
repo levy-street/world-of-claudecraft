@@ -336,6 +336,12 @@ export const pt_BR: EnTranslations = {
       "healerConfirmAccept": "Reviva-me",
       "healerConfirmCancel": "Cancelar"
     },
+    "wiki": {
+      "confirmTitle": "Open the Wiki?",
+      "confirmBody": "This opens the World of ClaudeCraft wiki in your browser. The game keeps running.",
+      "confirmOpen": "Open Wiki",
+      "confirmCancel": "Cancel"
+    },
     "unstuck": {
       "menuButton": "Desbloqueio",
       "help": "Recuperação: /unstuck inicia uma contagem regressiva parado para movê-lo até um local seguro alcançável nas proximidades.",
@@ -1920,6 +1926,9 @@ export const pt_BR: EnTranslations = {
       "sortRecent": "Recentes",
       "sortQuality": "Qualidade",
       "sortName": "Nome",
+      "sortButton": "Sort",
+      "sortButtonAria": "Sort your bags",
+      "sortButtonHint": "Combine stacks and group items by type",
       "searchPlaceholder": "Pesquisar itens",
       "searchAria": "Pesquisar itens da bolsa por nome",
       "noMatch": "Nenhum item corresponde aos seus filtros.",
@@ -2593,6 +2602,7 @@ export const pt_BR: EnTranslations = {
       "logging": "Lenharia",
       "herbalism": "Herborismo",
       "fishing": "Pesca",
+      "farming": "Farming",
       "notReady": "Este nó de recursos ainda não se regenerou para você.",
       "gatherLine": "Você coleta: {name}.",
       "gatherLineQty": "Você coleta: {name} x{qty}.",
@@ -2622,23 +2632,27 @@ export const pt_BR: EnTranslations = {
         "mining": "Você precisa de uma picareta de mineração de nível {tier} para extrair este veio.",
         "logging": "Você precisa de um machado de lenharia de nível {tier} para derrubar este arvoredo.",
         "herbalism": "Você precisa de uma foice de herborismo de nível {tier} para colher este canteiro.",
-        "fishing": "Você precisa de uma vara de pesca de nível {tier} para pescar nestas águas."
+        "fishing": "Você precisa de uma vara de pesca de nível {tier} para pescar nestas águas.",
+        "farming": "You need a tier {tier} farming hoe to work this bed."
       },
       "toolRequired": {
         "mining": "Você precisa de uma picareta de mineração para extrair este veio.",
         "logging": "Você precisa de um machado de lenharia para derrubar este arvoredo.",
         "herbalism": "Você precisa de uma foice de herborismo para colher este canteiro.",
-        "fishing": "Você precisa de uma vara de pesca para lançar a linha."
+        "fishing": "Você precisa de uma vara de pesca para lançar a linha.",
+        "farming": "You need a farming hoe to work this bed."
       },
       "noNodeNearby": {
         "mining": "Não há nenhum veio de minério ao alcance.",
         "logging": "Não há nenhum arvoredo ao alcance.",
-        "herbalism": "Não há nenhum canteiro de ervas ao alcance."
+        "herbalism": "Não há nenhum canteiro de ervas ao alcance.",
+        "farming": "There is no crop bed within reach."
       },
       "wieldUnmet": {
         "mining": "Você precisa de Mineração {skill} para brandir a picareta que já está nas suas bolsas.",
         "logging": "Você precisa de Lenharia {skill} para brandir o machado que já está nas suas bolsas.",
-        "herbalism": "Você precisa de Herborismo {skill} para usar a foice que já está nas suas bolsas."
+        "herbalism": "Você precisa de Herborismo {skill} para usar a foice que já está nas suas bolsas.",
+        "farming": "You need Farming {skill} to swing the hoe already in your bags."
       },
       "wieldUnmetCorpse": "Você precisa de {skill} de habilidade em coleta para pôr sua melhor ferramenta para trabalhar.",
       "toolTierUnmetCorpse": "Você precisa de uma ferramenta de coleta de nível {tier} para recuperar os melhores materiais.",
@@ -2647,7 +2661,8 @@ export const pt_BR: EnTranslations = {
           "mining": "Ferramenta de mineração (nível {tier})",
           "logging": "Ferramenta de lenharia (nível {tier})",
           "herbalism": "Ferramenta de herborismo (nível {tier})",
-          "fishing": "Vara de pesca (nível {tier})"
+          "fishing": "Vara de pesca (nível {tier})",
+          "farming": "Farming tool (tier {tier})"
         },
         "unlocks": {
           "mining": "Necessária para extrair veios de minério até o nível {tier}.",
@@ -4594,7 +4609,8 @@ export const pt_BR: EnTranslations = {
         "mining": "A Mineração arranca minério direto da rocha do mundo: cobre no Vale de Eastbrook, ferro no Pântano de Mirefen e ósmio lá em cima nas Alturas de Thornpeak, com veios iniciais espalhados por toda zona mais jovem além delas, alimentando os ofícios da forja. Aberta a todos a partir do nível 1: uma picareta de mineração de 20 cobre de um balcão de Eastbrook, Fenbridge ou Highwatch abre todos os veios iniciais, e os degraus mais altos da escada de picaretas despertam conforme o seu próprio contador os conquista. Acompanhada em seu próprio contador até um limite de 100.",
         "logging": "A Lenharia derruba madeira de arvoredos por todo o mundo: casca de ferro no Vale de Eastbrook, freixo no Pântano de Mirefen, pinheiro alto nas Alturas de Thornpeak, e arvoredos iniciais em toda zona mais jovem, a matéria-prima para cabos, cajados e a bancada do engenheiro. Aberta a todos a partir do nível 1 com um machado de lenharia nas bolsas (20 cobre nos balcões de Eastbrook, Fenbridge e Highwatch), acompanhada em seu próprio contador até um limite de 100.",
         "herbalism": "O Herborismo colhe o que cresce livre: folha reluzente no Vale de Eastbrook, folha dourada no Pântano de Mirefen, pétala solar nas Alturas de Thornpeak, e canteiros iniciais em toda zona mais jovem, a folha e o caule que mantêm os ofícios do boticário fervendo. Aberto a todos a partir do nível 1 com uma foice de herborismo nas bolsas (20 cobre nos balcões de Eastbrook, Fenbridge e Highwatch), acompanhado em seu próprio contador até um limite de 100.",
-        "fishing": "A Pesca é a estranha no ninho entre os ofícios de coleta, e a mais profunda: um minijogo de verdade de fisgar e recolher, tabelas de captura próprias em cada uma das três zonas centrais (as águas jovens além delas servem a tabela do Vale por enquanto) e um limite de proficiência de 200, o dobro dos outros. Compre uma vara, fique de frente para a água aberta e lance."
+        "fishing": "A Pesca é a estranha no ninho entre os ofícios de coleta, e a mais profunda: um minijogo de verdade de fisgar e recolher, tabelas de captura próprias em cada uma das três zonas centrais (as águas jovens além delas servem a tabela do Vale por enquanto) e um limite de proficiência de 200, o dobro dos outros. Compre uma vara, fique de frente para a água aberta e lance.",
+        "farming": "Farming is the one gathering trade you tend rather than take: crops raised from seed in worked beds, then pulled up ripe for the kitchens and the apothecary benches. Its beds, seeds, and tools arrive in a later patch, so the tables below stand empty for now. That is deliberate rather than an oversight: the trade holds its seat on the gathering counter, tracked to a cap of 100, and fills in as its content lands."
       },
       "rhythmHeading": "O ritmo da coleta",
       "rhythmBody": "Uma coleta é um lançamento curto e visível, não um agarrão instantâneo: {base} segundos de base, nunca abaixo de um piso de {floor} segundos. Carregar uma ferramenta acima do nível do nó, uma que a sua proficiência permita manejar, te acelera em {tool} segundos por nível acima dele, e cada faixa de proficiência que você cruza corta mais {band} segundos; apenas igualar o nível do nó só abre a porta, são os níveis acima dele que deixam você rápido.\n\nUma bolsa cheia recusa educadamente o lançamento antes que ele comece, então nada se perde no meio do golpe, e toda coleta paga uma pequena fatia de EXP de personagem, escalada pelo nível do nó contra o seu do mesmo jeito que a EXP de abate escala: um nó cinza trivial não ensina nada a um personagem no limite.",
@@ -4625,7 +4641,8 @@ export const pt_BR: EnTranslations = {
         "mining": "Seu primeiro nó de qualquer ofício conquista Frutos do Campo, e o limite de 100 em Mineração inscreve Minério no Sangue. Atingir 100 em quaisquer três dentre Mineração, Lenharia, Herborismo e Pesca adiciona Mestre Coletor com 25 de Renome, e quebrar uma veia imaculada registra sua própria marca de colecionador. Nenhum desses concede poder: feitos são títulos e Renome, um registro dos caminhos que você percorreu.",
         "logging": "Seu primeiro nó de qualquer ofício conquista Frutos do Campo, e o limite de 100 em Lenharia inscreve Cortador de Cerne. Atingir 100 em quaisquer três dentre Mineração, Lenharia, Herborismo e Pesca adiciona Mestre Coletor com 25 de Renome, e uma batida de cerne antigo registra sua própria marca de colecionador. Feitos são apenas títulos e Renome, nunca poder.",
         "herbalism": "Seu primeiro nó de qualquer ofício conquista Frutos do Campo, e o limite de 100 em Herborismo inscreve Mestre da Campina. Atingir 100 em quaisquer três dentre Mineração, Lenharia, Herborismo e Pesca adiciona Mestre Coletor com 25 de Renome, e uma flor ao luar registra sua própria marca de colecionador. Feitos são apenas títulos e Renome, nunca poder.",
-        "fishing": "O marco de 100 inscreve Sal Velho e o de 200 inscreve Pescador Mestre com seu título, o ponto mais alto da arte do pescador; a Pesca também conta para Mestre Coletor, conquistado com 100 em quaisquer três ofícios de coleta. Um primeiro peixe das águas de cada uma de seis zonas preenche a sua própria página, as três zonas centrais mais Willowfen, Galecrest e Farshore além delas, e o Koi do Brilho Solar registra Lampejo de Esperança, então viajantes com uma vara na mochila enchem o seu livro mais rápido do que esperam."
+        "fishing": "O marco de 100 inscreve Sal Velho e o de 200 inscreve Pescador Mestre com seu título, o ponto mais alto da arte do pescador; a Pesca também conta para Mestre Coletor, conquistado com 100 em quaisquer três ofícios de coleta. Um primeiro peixe das águas de cada uma de seis zonas preenche a sua própria página, as três zonas centrais mais Willowfen, Galecrest e Farshore além delas, e o Koi do Brilho Solar registra Lampejo de Esperança, então viajantes com uma vara na mochila enchem o seu livro mais rápido do que esperam.",
+        "farming": "Farming keeps no deeds of its own yet: its beds are still to come, and the milestone and cap deeds that mark the other trades arrive alongside them. Proficiency in it already counts toward Master Gatherer, which is earned at 100 in any three gathering trades, so a farmer will fill that page the same way everyone else does. Deeds are titles and Renown only, never power."
       },
       "fish": {
         "startHeading": "Primeiros passos",

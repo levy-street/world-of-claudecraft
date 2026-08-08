@@ -1922,6 +1922,7 @@ async function startGame(
     onSocial: () => hud.toggleSocial(),
     onDiscord: () => openDiscordEntry(),
     onDonate: () => window.open(DONATE_URL, '_blank', 'noopener,noreferrer'),
+    onWiki: () => hud.openWiki(),
     onEmotes: () => hud.toggleEmoteWheel(),
     onArena: () => hud.toggleArena(),
     onDungeonFinder: () => hud.toggleDungeonFinder(),

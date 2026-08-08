@@ -207,12 +207,14 @@ export const DEEDS: Record<string, DeedDef> = {
   prog_master_gatherer: {
     id: 'prog_master_gatherer',
     name: 'Master Gatherer',
-    // Desc reword (fishing joined the gathering ring, and the any-three
-    // trigger counts it): the desc names all four professions.
+    // Desc reword, second time (farming joined the gathering ring after
+    // fishing did, and the any-three trigger counts every registered trade).
+    // Enumerating the roster is what went stale twice, so the desc no longer
+    // names or counts the trades at all and a sixth trade cannot restale it.
     // The trigger itself is untouched (rule 9); the stale locale desc fills
     // were dropped with the reword and refill at release (deed_i18n.locales,
-    // English fallback until then).
-    desc: 'Reach 100 proficiency in any three of Mining, Logging, Herbalism, and Fishing.',
+    // English fallback until then), the same protocol as the fishing round.
+    desc: 'Reach 100 proficiency in any three gathering trades.',
     category: 'progression',
     renown: 25,
     trigger: { kind: 'gathering', amount: 100, count: 3 },

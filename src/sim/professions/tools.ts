@@ -546,6 +546,12 @@ function charmIndexToConsume(
  */
 export function slotToolEffectRefused(professionId: string, effectId: string): boolean {
   if (professionId === 'fishing') return true;
+  // Farming is registered but ships no tool item until its hoe phase, so a
+  // farming pair is refusable only by the sim action otherwise, which is
+  // exactly the junk-audit-row class this static predicate exists to stop
+  // ahead of the admin restore write. The hoe phase lifts this arm when the
+  // first farming gatherTool lands.
+  if (professionId === 'farming') return true;
   return (
     Object.hasOwn(TOOL_EFFECTS, effectId) &&
     TOOL_EFFECTS[effectId as ToolEffectId].kind === 'respawnSpeed'

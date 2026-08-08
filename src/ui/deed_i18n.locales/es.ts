@@ -178,7 +178,6 @@ export const table: DeedLocaleTable = {
   },
   prog_master_gatherer: {
     name: 'Maestro recolector',
-    desc: 'Alcanza 100 de pericia en cualquiera de tres entre Minería, Tala, Herboristería y Pesca.',
   },
   prog_first_craft: { name: 'Hecho a mano', desc: 'Completa con éxito tu primera fabricación.' },
   prog_craft_specialist: {

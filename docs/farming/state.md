@@ -245,15 +245,85 @@ missing copy at runtime): `src/ui/gathering_profession_name.ts`
 `src/ui/gathering_view.ts` `gatherDeniedLineKey` (falls through to the corpse line) and
 `gatherToolNoNodeKey` (falls through to the mining line); the four per-profession key
 families in `src/ui/i18n.catalog/hud_chrome.ts` (`toolTierUnmet`, `toolRequired`,
-`wieldUnmet`, `noNodeNearby`) plus the profession display name.
+`wieldUnmet`, `noNodeNearby`) plus the profession display name; and the TWO hand-written
+guide prose keys in `src/ui/i18n.catalog/guide.ts` that hardcode the trade count,
+`guide.professions.whatBody` ("four gathering trades") and
+`guide.professions.gatherHubBody` ("Four gathering trades feed the ring ...", also
+naming each trade), discovered in Phase 1: neither updates automatically, no test pins
+them, and every locale overlay carries translations that go stale on reword (reword the
+English count-free, ship the five non-Latin fills per M16, pin against a hardcoded
+count, and ledger the stale Latin overlays for the release-time fill). Also discovered
+in Phase 1: `src/ui/gather_tool_tooltip.ts` carries an EXHAUSTIVE
+`Record<GatheringProfessionId, TranslationKey>` (`KIND_KEYS`, compile-forced, needs a
+`hudChrome.gathering.toolTooltip.kind.farming` key) beside two Partial-typed neighbours
+(`UNLOCKS_KEYS`, `USE_KEYS`) that miss silently; Phase 1 fills `KIND_KEYS` and
+deliberately leaves the Partial pair empty for farming (no hoe item exists yet; the
+crops/tools phase revisits them when the hoe lands). And
+`src/ui/gather_node_tooltip_controller.ts` (lines 56-66) carries three-key
+node-tooltip maps that never listed fishing: farming is fishing-shaped (own
+FARM_PATCHES table, never a GatherNodeType), so the deliberate decision is that
+farming, like fishing, NEVER gains a row there; if a later phase ever adds a farming
+node type this entry is the reminder that the decision was made, not missed.
+
+Latent sites the Phase 1 reviews mapped for LATER phases (each unreachable today,
+each bites the phase that ships the named feature):
+- The hoe phase: `tierRequired`/`requiresTool` hud_chrome families and the
+  `UNLOCKS_KEYS`/`USE_KEYS` Partial maps in `src/ui/gather_tool_tooltip.ts` (call
+  sites guard undefined, lines just drop); `useGatherToolItem` returns a SILENT false
+  for farming (`NODE_TYPE_BY_PROFESSION` has no farming row, guard at
+  `src/sim/professions/gathering.ts` tool-use path), so the noNodeNearby.farming
+  denial line stays unreachable until the beds phase decides farming's tool-use path;
+  and `slotToolEffectRefused` (`src/sim/professions/tools.ts`) statically REFUSES
+  every farming pair (Phase 1 QA finding: without it the admin restore path accepted
+  farming pairs it could never grant); the hoe phase LIFTS that refusal arm and its
+  pins (tool_effect_tooltip and professions_admin_restore suites) when the first
+  farming gatherTool lands. The growth phase also deletes or inverts the structural
+  ungainability pin in tests/professions_gathering.test.ts. The wiki page's tools and
+  nodes sections length-guard (Phase 1 QA finding: an empty nodes array rendered
+  "respawns for you 0 seconds"); the phase that ships farming tools or beds gets those
+  sections back automatically, with the render test in tests/guide.test.ts flipping
+  to demand them.
+- The beds phase: `TIER_REQUIRED_KEYS`, `REQUIRES_TOOL_KEYS`, `NODE_NAME_KEYS` in
+  `src/ui/gather_node_tooltip_controller.ts` (hover surface must match the click
+  toast); the `gatherDeniedLineKey` comment promise that the beds phase decides which
+  surface patches emit.
+- The tools phase: `toolEffectSlotsFor` sorts wire rows by professionId codepoint and
+  'farming' sorts BEFORE 'fishing', so the first farming tool-effect row lands at the
+  FRONT of the wire array (declared contract, but expect the shift).
+- The growth phase (first phase where farming proficiency can exceed 0): the parity
+  omit-defaults shield ends there (a nonzero farming key enters the state sample), so
+  THAT phase re-runs the full golden regen Phase 1 proved unnecessary; SimEvent
+  payloads must never carry a whole proficiency record (event digests hash with
+  omitDefaults false, so a zero key WOULD move them); and the legacy `professions`
+  dual-write rollback caveat becomes real (an older binary normalizes over four ids
+  and persists the loss; documented in docs/design/professions-tuning-packet.md).
+- Release-time i18n reconcile: the five non-Latin whatBody fills say "all eight
+  crafts" where English says "seven of the eight" (pre-existing condensation,
+  inherited); the Latin-script overlays keep stale "four trades" prose for
+  whatBody/gatherHubBody and the count-bearing gatherDeeds rows.
+- Pre-existing stale comments inherited, not fixed (outside the Phase 1 diff):
+  `src/sim/types.ts` "over the three professions", `src/net/online.ts` gprof comments
+  "(Mining/Logging/Herbalism, #1119)" twice.
 
 Data-driven sites that just work once the content row exists: `emptyGatheringProficiency`,
 `normalizeGatheringProficiency`, `gatheringSkillsView`, the tools and wield-gate
 walkers, `characterProfessionsSheet`, `buildGatheringProficiencyRows`, the professions
-window gathering section, the wiki generator (auto-adds the farming page; the summary
-line naming four gathering professions updates), and the deeds any-profession arm.
+window gathering section, the wiki generator (auto-adds the farming page; but see the
+silent-miss list above: the guide summary prose does NOT update itself, and the
+generated farming page takes the node-profession arm of
+`src/guide/pages/professions_gathering.ts`, rendering node-harvest prose with empty
+tool/node tables until a later phase gives farming its own arm), and the deeds
+any-profession arm.
 CONSEQUENCE to flag, not fix: farming automatically becomes a way to satisfy existing
-any-profession-at-N deeds (accepted default).
+any-profession-at-N deeds (accepted default). Phase 1 follow-on for the DEEDS PHASE
+(must-do, discovered in Phase 1): the Master Gatherer trigger
+(`src/sim/deeds.ts`, computed from `GATHERING_PROFESSION_IDS`) now counts farming, but
+its desc in `src/sim/content/deeds.ts` (`prog_master_gatherer`) still reads "any three
+of Mining, Logging, Herbalism, and Fishing" (its own comment records the same reword
+when fishing joined), and three guide keys
+(`guide.profPages.gatherDeeds.{mining,logging,herbalism}`) repeat the stale list. The
+deeds phase rewords all four count-free in one deliberate pass WITH their non-Latin
+fills (rewording them piecemeal in Phase 1 would stale reviewed overlay prose twice).
 
 Wire: `gprof` carries the fifth key for free (wholesale-replace mirror). The
 `tests/snapshots.test.ts` round-trip literal gains `farming: 0`. No new per-entity key;
@@ -262,7 +332,11 @@ plot state rides a NEW self delta key (working name `fplot`) registered in
 
 Test pins that move (re-pin deliberately, never loosen):
 `tests/professions_contracts.test.ts` (the exact-order skills array gains a fifth row),
-`tests/profession_icons.test.ts` (demands a `gather_farming` procedural icon),
+`tests/profession_icons.test.ts` (demands a `gather_farming` procedural icon; Phase 1
+found its E2/F checks also pin every recipe id as art-backed in production, committed
+128px WebP plus a maintainer-held master SHA in `public/ui/professions/mapping.json`,
+which procedural-only cannot satisfy: resolved by a deliberate PENDING_ART allowlist
+amendment scoped to `gather_farming`, cleared by the phase-13 asset batch),
 `tests/snapshots.test.ts` (literal above), `tests/deeds_content.test.ts` (totals),
 `tests/professions_skill_caps.test.ts` and other suites with literal proficiency maps,
 `tests/professions_blob_growth.test.ts` (worst-case save blob grows), the wiki
@@ -352,9 +426,29 @@ question does not arise (farming has no station).
 - New IWorld members: (none yet)
 - New SimEvents: (none yet)
 - New wire keys: (none yet)
-- New i18n keys and matcher rows: (none yet)
-- New items/recipes/deeds: (none yet)
-- Locked deviations from phase files: (none yet)
+- New i18n keys and matcher rows: Phase 1 added, all English-only catalog rows with
+  five non-Latin overlay fills each (M16): hudChrome.gathering.farming,
+  hudChrome.gathering.toolTierUnmet.farming, hudChrome.gathering.toolRequired.farming,
+  hudChrome.gathering.wieldUnmet.farming, hudChrome.gathering.noNodeNearby.farming,
+  hudChrome.gathering.toolTooltip.kind.farming, guide.profPages.gatherIntro.farming,
+  guide.profPages.gatherDeeds.farming. Reworded with fresh non-Latin fills:
+  guide.professions.whatBody, guide.professions.gatherHubBody,
+  guide.profPages.gatherDeeds.{mining,logging,herbalism}. Reworded English with
+  locale desc fills DROPPED per the deed_i18n release-refill protocol:
+  prog_master_gatherer desc (18 locales). No matcher rows (nothing sim-side emits
+  farming English).
+- New items/recipes/deeds: (none yet; Phase 1 deliberately adds none)
+- Locked deviations from phase files: Phase 1: (a) PENDING_ART_IDS allowlist in
+  tests/profession_icons.test.ts (E2 demands art-backed production ids the packet
+  did not anticipate; inverted assertions self-clear when the phase 13 art batch
+  lands; maintainer sign-off owed at feature review); (b) NO parity golden commit
+  (the predicted mechanical red never materializes: the sample drops inert zero
+  keys before digesting; regen proven byte-identical; the growth phase inherits the
+  first real regen); (c) six commits, not five (review round commit; no parity
+  commit); (d) Master Gatherer roster prose pulled INTO Phase 1 from the deeds
+  phase (fishing-precedent reword, all three reviewers concurring); (e) the
+  GATHERING_PROFESSION_IDS comment was amended, not preserved verbatim (it names
+  the appended professions).
 - Dev command surface: (Phase 3 records the exact /dev farm cheat names here at
   completion; Phases 7 and 8 depend on them for dev-created crops)
 

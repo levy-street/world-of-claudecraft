@@ -189,6 +189,7 @@ export const es: Record<string, string> = {
   'tickPerf.ms': '{value} ms',
   'tickPerf.noCapture': 'Aún no hay captura. Elige una ventana e inicia una.',
   'tickPerf.overBudget': 'por encima del presupuesto de 50ms',
+  'tickPerf.selfHeading': 'Grupos de claves de la instantánea propia (bcastSelf)',
   'tickPerf.simHeading': 'Fases internas de sim.tick()',
   'tickPerf.title': 'Perfilador de ticks del servidor',
   'calibration.autoRefresh': 'Actualización automática ({seconds}s)',

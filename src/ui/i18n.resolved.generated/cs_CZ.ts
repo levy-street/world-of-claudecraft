@@ -336,6 +336,12 @@ export const cs_CZ: EnTranslations = {
       "healerConfirmAccept": "Oživ mě",
       "healerConfirmCancel": "Zrušit"
     },
+    "wiki": {
+      "confirmTitle": "Open the Wiki?",
+      "confirmBody": "This opens the World of ClaudeCraft wiki in your browser. The game keeps running.",
+      "confirmOpen": "Open Wiki",
+      "confirmCancel": "Cancel"
+    },
     "unstuck": {
       "menuButton": "Vyproštění",
       "help": "Záchrana: /unstuck spustí nehybné odpočítávání, které tě přemístí na nedaleké dostupné bezpečné místo.",
@@ -1920,6 +1926,9 @@ export const cs_CZ: EnTranslations = {
       "sortRecent": "Nedávné",
       "sortQuality": "Kvalita",
       "sortName": "Název",
+      "sortButton": "Sort",
+      "sortButtonAria": "Sort your bags",
+      "sortButtonHint": "Combine stacks and group items by type",
       "searchPlaceholder": "Hledat předměty",
       "searchAria": "Hledat předměty v batozích podle názvu",
       "noMatch": "Tvým filtrům neodpovídají žádné předměty.",
@@ -2593,6 +2602,7 @@ export const cs_CZ: EnTranslations = {
       "logging": "Dřevorubectví",
       "herbalism": "Bylinkářství",
       "fishing": "Rybaření",
+      "farming": "Farming",
       "notReady": "Tento zdroj pro tebe ještě neobnovil zásoby.",
       "gatherLine": "Shromažďujete: {name}.",
       "gatherLineQty": "Shromažďujete: {name} x{qty}.",
@@ -2622,23 +2632,27 @@ export const cs_CZ: EnTranslations = {
         "mining": "K vytěžení této žíly potřebuješ krumpáč úrovně {tier}.",
         "logging": "K pokácení tohoto porostu potřebuješ dřevorubeckou sekeru úrovně {tier}.",
         "herbalism": "K sesbírání tohoto záhonu potřebuješ bylinkářský srp úrovně {tier}.",
-        "fishing": "K rybaření v těchto vodách potřebuješ rybářský prut úrovně {tier}."
+        "fishing": "K rybaření v těchto vodách potřebuješ rybářský prut úrovně {tier}.",
+        "farming": "You need a tier {tier} farming hoe to work this bed."
       },
       "toolRequired": {
         "mining": "K vytěžení této žíly potřebuješ hornický krumpáč.",
         "logging": "Ke skácení této skupiny stromů potřebuješ dřevorubeckou sekeru.",
         "herbalism": "Ke sběru tohoto porostu bylin potřebuješ bylinkářský srp.",
-        "fishing": "K nahození udice potřebuješ rybářský prut."
+        "fishing": "K nahození udice potřebuješ rybářský prut.",
+        "farming": "You need a farming hoe to work this bed."
       },
       "noNodeNearby": {
         "mining": "V dosahu není žádná rudná žíla.",
         "logging": "V dosahu není žádná skupina stromů.",
-        "herbalism": "V dosahu není žádný porost bylin."
+        "herbalism": "V dosahu není žádný porost bylin.",
+        "farming": "There is no crop bed within reach."
       },
       "wieldUnmet": {
         "mining": "K máchnutí krumpáčem, který už máš v batozích, potřebuješ Těžbu {skill}.",
         "logging": "K máchnutí sekerou, kterou už máš v batozích, potřebuješ Dřevorubectví {skill}.",
-        "herbalism": "K práci se srpem, který už máš v batozích, potřebuješ Bylinkářství {skill}."
+        "herbalism": "K práci se srpem, který už máš v batozích, potřebuješ Bylinkářství {skill}.",
+        "farming": "You need Farming {skill} to swing the hoe already in your bags."
       },
       "wieldUnmetCorpse": "K využití svého nejlepšího nástroje potřebuješ sběračskou dovednost {skill}.",
       "toolTierUnmetCorpse": "K získání nejjemnějších materiálů potřebuješ sběračský nástroj úrovně {tier}.",
@@ -2647,7 +2661,8 @@ export const cs_CZ: EnTranslations = {
           "mining": "Hornický nástroj ({tier}. úroveň)",
           "logging": "Dřevorubecký nástroj ({tier}. úroveň)",
           "herbalism": "Bylinkářský nástroj ({tier}. úroveň)",
-          "fishing": "Rybářský prut ({tier}. úroveň)"
+          "fishing": "Rybářský prut ({tier}. úroveň)",
+          "farming": "Farming tool (tier {tier})"
         },
         "unlocks": {
           "mining": "Nutný k těžbě rudných žil až do {tier}. úrovně.",
@@ -4594,7 +4609,8 @@ export const cs_CZ: EnTranslations = {
         "mining": "Těžba tahá rudu přímo ze skály světa: měď v Eastbrookském údolí, železo v Mirefenském močálu a osmium nahoře v Thornpeakských výšinách, se začátečnickými žilami roztroušenými po každé mladší zóně za nimi, což živí kovářská řemesla. Otevřená každému od 1. úrovně: hornický krumpáč za 20 měďáků z přepážky v Eastbrooku, Fenbridge nebo Highwatchi otevře každou začátečnickou žílu a vyšší příčle krumpáčového žebříčku se probouzejí, jak si je tvé vlastní počitadlo vyslouží. Vedená na vlastním počitadle až ke stropu 100.",
         "logging": "Dřevorubectví kácí dřevo ze skupin stromů po celém světě: železokůru v Eastbrookském údolí, jasan v Mirefenském močálu, horskou borovici v Thornpeakských výšinách a začátečnické skupiny v každé mladší zóně, surovinu pro topůrka, hole a strojírův pracovní stůl. Otevřené každému od 1. úrovně s dřevorubeckou sekerou v brašnách (20 měďáků u přepážek v Eastbrooku, Fenbridge a Highwatchi), vedené na vlastním počitadle až ke stropu 100.",
         "herbalism": "Bylinkářství sbírá to, co roste divoce: stříbrolist v Eastbrookském údolí, zlatolist v Mirefenském močálu, sluncokvět v Thornpeakských výšinách a začátečnické porosty v každé mladší zóně, list a stonek, které drží lékárnická řemesla v chodu. Otevřené každému od 1. úrovně s bylinkářským srpem v brašnách (20 měďáků u přepážek v Eastbrooku, Fenbridge a Highwatchi), vedené na vlastním počitadle až ke stropu 100.",
-        "fishing": "Rybaření je mezi sběratelskými živnostmi ta zvláštní, a zároveň nejhlubší: skutečná minihra na záběr a navíjení, vlastní tabulky úlovků v každé ze tří vnitrozemských zón (mladé vody za nimi zatím všechny obsluhuje tabulka Údolí) a strop zdatnosti 200, dvojnásobek ostatních. Kup prut, postav se čelem k otevřené vodě a nahoď."
+        "fishing": "Rybaření je mezi sběratelskými živnostmi ta zvláštní, a zároveň nejhlubší: skutečná minihra na záběr a navíjení, vlastní tabulky úlovků v každé ze tří vnitrozemských zón (mladé vody za nimi zatím všechny obsluhuje tabulka Údolí) a strop zdatnosti 200, dvojnásobek ostatních. Kup prut, postav se čelem k otevřené vodě a nahoď.",
+        "farming": "Farming is the one gathering trade you tend rather than take: crops raised from seed in worked beds, then pulled up ripe for the kitchens and the apothecary benches. Its beds, seeds, and tools arrive in a later patch, so the tables below stand empty for now. That is deliberate rather than an oversight: the trade holds its seat on the gathering counter, tracked to a cap of 100, and fills in as its content lands."
       },
       "rhythmHeading": "Rytmus sběru",
       "rhythmBody": "Sklizeň je krátké viditelné nahození, ne okamžité chňapnutí: {base} sekundy základ, nikdy ne pod dolní hranici {floor} sekundy. Nošení nástroje nad úrovní naleziště, takového, který ti tvá dovednost dovolí použít, tě zrychlí o {tool} sekundy za každou úroveň nad ní a každé překročené dovednostní pásmo ukrojí ještě {band} sekundy; pouhé vyrovnání úrovně naleziště tě dostane do dveří, rychlým tě dělají teprve úrovně nad ní.\n\nPlná brašna zdvořile odmítne nahození ještě před začátkem, takže se uprostřed rozmachu nic nepromarní, a každá sklizeň vyplatí malý díl zkušeností postavy, škálovaný úrovní naleziště proti té tvé stejně, jako se škálují zkušenosti za zabití: triviální šedé naleziště postavě na stropu nedá nic.",
@@ -4625,7 +4641,8 @@ export const cs_CZ: EnTranslations = {
         "mining": "Tvé první naleziště v jakékoli živnosti získá Plody pole a limit 100 v Těžbě zapíše Rudu v krvi. Dosažení 100 ve třech z Těžby, Dřevorubectví, Bylinkářství a Rybaření přidá Mistra sběrače za 25 Věhlasu a rozlomení čisté žíly zaznamená svůj vlastní sběratelský odkaz. Nic z toho nedává moc: skutky jsou tituly a Věhlas, záznam cest, kterými jsi prošel.",
         "logging": "Tvé první naleziště v jakékoli živnosti získá Plody pole a limit 100 v Dřevorubectví zapíše Tesače srdcoviny. Dosažení 100 ve třech z Těžby, Dřevorubectví, Bylinkářství a Rybaření přidá Mistra sběrače za 25 Věhlasu a záseky do dávného jádra zaznamenají svůj vlastní sběratelský odkaz. Skutky jsou jen tituly a Věhlas, nikdy moc.",
         "herbalism": "Tvé první naleziště v jakékoli živnosti získá Plody pole a limit 100 v Bylinkářství zapíše Pána luk. Dosažení 100 ve třech z Těžby, Dřevorubectví, Bylinkářství a Rybaření přidá Mistra sběrače za 25 Věhlasu a měsíčně kvetoucí květ zaznamená svůj vlastní sběratelský odkaz. Skutky jsou jen tituly a Věhlas, nikdy moc.",
-        "fishing": "Milník 100 zapíše Starého solanáře a 200 zapíše Mistrného rybáře i s jeho titulem, úplný vrchol rybářského umění; Rybaření se také počítá k Mistru sběrači, získanému na 100 ve třech libovolných sběratelských živnostech. První ryba z vod každé ze šesti zón zaplní vlastní stránku, tří vnitrozemských zón a Vrbové bažiny, Vichrného hřebene a Vzdáleného pobřeží za nimi, a Slunolesklý koi zapíše Záblesk naděje, takže cestovatelé s prutem v batohu si knihu plní rychleji, než čekají."
+        "fishing": "Milník 100 zapíše Starého solanáře a 200 zapíše Mistrného rybáře i s jeho titulem, úplný vrchol rybářského umění; Rybaření se také počítá k Mistru sběrači, získanému na 100 ve třech libovolných sběratelských živnostech. První ryba z vod každé ze šesti zón zaplní vlastní stránku, tří vnitrozemských zón a Vrbové bažiny, Vichrného hřebene a Vzdáleného pobřeží za nimi, a Slunolesklý koi zapíše Záblesk naděje, takže cestovatelé s prutem v batohu si knihu plní rychleji, než čekají.",
+        "farming": "Farming keeps no deeds of its own yet: its beds are still to come, and the milestone and cap deeds that mark the other trades arrive alongside them. Proficiency in it already counts toward Master Gatherer, which is earned at 100 in any three gathering trades, so a farmer will fill that page the same way everyone else does. Deeds are titles and Renown only, never power."
       },
       "fish": {
         "startHeading": "Jak začít",

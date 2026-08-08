@@ -5648,6 +5648,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.filterMount': '坐骑',
   'hudChrome.bags.filterQuest': '任务',
   'hudChrome.bags.sortAria': '排序背包物品',
+  'hudChrome.bags.sortButton': '整理',
+  'hudChrome.bags.sortButtonAria': '整理背包',
+  'hudChrome.bags.sortButtonHint': '合并堆叠并按类型分组物品',
   'hudChrome.bags.sortRecent': '最近',
   'hudChrome.bags.sortQuality': '品质',
   'hudChrome.bags.sortName': '名称',
@@ -8261,6 +8264,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.logging': '伐木',
   'hudChrome.gathering.herbalism': '草药学',
   'hudChrome.gathering.fishing': '钓鱼',
+  'hudChrome.gathering.farming': '耕作',
   'hudChrome.gathering.notReady': '这个资源节点尚未为你重新生成。',
   'hudChrome.gathering.gatherLine': '你采集了：{name}。',
   'hudChrome.gathering.gatherLineQty': '你采集了：{name} x{qty}。',
@@ -8281,10 +8285,12 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.toolTierUnmet.logging': '你需要{tier}阶伐木斧才能砍伐这片林木。',
   'hudChrome.gathering.toolTierUnmet.herbalism': '你需要{tier}阶草药镰才能采集这片草药丛。',
   'hudChrome.gathering.toolTierUnmet.fishing': '你需要{tier}阶钓竿才能在这片水域垂钓。',
+  'hudChrome.gathering.toolTierUnmet.farming': '你需要{tier}阶耕作锄才能打理这片田畦。',
   'hudChrome.gathering.toolTierUnmetCorpse': '你需要{tier}阶采集工具才能取得最上等的材料。',
   'hudChrome.gathering.wieldUnmet.mining': '你需要采矿{skill}才能挥动背包里已有的采矿镐。',
   'hudChrome.gathering.wieldUnmet.logging': '你需要伐木{skill}才能挥动背包里已有的伐木斧。',
   'hudChrome.gathering.wieldUnmet.herbalism': '你需要草药学{skill}才能使用背包里已有的草药镰。',
+  'hudChrome.gathering.wieldUnmet.farming': '你需要耕作{skill}才能挥动背包里已有的耕作锄。',
   'hudChrome.gathering.wieldUnmetCorpse': '你需要采集技能{skill}才能让最上等的工具派上用场。',
   'hudChrome.gathering.requiresTool.mining': '需要采矿镐',
   'hudChrome.gathering.requiresTool.logging': '需要伐木斧',
@@ -8293,13 +8299,16 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.toolRequired.logging': '你需要伐木斧才能砍伐这片林木。',
   'hudChrome.gathering.toolRequired.herbalism': '你需要草药镰才能采集这片草药丛。',
   'hudChrome.gathering.toolRequired.fishing': '你需要钓竿才能抛竿垂钓。',
+  'hudChrome.gathering.toolRequired.farming': '你需要耕作锄才能打理这片田畦。',
   'hudChrome.gathering.noNodeNearby.mining': '附近没有矿脉可供开采。',
   'hudChrome.gathering.noNodeNearby.logging': '附近没有林木可供砍伐。',
   'hudChrome.gathering.noNodeNearby.herbalism': '附近没有草药丛可供采集。',
+  'hudChrome.gathering.noNodeNearby.farming': '附近没有田畦可供打理。',
   'hudChrome.gathering.toolTooltip.kind.mining': '采矿工具（{tier}阶）',
   'hudChrome.gathering.toolTooltip.kind.logging': '伐木工具（{tier}阶）',
   'hudChrome.gathering.toolTooltip.kind.herbalism': '草药工具（{tier}阶）',
   'hudChrome.gathering.toolTooltip.kind.fishing': '钓鱼竿（{tier}阶）',
+  'hudChrome.gathering.toolTooltip.kind.farming': '耕作工具（{tier}阶）',
   'hudChrome.gathering.toolTooltip.unlocks.mining': '开采最高{tier}阶的矿脉所需。',
   'hudChrome.gathering.toolTooltip.unlocks.logging': '砍伐最高{tier}阶的林木所需。',
   'hudChrome.gathering.toolTooltip.unlocks.herbalism': '采集最高{tier}阶的草药丛所需。',
@@ -9217,6 +9226,11 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unstuck.standStillAnywhere': '请先停下再使用脱困。',
   'hudChrome.unstuck.busy': '请先完成当前动作再使用脱困。',
   'hudChrome.unstuck.unavailable': '当前状态下无法使用脱困。',
+  // Wiki launcher confirm (M16 non-Latin fills).
+  'hudChrome.wiki.confirmTitle': '打开维基？',
+  'hudChrome.wiki.confirmBody': '将在浏览器中打开 World of ClaudeCraft 维基，游戏会继续运行。',
+  'hudChrome.wiki.confirmOpen': '打开维基',
+  'hudChrome.wiki.confirmCancel': '取消',
   'guide.abilityHook.revenge': '横扫你前方的敌人，并可能在躲闪或招架后不消耗资源。',
   'guide.abilityHook.hamstring': '妨碍敌人的移动，使其无法逃脱。',
   'game.talents.choicesTab': '抉择',
@@ -10310,7 +10324,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.professions.comingSoon': '暂无配方',
   'guide.professions.gatherHubHeading': '采集',
   'guide.professions.gatherHubBody':
-    '四种采集行业为制作供给材料：采矿、伐木与草药学的上限为100，钓鱼为200。',
+    '采集行业为制作供给材料：采矿、伐木与草药学的上限为100，耕作在照料的田畦中从种子育出作物，上限同为100，钓鱼为200。',
   'guide.professions.archetypesHeading': '十大命途',
   'guide.professions.archetypesBody':
     '调谐到两个相邻行业即可获得一个成对头衔：两门主修可以一路练到最高层级，对侧的一门行业作为爱好保留在精良层级，其余行业则停留在普通层级。',
@@ -10421,6 +10435,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '草药学采集野生植物：东溪谷产润光叶，泥沼湿地产金叶，荆峰高地产日瓣草，为药坊类行业持续供应叶茎原料。从1级起向所有人开放，只需背包里备有一把草药镰（任意主城20铜），以独立计数器追踪，上限为100。',
   'guide.profPages.gatherIntro.fishing':
     '钓鱼通过咬钩与收线的节奏，在每个区域的开阔水面垂钓，上限为200。',
+  'guide.profPages.gatherIntro.farming':
+    '耕作在整治好的田畦中从种子育出作物，上限为100；它的田畦、种子与工具将随后续更新到来，因此下方表格暂时为空。',
   'guide.profPages.rhythmHeading': '采集节奏',
   'guide.profPages.rhythmBody':
     '采集是一段可见的施法：基础{base}秒，最短不低于{floor}秒；工具每高于节点一阶缩短{tool}秒，每个熟练度区间再缩短{band}秒。',
@@ -10526,7 +10542,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   // proper-noun precedent).
   'guide.professions.whatHeading': '剑之外的一门手艺',
   'guide.professions.whatBody':
-    '专业是这个世界的营生：四种采集行业从大地中获取原料，十种制作行业把它们变成装备、饭菜、药水与工具。万物环环相扣：你挖出的矿石成为刀剑，刀剑接受附魔，而附魔又需要从旧装备中分解出的粉尘。这里没有专业数量限制：每个角色都能同时修习全部八种已有内容的制作行业与全部四种采集行业，唯一的排他选择是你最终宣誓的命途，而一旦宣誓，落入休眠的制作行业便不再上升。技能永不下降，学会的东西也永远不会被夺走。',
+    '专业是这个世界的营生：采集行业从大地中获取原料，十种制作行业把它们变成装备、饭菜、药水与工具。万物环环相扣：你挖出的矿石成为刀剑，刀剑接受附魔，而附魔又需要从旧装备中分解出的粉尘。这里没有专业数量限制：每个角色都能同时修习全部八种已有内容的制作行业与全部采集行业，唯一的排他选择是你最终宣誓的命途，而一旦宣誓，落入休眠的制作行业便不再上升。技能永不下降，学会的东西也永远不会被夺走。',
   'guide.professions.deedsHeading': '铭记旅程的功业',
   'guide.professions.deedsBody':
     '功业之书伴随这一切：首次调谐获得Craftsworn，首次杰作获得Masterwright，均可作为头衔佩戴。八种可修行业各在技能50设有里程碑功业，并在上限125加冕Grandmaster头衔；钓鱼在100熟练获得Old Salt，200获得Master Angler头衔。\n\n此外还有更静默的篇章：首次采集与首次制作的功业、野外奇遇中的意外收获，以及拾起拆解之路的印记。这一切皆为装饰，只有头衔与声望。功业永不赋予力量，它只证明你曾在场。',
@@ -10538,13 +10554,15 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '每次采集都会掷出品质，而熟练度决定一切：新手永远采到普通品，熟练度越高，权重越向高品质移动，绝不倒退。到100上限时普通品完全消失：60%优秀、30%精良、8%史诗、2%传说。品质也意味着数量：普通1个，优秀与精良2个，史诗3个，传说4个。精良及以上的收获都会以你的名字署名（Gathered by），封顶时十次采集有四次带着你的名字。',
   'guide.profPages.gatherDeedsHeading': '沿途的功业',
   'guide.profPages.gatherDeeds.mining':
-    '任意行业的第一次采集获得Fruits of the Field，采矿100上限铭刻Ore in the Blood。采矿、伐木、草药学与钓鱼中任意三项达到100可得Master Gatherer（25声望），凿开纯净矿脉另有收藏印记。功业只有头衔与声望，永不赋予力量。',
+    '任意行业的第一次采集获得Fruits of the Field，采矿100上限铭刻Ore in the Blood。任意三项采集行业达到100可得Master Gatherer（25声望），凿开纯净矿脉另有收藏印记。功业只有头衔与声望，永不赋予力量。',
   'guide.profPages.gatherDeeds.logging':
-    '任意行业的第一次采集获得Fruits of the Field，伐木100上限铭刻Heartwood Hewer。四种采集行业中任意三项达到100可得Master Gatherer（25声望），劈出远古心材另有收藏印记。功业只有头衔与声望，永不赋予力量。',
+    '任意行业的第一次采集获得Fruits of the Field，伐木100上限铭刻Heartwood Hewer。任意三项采集行业达到100可得Master Gatherer（25声望），劈出远古心材另有收藏印记。功业只有头衔与声望，永不赋予力量。',
   'guide.profPages.gatherDeeds.herbalism':
-    '任意行业的第一次采集获得Fruits of the Field，草药学100上限铭刻Master of the Meadow。四种采集行业中任意三项达到100可得Master Gatherer（25声望），采下月光绽放另有收藏印记。功业只有头衔与声望，永不赋予力量。',
+    '任意行业的第一次采集获得Fruits of the Field，草药学100上限铭刻Master of the Meadow。任意三项采集行业达到100可得Master Gatherer（25声望），采下月光绽放另有收藏印记。功业只有头衔与声望，永不赋予力量。',
   'guide.profPages.gatherDeeds.fishing':
     '钓鱼100熟练铭刻Old Salt，200铭刻Master Angler及其头衔，那是垂钓技艺的顶点；钓鱼同样计入Master Gatherer（任意三项采集达到100）。在每个区域的水域钓起第一条鱼各有其页，钓起日辉锦鲤则记下Glimmer of Hope，所以包里常备鱼竿的旅人往往比预想中更快填满功业之书。',
+  'guide.profPages.gatherDeeds.farming':
+    '耕作暂无专属功业：田畦尚未到来，标记其他行业的里程碑与上限功业也将随之而来。它的熟练已经计入Master Gatherer（任意三项采集达到100）。功业只给头衔与名望，绝不给予力量。',
   'guide.profPages.fish.startHeading': '入门',
   'guide.profPages.fish.startBody':
     '一根Simple Fishing Pole在Eastbrook的Fisherman Brandt处只卖20铜（他在镇东缘望着Mirror Lake）；Tinker Gizzel、Fenbridge的Provisioner Hale和Highwatch的Quartermaster Bree也有存货。面向前方约24码内足够深的水面使用鱼竿即可抛竿。战斗中、游泳时或死亡时无法抛竿：站在岸上钓才是正途，任何区域的可钓水域都行。',

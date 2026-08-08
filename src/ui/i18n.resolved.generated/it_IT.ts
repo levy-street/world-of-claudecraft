@@ -336,6 +336,12 @@ export const it_IT: EnTranslations = {
       "healerConfirmAccept": "Ravvivami",
       "healerConfirmCancel": "Annulla"
     },
+    "wiki": {
+      "confirmTitle": "Open the Wiki?",
+      "confirmBody": "This opens the World of ClaudeCraft wiki in your browser. The game keeps running.",
+      "confirmOpen": "Open Wiki",
+      "confirmCancel": "Cancel"
+    },
     "unstuck": {
       "menuButton": "Sblocco",
       "help": "Recupero: /unstuck avvia un conto alla rovescia da fermo per spostarti in un punto sicuro raggiungibile nelle vicinanze.",
@@ -1920,6 +1926,9 @@ export const it_IT: EnTranslations = {
       "sortRecent": "Recenti",
       "sortQuality": "Qualità",
       "sortName": "Nome",
+      "sortButton": "Sort",
+      "sortButtonAria": "Sort your bags",
+      "sortButtonHint": "Combine stacks and group items by type",
       "searchPlaceholder": "Cerca oggetti",
       "searchAria": "Cerca gli oggetti della borsa per nome",
       "noMatch": "Nessun oggetto corrisponde ai tuoi filtri.",
@@ -2593,6 +2602,7 @@ export const it_IT: EnTranslations = {
       "logging": "Taglio del legname",
       "herbalism": "Erbalismo",
       "fishing": "Pesca",
+      "farming": "Farming",
       "notReady": "Questo nodo di risorse non e ancora rispawnato per te.",
       "gatherLine": "Raccogli: {name}.",
       "gatherLineQty": "Raccogli: {name} x {qty}.",
@@ -2622,23 +2632,27 @@ export const it_IT: EnTranslations = {
         "mining": "Hai bisogno di un piccone da estrazione di livello {tier} per raccogliere questo filone.",
         "logging": "Hai bisogno di un'ascia da taglio di livello {tier} per abbattere questo boschetto.",
         "herbalism": "Hai bisogno di una falce da erbalismo di livello {tier} per raccogliere quest'aiuola.",
-        "fishing": "Hai bisogno di una canna da pesca di livello {tier} per pescare in queste acque."
+        "fishing": "Hai bisogno di una canna da pesca di livello {tier} per pescare in queste acque.",
+        "farming": "You need a tier {tier} farming hoe to work this bed."
       },
       "toolRequired": {
         "mining": "Hai bisogno di un piccone da estrazione per raccogliere questo filone.",
         "logging": "Hai bisogno di un'ascia da taglio per abbattere questo boschetto.",
         "herbalism": "Hai bisogno di una falce da erbalismo per raccogliere quest'aiuola.",
-        "fishing": "Hai bisogno di una canna da pesca per lanciare la lenza."
+        "fishing": "Hai bisogno di una canna da pesca per lanciare la lenza.",
+        "farming": "You need a farming hoe to work this bed."
       },
       "noNodeNearby": {
         "mining": "Non c'è nessun filone di minerale a portata.",
         "logging": "Non c'è nessun boschetto di alberi a portata.",
-        "herbalism": "Non c'è nessuna aiuola d'erbe a portata."
+        "herbalism": "Non c'è nessuna aiuola d'erbe a portata.",
+        "farming": "There is no crop bed within reach."
       },
       "wieldUnmet": {
         "mining": "Ti serve Estrazione mineraria {skill} per impugnare il piccone che hai già nelle borse.",
         "logging": "Ti serve Taglio del legname {skill} per impugnare l'ascia che hai già nelle borse.",
-        "herbalism": "Ti serve Erbalismo {skill} per usare la falce che hai già nelle borse."
+        "herbalism": "Ti serve Erbalismo {skill} per usare la falce che hai già nelle borse.",
+        "farming": "You need Farming {skill} to swing the hoe already in your bags."
       },
       "wieldUnmetCorpse": "Ti serve abilità di raccolta {skill} per mettere all'opera il tuo strumento migliore.",
       "toolTierUnmetCorpse": "Hai bisogno di uno strumento da raccolta di livello {tier} per recuperare i materiali migliori.",
@@ -2647,7 +2661,8 @@ export const it_IT: EnTranslations = {
           "mining": "Strumento da estrazione (livello {tier})",
           "logging": "Strumento da taglio (livello {tier})",
           "herbalism": "Strumento da erbalismo (livello {tier})",
-          "fishing": "Canna da pesca (livello {tier})"
+          "fishing": "Canna da pesca (livello {tier})",
+          "farming": "Farming tool (tier {tier})"
         },
         "unlocks": {
           "mining": "Necessario per estrarre dai filoni di minerale fino al livello {tier}.",
@@ -4594,7 +4609,8 @@ export const it_IT: EnTranslations = {
         "mining": "L'Estrazione mineraria strappa il minerale direttamente dalla roccia del mondo: rame nella Valle di Eastbrook, ferro nella Palude di Mirefen e osmio lassù sulle Alture di Thornpeak, con filoni iniziali sparsi per ogni zona più giovane oltre di esse, che alimentano i mestieri della forgia. Aperta a tutti dal livello 1: un piccone da estrazione da 20 monete di rame preso a un bancone di Eastbrook, Fenbridge o Highwatch apre ogni filone iniziale, e i gradini più alti della scala dei picconi si risvegliano man mano che il tuo contatore se li guadagna. Tracciata su un contatore proprio fino a un limite di 100.",
         "logging": "Il Taglio del legname abbatte legname dai boschetti di alberi di tutto il mondo: corteccia di ferro nella Valle di Eastbrook, frassino nella Palude di Mirefen, altopino sulle Alture di Thornpeak e boschetti iniziali in ogni zona più giovane, la materia grezza per manici, bastoni e il banco dell'ingegnere. Aperto a tutti dal livello 1 con un'ascia da taglio nelle borse (20 monete di rame ai banconi di Eastbrook, Fenbridge e Highwatch), tracciato su un contatore proprio fino a un limite di 100.",
         "herbalism": "L'Erbalismo raccoglie ciò che cresce spontaneo: foglialucente nella Valle di Eastbrook, fogliadoro nella Palude di Mirefen, petalo solare sulle Alture di Thornpeak e aiuole iniziali in ogni zona più giovane, la foglia e lo stelo che tengono in ebollizione i mestieri dell'apotecario. Aperto a tutti dal livello 1 con una falce da erbalismo nelle borse (20 monete di rame ai banconi di Eastbrook, Fenbridge e Highwatch), tracciato su un contatore proprio fino a un limite di 100.",
-        "fishing": "La Pesca è la mosca bianca tra i mestieri di raccolta, e il più profondo: un vero minigioco di abboccata e recupero, tabelle delle catture proprie in ciascuna delle tre zone centrali (per ora le acque giovani oltre di esse servono tutte la tabella della Valle) e un limite di competenza di 200, il doppio degli altri. Compra una canna, mettiti di fronte all'acqua aperta e lancia."
+        "fishing": "La Pesca è la mosca bianca tra i mestieri di raccolta, e il più profondo: un vero minigioco di abboccata e recupero, tabelle delle catture proprie in ciascuna delle tre zone centrali (per ora le acque giovani oltre di esse servono tutte la tabella della Valle) e un limite di competenza di 200, il doppio degli altri. Compra una canna, mettiti di fronte all'acqua aperta e lancia.",
+        "farming": "Farming is the one gathering trade you tend rather than take: crops raised from seed in worked beds, then pulled up ripe for the kitchens and the apothecary benches. Its beds, seeds, and tools arrive in a later patch, so the tables below stand empty for now. That is deliberate rather than an oversight: the trade holds its seat on the gathering counter, tracked to a cap of 100, and fills in as its content lands."
       },
       "rhythmHeading": "Il ritmo del raccolto",
       "rhythmBody": "Un raccolto è un breve lancio visibile, non una presa istantanea: {base} secondi di base, mai sotto un minimo di {floor} secondi. Portare uno strumento sopra il livello del nodo, e che la tua competenza ti permetta di impugnare, ti accelera di {tool} secondi per ogni livello in più, e ogni fascia di competenza che superi taglia altri {band} secondi; limitarsi a pareggiare il livello del nodo ti fa entrare dalla porta, sono i livelli sopra di esso a renderti veloce.\n\nUna borsa piena rifiuta educatamente il lancio prima che cominci, così nulla va sprecato a metà colpo, e ogni raccolto paga una piccola fetta di PE del personaggio, scalata sul livello del nodo rispetto al tuo come scalano i PE da uccisione: un nodo grigio insignificante non insegna nulla a un personaggio al massimo.",
@@ -4625,7 +4641,8 @@ export const it_IT: EnTranslations = {
         "mining": "Il tuo primo nodo di qualsiasi professione guadagna Frutti del Campo, e il massimo di 100 in Mineria iscrive Minerale nel Sangue. Raggiungere 100 in qualsiasi tre tra Mineria, Boscaiolia, Erboristeria e Pesca aggiunge Maestro Raccoglitore a 25 Rinomanza, e il cracking di un filone intatto registra il proprio segno del collezionista. Nessuno di questi conferisce potere: le Imprese sono titoli e Rinomanza, un registro delle strade che hai percorso.",
         "logging": "Il tuo primo nodo di qualsiasi professione guadagna Frutti del Campo, e il massimo di 100 in Boscaiolia iscrive Taglialegna Cuore di Legno. Raggiungere 100 in qualsiasi tre tra Mineria, Boscaiolia, Erboristeria e Pesca aggiunge Maestro Raccoglitore a 25 Rinomanza, e un colpo di antico cuore di legno registra il proprio segno del collezionista. Le Imprese sono solo titoli e Rinomanza, mai potere.",
         "herbalism": "Il tuo primo nodo di qualsiasi professione guadagna Frutti del Campo, e il massimo di 100 in Erboristeria iscrive Maestro del Prato. Raggiungere 100 in qualsiasi tre tra Mineria, Boscaiolia, Erboristeria e Pesca aggiunge Maestro Raccoglitore a 25 Rinomanza, e un fiore lunare in fiore registra il proprio segno del collezionista. Le Imprese sono solo titoli e Rinomanza, mai potere.",
-        "fishing": "Il traguardo dei 100 iscrive Vecchio Sale e quello dei 200 iscrive Maestro Pescatore con il suo titolo, il vertice assoluto dell'arte del pescatore; la Pesca conta anche per Maestro Raccoglitore, guadagnato a 100 in tre qualsiasi dei mestieri di raccolta. Un primo pesce dalle acque di ciascuna di sei zone riempie una pagina propria, le tre zone centrali più il Willowfen, il Galecrest e Farshore oltre di esse, e il Koi del Bagliore Solare registra Barlume di Speranza, così i viaggiatori con una canna nello zaino riempiono il loro libro più in fretta di quanto si aspettino."
+        "fishing": "Il traguardo dei 100 iscrive Vecchio Sale e quello dei 200 iscrive Maestro Pescatore con il suo titolo, il vertice assoluto dell'arte del pescatore; la Pesca conta anche per Maestro Raccoglitore, guadagnato a 100 in tre qualsiasi dei mestieri di raccolta. Un primo pesce dalle acque di ciascuna di sei zone riempie una pagina propria, le tre zone centrali più il Willowfen, il Galecrest e Farshore oltre di esse, e il Koi del Bagliore Solare registra Barlume di Speranza, così i viaggiatori con una canna nello zaino riempiono il loro libro più in fretta di quanto si aspettino.",
+        "farming": "Farming keeps no deeds of its own yet: its beds are still to come, and the milestone and cap deeds that mark the other trades arrive alongside them. Proficiency in it already counts toward Master Gatherer, which is earned at 100 in any three gathering trades, so a farmer will fill that page the same way everyone else does. Deeds are titles and Renown only, never power."
       },
       "fish": {
         "startHeading": "Come iniziare",

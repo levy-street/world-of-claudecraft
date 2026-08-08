@@ -336,6 +336,12 @@ export const fr_FR: EnTranslations = {
       "healerConfirmAccept": "Ravive-moi",
       "healerConfirmCancel": "Annuler"
     },
+    "wiki": {
+      "confirmTitle": "Open the Wiki?",
+      "confirmBody": "This opens the World of ClaudeCraft wiki in your browser. The game keeps running.",
+      "confirmOpen": "Open Wiki",
+      "confirmCancel": "Cancel"
+    },
     "unstuck": {
       "menuButton": "Déblocage",
       "help": "Récupération : /unstuck démarre un compte à rebours immobile qui vous déplace vers un endroit sûr et accessible à proximité.",
@@ -1920,6 +1926,9 @@ export const fr_FR: EnTranslations = {
       "sortRecent": "Récents",
       "sortQuality": "Qualité",
       "sortName": "Nom",
+      "sortButton": "Sort",
+      "sortButtonAria": "Sort your bags",
+      "sortButtonHint": "Combine stacks and group items by type",
       "searchPlaceholder": "Rechercher des objets",
       "searchAria": "Rechercher les objets du sac par nom",
       "noMatch": "Aucun objet ne correspond à vos filtres.",
@@ -2593,6 +2602,7 @@ export const fr_FR: EnTranslations = {
       "logging": "Bûcheronnage",
       "herbalism": "Herboristerie",
       "fishing": "Pêche",
+      "farming": "Farming",
       "notReady": "Ce nœud de ressource n'a pas encore réapparu pour vous.",
       "gatherLine": "Vous rassemblez : {name}.",
       "gatherLineQty": "Vous rassemblez : {name} x{qty}.",
@@ -2622,23 +2632,27 @@ export const fr_FR: EnTranslations = {
         "mining": "Vous avez besoin d'un pic de mineur de palier {tier} pour exploiter ce filon.",
         "logging": "Vous avez besoin d'une hache de bûcheron de palier {tier} pour abattre ce bosquet.",
         "herbalism": "Vous avez besoin d'une serpe d'herboristerie de palier {tier} pour collecter cette parcelle.",
-        "fishing": "Vous avez besoin d'une canne à pêche de palier {tier} pour pêcher dans ces eaux."
+        "fishing": "Vous avez besoin d'une canne à pêche de palier {tier} pour pêcher dans ces eaux.",
+        "farming": "You need a tier {tier} farming hoe to work this bed."
       },
       "toolRequired": {
         "mining": "Vous avez besoin d'un pic de mineur pour exploiter ce filon.",
         "logging": "Vous avez besoin d'une hache de bûcheron pour abattre ce bosquet.",
         "herbalism": "Vous avez besoin d'une serpe d'herboristerie pour collecter cette parcelle.",
-        "fishing": "Vous avez besoin d'une canne à pêche pour lancer votre ligne."
+        "fishing": "Vous avez besoin d'une canne à pêche pour lancer votre ligne.",
+        "farming": "You need a farming hoe to work this bed."
       },
       "noNodeNearby": {
         "mining": "Aucun filon de minerai à portée.",
         "logging": "Aucun bosquet de bois à portée.",
-        "herbalism": "Aucune parcelle de plantes à portée."
+        "herbalism": "Aucune parcelle de plantes à portée.",
+        "farming": "There is no crop bed within reach."
       },
       "wieldUnmet": {
         "mining": "Vous avez besoin de Minage {skill} pour manier le pic déjà dans vos sacs.",
         "logging": "Vous avez besoin de Bûcheronnage {skill} pour manier la hache déjà dans vos sacs.",
-        "herbalism": "Vous avez besoin d'Herboristerie {skill} pour manier la serpe déjà dans vos sacs."
+        "herbalism": "Vous avez besoin d'Herboristerie {skill} pour manier la serpe déjà dans vos sacs.",
+        "farming": "You need Farming {skill} to swing the hoe already in your bags."
       },
       "wieldUnmetCorpse": "Vous avez besoin de {skill} en compétence de collecte pour mettre votre meilleur outil au travail.",
       "toolTierUnmetCorpse": "Vous avez besoin d'un outil de collecte de palier {tier} pour récupérer les meilleurs matériaux.",
@@ -2647,7 +2661,8 @@ export const fr_FR: EnTranslations = {
           "mining": "Outil de minage (palier {tier})",
           "logging": "Outil de bûcheronnage (palier {tier})",
           "herbalism": "Outil d'herboristerie (palier {tier})",
-          "fishing": "Canne à pêche (palier {tier})"
+          "fishing": "Canne à pêche (palier {tier})",
+          "farming": "Farming tool (tier {tier})"
         },
         "unlocks": {
           "mining": "Nécessaire pour exploiter les filons de minerai jusqu'au palier {tier}.",
@@ -4594,7 +4609,8 @@ export const fr_FR: EnTranslations = {
         "mining": "Le Minage arrache le minerai à même la roche du monde : le cuivre au Val d'Eastbrook, le fer au Marais de Mirefen, et l'osmium là-haut aux Hauteurs de Thornpeak, avec des filons de départ dispersés dans chaque zone plus jeune au-delà, de quoi alimenter les métiers de la forge. Ouvert à tous dès le niveau 1 : un pic de mineur à 20 cuivres, pris à un comptoir d'Eastbrook, de Fenbridge ou de Highwatch, ouvre tous les filons de départ, et les échelons supérieurs de l'échelle de pics s'éveillent à mesure que votre propre compteur les mérite. Suivi sur son propre compteur jusqu'à un plafond de 100.",
         "logging": "Le Bûcheronnage abat le bois des bosquets d'arbres du monde entier : l'écorce de fer au Val d'Eastbrook, le frêne gris au Marais de Mirefen, le pin des cimes aux Hauteurs de Thornpeak, et des bosquets de départ dans chaque zone plus jeune, la matière brute des manches, des bâtons et de l'établi de l'ingénieur. Ouvert à tous dès le niveau 1 avec une hache de bûcheron dans vos sacs (20 cuivres aux comptoirs d'Eastbrook, de Fenbridge et de Highwatch), suivi sur son propre compteur jusqu'à un plafond de 100.",
         "herbalism": "L'Herboristerie cueille ce qui pousse à l'état sauvage : la feuilleclat au Val d'Eastbrook, la feuille d'or au Marais de Mirefen, le pétale de soleil aux Hauteurs de Thornpeak, et des parcelles de départ dans chaque zone plus jeune, la feuille et la tige qui font bouillir les métiers d'apothicaire. Ouverte à tous dès le niveau 1 avec une serpe d'herboristerie dans vos sacs (20 cuivres aux comptoirs d'Eastbrook, de Fenbridge et de Highwatch), suivie sur son propre compteur jusqu'à un plafond de 100.",
-        "fishing": "La Pêche est le mouton noir des métiers de récolte, et le plus profond : un vrai mini-jeu de touche et de remontée, ses propres tables de prises dans chacune des trois zones du cœur du royaume (les jeunes eaux au-delà servent toutes la table du Val pour l'instant), et un plafond de maîtrise de 200, le double des autres. Achetez une canne, faites face à l'eau libre, et lancez."
+        "fishing": "La Pêche est le mouton noir des métiers de récolte, et le plus profond : un vrai mini-jeu de touche et de remontée, ses propres tables de prises dans chacune des trois zones du cœur du royaume (les jeunes eaux au-delà servent toutes la table du Val pour l'instant), et un plafond de maîtrise de 200, le double des autres. Achetez une canne, faites face à l'eau libre, et lancez.",
+        "farming": "Farming is the one gathering trade you tend rather than take: crops raised from seed in worked beds, then pulled up ripe for the kitchens and the apothecary benches. Its beds, seeds, and tools arrive in a later patch, so the tables below stand empty for now. That is deliberate rather than an oversight: the trade holds its seat on the gathering counter, tracked to a cap of 100, and fills in as its content lands."
       },
       "rhythmHeading": "Le rythme de la récolte",
       "rhythmBody": "Une récolte est une courte incantation visible, pas une prise instantanée : {base} secondes de base, jamais en dessous d'un plancher de {floor} seconde. Porter un outil au-dessus du palier du nœud, un outil que votre maîtrise vous permet de manier, vous accélère de {tool} secondes par palier au-dessus, et chaque tranche de maîtrise que vous franchissez retranche encore {band} secondes ; se contenter d'égaler le palier du nœud vous fait entrer, ce sont les paliers au-dessus qui vous rendent rapide.\n\nUn sac plein refuse poliment l'incantation avant même qu'elle ne commence, si bien que rien n'est gâché en plein geste, et chaque récolte verse une petite part d'expérience de personnage, calibrée sur le niveau du nœud face au vôtre comme l'expérience de tuerie : un nœud gris et trivial n'enseigne rien à un personnage au plafond.",
@@ -4625,7 +4641,8 @@ export const fr_FR: EnTranslations = {
         "mining": "Votre premier noeud d'un métier quelconque vous vaut Fruits de la terre, et le plafond de 100 en Minage inscrit le titre Minerai dans le sang. Atteindre 100 dans trois quelconques des métiers Minage, Bûcheronnage, Herboristerie et Pêche ajoute Grand Récolteur à 25 de Renommée, et briser une veine vierge consigne sa propre marque de collectionneur. Aucun de ces hauts faits n'accorde de puissance : ce sont des titres et de la Renommée, un témoignage des routes que vous avez parcourues.",
         "logging": "Votre premier noeud d'un métier quelconque vous vaut Fruits de la terre, et le plafond de 100 en Bûcheronnage inscrit le titre Bûcheron de cœur. Atteindre 100 dans trois quelconques des métiers Minage, Bûcheronnage, Herboristerie et Pêche ajoute Grand Récolteur à 25 de Renommée, et un coup de hache dans un vieux cœur de bois consigne sa propre marque de collectionneur. Les hauts faits n'accordent que des titres et de la Renommée, jamais de puissance.",
         "herbalism": "Votre premier noeud d'un métier quelconque vous vaut Fruits de la terre, et le plafond de 100 en Herboristerie inscrit Maître des prairies. Atteindre 100 dans trois quelconques des métiers Minage, Bûcheronnage, Herboristerie et Pêche ajoute Grand Récolteur à 25 de Renommée, et une floraison au clair de lune consigne sa propre marque de collectionneur. Les hauts faits n'accordent que des titres et de la Renommée, jamais de puissance.",
-        "fishing": "Le jalon des 100 inscrit Vieux Sel et celui des 200 inscrit Grand Pêcheur avec son titre, le sommet même de l'art du pêcheur ; la Pêche compte aussi pour Grand Récolteur, obtenu à 100 dans trois métiers de récolte quelconques. Un premier poisson tiré des eaux de chacune de six zones remplit sa propre page, les trois zones du cœur du royaume plus le Marais des Saules, la Crête du Vent et le Rivage Lointain au-delà, et le Koi solaire consigne Lueur d'espoir : les voyageurs qui gardent une canne dans leur paquetage remplissent donc leur livre plus vite qu'ils ne le croient."
+        "fishing": "Le jalon des 100 inscrit Vieux Sel et celui des 200 inscrit Grand Pêcheur avec son titre, le sommet même de l'art du pêcheur ; la Pêche compte aussi pour Grand Récolteur, obtenu à 100 dans trois métiers de récolte quelconques. Un premier poisson tiré des eaux de chacune de six zones remplit sa propre page, les trois zones du cœur du royaume plus le Marais des Saules, la Crête du Vent et le Rivage Lointain au-delà, et le Koi solaire consigne Lueur d'espoir : les voyageurs qui gardent une canne dans leur paquetage remplissent donc leur livre plus vite qu'ils ne le croient.",
+        "farming": "Farming keeps no deeds of its own yet: its beds are still to come, and the milestone and cap deeds that mark the other trades arrive alongside them. Proficiency in it already counts toward Master Gatherer, which is earned at 100 in any three gathering trades, so a farmer will fill that page the same way everyone else does. Deeds are titles and Renown only, never power."
       },
       "fish": {
         "startHeading": "Premiers pas",

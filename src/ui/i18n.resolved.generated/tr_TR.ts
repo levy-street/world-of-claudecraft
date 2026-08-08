@@ -336,6 +336,12 @@ export const tr_TR: EnTranslations = {
       "healerConfirmAccept": "Beni Canlandır",
       "healerConfirmCancel": "İptal etmek"
     },
+    "wiki": {
+      "confirmTitle": "Open the Wiki?",
+      "confirmBody": "This opens the World of ClaudeCraft wiki in your browser. The game keeps running.",
+      "confirmOpen": "Open Wiki",
+      "confirmCancel": "Cancel"
+    },
     "unstuck": {
       "menuButton": "Kurtulma",
       "help": "Kurtarma: /unstuck, seni yakındaki ulaşılabilir güvenli bir noktaya taşıyacak hareketsiz bir geri sayım başlatır.",
@@ -1920,6 +1926,9 @@ export const tr_TR: EnTranslations = {
       "sortRecent": "En son",
       "sortQuality": "Kalite",
       "sortName": "Ad",
+      "sortButton": "Sort",
+      "sortButtonAria": "Sort your bags",
+      "sortButtonHint": "Combine stacks and group items by type",
       "searchPlaceholder": "Öge ara",
       "searchAria": "Çanta ögelerini ada göre ara",
       "noMatch": "Filtrelerinizle eşleşen öge yok.",
@@ -2593,6 +2602,7 @@ export const tr_TR: EnTranslations = {
       "logging": "Ağaç kesme",
       "herbalism": "Bitkicilik",
       "fishing": "Balıkçılık",
+      "farming": "Farming",
       "notReady": "Bu kaynak noktası senin için henüz yeniden oluşmadı.",
       "gatherLine": "Topladığınız şey: {name}.",
       "gatherLineQty": "Şunu toplarsınız: {name} x{qty}.",
@@ -2622,23 +2632,27 @@ export const tr_TR: EnTranslations = {
         "mining": "Bu damarı işlemek için {tier}. kademe madenci kazmasına ihtiyacınız var.",
         "logging": "Bu korulugu devirmek için {tier}. kademe odun kesme baltasına ihtiyacınız var.",
         "herbalism": "Bu tarlayı toplamak için {tier}. kademe bitkicilik orakına ihtiyacınız var.",
-        "fishing": "Bu sularda balık tutmak için {tier}. kademe olta kamışına ihtiyacınız var."
+        "fishing": "Bu sularda balık tutmak için {tier}. kademe olta kamışına ihtiyacınız var.",
+        "farming": "You need a tier {tier} farming hoe to work this bed."
       },
       "toolRequired": {
         "mining": "Bu cevher damarını kazmak için bir madenci kazmasına ihtiyacınız var.",
         "logging": "Bu ağaç kümesini devirmek için bir oduncu baltasına ihtiyacınız var.",
         "herbalism": "Bu ot öbeğini toplamak için bir otçu orağına ihtiyacınız var.",
-        "fishing": "Balık tutmak için bir olta kamışına ihtiyacınız var."
+        "fishing": "Balık tutmak için bir olta kamışına ihtiyacınız var.",
+        "farming": "You need a farming hoe to work this bed."
       },
       "noNodeNearby": {
         "mining": "Erişebileceğiniz bir cevher damarı yok.",
         "logging": "Erişebileceğiniz bir ağaç kümesi yok.",
-        "herbalism": "Erişebileceğiniz bir ot öbeği yok."
+        "herbalism": "Erişebileceğiniz bir ot öbeği yok.",
+        "farming": "There is no crop bed within reach."
       },
       "wieldUnmet": {
         "mining": "Çantanızdaki kazmayı sallamak için Madencilik {skill} becerisine ihtiyacınız var.",
         "logging": "Çantanızdaki baltayı sallamak için Ağaç kesme {skill} becerisine ihtiyacınız var.",
-        "herbalism": "Çantanızdaki orağı kullanmak için Bitkicilik {skill} becerisine ihtiyacınız var."
+        "herbalism": "Çantanızdaki orağı kullanmak için Bitkicilik {skill} becerisine ihtiyacınız var.",
+        "farming": "You need Farming {skill} to swing the hoe already in your bags."
       },
       "wieldUnmetCorpse": "En iyi aletinizi iş başına koymak için {skill} toplama becerisine ihtiyacınız var.",
       "toolTierUnmetCorpse": "En iyi malzemeleri kurtarmak için {tier}. kademe toplama aracına ihtiyacınız var.",
@@ -2647,7 +2661,8 @@ export const tr_TR: EnTranslations = {
           "mining": "Madencilik aleti (kademe {tier})",
           "logging": "Odun kesimi aleti (kademe {tier})",
           "herbalism": "Otçuluk aleti (kademe {tier})",
-          "fishing": "Olta kamışı (kademe {tier})"
+          "fishing": "Olta kamışı (kademe {tier})",
+          "farming": "Farming tool (tier {tier})"
         },
         "unlocks": {
           "mining": "Kademe {tier} ve altındaki cevher damarlarını kazmak için gereklidir.",
@@ -4594,7 +4609,8 @@ export const tr_TR: EnTranslations = {
         "mining": "Madencilik cevheri doğrudan dünyanın kayasından söker: Doğudere Vadisi'nde bakır, Mirefen Bataklığı'nda demir ve yukarıda Dikenzirve Tepeleri'nde osmiyum; bunların ötesindeki her genç bölgeye de başlangıç damarları serpiştirilmiştir ve hepsi ocak zanaatlarını besler. 1. seviyeden itibaren herkese açıktır: Doğudere, Fenbridge ya da Highwatch tezgahından alınan 20 bakırlık bir madenci kazması her başlangıç damarını açar, kazma merdiveninin üst basamakları ise kendi sayacınız onları hak ettikçe uyanır. 100 tavanına kadar kendi sayacında izlenir.",
         "logging": "Odun Kesimi tüm dünyaya yayılmış ağaç kümelerinden kereste devirir: Doğudere Vadisi'nde demirkabuk, Mirefen Bataklığı'nda kül ağacı, Dikenzirve Tepeleri'nde yüksekçam ve her genç bölgede başlangıç kümeleri; saplar, asalar ve mühendisin tezgahı için ham stok. Çantanızda bir oduncu baltası varsa 1. seviyeden itibaren herkese açıktır (Doğudere, Fenbridge ve Highwatch tezgahlarında 20 bakır) ve 100 tavanına kadar kendi sayacında izlenir.",
         "herbalism": "Bitkicilik yabanda yetişeni toplar: Doğudere Vadisi'nde parlakyaprak, Mirefen Bataklığı'nda altın yaprak, Dikenzirve Tepeleri'nde güneşyaprağı ve her genç bölgede başlangıç öbekleri; eczacılık mesleklerinin kazanını kaynatan yaprak ve sap. Çantanızda bir bitkicilik orağı varsa 1. seviyeden itibaren herkese açıktır (Doğudere, Fenbridge ve Highwatch tezgahlarında 20 bakır) ve 100 tavanına kadar kendi sayacında izlenir.",
-        "fishing": "Balıkçılık, toplama meslekleri arasında kuralın dışında kalanı ve en derinidir: gerçek bir ısır-ve-çek mini oyunu, üç ana bölgenin her birinde kendine ait av tabloları (bunların ötesindeki genç sular şimdilik hep Vadi'nin tablosunu sunar) ve diğerlerinin iki katı olan 200'lük bir yetkinlik tavanı. Bir olta alın, açık suya dönün ve oltayı atın."
+        "fishing": "Balıkçılık, toplama meslekleri arasında kuralın dışında kalanı ve en derinidir: gerçek bir ısır-ve-çek mini oyunu, üç ana bölgenin her birinde kendine ait av tabloları (bunların ötesindeki genç sular şimdilik hep Vadi'nin tablosunu sunar) ve diğerlerinin iki katı olan 200'lük bir yetkinlik tavanı. Bir olta alın, açık suya dönün ve oltayı atın.",
+        "farming": "Farming is the one gathering trade you tend rather than take: crops raised from seed in worked beds, then pulled up ripe for the kitchens and the apothecary benches. Its beds, seeds, and tools arrive in a later patch, so the tables below stand empty for now. That is deliberate rather than an oversight: the trade holds its seat on the gathering counter, tracked to a cap of 100, and fills in as its content lands."
       },
       "rhythmHeading": "Toplama ritmi",
       "rhythmBody": "Bir hasat, anında bir kapış değil kısa ve görünür bir toplama yayıdır: temelde {base} saniye, asla {floor} saniyelik tabanın altına inmez. Düğümün kademesinin üzerinde, yetkinliğinizin kullanmanıza izin verdiği bir alet taşımak sizi üstündeki her kademe için {tool} saniye hızlandırır ve geçtiğiniz her yetkinlik bandı {band} saniye daha kırpar; düğümün kademesini yalnızca tutturmak sizi kapıdan içeri sokar, hızlı yapan ise onun üzerindeki kademelerdir.\n\nDolu bir çanta, toplama yayını daha başlamadan kibarca reddeder, böylece darbenin ortasında hiçbir şey ziyan olmaz; ayrıca her hasat küçük bir dilim karakter XP'si öder, tıpkı öldürme XP'sinin ölçeklendiği gibi düğümün seviyesi sizinkine göre ölçeklenir: önemsiz, gri bir düğüm tavana ulaşmış bir karaktere hiçbir şey öğretmez.",
@@ -4625,7 +4641,8 @@ export const tr_TR: EnTranslations = {
         "mining": "Herhangi bir mesleğin ilk düğümü Toprağın Meyvelerini kazandırır ve Madencilikteki 100 tavanı Kanında Maden'i yazar. Madencilik, Odun Kesimi, Otçuluk ve Balık Tutma'nın herhangi üçünde 100'e ulaşmak 25 Ün'de Usta Toplayıcı'yı ekler; bozulmamış bir damarı kırmak kendi koleksiyoncu işaretini kaydeder. Bunların hiçbiri güç vermez: yiğitlikler unvanlar ve Ün'dür, yürüdüğün yolların bir kaydıdır.",
         "logging": "Herhangi bir mesleğin ilk düğümü Toprağın Meyvelerini kazandırır ve Odun Kesimindeki 100 tavanı Kalp Odunu Yontucusu'nu yazar. Madencilik, Odun Kesimi, Otçuluk ve Balık Tutma'nın herhangi üçünde 100'e ulaşmak 25 Ün'de Usta Toplayıcı'yı ekler; antik bir kalp odunu darbesi kendi koleksiyoncu işaretini kaydeder. Yiğitlikler yalnızca unvanlar ve Ün'dür, asla güç değil.",
         "herbalism": "Herhangi bir mesleğin ilk düğümü Toprağın Meyvelerini kazandırır ve Otçuluktaki 100 tavanı Çayır Ustası'nı yazar. Madencilik, Odun Kesimi, Otçuluk ve Balık Tutma'nın herhangi üçünde 100'e ulaşmak 25 Ün'de Usta Toplayıcı'yı ekler; mehtaplı bir çiçek kendi koleksiyoncu işaretini kaydeder. Yiğitlikler yalnızca unvanlar ve Ün'dür, asla güç değil.",
-        "fishing": "100 kilometre taşı Eski Denizci'yi, 200 ise balıkçılık sanatının en tepesi olan Usta Balıkçı'yı kendi unvanıyla birlikte yazar; Balıkçılık ayrıca herhangi üç toplama mesleğinde 100'e ulaşınca kazanılan Usta Toplayıcı'ya da sayılır. Altı bölgenin sularından yakalanan ilk balık kendi sayfasını doldurur: üç ana bölge ile onların ötesindeki Söğüt Bataklığı, Fırtına Sırtı ve Uzak Kıyı; Günışıltısı Sazan ise Umut Işıltısı'nı kaydeder, bu yüzden çantasında olta taşıyan gezginler kitaplarını umduklarından daha hızlı doldurur."
+        "fishing": "100 kilometre taşı Eski Denizci'yi, 200 ise balıkçılık sanatının en tepesi olan Usta Balıkçı'yı kendi unvanıyla birlikte yazar; Balıkçılık ayrıca herhangi üç toplama mesleğinde 100'e ulaşınca kazanılan Usta Toplayıcı'ya da sayılır. Altı bölgenin sularından yakalanan ilk balık kendi sayfasını doldurur: üç ana bölge ile onların ötesindeki Söğüt Bataklığı, Fırtına Sırtı ve Uzak Kıyı; Günışıltısı Sazan ise Umut Işıltısı'nı kaydeder, bu yüzden çantasında olta taşıyan gezginler kitaplarını umduklarından daha hızlı doldurur.",
+        "farming": "Farming keeps no deeds of its own yet: its beds are still to come, and the milestone and cap deeds that mark the other trades arrive alongside them. Proficiency in it already counts toward Master Gatherer, which is earned at 100 in any three gathering trades, so a farmer will fill that page the same way everyone else does. Deeds are titles and Renown only, never power."
       },
       "fish": {
         "startHeading": "Başlangıç",

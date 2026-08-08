@@ -158,12 +158,19 @@ const NON_PROFESSIONS_BLOB_FIELDS = [
 // v0.33.0 offhand fix retired it, the fixture now instances all twelve
 // live slots (ALL_EQUIP_SLOTS), and the settled ceiling re-measured 8,587
 // bytes. The phase 20 density pass took the node count 120 to 156 and the
-// settled ceiling to a measured 9,451 bytes: the pin HOLDS, but the
-// headroom is now about 277 bytes, under one starter zone of node growth,
-// so the NEXT authored node-count growth of any size re-mints this bound
-// with its measured value (the tests/professions_node_persist.test.ts
+// settled ceiling to a measured 9,451 bytes: the pin HELD, but the headroom
+// was down to about 277 bytes, under one starter zone of node growth, so the
+// note called for the next authored growth to re-mint this bound with its
+// measured value (the tests/professions_node_persist.test.ts
 // 2048 -> 4096 -> 8192 precedent) rather than squeezing under it.
-const PROFESSIONS_BYTE_CEILING = 9728;
+// Registering Farming as the fifth gathering profession is that growth: it
+// costs 46 bytes (the key is dual-written, gatheringProficiency plus the
+// legacy professions blob) and the settled ceiling re-measured 9,497 bytes,
+// so the bound is re-minted a grid step up to 10 KiB rather than left with
+// 231 bytes of headroom. The fixture itself needed no edit: it caps every
+// id in GATHERING_PROFESSIONS, so a new profession joins the worst case
+// automatically.
+const PROFESSIONS_BYTE_CEILING = 10240;
 
 function ceilingSim(): Sim {
   const sim = makeSim();
@@ -345,7 +352,7 @@ describe('the professions blob growth bound (phase 16)', () => {
     expect(Object.keys(s2.equipmentInstance ?? {})).toHaveLength(ALL_EQUIP_SLOTS.length);
 
     // The byte bound itself, on the settled state. The lower bound tracks
-    // the measured settled value (9,451 at the phase 20 re-measure) minus a
+    // the measured settled value (9,497 at the Farming re-measure) minus a
     // small band, so the headroom note above cannot rot silently in either
     // direction: a measurement drifting more than a couple hundred bytes
     // reds here and forces the note to be re-read.

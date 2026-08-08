@@ -336,6 +336,12 @@ export const sv_SE: EnTranslations = {
       "healerConfirmAccept": "Återuppliva mig",
       "healerConfirmCancel": "Avbryt"
     },
+    "wiki": {
+      "confirmTitle": "Open the Wiki?",
+      "confirmBody": "This opens the World of ClaudeCraft wiki in your browser. The game keeps running.",
+      "confirmOpen": "Open Wiki",
+      "confirmCancel": "Cancel"
+    },
     "unstuck": {
       "menuButton": "Fastna-hjälp",
       "help": "Räddning: /unstuck startar en stillastående nedräkning som flyttar dig till en närliggande nåbar säker plats.",
@@ -1920,6 +1926,9 @@ export const sv_SE: EnTranslations = {
       "sortRecent": "Senaste",
       "sortQuality": "Kvalitet",
       "sortName": "Namn",
+      "sortButton": "Sort",
+      "sortButtonAria": "Sort your bags",
+      "sortButtonHint": "Combine stacks and group items by type",
       "searchPlaceholder": "Sök föremål",
       "searchAria": "Sök väskföremål efter namn",
       "noMatch": "Inga föremål matchar dina filter.",
@@ -2593,6 +2602,7 @@ export const sv_SE: EnTranslations = {
       "logging": "Skogsavverkning",
       "herbalism": "Örtkunskap",
       "fishing": "Fiske",
+      "farming": "Farming",
       "notReady": "Den här resursnoden har inte återspawnats för dig ännu.",
       "gatherLine": "Du samlar: {name}.",
       "gatherLineQty": "Du samlar in: {name} x{qty}.",
@@ -2622,23 +2632,27 @@ export const sv_SE: EnTranslations = {
         "mining": "Du behöver en tier {tier} gruvhacka för att bryta den här ådern.",
         "logging": "Du behöver en tier {tier} skogsavverkningsyxa för att fälla det här beståndet.",
         "herbalism": "Du behöver en tier {tier} örtinsamlingsskära för att samla den här fläcken.",
-        "fishing": "Du behöver ett tier {tier} fiskespö för att fiska i de här vattnen."
+        "fishing": "Du behöver ett tier {tier} fiskespö för att fiska i de här vattnen.",
+        "farming": "You need a tier {tier} farming hoe to work this bed."
       },
       "toolRequired": {
         "mining": "Du behöver en gruvhacka för att bryta den här ådern.",
         "logging": "Du behöver en skogsavverkningsyxa för att fälla det här beståndet.",
         "herbalism": "Du behöver en örtinsamlingsskära för att samla den här fläcken.",
-        "fishing": "Du behöver ett metspö för att kasta ut linan."
+        "fishing": "Du behöver ett metspö för att kasta ut linan.",
+        "farming": "You need a farming hoe to work this bed."
       },
       "noNodeNearby": {
         "mining": "Det finns ingen malmåder inom räckhåll.",
         "logging": "Det finns inget timmerbestånd inom räckhåll.",
-        "herbalism": "Det finns ingen örtfläck inom räckhåll."
+        "herbalism": "Det finns ingen örtfläck inom räckhåll.",
+        "farming": "There is no crop bed within reach."
       },
       "wieldUnmet": {
         "mining": "Du behöver Gruvdrift {skill} för att svinga hackan du redan har i väskorna.",
         "logging": "Du behöver Skogsavverkning {skill} för att svinga yxan du redan har i väskorna.",
-        "herbalism": "Du behöver Örtkunskap {skill} för att använda skäran du redan har i väskorna."
+        "herbalism": "Du behöver Örtkunskap {skill} för att använda skäran du redan har i väskorna.",
+        "farming": "You need Farming {skill} to swing the hoe already in your bags."
       },
       "wieldUnmetCorpse": "Du behöver insamlingsskicklighet {skill} för att sätta ditt finaste verktyg i arbete.",
       "toolTierUnmetCorpse": "Du behöver ett tier {tier} insamlingsverktyg för att återvinna de bästa materialen.",
@@ -2647,7 +2661,8 @@ export const sv_SE: EnTranslations = {
           "mining": "Gruvverktyg (tier {tier})",
           "logging": "Skogsavverkningsverktyg (tier {tier})",
           "herbalism": "Örtinsamlingsverktyg (tier {tier})",
-          "fishing": "Fiskespö (tier {tier})"
+          "fishing": "Fiskespö (tier {tier})",
+          "farming": "Farming tool (tier {tier})"
         },
         "unlocks": {
           "mining": "Krävs för att bryta malmådror upp till tier {tier}.",
@@ -4594,7 +4609,8 @@ export const sv_SE: EnTranslations = {
         "mining": "Gruvdrift bryter malm rakt ur världens berg: koppar i Östbäcksdalen, järn i Dykärrsträsket och osmium uppe i Törntoppshöjderna, med nybörjarådror utspridda genom varje yngre zon bortom dem, som föder smedjehantverken. Öppen för alla från nivå 1: en gruvhacka för 20 koppar från en disk i Östbäck, Fenbron eller Högvakt öppnar varje nybörjaråder, och hackstegens högre steg vaknar allteftersom din egen räknare förtjänar dem. Spårad på en egen räknare till ett tak på 100.",
         "logging": "Skogsavverkning fäller timmer från trädbestånd över hela världen: järnbark i Östbäcksdalen, askved i Dykärrsträsket, högtall i Törntoppshöjderna och nybörjarbestånd i varje yngre zon, råvaran till skaft, stavar och ingenjörens bänk. Öppen för alla från nivå 1 med en skogsavverkningsyxa i väskorna (20 koppar vid diskarna i Östbäck, Fenbron och Högvakt), spårad på en egen räknare till ett tak på 100.",
         "herbalism": "Örtkunskap samlar det som växer vilt: skimmerblad i Östbäcksdalen, guldblad i Dykärrsträsket, solkronblad i Törntoppshöjderna och nybörjarfläckar i varje yngre zon, bladet och stjälken som håller apotekaryrkena kokande. Öppen för alla från nivå 1 med en örtinsamlingsskära i väskorna (20 koppar vid diskarna i Östbäck, Fenbron och Högvakt), spårad på en egen räknare till ett tak på 100.",
-        "fishing": "Fiske är det udda inslaget bland insamlingsyrkena, och det djupaste: ett riktigt napp-och-indragning-minispel, egna fångsttabeller i var och en av kärnlandets tre zoner (de unga vattnen bortom dem serverar tills vidare alla Dalens tabell), och ett skicklighetstak på 200, dubbelt mot de andra. Köp ett metspö, vänd dig mot öppet vatten och kasta."
+        "fishing": "Fiske är det udda inslaget bland insamlingsyrkena, och det djupaste: ett riktigt napp-och-indragning-minispel, egna fångsttabeller i var och en av kärnlandets tre zoner (de unga vattnen bortom dem serverar tills vidare alla Dalens tabell), och ett skicklighetstak på 200, dubbelt mot de andra. Köp ett metspö, vänd dig mot öppet vatten och kasta.",
+        "farming": "Farming is the one gathering trade you tend rather than take: crops raised from seed in worked beds, then pulled up ripe for the kitchens and the apothecary benches. Its beds, seeds, and tools arrive in a later patch, so the tables below stand empty for now. That is deliberate rather than an oversight: the trade holds its seat on the gathering counter, tracked to a cap of 100, and fills in as its content lands."
       },
       "rhythmHeading": "Insamlingsrytmen",
       "rhythmBody": "En skörd är en kort synlig kanalisering, inte ett omedelbart grepp: {base} sekunder i grunden, aldrig under ett golv på {floor} sekunder. Att bära ett verktyg över nodens nivå, ett som din skicklighet låter dig hantera, snabbar upp dig med {tool} sekunder per nivå över den, och varje skicklighetsband du passerar skalar bort ytterligare {band} sekunder; att bara matcha nodens nivå släpper in dig genom dörren, det är nivåerna över den som gör dig snabb.\n\nEn full väska avböjer artigt kanaliseringen innan den börjar, så inget går till spillo mitt i svingen, och varje skörd ger en liten skiva karaktärserfarenhet, skalad efter nodens nivå mot din egen på samma sätt som erfarenhet för dödade fiender skalas: en trivial grå nod lär en karaktär vid taket ingenting.",
@@ -4625,7 +4641,8 @@ export const sv_SE: EnTranslations = {
         "mining": "Din första nod i vilket yrke som helst förtjänar Markens frukter, och 100-taket i Gruvdrift skriver in Malm i blodet. Att nå 100 i tre av Gruvdrift, Skogsavverkning, Örtplockning och Fiske lägger till Mästarskördare med 25 Ryktbarhet, och att knäcka en oskadd åder registrerar sin egen samlarmarkering. Inget av detta ger kraft: bedrifter är titlar och Ryktbarhet, ett register över de vägar du vandrat.",
         "logging": "Din första nod i vilket yrke som helst förtjänar Markens frukter, och 100-taket i Skogsavverkning skriver in Hjärtvedhuggaren. Att nå 100 i tre av Gruvdrift, Skogsavverkning, Örtplockning och Fiske lägger till Mästarskördare med 25 Ryktbarhet, och ett hugg av urgammalt hjärtved registrerar sin egen samlarmarkering. Bedrifter är titlar och Ryktbarhet enbart, aldrig kraft.",
         "herbalism": "Din första nod i vilket yrke som helst förtjänar Markens frukter, och 100-taket i Örtkunskap skriver in Ängens mästare. Att nå 100 i tre av Gruvdrift, Skogsavverkning, Örtkunskap och Fiske lägger till Mästarskördare med 25 Ryktbarhet, och en månlyst blomma registrerar sin egen samlarmarkering. Bedrifter är titlar och Ryktbarhet enbart, aldrig kraft.",
-        "fishing": "Milstolpen vid 100 skriver in Gamla saltet och 200 skriver in Mästarfiskare med sin titel, själva toppen av fiskarens konst; Fiske räknas också mot Mästarskördare, som förtjänas vid 100 i tre valfria insamlingsyrken. En första fisk ur sex zoners vatten fyller var sin egen sida, kärnlandets tre zoner samt Pilkärret, Stormkammen och Fjärrkusten bortom dem, och Solglintens koi registrerar Glimmer av hopp, så resenärer med ett spö i packningen fyller sin bok snabbare än de väntar sig."
+        "fishing": "Milstolpen vid 100 skriver in Gamla saltet och 200 skriver in Mästarfiskare med sin titel, själva toppen av fiskarens konst; Fiske räknas också mot Mästarskördare, som förtjänas vid 100 i tre valfria insamlingsyrken. En första fisk ur sex zoners vatten fyller var sin egen sida, kärnlandets tre zoner samt Pilkärret, Stormkammen och Fjärrkusten bortom dem, och Solglintens koi registrerar Glimmer av hopp, så resenärer med ett spö i packningen fyller sin bok snabbare än de väntar sig.",
+        "farming": "Farming keeps no deeds of its own yet: its beds are still to come, and the milestone and cap deeds that mark the other trades arrive alongside them. Proficiency in it already counts toward Master Gatherer, which is earned at 100 in any three gathering trades, so a farmer will fill that page the same way everyone else does. Deeds are titles and Renown only, never power."
       },
       "fish": {
         "startHeading": "Kom igång",

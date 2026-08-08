@@ -153,28 +153,34 @@ describe('the real seams', () => {
   });
 
   it("another player's mailed copy is NOT mine: the ownership conjunct is live", () => {
-    // Dropping belongsTo from mailboxHoldsItem would leave every other arm
-    // green while any stranger's mailed sickle suppressed MY re-grant,
-    // silently blocking a player from a required tool.
+    // Dropping the ownership half of mailboxHoldsItem would leave every other
+    // arm green while any stranger's mailed sickle suppressed MY re-grant,
+    // silently blocking a player from a required tool. Both letters are
+    // booked through the tracked sendLetter path, never a direct book push:
+    // the bucketed read (MailIndex) cannot see an untracked letter, which
+    // would make the negative arm below pass for invisibility instead of
+    // ownership, and its failure mode is duplicate quest-item minting.
     const sim = new Sim({ seed: 33, playerClass: 'warrior', autoEquip: false });
     const meta = sim.players.get(sim.playerId) as PlayerMeta;
-    sim.postOffice.mail.push({
-      id: 9001,
-      recipientKey: 'somebody-else-entirely',
-      recipientName: 'Somebody Else',
+    const toolLetter = {
+      letterId: 'qa_presence_tools',
       senderName: 'Postmaster',
-      kind: 'system',
       subject: 'Tools',
       body: '',
-      copper: 0,
       items: [{ itemId: TOOL, count: 1 }],
-      deliverAt: 0,
-      expiresAt: Infinity,
-      read: false,
-      announced: false,
-    });
+      delaySeconds: 0,
+    };
+    sim.postOffice.sendLetter('somebody-else-entirely', 'Somebody Else', toolLetter, 'system');
+    sim.tick();
     expect(sim.ctx.mailboxHoldsItem(meta, TOOL)).toBe(false);
     expect(playerHoldsQuestItem(sim.ctx, meta, TOOL)).toBe(false);
+
+    // Positive control: the SAME letter addressed to ME is seen, proving the
+    // negative above was the ownership conjunct and not an unindexed letter.
+    sim.postOffice.sendLetter(sim.postOffice.mailKeyFor(meta), meta.name, toolLetter, 'system');
+    sim.tick();
+    expect(sim.ctx.mailboxHoldsItem(meta, TOOL)).toBe(true);
+    expect(playerHoldsQuestItem(sim.ctx, meta, TOOL)).toBe(true);
   });
 
   it('sees a REAL market escrow through the real ownership check', () => {

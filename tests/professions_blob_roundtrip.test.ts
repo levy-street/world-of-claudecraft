@@ -60,7 +60,7 @@ const populatedSim = (): Sim => {
   const meta = sim.players.get(sim.playerId) as PlayerMeta;
   // Fractional proficiency on purpose: gather gains move in 0.25 steps, so a
   // serializer that rounded would pass an integer fixture.
-  meta.gatheringProficiency = { mining: 42.25, logging: 0, herbalism: 7, fishing: 150 };
+  meta.gatheringProficiency = { mining: 42.25, logging: 0, herbalism: 7, fishing: 150, farming: 0 };
   meta.toolEffectSlots = {
     logging: {
       effectId: 'gatherers_cache',
@@ -145,6 +145,7 @@ describe('the professions blob round-trip sweep', () => {
       logging: 0,
       herbalism: 7,
       fishing: 150,
+      farming: 0,
     });
     expect(s1.professions).toEqual(s1.gatheringProficiency); // legacy dual-write
     // Separate objects, never one aliased through the other (the serializer
@@ -212,7 +213,7 @@ describe('the professions blob round-trip sweep', () => {
     // clamped value. Pinned to the literal shipped caps.
     const sim = populatedSim();
     const s1 = sim.serializeCharacter(sim.playerId) as CharacterState;
-    s1.gatheringProficiency = { mining: 250, logging: 0, herbalism: 7, fishing: 999 };
+    s1.gatheringProficiency = { mining: 250, logging: 0, herbalism: 7, fishing: 999, farming: 0 };
     s1.professions = { ...s1.gatheringProficiency };
     s1.craftSkills = { ...s1.craftSkills, weaponcrafting: 999 };
 
@@ -229,6 +230,7 @@ describe('the professions blob round-trip sweep', () => {
       logging: 0,
       herbalism: 7,
       fishing: 200,
+      farming: 0,
     });
     expect(resaved.craftSkills?.weaponcrafting).toBe(125);
   });

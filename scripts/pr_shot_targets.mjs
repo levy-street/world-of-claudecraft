@@ -1238,6 +1238,48 @@ export const TARGETS = [
     },
   },
   {
+    key: 'inventory-sort',
+    label: 'Bags after the one-shot Sort (stacks consolidated, ladder order)',
+    when: ['sim/inventory_sort', 'ui/bags_window'],
+    // A deliberately messy bag (scattered partial stacks of the same material,
+    // fine grades split from their base, gear and trash interleaved), then the
+    // REAL Sort button press. On a base checkout the button does not exist and
+    // the click is skipped, so the same recipe shoots the honest BEFORE state.
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    async capture(page) {
+      await page.evaluate(() => {
+        const sim = window.__game?.sim;
+        const meta = sim?.players?.values?.().next?.()?.value;
+        const scramble = [
+          { itemId: 'copper_ore', count: 12 },
+          { itemId: 'baked_bread', count: 3 },
+          { itemId: 'copper_ore', count: 7 },
+          { itemId: 'fine_copper_ore', count: 4 },
+          { itemId: 'silverleaf_herb', count: 9 },
+          { itemId: 'copper_ore', count: 5 },
+          { itemId: 'fine_silverleaf_herb', count: 2 },
+          { itemId: 'silverleaf_herb', count: 6 },
+        ];
+        if (meta) for (const s of scramble) meta.inventory.push({ ...s });
+        for (const id of ['eastbrook_arming_sword', 'cryptbone_helm', 'minor_healing_potion']) {
+          try {
+            sim?.addItem(id, 1);
+          } catch {}
+        }
+        const el = document.querySelector('#bags');
+        if (el) el.style.display = 'none';
+        window.__game?.hud?.toggleBags?.();
+      });
+      await wait(500);
+      await page.evaluate(() => {
+        document.querySelector('button.bag-sort-btn')?.click();
+      });
+      // Past the settle ripple (160ms + capped stagger) so the shot is stable.
+      await wait(900);
+      return { clip: '#bags' };
+    },
+  },
+  {
     key: 'bank-chips',
     label: 'Bank window with its bags companion: category chips and Deposit materials',
     when: ['ui/bank', 'ui/bag_filter', 'sim/material_taxonomy'],
@@ -5111,7 +5153,9 @@ export const TARGETS = [
   {
     key: 'professions',
     label: 'Professions wheel window',
-    when: ['src/ui/professions_view.ts', 'src/ui/professions_window.ts'],
+    // content/professions: registering or retuning a profession in the content
+    // table changes what this window renders (the farming Phase 1 lesson).
+    when: ['src/ui/professions_view.ts', 'src/ui/professions_window.ts', 'content/professions'],
     variants: [
       { key: 'desktop-full', charClass: 'warrior', charName: 'Forgeheart' },
       { key: 'desktop-simplified', charClass: 'mage', charName: 'Newhand', simplified: true },
@@ -5122,6 +5166,13 @@ export const TARGETS = [
         key: 'desktop-gathering',
         charClass: 'warrior',
         charName: 'Forgeheart',
+        scrollSel: '.prof-gathering',
+      },
+      {
+        key: 'mobile-gathering',
+        charClass: 'warrior',
+        charName: 'Anvilmar',
+        mobile: true,
         scrollSel: '.prof-gathering',
       },
     ],
@@ -5182,6 +5233,9 @@ export const TARGETS = [
               { professionId: 'logging', skill: 45, maxSkill: 100 },
               { professionId: 'herbalism', skill: 100, maxSkill: 100 },
               { professionId: 'fishing', skill: 68, maxSkill: 200 },
+              // Farming is registered but ungainable until its growth phase
+              // ships, so the honest staged value is the only live one: 0.
+              { professionId: 'farming', skill: 0, maxSkill: 100 },
             ],
           };
           // professionsState is a data read on BOTH world shapes (a getter on
@@ -8013,6 +8067,51 @@ export const TARGETS = [
       );
       if (!proof) throw new Error('click did not resolve to the live mob over the corpse');
       return {};
+    },
+  },
+  {
+    key: 'wiki-launcher',
+    label: 'Wiki launcher: micro-bar button, Esc game-menu row, confirm dialog, mobile More tray',
+    when: ['ui/wiki_link'],
+    variants: [
+      { key: 'microbar' },
+      { key: 'game-menu' },
+      { key: 'confirm' },
+      { key: 'more-tray', mobile: true },
+    ],
+    async capture(page, variant) {
+      const scene = variant?.key ?? 'microbar';
+      if (scene === 'microbar') {
+        const ready = await pollForSize(page, '#side-buttons');
+        if (!ready) return { skip: 'the micro-button bar never became visible' };
+        return { clip: '#side-buttons' };
+      }
+      if (scene === 'game-menu') {
+        await page.evaluate(() => window.__game?.hud?.toggleOptionsMenu?.());
+        const ready = await pollForSize(page, '#options-menu');
+        if (!ready) return { skip: 'the game menu never became visible' };
+        return { clip: '#options-menu' };
+      }
+      if (scene === 'confirm') {
+        // Guarded so a BEFORE capture on the base build (no hud.openWiki yet)
+        // skips cleanly instead of throwing.
+        const opened = await page.evaluate(() => {
+          const hud = window.__game?.hud;
+          if (!hud?.openWiki) return { ok: false, reason: 'hud.openWiki is not present' };
+          hud.openWiki();
+          return { ok: true };
+        });
+        if (!opened.ok) return { skip: opened.reason };
+        const ready = await pollForSize(page, '#confirm-dialog');
+        if (!ready) return { skip: 'the wiki confirm dialog never became visible' };
+        return { clip: '#confirm-dialog' };
+      }
+      // more-tray (mobile): open the tray through the real More button handler,
+      // the same path a player taps, so the shot proves the binding is live.
+      await page.evaluate(() => document.getElementById('mobile-more')?.click());
+      const ready = await pollForSize(page, '#mobile-extra-controls');
+      if (!ready) return { skip: 'the mobile More tray never opened' };
+      return { clip: '#mobile-extra-controls' };
     },
   },
 ];

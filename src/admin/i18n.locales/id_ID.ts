@@ -230,6 +230,7 @@ export const id_ID: Record<string, string> = {
   'tickPerf.ms': '{value}ms',
   'tickPerf.noCapture': 'Belum ada penangkapan. Pilih jendela dan mulai satu.',
   'tickPerf.overBudget': 'melebihi anggaran 50ms',
+  'tickPerf.selfHeading': 'Grup kunci snapshot diri (bcastSelf)',
   'tickPerf.simHeading': 'Fase internal sim.tick()',
   'tickPerf.title': 'Profiler tick server',
   'calibration.autoRefresh': 'Segarkan otomatis ({seconds}d)',

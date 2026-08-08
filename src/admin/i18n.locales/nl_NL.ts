@@ -185,6 +185,7 @@ export const nl_NL: Record<string, string> = {
   'tickPerf.ms': '{value} ms',
   'tickPerf.noCapture': 'Nog niets vastgelegd. Kies een venster en start er een.',
   'tickPerf.overBudget': 'boven het budget van 50ms',
+  'tickPerf.selfHeading': 'Sleutelgroepen van de self-snapshot (bcastSelf)',
   'tickPerf.simHeading': 'sim.tick() interne fasen',
   'tickPerf.title': 'Server-tickprofiler',
   'calibration.autoRefresh': 'Automatisch verversen ({seconds}s)',

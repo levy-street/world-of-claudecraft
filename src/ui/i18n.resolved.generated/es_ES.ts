@@ -336,6 +336,12 @@ export const es_ES: EnTranslations = {
       "healerConfirmAccept": "Revívame",
       "healerConfirmCancel": "Cancelar"
     },
+    "wiki": {
+      "confirmTitle": "Open the Wiki?",
+      "confirmBody": "This opens the World of ClaudeCraft wiki in your browser. The game keeps running.",
+      "confirmOpen": "Open Wiki",
+      "confirmCancel": "Cancel"
+    },
     "unstuck": {
       "menuButton": "Desatascar",
       "help": "Recuperación: /unstuck inicia una cuenta regresiva estacionaria para llevarte a un punto seguro accesible cercano.",
@@ -1920,6 +1926,9 @@ export const es_ES: EnTranslations = {
       "sortRecent": "Recientes",
       "sortQuality": "Calidad",
       "sortName": "Nombre",
+      "sortButton": "Sort",
+      "sortButtonAria": "Sort your bags",
+      "sortButtonHint": "Combine stacks and group items by type",
       "searchPlaceholder": "Buscar objetos",
       "searchAria": "Buscar objetos de la bolsa por nombre",
       "noMatch": "Ningún objeto coincide con tus filtros.",
@@ -2593,6 +2602,7 @@ export const es_ES: EnTranslations = {
       "logging": "Tala",
       "herbalism": "Herboristería",
       "fishing": "Pesca",
+      "farming": "Farming",
       "notReady": "Este nodo de recursos aun no ha reaparecido para ti.",
       "gatherLine": "Reúnes: {name}.",
       "gatherLineQty": "Reúnes: {name} x{qty}.",
@@ -2622,23 +2632,27 @@ export const es_ES: EnTranslations = {
         "mining": "Necesitas un pico de minería de nivel {tier} para extraer esta veta.",
         "logging": "Necesitas un hacha de tala de nivel {tier} para talar este rodal.",
         "herbalism": "Necesitas una hoz de herboristería de nivel {tier} para recolectar esta parcela.",
-        "fishing": "Necesitas una caña de pescar de nivel {tier} para pescar en estas aguas."
+        "fishing": "Necesitas una caña de pescar de nivel {tier} para pescar en estas aguas.",
+        "farming": "You need a tier {tier} farming hoe to work this bed."
       },
       "toolRequired": {
         "mining": "Necesitas un pico de minero para explotar esta veta.",
         "logging": "Necesitas un hacha de leñador para talar esta arboleda.",
         "herbalism": "Necesitas una hoz de herborista para recoger esta mata.",
-        "fishing": "Necesitas una caña de pescar para lanzar el sedal."
+        "fishing": "Necesitas una caña de pescar para lanzar el sedal.",
+        "farming": "You need a farming hoe to work this bed."
       },
       "noNodeNearby": {
         "mining": "No hay ninguna veta de mineral a tu alcance.",
         "logging": "No hay ninguna arboleda a tu alcance.",
-        "herbalism": "No hay ninguna mata de hierbas a tu alcance."
+        "herbalism": "No hay ninguna mata de hierbas a tu alcance.",
+        "farming": "There is no crop bed within reach."
       },
       "wieldUnmet": {
         "mining": "Necesitas Minería {skill} para blandir el pico que ya llevas en las bolsas.",
         "logging": "Necesitas Tala {skill} para blandir el hacha que ya llevas en las bolsas.",
-        "herbalism": "Necesitas Herboristería {skill} para manejar la hoz que ya llevas en las bolsas."
+        "herbalism": "Necesitas Herboristería {skill} para manejar la hoz que ya llevas en las bolsas.",
+        "farming": "You need Farming {skill} to swing the hoe already in your bags."
       },
       "wieldUnmetCorpse": "Necesitas habilidad de recolección {skill} para sacar partido a tu mejor herramienta.",
       "toolTierUnmetCorpse": "Necesitas una herramienta de recolección de nivel {tier} para recuperar los mejores materiales.",
@@ -2647,7 +2661,8 @@ export const es_ES: EnTranslations = {
           "mining": "Herramienta de minería (nivel {tier})",
           "logging": "Herramienta de tala (nivel {tier})",
           "herbalism": "Herramienta de herboristería (nivel {tier})",
-          "fishing": "Caña de pescar (nivel {tier})"
+          "fishing": "Caña de pescar (nivel {tier})",
+          "farming": "Farming tool (tier {tier})"
         },
         "unlocks": {
           "mining": "Necesaria para extraer vetas de mineral hasta el nivel {tier}.",
@@ -4594,7 +4609,8 @@ export const es_ES: EnTranslations = {
         "mining": "La Minería saca mineral directamente de la roca del mundo: cobre en el Valle de Eastbrook, hierro en la Ciénaga de Mirefen y osmio allá arriba en las Alturas de Thornpeak, con vetas iniciales repartidas por cada zona más joven más allá de ellas, alimentando los oficios de la fragua. Abierta a todos desde el nivel 1: un pico de minero de 20 cobres de un mostrador de Eastbrook, Fenbridge o Highwatch abre todas las vetas iniciales, y los peldaños más altos de la escalera de picos despiertan a medida que tu propio contador se los gana. Registrada en su propio contador hasta un tope de 100.",
         "logging": "La Tala corta madera de arboledas repartidas por todo el mundo: corteza de hierro en el Valle de Eastbrook, madera de ceniza en la Ciénaga de Mirefen, pino cumbre en las Alturas de Thornpeak y arboledas iniciales en cada zona más joven, la materia prima para astiles, bastones y el banco del ingeniero. Abierta a todos desde el nivel 1 con un hacha de leñador en las bolsas (20 cobres en los mostradores de Eastbrook, Fenbridge y Highwatch), registrada en su propio contador hasta un tope de 100.",
         "herbalism": "La Herboristería recoge lo que crece silvestre: hoja de brillo en el Valle de Eastbrook, hoja dorada en la Ciénaga de Mirefen, pétalo de sol en las Alturas de Thornpeak y matas iniciales en cada zona más joven, la hoja y el tallo que mantienen en marcha los oficios de botica. Abierta a todos desde el nivel 1 con una hoz de herborista en las bolsas (20 cobres en los mostradores de Eastbrook, Fenbridge y Highwatch), registrada en su propio contador hasta un tope de 100.",
-        "fishing": "La Pesca es la rara entre los oficios de recolección, y la más profunda: un minijuego de verdad de picada y cobranza, tablas de capturas propias en cada una de las tres zonas centrales (las aguas jóvenes más allá sirven de momento la tabla del Valle) y un tope de pericia de 200, el doble que las demás. Compra una caña, ponte de cara al agua abierta y lanza."
+        "fishing": "La Pesca es la rara entre los oficios de recolección, y la más profunda: un minijuego de verdad de picada y cobranza, tablas de capturas propias en cada una de las tres zonas centrales (las aguas jóvenes más allá sirven de momento la tabla del Valle) y un tope de pericia de 200, el doble que las demás. Compra una caña, ponte de cara al agua abierta y lanza.",
+        "farming": "Farming is the one gathering trade you tend rather than take: crops raised from seed in worked beds, then pulled up ripe for the kitchens and the apothecary benches. Its beds, seeds, and tools arrive in a later patch, so the tables below stand empty for now. That is deliberate rather than an oversight: the trade holds its seat on the gathering counter, tracked to a cap of 100, and fills in as its content lands."
       },
       "rhythmHeading": "El ritmo de recolección",
       "rhythmBody": "Una cosecha es un lanzamiento corto y visible, no un agarre instantáneo: {base} segundos de base, nunca por debajo de un mínimo de {floor} segundos. Llevar una herramienta por encima del nivel del nodo, una que tu pericia te permita manejar, te acelera {tool} segundos por cada nivel por encima de él, y cada franja de pericia que cruzas recorta otros {band} segundos; igualar sin más el nivel del nodo te abre la puerta, son los niveles por encima los que te hacen rápido.\n\nUna bolsa llena rechaza cortésmente el lanzamiento antes de que empiece, así que no se desperdicia nada a medio golpe, y cada cosecha paga una pequeña porción de XP de personaje, escalada según el nivel del nodo frente al tuyo igual que escala la XP por muertes: un nodo gris trivial no le enseña nada a un personaje al tope.",
@@ -4625,7 +4641,8 @@ export const es_ES: EnTranslations = {
         "mining": "Tu primer nodo de cualquier oficio gana Frutos del Campo, y el tope de 100 en Minería inscribe Mineral en la Sangre. Llegar a 100 en cualquiera de los tres entre Minería, Tala, Herboristería y Pesca añade Maestro Recolector con 25 de Renombre, y romper una vena prístina registra su propia marca de coleccionista. Nada de esto otorga poder: las gestas son títulos y Renombre, un registro de los caminos que has recorrido.",
         "logging": "Tu primer nodo de cualquier oficio gana Frutos del Campo, y el tope de 100 en Tala inscribe Talador de Duramen. Llegar a 100 en cualquiera de los tres entre Minería, Tala, Herboristería y Pesca añade Maestro Recolector con 25 de Renombre, y un golpe de duramen antiguo registra su propia marca de coleccionista. Las gestas son títulos y Renombre únicamente, nunca poder.",
         "herbalism": "Tu primer nodo de cualquier oficio gana Frutos del Campo, y el tope de 100 en Herboristería inscribe Maestro del Prado. Llegar a 100 en cualquiera de los tres entre Minería, Tala, Herboristería y Pesca añade Maestro Recolector con 25 de Renombre, y una flor iluminada por la luna registra su propia marca de coleccionista. Las gestas son títulos y Renombre únicamente, nunca poder.",
-        "fishing": "El hito de 100 inscribe Viejo Sal y el de 200 inscribe Pescador Maestro con su título, la cima misma del arte del pescador; la Pesca también cuenta para Maestro Recolector, que se gana con 100 en tres cualesquiera de los oficios de recolección. Un primer pez de las aguas de cada una de seis zonas llena su propia página, las tres zonas centrales más El Pantano de los Sauces, La Cresta del Vendaval y La Costa Lejana al otro lado de ellas, y el Koi Destello Solar registra Destello de Esperanza, así que los viajeros con una caña en el macuto llenan su libro más rápido de lo que esperan."
+        "fishing": "El hito de 100 inscribe Viejo Sal y el de 200 inscribe Pescador Maestro con su título, la cima misma del arte del pescador; la Pesca también cuenta para Maestro Recolector, que se gana con 100 en tres cualesquiera de los oficios de recolección. Un primer pez de las aguas de cada una de seis zonas llena su propia página, las tres zonas centrales más El Pantano de los Sauces, La Cresta del Vendaval y La Costa Lejana al otro lado de ellas, y el Koi Destello Solar registra Destello de Esperanza, así que los viajeros con una caña en el macuto llenan su libro más rápido de lo que esperan.",
+        "farming": "Farming keeps no deeds of its own yet: its beds are still to come, and the milestone and cap deeds that mark the other trades arrive alongside them. Proficiency in it already counts toward Master Gatherer, which is earned at 100 in any three gathering trades, so a farmer will fill that page the same way everyone else does. Deeds are titles and Renown only, never power."
       },
       "fish": {
         "startHeading": "Primeros pasos",

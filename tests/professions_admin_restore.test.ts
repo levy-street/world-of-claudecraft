@@ -113,6 +113,12 @@ describe('restoreToolEffectSlotAction (GM restore, R35)', () => {
     expect(restoreToolEffectSlotAction(sim.ctx, 'fishing', 'gatherers_cache', sim.playerId)).toBe(
       'invalid_request',
     );
+    // farming: registered but shipless (no tool item until the hoe phase), so
+    // only the static pair policy can refuse it here, ahead of the audit
+    // write; without it every farming pair is a junk audit row at best.
+    expect(restoreToolEffectSlotAction(sim.ctx, 'farming', 'gatherers_cache', sim.playerId)).toBe(
+      'invalid_request',
+    );
     expect(metaOf(sim).toolEffectSlots).toBeUndefined();
   });
 

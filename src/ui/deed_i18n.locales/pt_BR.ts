@@ -178,7 +178,6 @@ export const table: DeedLocaleTable = {
   },
   prog_master_gatherer: {
     name: 'Mestre Coletor',
-    desc: 'Alcance 100 de proficiência em quaisquer tres dentre Mineracao, Lenharia, Herborismo e Pesca.',
   },
   prog_first_craft: { name: 'Feito à Mão', desc: 'Conclua sua primeira criação bem-sucedida.' },
   prog_craft_specialist: {

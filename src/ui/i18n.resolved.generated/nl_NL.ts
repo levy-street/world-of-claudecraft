@@ -336,6 +336,12 @@ export const nl_NL: EnTranslations = {
       "healerConfirmAccept": "Breng mij weer tot leven",
       "healerConfirmCancel": "Annuleren"
     },
+    "wiki": {
+      "confirmTitle": "Open the Wiki?",
+      "confirmBody": "This opens the World of ClaudeCraft wiki in your browser. The game keeps running.",
+      "confirmOpen": "Open Wiki",
+      "confirmCancel": "Cancel"
+    },
     "unstuck": {
       "menuButton": "Loskomen",
       "help": "Herstel: /unstuck start een stilstaande aftelling die je verplaatst naar een nabije bereikbare veilige plek.",
@@ -1920,6 +1926,9 @@ export const nl_NL: EnTranslations = {
       "sortRecent": "Recent",
       "sortQuality": "Kwaliteit",
       "sortName": "Naam",
+      "sortButton": "Sort",
+      "sortButtonAria": "Sort your bags",
+      "sortButtonHint": "Combine stacks and group items by type",
       "searchPlaceholder": "Items zoeken",
       "searchAria": "Tasitems zoeken op naam",
       "noMatch": "Geen items komen overeen met je filters.",
@@ -2593,6 +2602,7 @@ export const nl_NL: EnTranslations = {
       "logging": "Houtkap",
       "herbalism": "Kruidenkunde",
       "fishing": "Vissen",
+      "farming": "Farming",
       "notReady": "Dit grondstoffenpunt is voor jou nog niet teruggekeerd.",
       "gatherLine": "Jij verzamelt: {name}.",
       "gatherLineQty": "Je verzamelt: {name} x{qty}.",
@@ -2622,23 +2632,27 @@ export const nl_NL: EnTranslations = {
         "mining": "Je hebt een rang {tier} mijnhouweel nodig om deze ader te oogsten.",
         "logging": "Je hebt een rang {tier} kapbijl nodig om deze opstand te kappen.",
         "herbalism": "Je hebt een rang {tier} kruidenkunde-sikkel nodig om dit veld te verzamelen.",
-        "fishing": "Je hebt een rang {tier} hengel nodig om in deze wateren te vissen."
+        "fishing": "Je hebt een rang {tier} hengel nodig om in deze wateren te vissen.",
+        "farming": "You need a tier {tier} farming hoe to work this bed."
       },
       "toolRequired": {
         "mining": "Je hebt een mijnhouweel nodig om deze ertsader te ontginnen.",
         "logging": "Je hebt een kapbijl nodig om deze houtopstand te vellen.",
         "herbalism": "Je hebt een kruidenkunde-sikkel nodig om dit kruidenveld te oogsten.",
-        "fishing": "Je hebt een hengel nodig om je lijn uit te werpen."
+        "fishing": "Je hebt een hengel nodig om je lijn uit te werpen.",
+        "farming": "You need a farming hoe to work this bed."
       },
       "noNodeNearby": {
         "mining": "Er is geen ertsader binnen bereik.",
         "logging": "Er is geen houtopstand binnen bereik.",
-        "herbalism": "Er is geen kruidenveld binnen bereik."
+        "herbalism": "Er is geen kruidenveld binnen bereik.",
+        "farming": "There is no crop bed within reach."
       },
       "wieldUnmet": {
         "mining": "Je hebt Mijnbouw {skill} nodig om het houweel in je tassen te zwaaien.",
         "logging": "Je hebt Houtkap {skill} nodig om de bijl in je tassen te zwaaien.",
-        "herbalism": "Je hebt Kruidenkunde {skill} nodig om de sikkel in je tassen te hanteren."
+        "herbalism": "Je hebt Kruidenkunde {skill} nodig om de sikkel in je tassen te hanteren.",
+        "farming": "You need Farming {skill} to swing the hoe already in your bags."
       },
       "wieldUnmetCorpse": "Je hebt verzamelvaardigheid {skill} nodig om je beste gereedschap aan het werk te zetten.",
       "toolTierUnmetCorpse": "Je hebt een rang {tier} verzamelgereedschap nodig om de fijnste materialen te verzamelen.",
@@ -2647,7 +2661,8 @@ export const nl_NL: EnTranslations = {
           "mining": "Mijnbouwgereedschap (rang {tier})",
           "logging": "Houtkapgereedschap (rang {tier})",
           "herbalism": "Kruidenkundegereedschap (rang {tier})",
-          "fishing": "Hengel (rang {tier})"
+          "fishing": "Hengel (rang {tier})",
+          "farming": "Farming tool (tier {tier})"
         },
         "unlocks": {
           "mining": "Vereist om ertsaders tot en met rang {tier} te ontginnen.",
@@ -4594,7 +4609,8 @@ export const nl_NL: EnTranslations = {
         "mining": "Mijnbouw haalt erts recht uit het gesteente van de wereld: koper in Oostbeekdal, ijzer in Slijkveenmoeras en osmium hoog in Doorntop-Hoogten, met startaders verspreid door elke jongere zone daarbuiten, die de smidse-ambachten voeden. Vanaf niveau 1 voor iedereen open: een mijnhouweel van 20 koper aan een balie in Oostbeek, Fenbridge of Highwatch opent elke startader, en de hogere treden van de houweelladder ontwaken zodra je eigen teller ze verdient. Bijgehouden op een eigen teller tot een grens van 100.",
         "logging": "Houtkap velt hout uit houtopstanden over de hele wereld: ijzerschors in Oostbeekdal, essenhout in Slijkveenmoeras, hoogden in Doorntop-Hoogten, en startopstanden in elke jongere zone, de ruwe voorraad voor stelen, staven en de werkbank van de knutselaar. Vanaf niveau 1 voor iedereen open met een kapbijl in je tassen (20 koper aan de balies van Oostbeek, Fenbridge en Highwatch), bijgehouden op een eigen teller tot een grens van 100.",
         "herbalism": "Kruidenkunde verzamelt wat in het wild groeit: glansloofkruid in Oostbeekdal, goudblad in Slijkveenmoeras, zonnebloem in Doorntop-Hoogten, en startvelden in elke jongere zone, het blad en de stengel die de apothekersvakken aan het brouwen houden. Vanaf niveau 1 voor iedereen open met een kruidenkunde-sikkel in je tassen (20 koper aan de balies van Oostbeek, Fenbridge en Highwatch), bijgehouden op een eigen teller tot een grens van 100.",
-        "fishing": "Vissen is de vreemde eend onder de verzamelvakken, en het diepste: een echt aanslaan-en-inhalen-minispel, eigen vangsttabellen in elk van de drie kernlandzones (de jonge wateren daarbuiten bedienen voorlopig allemaal de tabel van het Dal), en een vaardigheidsgrens van 200, het dubbele van de rest. Koop een hengel, keer je naar open water, en werp uit."
+        "fishing": "Vissen is de vreemde eend onder de verzamelvakken, en het diepste: een echt aanslaan-en-inhalen-minispel, eigen vangsttabellen in elk van de drie kernlandzones (de jonge wateren daarbuiten bedienen voorlopig allemaal de tabel van het Dal), en een vaardigheidsgrens van 200, het dubbele van de rest. Koop een hengel, keer je naar open water, en werp uit.",
+        "farming": "Farming is the one gathering trade you tend rather than take: crops raised from seed in worked beds, then pulled up ripe for the kitchens and the apothecary benches. Its beds, seeds, and tools arrive in a later patch, so the tables below stand empty for now. That is deliberate rather than an oversight: the trade holds its seat on the gathering counter, tracked to a cap of 100, and fills in as its content lands."
       },
       "rhythmHeading": "Het verzamelritme",
       "rhythmBody": "Een oogst is een korte zichtbare worp, geen directe greep: {base} seconden basis, nooit onder een ondergrens van {floor} seconde. Gereedschap dragen boven de rang van het grondstoffenpunt, dat je vaardigheid je laat hanteren, versnelt je met {tool} seconde per rang daarboven, en elke vaardigheidsband die je passeert knipt er nog {band} seconde af; de rang van het grondstoffenpunt alleen maar evenaren brengt je door de deur, het zijn de rangen daarboven die je snel maken.\n\nEen volle tas weigert de worp beleefd voordat die begint, zodat er niets halverwege de zwaai verloren gaat, en elke oogst betaalt een klein plakje personage-XP, geschaald naar het niveau van het grondstoffenpunt tegenover het jouwe zoals kill-XP schaalt: een triviaal grijs grondstoffenpunt leert een afgetopt personage niets.",
@@ -4625,7 +4641,8 @@ export const nl_NL: EnTranslations = {
         "mining": "Je eerste grondstoffenpunt van een beroep verdient Vruchten van het Veld, en de grens van 100 in Mijnbouw schrijft Erts in het Bloed in. 100 bereiken in drie van Mijnbouw, Houtkap, Kruidenkunde en Vissen voegt Meesterverzamelaar toe bij 25 Roem, en het kraken van een ongerept ertsader legt zijn eigen verzamelaarsmerk vast. Niets hiervan schenkt macht: daden zijn titels en Roem, een verslag van de wegen die je bewandeld hebt.",
         "logging": "Je eerste grondstoffenpunt van een beroep verdient Vruchten van het Veld, en de grens van 100 in Houtkap schrijft Kernhouthakker in. 100 bereiken in drie van Mijnbouw, Houtkap, Kruidenkunde en Vissen voegt Meesterverzamelaar toe bij 25 Roem, en een slag in oud kernhout legt zijn eigen verzamelaarsmerk vast. Daden zijn titels en Roem, nooit macht.",
         "herbalism": "Je eerste grondstoffenpunt van een beroep verdient Vruchten van het Veld, en de grens van 100 in Kruidenkunde schrijft Meester van de Weide in. 100 bereiken in drie van Mijnbouw, Houtkap, Kruidenkunde en Vissen voegt Meesterverzamelaar toe bij 25 Roem, en een maanverlichte bloem legt zijn eigen verzamelaarsmerk vast. Daden zijn titels en Roem, nooit macht.",
-        "fishing": "De mijlpaal van 100 schrijft Oude Zout in en 200 schrijft Meesterhengelaar in met zijn titel, de absolute top van de hengelaarskunst; Vissen telt ook mee voor Meesterverzamelaar, verdiend bij 100 in drie willekeurige verzamelvakken. Een eerste vis uit de wateren van elk van zes zones vult een eigen pagina, de drie kernlandzones en daarbuiten Het Wilgenveen, De Windkam en De Verrekust, en de Zonglinstering-Koi legt Glinstering van Hoop vast, dus reizigers met een hengel in hun bagage vullen hun boek sneller dan ze verwachten."
+        "fishing": "De mijlpaal van 100 schrijft Oude Zout in en 200 schrijft Meesterhengelaar in met zijn titel, de absolute top van de hengelaarskunst; Vissen telt ook mee voor Meesterverzamelaar, verdiend bij 100 in drie willekeurige verzamelvakken. Een eerste vis uit de wateren van elk van zes zones vult een eigen pagina, de drie kernlandzones en daarbuiten Het Wilgenveen, De Windkam en De Verrekust, en de Zonglinstering-Koi legt Glinstering van Hoop vast, dus reizigers met een hengel in hun bagage vullen hun boek sneller dan ze verwachten.",
+        "farming": "Farming keeps no deeds of its own yet: its beds are still to come, and the milestone and cap deeds that mark the other trades arrive alongside them. Proficiency in it already counts toward Master Gatherer, which is earned at 100 in any three gathering trades, so a farmer will fill that page the same way everyone else does. Deeds are titles and Renown only, never power."
       },
       "fish": {
         "startHeading": "Aan de slag",

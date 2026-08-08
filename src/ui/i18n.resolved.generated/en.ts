@@ -336,6 +336,12 @@ export const en: EnTranslations = {
       "healerConfirmAccept": "Revive Me",
       "healerConfirmCancel": "Cancel"
     },
+    "wiki": {
+      "confirmTitle": "Open the Wiki?",
+      "confirmBody": "This opens the World of ClaudeCraft wiki in your browser. The game keeps running.",
+      "confirmOpen": "Open Wiki",
+      "confirmCancel": "Cancel"
+    },
     "unstuck": {
       "menuButton": "Unstuck",
       "help": "Recovery: /unstuck starts a stationary countdown to move you to a nearby reachable safe spot.",
@@ -1920,6 +1926,9 @@ export const en: EnTranslations = {
       "sortRecent": "Recent",
       "sortQuality": "Quality",
       "sortName": "Name",
+      "sortButton": "Sort",
+      "sortButtonAria": "Sort your bags",
+      "sortButtonHint": "Combine stacks and group items by type",
       "searchPlaceholder": "Search items",
       "searchAria": "Search bag items by name",
       "noMatch": "No items match your filters.",
@@ -2593,6 +2602,7 @@ export const en: EnTranslations = {
       "logging": "Logging",
       "herbalism": "Herbalism",
       "fishing": "Fishing",
+      "farming": "Farming",
       "notReady": "This resource node has not respawned for you yet.",
       "gatherLine": "You gather: {name}.",
       "gatherLineQty": "You gather: {name} x{qty}.",
@@ -2622,23 +2632,27 @@ export const en: EnTranslations = {
         "mining": "You need a tier {tier} mining pick to harvest this vein.",
         "logging": "You need a tier {tier} logging axe to fell this stand.",
         "herbalism": "You need a tier {tier} herbalism sickle to gather this patch.",
-        "fishing": "You need a tier {tier} fishing rod to fish these waters."
+        "fishing": "You need a tier {tier} fishing rod to fish these waters.",
+        "farming": "You need a tier {tier} farming hoe to work this bed."
       },
       "toolRequired": {
         "mining": "You need a mining pick to harvest this vein.",
         "logging": "You need a logging axe to fell this stand.",
         "herbalism": "You need a herbalism sickle to gather this patch.",
-        "fishing": "You need a fishing pole to cast a line."
+        "fishing": "You need a fishing pole to cast a line.",
+        "farming": "You need a farming hoe to work this bed."
       },
       "noNodeNearby": {
         "mining": "There is no ore vein within reach.",
         "logging": "There is no timber stand within reach.",
-        "herbalism": "There is no herb patch within reach."
+        "herbalism": "There is no herb patch within reach.",
+        "farming": "There is no crop bed within reach."
       },
       "wieldUnmet": {
         "mining": "You need Mining {skill} to swing the pick already in your bags.",
         "logging": "You need Logging {skill} to swing the axe already in your bags.",
-        "herbalism": "You need Herbalism {skill} to work the sickle already in your bags."
+        "herbalism": "You need Herbalism {skill} to work the sickle already in your bags.",
+        "farming": "You need Farming {skill} to swing the hoe already in your bags."
       },
       "wieldUnmetCorpse": "You need gathering skill {skill} to put your finest tool to work.",
       "toolTierUnmetCorpse": "You need a tier {tier} gathering tool to recover the finest materials.",
@@ -2647,7 +2661,8 @@ export const en: EnTranslations = {
           "mining": "Mining tool (tier {tier})",
           "logging": "Logging tool (tier {tier})",
           "herbalism": "Herbalism tool (tier {tier})",
-          "fishing": "Fishing rod (tier {tier})"
+          "fishing": "Fishing rod (tier {tier})",
+          "farming": "Farming tool (tier {tier})"
         },
         "unlocks": {
           "mining": "Required to mine ore veins up to tier {tier}.",
@@ -4407,14 +4422,14 @@ export const en: EnTranslations = {
       "archetypeChooseBody": "You do not need to seek any of this out. Work your trades, and once your craft skills first show a clear leaning toward one pair, the Crafting Guild notices and sends a Ravenpost letter naming the master to see and the quest to take. It arrives once per character, and only if you have not already sworn to a pair.",
       "archetypeSwitchBody": "A declaration is not a life sentence, either. A pair you have never held is simply a fresh attunement quest, while returning to a pair you walked away from asks you to make amends first: five tasks the first time, and three more added for every return you have already made (taking up a brand-new pair never raises the count). The choice stays meaningful without ever locking a door for good.",
       "whatHeading": "A trade beside the sword",
-      "whatBody": "Professions are the working life of the world: four gathering trades that pull raw material straight out of the land, and a ring of ten crafts that turn it into gear, meals, potions, and tools. Everything feeds something else here. The ore you mine becomes a blade, the blade takes an enchant, and the enchant needs dust broken out of old gear, so a gatherer, a crafter, and a tinkerer are all links in one chain.\n\nThere is no profession limit to agonize over. Every character can raise seven of the eight crafts that have content today and all four gathering professions side by side (Engineering is the one holdout: its recipes all start above the free ceiling, so its ladder waits for the Bombardier's oath); the only exclusive choice is your archetype, the identity you eventually swear to, though once you attune the crafts that fall dormant behind it climb only on their common recipes, and past skill 75 not at all. Skill never goes down, and nothing you learn is ever taken away.",
+      "whatBody": "Professions are the working life of the world: the gathering trades that pull raw material straight out of the land, and a ring of ten crafts that turn it into gear, meals, potions, and tools. Everything feeds something else here. The ore you mine becomes a blade, the blade takes an enchant, and the enchant needs dust broken out of old gear, so a gatherer, a crafter, and a tinkerer are all links in one chain.\n\nThere is no profession limit to agonize over. Every character can raise seven of the eight crafts that have content today and every gathering profession side by side (Engineering is the one holdout: its recipes all start above the free ceiling, so its ladder waits for the Bombardier's oath); the only exclusive choice is your archetype, the identity you eventually swear to, though once you attune the crafts that fall dormant behind it climb only on their common recipes, and past skill 75 not at all. Skill never goes down, and nothing you learn is ever taken away.",
       "ringHeading": "The craft ring",
       "ringBody": "Every craft with content today caps at 125 skill: Weaponcrafting, Armorcrafting, Tailoring, Leatherworking, Cooking, Alchemy, Engineering, and Enchanting. At a cap the trade keeps working, harvests still yield, crafts still resolve, and masterworks can still happen; only the number stops climbing. Pick a card below for a craft's full recipe tables and numbers.",
       "ringWaveNote": "Two crafts on the wheel, Jewelcrafting and Inscription, hold their seats but ship no recipes yet. That is deliberate rather than an oversight: their content arrives with future zones, and the caps above rise the same way, so a capped craft today is a head start on that expansion, not a finish line.",
       "capFmt": "Cap {cap}",
       "comingSoon": "No recipes yet",
       "gatherHubHeading": "Gathering",
-      "gatherHubBody": "Four gathering trades feed the ring from the field: Mining, Logging, and Herbalism pull ore, timber, and herbs out of the land and cap at 100 proficiency, while Fishing runs on its own bite-and-reel rhythm all the way to 200. Each page below carries the exact node maps, tool ladders, and odds.",
+      "gatherHubBody": "The gathering trades feed the ring from the field: Mining, Logging, and Herbalism pull ore, timber, and herbs out of the land and cap at 100 proficiency, Farming raises crops from seed in tended beds and caps at the same 100, while Fishing runs on its own bite-and-reel rhythm all the way to 200. Each page below carries the exact node maps, tool ladders, and odds.",
       "archetypesHeading": "The wheel and its archetypes",
       "archetypesBody": "The ten crafts sit on a fixed wheel, and geography on that wheel matters. Every two neighbors form a named pair: Smith for Weaponcrafting and Armorcrafting, Outfitter for Leatherworking and Tailoring, Apothecary for Alchemy and Cooking, Bombardier for Engineering and Alchemy, and six more around the ring.\n\nAttuning to a pair is a quest, not a menu click. Four pairs can be joined today (Smith, Outfitter, Apothecary, and Bombardier), each anchored by a resident master in Eastbrook whose acceptance quest states the whole bargain up front before you take it. Until you declare, every craft advances freely on recipes up through the rare tier (any recipe asking skill 74 or less), so you can try nearly everything before you choose (Engineering alone has no recipe that low, so its number waits).\n\nOnce you attune, your two pair crafts become your majors, with no ceiling short of the cap. The rest of the wheel does not go dark: one craft opposite your majors stays on as a hobby that keeps climbing through the rare tier (a repeatable quest at Smith Haldren's forge lets you swap which one), and every other craft goes dormant. A dormant craft keeps its skill and its common recipes, which keep teaching it on the normal curve until they gray at 75; everything above common stops paying at once, and a dormant craft never turns out a masterwork while it rests.",
       "pairFmt": "{a} and {b}",
@@ -4594,7 +4609,8 @@ export const en: EnTranslations = {
         "mining": "Mining pulls ore straight out of the world's rock: copper in Eastbrook Vale, iron in Mirefen Marsh, and osmium up in Thornpeak Heights, with starter veins scattered through every younger zone beyond them, feeding the forge crafts. Open to everyone from level 1: a 20 copper mining pick from an Eastbrook, Fenbridge, or Highwatch counter opens every starter vein, and the higher rungs of the pick ladder wake as your own counter earns them. Tracked on its own counter to a cap of 100.",
         "logging": "Logging fells timber from stands of trees across the whole world: ironbark in Eastbrook Vale, ashwood in Mirefen Marsh, highpine in Thornpeak Heights, and starter stands in every younger zone, the raw stock for hafts, staves, and the engineer's bench. Open to everyone from level 1 with a logging axe in your bags (20 copper at the Eastbrook, Fenbridge, and Highwatch counters), tracked on its own counter to a cap of 100.",
         "herbalism": "Herbalism gathers what grows wild: sheenleaf in Eastbrook Vale, goldleaf in Mirefen Marsh, sunpetal in Thornpeak Heights, and starter patches in every younger zone, the leaf and stem that keep the apothecary trades brewing. Open to everyone from level 1 with a herbalism sickle in your bags (20 copper at the Eastbrook, Fenbridge, and Highwatch counters), tracked on its own counter to a cap of 100.",
-        "fishing": "Fishing is the odd one out among the gathering trades, and the deepest: a real bite-and-reel minigame, its own catch tables in each of the three heartland zones (the young waters beyond them all serve the Vale's table for now), and a proficiency cap of 200, twice the others. Buy a pole, face open water, and cast."
+        "fishing": "Fishing is the odd one out among the gathering trades, and the deepest: a real bite-and-reel minigame, its own catch tables in each of the three heartland zones (the young waters beyond them all serve the Vale's table for now), and a proficiency cap of 200, twice the others. Buy a pole, face open water, and cast.",
+        "farming": "Farming is the one gathering trade you tend rather than take: crops raised from seed in worked beds, then pulled up ripe for the kitchens and the apothecary benches. Its beds, seeds, and tools arrive in a later patch, so the tables below stand empty for now. That is deliberate rather than an oversight: the trade holds its seat on the gathering counter, tracked to a cap of 100, and fills in as its content lands."
       },
       "rhythmHeading": "The gathering rhythm",
       "rhythmBody": "A harvest is a short visible cast, not an instant grab: {base} seconds base, never below a {floor} second floor. Carrying a tool above the node's tier, one your proficiency lets you wield, speeds you up by {tool} seconds per tier above it, and each proficiency band you cross trims another {band} seconds; merely matching the node's tier gets you in the door, it is the tiers above it that make you fast.\n\nA full bag politely refuses the cast before it starts, so nothing is wasted mid-swing, and every harvest pays a small slice of character XP, scaled by the node's level against your own the way kill XP scales: a trivial gray node teaches a capped character nothing.",
@@ -4622,10 +4638,11 @@ export const en: EnTranslations = {
       "specimenBody": "Keep a little bag room spare when you farm: a signed windfall needs room of its own or a matching signed stack to land in, and if nothing fits the yield still arrives but the signature is lost. Corpse harvesting has its own jackpot arm too: about {pct}% of each harvested component comes up rare or better. A family with a perfect specimen to give (hide, silk, venom, meat) keeps its ordinary yield plain and mints the signed specimen beside it; every other family signs the yield itself.",
       "gatherDeedsHeading": "Deeds along the way",
       "gatherDeeds": {
-        "mining": "Your first node of any trade earns Fruits of the Field, and the 100 cap in Mining inscribes Ore in the Blood. Reaching 100 in any three of Mining, Logging, Herbalism, and Fishing adds Master Gatherer at 25 Renown, and cracking a pristine vein records its own collector's mark. Twelve zones keep a gatherer's chronicle page apiece too, filled by harvesting an ore vein, a wood stand, and an herb patch within the zone's bounds. None of these grant power: deeds are titles and Renown, a record of the roads you have walked.",
-        "logging": "Your first node of any trade earns Fruits of the Field, and the 100 cap in Logging inscribes Heartwood Hewer. Reaching 100 in any three of Mining, Logging, Herbalism, and Fishing adds Master Gatherer at 25 Renown, and a strike of ancient heartwood records its own collector's mark. Twelve zones keep a gatherer's chronicle page apiece too, filled by harvesting an ore vein, a wood stand, and an herb patch within the zone's bounds. Deeds are titles and Renown only, never power.",
-        "herbalism": "Your first node of any trade earns Fruits of the Field, and the 100 cap in Herbalism inscribes Master of the Meadow. Reaching 100 in any three of Mining, Logging, Herbalism, and Fishing adds Master Gatherer at 25 Renown, and a moonlit bloom records its own collector's mark. Twelve zones keep a gatherer's chronicle page apiece too, filled by harvesting an ore vein, a wood stand, and an herb patch within the zone's bounds. Deeds are titles and Renown only, never power.",
-        "fishing": "The 100 milestone inscribes Old Salt and 200 inscribes Master Angler with its title, the very top of the angler's art; Fishing also counts toward Master Gatherer, earned at 100 in any three gathering trades. A first fish from each of twelve zones' waters fills its own page, the three heartland zones and the Willowfen, the Galecrest, the Farshore, the Frostveil, the Amberfall, the Nightbloom, the Wraithwood, the Palmreach, and the Evergarden beyond them, and the Sunglint Koi records Glimmer of Hope, so travelers with a pole in their pack fill their book faster than they expect."
+        "mining": "Your first node of any trade earns Fruits of the Field, and the 100 cap in Mining inscribes Ore in the Blood. Reaching 100 in any three gathering trades adds Master Gatherer at 25 Renown, and cracking a pristine vein records its own collector's mark. Twelve zones keep a gatherer's chronicle page apiece too, filled by harvesting an ore vein, a wood stand, and an herb patch within the zone's bounds. None of these grant power: deeds are titles and Renown, a record of the roads you have walked.",
+        "logging": "Your first node of any trade earns Fruits of the Field, and the 100 cap in Logging inscribes Heartwood Hewer. Reaching 100 in any three gathering trades adds Master Gatherer at 25 Renown, and a strike of ancient heartwood records its own collector's mark. Twelve zones keep a gatherer's chronicle page apiece too, filled by harvesting an ore vein, a wood stand, and an herb patch within the zone's bounds. Deeds are titles and Renown only, never power.",
+        "herbalism": "Your first node of any trade earns Fruits of the Field, and the 100 cap in Herbalism inscribes Master of the Meadow. Reaching 100 in any three gathering trades adds Master Gatherer at 25 Renown, and a moonlit bloom records its own collector's mark. Twelve zones keep a gatherer's chronicle page apiece too, filled by harvesting an ore vein, a wood stand, and an herb patch within the zone's bounds. Deeds are titles and Renown only, never power.",
+        "fishing": "The 100 milestone inscribes Old Salt and 200 inscribes Master Angler with its title, the very top of the angler's art; Fishing also counts toward Master Gatherer, earned at 100 in any three gathering trades. A first fish from each of twelve zones' waters fills its own page, the three heartland zones and the Willowfen, the Galecrest, the Farshore, the Frostveil, the Amberfall, the Nightbloom, the Wraithwood, the Palmreach, and the Evergarden beyond them, and the Sunglint Koi records Glimmer of Hope, so travelers with a pole in their pack fill their book faster than they expect.",
+        "farming": "Farming keeps no deeds of its own yet: its beds are still to come, and the milestone and cap deeds that mark the other trades arrive alongside them. Proficiency in it already counts toward Master Gatherer, which is earned at 100 in any three gathering trades, so a farmer will fill that page the same way everyone else does. Deeds are titles and Renown only, never power."
       },
       "fish": {
         "startHeading": "Getting started",

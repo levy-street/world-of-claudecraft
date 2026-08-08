@@ -61,6 +61,17 @@
       .sort((a, b) => b.stats.mean - a.stats.mean);
   });
 
+  // bcastSelf per-key-group breakdown (SELF_WIRE_PHASES server-side), sorted by
+  // mean cost like the sim rows: names which self key group eats the broadcast
+  // budget instead of one bcastSelf total.
+  const selfRows = $derived.by(() => {
+    const phases = status?.last?.profile.phases ?? {};
+    return Object.entries(phases)
+      .filter(([name]) => name.startsWith('self.'))
+      .map(([name, stats]) => ({ name: name.slice(5), stats: stats as PerfPhaseStats }))
+      .sort((a, b) => b.stats.mean - a.stats.mean);
+  });
+
   const overBudget = $derived((status?.last?.profile.phases.total?.p95 ?? 0) > TICK_BUDGET_MS);
 
   async function refresh(): Promise<void> {
@@ -172,6 +183,32 @@
           </thead>
           <tbody>
             {#each simRows as row (row.name)}
+              <tr>
+                <td>{row.name}</td>
+                <td class="num">{ms(row.stats.mean)}</td>
+                <td class="num">{ms(row.stats.p95)}</td>
+                <td class="num">{ms(row.stats.p99)}</td>
+                <td class="num">{ms(row.stats.max)}</td>
+              </tr>
+            {/each}
+          </tbody>
+        </table>
+      {/if}
+
+      {#if selfRows.length > 0}
+        <h3>{t('tickPerf.selfHeading')}</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>{t('tickPerf.colPhase')}</th>
+              <th class="num">{t('tickPerf.colMean')}</th>
+              <th class="num">{t('tickPerf.colP95')}</th>
+              <th class="num">{t('tickPerf.colP99')}</th>
+              <th class="num">{t('tickPerf.colMax')}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {#each selfRows as row (row.name)}
               <tr>
                 <td>{row.name}</td>
                 <td class="num">{ms(row.stats.mean)}</td>

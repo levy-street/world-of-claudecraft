@@ -217,6 +217,7 @@ export const nl_NL: AdminTranslations = {
   "tickPerf.overBudget": "boven het budget van 50ms",
   "tickPerf.loopHeading": "Lusfasen",
   "tickPerf.simHeading": "sim.tick() interne fasen",
+  "tickPerf.selfHeading": "Sleutelgroepen van de self-snapshot (bcastSelf)",
   "tickPerf.colPhase": "Fase",
   "tickPerf.colMean": "Gemiddelde",
   "tickPerf.colP95": "p95",

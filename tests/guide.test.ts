@@ -31,6 +31,7 @@ import { controls as controlsPage } from '../src/guide/pages/controls';
 import { catalogSections, deeds as deedsPage } from '../src/guide/pages/deeds';
 import { dungeons as dungeonsPage } from '../src/guide/pages/dungeons';
 import { professions as professionsPage } from '../src/guide/pages/professions';
+import { gatheringDetailHtml } from '../src/guide/pages/professions_gathering';
 import { world as worldPage } from '../src/guide/pages/world';
 import {
   GUIDE_BASE,
@@ -1422,7 +1423,17 @@ describe('Guide professions generated content accuracy', () => {
 });
 
 describe('Guide professions gathering accuracy', () => {
-  it('covers the four gathering professions with grounded caps and bands', () => {
+  it('covers every gathering profession with grounded caps and bands', () => {
+    // Literal list, not a mirror of GATHERING_PROFESSION_IDS: comparing the
+    // generated ids against the same array the generator iterates cannot see a
+    // trade that never reached the wiki. The mirror below still ties order.
+    expect(GUIDE_PROF_GATHERING.map((g) => g.id)).toEqual([
+      'mining',
+      'logging',
+      'herbalism',
+      'fishing',
+      'farming',
+    ]);
     expect(GUIDE_PROF_GATHERING.map((g) => g.id)).toEqual([...GATHERING_PROFESSION_IDS]);
     for (const g of GUIDE_PROF_GATHERING) {
       expect(g.maxSkill).toBe(
@@ -1432,12 +1443,94 @@ describe('Guide professions gathering accuracy', () => {
     }
     expect(GUIDE_PROF_GATHERING.find((g) => g.id === 'mining')?.maxSkill).toBe(100);
     expect(GUIDE_PROF_GATHERING.find((g) => g.id === 'fishing')?.maxSkill).toBe(200);
+    expect(GUIDE_PROF_GATHERING.find((g) => g.id === 'farming')?.maxSkill).toBe(100);
+  });
+
+  // Both hub bodies used to spell the trade count into the prose ("four
+  // gathering trades"), which made the wiki quietly lie the moment a fifth
+  // trade was registered. They are count-free now, and the hub sentence names
+  // every trade the sim ships, so a sixth one cannot land without an edit here.
+  it('describes the gathering trades count-free and names every one of them', () => {
+    setLanguage('en');
+    const bodies = [
+      ['guide.professions.whatBody', t('guide.professions.whatBody')],
+      ['guide.professions.gatherHubBody', t('guide.professions.gatherHubBody')],
+    ] as const;
+    for (const [key, value] of bodies) {
+      expect(value.length, key).toBeGreaterThan(0);
+      expect(value, `${key} spells a gathering-trade count`).not.toMatch(/\b(four|five|[45])\b/i);
+    }
+    const gatherHubBody = t('guide.professions.gatherHubBody');
+    for (const id of GATHERING_PROFESSION_IDS) {
+      const name = GATHERING_PROFESSIONS[id].name;
+      expect(gatherHubBody, `gatherHubBody never names ${name}`).toContain(name);
+    }
+    // Literal, so the loop above cannot pass vacuously on an empty id list.
+    expect(gatherHubBody).toContain('Farming');
+  });
+
+  // The farming page once rendered "respawns for you 0 seconds" (the `?? 0`
+  // fallback over an empty nodes array) and the full vendor-ladder prose over
+  // an empty tools table: invented content on a public page that three data
+  // pins and a full gate never saw, because data pins are not page pins. This
+  // drives the REAL page render on both sides of the length guard.
+  it('renders a tableless trade without tool or node prose, and a full trade with both', () => {
+    setLanguage('en');
+    const farming = GUIDE_PROF_GATHERING.find((g) => g.id === 'farming');
+    expect(farming).toBeDefined();
+    const html = gatheringDetailHtml(farming as (typeof GUIDE_PROF_GATHERING)[number]);
+    expect(html, 'tools prose must not render for a toolless trade').not.toContain(
+      'id="prof-tools"',
+    );
+    expect(html, 'nodes prose must not render for a nodeless trade').not.toContain(
+      'id="prof-nodes"',
+    );
+    expect(html).toContain('id="prof-rhythm"');
+    const mining = GUIDE_PROF_GATHERING.find((g) => g.id === 'mining');
+    const miningHtml = gatheringDetailHtml(mining as (typeof GUIDE_PROF_GATHERING)[number]);
+    expect(miningHtml, 'the guard is length-based: a full trade keeps tools').toContain(
+      'id="prof-tools"',
+    );
+    expect(miningHtml, 'the guard is length-based: a full trade keeps nodes').toContain(
+      'id="prof-nodes"',
+    );
+  });
+
+  // Master Gatherer's trigger counts every registered trade (src/sim/deeds.ts
+  // filters GATHERING_PROFESSION_IDS), so prose that enumerates the roster goes
+  // stale the moment a trade joins. It went stale twice, on fishing and again
+  // on farming, so the enumerating form is banned outright rather than patched
+  // a third time. tests/deeds_content.test.ts owns the trigger itself; this
+  // pins the player-visible strings that describe it.
+  it('never enumerates the Master Gatherer roster in the deed prose', () => {
+    setLanguage('en');
+    for (const id of GATHERING_PROFESSION_IDS) {
+      const body = t(`guide.profPages.gatherDeeds.${id}` as never);
+      expect(body.length, id).toBeGreaterThan(0);
+      expect(body, `gatherDeeds.${id} enumerates the gathering roster`).not.toMatch(
+        /any three of/i,
+      );
+    }
+    expect(DEEDS.prog_master_gatherer.desc).toBe(
+      'Reach 100 proficiency in any three gathering trades.',
+    );
   });
 
   it('aggregates every world node into its zone row (tool tier = node tier)', () => {
     const typeFor: Record<string, string> = { mining: 'ore', logging: 'wood', herbalism: 'herb' };
     for (const g of GUIDE_PROF_GATHERING) {
       if (g.id === 'fishing') continue;
+      if (g.id === 'farming') {
+        // Farming is registered as a trade before its beds, tools, and harvest
+        // table exist, so the generator emits the row with empty tables and no
+        // respawn number. Pinned empty ON PURPOSE: the phase that ships farming
+        // content reds here and has to give the trade real rows, rather than
+        // slipping through a skip.
+        expect(g.nodes).toEqual([]);
+        expect(g.tools).toEqual([]);
+        expect(g.respawnSeconds).toBeUndefined();
+        continue;
+      }
       const simNodes = GATHER_NODES.filter((n) => n.type === typeFor[g.id]);
       const total = (g.nodes ?? []).reduce((sum, row) => sum + row.count, 0);
       expect(total, `${g.id} node count drifted`).toBe(simNodes.length);

@@ -12,6 +12,20 @@ the professions window gathering section and the character sheet, the wiki farmi
 exists, and there is deliberately NO way to gain farming skill yet. Nothing else is
 player-reachable.
 
+EXECUTED 2026-08-08 WITH DEVIATIONS (authoritative record: progress.md Phase 1 Notes
+and state.md "Locked deviations"; summary here so this file stays honest): (a) the
+icon suite's E2 art-backed pin cannot be satisfied procedurally; a PENDING_ART_IDS
+allowlist with inverted, self-clearing assertions landed instead (maintainer sign-off
+owed); (b) the "isolated golden regen" never happened because the predicted parity
+red never materializes (the trace sample drops inert zero keys before digesting;
+regen proven byte-identical; the growth phase inherits the first real regen); (c)
+the Master Gatherer desc and three gatherDeeds guide bodies were pulled INTO this
+phase (fishing-precedent reword); (d) delivery followed D22: no push, no PR; the
+branch merged --no-ff into feature/farming-plan and the would-be PR body lives in
+progress.md; (e) the blast-radius list gained the sites discovered in flight
+(gather_tool_tooltip KIND_KEYS and Partial neighbours, gather_node_tooltip maps,
+the two-key guide count prose).
+
 ### Starter Prompt
 
 ```

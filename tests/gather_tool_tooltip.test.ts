@@ -13,6 +13,7 @@ import {
   FISH_BITE_DELAY_ROD_REDUCTION_SEC,
   fishingRodBandFor,
 } from '../src/sim/professions/fishing';
+import type { ItemDef } from '../src/sim/types';
 import { gatherToolTooltipLines } from '../src/ui/gather_tool_tooltip';
 
 describe('gatherToolTooltipLines: picks, axes, sickles', () => {
@@ -172,6 +173,61 @@ describe('gatherToolTooltipLines: fishing implements', () => {
     }
     // Both arms are live: two rods raise the ceiling, two do not.
     expect([sawLine, sawNone]).toEqual([2, 2]);
+  });
+});
+
+describe('gatherToolTooltipLines: farming, procedural ahead of its tool item', () => {
+  // Farming registered as the fifth gathering profession before any hoe item
+  // exists, so there is nothing in ITEMS to render and the def is synthetic.
+  // Two things here are invisible to tsc and worth pinning anyway: KIND_KEYS is
+  // an exhaustive Record, so the compiler forces a farming ROW but accepts any
+  // sibling's key as its VALUE (a mis-map would silently print "Fishing rod"
+  // on a hoe), and the wield line resolves through a SECOND table,
+  // GATHERING_PROFESSION_NAME_KEYS, whose farming row is what keeps that line
+  // from vanishing.
+  const hoe = (tier: number): ItemDef =>
+    ({
+      id: 'test_farming_hoe',
+      name: 'Test Farming Hoe',
+      kind: 'tool',
+      quality: 'common',
+      use: { type: 'gatherTool', professionId: 'farming', tier },
+      sellValue: 4,
+      buyValue: 20,
+    }) as ItemDef;
+
+  it('names farming as its own kind, never a sibling profession', () => {
+    const html = gatherToolTooltipLines(hoe(1));
+    expect(html).toContain('<div class="tt-sub">Farming tool (tier 1)</div>');
+    // The mis-mapped-row guard: an exhaustive Record accepts any of these as
+    // the farming value, and each one reads as a different tool in the hand.
+    for (const sibling of ['Mining tool', 'Logging tool', 'Herbalism tool', 'Fishing rod']) {
+      expect(html, `a farming hoe must not describe itself as a ${sibling}`).not.toContain(sibling);
+    }
+  });
+
+  it('carries the wield requirement, which proves the shared name table covers farming', () => {
+    // Without GATHERING_PROFESSION_NAME_KEYS.farming this line does not render
+    // wrong, it renders NOT AT ALL (the painter drops it rather than print
+    // "Requires Farming tool 40"), so its absence is the silent miss.
+    expect(gatherToolTooltipLines(hoe(2))).toContain(
+      '<div class="tt-desc">Requires Farming 40</div>',
+    );
+    // Tier 1 asks nothing, the same contract the picks and axes above hold to.
+    expect(gatherToolTooltipLines(hoe(1))).not.toContain('Requires Farming');
+  });
+
+  it('states no unlocks or use line while the hoe item is still unwritten', () => {
+    // DELIBERATE, not an oversight: UNLOCKS_KEYS and USE_KEYS are Partial and
+    // farming is deliberately absent from both, because no hoe exists and no
+    // crop-bed node type exists, so there is nothing true to say about what a
+    // tier opens or what using it does. The crops-and-tools phase adds both
+    // rows and flips these assertions; until then this pins the decision.
+    const html = gatherToolTooltipLines(hoe(1));
+    expect(html).not.toContain('Required to');
+    expect(html).not.toContain('Use:');
+    // The kind line is therefore the WHOLE tooltip at tier 1.
+    expect(html).toBe('<div class="tt-sub">Farming tool (tier 1)</div>');
   });
 });
 

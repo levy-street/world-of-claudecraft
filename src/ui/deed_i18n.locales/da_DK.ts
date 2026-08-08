@@ -156,7 +156,6 @@ export const table: DeedLocaleTable = {
   prog_herbalism_100: { name: 'Engens Mester', desc: 'Nå 100 i færdigheden Urtekundskab.' },
   prog_master_gatherer: {
     name: 'Mestersamler',
-    desc: 'Nå 100 i færdighed i tre af fagene Minedrift, Skovhugst, Urtekundskab og Fiskeri.',
   },
   prog_first_craft: { name: 'Håndlavet', desc: 'Fuldfør din første vellykkede fremstilling.' },
   prog_craft_specialist: {
