@@ -4,7 +4,7 @@
 
 import { esc } from '../../ui/esc';
 import { formatNumber, t } from '../../ui/i18n';
-import { CLASS_CHIPS, LEVEL_CAP, ZONE_TEASERS } from '../data';
+import { CLASS_CHIPS, LEVEL_CAP, ZONE_COUNT, ZONE_TEASERS } from '../data';
 import { hrefFor } from '../routes';
 import type { GuidePage } from './types';
 
@@ -61,12 +61,20 @@ function classesHtml(): string {
     </section>`;
 }
 
+// A zone whose band is a single level (every cap-level zone) would otherwise read
+// "Levels 20 to 20" on the busiest page we have, so it gets the single-level phrasing.
+function bandLabel(min: number, max: number): string {
+  return min === max
+    ? t('guide.home.world.levelsCap', { level: formatNumber(min) })
+    : t('guide.home.world.levels', { min: formatNumber(min), max: formatNumber(max) });
+}
+
 function worldHtml(): string {
   const cards = ZONE_TEASERS.map(
     (z) => `
       <a class="guide-zone-card guide-zone-${esc(z.id)}" href="${esc(hrefFor('world'))}">
         <div class="guide-zone-body">
-          <span class="guide-zone-band">${esc(t('guide.home.world.levels', { min: formatNumber(z.min), max: formatNumber(z.max) }))}</span>
+          <span class="guide-zone-band">${esc(bandLabel(z.min, z.max))}</span>
           <h3 class="guide-zone-name">${esc(t(z.nameKey))}</h3>
           <p class="guide-zone-blurb">${esc(t(z.blurbKey))}</p>
         </div>
@@ -75,7 +83,7 @@ function worldHtml(): string {
   return `
     <section class="guide-section" aria-labelledby="guide-world-h">
       <h2 class="guide-section-h" id="guide-world-h">${esc(t('guide.home.world.heading'))}</h2>
-      <p class="guide-section-sub">${esc(t('guide.home.world.sub'))}</p>
+      <p class="guide-section-sub">${esc(t('guide.home.world.subCount', { zones: formatNumber(ZONE_COUNT) }))}</p>
       <div class="guide-zone-grid">${cards}</div>
       <p class="guide-section-more"><a href="${esc(hrefFor('world'))}">${esc(t('guide.home.world.cta'))}</a></p>
     </section>`;
@@ -110,7 +118,13 @@ function faqHtml(): string {
     ['guide.home.faq.q1', t('guide.home.faq.a1')],
     ['guide.home.faq.q2', t('guide.home.faq.a2')],
     ['guide.home.faq.q3', t('guide.home.faq.a3')],
-    ['guide.home.faq.q4', t('guide.home.faq.a4', { cap: formatNumber(LEVEL_CAP) })],
+    [
+      'guide.home.faq.q4',
+      t('guide.home.faq.a4Count', {
+        cap: formatNumber(LEVEL_CAP),
+        zones: formatNumber(ZONE_COUNT),
+      }),
+    ],
   ] as const;
   const items = qa
     .map(

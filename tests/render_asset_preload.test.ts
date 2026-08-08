@@ -1,21 +1,27 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { characterPreloadUrls, manifestUrlsForGraphics } from '../src/render/characters/manifest';
+import { foliagePreloadInternalsForTest } from '../src/render/foliage';
 import { propPreloadInternalsForTest } from '../src/render/props';
 
-// Guard against the v0.16.0 "Could not start the renderer" P0. Both props (props.ts)
-// and characters (characters/assets.ts) freeze their GLB PRELOAD set at module-import
-// time from a graphics-tier GUESS (GFX.standardMaterials), but PLACEMENT runs later
-// against the LIVE tier resolved inside the Renderer constructor (initGfxTier reassigns
-// the GFX global after import). When the import-time guess came in LOWER than the live
-// render tier (weak/hybrid-GPU probe guesses low, the high-performance renderer resolves
-// medium+), a prop/character was placed that the lower import tier never preloaded, and
-// the synchronous accessor threw "... asset not preloaded", crashing world entry.
+// Guard against the v0.16.0 "Could not start the renderer" P0. Props (props.ts),
+// characters (characters/assets.ts), and foliage (foliage.ts) all freeze their GLB
+// PRELOAD set at module-import/deferred-lane-open time from a graphics-tier GUESS
+// (GFX.standardMaterials / GFX.leanFoliage), but PLACEMENT runs later against the LIVE
+// tier resolved inside the Renderer constructor (initGfxTier reassigns the GFX global
+// after import, from the real WebGL gpuRenderer string). When the import-time guess came
+// in LOWER than the live render tier (weak/hybrid-GPU probe guesses low, the
+// high-performance renderer resolves medium+), a prop/character/foliage model was placed
+// that the lower import tier never preloaded, and the synchronous accessor threw "...
+// asset not preloaded", crashing world entry.
 //
-// The fix makes both preload sets tier-INDEPENDENT (a superset of every tier's placement
-// set), the way foliage.ts has always sourced one frozen list for both preload and
-// placement. These tests assert that invariant at EVERY import-time tier, in particular
-// the lowest (the only one that could shrink the set and crash).
+// The fix makes every preload set tier-INDEPENDENT (a superset of every tier's placement
+// set). Foliage regressed this once already: a `deferredFoliageUrlsForBoot()` gate was
+// added to skip a url whose tier didn't match a frozen boot-time guess, silently
+// reintroducing the exact bug this suite exists to prevent ("foliage model not
+// preloaded: models/foliage/pine_2.glb"), uncaught because this file never had a foliage
+// case. These tests assert the tier-independence invariant at EVERY import-time tier, in
+// particular the lowest (the only one that could shrink the set and crash).
 
 describe('prop preload set covers placement at every graphics tier (v0.16.0 farmCrate P0)', () => {
   const { allPropKeys, lowTierPropKeys, preloadPropKeys } = propPreloadInternalsForTest;
@@ -65,6 +71,39 @@ describe('character preload set covers placement at every graphics tier (v0.16.0
         ).toBe(true);
       }
     }
+  });
+});
+
+describe('foliage preload set covers placement at every graphics tier (regression: the deferred lane silently re-scoped this to the import-time tier guess)', () => {
+  const { allFoliageModelUrls, lowTierFoliageModelUrls, highTierFoliageModelUrls } =
+    foliagePreloadInternalsForTest;
+
+  it('a real tier divergence exists (low renders a strict subset of the full catalog)', () => {
+    const low = lowTierFoliageModelUrls();
+    const all = allFoliageModelUrls();
+    expect(low.size).toBeLessThan(all.size);
+    // pine_2/4/5 only exist in the HIGH tier's variant set (FOLIAGE_MODEL_URLS_LOW.pine
+    // is just pine_1): the exact url the live crash report named.
+    expect(low.has('models/foliage/pine_2.glb')).toBe(false);
+    expect(highTierFoliageModelUrls().has('models/foliage/pine_2.glb')).toBe(true);
+    expect(all.has('models/foliage/pine_2.glb')).toBe(true);
+  });
+
+  it('ALL_FOLIAGE_MODEL_URLS is constructed as the exact HIGH union LOW superset (a data-shape invariant, not a runtime one: see tests/foliage_preload_boot.test.ts for proof the deferred loop actually FETCHES every one of these regardless of the import-time tier guess)', () => {
+    const all = allFoliageModelUrls();
+    const high = highTierFoliageModelUrls();
+    const low = lowTierFoliageModelUrls();
+    for (const url of high) expect(all.has(url)).toBe(true);
+    for (const url of low) expect(all.has(url)).toBe(true);
+    expect(all.size).toBe(high.size);
+  });
+
+  it('the deferred preload loop never skips a url by tier (no frozen-guess gate remains)', () => {
+    const source = readFileSync(new URL('../src/render/foliage.ts', import.meta.url), 'utf8');
+    expect(source).not.toMatch(/function deferredFoliageUrlsForBoot/);
+    expect(source).toMatch(
+      /for \(const url of ALL_FOLIAGE_MODEL_URLS\) \{\s*registerDeferredPreload\(\(\) =>\s*prepareFoliageSource\(url\)/,
+    );
   });
 });
 

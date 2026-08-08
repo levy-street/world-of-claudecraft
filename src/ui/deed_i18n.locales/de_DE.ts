@@ -33,19 +33,19 @@ export const table: DeedLocaleTable = {
     desc: 'Bereinige einen Riss vom Rang S, der schwersten Stufe, die ein Rissportal erzeugen kann.',
   },
   pvp_honor_sergeant: {
-    name: 'Sergeant',
+    name: 'Linienbrecher',
     desc: 'Verdiene im Laufe deines Lebens 10.000 Ehre. Sie auszugeben kostet dich nie den Rang.',
-    title: 'Sergeant',
+    title: 'Linienbrecher',
   },
   pvp_honor_knight_lieutenant: {
-    name: 'Ritter-Leutnant',
+    name: 'Feldverheerer',
     desc: 'Verdiene im Laufe deines Lebens 40.000 Ehre, eine Saison echten Krieges hinter dir.',
-    title: 'Ritter-Leutnant',
+    title: 'Feldverheerer',
   },
   pvp_honor_field_marshal: {
-    name: 'Feldmarschall',
+    name: 'Kriegsgekrönt',
     desc: 'Verdiene im Laufe deines Lebens 150.000 Ehre. Selten auf jedem Reich, und das sollte es auch sein.',
-    title: 'Feldmarschall',
+    title: 'Kriegsgekrönt',
   },
   chr_drakemaw_broodlord: {
     name: 'Gelegebrecher',

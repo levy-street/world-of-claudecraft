@@ -16,6 +16,7 @@ let gltfLoader: GLTFLoader | null = null;
 const gltfCache = new Map<string, Promise<GLTF>>();
 const hdrCache = new Map<string, Promise<THREE.DataTexture>>();
 const texCache = new Map<string, Promise<THREE.Texture>>();
+const ktx2TexCache = new Map<string, Promise<THREE.CompressedTexture>>();
 
 interface AssetQueue {
   active: number;
@@ -126,10 +127,14 @@ function polishGltfTextures(gltf: GLTF): void {
 // preload set a WebContent kill lands and which asset preceded it (the iPhone 17
 // Pro entry-kill investigation: WebContent died at 1.54 GB resident mid-decode
 // with no JS error, so sequencing evidence has to come from the console, not
-// from error handlers). Gated like the residency table: dev browsers plus the
-// native iOS profile under diagnosis. The production WEB population must not
-// pay ~700 console lines per entry; the native Release shell suppresses the JS
-// console anyway, and a Debug shell attached for diagnosis sees every line.
+// from error handlers). Gated like the residency table: dev browsers plus every
+// iOS WebKit host under diagnosis (Safari and other iOS browsers included, not
+// just the native shell: the WebContent kills this exists to trace hit them
+// identically, and having zero console evidence from the plain-browser population
+// is exactly what let a Safari-only regression of this kind go undiagnosed). The
+// native Release shell suppresses the JS console anyway, so this costs it
+// nothing; on iOS Safari the ~700 console lines per entry are the trade for
+// finally having sequencing evidence when a player reports a crash there.
 function loadDiagEnabled(): boolean {
   // Vitest sets DEV too, and every jsdom texture fetch FAILs, so a suite that
   // touches the loader emits hundreds of these lines; that console volume is
@@ -137,7 +142,7 @@ function loadDiagEnabled(): boolean {
   // flake on the release gate). Tests never read this diagnostic: keep it out
   // of the test env entirely.
   if (import.meta.env.TEST) return false;
-  return import.meta.env.DEV || GFX.nativeIosMemoryProfile;
+  return import.meta.env.DEV || GFX.iosMemoryProfile;
 }
 let loadDiagSeq = 0;
 function diagStart(kind: string, resolved: string): number {
@@ -420,6 +425,52 @@ export function loadTexture(
       },
     );
     texCache.set(key, p);
+  }
+  return p;
+}
+
+/** Standalone KTX2/Basis image (KHR_texture_basisu-style compressed atlas):
+ *  stays GPU-compressed in memory instead of decoding to a full RGBA bitmap,
+ *  the same win GLB-embedded textures already get. Shares the one ktx2Loader()
+ *  transcoder singleton the GLB parse path attaches to GLTFLoader, so this pays
+ *  no extra transcoder init. Colorspace and mip levels are baked into the KTX2
+ *  container at compress time (scripts/assets/compress_standalone_textures.mjs),
+ *  so unlike loadTexture there is no `srgb` option to pass. */
+export function loadKtx2Texture(url: string): Promise<THREE.CompressedTexture> {
+  const resolved = assetUrl(url);
+  let p = ktx2TexCache.get(resolved);
+  if (!p) {
+    const startedAt = assetLoadStarted();
+    p = scheduleLoad(textureQueue, () => {
+      const seq = diagStart('ktx2tex', resolved);
+      return withRetry(
+        () =>
+          new Promise<THREE.CompressedTexture>((resolve, reject) => {
+            ktx2Loader().load(resolved, resolve, undefined, () =>
+              reject(new Error(`ktx2 texture load failed: ${url}`)),
+            );
+          }),
+      ).then(
+        (tex) => {
+          diagSettle(seq, 'ktx2tex', resolved, true);
+          return tex;
+        },
+        (err: unknown) => {
+          diagSettle(seq, 'ktx2tex', resolved, false);
+          throw err;
+        },
+      );
+    }).then(
+      (tex) => {
+        recordAssetLoad('texture', resolved, startedAt);
+        return tex;
+      },
+      (err: unknown) => {
+        recordAssetLoad('texture', resolved, startedAt, true);
+        throw err;
+      },
+    );
+    ktx2TexCache.set(resolved, p);
   }
   return p;
 }

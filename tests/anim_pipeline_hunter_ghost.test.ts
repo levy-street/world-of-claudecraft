@@ -133,8 +133,12 @@ describe('ghost family bespoke attack (issue #2889 follow-up batch)', () => {
     // originally (batch 1's own pin); this batch migrates one more
     // (mob_ghost), and the nightkin family's own follow-up migration to
     // NIGHTKIN_FLOATING (tests/anim_pipeline_warlock_nightkin.test.ts) takes
-    // one more still, leaving 6 remaining direct `clips: FLOATING,` usages.
+    // one more, and the round-2 glub migration (tests/anim_pipeline_glub.test.ts)
+    // takes one more still, and the flying demon's own migration to
+    // DEMON_FLYING_FLOATING (tests/anim_pipeline_shaman_demonflying.test.ts)
+    // takes one more still, leaving 4 remaining direct `clips: FLOATING,`
+    // usages.
     const remaining = [...MANIFEST_SRC.matchAll(/clips: FLOATING,/g)].length;
-    expect(remaining).toBe(6);
+    expect(remaining).toBe(4);
   });
 });

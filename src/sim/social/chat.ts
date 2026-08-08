@@ -19,6 +19,7 @@ import { CLASSES, zoneAt } from '../data';
 import * as deedsMod from '../deeds';
 import { handleDevChat } from '../dev_commands';
 import { graveyardReadout } from '../entity_roster';
+import { livePlaytimeSeconds } from '../playtime';
 import {
   type AwayStatus,
   JOINABLE_CHANNELS,
@@ -475,7 +476,7 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
   // resets on relog), this figure only ever grows while the character is
   // actually in the world.
   if (/^\/playtime(?:\s|$)/i.test(raw)) {
-    const secs = Math.max(0, Math.floor(r.meta.totalPlayedSeconds + (ctx.time - r.meta.joinedAt)));
+    const secs = Math.max(0, Math.floor(livePlaytimeSeconds(r.meta, ctx.time)));
     const d = Math.floor(secs / 86400);
     const h = Math.floor((secs % 86400) / 3600);
     const m = Math.floor((secs % 3600) / 60);

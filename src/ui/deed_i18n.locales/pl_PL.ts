@@ -33,19 +33,19 @@ export const table: DeedLocaleTable = {
     desc: 'Oczyść Szczelinę rangi S, najtrudniejszy poziom, jaki może wygenerować portal Szczeliny.',
   },
   pvp_honor_sergeant: {
-    name: 'Sierżant',
+    name: 'Łamacz szyków',
     desc: 'Zdobądź 10 000 Honoru w ciągu całej kariery. Wydawanie go nigdy nie kosztuje cię rangi.',
-    title: 'Sierżant',
+    title: 'Łamacz szyków',
   },
   pvp_honor_knight_lieutenant: {
-    name: 'Rycerz-Porucznik',
+    name: 'Pustoszyciel pól',
     desc: 'Zdobądź 40 000 Honoru w ciągu całej kariery, mając za sobą sezon prawdziwej wojny.',
-    title: 'Rycerz-Porucznik',
+    title: 'Pustoszyciel pól',
   },
   pvp_honor_field_marshal: {
-    name: 'Marszałek Polny',
+    name: 'Ukoronowany wojną',
     desc: 'Zdobądź 150 000 Honoru w ciągu całej kariery. Rzadkość na każdym królestwie, i tak powinno być.',
-    title: 'Marszałek Polny',
+    title: 'Ukoronowany wojną',
   },
   chr_drakemaw_broodlord: {
     name: 'Pogromca Wylęgu',

@@ -213,8 +213,13 @@ export interface GfxSettings {
    * can see or react to: every knob here is cosmetic sharpness only (fairness rule).
    */
   readonly constrainedMemory: boolean;
-  /** Packaged iOS WKWebView profile that bounds retained GPU resources independently of FPS. */
-  readonly nativeIosMemoryProfile: boolean;
+  /**
+   * Every iOS WebKit host (Mobile Safari, any other iOS browser, and the packaged native
+   * WKWebView shell) shares the same WebContent process and its memory ceiling, so this
+   * bounds retained GPU resources independently of FPS on ALL of them, not just the native
+   * app. Set purely from `platform === 'ios'`; it does not require `nativeApp`.
+   */
+  readonly iosMemoryProfile: boolean;
   /** Global cap for inactive skinned character rigs retained for reuse. */
   readonly maxPooledCharacterVisuals: number;
   /** Global cap for inactive ground-object views (harvest nodes, loot, quest pickups) retained for reuse. */
@@ -927,9 +932,22 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
   // WKWebView's WebContent/GPU process has a hard resident-memory ceiling which is independent
   // of frame rate. The runtime governor can reduce draw cost after a slow submit, but it cannot
   // reclaim already-created textures, programs, materials, or rigs. Keep the player's selected
-  // tier (and its density/VFX progression) while routing the packaged iOS app through the
+  // tier (and its density/VFX progression) while routing every iOS WebKit host through the
   // bounded-residency material/world path from scene construction onward.
-  const nativeIosMemoryProfile = hints?.nativeApp === true && hints.platform === 'ios';
+  //
+  // This used to require hints.nativeApp === true, restricting the whole profile (render
+  // settings AND the streamed/deferred asset-loading paths it also gates: see
+  // characters/assets.ts streamedUrls/eagerSkinAtlases, foliage.ts/props.ts extractParts) to
+  // the packaged app. Mobile Safari and every other iOS browser run under the SAME WebKit
+  // engine and the SAME per-process WebContent memory ceiling (see safeStartupGraphicsPreset's
+  // isIosWebkit and the sibling tightMemoryProfile below, both of which already treated Safari
+  // and the native shell identically): only two narrow signals (nativeApp, or a stamped
+  // tightMemory marker) ever routed a plain-browser iOS session through the bounded path, so an
+  // un-flagged iPhone (e.g. any iPhone with more than the 4 GB-class RAM the tightMemory marker
+  // requires, which is most modern iPhones) playing in Safari got the full eager/unbounded
+  // residency profile and crashed under ordinary play exactly the way the packaged app used to
+  // before this profile existed for it.
+  const iosMemoryProfile = hints?.platform === 'ios';
   // The stricter 4 GB-class rung. The native shell can measure physicalMemory,
   // while either native WKWebView or iOS Safari can stamp the same marker after
   // a foreground entry kill. Both WebKit hosts share the WebContent ceiling.
@@ -939,7 +957,7 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
   // texels, MSAA, and DPR are cosmetic sharpness only, so this never crosses the
   // graphics-settings fairness line.
   const constrainedMemory =
-    nativeIosMemoryProfile ||
+    iosMemoryProfile ||
     isConstrainedBrowser({
       deviceMemory: hints?.deviceMemory,
       maxTouchPoints: hints?.maxTouchPoints ?? 0,
@@ -948,7 +966,7 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
     });
   const aaPolicy = gfxAaPolicy(tier, {
     constrainedMemory,
-    nativeIosMemoryProfile,
+    iosMemoryProfile,
     tightMemory: tightMemoryProfile,
   });
   let settings: GfxSettings = {
@@ -959,17 +977,17 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
     bucketBaselines: bucketBaselines(bucketBands),
     budget: GFX_BUDGETS[tier],
     autoGovernor: shouldUseAutoGovernor(tier, hints?.search ?? ''),
-    composer: !nativeIosMemoryProfile && gfxTierAtLeast(tier, 'high'),
-    gradePass: !nativeIosMemoryProfile && gfxTierAtLeast(tier, 'medium'),
+    composer: !iosMemoryProfile && gfxTierAtLeast(tier, 'high'),
+    gradePass: !iosMemoryProfile && gfxTierAtLeast(tier, 'medium'),
     // N8AO runs on the composer tiers: half-res + Low quality on high keeps
     // it ~1ms-class on real GPUs; ultra and insane get full-res Medium
-    ao: !nativeIosMemoryProfile && gfxTierAtLeast(tier, 'high'),
+    ao: !iosMemoryProfile && gfxTierAtLeast(tier, 'high'),
     msaaSamples: aaPolicy.msaaSamples,
     pixelRatioCap: aaPolicy.pixelRatioCap,
     // Shadows are cosmetic and duplicate the visible scene draw. Both constrained browsers and
-    // the stricter native-iOS residency profile remove that duplicate pass.
+    // the stricter iOS WebKit residency profile remove that duplicate pass.
     dynamicShadows: tier !== 'low' && !constrainedMemory,
-    shadowMap: nativeIosMemoryProfile
+    shadowMap: iosMemoryProfile
       ? 1024
       : tier === 'low'
         ? 2048
@@ -980,24 +998,24 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
           : constrainedMemory
             ? 2048
             : 4096,
-    standardMaterials: !nativeIosMemoryProfile && gfxTierAtLeast(tier, 'medium'),
+    standardMaterials: !iosMemoryProfile && gfxTierAtLeast(tier, 'medium'),
     // Round-10 detail-knob defaults (see the interface comment): High takes the
     // existing Advanced-Medium profile to bound its steady cost (basic worn
     // surface, reduced carpet, cavity-only relief). Ultra retains the full
     // 3-tap layers; Insane remains the 4-tap everything-on showcase.
-    surfaceDetail: !nativeIosMemoryProfile && gfxTierAtLeast(tier, 'high'),
+    surfaceDetail: !iosMemoryProfile && gfxTierAtLeast(tier, 'high'),
     surfaceDetailTaps: tier === 'insane' ? 4 : gfxTierAtLeast(tier, 'ultra') ? 3 : 0,
     surfaceDetailClampK: tier === 'insane' ? 1 : tier === 'ultra' ? 0.85 : 0,
-    bladeCarpetRadius: nativeIosMemoryProfile
+    bladeCarpetRadius: iosMemoryProfile
       ? 0
       : gfxTierAtLeast(tier, 'ultra')
         ? 34
         : tier === 'high'
           ? 24
           : 0,
-    cliffScree: !nativeIosMemoryProfile && gfxTierAtLeast(tier, 'ultra'),
-    canopyDetail: !nativeIosMemoryProfile && gfxTierAtLeast(tier, 'ultra'),
-    terrainRelief: nativeIosMemoryProfile
+    cliffScree: !iosMemoryProfile && gfxTierAtLeast(tier, 'ultra'),
+    canopyDetail: !iosMemoryProfile && gfxTierAtLeast(tier, 'ultra'),
+    terrainRelief: iosMemoryProfile
       ? 0
       : gfxTierAtLeast(tier, 'ultra')
         ? 3
@@ -1006,16 +1024,16 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
           : 0,
     aoFullRes: gfxTierAtLeast(tier, 'ultra'),
     smaa: aaPolicy.postAa === 'smaa',
-    bloom: !nativeIosMemoryProfile && gfxTierAtLeast(tier, 'high'),
+    bloom: !iosMemoryProfile && gfxTierAtLeast(tier, 'high'),
     terrainCastShadows: tier !== 'low' && !constrainedMemory,
-    lowPlus: tier === 'low' || nativeIosMemoryProfile,
+    lowPlus: tier === 'low' || iosMemoryProfile,
     // Tree and rock placement must match across clients because those decorations
     // occlude world sightlines. Keep the constrained profile on the full placement
     // set and reduce only non-occluding grass below.
     leanFoliage: tier === 'low' || (tier === 'medium' && weakIntegratedGpu),
     grassRadius: tightMemoryProfile
       ? 34
-      : nativeIosMemoryProfile
+      : iosMemoryProfile
         ? 52
         : tier === 'low'
           ? 80
@@ -1026,7 +1044,7 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
             : 82,
     grassStep: tightMemoryProfile
       ? 3.8
-      : nativeIosMemoryProfile
+      : iosMemoryProfile
         ? 2.75
         : tier === 'low'
           ? 2.05
@@ -1035,7 +1053,7 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
               ? 2.35
               : 2.0
             : 1.8,
-    farGrassDensityFloor: nativeIosMemoryProfile
+    farGrassDensityFloor: iosMemoryProfile
       ? 0.5
       : constrainedMemory
         ? 0.55
@@ -1048,11 +1066,11 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
               : tier === 'ultra'
                 ? 0.75
                 : 0.8,
-    terrainSplat: !nativeIosMemoryProfile && gfxTierAtLeast(tier, 'medium'),
+    terrainSplat: !iosMemoryProfile && gfxTierAtLeast(tier, 'medium'),
     windSway: true,
-    maxPointLights: nativeIosMemoryProfile ? 2 : constrainedMemory ? 3 : 6,
+    maxPointLights: iosMemoryProfile ? 2 : constrainedMemory ? 3 : 6,
     constrainedMemory,
-    nativeIosMemoryProfile,
+    iosMemoryProfile,
     tightMemory: tightMemoryProfile,
     // Every OTHER budget in this function falls back through constrainedMemory (the
     // cross-platform touch/coarse-pointer/narrow-viewport/deviceMemory detector, see
@@ -1067,7 +1085,7 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
     // GPU skeleton re-upload hitch pooling exists for, without growing without bound.
     maxPooledCharacterVisuals: tightMemoryProfile
       ? 4
-      : nativeIosMemoryProfile
+      : iosMemoryProfile
         ? 6
         : constrainedMemory
           ? 24
@@ -1082,7 +1100,7 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
     // maxPooledCharacterVisuals above; desktop keeps the historical unbounded pool.
     maxPooledObjects: tightMemoryProfile
       ? 4
-      : nativeIosMemoryProfile
+      : iosMemoryProfile
         ? 6
         : constrainedMemory
           ? 24
@@ -1091,7 +1109,7 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
     // memory profiles and the low tier (which includes software GL) opt out and
     // keep the straight-to-frozen far LOD.
     farCharacterAnimScale:
-      tier === 'low' || constrainedMemory || nativeIosMemoryProfile ? 1 : FAR_ANIM_RANGE_SCALE_MAX,
+      tier === 'low' || constrainedMemory || iosMemoryProfile ? 1 : FAR_ANIM_RANGE_SCALE_MAX,
     vistaTier: tier,
     waterTier: tier,
   };

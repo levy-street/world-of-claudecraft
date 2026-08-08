@@ -33,19 +33,19 @@ export const table: DeedLocaleTable = {
     desc: 'Completa uno Squarcio di rango S, il livello più difficile che un portale di Squarcio può generare.',
   },
   pvp_honor_sergeant: {
-    name: 'Sergente',
+    name: 'Spezzalinee',
     desc: 'Guadagna 10.000 Onore nel corso della tua vita. Spenderlo non ti farà mai perdere il grado.',
-    title: 'Sergente',
+    title: 'Spezzalinee',
   },
   pvp_honor_knight_lieutenant: {
-    name: 'Cavaliere-Luogotenente',
+    name: 'Devastacampi',
     desc: 'Guadagna 40.000 Onore nel corso della tua vita, una stagione di guerra vera alle spalle.',
-    title: 'Cavaliere-Luogotenente',
+    title: 'Devastacampi',
   },
   pvp_honor_field_marshal: {
-    name: 'Maresciallo di Campo',
+    name: 'Coronato dalla guerra',
     desc: 'Guadagna 150.000 Onore nel corso della tua vita. Raro in qualsiasi reame, ed è giusto che sia così.',
-    title: 'Maresciallo di Campo',
+    title: 'Coronato dalla guerra',
   },
   chr_drakemaw_broodlord: {
     name: 'Spezzacovata',

@@ -1000,13 +1000,21 @@ export interface WeaponProc {
   effects: WeaponProcEffect[];
 }
 
-// Held-in-offhand caster stat stick (orb/tome): no armor class, no weapon damage,
-// equips in the offhand slot by literal requiredClass (equipment_rules).
+// Offhand-slot stat stick with no armor class and no weapon damage (a caster
+// orb/tome, a hunter's quiver): equips in the offhand slot by literal
+// requiredClass (equipment_rules).
 export interface HeldOffhandItemDef extends BaseItemDef {
   kind: 'held_offhand';
   slot: 'offhand';
   armorType?: never;
   weapon?: never;
+  // Whether the item takes up a HAND, not just the offhand slot. Defaults to
+  // true (an orb or tome is held). A quiver is WORN, slung on the back, so it
+  // sets false and the two-hand exclusion never applies to it: see
+  // occupiesHand + displacedSlotForEquip in equipment_rules.ts. Anything false
+  // here also budgets on the lighter worn line (item_budget.ts), because a slot
+  // you keep alongside a two-hander is worth more than one you trade it for.
+  occupiesHand?: false;
 }
 
 export interface OtherItemDef extends BaseItemDef {

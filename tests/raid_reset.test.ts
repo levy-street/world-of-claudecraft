@@ -3,8 +3,11 @@ import {
   DEFAULT_RAID_RESET_TIME_ZONE,
   isSupportedTimeZone,
   nextRaidResetMs,
+  RAID_RESET_HOUR,
+  resetDayKey,
 } from '../server/raid_reset';
 import { resolveRaidResetTimeZone } from '../server/realm';
+import { DAILY_RESET_HOUR } from '../src/game/utc_day';
 
 // The daily raid reset lands at 03:00 (3 AM, the classic daily-reset hour) in the realm's
 // civil time zone (default US Eastern, America/New_York), so a realm shares one
@@ -135,6 +138,63 @@ describe('isSupportedTimeZone', () => {
   it('rejects unknown or empty zones', () => {
     expect(isSupportedTimeZone('Not/AZone')).toBe(false);
     expect(isSupportedTimeZone('')).toBe(false);
+  });
+});
+
+describe('resetDayKey: the ONE daily boundary a realm turns over on', () => {
+  it('holds one key across a whole evening of play, where midnight UTC split it', () => {
+    // The reported bug, as instants. Both are 2026-08-07 in US Pacific, either
+    // side of midnight UTC (5 PM Pacific in August), and the player won a
+    // battleground before the first and saw "first win of the day" after the
+    // second.
+    const morning = Date.UTC(2026, 7, 7, 17, 0, 0); // 10:00 Pacific, 13:00 Eastern
+    const evening = Date.UTC(2026, 7, 8, 1, 11, 0); // 18:11 Pacific, 21:11 Eastern
+
+    expect(resetDayKey(morning)).toBe(resetDayKey(evening));
+    // ...and it is a real regression test only because the OLD key differed.
+    const utcKey = (ms: number) => new Date(ms).toISOString().slice(0, 10);
+    expect(utcKey(morning)).not.toBe(utcKey(evening));
+  });
+
+  it('turns over exactly at the reset hour, not at local midnight', () => {
+    // 02:59 and 03:00 Eastern on the same civil date: the reset hour is the cut,
+    // so the earlier instant still belongs to the PREVIOUS day's window.
+    const beforeReset = Date.UTC(2026, 7, 7, 6, 59, 0); // 02:59 Eastern (EDT, UTC-4)
+    const afterReset = Date.UTC(2026, 7, 7, 7, 0, 0); // 03:00 Eastern
+    expect(resetDayKey(beforeReset)).toBe('2026-08-06');
+    expect(resetDayKey(afterReset)).toBe('2026-08-07');
+  });
+
+  it('rolls the month and the year back across an edge', () => {
+    // 01:00 Eastern on the 1st belongs to the last day of the previous month,
+    // and on Jan 1 to the previous YEAR. Date.UTC owns that arithmetic.
+    expect(resetDayKey(Date.UTC(2026, 7, 1, 5, 0, 0))).toBe('2026-07-31');
+    expect(resetDayKey(Date.UTC(2026, 0, 1, 6, 0, 0))).toBe('2025-12-31');
+  });
+
+  it('agrees with the lockout boundary: the key changes exactly when a reset passes', () => {
+    // The whole point of sharing RAID_RESET_HOUR. Step across the next raid
+    // reset and the day key must change on the same instant the lockout expires.
+    const now = Date.UTC(2026, 7, 7, 20, 0, 0);
+    const reset = nextRaidResetMs(now);
+    expect(resetDayKey(reset - 1)).toBe(resetDayKey(now));
+    expect(resetDayKey(reset)).not.toBe(resetDayKey(now));
+  });
+
+  it('is pure and zone-parameterized, like the rest of this module', () => {
+    const now = Date.UTC(2026, 7, 8, 1, 11, 0);
+    expect(resetDayKey(now)).toBe(resetDayKey(now));
+    // 18:11 Pacific on the 7th is already 10:11 on the 8th in Tokyo, past its
+    // own 3 AM, so a realm in that zone is legitimately a day ahead.
+    expect(resetDayKey(now, 'Asia/Tokyo')).toBe('2026-08-08');
+    expect(resetDayKey(now, DEFAULT_RAID_RESET_TIME_ZONE)).toBe('2026-08-07');
+  });
+
+  it('shares its reset hour with the offline client, which has no realm zone', () => {
+    // Offline there is no realm, so src/game/utc_day.ts applies the same rule in
+    // the player's OWN local zone. The hour is the promise both make ("a daily
+    // never turns over mid-evening"), so a drift between them is a bug.
+    expect(DAILY_RESET_HOUR).toBe(RAID_RESET_HOUR);
   });
 });
 

@@ -143,6 +143,7 @@ function makeCtx() {
     delveRuns: [],
     delvePetStash: new Map(),
     utcDay: '',
+    resetDay: '',
     pendingMobRespawns: [],
     partyInvites: new Map(),
     readyChecks: new Map(),

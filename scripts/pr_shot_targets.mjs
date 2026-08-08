@@ -3588,11 +3588,17 @@ export const TARGETS = [
   },
   {
     key: 'hunter-quiver-paperdoll',
-    label: 'Hunter paperdoll with a quiver in the off-hand',
+    label: 'Hunter paperdoll: a two-hander and a quiver worn together',
     // Quivers are the first items that put anything in a hunter's off-hand, so
     // the paperdoll is the view that shows the change. Keyed on the quiver
     // records themselves rather than a ui/ path: the diff is content-only.
-    when: ['content/zone3', 'content/items'],
+    //
+    // The recipe equips a TWO-HANDER before the quiver on purpose. A quiver on
+    // its own paints the same paperdoll either way, so it cannot show the
+    // two-hand exclusion: on the base tree the quiver benches the greatblade and
+    // the main hand shoots up EMPTY, which is the reported bug. Both slots
+    // filled is the fix.
+    when: ['content/zone3', 'content/items', 'equipment_rules', 'item_budget'],
     variants: [
       { key: 'desktop', charClass: 'hunter', charName: 'Fletcher' },
       { key: 'mobile', mobile: true, charClass: 'hunter', charName: 'Fletcher' },
@@ -3611,11 +3617,18 @@ export const TARGETS = [
           'cragmaw_huntquiver',
           'gravewyrm_bone_quiver',
           'direfang_quiver',
+          'direfang_greatblade',
         ]) {
           try {
             sim?.addItem(id, 1);
           } catch {}
         }
+        // Two-hander FIRST, then the quiver: this is the exact order a player
+        // hits the bug in, and the order that leaves the main hand empty on the
+        // base tree.
+        try {
+          sim?.equipItem('direfang_greatblade');
+        } catch {}
         try {
           sim?.equipItem('direfang_quiver');
         } catch {}

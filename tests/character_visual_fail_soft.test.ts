@@ -15,6 +15,7 @@ function mockGltfLoad(): void {
     loadGltf: vi.fn(() => Promise.resolve({ scene: {}, animations: [] })),
     loadHdr: vi.fn(() => new Promise(() => undefined)),
     loadTexture: vi.fn(() => new Promise(() => undefined)),
+    loadKtx2Texture: vi.fn(() => new Promise(() => undefined)),
     releaseGltf: vi.fn(),
   }));
 }
@@ -70,6 +71,7 @@ describe('createCharacterVisual happy path (issue 2079)', () => {
       loadGltf: vi.fn(() => Promise.resolve(stubGltf())),
       loadHdr: vi.fn(() => new Promise(() => undefined)),
       loadTexture: vi.fn(() => new Promise(() => undefined)),
+      loadKtx2Texture: vi.fn(() => new Promise(() => undefined)),
       releaseGltf: vi.fn(),
     }));
     const errSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
@@ -105,6 +107,7 @@ describe('CharacterVisual dispose() clears every cosmetic-overlay material cache
       loadGltf: vi.fn(() => Promise.resolve(stubGltf())),
       loadHdr: vi.fn(() => new Promise(() => undefined)),
       loadTexture: vi.fn(() => new Promise(() => undefined)),
+      loadKtx2Texture: vi.fn(() => new Promise(() => undefined)),
       releaseGltf: vi.fn(),
     }));
     const errSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);

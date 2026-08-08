@@ -33,19 +33,19 @@ export const table: DeedLocaleTable = {
     desc: 'Supera una Brecha de rango S, el nivel más difícil que puede abrir un portal de Brecha.',
   },
   pvp_honor_sergeant: {
-    name: 'Sargento',
+    name: 'Rompefilas',
     desc: 'Gana 10.000 de honor a lo largo de tu vida. Gastarlo nunca te cuesta el rango.',
-    title: 'Sargento',
+    title: 'Rompefilas',
   },
   pvp_honor_knight_lieutenant: {
-    name: 'Caballero Teniente',
+    name: 'Asolacampos',
     desc: 'Gana 40.000 de honor a lo largo de tu vida, toda una temporada de guerra real a tus espaldas.',
-    title: 'Caballero Teniente',
+    title: 'Asolacampos',
   },
   pvp_honor_field_marshal: {
-    name: 'Mariscal de Campo',
+    name: 'Coronado por la guerra',
     desc: 'Gana 150.000 de honor a lo largo de tu vida. Poco común en cualquier reino, y así debe ser.',
-    title: 'Mariscal de Campo',
+    title: 'Coronado por la guerra',
   },
   chr_drakemaw_broodlord: {
     name: 'Rompenidos',

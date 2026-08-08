@@ -321,6 +321,7 @@ import {
 import * as petAi from './pet/pet_ai';
 import * as petCommands from './pet/pet_commands';
 import type { MatchPetSnapshot } from './pet/pet_match_return';
+import { floorHeightAt } from './physics/character';
 import {
   isSwimming as isSwimmingImpl,
   moveSpeedMult as moveSpeedMultImpl,
@@ -329,6 +330,7 @@ import {
   stepPlayerMotion,
   swimSurfaceY,
 } from './player_motion';
+import { livePlaytimeSeconds } from './playtime';
 import {
   type ArchetypeState,
   acceptArchetypeQuest as acceptArchetypeQuestImpl,
@@ -2003,6 +2005,13 @@ export class Sim {
   // "no calendar known" (headless/replay), the daily window then never rolls over,
   // keeping same-seed runs reproducible. Tests may set it to pin a date.
   utcDay = '';
+  // The daily-reset WINDOW key ('YYYY-MM-DD' of the reset that opened it), set by
+  // the host each tick alongside utcDay. Every daily rollover reads THIS, not the
+  // calendar date: the server derives it from the realm's own 3 AM reset boundary
+  // (server/raid_reset.ts `resetDayKey`), the offline client from the player's
+  // local one, so a daily never rolls over mid-evening the way midnight UTC did.
+  // Empty string = "no calendar known" (headless/replay), same contract as utcDay.
+  resetDay = '';
   // the World Market (the Merchant's auction house): the Market instance owns the
   // listing book, per-seller collections, the id counter, and the Merchant entity
   // id. Constructed in the ctor after the SimContext (it consumes the seam); Sim
@@ -2789,7 +2798,12 @@ export class Sim {
       counters: freshCounters(),
       autoEquip: opts?.autoEquip ?? false,
       joinedAt: this.time,
-      totalPlayedSeconds: Math.max(0, savedState?.totalPlayedSeconds ?? 0),
+      // Finite-clamped like the bg standings below: Math.max passes NaN
+      // through, and a corrupt non-finite save would otherwise poison every
+      // future fold and ship null on the ptime wire.
+      totalPlayedSeconds: Number.isFinite(savedState?.totalPlayedSeconds)
+        ? Math.max(0, savedState?.totalPlayedSeconds as number)
+        : 0,
       lastActiveTick: this.tickCount,
       pendingUnstuck: null,
       arenaRating: savedArena1v1.rating,
@@ -3849,9 +3863,9 @@ export class Sim {
       unlockedMilestones: [...meta.unlockedMilestones],
       restedXp: meta.restedXp,
       // Fold this session's elapsed time into the persisted baseline (see
-      // PlayerMeta.totalPlayedSeconds); /playtime reads the running total the
-      // same way without waiting for a save.
-      totalPlayedSeconds: meta.totalPlayedSeconds + Math.max(0, this.time - meta.joinedAt),
+      // PlayerMeta.totalPlayedSeconds); /playtime and the playtimeSeconds
+      // facade read the running total the same way without waiting for a save.
+      totalPlayedSeconds: livePlaytimeSeconds(meta, this.time),
       // Legacy dual-write plus the current key, both off the one fold above
       // (separate objects on purpose, so no caller can alias one through the
       // other).
@@ -4475,6 +4489,14 @@ export class Sim {
   get restedXp(): number {
     return this.primary.restedXp;
   }
+  // IWorldProgressionXp.playtimeSeconds: the running lifetime played total
+  // (persisted baseline + this session's elapsed sim time), the same figure
+  // /playtime reports and serializeCharacter folds at save. Sim-clock derived,
+  // so it stays deterministic in every host; offline (no save loads a
+  // baseline) it equals this session's time in world.
+  get playtimeSeconds(): number {
+    return livePlaytimeSeconds(this.primary, this.time);
+  }
   get prestigeRank(): number {
     return this.primary.prestigeRank;
   }
@@ -4963,6 +4985,9 @@ export class Sim {
       },
       get delvePetStash() {
         return sim.delvePetStash;
+      },
+      get resetDay() {
+        return sim.resetDay;
       },
       get utcDay() {
         return sim.utcDay;
@@ -7759,7 +7784,22 @@ export class Sim {
     }
     e.pos.x = bestX;
     e.pos.z = bestZ;
-    const g = groundHeight(bestX, bestZ, this.cfg.seed);
+    // The floor a body rests on, which for a PLAYER includes the standable prop
+    // top underfoot, not just the terrain. Feared players are moved through here
+    // and return early from the player step, so `stepPlayerMotion` and its whole
+    // vertical pass never run for the duration: snapping to raw terrain dropped
+    // anyone feared off a rampart deck several yards INSIDE the rampart, where
+    // swept collision then refused every direction once the fear ended (from
+    // inside a volume every direction is a surface). Same expression the vertical
+    // pass and climb.ts already land against.
+    //
+    // Scoped to players deliberately: mobs and pets keep the terrain snap they
+    // have always had, so their movement, and the parity draw order with it, is
+    // untouched.
+    const g =
+      e.kind === 'player'
+        ? floorHeightAt(this.cfg.seed, bestX, bestZ, BODY_RADIUS, e.pos.y + 1e-3)
+        : groundHeight(bestX, bestZ, this.cfg.seed);
     e.pos.y =
       canSwim && g < waterLevelAt(bestX, bestZ, this.cfg.seed) - SWIM_DEPTH
         ? swimSurfaceY(bestX, bestZ, this.cfg.seed)

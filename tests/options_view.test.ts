@@ -509,6 +509,7 @@ const GENERAL_KEYS = [
   'showDevBadges',
   'showWalletOnCharacterScreen',
   'showWalletOnPlayerCard',
+  'showPlaytime',
   'showDailyRewardsChest',
   'showItemLevel',
   'showOwnNameplate',

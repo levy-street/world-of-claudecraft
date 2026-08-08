@@ -110,7 +110,6 @@ function workOrdersSection(): string {
 }
 
 export function economyDetailHtml(): string {
-  const e = GUIDE_PROF_ECONOMY;
   return `
     <article class="guide-article guide-prof-page">
       <p class="guide-section-more"><a href="${esc(hrefFor('professions'))}">${esc(t('guide.profPages.back'))}</a></p>
@@ -126,8 +125,13 @@ export function economyDetailHtml(): string {
         ${paras('guide.profPages.econ.marketBody')}
       </section>
       ${workOrdersSection()}
+      <section class="guide-block" id="prof-order-board">
+        <h2>${esc(t('guide.profPages.econ.orderBoardHeading'))}</h2>
+        ${paras('guide.profPages.econ.orderBoardBody')}
+      </section>
       <section class="guide-block" id="prof-commissions">
         <h2>${esc(t('guide.profPages.econ.commissionsHeading'))}</h2>
+        ${paras('guide.profPages.econ.commissionsBoardNote')}
         ${paras('guide.profPages.econ.commissionsBody')}
       </section>
       <section class="guide-block" id="prof-provenance">

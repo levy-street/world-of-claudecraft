@@ -12,15 +12,32 @@ import {
 const publicDir = path.join(__dirname, '..', 'public');
 
 function assetPath(url: string): string {
-  return path.join(publicDir, ...url.split('/').filter(Boolean));
+  return path.join(publicDir, ...url.split('?')[0].split('/').filter(Boolean));
+}
+
+/** The `?v=<hash12>` query every URL below carries: first 12 hex chars of the
+ * file's sha256, same convention as the sampled SFX manifest
+ * (scripts/sfx/manifest.mjs). server/static_cache.ts trusts an exact regex
+ * match to cache the file immutably, so this suite is the guard rail that
+ * catches a swapped-in remaster whose URL hash was not updated to match
+ * (recompute via `node scripts/render_music.mjs --hash <file>`). */
+function assetHash(url: string): string {
+  return createHash('sha256')
+    .update(readFileSync(assetPath(url)))
+    .digest('hex')
+    .slice(0, 12);
 }
 
 describe('remastered soundtrack catalog', () => {
-  it('maps every routable zone to a committed mp3 under public/audio/music', () => {
+  it('maps every routable zone to a committed, content-hash-versioned mp3 under public/audio/music', () => {
     for (const [zone, url] of Object.entries(ZONE_STREAM_URLS)) {
       if (url === null) continue;
-      expect(url, `zone '${zone}'`).toMatch(/^\/audio\/music\/[a-z0-9_]+\.mp3$/);
+      expect(url, `zone '${zone}'`).toMatch(/^\/audio\/music\/[a-z0-9_]+\.mp3\?v=[a-f0-9]{12}$/);
       expect(existsSync(assetPath(url)), `missing asset for zone '${zone}': ${url}`).toBe(true);
+      const [, requestedHash] = url.split('?v=');
+      expect(requestedHash, `stale cache-bust hash for zone '${zone}': ${url}`).toBe(
+        assetHash(url),
+      );
     }
   });
 
@@ -65,7 +82,8 @@ describe('remastered soundtrack catalog', () => {
     } as const satisfies Partial<Record<MusicZone, readonly [string, string]>>;
 
     for (const [zone, [url, expectedHash]] of Object.entries(supplied)) {
-      expect(ZONE_STREAM_URLS[zone as MusicZone], zone).toBe(url);
+      const versionedUrl = `${url}?v=${expectedHash.slice(0, 12)}`;
+      expect(ZONE_STREAM_URLS[zone as MusicZone], zone).toBe(versionedUrl);
       const hash = createHash('sha256')
         .update(readFileSync(assetPath(url)))
         .digest('hex');
@@ -74,16 +92,18 @@ describe('remastered soundtrack catalog', () => {
   });
 
   it('keeps explicit stand-ins only for new zones without supplied remasters', () => {
-    expect(ZONE_STREAM_URLS.dusk).toBe('/audio/music/marsh.mp3');
-    expect(ZONE_STREAM_URLS.ember).toBe('/audio/music/peaks.mp3');
-    expect(ZONE_STREAM_URLS.haunt).toBe('/audio/music/marsh.mp3');
+    expect(ZONE_STREAM_URLS.dusk).toBe(ZONE_STREAM_URLS.marsh);
+    expect(ZONE_STREAM_URLS.ember).toBe(ZONE_STREAM_URLS.peaks);
+    expect(ZONE_STREAM_URLS.haunt).toBe(ZONE_STREAM_URLS.marsh);
   });
 
   it('ships the two battle themes and they exist on disk', () => {
     expect(COMBAT_STREAM_URLS).toHaveLength(2);
     for (const url of COMBAT_STREAM_URLS) {
-      expect(url).toMatch(/^\/audio\/music\/combat_[0-9]+\.mp3$/);
+      expect(url).toMatch(/^\/audio\/music\/combat_[0-9]+\.mp3\?v=[a-f0-9]{12}$/);
       expect(existsSync(assetPath(url)), `missing combat asset: ${url}`).toBe(true);
+      const [, requestedHash] = url.split('?v=');
+      expect(requestedHash, `stale cache-bust hash: ${url}`).toBe(assetHash(url));
     }
   });
 

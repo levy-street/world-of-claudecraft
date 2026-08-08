@@ -33,19 +33,19 @@ export const table: DeedLocaleTable = {
     desc: 'Rensa en reva av grad S, den svåraste graden en revportal kan skapa.',
   },
   pvp_honor_sergeant: {
-    name: 'Sergeant',
+    name: 'Linjebrytare',
     desc: 'Tjäna in 10 000 heder under din livstid. Att spendera den kostar dig aldrig rangen.',
-    title: 'Sergeant',
+    title: 'Linjebrytare',
   },
   pvp_honor_knight_lieutenant: {
-    name: 'Riddarlöjtnant',
+    name: 'Fälthärjare',
     desc: 'Tjäna in 40 000 heder under din livstid, en säsong av verkligt krig bakom dig.',
-    title: 'Riddarlöjtnant',
+    title: 'Fälthärjare',
   },
   pvp_honor_field_marshal: {
-    name: 'Fältmarskalk',
+    name: 'Krigskrönt',
     desc: 'Tjäna in 150 000 heder under din livstid. Sällsynt i alla riken, och så borde det vara.',
-    title: 'Fältmarskalk',
+    title: 'Krigskrönt',
   },
   chr_drakemaw_broodlord: {
     name: 'Kullbrytaren',

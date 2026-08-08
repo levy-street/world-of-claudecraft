@@ -95,7 +95,7 @@ export const hudChromeStrings = {
   },
   // Floating combat text self-notes (proc consume labels, absorb readout).
   fct: {
-    absorbed: 'Absorbed {amount}',
+    absorbed: 'Absorbed ({amount})',
     cheap: 'Cheap!',
   },
   // Overhead emote display names (wheel tooltips/labels, editor items, overhead
@@ -1272,6 +1272,9 @@ export const hudChromeStrings = {
       'Keeps the mouse cursor inside the window while you drag to rotate the camera, so it cannot reach the screen edge or move to another monitor. Turn off if you prefer a free cursor.',
     showWalletOnCharacterScreen: 'Show Wallet on Character Screen',
     showWalletOnPlayerCard: 'Show Wallet on Player Card',
+    // Interface panel twin of the character sheet's privacy eye: the same
+    // per-device settings.showPlaytime preference, discoverable from Options.
+    showPlaytime: 'Show Time Played on Character Screen',
     // Interface panel toggle: nameplate glyph/outline, inspect block, player
     // card, and the Developers leaderboard tab (on by default).
     showDevBadges: 'Show Developer Badges',
@@ -1618,6 +1621,19 @@ export const hudChromeStrings = {
   charSheet: {
     offense: 'Offense',
     defense: 'Defense',
+    // The lifetime "Time Played" line at the foot of the sheet (the same
+    // running total the /playtime chat command reports). The value composes
+    // the two coarsest units from the plurals.playtime* fragments through
+    // playtimeParts ({major}/{minor} arrive pre-localized), so a locale can
+    // reorder or drop the separator.
+    playtimeLabel: 'Time Played',
+    playtimeParts: '{major}, {minor}',
+    playtimeUnderMinute: 'Less than a minute',
+    // Shown in place of the value while the eye toggle conceals it
+    // (screenshot/stream privacy; the total keeps accruing).
+    playtimeHidden: 'Hidden',
+    showPlaytimeAria: 'Show time played',
+    hidePlaytimeAria: 'Hide time played',
   },
   // Character-screen stat tooltips (hover a stat on the C panel). The stat NAMES
   // reuse itemUi.stats.*; only these descriptions / effect lines / notes are new.
@@ -1787,6 +1803,26 @@ export const hudChromeStrings = {
       few: '{count} seconds remaining',
       many: '{count} seconds remaining',
       other: '{count} seconds remaining',
+    },
+    // Unit fragments for the character sheet's Time Played line ({count} is
+    // pre-formatted through formatNumber at the call site).
+    playtimeDays: {
+      one: '{count} day',
+      few: '{count} days',
+      many: '{count} days',
+      other: '{count} days',
+    },
+    playtimeHours: {
+      one: '{count} hour',
+      few: '{count} hours',
+      many: '{count} hours',
+      other: '{count} hours',
+    },
+    playtimeMinutes: {
+      one: '{count} minute',
+      few: '{count} minutes',
+      many: '{count} minutes',
+      other: '{count} minutes',
     },
     playersOnline: {
       one: 'Who: {count} player online on {realm}.',

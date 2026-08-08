@@ -33,19 +33,19 @@ export const table: DeedLocaleTable = {
     desc: 'Bir Yarık portalının oluşturabileceği en zor kademe olan S dereceli bir Yarığı temizle.',
   },
   pvp_honor_sergeant: {
-    name: 'Çavuş',
+    name: 'Saf Kıran',
     desc: 'Ömrün boyunca 10.000 onur kazan. Onu harcamak rütbeni asla kaybettirmez.',
-    title: 'Çavuş',
+    title: 'Saf Kıran',
   },
   pvp_honor_knight_lieutenant: {
-    name: 'Şövalye-Teğmen',
+    name: 'Meydan Yağmacısı',
     desc: 'Ömrün boyunca 40.000 onur kazan, arkanda gerçek bir savaş mevsimi bırak.',
-    title: 'Şövalye-Teğmen',
+    title: 'Meydan Yağmacısı',
   },
   pvp_honor_field_marshal: {
-    name: 'Saha Mareşali',
+    name: 'Savaş Taçlısı',
     desc: 'Ömrün boyunca 150.000 onur kazan. Herhangi bir diyarda nadirdir, ve öyle de olmalı.',
-    title: 'Saha Mareşali',
+    title: 'Savaş Taçlısı',
   },
   chr_drakemaw_broodlord: {
     name: 'Kuluçka Kırıcı',

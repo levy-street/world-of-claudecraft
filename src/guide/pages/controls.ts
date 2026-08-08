@@ -21,8 +21,12 @@ const GROUPS: Group[] = [
     heading: 'guide.controls.groupMovement',
     rows: [
       { keys: ['W', 'A', 'S', 'D'], label: 'controls.moveTurn' },
+      // The four movement actions each carry a second default (ArrowUp/Down/Left/Right).
+      { keys: ['guide.controls.arrowKeys'], label: 'guide.controls.moveAlt' },
       { keys: ['Q', 'E'], label: 'controls.strafe' },
-      { keys: ['Space'], label: 'controls.jump' },
+      { keys: ['Space'], label: 'guide.controls.jumpSwim' },
+      // 'dive' defaults to ControlLeft, which the game's own keycap map glyphs as LCtrl.
+      { keys: ['LCtrl'], label: 'guide.controls.swimDown' },
       { keys: ['R'], label: 'controls.autorun' },
     ],
   },
@@ -34,6 +38,9 @@ const GROUPS: Group[] = [
       { keys: ['J'], label: 'guide.controls.cycleFriendly' },
       { keys: ['Shift+J'], label: 'guide.controls.targetAuras' },
       { keys: ['F'], label: 'controls.interact' },
+      { keys: ['Shift+F'], label: 'guide.controls.bgFlag' },
+      // Only live while the Attack Move option is on; the note under the tables says so.
+      { keys: ['A'], label: 'guide.controls.attackMove' },
       { keys: ['1', '0'], label: 'guide.controls.abilities' },
     ],
   },
@@ -56,6 +63,7 @@ const GROUPS: Group[] = [
       { keys: ['Y'], label: 'guide.controls.valeCup' },
       { keys: ['`'], label: 'guide.controls.mount' },
       { keys: ['K'], label: 'guide.controls.leaderboard' },
+      { keys: ['Shift+H'], label: 'guide.controls.meters' },
       { keys: ['I'], label: 'guide.controls.calendar' },
       { keys: ['Shift+I'], label: 'guide.controls.dungeonFinder' },
       { keys: ['U'], label: 'guide.controls.discord' },
@@ -66,7 +74,10 @@ const GROUPS: Group[] = [
   },
   {
     heading: 'guide.controls.groupPet',
-    rows: [{ keys: ['Ctrl+1', 'Ctrl+5'], label: 'guide.controls.petBar' }],
+    rows: [
+      { keys: ['Ctrl+1', 'Ctrl+5'], label: 'guide.controls.petBar' },
+      { keys: ['Ctrl+6'], label: 'guide.controls.petMark' },
+    ],
   },
   {
     heading: 'guide.controls.groupCamera',
@@ -112,7 +123,10 @@ export const controls: GuidePage = {
         <h1>${esc(t('guide.nav.controls'))}</h1>
         ${lead('guide.controls.intro')}
         ${groups}
+        <p>${esc(t('guide.controls.swimNote'))}</p>
+        <p>${esc(t('guide.controls.clickMoveNote'))}</p>
         <p>${esc(t('guide.controls.attackMoveNote'))}</p>
+        <p>${esc(t('guide.controls.onBarBinding'))}</p>
         <section class="guide-block">
           <h2>${esc(t('guide.controls.mobileHeading'))}</h2>
           <p>${esc(t('guide.controls.mobileBody'))}</p>

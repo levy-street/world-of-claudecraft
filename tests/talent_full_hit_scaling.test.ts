@@ -30,6 +30,7 @@ import { Sim } from '../src/sim/sim';
 import { directHealBonus, directHitBonus } from '../src/sim/spell_scaling';
 import { resolveTalentHitMult } from '../src/sim/talent_hit_mult';
 import type { AbilityEffect, Entity } from '../src/sim/types';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 function directDamageEffect(effects: AbilityEffect[]) {
   const found = effects.find((e) => e.type === 'directDamage');
@@ -123,7 +124,12 @@ describe('mastery/talent damage percent scales the whole hit, not just the base 
     const baseline = emptyModifiers();
 
     const tickValue = (mods: TalentModifiers, spellPower: number): number => {
-      const sim = new Sim({ seed: 11, playerClass: 'warlock', autoEquip: true });
+      const sim = new Sim({
+        seed: 11,
+        playerClass: 'warlock',
+        autoEquip: true,
+        world: EMPTY_TEST_WORLD,
+      });
       sim.setPlayerLevel(20);
       installMods(sim, mods);
       sim.player.spellPower = spellPower;
@@ -152,7 +158,12 @@ describe('mastery/talent damage percent scales the whole hit, not just the base 
     const baseline = emptyModifiers();
 
     const tickValue = (mods: TalentModifiers, spellPower: number): number => {
-      const sim = new Sim({ seed: 21, playerClass: 'priest', autoEquip: true });
+      const sim = new Sim({
+        seed: 21,
+        playerClass: 'priest',
+        autoEquip: true,
+        world: EMPTY_TEST_WORLD,
+      });
       sim.setPlayerLevel(20);
       installMods(sim, mods);
       sim.player.spellPower = spellPower;
@@ -180,7 +191,12 @@ describe('mastery/talent damage percent scales the whole hit, not just the base 
 
     const shieldValue = (mods: TalentModifiers, spellPower: number): number => {
       const modsWithSpec: TalentModifiers = { ...mods, spec: 'frost' }; // ice_barrier is frost-spec-gated
-      const sim = new Sim({ seed: 31, playerClass: 'mage', autoEquip: true });
+      const sim = new Sim({
+        seed: 31,
+        playerClass: 'mage',
+        autoEquip: true,
+        world: EMPTY_TEST_WORLD,
+      });
       sim.setPlayerLevel(20);
       installMods(sim, modsWithSpec);
       sim.player.spellPower = spellPower;
@@ -259,7 +275,12 @@ describe('mastery/talent damage percent scales the whole hit, not just the base 
     // grants holy_shield as the Protection signature, rather than replacing
     // meta.talentMods wholesale, so the grant survives.
     const castHits = (boost: boolean): number[] => {
-      const sim = new Sim({ seed: 41, playerClass: 'paladin', autoEquip: true });
+      const sim = new Sim({
+        seed: 41,
+        playerClass: 'paladin',
+        autoEquip: true,
+        world: EMPTY_TEST_WORLD,
+      });
       sim.setPlayerLevel(20);
       // holy_shield (Hallowed Wall) is granted as the Protection signature
       // ability (talents.ts: spec.signature), not base kit by def alone.
@@ -377,7 +398,12 @@ describe('mastery/talent damage percent scales the whole hit, not just the base 
     const healPct = 0.2;
 
     const castInitialHeals = (boost: boolean): number[] => {
-      const sim = new Sim({ seed: 51, playerClass: 'mage', autoEquip: true });
+      const sim = new Sim({
+        seed: 51,
+        playerClass: 'mage',
+        autoEquip: true,
+        world: EMPTY_TEST_WORLD,
+      });
       sim.setPlayerLevel(20);
       if (!sim.setSpec('arcane')) throw new Error('failed to set arcane spec');
       const meta = sim.meta(sim.playerId);

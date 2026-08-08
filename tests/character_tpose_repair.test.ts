@@ -99,6 +99,7 @@ async function makeVisual(): Promise<CharacterVisual> {
     loadGltf: vi.fn(() => Promise.resolve(stubGltf())),
     loadHdr: vi.fn(() => new Promise(() => undefined)),
     loadTexture: vi.fn(() => new Promise(() => undefined)),
+    loadKtx2Texture: vi.fn(() => new Promise(() => undefined)),
     releaseGltf: vi.fn(),
   }));
   const { preloadTrainingDummyAssets } = await import('../src/render/characters/assets');

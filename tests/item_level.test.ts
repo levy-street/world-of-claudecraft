@@ -6,6 +6,7 @@ import {
   RIFT_RARE_ITEM_IDS,
 } from '../src/sim/content/rift/items';
 import { ITEMS, MOBS } from '../src/sim/data';
+import { occupiesHand } from '../src/sim/equipment_rules';
 import {
   expectedStatBudget,
   itemFromRaid,
@@ -314,7 +315,15 @@ describe('item level: every level-20 item is balanced to budget', () => {
     for (const id of Object.keys(ITEMS)) {
       const item = ITEMS[id];
       if (!item.slot || itemSourceLevel(id) !== 20) continue;
-      const hand = item.kind === 'weapon' && item.hand === 'twohand' ? 'twohand' : 'onehand';
+      // The hand dimension is what the item COSTS in hands, which is what its
+      // budget line is priced on: a two-hander takes both, a worn offhand (a
+      // quiver) takes none and so prices below the held offhand it shares a slot
+      // with. Three lines, not two.
+      const hand = !occupiesHand(item)
+        ? 'worn'
+        : item.kind === 'weapon' && item.hand === 'twohand'
+          ? 'twohand'
+          : 'onehand';
       const key = `${itemLevel(item)}:${item.quality}:${item.slot}:${hand}`;
       let sums = groups.get(key);
       if (!sums) {

@@ -440,7 +440,7 @@ describe('graphics tier resolution', () => {
     expect(lowMem.maxPointLights).toBe(3);
   });
 
-  it('uses the bounded-residency renderer profile for the packaged native iOS app', () => {
+  it('uses the bounded-residency renderer profile on EVERY iOS WebKit host, not just the packaged native app', () => {
     const nativeIos = {
       maxTouchPoints: 5,
       coarsePointer: true,
@@ -450,6 +450,15 @@ describe('graphics tier resolution', () => {
     };
     const medium = gfxInternalsForTest.settingsFor('medium', nativeIos);
     const high = gfxInternalsForTest.settingsFor('high', nativeIos);
+    // iOS Safari (or any other iOS browser): platform 'ios', but NOT the packaged
+    // native shell. Regression coverage for the bug this file used to pin as correct:
+    // Mobile Safari and the native WKWebView shell run the same WebKit engine under
+    // the same per-process WebContent memory ceiling (see safeStartupGraphicsPreset's
+    // isIosWebkit and the sibling tightMemoryProfile rung below, both of which already
+    // treated Safari and native identically), so gating this profile on `nativeApp`
+    // left every plain-browser iOS session - i.e. most iOS players - eagerly loading
+    // full-residency assets under the exact same ceiling the native app was bounded
+    // against, and crashing under ordinary play.
     const mobileWeb = gfxInternalsForTest.settingsFor('medium', {
       ...nativeIos,
       nativeApp: false,
@@ -460,7 +469,7 @@ describe('graphics tier resolution', () => {
     });
 
     expect(medium.tier).toBe('medium');
-    expect(medium.nativeIosMemoryProfile).toBe(true);
+    expect(medium.iosMemoryProfile).toBe(true);
     expect(medium.standardMaterials).toBe(false);
     expect(medium.lowPlus).toBe(true);
     // Collision-bearing tree/rock placement stays identical to other Medium clients.
@@ -480,29 +489,31 @@ describe('graphics tier resolution', () => {
 
     // Higher labels can retain their density/bucket progression, but they must not
     // re-enable WKWebView's unbounded GPU-residency features.
-    expect(high.nativeIosMemoryProfile).toBe(true);
+    expect(high.iosMemoryProfile).toBe(true);
     expect(high.standardMaterials).toBe(false);
     expect(high.terrainSplat).toBe(false);
     expect(high.composer).toBe(false);
     expect(high.dynamicShadows).toBe(false);
 
-    expect(mobileWeb.nativeIosMemoryProfile).toBe(false);
-    expect(mobileWeb.standardMaterials).toBe(true);
-    expect(nativeAndroid.nativeIosMemoryProfile).toBe(false);
+    // iOS Safari now gets EXACTLY the native app's bounded-residency profile: same flag,
+    // same knobs, byte for byte. Only the platform check (`platform === 'ios'`) decides
+    // this, never `nativeApp`.
+    expect(mobileWeb.iosMemoryProfile).toBe(true);
+    expect(mobileWeb).toEqual(medium);
+    // Android stays on the generic cross-platform constrainedMemory tier: this profile
+    // (and its extra streamed-asset/quality knobs) is iOS WebKit specific.
+    expect(nativeAndroid.iosMemoryProfile).toBe(false);
     expect(nativeAndroid.standardMaterials).toBe(true);
     // A touch/coarse-pointer device is `constrainedMemory` regardless of platform (see
-    // isConstrainedBrowser), so it must fall onto the SAME bounded reuse-pool tier every
-    // other mobile budget in this function already uses (maxPointLights above), not the
-    // desktop-only POSITIVE_INFINITY. Previously it stayed unbounded on Android (any
-    // browser or the native shell) and on iOS Safari/native without a stamped tightMemory
-    // marker, so every despawned mob/NPC's Skeleton + GPU bone texture piled up for the
-    // rest of the session with nothing capping it.
+    // isConstrainedBrowser), so Android still falls onto the SAME bounded reuse-pool tier
+    // every other mobile budget in this function already uses (maxPointLights above), not
+    // the desktop-only POSITIVE_INFINITY.
     expect(nativeAndroid.maxPooledCharacterVisuals).toBe(24);
     expect(nativeAndroid.maxPooledObjects).toBe(24);
-    // mobileWeb is iOS Safari (platform 'ios') but NOT the native shell, so it was never
-    // nativeIosMemoryProfile either; it falls to the same constrainedMemory tier.
-    expect(mobileWeb.maxPooledCharacterVisuals).toBe(24);
-    expect(mobileWeb.maxPooledObjects).toBe(24);
+    // mobileWeb gets the TIGHTER iosMemoryProfile pool cap (6), not the generic
+    // constrainedMemory cap (24) Android and pre-fix Safari used to share.
+    expect(mobileWeb.maxPooledCharacterVisuals).toBe(6);
+    expect(mobileWeb.maxPooledObjects).toBe(6);
   });
 
   it('bounds the pooled-visual and pooled-object reuse caps on every constrained-memory device, never just the two narrow iOS profiles', () => {
@@ -565,7 +576,7 @@ describe('graphics tier resolution', () => {
     expect(tight.maxPooledCharacterVisuals).toBe(4);
     // Collision-bearing tree/rock placement fairness holds on the tight rung too.
     expect(tight.leanFoliage).toBe(false);
-    expect(tight.nativeIosMemoryProfile).toBe(true);
+    expect(tight.iosMemoryProfile).toBe(true);
 
     // Without the hint the standard native profile is exactly what it was: a
     // device the shell cannot measure keeps today's behaviour, byte for byte.

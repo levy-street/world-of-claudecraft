@@ -33,19 +33,19 @@ export const table: DeedLocaleTable = {
     desc: 'Limpe uma Fenda de nível S, o grau mais difícil que um portal de Fenda pode gerar.',
   },
   pvp_honor_sergeant: {
-    name: 'Sargento',
+    name: 'Quebra-linhas',
     desc: 'Ganhe 10.000 de Honra ao longo da vida. Gastá-la nunca custa o posto.',
-    title: 'Sargento',
+    title: 'Quebra-linhas',
   },
   pvp_honor_knight_lieutenant: {
-    name: 'Cavaleiro-Tenente',
+    name: 'Devastador de campos',
     desc: 'Ganhe 40.000 de Honra ao longo da vida, uma temporada de guerra de verdade nas costas.',
-    title: 'Cavaleiro-Tenente',
+    title: 'Devastador de campos',
   },
   pvp_honor_field_marshal: {
-    name: 'Marechal de Campo',
+    name: 'Coroado pela guerra',
     desc: 'Ganhe 150.000 de Honra ao longo da vida. Raro em qualquer reino, e deveria ser.',
-    title: 'Marechal de Campo',
+    title: 'Coroado pela guerra',
   },
   chr_drakemaw_broodlord: {
     name: 'Quebra-Ninhada',

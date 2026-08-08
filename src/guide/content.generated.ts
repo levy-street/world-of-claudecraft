@@ -5122,27 +5122,27 @@ export const GUIDE_DEEDS: GuideDeed[] = [
   },
   {
     "id": "pvp_honor_sergeant",
-    "name": "Sergeant",
+    "name": "Linebreaker",
     "category": "pvp",
     "renown": 10,
     "feat": false,
-    "rewardTitle": "Sergeant"
+    "rewardTitle": "Linebreaker"
   },
   {
     "id": "pvp_honor_knight_lieutenant",
-    "name": "Knight-Lieutenant",
+    "name": "Fieldreaver",
     "category": "pvp",
     "renown": 25,
     "feat": false,
-    "rewardTitle": "Knight-Lieutenant"
+    "rewardTitle": "Fieldreaver"
   },
   {
     "id": "pvp_honor_field_marshal",
-    "name": "Field Marshal",
+    "name": "Warcrowned",
     "category": "pvp",
     "renown": 50,
     "feat": false,
-    "rewardTitle": "Field Marshal"
+    "rewardTitle": "Warcrowned"
   }
 ];
 

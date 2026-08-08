@@ -965,6 +965,12 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '每场比赛无论胜负都会移动角色的战场评分,历史总榜记录王国的冠军。胜利与鏖战到底的失利也会通过战争体系发放荣誉。',
   'hudChrome.charSheet.offense': '攻击',
   'hudChrome.charSheet.defense': '防御',
+  'hudChrome.charSheet.playtimeLabel': '游戏时长',
+  'hudChrome.charSheet.playtimeParts': '{major}{minor}',
+  'hudChrome.charSheet.playtimeUnderMinute': '不到一分钟',
+  'hudChrome.charSheet.playtimeHidden': '已隐藏',
+  'hudChrome.charSheet.showPlaytimeAria': '显示游戏时长',
+  'hudChrome.charSheet.hidePlaytimeAria': '隐藏游戏时长',
   'hudChrome.statInfo.fromYour': '来自你的 {value} 点{stat}：',
   'hudChrome.statInfo.names.spellPower': '法术强度',
   'hudChrome.statInfo.names.critRating': '暴击等级',
@@ -1149,6 +1155,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.keybindHelpLockCursorOnRotate':
     '拖动旋转镜头时将鼠标光标保持在窗口内，使其无法到达屏幕边缘或移动到另一台显示器。如果你喜欢自由光标，请关闭此选项。',
   'hudChrome.options.showWalletOnCharacterScreen': '在角色界面显示钱包',
+  'hudChrome.options.showPlaytime': '在角色界面显示游戏时长',
   'hudChrome.options.showWalletOnPlayerCard': '在玩家卡片显示钱包',
   'hudChrome.options.showDevBadges': '显示开发者徽章',
   'hudChrome.options.showOwnNameplate': '显示我的姓名板',
@@ -5468,6 +5475,18 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.plurals.secondsRemaining.few': '剩余 {count} 秒',
   'hudChrome.plurals.secondsRemaining.many': '剩余 {count} 秒',
   'hudChrome.plurals.secondsRemaining.other': '剩余 {count} 秒',
+  'hudChrome.plurals.playtimeDays.one': '{count} 天',
+  'hudChrome.plurals.playtimeDays.few': '{count} 天',
+  'hudChrome.plurals.playtimeDays.many': '{count} 天',
+  'hudChrome.plurals.playtimeDays.other': '{count} 天',
+  'hudChrome.plurals.playtimeHours.one': '{count} 小时',
+  'hudChrome.plurals.playtimeHours.few': '{count} 小时',
+  'hudChrome.plurals.playtimeHours.many': '{count} 小时',
+  'hudChrome.plurals.playtimeHours.other': '{count} 小时',
+  'hudChrome.plurals.playtimeMinutes.one': '{count} 分钟',
+  'hudChrome.plurals.playtimeMinutes.few': '{count} 分钟',
+  'hudChrome.plurals.playtimeMinutes.many': '{count} 分钟',
+  'hudChrome.plurals.playtimeMinutes.other': '{count} 分钟',
   'hudChrome.plurals.playersMatching.one': '查询：{realm}上有{count}名玩家匹配“{query}”。',
   'hudChrome.plurals.playersMatching.few': '查询：{realm}上有{count}名玩家匹配“{query}”。',
   'hudChrome.plurals.playersMatching.many': '查询：{realm}上有{count}名玩家匹配“{query}”。',
@@ -6561,6 +6580,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.progression.bandLabel': '{min} 至 {max} 级',
   'guide.progression.capBody':
     '每升一级都会让你更加坚韧，并带来新的技能，一路直至 {cap} 级的等级上限。',
+  'guide.progression.capEndgameBody':
+    '裂隙是唯一真正等到满级才开放的内容。它们按自己的节奏在各处国度中撕裂开来，分为 C 到 S 的等阶，而全服的每一支队伍都在争当率先封印它的那一队。探秘的告示板同样一直都在，等你的装备跟上之后，它更高的难度也值得再走一趟。',
   'guide.progression.capJourneyBody':
     '{cap} 级是上限，是升级的终点，却非成长的尽头。从那时起，你可以打普通与英雄难度的地下城和团队副本，在世界首领崛起时与他一战，追逐更好的装备，并在竞技场中检验自己。',
   'guide.progression.capTitle': '抵达 {cap} 级',
@@ -6568,6 +6589,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '每一场战斗、每一个任务、每一步北行，都会让你的英雄更强。这里讲的是升级如何运作，以及登顶之后是什么让你持续成长。',
   'guide.progression.journeyBody':
     '整个世界是一片连绵不绝的大陆，三大区域由南向北铺展，每一处的等级都更高一层。你从翠绿的山谷启程，一路穿过湿地，最终止步于寒冷的高耸峰巅。循着任务指引而行，这片土地便会带你从一处走向下一处。',
+  'guide.progression.journeyBodyCount':
+    '整个世界是一片连绵不绝的大陆，共有 {zones} 个区域。其中三个是你升级时走的那条路，由南向北铺展：你从翠绿的山谷启程，一路穿过湿地，最终止步于寒冷的高耸峰巅。循着任务指引而行，这片土地便会带你从一处走向下一处。山谷海岸之外还有一座小岛，供低等级时前往；其余的国度都自那同一条路旁展开，是为已经走完这段攀登的角色准备的。',
   'guide.progression.journeyTitle': '北行之旅',
   'guide.progression.noRush':
     '不必着急。这个世界供你按自己的节奏尽情享受，所以尽管漫步，接下吸引你的任务，让你的英雄在旅途中渐渐成长。',
@@ -11011,4 +11034,794 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.waterRipples': '水面涟漪（尾波）',
   'hudChrome.breath.label': '呼吸',
   'hudChrome.breath.drowning': '溺水！',
+  'guide.arenaPage.honorBody':
+    '荣誉是与其他玩家交战所用的货币。你可以在灰烬角斗场以及荆谷原野上赚取它，它与你的钱币分开存放，永远不会混在一起，你的角色面板会显示你手上持有多少。它只有一种用途：战争套装。',
+  'guide.arenaPage.honorFinalNote':
+    '荣誉购买是最终的。用钱币买下的东西还能从商人的回购列表里买回来，但荣誉购买永远不会出现在那里，而战争套装在你买下的那一刻便已灵魂绑定，因此它再也无法交易、邮寄，或以任何形式退回。商店正因如此才要你确认一次：按下之前，请把那件装备看清楚。',
+  'guide.arenaPage.honorHeading': '荣誉',
+  'guide.arenaPage.quartermastersBody':
+    '两位军需官守着同样的货架，就近交易即可。荣誉军需官怒焰站在东溪谷，战争军备库总管战帅德拉文·科尔则守着高望的柜台。他们备的都是战争品级：五个护甲系列，外加所有系列共用的项链、戒指与武器。',
+  'guide.arenaPage.rewardsBody':
+    '一场排位胜利会发放荣誉，也就是玩家对战的货币，而落败除了评分之外不会让你付出任何代价。荣誉意在奖励真刀真枪的对局：同一天里再次击败同一个对手或同一支队伍不会再有额外收益，连胜一整天后每场胜利的收益也会随之略微下降，而对手认输的比赛虽然照样影响评分，却完全不给荣誉。这一天属于荣誉自己，它按自己的时钟翻篇，而不随王国的副本重置。',
+  'guide.arenaPage.rewardsHeading': '排位对战能带来什么',
+  'guide.arenaPage.warfareBody':
+    '每一件战争装备都带有战争进攻等级与战争防御等级，而这两项等级对怪物毫无作用。它们只在你与其他玩家交手时生效，无论是决斗、竞技场还是战场：进攻提高你造成的伤害，防御削减你受到的伤害，各自都有自己的上限。每个护甲系列同时也是一套套装，它的套装效果同样是只对玩家生效的战争等级或效果，因此一整身荣誉装备在地下城首领面前一文不值。',
+  'guide.arenaPage.warfareHeading': '战争套装',
+  'guide.arenaPage.warfareTradeBody':
+    '这正是刻意为之的取舍。战争套装是为与玩家交战而生的，不是绕过地下城品级的捷径：在同一个部位上，一件战争装备永远不会带有同部位地下城史诗所拥有的战斗属性，而它所带来的一切都只花在其他玩家身上。想在竞技场里站得住脚，就去买它；想更快地打通英雄难度，就去地下城里挣你的装备。',
+  'guide.classPage.formLine.form_cat': '近战输出形态：像盗贼一样使用能量与连击点，威胁值也低得多。',
+  'guide.classPage.formLine.form_travel':
+    '赶路形态：在地面上快得多，但在你变回原形之前无法使用其他技能。',
+  'guide.classPage.formName.form_bear': '巨熊形态',
+  'guide.classPage.formName.form_travel': '迅捷形态',
+  'guide.classPage.formsHeading': '变形',
+  'guide.classPage.formsMoonwing':
+    '平衡系德鲁伊还会多得到一种形态：枭兽形态，也就是平衡德鲁伊作战时所用的施法形态。它是唯一保留法术的野兽形态，而你的魔杖也只在这个形态或你普通的施法形态下才能使用。',
+  'guide.classPage.formsNote':
+    '德鲁伊靠变形作战。大多数德鲁伊技能都归属于某一种形态，因此你当前所处的形态决定了你能施放什么，而变形本身会消耗少量法力。无论是否身处战斗，你都可以随时变形，次数不限。',
+  'guide.classPage.mageEleHeading': '水元素',
+  'guide.classPage.mageEleJet':
+    '水流喷射在宠物栏上有属于自己的按钮：点击它，就能把一道寒流锁定在某个敌人身上；右键点击它（在移动端为长按），则让水元素在冷却结束后自行施放。',
+  'guide.classPage.mageEleNote':
+    '冰霜法师能学会召唤水元素，这个远程同伴会自行向你的目标投掷水箭。它像猎人的野兽或术士的恶魔一样听命于宠物栏，不过它并不是用来替你拉住目标的。',
+  'guide.classPage.mageEleSummon': '一个冰霜法术，把水元素召唤到你身边，并让它扑向你的目标。',
+  'guide.classPage.mageLore':
+    '法师驾驭火焰与冰霜摧毁敌人，召唤水元素，将威胁冻在原地，甚至扭曲时间本身来庇护和治疗同伴。',
+  'guide.combat.allyRezBody':
+    '你并不总是得自己走回去。拥有复活法术的盟友可以把你扶起来，它会以一个提示的形式送到你面前，由你接受或拒绝；放着不管它就会过期，所以趁它还在时给个答复。接受之后，你会带着一部分生命与法力，在施法的那位朋友身旁站起来。有些治疗者可以一次向倒下的整支队伍发出邀请，不过你们每个人仍要各自回应自己的提示。荆谷原野是唯一的例外：那里没有任何复活法术能触及你，你只能等待己方的下一波复活潮。',
+  'guide.combat.allyRezTitle': '盟友何时能把你扶起来',
+  'guide.combat.breathBody':
+    '深水可以游泳，你也可以潜到水面之下。当你的头没入水中时，屏幕上方附近会出现一条蓝色的呼吸条并不断减少；浮出水面后，它回满的速度远快于消耗的速度。若在水下把它耗尽，你就会开始溺水，每秒失去一大块生命值，直到重新呼吸到空气为止，所以长时间下潜时务必留意那条呼吸条。死亡会清空它，因此跑尸总是从满满的一口气开始。',
+  'guide.combat.climbBody':
+    '岩架并不是墙。跳向某个高得踩不上去的东西时，你的角色会在跳跃接近顶点时抓住边沿，并翻身上去，不需要按下任何专门的按键。凡是你自己就能跨过的低矮障碍，都会被平平常常地略过；完整的引体上翻只留给高过你头顶的边沿。这个动作很短，而且在进行时会接管你的操控，因此你无法中途改变方向。若在翻越途中被击晕，你会松手坠落，坠落距离从起跳的地面算起；而击晕或定身会让翻越根本无法开始，这一点在你想从一场恶战的困境中脱身时很值得记住。',
+  'guide.combat.climbTitle': '翻上岩架',
+  'guide.combat.fatigueBody':
+    '大海没有围墙。世界本就打算让你游过去的那些水域，也就是陆地与陆地之间的海峡与水湾，以及内陆的湖泊，无论花多久横渡都很安全。可若你从岸边一路游进真正的外海，它就会开始榨干你的体力：先是出现一则警告，你有足够的时间掉头，之后大海便会造成不断加重、任何手段都无法阻止的伤害，直到你朝陆地折返为止。在离岸那么远的地方溺死或力竭而亡，都和其他任何死亡一样需要释放灵魂，所以请把地平线当作风景，而不是目的地。',
+  'guide.combat.hazardsTitle': '水也能要你的命',
+  'guide.combat.threatTitle': '敌人会打谁',
+  'guide.combat.unstuckBody':
+    '如果世界把你困在了出不来的地方，请输入 /unstuck。你需要脱离战斗、站定不动，不被击晕或定身束缚，也不在决斗或竞技场比赛之中：一段短暂的倒计时随即开始，移动或受到伤害都会取消它。倒计时走完后，你会被放到最近的墓地。它绝不会杀死你，也不会留下尸体；若你本已倒下，它会就地把你复活。代价是脱困后遗症，一段时间内削弱你的全部属性，等到你能再次使用这条指令时它已经消退；而且和守护者的代价一样，它对全新的角色完全网开一面。',
+  'guide.combat.unstuckTitle': '当你真的被困住时',
+  'guide.commandsPage.abilities': '你已经学会的技能。',
+  'guide.commandsPage.afk':
+    '把自己标记为暂离，并可附上一条留言，任何密语你的人都会收到它作为自动回复。不带留言再输入一次即可清除；任何其他聊天也会清除它。',
+  'guide.commandsPage.aliasBody':
+    '大多数指令都有简写，而同一行中列出的每一种写法作用完全相同：/w、/t 和 /tell 是同一条指令。尖括号里的词是必填的，方括号里的词是可选的，而指令本身的大小写从来无关紧要。',
+  'guide.commandsPage.arena':
+    '你在灰烬角斗场两个组别中的战绩：1v1 与 2v2 各自的评分、胜场、负场与胜率。',
+  'guide.commandsPage.assist':
+    '把目标切换为指定玩家正在选中的目标。不写名字时，则协助你当前选中的那位玩家。它在世界各处都能触及你的队伍与团队，以及近到你能看见的任何人。',
+  'guide.commandsPage.attack': '自动攻击是否正在进行、打的是谁，以及你挥击一次需要多久。',
+  'guide.commandsPage.bags': '你正携带的东西，按品质从高到低排列，钱币列在最后。',
+  'guide.commandsPage.bangBody':
+    '有几条指令以感叹号开头，而不是斜杠。它们会向全王国宣告某件事，并同时发布到社区 Discord，因此没有登录的人也能看到。它们属于在线游玩的一部分。',
+  'guide.commandsPage.bangHeading': '社区指令',
+  'guide.commandsPage.bangList':
+    '这一组包括：!lfg 寻求组队，!wts 与 !wtb 出售和收购，!recruit 公会招募，!event 发起团队活动或聚会，以及 !help 求助。先输入指令，再写上你的留言。',
+  'guide.commandsPage.block':
+    '更强硬的版本：它还会拦下对方的密语、邀请与邮件，并让你们在 /who 中彼此隐形。列表形式会打印出你屏蔽了哪些人。',
+  'guide.commandsPage.buffs': '你身上的增益与减益，以及每一项剩余的时间。',
+  'guide.commandsPage.buyback': '你最近卖给商人、目前仍能买回来的东西。',
+  'guide.commandsPage.casting': '你正在施放或引导什么，还剩多久。',
+  'guide.commandsPage.channelsIntro':
+    '综合频道触及整个王国，你一登录就身在其中。世界与 LFG 则需要自行加入：先加入，然后才能在里面阅读和发言。',
+  'guide.commandsPage.cmdHeader': '指令',
+  'guide.commandsPage.combat': '你是否身处战斗中，以及何时会脱离战斗。',
+  'guide.commandsPage.combo': '你当前持有多少连击点。',
+  'guide.commandsPage.completed': '你已经交付的任务，按你完成它们的先后顺序排列。',
+  'guide.commandsPage.consider': '与你相比，目标的等级意味着多大的危险。',
+  'guide.commandsPage.consumable': '此刻正作用在你身上的食物与饮品，以及各自还剩多久。',
+  'guide.commandsPage.cooldowns': '你有哪些技能正在冷却，最快就绪的排在最前。',
+  'guide.commandsPage.dnd': '请勿打扰：与暂离类似，只是发给你的密语会被拦下，而不是送达。',
+  'guide.commandsPage.doesHeader': '它的作用',
+  'guide.commandsPage.dungeonMode': '在普通与英雄难度之间切换你的地下城。',
+  'guide.commandsPage.dungeonReset': '放弃你自己名下的空副本，也就是改完难度之后要做的那件事。',
+  'guide.commandsPage.dungeons':
+    '每一座地下城，连同它的门所在的区域、它所设计的队伍人数，以及你当前设定的难度。',
+  'guide.commandsPage.emotesBody':
+    '社交表情动作也是指令：/wave、/bow、/cheer、/dance、/laugh 等等，每一个都会展示给说话范围内的所有人。加上一个名字就能把它指向某人，例如“/wave Aleph”，而 /me 则可以表达列表里没有的任何动作。',
+  'guide.commandsPage.emotesHeading': '表情动作',
+  'guide.commandsPage.emotesMore': '更多关于表情动作与结伴同行的内容',
+  'guide.commandsPage.falling': '你是否腾空、离地多高，以及这一落会不会摔疼。',
+  'guide.commandsPage.follow':
+    '自动跟随另一位玩家。不写名字时，跟随你当前的目标。移动、施法、战斗、切换目标，或对方跑远，都会结束跟随，而且战斗中无法开始跟随。',
+  'guide.commandsPage.form': '你所处的变形形态或战斗姿态。',
+  'guide.commandsPage.gAlias':
+    '一个有两种含义的简写，因此值得记住：离线时它发往综合频道，在线时它是你的公会频道。确定要说综合频道时，请输入 /general 或 /1。',
+  'guide.commandsPage.gear': '你已装备的全部物品，逐个部位列出，空着的部位一目了然。',
+  'guide.commandsPage.general': '全王国的综合频道。',
+  'guide.commandsPage.gold': '你的钱袋里有些什么。',
+  'guide.commandsPage.graveyard': '如果你倒在此处，灵魂会回到哪里。',
+  'guide.commandsPage.groupChannels': '频道',
+  'guide.commandsPage.groupCombat': '战斗中',
+  'guide.commandsPage.groupParty': '队伍与组队',
+  'guide.commandsPage.groupPeople': '其他玩家',
+  'guide.commandsPage.groupRecovery': '脱困与状态',
+  'guide.commandsPage.groupSelf': '你的角色',
+  'guide.commandsPage.groupState': '你此刻如何',
+  'guide.commandsPage.groupTalking': '交谈',
+  'guide.commandsPage.groupWorld': '世界与旅行',
+  'guide.commandsPage.guild': '与你的公会交谈。仅限在线游玩，而且你需要身在一个公会中。',
+  'guide.commandsPage.help': '把指令列表打印到你的聊天框里。',
+  'guide.commandsPage.helpTipBody':
+    '在游戏中输入 /help、/commands，或者只打一个 /?，整份指令列表就会打印到你的聊天框里。指令打错时，游戏会告诉你它无法识别，并把你指回 /help。',
+  'guide.commandsPage.helpTipTitle': '游戏自己也记着这份列表',
+  'guide.commandsPage.ignore':
+    '让某位玩家的公开聊天和他头顶的聊天气泡对你隐藏。他的密语、掷骰、邀请与邮件仍会送达。列表形式会打印出你屏蔽了哪些人的聊天。',
+  'guide.commandsPage.inspect': '查看一位在线玩家的等级、职业与生命值。',
+  'guide.commandsPage.intro': '你可以输入到聊天框里的每一条指令，按用途分组，并附上它们的简写。',
+  'guide.commandsPage.invite': '按名字邀请一位在线玩家加入你的队伍，无论他站得多远。',
+  'guide.commandsPage.join':
+    '加入或离开一个可选频道。可加入的有 world 与 lfg 两个，单独输入 /join 会把它们列出来。为其中之一打开一个聊天标签页，也会替你加入它。',
+  'guide.commandsPage.lfg': '在 LFG 频道里发言，人们在这里寻找队伍。请先加入它。',
+  'guide.commandsPage.listings':
+    '你自己在世界市场上的挂单，包括要价、每一件还剩多久，以及你还能再挂多少。',
+  'guide.commandsPage.manaRegen': '对法力使用者而言：你脱离战斗后的法力回复是否已经重新开始跳动。',
+  'guide.commandsPage.me':
+    '以第三人称写下自由的动作文字，因此“/me 凝视着喷泉”会显示为你的名字后面跟着这个动作。你附近的所有人都能看到。',
+  'guide.commandsPage.nearby': '离你最近的活物，由近及远。',
+  'guide.commandsPage.officer': '你公会的官员频道，向官员与会长开放。仅限在线游玩。',
+  'guide.commandsPage.overpower': '对战士而言：敌人闪避所打开的血手窗口是否仍然可用。',
+  'guide.commandsPage.partyChat': '与你队伍或团队中的每一个人交谈。',
+  'guide.commandsPage.partyRoster':
+    '后面不跟留言时，它会改为打印你的队伍名单：每位成员的等级、职业与生命值，并标出队长。',
+  'guide.commandsPage.peopleNote':
+    '/who 名单，以及你屏蔽聊天与屏蔽的名单，都由服务器保管，因此这些只在在线游玩时可用。',
+  'guide.commandsPage.pet': '你宠物的名字、等级、族系与生命值。',
+  'guide.commandsPage.petTaunt': '你宠物的嘲讽冷却，以及它是否被设为自行施放。',
+  'guide.commandsPage.played': '这个角色本次登录以来在世界中待了多久。',
+  'guide.commandsPage.playtime': '这个角色累计被游玩了多久，涵盖每一次登录。',
+  'guide.commandsPage.pois': '你当前区域的地标，由近及远，并附上到每一处的距离。',
+  'guide.commandsPage.potion': '战斗药水的共享冷却，它与你的技能冷却是分开的。',
+  'guide.commandsPage.quests': '你进行中的任务日志，以及每个目标的进度。',
+  'guide.commandsPage.queued': '已经蓄势待发、将在你下一次近战挥击时打出的技能。',
+  'guide.commandsPage.range': '你的目标离你多远，以及这个距离是否在近战范围之内。',
+  'guide.commandsPage.ready':
+    '由队伍或团队的队长发起准备确认，其他每个人都会收到一个提示来回答是或否。',
+  'guide.commandsPage.reply': '回复最后密语你的那个人，无需再次输入他的名字。',
+  'guide.commandsPage.roll':
+    '掷一个随机数，除非你指定上限或范围，否则从 1 到 100。你的队伍会看到结果；你不在队伍中时，则是附近的所有人。掷骰由服务器完成，因此没人能作假。',
+  'guide.commandsPage.savedMana':
+    '对处于变形状态的法力使用者而言：变形期间被寄存起来的法力，会在你变回原形时归还给你。',
+  'guide.commandsPage.say':
+    '对站在你附近的玩家说话。不带斜杠的普通一行，会发往你当前选中的聊天标签页，而“说”正是你一开始所在的那一个。',
+  'guide.commandsPage.selfIntro':
+    '这些会在你的聊天框里打印出一行只有你看得到的私人信息。什么都不会广播出去，因此在战斗中途使用也很安全。',
+  'guide.commandsPage.session': '你登录以来做过的事：击杀、死亡、伤害与经验。',
+  'guide.commandsPage.sit': '就地坐下，以及重新站起来。只要你移动、施法或挨了一下，就会自动站起。',
+  'guide.commandsPage.slashBody':
+    '凡是你在聊天框里输入、以斜杠开头的内容，都是指令，而不是你说出口的话。按下回车后，它要么执行一个动作（跟随某人、邀请某人、掷骰），要么打印出一行只有你看得到的私人信息。',
+  'guide.commandsPage.speed': '与正常奔跑相比你移动得有多快，以及是否有什么东西把你定住了。',
+  'guide.commandsPage.stats':
+    '一行角色概要：等级、职业、生命值、你的资源、攻击强度、暴击几率与护甲。',
+  'guide.commandsPage.stickyBody':
+    '你选中的是哪个聊天标签页，决定了不带斜杠的普通一行会发往何处。选中世界标签页后，你下一行没有前缀的话就会发往世界频道，所以动手打字前先瞄一眼标签页。斜杠指令永远优先于标签页，因此无论当前是哪个标签页，/w Bob 你好 都会密语 Bob；而在密语标签页上，普通的一行会回复最后密语你的那个人。',
+  'guide.commandsPage.talents': '你的专精，以及你的六个天赋行里已经选好了几行。',
+  'guide.commandsPage.target': '你当前的目标：名字、等级、它是什么，以及生命值。',
+  'guide.commandsPage.targetBuffs': '你目标身上的光环，每一项都标注为增益或减益。',
+  'guide.commandsPage.threat': '正在与你交战的敌人当前都盯着谁。',
+  'guide.commandsPage.unfollow': '停止跟随。',
+  'guide.commandsPage.unknownBody':
+    '游戏无法识别的指令会返回一条未知指令的提示，而且不会被说出口，因此打错字绝不会落到你正在聊天的那个频道里。连续发得太快的指令会被限流：稍微放慢一点，它们就又能通过了。有些指令需要一个作用对象，所以没有选中任何人时使用 /follow，或者没人密语过你时使用 /reply，游戏都会如实告诉你。',
+  'guide.commandsPage.unknownHeading': '如果一条指令不起作用',
+  'guide.commandsPage.unstuck':
+    '被世界困住时的那条出路。站定不动熬过一段短暂的倒计时，你就会被移动到最近的墓地；若你已经倒下，还会在那里被复活。事后你会带着脱困后遗症虚弱一阵子，因此它是最后的手段，而不是捷径。',
+  'guide.commandsPage.where': '你所站的区域、它的等级范围，以及你的坐标。',
+  'guide.commandsPage.whisper':
+    '向一位在线玩家发送私聊消息。只要不会指向多个玩家，你把名字的大小写打成什么样都能对上。',
+  'guide.commandsPage.who':
+    '列出在线的玩家。附上一段文字，即可只留下名字或所在区域包含该文字的人。',
+  'guide.commandsPage.world': '在世界频道发言，前提是你已经加入了它。',
+  'guide.commandsPage.xp': '查看你的等级，以及本级已经走了多远。',
+  'guide.commandsPage.yell': '放声呼喊，让远在说话范围之外的玩家也能听见。',
+  'guide.commandsPage.zones': '按旅行顺序列出每一个区域及其等级范围，并标出你正身处的那一个。',
+  'guide.controls.attackMove': '攻击移动（需先在选项中开启）',
+  'guide.controls.bgFlag': '在荆谷原野夺取敌方战旗',
+  'guide.controls.jumpSwim': '跳跃；身在水中时上浮',
+  'guide.controls.meters': '伤害统计（伤害、治疗与威胁）',
+  'guide.controls.moveAlt': '移动与转身（同样的四个操作，使用第二套按键）',
+  'guide.controls.onBarBinding':
+    '你也可以直接在动作条上绑定按键：在“按键绑定”面板中选择“编辑动作条按键”，然后点击动作条上的某个格子，再按下你想要的键。设置完毕后点击“完成”。这一项仅限桌面端，因为它需要一块实体键盘。',
+  'guide.controls.petMark': '宠物：标记，选中你自己的宠物（等同于点击它的头像框）',
+  'guide.controls.swimDown': '身在水中时下潜（按住）',
+  'guide.controls.swimNote':
+    '游泳用到两个键：按住空格上浮，按住左 Ctrl 下沉。向前游动时把镜头压低同样会下潜，所以你可以用视角来掌控自己的深度。左 Ctrl 是默认按键中唯一一个单独的修饰键，而在绑定按键时，单独按下的修饰键会被忽略，因此若要重新绑定“下潜”，请挑一个不是修饰键的按键。',
+  'guide.deedsPage.bookBody':
+    '功绩之书把每一个功绩归入可以随手切换的类别，并配有搜索框，以及“全部”“已获得”“未获得”和“即将完成”几种筛选。靠近顶部的“最近”一栏收着你最新解锁的功绩，点击其中一条便会直接跳到它的卡片；点击别人发在聊天里的功绩名，同样如此。它旁边的“即将完成”会指出你最接近达成的那寥寥几个。在线上世界里，每个功绩还带着自己的稀有度，也就是已经获得它的冒险者比例，让你一眼看出哪些寻常、哪些是真正的攀登；离线世界没有可供统计的人口，因此不显示稀有度。侧栏的末尾是头衔架，你在那里挑选自己佩戴的那一个。',
+  'guide.deedsPage.bookHeading': '走进功绩之书',
+  'guide.delvesPage.lockpickAnteBody':
+    '在碰到锁之前，你先定下条件。取三根撬锁针，便留有失手的余地，但箱子只付出最朴素的奖赏；取两根，是折中的交易；只取一根，一次干净利落的开锁将付出最丰厚的回报。手上的撬锁针越少，每一步之间可供思考的时间就越短；而若最后一根也折断，锁便彻底卡死：那口箱子就此失去，直到你再通关一次这处探秘为止。',
+  'guide.delvesPage.riteBody':
+    '并非每一次探秘都以一把锁收尾。溺亡连祷改为以一场仪式作结：守护者倒下之后，圣物匣周围的神龛会依次亮起，要你把这个顺序答回去。开始之前你先选定它的难度，与撬锁针索要的正是同一份交易。最温和的一档会为你把序列重播不止一次，也给你不止一次尝试，但它会压低圣物匣的回报；最严苛的一档只展示一次顺序，只给你一次机会，也是通往最丰厚奖赏的唯一途径。',
+  'guide.delvesPage.riteHeading': '当一次探秘以仪式收尾',
+  'guide.dungeonsPage.finderBoardBody':
+    '更想自己挑选同伴？队长可以改为把队伍发布到预组板上，并标注这一趟是为了什么：首次通关、任务、全清、学习本，或是速刷。其他玩家提交申请，由队长决定谁能同行。板上没有自由填写的招募文字，只有这些标签；列表中还有一项只走板子，只接受发布招募，而不进入自动队列。',
+  'guide.dungeonsPage.finderBody':
+    '你不必在聊天里扯着嗓子凑人。打开地下城查找器，看看它能为哪些副本排队，勾出你愿意去的，选好你要担任的定位，然后加入队列。查找器会按坦克、治疗与输出的正确搭配组出一支完整队伍，再同时向所有人发出邀请；队伍全员接受的那一刻，你便被编入其中。列表上不只有五人本：十人团队副本也在这里排队，两种难度都有，不过查找器从不检查你是否已挣得进入的资格，因此副本门口依然可能把你挡回来。王国里并非每一处副本都在它的名单上，所以在指望它带你去某座地下城之前，先看一眼。',
+  'guide.dungeonsPage.finderOfferBody':
+    '组好的队伍只在一小段时间内向你发出邀请，所以请尽快作答。让邀请过期或干脆拒绝，查找器会把你暂时挡在队列之外，过一会儿才让你重新排队，免得一支只答了一半的队伍拖住所有人。',
+  'guide.dungeonsPage.finderRolesBody':
+    '在你选定专精之前，可选的定位来自你的职业；有了专精之后，则来自你当前激活的专精，所以一个治疗排的就是治疗。过了天赋开放的那个等级，查找器会要求你先选好专精，否则根本不给你定位。列表上的每处副本还各有自己的等级区间，比副本门口的要求更紧，排队队伍中的每一名成员都必须落在区间之内：需要队伍拖着走的角色，查找器不会给它座位。',
+  'guide.dungeonsPage.finderTitle': '寻找一支队伍',
+  'guide.dungeonsPage.formatsNote':
+    '地下城与团队副本是三种副本形式之一。探秘是供一到两人进行的短小下潜；而裂隙是在世界中自行撕开的裂口，会把一支队伍投进一座每次都全新生成的地下城。',
+  'guide.economy.guildBankNote':
+    '在你个人的银行之外，公会还守着一座自己的金库，在同一位司库处开启，并从同一个窗口的一个标签页进入：一份共享的钱币储备，加上一处集中存放货物的仓库。每位成员都可以查看它，而能把东西存进取出的只有官员。社交页面有更详细的说明。',
+  'guide.economy.honorBody':
+    '与其他玩家作战会带来第三种货币：荣誉。赢下一场排位竞技场对决可以获得荣誉，而在荆谷原野打满一整场比赛，无论胜负都会发放荣誉，所以原野上的一场苦战永远不算白打。荣誉积攒在你的角色面板上，绝不与你的钱币混在一起。你可以在荣誉军需官处花掉它，也就是东溪镇的 FURY 与高守哨站的 Warmarshal Draven Kole，两人共用同一批存货：整套战争护甲系列、饰品与武器，都只有荣誉买得到。这些购买是最终的，装备在你买下的那一刻便绑定于你，所以确认之前先把它读清楚。竞技场页面讲的是荣誉本身如何挣得。',
+  'guide.editorPage.buildBody':
+    '工具排在左侧的边栏上，每个按钮上都写着自己的单字母快捷键。选中一件，直接在眼前的地图上动手。Ctrl+Z 撤销，Ctrl+Y 重做，所以你的任何尝试都不是覆水难收。',
+  'guide.editorPage.buildTitle': '你能造些什么',
+  'guide.editorPage.helpBody':
+    '顶栏的“帮助”会打开一份参考，涵盖每一件工具、键盘快捷键与鼠标操作，并且随时可以重新播放那段引导教程。剩下的就是自己动手摆弄：撤销永远只有一个按键之遥，而“导出”会给你一份地图副本，让你随时都能回到这里。',
+  'guide.editorPage.helpTitle': '熟悉这些工具',
+  'guide.editorPage.intro':
+    '一个属于你自己的地图编辑器，就在浏览器里。塑造大地，栽上道具与营地，然后跳进你做出来的成品，四处走一走。',
+  'guide.editorPage.playtestBody':
+    '“试玩”会把地图交给游戏，让你以一名战士的身份落进其中。你造的一切都在脚下：营地会刷出怪物，空气墙拦得住人，带碰撞的摆放物会把你挤到一边。看够了就回到编辑器，接着干活。',
+  'guide.editorPage.playtestTitle': '游玩你的地图',
+  'guide.editorPage.sandboxBody':
+    '自定义地图绝不会改动别人正在玩的那个游戏。一次试玩在你自己的浏览器中离线运行，从不与服务器说话，所以其中发生的一切都碰不到你的角色，也碰不到共享的世界。',
+  'guide.editorPage.sandboxTitle': '一个沙盒，而非正式世界',
+  'guide.editorPage.saveBody':
+    'Ctrl+S 保存，而只要还有未保存的改动，“保存”按钮上就会带着一个圆点。没有账号，编辑器照样能用：地图存在你自己的浏览器里，自动保存可以随手打开，“导出”会把一张地图写成一个普通的 JSON 文件，“导入”则能原样读回来。\n\n用你的游戏账号登录之后，保存还会同时送到服务器，于是你的地图会跟着你换到另一台机器上。“打开”窗口有两个标签页，一个装着这个浏览器里的草稿，另一个装着存到你账号上的地图。如果编辑器显示离线标记，请在另一个标签页登录游戏，然后重新加载编辑器。',
+  'guide.editorPage.saveTitle': '保存你的作品',
+  'guide.editorPage.shareBody':
+    '保存到账号上的地图一开始都是私有的。在“打开”窗口里，你可以发布其中一张，让任何人都能翻到它，也可以随时再取消发布。同一个窗口中的“公开地图”标签页，可以浏览其他玩家发布的一切：“打开”会载入一张，让你看看它是怎么做出来的，“派生”则会把一份私有副本放进你自己的列表，随你怎么改。副本就是一张新地图：编辑它绝不会碰到原作。\n\n一个账号能留存的地图数量是有上限的，所以把那些玩腻的实验作品收拾干净吧。\n',
+  'guide.editorPage.shareTitle': '发布与派生',
+  'guide.editorPage.toolBlockerBody':
+    '拖出阻挡移动却什么都不显示的空气墙，用来悄悄封住一道你想关上的边界。',
+  'guide.editorPage.toolBlockerTitle': '空气墙',
+  'guide.editorPage.toolCampBody':
+    '布置在试玩中会活过来的怪物营地，并定下试玩时把玩家放下的那个位置。',
+  'guide.editorPage.toolCampTitle': '营地与出生点',
+  'guide.editorPage.toolLandBody':
+    '用一支笔刷抬升、下压、平滑与压平地面，笔刷的大小与强度随时都能改。',
+  'guide.editorPage.toolLandTitle': '塑造大地',
+  'guide.editorPage.toolPlaceBody':
+    '把内置资源目录里的部件放到地面上，然后移动、旋转、缩放与复制它们。摆放物可以带上碰撞，让玩家绕着走而不是穿过去；改变主意时，擦除工具能把一件摆放物从地图上重新拿掉。',
+  'guide.editorPage.toolPlaceTitle': '放置道具',
+  'guide.editorPage.toolRegionBody':
+    '用区域工具框选地形与已放置的资源，再把这份选择粘到地图上的别处。',
+  'guide.editorPage.toolRegionTitle': '复制整片区域',
+  'guide.editorPage.toolSurfaceBody':
+    '在区域默认地表之上绘制生态地被，并设定地图所声明的那片湖泊的水位。',
+  'guide.editorPage.toolSurfaceTitle': '绘制与放水',
+  'guide.editorPage.uploadBody':
+    '登录之后，“上传”按钮可以把一个属于你自己的 GLB 模型加进资源浏览器，与内置目录并排摆着，像其他道具一样随时放置。上传的模型存在你的账号上，会计入体积与存储上限，不再需要时可以从资源浏览器里删掉。',
+  'guide.editorPage.uploadTitle': '带上你自己的模型',
+  'guide.editorPage.viewsBody':
+    '3D 视口用真正的游戏渲染器绘制你的地图，所见即所得：拖动环绕，滚轮缩放。2D 俯视图是平面示意图，更适合挪动据点、墓地与兴趣点之类的区域标记，也更适合在动手雕刻之前先框定一大片地方。切换按钮就在顶栏。',
+  'guide.editorPage.viewsTitle': '同一张地图的两种视图',
+  'guide.editorPage.whereBody':
+    '编辑器是一个独立于游戏的页面，位于 /editor。它打开时是一张全新的、尚未命名的地图，由你早已熟悉的这个世界搭起来，所以你脚下从一开始就是真实的土地。首次到访时会运行一段简短的引导教程，顶栏的“帮助”随时可以再来一遍。',
+  'guide.editorPage.whereTitle': '在哪里找到它',
+  'guide.faqPage.a12':
+    '有一个可选的外观商店。它只卖模样：第一赛季兵器库的武器皮肤，用商店货币 Claudium 购买。里面没有任何东西会增加属性、战力或进度，一款皮肤也绝不会改变你的武器如何打出伤害，所以每一件真正要紧的装备，依然只来自游玩本身。',
+  'guide.faqPage.a13':
+    '浏览器版本什么都不用准备：打开网站就能玩。如果你更想要一个应用，游戏官网的下载页备有 Windows、macOS 与 Linux 的桌面端下载。iOS 与 Android 原生应用正在路上；在它们到来之前，手机或平板可以用浏览器版本游玩，触控操作一应俱全。每一个版本登录的都是同一个账号、同一批世界，所以你的角色会一路跟着你。',
+  'guide.faqPage.a14':
+    '一台笔记本、台式机、手机或平板上的较新浏览器。首次启动时，游戏会读一读你的设备，挑一个相配的画质档位，从“低”到“超高”；而你自己做出的选择永远优先。鼠标键盘、触控与手柄都可以用。设置页面与操作页面有更细的说明。',
+  'guide.faqPage.a15':
+    '只有在线游玩才需要。离线世界什么都不问：在开始界面选择“离线”，按下“开始游戏”即可。在线账号是免费的，需要一个用户名、一个密码，以及一个用来找回账号的邮箱，你的角色会保存在服务器上。有了账号之后，你还可以在选项中开启双重验证。',
+  'guide.faqPage.a16':
+    '在线游玩发生在一个个世界上，而每个世界都是这个游戏的一份完整副本，有自己的玩家、自己的世界市场、自己的排名。登录时，世界列表会显示每个世界有多热闹，从“清闲”到“满员”，你可以挑一个安静的图个宽敞，或挑一个热闹的图个人气。你的角色住在创建它的那个世界上，而你也可以在不止一个世界里各留角色。',
+  'guide.faqPage.q12': '有内购商店吗？',
+  'guide.faqPage.q13': '在哪里可以下载客户端？',
+  'guide.faqPage.q14': '运行它需要什么配置？',
+  'guide.faqPage.q15': '我需要一个账号吗？',
+  'guide.faqPage.q16': '什么是世界？',
+  'guide.gear.bagsSort':
+    '背包乱起来的时候，背包窗口里的“整理”按钮一按就能收拾妥当。同一种东西的零散堆叠会被合并到一起，所有物品也会按一个好读的顺序重新排开：先是武器与护甲，然后是背包、消耗品、工具与坐骑，接着是制作材料，每一种精细品级都紧挨着它的普通版本，再往后是任务物品，灰色废品排在最末，好让你一眼看清哪些该卖。整理绝不会凭空造出或弄丢任何东西，只是重新排列，所以任何时候按下去都是安全的。',
+  'guide.gear.bindOnTradeBody':
+    '同一个道理还有更温和的一种：有些东西是交易绑定，也就是说它们只能易手一次，之后便归接下它的人所有。受人委托打造的成品，会在制作者交出去的那一刻绑定。受这条规则约束的副本绝不会登上市场，也不会走邮驿，因为那两处都是匿名的；它只能当面交接，否则就不成交，而一旦交出去，它就绑定了。提示会写明一件物品遵循哪一条规则，所以打算转卖之前先看一眼。',
+  'guide.gear.cosmeticsWeapons':
+    '武器皮肤是第三条线，它改变的是你手中所持之物，而不是持有它的人。一款皮肤会重涂一整类武器，因此这份模样会跟着你当前装备的剑、法杖或弓走，也绝不触碰武器的属性、攻击距离或速度。皮肤按账号解锁，而不是按角色解锁，并且和其他外观一样，分成一个个收藏系列与稀有度层级。它们出自兵器库的赛季收藏，而不是在世界中拾得；设置皮肤同样在兵器库里进行，每类武器一款，而不是在外观那一栏中设定。站在你身边的每一个人，都能看见你所佩的皮肤。',
+  'guide.gear.offhandBody':
+    '副手能拿什么，取决于你的职业。盾牌放在那里，宝珠或典籍之类的手持法器也放在那里，猎人的箭袋同样如此。能够双持的职业则会在副手放上第二把武器。双手武器通常要占去两只手，所以装备一把双手武器会让副手原本拿着的东西下场，除非你的专精正是少数几个能同时挥舞两把双手武器的那种。',
+  'guide.gear.requiredLevelBody':
+    '有些装备还带着一个需求等级，写在提示上。任何等级的你都可以拾取、买下或收下这样一件装备，但在达到那个等级之前都穿不上它。这个要求跟着装备的来源走，而不只看它的颜色，所以在自己等级上赢来的一件稀有装备通常立刻就能穿；而来自远高于你等级之处的转手货，则要在你的背包里等你追上它。',
+  'guide.gear.soulboundBodyBound':
+    '少数特殊奖励是灵魂绑定的，从你挣到它的那一刻起便与你的角色绑在一起。灵魂绑定的物品无法交易、邮寄、卖给商人，也无法上架到市场；它只属于你一个人。这守住了英雄徽记之类的珍贵凭证，也覆盖每一件用荣誉买来的战争装备，因此一套玩家对战的行头，只会由挣得它的那个角色穿在身上。你从世界中赢来的大多数装备，依然可以自由交易、出售或分享。',
+  'guide.gear.sourcesHonor':
+    '荣誉是与其他玩家作战换来的报酬，而荣誉军需官（东溪镇的 FURY 与高守哨站的 Warmarshal Draven Kole）守着只有荣誉买得到的战争商店：整套的护甲系列、饰品，以及任何钱币商人都不进货的武器。竞技场页面讲的是荣誉本身如何挣得。',
+  'guide.gear.sourcesRifts':
+    '到了等级上限，裂隙又添上一处来源，而裂隙是一场竞速：最先通关的那支队伍赢得它的奖励。这份首杀会在这一趟留下的所有东西之外额外给出装备，其中包括一枚按你职业定位打造的 Riftbound 指环，这是一枚在世界的其他任何地方都找不到的戒指。第二个完成的队伍照样跑完了自己的这一趟，通关的记录也归他们；他们失去的只有首杀奖励。裂隙页面讲的是这场竞速本身。',
+  'guide.glossary.chronicleDef':
+    '一个区域自有的一套功绩，由当地的编年史者收拢成一个个章节。这些章节你可以按任意顺序去完成。',
+  'guide.glossary.chronicleTerm': '编年史',
+  'guide.glossary.claudiumDef': 'WOC 商店的货币，只花在外观上，别无他用。它绝不购买战力或进度。',
+  'guide.glossary.commissionDef':
+    '为别人打造的一件成品。制作者把它标记为委托，它便会绑定到交易中收下它的人身上；日后工位主管可以收一笔费用，再把它解绑。',
+  'guide.glossary.commissionTerm': '委托与制作者之约',
+  'guide.glossary.fatigueDef':
+    '向外海游得够远，海水便开始抽走你的力气：先是一声警告，随后伤害不断加重，直到你转身游回陆地。',
+  'guide.glossary.fatigueTerm': '疲劳',
+  'guide.glossary.finderDef':
+    '这个窗口收录了各座地下城与团队副本，为你排队快速匹配，并列出正在招人的预组队伍。默认按 Shift+I 打开。',
+  'guide.glossary.finderTerm': '地下城查找器',
+  'guide.glossary.fiveSecondDef':
+    '自你上一次消耗法力算起满五秒，法力才会开始自行回复。正因如此，施法者会控制自己的节奏，而不是一味地全力倾泻。',
+  'guide.glossary.fiveSecondTerm': '五秒规则',
+  'guide.glossary.honorDef':
+    '与其他玩家作战换来的报酬：竞技场的胜利、荆谷原野的胜场以及荣誉击杀都会往上累加。你可以用它换取战争套装。',
+  'guide.glossary.honorTerm': '荣誉',
+  'guide.glossary.itemLevelDef':
+    '一个概括装备强弱的数字，想快速比较两件装备时很好用。在选项中开启“显示物品等级”，就能在提示中看到它。只有来源明确的装备才带着它，因此商人处的普通货色与新手装备什么都不显示，缺了这个数字属于正常，而不是出了毛病。',
+  'guide.glossary.itemLevelTerm': '物品等级',
+  'guide.glossary.marksDef':
+    '可反复挑战的终局内容在战利品之外发放的两种奖励。探秘产出探秘印记，可在探秘商店换取装备，并强化你的同伴；英雄难度地下城产出英雄徽记，可在英雄军需官处换取装备。',
+  'guide.glossary.marksTerm': '探秘印记与英雄徽记',
+  'guide.glossary.masterworkDef':
+    '一件成品的最上乘版本，技艺娴熟的制作者时不时便会打出一件，取代那份普通副本。杰作永远刻着它制作者的名字。',
+  'guide.glossary.masterworkTerm': '杰作',
+  'guide.glossary.mountDef':
+    '你骑着穿越大地、走得更快的坐骑生物。你要做的几乎任何别的事都会把你请下来：游泳、进入战斗、采集与制作，全都会让你重新站回地上。',
+  'guide.glossary.mountTerm': '坐骑',
+  'guide.glossary.offHandDef':
+    '第二个手部栏位。它可以拿一面盾牌，或提灯、箭袋之类的手持物品；只有当你的职业与专精能够双持时，才能在那里拿上第二把武器。',
+  'guide.glossary.offHandTerm': '副手',
+  'guide.glossary.premadeDef':
+    '由某位玩家亲手拉起、并发布在地下城查找器板上的队伍，而不是快速匹配队列替你拼出来的那一种。',
+  'guide.glossary.premadeTerm': '预组队伍',
+  'guide.glossary.reinsDef':
+    '就是坐骑本身的那件物品。把一副缰绳留在背包或银行里，那匹坐骑便是你的；使用它就能骑上去。缰绳可以交易、邮寄，也可以卖给其他玩家。',
+  'guide.glossary.reinsTerm': '缰绳',
+  'guide.glossary.requiredLevelDef':
+    '你必须先达到这个等级，才能穿上或握住一件装备。在你还没到之前，提示会用红色标出它。',
+  'guide.glossary.requiredLevelTerm': '需求等级',
+  'guide.glossary.ridingDef':
+    '让你能够骑乘的那门技能。20 级时在马厩总管处一次性买下，此后便永远留在你的角色身上。',
+  'guide.glossary.ridingTerm': '骑术',
+  'guide.glossary.riftDef':
+    '在各个区域中自行撕开的一道裂口，向下通往一处按这道裂隙自己的种子全新生成的副本，一层接着一层。裂隙分为 C、B、A、S 四个等级。入口过一阵子便不再接纳新的队伍，而全服第一支抵达最底层的队伍，才是唯一能将它封上的那一支。',
+  'guide.glossary.riftRankDef':
+    '裂隙身上的那个字母，C、B、A 或 S，也是决定它有多难的唯一因素。裂隙绝不会随你队伍的人数缩放，因此等级本身就是全部的难度阶梯：C 最温和，S 最凶险，而每一个等级都是为一支队伍准备的。',
+  'guide.glossary.riftRankTerm': '等级（裂隙）',
+  'guide.glossary.setBonusDef':
+    '同时穿着同一护甲系列的数件装备所换来的额外奖励。提示会数一数你身上穿了这套的几件，穿得越多，解锁的效果也越多。',
+  'guide.glossary.setBonusTerm': '套装效果',
+  'guide.glossary.talentRowDef':
+    '天赋分六行到来，分别在 5、8、11、14、17 和 20 级各开一行。每一行给出三个选项，你从中挑走一个，因此没有需要攒起来或花出去的点数。',
+  'guide.glossary.talentRowTerm': '天赋行',
+  'guide.glossary.toolCharmDef':
+    '一种制作出来的护符，可在专业窗口中嵌进采矿、伐木或采药工具，让它们的收获更好。嵌入会消耗掉护符，效果持续固定的次数。次数用尽之后，你用材料为那个槽位续充，而不是再做一枚新的护符。',
+  'guide.glossary.toolCharmTerm': '工具护符',
+  'guide.glossary.unstuckDef':
+    '从游戏菜单里使用“脱困”所要付出的代价。站着别动，等倒计时走完，它会把你放在最近的墓地，而此后一段时间里，你会带着一层临时的虚弱。',
+  'guide.glossary.unstuckTerm': '脱困虚弱',
+  'guide.glossary.warfareDef':
+    '玩家对战的装备那一面。军需官用荣誉出售成套的战争护甲，而它们所带的战争评级，只在与其他玩家的战斗中作数。',
+  'guide.glossary.warfareTerm': '战争',
+  'guide.glossary.worldDef':
+    '在线游戏的一份共享副本，有自己的玩家、自己的市场与自己的排名。本指南也把它叫作位面，而你的角色，住在创建它的那个世界上。',
+  'guide.glossary.worldTerm': '世界',
+  'guide.groups.character': '你的角色',
+  'guide.groups.compete': '玩家对战',
+  'guide.groups.endgame': '组队内容',
+  'guide.groups.world': '这个世界',
+  'guide.home.world.farshoreBlurb':
+    '沙洲另一头的一座岛屿，天空在裂野之上撕裂开来，而鸥港为每一次破口鸣响它的钟。',
+  'guide.home.world.farshoreName': '远岸',
+  'guide.home.world.galeBlurb': '海崖与呼啸的丘陵，这里的风从不停歇，而烛港把门关得紧紧的。',
+  'guide.home.world.galeName': '疾风崖',
+  'guide.home.world.gardenBlurb':
+    '一片树篱迷宫般的国度，至今仍被谁也没见过的园丁修剪着，入口就在篱苑镇与它的喷泉庭院之后。',
+  'guide.home.world.gardenName': '常青园',
+  'guide.home.world.hauntBlurb': '巨树华盖之下的闹鬼森林，绞湖镇的提灯是这条路上唯一诚实的光。',
+  'guide.home.world.hauntName': '怨灵林',
+  'guide.home.world.jungleBlurb':
+    '棕榈、白沙与聒噪的飞鸟，海滨小镇漂流港在沙滩上守着一堆不灭的篝火。',
+  'guide.home.world.jungleName': '棕榈湾',
+  'guide.home.world.levelsCap': '{level} 级',
+  'guide.home.world.nightBlurb': '一片繁星午夜的国度，花朵照亮小径，月栖镇彻夜守望。',
+  'guide.home.world.nightName': '夜绽花野',
+  'guide.howToPlay.step0Body':
+    '离线游玩什么都不需要：在开始界面选择“离线”，再按“开始游戏”。想和大家一起玩，就注册一个免费账号（一个用户名、一个密码，以及一个用于找回账号的邮箱），或登录你已有的账号，然后从服务器列表里挑一个服务器。',
+  'guide.howToPlay.worldsBody':
+    '在线游玩发生在各个服务器上，每个服务器都是一份完整的游戏副本，有自己的玩家、自己的世界市场，也有自己的排名。服务器列表会显示每个服务器有多繁忙，从“低”到“已满”，所以你可以挑一个清静的落得宽敞，也可以挑一个热闹的不缺同伴。你的角色属于你创建它的那个服务器，而你可以在不止一个服务器上保留角色。',
+  'guide.howToPlay.worldsTitle': '选择服务器',
+  'guide.interfacePage.actionBarsBody':
+    '经验条上方是三排各十一个技能格，第一排最前端还有一个专用的攻击按钮。一开始只有第一排：需要更多空间时，可在选项里开启第二排和第三排，而第三排要求先开启第二排。键盘顶部的数字键触发第一排，额外的动作条默认绑定小键盘。\n\n技能来自你的法术书（P）：把技能从书里拖到某个格子上，或者用它那一行的开关把它放进第一个空格。物品也一样，所以一叠药水或一卷绷带都可以住在格子里，用按键使用。\n\n把某一排排布成你喜欢的样子之后，你可以锁定它。锁定会拒绝拖动、放置和清空，同时技能照常好用，这样战斗中的一次误点也不会打乱你的按钮。\n\n还有两条较小的条会在用得上时加入进来：宠物条，包含攻击、停止、嘲讽、防御和主动，对应 Ctrl 加 1 到 5；以及供会切换姿态或形态的职业使用的姿态条。',
+  'guide.interfacePage.actionBarsTitle': '你的动作条',
+  'guide.interfacePage.aurasBody':
+    '你自己的增益会在右上角小地图旁排成一行小图标，每一个都在倒数剩余时间，你的减益则排在它们下方一行。右键点击自己的某个增益即可取消它。\n\n有一个选项可以把你的增益行移到自己的单位框体上，把整个角落都留给减益。\n\n目标的增益和减益一起显示在它框体下方的一条区域里。想要更宽敞时，Shift+J 会打开单独的“目标增益与减益”窗口，你可以移动它、只筛选增益或只筛选减益，并让它一直开着。',
+  'guide.interfacePage.aurasTitle': '增益与减益',
+  'guide.interfacePage.barsBody':
+    '你施法或引导时，施法条会出现在屏幕中央、动作条正上方，并带着法术的名称与剩余时间。你的目标在它自己的框体上也有一条施法条，好让你看清接下来会发生什么并作出应对。\n\n施法条下方是一条细细的挥击条，它在你两次武器挥击之间填充，让近战或远程攻击者看清下一次自动攻击何时落下。\n\n你的经验条横贯动作条下方的整个宽度，被刻成一段一段，其中较亮的一截表示你已经存下的休息经验。\n\n潜入水下时，屏幕顶部会出现一条蓝色的呼吸条。头没在水里时它会一直下降，耗尽后会闪红并让你开始溺水，而你一浮出水面它就迅速回满。空格键让你上浮，下潜键（默认为 Ctrl）带你潜得更深。\n\n伤害与治疗会以小小的数字从命中之处向上飘起，让你不必读文字也能看懂一场战斗。聊天框里的“战斗”标签页保留着完整的文字记录。',
+  'guide.interfacePage.barsTitle': '各类条、计时与战斗文字',
+  'guide.interfacePage.chatBody':
+    '屏幕左下角。按回车开始输入，再按一次回车发送。\n\n有两个标签页始终在那里：“聊天”，是你身边所说一切的合并记录；以及“战斗”，是你这场战斗的文字记录。加号按钮可以添加更多，每个频道一个：说话、大喊、队伍、综合、世界、寻求组队、公会和官员，另外还有一个密语标签页，把你发出和收到的每一条密语都聚在一处。在某个频道标签页里输入，就会直接发往那个频道，不必再重打命令。\n\n整个聊天框可以拖到别的位置，也可以调整大小，而且它会记住你把它留在了哪里。',
+  'guide.interfacePage.chatTitle': '聊天框',
+  'guide.interfacePage.framePartyBody':
+    '队伍成员在左侧、你的目标框体下方逐行排列，每人一行。某位成员走出距离时，他那一行会变暗；行上会显示值得你反应的效果，还可以在旁边显示他的宠物。每一行带多少生命值文字由你决定：不显示、百分比、具体数值，或者两者都要。',
+  'guide.interfacePage.framePartyTitle': '你的队伍',
+  'guide.interfacePage.framePetBody':
+    '猎人、术士，以及任何放出了宠物的人，都会在自己的框体旁得到一个小框体，显示宠物的名字、等级和生命值。点击那个框体即可选中你的宠物，用键盘按 Ctrl+6 也是一样。',
+  'guide.interfacePage.framesBody':
+    '单位框体就是一张头像加上旁边的几条状态条：生命条总是有的，单位拥有资源时还有一条资源条，另外是名字和等级标记。伤害护盾会以较亮的一段叠加在生命条之上，让你看着护盾先被耗尽，生命值才开始下降。',
+  'guide.interfacePage.frameSelfBody':
+    '屏幕底部中央，紧挨着你的动作条。头像、等级、生命值和你的资源，战斗中带一个标记，休息时带一个休息标记，会积攒连击点的职业还带着一排连击点。点击这个框体就会选中你自己。',
+  'guide.interfacePage.frameSelfTitle': '你自己的框体',
+  'guide.interfacePage.framesMoveBody':
+    '你的框体、目标框体和队伍框体都可以移动。每个框体角上都有一个小小的移动按钮：解开它，把框体拖到你想要的位置，再锁上，这样一次误点就挪不动它。如果挪到了让你后悔的地方，选项里的“重置框体位置”会把它们统统弹回最初的位置。',
+  'guide.interfacePage.framesTitle': '单位框体',
+  'guide.interfacePage.frameTargetBody':
+    '左上角，在你选中某个目标的那一刻出现，取消选中后又消失。同样是头像与状态条，此外较难缠的敌人会带上精英标记，还有一条显示你的目标正在施放什么的施法条，以及一排它身上的效果。',
+  'guide.interfacePage.frameTargetTitle': '你的目标',
+  'guide.interfacePage.frameTotBody':
+    '目标框体旁的一个小框体，显示你的目标此刻正打着谁。要分辨一只怪物是在打你的坦克还是冲你来了，这是最快的办法。它默认隐藏，需要你在选项里开启。',
+  'guide.interfacePage.frameTotTitle': '你目标的目标',
+  'guide.interfacePage.glanceBody':
+    '界面沿着屏幕四周排布，把中间让给世界。你自己的框体、你的动作条和你的经验条排在底部。你的目标和你的队伍在左上角。小地图和区域名在右上角，各类追踪器从它们下方沿右侧排下来。聊天框在左下角，右下角则是一排小方块按钮。\n\n其余的一切都是你可以打开和关上的窗口。大多数窗口有自己的按键，大多数在右下角那排按钮里也有一个按钮，而每一个都可以再按一次它自己的按键，或者按 Esc 关掉。',
+  'guide.interfacePage.glanceTitle': '界面一览',
+  'guide.interfacePage.intro':
+    '一张屏幕地图：你界面上的每个框体、每条状态条和每个按钮各司何职，以及每个按键打开的是哪个窗口。',
+  'guide.interfacePage.keyWindowsBody':
+    '下面每一个都有自己的默认按键，并在右下角那排按钮里有一个按钮。再按一次该按键，或者按 Esc，即可关闭。',
+  'guide.interfacePage.keyWindowsTitle': '用按键打开的窗口',
+  'guide.interfacePage.lootBody':
+    '与一具你应得的尸体互动，战利品窗口就会打开，列出掉落的东西。点击某一行即可取走。\n\n在队伍里，按照队伍的拾取规则，一件好掉落会转而在你的屏幕上弹出一个掷骰提示：想自己用就选“需求”，打算拿去卖就选“贪婪”，愿意让给别人就选“放弃”。随后一个小面板会在倒计时期间显示谁已经掷过、又选了什么。\n\n拾取规则本身住在一个自己的小窗口里。队长可以在那里更改规则，其他人看到的是同一个只读窗口，所以规则从来不是秘密。\n\n有些尸体身上还能采集材料。可以采时，战利品窗口的底部会出现一个“采集”区域，你想要的每种材料都有一个可以勾选的方框。',
+  'guide.interfacePage.lootTitle': '战利品与掷骰',
+  'guide.interfacePage.mapBody':
+    'M 打开世界地图：整块大陆铺展开来，上面有你自己的箭头、各个区域及其名称、你周围的兴趣点、传送门，还有你已经发现的采集资源点。你的队伍也会显示在上面。在探秘里，地图会切换成你目前已探索房间的示意图。\n\n右侧、小地图下方，一叠追踪器让你不必打开任何窗口就能盯住手头的事：你追踪的任务及其目标、你的功绩进度、你所在的探秘，以及你正在参与的任何裂隙。想把屏幕空间要回来时，任务追踪器可以折叠。',
+  'guide.interfacePage.mapTitle': '世界地图与你的追踪器',
+  'guide.interfacePage.minimapBody':
+    '右上角：一张圆形小地图，上方是区域名，下方是你的坐标，外面环着一圈标出一天时辰的表盘。\n\n有话要说时，它上面会冒出一些小小的指示：有未读信件在等你时是一只信封，有售出所得或退回的货物在商人处等你时是一枚硬币，还有一个列出你团队副本锁定的按钮。',
+  'guide.interfacePage.minimapTitle': '小地图',
+  'guide.interfacePage.mobileBody':
+    '触屏控制会自行出现，布局也会按你的屏幕自己调整：小手机上是紧凑排布，大屏手机上是标准排布，平板上则更宽松些。\n\n你的技能排成一圈，而不是一排数字：攻击按钮旁边是五个动作按钮，还有一个翻页开关，可以让这一圈轮换到你其余的格子，三条动作条全部开启后最多有七页。围着它们的是触屏玩家最常伸手去按的按钮：切换目标、使用面前的东西、跳跃，另外还有一排可以拉出来的消耗品，会自动从你身上带着的东西里补齐。\n\n屏幕底缘依次是聊天、社交、任务、设置和更多。“更多”会打开一个托盘，装着其余的窗口，包括你的角色、地下城查找器、PvP、溪谷杯、表情和维基。这里的窗口会铺满整个屏幕，而不是浮在上面。\n\n移动单位框体是桌面端的事：在触屏上，布局会替你把它们安排好。',
+  'guide.interfacePage.mobileTitle': '在手机或平板上',
+  'guide.interfacePage.playerCardBody':
+    '角色属性面板上有一个按钮，可以生成一张玩家名片：一张带着你角色特写的图片，配上你身上的装备和你的属性，随时可以保存或分享。它是用来炫耀一套新装备的快照，不会改变游戏里的任何东西。',
+  'guide.interfacePage.playerCardTitle': '你的玩家名片',
+  'guide.interfacePage.railBody':
+    '在屏幕右下角，离小地图远远的地方，是一排小方块按钮，一个窗口一个，分作并排的两列短栏。它们大多印着自己的默认按键。\n\n它们涵盖你的角色、法术书、天赋、任务日志、功绩之书、专业、世界地图、背包、制作、PvP、地下城查找器、溪谷杯、纸牌对决、排行榜、表情、音乐、好友与公会、这份维基，以及游戏菜单。另有几个只在用得上时才加入其中。',
+  'guide.interfacePage.railTitle': '按钮栏',
+  'guide.interfacePage.scopeBody':
+    '本页提到的每一个按键都是默认设置，而且每一个都可以重新绑定。完整的按键表在“操作键”页面，而改变界面外观与行为的选项在“设置和性能”页面。Esc 关闭最上层的窗口，什么都没打开时则打开游戏菜单。',
+  'guide.interfacePage.scopeTitle': '按键，以及在哪里更改',
+  'guide.interfacePage.wikiBody':
+    '在游戏里，这份维基只有一步之遥。右下角那排按钮里有它的一个按钮，Esc 游戏菜单里有它的一行，在手机上它住在“更多”托盘里。因为打开它就等于把你交给浏览器，这个按钮总会先请你确认，所以战斗中的一次误触绝不会把你拽出战斗。游戏会在它背后继续运行。',
+  'guide.interfacePage.wikiTitle': '维基按钮',
+  'guide.interfacePage.winBagsBody':
+    '你带着的一切，装在一个有四个背包插槽的包里。顶部的分类标签可以把它收窄到武器、护甲、消耗品、材料、工具、任务物品或坐骑，搜索框则按名称过滤。排序下拉菜单会按最近获得、品质或名称重排你正在看的东西，这个选择会在会话之间记住。另有一个单独的“整理”按钮，一按就把包里真正的格子理顺，并清掉分类标签和搜索，让你看到整理好的整个背包。',
+  'guide.interfacePage.winCharBody':
+    '一侧是你已装备的装备，另一侧是你的属性以及它们所支撑的数值，每个数值上都有提示，说明它对你的职业有什么用。这里还带着你的终身游戏时长，旁边有一只小眼睛，在你不愿示人时可以把这个数字藏起来；生成玩家名片的按钮也在这里。',
+  'guide.interfacePage.winCharTitle': '角色属性面板（C）',
+  'guide.interfacePage.winCraftingBody':
+    '你的配方、每个配方需要什么，以及以你此刻带着的材料现在能做出什么。',
+  'guide.interfacePage.winCraftingTitle': '制作（T）',
+  'guide.interfacePage.winDeedsBody':
+    '你做过之事的记录、它们给你带来的头衔与名望，以及还有哪些尚未完成。',
+  'guide.interfacePage.winDeedsTitle': '功绩之书（Shift+Z）',
+  'guide.interfacePage.winFinderBody':
+    '你可以排队的组队内容目录。勾选你想要的活动，独自加入队列，或为自己的队伍发布一条招募，等队伍凑齐时接受即可。',
+  'guide.interfacePage.winFinderTitle': '地下城查找器（Shift+I）',
+  'guide.interfacePage.winMetersBody':
+    '你和身边所有人的伤害、治疗与仇恨，分段保存，方便你回看上一场战斗。治疗与仇恨面板可以拉出来单独放着。',
+  'guide.interfacePage.winMetersTitle': '伤害统计（Shift+H）',
+  'guide.interfacePage.winMoreBody':
+    '世界地图（M）、PvP 窗口（G）、溪谷杯（Y）、排行榜（K）、活动日历（I）和表情轮盘（X）都以同样的方式工作。',
+  'guide.interfacePage.winMoreTitle': '还有几个',
+  'guide.interfacePage.winProfessionsBody':
+    '你学会了哪些行业、每一门有多熟练，以及每一门还能走多远。',
+  'guide.interfacePage.winProfessionsTitle': '专业（Shift+P）',
+  'guide.interfacePage.winQuestLogBody':
+    '你接下的每一个任务、它的故事、它的目标和你的进度，还可以把其中任意内容标到地图上，并挑选你的追踪器跟随哪些任务。',
+  'guide.interfacePage.winQuestLogTitle': '任务日志（L）',
+  'guide.interfacePage.winSocialBody':
+    '分为好友、你的公会及其成员名册、你的团队，以及你已忽略或拉黑的玩家等标签页。',
+  'guide.interfacePage.winSocialTitle': '好友与公会（O）',
+  'guide.interfacePage.winSpellbookBody':
+    '你职业的每一个技能，已学会的和还没到的，按顺序排开。你正是在这里把技能拖到动作条上的。',
+  'guide.interfacePage.winSpellbookTitle': '法术书（P）',
+  'guide.interfacePage.winTalentsBody':
+    '在这里选择你的专精，还有你的六个天赋行：每行提供三个选项，以及每个选项的作用。尚未到达的行会与当前可选的行并排显示。',
+  'guide.interfacePage.winTalentsTitle': '天赋（N）',
+  'guide.interfacePage.worldWindowsBody':
+    '有些窗口你从不为它按键：你和合适的人交谈、或点击合适的东西时，它们自己就打开了。\n\n商人会打开商人窗口，里面有供你选购的存货，还有一个回购标签页，留着你最近卖掉的东西，以防你是卖错了。职业训练师会打开你现在能学什么、后面还有什么等着你的列表。\n\n银行职员会打开你的金库，这个保险箱里的额外格子可以花钱再买。如果你的公会开设了公会银行，那里的第二个标签页会显示它：每位成员即使没有取出的权限也能看看里面有什么，所以没人需要开口打听公会存着什么；各个等级决定谁可以存入、取出和调动公会的金币，而日志记录着每一次进出。\n\n渡鸦邮驿的邮箱会打开你的信件，一个标签页放已经到的，另一个是寄信的表单，连附件一起。商人处的世界市场有自己的窗口：一个标签页浏览和购买，另一个上架你自己的货物，第三个收取已经卖掉的所得。与另一位玩家面对面交易，则会打开一个交易窗口，双方各占一侧。',
+  'guide.interfacePage.worldWindowsTitle': '世界为你打开的窗口',
+  'guide.mountsPage.breaksBody':
+    '水永远赢。骑进任何深到要游泳的地方，你会立刻落地，因为没有哪只地面坐骑会游泳；而死亡会把你摔在原地。战斗中、死亡或以灵魂形态往回赶的路上，以及荆谷原野比赛的任何阶段，你都无法召唤坐骑：那场比赛从集结到最后的据点争夺全程徒步。召唤到一半走进战斗或走进水里，同样会中断召唤。\n\n你做的大多数事情也会把你放下来。挥出攻击、开始施法、采集资源点、钓鱼、制作、附魔和回收，都会在你起手的那一刻让你下马，所以每遇到一处矿脉都要做好跳下来的准备。召唤坐骑还会解除你正维持的任何变形形态：你永远不会既变着形又骑着坐骑。',
+  'guide.mountsPage.breaksHeading': '什么会让你重新落回地上',
+  'guide.mountsPage.collectBody':
+    '除了玛拉的柜台，缰绳是找来的，而不是买来的。它们出自五人地下城和团队副本英雄难度的最终首领，也出自裂隙的完成奖励，而你结束的裂隙越难，它可能留下的缰绳就越稀有。它们按设计就是稀有的收获，没有哪一趟必定给你一副，所以搜寻坐骑的稳妥办法，是把这份搜寻顺路带进你本来就要跑的副本里。本页不会告诉你哪只坐骑挂在哪个首领身上：那一部分留给你自己去弄明白。',
+  'guide.mountsPage.collectHeading': '更稀有的坐骑从何而来',
+  'guide.mountsPage.firstBody':
+    '英勇战马是全世界唯一一只出售的坐骑。学会骑术之后，玛拉会以 10 金把英勇战马的缰绳卖给你，那副缰绳从此归你所有。其余每一只坐骑都要在世界里赢来，所以几乎每位骑手都是从这匹马开始的。',
+  'guide.mountsPage.firstHeading': '你的第一只坐骑',
+  'guide.mountsPage.goodsBody':
+    '坐骑是一件物品，因此它也是经济可以流转的东西。只要缰绳还在你的背包或银行里，这只坐骑就属于你；不过存进银行的缰绳只保住所有权，并不能让你骑：要召唤这头坐骑，你得把缰绳带在身上。玩家的缰绳不带灵魂绑定，因此除非物品本身另有说明，它们可以交易、可以邮寄，也可以像其他任何收获一样在世界市场上架。出手之前有两件事值得先知道：任何商人都不会回购一副缰绳，所以坐骑是一笔你要么留着、要么转手，却无法套现的购买；另外，如果缰绳在你骑乘时离手，坐骑会跟着一起走，而你会被就地放下。',
+  'guide.mountsPage.goodsHeading': '缰绳只是寻常货物',
+  'guide.mountsPage.heading': '坐骑与骑乘',
+  'guide.mountsPage.intro':
+    '坐骑是穿越世界的更快方式，仅此而已。你在马厩学会骑乘，买下第一副缰绳，此后每一条路都会变短。',
+  'guide.mountsPage.learnBody':
+    '骑术是一门只需买一次的技能，它在 {level} 级开启。马厩总管玛拉·希琴在丘陵上经营着疾风崖马厩，她出售骑术训练，价钱是 80 金。正是这一次购买让你得以骑上坐骑，而且它会永远伴着你。\n\n学会之后，玛拉还有一个任务给你：骑术课。接下它，跟着标记走到起始拱门后方那块发光的方砖上，然后按“开始比赛”。她会借给你一匹训练用英勇战马来上这堂课，所以课程本身分文不取。跑完赛道、完成它，再回到她那里领取你的金币和经验。借出的战马课后会回到马厩，所以这堂课教给你的是骑术本身，而不是白送你一匹马。',
+  'guide.mountsPage.learnHeading': '学习骑乘',
+  'guide.mountsPage.raceBody':
+    '玛拉围场里的障碍赛道随时向任何人开放，并不只在上课时才能跑。骑上坐骑，站到拱门后方那块发光的方砖上，然后按“开始比赛”。倒计时会让你原地待命，接着计时开始：越过全部七道障碍，并在时间走完之前从拱门骑出去。\n\n只有当你确实凌空越过横杆时，这道障碍才算数，所以轻轻松松从旁边骑过去什么也清不掉。你可以按任意顺序、从任意一侧越过它们，漏掉一道也不是世界末日：绕回来再跳一次就是。死亡、下马或离开围场都会结束这次挑战，而没有什么拦着你再来一次。这里没有费用、没有冷却，除了成绩本身也没有奖品，而且任意多的骑手可以同时跑这条赛道，互不妨碍。',
+  'guide.mountsPage.raceHeading': '马厩赛道',
+  'guide.mountsPage.rideBody':
+    '这里没有坐骑窗口，也不用设定最爱的坐骑，因为缰绳就是坐骑。从背包里或从动作条格子上使用一副缰绳，你就骑上了那只坐骑。召唤需要一点时间，是一段短短的呼唤而非瞬发，所以它救不了你一次糟糕的拉怪。下马是瞬时的，而且从不会被阻止。\n\n再次使用你正骑着的那副缰绳，就会把这只坐骑收起来。骑乘时使用另一副缰绳，会直接换乘过去，中间不必再召唤一次。“骑乘 / 下骑”键（默认是反引号键）永远只负责让你下来：它是下马的路，不是上马的路。唯一的例外是骑术课，在那里同一个键会召唤玛拉借给你的战马，因为借来的马没有缰绳可点。在手机或平板上，“更多”托盘里的坐骑按钮两个方向都管用。',
+  'guide.mountsPage.rideHeading': '上马与下马',
+  'guide.mountsPage.speedBody':
+    '速度是坐骑之间唯一的差别。你从玛拉处买来的英勇战马定下了基础脚程，而你在世界里收集到的坐骑都跑得比它快：缰绳越稀有，骑起来越快，并且是分成几个清晰的档位，而不是平滑地往上滑。没有第二阶骑术可以训练，之后也没有升级可以购买。骑术你只付一次钱，从此以后，你用的是哪副缰绳，就决定了你走得多快。',
+  'guide.mountsPage.speedHeading': '速度与档位',
+  'guide.mountsPage.whatBody':
+    '坐骑是你骑乘的野兽，而它给你的东西就是速度。没有护甲，没有伤害，没有属性：它带着你更快地掠过地面，跳跃时也蹦得高一点，这就是这笔交易的全部。游戏里的每一只坐骑都是地面坐骑，所以没有飞行，它们也都不会游泳。',
+  'guide.mountsPage.whatHeading': '坐骑是什么',
+  'guide.mountsPage.whereBody':
+    '疾风崖马厩标注在疾风崖的地图上，位于断崖与沉船滩之间的丘陵上。玛拉站在马厩旁，面朝赛场。',
+  'guide.mountsPage.whereHeading': '在哪里找到她',
+  'guide.nav.commands': '斜杠命令',
+  'guide.nav.editor': '世界编辑器',
+  'guide.nav.interface': '界面与 HUD',
+  'guide.nav.mounts': '坐骑与骑乘',
+  'guide.nav.rifts': '裂隙',
+  'guide.professions.focusBodyTiers':
+    '每座主城都为过路的采集者备有一块城镇专注面板：站在城镇里，从小地图旁打开它，把 10 点专注点数的预算摊到你在意的那些材料种类上。某种材料每投入 5 点，它的采集品级就提升一档（最多两档），而每一点都会让它的产量增加 10%；未获专注的材料绝不会因此变差。\n\n你的分配会跟随你的角色走遍各地，日后任何一次回到城镇都可以重新调整，快慢由你决定。慢慢来是免费的：每移动 1 点，重新调整需要 1 分钟。花点小钱可以加快，每点 15 秒，另加每点 5 铜与 1 个铃音之尘；全额付费则立刻完成，每点 25 铜与 5 个铃音之尘。只有你实际移动的点数才算钱，所以挪动一个点很便宜，而打开面板又原样关上，在任何档位下都分文不取。',
+  'guide.professions.harvestBodyFamilies':
+    '采集并不止步于资源节点。许多被击杀的野兽都可以被采集一次，先到先得：兽皮、尖牙、利爪、獠牙、丝线、毒液、布料与兽肉，与它的普通战利品一并直接取自尸体，一次按键就会同时打开两者。当一头野兽身上不止一种可用材料时，如何取舍便由你决定：把它能给的全部取走，或专注于更少的材料，换取你所取之物明显更精细的品级。\n\n在能产出标本的族群身上掷出精良或更高的采集品质时，除普通产出之外还会额外获得一件署名的完美标本（一块Pristine Hide、一份Pristine Silk、一枚Pristine Venom Gland、一只Pristine Claw或一份Prime Cut），并在你的功绩之书中记下A Perfect Specimen。任何角色都可以采集，无需训练；而你拥有的任何采集工具，无论属于哪一门行业，都会计入最上等材料的判定。',
+  'guide.professions.toolEffectsBody':
+    '采集工具身上有一个插槽，而附魔师的护符正是嵌进去的东西。采集者储囊会为一次采集的产出多加一个单位；匠人之眼则提升它采上来之物的品级。Eastbrook的工坊宗师Tinker Gizzel会把两者传授给附魔技能达到 25 的附魔师，两者也都在他的工坊里制作。\\n\\n新嵌入的护符在普通品质工具上带有 20 次充能，工具稀有度每高一阶再加 10 次，所以同一枚护符嵌在史诗采矿镐上时起始便是 50 次。只有当护符真正改变了结果时才会消耗一次充能，对它没能改善的采集绝不扣减；插槽还可以设成每次使用前询问，让护符一直等到你说“使用一次充能”为止。嵌入一枚新护符，会围绕你当时携带的工具把这个插槽重铸一遍，因此它填到的是那件工具所能容纳的量，而不是退回从前的某个高点；而一次什么都不会改变的重嵌会被挡回来，不会白白吃掉护符。\\n\\n充能用尽并不会毁掉护符：由工具的主人为插槽补充，每花一份奥术材料补 10 次充能；至于它要哪种材料，取决于你携带的工具与这个插槽历来被填过的最好工具之中更好的那件：普通或优秀工具用铃音之尘，精良工具用铃音精华，史诗工具用铃音碎片。把好工具留在银行并不会换来更便宜的补充，只会在同样价钱下更少；真正降到更便宜一档的老实办法，是带着较差的工具嵌入一枚新护符，把插槽在那里重铸。如果插槽的上限高过你当前工具能填到的量，补充会停在那件工具的上限处，并提醒你带上更好的那一件。若你正是署名这枚护符的附魔师，补充只需一半材料，若你还专精附魔则更少；其他人一律付全价。补充是一段短读条，和这门手艺的其余部分一样。',
+  'guide.professions.toolEffectsHeading': '工具效果',
+  'guide.profPages.econ.commissionsBoardNote':
+    '走进一份委托有两条路：你在上方的板上发布订单，把活儿送到工匠面前；或者工匠干脆自己决定为你做一件。两者最终都归于同一份绑定。',
+  'guide.profPages.econ.orderBoardBody':
+    '你不必在聊天里满世界找工匠。打开你的制作窗口，委托订单板就在它的标题栏里，一点即到。任何人都可以在那里发布订单：说明你想要做的配方，然后要么留作公开，让任何工匠都能接下，要么指定给某一位工匠，那样便只有他能接手。工匠在板上浏览之后接下订单，而接单即是承诺，所以一份活儿在同一时间只会有一个人在做。\n\n发布时不会扣下任何东西：订单既不预留金币也不预留材料，因此价格和由谁提供材料仍留在你们两人之间商定，和任何委托历来的谈法一样。只要订单还开着，你可以取消自己发布的订单，而无人接下的订单会在一天后自行过期。工匠一旦接下，就只有交付才能了结它。\n\n交付是当面进行的。工匠以委托的方式做出这件物品，来到你面前，亲手交给你，所以请留出一个背包格子来接收。送到手里的东西遵循下方的普通委托规则，通过制作者之约绑定给你。',
+  'guide.profPages.econ.orderBoardHeading': '委托订单板',
+  'guide.profPages.ench.charmsBody':
+    '采集者的护符也出自附魔。你的附魔技能达到 25 后，Tinker Gizzel会在Eastbrook的工具工坊传授两者：为一次采集多加一个单位产出的采集者储囊，以及提升采上来之物品级的匠人之眼。每一枚都只制作一次，然后嵌进采矿镐、斧或镰刀，只在真正被它改善的采集上消耗一次充能。\n\n补充充能才是这门手艺持续赚钱的地方。充能由工具的主人恢复，而不是由上门的附魔师来做；当那位主人正是署名这枚护符的附魔师时，补充只需一半材料，若还带着附魔专精则更少。因此隔着柜台卖出的护符只是一锤子买卖，而嵌在你自己工具上的那些，才是养起来便宜的。完整的充能与材料阶梯见任意一门采集专业页面的“工具效果”一节。',
+  'guide.profPages.ench.charmsHeading': '给采集者工具的护符',
+  'guide.profPages.ench.enchantsNoteOffhand':
+    '附魔分三个层级。基础层级消耗铃音之尘（高端配方还需少量铃音精华），覆盖武器槽、副手以及每一个护甲槽，属性轴选项之丰令每种配装都能在每个槽位找到合适的附魔：盾牌与施法者手持副手有属于自己的耐力附魔，因此没有哪个装备槽是附魔的死角。进阶层级每件消耗一个铃音碎片加若干铃音精华：对影响最大的槽位给出更强的加成。碎片此外还有两个去处，两个护符配方各要五个，以及工具效果补充的最高一档，所以动手花用之前先攒下几个。\n\n夹在两者之间的是五种符文附魔，各对应一种定向副产物，确保你磨出的任何材料都不会白费：符文锋刃（武器，力量，消耗共鸣钢片），符文印记（武器，智力，共鸣木片），符文织纹（胸甲，精神，共鸣线段），符文皮甲（护腿，敏捷，共鸣皮料），符文锁链（头盔，耐力，共鸣链片）。每件还各需两个铃音精华；对于同时拥有基础与进阶附魔的槽位和属性，符文附魔的加成介于两者之间，唯有符文织纹是迄今最强的胸甲精神附魔，符文皮甲则是唯一的护腿敏捷附魔。确切加成详见下方表格。',
+  'guide.profPages.faq.a10':
+    '护符是一种嵌入式的工具效果：附魔师的手艺，安在采集工具里，改善它采上来的东西。采集者储囊为一次采集多加一个单位，匠人之眼提升它的品级，而Tinker Gizzel会在Eastbrook的工具工坊向附魔技能达到 25 的人传授两者。只有当护符真正改变了结果时才会消耗一次充能，所以它无法改善的那一次采集不会让你有任何损耗；插槽还可以设成每次使用前询问，方便你一次一次地拿主意。\\n\\n一枚新护符在普通品质工具上带有 20 次充能，稀有度每高一阶再加 10 次，所以史诗工具起始便是 50 次。用尽了也不会毁掉护符：由工具的主人为插槽补充，每份奥术材料补 10 次充能，材料取决于他携带的工具与这个插槽历来被填过的最好工具之中更好的那件（普通或优秀工具用铃音之尘，精良工具用铃音精华，史诗工具用铃音碎片）。补充前把好工具存进银行绝不会让它更便宜，只会在同样价钱下更少；而带着较差的工具嵌入一枚新护符，才是回到更便宜一档的办法。署名这枚护符的附魔师为自己的护符补充只付一半，带着附魔专精则更少。',
+  'guide.profPages.faq.a9':
+    '把它发布到委托订单板上。打开制作窗口，从它的标题栏打开订单板，说明你想要做的配方：把订单留作公开，让任何工匠都能接下，或者指定给某位你已经认识的工匠。接单便意味着这位工匠承诺了这份活儿，而一份订单在同一时间只会由一个人握着。\n\n发布时不会扣下金币和材料，所以价格与由谁提供材料请你们自行商定，就像委托历来的谈法一样。只要订单还开着，你可以取消自己发布的订单，而无人接下的订单会在一天后过期。交付是当面的：东西做好时，带着一个空背包格站到你的工匠身边。它到手时会通过制作者之约绑定给你，任何工位的大师都可以按常规费用为你解绑。',
+  'guide.profPages.faq.q10': '什么是护符？充能用尽之后又会怎样？',
+  'guide.profPages.faq.q9': '我要怎么请别人替我制作东西？',
+  'guide.profPages.findingNodesNote':
+    '你不必全靠眼睛去找。区域里的每一处资源点，只要地图正显示着那片地面，都会画在区域地图上，你经过时也会出现在小地图上，因此一条采集路线可以在出发之前就在地图界面上规划好。你的工具还够不着的资源点是标出来而不是藏起来：它留在原处，只是标记被划掉并变暗，好让你看见自己正在为之训练的那片地。在桌面端，把鼠标悬停在世界里的矿脉、林木或草丛上，会说出它的名字、告诉你它需要哪种工具，而且在你采过之后，还会以秒为单位为你自己倒数它的重生时间。触屏上没有悬停可言，于是小地图上的标记讲的是同一件事。',
+  'guide.profPages.specimenBodyFamilies':
+    '采集时请留出一点背包空间：一件署名的意外之喜需要属于它自己的空位，或者一个可以并进去的同款署名堆叠；若实在放不下，产出仍然会到手，只是署名就此失去。尸体采集也有属于自己的一份大奖机制：每种被采集的材料大约有 {pct}% 的几率掷出精良或更高品质。能给出完美标本的族群（兽皮、丝线、毒液、利爪、兽肉）会让普通产出保持朴素，另外在旁边铸出那件署名标本；其余三种，尖牙、布料与獠牙，则直接把署名打在产出本身上。',
+  'guide.progression.ridingBody':
+    '骑术是攀登尽头等着你的东西之一。到了 {level} 级，一位马厩总管会用一笔相当可观的金币把这门技能教给你，而训练赛道上的一堂课会为你挣来第一副缰绳。坐骑不带来任何力量；它只是把世界变小了一些，而在向北长途跋涉之后，这本身就是一种奖赏。',
+  'guide.progression.ridingTitle': '学习骑乘',
+  'guide.questsPage.availableBody':
+    '任务是成串出现的。大多数任务要等你交掉前一个之后才会给出，许多还要求一个最低等级，所以今天没什么可给你的 NPC，等你再升几级、或者结掉手上正做的那个任务之后，也许就有一大堆了。少数任务另有自己的条件，比如骑术课，要买下骑术技能之后才会开启。组队任务会一上来就说明白，列出它建议你带上几名玩家。有些活计可以重复：等上一阵之后可以再接，而任务发布者头顶的标记会告诉你什么时候又轮回来了。',
+  'guide.questsPage.availableTitle': '为什么这个 NPC 没有任务给你',
+  'guide.questsPage.cardMasterBody':
+    '东溪镇里有一位 NPC 发的是牌，而不是差事。找牌局大师聊聊，从他的菜单里选出“纸牌对决”，你就会加入一个队列，与下一位等待中的玩家配对。任何职业都可以坐下来玩，等级和装备完全不作数。你们各自从自己那副二十张的牌组出牌，牌面一到十，手上同时握着四张，每一轮再抽一张：点数大的赢下这一轮，两张一样的牌算作平局，双方都不得分。先赢两轮者赢下这一场，所以一场对决是三局两胜。每一轮都有时限，若你九十秒不出牌，这一场就判给对方，除非当时还没有任何一轮分出胜负，那样它便直接作废，无人取胜。你自己中途走开，结果也一样。加入队列时你必须站在牌局大师身边，但一旦配上对手，牌桌会自行打开，你在任何地方都能玩。它需要两个人，所以离线世界从不提供它。',
+  'guide.questsPage.cardMasterTitle': '并非每个 NPC 都有任务：牌局大师',
+  'guide.questsPage.typeEscortBody':
+    '有人需要被护送着走过一段危险的路。接下任务，到路口找到等在那里的人，与他交谈便可动身。他会按自己的步调走，你在旁边跟上；沿途潜伏的麻烦冲着的是他，并不总是冲着你。跟紧一点：敌人会一波波地伏击这段路，只有把一波清掉，队伍才会继续前进。你无法攻击被护送的人，但可以为他治疗；万一他倒下了，这一趟只是重置一次，你可以再来。带着他活着走到另一头，而你也在他身旁，任务便会记功。',
+  'guide.questsPage.typeEscortTitle': '护送',
+  'guide.riftsPage.boundBody':
+    '你的队伍在裂隙里拿下的第一个击杀，会把这一趟定下来。从那一刻起，你就被绑定在这一份副本上：无论因为什么走出去，再回来时进的都是你离开的那一趟，绝不会进别人的，也绝不会开一趟新的。在第一个击杀之前，什么都还没定，所以还在集结的队伍可以重新会合、一起走进去，不会在身后留下一堆半开的副本。',
+  'guide.riftsPage.boundHeading': '一旦见了血',
+  'guide.riftsPage.floorsHeading': '层层向下',
+  'guide.riftsPage.groupBody':
+    '带上一支队伍。裂隙不会因为进去的人少就手下留情：里面没有任何东西会去数你们站着几个人，所以传送门上写的是什么等级，你打的就是什么等级，无论你们是五个人还是一个人。门口确实会放你独自进去，也确实有人这么试过，但裂隙在每一个等级上都是团队内容，而且从第一个房间起它就诚实地告诉你这一点。你的小队会拿到属于自己的一份副本，别的队伍不会闯进你的这一趟。若是倒下了，你可以化作鬼魂走回来，等里面的战斗停下再收拾自己。',
+  'guide.riftsPage.groupHeading': '谁该进去',
+  'guide.riftsPage.heading': '裂隙',
+  'guide.riftsPage.intro':
+    '裂隙不是一扇你走过去的门，而是世界本身裂开的一道口子。踏进去，你会得到一段谁都没跑过的下行之路：层数、怪物，以及等在最底下的那个东西，全都是为这一道裂隙当场生成的，所以同样的等级，两次也绝不会走出一样的过程。',
+  'guide.riftsPage.levelNote':
+    '裂隙属于终局内容。无论哪个等级的裂隙，你都必须达到等级上限，也就是 {n} 级，才能踏进去。',
+  'guide.riftsPage.openBody':
+    '裂隙撕开的地方，是王国更外围的那些区域，而不是初始的山谷，而且整个王国都会听到消息：一道裂隙出现的那一刻，聊天栏就会有一行字报出它的等级和所在的区域。每个符合条件的区域大约每小时轮到一次裂隙，已经立着一道裂隙的区域会先等着，而不是再开第二道。没人去封的裂隙，会在几个小时后自行坍塌，这件事王国同样会听说。裂隙被封印过的区域会安静下来，直到下一轮轮到它，所以看到通报时，趁消息还新鲜就动身，是值得的。',
+  'guide.riftsPage.openHeading': '裂隙在哪里开启，多久开一次',
+  'guide.riftsPage.raceBody':
+    '王国里的每一支队伍都可以同时攻打同一道裂隙，各打各的那一份副本，但只有第一个把最底下那个东西放倒的队伍才能封印它。有队伍获胜时，全王国都会听到他们的名字和用时，入口也随之在他们身后关闭。输掉这场竞速并不会结束你的这一趟：你的副本仍然开着，最底下那个东西照样会倒在你手上，你也照样能靠自己走出来。你失去的，是通关本该带来的一切。首领不会为第二名留下任何东西，所以你带回家的，只有一路向下时从小怪身上掉出来的东西，再无其他。功绩之书仍然会记下这次通关，因为那东西确实是你放倒的。这是游戏里唯一一场你可能输掉、却连赢家的面都见不着的竞速。',
+  'guide.riftsPage.raceHeading': '首杀之争',
+  'guide.riftsPage.ranksBody':
+    '每一道裂隙都有 C、B、A 或 S 的等级，等级会写在通报里，所以你还没出城就知道自己要去面对什么。C 最温和，B 和 A 逐级攀升，而 S 是一道裂隙所能达到的最难。等级是唯一的旋钮。它决定各层有多凶狠，除此之外再没有别的东西由它决定，所以 C 级裂隙并不是一道更小的裂隙，而是同样形状的一趟路，只是手下留了情。',
+  'guide.riftsPage.ranksHeading': '四个等级',
+  'guide.riftsPage.rewardsBody':
+    '真正给报酬的，是封印一道裂隙，而不只是活着从里面出来。抢先把裂隙打下来，它的报酬就对得起与它等级相当的副本内容，所以更高的等级值得你跑更难的一趟。封印还会把一枚裂隙之戒交到在场每个人手里，按你职业的定位裁剪打造，并且专属于你，同时在你的背包里留下裂隙精华和裂隙宝石。除了归途之外，最底下那个东西还会留下一口封着的储藏，你的队伍可以撬开它取走额外的战利品，用的正是你在探秘宝箱那里熟悉的锁簧之径撬锁，所以干净沉稳地撬，比慌乱赶工赚得更多。这些第二名的队伍一样都拿不到：输掉的竞速只留给你一路向下时从小怪身上掉出来的东西。功绩之书是唯一的例外，无论输赢它都会记下你的通关，其中一个功绩为封闭你的第一道裂隙，另一个为放倒一道 S 级裂隙。',
+  'guide.riftsPage.rewardsHeading': '你能带走什么',
+  'guide.riftsPage.trackerBody':
+    '在里面时，屏幕上的一小条会帮你保持方向：你在第几层、总共几层，以及一个实时倒计时。这个倒计时要看仔细，因为它数的不是你这一趟剩下的时间，而是外面世界里的入口对新队伍关闭的时间。只要你已经进来了，你的小队就能按自己的节奏把这道裂隙打完，花多久都行。',
+  'guide.riftsPage.trackerHeading': '屏幕上的追踪条',
+  'guide.riftsPage.whatBody':
+    '地下城是地方。它们一直待在原处，你会一遍遍地学它们，直到每一个角落都了然于心。探秘是你从告示板开始的一段短促而私人的下行，为一两个人裁剪。裂隙两者都不是：它自行开启，就在世界之中，毫无预兆，而里面的一切都是在它开启的那一刻生成的。没人能给你一条路线，因为没人下过这一道。它和另外两者一样是独立副本，所以你在里面找到的东西只属于你和你的队伍；但它是游戏里唯一一种主动来找你、而不是等着被找到的副本内容。',
+  'guide.riftsPage.whatHeading': '裂隙是什么',
+  'guide.settingsPage.advancedLadder':
+    '只要动了其中任何一个，画质预设就会切换到“高级”，并以你当时正看着的那些档位为起点，因此你的自定义搭配是从你已经看到的样子开始，而不是从零开始。调得满意了，按“应用”。“高级”排在预设列表的最后正是这个道理：它是专家档，你自己的那套搭配就住在那里。',
+  'guide.settingsPage.ifAurasOnPlayerFrame':
+    '除了光环条之外，也把你的增益和减益显示在你自己的单位框体上。',
+  'guide.settingsPage.ifChatFontScale': '聊天文字的大小。',
+  'guide.settingsPage.ifChatIntro': '聊天窗口读起来是什么样。聊天窗口本身的重置也放在这里。',
+  'guide.settingsPage.ifChatOpacity': '聊天背景有多实。',
+  'guide.settingsPage.ifChatTimestamps': '为每一行聊天加上时间，可选 12 小时制或 24 小时制。',
+  'guide.settingsPage.ifCombatIntro': '你的技能栏如何表现，以及战斗会在屏幕上放些什么。',
+  'guide.settingsPage.ifCompactChat': '收紧聊天行距，让一屏能装下更多内容。',
+  'guide.settingsPage.ifDailyChest': '每日奖励宝箱是否显示在你的 HUD 上。',
+  'guide.settingsPage.ifExtraBars':
+    '显示第二排动作条，开启第二排之后还能再开第三排。即使这些排处于隐藏状态，其中的格子依然可以用快捷键触发。',
+  'guide.settingsPage.ifFctScale': '从目标身上飘出的伤害与治疗数字的大小。',
+  'guide.settingsPage.ifFramesIntro':
+    '你自己的框体、你的目标框体，以及整个队伍布局。队伍那一组还带有缩放、宽度、高度、间距和列数滑块，方便把团队网格塞进你的屏幕；标签页底部的“重置”按钮会把每一个框体放回最初的位置。',
+  'guide.settingsPage.ifGeneralIntro':
+    '缩放、对比度，以及界面会显示关于你的哪些信息。语言和主题选择器也在这个标签页的顶部。',
+  'guide.settingsPage.ifGroundReticle': '在你瞄准一个地面施放的法术时，显示地面圆圈。',
+  'guide.settingsPage.ifHideUnused': '隐藏空的动作格，只绘制你真正会用到的按钮。',
+  'guide.settingsPage.ifHighContrastBackground':
+    '在起始界面和角色界面背后使用更朴素、对比度更高的背景。',
+  'guide.settingsPage.ifHighContrastText':
+    '更粗、对比度更高的界面文字。它首先是一项无障碍选项，在明亮的屏幕上也非常好用。',
+  'guide.settingsPage.ifHudOpacity': 'HUD 面板盖在背后的世界上时有多实。',
+  'guide.settingsPage.ifInvertLookY': '翻转鼠标视角的上下方向。',
+  'guide.settingsPage.ifLockBars': '锁定你的技能栏，免得不小心把技能从格子里拖出来。',
+  'guide.settingsPage.ifMouseoverCast':
+    '让治疗或友方法术落在你鼠标悬停的那个队伍框体上，而不改变你当前的目标。',
+  'guide.settingsPage.ifPartyHealthText':
+    '队伍血条上写什么：不显示、百分比、当前生命，或当前与最大生命。',
+  'guide.settingsPage.ifPartyShowAuras':
+    '队伍框体上是否显示增益和减益。相应的开关还涵盖资源条、吸收盾、宠物，以及你自己是否出现在队伍列表里。',
+  'guide.settingsPage.ifPartySort': '队伍成员的排列顺序：入队顺序、职责或名字。',
+  'guide.settingsPage.ifPartyStyle':
+    '队伍布局：“自动”跟随你的队伍规模，“经典”是传统的竖排，“团队”把所有人压进紧凑网格。',
+  'guide.settingsPage.ifPetFrame': '为你的宠物显示一个框体。',
+  'guide.settingsPage.ifPlayerFrameScale': '你自己单位框体的大小。',
+  'guide.settingsPage.ifShowAttackButton': '在你的动作条上放一个明确的“攻击”按钮。',
+  'guide.settingsPage.ifShowItemLevel':
+    '在每个物品提示框里加上一行物品等级。默认关闭，以保留只显示属性的经典提示框。',
+  'guide.settingsPage.ifShowOwnNameplate':
+    '把你自己的头顶铭牌完全按别人看到的样子画出来，装饰也一并显示。想要经典视角就把它关掉。',
+  'guide.settingsPage.ifShowPlayerNameplates':
+    '显示其他玩家的铭牌。关闭能让拥挤的大本营清爽不少，而无论开关，你当前的目标始终清晰可辨。',
+  'guide.settingsPage.ifShowPlaytime':
+    '在角色面板上显示你的终身游戏时长。默认开启，面板上还有一个眼睛按钮，可以按设备切换显示，直播或截图时很方便。无论显不显示，总时长都照常累计。',
+  'guide.settingsPage.ifStartAttack':
+    '使用技能时是否同时开始自动攻击。默认开启，也是大多数玩家熟悉的经典行为。',
+  'guide.settingsPage.ifStickyTarget': '点击空地时保留当前目标，而不是把它清空。',
+  'guide.settingsPage.ifStopAutoAttack':
+    '切换目标时是否停下你的挥击。默认关闭，因此你的攻击会延续到新目标身上。',
+  'guide.settingsPage.ifTargetFrameScale': '你目标框体的大小。',
+  'guide.settingsPage.ifTargetOfTarget':
+    '显示你的目标正在攻击谁，这是判断坦克有没有拉住的经典办法。',
+  'guide.settingsPage.ifTooltipScale': '提示框文字的大小，在小屏幕或超大屏幕上都很实用。',
+  'guide.settingsPage.ifUiScale':
+    '一次性缩放整个界面。它会在你松开滑块时生效，这样拖动的过程中，光标下的窗口不会乱跑。',
+  'guide.settingsPage.ifWalkByAutoloot': '走过自己击杀的尸体时，顺手把战利品收走。默认关闭。',
+  'guide.settingsPage.ifWallet': '角色界面上是否显示你的钱包。玩家名片也有一个对应的开关。',
+  'guide.settingsPage.interfaceFoot':
+    '这还不是全部。每个标签页里的滑块和开关，都比这里列得出来的多，所以打开它看一遍，从上往下读一读吧。这五分钟花得很值。',
+  'guide.settingsPage.interfaceHeading': '“界面”面板',
+  'guide.settingsPage.interfaceIntro':
+    '界面是游戏里最大的一个面板，分成四个标签页。这里面没有任何东西会改变世界能对你做什么：它改变的是显示给你什么、显示得多大。下面这些行最值得了解。',
+  'guide.settingsPage.keybindsBody':
+    '按键列表只是那个面板的一半。它上面还有一排开关，决定你的鼠标如何驾驭这个游戏：鼠标镜头、旋转视角时是否锁定光标、点击移动以及由哪个鼠标键触发、攻击移动、左手触控布局，还有聊天的脏话过滤。',
+  'guide.settingsPage.keybindsHeading': '“按键绑定”面板',
+  'guide.settingsPage.keybindsMouseBody':
+    '那里有两件事很容易被忽略。鼠标按键可以像键盘按键一样绑定，所以滚轮点击和拇指键都能承载技能，而左右键则保留给镜头和点击世界。此外，你可以直接从动作条上绑定：在这里打开条上绑定模式，然后点一个格子，按下你想要的键。',
+  'guide.settingsPage.panelsMoreBody':
+    '本页没有列表说明的那两个面板，同样值得一看。“光环”是你调整那些大幅屏幕提示的地方，它们会在你职业的触发效果就绪时亮起：哪些要显示、大小、颜色、不透明度，以及摆在屏幕的什么位置。“性能监视器”则是你调校本页选项时打开、调完再隐藏的那个读数。',
+  'guide.settingsPage.rowAmbientOcclusion':
+    '表面交界处那层柔和的接触阴影。可选关闭、半分辨率或全分辨率。',
+  'guide.settingsPage.rowAntiAliasing':
+    '抚平远处几何体的锯齿边缘。开销很小，多数机器都值得保持开启。',
+  'guide.settingsPage.rowBloom': '明亮光源、火焰和法术特效周围那圈柔和的辉光。',
+  'guide.settingsPage.rowCameraSpeed': '用鼠标环顾四周时，镜头转动得有多快。',
+  'guide.settingsPage.rowCharacterDetail':
+    '其他角色在多远之外仍保留完整的动画骨骼，再往外才降级为更简单的版本。数值越高，在拥挤的大本营里看着越舒服，开销也越大。',
+  'guide.settingsPage.rowDynamicLights': '有多少火把、篝火和法术会向周围的场景投出真实光照。',
+  'guide.settingsPage.rowFullscreen': '让游戏铺满整个屏幕。',
+  'guide.settingsPage.rowInterfaceMode':
+    '你用的是桌面界面，还是屏幕上的触控操作。“自动”会读取你的设备，你也可以强制指定其中一种：带键盘的平板可以用桌面布局，触屏笔记本也可以用触控操作。',
+  'guide.settingsPage.rowOverflowXp':
+    '在满级之后，你的经验条是继续用溢出经验填充，还是改为显示经典的满级静态文字。',
+  'guide.settingsPage.rowParticleEffects': '法术、天气和环境粒子效果最多可以做到多浓。',
+  'guide.settingsPage.rowSurfaceDetail':
+    '石料与铺装上那层磨损细节，从关闭一直到完整的视差效果。这是城镇街道的那个旋钮：保留得越多，一条铺装街道画起来就越吃力。',
+  'guide.settingsPage.rowTouchLookSpeed': '滑动视角的同一项设置，只有在触屏设备上才会出现。',
+  'guide.settingsPage.rowViewDistance':
+    '世界在淡出之前能向远处绘制多远。每个预设都会替你设好，直到你自己动它为止。',
+  'guide.settingsPage.rowWaterQuality': '湖泊、河流和外海如何着色，从平坦省性能一直到完全反射。',
+  'guide.settingsPage.rowWaterRipples':
+    '游泳时在你身后荡开的尾迹与涟漪。默认关闭，也是唯一一项真会吃帧数的水效；无论开关，水花和气泡都不受影响。',
+  'guide.settingsPage.valueUltraOrInsane': '“超高”，想要全都要就选“极致”',
+  'guide.social.blockBody':
+    '屏蔽是更重的手段，用来对付那些不肯放过你的人。屏蔽会切断对方的组队邀请、密语和邮件，也切断他们的聊天，让你们两人在 /who 中互相隐形，若对方在你的好友列表里，也会被移出去。在对方名字上右键从菜单里选择屏蔽，或者使用 /block；/unblock 可以解除，/blocklist 会列出名单上都有谁。',
+  'guide.social.chatMore': '关于聊天窗口和界面其余部分的更多内容',
+  'guide.social.discordLinkBody':
+    '游戏内的 Discord 面板也能反着用。把你的 Discord 账号关联上去，你在那边拥有的社区身份组便会跟着你进入这个世界：头顶一个彩色的名字，以及在管理身份组的聊天行上加一个标记，这样你随时都能分辨出真正的管理员和只是借了个名头的人。关联还会记录一个随你参与度攀升的状态。这一切都不会在游戏里给你任何权力。',
+  'guide.social.finderBoardBody':
+    '查找器还维护着一块预组队伍的告示板。队长发布一条带标签的招募，说明这一趟是做什么的，从初次探访到直接全通都有，你申请加入，由队长审核通过。自动队列负责填充各个地下城和终局团队副本，普通与英雄各一档；而告示板还能挂出单人的前置任务那一趟，队列绝不会替你排它；探秘和野外出行则要你自己张罗。无论走哪条路，查找器都只负责把队伍搭起来：走到门口、设定难度、谈好战利品规则，仍然是你们自己的事。',
+  'guide.social.finderBody':
+    '你不必在“寻求组队”频道里喊人才能凑齐一趟。打开地下城查找器，选好你想跑的内容和你愿意承担的职责，独自或者带着现成的队伍加入队列。查找器会一直等到职责配齐，然后同时向所有人发出邀请：一个弹窗请你们每个人确认，最后一个人点下同意的瞬间，队伍就成立了。拒绝邀请或者让它超时，会让你先进入一小段冷却，之后才会再收到下一次邀请，好让这条队伍一直往前走。',
+  'guide.social.finderHeading': '寻找队伍',
+  'guide.social.finderMore': '看看每个地下城里都有什么',
+  'guide.social.guildBankBody':
+    '公会也有属于自己的金库。走到某个大本营城镇的银行管理员面前，打开你的银行，切换到“公会”标签页：在那里你会看到一份钱币金库，以及公会共同拥有的物品仓储。每位成员都能打开来看看里面有什么，面板也会清清楚楚地写明谁能做得更多。只有会长和官员可以动手，把钱币和货物存进去、再发放出来，而每一笔存取都会写进公会可以查阅的日志，所以没有任何东西会不留记录地被搬走。',
+  'guide.social.guildBankHeading': '公会银行',
+  'guide.social.guildBankRulesBody':
+    '物品仓储一开始是关着的。由一名官员自掏腰包把它开出来，之后公会可以用金库里的钱把它扩大。任务物品、一切灵魂绑定的东西，以及世界市场不收的装备，都进不去，规则与邮件和市场一致，所以公会银行装的是那些仍然可以易手的货物。',
+  'guide.social.guildBoardBody':
+    '公会同样会被排名。排行榜窗口在玩家榜之外还留有一块公会榜，按成员们共同赚得的成绩为公会排名，所以一个热闹的公会能看到自己身处何位。',
+  'guide.social.jailBody':
+    '管理员维持着秩序，凡是不让别人好好玩游戏的玩家，都可能被送进牢房。刑期一定有固定的长度，尽管管理员可以提前结束它；而且无论你是否保持登录，它都按时钟照走。',
+  'guide.social.jailHeading': '管理员与牢房',
+  'guide.social.moderationBody':
+    '如果有玩家举止出格，右键他的名字并选择“举报玩家”。挑一个原因，从骚扰到刷屏再到作弊，写上一句发生了什么，然后发送：这份举报会送到管理员那里去看。举报是给他们的一张便条，本身并不是处罚。发出它并不会禁言、踢出或关押任何人，也不会有回复告诉你处理结果如何。等待期间，屏蔽对方可以先止住麻烦。',
+  'guide.social.moderationHeading': '举报玩家',
+  'guide.social.realmsBody':
+    '联机游玩运行在一个个服务器上，每个服务器都是各自独立的地方，有各自的玩家。开玩之前你要从服务器列表里挑一个，每一行都会显示这个服务器此刻有多热闹，从“低”“中”“高”一直到“已满”，当前没有开启的服务器则显示“离线”。“低”意味着空间充裕，“高”意味着人气十足；达到上限的服务器会显示“已满”，并在有人退出之前拒绝新的登录，所以挑一个朋友所在的、或者还有空位的地方吧。',
+  'guide.social.realmsHeading': '服务器',
+  'guide.social.realmsScopeBody':
+    '你做的一切都留在你选定的那个服务器上：你的角色、好友列表、公会和世界市场都在那里，你在游戏内打开的公会榜与玩家榜也只统计这一个服务器，而网站上的榜单则会把所有服务器汇总起来。每个服务器还有自己的每日团队副本重置，按各自的本地时间进行。',
+  'guide.stats.hitBody':
+    '命中等级来自你的装备及其套装奖励。它让你的攻击更少落空，也让你的法术更少被抵抗；面对比你等级更高的敌人时，它最能发挥价值，因为那里正是落空堆积得最快的地方。你的面板上把它写作“命中等级”。',
+  'guide.stats.hitTitle': '命中等级',
+  'guide.stats.parryBody':
+    '招架是战士自己的防御：有几率把一次近战打击整个挡开、不受任何伤害，并随力量成长。只有从正面袭来的攻击才会被招架，这也是你该始终面向正在打你的东西的又一个理由。其他职业面板上的这一行，会一直停在零。',
+  'guide.stats.parryTitle': '招架',
+  'guide.stats.warfareBody':
+    '战争是唯一一项只在对抗其他玩家时才作数的属性：它提高你对他们造成的伤害，也降低你从他们那里受到的伤害，你的面板会把这两半写在同一行上。面对生物时它毫无作用。它来自你用荣誉换购的战争装备，因此它是参与 PvP 的回报，而不是升级途中该去追求的东西。',
+  'guide.stats.warfareTitle': '战争',
+  'guide.talentsPage.loadoutNote':
+    '你不必只认准一套配点。在面板里保存一套具名的配置，它会连同天赋选择和你的动作条一起记住，因此切换到另一套只需点一下，遵循的规则与重置相同：脱离战斗，且不在竞技场比赛或战场之中。',
+  'guide.thornhollowPage.rewardsBody':
+    '每一场打完的比赛都会给荣誉：获胜给得更多，落败或平局也有一份安慰；此外你每拿下一个击杀、每协助一次，都会额外得到少量荣誉，所以在远离旗帜的地方厮杀同样值得。每天的首胜还会额外给一份奖励，只要这份奖励还等着你，面板就会告诉你。这个“每天”属于荣誉自己，它按自己的时钟翻篇，而不跟着王国的副本重置走。反复遇上同一支队伍，从第二次起比赛本身给的荣誉会减少，但很快就会稳定在一个下限，而不会一路跌到零；被判弃权的比赛则一点都不给。赚到的荣誉可以在任意一位战争军需官处消费。',
+  'guide.thornhollowPage.rewardsHeading': '一场比赛给什么',
+  'guide.worldPage.farshoreBlurb':
+    '一座满是鸥鸣与咸风的海岛，浮在东溪谷东岸之外；裂隙在这里毫无预兆地撕开，而渔镇鸥港守着自己的这片海岸。',
+  'guide.worldPage.farshoreGreeter': '守钟人塔姆，登岸口',
+  'guide.worldPage.farshoreGreeting':
+    '你是从沙洲堤道过来的？那你是这一周里的头一个，守望者肯定想亲眼瞧瞧你。',
+  'guide.worldPage.farshorePlaceNotes':
+    '鸥港是岛上唯一的城镇，也是它的堡垒。登岸口是沙洲堤道上岸的地方，岬角上立着一口警钟；守望草甸占着镇子东南的高地，一位裂察在那里聆听下一次裂开；碎裂断崖在岛的南端豁然裂开；裂野则是鸥港以东那片被摧残的麦田，至今仍爬满了从那道裂口涌出来的东西。',
+  'guide.worldPage.mountsBody':
+    '骑乘是唯一能把世界变小的东西，而它首先是一堂课，其次才是一匹马。到了 20 级，马厩总管玛拉会收下你：你从她那里买下骑术，而骑乘课本身是免费的，那是一段跳跃赛道，你骑着借来的坐骑绕她的围场跑一圈。通过之后把这堂课交还，你的第一匹英勇战马就归你了，从此你在王国里赶路会明显快上不少。速度是坐骑给你的全部：更稀有的那些来自最难的内容，跑得还要更快，但它们都不会改变你在战斗中的强弱。用你操作设置里绑定的按键上下坐骑。战斗中无法上马，而挥动武器、施放法术、涉水，或是在战斗中倒下，都会让你重新落回地面。',
+  'guide.worldPage.mountsMore': '关于坐骑的一切',
+  'guide.worldPage.mountsTitle': '坐骑',
+  'guide.worldPage.riftBody':
+    '有什么东西不断在这个王国身上撕开口子。裂隙传送门会自行在世界各处开启，绝不会出现在起始之路的那三片区域，但在它们之外的每一片王国土地以及远岸上都会出现，而每当一道裂隙撕开，整个王国都会听到消息。每一道传送门都带着一个等级，等级越高，这段下行之路越难，也越丰厚。传送门是一场共享的事件：任何队伍都可以踏进去，并各自得到属于自己的一趟，但首杀永远只属于一支队伍，所以一道新鲜的裂隙值得你赶紧动身。进入它需要 20 级，而如果没人及时应答，裂隙会自行坍塌。',
+  'guide.worldPage.riftMore': '关于裂隙的一切',
+  'guide.worldPage.riftTitle': '裂隙传送门',
+  'guide.worldPage.travelBody':
+    '王国里的每一条路，都得靠走或者骑。这里没有飞行路线，没有马车，也没有传送网络：地图是一整块相连的陆地，每一处连接都是你可以踩上去的东西。山脊把一片土地与下一片隔开，两地共享一道山脊时，道路便会翻过一处山口。不过并非每一处边界都是这样。北面有一条长长的堤道，载着道路从帷幕幽谷跨过水面，通往更北的雪国；而回到南边，有一道细细的天然沙洲，名叫沙洲堤道，自东溪谷海岸向东延伸，直抵远岸岛上的登岸口，那座岛根本没有陆上边界。整个地表世界里恰好只有一道真正的门户：荆峰高处的一层暮色之幕，通往帷幕幽谷。幽谷的南侧山脊被封死，没有山口可以穿过，所以那层幕正是你最初进去的方式，而回程时它会在你身后合上。\n\n无论你倒在哪里，走回来的路都不长。每一片区域至少有一座墓地，一位灵魂医者悬在墓碑上方，释放出的灵魂会在最近的那一座升起。\n\n地图不会终结于一堵看不见的墙。陆地会一路铺展成海滩与岬角，然后没入开阔的水面。世界本就打算让你游过去的那些地方，也就是两片土地之间的海峡与湖泊，都平静而安全。若你偏要向外海进发，距离本身会把你劝回来：你会被警告一次，再警告一次，而如果你还继续游，大海就会把你耗到死。下潜也有它自己的限度，因为你的气在水下会用尽，所以水一提醒你，就浮上来换口气、掉头回去吧。',
+  'guide.worldPage.travelTitle': '四处走动',
+  'guide.controls.clickMoveNote':
+    '点击移动默认是关着的，要你自己打开：在游戏菜单中打开“按键绑定”面板，开启“点击移动”，再用它下方的“点击移动按键”一行挑选由哪个鼠标键负责走路（默认是左键，也可以选右键）。开启之后，点一下地面上的某处，你便会朝那里走去，地上还会有一个标记指出你的去向。点击一只生物或另一位玩家，你会走到对方近前、在够得着的距离停下，而这一次点击照样完成它平常的选中或交互；如果你点的东西本来就在身边，那就直接交互，人不必挪窝。任何一个移动按键都会立刻把控制权收回、结束这趟行程，按住鼠标键环顾四周也一样。跳跃不会，所以你可以一路蹦着继续赶路；而打开游戏菜单只是让行程暂停，关掉菜单后它会接着走完。',
+  'guide.deedsPage.platformBody':
+    '如果你在桌面客户端中关联了 Steam 或 Epic Games 账号，你所获得的功绩会向外同步为该账号上的成就。游戏世界始终是准绳：功绩在这里挣得，记录在你的角色身上，成就随后跟上。并非每一项功绩都有对应的成就；若某个成就没有立刻到账，它会在你下次登录时补上。关联永远只是关联，绝不是一种登录方式。',
+  'guide.deedsPage.platformHeading': 'Steam 与 Epic 成就',
+  'guide.faqPage.a17':
+    '同一个账号在每个服务器上最多可以有十个角色，而你也可以在不止一个服务器上拥有角色。想删掉某个角色，就在角色列表里删除它：该角色必须不在世界中，而且你要输入它的名字来确认，所以手一滑绝不会让你失去一位英雄。删除是永久的。那个角色的随身家当会随它而去，它在世界市场上的挂单会被撤下，渡鸦邮驿的信箱也会被清空。',
+  'guide.faqPage.a18':
+    '你自己改不了，所以起名时挑一个中意的。名字为 2 到 16 个字母，以字母开头，允许空格、连字符和撇号；无论大小写怎么写，每个名字在它所在的服务器上都是唯一的。违反行为准则的名字会被拒绝。唯一一次会被要求改名，是管理员要求你改。注销账号可能会把它的名字释放给其他玩家，而单纯一阵子不玩绝不会：闲置的账号照样保留它的名字。',
+  'guide.faqPage.a19':
+    '你的角色会在世界中停留大约五分钟，游戏也会自行尝试重连，所以信号中断、合上笔记本或刷新页面，通常都能让你回到原处、回到同一场对局里。也正因为你的角色确实还站在那儿，掉线并不是逃离战斗的办法。从游戏菜单里选择“退出登录”，则会立即离开，不必等完那段时间。',
+  'guide.faqPage.a20':
+    '在在线游戏中，用 Esc 打开菜单，选择“报告错误”。描述发生了什么，然后发送：你所在的服务器、你的角色，以及你当时站在哪里，都会自动一同附上，还有你的版本与设备信息；你也可以勾选“包含截图”，附上你当时看到的画面。如果你接连发送好几份，可能会被要求稍等片刻再发下一份。',
+  'guide.faqPage.q17': '我可以拥有多少个角色？可以删除角色吗？',
+  'guide.faqPage.q18': '我可以更改角色的名字吗？',
+  'guide.faqPage.q19': '如果我掉线了会怎么样？',
+  'guide.faqPage.q20': '我发现了一个错误，该怎么报告？',
+  'guide.howToPlay.charactersBody':
+    '一个账号在每个服务器上最多可以保留十个角色，所以你尽可以多试几个职业，不必舍弃什么。删除则是一件需要下决心的事：角色必须不在世界中，游戏还会让你输入它的名字才肯放行。被删除的角色一去不返，它在世界市场上的挂单和渡鸦邮驿里的信件也会随它一并消失。',
+  'guide.howToPlay.charactersTitle': '你的角色',
+  'guide.howToPlay.connectionBody':
+    '信号中断、合上屏幕或刷新页面，都不会把你踢下线。你的角色会在世界中被保留大约五分钟，游戏则自行重连，你会回到同一场对局的同一个地方。这也意味着掉线并不是脱离战斗的办法：你的角色仍然站在那里。从游戏菜单退出登录会立刻离开，不必等待；在同一个账号上登录另一个角色也是一样。',
+  'guide.howToPlay.connectionTitle': '如果你掉线了',
+  'guide.howToPlay.namesBody':
+    '名字长 2 到 16 个字母，以字母开头，可以包含空格、连字符和撇号。同一个服务器上不会有两个角色重名，而大小写并不能让一个名字空出来：如果 Ashwind 已被占用，ashwind 同样被占用。你自己的写法会被原样保留。挑一个你会一直喜欢的名字吧，因为它会一直伴着这个角色。',
+  'guide.howToPlay.namesTitle': '为你的英雄起名',
+  'guide.faqPage.a6Count':
+    '{cap} 级，需通过任务、地下城与探索横跨各处区域达成。全世界共有 {zones} 个区域，从最初的山谷，一直到专为满级角色打造的地带。',
+  'guide.home.faq.a4Count':
+    '等级上限为 {cap} 级，需通过任务、地下城与探索横跨各处区域达成。全世界共有 {zones} 个区域，其中最遥远的几处专为满级角色打造。',
+  'guide.home.world.subCount':
+    '一片连绵不绝的大陆，共 {zones} 个区域，从静谧的山谷、沉没的沼泽，到余烬荒原、冰封高地与树篱迷宫花园。',
+  'guide.combat.threatBody':
+    '每个敌人都在心里记着一笔账，算清是谁最惹恼了它。伤害会加到账上，治疗同样如此：一次治疗会把威胁值加到正与被治疗者交战的那些敌人身上，并在它们之间分摊，因此最安全的治疗，是治疗那位已经被坦克拉稳的同伴。坦克会开启防御姿态或防护形态，让自己产生的一切威胁成倍增加，而德鲁伊的狼形态则相反，会甩掉威胁；嘲讽则把施放者直接抬到账目顶端，并在几秒内把敌人钉在他身上。敌人不会在有人刚刚超过坦克的那一瞬间就转火：要把它拉走需要明显的领先，远程需要的领先幅度又比近战更大，因此起手时稍有耐心，就能让战斗留在它该在的地方。',
+  'guide.classPage.formLine.form_bear':
+    '坦克形态：厚实的兽皮，以怒气取代法力，还有额外的威胁值，让敌人始终朝你挥拳。',
+  'guide.riftsPage.floorsBody':
+    '一道裂隙有若干层，每一层都是当场生成的；而通往下一层的路，要等这一层跟你算清了账才会打开：清掉层里还活着的东西，解开它横在你路上的机关，向下的通道便会撕裂而开。最后一层以一名首领收尾。每一层都有自己的性格，所以一趟下来，你可能刚走出严寒，转身就踏进余烬之中，聊天栏会在你抵达每一层时报出它的名字。这一趟究竟有几层，看你屏幕上的追踪条。有些裂隙开启的则是一处手工搭建的场景，它有自己固定的长度，而不是生成出来的下行之路。',
 };

@@ -20,7 +20,16 @@ const MEDIA_ROOTS = ['models', 'textures', 'env', 'vfx'];
 const HASH_LEN = 12;
 // Per-directory CLAUDE.md docs live alongside the assets under public/models/<category>/;
 // exclude them (and anything else non-media) so the manifest never ships internal docs.
-const MEDIA_EXTENSIONS = new Set(['.glb', '.fbx', '.hdr', '.jpg', '.jpeg', '.png', '.webp']);
+const MEDIA_EXTENSIONS = new Set([
+  '.glb',
+  '.fbx',
+  '.hdr',
+  '.jpg',
+  '.jpeg',
+  '.png',
+  '.webp',
+  '.ktx2',
+]);
 
 function walk(dir) {
   const out = [];

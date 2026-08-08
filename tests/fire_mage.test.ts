@@ -12,9 +12,10 @@ import { ABILITIES, MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
 import type { Entity, SimEvent } from '../src/sim/types';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 function mageWithSpec(spec: 'fire' | 'frost') {
-  const sim = new Sim({ seed: 33, playerClass: 'mage', autoEquip: true });
+  const sim = new Sim({ seed: 33, playerClass: 'mage', autoEquip: true, world: EMPTY_TEST_WORLD });
   sim.setPlayerLevel(20);
   expect(sim.setSpec(spec)).toBe(true);
   sim.tick();
@@ -538,7 +539,12 @@ describe('Meteor', () => {
 
 describe('the personal-barrier slot', () => {
   it('Warded cuts damage behind Blazing Barrier and heals when it breaks', () => {
-    const sim = new Sim({ seed: 33, playerClass: 'mage', autoEquip: true });
+    const sim = new Sim({
+      seed: 33,
+      playerClass: 'mage',
+      autoEquip: true,
+      world: EMPTY_TEST_WORLD,
+    });
     sim.setPlayerLevel(20);
     expect(sim.applyTalents({ spec: 'fire', rows: { 8: 'mag_r8_warded' } } as never)).toBe(true);
     sim.tick();
@@ -574,7 +580,12 @@ describe('the personal-barrier slot', () => {
   });
 
   it('Cold Snap finishes the Blazing Barrier cooldown too', () => {
-    const sim = new Sim({ seed: 33, playerClass: 'mage', autoEquip: true });
+    const sim = new Sim({
+      seed: 33,
+      playerClass: 'mage',
+      autoEquip: true,
+      world: EMPTY_TEST_WORLD,
+    });
     sim.setPlayerLevel(20);
     expect(sim.applyTalents({ spec: 'fire', rows: { 17: 'mag_r17_cold_snap' } } as never)).toBe(
       true,

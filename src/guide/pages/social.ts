@@ -1,5 +1,7 @@
-// Social and Groups: chat channels, parties and party loot, friends and ignore, and
-// guilds. Systems and direction only, no moderation thresholds or filter internals.
+// Social and Groups: worlds (the realm picker), chat channels, parties and party loot,
+// the Dungeon Finder as a social tool, friends, ignore and block, guilds and the guild
+// bank, and reporting. Systems and direction only, no moderation thresholds, no filter
+// internals, no bank prices.
 
 import { esc } from '../../ui/esc';
 import { t } from '../../ui/i18n';
@@ -43,13 +45,25 @@ export const social: GuidePage = {
         ${lead('guide.social.intro')}
 
         <section class="guide-block">
+          <h2>${esc(t('guide.social.realmsHeading'))}</h2>
+          <p>${esc(t('guide.social.realmsBody'))}</p>
+          <p>${esc(t('guide.social.realmsScopeBody'))}</p>
+        </section>
+
+        <section class="guide-block">
           <h2>${esc(t('guide.social.chatHeading'))}</h2>
           <p>${esc(t('guide.social.chatBody'))}</p>
           <ul class="guide-list">${channels}</ul>
           <p>${esc(t('guide.social.emotesBody'))}</p>
+          <p class="guide-section-more"><a href="${esc(hrefFor('reference/interface'))}">${esc(t('guide.social.chatMore'))}</a></p>
         </section>
 
-        ${section('guide.social.communityHeading', p('guide.social.communityBody'))}
+        <section class="guide-block">
+          <h2>${esc(t('guide.social.communityHeading'))}</h2>
+          <p>${esc(t('guide.social.communityBody'))}</p>
+          <p>${esc(t('guide.social.discordLinkBody'))}</p>
+        </section>
+
         ${section('guide.social.slashHeading', p('guide.social.slashBody'))}
 
         <section class="guide-block">
@@ -57,6 +71,13 @@ export const social: GuidePage = {
           <p>${esc(t('guide.social.partyBody'))}</p>
           <p>${esc(t('guide.social.partyCredit'))}</p>
           <p>${esc(t('guide.social.raidBody'))}</p>
+        </section>
+
+        <section class="guide-block">
+          <h2>${esc(t('guide.social.finderHeading'))}</h2>
+          <p>${esc(t('guide.social.finderBody'))}</p>
+          <p>${esc(t('guide.social.finderBoardBody'))}</p>
+          <p class="guide-section-more"><a href="${esc(hrefFor('dungeons'))}">${esc(t('guide.social.finderMore'))}</a></p>
         </section>
 
         ${section('guide.social.readyHeading', p('guide.social.readyBody'))}
@@ -68,12 +89,24 @@ export const social: GuidePage = {
           <ul class="guide-list">${loot}</ul>
         </section>
 
-        ${section('guide.social.friendsHeading', p('guide.social.friendsBody') + p('guide.social.ignoreBody'))}
+        <section class="guide-block">
+          <h2>${esc(t('guide.social.friendsHeading'))}</h2>
+          <p>${esc(t('guide.social.friendsBody'))}</p>
+          <p>${esc(t('guide.social.ignoreBody'))}</p>
+          <p>${esc(t('guide.social.blockBody'))}</p>
+        </section>
 
         <section class="guide-block">
           <h2>${esc(t('guide.social.guildHeading'))}</h2>
           <p>${esc(t('guide.social.guildBody'))}</p>
           <p>${esc(t('guide.social.guildChatBody'))}</p>
+          <p>${esc(t('guide.social.guildBoardBody'))}</p>
+        </section>
+
+        <section class="guide-block">
+          <h2>${esc(t('guide.social.guildBankHeading'))}</h2>
+          <p>${esc(t('guide.social.guildBankBody'))}</p>
+          <p>${esc(t('guide.social.guildBankRulesBody'))}</p>
         </section>
 
         ${section('guide.social.calendarHeading', p('guide.social.calendarBody'))}
@@ -83,9 +116,20 @@ export const social: GuidePage = {
           <p>${esc(t('guide.social.etiquetteBody'))}</p>
         </section>
 
+        <section class="guide-block">
+          <h2>${esc(t('guide.social.moderationHeading'))}</h2>
+          <p>${esc(t('guide.social.moderationBody'))}</p>
+        </section>
+
+        <section class="guide-block">
+          <h2>${esc(t('guide.social.jailHeading'))}</h2>
+          <p>${esc(t('guide.social.jailBody'))}</p>
+        </section>
+
         ${related([
           { href: hrefFor('how-to-play'), key: 'guide.nav.howToPlay' },
           { href: hrefFor('dungeons'), key: 'guide.nav.dungeons' },
+          { href: hrefFor('reference/interface'), key: 'guide.nav.interface' },
           { href: hrefFor('economy'), key: 'guide.nav.economy' },
         ])}
       </article>`;

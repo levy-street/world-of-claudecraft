@@ -123,9 +123,9 @@ describe('refreshDelveDaily', () => {
       delveDaily: { date, firstClearXp: new Set(['x']), markClears: 4 },
     }) as unknown as PlayerMeta;
 
-  it('rolls over to a fresh window on a new UTC day', () => {
+  it('rolls over to a fresh window on a new reset day', () => {
     const m = meta('2099-01-01');
-    refreshDelveDaily({ utcDay: '2099-01-02' } as unknown as SimContext, m);
+    refreshDelveDaily({ resetDay: '2099-01-02' } as unknown as SimContext, m);
     expect(m.delveDaily.date).toBe('2099-01-02');
     expect(m.delveDaily.firstClearXp.size).toBe(0);
     expect(m.delveDaily.markClears).toBe(0);
@@ -133,10 +133,10 @@ describe('refreshDelveDaily', () => {
 
   it('is a no-op on the same day or when the day is unknown', () => {
     const same = meta('2099-01-01');
-    refreshDelveDaily({ utcDay: '2099-01-01' } as unknown as SimContext, same);
+    refreshDelveDaily({ resetDay: '2099-01-01' } as unknown as SimContext, same);
     expect(same.delveDaily.markClears).toBe(4);
     const unknown = meta('2099-01-01');
-    refreshDelveDaily({ utcDay: '' } as unknown as SimContext, unknown);
+    refreshDelveDaily({ resetDay: '' } as unknown as SimContext, unknown);
     expect(unknown.delveDaily.date).toBe('2099-01-01');
     expect(unknown.delveDaily.markClears).toBe(4);
   });
