@@ -618,14 +618,14 @@
         "colourspace": "srgb",
         "alpha": "opaque"
       },
-      "canonicalDisplayName": "Wrathwing",
-      "canonicalGameplayMeaningOrAcquisition": "Wrathwing grants 60 attack power and 30 spell power for 20 sec; 180 sec cooldown.",
+      "canonicalDisplayName": "Zealwing",
+      "canonicalGameplayMeaningOrAcquisition": "Zealwing grants 60 attack power and 30 spell power for 20 sec; 180 sec cooldown.",
       "intendedVisualSubject": "Golden wings flanking a sword and spell orb, both ignited by one halo.",
       "generation": {
         "source": "OpenAI built-in image generation",
         "owner": "World of ClaudeCraft",
         "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-        "prompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for paladin\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Wrathwing (avenging_wrath)\nCanonical mechanic: Wrathwing grants 60 attack power and 30 spell power for 20 sec; 180 sec cooldown.\nSubject: Golden wings flanking a sword and spell orb, both ignited by one halo.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph",
+        "prompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for paladin\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Zealwing (avenging_wrath)\nCanonical mechanic: Zealwing grants 60 attack power and 30 spell power for 20 sec; 180 sec cooldown.\nSubject: Golden wings flanking a sword and spell orb, both ignited by one halo.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph",
         "references": [
           {
             "path": "public/ui/skills/paladin/judgement.webp",
@@ -1533,14 +1533,14 @@
         "colourspace": "srgb",
         "alpha": "opaque"
       },
-      "canonicalDisplayName": "Crusader Strike",
-      "canonicalGameplayMeaningOrAcquisition": "Crusader Strike deals weapon damage plus 24 Holy damage; 4 sec cooldown.",
+      "canonicalDisplayName": "Oathstrike",
+      "canonicalGameplayMeaningOrAcquisition": "Oathstrike deals weapon damage plus 24 Holy damage; 4 sec cooldown.",
       "intendedVisualSubject": "A cross-marked sword carving a bright diagonal holy arc.",
       "generation": {
         "source": "OpenAI built-in image generation",
         "owner": "World of ClaudeCraft",
         "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-        "prompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for paladin\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Crusader Strike (crusader_strike)\nCanonical mechanic: Crusader Strike deals weapon damage plus 24 Holy damage; 4 sec cooldown.\nSubject: A cross-marked sword carving a bright diagonal holy arc.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph",
+        "prompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for paladin\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Oathstrike (crusader_strike)\nCanonical mechanic: Oathstrike deals weapon damage plus 24 Holy damage; 4 sec cooldown.\nSubject: A cross-marked sword carving a bright diagonal holy arc.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph",
         "references": [
           {
             "path": "public/ui/skills/paladin/judgement.webp",
@@ -2753,14 +2753,14 @@
         "colourspace": "srgb",
         "alpha": "opaque"
       },
-      "canonicalDisplayName": "Holy Nova",
-      "canonicalGameplayMeaningOrAcquisition": "Holy Nova heals allies within 10 yd for 34 to 42 and damages enemies for 24 to 30. At level 20 the heal becomes 49 to 61 while damage remains 24 to 30.",
+      "canonicalDisplayName": "Hallowburst",
+      "canonicalGameplayMeaningOrAcquisition": "Hallowburst heals allies within 10 yd for 34 to 42 and damages enemies for 24 to 30. At level 20 the heal becomes 49 to 61 while damage remains 24 to 30.",
       "intendedVisualSubject": "A central priest with a white-gold ring passing through ally hearts and enemy skulls.",
       "generation": {
         "source": "OpenAI built-in image generation",
         "owner": "World of ClaudeCraft",
         "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-        "prompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for priest\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Holy Nova (holy_nova)\nCanonical mechanic: Holy Nova heals allies within 10 yd for 34 to 42 and damages enemies for 24 to 30. At level 20 the heal becomes 49 to 61 while damage remains 24 to 30.\nSubject: A central priest with a white-gold ring passing through ally hearts and enemy skulls.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph",
+        "prompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for priest\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Hallowburst (holy_nova)\nCanonical mechanic: Hallowburst heals allies within 10 yd for 34 to 42 and damages enemies for 24 to 30. At level 20 the heal becomes 49 to 61 while damage remains 24 to 30.\nSubject: A central priest with a white-gold ring passing through ally hearts and enemy skulls.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph",
         "references": [
           {
             "path": "public/ui/skills/priest/renew.webp",
@@ -2875,14 +2875,14 @@
         "colourspace": "srgb",
         "alpha": "opaque"
       },
-      "canonicalDisplayName": "Holy Shock",
-      "canonicalGameplayMeaningOrAcquisition": "Holy Shock heals a friendly for 40 to 50 or damages an enemy for 40 to 50 at 30 yd; 8 sec cooldown. At level 20 the heal becomes 58 to 73 while damage remains 40 to 50.",
+      "canonicalDisplayName": "Lightjolt",
+      "canonicalGameplayMeaningOrAcquisition": "Lightjolt heals a friendly for 40 to 50 or damages an enemy for 40 to 50 at 30 yd; 8 sec cooldown. At level 20 the heal becomes 58 to 73 while damage remains 40 to 50.",
       "intendedVisualSubject": "A split holy bolt branching toward a heart and a scorched enemy.",
       "generation": {
         "source": "OpenAI built-in image generation",
         "owner": "World of ClaudeCraft",
         "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-        "prompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for paladin\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Holy Shock (holy_shock)\nCanonical mechanic: Holy Shock heals a friendly for 40 to 50 or damages an enemy for 40 to 50 at 30 yd; 8 sec cooldown. At level 20 the heal becomes 58 to 73 while damage remains 40 to 50.\nSubject: A split holy bolt branching toward a heart and a scorched enemy.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph",
+        "prompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for paladin\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Lightjolt (holy_shock)\nCanonical mechanic: Lightjolt heals a friendly for 40 to 50 or damages an enemy for 40 to 50 at 30 yd; 8 sec cooldown. At level 20 the heal becomes 58 to 73 while damage remains 40 to 50.\nSubject: A split holy bolt branching toward a heart and a scorched enemy.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph",
         "references": [
           {
             "path": "public/ui/skills/paladin/holy_light.webp",
@@ -4705,14 +4705,14 @@
         "colourspace": "srgb",
         "alpha": "opaque"
       },
-      "canonicalDisplayName": "Spellsteal",
-      "canonicalGameplayMeaningOrAcquisition": "Spellsteal removes one beneficial magic effect from an enemy and transfers it to the caster; 12 sec cooldown.",
+      "canonicalDisplayName": "Spellplunder",
+      "canonicalGameplayMeaningOrAcquisition": "Spellplunder removes one beneficial magic effect from an enemy and transfers it to the caster; 12 sec cooldown.",
       "intendedVisualSubject": "A glowing buff rune being pulled from an enemy into an open mage hand.",
       "generation": {
         "source": "OpenAI built-in image generation",
         "owner": "World of ClaudeCraft",
         "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-        "prompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for mage\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Spellsteal (spellsteal)\nCanonical mechanic: Spellsteal removes one beneficial magic effect from an enemy and transfers it to the caster; 12 sec cooldown.\nSubject: A glowing buff rune being pulled from an enemy into an open mage hand.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph",
+        "prompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for mage\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Spellplunder (spellsteal)\nCanonical mechanic: Spellplunder removes one beneficial magic effect from an enemy and transfers it to the caster; 12 sec cooldown.\nSubject: A glowing buff rune being pulled from an enemy into an open mage hand.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph",
         "references": [
           {
             "path": "public/ui/skills/mage/counterspell.webp",
@@ -5558,14 +5558,14 @@
         "colourspace": "srgb",
         "alpha": "opaque"
       },
-      "canonicalDisplayName": "Swiftmend",
-      "canonicalGameplayMeaningOrAcquisition": "Swiftmend consumes a heal-over-time effect on a friendly and instantly heals 105 to 125; 8 sec cooldown.",
+      "canonicalDisplayName": "Fleetmend",
+      "canonicalGameplayMeaningOrAcquisition": "Fleetmend consumes a heal-over-time effect on a friendly and instantly heals 105 to 125; 8 sec cooldown.",
       "intendedVisualSubject": "A rejuvenation leaf dissolving into an immediate golden heart burst.",
       "generation": {
         "source": "OpenAI built-in image generation",
         "owner": "World of ClaudeCraft",
         "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-        "prompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for druid\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Swiftmend (swiftmend)\nCanonical mechanic: Swiftmend consumes a heal-over-time effect on a friendly and instantly heals 105 to 125; 8 sec cooldown.\nSubject: A rejuvenation leaf dissolving into an immediate golden heart burst.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph",
+        "prompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for druid\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Fleetmend (swiftmend)\nCanonical mechanic: Fleetmend consumes a heal-over-time effect on a friendly and instantly heals 105 to 125; 8 sec cooldown.\nSubject: A rejuvenation leaf dissolving into an immediate golden heart burst.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph",
         "references": [
           {
             "path": "public/ui/skills/druid/rejuvenation.webp",
@@ -5924,14 +5924,14 @@
         "colourspace": "srgb",
         "alpha": "opaque"
       },
-      "canonicalDisplayName": "Wyvern Sting",
-      "canonicalGameplayMeaningOrAcquisition": "Wyvern Sting incapacitates a target 8 to 30 yd away for up to 4 sec; damage breaks it; 60 sec cooldown.",
+      "canonicalDisplayName": "Drakesting",
+      "canonicalGameplayMeaningOrAcquisition": "Drakesting incapacitates a target 8 to 30 yd away for up to 4 sec; damage breaks it; 60 sec cooldown.",
       "intendedVisualSubject": "A winged serpent stinger piercing a closing eye with sleep vapor.",
       "generation": {
         "source": "OpenAI built-in image generation",
         "owner": "World of ClaudeCraft",
         "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-        "prompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for hunter\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Wyvern Sting (wyvern_sting)\nCanonical mechanic: Wyvern Sting incapacitates a target 8 to 30 yd away for up to 4 sec; damage breaks it; 60 sec cooldown.\nSubject: A winged serpent stinger piercing a closing eye with sleep vapor.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph",
+        "prompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for hunter\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Drakesting (wyvern_sting)\nCanonical mechanic: Drakesting incapacitates a target 8 to 30 yd away for up to 4 sec; damage breaks it; 60 sec cooldown.\nSubject: A winged serpent stinger piercing a closing eye with sleep vapor.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph",
         "references": [
           {
             "path": "public/ui/skills/hunter/concussive_shot.webp",
@@ -8132,14 +8132,14 @@
         "colourspace": "srgb",
         "alpha": "opaque"
       },
-      "canonicalDisplayName": "Mantle of the Frostmane",
-      "canonicalGameplayMeaningOrAcquisition": "Rare cloth shoulder reward for Frostmane Tyrant in Frostveil, a trophy tied to the village's debt and the tyrant's snow mane.",
+      "canonicalDisplayName": "Mantle of the Rimemane",
+      "canonicalGameplayMeaningOrAcquisition": "Rare cloth shoulder reward for Rimemane Tyrant in Frostveil, a trophy tied to the village's debt and the tyrant's snow mane.",
       "intendedVisualSubject": "A white and ice-blue cloth shoulder mantle heavily edged in a snow-beast mane, with frost clumped at the fur tips.",
       "generation": {
         "source": "OpenAI built-in image generation",
         "owner": "World of ClaudeCraft",
         "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-        "prompt": "Use case: stylized-concept\nAsset type: square game inventory icon\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG inventory art for Mantle of the Frostmane (frostmane_mantle)\nCanonical context: Rare cloth shoulder reward for Frostmane Tyrant in Frostveil, a trophy tied to the village's debt and the tyrant's snow mane.\nSubject: A white and ice-blue cloth shoulder mantle heavily edged in a snow-beast mane, with frost clumped at the fur tips.\nScene/backdrop: opaque blue-black or charcoal atmospheric vignette\nComposition/framing: one tangible centered object or established slot-appropriate pair, strong silhouette at 28px, 10 to 16px safe margins at 128px\nLighting/mood: top-left key light with restrained rim or internal magical accent\nConstraints: physically distinct design; no UI border, rarity frame, halo, text, watermark, mannequin, character, scene diorama or crop",
+        "prompt": "Use case: stylized-concept\nAsset type: square game inventory icon\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG inventory art for Mantle of the Rimemane (frostmane_mantle)\nCanonical context: Rare cloth shoulder reward for Rimemane Tyrant in Frostveil, a trophy tied to the village's debt and the tyrant's snow mane.\nSubject: A white and ice-blue cloth shoulder mantle heavily edged in a snow-beast mane, with frost clumped at the fur tips.\nScene/backdrop: opaque blue-black or charcoal atmospheric vignette\nComposition/framing: one tangible centered object or established slot-appropriate pair, strong silhouette at 28px, 10 to 16px safe margins at 128px\nLighting/mood: top-left key light with restrained rim or internal magical accent\nConstraints: physically distinct design; no UI border, rarity frame, halo, text, watermark, mannequin, character, scene diorama or crop",
         "references": [
           {
             "path": "public/ui/items/greyjaw_pelt_cloak.webp",
@@ -8272,13 +8272,13 @@
         "alpha": "opaque"
       },
       "canonicalDisplayName": "Grave-Candle",
-      "canonicalGameplayMeaningOrAcquisition": "Quest interaction token in Wraithwood: relight four Grave-Candles for Candles at the Bounds after drizzle drowned them; while lit, the boundary wards keep Gallowmere's buried dead down.",
+      "canonicalGameplayMeaningOrAcquisition": "Quest interaction token in Wraithwood: relight four Grave-Candles for Candles at the Bounds after drizzle drowned them; while lit, the boundary wards keep Gibbetmere's buried dead down.",
       "intendedVisualSubject": "A wet grave taper on a small boundary-stone base, with a dark drowned wick and only the relighting taper or first spark nearby; show the doused target state, not an already blazing candle.",
       "generation": {
         "source": "OpenAI built-in image generation",
         "owner": "World of ClaudeCraft",
         "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-        "prompt": "Use case: stylized-concept\nAsset type: square game inventory icon\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG inventory art for Grave-Candle (gallowmere_grave_candle)\nCanonical context: Quest interaction token in Wraithwood: relight four Grave-Candles for Candles at the Bounds after drizzle drowned them; while lit, the boundary wards keep Gallowmere's buried dead down.\nSubject: A wet grave taper on a small boundary-stone base, with a dark drowned wick and only the relighting taper or first spark nearby; show the doused target state, not an already blazing candle.\nScene/backdrop: opaque blue-black or charcoal atmospheric vignette\nComposition/framing: one tangible centered object or established slot-appropriate pair, strong silhouette at 28px, 10 to 16px safe margins at 128px\nLighting/mood: top-left key light with restrained rim or internal magical accent\nConstraints: physically distinct design; no UI border, rarity frame, halo, text, watermark, mannequin, character, scene diorama or crop",
+        "prompt": "Use case: stylized-concept\nAsset type: square game inventory icon\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG inventory art for Grave-Candle (gallowmere_grave_candle)\nCanonical context: Quest interaction token in Wraithwood: relight four Grave-Candles for Candles at the Bounds after drizzle drowned them; while lit, the boundary wards keep Gibbetmere's buried dead down.\nSubject: A wet grave taper on a small boundary-stone base, with a dark drowned wick and only the relighting taper or first spark nearby; show the doused target state, not an already blazing candle.\nScene/backdrop: opaque blue-black or charcoal atmospheric vignette\nComposition/framing: one tangible centered object or established slot-appropriate pair, strong silhouette at 28px, 10 to 16px safe margins at 128px\nLighting/mood: top-left key light with restrained rim or internal magical accent\nConstraints: physically distinct design; no UI border, rarity frame, halo, text, watermark, mannequin, character, scene diorama or crop",
         "references": [
           {
             "path": "public/ui/items/tallow_candle.webp",
@@ -9525,13 +9525,13 @@
         "alpha": "opaque"
       },
       "canonicalDisplayName": "Mantle of the Unhorsed",
-      "canonicalGameplayMeaningOrAcquisition": "Rare cloth shoulder reward for Horn of the Huntsman in Wraithwood; the Pale Huntsman is unhorsed, his horn stops mid-note, and Gallowmere's bells answer.",
+      "canonicalGameplayMeaningOrAcquisition": "Rare cloth shoulder reward for Horn of the Huntsman in Wraithwood; the Pale Huntsman is unhorsed, his horn stops mid-note, and Gibbetmere's bells answer.",
       "intendedVisualSubject": "A spectral dark-hunt cloth shoulder mantle fastened by a snapped hunting-horn clasp and a subtle piece of broken horse tack; not a generic grave mantle.",
       "generation": {
         "source": "OpenAI built-in image generation",
         "owner": "World of ClaudeCraft",
         "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-        "prompt": "Use case: stylized-concept\nAsset type: square game inventory icon\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG inventory art for Mantle of the Unhorsed (mantle_of_the_unhorsed)\nCanonical context: Rare cloth shoulder reward for Horn of the Huntsman in Wraithwood; the Pale Huntsman is unhorsed, his horn stops mid-note, and Gallowmere's bells answer.\nSubject: A spectral dark-hunt cloth shoulder mantle fastened by a snapped hunting-horn clasp and a subtle piece of broken horse tack; not a generic grave mantle.\nScene/backdrop: opaque blue-black or charcoal atmospheric vignette\nComposition/framing: one tangible centered object or established slot-appropriate pair, strong silhouette at 28px, 10 to 16px safe margins at 128px\nLighting/mood: top-left key light with restrained rim or internal magical accent\nConstraints: physically distinct design; no UI border, rarity frame, halo, text, watermark, mannequin, character, scene diorama or crop",
+        "prompt": "Use case: stylized-concept\nAsset type: square game inventory icon\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG inventory art for Mantle of the Unhorsed (mantle_of_the_unhorsed)\nCanonical context: Rare cloth shoulder reward for Horn of the Huntsman in Wraithwood; the Pale Huntsman is unhorsed, his horn stops mid-note, and Gibbetmere's bells answer.\nSubject: A spectral dark-hunt cloth shoulder mantle fastened by a snapped hunting-horn clasp and a subtle piece of broken horse tack; not a generic grave mantle.\nScene/backdrop: opaque blue-black or charcoal atmospheric vignette\nComposition/framing: one tangible centered object or established slot-appropriate pair, strong silhouette at 28px, 10 to 16px safe margins at 128px\nLighting/mood: top-left key light with restrained rim or internal magical accent\nConstraints: physically distinct design; no UI border, rarity frame, halo, text, watermark, mannequin, character, scene diorama or crop",
         "references": [
           {
             "path": "public/ui/items/shardsong_mantle.webp",
