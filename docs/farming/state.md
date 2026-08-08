@@ -161,13 +161,23 @@ visit or a punishment for lateness is violating the design, not tuning it.
   the machine-enforced payout arithmetic (`copperReward` equals
   `floor(WORK_ORDER_PAYOUT_FRACTION * summed vendor sellValue)`, guarded by
   `tests/professions_work_orders.test.ts`; leave the arithmetic comment on every row).
-- D22: Delivery model: the packet docs merge first as their own PR into the newest
-  `release/**` branch; every phase then starts by re-resolving the NEWEST release
-  branch (version sort), branches off it in THIS worktree, and merges release movement
-  in with the release-merge-audit skill when long-lived. Each phase is its own PR.
-  Every phase file carries a Live-surface note stating exactly what players can reach
-  after that phase merges (early sim phases stay dormant: no vendor seeds, no render,
-  no UI entry until their enabling phases land).
+- D22: Delivery model, LOCAL-ONLY (standing user rule, 2026-08-07; this supersedes
+  every push-and-open-a-PR line in the phase files, and state.md wins on
+  contradiction): ALL farming work stays local until the user declares the feature
+  done. No pushes, no PRs, for anything farming. The integration branch is the LOCAL
+  `feature/farming-plan` in this worktree (it carries docs/farming/ and is based on
+  release/v0.36.0). Every phase: fetch, then branch `fix/farming-phase-NN-<slug>` off
+  LOCAL `feature/farming-plan` (never off a bare release tip, which lacks the packet);
+  if a newer `release/**` tip exists than the branch has absorbed, merge it INTO the
+  phase branch first (release-merge-audit for a nontrivial merge). A finished phase
+  merges back into `feature/farming-plan` with --no-ff (the phase boundary stays
+  readable) and deletes its branch. The would-be PR body becomes the phase report in
+  the progress.md Notes block (including required flags and screenshot references);
+  screenshots are still captured and committed under docs/screenshots. Every phase
+  file carries a Live-surface note stating exactly what players can reach once the
+  feature eventually ships (early sim phases stay dormant: no vendor seeds, no
+  render, no UI entry until their enabling phases land). When the user green-lights
+  going public, `feature/farming-plan` is pushed and delivered whole.
 - D23: Parity goldens. Professions fields are sampled into every golden digest, so
   adding `farming: 0` to the default proficiency map regenerates ALL goldens in Phase 1
   (deliberate, `UPDATE_PARITY=1`, its own reviewed commit, the Phase 8 professions
