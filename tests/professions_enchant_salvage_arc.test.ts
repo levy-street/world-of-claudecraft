@@ -604,6 +604,38 @@ describe('online end-to-end (live GameServer, wire commands + self-deltas)', () 
     expect(remaining[0].instance).toEqual({ rolled: { masterwork: true, stats: { str: 2 } } });
   });
 
+  it('the server resolves extract_essence with the selected slot (Masterwrought phase 04)', () => {
+    const server = new GameServer();
+    const fc = fakeWs();
+    const st = joinServer(server, fc, 713, 'QaSunder');
+    placeAt(server, st.pid, { x: 0, z: 150 });
+    // A raid-sourced epic (Nythraxis loot): the one target class the sunder
+    // admission accepts. Two copies so the selected-slot pin has a decoy.
+    const RAID_EPIC = 'crownforged_dreadhelm';
+    server.sim.ctx.addItemInstance(RAID_EPIC, { signer: 'KeepMe' }, st.pid);
+    server.sim.addItem(RAID_EPIC, 1, st.pid);
+    const plainIndex = serverInv(server, st.pid).findIndex(
+      (slot) => slot.itemId === RAID_EPIC && !slot.instance,
+    );
+
+    cmd(server, st, { cmd: 'extract_essence', item: RAID_EPIC, slot: plainIndex });
+    flushEnchantFamilyCast(server, st.pid);
+
+    const inv = serverInv(server, st.pid);
+    expect(inv.filter((slot) => slot.itemId === 'sundered_essence')).toHaveLength(1);
+    const remainingEpics = inv.filter((slot) => slot.itemId === RAID_EPIC);
+    expect(remainingEpics).toHaveLength(1);
+    expect(remainingEpics[0].instance?.signer).toBe('KeepMe');
+    // The completion line rides the personal log event over the wire. Match
+    // the line's own prefix: the join broadcast also contains "Sunder" (the
+    // player is named QaSunder), which a loose regex would scoop up.
+    const logs = eventsFor(fc.sent, 'log').filter((e: any) =>
+      (e.text ?? '').startsWith('You sunder '),
+    );
+    expect(logs).toHaveLength(1);
+    expect((logs[0] as any).text).toBe('You sunder Bonewrought Dreadhelm into Sundered Essence.');
+  });
+
   it('resolves the three commands server-side and mirrors denc/ench/salv into a real ClientWorld', () => {
     const server = new GameServer();
     const fc = fakeWs();
