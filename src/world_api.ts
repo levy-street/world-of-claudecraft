@@ -578,6 +578,14 @@ export const COMMAND_NAMES = [
   // sim consolidates and restamps cell hints deterministically. Appended
   // because wire tokens are never reordered.
   'inv_sort',
+  // Farming's growth phase: sow a crop into a garden bed, and pull it back
+  // out (Sim.plantCrop / Sim.harvestCrop via src/sim/professions/farming.ts).
+  // Both carry IDS ONLY (`bed`, and `crop` on the plant): the seed cost, the
+  // pre-rolled growth script, the deadline and the yield are all resolved
+  // sim-side, so there is no item payload on this wire to forge. Appended
+  // because wire tokens are never reordered.
+  'plant_crop',
+  'harvest_crop',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -659,7 +667,8 @@ export type WorldFacet =
   | 'IWorldDungeonFinder'
   | 'IWorldActionBar'
   | 'IWorldDeeds'
-  | 'IWorldMounts';
+  | 'IWorldMounts'
+  | 'IWorldFarming';
 
 export const COMMAND_FACETS = {
   // IWorldCombat: ability casts, auto-attack, spirit release.
@@ -891,4 +900,10 @@ export const COMMAND_FACETS = {
   // IWorldActionBar: the debounced action-bar layout upload. takeActionBarLayoutRestore
   // is a login-time read (no send, untagged).
   save_hotbar_layout: 'IWorldActionBar',
+  // IWorldFarming: the two growth-phase plot mutations (snake_case wire
+  // strings, by design). farmPatches (a static content read served from the
+  // client bundle) and myFarmPlots (the `fplot` self-delta mirror) carry no
+  // wire command and stay untagged.
+  plant_crop: 'IWorldFarming',
+  harvest_crop: 'IWorldFarming',
 } as const satisfies Partial<Record<ClientCommand, WorldFacet>>;

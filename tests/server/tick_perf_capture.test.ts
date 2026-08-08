@@ -297,6 +297,7 @@ describe('tick perf capture lifecycle', () => {
       'sim.market',
       'sim.postOffice',
       'sim.delayedEv',
+      'sim.farming',
       'sim.deeds',
       'sim.gridRefresh',
     ];
@@ -315,12 +316,12 @@ describe('tick perf capture lifecycle', () => {
       'sim.mob.update|reptile',
       'sim.mob.update|other',
     ];
-    expect(base).toHaveLength(32);
+    expect(base).toHaveLength(33);
     expect(buckets).toHaveLength(13);
     // Base names are byte-identical and first; the buckets are appended after and
     // nothing else, so every registered name still reaches the TickProfiler ctor.
-    expect(SIM_LAP_PHASES.slice(0, 32)).toEqual(base);
-    expect(SIM_LAP_PHASES.slice(32)).toEqual(buckets);
+    expect(SIM_LAP_PHASES.slice(0, 33)).toEqual(base);
+    expect(SIM_LAP_PHASES.slice(33)).toEqual(buckets);
     // Each bucket is registered (present in the set the ctor pre-registers).
     const registered = new Set(SIM_LAP_PHASES);
     for (const name of buckets) {

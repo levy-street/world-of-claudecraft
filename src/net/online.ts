@@ -4368,6 +4368,22 @@ export class ClientWorld implements IWorld {
     this.actionBarRestore = undefined; // one-shot: consumed by the HUD at world entry
     return restore;
   }
+  // --- IWorldFarming: the two plot mutations (snake_case wire, by design).
+  // Command only, NEVER predicted: the server re-validates the bed id, the
+  // crop id, ownership, the skill threshold, and the seed in bags inside the
+  // sim (the hoe-tier gate is deferred to the crop-ladder
+  // phase), consumes the seed, and pre-rolls the whole hidden
+  // growth script there. Writing an optimistic plot row here would be
+  // guessing at a deadline only the authority can set, and the hidden
+  // survival/yield slots deliberately never reach this client at all, so
+  // there is nothing to predict FROM. Every outcome mirrors back on the
+  // `fplot` self delta plus a text-free id-carrying SimEvent. ---
+  plantCrop(bedId: string, cropId: string): void {
+    this.cmd({ cmd: 'plant_crop', bed: bedId, crop: cropId });
+  }
+  harvestCrop(bedId: string): void {
+    this.cmd({ cmd: 'harvest_crop', bed: bedId });
+  }
   chat(text: string): void {
     this.cmd({ cmd: 'chat', text });
   }
