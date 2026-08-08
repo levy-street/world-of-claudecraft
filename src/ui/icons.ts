@@ -3158,6 +3158,16 @@ const ITEM_RECIPES: Record<string, IconRecipe> = {
   // via ITEM_WEAPON_VARIANTS like every other weapon).
   bonewrought_bulwark: r('steel', 'bone', ['shield', { p: 'skull', ...TR }], ['glow', 'sparkle']),
   wraithfire_orb: r('shadow', 'shadowPurple', ['gem'], ['glow', 'sparkle']),
+  // Farming (growth-engine phase). Explicit recipes because the trinket
+  // fallback would send all four to the same scroll-on-leather glyph, and a
+  // farmer's bag needs the seed, the produce, its fine twin and the husks
+  // tellable apart at a glance (pinned distinct by tests/item_icons.test.ts
+  // A4). These are the ART_PENDING drawn stand-ins; committed WebP art
+  // replaces them at the art phase.
+  vale_wheat_seed: r('nature', 'earthBrown', [{ p: 'sack', pal: 'earthBrown' }]),
+  vale_wheat: r('nature', 'gold', [{ p: 'leaf', pal: 'gold' }]),
+  fine_vale_wheat: r('nature', 'gold', [{ p: 'leaf', pal: 'gold' }], ['sparkle']),
+  withered_husks: r('earth', 'earthBrown', [{ p: 'leaf', pal: 'earthBrown' }], ['crack']),
   // misc UI icons (not real items)
   coin_gold: r('treasure', 'gold', ['coin'], ['sparkle']),
   slot_empty: r('junk', 'silverWhite', []),
