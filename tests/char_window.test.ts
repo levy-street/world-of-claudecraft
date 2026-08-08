@@ -68,8 +68,11 @@ describe('char_window: WCAG 2.2 AA', () => {
 });
 
 describe('char_window: profession art placements', () => {
-  it('renders gathering rows with their dedicated painted icons', () => {
-    expect(painter).toMatch(/professionImageUrl\(`gather_\$\{r\.professionId\}`\)/);
+  it('renders gathering rows through the art-or-procedural icon resolver', () => {
+    // professionIconUrl, not professionImageUrl: the resolver that falls back
+    // to the procedural composer, so a pending-art profession still paints
+    // (the five-icon render test below pins the behavior; this pins the seam).
+    expect(painter).toMatch(/professionIconUrl\(`gather_\$\{r\.professionId\}`, 56\)/);
     expect(painter).toContain('class="char-gather-icon"');
     expect(painter).toContain('class="char-gather-row"');
   });
@@ -81,7 +84,7 @@ describe('char_window: profession art placements', () => {
     expect(painter).toContain('alt=""');
   });
 
-  it('paints the exact four gathering assets and replaces the inline pair crest', () => {
+  it('paints all five gathering icons, farming via the procedural fallback, and replaces the inline pair crest', () => {
     let canvasContext: unknown;
     canvasContext = new Proxy(
       {},
@@ -111,6 +114,7 @@ describe('char_window: profession art placements', () => {
           { professionId: 'logging', skill: 12, maxSkill: 125 },
           { professionId: 'herbalism', skill: 13, maxSkill: 125 },
           { professionId: 'fishing', skill: 14, maxSkill: 125 },
+          { professionId: 'farming', skill: 0, maxSkill: 100 },
         ],
       },
     };
@@ -158,6 +162,10 @@ describe('char_window: profession art placements', () => {
       '/ui/professions/gather_logging.webp',
       '/ui/professions/gather_herbalism.webp',
       '/ui/professions/gather_fishing.webp',
+      // Farming has no committed art (PENDING_ART_IDS), so the char sheet
+      // must paint the same procedural composer the professions window uses,
+      // never an iconless gap beside four painted siblings.
+      'data:image/png;base64,stub',
     ]);
     const crest = root.querySelector<HTMLImageElement>('.char-archetype-title-crest');
     expect(crest?.getAttribute('src')).toBe('/ui/professions/archetype_smith.webp');

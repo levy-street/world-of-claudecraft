@@ -31,13 +31,13 @@ import { esc } from './esc';
 import { gatheringProfessionNameKey } from './gathering_profession_name';
 import { buildGatheringProficiencyRows } from './gathering_view';
 import { formatNumber, type TranslationKey, t, tPlural } from './i18n';
-import { iconDataUrl, QUALITY_COLOR } from './icons';
+import { iconDataUrl, professionIconUrl, QUALITY_COLOR } from './icons';
 import type { ItemDragState } from './item_drag_state';
 import { wornTooltipInstance } from './item_instance_tooltip';
 import type { PainterHostPresentation } from './painter_host';
 import { playtimeParts, playtimeShape } from './playtime_view';
 import { hydratePortraits, modularLookFor, portraitChipHtml } from './portrait_chip';
-import { archetypeImageUrl, professionImageUrl } from './profession_art';
+import { archetypeImageUrl } from './profession_art';
 import { qualityGlowShadow } from './quality_glow';
 import { tSim } from './sim_i18n';
 import type { StatId } from './stat_tooltip';
@@ -321,10 +321,12 @@ export class CharWindow {
       .map((r) => {
         const key = gatheringProfessionNameKey(r.professionId);
         if (key === undefined) return '';
-        const imageUrl = professionImageUrl(`gather_${r.professionId}`);
-        const icon = imageUrl
-          ? `<img class="char-gather-icon" src="${esc(imageUrl)}" alt="" draggable="false">`
-          : '';
+        // professionIconUrl, not professionImageUrl: a pending-art profession
+        // (farming) must paint its procedural composer icon, never an iconless
+        // gap beside painted siblings; the professions window resolves the
+        // same way. 56 keeps the 28px slot crisp on 2x displays.
+        const iconUrl = professionIconUrl(`gather_${r.professionId}`, 56);
+        const icon = `<img class="char-gather-icon" src="${esc(iconUrl)}" alt="" draggable="false">`;
         const skillValue = t('hudChrome.professions.skillValue', {
           skill: formatNumber(r.displayValue, { maximumFractionDigits: 0 }),
           max: formatNumber(r.maxSkill, { maximumFractionDigits: 0 }),
