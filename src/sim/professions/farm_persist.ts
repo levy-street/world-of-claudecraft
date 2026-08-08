@@ -107,7 +107,13 @@ export function normalizeFarmPlots(
 ): Map<string, PlotState> {
   const out = new Map<string, PlotState>();
   if (!saved) return out;
-  for (const [bedId, row] of Object.entries(saved)) {
+  // KEY-SORTED insertion, mirroring the serializer: the live Map's iteration
+  // order must be sim-owned, never a saved-JSON key-order artifact. The growth
+  // phase iterates this Map per tick, so an unsorted insert would make the rng
+  // stream position depend on how the DB round-tripped the blob.
+  for (const [bedId, row] of Object.entries(saved).sort(([a], [b]) =>
+    a < b ? -1 : a > b ? 1 : 0,
+  )) {
     if (!row || !opts.validBedIds.has(bedId) || !opts.validCropIds.has(row.cropId)) continue;
     if (!finite(row.plantedAtMs) || !finite(row.readyAtMs)) continue;
     if (row.plantedAtMs <= 0 || row.readyAtMs <= 0) continue;

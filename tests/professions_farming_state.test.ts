@@ -344,6 +344,15 @@ describe('load-side anti-tamper (one corrupt dimension per arm)', () => {
     expect(({} as { cropId?: unknown }).cropId).toBeUndefined();
   });
 
+  it('inserts survivors in sorted bed order, never saved-JSON key order', () => {
+    // The live Map's iteration order must be sim-owned: the growth phase will
+    // iterate meta.farmPlots per tick, and if insertion mirrored the saved
+    // JSON, the rng stream position would become a function of JSONB key
+    // order, a DB round-trip artifact outside the sim's control.
+    const loaded = norm({ bed_beta: { ...VALID }, bed_alpha: { ...VALID } });
+    expect([...loaded.keys()]).toEqual(['bed_alpha', 'bed_beta']);
+  });
+
   it('pins the tamper ceiling to its literal (seven days in ms)', () => {
     expect(FARM_MAX_GROW_MS).toBe(604800000);
   });
