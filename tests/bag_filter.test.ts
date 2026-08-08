@@ -499,9 +499,14 @@ describe('chip reachability census: the All-only set, pinned', () => {
     'tangled_weed',
     'travelers_knapsack',
     'wolfhide_satchel',
+    // Masterwrought phase 04: the tradable making-catalyst is All-only until
+    // the first apex recipe classifies it (it then derives into the material
+    // set and gains the materials chip; move it out of here in the same
+    // change as its ALLOWED_UNCLASSIFIED_JUNK row in material_taxonomy).
+    'wyrmfall_core',
   ] as const;
 
-  it('exactly the ruled 26 junk items plus the 6 bag-kind items match no chip', () => {
+  it('exactly the ruled 27 junk items plus the 6 bag-kind items match no chip', () => {
     const allOnly = Object.values(REAL_ITEMS)
       .filter((def) => !BAG_CATEGORIES.some((c) => c !== 'all' && matchesCategory(def, c)))
       .map((d) => d.id)
