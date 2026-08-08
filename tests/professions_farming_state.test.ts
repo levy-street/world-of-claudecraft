@@ -177,6 +177,17 @@ describe('the public projection, driven directly (the pure-leaf contract)', () =
     ...over,
   });
 
+  it('projects the empty map to the shared frozen instance, no per-call allocation', () => {
+    // The empty case is ~100% of players until planting ships, and the
+    // projection runs per session per tick on the snapshot path: the
+    // EMPTY_TOOL_EFFECT_SLOT_VIEWS precedent, identity-pinned so a fresh []
+    // regression reds here.
+    const m = new Map<string, PlotState>();
+    expect(projectFarmPlots(m, 1_000)).toBe(projectFarmPlots(m, 2_000));
+    expect(projectFarmPlots(m, 1_000)).toEqual([]);
+    expect(Object.isFrozen(projectFarmPlots(m, 1_000))).toBe(true);
+  });
+
   it('sorts rows by bed id regardless of map insertion order', () => {
     const m = new Map<string, PlotState>([
       ['bed_beta', plot()],
@@ -199,7 +210,7 @@ describe('the public projection, driven directly (the pure-leaf contract)', () =
     const m = new Map<string, PlotState>([
       ['bed_alpha', plot({ survivalRoll: 0.5, yieldSeed: 9 })],
     ]);
-    const row = projectFarmPlots(m, 10_000)[0] as Record<string, unknown>;
+    const row = projectFarmPlots(m, 10_000)[0] as unknown as Record<string, unknown>;
     expect(Object.keys(row).sort()).toEqual([
       'bedId',
       'compost',
@@ -457,6 +468,17 @@ describe('the save round trip through a real Sim', () => {
     expect(sim.myFarmPlots).toEqual(sim.farmPlotsFor(pid));
     // An unknown pid is empty, never a throw (the toolEffectSlotsFor arm).
     expect(sim.farmPlotsFor(987_654)).toEqual([]);
+  });
+
+  it('serves the shared empty projection for a plotless player and an unknown pid', () => {
+    // Both empty arms return the ONE frozen instance (the
+    // EMPTY_TOOL_EFFECT_SLOT_VIEWS precedent): this runs per session per tick
+    // on the snapshot path, and a fresh [] per call was an allocation for the
+    // overwhelming majority who have no planted bed.
+    const { sim, pid } = load(baseState());
+    expect(sim.farmPlotsFor(pid)).toBe(sim.farmPlotsFor(pid));
+    expect(sim.farmPlotsFor(pid)).toBe(sim.farmPlotsFor(987_654));
+    expect(sim.farmPlotsFor(pid)).toEqual([]);
   });
 
   it('pins the persisted bed-id roster to its literals', () => {

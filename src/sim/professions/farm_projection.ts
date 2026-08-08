@@ -64,6 +64,12 @@ export interface FarmPlotView {
   status: FarmPlotStatus;
 }
 
+// The shared empty projection (the EMPTY_TOOL_EFFECT_SLOT_VIEWS precedent in
+// professions/tools.ts): projection runs per session per tick on the snapshot
+// path, and the empty map is the overwhelming majority, so a fresh [] per
+// call would be a per-player-per-tick allocation for nothing.
+export const EMPTY_FARM_PLOT_VIEWS: readonly FarmPlotView[] = Object.freeze([]);
+
 // Project a player's plots for the wire and both IWorld implementations.
 // Explicit field picks are the leak barrier: a future PlotState field stays
 // sim-side unless someone adds it here on purpose and re-pins the exhaustive
@@ -73,7 +79,8 @@ export interface FarmPlotView {
 export function projectFarmPlots(
   plots: ReadonlyMap<string, PlotState>,
   nowMs: number,
-): FarmPlotView[] {
+): readonly FarmPlotView[] {
+  if (plots.size === 0) return EMPTY_FARM_PLOT_VIEWS;
   const rows: FarmPlotView[] = [];
   for (const [bedId, p] of plots) {
     rows.push({

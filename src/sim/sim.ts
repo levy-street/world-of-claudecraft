@@ -390,7 +390,12 @@ import {
   type PersistedFarmPlot,
   serializeFarmPlots,
 } from './professions/farm_persist';
-import { type FarmPlotView, type PlotState, projectFarmPlots } from './professions/farm_projection';
+import {
+  EMPTY_FARM_PLOT_VIEWS,
+  type FarmPlotView,
+  type PlotState,
+  projectFarmPlots,
+} from './professions/farm_projection';
 import * as fishing from './professions/fishing';
 import type { RespecPaymentTier } from './professions/focus';
 import * as professionsFocus from './professions/focus';
@@ -11907,17 +11912,18 @@ export class Sim {
 
   // The viewer's farm plots, projected for the seam. Takes an explicit pid
   // (the toolEffectSlotsFor precedent) so the server can build one player's
-  // delta while the offline getter below reads the primary. Returns [] for an
-  // unknown pid and for a player with no planted bed, which is the default and
-  // the overwhelming majority. The projection owns the bed-id sort and the
-  // hidden-slot leak barrier (professions/farm_projection.ts).
-  farmPlotsFor(pid: number): FarmPlotView[] {
+  // delta while the offline getter below reads the primary. Returns the
+  // shared frozen empty projection for an unknown pid and for a player with
+  // no planted bed, which is the default and the overwhelming majority (the
+  // EMPTY_TOOL_EFFECT_SLOT_VIEWS arm above). The projection owns the bed-id
+  // sort and the hidden-slot leak barrier (professions/farm_projection.ts).
+  farmPlotsFor(pid: number): readonly FarmPlotView[] {
     const meta = this.players.get(pid);
-    if (!meta) return [];
+    if (!meta) return EMPTY_FARM_PLOT_VIEWS;
     return projectFarmPlots(meta.farmPlots, this.lockoutNowMs());
   }
 
-  get myFarmPlots(): FarmPlotView[] {
+  get myFarmPlots(): readonly FarmPlotView[] {
     return this.farmPlotsFor(this.primaryId);
   }
 
