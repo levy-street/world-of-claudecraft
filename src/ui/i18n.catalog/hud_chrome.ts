@@ -38,6 +38,16 @@ export const hudChromeStrings = {
     healerConfirmAccept: 'Revive Me',
     healerConfirmCancel: 'Cancel',
   },
+  // Wiki launcher (#mm-wiki, the Esc-menu row, the mobile More tray). The
+  // button label reuses nav.wiki; these are the confirm dialog's strings
+  // (confirm-first so a mid-fight tap never opens the browser by accident).
+  wiki: {
+    confirmTitle: 'Open the Wiki?',
+    confirmBody:
+      'This opens the World of ClaudeCraft wiki in your browser. The game keeps running.',
+    confirmOpen: 'Open Wiki',
+    confirmCancel: 'Cancel',
+  },
   // Countdown-to-graveyard recovery. Stable event phases/reasons come from the
   // authoritative sim; new semantics use new keys so stale safe-spot translations
   // cannot be shown while locale fills catch up.
@@ -2163,6 +2173,12 @@ export const hudChromeStrings = {
     sortRecent: 'Recent',
     sortQuality: 'Quality',
     sortName: 'Name',
+    // The one-shot clean-up button beside the view controls: combines partial
+    // stacks and rearranges the real cells server-side (IWorldInventory
+    // sortInventory), unlike the view-only dropdown above it.
+    sortButton: 'Sort',
+    sortButtonAria: 'Sort your bags',
+    sortButtonHint: 'Combine stacks and group items by type',
     searchPlaceholder: 'Search items',
     searchAria: 'Search bag items by name',
     noMatch: 'No items match your filters.',

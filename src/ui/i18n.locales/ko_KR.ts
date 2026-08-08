@@ -5853,6 +5853,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.filterMount': '탈것',
   'hudChrome.bags.filterQuest': '퀘스트',
   'hudChrome.bags.sortAria': '가방 아이템 정렬',
+  'hudChrome.bags.sortButton': '정리',
+  'hudChrome.bags.sortButtonAria': '가방 정리',
+  'hudChrome.bags.sortButtonHint': '묶음을 합치고 아이템을 종류별로 정리합니다',
   'hudChrome.bags.sortRecent': '최근',
   'hudChrome.bags.sortQuality': '품질',
   'hudChrome.bags.sortName': '이름',
@@ -9647,6 +9650,12 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unstuck.standStillAnywhere': '제자리에 멈춘 뒤 갇힘 탈출을 사용하세요.',
   'hudChrome.unstuck.busy': '현재 행동을 끝낸 뒤 갇힘 탈출을 사용하세요.',
   'hudChrome.unstuck.unavailable': '현재 상태에서는 갇힘 탈출을 사용할 수 없습니다.',
+  // Wiki launcher confirm (M16 non-Latin fills).
+  'hudChrome.wiki.confirmTitle': '위키를 열까요?',
+  'hudChrome.wiki.confirmBody':
+    'World of ClaudeCraft 위키를 브라우저에서 엽니다. 게임은 계속 실행됩니다.',
+  'hudChrome.wiki.confirmOpen': '위키 열기',
+  'hudChrome.wiki.confirmCancel': '취소',
   'guide.abilityHook.revenge':
     '전방의 적을 휩쓸며, 회피하거나 무기 막기 후 자원 소모 없이 사용할 수 있습니다.',
   'guide.abilityHook.hamstring': '적의 움직임을 방해해 달아나지 못하게 합니다.',

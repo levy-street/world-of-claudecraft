@@ -228,6 +228,7 @@ export const ko_KR: Record<string, string> = {
   'tickPerf.ms': '{value}ms',
   'tickPerf.noCapture': '아직 캡처가 없습니다. 구간을 선택하고 캡처를 시작하세요.',
   'tickPerf.overBudget': '50ms 예산 초과',
+  'tickPerf.selfHeading': '셀프 스냅샷 키 그룹 (bcastSelf)',
   'tickPerf.simHeading': 'sim.tick() 내부 단계',
   'tickPerf.title': '서버 틱 프로파일러',
   'calibration.autoRefresh': '자동 새로고침 ({seconds}초)',

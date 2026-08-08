@@ -230,6 +230,7 @@ export const ru_RU: Record<string, string> = {
   'tickPerf.ms': '{value} мс',
   'tickPerf.noCapture': 'Захвата ещё нет. Выберите окно и запустите его.',
   'tickPerf.overBudget': 'превышен бюджет 50ms',
+  'tickPerf.selfHeading': 'Группы ключей собственного снимка (bcastSelf)',
   'tickPerf.simHeading': 'внутренние фазы sim.tick()',
   'tickPerf.title': 'Профилировщик тиков сервера',
   'calibration.autoRefresh': 'Автообновление ({seconds} с)',

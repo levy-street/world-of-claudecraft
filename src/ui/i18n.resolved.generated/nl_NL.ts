@@ -336,6 +336,12 @@ export const nl_NL: EnTranslations = {
       "healerConfirmAccept": "Breng mij weer tot leven",
       "healerConfirmCancel": "Annuleren"
     },
+    "wiki": {
+      "confirmTitle": "Open the Wiki?",
+      "confirmBody": "This opens the World of ClaudeCraft wiki in your browser. The game keeps running.",
+      "confirmOpen": "Open Wiki",
+      "confirmCancel": "Cancel"
+    },
     "unstuck": {
       "menuButton": "Loskomen",
       "help": "Herstel: /unstuck start een stilstaande aftelling die je verplaatst naar een nabije bereikbare veilige plek.",
@@ -1920,6 +1926,9 @@ export const nl_NL: EnTranslations = {
       "sortRecent": "Recent",
       "sortQuality": "Kwaliteit",
       "sortName": "Naam",
+      "sortButton": "Sort",
+      "sortButtonAria": "Sort your bags",
+      "sortButtonHint": "Combine stacks and group items by type",
       "searchPlaceholder": "Items zoeken",
       "searchAria": "Tasitems zoeken op naam",
       "noMatch": "Geen items komen overeen met je filters.",

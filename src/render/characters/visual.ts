@@ -9,7 +9,14 @@ import { WEAPON_SKINS } from '../../sim/content/weapon_skins';
 import type { OverheadEmoteId } from '../../world_api';
 import { GFX } from '../gfx';
 import { cloneMaterialWithHooks } from '../material_clone_hooks';
-import { createWeaponVfx, WEAPON_VFX, type WeaponVfxHandle } from '../weapon_vfx';
+import {
+  createWeaponVfx,
+  DEFAULT_TUNING,
+  WEAPON_VFX,
+  type WeaponVfxHandle,
+  type WeaponVfxTuning,
+} from '../weapon_vfx';
+import { scaleWeaponVfxTuning } from '../weapon_vfx_shed_core';
 import { weaponVfxTuningFor } from '../weapon_vfx_tuning';
 import {
   type AnimActionWeight,
@@ -380,6 +387,12 @@ export class CharacterVisual {
   }
   private weaponSkinId: string | null = null;
   private weaponVfx: WeaponVfxHandle[] = [];
+  // The skin's authored tuning row (the rig's 1.0 look) plus the shed
+  // multiplier last applied over it, and one scratch the scaled row is written
+  // into so a shed step allocates nothing.
+  private weaponVfxAuthored: Partial<WeaponVfxTuning> = {};
+  private weaponVfxShed = 1;
+  private readonly weaponVfxTuningScratch: WeaponVfxTuning = { ...DEFAULT_TUNING };
   /** Long-hair secondary motion (modular styles with sway morphs; empty and
    *  free on every other rig). */
   private hairSway = new HairSwayDriver();
@@ -1707,10 +1720,14 @@ export class CharacterVisual {
     const skin = this.weaponSkinId ? WEAPON_SKINS[this.weaponSkinId] : null;
     const spec = skin ? (WEAPON_VFX[skin.model] ?? null) : null;
     if (!skin || !spec) return;
+    // The authored row is the rig's 1.0 look; the shed lever below re-derives
+    // from it, so it must be kept rather than only pushed once.
+    this.weaponVfxAuthored = weaponVfxTuningFor(skin.model, spec.tier);
+    this.weaponVfxShed = 1;
     for (const payload of payloads) {
       const handle = createWeaponVfx(payload, spec, { grounded: false });
       handle.setBackdropVisible(false);
-      handle.setTuning(weaponVfxTuningFor(skin.model, spec.tier));
+      handle.setTuning(this.weaponVfxAuthored);
       handle.setPixelScale(weaponVfxViewportHeight * this.weaponVfxSpriteScale);
       // Tag the rig's own scene nodes: applyMaterials must never tint its
       // ShaderMaterials and the shadow pass has no business with sprite shells.
@@ -1733,10 +1750,43 @@ export class CharacterVisual {
 
   /** Advance the weapon-skin VFX (shader time, pulse, flicker). Cheap no-op
    *  without an active skin; the renderer calls it once per entity per frame.
-   *  Also re-pins bow payload orientation (see reattachHeldWeapon). */
-  updateWeaponVfx(dt: number): void {
+   *  Also re-pins bow payload orientation (see reattachHeldWeapon).
+   *
+   *  `shed` is the rig-strength multiplier from `weaponVfxShedScale` (viewer
+   *  distance plus the frame-budget governor's vfx lever); 1 is the authored
+   *  look. It only ever DIMS; what removes a rig is the far-LOD swap below.
+   *
+   *  The rig's point light deliberately keeps its `visible` flag at every
+   *  scale: three counts visible point lights into every lit material's program
+   *  cache key, so clearing one mid-flight is the open-world recompile freeze.
+   *  Dimming drives its intensity down instead, which is the look without the
+   *  hazard. */
+  updateWeaponVfx(dt: number, shed = 1): void {
     this.applySkinOrientation(dt);
+    if (this.weaponVfx.length === 0) return;
+    // A rig that the far-LOD swap has taken off screen still cost a full tick
+    // of uniform writes, emissive pulse and light flicker every frame, for
+    // something no pixel can show: `setFar` hides `modelWrap`, and a held
+    // weapon (with its rig) hangs off a bone INSIDE it.
+    //
+    // Gated on farMesh as well as `far`, and that is the load-bearing half:
+    // `setFar` leaves `modelWrap` VISIBLE when there is no baked mesh to stand
+    // in for it, while `isFar` reads true either way. Skipping on `far` alone
+    // would freeze a rig that is still drawing, leaving its motes hanging in
+    // the air and its light stuck at whatever the last flicker wrote.
+    if (this.far && this.farMesh) return;
+    this.applyWeaponVfxShed(shed);
     for (const handle of this.weaponVfx) handle.update(dt);
+  }
+
+  // Write-elided: setTuning walks every part and rewrites its materials, so the
+  // quantized scale is compared first and an unchanged frame costs nothing.
+  private applyWeaponVfxShed(shed: number): void {
+    const next = Number.isFinite(shed) ? Math.min(1, Math.max(0, shed)) : 1;
+    if (next === this.weaponVfxShed) return;
+    this.weaponVfxShed = next;
+    scaleWeaponVfxTuning(this.weaponVfxAuthored, next, this.weaponVfxTuningScratch);
+    for (const handle of this.weaponVfx) handle.setTuning(this.weaponVfxTuningScratch);
   }
 
   /** Blend pinned skin payloads between the authored grip glue and their

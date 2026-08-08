@@ -46,6 +46,7 @@ import {
   type InvSlot,
   type MailResultCode,
 } from '../types';
+import { MailIndex } from './mail_index';
 
 const MAIL_RANGE = INTERACT_RANGE + 2; // you must stand at a raven pillar to tend your post
 export const MAIL_POSTAGE = 30; // copper per letter
@@ -127,17 +128,51 @@ export class PostOffice {
   // to tend your post.
   mailboxIds: number[] = [];
 
-  // Finding 4 (perf): a maintained count of delivered-and-unread letters per
-  // recipientKey (the same key deliveredFor/belongsTo match on). mailUnreadFor
-  // reads it in O(1) rather than scanning the whole book once per online session
-  // per tick. `undelivered` is the small set of still-in-flight letters, so a
-  // delivery transition updates the index at the exact tick the old scan would
-  // have counted it. Both are derived state, rebuilt from the book on load and
+  // Finding 4 (perf), extended: the derived lookup state (per-recipient letter
+  // buckets, the delivered-and-unread counts, the in-flight set) lives in
+  // MailIndex, kept in lockstep by routing every membership or recipient-key
+  // mutation through it. deliveredFor/storedCountFor/mailboxHoldsItem read
+  // buckets, and mailUnreadFor reads the maintained count, instead of scanning
+  // the whole global book per player per call (the production broadcast hot
+  // spot on a grown book). Derived state only: rebuilt from the book on load,
   // never persisted.
-  private unreadIndex = new Map<string, number>();
-  private undelivered = new Set<MailMessage>();
+  private index = new MailIndex<MailMessage>();
+
+  // Wire revision: advances on every mutation a mailbox view can observe
+  // (booking, a delivery landing, expiry/return, take, read, delete, rekey,
+  // purge, load), so the server's snapshot gate rebuilds a viewer's
+  // mailInfoFor only when something actually changed (the market browseRev
+  // pattern). Every wire-reachable mutating verb must ride a bump or the gate
+  // serves a stale view; tests/mail_wire_cache.test.ts pins each one.
+  private rev = 0;
 
   constructor(private readonly ctx: SimContext) {}
+
+  private bumpRev(): void {
+    this.rev++;
+  }
+
+  // The change signal the server's snapshot gate polls instead of rebuilding
+  // the mailbox view every tick: null while this player is not at a raven
+  // pillar (the same gate mailInfoFor applies), else the current revision.
+  // Server-only, never IWorld (the market browseRevFor precedent).
+  mailRevFor(pid: number): number | null {
+    if (!this.mailboxViewer(pid)) return null;
+    return this.rev;
+  }
+
+  // The ONE viewer gate the mailbox view and its change signal share: a
+  // resolvable player standing near a raven pillar. mailRevFor and mailInfoFor
+  // both read through this so the two can never drift apart (a one-sided
+  // condition added later, the dead-gate mailTake already applies being the
+  // likely candidate, would ship a stale non-null inbox or a spurious null).
+  private mailboxViewer(pid: number): { meta: PlayerMeta; e: Entity } | null {
+    const meta = this.ctx.players.get(pid);
+    const e = this.ctx.entities.get(pid);
+    if (!meta || !e) return null;
+    if (!this.nearMailbox(e)) return null;
+    return { meta, e };
+  }
 
   // Public tick entry: the Sim tick calls this in the end-of-tick system block
   // (after market.update()). Once a second: land due letters, prune expired ones.
@@ -146,8 +181,11 @@ export class PostOffice {
     // time into the unread index, so mailUnreadFor stays byte-identical to the
     // former per-call scan at the exact tick (never a per-second lag). Iterates
     // only the small in-flight set, not the whole book, and touches no rng/event
-    // stream (the arrival toast keeps its own per-second cadence below).
-    this.deliverDue();
+    // stream (the arrival toast keeps its own per-second cadence below). A
+    // landing changes what mailInfoFor shows purely by time passing, so it is
+    // a rev bump like any other mutation (the wire gate would otherwise serve
+    // the pre-landing view until its staleness backstop).
+    if (this.index.deliverDue(this.ctx.time) > 0) this.bumpRev();
     if (this.ctx.tickCount % 20 !== 0) return;
     const now = this.ctx.time;
     for (let i = this.mail.length - 1; i >= 0; i--) {
@@ -173,19 +211,20 @@ export class PostOffice {
       if (m.kind === 'player' && now >= m.expiresAt && (m.items.length > 0 || m.copper > 0)) {
         if (m.returned) {
           // The one sanctioned destruction: the return flight already happened.
-          if (!m.read && now >= m.deliverAt) this.indexDec(m.recipientKey);
-          this.undelivered.delete(m);
+          this.index.untrack(m, now);
           this.mail.splice(i, 1);
+          this.bumpRev();
         } else {
           this.returnToSender(m, now);
         }
         continue;
       }
       if (now >= m.expiresAt && m.items.length === 0 && m.copper <= 0) {
-        // A delivered-and-unread letter that expires leaves the unread index.
-        if (!m.read && now >= m.deliverAt) this.indexDec(m.recipientKey);
-        this.undelivered.delete(m);
+        // An expired letter leaves the buckets and, if delivered-and-unread,
+        // the unread count (untrack re-derives both from the letter's state).
+        this.index.untrack(m, now);
         this.mail.splice(i, 1);
+        this.bumpRev();
       }
     }
   }
@@ -203,9 +242,11 @@ export class PostOffice {
   // always stable-id by construction (booked that way, or by a prior return),
   // so a letter that bounces back and forth stays stable-id-keyed on both ends.
   private returnToSender(m: MailMessage, now: number): void {
-    // Move the delivered-and-unread contribution out of the old bucket
-    // (exactly what the index counts; the rekeyMailOwner shape).
-    if (!m.read && now >= m.deliverAt) this.indexDec(m.recipientKey);
+    // A wholesale mutation (recipient, read flag, delivery re-arm), so it is
+    // bracketed with untrack/track: every index contribution (bucket, unread
+    // count, in-flight set) is dropped under the old state and re-derived from
+    // the new one (the MailIndex contract).
+    this.index.untrack(m, now);
     const homeKey = m.senderKey ?? m.senderName;
     const homeName = m.senderName;
     m.senderKey = m.recipientKey;
@@ -219,7 +260,8 @@ export class PostOffice {
     m.deliverAt = now + MAIL_DELIVERY_SECONDS;
     // The second window: one more chance to claim, then the sweep deletes.
     m.expiresAt = now + MAIL_ATTACHMENT_EXPIRY_SECONDS;
-    this.trackDelivery(m);
+    this.index.track(m, now);
+    this.bumpRev();
   }
 
   private nearMailbox(e: Entity): boolean {
@@ -239,11 +281,14 @@ export class PostOffice {
   // mailbox and nowhere else). The quest re-grant predicate
   // (quests/quest_item_presence.ts) reads this: an item waiting in the
   // mailbox is recoverable through mailTake, so a re-accept must not mint a
-  // duplicate. Pure read, no rng, no mutation.
+  // duplicate. Pure read, no rng, no mutation; a bucket union (the dual-key
+  // rule) instead of the whole-book scan it replaced.
   mailboxHoldsItem(meta: PlayerMeta, itemId: string): boolean {
-    return this.mail.some(
-      (m) => this.belongsTo(m, meta) && m.items.some((s) => s.itemId === itemId && s.count > 0),
-    );
+    const holds = (m: MailMessage): boolean =>
+      m.items.some((s) => s.itemId === itemId && s.count > 0);
+    const key = this.mailKeyFor(meta);
+    if (this.index.bucketFor(key).some(holds)) return true;
+    return meta.name !== key && this.index.bucketFor(meta.name).some(holds);
   }
 
   // Structured outcome (the lockpick convention: the sim emits data only, the
@@ -264,68 +309,30 @@ export class PostOffice {
     return null;
   }
 
-  private belongsTo(m: MailMessage, meta: PlayerMeta): boolean {
-    return m.recipientKey === this.mailKeyFor(meta) || m.recipientKey === meta.name;
-  }
-
+  // Everything delivered to this player, via the bucket union (their stable
+  // mail key plus their display name, the historical belongsTo dual-key rule).
+  // A letter carries exactly one recipientKey, so the buckets never overlap
+  // and the union is duplicate-free. The result's order is NOT book order:
+  // cross-bucket order differs when a player has legacy name-keyed letters,
+  // and within a bucket an untrack/track bracket (rekey, the return flight)
+  // re-appends at the tail. Every consumer is order-insensitive (mailInfoFor
+  // sorts on a total order, take/read find by unique id, the rest count),
+  // pinned by tests/mail_index.test.ts and the mail suites. The ordering invariant the old per-call scan documented still
+  // holds: update() (which lands due letters) runs to completion inside tick()
+  // before any mail command or snapshot read observes a newly-due letter.
   private deliveredFor(meta: PlayerMeta): MailMessage[] {
     const now = this.ctx.time;
-    return this.mail.filter((m) => this.belongsTo(m, meta) && now >= m.deliverAt);
+    const key = this.mailKeyFor(meta);
+    const out: MailMessage[] = [];
+    for (const m of this.index.bucketFor(key)) if (now >= m.deliverAt) out.push(m);
+    if (meta.name !== key) {
+      for (const m of this.index.bucketFor(meta.name)) if (now >= m.deliverAt) out.push(m);
+    }
+    return out;
   }
 
   private storedCountFor(key: string, name: string): number {
-    return this.mail.reduce(
-      (n, m) => n + (m.recipientKey === key || m.recipientKey === name ? 1 : 0),
-      0,
-    );
-  }
-
-  private indexInc(key: string): void {
-    this.unreadIndex.set(key, (this.unreadIndex.get(key) ?? 0) + 1);
-  }
-
-  private indexDec(key: string): void {
-    const next = (this.unreadIndex.get(key) ?? 0) - 1;
-    if (next > 0) this.unreadIndex.set(key, next);
-    else this.unreadIndex.delete(key);
-  }
-
-  // Fold a freshly booked or loaded letter into the unread index and the
-  // in-flight set: an already-due letter counts as unread now (unless read); one
-  // still on the wing waits in `undelivered` until deliverDue lands it.
-  private trackDelivery(m: MailMessage): void {
-    if (this.ctx.time >= m.deliverAt) {
-      if (!m.read) this.indexInc(m.recipientKey);
-    } else {
-      this.undelivered.add(m);
-    }
-  }
-
-  // Per-tick: land any in-flight letter whose delivery time has arrived, moving
-  // it from `undelivered` into the unread index. Draws no rng and emits nothing
-  // (the arrival toast stays on its own per-second cadence in update()), so it
-  // never perturbs the deterministic event/rng stream. Correctness rests on the
-  // ordering invariant that update() (which calls this) runs to completion inside
-  // tick() before any mail command or mailUnreadFor observes a newly-due letter:
-  // tick() invokes no mail mutator mid-loop, and all commands/snapshots run
-  // between ticks, so a command's deliveredFor never sees a due-but-unfolded
-  // letter that indexDec could turn into a phantom under-count.
-  private deliverDue(): void {
-    if (this.undelivered.size === 0) return;
-    const now = this.ctx.time;
-    for (const m of this.undelivered) {
-      if (now < m.deliverAt) continue;
-      this.undelivered.delete(m);
-      if (!m.read) this.indexInc(m.recipientKey);
-    }
-  }
-
-  // Rebuild the unread index + in-flight set from the current book (used after a
-  // deserialize/load so neither is ever persisted).
-  private rebuildUnreadIndex(): void {
-    this.unreadIndex.clear();
-    this.undelivered.clear();
-    for (const m of this.mail) this.trackDelivery(m);
+    return this.index.countFor(key) + (name !== key ? this.index.countFor(name) : 0);
   }
 
   mailUnreadFor(pid: number): number {
@@ -338,8 +345,8 @@ export class PostOffice {
     const meta = this.ctx.players.get(pid);
     if (!meta) return 0;
     const key = this.mailKeyFor(meta);
-    let unread = this.unreadIndex.get(key) ?? 0;
-    if (meta.name !== key) unread += this.unreadIndex.get(meta.name) ?? 0;
+    let unread = this.index.unreadFor(key);
+    if (meta.name !== key) unread += this.index.unreadFor(meta.name);
     return unread;
   }
 
@@ -558,11 +565,17 @@ export class PostOffice {
       return;
     }
     const hadAttachments = m.copper > 0 || m.items.length > 0;
+    // Bump only when something observable moved: the revision is realm-global,
+    // so an unconditional bump would let a repeat-take on an already-emptied,
+    // already-read letter force an inbox rebuild for every near-pillar viewer
+    // per command, at the command-lane rate.
+    let mutated = false;
     // Coin is never capacity-gated: it always lands in the purse.
     if (m.copper > 0) {
       meta.copper += m.copper;
       this.result(meta.entityId, 'collected', { value: m.copper });
       m.copper = 0;
+      mutated = true;
     }
     // Parcels respect bag capacity (#1354, the market-collect rule): a stack that
     // does not fit stays ATTACHED to the letter for a later take, never destroyed
@@ -590,12 +603,14 @@ export class PostOffice {
         kept.push(s);
       }
     }
+    if (kept.length !== m.items.length) mutated = true;
     m.items = kept;
     // Tending the letter marks it read (drops it from the unread index once).
     if (!m.read) {
-      this.indexDec(m.recipientKey);
-      m.read = true;
+      this.index.markRead(m, this.ctx.time);
+      mutated = true;
     }
+    if (mutated) this.bumpRev();
     if (kept.length > 0) {
       // Attachments remain: expiresAt is untouched here, so the letter's
       // existing clock keeps running. That is Infinity for system/npc mail
@@ -610,6 +625,8 @@ export class PostOffice {
     // system/npc mail, the attachment window for player parcels, either way a
     // returned letter included) and starts the standard emptied-letter window.
     // Only the take that empties it fires, so a repeat take never extends it.
+    // No extra bump for the expiry-clock write: reaching here means the take
+    // emptied real attachments, so `mutated` already bumped above.
     if (hadAttachments) m.expiresAt = this.ctx.time + MAIL_EXPIRY_SECONDS;
   }
 
@@ -622,21 +639,29 @@ export class PostOffice {
       this.result(meta.entityId, 'tooFar');
       return;
     }
-    const idx = this.mail.findIndex(
-      (x) => x.id === mailId && this.belongsTo(x, meta) && this.ctx.time >= x.deliverAt,
-    );
-    if (idx < 0) {
+    // Same match the old whole-book findIndex made (id + ownership +
+    // delivered), resolved through the buckets; the book splice still needs
+    // the array position, and a user-command-rate indexOf is fine.
+    const m = this.deliveredFor(meta).find((x) => x.id === mailId);
+    if (!m) {
       this.result(meta.entityId, 'letterGone');
       return;
     }
-    const m = this.mail[idx];
     if (m.items.length > 0 || m.copper > 0) {
       this.result(meta.entityId, 'takeParcelsFirst');
       return;
     }
-    // A delivered-and-unread letter deleted before it is read leaves the index.
-    if (!m.read) this.indexDec(m.recipientKey);
+    // Guarded index: `m` comes from deliveredFor over this same book, so -1
+    // is unreachable today; the guard exists because splice(-1, 1) would
+    // silently delete the LAST letter in the realm book, someone else's
+    // attachments included, if the index and the book ever drifted.
+    const idx = this.mail.indexOf(m);
+    if (idx < 0) return;
+    // A delivered-and-unread letter deleted before it is read leaves the
+    // unread count too (untrack re-derives every contribution).
+    this.index.untrack(m, this.ctx.time);
     this.mail.splice(idx, 1);
+    this.bumpRev();
   }
 
   mailMarkRead(mailId: number, pid?: number): void {
@@ -644,8 +669,8 @@ export class PostOffice {
     if (!r) return;
     const m = this.deliveredFor(r.meta).find((x) => x.id === mailId);
     if (m && !m.read) {
-      this.indexDec(m.recipientKey);
-      m.read = true;
+      this.index.markRead(m, this.ctx.time);
+      this.bumpRev();
     }
   }
 
@@ -737,16 +762,17 @@ export class PostOffice {
       announced: false,
     };
     this.mail.push(msg);
-    this.trackDelivery(msg);
+    this.index.track(msg, this.ctx.time);
+    this.bumpRev();
   }
 
   mailInfoFor(pid: number): import('../../world_api').MailInfo | null {
-    const meta = this.ctx.players.get(pid);
-    const e = this.ctx.entities.get(pid);
-    if (!meta || !e) return null;
     // The post is a place you visit: only stream it while standing at a raven
-    // pillar, which also bounds the per-snapshot wire cost.
-    if (!this.nearMailbox(e)) return null;
+    // pillar (the shared mailboxViewer gate, lockstep with mailRevFor), which
+    // also bounds the per-snapshot wire cost.
+    const viewer = this.mailboxViewer(pid);
+    if (!viewer) return null;
+    const meta = viewer.meta;
     const mine = this.deliveredFor(meta).sort((a, b) => b.deliverAt - a.deliverAt || b.id - a.id);
     return {
       messages: mine.map((m) => ({
@@ -802,15 +828,10 @@ export class PostOffice {
       }
       if (m.recipientKey === key || m.recipientKey === oldName || m.recipientKey === newName) {
         if (m.recipientKey !== key || m.recipientName !== newName) changed = true;
-        const oldKey = m.recipientKey;
-        // Move this letter's unread contribution from its old key bucket to the
-        // stable id key when the key actually changes (delivered-and-unread only,
-        // matching exactly what the index counts).
-        if (oldKey !== key && !m.read && this.ctx.time >= m.deliverAt) {
-          this.indexDec(oldKey);
-          this.indexInc(key);
-        }
-        m.recipientKey = key;
+        // Move this letter's bucket entry and its unread contribution to the
+        // stable id key when the key actually changes (the MailIndex rekey
+        // contract: delivered-and-unread only, a same-key call is a no-op).
+        this.index.rekey(m, key, this.ctx.time);
         m.recipientName = newName;
       }
       // The escrowed payloads follow their owner through the rename the same
@@ -827,6 +848,7 @@ export class PostOffice {
         }
       }
     }
+    if (changed) this.bumpRev();
     return changed;
   }
 
@@ -893,27 +915,24 @@ export class PostOffice {
         // Normalize a legacy name-keyed address to the stable id BEFORE the
         // flight: returnToSender records the outgoing address as the new
         // senderKey, and that field must never hold a reclaimable display
-        // name (its own comment promises stable-id by construction). Move
-        // the letter's delivered-and-unread contribution with the key (the
-        // rekeyMailOwner shape), because returnToSender's own decrement
-        // reads the field this walk just overwrote; without the move the
-        // name bucket keeps a phantom unread the freed name's next holder
-        // reads forever. No CURRENT producer books a name-keyed unreturned
-        // player letter (returns set `returned`, sends key by id), so this
-        // arm serves blobs loadMail preserves verbatim: legacy defense,
-        // same standing as the dual-key purge arms themselves.
-        if (m.recipientKey !== key && !m.read && now >= m.deliverAt) {
-          this.indexDec(m.recipientKey);
-          this.indexInc(key);
-        }
-        m.recipientKey = key;
+        // name (its own comment promises stable-id by construction). The
+        // index rekey moves the letter's bucket entry and its
+        // delivered-and-unread contribution with the key, because
+        // returnToSender's own untrack reads the field this walk just
+        // overwrote; without the move the name bucket keeps a phantom entry
+        // the freed name's next holder reads forever. No CURRENT producer
+        // books a name-keyed unreturned player letter (returns set
+        // `returned`, sends key by id), so this arm serves blobs loadMail
+        // preserves verbatim: legacy defense, same standing as the dual-key
+        // purge arms themselves.
+        this.index.rekey(m, key, now);
         this.returnToSender(m, now);
         continue;
       }
-      if (!m.read && now >= m.deliverAt) this.indexDec(m.recipientKey);
-      this.undelivered.delete(m);
+      this.index.untrack(m, now);
       this.mail.splice(i, 1);
     }
+    if (changed) this.bumpRev();
     return changed;
   }
 
@@ -1062,8 +1081,11 @@ export class PostOffice {
     const maxId = this.mail.reduce((mx, m) => Math.max(mx, m.id + 1), 1);
     this.nextMailId = Math.max(this.nextMailId, save.nextMailId ?? 1, maxId);
     for (const parcel of returnedParcels) this.book(parcel);
-    // The unread index is derived state, never persisted: rebuild it from the
-    // freshly loaded book.
-    this.rebuildUnreadIndex();
+    // Buckets, unread counts, and the in-flight set are derived state, never
+    // persisted: rebuild them from the freshly loaded book. The wire revision
+    // advances too (book() above already bumped for any returned parcel, but a
+    // plain load must invalidate viewers as well).
+    this.index.rebuild(this.mail, this.ctx.time);
+    this.bumpRev();
   }
 }

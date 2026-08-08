@@ -11,6 +11,7 @@ import {
   bagQualityKey,
   bagQuestSectionHeadersAllowed,
   bagShiftLinks,
+  bagSortSignature,
   bagStackIndex,
   bagsMoneyRowStale,
   bagsWindowShown,
@@ -817,5 +818,35 @@ describe('noVendorSell affordances (the quest-granted starter tools)', () => {
     expect(bagItemAction(ITEMS.starterTool, { ...NO_MODE, tradeOpen: true })).toBe('trade');
     expect(bagItemAction(ITEMS.starterTool, { ...NO_MODE, bankDeposit: true })).toBe('bankDeposit');
     expect(bagItemAction(ITEMS.starterTool, NO_MODE)).toBe('use');
+  });
+});
+
+describe('bagSortSignature', () => {
+  const inv = (): InvSlot[] => [
+    { itemId: 'bread', count: 3, slot: 4 },
+    { itemId: 'sword', count: 1 },
+  ];
+
+  it('is stable for an unchanged inventory (same on both host shapes)', () => {
+    expect(bagSortSignature(inv())).toBe(bagSortSignature(inv()));
+  });
+
+  it('moves when a count changes (consolidation)', () => {
+    const changed = inv();
+    changed[0].count = 5;
+    expect(bagSortSignature(changed)).not.toBe(bagSortSignature(inv()));
+  });
+
+  it('moves when only a cell hint changes (the restamp, no merge at all)', () => {
+    const changed = inv();
+    changed[1].slot = 0;
+    expect(bagSortSignature(changed)).not.toBe(bagSortSignature(inv()));
+  });
+
+  it('distinguishes an absent hint from cell 0 and never collides on removal', () => {
+    const hinted: InvSlot[] = [{ itemId: 'bread', count: 3, slot: 0 }];
+    const unhinted: InvSlot[] = [{ itemId: 'bread', count: 3 }];
+    expect(bagSortSignature(hinted)).not.toBe(bagSortSignature(unhinted));
+    expect(bagSortSignature([])).not.toBe(bagSortSignature(unhinted));
   });
 });

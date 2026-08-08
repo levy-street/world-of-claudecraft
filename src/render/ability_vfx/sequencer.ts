@@ -31,9 +31,27 @@ const IMPLODE_DUR = 0.42;
 const BARRIER_DUR = 1.35;
 const BARRIER_PLATE_LIFE = 1.1;
 
+// Per-frame anchor scratch for drawTransients (see src/render/vfx_anchor.ts).
+// Its four anchor reads live in mutually exclusive branches and each is spent
+// on plain-number overlay pushes inside its own branch, so one scratch covers
+// them; the one-shot beat paths below keep allocating (they run on an event,
+// not per frame).
+const transientAnchor = { x: 0, y: 0, z: 0 };
+
+/** A mutable world point. Kept structural so this module stays Three-free; a
+ *  THREE.Vector3 satisfies it, which is what the fx engine actually hands back. */
+export interface SeqPoint {
+  x: number;
+  y: number;
+  z: number;
+}
+
 // The host surface fx.ts implements: every primitive the sequences drive.
 export interface SequencerHost {
-  anchorOf(id: number, frac: number): { x: number; y: number; z: number } | null;
+  /** Resolve an entity anchor. Pass `out` from a per-frame path to fill a
+   *  caller-owned point instead of allocating (see src/render/vfx_anchor.ts);
+   *  the reading is only valid until that scratch is reused. */
+  anchorOf(id: number, frac: number, out?: SeqPoint): SeqPoint | null;
   groundYAt(x: number, z: number): number;
   ringAt(
     x: number,
@@ -1675,7 +1693,7 @@ export class ArchetypeSequencer {
     const flashDur = boost ? SPECTACLE.releaseDur : 0.1;
     const sinceRelease = slot.t - slot.releaseAt;
     if (sinceRelease >= 0 && sinceRelease < flashDur) {
-      const caster = host.anchorOf(slot.casterId, 0.58);
+      const caster = host.anchorOf(slot.casterId, 0.58, transientAnchor);
       if (caster) {
         const rp = sinceRelease / flashDur;
         const size = (0.6 + 1.1 * rp) * slot.power * (boost ? SPECTACLE.releaseStar : 1);
@@ -1812,7 +1830,7 @@ export class ArchetypeSequencer {
     // inward; tier 1 runs a smaller, sparser pull)
     if (slot.implode > 0) {
       slot.implode -= dt;
-      const caster = host.anchorOf(slot.casterId, 0.55);
+      const caster = host.anchorOf(slot.casterId, 0.55, transientAnchor);
       if (caster) {
         const motes = slot.tier === 0 ? 8 : 4;
         const pull = Math.max(0, slot.implode / IMPLODE_DUR);
@@ -1835,7 +1853,7 @@ export class ArchetypeSequencer {
     // barrier plates snapping into a guarding arc (staggered in, long fade)
     if (slot.barrierT > 0) {
       slot.barrierT -= dt;
-      const center = host.anchorOf(slot.casterId, 0.55);
+      const center = host.anchorOf(slot.casterId, 0.55, transientAnchor);
       if (center) {
         const elapsed = BARRIER_DUR - slot.barrierT;
         for (let k = 0; k < 5; k++) {
@@ -1866,7 +1884,9 @@ export class ArchetypeSequencer {
     // aura-less cases (strike.stars flourishes, a cc read with no worn aura).
     if (slot.ccStars > 0) {
       slot.ccStars -= dt;
-      const head = host.heldStunStars(slot.targetId) ? null : host.anchorOf(slot.targetId, 1.0);
+      const head = host.heldStunStars(slot.targetId)
+        ? null
+        : host.anchorOf(slot.targetId, 1.0, transientAnchor);
       if (head) {
         for (let k = 0; k < STUN_STAR_COUNT; k++) {
           const a = host.timeNow() * STUN_STAR_RATE + (k / STUN_STAR_COUNT) * Math.PI * 2;

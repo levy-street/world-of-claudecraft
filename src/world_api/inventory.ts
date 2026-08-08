@@ -18,6 +18,13 @@ export interface IWorldInventory {
    *  `to` (a swap when that cell holds a stack, a move to the end when it is free
    *  space). The order is the inventory array itself, persisted with the character. */
   moveInventoryItem(from: number, to: number): void;
+  /** One-shot bag clean-up (the classic sort button): consolidate partial
+   *  stacks and restamp every stack's persisted cell hint into the canonical
+   *  ladder (gear, consumables, tools, materials with fine grades beside
+   *  their base, quest, gray trash last). Authoritative like every inventory
+   *  command; deterministic, so both hosts land the identical grid
+   *  (src/sim/inventory_sort.ts). */
+  sortInventory(): void;
   /** Equip into the exact slot the player aimed at (a paperdoll drop target),
    *  instead of letting the sim's resolver pick (a ring dropped on the second
    *  finger lands there even while the first is free). The sim re-validates the

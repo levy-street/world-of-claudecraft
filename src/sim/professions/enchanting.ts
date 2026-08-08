@@ -665,8 +665,8 @@ export function completeDisenchantCast(ctx: SimContext, p: Entity, meta: PlayerM
   if (session.itemId === '') return;
   const slotIndex = session.bagSlot < 0 ? undefined : session.bagSlot;
   // Pin re-check for a slot-selected disenchant: a mid-cast bag splice (move,
-  // destroy, sell, bank) can shift a DIFFERENT copy of the same item id under
-  // the pinned index, and resolveDisenchant's id-only slot check would then
+  // destroy, sell, bank, sort) can shift a DIFFERENT copy of the same item id
+  // under the pinned index, and resolveDisenchant's id-only slot check would then
   // destroy a copy the player never selected (the enchanted or masterwork
   // one). Deny not_held instead; the player re-picks. Unpinned disenchants
   // re-resolve their preferred victim fresh and need no pin.

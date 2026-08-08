@@ -12,33 +12,75 @@ export const pending: Record<string, readonly string[]> = {
   "es": [
     "entities.abilities.intervene.description",
     "entities.abilities.intervene.name",
-    "hudChrome.arenaGate.minLevelNote"
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bags.sortButton",
+    "hudChrome.bags.sortButtonAria",
+    "hudChrome.bags.sortButtonHint",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle"
   ],
   "es_ES": [
     "entities.abilities.intervene.description",
     "entities.abilities.intervene.name",
-    "hudChrome.arenaGate.minLevelNote"
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bags.sortButton",
+    "hudChrome.bags.sortButtonAria",
+    "hudChrome.bags.sortButtonHint",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle"
   ],
   "fr_FR": [
     "entities.abilities.intervene.description",
     "entities.abilities.intervene.name",
-    "hudChrome.arenaGate.minLevelNote"
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bags.sortButton",
+    "hudChrome.bags.sortButtonAria",
+    "hudChrome.bags.sortButtonHint",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle"
   ],
   "fr_CA": [
     "entities.abilities.intervene.description",
     "entities.abilities.intervene.name",
-    "hudChrome.arenaGate.minLevelNote"
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bags.sortButton",
+    "hudChrome.bags.sortButtonAria",
+    "hudChrome.bags.sortButtonHint",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle"
   ],
   "en_CA": [],
   "it_IT": [
     "entities.abilities.intervene.description",
     "entities.abilities.intervene.name",
-    "hudChrome.arenaGate.minLevelNote"
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bags.sortButton",
+    "hudChrome.bags.sortButtonAria",
+    "hudChrome.bags.sortButtonHint",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle"
   ],
   "de_DE": [
     "entities.abilities.intervene.description",
     "entities.abilities.intervene.name",
-    "hudChrome.arenaGate.minLevelNote"
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bags.sortButton",
+    "hudChrome.bags.sortButtonAria",
+    "hudChrome.bags.sortButtonHint",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle"
   ],
   "zh_CN": [],
   "zh_TW": [],
@@ -47,47 +89,110 @@ export const pending: Record<string, readonly string[]> = {
   "pt_BR": [
     "entities.abilities.intervene.description",
     "entities.abilities.intervene.name",
-    "hudChrome.arenaGate.minLevelNote"
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bags.sortButton",
+    "hudChrome.bags.sortButtonAria",
+    "hudChrome.bags.sortButtonHint",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle"
   ],
   "ru_RU": [],
   "cs_CZ": [
     "entities.abilities.intervene.description",
     "entities.abilities.intervene.name",
-    "hudChrome.arenaGate.minLevelNote"
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bags.sortButton",
+    "hudChrome.bags.sortButtonAria",
+    "hudChrome.bags.sortButtonHint",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle"
   ],
   "nl_NL": [
     "entities.abilities.intervene.description",
     "entities.abilities.intervene.name",
-    "hudChrome.arenaGate.minLevelNote"
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bags.sortButton",
+    "hudChrome.bags.sortButtonAria",
+    "hudChrome.bags.sortButtonHint",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle"
   ],
   "pl_PL": [
     "entities.abilities.intervene.description",
     "entities.abilities.intervene.name",
-    "hudChrome.arenaGate.minLevelNote"
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bags.sortButton",
+    "hudChrome.bags.sortButtonAria",
+    "hudChrome.bags.sortButtonHint",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle"
   ],
   "id_ID": [
     "entities.abilities.intervene.description",
     "entities.abilities.intervene.name",
-    "hudChrome.arenaGate.minLevelNote"
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bags.sortButton",
+    "hudChrome.bags.sortButtonAria",
+    "hudChrome.bags.sortButtonHint",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle"
   ],
   "tr_TR": [
     "entities.abilities.intervene.description",
     "entities.abilities.intervene.name",
-    "hudChrome.arenaGate.minLevelNote"
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bags.sortButton",
+    "hudChrome.bags.sortButtonAria",
+    "hudChrome.bags.sortButtonHint",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle"
   ],
   "sv_SE": [
     "entities.abilities.intervene.description",
     "entities.abilities.intervene.name",
-    "hudChrome.arenaGate.minLevelNote"
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bags.sortButton",
+    "hudChrome.bags.sortButtonAria",
+    "hudChrome.bags.sortButtonHint",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle"
   ],
   "vi_VN": [
     "entities.abilities.intervene.description",
     "entities.abilities.intervene.name",
-    "hudChrome.arenaGate.minLevelNote"
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bags.sortButton",
+    "hudChrome.bags.sortButtonAria",
+    "hudChrome.bags.sortButtonHint",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle"
   ],
   "da_DK": [
     "entities.abilities.intervene.description",
     "entities.abilities.intervene.name",
-    "hudChrome.arenaGate.minLevelNote"
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bags.sortButton",
+    "hudChrome.bags.sortButtonAria",
+    "hudChrome.bags.sortButtonHint",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle"
   ]
 };

@@ -217,6 +217,7 @@ export const pl_PL: AdminTranslations = {
   "tickPerf.overBudget": "ponad budżet 50ms",
   "tickPerf.loopHeading": "Fazy pętli",
   "tickPerf.simHeading": "wewnętrzne fazy sim.tick()",
+  "tickPerf.selfHeading": "Grupy kluczy własnej migawki (bcastSelf)",
   "tickPerf.colPhase": "Faza",
   "tickPerf.colMean": "Średnia",
   "tickPerf.colP95": "p95",

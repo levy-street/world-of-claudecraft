@@ -301,6 +301,7 @@ export type OptionsPanelId =
 
 export type OptionsMenuAction =
   | { kind: 'goto'; view: OptionsPanelId }
+  | { kind: 'wiki' }
   | { kind: 'unstuck' }
   | { kind: 'logout' }
   | { kind: 'close' };
@@ -321,6 +322,9 @@ export function buildOptionsMenu(opts: { bugReportAvailable: boolean }): Options
     { labelKey: 'hudChrome.auraOverlay.title', action: { kind: 'goto', view: 'auras' } },
     { labelKey: 'hud.options.audio', action: { kind: 'goto', view: 'audio' } },
     { labelKey: 'hudChrome.perf.title', action: { kind: 'goto', view: 'performance' } },
+    // The wiki row sits with the help-shaped entries (above Report a Bug /
+    // Unstuck); it opens the confirm-first external hop, never a sub-panel.
+    { labelKey: 'nav.wiki', action: { kind: 'wiki' } },
   ];
   if (opts.bugReportAvailable)
     entries.push({

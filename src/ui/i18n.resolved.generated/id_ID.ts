@@ -336,6 +336,12 @@ export const id_ID: EnTranslations = {
       "healerConfirmAccept": "Bangkitkan Aku",
       "healerConfirmCancel": "Membatalkan"
     },
+    "wiki": {
+      "confirmTitle": "Open the Wiki?",
+      "confirmBody": "This opens the World of ClaudeCraft wiki in your browser. The game keeps running.",
+      "confirmOpen": "Open Wiki",
+      "confirmCancel": "Cancel"
+    },
     "unstuck": {
       "menuButton": "Lepaskan Diri",
       "help": "Pemulihan: /unstuck memulai hitung mundur diam di tempat untuk memindahkanmu ke titik aman terjangkau terdekat.",
@@ -1920,6 +1926,9 @@ export const id_ID: EnTranslations = {
       "sortRecent": "Terbaru",
       "sortQuality": "Kualitas",
       "sortName": "Nama",
+      "sortButton": "Sort",
+      "sortButtonAria": "Sort your bags",
+      "sortButtonHint": "Combine stacks and group items by type",
       "searchPlaceholder": "Cari barang",
       "searchAria": "Cari barang tas berdasarkan nama",
       "noMatch": "Tidak ada barang yang cocok dengan saringanmu.",

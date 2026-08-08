@@ -336,6 +336,12 @@ export const zh_TW: EnTranslations = {
       "healerConfirmAccept": "復活",
       "healerConfirmCancel": "取消"
     },
+    "wiki": {
+      "confirmTitle": "開啟維基？",
+      "confirmBody": "將在瀏覽器中開啟 World of ClaudeCraft 維基，遊戲會繼續執行。",
+      "confirmOpen": "開啟維基",
+      "confirmCancel": "取消"
+    },
     "unstuck": {
       "menuButton": "脫困",
       "help": "脫困：/unstuck 會啟動原地倒數，之後將你移動到附近可到達的安全位置。",
@@ -1920,6 +1926,9 @@ export const zh_TW: EnTranslations = {
       "sortRecent": "最近",
       "sortQuality": "品質",
       "sortName": "名稱",
+      "sortButton": "整理",
+      "sortButtonAria": "整理背包",
+      "sortButtonHint": "合併堆疊並按類型分組物品",
       "searchPlaceholder": "搜尋物品",
       "searchAria": "依名稱搜尋背包物品",
       "noMatch": "沒有符合篩選條件的物品。",

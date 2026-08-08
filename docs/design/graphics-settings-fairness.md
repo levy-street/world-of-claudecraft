@@ -43,6 +43,22 @@ COSMETIC (may be tiered down on lower presets):
 - Buff-icon overflow when the bar is full. A buff is active whether or not its icon is on
   screen, so hiding a buff icon removes no actionable information.
 - Portrait and HP-bar redraw smoothness within human reaction tolerance (about 200 ms).
+- Weapon-skin VFX richness (`src/render/weapon_vfx_shed_core.ts`). The rarity rig on a
+  VFX-bearing weapon skin (glow, motes, aurora, shell, cast light) FADES on two inputs.
+  Neither reaches zero: what removes a rig is the character LOD swap, which replaces the whole
+  articulated rig with one baked mesh and is shared by the entire render path. The fade exists
+  so that removal is not a pop.
+  - VIEWER DISTANCE, measured against `CHARACTER_LOD_RANGE_SQ`, the articulated-rig range
+    BEFORE the crowd and per-tier factors scale it. Deliberately that fixed constant and not
+    the live band edge: the live edge reads a per-client, per-frame count of visible rigs, so
+    a fade keyed to it would pulse as unrelated players wander past a viewer's frustum and
+    would differ between two viewers standing in the same spot. Against the constant this arm
+    is identical for every player on every preset.
+  - The frame-budget governor's `vfx` bucket, the same lever the pooled particle cloud and the
+    ability VFX already answer to, floored at `WEAPON_VFX_GOVERNOR_FLOOR`. It is the one input
+    that differs between two players looking at the same wearer, and it can only dim.
+  What is faded is decoration ON a weapon. The wearer, their nameplate, their cast bar, their
+  auras, their position and the weapon model itself are untouched at every scale.
 
 The test for any new tier knob: if a knob hides or delays something a player READS AND REACTS
 TO, it is not allowed. If it only reduces visual richness or redraw smoothness, it is fine.
@@ -151,6 +167,19 @@ it, so the boundary cannot creep back in as decoration.
   cap path for the sap).
 - `tests/auras_view.test.ts`: `isAuraDebuff` classifies a negative-value `buff_*` sap identically
   for the Sim aura and its `ClientWorld` mirror.
+- `tests/weapon_vfx_shed.test.ts`: the weapon-skin fade. Neither arm reaches zero and the
+  lever's floor is proven to stay clear of the multiplier at which a part would stop drawing,
+  so the fade can never be mistaken for a cull; the distance arm is anchored to the fixed
+  `CHARACTER_LOD_RANGE_SQ` rather than the live band edge, and the policy is scanned free of
+  any tier, preset or device-profile input and pinned to its two arguments; the applied fade is
+  proven to dim the rig light WITHOUT clearing its `visible` flag, because three counts visible
+  point lights into every lit material's program cache key and dropping one is the open-world
+  recompile freeze; and the far-LOD skip is pinned to require a baked stand-in mesh, since
+  `setFar` leaves the rig drawing when there is none.
+- `tests/drape_lod_core.test.ts`: the ground-VFX drape LOD reads viewer distance and the mark's
+  own geometry only (pinned to its two arguments), every sample it takes is one the exact drape
+  would also have taken, and the marks it is allowed to thin at all are bounded by a world-space
+  sample-spacing cap, so no mark's footprint, radius or position can move with it.
 - `tests/ability_vfx_stun_stars.test.ts`: the overhead stunned-star band (the "why can't I act"
   tell, keyed off aura kind so every stun source reads) occupies the FIRST overlay slots, draws
   identically at vfx quality 0, holds an alpha floor for the aura's whole life, and is bounded

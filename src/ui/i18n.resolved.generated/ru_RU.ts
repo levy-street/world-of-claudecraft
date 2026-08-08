@@ -336,6 +336,12 @@ export const ru_RU: EnTranslations = {
       "healerConfirmAccept": "Воскресить",
       "healerConfirmCancel": "Отмена"
     },
+    "wiki": {
+      "confirmTitle": "Открыть вики?",
+      "confirmBody": "Вики World of ClaudeCraft откроется в браузере. Игра продолжит работать.",
+      "confirmOpen": "Открыть вики",
+      "confirmCancel": "Отмена"
+    },
     "unstuck": {
       "menuButton": "Выбраться",
       "help": "Спасение: /unstuck запускает неподвижный отсчёт, после которого вы окажетесь в ближайшем доступном безопасном месте.",
@@ -1920,6 +1926,9 @@ export const ru_RU: EnTranslations = {
       "sortRecent": "Недавние",
       "sortQuality": "Качество",
       "sortName": "Название",
+      "sortButton": "Уборка",
+      "sortButtonAria": "Навести порядок в сумках",
+      "sortButtonHint": "Объединяет стопки и группирует предметы по типу",
       "searchPlaceholder": "Поиск предметов",
       "searchAria": "Поиск предметов в сумках по названию",
       "noMatch": "Нет предметов, соответствующих фильтрам.",

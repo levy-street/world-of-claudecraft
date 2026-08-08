@@ -2094,9 +2094,10 @@
      split already keeps each column well under budget at 1366x768, but the
      rescue stays as a floor for shorter viewports still. Pinned by the
      rail-height budget test in tests/crafting_launcher.test.ts. Threshold is
-     600px, not 720px: uncompacted col-b (128 + 10 * (30 + 4) = 468) already
-     fits the 660px maximized-1366x768 budget, so the rescue only needs to
-     fire below that. */
+     600px, not 720px: uncompacted col-b already fits the 660px
+     maximized-1366x768 budget (that same rail-height budget test derives the
+     arithmetic from the live markup), so the rescue only needs to fire below
+     that. */
   @media (max-height: 600px) {
     .side-buttons-col {
       gap: 1px;

@@ -42,6 +42,12 @@ const ITEMS: Record<string, ItemDef> = {
   // A REAL catalog id: the material chip is honest-taxonomy set membership
   // (src/sim/material_taxonomy.ts), so a synthetic id can never match it.
   iron_ore: { id: 'iron_ore', name: 'Iron Ore', kind: 'junk', quality: 'common' },
+  // Its REAL fine grade (MATERIAL_GRADES links the pair), for the grade-family
+  // grouping arm of the quality view.
+  fine_iron_ore: { id: 'fine_iron_ore', name: 'Fine Iron Ore', kind: 'junk', quality: 'common' },
+  // A REAL material whose name sorts BETWEEN 'Fine Iron Ore' and 'Iron Ore',
+  // so the grade-family arm is decisive: a plain name order would interleave it.
+  goldleaf_herb: { id: 'goldleaf_herb', name: 'Goldleaf Herb', kind: 'junk', quality: 'common' },
   keystone: { id: 'keystone', name: 'Crypt Keystone', kind: 'quest', quality: 'common' },
   relic: { id: 'relic', name: 'Ancient Relic', kind: 'armor', slot: 'chest', quality: 'legendary' },
   reins: {
@@ -186,19 +192,61 @@ describe('applyBagFilter: search', () => {
 });
 
 describe('applyBagFilter: sorting', () => {
-  it('sorts by quality descending (legendary first, poor last), ties keep insertion order', () => {
+  it('sorts by quality descending (legendary first, poor last), ties on the clean-up ladder', () => {
+    // Within a quality band the order is the canonical clean-up ladder
+    // (weapons, consumables, food, tools, quest), not insertion order: the
+    // common band here reads dagger, potion, bread, rod, keystone.
     const out = applyBagFilter(INV, lookup, { category: 'all', sort: 'quality', search: '' });
     expect(ids(out)).toEqual([
       'relic',
       'helm',
       'blade',
-      'potion',
-      'keystone',
-      'bread',
       'dagger',
+      'potion',
+      'bread',
       'rod',
+      'keystone',
       'pelt',
     ]);
+  });
+
+  it('quality view keeps every stack of an item adjacent (the scattered-stacks report)', () => {
+    const inv: InvSlot[] = [
+      { itemId: 'iron_ore', count: 20 },
+      { itemId: 'bread', count: 2 },
+      { itemId: 'iron_ore', count: 7 },
+      { itemId: 'potion', count: 1 },
+      { itemId: 'iron_ore', count: 12 },
+    ];
+    const out = applyBagFilter(inv, lookup, { category: 'all', sort: 'quality', search: '' });
+    expect(ids(out)).toEqual(['potion', 'bread', 'iron_ore', 'iron_ore', 'iron_ore']);
+    // Fuller stacks lead within the item.
+    expect(out.slice(2).map((s) => s.count)).toEqual([20, 12, 7]);
+  });
+
+  it('quality view seats a fine material grade beside its base grade, fine first', () => {
+    // iron_ore has a real MATERIAL_GRADES row (fine_iron_ore); both grades are
+    // quality common, so only the grade family, never quality, can group them.
+    // Goldleaf Herb alphabetizes between the two grade NAMES, so a plain name
+    // order would read fine_iron_ore, goldleaf_herb, iron_ore: the family key
+    // is what pulls the grades together past it.
+    const inv: InvSlot[] = [
+      { itemId: 'iron_ore', count: 9 },
+      { itemId: 'bread', count: 1 },
+      { itemId: 'goldleaf_herb', count: 4 },
+      { itemId: 'fine_iron_ore', count: 3 },
+    ];
+    const out = applyBagFilter(inv, lookup, { category: 'all', sort: 'quality', search: '' });
+    expect(ids(out)).toEqual(['bread', 'goldleaf_herb', 'fine_iron_ore', 'iron_ore']);
+  });
+
+  it('name view breaks a same-name tie with the ladder (fuller stacks first)', () => {
+    const inv: InvSlot[] = [
+      { itemId: 'iron_ore', count: 7 },
+      { itemId: 'iron_ore', count: 20 },
+    ];
+    const out = applyBagFilter(inv, lookup, { category: 'all', sort: 'name', search: '' });
+    expect(out.map((s) => s.count)).toEqual([20, 7]);
   });
 
   it('sorts by name A to Z', () => {
@@ -232,11 +280,11 @@ describe('applyBagFilter: sorting', () => {
       'relic',
       'helm',
       'blade',
-      'potion',
-      'keystone',
-      'bread',
       'dagger',
+      'potion',
+      'bread',
       'rod',
+      'keystone',
       'pelt',
       'ghost',
     ]);

@@ -212,6 +212,26 @@ collision/movement.
   (material, z-band), share materials via `surfaceMat`, distance-cull/LOD in
   `sync` (see the `*_RANGE_SQ` constants). No per-frame `new THREE.*` in hot paths;
   reuse the `tmpV` scratch vectors / scratch arrays already in `renderer.ts`.
+  The VFX world-anchor seam follows the same rule with an explicit contract:
+  `vfx_anchor.ts` `createVfxAnchor` takes an optional caller-owned destination,
+  so a per-frame path passes its own scratch (the reading is valid only until
+  that scratch is reused) and a one-shot spawn path omits it and gets a fresh
+  retainable vector.
+- **A cosmetic subsystem answers to a lever, and the lever says which job it is
+  doing.** `weapon_vfx_shed_core.ts` is the shape to copy: it FADES (both arms
+  floored above the multiplier at which a part stops drawing) and leaves REMOVAL
+  to the character LOD swap, which already owns it on inputs the whole render
+  path shares. Read its header before adding a shed of your own, including why
+  the distance arm is anchored to the fixed `CHARACTER_LOD_RANGE_SQ` and not to
+  the live crowd-adaptive band edge, and
+  `docs/design/graphics-settings-fairness.md` for why that choice is what keeps
+  a fade fairness-safe.
+- **Work that a hidden subtree cannot show is work not to do.** The far-LOD swap
+  hides `modelWrap`, so anything parented into the rig (a held weapon and its
+  VFX) stops being drawn without any of its own flags changing; a per-frame
+  driver over such a subtree should skip. Check the swap ACTUALLY happened
+  (`CharacterVisual.setFar` keeps the rig visible when no baked mesh exists,
+  while `isFar` reads true either way), never just the intent flag.
 - **Cloning a material? Use `material_clone_hooks.ts`.** `Material.clone()` copies
   userData but silently DROPS `onBeforeCompile`, and three keys its program cache
   on `customProgramCacheKey()`, whose default return value IS

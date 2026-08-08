@@ -222,6 +222,7 @@ export const zh_TW: Record<string, string> = {
   'tickPerf.ms': '{value} 毫秒',
   'tickPerf.noCapture': '尚未有擷取紀錄。請選擇視窗長度並開始擷取。',
   'tickPerf.overBudget': '超出 50ms 預算',
+  'tickPerf.selfHeading': '自身快照鍵分組 (bcastSelf)',
   'tickPerf.simHeading': 'sim.tick() 內部階段',
   'tickPerf.title': '伺服器 tick 效能分析',
   'calibration.autoRefresh': '自動重新整理（{seconds} 秒）',

@@ -966,6 +966,15 @@ export interface SimContextCallbacks {
   // the PostOffice instance on Sim.
   mailboxHoldsItem(meta: PlayerMeta, itemId: string): boolean;
 
+  // Commission order board (professions/commission_order.ts owns every
+  // mutation site): advances Sim.commissionOrderBoardRev, the change signal
+  // the server's corder snapshot gate polls before paying for a
+  // commissionOrdersFor rebuild. Called at each of the module's board
+  // mutations (open/accept/cancel/deliver on success, the retention sweep per
+  // settled or dropped row); offline hosts never read the counter, so the
+  // callback is behavior-neutral there.
+  bumpCommissionOrderBoardRev(): void;
+
   // Set proc firing is owned by combat/set_procs.ts.
   applySetProcs(source: Entity, target: Entity | null, trigger: SetProc['trigger']): void;
   // Book of Deeds (deeds.ts owns every body; append-only additions). The
@@ -1543,6 +1552,8 @@ export function createSimContext(host: SimContextHost): SimContext {
     mailAuthoredLetter: host.mailAuthoredLetter,
     mailboxHoldsItem: host.mailboxHoldsItem,
     applySetProcs: host.applySetProcs,
+    // Commission order board change signal (writer side of the corder gate).
+    bumpCommissionOrderBoardRev: host.bumpCommissionOrderBoardRev,
     // Book of Deeds seam (points at deeds.ts via the Sim-bound arrows).
     bumpDeedStat: host.bumpDeedStat,
     markItemDiscovered: host.markItemDiscovered,

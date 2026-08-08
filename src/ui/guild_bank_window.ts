@@ -32,6 +32,8 @@
 import { audio } from '../game/audio';
 import { ITEMS } from '../sim/data';
 import type { IWorld } from '../world_api';
+import { bagCornerMark, bagRimClasses } from './bag_corner_mark_view';
+import { bagFineMark } from './bag_fine_mark_view';
 import { bagInstanceGlyphKind } from './bag_instance_glyph_view';
 import { showQuantityPrompt } from './bank_quantity_prompt';
 import { itemDisplayName } from './entity_i18n';
@@ -53,7 +55,7 @@ import {
 } from './guild_bank_view';
 import { formatMoney, formatNumber, t } from './i18n';
 import { QUALITY_COLOR } from './icons';
-import { INSTANCE_GLYPH_ARIA_KEYS, instanceGlyphMarkHtml } from './item_instance_glyph_mark';
+import { cornerMarkHtml, INSTANCE_GLYPH_ARIA_KEYS } from './item_instance_glyph_mark';
 import { knownItemDef } from './known_item';
 import type { PainterHostPresentation } from './painter_host';
 import { tSim } from './sim_i18n';
@@ -461,13 +463,19 @@ export class GuildBankTab {
     const dormantClass = slot.dormant ? ' gbank-dormant' : '';
     const itemName = item ? itemDisplayName(item) : t('hudChrome.bank.guildUnknownItem');
     const count = this.fmt(slot.count);
-    // Per-copy corner marks share the bags/personal-bank helper so a guild-banked
-    // masterwork keeps its seal. Dormant lock mark sits top-right; instance glyphs
-    // sit top-left, so both can coexist without colliding.
+    // Corner marks share the bags/personal-bank helpers and priority core
+    // (bag_corner_mark_view.ts) so a guild-banked masterwork or fine stack
+    // keeps its seal. Dormant lock mark sits top-right; corner marks sit
+    // top-left, so both can coexist without colliding. Quest items cannot
+    // enter the guild bank, so the quest arm is always null. The unknown-id
+    // arm below shares this mint: a stale or removed id is never in the local
+    // grade table, so fineMark is false there and only the glyph can paint.
     const glyphKind = bagInstanceGlyphKind(slot.instance);
-    const instanceMark = instanceGlyphMarkHtml(glyphKind);
+    const fineMark = bagFineMark(slot.itemId);
+    const cornerMark = bagCornerMark(glyphKind, null, fineMark);
+    const instanceMark = cornerMarkHtml(cornerMark);
     if (slot.known && item) {
-      cell.className = `bank-item q-${slot.qualityKey}${dormantClass}`;
+      cell.className = `bank-item q-${slot.qualityKey}${bagRimClasses(null, fineMark)}${dormantClass}`;
       const qColor = QUALITY_COLOR[slot.qualityKey] ?? QUALITY_DEFAULT_COLOR;
       cell.style.setProperty('--bank-slot-quality', qColor);
       const mark = slot.dormant ? `<span class="gbank-dormant-mark">${svgIcon('lock')}</span>` : '';
@@ -492,8 +500,13 @@ export class GuildBankTab {
     } else {
       // Unknown id (a removed def): a recoverable dormant-shaped cell. The sim
       // ALLOWS withdrawing it (the recovery path), so it stays actionable; the
-      // raw id is the only name that exists for it.
-      cell.className = `bank-item gbank-unknown${dormantClass}`;
+      // raw id is the only name that exists for it. The rim call mirrors the
+      // known arm so the two halves of the fine mark can never split across
+      // the branch: fineMark is false for any id outside the local grade
+      // table, so this is a no-op today, but if the grade table ever carried
+      // an id this branch sees, the seal minted above and the rim would still
+      // arrive together.
+      cell.className = `bank-item gbank-unknown${bagRimClasses(null, fineMark)}${dormantClass}`;
       cell.innerHTML = `<span class="gbank-unknown-label">${esc(
         t('hudChrome.bank.guildUnknownItem'),
       )}</span>${instanceMark}<span class="bank-count">${

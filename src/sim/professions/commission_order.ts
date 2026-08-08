@@ -176,6 +176,7 @@ export function openCommissionOrder(
     status: 'open',
     openedAt: ctx.time,
   });
+  ctx.bumpCommissionOrderBoardRev();
   return { ok: true, orderId: id };
 }
 
@@ -194,6 +195,7 @@ export function cancelCommissionOrder(
   if (order.status !== 'open') return { ok: false, orderId, reason: 'order_not_open' };
   order.status = 'cancelled';
   order.settledAt = ctx.time;
+  ctx.bumpCommissionOrderBoardRev();
   return { ok: true, orderId };
 }
 
@@ -216,6 +218,7 @@ export function acceptCommissionOrder(
   order.status = 'accepted';
   order.acceptedBy = r.meta.entityId;
   order.acceptedByName = r.meta.name;
+  ctx.bumpCommissionOrderBoardRev();
   return { ok: true, orderId };
 }
 
@@ -302,6 +305,7 @@ export function deliverCommissionOrder(
   ctx.addItemInstance(order.itemId, freed, order.requesterId, 1);
   order.status = 'delivered';
   order.settledAt = ctx.time;
+  ctx.bumpCommissionOrderBoardRev();
   return { ok: true, orderId, itemId: order.itemId };
 }
 
@@ -336,17 +340,21 @@ export function commissionOrdersFor(ctx: SimContext, pid: number): CommissionOrd
 
 /** The retention sweep (server/CLAUDE.md "Hot paths"): every unbounded live
  *  collection needs one. Called once per tick from the end-of-tick block,
- *  beside updateTradesAndInvites. Draws no rng. */
+ *  beside updateTradesAndInvites. Draws no rng. Each settle or drop advances
+ *  the board revision the server's corder snapshot gate polls, like every
+ *  other mutation site in this module. */
 export function updateCommissionOrders(ctx: SimContext): void {
   for (let i = ctx.commissionOrderBoard.length - 1; i >= 0; i--) {
     const order = ctx.commissionOrderBoard[i];
     if (order.status === 'open' && ctx.time - order.openedAt > ORDER_OPEN_EXPIRE_SECONDS) {
       order.status = 'expired';
       order.settledAt = ctx.time;
+      ctx.bumpCommissionOrderBoardRev();
       continue;
     }
     if (order.settledAt !== undefined && ctx.time - order.settledAt > ORDER_RETAIN_SECONDS) {
       ctx.commissionOrderBoard.splice(i, 1);
+      ctx.bumpCommissionOrderBoardRev();
     }
   }
 }

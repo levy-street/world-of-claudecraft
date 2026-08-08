@@ -57,7 +57,7 @@ describe('hunter ability-specific attacks (issue #2889 follow-up batch)', () => 
   });
 
   it('wires both donor GLBs (the pre-existing bow_anims.glb and the new one) and an attackByAbility override for every mapped ability', () => {
-    const block = manifestBlock('player_hunter: {', 'player_rogue: {');
+    const block = manifestBlock('player_hunter: swims({', 'player_rogue: swims({');
     expect(block).toContain('bow_anims.glb');
     expect(block).toContain('hunter_ability_anims.glb');
     expect(block).toContain('attackByAbility');
@@ -65,7 +65,7 @@ describe('hunter ability-specific attacks (issue #2889 follow-up batch)', () => 
   });
 
   it('every mapped ability id is a real hunter ability, and every referenced clip is shipped or an existing rig clip', () => {
-    const hunterBlock = manifestBlock('player_hunter: {', 'player_rogue: {');
+    const hunterBlock = manifestBlock('player_hunter: swims({', 'player_rogue: swims({');
     const abilityStart = hunterBlock.indexOf('attackByAbility: {');
     expect(abilityStart).toBeGreaterThanOrEqual(0);
     const abilityEnd = hunterBlock.indexOf('\n      },', abilityStart);

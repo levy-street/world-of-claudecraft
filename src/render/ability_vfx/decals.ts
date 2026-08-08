@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { drapeRingLocalY } from '../selection_ring';
+import { drapeFanLocalY, drapeStrideFor, fanVertexSpacing } from '../drape_lod_core';
 import type { AbilityVfxTextures } from './fx_textures';
 
 // Fading ground decals (scorch embers, frost rime, arcane runes, earth
@@ -13,9 +13,13 @@ import type { AbilityVfxTextures } from './fx_textures';
 // Slope fix (selection-ring idiom, see ground_auras.ts): a flat disc buries
 // its uphill half on any slope, so each spawn drapes the disc's vertices over
 // the sampled terrain plus a small lift. A decal never moves or rescales, so
-// the drape runs exactly once per spawn - zero steady-state work.
+// the drape runs exactly once per spawn - zero steady-state work. Those samples
+// still thin with camera distance (../drape_lod_core): a far mark samples the
+// rim more coarsely and interpolates between, keeping its world position and
+// radius exactly as they were.
 
 const DECAL_SLOTS = 12;
+const DECAL_SEGMENTS = 24;
 const DRAPE_LIFT = 0.06; // yards above the sampled ground, against z-fighting
 
 export type DecalStyle = 'ember' | 'rime' | 'rune' | 'crack' | 'char';
@@ -36,6 +40,11 @@ export class GroundDecals {
   private maps: Record<DecalStyle, THREE.CanvasTexture>;
   // center-relative XZ of every disc vertex (all slots clone the same base)
   private localXZ: Float32Array;
+  // Latest camera position (pushed once a frame from the fx engine) and whether
+  // one has ever arrived: before the first frame every drape stays exact.
+  private camX = 0;
+  private camZ = 0;
+  private camKnown = false;
 
   constructor(
     scene: THREE.Scene,
@@ -51,7 +60,7 @@ export class GroundDecals {
     };
     // Rotation baked into the geometry (instead of mesh.rotation.x) so the
     // position attribute's Y IS the up-axis the drape writes.
-    const geo = new THREE.CircleGeometry(1, 24);
+    const geo = new THREE.CircleGeometry(1, DECAL_SEGMENTS);
     geo.rotateX(-Math.PI / 2);
     const basePos = geo.getAttribute('position') as THREE.BufferAttribute;
     this.localXZ = new Float32Array(basePos.count * 2);
@@ -123,6 +132,13 @@ export class GroundDecals {
     proto.dispose();
   }
 
+  /** Where the camera is this frame, for the drape distance LOD. */
+  setCameraPosition(x: number, z: number): void {
+    this.camX = x;
+    this.camZ = z;
+    this.camKnown = true;
+  }
+
   spawn(
     x: number,
     y: number,
@@ -146,7 +162,25 @@ export class GroundDecals {
     slot.mesh.scale.setScalar(radius);
     // drape the disc over the terrain so no arc buries on a slope (the lift
     // dodges z-fighting the old flat +0.04 offset handled)
-    drapeRingLocalY(this.localXZ, x, z, y, radius, DRAPE_LIFT, this.groundY, slot.drapeY);
+    const dx = x - this.camX;
+    const dz = z - this.camZ;
+    drapeFanLocalY(
+      this.localXZ,
+      x,
+      z,
+      y,
+      radius,
+      DRAPE_LIFT,
+      this.groundY,
+      slot.drapeY,
+      // -1 reads as "unknown" to drapeStrideFor, which then drapes exactly. A
+      // wide mark's rim vertices are already yards apart, so the spacing cap
+      // there refuses to thin it at all.
+      drapeStrideFor(
+        this.camKnown ? dx * dx + dz * dz : -1,
+        fanVertexSpacing(radius, DECAL_SEGMENTS),
+      ),
+    );
     const pos = slot.mesh.geometry.getAttribute('position') as THREE.BufferAttribute;
     for (let i = 0; i < slot.drapeY.length; i++) pos.setY(i, slot.drapeY[i]);
     pos.needsUpdate = true;

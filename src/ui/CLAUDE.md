@@ -318,6 +318,20 @@ follow the root `extract-and-test` skill for the move-not-rewrite mechanics. The
   instance (`unit_frame.ts` + `unit_frame_painter.ts`); an extra action bar is another
   `ActionBarPainter` from a new bar descriptor (`hud/action_bar/action_bar_view.ts` +
   `action_bar_painter.ts`).
+- **Item-cell marks are an ALL-SURFACES family, never a one-window feature.** Every mark an
+  owned item stack wears (the masterwork seal, the enchanted/signed/bound glyphs, the generic
+  instance wedge, the fine-grade rim + seal, and any future grade/purpose/per-copy mark) paints
+  identically on EVERY surface that renders owned stacks: the bag grid, the personal bank grid,
+  and the guild bank grid. A new mark, or a new surface that shows owned stacks, wires all of
+  them in the SAME change: decision logic in a pure core beside `bag_corner_mark_view.ts`
+  (which owns the corner priority), markup minted in `item_instance_glyph_mark.ts` (never an
+  inline span in one painter), CSS as dual `.bag-item` / `.bank-item` selector rules (one
+  definition; note both grids have a common/poor neutral reset the rim rule must FOLLOW), and
+  the three `*_instance_marker` suites extended together. The one deliberate exception is the
+  quest seal, bag-only because quest items cannot enter either bank. This rule exists because
+  the fine mark shipped bag-only and losing the mark on deposit was reported as a bug (the
+  same shape as the earlier bank-missed masterwork seal): a mark describes the ITEM, so no
+  window it appears in may drop it.
 - **`Hud` stays the orchestrator.** Keep `open<Window>`/`close<Window>` in `Hud` (cross-window
   coordination needs its private state); the per-render method shrinks to: resolve the entity,
   build the view, call the module with `deps`.
