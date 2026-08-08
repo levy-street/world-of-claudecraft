@@ -45,7 +45,7 @@ full report now based on what you have already seen. No more tool calls. Format:
 BLOCKING / SHOULD-FIX / NICE-TO-HAVE / VERDICT."
 - Correctness agent: every deliverable and acceptance criterion actually met; the
   offline Sim and the online ClientWorld paths behave identically; edge cases (denial
-  still draws zero, golden on the final pick, a chronicle mark in every FARMING_ZONES
+  still draws zero, golden on the final pick, a chronicle mark in every FARMING_ZONE_TIERS
   zone). Where sim behavior changed, run live headless-Sim probes via a throwaway vitest
   file driving real ticks with an injected ADVANCEABLE clock (the clock must advance
   now() or waits hang), then delete the file and verify the tree is clean. Verify

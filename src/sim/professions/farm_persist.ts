@@ -66,9 +66,11 @@ export function serializeFarmPlots(
   if (plots.size === 0) return undefined;
   const out: Record<string, PersistedFarmPlot> = {};
   // KEY-SORTED like the packet's other persisted maps (questedHobbies,
-  // serializeNodeReadiness), so persisted blob diffs stay readable instead of
-  // carrying per-player plant order. Readers are keyed lookups; only the
-  // serialized text changes.
+  // serializeNodeReadiness). Postgres JSONB does not preserve object key
+  // order, so this buys nothing for the DB text; what it does buy is
+  // deterministic serialized BYTES for the blob-bound suites and JS-level
+  // round-trip diffs, instead of carrying per-player plant order. Readers
+  // are keyed lookups; only the serialized text changes.
   for (const bedId of [...plots.keys()].sort((a, b) => (a < b ? -1 : a > b ? 1 : 0))) {
     const p = plots.get(bedId) as PlotState;
     out[bedId] = {
@@ -157,9 +159,12 @@ export function normalizeFarmPlots(
       cropId: row.cropId,
       plantedAtMs,
       readyAtMs: plantedAtMs + duration,
-      // A corrupt hidden slot drops the SLOT, never the row: the growth phase
-      // re-rolls an absent slot at harvest, so dropping the plot instead would
-      // destroy a real crop over a field the player cannot see.
+      // A corrupt hidden slot drops the SLOT, never the row: dropping the
+      // plot instead would destroy a real crop over a field the player cannot
+      // see. The growth phase fills an absent slot by DERIVING a
+      // deterministic replacement (bed id plus plantedAtMs, the state.md
+      // handoff rule), never a fresh roll, so a dropped slot is not a reroll
+      // primitive.
       ...(finite(row.survivalRoll) ? { survivalRoll: row.survivalRoll } : {}),
       ...(finite(row.yieldSeed) ? { yieldSeed: row.yieldSeed } : {}),
       compost: row.compost === true,

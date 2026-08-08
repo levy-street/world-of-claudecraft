@@ -49,7 +49,7 @@ Spawn one Explore agent (thoroughness: very thorough) to read and summarize:
   docs/image-to-glb-asset-workflow.md.
 - Source files for this phase: src/sim/content/farm_patches.ts (FARM_PATCHES and
   FarmPatchDef as landed in Phase 2; progress.md notes any name refinement),
-  src/sim/professions/farming_zones.ts (FARMING_ZONES, its one home),
+  src/sim/professions/farming_zones.ts (FARMING_ZONE_TIERS, its one home),
   src/world_api/farming.ts (the IWorldFarming facet as landed), the closest existing
   scripts/assets/build_*.mjs exporter to use as the template (Explore picks and names
   it), the best existing src/render adapter precedent for signature-guarded rebuilds

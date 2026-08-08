@@ -33,7 +33,7 @@ visit or a punishment for lateness is violating the design, not tuning it.
   Rationale, verified: a new `GatherNodeType` is conscripted by
   `tests/professions_zone_rollout.test.ts` (R37) and `tests/gather_node_placement.test.ts`
   into every zone at exact pinned counts. Farming instead adds its OWN rollout arms
-  keyed to an explicit set: `FARMING_ZONES = eastbrook_vale (tier 1), mirefen_marsh
+  keyed to an explicit set: `FARMING_ZONE_TIERS = eastbrook_vale (tier 1), mirefen_marsh
   (tier 2), thornpeak_heights (tier 3), evergarden (tier 4)`, plus its OWN placement
   guard suite cloning the physical-safety arms (dry land, no collider overlap, reachable
   stand spot, zone containment, spacing) for `FARM_PATCHES`. Hub anchors for patch
@@ -367,7 +367,7 @@ freshness gate (`tests/guide.test.ts`, regen via `npm run wiki:content`), and th
 parity golden set (D23).
 
 R37 (`tests/professions_zone_rollout.test.ts`): farming adds its OWN arms against
-`FARMING_ZONES` (patch coverage per farming zone, seed/produce/fine-twin integrity,
+`FARMING_ZONE_TIERS` (patch coverage per farming zone, seed/produce/fine-twin integrity,
 hoe rungs at each tier with the hub stocking rule, top rung unpriced and craftable,
 chronicle deeds earnable). The existing node arms are untouched. The farming station
 question does not arise (farming has no station).
@@ -433,7 +433,7 @@ question does not arise (farming has no station).
   produce, fine twins, compost, husks, tonic, hoes, dishes, feast)
 - `src/sim/professions/farming.ts` (the driver: plant, harvest, growth script,
   survival/yield resolution, updateFarming, ready-check helpers)
-- `src/sim/professions/farming_zones.ts` (FARMING_ZONES, the zone tier side table:
+- `src/sim/professions/farming_zones.ts` (FARMING_ZONE_TIERS, the zone tier side table:
   the one home of the zone set; farm_patches.ts never redefines it)
 - `src/world_api/farming.ts` (IWorldFarming facet: patch defs, my plots, commands)
 - `src/ui/harvest_journal_view.ts` + `src/ui/harvest_journal_window.ts` (or the
@@ -496,7 +496,7 @@ question does not arise (farming has no station).
   can plant this phase, so no live save can carry it. (i) The D2 Evergarden hub
   prose was FALSE against shipped content and is corrected in D2 above: Hedgewick
   is the zone hub and the reachability flood origin; the parterre stays the
-  patch-site anchor. (j) FARMING_ZONES is farming's OWN tier column, deliberately
+  patch-site anchor. (j) FARMING_ZONE_TIERS is farming's OWN tier column, deliberately
   diverging from the shipped zone-progression ladder at evergarden (tier 4 showcase
   vs the named inversion's tier 1), so the fishing test's GATHER_NODES derivation
   CANNOT be copied: literal pins plus the one-ladder arm (FARM_PATCHES[].tier

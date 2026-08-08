@@ -103,7 +103,7 @@ Agent 3, dead code and cleanup:
   DOM/Three/render/ui/game/net imports in src/sim/); no unresolved TODOs (the hidden
   outcome slots are declared-for-Phase-3 by design, which is a documented forward
   reference, not a TODO); naming consistency (bed ids, fplot, FarmPatchDef,
-  FARMING_ZONES); no leftover throwaway files.
+  FARMING_ZONE_TIERS); no leftover throwaway files.
 
 Then dispatch the Review Dispatch Matrix rows in docs/farming/implementation-plan.md
 that match the phase diff (expected: cross-platform-sync, architecture-reviewer,

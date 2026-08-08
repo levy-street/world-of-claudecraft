@@ -91,7 +91,7 @@ Agent A, patch content and placement guard:
   per-site bed count (uniform or tier-scaled); record the choice in progress.md Notes
   and the state.md ledger.
 - src/sim/professions/farming_zones.ts: a pure leaf per the fishing_zones.ts header
-  rules: the FARMING_ZONES tier ladder, an Object.hasOwn reader, an explicit row per
+  rules: the FARMING_ZONE_TIERS tier ladder, an Object.hasOwn reader, an explicit row per
   farming zone, and every knob DERIVED from the tier, never an independent constant.
 - tests/farm_patch_placement.test.ts: clone the physical-safety arms from
   tests/gather_node_placement.test.ts for FARM_PATCHES: dry land, no collider

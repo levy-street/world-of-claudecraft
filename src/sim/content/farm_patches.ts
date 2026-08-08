@@ -11,10 +11,10 @@
 // One patch per farming hub, four hubs on the farming tier ladder (the D2
 // hub list): Eastbrook tier 1, Fenbridge tier 2, Highwatch tier 3, and the
 // Evergarden's parterre grounds tier 4 (the showcase; its reachability anchor
-// is the zone hub, Hedgewick). The tier column must agree with FARMING_ZONES
-// (src/sim/professions/farming_zones.ts): the one-ladder arm in
-// tests/farm_patch_placement.test.ts pins the agreement, so no other module
-// ever hardcodes a farming zone tier.
+// is the zone hub, Hedgewick). The tier column must agree with
+// FARMING_ZONE_TIERS (src/sim/professions/farming_zones.ts): the one-ladder
+// arm in tests/farm_patch_placement.test.ts pins the agreement, so no other
+// module ever hardcodes a farming zone tier.
 //
 // BED IDS ARE STABLE AND NEVER RENUMBER: plot state is persisted in
 // CharacterState keyed by these ids (the shipped-id rule in
@@ -160,6 +160,11 @@ export const FARM_PATCHES: readonly FarmPatchDef[] = Object.freeze(
 
 // The load-side bed allowlist: a persisted plot whose bed id is not here is
 // dropped on load (the node_persist.ts anti-tamper pattern).
+// UNLIKE the deep-frozen table above, this Set (and FARM_CROP_IDS below)
+// stays a live instance: Object.freeze cannot disable Set.add and the
+// ReadonlySet type erases at runtime. That asymmetry is acceptable only
+// because the allowlists never cross the IWorld seam; they are internal to
+// the load path.
 export const FARM_BED_IDS: ReadonlySet<string> = new Set(
   FARM_PATCHES.flatMap((p) => p.beds.map((b) => b.id)),
 );
