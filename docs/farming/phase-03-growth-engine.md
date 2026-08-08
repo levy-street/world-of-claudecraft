@@ -28,11 +28,16 @@ STEP 0 - PRE-FLIGHT
   main checkout. Use git -C /home/fernandoramirez/Documents/woc-farming-plan for every
   git command (the Bash cwd drifts).
 - git status must be clean. If it is not, stop and surface it.
-- Re-resolve the NEWEST release branch: git fetch origin --prune, then
-  git branch -r --list 'origin/release/*' | sort -V and take the last row. Create
-  branch fix/farming-phase-03-growth-engine off its tip. Record the phase-start
-  commit hash for the STEP 3 diff. If release moves mid-phase and this branch goes
-  long-lived, merge release in and run the release-merge-audit skill.
+- AMENDED per D22 (executed 2026-08-08 this way): git fetch origin --prune, check
+  out the LOCAL feature/farming-plan, and cut fix/farming-phase-03-growth-engine
+  off it. Re-resolve the NEWEST origin/release/** tip (sort -V, last row); if it
+  is newer than the last absorbed tip, merge it into the phase branch FIRST
+  (regenerate generated i18n bundles on conflict), run the release-merge-audit
+  skill, and RE-RUN tests/world_api_parity.test.ts and tests/snapshots.test.ts on
+  the merged HEAD (identical count-pin bumps on both sides auto-merge to a wrong
+  total with no textual conflict). Record the phase-start commit hash for the
+  STEP 3 diff. (As executed: the tip was 81804a179e, already absorbed, so no
+  merge was needed and the phase started at 2cac388c91.)
 - Scan Claude Code memory: the MEMORY.md index, the farming-skill-program entry, plus
   these phase-relevant topics: frozen-clock-rig-hangs-vitest (an injected clock that
   never advances hangs self-re-arming waits), mutation-checks-commit-first,
@@ -237,11 +242,19 @@ explicit paths only, never git add -A, no session links or Claude attribution:
 4. test(professions): the lifecycle suite plus the farming_session parity scenario
    and its golden.
 5. docs(farming): progress and state updates.
+AMENDED per D22: when every step is done and no BLOCKING stands, merge the phase
+branch --no-ff into feature/farming-plan and delete it; never push, never open a
+PR. The would-be PR body is recorded in the progress.md Phase 3 Notes. (Commit 2
+as executed also carries the character-blob size signal and the SIM_LAP_PHASES
+registration; commit 4 also carries the census-suite absorptions.)
 
 STEP 5 - ACCEPTANCE CRITERIA
 - [ ] plantCrop enforces the gates in the stated order (alive, range, bed free for
-      this player, skill threshold, seed in bags, hoe tier via canGatherTier plus the
-      wield gate); every deny arm is tested individually and draws zero.
+      this player, skill threshold, seed in bags); every deny arm is tested
+      individually and draws zero. AMENDED, deviation (p) in state.md: the hoe-tier
+      and wield gates are DEFERRED to Phase 5, verified not assumed (farming
+      registers no gatherTool, so canGatherTier would refuse every plant, and the
+      R22 banner forbids the bare-hands-floored scan for access decisions).
 - [ ] Planting consumes the seed and pre-rolls the full growth script in ONE
       contiguous ctx.rng block (per-stage survival per D6, the yield seed per D7);
       ready-at derives from the crop duration via ctx.lockoutNowMs.

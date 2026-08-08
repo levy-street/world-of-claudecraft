@@ -20,13 +20,14 @@ parity, i18n completeness, and the phase's own acceptance criteria.
 STEP 0 - PRE-FLIGHT
 - Work ONLY in the persistent worktree ~/Documents/woc-farming-plan; git status must
   be clean; use git -C with the absolute path on every git command.
-- git fetch origin --prune, then check out the phase PR branch
-  fix/farming-phase-03-growth-engine.
-- Identify the phase diff: the PR's commits against its base, NEVER
-  everything-since-phase-start (the release tip may have moved concurrently).
-  Preferred: gh pr diff <PR-number> --name-only and gh pr view <PR-number> --json
-  baseRefName,commits. Fallback: BASE=$(git merge-base origin/<base-release-branch>
-  HEAD); git log --oneline $BASE..HEAD; git diff --name-only $BASE..HEAD.
+- AMENDED per D22: no PR exists and the phase branch is deleted after its merge.
+  git fetch origin --prune, check out the LOCAL feature/farming-plan, and audit
+  the Phase 3 merge commit (the --no-ff merge of fix/farming-phase-03-growth-engine;
+  find it with git log --merges --oneline -5).
+- Identify the phase diff from that merge: git diff --name-only <merge>^1 <merge>
+  (first parent to merge tip), and the phase commits with
+  git log --oneline <merge>^1..<merge>^2. NEVER everything-since-phase-start (the
+  release tip may have been absorbed concurrently).
 - Scan Claude Code memory: the MEMORY.md index, the farming-skill-program entry, plus
   frozen-clock-rig-hangs-vitest, mutation-checks-commit-first,
   mutation-verdicts-need-exit-code-plus-names, mutation-edits-need-landing-proof,
@@ -129,8 +130,11 @@ STEP 3 - FIX
 - Separate fix commits with explicit paths, Conventional Commits with bodies, never
   git add -A, no session links or Claude attribution.
 - After fixes: node scripts/gate_select.mjs (the armory browser red is the standing
-  environmental exception; grep the log for "FAIL" (the selective gate prints "[gate:select] FAIL", the full gate "[gate] FAIL") plus the GATE EXIT marker; PR CI is the arbiter), then
-  push the fix commits to the phase PR branch.
+  environmental exception; grep the log for "FAIL" (the selective gate prints
+  "[gate:select] FAIL", the full gate "[gate] FAIL") plus the GATE EXIT marker).
+  AMENDED per D22: no push, no PR, and the gate log IS the arbiter (there is no PR
+  CI). Fix commits land on a local QA branch cut off feature/farming-plan and merge
+  back --no-ff when no BLOCKING stands.
 
 STEP 4 - DOC UPDATES
 - docs/farming/progress.md: fill the Phase 3 QA row (status, dates) and append QA

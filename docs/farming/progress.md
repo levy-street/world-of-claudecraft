@@ -10,7 +10,7 @@
 | Phase 1 QA | done (PASS-WITH-FOLLOWUPS) | 2026-08-08 | 2026-08-08 |
 | Phase 2 (patches and plots) | done | 2026-08-08 | 2026-08-08 |
 | Phase 2 QA | done (PASS-WITH-FOLLOWUPS) | 2026-08-08 | 2026-08-08 |
-| Phase 3 (growth engine) | not started | | |
+| Phase 3 (growth engine) | done | 2026-08-08 | 2026-08-08 |
 | Phase 3 QA | not started | | |
 | Phase 4 (knobs) | not started | | |
 | Phase 4 QA | not started | | |
@@ -393,7 +393,134 @@ fix/farming-phase-02-qa merged --no-ff per D22:
   DEPLOY.md when planting ships; render-phase FarmBedDef export symmetry.
 
 ### Phase 3
-(not started)
+Completed 2026-08-08, executed local-only per D22 (no push, no PR; phase branch
+fix/farming-phase-03-growth-engine merged --no-ff into feature/farming-plan and
+deleted). Base: release/v0.36.0 tip 81804a179e, already absorbed at phase start, so
+no release merge was needed. Commits: a8560344a2 (sim engine), 5e0e9ab766 (command
+chain, dev cheat, blob signal), 4553b71357 (ui rows and matcher), b03a8ba7fc (tests,
+parity session, census pins), plus the docs commit closing the phase.
+
+Acceptance (STEP 5, with states):
+- [x] plantCrop gate order, every deny arm tested individually and drawing zero,
+      WITH one locked deviation: the hoe-tier and wield gates are DEFERRED to
+      Phase 5, verified not assumed (no farming gatherTool exists;
+      bestOwnedGatherToolTierOrNone returns NO_TOOL_OWNED so canGatherTier(0, 1)
+      would refuse EVERY plant, and the R22 banner forbids the bare-hands-floored
+      scan for access decisions). Documented at the gate site and in all three seam
+      comments; the ungainability pin stays green.
+- [x] Seed consumed; the full growth script pre-rolled in ONE contiguous two-draw
+      ctx.rng block (survivalRoll then yieldSeed); ready-at from the crop duration
+      via ctx.lockoutNowMs, write-side anchor floored at 1 to match the load rule.
+- [x] FARMING_CAST_ID across all four id-discriminating sites: completion routing
+      (return-only arm; the plant resolves at command time, the cast is flavor),
+      castingReadout ('You are planting.' plus matcher row), castBarState (audited
+      no-op: generic filling hardcast, the pre-roll is not in castTotal), hud
+      castDisplayName (abilityUi.cast.farming).
+- [x] harvestCrop: withered grants 2 withered_husks and no XP; ready resolves the
+      harvest-lives yield (floor 3, pick cap 12, skill-scaled keep and fine
+      chances) from a local pure expansion of yieldSeed; XP through
+      queueGatheringGrant with FARMING_GAIN_SCHEDULE behind a composed tier
+      ceiling.
+- [x] Draw-count contract stated in farming.ts and pinned per arm: 2 at plant, 0 at
+      harvest, 0 on every deny, 0 at expiry, 0 at login, 0 in the tick.
+- [x] updateFarming appended in the tick tail (after the delayed-event drain lap,
+      before updateDeeds), 1 Hz internal guard, zero draws, lap marker registered
+      in SIM_LAP_PHASES.
+- [x] Typed deny reasons; four text-free id-carrying SimEvents; catalog rows,
+      matcher coverage, and locale item names; localization_fixes and
+      localization_coverage green.
+- [x] Command chain wired in all four parts plus the facet, schema, and parity pins
+      (306/79/227, facet count 33 unchanged).
+- [x] /dev farmgrow (alias /devfarmgrow) behind ALLOW_DEV_COMMANDS; writes
+      readyAtMs only, draws nothing, leaves settled plots alone.
+- [x] tests/professions_farming.test.ts green (55 tests): lifecycle on an
+      advanceable injected clock, survival boundaries, draw pins, same-seed
+      determinism, mid-growth round trips on BOTH anchor paths, every deny arm,
+      anti-chore late-harvest equality.
+- [x] farming_session parity scenario and golden green; ZERO pre-existing goldens
+      moved. The new golden itself was re-minted twice in-phase, both times for
+      cause (the double-loot-line fix moved the event digest; the write-side
+      anchor floor corrected a recording of the destroy-on-load defect).
+- [x] The Phase 2 negative wire-leak pin passes with the hidden slots genuinely
+      filled.
+- [x] Tuning constants stated below and flagged for the maintainer.
+
+Notes:
+- Draw layout locked: plant success draws exactly 2 (survivalRoll uniform [0,1),
+  then yieldSeed uint32), contiguous, after every deny arm and every
+  state-breaking side effect (stealth, sit, mount all pinned at 2 draws). Harvest
+  draws 0: yield expands from yieldSeed via a module-local mulberry32; per pick,
+  one keep-life roll then one fine roll, documented at the resolver.
+- Growth stages: 4 visual stages derived purely from elapsed fraction thirds
+  (sprout, seedling, maturing, ready); no stored stage state; Phase 7 consumes.
+- Survival is evaluated against CURRENT farming skill at read time (D6's
+  "out-leveling permanently retires its risk", monotone player-favorable because
+  proficiency never decreases); survived = survivalRoll < chance, chance = 0.85
+  at the band gate ramping to 1.0 at band top, +0.10 compost +0.10 watch (both
+  Phase 4, default off), cap 1.0.
+- Tuning constants for the maintainer (all flagged in source): vale_wheat 45 min
+  duration (mid tier-1 band), keep chance 0.15 + 0.35 x skill/100, fine chance
+  0.02 + 0.08 x skill/100, pick floor 3 and cap 12, husk payout 2, plant cast 2 s,
+  FARMING_GAIN_SCHEDULE [25:1, 50:0.5, 75:0.1, 100:0.02], sellValues 1/4/8
+  (seed/produce/fine twin, buyValue 32 on the fine twin per the fine-material
+  convention). CONSEQUENCE needing a call: tier-1-only content teaches farming
+  to proficiency 50 and stops (the composed ceiling mirroring fishing);
+  reachable 100 waits for Phase 5 tier 2+.
+- fine_vale_wheat ships as an ordinary item with NO MATERIAL_GRADES row (locked
+  deviation: the grades table is pinned as exactly the nine node yields and its
+  suite derives from live node content; the fine roll lives in farming's own
+  harvest resolver). The crop id shipped as vale_wheat, closing Phase 2
+  deviation (h) (the 'wheat' placeholder), data-safe because nothing could
+  have planted.
+- The four items joined the material taxonomy through a new derived source
+  (FARM_MATERIAL_ITEM_IDS off the crop catalog, self-registering for Phase 5)
+  and sit in a self-clearing CONSUMER_DEFERRED_MATERIALS list in the affinity
+  census (husks consume in Phase 4, produce in Phase 6); icons ride
+  ITEM_ART_PENDING re-pinned as an exact id set.
+- Server-side findings fixed in-phase: fplot moved behind the heavy-self gate
+  now that its non-empty arm is live (the Phase 2 "revisit if rows grow"
+  trigger; plant_crop and harvest_crop are HEAVY_SELF_CMDS members, with honest
+  comments that wireRev already covers the successful paths); farmPlanted joined
+  HEAVY_SELF_EVENTS (seed spend rides no loot event); the character blob gained
+  the warn-only size signal at the one save chokepoint (CHARACTER_BLOB_WARN_BYTES
+  131072, rate-limited, attempt-worded); SIM_LAP_PHASES gained the farming lap.
+- Persistence hardening landed with the slots' meaning: clamp to real domains,
+  deterministic FNV-1a derivation for absent slots (accidental-loss guarantee
+  only, honestly worded), clamp-visibility counting for the operator warn, the
+  one-rule max(nowMs, 1) re-anchor pinned on both load paths, non-finite clocks
+  skip the re-anchor entirely, and the write side floors its anchor at 1.
+- DEPLOY.md now carries the mixed-fleet deploy-order and rollback bullet (this
+  is the build that makes plots plantable).
+- Deferrals with owners: /dev GUI row for farmgrow (Phase 7); nameplate raw-id
+  cast label for non-player farming casts (Phase 7, pre-existing class gap
+  shared with craft/enchant/salvage/recharge); Hud arms-wiring jsdom pin (no
+  Hud harness exists repo-wide, ledgered at sibling parity); BASE_DICT locale
+  fill for error.castingPlanting (release-time i18n fill); p99 blob-size gauge
+  in the perf heartbeat (maintainer/Phase 3 QA call); an amount-aware arm for
+  the deeds gainability guard (the phase that authors a farming deed).
+- Offline-host semantics, stated: the offline browser Sim's lockoutNowMs is the
+  session-local sim clock, so offline crops need the tab running and a reload
+  re-anchors remaining growth; the check-in thesis holds fully on the
+  wall-clock server host (the offline-taster ruling, consistent with Phase 2).
+
+Would-be PR body (D22 record):
+  Title: feat(professions): farming phase 3, the growth engine
+  Summary: plant, grow, and harvest work deterministically end to end. plantCrop
+  gates draw-free in a stated order, consumes the seed, and pre-rolls the whole
+  growth script in one contiguous two-draw rng block; growth is a pure timer on
+  ctx.lockoutNowMs; harvestCrop grants produce (or withered husks) with ZERO rng
+  draws by expanding the pre-rolled yield seed; a late harvest equals an on-time
+  one. Ships the plant_crop/harvest_crop command chain across both worlds with
+  all parity pins, the /dev farmgrow cheat, a warn-only character-blob size
+  signal at the save chokepoint, four items with full i18n and census
+  registration, the four farm SimEvents rendered through pure-core selectors,
+  and the farming_session parity scenario whose golden pins the draw ledger
+  (2/4/4/4). Six domain reviews plus the QA gate ran; every blocking finding
+  was fixed in-phase (SIM_LAP_PHASES registration, double loot line, fplot
+  hot-path gating, DEPLOY.md deploy-order bullet, count-0 event collapse,
+  non-finite clock anchor). Maintainer attention requested on: the tuning
+  block above, the proficiency-50 ceiling until Phase 5, and the pending item
+  art (exact-set ITEM_ART_PENDING).
 
 ### Phase 4
 (not started)

@@ -248,6 +248,22 @@ For off-box safety, sync the directory to S3 occasionally:
   rollback across a cap change needs a restore-from-backup plan for professions
   counters. Details: "Rollback erases newer fields" in
   `docs/design/professions-tuning-packet.md`.
+- **Farming plot deploy order and rollback (mixed fleet)**: `farmPlots` rides
+  `characters.state`, which is written whole, so a server binary that predates the
+  farming growth-engine release autosaves the blob WITHOUT `farmPlots` and erases
+  every planted crop that process touches. Deploy order: roll the growth-engine
+  release out to EVERY realm process before any release that lets players obtain
+  seeds goes live (seeds are deliberately unobtainable online until the farming
+  go-live release, so the window is theoretical until then; it stops being
+  theoretical the moment a seed faucet ships). Rollback: rolling back past the
+  growth-engine release after plants exist destroys all plot state on the next
+  30 s autosave sweep, and the only recovery is restore-from-backup. The hidden
+  per-plot pre-rolls (`survivalRoll`, `yieldSeed`) live in the same blob; the load
+  side clamps them into their value domains and re-derives absent slots
+  deterministically, so RESTORED bytes always resolve to the same outcome and
+  cannot be replayed for rerolls. A writer with direct blob access can still
+  reroll by editing `plantedAtMs`; that is total compromise already and is
+  bounded by the allowlists and clamps, not by the derivation.
 - **Client/server deploy order for content releases**: deploy the SERVER first, then
   let clients update. Web and desktop bundles refresh on their next load. The iOS
   binary rides App Store review and cannot pick up a same-day bundle (LiveUpdates
