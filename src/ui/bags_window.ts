@@ -50,6 +50,7 @@ import {
   bagNoMatchKind,
   bagQualityKey,
   bagShiftLinks,
+  bagSortSignature,
   bagStackIndex,
   bagsMoneyRowStale,
   bagTooltipHintKey,
@@ -91,6 +92,13 @@ import { totalHeldCount } from './vendor_sell_quantity';
 import { dropOnWorld } from './world_drop_target';
 
 const BAG_FILTER_KEY = 'woc_bag_filter';
+
+// Sort settle ripple: how long an armed settle waits for the tidied grid to
+// arrive before giving up (the bank deposit status timeout-backstop pattern:
+// a no-op sort on an already-tidy bag must not stay armed forever), and the
+// per-cell stagger cap that keeps a full 72-cell bag inside half a second.
+const SORT_SETTLE_MS = 3000;
+const SORT_SETTLE_STAGGER_CAP = 20;
 
 // The ad-hoc discard / sell / bank-deposit quantity prompts mount into #prompt-stack
 // (outside #bags). A window-level close() removes any that are open so it never leaves
@@ -286,7 +294,28 @@ export class BagsWindow {
   // a stale class never sticks after the cell is torn down.
   private readonly trackerHighlight = new BagQuestTrackerHighlight(document);
 
+  // One-shot sort settle animation. Armed by the sort button; the NEXT grid
+  // paint whose INVENTORY signature (bagSortSignature: id, count, cell hint)
+  // differs from the PRESS-TIME baseline plays the CSS settle ripple and
+  // disarms. Keyed on the inventory rather than the painted grid because the
+  // press both resets an active filter (a shape switch that is not a sort
+  // effect) and, online, repaints the still-unsorted mirror first: the tidied
+  // inventory only lands with the heavy self snapshot. Comparing against the
+  // baseline (not the previous paint) keeps intermediate paints, or a close
+  // and reopen inside the window, from shifting what "changed" means. A
+  // timestamp backstop (SORT_SETTLE_MS) keeps a no-op sort (already tidy)
+  // from arming forever.
+  private sortSettleArmedAt = 0;
+  private lastSortBaseline = '';
+
   constructor(private readonly deps: BagsWindowDeps) {}
+
+  private armSortSettle(): void {
+    this.sortSettleArmedAt = performance.now();
+    // Captured BEFORE the sort command runs (offline the sim mutates
+    // synchronously on the same call stack as the click handler).
+    this.lastSortBaseline = bagSortSignature(this.deps.world().inventory);
+  }
 
   /**
    * Repaint the money row when the purse moved, the staleness contract this window
@@ -645,8 +674,65 @@ export class BagsWindow {
     });
     tools.appendChild(sort);
 
+    // The one-shot clean-up button (world.sortInventory): unlike the view-only
+    // dropdown beside it, this rearranges the REAL cells (server-side online,
+    // so both hosts land the identical grid). Pressing it also resets any
+    // active filter/search/view back to the pristine cells: the whole point of
+    // the press is seeing the tidied bag, and a derived list would hide it.
+    const sortBtn = document.createElement('button');
+    sortBtn.type = 'button';
+    sortBtn.className = 'bag-sort-btn';
+    sortBtn.dataset.focusKey = 'bag-sort-btn';
+    sortBtn.innerHTML = `${svgIcon('sort')}<span>${esc(t('hudChrome.bags.sortButton'))}</span>`;
+    sortBtn.setAttribute('aria-label', t('hudChrome.bags.sortButtonAria'));
+    this.deps.attachTooltip(
+      sortBtn,
+      () => `<div class="tt-sub">${esc(t('hudChrome.bags.sortButtonHint'))}</div>`,
+    );
+    sortBtn.addEventListener('click', () => {
+      audio.cardShuffle();
+      this.armSortSettle();
+      this.deps.world().sortInventory();
+      // In-memory only, deliberately NOT persisted: the press shows the
+      // tidied cells NOW, but the player's saved category/sort/search
+      // preference (woc_bag_filter) survives into the next session.
+      this.filter = { ...DEFAULT_BAG_FILTER };
+      this.render();
+    });
+    tools.appendChild(sortBtn);
+
     bar.appendChild(tools);
     return bar;
+  }
+
+  // Whether an armed sort settle should play on THIS paint: only while the
+  // arming is fresh (the backstop clears a no-op sort) and only once the
+  // inventory actually differs from its press-time state (online, the tidied
+  // inventory arrives with the heavy self snapshot, not the press's own
+  // repaint; the press's filter reset alone must never fire it).
+  private consumeSortSettle(signature: string): boolean {
+    if (this.sortSettleArmedAt === 0) return false;
+    if (performance.now() - this.sortSettleArmedAt >= SORT_SETTLE_MS) {
+      this.sortSettleArmedAt = 0;
+      return false;
+    }
+    if (signature === this.lastSortBaseline) return false;
+    this.sortSettleArmedAt = 0;
+    return true;
+  }
+
+  // The CSS-only settle ripple: a class on the grid plus a per-cell stagger
+  // index. No JS driver and no layout read (the cold-window contract); the
+  // stagger caps so a full 72-cell bag still settles inside half a second,
+  // and reduced-motion turns the whole thing off in the stylesheet.
+  private applySortSettle(grid: HTMLElement): void {
+    grid.classList.add('bag-grid-settle');
+    for (let i = 0; i < grid.children.length; i++) {
+      (grid.children[i] as HTMLElement).style.setProperty(
+        '--settle-i',
+        String(Math.min(i, SORT_SETTLE_STAGGER_CAP)),
+      );
+    }
   }
 
   // Populate (or repopulate) the .bag-grid scroll container from the current filter
@@ -660,6 +746,10 @@ export class BagsWindow {
       this.filter,
       world.bagCapacity,
     );
+    // Settle bookkeeping rides every paint: the class never persists across a
+    // repaint (each replay would re-run the animation on the fresh nodes).
+    grid.classList.remove('bag-grid-settle');
+    const settle = this.consumeSortSettle(bagSortSignature(world.inventory));
     if (model.state === 'empty') {
       grid.innerHTML = `<div class="bag-empty">${esc(t('itemUi.bags.empty'))}</div>`;
       return;
@@ -697,6 +787,7 @@ export class BagsWindow {
               : this.buildEmptyCell(cell),
         );
       }
+      if (settle) this.applySortSettle(grid);
       return;
     }
     // Derived list: soft Quest section headers only when buildBagListRows allows
@@ -720,6 +811,7 @@ export class BagsWindow {
       }
     }
     for (let i = 0; i < model.emptyCells; i++) grid.appendChild(this.buildEmptyCell(null));
+    if (settle) this.applySortSettle(grid);
   }
 
   // Soft parchment section caption for a derived bag list (Quest grouping). Not a

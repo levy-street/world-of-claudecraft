@@ -10,54 +10,159 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
-    "hudChrome.arenaGate.minLevelNote"
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bags.sortButton",
+    "hudChrome.bags.sortButtonAria",
+    "hudChrome.bags.sortButtonHint",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle"
   ],
   "es_ES": [
-    "hudChrome.arenaGate.minLevelNote"
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bags.sortButton",
+    "hudChrome.bags.sortButtonAria",
+    "hudChrome.bags.sortButtonHint",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle"
   ],
   "fr_FR": [
-    "hudChrome.arenaGate.minLevelNote"
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bags.sortButton",
+    "hudChrome.bags.sortButtonAria",
+    "hudChrome.bags.sortButtonHint",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle"
   ],
   "fr_CA": [
-    "hudChrome.arenaGate.minLevelNote"
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bags.sortButton",
+    "hudChrome.bags.sortButtonAria",
+    "hudChrome.bags.sortButtonHint",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle"
   ],
   "en_CA": [],
   "it_IT": [
-    "hudChrome.arenaGate.minLevelNote"
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bags.sortButton",
+    "hudChrome.bags.sortButtonAria",
+    "hudChrome.bags.sortButtonHint",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle"
   ],
   "de_DE": [
-    "hudChrome.arenaGate.minLevelNote"
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bags.sortButton",
+    "hudChrome.bags.sortButtonAria",
+    "hudChrome.bags.sortButtonHint",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle"
   ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
   "pt_BR": [
-    "hudChrome.arenaGate.minLevelNote"
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bags.sortButton",
+    "hudChrome.bags.sortButtonAria",
+    "hudChrome.bags.sortButtonHint",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle"
   ],
   "ru_RU": [],
   "cs_CZ": [
-    "hudChrome.arenaGate.minLevelNote"
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bags.sortButton",
+    "hudChrome.bags.sortButtonAria",
+    "hudChrome.bags.sortButtonHint",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle"
   ],
   "nl_NL": [
-    "hudChrome.arenaGate.minLevelNote"
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bags.sortButton",
+    "hudChrome.bags.sortButtonAria",
+    "hudChrome.bags.sortButtonHint",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle"
   ],
   "pl_PL": [
-    "hudChrome.arenaGate.minLevelNote"
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bags.sortButton",
+    "hudChrome.bags.sortButtonAria",
+    "hudChrome.bags.sortButtonHint",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle"
   ],
   "id_ID": [
-    "hudChrome.arenaGate.minLevelNote"
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bags.sortButton",
+    "hudChrome.bags.sortButtonAria",
+    "hudChrome.bags.sortButtonHint",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle"
   ],
   "tr_TR": [
-    "hudChrome.arenaGate.minLevelNote"
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bags.sortButton",
+    "hudChrome.bags.sortButtonAria",
+    "hudChrome.bags.sortButtonHint",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle"
   ],
   "sv_SE": [
-    "hudChrome.arenaGate.minLevelNote"
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bags.sortButton",
+    "hudChrome.bags.sortButtonAria",
+    "hudChrome.bags.sortButtonHint",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle"
   ],
   "vi_VN": [
-    "hudChrome.arenaGate.minLevelNote"
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bags.sortButton",
+    "hudChrome.bags.sortButtonAria",
+    "hudChrome.bags.sortButtonHint",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle"
   ],
   "da_DK": [
-    "hudChrome.arenaGate.minLevelNote"
+    "hudChrome.arenaGate.minLevelNote",
+    "hudChrome.bags.sortButton",
+    "hudChrome.bags.sortButtonAria",
+    "hudChrome.bags.sortButtonHint",
+    "hudChrome.wiki.confirmBody",
+    "hudChrome.wiki.confirmCancel",
+    "hudChrome.wiki.confirmOpen",
+    "hudChrome.wiki.confirmTitle"
   ]
 };

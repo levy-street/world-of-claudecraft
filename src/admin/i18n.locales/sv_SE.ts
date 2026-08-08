@@ -184,6 +184,7 @@ export const sv_SE: Record<string, string> = {
   'tickPerf.ms': '{value} ms',
   'tickPerf.noCapture': 'Ingen fångst än. Välj ett fönster och starta en.',
   'tickPerf.overBudget': 'över 50ms-budgeten',
+  'tickPerf.selfHeading': 'Nyckelgrupper för den egna ögonblicksbilden (bcastSelf)',
   'tickPerf.simHeading': 'interna faser i sim.tick()',
   'tickPerf.title': 'Serverns tick-profilerare',
   'calibration.autoRefresh': 'Uppdatera automatiskt ({seconds}s)',

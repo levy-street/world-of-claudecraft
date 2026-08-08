@@ -27,6 +27,10 @@ const ITEMS: Record<string, ItemDef> = {
   // A REAL catalog id: the material chip is honest-taxonomy set membership
   // (src/sim/material_taxonomy.ts), so a synthetic id can never match it.
   iron_ore: { id: 'iron_ore', name: 'Iron Ore', kind: 'junk', quality: 'common' },
+  // Its REAL fine grade plus a REAL material whose name interleaves the two,
+  // for the grade-family tiebreak arms (mirrors the bag_filter fixtures).
+  fine_iron_ore: { id: 'fine_iron_ore', name: 'Fine Iron Ore', kind: 'junk', quality: 'common' },
+  goldleaf_herb: { id: 'goldleaf_herb', name: 'Goldleaf Herb', kind: 'junk', quality: 'common' },
   keystone: { id: 'keystone', name: 'Crypt Keystone', kind: 'quest', quality: 'common' },
   relic: { id: 'relic', name: 'Ancient Relic', kind: 'armor', slot: 'chest', quality: 'legendary' },
 } as unknown as Record<string, ItemDef>;
@@ -152,10 +156,12 @@ describe('filterBankSlots: search matches the LOCALIZED name, not item.name', ()
 });
 
 describe('filterBankSlots: sorting preserves slotIndex', () => {
-  it('sorts by quality descending (legendary first), ties keep insertion order', () => {
+  it('sorts by quality descending (legendary first), ties on the clean-up ladder', () => {
+    // Within the common band the canonical ladder orders potion, rod, keystone
+    // (consumable, tool, quest), matching the bags' quality view.
     const out = filterBankSlots(MODELS, lookup, state({ sort: 'quality' }), nameOf);
-    expect(ids(out)).toEqual(['relic', 'helm', 'blade', 'potion', 'keystone', 'rod', 'pelt']);
-    expect(indices(out)).toEqual([7, 3, 2, 5, 8, 1, 0]);
+    expect(ids(out)).toEqual(['relic', 'helm', 'blade', 'potion', 'rod', 'keystone', 'pelt']);
+    expect(indices(out)).toEqual([7, 3, 2, 5, 1, 8, 0]);
   });
 
   it('sorts by the LOCALIZED name (order differs from the English item.name)', () => {
@@ -166,6 +172,44 @@ describe('filterBankSlots: sorting preserves slotIndex', () => {
     // A sort on the English item.name would instead lead with 'Ancient Relic' (relic),
     // so this order proves the name-sort uses nameOf.
     expect(ids(out)[0]).not.toBe('relic');
+  });
+
+  it('keeps every stack of an item adjacent in the quality view, slotIndex intact', () => {
+    // Three scattered stacks of one id: the ladder tiebreak must seat them
+    // together (fuller first) while each row keeps its ORIGINAL slotIndex
+    // (the wire argument a click acts on).
+    const scattered: BankSlotModel[] = [
+      { slotIndex: 10, itemId: 'iron_ore', count: 7, showCount: true, qualityKey: 'common' },
+      ...MODELS,
+      { slotIndex: 11, itemId: 'iron_ore', count: 20, showCount: true, qualityKey: 'common' },
+    ];
+    const out = filterBankSlots(scattered, lookup, state({ sort: 'quality' }), nameOf);
+    const orePositions = out.map((m, i) => ({ m, i })).filter(({ m }) => m.itemId === 'iron_ore');
+    expect(orePositions).toHaveLength(2);
+    expect(orePositions[1].i - orePositions[0].i).toBe(1);
+    expect(orePositions.map(({ m }) => m.count)).toEqual([20, 7]);
+    expect(orePositions.map(({ m }) => m.slotIndex)).toEqual([11, 10]);
+  });
+
+  it('seats a fine grade beside its base past an interleaving name (quality view)', () => {
+    const grades: BankSlotModel[] = [
+      { slotIndex: 12, itemId: 'iron_ore', count: 9, showCount: true, qualityKey: 'common' },
+      { slotIndex: 13, itemId: 'goldleaf_herb', count: 4, showCount: true, qualityKey: 'common' },
+      { slotIndex: 14, itemId: 'fine_iron_ore', count: 3, showCount: true, qualityKey: 'common' },
+    ];
+    const out = filterBankSlots(grades, lookup, state({ sort: 'quality' }), nameOf);
+    expect(ids(out)).toEqual(['goldleaf_herb', 'fine_iron_ore', 'iron_ore']);
+    expect(indices(out)).toEqual([13, 14, 12]);
+  });
+
+  it('breaks a same-localized-name tie in the name view with the ladder', () => {
+    const twin: BankSlotModel[] = [
+      { slotIndex: 15, itemId: 'iron_ore', count: 7, showCount: true, qualityKey: 'common' },
+      { slotIndex: 16, itemId: 'iron_ore', count: 20, showCount: true, qualityKey: 'common' },
+    ];
+    const out = filterBankSlots(twin, lookup, state({ sort: 'name' }), nameOf);
+    expect(out.map((m) => m.count)).toEqual([20, 7]);
+    expect(indices(out)).toEqual([16, 15]);
   });
 
   it('carries slotIndex through a combined category + sort', () => {

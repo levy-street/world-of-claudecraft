@@ -223,6 +223,7 @@ export const en = {
   'tickPerf.overBudget': 'over the 50ms budget',
   'tickPerf.loopHeading': 'Loop phases',
   'tickPerf.simHeading': 'sim.tick() internal phases',
+  'tickPerf.selfHeading': 'Self snapshot key groups (bcastSelf)',
   'tickPerf.colPhase': 'Phase',
   'tickPerf.colMean': 'Mean',
   'tickPerf.colP95': 'p95',

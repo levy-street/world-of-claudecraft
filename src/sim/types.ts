@@ -739,7 +739,10 @@ export type SkinRank = 'uncommon' | 'rare' | 'epic';
 
 export type ArmorType = 'cloth' | 'leather' | 'mail';
 
-type ItemKind =
+// Exported so inventory_sort.ts can type its clean-up ladder as
+// Record<ItemKind, number>: a new kind then FAILS to compile until it is
+// given a rank, instead of silently sorting after gray trash.
+export type ItemKind =
   | 'weapon'
   | 'armor'
   | 'held_offhand'

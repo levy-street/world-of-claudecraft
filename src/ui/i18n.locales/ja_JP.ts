@@ -5867,6 +5867,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.filterMount': 'マウント',
   'hudChrome.bags.filterQuest': 'クエスト',
   'hudChrome.bags.sortAria': 'バッグのアイテムを並べ替える',
+  'hudChrome.bags.sortButton': '整理',
+  'hudChrome.bags.sortButtonAria': 'バッグを整理する',
+  'hudChrome.bags.sortButtonHint': 'スタックをまとめ、アイテムを種類ごとに並べます',
   'hudChrome.bags.sortRecent': '最近',
   'hudChrome.bags.sortQuality': '品質',
   'hudChrome.bags.sortName': '名前',
@@ -9658,6 +9661,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unstuck.standStillAnywhere': '静止してからスタック解除を使用してください。',
   'hudChrome.unstuck.busy': '現在の行動を終えてからスタック解除を使用してください。',
   'hudChrome.unstuck.unavailable': '現在の状態ではスタック解除を使用できません。',
+  // Wiki launcher confirm (M16 non-Latin fills).
+  'hudChrome.wiki.confirmTitle': 'Wikiを開きますか？',
+  'hudChrome.wiki.confirmBody':
+    'World of ClaudeCraft のWikiをブラウザで開きます。ゲームはそのまま続行されます。',
+  'hudChrome.wiki.confirmOpen': 'Wikiを開く',
+  'hudChrome.wiki.confirmCancel': 'キャンセル',
   'guide.abilityHook.revenge':
     '前方の敵を薙ぎ払い、回避または受け流しの後に消費なしで使えることがある。',
   'guide.abilityHook.hamstring': '敵の移動を妨げ、逃走を阻止する。',

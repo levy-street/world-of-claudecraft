@@ -336,6 +336,12 @@ export const ko_KR: EnTranslations = {
       "healerConfirmAccept": "부활",
       "healerConfirmCancel": "취소"
     },
+    "wiki": {
+      "confirmTitle": "위키를 열까요?",
+      "confirmBody": "World of ClaudeCraft 위키를 브라우저에서 엽니다. 게임은 계속 실행됩니다.",
+      "confirmOpen": "위키 열기",
+      "confirmCancel": "취소"
+    },
     "unstuck": {
       "menuButton": "갇힘 탈출",
       "help": "탈출: /unstuck은 제자리에서 카운트다운을 시작한 뒤 주변의 도달 가능한 안전한 위치로 이동합니다.",
@@ -1920,6 +1926,9 @@ export const ko_KR: EnTranslations = {
       "sortRecent": "최근",
       "sortQuality": "품질",
       "sortName": "이름",
+      "sortButton": "정리",
+      "sortButtonAria": "가방 정리",
+      "sortButtonHint": "묶음을 합치고 아이템을 종류별로 정리합니다",
       "searchPlaceholder": "아이템 검색",
       "searchAria": "이름으로 가방 아이템 검색",
       "noMatch": "필터와 일치하는 아이템이 없습니다.",

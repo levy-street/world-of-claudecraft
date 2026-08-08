@@ -336,6 +336,12 @@ export const en: EnTranslations = {
       "healerConfirmAccept": "Revive Me",
       "healerConfirmCancel": "Cancel"
     },
+    "wiki": {
+      "confirmTitle": "Open the Wiki?",
+      "confirmBody": "This opens the World of ClaudeCraft wiki in your browser. The game keeps running.",
+      "confirmOpen": "Open Wiki",
+      "confirmCancel": "Cancel"
+    },
     "unstuck": {
       "menuButton": "Unstuck",
       "help": "Recovery: /unstuck starts a stationary countdown to move you to a nearby reachable safe spot.",
@@ -1920,6 +1926,9 @@ export const en: EnTranslations = {
       "sortRecent": "Recent",
       "sortQuality": "Quality",
       "sortName": "Name",
+      "sortButton": "Sort",
+      "sortButtonAria": "Sort your bags",
+      "sortButtonHint": "Combine stacks and group items by type",
       "searchPlaceholder": "Search items",
       "searchAria": "Search bag items by name",
       "noMatch": "No items match your filters.",

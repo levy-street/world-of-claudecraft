@@ -231,6 +231,7 @@ export const vi_VN: Record<string, string> = {
   'tickPerf.ms': '{value} ms',
   'tickPerf.noCapture': 'Chưa có bản ghi nào. Hãy chọn một cửa sổ và bắt đầu ghi.',
   'tickPerf.overBudget': 'vượt ngân sách 50ms',
+  'tickPerf.selfHeading': 'Nhóm khóa ảnh chụp nhanh bản thân (bcastSelf)',
   'tickPerf.simHeading': 'Các giai đoạn bên trong sim.tick()',
   'tickPerf.title': 'Trình phân tích tick máy chủ',
   'calibration.autoRefresh': 'Tự động làm mới ({seconds}s)',

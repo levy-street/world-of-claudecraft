@@ -420,28 +420,43 @@ describe('dead-gate: Spirit Healer exceptions for a ghost', () => {
     const mailbox = [...sim.entities.values()].find(
       (e: AnyEntity) => e.templateId === 'mailbox',
     ) as AnyEntity;
-    sim.postOffice.mail.push({
-      id: 4242,
-      recipientKey: meta.name,
-      recipientName: meta.name,
-      senderName: 'Postmaster',
-      kind: 'system',
-      subject: 'Coin',
-      body: '',
-      copper: 50,
-      items: [],
-      deliverAt: 0,
-      expiresAt: Infinity,
-      read: false,
-      announced: false,
-    });
+    // Seed through the tracked booking path (sendLetter), never a direct
+    // book push: the bucketed reads (MailIndex) cannot see an untracked
+    // letter, which would make this refusal vacuous (the take would refuse
+    // dead or alive because the letter is invisible, not because of the
+    // dead gate).
+    sim.postOffice.sendLetter(
+      sim.postOffice.mailKeyFor(meta),
+      meta.name,
+      {
+        letterId: 'qa_dead_gate_coin',
+        senderName: 'Postmaster',
+        subject: 'Coin',
+        body: '',
+        copper: 50,
+        delaySeconds: 0,
+      },
+      'system',
+    );
+    sim.tick();
+    const letterId = sim.postOffice.mail.find((m: any) => m.letterId === 'qa_dead_gate_coin')!.id;
     teleport(sim, p, mailbox.pos.x + 1, mailbox.pos.z);
     makeDead(sim, 'ghost');
     const before = meta.copper;
-    sim.mailTake(4242);
+    sim.mailTake(letterId);
     expect(meta.copper).toBe(before);
-    const letter = sim.postOffice.mail.find((m: any) => m.id === 4242)!;
+    const letter = sim.postOffice.mail.find((m: any) => m.id === letterId)!;
     expect(letter.copper).toBe(50); // still attached
+
+    // Alive control: the SAME take collects once alive again, proving the
+    // refusal above was the dead gate and not an unreachable letter.
+    p.dead = false;
+    p.ghost = false;
+    p.hp = 1;
+    teleport(sim, p, mailbox.pos.x + 1, mailbox.pos.z);
+    sim.mailTake(letterId);
+    expect(meta.copper).toBe(before + 50);
+    expect(sim.postOffice.mail.find((m: any) => m.id === letterId)!.copper).toBe(0);
   });
 
   it('bank commands are silently refused while dead (the market/mail idiom)', () => {

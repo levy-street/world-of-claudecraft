@@ -336,6 +336,12 @@ export const ja_JP: EnTranslations = {
       "healerConfirmAccept": "復活する",
       "healerConfirmCancel": "キャンセル"
     },
+    "wiki": {
+      "confirmTitle": "Wikiを開きますか？",
+      "confirmBody": "World of ClaudeCraft のWikiをブラウザで開きます。ゲームはそのまま続行されます。",
+      "confirmOpen": "Wikiを開く",
+      "confirmCancel": "キャンセル"
+    },
     "unstuck": {
       "menuButton": "スタック解除",
       "help": "復帰：/unstuck はその場でカウントダウンを開始し、近くの到達可能な安全地点へ移動します。",
@@ -1920,6 +1926,9 @@ export const ja_JP: EnTranslations = {
       "sortRecent": "最近",
       "sortQuality": "品質",
       "sortName": "名前",
+      "sortButton": "整理",
+      "sortButtonAria": "バッグを整理する",
+      "sortButtonHint": "スタックをまとめ、アイテムを種類ごとに並べます",
       "searchPlaceholder": "アイテムを検索",
       "searchAria": "名前でバッグのアイテムを検索",
       "noMatch": "条件に一致するアイテムはありません。",

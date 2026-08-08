@@ -27,7 +27,7 @@ vi.mock('../server/db', () => ({
   })),
 }));
 
-import { type ClientSession, GameServer } from '../server/game';
+import { type ClientSession, CORDER_WIRE_INTERVAL_TICKS, GameServer } from '../server/game';
 import { ClientWorld } from '../src/net/online';
 import { ALL_RECIPES } from '../src/sim/content/recipes';
 import { ITEMS } from '../src/sim/data';
@@ -659,6 +659,10 @@ describe('live GameServer: the commission order board over the real wire', () =>
     routeTick(server);
     expect(server.sim.commissionOrderBoard.find((o) => o.id === order.id)?.status).toBe('accepted');
 
+    // The requester did not issue the accept, so their corder gate re-opens on
+    // the wire cadence, not on the very next snapshot; walk one cadence
+    // window before asserting their view converged.
+    for (let i = 0; i < CORDER_WIRE_INTERVAL_TICKS; i++) server.sim.tick();
     broadcast(server);
     const boardForRequester = lastCorderFrom(fa.sent, 0) as Array<{ id: number; status: string }>;
     expect(boardForRequester?.some((o) => o.id === order.id && o.status === 'accepted')).toBe(true);

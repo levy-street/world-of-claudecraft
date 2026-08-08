@@ -228,6 +228,7 @@ export const ja_JP: Record<string, string> = {
   'tickPerf.ms': '{value}ms',
   'tickPerf.noCapture': 'まだキャプチャがありません。ウィンドウを選択して開始してください。',
   'tickPerf.overBudget': '50msの予算を超過',
+  'tickPerf.selfHeading': '自己スナップショットのキーグループ (bcastSelf)',
   'tickPerf.simHeading': 'sim.tick() の内部フェーズ',
   'tickPerf.title': 'サーバーティックプロファイラ',
   'calibration.autoRefresh': '自動更新 ({seconds}秒)',

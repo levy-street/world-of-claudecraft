@@ -217,6 +217,7 @@ export const en_XA: AdminTranslations = {
   "tickPerf.overBudget": "[óʋéŕ ţĥé 50ɱš ƀúðĝéţ]",
   "tickPerf.loopHeading": "[Ļóóþ þĥášéš]",
   "tickPerf.simHeading": "[šíɱ.ţíçķ() íñţéŕñáļ þĥášéš]",
+  "tickPerf.selfHeading": "[Šéļƒ šñáþšĥóţ ķéý ĝŕóúþš (ƀçášţŠéļƒ)]",
   "tickPerf.colPhase": "[Þĥášé]",
   "tickPerf.colMean": "[Ɱéáñ]",
   "tickPerf.colP95": "[þ95]",

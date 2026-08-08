@@ -131,6 +131,12 @@ function polishGltfTextures(gltf: GLTF): void {
 // pay ~700 console lines per entry; the native Release shell suppresses the JS
 // console anyway, and a Debug shell attached for diagnosis sees every line.
 function loadDiagEnabled(): boolean {
+  // Vitest sets DEV too, and every jsdom texture fetch FAILs, so a suite that
+  // touches the loader emits hundreds of these lines; that console volume is
+  // what keeps onUserConsoleLog rpcs in flight at worker teardown (the shard
+  // flake on the release gate). Tests never read this diagnostic: keep it out
+  // of the test env entirely.
+  if (import.meta.env.TEST) return false;
   return import.meta.env.DEV || GFX.nativeIosMemoryProfile;
 }
 let loadDiagSeq = 0;
