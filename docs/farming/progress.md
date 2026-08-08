@@ -346,8 +346,10 @@ fix/farming-phase-02-qa merged --no-ff per D22:
   followed by the two matrix rows the build never dispatched:
   privacy-security-review (its row matches by text; verdict ship-it, the one
   should-fix is the Phase 3 hidden-slot clamp gate, ledgered in the handoff)
-  and database-performance-reviewer (borderline row via stored-data growth).
-  migration-safety and database-performance both needed the known
+  and database-performance-reviewer (borderline row via stored-data growth;
+  verdict PASS, corrected the first fleet estimate's storage-vs-write-volume
+  conflation and added two plant-phase gates, all ledgered in the state.md
+  handoff). migration-safety and database-performance both needed the known
   agent-redispatch recovery. 0 BLOCKING anywhere.
 - Correctness probes (all green, real paths): hidden slots and yield seed
   filled then proven absent over a real GameServer broadcast while status

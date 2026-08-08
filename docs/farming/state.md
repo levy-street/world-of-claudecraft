@@ -582,13 +582,31 @@ question does not arise (farming has no station).
     phase that makes plots plantable; it lives only here until then.
   - The per-tick fplot emit stringifies every planted player's rows at 20 Hz
     (tslot-consistent, bounded at 23 beds); revisit if rows grow.
-  - Stored-data growth at fleet scale (the database row, recorded at Phase 2 QA):
-    a fully planted character adds about 4.4 KiB of JSONB to characters.state
-    (23 beds at about 193 bytes; blob ceiling re-minted 14336), which is about
-    44 MB of extra storage per 10k fully planted characters AND rides every
-    autosave UPDATE payload and its WAL, not just storage. Content-scaled and
-    bounded (the bed allowlist caps the map at 23 after normalize); no new
-    table, no retention story owed.
+  - Stored-data growth at fleet scale (the database-performance row, recorded
+    at Phase 2 QA; the reviewer corrected the first estimate's conflation):
+    a fully planted character adds 4,451 bytes of JSONB to characters.state
+    (23 beds at about 193.5 bytes; blob ceiling re-minted 14336). STORAGE is
+    one-time: about 44.5 MB per 10k fully planted characters. WRITE volume
+    scales with CONCURRENT ONLINE, not the table: the 30 s autosave sweep
+    (AUTOSAVE_SECONDS, server/game.ts) writes only online sessions, so the
+    worst case is about 4.45 MB per sweep at the R36 1,000-concurrent target
+    (about 148 KB/s logical). Today's real number is ZERO: no writer exists.
+    Postgres rewrites the whole TOAST value on any change, so once plants
+    exist the delta rides every autosave of a planted character; pglz should
+    compress the 23 near-identical rows well below the uncompressed figure
+    (inferred, not measured).
+  - TWO MORE HARD GATES from the database review, landing WITH the plant
+    writer (Phase 3): (1) validate the bed id against FARM_BED_IDS at plant
+    time and pin the refusal; the load-side allowlist is the ONLY 23-row
+    bound and it cannot catch a live writer bug before the blob grows.
+    (2) a runtime size signal on the serialized character state
+    (JSON.stringify(cleanState).length already exists at
+    server/db.ts saveCharacterState; guild-bank books have a measured skip
+    bound and warn, the character blob has none). Sizing measurement recipe,
+    DISPOSABLE local PG16 only: pg_column_size(state) with and without the
+    13,948-byte worst-case blob for the compressed delta, then
+    pg_current_wal_lsn() movement across about 100 repeated UPDATEs of each
+    shape for per-save WAL amplification.
   - Spectator sessions mirror the spectated player's plots into myFarmPlots (the
     whole self block does this); do not hang plant/harvest UI off it while
     spectating.
