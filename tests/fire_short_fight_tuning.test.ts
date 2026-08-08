@@ -11,8 +11,8 @@
 // reported gear, the Phoenix Trance opener, the Cinderfall dump, Hot Streak
 // Pyrelances, Meteor on cooldown, Cinderbolt filler. The comparator is frost
 // in the IDENTICAL gear playing its real kit (Water Elemental pre-summoned,
-// Icy Veins, Frozen Orb, Brain Freeze Flurries, Fingers-of-Frost Ice Lances,
-// Glacial Spike at five icicles, Rimelance filler), a fuller baseline than
+// Coldsurge, Frostglobe, Brain Freeze Flurries, Fingers-of-Frost Ice Lances,
+// Rimeneedle at five icicles, Rimelance filler), a fuller baseline than
 // chronomancy_balance.test.ts' Frostbolt-spam "cryo" proxy so the burst band
 // is honest. Mana is pinned to full: the report's premise is that mana never
 // matters at 27s.
@@ -233,8 +233,8 @@ function runShortFight(spec: Spec, seconds: number, seed = 41, rows?: Rows): Bur
         else sim.castAbility('fireball');
       }
     } else if (free(p)) {
-      // Frost plays its real kit: Icy Veins opener, Glacial Spike at five
-      // icicles, Brain Freeze Flurry, proc-fed Ice Lance, Frozen Orb on
+      // Frost plays its real kit: Coldsurge opener, Rimeneedle at five
+      // icicles, Brain Freeze Flurry, proc-fed Ice Lance, Frostglobe on
       // cooldown, Rimelance filler; with rows, Rune uptime and Racing Mind
       // Glacial Spikes.
       const icicles = p.auras.find((a) => a.kind === 'icicles');

@@ -17,7 +17,7 @@ import type { Entity, MoveInput } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
 
 // The physics-asset audit, interaction half: forced movement (knockback,
-// charge, Heroic Leap) against standable geometry, client-predictor parity
+// charge, Vaulting Charge) against standable geometry, client-predictor parity
 // inside dungeons, persistence on a roof, the step-smooth core, and the
 // climb's veto edges.
 

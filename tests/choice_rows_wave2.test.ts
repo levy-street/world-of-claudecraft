@@ -203,7 +203,7 @@ describe('druid wave 2 choice rows', () => {
     expect(p.auras.some((a) => a.id === 'dru_redmaw')).toBe(true);
 
     // Bloom's End is self-contained since the final #1756 pass: a full
-    // Wildbloom arms an instant Wildmend instead of resetting Swiftmend
+    // Wildbloom arms an instant Wildmend instead of resetting Fleetmend
     // (unobtainable alongside this row).
     const healer = rig('druid', 20, { 5: 'dru_r5_natures_bounty' });
     healer.p.hp = Math.round(healer.p.maxHp * 0.5);

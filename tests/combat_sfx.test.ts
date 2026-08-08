@@ -398,7 +398,7 @@ describe('combat SFX policy', () => {
     ).toBe('impact_fire');
   });
 
-  it('gives Frozen Orb and Glacial Spike their own impact instead of the shared impact_frost', () => {
+  it('gives Frostglobe and Rimeneedle their own impact instead of the shared impact_frost', () => {
     for (const [abilityId, key] of [
       ['frozen_orb', 'frozen_orb'],
       ['glacial_spike', 'glacial_spike'],

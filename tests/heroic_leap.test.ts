@@ -1,4 +1,4 @@
-// Heroic Leap (owner 2026-07-09): the leap ARCS to the landing over ~0.6s instead
+// Vaulting Charge (owner 2026-07-09): the leap ARCS to the landing over ~0.6s instead
 // of teleporting, and its AoE slams down on touchdown (not at cast). Drives the sim
 // deterministically: arm the flight, watch it rise, then land + blast.
 // Restored from the pre-revert payload (f274835b1^); the HeroicLeapFlight fields
@@ -20,7 +20,7 @@ type AnySim = Sim & {
   addEntity(entity: Entity): void;
 };
 
-describe('Heroic Leap: arcs over time, slams on landing', () => {
+describe('Vaulting Charge: arcs over time, slams on landing', () => {
   it('arms a flight, rises mid-air, then lands near the aim and blasts on touchdown', () => {
     const sim = new Sim({ seed: 7, playerClass: 'warrior', autoEquip: true }) as AnySim;
     sim.setPlayerLevel(MAX_LEVEL);
@@ -129,7 +129,7 @@ describe('Heroic Leap: arcs over time, slams on landing', () => {
 // The flight must die with the caster or with any external relocation: a stale
 // leap otherwise resumes later and teleports the player onto the stored landing
 // point (skipping the corpse run, or undoing an arena/fiesta placement).
-describe('Heroic Leap: lifecycle resets', () => {
+describe('Vaulting Charge: lifecycle resets', () => {
   function armLeap(seed: number): { sim: AnySim; p: Entity; landing: { x: number; z: number } } {
     const sim = new Sim({ seed, playerClass: 'warrior', autoEquip: true }) as AnySim;
     sim.setPlayerLevel(MAX_LEVEL);
@@ -162,7 +162,7 @@ describe('Heroic Leap: lifecycle resets', () => {
       duration: 0.6,
       apex: 5,
       landingAoe: { min: 24, max: 32, radius: 6 },
-      abilityName: 'Heroic Leap',
+      abilityName: 'Vaulting Charge',
       abilityId: 'heroic_leap',
       school: 'physical',
     };

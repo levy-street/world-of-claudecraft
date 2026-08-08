@@ -8,7 +8,7 @@ import type { Aura, Entity } from '../src/sim/types';
 // target actually carries a dispellable effect (a beneficial magic effect on
 // an enemy, or a harmful one on an ally). A no-food cast is refused at the
 // cast gate BEFORE billing (the judgement no-Seal precedent): no mana, no
-// cooldown. Other dispel abilities (Cleansing Verdict, Spellsteal) keep the
+// cooldown. Other dispel abilities (Cleansing Verdict, Spellplunder) keep the
 // old fire-anyway behavior; the gate is the requiresDispellable opt-in.
 
 type Ev = { type?: string; text?: string };

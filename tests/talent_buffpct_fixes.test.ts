@@ -114,7 +114,7 @@ describe('talent buffPct resolver fixes', () => {
   // scaleEffect had no case for 'groundAoE' or 'repositionToAim', so a global
   // damage modifier (e.g. the Fiesta arena augments, aug_bloodhunter's
   // +18%/+18%) silently no-opped on Consecration, Earthquake, Blizzard,
-  // Meteor, and Heroic Leap's landing hit while every directDamage ability
+  // Meteor, and Vaulting Charge's landing hit while every directDamage ability
   // scaled correctly. These pin the fix against the same global mult a
   // directDamage ability already applies.
   it('Consecration groundAoE damage scales with the global spell damage modifier, same factor as a directDamage ability', () => {
@@ -174,7 +174,7 @@ describe('talent buffPct resolver fixes', () => {
     expect(rune.allyBuffPct).toBe(0.1);
   });
 
-  it('Heroic Leap landingAoe damage scales with the global melee damage modifier', () => {
+  it('Vaulting Charge landingAoe damage scales with the global melee damage modifier', () => {
     const mods = emptyModifiers();
     accumulateTalentEffect(mods, { global: { meleeDmgPct: 0.4 } }, 1);
 

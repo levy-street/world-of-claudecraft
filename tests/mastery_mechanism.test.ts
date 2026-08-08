@@ -260,7 +260,7 @@ describe('crit-damage masteries are scoped to their channel (F4)', () => {
     expect(sim.setSpec('holy')).toBe(true);
     const p = sim.entities.get(sim.playerId) as Entity;
     // Holy mastery boosts HEAL crits only; the spell and physical crit channels stay 0,
-    // so the paladin's Holy Shock / Crusader Strike crits are not amplified.
+    // so the paladin's Lightjolt / Oathstrike crits are not amplified.
     expect(p.critDmgHealBonus).toBeCloseTo(0.5);
     expect(p.critDmgSpellBonus).toBe(0);
     expect(p.critDmgPhysBonus).toBe(0);

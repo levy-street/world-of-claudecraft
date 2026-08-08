@@ -408,7 +408,7 @@ describe('dock flows', () => {
 });
 
 describe('abilities x collision', () => {
-  it('Heroic Leap onto the stall canopy seats on the sampled gable, and off again', () => {
+  it('Vaulting Charge onto the stall canopy seats on the sampled gable, and off again', () => {
     const sim = makeSim();
     const approachX = LEGACY_STALL.x + LEGACY_STALL_APPROACH.x * 5.5;
     const approachZ = LEGACY_STALL.z + LEGACY_STALL_APPROACH.z * 5.5;
@@ -435,7 +435,7 @@ describe('abilities x collision', () => {
     expect(p.pos.y - groundHeight(p.pos.x, p.pos.z, SEED)).toBeLessThan(0.15);
   });
 
-  it('Heroic Leap onto the crypt dais lands at the lifted floor', () => {
+  it('Vaulting Charge onto the crypt dais lands at the lifted floor', () => {
     const sim = makeSim();
     const o = instanceOrigin(DUNGEONS.hollow_crypt.index, 0);
     const d = CRYPT_LAYOUT.dais;

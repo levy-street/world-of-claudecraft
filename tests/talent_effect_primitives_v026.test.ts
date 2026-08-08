@@ -110,7 +110,7 @@ describe('Talents V2 dispel and steal primitives', () => {
   it.each([
     ['buff_sta', 10],
     ['buff_sta_pct', 20],
-  ] as const)('reverses non-player %s stat folds when Spellsteal removes them', (kind, value) => {
+  ] as const)('reverses non-player %s stat folds when Spellplunder removes them', (kind, value) => {
     const sim = new Sim({ seed: 22, playerClass: 'mage', autoEquip: true });
     const enemy = addHostile(sim);
     const baseMaxHp = enemy.maxHp;
@@ -125,7 +125,7 @@ describe('Talents V2 dispel and steal primitives', () => {
     expect(enemy.hp).toBe(Math.round(baseMaxHp * 0.5));
   });
 
-  it('starts Greater Invisibility damage reduction when Spellsteal ends the vanish', () => {
+  it('starts Greater Invisibility damage reduction when Spellplunder ends the vanish', () => {
     const sim = new Sim({ seed: 23, playerClass: 'mage', autoEquip: true });
     const enemy = addHostile(sim);
     sim.ctx.applyAura(enemy, {

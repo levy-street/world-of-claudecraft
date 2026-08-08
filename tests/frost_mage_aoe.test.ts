@@ -17,9 +17,9 @@ import type { PlayerMeta } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 import type { Entity, SimEvent } from '../src/sim/types';
 
-// Frost mage AoE half (owner design 2026-07-11): Frozen Orb, the drifting
+// Frost mage AoE half (owner design 2026-07-11): Frostglobe, the drifting
 // Icicle generator (combat/frozen_orb.ts), and Blizzard, the ground channel
-// that snares and refunds Frozen Orb cooldown per enemy struck, capped per
+// that snares and refunds Frostglobe cooldown per enemy struck, capped per
 // cast (combat/frost_mage.ts channel hooks).
 
 type TestSim = Sim & {
@@ -77,10 +77,10 @@ const knownIds = (spec: string | null): Set<string> =>
   );
 
 describe('AoE content defs', () => {
-  it('pins Frozen Orb: level 15, instant, 45s cooldown, frost-gated, orb effect', () => {
+  it('pins Frostglobe: level 15, instant, 45s cooldown, frost-gated, orb effect', () => {
     const def = ABILITIES.frozen_orb;
     expect(def).toBeDefined();
-    expect(def.name).toBe('Frozen Orb');
+    expect(def.name).toBe('Frostglobe');
     expect(def.learnLevel).toBe(15);
     expect(def.specs).toEqual(['frost']);
     expect(def.castTime).toBe(0);
@@ -92,7 +92,7 @@ describe('AoE content defs', () => {
     ]);
   });
 
-  it('unlocks Frozen Orb at level 15, not level 14', () => {
+  it('unlocks Frostglobe at level 15, not level 14', () => {
     const frostMods = computeTalentModifiers('mage', alloc('frost'));
     const at14 = abilitiesKnownAt('mage', 14, frostMods).map((known) => known.def.id);
     const at15 = abilitiesKnownAt('mage', 15, frostMods).map((known) => known.def.id);
@@ -140,7 +140,7 @@ describe('AoE content defs', () => {
   });
 });
 
-describe('Frozen Orb in combat', () => {
+describe('Frostglobe in combat', () => {
   it('release emits the one orb-flight visual event carrying the whole path', () => {
     const { sim, p } = makeSim();
     const near = spawnDummy(sim, p, 4);
@@ -188,7 +188,7 @@ describe('Frozen Orb in combat', () => {
     expect(orbState().z).toBe(zHeld);
     // The owner's rule verbatim: if the pulses are hitting someone, the orb is
     // stopped; the held second pulses the prey while the position stays pinned.
-    expect(damageEvents(held, 'Frozen Orb').length).toBeGreaterThanOrEqual(1);
+    expect(damageEvents(held, 'Frostglobe').length).toBeGreaterThanOrEqual(1);
     // Kill the prey: the next tick frees the orb and it drifts on.
     prey.hp = 1;
     (sim as any).dealDamage(p, prey, 5, false, 'frost', null, 'hit', true);
@@ -220,7 +220,7 @@ describe('Frozen Orb in combat', () => {
     p.resource = p.maxResource;
     sim.castAbility('frozen_orb');
     const events = tickFor(sim, 1.5); // first pulse fires at ~1s
-    const hits = damageEvents(events, 'Frozen Orb');
+    const hits = damageEvents(events, 'Frostglobe');
     expect(hits.length).toBeGreaterThanOrEqual(1);
     expect(hits[0].targetId).toBe(near.id);
     const slow = near.auras.find((a) => a.id === 'frozen_orb_slow');
@@ -242,9 +242,9 @@ describe('Frozen Orb in combat', () => {
     // seconds of travel before the pulse can touch the dummy.
     const travelNeeded = (14 - 6) / FROZEN_ORB_SPEED;
     const early = tickFor(sim, travelNeeded - 1);
-    expect(damageEvents(early, 'Frozen Orb')).toHaveLength(0);
+    expect(damageEvents(early, 'Frostglobe')).toHaveLength(0);
     const late = tickFor(sim, 3);
-    expect(damageEvents(late, 'Frozen Orb').length).toBeGreaterThanOrEqual(1);
+    expect(damageEvents(late, 'Frostglobe').length).toBeGreaterThanOrEqual(1);
   });
 
   it('expires after its 8s life, caps Icicles, and never grants Fingers', () => {
@@ -257,7 +257,7 @@ describe('Frozen Orb in combat', () => {
     let total = 0;
     for (let i = 0; i < 20 * 9; i++) {
       const events = sim.tick();
-      total += damageEvents(events, 'Frozen Orb').length;
+      total += damageEvents(events, 'Frostglobe').length;
       const icicles = p.auras.find((a) => a.kind === 'icicles');
       if (icicles) expect(icicles.stacks ?? 1).toBeLessThanOrEqual(ICICLE_MAX);
       expect(p.auras.some((a) => a.kind === 'fingers_of_frost')).toBe(false);
@@ -265,7 +265,7 @@ describe('Frozen Orb in combat', () => {
     expect(total).toBeGreaterThan(0);
     // Life over: two more seconds add nothing.
     const after = tickFor(sim, 2);
-    expect(damageEvents(after, 'Frozen Orb')).toHaveLength(0);
+    expect(damageEvents(after, 'Frostglobe')).toHaveLength(0);
   });
 
   it('same seed, same casts: identical orb pulse sequence (determinism)', () => {
@@ -276,7 +276,7 @@ describe('Frozen Orb in combat', () => {
       sim.drainEvents();
       p.resource = p.maxResource;
       sim.castAbility('frozen_orb');
-      return damageEvents(tickFor(sim, 9), 'Frozen Orb').map((e) => e.amount);
+      return damageEvents(tickFor(sim, 9), 'Frostglobe').map((e) => e.amount);
     };
     const first = run();
     expect(first.length).toBeGreaterThan(0);
@@ -304,7 +304,7 @@ describe('Blizzard in combat', () => {
     expect(p.cooldowns.has('blizzard')).toBe(true);
   });
 
-  it('refunds Frozen Orb cooldown per enemy struck, capped per cast, and re-arms next cast', () => {
+  it('refunds Frostglobe cooldown per enemy struck, capped per cast, and re-arms next cast', () => {
     const { sim, p } = makeSim();
     const pack = [spawnDummy(sim, p, 10), spawnDummy(sim, p, 12), spawnDummy(sim, p, 11)];
     face(p, pack[0]);

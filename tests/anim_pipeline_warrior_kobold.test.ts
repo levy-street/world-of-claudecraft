@@ -1,5 +1,5 @@
 // Warrior/kobold batch of the large-scale animation authoring initiative
-// (issue #2889): a bespoke warrior movement clip (Heroic Leap) plus six more
+// (issue #2889): a bespoke warrior movement clip (Vaulting Charge) plus six more
 // attackByAbility entries added to the class's existing extensive coverage,
 // each verified to actually reach CharacterVisual.playAttack at runtime (see
 // scripts/build_warrior_ability_anims.mjs's header for the render-dispatch

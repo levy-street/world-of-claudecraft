@@ -63,7 +63,7 @@ describe('every retained active row grant casts through the canonical Sim path',
         if (grant.abilityId === 'victory_rush') {
           sim.ctx.applyAura(player, {
             id: 'victory_rush_window',
-            name: 'Victory Rush',
+            name: "Victor's Surge",
             kind: 'victory_rush',
             remaining: 20,
             duration: 20,

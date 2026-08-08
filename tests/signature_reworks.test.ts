@@ -33,7 +33,7 @@ function addAlly(sim: Sim, x: number, z: number, hp = 100): Entity {
 }
 
 describe('reworked signatures', () => {
-  it('Conflagrate and Swiftmend use the retuned cooldowns (6s / 8s)', () => {
+  it('Conflagrate and Fleetmend use the retuned cooldowns (6s / 8s)', () => {
     const lock = makeSim('warlock', 'destruction');
     expect(lock.resolvedAbility('conflagrate')?.cooldown).toBe(6);
     const druid = makeSim('druid', 'restoration');

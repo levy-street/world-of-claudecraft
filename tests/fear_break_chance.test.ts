@@ -10,7 +10,7 @@ import type { Aura, Entity } from '../src/sim/types';
 // min(1, amount / (scale * maxHp)), so big hits reliably break it and dot
 // ticks usually do not (the classic behavior that makes dot-then-fear a
 // warlock rotation instead of an anti-combo). Plain incapacitates (Eye Jab,
-// Wyvern Sting, Startle Shot) keep the classic break-on-any-damage rule, and
+// Drakesting, Startle Shot) keep the classic break-on-any-damage rule, and
 // the warrior Lingering Dread soak threshold is unchanged.
 
 function addTarget(sim: Sim, distance: number, level = 20): Entity {
