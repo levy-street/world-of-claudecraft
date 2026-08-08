@@ -24,7 +24,12 @@ phase (fishing-precedent reword); (d) delivery followed D22: no push, no PR; the
 branch merged --no-ff into feature/farming-plan and the would-be PR body lives in
 progress.md; (e) the blast-radius list gained the sites discovered in flight
 (gather_tool_tooltip KIND_KEYS and Partial neighbours, gather_node_tooltip maps,
-the two-key guide count prose).
+the two-key guide count prose). This block's lettering is NOT canonical:
+state.md's "Locked deviations" ledger is, and it enumerates seven entries
+(a) to (g) covering both files' sets (harmonized in Phase 1 QA). Phase 1 QA
+passed 2026-08-08, PASS-WITH-FOLLOWUPS: five findings fixed on
+fix/farming-phase-01-qa (the char sheet farming icon fallback among them),
+deferrals ledgered; full record in progress.md's Phase 1 QA notes.
 
 ### Starter Prompt
 

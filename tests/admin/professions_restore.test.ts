@@ -282,6 +282,12 @@ describe('restoreSlotBodyError refuses statically impossible pairs before any au
     expect(restoreSlotBodyError({ professionId: 'mining', effectId: 'quickening_charm' })).toBe(
       'that effect cannot be slotted on that profession',
     );
+    // Farming joined shipless (no hoe until its tool phase), a third static
+    // class: the REST validator must refuse it HERE, ahead of the audit
+    // write, not just the sim action layer that re-checks defensively.
+    expect(restoreSlotBodyError({ professionId: 'farming', effectId: 'gatherers_cache' })).toBe(
+      'that effect cannot be slotted on that profession',
+    );
     // A valid pair still passes: the policy gate must not over-refuse.
     expect(
       restoreSlotBodyError({ professionId: 'mining', effectId: 'gatherers_cache' }),

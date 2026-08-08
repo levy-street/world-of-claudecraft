@@ -382,7 +382,8 @@ export type ResolvedSlotToolEffect =
  *   - a profession id that is not a gathering profession
  *   - an effect id absent from the live catalog
  *   - a pair the slot POLICY refuses (`slotToolEffectRefused` below: the
- *     Springback Charm everywhere, every effect on fishing)
+ *     Springback Charm everywhere, every effect on fishing, and every effect
+ *     on farming until its hoe phase lifts the shipless refusal)
  *   - any confirm mode outside the union. A malformed value is refused
  *     OUTRIGHT rather than falling back; 'prompt' is accepted since the R40
  *     confirm flow shipped: the harvest command carries the per-use consent

@@ -20,6 +20,13 @@ demanding an isolated golden commit), expect six commits not five, and expect th
 Master Gatherer roster prose reword (deeds.ts desc, 18 dropped locale desc fills,
 three reworded gatherDeeds bodies with 15 non-Latin fills) inside this phase.
 
+QA EXECUTED 2026-08-08, verdict PASS-WITH-FOLLOWUPS: the second release absorb
+(merge a9959c3670) landed first with the release-merge-audit clean and parity
+re-proven byte-identical; the 8-agent audit found 0 BLOCKING; five findings were
+fixed on fix/farming-phase-01-qa (merged --no-ff, branch deleted) and six
+mutation checks all killed. Deferrals and the deviation-lettering harmonization
+are recorded in progress.md's Phase 1 QA notes and state.md's ledgers.
+
 ### QA Starter Prompt
 
 ```

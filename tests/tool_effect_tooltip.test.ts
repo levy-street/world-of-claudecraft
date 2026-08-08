@@ -75,6 +75,15 @@ describe('toolEffectTooltipLines: live charms', () => {
     // audit write; the hoe phase lifts the refusal arm and these pins with it.
     expect(slotToolEffectRefused('farming', 'gatherers_cache')).toBe(true);
     expect(slotToolEffectRefused('farming', 'artisans_eye')).toBe(true);
+    // Self-clearing tripwire, the PENDING_ART_IDS idiom: the static farming
+    // refusal is only honest while no farming gatherTool exists. The first
+    // hoe reds this pin, forcing the refusal arm in slotToolEffectRefused
+    // and the two pins above to be lifted in the same change.
+    expect(
+      Object.values(ITEMS).filter(
+        (item) => item.use?.type === 'gatherTool' && item.use.professionId === 'farming',
+      ),
+    ).toEqual([]);
   });
 });
 

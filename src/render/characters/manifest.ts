@@ -2147,10 +2147,7 @@ export const VISUALS: Record<string, VisualDef> = {
     // Treant_Attack clip donor (scripts/build_treant_anims.mjs): mesh-free,
     // baked off this same rig's own poses. Loads alongside the yeti's
     // hit-variety donor GLB; both are mesh-free so their clips just merge in.
-    animUrls: [
-      `${CREATURES}/yeti_hit_variety_anims.glb`,
-      `${CREATURES}/treant_ability_anims.glb`,
-    ],
+    animUrls: [`${CREATURES}/yeti_hit_variety_anims.glb`, `${CREATURES}/treant_ability_anims.glb`],
     tint: 'entity',
     tintStrength: 0.72, // the white pelt needs a heavy wash to read as moss
   },

@@ -4,7 +4,10 @@ Read this file first in every phase session. It is the single authority for lock
 decisions. If a phase file contradicts this file, this file wins and the phase file
 gets swept in the same pass (amend the QA twin too, always).
 
-Current phase: none started. Packet authored 2026-08-07 off release/v0.36.0.
+Current phase: Phase 1 done, QA passed 2026-08-08 (PASS-WITH-FOLLOWUPS); Phase 2
+next. Packet authored 2026-08-07 off release/v0.36.0; the branch has absorbed
+release/v0.36.0 through 6ed4d7e12c (second absorb 2026-08-08, release-merge-audit
+clean, parity re-proven byte-identical on the merged HEAD).
 Working tree: ALL farming work happens in the persistent worktree
 `~/Documents/woc-farming-plan`. Other sessions share the main checkout; never work there.
 
@@ -216,6 +219,10 @@ visit or a punishment for lateness is violating the design, not tuning it.
 
 ## Tick and hook points (verified against release/v0.36.0)
 
+Verified at packet authoring; the branch has absorbed newer v0.36.0 tips since
+(6ed4d7e12c as of 2026-08-08), so each phase start re-verifies the hook points
+it is about to use.
+
 - The per-tick driver `updateFarming(ctx)` APPENDS after `updateProfNudges(this.ctx)`
   and before `deedsMod.updateDeeds(this.ctx)` in `Sim.tick` (append, never reorder: the
   shared rng stream makes reordering fork every golden). It draws no rng (D4) and does
@@ -276,8 +283,11 @@ each bites the phase that ships the named feature):
   and `slotToolEffectRefused` (`src/sim/professions/tools.ts`) statically REFUSES
   every farming pair (Phase 1 QA finding: without it the admin restore path accepted
   farming pairs it could never grant); the hoe phase LIFTS that refusal arm and its
-  pins (tool_effect_tooltip and professions_admin_restore suites) when the first
-  farming gatherTool lands. The growth phase also deletes or inverts the structural
+  pins (tool_effect_tooltip and professions_admin_restore suites, plus the
+  Phase-1-QA additions: the self-clearing no-farming-gatherTool tripwire in
+  tests/tool_effect_tooltip.test.ts and the restoreSlotBodyError farming case in
+  tests/admin/professions_restore.test.ts, both of which red the moment the first
+  farming gatherTool lands) when the first farming gatherTool lands. The growth phase also deletes or inverts the structural
   ungainability pin in tests/professions_gathering.test.ts. The wiki page's tools and
   nodes sections length-guard (Phase 1 QA finding: an empty nodes array rendered
   "respawns for you 0 seconds"); the phase that ships farming tools or beds gets those
@@ -292,7 +302,9 @@ each bites the phase that ships the named feature):
   FRONT of the wire array (declared contract, but expect the shift).
 - The growth phase (first phase where farming proficiency can exceed 0): the parity
   omit-defaults shield ends there (a nonzero farming key enters the state sample), so
-  THAT phase re-runs the full golden regen Phase 1 proved unnecessary; SimEvent
+  THAT phase re-runs the full golden regen Phase 1 proved unnecessary; it also raises
+  GAINABLE_GATHERING_PROFESSIONS in tests/deeds_content.test.ts (the any-N cap guard
+  is one-directional and nothing else reds when farming becomes gainable); SimEvent
   payloads must never carry a whole proficiency record (event digests hash with
   omitDefaults false, so a zero key WOULD move them); and the legacy `professions`
   dual-write rollback caveat becomes real (an older binary normalizes over four ids
@@ -303,12 +315,18 @@ each bites the phase that ships the named feature):
   whatBody/gatherHubBody and the count-bearing gatherDeeds rows.
 - Pre-existing stale comments inherited, not fixed (outside the Phase 1 diff):
   `src/sim/types.ts` "over the three professions", `src/net/online.ts` gprof comments
-  "(Mining/Logging/Herbalism, #1119)" twice.
+  "(Mining/Logging/Herbalism, #1119)" twice, the `src/guide/pages/professions.ts`
+  header ("the four gathering professions"), and `scripts/load_professions.mjs`
+  GATHER_PROFS (a three-id literal that never gained fishing or farming; bench
+  tooling only).
 
 Data-driven sites that just work once the content row exists: `emptyGatheringProficiency`,
 `normalizeGatheringProficiency`, `gatheringSkillsView`, the tools and wield-gate
 walkers, `characterProfessionsSheet`, `buildGatheringProficiencyRows`, the professions
-window gathering section, the wiki generator (auto-adds the farming page; but see the
+window gathering section (Phase 1 QA correction: an icon SITE only just-works if it
+resolves through `professionIconUrl`, the art-or-procedural resolver;
+`professionImageUrl` alone paints nothing for a pending-art id, which is how the char
+sheet farming row shipped iconless until the QA round), the wiki generator (auto-adds the farming page; but see the
 silent-miss list above: the guide summary prose does NOT update itself, and the
 generated farming page takes the node-profession arm of
 `src/guide/pages/professions_gathering.ts`, rendering node-harvest prose with empty
@@ -448,7 +466,14 @@ question does not arise (farming has no station).
   commit); (d) Master Gatherer roster prose pulled INTO Phase 1 from the deeds
   phase (fishing-precedent reword, all three reviewers concurring); (e) the
   GATHERING_PROFESSION_IDS comment was amended, not preserved verbatim (it names
-  the appended professions).
+  the appended professions); (f) delivery followed D22: no push, no PR, the
+  phase branch merged --no-ff into feature/farming-plan and the would-be PR
+  body lives in progress.md (the phase file letters this (d)); (g) the
+  blast-radius list gained the sites discovered in flight: gather_tool_tooltip
+  KIND_KEYS and its Partial neighbours, the gather_node_tooltip maps, the
+  two-key guide count prose (the phase file letters this (e)). THIS ledger's
+  lettering is canonical; the phase file's five-letter block differs and
+  points here (harmonized in Phase 1 QA, 2026-08-08).
 - Dev command surface: (Phase 3 records the exact /dev farm cheat names here at
   completion; Phases 7 and 8 depend on them for dev-created crops)
 

@@ -333,7 +333,6 @@ describe('profession webp icons', () => {
       ).toBe(true);
       const url = professionIconUrl(id, 46);
       expect(url, `${id} must compose a procedural icon`).toBe(STUB_DATA_URL);
-      expect((url as string).length, `${id} procedural icon must be non-empty`).toBeGreaterThan(0);
     }
   });
 
