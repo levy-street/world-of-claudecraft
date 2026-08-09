@@ -8911,6 +8911,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.farming.denied.not_ready': 'Этот урожай еще растет.',
   'hudChrome.farming.denied.no_plot': 'На этой грядке ничего не посажено.',
   'hudChrome.farming.denied.no_husks': 'У вас недостаточно засохшей шелухи.',
+  'hudChrome.farming.denied.no_compost': 'У вас нет компоста.',
+  'hudChrome.farming.denied.no_fee_produce': 'У вас нет урожая, чтобы оплатить присмотр.',
+  'hudChrome.farming.denied.no_tonic': 'У вас нет тоника роста.',
   'hudChrome.farming.husksConvertedLine':
     'Вы обмениваете засохшую шелуху ({husks} шт.) на {name}.',
   'hudChrome.farming.husksConvertedLineQty':

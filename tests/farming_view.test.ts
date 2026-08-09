@@ -34,6 +34,9 @@ describe('farmDeniedLineKey', () => {
       'not_ready',
       'no_plot',
       'no_husks',
+      'no_compost',
+      'no_fee_produce',
+      'no_tonic',
     ];
     const keys = reasons.map((r) => farmDeniedLineKey(r));
     expect(keys).toEqual([
@@ -46,6 +49,9 @@ describe('farmDeniedLineKey', () => {
       'hudChrome.farming.denied.not_ready',
       'hudChrome.farming.denied.no_plot',
       'hudChrome.farming.denied.no_husks',
+      'hudChrome.farming.denied.no_compost',
+      'hudChrome.farming.denied.no_fee_produce',
+      'hudChrome.farming.denied.no_tonic',
     ]);
     // Every key must actually EXIST: t() throws on an untracked key in test,
     // so this is what a leaf missing from the catalog fails on rather than a

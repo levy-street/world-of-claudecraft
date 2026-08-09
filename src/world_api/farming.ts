@@ -1,7 +1,11 @@
 import type { FarmPatchDef } from '../sim/content/farm_patches';
-import type { FarmPlotStatus, FarmPlotView } from '../sim/professions/farm_projection';
+import type {
+  FarmPlantKnobs,
+  FarmPlotStatus,
+  FarmPlotView,
+} from '../sim/professions/farm_projection';
 
-export type { FarmPatchDef, FarmPlotStatus, FarmPlotView };
+export type { FarmPatchDef, FarmPlantKnobs, FarmPlotStatus, FarmPlotView };
 
 // Farming, the fifth gathering profession: the static garden-bed geography
 // plus the caller's OWN plot state, and the commands that mutate it (plant,
@@ -35,20 +39,28 @@ export interface IWorldFarming {
   // duration field (the RaidLockout msRemaining template), which lands with
   // the first timer surface.
   myFarmPlots: readonly FarmPlotView[];
-  // Sow `cropId` into the garden bed `bedId`. Server-authoritative in the
+  // Sow `cropId` into the garden bed `bedId`, with the optional plant-time
+  // knob payload (compost, farmer's watch, growth tonic: every choice is
+  // front-loaded at plant time per D8, so the knobs ride THIS call and there
+  // is no later knob command). Server-authoritative in the
   // strongest sense this profession has: the Sim re-validates the bed id
   // against FARM_BED_IDS, the crop id against the crop catalog, that the bed
-  // is free FOR THIS PLAYER, the farming skill threshold, and that a seed is
-  // actually in the sender's bags (the hoe-tier and wield gates are DEFERRED
-  // to the crop-ladder phase: no farming tool kind exists yet),
-  // then consumes the seed and pre-rolls the WHOLE growth script (the hidden
-  // survival outcomes and the yield seed) in one contiguous rng block. The
-  // wire carries two ids and nothing else: no item payload, no roll, no
-  // deadline, so a client can neither choose its own outcome nor learn it.
-  // ClientWorld sends the plant_crop command and never predicts: the new plot
-  // row arrives on the `fplot` self delta and the outcome as a text-free
-  // id-carrying SimEvent.
-  plantCrop(bedId: string, cropId: string): void;
+  // is free FOR THIS PLAYER, the farming skill threshold, that a seed is
+  // actually in the sender's bags, and that every REQUESTED knob can be paid
+  // from those bags (compost and tonic by count, the watch fee by the
+  // tier-scaled produce plan in farm_watch_fee.ts); a knob that cannot be
+  // paid denies the whole plant with nothing consumed (the hoe-tier and
+  // wield gates are DEFERRED to the crop-ladder phase: no farming tool kind
+  // exists yet). It then consumes the seed plus the requested knob payments
+  // and pre-rolls the WHOLE growth script (the hidden survival outcomes and
+  // the yield seed) in one contiguous rng block, IDENTICAL under every knob
+  // combination. The wire carries the two ids plus up to three literal-true
+  // knob booleans and nothing else: no item payload, no roll, no deadline,
+  // so a client can neither choose its own outcome nor learn it. ClientWorld
+  // sends the plant_crop command and never predicts: the new plot row
+  // arrives on the `fplot` self delta (its knob flags included) and the
+  // outcome as a text-free id-carrying SimEvent.
+  plantCrop(bedId: string, cropId: string, knobs?: FarmPlantKnobs): void;
   // Pull the crop out of the garden bed `bedId`. Same authority split: the
   // Sim re-validates the bed id, that the plot is the SENDER'S, and that it
   // is ready or withered, then resolves the yield from the pre-rolled hidden

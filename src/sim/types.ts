@@ -5697,8 +5697,13 @@ export type SimEvent = { pid?: number } & (
         | 'not_ready'
         | 'no_plot'
         // The knobs phase, appended (wire enums are never reordered):
-        // convert_husks with fewer husks than one batch costs.
-        | 'no_husks';
+        // convert_husks with fewer husks than one batch costs, then the
+        // three plant-time knob payments that could not be met (each denies
+        // the WHOLE plant with nothing consumed and zero draws).
+        | 'no_husks'
+        | 'no_compost'
+        | 'no_fee_produce'
+        | 'no_tonic';
       bedId?: string;
       cropId?: string;
     }

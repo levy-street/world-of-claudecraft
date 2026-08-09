@@ -14,9 +14,11 @@
 //
 // DRAW CONTRACT (the D4 determinism contract, stated here and pinned in
 // tests/professions_farming.test.ts):
-//   plant, success ......... EXACTLY 2 ctx.rng draws, one contiguous block
-//   plant, every deny arm .. 0
-//   harvest, any outcome ... 0
+//   plant, success ......... EXACTLY 2 ctx.rng draws, one contiguous block,
+//                            IDENTICAL UNDER EVERY KNOB COMBINATION
+//   plant, every deny arm .. 0 (the knob-payment denies included)
+//   harvest, any outcome ... 0 (toniced included)
+//   convert_husks .......... 0 (both outcomes)
 //   growth deadline passing  0 (nothing runs at expiry: there is no timer)
 //   login / save+load ...... 0
 //   the tick sweep ......... 0 (updateFarming below draws nothing)
@@ -27,6 +29,13 @@
 // NEVER through ctx.rng and never through Math.random: seed expansion of an
 // already-drawn value is not a new draw, which is what keeps a harvest
 // draw-free no matter when, or on which host, it happens.
+//
+// THE KNOBS RULE, the phase's one hard law: KNOB EFFECTS NEVER CHANGE THE
+// NUMBER OF RNG DRAWS. THEY CHANGE THRESHOLDS APPLIED TO ALREADY-DRAWN VALUES
+// (compost and the watch raise the survival chance the stored roll is
+// compared against; the tonic reads FURTHER into the mulberry32 expansion of
+// the stored yield seed), SO THE CONTRACT ABOVE SURVIVES EVERY KNOB
+// COMBINATION, and the UNTONICED expansion stays bit-identical per seed.
 //
 // VISUAL GROWTH STAGES are DERIVED, never stored, and are named here so the
 // render phase has one definition to read rather than inventing a second. A
@@ -39,6 +48,7 @@
 
 import {
   FARM_COMPOST_ITEM_ID,
+  FARM_GROWTH_TONIC_ITEM_ID,
   FARM_WITHERED_HUSK_ITEM_ID,
   type FarmCropDef,
   farmCropById,
@@ -50,7 +60,8 @@ import { forceDismount } from '../mounts';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { type Entity, FARMING_CAST_ID, INTERACT_RANGE, isConsuming } from '../types';
-import { farmPlotSurvived, type PlotState } from './farm_projection';
+import { type FarmPlantKnobs, farmPlotSurvived, type PlotState } from './farm_projection';
+import { planWatchFee, type WatchFeeLeg } from './farm_watch_fee';
 import { queueGatheringGrant } from './gathering';
 
 // The survival ramp lives with the STATUS it decides (farm_projection.ts, the
@@ -91,6 +102,14 @@ export const FARM_KEEP_CHANCE_SKILL_SCALE = 0.35;
 // yield value without touching yield count.
 export const FARM_FINE_CHANCE_BASE = 0.02;
 export const FARM_FINE_CHANCE_SKILL_SCALE = 0.08;
+// The growth tonic's yield arm (D7: one knob one job, tonic is yield). A
+// tonic armed at plant time gives the harvest ONE further roll against this
+// chance; a win adds the flat bonus picks below, granted at BASE grade. Both
+// TUNING, PROVISIONAL, FLAGGED FOR THE MAINTAINER: a coin flip for two extra
+// picks is "a chance of a mildly larger harvest" against the guaranteed
+// floor of 3, an expected value of one pick per tonic.
+export const FARM_TONIC_BONUS_CHANCE = 0.5;
+export const FARM_TONIC_BONUS_PICKS = 2;
 // The skill the scales above are expressed against: the farming proficiency
 // cap (GATHERING_PROFESSIONS.farming maxSkill), so "at the cap" reads
 // literally in the formulas.
@@ -105,8 +124,16 @@ export const FARM_WITHERED_HUSK_COUNT = 2;
 // material taxonomy can read it as data without importing this engine module;
 // re-exported here because this is where callers and tests reach for it.
 export { FARM_WITHERED_HUSK_ITEM_ID };
-// The knob-supply ids, same content-layer home and re-export rationale.
-export { FARM_COMPOST_ITEM_ID, FARM_GROWTH_TONIC_ITEM_ID } from '../content/farm_crops';
+// The knob-supply ids, same content-layer home and re-export rationale; the
+// knob payload type and the fee planner ride along for the same reason.
+export { FARM_COMPOST_ITEM_ID, FARM_GROWTH_TONIC_ITEM_ID };
+export type { FarmPlantKnobs } from './farm_projection';
+export {
+  FARM_WATCH_FEE_BY_TIER,
+  eligibleWatchFeeItemIds,
+  planWatchFee,
+  watchFeeAmount,
+} from './farm_watch_fee';
 
 // How many husks one compost costs at the farmer's trade (convertHusks
 // below). TUNING, PROVISIONAL, FLAGGED FOR THE MAINTAINER: a failed crop pays
@@ -181,11 +208,12 @@ function mulberry32(seed: number): () => number {
 }
 
 export interface FarmHarvestYield {
-  /** Base-grade units granted. */
+  /** Base-grade units granted (tonic bonus picks included: they land at base
+   *  grade, see resolveFarmHarvest). */
   count: number;
   /** Fine-grade units granted; picks that upgraded, so count + fine = picks. */
   fine: number;
-  /** Total picks the lives loop resolved. */
+  /** Total picks resolved: the lives loop plus any tonic bonus. */
   picks: number;
 }
 
@@ -202,8 +230,21 @@ export interface FarmHarvestYield {
  *  Reading the CURRENT skill rather than a plant-time snapshot is the same
  *  player-favorable rule the survival ramp uses: proficiency only ever rises,
  *  so a plot left in the ground while its owner improves pays better, never
- *  worse. Lateness itself is not an input (the anti-chore invariant). */
-export function resolveFarmHarvest(yieldSeed: number, skill: number): FarmHarvestYield {
+ *  worse. Lateness itself is not an input (the anti-chore invariant).
+ *
+ *  THE TONIC ARM IS SEED EXPANSION, NOT A DRAW (the knobs phase, and the caps
+ *  rule the whole phase answers to): an armed tonic reads ONE further value
+ *  from the SAME mulberry32 stream, after the lives loop, and a win adds the
+ *  flat bonus at base grade. The untoniced path never reaches that read, so
+ *  its expansion is bit-identical to the pre-knob code for every seed (the
+ *  same-seed determinism pin and the anti-chore late-harvest equality both
+ *  guard this), and the stream position depends only on the INPUTS (seed,
+ *  skill, the tonic flag), never on an outcome. */
+export function resolveFarmHarvest(
+  yieldSeed: number,
+  skill: number,
+  tonic = false,
+): FarmHarvestYield {
   const next = mulberry32(yieldSeed);
   const keepChance = Math.min(
     1,
@@ -225,7 +266,18 @@ export function resolveFarmHarvest(yieldSeed: number, skill: number): FarmHarves
     if (keepRoll >= keepChance) lives--;
     if (fineRoll < fineChance) fine++;
   }
-  return { count: picks - fine, fine, picks };
+  let bonus = 0;
+  if (tonic) {
+    // The one tonic read (see the banner above). The roll happens whether or
+    // not it wins, so the toniced stream shape is regular too: exactly one
+    // read past the loop, every time.
+    const bonusRoll = next();
+    if (bonusRoll < FARM_TONIC_BONUS_CHANCE) bonus = FARM_TONIC_BONUS_PICKS;
+  }
+  // Bonus picks land at BASE grade: the tonic's job is a mildly larger
+  // harvest (D7, one knob one job), not a second fine roll, and `count + fine
+  // = picks` stays the one shape every consumer may rely on.
+  return { count: picks - fine + bonus, fine, picks: picks + bonus };
 }
 
 /** The four derived visual growth stages (see the banner). Pure, stateless,
@@ -285,26 +337,35 @@ function farmingSkillOf(meta: PlayerMeta): number {
 // plantCrop
 // ---------------------------------------------------------------------------
 
-/** Put a crop in a bed.
+/** Put a crop in a bed, with every plant-time choice riding the same call.
  *
  *  THE PLANT RESOLVES AT COMMAND TIME. Everything that decides an outcome (the
- *  seed consumption, the two-draw pre-roll, the plot write, the event) happens
- *  here, before the cast even starts; the cast is pure flavor. That is a
- *  DELIBERATE deviation from every other non-spell cast in the codebase, where
- *  the completion does the work, and its consequence is the point: damage
- *  cancelling the cast leaves the plant standing, because the crop is already
- *  in the ground. A player who is interrupted mid-animation has still planted,
- *  and has not lost the seed for nothing.
+ *  seed and knob consumption, the two-draw pre-roll, the plot write, the
+ *  event) happens here, before the cast even starts; the cast is pure flavor.
+ *  That is a DELIBERATE deviation from every other non-spell cast in the
+ *  codebase, where the completion does the work, and its consequence is the
+ *  point: damage cancelling the cast leaves the plant standing, because the
+ *  crop is already in the ground. A player who is interrupted mid-animation
+ *  has still planted, and has not lost the seed for nothing.
  *
  *  Gate order is STATED and checked top to bottom. Every deny arm returns
- *  early and draws ZERO rng, so a refused plant can never move the shared rng
- *  stream a harvest or a mob roll walks. */
+ *  early, draws ZERO rng and consumes NOTHING, so a refused plant can never
+ *  move the shared rng stream a harvest or a mob roll walks, and never costs
+ *  an item: the knob gates below are affordability CHECKS, and every payment
+ *  is spent together after the last gate has passed.
+ *
+ *  THE KNOBS BEND THRESHOLDS, NEVER THE DRAW COUNT (the phase's one hard
+ *  rule): a knobbed plant draws the same two values a plain plant draws, and
+ *  the flags stored on the plot change only what those already-drawn values
+ *  are later compared against (survival) or how the stored seed expands
+ *  (tonic). The draw pin covers every knob combination. */
 export function plantCrop(
   ctx: SimContext,
   p: Entity,
   meta: PlayerMeta,
   bedId: string,
   cropId: string,
+  knobs: FarmPlantKnobs = {},
 ): void {
   // 1. Dead. The family's shared error line (already matcher-covered), never
   //    a farmDenied reason: no new wire enum arm for a state every command
@@ -361,7 +422,39 @@ export function plantCrop(
     ctx.emit({ type: 'farmDenied', pid: meta.entityId, reason: 'no_seed', bedId, cropId });
     return;
   }
-  // 9. THE HOE GATE IS DEFERRED TO THE CROP-LADDER PHASE, and the omission is
+  // 9 to 11: the knob gates (the knobs phase), in the payload's own order:
+  // compost, then the watch fee, then the tonic. AFFORDABILITY CHECKS ONLY. A
+  // requested knob that cannot be paid denies the WHOLE plant with nothing
+  // consumed and zero draws; every payment is spent together below, after the
+  // deliberate-action trio, beside the seed. An unrequested knob is never
+  // checked: a plain plant must not start failing because a supply item ran
+  // out.
+  const wantCompost = knobs.compost === true;
+  const wantWatch = knobs.watch === true;
+  const wantTonic = knobs.tonic === true;
+  // 9. Compost in bags (one per plant).
+  if (wantCompost && ctx.countItem(FARM_COMPOST_ITEM_ID, meta.entityId) < 1) {
+    ctx.emit({ type: 'farmDenied', pid: meta.entityId, reason: 'no_compost', bedId, cropId });
+    return;
+  }
+  // 10. The watch fee: tier-scaled produce in kind, planned here and spent
+  //     below. The predicate and the deterministic consumption order live in
+  //     farm_watch_fee.ts (any farming produce of the crop's tier or below,
+  //     mixed kinds allowed, cheapest first).
+  let feePlan: readonly WatchFeeLeg[] | null = null;
+  if (wantWatch) {
+    feePlan = planWatchFee(crop.tier, (itemId) => ctx.countItem(itemId, meta.entityId));
+    if (!feePlan) {
+      ctx.emit({ type: 'farmDenied', pid: meta.entityId, reason: 'no_fee_produce', bedId, cropId });
+      return;
+    }
+  }
+  // 11. Tonic in bags (one per plant).
+  if (wantTonic && ctx.countItem(FARM_GROWTH_TONIC_ITEM_ID, meta.entityId) < 1) {
+    ctx.emit({ type: 'farmDenied', pid: meta.entityId, reason: 'no_tonic', bedId, cropId });
+    return;
+  }
+  // 12. THE HOE GATE IS DEFERRED TO THE CROP-LADDER PHASE, and the omission is
   //    verified rather than assumed. The gate would read
   //    canGatherTier(<owned farming tool tier>, crop.tier), and the honest
   //    ownership scans (bestOwnedGatherToolTierOrNone, and the wield-filtered
@@ -393,9 +486,17 @@ export function plantCrop(
     p.mountCastKey = '';
   }
 
-  // The seed is spent BEFORE the pre-roll, so the draw block below is the last
-  // thing that happens and every path reaching it is committed.
+  // The seed and every requested knob are spent together BEFORE the pre-roll,
+  // so the draw block below is the last thing that happens and every path
+  // reaching it is committed. Payments are pure removeItem field work
+  // (draw-free), and each was proven affordable by its gate above, in this
+  // same synchronous body, so none can come up short here.
   ctx.removeItem(crop.seedItemId, 1, meta.entityId);
+  if (wantCompost) ctx.removeItem(FARM_COMPOST_ITEM_ID, 1, meta.entityId);
+  if (feePlan) {
+    for (const leg of feePlan) ctx.removeItem(leg.itemId, leg.count, meta.entityId);
+  }
+  if (wantTonic) ctx.removeItem(FARM_GROWTH_TONIC_ITEM_ID, 1, meta.entityId);
 
   // ---- THE ONE PRE-ROLL BLOCK: EXACTLY TWO DRAWS, CONTIGUOUS, IN ORDER ----
   // Nothing may be inserted between, before, or after these two lines that
@@ -425,12 +526,12 @@ export function plantCrop(
     readyAtMs: now + crop.durationMs,
     survivalRoll,
     yieldSeed,
-    // The three knobs are declared off; the knobs phase is the only thing
-    // that ever sets them, and it sets them HERE, at plant time (front-loaded
-    // choice: there is no mid-growth interaction of any kind).
-    compost: false,
-    watch: false,
-    tonic: false,
+    // The three knobs are set HERE, at plant time, and never again
+    // (front-loaded choice: there is no mid-growth interaction of any kind).
+    // Each flag is true exactly when its payment was consumed above.
+    compost: wantCompost,
+    watch: wantWatch,
+    tonic: wantTonic,
     notified: false,
   };
   insertPlotSorted(meta.farmPlots, bedId, plot);
@@ -577,7 +678,10 @@ export function harvestCrop(ctx: SimContext, p: Entity, meta: PlayerMeta, bedId:
   // a replacement for a lost slot, so this is unreachable for any real plot,
   // and where it is reachable at all a deterministic harvest beats a refusal.
   const yieldSeed = Number.isFinite(plot.yieldSeed) ? (plot.yieldSeed as number) : 0;
-  const { count, fine } = resolveFarmHarvest(yieldSeed, skill);
+  // The tonic flag stored at plant time arms the bonus arm of the expansion
+  // (one further read of the same stream, never a ctx.rng draw; see the
+  // resolveFarmHarvest banner).
+  const { count, fine } = resolveFarmHarvest(yieldSeed, skill, plot.tonic === true);
   // Deliberately NOT capacity-gated. A crop the player already grew must not
   // be destroyed by full bags (nothing rots, and a refusal here would BE a
   // rot), so the grant force-adds over capacity exactly like the quest-catch

@@ -6739,8 +6739,9 @@ export class GameServer {
         // Farming's growth phase. TYPE boundary only: the sim is the single
         // definition of legality, and it re-validates the bed id against
         // FARM_BED_IDS, the crop id against the crop catalog, that the bed is
-        // free for THIS player, the skill threshold, and the seed in the
-        // sender's own bags (the hoe-tier gate is deferred to the crop-ladder
+        // free for THIS player, the skill threshold, the seed in the
+        // sender's own bags, and that every REQUESTED knob can be paid from
+        // those bags (the hoe-tier gate is deferred to the crop-ladder
         // phase). Nothing here normalizes or defaults an
         // id, for the slot_tool_effect reason above: laundering an unknown id
         // would hand the sim a value it never saw and make the two hosts
@@ -6751,8 +6752,32 @@ export class GameServer {
         // per-tick diff: the seed spend bumps meta.wireRev (a heavyDue input)
         // and `plant_crop` is also a HEAVY_SELF_CMDS member, either of which is
         // sufficient. See the HEAVY_SELF_CMDS entry for which does the work.
-        if (typeof msg.bed === 'string' && typeof msg.crop === 'string') {
-          sim.plantCrop(msg.bed, msg.crop, pid);
+        //
+        // The knob fields (the knobs phase) are guarded PER FIELD like the
+        // ids: present-but-not-boolean refuses the whole frame, because
+        // coercing a junk value into a knob choice would be the same
+        // laundering the id rule forbids. Absent and false are the SAME
+        // protocol statement (knob not requested; the client omits unset
+        // knobs so a plain plant's frame stays byte-identical to the pre-knob
+        // wire), so the strict `=== true` mapping below is the frame
+        // contract, not a default.
+        if (
+          typeof msg.bed === 'string' &&
+          typeof msg.crop === 'string' &&
+          (msg.compost === undefined || typeof msg.compost === 'boolean') &&
+          (msg.watch === undefined || typeof msg.watch === 'boolean') &&
+          (msg.tonic === undefined || typeof msg.tonic === 'boolean')
+        ) {
+          sim.plantCrop(
+            msg.bed,
+            msg.crop,
+            {
+              compost: msg.compost === true,
+              watch: msg.watch === true,
+              tonic: msg.tonic === true,
+            },
+            pid,
+          );
         }
         break;
       case 'harvest_crop':

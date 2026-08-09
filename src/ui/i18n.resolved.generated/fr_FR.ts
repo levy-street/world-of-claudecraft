@@ -2732,7 +2732,10 @@ export const fr_FR: EnTranslations = {
         "no_seed": "You have no seed for that crop.",
         "not_ready": "That crop is still growing.",
         "no_plot": "Nothing is planted in that bed.",
-        "no_husks": "You do not have enough withered husks."
+        "no_husks": "You do not have enough withered husks.",
+        "no_compost": "You have no compost.",
+        "no_fee_produce": "You have no produce to pay the watch fee.",
+        "no_tonic": "You have no growth tonic."
       },
       "husksConvertedLine": "You trade {husks} withered husks for {name}.",
       "husksConvertedLineQty": "You trade {husks} withered husks for {name} x{qty}."

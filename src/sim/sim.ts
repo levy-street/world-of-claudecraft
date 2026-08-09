@@ -394,6 +394,7 @@ import {
 } from './professions/farm_persist';
 import {
   EMPTY_FARM_PLOT_VIEWS,
+  type FarmPlantKnobs,
   type FarmPlotView,
   type PlotState,
   projectFarmPlots,
@@ -11968,13 +11969,15 @@ export class Sim {
     return this.farmPlotsFor(this.primaryId);
   }
 
-  // Plant a crop in a garden bed. Thin delegate: the whole decision (the
-  // stated gate order, the seed spend, the one two-draw pre-roll block, the
-  // plot write) lives in professions/farming.ts, which owns the draw contract.
-  plantCrop(bedId: string, cropId: string, pid?: number): void {
+  // Plant a crop in a garden bed, with the optional plant-time knob payload
+  // (compost, farmer's watch, growth tonic). Thin delegate: the whole
+  // decision (the stated gate order, the seed and knob payments, the one
+  // two-draw pre-roll block, the plot write) lives in professions/farming.ts,
+  // which owns the draw contract.
+  plantCrop(bedId: string, cropId: string, knobs?: FarmPlantKnobs, pid?: number): void {
     const r = this.ctx.resolve(pid);
     if (!r) return;
-    plantCropAction(this.ctx, r.e, r.meta, bedId, cropId);
+    plantCropAction(this.ctx, r.e, r.meta, bedId, cropId, knobs);
   }
 
   // Harvest a finished plot. Thin delegate like plantCrop above; draw-free on

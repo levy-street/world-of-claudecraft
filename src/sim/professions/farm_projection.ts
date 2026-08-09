@@ -50,6 +50,19 @@ export interface PlotState {
 // unobservable while the plot grows).
 export type FarmPlotStatus = 'growing' | 'ready' | 'withered';
 
+// The plant-time knob request (the knobs phase), the payload shape plantCrop
+// accepts on the IWorld seam and the wire alike: three independent opt-ins
+// mirroring the three PlotState flags above. Every knob is chosen AT PLANT
+// TIME and never later (D8, front-loaded only); an absent field means the
+// knob was not requested, exactly as `false` does, which is what lets the
+// wire frame omit unset knobs and stay byte-identical to the pre-knob
+// protocol on a plain plant.
+export interface FarmPlantKnobs {
+  compost?: boolean;
+  watch?: boolean;
+  tonic?: boolean;
+}
+
 // The survival ramp (the growth-engine phase). Pure arithmetic, no rng, no
 // content import: the caller supplies the crop's tier, which keeps this file
 // the pure leaf its banner promises.

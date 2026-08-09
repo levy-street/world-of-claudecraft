@@ -1351,14 +1351,14 @@ describe('the Sim delegates', () => {
   it('forwards plantCrop and harvestCrop, and no-ops on an unknown pid', () => {
     const h = makeHarness();
     giveSeeds(h);
-    h.sim.plantCrop(BED, CROP_ID, h.pid);
+    h.sim.plantCrop(BED, CROP_ID, undefined, h.pid);
     expect(h.meta.farmPlots.has(BED)).toBe(true);
     clearCast(h.sim);
     h.advance(CROP.durationMs);
     h.sim.harvestCrop(BED, h.pid);
     expect(h.meta.farmPlots.has(BED)).toBe(false);
     // An unresolvable pid changes nothing and throws nothing.
-    expect(() => h.sim.plantCrop(BED, CROP_ID, 987_654)).not.toThrow();
+    expect(() => h.sim.plantCrop(BED, CROP_ID, undefined, 987_654)).not.toThrow();
     expect(() => h.sim.harvestCrop(BED, 987_654)).not.toThrow();
     expect(h.meta.farmPlots.size).toBe(0);
   });

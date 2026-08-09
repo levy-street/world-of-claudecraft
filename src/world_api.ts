@@ -203,7 +203,12 @@ export type {
   DungeonFinderQueueView,
 } from './world_api/dungeon_finder';
 export type { RaidLockout, RiftFloorView } from './world_api/dungeons';
-export type { FarmPatchDef, FarmPlotStatus, FarmPlotView } from './world_api/farming';
+export type {
+  FarmPatchDef,
+  FarmPlantKnobs,
+  FarmPlotStatus,
+  FarmPlotView,
+} from './world_api/farming';
 export {
   GUILD_BANK_LOG_LIMIT,
   type GuildBankInfo,

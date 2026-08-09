@@ -8757,6 +8757,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.farming.denied.not_ready': '그 작물은 아직 자라는 중입니다.',
   'hudChrome.farming.denied.no_plot': '그 밭에는 아무것도 심겨 있지 않습니다.',
   'hudChrome.farming.denied.no_husks': '시든 껍질이 부족합니다.',
+  'hudChrome.farming.denied.no_compost': '퇴비가 없습니다.',
+  'hudChrome.farming.denied.no_fee_produce': '망보기 삯을 치를 농산물이 없습니다.',
+  'hudChrome.farming.denied.no_tonic': '성장 토닉이 없습니다.',
   'hudChrome.farming.husksConvertedLine': '시든 껍질 {husks}개를 {name}(으)로 교환했습니다.',
   'hudChrome.farming.husksConvertedLineQty':
     '시든 껍질 {husks}개를 {name} x{qty}(으)로 교환했습니다.',

@@ -3362,8 +3362,11 @@ export const hudChromeStrings = {
       not_ready: 'That crop is still growing.',
       no_plot: 'Nothing is planted in that bed.',
       // The knobs phase: the husk trade with fewer husks than one batch
-      // costs (convert_husks).
+      // costs (convert_husks), then the three plant-time knob payments.
       no_husks: 'You do not have enough withered husks.',
+      no_compost: 'You have no compost.',
+      no_fee_produce: 'You have no produce to pay the watch fee.',
+      no_tonic: 'You have no growth tonic.',
     },
     // The husk trade's one line (the knobs phase): names BOTH sides of the
     // trade, what left the bags and what arrived, because the compost grant's

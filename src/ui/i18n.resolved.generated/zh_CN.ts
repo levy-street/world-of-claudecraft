@@ -2732,7 +2732,10 @@ export const zh_CN: EnTranslations = {
         "no_seed": "你没有该作物的种子。",
         "not_ready": "那株作物还在生长。",
         "no_plot": "那片田畦里什么也没种。",
-        "no_husks": "你的枯萎谷壳不够。"
+        "no_husks": "你的枯萎谷壳不够。",
+        "no_compost": "你没有堆肥。",
+        "no_fee_produce": "你没有可以支付看守费的农产品。",
+        "no_tonic": "你没有生长滋补剂。"
       },
       "husksConvertedLine": "你用{husks}个枯萎谷壳换取了{name}。",
       "husksConvertedLineQty": "你用{husks}个枯萎谷壳换取了{name} x{qty}。"
