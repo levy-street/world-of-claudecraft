@@ -290,6 +290,7 @@ import {
   farmHarvestLineKey,
   farmHusksConvertedLineKey,
   farmPlantedTokenId,
+  farmSeedBackLineKey,
   farmWitheredLineKey,
 } from './farming_view';
 import { blockFctAmountText } from './fct_core';
@@ -11925,6 +11926,20 @@ export class Hud {
               '#7fdc4f',
             );
           }
+          // The tier 3/4 seed-back sentence, only when the event carries a
+          // POSITIVE count (the emitter omits zero; the positive guard also
+          // drops a malformed zero from a stale or foreign server rather
+          // than printing "x0"). The seed item resolves client-side from the
+          // crop id through the same shared hop the plant line uses.
+          if (ev.seedBackCount !== undefined && ev.seedBackCount > 0) {
+            this.log(
+              t(farmSeedBackLineKey(ev.seedBackCount), {
+                name: grantItemToken(farmPlantedTokenId(ev.cropId)),
+                qty: grantQtyText(ev.seedBackCount),
+              }),
+              '#7fdc4f',
+            );
+          }
           break;
         }
         case 'farmWithered': {
@@ -11939,6 +11954,19 @@ export class Hud {
             }),
             '#a8a8a8',
           );
+          // The seed-back consolation on a failed high-tier crop (the roll
+          // fires on BOTH outcomes): a real grant, so it keeps the grant
+          // green rather than the failure grey, and the same positive guard
+          // as the harvested arm above.
+          if (ev.seedBackCount !== undefined && ev.seedBackCount > 0) {
+            this.log(
+              t(farmSeedBackLineKey(ev.seedBackCount), {
+                name: grantItemToken(farmPlantedTokenId(ev.cropId)),
+                qty: grantQtyText(ev.seedBackCount),
+              }),
+              '#7fdc4f',
+            );
+          }
           break;
         }
         case 'farmDenied': {

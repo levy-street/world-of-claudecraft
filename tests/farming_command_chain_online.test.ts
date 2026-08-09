@@ -394,6 +394,7 @@ describe('farmPlanted is a HEAVY_SELF_EVENTS member: the planter self-mirror re-
     const pid = session.pid as number;
     standAtBed(server, pid, BED);
     server.sim.addItem('vale_wheat_seed', 1, pid);
+    server.sim.addItem('garden_hoe', 1, pid); // the step-12 hoe gate
     // FLUSH THE SETUP FIRST. Granting the seed emits its own `loot` event, and
     // events sit in the sim buffer until a tick drains them, so without this
     // the plant tick would route the SETUP's loot (itself a member) and dirty
@@ -484,6 +485,7 @@ describe('a plot change reaches the planter in the very next snapshot', () => {
     const pid = session.pid as number;
     standAtBed(server, pid, BED);
     server.sim.addItem('vale_wheat_seed', 1, pid);
+    server.sim.addItem('garden_hoe', 1, pid); // the step-12 hoe gate
 
     // Baseline: a broadcast BEFORE the plant, so the client's mirror already
     // holds the empty plot set and the assertion below cannot pass on a
@@ -520,6 +522,7 @@ describe('a plot change reaches the planter in the very next snapshot', () => {
     const pid = session.pid as number;
     standAtBed(server, pid, BED);
     server.sim.addItem('vale_wheat_seed', 1, pid);
+    server.sim.addItem('garden_hoe', 1, pid); // the step-12 hoe gate
     server.sim.addItem('compost', 1, pid);
     server.sim.addItem('growth_tonic', 1, pid);
     server.sim.addItem('vale_wheat', 2, pid);
@@ -562,6 +565,7 @@ describe('a plot change reaches the planter in the very next snapshot', () => {
     const pid = session.pid as number;
     standAtBed(server, pid, BED);
     server.sim.addItem('vale_wheat_seed', 1, pid);
+    server.sim.addItem('garden_hoe', 1, pid); // the step-12 hoe gate
     server.handleMessage(
       session,
       JSON.stringify({ t: 'cmd', cmd: 'plant_crop', bed: BED, crop: CROP }),
@@ -623,6 +627,7 @@ describe('the four farm events reach the actor, and only the actor', () => {
     standAtBed(server, pid, BED);
     standAtBed(server, bystander.pid as number, BED);
     server.sim.addItem('vale_wheat_seed', 1, pid);
+    server.sim.addItem('garden_hoe', 1, pid); // the step-12 hoe gate
     routeTick(server);
     fc.sent.length = 0;
     bystanderFc.sent.length = 0;
@@ -696,6 +701,7 @@ describe('the four farm events reach the actor, and only the actor', () => {
     const pid = session.pid as number;
     standAtBed(server, pid, BED);
     server.sim.addItem('vale_wheat_seed', 2, pid);
+    server.sim.addItem('garden_hoe', 1, pid); // the step-12 hoe gate
     server.handleMessage(
       session,
       JSON.stringify({ t: 'cmd', cmd: 'plant_crop', bed: BED, crop: CROP }),

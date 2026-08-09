@@ -3556,6 +3556,14 @@ export const hudChromeStrings = {
     // news and says plainly that the crop, not the bed, was lost.
     witheredLine: 'The crop withered. You clear the bed: {name}.',
     witheredLineQty: 'The crop withered. You clear the bed: {name} x{qty}.',
+    // The seed-back sentence (the crop-ladder phase): a tier 3/4 harvest can
+    // hand back seeds beside its payout, on EITHER outcome, so this renders
+    // whenever farmHarvested / farmWithered carries a positive seedBackCount.
+    // Names the SEED as a spliced token (farming_view.ts resolves the crop id
+    // to its seed item, the plant line's shared hop), with the family's
+    // quantity split.
+    seedBackLine: 'You recover seed: {name}.',
+    seedBackLineQty: 'You recover seed: {name} x{qty}.',
     // Refusal toasts, one per farmDenied reason, keyed by the reason id
     // itself so gathering_view.ts resolves them by template literal and no
     // second map can drift. Error toasts only: no line, no cue, no other

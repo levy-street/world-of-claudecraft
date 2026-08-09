@@ -8785,6 +8785,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.farming.harvestFineLineQty': 'さらに{name} x{qty}も収穫した。',
   'hudChrome.farming.witheredLine': '作物が枯れた。畑を片づけた：{name}。',
   'hudChrome.farming.witheredLineQty': '作物が枯れた。畑を片づけた：{name} x{qty}。',
+  'hudChrome.farming.seedBackLine': '種を回収した：{name}。',
+  'hudChrome.farming.seedBackLineQty': '種を回収した：{name} x{qty}。',
   'hudChrome.farming.denied.bad_bed': 'そこに作物畑はありません。',
   'hudChrome.farming.denied.bad_crop': 'それはここには植えられません。',
   'hudChrome.farming.denied.range': 'その作物畑から離れすぎています。',

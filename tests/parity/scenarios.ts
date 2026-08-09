@@ -35,7 +35,12 @@ import type { DelayedEvent } from '../../src/sim/entity_roster';
 import { solveLockActions } from '../../src/sim/lockpick';
 import type { PendingLootRoll } from '../../src/sim/loot/loot_roll';
 import type { PlotState } from '../../src/sim/professions/farm_projection';
-import { FARM_PLANT_CAST_SEC, harvestCrop, plantCrop } from '../../src/sim/professions/farming';
+import {
+  convertHusks,
+  FARM_PLANT_CAST_SEC,
+  harvestCrop,
+  plantCrop,
+} from '../../src/sim/professions/farming';
 import { startFishing } from '../../src/sim/professions/fishing';
 import { gatherCastDurationSec, gatherNodeById } from '../../src/sim/professions/gathering';
 import { type ArenaMatch, type PlayerMeta, Sim } from '../../src/sim/sim';
@@ -5172,14 +5177,26 @@ function professionsToolEffectSlot(seed = 1): Scenario {
 // without it, one 15% roll at proficiency 0 decides whether the produce path
 // or the husk path runs, and a future re-tune of the survival ramp could flip
 // a beat while the scenario still looked green.
+// The Phase 4 QA M8 lesson: never assume a seed wins. Probed against the real
+// modules: mulberry32((4 ^ 0x9e3779b9) >>> 0)() = 0.217326 < 0.5
+// (FARM_TONIC_BONUS_CHANCE), so yieldSeed 4 WINS the tonic roll, and its
+// skill-1 expansion is fine-free (resolveFarmHarvest(4, 1) = { count: 3,
+// fine: 0 }, toniced count 5), so the toniced beat below adds exactly one
+// produce grant and no fine line. Exported for the coverage suite's in-arm
+// non-vacuity guard (tests/parity/coverage_c.test.ts).
+export const FARM_TONIC_WINNER_YIELD_SEED = 4;
+
 function professionsFarmingSession(seed = 1): Scenario {
   // The two northern beds of the Eastbrook allotments (content/farm_patches.ts
   // bed_eastbrook_1 at 16,30 and bed_eastbrook_2 at 21,30). Beds sit on a 5
   // yard pitch, which is INTERACT_RANGE, so the midpoint below is 2.5yd from
   // each and one stand point reaches both: no teleport between the plants, and
-  // none between the harvests.
+  // none between the harvests. The Phase 5 extension (deviation (z)) then
+  // moves to the Thornpeak patch (content/farm_patches.ts bed_thornpeak_1 at
+  // -23,685) for the tier-3 seed-back beat.
   const BED_READY = 'bed_eastbrook_1';
   const BED_WITHERED = 'bed_eastbrook_2';
+  const BED_T3 = 'bed_thornpeak_1';
   const CROP = 'vale_wheat';
   return {
     name: 'farming_session',
@@ -5190,10 +5207,14 @@ function professionsFarmingSession(seed = 1): Scenario {
       'plant consumes the seed and starts the flavor cast (FARMING_CAST_ID)',
       'busy gate: the second plant waits out the first plant cast',
       'growth window: readyAtMs reached with ZERO rng draws and zero events',
-      'harvestCrop survived path: zero draws, produce granted from the stored yield seed',
-      'harvestCrop withered path: zero draws, withered husks paid instead of produce',
+      'harvestCrop survived path: zero draws (tier 1), produce granted from the stored yield seed',
+      'harvestCrop withered path: zero draws (tier 1), withered husks paid instead of produce',
       'both harvests free their bed (farmPlots empty at the end)',
       'gathering grant drain: the queued farming proficiency lands on the next tick',
+      'knobbed plant (compost + watch + tonic): payments consumed, still exactly two draws',
+      'toniced harvest on a probed WINNING yieldSeed: zero draws, bonus picks at base grade',
+      'convertHusks: the withered payout batch trades into compost, zero draws',
+      'tier-3 harvest (highland_barley at Thornpeak): EXACTLY one draw, the seed-back roll',
     ],
     build: () => new Sim({ seed, playerClass: 'warrior', autoEquip: true }),
     drive(rec: Recorder) {
@@ -5256,6 +5277,75 @@ function professionsFarmingSession(seed = 1): Scenario {
       // drainGatheringGrants runs EARLIER in the tick than any command, so the
       // grant queued above lands on the next tick; this tail is what puts the
       // raised proficiency into the final sample.
+      rec.tick(8);
+
+      // ---- The Phase 5 extension (deviation (z)): every beat below is
+      // appended AFTER the original drive, so the earlier labels and their
+      // ledger values stay byte-identical. ----
+
+      // KNOBBED PLANT: all three knobs on the freed northern bed. The
+      // supplies are scaffolding grants (draw-free, ordinary hub lines): a
+      // fresh seed (both starters are in the ground above), one compost, one
+      // tonic, and 2 vale_wheat produce for the tier-1 watch fee, paid
+      // beside the 3 produce the first harvest banked.
+      sim.addItem('vale_wheat_seed', 1, pid);
+      sim.addItem('compost', 1, pid);
+      sim.addItem('growth_tonic', 1, pid);
+      sim.addItem('vale_wheat', 2, pid);
+      // Ride out the SECOND plant's flavor cast remainder (0.6 sec of its 2
+      // sec still runs here), or the knobbed plant would deny busy.
+      rec.tick(Math.ceil(FARM_PLANT_CAST_SEC / DT) + 1);
+      plantCrop(sim.ctx, p, meta, BED_READY, CROP, { compost: true, watch: true, tonic: true });
+      const knobbed = meta.farmPlots.get(BED_READY) as PlotState;
+      // The stored knob flags, stashed for the coverage suite: farmPlanted is
+      // knob-free on the wire (the fplot projection carries the flags), so
+      // the notes are where a test can see what the payments bought.
+      rec.notes.knobbedFlags = {
+        compost: knobbed.compost,
+        watch: knobbed.watch,
+        tonic: knobbed.tonic,
+      };
+      rec.snapshot('planted-knobbed');
+
+      // TONICED HARVEST ON A WINNING SEED: force ready + survived exactly as
+      // the beats above, then OVERWRITE the minted yieldSeed with the probed
+      // tonic WINNER (see FARM_TONIC_WINNER_YIELD_SEED above): at a losing
+      // seed the toniced and plain expansions coincide and the beat proves
+      // nothing (the M8 lesson). Zero draws: the tonic is seed expansion,
+      // and vale_wheat is tier 1, so no seed-back roll either.
+      knobbed.readyAtMs = sim.ctx.lockoutNowMs();
+      knobbed.survivalRoll = 0.01;
+      knobbed.yieldSeed = FARM_TONIC_WINNER_YIELD_SEED;
+      harvestCrop(sim.ctx, p, meta, BED_READY);
+      rec.snapshot('harvested-toniced');
+
+      // HUSK CONVERSION: the withered beat above paid exactly 2 husks, one
+      // batch, so this trades them into exactly one compost. Zero draws.
+      convertHusks(sim.ctx, p, meta);
+      rec.snapshot('husks-converted');
+
+      // TIER-3 SEED-BACK at the Thornpeak patch. Ride out the knobbed
+      // plant's own flavor cast first (its 2 sec are untouched here), which
+      // also drains the toniced harvest's queued gain BEFORE the proficiency
+      // write below, so the write is the last word.
+      rec.tick(Math.ceil(FARM_PLANT_CAST_SEC / DT) + 1);
+      teleport(sim, p, -23, 685); // bed_thornpeak_1 (content/farm_patches.ts)
+      meta.gatheringProficiency.farming = 75;
+      sim.addItem('skysilver_hoe', 1, pid);
+      sim.addItem('highland_barley_seed', 1, pid);
+      // Two draws (the plant pre-roll)...
+      plantCrop(sim.ctx, p, meta, BED_T3, 'highland_barley');
+      rec.snapshot('planted-t3');
+      const barley = meta.farmPlots.get(BED_T3) as PlotState;
+      barley.readyAtMs = sim.ctx.lockoutNowMs();
+      barley.survivalRoll = 0.01;
+      // ...and EXACTLY one more, the seed-back roll: whatever band the
+      // shared stream yields here is the recorded truth (the coverage suite
+      // asserts the ledger arithmetic and that the event's seedBackCount
+      // matches the highland_barley_seed bag delta, never a band literal).
+      harvestCrop(sim.ctx, p, meta, BED_T3);
+      rec.snapshot('harvested-t3');
+      // Drain the barley harvest's queued 0.02 gain into the final sample.
       rec.tick(8);
     },
   };

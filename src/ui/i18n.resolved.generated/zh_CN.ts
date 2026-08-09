@@ -2899,6 +2899,8 @@ export const zh_CN: EnTranslations = {
       "harvestFineLineQty": "你还收获了：{name} x{qty}。",
       "witheredLine": "作物枯萎了。你清理了田畦：{name}。",
       "witheredLineQty": "作物枯萎了。你清理了田畦：{name} x{qty}。",
+      "seedBackLine": "你回收了种子：{name}。",
+      "seedBackLineQty": "你回收了种子：{name} x{qty}。",
       "denied": {
         "bad_bed": "那里没有田畦。",
         "bad_crop": "你无法在这里种植它。",

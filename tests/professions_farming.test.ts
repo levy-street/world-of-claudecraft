@@ -3,7 +3,8 @@
 // THE DRAW CONTRACT stated in src/sim/professions/farming.ts.
 //
 // The draw contract is the reason most of this file exists. Farming's whole
-// determinism story is that a plant costs exactly two rng draws and literally
+// determinism story is that a plant costs exactly two rng draws, a tier 3/4
+// harvest costs exactly one (the seed-back roll, both outcomes), and literally
 // nothing else costs any, so growth can be wall-clock and offline-friendly
 // without the three hosts ever diverging. Every clause of that contract gets
 // its own counted arm below.
@@ -37,6 +38,9 @@ import {
   FARM_HUSKS_PER_COMPOST,
   FARM_KEEP_CHANCE_BASE,
   FARM_PLANT_CAST_SEC,
+  FARM_SEED_BACK_MIN_TIER,
+  FARM_SEED_BACK_ONE_CHANCE,
+  FARM_SEED_BACK_TWO_CHANCE,
   FARM_SURVIVAL_AT_GATE,
   FARM_SURVIVAL_BAND_SPAN,
   FARM_TONIC_BONUS_CHANCE,
@@ -150,6 +154,23 @@ function countDraws(sim: Sim, run: () => void): number {
     sim.rng.setObserver(null);
   }
   return draws;
+}
+
+/** countDraws' value-recording sibling: the seed-back arms assert the BAND
+ *  the one harvest roll landed in, not just its count, so a draw-block shift
+ *  that re-seats the stream reds on the in-arm band claim instead of going
+ *  quietly vacuous (the probed-seed rule). */
+function recordDraws(sim: Sim, run: () => void): number[] {
+  const values: number[] = [];
+  sim.rng.setObserver((value) => {
+    values.push(value);
+  });
+  try {
+    run();
+  } finally {
+    sim.rng.setObserver(null);
+  }
+  return values;
 }
 
 function eventsOf<T extends SimEvent['type']>(
@@ -614,6 +635,28 @@ describe('plantCrop: the stated gate order, every arm draw-free', () => {
     expect(draws).toBe(0);
     expect(denyReason(h.sim, from)).toBe('no_seed');
     expect(h.meta.farmPlots.size).toBe(0);
+  });
+
+  it("refuses a REAL tier-2 crop below its band: reason 'skill', zero draws, seed kept", () => {
+    // The Phase 3 QA deferral, now reachable with shipped content: the
+    // command-level skill arm needed a synthetic record while vale_wheat was
+    // the only crop, and the ladder's marsh_rice (tier 2, threshold 25) is
+    // the real thing. This is ALSO an order proof: the harness garden_hoe
+    // cannot cover tier 2, so gate 12 (tool) would refuse too, and gate 7
+    // (skill) must own the reason.
+    h.sim.addItem('marsh_rice_seed', 1, h.pid);
+    expect(h.meta.gatheringProficiency.farming).toBe(0);
+    const from = h.sim.events.length;
+    expect(countDraws(h.sim, () => plant(h, BED, 'marsh_rice'))).toBe(0);
+    expect(denyReason(h.sim, from)).toBe('skill');
+    expect(h.sim.countItem('marsh_rice_seed', h.pid)).toBe(1);
+    expect(h.meta.farmPlots.size).toBe(0);
+    // Anti-vacuous: past the band with a covering hoe, the SAME command
+    // plants (and spends the ordinary two draws).
+    h.meta.gatheringProficiency.farming = 40;
+    h.sim.addItem('bronze_hoe', 1, h.pid);
+    expect(countDraws(h.sim, () => plant(h, BED, 'marsh_rice'))).toBe(2);
+    expect(h.meta.farmPlots.get(BED)?.cropId).toBe('marsh_rice');
   });
 
   it('preserves stealth, sitting and mount on a refusal (the trio runs after every gate)', () => {
@@ -1352,7 +1395,9 @@ describe('the slotted farming tool effect at harvest (the hoe phase C3 wiring)',
   // shown to differ from the unarmed one on the plot's own seed (probed, or
   // swept in-arm), so an equality below can never pass because both sides
   // collapsed to the unarmed harvest. And every arm counts ZERO ctx.rng
-  // draws at harvest: the effect halves are seed expansions, never draws.
+  // draws at harvest: the effect halves are seed expansions, never draws
+  // (tier-1 plots here; the one draw a tier 3/4 harvest spends is the
+  // seed-back roll, owned by its own describe below).
   let h: Harness;
   beforeEach(() => {
     h = makeHarness();
@@ -1445,7 +1490,12 @@ describe('the slotted farming tool effect at harvest (the hoe phase C3 wiring)',
   });
 });
 
-describe('harvestCrop: draw-free on every path', () => {
+describe('harvestCrop: draw-free on every TIER 1/2 path', () => {
+  // Every arm here plants the tier-1 vale_wheat, so the zero-draw pins are
+  // tier-scoped claims: since the crop ladder, a TIER 3/4 harvest draws
+  // exactly one (the seed-back roll), pinned band by band in its own
+  // describe below. Tier is an input, not an outcome, so the tier-1 arms
+  // here and the tier 3/4 arms there can never fork one stream.
   let h: Harness;
   beforeEach(() => {
     h = makeHarness();
@@ -1584,8 +1634,9 @@ describe('harvestCrop: draw-free on every path', () => {
     // forgets them prints a second line and stacks a second cue.
     //
     // Asserted over the harvest's OWN loot events rather than a count, so a
-    // future third grant (a seed-back roll, a rare-event windfall) is covered
-    // the moment it lands instead of quietly slipping through.
+    // further grant (a rare-event windfall; the tier 3/4 seed-back grant is
+    // executed-covered in its own describe below) is covered the moment it
+    // lands instead of quietly slipping through.
     const assertAllFlagged = (from: number, label: string) => {
       const loots = eventsOf(h.sim, from, 'loot');
       expect(loots.length, `${label}: expected at least one hub loot event`).toBeGreaterThan(0);
@@ -1781,6 +1832,242 @@ describe('harvestCrop: draw-free on every path', () => {
     expect(p.auras.some((a) => a.kind === 'stealth')).toBe(true);
     expect(p.mountKey).toBe(DEFAULT_MOUNT);
     expect(p.sitting).toBe(true);
+  });
+});
+
+describe('the seed-back roll (tier 3/4): ONE draw at harvest, banded payouts', () => {
+  // The one deliberate exception to "harvest draws nothing": a tier 3/4
+  // harvest spends EXACTLY one ctx.rng draw at a FIXED position (after the
+  // outcome-resolution gates, before the survived/withered branch and every
+  // loop), on BOTH outcomes. It is a REAL draw at player-action time, NOT a
+  // seed expansion: the tonic is seed-anchored because its outcome is fixed
+  // at plant time; seed-back is decided by the harvest itself, which is
+  // D4-legal because a harvest is a player action.
+  //
+  // PROBED SEEDS, the vacuity rule: the roll is the THIRD post-construction
+  // draw on these harnesses (two plant draws, then the harvest's one), so
+  // each band arm names the harness seed whose third draw was probed into
+  // its band, and asserts the captured value IN-ARM against the shipped
+  // thresholds. Probed against the real modules (third draw after
+  // new Sim({ seed, playerClass: 'warrior', autoEquip: false })):
+  //   seed 4  -> 0.026266 (tier-3 two-seed band, under 0.08)
+  //   seed 3  -> 0.180549 (tier-3 one-seed band, in [0.08, 0.40))
+  //   seed 5  -> 0.712293 (tier-3 zero band, at or above 0.40)
+  //   seed 41 -> 0.067811 (tier-4 ONE-seed band, in [0.06, 0.35); the same
+  //              roll sits under tier 3's 0.08, which is what makes it the
+  //              per-tier-thresholds proof)
+  //   seed 8  -> 0.202110 (a withered-arm WINNER: pays 1 seed)
+  const T3_CROP = 'highland_barley';
+  const T3_SEED = 'highland_barley_seed';
+  const T3_HOE = 'skysilver_hoe';
+  const T4_CROP = 'gilded_sunmelon';
+  const T4_SEED = 'gilded_sunmelon_seed';
+  const T4_HOE = 'osmium_hoe';
+
+  /** Grant the hoe, the proficiency and one seed, plant, and ripen. */
+  function plantTier(
+    h: Harness,
+    cropId: string,
+    hoeId: string,
+    proficiency: number,
+    bedId = BED,
+  ): PlotState {
+    const crop = FARM_CROPS[cropId] as FarmCropDef;
+    h.meta.gatheringProficiency.farming = proficiency;
+    h.sim.addItem(hoeId, 1, h.pid);
+    h.sim.addItem(crop.seedItemId, 1, h.pid);
+    plantCrop(h.sim.ctx, h.sim.player, h.meta, bedId, cropId);
+    clearCast(h.sim);
+    h.advance(crop.durationMs);
+    return h.meta.farmPlots.get(bedId) as PlotState;
+  }
+
+  /** Every hub loot event in the window carries both #2430 flags: executed
+   *  coverage for the seed-back grant site beside the produce grants. */
+  function assertAllLootFlagged(h: Harness, from: number): void {
+    const loots = eventsOf(h.sim, from, 'loot');
+    expect(loots.length).toBeGreaterThan(0);
+    for (const lev of loots) {
+      expect(lev.silent, lev.text).toBe(true);
+      expect(lev.callerLogs, lev.text).toBe(true);
+    }
+  }
+
+  it('pins the seed-back tuning to its literals (the wire-name-constant rule)', () => {
+    // TUNING, PROVISIONAL, FLAGGED FOR THE MAINTAINER (economy-sensitive):
+    // one literal pin for the maps every arm below reaches through the
+    // import, so a retune is a deliberate edit here too.
+    expect(FARM_SEED_BACK_MIN_TIER).toBe(3);
+    expect(FARM_SEED_BACK_TWO_CHANCE).toEqual({ 3: 0.08, 4: 0.06 });
+    expect(FARM_SEED_BACK_ONE_CHANCE).toEqual({ 3: 0.4, 4: 0.35 });
+    // The band shape itself: the two-seed slice sits strictly inside the
+    // pays-anything slice, per tier.
+    for (const tier of [3, 4]) {
+      expect(FARM_SEED_BACK_TWO_CHANCE[tier]).toBeGreaterThan(0);
+      expect(FARM_SEED_BACK_TWO_CHANCE[tier]).toBeLessThan(FARM_SEED_BACK_ONE_CHANCE[tier]);
+      expect(FARM_SEED_BACK_ONE_CHANCE[tier]).toBeLessThan(1);
+    }
+  });
+
+  it('a survived tier-3 harvest draws EXACTLY one, and the two-seed band pays 2 (probed seed 4)', () => {
+    const h = makeHarness(4);
+    const plot = plantTier(h, T3_CROP, T3_HOE, 75);
+    plot.survivalRoll = 0; // survival forced: this arm is about the roll
+    expect(h.sim.countItem(T3_SEED, h.pid)).toBe(0); // the plant spent it
+    const expected = resolveFarmHarvest(plot.yieldSeed as number, 75);
+    const from = h.sim.events.length;
+    const values = recordDraws(h.sim, () => harvest(h));
+    expect(values).toHaveLength(1);
+    // The in-arm band claim (the probe, re-proven where it counts): a draw
+    // block shift that re-seats the stream reds HERE, loudly.
+    expect(values[0]).toBeLessThan(FARM_SEED_BACK_TWO_CHANCE[3] as number);
+    expect(h.sim.countItem(T3_SEED, h.pid)).toBe(2);
+    const ev = eventsOf(h.sim, from, 'farmHarvested')[0];
+    expect(ev.seedBackCount).toBe(2);
+    // The ordinary payout still rides beside the seed-back, untouched.
+    expect(ev.cropId).toBe(T3_CROP);
+    expect(h.sim.countItem('highland_barley', h.pid)).toBe(expected.count);
+    expect(h.sim.countItem('fine_highland_barley', h.pid)).toBe(expected.fine);
+    assertAllLootFlagged(h, from);
+  });
+
+  it('the one-seed band pays 1 (probed seed 3)', () => {
+    const h = makeHarness(3);
+    const plot = plantTier(h, T3_CROP, T3_HOE, 75);
+    plot.survivalRoll = 0;
+    const from = h.sim.events.length;
+    const values = recordDraws(h.sim, () => harvest(h));
+    expect(values).toHaveLength(1);
+    expect(values[0]).toBeGreaterThanOrEqual(FARM_SEED_BACK_TWO_CHANCE[3] as number);
+    expect(values[0]).toBeLessThan(FARM_SEED_BACK_ONE_CHANCE[3] as number);
+    expect(h.sim.countItem(T3_SEED, h.pid)).toBe(1);
+    expect(eventsOf(h.sim, from, 'farmHarvested')[0].seedBackCount).toBe(1);
+    assertAllLootFlagged(h, from);
+  });
+
+  it('the zero band still draws its one, pays nothing, and OMITS the field (probed seed 5)', () => {
+    // The omit-zero pin: a zero roll leaves the event byte-identical to the
+    // pre-field wire (the only-when-true doctrine), and the bag agrees. The
+    // draw still happens, which is the whole fixed-position contract: the
+    // stream moves by exactly one per tier 3/4 harvest, win or lose.
+    const h = makeHarness(5);
+    const plot = plantTier(h, T3_CROP, T3_HOE, 75);
+    plot.survivalRoll = 0;
+    const from = h.sim.events.length;
+    const values = recordDraws(h.sim, () => harvest(h));
+    expect(values).toHaveLength(1);
+    expect(values[0]).toBeGreaterThanOrEqual(FARM_SEED_BACK_ONE_CHANCE[3] as number);
+    expect(h.sim.countItem(T3_SEED, h.pid)).toBe(0);
+    const ev = eventsOf(h.sim, from, 'farmHarvested')[0];
+    expect('seedBackCount' in ev).toBe(false);
+  });
+
+  it('a tier-4 harvest draws its one and pays by ITS OWN thresholds (probed seed 41)', () => {
+    // The per-tier proof: this roll (0.067811) sits UNDER tier 3's two-seed
+    // threshold but inside tier 4's one-seed band, so a flat-rate regression
+    // that ignored the crop tier would pay 2 here and red on the bag.
+    const h = makeHarness(41);
+    const plot = plantTier(h, T4_CROP, T4_HOE, 85);
+    plot.survivalRoll = 0;
+    const from = h.sim.events.length;
+    const values = recordDraws(h.sim, () => harvest(h));
+    expect(values).toHaveLength(1);
+    expect(values[0]).toBeLessThan(FARM_SEED_BACK_TWO_CHANCE[3] as number);
+    expect(values[0]).toBeGreaterThanOrEqual(FARM_SEED_BACK_TWO_CHANCE[4] as number);
+    expect(values[0]).toBeLessThan(FARM_SEED_BACK_ONE_CHANCE[4] as number);
+    expect(h.sim.countItem(T4_SEED, h.pid)).toBe(1);
+    expect(eventsOf(h.sim, from, 'farmHarvested')[0].seedBackCount).toBe(1);
+    assertAllLootFlagged(h, from);
+  });
+
+  it('a WITHERED tier-3 harvest draws its one and can pay seed-back beside the husks (probed seed 8)', () => {
+    // The withered consolation roll is deliberate (both outcomes share the
+    // one pre-branch draw), so a failed high-tier crop can hand a seed back
+    // WITH its husks. Proficiency 70: the skysilver hoe wields exactly at
+    // its R22 requirement, and the tier-3 survival ramp reads 0.97 there, so
+    // the 0.99 roll below genuinely withers without any skill fiddling.
+    const h = makeHarness(8);
+    const plot = plantTier(h, T3_CROP, T3_HOE, 70);
+    plot.survivalRoll = 0.99;
+    const from = h.sim.events.length;
+    const values = recordDraws(h.sim, () => harvest(h));
+    expect(values).toHaveLength(1);
+    // The probed winner claim, in-arm: this roll pays exactly one seed.
+    expect(values[0]).toBeGreaterThanOrEqual(FARM_SEED_BACK_TWO_CHANCE[3] as number);
+    expect(values[0]).toBeLessThan(FARM_SEED_BACK_ONE_CHANCE[3] as number);
+    // Husks still paid, produce still absent, and the seed beside them.
+    expect(h.sim.countItem(FARM_WITHERED_HUSK_ITEM_ID, h.pid)).toBe(FARM_WITHERED_HUSK_COUNT);
+    expect(h.sim.countItem('highland_barley', h.pid)).toBe(0);
+    expect(h.sim.countItem(T3_SEED, h.pid)).toBe(1);
+    const withered = eventsOf(h.sim, from, 'farmWithered');
+    expect(withered).toHaveLength(1);
+    expect(withered[0].count).toBe(FARM_WITHERED_HUSK_COUNT);
+    expect(withered[0].seedBackCount).toBe(1);
+    expect(eventsOf(h.sim, from, 'farmHarvested')).toEqual([]);
+    // A failure still teaches nothing: the consolation is seeds, not skill.
+    expect(h.meta.pendingGatherGrants).toEqual([]);
+    assertAllLootFlagged(h, from);
+  });
+
+  it('every harvest deny path still draws ZERO with a tier-3 plot in the ground', () => {
+    // The roll sits AFTER the outcome-resolution gates, so a refused harvest
+    // of a high-tier plot moves the stream exactly as far as a refused
+    // tier-1 one: not at all.
+    const h = makeHarness(4);
+    const crop = FARM_CROPS[T3_CROP] as FarmCropDef;
+    h.meta.gatheringProficiency.farming = 75;
+    h.sim.addItem(T3_HOE, 1, h.pid);
+    h.sim.addItem(T3_SEED, 1, h.pid);
+    plantCrop(h.sim.ctx, h.sim.player, h.meta, BED, T3_CROP);
+    clearCast(h.sim);
+
+    // not_ready, one ms short of the deadline.
+    h.advance(crop.durationMs - 1);
+    let from = h.sim.events.length;
+    expect(countDraws(h.sim, () => harvest(h))).toBe(0);
+    expect(denyReason(h.sim, from)).toBe('not_ready');
+    h.advance(1);
+
+    h.sim.player.dead = true;
+    expect(countDraws(h.sim, () => harvest(h))).toBe(0);
+    h.sim.player.dead = false;
+
+    from = h.sim.events.length;
+    expect(countDraws(h.sim, () => harvest(h, 'bed_not_a_real_bed'))).toBe(0);
+    expect(denyReason(h.sim, from)).toBe('bad_bed');
+
+    h.sim.player.pos.x += 50;
+    from = h.sim.events.length;
+    expect(countDraws(h.sim, () => harvest(h))).toBe(0);
+    expect(denyReason(h.sim, from)).toBe('range');
+    standAtBed(h.sim, BED);
+
+    from = h.sim.events.length;
+    expect(countDraws(h.sim, () => harvest(h, BED2))).toBe(0);
+    expect(denyReason(h.sim, from)).toBe('no_plot');
+
+    // Anti-vacuous close: the plot survived all five refusals, and the REAL
+    // harvest then spends exactly its one draw.
+    (h.meta.farmPlots.get(BED) as PlotState).survivalRoll = 0;
+    expect(countDraws(h.sim, () => harvest(h))).toBe(1);
+  });
+
+  it('a tier-2 harvest draws ZERO: the negative arm of the tier condition', () => {
+    // Same harness shape as the banded arms above, one tier down, so the
+    // zero here is about the TIER and nothing else (the non-vacuous negative
+    // arm the tier-1 describe cannot supply on its own).
+    const h = makeHarness(4);
+    const plot = plantTier(h, 'marsh_rice', 'bronze_hoe', 40);
+    plot.survivalRoll = 0;
+    const expected = resolveFarmHarvest(plot.yieldSeed as number, 40);
+    const from = h.sim.events.length;
+    expect(countDraws(h.sim, () => harvest(h))).toBe(0);
+    expect(h.sim.countItem('marsh_rice_seed', h.pid)).toBe(0);
+    const ev = eventsOf(h.sim, from, 'farmHarvested')[0];
+    expect('seedBackCount' in ev).toBe(false);
+    // The harvest itself still paid normally.
+    expect(h.sim.countItem('marsh_rice', h.pid)).toBe(expected.count);
+    expect(h.sim.countItem('fine_marsh_rice', h.pid)).toBe(expected.fine);
   });
 });
 
@@ -2012,6 +2299,31 @@ describe('the draw contract, clause by clause', () => {
       h.sim.tickCount = tickCount;
       expect(countDraws(h.sim, () => updateFarming(h.sim.ctx))).toBe(0);
     }
+  });
+
+  it('draws EXACTLY one at a tier 3/4 harvest and ZERO at tier 1/2: the seed-back clause', () => {
+    // The contract's newest clause, proven in one session so the two counts
+    // share a stream: the same farmer harvests a tier-3 plot (one draw, the
+    // seed-back roll) and a tier-1 plot (zero), back to back. The banded
+    // payout arms live in the seed-back describe; this is the clause count.
+    const h = makeHarness(4);
+    h.meta.gatheringProficiency.farming = 75;
+    h.sim.addItem('skysilver_hoe', 1, h.pid);
+    h.sim.addItem('highland_barley_seed', 1, h.pid);
+    plantCrop(h.sim.ctx, h.sim.player, h.meta, BED, 'highland_barley');
+    clearCast(h.sim);
+    giveSeeds(h);
+    plant(h, BED2); // vale_wheat, tier 1
+    clearCast(h.sim);
+    h.advance((FARM_CROPS.highland_barley as FarmCropDef).durationMs);
+    for (const bedId of [BED, BED2]) {
+      (h.meta.farmPlots.get(bedId) as PlotState).survivalRoll = 0;
+    }
+    expect(countDraws(h.sim, () => harvest(h, BED))).toBe(1);
+    expect(countDraws(h.sim, () => harvest(h, BED2))).toBe(0);
+    // Both really paid, so neither count came from a refused command.
+    expect(h.sim.countItem('highland_barley', h.pid)).toBeGreaterThan(0);
+    expect(h.sim.countItem(PRODUCE_ID, h.pid)).toBeGreaterThan(0);
   });
 });
 

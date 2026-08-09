@@ -2899,6 +2899,8 @@ export const ja_JP: EnTranslations = {
       "harvestFineLineQty": "さらに{name} x{qty}も収穫した。",
       "witheredLine": "作物が枯れた。畑を片づけた：{name}。",
       "witheredLineQty": "作物が枯れた。畑を片づけた：{name} x{qty}。",
+      "seedBackLine": "種を回収した：{name}。",
+      "seedBackLineQty": "種を回収した：{name} x{qty}。",
       "denied": {
         "bad_bed": "そこに作物畑はありません。",
         "bad_crop": "それはここには植えられません。",

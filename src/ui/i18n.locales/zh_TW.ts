@@ -8379,6 +8379,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.farming.harvestFineLineQty': '你還收穫了：{name} x{qty}。',
   'hudChrome.farming.witheredLine': '作物枯萎了。你清理了田畦：{name}。',
   'hudChrome.farming.witheredLineQty': '作物枯萎了。你清理了田畦：{name} x{qty}。',
+  'hudChrome.farming.seedBackLine': '你回收了種子：{name}。',
+  'hudChrome.farming.seedBackLineQty': '你回收了種子：{name} x{qty}。',
   'hudChrome.farming.denied.bad_bed': '那裡沒有田畦。',
   'hudChrome.farming.denied.bad_crop': '你無法在這裡種植它。',
   'hudChrome.farming.denied.range': '你離那片田畦太遠了。',

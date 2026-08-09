@@ -5688,7 +5688,10 @@ export type SimEvent = { pid?: number } & (
   // picks the harvest-lives roll resolved, since a fine roll UPGRADES a pick
   // rather than adding one. Both fine fields are absent when no pick upgraded
   // (the effectDepleted precedent: an absent optional keeps the common event
-  // byte-identical to the pre-field wire). Text-free (the gatherResult idiom).
+  // byte-identical to the pre-field wire). `seedBackCount` is the tier 3/4
+  // seed-back roll's payout in crop seeds (the client resolves the seed item
+  // from cropId), present ONLY when positive, the same only-when-true rule.
+  // Text-free (the gatherResult idiom).
   | {
       type: 'farmHarvested';
       pid: number;
@@ -5698,12 +5701,23 @@ export type SimEvent = { pid?: number } & (
       count: number;
       fineItemId?: string;
       fineCount?: number;
+      seedBackCount?: number;
     }
   // Farming: a plot that lost its survival pre-roll was cleared, paying
   // `count` withered husks instead of produce. Emitted at HARVEST, never at
   // the growth deadline: nothing rots and no timer fires, so the player learns
-  // the outcome when they come to collect. Text-free (the gatherResult idiom).
-  | { type: 'farmWithered'; pid: number; bedId: string; cropId: string; count: number }
+  // the outcome when they come to collect. `seedBackCount` mirrors
+  // farmHarvested's field (the tier 3/4 seed-back roll fires on BOTH
+  // outcomes; the withered consolation is deliberate), present ONLY when
+  // positive. Text-free (the gatherResult idiom).
+  | {
+      type: 'farmWithered';
+      pid: number;
+      bedId: string;
+      cropId: string;
+      count: number;
+      seedBackCount?: number;
+    }
   // Farming: a plant or harvest was refused. Personal and text-free (the
   // gatherDenied idiom): the client composes its own localized copy off
   // `reason`. `bedId` and `cropId` are present when the refusing arm KNOWS

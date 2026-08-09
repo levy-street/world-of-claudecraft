@@ -82,6 +82,18 @@ export function farmWitheredLineKey(count: number | undefined): TranslationKey {
     : 'hudChrome.farming.witheredLine';
 }
 
+/** The seed-back line a tier 3/4 harvest renders, on EITHER outcome, when its
+ *  event carries a positive seedBackCount: the crop handed back seeds beside
+ *  its payout, so the line names the SEED item, resolved from the crop id by
+ *  farmPlantedTokenId above (the same one hop the plant line takes, shared so
+ *  the two lines can never name different items for one crop), with the
+ *  family's quantity split. */
+export function farmSeedBackLineKey(count: number | undefined): TranslationKey {
+  return isMultiUnitGrant(count)
+    ? 'hudChrome.farming.seedBackLineQty'
+    : 'hudChrome.farming.seedBackLine';
+}
+
 /** The line the husk trade renders (the knobs phase's convert_husks command):
  *  the quantity split keys on the COMPOST granted, the grant side of the
  *  trade, matching every other grant-line family; the husks spent splice into

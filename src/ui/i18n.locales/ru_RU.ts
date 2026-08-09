@@ -8951,6 +8951,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.farming.harvestFineLineQty': 'Вы также собираете: {name} x{qty}.',
   'hudChrome.farming.witheredLine': 'Урожай засох. Вы расчищаете грядку: {name}.',
   'hudChrome.farming.witheredLineQty': 'Урожай засох. Вы расчищаете грядку: {name} x{qty}.',
+  'hudChrome.farming.seedBackLine': 'Вы сохраняете семена на посадку: {name}.',
+  'hudChrome.farming.seedBackLineQty': 'Вы сохраняете семена на посадку: {name} x{qty}.',
   'hudChrome.farming.denied.bad_bed': 'Там нет грядки.',
   'hudChrome.farming.denied.bad_crop': 'Это здесь посадить нельзя.',
   'hudChrome.farming.denied.range': 'Вы слишком далеко от этой грядки.',

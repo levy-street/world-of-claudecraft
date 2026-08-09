@@ -14,21 +14,30 @@
 //
 // DRAW CONTRACT (the D4 determinism contract, stated here and pinned in
 // tests/professions_farming.test.ts):
-//   plant, success ......... EXACTLY 2 ctx.rng draws, one contiguous block,
-//                            IDENTICAL UNDER EVERY KNOB COMBINATION
-//   plant, every deny arm .. 0 (the knob-payment denies included)
-//   harvest, any outcome ... 0 (toniced included)
-//   convert_husks .......... 0 (both outcomes)
-//   growth deadline passing  0 (nothing runs at expiry: there is no timer)
-//   login / save+load ...... 0
-//   the tick sweep ......... 0 (updateFarming below draws nothing)
+//   plant, success ............ EXACTLY 2 ctx.rng draws, one contiguous block,
+//                               IDENTICAL UNDER EVERY KNOB COMBINATION
+//   plant, every deny arm ..... 0 (the knob-payment denies included)
+//   harvest, tier 1/2 crop .... 0 on every outcome (toniced included)
+//   harvest, tier 3/4 crop .... EXACTLY 1 contiguous draw, the seed-back roll,
+//                               on BOTH outcomes (survived and withered)
+//   harvest, every deny arm ... 0
+//   convert_husks ............. 0 (both outcomes)
+//   growth deadline passing ... 0 (nothing runs at expiry: there is no timer)
+//   login / save+load ......... 0
+//   the tick sweep ............ 0 (updateFarming below draws nothing)
 // The two plant draws are the WHOLE growth script: a survival roll and a
 // yield seed, both stored in the plot's hidden slots (farm_projection.ts) and
 // consumed at harvest. Harvest yield expands DETERMINISTICALLY from the
 // pre-rolled yieldSeed through a local pure generator (mulberry32 below),
 // NEVER through ctx.rng and never through Math.random: seed expansion of an
-// already-drawn value is not a new draw, which is what keeps a harvest
-// draw-free no matter when, or on which host, it happens.
+// already-drawn value is not a new draw, which is what keeps a tier 1/2
+// harvest draw-free no matter when, or on which host, it happens. The ONE
+// draw a tier 3/4 harvest adds is the seed-back roll (harvestCrop below): a
+// REAL ctx.rng draw at harvest ACTION time, deliberately NOT an expansion of
+// the stored script, and D4-legal for the same reason the plant pre-roll is,
+// because a harvest is a player action. The crop tier deciding whether that
+// draw happens is an INPUT read from content, never an outcome, so
+// conditioning on it can never fork the stream.
 //
 // THE KNOBS RULE, the phase's one hard law: KNOB EFFECTS NEVER CHANGE THE
 // NUMBER OF RNG DRAWS. THEY CHANGE THRESHOLDS APPLIED TO ALREADY-DRAWN VALUES
@@ -162,6 +171,27 @@ export { FARM_COMPOST_ITEM_ID, FARM_GROWTH_TONIC_ITEM_ID, FARM_WITHERED_HUSK_ITE
 // next attempt's insurance" read literally; it is also value-neutral at the
 // vendor (2 husks at sellValue 1 make 1 compost at sellValue 2).
 export const FARM_HUSKS_PER_COMPOST = 2;
+
+// Seed-back at harvest for the HIGH-TIER crops (the crop-ladder phase's
+// economy arm). A harvest of a tier FARM_SEED_BACK_MIN_TIER or higher crop
+// rolls ONCE against its tier's pair of thresholds below (one draw, two
+// thresholds: under the two-chance it pays 2 of the crop's own seeds, else
+// under the one-chance it pays 1, else 0), on BOTH outcomes, survived and
+// withered. Tier 1 and 2 crops draw NOTHING at harvest: their seeds have
+// vendor faucets, so the market pressure this exists for does not apply.
+//
+// TUNING, ALL PROVISIONAL, FLAGGED FOR THE MAINTAINER, and ECONOMY-SENSITIVE
+// (the state.md OPEN items): tier 3/4 seeds are market goods with NO vendor
+// faucet, so the harvest loop needs a partial seed return to stay
+// seed-positive at skill (the produce a harvest pays funds the rest of the
+// next seed) without a rate so high that seeds stop being worth crafting or
+// selling. At these rates a tier-3 harvest expects 0.48 seeds back
+// (2 x 0.08 + 1 x 0.32) and a tier-4 harvest 0.41 (2 x 0.06 + 1 x 0.29), so
+// roughly every second high-tier harvest replants itself and every other
+// plant still buys its seed from the market.
+export const FARM_SEED_BACK_MIN_TIER = 3;
+export const FARM_SEED_BACK_TWO_CHANCE: Readonly<Record<number, number>> = { 3: 0.08, 4: 0.06 };
+export const FARM_SEED_BACK_ONE_CHANCE: Readonly<Record<number, number>> = { 3: 0.4, 4: 0.35 };
 
 // Per-harvest proficiency gain schedule, the fishing FISHING_GAIN_SCHEDULE
 // shape scaled to farming's cap of 100: the breakpoints are the band
@@ -633,9 +663,11 @@ function insertPlotSorted(plots: Map<string, PlotState>, bedId: string, plot: Pl
 // harvestCrop
 // ---------------------------------------------------------------------------
 
-/** Take a finished plot out of a bed. Draws ZERO rng on every path: the
- *  outcome was rolled at plant time and the yield expands deterministically
- *  from the stored seed.
+/** Take a finished plot out of a bed. Draws ZERO rng on every deny path and
+ *  on every tier 1/2 harvest: the outcome was rolled at plant time and the
+ *  yield expands deterministically from the stored seed. A tier 3/4 harvest
+ *  draws EXACTLY ONE, the seed-back roll (the one draw block below), on both
+ *  outcomes.
  *
  *  NO BUSY GATE, unlike plantCrop. Harvesting is instant (there is no cast to
  *  conflict with) and it is the SECOND of the two visits a crop cycle ever
@@ -680,6 +712,50 @@ export function harvestCrop(ctx: SimContext, p: Entity, meta: PlayerMeta, bedId:
   // takes the plot out, whatever it turned into.
   meta.farmPlots.delete(bedId);
 
+  // ---- THE ONE HARVEST DRAW BLOCK: the seed-back roll, tier 3 and 4 only ----
+  // A REAL ctx.rng draw at harvest ACTION time, deliberately NOT a seed
+  // expansion: the tonic is seed-anchored because its outcome must be fixed at
+  // plant time, while seed-back is a fresh reward decided by the harvest
+  // itself, D4-legal because a harvest is a player action (the same legality
+  // the plant pre-roll rides). Never conflate the two, and never anchor an
+  // expansion read to a skill-varying loop position (the tonic lesson). ONE
+  // contiguous draw at this FIXED position: immediately after the
+  // plot-outcome resolution gates above, BEFORE the survived/withered branch
+  // and before every loop, so its stream position can never depend on the
+  // outcome, the yield expansion's length, or any knob. It rolls on BOTH
+  // outcomes: the withered consolation roll is DELIBERATE (a failed high-tier
+  // crop can still hand a seed back beside its husks, the same
+  // failure-is-a-smaller-reward thesis), and an outcome-scoped draw would
+  // fork the stream by outcome besides. Multi-threshold single draw: under
+  // the two-chance it pays 2 seeds, else under the one-chance 1, else 0.
+  // Tier 1/2 crops reach this block and draw NOTHING: the tier is an INPUT
+  // read from content, never an outcome, so conditioning on it cannot fork
+  // the stream, and a retired crop id reads tier 1 (farmCropTier's fallback),
+  // so neither withered arm below can ever strand an ungrantable seed-back.
+  let seedBackCount = 0;
+  if (cropTier >= FARM_SEED_BACK_MIN_TIER) {
+    const seedBackRoll = ctx.rng.next();
+    const twoChance = FARM_SEED_BACK_TWO_CHANCE[cropTier] ?? 0;
+    const oneChance = FARM_SEED_BACK_ONE_CHANCE[cropTier] ?? 0;
+    seedBackCount = seedBackRoll < twoChance ? 2 : seedBackRoll < oneChance ? 1 : 0;
+  }
+  // ------------------------- END OF THE DRAW BLOCK -------------------------
+
+  // The seed-back grant, ONE call site shared by both outcomes (the branch
+  // below only decides which event carries the count). silent + callerLogs:
+  // the farmHarvested or farmWithered event owns both halves of the feedback
+  // for the whole visit (the #2430 one-line-per-farm-grant rule), and it
+  // carries seedBackCount for the client's own seed-back line. `crop` is
+  // always defined when the count is positive (an id the catalog dropped
+  // reads tier 1 above and never rolls); the guard narrows the type rather
+  // than expressing doubt.
+  if (seedBackCount > 0 && crop) {
+    ctx.addItem(crop.seedItemId, seedBackCount, meta.entityId, {
+      silent: true,
+      callerLogs: true,
+    });
+  }
+
   if (!farmPlotSurvived(plot, skill, cropTier)) {
     // The failure payout. Granted, not merely announced: a failed crop is a
     // smaller reward, never a punishment. No proficiency: the schedule pays
@@ -701,6 +777,10 @@ export function harvestCrop(ctx: SimContext, p: Entity, meta: PlayerMeta, bedId:
       bedId,
       cropId: plot.cropId,
       count: FARM_WITHERED_HUSK_COUNT,
+      // Present ONLY when the seed-back roll above paid (the knobs
+      // only-when-true wire precedent): a zero roll leaves the frame
+      // byte-identical to the pre-field wire.
+      ...(seedBackCount > 0 ? { seedBackCount } : {}),
     });
     return;
   }
@@ -722,6 +802,9 @@ export function harvestCrop(ctx: SimContext, p: Entity, meta: PlayerMeta, bedId:
       bedId,
       cropId: plot.cropId,
       count: FARM_WITHERED_HUSK_COUNT,
+      // No seedBackCount arm here, and none can ever be owed: a retired crop
+      // id reads tier 1 (farmCropTier's fallback), so the seed-back block
+      // above never rolled for this plot.
     });
     return;
   }
@@ -815,6 +898,10 @@ export function harvestCrop(ctx: SimContext, p: Entity, meta: PlayerMeta, bedId:
     // MIXED harvest. Keeping them absent on the common path also leaves it
     // byte-identical to the pre-field wire (the stale-client doctrine).
     ...(fine > 0 && !allFine ? { fineItemId: crop.fineProduceItemId, fineCount: fine } : {}),
+    // The seed-back count, present ONLY when the roll above paid (the knobs
+    // only-when-true wire precedent): every tier 1/2 harvest and every
+    // zero-band tier 3/4 harvest keeps the pre-field frame byte-identical.
+    ...(seedBackCount > 0 ? { seedBackCount } : {}),
   });
   // Proficiency through the shared gathering-grant queue, draining on the tick
   // path exactly like a node harvest. The gain is PURE STATE computed after

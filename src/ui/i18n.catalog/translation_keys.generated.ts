@@ -8092,6 +8092,8 @@ export type TranslationKeyFlat =
   | 'hudChrome.farming.husksConvertedLine'
   | 'hudChrome.farming.husksConvertedLineQty'
   | 'hudChrome.farming.plantLine'
+  | 'hudChrome.farming.seedBackLine'
+  | 'hudChrome.farming.seedBackLineQty'
   | 'hudChrome.farming.witheredLine'
   | 'hudChrome.farming.witheredLineQty'
   | 'hudChrome.fct.absorbed'

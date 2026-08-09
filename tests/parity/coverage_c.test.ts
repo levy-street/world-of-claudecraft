@@ -10,9 +10,11 @@
 // entities helpers live in run_scenarios.ts.
 
 import { describe, expect, it } from 'vitest';
+import { ITEMS } from '../../src/sim/data';
+import { resolveFarmHarvest } from '../../src/sim/professions/farming';
 import { record } from './record';
 import { type Ev, entities, run } from './run_scenarios';
-import { SCENARIOS } from './scenarios';
+import { FARM_TONIC_WINNER_YIELD_SEED, SCENARIOS } from './scenarios';
 
 describe('coverage: each scenario fires its subsystem', () => {
   it('mob_lifecycle: frenzy + death-throes arm/detonate + wild respawn (despawn adds) + dungeon stays dead', () => {
@@ -548,31 +550,34 @@ describe('coverage: each scenario fires its subsystem', () => {
     expect(slot.durability).toBe(29);
   });
 
-  it('farming_session: two plants draw two each, growth and both harvests draw nothing', () => {
+  it('farming_session: plants draw two each, only the tier-3 harvest draws one (the seed-back roll)', () => {
     const { trace, rec } = record(SCENARIOS.find((s) => s.name === 'farming_session')!);
     const ev = rec.allEvents as Ev[];
     const pid = (rec.sim as any).playerId as number;
     const meta = (rec.sim as any).players.get(pid);
 
-    // Both plants landed, in drive order, and each started the flavor cast.
-    // The second one is the load-bearing half: it only lands because the
-    // drive waits out the first cast, so a busy-gate regression turns the
-    // pair into a single plant here.
+    // All four plants landed, in drive order, and each started the flavor
+    // cast. The second one is the load-bearing half of the busy gate (it only
+    // lands because the drive waits out the first cast); the third is the
+    // knobbed plant on the freed bed; the fourth is the tier-3 barley at the
+    // Thornpeak patch.
     expect(ev.filter((e) => e.type === 'farmPlanted').map((e) => e.bedId)).toEqual([
       'bed_eastbrook_1',
       'bed_eastbrook_2',
+      'bed_eastbrook_1',
+      'bed_thornpeak_1',
     ]);
     expect(
       ev.filter((e) => e.type === 'castStart' && e.ability === 'farming'),
-      'both plants started the FARMING_CAST_ID flavor cast',
-    ).toHaveLength(2);
+      'every plant started the FARMING_CAST_ID flavor cast',
+    ).toHaveLength(4);
 
     // THE DRAW LEDGER, the point of this scenario. rng.draws is cumulative
     // from drive start: two draws per plant (the contiguous survival + yield
-    // seed pre-roll) and NOTHING anywhere else. The growth window and both
-    // harvests sitting at the same count as the last plant is the pin that a
-    // draw added at the growth deadline, in the tick sweep, or in either
-    // harvest body would move.
+    // seed pre-roll), EXACTLY one at the tier-3 harvest (the seed-back roll),
+    // and NOTHING anywhere else. Growth windows, tier-1 harvests (toniced
+    // included), and the husk trade all sit at the count of the beat before
+    // them; harvested-t3 sitting at planted-t3 + 1 is the seed-back clause.
     const drawsAt = (label: string): number => {
       const frame = trace.frames.find((f) => f.label === label);
       expect(frame, `missing the ${label} checkpoint frame`).toBeTruthy();
@@ -582,76 +587,143 @@ describe('coverage: each scenario fires its subsystem', () => {
     expect(drawsAt('planted')).toBe(4);
     expect(drawsAt('grown')).toBe(4);
     expect(drawsAt('harvested')).toBe(4);
-    expect(trace.draws).toBe(4);
+    expect(drawsAt('planted-knobbed')).toBe(6);
+    expect(drawsAt('harvested-toniced')).toBe(6);
+    expect(drawsAt('husks-converted')).toBe(6);
+    expect(drawsAt('planted-t3')).toBe(8);
+    expect(drawsAt('harvested-t3')).toBe(9);
+    expect(trace.draws).toBe(9);
 
-    // The survived plot paid produce expanded from its stored yield seed: the
-    // guaranteed three-pick floor, with no pick upgrading at proficiency 0
-    // (the fine chance there is 0.02), so BOTH fine fields stay absent and
-    // the common harvest keeps the pre-field wire shape.
+    // The knobbed plant really stored all three paid flags (farmPlanted is
+    // knob-free on the wire, so the drive stashes the stored plot's flags).
+    expect(rec.notes.knobbedFlags).toEqual({ compost: true, watch: true, tonic: true });
+
+    // The first survived plot paid produce expanded from its stored yield
+    // seed: the guaranteed three-pick floor, with no pick upgrading at
+    // proficiency 0 (the fine chance there is 0.02), so BOTH fine fields stay
+    // absent and the common harvest keeps the pre-field wire shape. No
+    // seedBackCount either: tier 1 never rolls (the omit-zero doctrine).
     const harvested = ev.filter((e) => e.type === 'farmHarvested');
-    expect(harvested).toHaveLength(1);
+    expect(harvested).toHaveLength(3);
     expect(harvested[0].bedId).toBe('bed_eastbrook_1');
     expect(harvested[0].itemId).toBe('vale_wheat');
     expect(harvested[0].count).toBe(3);
     expect('fineItemId' in harvested[0]).toBe(false);
     expect('fineCount' in harvested[0]).toBe(false);
+    expect('seedBackCount' in harvested[0]).toBe(false);
 
     // The plot forced to fail paid husks INSTEAD of produce, and said so with
-    // its own event rather than a quiet empty harvest.
+    // its own event rather than a quiet empty harvest. Tier 1: no seed-back
+    // field on the withered arm either.
     const withered = ev.filter((e) => e.type === 'farmWithered');
     expect(withered).toHaveLength(1);
     expect(withered[0].bedId).toBe('bed_eastbrook_2');
     expect(withered[0].count).toBe(2);
+    expect('seedBackCount' in withered[0]).toBe(false);
 
-    // ONE LINE PER FARM GRANT (#2430), pinned where it is actually
-    // observable. Both farm grants go through the shared inventory hub, which
-    // emits its own "You receive: X" loot event; the farming resolver stands
-    // that text (and its ding) down with { silent: true, callerLogs: true } so
-    // the client's own farming line is the only one a player sees. Nothing
-    // else in the suite would notice those flags being dropped: the grant
-    // still lands, the farm events are unchanged, and the double line only
-    // shows up in a running client.
-    //
-    // The partition is by position, not by text: the ONLY loot event before
-    // the first farmPlanted is the drive's own seed grant (scaffolding, which
-    // deliberately keeps the hub line), and everything after it is a farm
-    // payout.
-    const loot = ev.filter((e) => e.type === 'loot');
-    const firstPlantAt = ev.findIndex((e) => e.type === 'farmPlanted');
-    expect(firstPlantAt).toBeGreaterThanOrEqual(0);
-    const grantLoot = ev.filter((e, i) => e.type === 'loot' && i > firstPlantAt);
-    // Anti-vacuous, and tighter than "at least one": exactly the produce grant
-    // and the husk grant, so an unrelated loot event drifting into the window
-    // fails here rather than being silently swept into the flag check below.
-    expect(grantLoot).toHaveLength(2);
-    for (const g of grantLoot) {
-      expect(g.callerLogs, `farm grant loot must stand its own text down: ${g.text}`).toBe(true);
-      expect(g.silent, `farm grant loot must stand its own ding down: ${g.text}`).toBe(true);
-    }
-    // The inverse arm, which is what proves the flags come from the farming
-    // grant path and are not simply on every loot event in the world: the
-    // drive's setup grant, before any planting, carries neither.
-    expect(loot).toHaveLength(3);
-    expect(loot[0].callerLogs).toBeUndefined();
-    expect(loot[0].silent).toBeUndefined();
+    // The toniced harvest, on the probed WINNING yieldSeed the drive wrote
+    // (the M8 lesson: at a losing seed both expansions coincide and this
+    // beat proves nothing). The in-arm non-vacuity guard is the first
+    // assertion: the toniced expansion of that seed really exceeds the
+    // unarmed one at the harvest-time skill of 1 (the first harvest's +1
+    // gain had drained by then).
+    const toniced = resolveFarmHarvest(FARM_TONIC_WINNER_YIELD_SEED, 1, true);
+    const unarmed = resolveFarmHarvest(FARM_TONIC_WINNER_YIELD_SEED, 1, false);
+    expect(toniced.count).toBeGreaterThan(unarmed.count);
+    expect(toniced.fine).toBe(0); // the probe chose a fine-free winner
+    expect(harvested[1].bedId).toBe('bed_eastbrook_1');
+    expect(harvested[1].itemId).toBe('vale_wheat');
+    expect(harvested[1].count).toBe(toniced.count);
+    expect('fineItemId' in harvested[1]).toBe(false);
+    expect('seedBackCount' in harvested[1]).toBe(false);
 
-    // Both grants really reached the bags, both seeds really left them, and
-    // both beds are free again (one visit takes the plot out on either
-    // outcome).
+    // The husk trade: the withered beat paid exactly 2 husks, one batch, so
+    // one call converts them into exactly one compost.
+    const convertedEv = ev.filter((e) => e.type === 'farmHusksConverted');
+    expect(convertedEv).toHaveLength(1);
+    expect(convertedEv[0].husks).toBe(2);
+    expect(convertedEv[0].compost).toBe(1);
+
+    // The tier-3 harvest: whatever band the shared stream yielded is the
+    // recorded truth, so the pins are CONSISTENCY, never a band literal: the
+    // event's seedBackCount (present only when positive) must equal the
+    // highland_barley_seed bag delta (the drive granted 1 seed and the plant
+    // spent it, so the final bag IS the seed-back), and the base/fine grants
+    // must match their bags the same way.
     const countOf = (itemId: string): number =>
       meta.inventory
         .filter((s: any) => s.itemId === itemId)
         .reduce((n: number, s: any) => n + (s.count ?? 1), 0);
-    expect(countOf('vale_wheat')).toBe(3);
-    expect(countOf('withered_husks')).toBe(2);
+    const barleyEv = harvested[2];
+    expect(barleyEv.bedId).toBe('bed_thornpeak_1');
+    expect(barleyEv.cropId).toBe('highland_barley');
+    const seedBack = (barleyEv.seedBackCount as number | undefined) ?? 0;
+    expect([0, 1, 2]).toContain(seedBack);
+    if ('seedBackCount' in barleyEv) expect(seedBack).toBeGreaterThan(0); // omit-zero
+    expect(countOf('highland_barley_seed')).toBe(seedBack);
+    expect(countOf(barleyEv.itemId)).toBe(barleyEv.count);
+    if (barleyEv.fineItemId !== undefined) {
+      expect(countOf(barleyEv.fineItemId)).toBe(barleyEv.fineCount);
+    }
+
+    // ONE LINE PER FARM GRANT (#2430), pinned where it is actually
+    // observable. Every farm payout goes through the shared inventory hub,
+    // whose "You receive: X" loot event must ride with { silent: true,
+    // callerLogs: true } so the client's own farming line is the only one a
+    // player sees. The drive's scaffolding grants keep the plain hub line,
+    // which is the inverse arm proving the flags come from the farming grant
+    // path and not from every loot event in the world. The partition is
+    // exhaustive and EXACT: no event may carry half the pair, the unflagged
+    // side is pinned to the eight scaffolding grants in drive order, and the
+    // flagged side is counted by arithmetic over the farm events themselves
+    // (one hub grant per base payout, per present fine pair, per present
+    // seedBackCount, per husk trade).
+    const loot = ev.filter((e) => e.type === 'loot');
+    const flagged = loot.filter((l) => l.silent === true && l.callerLogs === true);
+    const unflagged = loot.filter((l) => l.silent === undefined && l.callerLogs === undefined);
+    expect(flagged.length + unflagged.length, 'no loot event may carry half the flag pair').toBe(
+      loot.length,
+    );
+    const receiveLine = (itemId: string, count = 1): string =>
+      `You receive: ${(ITEMS as any)[itemId].name}${count > 1 ? ' x' + count : ''}.`;
+    expect(unflagged.map((l) => l.text)).toEqual([
+      receiveLine('vale_wheat_seed', 2),
+      receiveLine('garden_hoe'),
+      receiveLine('vale_wheat_seed'),
+      receiveLine('compost'),
+      receiveLine('growth_tonic'),
+      receiveLine('vale_wheat', 2),
+      receiveLine('skysilver_hoe'),
+      receiveLine('highland_barley_seed'),
+    ]);
+    const expectedFlagged =
+      harvested.reduce(
+        (n, e) =>
+          n + 1 + (e.fineItemId !== undefined ? 1 : 0) + (e.seedBackCount !== undefined ? 1 : 0),
+        0,
+      ) +
+      withered.reduce((n, e) => n + 1 + (e.seedBackCount !== undefined ? 1 : 0), 0) +
+      convertedEv.length;
+    expect(flagged).toHaveLength(expectedFlagged);
+
+    // The bags agree with every beat: the fee spent 2 of the 5 produce held
+    // (3 banked + 2 scaffolding) before the toniced harvest re-paid, the
+    // husk batch became the compost back in the bag (1 granted - 1 paid + 1
+    // converted), the tonic was consumed, and every seed pouch is empty
+    // except the seed-back. Both eastbrook beds and the thornpeak bed are
+    // free again (one visit takes the plot out on either outcome).
+    expect(countOf('vale_wheat')).toBe(3 + toniced.count);
+    expect(countOf('withered_husks')).toBe(0);
     expect(countOf('vale_wheat_seed')).toBe(0);
+    expect(countOf('compost')).toBe(1);
+    expect(countOf('growth_tonic')).toBe(0);
     expect(meta.farmPlots.size).toBe(0);
 
-    // The gathering-grant drain: the harvest queues proficiency from the
-    // command body and the per-player tick loop pays it out on a LATER tick,
-    // so this also proves the drive's tail is long enough to catch it. One
-    // gain of 1 from the survived harvest; the withered one queues nothing.
-    expect(meta.gatheringProficiency.farming).toBe(1);
+    // The gathering-grant drain across the whole session: +1 at proficiency
+    // 0 from the first harvest, +1 at 1 from the toniced harvest (drained
+    // before the drive's proficiency write of 75), then the barley harvest's
+    // 0.02 at 75 (tier 3 teaches past 75) lands on the tail ticks.
+    expect(meta.gatheringProficiency.farming).toBeCloseTo(75.02, 10);
   });
 
   it('idle_mob_distance_culling: advances the near mob, freezes the far mob, and keeps passive rolls off the shared stream', () => {

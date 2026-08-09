@@ -8770,6 +8770,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.farming.harvestFineLineQty': '또한 {name} x{qty}을(를) 수확했습니다.',
   'hudChrome.farming.witheredLine': '작물이 시들었습니다. 밭을 정리했습니다: {name}.',
   'hudChrome.farming.witheredLineQty': '작물이 시들었습니다. 밭을 정리했습니다: {name} x{qty}.',
+  'hudChrome.farming.seedBackLine': '씨앗을 회수했습니다: {name}.',
+  'hudChrome.farming.seedBackLineQty': '씨앗을 회수했습니다: {name} x{qty}.',
   'hudChrome.farming.denied.bad_bed': '그곳에는 작물밭이 없습니다.',
   'hudChrome.farming.denied.bad_crop': '그것은 여기에 심을 수 없습니다.',
   'hudChrome.farming.denied.range': '그 작물밭에서 너무 멀리 떨어져 있습니다.',

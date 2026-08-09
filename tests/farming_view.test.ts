@@ -14,6 +14,7 @@ import {
   farmHarvestLineKey,
   farmHusksConvertedLineKey,
   farmPlantedTokenId,
+  farmSeedBackLineKey,
   farmWitheredLineKey,
 } from '../src/ui/farming_view';
 import { gatherLineKey, harvestLineKey } from '../src/ui/grant_line_view';
@@ -141,6 +142,12 @@ describe('the farm grant-line selectors', () => {
     expect(farmFineLineKey(2)).toBe('hudChrome.farming.harvestFineLineQty');
     expect(farmWitheredLineKey(1)).toBe('hudChrome.farming.witheredLine');
     expect(farmWitheredLineKey(2)).toBe('hudChrome.farming.witheredLineQty');
+    // The seed-back sentence (tier 3/4 harvests, both outcomes): the same
+    // boundary, and the shipped payouts sit exactly one on each side of it
+    // (1 seed takes the plain line, 2 the quantity sibling).
+    expect(farmSeedBackLineKey(undefined)).toBe('hudChrome.farming.seedBackLine');
+    expect(farmSeedBackLineKey(1)).toBe('hudChrome.farming.seedBackLine');
+    expect(farmSeedBackLineKey(2)).toBe('hudChrome.farming.seedBackLineQty');
     // The husk trade keys on the COMPOST granted, the grant side of the
     // trade, with the same boundary and the same absent-reads-as-one rule.
     expect(farmHusksConvertedLineKey(undefined)).toBe('hudChrome.farming.husksConvertedLine');
@@ -184,8 +191,10 @@ describe('the farm grant-line selectors', () => {
       farmWitheredLineKey(2),
       farmHusksConvertedLineKey(1),
       farmHusksConvertedLineKey(2),
+      farmSeedBackLineKey(1),
+      farmSeedBackLineKey(2),
     ];
-    expect(new Set(farmKeys).size).toBe(8);
+    expect(new Set(farmKeys).size).toBe(10);
     // And never the gather or corpse-harvest families either: those matchers
     // still own "You gather:" / "You harvest:" for their own surfaces.
     for (const shared of [

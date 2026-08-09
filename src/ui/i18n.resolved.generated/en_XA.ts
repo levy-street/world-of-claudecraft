@@ -2899,6 +2899,8 @@ export const en_XA: EnTranslations = {
       "harvestFineLineQty": "[Ýóú áļšó ƀŕíñĝ íñ: {name} ẋ{qty}.]",
       "witheredLine": "[Ţĥé çŕóþ ŵíţĥéŕéð. Ýóú çļéáŕ ţĥé ƀéð: {name}.]",
       "witheredLineQty": "[Ţĥé çŕóþ ŵíţĥéŕéð. Ýóú çļéáŕ ţĥé ƀéð: {name} ẋ{qty}.]",
+      "seedBackLine": "[Ýóú ŕéçóʋéŕ šééð: {name}.]",
+      "seedBackLineQty": "[Ýóú ŕéçóʋéŕ šééð: {name} ẋ{qty}.]",
       "denied": {
         "bad_bed": "[Ţĥéŕé íš ñó çŕóþ ƀéð ţĥéŕé.]",
         "bad_crop": "[Ýóú çáññóţ þļáñţ ţĥáţ ĥéŕé.]",
