@@ -344,6 +344,21 @@ export function slotEffect(
   };
 }
 
+/** Whether this profession's slot may NEVER mint in prompt mode: the ONE
+ *  policy authority for the pairing, read by the resolver arm below (which
+ *  refuses the mint) AND by the professions window (which suppresses the
+ *  "Ask each use" toggle on the row), so the two surfaces cannot drift. The
+ *  Phase 5 QA found the drift's cost: the window offered farming a checkbox
+ *  whose every resulting mint the resolver refused, so ticking it emptied
+ *  the row's slottable set and erased both the buttons and the toggle
+ *  itself until the window reopened. Farming refuses because harvest_crop
+ *  carries no confirm channel (see the resolver arm's banner); the Phase
+ *  7/8 change that lands the channel edits this predicate and the arm
+ *  together. */
+export function promptSlotRefused(professionId: string): boolean {
+  return professionId === 'farming';
+}
+
 /** Stable deny vocabulary for one slot request (the trainResult idiom: ids,
  *  not prose; the client renders localized copy). `invalid_request` covers the
  *  shapes an honest client never sends (unknown profession/effect, a
@@ -450,7 +465,7 @@ export function resolveSlotToolEffect(
   // (normalizeToolEffectSlots below) needs no matching arm: farming slots
   // became mintable only in the hoe phase and this gate ships with the
   // ladder, so no persisted farming row in prompt mode can exist.
-  if (professionId === 'farming' && confirmMode === 'prompt') {
+  if (promptSlotRefused(professionId) && confirmMode === 'prompt') {
     return { ok: false, reason: 'invalid_request' };
   }
   const profession = professionId as GatheringProfessionId;
