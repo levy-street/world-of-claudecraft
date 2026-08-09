@@ -223,10 +223,14 @@ function stripOrphanedFormAuras(ctx: SimContext, meta: PlayerMeta, e: Entity | u
   }
 }
 
+// Combat is the line, not the venue. A battleground is deliberately absent: a
+// queue pop can catch a player in a farming build, the match is rated, and gear
+// was always swappable in there (equipItem carries no match gate), so blocking
+// the talent half left a fighter with no way to fix a build the queue chose for
+// them. The arena stays locked; its matches are short and start on a prep hold.
 function talentLockReason(ctx: SimContext, p: Entity): string | null {
   if (p.inCombat) return 'You cannot change talents in combat.';
   if (ctx.arenaMatches.has(p.id)) return 'You cannot change talents during an arena match.';
-  if (ctx.bgMatches.has(p.id)) return 'You cannot change talents during a battleground.';
   return null;
 }
 
@@ -335,7 +339,7 @@ function dismissSpecLockedPet(ctx: SimContext, e: Entity, meta: PlayerMeta): voi
 
 // Legacy incremental API retained for old scripts. The node system is gone, so
 // this no longer changes state.
-export function spendTalentPoint(ctx: SimContext, nodeId: string, pid?: number): boolean {
+export function spendTalentPoint(ctx: SimContext, _nodeId: string, pid?: number): boolean {
   const r = ctx.resolve(pid);
   if (!r) return false;
   ctx.error(r.e.id, 'Invalid talent build.');

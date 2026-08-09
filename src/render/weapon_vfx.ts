@@ -2699,6 +2699,12 @@ function makeShell(root: THREE.Object3D, shellSpec: WeaponVfxShellSpec): VfxPart
     shell.scale.setScalar(1.015);
     shell.frustumCulled = false;
     shell.userData.__vfx = true;
+    // The shell parents to the host weapon mesh, not the rig group visual.ts
+    // tags, and userData is per object, never inherited. Without its own skip
+    // tag applyMaterials re-owns the shell with a ShaderMaterial clone, so the
+    // rig's per-frame uTime and shed uStr uniform writes land on a material
+    // nothing renders anymore.
+    shell.userData.weaponVfxMesh = true;
     shells.push({ host, shell });
   });
   for (const { host, shell } of shells) host.add(shell);

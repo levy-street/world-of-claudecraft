@@ -338,14 +338,36 @@ export class QuestDialogController {
         ),
       )
       .map((progress) => progress.questId);
-    // The WARFARE quartermaster ADDS its sectioned window (gated on the NpcDef
-    // flag, never a hard-coded id) BESIDE the generic goods row rather than
-    // replacing it: FURY shipped with a goods row, and suppressing it took
-    // selling and buyback away at an NPC that already had them. The two rows
-    // carry different labels and different accessible names, which is what the
-    // suppression was really there to avoid.
+    // The WARFARE quartermaster REPLACES the generic goods row with its sectioned
+    // window (gated on the NpcDef flag, never a hard-coded id).
+    //
+    // This reverses an earlier decision, deliberately (owner 2026-08-07). Both rows
+    // used to show, on the reasoning that distinct labels made them tellable apart
+    // and that suppressing the generic row cost selling and buyback at an NPC that
+    // had them. In play the two still read as the same option, because they open
+    // the SAME stock: a quartermaster's vendorItems IS the whole WARFARE catalog,
+    // so the generic grid is a flat copy of what the sectioned window lays out
+    // properly. One row, the good one.
+    //
+    // The stock itself must stay non-empty: the honor purchase path is generic
+    // over vendorItems (items.ts buyItem refuses an empty list and requires the id
+    // to be in it), and the warfareVendor flag is a WINDOW routing hint the buy
+    // path never reads. Emptying the stock to hide the row would turn the shop
+    // off. Suppressing the ROW is the only lever that does not.
+    //
+    // It is also the safer row. The ordinary vendor window renders an honor price
+    // for its rows (vendor_view.ts) and its onBuy calls sim.buyItem straight
+    // through with NO confirm, so the generic row was an unconfirmed one-click
+    // path to the same tens-of-thousands-of-honor set pieces the sectioned window
+    // puts behind a confirm dialog (Hud.requestWarfarePurchase). Dropping it
+    // closes that bypass; tests/warfare_purchase_confirm.test.ts pins both halves.
+    //
+    // Accepted cost: selling is no longer reachable at FURY or Warmarshal Draven
+    // Kole, both dedicated honor quartermasters. Nothing is stranded by it: the
+    // buyback list is per PLAYER (PlayerMeta.vendorBuyback), not per NPC, so
+    // anything sold earlier is still bought back at any other vendor in the world.
     const hasWarfareVendor = isWarfareVendorNpc(definition);
-    const hasVendor = npc.vendorItems.length > 0;
+    const hasVendor = npc.vendorItems.length > 0 && !hasWarfareVendor;
     // Station master (Professions 2.0): the resident master of a
     // crafting station (stations content masterNpcId) offers recipe training.
     const hasTraining = isStationMasterNpc(npc.templateId, world.stationPlacements);

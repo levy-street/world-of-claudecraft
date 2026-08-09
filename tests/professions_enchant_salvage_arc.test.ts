@@ -26,10 +26,11 @@ vi.mock('../server/db', () => ({
 
 import { type ClientSession, GameServer } from '../server/game';
 import type { ClientWorld } from '../src/net/online';
+import { BUILTIN_WORLD } from '../src/sim/data';
 import { MARKET_MAX_LISTINGS } from '../src/sim/market';
 import { type PlayerMeta, Sim } from '../src/sim/sim';
 import * as tradeMod from '../src/sim/social/trade';
-import type { Entity, InvSlot, SimEvent } from '../src/sim/types';
+import type { Entity, InvSlot, SimEvent, WorldContent } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
 import { bareClient } from './helpers/bare_client';
 import {
@@ -39,6 +40,19 @@ import {
   runDisenchant,
   runSalvage,
 } from './helpers/enchant_family_cast';
+
+// Subsystem world (Phase 9 pattern, tests/sim_shared.ts): every offline Sim in
+// this suite exercises crafting, disenchant/enchant/salvage, player trade, and
+// the World Market, never an ambient camp or mob. It DOES need two built-in
+// NPCs by templateId (moveToVendor's trader_wilkes, moveToMerchant's
+// the_merchant), so this keeps every built-in npc (fixed placements, no rng
+// draw) and trims only the camps and groundObjects that spawn the rest of the
+// 11-zone world's mobs/loot and consume rng draws neither surface here reads.
+const PROFESSIONS_ENCHANT_SALVAGE_TEST_WORLD: WorldContent = {
+  ...BUILTIN_WORLD,
+  camps: [],
+  groundObjects: [],
+};
 
 /** Complete a running enchant-family cast on the server sim and route events. */
 function flushEnchantFamilyCast(server: GameServer, pid: number): void {
@@ -184,7 +198,12 @@ function moveToMerchant(sim: Sim, pid: number): void {
 
 describe('offline Sim end-to-end (IWorld surface)', () => {
   it('crafted Eastbrook Chainmail Vest stacks yield materials but never teach Enchanting', () => {
-    const sim = new Sim({ seed: 20260726, playerClass: 'warrior', autoEquip: false });
+    const sim = new Sim({
+      seed: 20260726,
+      playerClass: 'warrior',
+      world: PROFESSIONS_ENCHANT_SALVAGE_TEST_WORLD,
+      autoEquip: false,
+    });
     const pid = sim.playerId;
     const meta = metaFor(sim, pid);
 
@@ -215,7 +234,12 @@ describe('offline Sim end-to-end (IWorld surface)', () => {
   });
 
   it('crafted Eastbrook Chainmail Vest replacement keeps provenance before disenchant', () => {
-    const sim = new Sim({ seed: 20260728, playerClass: 'warrior', autoEquip: false });
+    const sim = new Sim({
+      seed: 20260728,
+      playerClass: 'warrior',
+      world: PROFESSIONS_ENCHANT_SALVAGE_TEST_WORLD,
+      autoEquip: false,
+    });
     const pid = sim.playerId;
     const meta = metaFor(sim, pid);
 
@@ -244,7 +268,12 @@ describe('offline Sim end-to-end (IWorld surface)', () => {
   });
 
   it('crafted Eastbrook Chainmail Vest unequip keeps provenance before disenchant', () => {
-    const sim = new Sim({ seed: 20260729, playerClass: 'warrior', autoEquip: false });
+    const sim = new Sim({
+      seed: 20260729,
+      playerClass: 'warrior',
+      world: PROFESSIONS_ENCHANT_SALVAGE_TEST_WORLD,
+      autoEquip: false,
+    });
     const pid = sim.playerId;
     const meta = metaFor(sim, pid);
 
@@ -264,7 +293,12 @@ describe('offline Sim end-to-end (IWorld surface)', () => {
   });
 
   it('crafted Eastbrook Chainmail Vest buyback keeps provenance before disenchant', () => {
-    const sim = new Sim({ seed: 20260730, playerClass: 'warrior', autoEquip: false });
+    const sim = new Sim({
+      seed: 20260730,
+      playerClass: 'warrior',
+      world: PROFESSIONS_ENCHANT_SALVAGE_TEST_WORLD,
+      autoEquip: false,
+    });
     const pid = sim.playerId;
     const meta = metaFor(sim, pid);
     moveToVendor(sim);
@@ -304,6 +338,7 @@ describe('offline Sim end-to-end (IWorld surface)', () => {
     const sim = new Sim({
       seed: 20260731,
       playerClass: 'warrior',
+      world: PROFESSIONS_ENCHANT_SALVAGE_TEST_WORLD,
       autoEquip: false,
       noPlayer: true,
     });
@@ -343,6 +378,7 @@ describe('offline Sim end-to-end (IWorld surface)', () => {
     const sim = new Sim({
       seed: 20260732,
       playerClass: 'warrior',
+      world: PROFESSIONS_ENCHANT_SALVAGE_TEST_WORLD,
       autoEquip: false,
       noPlayer: true,
     });
@@ -383,6 +419,7 @@ describe('offline Sim end-to-end (IWorld surface)', () => {
     const sim = new Sim({
       seed: 20260734,
       playerClass: 'warrior',
+      world: PROFESSIONS_ENCHANT_SALVAGE_TEST_WORLD,
       autoEquip: false,
       noPlayer: true,
     });
@@ -419,6 +456,7 @@ describe('offline Sim end-to-end (IWorld surface)', () => {
     const sim = new Sim({
       seed: 20260735,
       playerClass: 'warrior',
+      world: PROFESSIONS_ENCHANT_SALVAGE_TEST_WORLD,
       autoEquip: false,
       noPlayer: true,
     });
@@ -457,6 +495,7 @@ describe('offline Sim end-to-end (IWorld surface)', () => {
     const sim = new Sim({
       seed: 20260736,
       playerClass: 'warrior',
+      world: PROFESSIONS_ENCHANT_SALVAGE_TEST_WORLD,
       autoEquip: false,
       noPlayer: true,
     });
@@ -482,7 +521,12 @@ describe('offline Sim end-to-end (IWorld surface)', () => {
   });
 
   it('a non-crafted eligible item still gains Enchanting skill when disenchanted', () => {
-    const sim = new Sim({ seed: 20260727, playerClass: 'warrior', autoEquip: false });
+    const sim = new Sim({
+      seed: 20260727,
+      playerClass: 'warrior',
+      world: PROFESSIONS_ENCHANT_SALVAGE_TEST_WORLD,
+      autoEquip: false,
+    });
     const pid = sim.playerId;
     const meta = metaFor(sim, pid);
 
@@ -495,7 +539,12 @@ describe('offline Sim end-to-end (IWorld surface)', () => {
   });
 
   it('disenchants a rare (typed secondary), applies a Runed enchant, salvages, with lastX mirrors', () => {
-    const sim = new Sim({ seed: 20260721, playerClass: 'warrior', autoEquip: false });
+    const sim = new Sim({
+      seed: 20260721,
+      playerClass: 'warrior',
+      world: PROFESSIONS_ENCHANT_SALVAGE_TEST_WORLD,
+      autoEquip: false,
+    });
     const inv = () => sim.ctx.resolve()?.meta.inventory ?? [];
 
     // 1. Rare disenchant: fixed 1 essence + exactly 1 armed resonant_steel.
@@ -553,7 +602,12 @@ describe('offline Sim end-to-end (IWorld surface)', () => {
 
 describe('online end-to-end (live GameServer, wire commands + self-deltas)', () => {
   it('disenchants the selected duplicate slot and preserves a masterwork copy with the same item id', () => {
-    const sim = new Sim({ seed: 314, playerClass: 'warrior', autoEquip: false });
+    const sim = new Sim({
+      seed: 314,
+      playerClass: 'warrior',
+      world: PROFESSIONS_ENCHANT_SALVAGE_TEST_WORLD,
+      autoEquip: false,
+    });
     const pid = sim.playerId;
     sim.ctx.addItemInstance(
       COMMON_WEAPON,
@@ -693,7 +747,12 @@ describe('apply-enchant keeps the crafted-provenance marker (the anti-farm gate)
     // The bug: a common crafted piece carries its provenance on the SLOT with no
     // `instance` at all, and the mint rebuilt the copy from the consumed
     // PAYLOAD only, so the marker had nowhere to survive.
-    const sim = new Sim({ seed: 20260901, playerClass: 'warrior', autoEquip: false });
+    const sim = new Sim({
+      seed: 20260901,
+      playerClass: 'warrior',
+      world: PROFESSIONS_ENCHANT_SALVAGE_TEST_WORLD,
+      autoEquip: false,
+    });
     const pid = sim.playerId;
     grantVestMaterials(sim, pid);
     runCraft(sim, CRAFTED_COMMON_ARMOR_RECIPE, false, pid);
@@ -710,7 +769,12 @@ describe('apply-enchant keeps the crafted-provenance marker (the anti-farm gate)
   it('disenchanting that enchanted self-crafted piece still pays NO enchanting skill', () => {
     // The behaviour the marker exists for. Without it, craft -> enchant ->
     // disenchant is a self-serve skill loop on the player's own gear.
-    const sim = new Sim({ seed: 20260902, playerClass: 'warrior', autoEquip: false });
+    const sim = new Sim({
+      seed: 20260902,
+      playerClass: 'warrior',
+      world: PROFESSIONS_ENCHANT_SALVAGE_TEST_WORLD,
+      autoEquip: false,
+    });
     const pid = sim.playerId;
     const meta = metaFor(sim, pid);
     grantVestMaterials(sim, pid);
@@ -732,7 +796,12 @@ describe('apply-enchant keeps the crafted-provenance marker (the anti-farm gate)
   it('a FOUND piece still pays skill: the gate denies provenance, not enchanting', () => {
     // The negative arm. If this ever went to 0 the fix would be over-broad,
     // silently killing the legitimate disenchant faucet.
-    const sim = new Sim({ seed: 20260903, playerClass: 'warrior', autoEquip: false });
+    const sim = new Sim({
+      seed: 20260903,
+      playerClass: 'warrior',
+      world: PROFESSIONS_ENCHANT_SALVAGE_TEST_WORLD,
+      autoEquip: false,
+    });
     const pid = sim.playerId;
     const meta = metaFor(sim, pid);
     sim.addItem(CRAFTED_COMMON_ARMOR, 1, pid); // granted, never crafted: no marker
@@ -751,7 +820,12 @@ describe('apply-enchant keeps the crafted-provenance marker (the anti-farm gate)
   });
 
   it('a masterwork crafted copy keeps seal, signer, AND marker through the mint', () => {
-    const sim = new Sim({ seed: 20260904, playerClass: 'warrior', autoEquip: false });
+    const sim = new Sim({
+      seed: 20260904,
+      playerClass: 'warrior',
+      world: PROFESSIONS_ENCHANT_SALVAGE_TEST_WORLD,
+      autoEquip: false,
+    });
     const pid = sim.playerId;
     sim.addItemInstance(
       CRAFTED_COMMON_ARMOR,
@@ -772,7 +846,12 @@ describe('apply-enchant keeps the crafted-provenance marker (the anti-farm gate)
   });
 
   it('the REPLACE arm keeps the marker too', () => {
-    const sim = new Sim({ seed: 20260905, playerClass: 'warrior', autoEquip: false });
+    const sim = new Sim({
+      seed: 20260905,
+      playerClass: 'warrior',
+      world: PROFESSIONS_ENCHANT_SALVAGE_TEST_WORLD,
+      autoEquip: false,
+    });
     const pid = sim.playerId;
     grantVestMaterials(sim, pid);
     runCraft(sim, CRAFTED_COMMON_ARMOR_RECIPE, false, pid);

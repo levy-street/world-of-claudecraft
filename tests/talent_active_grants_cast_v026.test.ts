@@ -21,6 +21,36 @@ function addTarget(sim: Sim, distance: number): Entity {
   return mob;
 }
 
+/**
+ * An ALLY in line of sight, for a grant that cannot be self-cast.
+ *
+ * A friendly ability with an authored `minRange` refuses at distance 0, so the
+ * hostile dummy the harness gives everything else leaves it with only the
+ * current-target-else-SELF fallback and no legal target at all. Keyed on the
+ * authored minRange rather than on an ability id so the next such grant is
+ * covered too; every other friendly grant keeps the self-cast this harness has
+ * always exercised.
+ */
+function addAlly(sim: Sim, distance: number): Entity {
+  const player = sim.player;
+  const pid = sim.addPlayer('priest', 'Bystander');
+  const ally = sim.entities.get(pid);
+  if (!ally) throw new Error('no ally');
+  const hasLineOfSight = (
+    sim as unknown as { hasLineOfSight(source: Entity, target: Entity): boolean }
+  ).hasLineOfSight;
+  for (const angle of [0, Math.PI / 2, Math.PI, (3 * Math.PI) / 2, Math.PI / 4]) {
+    ally.pos.x = player.pos.x + Math.sin(angle) * distance;
+    ally.pos.z = player.pos.z + Math.cos(angle) * distance;
+    ally.pos.y = player.pos.y;
+    ally.prevPos = { ...ally.pos };
+    if (hasLineOfSight.call(sim, player, ally)) break;
+  }
+  sim.targetEntity(ally.id);
+  player.facing = Math.atan2(ally.pos.x - player.pos.x, ally.pos.z - player.pos.z);
+  return ally;
+}
+
 describe('every retained active row grant casts through the canonical Sim path', () => {
   for (const cls of ALL_CLASSES) {
     const grants = ROW_TREES[cls].flatMap((row) =>
@@ -43,7 +73,14 @@ describe('every retained active row grant casts through the canonical Sim path',
         expect(resolved, `${grant.optionId} did not resolve ${grant.abilityId}`).toBeDefined();
 
         const distance = cls === 'hunter' ? 15 : 3;
-        const target = addTarget(sim, distance);
+        const hostile = addTarget(sim, distance);
+        // A friendly grant with a minimum range needs a real ally; the hostile
+        // dummy above stays in the world so the cast still resolves against a
+        // populated scene, it just is not what the ability is aimed at.
+        const needsAlly = resolved?.def.targetType === 'friendly' && !!resolved.def.minRange;
+        const target = needsAlly
+          ? addAlly(sim, Math.max(resolved.def.minRange ?? 0, 3) + 4)
+          : hostile;
         const player = sim.player;
         if (cls === 'hunter') {
           const hasLineOfSight = (

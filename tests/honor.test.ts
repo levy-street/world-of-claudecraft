@@ -448,7 +448,13 @@ describe('WARFARE damage', () => {
     target.stats.pvpDefense = 0.2;
     target.maxHp = target.hp = 1_000;
     friendly.maxHp = friendly.hp = 1_000;
-    sim.duels.set(sourcePid, { a: sourcePid, b: targetPid, state: 'active', timer: 0 });
+    sim.duels.set(sourcePid, {
+      a: sourcePid,
+      b: targetPid,
+      state: 'active',
+      timer: 0,
+      controlled: new Map(),
+    });
     sim.duels.set(targetPid, sim.duels.get(sourcePid)!);
 
     (sim as any).dealDamage(source, target, 100, false, 'arcane', null, 'hit');
@@ -476,7 +482,13 @@ describe('WARFARE damage', () => {
     source.stats.pvpOffense = 9;
     target.stats.pvpDefense = 9;
     target.maxHp = target.hp = 1_000;
-    sim.duels.set(sourcePid, { a: sourcePid, b: targetPid, state: 'active', timer: 0 });
+    sim.duels.set(sourcePid, {
+      a: sourcePid,
+      b: targetPid,
+      state: 'active',
+      timer: 0,
+      controlled: new Map(),
+    });
     sim.duels.set(targetPid, sim.duels.get(sourcePid)!);
 
     (sim as any).dealDamage(source, target, 100, false, 'arcane', null, 'hit');

@@ -93,6 +93,7 @@ import {
   isEquipSlot,
   MAX_LEVEL,
   type MobFamily,
+  PLAYER_INTEREST_DROP_RADIUS,
   RUN_SPEED,
   type SimEvent,
   type SportRole,
@@ -317,7 +318,7 @@ const ALDRIC_METEOR_QUEST_ID = 'q_aldrics_fallen_star';
 const INTEREST_RADIUS = 90;
 // Exported so the idle-mob-tick radius below (and its test) stay pinned to this
 // exact number instead of drifting into a second copy.
-export const INTEREST_DROP_RADIUS = 100;
+export const INTEREST_DROP_RADIUS = PLAYER_INTEREST_DROP_RADIUS;
 // Stationary quest/vendor npcs anchor map markers, so they keep the legacy
 // radius; once known they cost a handful of bytes per snapshot anyway.
 const NPC_INTEREST_RADIUS = 120;
@@ -556,6 +557,10 @@ const BG_WIRE_INTERVAL_TICKS = Math.max(1, Math.round(1 / (DT * BG_WIRE_HZ)));
 const BG_WIRE_RESET_EVENTS = new Set([
   'bgQueued',
   'bgUnqueued',
+  // The offer prompt is a 30 second clock the player must act on, so it must
+  // never wait up to a BG_WIRE_HZ period to appear or to show a new accept.
+  'bgProposed',
+  'bgProposalUpdate',
   'bgFound',
   'bgStart',
   'bgFlag',
@@ -5349,14 +5354,16 @@ export class GameServer {
    *  save: an officer-plus member first (the rank that already moves this book
    *  every day), else any member. Null when nobody from the guild is online.
    *
-   *  Membership comes from a FRESH database read, not the session stamp. The
-   *  stamp can lag a kick or a leave, and carrying is NOT a free favour: if the
-   *  escrow save is refused, the carrier's session is QUARANTINED and
-   *  DISCONNECTED (the rollback arm), so a stale stamp would put a player who
-   *  is no longer even a member of the guild on a rollback-and-kick path for an
-   *  operator's act. One indexed read per operator purge is the right price for
-   *  that. A read failure answers null (fail closed: no carrier, no purge)
-   *  rather than falling back to the stamp.
+   *  Membership comes from a FRESH database read (socialDb.guildMembersFresh,
+   *  which deliberately bypasses the roster cache in server/guild_roster_cache.ts),
+   *  not the session stamp and not a TTL-cached roster answer. The stamp can lag
+   *  a kick or a leave, and carrying is NOT a free favour: if the escrow save is
+   *  refused, the carrier's session is QUARANTINED and DISCONNECTED (the
+   *  rollback arm), so a stale read would put a player who is no longer even a
+   *  member of the guild on a rollback-and-kick path for an operator's act. One
+   *  indexed read per operator purge is the right price for that. A read
+   *  failure answers null (fail closed: no carrier, no purge) rather than
+   *  falling back to the stamp.
    *
    *  Which BOOK gets flushed does not depend on this choice: the flush is
    *  driven by the session's own `dirtyGuildBanks` mark, which runGuildBankOp
@@ -5365,7 +5372,7 @@ export class GameServer {
   private async guildBankSaveCarrier(guildId: number): Promise<ClientSession | null> {
     let rankByCharacterId: Map<number, GuildRank>;
     try {
-      const members = await this.socialDb.guildMembers(guildId);
+      const members = await this.socialDb.guildMembersFresh(guildId);
       rankByCharacterId = new Map(members.map((m) => [m.id, m.rank]));
     } catch (err) {
       console.error(`guild bank carrier lookup failed for guild ${guildId}:`, err);
@@ -7428,6 +7435,12 @@ export class GameServer {
         sim.bgQueueJoin(pid);
         session.lastBgWireTick = -BG_WIRE_INTERVAL_TICKS;
         break;
+      case 'bg_respond':
+        // The client sends a real boolean; anything else is a malformed frame
+        // and must not be read as an accept.
+        if (typeof msg.accept !== 'boolean') break;
+        sim.bgRespond(msg.accept, pid);
+        break;
       case 'bg_leave':
         sim.bgQueueLeave(pid);
         session.lastBgWireTick = -BG_WIRE_INTERVAL_TICKS;
@@ -8494,11 +8507,6 @@ export class GameServer {
       res: Math.round(p.resource * 10) / 10,
       mres: p.maxResource,
       rtype: p.resourceType,
-      xp: meta.xp,
-      lxp: meta.lifetimeXp,
-      rxp: Math.round(meta.restedXp),
-      prk: meta.prestigeRank,
-      copper: meta.copper,
       gcd: round2(p.gcdRemaining),
       pcd: round2(p.potionCdRemaining),
       fcd: round2(p.firebottleCdRemaining),
@@ -8507,16 +8515,6 @@ export class GameServer {
       target: p.targetId,
       auto: p.autoAttack,
       queued: p.queuedOnSwing,
-      ap: p.attackPower,
-      sp: p.spellPower,
-      sh: p.spellHaste,
-      crit: p.critChance,
-      dodge: p.dodgeChance,
-      blk: p.blockChance,
-      bval: p.blockValue,
-      crat: p.critRating,
-      hrat: p.hasteRating,
-      hirat: p.hitRating,
       eat: p.eating ? { remaining: round2(p.eating.remaining) } : null,
       drk: p.drinking ? { remaining: round2(p.drinking.remaining) } : null,
       // Craft-cast session mirror (self-only, the eat/drk shape): the crafting
@@ -8533,7 +8531,6 @@ export class GameServer {
       opUntil: p.overpowerUntil > this.sim.time ? 1 : 0,
       opRem: round2(Math.max(0, p.overpowerUntil - this.sim.time)),
       ack: session.spectating ? 0 : anchorSession.lastInputSeq,
-      ddiff: this.sim.dungeonDifficulty(anchorSession.pid),
     });
     const json = JSON.stringify(self);
     selfLap?.('self.base');
@@ -8562,6 +8559,28 @@ export class GameServer {
     const maybe = (key: string, value: unknown): void => {
       maybeSerialized(key, JSON.stringify(value ?? null));
     };
+    // Static combat-rating/progression scalars: rarely change (gear/talent swap,
+    // level or XP gain, a copper transaction, a heroic-key toggle), unlike every
+    // other field on this record which was still being rebuilt and stringified
+    // every tick regardless. Delta-guarded like the rest of this record; the
+    // reconciliation-critical fields above (resource, gcd, swing, combo, target,
+    // auto, queued) stay unconditional since they change on most combat ticks.
+    maybe('xp', meta.xp);
+    maybe('lxp', meta.lifetimeXp);
+    maybe('rxp', Math.round(meta.restedXp));
+    maybe('prk', meta.prestigeRank);
+    maybe('copper', meta.copper);
+    maybe('ap', p.attackPower);
+    maybe('sp', p.spellPower);
+    maybe('sh', p.spellHaste);
+    maybe('crit', p.critChance);
+    maybe('dodge', p.dodgeChance);
+    maybe('blk', p.blockChance);
+    maybe('bval', p.blockValue);
+    maybe('crat', p.critRating);
+    maybe('hrat', p.hasteRating);
+    maybe('hirat', p.hitRating);
+    maybe('ddiff', this.sim.dungeonDifficulty(anchorSession.pid));
     // Dynamic / latency-sensitive fields: diffed every tick. These change from
     // outside this session's own commands/events, party member HP from another
     // player taking damage, cooldowns counting down, an incoming trade/duel,

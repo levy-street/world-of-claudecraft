@@ -10,6 +10,10 @@ import { loadBrowserslistFloors } from './scripts/browserslist_targets.mjs';
 // Untyped zero-dep build helper (same convention as the other scripts/*.mjs tools).
 // vite.config.ts is outside tsconfig `include`, so this import is never type-checked.
 import { templateModulepreload } from './scripts/i18n_modulepreload.mjs';
+import {
+  diagnosticsCaptureAllowed,
+  diagnosticsReadAllowed,
+} from './scripts/lib/diagnostics_capture_guard.mjs';
 
 const root = fileURLToPath(new URL('.', import.meta.url));
 
@@ -297,6 +301,98 @@ function musicEditorSavePlugin() {
   };
 }
 
+// Dev-only in-memory collector for an unattended local diagnostics run. Reports never
+// touch disk and the endpoints do not exist in preview or production builds.
+function diagnosticsCapturePlugin() {
+  let latestReport = '';
+  return {
+    name: 'woc-diagnostics-capture',
+    apply: 'serve' as const,
+    configureServer(server: {
+      middlewares: {
+        use: (
+          fn: (
+            req: {
+              url?: string;
+              method?: string;
+              headers: Record<string, string | string[] | undefined>;
+              socket: { remoteAddress?: string };
+              setEncoding: (encoding: BufferEncoding) => void;
+              on: (event: string, callback: (chunk?: unknown) => void) => void;
+            },
+            res: {
+              statusCode: number;
+              setHeader: (name: string, value: string) => void;
+              end: (body?: string) => void;
+            },
+            next: () => void,
+          ) => void,
+        ) => void;
+      };
+    }) {
+      server.middlewares.use((req, res, next) => {
+        const pathOnly = (req.url ?? '').split('?')[0];
+        const host = Array.isArray(req.headers.host) ? req.headers.host[0] : req.headers.host;
+        if (pathOnly === '/__diagnostics/latest') {
+          if (req.method !== 'GET') {
+            res.statusCode = 405;
+            res.end('GET only');
+            return;
+          }
+          if (!diagnosticsReadAllowed(req.socket.remoteAddress, host)) {
+            res.statusCode = 403;
+            res.end('loopback requests only');
+            return;
+          }
+          res.setHeader('Cache-Control', 'no-store');
+          res.setHeader('Content-Type', 'text/markdown; charset=utf-8');
+          res.statusCode = latestReport ? 200 : 404;
+          res.end(latestReport || 'No completed diagnostics capture yet.');
+          return;
+        }
+        if (pathOnly !== '/__diagnostics/capture') {
+          next();
+          return;
+        }
+        if (req.method !== 'POST') {
+          res.statusCode = 405;
+          res.end('POST only');
+          return;
+        }
+        const origin = Array.isArray(req.headers.origin)
+          ? req.headers.origin[0]
+          : req.headers.origin;
+        if (!diagnosticsCaptureAllowed(req.socket.remoteAddress, origin, host)) {
+          res.statusCode = 403;
+          res.end('loopback same-origin requests only');
+          return;
+        }
+        let body = '';
+        let bodyBytes = 0;
+        let rejected = false;
+        req.setEncoding('utf8');
+        req.on('data', (chunk) => {
+          if (rejected) return;
+          const text = typeof chunk === 'string' ? chunk : String(chunk ?? '');
+          bodyBytes += Buffer.byteLength(text, 'utf8');
+          if (bodyBytes > 2_000_000) {
+            rejected = true;
+            res.statusCode = 413;
+            res.end('report too large');
+            return;
+          }
+          body += text;
+        });
+        req.on('end', () => {
+          if (rejected) return;
+          latestReport = body;
+          res.statusCode = 204;
+          res.end();
+        });
+      });
+    },
+  };
+}
 export default defineConfig({
   base: '/',
   // The Svelte plugin only transforms the standalone admin entry. The testing
@@ -307,6 +403,7 @@ export default defineConfig({
     staticPageAliasPlugin(),
     i18nModulepreloadPlugin(),
     musicEditorSavePlugin(),
+    ...(process.env.WOC_DIAGNOSTICS_CAPTURE === '1' ? [diagnosticsCapturePlugin()] : []),
   ],
   resolve: { alias: { '#bot-detector': botDetectorImpl } },
   define: {

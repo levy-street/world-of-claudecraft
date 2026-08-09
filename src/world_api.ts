@@ -156,6 +156,7 @@ export type {
   BgLadderEntry,
   BgMatchInfo,
   BgPlayerInfo,
+  BgProposalInfo,
 } from './world_api/battleground';
 export type { CardMinigameInfo } from './world_api/card_minigame';
 export { isOverheadEmoteId, OVERHEAD_EMOTES } from './world_api/chat';
@@ -550,6 +551,7 @@ export const COMMAND_NAMES = [
   // env-gated force-start (dispatch-only, below).
   'bg_queue',
   'bg_leave',
+  'bg_respond',
   'bg_flag',
   'dev_bg_start',
   // Profiler-only server authority: idempotently prevents incoming damage while
@@ -787,6 +789,7 @@ export const COMMAND_FACETS = {
   // IWorldBattleground: the Thornhollow Fields queue + the deliberate flag action.
   bg_queue: 'IWorldBattleground',
   bg_leave: 'IWorldBattleground',
+  bg_respond: 'IWorldBattleground',
   bg_flag: 'IWorldBattleground',
   // IWorldCardMinigame: the Card Duel minigame queue + in-match card plays.
   // cardMinigameInfo is a snapshot read (no send).

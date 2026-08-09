@@ -1454,6 +1454,173 @@ export const ja_JP: EnTranslations = {
       "badges": {
         "backgrounded": "バックグラウンド",
         "offline": "オフライン"
+      },
+      "diagnostics": {
+        "panelAria": "World of ClaudeCraft パフォーマンス診断",
+        "title": "ClaudeCraft パフォーマンス診断",
+        "subtitle": "ゲーム固有のスキャンで、根拠とコードレベルの修正案を提示します。",
+        "aria": {
+          "liveMeasurements": "リアルタイムのパフォーマンス測定",
+          "scanProgress": "診断スキャンの進行状況",
+          "findings": "優先度順の診断結果"
+        },
+        "controls": {
+          "minimize": "最小化",
+          "expand": "展開",
+          "start": "15 秒スキャンを開始",
+          "refreshCensus": "シーン集計を更新",
+          "copyReport": "明確なレポートをコピー",
+          "downloadReport": "レポートをダウンロード",
+          "scanning": "スキャン中...",
+          "scanAnother": "別のエリアをスキャン",
+          "reportLogged": "レポートをコンソールに記録しました",
+          "copied": "コピーしました",
+          "copyBlocked": "コピーできません：レポートを記録しました",
+          "retestLowGraphics": "低画質で再テスト"
+        },
+        "instruction": "最も正確な結果を得るには、オフラインプレイに入り、重い場所を移動してカメラを回し、スキャン中にカクつく効果を発生させてください。",
+        "status": {
+          "pausedHiddenRestart": "このタブが非表示のためスキャンを一時停止しました。戻ると再開します。",
+          "restoredRestart": "タブが復帰しました。15 秒間のアクティブなゲームプレイ収集を最初からやり直します。",
+          "worldLoaded": "ワールドを読み込みました。操作可能な最初のフレームを待っています。",
+          "pausedHiddenContinue": "このタブが非表示のためスキャンを一時停止しました。続けるにはゲームに戻ってください。",
+          "collectingRemaining": {
+            "one": "アクティブなゲームプレイを収集中：残り {seconds} 秒",
+            "other": "アクティブなゲームプレイを収集中：残り {seconds} 秒"
+          },
+          "waitingFrames": "代表的なゲームプレイフレームを待機中：{current}/{minimum}",
+          "collectingNow": "アクティブなゲームプレイを収集中：問題のあるエリアを今すぐ移動してください。",
+          "ready": "スキャンの準備ができました。開始を押して遅延を再現してください。",
+          "waitingWorld": "ゲームワールドを待っています。オフラインプレイを選ぶか、オンラインキャラクターで入ってください。"
+        },
+        "metrics": {
+          "waitingRenderer": "レンダラー：待機中",
+          "waitingCensus": "シーン集計：待機中",
+          "waitingHitch": "カクつきの原因判定：ワールド進入時に有効",
+          "recent": "直近  {fps} FPS | p95 {p95} ミリ秒 | 50 ミリ秒超 {longFrames}",
+          "render": "描画  送信 {submit} ミリ秒 | ワールド {world} ミリ秒 | エンティティ {entities} ミリ秒",
+          "scene": "シーン   {calls} 呼び出し | {triangles} 三角形 | {views} ビュー",
+          "hitches": "カクつき {hitches} | シェーダー {shaders} | アップロード {uploads} | ビュー {views}",
+          "gpu": "GPU     {renderer}",
+          "waitingValue": "待機中"
+        },
+        "scoreHeadline": "{score}/100：{headline}",
+        "healthyNoFindings": "対処可能なしきい値は検出されませんでした。短いカクつきが気になる場合は、発生する正確な移動経路でもう一度スキャンしてください。",
+        "findingMeta": "{severity} | 信頼度 {confidence}",
+        "sections": {
+          "evidence": "根拠",
+          "tryNow": "今すぐ試す",
+          "codeFix": "コード修正",
+          "source": "関連ソース"
+        },
+        "severity": {
+          "critical": "重大",
+          "warning": "警告",
+          "info": "情報"
+        },
+        "confidence": {
+          "high": "高",
+          "medium": "中",
+          "low": "低"
+        },
+        "diagnosis": {
+          "noProblemTitle": "重大なパフォーマンス問題は検出されませんでした",
+          "summary": {
+            "findings": {
+              "one": "直近 10 秒は {fps} FPS、フレーム p95 は {p95} で、対処可能な問題が {findings} 件ありました。",
+              "other": "直近 10 秒は {fps} FPS、フレーム p95 は {p95} で、対処可能な問題が {findings} 件ありました。"
+            },
+            "healthy": "直近 10 秒は {fps} FPS、フレーム p95 は {p95} でした。ゲーム、ブラウザー、GPU、メモリ、アセット、ネットワークのしきい値は検出されませんでした。"
+          },
+          "titles": {
+            "hardwareAcceleration": "ソフトウェアレンダリングが有効です",
+            "integratedGpu": "ゲームは内蔵 GPU を使用しています",
+            "highDpi": "高解像度レンダリングの負荷が高くなっています",
+            "forcedHighGraphics": "高画質の強制指定で性能が低下しています",
+            "lowMemory": "デバイスの使用可能メモリが少なくなっています",
+            "browserStalls": "ブラウザーまたは拡張機能の停止を検出しました",
+            "heapPressure": "ブラウザーのメモリ圧迫を検出しました",
+            "contextLoss": "グラフィックスコンテキストがリセットされました",
+            "gpuSubmit": "GPU 送信がフレームの主なボトルネックです",
+            "sceneDraw": "シーン描画コストが現在の画質予算を超えています",
+            "shadowPass": "シャドウパスが描画呼び出しの多くを使用しています",
+            "rendererWorld": "ワールド描画の更新が CPU に制限されています",
+            "rendererEntities": "エンティティ表示の更新が CPU に制限されています",
+            "rendererNameplates": "ネームプレート描画の負荷が高くなっています",
+            "simCpu": "シミュレーションがフレーム時間を消費しています",
+            "hudCpu": "HUD 更新がフレーム時間を消費しています",
+            "eventCpu": "イベント処理がフレーム時間を消費しています",
+            "shaderCompile": "ゲーム中にシェーダーがコンパイルされています",
+            "textureUpload": "テクスチャのアップロードでカクつきが発生しています",
+            "viewCreate": "エンティティ表示の作成でカクつきが発生しています",
+            "otherHitch": "原因不明の長いフレームが残っています",
+            "assetStartup": "アセット処理でゲーム開始が遅れています",
+            "longTasks": "ブラウザーの長いタスクがフレームを妨げています",
+            "networkLatency": "ネットワーク配信で表示応答が遅れています",
+            "snapshotApply": "スナップショット処理がクライアントを妨げています",
+            "generic": "パフォーマンスルール {rule} に対処が必要です"
+          },
+          "causes": {
+            "environment": "検出されたブラウザー、GPU、メモリ、またはデバイスの設定が、ゲーム描画前から性能を制限する可能性があります。",
+            "graphics": "この計測のグラフィックス処理が、現在のフレームまたはシーン予算を超えています。",
+            "cpu": "計測された CPU フェーズが、フレーム予算を超えるほどメインスレッド時間を使用しています。",
+            "loading": "リソース準備または初回使用の処理が、表示中のゲームや起動経路で実行されました。",
+            "network": "ネットワーク配信またはクライアントのスナップショット処理で、最新の操作可能状態が遅れています。"
+          },
+          "evidence": {
+            "environment": "環境ルール {rule} がこのデバイスとブラウザーに一致しました。",
+            "gpuSubmit": "WebGL 送信 p95 は {submit} で、レンダラー p95 の {share} です。",
+            "frame": "直近の計測は {fps} FPS、フレーム p95 は {p95} です。",
+            "sceneCalls": "シーンの描画呼び出しは {calls} 回で、目標は {target} 回です。",
+            "sceneTriangles": "シーンの三角形は {triangles} 個で、目標は {target} 個です。",
+            "sceneCategory": "シーン分類 {category} は {calls} 回の呼び出しと {triangles} 個の三角形を占めます。",
+            "censusNeeded": "主要な描画分類を確認するため、シーン集計を更新してください。",
+            "shadow": "シャドウパスは {calls} 回、基準の {share}、{triangles} 個の三角形を送信します。",
+            "cpuPhase": "計測フェーズ {phase} の p95 は {p95} です。",
+            "hitch": "記録された {total} 回のカクつきのうち {count} 回が原因 {cause} に一致しました。",
+            "assets": "プリロードゲートは登録済み {tasks} タスクを {wait} 待機しました。",
+            "failedAssets": "失敗したアセットグループ：{groups}。",
+            "longTasks": "長いタスクは {count} 件、p95 は {p95}、最大は {max} でした。",
+            "network": "スナップショット間隔は {interval}、最新経過時間は {age}、入力応答 p95 は {echo} です。",
+            "snapshot": "スナップショット解析と適用の p95 は {work}、ネットワーク間隔 p95 は {gap} です。",
+            "generic": "診断ルール {rule} がこの計測に一致しました。"
+          },
+          "tryNow": {
+            "environment": "検出された環境設定を修正して再起動し、同じスキャンを繰り返してください。",
+            "graphics": "同じカメラ経路を低画質で再テストし、グラフィックス負荷を確認してください。",
+            "cpu": "静止時と移動時にスキャンを繰り返し、CPU フェーズを切り分けてください。",
+            "loading": "同じ経路または初回操作を繰り返し、カクつくタイミングを確認してください。",
+            "network": "同じ移動とカメラ経路をオフラインプレイと比較してください。"
+          },
+          "codeFix": {
+            "environment": "検出された代替経路を共有グラフィックスおよびメモリ予算内に収めてください。",
+            "graphics": "既存の描画予算、インスタンス化、マテリアル共有、LOD、非表示処理の省略を使用してください。",
+            "cpu": "指定フェーズを計測し、重複処理と割り当てを除き、ゲーム動作を維持してください。",
+            "loading": "既存の起動とストリーミング予算で、初回処理を事前読込、プール、または分散してください。",
+            "network": "権威サーバーモデルを弱めずに、配信またはスナップショット処理コストを減らしてください。"
+          }
+        },
+        "report": {
+          "title": "World of ClaudeCraft パフォーマンス診断",
+          "statusLine": "状態：{status}（{score}/100）",
+          "capturedLine": "計測日時：{captured}",
+          "topFindingLine": "最重要項目：{finding}",
+          "summaryLine": "概要：{summary}",
+          "gpuLine": "GPU：{gpu}",
+          "graphicsLine": "画質：{tier}、描画倍率 {scale}",
+          "recentLine": "直近：{fps} FPS、p95 {p95}、50 ミリ秒超 {longFrames} フレーム、計測 {frames} フレーム",
+          "resultHeading": "結果",
+          "noThreshold": "この計測では対処可能なしきい値は検出されませんでした。",
+          "findingHeading": "{index}. {title}",
+          "findingMeta": "重大度：{severity}。信頼度：{confidence}。",
+          "rawSnapshotHeading": "生のスナップショット",
+          "notAvailable": "利用不可",
+          "status": {
+            "critical": "重大",
+            "needsAttention": "要確認",
+            "healthy": "正常"
+          }
+        }
       }
     },
     "auraOverlay": {
@@ -2873,6 +3040,11 @@ export const ja_JP: EnTranslations = {
       "toolEffectRechargeFull": "{effect}はすでに完全に充填されている。",
       "toolEffectRechargeToolCapped": "{effect}をさらに充填するには、より上質な{profession}用ツールが必要だ。",
       "toolEffectRechargeMaterials": "{effect}の再充填には{material}x{count}が必要だ。",
+      "craftingProgress": "製作中：残り{remaining}秒（全{total}秒）。",
+      "disenchantingProgress": "分解中：残り{remaining}秒（全{total}秒）。",
+      "enchantingProgress": "付与中：残り{remaining}秒（全{total}秒）。",
+      "salvagingProgress": "解体中：残り{remaining}秒（全{total}秒）。",
+      "rechargingToolEffectProgress": "道具の効果を再充填中：残り{remaining}秒（全{total}秒）。",
       "tierPipAria": "ティア {tier}",
       "nextUnlockTier": "次のティアまであと {points}：傑作の成功率が上がります",
       "nextUnlockSpecialized": "専門化まであと {points}：素材コストが下がります",
@@ -3167,6 +3339,14 @@ export const ja_JP: EnTranslations = {
       "denyNotCrafted": "先に受注品を製作してください（受注トグルをオンに）。",
       "denyOutOfRange": "納品するには依頼者の近くにいる必要があります。",
       "denyNoSpace": "依頼者のバッグに空きがありません。"
+    },
+    "bgOffer": {
+      "title": "ソーンホロウ平原の準備が整いました",
+      "accepted": "{size} 人中 {accepted} 人が承認",
+      "remaining": "残り {seconds} 秒",
+      "accept": "承認",
+      "decline": "辞退",
+      "acceptedWait": "他の参加者を待っています..."
     },
     "finder": {
       "title": "ダンジョンファインダー",
@@ -7269,6 +7449,9 @@ export const ja_JP: EnTranslations = {
   "gpuNotice": {
     "bodyDesktop": "ゲームがGPUアクセラレーションなしで動作しているため、非常に重くなります。グラフィックドライバーを更新してから、ゲームを再起動してください。Windowsでは、設定 > システム > ディスプレイ > グラフィック でこのゲームを「高パフォーマンス」に設定してください。",
     "bodyWeb": "ゲームがGPUアクセラレーションなしで動作しているため、非常に重くなります。ブラウザーの設定でハードウェアアクセラレーションを有効にし、グラフィックドライバーを更新してから、ブラウザーを再起動してください。",
+    "hybridBodyWindows": "このセッションは統合（省電力）GPUで描画しています。このパソコンにディスクリート（専用）ゲーミングGPUも搭載されている場合は、設定 > システム > ディスプレイ > グラフィックス でブラウザを「高パフォーマンス」に設定してから再起動してください。デスクトップアプリでは自動的にディスクリートGPUが選択されます。",
+    "hybridBodyLinux": "このセッションは統合（省電力）GPUで描画しています。このパソコンにディスクリート（専用）ゲーミングGPUも搭載されている場合は、ブラウザやグラフィックスドライバに独自のGPU選択設定があるか、お使いのディストリビューションにGPU切り替えツール（PRIMEやoptimus-managerなど）が用意されている場合があります。デスクトップアプリでは自動的にディスクリートGPUが選択されます。",
+    "hybridBodyOther": "このセッションは統合（省電力）GPUで描画しています。このパソコンにディスクリート（専用）ゲーミングGPUも搭載されている場合は、ブラウザやオペレーティングシステムのグラフィックス設定を確認して有効にしてください。デスクトップアプリでは自動的にディスクリートGPUが選択されます。",
     "dismiss": "閉じる"
   },
   "perfNudge": {
@@ -7730,6 +7913,7 @@ export const ja_JP: EnTranslations = {
       "deathRecapAbility": "死亡しました。{ability}によって死亡しました。",
       "deathRecapFalling": "死亡しました。転落死しました。",
       "deathRecapDrowned": "死亡しました。溺死しました。",
+      "deathRecapCauterized": "死亡しました。焼灼の炎に飲み込まれました。",
       "respawn": "再び休まり、完全な状態になりました。",
       "ignoringChat": "{name}のチャットを無視します。",
       "noLongerIgnoring": "{name}の無視を解除しました。",
@@ -7773,6 +7957,7 @@ export const ja_JP: EnTranslations = {
       "outOfRange": "射程外です。",
       "noTarget": "対象がいません。",
       "tooClose": "近すぎます！",
+      "mustTargetAlly": "味方を対象にしてください。",
       "facing": "対象の方を向いている必要があります。",
       "targetHealthBelow": "その能力は対象の体力が{percent}%未満でなければ使えません。",
       "dagger": "短剣を装備する必要があります。",
@@ -9390,6 +9575,10 @@ export const ja_JP: EnTranslations = {
       "die_by_sword": {
         "name": "剣に死す",
         "description": "防御的クールダウン。8秒間、受けるダメージが30%減少し、攻撃を回避する確率が大幅に上昇します。"
+      },
+      "intervene": {
+        "name": "援護",
+        "description": "味方プレイヤーに突撃し、6秒間{damage}ダメージを吸収するシールドを付与します。"
       },
       "recklessness": {
         "name": "無謀",

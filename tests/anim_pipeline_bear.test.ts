@@ -51,14 +51,12 @@ describe('bear family bespoke attack (issue #2889 round 2)', () => {
     const bipedConstBlock = manifestBlock('const BIPED14: ClipMap = {', '};');
     expect(bipedConstBlock).toContain("attack: ['Punch', 'Weapon']");
 
-    // Exactly 2 remaining direct `clips: BIPED14,` usages (6 originally:
-    // mob_bear, mob_yeti, mob_murloc, mob_troll, mob_demon, mob_demonalt,
-    // minus the one migrated to BEAR_BIPED14 above, the one already
-    // migrated to TROLL_BIPED14 by mob_troll's own bespoke attack, the one
-    // already migrated to YETI_BIPED14 by mob_yeti's own bespoke attack,
-    // and the one already migrated to MURLOC_BIPED14 by mob_murloc's own
-    // bespoke attack, #2889).
+    // No remaining direct `clips: BIPED14,` usages (6 originally: mob_bear,
+    // mob_yeti, mob_murloc, mob_troll, mob_demon, mob_demonalt, all now
+    // migrated to their own bespoke ClipMap: BEAR_BIPED14 above,
+    // TROLL_BIPED14, YETI_BIPED14, MURLOC_BIPED14, and DEMON_BIPED14 for
+    // both mob_demon and mob_demonalt, #2889).
     const remaining = [...MANIFEST_SRC.matchAll(/clips: BIPED14,/g)].length;
-    expect(remaining).toBe(2);
+    expect(remaining).toBe(0);
   });
 });

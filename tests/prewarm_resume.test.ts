@@ -210,6 +210,9 @@ describe('resumeDroppedPrewarmEntries', () => {
 
   it('wires the production compile resume lane to bounded units', () => {
     const source = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    const unitsStart = source.indexOf('const compileEntryUnits =');
+    const unitsEnd = source.indexOf('const runEntry =', unitsStart);
+    const unitsSlice = source.slice(unitsStart, unitsEnd);
     const compileEntryStart = source.indexOf("id: 'programs.compile'");
     const compileEntryEnd = source.indexOf("id: 'sky.current-zone'", compileEntryStart);
     const compileEntry = source.slice(compileEntryStart, compileEntryEnd);
@@ -221,12 +224,17 @@ describe('resumeDroppedPrewarmEntries', () => {
     expect(compileEntryEnd).toBeGreaterThan(compileEntryStart);
     expect(resumeStart).toBeGreaterThan(-1);
     expect(runStart).toBeGreaterThan(resumeStart);
-    expect(resumeSlice.match(/buildPrewarmCompileUnits\(/g)).toHaveLength(1);
-    expect(resumeSlice).toContain('roots: group.children');
-    expect(resumeSlice).toContain('await this.compilePrewarmColorPrograms(root, false)');
-    expect(resumeSlice).toContain('await this.compileSkinnedShadowPrograms(root)');
-    expect(resumeSlice).not.toContain('compileAsync(this.scene');
-    expect(resumeSlice).not.toContain('Promise.race');
+    expect(unitsSlice.match(/buildPrewarmCompileUnits\(/g)).toHaveLength(1);
+    expect(resumeSlice).toContain('return compileEntryUnits()');
+    expect(unitsStart).toBeGreaterThan(-1);
+    expect(unitsEnd).toBeGreaterThan(unitsStart);
+    expect(unitsSlice).toContain('if (visibleOnly) root.traverseVisible(collect)');
+    expect(unitsSlice).toContain('else root.traverse(collect)');
+    expect(unitsSlice).toContain('roots: compileRoots(group.children, false)');
+    expect(unitsSlice).toContain('await this.compilePrewarmColorPrograms(root, false)');
+    expect(unitsSlice).toContain('await this.compileSkinnedShadowPrograms(root)');
+    expect(compileEntry).not.toContain('compileAsync(this.scene');
+    expect(compileEntry).not.toContain('Promise.race');
     expect(source).toContain('void settlePrewarmBeforePublish(');
     expect(source).toContain('resumeDroppedPrewarmEntries(resume, {');
     expect(source).toContain(

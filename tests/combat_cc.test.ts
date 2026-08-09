@@ -9,14 +9,18 @@ import {
   blindMissBonus,
   damageBreakThreshold,
   hasUnbreakableMovementLock,
+  incapacitateSourceAbilityId,
   isDisarmed,
+  isFearAura,
   isLockedOut,
   isRooted,
   isSilenced,
   isStunned,
   isUnbreakableControlAura,
+  SHARED_FEAR_AURA_ID,
   tonguesMult,
 } from '../src/sim/combat/cc';
+import { ABILITIES } from '../src/sim/data';
 import type { AbilityEffect, Aura, Entity } from '../src/sim/types';
 
 const directBreakableRoot: AbilityEffect = {
@@ -173,5 +177,62 @@ describe('cc: tonguesMult', () => {
   it('returns 1 when unafflicted and the strongest multiplier otherwise', () => {
     expect(tonguesMult(withAuras())).toBe(1);
     expect(tonguesMult(withAuras(aura('tongues', 1.3), aura('tongues', 1.6)))).toBe(1.6);
+  });
+});
+
+describe('cc: isFearAura', () => {
+  // There is no `fear` AuraKind: a fear is an `incapacitate` that also sends
+  // the victim fleeing, carried by the shared aura id or by the source
+  // ability's fearDr flag. This is the one rule that reads it, so every
+  // consumer (the sim's own reads and the renderer's held CC band) agrees on
+  // which incapacitates are fears.
+  const usesFearDr = (id: string) => ABILITIES[id]?.fearDr === true;
+
+  it('claims the shared fear id whatever applied it', () => {
+    // Applied literally by the AoE fear effect, the mob flee driver, and
+    // Banshee's Wail. Matched by id alone, proven here by a resolver that
+    // answers false for everything: a mob-applied fear must never depend on
+    // the warlock ability continuing to exist.
+    expect(isFearAura({ id: SHARED_FEAR_AURA_ID, kind: 'incapacitate' }, () => false)).toBe(true);
+  });
+
+  it('claims a per-ability incapacitate whose ability uses fear diminishing returns', () => {
+    expect(isFearAura({ id: 'death_coil_incap', kind: 'incapacitate' }, usesFearDr)).toBe(true);
+  });
+
+  it('refuses the incapacitates that hold a victim in place rather than running it', () => {
+    for (const id of ['gouge_incap', 'sap_incap', 'wyvern_sting_incap', 'temporal_hourglass']) {
+      expect(isFearAura({ id, kind: 'incapacitate' }, usesFearDr), id).toBe(false);
+    }
+  });
+
+  it('refuses any aura of another kind, including one named like a fear', () => {
+    expect(isFearAura({ id: SHARED_FEAR_AURA_ID, kind: 'stun' }, usesFearDr)).toBe(false);
+    expect(isFearAura({ id: SHARED_FEAR_AURA_ID, kind: 'root' }, usesFearDr)).toBe(false);
+    expect(isFearAura({ id: 'hamstring_slow', kind: 'slow' }, usesFearDr)).toBe(false);
+  });
+
+  it('covers every fearDr ability in the content tables (drift guard)', () => {
+    // Derived from ABILITIES rather than hand-listed: a NEW fear ability that
+    // sets fearDr must be claimed the moment it is authored, or its victims
+    // silently read as an ordinary incapacitate.
+    const fearAbilities = Object.values(ABILITIES).filter((a) => a.fearDr === true);
+    expect(fearAbilities.length).toBeGreaterThan(0);
+    for (const ability of fearAbilities) {
+      expect(
+        isFearAura({ id: `${ability.id}_incap`, kind: 'incapacitate' }, usesFearDr),
+        `${ability.id} sets fearDr but its worn aura is not claimed as a fear`,
+      ).toBe(true);
+    }
+  });
+});
+
+describe('cc: incapacitateSourceAbilityId', () => {
+  it('parses the incapacitate id convention, and only that convention', () => {
+    expect(incapacitateSourceAbilityId('death_coil_incap')).toBe('death_coil');
+    expect(incapacitateSourceAbilityId('fear_incap')).toBe('fear');
+    // Not the convention: no suffix at all, and a bare suffix with no ability.
+    expect(incapacitateSourceAbilityId('temporal_hourglass')).toBeNull();
+    expect(incapacitateSourceAbilityId('_incap')).toBeNull();
   });
 });

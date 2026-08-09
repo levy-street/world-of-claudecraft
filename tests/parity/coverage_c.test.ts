@@ -292,20 +292,28 @@ describe('coverage: each scenario fires its subsystem', () => {
     expect(chats.some((e) => e.text === 'Malric...')).toBe(true);
   }, 90_000);
 
-  it('warrior_row_capstones: double charge, thresholded fear, victory rush heal, bladestorm ticks', () => {
+  it('warrior_row_capstones: intervene, thresholded fear, victory rush heal, bladestorm ticks', () => {
     const rec = run('warrior_row_capstones');
     const sim = rec.sim as any;
     const pid = sim.playerId;
     const ev = rec.allEvents as Ev[];
-    expect(rec.notes.chargeSpent).toBe(2);
-    expect(rec.notes.chargeRecharging).toBe(true);
-    const feared = entities(rec).find((e) =>
-      e.auras?.some((a: any) => a.id === 'fear_incap'),
-    ) as any;
-    expect(feared).toBeTruthy();
-    const fear = feared.auras.find((a: any) => a.id === 'fear_incap');
-    expect(fear.breaksOnDamage).toBe(true);
-    expect(fear.breakThreshold).toBeGreaterThan(0);
+    // The hostile Onrush keeps both side effects...
+    expect(rec.notes.onrushRage).toBe(true);
+    expect(rec.notes.onrushInCombat).toBe(true);
+    // ...and the friendly Intervene takes neither, while shielding the ally.
+    expect(rec.notes.interveneShield).toBe(50);
+    expect(rec.notes.interveneClosed).toBe(true);
+    expect(rec.notes.interveneRage).toBe(0);
+    expect(rec.notes.interveneInCombat).toBe(false);
+    expect(rec.notes.interveneAutoAttack).toBe(false);
+    // Read at APPLY, not from end-of-run state: the legs after the shout run over
+    // five seconds, so anything shorter than the old 8 sec fear has expired by the
+    // end and an end-state lookup quietly finds nothing to assert.
+    expect(rec.notes.fearApplied).toBe(true);
+    expect(rec.notes.fearDuration).toBe(4);
+    expect(rec.notes.fearBreaksOnDamage).toBe(true);
+    // Lingering Dread's soak, 10% of the wolf's max health.
+    expect(rec.notes.fearBreakThreshold).toBeGreaterThan(0);
     expect(ev.some((e) => (e.type === 'heal' || e.type === 'heal2') && e.targetId === pid)).toBe(
       true,
     );
@@ -644,5 +652,24 @@ describe('coverage: each scenario fires its subsystem', () => {
     // so this also proves the drive's tail is long enough to catch it. One
     // gain of 1 from the survived harvest; the withered one queues nothing.
     expect(meta.gatheringProficiency.farming).toBe(1);
+  });
+
+  it('idle_mob_distance_culling: advances the near mob, freezes the far mob, and keeps passive rolls off the shared stream', () => {
+    const scenario = SCENARIOS.find((item) => item.name === 'idle_mob_distance_culling');
+    expect(scenario, 'missing the idle-mob culling parity scenario').toBeTruthy();
+    if (!scenario) return;
+
+    const { trace, rec } = record(scenario);
+    expect(rec.sim.cfg.idleMobTickRadius).toBe(100);
+    const near = rec.sim.entities.get(rec.notes.nearMobId as number);
+    const far = rec.sim.entities.get(rec.notes.farMobId as number);
+    expect(near, 'near boundary probe disappeared').toBeTruthy();
+    expect(far, 'far boundary probe disappeared').toBeTruthy();
+    if (!near || !far) return;
+    expect(Math.hypot(near.pos.x - near.spawnPos.x, near.pos.z - near.spawnPos.z)).toBeGreaterThan(
+      0.1,
+    );
+    expect({ x: far.pos.x, z: far.pos.z }).toEqual({ x: far.spawnPos.x, z: far.spawnPos.z });
+    expect(trace.draws).toBe(0);
   });
 });

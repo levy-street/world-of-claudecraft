@@ -115,6 +115,21 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      # electron-builder downloads Electron itself plus its packaging tools
+      # into this cache directory on every build; a cold run redownloads tens
+      # to hundreds of MB before packaging even starts. Keyed on the
+      # lockfile since the Electron/electron-builder versions live in
+      # package.json devDependencies, which the lockfile fingerprints.
+      - name: Cache electron-builder downloads
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/electron
+            ~/.cache/electron-builder
+          key: electron-builder-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            electron-builder-${{ runner.os }}-
+
       # Full website-channel build: vite client bundle baked for production,
       # then electron-builder producing the Linux arch matrix from
       # package.json "build" (AppImage + deb, x64 + arm64) plus the per-arch
@@ -252,6 +267,21 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      # electron-builder downloads Electron itself plus its packaging tools
+      # into this cache directory on every build; a cold run redownloads tens
+      # to hundreds of MB before packaging even starts. Keyed on the
+      # lockfile since the Electron/electron-builder versions live in
+      # package.json devDependencies, which the lockfile fingerprints.
+      - name: Cache electron-builder downloads
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/Library/Caches/electron
+            ~/Library/Caches/electron-builder
+          key: electron-builder-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            electron-builder-${{ runner.os }}-
 
       # CSC_LINK is the base64 .p12 (electron-builder consumes it directly);
       # the App Store Connect API key must be a file on disk, so the .p8
@@ -402,6 +432,32 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      # electron-builder downloads Electron itself plus its packaging
+      # helper binaries (winCodeSign, nsis, etc) into these two folders on
+      # first use; without caching, every publish run re-downloads the
+      # same files even though the versions are pinned by pnpm-lock.yaml
+      # and rarely change between runs.
+      - name: Cache electron and electron-builder downloads
+        uses: actions/cache@v4
+        with:
+          path: |
+            ${{ env.LOCALAPPDATA }}\electron\Cache
+            ${{ env.LOCALAPPDATA }}\electron-builder\Cache
+          key: ${{ runner.os }}-electron-builder-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-electron-builder-
+
+      # dotnet tool install --global resolves and restores AzureSignTool
+      # through the local NuGet global-packages folder; caching it avoids
+      # re-downloading the tool and its dependencies on every run. The
+      # install step below pins no explicit version, so there is no
+      # version to key on: the key is a fixed string.
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-azuresigntool
 
       # The sign hook shells out to the AzureSignTool dotnet global tool; the
       # runner's dotnet tools directory is already on PATH.

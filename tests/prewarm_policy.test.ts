@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
+  BLOCKING_PREWARM_ENTRIES_WITHOUT_PARALLEL_COMPILE,
   CONSTRAINED_PREWARM_KEEP,
   CONSTRAINED_PREWARM_RESUME,
   constrainedEntryViewCreateBudget,
@@ -16,6 +17,7 @@ import {
   prewarmEntryShouldDefer,
   remainingPrewarmViewBudget,
   resolvePrewarmPolicy,
+  withRestoredPrewarmState,
 } from '../src/render/prewarm_policy';
 
 // The real desktop constants (renderer.ts), injected so the test pins the actual
@@ -57,7 +59,7 @@ const MANIFEST_IDS = [
   'diagnostics.baseline',
 ];
 
-describe('resolvePrewarmPolicy: unconstrained (desktop) reproduces historical behavior', () => {
+describe('resolvePrewarmPolicy: unconstrained desktop', () => {
   it('runs the full manifest with generous budgets and no reordering', () => {
     const p = resolvePrewarmPolicy(BASE);
     expect(p.minimalManifest).toBe(false);
@@ -66,8 +68,9 @@ describe('resolvePrewarmPolicy: unconstrained (desktop) reproduces historical be
     expect(p.maxViews).toBe(72);
     expect(p.yieldBetweenEntries).toBe(false);
     expect(p.linkPassPerEntry).toBe(false);
-    expect(p.compileBeforeFirstFrame).toBe(false);
+    expect(p.compileBeforeFirstFrame).toBe(true);
     expect(p.skipMonolithCompile).toBe(false);
+    expect(p.skipFullScenePasses).toBe(false);
     expect(p.finishFullManifestBeforeReveal).toBe(false);
   });
 
@@ -75,15 +78,18 @@ describe('resolvePrewarmPolicy: unconstrained (desktop) reproduces historical be
     const p = resolvePrewarmPolicy({ ...BASE, finishFullManifestBeforeReveal: true });
     expect(p.finishFullManifestBeforeReveal).toBe(true);
 
-    const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    const renderer = readFileSync(
+      new URL('../src/render/renderer.ts', import.meta.url),
+      'utf8',
+    ).replace(/\r\n/g, '\n');
     expect(renderer).toContain(
       "finishFullManifestBeforeReveal: GFX.tier === 'insane' && !GFX.constrainedMemory",
     );
     expect(renderer).toContain(
-      'const buildDeadline = prewarmBuildDeadline(\n      deadline,\n      PREWARM_BUILD_RESERVE_MS,\n      policy.finishFullManifestBeforeReveal,\n    );',
+      'const buildDeadline = prewarmBuildDeadline(\n      deadline,\n      hardDeadline,\n      PREWARM_BUILD_RESERVE_MS,\n      policy.finishFullManifestBeforeReveal,\n    );',
     );
     expect(renderer).toContain(
-      'prewarmEntryShouldDefer(\n          entryStarted,\n          deadline,\n          entry.deadlineExempt ?? false,\n          policy.finishFullManifestBeforeReveal,\n        )',
+      'prewarmEntryShouldDefer(\n          entryStarted,\n          deadline,\n          hardDeadline,\n          entry.deadlineExempt ?? false,\n          policy.finishFullManifestBeforeReveal,\n        )',
     );
     expect(renderer).toContain(
       'this.createPersistentPortalViews(\n            createdViewTypes,\n            buildDeadline,',
@@ -94,29 +100,120 @@ describe('resolvePrewarmPolicy: unconstrained (desktop) reproduces historical be
   });
 
   it('never defers full-manifest entries and does not trim their archetype build', () => {
-    expect(prewarmEntryShouldDefer(12_000, 12_000, false, true)).toBe(false);
-    expect(prewarmEntryShouldDefer(20_000, 12_000, false, true)).toBe(false);
-    expect(prewarmBuildDeadline(12_000, 3_000, true)).toBe(Number.MAX_SAFE_INTEGER);
+    expect(prewarmEntryShouldDefer(12_000, 12_000, 15_000, false, true)).toBe(false);
+    expect(prewarmEntryShouldDefer(14_999, 12_000, 15_000, false, true)).toBe(false);
+    expect(prewarmEntryShouldDefer(15_000, 12_000, 15_000, false, true)).toBe(true);
+    expect(prewarmBuildDeadline(12_000, 15_000, 3_000, true)).toBe(15_000);
   });
 
   it('keeps the ordinary soft deadline and explicit exemption behavior', () => {
-    expect(prewarmEntryShouldDefer(11_999, 12_000, false, false)).toBe(false);
-    expect(prewarmEntryShouldDefer(12_000, 12_000, false, false)).toBe(true);
-    expect(prewarmEntryShouldDefer(12_000, 12_000, true, false)).toBe(false);
-    expect(prewarmBuildDeadline(12_000, 3_000, false)).toBe(9_000);
+    expect(prewarmEntryShouldDefer(11_999, 12_000, 15_000, false, false)).toBe(false);
+    expect(prewarmEntryShouldDefer(12_000, 12_000, 15_000, false, false)).toBe(true);
+    expect(prewarmEntryShouldDefer(12_000, 12_000, 15_000, true, false)).toBe(false);
+    expect(prewarmEntryShouldDefer(15_000, 12_000, 15_000, true, false)).toBe(true);
+    expect(prewarmBuildDeadline(12_000, 15_000, 3_000, false)).toBe(9_000);
   });
 
   it('uses the low view cap on the low tier', () => {
     expect(resolvePrewarmPolicy({ ...BASE, lowGfx: true }).maxViews).toBe(48);
   });
 
-  it('never reorders or trims the manifest', () => {
+  it('keeps the full manifest and compiles before the first full-scene frame', () => {
     const p = resolvePrewarmPolicy(BASE);
-    expect(orderedPrewarmIds(MANIFEST_IDS, p)).toEqual(MANIFEST_IDS);
+    const ordered = orderedPrewarmIds(MANIFEST_IDS, p);
+    const frameIdx = ordered.indexOf('world.initial-frame');
+    expect(ordered.indexOf('programs.compile')).toBe(frameIdx - 1);
+    expect(new Set(ordered)).toEqual(new Set(MANIFEST_IDS));
     for (const id of MANIFEST_IDS) expect(prewarmEntryRuns(id, p)).toBe(true);
+  });
+
+  it('omits uninterruptible whole-scene submits without parallel compile', () => {
+    const p = resolvePrewarmPolicy({ ...BASE, asyncCompileSupported: false });
+    expect(p.compileBeforeFirstFrame).toBe(false);
+    expect(p.skipMonolithCompile).toBe(true);
+    expect(p.skipFullScenePasses).toBe(true);
+    expect(p.linkPassPerEntry).toBe(false);
+    for (const id of BLOCKING_PREWARM_ENTRIES_WITHOUT_PARALLEL_COMPILE) {
+      expect(prewarmEntryRuns(id, p)).toBe(false);
+    }
+    expect(prewarmEntryRuns('textures.scene', p)).toBe(true);
+  });
+
+  it('keeps the required desktop compiler behind the loading cover after a slow first frame', () => {
+    const renderer = readFileSync(
+      new URL('../src/render/renderer.ts', import.meta.url),
+      'utf8',
+    ).replace(/\r\n/g, '\n');
+    const compileEntryAt = renderer.indexOf("id: 'programs.compile'");
+    const nextEntryAt = renderer.indexOf("id: 'sky.current-zone'", compileEntryAt);
+    const compileEntry = renderer.slice(compileEntryAt, nextEntryAt);
+
+    expect(compileEntryAt).toBeGreaterThan(-1);
+    expect(nextEntryAt).toBeGreaterThan(compileEntryAt);
+    expect(compileEntry).toContain(
+      'deadlineExempt: !constrainedPrewarm && this.asyncCompileSupported',
+    );
   });
 });
 
+it('restores prewarm state after both successful and failed variant work', async () => {
+  let state = { level: 1, marker: 'original' };
+  const capture = () => ({ ...state });
+  const restore = (snapshot: typeof state) => {
+    state = snapshot;
+  };
+
+  await withRestoredPrewarmState(capture, restore, async () => {
+    state = { level: 0.5, marker: 'temporary' };
+  });
+  expect(state).toEqual({ level: 1, marker: 'original' });
+
+  await expect(
+    withRestoredPrewarmState(capture, restore, async () => {
+      state = { level: 0.25, marker: 'failed' };
+      throw new Error('compile failed');
+    }),
+  ).rejects.toThrow('compile failed');
+  expect(state).toEqual({ level: 1, marker: 'original' });
+});
+it('prewarms adaptive quality shader variants behind the desktop loading cover', () => {
+  const renderer = readFileSync(
+    new URL('../src/render/renderer.ts', import.meta.url),
+    'utf8',
+  ).replace(/\r\n/g, '\n');
+  const entryAt = renderer.indexOf("id: 'programs.budget-variants'");
+  const nextEntryAt = renderer.indexOf("id: 'sky.current-zone'", entryAt);
+  const entry = renderer.slice(entryAt, nextEntryAt);
+
+  expect(entryAt).toBeGreaterThan(-1);
+  expect(nextEntryAt).toBeGreaterThan(entryAt);
+  expect(entry).toContain('renderBudgetShaderPrewarmLevels(originalState)');
+  expect(entry).toContain('this.renderPrewarmPass(1 / 60)');
+  expect(entry).toContain('renderPasses++');
+  expect(entry).toContain('performance.now() >= gpuSubmitDeadline');
+  expect(entry).toContain('withRestoredPrewarmState(');
+  expect(entry).not.toContain('compilePrewarmColorPrograms(this.scene');
+  expect(entry).toContain('deadlineExempt: !constrainedPrewarm && this.asyncCompileSupported');
+});
+it('settles linked desktop programs only until the independent hard deadline', () => {
+  const renderer = readFileSync(
+    new URL('../src/render/renderer.ts', import.meta.url),
+    'utf8',
+  ).replace(/\r\n/g, '\n');
+  for (const [id, nextId] of [
+    ['sky.current-zone', 'render.settle-passes'],
+    ['render.settle-passes', 'diagnostics.baseline'],
+  ] as const) {
+    const entryAt = renderer.indexOf(`id: '${id}'`);
+    const nextEntryAt = renderer.indexOf(`id: '${nextId}'`, entryAt);
+    const entry = renderer.slice(entryAt, nextEntryAt);
+    expect(entryAt).toBeGreaterThan(-1);
+    expect(nextEntryAt).toBeGreaterThan(entryAt);
+    expect(entry).toContain('deadlineExempt: !constrainedPrewarm && this.asyncCompileSupported');
+    expect(entry).toContain('gpuSubmitDeadline');
+    expect(entry).not.toContain('finishBehindCover');
+  }
+});
 describe('resolvePrewarmPolicy: constrained with parallel compile (the iPhone path)', () => {
   const p = resolvePrewarmPolicy({
     ...BASE,
@@ -161,7 +258,10 @@ describe('resolvePrewarmPolicy: constrained with parallel compile (the iPhone pa
   });
 
   it('wires the two-view constrained cap into the renderer', () => {
-    const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    const renderer = readFileSync(
+      new URL('../src/render/renderer.ts', import.meta.url),
+      'utf8',
+    ).replace(/\r\n/g, '\n');
     expect(renderer).toContain('const VIEW_PREWARM_MAX_VIEWS_CONSTRAINED = 2;');
     expect(renderer).toContain('remainingPrewarmViewBudget(policy.maxViews, createdViews)');
   });
@@ -207,12 +307,16 @@ describe('resolvePrewarmPolicy: constrained WITHOUT parallel compile', () => {
     asyncCompileSupported: false,
   });
 
-  it('links group-by-group per entry and skips the synchronous monolith', () => {
-    expect(p.linkPassPerEntry).toBe(true);
+  it('skips every uninterruptible full-scene submit', () => {
+    expect(p.linkPassPerEntry).toBe(false);
     expect(p.skipMonolithCompile).toBe(true);
+    expect(p.skipFullScenePasses).toBe(true);
     // No reorder: without off-thread compile there is nothing to front-load.
     expect(p.compileBeforeFirstFrame).toBe(false);
     expect(orderedPrewarmIds(MANIFEST_IDS, p)).toEqual(MANIFEST_IDS);
+    for (const id of BLOCKING_PREWARM_ENTRIES_WITHOUT_PARALLEL_COMPILE) {
+      expect(prewarmEntryRuns(id, p)).toBe(false);
+    }
   });
 });
 
@@ -355,7 +459,10 @@ describe('mandatory interaction-landmark prewarm', () => {
     );
     expect(ordered.indexOf('views.landmarks')).toBeLessThan(ordered.indexOf('views.nearby'));
 
-    const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    const renderer = readFileSync(
+      new URL('../src/render/renderer.ts', import.meta.url),
+      'utf8',
+    ).replace(/\r\n/g, '\n');
     const landmarkEntryAt = renderer.indexOf("id: 'views.landmarks'");
     const portalEntryAt = renderer.indexOf("id: 'views.persistent-portals'");
     const nearbyEntryAt = renderer.indexOf("id: 'views.nearby'");
@@ -387,7 +494,10 @@ describe('mandatory interaction-landmark prewarm', () => {
     // could reuse it instead of duplicating it. gateViewOnCompile itself still
     // owns the unsupported-browser short-circuit and the compilePending
     // lifecycle; sequencing and timeout diagnostics now live one hop over.
-    const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    const renderer = readFileSync(
+      new URL('../src/render/renderer.ts', import.meta.url),
+      'utf8',
+    ).replace(/\r\n/g, '\n');
     const gateStart = renderer.indexOf('private gateViewOnCompile(');
     const gateEnd = renderer.indexOf('\n  /** The visual the player currently sees', gateStart);
     const gate = renderer.slice(gateStart, gateEnd);
@@ -452,7 +562,10 @@ describe('constrained entry view creation ramp', () => {
   });
 
   it('is wired into the renderer before optional candidate creation', () => {
-    const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    const renderer = readFileSync(
+      new URL('../src/render/renderer.ts', import.meta.url),
+      'utf8',
+    ).replace(/\r\n/g, '\n');
     const budgetMethodStart = renderer.indexOf('private runtimeViewCreateBudget(');
     const budgetMethodEnd = renderer.indexOf(
       '\n  private viewCandidatePriority(',
@@ -476,7 +589,10 @@ describe('constrained entry view creation ramp', () => {
   });
 
   it('uses the bounded texture path for constrained prewarm', () => {
-    const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    const renderer = readFileSync(
+      new URL('../src/render/renderer.ts', import.meta.url),
+      'utf8',
+    ).replace(/\r\n/g, '\n');
     expect(renderer).toContain(
       `await this.prewarmInitialSceneTexturesBatched(
                 policy.textureBatchSize,
@@ -518,7 +634,10 @@ describe('constrained entry view creation ramp', () => {
 
 describe('runtime entity-view parity', () => {
   it('keeps the full shared visibility range and continuous world submission', () => {
-    const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    const renderer = readFileSync(
+      new URL('../src/render/renderer.ts', import.meta.url),
+      'utf8',
+    ).replace(/\r\n/g, '\n');
     expect(renderer).not.toContain('ENTITY_VIEW_CREATE_RANGE_CONSTRAINED');
     expect(renderer).not.toContain('ENTITY_VIEW_DESTROY_RANGE_CONSTRAINED');
     expect(renderer).not.toContain('resolveRuntimeViewRangePolicy({');

@@ -140,13 +140,13 @@ describe('mob_demon_flying bespoke attack (issue #2889)', () => {
     expect(floatingConstBlock).toContain("attack: ['Headbutt', 'Punch']");
 
     // Every other VisualDef still pointing at the shared constant is
-    // untouched: exactly 4 remaining direct `clips: FLOATING,` usages (9
+    // untouched: exactly 3 remaining direct `clips: FLOATING,` usages (9
     // originally across the whole multi-batch initiative, minus the
     // elemental's ELEMENTAL_FLOATING migration, the ghost's GHOST_FLOATING
     // migration, the nightkin's NIGHTKIN_FLOATING migration, the glub's
-    // GLUB_FLOATING migration, and the flying demon's own
-    // DEMON_FLYING_FLOATING migration here).
+    // GLUB_FLOATING migration, the dragonkin's DRAGONKIN_FLOATING migration,
+    // and the flying demon's own DEMON_FLYING_FLOATING migration here).
     const remaining = [...MANIFEST_SRC.matchAll(/clips: FLOATING,/g)].length;
-    expect(remaining).toBe(4);
+    expect(remaining).toBe(3);
   });
 });

@@ -1454,6 +1454,173 @@ export const zh_CN: EnTranslations = {
       "badges": {
         "backgrounded": "后台运行",
         "offline": "离线"
+      },
+      "diagnostics": {
+        "panelAria": "World of ClaudeCraft 性能诊断",
+        "title": "ClaudeCraft 性能医生",
+        "subtitle": "针对游戏的扫描，提供证据和代码级修复建议。",
+        "aria": {
+          "liveMeasurements": "实时性能测量",
+          "scanProgress": "诊断扫描进度",
+          "findings": "按优先级排序的诊断结果"
+        },
+        "controls": {
+          "minimize": "最小化",
+          "expand": "展开",
+          "start": "开始 15 秒扫描",
+          "refreshCensus": "刷新场景统计",
+          "copyReport": "复制清晰报告",
+          "downloadReport": "下载报告",
+          "scanning": "扫描中...",
+          "scanAnother": "扫描另一个区域",
+          "reportLogged": "报告已记录到控制台",
+          "copied": "已复制",
+          "copyBlocked": "复制受阻：报告已记录",
+          "retestLowGraphics": "使用低画质重新测试"
+        },
+        "instruction": "为获得最佳信号，请进入离线游戏，在卡顿区域移动并旋转镜头，然后在扫描期间触发造成卡顿的效果。",
+        "status": {
+          "pausedHiddenRestart": "此标签页隐藏时扫描已暂停。返回后扫描将重新开始。",
+          "restoredRestart": "标签页已恢复。正在重新开始一次干净的 15 秒活跃游戏采集。",
+          "worldLoaded": "世界已加载。正在等待第一个可操作帧。",
+          "pausedHiddenContinue": "此标签页隐藏时扫描已暂停。请返回游戏以继续。",
+          "collectingRemaining": {
+            "one": "正在采集活跃游戏：剩余 {seconds} 秒",
+            "other": "正在采集活跃游戏：剩余 {seconds} 秒"
+          },
+          "waitingFrames": "正在等待有代表性的游戏帧：{current}/{minimum}",
+          "collectingNow": "正在采集活跃游戏：现在请穿过问题区域。",
+          "ready": "已准备扫描。按开始并重现卡顿。",
+          "waitingWorld": "正在等待游戏世界。请选择离线游戏或进入一个在线角色。"
+        },
+        "metrics": {
+          "waitingRenderer": "渲染器：等待中",
+          "waitingCensus": "场景统计：等待中",
+          "waitingHitch": "卡顿归因：进入世界时已启用",
+          "recent": "最近  {fps} FPS | p95 {p95} 毫秒 | >50 毫秒 {longFrames}",
+          "render": "渲染  提交 {submit} 毫秒 | 世界 {world} 毫秒 | 实体 {entities} 毫秒",
+          "scene": "场景   {calls} 次调用 | {triangles} 个三角形 | {views} 个视图",
+          "hitches": "卡顿 {hitches} | 着色器 {shaders} | 上传 {uploads} | 视图 {views}",
+          "gpu": "GPU     {renderer}",
+          "waitingValue": "等待中"
+        },
+        "scoreHeadline": "{score}/100：{headline}",
+        "healthyNoFindings": "未触发可执行的阈值。如果短暂卡顿仍然影响体验，请沿着触发卡顿的准确移动路径重新运行扫描。",
+        "findingMeta": "{severity} | {confidence} 置信度",
+        "sections": {
+          "evidence": "证据",
+          "tryNow": "立即尝试",
+          "codeFix": "代码修复",
+          "source": "相关源文件"
+        },
+        "severity": {
+          "critical": "严重",
+          "warning": "警告",
+          "info": "信息"
+        },
+        "confidence": {
+          "high": "高",
+          "medium": "中",
+          "low": "低"
+        },
+        "diagnosis": {
+          "noProblemTitle": "未检测到明显性能问题",
+          "summary": {
+            "findings": {
+              "one": "最近 10 秒在 {fps} FPS、帧 p95 为 {p95} 时发现 {findings} 项可处理问题。",
+              "other": "最近 10 秒在 {fps} FPS、帧 p95 为 {p95} 时发现 {findings} 项可处理问题。"
+            },
+            "healthy": "最近 10 秒保持 {fps} FPS，帧 p95 为 {p95}。游戏、浏览器、GPU、内存、资源和网络均未触发阈值。"
+          },
+          "titles": {
+            "hardwareAcceleration": "正在使用软件渲染",
+            "integratedGpu": "游戏正在使用集成显卡",
+            "highDpi": "高分辨率渲染开销较大",
+            "forcedHighGraphics": "强制高画质正在降低性能",
+            "lowMemory": "设备可用内存较低",
+            "browserStalls": "检测到浏览器或扩展程序停顿",
+            "heapPressure": "检测到浏览器内存压力",
+            "contextLoss": "图形上下文已重置",
+            "gpuSubmit": "GPU 提交是主要帧瓶颈",
+            "sceneDraw": "场景绘制开销超过当前画质预算",
+            "shadowPass": "阴影通道占用大量绘制调用",
+            "rendererWorld": "世界渲染器更新受 CPU 限制",
+            "rendererEntities": "实体视图更新受 CPU 限制",
+            "rendererNameplates": "姓名牌绘制开销较大",
+            "simCpu": "模拟工作占用帧时间",
+            "hudCpu": "HUD 更新占用帧时间",
+            "eventCpu": "事件处理占用帧时间",
+            "shaderCompile": "游戏过程中正在编译着色器",
+            "textureUpload": "纹理上传导致游戏卡顿",
+            "viewCreate": "实体视图创建导致卡顿",
+            "otherHitch": "仍有未归因的长帧",
+            "assetStartup": "资源处理延迟了游戏启动",
+            "longTasks": "浏览器长任务正在阻塞帧",
+            "networkLatency": "网络传输延迟了可见响应",
+            "snapshotApply": "快照处理正在阻塞客户端",
+            "generic": "性能规则 {rule} 需要处理"
+          },
+          "causes": {
+            "environment": "检测到的浏览器、GPU、内存或设备设置可能在游戏渲染前限制性能。",
+            "graphics": "本次采集测得的图形工作超过当前帧预算或场景预算。",
+            "cpu": "某个 CPU 阶段占用了足以错过帧预算的主线程时间。",
+            "loading": "资源准备或首次使用工作发生在可见游戏或启动路径中。",
+            "network": "网络传输或客户端快照处理延迟了最新可操作状态。"
+          },
+          "evidence": {
+            "environment": "环境规则 {rule} 与此设备和浏览器匹配。",
+            "gpuSubmit": "WebGL 提交 p95 为 {submit}，占渲染器 p95 的 {share}。",
+            "frame": "最近窗口测得 {fps} FPS，帧 p95 为 {p95}。",
+            "sceneCalls": "场景使用 {calls} 次绘制调用，目标为 {target}。",
+            "sceneTriangles": "场景提交 {triangles} 个三角形，目标为 {target}。",
+            "sceneCategory": "场景类别 {category} 贡献 {calls} 次调用和 {triangles} 个测量三角形。",
+            "censusNeeded": "刷新场景统计以识别主要渲染类别。",
+            "shadow": "阴影通道提交 {calls} 次调用，占基线的 {share}，共 {triangles} 个三角形。",
+            "cpuPhase": "测得阶段 {phase} 的 p95 为 {p95}。",
+            "hitch": "记录的 {total} 次卡顿中，有 {count} 次与原因 {cause} 匹配。",
+            "assets": "预加载门为 {tasks} 个已注册任务等待了 {wait}。",
+            "failedAssets": "失败的资源组：{groups}。",
+            "longTasks": "测得 {count} 个长任务，p95 为 {p95}，最大值为 {max}。",
+            "network": "快照间隔为 {interval}，最新快照年龄为 {age}，输入回显 p95 为 {echo}。",
+            "snapshot": "快照解析和应用 p95 为 {work}；网络间隔 p95 为 {gap}。",
+            "generic": "诊断规则 {rule} 与本次采集匹配。"
+          },
+          "tryNow": {
+            "environment": "修正检测到的环境设置，重新启动，然后重复相同扫描。",
+            "graphics": "以低画质重复相同镜头路径，确认图形压力。",
+            "cpu": "分别在静止和移动时重复扫描，以隔离 CPU 阶段。",
+            "loading": "重复相同路线或首次使用操作，确认卡顿发生时机。",
+            "network": "在离线游戏中使用相同移动和镜头路径进行比较。"
+          },
+          "codeFix": {
+            "environment": "让检测到的备用路径遵守共享图形和内存预算。",
+            "graphics": "使用现有渲染预算、实例化、材质共享、LOD 和隐藏工作跳过机制。",
+            "cpu": "分析指定阶段，移除重复工作和分配，并保持游戏行为。",
+            "loading": "通过现有启动和流式预算预加载、池化或分摊已识别的首次使用工作。",
+            "network": "降低传输或快照处理成本，同时不削弱权威服务器模型。"
+          }
+        },
+        "report": {
+          "title": "World of ClaudeCraft 性能诊断",
+          "statusLine": "状态：{status}（{score}/100）",
+          "capturedLine": "采集时间：{captured}",
+          "topFindingLine": "首要问题：{finding}",
+          "summaryLine": "摘要：{summary}",
+          "gpuLine": "GPU：{gpu}",
+          "graphicsLine": "画质：{tier}，渲染比例 {scale}",
+          "recentLine": "最近：{fps} FPS，p95 {p95}，{longFrames} 帧超过 50 毫秒，共测量 {frames} 帧",
+          "resultHeading": "结果",
+          "noThreshold": "本次采集未触发可处理阈值。",
+          "findingHeading": "{index}. {title}",
+          "findingMeta": "严重程度：{severity}。置信度：{confidence}。",
+          "rawSnapshotHeading": "原始快照",
+          "notAvailable": "不可用",
+          "status": {
+            "critical": "严重",
+            "needsAttention": "需要注意",
+            "healthy": "正常"
+          }
+        }
       }
     },
     "auraOverlay": {
@@ -2873,6 +3040,11 @@ export const zh_CN: EnTranslations = {
       "toolEffectRechargeFull": "{effect}已充满能量。",
       "toolEffectRechargeToolCapped": "携带更好的{profession}工具才能继续为{effect}充能。",
       "toolEffectRechargeMaterials": "为{effect}充能需要{material}x{count}。",
+      "craftingProgress": "正在制作：还剩{remaining}秒，共{total}秒。",
+      "disenchantingProgress": "正在分解：还剩{remaining}秒，共{total}秒。",
+      "enchantingProgress": "正在附魔：还剩{remaining}秒，共{total}秒。",
+      "salvagingProgress": "正在回收：还剩{remaining}秒，共{total}秒。",
+      "rechargingToolEffectProgress": "正在为工具效果充能：还剩{remaining}秒，共{total}秒。",
       "tierPipAria": "阶级 {tier}",
       "nextUnlockTier": "距离下一阶级还差 {points} 点：打造大师之作的几率将提升",
       "nextUnlockSpecialized": "距离专精还差 {points} 点：材料消耗将降低",
@@ -3167,6 +3339,14 @@ export const zh_CN: EnTranslations = {
       "denyNotCrafted": "请先制作出委托物品（勾选委托选项）。",
       "denyOutOfRange": "你必须靠近委托人才能交付委托。",
       "denyNoSpace": "委托人的背包空间不足。"
+    },
+    "bgOffer": {
+      "title": "荆谷原野已准备就绪",
+      "accepted": "已确认 {accepted}/{size}",
+      "remaining": "剩余 {seconds} 秒确认",
+      "accept": "接受",
+      "decline": "拒绝",
+      "acceptedWait": "等待其他人确认..."
     },
     "finder": {
       "title": "地下城查找器",
@@ -7269,6 +7449,9 @@ export const zh_CN: EnTranslations = {
   "gpuNotice": {
     "bodyDesktop": "游戏正在没有 GPU 加速的情况下运行，会非常缓慢。请更新显卡驱动后重启游戏。在 Windows 上，还请在 设置 > 系统 > 显示 > 显示卡 中将本游戏设为“高性能”。",
     "bodyWeb": "游戏正在没有 GPU 加速的情况下运行，会非常缓慢。请在浏览器设置中启用硬件加速，更新显卡驱动，然后重启浏览器。",
+    "hybridBodyWindows": "本次会话正在集成（节能）显卡上渲染。如果这台电脑还配有独立游戏显卡，请在 设置 > 系统 > 显示 > 显示卡 中将浏览器设为“高性能”，然后重启浏览器。桌面版会自动选择独立显卡。",
+    "hybridBodyLinux": "本次会话正在集成（节能）显卡上渲染。如果这台电脑还配有独立游戏显卡，您的浏览器或显卡驱动可能提供了自己的显卡选择设置，或者您的发行版可能提供了显卡切换工具（例如 PRIME 或 optimus-manager）。桌面版会自动选择独立显卡。",
+    "hybridBodyOther": "本次会话正在集成（节能）显卡上渲染。如果这台电脑还配有独立游戏显卡，请检查浏览器和操作系统的显卡设置以启用它。桌面版会自动选择独立显卡。",
     "dismiss": "关闭"
   },
   "perfNudge": {
@@ -7730,6 +7913,7 @@ export const zh_CN: EnTranslations = {
       "deathRecapAbility": "你已经死亡。死于{ability}。",
       "deathRecapFalling": "你已经死亡。你摔死了。",
       "deathRecapDrowned": "你已经死亡。你淹死了。",
+      "deathRecapCauterized": "你已经死亡。灼烧术的烈焰吞噬了你。",
       "respawn": "你再次感到精力恢复、身体完整。",
       "ignoringChat": "已屏蔽来自 {name} 的聊天。",
       "noLongerIgnoring": "不再屏蔽 {name}。",
@@ -7773,6 +7957,7 @@ export const zh_CN: EnTranslations = {
       "outOfRange": "超出范围。",
       "noTarget": "你没有目标。",
       "tooClose": "太近了！",
+      "mustTargetAlly": "你必须选定一名友方目标。",
       "facing": "你必须面向目标。",
       "targetHealthBelow": "该技能要求目标生命值低于 {percent}%。",
       "dagger": "你必须装备匕首。",
@@ -9390,6 +9575,10 @@ export const zh_CN: EnTranslations = {
       "die_by_sword": {
         "name": "剑在人在",
         "description": "防御性冷却技能：持续 8 秒，你受到的伤害降低 30%，并大幅提高躲闪攻击的几率。"
+      },
+      "intervene": {
+        "name": "援护",
+        "description": "冲向一名友方玩家，为其抵挡 {damage} 点伤害，持续 6 秒。"
       },
       "recklessness": {
         "name": "鲁莽",
