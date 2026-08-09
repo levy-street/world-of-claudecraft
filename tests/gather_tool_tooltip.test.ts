@@ -176,15 +176,15 @@ describe('gatherToolTooltipLines: fishing implements', () => {
   });
 });
 
-describe('gatherToolTooltipLines: farming, procedural ahead of its tool item', () => {
-  // Farming registered as the fifth gathering profession before any hoe item
-  // exists, so there is nothing in ITEMS to render and the def is synthetic.
-  // Two things here are invisible to tsc and worth pinning anyway: KIND_KEYS is
-  // an exhaustive Record, so the compiler forces a farming ROW but accepts any
-  // sibling's key as its VALUE (a mis-map would silently print "Fishing rod"
-  // on a hoe), and the wield line resolves through a SECOND table,
-  // GATHERING_PROFESSION_NAME_KEYS, whose farming row is what keeps that line
-  // from vanishing.
+describe('gatherToolTooltipLines: farming', () => {
+  // The def stays synthetic even though the four hoe items shipped with the
+  // crops-and-tools phase: a parameterized tier is what lets each arm pick the
+  // exact rung it needs. Two things here are invisible to tsc and worth
+  // pinning anyway: KIND_KEYS is an exhaustive Record, so the compiler forces
+  // a farming ROW but accepts any sibling's key as its VALUE (a mis-map would
+  // silently print "Fishing rod" on a hoe), and the wield line resolves
+  // through a SECOND table, GATHERING_PROFESSION_NAME_KEYS, whose farming row
+  // is what keeps that line from vanishing.
   const hoe = (tier: number): ItemDef =>
     ({
       id: 'test_farming_hoe',
@@ -217,17 +217,27 @@ describe('gatherToolTooltipLines: farming, procedural ahead of its tool item', (
     expect(gatherToolTooltipLines(hoe(1))).not.toContain('Requires Farming');
   });
 
-  it('states no unlocks or use line while the hoe item is still unwritten', () => {
-    // DELIBERATE, not an oversight: UNLOCKS_KEYS and USE_KEYS are Partial and
-    // farming is deliberately absent from both, because no hoe exists and no
-    // crop-bed node type exists, so there is nothing true to say about what a
-    // tier opens or what using it does. The crops-and-tools phase adds both
-    // rows and flips these assertions; until then this pins the decision.
+  it('renders the unlocks and bags-use lines, and the use line deliberately lacks "Use:"', () => {
+    // The crops-and-tools phase filled the farming UNLOCKS_KEYS and USE_KEYS
+    // rows this test used to pin as deliberately absent, so this is the
+    // flipped truth: the unlocks line names the crop tiers the hoe's tier
+    // opens (the step-12 plant gate), and the use line states the
+    // bags-carried behavior. That use line is the family's one deliberate
+    // exception to the imperative "Use:" prefix (a hoe is a passive gate:
+    // beds are worked by planting directly, clicking the hoe starts
+    // nothing), and the not.toContain arm PINS the exception rather than
+    // leaving it as a comment in the key map.
     const html = gatherToolTooltipLines(hoe(1));
-    expect(html).not.toContain('Required to');
+    expect(html).toContain('<div class="tt-desc">Required to plant crops up to tier 1.</div>');
+    expect(html).toContain(
+      '<div class="tt-desc">Works from your bags when you plant a crop bed.</div>',
+    );
     expect(html).not.toContain('Use:');
-    // The kind line is therefore the WHOLE tooltip at tier 1.
-    expect(html).toBe('<div class="tt-sub">Farming tool (tier 1)</div>');
+    // The tier interpolates: a tier-3 hoe names tier-3 crops, so the line is
+    // the template rendered and never a hardcoded tier-1 sentence.
+    expect(gatherToolTooltipLines(hoe(3))).toContain(
+      '<div class="tt-desc">Required to plant crops up to tier 3.</div>',
+    );
   });
 });
 

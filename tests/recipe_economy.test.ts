@@ -17,6 +17,7 @@ import {
 import {
   ALL_RECIPES,
   COMBO_RECIPES,
+  HOE_RECIPES,
   LADDER_RECIPES,
   ROD_RECIPES,
   recipeById,
@@ -146,11 +147,15 @@ describe('THE ECONOMY INVARIANT', () => {
 
   it('every recipe a vendor COULD fully feed vendors strictly below its cheapest input', () => {
     const vendorFed = counterfactuallyVendorFedRecipes();
-    // Membership pin: exactly these six loops. A new recipe (or a new buyValue
-    // on a reagent) that makes another recipe counterfactually vendor-fed must
-    // be added HERE deliberately, and it then rides the bound below.
+    // Membership pin: exactly these seven loops. A new recipe (or a new
+    // buyValue on a reagent) that makes another recipe counterfactually
+    // vendor-fed must be added HERE deliberately, and it then rides the bound
+    // below. recipe_bronze_hoe joined with the hoe phase: both its reagents
+    // carry a copper basis (fine_vale_wheat is the farming economy-basis
+    // convention, garden_hoe is the vendor-priced tier-1 rung).
     expect(vendorFed.map((recipe) => recipe.id).sort()).toEqual([
       'recipe_ashwood_axe',
+      'recipe_bronze_hoe',
       'recipe_goldleaf_mana_draught',
       'recipe_goldleaf_sickle',
       'recipe_sootscale_mantle',
@@ -161,7 +166,7 @@ describe('THE ECONOMY INVARIANT', () => {
     // allowed to run over an empty set. The toEqual above would catch a drop to
     // zero today, but the floor states the requirement directly, so a future
     // edit that relaxes the membership pin cannot quietly take the teeth with it.
-    expect(vendorFed.length).toBeGreaterThanOrEqual(6);
+    expect(vendorFed.length).toBeGreaterThanOrEqual(7);
     for (const recipe of vendorFed) {
       expect(
         outputValue(recipe),
@@ -277,17 +282,19 @@ describe('REFERENTIAL INTEGRITY', () => {
       }
     }
     // The 54 ladder recipes plus the 3 grandfathered combos all carry
-    // 'trainer', and so do the two crafted rods and the two tool-effect
-    // charms: the pre-training id list is frozen, so anything authored after
-    // that switch has to be learned.
+    // 'trainer', and so do the two crafted rods, the two tool-effect charms,
+    // and the three crafted hoes: the pre-training id list is frozen, so
+    // anything authored after that switch has to be learned.
     expect(trainerRecipes).toBe(
       LADDER_RECIPES.length +
         COMBO_RECIPES.length +
         ROD_RECIPES.length +
-        TOOL_EFFECT_RECIPES.length,
+        TOOL_EFFECT_RECIPES.length +
+        HOE_RECIPES.length,
     );
     expect(ROD_RECIPES).toHaveLength(2);
     expect(TOOL_EFFECT_RECIPES).toHaveLength(2);
+    expect(HOE_RECIPES).toHaveLength(3);
   });
 
   it('the three station-free combo recipes resolve a home via professionId, not stationType', () => {

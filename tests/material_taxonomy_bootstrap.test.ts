@@ -19,11 +19,12 @@ describe('material_taxonomy as the first-evaluated sim module', () => {
     // 55 before the farming growth-engine phase added its four yields as a new
     // derivation source (content/farm_crops.ts), 59 after; 61 once the knobs
     // phase added the two supplies (compost and the growth tonic) to that same
-    // source. The count is a literal
+    // source; 82 once the crop-ladder phase shipped the seven remaining crops
+    // (21 more ids: seed, produce, fine twin per crop). The count is a literal
     // because this file may not import the tables to derive it: importing
     // anything else from src/sim is exactly what the premise arm below
     // forbids, so the number is re-pinned by hand whenever the set moves.
-    expect(MATERIAL_ITEM_IDS.size).toBe(61);
+    expect(MATERIAL_ITEM_IDS.size).toBe(82);
     expect(MATERIAL_ITEM_IDS.has('iron_ore')).toBe(true);
     expect(MATERIAL_ITEM_IDS.has('arcanite_bar')).toBe(true);
     // The farming source specifically, because it is the newest and the one

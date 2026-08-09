@@ -127,28 +127,39 @@ jobs:
   release-version-gate:
     name: Release version gate
     if: (github.event_name == 'pull_request' && github.base_ref == 'main' && startsWith(github.head_ref, 'release/')) || (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/release/'))
+    # Checkout, pnpm install, and one small version-surface check: comparable
+    # in shape to release-i18n's toolchain overhead. 10 gives ample margin
+    # over a script that runs in a fraction of a second locally.
+    timeout-minutes: 10
     runs-on: ubuntu-latest
 
     steps:
       - name: Check out repository
         uses: actions/checkout@v6
-
-      - name: Set up pnpm
-        uses: pnpm/action-setup@v4
         with:
-          version: 10.34.5
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: 26
-          cache: pnpm
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+          # Blob-less shallow sparse checkout: scripts/release_version.mjs
+          # only imports node:fs/node:path/node:url and only reads/writes
+          # package.json, android/app/build.gradle,
+          # ios/App/App.xcodeproj/project.pbxproj, src/game/desktop_download.ts,
+          # index.html, play.html, README.md, and the files directly under
+          # docs/i18n/, never the rest of the tree or the history.
+          filter: blob:none
+          sparse-checkout: |
+            scripts
+            package.json
+            android/app
+            ios/App/App.xcodeproj
+            src/game
+            index.html
+            play.html
+            README.md
+            docs/i18n
 
       - name: Verify release version surfaces
-        run: npm run release:check
+        # The script is stdlib-only (fs/path/url), so it runs on the
+        # runner's preinstalled Node: no setup-node, no pnpm, no dependency
+        # install on this job.
+        run: node scripts/release_version.mjs check
 
   # Classify whether this run touches the code path set (D10). The classifier
   # reads the PR's changed files from the GitHub API (the pull request files
@@ -214,6 +225,11 @@ jobs:
   # Biome-eligible file (docs, assets, generated i18n).
   lint:
     name: Format + lint (Biome, changed files)
+    # Unmatrixed single toolchain-setup-plus-checks job, comparable in shape to
+    # browser-gate: checkout, pnpm install, a base-ref fetch, then one biome
+    # pass. 15 keeps a margin over browser-gate's 10 minute bound for the extra
+    # base-ref resolution step.
+    timeout-minutes: 15
     runs-on: ubuntu-latest
 
     steps:
@@ -346,12 +362,14 @@ jobs:
         # Restores ~/.cache/ms-playwright when the Playwright version matches.
         # The install step always runs: on a hit it is a cheap no-op for the
         # browser download and only ensures OS deps; on a miss it downloads.
+        # No restore-keys: a version-prefix fallback would restore a stale
+        # Playwright version's binaries alongside the new install, which the
+        # cache never evicts, so every future bump would leave dead weight
+        # cached forever instead of a clean version-scoped miss.
         uses: actions/cache@v4
         with:
           path: ~/.cache/ms-playwright
           key: playwright-chromium-${{ runner.os }}-${{ steps.playwright-version.outputs.version }}
-          restore-keys: |
-            playwright-chromium-${{ runner.os }}-
 
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
@@ -632,6 +650,12 @@ jobs:
     # every build on the merge result, not just the PR head.
     needs: changes
     if: ((github.event_name == 'pull_request' && (github.base_ref != 'main' || !startsWith(github.head_ref, 'release/'))) || (github.event_name == 'push' && !startsWith(github.ref, 'refs/heads/release/')) || github.event_name == 'workflow_dispatch' || github.event_name == 'merge_group') && needs.changes.outputs.code != 'false'
+    # Unmatrixed single toolchain-setup-plus-checks job, comparable in shape to
+    # browser-gate, but heavier: i18n generation, the malware gate, a
+    # typecheck, and four builds. 20 matches the shard matrices' bound so a
+    # stalled runner here dies and reruns instead of holding a required check
+    # for hours.
+    timeout-minutes: 20
     runs-on: ubuntu-latest
 
     steps:
@@ -707,7 +731,7 @@ jobs:
         run: npm run build:bot
 
       - name: Build client
-        run: npm run build
+        run: npm run wiki:content && npm run build:bundle
 
   # A release ref runs THREE parallel jobs: release-gate (this one) runs the test
   # suite at PR tier, release-i18n runs the release TIER over the suites that read
@@ -800,6 +824,10 @@ jobs:
   release-i18n:
     name: Release i18n (21-locale fill)
     if: (github.event_name == 'pull_request' && github.base_ref == 'main' && startsWith(github.head_ref, 'release/')) || (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/release/'))
+    # Unsharded and seconds long by design (five test files, see the job
+    # comment above): the toolchain setup dominates the wall time. 10 mirrors
+    # release-version-gate's bound for the same shape.
+    timeout-minutes: 10
     runs-on: ubuntu-latest
 
     env:
@@ -834,6 +862,9 @@ jobs:
   release-checks:
     name: Release checks (freshness, typecheck, builds)
     if: (github.event_name == 'pull_request' && github.base_ref == 'main' && startsWith(github.head_ref, 'release/')) || (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/release/'))
+    # Mirrors pr-checks: same step list (i18n generation, malware gate,
+    # typecheck, four builds), so the same 20 minute bound.
+    timeout-minutes: 20
     runs-on: ubuntu-latest
 
     steps:
@@ -903,4 +934,4 @@ jobs:
         run: npm run build:bot
 
       - name: Build client
-        run: npm run build
+        run: npm run wiki:content && npm run build:bundle

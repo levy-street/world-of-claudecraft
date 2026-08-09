@@ -1531,7 +1531,7 @@ describe('site wiring (real modules, not direct bumps)', () => {
     const sim = makeSim();
     const a = sim.playerId;
     const b = sim.addPlayer('warrior', 'Rival');
-    const duel = { a, b, state: 'active' as const, timer: 0 };
+    const duel = { a, b, state: 'active' as const, timer: 0, controlled: new Map() };
     duelMod.endDuel(sim.ctx, duel, a);
     const metaA = sim.players.get(a)!;
     const metaB = sim.players.get(b)!;
@@ -1551,7 +1551,7 @@ describe('site wiring (real modules, not direct bumps)', () => {
     const sim = makeSim();
     const a = sim.playerId;
     const b = sim.addPlayer('warrior', 'Rival');
-    const duel = { a, b, state: 'active' as const, timer: 0 };
+    const duel = { a, b, state: 'active' as const, timer: 0, controlled: new Map() };
     sim.ctx.duels.set(a, duel);
     sim.ctx.duels.set(b, duel);
     const attacker = sim.entities.get(a)!;

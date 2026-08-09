@@ -2433,6 +2433,31 @@ const ITEM_ENTITY_IDS = [
   'withered_husks',
   'compost',
   'growth_tonic',
+  'brook_carrot_seed',
+  'brook_carrot',
+  'fine_brook_carrot',
+  'marsh_rice_seed',
+  'marsh_rice',
+  'fine_marsh_rice',
+  'bog_beet_seed',
+  'bog_beet',
+  'fine_bog_beet',
+  'highland_barley_seed',
+  'highland_barley',
+  'fine_highland_barley',
+  'frost_gourd_seed',
+  'frost_gourd',
+  'fine_frost_gourd',
+  'gilded_sunmelon_seed',
+  'gilded_sunmelon',
+  'fine_gilded_sunmelon',
+  'evergarden_greens_seed',
+  'evergarden_greens',
+  'fine_evergarden_greens',
+  'garden_hoe',
+  'bronze_hoe',
+  'skysilver_hoe',
+  'osmium_hoe',
 ] as const;
 
 type ItemEntityId = (typeof ITEM_ENTITY_IDS)[number];
@@ -2572,6 +2597,41 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   // plain real words, no coined compost grades borrowed from other games.
   compost: 'Compost',
   growth_tonic: 'Growth Tonic',
+  // The crop-ladder phase's seven crop families (seed, produce, fine twin),
+  // same English-appended treatment and the same stay-in-step rule against
+  // the ItemDef `name` fields in src/sim/content/items.ts. IP-safe per D17:
+  // real plant words plus zone-flavored qualifiers, coining nothing from
+  // another game.
+  brook_carrot_seed: 'Brook Carrot Seed',
+  brook_carrot: 'Brook Carrot',
+  fine_brook_carrot: 'Fine Brook Carrot',
+  marsh_rice_seed: 'Marsh Rice Seed',
+  marsh_rice: 'Marsh Rice',
+  fine_marsh_rice: 'Fine Marsh Rice',
+  bog_beet_seed: 'Bog Beet Seed',
+  bog_beet: 'Bog Beet',
+  fine_bog_beet: 'Fine Bog Beet',
+  highland_barley_seed: 'Highland Barley Seed',
+  highland_barley: 'Highland Barley',
+  fine_highland_barley: 'Fine Highland Barley',
+  frost_gourd_seed: 'Frost Gourd Seed',
+  frost_gourd: 'Frost Gourd',
+  fine_frost_gourd: 'Fine Frost Gourd',
+  gilded_sunmelon_seed: 'Gilded Sunmelon Seed',
+  gilded_sunmelon: 'Gilded Sunmelon',
+  fine_gilded_sunmelon: 'Fine Gilded Sunmelon',
+  evergarden_greens_seed: 'Evergarden Greens Seed',
+  evergarden_greens: 'Evergarden Greens',
+  fine_evergarden_greens: 'Fine Evergarden Greens',
+  // The hoe ladder (the crop-ladder phase's tool half), same English-appended
+  // treatment and the same stay-in-step rule against the ItemDef `name`
+  // fields. IP-safe per D17: plain real words at tiers 1 and 2, and the
+  // repo's own shipped Skysilver/Osmium material coinages at tiers 3 and 4
+  // (the mining pick precedent).
+  garden_hoe: 'Garden Hoe',
+  bronze_hoe: 'Bronze Hoe',
+  skysilver_hoe: 'Skysilver Hoe',
+  osmium_hoe: 'Osmium Hoe',
 };
 
 function itemTranslations(names: readonly string[]): ItemEntityTranslations {

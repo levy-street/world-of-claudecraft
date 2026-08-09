@@ -162,6 +162,45 @@ function copyCaps(caps: RenderBudgetCaps): RenderBudgetCaps {
   return { ...caps };
 }
 
+const URGENT_FOLIAGE_STEP = 0.14;
+const URGENT_GRASS_STEP = 0.14;
+const URGENT_LIGHTING_STEP = 0.12;
+const URGENT_VFX_STEP = 0.08;
+
+/** Non-resolution states visited by repeated urgent degradation.
+ * applyPointLightBudget already pins a counted light at its visible ancestry root, so
+ * hidden descendants cannot drift the live program's drawn-light count. Renderer
+ * prewarm still walks this urgent ladder as defense in depth for legitimate budget
+ * transitions behind the loading cover. It omits the normal-pressure ladder's smaller
+ * steps; grass, foliage and VFX levels do not select shader programs themselves. */
+export function renderBudgetShaderPrewarmLevels(
+  state: Pick<RenderBudgetState, 'levels' | 'caps'>,
+): RenderBudgetLevels[] {
+  let current = copyLevels(state.levels);
+  const sequence: RenderBudgetLevels[] = [];
+  for (let i = 0; i < 16; i++) {
+    const next: RenderBudgetLevels = {
+      grass: Math.max(state.caps.minGrassLevel, round2(current.grass - URGENT_GRASS_STEP)),
+      foliage: Math.max(state.caps.minFoliageLevel, round2(current.foliage - URGENT_FOLIAGE_STEP)),
+      vfx: Math.max(state.caps.minVfxLevel, round2(current.vfx - URGENT_VFX_STEP)),
+      lighting: Math.max(
+        state.caps.minLightingLevel,
+        round2(current.lighting - URGENT_LIGHTING_STEP),
+      ),
+      resolution: current.resolution,
+    };
+    if (
+      next.grass === current.grass &&
+      next.foliage === current.foliage &&
+      next.vfx === current.vfx &&
+      next.lighting === current.lighting
+    )
+      break;
+    sequence.push(next);
+    current = next;
+  }
+  return sequence;
+}
 const SUBMIT_STALL_MS = 120;
 const SUBMIT_STALL_URGENT_MS = 250;
 const SUBMIT_STALL_HOLD_SECONDS: Record<GfxTier, number> = {
@@ -478,7 +517,7 @@ export class RenderBudgetGovernor {
     let changed = false;
 
     const drawDominant = pressure.draw >= pressure.frame && pressure.draw >= pressure.submit;
-    const foliageStep = urgent ? 0.14 : 0.08;
+    const foliageStep = urgent ? URGENT_FOLIAGE_STEP : 0.08;
     if (
       (urgent || drawDominant || pressure.draw >= 1.08) &&
       this.reduceLevel('foliage', this.caps.minFoliageLevel, foliageStep)
@@ -486,7 +525,7 @@ export class RenderBudgetGovernor {
       changed = true;
     }
 
-    const grassStep = urgent ? 0.14 : 0.08;
+    const grassStep = urgent ? URGENT_GRASS_STEP : 0.08;
     if (
       (urgent ||
         pressure.grass >= 1 ||
@@ -496,7 +535,7 @@ export class RenderBudgetGovernor {
       changed = true;
     }
 
-    const lightingStep = urgent ? 0.12 : 0.07;
+    const lightingStep = urgent ? URGENT_LIGHTING_STEP : 0.07;
     const environmentFloored =
       this.levels.foliage <= this.caps.minFoliageLevel + 0.001 &&
       this.levels.grass <= this.caps.minGrassLevel + 0.001;
@@ -507,7 +546,7 @@ export class RenderBudgetGovernor {
       changed = true;
     }
 
-    const vfxStep = urgent ? 0.08 : 0.05;
+    const vfxStep = urgent ? URGENT_VFX_STEP : 0.05;
     const lightingDone = this.levels.lighting <= this.caps.minLightingLevel + 0.001;
     const severeFramePressure = pressure.frame >= 1.25 || pressure.submit >= 1.25;
     if (

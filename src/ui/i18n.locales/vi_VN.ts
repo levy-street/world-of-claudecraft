@@ -396,7 +396,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectTooltip.bonus.gatherersCache': '+1 sản lượng mỗi lần thu hoạch trong khi còn nạp.',
   'hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm': 'Rút ngắn thời gian hồi sinh của điểm tài nguyên mà nó kích hoạt.',
   'hudChrome.professions.toolEffectTooltip.charges': 'Bắt đầu với {base} lượt nạp trên một công cụ phổ thông (+{bonus} mỗi bậc hiếm).',
-  'hudChrome.professions.toolEffectTooltip.howToSlot': 'Gắn vào công cụ khai khoáng, đốn gỗ, hoặc thảo dược từ cửa sổ Nghề Nghiệp. Bị tiêu hao khi gắn.',
+  'hudChrome.professions.toolEffectTooltip.howToSlot': 'Gắn vào công cụ khai khoáng, đốn gỗ, thảo dược, hoặc nông nghiệp từ cửa sổ Nghề Nghiệp. Bị tiêu hao khi gắn.',
   'hudChrome.professions.toolEffectTooltip.kind': 'Bùa Công Cụ',
   'hudChrome.professions.toolEffectTooltip.landOnly': 'Không thể gắn vào cần câu.',
   'hudChrome.professions.toolEffectTooltip.openProfessions': 'Mở Nghề Nghiệp để gắn cái này vào một công cụ thu thập.',

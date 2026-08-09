@@ -63,6 +63,50 @@ export function isInStasis(e: Entity): boolean {
   return e.auras.some((a) => a.kind === 'stasis');
 }
 
+// The FEAR family inside the `incapacitate` kind. There is deliberately no
+// `fear` AuraKind: a fear is an incapacitate that also sends the victim
+// fleeing (updateFearMovement) and takes the 'fear' diminishing-returns
+// category, and folding that into a new kind would move every isStunned /
+// MOVEMENT_LOCK_AURA_KINDS / dispel / HUD branch at once. So fear identity is
+// carried by the aura ID plus the source ability's `fearDr` flag, and this is
+// the ONE rule that reads it, so no consumer re-derives the set and drifts.
+//
+// Two arms, because the sim applies fear three ways:
+//   1. The SHARED id, applied literally by the AoE fear effect
+//      (combat/effect_dispatch.ts 'aoeFear'), by the mob flee driver
+//      (mob/locomotion.ts) and by Banshee's Wail (mob/mob_swing.ts). Matched by
+//      id alone so a mob-applied fear never depends on the warlock ability
+//      continuing to exist.
+//   2. A per-ability `<abilityId>_incap` aura whose ability sets `fearDr`
+//      (Harrow, Morrowlash today). The caller supplies the flag rather than
+//      this leaf importing the content tables, which would pull all of
+//      `sim/data.ts` into a module `player_motion`/`climb`/`aura_classify`
+//      already sit downstream of.
+// Every OTHER incapacitate (Gouge, Sap, Blind, Hibernate, Wyvern Sting,
+// Startle Shot, Dragon's Breath, the staged-cone daze, temporal_hourglass) is
+// deliberately NOT a fear: those hold the victim in place rather than sending
+// it running, so the reads that key off this must not claim them.
+export const SHARED_FEAR_AURA_ID = 'fear_incap';
+export const INCAPACITATE_AURA_SUFFIX = '_incap';
+
+// The ability id an `<abilityId>_incap` aura was authored by, or null when the
+// id does not follow the incapacitate convention at all.
+export function incapacitateSourceAbilityId(auraId: string): string | null {
+  if (!auraId.endsWith(INCAPACITATE_AURA_SUFFIX)) return null;
+  const base = auraId.slice(0, -INCAPACITATE_AURA_SUFFIX.length);
+  return base.length > 0 ? base : null;
+}
+
+export function isFearAura(
+  aura: { id: string; kind: string },
+  usesFearDr: (abilityId: string) => boolean,
+): boolean {
+  if (aura.kind !== 'incapacitate') return false;
+  if (aura.id === SHARED_FEAR_AURA_ID) return true;
+  const source = incapacitateSourceAbilityId(aura.id);
+  return source !== null && usesFearDr(source);
+}
+
 export function isRooted(e: Entity): boolean {
   return isStunned(e) || e.auras.some((a) => a.kind === 'root');
 }

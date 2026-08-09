@@ -1350,6 +1350,18 @@ function readGpuRendererString(): string | undefined {
   }
 }
 
+/**
+ * The session's UNMASKED_RENDERER_WEBGL adapter-name string (probed at most
+ * once, cached; see probeGpuRenderer above). Undefined in Node or when the
+ * browser refuses debug renderer info. Consumed by
+ * src/game/hybrid_gpu_detect.ts for the boot-time hybrid-GPU notice, which
+ * needs the same adapter string classifyGpuRenderer/isWeakIntegratedGpu
+ * already classify, without re-probing a second throwaway context.
+ */
+export function activeGpuRendererName(): string | undefined {
+  return probeGpuRenderer();
+}
+
 /** Tier explicitly requested via URL, or null when it should be auto-detected. */
 export function urlForcedTier(): GfxTier | null {
   if (typeof location === 'undefined') return null;

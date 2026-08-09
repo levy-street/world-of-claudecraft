@@ -447,7 +447,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectTooltip.charges':
     'Starter med {base} ladninger på et almindeligt værktøj (+{bonus} pr. sjældenhedstrin).',
   'hudChrome.professions.toolEffectTooltip.howToSlot':
-    'Sæt den i et minedrifts-, skovhugst- eller urtekundskabsværktøj fra Erhverv-vinduet. Forbruges, når den sættes i.',
+    'Sæt den i et minedrifts-, skovhugst-, urtekundskabs- eller landbrugsværktøj fra Erhverv-vinduet. Forbruges, når den sættes i.',
   'hudChrome.professions.toolEffectTooltip.kind': 'Værktøjsamulet',
   'hudChrome.professions.toolEffectTooltip.landOnly': 'Kan ikke sættes i fiskestænger.',
   'hudChrome.professions.toolEffectTooltip.openProfessions':

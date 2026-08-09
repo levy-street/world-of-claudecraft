@@ -9423,6 +9423,72 @@
     font-size: 12px;
     color: var(--color-text-muted);
   }
+  /* The Thornhollow Fields queue-pop prompt. Same placement and z-index as the
+     finder's, because it answers the same question and only one of the two can
+     ever be open at once (a live offer refuses the other queue). */
+  #bg-proposal-popup {
+    display: none;
+    position: fixed;
+    top: 64px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 500;
+    width: 320px;
+    max-width: 94%;
+    padding: 12px 14px;
+    border: 1px solid #8a6a28;
+    border-radius: 6px;
+    background: linear-gradient(180deg, #2c2110, #1a1207);
+    box-shadow: 0 6px 24px #000c;
+    text-align: center;
+  }
+  .bgp-head {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-family: var(--title-font);
+    font-size: 14px;
+    color: #ffd9a0;
+    margin-bottom: 8px;
+  }
+  .bgp-head .ui-icon {
+    width: 16px;
+    height: 16px;
+  }
+  .bgp-tally {
+    font-size: 15px;
+    color: var(--color-text-muted);
+    margin: 2px 0 4px;
+  }
+  .bgp-tally.full {
+    color: #9fdc8f;
+  }
+  .bgp-remaining {
+    font-size: 12px;
+    color: var(--color-text-muted);
+    margin: 4px 0 8px;
+  }
+  .bgp-actions {
+    display: flex;
+    gap: 8px;
+  }
+  .bgp-actions .btn {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    text-align: center;
+  }
+  .bgp-actions .ui-icon {
+    width: 13px;
+    height: 13px;
+  }
+  .bgp-waiting {
+    font-size: 12px;
+    color: var(--color-text-muted);
+  }
   .df-proposal {
     border: 1px solid #8a6a28;
     border-radius: 5px;
@@ -9947,11 +10013,16 @@
     position: absolute;
     top: 285px;
     right: 12px;
-    width: 380px;
+    /* A ceiling, not a fixed box: every line shrinks to fit (align-items:
+       flex-end), so the wider ceiling only ever buys room for long names. The
+       percentage cap is against the full-screen HUD layer, so a narrow phone
+       keeps its 12px gutters without needing a mobile arm or a viewport unit. */
+    width: 420px;
+    max-width: calc(100% - 24px);
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    gap: 7px;
+    gap: 6px;
     pointer-events: none;
     z-index: 17;
   }
@@ -9961,20 +10032,21 @@
     gap: 9px;
     max-width: 100%;
     font-family: var(--title-font);
-    font-size: 19px;
+    font-size: 16px;
     letter-spacing: 0.4px;
     color: #d8d2c0;
     background: linear-gradient(100deg, #10131add, #080a0eee);
     border: 1px solid #3a4a66;
     border-right-width: 5px;
     border-radius: 8px;
-    padding: 7px 14px;
+    /* The right pad is the wider one on purpose: it clears the 5px team stripe
+       so a name never runs straight into the colored edge. */
+    padding: 5px 18px 5px 12px;
     text-shadow: 1px 1px 3px #000;
     box-shadow: 0 2px 12px #0009;
     animation: bgkf-in 0.32s cubic-bezier(0.2, 1.4, 0.4, 1);
     white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis;
   }
   .bgkf-line.crimson {
     border-right-color: var(--color-team-red);
@@ -9983,15 +10055,28 @@
     border-right-color: var(--color-team-blue);
   }
   .bgkf-mark {
-    width: 19px;
-    height: 19px;
+    width: 16px;
+    height: 16px;
     flex: none;
     color: var(--gold);
     filter: drop-shadow(1px 1px 2px #000);
   }
+  /* The ellipsis belongs HERE, on the name, and never on .bgkf-line:
+     text-overflow applies to a block box's own text, so on the flex CONTAINER
+     it did nothing at all and an over-long name was hard-sheared mid-glyph.
+     min-width:0 is what lets a flex item shrink below its text width, which is
+     the other half of making the ellipsis reachable. The 3px padding with the
+     matching negative margin is clip bleed: overflow:hidden clips to the
+     padding box, so the line's text-shadow survives, and the negative margin
+     hands the 3px back to the layout. */
   .bgkf-name {
     font-weight: 700;
-    font-size: 21px;
+    font-size: 17px;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 0 3px;
+    margin: 0 -3px;
   }
   .bgkf-name.crimson {
     color: #ff6a5c;
@@ -10001,7 +10086,9 @@
   }
   .bgkf-verb {
     color: #b8b09a;
-    font-size: 16px;
+    font-size: 13px;
+    /* the short connective never shrinks; the names absorb the squeeze */
+    flex: none;
   }
   @keyframes bgkf-in {
     from {

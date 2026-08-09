@@ -445,7 +445,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectTooltip.charges':
     'Sıradan bir alette {base} şarjla başlar (her nadirlik kademesinde +{bonus}).',
   'hudChrome.professions.toolEffectTooltip.howToSlot':
-    'Meslekler penceresinden bir madencilik, ağaç kesme ya da bitkicilik aletine yuvala. Yuvalandığında tüketilir.',
+    'Meslekler penceresinden bir madencilik, ağaç kesme, bitkicilik ya da çiftçilik aletine yuvala. Yuvalandığında tüketilir.',
   'hudChrome.professions.toolEffectTooltip.kind': 'Alet tılsımı',
   'hudChrome.professions.toolEffectTooltip.landOnly': 'Olta kamışlarına yuvalanmaz.',
   'hudChrome.professions.toolEffectTooltip.openProfessions':

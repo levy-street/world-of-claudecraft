@@ -468,21 +468,20 @@ describe('gathering profession proficiency (#1119)', () => {
   });
 });
 
-describe('farming stays node-free and tool-free', () => {
-  // BOTH assertions still hold after the growth phase, and both are still
-  // worth pinning; only the reason changed. Farming's gain path is its own
-  // harvest command (professions/farming.ts queues through
-  // queueGatheringGrant), NOT a gather node and NOT a tool, which is the
-  // fishing-shaped rather than node-shaped integration the packet locked: a
-  // farming GatherNodeType would be conscripted into every zone by the R37
-  // coverage rule and the node placement suites.
+describe('farming stays node-free, with the hoe ladder as its gatherTools', () => {
+  // The no-node half still holds after the crop-ladder phase and is still
+  // worth pinning: farming's gain path is its own harvest command
+  // (professions/farming.ts queues through queueGatheringGrant), NOT a
+  // gather node, which is the fishing-shaped rather than node-shaped
+  // integration the packet locked: a farming GatherNodeType would be
+  // conscripted into every zone by the R37 coverage rule and the node
+  // placement suites.
   //
-  // The no-gatherTool arm is now also what documents the DEFERRED hoe gate:
-  // plantCrop omits its canGatherTier call precisely because no farming
-  // gatherTool ships, so the honest ownership scan reports NO_TOOL_OWNED and
-  // a tier-1 check would refuse every plant. The crop-ladder phase adds the
-  // four hoes and the gate together, and inverts this arm's second half then.
-  it('has no node type and no gather tool that could grant farming skill', () => {
+  // The no-gatherTool half INVERTED with the crop-ladder phase, exactly as
+  // the deferred-gate note here promised: the four hoes ship and plantCrop's
+  // step-12 gate consumes them through the R22 wield-filtered scan, so the
+  // deliberate re-pin is the four-rung roster rather than the empty set.
+  it('has no node type, and the gather tools it now has are the four hoes', () => {
     const nodeProfessions = Object.values(NODE_HARVEST_TABLE).map((e) => e.professionId);
     expect(nodeProfessions).not.toContain('farming');
     // Anti-vacuous: the table still carries the three real node professions.
@@ -490,8 +489,13 @@ describe('farming stays node-free and tool-free', () => {
     const farmingTools = Object.entries(ITEMS).filter(
       ([, item]) => item.use?.type === 'gatherTool' && item.use.professionId === 'farming',
     );
-    expect(farmingTools).toEqual([]);
-    // Anti-vacuous: the same scan finds the tools of a shipped profession.
+    expect(farmingTools.map(([id]) => id)).toEqual([
+      'garden_hoe',
+      'bronze_hoe',
+      'skysilver_hoe',
+      'osmium_hoe',
+    ]);
+    // Anti-vacuous: the same scan finds the tools of an older profession.
     expect(
       Object.values(ITEMS).some(
         (item) => item.use?.type === 'gatherTool' && item.use.professionId === 'mining',

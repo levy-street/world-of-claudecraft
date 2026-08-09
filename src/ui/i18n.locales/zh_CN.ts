@@ -78,6 +78,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.die_by_sword.description':
     '防御性冷却技能：持续 8 秒，你受到的伤害降低 30%，并大幅提高躲闪攻击的几率。',
   'entities.abilities.die_by_sword.name': '剑在人在',
+  'entities.abilities.intervene.name': '援护',
+  'entities.abilities.intervene.description':
+    '冲向一名友方玩家，为其抵挡 {damage} 点伤害，持续 6 秒。',
   'entities.abilities.emboldening_roar.description':
     '发出一声鼓舞的怒吼：你和 40 码内的友方玩家获得鼓舞，你接下来的 3 个技能必定暴击。（狂怒）',
   'entities.abilities.emboldening_roar.name': '鼓舞怒吼',
@@ -2040,6 +2043,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hud.system.deathRecapAbility': '你已经死亡。死于{ability}。',
   'hud.system.deathRecapFalling': '你已经死亡。你摔死了。',
   'hud.system.deathRecapDrowned': '你已经死亡。你淹死了。',
+  'hud.system.deathRecapCauterized': '你已经死亡。灼烧术的烈焰吞噬了你。',
   'hud.system.respawn': '你再次感到精力恢复、身体完整。',
   'hud.system.ignoringChat': '已屏蔽来自 {name} 的聊天。',
   'hud.system.noLongerIgnoring': '不再屏蔽 {name}。',
@@ -2080,6 +2084,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hud.errors.outOfRange': '超出范围。',
   'hud.errors.noTarget': '你没有目标。',
   'hud.errors.tooClose': '太近了！',
+  'hud.errors.mustTargetAlly': '你必须选定一名友方目标。',
   'hud.errors.facing': '你必须面向目标。',
   'hud.errors.targetHealthBelow': '该技能要求目标生命值低于 {percent}%。',
   'hud.errors.dagger': '你必须装备匕首。',
@@ -7507,6 +7512,12 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '游戏正在没有 GPU 加速的情况下运行，会非常缓慢。请更新显卡驱动后重启游戏。在 Windows 上，还请在 设置 > 系统 > 显示 > 显示卡 中将本游戏设为“高性能”。',
   'gpuNotice.bodyWeb':
     '游戏正在没有 GPU 加速的情况下运行，会非常缓慢。请在浏览器设置中启用硬件加速，更新显卡驱动，然后重启浏览器。',
+  'gpuNotice.hybridBodyWindows':
+    '本次会话正在集成（节能）显卡上渲染。如果这台电脑还配有独立游戏显卡，请在 设置 > 系统 > 显示 > 显示卡 中将浏览器设为“高性能”，然后重启浏览器。桌面版会自动选择独立显卡。',
+  'gpuNotice.hybridBodyLinux':
+    '本次会话正在集成（节能）显卡上渲染。如果这台电脑还配有独立游戏显卡，您的浏览器或显卡驱动可能提供了自己的显卡选择设置，或者您的发行版可能提供了显卡切换工具（例如 PRIME 或 optimus-manager）。桌面版会自动选择独立显卡。',
+  'gpuNotice.hybridBodyOther':
+    '本次会话正在集成（节能）显卡上渲染。如果这台电脑还配有独立游戏显卡，请检查浏览器和操作系统的显卡设置以启用它。桌面版会自动选择独立显卡。',
   'gpuNotice.dismiss': '关闭',
   'perfNudge.integratedGpu':
     '游戏正在集成（节能）显卡上运行。如果这台电脑还配有独立游戏显卡，请在 Windows 的 设置 > 系统 > 显示 > 显示卡 中将浏览器设为“高性能”，然后重启浏览器。桌面版会自动选择游戏显卡。',
@@ -8310,6 +8321,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.tierRequired.mining': '需要{tier}阶采矿镐',
   'hudChrome.gathering.tierRequired.logging': '需要{tier}阶伐木斧',
   'hudChrome.gathering.tierRequired.herbalism': '需要{tier}阶草药镰',
+  'hudChrome.gathering.tierRequired.farming': '需要{tier}阶耕作锄',
   'hudChrome.gathering.toolTierUnmet.mining': '你需要{tier}阶采矿镐才能开采这条矿脉。',
   'hudChrome.gathering.toolTierUnmet.logging': '你需要{tier}阶伐木斧才能砍伐这片林木。',
   'hudChrome.gathering.toolTierUnmet.herbalism': '你需要{tier}阶草药镰才能采集这片草药丛。',
@@ -8342,9 +8354,11 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.toolTooltip.unlocks.logging': '砍伐最高{tier}阶的林木所需。',
   'hudChrome.gathering.toolTooltip.unlocks.herbalism': '采集最高{tier}阶的草药丛所需。',
   'hudChrome.gathering.toolTooltip.unlocks.fishing': '在最高{tier}阶的水域垂钓所需。',
+  'hudChrome.gathering.toolTooltip.unlocks.farming': '种植最高{tier}阶的作物所需。',
   'hudChrome.gathering.toolTooltip.use.mining': '使用：开采附近的矿脉。',
   'hudChrome.gathering.toolTooltip.use.logging': '使用：砍伐附近的林木。',
   'hudChrome.gathering.toolTooltip.use.herbalism': '使用：采集附近的草药丛。',
+  'hudChrome.gathering.toolTooltip.use.farming': '放在背包里即可，在田畦种植作物时自动生效。',
   'hudChrome.gathering.toolTooltip.speed': '在低于{tier}阶的节点采集速度更快。',
   'hudChrome.gathering.toolTooltip.rodRequired': '钓鱼所需。',
   'hudChrome.gathering.toolTooltip.rodBite': '鱼上钩最多可提前{seconds}秒。',
@@ -8364,6 +8378,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.farming.harvestFineLineQty': '你还收获了：{name} x{qty}。',
   'hudChrome.farming.witheredLine': '作物枯萎了。你清理了田畦：{name}。',
   'hudChrome.farming.witheredLineQty': '作物枯萎了。你清理了田畦：{name} x{qty}。',
+  'hudChrome.farming.seedBackLine': '你回收了种子：{name}。',
+  'hudChrome.farming.seedBackLineQty': '你回收了种子：{name} x{qty}。',
   'hudChrome.farming.denied.bad_bed': '那里没有田畦。',
   'hudChrome.farming.denied.bad_crop': '你无法在这里种植它。',
   'hudChrome.farming.denied.range': '你离那片田畦太远了。',
@@ -8376,6 +8392,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.farming.denied.no_compost': '你没有堆肥。',
   'hudChrome.farming.denied.no_fee_produce': '你没有可以支付看守费的农产品。',
   'hudChrome.farming.denied.no_tonic': '你没有生长滋补剂。',
+  'hudChrome.farming.denied.tool': '你没有适合该作物的耕作锄。',
   'hudChrome.farming.husksConvertedLine': '你用{husksName} x{husks}换取了{name}。',
   'hudChrome.farming.husksConvertedLineQty': '你用{husksName} x{husks}换取了{name} x{qty}。',
   'gatherEvent.pristineVein': '{finder}挖到了一条纯净的矿脉！',
@@ -8391,6 +8408,31 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.withered_husks.name': '枯萎的谷壳',
   'entities.items.compost.name': '堆肥',
   'entities.items.growth_tonic.name': '生长滋补剂',
+  'entities.items.brook_carrot_seed.name': '溪畔胡萝卜种子',
+  'entities.items.brook_carrot.name': '溪畔胡萝卜',
+  'entities.items.fine_brook_carrot.name': '优质溪畔胡萝卜',
+  'entities.items.marsh_rice_seed.name': '沼泽稻米种子',
+  'entities.items.marsh_rice.name': '沼泽稻米',
+  'entities.items.fine_marsh_rice.name': '优质沼泽稻米',
+  'entities.items.bog_beet_seed.name': '沼泽甜菜种子',
+  'entities.items.bog_beet.name': '沼泽甜菜',
+  'entities.items.fine_bog_beet.name': '优质沼泽甜菜',
+  'entities.items.highland_barley_seed.name': '高地大麦种子',
+  'entities.items.highland_barley.name': '高地大麦',
+  'entities.items.fine_highland_barley.name': '优质高地大麦',
+  'entities.items.frost_gourd_seed.name': '霜瓜种子',
+  'entities.items.frost_gourd.name': '霜瓜',
+  'entities.items.fine_frost_gourd.name': '优质霜瓜',
+  'entities.items.gilded_sunmelon_seed.name': '鎏金太阳瓜种子',
+  'entities.items.gilded_sunmelon.name': '鎏金太阳瓜',
+  'entities.items.fine_gilded_sunmelon.name': '优质鎏金太阳瓜',
+  'entities.items.evergarden_greens_seed.name': '常青园青菜种子',
+  'entities.items.evergarden_greens.name': '常青园青菜',
+  'entities.items.fine_evergarden_greens.name': '优质常青园青菜',
+  'entities.items.garden_hoe.name': '菜园锄',
+  'entities.items.bronze_hoe.name': '青铜锄',
+  'entities.items.skysilver_hoe.name': '天银锄',
+  'entities.items.osmium_hoe.name': '锇金锄',
   'hudChrome.archetypeTitle.label': '称号',
   'hudChrome.archetypeTitle.none': '无',
   'hudChrome.archetypeTitle.hobbyLabel': '爱好',
@@ -8967,6 +9009,12 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.proposalTitle': '找到队伍：{name}',
   'hudChrome.finder.proposalRole': '你的职责：{role}',
   'hudChrome.finder.accepted': '{accepted}/{size} 已确认',
+  'hudChrome.bgOffer.title': '荆谷原野已准备就绪',
+  'hudChrome.bgOffer.accepted': '已确认 {accepted}/{size}',
+  'hudChrome.bgOffer.remaining': '剩余 {seconds} 秒确认',
+  'hudChrome.bgOffer.accept': '接受',
+  'hudChrome.bgOffer.decline': '拒绝',
+  'hudChrome.bgOffer.acceptedWait': '等待其他人确认...',
   'hudChrome.finder.remaining': '剩余 {seconds} 秒确认',
   'hudChrome.finder.accept': '接受',
   'hudChrome.finder.decline': '拒绝',
@@ -10017,7 +10065,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '充能期间将收获品级提升1个工具等级。',
   'hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm': '缩短其触发的资源节点重生计时。',
   'hudChrome.professions.toolEffectTooltip.howToSlot':
-    '在专业窗口中将其镶嵌到采矿、伐木或草药学工具上。镶嵌后即消耗。',
+    '在专业窗口中将其镶嵌到采矿、伐木、草药学或耕作工具上。镶嵌后即消耗。',
   'hudChrome.professions.toolEffectTooltip.charges':
     '普通品质工具初始有{base}次充能（稀有度每升一级+{bonus}次）。',
   'hudChrome.professions.toolEffectTooltip.landOnly': '无法镶嵌到鱼竿上。',
@@ -10035,6 +10083,12 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectRechargeNoSlot': '{profession}上没有镶嵌任何效果。',
   'hudChrome.professions.toolEffectRechargeFull': '{effect}已充满能量。',
   'hudChrome.professions.toolEffectRechargeMaterials': '为{effect}充能需要{material}x{count}。',
+  'hudChrome.professions.craftingProgress': '正在制作：还剩{remaining}秒，共{total}秒。',
+  'hudChrome.professions.disenchantingProgress': '正在分解：还剩{remaining}秒，共{total}秒。',
+  'hudChrome.professions.enchantingProgress': '正在附魔：还剩{remaining}秒，共{total}秒。',
+  'hudChrome.professions.salvagingProgress': '正在回收：还剩{remaining}秒，共{total}秒。',
+  'hudChrome.professions.rechargingToolEffectProgress':
+    '正在为工具效果充能：还剩{remaining}秒，共{total}秒。',
   'hudChrome.professions.toolEffectSpent': '已耗尽，需要充能',
   'hudChrome.professions.toolEffectDepleted': '工具效果已耗尽',
   'hudChrome.professions.toolEffectRechargePrice': '充能：{material} x{count}',
@@ -10492,7 +10546,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.gatherIntro.fishing':
     '钓鱼通过咬钩与收线的节奏，在每个区域的开阔水面垂钓，上限为200。',
   'guide.profPages.gatherIntro.farming':
-    '耕作在整治好的田畦中从种子育出作物，上限为100；它的田畦、种子与工具将随后续更新到来，因此下方表格暂时为空。',
+    '耕作是唯一以照料代替采掘的采集行业：在整治好的田畦中播下种子，人不在时作物照样生长，回来时拔起成熟的收成。从Eastbrook的份地到Evergarden的花圃，每处耕作据点都有自己的田畦，阶梯的每一级都长着一对专属作物，手艺到家还能收下精良等级。农活由锄头开启：Garden Hoe照看起步的田畦，更高各级则由工程师打造。熟练在专属计数上累积，上限为100。',
   'guide.profPages.rhythmHeading': '采集节奏',
   'guide.profPages.rhythmBody':
     '采集是一段可见的施法：基础{base}秒，最短不低于{floor}秒；工具每高于节点一阶缩短{tool}秒，每个熟练度区间再缩短{band}秒。',
@@ -10618,7 +10672,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.gatherDeeds.fishing':
     '钓鱼100熟练铭刻Old Salt，200铭刻Master Angler及其头衔，那是垂钓技艺的顶点；钓鱼同样计入Master Gatherer（任意三项采集达到100）。在每个区域的水域钓起第一条鱼各有其页，钓起日辉锦鲤则记下Glimmer of Hope，所以包里常备鱼竿的旅人往往比预想中更快填满功业之书。',
   'guide.profPages.gatherDeeds.farming':
-    '耕作暂无专属功业：田畦尚未到来，标记其他行业的里程碑与上限功业也将随之而来。它的熟练已经计入Master Gatherer（任意三项采集达到100）。功业只给头衔与名望，绝不给予力量。',
+    '耕作暂无专属功业：如今田畦与作物已经扎根，标记其他行业的里程碑与上限功业将随后续更新一并到来。它的熟练已经计入Master Gatherer（任意三项采集达到100），耕作者能像旁人一样填满那一页。功业只给头衔与名望，绝不给予力量。',
   'guide.profPages.fish.startHeading': '入门',
   'guide.profPages.fish.startBody':
     '一根Simple Fishing Pole在Eastbrook的Fisherman Brandt处只卖20铜（他在镇东缘望着Mirror Lake）；Tinker Gizzel、Fenbridge的Provisioner Hale和Highwatch的Quartermaster Bree也有存货。面向前方约24码内足够深的水面使用鱼竿即可抛竿。战斗中、游泳时或死亡时无法抛竿：站在岸上钓才是正途，任何区域的可钓水域都行。',
@@ -11864,4 +11918,178 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '坦克形态：厚实的兽皮，以怒气取代法力，还有额外的威胁值，让敌人始终朝你挥拳。',
   'guide.riftsPage.floorsBody':
     '一道裂隙有若干层，每一层都是当场生成的；而通往下一层的路，要等这一层跟你算清了账才会打开：清掉层里还活着的东西，解开它横在你路上的机关，向下的通道便会撕裂而开。最后一层以一名首领收尾。每一层都有自己的性格，所以一趟下来，你可能刚走出严寒，转身就踏进余烬之中，聊天栏会在你抵达每一层时报出它的名字。这一趟究竟有几层，看你屏幕上的追踪条。有些裂隙开启的则是一处手工搭建的场景，它有自己固定的长度，而不是生成出来的下行之路。',
+  // Performance diagnostics panel chrome. Technical report prose remains English.
+  'hudChrome.perf.diagnostics.panelAria': 'World of ClaudeCraft 性能诊断',
+  'hudChrome.perf.diagnostics.title': 'ClaudeCraft 性能医生',
+  'hudChrome.perf.diagnostics.subtitle': '针对游戏的扫描，提供证据和代码级修复建议。',
+  'hudChrome.perf.diagnostics.aria.liveMeasurements': '实时性能测量',
+  'hudChrome.perf.diagnostics.aria.scanProgress': '诊断扫描进度',
+  'hudChrome.perf.diagnostics.aria.findings': '按优先级排序的诊断结果',
+  'hudChrome.perf.diagnostics.controls.minimize': '最小化',
+  'hudChrome.perf.diagnostics.controls.expand': '展开',
+  'hudChrome.perf.diagnostics.controls.start': '开始 15 秒扫描',
+  'hudChrome.perf.diagnostics.controls.refreshCensus': '刷新场景统计',
+  'hudChrome.perf.diagnostics.controls.copyReport': '复制清晰报告',
+  'hudChrome.perf.diagnostics.controls.downloadReport': '下载报告',
+  'hudChrome.perf.diagnostics.controls.scanning': '扫描中...',
+  'hudChrome.perf.diagnostics.controls.scanAnother': '扫描另一个区域',
+  'hudChrome.perf.diagnostics.controls.reportLogged': '报告已记录到控制台',
+  'hudChrome.perf.diagnostics.controls.copied': '已复制',
+  'hudChrome.perf.diagnostics.controls.copyBlocked': '复制受阻：报告已记录',
+  'hudChrome.perf.diagnostics.controls.retestLowGraphics': '使用低画质重新测试',
+  'hudChrome.perf.diagnostics.instruction':
+    '为获得最佳信号，请进入离线游戏，在卡顿区域移动并旋转镜头，然后在扫描期间触发造成卡顿的效果。',
+  'hudChrome.perf.diagnostics.status.pausedHiddenRestart':
+    '此标签页隐藏时扫描已暂停。返回后扫描将重新开始。',
+  'hudChrome.perf.diagnostics.status.restoredRestart':
+    '标签页已恢复。正在重新开始一次干净的 15 秒活跃游戏采集。',
+  'hudChrome.perf.diagnostics.status.worldLoaded': '世界已加载。正在等待第一个可操作帧。',
+  'hudChrome.perf.diagnostics.status.pausedHiddenContinue':
+    '此标签页隐藏时扫描已暂停。请返回游戏以继续。',
+  'hudChrome.perf.diagnostics.status.collectingRemaining.one':
+    '正在采集活跃游戏：剩余 {seconds} 秒',
+  'hudChrome.perf.diagnostics.status.collectingRemaining.other':
+    '正在采集活跃游戏：剩余 {seconds} 秒',
+  'hudChrome.perf.diagnostics.status.waitingFrames':
+    '正在等待有代表性的游戏帧：{current}/{minimum}',
+  'hudChrome.perf.diagnostics.status.collectingNow': '正在采集活跃游戏：现在请穿过问题区域。',
+  'hudChrome.perf.diagnostics.status.ready': '已准备扫描。按开始并重现卡顿。',
+  'hudChrome.perf.diagnostics.status.waitingWorld':
+    '正在等待游戏世界。请选择离线游戏或进入一个在线角色。',
+  'hudChrome.perf.diagnostics.metrics.waitingRenderer': '渲染器：等待中',
+  'hudChrome.perf.diagnostics.metrics.waitingCensus': '场景统计：等待中',
+  'hudChrome.perf.diagnostics.metrics.waitingHitch': '卡顿归因：进入世界时已启用',
+  'hudChrome.perf.diagnostics.metrics.recent':
+    '最近  {fps} FPS | p95 {p95} 毫秒 | >50 毫秒 {longFrames}',
+  'hudChrome.perf.diagnostics.metrics.render':
+    '渲染  提交 {submit} 毫秒 | 世界 {world} 毫秒 | 实体 {entities} 毫秒',
+  'hudChrome.perf.diagnostics.metrics.scene':
+    '场景   {calls} 次调用 | {triangles} 个三角形 | {views} 个视图',
+  'hudChrome.perf.diagnostics.metrics.hitches':
+    '卡顿 {hitches} | 着色器 {shaders} | 上传 {uploads} | 视图 {views}',
+  'hudChrome.perf.diagnostics.metrics.gpu': 'GPU     {renderer}',
+  'hudChrome.perf.diagnostics.metrics.waitingValue': '等待中',
+  'hudChrome.perf.diagnostics.scoreHeadline': '{score}/100：{headline}',
+  'hudChrome.perf.diagnostics.healthyNoFindings':
+    '未触发可执行的阈值。如果短暂卡顿仍然影响体验，请沿着触发卡顿的准确移动路径重新运行扫描。',
+  'hudChrome.perf.diagnostics.findingMeta': '{severity} | {confidence} 置信度',
+  'hudChrome.perf.diagnostics.sections.evidence': '证据',
+  'hudChrome.perf.diagnostics.sections.tryNow': '立即尝试',
+  'hudChrome.perf.diagnostics.sections.codeFix': '代码修复',
+  'hudChrome.perf.diagnostics.sections.source': '相关源文件',
+  'hudChrome.perf.diagnostics.severity.critical': '严重',
+  'hudChrome.perf.diagnostics.severity.warning': '警告',
+  'hudChrome.perf.diagnostics.severity.info': '信息',
+  'hudChrome.perf.diagnostics.confidence.high': '高',
+  'hudChrome.perf.diagnostics.confidence.medium': '中',
+  'hudChrome.perf.diagnostics.confidence.low': '低',
+  'hudChrome.perf.diagnostics.diagnosis.noProblemTitle': '未检测到明显性能问题',
+  'hudChrome.perf.diagnostics.diagnosis.summary.findings.one':
+    '最近 10 秒在 {fps} FPS、帧 p95 为 {p95} 时发现 {findings} 项可处理问题。',
+  'hudChrome.perf.diagnostics.diagnosis.summary.findings.other':
+    '最近 10 秒在 {fps} FPS、帧 p95 为 {p95} 时发现 {findings} 项可处理问题。',
+  'hudChrome.perf.diagnostics.diagnosis.summary.healthy':
+    '最近 10 秒保持 {fps} FPS，帧 p95 为 {p95}。游戏、浏览器、GPU、内存、资源和网络均未触发阈值。',
+  'hudChrome.perf.diagnostics.diagnosis.titles.hardwareAcceleration': '正在使用软件渲染',
+  'hudChrome.perf.diagnostics.diagnosis.titles.integratedGpu': '游戏正在使用集成显卡',
+  'hudChrome.perf.diagnostics.diagnosis.titles.highDpi': '高分辨率渲染开销较大',
+  'hudChrome.perf.diagnostics.diagnosis.titles.forcedHighGraphics': '强制高画质正在降低性能',
+  'hudChrome.perf.diagnostics.diagnosis.titles.lowMemory': '设备可用内存较低',
+  'hudChrome.perf.diagnostics.diagnosis.titles.browserStalls': '检测到浏览器或扩展程序停顿',
+  'hudChrome.perf.diagnostics.diagnosis.titles.heapPressure': '检测到浏览器内存压力',
+  'hudChrome.perf.diagnostics.diagnosis.titles.contextLoss': '图形上下文已重置',
+  'hudChrome.perf.diagnostics.diagnosis.titles.gpuSubmit': 'GPU 提交是主要帧瓶颈',
+  'hudChrome.perf.diagnostics.diagnosis.titles.sceneDraw': '场景绘制开销超过当前画质预算',
+  'hudChrome.perf.diagnostics.diagnosis.titles.shadowPass': '阴影通道占用大量绘制调用',
+  'hudChrome.perf.diagnostics.diagnosis.titles.rendererWorld': '世界渲染器更新受 CPU 限制',
+  'hudChrome.perf.diagnostics.diagnosis.titles.rendererEntities': '实体视图更新受 CPU 限制',
+  'hudChrome.perf.diagnostics.diagnosis.titles.rendererNameplates': '姓名牌绘制开销较大',
+  'hudChrome.perf.diagnostics.diagnosis.titles.simCpu': '模拟工作占用帧时间',
+  'hudChrome.perf.diagnostics.diagnosis.titles.hudCpu': 'HUD 更新占用帧时间',
+  'hudChrome.perf.diagnostics.diagnosis.titles.eventCpu': '事件处理占用帧时间',
+  'hudChrome.perf.diagnostics.diagnosis.titles.shaderCompile': '游戏过程中正在编译着色器',
+  'hudChrome.perf.diagnostics.diagnosis.titles.textureUpload': '纹理上传导致游戏卡顿',
+  'hudChrome.perf.diagnostics.diagnosis.titles.viewCreate': '实体视图创建导致卡顿',
+  'hudChrome.perf.diagnostics.diagnosis.titles.otherHitch': '仍有未归因的长帧',
+  'hudChrome.perf.diagnostics.diagnosis.titles.assetStartup': '资源处理延迟了游戏启动',
+  'hudChrome.perf.diagnostics.diagnosis.titles.longTasks': '浏览器长任务正在阻塞帧',
+  'hudChrome.perf.diagnostics.diagnosis.titles.networkLatency': '网络传输延迟了可见响应',
+  'hudChrome.perf.diagnostics.diagnosis.titles.snapshotApply': '快照处理正在阻塞客户端',
+  'hudChrome.perf.diagnostics.diagnosis.titles.generic': '性能规则 {rule} 需要处理',
+  'hudChrome.perf.diagnostics.diagnosis.causes.environment':
+    '检测到的浏览器、GPU、内存或设备设置可能在游戏渲染前限制性能。',
+  'hudChrome.perf.diagnostics.diagnosis.causes.graphics':
+    '本次采集测得的图形工作超过当前帧预算或场景预算。',
+  'hudChrome.perf.diagnostics.diagnosis.causes.cpu':
+    '某个 CPU 阶段占用了足以错过帧预算的主线程时间。',
+  'hudChrome.perf.diagnostics.diagnosis.causes.loading':
+    '资源准备或首次使用工作发生在可见游戏或启动路径中。',
+  'hudChrome.perf.diagnostics.diagnosis.causes.network':
+    '网络传输或客户端快照处理延迟了最新可操作状态。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.environment':
+    '环境规则 {rule} 与此设备和浏览器匹配。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.gpuSubmit':
+    'WebGL 提交 p95 为 {submit}，占渲染器 p95 的 {share}。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.frame':
+    '最近窗口测得 {fps} FPS，帧 p95 为 {p95}。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.sceneCalls':
+    '场景使用 {calls} 次绘制调用，目标为 {target}。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.sceneTriangles':
+    '场景提交 {triangles} 个三角形，目标为 {target}。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.sceneCategory':
+    '场景类别 {category} 贡献 {calls} 次调用和 {triangles} 个测量三角形。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.censusNeeded': '刷新场景统计以识别主要渲染类别。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.shadow':
+    '阴影通道提交 {calls} 次调用，占基线的 {share}，共 {triangles} 个三角形。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.cpuPhase': '测得阶段 {phase} 的 p95 为 {p95}。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.hitch':
+    '记录的 {total} 次卡顿中，有 {count} 次与原因 {cause} 匹配。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.assets':
+    '预加载门为 {tasks} 个已注册任务等待了 {wait}。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.failedAssets': '失败的资源组：{groups}。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.longTasks':
+    '测得 {count} 个长任务，p95 为 {p95}，最大值为 {max}。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.network':
+    '快照间隔为 {interval}，最新快照年龄为 {age}，输入回显 p95 为 {echo}。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.snapshot':
+    '快照解析和应用 p95 为 {work}；网络间隔 p95 为 {gap}。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.generic': '诊断规则 {rule} 与本次采集匹配。',
+  'hudChrome.perf.diagnostics.diagnosis.tryNow.environment':
+    '修正检测到的环境设置，重新启动，然后重复相同扫描。',
+  'hudChrome.perf.diagnostics.diagnosis.tryNow.graphics':
+    '以低画质重复相同镜头路径，确认图形压力。',
+  'hudChrome.perf.diagnostics.diagnosis.tryNow.cpu':
+    '分别在静止和移动时重复扫描，以隔离 CPU 阶段。',
+  'hudChrome.perf.diagnostics.diagnosis.tryNow.loading':
+    '重复相同路线或首次使用操作，确认卡顿发生时机。',
+  'hudChrome.perf.diagnostics.diagnosis.tryNow.network':
+    '在离线游戏中使用相同移动和镜头路径进行比较。',
+  'hudChrome.perf.diagnostics.diagnosis.codeFix.environment':
+    '让检测到的备用路径遵守共享图形和内存预算。',
+  'hudChrome.perf.diagnostics.diagnosis.codeFix.graphics':
+    '使用现有渲染预算、实例化、材质共享、LOD 和隐藏工作跳过机制。',
+  'hudChrome.perf.diagnostics.diagnosis.codeFix.cpu':
+    '分析指定阶段，移除重复工作和分配，并保持游戏行为。',
+  'hudChrome.perf.diagnostics.diagnosis.codeFix.loading':
+    '通过现有启动和流式预算预加载、池化或分摊已识别的首次使用工作。',
+  'hudChrome.perf.diagnostics.diagnosis.codeFix.network':
+    '降低传输或快照处理成本，同时不削弱权威服务器模型。',
+  'hudChrome.perf.diagnostics.report.title': 'World of ClaudeCraft 性能诊断',
+  'hudChrome.perf.diagnostics.report.statusLine': '状态：{status}（{score}/100）',
+  'hudChrome.perf.diagnostics.report.capturedLine': '采集时间：{captured}',
+  'hudChrome.perf.diagnostics.report.topFindingLine': '首要问题：{finding}',
+  'hudChrome.perf.diagnostics.report.summaryLine': '摘要：{summary}',
+  'hudChrome.perf.diagnostics.report.gpuLine': 'GPU：{gpu}',
+  'hudChrome.perf.diagnostics.report.graphicsLine': '画质：{tier}，渲染比例 {scale}',
+  'hudChrome.perf.diagnostics.report.recentLine':
+    '最近：{fps} FPS，p95 {p95}，{longFrames} 帧超过 50 毫秒，共测量 {frames} 帧',
+  'hudChrome.perf.diagnostics.report.resultHeading': '结果',
+  'hudChrome.perf.diagnostics.report.noThreshold': '本次采集未触发可处理阈值。',
+  'hudChrome.perf.diagnostics.report.findingHeading': '{index}. {title}',
+  'hudChrome.perf.diagnostics.report.findingMeta': '严重程度：{severity}。置信度：{confidence}。',
+  'hudChrome.perf.diagnostics.report.rawSnapshotHeading': '原始快照',
+  'hudChrome.perf.diagnostics.report.notAvailable': '不可用',
+  'hudChrome.perf.diagnostics.report.status.critical': '严重',
+  'hudChrome.perf.diagnostics.report.status.needsAttention': '需要注意',
+  'hudChrome.perf.diagnostics.report.status.healthy': '正常',
 };

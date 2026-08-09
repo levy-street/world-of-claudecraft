@@ -471,7 +471,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectTooltip.charges':
     'Startet mit {base} Ladungen auf einem gewöhnlichen Werkzeug (+{bonus} pro Seltenheitsstufe).',
   'hudChrome.professions.toolEffectTooltip.howToSlot':
-    'Auf ein Bergbau-, Holzfäller- oder Kräuterkunde-Werkzeug im Berufe-Fenster einsetzen. Wird beim Einsetzen verbraucht.',
+    'Auf ein Bergbau-, Holzfäller-, Kräuterkunde- oder Landwirtschafts-Werkzeug im Berufe-Fenster einsetzen. Wird beim Einsetzen verbraucht.',
   'hudChrome.professions.toolEffectTooltip.kind': 'Werkzeug-Talisman',
   'hudChrome.professions.toolEffectTooltip.landOnly': 'Lässt sich nicht auf Angelruten einsetzen.',
   'hudChrome.professions.toolEffectTooltip.openProfessions':

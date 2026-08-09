@@ -13,6 +13,31 @@ NpcDef.vendorItems row until Phase 9 flips go-live; tier 3 and 4 seeds come only
 from seed-back rolls on crops nobody can plant yet. Nothing added this phase is
 player-reachable.
 
+EXECUTION AMENDMENTS (2026-08-09, the phase as it actually landed; state.md's
+ledger letters (aa) through (af) plus the (o) and (z) closures are the
+authority, this block is the in-file sweep):
+- Prompt-mode tool-effect slot mints are REFUSED for farming (ledger (af)):
+  harvest_crop carries no confirm channel, so a prompt slot could never fire;
+  the refusal ships at resolveSlotToolEffect with the confirm-channel decision
+  pointed at the Phase 7/8 farming UI work.
+- Lane A ships NO MATERIAL_GRADES row per locked deviation (o); fine twins are
+  ordinary items priced per the shipped fine_vale_wheat precedent (sell 2x the
+  BASE sell, buyValue 4x the FINE's OWN sell), and the "four-times buyValue
+  convention" wording below reads against the fine's own sellValue. Farming
+  fine twins get NO downward grade substitution (commented at the items block).
+- Lane C's "TOOL_RECIPES rows" landed as the separate HOE_RECIPES list per the
+  rod precedent (ledger (ad)); "a pin proves all three existing tool effects
+  slot onto a hoe" is amended by ledger (ac): the TWO live effects slot and
+  act at harvest draw-free, quickening_charm stays refused by the kind arm.
+- The hoe gate rides the wield-filtered scan per ledger (ab): the effective
+  plant ladder is 0/40/70/85 layered over the crop thresholds.
+- The generic hub-stocking arm excludes farming per ledger (aa); the farming
+  dormant-state arm pins the no-vendor truth.
+- Seed-back rolls on BOTH harvest outcomes per ledger (ae).
+- Delivery per D22: no push, no PR; the phase branch merges --no-ff into the
+  local feature/farming-plan and the would-be PR body lives in progress.md.
+  The final push-and-open-a-PR line below is superseded.
+
 ### Starter Prompt
 
 ```

@@ -20,6 +20,7 @@
 // precedent), rather than loosening it ahead of need.
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { FARM_CROPS } from '../src/sim/content/farm_crops';
 import { FARM_BED_IDS } from '../src/sim/content/farm_patches';
 import { GATHER_NODES } from '../src/sim/content/gather_nodes';
 import {
@@ -182,10 +183,17 @@ const NON_PROFESSIONS_BLOB_FIELDS = [
 // The growth engine (Phase 3) then renamed the fixture's crop id to the
 // shipped vale_wheat; the Phase 3 QA re-measure settled at 13,994 bytes
 // (about 196 bytes per bed), 342 bytes under the ceiling and 298 over the
-// floor, inside the doctrine's couple-hundred-byte band, so both pins stand
-// un-re-minted. The next authored growth (the Phase 5 crop ladder, or a new
-// patch site) re-measures again and re-mints if the band shrinks.
-const PROFESSIONS_BYTE_CEILING = 14336;
+// floor, inside the doctrine's couple-hundred-byte band, so both pins stood
+// un-re-minted.
+// The Phase 5 crop ladder is the next authored growth: three HOE_RECIPES ids
+// join knownRecipes, and the fixture's full-width doctrine now plants every
+// bed with the WIDEST shipped crop id (evergarden_greens, 7 bytes per bed
+// over vale_wheat). The settled ceiling re-measured 14,218 bytes, 118 under
+// the 14 KiB bound, well inside one bed site of growth, so the bound is
+// re-minted a grid step up to 15 KiB rather than left to shave the band, and
+// the floor re-tracks to 13,952 (266 under the measured value, the same
+// couple-hundred-byte band as every previous mint).
+const PROFESSIONS_BYTE_CEILING = 15360;
 
 function ceilingSim(): Sim {
   const sim = makeSim();
@@ -287,13 +295,20 @@ function ceilingSim(): Sim {
   // load-side clamp is a no-op and the settle stays a fixed point. The
   // fresh-Sim load runs at time 0, where the growth phase's anchor rule
   // re-anchors any positive plant time to the floor of 1 and leaves it there
-  // on every later load. Content-scaled like nodeHarvestCooldowns: about 196
-  // bytes per authored bed at the Phase 3 QA re-measure (the settled total
-  // lives in the ceiling ledger above).
+  // on every later load. Content-scaled like nodeHarvestCooldowns: about 203
+  // bytes per authored bed at the Phase 5 crop-ladder re-measure (the settled
+  // total lives in the ceiling ledger above).
   if (FARM_BED_IDS.size !== 23) throw new Error('farm bed set changed; re-mint the ceiling');
+  // Full width includes the crop id column: the Phase 5 ladder shipped ids
+  // longer than vale_wheat, so the worst case plants every bed with the
+  // WIDEST id the catalog carries. Derived, with the winner pinned, so a
+  // future longer id moves the fixture and forces this ceiling re-read.
+  const widestCropId = Object.keys(FARM_CROPS).reduce((a, b) => (b.length > a.length ? b : a));
+  if (widestCropId !== 'evergarden_greens')
+    throw new Error('widest crop id changed; re-measure and re-mint the ceiling');
   for (const bedId of FARM_BED_IDS) {
     meta.farmPlots.set(bedId, {
-      cropId: 'vale_wheat',
+      cropId: widestCropId,
       plantedAtMs: 1_000,
       readyAtMs: 1_000 + FARM_MAX_GROW_MS,
       survivalRoll: 0.12345678901234566,
@@ -397,9 +412,11 @@ describe('the professions blob growth bound (phase 16)', () => {
     // bed planted at full row width) minus a small band, so the headroom
     // note above cannot rot silently in either direction: a measurement
     // drifting more than a couple hundred bytes reds here and forces the
-    // note to be re-read. Re-minted 9280 to 13,696 with the ceiling.
+    // note to be re-read. Re-minted 9280 to 13,696 with the 14 KiB ceiling,
+    // then 13,696 to 13,952 with the Phase 5 crop-ladder mint (measured
+    // 14,218; the ledger above).
     const bytes = professionsBytes(s2);
-    expect(bytes).toBeGreaterThan(13696);
+    expect(bytes).toBeGreaterThan(13952);
     expect(bytes).toBeLessThanOrEqual(PROFESSIONS_BYTE_CEILING);
   });
 

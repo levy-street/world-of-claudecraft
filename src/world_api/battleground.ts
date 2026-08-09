@@ -80,6 +80,15 @@ export interface BgLadderEntry {
   losses: number;
 }
 
+/** A live queue-pop offer as the local player sees it. Anonymous by design. */
+export interface BgProposalInfo {
+  id: number;
+  size: number; // fighters the offer needs (always both teams in full)
+  accepted: number; // fighters who have accepted so far
+  myResponse: 'pending' | 'accepted';
+  remaining: number; // whole seconds left to answer
+}
+
 export interface BgInfo {
   rating: number;
   wins: number;
@@ -94,6 +103,14 @@ export interface BgInfo {
    *  and back true on the UTC rollover. Rides the `bg` key's own refresh cadence:
    *  the chip is an invitation, never actionable in-match information. */
   firstWinBonusReady: boolean;
+  /** The live queue-pop offer awaiting my answer, or null. Counts only, never
+   *  names: the ten have not been introduced, and a decline must not leak who
+   *  was on the other side (the Dungeon Finder proposal makes the same promise). */
+  proposal: BgProposalInfo | null;
+  /** Whole seconds until I may queue again after failing to answer an offer
+   *  (0 = clear). Silence is what this exists to price; see
+   *  `BG_PROPOSAL_LOCKOUT_SECONDS`. */
+  requeueIn: number;
   match: BgMatchInfo | null;
   // Live standings of the rated champions currently online, best first, capped
   // at BG_LADDER_SIZE. Rides INSIDE this key rather than a facet member of its
@@ -112,6 +129,9 @@ export interface IWorldBattleground {
   bgInfo: BgInfo | null;
   bgQueueJoin(): void;
   bgQueueLeave(): void;
+  /** Answer the live queue-pop offer. Declining, or letting it lapse, leaves the
+   *  queue and books the short requeue lockout. */
+  bgRespond(accept: boolean): void;
   /** The deliberate battleground action press: pick up a grabbable flag within reach. */
   bgFlagAction(): void;
 }

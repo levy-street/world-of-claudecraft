@@ -4,6 +4,7 @@ import {
   CASTER_HUB_RECIPES,
   COMBO_RECIPES,
   COMMON_RECIPES,
+  HOE_RECIPES,
   LADDER_RECIPES,
   ROD_RECIPES,
   recipeById,
@@ -428,6 +429,7 @@ describe('craftItem command (#1127)', () => {
       ...COMMON_RECIPES,
       ...TOOL_RECIPES,
       ...ROD_RECIPES,
+      ...HOE_RECIPES,
       ...TOOL_EFFECT_RECIPES,
       ...CASTER_HUB_RECIPES,
       ...COMBO_RECIPES,
@@ -439,6 +441,7 @@ describe('craftItem command (#1127)', () => {
       COMMON_RECIPES.length +
         TOOL_RECIPES.length +
         ROD_RECIPES.length +
+        HOE_RECIPES.length +
         TOOL_EFFECT_RECIPES.length +
         CASTER_HUB_RECIPES.length +
         COMBO_RECIPES.length +

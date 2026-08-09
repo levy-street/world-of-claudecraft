@@ -379,6 +379,7 @@ describe('/dev farmgrow (farming grow-now)', () => {
     sim.player.pos.z = bed.z;
     sim.player.prevPos = { ...sim.player.pos };
     sim.addItem('vale_wheat_seed', 1, sim.playerId);
+    sim.addItem('garden_hoe', 1, sim.playerId); // the step-12 hoe gate
     sim.plantCrop('bed_eastbrook_1', 'vale_wheat');
     const meta = sim.meta(sim.playerId);
     expect(meta?.farmPlots.has('bed_eastbrook_1')).toBe(true);

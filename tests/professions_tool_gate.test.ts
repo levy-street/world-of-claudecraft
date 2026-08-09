@@ -432,7 +432,10 @@ describe('gate table completeness', () => {
     }
     // Non-vacuity, asserted AFTER the loop so a newly added ungated tool is
     // named by its own arm first rather than reported as a bare count change.
-    expect(tools.length).toBe(9);
+    // 10 since the hoe phase: garden_hoe joined as farming's vendor-priced
+    // tier-1 entry tool (correctly ungated above; rungs 2 to 4 carry no
+    // buyValue at all, so they never enter this sweep).
+    expect(tools.length).toBe(10);
   });
 
   it('no fishing implement is gated: the water paces the rods, not the counter', () => {

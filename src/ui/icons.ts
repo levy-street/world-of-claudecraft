@@ -2868,6 +2868,11 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   victory_rush: r('fury', 'gold', ['sword', { p: 'heart', ...BR }], ['glow']),
   piercing_howl: r('storm', 'steel', ['roar', { p: 'boot', ...BR }], ['arcs']),
   die_by_sword: r('steel', 'gold', ['shield', { p: 'sword', ...TR }], ['glow', 'arcs']),
+  // Intervene ships PAINTED art (ABILITY_IMAGE_IDS below), so abilityImageUrl wins and
+  // this recipe is the fallback path only. It stays because every ability owes an
+  // explicit, distinct recipe (tests/ability_icons.test.ts): a shield (the ally absorb)
+  // over a boot (the rush).
+  intervene: r('steel', 'gold', ['shield', { p: 'boot', ...BR }], ['motion', 'glow']),
   recklessness: r('fury', 'blood', ['axe', { p: 'sunburst', ...TL }], ['glow']),
   avatar: r('earth', 'earthBrown', ['helm', { p: 'fist', ...BR }], ['crack', 'glow']),
   sanguine_aura: r('blood', 'blood', ['droplet', { p: 'heart', ...TL }], ['arcs', 'glow']),
@@ -3174,6 +3179,72 @@ const ITEM_RECIPES: Record<string, IconRecipe> = {
   // and a green draught for the tonic (the one potion glyph in the family).
   compost: r('earth', 'earthBrown', [{ p: 'sack', pal: 'earthBrown' }], ['drips']),
   growth_tonic: r('nature', 'leafGreen', [{ p: 'potion', pal: 'leafGreen' }], ['sparkle']),
+  // The crop-ladder phase's seven crop families (seed, produce, fine twin),
+  // same ART_PENDING drawn stand-in treatment and the same A4
+  // pairwise-distinctness demand as the vale_wheat family above. Each fine
+  // recipe is exactly its produce recipe plus 'sparkle' (the fine-grade
+  // marker); no non-fine row carries sparkle.
+  brook_carrot_seed: r('nature', 'ember', [
+    { p: 'sack', pal: 'earthBrown' },
+    { p: 'fang', pal: 'ember', x: 13, y: -13, s: 0.45 },
+  ]),
+  brook_carrot: r('nature', 'ember', [
+    { p: 'fang', pal: 'ember' },
+    { p: 'leaf', pal: 'leafGreen', x: 13, y: -13, s: 0.45 },
+  ]),
+  fine_brook_carrot: r(
+    'nature',
+    'ember',
+    [
+      { p: 'fang', pal: 'ember' },
+      { p: 'leaf', pal: 'leafGreen', x: 13, y: -13, s: 0.45 },
+    ],
+    ['sparkle'],
+  ),
+  marsh_rice_seed: r('drink', 'earthBrown', [{ p: 'sack', pal: 'earthBrown' }]),
+  marsh_rice: r('drink', 'bone', [{ p: 'leaf', pal: 'bone' }]),
+  fine_marsh_rice: r('drink', 'bone', [{ p: 'leaf', pal: 'bone' }], ['sparkle']),
+  bog_beet_seed: r('nature', 'venom', [{ p: 'sack', pal: 'venom' }]),
+  bog_beet: r('nature', 'blood', [{ p: 'droplet', pal: 'blood' }]),
+  fine_bog_beet: r('nature', 'blood', [{ p: 'droplet', pal: 'blood' }], ['sparkle']),
+  highland_barley_seed: r('earth', 'gold', [{ p: 'sack', pal: 'earthBrown' }]),
+  highland_barley: r('earth', 'gold', [{ p: 'leaf', pal: 'gold' }]),
+  fine_highland_barley: r('earth', 'gold', [{ p: 'leaf', pal: 'gold' }], ['sparkle']),
+  frost_gourd_seed: r('frost', 'earthBrown', [{ p: 'sack', pal: 'earthBrown' }]),
+  frost_gourd: r('frost', 'ice', [{ p: 'waterskin', pal: 'ice' }]),
+  fine_frost_gourd: r('frost', 'ice', [{ p: 'waterskin', pal: 'ice' }], ['sparkle']),
+  gilded_sunmelon_seed: r('nature', 'gold', [{ p: 'sack', pal: 'gold' }]),
+  gilded_sunmelon: r('nature', 'gold', [{ p: 'sunburst', pal: 'gold' }]),
+  fine_gilded_sunmelon: r('nature', 'gold', [{ p: 'sunburst', pal: 'gold' }], ['sparkle']),
+  evergarden_greens_seed: r('nature', 'leafGreen', [{ p: 'sack', pal: 'leafGreen' }]),
+  evergarden_greens: r('nature', 'leafGreen', [{ p: 'leaf', pal: 'leafGreen' }]),
+  fine_evergarden_greens: r('nature', 'leafGreen', [{ p: 'leaf', pal: 'leafGreen' }], ['sparkle']),
+  // The hoe ladder (the crop-ladder phase's tool half), same ART_PENDING
+  // drawn stand-in treatment and the same A4 pairwise-distinctness demand: a
+  // staff haft plus an angled blade up the material palettes, glow on the
+  // rare top rung only (the gorraks_cleaver precedent). NO sparkle on any
+  // rung: sparkle is the fine-grade marker.
+  garden_hoe: r('wood', 'earthBrown', [
+    { p: 'staff', pal: 'earthBrown', rot: 0.7 },
+    { p: 'fang', pal: 'steel', x: 12, y: -14, s: 0.5, rot: 2.4 },
+  ]),
+  bronze_hoe: r('wood', 'leather', [
+    { p: 'staff', pal: 'leather', rot: 0.7 },
+    { p: 'fang', pal: 'gold', x: 12, y: -14, s: 0.55, rot: 2.4 },
+  ]),
+  skysilver_hoe: r('steel', 'silverWhite', [
+    { p: 'staff', pal: 'earthBrown', rot: 0.7 },
+    { p: 'fang', pal: 'silverWhite', x: 12, y: -14, s: 0.6, rot: 2.4 },
+  ]),
+  osmium_hoe: r(
+    'steel',
+    'steel',
+    [
+      { p: 'staff', pal: 'earthBrown', rot: 0.7 },
+      { p: 'fang', pal: 'steel', x: 12, y: -14, s: 0.65, rot: 2.4 },
+    ],
+    ['glow'],
+  ),
   // misc UI icons (not real items)
   coin_gold: r('treasure', 'gold', ['coin'], ['sparkle']),
   slot_empty: r('junk', 'silverWhite', []),
@@ -3865,6 +3936,7 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
   'rallying_cry',
   'berserker_stance',
   'die_by_sword',
+  'intervene',
   'storm_bolt',
   'victory_rush',
   'piercing_howl',
@@ -4548,6 +4620,38 @@ export const ITEM_ART_PENDING = new Set<string>([
   // scheduled art phase.
   'compost',
   'growth_tonic',
+  // The crop-ladder phase's seven crop families (seed, produce, fine twin),
+  // the same dormant-online reasoning as everything above and the same
+  // scheduled art phase.
+  'bog_beet',
+  'bog_beet_seed',
+  'brook_carrot',
+  'brook_carrot_seed',
+  'evergarden_greens',
+  'evergarden_greens_seed',
+  'fine_bog_beet',
+  'fine_brook_carrot',
+  'fine_evergarden_greens',
+  'fine_frost_gourd',
+  'fine_gilded_sunmelon',
+  'fine_highland_barley',
+  'fine_marsh_rice',
+  'frost_gourd',
+  'frost_gourd_seed',
+  'gilded_sunmelon',
+  'gilded_sunmelon_seed',
+  'highland_barley',
+  'highland_barley_seed',
+  'marsh_rice',
+  'marsh_rice_seed',
+  // The hoe ladder (the crop-ladder phase's tool half), the same
+  // dormant-online reasoning (rungs 2 to 4 are craft-only behind farming fine
+  // twins no live faucet mints, and the vendor rung is stocked at go-live)
+  // and the same scheduled art phase.
+  'bronze_hoe',
+  'garden_hoe',
+  'osmium_hoe',
+  'skysilver_hoe',
 ]);
 
 /** Static URL of an item's (or a UI pseudo-item's) image icon, or null if it uses a recipe. */

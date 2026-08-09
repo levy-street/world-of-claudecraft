@@ -44,6 +44,17 @@ export const CONSTRAINED_PREWARM_KEEP: readonly string[] = [
  */
 export const CONSTRAINED_PREWARM_RESUME: readonly string[] = ['vfx.ability-primitives'];
 
+/** Whole-scene GPU submits that can synchronously link every visible program
+ * when KHR_parallel_shader_compile is unavailable. They cannot be interrupted
+ * once WebGL enters the driver, so omit them to preserve the entry hard limit. */
+export const BLOCKING_PREWARM_ENTRIES_WITHOUT_PARALLEL_COMPILE: readonly string[] = [
+  'world.initial-frame',
+  'programs.compile',
+  'programs.budget-variants',
+  'sky.current-zone',
+  'render.settle-passes',
+];
+
 export const CONSTRAINED_TEXTURE_BATCH_SIZE = 4;
 export const CONSTRAINED_TEXTURE_MAX_MS = 1200;
 export const CONSTRAINED_ENTRY_VIEW_RAMP_MS = 300;
@@ -154,6 +165,8 @@ export interface PrewarmPolicy {
   compileBeforeFirstFrame: boolean;
   /** Skip the monolithic programs.compile block entirely. */
   skipMonolithCompile: boolean;
+  /** Omit uninterruptible whole-scene submits when shader linking is synchronous. */
+  skipFullScenePasses: boolean;
   /** Restrict the manifest to CONSTRAINED_PREWARM_KEEP. */
   minimalManifest: boolean;
   /** Textures initialized before yielding the event loop; 0 uses the synchronous desktop path. */
@@ -168,27 +181,46 @@ export interface PrewarmPolicy {
 export function prewarmEntryShouldDefer(
   entryStartedMs: number,
   deadlineMs: number,
+  hardDeadlineMs: number,
   deadlineExempt: boolean,
   finishFullManifestBeforeReveal: boolean,
 ): boolean {
+  if (entryStartedMs >= hardDeadlineMs) return true;
   return entryStartedMs >= deadlineMs && !deadlineExempt && !finishFullManifestBeforeReveal;
 }
 
-/** Build cutoff paired with the entry policy; full Insane prewarm does not trim archetypes. */
+/** Build cutoff paired with the entry policy. Full Insane prewarm may use the
+ * soft-deadline reserve, but it still stops at the independent hard deadline. */
 export function prewarmBuildDeadline(
   deadlineMs: number,
+  hardDeadlineMs: number,
   reserveMs: number,
   finishFullManifestBeforeReveal: boolean,
 ): number {
-  return finishFullManifestBeforeReveal
-    ? Number.MAX_SAFE_INTEGER
-    : deadlineMs - Math.max(0, reserveMs);
+  return Math.min(
+    hardDeadlineMs,
+    finishFullManifestBeforeReveal ? hardDeadlineMs : deadlineMs - Math.max(0, reserveMs),
+  );
+}
+
+/** Run temporary prewarm state under a guaranteed behavioral restore. */
+export async function withRestoredPrewarmState<T, R>(
+  capture: () => T,
+  restore: (state: T) => void,
+  work: () => R | Promise<R>,
+): Promise<R> {
+  const original = capture();
+  try {
+    return await work();
+  } finally {
+    restore(original);
+  }
 }
 
 /**
  * Resolve every prewarm knob from the device profile. The constrained arms are the
- * watchdog + memory fix; the unconstrained arm reproduces the historical desktop
- * behavior exactly (full manifest, generous budgets, no reordering).
+ * watchdog + memory fix. The unconstrained arm keeps the full desktop manifest and
+ * budgets, while parallel compile is moved ahead of the first whole-scene submit.
  */
 export function resolvePrewarmPolicy(input: PrewarmPolicyInput): PrewarmPolicy {
   const { constrainedMemory, asyncCompileSupported, lowGfx } = input;
@@ -200,8 +232,9 @@ export function resolvePrewarmPolicy(input: PrewarmPolicyInput): PrewarmPolicy {
       maxViews: baseMaxViews,
       yieldBetweenEntries: false,
       linkPassPerEntry: false,
-      compileBeforeFirstFrame: false,
-      skipMonolithCompile: false,
+      compileBeforeFirstFrame: asyncCompileSupported,
+      skipMonolithCompile: !asyncCompileSupported,
+      skipFullScenePasses: !asyncCompileSupported,
       minimalManifest: false,
       textureBatchSize: 0,
       textureMaxMs: 0,
@@ -217,12 +250,13 @@ export function resolvePrewarmPolicy(input: PrewarmPolicyInput): PrewarmPolicy {
     // empty local world. The rest stream in via the per-frame view-create budget.
     maxViews: Math.min(baseMaxViews, input.maxViewsConstrained),
     yieldBetweenEntries: true,
-    // Without parallel compile the monolith is one giant synchronous block, so link
-    // group-by-group per entry instead. With it, the async compile entry links
-    // off-thread and per-entry passes only starve the manifest.
-    linkPassPerEntry: !asyncCompileSupported,
+    // A full-scene render is itself the synchronous shader-link monolith when the
+    // extension is absent. Never enter that uninterruptible driver call inside the
+    // loading gate; first-sight compile gates handle later streamed views instead.
+    linkPassPerEntry: false,
     compileBeforeFirstFrame: asyncCompileSupported,
     skipMonolithCompile: !asyncCompileSupported,
+    skipFullScenePasses: !asyncCompileSupported,
     minimalManifest: true,
     textureBatchSize: CONSTRAINED_TEXTURE_BATCH_SIZE,
     textureMaxMs: CONSTRAINED_TEXTURE_MAX_MS,
@@ -257,6 +291,12 @@ export function remainingPrewarmViewBudget(maxViews: number, createdViews: numbe
 
 /** True when this manifest entry runs under the given policy. */
 export function prewarmEntryRuns(id: string, policy: PrewarmPolicy): boolean {
+  if (
+    policy.skipFullScenePasses &&
+    BLOCKING_PREWARM_ENTRIES_WITHOUT_PARALLEL_COMPILE.includes(id)
+  ) {
+    return false;
+  }
   if (!policy.minimalManifest) return true;
   return CONSTRAINED_PREWARM_KEEP.includes(id);
 }

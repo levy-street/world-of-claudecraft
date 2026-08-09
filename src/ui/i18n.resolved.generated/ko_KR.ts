@@ -1454,6 +1454,173 @@ export const ko_KR: EnTranslations = {
       "badges": {
         "backgrounded": "백그라운드",
         "offline": "오프라인"
+      },
+      "diagnostics": {
+        "panelAria": "World of ClaudeCraft 성능 진단",
+        "title": "ClaudeCraft 성능 진단",
+        "subtitle": "게임에 맞춘 스캔으로 근거와 코드 수준의 수정안을 제공합니다.",
+        "aria": {
+          "liveMeasurements": "실시간 성능 측정",
+          "scanProgress": "진단 스캔 진행률",
+          "findings": "우선순위별 진단 결과"
+        },
+        "controls": {
+          "minimize": "최소화",
+          "expand": "펼치기",
+          "start": "15초 스캔 시작",
+          "refreshCensus": "장면 통계 새로 고침",
+          "copyReport": "명확한 보고서 복사",
+          "downloadReport": "보고서 다운로드",
+          "scanning": "스캔 중...",
+          "scanAnother": "다른 지역 스캔",
+          "reportLogged": "보고서를 콘솔에 기록했습니다",
+          "copied": "복사됨",
+          "copyBlocked": "복사 차단됨: 보고서를 기록했습니다",
+          "retestLowGraphics": "낮은 그래픽으로 다시 테스트"
+        },
+        "instruction": "가장 정확한 결과를 얻으려면 오프라인 플레이에 들어가 느린 지역을 이동하고 카메라를 돌린 뒤, 스캔 중 끊김을 일으키는 효과를 실행하세요.",
+        "status": {
+          "pausedHiddenRestart": "이 탭이 숨겨져 스캔을 일시 중지했습니다. 돌아오면 다시 시작합니다.",
+          "restoredRestart": "탭이 복원되었습니다. 15초 활성 게임플레이 수집을 처음부터 다시 시작합니다.",
+          "worldLoaded": "월드를 불러왔습니다. 조작 가능한 첫 프레임을 기다리는 중입니다.",
+          "pausedHiddenContinue": "이 탭이 숨겨져 스캔을 일시 중지했습니다. 계속하려면 게임으로 돌아오세요.",
+          "collectingRemaining": {
+            "one": "활성 게임플레이 수집 중: {seconds}초 남음",
+            "other": "활성 게임플레이 수집 중: {seconds}초 남음"
+          },
+          "waitingFrames": "대표 게임플레이 프레임 대기 중: {current}/{minimum}",
+          "collectingNow": "활성 게임플레이 수집 중: 지금 문제 지역을 지나가세요.",
+          "ready": "스캔 준비 완료. 시작을 누르고 느려짐을 재현하세요.",
+          "waitingWorld": "게임 월드를 기다리는 중입니다. 오프라인 플레이를 선택하거나 온라인 캐릭터로 입장하세요."
+        },
+        "metrics": {
+          "waitingRenderer": "렌더러: 대기 중",
+          "waitingCensus": "장면 통계: 대기 중",
+          "waitingHitch": "끊김 원인 추적: 월드 입장 시 활성화됨",
+          "recent": "최근  {fps} FPS | p95 {p95}밀리초 | 50밀리초 초과 {longFrames}",
+          "render": "렌더  제출 {submit}밀리초 | 월드 {world}밀리초 | 엔티티 {entities}밀리초",
+          "scene": "장면   호출 {calls}회 | 삼각형 {triangles}개 | 뷰 {views}개",
+          "hitches": "끊김 {hitches} | 셰이더 {shaders} | 업로드 {uploads} | 뷰 {views}",
+          "gpu": "GPU     {renderer}",
+          "waitingValue": "대기 중"
+        },
+        "scoreHeadline": "{score}/100: {headline}",
+        "healthyNoFindings": "조치 가능한 임계값이 감지되지 않았습니다. 짧은 끊김이 계속 거슬리면 끊김을 일으키는 정확한 이동 경로에서 다시 스캔하세요.",
+        "findingMeta": "{severity} | 신뢰도 {confidence}",
+        "sections": {
+          "evidence": "근거",
+          "tryNow": "지금 시도",
+          "codeFix": "코드 수정",
+          "source": "관련 소스"
+        },
+        "severity": {
+          "critical": "심각",
+          "warning": "경고",
+          "info": "정보"
+        },
+        "confidence": {
+          "high": "높음",
+          "medium": "중간",
+          "low": "낮음"
+        },
+        "diagnosis": {
+          "noProblemTitle": "중대한 성능 문제가 감지되지 않았습니다",
+          "summary": {
+            "findings": {
+              "one": "최근 10초 동안 {fps} FPS, 프레임 p95 {p95}에서 조치 가능한 문제 {findings}개를 찾았습니다.",
+              "other": "최근 10초 동안 {fps} FPS, 프레임 p95 {p95}에서 조치 가능한 문제 {findings}개를 찾았습니다."
+            },
+            "healthy": "최근 10초 동안 {fps} FPS를 유지했고 프레임 p95는 {p95}입니다. 게임, 브라우저, GPU, 메모리, 에셋 또는 네트워크 임계값이 감지되지 않았습니다."
+          },
+          "titles": {
+            "hardwareAcceleration": "소프트웨어 렌더링이 활성화되어 있습니다",
+            "integratedGpu": "게임이 내장 GPU를 사용하고 있습니다",
+            "highDpi": "고해상도 렌더링 비용이 높습니다",
+            "forcedHighGraphics": "강제 높은 그래픽 설정이 성능을 낮춥니다",
+            "lowMemory": "기기의 사용 가능한 메모리가 부족합니다",
+            "browserStalls": "브라우저 또는 확장 프로그램 멈춤이 감지되었습니다",
+            "heapPressure": "브라우저 메모리 압박이 감지되었습니다",
+            "contextLoss": "그래픽 컨텍스트가 재설정되었습니다",
+            "gpuSubmit": "GPU 제출이 주요 프레임 병목입니다",
+            "sceneDraw": "장면 그리기 비용이 현재 그래픽 예산을 초과합니다",
+            "shadowPass": "그림자 패스가 많은 그리기 호출을 사용합니다",
+            "rendererWorld": "월드 렌더러 업데이트가 CPU에 제한됩니다",
+            "rendererEntities": "엔티티 뷰 업데이트가 CPU에 제한됩니다",
+            "rendererNameplates": "이름표 그리기 비용이 높습니다",
+            "simCpu": "시뮬레이션 작업이 프레임 시간을 사용합니다",
+            "hudCpu": "HUD 업데이트가 프레임 시간을 사용합니다",
+            "eventCpu": "이벤트 처리가 프레임 시간을 사용합니다",
+            "shaderCompile": "게임 중 셰이더가 컴파일되고 있습니다",
+            "textureUpload": "텍스처 업로드가 게임 끊김을 일으킵니다",
+            "viewCreate": "엔티티 뷰 생성이 끊김을 일으킵니다",
+            "otherHitch": "원인을 알 수 없는 긴 프레임이 남아 있습니다",
+            "assetStartup": "에셋 작업이 게임 시작을 지연시킵니다",
+            "longTasks": "브라우저의 긴 작업이 프레임을 막습니다",
+            "networkLatency": "네트워크 전송이 화면 반응을 지연시킵니다",
+            "snapshotApply": "스냅샷 처리가 클라이언트를 막습니다",
+            "generic": "성능 규칙 {rule}에 조치가 필요합니다"
+          },
+          "causes": {
+            "environment": "감지된 브라우저, GPU, 메모리 또는 기기 설정이 게임 렌더링 전부터 성능을 제한할 수 있습니다.",
+            "graphics": "이번 측정의 그래픽 작업이 현재 프레임 또는 장면 예산을 초과합니다.",
+            "cpu": "측정된 CPU 단계가 프레임 예산을 놓칠 만큼 메인 스레드 시간을 사용합니다.",
+            "loading": "리소스 준비 또는 최초 사용 작업이 보이는 게임이나 시작 경로에서 실행되었습니다.",
+            "network": "네트워크 전송 또는 클라이언트 스냅샷 처리가 최신 플레이 상태를 지연시킵니다."
+          },
+          "evidence": {
+            "environment": "환경 규칙 {rule}이 이 기기와 브라우저에 일치했습니다.",
+            "gpuSubmit": "WebGL 제출 p95는 {submit}이며 렌더러 p95의 {share}입니다.",
+            "frame": "최근 구간은 {fps} FPS, 프레임 p95 {p95}로 측정되었습니다.",
+            "sceneCalls": "장면은 {calls}개의 그리기 호출을 사용하며 목표는 {target}개입니다.",
+            "sceneTriangles": "장면은 {triangles}개의 삼각형을 제출하며 목표는 {target}개입니다.",
+            "sceneCategory": "장면 범주 {category}가 {calls}개 호출과 {triangles}개 측정 삼각형을 차지합니다.",
+            "censusNeeded": "주요 렌더 범주를 확인하려면 장면 통계를 새로 고치세요.",
+            "shadow": "그림자 패스는 {calls}개 호출, 기준의 {share}, {triangles}개 삼각형을 제출합니다.",
+            "cpuPhase": "측정된 단계 {phase}의 p95는 {p95}입니다.",
+            "hitch": "기록된 {total}개 끊김 중 {count}개가 원인 {cause}와 일치했습니다.",
+            "assets": "프리로드 게이트가 등록된 {tasks}개 작업을 {wait} 동안 기다렸습니다.",
+            "failedAssets": "실패한 에셋 그룹: {groups}.",
+            "longTasks": "긴 작업 {count}개가 측정되었고 p95는 {p95}, 최대는 {max}입니다.",
+            "network": "스냅샷 간격은 {interval}, 최신 경과 시간은 {age}, 입력 응답 p95는 {echo}입니다.",
+            "snapshot": "스냅샷 해석과 적용 p95는 {work}, 네트워크 간격 p95는 {gap}입니다.",
+            "generic": "진단 규칙 {rule}이 이번 측정과 일치했습니다."
+          },
+          "tryNow": {
+            "environment": "감지된 환경 설정을 수정하고 다시 시작한 뒤 같은 스캔을 반복하세요.",
+            "graphics": "같은 카메라 경로를 낮은 그래픽으로 다시 테스트해 그래픽 압박을 확인하세요.",
+            "cpu": "정지 상태와 이동 상태에서 스캔을 반복해 CPU 단계를 분리하세요.",
+            "loading": "같은 경로나 최초 사용 동작을 반복해 끊김 시점을 확인하세요.",
+            "network": "같은 이동과 카메라 경로를 오프라인 플레이와 비교하세요."
+          },
+          "codeFix": {
+            "environment": "감지된 대체 경로를 공유 그래픽과 메모리 예산 안에 유지하세요.",
+            "graphics": "기존 렌더 예산, 인스턴싱, 재질 공유, LOD와 숨김 작업 건너뛰기를 사용하세요.",
+            "cpu": "지정된 단계를 프로파일링하고 중복 작업과 할당을 제거하며 게임 동작을 유지하세요.",
+            "loading": "기존 시작 및 스트리밍 예산으로 최초 사용 작업을 프리로드, 풀링 또는 분산하세요.",
+            "network": "권위 서버 모델을 약화하지 않고 전송 또는 스냅샷 처리 비용을 줄이세요."
+          }
+        },
+        "report": {
+          "title": "World of ClaudeCraft 성능 진단",
+          "statusLine": "상태: {status} ({score}/100)",
+          "capturedLine": "측정 시간: {captured}",
+          "topFindingLine": "최우선 결과: {finding}",
+          "summaryLine": "요약: {summary}",
+          "gpuLine": "GPU: {gpu}",
+          "graphicsLine": "그래픽: {tier}, 렌더 배율 {scale}",
+          "recentLine": "최근: {fps} FPS, p95 {p95}, 50밀리초 초과 {longFrames}프레임, 측정 {frames}프레임",
+          "resultHeading": "결과",
+          "noThreshold": "이번 측정에서는 조치 가능한 임계값이 감지되지 않았습니다.",
+          "findingHeading": "{index}. {title}",
+          "findingMeta": "심각도: {severity}. 신뢰도: {confidence}.",
+          "rawSnapshotHeading": "원본 스냅샷",
+          "notAvailable": "사용할 수 없음",
+          "status": {
+            "critical": "심각",
+            "needsAttention": "주의 필요",
+            "healthy": "정상"
+          }
+        }
       }
     },
     "auraOverlay": {
@@ -2651,7 +2818,8 @@ export const ko_KR: EnTranslations = {
       "tierRequired": {
         "mining": "{tier}티어 채광 곡괭이 필요",
         "logging": "{tier}티어 벌목 도끼 필요",
-        "herbalism": "{tier}티어 약초 낫 필요"
+        "herbalism": "{tier}티어 약초 낫 필요",
+        "farming": "{tier}티어 농사 괭이 필요"
       },
       "requiresTool": {
         "mining": "채광 곡괭이 필요",
@@ -2698,12 +2866,14 @@ export const ko_KR: EnTranslations = {
           "mining": "{tier}티어까지의 광맥을 캐는 데 필요합니다.",
           "logging": "{tier}티어까지의 벌목 나무를 베는 데 필요합니다.",
           "herbalism": "{tier}티어까지의 약초 군락을 채집하는 데 필요합니다.",
-          "fishing": "{tier}티어까지의 수역에서 낚시하는 데 필요합니다."
+          "fishing": "{tier}티어까지의 수역에서 낚시하는 데 필요합니다.",
+          "farming": "{tier}티어까지의 작물을 심는 데 필요합니다."
         },
         "use": {
           "mining": "사용: 근처의 광맥을 캡니다.",
           "logging": "사용: 근처의 벌목 나무를 벱니다.",
-          "herbalism": "사용: 근처의 약초 군락에서 채집합니다."
+          "herbalism": "사용: 근처의 약초 군락에서 채집합니다.",
+          "farming": "가방에 넣어 두면 작물밭에 심을 때 사용됩니다."
         },
         "speed": "{tier}티어 미만 채집지에서 더 빠르게 채집합니다.",
         "rodRequired": "낚시에 필요합니다.",
@@ -2728,6 +2898,8 @@ export const ko_KR: EnTranslations = {
       "harvestFineLineQty": "또한 {name} x{qty}을(를) 수확했습니다.",
       "witheredLine": "작물이 시들었습니다. 밭을 정리했습니다: {name}.",
       "witheredLineQty": "작물이 시들었습니다. 밭을 정리했습니다: {name} x{qty}.",
+      "seedBackLine": "씨앗을 회수했습니다: {name}.",
+      "seedBackLineQty": "씨앗을 회수했습니다: {name} x{qty}.",
       "denied": {
         "bad_bed": "그곳에는 작물밭이 없습니다.",
         "bad_crop": "그것은 여기에 심을 수 없습니다.",
@@ -2740,7 +2912,8 @@ export const ko_KR: EnTranslations = {
         "no_husks": "시든 껍질이 부족합니다.",
         "no_compost": "퇴비가 없습니다.",
         "no_fee_produce": "망보기 삯을 치를 농산물이 없습니다.",
-        "no_tonic": "성장 토닉이 없습니다."
+        "no_tonic": "성장 토닉이 없습니다.",
+        "tool": "그 작물에 맞는 농사 괭이가 없습니다."
       },
       "husksConvertedLine": "{husksName} x{husks}을(를) {name}(으)로 교환했습니다.",
       "husksConvertedLineQty": "{husksName} x{husks}을(를) {name} x{qty}(으)로 교환했습니다."
@@ -2856,7 +3029,7 @@ export const ko_KR: EnTranslations = {
           "artisansEye": "충전된 동안 수확 등급이 도구 1단계만큼 올라갑니다.",
           "quickeningCharm": "발동한 자원 채집지의 재생성 시간을 단축합니다."
         },
-        "howToSlot": "전문 기술 창에서 채광, 벌목, 약초학 도구에 장착합니다. 장착 시 소모됩니다.",
+        "howToSlot": "전문 기술 창에서 채광, 벌목, 약초학, 농사 도구에 장착합니다. 장착 시 소모됩니다.",
         "charges": "일반 등급 도구에서는 {base}회 충전으로 시작합니다(희귀도 한 단계마다 +{bonus}회).",
         "landOnly": "낚싯대에는 장착할 수 없습니다.",
         "openProfessions": "전문 기술 창을 열어 채집 도구에 장착하세요."
@@ -2873,6 +3046,11 @@ export const ko_KR: EnTranslations = {
       "toolEffectRechargeFull": "{effect}은(는) 이미 완전히 충전되어 있습니다.",
       "toolEffectRechargeToolCapped": "{effect}을(를) 더 충전하려면 더 좋은 {profession} 도구가 필요합니다.",
       "toolEffectRechargeMaterials": "{effect} 재충전에는 {material} x{count}이(가) 필요합니다.",
+      "craftingProgress": "제작 중: {total}초 중 {remaining}초 남음.",
+      "disenchantingProgress": "분해 중: {total}초 중 {remaining}초 남음.",
+      "enchantingProgress": "마법부여 중: {total}초 중 {remaining}초 남음.",
+      "salvagingProgress": "수리 재료 회수 중: {total}초 중 {remaining}초 남음.",
+      "rechargingToolEffectProgress": "도구 효과 재충전 중: {total}초 중 {remaining}초 남음.",
       "tierPipAria": "티어 {tier}",
       "nextUnlockTier": "다음 티어까지 숙련도 {points} 남음: 걸작 확률이 높아집니다",
       "nextUnlockSpecialized": "전문화까지 숙련도 {points} 남음: 재료 소모가 줄어듭니다",
@@ -3167,6 +3345,14 @@ export const ko_KR: EnTranslations = {
       "denyNotCrafted": "먼저 주문 제작품을 만드세요 (주문 제작 토글을 켜고).",
       "denyOutOfRange": "의뢰를 전달하려면 의뢰인 근처에 있어야 합니다.",
       "denyNoSpace": "의뢰인의 가방에 공간이 없습니다."
+    },
+    "bgOffer": {
+      "title": "쏜할로우 평원이 준비되었습니다",
+      "accepted": "{size}명 중 {accepted}명 수락",
+      "remaining": "응답까지 {seconds}초",
+      "accept": "수락",
+      "decline": "거절",
+      "acceptedWait": "다른 참가자를 기다리는 중..."
     },
     "finder": {
       "title": "던전 찾기",
@@ -5183,7 +5369,7 @@ export const ko_KR: EnTranslations = {
         "logging": "벌목은 세 지역의 나무숲에서 목재를 베어 낸다. 이스트브룩 골짜기의 무쇠껍질나무, 마이어펜 습지의 물푸레나무, 쏜피크 고지의 고산소나무가 무기 자루와 지팡이, 그리고 기술자의 작업대에 들어가는 원자재다. 레벨 1부터 누구나 할 수 있고, 가방에 벌목 도끼(어느 거점 마을에서나 20동)만 있으면 된다. 자체 수치로 기록되며 상한은 100이다.",
         "herbalism": "약초학은 야생에서 자라는 것을 캔다. 이스트브룩 골짜기의 윤기잎, 마이어펜 습지의 금빛잎, 쏜피크 고지의 태양꽃잎, 연금술 계열 전문직의 조제를 이어 주는 잎과 줄기다. 레벨 1부터 누구나 할 수 있고, 가방에 약초 낫(어느 거점 마을에서나 20동)만 있으면 된다. 자체 수치로 기록되며 상한은 100이다.",
         "fishing": "낚시는 입질과 릴 감기의 흐름으로 모든 지역의 트인 물가에서 어획물을 낚으며, 상한은 200이다.",
-        "farming": "농사는 손질한 밭에서 씨앗으로 작물을 길러 상한이 100이며, 밭과 씨앗, 도구는 이후 업데이트로 들어오므로 아래 표는 지금은 비어 있다."
+        "farming": "농사는 캐내는 것이 아니라 돌보아 기르는 유일한 채집 기술이다. 손질한 밭에 씨앗을 심으면 자리를 비워도 작물이 자라고, 돌아와 익은 것을 뽑으면 된다. Eastbrook의 텃밭부터 Evergarden의 화단까지 농사 거점마다 전용 밭이 있으며, 사다리의 단마다 고유한 작물이 한 쌍씩 자라고 솜씨가 늘면 상급 등급도 거둔다. 일은 괭이에서 시작한다. Garden Hoe가 첫 밭을 맡고, 그 위 단계의 괭이는 기술자가 만든다. 숙련은 전용 카운터로 상한 100까지 오른다."
       },
       "rhythmHeading": "채집의 리듬",
       "rhythmBody": "채집은 눈에 보이는 시전이다. 기본 {base}초에 최소 {floor}초까지, 도구가 채집물보다 한 티어 높을 때마다 {tool}초, 숙련도 구간마다 {band}초씩 짧아진다.",
@@ -5215,7 +5401,7 @@ export const ko_KR: EnTranslations = {
         "logging": "어느 채집이든 첫 채집은 Fruits of the Field를, 벌목 100 상한은 Heartwood Hewer를 새긴다. 채집 기술 중 어느 셋이든 100에 이르면 Master Gatherer(명성 25)를 얻고, 고대 심재를 쪼개면 전용 수집 표식도 남는다. 업적은 칭호와 명성뿐, 힘을 주지 않는다.",
         "herbalism": "어느 채집이든 첫 채집은 Fruits of the Field를, 약초학 100 상한은 Master of the Meadow를 새긴다. 채집 기술 중 어느 셋이든 100에 이르면 Master Gatherer(명성 25)를 얻고, 달빛 개화를 꺾으면 전용 수집 표식도 남는다. 업적은 칭호와 명성뿐, 힘을 주지 않는다.",
         "fishing": "숙련 100은 Old Salt를, 200은 Master Angler와 그 칭호를 새긴다. 낚시꾼 기예의 정점이다. 낚시도 Master Gatherer(세 기술 100)에 포함된다. 각 지역의 물에서 낚는 첫 물고기가 저마다의 페이지를 채우고, 윤슬 코이를 낚으면 Glimmer of Hope가 기록된다.",
-        "farming": "농사에는 아직 고유 업적이 없다. 밭이 앞으로 들어오고, 다른 전문직을 장식하는 이정표와 상한 업적도 함께 들어온다. 숙련은 이미 Master Gatherer(세 기술 100)에 포함된다. 업적은 칭호와 명성만 줄 뿐, 결코 힘을 주지 않는다."
+        "farming": "농사에는 아직 고유 업적이 없다. 밭과 작물이 자리 잡은 지금, 다른 전문직을 장식하는 이정표와 상한 업적은 이후 업데이트로 들어온다. 숙련은 이미 Master Gatherer(아무 세 채집 기술 100)에 포함되므로 농부도 남들과 같은 방식으로 그 페이지를 채운다. 업적은 칭호와 명성만 줄 뿐, 결코 힘을 주지 않는다."
       },
       "fish": {
         "startHeading": "시작하기",
@@ -7269,6 +7455,9 @@ export const ko_KR: EnTranslations = {
   "gpuNotice": {
     "bodyDesktop": "게임이 GPU 가속 없이 실행되고 있어 매우 느립니다. 그래픽 드라이버를 업데이트한 뒤 게임을 다시 시작하세요. Windows에서는 설정 > 시스템 > 디스플레이 > 그래픽에서 이 게임을 \"고성능\"으로 설정하세요.",
     "bodyWeb": "게임이 GPU 가속 없이 실행되고 있어 매우 느립니다. 브라우저 설정에서 하드웨어 가속을 켜고 그래픽 드라이버를 업데이트한 뒤 브라우저를 다시 시작하세요.",
+    "hybridBodyWindows": "이 세션은 통합(절전형) GPU에서 렌더링되고 있습니다. 이 컴퓨터에 별도의 게이밍 GPU도 있다면, 설정 > 시스템 > 디스플레이 > 그래픽에서 브라우저를 고성능으로 설정한 다음 다시 시작하세요. 데스크톱 앱은 자동으로 전용 GPU를 선택합니다.",
+    "hybridBodyLinux": "이 세션은 통합(절전형) GPU에서 렌더링되고 있습니다. 이 컴퓨터에 별도의 게이밍 GPU도 있다면, 브라우저나 그래픽 드라이버에 자체 GPU 선택 설정이 있거나 배포판에 GPU 전환 도구(PRIME 또는 optimus-manager 등)가 있을 수 있습니다. 데스크톱 앱은 자동으로 전용 GPU를 선택합니다.",
+    "hybridBodyOther": "이 세션은 통합(절전형) GPU에서 렌더링되고 있습니다. 이 컴퓨터에 별도의 게이밍 GPU도 있다면, 브라우저와 운영체제의 그래픽 설정을 확인하여 활성화하세요. 데스크톱 앱은 자동으로 전용 GPU를 선택합니다.",
     "dismiss": "닫기"
   },
   "perfNudge": {
@@ -7730,6 +7919,7 @@ export const ko_KR: EnTranslations = {
       "deathRecapAbility": "사망했습니다. {ability}(으)로 사망했습니다.",
       "deathRecapFalling": "사망했습니다. 추락사했습니다.",
       "deathRecapDrowned": "사망했습니다. 익사했습니다.",
+      "deathRecapCauterized": "사망했습니다. 소작의 화염이 당신을 집어삼켰습니다.",
       "respawn": "다시 온전하고 편안한 상태가 되었습니다.",
       "ignoringChat": "{name}의 채팅을 차단합니다.",
       "noLongerIgnoring": "{name}을 더 이상 차단하지 않습니다.",
@@ -7773,6 +7963,7 @@ export const ko_KR: EnTranslations = {
       "outOfRange": "사정거리 밖입니다.",
       "noTarget": "대상이 없습니다.",
       "tooClose": "너무 가깝습니다!",
+      "mustTargetAlly": "아군을 대상으로 지정해야 합니다.",
       "facing": "대상을 바라봐야 합니다.",
       "targetHealthBelow": "그 능력은 대상 생명력이 {percent}% 미만이어야 합니다.",
       "dagger": "단검을 착용해야 합니다.",
@@ -9390,6 +9581,10 @@ export const ko_KR: EnTranslations = {
       "die_by_sword": {
         "name": "검의 승부",
         "description": "방어 재사용 기술입니다. 8초 동안 받는 피해가 30% 감소하고 훨씬 많은 공격을 회피합니다."
+      },
+      "intervene": {
+        "name": "엄호",
+        "description": "아군 플레이어에게 돌진하여 6초 동안 피해 {damage}을(를) 흡수하는 보호막을 부여합니다."
       },
       "recklessness": {
         "name": "무모함",
@@ -11244,6 +11439,81 @@ export const ko_KR: EnTranslations = {
       },
       "growth_tonic": {
         "name": "성장 토닉"
+      },
+      "brook_carrot_seed": {
+        "name": "시냇가 당근 씨앗"
+      },
+      "brook_carrot": {
+        "name": "시냇가 당근"
+      },
+      "fine_brook_carrot": {
+        "name": "상급 시냇가 당근"
+      },
+      "marsh_rice_seed": {
+        "name": "습지 쌀 씨앗"
+      },
+      "marsh_rice": {
+        "name": "습지 쌀"
+      },
+      "fine_marsh_rice": {
+        "name": "상급 습지 쌀"
+      },
+      "bog_beet_seed": {
+        "name": "늪지 비트 씨앗"
+      },
+      "bog_beet": {
+        "name": "늪지 비트"
+      },
+      "fine_bog_beet": {
+        "name": "상급 늪지 비트"
+      },
+      "highland_barley_seed": {
+        "name": "고지대 보리 씨앗"
+      },
+      "highland_barley": {
+        "name": "고지대 보리"
+      },
+      "fine_highland_barley": {
+        "name": "상급 고지대 보리"
+      },
+      "frost_gourd_seed": {
+        "name": "서리 박 씨앗"
+      },
+      "frost_gourd": {
+        "name": "서리 박"
+      },
+      "fine_frost_gourd": {
+        "name": "상급 서리 박"
+      },
+      "gilded_sunmelon_seed": {
+        "name": "금빛 태양멜론 씨앗"
+      },
+      "gilded_sunmelon": {
+        "name": "금빛 태양멜론"
+      },
+      "fine_gilded_sunmelon": {
+        "name": "상급 금빛 태양멜론"
+      },
+      "evergarden_greens_seed": {
+        "name": "상록 정원 잎채소 씨앗"
+      },
+      "evergarden_greens": {
+        "name": "상록 정원 잎채소"
+      },
+      "fine_evergarden_greens": {
+        "name": "상급 상록 정원 잎채소"
+      },
+      "garden_hoe": {
+        "name": "텃밭 괭이"
+      },
+      "bronze_hoe": {
+        "name": "청동 괭이"
+      },
+      "skysilver_hoe": {
+        "name": "천은 괭이"
+      },
+      "osmium_hoe": {
+        "name": "오스뮴 괭이"
       },
       "conjured_water4": {
         "name": "창조된 샘물"

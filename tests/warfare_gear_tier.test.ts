@@ -335,11 +335,17 @@ describe('the five WARFARE sets', () => {
     // wording would be a false tooltip. This is a t() source string: rewording
     // it later costs every locale, which is why it is pinned character for
     // character rather than described.
+    //
+    // "Warfare" is sentence case here on purpose. The all-caps spelling is the
+    // internal name for the currency and the set family; the shouted form read
+    // as emphasis in a bonus line that is otherwise ordinary prose, so the
+    // player-facing copy uses the ordinary word. The ids stay `warfare_*`.
     for (const setId of WARFARE_SET_IDS) {
       const four = ITEM_SETS[setId].bonuses.find((b) => b.pieces === 4);
       expect(four?.text, setId).toBe(
-        'Increases WARFARE Offense Rating by 40, and crowd control cast on you by hostile players lasts 15% less.',
+        'Increases Warfare Offense Rating by 40, and crowd control cast on you by hostile players lasts 15% less.',
       );
+      expect(four?.text, setId).not.toContain('WARFARE');
       expect(four?.text, setId).not.toContain('from hostile players');
     }
   });

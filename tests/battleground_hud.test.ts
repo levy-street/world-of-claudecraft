@@ -42,6 +42,8 @@ const baseInfo = (over: Partial<BgInfo> = {}): BgInfo => ({
   queueSize: 0,
   queuedParty: 1,
   firstWinBonusReady: false,
+  proposal: null,
+  requeueIn: 0,
   match: null,
   ladder: [],
   ...over,
@@ -530,6 +532,88 @@ describe('battleground kill feed (pure core)', () => {
     expect(pruned).toHaveLength(1);
     expect(pruned[0].killerName).toBe('K1');
     expect(pruneBgKillLines(pruned, 104 + BG_KILL_FEED_TTL)).toHaveLength(0);
+  });
+
+  it('holds a line up for the tuned nine seconds', () => {
+    // The one place the dwell length itself is pinned to a literal: every other
+    // assertion in this block derives its expiry from the constant, so without
+    // this a retune of the TTL would slip through the whole suite unnoticed.
+    expect(BG_KILL_FEED_TTL).toBe(9);
+    expect(pushBgKillLine([], kill(0), 100)[0].expiresAt).toBe(109);
+  });
+});
+
+describe('battleground kill feed (stylesheet contract)', () => {
+  const CSS = readFileSync(new URL('../src/styles/components.css', import.meta.url), 'utf8');
+
+  // Slice ONE rule body out of the sheet by exact selector, so a lookup of
+  // `.bgkf-name` can never pick up `.bgkf-name.crimson` instead.
+  const ruleBody = (selector: string): string => {
+    const re = new RegExp(`(?:^|[\\s,])${selector.replace(/[.#]/g, '\\$&')}\\s*\\{`, 'm');
+    const m = re.exec(CSS);
+    if (!m) throw new Error(`${selector} should exist in components.css`);
+    const start = m.index + m[0].length;
+    const end = CSS.indexOf('}', start);
+    expect(end, `${selector} should close`).toBeGreaterThan(start);
+    return CSS.slice(start, end);
+  };
+
+  const px = (body: string, prop: string): number => {
+    const m = new RegExp(`(?:^|;)\\s*${prop}\\s*:\\s*(-?[\\d.]+)px`, 'm').exec(body);
+    if (!m) throw new Error(`${prop} should be declared in px`);
+    return Number(m[1]);
+  };
+
+  // padding shorthand, CSS box order: top right bottom left (with the usual
+  // 1/2/3-value fill-ins).
+  const padding = (body: string): { top: number; right: number; bottom: number; left: number } => {
+    const m = /(?:^|;)\s*padding\s*:\s*([^;]+);/m.exec(body);
+    if (!m) throw new Error('padding should be declared');
+    const v = m[1]
+      .trim()
+      .split(/\s+/)
+      .map((s) => Number.parseFloat(s));
+    const [top, right = top, bottom = top, left = right] = v;
+    return { top, right, bottom, left };
+  };
+
+  it('puts the ellipsis on the NAME, never on the flex line container', () => {
+    const line = ruleBody('.bgkf-line');
+    expect(line).toContain('display: flex');
+    // text-overflow on a flex container does nothing: it used to sit here and
+    // long names were hard-sheared with no ellipsis at all.
+    expect(line).not.toContain('text-overflow');
+    const name = ruleBody('.bgkf-name');
+    expect(name).toContain('text-overflow: ellipsis');
+    expect(name).toContain('overflow: hidden');
+    expect(name).toContain('min-width: 0'); // the half that lets the item shrink
+  });
+
+  it('keeps the last glyph well clear of the team-colored stripe', () => {
+    const line = ruleBody('.bgkf-line');
+    const pad = padding(line);
+    // At the old 14px right pad against a 5px stripe the gap read as 9px and a
+    // name sat right on the colored edge; 12px of clearance is the floor now.
+    expect(pad.right - px(line, 'border-right-width')).toBeGreaterThanOrEqual(12);
+    expect(pad.right).toBeGreaterThan(pad.left);
+  });
+
+  it('lets the names absorb the squeeze, never the mark or the verb', () => {
+    expect(ruleBody('.bgkf-mark')).toContain('flex: none');
+    expect(ruleBody('.bgkf-verb')).toContain('flex: none');
+  });
+
+  it('holds the trimmed type scale and the responsive width ceiling', () => {
+    const line = ruleBody('.bgkf-line');
+    expect(px(line, 'font-size')).toBe(16);
+    expect(px(ruleBody('.bgkf-name'), 'font-size')).toBe(17);
+    expect(px(ruleBody('.bgkf-verb'), 'font-size')).toBe(13);
+    expect(padding(line).top).toBe(5);
+    const feed = ruleBody('#bg-killfeed');
+    expect(px(feed, 'width')).toBe(420);
+    // no mobile arm exists for this surface: the cap is what keeps a narrow
+    // phone from pushing the stack off the left edge.
+    expect(feed).toContain('max-width: calc(100% - 24px)');
   });
 });
 

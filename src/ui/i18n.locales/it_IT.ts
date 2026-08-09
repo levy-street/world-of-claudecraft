@@ -470,7 +470,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectTooltip.charges':
     'Parte con {base} cariche su uno strumento comune (+{bonus} per ogni gradino di rarità).',
   'hudChrome.professions.toolEffectTooltip.howToSlot':
-    'Inseriscilo su uno strumento da estrazione mineraria, taglio del legname o erbalismo dalla finestra Professioni. Viene consumato quando inserito.',
+    'Inseriscilo su uno strumento da estrazione mineraria, taglio del legname, erbalismo o agricoltura dalla finestra Professioni. Viene consumato quando inserito.',
   'hudChrome.professions.toolEffectTooltip.kind': 'Amuleto per strumenti',
   'hudChrome.professions.toolEffectTooltip.landOnly': 'Non si inserisce sulle canne da pesca.',
   'hudChrome.professions.toolEffectTooltip.openProfessions':

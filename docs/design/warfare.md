@@ -424,3 +424,22 @@ paragraph records the property and decides nothing.
 
 The same stock list is sold from two placements: FURY in Eastbrook and the named
 quartermaster in Highwatch. One stock, two vendors.
+
+Each of those two offers exactly ONE shop row in its gossip menu, the sectioned
+Warfare window, and not the generic "Browse Goods" row beside it. Both rows
+shipped briefly, on the reasoning that distinct labels made them tellable apart.
+They are not really two options: a quartermaster's `vendorItems` IS the whole
+Warfare catalog, so the generic grid was a flat copy of what the sectioned window
+lays out by family. It was also the unsafe copy, because the ordinary vendor
+window buys with no confirmation, while the sectioned window puts every purchase
+behind one (`Hud.requestWarfarePurchase`); honor is unrefundable and a set piece
+costs tens of thousands of it. The suppression is on the ROW, never on the stock,
+since the honor buy path is generic over a non-empty `vendorItems` and would
+switch the shop off entirely if the list were emptied. Selling is the one thing
+lost at these two NPCs, and nothing is stranded by it: the buyback list is per
+player, not per vendor.
+
+Within the window the families are ordered by armor class, heaviest first, so the
+list reads mail, then leather, then cloth: Furyforged, Stormbound, Ashstalker,
+Thornhide, Cinderweave. The set table above is ordered by when each family was
+authored, which is why Thornhide appears last there and fourth in the shop.

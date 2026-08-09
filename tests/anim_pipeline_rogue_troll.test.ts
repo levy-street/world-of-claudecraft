@@ -139,13 +139,11 @@ describe('mob_troll bespoke attack (issue #2889 rogue-troll batch)', () => {
     const biped14ConstBlock = manifestBlock('const BIPED14: ClipMap = {', '};');
     expect(biped14ConstBlock).toContain("attack: ['Punch', 'Weapon']");
 
-    // A specific sibling family this batch does not touch (a concurrent
-    // in-flight batch may independently migrate a DIFFERENT BIPED14 member,
-    // so this asserts one named family rather than an exact remaining count).
-    // mob_yeti, mob_murloc, and mob_bear were all later migrated off the
-    // shared constant too (issue #2889 round 2, their own bespoke attacks),
-    // so mob_demon is the still-untouched sibling this assertion now names.
-    const demonBlock = manifestBlock('mob_demon: {', 'mob_demon_flying: {');
-    expect(demonBlock).toContain('clips: BIPED14,');
+    // mob_yeti, mob_murloc, mob_bear, and mob_demon were all later migrated
+    // off the shared constant too (issue #2889 round 2, their own bespoke
+    // attacks), completing the migration: no consumer references the raw
+    // BIPED14 constant directly anymore, only via a spread into its own
+    // derived per-family constant (TROLL_BIPED14, DEMON_BIPED14, etc).
+    expect(MANIFEST_SRC).not.toContain('clips: BIPED14,');
   });
 });

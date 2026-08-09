@@ -853,9 +853,19 @@ describe('the save round trip through a real Sim', () => {
       'bed_thornpeak_5',
       'bed_thornpeak_6',
     ]);
-    // The crop allowlist is a save-key roster too (deviation (h): one
-    // pre-declared crop until the growth phase ships the catalog).
-    expect([...FARM_CROP_IDS]).toEqual(['vale_wheat']);
+    // The crop allowlist is a save-key roster too. The crop-ladder phase
+    // shipped the full eight-crop catalog (D11 ids, tier order), so the
+    // roster pins all eight; a dropped or renamed id is a destroyed save row.
+    expect([...FARM_CROP_IDS]).toEqual([
+      'vale_wheat',
+      'brook_carrot',
+      'marsh_rice',
+      'bog_beet',
+      'highland_barley',
+      'frost_gourd',
+      'gilded_sunmelon',
+      'evergarden_greens',
+    ]);
   });
 
   it('serves the static patch table by reference, deep-frozen', () => {

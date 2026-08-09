@@ -1431,8 +1431,9 @@ export function resetEvadingMob(ctx: SimContext, mob: Entity): void {
       }
     }
   }
-  // The reset re-seeds the idle timer, so an off-stream mob rolls it off-stream too
-  // (idleRng's fallback IS ctx.rng, so every other mob's draw is unmoved).
+  // The reset re-seeds the idle timer through the same passive lane. An explicit
+  // off-stream mob leaves the shared lane untouched; a distance-culling config routes
+  // every mob here privately and intentionally has a different shared RNG digest.
   mob.wanderTimer = wanderPause(idleRng(ctx, mob), mob, 2, 8);
   if (mob.templateId === NYTHRAXIS_BOSS_ID) ctx.resetNythraxisEncounter(mob);
   if (mob.templateId === SISTER_NHALIA_BOSS_ID) resetDrownedLitanyBossEncounter(ctx, mob);

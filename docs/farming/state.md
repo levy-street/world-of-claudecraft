@@ -4,12 +4,20 @@ Read this file first in every phase session. It is the single authority for lock
 decisions. If a phase file contradicts this file, this file wins and the phase file
 gets swept in the same pass (amend the QA twin too, always).
 
-Current phase: Phase 4 (knobs) done 2026-08-08; Phase 4 QA next. Packet authored
-2026-08-07 off release/v0.36.0; the branch has absorbed release/v0.36.0 through
-1478f9d2ba (sixth absorb, opening Phase 4 2026-08-08: PR 2974's Seeker
-daily-rewards mobile CSS, empty intersection with farming; release-merge-audit
-clean, parity and snapshots re-proven green on the merged HEAD; the fifth
-absorb 4d52f151eb landed at Phase 3 QA).
+Current phase: Phase 5 (crops and tools) in flight 2026-08-09; Phase 4 QA done
+2026-08-08. Packet authored 2026-08-07 off release/v0.36.0; the branch has
+absorbed release/v0.36.0 through 5819c005a7 (eighth absorb, opening Phase 5
+2026-08-09: the gate-perf CI batch, warrior Intervene and fear DR, the three
+r165 compileAsync patch with its lockfile-driven asset seal re-mint, idle-mob
+distance culling with its own parity scenario, the 16 static self-record
+scalars moved behind the delta gate, and bg_respond; release-merge-audit clean,
+parity and snapshots re-proven green on the merged HEAD, farming_session golden
+byte-identical. Count-pin baselines after this absorb: command_schema 196/209,
+IWorld members 308 (79 data, 229 method), delta keys 84. The seventh absorb
+66c2340242 landed at Phase 4 QA, PRs 3162 and 3164; the sixth 1478f9d2ba opened
+Phase 4; the fifth 4d52f151eb landed at Phase 3 QA. NOTE for any farming GLB
+work (Phase 7 props, Phase 13 art): fingerprints must be minted against the
+NEW pnpm-lock.yaml this absorb brought, or the asset suites red.)
 Working tree: ALL farming work happens in the persistent worktree
 `~/Documents/woc-farming-plan`. Other sessions share the main checkout; never work there.
 
@@ -714,6 +722,66 @@ question does not arise (farming has no station).
   plant, one toniced harvest on a winner seed, and one husk conversion,
   and re-records the golden deliberately in an isolated commit per D23;
   the handoff line in the Phase 5 gate list below is the tripwire.
+  Phase 5: (z) CLOSED: farming_session gained the knobbed plant, the toniced
+  harvest on a probed winner yieldSeed (the M8 lesson applied: winner probed,
+  non-vacuity asserted in-arm), the husk conversion, and a tier-3 seed-back
+  beat; golden re-recorded in its own isolated commit (md5
+  29a11d98bda17f9c38bd8e9016df7fc7 to bf00c277b89e142446550f00c1035696), the
+  coverage_c ledger re-pinned 4 to 9 draws. (aa) the R37 hub-stocking arm's
+  landTools scan EXCLUDES farming exactly as it excludes fishing: the hub rule
+  is about the rungs a zone's own NODES use and farming has no nodes (D2);
+  garden_hoe stays vendor-PRICED (20) but dormant, and the farming ladder's
+  own dormant-state arm pins the no-vendor truth positively until Phase 9
+  flips stocking, the hub exclusion, and the dormant arm together (the go-live
+  checklist line). The guide's priced-but-unstocked arm carries the same
+  narrowing. (ab) the plant hoe gate (gate 12) rides
+  canGatherTier(bestWieldableGatherToolTierOrNone(...), crop.tier) per the R22
+  banner: the EFFECTIVE plant ladder is the frozen wield gates (tier 1/2/3/4
+  hoes at farming 0/40/70/85) LAYERED OVER the crop skill thresholds
+  (0/25/50/75, gate 7, which still fires first), exactly the land-profession
+  shape; traversable because teaching ceilings run 50/75/100/100. The phase
+  file's bare "riding canGatherTier" wording is superseded; deny reason
+  'tool', ordered after the tonic gate, precedence pinned. (ac) the phase
+  file's "a pin proves all three existing tool effects slot onto a hoe" was
+  FALSE as written: the respawnSpeed kind arm refuses quickening_charm
+  (display name Springback Charm) on EVERY profession and stays. The two live
+  effects (gatherers_cache, artisans_eye) slot AND act at harvest rather than
+  shipping mintable-but-inert (the fishing refusal's own doctrine): wired
+  through applyToolEffectUse draw-free (quantity maps to flat bonus picks,
+  quality to a maintainer-flagged fine-chance bump, auto-mode spends one
+  charge per bonus-bearing harvest, prompt-mode skips whole since harvest_crop
+  carries no confirm channel), pinned non-vacuously both directions. (ad) hoe
+  recipes are their OWN HOE_RECIPES list per the rod precedent, never
+  TOOL_RECIPES rows (that list's invariant consumes MATERIAL_GRADES fine
+  grades and its length is pinned at 6): invariant, each rung consumes the
+  fine twin of a crop one tier below plus the hoe one rung down
+  (fine_vale_wheat/fine_marsh_rice/fine_highland_barley), rungs 2-4 are
+  CRAFT-ONLY (the rod ladder's vendor arm is locked off by the
+  rung-1-only-priced rule), engineering at the toolworks, pinned in
+  tests/professions_hoe_recipes.test.ts. (ae) the tier 3/4 seed-back roll
+  fires on BOTH outcomes (the withered consolation roll): one uniform
+  contract clause per tier beats an outcome-forked draw count, and a died
+  overnight crop returning a seed is anti-frustration, not economy (rates
+  maintainer-flagged). In-phase: the blob byte model re-minted floor 13952 /
+  ceiling 15360 (the doctrine's headroom rule; fixture now derives the widest
+  crop id with a literal guard), and vale_wheat_seed gained buyValue 4 (the
+  tier-1 seed row; the packet's Phase 3 pricing predated the seed-pricing
+  table). (af) prompt-mode tool-effect slot mints are REFUSED for farming at
+  resolveSlotToolEffect: harvest_crop carries no confirm channel (confirmed is
+  hard false at the harvest apply site), so a prompt-mode farming slot could
+  never fire, never spend, and never ratchet, a charm consumed into a dead
+  slot; refusing at the mint closes the trap with no load-side arm needed (no
+  farming slot predates the hoe phase). The harvest confirm channel, if ever
+  wanted, is the Phase 7/8 farming-UI decision; pinned three ways (prompt
+  farming refused, always farming mints, prompt mining mints). Review-round
+  extras worth knowing at QA: the 'tool' deny toast names the required tier
+  via hudChrome.gathering.tierRequired.farming through the farmDeniedToast
+  pure core (the sinkless requiresTool.farming key was deleted with its
+  fills); the reworded howToSlot line carries corrected fills in ALL 18
+  overlays (a stale Latin fill is invisible to both gate tiers, the class to
+  sweep on every reword); and the gather_tool_tooltip tripwire (the SECOND
+  self-clearing farming tripwire, missed by the phase's own suite lists) is
+  flipped with the no-Use-prefix exception pinned.
 - Dev command surface: Phase 3 registers /dev farmgrow [bedId] (alias
   /devfarmgrow [bedId]) in src/sim/dev_commands.ts behind ALLOW_DEV_COMMANDS:
   with a bed id it advances that plot, without one it advances ALL of the

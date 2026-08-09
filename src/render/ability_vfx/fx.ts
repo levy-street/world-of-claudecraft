@@ -3,17 +3,12 @@ import {
   type AbilityVfxBuffSpec,
   type AbilityVfxFullSpec,
   abilityHexColor,
-  insertStunBandPick,
-  MAX_STUN_STAR_BANDS,
-  STUN_STAR_ALPHA_FLOOR,
-  STUN_STAR_BRIGHTNESS,
-  STUN_STAR_COLOR,
-  STUN_STAR_COUNT,
-  STUN_STAR_LIFT,
-  STUN_STAR_RADIUS,
-  STUN_STAR_RATE,
-  STUN_STAR_SIZE,
-  stunBandRankKey,
+  CC_BAND_SPECS,
+  type CcBandSpec,
+  type CcBandType,
+  ccBandRankKey,
+  insertCcBandPick,
+  MAX_CC_BANDS,
 } from '../ability_vfx_core';
 import type { AbilityAudioKind, AbilityAudioOpts } from '../audio_sink';
 import { type DecalStyle, GroundDecals } from './decals';
@@ -318,19 +313,21 @@ export class AbilityVfxFx implements SequencerHost {
   private windups = new Map<number, WindupState>();
   private orbits = new Map<number, OrbitBand[]>();
   private orbitBandCount = 0;
-  // Persistent stunned-star bands (holdStunStars), one entry per stunned
+  // Persistent crowd-control bands (holdCcBand), one entry per controlled
   // entity, frame-stamp swept exactly like windups/orbits. Drawn for at most
-  // the MAX_STUN_STAR_BANDS best-ranked entities per frame (the fixed pick
-  // arrays are the selection scratch, reused every frame). hx/hy/hz cache the
-  // frame's resolved head anchor so the ranking pass and the draw share one
-  // resolve instead of asking the anchor delegate twice.
-  private stunStars = new Map<
+  // the MAX_CC_BANDS best-ranked entities per frame across ALL band types (the
+  // fixed pick arrays are the selection scratch, reused every frame). hx/hy/hz
+  // cache the frame's resolved body anchor so the draw never re-resolves it
+  // (the renderer's anchor delegate allocates a Vector3 per call); which end of
+  // the body that anchor is comes from the band spec's anchorFrac, so the root
+  // band rides the ankles while the stun and fear bands ride the head.
+  private ccBands = new Map<
     number,
-    { remaining: number; stamp: number; hx: number; hy: number; hz: number }
+    { type: CcBandType; remaining: number; stamp: number; hx: number; hy: number; hz: number }
   >();
-  private stunPickIds: number[] = new Array(MAX_STUN_STAR_BANDS).fill(0);
-  private stunPickKeys: number[] = new Array(MAX_STUN_STAR_BANDS).fill(0);
-  private stunPickCount = 0;
+  private ccPickIds: number[] = new Array(MAX_CC_BANDS).fill(0);
+  private ccPickKeys: number[] = new Array(MAX_CC_BANDS).fill(0);
+  private ccPickCount = 0;
   private time = 0;
   private frame = 0;
   private qualityLevel = 1;
@@ -884,18 +881,21 @@ export class AbilityVfxFx implements SequencerHost {
     return out;
   }
 
-  // True when the aura-driven stunned-star band actually WON a draw slot in
+  // True when an aura-driven CC band of ANY type actually WON a draw slot in
   // the latest frame, which is what the sequencer's cast-moment ccStars stand
-  // down for. Membership in the pick set, deliberately not "was fed": the
-  // band count is capped, and answering on fed-ness suppressed the
-  // cast-moment band for a capped-out victim whose held band was never drawn,
-  // leaving it with no overhead read at all (worse than before this feature
-  // existed). The pick set is rebuilt at the top of every update(), before
-  // sequencer.update() consults it, so the sequencer always reads the set for
-  // the frame it is drawing.
-  heldStunStars(targetId: number): boolean {
-    for (let i = 0; i < this.stunPickCount; i++) {
-      if (this.stunPickIds[i] === targetId) return true;
+  // down for. Any type, not just stun: the 'cc' archetype flashes the same
+  // yellow stars for a root or a fear cast, so a victim now wearing its own
+  // green ankle shards or violet wisps must claim the read away from a burst
+  // that would name the wrong control. Membership in the pick set,
+  // deliberately not "was fed": the band count is capped, and answering on
+  // fed-ness suppressed the cast-moment band for a capped-out victim whose
+  // held band was never drawn, leaving it with no overhead read at all (worse
+  // than before this feature existed). The pick set is rebuilt at the top of
+  // every update(), before sequencer.update() consults it, so the sequencer
+  // always reads the set for the frame it is drawing.
+  heldCcBand(targetId: number): boolean {
+    for (let i = 0; i < this.ccPickCount; i++) {
+      if (this.ccPickIds[i] === targetId) return true;
     }
     return false;
   }
@@ -977,7 +977,7 @@ export class AbilityVfxFx implements SequencerHost {
   // in the painter, while scarce render pools are released immediately so an
   // offscreen actor consumes no overlay, shell, ground-aura, or glow work.
   sleepEntity(entityId: number): void {
-    this.stunStars.delete(entityId);
+    this.ccBands.delete(entityId);
     this.windups.delete(entityId);
     const bands = this.orbits.get(entityId);
     if (bands) {
@@ -1401,41 +1401,58 @@ export class AbilityVfxFx implements SequencerHost {
     return true;
   }
 
-  // Holds the persistent stunned-star band over the entity's head while a
-  // worn `kind: 'stun'` aura lives: the painter re-feeds it every frame from
-  // its aura scan, and the update sweep drops it the frame the feed stops
-  // (aura faded, entity left interest), so there is no teardown bookkeeping.
-  // remaining drives the fade toward the alpha floor over the stun's final
-  // second; the color is always STUN_STAR_COLOR (one uniform tell).
-  holdStunStars(entityId: number, remaining: number): void {
-    let s = this.stunStars.get(entityId);
+  // Holds the persistent CC band on the entity while a worn hard-CC aura
+  // lives: the painter re-feeds it every frame from its aura scan, and the
+  // update sweep drops it the frame the feed stops (aura faded, entity left
+  // interest), so there is no teardown bookkeeping. remaining drives the fade
+  // toward the alpha floor over the aura's final second; `type` picks the
+  // whole visual (color, cell, geometry, which end of the body it rides) from
+  // CC_BAND_SPECS, so a victim whose control changes kind mid-life (a stun
+  // landing on a rooted target) swaps to the more severe band in place.
+  holdCcBand(entityId: number, type: CcBandType, remaining: number): void {
+    let s = this.ccBands.get(entityId);
     if (!s) {
-      s = { remaining, stamp: this.frame, hx: 0, hy: 0, hz: 0 };
-      this.stunStars.set(entityId, s);
+      s = { type, remaining, stamp: this.frame, hx: 0, hy: 0, hz: 0 };
+      this.ccBands.set(entityId, s);
       return;
     }
+    s.type = type;
     s.remaining = remaining;
     s.stamp = this.frame;
   }
 
-  // One held star band (the drawOrbit sibling): STUN_STAR_COUNT sprites
-  // orbiting the head anchor the pick loop already resolved. Alpha reads the
-  // stun's remaining time but never falls below the floor while the aura
+  // One held band (the drawOrbit sibling): the spec's sprite count riding a
+  // ring around the anchor the pick loop already resolved. Alpha reads the
+  // aura's remaining time but never falls below the spec's floor while it
   // lives: the fade above the floor is the duration read, the floor is the
-  // fairness rule (an active stun tell must stay readable to the last tick).
-  private drawStunStars(s: { remaining: number; hx: number; hy: number; hz: number }): void {
-    const alpha = Math.max(STUN_STAR_ALPHA_FLOOR, Math.min(1, s.remaining));
-    for (let k = 0; k < STUN_STAR_COUNT; k++) {
-      const a = this.time * STUN_STAR_RATE + (k / STUN_STAR_COUNT) * Math.PI * 2;
+  // fairness rule (an active CC tell must stay readable to the last tick).
+  // A spec with a wobble bobs each sprite on its own phase, which is the
+  // fear band's motion signature (see CC_BAND_SPECS: color alone must not be
+  // the only thing separating the three).
+  private drawCcBand(s: {
+    type: CcBandType;
+    remaining: number;
+    hx: number;
+    hy: number;
+    hz: number;
+  }): void {
+    const spec: CcBandSpec = CC_BAND_SPECS[s.type];
+    const alpha = Math.max(spec.alphaFloor, Math.min(1, s.remaining));
+    const cell = OVERLAY_CELL[spec.cell];
+    for (let k = 0; k < spec.count; k++) {
+      const phase = (k / spec.count) * Math.PI * 2;
+      const a = this.time * spec.rate + phase;
+      const bob =
+        spec.wobble === 0 ? 0 : Math.sin(this.time * spec.rate * 1.7 + phase) * spec.wobble;
       this.overlay.push(
-        s.hx + Math.cos(a) * STUN_STAR_RADIUS,
-        s.hy + STUN_STAR_LIFT,
-        s.hz + Math.sin(a) * STUN_STAR_RADIUS,
-        STUN_STAR_COLOR,
-        STUN_STAR_SIZE,
-        OVERLAY_CELL.star,
+        s.hx + Math.cos(a) * spec.radius,
+        s.hy + spec.lift + bob,
+        s.hz + Math.sin(a) * spec.radius,
+        spec.color,
+        spec.size,
+        cell,
         alpha,
-        STUN_STAR_BRIGHTNESS,
+        spec.brightness,
       );
     }
   }
@@ -1485,46 +1502,41 @@ export class AbilityVfxFx implements SequencerHost {
     );
     this.spirits.update(dt);
     this.overlay.beginFrame();
-    // The stunned-star bands draw FIRST in the frame's overlay batch: the
-    // stun tell is actionable information, so capacity contention with the
-    // decorative sprites that follow must never be able to drop it. The band
-    // count is itself bounded (MAX_STUN_STAR_BANDS), so a raid-wide mass stun
-    // cannot starve the windup telegraphs and worn-debuff bands drawn after
-    // it, and the slots go to bands IN FRONT of the camera before any behind
-    // it (stunBandRankKey owns why that is a fairness rule, not polish).
-    // The sequencer's cast-moment ccStars stand down only for the bands that
-    // actually win a slot here, so the two are one continuous read for a
-    // drawn band, and a band the cap drops still reads through the burst.
-    let stunPicks = 0;
-    for (const [id, s] of this.stunStars) {
+    // The CC bands draw FIRST in the frame's overlay batch: a hard-CC tell is
+    // actionable information, so capacity contention with the decorative
+    // sprites that follow must never be able to drop it. The band count is
+    // itself bounded (MAX_CC_BANDS, ONE budget across all three types), so a
+    // raid-wide mass CC cannot starve the windup telegraphs and worn-debuff
+    // bands drawn after it. Slots go by severity first and then to bands IN
+    // FRONT of the camera before any behind it (ccBandRankKey owns why both
+    // are fairness rules, not polish). The sequencer's cast-moment ccStars
+    // stand down only for the bands that actually win a slot here, so the two
+    // are one continuous read for a drawn band, and a band the cap drops still
+    // reads through the burst.
+    let ccPicks = 0;
+    for (const [id, s] of this.ccBands) {
       if (s.stamp !== this.frame) {
-        this.stunStars.delete(id);
+        this.ccBands.delete(id);
         continue;
       }
-      const head = this.anchorOf(id, 1.0, anchorScratchA);
-      if (!head) continue;
-      s.hx = head.x;
-      s.hy = head.y;
-      s.hz = head.z;
-      const dx = head.x - camPosScratch.x;
-      const dy = head.y - camPosScratch.y;
-      const dz = head.z - camPosScratch.z;
+      const spec = CC_BAND_SPECS[s.type];
+      const at = this.anchorOf(id, spec.anchorFrac, anchorScratchA);
+      if (!at) continue;
+      s.hx = at.x;
+      s.hy = at.y;
+      s.hz = at.z;
+      const dx = at.x - camPosScratch.x;
+      const dy = at.y - camPosScratch.y;
+      const dz = at.z - camPosScratch.z;
       const inFront = dx * camFwdScratch.x + dy * camFwdScratch.y + dz * camFwdScratch.z > 0;
-      const key = stunBandRankKey(dx * dx + dy * dy + dz * dz, inFront);
-      stunPicks = insertStunBandPick(
-        this.stunPickIds,
-        this.stunPickKeys,
-        stunPicks,
-        id,
-        key,
-        MAX_STUN_STAR_BANDS,
-      );
+      const key = ccBandRankKey(spec.severity, dx * dx + dy * dy + dz * dz, inFront);
+      ccPicks = insertCcBandPick(this.ccPickIds, this.ccPickKeys, ccPicks, id, key, MAX_CC_BANDS);
     }
-    // Published BEFORE sequencer.update below, which asks heldStunStars.
-    this.stunPickCount = stunPicks;
-    for (let i = 0; i < stunPicks; i++) {
-      const s = this.stunStars.get(this.stunPickIds[i]);
-      if (s) this.drawStunStars(s);
+    // Published BEFORE sequencer.update below, which asks heldCcBand.
+    this.ccPickCount = ccPicks;
+    for (let i = 0; i < ccPicks; i++) {
+      const s = this.ccBands.get(this.ccPickIds[i]);
+      if (s) this.drawCcBand(s);
     }
     // styled bolt heads ride this frame's overlay batch (positions were just
     // advanced by ribbons.update above)
@@ -1592,8 +1604,8 @@ export class AbilityVfxFx implements SequencerHost {
     this.windups.clear();
     this.orbits.clear();
     this.orbitBandCount = 0;
-    this.stunStars.clear();
-    this.stunPickCount = 0;
+    this.ccBands.clear();
+    this.ccPickCount = 0;
     for (const s of this.screenFxQueue) s.active = false;
   }
 

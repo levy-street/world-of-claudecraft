@@ -920,17 +920,22 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   // phase, produce feeds the dishes phase. Everything here is market-listable
   // and vendor-sellable in the meantime, so nothing is a dead row.
   //
-  // Seeds and husks carry NO buyValue on purpose: a vendor row without one
-  // renders and then refuses, and neither is meant to be vendor-obtainable
-  // yet. Seed stocking lands with the farmer NPCs. Produce follows the node
-  // materials' convention exactly (kind junk so it browses under the market's
-  // material filter, common quality so sellAllJunk never vendors it).
+  // Husks carry NO buyValue on purpose: a vendor row without one renders and
+  // then refuses, and they are not meant to be vendor-obtainable. Tier 1 and
+  // 2 seeds carry a positive buyValue per the locked pricing table, DORMANT
+  // BY CHOICE until the farmer NPCs stock them in the go-live phase (no
+  // vendorItems list names any seed yet); tier 3 and 4 seeds are
+  // deliberately never vendor-obtainable (drop and market supply only).
+  // Produce follows the node materials' convention exactly (kind junk so it
+  // browses under the market's material filter, common quality so
+  // sellAllJunk never vendors it).
   vale_wheat_seed: {
     id: 'vale_wheat_seed',
     name: 'Vale Wheat Seed',
     kind: 'junk',
     quality: 'common',
     sellValue: 1,
+    buyValue: 4,
   },
   vale_wheat: {
     id: 'vale_wheat',
@@ -943,6 +948,9 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   // base sellValue, with the 4x buyValue economy basis on top. It is NOT a
   // MATERIAL_GRADES row (that table is the nine node yields and its suites pin
   // it to exactly those); farming mints this through its own harvest roll.
+  // Farming fine twins get NO downward grade substitution: materialGradeIds
+  // walks MATERIAL_GRADES only, so a recipe asking for base produce (a Phase 6
+  // dish included) is NOT satisfied by the fine twin.
   fine_vale_wheat: {
     id: 'fine_vale_wheat',
     name: 'Fine Vale Wheat',
@@ -992,6 +1000,276 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     kind: 'junk',
     quality: 'common',
     sellValue: 6,
+  },
+  // The crop-ladder phase's seven remaining crops (ids locked by D11), in
+  // tier order, each the same three-row family as vale_wheat above: seed,
+  // produce, fine twin. VALUES ARE PROVISIONAL and flagged for the
+  // maintainer, following the locked pricing table.
+  //
+  // Vendor status is DORMANT BY CHOICE, exactly the vale_wheat block's
+  // model: tier 1 and 2 seeds carry their buyValue now for the Phase 9
+  // farmer-NPC stocking (no vendorItems list names one until then), tier 3
+  // and 4 seeds carry none (supply is drop and market side by design), and
+  // produce carries none, with ONE exception: brook_carrot, the D9 starter
+  // fee vegetable, is vendor-priced so the watch-fee loop can be paid from
+  // vendor stock before a first harvest lands. Every fine twin's buyValue
+  // is the ECONOMY BASIS for the recipe_economy counterfactual, never a
+  // stock row, the fine-material convention below; no NPC stocks any fine
+  // twin. The no-downward-substitution rule on the fine_vale_wheat comment
+  // above covers every fine twin in this block too.
+  //
+  // CONSUMERS (the wolf_fang rule): every seed is consumed by plant_crop at
+  // plant time, a live consumer today; per-row comments carry each produce
+  // and fine twin's explicit Phase 6 consumer note.
+  brook_carrot_seed: {
+    id: 'brook_carrot_seed',
+    name: 'Brook Carrot Seed',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 1,
+    buyValue: 4,
+  },
+  // The D9 fee vegetable, the one produce row with a buyValue: priced at the
+  // 4x-sell convention so the watch fee is payable from vendor stock before
+  // a player's first harvest. Consumed by the watch fee today; Phase 6
+  // consumer note: a cooking-dish ingredient in the dishes phase.
+  brook_carrot: {
+    id: 'brook_carrot',
+    name: 'Brook Carrot',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 4,
+    buyValue: 16,
+  },
+  // Phase 6 consumer note: the fine cooking-grade twin the skill-scaled
+  // harvest roll upgrades a pick into (the dishes phase decides its recipe
+  // role). As a TIER 1 fine twin it is deliberately not a hoe-recipe reagent
+  // candidate (the hoe ladder drafts from the tier 2 to 4 fine twins).
+  fine_brook_carrot: {
+    id: 'fine_brook_carrot',
+    name: 'Fine Brook Carrot',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 8,
+    buyValue: 32,
+  },
+  marsh_rice_seed: {
+    id: 'marsh_rice_seed',
+    name: 'Marsh Rice Seed',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 2,
+    buyValue: 8,
+  },
+  // Watch-fee sink plus vendor sell today; Phase 6 consumer note: a
+  // cooking-dish recipe consumes marsh rice in the dishes phase. No
+  // buyValue (the brook_carrot D9 exception does not apply here).
+  marsh_rice: {
+    id: 'marsh_rice',
+    name: 'Marsh Rice',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 8,
+  },
+  // Phase 6 consumer note: cooking dishes; as a tier-2 fine twin it is a
+  // candidate hoe-recipe reagent (the hoe author decides which fine twins
+  // the hoe recipes consume).
+  fine_marsh_rice: {
+    id: 'fine_marsh_rice',
+    name: 'Fine Marsh Rice',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 16,
+    buyValue: 64,
+  },
+  bog_beet_seed: {
+    id: 'bog_beet_seed',
+    name: 'Bog Beet Seed',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 2,
+    buyValue: 8,
+  },
+  // Watch-fee sink today; Phase 6 consumer note: a marsh-root dish reagent
+  // when cooking lands. No buyValue per the produce rule.
+  bog_beet: {
+    id: 'bog_beet',
+    name: 'Bog Beet',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 8,
+  },
+  // Phase 6 consumer note: cooking-grade reagent; tier-2 fine twin, so a
+  // candidate hoe-recipe reagent (the hoe author decides).
+  fine_bog_beet: {
+    id: 'fine_bog_beet',
+    name: 'Fine Bog Beet',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 16,
+    buyValue: 64,
+  },
+  highland_barley_seed: {
+    id: 'highland_barley_seed',
+    name: 'Highland Barley Seed',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 4,
+  },
+  // Watch-fee sink today; Phase 6 consumer note: a tier-3 cooking-dish
+  // reagent lands in the dishes phase.
+  highland_barley: {
+    id: 'highland_barley',
+    name: 'Highland Barley',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 15,
+  },
+  // Phase 6 consumer note: cooking-grade reagent; tier-3 fine twin, so a
+  // candidate hoe-recipe reagent (the hoe author decides).
+  fine_highland_barley: {
+    id: 'fine_highland_barley',
+    name: 'Fine Highland Barley',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 30,
+    buyValue: 120,
+  },
+  frost_gourd_seed: {
+    id: 'frost_gourd_seed',
+    name: 'Frost Gourd Seed',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 4,
+  },
+  // Watch-fee sink today; Phase 6 consumer note: a tier-3 vegetable input
+  // for the dishes phase.
+  frost_gourd: {
+    id: 'frost_gourd',
+    name: 'Frost Gourd',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 15,
+  },
+  // Phase 6 consumer note: fine-ingredient input for the dishes phase;
+  // tier-3 fine twin, so a candidate hoe-recipe reagent (the hoe author
+  // decides).
+  fine_frost_gourd: {
+    id: 'fine_frost_gourd',
+    name: 'Fine Frost Gourd',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 30,
+    buyValue: 120,
+  },
+  gilded_sunmelon_seed: {
+    id: 'gilded_sunmelon_seed',
+    name: 'Gilded Sunmelon Seed',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 8,
+  },
+  // Watch-fee sink today; Phase 6 consumer note: a cooking-dish reagent in
+  // the dishes phase (the tier-4 dish line).
+  gilded_sunmelon: {
+    id: 'gilded_sunmelon',
+    name: 'Gilded Sunmelon',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 40,
+  },
+  // Phase 6 consumer note: a Phase 6 reagent; tier-4 fine twin, so a
+  // candidate hoe-recipe reagent (the hoe author decides).
+  fine_gilded_sunmelon: {
+    id: 'fine_gilded_sunmelon',
+    name: 'Fine Gilded Sunmelon',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 80,
+    buyValue: 320,
+  },
+  evergarden_greens_seed: {
+    id: 'evergarden_greens_seed',
+    name: 'Evergarden Greens Seed',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 8,
+  },
+  // Watch-fee sink today; Phase 6 consumer note: the flagship tier-4
+  // cooking reagent (the top-band feast and entree recipes) when cooking
+  // lands.
+  evergarden_greens: {
+    id: 'evergarden_greens',
+    name: 'Evergarden Greens',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 40,
+  },
+  // Phase 6 consumer note: reserved as a premium cooking reagent; tier-4
+  // fine twin, so a candidate hoe-recipe reagent (the hoe author decides).
+  fine_evergarden_greens: {
+    id: 'fine_evergarden_greens',
+    name: 'Fine Evergarden Greens',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 80,
+    buyValue: 320,
+  },
+  // The farming hoe ladder (the crop-ladder phase's tool half): the fifth
+  // gathering profession's gatherTool items, mirroring the pick/axe/sickle
+  // shape exactly (kind tool, infinite durability, `use.tier` read by the
+  // step-12 hoe gate in professions/farming.ts through the R22 wield-filtered
+  // scan, so `use.tier` gates which CROP tiers may be planted).
+  //
+  // PRICES: garden_hoe joins the 20-copper tier-1 rung (the trivial one-time
+  // purchase, pinned as a literal in tests/professions_tools.test.ts) and is
+  // the ONLY vendor-priced rung: the 120/400 rungs deliberately gain NO
+  // farming member, because rungs 2 to 4 are CRAFT-ONLY (HOE_RECIPES in
+  // content/recipes.ts, engineering at the toolworks), so a non-engineer
+  // farmer buys them from players via market or trade. osmium_hoe is
+  // unpriced-for-buy AND craftable (the R23 shape), absent from every
+  // vendorItems list and from HEROIC_VENDOR_STOCK like the tier-4/5 land
+  // tools above; unlike them there is deliberately NO delve Marks fallback
+  // row this phase. FLAGGED FOR THE MAINTAINER: whether the Marks shop should
+  // gain a hoe row later as the non-crafter route.
+  //
+  // garden_hoe carries NO noVendorSell/noMarketList: those flags exist to
+  // close quest-grant mints and ONLY the three quest-granted tier-1 tools
+  // carry them (the banner above); no quest grants a hoe. If a farming
+  // starter quest ever hands one over through requiredItems, both flags must
+  // be added in that same change.
+  garden_hoe: {
+    id: 'garden_hoe',
+    name: 'Garden Hoe',
+    kind: 'tool',
+    quality: 'common',
+    use: { type: 'gatherTool', professionId: 'farming', tier: 1 },
+    sellValue: 4,
+    buyValue: 20,
+  },
+  bronze_hoe: {
+    id: 'bronze_hoe',
+    name: 'Bronze Hoe',
+    kind: 'tool',
+    quality: 'common',
+    use: { type: 'gatherTool', professionId: 'farming', tier: 2 },
+    sellValue: 10,
+  },
+  skysilver_hoe: {
+    id: 'skysilver_hoe',
+    name: 'Skysilver Hoe',
+    kind: 'tool',
+    quality: 'uncommon',
+    use: { type: 'gatherTool', professionId: 'farming', tier: 3 },
+    sellValue: 25,
+  },
+  osmium_hoe: {
+    id: 'osmium_hoe',
+    name: 'Osmium Hoe',
+    kind: 'tool',
+    quality: 'rare',
+    use: { type: 'gatherTool', professionId: 'farming', tier: 4 },
+    sellValue: 60,
   },
   // Fine grades of the nine node materials (D8, the fine-material axis). A
   // harvest yields one of these INSTEAD of its base id when the player's tool

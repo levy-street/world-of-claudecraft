@@ -470,7 +470,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectTooltip.charges':
     'Empieza con {base} cargas en una herramienta común (+{bonus} por nivel de rareza).',
   'hudChrome.professions.toolEffectTooltip.howToSlot':
-    'Colócalo en una herramienta de minería, tala o herboristería desde la ventana de Profesiones. Se consume al colocarlo.',
+    'Colócalo en una herramienta de minería, tala, herboristería o agricultura desde la ventana de Profesiones. Se consume al colocarlo.',
   'hudChrome.professions.toolEffectTooltip.kind': 'Amuleto de herramienta',
   'hudChrome.professions.toolEffectTooltip.landOnly': 'No se coloca en cañas de pescar.',
   'hudChrome.professions.toolEffectTooltip.openProfessions':

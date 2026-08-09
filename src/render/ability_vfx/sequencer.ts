@@ -143,11 +143,13 @@ export interface SequencerHost {
     brightness: number,
   ): void;
   overlayCells(): { glow: number; star: number; rune: number; spark: number };
-  // True while the host holds a live aura-driven stunned-star band for this
-  // entity (fed this frame). The sequencer's cast-moment ccStars stand down
-  // for it, so one stun never draws two bands, and the full-alpha held band
-  // is never hidden behind the cast-moment band's fade-out tail.
-  heldStunStars(targetId: number): boolean;
+  // True while the host DRAWS a live aura-driven CC band for this entity (any
+  // band type: stun, fear, or root). The sequencer's cast-moment ccStars stand
+  // down for it, so one control never draws two bands, the full-alpha held
+  // band is never hidden behind the cast-moment band's fade-out tail, and a
+  // root or fear victim reads its own band's color rather than the yellow
+  // stars this archetype flashes for every control ability alike.
+  heldCcBand(targetId: number): boolean;
   // One frame of the authored windup ceremony on an entity (drives the
   // sequencer's synthetic pre-release phase for instant casts).
   windupDraw(entityId: number, colorHex: number, progress: number, style: string): void;
@@ -1875,16 +1877,20 @@ export class ArchetypeSequencer {
         }
       }
     }
-    // Stunned-star band over the victim's head. The STUN_STAR_* constants are
-    // shared with the fx engine's held aura-driven band, and that band OWNS
-    // the read whenever the victim's stun aura is live (host.heldStunStars):
-    // this cast-moment band stands down for it (the timer still runs), so one
-    // stun never draws two bands and the held band's full alpha is never
-    // hidden behind this band's fade-out tail. It still draws alone for the
-    // aura-less cases (strike.stars flourishes, a cc read with no worn aura).
+    // Cast-moment star band over the victim's head. The STUN_STAR_* constants
+    // are shared with the fx engine's held aura-driven stun band, and a held
+    // band of ANY type OWNS the read whenever it is being drawn
+    // (host.heldCcBand): this cast-moment band stands down for it (the timer
+    // still runs), so one control never draws two bands and the held band's
+    // full alpha is never hidden behind this band's fade-out tail. Standing
+    // down for a root or fear band matters as much as for a stun: this
+    // archetype flashes yellow stars for EVERY control ability, so without the
+    // handoff a rooted victim would read as stunned for the burst's length.
+    // It still draws alone for the aura-less cases (strike.stars flourishes, a
+    // cc read with no worn aura).
     if (slot.ccStars > 0) {
       slot.ccStars -= dt;
-      const head = host.heldStunStars(slot.targetId)
+      const head = host.heldCcBand(slot.targetId)
         ? null
         : host.anchorOf(slot.targetId, 1.0, transientAnchor);
       if (head) {

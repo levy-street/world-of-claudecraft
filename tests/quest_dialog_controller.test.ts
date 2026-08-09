@@ -512,46 +512,51 @@ describe('QuestDialogController', () => {
     expect(cardMaster.openCardDuel).toHaveBeenCalledTimes(1);
   });
 
-  it('keeps the generic goods row BESIDE the WARFARE shop row, with distinct labels and routes', () => {
-    // Round-2 review finding: the gossip menu suppressed hasVendor for a
-    // warfareVendor-flagged NPC, which silently took selling and buyback away
-    // at FURY, a shipped NPC that already had a generic goods row. Both rows
-    // ship now; what the suppression was really avoiding (two buttons wearing
-    // the same "Browse Goods" label) is fixed by the shop row's own keys.
+  it('REPLACES the generic goods row with the WARFARE shop row at a flagged NPC', () => {
+    // The WARFARE quartermaster shows ONE shop row, not two (owner 2026-08-07).
+    // This reverses the round-2 review decision that shipped both: the two rows
+    // open the SAME stock, because a quartermaster's vendorItems IS the whole
+    // WARFARE catalog, so the generic grid was a flat copy of what the sectioned
+    // window lays out properly. Distinct labels made them tellable apart without
+    // making the duplication any less confusing.
     const flaggedId = Object.values(NPCS).find((definition) => definition.warfareVendor)?.id;
     if (!flaggedId) throw new Error('warfare vendor fixture not found');
     const flagged = npc(60, flaggedId);
+    // Non-empty on purpose, and this is the load-bearing half. The honor buy
+    // path (items.ts buyItem) is generic over vendorItems and refuses an empty
+    // list; the warfareVendor flag is a WINDOW routing hint it never reads. So
+    // the suppression has to happen on the ROW. Emptying the stock to hide the
+    // row would turn the shop itself off, which is why this fixture stocks the
+    // NPC and still expects no goods row.
     flagged.vendorItems = ['minor_healing_potion'];
     const both = harness(flagged);
     both.controller.open(flagged.id);
 
     const goods = both.element.querySelector<HTMLButtonElement>('[data-vendor]');
     const shop = both.element.querySelector<HTMLButtonElement>('[data-warfare-shop]');
-    expect(goods, 'the generic goods row survives at a flagged NPC').not.toBeNull();
+    expect(goods, 'no generic goods row at a flagged NPC, even with stock').toBeNull();
     expect(shop, 'the WARFARE shop row').not.toBeNull();
-    const npcName = `npc:${flaggedId}`;
-    expect(goods?.textContent).toContain(t('questUi.dialog.browseGoods'));
     expect(shop?.textContent).toContain(t('hudChrome.warfareShop.gossipOption'));
-    expect(goods?.textContent).not.toBe(shop?.textContent);
-    expect(goods?.getAttribute('aria-label')).toBe(
-      t('questUi.dialog.browseGoodsAria', { name: npcName }),
-    );
     expect(shop?.getAttribute('aria-label')).toBe(
-      t('hudChrome.warfareShop.gossipOptionAria', { name: npcName }),
+      t('hudChrome.warfareShop.gossipOptionAria', { name: `npc:${flaggedId}` }),
     );
-    expect(goods?.getAttribute('aria-label')).not.toBe(shop?.getAttribute('aria-label'));
 
     // The shop row routes to the sectioned window and nowhere else.
     shop?.click();
     expect(both.openWarfareVendor).toHaveBeenCalledWith(flagged.id, both.trapOpener);
     expect(both.openVendor).not.toHaveBeenCalled();
 
-    // A fresh dialog, because the click above closed this one: the goods row
-    // still routes to the ORDINARY vendor window (selling and buyback).
-    const generic = harness(npc(61, flaggedId));
-    generic.entity.vendorItems = ['minor_healing_potion'];
+    // Scoped to the FLAG, not to vendors generally: an ordinary stocked NPC
+    // still gets its goods row, routing to the ordinary window. ("closes gossip
+    // before opening every non-quest destination" above covers the same NPC;
+    // asserted here too so deleting that one cannot quietly make this vacuous.)
+    const ordinary = npc(61, ordinaryNpcId());
+    ordinary.vendorItems = ['minor_healing_potion'];
+    const generic = harness(ordinary);
     generic.controller.open(61);
-    generic.element.querySelector<HTMLButtonElement>('[data-vendor]')?.click();
+    const genericGoods = generic.element.querySelector<HTMLButtonElement>('[data-vendor]');
+    expect(genericGoods, 'an unflagged stocked NPC keeps its goods row').not.toBeNull();
+    genericGoods?.click();
     expect(generic.openVendor).toHaveBeenCalledWith(61, generic.trapOpener);
     expect(generic.openWarfareVendor).not.toHaveBeenCalled();
   });

@@ -31,6 +31,7 @@ import { DAMAGE_IDLE_DESPAWN_MOB_IDS, DAMAGE_IDLE_DESPAWN_SECONDS } from '../ent
 import { weaponHand } from '../equipment_rules';
 import { lockNormalDungeonResetOnBossKill, spawnBossExitPortal } from '../instances/dungeons';
 import { spawnWidowHatchlingOnEggDeath } from '../mob/egg_hatchling';
+import { PET_AGGRESSIVE_RANGE } from '../pet/pet_ai';
 import { pvpDamageMultiplier } from '../pvp';
 import { resolveRespawnSeconds } from '../respawn_policy';
 import { aurasSurvivingDeath } from '../resurrection';
@@ -84,7 +85,14 @@ const VICTORY_RUSH_WINDOW = 20;
 const PURSUIT_SPEED_DURATION = 6;
 const BLOODBATH_DURATION = 8;
 const BLOODBATH_MAX_STACKS = 5;
-const PET_STEALTH_DETECTION_RADIUS = 50;
+// A pet's stealth-detection base radius is its aggro-radius analogue, imported from the
+// pet-AI slice so this gate and petCanSeeTarget (pet/pet_ai.ts) cannot drift: a pet that
+// cannot ACQUIRE a stealthed player must not be able to damage one either. This used to
+// be a local 50, the pet's assist scan span, which is a range and not a radius. The
+// guard below is keyed on "owned mob", so it also covers the delve companion, whose own
+// acquisition (delves/companion.ts) has never consulted stealth at all; that asymmetry
+// is pre-existing and narrowed, not introduced, by the smaller radius.
+const PET_STEALTH_DETECTION_RADIUS = PET_AGGRESSIVE_RANGE;
 
 // Baseline uninterruptible casts and a resolved talent modifier can each block
 // classic-era damage pushback. The resolved check is player-only and reads the

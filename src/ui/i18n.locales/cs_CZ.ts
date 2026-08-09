@@ -447,7 +447,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectTooltip.charges':
     'Na běžném nástroji začíná s {base} nabitími (+{bonus} za každý stupeň vzácnosti).',
   'hudChrome.professions.toolEffectTooltip.howToSlot':
-    'Vlož do hornického, dřevorubeckého nebo bylinkářského nástroje z okna Profese. Při vložení se spotřebuje.',
+    'Vlož do hornického, dřevorubeckého, bylinkářského nebo zemědělského nástroje z okna Profese. Při vložení se spotřebuje.',
   'hudChrome.professions.toolEffectTooltip.kind': 'Amulet nástroje',
   'hudChrome.professions.toolEffectTooltip.landOnly': 'Nelze vložit do rybářských prutů.',
   'hudChrome.professions.toolEffectTooltip.openProfessions':

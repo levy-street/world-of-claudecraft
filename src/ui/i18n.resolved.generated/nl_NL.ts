@@ -1454,6 +1454,173 @@ export const nl_NL: EnTranslations = {
       "badges": {
         "backgrounded": "Op achtergrond",
         "offline": "Offline"
+      },
+      "diagnostics": {
+        "panelAria": "World of ClaudeCraft performance diagnostics",
+        "title": "ClaudeCraft Performance Doctor",
+        "subtitle": "A game-specific scan with evidence and code-level fixes.",
+        "aria": {
+          "liveMeasurements": "Live performance measurements",
+          "scanProgress": "Diagnostic scan progress",
+          "findings": "Ranked diagnostic findings"
+        },
+        "controls": {
+          "minimize": "Minimize",
+          "expand": "Expand",
+          "start": "Start 15-second scan",
+          "refreshCensus": "Refresh scene census",
+          "copyReport": "Copy clear report",
+          "downloadReport": "Download report",
+          "scanning": "Scanning...",
+          "scanAnother": "Scan another area",
+          "reportLogged": "Report logged to console",
+          "copied": "Copied",
+          "copyBlocked": "Copy blocked: report logged",
+          "retestLowGraphics": "Retest on Low graphics"
+        },
+        "instruction": "For the best signal, enter Play Offline, move through the slow area, rotate the camera, and trigger the effect that stutters while the scan is running.",
+        "status": {
+          "pausedHiddenRestart": "Scan paused while this tab is hidden. It will restart when you return.",
+          "restoredRestart": "Tab restored. Restarting a clean 15-second active-gameplay capture.",
+          "worldLoaded": "World loaded. Waiting for the first playable frame.",
+          "pausedHiddenContinue": "Scan paused while this tab is hidden. Return to the game to continue.",
+          "collectingRemaining": {
+            "one": "Collecting active gameplay: {seconds} second remaining",
+            "other": "Collecting active gameplay: {seconds} seconds remaining"
+          },
+          "waitingFrames": "Waiting for representative gameplay frames: {current}/{minimum}",
+          "collectingNow": "Collecting active gameplay: move through the problem area now.",
+          "ready": "Ready to scan. Press Start and reproduce the slowdown.",
+          "waitingWorld": "Waiting for the game world. Choose Play Offline or enter an online character."
+        },
+        "metrics": {
+          "waitingRenderer": "renderer: waiting",
+          "waitingCensus": "scene census: waiting",
+          "waitingHitch": "hitch attribution: armed on world entry",
+          "recent": "recent  {fps} FPS | p95 {p95} ms | >50 ms {longFrames}",
+          "render": "render  submit {submit} ms | world {world} ms | entities {entities} ms",
+          "scene": "scene   {calls} calls | {triangles} tris | {views} views",
+          "hitches": "hitches {hitches} | shaders {shaders} | uploads {uploads} | views {views}",
+          "gpu": "GPU     {renderer}",
+          "waitingValue": "waiting"
+        },
+        "scoreHeadline": "{score}/100: {headline}",
+        "healthyNoFindings": "No actionable threshold fired. If a short hitch still bothers you, rerun the scan along the exact movement path that triggers it.",
+        "findingMeta": "{severity} | {confidence} confidence",
+        "sections": {
+          "evidence": "Evidence",
+          "tryNow": "Try now",
+          "codeFix": "Code fix",
+          "source": "Relevant source"
+        },
+        "severity": {
+          "critical": "CRITICAL",
+          "warning": "WARNING",
+          "info": "INFO"
+        },
+        "confidence": {
+          "high": "high",
+          "medium": "medium",
+          "low": "low"
+        },
+        "diagnosis": {
+          "noProblemTitle": "No material performance problem detected",
+          "summary": {
+            "findings": {
+              "one": "{findings} actionable finding from the last 10 seconds at {fps} FPS and {p95} frame p95.",
+              "other": "{findings} actionable findings from the last 10 seconds at {fps} FPS and {p95} frame p95."
+            },
+            "healthy": "The last 10 seconds held {fps} FPS with a {p95} frame p95. No game, browser, GPU, memory, asset, or network threshold fired."
+          },
+          "titles": {
+            "hardwareAcceleration": "Software rendering is active",
+            "integratedGpu": "The game is using the integrated GPU",
+            "highDpi": "High resolution rendering is expensive here",
+            "forcedHighGraphics": "Forced high graphics is reducing performance",
+            "lowMemory": "Available device memory is low",
+            "browserStalls": "Browser or extension stalls were detected",
+            "heapPressure": "Browser memory pressure was detected",
+            "contextLoss": "The graphics context was reset",
+            "gpuSubmit": "GPU submission is the main frame bottleneck",
+            "sceneDraw": "Scene draw cost exceeds the active graphics budget",
+            "shadowPass": "The shadow pass uses a large share of draw calls",
+            "rendererWorld": "World renderer updates are CPU-bound",
+            "rendererEntities": "Entity view updates are CPU-bound",
+            "rendererNameplates": "Nameplate painting is expensive",
+            "simCpu": "Simulation work is consuming the frame",
+            "hudCpu": "HUD updates are consuming the frame",
+            "eventCpu": "Event processing is consuming the frame",
+            "shaderCompile": "Shaders are compiling during gameplay",
+            "textureUpload": "Texture uploads are causing gameplay hitches",
+            "viewCreate": "Entity view creation is causing hitches",
+            "otherHitch": "Unattributed long frames remain",
+            "assetStartup": "Game startup is delayed by asset work",
+            "longTasks": "Long browser tasks are blocking frames",
+            "networkLatency": "Network delivery is delaying visible response",
+            "snapshotApply": "Snapshot processing is blocking the client",
+            "generic": "Performance rule {rule} needs attention"
+          },
+          "causes": {
+            "environment": "A detected browser, GPU, memory, or device setting can limit performance before the game renders a frame.",
+            "graphics": "Measured graphics work is above the active frame or scene budget for this capture.",
+            "cpu": "A measured CPU phase is taking enough main-thread time to miss the frame budget.",
+            "loading": "Resource preparation or first-use work happened on a visible gameplay or startup path.",
+            "network": "Network delivery or client snapshot processing is delaying the latest playable state."
+          },
+          "evidence": {
+            "environment": "The environment rule {rule} matched this device and browser.",
+            "gpuSubmit": "WebGL submission p95 is {submit}, or {share} of renderer p95.",
+            "frame": "The recent window measured {fps} FPS with a {p95} frame p95.",
+            "sceneCalls": "The scene uses {calls} draw calls against a target of {target}.",
+            "sceneTriangles": "The scene submits {triangles} triangles against a target of {target}.",
+            "sceneCategory": "Scene category {category} contributes {calls} calls and {triangles} measured triangles.",
+            "censusNeeded": "Refresh the scene census to identify the leading render category.",
+            "shadow": "The shadow pass submits {calls} calls, {share} of the baseline, and {triangles} triangles.",
+            "cpuPhase": "Measured phase {phase} has a p95 of {p95}.",
+            "hitch": "{count} of {total} recorded hitches matched cause {cause}.",
+            "assets": "The preload gate waited {wait} for {tasks} registered tasks.",
+            "failedAssets": "Failed asset groups: {groups}.",
+            "longTasks": "{count} long tasks were measured, with p95 {p95} and maximum {max}.",
+            "network": "Snapshot interval is {interval}, latest age is {age}, and input echo p95 is {echo}.",
+            "snapshot": "Snapshot parse and apply p95 is {work}; network gap p95 is {gap}.",
+            "generic": "Diagnostic rule {rule} matched this capture."
+          },
+          "tryNow": {
+            "environment": "Correct the detected environment setting, restart, and repeat the same scan.",
+            "graphics": "Retest the same camera path on Low graphics to confirm graphics pressure.",
+            "cpu": "Repeat the scan while idle and while moving to isolate the CPU phase.",
+            "loading": "Repeat the same route or first-use action to confirm when the hitch occurs.",
+            "network": "Compare Play Offline with the same movement and camera path."
+          },
+          "codeFix": {
+            "environment": "Keep the detected fallback path within the shared graphics and memory budgets.",
+            "graphics": "Use the existing render budget, instancing, material sharing, LOD, and hidden-work skips.",
+            "cpu": "Profile the named phase, remove repeated work and allocations, and preserve gameplay behavior.",
+            "loading": "Preload, pool, or spread the identified first-use work through the existing startup and streaming budgets.",
+            "network": "Reduce delivery or snapshot processing cost without weakening the authoritative server model."
+          }
+        },
+        "report": {
+          "title": "World of ClaudeCraft performance diagnosis",
+          "statusLine": "Status: {status} ({score}/100)",
+          "capturedLine": "Captured: {captured}",
+          "topFindingLine": "Top finding: {finding}",
+          "summaryLine": "Summary: {summary}",
+          "gpuLine": "GPU: {gpu}",
+          "graphicsLine": "Graphics: {tier}, render scale {scale}",
+          "recentLine": "Recent: {fps} FPS, p95 {p95}, {longFrames} frames over 50 ms, {frames} measured frames",
+          "resultHeading": "Result",
+          "noThreshold": "No actionable threshold fired in this capture.",
+          "findingHeading": "{index}. {title}",
+          "findingMeta": "Severity: {severity}. Confidence: {confidence}.",
+          "rawSnapshotHeading": "Raw snapshot",
+          "notAvailable": "not available",
+          "status": {
+            "critical": "critical",
+            "needsAttention": "needs attention",
+            "healthy": "healthy"
+          }
+        }
       }
     },
     "auraOverlay": {
@@ -2651,7 +2818,8 @@ export const nl_NL: EnTranslations = {
       "tierRequired": {
         "mining": "Vereist een rang {tier} mijnhouweel",
         "logging": "Vereist een rang {tier} kapbijl",
-        "herbalism": "Vereist een rang {tier} kruidenkunde-sikkel"
+        "herbalism": "Vereist een rang {tier} kruidenkunde-sikkel",
+        "farming": "Requires a tier {tier} farming hoe"
       },
       "requiresTool": {
         "mining": "Vereist een mijnhouweel",
@@ -2698,12 +2866,14 @@ export const nl_NL: EnTranslations = {
           "mining": "Vereist om ertsaders tot en met rang {tier} te ontginnen.",
           "logging": "Vereist om houtopstanden tot en met rang {tier} te vellen.",
           "herbalism": "Vereist om kruidenvelden tot en met rang {tier} te oogsten.",
-          "fishing": "Vereist om wateren tot en met rang {tier} te bevissen."
+          "fishing": "Vereist om wateren tot en met rang {tier} te bevissen.",
+          "farming": "Required to plant crops up to tier {tier}."
         },
         "use": {
           "mining": "Gebruik: ontgin een nabijgelegen ertsader.",
           "logging": "Gebruik: vel een nabijgelegen houtopstand.",
-          "herbalism": "Gebruik: oogst van een nabijgelegen kruidenveld."
+          "herbalism": "Gebruik: oogst van een nabijgelegen kruidenveld.",
+          "farming": "Works from your bags when you plant a crop bed."
         },
         "speed": "Verzamelt sneller bij grondstoffenpunten onder rang {tier}.",
         "rodRequired": "Vereist om te vissen.",
@@ -2728,6 +2898,8 @@ export const nl_NL: EnTranslations = {
       "harvestFineLineQty": "You also bring in: {name} x{qty}.",
       "witheredLine": "The crop withered. You clear the bed: {name}.",
       "witheredLineQty": "The crop withered. You clear the bed: {name} x{qty}.",
+      "seedBackLine": "You recover seed: {name}.",
+      "seedBackLineQty": "You recover seed: {name} x{qty}.",
       "denied": {
         "bad_bed": "There is no crop bed there.",
         "bad_crop": "You cannot plant that here.",
@@ -2740,7 +2912,8 @@ export const nl_NL: EnTranslations = {
         "no_husks": "You do not have enough withered husks.",
         "no_compost": "You have no compost.",
         "no_fee_produce": "You have no produce to pay the watch fee.",
-        "no_tonic": "You have no growth tonic."
+        "no_tonic": "You have no growth tonic.",
+        "tool": "You have no farming hoe fit for that crop."
       },
       "husksConvertedLine": "You trade {husksName} x{husks} for {name}.",
       "husksConvertedLineQty": "You trade {husksName} x{husks} for {name} x{qty}."
@@ -2856,7 +3029,7 @@ export const nl_NL: EnTranslations = {
           "artisansEye": "Verhoogt de oogstgraad met 1 gereedschapsrang zolang het geladen is.",
           "quickeningCharm": "Verkort de hergroeitijd van het grondstoffenpunt dat het activeert."
         },
-        "howToSlot": "Plaats op een mijnbouw-, houtkap- of kruidenkundegereedschap vanuit het venster Beroepen. Wordt verbruikt bij plaatsing.",
+        "howToSlot": "Plaats op een mijnbouw-, houtkap-, kruidenkunde- of landbouwgereedschap vanuit het venster Beroepen. Wordt verbruikt bij plaatsing.",
         "charges": "Begint met {base} ladingen op een gewoon gereedschap (+{bonus} per zeldzaamheidsrang).",
         "landOnly": "Kan niet op hengels worden geplaatst.",
         "openProfessions": "Open Beroepen om dit op een verzamelgereedschap te plaatsen."
@@ -2873,6 +3046,11 @@ export const nl_NL: EnTranslations = {
       "toolEffectRechargeFull": "{effect} is al volledig opgeladen.",
       "toolEffectRechargeToolCapped": "Draag beter {profession}-gereedschap om {effect} verder op te laden.",
       "toolEffectRechargeMaterials": "Het opladen van {effect} vereist {material} x{count}.",
+      "craftingProgress": "You are crafting: {remaining}s of {total}s remaining.",
+      "disenchantingProgress": "You are disenchanting: {remaining}s of {total}s remaining.",
+      "enchantingProgress": "You are enchanting: {remaining}s of {total}s remaining.",
+      "salvagingProgress": "You are salvaging: {remaining}s of {total}s remaining.",
+      "rechargingToolEffectProgress": "You are recharging a tool effect: {remaining}s of {total}s remaining.",
       "tierPipAria": "Niveau {tier}",
       "nextUnlockTier": "Nog {points} punten tot het volgende niveau: de kans op meesterwerk stijgt",
       "nextUnlockSpecialized": "Nog {points} punten tot Gespecialiseerd: materiaalkosten dalen",
@@ -3167,6 +3345,14 @@ export const nl_NL: EnTranslations = {
       "denyNotCrafted": "Vervaardig eerst het bestelde stuk (met de opdrachtschakelaar aan).",
       "denyOutOfRange": "Je moet in de buurt van de aanvrager zijn om een opdracht af te leveren.",
       "denyNoSpace": "De aanvrager heeft geen ruimte in de tassen."
+    },
+    "bgOffer": {
+      "title": "Thornhollow Fields is ready",
+      "accepted": "{accepted} of {size} ready",
+      "remaining": "{seconds}s to answer",
+      "accept": "Accept",
+      "decline": "Decline",
+      "acceptedWait": "Waiting for the others..."
     },
     "finder": {
       "title": "Kerkerzoekmachine",
@@ -5183,7 +5369,7 @@ export const nl_NL: EnTranslations = {
         "logging": "Houtkap velt hout uit houtopstanden over de hele wereld: ijzerschors in Oostbeekdal, essenhout in Slijkveenmoeras, hoogden in Doorntop-Hoogten, en startopstanden in elke jongere zone, de ruwe voorraad voor stelen, staven en de werkbank van de knutselaar. Vanaf niveau 1 voor iedereen open met een kapbijl in je tassen (20 koper aan de balies van Oostbeek, Fenbridge en Highwatch), bijgehouden op een eigen teller tot een grens van 100.",
         "herbalism": "Kruidenkunde verzamelt wat in het wild groeit: glansloofkruid in Oostbeekdal, goudblad in Slijkveenmoeras, zonnebloem in Doorntop-Hoogten, en startvelden in elke jongere zone, het blad en de stengel die de apothekersvakken aan het brouwen houden. Vanaf niveau 1 voor iedereen open met een kruidenkunde-sikkel in je tassen (20 koper aan de balies van Oostbeek, Fenbridge en Highwatch), bijgehouden op een eigen teller tot een grens van 100.",
         "fishing": "Vissen is de vreemde eend onder de verzamelvakken, en het diepste: een echt aanslaan-en-inhalen-minispel, eigen vangsttabellen in elk van de drie kernlandzones (de jonge wateren daarbuiten bedienen voorlopig allemaal de tabel van het Dal), en een vaardigheidsgrens van 200, het dubbele van de rest. Koop een hengel, keer je naar open water, en werp uit.",
-        "farming": "Farming is the one gathering trade you tend rather than take: crops raised from seed in worked beds, then pulled up ripe for the kitchens and the apothecary benches. Its beds, seeds, and tools arrive in a later patch, so the tables below stand empty for now. That is deliberate rather than an oversight: the trade holds its seat on the gathering counter, tracked to a cap of 100, and fills in as its content lands."
+        "farming": "Farming is the one gathering trade you tend rather than take: crops raised from seed in worked garden beds, growing on their own clock whether you stay or go, and pulled up ripe when you come back. Every farming hub keeps a bed site of its own, from the Eastbrook allotments up to the Evergarden parterre, and each rung of that ladder grows its own pair of crops, each with a finer grade for a practiced hand to pull. A hoe opens the work: the garden hoe covers the starter beds, and engineers craft the rungs above it for the tougher ground. Tracked on its own counter to a cap of 100."
       },
       "rhythmHeading": "Het verzamelritme",
       "rhythmBody": "Een oogst is een korte zichtbare worp, geen directe greep: {base} seconden basis, nooit onder een ondergrens van {floor} seconde. Gereedschap dragen boven de rang van het grondstoffenpunt, dat je vaardigheid je laat hanteren, versnelt je met {tool} seconde per rang daarboven, en elke vaardigheidsband die je passeert knipt er nog {band} seconde af; de rang van het grondstoffenpunt alleen maar evenaren brengt je door de deur, het zijn de rangen daarboven die je snel maken.\n\nEen volle tas weigert de worp beleefd voordat die begint, zodat er niets halverwege de zwaai verloren gaat, en elke oogst betaalt een klein plakje personage-XP, geschaald naar het niveau van het grondstoffenpunt tegenover het jouwe zoals kill-XP schaalt: een triviaal grijs grondstoffenpunt leert een afgetopt personage niets.",
@@ -5215,7 +5401,7 @@ export const nl_NL: EnTranslations = {
         "logging": "Je eerste grondstoffenpunt van een beroep verdient Vruchten van het Veld, en de grens van 100 in Houtkap schrijft Kernhouthakker in. 100 bereiken in drie van Mijnbouw, Houtkap, Kruidenkunde en Vissen voegt Meesterverzamelaar toe bij 25 Roem, en een slag in oud kernhout legt zijn eigen verzamelaarsmerk vast. Daden zijn titels en Roem, nooit macht.",
         "herbalism": "Je eerste grondstoffenpunt van een beroep verdient Vruchten van het Veld, en de grens van 100 in Kruidenkunde schrijft Meester van de Weide in. 100 bereiken in drie van Mijnbouw, Houtkap, Kruidenkunde en Vissen voegt Meesterverzamelaar toe bij 25 Roem, en een maanverlichte bloem legt zijn eigen verzamelaarsmerk vast. Daden zijn titels en Roem, nooit macht.",
         "fishing": "De mijlpaal van 100 schrijft Oude Zout in en 200 schrijft Meesterhengelaar in met zijn titel, de absolute top van de hengelaarskunst; Vissen telt ook mee voor Meesterverzamelaar, verdiend bij 100 in drie willekeurige verzamelvakken. Een eerste vis uit de wateren van elk van zes zones vult een eigen pagina, de drie kernlandzones en daarbuiten Het Wilgenveen, De Windkam en De Verrekust, en de Zonglinstering-Koi legt Glinstering van Hoop vast, dus reizigers met een hengel in hun bagage vullen hun boek sneller dan ze verwachten.",
-        "farming": "Farming keeps no deeds of its own yet: its beds are still to come, and the milestone and cap deeds that mark the other trades arrive alongside them. Proficiency in it already counts toward Master Gatherer, which is earned at 100 in any three gathering trades, so a farmer will fill that page the same way everyone else does. Deeds are titles and Renown only, never power."
+        "farming": "Farming keeps no deeds of its own yet: now that its beds and crops are in the ground, the milestone and cap deeds that mark the other trades arrive in a later patch. Proficiency in it already counts toward Master Gatherer, which is earned at 100 in any three gathering trades, so a farmer will fill that page the same way everyone else does. Deeds are titles and Renown only, never power."
       },
       "fish": {
         "startHeading": "Aan de slag",
@@ -7269,6 +7455,9 @@ export const nl_NL: EnTranslations = {
   "gpuNotice": {
     "bodyDesktop": "Het spel draait zonder GPU-versnelling en zal traag zijn. Werk je grafische stuurprogramma's bij en herstart het spel. Stel op Windows ook het spel in op Hoge prestaties via Instellingen, Systeem, Beeldscherm, Afbeeldingen.",
     "bodyWeb": "Het spel draait zonder GPU-versnelling en zal traag zijn. Schakel hardwareversnelling in je browserinstellingen in, werk je grafische stuurprogramma's bij en herstart je browser.",
+    "hybridBodyWindows": "This session is rendering on the integrated (power-saving) GPU. If this computer also has a discrete gaming GPU, set your browser to High performance under Settings > System > Display > Graphics, then restart it. The desktop app picks the discrete GPU automatically.",
+    "hybridBodyLinux": "This session is rendering on the integrated (power-saving) GPU. If this computer also has a discrete gaming GPU, your browser or graphics driver may offer its own GPU selection setting, or your distribution may offer a GPU switching tool (such as PRIME or optimus-manager). The desktop app picks the discrete GPU automatically.",
+    "hybridBodyOther": "This session is rendering on the integrated (power-saving) GPU. If this computer also has a discrete gaming GPU, check your browser and operating system graphics settings to enable it. The desktop app picks the discrete GPU automatically.",
     "dismiss": "Sluiten"
   },
   "perfNudge": {
@@ -7730,6 +7919,7 @@ export const nl_NL: EnTranslations = {
       "deathRecapAbility": "Je bent gestorven. Gedood door {ability}.",
       "deathRecapFalling": "Je bent gestorven. Je bent te pletter gevallen.",
       "deathRecapDrowned": "Je bent gestorven. Je bent verdronken.",
+      "deathRecapCauterized": "You have died. Cauterize's burn overwhelmed you.",
       "respawn": "Je voelt je uitgerust en weer heel.",
       "ignoringChat": "Chat van {name} wordt genegeerd.",
       "noLongerIgnoring": "{name} wordt niet langer genegeerd.",
@@ -7773,6 +7963,7 @@ export const nl_NL: EnTranslations = {
       "outOfRange": "Buiten bereik.",
       "noTarget": "Je hebt geen doelwit.",
       "tooClose": "Te dichtbij!",
+      "mustTargetAlly": "You must target an ally.",
       "facing": "Je moet naar je doelwit gekeerd staan.",
       "targetHealthBelow": "Die vaardigheid vereist dat het doelwit onder {percent}% gezondheid is.",
       "dagger": "Je moet een dolk hanteren.",
@@ -9390,6 +9581,10 @@ export const nl_NL: EnTranslations = {
       "die_by_sword": {
         "name": "Door het Zwaard",
         "description": "Defensieve afkoeltijd: gedurende 8 sec loop je 30% minder schade op en ontwijk je veel meer aanvallen."
+      },
+      "intervene": {
+        "name": "Intervene",
+        "description": "Rush to a friendly player, shielding them from {damage} damage for 6 sec."
       },
       "recklessness": {
         "name": "Roekeloosheid",
@@ -11244,6 +11439,81 @@ export const nl_NL: EnTranslations = {
       },
       "growth_tonic": {
         "name": "Growth Tonic"
+      },
+      "brook_carrot_seed": {
+        "name": "Brook Carrot Seed"
+      },
+      "brook_carrot": {
+        "name": "Brook Carrot"
+      },
+      "fine_brook_carrot": {
+        "name": "Fine Brook Carrot"
+      },
+      "marsh_rice_seed": {
+        "name": "Marsh Rice Seed"
+      },
+      "marsh_rice": {
+        "name": "Marsh Rice"
+      },
+      "fine_marsh_rice": {
+        "name": "Fine Marsh Rice"
+      },
+      "bog_beet_seed": {
+        "name": "Bog Beet Seed"
+      },
+      "bog_beet": {
+        "name": "Bog Beet"
+      },
+      "fine_bog_beet": {
+        "name": "Fine Bog Beet"
+      },
+      "highland_barley_seed": {
+        "name": "Highland Barley Seed"
+      },
+      "highland_barley": {
+        "name": "Highland Barley"
+      },
+      "fine_highland_barley": {
+        "name": "Fine Highland Barley"
+      },
+      "frost_gourd_seed": {
+        "name": "Frost Gourd Seed"
+      },
+      "frost_gourd": {
+        "name": "Frost Gourd"
+      },
+      "fine_frost_gourd": {
+        "name": "Fine Frost Gourd"
+      },
+      "gilded_sunmelon_seed": {
+        "name": "Gilded Sunmelon Seed"
+      },
+      "gilded_sunmelon": {
+        "name": "Gilded Sunmelon"
+      },
+      "fine_gilded_sunmelon": {
+        "name": "Fine Gilded Sunmelon"
+      },
+      "evergarden_greens_seed": {
+        "name": "Evergarden Greens Seed"
+      },
+      "evergarden_greens": {
+        "name": "Evergarden Greens"
+      },
+      "fine_evergarden_greens": {
+        "name": "Fine Evergarden Greens"
+      },
+      "garden_hoe": {
+        "name": "Garden Hoe"
+      },
+      "bronze_hoe": {
+        "name": "Bronze Hoe"
+      },
+      "skysilver_hoe": {
+        "name": "Skysilver Hoe"
+      },
+      "osmium_hoe": {
+        "name": "Osmium Hoe"
       },
       "conjured_water4": {
         "name": "Getoverd bronwater"

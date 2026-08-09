@@ -8,11 +8,17 @@ import { describe, expect, it } from 'vitest';
 import { CASTLE, CASTLE_GATES, castleLift } from '../src/sim/castle_layout';
 import { Sim } from '../src/sim/sim';
 import { groundHeight } from '../src/sim/world';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 const SEED = 42;
 
 function makeWalker(spot: { x: number; z: number }) {
-  const sim = new Sim({ seed: SEED, playerClass: 'warrior', autoEquip: true });
+  const sim = new Sim({
+    seed: SEED,
+    playerClass: 'warrior',
+    autoEquip: true,
+    world: EMPTY_TEST_WORLD,
+  });
   sim.setPlayerLevel(20);
   const p = sim.player;
   const meta = (

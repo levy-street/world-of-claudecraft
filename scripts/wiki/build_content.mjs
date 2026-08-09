@@ -769,10 +769,12 @@ const profGathering = GATHERING_PROFESSION_IDS.map((id) => {
   const nodeType = Object.keys(NODE_HARVEST_TABLE).find(
     (type) => NODE_HARVEST_TABLE[type].professionId === id,
   );
-  // A gathering profession can be registered before its harvest nodes exist
-  // (farming ships its beds in a later phase). Emit the row with empty tables
-  // and no respawn number instead of failing the build; respawnSeconds is
-  // optional in the emitted type and the page reads it as `?? 0`.
+  // A gathering profession can have NO harvest nodes at all: farming is
+  // fishing-shaped on land (its beds are patch content, never GATHER_NODES
+  // rows), so its node table stays empty forever while its tool ladder
+  // carries the hoes. Emit the row with an empty nodes table and no respawn
+  // number instead of failing the build; respawnSeconds is optional in the
+  // emitted type and the page length-guards the section.
   const harvest = nodeType ? NODE_HARVEST_TABLE[nodeType] : null;
   return {
     ...base,

@@ -45,8 +45,9 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // and stopAutoAttackOnTargetSwitch joining as a send + dispatch pair (issue #1358).
 // This branch adds set_helm as a send + dispatch pair (the paperdoll
 // helmet-visibility eye; helmHidden persists per character like weaponStowed),
-// and inv_sort as a send + dispatch pair (the one-shot bag clean-up; no
-// payload, the sim re-derives the whole arrangement deterministically).
+// inv_sort as a send + dispatch pair (the one-shot bag clean-up; no payload,
+// the sim re-derives the whole arrangement deterministically), and bg_respond
+// as a send + dispatch pair (the battleground queue-pop answer).
 // This branch adds farming's growth phase as two send + dispatch pairs,
 // plant_crop and harvest_crop (sow a crop into a garden bed and pull it back
 // out). Both carry ids only: the seed cost, the pre-rolled growth script, the
@@ -54,8 +55,8 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // for a client to forge. Farming's knobs phase adds convert_husks as a third
 // send + dispatch pair (trade withered husks for compost): NO payload at all,
 // the ratio and batch count resolve sim-side from the sender's own bags.
-const EXPECTED_SEND_COUNT = 195;
-const EXPECTED_DISPATCH_COUNT = 208;
+const EXPECTED_SEND_COUNT = 196;
+const EXPECTED_DISPATCH_COUNT = 209;
 const EXPECTED_DISPATCH_ONLY_COUNT = 13;
 
 // The chat sub-channel routing switch (server/game.ts `switch

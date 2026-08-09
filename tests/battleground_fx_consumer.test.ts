@@ -34,6 +34,8 @@ function bgInfo(flags: [BgFlagInfo, BgFlagInfo]): BgInfo {
     queued: false,
     queueSize: 0,
     firstWinBonusReady: true,
+    proposal: null,
+    requeueIn: 0,
     queuedParty: 0,
     ladder: [],
     match: {

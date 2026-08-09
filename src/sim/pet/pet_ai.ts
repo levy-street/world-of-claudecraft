@@ -66,7 +66,10 @@ const PET_FORCE_RECOVERY_DISTANCE = 96; // beyond this separation, snap after a 
 const PET_PATH_STALE_DISTANCE = 4; // path end this far from the (now-moved) owner: recompute the heel route
 const PET_WAYPOINT_REACHED = 1; // pet within this of the next waypoint: pop it and home on the next leg
 const PET_ASSIST_RANGE = 50; // how far the pet scans for enemies engaging the pair
-const PET_AGGRESSIVE_RANGE = 18; // aggressive pets look for idle enemies this close
+// The pet's own analogue of a wild mob's aggro radius: how far it notices an enemy it
+// was not already told about. Exported because combat/damage.ts scales the pet's
+// stealth-detection radius off the same number, and the two must not drift.
+export const PET_AGGRESSIVE_RANGE = 18; // aggressive pets look for idle enemies this close
 // A pet pulls idle wild mobs by proximity just like its owner. The max mob detection
 // radius is 20 (see the clamp below), so any mob that could notice the pet is within
 // 20yd of it; scanning from the pet (there are at most a handful) keeps this off every
@@ -532,8 +535,19 @@ export function petPickTarget(ctx: SimContext, pet: Entity, owner: Entity): Enti
     if (!petCanSeeTarget(pet, m)) return;
     const engagingUs =
       m.kind === 'mob' && (m.aggroTargetId === owner.id || m.aggroTargetId === pet.id);
+    // "Assist my target": the owner has this thing targeted AND is actually engaged with
+    // it. The proof of engagement is per kind. A mob carries a hate table, so the owner
+    // appearing on it is exact. A player carries none, so before this the player case had
+    // no signal at all beyond a melee swing, and a caster attacking an enemy player with
+    // spells got no assist whatsoever (found in a battleground; it applies to every
+    // player-vs-player fight). inCombat is the equivalent "the owner is fighting" flag,
+    // and it is deliberately NOT target-specific: an owner fighting A while targeting B
+    // sends the pet to B, which is exactly what the assist stance promises.
     const ownerOffense =
-      owner.targetId === m.id && (owner.autoAttack || (m.kind === 'mob' && m.threat.has(owner.id)));
+      owner.targetId === m.id &&
+      (owner.autoAttack ||
+        (m.kind === 'mob' && m.threat.has(owner.id)) ||
+        (m.kind === 'player' && owner.inCombat));
     const aggressive =
       pet.petMode === 'aggressive' && !ownerIdle && dist2d(pet.pos, m.pos) <= PET_AGGRESSIVE_RANGE;
     if (!engagingUs && !ownerOffense && !aggressive) return;
@@ -546,7 +560,15 @@ export function petPickTarget(ctx: SimContext, pet: Entity, owner: Entity): Enti
   return best;
 }
 
+// Stealth detection scales off a BASE RADIUS, not off how far the observer can be
+// interested in something. A mob passes its own aggro radius (mob/targeting.ts), so
+// PET_AGGRESSIVE_RANGE, the pet's analogue of that, is the base of the same ORDER; the
+// 50yd assist RANGE that used to be passed is a scan span, and reusing it as a radius
+// gave the pet roughly three times a mob's reach on a stealthed player. Not the
+// identical rule: a mob's base also carries a level term and the delve detect
+// multiplier, which no pet path has ever applied. Keep this identical to the base
+// combat/damage.ts passes, or a pet could hit what it cannot see.
 function petCanSeeTarget(pet: Entity, target: Entity): boolean {
   if (target.kind !== 'player') return true;
-  return canDetectStealthedTarget(pet, target, PET_ASSIST_RANGE);
+  return canDetectStealthedTarget(pet, target, PET_AGGRESSIVE_RANGE);
 }

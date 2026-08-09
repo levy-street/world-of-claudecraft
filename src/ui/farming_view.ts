@@ -35,6 +35,38 @@ export function farmDeniedLineKey(reason: FarmDeniedReason): TranslationKey {
   return `hudChrome.farming.denied.${reason}`;
 }
 
+/** The toast one farmDenied event renders: the key, plus the tier param when
+ *  the line carries one. Everything except the 'tool' reason resolves through
+ *  farmDeniedLineKey above unchanged.
+ *
+ *  The 'tool' reason is the one arm that can do better than its flat line:
+ *  the event carries the refused crop's id, and the crop record carries the
+ *  tier the step-12 plant gate demanded, so when the id resolves in the crop
+ *  catalog the toast names that tier through the shared
+ *  hudChrome.gathering.tierRequired.farming line (node-path parity: the same
+ *  statement a vein's hover line makes about its pick). A cropId the catalog
+ *  does not carry (content drift between a client and a newer server, the
+ *  farmPlantedTokenId degrade case) falls back to the flat denied.tool line
+ *  rather than rendering a tierless template. */
+export interface FarmDeniedToast {
+  key: TranslationKey;
+  /** Present only on the tier-named tool refusal. The caller formats it. */
+  params?: { tier: number };
+}
+
+export function farmDeniedToast(
+  reason: FarmDeniedReason,
+  cropId: string | undefined,
+): FarmDeniedToast {
+  if (reason === 'tool') {
+    const crop = cropId !== undefined ? farmCropById(cropId) : undefined;
+    if (crop) {
+      return { key: 'hudChrome.gathering.tierRequired.farming', params: { tier: crop.tier } };
+    }
+  }
+  return { key: farmDeniedLineKey(reason) };
+}
+
 /** The item id whose token a farm PLANT line splices. A plant event carries
  *  the crop id, and what the player actually spent is that crop's seed, so
  *  this is the one hop between them: the disenchant/salvage precedent of a
@@ -80,6 +112,18 @@ export function farmWitheredLineKey(count: number | undefined): TranslationKey {
   return isMultiUnitGrant(count)
     ? 'hudChrome.farming.witheredLineQty'
     : 'hudChrome.farming.witheredLine';
+}
+
+/** The seed-back line a tier 3/4 harvest renders, on EITHER outcome, when its
+ *  event carries a positive seedBackCount: the crop handed back seeds beside
+ *  its payout, so the line names the SEED item, resolved from the crop id by
+ *  farmPlantedTokenId above (the same one hop the plant line takes, shared so
+ *  the two lines can never name different items for one crop), with the
+ *  family's quantity split. */
+export function farmSeedBackLineKey(count: number | undefined): TranslationKey {
+  return isMultiUnitGrant(count)
+    ? 'hudChrome.farming.seedBackLineQty'
+    : 'hudChrome.farming.seedBackLine';
 }
 
 /** The line the husk trade renders (the knobs phase's convert_husks command):

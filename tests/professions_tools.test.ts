@@ -161,11 +161,17 @@ describe('gathering tool tier gating (#1123)', () => {
     // "20 copper at any zone hub") needs the entry tools to STAY trivial
     // one-time purchases. Literal buyValue pins so a price rebalance must
     // consciously touch this claim rather than drift past it.
+    // garden_hoe joined the rung with the hoe phase: farming's entry tool is
+    // the same trivial one-time purchase. It is the ONLY vendor-priced hoe:
+    // rungs 2 to 4 are deliberately absent from the 120/400 pins below
+    // because they are craft-only (HOE_RECIPES, engineering at the
+    // toolworks), bought from players rather than counters.
     for (const toolId of [
       'copper_mining_pick',
       'handaxe',
       'gathering_sickle',
       'simple_fishing_pole',
+      'garden_hoe',
     ] as const) {
       expect(ITEMS[toolId]?.buyValue, toolId).toBe(20);
     }
@@ -734,6 +740,9 @@ describe('crafted higher-tier base tools and monster-material gating (#1135)', (
     const logging = [ITEMS.ashwood_axe, ITEMS.elderwood_axe];
     const herbalism = [ITEMS.goldleaf_sickle, ITEMS.sunpetal_sickle];
     const fishing = [ITEMS.stormreel_fishing_rod, ITEMS.tidewrought_fishing_rod];
+    // The hoe phase: farming's ladder tops out at the crafted tier-4
+    // osmium_hoe (HOE_RECIPES work; no tier-5 hoe ships this phase).
+    const farming = [ITEMS.osmium_hoe];
     // DERIVED, not hand-listed: every gatherTool above tier 3, whatever its
     // profession. The four lists are the readable statement of what that set
     // is today, and the cross-check is what makes a future crafted tool land
@@ -744,7 +753,7 @@ describe('crafted higher-tier base tools and monster-material gating (#1135)', (
       (def) => def.use?.type === 'gatherTool' && def.use.tier > 3,
     );
     const craftedIds = new Set(
-      [...mining, ...logging, ...herbalism, ...fishing].map((item) => item.id),
+      [...mining, ...logging, ...herbalism, ...fishing, ...farming].map((item) => item.id),
     );
     expect([...craftedIds].sort()).toEqual(craftedFromContent.map((d) => d.id).sort());
     // THE CLAIM IS "NEVER FOR COPPER", NOT "NEVER ON A COUNTER". Marks are a
@@ -775,6 +784,14 @@ describe('crafted higher-tier base tools and monster-material gating (#1135)', (
       Object.values(DELVE_SHOPS).flatMap((entries) => entries.map((e) => e.itemId)),
     );
     for (const id of craftedIds) {
+      // osmium_hoe is the DELIBERATE exception to the Marks route: the hoe
+      // phase ships no delve Marks fallback row (the hoe block in
+      // content/items.ts, flagged for the maintainer), so craft is its only
+      // mint above rung 1 and the absence is pinned rather than assumed.
+      if (id === 'osmium_hoe') {
+        expect(delveStocked.has(id)).toBe(false);
+        continue;
+      }
       expect(delveStocked.has(id), `${id} needs a Marks route`).toBe(true);
     }
     for (const [profession, tools] of [
@@ -791,6 +808,11 @@ describe('crafted higher-tier base tools and monster-material gating (#1135)', (
       // future counter row cannot quietly price one.
       for (const item of tools) expect(item.buyValue).toBeUndefined();
     }
+    // Farming's single crafted rung, outside the [4, 5] pair loop above
+    // because no tier-5 hoe ships: tier 4 only, and never priced in copper.
+    expect(farming.every(Boolean)).toBe(true);
+    expect(farming.map((item) => gatherToolTier(item, 'farming'))).toEqual([4]);
+    for (const item of farming) expect(item.buyValue).toBeUndefined();
   });
 
   it('the copper sweep is non-vacuous: the counters it reads really do stock things', () => {

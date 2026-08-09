@@ -28,6 +28,11 @@ export const INTERACT_RANGE = 5;
 // code that stays on Sim (the chat router, pickUpObject) and an extracted slice (the
 // Nythraxis encounter's yells + crypt-relic respawn), so they live here, not in sim.ts.
 export const YELL_RANGE = 100;
+// Shared host interest boundary: the renderer destroys ordinary entity views at
+// 96 yards, and the network keeps known entities through this slightly wider
+// hysteresis edge. Offline and server Sims may therefore skip only idle,
+// ownerless mob AI beyond this radius without freezing anything a player sees.
+export const PLAYER_INTEREST_DROP_RADIUS = 100;
 export const OBJECT_RESPAWN = 30;
 // How many of a party member's auras ride the party wire (PartyMemberInfo.auras,
 // the mini icon strip under each party frame row). A cap, not a filter: the first
@@ -4676,6 +4681,12 @@ export type SimEvent = { pid?: number } & (
   // position: the group's 1-based place in the queue line
   | { type: 'bgQueued'; position: number }
   | { type: 'bgUnqueued' }
+  // The queue-pop offer opened for this player: `seconds` is the answer
+  // window. The client opens its Accept/Decline prompt on this event and
+  // polls bgInfo.proposal for the countdown thereafter.
+  | { type: 'bgProposed'; seconds: number }
+  // One more fighter accepted the offer this player is looking at.
+  | { type: 'bgProposalUpdate'; accepted: number }
   | { type: 'bgFound'; team: number }
   | { type: 'bgCountdown'; seconds: number }
   | { type: 'bgStart' }
@@ -5677,7 +5688,10 @@ export type SimEvent = { pid?: number } & (
   // picks the harvest-lives roll resolved, since a fine roll UPGRADES a pick
   // rather than adding one. Both fine fields are absent when no pick upgraded
   // (the effectDepleted precedent: an absent optional keeps the common event
-  // byte-identical to the pre-field wire). Text-free (the gatherResult idiom).
+  // byte-identical to the pre-field wire). `seedBackCount` is the tier 3/4
+  // seed-back roll's payout in crop seeds (the client resolves the seed item
+  // from cropId), present ONLY when positive, the same only-when-true rule.
+  // Text-free (the gatherResult idiom).
   | {
       type: 'farmHarvested';
       pid: number;
@@ -5687,12 +5701,23 @@ export type SimEvent = { pid?: number } & (
       count: number;
       fineItemId?: string;
       fineCount?: number;
+      seedBackCount?: number;
     }
   // Farming: a plot that lost its survival pre-roll was cleared, paying
   // `count` withered husks instead of produce. Emitted at HARVEST, never at
   // the growth deadline: nothing rots and no timer fires, so the player learns
-  // the outcome when they come to collect. Text-free (the gatherResult idiom).
-  | { type: 'farmWithered'; pid: number; bedId: string; cropId: string; count: number }
+  // the outcome when they come to collect. `seedBackCount` mirrors
+  // farmHarvested's field (the tier 3/4 seed-back roll fires on BOTH
+  // outcomes; the withered consolation is deliberate), present ONLY when
+  // positive. Text-free (the gatherResult idiom).
+  | {
+      type: 'farmWithered';
+      pid: number;
+      bedId: string;
+      cropId: string;
+      count: number;
+      seedBackCount?: number;
+    }
   // Farming: a plant or harvest was refused. Personal and text-free (the
   // gatherDenied idiom): the client composes its own localized copy off
   // `reason`. `bedId` and `cropId` are present when the refusing arm KNOWS
@@ -5719,7 +5744,12 @@ export type SimEvent = { pid?: number } & (
         | 'no_husks'
         | 'no_compost'
         | 'no_fee_produce'
-        | 'no_tonic';
+        | 'no_tonic'
+        // The hoe phase, appended: the step-12 hoe gate refused the plant (no
+        // WIELDABLE farming hoe covering the crop's tier in bags; one reason
+        // for both the no-hoe and the tier-short case, like gatherDenied's
+        // tool arm).
+        | 'tool';
       bedId?: string;
       cropId?: string;
     }
@@ -6031,11 +6061,11 @@ export interface SimConfig {
   // host reads it, the sim never does), so the parity/determinism gates are untouched.
   perfLap?: (phase: string, entity?: Entity) => void;
   // Distance-cull throttle: when positive, idle ownerless mobs farther than this many
-  // world units from every player skip their per-tick idle AI. Per host: the offline
-  // browser Sim and every deterministic golden/test Sim leave it unset (0, fully live,
-  // draw-order stable); the live GameServer sets it to INTEREST_DROP_RADIUS (the same
-  // distance a mob stays known/rendered to a viewer, see server/game.ts, #2703); the
-  // headless RL env sets its own throttle (headless/env_server.ts).
+  // world units from every player skip their per-tick idle AI. The offline browser and
+  // live GameServer set it to PLAYER_INTEREST_DROP_RADIUS; deterministic tests leave it
+  // unset unless they are explicitly pinning the culling contract. The headless RL env
+  // keeps its own intentional 80-unit throttle (headless/env_server.ts). Positive values
+  // also move every passive idle roll to the per-mob lane; see mob/idle_rng.ts.
   idleMobTickRadius?: number;
   // When true, the Sowfield auto-runs a bot-vs-bot showcase match after a stretch
   // of no queue activity, so a walk-up spectator always has a game to watch (and

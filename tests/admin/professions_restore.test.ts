@@ -282,10 +282,16 @@ describe('restoreSlotBodyError refuses statically impossible pairs before any au
     expect(restoreSlotBodyError({ professionId: 'mining', effectId: 'quickening_charm' })).toBe(
       'that effect cannot be slotted on that profession',
     );
-    // Farming joined shipless (no hoe until its tool phase), a third static
-    // class: the REST validator must refuse it HERE, ahead of the audit
-    // write, not just the sim action layer that re-checks defensively.
-    expect(restoreSlotBodyError({ professionId: 'farming', effectId: 'gatherers_cache' })).toBe(
+    // The hoe phase lifted farming's shipless refusal: a live-effect farming
+    // pair now validates like the mining control (the audit-first ordering is
+    // unchanged, only the pair policy admitted the pair).
+    expect(
+      restoreSlotBodyError({ professionId: 'farming', effectId: 'gatherers_cache' }),
+    ).toBeNull();
+    // The still-refused farming control: Springback (kind respawnSpeed) stays
+    // statically impossible on farming via the kind arm, like every land
+    // profession, so the validator refusal ahead of the audit write survives.
+    expect(restoreSlotBodyError({ professionId: 'farming', effectId: 'quickening_charm' })).toBe(
       'that effect cannot be slotted on that profession',
     );
     // A valid pair still passes: the policy gate must not over-refuse.

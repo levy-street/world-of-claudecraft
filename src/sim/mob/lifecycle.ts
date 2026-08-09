@@ -150,8 +150,9 @@ export function respawnMob(ctx: SimContext, mob: Entity): void {
   mob.leapReadyAt = undefined;
   mob.leapBurnPending = undefined;
   mob.wardOneHit = undefined;
-  // A fresh life re-seeds the idle timer, so an off-stream mob rolls it off-stream
-  // too (idleRng's fallback IS ctx.rng, so every other mob's draw is unmoved).
+  // A fresh life re-seeds the idle timer through the same passive lane. An explicit
+  // off-stream mob leaves the shared lane untouched; a distance-culling config routes
+  // every mob here privately and intentionally has a different shared RNG digest.
   mob.wanderTimer = wanderPause(idleRng(ctx, mob), mob, 2, 8);
   if (mob.templateId === NYTHRAXIS_BOSS_ID) ctx.resetNythraxisEncounter(mob);
   for (const meta of ctx.players.values()) {

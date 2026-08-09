@@ -394,6 +394,7 @@ describe('farmPlanted is a HEAVY_SELF_EVENTS member: the planter self-mirror re-
     const pid = session.pid as number;
     standAtBed(server, pid, BED);
     server.sim.addItem('vale_wheat_seed', 1, pid);
+    server.sim.addItem('garden_hoe', 1, pid); // the step-12 hoe gate
     // FLUSH THE SETUP FIRST. Granting the seed emits its own `loot` event, and
     // events sit in the sim buffer until a tick drains them, so without this
     // the plant tick would route the SETUP's loot (itself a member) and dirty
@@ -484,6 +485,7 @@ describe('a plot change reaches the planter in the very next snapshot', () => {
     const pid = session.pid as number;
     standAtBed(server, pid, BED);
     server.sim.addItem('vale_wheat_seed', 1, pid);
+    server.sim.addItem('garden_hoe', 1, pid); // the step-12 hoe gate
 
     // Baseline: a broadcast BEFORE the plant, so the client's mirror already
     // holds the empty plot set and the assertion below cannot pass on a
@@ -520,6 +522,7 @@ describe('a plot change reaches the planter in the very next snapshot', () => {
     const pid = session.pid as number;
     standAtBed(server, pid, BED);
     server.sim.addItem('vale_wheat_seed', 1, pid);
+    server.sim.addItem('garden_hoe', 1, pid); // the step-12 hoe gate
     server.sim.addItem('compost', 1, pid);
     server.sim.addItem('growth_tonic', 1, pid);
     server.sim.addItem('vale_wheat', 2, pid);
@@ -562,6 +565,7 @@ describe('a plot change reaches the planter in the very next snapshot', () => {
     const pid = session.pid as number;
     standAtBed(server, pid, BED);
     server.sim.addItem('vale_wheat_seed', 1, pid);
+    server.sim.addItem('garden_hoe', 1, pid); // the step-12 hoe gate
     server.handleMessage(
       session,
       JSON.stringify({ t: 'cmd', cmd: 'plant_crop', bed: BED, crop: CROP }),
@@ -608,11 +612,17 @@ describe('the four farm events reach the actor, and only the actor', () => {
     return { session, fc };
   }
 
-  function farmEvents(sent: unknown[], type: string): { pid?: number }[] {
+  interface FarmEventFrame {
+    pid?: number;
+    reason?: string;
+    seedBackCount?: number;
+  }
+
+  function farmEvents(sent: unknown[], type: string): FarmEventFrame[] {
     return (sent as { t?: string; list?: { type?: string; pid?: number }[] }[])
       .filter((m) => m.t === 'events')
       .flatMap((m) => m.list ?? [])
-      .filter((e) => e.type === type) as { pid?: number }[];
+      .filter((e) => e.type === type) as FarmEventFrame[];
   }
 
   it('delivers farmPlanted and farmDenied to the planter, never to a bystander', () => {
@@ -623,6 +633,7 @@ describe('the four farm events reach the actor, and only the actor', () => {
     standAtBed(server, pid, BED);
     standAtBed(server, bystander.pid as number, BED);
     server.sim.addItem('vale_wheat_seed', 1, pid);
+    server.sim.addItem('garden_hoe', 1, pid); // the step-12 hoe gate
     routeTick(server);
     fc.sent.length = 0;
     bystanderFc.sent.length = 0;
@@ -696,6 +707,7 @@ describe('the four farm events reach the actor, and only the actor', () => {
     const pid = session.pid as number;
     standAtBed(server, pid, BED);
     server.sim.addItem('vale_wheat_seed', 2, pid);
+    server.sim.addItem('garden_hoe', 1, pid); // the step-12 hoe gate
     server.handleMessage(
       session,
       JSON.stringify({ t: 'cmd', cmd: 'plant_crop', bed: BED, crop: CROP }),
@@ -735,5 +747,124 @@ describe('the four farm events reach the actor, and only the actor', () => {
     routeTick(server);
     expect(farmEvents(fc.sent, 'farmWithered')).toHaveLength(1);
     expect(farmEvents(fc.sent, 'farmHarvested')).toHaveLength(0);
+  });
+
+  it('carries a POSITIVE seedBackCount on a tier-3 farmHarvested frame, to the actor only', () => {
+    // The wire half of the seed-back contract: the sim-level band arms
+    // (tests/professions_farming.test.ts) prove the roll and the grant, but
+    // nothing else proves the OPTIONAL field survives the event routing to
+    // the actor's socket. The seed-back roll is a REAL ctx.rng draw on the
+    // server's shared WORLD_SEED stream, so which band pays here is fixed by
+    // this test's exact command sequence, and it was PROBED the way the sim
+    // suite documents its band seeds (run once per candidate sequence, read
+    // the frame): with no pre-plants the recorded roll sits in the zero band
+    // (server ticks draw nothing in this fixture, so extra routeTicks cannot
+    // move it), and the two tier-1 pre-plants below (two draws each) seat
+    // the barley harvest's roll in the ONE-SEED band. The assertion is > 0
+    // rather than the band literal so a band-width retune only reds this arm
+    // if the roll stops paying at all; re-probe by varying the pre-plant
+    // count if it ever does.
+    const server = new GameServer();
+    const { session, fc } = joinWithSocket(server, 1, 'Barley');
+    const { fc: bystanderFc } = joinWithSocket(server, 2, 'Bystander');
+    const pid = session.pid as number;
+    const T3_BED = 'bed_thornpeak_1';
+    // Tier 3 admission: the wieldable tier-3 hoe (skysilver wields at
+    // Farming 70), proficiency 75, and the barley seed.
+    const meta = server.sim.meta(pid);
+    if (!meta) throw new Error('no meta for the actor');
+    meta.gatheringProficiency.farming = 75;
+    server.sim.addItem('skysilver_hoe', 1, pid);
+    server.sim.addItem('highland_barley_seed', 1, pid);
+    server.sim.addItem('vale_wheat_seed', 2, pid);
+    // The two probed stream-seating pre-plants (see the banner): tier-1
+    // wheat at the two neighbor beds, each landed from its own bed (the
+    // 5 yard pitch keeps one stance from reaching two beds) with the flavor
+    // cast cleared between commands.
+    const actor = server.sim.entities.get(pid);
+    for (const preBed of ['bed_thornpeak_2', 'bed_thornpeak_3']) {
+      standAtBed(server, pid, preBed);
+      server.handleMessage(
+        session,
+        JSON.stringify({ t: 'cmd', cmd: 'plant_crop', bed: preBed, crop: CROP }),
+      );
+      if (actor) {
+        actor.castingAbility = null;
+        actor.castRemaining = 0;
+      }
+    }
+    expect(meta.farmPlots.size).toBe(2); // both pre-plants really drew their two
+    standAtBed(server, pid, T3_BED);
+    server.handleMessage(
+      session,
+      JSON.stringify({ t: 'cmd', cmd: 'plant_crop', bed: T3_BED, crop: 'highland_barley' }),
+    );
+    // The suite's plot-write idiom: force ready, force the survival win (this
+    // arm is about the harvest frame, not the wither branch), clear the
+    // flavor cast.
+    const plot = meta.farmPlots.get(T3_BED);
+    if (!plot) throw new Error('the tier-3 plant did not land');
+    plot.readyAtMs = 0;
+    plot.survivalRoll = 0;
+    const player = server.sim.entities.get(pid);
+    if (player) {
+      player.castingAbility = null;
+      player.castRemaining = 0;
+    }
+    routeTick(server);
+    fc.sent.length = 0;
+    bystanderFc.sent.length = 0;
+
+    server.handleMessage(session, JSON.stringify({ t: 'cmd', cmd: 'harvest_crop', bed: T3_BED }));
+    routeTick(server);
+
+    const frames = farmEvents(fc.sent, 'farmHarvested');
+    expect(frames).toHaveLength(1);
+    expect(frames[0].pid).toBe(pid);
+    // Present AND positive: the emitter omits zero (the omit-zero doctrine),
+    // so presence alone would be satisfied by any positive band, and the
+    // explicit > 0 keeps the claim honest about what the field means.
+    expect(frames[0].seedBackCount).toBeDefined();
+    expect(frames[0].seedBackCount as number).toBeGreaterThan(0);
+    // The grant is real on the authoritative bags (the drive granted exactly
+    // one seed and the plant spent it, so the bag IS the seed-back).
+    expect(server.sim.countItem('highland_barley_seed', pid)).toBe(
+      frames[0].seedBackCount as number,
+    );
+    // Personal means personal, seed-back included.
+    expect(farmEvents(bystanderFc.sent, 'farmHarvested')).toHaveLength(0);
+  });
+
+  it("delivers the farmDenied 'tool' refusal (hoe-less plant) to the actor only", () => {
+    // The step-12 hoe gate's refusal over the live wire: the seed IS in bags
+    // (the hoe gate sits after the seed gate, so a seedless plant would deny
+    // 'no_seed' instead and this arm would prove nothing about the tool arm),
+    // and no hoe is. The reason field is asserted, not just the event type:
+    // the client's toast selection (farmDeniedToast) keys on it, and for
+    // 'tool' also reads the frame's cropId for the tier-named line.
+    const server = new GameServer();
+    const { session, fc } = joinWithSocket(server, 1, 'Hoeless');
+    const { fc: bystanderFc } = joinWithSocket(server, 2, 'Bystander');
+    const pid = session.pid as number;
+    standAtBed(server, pid, BED);
+    server.sim.addItem('vale_wheat_seed', 1, pid);
+    routeTick(server);
+    fc.sent.length = 0;
+    bystanderFc.sent.length = 0;
+
+    server.handleMessage(
+      session,
+      JSON.stringify({ t: 'cmd', cmd: 'plant_crop', bed: BED, crop: CROP }),
+    );
+    routeTick(server);
+
+    const denials = farmEvents(fc.sent, 'farmDenied');
+    expect(denials).toHaveLength(1);
+    expect(denials[0].pid).toBe(pid);
+    expect(denials[0].reason).toBe('tool');
+    expect(farmEvents(bystanderFc.sent, 'farmDenied')).toHaveLength(0);
+    // Refused means refused: nothing planted, nothing spent.
+    expect(server.sim.meta(pid)?.farmPlots.has(BED)).toBe(false);
+    expect(server.sim.countItem('vale_wheat_seed', pid)).toBe(1);
   });
 });

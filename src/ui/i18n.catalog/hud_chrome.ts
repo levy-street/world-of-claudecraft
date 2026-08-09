@@ -1415,7 +1415,8 @@ export const hudChromeStrings = {
   // Performance overlay (the customizable in-game stats panel + its Options
   // sub-view). Player-facing, so every label is a key here; the live numbers in
   // the overlay run through formatNumber and these unit strings. Distinct from
-  // the dev `?perf` diagnostic, which stays English like console.*.
+  // the older dev `?perf` trace output, which stays English like console.*. The real-DOM
+  // `?diagnostics=1` panel below is localized because its chrome is user-visible.
   perf: {
     title: 'Performance Overlay',
     enable: 'Show Performance Overlay',
@@ -1492,6 +1493,193 @@ export const hudChromeStrings = {
     badges: {
       backgrounded: 'Backgrounded',
       offline: 'Offline',
+    },
+    diagnostics: {
+      panelAria: 'World of ClaudeCraft performance diagnostics',
+      title: 'ClaudeCraft Performance Doctor',
+      subtitle: 'A game-specific scan with evidence and code-level fixes.',
+      aria: {
+        liveMeasurements: 'Live performance measurements',
+        scanProgress: 'Diagnostic scan progress',
+        findings: 'Ranked diagnostic findings',
+      },
+      controls: {
+        minimize: 'Minimize',
+        expand: 'Expand',
+        start: 'Start 15-second scan',
+        refreshCensus: 'Refresh scene census',
+        copyReport: 'Copy clear report',
+        downloadReport: 'Download report',
+        scanning: 'Scanning...',
+        scanAnother: 'Scan another area',
+        reportLogged: 'Report logged to console',
+        copied: 'Copied',
+        copyBlocked: 'Copy blocked: report logged',
+        retestLowGraphics: 'Retest on Low graphics',
+      },
+      instruction:
+        'For the best signal, enter Play Offline, move through the slow area, rotate the camera, and trigger the effect that stutters while the scan is running.',
+      status: {
+        pausedHiddenRestart:
+          'Scan paused while this tab is hidden. It will restart when you return.',
+        restoredRestart: 'Tab restored. Restarting a clean 15-second active-gameplay capture.',
+        worldLoaded: 'World loaded. Waiting for the first playable frame.',
+        pausedHiddenContinue:
+          'Scan paused while this tab is hidden. Return to the game to continue.',
+        collectingRemaining: {
+          one: 'Collecting active gameplay: {seconds} second remaining',
+          other: 'Collecting active gameplay: {seconds} seconds remaining',
+        },
+        waitingFrames: 'Waiting for representative gameplay frames: {current}/{minimum}',
+        collectingNow: 'Collecting active gameplay: move through the problem area now.',
+        ready: 'Ready to scan. Press Start and reproduce the slowdown.',
+        waitingWorld:
+          'Waiting for the game world. Choose Play Offline or enter an online character.',
+      },
+      metrics: {
+        waitingRenderer: 'renderer: waiting',
+        waitingCensus: 'scene census: waiting',
+        waitingHitch: 'hitch attribution: armed on world entry',
+        recent: 'recent  {fps} FPS | p95 {p95} ms | >50 ms {longFrames}',
+        render: 'render  submit {submit} ms | world {world} ms | entities {entities} ms',
+        scene: 'scene   {calls} calls | {triangles} tris | {views} views',
+        hitches: 'hitches {hitches} | shaders {shaders} | uploads {uploads} | views {views}',
+        gpu: 'GPU     {renderer}',
+        waitingValue: 'waiting',
+      },
+      scoreHeadline: '{score}/100: {headline}',
+      healthyNoFindings:
+        'No actionable threshold fired. If a short hitch still bothers you, rerun the scan along the exact movement path that triggers it.',
+      findingMeta: '{severity} | {confidence} confidence',
+      sections: {
+        evidence: 'Evidence',
+        tryNow: 'Try now',
+        codeFix: 'Code fix',
+        source: 'Relevant source',
+      },
+      severity: {
+        critical: 'CRITICAL',
+        warning: 'WARNING',
+        info: 'INFO',
+      },
+      confidence: {
+        high: 'high',
+        medium: 'medium',
+        low: 'low',
+      },
+      diagnosis: {
+        noProblemTitle: 'No material performance problem detected',
+        summary: {
+          findings: {
+            one: '{findings} actionable finding from the last 10 seconds at {fps} FPS and {p95} frame p95.',
+            other:
+              '{findings} actionable findings from the last 10 seconds at {fps} FPS and {p95} frame p95.',
+          },
+          healthy:
+            'The last 10 seconds held {fps} FPS with a {p95} frame p95. No game, browser, GPU, memory, asset, or network threshold fired.',
+        },
+        titles: {
+          hardwareAcceleration: 'Software rendering is active',
+          integratedGpu: 'The game is using the integrated GPU',
+          highDpi: 'High resolution rendering is expensive here',
+          forcedHighGraphics: 'Forced high graphics is reducing performance',
+          lowMemory: 'Available device memory is low',
+          browserStalls: 'Browser or extension stalls were detected',
+          heapPressure: 'Browser memory pressure was detected',
+          contextLoss: 'The graphics context was reset',
+          gpuSubmit: 'GPU submission is the main frame bottleneck',
+          sceneDraw: 'Scene draw cost exceeds the active graphics budget',
+          shadowPass: 'The shadow pass uses a large share of draw calls',
+          rendererWorld: 'World renderer updates are CPU-bound',
+          rendererEntities: 'Entity view updates are CPU-bound',
+          rendererNameplates: 'Nameplate painting is expensive',
+          simCpu: 'Simulation work is consuming the frame',
+          hudCpu: 'HUD updates are consuming the frame',
+          eventCpu: 'Event processing is consuming the frame',
+          shaderCompile: 'Shaders are compiling during gameplay',
+          textureUpload: 'Texture uploads are causing gameplay hitches',
+          viewCreate: 'Entity view creation is causing hitches',
+          otherHitch: 'Unattributed long frames remain',
+          assetStartup: 'Game startup is delayed by asset work',
+          longTasks: 'Long browser tasks are blocking frames',
+          networkLatency: 'Network delivery is delaying visible response',
+          snapshotApply: 'Snapshot processing is blocking the client',
+          generic: 'Performance rule {rule} needs attention',
+        },
+        causes: {
+          environment:
+            'A detected browser, GPU, memory, or device setting can limit performance before the game renders a frame.',
+          graphics:
+            'Measured graphics work is above the active frame or scene budget for this capture.',
+          cpu: 'A measured CPU phase is taking enough main-thread time to miss the frame budget.',
+          loading:
+            'Resource preparation or first-use work happened on a visible gameplay or startup path.',
+          network:
+            'Network delivery or client snapshot processing is delaying the latest playable state.',
+        },
+        evidence: {
+          environment: 'The environment rule {rule} matched this device and browser.',
+          gpuSubmit: 'WebGL submission p95 is {submit}, or {share} of renderer p95.',
+          frame: 'The recent window measured {fps} FPS with a {p95} frame p95.',
+          sceneCalls: 'The scene uses {calls} draw calls against a target of {target}.',
+          sceneTriangles: 'The scene submits {triangles} triangles against a target of {target}.',
+          sceneCategory:
+            'Scene category {category} contributes {calls} calls and {triangles} measured triangles.',
+          censusNeeded: 'Refresh the scene census to identify the leading render category.',
+          shadow:
+            'The shadow pass submits {calls} calls, {share} of the baseline, and {triangles} triangles.',
+          cpuPhase: 'Measured phase {phase} has a p95 of {p95}.',
+          hitch: '{count} of {total} recorded hitches matched cause {cause}.',
+          assets: 'The preload gate waited {wait} for {tasks} registered tasks.',
+          failedAssets: 'Failed asset groups: {groups}.',
+          longTasks: '{count} long tasks were measured, with p95 {p95} and maximum {max}.',
+          network:
+            'Snapshot interval is {interval}, latest age is {age}, and input echo p95 is {echo}.',
+          snapshot: 'Snapshot parse and apply p95 is {work}; network gap p95 is {gap}.',
+          generic: 'Diagnostic rule {rule} matched this capture.',
+        },
+        tryNow: {
+          environment:
+            'Correct the detected environment setting, restart, and repeat the same scan.',
+          graphics: 'Retest the same camera path on Low graphics to confirm graphics pressure.',
+          cpu: 'Repeat the scan while idle and while moving to isolate the CPU phase.',
+          loading: 'Repeat the same route or first-use action to confirm when the hitch occurs.',
+          network: 'Compare Play Offline with the same movement and camera path.',
+        },
+        codeFix: {
+          environment:
+            'Keep the detected fallback path within the shared graphics and memory budgets.',
+          graphics:
+            'Use the existing render budget, instancing, material sharing, LOD, and hidden-work skips.',
+          cpu: 'Profile the named phase, remove repeated work and allocations, and preserve gameplay behavior.',
+          loading:
+            'Preload, pool, or spread the identified first-use work through the existing startup and streaming budgets.',
+          network:
+            'Reduce delivery or snapshot processing cost without weakening the authoritative server model.',
+        },
+      },
+      report: {
+        title: 'World of ClaudeCraft performance diagnosis',
+        statusLine: 'Status: {status} ({score}/100)',
+        capturedLine: 'Captured: {captured}',
+        topFindingLine: 'Top finding: {finding}',
+        summaryLine: 'Summary: {summary}',
+        gpuLine: 'GPU: {gpu}',
+        graphicsLine: 'Graphics: {tier}, render scale {scale}',
+        recentLine:
+          'Recent: {fps} FPS, p95 {p95}, {longFrames} frames over 50 ms, {frames} measured frames',
+        resultHeading: 'Result',
+        noThreshold: 'No actionable threshold fired in this capture.',
+        findingHeading: '{index}. {title}',
+        findingMeta: 'Severity: {severity}. Confidence: {confidence}.',
+        rawSnapshotHeading: 'Raw snapshot',
+        notAvailable: 'not available',
+        status: {
+          critical: 'critical',
+          needsAttention: 'needs attention',
+          healthy: 'healthy',
+        },
+      },
     },
   },
   auraOverlay: {
@@ -3207,9 +3395,18 @@ export const hudChromeStrings = {
       mining: 'Requires a tier {tier} mining pick',
       logging: 'Requires a tier {tier} logging axe',
       herbalism: 'Requires a tier {tier} herbalism sickle',
+      // The farming arm's sink is NOT the node tooltip (farming has no world
+      // nodes): it is the farmDenied 'tool' toast, which names the tier the
+      // refused CROP demands when the event's cropId resolves
+      // (farming_view.ts farmDeniedToast), so the refusal teaches the same
+      // number the node families' hover line does.
+      farming: 'Requires a tier {tier} farming hoe',
     },
     // Tooltip requirement line for tier-1 nodes (#2343: every harvest needs a
     // matching tool, bare hands never gather, so tier 1 needs the base tool).
+    // No farming arm: farming has no nodes, so a tierless "requires a hoe"
+    // line has no surface to render on (the tiered toast above covers the
+    // refusal, falling back to hudChrome.farming.denied.tool).
     requiresTool: {
       mining: 'Requires a mining pick',
       logging: 'Requires a logging axe',
@@ -3286,11 +3483,19 @@ export const hudChromeStrings = {
         // tool family whose tooltip never named the access it buys, so the
         // only way to learn the water refuses you was to be refused.
         fishing: 'Required to fish waters up to tier {tier}.',
+        // The hoe arm says CROPS rather than nodes: what a hoe tier opens is
+        // which crop tiers may be planted (the step-12 gate in
+        // professions/farming.ts), and beds themselves are not tiered nodes.
+        farming: 'Required to plant crops up to tier {tier}.',
       },
       use: {
         mining: 'Use: Mine a nearby ore vein.',
         logging: 'Use: Fell a nearby timber stand.',
         herbalism: 'Use: Gather from a nearby herb patch.',
+        // No "Use:" imperative: a hoe is a passive gate (clicking it starts
+        // nothing; beds are worked by planting and harvesting directly), so
+        // the line states the bags-carried behavior instead of a click.
+        farming: 'Works from your bags when you plant a crop bed.',
       },
       speed: 'Gathers faster at nodes below tier {tier}.',
       rodRequired: 'Required to fish.',
@@ -3356,6 +3561,14 @@ export const hudChromeStrings = {
     // news and says plainly that the crop, not the bed, was lost.
     witheredLine: 'The crop withered. You clear the bed: {name}.',
     witheredLineQty: 'The crop withered. You clear the bed: {name} x{qty}.',
+    // The seed-back sentence (the crop-ladder phase): a tier 3/4 harvest can
+    // hand back seeds beside its payout, on EITHER outcome, so this renders
+    // whenever farmHarvested / farmWithered carries a positive seedBackCount.
+    // Names the SEED as a spliced token (farming_view.ts resolves the crop id
+    // to its seed item, the plant line's shared hop), with the family's
+    // quantity split.
+    seedBackLine: 'You recover seed: {name}.',
+    seedBackLineQty: 'You recover seed: {name} x{qty}.',
     // Refusal toasts, one per farmDenied reason, keyed by the reason id
     // itself so gathering_view.ts resolves them by template literal and no
     // second map can drift. Error toasts only: no line, no cue, no other
@@ -3375,6 +3588,9 @@ export const hudChromeStrings = {
       no_compost: 'You have no compost.',
       no_fee_produce: 'You have no produce to pay the watch fee.',
       no_tonic: 'You have no growth tonic.',
+      // The hoe phase: the step-12 hoe gate's refusal, one line for both the
+      // no-hoe and the tier-short (or wield-short) case.
+      tool: 'You have no farming hoe fit for that crop.',
     },
     // The husk trade's one line (the knobs phase): names BOTH sides of the
     // trade, what left the bags and what arrived, because the compost grant's
@@ -3562,7 +3778,7 @@ export const hudChromeStrings = {
         quickeningCharm: 'Shortens the node respawn timer it triggers.',
       },
       howToSlot:
-        'Slot onto a mining, logging, or herbalism tool from the Professions window. Consumed when slotted.',
+        'Slot onto a mining, logging, herbalism, or farming tool from the Professions window. Consumed when slotted.',
       charges: 'Starts with {base} charges on a common tool (+{bonus} per rarity rung).',
       landOnly: 'Does not slot on fishing rods.',
       openProfessions: 'Open Professions to slot this onto a gathering tool.',
@@ -3589,6 +3805,15 @@ export const hudChromeStrings = {
     // rather than claiming the slot is full.
     toolEffectRechargeToolCapped: 'Carry a better {profession} tool to charge {effect} further.',
     toolEffectRechargeMaterials: 'Recharging {effect} needs {material} x{count}.',
+    // In-progress readouts for the four crafting/gathering-service actions plus
+    // tool-effect recharging (social/chat_readouts.ts describeActiveAction):
+    // countdown chat lines shown while the action channels.
+    craftingProgress: 'You are crafting: {remaining}s of {total}s remaining.',
+    disenchantingProgress: 'You are disenchanting: {remaining}s of {total}s remaining.',
+    enchantingProgress: 'You are enchanting: {remaining}s of {total}s remaining.',
+    salvagingProgress: 'You are salvaging: {remaining}s of {total}s remaining.',
+    rechargingToolEffectProgress:
+      'You are recharging a tool effect: {remaining}s of {total}s remaining.',
     tierPipAria: 'Tier {tier}',
     nextUnlockTier: '{points} points to the next tier: masterwork odds improve',
     nextUnlockSpecialized: '{points} points to Specialized: material costs drop',
@@ -4120,6 +4345,17 @@ export const hudChromeStrings = {
   // Dungeon Finder window (docs/prd/dungeon-finder.md). Dungeon, creature,
   // item, quest, and zone NAMES resolve through tEntity/world_entity_i18n,
   // never through these keys.
+  // The Thornhollow Fields queue-pop prompt (src/ui/hud/battleground/
+  // battleground_proposal_popup.ts). Counts only, never names: the ten have not
+  // been introduced and a decline must not leak who was opposite.
+  bgOffer: {
+    title: 'Thornhollow Fields is ready',
+    accepted: '{accepted} of {size} ready',
+    remaining: '{seconds}s to answer',
+    accept: 'Accept',
+    decline: 'Decline',
+    acceptedWait: 'Waiting for the others...',
+  },
   finder: {
     title: 'Dungeon Finder',
     close: 'Close',

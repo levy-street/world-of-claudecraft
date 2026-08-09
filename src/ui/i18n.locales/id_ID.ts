@@ -450,7 +450,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectTooltip.charges':
     'Dimulai dengan {base} muatan pada alat umum (+{bonus} per anak tangga kelangkaan).',
   'hudChrome.professions.toolEffectTooltip.howToSlot':
-    'Pasangkan pada alat Penambangan, Penebangan, atau Herbalisme dari jendela Profesi. Habis terpakai saat dipasang.',
+    'Pasangkan pada alat Penambangan, Penebangan, Herbalisme, atau Pertanian dari jendela Profesi. Habis terpakai saat dipasang.',
   'hudChrome.professions.toolEffectTooltip.kind': 'Jimat Alat',
   'hudChrome.professions.toolEffectTooltip.landOnly': 'Tidak dapat dipasang pada joran pancing.',
   'hudChrome.professions.toolEffectTooltip.openProfessions':

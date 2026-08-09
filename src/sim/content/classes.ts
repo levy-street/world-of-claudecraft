@@ -5137,7 +5137,10 @@ export const ABILITIES: Record<string, AbilityDef> = {
     learnLevel: 6,
     cost: 0,
     castTime: 0,
-    cooldown: 20,
+    // 30s (was 20s, owner 2026-08-07): the warrior mobility budget in PvP is the
+    // whole point of the level-5 row re-cut above, and Heroic Leap is the other
+    // half of it. Base kit, so this lands on all three specs.
+    cooldown: 30,
     range: 30,
     school: 'physical',
     requiresTarget: false,
@@ -5198,10 +5201,15 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'physical',
     requiresTarget: false,
     // Classic-era shape (25 rage / 3 min / 5 targets / 8 yd / 8 sec) scaled to
-    // the 1-20 band: cost and cooldown tuned down, the fear itself unchanged.
-    effects: [{ type: 'aoeFear', duration: 8, radius: 8, maxTargets: 5 }],
+    // the 1-20 band: cost and cooldown tuned down. The DURATION now diverges too
+    // (owner 2026-08-07, 8 -> 4): classic's 8 sec left the melee class with a
+    // longer fear than either caster whose identity is fear (Psychic Scream 4,
+    // Howl of Terror 3), and PVP_FEAR_DR_RESET (60s) is half this cooldown, so DR
+    // never engages and every cast landed the full 8. 4 anchors on Psychic Scream
+    // rather than on an invented number.
+    effects: [{ type: 'aoeFear', duration: 4, radius: 8, maxTargets: 5 }],
     description:
-      'A terrifying shout that sends up to 5 enemies within 8 yards fleeing in fear for 8 sec. Damage may break the effect.',
+      'A terrifying shout that sends up to 5 enemies within 8 yards fleeing in fear for 4 sec. Damage may break the effect.',
   },
   bladestorm: {
     id: 'bladestorm',
@@ -5284,6 +5292,64 @@ export const ABILITIES: Record<string, AbilityDef> = {
     effects: [{ type: 'selfBuff', kind: 'die_by_sword', value: 0.3, duration: 8 }],
     description:
       'Defensive cooldown: for 8 sec you take 30% less damage and dodge far more attacks.',
+  },
+  // The level-5 mobility row's peel option (replaces Double Charge, which stored a
+  // second Onrush use and, under the parallel per-charge recharge model, handed PvP
+  // warriors two 25-yard gap closers plus two stuns per 15 sec).
+  //
+  // Deliberately NOT a second Onrush: it reuses the `charge` effect but targets a
+  // FRIENDLY player, so it adds mobility and a peel without adding pressure. The row
+  // job is mobility with no direct damage increase (docs/design/class-design-rules.md),
+  // and this carries no damage, no control, and no rage.
+  //
+  // No `specs` field: this ability is ONLY ever reached as a row grant, and grants
+  // bypass the level and spec gates in abilitiesKnownAt, so a `specs` list here would
+  // be dead weight rather than a restriction. (Contrast die_by_sword above, which
+  // carries specs:['arms'] because it is ALSO Arms base kit; its row grant still
+  // reaches every spec.)
+  //
+  // The shield is ranked rather than flat so it tracks the health curve at roughly 6-7%
+  // of maximum health across the band it is usable in (252 hp at level 5, 822 at 20); a
+  // flat value tuned for the cap would be three times as strong at level 5. It is well
+  // under a dedicated healer shield (Psalm of Warding rank 4 absorbs 210) by design.
+  //
+  // Those two claims are the reason for the numbers, so they are PINNED rather than
+  // left as prose: tests/warrior_intervene.test.ts asserts the share of the health
+  // curve at each rank's own unlock level and the ceiling against the healer shield.
+  // An absolutes-only test would have gone green on any re-tune that broke both.
+  intervene: {
+    id: 'intervene',
+    name: 'Intervene',
+    class: 'warrior',
+    learnLevel: 5,
+    cost: 0,
+    castTime: 0,
+    // 30s (owner 2026-08-07), deliberately DOUBLE the hostile Onrush's 15s: this
+    // row exists to reduce the warrior mobility budget in PvP, so the replacement
+    // must not hand back a short-cooldown reposition through the friendly door.
+    cooldown: 30,
+    range: 25,
+    minRange: 8,
+    school: 'physical',
+    requiresTarget: true,
+    targetType: 'friendly',
+    offGcd: true,
+    effects: [{ type: 'charge' }, { type: 'absorb', amount: 18, duration: 6 }],
+    ranks: [
+      {
+        rank: 2,
+        level: 11,
+        cost: 0,
+        effects: [{ type: 'charge' }, { type: 'absorb', amount: 34, duration: 6 }],
+      },
+      {
+        rank: 3,
+        level: 17,
+        cost: 0,
+        effects: [{ type: 'charge' }, { type: 'absorb', amount: 50, duration: 6 }],
+      },
+    ],
+    description: 'Rush to a friendly player, shielding them from $d damage for 6 sec.',
   },
   recklessness: {
     id: 'recklessness',

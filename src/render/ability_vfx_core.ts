@@ -12,6 +12,9 @@
 //   ringScale >= 0 (0 = no ring); NO tier drops the ring, the area telegraph
 //   is actionable, not decoration
 
+import { isFearAura } from '../sim/combat/cc';
+import { ABILITIES } from '../sim/data';
+
 // Compact per-ability visual spec (key legend in ability_vfx_specs.ts header):
 // c=color p=palette pw=power sp=sparks rg=ringScale vr=vRing db=debris
 // sm=smoke bl=blood li=lightScale b=bolt{v:speed,h:headScale,j:jagged,
@@ -353,76 +356,192 @@ export function planImpact(
 //   re-hits share a flat ACCENT_CAP per rolling second (admitAccent) and never
 //   consume a cast slot, so a normal rotation of casts + its own hits + autos
 //   stays tier 0 indefinitely.
-// The persistent stunned-star tell: any worn `kind: 'stun'` aura circles a
-// star band over the victim's head for the aura's whole life. Keyed off the
-// aura KIND, never the spec table, so every stun source (player abilities,
-// mob stomps, traps) reads without authoring a spec. The sequencer's
-// cast-moment ccStars band shares these constants and the same time base and
-// STANDS DOWN for any victim whose band actually WINS a draw slot this frame
-// (heldStunStars on the SequencerHost seam): never a double draw, never a dip
-// where the cast band's fade-out tail hides the held band's full alpha, and
-// never a capped-out victim left with no overhead read at all. A stun is
-// actionable information (the PvP "why can't I act"
-// read), so the painter feeds it outside the cast budget, no quality tier
-// sheds it, and the alpha floor keeps it readable for the stun's whole life
-// (the fade above the floor stays as the duration read).
+// The persistent crowd-control tells: a worn hard-CC aura wears a held band
+// for the aura's whole life. Three types today (stun, fear, root), each keyed
+// off what the SIM says the victim is suffering, never the spec table, so
+// every source (player abilities, mob stomps, ensnare affixes, traps) reads
+// without authoring a spec. The sequencer's cast-moment ccStars band shares
+// the stun geometry and the same time base and STANDS DOWN for any victim
+// whose band actually WINS a draw slot this frame (heldCcBand on the
+// SequencerHost seam): never a double draw, never a dip where the cast band's
+// fade-out tail hides the held band's full alpha, and never a capped-out
+// victim left with no overhead read at all. That stand-down is also what
+// resolves the cast-moment COLOR collision: the 'cc' archetype flashes yellow
+// stars for every control ability including roots and fears, so once a root or
+// fear victim wears its own band, the misleading yellow burst yields to it
+// within a frame instead of claiming the read.
 //
-// Scope note: 'stun' is deliberately the only aura kind here, and that is a
-// scope choice, NOT a claim that the other cannot-act kinds are covered.
-// 'polymorph' genuinely is (the sheep rig keys off the kind, so both its
-// sources read), and both 'stasis' ids carry a read (ice_block's shell,
-// temporal_hourglass's own visual). 'incapacitate' is NOT: that hourglass
-// read is keyed to the aura ID 'temporal_hourglass', so the other nine
-// incapacitate ids (Gouge, Sap, Blind, Fear, Hibernate, Wyvern Sting,
-// Startle Shot, Death Coil, Dragon's Breath) wear nothing persistent.
-// Giving them a band is a separate design call, not an oversight to patch
-// here: they are break-on-damage CC, and a tell that says "hit me and this
-// ends" is a different read from a hard stun's "nothing you do matters".
-export const STUN_STAR_COUNT = 4;
-export const STUN_STAR_RADIUS = 0.45;
-export const STUN_STAR_LIFT = 0.55;
-export const STUN_STAR_RATE = 2.4;
-export const STUN_STAR_SIZE = 0.2;
-export const STUN_STAR_BRIGHTNESS = 2.2;
-// One classic dizzy-stars yellow for EVERY stun source, deliberately not the
-// ability's accent: a tell reads fastest when it looks identical no matter
-// what applied it (low blue channel so the overbright additive draw clamps
-// toward pure yellow, never washes to white).
-export const STUN_STAR_COLOR = 0xffd700;
-export const STUN_STAR_ALPHA_FLOOR = 0.35;
+// Hard CC is actionable information (the "why can't I act" read), so the
+// painter feeds these outside the cast budget, no quality tier sheds them, and
+// the alpha floor keeps them readable for the aura's whole life (the fade
+// above the floor stays as the duration read).
+//
+// Scope note: these three are a scope choice, NOT a claim the remaining
+// cannot-act kinds are uncovered. 'polymorph' genuinely is covered (the sheep
+// rig keys off the kind, so both its sources read) and both 'stasis' ids carry
+// a read (ice_block's shell, temporal_hourglass's own visual). The
+// NON-fear incapacitates still wear nothing persistent: Gouge, Sap, Blind,
+// Hibernate, Wyvern Sting, Startle Shot, Dragon's Breath and the staged-cone
+// daze hold a victim in place and break on the first damage, which is a
+// different read again ("hit me and this ends"), and giving that its own tell
+// stays a separate design call.
+export type CcBandType = 'stun' | 'fear' | 'root';
+
+// Which atlas cell the band's sprites draw from, as the CELL NAME rather than
+// the resolved index: the atlas lives in fx_textures.ts, which imports Three,
+// and this core stays Three-free. The fx engine maps the name once.
+export type CcBandCell = 'star' | 'glow' | 'spark';
+
+export interface CcBandSpec {
+  readonly type: CcBandType;
+  // Draw priority when slots are scarce, lowest first. Ordered by how total
+  // the lockout is: a stun means nothing you do matters, a fear means you are
+  // being run around and cannot act (but damage may end it), a root still
+  // leaves you casting and swinging. When one victim wears several, the most
+  // severe is the one band drawn, which also settles the fact that a stunned
+  // entity is ALWAYS also isRooted() in the sim.
+  readonly severity: number;
+  readonly count: number;
+  readonly radius: number;
+  // Height along the victim's own body: the fraction handed to the anchor
+  // (1 = head, 0 = feet) plus a small world-space offset on top of it.
+  readonly anchorFrac: number;
+  readonly lift: number;
+  readonly rate: number;
+  readonly size: number;
+  readonly brightness: number;
+  readonly color: number;
+  readonly alphaFloor: number;
+  readonly cell: CcBandCell;
+  // Vertical panic bob, in world units (0 = a flat ring). Driven off the
+  // shared fx clock, so it stays deterministic.
+  readonly wobble: number;
+}
+
+// Every band color is chosen for what it looks like AFTER the overbright
+// additive draw clamps it, not on the swatch: a channel at or above
+// 1 / brightness saturates to white. So the dominant channel is pushed up to
+// clamp and the others held low, which is what keeps yellow from washing to
+// white, violet from washing to pink, and green from washing to mint.
+// The three read apart on TWO axes at once, color and motion signature, so the
+// tell survives for a colorblind player: yellow stars ringing the head, violet
+// wisps bobbing above it, green shards turning slowly at the ankles.
+export const CC_BAND_SPECS: Readonly<Record<CcBandType, CcBandSpec>> = {
+  // The classic dizzy-stars yellow, identical for every stun source: a tell
+  // reads fastest when it looks the same no matter what applied it.
+  stun: {
+    type: 'stun',
+    severity: 0,
+    count: 4,
+    radius: 0.45,
+    anchorFrac: 1,
+    lift: 0.55,
+    rate: 2.4,
+    size: 0.2,
+    brightness: 2.2,
+    color: 0xffd700,
+    alphaFloor: 0.35,
+    cell: 'star',
+    wobble: 0,
+  },
+  // Fleeing dread: fewer, larger, faster wisps that bob rather than ride a
+  // flat ring, because the victim is being run around and the silhouette
+  // should say so from behind at distance.
+  fear: {
+    type: 'fear',
+    severity: 1,
+    count: 3,
+    radius: 0.5,
+    anchorFrac: 1,
+    lift: 0.62,
+    rate: 3.4,
+    size: 0.26,
+    brightness: 2,
+    color: 0x6a1bff,
+    alphaFloor: 0.35,
+    cell: 'glow',
+    wobble: 0.09,
+  },
+  // At the ANKLES, not overhead: a root says "my feet are stuck", which is a
+  // different sentence from the head-space tells, and putting it at the base
+  // keeps the two legible on the same screen without competing.
+  //
+  // The ring is WIDER than the head-space bands even though it reads smaller
+  // on screen, and that is the whole difficulty of drawing at the base: an
+  // overhead band orbits empty air, while a ground band orbits the widest
+  // part of the victim. A first pass at radius 0.38 was fed, ranked, and
+  // drawn every frame, and was still invisible in a capture, because the
+  // sprites sat INSIDE a boar's body and the depth test buried them. The
+  // ring has to clear the footprint of a broad quadruped, not just a
+  // humanoid's ankles, and the extra lift keeps it off a sloping surface.
+  root: {
+    type: 'root',
+    severity: 2,
+    count: 4,
+    radius: 0.85,
+    anchorFrac: 0,
+    lift: 0.12,
+    rate: 1.1,
+    size: 0.22,
+    brightness: 2,
+    color: 0x28e63c,
+    alphaFloor: 0.35,
+    cell: 'spark',
+    wobble: 0,
+  },
+} as const;
+
+// Back-compat aliases for the stun geometry the sequencer's cast-moment band
+// shares. They are the stun spec's own fields, so the two bands cannot drift.
+export const STUN_STAR_COUNT = CC_BAND_SPECS.stun.count;
+export const STUN_STAR_RADIUS = CC_BAND_SPECS.stun.radius;
+export const STUN_STAR_LIFT = CC_BAND_SPECS.stun.lift;
+export const STUN_STAR_RATE = CC_BAND_SPECS.stun.rate;
+export const STUN_STAR_SIZE = CC_BAND_SPECS.stun.size;
+export const STUN_STAR_BRIGHTNESS = CC_BAND_SPECS.stun.brightness;
+export const STUN_STAR_COLOR = CC_BAND_SPECS.stun.color;
+
 // The overlay point cloud is one shared hard-capped batch (128 sprites for
 // EVERY windup orb, orbit band, bolt head, and sequencer transient in the
 // scene), so the held bands are bounded too: the fx engine draws the N
-// best-ranked stunned entities and no more. 8 bands = 32 sprites, a quarter
-// of the batch, so a raid-wide mass stun can never starve the other
-// actionable reads (enemy windup telegraphs, worn-debuff bands) that draw
-// after it. A band that loses its slot is not silently dark: the sequencer's
-// cast-moment ccStars stand down only for entities that actually WON a slot
-// this frame, so a dropped band still reads through the cast-moment burst
-// while one is running.
-export const MAX_STUN_STAR_BANDS = 8;
+// best-ranked victims and no more. This is ONE budget across all three types,
+// deliberately not one each: three separate caps of 8 would reach 96 of the
+// 128 sprites and starve the other actionable reads (enemy windup telegraphs,
+// worn-debuff bands) that draw after them. 8 bands at 3 to 4 sprites is at
+// most 32, a quarter of the batch, so even a raid-wide mass CC cannot.
+// A band that loses its slot is not silently dark: the sequencer's cast-moment
+// ccStars stand down only for entities that actually WON a slot this frame, so
+// a dropped band still reads through the cast-moment burst while one is
+// running.
+export const MAX_CC_BANDS = 8;
 
 // Bands behind the camera sort after every band in front of it, so an
 // on-screen victim can never lose its slot to one nobody can see. This
 // matters for fairness, not just polish: character self-culling is only
 // enabled on the tier that casts no sun shadow (GFX.dynamicShadows ->
-// cullCharacters), so on medium and above EVERY stunned entity in interest
+// cullCharacters), so on medium and above EVERY controlled entity in interest
 // range is fed, behind-camera ones included, while on low the offscreen
 // non-actionable ones are slept before they ever compete. Ranking purely by
 // camera distance would therefore let a medium-tier player lose an on-screen
-// stun read that a low-tier player would keep, which is a preset conferring
-// a disadvantage. The penalty exceeds any squared distance the world can
+// CC read that a low-tier player would keep, which is a preset conferring a
+// disadvantage. The penalty exceeds any squared distance the world can
 // produce (interest radius is ~120 yd, so dist2 tops out near 1.4e4).
-export const STUN_BAND_BEHIND_CAMERA_PENALTY = 1e9;
-export function stunBandRankKey(dist2: number, inFront: boolean): number {
-  return inFront ? dist2 : dist2 + STUN_BAND_BEHIND_CAMERA_PENALTY;
+export const CC_BAND_BEHIND_CAMERA_PENALTY = 1e9;
+// Severity outranks distance outright: when slots are scarce a distant stun
+// beats a nearby root, because the two tells do not carry equal weight to the
+// player reading them. The stride clears the largest key severity 0 can
+// produce (penalty + max dist2, about 1e9) by three orders of magnitude.
+export const CC_BAND_SEVERITY_STRIDE = 1e12;
+export function ccBandRankKey(severity: number, dist2: number, inFront: boolean): number {
+  const within = inFront ? dist2 : dist2 + CC_BAND_BEHIND_CAMERA_PENALTY;
+  return severity * CC_BAND_SEVERITY_STRIDE + within;
 }
 
 // Insert one candidate into a caller-owned fixed-capacity buffer kept
 // ascending by rank key, dropping the worst entry once full. Returns the new
 // count. Allocation-free and Three-free so the per-frame selection is a plain
 // unit test; `ids` and `keys` are parallel and both at least `max` long.
-export function insertStunBandPick(
+export function insertCcBandPick(
   ids: number[],
   keys: number[],
   count: number,
@@ -443,25 +562,48 @@ export function insertStunBandPick(
   return count < max ? count + 1 : count;
 }
 
-// Index of the worn stun aura with the longest remaining time, -1 when none
-// is live. Index rather than the record so the per-frame scan allocates
-// nothing. remaining is optional on the slice (mirrored auras always carry
-// it); a stun with none counts as 1s so it still reads, and a stun at
-// remaining 0 is already expiring and never picked.
-export function wornStunIndex(auras: readonly { kind?: string; remaining?: number }[]): number {
-  let best = 0;
-  let index = -1;
+const abilityUsesFearDr = (abilityId: string): boolean => ABILITIES[abilityId]?.fearDr === true;
+
+// The one band a victim wears this frame, or null when it wears no hard CC.
+// One scan over the aura list, resolving BOTH which type wins (most severe,
+// see CcBandSpec.severity) and how long that type has left (longest-remaining
+// aura of the winning type, so a refresh or a second application extends the
+// read rather than cutting it short).
+//
+// `remaining` is optional on the slice (mirrored auras always carry it): an
+// aura without one counts as 1s so it still reads, and one at exactly 0 is
+// already expiring and never picked. The fear arm resolves through the sim's
+// own isFearAura rule, so the renderer never re-derives which incapacitates
+// are fears; the ABILITIES lookup it needs runs only for incapacitate-kind
+// auras, which are at most one or two per victim and rare, so the scan stays
+// cheap enough to leave unmemoized.
+export function wornCcBand(
+  auras: readonly { id?: string; kind?: string; remaining?: number }[],
+): { type: CcBandType; remaining: number } | null {
+  let bestType: CcBandType | null = null;
+  let bestSeverity = Number.POSITIVE_INFINITY;
+  let bestRemaining = 0;
   for (let i = 0; i < auras.length; i++) {
     const a = auras[i];
-    if (a.kind === 'stun') {
-      const rem = a.remaining ?? 1;
-      if (rem > best) {
-        best = rem;
-        index = i;
-      }
+    const rem = a.remaining ?? 1;
+    if (rem <= 0) continue;
+    let type: CcBandType | null = null;
+    if (a.kind === 'stun') type = 'stun';
+    else if (a.kind === 'root') type = 'root';
+    else if (
+      a.kind === 'incapacitate' &&
+      isFearAura({ id: a.id ?? '', kind: a.kind }, abilityUsesFearDr)
+    )
+      type = 'fear';
+    if (type === null) continue;
+    const severity = CC_BAND_SPECS[type].severity;
+    if (severity < bestSeverity || (severity === bestSeverity && rem > bestRemaining)) {
+      bestType = type;
+      bestSeverity = severity;
+      bestRemaining = rem;
     }
   }
-  return index;
+  return bestType === null ? null : { type: bestType, remaining: bestRemaining };
 }
 
 // Fixed-size ring buffers of timestamps: zero allocation in steady state (one

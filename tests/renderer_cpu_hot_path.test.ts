@@ -84,6 +84,9 @@ describe('renderer CPU hot path', () => {
       props: 1,
       foliage: 1,
       fish: 1,
+      ambientScenery: 1,
+      zoneVisibility: 1,
+      zoneFeatures: 1,
       vfx: 1,
       camera: 1,
       ambience: 1,
@@ -136,6 +139,43 @@ describe('renderer CPU hot path', () => {
     expect(state.stallHoldSeconds).toBe(18);
   });
 
+  it('attributes visibility, fish, ambient scenery, and zone feature animation separately', () => {
+    const terrainMarkAt = renderer.lastIndexOf(
+      "this.markRendererWorldPhase(worldPhaseMs, 'terrain', worldStart)",
+    );
+    const zoneVisibilityAt = renderer.lastIndexOf('this.updateZoneFeatureVisibility(fogFar);');
+    const earlyZoneFeatureMarkAt = renderer.indexOf(
+      "this.markRendererWorldPhase(worldPhaseMs, 'zoneVisibility', worldStart)",
+      zoneVisibilityAt,
+    );
+    const propsUpdateAt = renderer.indexOf('this.propsView.update(', zoneVisibilityAt);
+    const fishUpdateAt = renderer.lastIndexOf('this.fish.update(p.pos.x, p.pos.z, dt);');
+    const fishMarkAt = renderer.indexOf(
+      "this.markRendererWorldPhase(worldPhaseMs, 'fish', worldStart)",
+      fishUpdateAt,
+    );
+    const motesAt = renderer.indexOf('this.motes.update(p.pos.x, p.pos.z, dt);', fishUpdateAt);
+    const ambientMarkAt = renderer.indexOf(
+      "this.markRendererWorldPhase(worldPhaseMs, 'ambientScenery', worldStart)",
+      motesAt,
+    );
+    const realmFloraAt = renderer.indexOf('this.realmFlora?.update(this.time);', motesAt);
+    const featureMarkAt = renderer.indexOf(
+      "this.markRendererWorldPhase(worldPhaseMs, 'zoneFeatures', worldStart)",
+      realmFloraAt,
+    );
+
+    expect(terrainMarkAt).toBeGreaterThan(-1);
+    expect(zoneVisibilityAt).toBeGreaterThan(terrainMarkAt);
+    expect(earlyZoneFeatureMarkAt).toBeGreaterThan(zoneVisibilityAt);
+    expect(propsUpdateAt).toBeGreaterThan(earlyZoneFeatureMarkAt);
+    expect(fishUpdateAt).toBeGreaterThan(-1);
+    expect(fishMarkAt).toBeGreaterThan(fishUpdateAt);
+    expect(motesAt).toBeGreaterThan(fishMarkAt);
+    expect(ambientMarkAt).toBeGreaterThan(motesAt);
+    expect(realmFloraAt).toBeGreaterThan(ambientMarkAt);
+    expect(featureMarkAt).toBeGreaterThan(realmFloraAt);
+  });
   it('fully skips proven-static world branches while reusing telemetry containers', () => {
     expect(renderer).toContain('const frameStats = this.lastFrameStats');
     expect(renderer).toContain('this.foliage.perfStats(frameStats.foliage)');

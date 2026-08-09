@@ -1454,6 +1454,173 @@ export const zh_TW: EnTranslations = {
       "badges": {
         "backgrounded": "背景執行中",
         "offline": "離線"
+      },
+      "diagnostics": {
+        "panelAria": "World of ClaudeCraft 效能診斷",
+        "title": "ClaudeCraft 效能醫生",
+        "subtitle": "針對遊戲的掃描，提供證據與程式碼層級修正建議。",
+        "aria": {
+          "liveMeasurements": "即時效能測量",
+          "scanProgress": "診斷掃描進度",
+          "findings": "依優先順序排列的診斷結果"
+        },
+        "controls": {
+          "minimize": "最小化",
+          "expand": "展開",
+          "start": "開始 15 秒掃描",
+          "refreshCensus": "重新整理場景統計",
+          "copyReport": "複製清晰報告",
+          "downloadReport": "下載報告",
+          "scanning": "掃描中...",
+          "scanAnother": "掃描另一個區域",
+          "reportLogged": "報告已記錄至主控台",
+          "copied": "已複製",
+          "copyBlocked": "複製受阻：報告已記錄",
+          "retestLowGraphics": "使用低畫質重新測試"
+        },
+        "instruction": "為取得最佳訊號，請進入離線遊戲，在卡頓區域移動並旋轉鏡頭，然後在掃描期間觸發造成卡頓的效果。",
+        "status": {
+          "pausedHiddenRestart": "此分頁隱藏時掃描已暫停。返回後掃描將重新開始。",
+          "restoredRestart": "分頁已恢復。正在重新開始一次乾淨的 15 秒活躍遊戲擷取。",
+          "worldLoaded": "世界已載入。正在等待第一個可操作影格。",
+          "pausedHiddenContinue": "此分頁隱藏時掃描已暫停。請返回遊戲以繼續。",
+          "collectingRemaining": {
+            "one": "正在擷取活躍遊戲：剩餘 {seconds} 秒",
+            "other": "正在擷取活躍遊戲：剩餘 {seconds} 秒"
+          },
+          "waitingFrames": "正在等待具代表性的遊戲影格：{current}/{minimum}",
+          "collectingNow": "正在擷取活躍遊戲：現在請穿過問題區域。",
+          "ready": "已準備掃描。按開始並重現卡頓。",
+          "waitingWorld": "正在等待遊戲世界。請選擇離線遊戲或進入一個線上角色。"
+        },
+        "metrics": {
+          "waitingRenderer": "算繪器：等待中",
+          "waitingCensus": "場景統計：等待中",
+          "waitingHitch": "卡頓歸因：進入世界時已啟用",
+          "recent": "最近  {fps} FPS | p95 {p95} 毫秒 | >50 毫秒 {longFrames}",
+          "render": "算繪  提交 {submit} 毫秒 | 世界 {world} 毫秒 | 實體 {entities} 毫秒",
+          "scene": "場景   {calls} 次呼叫 | {triangles} 個三角形 | {views} 個視圖",
+          "hitches": "卡頓 {hitches} | 著色器 {shaders} | 上傳 {uploads} | 視圖 {views}",
+          "gpu": "GPU     {renderer}",
+          "waitingValue": "等待中"
+        },
+        "scoreHeadline": "{score}/100：{headline}",
+        "healthyNoFindings": "未觸發可執行的門檻。如果短暫卡頓仍影響體驗，請沿著觸發卡頓的確切移動路徑重新執行掃描。",
+        "findingMeta": "{severity} | {confidence} 信心度",
+        "sections": {
+          "evidence": "證據",
+          "tryNow": "立即嘗試",
+          "codeFix": "程式碼修正",
+          "source": "相關來源檔案"
+        },
+        "severity": {
+          "critical": "嚴重",
+          "warning": "警告",
+          "info": "資訊"
+        },
+        "confidence": {
+          "high": "高",
+          "medium": "中",
+          "low": "低"
+        },
+        "diagnosis": {
+          "noProblemTitle": "未偵測到明顯效能問題",
+          "summary": {
+            "findings": {
+              "one": "最近 10 秒在 {fps} FPS、影格 p95 為 {p95} 時發現 {findings} 項可處理問題。",
+              "other": "最近 10 秒在 {fps} FPS、影格 p95 為 {p95} 時發現 {findings} 項可處理問題。"
+            },
+            "healthy": "最近 10 秒維持 {fps} FPS，影格 p95 為 {p95}。遊戲、瀏覽器、GPU、記憶體、資源與網路均未觸發門檻。"
+          },
+          "titles": {
+            "hardwareAcceleration": "正在使用軟體算繪",
+            "integratedGpu": "遊戲正在使用整合式 GPU",
+            "highDpi": "高解析度算繪開銷較大",
+            "forcedHighGraphics": "強制高畫質正在降低效能",
+            "lowMemory": "裝置可用記憶體偏低",
+            "browserStalls": "偵測到瀏覽器或擴充功能停頓",
+            "heapPressure": "偵測到瀏覽器記憶體壓力",
+            "contextLoss": "圖形內容已重設",
+            "gpuSubmit": "GPU 提交是主要影格瓶頸",
+            "sceneDraw": "場景繪製成本超過目前畫質預算",
+            "shadowPass": "陰影通道占用大量繪製呼叫",
+            "rendererWorld": "世界算繪器更新受 CPU 限制",
+            "rendererEntities": "實體視圖更新受 CPU 限制",
+            "rendererNameplates": "姓名牌繪製成本偏高",
+            "simCpu": "模擬工作占用影格時間",
+            "hudCpu": "HUD 更新占用影格時間",
+            "eventCpu": "事件處理占用影格時間",
+            "shaderCompile": "遊戲過程中正在編譯著色器",
+            "textureUpload": "紋理上傳造成遊戲卡頓",
+            "viewCreate": "實體視圖建立造成卡頓",
+            "otherHitch": "仍有未歸因的長影格",
+            "assetStartup": "資源處理延遲了遊戲啟動",
+            "longTasks": "瀏覽器長任務正在阻塞影格",
+            "networkLatency": "網路傳輸延遲了可見回應",
+            "snapshotApply": "快照處理正在阻塞客戶端",
+            "generic": "效能規則 {rule} 需要處理"
+          },
+          "causes": {
+            "environment": "偵測到的瀏覽器、GPU、記憶體或裝置設定可能在遊戲算繪前限制效能。",
+            "graphics": "本次擷取測得的圖形工作超過目前影格或場景預算。",
+            "cpu": "某個 CPU 階段占用足以錯過影格預算的主執行緒時間。",
+            "loading": "資源準備或首次使用工作發生在可見遊戲或啟動路徑中。",
+            "network": "網路傳輸或客戶端快照處理延遲了最新可操作狀態。"
+          },
+          "evidence": {
+            "environment": "環境規則 {rule} 與此裝置和瀏覽器相符。",
+            "gpuSubmit": "WebGL 提交 p95 為 {submit}，占算繪器 p95 的 {share}。",
+            "frame": "最近視窗測得 {fps} FPS，影格 p95 為 {p95}。",
+            "sceneCalls": "場景使用 {calls} 次繪製呼叫，目標為 {target}。",
+            "sceneTriangles": "場景提交 {triangles} 個三角形，目標為 {target}。",
+            "sceneCategory": "場景類別 {category} 貢獻 {calls} 次呼叫和 {triangles} 個測量三角形。",
+            "censusNeeded": "重新整理場景統計以識別主要算繪類別。",
+            "shadow": "陰影通道提交 {calls} 次呼叫，占基準的 {share}，共 {triangles} 個三角形。",
+            "cpuPhase": "測得階段 {phase} 的 p95 為 {p95}。",
+            "hitch": "記錄的 {total} 次卡頓中，有 {count} 次符合原因 {cause}。",
+            "assets": "預載門檻為 {tasks} 個已登錄任務等待了 {wait}。",
+            "failedAssets": "失敗的資源群組：{groups}。",
+            "longTasks": "測得 {count} 個長任務，p95 為 {p95}，最大值為 {max}。",
+            "network": "快照間隔為 {interval}，最新快照時間為 {age}，輸入回應 p95 為 {echo}。",
+            "snapshot": "快照解析與套用 p95 為 {work}；網路間隔 p95 為 {gap}。",
+            "generic": "診斷規則 {rule} 與本次擷取相符。"
+          },
+          "tryNow": {
+            "environment": "修正偵測到的環境設定，重新啟動，再重複相同掃描。",
+            "graphics": "以低畫質重複相同鏡頭路徑，確認圖形壓力。",
+            "cpu": "分別在靜止與移動時重複掃描，以隔離 CPU 階段。",
+            "loading": "重複相同路線或首次使用操作，確認卡頓發生時機。",
+            "network": "在離線遊戲中使用相同移動與鏡頭路徑進行比較。"
+          },
+          "codeFix": {
+            "environment": "讓偵測到的備援路徑遵守共用圖形與記憶體預算。",
+            "graphics": "使用現有算繪預算、實例化、材質共用、LOD 與隱藏工作略過機制。",
+            "cpu": "分析指定階段，移除重複工作與配置，並維持遊戲行為。",
+            "loading": "透過現有啟動與串流預算預載、池化或分攤已識別的首次使用工作。",
+            "network": "降低傳輸或快照處理成本，同時不削弱權威伺服器模型。"
+          }
+        },
+        "report": {
+          "title": "World of ClaudeCraft 效能診斷",
+          "statusLine": "狀態：{status}（{score}/100）",
+          "capturedLine": "擷取時間：{captured}",
+          "topFindingLine": "首要問題：{finding}",
+          "summaryLine": "摘要：{summary}",
+          "gpuLine": "GPU：{gpu}",
+          "graphicsLine": "畫質：{tier}，算繪比例 {scale}",
+          "recentLine": "最近：{fps} FPS，p95 {p95}，{longFrames} 個影格超過 50 毫秒，共測量 {frames} 個影格",
+          "resultHeading": "結果",
+          "noThreshold": "本次擷取未觸發可處理門檻。",
+          "findingHeading": "{index}. {title}",
+          "findingMeta": "嚴重程度：{severity}。信心度：{confidence}。",
+          "rawSnapshotHeading": "原始快照",
+          "notAvailable": "無法使用",
+          "status": {
+            "critical": "嚴重",
+            "needsAttention": "需要注意",
+            "healthy": "正常"
+          }
+        }
       }
     },
     "auraOverlay": {
@@ -2651,7 +2818,8 @@ export const zh_TW: EnTranslations = {
       "tierRequired": {
         "mining": "需要{tier}階採礦鎬",
         "logging": "需要{tier}階伐木斧",
-        "herbalism": "需要{tier}階草藥鐮"
+        "herbalism": "需要{tier}階草藥鐮",
+        "farming": "需要{tier}階耕作鋤"
       },
       "requiresTool": {
         "mining": "需要採礦鎬",
@@ -2698,12 +2866,14 @@ export const zh_TW: EnTranslations = {
           "mining": "開採最高{tier}階的礦脈所需。",
           "logging": "砍伐最高{tier}階的林木所需。",
           "herbalism": "採集最高{tier}階的草藥叢所需。",
-          "fishing": "在最高{tier}階的水域垂釣所需。"
+          "fishing": "在最高{tier}階的水域垂釣所需。",
+          "farming": "種植最高{tier}階的作物所需。"
         },
         "use": {
           "mining": "使用：開採附近的礦脈。",
           "logging": "使用：砍伐附近的林木。",
-          "herbalism": "使用：採集附近的草藥叢。"
+          "herbalism": "使用：採集附近的草藥叢。",
+          "farming": "放在背包裡即可，在田畦種植作物時自動生效。"
         },
         "speed": "在低於{tier}階的節點採集速度更快。",
         "rodRequired": "釣魚所需。",
@@ -2728,6 +2898,8 @@ export const zh_TW: EnTranslations = {
       "harvestFineLineQty": "你還收穫了：{name} x{qty}。",
       "witheredLine": "作物枯萎了。你清理了田畦：{name}。",
       "witheredLineQty": "作物枯萎了。你清理了田畦：{name} x{qty}。",
+      "seedBackLine": "你回收了種子：{name}。",
+      "seedBackLineQty": "你回收了種子：{name} x{qty}。",
       "denied": {
         "bad_bed": "那裡沒有田畦。",
         "bad_crop": "你無法在這裡種植它。",
@@ -2740,7 +2912,8 @@ export const zh_TW: EnTranslations = {
         "no_husks": "你的枯萎穀殼不夠。",
         "no_compost": "你沒有堆肥。",
         "no_fee_produce": "你沒有可以支付看守費的農產品。",
-        "no_tonic": "你沒有生長滋補劑。"
+        "no_tonic": "你沒有生長滋補劑。",
+        "tool": "你沒有適合該作物的耕作鋤。"
       },
       "husksConvertedLine": "你用{husksName} x{husks}換取了{name}。",
       "husksConvertedLineQty": "你用{husksName} x{husks}換取了{name} x{qty}。"
@@ -2856,7 +3029,7 @@ export const zh_TW: EnTranslations = {
           "artisansEye": "充能期間將收穫品級提升1個工具等級。",
           "quickeningCharm": "縮短其觸發的資源節點重生計時。"
         },
-        "howToSlot": "在專業視窗中將其鑲嵌到採礦、伐木或藥草學工具上。鑲嵌後即消耗。",
+        "howToSlot": "在專業視窗中將其鑲嵌到採礦、伐木、藥草學或耕作工具上。鑲嵌後即消耗。",
         "charges": "普通品質工具初始有{base}次充能（稀有度每升一級+{bonus}次）。",
         "landOnly": "無法鑲嵌到釣竿上。",
         "openProfessions": "打開專業視窗，將其鑲嵌到採集工具上。"
@@ -2873,6 +3046,11 @@ export const zh_TW: EnTranslations = {
       "toolEffectRechargeFull": "{effect}已充滿能量。",
       "toolEffectRechargeToolCapped": "攜帶更好的{profession}工具才能繼續為{effect}充能。",
       "toolEffectRechargeMaterials": "為{effect}充能需要{material}x{count}。",
+      "craftingProgress": "正在製作：還剩{remaining}秒，共{total}秒。",
+      "disenchantingProgress": "正在分解：還剩{remaining}秒，共{total}秒。",
+      "enchantingProgress": "正在附魔：還剩{remaining}秒，共{total}秒。",
+      "salvagingProgress": "正在回收：還剩{remaining}秒，共{total}秒。",
+      "rechargingToolEffectProgress": "正在為工具效果充能：還剩{remaining}秒，共{total}秒。",
       "tierPipAria": "階級 {tier}",
       "nextUnlockTier": "距離下一階級還差 {points} 點：打造大師之作的機率將提升",
       "nextUnlockSpecialized": "距離專精還差 {points} 點：材料消耗將降低",
@@ -3167,6 +3345,14 @@ export const zh_TW: EnTranslations = {
       "denyNotCrafted": "請先製作出委託物品（勾選委託選項）。",
       "denyOutOfRange": "你必須靠近委託人才能交付委託。",
       "denyNoSpace": "委託人的背包空間不足。"
+    },
+    "bgOffer": {
+      "title": "荊谷原野已準備就緒",
+      "accepted": "已確認 {accepted}/{size}",
+      "remaining": "剩餘 {seconds} 秒確認",
+      "accept": "接受",
+      "decline": "拒絕",
+      "acceptedWait": "等待其他人確認..."
     },
     "finder": {
       "title": "地城搜尋器",
@@ -5183,7 +5369,7 @@ export const zh_TW: EnTranslations = {
         "logging": "伐木在三大區域的林地中砍伐木材：東溪谷產鐵皮木，泥沼濕地產梣木，荊峰高地產高松，供給武器柄材、法杖與工程師工坊。從1級起人人皆可伐木，只需背包中備有一把伐木斧（各區域主城20銅幣），以獨立計數器追蹤，上限為100。",
         "herbalism": "藥草學採集野地所生的草藥：東溪谷產潤光葉，泥沼濕地產金葉，荊峰高地產日瓣草，這些葉與莖讓藥劑類行業得以持續調製。從1級起人人皆可採集，只需背包中備有一把草藥鐮（各區域主城20銅幣），以獨立計數器追蹤，上限為100。",
         "fishing": "釣魚通過咬鉤與收線的節奏，在每個區域的開闊水面垂釣，上限為200。",
-        "farming": "耕作在整治好的田畦中從種子育出作物，上限為100；它的田畦、種子與工具將隨後續更新到來，因此下方表格暫時為空。"
+        "farming": "耕作是唯一以照料代替採掘的採集行業：在整治好的田畦中播下種子，人不在時作物照樣生長，回來時拔起成熟的收成。從Eastbrook的份地到Evergarden的花圃，每處耕作據點都有自己的田畦，階梯的每一級都長著一對專屬作物，手藝到家還能收下精良等級。農活由鋤頭開啟：Garden Hoe照看起步的田畦，更高各級則由工程師打造。熟練在專屬計數上累積，上限為100。"
       },
       "rhythmHeading": "採集節奏",
       "rhythmBody": "採集是一段可見的施法：基礎{base}秒，最短不低於{floor}秒；工具每高於節點一階縮短{tool}秒，每個熟練度區間再縮短{band}秒。",
@@ -5215,7 +5401,7 @@ export const zh_TW: EnTranslations = {
         "logging": "任意行業的第一次採集獲得Fruits of the Field，伐木100上限銘刻Heartwood Hewer。任意三項採集行業達到100可得Master Gatherer（25聲望），劈出遠古心材另有收藏印記。功業只有頭銜與聲望，永不賦予力量。",
         "herbalism": "任意行業的第一次採集獲得Fruits of the Field，藥草學100上限銘刻Master of the Meadow。任意三項採集行業達到100可得Master Gatherer（25聲望），採下月光綻放另有收藏印記。功業只有頭銜與聲望，永不賦予力量。",
         "fishing": "釣魚100熟練銘刻Old Salt，200銘刻Master Angler及其頭銜，垂釣技藝的頂點；釣魚同樣計入Master Gatherer（任意三項採集達到100）。在每個區域的水域釣起第一條魚各有其頁，釣起日輝錦鯉則記下Glimmer of Hope。",
-        "farming": "耕作暫無專屬功業：田畦尚未到來，標記其他行業的里程碑與上限功業也將隨之而來。它的熟練已經計入Master Gatherer（任意三項採集達到100）。功業只給頭銜與名望，絕不給予力量。"
+        "farming": "耕作暫無專屬功業：如今田畦與作物已經紮根，標記其他行業的里程碑與上限功業將隨後續更新一併到來。它的熟練已經計入Master Gatherer（任意三項採集達到100），耕作者能像旁人一樣填滿那一頁。功業只給頭銜與名望，絕不給予力量。"
       },
       "fish": {
         "startHeading": "入門",
@@ -7269,6 +7455,9 @@ export const zh_TW: EnTranslations = {
   "gpuNotice": {
     "bodyDesktop": "遊戲目前在沒有 GPU 加速的情況下執行，會非常緩慢。請更新顯示卡驅動程式後重新啟動遊戲。在 Windows 上，還請在 設定 > 系統 > 顯示器 > 顯示卡 中將本遊戲設為「高效能」。",
     "bodyWeb": "遊戲目前在沒有 GPU 加速的情況下執行，會非常緩慢。請在瀏覽器設定中啟用硬體加速，更新顯示卡驅動程式，然後重新啟動瀏覽器。",
+    "hybridBodyWindows": "本次工作階段正在集成（省電）顯示卡上算圖。如果這台電腦還配有獨立遊戲顯示卡，請在 設定 > 系統 > 顯示 > 圖形 中將瀏覽器設為「高效能」，然後重新啟動瀏覽器。桌面版會自動選擇獨立顯示卡。",
+    "hybridBodyLinux": "本次工作階段正在集成（省電）顯示卡上算圖。如果這台電腦還配有獨立遊戲顯示卡，您的瀏覽器或顯示卡驅動程式可能提供自己的顯示卡選擇設定，或您的發行版可能提供顯示卡切換工具（例如 PRIME 或 optimus-manager）。桌面版會自動選擇獨立顯示卡。",
+    "hybridBodyOther": "本次工作階段正在集成（省電）顯示卡上算圖。如果這台電腦還配有獨立遊戲顯示卡，請檢查瀏覽器與作業系統的顯示卡設定以啟用它。桌面版會自動選擇獨立顯示卡。",
     "dismiss": "關閉"
   },
   "perfNudge": {
@@ -7730,6 +7919,7 @@ export const zh_TW: EnTranslations = {
       "deathRecapAbility": "你已經死亡。死於{ability}。",
       "deathRecapFalling": "你已經死亡。你摔死了。",
       "deathRecapDrowned": "你已經死亡。你溺死了。",
+      "deathRecapCauterized": "你已經死亡。灼燒術的烈焰吞噬了你。",
       "respawn": "你再次感到精力恢復、身體完整。",
       "ignoringChat": "已封鎖來自 {name} 的聊天。",
       "noLongerIgnoring": "不再封鎖 {name}。",
@@ -7773,6 +7963,7 @@ export const zh_TW: EnTranslations = {
       "outOfRange": "超出範圍。",
       "noTarget": "你沒有目標。",
       "tooClose": "太近了！",
+      "mustTargetAlly": "你必須選定一名友方目標。",
       "facing": "你必須面向目標。",
       "targetHealthBelow": "該技能要求目標生命值低於 {percent}%。",
       "dagger": "你必須裝備匕首。",
@@ -9390,6 +9581,10 @@ export const zh_TW: EnTranslations = {
       "die_by_sword": {
         "name": "劍在人在",
         "description": "防禦性冷卻技：持續 8 秒，你受到的傷害降低 30%，並大幅提高閃躲攻擊的機率。"
+      },
+      "intervene": {
+        "name": "援護",
+        "description": "衝向一名友方玩家，為其抵擋 {damage} 點傷害，持續 6 秒。"
       },
       "recklessness": {
         "name": "魯莽",
@@ -11244,6 +11439,81 @@ export const zh_TW: EnTranslations = {
       },
       "growth_tonic": {
         "name": "生長滋補劑"
+      },
+      "brook_carrot_seed": {
+        "name": "溪畔胡蘿蔔種子"
+      },
+      "brook_carrot": {
+        "name": "溪畔胡蘿蔔"
+      },
+      "fine_brook_carrot": {
+        "name": "優質溪畔胡蘿蔔"
+      },
+      "marsh_rice_seed": {
+        "name": "沼澤稻米種子"
+      },
+      "marsh_rice": {
+        "name": "沼澤稻米"
+      },
+      "fine_marsh_rice": {
+        "name": "優質沼澤稻米"
+      },
+      "bog_beet_seed": {
+        "name": "沼澤甜菜種子"
+      },
+      "bog_beet": {
+        "name": "沼澤甜菜"
+      },
+      "fine_bog_beet": {
+        "name": "優質沼澤甜菜"
+      },
+      "highland_barley_seed": {
+        "name": "高地大麥種子"
+      },
+      "highland_barley": {
+        "name": "高地大麥"
+      },
+      "fine_highland_barley": {
+        "name": "優質高地大麥"
+      },
+      "frost_gourd_seed": {
+        "name": "霜瓜種子"
+      },
+      "frost_gourd": {
+        "name": "霜瓜"
+      },
+      "fine_frost_gourd": {
+        "name": "優質霜瓜"
+      },
+      "gilded_sunmelon_seed": {
+        "name": "鎏金太陽瓜種子"
+      },
+      "gilded_sunmelon": {
+        "name": "鎏金太陽瓜"
+      },
+      "fine_gilded_sunmelon": {
+        "name": "優質鎏金太陽瓜"
+      },
+      "evergarden_greens_seed": {
+        "name": "常青園青菜種子"
+      },
+      "evergarden_greens": {
+        "name": "常青園青菜"
+      },
+      "fine_evergarden_greens": {
+        "name": "優質常青園青菜"
+      },
+      "garden_hoe": {
+        "name": "菜園鋤"
+      },
+      "bronze_hoe": {
+        "name": "青銅鋤"
+      },
+      "skysilver_hoe": {
+        "name": "天銀鋤"
+      },
+      "osmium_hoe": {
+        "name": "鋨金鋤"
       },
       "conjured_water4": {
         "name": "魔法泉水"
