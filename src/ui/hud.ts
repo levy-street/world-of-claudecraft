@@ -284,6 +284,13 @@ import {
 } from './entity_i18n';
 import { ERROR_LOG_COLOR, shouldMirrorErrorToast } from './error_toast_log';
 import { esc } from './esc';
+import {
+  farmDeniedLineKey,
+  farmFineLineKey,
+  farmHarvestLineKey,
+  farmPlantedTokenId,
+  farmWitheredLineKey,
+} from './farming_view';
 import { blockFctAmountText } from './fct_core';
 import { fctSpawnShape } from './fct_event';
 import { FctPainter } from './fct_painter';
@@ -300,7 +307,6 @@ import { gatheringProfessionNameKey } from './gathering_profession_name';
 import {
   buildGatheringProficiencyRows,
   buildGatherNodeTooltip,
-  farmDeniedLineKey,
   gatherDeniedLineKey,
   gatherDowngradeLineKey,
   gatherRareTierFor,
@@ -308,10 +314,6 @@ import {
 } from './gathering_view';
 import {
   craftedLineKey,
-  farmFineLineKey,
-  farmHarvestLineKey,
-  farmPlantedTokenId,
-  farmWitheredLineKey,
   gatherLineKey,
   grantItemToken,
   grantQtyText,
