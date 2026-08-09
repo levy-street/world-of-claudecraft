@@ -580,9 +580,12 @@ Executed 2026-08-08, local-only per D22: branch fix/farming-phase-04-knobs off
 feature/farming-plan, sixth v0.36.0 absorb first (merge da3d1cec4b of tip
 1478f9d2ba, PR 2974 Seeker daily-rewards mobile CSS, empty intersection with
 farming; release-merge-audit clean, parity and snapshots re-proven on the
-merged HEAD). Five commits: 122dd3de56 farming_view extraction, 80f6169435
+merged HEAD). Eight commits: 122dd3de56 farming_view extraction, 80f6169435
 items + convertHusks, 5014a395be knob payload + watch fee + tonic arm,
-81d3d2ba00 the test battery, plus the docs commit.
+81d3d2ba00 the test battery, e02e8efebd the docs commit, then three
+follow-ups the first write of this sentence predated: a628b65a65 the
+review-round fixes, 2db9606ef4 the gate-caught grant-site census re-pin,
+and 4b9a36fd63 the review and gate notes.
 
 Acceptance criteria (phase-04-knobs.md STEP 5), each with its state:
 
