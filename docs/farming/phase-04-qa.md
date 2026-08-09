@@ -7,6 +7,16 @@ for all eight). The audit also probes the fee-bootstrap path (a player with zero
 produce must be cleanly denied, never soft-locked) and verifies the binding
 Live-surface note in phase-04-knobs.md: everything this phase minted is unobtainable.
 
+AMENDED at Phase 4 execution (2026-08-08), per D22: no PR exists. The phase landed
+as local commits on fix/farming-phase-04-knobs, merged --no-ff into
+feature/farming-plan; STEP 0's "check out the PR branch / gh pr view" resolves to
+auditing the merge commit into feature/farming-plan (the phase diff is the merge's
+second-parent range, less the release absorb da3d1cec4b it starts from), and the
+would-be PR body is the progress.md Phase 4 Notes block. Read state.md deviations
+(w), (x), (y) before auditing the census restructure, the survival scale, or the
+gate-precedence arms: each is a deliberate, ledgered call, not drift. The
+phase-04-knobs.md AMENDMENTS block lists every other sweep.
+
 ### QA Starter Prompt
 
 ```

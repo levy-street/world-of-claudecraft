@@ -13,6 +13,33 @@ Phase 9 flips go-live. Withered husks only come from failed crops, and no seed i
 obtainable yet, so convertHusks is unreachable in live play. Nothing player-reachable
 changes when this phase merges.
 
+AMENDMENTS (Phase 4 execution, 2026-08-08; state.md wins on contradiction):
+- Delivery followed D22 (local-only): no push, no PR. The branch merged --no-ff
+  into feature/farming-plan and the would-be PR body lives in the progress.md
+  Phase 4 Notes block. Every "flag it for the maintainer in the PR body" below
+  resolves there, and the starter prompt's final push-and-open-a-PR line is
+  superseded.
+- The "farming items content module (planned src/sim/content/farming_items.ts)"
+  named in STEP 1 and Agent A never existed: the Phase 3 items shipped in
+  src/sim/content/items.ts BASE_ITEMS, and compost/growth_tonic landed beside
+  them (ids and the FARM_SUPPLY_ITEM_IDS block in content/farm_crops.ts).
+- "10 survival points ... caps at 100" is the shipped [0,1] scale times 100:
+  the payload wires to the EXISTING FARM_SURVIVAL_COMPOST_BONUS and
+  FARM_SURVIVAL_WATCH_BONUS constants (0.10 each, capped at 1); no second
+  scale was minted (state.md deviation (x)).
+- The withered-husk deferral did NOT clear out of CONSUMER_DEFERRED_MATERIALS
+  one id at a time: the census's recipe-keyed self-clearing arm cannot see
+  command consumers, so the list was REPLACED by a structural farming
+  exemption (state.md deviation (w)).
+- The watch fee accepts MIXED produce kinds (cheapest first, base before
+  fine): a farmer holding enough qualifying produce across stacks is never
+  refused (refinement recorded in farm_watch_fee.ts, not a contradiction).
+- Unlisted deliverable executed with the phase per the state.md standing
+  instruction: the src/ui/farming_view.ts pure-core extraction (rule of
+  three; the deny leaves and the husk-trade line are the third arrival).
+- The farming_session golden was NOT re-recorded (the expected outcome held:
+  the scenario was not extended and the draw block did not change).
+
 ### Starter Prompt
 
 ```
