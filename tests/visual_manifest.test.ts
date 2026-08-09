@@ -311,12 +311,14 @@ describe('character visual manifest', () => {
       const doc = await io.read(`public/${visual.url}`);
       const animations = doc.getRoot().listAnimations();
       const names = new Set(animations.map((animation) => animation.getName()));
-      // A bespoke attack (e.g. mob_wildheart_stalker's Wildheart_Stalker_Attack,
-      // scripts/build_wildheart_stalker_anims.mjs, and mob_wildheart_hexcaller's
-      // Wildheart_Hexcaller_Attack, scripts/build_wildheart_hexcaller_anims.mjs) ships
-      // mesh-free in its own animUrls companion GLB, not the base rig GLB this test
-      // re-cuts; merge every animUrls donor's clip names in too, same as the general
-      // animUrls-aware gate in tests/character_clipmaps.test.ts.
+      // A bespoke attack/cast clip (e.g. mob_wildheart_stalker's Wildheart_Stalker_Attack,
+      // scripts/build_wildheart_stalker_anims.mjs; mob_wildheart_hexcaller's
+      // Wildheart_Hexcaller_Attack, scripts/build_wildheart_hexcaller_anims.mjs; or
+      // mob_wildheart_high_priest's Wildheart_High_Priest_Attack,
+      // scripts/build_wildheart_high_priest_anims.mjs) ships mesh-free in its own
+      // animUrls companion GLB, not the base rig GLB this test re-cuts; merge every
+      // animUrls donor's clip names in too, same as the general animUrls-aware gate in
+      // tests/character_clipmaps.test.ts.
       for (const url of visual.animUrls ?? []) {
         const donorNames = await glbAnimationNames(`public/${url}`);
         for (const name of donorNames) names.add(name);

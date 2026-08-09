@@ -394,6 +394,20 @@ const MURLOC_BIPED14: ClipMap = {
   attack: ['Murloc_Attack'],
 };
 
+// The warlock demon pet family's own attack (scripts/build_demon_anims.mjs,
+// issue #2889 round 2): BIPED14's Punch/Weapon attack is shared by
+// reference across 6 unrelated families (mob_bear, mob_yeti, mob_murloc,
+// mob_troll, mob_demon, mob_demonalt). This "nod-and-slash" clip is baked
+// off demonalt.glb's own donor poses (Weapon's swing blended through the
+// currently unused Yes clip's downward nod), so only mob_demon and
+// mob_demonalt get it: they already share the same base rig and
+// tint-only differentiation, so sharing the new attack too is consistent
+// with how the rest of that pairing works.
+const DEMON_BIPED14: ClipMap = {
+  ...BIPED14,
+  attack: ['Demon_Attack'],
+};
+
 // The bear family's own attack (scripts/build_bear_anims.mjs, issue #2889
 // round 2): BIPED14's Punch/Weapon attack is shared by reference across 6
 // unrelated families (mob_bear, mob_yeti, mob_murloc, mob_troll, mob_demon,
@@ -438,6 +452,19 @@ const WILDHEART_HEXCALLER: ClipMap = {
   ...TRIPO_BIPED_FULL_RIG,
   attack: ['Wildheart_Hexcaller_Attack'],
   cast: 'Wildheart_Hexcaller_Attack',
+};
+
+// Zulgar, Voice of the Basin's own attack/cast (scripts/build_wildheart_high_priest_anims.mjs,
+// issue #2889 round 2): TRIPO_BIPED_FULL_RIG's Attack and Cast are shared by reference
+// across all 5 Wildheart Basin mobs. This clip is baked off wildheart_high_priest.glb's
+// own donor poses (a climactic Cast hold into Jump's own pose repurposed as a downward
+// slam/roar release), so only mob_wildheart_high_priest gets it; the other 4 Wildheart
+// mobs are untouched. Wired into both attack and cast; deliberately the longest and most
+// dramatic of the five, befitting the dungeon boss.
+const WILDHEART_HIGH_PRIEST: ClipMap = {
+  ...TRIPO_BIPED_FULL_RIG,
+  attack: ['Wildheart_High_Priest_Attack'],
+  cast: 'Wildheart_High_Priest_Attack',
 };
 
 // The Bloodmane Ravager's own attack (scripts/build_wildheart_ravager_anims.mjs, issue
@@ -529,6 +556,18 @@ const NIGHTKIN_FLOATING: ClipMap = {
 const GLUB_FLOATING: ClipMap = {
   ...FLOATING,
   attack: ['Glub_Attack'],
+};
+
+// The dragonkin family's own attack (scripts/build_dragonkin_anims.mjs, issue
+// #2889): the same FLOATING constant migrated mob_elemental gets its second
+// migration here, still shared by reference across the remaining 8 unrelated
+// families. This clip is baked off dragonevolved.glb's own donor poses (its
+// Headbutt ram plus its own unused No/Yes gesture pair, the same spare-clip
+// shape the elemental script found on golelingevolved.glb), so only
+// mob_dragonkin gets it; every other FLOATING family stays untouched.
+const DRAGONKIN_FLOATING: ClipMap = {
+  ...FLOATING,
+  attack: ['Dragonkin_Attack'],
 };
 
 // The flying demon family's own attack (scripts/build_demon_flying_anims.mjs,
@@ -1398,9 +1437,40 @@ export const VISUALS: Record<string, VisualDef> = {
   }),
   player_druid: swims({
     url: `${PLAYERS}/druid.glb`,
-    animUrls: [`${PLAYERS}/druid_hit_variety_anims.glb`],
     height: HUMANOID_H,
-    clips: kaykit(['2H_Melee_Attack_Chop']),
+    clips: {
+      ...kaykit(['2H_Melee_Attack_Chop']),
+      // Ability-specific spellcasts (scripts/build_druid_ability_anims.mjs,
+      // issue #2889): the druid's caster kit had zero attackByAbility
+      // overrides, so every nature/arcane spell played the same staff chop.
+      // Scope is the caster side only, bear/cat/travel forms already have
+      // their own dedicated ClipMap constants and are untouched here. Mapped
+      // primarily by school (src/sim/content/classes.ts), the same signal
+      // batch 1 used for the mage; named exceptions cover heal, root/CC, and
+      // channel roles, since the nature school alone spans very different
+      // actions. Not every ability in the kit is listed: shapeshift and
+      // melee-form abilities keep their own clips, and this is a
+      // representative slice of the caster kit, not exhaustive coverage.
+      attackByAbility: {
+        wrath: 'Cast_Nature',
+        faerie_fire: 'Cast_Nature',
+        thorns: 'Cast_Nature',
+        mark_of_the_wild: 'Cast_Nature',
+        insect_swarm: 'Cast_Nature',
+        moonfire: 'Cast_Starfall',
+        starfire: 'Cast_Starfall',
+        healing_touch: 'Cast_Nurture',
+        regrowth: 'Cast_Nurture',
+        rejuvenation: 'Cast_Nurture',
+        entangling_roots: 'Cast_Roots',
+        hibernate: 'Cast_Roots',
+        hurricane: 'Cast_Storm',
+      },
+    },
+    // Ability-specific spellcast clips (scripts/build_druid_ability_anims.mjs):
+    // a mesh-free clip donor GLB baked off this rig's own spellcasting poses,
+    // alongside the hit-variety donor.
+    animUrls: [`${PLAYERS}/druid_hit_variety_anims.glb`, `${PLAYERS}/druid_ability_anims.glb`],
     // dedicated druid model (own texture, ships a Backpack mesh)
     attach: [{ url: `${WEAPONS}/staff.glb`, bone: 'handslot.r' }],
     weaponSlots: [0],
@@ -1905,10 +1975,16 @@ export const VISUALS: Record<string, VisualDef> = {
   },
   mob_wildheart_high_priest: {
     url: `${CREATURES}/wildheart_high_priest.glb`,
-    animUrls: [`${CREATURES}/wildheart_high_priest_hit_variety_anims.glb`],
+    // Wildheart_High_Priest_Attack clip donor
+    // (scripts/build_wildheart_high_priest_anims.mjs): mesh-free, baked off this same
+    // rig's own poses.
+    animUrls: [
+      `${CREATURES}/wildheart_high_priest_hit_variety_anims.glb`,
+      `${CREATURES}/wildheart_high_priest_ability_anims.glb`,
+    ],
     height: 3.2,
     yaw: -Math.PI / 2,
-    clips: TRIPO_BIPED_FULL_RIG,
+    clips: WILDHEART_HIGH_PRIEST,
     tint: 'entity',
     tintStrength: 0.03,
   },
@@ -1936,7 +2012,10 @@ export const VISUALS: Record<string, VisualDef> = {
     hover: 0.25,
     // light tint only — heavy washes crush the wyrm to black under the green
     // sanctum torchlight
-    clips: FLOATING,
+    clips: DRAGONKIN_FLOATING,
+    // Dragonkin_Attack clip donor (scripts/build_dragonkin_anims.mjs):
+    // mesh-free, baked off this same rig's own poses.
+    animUrls: [`${CREATURES}/dragonkin_ability_anims.glb`],
     tint: 'entity',
     tintStrength: 0.2,
   },
@@ -2044,9 +2123,14 @@ export const VISUALS: Record<string, VisualDef> = {
   // the mob template's scale tell the little orange emberkin from the bulky gloomshade
   mob_demon: {
     url: `${CREATURES}/demonalt.glb`,
-    animUrls: [`${CREATURES}/demonalt_hit_variety_anims.glb`],
     height: 1.8,
-    clips: BIPED14,
+    clips: DEMON_BIPED14,
+    // Demon_Attack clip donor (scripts/build_demon_anims.mjs): mesh-free,
+    // baked off this same rig's own poses. Shared with mob_demonalt below.
+    animUrls: [
+      `${CREATURES}/demonalt_hit_variety_anims.glb`,
+      `${CREATURES}/demon_ability_anims.glb`,
+    ],
     tint: 'entity',
     tintStrength: 0.5,
   },
@@ -2177,9 +2261,14 @@ export const VISUALS: Record<string, VisualDef> = {
   },
   mob_demonalt: {
     url: `${CREATURES}/demonalt.glb`,
-    animUrls: [`${CREATURES}/demonalt_hit_variety_anims.glb`],
     height: 2.1,
-    clips: BIPED14,
+    clips: DEMON_BIPED14,
+    // Demon_Attack clip donor (scripts/build_demon_anims.mjs): mesh-free,
+    // baked off this same rig's own poses. Shared with mob_demon above.
+    animUrls: [
+      `${CREATURES}/demonalt_hit_variety_anims.glb`,
+      `${CREATURES}/demon_ability_anims.glb`,
+    ],
     tint: 'entity',
     tintStrength: 0.35,
   },

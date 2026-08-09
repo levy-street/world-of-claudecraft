@@ -2868,6 +2868,11 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   victory_rush: r('fury', 'gold', ['sword', { p: 'heart', ...BR }], ['glow']),
   piercing_howl: r('storm', 'steel', ['roar', { p: 'boot', ...BR }], ['arcs']),
   die_by_sword: r('steel', 'gold', ['shield', { p: 'sword', ...TR }], ['glow', 'arcs']),
+  // Intervene ships PAINTED art (ABILITY_IMAGE_IDS below), so abilityImageUrl wins and
+  // this recipe is the fallback path only. It stays because every ability owes an
+  // explicit, distinct recipe (tests/ability_icons.test.ts): a shield (the ally absorb)
+  // over a boot (the rush).
+  intervene: r('steel', 'gold', ['shield', { p: 'boot', ...BR }], ['motion', 'glow']),
   recklessness: r('fury', 'blood', ['axe', { p: 'sunburst', ...TL }], ['glow']),
   avatar: r('earth', 'earthBrown', ['helm', { p: 'fist', ...BR }], ['crack', 'glow']),
   sanguine_aura: r('blood', 'blood', ['droplet', { p: 'heart', ...TL }], ['arcs', 'glow']),
@@ -3849,6 +3854,7 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
   'rallying_cry',
   'berserker_stance',
   'die_by_sword',
+  'intervene',
   'storm_bolt',
   'victory_rush',
   'piercing_howl',

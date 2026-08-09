@@ -16,6 +16,7 @@ import { createMob } from '../src/sim/entity';
 import type { PlayerMeta } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 import type { Entity, SimEvent } from '../src/sim/types';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 // Frost mage AoE half (owner design 2026-07-11): Frozen Orb, the drifting
 // Icicle generator (combat/frozen_orb.ts), and Blizzard, the ground channel
@@ -28,8 +29,16 @@ type TestSim = Sim & {
   addEntity(entity: Entity): void;
 };
 
+// Every mob here is hand-spawned via createMob (training dummies, positioned
+// off the player), and no test reaches for an ambient camp, npc, or ground
+// object, so the full built-in world is unused overhead: trim it.
 function makeSim(seed = 60601): { sim: TestSim; p: Entity } {
-  const sim = new Sim({ seed, playerClass: 'mage', autoEquip: true }) as unknown as TestSim;
+  const sim = new Sim({
+    seed,
+    playerClass: 'mage',
+    autoEquip: true,
+    world: EMPTY_TEST_WORLD,
+  }) as unknown as TestSim;
   sim.setPlayerLevel(20);
   expect(sim.setSpec('frost')).toBe(true);
   sim.tick();

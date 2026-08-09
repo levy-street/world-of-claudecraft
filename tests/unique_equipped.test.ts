@@ -7,6 +7,7 @@ import {
 } from '../src/sim/equipment_rules';
 import { Sim } from '../src/sim/sim';
 import type { ItemDef } from '../src/sim/types';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 // Legendary items are unique-equipped: a character may wear at most one copy of
 // a given legendary FAMILY at a time (rings, dual-wield hands), where a heroic
@@ -61,7 +62,7 @@ function addWithoutAutoEquip(sim: Sim, itemId: string, count = 1): void {
 }
 
 function makeFuryWarrior(seed: number): Sim {
-  const sim = new Sim({ seed, playerClass: 'warrior', autoEquip: true });
+  const sim = new Sim({ seed, playerClass: 'warrior', autoEquip: true, world: EMPTY_TEST_WORLD });
   sim.setPlayerLevel(20);
   expect(sim.setSpec('fury')).toBe(true);
   return sim;
@@ -282,7 +283,12 @@ describe('unique-equipped load-time demotion', () => {
     state.equipment.mainhand = 'kingsbane_last_oath';
     state.equipment.offhand = 'kingsbane_last_oath';
 
-    const sim2 = new Sim({ seed: 9007, playerClass: 'warrior', noPlayer: true });
+    const sim2 = new Sim({
+      seed: 9007,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: EMPTY_TEST_WORLD,
+    });
     const pid = sim2.addPlayer('warrior', 'Restored', { state });
     const meta = sim2.meta(pid)!;
 
@@ -301,7 +307,12 @@ describe('unique-equipped load-time demotion', () => {
     state.equipment.mainhand = 'kingsbane_last_oath';
     state.equipment.offhand = 'heroic_kingsbane_last_oath';
 
-    const sim2 = new Sim({ seed: 9015, playerClass: 'warrior', noPlayer: true });
+    const sim2 = new Sim({
+      seed: 9015,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: EMPTY_TEST_WORLD,
+    });
     const pid = sim2.addPlayer('warrior', 'Restored', { state });
     const meta = sim2.meta(pid)!;
 
@@ -320,7 +331,12 @@ describe('unique-equipped load-time demotion', () => {
       offhand: { enchant: 'ench_bench' },
     };
 
-    const sim2 = new Sim({ seed: 9017, playerClass: 'warrior', noPlayer: true });
+    const sim2 = new Sim({
+      seed: 9017,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: EMPTY_TEST_WORLD,
+    });
     const pid = sim2.addPlayer('warrior', 'Restored', { state });
     const meta = sim2.meta(pid)!;
 
@@ -338,7 +354,12 @@ describe('unique-equipped load-time demotion', () => {
     state.equipment.mainhand = 'kingsbane_last_oath';
     state.equipment.offhand = 'voidsong_dirk';
 
-    const sim2 = new Sim({ seed: 9009, playerClass: 'warrior', noPlayer: true });
+    const sim2 = new Sim({
+      seed: 9009,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: EMPTY_TEST_WORLD,
+    });
     const pid = sim2.addPlayer('warrior', 'Restored', { state });
     const meta = sim2.meta(pid)!;
 

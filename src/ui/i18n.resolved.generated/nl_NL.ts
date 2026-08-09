@@ -3009,6 +3009,11 @@ export const nl_NL: EnTranslations = {
       "toolEffectRechargeFull": "{effect} is al volledig opgeladen.",
       "toolEffectRechargeToolCapped": "Draag beter {profession}-gereedschap om {effect} verder op te laden.",
       "toolEffectRechargeMaterials": "Het opladen van {effect} vereist {material} x{count}.",
+      "craftingProgress": "You are crafting: {remaining}s of {total}s remaining.",
+      "disenchantingProgress": "You are disenchanting: {remaining}s of {total}s remaining.",
+      "enchantingProgress": "You are enchanting: {remaining}s of {total}s remaining.",
+      "salvagingProgress": "You are salvaging: {remaining}s of {total}s remaining.",
+      "rechargingToolEffectProgress": "You are recharging a tool effect: {remaining}s of {total}s remaining.",
       "tierPipAria": "Niveau {tier}",
       "nextUnlockTier": "Nog {points} punten tot het volgende niveau: de kans op meesterwerk stijgt",
       "nextUnlockSpecialized": "Nog {points} punten tot Gespecialiseerd: materiaalkosten dalen",
@@ -7413,6 +7418,9 @@ export const nl_NL: EnTranslations = {
   "gpuNotice": {
     "bodyDesktop": "Het spel draait zonder GPU-versnelling en zal traag zijn. Werk je grafische stuurprogramma's bij en herstart het spel. Stel op Windows ook het spel in op Hoge prestaties via Instellingen, Systeem, Beeldscherm, Afbeeldingen.",
     "bodyWeb": "Het spel draait zonder GPU-versnelling en zal traag zijn. Schakel hardwareversnelling in je browserinstellingen in, werk je grafische stuurprogramma's bij en herstart je browser.",
+    "hybridBodyWindows": "This session is rendering on the integrated (power-saving) GPU. If this computer also has a discrete gaming GPU, set your browser to High performance under Settings > System > Display > Graphics, then restart it. The desktop app picks the discrete GPU automatically.",
+    "hybridBodyLinux": "This session is rendering on the integrated (power-saving) GPU. If this computer also has a discrete gaming GPU, your browser or graphics driver may offer its own GPU selection setting, or your distribution may offer a GPU switching tool (such as PRIME or optimus-manager). The desktop app picks the discrete GPU automatically.",
+    "hybridBodyOther": "This session is rendering on the integrated (power-saving) GPU. If this computer also has a discrete gaming GPU, check your browser and operating system graphics settings to enable it. The desktop app picks the discrete GPU automatically.",
     "dismiss": "Sluiten"
   },
   "perfNudge": {
@@ -7876,6 +7884,7 @@ export const nl_NL: EnTranslations = {
       "deathRecapAbility": "Je bent gestorven. Gedood door {ability}.",
       "deathRecapFalling": "Je bent gestorven. Je bent te pletter gevallen.",
       "deathRecapDrowned": "Je bent gestorven. Je bent verdronken.",
+      "deathRecapCauterized": "You have died. Cauterize's burn overwhelmed you.",
       "respawn": "Je voelt je uitgerust en weer heel.",
       "ignoringChat": "Chat van {name} wordt genegeerd.",
       "noLongerIgnoring": "{name} wordt niet langer genegeerd.",
@@ -7919,6 +7928,7 @@ export const nl_NL: EnTranslations = {
       "outOfRange": "Buiten bereik.",
       "noTarget": "Je hebt geen doelwit.",
       "tooClose": "Te dichtbij!",
+      "mustTargetAlly": "You must target an ally.",
       "facing": "Je moet naar je doelwit gekeerd staan.",
       "targetHealthBelow": "Die vaardigheid vereist dat het doelwit onder {percent}% gezondheid is.",
       "dagger": "Je moet een dolk hanteren.",
@@ -9535,6 +9545,10 @@ export const nl_NL: EnTranslations = {
       "die_by_sword": {
         "name": "Door het Zwaard",
         "description": "Defensieve afkoeltijd: gedurende 8 sec loop je 30% minder schade op en ontwijk je veel meer aanvallen."
+      },
+      "intervene": {
+        "name": "Intervene",
+        "description": "Rush to a friendly player, shielding them from {damage} damage for 6 sec."
       },
       "recklessness": {
         "name": "Roekeloosheid",

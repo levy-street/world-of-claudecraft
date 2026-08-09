@@ -269,14 +269,19 @@ describe('canonical allocation, unlocks, and repair', () => {
 
 describe('modifier bake and known-ability resolution', () => {
   it('folds the selected row once and never folds its two alternatives', () => {
-    const doubleCharge = computeTalentModifiers(
+    // `war_row_double_charge` is the FROZEN id of the level-5 row's first option, kept
+    // stable across the Double Charge -> Intervene content swap so saved picks survive.
+    // It now grants an ability rather than adding a stored Onrush use.
+    const intervene = computeTalentModifiers(
       'warrior',
       allocation(null, { 5: 'war_row_double_charge' }),
     );
-    expect(doubleCharge.abilities.charge?.bonusCharges).toBe(1);
-    expect(doubleCharge.global.onKillSpeedPct).toBe(0);
+    expect(intervene.grants.some((g) => g.ability === 'intervene')).toBe(true);
+    expect(intervene.abilities.charge?.bonusCharges).toBeUndefined();
+    expect(intervene.global.onKillSpeedPct).toBe(0);
 
     const pursuit = computeTalentModifiers('warrior', allocation(null, { 5: 'war_row_pursuit' }));
+    expect(pursuit.grants.some((g) => g.ability === 'intervene')).toBe(false);
     expect(pursuit.abilities.charge).toBeUndefined();
     expect(pursuit.global.onKillSpeedPct).toBeCloseTo(0.3);
   });
@@ -490,7 +495,7 @@ describe('Sim authoritative Talent V2 integration', () => {
         8: 'war_row_die_by_the_sword',
       }),
     );
-    expect(meta.talentMods.abilities.charge?.bonusCharges).toBe(1);
+    expect(meta.known.some((ability) => ability.def.id === 'intervene')).toBe(true);
     expect(meta.known.some((ability) => ability.def.id === 'die_by_sword')).toBe(true);
   });
 

@@ -75,6 +75,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.die_by_sword.description':
     'Защитная способность: в течение 8 сек вы получаете на 30% меньше урона и уклоняетесь от гораздо большего числа атак.',
   'entities.abilities.die_by_sword.name': 'Погибель от меча',
+  'entities.abilities.intervene.name': 'Вмешательство',
+  'entities.abilities.intervene.description':
+    'Рывок к союзному игроку, поглощающий {damage} ед. урона в течение 6 сек.',
   'entities.abilities.emboldening_roar.description':
     'Издает ободряющий рев: вы и дружественные игроки в пределах 40 м воодушевлены, а ваши следующие 3 способности гарантированно станут критическими ударами. (ветка «Неистовство»)',
   'entities.abilities.emboldening_roar.name': 'Ободряющий рев',
@@ -2157,6 +2160,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hud.system.deathRecapAbility': 'Вы погибли. Причина: {ability}.',
   'hud.system.deathRecapFalling': 'Вы погибли. Вы разбились насмерть.',
   'hud.system.deathRecapDrowned': 'Вы погибли. Вы утонули.',
+  'hud.system.deathRecapCauterized': 'Вы погибли. Ожог Прижигания одолел вас.',
   'hud.system.respawn': 'Вы снова чувствуете себя отдохнувшим и целым.',
   'hud.system.ignoringChat': 'Чат от {name} игнорируется.',
   'hud.system.noLongerIgnoring': '{name} больше не игнорируется.',
@@ -2200,6 +2204,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hud.errors.outOfRange': 'Вне дальности.',
   'hud.errors.noTarget': 'У вас нет цели.',
   'hud.errors.tooClose': 'Слишком близко!',
+  'hud.errors.mustTargetAlly': 'Нужно выбрать целью союзника.',
   'hud.errors.facing': 'Вы должны смотреть на цель.',
   'hud.errors.targetHealthBelow':
     'Эта способность требует, чтобы здоровье цели было ниже {percent}%.',
@@ -7946,6 +7951,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Игра работает без GPU-ускорения и будет сильно тормозить. Обновите драйверы видеокарты и перезапустите игру. В Windows также выберите для игры режим «Высокая производительность» в разделе Параметры > Система > Дисплей > Графика.',
   'gpuNotice.bodyWeb':
     'Игра работает без GPU-ускорения и будет сильно тормозить. Включите аппаратное ускорение в настройках браузера, обновите драйверы видеокарты и перезапустите браузер.',
+  'gpuNotice.hybridBodyWindows':
+    'Этот сеанс работает на встроенной (энергосберегающей) видеокарте. Если на этом компьютере также есть дискретная игровая видеокарта, установите в браузере режим "Высокая производительность" в разделе Параметры > Система > Дисплей > Графика, а затем перезапустите браузер. Настольное приложение выбирает дискретную видеокарту автоматически.',
+  'gpuNotice.hybridBodyLinux':
+    'Этот сеанс работает на встроенной (энергосберегающей) видеокарте. Если на этом компьютере также есть дискретная игровая видеокарта, в вашем браузере или драйвере видеокарты может быть собственная настройка выбора видеокарты, либо ваш дистрибутив может предлагать инструмент переключения видеокарт (например, PRIME или optimus-manager). Настольное приложение выбирает дискретную видеокарту автоматически.',
+  'gpuNotice.hybridBodyOther':
+    'Этот сеанс работает на встроенной (энергосберегающей) видеокарте. Если на этом компьютере также есть дискретная игровая видеокарта, проверьте настройки графики браузера и операционной системы, чтобы включить ее. Настольное приложение выбирает дискретную видеокарту автоматически.',
   'gpuNotice.dismiss': 'Закрыть',
   'perfNudge.integratedGpu':
     'Игра работает на встроенном (энергосберегающем) графическом процессоре. Если в этом компьютере есть и игровая видеокарта, выберите для браузера режим «Высокая производительность» в разделе Параметры > Система > Дисплей > Графика в Windows, затем перезапустите браузер. Настольная версия выбирает игровую видеокарту автоматически.',
@@ -10661,6 +10672,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectRechargeNoSlot': 'Эффект не установлен: {profession}.',
   'hudChrome.professions.toolEffectRechargeFull': '{effect} уже полностью заряжен.',
   'hudChrome.professions.toolEffectRechargeMaterials': 'Для перезарядки {effect} нужно {material} x{count}.',
+  'hudChrome.professions.craftingProgress': 'Вы создаете предмет: осталось {remaining} с из {total} с.',
+  'hudChrome.professions.disenchantingProgress': 'Вы распыляете предмет: осталось {remaining} с из {total} с.',
+  'hudChrome.professions.enchantingProgress': 'Вы накладываете чары: осталось {remaining} с из {total} с.',
+  'hudChrome.professions.salvagingProgress': 'Вы разбираете предмет: осталось {remaining} с из {total} с.',
+  'hudChrome.professions.rechargingToolEffectProgress':
+    'Вы перезаряжаете эффект инструмента: осталось {remaining} с из {total} с.',
   'hudChrome.professions.toolEffectSpent': 'Израсходовано, нужна подзарядка',
   'hudChrome.professions.toolEffectDepleted': 'Эффект инструмента израсходован',
   'hudChrome.professions.toolEffectRechargePrice': 'Подзарядка: {material} x{count}',

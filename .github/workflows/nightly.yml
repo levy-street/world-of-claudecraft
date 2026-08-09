@@ -191,7 +191,7 @@ jobs:
         run: npm run build:bot
 
       - name: Build client
-        run: npm run build
+        run: npm run wiki:content && npm run build:bundle
 
   # The Chromium browser regressions, mirroring the browser-gate job in ci.yml.
   browser:

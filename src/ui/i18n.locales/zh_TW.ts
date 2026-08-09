@@ -78,6 +78,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.die_by_sword.description':
     '防禦性冷卻技：持續 8 秒，你受到的傷害降低 30%，並大幅提高閃躲攻擊的機率。',
   'entities.abilities.die_by_sword.name': '劍在人在',
+  'entities.abilities.intervene.name': '援護',
+  'entities.abilities.intervene.description':
+    '衝向一名友方玩家，為其抵擋 {damage} 點傷害，持續 6 秒。',
   'entities.abilities.emboldening_roar.description':
     '發出壯膽的怒吼：你與 40 碼內的友方玩家獲得壯膽效果，且你接下來的 3 個技能必定是暴擊。（狂怒）',
   'entities.abilities.emboldening_roar.name': '壯膽怒吼',
@@ -2043,6 +2046,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hud.system.deathRecapAbility': '你已經死亡。死於{ability}。',
   'hud.system.deathRecapFalling': '你已經死亡。你摔死了。',
   'hud.system.deathRecapDrowned': '你已經死亡。你溺死了。',
+  'hud.system.deathRecapCauterized': '你已經死亡。灼燒術的烈焰吞噬了你。',
   'hud.system.respawn': '你再次感到精力恢復、身體完整。',
   'hud.system.ignoringChat': '已封鎖來自 {name} 的聊天。',
   'hud.system.noLongerIgnoring': '不再封鎖 {name}。',
@@ -2083,6 +2087,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hud.errors.outOfRange': '超出範圍。',
   'hud.errors.noTarget': '你沒有目標。',
   'hud.errors.tooClose': '太近了！',
+  'hud.errors.mustTargetAlly': '你必須選定一名友方目標。',
   'hud.errors.facing': '你必須面向目標。',
   'hud.errors.targetHealthBelow': '該技能要求目標生命值低於 {percent}%。',
   'hud.errors.dagger': '你必須裝備匕首。',
@@ -7510,6 +7515,12 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '遊戲目前在沒有 GPU 加速的情況下執行，會非常緩慢。請更新顯示卡驅動程式後重新啟動遊戲。在 Windows 上，還請在 設定 > 系統 > 顯示器 > 顯示卡 中將本遊戲設為「高效能」。',
   'gpuNotice.bodyWeb':
     '遊戲目前在沒有 GPU 加速的情況下執行，會非常緩慢。請在瀏覽器設定中啟用硬體加速，更新顯示卡驅動程式，然後重新啟動瀏覽器。',
+  'gpuNotice.hybridBodyWindows':
+    '本次工作階段正在集成（省電）顯示卡上算圖。如果這台電腦還配有獨立遊戲顯示卡，請在 設定 > 系統 > 顯示 > 圖形 中將瀏覽器設為「高效能」，然後重新啟動瀏覽器。桌面版會自動選擇獨立顯示卡。',
+  'gpuNotice.hybridBodyLinux':
+    '本次工作階段正在集成（省電）顯示卡上算圖。如果這台電腦還配有獨立遊戲顯示卡，您的瀏覽器或顯示卡驅動程式可能提供自己的顯示卡選擇設定，或您的發行版可能提供顯示卡切換工具（例如 PRIME 或 optimus-manager）。桌面版會自動選擇獨立顯示卡。',
+  'gpuNotice.hybridBodyOther':
+    '本次工作階段正在集成（省電）顯示卡上算圖。如果這台電腦還配有獨立遊戲顯示卡，請檢查瀏覽器與作業系統的顯示卡設定以啟用它。桌面版會自動選擇獨立顯示卡。',
   'gpuNotice.dismiss': '關閉',
   'perfNudge.integratedGpu':
     '遊戲目前在內建（省電）顯示晶片上執行。如果這台電腦還配有獨立遊戲顯示卡，請在 Windows 的 設定 > 系統 > 顯示器 > 顯示卡 中將瀏覽器設為「高效能」，然後重新啟動瀏覽器。桌面版會自動選擇遊戲顯示卡。',
@@ -10014,6 +10025,12 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectRechargeNoSlot': '{profession}上沒有鑲嵌任何效果。',
   'hudChrome.professions.toolEffectRechargeFull': '{effect}已充滿能量。',
   'hudChrome.professions.toolEffectRechargeMaterials': '為{effect}充能需要{material}x{count}。',
+  'hudChrome.professions.craftingProgress': '正在製作：還剩{remaining}秒，共{total}秒。',
+  'hudChrome.professions.disenchantingProgress': '正在分解：還剩{remaining}秒，共{total}秒。',
+  'hudChrome.professions.enchantingProgress': '正在附魔：還剩{remaining}秒，共{total}秒。',
+  'hudChrome.professions.salvagingProgress': '正在回收：還剩{remaining}秒，共{total}秒。',
+  'hudChrome.professions.rechargingToolEffectProgress':
+    '正在為工具效果充能：還剩{remaining}秒，共{total}秒。',
   'hudChrome.professions.toolEffectSpent': '已耗盡，需要充能',
   'hudChrome.professions.toolEffectDepleted': '工具效果已耗盡',
   'hudChrome.professions.toolEffectRechargePrice': '充能：{material} x{count}',

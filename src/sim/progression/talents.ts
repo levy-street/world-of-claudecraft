@@ -55,12 +55,7 @@ import { ABILITIES } from '../data';
 import { recalcPlayerStats } from '../entity';
 import { itemCopyPin } from '../item_copy_ref';
 import { equipItem as equipItemImpl } from '../items';
-import {
-  buildGearSet,
-  planGearSwap,
-  type SavedGearSet,
-  wornAsBagSlot,
-} from '../loadout_gear';
+import { buildGearSet, planGearSwap, type SavedGearSet, wornAsBagSlot } from '../loadout_gear';
 import { despawnPersistentPet, petOf } from '../pet/pet_commands';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -344,7 +339,7 @@ function dismissSpecLockedPet(ctx: SimContext, e: Entity, meta: PlayerMeta): voi
 
 // Legacy incremental API retained for old scripts. The node system is gone, so
 // this no longer changes state.
-export function spendTalentPoint(ctx: SimContext, nodeId: string, pid?: number): boolean {
+export function spendTalentPoint(ctx: SimContext, _nodeId: string, pid?: number): boolean {
   const r = ctx.resolve(pid);
   if (!r) return false;
   ctx.error(r.e.id, 'Invalid talent build.');

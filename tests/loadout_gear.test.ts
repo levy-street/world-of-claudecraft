@@ -16,7 +16,12 @@ import { slotAcceptsItem } from '../src/sim/equipment_rules';
 import { itemCopyPin } from '../src/sim/item_copy_ref';
 import { buildGearSet, planGearSwap, type SavedGearSet } from '../src/sim/loadout_gear';
 import { repairTalentLoadouts } from '../src/sim/talent_loadouts';
-import { ALL_EQUIP_SLOTS, type EquipSlot, type InvSlot, type ItemInstancePayload } from '../src/sim/types';
+import {
+  ALL_EQUIP_SLOTS,
+  type EquipSlot,
+  type InvSlot,
+  type ItemInstancePayload,
+} from '../src/sim/types';
 
 const GIRDLE = 'warfare_girdle';
 const BOOTS = 'warfare_boots';

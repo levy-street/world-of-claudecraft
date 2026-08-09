@@ -103,6 +103,7 @@ import {
   parsePageParams,
   resetAdminPlayersCapForTests,
 } from '../server/admin';
+import { resetAdminActivityCacheForTests } from '../server/admin_activity_cache';
 import {
   accountDetail,
   associationsForIp,
@@ -160,6 +161,7 @@ import {
   recordProfessionsRestore,
   resetChatStrikesAudited,
 } from '../server/moderation_db';
+import { resetModerationQueueCacheForTests } from '../server/moderation_queue_cache';
 import { authFailureCount, resetAuthFailures } from '../server/ratelimit';
 import {
   adminRolesForAccount,
@@ -267,10 +269,12 @@ const fakeGame = fakeGameState as typeof fakeGameState & Parameters<typeof handl
 
 beforeEach(() => {
   vi.clearAllMocks();
-  // The overview branch reads through the shared TTL memo (admin_overview_cache),
-  // whose refresh IS the mocked overviewCounts here; start every test cold so one
-  // test's cached value never leaks into the next.
+  // The overview/activity/moderation-queue branches all read through shared TTL
+  // memos whose refresh IS the mocked admin_db/moderation_db function here; start
+  // every test cold so one test's cached value never leaks into the next.
   resetOverviewCacheForTests();
+  resetAdminActivityCacheForTests();
+  resetModerationQueueCacheForTests();
   resetAdminGuildListReadsForTests();
   resetAdminPlayersCapForTests();
   // The per-account failed-login throttle (server/ratelimit.ts) is real, module-level
@@ -960,6 +964,11 @@ describe('admin api auth', () => {
   it('serves the moderation queue to admins with online account context', async () => {
     vi.mocked(accountAndScopeForToken).mockResolvedValue(fullToken(7));
     vi.mocked(isAdminAccount).mockResolvedValue(true);
+    // moderation_queue_cache.ts's base read is online-blind by design (see its
+    // header): the underlying moderationQueue is always called with an EMPTY
+    // set, and the live online status (fakeGameState.liveAccountIds => Set([9])
+    // below) is merged in afterward, never baked into what moderationQueue
+    // itself returns.
     vi.mocked(moderationQueue).mockResolvedValue([
       {
         accountId: 9,
@@ -971,7 +980,7 @@ describe('admin api auth', () => {
         latestReportAt: new Date().toISOString(),
         latestReason: 'spam',
         characterNames: ['Badactor'],
-        online: true,
+        online: false,
       },
     ]);
     const res = fakeRes();
@@ -983,8 +992,11 @@ describe('admin api auth', () => {
     );
 
     expect(res.statusCode).toBe(200);
-    expect(moderationQueue).toHaveBeenCalledWith(new Set([9]));
+    expect(moderationQueue).toHaveBeenCalledWith(new Set());
     expect(res.body.data.rows[0].openReports).toBe(4);
+    // fakeGameState.liveAccountIds() returns Set([9]) (below), so the cache's
+    // live merge marks account 9 online even though the base row was not.
+    expect(res.body.data.rows[0].online).toBe(true);
   });
 
   it('serves perf summaries and raw rows through existing admin auth', async () => {

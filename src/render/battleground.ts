@@ -82,9 +82,17 @@ export function ensureBattlegroundAssets(): Promise<void> {
   return battlegroundAssetsPromise;
 }
 
-// The DEFERRED lane: the field's art is only ever needed by a player who enters
-// the band, so it must not compete with the launcher's own fetches.
-if (typeof window !== 'undefined') registerDeferredPreload(() => ensureBattlegroundAssets());
+// The BACKGROUND lane, not just deferred: the field's art is only ever needed
+// by a player who enters the band, and buildBattleground() (below) already
+// streams its own pieces in as they resolve rather than reading the cache
+// synchronously (a player who arrives mid-stream sees the field fill in
+// rather than nothing at all), so it tolerates its preload finishing after
+// first frame too. Boot must not spend time on tens of MB of match art most
+// sessions never load into, on top of not competing with the launcher's own
+// fetches.
+if (typeof window !== 'undefined') {
+  registerDeferredPreload(() => ensureBattlegroundAssets(), 'background');
+}
 
 /** The renderer-owned hooks the field plugs into (the yumi signature shape). */
 export interface BattlegroundLightHooks {

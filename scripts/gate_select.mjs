@@ -70,6 +70,16 @@ const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'
 /** @param {string} cmd @param {string[]} args */
 const git = (cmd, args) => spawnSync(cmd, args, { encoding: 'utf8', shell, cwd: repoRoot });
 
+// Resolve the vitest binary directly instead of going through `npx --no-install
+// vitest`: npx still pays a real per-invocation startup cost even when it skips
+// the install check, and this file spawns vitest up to four times in one run.
+const vitestBin = path.join(
+  repoRoot,
+  'node_modules',
+  '.bin',
+  process.platform === 'win32' ? 'vitest.cmd' : 'vitest',
+);
+
 // Same preflights as gate.mjs (dependency sync, then ffmpeg/ffprobe by
 // execution). They exist to turn a confusing mid-gate failure into a clear early
 // one, and this path is the one people run most.
@@ -151,8 +161,8 @@ const vitestSteps = [];
 if (plan.mode === 'full') {
   vitestSteps.push({
     name: 'vitest (full suite, planner fell back)',
-    cmd: 'npx',
-    args: ['--no-install', 'vitest', ...buildFullSuiteArgs({ workers })],
+    cmd: vitestBin,
+    args: [...buildFullSuiteArgs({ workers })],
   });
 } else {
   // Chunked: with shell:true on win32, ~500 paths in one argv exceeds cmd.exe's
@@ -170,8 +180,8 @@ if (plan.mode === 'full') {
         chunks.length === 1
           ? `vitest (always-run, ${runnable.length} files)`
           : `vitest (always-run ${i + 1}/${chunks.length}, ${files.length} files)`,
-      cmd: 'npx',
-      args: ['--no-install', 'vitest', ...buildAlwaysRunArgs({ files, workers })],
+      cmd: vitestBin,
+      args: [...buildAlwaysRunArgs({ files, workers })],
       hint: 'these tests reach outside the module graph, so they run on every selective gate',
     });
   });
@@ -182,8 +192,8 @@ if (plan.mode === 'full') {
       // changed sources AND fed-through generated i18n artifacts, and the
       // plan.reason line above counts those separately.
       name: `vitest (related over ${plan.relatedSources.length} path(s))`,
-      cmd: 'npx',
-      args: ['--no-install', 'vitest', ...relatedArgs],
+      cmd: vitestBin,
+      args: [...relatedArgs],
     });
   }
 }
@@ -195,8 +205,8 @@ if (plan.mode === 'full') {
 if (releaseTier) {
   vitestSteps.push({
     name: 'vitest (release-tier i18n)',
-    cmd: 'npx',
-    args: ['--no-install', 'vitest', 'run', ...I18N_RELEASE_TIER_SUITES, `--maxWorkers=${workers}`],
+    cmd: vitestBin,
+    args: ['run', ...I18N_RELEASE_TIER_SUITES, `--maxWorkers=${workers}`],
     env: { I18N_RELEASE_TIER: '1' },
     hint: 'release-tier i18n is red until every locale is filled: run the i18n-locale-fill workflow (docs/i18n-scaling/translation-workflow.md). It does NOT indicate a code regression.',
   });

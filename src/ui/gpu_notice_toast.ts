@@ -1,15 +1,21 @@
-// Software-rendering notice: a one-time, dismissible, shell-level toast shown
-// when the session runs on a software rasterizer (WARP, SwiftShader, llvmpipe).
-// Since Chromium 141 removed the automatic SwiftShader fallback, the Windows
-// no-GPU shape is the D3D11 WARP device: the game still boots and plays (low
-// tier), but at a slideshow frame rate with no explanation; this toast is that
-// explanation. State transitions live in the pure view-core
-// (src/ui/gpu_notice_view.ts); this module is the thin DOM consumer (it owns a
-// fixed-position element on document.body; styles in src/styles/shell.css
-// "software rendering notice" section). It works on both the pre-game shell
-// and in-world, like the desktop update toast it is modeled on.
+// GPU notice family: a one-time, dismissible, shell-level toast covering two
+// independent triggers (see src/ui/gpu_notice_view.ts):
+// - software rendering (WARP/SwiftShader/llvmpipe): since Chromium 141
+//   removed the automatic SwiftShader fallback, the Windows no-GPU shape is
+//   the D3D11 WARP device, which still boots and plays (low tier) but at a
+//   slideshow frame rate with no explanation; this toast is that explanation.
+// - hybrid-GPU-likely (issue #2119): an integrated GPU on a machine that
+//   likely also has a discrete one, where the page has no lever to switch
+//   adapters (electron/gpu_preference.cjs already solves this in the desktop
+//   shell; the browser path only has per-OS guidance).
+// State transitions live in the pure view-core (src/ui/gpu_notice_view.ts);
+// this module is the thin DOM consumer (it owns a fixed-position element on
+// document.body; styles in src/styles/shell.css "software rendering notice"
+// section, shared by both variants). It works on both the pre-game shell and
+// in-world, like the desktop update toast it is modeled on.
 
 import {
+  type DesktopPlatform,
   dismissGpuNotice,
   type GpuNoticeState,
   gpuNoticeBodyKey,
@@ -17,22 +23,24 @@ import {
 } from './gpu_notice_view';
 import { t } from './i18n';
 
-// Per-install dismissal: the notice explains a machine-level condition, so once
-// a player has read it, never nag again (a session-only fallback applies when
-// storage is unavailable, e.g. hardened private modes).
-const DISMISSED_KEY = 'woc_gpu_notice_dismissed';
+// Per-install dismissal, one key per variant: each explains a different
+// machine-level condition, so dismissing the software notice must never
+// suppress a later hybrid one and vice versa. A session-only fallback applies
+// when storage is unavailable (e.g. hardened private modes).
+const SOFTWARE_DISMISSED_KEY = 'woc_gpu_notice_dismissed';
+const HYBRID_DISMISSED_KEY = 'woc_gpu_notice_hybrid_dismissed';
 
-function readDismissed(): boolean {
+function readDismissed(key: string): boolean {
   try {
-    return typeof localStorage !== 'undefined' && localStorage.getItem(DISMISSED_KEY) === '1';
+    return typeof localStorage !== 'undefined' && localStorage.getItem(key) === '1';
   } catch {
     return false;
   }
 }
 
-function writeDismissed(): void {
+function writeDismissed(key: string): void {
   try {
-    localStorage.setItem(DISMISSED_KEY, '1');
+    localStorage.setItem(key, '1');
   } catch {
     // Storage unavailable: the in-memory dismissal still hides it this session.
   }
@@ -43,13 +51,17 @@ function writeDismissed(): void {
 // else here is unchanged by that packet.
 export function initGpuNotice(input: {
   softwareRendering: boolean;
+  hybridGpuLikely: boolean;
   desktopShell: boolean;
+  desktopPlatform: DesktopPlatform;
 }): boolean {
   let state: GpuNoticeState = resolveGpuNotice({
     softwareRendering: input.softwareRendering,
-    dismissedBefore: readDismissed(),
+    hybridGpuLikely: input.hybridGpuLikely,
+    softwareDismissedBefore: readDismissed(SOFTWARE_DISMISSED_KEY),
+    hybridDismissedBefore: readDismissed(HYBRID_DISMISSED_KEY),
   });
-  if (!state.shown) return false;
+  if (!state.shown || !state.variant) return false;
 
   let root: HTMLDivElement | null = null;
   let message: HTMLSpanElement | null = null;
@@ -68,8 +80,9 @@ export function initGpuNotice(input: {
     dismissButton.type = 'button';
     dismissButton.className = 'gpu-notice-dismiss';
     dismissButton.addEventListener('click', () => {
+      const key = state.variant === 'hybrid' ? HYBRID_DISMISSED_KEY : SOFTWARE_DISMISSED_KEY;
       state = dismissGpuNotice(state);
-      writeDismissed();
+      writeDismissed(key);
       render();
     });
     root.append(message, dismissButton);
@@ -77,14 +90,20 @@ export function initGpuNotice(input: {
   };
 
   const render = (): void => {
-    if (!state.shown) {
+    if (!state.shown || !state.variant) {
       if (root) root.hidden = true;
       return;
     }
     ensureDom();
     if (!root || !message || !dismissButton) return;
     root.hidden = false;
-    message.textContent = t(gpuNoticeBodyKey(input.desktopShell));
+    message.textContent = t(
+      gpuNoticeBodyKey({
+        variant: state.variant,
+        desktopShell: input.desktopShell,
+        desktopPlatform: input.desktopPlatform,
+      }),
+    );
     dismissButton.textContent = t('gpuNotice.dismiss');
   };
 

@@ -3009,6 +3009,11 @@ export const es_ES: EnTranslations = {
       "toolEffectRechargeFull": "{effect} ya tiene la carga completa.",
       "toolEffectRechargeToolCapped": "Lleva una herramienta de {profession} mejor para cargar más {effect}.",
       "toolEffectRechargeMaterials": "Recargar {effect} requiere {material} x{count}.",
+      "craftingProgress": "You are crafting: {remaining}s of {total}s remaining.",
+      "disenchantingProgress": "You are disenchanting: {remaining}s of {total}s remaining.",
+      "enchantingProgress": "You are enchanting: {remaining}s of {total}s remaining.",
+      "salvagingProgress": "You are salvaging: {remaining}s of {total}s remaining.",
+      "rechargingToolEffectProgress": "You are recharging a tool effect: {remaining}s of {total}s remaining.",
       "tierPipAria": "Nivel {tier}",
       "nextUnlockTier": "{points} apunta al siguiente nivel: las probabilidades de obra maestra mejoran",
       "nextUnlockSpecialized": "{points} apunta a Specialized: bajan los costes de materiales",
@@ -7413,6 +7418,9 @@ export const es_ES: EnTranslations = {
   "gpuNotice": {
     "bodyDesktop": "El juego se ejecuta sin aceleración de GPU y será lento. Actualiza los controladores de gráficos y reinicia el juego. En Windows, establece también el juego como Alto rendimiento en Configuración > Sistema > Pantalla > Gráficos.",
     "bodyWeb": "El juego se ejecuta sin aceleración de GPU y será lento. Activa la aceleración de hardware en los ajustes del navegador, actualiza los controladores de gráficos y reinicia el navegador.",
+    "hybridBodyWindows": "This session is rendering on the integrated (power-saving) GPU. If this computer also has a discrete gaming GPU, set your browser to High performance under Settings > System > Display > Graphics, then restart it. The desktop app picks the discrete GPU automatically.",
+    "hybridBodyLinux": "This session is rendering on the integrated (power-saving) GPU. If this computer also has a discrete gaming GPU, your browser or graphics driver may offer its own GPU selection setting, or your distribution may offer a GPU switching tool (such as PRIME or optimus-manager). The desktop app picks the discrete GPU automatically.",
+    "hybridBodyOther": "This session is rendering on the integrated (power-saving) GPU. If this computer also has a discrete gaming GPU, check your browser and operating system graphics settings to enable it. The desktop app picks the discrete GPU automatically.",
     "dismiss": "Cerrar"
   },
   "perfNudge": {
@@ -7876,6 +7884,7 @@ export const es_ES: EnTranslations = {
       "deathRecapAbility": "Has muerto. Te mató {ability}.",
       "deathRecapFalling": "Has muerto. Moriste al caer.",
       "deathRecapDrowned": "Has muerto. Te ahogaste.",
+      "deathRecapCauterized": "You have died. Cauterize's burn overwhelmed you.",
       "respawn": "Te sientes descansado y completo de nuevo.",
       "ignoringChat": "Ignorando el chat de {name}.",
       "noLongerIgnoring": "Ya no ignoras a {name}.",
@@ -7919,6 +7928,7 @@ export const es_ES: EnTranslations = {
       "outOfRange": "Fuera de alcance.",
       "noTarget": "No tienes objetivo.",
       "tooClose": "¡Demasiado cerca!",
+      "mustTargetAlly": "You must target an ally.",
       "facing": "Debes mirar a tu objetivo.",
       "targetHealthBelow": "Esa habilidad requiere que el objetivo tenga menos de {percent}% de salud.",
       "dagger": "Debes llevar una daga.",
@@ -9535,6 +9545,10 @@ export const es_ES: EnTranslations = {
       "die_by_sword": {
         "name": "Morir por la Espada",
         "description": "Recurso defensivo: durante 8 s recibes un 30% menos de daño y esquivas muchos más ataques."
+      },
+      "intervene": {
+        "name": "Intervene",
+        "description": "Rush to a friendly player, shielding them from {damage} damage for 6 sec."
       },
       "recklessness": {
         "name": "Temeridad",

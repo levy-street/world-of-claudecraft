@@ -39,9 +39,11 @@ describe('Talents V2 icon routing', () => {
   });
 
   it('maps Charge modifiers and Combat Mastery to their exact authored icons', () => {
+    // Frozen option id, new content: the level-5 row grants Intervene now, so its
+    // icon resolves through the granted ability rather than the old modifier art.
     expect(talentRowOptionIconRef(warriorOption('war_row_double_charge'))).toEqual({
       kind: 'ability',
-      id: 'double_charge',
+      id: 'intervene',
     });
     expect(talentRowOptionIconRef(warriorOption('war_row_crushing_charge'))).toEqual({
       kind: 'ability',

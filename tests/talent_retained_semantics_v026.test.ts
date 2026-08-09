@@ -186,9 +186,10 @@ describe('retained v0.26 all-class Talents V2 semantics', () => {
     const twinstrike = resolved('warrior', 'raging_gale', {}, 'fury');
     expect(twinstrike).toMatchObject({ charges: 2, bonusCharges: 1 });
 
-    const doubleCharge = resolved('warrior', 'charge', { 5: 'war_row_double_charge' }, 'arms');
-    expect(doubleCharge).toMatchObject({ charges: 2, bonusCharges: 1 });
-
+    // The warrior arm was Double Charge, which this branch replaced with Intervene,
+    // so `charge` no longer takes talent bonusCharges. The talent-added half of the
+    // claim is still covered by Double Blink below; only the warrior INSTANCE is
+    // gone, not the mechanism.
     const doubleBlink = resolved('mage', 'blink', { 5: 'mag_r5_double_blink' });
     expect(doubleBlink).toMatchObject({ charges: 2, bonusCharges: 1 });
   });
@@ -346,7 +347,7 @@ describe('retained v0.26 all-class Talents V2 semantics', () => {
     );
   });
 
-  it('makes winning Lingering Dread absorb 20% max-health damage before fear breaks', () => {
+  it('makes winning Lingering Dread absorb 10% max-health damage before fear breaks', () => {
     const sim = harness(
       new Sim({ seed: 2614, playerClass: 'warrior', autoEquip: false, world: EMPTY_TEST_WORLD }),
     );
@@ -359,17 +360,17 @@ describe('retained v0.26 all-class Talents V2 semantics', () => {
 
     runEffects(sim.ctx, player, metaOf(sim), target, shout);
     const fear = target.auras.find((aura) => aura.id === 'fear_incap');
-    expect(fear?.breakThreshold).toBe(Math.round(target.maxHp * 0.2));
+    expect(fear?.breakThreshold).toBe(Math.round(target.maxHp * 0.1));
 
     dealDamage(sim.ctx, player, target, 100, false, 'physical', 'Test Hit', 'hit');
     expect(target.auras.find((aura) => aura.id === 'fear_incap')?.breakThreshold).toBe(
-      Math.round(target.maxHp * 0.2) - 100,
+      Math.round(target.maxHp * 0.1) - 100,
     );
     dealDamage(
       sim.ctx,
       player,
       target,
-      Math.round(target.maxHp * 0.2) - 100,
+      Math.round(target.maxHp * 0.1) - 100,
       false,
       'physical',
       'Test Hit',

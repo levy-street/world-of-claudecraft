@@ -12,9 +12,11 @@ import {
   type PrewarmPolicyInput,
   partitionMandatoryLandmarkCandidates,
   prewarmBuildDeadline,
+  prewarmCompileUnitDeadline,
   prewarmEntryResumesAfterSkip,
   prewarmEntryRuns,
   prewarmEntryShouldDefer,
+  prewarmProgramContentKeys,
   remainingPrewarmViewBudget,
   resolvePrewarmPolicy,
   withRestoredPrewarmState,
@@ -37,7 +39,10 @@ const BASE: PrewarmPolicyInput = {
 };
 
 // The full manifest id order the renderer builds, for the reorder tests.
+// Kept in lockstep with the renderer by the "matches the renderer's real
+// manifest" case below, which parses the source.
 const MANIFEST_IDS = [
+  'sky.nearby-biomes',
   'views.required',
   'views.landmarks',
   'views.persistent-portals',
@@ -49,15 +54,52 @@ const MANIFEST_IDS = [
   'entities.npc-archetypes',
   'objects.quest-archetypes',
   'props.material-variants',
+  'props.ghost-fade-variants',
   'foliage.materials',
+  'foliage.great-tree-materials',
+  'surface-detail.textures',
+  'weather.materials',
+  'landmarks.impact-site',
+  'world.settle-state',
   'textures.scene',
   'vfx.atlas',
+  'vfx.weapon-skins',
+  'vfx.ability-primitives',
   'world.initial-frame',
   'programs.compile',
-  'sky.biome-variants',
+  'programs.budget-variants',
+  'sky.current-zone',
   'render.settle-passes',
   'diagnostics.baseline',
 ];
+
+/** The renderer's manifest entries parsed from source: id, and whether the
+ *  literal carries required / deadlineExempt properties. */
+function parsedManifestEntries(): { id: string; required: boolean; deadlineExempt: boolean }[] {
+  const renderer = readFileSync(
+    new URL('../src/render/renderer.ts', import.meta.url),
+    'utf8',
+  ).replace(/\r\n/g, '\n');
+  const start = renderer.indexOf('const manifest: PrewarmManifestEntry[] = [');
+  const end = renderer.indexOf('const byId = new Map(', start);
+  expect(start).toBeGreaterThan(-1);
+  expect(end).toBeGreaterThan(start);
+  const slice = renderer.slice(start, end);
+  const blocks = slice.split(/\n {6}\{\n/).slice(1);
+  return blocks.map((block) => {
+    const id = /id: '([^']+)'/.exec(block)?.[1];
+    expect(id).toBeTruthy();
+    // The VALUE matters, not the property's presence: a literal
+    // `deadlineExempt: false` is exactly the deferrable-required bug the
+    // downstream invariant hunts.
+    const exemptLiteral = /deadlineExempt: ([^,\n]+)/.exec(block)?.[1]?.trim();
+    return {
+      id: id as string,
+      required: block.includes('required: true'),
+      deadlineExempt: exemptLiteral !== undefined && exemptLiteral !== 'false',
+    };
+  });
+}
 
 describe('resolvePrewarmPolicy: unconstrained desktop', () => {
   it('runs the full manifest with generous budgets and no reordering', () => {
@@ -137,6 +179,129 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
       expect(prewarmEntryRuns(id, p)).toBe(false);
     }
     expect(prewarmEntryRuns('textures.scene', p)).toBe(true);
+  });
+
+  it('matches the renderer real manifest order', () => {
+    expect(parsedManifestEntries().map((entry) => entry.id)).toEqual(MANIFEST_IDS);
+  });
+
+  it('reserves compile-loop room so the initial frame always fits before the GPU guard', () => {
+    // The measured failure (entry blob, 2026-08-09): programs.compile is
+    // deadline-exempt and ran to the 14 s GPU-submit guard, so
+    // world.initial-frame started past the 12 s soft deadline and was
+    // cancelled outright; the initial scene's programs then linked at first
+    // LIVE draw (102-318 ms submit stalls, 17 programs in one frame).
+    expect(prewarmCompileUnitDeadline(14_000, 2_000)).toBe(12_000);
+    // A nonsensical negative reserve never EXTENDS the compile wall.
+    expect(prewarmCompileUnitDeadline(14_000, -500)).toBe(14_000);
+
+    const renderer = readFileSync(
+      new URL('../src/render/renderer.ts', import.meta.url),
+      'utf8',
+    ).replace(/\r\n/g, '\n');
+    expect(renderer).toContain('const compileUnitDeadline = prewarmCompileUnitDeadline(');
+    expect(renderer).toContain('PREWARM_FRAME_RESERVE_MS');
+    const compileEntryAt = renderer.indexOf("id: 'programs.compile'");
+    const nextEntryAt = renderer.indexOf("id: 'programs.budget-variants'", compileEntryAt);
+    const compileEntry = renderer.slice(compileEntryAt, nextEntryAt);
+    expect(compileEntryAt).toBeGreaterThan(-1);
+    expect(nextEntryAt).toBeGreaterThan(compileEntryAt);
+    // The unit loop must stop at the RESERVED deadline, not the GPU guard.
+    expect(compileEntry).toContain('performance.now() >= compileUnitDeadline');
+    expect(compileEntry).not.toContain('performance.now() >= gpuSubmitDeadline');
+  });
+
+  it('leaves no required entry deferrable downstream of the exempt compile', () => {
+    // The regression class that dropped world.initial-frame: every entry
+    // ordered at or after programs.compile (which may lawfully consume the
+    // whole soft budget) must carry a deadlineExempt property, or a slow
+    // compile silently cancels a required entry. This would have caught the
+    // granularity regression that pushed elapsed past the soft deadline.
+    const entries = parsedManifestEntries();
+    const ordered = orderedPrewarmIds(
+      entries.map((entry) => entry.id),
+      resolvePrewarmPolicy(BASE),
+    );
+    const compileAt = ordered.indexOf('programs.compile');
+    expect(compileAt).toBeGreaterThan(-1);
+    const byId = new Map(entries.map((entry) => [entry.id, entry]));
+    for (const id of ordered.slice(compileAt)) {
+      const entry = byId.get(id);
+      expect(entry).toBeTruthy();
+      if (entry?.required) {
+        expect(entry.deadlineExempt, `required entry ${id} is deferrable`).toBe(true);
+      }
+    }
+  });
+
+  it('encodes program-content keys exactly as fine as three program cache key', () => {
+    // The residue probe named the cost of a coarser key: 28 instanced-prop
+    // colour programs plus 3 instanced depth ones relinked at draw time over
+    // a missing instanceColor bit, and 4 more over morph COUNTS collapsed to
+    // a boolean. A dedupe key must distinguish every bit three keys on.
+    const base = { isSkinnedMesh: false, isInstancedMesh: true, castShadow: true };
+    const plain = prewarmProgramContentKeys({ ...base, hasInstanceColor: false }, ['mat-1']);
+    const colored = prewarmProgramContentKeys({ ...base, hasInstanceColor: true }, ['mat-1']);
+    expect(plain).toHaveLength(1);
+    expect(plain).not.toEqual(colored);
+
+    const morphs2 = prewarmProgramContentKeys({ morphTargetCount: 2 }, ['mat-1']);
+    const morphs6 = prewarmProgramContentKeys({ morphTargetCount: 6 }, ['mat-1']);
+    expect(morphs2).not.toEqual(morphs6);
+    expect(prewarmProgramContentKeys({ morphTargetCount: 2 }, ['mat-1'])).toEqual(morphs2);
+
+    // Presence vs absence: three defines USE_MORPHTARGETS on the position
+    // attribute's PRESENCE, so present-with-zero and absent are distinct.
+    expect(
+      prewarmProgramContentKeys({ hasMorphPositions: true, morphTargetCount: 0 }, ['mat-1']),
+    ).not.toEqual(prewarmProgramContentKeys({ hasMorphPositions: false }, ['mat-1']));
+
+    // Every remaining object/geometry cache-key bit is its own dimension:
+    // morph normal and colour counts, tangents, vertex colour item size
+    // (4 flips vertexAlphas), batched meshes.
+    const flat = prewarmProgramContentKeys({}, ['mat-1']);
+    expect(prewarmProgramContentKeys({ morphNormalCount: 2 }, ['mat-1'])).not.toEqual(flat);
+    expect(prewarmProgramContentKeys({ morphColorCount: 1 }, ['mat-1'])).not.toEqual(flat);
+    expect(prewarmProgramContentKeys({ hasTangents: true }, ['mat-1'])).not.toEqual(flat);
+    expect(prewarmProgramContentKeys({ vertexColorItemSize: 3 }, ['mat-1'])).not.toEqual(
+      prewarmProgramContentKeys({ vertexColorItemSize: 4 }, ['mat-1']),
+    );
+    expect(prewarmProgramContentKeys({ isBatchedMesh: true }, ['mat-1'])).not.toEqual(flat);
+
+    // Per-material keys: a two-material mesh contributes one key per slot.
+    expect(prewarmProgramContentKeys({}, ['mat-1', 'mat-2'])).toHaveLength(2);
+    // Different material, same shape: distinct keys.
+    expect(prewarmProgramContentKeys({}, ['mat-1'])).not.toEqual(
+      prewarmProgramContentKeys({}, ['mat-2']),
+    );
+  });
+
+  it('wires the compile dedupe and the widened shadow arm to the measured residue', () => {
+    const renderer = readFileSync(
+      new URL('../src/render/renderer.ts', import.meta.url),
+      'utf8',
+    ).replace(/\r\n/g, '\n');
+    // The dedupe key comes from the shared pure helper, never a hand-rolled
+    // string that can drift from three's cache key again.
+    expect(renderer).toContain('prewarmProgramContentKeys(');
+    expect(renderer).toContain('hasInstanceColor: ');
+    expect(renderer).toContain('morphTargetCount: ');
+    // The prewarm depth material must match the REAL shadow pass variant:
+    // three's shadow depth material uses RGBADepthPacking and depthPacking is
+    // in the program cache key, so omitting it links a dead variant (the
+    // pre-existing defect the residue probe exposed: every skinned-shadow
+    // compile linked BasicDepthPacking, and the frame relinked all of them).
+    expect(renderer).toContain('depthPacking: THREE.RGBADepthPacking');
+    // The shadow arm covers every caster, not just skinned rigs: static and
+    // instanced casters' depth programs were 12 of the frame's 64 residual
+    // links.
+    const shadowStart = renderer.indexOf('private async compileShadowPrograms(');
+    const shadowEnd = renderer.indexOf('\n  // A tiny throwaway target', shadowStart);
+    expect(shadowStart).toBeGreaterThan(-1);
+    expect(shadowEnd).toBeGreaterThan(shadowStart);
+    const shadowMethod = renderer.slice(shadowStart, shadowEnd);
+    expect(shadowMethod).toContain('if (!mesh.isMesh || !mesh.castShadow) return;');
+    expect(shadowMethod).not.toContain('if (!mesh.isSkinnedMesh || !mesh.castShadow) return;');
   });
 
   it('keeps the required desktop compiler behind the loading cover after a slow first frame', () => {
@@ -331,6 +496,10 @@ describe('the keep-list is the minimal entry set', () => {
         'views.nearby',
         'views.persistent-portals',
         'views.required',
+        // The pre-collection world-state update: without it, textures.scene
+        // and the compile units collect a visibility state the initial frame
+        // does not draw, and the frame pays the difference synchronously.
+        'world.settle-state',
         'world.initial-frame',
       ].sort(),
     );
@@ -538,7 +707,7 @@ describe('mandatory interaction-landmark prewarm', () => {
     expect(core).toContain('export class CompileGateQueue');
     expect(core).toContain('timedOut = true;');
     expect(core).toContain(
-      'if (this.sharedQueue) return this.sharedQueue.run(work, options.priority, options.label)',
+      'return this.sharedQueue.run(work, options.priority, options.label, { releaseTail: true })',
     );
     expect(core).toContain('this.tail.then(work)');
   });

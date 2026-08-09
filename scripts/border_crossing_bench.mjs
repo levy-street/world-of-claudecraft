@@ -191,6 +191,12 @@ async function measureCrossing(page) {
       gpuQueueSlowest: (stats.gpuQueue?.slowest ?? [])
         .slice(0, 10)
         .map((u) => ({ label: u.label, syncMs: u.syncMs, wallMs: u.wallMs })),
+      gpuQueueActive: stats.gpuQueue?.active ?? null,
+      gpuQueueStalls: (stats.gpuQueue?.stalls ?? []).map((s) => ({
+        label: s.label,
+        ageMs: s.ageMs,
+        settled: s.settled,
+      })),
       topStalls: (s.devTrace?.frames ?? [])
         .filter((f) => f.stallAttribution)
         .slice(0, 3)

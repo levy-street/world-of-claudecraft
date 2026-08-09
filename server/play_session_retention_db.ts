@@ -45,9 +45,9 @@ CREATE INDEX IF NOT EXISTS account_ip_associations_last_seen ON account_ip_assoc
 `;
 
 // The admin activity windows read a 30-day play_sessions window
-// (ACTIVITY_WINDOW_DAYS in server/admin.ts), so the retention floor sits
-// strictly above it, with headroom for sessions that span days, so a fold can
-// never delete a row an admin activity window still counts.
+// (ACTIVITY_WINDOW_DAYS in server/admin_activity_cache.ts), so the retention
+// floor sits strictly above it, with headroom for sessions that span days, so
+// a fold can never delete a row an admin activity window still counts.
 export const PLAY_SESSION_RETENTION_FLOOR_DAYS = 45;
 
 // 0 (or any non-finite or non-positive value) means keep forever and is never

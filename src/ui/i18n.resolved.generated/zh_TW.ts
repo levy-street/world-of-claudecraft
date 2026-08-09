@@ -3009,6 +3009,11 @@ export const zh_TW: EnTranslations = {
       "toolEffectRechargeFull": "{effect}已充滿能量。",
       "toolEffectRechargeToolCapped": "攜帶更好的{profession}工具才能繼續為{effect}充能。",
       "toolEffectRechargeMaterials": "為{effect}充能需要{material}x{count}。",
+      "craftingProgress": "正在製作：還剩{remaining}秒，共{total}秒。",
+      "disenchantingProgress": "正在分解：還剩{remaining}秒，共{total}秒。",
+      "enchantingProgress": "正在附魔：還剩{remaining}秒，共{total}秒。",
+      "salvagingProgress": "正在回收：還剩{remaining}秒，共{total}秒。",
+      "rechargingToolEffectProgress": "正在為工具效果充能：還剩{remaining}秒，共{total}秒。",
       "tierPipAria": "階級 {tier}",
       "nextUnlockTier": "距離下一階級還差 {points} 點：打造大師之作的機率將提升",
       "nextUnlockSpecialized": "距離專精還差 {points} 點：材料消耗將降低",
@@ -7413,6 +7418,9 @@ export const zh_TW: EnTranslations = {
   "gpuNotice": {
     "bodyDesktop": "遊戲目前在沒有 GPU 加速的情況下執行，會非常緩慢。請更新顯示卡驅動程式後重新啟動遊戲。在 Windows 上，還請在 設定 > 系統 > 顯示器 > 顯示卡 中將本遊戲設為「高效能」。",
     "bodyWeb": "遊戲目前在沒有 GPU 加速的情況下執行，會非常緩慢。請在瀏覽器設定中啟用硬體加速，更新顯示卡驅動程式，然後重新啟動瀏覽器。",
+    "hybridBodyWindows": "本次工作階段正在集成（省電）顯示卡上算圖。如果這台電腦還配有獨立遊戲顯示卡，請在 設定 > 系統 > 顯示 > 圖形 中將瀏覽器設為「高效能」，然後重新啟動瀏覽器。桌面版會自動選擇獨立顯示卡。",
+    "hybridBodyLinux": "本次工作階段正在集成（省電）顯示卡上算圖。如果這台電腦還配有獨立遊戲顯示卡，您的瀏覽器或顯示卡驅動程式可能提供自己的顯示卡選擇設定，或您的發行版可能提供顯示卡切換工具（例如 PRIME 或 optimus-manager）。桌面版會自動選擇獨立顯示卡。",
+    "hybridBodyOther": "本次工作階段正在集成（省電）顯示卡上算圖。如果這台電腦還配有獨立遊戲顯示卡，請檢查瀏覽器與作業系統的顯示卡設定以啟用它。桌面版會自動選擇獨立顯示卡。",
     "dismiss": "關閉"
   },
   "perfNudge": {
@@ -7876,6 +7884,7 @@ export const zh_TW: EnTranslations = {
       "deathRecapAbility": "你已經死亡。死於{ability}。",
       "deathRecapFalling": "你已經死亡。你摔死了。",
       "deathRecapDrowned": "你已經死亡。你溺死了。",
+      "deathRecapCauterized": "你已經死亡。灼燒術的烈焰吞噬了你。",
       "respawn": "你再次感到精力恢復、身體完整。",
       "ignoringChat": "已封鎖來自 {name} 的聊天。",
       "noLongerIgnoring": "不再封鎖 {name}。",
@@ -7919,6 +7928,7 @@ export const zh_TW: EnTranslations = {
       "outOfRange": "超出範圍。",
       "noTarget": "你沒有目標。",
       "tooClose": "太近了！",
+      "mustTargetAlly": "你必須選定一名友方目標。",
       "facing": "你必須面向目標。",
       "targetHealthBelow": "該技能要求目標生命值低於 {percent}%。",
       "dagger": "你必須裝備匕首。",
@@ -9535,6 +9545,10 @@ export const zh_TW: EnTranslations = {
       "die_by_sword": {
         "name": "劍在人在",
         "description": "防禦性冷卻技：持續 8 秒，你受到的傷害降低 30%，並大幅提高閃躲攻擊的機率。"
+      },
+      "intervene": {
+        "name": "援護",
+        "description": "衝向一名友方玩家，為其抵擋 {damage} 點傷害，持續 6 秒。"
       },
       "recklessness": {
         "name": "魯莽",

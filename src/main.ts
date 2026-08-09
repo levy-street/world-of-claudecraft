@@ -212,7 +212,11 @@ import {
   prepareGraphicsProfileAssets,
   resetGraphicsProfileDerivedCaches,
 } from './render/assets/graphics_profile';
-import { assetsReady, beginDeferredPreloads } from './render/assets/preload';
+import {
+  assetsReady,
+  beginBackgroundPreloads,
+  beginDeferredPreloads,
+} from './render/assets/preload';
 import {
   CharacterPreview,
   type PreviewAppearance,
@@ -4763,6 +4767,18 @@ async function startGame(
   requestAnimationFrame(() =>
     requestAnimationFrame(() => {
       entryDiagnostics.checkpoint('first-paint');
+      // Open the background preload lane now that the first frame is actually on
+      // screen: content tagged 'background' (a lazily streamed-in proximity
+      // build that tolerates its assets arriving late) never had to share the
+      // boot gate with the launcher's own fetches; starting it here just keeps
+      // it from competing with the deferred-critical lane for bandwidth/decode
+      // slots during the loading screen either.
+      const backgroundStarted = beginBackgroundPreloads();
+      if (backgroundStarted > 0) {
+        console.info(
+          `[entry-guard] world assets: started ${backgroundStarted} background preloads`,
+        );
+      }
       const revealWorld = (): void => {
         hideLoadingScreen();
         // Start the intro clock as the loading screen begins to fade: the camera

@@ -2368,7 +2368,7 @@ function warriorRowCapstones(): Scenario {
   return {
     name: 'warrior_row_capstones',
     coverage: [
-      'double charge: two spends while one recharge runs',
+      'intervene: friendly-target charge, ally absorb, no rage and no combat entry',
       'aoeFear headings + Lingering Dread breakThreshold',
       'victory rush on-kill window + selfHealPctMax',
       'bladestorm self-centered channel ticks',
@@ -2378,6 +2378,7 @@ function warriorRowCapstones(): Scenario {
     drive(rec: Recorder) {
       const sim = rec.sim;
       sim.setPlayerLevel(MAX_LEVEL);
+      // Frozen option id; the level-5 row now grants Intervene, not Double Charge.
       sim.selectTalentRow(5, 'war_row_double_charge');
       sim.selectTalentRow(8, 'war_row_victory_rush');
       sim.selectTalentRow(11, 'war_row_lingering_dread');
@@ -2398,24 +2399,51 @@ function warriorRowCapstones(): Scenario {
       beef(mobB, 8000);
       rec.track(mobA.id);
       rec.track(mobB.id);
-      // Double Charge: two back-to-back charges while the first recharge runs.
+      // Onrush: the hostile charge, unchanged by the level-5 row swap. Recorded here
+      // so the trace still pins the rage grant and the combat entry the friendly
+      // branch below must NOT take.
       teleport(sim, p, ax - 12, az);
       sim.targetEntity(mobA.id);
       face(p, mobA);
+      p.resource = 0;
       sim.castAbility('charge');
       rec.tick(8);
-      teleport(sim, p, mobB.pos.x - 12, mobB.pos.z);
-      sim.targetEntity(mobB.id);
-      face(p, mobB);
-      sim.castAbility('charge');
-      // Coverage anchor: both stored uses spent while one recharge timer runs
-      // (the classic single-cooldown gate would have blocked cast #2).
-      const chargeState = p.abilityCharges?.charge;
-      rec.notes.chargeSpent = chargeState
-        ? chargeState.maxCharges - chargeState.charges
-        : undefined;
-      rec.notes.chargeRecharging = (chargeState?.recharge ?? 0) > 0;
-      rec.snapshot('double-charge-spent');
+      rec.notes.onrushRage = p.resource > 0;
+      rec.notes.onrushInCombat = p.inCombat === true;
+      rec.snapshot('onrush-landed');
+      // Intervene: the same charge effect against a FRIENDLY player. It repositions
+      // the warrior and shields the ally, but mints no rage and never flags combat.
+      const allyPid = sim.addPlayer('priest', 'Warden');
+      const ally = sim.entities.get(allyPid) as AnyEntity;
+      teleport(sim, p, ax - 12, az);
+      teleport(sim, ally, ax - 12, az + 15);
+      p.resource = 0;
+      p.inCombat = false;
+      p.combatTimer = 999;
+      p.autoAttack = false;
+      p.gcdRemaining = 0;
+      sim.targetEntity(ally.id);
+      face(p, ally);
+      const gapBefore = Math.hypot(p.pos.x - ally.pos.x, p.pos.z - ally.pos.z);
+      sim.castAbility('intervene');
+      // CAST-TIME anchors. A friendly cast resolves its effects inline, so the absorb,
+      // the (absent) rage grant, and the (absent) combat entry all land on this line.
+      // They must be read BEFORE ticking: the wolves engaged by the Onrush above are
+      // still live, so within a tick or two they will soak the ally's shield and drag
+      // the warrior back into combat for reasons that have nothing to do with Intervene.
+      // Fresh lookups because assigning the flags above narrows their literal types.
+      const atCast = sim.entities.get(p.id) as AnyEntity;
+      rec.notes.interveneShield = ally.auras.find((a) => a.kind === 'absorb')?.value;
+      rec.notes.interveneRage = atCast.resource;
+      rec.notes.interveneInCombat = atCast.inCombat;
+      rec.tick(16);
+      // ARRIVAL anchors: the rush is forced movement over several ticks, and the
+      // auto-attack engage (suppressed for a friendly target) fires when it lands.
+      const onArrival = sim.entities.get(p.id) as AnyEntity;
+      rec.notes.interveneClosed =
+        Math.hypot(onArrival.pos.x - ally.pos.x, onArrival.pos.z - ally.pos.z) < gapBefore;
+      rec.notes.interveneAutoAttack = onArrival.autoAttack;
+      rec.snapshot('intervene-landed');
       rec.tick(8);
       // Intimidating Shout with the Lingering Dread threshold armed: both wolves
       // are inside the 8yd shout (two flee-heading rng draws).
@@ -2423,6 +2451,20 @@ function warriorRowCapstones(): Scenario {
       p.resource = 50;
       p.gcdRemaining = 0;
       sim.castAbility('intimidating_shout');
+      // Record the fear AT APPLY. Reading it from end-of-run state only worked
+      // while the fear was 8 sec: the Victory Rush and Bladestorm legs below run
+      // over five seconds, so a 4 sec fear is long expired by then and the
+      // coverage anchor silently found nothing to assert on.
+      {
+        const feared = [...sim.entities.values()].find((e) =>
+          (e as AnyEntity).auras.some((a) => a.id === 'fear_incap'),
+        ) as AnyEntity | undefined;
+        const fear = feared?.auras.find((a) => a.id === 'fear_incap');
+        rec.notes.fearApplied = fear !== undefined;
+        rec.notes.fearDuration = fear?.duration;
+        rec.notes.fearBreaksOnDamage = fear?.breaksOnDamage === true;
+        rec.notes.fearBreakThreshold = fear?.breakThreshold;
+      }
       rec.snapshot('feared');
       rec.tick(8);
       // Victory Rush: a lethal blow opens the window; the strike on a fresh

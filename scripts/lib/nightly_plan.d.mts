@@ -24,7 +24,15 @@ export function buildTargets(opts: {
   inputRef?: string | null;
   releaseBranch?: string | null;
   defaultBranch?: string;
+  shaByRef?: Readonly<Record<string, string | null | undefined>>;
 }): string[];
+
+export function dedupeTargetsBySha(
+  names: readonly string[],
+  shaByRef: Readonly<Record<string, string | null | undefined>>,
+): string[];
+
+export function shaFromGitRefResponse(body: unknown): string | null;
 
 export function summarizeRunJobs(
   jobs: ReadonlyArray<{

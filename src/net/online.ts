@@ -3212,23 +3212,28 @@ export class ClientWorld implements IWorld {
       if (s.stats !== undefined) {
         e.stats = { pvpOffense: 0, pvpDefense: 0, ...s.stats };
       }
-      e.attackPower = s.ap ?? 0;
+      // Static combat-rating scalars (ap/sp/sh/crit/dodge/blk/bval/crat/hrat/hirat):
+      // delta-guarded on selfWireJson like the rest of this record (server/game.ts),
+      // so an omitted key means unchanged, not zero. Fall back to the prior mirrored
+      // value, the same `s.X ?? e.X` shape already used for `weapon` below.
+      e.attackPower = s.ap ?? e.attackPower;
       e.rangedPower = s.rp ?? 0;
-      e.spellPower = s.sp ?? 0;
+      e.spellPower = s.sp ?? e.spellPower;
       // Spell haste feeds the hasted-cast-time tooltip; melee/ranged haste need
       // no wiring (the swing timers already ride the snapshot).
-      e.spellHaste = s.sh ?? 0;
-      e.critChance = s.crit ?? 0.05;
-      e.dodgeChance = s.dodge ?? 0.05;
-      e.blockChance = s.blk ?? 0;
-      e.blockValue = s.bval ?? 0;
+      e.spellHaste = s.sh ?? e.spellHaste;
+      e.critChance = s.crit ?? e.critChance;
+      e.dodgeChance = s.dodge ?? e.dodgeChance;
+      e.blockChance = s.blk ?? e.blockChance;
+      e.blockValue = s.bval ?? e.blockValue;
       // Crit/haste/hit RATING are informational paper-doll stats (combat values ride
-      // crit/sh above, and hit resolves server-side); sent always like the other self
-      // stats so the online character sheet shows them instead of the blankEntity 0.
+      // crit/sh above, and hit resolves server-side); delta-guarded like the rest of
+      // this record so the online character sheet keeps showing the last-known value
+      // between gear/talent changes instead of flashing back to the blankEntity 0.
       // Server-recomputed.
-      e.critRating = s.crat ?? 0;
-      e.hasteRating = s.hrat ?? 0;
-      e.hitRating = s.hirat ?? 0;
+      e.critRating = s.crat ?? e.critRating;
+      e.hasteRating = s.hrat ?? e.hasteRating;
+      e.hitRating = s.hirat ?? e.hitRating;
       e.weapon = s.weapon ?? e.weapon;
       // ticksElapsed is a sim-internal sfx-cadence counter (consume_sfx.ts):
       // the client never derives a sound decision from this local shadow (the
@@ -3261,26 +3266,25 @@ export class ClientWorld implements IWorld {
       e.craftCastRecipeId = s.ccast?.r ?? '';
       e.craftCastBatchRemaining = s.ccast?.rem ?? 0;
       e.craftCastBatchTotal = s.ccast?.tot ?? 0;
-      // IWorldProgressionXp facet (W7) self-decode: xp/lxp/rxp/prk ride every
-      // self-frame (?? 0); milestones is delta-guarded (omitted keeps the prior
-      // mirror). Terse keys (lxp->lifetimeXp, rxp->restedXp, prk->prestigeRank,
+      // IWorldProgressionXp facet (W7) self-decode: xp/lxp/rxp/prk are delta-guarded
+      // like milestones (an omitted key keeps the prior mirror). Terse keys
+      // (lxp->lifetimeXp, rxp->restedXp, prk->prestigeRank,
       // milestones->unlockedMilestones) are unchanged by the re-group.
-      this.xp = s.xp ?? 0;
-      this.lifetimeXp = s.lxp ?? 0;
-      this.restedXp = s.rxp ?? 0;
-      this.prestigeRank = s.prk ?? 0;
+      this.xp = s.xp ?? this.xp;
+      this.lifetimeXp = s.lxp ?? this.lifetimeXp;
+      this.restedXp = s.rxp ?? this.restedXp;
+      this.prestigeRank = s.prk ?? this.prestigeRank;
       if (s.milestones !== undefined) this.unlockedMilestones = s.milestones;
-      // IWorldInventory facet (W2) self-decode: copper rides every self-frame (?? 0);
-      // inv/buyback/equip are delta-guarded (a missing field keeps the prior mirror).
-      // Terse keys (inv/buyback/equip/copper) and the per-field guards are unchanged by
+      // IWorldInventory facet (W2) self-decode: copper is delta-guarded like
+      // inv/buyback/equip (a missing field keeps the prior mirror). Terse keys
+      // (inv/buyback/equip/copper) and the per-field guards are unchanged by
       // the move; the offline counterpart is src/sim/items.ts.
       // A money-only delta carries no inventory echo at all (a proceeds-only market
       // collect, a trainer fee, a bank slot buy all move meta.copper and nothing else),
       // so without this the bag money row and vendor affordability sat stale until the
-      // window was reopened (#2373). DIFF against the prior mirror, never a presence
-      // test: copper rides EVERY self-frame, so `s.copper !== undefined` would raise the
-      // flag at 20 Hz and rebuild the bags under the player's cursor continuously.
-      const copper = s.copper ?? 0;
+      // window was reopened (#2373). Falling back to the prior mirror when the key is
+      // omitted (unchanged) keeps this a true diff: the flag only raises on a real move.
+      const copper = s.copper ?? this.copper;
       if (copper !== this.copper) this.invChanged = true;
       this.copper = copper;
       if (s.inv !== undefined) {

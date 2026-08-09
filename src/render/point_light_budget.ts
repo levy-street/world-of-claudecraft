@@ -120,6 +120,27 @@ export function applyPointLightBudget(
   return drawn;
 }
 
+/**
+ * Count the ranked lights the render would draw in the CURRENT visibility
+ * state: budget-visible AND ancestry-visible down from `sceneRoot`. The
+ * bounded prewarm render hides most top-level scene children transiently,
+ * out of band of the budget pass, so it re-derives the drawn count with this
+ * and raises the pads to keep the render-visible total pinned. Without the
+ * re-pin, NUM_POINT_LIGHTS drifts below the pinned total during that render
+ * and every first-drawn material links a program variant synchronously, one
+ * the live render never draws (the measured 100-280 ms prewarm-unit stalls).
+ */
+export function countDrawnPointLights(
+  ranked: readonly RankedPointLight[],
+  sceneRoot: THREE.Object3D,
+): number {
+  let drawn = 0;
+  for (const entry of ranked) {
+    if (entry.light.visible && isDrawnEligible(entry.light, sceneRoot)) drawn++;
+  }
+  return drawn;
+}
+
 /** Flicker only fire lights that the completed budget says can contribute. */
 export function flickerContributingFireLights(
   ranked: readonly RankedPointLight[],

@@ -53,12 +53,13 @@ describe('Vineclaw Stalker bespoke attack (issue #2889 round 2)', () => {
     const rigConstBlock = manifestBlock('const TRIPO_BIPED_FULL_RIG: ClipMap = {', '};');
     expect(rigConstBlock).toContain("attack: ['Attack']");
 
-    // Every other VisualDef still pointing at the shared constant is untouched: exactly 2
-    // remaining direct `clips: TRIPO_BIPED_FULL_RIG,` usages (5 originally, minus the one
-    // migrated to WILDHEART_STALKER above, minus mob_wildheart_hexcaller's and
-    // mob_wildheart_ravager's parallel migrations to WILDHEART_HEXCALLER and
-    // WILDHEART_RAVAGER, issue #2889 round 2).
+    // Every other VisualDef still pointing at the shared constant is untouched: exactly 1
+    // remaining direct `clips: TRIPO_BIPED_FULL_RIG,` usage (mob_wildheart_beastmaster; 5
+    // originally, minus the one migrated to WILDHEART_STALKER above, minus
+    // mob_wildheart_hexcaller's, mob_wildheart_ravager's, and mob_wildheart_high_priest's
+    // parallel migrations to WILDHEART_HEXCALLER, WILDHEART_RAVAGER, and
+    // WILDHEART_HIGH_PRIEST, issue #2889 round 2).
     const remaining = [...MANIFEST_SRC.matchAll(/clips: TRIPO_BIPED_FULL_RIG,/g)].length;
-    expect(remaining).toBe(2);
+    expect(remaining).toBe(1);
   });
 });

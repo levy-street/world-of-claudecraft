@@ -799,8 +799,18 @@ const PVP_STUN_DR_RESET = 18; // stuns share the root-style 100/50/25/immune sch
 const PVP_POLYMORPH_DR_RESET = 60;
 const PVP_FEAR_DR_RESET = 60;
 const PVP_CC_DR_MULTIPLIERS = [1, 0.5, 0.25] as const;
+// Polymorph keeps an ABSOLUTE ladder on purpose: exactly one ability rides it
+// (mage polymorph, authored 15s), so the 10s first rung reads as a deliberate PvP
+// cap on a longer PvE value rather than an accident.
 const PVP_POLYMORPH_DR_DURATIONS = [10, 5, 1] as const;
-const PVP_FEAR_DR_DURATIONS = [8, 4, 2, 1] as const;
+// Fear is a MULTIPLIER ladder, and must stay one. It was absolute seconds
+// ([8, 4, 2, 1]) returned without reading the ability's authored duration, so in
+// PvP every fear lasted 8s on first application no matter what its tooltip said:
+// Psychic Scream (4s) and Howl of Terror / Death Coil (3s) were all silently
+// doubled or better. Five abilities across three classes share this ladder, so an
+// absolute table can only ever be right for one of them. These factors reproduce
+// the old 8 -> 4 -> 2 -> 1 exactly for an 8s fear.
+const PVP_FEAR_DR_MULTIPLIERS = [1, 0.5, 0.25, 0.125] as const;
 // Exported for social/chat.ts (broadcastEmote) + the /roll say/yell ranges; the in-sim
 // say/yell distance checks read it too. /say carries a short distance; /yell across a camp.
 export const SAY_RANGE = 25;
@@ -6259,7 +6269,9 @@ export class Sim {
       p.chargeTargetId = null;
       p.chargePath = [];
       if (target) p.facing = steadyAngleTo(p.pos, target.pos, p.facing);
-      if (arrived) this.startAutoAttack(p.id);
+      // Landing on a FRIENDLY target (Intervene) must not engage auto-attack:
+      // startAutoAttack would refuse an ally and toast "Invalid attack target."
+      if (arrived && target && this.isHostileTo(p, target)) this.startAutoAttack(p.id);
       return true;
     };
     if (!target || target.dead || p.chargeTimeLeft <= 0 || isRooted(p)) return done(false);
@@ -7014,7 +7026,12 @@ export class Sim {
     }
     if (category === 'fear') {
       target.ccDr.set(category, { stage: stage + 1, resetAt: this.time + reset });
-      return PVP_FEAR_DR_DURATIONS[Math.min(stage, PVP_FEAR_DR_DURATIONS.length - 1)];
+      // Scales the ability's OWN duration; see PVP_FEAR_DR_MULTIPLIERS. Like
+      // polymorph and unlike root/stun, fear never reaches full immunity: the
+      // factor clamps at the last rung rather than returning null.
+      return (
+        duration * PVP_FEAR_DR_MULTIPLIERS[Math.min(stage, PVP_FEAR_DR_MULTIPLIERS.length - 1)]
+      );
     }
     if (stage >= PVP_CC_DR_MULTIPLIERS.length) return null;
     target.ccDr.set(category, { stage: stage + 1, resetAt: this.time + reset });

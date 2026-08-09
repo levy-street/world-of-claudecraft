@@ -3009,6 +3009,11 @@ export const ja_JP: EnTranslations = {
       "toolEffectRechargeFull": "{effect}はすでに完全に充填されている。",
       "toolEffectRechargeToolCapped": "{effect}をさらに充填するには、より上質な{profession}用ツールが必要だ。",
       "toolEffectRechargeMaterials": "{effect}の再充填には{material}x{count}が必要だ。",
+      "craftingProgress": "製作中：残り{remaining}秒（全{total}秒）。",
+      "disenchantingProgress": "分解中：残り{remaining}秒（全{total}秒）。",
+      "enchantingProgress": "付与中：残り{remaining}秒（全{total}秒）。",
+      "salvagingProgress": "解体中：残り{remaining}秒（全{total}秒）。",
+      "rechargingToolEffectProgress": "道具の効果を再充填中：残り{remaining}秒（全{total}秒）。",
       "tierPipAria": "ティア {tier}",
       "nextUnlockTier": "次のティアまであと {points}：傑作の成功率が上がります",
       "nextUnlockSpecialized": "専門化まであと {points}：素材コストが下がります",
@@ -7413,6 +7418,9 @@ export const ja_JP: EnTranslations = {
   "gpuNotice": {
     "bodyDesktop": "ゲームがGPUアクセラレーションなしで動作しているため、非常に重くなります。グラフィックドライバーを更新してから、ゲームを再起動してください。Windowsでは、設定 > システム > ディスプレイ > グラフィック でこのゲームを「高パフォーマンス」に設定してください。",
     "bodyWeb": "ゲームがGPUアクセラレーションなしで動作しているため、非常に重くなります。ブラウザーの設定でハードウェアアクセラレーションを有効にし、グラフィックドライバーを更新してから、ブラウザーを再起動してください。",
+    "hybridBodyWindows": "このセッションは統合（省電力）GPUで描画しています。このパソコンにディスクリート（専用）ゲーミングGPUも搭載されている場合は、設定 > システム > ディスプレイ > グラフィックス でブラウザを「高パフォーマンス」に設定してから再起動してください。デスクトップアプリでは自動的にディスクリートGPUが選択されます。",
+    "hybridBodyLinux": "このセッションは統合（省電力）GPUで描画しています。このパソコンにディスクリート（専用）ゲーミングGPUも搭載されている場合は、ブラウザやグラフィックスドライバに独自のGPU選択設定があるか、お使いのディストリビューションにGPU切り替えツール（PRIMEやoptimus-managerなど）が用意されている場合があります。デスクトップアプリでは自動的にディスクリートGPUが選択されます。",
+    "hybridBodyOther": "このセッションは統合（省電力）GPUで描画しています。このパソコンにディスクリート（専用）ゲーミングGPUも搭載されている場合は、ブラウザやオペレーティングシステムのグラフィックス設定を確認して有効にしてください。デスクトップアプリでは自動的にディスクリートGPUが選択されます。",
     "dismiss": "閉じる"
   },
   "perfNudge": {
@@ -7876,6 +7884,7 @@ export const ja_JP: EnTranslations = {
       "deathRecapAbility": "死亡しました。{ability}によって死亡しました。",
       "deathRecapFalling": "死亡しました。転落死しました。",
       "deathRecapDrowned": "死亡しました。溺死しました。",
+      "deathRecapCauterized": "死亡しました。焼灼の炎に飲み込まれました。",
       "respawn": "再び休まり、完全な状態になりました。",
       "ignoringChat": "{name}のチャットを無視します。",
       "noLongerIgnoring": "{name}の無視を解除しました。",
@@ -7919,6 +7928,7 @@ export const ja_JP: EnTranslations = {
       "outOfRange": "射程外です。",
       "noTarget": "対象がいません。",
       "tooClose": "近すぎます！",
+      "mustTargetAlly": "味方を対象にしてください。",
       "facing": "対象の方を向いている必要があります。",
       "targetHealthBelow": "その能力は対象の体力が{percent}%未満でなければ使えません。",
       "dagger": "短剣を装備する必要があります。",
@@ -9535,6 +9545,10 @@ export const ja_JP: EnTranslations = {
       "die_by_sword": {
         "name": "剣に死す",
         "description": "防御的クールダウン。8秒間、受けるダメージが30%減少し、攻撃を回避する確率が大幅に上昇します。"
+      },
+      "intervene": {
+        "name": "援護",
+        "description": "味方プレイヤーに突撃し、6秒間{damage}ダメージを吸収するシールドを付与します。"
       },
       "recklessness": {
         "name": "無謀",

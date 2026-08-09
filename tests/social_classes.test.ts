@@ -1,18 +1,42 @@
 // The per-class kit smoke tests plus elite-mob scaling, sharded out of
 // tests/social.test.ts (which keeps parties/duels/trading/instances) so
 // neither file carries the whole bill. Fixtures live in tests/social_shared.ts.
-// The class tests that fight a live forest wolf keep the full built-in world:
-// they need a real camp mob.
+// The class tests that fight a live forest wolf only need a forest_wolf camp mob,
+// not the rest of the built-in world; see CLASS_WOLF_TEST_WORLD below.
 import { describe, expect, it } from 'vitest';
-import { ABILITIES, abilitiesKnownAt, CLASSES, instanceOrigin, MOBS } from '../src/sim/data';
+import {
+  ABILITIES,
+  abilitiesKnownAt,
+  BUILTIN_WORLD,
+  CLASSES,
+  instanceOrigin,
+  MOBS,
+} from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
-import { ALL_CLASSES, MAX_LEVEL } from '../src/sim/types';
+import { ALL_CLASSES, MAX_LEVEL, type WorldContent } from '../src/sim/types';
 import { face, makeWorld, mustEntity, nearestMob, teleport } from './social_shared';
+
+// Most of this file's Sim instances never touch ambient world content at all (kit/stat
+// checks, self-only heals/shields/forms); a handful cast at a live camp mob, and only need
+// a forest_wolf. Trimming each construction to only what its test reaches for keeps Sim
+// setup cheap without touching the shared fixtures in social_shared.ts.
+const CLASS_TEST_WORLD: WorldContent = {
+  ...BUILTIN_WORLD,
+  camps: [],
+  npcs: {},
+  groundObjects: [],
+};
+const CLASS_WOLF_TEST_WORLD: WorldContent = {
+  ...BUILTIN_WORLD,
+  camps: BUILTIN_WORLD.camps.filter((camp) => camp.mobId === 'forest_wolf'),
+  npcs: {},
+  groundObjects: [],
+};
 
 describe('nine classes', () => {
   it('every class spawns with a working kit and stats', () => {
     for (const cls of ALL_CLASSES) {
-      const sim = new Sim({ seed: 42, playerClass: cls });
+      const sim = new Sim({ seed: 42, playerClass: cls, world: CLASS_TEST_WORLD });
       const p = sim.player;
       expect(p.maxHp).toBeGreaterThan(30);
       expect(sim.known.length).toBeGreaterThan(0);
@@ -36,7 +60,7 @@ describe('nine classes', () => {
   });
 
   it('priest heals and shields', () => {
-    const sim = new Sim({ seed: 42, playerClass: 'priest' });
+    const sim = new Sim({ seed: 42, playerClass: 'priest', world: CLASS_TEST_WORLD });
     const p = sim.player;
     sim.setPlayerLevel(6);
     p.hp = 30;
@@ -75,7 +99,7 @@ describe('nine classes', () => {
   });
 
   it('renew ticks healing over time', () => {
-    const sim = new Sim({ seed: 42, playerClass: 'priest' });
+    const sim = new Sim({ seed: 42, playerClass: 'priest', world: CLASS_TEST_WORLD });
     sim.setPlayerLevel(8);
     const p = sim.player;
     p.hp = 20;
@@ -85,7 +109,7 @@ describe('nine classes', () => {
   });
 
   it('paladin seal empowers swings and judgement consumes it', () => {
-    const sim = new Sim({ seed: 42, playerClass: 'paladin' });
+    const sim = new Sim({ seed: 42, playerClass: 'paladin', world: CLASS_WOLF_TEST_WORLD });
     sim.setPlayerLevel(4);
     const p = sim.player;
     sim.castAbility('seal_of_righteousness');
@@ -122,7 +146,7 @@ describe('nine classes', () => {
   });
 
   it('warlock life taps and drains life', () => {
-    const sim = new Sim({ seed: 42, playerClass: 'warlock' });
+    const sim = new Sim({ seed: 42, playerClass: 'warlock', world: CLASS_WOLF_TEST_WORLD });
     sim.setPlayerLevel(10);
     const p = sim.player;
     p.resource = 10;
@@ -146,7 +170,7 @@ describe('nine classes', () => {
   });
 
   it('hunter kills with ranged auto shot from distance', () => {
-    const sim = new Sim({ seed: 42, playerClass: 'hunter' });
+    const sim = new Sim({ seed: 42, playerClass: 'hunter', world: CLASS_WOLF_TEST_WORLD });
     const p = sim.player;
     const wolf = nearestMob(sim, 'forest_wolf');
     p.maxHp = 500;
@@ -171,7 +195,7 @@ describe('nine classes', () => {
   });
 
   it('lightning shield zaps attackers (thorns)', () => {
-    const sim = new Sim({ seed: 42, playerClass: 'shaman' });
+    const sim = new Sim({ seed: 42, playerClass: 'shaman', world: CLASS_WOLF_TEST_WORLD });
     sim.setPlayerLevel(8);
     const p = sim.player;
     sim.castAbility('lightning_shield');
@@ -246,7 +270,7 @@ describe('nine classes', () => {
   }, 90_000);
 
   it('druid bear form toggles and raises armor', () => {
-    const sim = new Sim({ seed: 42, playerClass: 'druid' });
+    const sim = new Sim({ seed: 42, playerClass: 'druid', world: CLASS_TEST_WORLD });
     sim.setPlayerLevel(10);
     const p = sim.player;
     const armorBefore = p.stats.armor;
