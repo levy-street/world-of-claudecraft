@@ -92,7 +92,10 @@ export const FARM_PLANT_CAST_SEC = 2;
 // 100 it is 0.50, so about 6. The pick cap is a hard bound on the loop rather
 // than a balance number: it can only bind at a keep chance no shipped skill
 // reaches, and it exists so a future tuning pass cannot turn this into an
-// unbounded loop.
+// unbounded loop. NOTE for any reader treating it as the yield ceiling: the
+// tonic bonus lands OUTSIDE the loop, so a capped toniced harvest returns up
+// to FARM_HARVEST_PICK_CAP + FARM_TONIC_BONUS_PICKS picks (pinned); this
+// constant bounds the LOOP, never the returned yield.
 export const FARM_HARVEST_LIFE_FLOOR = 3;
 export const FARM_HARVEST_PICK_CAP = 12;
 export const FARM_KEEP_CHANCE_BASE = 0.15;
@@ -121,17 +124,13 @@ const FARM_SKILL_SCALE_DENOM = 100;
 // the next attempt's insurance.
 export const FARM_WITHERED_HUSK_COUNT = 2;
 export type { FarmPlantKnobs } from './farm_projection';
-export {
-  eligibleWatchFeeItemIds,
-  FARM_WATCH_FEE_BY_TIER,
-  planWatchFee,
-  watchFeeAmount,
-} from './farm_watch_fee';
 // The item id itself lives in the content layer (content/farm_crops.ts) so the
 // material taxonomy can read it as data without importing this engine module;
 // re-exported here because this is where callers and tests reach for it.
 // The knob-supply ids, same content-layer home and re-export rationale; the
-// knob payload type and the fee planner ride along for the same reason.
+// knob payload type above rides along for the same reason. The fee planner is
+// NOT re-exported: its callers and its suite import farm_watch_fee.ts
+// directly, and a convenience surface nobody reaches through is dead code.
 export { FARM_COMPOST_ITEM_ID, FARM_GROWTH_TONIC_ITEM_ID, FARM_WITHERED_HUSK_ITEM_ID };
 
 // How many husks one compost costs at the farmer's trade (convertHusks

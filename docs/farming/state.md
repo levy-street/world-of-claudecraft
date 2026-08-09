@@ -434,10 +434,17 @@ question does not arise (farming has no station).
 ## Key planned files (working names; a phase may refine with a note here)
 
 - `src/sim/content/farm_patches.ts` (FARM_PATCHES, FarmPatchDef)
-- `src/sim/content/farming_items.ts` or rows in existing item/content modules (seeds,
-  produce, fine twins, compost, husks, tonic, hoes, dishes, feast)
+- REFINED (Phases 3 and 4): `src/sim/content/farming_items.ts` never existed;
+  item defs live in `src/sim/content/items.ts` BASE_ITEMS and the id blocks
+  (FARM_MATERIAL_ITEM_IDS, FARM_SUPPLY_ITEM_IDS) in
+  `src/sim/content/farm_crops.ts` beside the crop catalog
 - `src/sim/professions/farming.ts` (the driver: plant, harvest, growth script,
   survival/yield resolution, updateFarming, ready-check helpers)
+- `src/sim/professions/farm_watch_fee.ts` (Phase 4: the D9 fee predicate,
+  eligibility order, and payment planner; pure leaf with an injectable
+  catalog since Phase 4 QA)
+- `src/ui/farming_view.ts` (Phase 4: farming's own UI pure core in
+  UI_PURE_CORES; the deny-line key and the grant-line selectors moved in)
 - `src/sim/professions/farming_zones.ts` (FARMING_ZONE_TIERS, the zone tier side table:
   the one home of the zone set; farm_patches.ts never redefines it)
 - `src/world_api/farming.ts` (IWorldFarming facet: patch defs, my plots, commands)
@@ -530,7 +537,14 @@ question does not arise (farming has no station).
   error.castingPlanting for the one sim-side English sentence 'You are
   planting.' (BASE_DICT locale fill deferred to release-time per the
   contributor contract). All wordy values carry the five non-Latin fills (M16).
-- New items/recipes/deeds: Phase 4 items: compost (sellValue 2, buyValue 8 at
+- New items/recipes/deeds: Phase 4 also minted two more maintainer-flagged
+  constant families the first write of this entry omitted (Phase 4 QA
+  correction; both live at their definitions and in the progress.md notes):
+  FARM_WATCH_FEE_BY_TIER = 2/3/4/6 produce for tiers 1 to 4
+  (src/sim/professions/farm_watch_fee.ts, the produce-sink rate), and
+  FARM_TONIC_BONUS_CHANCE = 0.5 with FARM_TONIC_BONUS_PICKS = 2
+  (src/sim/professions/farming.ts, expected value one extra base-grade pick
+  per tonic). Phase 4 items: compost (sellValue 2, buyValue 8 at
   the 4x convention, maintainer-flagged; vendor-stocked in Phase 9 per D9) and
   growth_tonic (sellValue 6, NO buyValue: never vendor-stocked, alchemy-crafted
   in Phase 6). Both are plain consumed-by-command items with no ItemDef.use
@@ -688,6 +702,18 @@ question does not arise (farming has no station).
   no_compost before no_fee_produce before no_tonic) and added the
   check-then-pay atomicity proof (a passed compost gate spends nothing when
   the later tonic gate refuses).
+  Phase 4 QA: (z) the parity-scenario knob coverage is DEFERRED to Phase 5:
+  the farming_session golden stays untouched through this QA (the phase's
+  own locked outcome, and the QA session's stopping rule forbids moving a
+  pre-existing golden), so the knobbed plant, the toniced harvest, and
+  convert_husks do not enter the cross-host draw-order digest yet; their
+  draw contract is held by the single-host pins (the 8-combination count
+  pin with identical (survivalRoll, yieldSeed) pairs, the live QA probes,
+  and the same-seed determinism arm). Phase 5 (crop ladder) extends
+  farming_session (or adds a farming_knobs scenario) with one knobbed
+  plant, one toniced harvest on a winner seed, and one husk conversion,
+  and re-records the golden deliberately in an isolated commit per D23;
+  the handoff line in the Phase 5 gate list below is the tripwire.
 - Dev command surface: Phase 3 registers /dev farmgrow [bedId] (alias
   /devfarmgrow [bedId]) in src/sim/dev_commands.ts behind ALLOW_DEV_COMMANDS:
   with a bed id it advances that plot, without one it advances ALL of the
@@ -837,16 +863,57 @@ question does not arise (farming has no station).
     section. Work orders verified N/A: the commission modules carry zero
     gathering-profession references, so no farming order can mint before the
     phase that wires crops in deliberately.
-  - The next farming UI addition extracts src/ui/farming_view.ts (UI_PURE_CORES)
-    and moves farmDeniedLineKey plus the three farm grant-line selectors into it:
-    farming's view logic currently spans gathering_view.ts and grant_line_view.ts
-    by adjacency, one addition short of the rule of three.
+  - EXECUTED in Phase 4 (commit 122dd3de56; this line predates it): the
+    farming_view.ts extraction fired, moving farmDeniedLineKey plus FOUR farm
+    grant-line selectors (farmHarvestLineKey, farmFineLineKey,
+    farmWitheredLineKey, farmPlantedTokenId; the original count of three was
+    an undercount), moves not re-exports, with the test blocks relocated to
+    tests/farming_view.test.ts. See the Phase 4 entry in progress.md.
   - The command-level 'skill' deny emit is unreachable until a tier-2 crop ships;
     the Phase 5 crop ladder inherits driving it (one plant below a real
     threshold) deliberately.
   - farmGrowthStage now takes the structural minimum (plantedAtMs/readyAtMs pick)
     and documents the clock-base contract in its banner; the msRemaining wire
     field stays owed to Phase 8 (the first timer surface).
+
+- Phase 4 QA addenda (2026-08-08), carried for later phases:
+  - THE TONIC CONTRACT, ledgered here because the next session reads this
+    file first (it previously lived only in the farming.ts banner and the
+    progress.md notes): the tonic bonus roll is SEED-ANCHORED, one value
+    from mulberry32((yieldSeed ^ 0x9e3779b9) >>> 0), never a read past the
+    lives loop, so the tonic outcome is a plant-time constant and a
+    skill-up can only add picks (the 200-seed monotonicity sweep pins it,
+    and the review round measured about 5.8k win-to-loss flips per million
+    adjacent skill steps under the loop-relative form). ANY future pre-roll
+    expansion (Phase 5 crops, Phase 8 UI previews, new knobs) that anchors
+    an auxiliary roll to a skill-varying loop position is a regression,
+    not a cleanup.
+  - The QA killed three surviving mutants by making their pins real: the
+    two end-to-end tonic arms ran on a losing seed (41) and now run on the
+    probed winner TONIC_WIN_SEED with non-vacuity guards; the fee-module
+    ordering/exclusion/dedupe promises were unfalsifiable against the
+    one-crop catalog and now drive an injectable synthetic ladder; the fee
+    legs gained their own check-then-pay atomicity arm (the compost arm
+    alone could not see a fee spent at its gate).
+  - The seed/produce disjointness pin in tests/farm_watch_fee.test.ts
+    walks the LIVE catalog: a Phase 5 crop whose seedItemId aliases any
+    produce id reds there (the fee plan is made before payments run, so an
+    aliased row would double-count one stack and under-collect silently).
+  - Accepted as-is, deliberately: FARM_SUPPLY_ITEM_IDS stays exported with
+    no external consumer yet (the Phase 9 farmer-NPC vendor stock is its
+    intended reader); the growth_tonic icon shares the 'sparkle' overlay
+    with the fine-grade family (glyph-semantics note for the Phase 13 art
+    batch); the knob deny lines stay full English prose rather than
+    spliced name tokens, with the rename-drift pin in
+    tests/farming_view.test.ts as the tie; the roughly 120 pending Latin
+    locale rows ride to the release-time fill as usual; no HUD affordance
+    teaches the knobs or the husk trade until Phases 7 and 8 (the deny
+    toasts are the fallback surface, per the phase's own deferral).
+  - The four deliberate no-action calls from the phase notes were
+    re-judged and ALL UPHELD (refusal-spam re-serialize, offline forged
+    knob flags, the deviation (w) auto-exemption with the exact-set pin as
+    its gate, the Materials chip classifying two dormant faucet-free
+    items).
 
 ## OPEN items (maintainer decisions or later-phase calls, never guess)
 

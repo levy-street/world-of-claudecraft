@@ -64,6 +64,15 @@ const FINE_ID = 'fine_vale_wheat';
 const BED = 'bed_eastbrook_1';
 const BED2 = 'bed_eastbrook_2';
 const START_MS = 1_700_000_000_000;
+// A harness seed whose plant-time yieldSeed WINS the tonic roll (probed
+// against the real modules: resolveFarmHarvest(ys, 0, true).count exceeds
+// the untoniced count). The two end-to-end tonic arms MUST run on a winner:
+// at a losing seed (41 among them) the toniced and plain expansions are
+// identical, so the arms stay green even when the harvest drops the stored
+// tonic flag (the QA round's surviving mutant). Each arm also asserts its
+// own non-vacuity, so a draw-block shift that changes the minted yieldSeed
+// reds loudly instead of going quietly vacuous again.
+const TONIC_WIN_SEED = 2;
 
 // The shipped crop's own numbers, read from the catalog rather than restated,
 // so a tuning pass moves the fixture with the content instead of reddening
@@ -760,6 +769,7 @@ describe('the knob payload (the knobs phase): payments, denies, thresholds', () 
       { watch: true, tonic: true },
       { compost: true, watch: true, tonic: true },
     ];
+    const rolled: [number, number][] = [];
     for (const combo of combos) {
       const hc = makeHarness(41);
       hc.sim.addItem(SEED_ID, 1, hc.pid);
@@ -774,7 +784,12 @@ describe('the knob payload (the knobs phase): payments, denies, thresholds', () 
       expect(plot.compost, JSON.stringify(combo)).toBe(combo.compost === true);
       expect(plot.watch, JSON.stringify(combo)).toBe(combo.watch === true);
       expect(plot.tonic, JSON.stringify(combo)).toBe(combo.tonic === true);
+      rolled.push([plot.survivalRoll as number, plot.yieldSeed as number]);
     }
+    // The headline claim stated directly rather than by inference: same sim
+    // seed, same TWO PRE-ROLLED VALUES, whatever the knobs. Eight identical
+    // (survivalRoll, yieldSeed) pairs, not merely eight identical counts.
+    for (const pair of rolled) expect(pair).toEqual(rolled[0]);
   });
 
   it('consumes exactly one compost for the compost knob and nothing else moves', () => {
@@ -807,7 +822,7 @@ describe('the knob payload (the knobs phase): payments, denies, thresholds', () 
     expect((h.meta.farmPlots.get(BED) as PlotState).watch).toBe(true);
   });
 
-  it('pays a mixed fee cheapest-first when no single stack covers it', () => {
+  it('pays a mixed fee in the fixed tier-ascending order when no single stack covers it', () => {
     h.sim.addItem(SEED_ID, 1, h.pid);
     h.sim.addItem(PRODUCE_ID, 1, h.pid);
     h.sim.addItem(FINE_ID, 5, h.pid);
@@ -858,6 +873,25 @@ describe('the knob payload (the knobs phase): payments, denies, thresholds', () 
     expect(h.meta.farmPlots.size).toBe(0);
     expect(h.sim.countItem(SEED_ID, h.pid)).toBe(1);
     expect(h.sim.countItem(FARM_COMPOST_ITEM_ID, h.pid)).toBe(1);
+  });
+
+  it('denies no_tonic WITHOUT spending the watch fee whose plan had already passed its gate', () => {
+    // The fee twin of the compost atomicity arm above, and the sharper one:
+    // the fee is the payment most at risk of being hoisted into its gate,
+    // because planWatchFee returns a multi-leg PLAN at gate 10 and the legs
+    // must spend only in the shared post-gate payment block. A passed fee
+    // gate followed by a tonic refusal leaves every produce stack untouched
+    // (this arm kills the QA round's surviving spend-at-gate mutant).
+    giveSeeds(h);
+    h.sim.addItem(FARM_COMPOST_ITEM_ID, 1, h.pid);
+    h.sim.addItem(PRODUCE_ID, 2, h.pid);
+    const from = h.sim.events.length;
+    expect(countDraws(h.sim, () => plantK({ compost: true, watch: true, tonic: true }))).toBe(0);
+    expect(denyReason(h.sim, from)).toBe('no_tonic');
+    expect(h.meta.farmPlots.size).toBe(0);
+    expect(h.sim.countItem(SEED_ID, h.pid)).toBe(1);
+    expect(h.sim.countItem(FARM_COMPOST_ITEM_ID, h.pid)).toBe(1);
+    expect(h.sim.countItem(PRODUCE_ID, h.pid)).toBe(2);
   });
 
   it('denies an already-knobbed replant as bed_taken, leaving the plot and bags untouched', () => {
@@ -986,6 +1020,12 @@ describe('the knob payload (the knobs phase): payments, denies, thresholds', () 
     // inert until now): a knobbed plot must reload with its flags intact and
     // the survival bend still live, or a relog would silently strip an
     // insurance the player paid for.
+    //
+    // On the tonic-winning seed, NOT the default: the closing delta assertion
+    // proves the reloaded tonic flag armed the toniced expansion, which only
+    // means something when that expansion differs from the plain one (the
+    // non-vacuity guard below holds this arm honest).
+    h = makeHarness(TONIC_WIN_SEED);
     giveAllSupplies();
     plantK({ compost: true, watch: true, tonic: true });
     clearCast(h.sim);
@@ -1019,6 +1059,12 @@ describe('the knob payload (the knobs phase): payments, denies, thresholds', () 
     farmer.prevPos = { ...farmer.pos };
     const from = fresh.events.length;
     const expected = resolveFarmHarvest(plot.yieldSeed as number, 0, true);
+    // Non-vacuity guard: the reloaded seed's tonic roll WINS, so the delta
+    // assertion at the bottom really pins the flag read, not a coincidence
+    // of identical expansions.
+    expect(expected.count).toBeGreaterThan(
+      resolveFarmHarvest(plot.yieldSeed as number, 0, false).count,
+    );
     // Delta, not an absolute: the reloaded bags still carry the produce the
     // watch fee did not consume at plant time.
     const produceBefore = fresh.countItem(PRODUCE_ID, meta.entityId);
@@ -1090,7 +1136,7 @@ describe('the tonic yield arm: seed expansion, never a draw', () => {
   });
 
   it('harvests a toniced plot with ZERO ctx.rng draws and pays the expanded yield', () => {
-    const h = makeHarness();
+    const h = makeHarness(TONIC_WIN_SEED);
     h.sim.addItem(SEED_ID, 1, h.pid);
     h.sim.addItem(FARM_GROWTH_TONIC_ITEM_ID, 1, h.pid);
     plantCrop(h.sim.ctx, h.sim.player, h.meta, BED, CROP_ID, { tonic: true });
@@ -1099,9 +1145,36 @@ describe('the tonic yield arm: seed expansion, never a draw', () => {
     const plot = h.meta.farmPlots.get(BED) as PlotState;
     plot.survivalRoll = 0; // survival forced, so this arm is about yield only
     const expected = resolveFarmHarvest(plot.yieldSeed as number, 0, true);
+    // Non-vacuity guard: this seed's tonic roll WINS, so the expected yield
+    // genuinely differs from the untoniced expansion and the assertion below
+    // can see the harvest ignoring the stored flag.
+    expect(expected.count).toBeGreaterThan(
+      resolveFarmHarvest(plot.yieldSeed as number, 0, false).count,
+    );
     expect(countDraws(h.sim, () => harvestCrop(h.sim.ctx, h.sim.player, h.meta, BED))).toBe(0);
     expect(h.sim.countItem(PRODUCE_ID, h.pid)).toBe(expected.count);
     expect(h.sim.countItem(FINE_ID, h.pid)).toBe(expected.fine);
+  });
+
+  it('returns CAP plus BONUS picks on a capped toniced win: the cap bounds the loop, not the yield', () => {
+    // keepChance saturates at 1 above skill (1 - base) / scale * 100, so
+    // every pick keeps its life and the loop runs to the cap exactly (the
+    // unclamped-skill seam the resolver banner reserves for tests). On a
+    // tonic-winning seed the bonus lands on top: any reader treating
+    // FARM_HARVEST_PICK_CAP as the true yield ceiling is wrong by BONUS,
+    // which is exactly what this pin exists to say out loud.
+    const SKILL_AT_SATURATION = 300;
+    let winner = -1;
+    for (let seed = 0; seed < 100 && winner < 0; seed++) {
+      if (resolveFarmHarvest(seed, 0, true).picks > resolveFarmHarvest(seed, 0).picks) {
+        winner = seed;
+      }
+    }
+    expect(winner).toBeGreaterThanOrEqual(0);
+    expect(resolveFarmHarvest(winner, SKILL_AT_SATURATION).picks).toBe(FARM_HARVEST_PICK_CAP);
+    expect(resolveFarmHarvest(winner, SKILL_AT_SATURATION, true).picks).toBe(
+      FARM_HARVEST_PICK_CAP + FARM_TONIC_BONUS_PICKS,
+    );
   });
 
   it('pays a toniced harvest N hours late EXACTLY what an on-time one pays', () => {

@@ -134,7 +134,7 @@ export class BagItemActionMenu {
       const id = act as BagItemContextActionId;
       if (id === 'default') runDefault();
       else if (id === 'disenchant') this.confirmDestroy('disenchant', itemId, slotIndex);
-      else if (id === 'salvage') this.confirmDestroy('salvage', itemId);
+      else if (id === 'salvage') this.confirmDestroy('salvage', itemId, slotIndex);
       else if (id === 'applyEnchant') this.openEnchantPicker(itemId, x, y);
     });
   }
@@ -187,7 +187,8 @@ export class BagItemActionMenu {
         if (action === 'disenchant') {
           if (slotIndex === undefined) world.disenchantItem(itemId);
           else world.disenchantItem(itemId, { slotIndex });
-        } else world.salvageItem(itemId);
+        } else if (slotIndex === undefined) world.salvageItem(itemId);
+        else world.salvageItem(itemId, { slotIndex });
         this.deps.afterAction();
       },
     );

@@ -44,6 +44,11 @@ import { formatMoney } from './format_money';
 import { throwFirebottleAtNearestHut } from './interactions/firebottle_hut';
 import { moveStackToCell } from './inventory_order';
 import { sortInventoryStacks } from './inventory_sort';
+import {
+  consumeNewestInventoryUnit,
+  consumeSelectedInventorySlot,
+  selectedInventorySlot,
+} from './item_copy_ref';
 import { canStackInstancePayloads, itemInstancePayloadsEqual } from './item_instance_merge';
 import { meetsLevelRequirement, requiredLevelFor } from './item_level_req';
 import { mountOwned, summonMountItem } from './mounts';
@@ -87,20 +92,6 @@ type EquippedInventoryUnit = InventoryUnit;
 // vendor sell/buyback already had, so they reuse this shape and the walk
 // below instead of duplicating it.
 export type VendorRemovedUnit = InventoryUnit;
-
-function consumeEquippedInventoryUnit(meta: PlayerMeta, itemId: string): EquippedInventoryUnit {
-  for (let i = meta.inventory.length - 1; i >= 0; i--) {
-    const slot = meta.inventory[i];
-    if (slot.itemId !== itemId) continue;
-    const instance =
-      slot.instance && slot.count > 1 ? cloneItemInstancePayload(slot.instance) : slot.instance;
-    const craftedRecipeId = slot.craftedRecipeId;
-    slot.count -= 1;
-    if (slot.count <= 0) meta.inventory.splice(i, 1);
-    return { instance, craftedRecipeId };
-  }
-  return { instance: undefined, craftedRecipeId: undefined };
-}
 
 function equipmentPayloadFor(unit: EquippedInventoryUnit): ItemInstancePayload | undefined {
   if (!unit.instance && unit.craftedRecipeId === undefined) return undefined;
@@ -335,7 +326,13 @@ export function removeVendorSellUnits(
   return consumed;
 }
 
-export function discardItem(ctx: SimContext, itemId: string, count = 1, pid?: number): void {
+export function discardItem(
+  ctx: SimContext,
+  itemId: string,
+  count = 1,
+  pid?: number,
+  slotIndex?: number,
+): void {
   const r = ctx.resolve(pid);
   if (!r) return;
   const { meta } = r;
@@ -348,17 +345,35 @@ export function discardItem(ctx: SimContext, itemId: string, count = 1, pid?: nu
   if (def.noDiscard) return;
   const discardCount = Number.isFinite(count) ? Math.min(Math.floor(count), available) : 0;
   if (discardCount <= 0) return;
-  // The copy-choice rule on the discard arm (the phase 18 whole-branch
-  // review): with a plain and a self-signed charm copy in the bags, the
-  // discard consumes the plain one and the recharge discount survives.
-  removePreferFungible(
-    ctx,
-    itemId,
-    discardCount,
-    meta.entityId,
-    undefined,
-    sellerSignedCharmDeprioritize(meta.name, itemId),
-  );
+  // A named slot destroys exactly that copy, but ONLY for a single unit.
+  //
+  // The bulk arm deliberately spans slots: a stackable item's per-slot count
+  // tops out at its stackSize, so "destroy 40" reaches across several stacks and
+  // no one index names them (see the prompt cap in bags_window). For bulk the
+  // legacy prefer-plain walk below is also the RIGHT rule rather than a
+  // compromise, since it consumes interchangeable shells first and leaves an
+  // enchanted or signed copy standing longest.
+  const single = discardCount === 1 && slotIndex !== undefined;
+  if (single) {
+    const taken = consumeSelectedInventorySlot(meta.inventory, itemId, slotIndex);
+    if (taken === null) {
+      ctx.error(meta.entityId, "You don't have that item.");
+      return;
+    }
+    ctx.onInventoryChangedForQuests?.(meta);
+  } else {
+    // The copy-choice rule on the discard arm (the phase 18 whole-branch
+    // review): with a plain and a self-signed charm copy in the bags, the
+    // discard consumes the plain one and the recharge discount survives.
+    removePreferFungible(
+      ctx,
+      itemId,
+      discardCount,
+      meta.entityId,
+      undefined,
+      sellerSignedCharmDeprioritize(meta.name, itemId),
+    );
+  }
   ctx.emit({
     type: 'log',
     // biome-ignore lint/style/useTemplate: keep this scanner-friendly shape for i18n extraction.
@@ -401,6 +416,7 @@ export function equipItem(
   itemId: string,
   pid?: number,
   targetSlot?: EquipSlot,
+  slotIndex?: number,
 ): void {
   const r = ctx.resolve(pid);
   if (!r) return;
@@ -409,6 +425,18 @@ export function equipItem(
   if (!def?.slot || (def.kind !== 'weapon' && def.kind !== 'armor' && def.kind !== 'held_offhand'))
     return;
   if (ctx.countItem(itemId, meta.entityId) <= 0) return;
+  // Validate the selection BEFORE anything mutates. The displaced-hand branch below
+  // deletes the other hand's equipment entry, and the consume that could refuse sits
+  // further down, so refusing late destroyed the displaced piece outright: neither
+  // worn nor in bags, with its stats still applied because recalc never ran. Resolve
+  // without consuming here, and refuse before the first write.
+  if (
+    slotIndex !== undefined &&
+    selectedInventorySlot(meta.inventory, itemId, slotIndex) === null
+  ) {
+    ctx.error(meta.entityId, "You don't have that item.");
+    return;
+  }
   if (targetSlot && !slotAcceptsItem(def, targetSlot)) {
     ctx.error(meta.entityId, 'That does not go in that slot.');
     return;
@@ -476,15 +504,40 @@ export function equipItem(
     delete meta.equipment[displacedSlot];
     if (meta.equipmentInstance) delete meta.equipmentInstance[displacedSlot];
   }
-  // removeItem scans from the highest inventory index down (sim.ts), so a
+  // The id-only arm still scans highest inventory index down, so a
   // freshly-enchanted copy (pushed onto the end by addItemInstance,
-  // src/sim/professions/enchanting.ts applyEnchant) is what this picks up first
-  // when both a plain and an enchanted copy of the same item exist and nothing
-  // else has been looted since. That only holds while the enchanted copy stays
-  // the highest-index match: loot another plain copy afterward and the plain
-  // one gets equipped instead. Deterministic, acceptable for v1, but a future
-  // picker UI should not assume the enchanted copy is always favored.
-  const consumed = consumeEquippedInventoryUnit(meta, itemId);
+  // src/sim/professions/enchanting.ts applyEnchant) is picked up first only while
+  // it stays the highest-index match: loot another plain copy afterward and the
+  // plain one gets equipped instead. That is the hazard the original comment here
+  // flagged, warning that "a future picker UI should not assume the enchanted copy
+  // is always favored". It is no longer the only option: a caller that knows which
+  // copy the player meant passes slotIndex and gets exactly it. The id-only walk
+  // stays byte-identical for the callers that cannot (server/pbe_boost.ts, the RL
+  // host, the parity goldens).
+  // A named slot equips exactly that copy. This is the surface the whole feature
+  // exists for: with a plain and an enchanted copy of one piece, the legacy walk
+  // takes whichever is NEWEST, so looting a plain duplicate silently benches your
+  // enchanted one. The comment this replaces said as much and accepted it for v1,
+  // warning that "a future picker UI should not assume the enchanted copy is
+  // always favored". A gear-set loadout is exactly that picker.
+  //
+  // An invalid selection refuses rather than falling back, because equipping the
+  // wrong copy is silent: the piece looks right in the paperdoll and simply
+  // carries none of the stats the player expected.
+  let consumed: InventoryUnit;
+  if (slotIndex !== undefined) {
+    const taken = consumeSelectedInventorySlot(meta.inventory, itemId, slotIndex);
+    // Unreachable in practice: the early gate above refuses an invalid selection
+    // before any mutation. Kept as a belt, and audible so it can never become a
+    // silent no-op if the gate is ever moved.
+    if (!taken) {
+      ctx.error(meta.entityId, "You don't have that item.");
+      return;
+    }
+    consumed = taken;
+  } else {
+    consumed = consumeNewestInventoryUnit(meta.inventory, itemId);
+  }
   ctx.onInventoryChangedForQuests(meta);
   if (old) {
     // Return the piece that was worn: if it carried an enchant, give it back
@@ -604,13 +657,46 @@ export function unequipItem(ctx: SimContext, slot: EquipSlot, pid?: number): boo
   return true;
 }
 
-export function useItem(ctx: SimContext, itemId: string, pid?: number): ItemUseResult | undefined {
+export function useItem(
+  ctx: SimContext,
+  itemId: string,
+  pid?: number,
+  slotIndex?: number,
+): ItemUseResult | undefined {
   const r = ctx.resolve(pid);
   if (!r) return;
   const { meta, e: p } = r;
   const def = ITEMS[itemId];
+  // All three use branches (food/drink, potion, elixir) consume one unit, so the
+  // selection is honored here once instead of at each arm. Returns the consumed
+  // payload because the potion branch reads it (the crafting-provenance trickle).
+  //
+  // Consumables of one id are interchangeable in effect, so this matters less
+  // than it does for gear; it is threaded anyway so the family has no id-only
+  // holes left for a new command to copy.
+  const consumeOneUnit = (): ItemInstancePayload | undefined => {
+    if (slotIndex === undefined) {
+      const [unit] = ctx.removeItem(itemId, 1, meta.entityId);
+      return unit;
+    }
+    const taken = consumeSelectedInventorySlot(meta.inventory, itemId, slotIndex);
+    if (!taken) return undefined;
+    ctx.onInventoryChangedForQuests?.(meta);
+    return taken.instance;
+  };
   if (!def) return;
   if (ctx.countItem(itemId, meta.entityId) <= 0) {
+    ctx.error(meta.entityId, "You don't have that item.");
+    return;
+  }
+  // Validate the selection BEFORE any effect. Every use arm applied its heal, aura,
+  // cooldown or sit and only then consumed, so a refused selection granted the
+  // effect for free, repeatably. The aggregate countItem check above cannot catch
+  // it: the player really does hold the item, they just named a slot that is not it.
+  if (
+    slotIndex !== undefined &&
+    selectedInventorySlot(meta.inventory, itemId, slotIndex) === null
+  ) {
     ctx.error(meta.entityId, "You don't have that item.");
     return;
   }
@@ -688,7 +774,7 @@ export function useItem(ctx: SimContext, itemId: string, pid?: number): ItemUseR
       );
       return;
     }
-    ctx.removeItem(itemId, 1, meta.entityId);
+    consumeOneUnit();
     p.sitting = true;
     p[slot] = {
       itemId,
@@ -737,7 +823,7 @@ export function useItem(ctx: SimContext, itemId: string, pid?: number): ItemUseR
     // cheap gate inside battlefieldExperienceTrickle short-circuits
     // everything below rare tier, so this is a no-op for every plain/common/
     // uncommon potion, exactly as before this issue.
-    const [drunkInstance] = ctx.removeItem(itemId, 1, meta.entityId);
+    const drunkInstance = consumeOneUnit();
     if (drunkInstance) {
       const granted = battlefieldExperienceTrickle(meta.craftSkills, {
         itemId,
@@ -779,7 +865,7 @@ export function useItem(ctx: SimContext, itemId: string, pid?: number): ItemUseR
     // family component (elixir_battle_...), not just the kind.
     const elx = def.elixir;
     if (!elx) return;
-    ctx.removeItem(itemId, 1, meta.entityId);
+    consumeOneUnit();
     ctx.applyAura(p, {
       id: `elixir_${elx.kind}`,
       name: elx.aura,
@@ -792,9 +878,12 @@ export function useItem(ctx: SimContext, itemId: string, pid?: number): ItemUseR
     });
     ctx.emit({ type: 'log', text: `You quaff ${def.name}.`, color: '#c9f', pid: meta.entityId });
   } else if (def.kind === 'weapon' || def.kind === 'armor' || def.kind === 'held_offhand') {
-    equipItem(ctx, itemId, meta.entityId);
+    // Forward the selection: click-to-equip routes through 'use', so this is the
+    // most common equip gesture in the game. Dropping it here left that gesture
+    // guessing while the aimed paperdoll path was precise.
+    equipItem(ctx, itemId, meta.entityId, undefined, slotIndex);
   } else if (def.kind === 'bag') {
-    equipBagCmd(ctx, itemId, undefined, meta.entityId);
+    equipBagCmd(ctx, itemId, undefined, meta.entityId, slotIndex);
   } else if (def.kind === 'mount') {
     // Reins work like any other usable item: clicking them (bags or an action-bar
     // slot) summons THAT mount. summonMountItem owns every gate, riding skill
@@ -1015,7 +1104,13 @@ function recordVendorBuyback(
   while (meta.vendorBuyback.length > VENDOR_BUYBACK_LIMIT) meta.vendorBuyback.pop();
 }
 
-export function sellItem(ctx: SimContext, itemId: string, count = 1, pid?: number): void {
+export function sellItem(
+  ctx: SimContext,
+  itemId: string,
+  count = 1,
+  pid?: number,
+  slotIndex?: number,
+): void {
   const r = ctx.resolve(pid);
   if (!r) return;
   const { meta, e: p } = r;
@@ -1073,17 +1168,48 @@ export function sellItem(ctx: SimContext, itemId: string, count = 1, pid?: numbe
   // units get their own per-unit rows so buyback can restore the exact
   // payload sold instead of silently minting a generic copy (the #2207
   // sibling gap social/trade.ts's grantOffer fix left open, see its comment).
-  const consumedUnits = removeVendorSellUnits(
-    ctx,
-    itemId,
-    sellableCount,
-    meta.entityId,
-    (instance) => instance.boundTo !== undefined,
-    // The copy-choice rule on the vendor arm too (the phase 18 whole-branch
-    // review): the seller's own self-signed charm copies go last, so selling
-    // one of two charms never silently retires the recharge discount.
-    sellerSignedCharmDeprioritize(meta.name, itemId),
-  );
+  // A named slot sells exactly that copy, single unit only. The bulk arm spans
+  // slots by design (see discardItem for the same reasoning), and there the
+  // prefer-plain walk below is the right rule rather than a compromise.
+  //
+  // The bound check is repeated here rather than inherited: the clamp above
+  // counts unbound copies in AGGREGATE, which says nothing about whether THIS
+  // slot is the bound one. Without it a selection could sell the bound copy
+  // while the clamp was satisfied by an unbound one elsewhere, which is exactly
+  // the laundering hole the clamp exists to close.
+  let consumedUnits: InventoryUnit[];
+  if (sellableCount === 1 && slotIndex !== undefined) {
+    // Match the id BEFORE reading boundTo. Reading the raw slot first meant naming
+    // a slot that holds a different, bound item reported "bound" rather than
+    // "don't have that item", which is a misleading refusal.
+    const named = meta.inventory[slotIndex];
+    if (named?.itemId === itemId && named.instance?.boundTo !== undefined) {
+      ctx.error(meta.entityId, 'That item is bound and cannot be sold.');
+      return;
+    }
+    // `!taken` rather than `=== null`: the undefined arm cannot occur inside this
+    // branch (slotIndex is defined), and narrowing on it keeps the type honest
+    // without an assertion.
+    const taken = consumeSelectedInventorySlot(meta.inventory, itemId, slotIndex);
+    if (!taken) {
+      ctx.error(meta.entityId, "You don't have that item.");
+      return;
+    }
+    ctx.onInventoryChangedForQuests?.(meta);
+    consumedUnits = [taken];
+  } else {
+    consumedUnits = removeVendorSellUnits(
+      ctx,
+      itemId,
+      sellableCount,
+      meta.entityId,
+      (instance) => instance.boundTo !== undefined,
+      // The copy-choice rule on the vendor arm too (the phase 18 whole-branch
+      // review): the seller's own self-signed charm copies go last, so selling
+      // one of two charms never silently retires the recharge discount.
+      sellerSignedCharmDeprioritize(meta.name, itemId),
+    );
+  }
   for (const unit of consumedUnits) {
     recordVendorBuyback(meta, itemId, 1, unit.instance, unit.craftedRecipeId);
   }

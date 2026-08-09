@@ -31,14 +31,30 @@ AMENDMENTS (Phase 4 execution, 2026-08-08; state.md wins on contradiction):
   one id at a time: the census's recipe-keyed self-clearing arm cannot see
   command consumers, so the list was REPLACED by a structural farming
   exemption (state.md deviation (w)).
-- The watch fee accepts MIXED produce kinds (cheapest first, base before
-  fine): a farmer holding enough qualifying produce across stacks is never
-  refused (refinement recorded in farm_watch_fee.ts, not a contradiction).
+- The watch fee accepts MIXED produce kinds (lowest tier first, base before
+  fine within a crop; the order is FIXED, deliberately not value-ascending,
+  per the farm_watch_fee.ts banner): a farmer holding enough qualifying
+  produce across stacks is never refused (refinement recorded in
+  farm_watch_fee.ts, not a contradiction; this sentence originally said
+  "cheapest first", corrected in Phase 4 QA to match the shipped order).
 - Unlisted deliverable executed with the phase per the state.md standing
   instruction: the src/ui/farming_view.ts pure-core extraction (rule of
   three; the deny leaves and the husk-trade line are the third arrival).
 - The farming_session golden was NOT re-recorded (the expected outcome held:
   the scenario was not extended and the draw block did not change).
+- The review round anchored the tonic bonus roll to its OWN mulberry32
+  expansion of the stored seed (yieldSeed xor a constant), never a
+  loop-relative read: the lives loop grows with skill, so a loop-relative
+  bonus position breaks player-favorable monotonicity (state.md Phase 4 QA
+  addenda carry the contract; the 200-seed sweep pins it).
+- Commit cadence ran to EIGHT commits against STEP 4's "2 to 5": the five
+  planned plus the review-round fix commit, the gate-caught census re-pin,
+  and the review/gate notes commit, each legitimately separate.
+- Phase 4 QA (2026-08-08): three surviving mutants forced test repairs (the
+  tonic end-to-end arms were vacuous on a losing seed, the fee-module pins
+  were unfalsifiable against the one-crop catalog, and the fee legs had no
+  atomicity arm); the parity-scenario knob coverage is deviation (z),
+  deferred to Phase 5 (state.md ledger).
 
 ### Starter Prompt
 

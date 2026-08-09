@@ -1619,7 +1619,12 @@ export const es_ES: EnTranslations = {
       }
     },
     "talents": {
-      "defaultBuildName": "Configuración {n}"
+      "defaultBuildName": "Configuración {n}",
+      "newBuildWithGear": "New Build (save gear too)",
+      "gearRestored": "Restored {n} gear pieces from this build.",
+      "gearNotHeld": "You no longer have {n} of this build's saved pieces.",
+      "gearCopyGone": "{n} saved pieces were not the copy this build pinned.",
+      "gearTakenByOtherSlot": "{n} saved pieces need another copy you do not have."
     },
     "tips": {
       "joinChannels": "Consejo: escribe /join world o /join lfg para chatear con jugadores de todas partes del mundo."

@@ -13,7 +13,7 @@
 | Phase 3 (growth engine) | done | 2026-08-08 | 2026-08-08 |
 | Phase 3 QA | done | 2026-08-08 | 2026-08-08 |
 | Phase 4 (knobs) | done | 2026-08-08 | 2026-08-08 |
-| Phase 4 QA | not started | | |
+| Phase 4 QA | done (PASS-WITH-FOLLOWUPS) | 2026-08-08 | 2026-08-08 |
 | Phase 5 (crops and tools) | not started | | |
 | Phase 5 QA | not started | | |
 | Phase 6 (economy hooks) | not started | | |
@@ -580,9 +580,12 @@ Executed 2026-08-08, local-only per D22: branch fix/farming-phase-04-knobs off
 feature/farming-plan, sixth v0.36.0 absorb first (merge da3d1cec4b of tip
 1478f9d2ba, PR 2974 Seeker daily-rewards mobile CSS, empty intersection with
 farming; release-merge-audit clean, parity and snapshots re-proven on the
-merged HEAD). Five commits: 122dd3de56 farming_view extraction, 80f6169435
+merged HEAD). Eight commits: 122dd3de56 farming_view extraction, 80f6169435
 items + convertHusks, 5014a395be knob payload + watch fee + tonic arm,
-81d3d2ba00 the test battery, plus the docs commit.
+81d3d2ba00 the test battery, e02e8efebd the docs commit, then three
+follow-ups the first write of this sentence predated: a628b65a65 the
+review-round fixes, 2db9606ef4 the gate-caught grant-site census re-pin,
+and 4b9a36fd63 the review and gate notes.
 
 Acceptance criteria (phase-04-knobs.md STEP 5), each with its state:
 
@@ -707,6 +710,90 @@ fallback-only census class Phase 2 hit), fixed as its own commit. Run two:
 "[gate:select] PASS: all 8 steps green (vitest workers: 12)", zero FAIL
 lines in the log. The shell exit code of run one was 0 while the log said
 FAIL: the log-marker rule is the arbiter, re-confirmed.
+
+Phase 4 QA (2026-08-08), the audit record. VERDICT: PASS-WITH-FOLLOWUPS.
+
+Pre-audit: QA branch fix/farming-phase-04-qa off feature/farming-plan
+(audit-start 4c1e92dc69); seventh v0.36.0 absorb merged FIRST (merge
+1c81459323 of tip 66c2340242: PR 3162 per-copy item addressing plus PR
+3164 loadout gear sets, 65 files). release-merge-audit clean: 38 overlaps
+(30 generated i18n, regen byte-identical), farming wiring intact in all
+eight real overlap files, no db-mock trap in the six new release suites,
+no new routes or commands, tsc clean, parity and snapshots 500/500 on the
+merged HEAD (release never touched the parity pins, so 307 is genuine:
+the identical-bump trap did not fire).
+
+Audit shape: 19 live probe tests (advanceable injected clock; all EIGHT
+knob combinations on two seeds driven plant-grow-harvest with real ticks:
+plant exactly 2 draws, expiry tick driver 0, harvest 0; stored flags
+mirror the combos; exact consumption; fee-bootstrap deny atomic, 0 draws,
+localized leaf, never a soft-lock; sub-batch husk deny clean); an 8-lane
+reviewer fan-out (two custom lanes died report-less and were redispatched
+on the fixed tree: cross-platform-sync PASS, privacy-security-review
+PASS); EIGHT mutation checks: 5 killed on the phase tree as shipped, 3
+SURVIVED and forced test repairs, then all 3 re-proven killed:
+- M8 (the one BLOCKING, test-coverage lane): the two end-to-end tonic
+  arms ran on harness seed 41, a tonic LOSER, so disabling the
+  harvest-side flag read left every suite green. Fixed in 62ea9e5cad:
+  both arms moved to the probed winner TONIC_WIN_SEED = 2 with
+  non-vacuity guards; the mutant now reds both arms by name.
+- M5 (SHOULD-FIX): no arm pinned the fee legs surviving a later tonic
+  refusal; a spend-at-gate mutant survived 117 tests. Fixed in
+  62ea9e5cad: the fee twin of the compost atomicity arm.
+- M3 (SHOULD-FIX): the fee-module ordering, exclusion, and dedupe pins
+  were constant-true against the one-crop catalog (deleting the Set left
+  102 tests green). Fixed in 182d2b2f4f: injectable catalog parameter, a
+  synthetic multi-tier ladder with a deliberate base/fine id collision,
+  a planner-level double-count arm, and the live seed/produce
+  disjointness pin.
+Killed on the phase tree as shipped: the loop-relative tonic re-anchor
+(the monotonicity sweep), the dropped survival cap clamp (both boundary
+arms), the deny-precedence flip (order proofs), the dropped wire guard
+(per-field refusal), and single-batch convertHusks (the
+every-complete-batch arm).
+
+Also landed (c8acdf1a0d): the fplot knob-flag broadcast pin with the
+nine-key exhaustive row set; the CAP-plus-BONUS pick ceiling pin plus
+the constant's comment; the deny-prose rename-drift pin and the
+x{husks} plural-floor pin in farming_view; the mixed-fee test retitled
+off "cheapest-first"; the dead four-symbol fee re-export block dropped.
+Docs (d944051422): watch-fee tiers and tonic tuning added to the
+state.md proposed-constants ledger; the seed-anchored tonic contract
+ledgered where the next session reads first; the commit enumeration
+corrected to eight; key planned files refined; the farming_view trigger
+marked executed (four selectors); deviation (z) swept into both phase
+files. Absorb-side format debt fixed scoped (8f3f1bdc86: three PR-3164
+files; the only ci:changed red, now exit 0).
+
+Deviation (z): parity-scenario knob coverage deferred to Phase 5. The
+farming_session golden stayed untouched through this QA (md5
+29a11d98bda17f9c38bd8e9016df7fc7, its stopping rule); the single-host
+pins and live probes hold the knob paths' draw contract until the Phase
+5 scenario extension re-records deliberately.
+
+Deliberate no-action calls re-judged, ALL UPHELD: the refusal-spam heavy
+re-serialize (bounded by the command lane; the Phase 9 note stands),
+offline forged knob flags (offline-only, the survivalRoll-analysis
+class), the deviation (w) auto-exemption (the exact-set taxonomy pin is
+the gate; the maintainer read before Phase 5 is still owed), and the
+Materials chip classifying two dormant faucet-free items. Accepted
+as-is: FARM_SUPPLY_ITEM_IDS stays exported for the Phase 9 vendor stock;
+the growth_tonic sparkle overlay is noted for the art batch; the pending
+Latin rows ride to the release fill; the knob deny lines stay prose with
+the rename-drift pin as the tie; the junk-knob silent frame drop is the
+deliberate id-guard convention (pinned).
+
+Counts: 1 BLOCKING found and fixed; 6 SHOULD-FIX (3 fixed in code, 2
+fixed in docs, 1 deferred as deviation (z)); 20 NICE-TO-HAVE (7 adopted,
+13 upheld or ledgered as deliberate). QA commits: 62ea9e5cad,
+182d2b2f4f, c8acdf1a0d, d944051422, 8f3f1bdc86, plus this record.
+
+QA GATE: node scripts/gate_select.mjs run once on the QA tip
+(BROWSER_PATH exported): the planner fell back to the full suite (broad
+change, 179 changed paths against the release base), and the log's final
+marker is "[gate:select] PASS: all 8 steps green (vitest workers: 12)"
+with zero FAIL lines and zero failed suites; neither known contention
+flake fired.
 
 ### Phase 5
 (not started)

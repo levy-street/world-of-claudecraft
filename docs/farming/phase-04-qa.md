@@ -7,6 +7,20 @@ for all eight). The audit also probes the fee-bootstrap path (a player with zero
 produce must be cleanly denied, never soft-locked) and verifies the binding
 Live-surface note in phase-04-knobs.md: everything this phase minted is unobtainable.
 
+AMENDED at Phase 4 QA execution (2026-08-08), the audit's own record: the audit
+ran on fix/farming-phase-04-qa off feature/farming-plan with the seventh
+v0.36.0 absorb (tip 66c2340242, PRs 3162 and 3164) merged first and
+release-merge-audited clean. Verdict and fix list live in the progress.md
+Phase 4 QA block. Deviation (z) (state.md ledger): the parity-scenario knob
+coverage is deferred to Phase 5; the farming_session golden stayed untouched
+through this QA by its stopping rule, and the knob paths' draw contract is
+held by the single-host pins until the Phase 5 scenario extension re-records
+deliberately. The STEP 2 mutation instruction is sharpened by this run's
+result: a draw-contract pin can be decisive while a YIELD pin is vacuous
+(the tonic arms passed on a seed whose tonic roll loses); any future
+expansion arm must assert its expected value differs from the unarmed
+expansion before trusting an equality assertion.
+
 AMENDED at Phase 4 execution (2026-08-08), per D22: no PR exists. The phase landed
 as local commits on fix/farming-phase-04-knobs, merged --no-ff into
 feature/farming-plan; STEP 0's "check out the PR branch / gh pr view" resolves to

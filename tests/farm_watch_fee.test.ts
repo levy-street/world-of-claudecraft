@@ -5,12 +5,49 @@
 // eligibility order, and the plan arithmetic.
 
 import { describe, expect, it } from 'vitest';
+import { FARM_CROPS, type FarmCropDef } from '../src/sim/content/farm_crops';
 import {
   eligibleWatchFeeItemIds,
   FARM_WATCH_FEE_BY_TIER,
   planWatchFee,
   watchFeeAmount,
 } from '../src/sim/professions/farm_watch_fee';
+
+// A synthetic multi-tier catalog for the injectable-crops arms below. The
+// shipped table carries ONE crop, so against live data the tier ordering,
+// the higher-tier exclusion, and the dedupe literally cannot fail (the QA
+// round proved it: deleting the Set left every suite green). These rows make
+// all three falsifiable today instead of when the crop ladder lands.
+// Authored OUT of tier order on purpose (the walk must sort, never trust
+// insertion order), with one deliberate collision: 'twinberry' names the
+// SAME id for its base and fine grades, so a double-listing would count one
+// bag stack twice.
+const SYNTH_LADDER: readonly FarmCropDef[] = [
+  {
+    id: 'frostroot',
+    tier: 3,
+    durationMs: 60_000,
+    seedItemId: 'frostroot_seed',
+    produceItemId: 'frostroot',
+    fineProduceItemId: 'fine_frostroot',
+  },
+  {
+    id: 'twinberry',
+    tier: 1,
+    durationMs: 60_000,
+    seedItemId: 'twinberry_seed',
+    produceItemId: 'twinberry_fruit',
+    fineProduceItemId: 'twinberry_fruit',
+  },
+  {
+    id: 'amberleaf',
+    tier: 1,
+    durationMs: 60_000,
+    seedItemId: 'amberleaf_seed',
+    produceItemId: 'amberleaf',
+    fineProduceItemId: 'fine_amberleaf',
+  },
+];
 
 describe('FARM_WATCH_FEE_BY_TIER', () => {
   it('pins the fee table to its literals', () => {
@@ -62,6 +99,44 @@ describe('eligibleWatchFeeItemIds', () => {
     // filter really reads the tier rather than passing everything.
     expect(eligibleWatchFeeItemIds(0)).toEqual([]);
   });
+
+  it('orders a multi-tier catalog tier-ascending, then id, base before fine (synthetic)', () => {
+    // The comparator's tier arm exercised for real: amberleaf and twinberry
+    // (both tier 1, id order) come before frostroot (tier 3), whatever the
+    // authoring order, and the twinberry collision lists once.
+    expect(eligibleWatchFeeItemIds(3, SYNTH_LADDER)).toEqual([
+      'amberleaf',
+      'fine_amberleaf',
+      'twinberry_fruit',
+      'frostroot',
+      'fine_frostroot',
+    ]);
+  });
+
+  it('EXCLUDES a higher-tier crop from a lower-tier plant (the D9 predicate, synthetic)', () => {
+    // The actual fee predicate direction: a tier-1 plant may not be paid in
+    // tier-3 produce. Never exercisable against the one-crop live catalog.
+    expect(eligibleWatchFeeItemIds(1, SYNTH_LADDER)).toEqual([
+      'amberleaf',
+      'fine_amberleaf',
+      'twinberry_fruit',
+    ]);
+  });
+
+  it('keeps every live seed id OUT of the fee-eligible produce set (the aliasing pin)', () => {
+    // Seeds are not produce: the plant command counts and spends the seed
+    // separately from the fee legs, and the plan is made before any payment
+    // runs, so a crop whose seed id aliased any produce id would let one bag
+    // stack answer both gates and under-collect at spend time. This pin is
+    // what stops the crop-ladder phase authoring that row by accident; it
+    // walks the LIVE catalog, so the seven new crops join it for free.
+    const produceIds = new Set(
+      Object.values(FARM_CROPS).flatMap((c) => [c.produceItemId, c.fineProduceItemId]),
+    );
+    for (const crop of Object.values(FARM_CROPS)) {
+      expect(produceIds.has(crop.seedItemId), crop.id).toBe(false);
+    }
+  });
 });
 
 describe('planWatchFee', () => {
@@ -93,6 +168,15 @@ describe('planWatchFee', () => {
       const ids = eligibleWatchFeeItemIds(tier);
       expect(new Set(ids).size, `tier ${tier}`).toBe(ids.length);
     }
+  });
+
+  it('cannot fund a fee by counting one collided stack twice (synthetic)', () => {
+    // The double-count guard proven at the PLANNER, with the collision the
+    // live catalog cannot produce: one twinberry fruit against a fee of two
+    // must come up short. A dropped dedupe lists the id twice, reads the same
+    // stack twice, and funds a plan the bags cannot pay.
+    const counts: Record<string, number> = { twinberry_fruit: 1 };
+    expect(planWatchFee(1, (id) => counts[id] ?? 0, SYNTH_LADDER)).toBeNull();
   });
 
   it('returns null when the qualifying produce falls short, planning nothing partial', () => {

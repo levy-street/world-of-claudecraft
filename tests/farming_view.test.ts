@@ -6,6 +6,7 @@
 
 import { describe, expect, it } from 'vitest';
 import { ITEMS } from '../src/sim/data';
+import { FARM_HUSKS_PER_COMPOST } from '../src/sim/professions/farming';
 import {
   type FarmDeniedReason,
   farmDeniedLineKey,
@@ -63,6 +64,38 @@ describe('farmDeniedLineKey', () => {
     const copy = keys.map((k) => t(k));
     for (const line of copy) expect(line.length).toBeGreaterThan(0);
     expect(new Set(copy).size).toBe(reasons.length);
+  });
+
+  it('keeps the knob deny prose naming the real items, so a rename reds here (the drift pin)', () => {
+    // The three knob deny lines restate item names as inline PROSE, a
+    // deliberate tradeoff (an error toast reads better as a sentence than a
+    // spliced token; the gatherDenied family's convention), which leaves
+    // nothing tying the copy to the item defs. This pin is that tie: each
+    // line must contain its item's English display name, so a rename makes
+    // the stale toast a test failure instead of a shipped lie in six locale
+    // variants. The husk-trade line needs no such pin: it splices
+    // {husksName}/{name} straight from the defs.
+    setLanguage('en');
+    for (const [itemId, key] of [
+      ['withered_husks', 'hudChrome.farming.denied.no_husks'],
+      ['compost', 'hudChrome.farming.denied.no_compost'],
+      ['growth_tonic', 'hudChrome.farming.denied.no_tonic'],
+    ] as const) {
+      const name = ITEMS[itemId]?.name ?? '';
+      expect(name, itemId).toBeTruthy();
+      expect(t(key).toLowerCase(), key).toContain(name.toLowerCase());
+    }
+  });
+});
+
+describe('the husk-trade line and its plural floor', () => {
+  it('may hardcode x{husks} only while a batch stays plural (the UI side of the sim pin)', () => {
+    // Both husksConvertedLine variants embed 'x{husks}' unconditionally,
+    // which honors the no-x1 rule only because one batch always spends at
+    // least two husks. The sim pins the constant's value once; this arm is
+    // the UI-side link, so a tuning drop to 1 reds BESIDE the line that
+    // would start reading 'Withered Husks x1'.
+    expect(FARM_HUSKS_PER_COMPOST).toBeGreaterThan(1);
   });
 });
 

@@ -13,7 +13,7 @@ export interface IWorldInventory {
   equipment: Partial<Record<EquipSlot, string>>;
   equipmentInstances: PlayerEquipmentInstances;
   copper: number;
-  equipItem(itemId: string): void;
+  equipItem(itemId: string, target?: { slotIndex: number }): void;
   /** Reorder the bags: move the stack at inventory index `from` onto the bag cell at
    *  `to` (a swap when that cell holds a stack, a move to the end when it is free
    *  space). The order is the inventory array itself, persisted with the character. */
@@ -29,14 +29,14 @@ export interface IWorldInventory {
    *  instead of letting the sim's resolver pick (a ring dropped on the second
    *  finger lands there even while the first is free). The sim re-validates the
    *  slot against the item, so an illegal pairing is refused, never coerced. */
-  equipItemToSlot(itemId: string, slot: EquipSlot): void;
+  equipItemToSlot(itemId: string, slot: EquipSlot, target?: { slotIndex: number }): void;
   unequipItem(slot: EquipSlot): void;
   /** Equip a bag item into a socket (first empty when omitted; swaps in place). */
-  equipBag(itemId: string, socket?: number): void;
+  equipBag(itemId: string, socket?: number, target?: { slotIndex: number }): void;
   /** Return the bag in `socket` to the inventory (refused when items would not fit). */
   unequipBag(socket: number): void;
-  useItem(itemId: string): void;
-  discardItem(itemId: string, count?: number): void;
+  useItem(itemId: string, target?: { slotIndex: number }): void;
+  discardItem(itemId: string, count?: number, target?: { slotIndex: number }): void;
   // The request rides an options bag (VendorBuyOptions, phase 21): `bulk`
   // requests as many units as the buyer can currently afford in one purchase,
   // capped at the item's bag stack size (VendorGoodsRow.bulkQuantity previews
@@ -46,7 +46,7 @@ export interface IWorldInventory {
   // at most one of the two fields. An empty/omitted bag buys the ordinary
   // single unit (or the food/drink staple stack), byte-identical to today.
   buyItem(npcId: number, itemId: string, opts?: VendorBuyOptions): void;
-  sellItem(itemId: string, count?: number): void;
+  sellItem(itemId: string, count?: number, target?: { slotIndex: number }): void;
   // Sell every gray (poor-quality) item in the bags at once while a vendor is open.
   // Quest items and anything flagged noVendorSell are left untouched.
   sellAllJunk(): void;
@@ -63,7 +63,7 @@ export interface IWorldInventory {
     instance?: ItemInstancePayload,
     craftedRecipeId?: string,
   ): void;
-  upgradeRiftItem(itemId: string): void;
-  enchantRiftItem(itemId: string, stat: string): void;
-  socketRiftGem(itemId: string, gemId: string): void;
+  upgradeRiftItem(itemId: string, target?: { slotIndex: number }): void;
+  enchantRiftItem(itemId: string, stat: string, target?: { slotIndex: number }): void;
+  socketRiftGem(itemId: string, gemId: string, target?: { slotIndex: number }): void;
 }

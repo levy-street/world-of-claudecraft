@@ -38,6 +38,7 @@
 import { hasUnbreakableMovementLock } from '../combat/cc';
 import { DUNGEON_X_THRESHOLD, ITEMS, isDelvePos, MOBS } from '../data';
 import { createMob } from '../entity';
+import { consumeSelectedInventorySlot } from '../item_copy_ref';
 import type { PetState } from '../sim';
 import type { SimContext } from '../sim_context';
 import { addThreat, clearThreat } from '../threat';
@@ -640,7 +641,7 @@ export function petWaterJet(ctx: SimContext, pid?: number): void {
   startWaterJet(ctx, pet, target, jet);
 }
 
-export function feedPet(ctx: SimContext, itemId: string, pid?: number): void {
+export function feedPet(ctx: SimContext, itemId: string, pid?: number, slotIndex?: number): void {
   const r = ctx.resolve(pid);
   if (!r) return;
   if (r.meta.cls !== 'hunter') {
@@ -666,7 +667,20 @@ export function feedPet(ctx: SimContext, itemId: string, pid?: number): void {
     ctx.error(r.e.id, 'Your pet is already at full health.');
     return;
   }
-  ctx.removeItem(itemId, 1, r.e.id);
+  // A named slot consumes exactly that copy; an id-only call keeps the legacy
+  // newest-first walk (ctx.removeItem) untouched.
+  if (slotIndex !== undefined) {
+    if (consumeSelectedInventorySlot(r.meta.inventory, itemId, slotIndex) === null) {
+      // Say why. Every other surface in this family emits the same line; a silent
+      // refusal reads to the player as the button being broken.
+      ctx.error(r.e.id, "You don't have that item.");
+      return;
+    }
+    ctx.onInventoryChangedForQuests?.(r.meta);
+  } else {
+    ctx.removeItem(itemId, 1, r.e.id);
+  }
+
   pet.auras = pet.auras.filter((a) => a.id !== 'feed_pet');
   ctx.applyAura(pet, {
     id: 'feed_pet',
