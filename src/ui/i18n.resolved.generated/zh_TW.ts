@@ -1619,7 +1619,12 @@ export const zh_TW: EnTranslations = {
       }
     },
     "talents": {
-      "defaultBuildName": "配置 {n}"
+      "defaultBuildName": "配置 {n}",
+      "newBuildWithGear": "新增配置（同時儲存裝備）",
+      "gearRestored": "已從此配置恢復 {n} 件裝備。",
+      "gearNotHeld": "你已不再擁有該配置儲存的 {n} 件裝備。",
+      "gearCopyGone": "有 {n} 件裝備不是該配置鎖定的那一件。",
+      "gearTakenByOtherSlot": "有 {n} 件裝備需要你沒有的另一件副本。"
     },
     "tips": {
       "joinChannels": "提示：輸入 /join world 或 /join lfg 可與全世界的玩家聊天。"

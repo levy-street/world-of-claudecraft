@@ -455,7 +455,12 @@ export class CharWindow {
    *  here). The refusals are pre-empted client-side with the sim's OWN wording
    *  (tSim), so no doomed command is sent and the toast reads identically to the
    *  authoritative one the server would emit; the sim re-validates regardless. */
-  dropOnEquipSlot(itemId: string, slot: EquipSlot): void {
+  /** `target` names WHICH bag copy was dragged. Without it the equip command
+   *  falls back to the newest matching copy, which is the wrong copy whenever the
+   *  player holds a plain duplicate of an enchanted piece. The bags window has the
+   *  index (it owns the drag source), so it is threaded through rather than
+   *  re-derived here, where the live slot object is no longer in hand. */
+  dropOnEquipSlot(itemId: string, slot: EquipSlot, target?: { slotIndex: number }): void {
     const item = ITEMS[itemId];
     if (!item) return;
     const world = this.deps.world();
@@ -486,7 +491,7 @@ export class CharWindow {
         this.deps.showError(tSim('error.uniqueEquipped'));
         return;
       case 'equip':
-        world.equipItemToSlot(itemId, slot);
+        world.equipItemToSlot(itemId, slot, target);
         audio.click();
         this.deps.hideTooltip();
         this.deps.renderBags();
@@ -548,7 +553,15 @@ export class CharWindow {
       e.preventDefault();
       this.deps.dragState.end();
       this.markDropTargets(null);
-      this.dropOnEquipSlot(drag.itemId, slot);
+      // The desktop drop carries the drag's bag index the same way the touch path
+      // does; without it the most ordinary equip gesture fell back to the guess.
+      // `drag.index` is already null for a sorted or filtered grid, which names no
+      // position, so that case correctly sends no selection.
+      this.dropOnEquipSlot(
+        drag.itemId,
+        slot,
+        drag.index !== null && drag.index >= 0 ? { slotIndex: drag.index } : undefined,
+      );
     });
   }
 

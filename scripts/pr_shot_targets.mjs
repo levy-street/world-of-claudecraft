@@ -220,7 +220,7 @@ export const TARGETS = [
       const staged = await page.evaluate(() => {
         const game = window.__game;
         const sim = game?.sim;
-        if (!sim || !sim.player) return { ok: false, reason: 'offline world is unavailable' };
+        if (!sim?.player) return { ok: false, reason: 'offline world is unavailable' };
         if (!sim.bgMatchFor(sim.player.id)) {
           const classes = [
             'warrior',
@@ -424,9 +424,7 @@ export const TARGETS = [
           document.querySelector('.gpu-notice-dismiss')?.click();
           const el = document.querySelector('#banner');
           return (
-            el !== null &&
-            el.classList.contains('banner-skill') &&
-            Number(getComputedStyle(el).opacity) > 0.95
+            el?.classList.contains('banner-skill') && Number(getComputedStyle(el).opacity) > 0.95
           );
         });
         if (visible) break;
@@ -1464,8 +1462,8 @@ export const TARGETS = [
           const bg = c instanceof HTMLElement ? c.style.backgroundImage : '';
           const img = c.querySelector?.('img');
           return (
-            (bg && bg.includes('tidewrought_fishing_rod')) ||
-            (img && img.getAttribute('src')?.includes('tidewrought_fishing_rod'))
+            bg?.includes('tidewrought_fishing_rod') ||
+            img?.getAttribute('src')?.includes('tidewrought_fishing_rod')
           );
         });
         if (!el) return;
@@ -1522,8 +1520,8 @@ export const TARGETS = [
           const bg = c instanceof HTMLElement ? c.style.backgroundImage : '';
           const img = c.querySelector?.('img');
           return (
-            (bg && bg.includes('silverleaf_healing_draught')) ||
-            (img && img.getAttribute('src')?.includes('silverleaf_healing_draught'))
+            bg?.includes('silverleaf_healing_draught') ||
+            img?.getAttribute('src')?.includes('silverleaf_healing_draught')
           );
         });
         if (!el) return;
@@ -1599,10 +1597,7 @@ export const TARGETS = [
         const el = cells.find((c) => {
           const bg = c instanceof HTMLElement ? c.style.backgroundImage : '';
           const img = c.querySelector?.('img');
-          return (
-            (bg && bg.includes('rough_hide')) ||
-            (img && img.getAttribute('src')?.includes('rough_hide'))
-          );
+          return bg?.includes('rough_hide') || img?.getAttribute('src')?.includes('rough_hide');
         });
         if (!el) return;
         const r = el.getBoundingClientRect();
@@ -1662,8 +1657,8 @@ export const TARGETS = [
           const img = c.querySelector?.('img');
           const aria = c.getAttribute?.('aria-label') ?? '';
           return (
-            (bg && bg.includes('elixir_of_the_boar')) ||
-            (img && img.getAttribute('src')?.includes('elixir_of_the_boar')) ||
+            bg?.includes('elixir_of_the_boar') ||
+            img?.getAttribute('src')?.includes('elixir_of_the_boar') ||
             aria.startsWith('Elixir of the Boar')
           );
         });

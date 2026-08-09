@@ -266,9 +266,20 @@ describe('touch drop routing beyond the hit-test (the phase 14 QA gaps)', () => 
 
   it('the bags release routes both action arms into the HUD deps (source pin)', () => {
     const bags = stripped('../src/ui/bags_window.ts');
-    expect(bags).toContain(
-      "if (target.kind === 'equip') this.deps.dropOnEquipSlot(s.itemId, target.slot);",
+    // The equip arm now also forwards WHICH bag copy was dragged, so it is no
+    // longer a single line. Pinned as its parts rather than as one string: the
+    // routing claim (this arm reaches dropOnEquipSlot with the item and the
+    // target slot) is what this test is about, and the added third argument is
+    // the copy-addressing work, covered by tests/item_copy_addressing_guard.
+    const equipArm = bags.slice(
+      bags.indexOf("if (target.kind === 'equip')"),
+      bags.indexOf("else if (target.kind === 'bagCell')"),
     );
+    expect(equipArm, 'the equip arm must reach the HUD dep').toContain(
+      'this.deps.dropOnEquipSlot(',
+    );
+    expect(equipArm).toContain('s.itemId');
+    expect(equipArm).toContain('target.slot');
     expect(bags).toContain(
       "else if (target.kind === 'actionSlot') this.deps.dropOnActionSlot(s.itemId, target.slot);",
     );

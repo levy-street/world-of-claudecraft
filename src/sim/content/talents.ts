@@ -1,3 +1,4 @@
+import type { SavedGearSet } from '../loadout_gear';
 import type { AbilityEffect, AuraKind, ResourceType } from '../types';
 import { ALL_CLASSES, MAX_LEVEL, type PlayerClass } from '../types';
 import { specBaselineFor } from './spec_baselines';
@@ -257,6 +258,14 @@ export interface SavedLoadout {
   name: string;
   alloc: TalentAllocation;
   bar: (string | null)[];
+  /** The worn set this loadout captured, if the player opted in at save time
+   *  (src/sim/loadout_gear.ts). OMITTED, never set to undefined, when gear was not
+   *  captured: it is additive persistence, so an old save loads unchanged and the
+   *  snapshot shape stays byte-identical for every loadout that carries no set.
+   *
+   *  Opt-in rather than automatic on purpose. Someone saving a talent build for a
+   *  dungeon should not have their gear swap as a side effect of applying it. */
+  gear?: SavedGearSet;
 }
 
 export const MAX_LOADOUTS = 10;

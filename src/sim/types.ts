@@ -5138,6 +5138,22 @@ export type SimEvent = { pid?: number } & (
         | 'same_enchant'
         | 'busy';
     }
+  // Outcome of applying a loadout's saved gear set. TEXT-FREE on purpose: the sim
+  // stays language-agnostic and the client renders the copy from a t() key, which
+  // avoids adding a twentieth-locale in-file dictionary entry for one sentence.
+  // Personal (carries pid). Only emitted when a loadout actually captured gear.
+  | {
+      type: 'loadoutGearResult';
+      /** Pieces equipped from the saved set. */
+      equipped: number;
+      /** Slots already wearing the exact saved copy. */
+      alreadyWorn: number;
+      /** Saved pieces that could not be found, by reason, so the client can word
+       *  "you no longer own it" differently from "that enchanted copy is gone". */
+      notHeld: number;
+      copyGone: number;
+      takenByOtherSlot: number;
+    }
   | {
       type: 'salvageResult';
       ok: boolean;

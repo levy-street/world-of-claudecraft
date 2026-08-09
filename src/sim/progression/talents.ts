@@ -53,10 +53,18 @@ import {
 } from '../content/talents';
 import { ABILITIES } from '../data';
 import { recalcPlayerStats } from '../entity';
+import { itemCopyPin } from '../item_copy_ref';
+import { equipItem as equipItemImpl } from '../items';
+import {
+  buildGearSet,
+  planGearSwap,
+  type SavedGearSet,
+  wornAsBagSlot,
+} from '../loadout_gear';
 import { despawnPersistentPet, petOf } from '../pet/pet_commands';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
-import { type Entity, isFormAuraKind } from '../types';
+import { ALL_EQUIP_SLOTS, type Entity, type EquipSlot, isFormAuraKind } from '../types';
 
 function cleanRemovedProcState(
   ctx: SimContext,
@@ -399,6 +407,7 @@ export function saveTalentLoadout(
   bar: (string | null)[],
   pidOrAlloc?: number | TalentAllocation,
   allocMaybe?: TalentAllocation,
+  captureGear = false,
 ): number {
   const pid = typeof pidOrAlloc === 'number' ? pidOrAlloc : undefined;
   const alloc = typeof pidOrAlloc === 'object' ? pidOrAlloc : allocMaybe;
@@ -415,6 +424,20 @@ export function saveTalentLoadout(
     ? bar.slice(0, SAVED_LOADOUT_BAR_SLOTS).map((b) => (typeof b === 'string' ? b : null))
     : [];
   const lo: SavedLoadout = { name: clean, alloc: cloneAllocation(r.meta.talents), bar: safeBar };
+  // Opt-in: the `gear` KEY is absent unless the player asked for it, which keeps the
+  // persisted and wire shapes unchanged for every talent-only loadout.
+  if (captureGear) {
+    const captured = buildGearSet(r.meta.equipment, r.meta.equipmentInstance);
+    if (Object.keys(captured).length > 0) lo.gear = captured;
+  } else {
+    // Preserve a gear set the loadout already had. An overwrite rebuilds the whole
+    // record, so a plain "Save Build" over an existing gear-carrying loadout used
+    // to delete its pinned set silently: tweak one talent on a PvP build, hit Save,
+    // and the gear was gone with no warning. Not asking to CHANGE the gear is not
+    // the same as asking to remove it.
+    const existingGear = r.meta.loadouts.find((l) => l.name === clean)?.gear;
+    if (existingGear) lo.gear = existingGear;
+  }
   const existing = r.meta.loadouts.findIndex((l) => l.name === clean);
   if (existing >= 0) {
     r.meta.loadouts = r.meta.loadouts.map((saved, index) => (index === existing ? lo : saved));
@@ -434,6 +457,100 @@ export function saveTalentLoadout(
   return r.meta.activeLoadout;
 }
 
+/**
+ * Apply a saved gear set: plan against the CURRENT bags, then equip each resolved
+ * copy into its saved slot.
+ *
+ * Calls the equip impl directly rather than `ctx.equipItem`, deliberately. The seam
+ * signature is `(itemId, pid?)` and the `Sim` facade overloads its second parameter
+ * for IWorld callers, so a bag index passed positionally through either would land
+ * in the wrong argument. Going straight to the impl lets both the target equip slot
+ * and the bag index be named explicitly, which is the whole point: the index is what
+ * makes this equip the copy the player SAVED rather than the newest match.
+ *
+ * Never fails the switch. Talents have already committed by the time this runs, and
+ * callers rely on that, so a missing piece is reported and the rest still equip.
+ */
+function applySavedGear(ctx: SimContext, meta: PlayerMeta, set: SavedGearSet): void {
+  // RE-PLAN PER SLOT, against the live bags, immediately before each equip.
+  //
+  // Resolving every index up front and then equipping in sequence is wrong: each
+  // equip splices its consumed stack out of the inventory, shifting every higher
+  // index down one, and the loop does not run in index order. The second piece
+  // then consumed whatever slid into its recorded index, which reintroduces the
+  // exact wrong-copy defect this feature exists to prevent.
+  //
+  // Re-planning also replaces the planner's cross-slot claim set for free: once a
+  // stack is consumed it is simply not there for the next slot to find, so two ring
+  // slots sharing one held copy resolve correctly without bookkeeping.
+  let equipped = 0;
+  let alreadyWorn = 0;
+  const reasons = { notHeld: 0, copyGone: 0, takenByOtherSlot: 0 };
+  // Re-derived here, not taken from the plan. Each per-slot re-plan starts a fresh
+  // claim set, so the planner's own takenByOtherSlot is unreachable from this loop
+  // and one held ring saved into both ring slots reported notHeld: the player was
+  // told they no longer own a copy they are wearing one slot over. Tracking the
+  // pins THIS apply has already consumed restores the distinction.
+  const consumedPins = new Set<string>();
+
+  // Canonical equipment order, matching planGearSwap.
+  const wanted = new Set(Object.keys(set) as EquipSlot[]);
+  for (const slot of ALL_EQUIP_SLOTS.filter((s2) => wanted.has(s2))) {
+    const want = set[slot];
+    if (!want) continue;
+    const plan = planGearSwap(
+      { [slot]: want } as SavedGearSet,
+      meta.inventory,
+      meta.equipment,
+      meta.equipmentInstance,
+    );
+    if (plan.alreadyWorn.length > 0) {
+      alreadyWorn++;
+      continue;
+    }
+    const step = plan.equips[0];
+    if (!step) {
+      let reason = plan.unavailable[0]?.reason ?? 'notHeld';
+      // An earlier slot in this same apply already took the copy this slot wants.
+      if (reason === 'notHeld' && consumedPins.has(want.pin)) reason = 'takenByOtherSlot';
+      reasons[reason]++;
+      continue;
+    }
+    // Count the real transition, not the intent. equipItem has refusal arms the
+    // planner does not model (level requirement, unique-equipped, a full bag on a
+    // displaced piece), so reporting the plan told players pieces were restored
+    // that were not.
+    // Pin the PAYLOAD on both sides, through the same normalization the planner
+    // uses. Pinning a bare {itemId, count} made the pin comparison identical to an
+    // id comparison, so the feature's flagship case (a plain copy worn, the saved
+    // ENCHANTED copy restored over it) counted as a failure and told the player
+    // "not the copy this build pinned" about the swap that had just succeeded.
+    const pinAt = (): string => {
+      const worn = meta.equipment[slot];
+      return worn === undefined
+        ? ''
+        : itemCopyPin(wornAsBagSlot(worn, meta.equipmentInstance?.[slot]));
+    };
+    const beforePin = pinAt();
+    equipItemImpl(ctx, step.itemId, meta.entityId, step.slot, step.bagIndex);
+    const afterPin = pinAt();
+    if (meta.equipment[slot] !== undefined && afterPin !== beforePin) {
+      equipped++;
+      consumedPins.add(afterPin);
+    } else reasons.copyGone++;
+  }
+
+  ctx.emit({
+    type: 'loadoutGearResult',
+    pid: meta.entityId,
+    equipped,
+    alreadyWorn,
+    notHeld: reasons.notHeld,
+    copyGone: reasons.copyGone,
+    takenByOtherSlot: reasons.takenByOtherSlot,
+  });
+}
+
 // Apply a saved loadout's talents (out of combat). The action bar is restored
 // client-side from the loadout's stored slot map. Re-validated server-side.
 export function switchTalentLoadout(ctx: SimContext, index: number, pid?: number): boolean {
@@ -447,6 +564,11 @@ export function switchTalentLoadout(ctx: SimContext, index: number, pid?: number
   }
   const revisionBeforeMutation = r.meta.wireRev;
   if (!commitTalentAllocation(ctx, r.meta, r.e, lo.alloc, null)) return false;
+  // Gear AFTER talents, and only if this loadout captured a set. Talents committing
+  // is the contract callers already rely on, so a gear problem must never be able to
+  // fail the talent swap: every unavailable piece is reported and the rest still
+  // equip, rather than the whole switch refusing.
+  if (lo.gear) applySavedGear(ctx, r.meta, lo.gear);
   r.meta.activeLoadout = index;
   markTalentSnapshotDirty(r.meta, revisionBeforeMutation);
   ctx.emit({

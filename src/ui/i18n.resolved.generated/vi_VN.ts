@@ -1619,7 +1619,12 @@ export const vi_VN: EnTranslations = {
       }
     },
     "talents": {
-      "defaultBuildName": "Cấu Hình {n}"
+      "defaultBuildName": "Cấu Hình {n}",
+      "newBuildWithGear": "New Build (save gear too)",
+      "gearRestored": "Restored {n} gear pieces from this build.",
+      "gearNotHeld": "You no longer have {n} of this build's saved pieces.",
+      "gearCopyGone": "{n} saved pieces were not the copy this build pinned.",
+      "gearTakenByOtherSlot": "{n} saved pieces need another copy you do not have."
     },
     "tips": {
       "joinChannels": "Mẹo: gõ /join world hoặc /join lfg để trò chuyện với người chơi khắp thế giới."
