@@ -2,7 +2,7 @@
   "scenario": "farming_session",
   "seed": 1,
   "sampleEvery": 20,
-  "ticks": 69,
+  "ticks": 159,
   "coverage": [
     "class:warrior (farmer)",
     "plantCrop gate order passed: alive, range, bed free, crop known, skill, seed in bags",
@@ -10,13 +10,17 @@
     "plant consumes the seed and starts the flavor cast (FARMING_CAST_ID)",
     "busy gate: the second plant waits out the first plant cast",
     "growth window: readyAtMs reached with ZERO rng draws and zero events",
-    "harvestCrop survived path: zero draws, produce granted from the stored yield seed",
-    "harvestCrop withered path: zero draws, withered husks paid instead of produce",
+    "harvestCrop survived path: zero draws (tier 1), produce granted from the stored yield seed",
+    "harvestCrop withered path: zero draws (tier 1), withered husks paid instead of produce",
     "both harvests free their bed (farmPlots empty at the end)",
-    "gathering grant drain: the queued farming proficiency lands on the next tick"
+    "gathering grant drain: the queued farming proficiency lands on the next tick",
+    "knobbed plant (compost + watch + tonic): payments consumed, still exactly two draws",
+    "toniced harvest on a probed WINNING yieldSeed: zero draws, bonus picks at base grade",
+    "convertHusks: the withered payout batch trades into compost, zero draws",
+    "tier-3 harvest (highland_barley at Thornpeak): EXACTLY one draw, the seed-back roll"
   ],
-  "draws": 4,
-  "drawDigest": "49d036fe",
+  "draws": 9,
+  "drawDigest": "9526117b",
   "frames": [
     {
       "tick": 0,
@@ -154,8 +158,8 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "3ee386e6",
-      "events": "981c2d04",
+      "state": "d3326810",
+      "events": "3e9a9a34",
       "rng": {
         "draws": 2,
         "digest": "00a2a78c"
@@ -186,6 +190,7 @@
             "itemsDiscovered": [
               "baked_bread",
               "eastbrook_buckler",
+              "garden_hoe",
               "recruit_tunic",
               "vale_wheat_seed",
               "worn_sword"
@@ -222,6 +227,10 @@
             {
               "count": 1,
               "itemId": "vale_wheat_seed"
+            },
+            {
+              "count": 1,
+              "itemId": "garden_hoe"
             }
           ],
           "mailWelcomed": true,
@@ -306,7 +315,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 964,
-      "state": "1a1cac46",
+      "state": "29bb08b0",
       "events": "cc147418",
       "rng": {
         "draws": 2,
@@ -317,7 +326,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 964,
-      "state": "75a0bd74",
+      "state": "527e3c3a",
       "events": "6331f94e",
       "rng": {
         "draws": 2,
@@ -328,7 +337,7 @@
       "tick": 41,
       "time": 2.05,
       "nextId": 964,
-      "state": "699e032d",
+      "state": "02519b7d",
       "events": "a0c15f90",
       "rng": {
         "draws": 4,
@@ -360,6 +369,7 @@
             "itemsDiscovered": [
               "baked_bread",
               "eastbrook_buckler",
+              "garden_hoe",
               "recruit_tunic",
               "vale_wheat_seed",
               "worn_sword"
@@ -402,6 +412,10 @@
             {
               "count": 5,
               "itemId": "baked_bread"
+            },
+            {
+              "count": 1,
+              "itemId": "garden_hoe"
             }
           ],
           "mailWelcomed": true,
@@ -486,7 +500,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 964,
-      "state": "c6273e71",
+      "state": "7a1882c9",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -497,7 +511,7 @@
       "tick": 61,
       "time": 3.05,
       "nextId": 964,
-      "state": "7e56c260",
+      "state": "cbccec20",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -529,6 +543,7 @@
             "itemsDiscovered": [
               "baked_bread",
               "eastbrook_buckler",
+              "garden_hoe",
               "recruit_tunic",
               "vale_wheat_seed",
               "worn_sword"
@@ -571,6 +586,10 @@
             {
               "count": 5,
               "itemId": "baked_bread"
+            },
+            {
+              "count": 1,
+              "itemId": "garden_hoe"
             }
           ],
           "mailWelcomed": true,
@@ -655,7 +674,7 @@
       "tick": 61,
       "time": 3.05,
       "nextId": 964,
-      "state": "37622972",
+      "state": "af10f992",
       "events": "c8d07f43",
       "rng": {
         "draws": 4,
@@ -687,6 +706,7 @@
             "itemsDiscovered": [
               "baked_bread",
               "eastbrook_buckler",
+              "garden_hoe",
               "recruit_tunic",
               "vale_wheat",
               "vale_wheat_seed",
@@ -709,6 +729,10 @@
             {
               "count": 5,
               "itemId": "baked_bread"
+            },
+            {
+              "count": 1,
+              "itemId": "garden_hoe"
             },
             {
               "count": 3,
@@ -804,16 +828,38 @@
       ]
     },
     {
-      "tick": 69,
-      "time": 3.45,
+      "tick": 80,
+      "time": 4,
       "nextId": 964,
-      "state": "e0214034",
-      "events": "e5fbca0c",
+      "state": "b17b8255",
+      "events": "7a568fee",
       "rng": {
         "draws": 4,
         "digest": "49d036fe"
+      }
+    },
+    {
+      "tick": 100,
+      "time": 5,
+      "nextId": 964,
+      "state": "e81384d5",
+      "events": "6331f94e",
+      "rng": {
+        "draws": 4,
+        "digest": "49d036fe"
+      }
+    },
+    {
+      "tick": 110,
+      "time": 5.5,
+      "nextId": 964,
+      "state": "6bcb1f55",
+      "events": "9e974885",
+      "rng": {
+        "draws": 6,
+        "digest": "1272a77a"
       },
-      "label": "final",
+      "label": "planted-knobbed",
       "players": [
         {
           "activeLoadout": -1,
@@ -838,7 +884,187 @@
             "dungeonClears": {},
             "itemsDiscovered": [
               "baked_bread",
+              "compost",
               "eastbrook_buckler",
+              "garden_hoe",
+              "growth_tonic",
+              "recruit_tunic",
+              "vale_wheat",
+              "vale_wheat_seed",
+              "withered_husks",
+              "worn_sword"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "prog_first_harvest",
+              ""
+            ]
+          ],
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 959,
+          "equipment": {
+            "chest": "recruit_tunic",
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
+          },
+          "equipmentInstance": {},
+          "farmPlots": [
+            [
+              "bed_eastbrook_1",
+              {
+                "compost": true,
+                "cropId": "vale_wheat",
+                "plantedAtMs": 5499,
+                "readyAtMs": 2705499,
+                "survivalRoll": 0.938211,
+                "tonic": true,
+                "watch": true,
+                "yieldSeed": 1634866458
+              }
+            ]
+          ],
+          "gatheringProficiency": {
+            "farming": 1
+          },
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 1,
+              "itemId": "garden_hoe"
+            },
+            {
+              "count": 3,
+              "itemId": "vale_wheat"
+            },
+            {
+              "count": 2,
+              "itemId": "withered_husks"
+            }
+          ],
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "renown": 5,
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {}
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 46,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3594.5,
+              "school": "physical",
+              "sourceId": 959
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
+          "castRemaining": 2,
+          "castTotal": 2,
+          "castingAbility": "farming",
+          "combatTimer": 104.5,
+          "comboUntil": -1,
+          "critChance": 0.06,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.06,
+          "fallStartY": 0.421549,
+          "fiveSecondRule": 104.5,
+          "hp": 100,
+          "id": 959,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 100,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 18.5,
+            "y": 0.421549,
+            "z": 30
+          },
+          "potionCooldownUntil": -1,
+          "resourceType": "rage",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 5,
+          "stats": {
+            "agi": 20,
+            "armor": 144,
+            "int": 10,
+            "spi": 11,
+            "sta": 23,
+            "str": 23
+          },
+          "templateId": "warrior",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2
+          }
+        }
+      ]
+    },
+    {
+      "tick": 110,
+      "time": 5.5,
+      "nextId": 964,
+      "state": "ab91ee9d",
+      "events": "d3dfbffa",
+      "rng": {
+        "draws": 6,
+        "digest": "1272a77a"
+      },
+      "label": "harvested-toniced",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "autoEquip": true,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "bgRating": 1500,
+          "cls": "warrior",
+          "companionUpgrades": {},
+          "counters": {},
+          "craftSkills": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "compost",
+              "eastbrook_buckler",
+              "garden_hoe",
+              "growth_tonic",
               "recruit_tunic",
               "vale_wheat",
               "vale_wheat_seed",
@@ -871,12 +1097,392 @@
               "itemId": "baked_bread"
             },
             {
-              "count": 3,
+              "count": 1,
+              "itemId": "garden_hoe"
+            },
+            {
+              "count": 8,
               "itemId": "vale_wheat"
             },
             {
               "count": 2,
               "itemId": "withered_husks"
+            }
+          ],
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "pendingGatherGrants": [
+            {
+              "amount": 1,
+              "professionId": "farming"
+            }
+          ],
+          "recipesGrandfathered": true,
+          "renown": 5,
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {}
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 46,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3594.5,
+              "school": "physical",
+              "sourceId": 959
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
+          "castRemaining": 2,
+          "castTotal": 2,
+          "castingAbility": "farming",
+          "combatTimer": 104.5,
+          "comboUntil": -1,
+          "critChance": 0.06,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.06,
+          "fallStartY": 0.421549,
+          "fiveSecondRule": 104.5,
+          "hp": 100,
+          "id": 959,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 100,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 18.5,
+            "y": 0.421549,
+            "z": 30
+          },
+          "potionCooldownUntil": -1,
+          "resourceType": "rage",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 5,
+          "stats": {
+            "agi": 20,
+            "armor": 144,
+            "int": 10,
+            "spi": 11,
+            "sta": 23,
+            "str": 23
+          },
+          "templateId": "warrior",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2
+          }
+        }
+      ]
+    },
+    {
+      "tick": 110,
+      "time": 5.5,
+      "nextId": 964,
+      "state": "fe38653c",
+      "events": "efb870d2",
+      "rng": {
+        "draws": 6,
+        "digest": "1272a77a"
+      },
+      "label": "husks-converted",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "autoEquip": true,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "bgRating": 1500,
+          "cls": "warrior",
+          "companionUpgrades": {},
+          "counters": {},
+          "craftSkills": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "compost",
+              "eastbrook_buckler",
+              "garden_hoe",
+              "growth_tonic",
+              "recruit_tunic",
+              "vale_wheat",
+              "vale_wheat_seed",
+              "withered_husks",
+              "worn_sword"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "prog_first_harvest",
+              ""
+            ]
+          ],
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 959,
+          "equipment": {
+            "chest": "recruit_tunic",
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {
+            "farming": 1
+          },
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 1,
+              "itemId": "garden_hoe"
+            },
+            {
+              "count": 8,
+              "itemId": "vale_wheat"
+            },
+            {
+              "count": 1,
+              "itemId": "compost"
+            }
+          ],
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "pendingGatherGrants": [
+            {
+              "amount": 1,
+              "professionId": "farming"
+            }
+          ],
+          "recipesGrandfathered": true,
+          "renown": 5,
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {}
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 46,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3594.5,
+              "school": "physical",
+              "sourceId": 959
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
+          "castRemaining": 2,
+          "castTotal": 2,
+          "castingAbility": "farming",
+          "combatTimer": 104.5,
+          "comboUntil": -1,
+          "critChance": 0.06,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.06,
+          "fallStartY": 0.421549,
+          "fiveSecondRule": 104.5,
+          "hp": 100,
+          "id": 959,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 100,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 18.5,
+            "y": 0.421549,
+            "z": 30
+          },
+          "potionCooldownUntil": -1,
+          "resourceType": "rage",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 5,
+          "stats": {
+            "agi": 20,
+            "armor": 144,
+            "int": 10,
+            "spi": 11,
+            "sta": 23,
+            "str": 23
+          },
+          "templateId": "warrior",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2
+          }
+        }
+      ]
+    },
+    {
+      "tick": 120,
+      "time": 6,
+      "nextId": 964,
+      "state": "e5f8eac3",
+      "events": "741638a5",
+      "rng": {
+        "draws": 6,
+        "digest": "1272a77a"
+      }
+    },
+    {
+      "tick": 140,
+      "time": 7,
+      "nextId": 964,
+      "state": "92a1e0e5",
+      "events": "741638a5",
+      "rng": {
+        "draws": 6,
+        "digest": "1272a77a"
+      }
+    },
+    {
+      "tick": 151,
+      "time": 7.55,
+      "nextId": 964,
+      "state": "c4a9c35a",
+      "events": "feef7f1a",
+      "rng": {
+        "draws": 8,
+        "digest": "3c3c49a7"
+      },
+      "label": "planted-t3",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "autoEquip": true,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "bgRating": 1500,
+          "cls": "warrior",
+          "companionUpgrades": {},
+          "counters": {},
+          "craftSkills": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "compost",
+              "eastbrook_buckler",
+              "garden_hoe",
+              "growth_tonic",
+              "highland_barley_seed",
+              "recruit_tunic",
+              "skysilver_hoe",
+              "vale_wheat",
+              "vale_wheat_seed",
+              "withered_husks",
+              "worn_sword"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "prog_first_harvest",
+              ""
+            ]
+          ],
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 959,
+          "equipment": {
+            "chest": "recruit_tunic",
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
+          },
+          "equipmentInstance": {},
+          "farmPlots": [
+            [
+              "bed_thornpeak_1",
+              {
+                "cropId": "highland_barley",
+                "plantedAtMs": 7549,
+                "readyAtMs": 14407549,
+                "survivalRoll": 0.85704,
+                "yieldSeed": 1027816175
+              }
+            ]
+          ],
+          "gatheringProficiency": {
+            "farming": 75
+          },
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 1,
+              "itemId": "garden_hoe"
+            },
+            {
+              "count": 8,
+              "itemId": "vale_wheat"
+            },
+            {
+              "count": 1,
+              "itemId": "compost"
+            },
+            {
+              "count": 1,
+              "itemId": "skysilver_hoe"
             }
           ],
           "mailWelcomed": true,
@@ -899,23 +1505,23 @@
               "id": "battle_stance",
               "kind": "battle_stance",
               "name": "Battle Stance",
-              "remaining": 3596.55,
+              "remaining": 3592.45,
               "school": "physical",
               "sourceId": 959
             }
           ],
           "blockChance": 0.05,
           "blockValue": 6,
-          "castRemaining": 0.6,
+          "castRemaining": 2,
           "castTotal": 2,
           "castingAbility": "farming",
-          "combatTimer": 102.45,
+          "combatTimer": 106.55,
           "comboUntil": -1,
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": 0.421549,
-          "fiveSecondRule": 102.45,
+          "fallStartY": 2.459535,
+          "fiveSecondRule": 106.55,
           "hp": 100,
           "id": 959,
           "kind": "player",
@@ -929,9 +1535,369 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 18.5,
-            "y": 0.421549,
-            "z": 30
+            "x": -23,
+            "y": 2.459535,
+            "z": 685
+          },
+          "potionCooldownUntil": -1,
+          "resourceType": "rage",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 5,
+          "stats": {
+            "agi": 20,
+            "armor": 144,
+            "int": 10,
+            "spi": 11,
+            "sta": 23,
+            "str": 23
+          },
+          "templateId": "warrior",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2
+          }
+        }
+      ]
+    },
+    {
+      "tick": 151,
+      "time": 7.55,
+      "nextId": 964,
+      "state": "9720ec4d",
+      "events": "d3ac5484",
+      "rng": {
+        "draws": 9,
+        "digest": "9526117b"
+      },
+      "label": "harvested-t3",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "autoEquip": true,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "bgRating": 1500,
+          "cls": "warrior",
+          "companionUpgrades": {},
+          "counters": {},
+          "craftSkills": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "compost",
+              "eastbrook_buckler",
+              "garden_hoe",
+              "growth_tonic",
+              "highland_barley",
+              "highland_barley_seed",
+              "recruit_tunic",
+              "skysilver_hoe",
+              "vale_wheat",
+              "vale_wheat_seed",
+              "withered_husks",
+              "worn_sword"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "prog_first_harvest",
+              ""
+            ]
+          ],
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 959,
+          "equipment": {
+            "chest": "recruit_tunic",
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {
+            "farming": 75
+          },
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 1,
+              "itemId": "garden_hoe"
+            },
+            {
+              "count": 8,
+              "itemId": "vale_wheat"
+            },
+            {
+              "count": 1,
+              "itemId": "compost"
+            },
+            {
+              "count": 1,
+              "itemId": "skysilver_hoe"
+            },
+            {
+              "count": 1,
+              "itemId": "highland_barley_seed"
+            },
+            {
+              "count": 4,
+              "itemId": "highland_barley"
+            }
+          ],
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "pendingGatherGrants": [
+            {
+              "amount": 0.02,
+              "professionId": "farming"
+            }
+          ],
+          "recipesGrandfathered": true,
+          "renown": 5,
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {}
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 46,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3592.45,
+              "school": "physical",
+              "sourceId": 959
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
+          "castRemaining": 2,
+          "castTotal": 2,
+          "castingAbility": "farming",
+          "combatTimer": 106.55,
+          "comboUntil": -1,
+          "critChance": 0.06,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.06,
+          "fallStartY": 2.459535,
+          "fiveSecondRule": 106.55,
+          "hp": 100,
+          "id": 959,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 100,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -23,
+            "y": 2.459535,
+            "z": 685
+          },
+          "potionCooldownUntil": -1,
+          "resourceType": "rage",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 5,
+          "stats": {
+            "agi": 20,
+            "armor": 144,
+            "int": 10,
+            "spi": 11,
+            "sta": 23,
+            "str": 23
+          },
+          "templateId": "warrior",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2
+          }
+        }
+      ]
+    },
+    {
+      "tick": 159,
+      "time": 7.95,
+      "nextId": 964,
+      "state": "a77cceec",
+      "events": "741638a5",
+      "rng": {
+        "draws": 9,
+        "digest": "9526117b"
+      },
+      "label": "final",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "autoEquip": true,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "bgRating": 1500,
+          "cls": "warrior",
+          "companionUpgrades": {},
+          "counters": {},
+          "craftSkills": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "compost",
+              "eastbrook_buckler",
+              "garden_hoe",
+              "growth_tonic",
+              "highland_barley",
+              "highland_barley_seed",
+              "recruit_tunic",
+              "skysilver_hoe",
+              "vale_wheat",
+              "vale_wheat_seed",
+              "withered_husks",
+              "worn_sword"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "prog_first_harvest",
+              ""
+            ]
+          ],
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 959,
+          "equipment": {
+            "chest": "recruit_tunic",
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {
+            "farming": 75.02
+          },
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 1,
+              "itemId": "garden_hoe"
+            },
+            {
+              "count": 8,
+              "itemId": "vale_wheat"
+            },
+            {
+              "count": 1,
+              "itemId": "compost"
+            },
+            {
+              "count": 1,
+              "itemId": "skysilver_hoe"
+            },
+            {
+              "count": 1,
+              "itemId": "highland_barley_seed"
+            },
+            {
+              "count": 4,
+              "itemId": "highland_barley"
+            }
+          ],
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "renown": 5,
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {}
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 46,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3592.05,
+              "school": "physical",
+              "sourceId": 959
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
+          "castRemaining": 1.6,
+          "castTotal": 2,
+          "castingAbility": "farming",
+          "combatTimer": 106.95,
+          "comboUntil": -1,
+          "critChance": 0.06,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.06,
+          "fallStartY": 2.459535,
+          "fiveSecondRule": 106.95,
+          "hp": 100,
+          "id": 959,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 100,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -23,
+            "y": 2.459535,
+            "z": 685
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
