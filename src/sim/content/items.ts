@@ -1043,8 +1043,9 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   },
   // Phase 6 consumer note: the fine cooking-grade twin the skill-scaled
   // harvest roll upgrades a pick into (the dishes phase decides its recipe
-  // role). As a TIER 1 fine twin it is deliberately not a hoe-recipe reagent
-  // candidate (the hoe ladder drafts from the tier 2 to 4 fine twins).
+  // role). Not a hoe reagent: the shipped HOE_RECIPES draft ONE fine twin
+  // per tier from tiers 1 to 3 (each rung consumes the twin one tier below
+  // it, deviation (ad)), and the tier-1 slot went to fine_vale_wheat.
   fine_brook_carrot: {
     id: 'fine_brook_carrot',
     name: 'Fine Brook Carrot',
@@ -1071,9 +1072,9 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     quality: 'common',
     sellValue: 8,
   },
-  // Phase 6 consumer note: cooking dishes; as a tier-2 fine twin it is a
-  // candidate hoe-recipe reagent (the hoe author decides which fine twins
-  // the hoe recipes consume).
+  // Phase 6 consumer note: cooking dishes. ALSO a live hoe reagent already:
+  // recipe_skysilver_hoe consumes it (the rung one tier above its crop,
+  // deviation (ad); pinned in tests/professions_hoe_recipes.test.ts).
   fine_marsh_rice: {
     id: 'fine_marsh_rice',
     name: 'Fine Marsh Rice',
@@ -1099,8 +1100,8 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     quality: 'common',
     sellValue: 8,
   },
-  // Phase 6 consumer note: cooking-grade reagent; tier-2 fine twin, so a
-  // candidate hoe-recipe reagent (the hoe author decides).
+  // Phase 6 consumer note: cooking-grade reagent. Not a hoe reagent: the
+  // hoe ladder's tier-2 slot went to its sibling fine_marsh_rice.
   fine_bog_beet: {
     id: 'fine_bog_beet',
     name: 'Fine Bog Beet',
@@ -1125,8 +1126,9 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     quality: 'common',
     sellValue: 15,
   },
-  // Phase 6 consumer note: cooking-grade reagent; tier-3 fine twin, so a
-  // candidate hoe-recipe reagent (the hoe author decides).
+  // Phase 6 consumer note: cooking-grade reagent. ALSO a live hoe reagent
+  // already: recipe_osmium_hoe consumes it (deviation (ad); pinned in
+  // tests/professions_hoe_recipes.test.ts).
   fine_highland_barley: {
     id: 'fine_highland_barley',
     name: 'Fine Highland Barley',
@@ -1151,9 +1153,9 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     quality: 'common',
     sellValue: 15,
   },
-  // Phase 6 consumer note: fine-ingredient input for the dishes phase;
-  // tier-3 fine twin, so a candidate hoe-recipe reagent (the hoe author
-  // decides).
+  // Phase 6 consumer note: fine-ingredient input for the dishes phase. Not
+  // a hoe reagent: the hoe ladder's tier-3 slot went to its sibling
+  // fine_highland_barley.
   fine_frost_gourd: {
     id: 'fine_frost_gourd',
     name: 'Fine Frost Gourd',
@@ -1178,8 +1180,9 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     quality: 'common',
     sellValue: 40,
   },
-  // Phase 6 consumer note: a Phase 6 reagent; tier-4 fine twin, so a
-  // candidate hoe-recipe reagent (the hoe author decides).
+  // Phase 6 consumer note: a Phase 6 reagent. STRUCTURALLY never a hoe
+  // reagent: each rung consumes the twin one tier below it (deviation (ad)),
+  // so a tier-4 twin would need a tier-5 hoe, and the ladder tops at 4.
   fine_gilded_sunmelon: {
     id: 'fine_gilded_sunmelon',
     name: 'Fine Gilded Sunmelon',
@@ -1205,8 +1208,9 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     quality: 'common',
     sellValue: 40,
   },
-  // Phase 6 consumer note: reserved as a premium cooking reagent; tier-4
-  // fine twin, so a candidate hoe-recipe reagent (the hoe author decides).
+  // Phase 6 consumer note: reserved as a premium cooking reagent.
+  // STRUCTURALLY never a hoe reagent, like its sunmelon sibling above: a
+  // tier-4 twin would need a tier-5 hoe under deviation (ad)'s invariant.
   fine_evergarden_greens: {
     id: 'fine_evergarden_greens',
     name: 'Fine Evergarden Greens',
