@@ -690,6 +690,10 @@ export class PerfMonitor {
       state.views = r.views;
       state.gpuQueueUnits = r.gpuQueue.units;
       state.gpuQueueSyncMs = Math.round(r.gpuQueue.totalSyncMs);
+      // Monotonic on purpose: a unit that never settles moves neither of the
+      // two above, so a hitch bracketing a new stall reads as the queue
+      // wedging rather than as an empty diff.
+      state.gpuQueueStalls = r.gpuQueue.stallCount;
       state.effectiveRenderScale = r.effectiveRenderScale;
       state.budgetMode = r.renderBudget.mode;
       // Day/night dimension: a hitch cluster that only appears with

@@ -181,7 +181,7 @@ describe('perf monitor forensics state assembly', () => {
       calls: 1200,
       triangles: 9_000_000,
       views: 40,
-      gpuQueue: { units: 3, totalSyncMs: 12.6 },
+      gpuQueue: { units: 3, totalSyncMs: 12.6, stallCount: 2 },
       effectiveRenderScale: 1,
       renderBudget: { mode: 'steady' },
       nightAmount: 0.85,
@@ -196,6 +196,9 @@ describe('perf monitor forensics state assembly', () => {
     expect(state.activePointLights).toBe(6);
     expect(state.programs).toBe(700);
     expect(state.gpuQueueSyncMs).toBe(13);
+    // A wedged unit moves neither units nor sync time, so the stall counter is
+    // the dimension that can bracket a hitch with a queue that stopped draining.
+    expect(state.gpuQueueStalls).toBe(2);
     expect(state.biome).toBe('marsh');
     expect(state.px).toBe(123);
     expect(state.pz).toBe(-56);

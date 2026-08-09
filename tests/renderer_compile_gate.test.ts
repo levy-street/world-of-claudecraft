@@ -155,7 +155,7 @@ describe('Renderer live shader compile rejection recovery', () => {
         return Promise.resolve();
       },
     );
-    renderer.compileSkinnedShadowPrograms = vi.fn(() => {
+    renderer.compileShadowPrograms = vi.fn(() => {
       order.push('shadow');
       return Promise.resolve();
     });
@@ -165,7 +165,7 @@ describe('Renderer live shader compile rejection recovery', () => {
 
     expect(order).toEqual(['color:false', 'shadow']);
     expect(renderer.compilePrewarmColorPrograms).toHaveBeenCalledWith(target, false);
-    expect(renderer.compileSkinnedShadowPrograms).toHaveBeenCalledWith(target);
+    expect(renderer.compileShadowPrograms).toHaveBeenCalledWith(target);
   });
 
   it('never compiles a live gate at the ambient render target (colour-space cache-key trap)', () => {
@@ -179,7 +179,7 @@ describe('Renderer live shader compile rejection recovery', () => {
     // compileAsync here links the canvas variant while composer tiers draw the
     // linear one: route through the same variant pair the boot prewarm uses.
     expect(gateMethod).toContain('this.compilePrewarmColorPrograms(target, false)');
-    expect(gateMethod).toContain('this.compileSkinnedShadowPrograms(target)');
+    expect(gateMethod).toContain('this.compileShadowPrograms(target)');
     expect(gateMethod).not.toContain('this.webgl.compileAsync');
   });
 

@@ -115,7 +115,17 @@ function baseSnapshot(): PerfSnapshot {
       renderDiagnostics: {} as never,
       nightAmount: 0,
       prewarm: null,
-      gpuQueue: { units: 0, totalSyncMs: 0, worstSyncMs: 0, slowest: [] },
+      gpuQueue: {
+        units: 0,
+        totalSyncMs: 0,
+        worstSyncMs: 0,
+        slowest: [],
+        pending: 0,
+        active: null,
+        waitingTails: [],
+        stallCount: 0,
+        stalls: [],
+      },
     },
     hud: { hotDomWrites: 10, hotDomSkippedWrites: 90, hotDomSkipRate: 0.9 },
     assets: {

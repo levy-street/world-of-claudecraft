@@ -695,6 +695,188 @@ describe('perf report ingestion', () => {
     expect((stored.rawSummary as Record<string, unknown>).oversized).toBeUndefined();
   });
 
+  it('stores the GPU queue block bounded, and keeps it when raw summaries are truncated (#3167)', async () => {
+    const {
+      GPU_QUEUE_RAW_MS_MAX,
+      GPU_QUEUE_RAW_AGE_MS_MAX,
+      GPU_QUEUE_RAW_STALLS_MAX,
+      GPU_QUEUE_RAW_TAILS_MAX,
+    } = perfReportInternalsForTest;
+    const wedged = {
+      units: 12,
+      totalSyncMs: 240.5,
+      worstSyncMs: 88.2,
+      pending: 6,
+      stallCount: 1,
+      active: { label: 'wedged-compile', priority: 40, ageMs: 91_000 },
+      waitingTails: [{ label: 'released-gate', priority: 30, ageMs: 5000 }],
+      stalls: [{ label: 'wedged-compile', priority: 40, ageMs: 91_000, settled: false }],
+      slowest: [{ label: 'live-view-compile', priority: 30, syncMs: 88.2, wallMs: 120.4 }],
+    };
+    const stored = fakeRes();
+
+    await handlePerfReport(
+      fakeReq({
+        sessionId: 'gpu-queue-wedge',
+        rawSummary: { seconds: 30, rendererGpuQueue: wedged },
+      }),
+      stored,
+    );
+
+    expect(stored.statusCode).toBe(200);
+    expect(insertClientPerfReport).toHaveBeenCalledWith(
+      expect.objectContaining({ rawSummary: { seconds: 30, rendererGpuQueue: wedged } }),
+    );
+
+    // A hostile payload cannot inject an absurd age, an unbounded stall list,
+    // or a novel-length label into the admin raw-report reader.
+    vi.mocked(insertClientPerfReport).mockClear();
+    const hostile = fakeRes();
+    await handlePerfReport(
+      fakeReq({
+        sessionId: 'gpu-queue-hostile',
+        rawSummary: {
+          rendererGpuQueue: {
+            units: -5,
+            totalSyncMs: 'nope',
+            worstSyncMs: 9e12,
+            pending: 1e12,
+            stallCount: 3,
+            active: { label: 'x'.repeat(400), priority: 9e9, ageMs: 9e12 },
+            waitingTails: Array.from({ length: 9 }, () => ({
+              label: 'y'.repeat(300),
+              priority: -9e9,
+              ageMs: -5,
+            })),
+            stalls: Array.from({ length: 40 }, () => ({
+              label: 'wedged',
+              priority: 40,
+              ageMs: 9e12,
+              settled: 'yes',
+            })),
+            slowest: 'not-an-array',
+          },
+        },
+      }),
+      hostile,
+    );
+    expect(hostile.statusCode).toBe(200);
+    const hostileRow = vi.mocked(insertClientPerfReport).mock.calls.at(-1)![0];
+    const hostileQueue = (hostileRow.rawSummary as Record<string, Record<string, unknown>>)
+      .rendererGpuQueue;
+    expect(hostileQueue).toMatchObject({
+      units: 0,
+      totalSyncMs: 0,
+      worstSyncMs: GPU_QUEUE_RAW_MS_MAX,
+      stallCount: 3,
+      active: { label: 'x'.repeat(80), priority: 1000, ageMs: GPU_QUEUE_RAW_AGE_MS_MAX },
+      slowest: [],
+    });
+    expect(hostileQueue.stalls).toHaveLength(GPU_QUEUE_RAW_STALLS_MAX);
+    expect((hostileQueue.stalls as Record<string, unknown>[])[0].ageMs).toBe(
+      GPU_QUEUE_RAW_AGE_MS_MAX,
+    );
+    // Pin the bound's VALUE too: comparing output length against the same
+    // constant the sanitizer slices with would pass at any value.
+    expect(GPU_QUEUE_RAW_TAILS_MAX).toBe(4);
+    expect(hostileQueue.waitingTails).toHaveLength(GPU_QUEUE_RAW_TAILS_MAX);
+    expect((hostileQueue.waitingTails as Record<string, unknown>[])[0]).toEqual({
+      label: 'y'.repeat(80),
+      priority: -1000,
+      ageMs: 0,
+    });
+
+    // A malformed block is dropped rather than stored half-shaped.
+    vi.mocked(insertClientPerfReport).mockClear();
+    const malformed = fakeRes();
+    await handlePerfReport(
+      fakeReq({
+        sessionId: 'gpu-queue-malformed',
+        rawSummary: { seconds: 12, rendererGpuQueue: 'not-an-object' },
+      }),
+      malformed,
+    );
+    expect(malformed.statusCode).toBe(200);
+    expect(insertClientPerfReport).toHaveBeenCalledWith(
+      expect.objectContaining({ rawSummary: { seconds: 12 } }),
+    );
+
+    // The compact path keeps it: a wedge is exactly what an oversized report
+    // must still carry.
+    vi.mocked(insertClientPerfReport).mockClear();
+    const truncated = fakeRes();
+    await handlePerfReport(
+      fakeReq({
+        sessionId: 'gpu-queue-truncated',
+        rawSummary: { seconds: 30, rendererGpuQueue: wedged, oversized: 'x'.repeat(40_000) },
+      }),
+      truncated,
+    );
+    expect(truncated.statusCode).toBe(200);
+    expect(insertClientPerfReport).toHaveBeenCalledWith(
+      expect.objectContaining({
+        rawSummary: expect.objectContaining({ truncated: true, rendererGpuQueue: wedged }),
+      }),
+    );
+
+    // Back-compat: an old client's block has no waitingTails key at all; it
+    // stores with an explicit empty list, everything else untouched.
+    vi.mocked(insertClientPerfReport).mockClear();
+    const legacy = fakeRes();
+    await handlePerfReport(
+      fakeReq({
+        sessionId: 'gpu-queue-legacy',
+        rawSummary: {
+          rendererGpuQueue: {
+            units: 3,
+            totalSyncMs: 12.5,
+            worstSyncMs: 8,
+            pending: 1,
+            stallCount: 0,
+            active: null,
+            stalls: [],
+            slowest: [],
+          },
+        },
+      }),
+      legacy,
+    );
+    expect(legacy.statusCode).toBe(200);
+    const legacyRow = vi.mocked(insertClientPerfReport).mock.calls.at(-1)![0];
+    const legacyQueue = (legacyRow.rawSummary as Record<string, Record<string, unknown>>)
+      .rendererGpuQueue;
+    expect(legacyQueue.waitingTails).toEqual([]);
+    expect(legacyQueue.units).toBe(3);
+
+    // Junk entries are dropped by the record filter, real ones kept.
+    vi.mocked(insertClientPerfReport).mockClear();
+    const junk = fakeRes();
+    await handlePerfReport(
+      fakeReq({
+        sessionId: 'gpu-queue-junk-tails',
+        rawSummary: {
+          rendererGpuQueue: {
+            units: 1,
+            totalSyncMs: 1,
+            worstSyncMs: 1,
+            pending: 0,
+            stallCount: 0,
+            active: null,
+            waitingTails: [null, 'junk', { label: 'real-gate', priority: 30, ageMs: 100 }],
+            stalls: [],
+            slowest: [],
+          },
+        },
+      }),
+      junk,
+    );
+    expect(junk.statusCode).toBe(200);
+    const junkRow = vi.mocked(insertClientPerfReport).mock.calls.at(-1)![0];
+    const junkQueue = (junkRow.rawSummary as Record<string, Record<string, unknown>>)
+      .rendererGpuQueue;
+    expect(junkQueue.waitingTails).toEqual([{ label: 'real-gate', priority: 30, ageMs: 100 }]);
+  });
+
   it('preserves the net pipeline and heap sawtooth blocks when raw summaries are truncated', async () => {
     const res = fakeRes();
     const netPipeline = {

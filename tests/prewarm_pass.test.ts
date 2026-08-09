@@ -342,14 +342,11 @@ describe('runBackgroundPrewarm', () => {
     const boundedEnd = source.indexOf('\n  private renderPrewarmPass(', boundedStart);
     const boundedMethod = source.slice(boundedStart, boundedEnd);
     const compileStart = source.indexOf('private async compilePrewarmColorPrograms(');
-    const compileEnd = source.indexOf(
-      '\n  private async compileSkinnedShadowPrograms(',
-      compileStart,
-    );
+    const compileEnd = source.indexOf('\n  private async compileShadowPrograms(', compileStart);
     const compileMethod = source.slice(compileStart, compileEnd);
 
     expect(zoneMethod).toContain('() => this.compilePrewarmColorPrograms(childRoot, true)');
-    expect(zoneMethod).toContain('() => this.compileSkinnedShadowPrograms(childRoot)');
+    expect(zoneMethod).toContain('() => this.compileShadowPrograms(childRoot)');
     expect(zoneMethod).toContain('runUpload: (work, label) =>');
     // The decomposed upload: texture batches first, then the bounded render.
     expect(zoneMethod).toContain('warmChildUnits: (groupLike, child) =>');
@@ -401,7 +398,7 @@ describe('runBackgroundPrewarm', () => {
     const zoneStart = source.indexOf('private async prepareZoneSky(');
     const zoneEnd = source.indexOf('\n  /** Blocking-path neighborhood prepare', zoneStart);
     const zoneSlice = source.slice(zoneStart, zoneEnd);
-    const shadowStart = source.indexOf('private async compileSkinnedShadowPrograms(');
+    const shadowStart = source.indexOf('private async compileShadowPrograms(');
     const shadowEnd = source.indexOf('\n  // A tiny throwaway target', shadowStart);
     const shadowSlice = source.slice(shadowStart, shadowEnd);
     const bootStart = source.indexOf("id: 'programs.compile'");

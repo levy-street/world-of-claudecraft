@@ -223,7 +223,20 @@ function snapshot(): PerfSnapshot {
       graphicsConfigVersion: 16,
       tier: 'high',
       qualityBuckets: qualityBuckets(),
-      gpuQueue: { units: 0, totalSyncMs: 0, worstSyncMs: 0, slowest: [] },
+      gpuQueue: {
+        units: 2,
+        totalSyncMs: 18.4,
+        worstSyncMs: 12.1,
+        slowest: [
+          { label: 'live-view-compile', priority: 30, syncMs: 12.1, wallMs: 40.2, atMs: 5000 },
+          { label: 'texture-chunk', priority: 10, syncMs: 6.3, wallMs: 6.3, atMs: 5200 },
+        ],
+        pending: 0,
+        active: null,
+        waitingTails: [],
+        stallCount: 0,
+        stalls: [],
+      },
       nightAmount: 0,
       autoGovernor: true,
       budget: {
@@ -428,6 +441,66 @@ describe('perf reporter payload', () => {
     expect(
       (body.rawSummary as { browser?: { longTasks?: Record<string, number> } }).browser?.longTasks,
     ).toEqual({ totalMs: 120, avg: 60, max: 80, lastAge: 1000 });
+  });
+
+  it('carries the GPU queue block, active unit included, into raw summary (#3167)', () => {
+    // A settled queue: only completed units, no running one. This is the arm
+    // that used to be the ONLY arm, since a never-settling unit records nothing.
+    const settings = new Settings();
+    const settled = perfReporterInternalsForTest.payloadFromSnapshot(
+      snapshot(),
+      settings,
+      'sess1',
+      42,
+    )!;
+    const settledQueue = (settled.rawSummary as { rendererGpuQueue?: Record<string, unknown> })
+      .rendererGpuQueue;
+    expect(settledQueue).toMatchObject({
+      units: 2,
+      totalSyncMs: 18.4,
+      worstSyncMs: 12.1,
+      pending: 0,
+      stallCount: 0,
+      active: null,
+      stalls: [],
+    });
+    expect(settledQueue?.slowest).toEqual([
+      { label: 'live-view-compile', priority: 30, syncMs: 12.1, wallMs: 40.2 },
+      { label: 'texture-chunk', priority: 10, syncMs: 6.3, wallMs: 6.3 },
+    ]);
+
+    const snap = snapshot();
+    snap.renderer!.gpuQueue = {
+      units: 2,
+      totalSyncMs: 18.4,
+      worstSyncMs: 12.1,
+      slowest: [],
+      pending: 7,
+      active: { label: 'wedged-compile', priority: 40, ageMs: 91_000, atMs: 12_000 },
+      waitingTails: [{ label: 'released-gate', priority: 30, ageMs: 5000, atMs: 11_000 }],
+      stallCount: 1,
+      stalls: [
+        { label: 'wedged-compile', priority: 40, ageMs: 91_000, atMs: 12_000, settled: false },
+      ],
+    };
+    const wedged = perfReporterInternalsForTest.payloadFromSnapshot(snap, settings, 'sess1', 42)!;
+    const wedgedQueue = (wedged.rawSummary as { rendererGpuQueue?: Record<string, unknown> })
+      .rendererGpuQueue;
+    // The wedge is the whole point: units stayed at 2, so only the active unit
+    // and the stall say the queue has been blocked for a minute and a half.
+    expect(wedgedQueue).toMatchObject({
+      units: 2,
+      pending: 7,
+      stallCount: 1,
+      active: { label: 'wedged-compile', priority: 40, ageMs: 91_000 },
+      stalls: [{ label: 'wedged-compile', priority: 40, ageMs: 91_000, settled: false }],
+    });
+    // A released tail rides beside the active unit. Exact equality on purpose:
+    // toMatchObject's subset semantics would pass even if atMs leaked through,
+    // and dropping atMs (page-relative, fleet-meaningless) is the claim.
+    expect((wedgedQueue as { waitingTails?: unknown[] }).waitingTails).toEqual([
+      { label: 'released-gate', priority: 30, ageMs: 5000 },
+    ]);
   });
 
   it('carries the always-on net pipeline and heap sawtooth blocks into raw summary', () => {
