@@ -7,6 +7,26 @@ satisfies the consumer rule (a real consumer or an explicit Phase 6 consumer not
 and NO vendorItems row anywhere in the content set gained a farming item, which is
 the binding Live-surface note of phase-05-crops-and-tools.md.
 
+EXECUTION AMENDMENTS (2026-08-09, swept from the Phase 5 build; state.md
+ledger letters (aa) through (ae) are the authority):
+- There is NO PR (D22 local-only delivery): audit the merge commit of
+  fix/farming-phase-05-crops-and-tools into feature/farming-plan; the phase
+  diff is that branch's commits against the eighth-absorb merge d6087e25c3.
+- Expectations that moved with the ledgered amendments: no MATERIAL_GRADES
+  farming rows exist (deviation (o)); hoe recipes live in HOE_RECIPES
+  (tests/professions_hoe_recipes.test.ts), not TOOL_RECIPES; the tool-effect
+  pin covers the TWO live effects plus the kind-arm refusal of
+  quickening_charm (ledger (ac)), and both effects ACT at harvest (draw-free,
+  charge-spend and prompt-skip pinned); the plant gate ladder is the wield
+  ladder 0/40/70/85 over the crop thresholds (ledger (ab)); the hub-stocking
+  scan excludes farming and the dormant arm pins no-vendor (ledger (aa));
+  tier 3/4 seed-back draws on BOTH outcomes, exactly one contiguous draw
+  (ledger (ae)); the golden md5 entering QA is
+  bf00c277b89e142446550f00c1035696 (re-recorded in the isolated commit
+  564ad5382a with the deviation (z) beats).
+- The blob byte model was re-minted floor 13952 / ceiling 15360; the fixture
+  derives the widest crop id with a literal guard.
+
 ### QA Starter Prompt
 
 ```

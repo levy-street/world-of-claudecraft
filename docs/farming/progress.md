@@ -14,7 +14,7 @@
 | Phase 3 QA | done | 2026-08-08 | 2026-08-08 |
 | Phase 4 (knobs) | done | 2026-08-08 | 2026-08-08 |
 | Phase 4 QA | done (PASS-WITH-FOLLOWUPS) | 2026-08-08 | 2026-08-08 |
-| Phase 5 (crops and tools) | not started | | |
+| Phase 5 (crops and tools) | done | 2026-08-09 | 2026-08-09 |
 | Phase 5 QA | not started | | |
 | Phase 6 (economy hooks) | not started | | |
 | Phase 6 QA | not started | | |
@@ -796,7 +796,140 @@ with zero FAIL lines and zero failed suites; neither known contention
 flake fired.
 
 ### Phase 5
-(not started)
+
+Acceptance list (from phase-05-crops-and-tools.md STEP 5, states as landed;
+the EXECUTION AMENDMENTS block there and state.md letters (aa)-(af) amend
+where noted):
+- [x] all eight locked crop ids exist with seed, produce, and fine_ twin
+      defs; produce kind junk and market-listable; sellValue per the
+      materials convention; fine twins per the precedent EXACTLY (sell 2x
+      base sell, buyValue 4x the fine's OWN sell; the phase file's
+      "four-times buyValue" wording reads against the fine's own sell)
+- [x] AMENDED by deviation (o): NO MATERIAL_GRADES rows (the table stays the
+      nine node yields); procedural icons and English name rows exist for
+      every new item (24 crop items + 4 hoes, pairwise-distinct recipes,
+      ITEM_ART_PENDING 31); display names flagged for the maintainer lore
+      pass, IP-audited per D17 at authoring time (audit prose in the batch
+      spec, summarized in Notes)
+- [x] tier 1/2 seeds carry positive buyValue (vale_wheat_seed gained buy 4
+      in-phase) and appear on NO vendorItems row; tier 3/4 seeds carry no
+      vendor pricing and flow from harvest seed-back (rare event joins at
+      Phase 10 per D11)
+- [x] brook_carrot produce buyValue 16 (4x sell, D9), the only priced
+      produce; pinned both directions in the rollout arms
+- [x] the crop duration and tier table lives in farm_crops.ts with a
+      maintainer-flag block on every tuning constant
+- [x] hoe ladder: four rungs at tiers 1-4, AMENDED by (ad): recipes live in
+      the separate HOE_RECIPES list at the toolworks (rod precedent; rungs
+      2-4 craft-only), buyValue on rung 1 only (20), top rung unpriced and
+      craftable per the R23 arm (verified conscripted and green)
+- [x] AMENDED by (ac): slotToolEffectRefused admits farming; the TWO live
+      effects slot AND act at harvest draw-free (pinned non-vacuously);
+      quickening_charm stays refused by the kind arm everywhere; prompt-mode
+      farming mints refused per (af)
+- [x] seed-back draws at harvest action time for tier 3/4 on BOTH outcomes
+      per (ae) (exactly one contiguous draw; rates 0.08/0.40 and 0.06/0.35
+      economy-flagged); the contract restated in the banner and re-pinned
+      clause by clause
+- [x] the farming_session golden re-record is its own isolated commit
+      (564ad5382a; md5 29a11d98bda17f9c38bd8e9016df7fc7 to
+      bf00c277b89e142446550f00c1035696) and carries the deviation (z) beats
+- [x] FARM_PATCHES bed counts CONFIRMED at 4/5/6/8 (23 beds; counts were
+      already final, no provisional marker existed); farm_patch_placement
+      green
+- [x] farming rollout arms green: the new FARMING_ZONE_TIERS-keyed describe
+      (8 arms with paired counter-examples) plus the (aa) narrowing of the
+      generic hub arm; the dormant hub-stocking arm pins no-vendor until
+      Phase 9
+- [x] recipe_economy green (HOE_RECIPES joins the counterfactual set and the
+      trainer sums); wiki regenerated, guide freshness green, both stale
+      guide keys reworded count-free with five fresh non-Latin fills each
+- [x] gate: node scripts/gate_select.mjs PASS all 8 steps (run two; run one's
+      full-suite fallback caught the delve-shop conscription and the farmgrow
+      hoe grant, healed in 1e63df0dfa; zero FAIL lines, no flakes on run two)
+- [x] progress.md and state.md ledgers updated
+
+Notes (the would-be PR body per D22):
+
+Phase 5 lands the whole farming content surface: the eight-crop ladder
+(vale_wheat and brook_carrot at tier 1, marsh_rice and bog_beet at 2,
+highland_barley and frost_gourd at 3, gilded_sunmelon and evergarden_greens
+at 4, all D11-locked ids), the four-rung hoe ladder (garden 20c vendor
+entry dormant until Phase 9, bronze, skysilver, osmium; HOE_RECIPES at the
+toolworks consuming the fine twin one tier below plus the rung below), the
+live step-12 plant gate (wield ladder 0/40/70/85 over the crop thresholds,
+deviation (ab)), the two live tool effects acting at harvest (deviation
+(ac): quantity to bonus picks, quality to a fine-chance bump, draw-free,
+prompt-mode mints refused per (af)), and the tier 3/4 seed-back faucet (one
+action-time draw per harvest on both outcomes, deviation (ae)). The
+farming_session golden re-recorded once, isolated, with the deviation (z)
+beats (knobbed plant, toniced harvest on a probed winner, husk conversion,
+tier-3 seed-back), ledger 4 to 9 draws.
+
+Execution: eighth v0.36.0 absorb first (5819c005a7, release-merge-audit
+clean, count pins reconciled by suite: commands 196/209, IWorld 308, delta
+keys 84). Content authored by a 12-agent Workflow (7 crop authors + hoe
+author, 3-lane adversarial verify, reconciler), applied by four sequential
+writer lanes, reviewed by architecture + frontend-seam + cross-platform +
+qa-checklist with one fix round (notably: the SECOND self-clearing tripwire
+in gather_tool_tooltip.test.ts that the writers' suite lists missed, the
+sinkless requiresTool.farming key, and the 13 stale Latin howToSlot fills
+that no gate tier could ever catch).
+
+MAINTAINER FLAGS (all carry TUNING/PROVISIONAL comments in code):
+- Durations: carrot 35m, rice 130m, beet 135m (5-minute sibling gap
+  advisory: barely visible on 2h timers, tighten or spread at will), barley
+  4h, gourd 4.5h, sunmelon 10h, greens 10.5h.
+- Seed-back rates: tier 3 two/one bands 0.08/0.40 (E 0.48 seeds per
+  harvest), tier 4 0.06/0.35 (E 0.41). Economy-sensitive: the tier 3/4 seed
+  market has no other faucet until Phase 10.
+- Hoe prices: 4/20 (rung 1), 10, 25, 60 sell-only above; the effect
+  fine-chance bump constant; display names for the lore pass (Skysilver and
+  Osmium reuse the shipped pick coinages at compressed tiers 3/4 since the
+  hoe ladder is four rungs to the picks' five).
+- The deviation (w) structural affinity exemption now covers 27 materials
+  (was 6): the maintainer read on that exemption is STILL OWED (standing
+  since Phase 4).
+- Blob ceiling band WIDENED deliberately: 14336 to 15360 while the settled
+  measurement is 14218 (the old bound left 118 bytes, under one bed site of
+  growth, the doctrine's forced-mint case); the next re-mint should know the
+  upper band is now roughly 1142 bytes.
+- Art debt: ITEM_ART_PENDING sits at 31 farming ids for the art phase; the
+  four hoe icons share a two-piece geometry that may read alike at 32px
+  (frontend reviewer note), eyeball at the art pass.
+- Latin-overlay staleness for the two reworded guide keys is the standing
+  release-time fill item; the howToSlot reword is ALREADY corrected in all
+  18 overlays (in-phase, because a stale fill there stated wrong slotting
+  rules and is invisible to both gate tiers).
+- Phase 9 go-live checklist gains: stock the vendors AND flip the (aa) hub
+  exclusion AND the dormant arm together; give garden_hoe its vendor
+  counter (the wiki truthfully shows price-no-vendor today); consider the
+  harvest confirm channel for prompt-mode effects (Phase 7/8 UI).
+
+QA-session pointers: the wield-vs-crop ladder layering (ab) means gate 7
+'skill' and gate 12 'tool' are BOTH reachable per tier; the effect arms'
+vacuity guards ride probed seeds documented in-file; coverage_c pins the
+recorded seed-back band literal (1) that moves only with a deliberate
+re-record; the online boundary suite owns the seedBackCount and 'tool'
+frame claims.
+
+Review verdicts: architecture PASS-WITH-FOLLOWUPS (all followups applied or
+ledgered), frontend-seam BLOCKING (fixed in 99e3c39ccd), cross-platform
+PASS-WITH-FOLLOWUPS (all applied), qa-checklist: see below.
+- QA-checklist verdict: READY on the code, zero BLOCKING (delivered via the
+  Agent-tool redispatch after the Workflow lane died report-less, the
+  standing recovery). Its two documentation closes (this progress.md entry,
+  the (af) line in the phase file's amendments block) are done; its two
+  PR-body notes (the deliberately widened blob band, the 13 Latin overlay
+  edits with their justification) are recorded above; its VERIFY item (run
+  gate_select on the final HEAD) is the gate line below.
+- Gate: BROWSER_PATH gate_select run one FAIL at the full-suite fallback
+  with two named reds outside every targeted list (tests/delve_shop.test.ts
+  conscripting osmium_hoe into the Marks-route walk; tests/dev_commands
+  .test.ts farmgrow planting through the live gate hoe-less), both healed
+  test-first in 1e63df0dfa; run two "[gate:select] PASS: all 8 steps green",
+  zero FAIL lines, no contention flakes. The gate log is the arbiter per
+  D22; logs at the session scratchpad gate_phase5*.log.
 
 ### Phase 6
 (not started)
