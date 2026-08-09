@@ -596,10 +596,11 @@ Acceptance criteria (phase-04-knobs.md STEP 5), each with its state:
       the phase file's "10 points"), capped at exactly 1, with boundary
       arms at and above the cap
 - [x] the watch fee predicate is any farming produce of the crop's tier or
-      below (fine twins included, mixed kinds allowed, cheapest first);
-      per-tier amounts 2/3/4/6 proposed and maintainer-flagged
+      below (fine twins included, mixed kinds allowed, in the fixed order:
+      lowest tier first, base before fine within a crop); per-tier amounts
+      2/3/4/6 proposed and maintainer-flagged
 - [x] the fee consumption pin proves the exact produce leaves and nothing
-      else moves (plus a mixed cheapest-first pin)
+      else moves (plus a mixed fixed-order pin)
 - [x] tonic consumed at plant arms a yield bonus applied at harvest against
       the stored seed's expansion, with no added draw (one further read of
       the SAME mulberry32 stream; untoniced path bit-identical, pinned)
@@ -668,10 +669,44 @@ env_protocol, bandwidth, localization_fixes, parity with zero golden
 movement); ci:changed exit 0 (warnings only, pre-existing debt); five
 scripted mutations all KILLED with named reds (third pre-roll draw: 6 reds
 incl. the parity golden; spend-at-gate: 2; dropped stored compost flag: 6;
-tonic-never-wins: 1; fee order flipped: 5). Gate log recorded below after
-the review round. No screenshots: the phase ships no visual surface (the
-dormant Live-surface note holds; wiki:content regen was a byte-identical
-no-op).
+tonic-never-wins: 1; fee order flipped: 5). No screenshots: the phase ships
+no visual surface (the dormant Live-surface note holds; wiki:content regen
+was a byte-identical no-op).
+
+REVIEW ROUND (Workflow fan-out, 4/4 delivered): architecture-reviewer
+PASS-WITH-FOLLOWUPS, cross-platform-sync BLOCK, frontend-seam-reviewer
+BLOCK, qa-checklist PASS-WITH-FOLLOWUPS. The two BLOCKs shared one root
+cause, fixed in a628b65a65: the two item names shipped without their five
+non-Latin fills (tests/i18n_completeness.test.ts red with exactly 10 leaks,
+a suite the targeted validation list had not named). The same commit takes
+the architecture reviewer's real behavioral find: the loop-relative tonic
+read broke player-favorable monotonicity (a skill-up moved the bonus roll
+and flipped wins to losses about 5.8k times per million adjacent skill
+steps); the bonus roll now expands from its own seed-anchored mulberry32
+position, pinned by a 200-seed monotonicity sweep. Also landed: the
+husk-trade line splices both items as tokens, the watch-fee dedupe guard
+plus uniqueness pin, the NaN-honest watchFeeAmount, comment corrections
+(the stale always-false knob banner, the cheapest-first overstatement, the
+stream-position claim), the tonic-forfeited-on-wither note at the resolver,
+and the knobbed save-load-harvest arm. Deliberate no-action calls, left for
+the QA session to re-judge: convert_husks refusal spam costs one heavy
+re-serialize per refusal (the plant_crop precedent, unreachable until a
+husk faucet exists; the Phase 9 rate-limiter note already covers the
+family); a hand-edited OFFLINE save can forge knob flags for free survival
+(offline-only, same class as the accepted survivalRoll analysis); deviation
+(w)'s structural exemption means future FARM_MATERIAL_ITEM_IDS additions
+auto-exempt from the affinity census (the taxonomy exact-set pin is the
+gate; flagged for a maintainer read before Phase 5 adds seven crops); the
+Materials chip/market filter now classify two dormant items (unreachable:
+no faucet mints either).
+
+GATE: node scripts/gate_select.mjs run twice. Run one FAILED at the
+full-suite fallback's tests/professions_silent_loot.test.ts grant-site
+census (farming.ts 4 to 5: the convertHusks compost grant; the same
+fallback-only census class Phase 2 hit), fixed as its own commit. Run two:
+"[gate:select] PASS: all 8 steps green (vitest workers: 12)", zero FAIL
+lines in the log. The shell exit code of run one was 0 while the log said
+FAIL: the log-marker rule is the arbiter, re-confirmed.
 
 ### Phase 5
 (not started)
