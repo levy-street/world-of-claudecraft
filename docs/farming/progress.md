@@ -15,7 +15,7 @@
 | Phase 4 (knobs) | done | 2026-08-08 | 2026-08-08 |
 | Phase 4 QA | done (PASS-WITH-FOLLOWUPS) | 2026-08-08 | 2026-08-08 |
 | Phase 5 (crops and tools) | done | 2026-08-09 | 2026-08-09 |
-| Phase 5 QA | not started | | |
+| Phase 5 QA | done (PASS-WITH-FOLLOWUPS) | 2026-08-09 | 2026-08-09 |
 | Phase 6 (economy hooks) | not started | | |
 | Phase 6 QA | not started | | |
 | Phase 7 (render and juice) | not started | | |
@@ -930,6 +930,76 @@ PASS-WITH-FOLLOWUPS (all applied), qa-checklist: see below.
   test-first in 1e63df0dfa; run two "[gate:select] PASS: all 8 steps green",
   zero FAIL lines, no contention flakes. The gate log is the arbiter per
   D22; logs at the session scratchpad gate_phase5*.log.
+
+#### Phase 5 QA (2026-08-09)
+
+Verdict: PASS-WITH-FOLLOWUPS. Zero BLOCKING against the shipped behavior;
+the two BLOCKING findings were COVERAGE holes (unpinned surfaces), both
+closed test-only. The draw contract, the golden (md5
+bf00c277b89e142446550f00c1035696, byte-identical throughout), and every
+census held.
+
+Pre-audit: ninth v0.36.0 absorb 18c6bf65f3 (tip 6e1ead1fea, PRs 3217 and
+3219, gfx-perf GPU queue and entry prewarm, render-only; release-merge-audit
+clean, EMPTY farming intersection, no lockfile change; parity + snapshots
+re-proven on the merged HEAD). Audit: 7-lane Workflow fan-out (5 delivered;
+the test-coverage lane died on an API stall and qa-checklist finished
+report-less, both recovered via Agent-tool redispatch with full reports),
+plus orchestrator-side verification (spine suites, 14 census suites, the
+coverage_c ledger literals, golden isolation) and a live-probe re-proof of
+the draw contract on fresh seeds by the correctness lane. Mutation battery
+5 mutants: 4 killed as shipped with named reds, 1 SURVIVED (the R37 hub
+exclusion widened to mining stayed green) and is now pinned and re-proven
+killed.
+
+Findings and fixes (7 commits on fix/farming-phase-05-qa):
+- 2 BLOCKING coverage holes: the R47 ratchet line and the R42 spend
+  predicate's false branch were deletable/invertible with every suite
+  green; closed with the carried-osmium latch arm and the inverted-probe
+  kept-charge arm (572ef8b63c).
+- Crossed draw-contract arms (tier-3 x armed cache x stored tonic,
+  survived AND withered), a run-twice determinism leg over the seed-back
+  path, the fine-chance literal pin, artisans_eye mint-reachability, the
+  (ab) traversability guard (wield gate <= previous tier's teaching
+  ceiling, plus the ladder literals), the online tool-deny cropId pin, the
+  hub exclusion-set pins, the delve-shop no-Marks tripwire (572ef8b63c,
+  2fc93b828f with the four hoe quality literals).
+- feat: farmHarvested carries effectDepleted, the gatherResult last-charge
+  signal (deviation (ag)); the withered seedBackCount spread gained the
+  grant's own crop guard (922bab98a2).
+- fix: the Ask-each-use toggle suppressed on the farming row through the
+  mint's own promptSlotRefused predicate (deviation (ah)); ticking it used
+  to erase the whole actions row until reopen (da8f225cbf).
+- fix: frost_gourd_seed re-palettes to an ice sack (it was pixel-close to
+  marsh_rice_seed at 32px behind two blue radials) with the targeted A4b
+  pair pin (6bccc25761).
+- docs: comment-truth sweep across items.ts, recipes.ts, farming.ts, the
+  facet and online mirrors (both still called the hoe gate deferred), and
+  the admin restore route's rotting pair-count numerals (73b8fd7746).
+- Screenshots: docs/screenshots/farming-phase-05 bag-grid capture of the
+  31 stand-in icons, LOW preset (the program's Phase 2-4 capture drift is
+  recorded in state.md; Phase 7 re-anchors the obligation).
+
+Deferrals, each with an owner: ja_JP guide fill names the hoe in English
+(release-time locale pass, check zh/ko/ru for the pattern); the hud.ts
+seed-back block duplication stays at two copies (rule of three; extract on
+a third seed-back surface); the two raw grant-green hex literals ride the
+eventual log-color tokenization sweep; the normalize load-side prompt arm
+is a RECORDED no-action (state.md addenda); the fine-twin buyValue
+doctrine intersection is maintainer-flagged; tier-3/4 gate-precedence arms
+declined (the gate order is tier-generic and pinned at tier 2); crop price
+literal anchors declined (the relational form IS the stated convention).
+
+Reviewer verdicts: correctness PASS-WITH-FOLLOWUPS (live probes 5/5 on
+fresh seeds, IP audit clean, whole-content vendor scan clean), dead-code
+PASS-WITH-FOLLOWUPS, architecture PASS-WITH-FOLLOWUPS (seed-back
+contiguity re-verified on every path), cross-platform PASS-WITH-FOLLOWUPS
+(both widened wire surfaces ride the relay verbatim), frontend-seam
+PASS-WITH-FOLLOWUPS (build fixes verified holding), test-coverage
+BLOCKING (both closed), qa-checklist READY-WITH-FOLLOWUPS (its at-threshold
+wield concern resolved by the (ab) ledger: teaching ceilings clear every
+wield gate, now pinned; its ratchet-scan concern resolved against the node
+precedent, recorded).
 
 ### Phase 6
 (not started)

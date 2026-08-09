@@ -4,20 +4,23 @@ Read this file first in every phase session. It is the single authority for lock
 decisions. If a phase file contradicts this file, this file wins and the phase file
 gets swept in the same pass (amend the QA twin too, always).
 
-Current phase: Phase 5 (crops and tools) in flight 2026-08-09; Phase 4 QA done
-2026-08-08. Packet authored 2026-08-07 off release/v0.36.0; the branch has
-absorbed release/v0.36.0 through 5819c005a7 (eighth absorb, opening Phase 5
-2026-08-09: the gate-perf CI batch, warrior Intervene and fear DR, the three
-r165 compileAsync patch with its lockfile-driven asset seal re-mint, idle-mob
-distance culling with its own parity scenario, the 16 static self-record
-scalars moved behind the delta gate, and bg_respond; release-merge-audit clean,
-parity and snapshots re-proven green on the merged HEAD, farming_session golden
-byte-identical. Count-pin baselines after this absorb: command_schema 196/209,
-IWorld members 308 (79 data, 229 method), delta keys 84. The seventh absorb
-66c2340242 landed at Phase 4 QA, PRs 3162 and 3164; the sixth 1478f9d2ba opened
-Phase 4; the fifth 4d52f151eb landed at Phase 3 QA. NOTE for any farming GLB
+Current phase: Phase 5 QA done 2026-08-09 (PASS-WITH-FOLLOWUPS); Phase 6
+(economy hooks) is next. Packet authored 2026-08-07 off release/v0.36.0; the
+branch has absorbed release/v0.36.0 through 6e1ead1fea (ninth absorb, opening
+Phase 5 QA 2026-08-09: the gfx-perf GPU queue and entry-prewarm batches, PRs
+3217 and 3219, render-only; release-merge-audit clean with an EMPTY
+farming-footprint intersection, no new endpoints, no lockfile change; parity
+and snapshots re-proven green on the merged HEAD, farming_session golden
+byte-identical. Count-pin baselines unchanged from the eighth absorb:
+command_schema 196/209, IWorld members 308 (79 data, 229 method), delta keys
+84. The eighth absorb 5819c005a7 opened Phase 5: the gate-perf CI batch,
+warrior Intervene and fear DR, the three r165 compileAsync patch with its
+lockfile-driven asset seal re-mint, idle-mob distance culling with its own
+parity scenario, the 16 static self-record scalars moved behind the delta
+gate, and bg_respond. The seventh absorb 66c2340242 landed at Phase 4 QA;
+the sixth 1478f9d2ba opened Phase 4. NOTE for any farming GLB
 work (Phase 7 props, Phase 13 art): fingerprints must be minted against the
-NEW pnpm-lock.yaml this absorb brought, or the asset suites red.)
+pnpm-lock.yaml the EIGHTH absorb brought, or the asset suites red.)
 Working tree: ALL farming work happens in the persistent worktree
 `~/Documents/woc-farming-plan`. Other sessions share the main checkout; never work there.
 
@@ -782,6 +785,24 @@ question does not arise (farming has no station).
   sweep on every reword); and the gather_tool_tooltip tripwire (the SECOND
   self-clearing farming tripwire, missed by the phase's own suite lists) is
   flipped with the no-Use-prefix exception pinned.
+  Phase 5 QA: (ag) farmHarvested carries the last-charge signal
+  effectDepleted (the gatherResult shape reused whole: only-when-true
+  optional, spent-guarded durability read, the shared
+  hudChrome.professions.toolEffectDepleted self-note in the hud arm). ONLY
+  farmHarvested can carry it, because the withered return sits above the
+  effect block, so a failed crop never applies, spends, or depletes (pinned
+  by the withered crossed arm: charge and ceiling both untouched). Farming
+  was otherwise the one profession whose live tool effects broke silently.
+  The farming_session golden was untouched (no scenario beat arms an
+  effect; md5 re-verified byte-identical). (ah) the professions window
+  suppresses the R40 "Ask each use" toggle on the farming row through
+  promptSlotRefused (src/sim/professions/tools.ts), the SAME predicate the
+  mint's refusal arm reads, so the two surfaces cannot drift: before this,
+  ticking the farming toggle emptied the row's slottable set (every prompt
+  mint is refused) and erased the whole actions row, toggle included, until
+  the window reopened. The Phase 7/8 change that lands a harvest confirm
+  channel edits the predicate and the resolver arm together; the layout pin
+  (farming buttons without toggle, mining control arm) moves with it.
 - Dev command surface: Phase 3 registers /dev farmgrow [bedId] (alias
   /devfarmgrow [bedId]) in src/sim/dev_commands.ts behind ALLOW_DEV_COMMANDS:
   with a bed id it advances that plot, without one it advances ALL of the
@@ -982,6 +1003,55 @@ question does not arise (farming has no station).
     knob flags, the deviation (w) auto-exemption with the exact-set pin as
     its gate, the Materials chip classifying two dormant faucet-free
     items).
+
+- Phase 5 QA addenda (2026-08-09), carried for later phases:
+  - TWO REAL COVERAGE HOLES closed test-only: the R47 ratchet line in
+    harvestCrop and the R42 spend predicate's FALSE branch were both
+    deletable or invertible with every suite green. The false-branch pin
+    uses the INVERTED probe (sweep for a seed where the armed expansion
+    changes NOTHING, then demand the charge survives while the ratchet
+    still latches); keep that idiom for any spend-only-when-it-mattered
+    settle a later phase adds.
+  - The ratchet's rarity read is the UNFILTERED ownership scan ON PURPOSE,
+    confirmed against the node settle (gathering.ts) and the R30 recharge
+    read: the latch only prices a slot UP, so an unwieldable carried hoe is
+    the anti-gaming case, not a scan bug. Stated at the call site now; do
+    not "fix" it to the wield-filtered scan.
+  - EXCLUSION SETS NEED PINS, the M3 lesson: the R37 hub arm's farming skip
+    survived being widened to mining (nothing red). The arm now collects
+    hubSkipped/hubAsserted sets and pins both directions, and the
+    delve-shop farming skip gained the inverted no-Marks-row-today
+    tripwire. Any future census exclusion ships WITH its set pin.
+  - The mint-side farming+prompt gate deliberately has NO load-side twin,
+    the decision RECORDED here after three lanes converged: every
+    confirmMode writer routes through resolveSlotToolEffect (the slot
+    actions both call it; the admin restore body carries no confirmMode
+    field), so no legal path mints a farming prompt row; a hand-edited
+    offline blob row loads as a dead prompt slot (skip-whole, charge kept,
+    mode chip visible), which is the fail-safe direction. Revisit ONLY if a
+    new re-mint or import path lands.
+  - Fine-twin buyValue doctrine, flagged for the maintainer with the other
+    economy constants: ALL EIGHT fine twins price buyValue at 4x their own
+    sell (the node fine-material convention fine_vale_wheat set in Phase
+    3), while tier 3/4 seeds and non-carrot produce carry none under the
+    no-vendor-faucet rationale. Both rules are individually stated; their
+    intersection (a priced tier-4 fine twin above an unpriced tier-4 seed)
+    is a doctrine question nothing enforces either way today because
+    nothing stocks any of the 31 ids until Phase 9.
+  - Screenshot drift, program-wide: Phases 2 through 4 shipped no captures
+    (sim-only surfaces); Phase 5 QA added the bag-grid capture of the 31
+    stand-in icons on the LOW preset under docs/screenshots/farming-phase-05
+    (desktop; the mobile offline boot flow resisted the harness and the
+    icons are viewport-identical assets, deferred). The obligation
+    re-anchors hard at Phase 7 (the first world-visible surface) and every
+    later visual phase.
+  - Mutation battery: 4 of 5 mutants killed as shipped with named reds
+    (gate-12 bare-hands swap, dropped charge spend, outcome-forked
+    seed-back, dropped silent flag on the seed-back grant); the exclusion
+    widen survived and its pin now kills it (re-proven). The commit-first
+    rule was struck a FOURTH time this program: a re-probe's checkout
+    revert wiped the uncommitted pin it was proving; the battery's fix
+    landed in its own commit before any further probe.
 
 ## OPEN items (maintainer decisions or later-phase calls, never guess)
 
