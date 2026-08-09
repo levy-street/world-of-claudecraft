@@ -11940,6 +11940,14 @@ export class Hud {
               '#7fdc4f',
             );
           }
+          // The last-charge signal (the gatherResult arm's farming twin):
+          // the harvest that spent the slotted effect's final charge
+          // announces it as an FCT self-note. ONE surface on purpose: the
+          // professions window's charge row is the durable record, so a log
+          // line here would be the double-feedback trap.
+          if (ev.effectDepleted) {
+            this.showSelfNote(t('hudChrome.professions.toolEffectDepleted'));
+          }
           break;
         }
         case 'farmWithered': {

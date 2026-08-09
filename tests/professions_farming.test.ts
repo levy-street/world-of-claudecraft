@@ -1489,6 +1489,40 @@ describe('the slotted farming tool effect at harvest (the hoe phase C3 wiring)',
     expect(slot.durability).toBe(before - 1);
   });
 
+  it('the last-charge signal: farmHarvested carries effectDepleted exactly on the emptying spend', () => {
+    // The gatherResult precedent (the node path's last-charge signal): a
+    // farmer's charm must not break silently, so the harvest that spends the
+    // final charge says so on its own event, and ONLY that harvest. Three
+    // beats: a spend that leaves charges (no flag), the emptying spend (flag
+    // true), and a use on the already-empty slot (no flag, unarmed payout).
+    const plot = ripen();
+    void plot;
+    const slot = slotEffect('gatherers_cache');
+    slot.durability = 2;
+    h.meta.toolEffectSlots = { farming: slot };
+    const from1 = h.sim.events.length;
+    harvest(h);
+    const first = eventsOf(h.sim, from1, 'farmHarvested')[0];
+    expect(slot.durability).toBe(1);
+    expect('effectDepleted' in first).toBe(false);
+    // The emptying spend announces itself.
+    ripen();
+    const from2 = h.sim.events.length;
+    harvest(h);
+    const second = eventsOf(h.sim, from2, 'farmHarvested')[0];
+    expect(slot.durability).toBe(0);
+    expect(second.effectDepleted).toBe(true);
+    // The empty slot stays silent and pays unarmed (applied is false).
+    giveSeeds(h);
+    const plot3 = ripen();
+    const unarmed = resolveFarmHarvest(plot3.yieldSeed as number, 0);
+    const from3 = h.sim.events.length;
+    harvest(h);
+    const third = eventsOf(h.sim, from3, 'farmHarvested')[0];
+    expect('effectDepleted' in third).toBe(false);
+    expect(third.count).toBe(unarmed.count);
+  });
+
   it('pins the fine-chance effect bump to its literal (the wire-name-constant rule)', () => {
     // TUNING, PROVISIONAL, FLAGGED FOR THE MAINTAINER: the one effect
     // constant every armed arm above reaches through the import, pinned as a

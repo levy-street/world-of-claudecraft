@@ -779,8 +779,12 @@ export function harvestCrop(ctx: SimContext, p: Entity, meta: PlayerMeta, bedId:
       count: FARM_WITHERED_HUSK_COUNT,
       // Present ONLY when the seed-back roll above paid (the knobs
       // only-when-true wire precedent): a zero roll leaves the frame
-      // byte-identical to the pre-field wire.
-      ...(seedBackCount > 0 ? { seedBackCount } : {}),
+      // byte-identical to the pre-field wire. The `crop` conjunct matches
+      // the grant's own guard above, so this event can never advertise a
+      // seed the grant skipped, no matter what farmCropTier's retired-id
+      // fallback becomes (today the fallback reads tier 1 and the roll
+      // never fires for a cropless plot, so the terms always agree).
+      ...(seedBackCount > 0 && crop ? { seedBackCount } : {}),
     });
     return;
   }
@@ -865,9 +869,16 @@ export function harvestCrop(ctx: SimContext, p: Entity, meta: PlayerMeta, bedId:
   // ctx.rng draws, so the harvest's draw contract holds. No cast-start
   // capture arm: harvesting is instant (no cast window a trade could
   // exploit), so the one completion-time read covers both R47 ends.
+  let effectDepleted = false;
   if (effectUse.applied && slot) {
     ratchetCeilingForUse(slot, bestOwnedGatherToolFor(meta.inventory, 'farming', ITEMS).rarity);
-    if (armed.count !== base.count || armed.fine !== base.fine) depleteEffect(slot);
+    if (armed.count !== base.count || armed.fine !== base.fine) {
+      // The last-charge signal (the gatherResult settle's farming twin):
+      // `spent` guards the durability read, because the read alone would
+      // announce a depletion the settle never performed.
+      const spent = depleteEffect(slot);
+      effectDepleted = spent && slot.durability <= 0;
+    }
   }
   // THE ALL-FINE COLLAPSE. The base fields describe the harvest's PRIMARY
   // grant, and when every pick upgrades there is no base-grade grant at all,
@@ -902,6 +913,9 @@ export function harvestCrop(ctx: SimContext, p: Entity, meta: PlayerMeta, bedId:
     // only-when-true wire precedent): every tier 1/2 harvest and every
     // zero-band tier 3/4 harvest keeps the pre-field frame byte-identical.
     ...(seedBackCount > 0 ? { seedBackCount } : {}),
+    // The last-charge signal, same only-when-true rule (the gatherResult
+    // precedent): present exactly when the settle above emptied the slot.
+    ...(effectDepleted ? { effectDepleted: true as const } : {}),
   });
   // Proficiency through the shared gathering-grant queue, draining on the tick
   // path exactly like a node harvest. The gain is PURE STATE computed after

@@ -315,4 +315,24 @@ describe('the hud seed-back render arms (source pin)', () => {
     expect(arm.split('farmSeedBackLineKey(ev.seedBackCount)').length - 1).toBe(1);
     expect(guardBlock(arm)).toContain('farmSeedBackLineKey(ev.seedBackCount)');
   });
+
+  it('farmHarvested announces the last charge under its own gate, and ONLY farmHarvested', () => {
+    // The depletion self-note (the gatherResult arm's farming twin), pinned
+    // THROUGH the operator: the note call must sit inside the
+    // `if (ev.effectDepleted)` gate, once, in the harvested arm alone. The
+    // withered arm must stay note-free: the sim's withered return sits above
+    // the effect block, so a depletion there would announce a spend that
+    // never happened.
+    const arm = caseSlice('farmHarvested', 'farmWithered');
+    const gate = 'if (ev.effectDepleted) {';
+    const at = arm.indexOf(gate);
+    expect(at, 'the depletion gate exists').toBeGreaterThan(-1);
+    expect(arm.indexOf(gate, at + 1), 'exactly one depletion gate').toBe(-1);
+    const gated = arm.slice(at, arm.indexOf('}', at) + 1);
+    expect(gated).toContain("this.showSelfNote(t('hudChrome.professions.toolEffectDepleted'))");
+    // The note never renders outside its gate, and never in the withered arm.
+    expect(arm.split('toolEffectDepleted').length - 1).toBe(1);
+    const witheredArm = caseSlice('farmWithered', 'farmDenied');
+    expect(witheredArm).not.toContain('effectDepleted');
+  });
 });
