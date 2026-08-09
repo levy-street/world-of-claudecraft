@@ -60,7 +60,11 @@ import {
   resolveFarmHarvest,
   updateFarming,
 } from '../src/sim/professions/farming';
-import { resolveSlotToolEffect, slotEffect, startingDurabilityFor } from '../src/sim/professions/tools';
+import {
+  resolveSlotToolEffect,
+  slotEffect,
+  startingDurabilityFor,
+} from '../src/sim/professions/tools';
 import { wieldRequirementForTier } from '../src/sim/professions/wield_gate';
 import { type CharacterState, type PlayerMeta, Sim } from '../src/sim/sim';
 import { FARMING_CAST_ID, isNonSpellCast, type SimEvent } from '../src/sim/types';

@@ -920,9 +920,7 @@ describe('the farming ladder: every farming zone arrives mechanically whole', ()
     // rarity resolution, so a silent quality edit re-prices charges with
     // nothing else red. The step function is deliberate: tiers 1 and 2 are
     // both common, matching every other land ladder.
-    expect(
-      Object.fromEntries(farmingTools.map(([itemId, def]) => [itemId, def.quality])),
-    ).toEqual({
+    expect(Object.fromEntries(farmingTools.map(([itemId, def]) => [itemId, def.quality]))).toEqual({
       garden_hoe: 'common',
       bronze_hoe: 'common',
       skysilver_hoe: 'uncommon',
