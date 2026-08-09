@@ -8672,6 +8672,10 @@ export class Sim {
     this.targeting.tabTarget(pid);
   }
 
+  tabTargetPrev(pid?: number): void {
+    this.targeting.tabTargetPrev(pid);
+  }
+
   targetNearestEnemy(pid?: number): void {
     this.targeting.targetNearestEnemy(pid);
   }

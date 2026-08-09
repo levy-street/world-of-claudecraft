@@ -6664,6 +6664,9 @@ export class GameServer {
       case 'tab':
         sim.tabTarget(pid);
         break;
+      case 'tabPrev':
+        sim.tabTargetPrev(pid);
+        break;
       case 'targetNearest':
         sim.targetNearestEnemy(pid);
         break;

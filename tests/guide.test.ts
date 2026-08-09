@@ -1454,6 +1454,7 @@ describe('Guide controls reference completeness', () => {
     expect(html).toContain('<kbd>Shift+F</kbd></td><td>Take the enemy flag in Thornhollow Fields');
     expect(html).toContain('<kbd>Shift+H</kbd></td><td>Damage meters');
     expect(html).toContain('<kbd>Ctrl+6</kbd></td><td>Pet: Mark');
+    expect(html).toContain('<kbd>Shift+Tab</kbd></td><td>Cycle target backward');
   });
 
   it('keeps the second-wave binds in step with the game defaults', () => {
@@ -1462,6 +1463,7 @@ describe('Guide controls reference completeness', () => {
     expect(defaults.get('bgFlag')).toEqual(['Shift+KeyF']);
     expect(defaults.get('meters')).toEqual(['Shift+KeyH']);
     expect(defaults.get('targetPet')).toEqual(['Ctrl+Digit6']);
+    expect(defaults.get('targetPrev')).toEqual(['Shift+Tab']);
     // The arrow keys are the SECOND default of the four movement actions, which is the
     // whole claim the Arrow Keys row makes.
     expect(defaults.get('forward')).toEqual(['KeyW', 'ArrowUp']);

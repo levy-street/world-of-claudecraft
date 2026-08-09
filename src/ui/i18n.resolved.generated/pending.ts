@@ -10,99 +10,129 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "guide.controls.targetPrev",
     "guide.talentsPage.loadoutGearNote",
     "guide.thornhollowPage.backfillNote",
     "guide.thornhollowPage.leavingBody",
-    "guide.thornhollowPage.leavingHeading"
+    "guide.thornhollowPage.leavingHeading",
+    "hudChrome.keybinds.targetPrev"
   ],
   "es_ES": [
+    "guide.controls.targetPrev",
     "guide.talentsPage.loadoutGearNote",
     "guide.thornhollowPage.backfillNote",
     "guide.thornhollowPage.leavingBody",
-    "guide.thornhollowPage.leavingHeading"
+    "guide.thornhollowPage.leavingHeading",
+    "hudChrome.keybinds.targetPrev"
   ],
   "fr_FR": [
+    "guide.controls.targetPrev",
     "guide.talentsPage.loadoutGearNote",
     "guide.thornhollowPage.backfillNote",
     "guide.thornhollowPage.leavingBody",
-    "guide.thornhollowPage.leavingHeading"
+    "guide.thornhollowPage.leavingHeading",
+    "hudChrome.keybinds.targetPrev"
   ],
   "fr_CA": [
+    "guide.controls.targetPrev",
     "guide.talentsPage.loadoutGearNote",
     "guide.thornhollowPage.backfillNote",
     "guide.thornhollowPage.leavingBody",
-    "guide.thornhollowPage.leavingHeading"
+    "guide.thornhollowPage.leavingHeading",
+    "hudChrome.keybinds.targetPrev"
   ],
   "en_CA": [],
   "it_IT": [
+    "guide.controls.targetPrev",
     "guide.talentsPage.loadoutGearNote",
     "guide.thornhollowPage.backfillNote",
     "guide.thornhollowPage.leavingBody",
-    "guide.thornhollowPage.leavingHeading"
+    "guide.thornhollowPage.leavingHeading",
+    "hudChrome.keybinds.targetPrev"
   ],
   "de_DE": [
+    "guide.controls.targetPrev",
     "guide.talentsPage.loadoutGearNote",
     "guide.thornhollowPage.backfillNote",
     "guide.thornhollowPage.leavingBody",
-    "guide.thornhollowPage.leavingHeading"
+    "guide.thornhollowPage.leavingHeading",
+    "hudChrome.keybinds.targetPrev"
   ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
   "pt_BR": [
+    "guide.controls.targetPrev",
     "guide.talentsPage.loadoutGearNote",
     "guide.thornhollowPage.backfillNote",
     "guide.thornhollowPage.leavingBody",
-    "guide.thornhollowPage.leavingHeading"
+    "guide.thornhollowPage.leavingHeading",
+    "hudChrome.keybinds.targetPrev"
   ],
   "ru_RU": [],
   "cs_CZ": [
+    "guide.controls.targetPrev",
     "guide.talentsPage.loadoutGearNote",
     "guide.thornhollowPage.backfillNote",
     "guide.thornhollowPage.leavingBody",
-    "guide.thornhollowPage.leavingHeading"
+    "guide.thornhollowPage.leavingHeading",
+    "hudChrome.keybinds.targetPrev"
   ],
   "nl_NL": [
+    "guide.controls.targetPrev",
     "guide.talentsPage.loadoutGearNote",
     "guide.thornhollowPage.backfillNote",
     "guide.thornhollowPage.leavingBody",
-    "guide.thornhollowPage.leavingHeading"
+    "guide.thornhollowPage.leavingHeading",
+    "hudChrome.keybinds.targetPrev"
   ],
   "pl_PL": [
+    "guide.controls.targetPrev",
     "guide.talentsPage.loadoutGearNote",
     "guide.thornhollowPage.backfillNote",
     "guide.thornhollowPage.leavingBody",
-    "guide.thornhollowPage.leavingHeading"
+    "guide.thornhollowPage.leavingHeading",
+    "hudChrome.keybinds.targetPrev"
   ],
   "id_ID": [
+    "guide.controls.targetPrev",
     "guide.talentsPage.loadoutGearNote",
     "guide.thornhollowPage.backfillNote",
     "guide.thornhollowPage.leavingBody",
-    "guide.thornhollowPage.leavingHeading"
+    "guide.thornhollowPage.leavingHeading",
+    "hudChrome.keybinds.targetPrev"
   ],
   "tr_TR": [
+    "guide.controls.targetPrev",
     "guide.talentsPage.loadoutGearNote",
     "guide.thornhollowPage.backfillNote",
     "guide.thornhollowPage.leavingBody",
-    "guide.thornhollowPage.leavingHeading"
+    "guide.thornhollowPage.leavingHeading",
+    "hudChrome.keybinds.targetPrev"
   ],
   "sv_SE": [
+    "guide.controls.targetPrev",
     "guide.talentsPage.loadoutGearNote",
     "guide.thornhollowPage.backfillNote",
     "guide.thornhollowPage.leavingBody",
-    "guide.thornhollowPage.leavingHeading"
+    "guide.thornhollowPage.leavingHeading",
+    "hudChrome.keybinds.targetPrev"
   ],
   "vi_VN": [
+    "guide.controls.targetPrev",
     "guide.talentsPage.loadoutGearNote",
     "guide.thornhollowPage.backfillNote",
     "guide.thornhollowPage.leavingBody",
-    "guide.thornhollowPage.leavingHeading"
+    "guide.thornhollowPage.leavingHeading",
+    "hudChrome.keybinds.targetPrev"
   ],
   "da_DK": [
+    "guide.controls.targetPrev",
     "guide.talentsPage.loadoutGearNote",
     "guide.thornhollowPage.backfillNote",
     "guide.thornhollowPage.leavingBody",
-    "guide.thornhollowPage.leavingHeading"
+    "guide.thornhollowPage.leavingHeading",
+    "hudChrome.keybinds.targetPrev"
   ]
 };

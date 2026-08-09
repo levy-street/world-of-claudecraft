@@ -4006,6 +4006,10 @@ export class ClientWorld implements IWorld {
     this.pendingTargetEcho = null;
     this.cmd({ cmd: 'tab' });
   }
+  tabTargetPrev(): void {
+    this.pendingTargetEcho = null; // server-resolved retarget, as tabTarget
+    this.cmd({ cmd: 'tabPrev' });
+  }
   targetNearestFriendly(): void {
     this.pendingTargetEcho = null; // server-resolved retarget, as tabTarget
     this.cmd({ cmd: 'targetNearestFriendly' });

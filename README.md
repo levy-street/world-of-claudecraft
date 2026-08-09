@@ -284,7 +284,7 @@ Press `G` to open the PvP window (Thornhollow Fields is its primary tab, beside 
 |---|---|
 | `W` / `S` | run / backpedal. `A`/`D` turn (strafe with right mouse held), `Q`/`E` strafe |
 | right-drag / left-drag | mouselook / orbit camera. Wheel zooms, `Space` jumps |
-| `Tab` | cycle nearest enemies. left-click to target, right-click to attack, loot, or talk |
+| `Tab` / `Shift+Tab` | cycle nearest enemies forward / backward. left-click to target, right-click to attack, loot, or talk |
 | `1`-`9`, `0`, `-`, `=` | action bar |
 | `F` | interact (loot a corpse, pick up an object, talk) |
 | `C` `P` `L` `M` `B` `N` `T` | character, spellbook, quest log, world map, bags, talents, crafting |
