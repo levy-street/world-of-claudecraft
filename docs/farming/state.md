@@ -4,12 +4,20 @@ Read this file first in every phase session. It is the single authority for lock
 decisions. If a phase file contradicts this file, this file wins and the phase file
 gets swept in the same pass (amend the QA twin too, always).
 
-Current phase: Phase 4 (knobs) done 2026-08-08; Phase 4 QA next. Packet authored
-2026-08-07 off release/v0.36.0; the branch has absorbed release/v0.36.0 through
-1478f9d2ba (sixth absorb, opening Phase 4 2026-08-08: PR 2974's Seeker
-daily-rewards mobile CSS, empty intersection with farming; release-merge-audit
-clean, parity and snapshots re-proven green on the merged HEAD; the fifth
-absorb 4d52f151eb landed at Phase 3 QA).
+Current phase: Phase 5 (crops and tools) in flight 2026-08-09; Phase 4 QA done
+2026-08-08. Packet authored 2026-08-07 off release/v0.36.0; the branch has
+absorbed release/v0.36.0 through 5819c005a7 (eighth absorb, opening Phase 5
+2026-08-09: the gate-perf CI batch, warrior Intervene and fear DR, the three
+r165 compileAsync patch with its lockfile-driven asset seal re-mint, idle-mob
+distance culling with its own parity scenario, the 16 static self-record
+scalars moved behind the delta gate, and bg_respond; release-merge-audit clean,
+parity and snapshots re-proven green on the merged HEAD, farming_session golden
+byte-identical. Count-pin baselines after this absorb: command_schema 196/209,
+IWorld members 308 (79 data, 229 method), delta keys 84. The seventh absorb
+66c2340242 landed at Phase 4 QA, PRs 3162 and 3164; the sixth 1478f9d2ba opened
+Phase 4; the fifth 4d52f151eb landed at Phase 3 QA. NOTE for any farming GLB
+work (Phase 7 props, Phase 13 art): fingerprints must be minted against the
+NEW pnpm-lock.yaml this absorb brought, or the asset suites red.)
 Working tree: ALL farming work happens in the persistent worktree
 `~/Documents/woc-farming-plan`. Other sessions share the main checkout; never work there.
 
