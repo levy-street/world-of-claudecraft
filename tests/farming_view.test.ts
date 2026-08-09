@@ -11,6 +11,7 @@ import { ITEMS } from '../src/sim/data';
 import { FARM_HUSKS_PER_COMPOST } from '../src/sim/professions/farming';
 import {
   type FarmDeniedReason,
+  type FarmDeniedToast,
   farmDeniedLineKey,
   farmDeniedToast,
   farmFineLineKey,
@@ -218,7 +219,9 @@ describe('farmDeniedToast: the tool refusal names the crop tier when it can', ()
     // Node-path parity: the same statement a vein's hover line makes about
     // its pick, delivered as the refusal toast because farming has no node to
     // hover. The tier comes from the crop record, so a tier-3 refusal names 3.
-    expect(farmDeniedToast('tool', 'highland_barley')).toEqual({
+    // Typed through the EXPORTED shape so the type earns its export surface.
+    const toast: FarmDeniedToast = farmDeniedToast('tool', 'highland_barley');
+    expect(toast).toEqual({
       key: 'hudChrome.gathering.tierRequired.farming',
       params: { tier: 3 },
     });
