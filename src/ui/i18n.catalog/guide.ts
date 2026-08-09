@@ -2756,7 +2756,7 @@ export const guideStrings = {
       fishing:
         "Fishing is the odd one out among the gathering trades, and the deepest: a real bite-and-reel minigame, its own catch tables in each of the three heartland zones (the young waters beyond them all serve the Vale's table for now), and a proficiency cap of 200, twice the others. Buy a pole, face open water, and cast.",
       farming:
-        'Farming is the one gathering trade you tend rather than take: crops raised from seed in worked beds, then pulled up ripe for the kitchens and the apothecary benches. Its beds, seeds, and tools arrive in a later patch, so the tables below stand empty for now. That is deliberate rather than an oversight: the trade holds its seat on the gathering counter, tracked to a cap of 100, and fills in as its content lands.',
+        'Farming is the one gathering trade you tend rather than take: crops raised from seed in worked garden beds, growing on their own clock whether you stay or go, and pulled up ripe when you come back. Every farming hub keeps a bed site of its own, from the Eastbrook allotments up to the Evergarden parterre, and each rung of that ladder grows its own pair of crops, each with a finer grade for a practiced hand to pull. A hoe opens the work: the garden hoe covers the starter beds, and engineers craft the rungs above it for the tougher ground. Tracked on its own counter to a cap of 100.',
     },
     rhythmHeading: 'The gathering rhythm',
     rhythmBody:
@@ -2810,7 +2810,7 @@ export const guideStrings = {
       fishing:
         "The 100 milestone inscribes Old Salt and 200 inscribes Master Angler with its title, the very top of the angler's art; Fishing also counts toward Master Gatherer, earned at 100 in any three gathering trades. A first fish from each of twelve zones' waters fills its own page, the three heartland zones and the Willowfen, the Galecrest, the Farshore, the Frostveil, the Amberfall, the Nightbloom, the Wraithwood, the Palmreach, and the Evergarden beyond them, and the Sunglint Koi records Glimmer of Hope, so travelers with a pole in their pack fill their book faster than they expect.",
       farming:
-        'Farming keeps no deeds of its own yet: its beds are still to come, and the milestone and cap deeds that mark the other trades arrive alongside them. Proficiency in it already counts toward Master Gatherer, which is earned at 100 in any three gathering trades, so a farmer will fill that page the same way everyone else does. Deeds are titles and Renown only, never power.',
+        'Farming keeps no deeds of its own yet: now that its beds and crops are in the ground, the milestone and cap deeds that mark the other trades arrive in a later patch. Proficiency in it already counts toward Master Gatherer, which is earned at 100 in any three gathering trades, so a farmer will fill that page the same way everyone else does. Deeds are titles and Renown only, never power.',
     },
     fish: {
       startHeading: 'Getting started',

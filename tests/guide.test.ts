@@ -1553,19 +1553,38 @@ describe('Guide professions gathering accuracy', () => {
   // fallback over an empty nodes array) and the full vendor-ladder prose over
   // an empty tools table: invented content on a public page that three data
   // pins and a full gate never saw, because data pins are not page pins. This
-  // drives the REAL page render on both sides of the length guard.
-  it('renders a tableless trade without tool or node prose, and a full trade with both', () => {
+  // drives the REAL page render on both sides of the length guard. The Phase
+  // 5 hoe ladder flipped farming's tools side: the section is DEMANDED now,
+  // while the nodes side stays guarded off forever (farming has no
+  // GATHER_NODES by design, fishing-shaped on land), and a synthetic toolless
+  // record keeps the guard's absent side exercised.
+  it('renders farming with its tool ladder, no node prose, and length-guards empty tables', () => {
     setLanguage('en');
     const farming = GUIDE_PROF_GATHERING.find((g) => g.id === 'farming');
     expect(farming).toBeDefined();
     const html = gatheringDetailHtml(farming as (typeof GUIDE_PROF_GATHERING)[number]);
-    expect(html, 'tools prose must not render for a toolless trade').not.toContain(
+    expect(html, 'the shipped hoe ladder must render its tools section').toContain(
       'id="prof-tools"',
     );
+    expect(html).toContain('Garden Hoe');
     expect(html, 'nodes prose must not render for a nodeless trade').not.toContain(
       'id="prof-nodes"',
     );
     expect(html).toContain('id="prof-rhythm"');
+    // The guard itself stays honest on its absent side: a toolless record
+    // still renders neither section, never prose over an empty table.
+    const toolless = {
+      ...(farming as (typeof GUIDE_PROF_GATHERING)[number]),
+      tools: [],
+      nodes: [],
+    };
+    const bareHtml = gatheringDetailHtml(toolless);
+    expect(bareHtml, 'tools prose must not render for a toolless trade').not.toContain(
+      'id="prof-tools"',
+    );
+    expect(bareHtml, 'nodes prose must not render for a nodeless trade').not.toContain(
+      'id="prof-nodes"',
+    );
     const mining = GUIDE_PROF_GATHERING.find((g) => g.id === 'mining');
     const miningHtml = gatheringDetailHtml(mining as (typeof GUIDE_PROF_GATHERING)[number]);
     expect(miningHtml, 'the guard is length-based: a full trade keeps tools').toContain(
@@ -1601,13 +1620,20 @@ describe('Guide professions gathering accuracy', () => {
     for (const g of GUIDE_PROF_GATHERING) {
       if (g.id === 'fishing') continue;
       if (g.id === 'farming') {
-        // Farming is registered as a trade before its beds, tools, and harvest
-        // table exist, so the generator emits the row with empty tables and no
-        // respawn number. Pinned empty ON PURPOSE: the phase that ships farming
-        // content reds here and has to give the trade real rows, rather than
-        // slipping through a skip.
+        // Farming has no GATHER_NODES rows by design (fishing-shaped on land:
+        // beds are patch content, never nodes), so the node aggregation stays
+        // EMPTY on purpose and no respawn number ever publishes. The tool
+        // ladder is the aggregation's real farming output since the Phase 5
+        // hoes: the four rungs, rung 1 the only priced one (dormant-by-choice
+        // vendor state; the row-by-row mirror below owns the rest of the
+        // fields).
         expect(g.nodes).toEqual([]);
-        expect(g.tools).toEqual([]);
+        expect((g.tools ?? []).map((tool) => [tool.name, tool.tier, tool.priceCopper])).toEqual([
+          ['Garden Hoe', 1, 20],
+          ['Bronze Hoe', 2, null],
+          ['Skysilver Hoe', 3, null],
+          ['Osmium Hoe', 4, null],
+        ]);
         expect(g.respawnSeconds).toBeUndefined();
         continue;
       }
@@ -1656,9 +1682,19 @@ describe('Guide professions gathering accuracy', () => {
       expect(rows[0].quality).toBe(def.quality ?? 'common');
       expect(rows[0].priceCopper).toBe(def.buyValue ?? null);
       if (def.buyValue != null) {
-        const stocked = Object.values(NPCS).some((n) => n.vendorItems?.includes(itemId));
-        expect(stocked, `vendor tool "${itemId}" is stocked by no NPC`).toBe(true);
-        expect(rows[0].vendors.length).toBeGreaterThan(0);
+        if (use.professionId === 'farming') {
+          // DORMANT BY CHOICE until the Phase 9 go-live: the garden hoe is
+          // vendor-PRICED from Phase 5 but no farmer NPC stocks it yet, so
+          // the page truthfully shows the price with no counter. The
+          // no-vendor state is pinned positively by the farming dormant arm
+          // in tests/professions_zone_rollout.test.ts; never extend this
+          // narrowing to the three node professions or to fishing.
+          expect(rows[0].vendors, `farming tool "${itemId}" must list no counter yet`).toEqual([]);
+        } else {
+          const stocked = Object.values(NPCS).some((n) => n.vendorItems?.includes(itemId));
+          expect(stocked, `vendor tool "${itemId}" is stocked by no NPC`).toBe(true);
+          expect(rows[0].vendors.length).toBeGreaterThan(0);
+        }
       } else {
         expect(rows[0].craftedBy).toBe(
           ALL_RECIPES.find((r) => r.resultItemId === itemId)?.professionId,

@@ -10547,7 +10547,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.gatherIntro.fishing':
     '钓鱼通过咬钩与收线的节奏，在每个区域的开阔水面垂钓，上限为200。',
   'guide.profPages.gatherIntro.farming':
-    '耕作在整治好的田畦中从种子育出作物，上限为100；它的田畦、种子与工具将随后续更新到来，因此下方表格暂时为空。',
+    '耕作是唯一以照料代替采掘的采集行业：在整治好的田畦中播下种子，人不在时作物照样生长，回来时拔起成熟的收成。从Eastbrook的份地到Evergarden的花圃，每处耕作据点都有自己的田畦，阶梯的每一级都长着一对专属作物，手艺到家还能收下精良等级。农活由锄头开启：Garden Hoe照看起步的田畦，更高各级则由工程师打造。熟练在专属计数上累积，上限为100。',
   'guide.profPages.rhythmHeading': '采集节奏',
   'guide.profPages.rhythmBody':
     '采集是一段可见的施法：基础{base}秒，最短不低于{floor}秒；工具每高于节点一阶缩短{tool}秒，每个熟练度区间再缩短{band}秒。',
@@ -10673,7 +10673,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.gatherDeeds.fishing':
     '钓鱼100熟练铭刻Old Salt，200铭刻Master Angler及其头衔，那是垂钓技艺的顶点；钓鱼同样计入Master Gatherer（任意三项采集达到100）。在每个区域的水域钓起第一条鱼各有其页，钓起日辉锦鲤则记下Glimmer of Hope，所以包里常备鱼竿的旅人往往比预想中更快填满功业之书。',
   'guide.profPages.gatherDeeds.farming':
-    '耕作暂无专属功业：田畦尚未到来，标记其他行业的里程碑与上限功业也将随之而来。它的熟练已经计入Master Gatherer（任意三项采集达到100）。功业只给头衔与名望，绝不给予力量。',
+    '耕作暂无专属功业：如今田畦与作物已经扎根，标记其他行业的里程碑与上限功业将随后续更新一并到来。它的熟练已经计入Master Gatherer（任意三项采集达到100），耕作者能像旁人一样填满那一页。功业只给头衔与名望，绝不给予力量。',
   'guide.profPages.fish.startHeading': '入门',
   'guide.profPages.fish.startBody':
     '一根Simple Fishing Pole在Eastbrook的Fisherman Brandt处只卖20铜（他在镇东缘望着Mirror Lake）；Tinker Gizzel、Fenbridge的Provisioner Hale和Highwatch的Quartermaster Bree也有存货。面向前方约24码内足够深的水面使用鱼竿即可抛竿。战斗中、游泳时或死亡时无法抛竿：站在岸上钓才是正途，任何区域的可钓水域都行。',

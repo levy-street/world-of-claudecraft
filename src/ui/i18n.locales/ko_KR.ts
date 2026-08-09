@@ -11040,7 +11040,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.gatherIntro.fishing':
     '낚시는 입질과 릴 감기의 흐름으로 모든 지역의 트인 물가에서 어획물을 낚으며, 상한은 200이다.',
   'guide.profPages.gatherIntro.farming':
-    '농사는 손질한 밭에서 씨앗으로 작물을 길러 상한이 100이며, 밭과 씨앗, 도구는 이후 업데이트로 들어오므로 아래 표는 지금은 비어 있다.',
+    '농사는 캐내는 것이 아니라 돌보아 기르는 유일한 채집 기술이다. 손질한 밭에 씨앗을 심으면 자리를 비워도 작물이 자라고, 돌아와 익은 것을 뽑으면 된다. Eastbrook의 텃밭부터 Evergarden의 화단까지 농사 거점마다 전용 밭이 있으며, 사다리의 단마다 고유한 작물이 한 쌍씩 자라고 솜씨가 늘면 상급 등급도 거둔다. 일은 괭이에서 시작한다. Garden Hoe가 첫 밭을 맡고, 그 위 단계의 괭이는 기술자가 만든다. 숙련은 전용 카운터로 상한 100까지 오른다.',
   'guide.profPages.rhythmHeading': '채집의 리듬',
   'guide.profPages.rhythmBody':
     '채집은 눈에 보이는 시전이다. 기본 {base}초에 최소 {floor}초까지, 도구가 채집물보다 한 티어 높을 때마다 {tool}초, 숙련도 구간마다 {band}초씩 짧아진다.',
@@ -11169,7 +11169,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.gatherDeeds.fishing':
     '숙련 100은 Old Salt를, 200은 Master Angler와 그 칭호를 새긴다. 낚시꾼 기예의 정점이다. 낚시도 Master Gatherer(세 기술 100)에 포함된다. 각 지역의 물에서 낚는 첫 물고기가 저마다의 페이지를 채우고, 윤슬 코이를 낚으면 Glimmer of Hope가 기록된다.',
   'guide.profPages.gatherDeeds.farming':
-    '농사에는 아직 고유 업적이 없다. 밭이 앞으로 들어오고, 다른 전문직을 장식하는 이정표와 상한 업적도 함께 들어온다. 숙련은 이미 Master Gatherer(세 기술 100)에 포함된다. 업적은 칭호와 명성만 줄 뿐, 결코 힘을 주지 않는다.',
+    '농사에는 아직 고유 업적이 없다. 밭과 작물이 자리 잡은 지금, 다른 전문직을 장식하는 이정표와 상한 업적은 이후 업데이트로 들어온다. 숙련은 이미 Master Gatherer(아무 세 채집 기술 100)에 포함되므로 농부도 남들과 같은 방식으로 그 페이지를 채운다. 업적은 칭호와 명성만 줄 뿐, 결코 힘을 주지 않는다.',
   'guide.profPages.fish.startHeading': '시작하기',
   'guide.profPages.fish.startBody':
     'Simple Fishing Pole은 Eastbrook의 Fisherman Brandt가 20동에 판다(마을 동쪽 끝에서 Mirror Lake를 노려보는 노련한 낚시꾼이다). Tinker Gizzel, Fenbridge의 Provisioner Hale, Highwatch의 Quartermaster Bree도 재고가 있다. 전방 약 24야드 안의 충분히 깊은 물을 바라보고 낚싯대를 쓰면 찌가 날아간다. 전투 중, 수영 중, 사망 중에는 던질 수 없다. 물가에서 던지는 것이 정석이고, 어느 지역의 낚시 가능한 물이든 좋다.',
