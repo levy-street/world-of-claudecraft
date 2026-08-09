@@ -2731,8 +2731,11 @@ export const zh_CN: EnTranslations = {
         "skill": "你的耕作技能不足以种植该作物。",
         "no_seed": "你没有该作物的种子。",
         "not_ready": "那株作物还在生长。",
-        "no_plot": "那片田畦里什么也没种。"
-      }
+        "no_plot": "那片田畦里什么也没种。",
+        "no_husks": "你的枯萎谷壳不够。"
+      },
+      "husksConvertedLine": "你用{husks}个枯萎谷壳换取了{name}。",
+      "husksConvertedLineQty": "你用{husks}个枯萎谷壳换取了{name} x{qty}。"
     },
     "archetypeTitle": {
       "label": "称号",
@@ -11227,6 +11230,12 @@ export const zh_CN: EnTranslations = {
       },
       "withered_husks": {
         "name": "枯萎的谷壳"
+      },
+      "compost": {
+        "name": "Compost"
+      },
+      "growth_tonic": {
+        "name": "Growth Tonic"
       },
       "conjured_water4": {
         "name": "魔法泉水"

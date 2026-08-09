@@ -38,6 +38,7 @@
 // compute the stage itself.
 
 import {
+  FARM_COMPOST_ITEM_ID,
   FARM_WITHERED_HUSK_ITEM_ID,
   type FarmCropDef,
   farmCropById,
@@ -104,6 +105,16 @@ export const FARM_WITHERED_HUSK_COUNT = 2;
 // material taxonomy can read it as data without importing this engine module;
 // re-exported here because this is where callers and tests reach for it.
 export { FARM_WITHERED_HUSK_ITEM_ID };
+// The knob-supply ids, same content-layer home and re-export rationale.
+export { FARM_COMPOST_ITEM_ID, FARM_GROWTH_TONIC_ITEM_ID } from '../content/farm_crops';
+
+// How many husks one compost costs at the farmer's trade (convertHusks
+// below). TUNING, PROVISIONAL, FLAGGED FOR THE MAINTAINER: a failed crop pays
+// FARM_WITHERED_HUSK_COUNT (2) husks, so at 2 husks per compost ONE failure
+// converts into exactly ONE compost, which is D6's "failure composts into the
+// next attempt's insurance" read literally; it is also value-neutral at the
+// vendor (2 husks at sellValue 1 make 1 compost at sellValue 2).
+export const FARM_HUSKS_PER_COMPOST = 2;
 
 // Per-harvest proficiency gain schedule, the fishing FISHING_GAIN_SCHEDULE
 // shape scaled to farming's cap of 100: the breakpoints are the band
@@ -622,6 +633,55 @@ export function harvestCrop(ctx: SimContext, p: Entity, meta: PlayerMeta, bedId:
   // queued from a command body lands on the NEXT tick, the same cadence every
   // other gathering grant has.
   queueGatheringGrant(meta, 'farming', farmingHarvestGainAt(skill, cropTier));
+}
+
+// ---------------------------------------------------------------------------
+// convertHusks
+// ---------------------------------------------------------------------------
+
+/** Trade withered husks for compost at the fixed ratio above: failure turned
+ *  into the next attempt's insurance (D6). ONE call converts EVERY complete
+ *  batch in the sender's bags, so a farmer with a season's husks is one
+ *  command away from their compost rather than one command per batch;
+ *  a remainder below one batch stays in the bags untouched.
+ *
+ *  Draws ZERO rng on every path: the ratio is a constant and the batch count
+ *  is arithmetic over the sender's own bag count.
+ *
+ *  THE LOCATION GATE IS DELIBERATELY PERMISSIVE THIS PHASE. The design fiction
+ *  is the farmer NPC working the husks into compost, and the go-live phase
+ *  (Phase 9, which ships the farmer NPCs) adds the NPC range gate here, the
+ *  same INTERACT_RANGE arm plantCrop's bed check uses. Until an NPC exists
+ *  there is nothing to range against, and husks are unobtainable in live play
+ *  anyway (no seed faucet exists), so the permissive gate ships nothing a
+ *  player can reach.
+ *
+ *  NO BUSY GATE, the harvestCrop rationale: the trade is instant, conflicts
+ *  with no cast, and refusing it during one would be a queue in disguise. The
+ *  dead gate stays, the same shared error line every command family answers
+ *  with. */
+export function convertHusks(ctx: SimContext, p: Entity, meta: PlayerMeta): void {
+  if (p.dead) {
+    ctx.error(meta.entityId, "You can't do that while dead.");
+    return;
+  }
+  const husks = ctx.countItem(FARM_WITHERED_HUSK_ITEM_ID, meta.entityId);
+  const batches = Math.floor(husks / FARM_HUSKS_PER_COMPOST);
+  if (batches < 1) {
+    ctx.emit({ type: 'farmDenied', pid: meta.entityId, reason: 'no_husks' });
+    return;
+  }
+  const spent = batches * FARM_HUSKS_PER_COMPOST;
+  ctx.removeItem(FARM_WITHERED_HUSK_ITEM_ID, spent, meta.entityId);
+  // silent + callerLogs: the farmHusksConverted event below owns both halves
+  // of the player feedback (the farmHarvested precedent, #2430). The generic
+  // "You receive:" hub line would be a second line for the one trade, and
+  // naming only the compost would hide what it cost.
+  ctx.addItem(FARM_COMPOST_ITEM_ID, batches, meta.entityId, {
+    silent: true,
+    callerLogs: true,
+  });
+  ctx.emit({ type: 'farmHusksConverted', pid: meta.entityId, husks: spent, compost: batches });
 }
 
 // ---------------------------------------------------------------------------

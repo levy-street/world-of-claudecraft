@@ -8910,6 +8910,11 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.farming.denied.no_seed': 'У вас нет семян этой культуры.',
   'hudChrome.farming.denied.not_ready': 'Этот урожай еще растет.',
   'hudChrome.farming.denied.no_plot': 'На этой грядке ничего не посажено.',
+  'hudChrome.farming.denied.no_husks': 'У вас недостаточно засохшей шелухи.',
+  'hudChrome.farming.husksConvertedLine':
+    'Вы обмениваете засохшую шелуху ({husks} шт.) на {name}.',
+  'hudChrome.farming.husksConvertedLineQty':
+    'Вы обмениваете засохшую шелуху ({husks} шт.) на {name} x{qty}.',
   'gatherEvent.pristineVein': '{finder} находит нетронутую жилу!',
   'gatherEvent.ancientHeartwood': '{finder} добывает древнюю сердцевину!',
   'gatherEvent.moonlitBloom': '{finder} находит лунный цветок!',

@@ -11,6 +11,7 @@ import {
   farmDeniedLineKey,
   farmFineLineKey,
   farmHarvestLineKey,
+  farmHusksConvertedLineKey,
   farmPlantedTokenId,
   farmWitheredLineKey,
 } from '../src/ui/farming_view';
@@ -18,7 +19,7 @@ import { gatherLineKey, harvestLineKey } from '../src/ui/grant_line_view';
 import { setLanguage, t } from '../src/ui/i18n';
 
 describe('farmDeniedLineKey', () => {
-  it('gives all eight refusal reasons their own real, distinct line', () => {
+  it('gives every refusal reason its own real, distinct line', () => {
     // The reasons are listed literally so this fails loudly if one is renamed;
     // the OTHER direction (a reason ADDED to the sim union with no line) is
     // caught by tsc, since farmDeniedLineKey's template literal has to be
@@ -32,6 +33,7 @@ describe('farmDeniedLineKey', () => {
       'no_seed',
       'not_ready',
       'no_plot',
+      'no_husks',
     ];
     const keys = reasons.map((r) => farmDeniedLineKey(r));
     expect(keys).toEqual([
@@ -43,17 +45,18 @@ describe('farmDeniedLineKey', () => {
       'hudChrome.farming.denied.no_seed',
       'hudChrome.farming.denied.not_ready',
       'hudChrome.farming.denied.no_plot',
+      'hudChrome.farming.denied.no_husks',
     ]);
     // Every key must actually EXIST: t() throws on an untracked key in test,
     // so this is what a leaf missing from the catalog fails on rather than a
     // player seeing a raw dotted path in a toast. The rendered COPY is checked
-    // for distinctness too, not just the keys: eight keys pointing at two
+    // for distinctness too, not just the keys: nine keys pointing at two
     // sentences would pass a key-only pin while telling the player the wrong
-    // thing six times.
+    // thing seven times.
     setLanguage('en');
     const copy = keys.map((k) => t(k));
     for (const line of copy) expect(line.length).toBeGreaterThan(0);
-    expect(new Set(copy).size).toBe(8);
+    expect(new Set(copy).size).toBe(reasons.length);
   });
 });
 
@@ -99,6 +102,25 @@ describe('the farm grant-line selectors', () => {
     expect(farmFineLineKey(2)).toBe('hudChrome.farming.harvestFineLineQty');
     expect(farmWitheredLineKey(1)).toBe('hudChrome.farming.witheredLine');
     expect(farmWitheredLineKey(2)).toBe('hudChrome.farming.witheredLineQty');
+    // The husk trade keys on the COMPOST granted, the grant side of the
+    // trade, with the same boundary and the same absent-reads-as-one rule.
+    expect(farmHusksConvertedLineKey(undefined)).toBe('hudChrome.farming.husksConvertedLine');
+    expect(farmHusksConvertedLineKey(1)).toBe('hudChrome.farming.husksConvertedLine');
+    expect(farmHusksConvertedLineKey(2)).toBe('hudChrome.farming.husksConvertedLineQty');
+    // Both leaves really render (t() throws on an untracked key in test), and
+    // the line splices BOTH sides of the trade: the husks spent and the
+    // compost gained.
+    setLanguage('en');
+    const line = t('hudChrome.farming.husksConvertedLineQty', {
+      husks: '4',
+      name: 'Compost',
+      qty: '2',
+    });
+    expect(line).toContain('4');
+    expect(line).toContain('Compost x2');
+    expect(t('hudChrome.farming.husksConvertedLine', { husks: '2', name: 'Compost' })).toContain(
+      'Compost',
+    );
   });
 
   it('farming produce, its fine twin, and the husk payout never share a key', () => {
@@ -114,8 +136,10 @@ describe('the farm grant-line selectors', () => {
       farmFineLineKey(2),
       farmWitheredLineKey(1),
       farmWitheredLineKey(2),
+      farmHusksConvertedLineKey(1),
+      farmHusksConvertedLineKey(2),
     ];
-    expect(new Set(farmKeys).size).toBe(6);
+    expect(new Set(farmKeys).size).toBe(8);
     // And never the gather or corpse-harvest families either: those matchers
     // still own "You gather:" / "You harvest:" for their own surfaces.
     for (const shared of [

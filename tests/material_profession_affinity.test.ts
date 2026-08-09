@@ -4,6 +4,7 @@
 
 import { describe, expect, it } from 'vitest';
 import { ENCHANTS } from '../src/sim/content/enchants';
+import { FARM_MATERIAL_ITEM_IDS } from '../src/sim/content/farm_crops';
 import { CRAFT_RING } from '../src/sim/content/professions';
 import { ALL_RECIPES } from '../src/sim/content/recipes';
 import { ALL_RECIPES as ALL_RECIPES_VIA_DATA } from '../src/sim/data';
@@ -12,25 +13,32 @@ import { MATERIAL_ITEM_IDS } from '../src/sim/material_taxonomy';
 import { baseMaterialFor, MATERIAL_GRADES } from '../src/sim/professions/material_grades';
 
 // The ONE sanctioned exception to the no-orphan-reagents census below:
-// farming's four items are honest materials whose craft consumers are
-// DELIBERATELY deferred, under the packet's same-phase-consumer ruling (D11).
-// The growth-engine phase ships a minimal crop slice so the engine can be
-// driven end to end; the husks are consumed by the knobs phase's convert
-// command, and the produce by the dishes phase, which closes this list. Until
-// then the items are still market-listable and vendor-sellable, so no stack is
-// truly unexplained, only uncrafted.
+// farming's materials, exempt STRUCTURALLY rather than by an enumerated
+// deferral list, because every one of them is consumed by a sim COMMAND,
+// which craftIdsForMaterialItem (a recipes-and-enchants scan) cannot see.
+// Seeds are spent by plant_crop; produce and its fine twin pay the farmer's
+// watch fee (the plant_crop knob payload); husks feed convert_husks; and the
+// two supplies (compost, growth tonic) are the plant-time knobs themselves.
+// That holds by construction for every crop the ladder phase will add (its
+// seed plants, its produce is fee-eligible), and the consumption carries
+// EXECUTED coverage in tests/professions_farming.test.ts rather than resting
+// on this comment.
 //
-// Enumerated rather than silenced, the ITEM_ART_PENDING discipline: the two
-// arms after the census hold the line from both sides (a stale entry reds once
-// its consumer lands, and the set is pinned exactly so it cannot grow quietly
-// to absorb a genuinely orphaned material). Do NOT add an id here to make a
-// red go away; author its consumer, or argue the classification.
-const CONSUMER_DEFERRED_MATERIALS: readonly string[] = [
-  'fine_vale_wheat',
-  'vale_wheat',
-  'vale_wheat_seed',
-  'withered_husks',
-];
+// HISTORY, so the shape is not relearned: through the growth-engine phase
+// this was an enumerated CONSUMER_DEFERRED_MATERIALS list whose self-clearing
+// arm demanded an entry leave when its recipe consumer landed. The knobs
+// phase REPLACED it (state.md deviation (w)): the consumers that actually
+// closed the loop are commands, which that arm could never see, and compost
+// and the tonic will never have a recipe consumer at all, so keeping them
+// "deferred" would have been a permanent lie. The anti-abuse gate the old
+// exact pin provided did not go away, it moved to the content layer: this
+// exemption derives from FARM_MATERIAL_ITEM_IDS, so smuggling an orphan in
+// requires editing content/farm_crops.ts, and the exact-set pin on that list
+// in tests/material_taxonomy.test.ts reds on any growth. A recipe consumer
+// arriving later (the dishes phase cooks produce) needs no edit here: the id
+// starts passing the census on its own terms and the exemption stays true
+// (the watch fee still consumes produce).
+const COMMAND_CONSUMED_FARM_MATERIALS: ReadonlySet<string> = new Set(FARM_MATERIAL_ITEM_IDS);
 
 describe('craftIdsForMaterialItem', () => {
   it('names the crafts that consume Rough Hide (the player-facing exemplar)', () => {
@@ -92,41 +100,38 @@ describe('craftIdsForMaterialItem', () => {
     // The material taxonomy only admits junk-kind members of the source-or-
     // reagent union; if a material has zero craft consumers the Used-by line
     // cannot fire and the bag stack is unexplained. Pin completeness here.
+    // Farming's family is command-consumed (see the exemption banner above),
+    // so its stacks are explained by a different mechanism, not unexplained.
+    let exempted = 0;
     for (const itemId of MATERIAL_ITEM_IDS) {
-      if (CONSUMER_DEFERRED_MATERIALS.includes(itemId)) continue;
+      if (COMMAND_CONSUMED_FARM_MATERIALS.has(itemId)) {
+        exempted++;
+        continue;
+      }
       expect(
         craftIdsForMaterialItem(itemId).length,
         `${itemId} must have a craft consumer`,
       ).toBeGreaterThan(0);
     }
+    // Anti-vacuous in both directions: the exemption really fired (farming's
+    // family is in the material set), and it did not swallow the census (the
+    // non-exempt majority was genuinely walked).
+    expect(exempted).toBe(COMMAND_CONSUMED_FARM_MATERIALS.size);
+    expect(MATERIAL_ITEM_IDS.size - exempted).toBeGreaterThan(40);
   });
 
-  // The two arms that keep the exception list above honest, in BOTH
-  // directions. Without them an id could be parked here forever, or a
-  // genuinely orphaned material could be added to silence a real failure.
-  it('every consumer-deferred id is a real material that genuinely has none yet', () => {
-    for (const itemId of CONSUMER_DEFERRED_MATERIALS) {
-      // Still a material: an id that fell out of the taxonomy has no business
-      // holding an exemption from a census it is no longer subject to.
+  it('the farming exemption names only real materials, all from the one content source', () => {
+    // The honesty arm the old deferral list carried, kept in the direction
+    // that still applies: an id that fell out of the taxonomy has no business
+    // holding an exemption from a census it is no longer subject to. The
+    // growth gate lives with the SOURCE: this set derives from
+    // FARM_MATERIAL_ITEM_IDS, whose exact-set pin in
+    // tests/material_taxonomy.test.ts reds on any addition, so an orphan
+    // cannot be smuggled in through this file at all.
+    expect(COMMAND_CONSUMED_FARM_MATERIALS.size).toBeGreaterThan(0);
+    for (const itemId of COMMAND_CONSUMED_FARM_MATERIALS) {
       expect(MATERIAL_ITEM_IDS.has(itemId), `${itemId} is no longer a material`).toBe(true);
-      // Still consumerless: the moment its owning phase lands a recipe, this
-      // reds and the id must leave the list rather than keep a free pass.
-      expect(
-        craftIdsForMaterialItem(itemId),
-        `${itemId} HAS a consumer now: drop it from CONSUMER_DEFERRED_MATERIALS`,
-      ).toEqual([]);
     }
-  });
-
-  it('pins the deferred set exactly, so it can never grow quietly', () => {
-    // An exact-set pin rather than a size floor: absorbing a future orphan
-    // into this list must be a deliberate, reviewed edit naming its phase.
-    expect([...CONSUMER_DEFERRED_MATERIALS].sort()).toEqual([
-      'fine_vale_wheat',
-      'vale_wheat',
-      'vale_wheat_seed',
-      'withered_husks',
-    ]);
   });
 
   it('every recipe professionId is a craft the affinity can name', () => {

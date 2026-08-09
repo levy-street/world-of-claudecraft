@@ -3168,6 +3168,12 @@ const ITEM_RECIPES: Record<string, IconRecipe> = {
   vale_wheat: r('nature', 'gold', [{ p: 'leaf', pal: 'gold' }]),
   fine_vale_wheat: r('nature', 'gold', [{ p: 'leaf', pal: 'gold' }], ['sparkle']),
   withered_husks: r('earth', 'earthBrown', [{ p: 'leaf', pal: 'earthBrown' }], ['crack']),
+  // Farming's knob supplies (the knobs phase), same ART_PENDING stand-in
+  // treatment and the same A4 pairwise-distinctness demand: a damp sack for
+  // the compost (earth base + drips, against the seed's plain nature sack)
+  // and a green draught for the tonic (the one potion glyph in the family).
+  compost: r('earth', 'earthBrown', [{ p: 'sack', pal: 'earthBrown' }], ['drips']),
+  growth_tonic: r('nature', 'leafGreen', [{ p: 'potion', pal: 'leafGreen' }], ['sparkle']),
   // misc UI icons (not real items)
   coin_gold: r('treasure', 'gold', ['coin'], ['sparkle']),
   slot_empty: r('junk', 'silverWhite', []),
@@ -4537,6 +4543,11 @@ export const ITEM_ART_PENDING = new Set<string>([
   'vale_wheat',
   'vale_wheat_seed',
   'withered_husks',
+  // The knobs phase's two supplies, the same dormant-online reasoning as the
+  // four above (no faucet for either exists until go-live) and the same
+  // scheduled art phase.
+  'compost',
+  'growth_tonic',
 ]);
 
 /** Static URL of an item's (or a UI pseudo-item's) image icon, or null if it uses a recipe. */

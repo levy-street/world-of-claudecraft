@@ -8756,6 +8756,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.farming.denied.no_seed': '그 작물의 씨앗이 없습니다.',
   'hudChrome.farming.denied.not_ready': '그 작물은 아직 자라는 중입니다.',
   'hudChrome.farming.denied.no_plot': '그 밭에는 아무것도 심겨 있지 않습니다.',
+  'hudChrome.farming.denied.no_husks': '시든 껍질이 부족합니다.',
+  'hudChrome.farming.husksConvertedLine': '시든 껍질 {husks}개를 {name}(으)로 교환했습니다.',
+  'hudChrome.farming.husksConvertedLineQty':
+    '시든 껍질 {husks}개를 {name} x{qty}(으)로 교환했습니다.',
   'gatherEvent.pristineVein': '{finder}님이 순수한 광맥을 발견했습니다!',
   'gatherEvent.ancientHeartwood': '{finder}님이 고대 심목을 베어냈습니다!',
   'gatherEvent.moonlitBloom': '{finder}님이 달빛 꽃을 발견했습니다!',

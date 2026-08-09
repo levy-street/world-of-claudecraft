@@ -3361,7 +3361,16 @@ export const hudChromeStrings = {
       no_seed: 'You have no seed for that crop.',
       not_ready: 'That crop is still growing.',
       no_plot: 'Nothing is planted in that bed.',
+      // The knobs phase: the husk trade with fewer husks than one batch
+      // costs (convert_husks).
+      no_husks: 'You do not have enough withered husks.',
     },
+    // The husk trade's one line (the knobs phase): names BOTH sides of the
+    // trade, what left the bags and what arrived, because the compost grant's
+    // hub line stands down for it (silent + callerLogs, the #2430 one-line
+    // rule). The quantity split follows the grant-line families above.
+    husksConvertedLine: 'You trade {husks} withered husks for {name}.',
+    husksConvertedLineQty: 'You trade {husks} withered husks for {name} x{qty}.',
   },
   // Archetype title chrome (#1130, pair-named under Professions 2.0):
   // `label` heads the character-sheet title line, `none` is shown before the

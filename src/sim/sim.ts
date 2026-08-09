@@ -399,6 +399,7 @@ import {
   projectFarmPlots,
 } from './professions/farm_projection';
 import {
+  convertHusks as convertHusksAction,
   harvestCrop as harvestCropAction,
   plantCrop as plantCropAction,
   updateFarming,
@@ -11982,6 +11983,16 @@ export class Sim {
     const r = this.ctx.resolve(pid);
     if (!r) return;
     harvestCropAction(this.ctx, r.e, r.meta, bedId);
+  }
+
+  // Trade withered husks for compost. Thin delegate like its two siblings
+  // above; draw-free on every path (the ratio is a constant), and the
+  // permissive location gate is documented at the action (the farmer-NPC
+  // range arm lands with the NPCs in the go-live phase).
+  convertHusks(pid?: number): void {
+    const r = this.ctx.resolve(pid);
+    if (!r) return;
+    convertHusksAction(this.ctx, r.e, r.meta);
   }
 
   // Slot an effect onto one gathering profession's tool, consuming one charm

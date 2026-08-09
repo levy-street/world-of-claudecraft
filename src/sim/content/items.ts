@@ -962,6 +962,37 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     quality: 'common',
     sellValue: 1,
   },
+  // The two plant-time knob supplies (the knobs phase, D6/D7/D9). Both are
+  // PLAIN ITEMS CONSUMED BY COMMAND, deliberately without an ItemDef.use arm:
+  // the plant_crop payload names which knobs to apply and the sim consumes
+  // them from bags at plant time (compost and the tonic), and convert_husks
+  // consumes husks to mint compost. Wiring either through the use path would
+  // invent a second consumption route the command already owns.
+  //
+  // VALUES ARE PROVISIONAL and flagged for the maintainer. Compost carries a
+  // vendor buyValue NOW per D9 (priced when the item lands, stocked by the
+  // farmer NPCs in the go-live phase) at the four-times-sell convention, and
+  // sits at twice a husk's value so the husk conversion (2 husks to 1
+  // compost) is value-neutral at the vendor. The growth tonic is NEVER
+  // vendor-stocked (alchemy-crafted from herbs in the economy-hooks phase,
+  // the cross-profession trade), so it carries sellValue only: a buyValue
+  // here would be the dead-row trap's opposite, a price for a faucet that
+  // must not exist.
+  compost: {
+    id: 'compost',
+    name: 'Compost',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 2,
+    buyValue: 8,
+  },
+  growth_tonic: {
+    id: 'growth_tonic',
+    name: 'Growth Tonic',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 6,
+  },
   // Fine grades of the nine node materials (D8, the fine-material axis). A
   // harvest yields one of these INSTEAD of its base id when the player's tool
   // is strictly above the material's zone tier at a full-grade vein

@@ -26,9 +26,12 @@ import { FARM_MAX_GROW_MS } from '../src/sim/professions/farm_persist';
 import type { PlotState } from '../src/sim/professions/farm_projection';
 import {
   canPlantCrop,
+  convertHusks,
+  FARM_COMPOST_ITEM_ID,
   FARM_FINE_CHANCE_BASE,
   FARM_HARVEST_LIFE_FLOOR,
   FARM_HARVEST_PICK_CAP,
+  FARM_HUSKS_PER_COMPOST,
   FARM_KEEP_CHANCE_BASE,
   FARM_PLANT_CAST_SEC,
   FARM_SURVIVAL_AT_GATE,
@@ -1044,6 +1047,102 @@ describe('harvestCrop: draw-free on every path', () => {
   });
 });
 
+describe('convertHusks: the husk trade, draw-free on every path', () => {
+  let h: Harness;
+  beforeEach(() => {
+    h = makeHarness();
+  });
+
+  function convert(): void {
+    convertHusks(h.sim.ctx, h.sim.player, h.meta);
+  }
+
+  it('pins the trade ratio to its literal', () => {
+    // The ratio is the trade's whole tuning surface and every arm below
+    // reaches it through the import, which is a self-comparison (the
+    // wire-name-constant rule). One literal pin, here: 2 husks per compost,
+    // so ONE failed crop (FARM_WITHERED_HUSK_COUNT husks) converts into
+    // exactly ONE compost.
+    expect(FARM_HUSKS_PER_COMPOST).toBe(2);
+    expect(FARM_HUSKS_PER_COMPOST).toBe(FARM_WITHERED_HUSK_COUNT);
+  });
+
+  it('converts EVERY complete batch in one call and leaves the remainder', () => {
+    h.sim.addItem(FARM_WITHERED_HUSK_ITEM_ID, 2 * FARM_HUSKS_PER_COMPOST + 1, h.pid);
+    const from = h.sim.events.length;
+    const draws = countDraws(h.sim, () => convert());
+    expect(draws).toBe(0);
+    expect(h.sim.countItem(FARM_COMPOST_ITEM_ID, h.pid)).toBe(2);
+    expect(h.sim.countItem(FARM_WITHERED_HUSK_ITEM_ID, h.pid)).toBe(1);
+    expect(eventsOf(h.sim, from, 'farmHusksConverted')).toEqual([
+      {
+        type: 'farmHusksConverted',
+        pid: h.pid,
+        husks: 2 * FARM_HUSKS_PER_COMPOST,
+        compost: 2,
+      },
+    ]);
+    expect(eventsOf(h.sim, from, 'farmDenied')).toEqual([]);
+  });
+
+  it('flags the compost grant silent + callerLogs, so one trade prints one line', () => {
+    // The #2430 one-line rule, the farmHarvested precedent: the
+    // farmHusksConverted event owns both halves of the feedback, so the hub
+    // "You receive:" line and the generic ding stand down.
+    h.sim.addItem(FARM_WITHERED_HUSK_ITEM_ID, FARM_HUSKS_PER_COMPOST, h.pid);
+    const from = h.sim.events.length;
+    convert();
+    const loots = eventsOf(h.sim, from, 'loot');
+    expect(loots.length).toBeGreaterThan(0);
+    for (const lev of loots) {
+      expect(lev.silent, lev.text).toBe(true);
+      expect(lev.callerLogs, lev.text).toBe(true);
+    }
+  });
+
+  it('refuses below one batch: nothing moves, zero draws, farmDenied no_husks', () => {
+    h.sim.addItem(FARM_WITHERED_HUSK_ITEM_ID, FARM_HUSKS_PER_COMPOST - 1, h.pid);
+    const from = h.sim.events.length;
+    expect(countDraws(h.sim, () => convert())).toBe(0);
+    // The refusal names no bed and no crop: the trade has neither.
+    expect(eventsOf(h.sim, from, 'farmDenied')).toEqual([
+      { type: 'farmDenied', pid: h.pid, reason: 'no_husks' },
+    ]);
+    expect(eventsOf(h.sim, from, 'farmHusksConverted')).toEqual([]);
+    // NOTHING was consumed on the refusal, remainder included.
+    expect(h.sim.countItem(FARM_WITHERED_HUSK_ITEM_ID, h.pid)).toBe(FARM_HUSKS_PER_COMPOST - 1);
+    expect(h.sim.countItem(FARM_COMPOST_ITEM_ID, h.pid)).toBe(0);
+  });
+
+  it('refuses a dead farmer without touching the bags', () => {
+    h.sim.addItem(FARM_WITHERED_HUSK_ITEM_ID, FARM_HUSKS_PER_COMPOST, h.pid);
+    h.sim.player.dead = true;
+    const from = h.sim.events.length;
+    expect(countDraws(h.sim, () => convert())).toBe(0);
+    expect(h.sim.countItem(FARM_WITHERED_HUSK_ITEM_ID, h.pid)).toBe(FARM_HUSKS_PER_COMPOST);
+    expect(h.sim.countItem(FARM_COMPOST_ITEM_ID, h.pid)).toBe(0);
+    expect(eventsOf(h.sim, from, 'farmHusksConverted')).toEqual([]);
+    // Anti-vacuous: alive again, the same bags convert.
+    h.sim.player.dead = false;
+    convert();
+    expect(h.sim.countItem(FARM_COMPOST_ITEM_ID, h.pid)).toBe(1);
+  });
+
+  it('needs no bed, no range and no cast: the location gate is the documented Phase 9 deferral', () => {
+    // The permissive gate, exercised rather than assumed: standing nowhere
+    // near a farm, mid-cast, the trade still lands. The go-live phase adds
+    // the farmer-NPC range arm and flips this arm with it.
+    h.sim.player.pos.x += 500;
+    h.sim.player.pos.z += 500;
+    giveSeeds(h);
+    h.sim.addItem(FARM_WITHERED_HUSK_ITEM_ID, FARM_HUSKS_PER_COMPOST, h.pid);
+    h.sim.player.castingAbility = FARMING_CAST_ID;
+    h.sim.player.castRemaining = 1;
+    convert();
+    expect(h.sim.countItem(FARM_COMPOST_ITEM_ID, h.pid)).toBe(1);
+  });
+});
+
 describe('THE ANTI-CHORE INVARIANT: nothing rots', () => {
   it('pays a harvest N hours late EXACTLY what an on-time harvest pays', () => {
     const onTime = makeHarness(1234);
@@ -1262,6 +1361,19 @@ describe('the Sim delegates', () => {
     expect(() => h.sim.plantCrop(BED, CROP_ID, 987_654)).not.toThrow();
     expect(() => h.sim.harvestCrop(BED, 987_654)).not.toThrow();
     expect(h.meta.farmPlots.size).toBe(0);
+  });
+
+  it('forwards convertHusks, and no-ops on an unknown pid', () => {
+    const h = makeHarness();
+    h.sim.addItem(FARM_WITHERED_HUSK_ITEM_ID, FARM_HUSKS_PER_COMPOST, h.pid);
+    // The unknown pid FIRST, while the husks are still in the bags: after the
+    // real call there is nothing left to convert, so ordering it second would
+    // prove nothing.
+    expect(() => h.sim.convertHusks(987_654)).not.toThrow();
+    expect(h.sim.countItem(FARM_COMPOST_ITEM_ID, h.pid)).toBe(0);
+    h.sim.convertHusks(h.pid);
+    expect(h.sim.countItem(FARM_COMPOST_ITEM_ID, h.pid)).toBe(1);
+    expect(h.sim.countItem(FARM_WITHERED_HUSK_ITEM_ID, h.pid)).toBe(0);
   });
 });
 

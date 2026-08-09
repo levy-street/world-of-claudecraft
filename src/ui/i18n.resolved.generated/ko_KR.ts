@@ -2731,8 +2731,11 @@ export const ko_KR: EnTranslations = {
         "skill": "그 작물을 재배하기에는 농사 숙련도가 부족합니다.",
         "no_seed": "그 작물의 씨앗이 없습니다.",
         "not_ready": "그 작물은 아직 자라는 중입니다.",
-        "no_plot": "그 밭에는 아무것도 심겨 있지 않습니다."
-      }
+        "no_plot": "그 밭에는 아무것도 심겨 있지 않습니다.",
+        "no_husks": "시든 껍질이 부족합니다."
+      },
+      "husksConvertedLine": "시든 껍질 {husks}개를 {name}(으)로 교환했습니다.",
+      "husksConvertedLineQty": "시든 껍질 {husks}개를 {name} x{qty}(으)로 교환했습니다."
     },
     "archetypeTitle": {
       "label": "칭호",
@@ -11227,6 +11230,12 @@ export const ko_KR: EnTranslations = {
       },
       "withered_husks": {
         "name": "시든 껍질"
+      },
+      "compost": {
+        "name": "Compost"
+      },
+      "growth_tonic": {
+        "name": "Growth Tonic"
       },
       "conjured_water4": {
         "name": "창조된 샘물"

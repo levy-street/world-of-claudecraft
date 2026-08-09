@@ -2431,6 +2431,8 @@ const ITEM_ENTITY_IDS = [
   'vale_wheat',
   'fine_vale_wheat',
   'withered_husks',
+  'compost',
+  'growth_tonic',
 ] as const;
 
 type ItemEntityId = (typeof ITEM_ENTITY_IDS)[number];
@@ -2565,6 +2567,11 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   vale_wheat: 'Vale Wheat',
   fine_vale_wheat: 'Fine Vale Wheat',
   withered_husks: 'Withered Husks',
+  // The knobs phase's two plant-time supplies, same treatment and the same
+  // stay-in-step rule against the ItemDef `name` fields. IP-safe per D17:
+  // plain real words, no coined compost grades borrowed from other games.
+  compost: 'Compost',
+  growth_tonic: 'Growth Tonic',
 };
 
 function itemTranslations(names: readonly string[]): ItemEntityTranslations {

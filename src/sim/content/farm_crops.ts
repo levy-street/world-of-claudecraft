@@ -110,15 +110,27 @@ export const FARM_CROP_IDS: ReadonlySet<string> = new Set(Object.keys(FARM_CROPS
 // its header bans. professions/farming.ts re-exports it for its own callers.
 export const FARM_WITHERED_HUSK_ITEM_ID = 'withered_husks';
 
-// Everything a farming cycle can put in a player's bags: the seed a plant
-// consumes, the produce a harvest grants, its fine twin, and the husks a
-// failure pays. Derived from the catalog, so the crop-ladder phase's seven
-// remaining crops self-register with no edit here.
+// The two plant-time knob supplies (the knobs phase). They live HERE in the
+// content layer, like the husk id above, so the material taxonomy can read
+// them as data without importing the engine module that consumes them.
+export const FARM_COMPOST_ITEM_ID = 'compost';
+export const FARM_GROWTH_TONIC_ITEM_ID = 'growth_tonic';
+export const FARM_SUPPLY_ITEM_IDS: readonly string[] = [
+  FARM_COMPOST_ITEM_ID,
+  FARM_GROWTH_TONIC_ITEM_ID,
+];
+
+// Everything a farming cycle can put in a player's bags or take out of them:
+// the seed a plant consumes, the produce a harvest grants, its fine twin, the
+// husks a failure pays, and the two knob supplies a plant can consume. Derived
+// from the catalog, so the crop-ladder phase's seven remaining crops
+// self-register with no edit here.
 //
 // This is the material taxonomy's farming source (see that module): farm
-// yields are materials for the same reason node yields are, and seeds are the
-// tradeable input side of the same loop.
+// yields are materials for the same reason node yields are, and the seeds and
+// knob supplies are the tradeable input side of the same loop.
 export const FARM_MATERIAL_ITEM_IDS: readonly string[] = [
   ...Object.values(FARM_CROPS).flatMap((c) => [c.seedItemId, c.produceItemId, c.fineProduceItemId]),
   FARM_WITHERED_HUSK_ITEM_ID,
+  ...FARM_SUPPLY_ITEM_IDS,
 ];

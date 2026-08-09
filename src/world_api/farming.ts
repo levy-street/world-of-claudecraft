@@ -4,9 +4,10 @@ import type { FarmPlotStatus, FarmPlotView } from '../sim/professions/farm_proje
 export type { FarmPatchDef, FarmPlotStatus, FarmPlotView };
 
 // Farming, the fifth gathering profession: the static garden-bed geography
-// plus the caller's OWN plot state, and the two growth-phase commands that
-// mutate it. The knob commands (compost, farmer's watch, growth tonic) land
-// in the knobs phase, so nothing but plant and harvest belongs here yet.
+// plus the caller's OWN plot state, and the commands that mutate it (plant,
+// harvest, and the knobs phase's husk conversion; the plant-time knobs
+// themselves ride plantCrop's payload rather than commands of their own,
+// because every choice is front-loaded at plant time per D8).
 //
 // THE WIRE PROJECTION NEVER CARRIES THE HIDDEN OUTCOME SLOTS OR THE YIELD
 // SEED. A plot's survival outcome and yield are pre-rolled server secrets
@@ -56,4 +57,12 @@ export interface IWorldFarming {
   // be re-rolled by replaying the command: the pre-roll happened at plant
   // time and the plot is gone once this resolves.
   harvestCrop(bedId: string): void;
+  // Trade withered husks for compost at the sim's fixed ratio
+  // (FARM_HUSKS_PER_COMPOST): failure turned into the next attempt's
+  // insurance. One call converts EVERY complete batch in the caller's bags;
+  // the remainder stays. Carries NO payload: the ratio, the batch count and
+  // both item ids resolve server-side from the sender's own bags, so there is
+  // nothing to forge. The location gate is deliberately permissive until the
+  // go-live phase ships the farmer NPCs, which add the NPC range arm.
+  convertHusks(): void;
 }

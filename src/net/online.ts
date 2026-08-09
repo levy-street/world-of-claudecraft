@@ -4384,6 +4384,9 @@ export class ClientWorld implements IWorld {
   harvestCrop(bedId: string): void {
     this.cmd({ cmd: 'harvest_crop', bed: bedId });
   }
+  convertHusks(): void {
+    this.cmd({ cmd: 'convert_husks' });
+  }
   chat(text: string): void {
     this.cmd({ cmd: 'chat', text });
   }

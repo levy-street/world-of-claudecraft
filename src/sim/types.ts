@@ -5695,10 +5695,20 @@ export type SimEvent = { pid?: number } & (
         | 'skill'
         | 'no_seed'
         | 'not_ready'
-        | 'no_plot';
+        | 'no_plot'
+        // The knobs phase, appended (wire enums are never reordered):
+        // convert_husks with fewer husks than one batch costs.
+        | 'no_husks';
       bedId?: string;
       cropId?: string;
     }
+  // Farming: withered husks were traded for compost (the knobs phase's
+  // convert_husks command). Personal and text-free (the gatherResult idiom):
+  // `husks` is what left the bags and `compost` what arrived, so the client
+  // composes its one localized line off the counts. The compost grant itself
+  // rides the hub loot event with the silent/callerLogs flags, exactly like a
+  // harvest grant, so this event owns both halves of the feedback.
+  | { type: 'farmHusksConverted'; pid: number; husks: number; compost: number }
 );
 
 export interface MoveInput {

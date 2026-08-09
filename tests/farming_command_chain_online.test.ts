@@ -163,6 +163,20 @@ describe('ClientWorld emits the farming frames the protocol declares', () => {
     });
   });
 
+  it('convertHusks sends convert_husks with NO payload beyond the frame chrome', () => {
+    withClient((world, sock) => {
+      world.convertHusks();
+
+      const frames = commandFrames(sock, 'convert_husks');
+      expect(frames).toHaveLength(1);
+      // Exhaustive: the ratio, the batch count and both item ids resolve
+      // sim-side from the sender's own bags, so an EXTRA field here would be
+      // a client trying to choose its own trade.
+      expect(Object.keys(frames[0]).sort()).toEqual(['cmd', 't']);
+      expect(frames[0]).toEqual({ t: 'cmd', cmd: 'convert_husks' });
+    });
+  });
+
   it('predicts nothing locally: the plot mirror is untouched until the server answers', () => {
     withClient((world, sock) => {
       world.plantCrop(BED, CROP);
@@ -179,19 +193,21 @@ describe('ClientWorld emits the farming frames the protocol declares', () => {
 });
 
 describe('the captured client frames reach the sim through the real dispatch', () => {
-  it('routes plant_crop and harvest_crop to the Sim with the ids the client sent', () => {
+  it('routes plant_crop, harvest_crop and convert_husks to the Sim with what the client sent', () => {
     const rawFrames: string[] = [];
     withClient((world, sock) => {
       world.plantCrop(BED, CROP);
       world.harvestCrop(BED);
+      world.convertHusks();
       rawFrames.push(...sock.sent);
     });
-    expect(rawFrames).toHaveLength(2);
+    expect(rawFrames).toHaveLength(3);
 
     const server = new GameServer();
     const session = joinServer(server, 1, 'Rowan');
     const plantSpy = vi.spyOn(server.sim, 'plantCrop').mockImplementation(() => {});
     const harvestSpy = vi.spyOn(server.sim, 'harvestCrop').mockImplementation(() => {});
+    const convertSpy = vi.spyOn(server.sim, 'convertHusks').mockImplementation(() => {});
 
     // Verbatim: the client's own bytes, never a frame written by this test.
     for (const raw of rawFrames) server.handleMessage(session, raw);
@@ -200,6 +216,8 @@ describe('the captured client frames reach the sim through the real dispatch', (
     expect(plantSpy).toHaveBeenCalledWith(BED, CROP, session.pid);
     expect(harvestSpy).toHaveBeenCalledTimes(1);
     expect(harvestSpy).toHaveBeenCalledWith(BED, session.pid);
+    expect(convertSpy).toHaveBeenCalledTimes(1);
+    expect(convertSpy).toHaveBeenCalledWith(session.pid);
     vi.restoreAllMocks();
   });
 
@@ -505,6 +523,41 @@ describe('the four farm events reach the actor, and only the actor', () => {
       session,
       JSON.stringify({ t: 'cmd', cmd: 'plant_crop', bed: 'bed_eastbrook_2', crop: CROP }),
     );
+    routeTick(server);
+    expect(farmEvents(fc.sent, 'farmDenied')).toHaveLength(1);
+    expect(farmEvents(bystanderFc.sent, 'farmDenied')).toHaveLength(0);
+  });
+
+  it('delivers farmHusksConverted to the trader, never to a bystander', () => {
+    // The knobs phase's fifth farm event, over the same live routing path as
+    // the four above: without this arm a suppression filter could mute the
+    // trade's only feedback line while every sim-level pin stayed green.
+    const server = new GameServer();
+    const { session, fc } = joinWithSocket(server, 1, 'Trader');
+    const { fc: bystanderFc } = joinWithSocket(server, 2, 'Bystander');
+    const pid = session.pid as number;
+    server.sim.addItem('withered_husks', 2, pid);
+    // Flush the setup grant's own loot event before measuring (the fixture
+    // vacuity discipline the HEAVY_SELF arms above document).
+    routeTick(server);
+    fc.sent.length = 0;
+    bystanderFc.sent.length = 0;
+
+    server.handleMessage(session, JSON.stringify({ t: 'cmd', cmd: 'convert_husks' }));
+    routeTick(server);
+    const events = farmEvents(fc.sent, 'farmHusksConverted');
+    expect(events).toHaveLength(1);
+    expect(events[0].pid).toBe(pid);
+    expect(farmEvents(bystanderFc.sent, 'farmHusksConverted')).toHaveLength(0);
+    // The trade really happened on the authoritative bags, so the delivery
+    // above is a real event and not a stray echo.
+    expect(server.sim.countItem('compost', pid)).toBe(1);
+    expect(server.sim.countItem('withered_husks', pid)).toBe(0);
+
+    // And the refusal twin through the same path: a second convert with an
+    // empty pouch answers with the pid-scoped farmDenied.
+    fc.sent.length = 0;
+    server.handleMessage(session, JSON.stringify({ t: 'cmd', cmd: 'convert_husks' }));
     routeTick(server);
     expect(farmEvents(fc.sent, 'farmDenied')).toHaveLength(1);
     expect(farmEvents(bystanderFc.sent, 'farmDenied')).toHaveLength(0);

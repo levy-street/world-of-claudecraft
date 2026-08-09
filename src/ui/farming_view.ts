@@ -81,3 +81,13 @@ export function farmWitheredLineKey(count: number | undefined): TranslationKey {
     ? 'hudChrome.farming.witheredLineQty'
     : 'hudChrome.farming.witheredLine';
 }
+
+/** The line the husk trade renders (the knobs phase's convert_husks command):
+ *  the quantity split keys on the COMPOST granted, the grant side of the
+ *  trade, matching every other grant-line family; the husks spent splice into
+ *  the line as their own token either way. */
+export function farmHusksConvertedLineKey(compost: number | undefined): TranslationKey {
+  return isMultiUnitGrant(compost)
+    ? 'hudChrome.farming.husksConvertedLineQty'
+    : 'hudChrome.farming.husksConvertedLine';
+}

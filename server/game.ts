@@ -822,6 +822,18 @@ const HEAVY_SELF_CMDS = new Set<string>([
   // receipt regardless of outcome).
   'plant_crop',
   'harvest_crop',
+  // The knobs phase's husk conversion, the same belt-and-braces trade as the
+  // pair above: a SUCCESSFUL conversion touches bags in both directions
+  // (husks out through ctx.removeItem, compost in through ctx.addItem), so
+  // wireRev already guarantees freshness on the path that changes anything,
+  // and the loot event the compost grant rides is a HEAVY_SELF_EVENTS member
+  // on top. The entry keeps the guarantee LOCAL to the command per the
+  // ledgered comment above; the cost is one spurious heavy re-serialize per
+  // refused conversion, the same trade every member here makes. NOTE: the
+  // PLANT-TIME KNOBS need no entry of their own because they are not
+  // commands: they ride plant_crop's payload, whose membership already marks
+  // on receipt, and a paid knob spends items (wireRev again).
+  'convert_husks',
   'loot',
   'harvestCorpse',
   'pickup',
@@ -6750,6 +6762,13 @@ export class GameServer {
         if (typeof msg.bed === 'string') {
           sim.harvestCrop(msg.bed, pid);
         }
+        break;
+      case 'convert_husks':
+        // Farming's knobs phase: trade withered husks for compost. NO payload
+        // to guard: the ratio, the batch count and both item ids resolve
+        // sim-side from the sender's own bags, and the refusal (too few
+        // husks) answers with the pid-scoped text-free farmDenied event.
+        sim.convertHusks(pid);
         break;
       case 'sell_all_junk':
         sim.sellAllJunk(pid);
