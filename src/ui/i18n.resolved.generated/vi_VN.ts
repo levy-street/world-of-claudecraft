@@ -2824,8 +2824,7 @@ export const vi_VN: EnTranslations = {
       "requiresTool": {
         "mining": "Cần cuốc khai khoáng",
         "logging": "Cần rìu đốn gỗ",
-        "herbalism": "Cần liềm thảo dược",
-        "farming": "Requires a farming hoe"
+        "herbalism": "Cần liềm thảo dược"
       },
       "toolTierUnmet": {
         "mining": "Bạn cần cuốc khai khoáng bậc {tier} để khai thác mạch này.",
@@ -3030,7 +3029,7 @@ export const vi_VN: EnTranslations = {
           "artisansEye": "Nâng bậc thu hoạch thêm 1 bậc công cụ trong khi còn nạp.",
           "quickeningCharm": "Rút ngắn thời gian hồi sinh của điểm tài nguyên mà nó kích hoạt."
         },
-        "howToSlot": "Gắn vào công cụ khai khoáng, đốn gỗ, hoặc thảo dược từ cửa sổ Nghề Nghiệp. Bị tiêu hao khi gắn.",
+        "howToSlot": "Gắn vào công cụ khai khoáng, đốn gỗ, thảo dược, hoặc nông nghiệp từ cửa sổ Nghề Nghiệp. Bị tiêu hao khi gắn.",
         "charges": "Bắt đầu với {base} lượt nạp trên một công cụ phổ thông (+{bonus} mỗi bậc hiếm).",
         "landOnly": "Không thể gắn vào cần câu.",
         "openProfessions": "Mở Nghề Nghiệp để gắn cái này vào một công cụ thu thập."

@@ -285,7 +285,7 @@ import {
 import { ERROR_LOG_COLOR, shouldMirrorErrorToast } from './error_toast_log';
 import { esc } from './esc';
 import {
-  farmDeniedLineKey,
+  farmDeniedToast,
   farmFineLineKey,
   farmHarvestLineKey,
   farmHusksConvertedLineKey,
@@ -11972,8 +11972,19 @@ export class Hud {
         case 'farmDenied': {
           // A refused plant, harvest or husk trade: an error toast ONLY, no
           // line, no cue, no other state (the gatherDenied pattern). The sim
-          // event is text-free, so the pure core resolves one key per reason.
-          this.showError(t(farmDeniedLineKey(ev.reason)));
+          // event is text-free, so the pure core resolves the key, and for
+          // the 'tool' reason also the tier the refused crop demands (the
+          // tierRequired.farming line, node-path parity), which is formatted
+          // HERE because the pure core stays formatter-free.
+          const toast = farmDeniedToast(ev.reason, ev.cropId);
+          this.showError(
+            t(
+              toast.key,
+              toast.params
+                ? { tier: formatNumber(toast.params.tier, { maximumFractionDigits: 0 }) }
+                : undefined,
+            ),
+          );
           break;
         }
         case 'farmHusksConverted': {

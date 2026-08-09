@@ -444,7 +444,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectTooltip.charges':
     'Börjar med {base} laddningar på ett vanligt verktyg (+{bonus} per sällsynthetssteg).',
   'hudChrome.professions.toolEffectTooltip.howToSlot':
-    'Montera på ett gruv-, skogsavverknings- eller örtinsamlingsverktyg från Yrkesfönstret. Förbrukas när den monteras.',
+    'Montera på ett gruv-, skogsavverknings-, örtinsamlings- eller jordbruksverktyg från Yrkesfönstret. Förbrukas när den monteras.',
   'hudChrome.professions.toolEffectTooltip.kind': 'Verktygsamulett',
   'hudChrome.professions.toolEffectTooltip.landOnly': 'Kan inte monteras på fiskespön.',
   'hudChrome.professions.toolEffectTooltip.openProfessions':

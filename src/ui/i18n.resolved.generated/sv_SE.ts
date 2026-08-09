@@ -2824,8 +2824,7 @@ export const sv_SE: EnTranslations = {
       "requiresTool": {
         "mining": "Kräver en gruvhacka",
         "logging": "Kräver en skogsavverkningsyxa",
-        "herbalism": "Kräver en örtinsamlingsskära",
-        "farming": "Requires a farming hoe"
+        "herbalism": "Kräver en örtinsamlingsskära"
       },
       "toolTierUnmet": {
         "mining": "Du behöver en tier {tier} gruvhacka för att bryta den här ådern.",
@@ -3030,7 +3029,7 @@ export const sv_SE: EnTranslations = {
           "artisansEye": "Höjer skördegraden med en verktygsnivå medan den är laddad.",
           "quickeningCharm": "Förkortar återspawningstiden för noden den utlöses på."
         },
-        "howToSlot": "Montera på ett gruv-, skogsavverknings- eller örtinsamlingsverktyg från Yrkesfönstret. Förbrukas när den monteras.",
+        "howToSlot": "Montera på ett gruv-, skogsavverknings-, örtinsamlings- eller jordbruksverktyg från Yrkesfönstret. Förbrukas när den monteras.",
         "charges": "Börjar med {base} laddningar på ett vanligt verktyg (+{bonus} per sällsynthetssteg).",
         "landOnly": "Kan inte monteras på fiskespön.",
         "openProfessions": "Öppna Yrken för att montera detta på ett insamlingsverktyg."

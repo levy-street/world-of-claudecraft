@@ -8901,7 +8901,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.requiresTool.mining': 'Требуется шахтерская кирка',
   'hudChrome.gathering.requiresTool.logging': 'Требуется лесорубный топор',
   'hudChrome.gathering.requiresTool.herbalism': 'Требуется серп травника',
-  'hudChrome.gathering.requiresTool.farming': 'Требуется мотыга земледельца',
   'hudChrome.gathering.toolRequired.mining': 'Чтобы разработать эту жилу, нужна шахтерская кирка.',
   'hudChrome.gathering.toolRequired.logging':
     'Чтобы срубить этот древостой, нужен лесорубный топор.',

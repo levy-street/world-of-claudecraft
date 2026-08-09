@@ -450,7 +450,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectTooltip.charges':
     'Zaczyna z {base} ładunkami na pospolitym narzędziu (+{bonus} za każdy stopień rzadkości).',
   'hudChrome.professions.toolEffectTooltip.howToSlot':
-    'Osadź na narzędziu górniczym, drwalskim lub zielarskim w oknie Profesji. Zużywa się przy osadzeniu.',
+    'Osadź na narzędziu górniczym, drwalskim, zielarskim lub rolniczym w oknie Profesji. Zużywa się przy osadzeniu.',
   'hudChrome.professions.toolEffectTooltip.kind': 'Talizman narzędzia',
   'hudChrome.professions.toolEffectTooltip.landOnly': 'Nie osadza się na wędkach.',
   'hudChrome.professions.toolEffectTooltip.openProfessions':

@@ -462,7 +462,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectTooltip.charges':
     'Começa com {base} cargas em uma ferramenta comum (+{bonus} por degrau de raridade).',
   'hudChrome.professions.toolEffectTooltip.howToSlot':
-    'Encaixe em uma ferramenta de mineração, lenharia ou herborismo pela janela de Profissões. Consumido ao ser encaixado.',
+    'Encaixe em uma ferramenta de mineração, lenharia, herborismo ou agricultura pela janela de Profissões. Consumido ao ser encaixado.',
   'hudChrome.professions.toolEffectTooltip.kind': 'Amuleto de ferramenta',
   'hudChrome.professions.toolEffectTooltip.landOnly': 'Não se encaixa em varas de pesca.',
   'hudChrome.professions.toolEffectTooltip.openProfessions':

@@ -2824,8 +2824,7 @@ export const en_XA: EnTranslations = {
       "requiresTool": {
         "mining": "[Ŕéɋúíŕéš á ɱíñíñĝ þíçķ]",
         "logging": "[Ŕéɋúíŕéš á ļóĝĝíñĝ áẋé]",
-        "herbalism": "[Ŕéɋúíŕéš á ĥéŕƀáļíšɱ šíçķļé]",
-        "farming": "[Ŕéɋúíŕéš á ƒáŕɱíñĝ ĥóé]"
+        "herbalism": "[Ŕéɋúíŕéš á ĥéŕƀáļíšɱ šíçķļé]"
       },
       "toolTierUnmet": {
         "mining": "[Ýóú ñééð á ţíéŕ {tier} ɱíñíñĝ þíçķ ţó ĥáŕʋéšţ ţĥíš ʋéíñ.]",

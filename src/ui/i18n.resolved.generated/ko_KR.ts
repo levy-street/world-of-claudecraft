@@ -2824,8 +2824,7 @@ export const ko_KR: EnTranslations = {
       "requiresTool": {
         "mining": "채광 곡괭이 필요",
         "logging": "벌목 도끼 필요",
-        "herbalism": "약초 낫 필요",
-        "farming": "농사 괭이 필요"
+        "herbalism": "약초 낫 필요"
       },
       "toolTierUnmet": {
         "mining": "이 광맥을 캐려면 {tier}티어 채광 곡괭이가 필요합니다.",

@@ -6788,9 +6788,11 @@ export class GameServer {
         // definition of legality, and it re-validates the bed id against
         // FARM_BED_IDS, the crop id against the crop catalog, that the bed is
         // free for THIS player, the skill threshold, the seed in the
-        // sender's own bags, and that every REQUESTED knob can be paid from
-        // those bags (the hoe-tier gate is deferred to the crop-ladder
-        // phase). Nothing here normalizes or defaults an
+        // sender's own bags, that every REQUESTED knob can be paid from
+        // those bags, and the hoe gate (step 12 in plantCrop: the
+        // wield-filtered hoe tier via bestWieldableGatherToolTierOrNone must
+        // cover the crop's tier, refused as farmDenied reason 'tool').
+        // Nothing here normalizes or defaults an
         // id, for the slot_tool_effect reason above: laundering an unknown id
         // would hand the sim a value it never saw and make the two hosts
         // disagree about the same message. Every refusal answers with a

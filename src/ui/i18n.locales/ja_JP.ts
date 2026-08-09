@@ -8738,7 +8738,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.requiresTool.mining': '採掘ピッケルが必要',
   'hudChrome.gathering.requiresTool.logging': '伐採斧が必要',
   'hudChrome.gathering.requiresTool.herbalism': '薬草鎌が必要',
-  'hudChrome.gathering.requiresTool.farming': '農耕鍬が必要',
   'hudChrome.gathering.toolRequired.mining': 'この鉱脈を採掘するには採掘ピッケルが必要です。',
   'hudChrome.gathering.toolRequired.logging': 'この立木を伐り倒すには伐採斧が必要です。',
   'hudChrome.gathering.toolRequired.herbalism': 'この群生地を採取するには薬草鎌が必要です。',

@@ -2824,8 +2824,7 @@ export const es: EnTranslations = {
       "requiresTool": {
         "mining": "Requiere un pico de minero",
         "logging": "Requiere un hacha de leñador",
-        "herbalism": "Requiere una hoz de herborista",
-        "farming": "Requires a farming hoe"
+        "herbalism": "Requiere una hoz de herborista"
       },
       "toolTierUnmet": {
         "mining": "Necesitas un pico de minería de nivel {tier} para extraer esta veta.",
@@ -3030,7 +3029,7 @@ export const es: EnTranslations = {
           "artisansEye": "Aumenta la calidad de recolección en 1 nivel de herramienta mientras está cargado.",
           "quickeningCharm": "Acorta el tiempo de reaparición del nodo que provoca."
         },
-        "howToSlot": "Colócalo en una herramienta de minería, tala o herboristería desde la ventana de Profesiones. Se consume al colocarlo.",
+        "howToSlot": "Colócalo en una herramienta de minería, tala, herboristería o agricultura desde la ventana de Profesiones. Se consume al colocarlo.",
         "charges": "Empieza con {base} cargas en una herramienta común (+{bonus} por nivel de rareza).",
         "landOnly": "No se coloca en cañas de pescar.",
         "openProfessions": "Abre Profesiones para colocar esto en una herramienta de recolección."

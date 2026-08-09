@@ -644,12 +644,16 @@ describe('coverage: each scenario fires its subsystem', () => {
     expect(convertedEv[0].husks).toBe(2);
     expect(convertedEv[0].compost).toBe(1);
 
-    // The tier-3 harvest: whatever band the shared stream yielded is the
-    // recorded truth, so the pins are CONSISTENCY, never a band literal: the
-    // event's seedBackCount (present only when positive) must equal the
-    // highland_barley_seed bag delta (the drive granted 1 seed and the plant
-    // spent it, so the final bag IS the seed-back), and the base/fine grants
-    // must match their bags the same way.
+    // The tier-3 harvest. The band is pinned as a LITERAL, the drawsAt style
+    // above: seedBackCount 1 (the one-seed band) is the recorded truth of the
+    // committed farming_session golden, so it moves only with a deliberate
+    // re-record, never silently. The tolerant toContain([0, 1, 2]) shape this
+    // replaces would have let the grant half of the beat go vacuous (a
+    // seed-back that stopped paying still satisfied it). The bag consistency
+    // arm stays: the event's count must equal the highland_barley_seed bag
+    // delta (the drive granted 1 seed and the plant spent it, so the final
+    // bag IS the seed-back), and the base/fine grants must match their bags
+    // the same way.
     const countOf = (itemId: string): number =>
       meta.inventory
         .filter((s: any) => s.itemId === itemId)
@@ -658,8 +662,7 @@ describe('coverage: each scenario fires its subsystem', () => {
     expect(barleyEv.bedId).toBe('bed_thornpeak_1');
     expect(barleyEv.cropId).toBe('highland_barley');
     const seedBack = (barleyEv.seedBackCount as number | undefined) ?? 0;
-    expect([0, 1, 2]).toContain(seedBack);
-    if ('seedBackCount' in barleyEv) expect(seedBack).toBeGreaterThan(0); // omit-zero
+    expect(seedBack).toBe(1);
     expect(countOf('highland_barley_seed')).toBe(seedBack);
     expect(countOf(barleyEv.itemId)).toBe(barleyEv.count);
     if (barleyEv.fineItemId !== undefined) {

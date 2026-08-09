@@ -224,10 +224,10 @@ export function farmingHarvestGain(proficiency: number): number {
  *  schedule's own row boundaries rather than a second constant set, so the two
  *  halves of the model cannot drift (the fishingTeachingCeilingFor template).
  *  Tier 1 teaches through the first two rows and grays at 50, tier 2 to 75,
- *  tier 3 and up to the cap. The consequence THIS PHASE, and it is deliberate:
- *  vale_wheat is the only shipped crop, so farming proficiency stops at 50
- *  until the crop-ladder phase authors tier 2, exactly as tier-1 water once
- *  capped an angler. */
+ *  tier 3 and up to the cap of 100. The crop-ladder phase shipped all eight
+ *  crops (two per tier, farm_crops.ts), so every ceiling is reachable in
+ *  live content: a farmer climbs off tier-1 crops at 50 and off tier-2 at
+ *  75, exactly as an angler climbs the water tiers. */
 export function farmingTeachingCeilingFor(cropTier: number): number {
   const row = Math.max(1, Math.min(cropTier, FARMING_GAIN_SCHEDULE.length - 1));
   return FARMING_GAIN_SCHEDULE[row].belowProficiency;

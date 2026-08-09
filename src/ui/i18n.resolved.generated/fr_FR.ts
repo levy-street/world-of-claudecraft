@@ -2824,8 +2824,7 @@ export const fr_FR: EnTranslations = {
       "requiresTool": {
         "mining": "Nécessite un pic de mineur",
         "logging": "Nécessite une hache de bûcheron",
-        "herbalism": "Nécessite une serpe d'herboristerie",
-        "farming": "Requires a farming hoe"
+        "herbalism": "Nécessite une serpe d'herboristerie"
       },
       "toolTierUnmet": {
         "mining": "Vous avez besoin d'un pic de mineur de palier {tier} pour exploiter ce filon.",
@@ -3030,7 +3029,7 @@ export const fr_FR: EnTranslations = {
           "artisansEye": "Augmente la qualité de récolte d'un palier d'outil tant que l'effet est chargé.",
           "quickeningCharm": "Raccourcit le délai de réapparition du nœud qu'il déclenche."
         },
-        "howToSlot": "Sertissez-le sur un outil de Minage, de Bûcheronnage ou d'Herboristerie depuis la fenêtre Métiers. Consommé une fois serti.",
+        "howToSlot": "Sertissez-le sur un outil de Minage, de Bûcheronnage, d'Herboristerie ou d'Agriculture depuis la fenêtre Métiers. Consommé une fois serti.",
         "charges": "Commence avec {base} charges sur un outil commun (+{bonus} par échelon de rareté).",
         "landOnly": "Ne se sertit pas sur les cannes à pêche.",
         "openProfessions": "Ouvrez Métiers pour le sertir sur un outil de récolte."

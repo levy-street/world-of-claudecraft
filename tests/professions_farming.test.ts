@@ -24,6 +24,7 @@ import {
 import { FARM_BED_IDS, farmBedById } from '../src/sim/content/farm_patches';
 import { DEFAULT_MOUNT } from '../src/sim/content/mounts';
 import { TOOL_EFFECTS } from '../src/sim/content/professions';
+import { ITEMS } from '../src/sim/data';
 import { FARM_MAX_GROW_MS } from '../src/sim/professions/farm_persist';
 import type { PlotState } from '../src/sim/professions/farm_projection';
 import {
@@ -59,7 +60,7 @@ import {
   resolveFarmHarvest,
   updateFarming,
 } from '../src/sim/professions/farming';
-import { slotEffect } from '../src/sim/professions/tools';
+import { resolveSlotToolEffect, slotEffect } from '../src/sim/professions/tools';
 import { type CharacterState, type PlayerMeta, Sim } from '../src/sim/sim';
 import { FARMING_CAST_ID, isNonSpellCast, type SimEvent } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
@@ -1487,6 +1488,62 @@ describe('the slotted farming tool effect at harvest (the hoe phase C3 wiring)',
     expect(h.sim.countItem(PRODUCE_ID, h.pid)).toBe(unarmed.count);
     expect(h.sim.countItem(FINE_ID, h.pid)).toBe(unarmed.fine);
     expect(slot.durability).toBe(before);
+  });
+});
+
+describe('the mint refuses a prompt-mode FARMING slot (no confirm channel exists)', () => {
+  // The arm directly above documents WHY: harvest_crop carries no confirm
+  // channel, so `confirmed` is hard false at farming's one apply site and a
+  // prompt slot skips whole, forever. A charm consumed into that slot would
+  // be a dead purchase, so the ONE MINT AUTHORITY (resolveSlotToolEffect)
+  // refuses the pair at the mint with the invalid-request shape it uses for
+  // every never-fires pairing. Both directions pinned, plus the non-farming
+  // control, so neither a blanket prompt refusal nor a blanket farming
+  // refusal can satisfy this block.
+  function bagsWith(h: Harness, ...itemIds: string[]) {
+    for (const itemId of itemIds) h.sim.addItem(itemId, 1, h.pid);
+    return h.meta.inventory;
+  }
+
+  it("refuses prompt on farming, mints 'always' on farming, and keeps prompt on mining", () => {
+    const h = makeHarness();
+    // The harness already granted the garden hoe; the charm and a pick join it.
+    const inventory = bagsWith(h, 'gatherers_cache', 'copper_mining_pick');
+    const prompt = resolveSlotToolEffect(
+      inventory,
+      'farming',
+      'gatherers_cache',
+      'prompt',
+      ITEMS,
+      h.meta.name,
+      undefined,
+    );
+    expect(prompt).toEqual({ ok: false, reason: 'invalid_request' });
+    // 'always' on farming still mints: the refusal is the MODE pairing, not
+    // a farming slot policy (the hoe phase lifted that).
+    const always = resolveSlotToolEffect(
+      inventory,
+      'farming',
+      'gatherers_cache',
+      'always',
+      ITEMS,
+      h.meta.name,
+      undefined,
+    );
+    expect(always.ok).toBe(true);
+    // And prompt on a profession WITH a confirm channel still mints: the
+    // non-farming control that keeps this from passing as a blanket prompt
+    // refusal.
+    const mining = resolveSlotToolEffect(
+      inventory,
+      'mining',
+      'gatherers_cache',
+      'prompt',
+      ITEMS,
+      h.meta.name,
+      undefined,
+    );
+    expect(mining.ok).toBe(true);
   });
 });
 

@@ -3395,17 +3395,22 @@ export const hudChromeStrings = {
       mining: 'Requires a tier {tier} mining pick',
       logging: 'Requires a tier {tier} logging axe',
       herbalism: 'Requires a tier {tier} herbalism sickle',
-      // The hoe phase: the farming requirement line, for any surface naming
-      // the crop-tier hoe demand (the step-12 plant gate).
+      // The farming arm's sink is NOT the node tooltip (farming has no world
+      // nodes): it is the farmDenied 'tool' toast, which names the tier the
+      // refused CROP demands when the event's cropId resolves
+      // (farming_view.ts farmDeniedToast), so the refusal teaches the same
+      // number the node families' hover line does.
       farming: 'Requires a tier {tier} farming hoe',
     },
     // Tooltip requirement line for tier-1 nodes (#2343: every harvest needs a
     // matching tool, bare hands never gather, so tier 1 needs the base tool).
+    // No farming arm: farming has no nodes, so a tierless "requires a hoe"
+    // line has no surface to render on (the tiered toast above covers the
+    // refusal, falling back to hudChrome.farming.denied.tool).
     requiresTool: {
       mining: 'Requires a mining pick',
       logging: 'Requires a logging axe',
       herbalism: 'Requires a herbalism sickle',
-      farming: 'Requires a farming hoe',
     },
     // gatherDenied error toast for a named tier: surface 'node' worded per
     // node family, plus the fishing arm, which is the ZONE rod gate (this

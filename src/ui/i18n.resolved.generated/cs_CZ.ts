@@ -2824,8 +2824,7 @@ export const cs_CZ: EnTranslations = {
       "requiresTool": {
         "mining": "Vyžaduje hornický krumpáč",
         "logging": "Vyžaduje dřevorubeckou sekeru",
-        "herbalism": "Vyžaduje bylinkářský srp",
-        "farming": "Requires a farming hoe"
+        "herbalism": "Vyžaduje bylinkářský srp"
       },
       "toolTierUnmet": {
         "mining": "K vytěžení této žíly potřebuješ krumpáč úrovně {tier}.",
@@ -3030,7 +3029,7 @@ export const cs_CZ: EnTranslations = {
           "artisansEye": "Dokud je nabito, zvyšuje jakost sklizně o 1 stupeň nástroje.",
           "quickeningCharm": "Zkracuje časovač obnovy naleziště, který spustí."
         },
-        "howToSlot": "Vlož do hornického, dřevorubeckého nebo bylinkářského nástroje z okna Profese. Při vložení se spotřebuje.",
+        "howToSlot": "Vlož do hornického, dřevorubeckého, bylinkářského nebo zemědělského nástroje z okna Profese. Při vložení se spotřebuje.",
         "charges": "Na běžném nástroji začíná s {base} nabitími (+{bonus} za každý stupeň vzácnosti).",
         "landOnly": "Nelze vložit do rybářských prutů.",
         "openProfessions": "Otevři Profese a vlož ho do sběračského nástroje."

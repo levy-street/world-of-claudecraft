@@ -2824,8 +2824,7 @@ export const pt_BR: EnTranslations = {
       "requiresTool": {
         "mining": "Requer uma picareta de mineração",
         "logging": "Requer um machado de lenharia",
-        "herbalism": "Requer uma foice de herborismo",
-        "farming": "Requires a farming hoe"
+        "herbalism": "Requer uma foice de herborismo"
       },
       "toolTierUnmet": {
         "mining": "Você precisa de uma picareta de mineração de nível {tier} para extrair este veio.",
@@ -3030,7 +3029,7 @@ export const pt_BR: EnTranslations = {
           "artisansEye": "Aumenta o grau da coleta em 1 nível de ferramenta enquanto estiver carregado.",
           "quickeningCharm": "Encurta o temporizador de regeneração do nó que ele ativa."
         },
-        "howToSlot": "Encaixe em uma ferramenta de mineração, lenharia ou herborismo pela janela de Profissões. Consumido ao ser encaixado.",
+        "howToSlot": "Encaixe em uma ferramenta de mineração, lenharia, herborismo ou agricultura pela janela de Profissões. Consumido ao ser encaixado.",
         "charges": "Começa com {base} cargas em uma ferramenta comum (+{bonus} por degrau de raridade).",
         "landOnly": "Não se encaixa em varas de pesca.",
         "openProfessions": "Abra Profissões para encaixar isto em uma ferramenta de coleta."

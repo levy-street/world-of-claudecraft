@@ -471,7 +471,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectTooltip.charges':
     'Commence avec {base} charges sur un outil commun (+{bonus} par échelon de rareté).',
   'hudChrome.professions.toolEffectTooltip.howToSlot':
-    "Sertissez-le sur un outil de Minage, de Bûcheronnage ou d'Herboristerie depuis la fenêtre Métiers. Consommé une fois serti.",
+    "Sertissez-le sur un outil de Minage, de Bûcheronnage, d'Herboristerie ou d'Agriculture depuis la fenêtre Métiers. Consommé une fois serti.",
   'hudChrome.professions.toolEffectTooltip.kind': "Breloque d'outil",
   'hudChrome.professions.toolEffectTooltip.landOnly': 'Ne se sertit pas sur les cannes à pêche.',
   'hudChrome.professions.toolEffectTooltip.openProfessions':

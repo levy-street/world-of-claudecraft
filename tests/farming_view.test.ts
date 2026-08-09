@@ -4,12 +4,15 @@
 // in tests/gathering_view.test.ts and tests/grant_line_view.test.ts beside the
 // modules that hosted the functions by adjacency).
 
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { ITEMS } from '../src/sim/data';
 import { FARM_HUSKS_PER_COMPOST } from '../src/sim/professions/farming';
 import {
   type FarmDeniedReason,
   farmDeniedLineKey,
+  farmDeniedToast,
   farmFineLineKey,
   farmHarvestLineKey,
   farmHusksConvertedLineKey,
@@ -39,6 +42,7 @@ describe('farmDeniedLineKey', () => {
       'no_compost',
       'no_fee_produce',
       'no_tonic',
+      'tool',
     ];
     const keys = reasons.map((r) => farmDeniedLineKey(r));
     expect(keys).toEqual([
@@ -54,6 +58,7 @@ describe('farmDeniedLineKey', () => {
       'hudChrome.farming.denied.no_compost',
       'hudChrome.farming.denied.no_fee_produce',
       'hudChrome.farming.denied.no_tonic',
+      'hudChrome.farming.denied.tool',
     ]);
     // Every key must actually EXIST: t() throws on an untracked key in test,
     // so this is what a leaf missing from the catalog fails on rather than a
@@ -205,5 +210,106 @@ describe('the farm grant-line selectors', () => {
     ]) {
       expect(farmKeys).not.toContain(shared);
     }
+  });
+});
+
+describe('farmDeniedToast: the tool refusal names the crop tier when it can', () => {
+  it('resolves a known cropId to the tierRequired.farming line with THAT crop tier', () => {
+    // Node-path parity: the same statement a vein's hover line makes about
+    // its pick, delivered as the refusal toast because farming has no node to
+    // hover. The tier comes from the crop record, so a tier-3 refusal names 3.
+    expect(farmDeniedToast('tool', 'highland_barley')).toEqual({
+      key: 'hudChrome.gathering.tierRequired.farming',
+      params: { tier: 3 },
+    });
+    // A tier-1 crop resolves too: the arm keys on the id resolving, never on
+    // the tier being high, and a wrong-tier regression reds on the 1 here
+    // beside the 3 above.
+    expect(farmDeniedToast('tool', 'vale_wheat')).toEqual({
+      key: 'hudChrome.gathering.tierRequired.farming',
+      params: { tier: 1 },
+    });
+    // The line itself renders and names the tier (t() throws on an untracked
+    // key in test, so this also proves the catalog leaf is live again).
+    setLanguage('en');
+    expect(t('hudChrome.gathering.tierRequired.farming', { tier: 3 })).toBe(
+      'Requires a tier 3 farming hoe',
+    );
+  });
+
+  it('falls back to the flat denied.tool line for an unknown or absent cropId', () => {
+    // Content drift between a client and a newer server (the
+    // farmPlantedTokenId degrade case): a cropId the catalog cannot resolve
+    // must not render a tierless template, so the flat line is the honest
+    // fallback. The prototype key rides along because farmCropById guards
+    // with Object.hasOwn.
+    expect(farmDeniedToast('tool', 'not_a_crop')).toEqual({ key: 'hudChrome.farming.denied.tool' });
+    expect(farmDeniedToast('tool', undefined)).toEqual({ key: 'hudChrome.farming.denied.tool' });
+    expect(farmDeniedToast('tool', 'constructor')).toEqual({
+      key: 'hudChrome.farming.denied.tool',
+    });
+    // Every non-tool reason passes through farmDeniedLineKey unchanged, a
+    // resolvable cropId beside it or not: the tier line is the tool arm's alone.
+    expect(farmDeniedToast('no_seed', 'highland_barley')).toEqual({
+      key: 'hudChrome.farming.denied.no_seed',
+    });
+    expect(farmDeniedToast('skill', undefined)).toEqual({ key: 'hudChrome.farming.denied.skill' });
+  });
+});
+
+describe('the hud seed-back render arms (source pin)', () => {
+  // The two seed-back arms live in the hud.ts coordinator's farmHarvested and
+  // farmWithered case bodies, which no jsdom suite drives, so this pins the
+  // source directly (the 'hud composition source pin' precedent in
+  // tests/gather_tool_tooltip.test.ts): each arm calls farmSeedBackLineKey
+  // exactly once, INSIDE a positive seedBackCount guard, in its own case
+  // body. Assertions run on extracted case slices and a brace-matched guard
+  // block, never on whole-file proximity regex; whole-line comments are
+  // stripped first so a commented-out call cannot satisfy the pin.
+  const hudSrc = readFileSync(path.join(__dirname, '../src/ui/hud.ts'), 'utf8').replace(
+    /^\s*\/\/.*$/gm,
+    '',
+  );
+
+  /** The case arm's slice: from its own label to the next case label, with
+   *  both anchors demanded unique so the slice cannot silently widen. */
+  function caseSlice(label: string, nextLabel: string): string {
+    const open = `case '${label}': {`;
+    const close = `case '${nextLabel}': {`;
+    const start = hudSrc.indexOf(open);
+    const end = hudSrc.indexOf(close);
+    expect(start, `case '${label}' exists`).toBeGreaterThan(-1);
+    expect(hudSrc.indexOf(open, start + 1), `case '${label}' appears once`).toBe(-1);
+    expect(end, `case '${nextLabel}' bounds the slice`).toBeGreaterThan(start);
+    return hudSrc.slice(start, end);
+  }
+
+  /** The brace-matched block of the arm's one positive seed-back guard. */
+  function guardBlock(slice: string): string {
+    const guard = 'if (ev.seedBackCount !== undefined && ev.seedBackCount > 0) {';
+    const at = slice.indexOf(guard);
+    expect(at, 'the positive guard exists').toBeGreaterThan(-1);
+    expect(slice.indexOf(guard, at + 1), 'exactly one guard per arm').toBe(-1);
+    let depth = 0;
+    for (let i = slice.indexOf('{', at); i < slice.length; i++) {
+      if (slice[i] === '{') depth += 1;
+      else if (slice[i] === '}') {
+        depth -= 1;
+        if (depth === 0) return slice.slice(at, i + 1);
+      }
+    }
+    throw new Error('unbalanced guard block');
+  }
+
+  it('farmHarvested renders the seed-back line exactly once, under the positive guard', () => {
+    const arm = caseSlice('farmHarvested', 'farmWithered');
+    expect(arm.split('farmSeedBackLineKey(ev.seedBackCount)').length - 1).toBe(1);
+    expect(guardBlock(arm)).toContain('farmSeedBackLineKey(ev.seedBackCount)');
+  });
+
+  it('farmWithered renders the seed-back line exactly once, under the positive guard', () => {
+    const arm = caseSlice('farmWithered', 'farmDenied');
+    expect(arm.split('farmSeedBackLineKey(ev.seedBackCount)').length - 1).toBe(1);
+    expect(guardBlock(arm)).toContain('farmSeedBackLineKey(ev.seedBackCount)');
   });
 });

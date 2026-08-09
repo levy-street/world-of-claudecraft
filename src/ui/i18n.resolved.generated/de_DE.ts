@@ -2824,8 +2824,7 @@ export const de_DE: EnTranslations = {
       "requiresTool": {
         "mining": "Erfordert eine Bergbau-Spitzhacke",
         "logging": "Erfordert eine Holzfäller-Axt",
-        "herbalism": "Erfordert eine Kräuterkunde-Sichel",
-        "farming": "Requires a farming hoe"
+        "herbalism": "Erfordert eine Kräuterkunde-Sichel"
       },
       "toolTierUnmet": {
         "mining": "Du brauchst eine Bergbau-Spitzhacke der Stufe {tier}, um diese Ader abzubauen.",
@@ -3030,7 +3029,7 @@ export const de_DE: EnTranslations = {
           "artisansEye": "Erhöht die Erntegüte um eine Werkzeugstufe, solange aufgeladen.",
           "quickeningCharm": "Verkürzt die Zeit, bis der ausgelöste Knoten nachwächst."
         },
-        "howToSlot": "Auf ein Bergbau-, Holzfäller- oder Kräuterkunde-Werkzeug im Berufe-Fenster einsetzen. Wird beim Einsetzen verbraucht.",
+        "howToSlot": "Auf ein Bergbau-, Holzfäller-, Kräuterkunde- oder Landwirtschafts-Werkzeug im Berufe-Fenster einsetzen. Wird beim Einsetzen verbraucht.",
         "charges": "Startet mit {base} Ladungen auf einem gewöhnlichen Werkzeug (+{bonus} pro Seltenheitsstufe).",
         "landOnly": "Lässt sich nicht auf Angelruten einsetzen.",
         "openProfessions": "Öffne die Berufe, um dies auf ein Sammelwerkzeug einzusetzen."

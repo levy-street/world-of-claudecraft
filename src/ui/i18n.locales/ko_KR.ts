@@ -8720,7 +8720,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.requiresTool.mining': '채광 곡괭이 필요',
   'hudChrome.gathering.requiresTool.logging': '벌목 도끼 필요',
   'hudChrome.gathering.requiresTool.herbalism': '약초 낫 필요',
-  'hudChrome.gathering.requiresTool.farming': '농사 괭이 필요',
   'hudChrome.gathering.toolRequired.mining': '이 광맥을 캐려면 채광 곡괭이가 필요합니다.',
   'hudChrome.gathering.toolRequired.logging': '이 나무를 베려면 벌목 도끼가 필요합니다.',
   'hudChrome.gathering.toolRequired.herbalism': '이 군락을 채집하려면 약초 낫이 필요합니다.',

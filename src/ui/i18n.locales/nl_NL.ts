@@ -455,7 +455,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectTooltip.charges':
     'Begint met {base} ladingen op een gewoon gereedschap (+{bonus} per zeldzaamheidsrang).',
   'hudChrome.professions.toolEffectTooltip.howToSlot':
-    'Plaats op een mijnbouw-, houtkap- of kruidenkundegereedschap vanuit het venster Beroepen. Wordt verbruikt bij plaatsing.',
+    'Plaats op een mijnbouw-, houtkap-, kruidenkunde- of landbouwgereedschap vanuit het venster Beroepen. Wordt verbruikt bij plaatsing.',
   'hudChrome.professions.toolEffectTooltip.kind': 'Gereedschapsbedel',
   'hudChrome.professions.toolEffectTooltip.landOnly': 'Kan niet op hengels worden geplaatst.',
   'hudChrome.professions.toolEffectTooltip.openProfessions':

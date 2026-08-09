@@ -2824,8 +2824,7 @@ export const da_DK: EnTranslations = {
       "requiresTool": {
         "mining": "Kræver en minehakke",
         "logging": "Kræver en skovhuggeøkse",
-        "herbalism": "Kræver en urtesegl",
-        "farming": "Requires a farming hoe"
+        "herbalism": "Kræver en urtesegl"
       },
       "toolTierUnmet": {
         "mining": "Du har brug for en niveau {tier} mineøkse for at høste denne åre.",
@@ -3030,7 +3029,7 @@ export const da_DK: EnTranslations = {
           "artisansEye": "Hæver høstkvaliteten med 1 værktøjsniveau, mens den er opladet.",
           "quickeningCharm": "Forkorter genskabelsestiden for den ressourcekilde, effekten udløses på."
         },
-        "howToSlot": "Sæt den i et minedrifts-, skovhugst- eller urtekundskabsværktøj fra Erhverv-vinduet. Forbruges, når den sættes i.",
+        "howToSlot": "Sæt den i et minedrifts-, skovhugst-, urtekundskabs- eller landbrugsværktøj fra Erhverv-vinduet. Forbruges, når den sættes i.",
         "charges": "Starter med {base} ladninger på et almindeligt værktøj (+{bonus} pr. sjældenhedstrin).",
         "landOnly": "Kan ikke sættes i fiskestænger.",
         "openProfessions": "Åbn Erhverv for at sætte denne i et indsamlingsværktøj."

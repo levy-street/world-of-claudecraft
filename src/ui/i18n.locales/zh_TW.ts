@@ -8336,7 +8336,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.requiresTool.mining': '需要採礦鎬',
   'hudChrome.gathering.requiresTool.logging': '需要伐木斧',
   'hudChrome.gathering.requiresTool.herbalism': '需要草藥鐮',
-  'hudChrome.gathering.requiresTool.farming': '需要耕作鋤',
   'hudChrome.gathering.toolRequired.mining': '你需要採礦鎬才能開採這條礦脈。',
   'hudChrome.gathering.toolRequired.logging': '你需要伐木斧才能砍伐這片林木。',
   'hudChrome.gathering.toolRequired.herbalism': '你需要草藥鐮才能採集這片草藥叢。',

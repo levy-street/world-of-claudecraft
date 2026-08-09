@@ -2824,8 +2824,7 @@ export const zh_TW: EnTranslations = {
       "requiresTool": {
         "mining": "需要採礦鎬",
         "logging": "需要伐木斧",
-        "herbalism": "需要草藥鐮",
-        "farming": "需要耕作鋤"
+        "herbalism": "需要草藥鐮"
       },
       "toolTierUnmet": {
         "mining": "你需要{tier}階採礦鎬才能開採這條礦脈。",

@@ -2824,8 +2824,7 @@ export const it_IT: EnTranslations = {
       "requiresTool": {
         "mining": "Richiede un piccone da estrazione",
         "logging": "Richiede un'ascia da taglio",
-        "herbalism": "Richiede una falce da erbalismo",
-        "farming": "Requires a farming hoe"
+        "herbalism": "Richiede una falce da erbalismo"
       },
       "toolTierUnmet": {
         "mining": "Hai bisogno di un piccone da estrazione di livello {tier} per raccogliere questo filone.",
@@ -3030,7 +3029,7 @@ export const it_IT: EnTranslations = {
           "artisansEye": "Aumenta il grado del raccolto di 1 livello di strumento mentre è carico.",
           "quickeningCharm": "Riduce il tempo di rigenerazione del nodo che attiva."
         },
-        "howToSlot": "Inseriscilo su uno strumento da estrazione mineraria, taglio del legname o erbalismo dalla finestra Professioni. Viene consumato quando inserito.",
+        "howToSlot": "Inseriscilo su uno strumento da estrazione mineraria, taglio del legname, erbalismo o agricoltura dalla finestra Professioni. Viene consumato quando inserito.",
         "charges": "Parte con {base} cariche su uno strumento comune (+{bonus} per ogni gradino di rarità).",
         "landOnly": "Non si inserisce sulle canne da pesca.",
         "openProfessions": "Apri Professioni per inserirlo su uno strumento da raccolta."

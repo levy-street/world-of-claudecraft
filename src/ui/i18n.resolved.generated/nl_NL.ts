@@ -2824,8 +2824,7 @@ export const nl_NL: EnTranslations = {
       "requiresTool": {
         "mining": "Vereist een mijnhouweel",
         "logging": "Vereist een kapbijl",
-        "herbalism": "Vereist een kruidenkunde-sikkel",
-        "farming": "Requires a farming hoe"
+        "herbalism": "Vereist een kruidenkunde-sikkel"
       },
       "toolTierUnmet": {
         "mining": "Je hebt een rang {tier} mijnhouweel nodig om deze ader te oogsten.",
@@ -3030,7 +3029,7 @@ export const nl_NL: EnTranslations = {
           "artisansEye": "Verhoogt de oogstgraad met 1 gereedschapsrang zolang het geladen is.",
           "quickeningCharm": "Verkort de hergroeitijd van het grondstoffenpunt dat het activeert."
         },
-        "howToSlot": "Plaats op een mijnbouw-, houtkap- of kruidenkundegereedschap vanuit het venster Beroepen. Wordt verbruikt bij plaatsing.",
+        "howToSlot": "Plaats op een mijnbouw-, houtkap-, kruidenkunde- of landbouwgereedschap vanuit het venster Beroepen. Wordt verbruikt bij plaatsing.",
         "charges": "Begint met {base} ladingen op een gewoon gereedschap (+{bonus} per zeldzaamheidsrang).",
         "landOnly": "Kan niet op hengels worden geplaatst.",
         "openProfessions": "Open Beroepen om dit op een verzamelgereedschap te plaatsen."

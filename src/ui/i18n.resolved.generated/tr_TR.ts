@@ -2824,8 +2824,7 @@ export const tr_TR: EnTranslations = {
       "requiresTool": {
         "mining": "Madenci kazması gerektirir",
         "logging": "Oduncu baltası gerektirir",
-        "herbalism": "Otçu orağı gerektirir",
-        "farming": "Requires a farming hoe"
+        "herbalism": "Otçu orağı gerektirir"
       },
       "toolTierUnmet": {
         "mining": "Bu damarı işlemek için {tier}. kademe madenci kazmasına ihtiyacınız var.",
@@ -3030,7 +3029,7 @@ export const tr_TR: EnTranslations = {
           "artisansEye": "Şarjlıyken hasat derecesini 1 alet kademesi yükseltir.",
           "quickeningCharm": "Tetiklediği düğüm yeniden oluşma süresini kısaltır."
         },
-        "howToSlot": "Meslekler penceresinden bir madencilik, ağaç kesme ya da bitkicilik aletine yuvala. Yuvalandığında tüketilir.",
+        "howToSlot": "Meslekler penceresinden bir madencilik, ağaç kesme, bitkicilik ya da çiftçilik aletine yuvala. Yuvalandığında tüketilir.",
         "charges": "Sıradan bir alette {base} şarjla başlar (her nadirlik kademesinde +{bonus}).",
         "landOnly": "Olta kamışlarına yuvalanmaz.",
         "openProfessions": "Bunu bir toplama aletine yuvalamak için Meslekler'i aç."

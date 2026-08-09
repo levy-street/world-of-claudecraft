@@ -2824,8 +2824,7 @@ export const en_CA: EnTranslations = {
       "requiresTool": {
         "mining": "Requires a mining pick",
         "logging": "Requires a logging axe",
-        "herbalism": "Requires a herbalism sickle",
-        "farming": "Requires a farming hoe"
+        "herbalism": "Requires a herbalism sickle"
       },
       "toolTierUnmet": {
         "mining": "You need a tier {tier} mining pick to harvest this vein.",

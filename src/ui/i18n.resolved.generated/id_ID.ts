@@ -2824,8 +2824,7 @@ export const id_ID: EnTranslations = {
       "requiresTool": {
         "mining": "Membutuhkan beliung penambangan",
         "logging": "Membutuhkan kapak penebangan",
-        "herbalism": "Membutuhkan sabit herbalisme",
-        "farming": "Requires a farming hoe"
+        "herbalism": "Membutuhkan sabit herbalisme"
       },
       "toolTierUnmet": {
         "mining": "Kamu membutuhkan beliung pertambangan tingkat {tier} untuk memanen urat ini.",
@@ -3030,7 +3029,7 @@ export const id_ID: EnTranslations = {
           "artisansEye": "Meningkatkan mutu panen sebesar 1 tingkat alat selama masih memiliki muatan.",
           "quickeningCharm": "Mempersingkat penghitung waktu munculnya kembali simpul yang dipicunya."
         },
-        "howToSlot": "Pasangkan pada alat Penambangan, Penebangan, atau Herbalisme dari jendela Profesi. Habis terpakai saat dipasang.",
+        "howToSlot": "Pasangkan pada alat Penambangan, Penebangan, Herbalisme, atau Pertanian dari jendela Profesi. Habis terpakai saat dipasang.",
         "charges": "Dimulai dengan {base} muatan pada alat umum (+{bonus} per anak tangga kelangkaan).",
         "landOnly": "Tidak dapat dipasang pada joran pancing.",
         "openProfessions": "Buka Profesi untuk memasangnya pada alat pengumpulan."

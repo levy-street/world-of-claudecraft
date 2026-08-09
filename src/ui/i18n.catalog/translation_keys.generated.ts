@@ -8223,7 +8223,6 @@ export type TranslationKeyFlat =
   | 'hudChrome.gathering.nodeName.ore'
   | 'hudChrome.gathering.nodeName.wood'
   | 'hudChrome.gathering.notReady'
-  | 'hudChrome.gathering.requiresTool.farming'
   | 'hudChrome.gathering.requiresTool.herbalism'
   | 'hudChrome.gathering.requiresTool.logging'
   | 'hudChrome.gathering.requiresTool.mining'

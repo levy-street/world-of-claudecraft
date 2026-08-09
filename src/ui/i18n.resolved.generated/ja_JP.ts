@@ -2824,8 +2824,7 @@ export const ja_JP: EnTranslations = {
       "requiresTool": {
         "mining": "採掘ピッケルが必要",
         "logging": "伐採斧が必要",
-        "herbalism": "薬草鎌が必要",
-        "farming": "農耕鍬が必要"
+        "herbalism": "薬草鎌が必要"
       },
       "toolTierUnmet": {
         "mining": "この鉱脈を採掘するにはティア{tier}の採掘ピッケルが必要です。",

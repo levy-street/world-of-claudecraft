@@ -2824,8 +2824,7 @@ export const pl_PL: EnTranslations = {
       "requiresTool": {
         "mining": "Wymaga kilofa górniczego",
         "logging": "Wymaga siekiery drwala",
-        "herbalism": "Wymaga sierpa zielarskiego",
-        "farming": "Requires a farming hoe"
+        "herbalism": "Wymaga sierpa zielarskiego"
       },
       "toolTierUnmet": {
         "mining": "Potrzebujesz kilofika górniczego {tier} poziomu, by zebrać tę żyłę.",
@@ -3030,7 +3029,7 @@ export const pl_PL: EnTranslations = {
           "artisansEye": "Podnosi gatunek zbioru o 1 poziom narzędzia, gdy naładowane.",
           "quickeningCharm": "Skraca czas odnowienia węzła, który uruchamia."
         },
-        "howToSlot": "Osadź na narzędziu górniczym, drwalskim lub zielarskim w oknie Profesji. Zużywa się przy osadzeniu.",
+        "howToSlot": "Osadź na narzędziu górniczym, drwalskim, zielarskim lub rolniczym w oknie Profesji. Zużywa się przy osadzeniu.",
         "charges": "Zaczyna z {base} ładunkami na pospolitym narzędziu (+{bonus} za każdy stopień rzadkości).",
         "landOnly": "Nie osadza się na wędkach.",
         "openProfessions": "Otwórz Profesje, aby osadzić to na narzędziu zbierackim."
