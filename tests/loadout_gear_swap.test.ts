@@ -335,4 +335,3 @@ describe('the result event describes the swap that actually happened', () => {
     expect(r?.notHeld).toBe(0);
   });
 });
-

@@ -55,12 +55,7 @@ import { ABILITIES } from '../data';
 import { recalcPlayerStats } from '../entity';
 import { itemCopyPin } from '../item_copy_ref';
 import { equipItem as equipItemImpl } from '../items';
-import {
-  buildGearSet,
-  planGearSwap,
-  type SavedGearSet,
-  wornAsBagSlot,
-} from '../loadout_gear';
+import { buildGearSet, planGearSwap, type SavedGearSet, wornAsBagSlot } from '../loadout_gear';
 import { despawnPersistentPet, petOf } from '../pet/pet_commands';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
