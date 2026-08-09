@@ -51,9 +51,11 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // plant_crop and harvest_crop (sow a crop into a garden bed and pull it back
 // out). Both carry ids only: the seed cost, the pre-rolled growth script, the
 // deadline and the yield resolve sim-side, so neither frame has an item payload
-// for a client to forge.
-const EXPECTED_SEND_COUNT = 194;
-const EXPECTED_DISPATCH_COUNT = 207;
+// for a client to forge. Farming's knobs phase adds convert_husks as a third
+// send + dispatch pair (trade withered husks for compost): NO payload at all,
+// the ratio and batch count resolve sim-side from the sender's own bags.
+const EXPECTED_SEND_COUNT = 195;
+const EXPECTED_DISPATCH_COUNT = 208;
 const EXPECTED_DISPATCH_ONLY_COUNT = 13;
 
 // The chat sub-channel routing switch (server/game.ts `switch

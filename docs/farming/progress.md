@@ -12,7 +12,7 @@
 | Phase 2 QA | done (PASS-WITH-FOLLOWUPS) | 2026-08-08 | 2026-08-08 |
 | Phase 3 (growth engine) | done | 2026-08-08 | 2026-08-08 |
 | Phase 3 QA | done | 2026-08-08 | 2026-08-08 |
-| Phase 4 (knobs) | not started | | |
+| Phase 4 (knobs) | done | 2026-08-08 | 2026-08-08 |
 | Phase 4 QA | not started | | |
 | Phase 5 (crops and tools) | not started | | |
 | Phase 5 QA | not started | | |
@@ -575,7 +575,138 @@ per D22 on fix/farming-phase-03-qa):
   whole QA round.
 
 ### Phase 4
-(not started)
+
+Executed 2026-08-08, local-only per D22: branch fix/farming-phase-04-knobs off
+feature/farming-plan, sixth v0.36.0 absorb first (merge da3d1cec4b of tip
+1478f9d2ba, PR 2974 Seeker daily-rewards mobile CSS, empty intersection with
+farming; release-merge-audit clean, parity and snapshots re-proven on the
+merged HEAD). Five commits: 122dd3de56 farming_view extraction, 80f6169435
+items + convertHusks, 5014a395be knob payload + watch fee + tonic arm,
+81d3d2ba00 the test battery, plus the docs commit.
+
+Acceptance criteria (phase-04-knobs.md STEP 5), each with its state:
+
+- [x] compost and growth_tonic exist as plain items with no ItemDef.use,
+      consumed only by command, with the def comment stating the choice;
+      compost carries buyValue 8 (maintainer-flagged), growth_tonic none
+- [x] plantCrop accepts the knob payload; every requested knob is consumed
+      server-side at plant time; an unpayable knob denies the whole plant
+      with nothing consumed and zero draws (check-then-pay atomicity pinned)
+- [x] compost and watch each add 0.10 survival (the shipped [0,1] scale of
+      the phase file's "10 points"), capped at exactly 1, with boundary
+      arms at and above the cap
+- [x] the watch fee predicate is any farming produce of the crop's tier or
+      below (fine twins included, mixed kinds allowed, in the fixed order:
+      lowest tier first, base before fine within a crop); per-tier amounts
+      2/3/4/6 proposed and maintainer-flagged
+- [x] the fee consumption pin proves the exact produce leaves and nothing
+      else moves (plus a mixed fixed-order pin)
+- [x] tonic consumed at plant arms a yield bonus applied at harvest against
+      the stored seed's expansion, with no added draw (one further read of
+      the SAME mulberry32 stream; untoniced path bit-identical, pinned)
+- [x] the draw contract is restated in the farming.ts banner and re-pinned
+      under all eight knob combinations with identical counts
+- [x] convertHusks on IWorldFarming, both worlds, parity pins 306 to 307
+      members and 227 to 228 methods; N = 2 proposed and maintainer-flagged;
+      the permissive gate comment names Phase 9 with no TODO marker
+- [x] all four deny arms tested: no_compost, no_fee_produce, no_tonic (the
+      atomicity arm), and the already-knobbed bed_taken replant
+- [x] every denial rides a stable farmDenied reason (four new leaves with
+      five non-Latin fills each); tests/localization_fixes.test.ts green
+- [x] same-seed determinism pinned, knobless AND fully knobbed sessions
+- [x] the farming_session golden untouched (md5 29a11d98bda17f9c38bd8e9016df7fc7
+      before and after; the scenario was deliberately NOT extended)
+- [x] STEP 3 validation green; node scripts/gate_select.mjs pass recorded in
+      the Phase 4 notes below
+- [x] progress.md and state.md ledgers updated
+
+Notes (the would-be PR body per D22):
+
+PROPOSED CONSTANTS AWAITING THE MAINTAINER, all landed provisional and
+flagged at their definitions:
+- compost: sellValue 2, buyValue 8 (the 4x convention; stocked in Phase 9)
+- growth_tonic: sellValue 6, no buyValue (never vendor-stocked, D9)
+- FARM_HUSKS_PER_COMPOST = 2: one failed crop (2 husks) converts to exactly
+  one compost, value-neutral at the vendor (2x1 copper husks to 1x2 compost)
+- FARM_WATCH_FEE_BY_TIER = 2/3/4/6 produce for tiers 1 to 4 (below the
+  3-pick harvest floor at tier 1, so the watch is never a net produce loss
+  for a fresh farmer)
+- FARM_TONIC_BONUS_CHANCE = 0.5, FARM_TONIC_BONUS_PICKS = 2 (base grade):
+  expected value one extra pick per tonic, "mildly larger" against the
+  floor of 3
+
+DESIGN POINTS WORTH REVIEW: the knob wire fields ride plant_crop only when
+literally true (a plain plant's frame stays byte-identical to the pre-knob
+protocol; absent and false are the same protocol statement, and the dispatch
+refuses present-but-not-boolean per field); every knob gate is a CHECK and
+all payments spend together after the last gate, beside the seed, above the
+unchanged two-draw pre-roll (the atomicity arm pins compost surviving a
+later tonic refusal); the tonic arm reads exactly one further value of the
+stored seed's mulberry32 stream whether or not it wins, so stream position
+depends only on inputs; convertHusks converts EVERY complete batch per call
+and its location gate is deliberately permissive until the Phase 9 farmer
+NPCs land the range arm (comment at the action names the phase).
+
+CENSUS RESTRUCTURE (state.md deviation (w)): the affinity census's
+CONSUMER_DEFERRED_MATERIALS list is replaced by a structural farming
+exemption derived from FARM_MATERIAL_ITEM_IDS, because every farming
+material now has a COMMAND consumer by construction (seeds via plant_crop,
+produce via the watch fee, husks via convert_husks, supplies via the knobs)
+and the old list's self-clearing arm keyed on recipe consumers it could
+never see; the anti-abuse growth gate moved to the exact-set pin on
+FARM_MATERIAL_ITEM_IDS in tests/material_taxonomy.test.ts.
+
+UI: the farming_view extraction fired (the state.md rule-of-three trigger):
+farmDeniedLineKey plus the four farm grant-line selectors moved into the new
+src/ui/farming_view.ts pure core (UI_PURE_CORES), moves not re-exports, with
+their test blocks relocated to tests/farming_view.test.ts; the
+farmHusksConverted line and the four new deny leaves land there.
+
+VALIDATION: tsc clean; all targeted suites green (professions_farming 90,
+farm_watch_fee 9, farming_view, farming_command_chain_online, world_api
+parity, command_schema/facets, item_icons, material taxonomy x3, snapshots,
+env_protocol, bandwidth, localization_fixes, parity with zero golden
+movement); ci:changed exit 0 (warnings only, pre-existing debt); five
+scripted mutations all KILLED with named reds (third pre-roll draw: 6 reds
+incl. the parity golden; spend-at-gate: 2; dropped stored compost flag: 6;
+tonic-never-wins: 1; fee order flipped: 5). No screenshots: the phase ships
+no visual surface (the dormant Live-surface note holds; wiki:content regen
+was a byte-identical no-op).
+
+REVIEW ROUND (Workflow fan-out, 4/4 delivered): architecture-reviewer
+PASS-WITH-FOLLOWUPS, cross-platform-sync BLOCK, frontend-seam-reviewer
+BLOCK, qa-checklist PASS-WITH-FOLLOWUPS. The two BLOCKs shared one root
+cause, fixed in a628b65a65: the two item names shipped without their five
+non-Latin fills (tests/i18n_completeness.test.ts red with exactly 10 leaks,
+a suite the targeted validation list had not named). The same commit takes
+the architecture reviewer's real behavioral find: the loop-relative tonic
+read broke player-favorable monotonicity (a skill-up moved the bonus roll
+and flipped wins to losses about 5.8k times per million adjacent skill
+steps); the bonus roll now expands from its own seed-anchored mulberry32
+position, pinned by a 200-seed monotonicity sweep. Also landed: the
+husk-trade line splices both items as tokens, the watch-fee dedupe guard
+plus uniqueness pin, the NaN-honest watchFeeAmount, comment corrections
+(the stale always-false knob banner, the cheapest-first overstatement, the
+stream-position claim), the tonic-forfeited-on-wither note at the resolver,
+and the knobbed save-load-harvest arm. Deliberate no-action calls, left for
+the QA session to re-judge: convert_husks refusal spam costs one heavy
+re-serialize per refusal (the plant_crop precedent, unreachable until a
+husk faucet exists; the Phase 9 rate-limiter note already covers the
+family); a hand-edited OFFLINE save can forge knob flags for free survival
+(offline-only, same class as the accepted survivalRoll analysis); deviation
+(w)'s structural exemption means future FARM_MATERIAL_ITEM_IDS additions
+auto-exempt from the affinity census (the taxonomy exact-set pin is the
+gate; flagged for a maintainer read before Phase 5 adds seven crops); the
+Materials chip/market filter now classify two dormant items (unreachable:
+no faucet mints either).
+
+GATE: node scripts/gate_select.mjs run twice. Run one FAILED at the
+full-suite fallback's tests/professions_silent_loot.test.ts grant-site
+census (farming.ts 4 to 5: the convertHusks compost grant; the same
+fallback-only census class Phase 2 hit), fixed as its own commit. Run two:
+"[gate:select] PASS: all 8 steps green (vitest workers: 12)", zero FAIL
+lines in the log. The shell exit code of run one was 0 while the log said
+FAIL: the log-marker rule is the arbiter, re-confirmed.
 
 ### Phase 5
 (not started)

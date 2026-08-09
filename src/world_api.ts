@@ -203,7 +203,12 @@ export type {
   DungeonFinderQueueView,
 } from './world_api/dungeon_finder';
 export type { RaidLockout, RiftFloorView } from './world_api/dungeons';
-export type { FarmPatchDef, FarmPlotStatus, FarmPlotView } from './world_api/farming';
+export type {
+  FarmPatchDef,
+  FarmPlantKnobs,
+  FarmPlotStatus,
+  FarmPlotView,
+} from './world_api/farming';
 export {
   GUILD_BANK_LOG_LIMIT,
   type GuildBankInfo,
@@ -586,6 +591,12 @@ export const COMMAND_NAMES = [
   // because wire tokens are never reordered.
   'plant_crop',
   'harvest_crop',
+  // Farming's knobs phase: trade withered husks for compost at the sim's
+  // fixed ratio (Sim.convertHusks via src/sim/professions/farming.ts). NO
+  // PAYLOAD AT ALL: the ratio, the batch count and both item ids are resolved
+  // sim-side from the sender's own bags, so there is nothing on this wire to
+  // forge. Appended because wire tokens are never reordered.
+  'convert_husks',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -906,4 +917,5 @@ export const COMMAND_FACETS = {
   // wire command and stay untagged.
   plant_crop: 'IWorldFarming',
   harvest_crop: 'IWorldFarming',
+  convert_husks: 'IWorldFarming',
 } as const satisfies Partial<Record<ClientCommand, WorldFacet>>;

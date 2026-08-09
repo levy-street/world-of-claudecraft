@@ -4,12 +4,12 @@ Read this file first in every phase session. It is the single authority for lock
 decisions. If a phase file contradicts this file, this file wins and the phase file
 gets swept in the same pass (amend the QA twin too, always).
 
-Current phase: Phase 2 done, QA passed 2026-08-08 (PASS-WITH-FOLLOWUPS); Phase 3
-(growth engine) next. Packet authored 2026-08-07 off release/v0.36.0; the branch
-has absorbed release/v0.36.0 through 81804a179e (fourth absorb, at Phase 2 QA
-2026-08-08: the guide-only wiki accuracy round 2; release-merge-audit clean,
-parity and snapshots re-proven green on the merged HEAD; the third absorb
-e5c16ca398 opened Phase 2 itself).
+Current phase: Phase 4 (knobs) done 2026-08-08; Phase 4 QA next. Packet authored
+2026-08-07 off release/v0.36.0; the branch has absorbed release/v0.36.0 through
+1478f9d2ba (sixth absorb, opening Phase 4 2026-08-08: PR 2974's Seeker
+daily-rewards mobile CSS, empty intersection with farming; release-merge-audit
+clean, parity and snapshots re-proven green on the merged HEAD; the fifth
+absorb 4d52f151eb landed at Phase 3 QA).
 Working tree: ALL farming work happens in the persistent worktree
 `~/Documents/woc-farming-plan`. Other sessions share the main checkout; never work there.
 
@@ -461,7 +461,19 @@ question does not arise (farming has no station).
   IWorldFarming (both worlds; wire tokens plant_crop / harvest_crop); parity pins
   moved 304 to 306 members, 225 to 227 methods (data 79 and facet count 33
   unchanged; the two extra 304 literals near the union pins moved with them).
-- New SimEvents: Phase 3: farmPlanted { pid, bedId, cropId }, farmHarvested
+  Phase 4: convertHusks() as a method member on IWorldFarming (both worlds; wire
+  token convert_husks, no payload); parity pins moved 306 to 307 members, 227 to
+  228 methods (data 79 and facet count 33 unchanged; the union-size pair moved
+  with them). plantCrop's SIGNATURE widened to (bedId, cropId, knobs?:
+  FarmPlantKnobs) with no member-count movement; FarmPlantKnobs lives in
+  farm_projection.ts and re-exports through the facet and the barrel.
+  command_schema counts moved 194/207 to 195/208 (send/dispatch).
+- New SimEvents: Phase 4: farmHusksConverted { pid, husks, compost } (text-free,
+  pid-scoped; owns both halves of the trade feedback, the compost grant riding
+  its hub loot event silent + callerLogs). farmDenied's reason union grew four
+  appended members: no_husks (convert_husks below one batch), then no_compost,
+  no_fee_produce, no_tonic (the plant-time knob payments; each denies the whole
+  plant with nothing consumed and zero draws). Phase 3: farmPlanted { pid, bedId, cropId }, farmHarvested
   { pid, bedId, cropId, itemId, count, fineItemId?, fineCount? } (an all-fine
   harvest collapses the fine grant INTO the base fields so count is always
   positive and the fine pair present means a genuinely mixed harvest),
@@ -482,7 +494,24 @@ question does not arise (farming has no station).
   redundant with honest comments: wireRev already covers the successful paths
   because both commands touch bags, but Phase 4's knob commands will mutate
   plots WITHOUT an inventory change and need the command-side marking).
-- New i18n keys and matcher rows: Phase 1 added, all English-only catalog rows with
+  Phase 4: the plant_crop frame gained three OPTIONAL literal-true knob fields
+  (compost, watch, tonic), sent only when true so a plain plant's frame stays
+  byte-identical to the pre-knob wire; the dispatch guards each per field
+  (present-but-not-boolean refuses the frame) and hands the sim a complete
+  boolean record (absent and false are the same protocol statement). The
+  exhaustive frame key-set pins in tests/farming_command_chain_online.test.ts
+  moved WITH the guard, both directions. convert_husks joined HEAVY_SELF_CMDS
+  (belt and braces per the ledgered comment: the trade touches bags both ways,
+  so wireRev covers success); the Phase 3 warning about knob COMMANDS needing
+  command-side marking was RETIRED BY DESIGN instead: the knobs are not
+  commands, they ride plant_crop's payload, and every paid knob spends items.
+- New i18n keys and matcher rows: Phase 4: six hudChrome.farming keys, each with
+  five non-Latin fills (M16): denied.{no_husks, no_compost, no_fee_produce,
+  no_tonic} plus husksConvertedLine/husksConvertedLineQty (the trade line names
+  both sides: the husks spent and the compost gained). Two item-name rows in the
+  items catalog (Compost, Growth Tonic), the English-appended treatment. No
+  matcher rows (every new denial and result is a text-free SimEvent).
+  Phase 1 added, all English-only catalog rows with
   five non-Latin overlay fills each (M16): hudChrome.gathering.farming,
   hudChrome.gathering.toolTierUnmet.farming, hudChrome.gathering.toolRequired.farming,
   hudChrome.gathering.wieldUnmet.farming, hudChrome.gathering.noNodeNearby.farming,
@@ -501,7 +530,20 @@ question does not arise (farming has no station).
   error.castingPlanting for the one sim-side English sentence 'You are
   planting.' (BASE_DICT locale fill deferred to release-time per the
   contributor contract). All wordy values carry the five non-Latin fills (M16).
-- New items/recipes/deeds: Phase 3 items: vale_wheat_seed (sellValue 1, no
+- New items/recipes/deeds: Phase 4 items: compost (sellValue 2, buyValue 8 at
+  the 4x convention, maintainer-flagged; vendor-stocked in Phase 9 per D9) and
+  growth_tonic (sellValue 6, NO buyValue: never vendor-stocked, alchemy-crafted
+  in Phase 6). Both are plain consumed-by-command items with no ItemDef.use
+  (the def comment states the choice), kind junk quality common (sellAllJunk
+  never vendors common), classified as MATERIALS via the new
+  FARM_SUPPLY_ITEM_IDS block folded into FARM_MATERIAL_ITEM_IDS
+  (content/farm_crops.ts): they are the tradeable input side of the farming
+  loop exactly like seeds. MATERIAL_ITEM_IDS moved 59 to 61
+  (material_taxonomy_bootstrap size pin re-minted); ITEM_ART_PENDING re-pinned
+  as an exact SIX-id set with A4-pairwise-distinct procedural recipes (a damp
+  sack and a green draught). Conversion: FARM_HUSKS_PER_COMPOST = 2
+  (maintainer-flagged), so one failed crop's husks make exactly one compost.
+  Phase 3 items: vale_wheat_seed (sellValue 1, no
   buyValue: seeds stay vendor-unobtainable until go-live), vale_wheat
   (sellValue 4), fine_vale_wheat (sellValue 8, buyValue 32, fine-material
   convention; deliberately NO MATERIAL_GRADES row, see deviation (o)),
@@ -618,6 +660,34 @@ question does not arise (farming has no station).
   state buys anything against another player. Pinned ("keeps stealth, the
   seat and the mount" in tests/professions_farming.test.ts); flipping it is a
   one-trio change plus that pin.
+  Phase 4: (w) the affinity census's CONSUMER_DEFERRED_MATERIALS list
+  (tests/material_profession_affinity.test.ts) is REPLACED by a structural
+  farming exemption derived from FARM_MATERIAL_ITEM_IDS, not shrunk by one id
+  as the packet expected: the list's self-clearing arm keyed on RECIPE
+  consumers (craftIdsForMaterialItem scans recipes and enchants only), so the
+  command consumers that actually closed the loop (plant_crop for seeds and
+  the watch fee, convert_husks for husks, the knobs for compost and the
+  tonic) could never clear it mechanically, and compost/growth_tonic will
+  NEVER gain a recipe consumer at all, which would have made their "deferred"
+  entries a permanent lie. Every farming material is command-consumed by
+  construction (holds for every crop the ladder phase adds), the consumption
+  carries executed coverage in tests/professions_farming.test.ts, and the
+  anti-abuse growth gate moved to the exact-set pin on FARM_MATERIAL_ITEM_IDS
+  in tests/material_taxonomy.test.ts (smuggling an orphan into the exemption
+  requires editing content, which that pin reds). A future recipe consumer
+  (the Phase 6 dishes) needs no census edit: the id starts passing the census
+  on its own terms. (x) the phase file's "compost adds 10 survival points ...
+  caps at 100" is the shipped [0,1] probability scale times 100: the payload
+  wires to the EXISTING FARM_SURVIVAL_COMPOST_BONUS / FARM_SURVIVAL_WATCH_BONUS
+  constants (0.10 each, Math.min(1, ...)), never a second 0-100 scale; with
+  the shipped constants no knob sum lands on exactly 1.0 except through the
+  clamp or at the band top, and the boundary arms pin both. (y) the
+  refusal-preserves-stealth/seat/mount arm re-armed at the TONIC gate (the new
+  last gate in the stated order) so it keeps proving the trio sits below EVERY
+  gate; the knob deny arms extended the precedence family (no_seed before
+  no_compost before no_fee_produce before no_tonic) and added the
+  check-then-pay atomicity proof (a passed compost gate spends nothing when
+  the later tonic gate refuses).
 - Dev command surface: Phase 3 registers /dev farmgrow [bedId] (alias
   /devfarmgrow [bedId]) in src/sim/dev_commands.ts behind ALLOW_DEV_COMMANDS:
   with a bed id it advances that plot, without one it advances ALL of the

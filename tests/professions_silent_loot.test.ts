@@ -470,11 +470,12 @@ describe('every professions grant site is accounted for (#2430)', () => {
     'commission_order.ts': 1,
     'crafting.ts': 6,
     'enchanting.ts': 4,
-    // Farming's four harvest grants: base produce, its fine twin, and the
-    // withered-husk payout on each of the two failure arms (a lost survival
-    // roll and the defensive retired-crop fallback). All four carry both flags,
-    // because farmHarvested / farmWithered own the whole player feedback.
-    'farming.ts': 4,
+    // Farming's five grants: base produce, its fine twin, the withered-husk
+    // payout on each of the two failure arms (a lost survival roll and the
+    // defensive retired-crop fallback), and the knobs phase's compost grant
+    // in convertHusks. All five carry both flags, because farmHarvested /
+    // farmWithered / farmHusksConverted own the whole player feedback.
+    'farming.ts': 5,
     'fishing.ts': 2,
     'gathering.ts': 2,
     'salvage.ts': 2,

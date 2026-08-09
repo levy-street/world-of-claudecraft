@@ -2731,8 +2731,14 @@ export const zh_TW: EnTranslations = {
         "skill": "你的耕作技能不足以種植該作物。",
         "no_seed": "你沒有該作物的種子。",
         "not_ready": "那株作物還在生長。",
-        "no_plot": "那片田畦裡什麼也沒種。"
-      }
+        "no_plot": "那片田畦裡什麼也沒種。",
+        "no_husks": "你的枯萎穀殼不夠。",
+        "no_compost": "你沒有堆肥。",
+        "no_fee_produce": "你沒有可以支付看守費的農產品。",
+        "no_tonic": "你沒有生長滋補劑。"
+      },
+      "husksConvertedLine": "你用{husksName} x{husks}換取了{name}。",
+      "husksConvertedLineQty": "你用{husksName} x{husks}換取了{name} x{qty}。"
     },
     "archetypeTitle": {
       "label": "稱號",
@@ -11227,6 +11233,12 @@ export const zh_TW: EnTranslations = {
       },
       "withered_husks": {
         "name": "枯萎的穀殼"
+      },
+      "compost": {
+        "name": "堆肥"
+      },
+      "growth_tonic": {
+        "name": "生長滋補劑"
       },
       "conjured_water4": {
         "name": "魔法泉水"

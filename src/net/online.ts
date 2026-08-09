@@ -106,6 +106,7 @@ import {
   type DevLeaderboardPage,
   type DuelInfo,
   type FarmPatchDef,
+  type FarmPlantKnobs,
   type FarmPlotView,
   type FriendInfo,
   type GuildBankInfo,
@@ -4378,11 +4379,25 @@ export class ClientWorld implements IWorld {
   // survival/yield slots deliberately never reach this client at all, so
   // there is nothing to predict FROM. Every outcome mirrors back on the
   // `fplot` self delta plus a text-free id-carrying SimEvent. ---
-  plantCrop(bedId: string, cropId: string): void {
-    this.cmd({ cmd: 'plant_crop', bed: bedId, crop: cropId });
+  plantCrop(bedId: string, cropId: string, knobs?: FarmPlantKnobs): void {
+    // Knob fields ride the frame ONLY when literally true (the fplot
+    // only-when-true convention): a plain plant's frame stays byte-identical
+    // to the pre-knob protocol, and the server treats an absent field and
+    // false identically (knob not requested).
+    this.cmd({
+      cmd: 'plant_crop',
+      bed: bedId,
+      crop: cropId,
+      ...(knobs?.compost === true ? { compost: true } : {}),
+      ...(knobs?.watch === true ? { watch: true } : {}),
+      ...(knobs?.tonic === true ? { tonic: true } : {}),
+    });
   }
   harvestCrop(bedId: string): void {
     this.cmd({ cmd: 'harvest_crop', bed: bedId });
+  }
+  convertHusks(): void {
+    this.cmd({ cmd: 'convert_husks' });
   }
   chat(text: string): void {
     this.cmd({ cmd: 'chat', text });

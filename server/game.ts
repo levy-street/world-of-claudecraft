@@ -822,6 +822,18 @@ const HEAVY_SELF_CMDS = new Set<string>([
   // receipt regardless of outcome).
   'plant_crop',
   'harvest_crop',
+  // The knobs phase's husk conversion, the same belt-and-braces trade as the
+  // pair above: a SUCCESSFUL conversion touches bags in both directions
+  // (husks out through ctx.removeItem, compost in through ctx.addItem), so
+  // wireRev already guarantees freshness on the path that changes anything,
+  // and the loot event the compost grant rides is a HEAVY_SELF_EVENTS member
+  // on top. The entry keeps the guarantee LOCAL to the command per the
+  // ledgered comment above; the cost is one spurious heavy re-serialize per
+  // refused conversion, the same trade every member here makes. NOTE: the
+  // PLANT-TIME KNOBS need no entry of their own because they are not
+  // commands: they ride plant_crop's payload, whose membership already marks
+  // on receipt, and a paid knob spends items (wireRev again).
+  'convert_husks',
   'loot',
   'harvestCorpse',
   'pickup',
@@ -6727,8 +6739,9 @@ export class GameServer {
         // Farming's growth phase. TYPE boundary only: the sim is the single
         // definition of legality, and it re-validates the bed id against
         // FARM_BED_IDS, the crop id against the crop catalog, that the bed is
-        // free for THIS player, the skill threshold, and the seed in the
-        // sender's own bags (the hoe-tier gate is deferred to the crop-ladder
+        // free for THIS player, the skill threshold, the seed in the
+        // sender's own bags, and that every REQUESTED knob can be paid from
+        // those bags (the hoe-tier gate is deferred to the crop-ladder
         // phase). Nothing here normalizes or defaults an
         // id, for the slot_tool_effect reason above: laundering an unknown id
         // would hand the sim a value it never saw and make the two hosts
@@ -6739,8 +6752,32 @@ export class GameServer {
         // per-tick diff: the seed spend bumps meta.wireRev (a heavyDue input)
         // and `plant_crop` is also a HEAVY_SELF_CMDS member, either of which is
         // sufficient. See the HEAVY_SELF_CMDS entry for which does the work.
-        if (typeof msg.bed === 'string' && typeof msg.crop === 'string') {
-          sim.plantCrop(msg.bed, msg.crop, pid);
+        //
+        // The knob fields (the knobs phase) are guarded PER FIELD like the
+        // ids: present-but-not-boolean refuses the whole frame, because
+        // coercing a junk value into a knob choice would be the same
+        // laundering the id rule forbids. Absent and false are the SAME
+        // protocol statement (knob not requested; the client omits unset
+        // knobs so a plain plant's frame stays byte-identical to the pre-knob
+        // wire), so the strict `=== true` mapping below is the frame
+        // contract, not a default.
+        if (
+          typeof msg.bed === 'string' &&
+          typeof msg.crop === 'string' &&
+          (msg.compost === undefined || typeof msg.compost === 'boolean') &&
+          (msg.watch === undefined || typeof msg.watch === 'boolean') &&
+          (msg.tonic === undefined || typeof msg.tonic === 'boolean')
+        ) {
+          sim.plantCrop(
+            msg.bed,
+            msg.crop,
+            {
+              compost: msg.compost === true,
+              watch: msg.watch === true,
+              tonic: msg.tonic === true,
+            },
+            pid,
+          );
         }
         break;
       case 'harvest_crop':
@@ -6750,6 +6787,13 @@ export class GameServer {
         if (typeof msg.bed === 'string') {
           sim.harvestCrop(msg.bed, pid);
         }
+        break;
+      case 'convert_husks':
+        // Farming's knobs phase: trade withered husks for compost. NO payload
+        // to guard: the ratio, the batch count and both item ids resolve
+        // sim-side from the sender's own bags, and the refusal (too few
+        // husks) answers with the pid-scoped text-free farmDenied event.
+        sim.convertHusks(pid);
         break;
       case 'sell_all_junk':
         sim.sellAllJunk(pid);

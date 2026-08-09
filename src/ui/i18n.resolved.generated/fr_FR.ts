@@ -2731,8 +2731,14 @@ export const fr_FR: EnTranslations = {
         "skill": "Your Farming skill is too low for that crop.",
         "no_seed": "You have no seed for that crop.",
         "not_ready": "That crop is still growing.",
-        "no_plot": "Nothing is planted in that bed."
-      }
+        "no_plot": "Nothing is planted in that bed.",
+        "no_husks": "You do not have enough withered husks.",
+        "no_compost": "You have no compost.",
+        "no_fee_produce": "You have no produce to pay the watch fee.",
+        "no_tonic": "You have no growth tonic."
+      },
+      "husksConvertedLine": "You trade {husksName} x{husks} for {name}.",
+      "husksConvertedLineQty": "You trade {husksName} x{husks} for {name} x{qty}."
     },
     "archetypeTitle": {
       "label": "Titre",
@@ -11227,6 +11233,12 @@ export const fr_FR: EnTranslations = {
       },
       "withered_husks": {
         "name": "Withered Husks"
+      },
+      "compost": {
+        "name": "Compost"
+      },
+      "growth_tonic": {
+        "name": "Growth Tonic"
       },
       "conjured_water4": {
         "name": "Eau de source invoquée"

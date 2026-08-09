@@ -26,16 +26,23 @@ import { FARM_MAX_GROW_MS } from '../src/sim/professions/farm_persist';
 import type { PlotState } from '../src/sim/professions/farm_projection';
 import {
   canPlantCrop,
+  convertHusks,
+  FARM_COMPOST_ITEM_ID,
   FARM_FINE_CHANCE_BASE,
+  FARM_GROWTH_TONIC_ITEM_ID,
   FARM_HARVEST_LIFE_FLOOR,
   FARM_HARVEST_PICK_CAP,
+  FARM_HUSKS_PER_COMPOST,
   FARM_KEEP_CHANCE_BASE,
   FARM_PLANT_CAST_SEC,
   FARM_SURVIVAL_AT_GATE,
   FARM_SURVIVAL_BAND_SPAN,
+  FARM_TONIC_BONUS_CHANCE,
+  FARM_TONIC_BONUS_PICKS,
   FARM_WITHERED_HUSK_COUNT,
   FARM_WITHERED_HUSK_ITEM_ID,
   FARMING_GAIN_SCHEDULE,
+  type FarmPlantKnobs,
   farmGrowthStage,
   farmingHarvestGain,
   farmingHarvestGainAt,
@@ -560,9 +567,11 @@ describe('plantCrop: the stated gate order, every arm draw-free', () => {
     // The mirror of the success-path state-breaking pin below: the deliberate
     // action trio (breakStealth, standUp, forceDismount) sits AFTER every deny
     // arm, so a refused plant never reveals or unseats the player. Armed
-    // exactly like the success pin but with an empty seed pouch, so the
-    // refusal comes from the LAST gate in the stated order: if the trio ever
-    // moves above ANY gate, this arm reds while the success pin stays green.
+    // exactly like the success pin but refused at the TONIC gate, which is
+    // the LAST gate in the stated order since the knobs phase (a seed is in
+    // the pouch, the tonic is not): if the trio ever moves above ANY gate,
+    // knob gates included, this arm reds while the success pin stays green.
+    giveSeeds(h);
     const p = h.sim.player;
     p.sitting = true;
     p.mountKey = DEFAULT_MOUNT;
@@ -578,8 +587,12 @@ describe('plantCrop: the stated gate order, every arm draw-free', () => {
     });
     p.stealthed = true;
     const from = h.sim.events.length;
-    expect(countDraws(h.sim, () => plant(h))).toBe(0);
-    expect(denyReason(h.sim, from)).toBe('no_seed');
+    expect(
+      countDraws(h.sim, () => plantCrop(h.sim.ctx, p, h.meta, BED, CROP_ID, { tonic: true })),
+    ).toBe(0);
+    expect(denyReason(h.sim, from)).toBe('no_tonic');
+    // The knob refusal consumed NOTHING, the seed included.
+    expect(h.sim.countItem(SEED_ID, h.pid)).toBe(1);
     expect(p.sitting).toBe(true);
     expect(p.mountKey).toBe(DEFAULT_MOUNT);
     expect(p.stealthed).toBe(true);
@@ -702,6 +715,415 @@ describe('plantCrop: the stated gate order, every arm draw-free', () => {
       expect(countDraws(h.sim, () => plant(h, bedId))).toBe(2);
     }
     expect(h.meta.farmPlots.size).toBe(3);
+  });
+});
+
+describe('the knob payload (the knobs phase): payments, denies, thresholds', () => {
+  let h: Harness;
+  beforeEach(() => {
+    h = makeHarness();
+  });
+
+  function plantK(knobs: FarmPlantKnobs, bedId = BED): void {
+    plantCrop(h.sim.ctx, h.sim.player, h.meta, bedId, CROP_ID, knobs);
+  }
+
+  /** Grant everything any knob combination could pay with. */
+  function giveAllSupplies(): void {
+    giveSeeds(h, 2);
+    h.sim.addItem(FARM_COMPOST_ITEM_ID, 2, h.pid);
+    h.sim.addItem(FARM_GROWTH_TONIC_ITEM_ID, 2, h.pid);
+    h.sim.addItem(PRODUCE_ID, 4, h.pid);
+  }
+
+  it('pins the tonic tuning to its literals', () => {
+    // The wire-name-constant rule: one literal pin for the pair every other
+    // arm reaches through the import.
+    expect(FARM_TONIC_BONUS_CHANCE).toBe(0.5);
+    expect(FARM_TONIC_BONUS_PICKS).toBe(2);
+  });
+
+  it('draws EXACTLY two under EVERY knob combination, and stores what was paid', () => {
+    // THE PHASE'S ONE HARD RULE, pinned as the acceptance criterion states
+    // it: the draw count is identical with and without each knob, across all
+    // eight combinations. Each combination runs on a fresh same-seed harness
+    // with every payment affordable, and the stored flags are asserted per
+    // combination so the two-draw count is two draws WITH the knobs armed,
+    // never two draws because the payload was dropped.
+    const combos: FarmPlantKnobs[] = [
+      {},
+      { compost: true },
+      { watch: true },
+      { tonic: true },
+      { compost: true, watch: true },
+      { compost: true, tonic: true },
+      { watch: true, tonic: true },
+      { compost: true, watch: true, tonic: true },
+    ];
+    for (const combo of combos) {
+      const hc = makeHarness(41);
+      hc.sim.addItem(SEED_ID, 1, hc.pid);
+      hc.sim.addItem(FARM_COMPOST_ITEM_ID, 1, hc.pid);
+      hc.sim.addItem(FARM_GROWTH_TONIC_ITEM_ID, 1, hc.pid);
+      hc.sim.addItem(PRODUCE_ID, 4, hc.pid);
+      const draws = countDraws(hc.sim, () =>
+        plantCrop(hc.sim.ctx, hc.sim.player, hc.meta, BED, CROP_ID, combo),
+      );
+      expect(draws, JSON.stringify(combo)).toBe(2);
+      const plot = hc.meta.farmPlots.get(BED) as PlotState;
+      expect(plot.compost, JSON.stringify(combo)).toBe(combo.compost === true);
+      expect(plot.watch, JSON.stringify(combo)).toBe(combo.watch === true);
+      expect(plot.tonic, JSON.stringify(combo)).toBe(combo.tonic === true);
+    }
+  });
+
+  it('consumes exactly one compost for the compost knob and nothing else moves', () => {
+    giveAllSupplies();
+    const from = h.sim.events.length;
+    plantK({ compost: true });
+    expect(h.sim.countItem(FARM_COMPOST_ITEM_ID, h.pid)).toBe(1);
+    expect(h.sim.countItem(SEED_ID, h.pid)).toBe(1);
+    expect(h.sim.countItem(FARM_GROWTH_TONIC_ITEM_ID, h.pid)).toBe(2);
+    expect(h.sim.countItem(PRODUCE_ID, h.pid)).toBe(4);
+    expect((h.meta.farmPlots.get(BED) as PlotState).compost).toBe(true);
+    expect(eventsOf(h.sim, from, 'farmPlanted')).toHaveLength(1);
+  });
+
+  it('consumes the EXACT watch-fee produce and nothing else moves (the fee pin)', () => {
+    // The acceptance criterion verbatim: the exact produce item leaves the
+    // bag. Tier 1 fee is 2, base grade first, so the base stack pays it all
+    // and the fine twin never moves.
+    h.sim.addItem(SEED_ID, 1, h.pid);
+    h.sim.addItem(PRODUCE_ID, 3, h.pid);
+    h.sim.addItem(FINE_ID, 2, h.pid);
+    h.sim.addItem(FARM_COMPOST_ITEM_ID, 2, h.pid);
+    h.sim.addItem(FARM_GROWTH_TONIC_ITEM_ID, 2, h.pid);
+    plantK({ watch: true });
+    expect(h.sim.countItem(PRODUCE_ID, h.pid)).toBe(1);
+    expect(h.sim.countItem(FINE_ID, h.pid)).toBe(2);
+    expect(h.sim.countItem(FARM_COMPOST_ITEM_ID, h.pid)).toBe(2);
+    expect(h.sim.countItem(FARM_GROWTH_TONIC_ITEM_ID, h.pid)).toBe(2);
+    expect(h.sim.countItem(SEED_ID, h.pid)).toBe(0);
+    expect((h.meta.farmPlots.get(BED) as PlotState).watch).toBe(true);
+  });
+
+  it('pays a mixed fee cheapest-first when no single stack covers it', () => {
+    h.sim.addItem(SEED_ID, 1, h.pid);
+    h.sim.addItem(PRODUCE_ID, 1, h.pid);
+    h.sim.addItem(FINE_ID, 5, h.pid);
+    plantK({ watch: true });
+    expect(h.sim.countItem(PRODUCE_ID, h.pid)).toBe(0);
+    expect(h.sim.countItem(FINE_ID, h.pid)).toBe(4);
+    expect((h.meta.farmPlots.get(BED) as PlotState).watch).toBe(true);
+  });
+
+  it('consumes exactly one tonic for the tonic knob', () => {
+    giveAllSupplies();
+    plantK({ tonic: true });
+    expect(h.sim.countItem(FARM_GROWTH_TONIC_ITEM_ID, h.pid)).toBe(1);
+    expect(h.sim.countItem(FARM_COMPOST_ITEM_ID, h.pid)).toBe(2);
+    expect((h.meta.farmPlots.get(BED) as PlotState).tonic).toBe(true);
+  });
+
+  it('denies no_compost with zero draws and NOTHING consumed', () => {
+    giveSeeds(h);
+    const from = h.sim.events.length;
+    expect(countDraws(h.sim, () => plantK({ compost: true }))).toBe(0);
+    expect(denyReason(h.sim, from)).toBe('no_compost');
+    expect(h.meta.farmPlots.size).toBe(0);
+    expect(h.sim.countItem(SEED_ID, h.pid)).toBe(1);
+  });
+
+  it('denies no_fee_produce with zero draws and NOTHING consumed', () => {
+    giveSeeds(h);
+    h.sim.addItem(FARM_COMPOST_ITEM_ID, 1, h.pid);
+    const from = h.sim.events.length;
+    expect(countDraws(h.sim, () => plantK({ watch: true }))).toBe(0);
+    expect(denyReason(h.sim, from)).toBe('no_fee_produce');
+    expect(h.meta.farmPlots.size).toBe(0);
+    expect(h.sim.countItem(SEED_ID, h.pid)).toBe(1);
+    expect(h.sim.countItem(FARM_COMPOST_ITEM_ID, h.pid)).toBe(1);
+  });
+
+  it('denies no_tonic WITHOUT spending the compost that had already passed its gate', () => {
+    // The atomicity proof, stronger than a plain no_tonic arm: compost was
+    // requested, present and affordable, and its gate had already passed when
+    // the tonic gate refused, yet nothing was consumed, because every gate is
+    // a check and every payment happens together after the last gate.
+    giveSeeds(h);
+    h.sim.addItem(FARM_COMPOST_ITEM_ID, 1, h.pid);
+    const from = h.sim.events.length;
+    expect(countDraws(h.sim, () => plantK({ compost: true, tonic: true }))).toBe(0);
+    expect(denyReason(h.sim, from)).toBe('no_tonic');
+    expect(h.meta.farmPlots.size).toBe(0);
+    expect(h.sim.countItem(SEED_ID, h.pid)).toBe(1);
+    expect(h.sim.countItem(FARM_COMPOST_ITEM_ID, h.pid)).toBe(1);
+  });
+
+  it('denies an already-knobbed replant as bed_taken, leaving the plot and bags untouched', () => {
+    // The fourth acceptance deny arm: replanting an occupied plot answers
+    // bed_taken from the earlier gate no matter what knobs ride the retry,
+    // and neither the stored flags nor the retry's would-be payments move.
+    giveAllSupplies();
+    plantK({ compost: true });
+    clearCast(h.sim);
+    const compostBefore = h.sim.countItem(FARM_COMPOST_ITEM_ID, h.pid);
+    const tonicBefore = h.sim.countItem(FARM_GROWTH_TONIC_ITEM_ID, h.pid);
+    const produceBefore = h.sim.countItem(PRODUCE_ID, h.pid);
+    const from = h.sim.events.length;
+    expect(countDraws(h.sim, () => plantK({ compost: true, watch: true, tonic: true }))).toBe(0);
+    expect(denyReason(h.sim, from)).toBe('bed_taken');
+    const plot = h.meta.farmPlots.get(BED) as PlotState;
+    expect(plot.compost).toBe(true);
+    expect(plot.watch).toBe(false);
+    expect(plot.tonic).toBe(false);
+    expect(h.sim.countItem(FARM_COMPOST_ITEM_ID, h.pid)).toBe(compostBefore);
+    expect(h.sim.countItem(FARM_GROWTH_TONIC_ITEM_ID, h.pid)).toBe(tonicBefore);
+    expect(h.sim.countItem(PRODUCE_ID, h.pid)).toBe(produceBefore);
+  });
+
+  it('answers no_seed before no_compost, no_compost before no_fee_produce, and that before no_tonic (order proofs)', () => {
+    // The knob gates joined the STATED order, so the precedence family grows
+    // with them (the bed_taken-vs-no_seed precedent): each arm co-arms two
+    // gates and the earlier one must own the reason.
+    let from = h.sim.events.length;
+    expect(countDraws(h.sim, () => plantK({ compost: true }))).toBe(0);
+    expect(denyReason(h.sim, from)).toBe('no_seed');
+
+    giveSeeds(h, 2);
+    from = h.sim.events.length;
+    expect(countDraws(h.sim, () => plantK({ compost: true, watch: true }))).toBe(0);
+    expect(denyReason(h.sim, from)).toBe('no_compost');
+
+    h.sim.addItem(FARM_COMPOST_ITEM_ID, 1, h.pid);
+    from = h.sim.events.length;
+    expect(countDraws(h.sim, () => plantK({ compost: true, watch: true, tonic: true }))).toBe(0);
+    expect(denyReason(h.sim, from)).toBe('no_fee_produce');
+  });
+
+  it('a compost plot survives a roll that withers the same unknobbed plot', () => {
+    // The threshold bend proven at the HARVEST, not just in the pure ramp: at
+    // skill 0 the tier-1 chance is 0.85 plain and 0.95 with compost, so a
+    // stored roll of 0.90 sits exactly between them and the knob flips the
+    // outcome of the same already-drawn value.
+    const knobbed = makeHarness(41);
+    const plain = makeHarness(41);
+    for (const [hx, knobs] of [
+      [knobbed, { compost: true } as FarmPlantKnobs],
+      [plain, {} as FarmPlantKnobs],
+    ] as const) {
+      hx.sim.addItem(SEED_ID, 1, hx.pid);
+      hx.sim.addItem(FARM_COMPOST_ITEM_ID, 1, hx.pid);
+      plantCrop(hx.sim.ctx, hx.sim.player, hx.meta, BED, CROP_ID, knobs);
+      clearCast(hx.sim);
+      (hx.meta.farmPlots.get(BED) as PlotState).survivalRoll = 0.9;
+      hx.advance(CROP.durationMs);
+    }
+    const fromK = knobbed.sim.events.length;
+    harvestCrop(knobbed.sim.ctx, knobbed.sim.player, knobbed.meta, BED);
+    expect(eventsOf(knobbed.sim, fromK, 'farmHarvested')).toHaveLength(1);
+    expect(eventsOf(knobbed.sim, fromK, 'farmWithered')).toEqual([]);
+    const fromP = plain.sim.events.length;
+    harvestCrop(plain.sim.ctx, plain.sim.player, plain.meta, BED);
+    expect(eventsOf(plain.sim, fromP, 'farmWithered')).toHaveLength(1);
+    expect(eventsOf(plain.sim, fromP, 'farmHarvested')).toEqual([]);
+  });
+
+  it('a watch plot survives the same in-between roll (one knob one job, same bonus)', () => {
+    h.sim.addItem(SEED_ID, 1, h.pid);
+    h.sim.addItem(PRODUCE_ID, 2, h.pid);
+    plantK({ watch: true });
+    clearCast(h.sim);
+    (h.meta.farmPlots.get(BED) as PlotState).survivalRoll = 0.9;
+    h.advance(CROP.durationMs);
+    const from = h.sim.events.length;
+    harvest(h);
+    expect(eventsOf(h.sim, from, 'farmHarvested')).toHaveLength(1);
+  });
+
+  it('caps survival at exactly 1: at the cap, and clamped back onto it from above', () => {
+    // The acceptance boundary pair, in the shipped [0, 1] units (the phase
+    // file's "100 points" scale is this, times 100): the band top lands
+    // exactly ON the cap with no knobs, and every knobbed sum past it clamps
+    // to exactly 1, never above. With the shipped constants no combination
+    // lands on exactly 1.0 through knob addition alone (the base never dips
+    // below 0.85), so at-the-cap is the band top and above-the-cap is any
+    // knobbed band top; just-below proves the clamp is not flattening the
+    // whole ramp.
+    expect(farmSurvivalChance(FARM_SURVIVAL_BAND_SPAN, 1, false, false)).toBe(1);
+    expect(farmSurvivalChance(FARM_SURVIVAL_BAND_SPAN, 1, true, true)).toBe(1);
+    expect(farmSurvivalChance(0, 1, true, true)).toBe(1);
+    expect(farmSurvivalChance(0, 1, true, false)).toBeCloseTo(0.95, 10);
+    expect(farmSurvivalChance(0, 1, true, false)).toBeLessThan(1);
+    // At the capped chance of exactly 1, NO roll in the draw domain [0, 1)
+    // can wither: the both-knobs plot survives even a 0.9999 roll at the
+    // gate skill.
+    h.sim.addItem(SEED_ID, 1, h.pid);
+    h.sim.addItem(FARM_COMPOST_ITEM_ID, 1, h.pid);
+    h.sim.addItem(PRODUCE_ID, 2, h.pid);
+    plantK({ compost: true, watch: true });
+    clearCast(h.sim);
+    (h.meta.farmPlots.get(BED) as PlotState).survivalRoll = 0.9999;
+    h.advance(CROP.durationMs);
+    const from = h.sim.events.length;
+    harvest(h);
+    expect(eventsOf(h.sim, from, 'farmHarvested')).toHaveLength(1);
+  });
+
+  it('projects the paid knob flags onto the wire row', () => {
+    giveAllSupplies();
+    plantK({ compost: true, watch: true, tonic: true });
+    const row = h.sim.farmPlotsFor(h.pid)[0];
+    expect(row?.compost).toBe(true);
+    expect(row?.watch).toBe(true);
+    expect(row?.tonic).toBe(true);
+    expect(row?.status).toBe('growing');
+  });
+
+  it('keeps the paid flags THROUGH a save and load, still bending the threshold', () => {
+    // The first phase whose persisted knob flags can be true (Phase 3 always
+    // wrote false, so the round-trip pins in professions_farming_state were
+    // inert until now): a knobbed plot must reload with its flags intact and
+    // the survival bend still live, or a relog would silently strip an
+    // insurance the player paid for.
+    giveAllSupplies();
+    plantK({ compost: true, watch: true, tonic: true });
+    clearCast(h.sim);
+    // A roll that withers unknobbed at skill 0 (chance 0.85) but survives
+    // with both survival knobs (capped at 1), so the post-reload harvest
+    // outcome proves the FLAGS, not just the row shape.
+    (h.meta.farmPlots.get(BED) as PlotState).survivalRoll = 0.9;
+    const saved = h.sim.serializeCharacter(h.pid) as CharacterState;
+
+    let nowMs = h.now() + CROP.durationMs;
+    const fresh = new Sim({
+      seed: 41,
+      playerClass: 'warrior',
+      noPlayer: true,
+      lockoutNowMs: () => nowMs,
+    });
+    fresh.addPlayer('warrior', 'Farmer', { state: saved });
+    const meta = [...fresh.players.values()][0] as PlayerMeta;
+    const plot = meta.farmPlots.get(BED) as PlotState;
+    expect(plot.compost).toBe(true);
+    expect(plot.watch).toBe(true);
+    expect(plot.tonic).toBe(true);
+    // Stand the RELOADED entity at the bed directly (the noPlayer Sim's
+    // primary getter is not what this arm is about).
+    const farmer = fresh.entities.get(meta.entityId);
+    if (!farmer) throw new Error('reloaded farmer entity missing');
+    const bed = farmBedById(BED);
+    if (!bed) throw new Error(`no such bed: ${BED}`);
+    farmer.pos.x = bed.x;
+    farmer.pos.z = bed.z;
+    farmer.prevPos = { ...farmer.pos };
+    const from = fresh.events.length;
+    const expected = resolveFarmHarvest(plot.yieldSeed as number, 0, true);
+    // Delta, not an absolute: the reloaded bags still carry the produce the
+    // watch fee did not consume at plant time.
+    const produceBefore = fresh.countItem(PRODUCE_ID, meta.entityId);
+    expect(countDraws(fresh, () => harvestCrop(fresh.ctx, farmer, meta, BED))).toBe(0);
+    expect(eventsOf(fresh, from, 'farmHarvested')).toHaveLength(1);
+    expect(eventsOf(fresh, from, 'farmWithered')).toEqual([]);
+    // And the reloaded tonic flag really armed the toniced expansion.
+    expect(fresh.countItem(PRODUCE_ID, meta.entityId) - produceBefore).toBe(expected.count);
+    nowMs += 1;
+  });
+});
+
+describe('the tonic yield arm: seed expansion, never a draw', () => {
+  it('adds the flat bonus at base grade, or nothing, and never touches the fine count', () => {
+    // The pure shape over a seed sweep: a toniced expansion equals the plain
+    // one except for a possible flat base-grade bonus, both outcomes really
+    // occur, and count + fine = picks holds on every shape.
+    let wins = 0;
+    let losses = 0;
+    for (let seed = 0; seed < 300; seed++) {
+      const plain = resolveFarmHarvest(seed, 20);
+      const toniced = resolveFarmHarvest(seed, 20, true);
+      expect(toniced.fine, `seed ${seed}`).toBe(plain.fine);
+      const delta = toniced.count - plain.count;
+      expect([0, FARM_TONIC_BONUS_PICKS], `seed ${seed}`).toContain(delta);
+      expect(toniced.picks - plain.picks, `seed ${seed}`).toBe(delta);
+      expect(toniced.count + toniced.fine, `seed ${seed}`).toBe(toniced.picks);
+      if (delta > 0) wins++;
+      else losses++;
+    }
+    expect(wins).toBeGreaterThan(0);
+    expect(losses).toBeGreaterThan(0);
+  });
+
+  it('leaves the UNTONICED expansion bit-identical: the default arm is the two-arg call', () => {
+    for (const seed of [0, 1, 999, 123_456]) {
+      expect(resolveFarmHarvest(seed, 30)).toEqual(resolveFarmHarvest(seed, 30, false));
+    }
+  });
+
+  it('NEVER pays less for more skill, toniced or plain (the monotonicity sweep)', () => {
+    // The player-favorable invariant the banner states, proven rather than
+    // asserted: proficiency only rises, so a plot left in the ground while
+    // its owner improves must pay better, never worse. The review round
+    // caught the original loop-relative tonic read breaking exactly this (a
+    // skill-up lengthened the lives loop, moved the bonus roll onto a
+    // different stream value, and flipped wins into losses thousands of
+    // times per million adjacent steps); the seed-anchored read this sweep
+    // pins makes the tonic outcome a plant-time constant.
+    for (let seed = 0; seed < 200; seed++) {
+      let prevPlain = -1;
+      let prevToniced = -1;
+      for (let skill = 0; skill <= 100; skill += 5) {
+        const plain = resolveFarmHarvest(seed, skill);
+        const toniced = resolveFarmHarvest(seed, skill, true);
+        expect(plain.picks, `seed ${seed} skill ${skill} plain`).toBeGreaterThanOrEqual(prevPlain);
+        expect(toniced.picks, `seed ${seed} skill ${skill} toniced`).toBeGreaterThanOrEqual(
+          prevToniced,
+        );
+        // The tonic outcome itself is skill-independent: the delta is the
+        // SAME flat bonus (or the same nothing) at every skill.
+        expect(toniced.picks - plain.picks, `seed ${seed} skill ${skill} delta`).toBe(
+          resolveFarmHarvest(seed, 0, true).picks - resolveFarmHarvest(seed, 0).picks,
+        );
+        prevPlain = plain.picks;
+        prevToniced = toniced.picks;
+      }
+    }
+  });
+
+  it('harvests a toniced plot with ZERO ctx.rng draws and pays the expanded yield', () => {
+    const h = makeHarness();
+    h.sim.addItem(SEED_ID, 1, h.pid);
+    h.sim.addItem(FARM_GROWTH_TONIC_ITEM_ID, 1, h.pid);
+    plantCrop(h.sim.ctx, h.sim.player, h.meta, BED, CROP_ID, { tonic: true });
+    clearCast(h.sim);
+    h.advance(CROP.durationMs);
+    const plot = h.meta.farmPlots.get(BED) as PlotState;
+    plot.survivalRoll = 0; // survival forced, so this arm is about yield only
+    const expected = resolveFarmHarvest(plot.yieldSeed as number, 0, true);
+    expect(countDraws(h.sim, () => harvestCrop(h.sim.ctx, h.sim.player, h.meta, BED))).toBe(0);
+    expect(h.sim.countItem(PRODUCE_ID, h.pid)).toBe(expected.count);
+    expect(h.sim.countItem(FINE_ID, h.pid)).toBe(expected.fine);
+  });
+
+  it('pays a toniced harvest N hours late EXACTLY what an on-time one pays', () => {
+    // The anti-chore equality re-proven with the knob armed: lateness is not
+    // an input to the tonic roll either.
+    const onTime = makeHarness(1234);
+    const late = makeHarness(1234);
+    for (const hx of [onTime, late]) {
+      hx.sim.addItem(SEED_ID, 1, hx.pid);
+      hx.sim.addItem(FARM_GROWTH_TONIC_ITEM_ID, 1, hx.pid);
+      plantCrop(hx.sim.ctx, hx.sim.player, hx.meta, BED, CROP_ID, { tonic: true });
+      clearCast(hx.sim);
+    }
+    onTime.advance(CROP.durationMs);
+    late.advance(CROP.durationMs + 12 * 60 * 60_000);
+    harvestCrop(onTime.sim.ctx, onTime.sim.player, onTime.meta, BED);
+    harvestCrop(late.sim.ctx, late.sim.player, late.meta, BED);
+    expect(late.sim.countItem(PRODUCE_ID, late.pid)).toBe(
+      onTime.sim.countItem(PRODUCE_ID, onTime.pid),
+    );
+    expect(late.sim.countItem(FINE_ID, late.pid)).toBe(onTime.sim.countItem(FINE_ID, onTime.pid));
+    expect(onTime.sim.countItem(PRODUCE_ID, onTime.pid)).toBeGreaterThan(0);
   });
 });
 
@@ -1044,6 +1466,102 @@ describe('harvestCrop: draw-free on every path', () => {
   });
 });
 
+describe('convertHusks: the husk trade, draw-free on every path', () => {
+  let h: Harness;
+  beforeEach(() => {
+    h = makeHarness();
+  });
+
+  function convert(): void {
+    convertHusks(h.sim.ctx, h.sim.player, h.meta);
+  }
+
+  it('pins the trade ratio to its literal', () => {
+    // The ratio is the trade's whole tuning surface and every arm below
+    // reaches it through the import, which is a self-comparison (the
+    // wire-name-constant rule). One literal pin, here: 2 husks per compost,
+    // so ONE failed crop (FARM_WITHERED_HUSK_COUNT husks) converts into
+    // exactly ONE compost.
+    expect(FARM_HUSKS_PER_COMPOST).toBe(2);
+    expect(FARM_HUSKS_PER_COMPOST).toBe(FARM_WITHERED_HUSK_COUNT);
+  });
+
+  it('converts EVERY complete batch in one call and leaves the remainder', () => {
+    h.sim.addItem(FARM_WITHERED_HUSK_ITEM_ID, 2 * FARM_HUSKS_PER_COMPOST + 1, h.pid);
+    const from = h.sim.events.length;
+    const draws = countDraws(h.sim, () => convert());
+    expect(draws).toBe(0);
+    expect(h.sim.countItem(FARM_COMPOST_ITEM_ID, h.pid)).toBe(2);
+    expect(h.sim.countItem(FARM_WITHERED_HUSK_ITEM_ID, h.pid)).toBe(1);
+    expect(eventsOf(h.sim, from, 'farmHusksConverted')).toEqual([
+      {
+        type: 'farmHusksConverted',
+        pid: h.pid,
+        husks: 2 * FARM_HUSKS_PER_COMPOST,
+        compost: 2,
+      },
+    ]);
+    expect(eventsOf(h.sim, from, 'farmDenied')).toEqual([]);
+  });
+
+  it('flags the compost grant silent + callerLogs, so one trade prints one line', () => {
+    // The #2430 one-line rule, the farmHarvested precedent: the
+    // farmHusksConverted event owns both halves of the feedback, so the hub
+    // "You receive:" line and the generic ding stand down.
+    h.sim.addItem(FARM_WITHERED_HUSK_ITEM_ID, FARM_HUSKS_PER_COMPOST, h.pid);
+    const from = h.sim.events.length;
+    convert();
+    const loots = eventsOf(h.sim, from, 'loot');
+    expect(loots.length).toBeGreaterThan(0);
+    for (const lev of loots) {
+      expect(lev.silent, lev.text).toBe(true);
+      expect(lev.callerLogs, lev.text).toBe(true);
+    }
+  });
+
+  it('refuses below one batch: nothing moves, zero draws, farmDenied no_husks', () => {
+    h.sim.addItem(FARM_WITHERED_HUSK_ITEM_ID, FARM_HUSKS_PER_COMPOST - 1, h.pid);
+    const from = h.sim.events.length;
+    expect(countDraws(h.sim, () => convert())).toBe(0);
+    // The refusal names no bed and no crop: the trade has neither.
+    expect(eventsOf(h.sim, from, 'farmDenied')).toEqual([
+      { type: 'farmDenied', pid: h.pid, reason: 'no_husks' },
+    ]);
+    expect(eventsOf(h.sim, from, 'farmHusksConverted')).toEqual([]);
+    // NOTHING was consumed on the refusal, remainder included.
+    expect(h.sim.countItem(FARM_WITHERED_HUSK_ITEM_ID, h.pid)).toBe(FARM_HUSKS_PER_COMPOST - 1);
+    expect(h.sim.countItem(FARM_COMPOST_ITEM_ID, h.pid)).toBe(0);
+  });
+
+  it('refuses a dead farmer without touching the bags', () => {
+    h.sim.addItem(FARM_WITHERED_HUSK_ITEM_ID, FARM_HUSKS_PER_COMPOST, h.pid);
+    h.sim.player.dead = true;
+    const from = h.sim.events.length;
+    expect(countDraws(h.sim, () => convert())).toBe(0);
+    expect(h.sim.countItem(FARM_WITHERED_HUSK_ITEM_ID, h.pid)).toBe(FARM_HUSKS_PER_COMPOST);
+    expect(h.sim.countItem(FARM_COMPOST_ITEM_ID, h.pid)).toBe(0);
+    expect(eventsOf(h.sim, from, 'farmHusksConverted')).toEqual([]);
+    // Anti-vacuous: alive again, the same bags convert.
+    h.sim.player.dead = false;
+    convert();
+    expect(h.sim.countItem(FARM_COMPOST_ITEM_ID, h.pid)).toBe(1);
+  });
+
+  it('needs no bed, no range and no cast: the location gate is the documented Phase 9 deferral', () => {
+    // The permissive gate, exercised rather than assumed: standing nowhere
+    // near a farm, mid-cast, the trade still lands. The go-live phase adds
+    // the farmer-NPC range arm and flips this arm with it.
+    h.sim.player.pos.x += 500;
+    h.sim.player.pos.z += 500;
+    giveSeeds(h);
+    h.sim.addItem(FARM_WITHERED_HUSK_ITEM_ID, FARM_HUSKS_PER_COMPOST, h.pid);
+    h.sim.player.castingAbility = FARMING_CAST_ID;
+    h.sim.player.castRemaining = 1;
+    convert();
+    expect(h.sim.countItem(FARM_COMPOST_ITEM_ID, h.pid)).toBe(1);
+  });
+});
+
 describe('THE ANTI-CHORE INVARIANT: nothing rots', () => {
   it('pays a harvest N hours late EXACTLY what an on-time harvest pays', () => {
     const onTime = makeHarness(1234);
@@ -1205,6 +1723,48 @@ describe('determinism across hosts', () => {
     expect(c.meta.farmPlots.get(BED)?.yieldSeed).not.toBe(a.meta.farmPlots.get(BED)?.yieldSeed);
   });
 
+  it('gives two Sims the identical KNOBBED session: plots, bags, grants and events', () => {
+    // The acceptance determinism pin re-armed with every knob in play: the
+    // same seed and the same knobbed command script produce the same plots,
+    // the same payments out of the bags, the same harvest into them, and the
+    // same event stream.
+    const a = makeHarness(4242);
+    const b = makeHarness(4242);
+    for (const hx of [a, b]) {
+      hx.sim.addItem(SEED_ID, 2, hx.pid);
+      hx.sim.addItem(FARM_COMPOST_ITEM_ID, 1, hx.pid);
+      hx.sim.addItem(FARM_GROWTH_TONIC_ITEM_ID, 1, hx.pid);
+      hx.sim.addItem(PRODUCE_ID, 2, hx.pid);
+      plantCrop(hx.sim.ctx, hx.sim.player, hx.meta, BED, CROP_ID, {
+        compost: true,
+        watch: true,
+        tonic: true,
+      });
+      clearCast(hx.sim);
+      plantCrop(hx.sim.ctx, hx.sim.player, hx.meta, BED2, CROP_ID, {});
+      clearCast(hx.sim);
+      hx.advance(CROP.durationMs);
+      harvestCrop(hx.sim.ctx, hx.sim.player, hx.meta, BED);
+      harvestCrop(hx.sim.ctx, hx.sim.player, hx.meta, BED2);
+    }
+    expect([...b.meta.farmPlots.entries()]).toEqual([...a.meta.farmPlots.entries()]);
+    for (const itemId of [
+      SEED_ID,
+      PRODUCE_ID,
+      FINE_ID,
+      FARM_COMPOST_ITEM_ID,
+      FARM_GROWTH_TONIC_ITEM_ID,
+      FARM_WITHERED_HUSK_ITEM_ID,
+    ]) {
+      expect(b.sim.countItem(itemId, b.pid), itemId).toBe(a.sim.countItem(itemId, a.pid));
+    }
+    expect(b.meta.pendingGatherGrants).toEqual(a.meta.pendingGatherGrants);
+    const farmEventsOf = (hx: Harness) => hx.sim.events.filter((e) => e.type.startsWith('farm'));
+    expect(farmEventsOf(b)).toEqual(farmEventsOf(a));
+    // Anti-vacuous: the knobbed session really planted with the knobs on.
+    expect(farmEventsOf(a).some((e) => e.type === 'farmPlanted')).toBe(true);
+  });
+
   it('survives a mid-growth save and load with its remaining duration intact', () => {
     const h = makeHarness(555);
     giveSeeds(h);
@@ -1252,16 +1812,29 @@ describe('the Sim delegates', () => {
   it('forwards plantCrop and harvestCrop, and no-ops on an unknown pid', () => {
     const h = makeHarness();
     giveSeeds(h);
-    h.sim.plantCrop(BED, CROP_ID, h.pid);
+    h.sim.plantCrop(BED, CROP_ID, undefined, h.pid);
     expect(h.meta.farmPlots.has(BED)).toBe(true);
     clearCast(h.sim);
     h.advance(CROP.durationMs);
     h.sim.harvestCrop(BED, h.pid);
     expect(h.meta.farmPlots.has(BED)).toBe(false);
     // An unresolvable pid changes nothing and throws nothing.
-    expect(() => h.sim.plantCrop(BED, CROP_ID, 987_654)).not.toThrow();
+    expect(() => h.sim.plantCrop(BED, CROP_ID, undefined, 987_654)).not.toThrow();
     expect(() => h.sim.harvestCrop(BED, 987_654)).not.toThrow();
     expect(h.meta.farmPlots.size).toBe(0);
+  });
+
+  it('forwards convertHusks, and no-ops on an unknown pid', () => {
+    const h = makeHarness();
+    h.sim.addItem(FARM_WITHERED_HUSK_ITEM_ID, FARM_HUSKS_PER_COMPOST, h.pid);
+    // The unknown pid FIRST, while the husks are still in the bags: after the
+    // real call there is nothing left to convert, so ordering it second would
+    // prove nothing.
+    expect(() => h.sim.convertHusks(987_654)).not.toThrow();
+    expect(h.sim.countItem(FARM_COMPOST_ITEM_ID, h.pid)).toBe(0);
+    h.sim.convertHusks(h.pid);
+    expect(h.sim.countItem(FARM_COMPOST_ITEM_ID, h.pid)).toBe(1);
+    expect(h.sim.countItem(FARM_WITHERED_HUSK_ITEM_ID, h.pid)).toBe(0);
   });
 });
 

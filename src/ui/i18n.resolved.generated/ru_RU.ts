@@ -2731,8 +2731,14 @@ export const ru_RU: EnTranslations = {
         "skill": "Ваш навык земледелия слишком низок для этой культуры.",
         "no_seed": "У вас нет семян этой культуры.",
         "not_ready": "Этот урожай еще растет.",
-        "no_plot": "На этой грядке ничего не посажено."
-      }
+        "no_plot": "На этой грядке ничего не посажено.",
+        "no_husks": "У вас недостаточно засохшей шелухи.",
+        "no_compost": "У вас нет компоста.",
+        "no_fee_produce": "У вас нет урожая, чтобы оплатить присмотр.",
+        "no_tonic": "У вас нет тоника роста."
+      },
+      "husksConvertedLine": "Вы обмениваете {husksName} x{husks} на {name}.",
+      "husksConvertedLineQty": "Вы обмениваете {husksName} x{husks} на {name} x{qty}."
     },
     "archetypeTitle": {
       "label": "Титул",
@@ -11227,6 +11233,12 @@ export const ru_RU: EnTranslations = {
       },
       "withered_husks": {
         "name": "Засохшая шелуха"
+      },
+      "compost": {
+        "name": "Компост"
+      },
+      "growth_tonic": {
+        "name": "Тоник роста"
       },
       "conjured_water4": {
         "name": "Сотворённая родниковая вода"

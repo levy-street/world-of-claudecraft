@@ -146,9 +146,47 @@ describe('ClientWorld emits the farming frames the protocol declares', () => {
       // The exhaustive key set, not a containment check: an EXTRA field is as
       // much a protocol change as a missing one, and a client-supplied item or
       // yield payload riding along here is the exact thing server authority
-      // forbids.
+      // forbids. A KNOBLESS plant stays byte-identical to the pre-knob
+      // protocol: unset knobs are omitted, never sent as false.
       expect(Object.keys(frames[0]).sort()).toEqual(['bed', 'cmd', 'crop', 't']);
       expect(frames[0]).toEqual({ t: 'cmd', cmd: 'plant_crop', bed: BED, crop: CROP });
+    });
+  });
+
+  it('plantCrop rides knob fields ONLY when literally true, one per requested knob', () => {
+    withClient((world, sock) => {
+      // All three requested: the frame carries all three literal-true fields
+      // and nothing else (still an exhaustive key set, the arm above's rule).
+      world.plantCrop(BED, CROP, { compost: true, watch: true, tonic: true });
+      // One requested: only that field rides.
+      world.plantCrop(BED, CROP, { watch: true });
+      // Explicit false is the SAME statement as absent (knob not requested),
+      // so it must not widen the frame either.
+      world.plantCrop(BED, CROP, { compost: false, watch: false, tonic: false });
+
+      const frames = commandFrames(sock, 'plant_crop');
+      expect(frames).toHaveLength(3);
+      expect(Object.keys(frames[0]).sort()).toEqual([
+        'bed',
+        'cmd',
+        'compost',
+        'crop',
+        't',
+        'tonic',
+        'watch',
+      ]);
+      expect(frames[0]).toEqual({
+        t: 'cmd',
+        cmd: 'plant_crop',
+        bed: BED,
+        crop: CROP,
+        compost: true,
+        watch: true,
+        tonic: true,
+      });
+      expect(Object.keys(frames[1]).sort()).toEqual(['bed', 'cmd', 'crop', 't', 'watch']);
+      expect(frames[1].watch).toBe(true);
+      expect(Object.keys(frames[2]).sort()).toEqual(['bed', 'cmd', 'crop', 't']);
     });
   });
 
@@ -160,6 +198,20 @@ describe('ClientWorld emits the farming frames the protocol declares', () => {
       expect(frames).toHaveLength(1);
       expect(Object.keys(frames[0]).sort()).toEqual(['bed', 'cmd', 't']);
       expect(frames[0]).toEqual({ t: 'cmd', cmd: 'harvest_crop', bed: BED });
+    });
+  });
+
+  it('convertHusks sends convert_husks with NO payload beyond the frame chrome', () => {
+    withClient((world, sock) => {
+      world.convertHusks();
+
+      const frames = commandFrames(sock, 'convert_husks');
+      expect(frames).toHaveLength(1);
+      // Exhaustive: the ratio, the batch count and both item ids resolve
+      // sim-side from the sender's own bags, so an EXTRA field here would be
+      // a client trying to choose its own trade.
+      expect(Object.keys(frames[0]).sort()).toEqual(['cmd', 't']);
+      expect(frames[0]).toEqual({ t: 'cmd', cmd: 'convert_husks' });
     });
   });
 
@@ -179,27 +231,50 @@ describe('ClientWorld emits the farming frames the protocol declares', () => {
 });
 
 describe('the captured client frames reach the sim through the real dispatch', () => {
-  it('routes plant_crop and harvest_crop to the Sim with the ids the client sent', () => {
+  it('routes plant_crop, harvest_crop and convert_husks to the Sim with what the client sent', () => {
     const rawFrames: string[] = [];
     withClient((world, sock) => {
       world.plantCrop(BED, CROP);
+      world.plantCrop(BED, CROP, { compost: true, tonic: true });
       world.harvestCrop(BED);
+      world.convertHusks();
       rawFrames.push(...sock.sent);
     });
-    expect(rawFrames).toHaveLength(2);
+    expect(rawFrames).toHaveLength(4);
 
     const server = new GameServer();
     const session = joinServer(server, 1, 'Rowan');
     const plantSpy = vi.spyOn(server.sim, 'plantCrop').mockImplementation(() => {});
     const harvestSpy = vi.spyOn(server.sim, 'harvestCrop').mockImplementation(() => {});
+    const convertSpy = vi.spyOn(server.sim, 'convertHusks').mockImplementation(() => {});
 
     // Verbatim: the client's own bytes, never a frame written by this test.
     for (const raw of rawFrames) server.handleMessage(session, raw);
 
-    expect(plantSpy).toHaveBeenCalledTimes(1);
-    expect(plantSpy).toHaveBeenCalledWith(BED, CROP, session.pid);
+    // The dispatch hands the sim a COMPLETE knob record either way: an
+    // omitted wire field arrives as false (absent and false are the same
+    // protocol statement), a literal-true field as true. This is the one
+    // place the whole field-name agreement between the client's send and the
+    // server's read is proven end to end.
+    expect(plantSpy).toHaveBeenCalledTimes(2);
+    expect(plantSpy).toHaveBeenNthCalledWith(
+      1,
+      BED,
+      CROP,
+      { compost: false, watch: false, tonic: false },
+      session.pid,
+    );
+    expect(plantSpy).toHaveBeenNthCalledWith(
+      2,
+      BED,
+      CROP,
+      { compost: true, watch: false, tonic: true },
+      session.pid,
+    );
     expect(harvestSpy).toHaveBeenCalledTimes(1);
     expect(harvestSpy).toHaveBeenCalledWith(BED, session.pid);
+    expect(convertSpy).toHaveBeenCalledTimes(1);
+    expect(convertSpy).toHaveBeenCalledWith(session.pid);
     vi.restoreAllMocks();
   });
 
@@ -210,12 +285,18 @@ describe('the captured client frames reach the sim through the real dispatch', (
     const harvestSpy = vi.spyOn(server.sim, 'harvestCrop').mockImplementation(() => {});
 
     // One case per FIELD, not one joint case: a guard that checked only `bed`
-    // would still pass a test that malformed both at once.
+    // would still pass a test that malformed both at once. The knob fields
+    // are guarded per field too: present-but-not-boolean refuses the whole
+    // frame (coercing junk into a knob choice would be the laundering the id
+    // rule forbids), covered one junk type per field.
     const refused: Record<string, unknown>[] = [
       { cmd: 'plant_crop', bed: 42, crop: CROP },
       { cmd: 'plant_crop', bed: BED, crop: 42 },
       { cmd: 'plant_crop', crop: CROP },
       { cmd: 'plant_crop', bed: BED },
+      { cmd: 'plant_crop', bed: BED, crop: CROP, compost: 'yes' },
+      { cmd: 'plant_crop', bed: BED, crop: CROP, watch: 1 },
+      { cmd: 'plant_crop', bed: BED, crop: CROP, tonic: null },
       { cmd: 'harvest_crop', bed: 42 },
       { cmd: 'harvest_crop' },
     ];
@@ -226,14 +307,25 @@ describe('the captured client frames reach the sim through the real dispatch', (
     expect(plantSpy).not.toHaveBeenCalled();
     expect(harvestSpy).not.toHaveBeenCalled();
 
-    // The same session still works with well-formed frames, so the refusals
-    // above are the guard doing its job and not a dead dispatch arm.
+    // The same session still works with well-formed frames (knobbed
+    // included), so the refusals above are the guard doing its job and not a
+    // dead dispatch arm.
     server.handleMessage(
       session,
       JSON.stringify({ t: 'cmd', cmd: 'plant_crop', bed: BED, crop: CROP }),
     );
+    server.handleMessage(
+      session,
+      JSON.stringify({ t: 'cmd', cmd: 'plant_crop', bed: BED, crop: CROP, compost: true }),
+    );
     server.handleMessage(session, JSON.stringify({ t: 'cmd', cmd: 'harvest_crop', bed: BED }));
-    expect(plantSpy).toHaveBeenCalledTimes(1);
+    expect(plantSpy).toHaveBeenCalledTimes(2);
+    expect(plantSpy).toHaveBeenLastCalledWith(
+      BED,
+      CROP,
+      { compost: true, watch: false, tonic: false },
+      session.pid,
+    );
     expect(harvestSpy).toHaveBeenCalledTimes(1);
     vi.restoreAllMocks();
   });
@@ -252,7 +344,12 @@ describe('the captured client frames reach the sim through the real dispatch', (
       JSON.stringify({ t: 'cmd', cmd: 'plant_crop', bed: 'bed_nowhere_99', crop: 'not_a_crop' }),
     );
 
-    expect(plantSpy).toHaveBeenCalledWith('bed_nowhere_99', 'not_a_crop', session.pid);
+    expect(plantSpy).toHaveBeenCalledWith(
+      'bed_nowhere_99',
+      'not_a_crop',
+      { compost: false, watch: false, tonic: false },
+      session.pid,
+    );
     vi.restoreAllMocks();
   });
 });
@@ -505,6 +602,41 @@ describe('the four farm events reach the actor, and only the actor', () => {
       session,
       JSON.stringify({ t: 'cmd', cmd: 'plant_crop', bed: 'bed_eastbrook_2', crop: CROP }),
     );
+    routeTick(server);
+    expect(farmEvents(fc.sent, 'farmDenied')).toHaveLength(1);
+    expect(farmEvents(bystanderFc.sent, 'farmDenied')).toHaveLength(0);
+  });
+
+  it('delivers farmHusksConverted to the trader, never to a bystander', () => {
+    // The knobs phase's fifth farm event, over the same live routing path as
+    // the four above: without this arm a suppression filter could mute the
+    // trade's only feedback line while every sim-level pin stayed green.
+    const server = new GameServer();
+    const { session, fc } = joinWithSocket(server, 1, 'Trader');
+    const { fc: bystanderFc } = joinWithSocket(server, 2, 'Bystander');
+    const pid = session.pid as number;
+    server.sim.addItem('withered_husks', 2, pid);
+    // Flush the setup grant's own loot event before measuring (the fixture
+    // vacuity discipline the HEAVY_SELF arms above document).
+    routeTick(server);
+    fc.sent.length = 0;
+    bystanderFc.sent.length = 0;
+
+    server.handleMessage(session, JSON.stringify({ t: 'cmd', cmd: 'convert_husks' }));
+    routeTick(server);
+    const events = farmEvents(fc.sent, 'farmHusksConverted');
+    expect(events).toHaveLength(1);
+    expect(events[0].pid).toBe(pid);
+    expect(farmEvents(bystanderFc.sent, 'farmHusksConverted')).toHaveLength(0);
+    // The trade really happened on the authoritative bags, so the delivery
+    // above is a real event and not a stray echo.
+    expect(server.sim.countItem('compost', pid)).toBe(1);
+    expect(server.sim.countItem('withered_husks', pid)).toBe(0);
+
+    // And the refusal twin through the same path: a second convert with an
+    // empty pouch answers with the pid-scoped farmDenied.
+    fc.sent.length = 0;
+    server.handleMessage(session, JSON.stringify({ t: 'cmd', cmd: 'convert_husks' }));
     routeTick(server);
     expect(farmEvents(fc.sent, 'farmDenied')).toHaveLength(1);
     expect(farmEvents(bystanderFc.sent, 'farmDenied')).toHaveLength(0);

@@ -77,7 +77,7 @@ import { isItemLevelEligible, itemLevel, itemScore } from '../sim/item_level';
 import { requiredLevelFor } from '../sim/item_level_req';
 import type { Ante, PickAction } from '../sim/lockpick';
 import { petCanForceTaunt } from '../sim/pet/pet_taunt_gate';
-import { FARM_WITHERED_HUSK_ITEM_ID } from '../sim/professions/farming';
+import { FARM_COMPOST_ITEM_ID, FARM_WITHERED_HUSK_ITEM_ID } from '../sim/professions/farming';
 import {
   computeRespecCost,
   FOCUS_POINT_BUDGET,
@@ -284,6 +284,14 @@ import {
 } from './entity_i18n';
 import { ERROR_LOG_COLOR, shouldMirrorErrorToast } from './error_toast_log';
 import { esc } from './esc';
+import {
+  farmDeniedLineKey,
+  farmFineLineKey,
+  farmHarvestLineKey,
+  farmHusksConvertedLineKey,
+  farmPlantedTokenId,
+  farmWitheredLineKey,
+} from './farming_view';
 import { blockFctAmountText } from './fct_core';
 import { fctSpawnShape } from './fct_event';
 import { FctPainter } from './fct_painter';
@@ -300,7 +308,6 @@ import { gatheringProfessionNameKey } from './gathering_profession_name';
 import {
   buildGatheringProficiencyRows,
   buildGatherNodeTooltip,
-  farmDeniedLineKey,
   gatherDeniedLineKey,
   gatherDowngradeLineKey,
   gatherRareTierFor,
@@ -308,10 +315,6 @@ import {
 } from './gathering_view';
 import {
   craftedLineKey,
-  farmFineLineKey,
-  farmHarvestLineKey,
-  farmPlantedTokenId,
-  farmWitheredLineKey,
   gatherLineKey,
   grantItemToken,
   grantQtyText,
@@ -11889,10 +11892,29 @@ export class Hud {
           break;
         }
         case 'farmDenied': {
-          // A refused plant or harvest: an error toast ONLY, no line, no cue,
-          // no other state (the gatherDenied pattern). The sim event is
-          // text-free, so the pure core resolves one key per reason.
+          // A refused plant, harvest or husk trade: an error toast ONLY, no
+          // line, no cue, no other state (the gatherDenied pattern). The sim
+          // event is text-free, so the pure core resolves one key per reason.
           this.showError(t(farmDeniedLineKey(ev.reason)));
+          break;
+        }
+        case 'farmHusksConverted': {
+          // The husk trade (the knobs phase). The event owns both halves of
+          // the feedback (the compost grant rides its hub loot event silent +
+          // callerLogs, the #2430 one-line rule), so this one line names both
+          // sides of the trade AS ITEM TOKENS: the husks spent and the
+          // compost gained, each through grantItemToken so neither can drift
+          // from its localized item name. Same grant green as the harvest
+          // line; no cue (the render / juice phase owns farming audio).
+          this.log(
+            t(farmHusksConvertedLineKey(ev.compost), {
+              husksName: grantItemToken(FARM_WITHERED_HUSK_ITEM_ID),
+              husks: grantQtyText(ev.husks),
+              name: grantItemToken(FARM_COMPOST_ITEM_ID),
+              qty: grantQtyText(ev.compost),
+            }),
+            '#7fdc4f',
+          );
           break;
         }
         case 'gatherRareEvent': {

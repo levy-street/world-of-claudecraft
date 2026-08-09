@@ -423,12 +423,15 @@ export const IWORLD_MEMBERS = [
   { name: 'saveActionBarLayout', kind: 'method' },
   { name: 'takeActionBarLayoutRestore', kind: 'method' },
   // IWorldFarming: the static garden-bed geography plus the viewer's own plot
-  // rows (both data), and the growth phase's two plot mutations (both methods).
-  // The knob commands land with the knobs phase.
+  // rows (both data), the growth phase's two plot mutations, and the knobs
+  // phase's husk conversion (all methods). The plant-time knobs themselves
+  // ride plantCrop's payload rather than members of their own (D8:
+  // front-loaded choice).
   { name: 'farmPatches', kind: 'data' },
   { name: 'myFarmPlots', kind: 'data' },
   { name: 'plantCrop', kind: 'method' },
   { name: 'harvestCrop', kind: 'method' },
+  { name: 'convertHusks', kind: 'method' },
 ] as const satisfies readonly IWorldMember[];
 
 const DATA_MEMBERS = IWORLD_MEMBERS.filter((m) => m.kind === 'data');
@@ -569,10 +572,11 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // data), leaving 302. Farming's patches-and-plots phase adds farmPatches
     // and myFarmPlots (IWorldFarming, data), leaving 304. Farming's growth
     // phase adds the two plot mutations, plantCrop and harvestCrop
-    // (IWorldFarming, methods), leaving 306.
-    expect(IWORLD_MEMBERS.length).toBe(306);
+    // (IWorldFarming, methods), leaving 306. Farming's knobs phase adds the
+    // husk conversion, convertHusks (IWorldFarming, a method), leaving 307.
+    expect(IWORLD_MEMBERS.length).toBe(307);
     expect(DATA_MEMBERS.length).toBe(79);
-    expect(METHOD_MEMBERS.length).toBe(227);
+    expect(METHOD_MEMBERS.length).toBe(228);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -640,6 +644,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'companionState',
       'companionUpgrade',
       'companionUpgrades',
+      'convertHusks',
       'convertPartyToRaid',
       'convertRaidToParty',
       'copper',
@@ -1018,6 +1023,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'clearMarker',
       'collectDelveChestLoot',
       'companionUpgrade',
+      'convertHusks',
       'convertPartyToRaid',
       'convertRaidToParty',
       'craftItem',
@@ -1724,6 +1730,7 @@ const FACET_FARMING = [
   'myFarmPlots',
   'plantCrop',
   'harvestCrop',
+  'convertHusks',
 ] as const satisfies readonly (keyof IWorldFarming)[];
 type _ExhaustFarming = AssertNever<Exclude<keyof IWorldFarming, (typeof FACET_FARMING)[number]>>;
 
@@ -1794,8 +1801,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(306);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(306);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(307);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(307);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

@@ -2731,8 +2731,14 @@ export const en_XA: EnTranslations = {
         "skill": "[Ýóúŕ Ƒáŕɱíñĝ šķíļļ íš ţóó ļóŵ ƒóŕ ţĥáţ çŕóþ.]",
         "no_seed": "[Ýóú ĥáʋé ñó šééð ƒóŕ ţĥáţ çŕóþ.]",
         "not_ready": "[Ţĥáţ çŕóþ íš šţíļļ ĝŕóŵíñĝ.]",
-        "no_plot": "[Ñóţĥíñĝ íš þļáñţéð íñ ţĥáţ ƀéð.]"
-      }
+        "no_plot": "[Ñóţĥíñĝ íš þļáñţéð íñ ţĥáţ ƀéð.]",
+        "no_husks": "[Ýóú ðó ñóţ ĥáʋé éñóúĝĥ ŵíţĥéŕéð ĥúšķš.]",
+        "no_compost": "[Ýóú ĥáʋé ñó çóɱþóšţ.]",
+        "no_fee_produce": "[Ýóú ĥáʋé ñó þŕóðúçé ţó þáý ţĥé ŵáţçĥ ƒéé.]",
+        "no_tonic": "[Ýóú ĥáʋé ñó ĝŕóŵţĥ ţóñíç.]"
+      },
+      "husksConvertedLine": "[Ýóú ţŕáðé {husksName} ẋ{husks} ƒóŕ {name}.]",
+      "husksConvertedLineQty": "[Ýóú ţŕáðé {husksName} ẋ{husks} ƒóŕ {name} ẋ{qty}.]"
     },
     "archetypeTitle": {
       "label": "[Ţíţļé]",
@@ -11227,6 +11233,12 @@ export const en_XA: EnTranslations = {
       },
       "withered_husks": {
         "name": "[Ŵíţĥéŕéð Ĥúšķš]"
+      },
+      "compost": {
+        "name": "[Çóɱþóšţ]"
+      },
+      "growth_tonic": {
+        "name": "[Ĝŕóŵţĥ Ţóñíç]"
       },
       "conjured_water4": {
         "name": "[Çóñĵúŕéð Šþŕíñĝŵáţéŕ]"

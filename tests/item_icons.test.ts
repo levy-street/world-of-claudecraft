@@ -280,13 +280,22 @@ describe('item webp icons', () => {
     // The size pin is what stops the list becoming a dumping ground: it must be
     // re-pinned deliberately, in the change that enumerates the debt, never
     // grown quietly. The painted-art wave cleared this to 0; the farming
-    // growth-engine phase re-opened it for its four items, which are dormant
-    // online (no seed faucet exists yet) and whose art is scheduled as its own
-    // later phase. It must fall back to 0 as that art lands.
+    // growth-engine phase re-opened it for its four items, and the knobs phase
+    // added its two supplies (compost and the growth tonic) under the same
+    // reasoning: all six are dormant online (no faucet for any exists yet)
+    // and their art is scheduled as its own later phase. It must fall back to
+    // 0 as that art lands.
     expect(
       [...ITEM_ART_PENDING].sort(),
       'art debt is enumerated and re-pinned deliberately, never grown quietly',
-    ).toEqual(['fine_vale_wheat', 'vale_wheat', 'vale_wheat_seed', 'withered_husks']);
+    ).toEqual([
+      'compost',
+      'fine_vale_wheat',
+      'growth_tonic',
+      'vale_wheat',
+      'vale_wheat_seed',
+      'withered_husks',
+    ]);
     // And the inverse: an id with committed art must still win the static url.
     expect(itemImageUrl('linen_pouch')).toBe('/ui/items/linen_pouch.webp');
   });

@@ -16,8 +16,6 @@ import {
   buildGatherNodeTooltip,
   buildNearbyGatherNodes,
   classifyGatherNode,
-  type FarmDeniedReason,
-  farmDeniedLineKey,
   gatherDeniedLineKey,
   gatherDowngradeLineKey,
   gatherEffectPrompt,
@@ -610,43 +608,8 @@ describe('tool-tier lock dimension', () => {
     expect(gatherDowngradeLineKey('find')).toBe('hudChrome.gathering.downgradeFind');
   });
 
-  it('farmDeniedLineKey gives all eight refusal reasons their own real, distinct line', () => {
-    // The reasons are listed literally so this fails loudly if one is renamed;
-    // the OTHER direction (a reason ADDED to the sim union with no line) is
-    // caught by tsc, since farmDeniedLineKey's template literal has to be
-    // assignable to TranslationKey.
-    const reasons: FarmDeniedReason[] = [
-      'bad_bed',
-      'bad_crop',
-      'range',
-      'bed_taken',
-      'skill',
-      'no_seed',
-      'not_ready',
-      'no_plot',
-    ];
-    const keys = reasons.map((r) => farmDeniedLineKey(r));
-    expect(keys).toEqual([
-      'hudChrome.farming.denied.bad_bed',
-      'hudChrome.farming.denied.bad_crop',
-      'hudChrome.farming.denied.range',
-      'hudChrome.farming.denied.bed_taken',
-      'hudChrome.farming.denied.skill',
-      'hudChrome.farming.denied.no_seed',
-      'hudChrome.farming.denied.not_ready',
-      'hudChrome.farming.denied.no_plot',
-    ]);
-    // Every key must actually EXIST: t() throws on an untracked key in test,
-    // so this is what a leaf missing from the catalog fails on rather than a
-    // player seeing a raw dotted path in a toast. The rendered COPY is checked
-    // for distinctness too, not just the keys: eight keys pointing at two
-    // sentences would pass a key-only pin while telling the player the wrong
-    // thing six times.
-    setLanguage('en');
-    const copy = keys.map((k) => t(k));
-    for (const line of copy) expect(line.length).toBeGreaterThan(0);
-    expect(new Set(copy).size).toBe(8);
-  });
+  // The farmDeniedLineKey block moved to tests/farming_view.test.ts with the
+  // selector itself: the knobs phase extracted src/ui/farming_view.ts.
 });
 
 describe('buildGatheringProficiencyRows', () => {

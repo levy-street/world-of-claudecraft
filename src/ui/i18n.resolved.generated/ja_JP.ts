@@ -2731,8 +2731,14 @@ export const ja_JP: EnTranslations = {
         "skill": "その作物を育てるには農耕スキルが足りません。",
         "no_seed": "その作物の種を持っていません。",
         "not_ready": "その作物はまだ育っています。",
-        "no_plot": "その畑には何も植えられていません。"
-      }
+        "no_plot": "その畑には何も植えられていません。",
+        "no_husks": "枯れた殻が足りません。",
+        "no_compost": "堆肥がありません。",
+        "no_fee_produce": "見張り料を払う作物がありません。",
+        "no_tonic": "成長トニックがありません。"
+      },
+      "husksConvertedLine": "{husksName} x{husks}を{name}と交換した。",
+      "husksConvertedLineQty": "{husksName} x{husks}を{name} x{qty}と交換した。"
     },
     "archetypeTitle": {
       "label": "称号",
@@ -11227,6 +11233,12 @@ export const ja_JP: EnTranslations = {
       },
       "withered_husks": {
         "name": "枯れた籾殻"
+      },
+      "compost": {
+        "name": "堆肥"
+      },
+      "growth_tonic": {
+        "name": "成長トニック"
       },
       "conjured_water4": {
         "name": "魔法の湧き水"

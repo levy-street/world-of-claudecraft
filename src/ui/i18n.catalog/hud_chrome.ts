@@ -3361,7 +3361,23 @@ export const hudChromeStrings = {
       no_seed: 'You have no seed for that crop.',
       not_ready: 'That crop is still growing.',
       no_plot: 'Nothing is planted in that bed.',
+      // The knobs phase: the husk trade with fewer husks than one batch
+      // costs (convert_husks), then the three plant-time knob payments.
+      no_husks: 'You do not have enough withered husks.',
+      no_compost: 'You have no compost.',
+      no_fee_produce: 'You have no produce to pay the watch fee.',
+      no_tonic: 'You have no growth tonic.',
     },
+    // The husk trade's one line (the knobs phase): names BOTH sides of the
+    // trade, what left the bags and what arrived, because the compost grant's
+    // hub line stands down for it (silent + callerLogs, the #2430 one-line
+    // rule). BOTH items splice as tokens ({husksName} is the husk item's own
+    // localized link, exactly like {name}): hardcoding "withered husks" as
+    // prose would drift from entities.items.withered_husks.name per locale
+    // on any rename, and the xN form sidesteps English pluralization. The
+    // quantity split follows the grant-line families above.
+    husksConvertedLine: 'You trade {husksName} x{husks} for {name}.',
+    husksConvertedLineQty: 'You trade {husksName} x{husks} for {name} x{qty}.',
   },
   // Archetype title chrome (#1130, pair-named under Professions 2.0):
   // `label` heads the character-sheet title line, `none` is shown before the

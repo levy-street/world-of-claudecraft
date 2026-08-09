@@ -394,11 +394,13 @@ import {
 } from './professions/farm_persist';
 import {
   EMPTY_FARM_PLOT_VIEWS,
+  type FarmPlantKnobs,
   type FarmPlotView,
   type PlotState,
   projectFarmPlots,
 } from './professions/farm_projection';
 import {
+  convertHusks as convertHusksAction,
   harvestCrop as harvestCropAction,
   plantCrop as plantCropAction,
   updateFarming,
@@ -11967,13 +11969,15 @@ export class Sim {
     return this.farmPlotsFor(this.primaryId);
   }
 
-  // Plant a crop in a garden bed. Thin delegate: the whole decision (the
-  // stated gate order, the seed spend, the one two-draw pre-roll block, the
-  // plot write) lives in professions/farming.ts, which owns the draw contract.
-  plantCrop(bedId: string, cropId: string, pid?: number): void {
+  // Plant a crop in a garden bed, with the optional plant-time knob payload
+  // (compost, farmer's watch, growth tonic). Thin delegate: the whole
+  // decision (the stated gate order, the seed and knob payments, the one
+  // two-draw pre-roll block, the plot write) lives in professions/farming.ts,
+  // which owns the draw contract.
+  plantCrop(bedId: string, cropId: string, knobs?: FarmPlantKnobs, pid?: number): void {
     const r = this.ctx.resolve(pid);
     if (!r) return;
-    plantCropAction(this.ctx, r.e, r.meta, bedId, cropId);
+    plantCropAction(this.ctx, r.e, r.meta, bedId, cropId, knobs);
   }
 
   // Harvest a finished plot. Thin delegate like plantCrop above; draw-free on
@@ -11982,6 +11986,16 @@ export class Sim {
     const r = this.ctx.resolve(pid);
     if (!r) return;
     harvestCropAction(this.ctx, r.e, r.meta, bedId);
+  }
+
+  // Trade withered husks for compost. Thin delegate like its two siblings
+  // above; draw-free on every path (the ratio is a constant), and the
+  // permissive location gate is documented at the action (the farmer-NPC
+  // range arm lands with the NPCs in the go-live phase).
+  convertHusks(pid?: number): void {
+    const r = this.ctx.resolve(pid);
+    if (!r) return;
+    convertHusksAction(this.ctx, r.e, r.meta);
   }
 
   // Slot an effect onto one gathering profession's tool, consuming one charm

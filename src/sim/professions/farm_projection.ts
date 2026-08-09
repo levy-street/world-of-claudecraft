@@ -50,6 +50,19 @@ export interface PlotState {
 // unobservable while the plot grows).
 export type FarmPlotStatus = 'growing' | 'ready' | 'withered';
 
+// The plant-time knob request (the knobs phase), the payload shape plantCrop
+// accepts on the IWorld seam and the wire alike: three independent opt-ins
+// mirroring the three PlotState flags above. Every knob is chosen AT PLANT
+// TIME and never later (D8, front-loaded only); an absent field means the
+// knob was not requested, exactly as `false` does, which is what lets the
+// wire frame omit unset knobs and stay byte-identical to the pre-knob
+// protocol on a plain plant.
+export interface FarmPlantKnobs {
+  compost?: boolean;
+  watch?: boolean;
+  tonic?: boolean;
+}
+
 // The survival ramp (the growth-engine phase). Pure arithmetic, no rng, no
 // content import: the caller supplies the crop's tier, which keeps this file
 // the pure leaf its banner promises.
@@ -57,9 +70,9 @@ export type FarmPlotStatus = 'growing' | 'ready' | 'withered';
 // TUNING, PROVISIONAL, FLAGGED FOR THE MAINTAINER. Base survival is 85 percent
 // at the crop's own gate and ramps to 100 percent at the top of its 25-point
 // band, so one full band above the threshold retires the crop's risk
-// permanently. Compost and the farmer's watch each add 10 points on top (both
-// are always false this phase; the knobs phase wires them), and the whole
-// thing caps at 1.
+// permanently. Compost and the farmer's watch each add 10 points on top (LIVE
+// since the knobs phase: plantCrop stores the flags a paid knob armed, and
+// this bonus arm is what they buy), and the whole thing caps at 1.
 export const FARM_SURVIVAL_AT_GATE = 0.85;
 export const FARM_SURVIVAL_BAND_SPAN = 25;
 export const FARM_SURVIVAL_COMPOST_BONUS = 0.1;

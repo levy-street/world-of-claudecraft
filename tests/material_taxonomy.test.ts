@@ -47,6 +47,7 @@ const HONEST_MATERIALS = [
   'arcanite_bar',
   'ashwood_log',
   'bone_fragments',
+  'compost',
   'cooking_salt',
   'copper_ore',
   'curved_tusk',
@@ -65,6 +66,7 @@ const HONEST_MATERIALS = [
   'glass_vial',
   'glimmerfin_koi',
   'goldleaf_herb',
+  'growth_tonic',
   'homespun_cloth',
   'iron_ore',
   'ironbark_log',
@@ -266,19 +268,24 @@ describe('MATERIAL_ITEM_IDS: every source table is fully represented', () => {
     expect(rows).toBeGreaterThan(0);
   });
 
-  it('contains every farming yield: produce, fine twin, seed, and husks', () => {
+  it('contains every farming yield and supply: produce, fine twin, seed, husks, knobs', () => {
     // Farming is fishing-shaped, not node-shaped: nothing it yields is in
     // NODE_MATERIAL_TABLE and its fine grade is deliberately not a
     // MATERIAL_GRADES row, so without its own source loop every crop the
-    // ladder phase adds would land unclassified.
+    // ladder phase adds would land unclassified. The two knob supplies
+    // (compost and the growth tonic, the knobs phase) join through the same
+    // source: they are the tradeable input side of the same loop, exactly
+    // like the seeds.
     for (const id of FARM_MATERIAL_ITEM_IDS) {
       expect(MATERIAL_ITEM_IDS.has(id), id).toBe(true);
     }
     // Anti-vacuous: the derived list is not empty and really does span all
-    // four families, so a crop table that stopped exporting would red here
+    // the families, so a crop table that stopped exporting would red here
     // instead of passing over nothing.
     expect([...FARM_MATERIAL_ITEM_IDS].sort()).toEqual([
+      'compost',
       'fine_vale_wheat',
+      'growth_tonic',
       'vale_wheat',
       'vale_wheat_seed',
       'withered_husks',

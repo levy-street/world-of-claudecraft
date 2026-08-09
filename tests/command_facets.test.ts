@@ -404,15 +404,17 @@ describe('command facet tags (deeds)', () => {
   });
 });
 
-// Farming: append the growth phase's two plot mutations. The table-consistency
-// invariants in the W6 block above (no orphan tag, no dispatch-only leak)
-// already cover the new entries; this block pins the exact facet per command,
-// keyed on the WIRE strings, and that the two Phase 2 reads stay untagged
-// (farmPatches is served from the client bundle with no round trip at all, and
-// myFarmPlots mirrors the `fplot` self delta). Append-only: never edit a tag.
+// Farming: append the growth phase's two plot mutations and the knobs phase's
+// husk conversion. The table-consistency invariants in the W6 block above (no
+// orphan tag, no dispatch-only leak) already cover the new entries; this block
+// pins the exact facet per command, keyed on the WIRE strings, and that the
+// two Phase 2 reads stay untagged (farmPatches is served from the client
+// bundle with no round trip at all, and myFarmPlots mirrors the `fplot` self
+// delta). Append-only: never edit a tag.
 const FARMING_TAGS: Readonly<Record<string, string>> = {
   plant_crop: 'IWorldFarming',
   harvest_crop: 'IWorldFarming',
+  convert_husks: 'IWorldFarming',
 };
 
 describe('command facet tags (farming)', () => {
@@ -425,13 +427,19 @@ describe('command facet tags (farming)', () => {
   });
 
   it('preserves the snake_case farming wire strings (never normalized to camelCase)', () => {
-    // The two wire strings pinned literally: these are the protocol, and a
+    // The three wire strings pinned literally: these are the protocol, and a
     // rename is a breaking change, not a refactor.
-    expect(Object.keys(FARMING_TAGS).sort()).toEqual(['harvest_crop', 'plant_crop']);
+    expect(Object.keys(FARMING_TAGS).sort()).toEqual([
+      'convert_husks',
+      'harvest_crop',
+      'plant_crop',
+    ]);
     expect('plant_crop' in tags).toBe(true);
     expect('harvest_crop' in tags).toBe(true);
+    expect('convert_husks' in tags).toBe(true);
     expect('plantCrop' in tags).toBe(false);
     expect('harvestCrop' in tags).toBe(false);
+    expect('convertHusks' in tags).toBe(false);
   });
 
   it('does not tag the reads (farmPatches, a bundled content table; myFarmPlots, the fplot mirror)', () => {
