@@ -120,20 +120,19 @@ const FARM_SKILL_SCALE_DENOM = 100;
 // punishment (the anti-chore thesis), and the knobs phase turns husks into
 // the next attempt's insurance.
 export const FARM_WITHERED_HUSK_COUNT = 2;
-// The item id itself lives in the content layer (content/farm_crops.ts) so the
-// material taxonomy can read it as data without importing this engine module;
-// re-exported here because this is where callers and tests reach for it.
-export { FARM_WITHERED_HUSK_ITEM_ID };
-// The knob-supply ids, same content-layer home and re-export rationale; the
-// knob payload type and the fee planner ride along for the same reason.
-export { FARM_COMPOST_ITEM_ID, FARM_GROWTH_TONIC_ITEM_ID };
 export type { FarmPlantKnobs } from './farm_projection';
 export {
-  FARM_WATCH_FEE_BY_TIER,
   eligibleWatchFeeItemIds,
+  FARM_WATCH_FEE_BY_TIER,
   planWatchFee,
   watchFeeAmount,
 } from './farm_watch_fee';
+// The item id itself lives in the content layer (content/farm_crops.ts) so the
+// material taxonomy can read it as data without importing this engine module;
+// re-exported here because this is where callers and tests reach for it.
+// The knob-supply ids, same content-layer home and re-export rationale; the
+// knob payload type and the fee planner ride along for the same reason.
+export { FARM_COMPOST_ITEM_ID, FARM_GROWTH_TONIC_ITEM_ID, FARM_WITHERED_HUSK_ITEM_ID };
 
 // How many husks one compost costs at the farmer's trade (convertHusks
 // below). TUNING, PROVISIONAL, FLAGGED FOR THE MAINTAINER: a failed crop pays
