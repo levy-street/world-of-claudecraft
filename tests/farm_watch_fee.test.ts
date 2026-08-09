@@ -13,15 +13,16 @@ import {
   watchFeeAmount,
 } from '../src/sim/professions/farm_watch_fee';
 
-// A synthetic multi-tier catalog for the injectable-crops arms below. The
-// shipped table carries ONE crop, so against live data the tier ordering,
-// the higher-tier exclusion, and the dedupe literally cannot fail (the QA
-// round proved it: deleting the Set left every suite green). These rows make
-// all three falsifiable today instead of when the crop ladder lands.
-// Authored OUT of tier order on purpose (the walk must sort, never trust
-// insertion order), with one deliberate collision: 'twinberry' names the
-// SAME id for its base and fine grades, so a double-listing would count one
-// bag stack twice.
+// A synthetic multi-tier catalog for the injectable-crops arms below. It
+// predates the crop ladder: when the shipped table carried ONE crop, the
+// tier ordering, the higher-tier exclusion, and the dedupe literally could
+// not fail against live data (the QA round proved it: deleting the Set left
+// every suite green). The ladder now makes the ordering and the exclusion
+// visible live (pinned below), but these rows still earn their keep: the
+// deliberate 'twinberry' collision names the SAME id for its base and fine
+// grades, a row the live catalog must never author (the aliasing pin), so
+// the dedupe stays falsifiable only here. Authored OUT of tier order on
+// purpose (the walk must sort, never trust insertion order).
 const SYNTH_LADDER: readonly FarmCropDef[] = [
   {
     id: 'frostroot',
@@ -84,14 +85,59 @@ describe('FARM_WATCH_FEE_BY_TIER', () => {
 });
 
 describe('eligibleWatchFeeItemIds', () => {
-  it('lists the shipped produce in the deterministic order: base before fine', () => {
-    // One crop ships today, so the full order is its base grade then its fine
-    // twin, at every planted tier (tier <= cropTier admits the tier-1 crop
-    // everywhere). The crop-ladder phase's additions join by derivation and
-    // extend this pin deliberately.
-    for (const tier of [1, 2, 3, 4]) {
-      expect(eligibleWatchFeeItemIds(tier)).toEqual(['vale_wheat', 'fine_vale_wheat']);
-    }
+  it('lists the shipped produce in the deterministic order: tier ascending, id, base before fine', () => {
+    // The live-catalog ordering, re-pinned deliberately by the crop-ladder
+    // phase: ascending crop tier, then catalog id within a tier, base grade
+    // before fine WITHIN a crop, and a planted tier admits only crops at or
+    // below it (the D9 predicate, now visible against live data).
+    expect(eligibleWatchFeeItemIds(1)).toEqual([
+      'brook_carrot',
+      'fine_brook_carrot',
+      'vale_wheat',
+      'fine_vale_wheat',
+    ]);
+    expect(eligibleWatchFeeItemIds(2)).toEqual([
+      'brook_carrot',
+      'fine_brook_carrot',
+      'vale_wheat',
+      'fine_vale_wheat',
+      'bog_beet',
+      'fine_bog_beet',
+      'marsh_rice',
+      'fine_marsh_rice',
+    ]);
+    expect(eligibleWatchFeeItemIds(3)).toEqual([
+      'brook_carrot',
+      'fine_brook_carrot',
+      'vale_wheat',
+      'fine_vale_wheat',
+      'bog_beet',
+      'fine_bog_beet',
+      'marsh_rice',
+      'fine_marsh_rice',
+      'frost_gourd',
+      'fine_frost_gourd',
+      'highland_barley',
+      'fine_highland_barley',
+    ]);
+    expect(eligibleWatchFeeItemIds(4)).toEqual([
+      'brook_carrot',
+      'fine_brook_carrot',
+      'vale_wheat',
+      'fine_vale_wheat',
+      'bog_beet',
+      'fine_bog_beet',
+      'marsh_rice',
+      'fine_marsh_rice',
+      'frost_gourd',
+      'fine_frost_gourd',
+      'highland_barley',
+      'fine_highland_barley',
+      'evergarden_greens',
+      'fine_evergarden_greens',
+      'gilded_sunmelon',
+      'fine_gilded_sunmelon',
+    ]);
   });
 
   it('admits nothing below tier 1', () => {
@@ -115,7 +161,8 @@ describe('eligibleWatchFeeItemIds', () => {
 
   it('EXCLUDES a higher-tier crop from a lower-tier plant (the D9 predicate, synthetic)', () => {
     // The actual fee predicate direction: a tier-1 plant may not be paid in
-    // tier-3 produce. Never exercisable against the one-crop live catalog.
+    // tier-3 produce. Also visible live since the crop ladder shipped; kept
+    // synthetic so the arm is independent of the live catalog's tuning.
     expect(eligibleWatchFeeItemIds(1, SYNTH_LADDER)).toEqual([
       'amberleaf',
       'fine_amberleaf',

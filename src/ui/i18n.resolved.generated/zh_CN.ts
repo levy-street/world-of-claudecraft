@@ -11434,6 +11434,69 @@ export const zh_CN: EnTranslations = {
       "growth_tonic": {
         "name": "生长滋补剂"
       },
+      "brook_carrot_seed": {
+        "name": "溪畔胡萝卜种子"
+      },
+      "brook_carrot": {
+        "name": "溪畔胡萝卜"
+      },
+      "fine_brook_carrot": {
+        "name": "优质溪畔胡萝卜"
+      },
+      "marsh_rice_seed": {
+        "name": "沼泽稻米种子"
+      },
+      "marsh_rice": {
+        "name": "沼泽稻米"
+      },
+      "fine_marsh_rice": {
+        "name": "优质沼泽稻米"
+      },
+      "bog_beet_seed": {
+        "name": "沼泽甜菜种子"
+      },
+      "bog_beet": {
+        "name": "沼泽甜菜"
+      },
+      "fine_bog_beet": {
+        "name": "优质沼泽甜菜"
+      },
+      "highland_barley_seed": {
+        "name": "高地大麦种子"
+      },
+      "highland_barley": {
+        "name": "高地大麦"
+      },
+      "fine_highland_barley": {
+        "name": "优质高地大麦"
+      },
+      "frost_gourd_seed": {
+        "name": "霜瓜种子"
+      },
+      "frost_gourd": {
+        "name": "霜瓜"
+      },
+      "fine_frost_gourd": {
+        "name": "优质霜瓜"
+      },
+      "gilded_sunmelon_seed": {
+        "name": "鎏金太阳瓜种子"
+      },
+      "gilded_sunmelon": {
+        "name": "鎏金太阳瓜"
+      },
+      "fine_gilded_sunmelon": {
+        "name": "优质鎏金太阳瓜"
+      },
+      "evergarden_greens_seed": {
+        "name": "常青园青菜种子"
+      },
+      "evergarden_greens": {
+        "name": "常青园青菜"
+      },
+      "fine_evergarden_greens": {
+        "name": "优质常青园青菜"
+      },
       "conjured_water4": {
         "name": "魔法泉水"
       },

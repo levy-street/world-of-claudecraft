@@ -12,10 +12,11 @@
 // load. Never rename, never reuse; retiring one is a deliberate
 // destroy-on-load decision.
 //
-// The full eight-crop ladder (two per tier) is packet-locked; this phase ships
-// exactly the tier-1 vale_wheat row so the engine is testable end to end, and
-// the crop-ladder phase adds the other seven with their fine twins and their
-// hoe gates. The skill threshold is NOT a column: it derives from the tier
+// The full eight-crop ladder (two per tier) is packet-locked and ships here:
+// the growth-engine phase landed exactly the tier-1 vale_wheat row so the
+// engine was testable end to end, and the crop-ladder phase adds the other
+// seven with their fine twins (the hoe gates land with the tool ladder in the
+// same phase). The skill threshold is NOT a column: it derives from the tier
 // through the shared 25-point band math (farmCropSkillThreshold below), so a
 // crop can never disagree with the profession's own ladder.
 
@@ -47,6 +48,77 @@ export interface FarmCropDef {
 // back inside one sitting.
 const VALE_WHEAT_DURATION_MS = 2_700_000;
 
+// TUNING, PROVISIONAL, FLAGGED FOR THE MAINTAINER: 35 minutes sits in the
+// lower half of the locked tier-1 band (30 to 60 minutes), deliberately
+// below vale_wheat's 45 so the two tier-1 crops never share a duration and
+// the starter vegetable reads as the quicker, cheaper first plant. It is
+// short enough that the D9 fee loop (buy the vendor carrot, plant, come
+// back for the harvest) resolves inside one sitting for a first-time
+// player, and long enough that a plot stays a check-in visit rather than
+// a refresh timer.
+const BROOK_CARROT_DURATION_MS = 2_100_000;
+
+// TUNING, PROVISIONAL, FLAGGED FOR THE MAINTAINER: 130 minutes takes the
+// high end of the locked tier-2 band (about 2 hours). The high end is
+// deliberate on two counts: it stays clear of the tier-2 sibling
+// (bog_beet, 8,100,000 ms, 135 minutes; the two crops of a tier must never
+// share a duration), and a paddy grain that outruns one sitting pushes the
+// second visit past a session boundary, the same check-in thesis
+// vale_wheat's mid-band 45 minutes serves one rung down.
+const MARSH_RICE_DURATION_MS = 7_800_000;
+
+// TUNING, PROVISIONAL, FLAGGED FOR THE MAINTAINER: 135 minutes takes the
+// high end of the locked tier-2 band (about 2 hours). Sitting a quarter
+// hour above the flat 120-minute center buys two things: the tier's two
+// crops keep distinct timers (the sibling marsh_rice ships at 7,800,000
+// ms, 130 minutes, so the pair never collides), and against
+// VALE_WHEAT_DURATION_MS (45 minutes) this timer clearly outlives one
+// sitting, making the marsh root the plant-now, collect-next-session rung
+// of the ladder rather than a longer wheat.
+const BOG_BEET_DURATION_MS = 8_100_000;
+
+// TUNING, PROVISIONAL, FLAGGED FOR THE MAINTAINER: 4 hours flat sits on
+// the round center of the locked tier-3 band (about 4 hours), the midpoint
+// the tier-3 sibling (frost_gourd, 16,200,000 ms, 4 hours 30 minutes)
+// deliberately leaves free, so the two tier-3 crops never share a
+// duration. Against VALE_WHEAT_DURATION_MS (45 minutes) it buys the hardy
+// mountain-grain feel: plant before one session and the harvest is the
+// natural first stop of the next, while staying comfortably short of the
+// tier-4 overnight band (8 to 11 hours).
+const HIGHLAND_BARLEY_DURATION_MS = 14_400_000;
+
+// TUNING, PROVISIONAL, FLAGGED FOR THE MAINTAINER: 4 hours 30 minutes takes
+// the top of the locked tier-3 band (about 4 hours). The high end buys two
+// things: it reads as the slow cold-hardy grower Thornpeak's flavor promises
+// against vale_wheat's 45-minute check-in, and it deliberately leaves the
+// round 4-hour midpoint free for the tier-3 sibling crop, so the two crops of
+// a tier cannot share a duration even if the sibling takes the obvious
+// center. At this length a morning plant is ready by evening and an evening
+// plant is ready next session, which keeps the check-in thesis intact one
+// rung below the overnight tier-4 band.
+const FROST_GOURD_DURATION_MS = 16_200_000;
+
+// TUNING, PROVISIONAL, FLAGGED FOR THE MAINTAINER: 10 hours takes the high
+// end of the locked tier-4 overnight band (8 to 11 hours): the Evergarden
+// showcase melon is the ladder's prestige wait, so planted at the end of an
+// evening session it is ready the next evening's first check-in even for a
+// player who logs in late, while staying an hour under the band ceiling.
+// The tier-4 sibling (evergarden_greens) sits half an hour higher at
+// 37,800,000 ms (10.5 hours); the two crops of a tier never share a
+// duration.
+const GILDED_SUNMELON_DURATION_MS = 36_000_000;
+
+// TUNING, PROVISIONAL, FLAGGED FOR THE MAINTAINER: 10.5 hours takes the
+// HIGH end of the locked tier-4 overnight band (8 to 11 hours), half an
+// hour above the tier-4 sibling (gilded_sunmelon, 36,000,000 ms, 10 hours),
+// so the two tier-4 durations never collide. Against a plant at an evening
+// logoff, the extra margin past 8 hours buys a crop that is not yet ready
+// at a short morning check and lands comfortably before the NEXT evening
+// session: the Evergarden capstone reads as a full-day commitment on the
+// check-in rhythm, never an alarm-clock race, and (per the header above)
+// the far end never rots, so the overshoot is pure slack.
+const EVERGARDEN_GREENS_DURATION_MS = 37_800_000;
+
 const FARM_CROP_ROWS: readonly FarmCropDef[] = [
   {
     id: 'vale_wheat',
@@ -55,6 +127,62 @@ const FARM_CROP_ROWS: readonly FarmCropDef[] = [
     seedItemId: 'vale_wheat_seed',
     produceItemId: 'vale_wheat',
     fineProduceItemId: 'fine_vale_wheat',
+  },
+  {
+    id: 'brook_carrot',
+    tier: 1,
+    durationMs: BROOK_CARROT_DURATION_MS,
+    seedItemId: 'brook_carrot_seed',
+    produceItemId: 'brook_carrot',
+    fineProduceItemId: 'fine_brook_carrot',
+  },
+  {
+    id: 'marsh_rice',
+    tier: 2,
+    durationMs: MARSH_RICE_DURATION_MS,
+    seedItemId: 'marsh_rice_seed',
+    produceItemId: 'marsh_rice',
+    fineProduceItemId: 'fine_marsh_rice',
+  },
+  {
+    id: 'bog_beet',
+    tier: 2,
+    durationMs: BOG_BEET_DURATION_MS,
+    seedItemId: 'bog_beet_seed',
+    produceItemId: 'bog_beet',
+    fineProduceItemId: 'fine_bog_beet',
+  },
+  {
+    id: 'highland_barley',
+    tier: 3,
+    durationMs: HIGHLAND_BARLEY_DURATION_MS,
+    seedItemId: 'highland_barley_seed',
+    produceItemId: 'highland_barley',
+    fineProduceItemId: 'fine_highland_barley',
+  },
+  {
+    id: 'frost_gourd',
+    tier: 3,
+    durationMs: FROST_GOURD_DURATION_MS,
+    seedItemId: 'frost_gourd_seed',
+    produceItemId: 'frost_gourd',
+    fineProduceItemId: 'fine_frost_gourd',
+  },
+  {
+    id: 'gilded_sunmelon',
+    tier: 4,
+    durationMs: GILDED_SUNMELON_DURATION_MS,
+    seedItemId: 'gilded_sunmelon_seed',
+    produceItemId: 'gilded_sunmelon',
+    fineProduceItemId: 'fine_gilded_sunmelon',
+  },
+  {
+    id: 'evergarden_greens',
+    tier: 4,
+    durationMs: EVERGARDEN_GREENS_DURATION_MS,
+    seedItemId: 'evergarden_greens_seed',
+    produceItemId: 'evergarden_greens',
+    fineProduceItemId: 'fine_evergarden_greens',
   },
 ];
 

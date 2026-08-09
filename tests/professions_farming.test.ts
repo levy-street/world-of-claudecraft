@@ -182,8 +182,22 @@ describe('the crop catalog and the cast sentinel', () => {
     expect(isNonSpellCast('fireball')).toBe(false);
   });
 
-  it('ships exactly the tier-1 crop, with its duration inside the locked band', () => {
-    expect(Object.keys(FARM_CROPS)).toEqual([CROP_ID]);
+  it('ships the full eight-crop ladder, two per tier, with vale_wheat inside its locked band', () => {
+    // The crop-ladder phase's catalog width pin: the packet-locked eight-crop
+    // ladder (D11 ids), authored in tier order. Retiring or renaming any of
+    // these destroys player plots at load (the save-key banner), so the list
+    // moves only deliberately.
+    expect(Object.keys(FARM_CROPS)).toEqual([
+      'vale_wheat',
+      'brook_carrot',
+      'marsh_rice',
+      'bog_beet',
+      'highland_barley',
+      'frost_gourd',
+      'gilded_sunmelon',
+      'evergarden_greens',
+    ]);
+    expect(Object.values(FARM_CROPS).map((c) => c.tier)).toEqual([1, 1, 2, 2, 3, 3, 4, 4]);
     expect(CROP.tier).toBe(1);
     expect(CROP.seedItemId).toBe(SEED_ID);
     expect(CROP.produceItemId).toBe(PRODUCE_ID);
@@ -192,6 +206,24 @@ describe('the crop catalog and the cast sentinel', () => {
     expect(CROP.durationMs).toBeGreaterThanOrEqual(30 * 60_000);
     expect(CROP.durationMs).toBeLessThanOrEqual(60 * 60_000);
     expect(CROP.durationMs).toBe(2_700_000);
+  });
+
+  it('pins every crop duration to its authored literal, all distinct, none shared within a tier', () => {
+    // The tuning surface of the whole ladder, pinned once: the two crops of a
+    // tier must never share a duration (the flag comments in farm_crops.ts
+    // state each choice), and the pin keeps a re-tune deliberate.
+    expect(Object.values(FARM_CROPS).map((c) => [c.id, c.durationMs])).toEqual([
+      ['vale_wheat', 2_700_000],
+      ['brook_carrot', 2_100_000],
+      ['marsh_rice', 7_800_000],
+      ['bog_beet', 8_100_000],
+      ['highland_barley', 14_400_000],
+      ['frost_gourd', 16_200_000],
+      ['gilded_sunmelon', 36_000_000],
+      ['evergarden_greens', 37_800_000],
+    ]);
+    const durations = Object.values(FARM_CROPS).map((c) => c.durationMs);
+    expect(new Set(durations).size).toBe(durations.length);
   });
 
   it('pins the plant cast length to its wire-visible literal', () => {
@@ -273,8 +305,9 @@ describe('FARMING_GAIN_SCHEDULE and the composed ceiling', () => {
   });
 
   it('zeroes the gain at or past the crop tier ceiling, the R19 composition', () => {
-    // A tier-1 crop teaches through the first two rows and grays at 50, which
-    // is exactly what caps farming at 50 until the crop ladder ships tier 2.
+    // The schedule truth, live now that the crop ladder ships all four tiers:
+    // a tier-1 crop teaches to 50, a tier-2 crop to 75, and tier 3 and 4
+    // crops to 100 (the composed ceiling above).
     expect(farmingHarvestGainAt(0, 1)).toBe(1);
     expect(farmingHarvestGainAt(25, 1)).toBe(0.5);
     expect(farmingHarvestGainAt(49.9, 1)).toBe(0.5);

@@ -11434,6 +11434,69 @@ export const ja_JP: EnTranslations = {
       "growth_tonic": {
         "name": "成長トニック"
       },
+      "brook_carrot_seed": {
+        "name": "小川ニンジンの種"
+      },
+      "brook_carrot": {
+        "name": "小川ニンジン"
+      },
+      "fine_brook_carrot": {
+        "name": "上質な小川ニンジン"
+      },
+      "marsh_rice_seed": {
+        "name": "湿原米の種"
+      },
+      "marsh_rice": {
+        "name": "湿原米"
+      },
+      "fine_marsh_rice": {
+        "name": "上質な湿原米"
+      },
+      "bog_beet_seed": {
+        "name": "沼地ビートの種"
+      },
+      "bog_beet": {
+        "name": "沼地ビート"
+      },
+      "fine_bog_beet": {
+        "name": "上質な沼地ビート"
+      },
+      "highland_barley_seed": {
+        "name": "高地大麦の種"
+      },
+      "highland_barley": {
+        "name": "高地大麦"
+      },
+      "fine_highland_barley": {
+        "name": "上質な高地大麦"
+      },
+      "frost_gourd_seed": {
+        "name": "霜瓜の種"
+      },
+      "frost_gourd": {
+        "name": "霜瓜"
+      },
+      "fine_frost_gourd": {
+        "name": "上質な霜瓜"
+      },
+      "gilded_sunmelon_seed": {
+        "name": "黄金の太陽メロンの種"
+      },
+      "gilded_sunmelon": {
+        "name": "黄金の太陽メロン"
+      },
+      "fine_gilded_sunmelon": {
+        "name": "上質な黄金の太陽メロン"
+      },
+      "evergarden_greens_seed": {
+        "name": "エバーガーデン青菜の種"
+      },
+      "evergarden_greens": {
+        "name": "エバーガーデン青菜"
+      },
+      "fine_evergarden_greens": {
+        "name": "上質なエバーガーデン青菜"
+      },
       "conjured_water4": {
         "name": "魔法の湧き水"
       },

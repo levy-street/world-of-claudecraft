@@ -11434,6 +11434,69 @@ export const ko_KR: EnTranslations = {
       "growth_tonic": {
         "name": "성장 토닉"
       },
+      "brook_carrot_seed": {
+        "name": "시냇가 당근 씨앗"
+      },
+      "brook_carrot": {
+        "name": "시냇가 당근"
+      },
+      "fine_brook_carrot": {
+        "name": "상급 시냇가 당근"
+      },
+      "marsh_rice_seed": {
+        "name": "습지 쌀 씨앗"
+      },
+      "marsh_rice": {
+        "name": "습지 쌀"
+      },
+      "fine_marsh_rice": {
+        "name": "상급 습지 쌀"
+      },
+      "bog_beet_seed": {
+        "name": "늪지 비트 씨앗"
+      },
+      "bog_beet": {
+        "name": "늪지 비트"
+      },
+      "fine_bog_beet": {
+        "name": "상급 늪지 비트"
+      },
+      "highland_barley_seed": {
+        "name": "고지대 보리 씨앗"
+      },
+      "highland_barley": {
+        "name": "고지대 보리"
+      },
+      "fine_highland_barley": {
+        "name": "상급 고지대 보리"
+      },
+      "frost_gourd_seed": {
+        "name": "서리 박 씨앗"
+      },
+      "frost_gourd": {
+        "name": "서리 박"
+      },
+      "fine_frost_gourd": {
+        "name": "상급 서리 박"
+      },
+      "gilded_sunmelon_seed": {
+        "name": "금빛 태양멜론 씨앗"
+      },
+      "gilded_sunmelon": {
+        "name": "금빛 태양멜론"
+      },
+      "fine_gilded_sunmelon": {
+        "name": "상급 금빛 태양멜론"
+      },
+      "evergarden_greens_seed": {
+        "name": "상록 정원 잎채소 씨앗"
+      },
+      "evergarden_greens": {
+        "name": "상록 정원 잎채소"
+      },
+      "fine_evergarden_greens": {
+        "name": "상급 상록 정원 잎채소"
+      },
       "conjured_water4": {
         "name": "창조된 샘물"
       },

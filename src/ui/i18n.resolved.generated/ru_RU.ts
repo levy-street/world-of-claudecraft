@@ -11434,6 +11434,69 @@ export const ru_RU: EnTranslations = {
       "growth_tonic": {
         "name": "Тоник роста"
       },
+      "brook_carrot_seed": {
+        "name": "Семена ручьевой моркови"
+      },
+      "brook_carrot": {
+        "name": "Ручьевая морковь"
+      },
+      "fine_brook_carrot": {
+        "name": "Отборная ручьевая морковь"
+      },
+      "marsh_rice_seed": {
+        "name": "Семена болотного риса"
+      },
+      "marsh_rice": {
+        "name": "Болотный рис"
+      },
+      "fine_marsh_rice": {
+        "name": "Отборный болотный рис"
+      },
+      "bog_beet_seed": {
+        "name": "Семена болотной свёклы"
+      },
+      "bog_beet": {
+        "name": "Болотная свёкла"
+      },
+      "fine_bog_beet": {
+        "name": "Отборная болотная свёкла"
+      },
+      "highland_barley_seed": {
+        "name": "Семена высокогорного ячменя"
+      },
+      "highland_barley": {
+        "name": "Высокогорный ячмень"
+      },
+      "fine_highland_barley": {
+        "name": "Отборный высокогорный ячмень"
+      },
+      "frost_gourd_seed": {
+        "name": "Семена морозной тыквы"
+      },
+      "frost_gourd": {
+        "name": "Морозная тыква"
+      },
+      "fine_frost_gourd": {
+        "name": "Отборная морозная тыква"
+      },
+      "gilded_sunmelon_seed": {
+        "name": "Семена золочёной солнечной дыни"
+      },
+      "gilded_sunmelon": {
+        "name": "Золочёная солнечная дыня"
+      },
+      "fine_gilded_sunmelon": {
+        "name": "Отборная золочёная солнечная дыня"
+      },
+      "evergarden_greens_seed": {
+        "name": "Семена зелени Вечного Сада"
+      },
+      "evergarden_greens": {
+        "name": "Зелень Вечного Сада"
+      },
+      "fine_evergarden_greens": {
+        "name": "Отборная зелень Вечного Сада"
+      },
       "conjured_water4": {
         "name": "Сотворённая родниковая вода"
       },

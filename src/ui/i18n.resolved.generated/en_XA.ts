@@ -11434,6 +11434,69 @@ export const en_XA: EnTranslations = {
       "growth_tonic": {
         "name": "[Ĝŕóŵţĥ Ţóñíç]"
       },
+      "brook_carrot_seed": {
+        "name": "[Ɓŕóóķ Çáŕŕóţ Šééð]"
+      },
+      "brook_carrot": {
+        "name": "[Ɓŕóóķ Çáŕŕóţ]"
+      },
+      "fine_brook_carrot": {
+        "name": "[Ƒíñé Ɓŕóóķ Çáŕŕóţ]"
+      },
+      "marsh_rice_seed": {
+        "name": "[Ɱáŕšĥ Ŕíçé Šééð]"
+      },
+      "marsh_rice": {
+        "name": "[Ɱáŕšĥ Ŕíçé]"
+      },
+      "fine_marsh_rice": {
+        "name": "[Ƒíñé Ɱáŕšĥ Ŕíçé]"
+      },
+      "bog_beet_seed": {
+        "name": "[Ɓóĝ Ɓééţ Šééð]"
+      },
+      "bog_beet": {
+        "name": "[Ɓóĝ Ɓééţ]"
+      },
+      "fine_bog_beet": {
+        "name": "[Ƒíñé Ɓóĝ Ɓééţ]"
+      },
+      "highland_barley_seed": {
+        "name": "[Ĥíĝĥļáñð Ɓáŕļéý Šééð]"
+      },
+      "highland_barley": {
+        "name": "[Ĥíĝĥļáñð Ɓáŕļéý]"
+      },
+      "fine_highland_barley": {
+        "name": "[Ƒíñé Ĥíĝĥļáñð Ɓáŕļéý]"
+      },
+      "frost_gourd_seed": {
+        "name": "[Ƒŕóšţ Ĝóúŕð Šééð]"
+      },
+      "frost_gourd": {
+        "name": "[Ƒŕóšţ Ĝóúŕð]"
+      },
+      "fine_frost_gourd": {
+        "name": "[Ƒíñé Ƒŕóšţ Ĝóúŕð]"
+      },
+      "gilded_sunmelon_seed": {
+        "name": "[Ĝíļðéð Šúñɱéļóñ Šééð]"
+      },
+      "gilded_sunmelon": {
+        "name": "[Ĝíļðéð Šúñɱéļóñ]"
+      },
+      "fine_gilded_sunmelon": {
+        "name": "[Ƒíñé Ĝíļðéð Šúñɱéļóñ]"
+      },
+      "evergarden_greens_seed": {
+        "name": "[Éʋéŕĝáŕðéñ Ĝŕééñš Šééð]"
+      },
+      "evergarden_greens": {
+        "name": "[Éʋéŕĝáŕðéñ Ĝŕééñš]"
+      },
+      "fine_evergarden_greens": {
+        "name": "[Ƒíñé Éʋéŕĝáŕðéñ Ĝŕééñš]"
+      },
       "conjured_water4": {
         "name": "[Çóñĵúŕéð Šþŕíñĝŵáţéŕ]"
       },

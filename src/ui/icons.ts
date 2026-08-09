@@ -3179,6 +3179,46 @@ const ITEM_RECIPES: Record<string, IconRecipe> = {
   // and a green draught for the tonic (the one potion glyph in the family).
   compost: r('earth', 'earthBrown', [{ p: 'sack', pal: 'earthBrown' }], ['drips']),
   growth_tonic: r('nature', 'leafGreen', [{ p: 'potion', pal: 'leafGreen' }], ['sparkle']),
+  // The crop-ladder phase's seven crop families (seed, produce, fine twin),
+  // same ART_PENDING drawn stand-in treatment and the same A4
+  // pairwise-distinctness demand as the vale_wheat family above. Each fine
+  // recipe is exactly its produce recipe plus 'sparkle' (the fine-grade
+  // marker); no non-fine row carries sparkle.
+  brook_carrot_seed: r('nature', 'ember', [
+    { p: 'sack', pal: 'earthBrown' },
+    { p: 'fang', pal: 'ember', x: 13, y: -13, s: 0.45 },
+  ]),
+  brook_carrot: r('nature', 'ember', [
+    { p: 'fang', pal: 'ember' },
+    { p: 'leaf', pal: 'leafGreen', x: 13, y: -13, s: 0.45 },
+  ]),
+  fine_brook_carrot: r(
+    'nature',
+    'ember',
+    [
+      { p: 'fang', pal: 'ember' },
+      { p: 'leaf', pal: 'leafGreen', x: 13, y: -13, s: 0.45 },
+    ],
+    ['sparkle'],
+  ),
+  marsh_rice_seed: r('drink', 'earthBrown', [{ p: 'sack', pal: 'earthBrown' }]),
+  marsh_rice: r('drink', 'bone', [{ p: 'leaf', pal: 'bone' }]),
+  fine_marsh_rice: r('drink', 'bone', [{ p: 'leaf', pal: 'bone' }], ['sparkle']),
+  bog_beet_seed: r('nature', 'venom', [{ p: 'sack', pal: 'venom' }]),
+  bog_beet: r('nature', 'blood', [{ p: 'droplet', pal: 'blood' }]),
+  fine_bog_beet: r('nature', 'blood', [{ p: 'droplet', pal: 'blood' }], ['sparkle']),
+  highland_barley_seed: r('earth', 'gold', [{ p: 'sack', pal: 'earthBrown' }]),
+  highland_barley: r('earth', 'gold', [{ p: 'leaf', pal: 'gold' }]),
+  fine_highland_barley: r('earth', 'gold', [{ p: 'leaf', pal: 'gold' }], ['sparkle']),
+  frost_gourd_seed: r('frost', 'earthBrown', [{ p: 'sack', pal: 'earthBrown' }]),
+  frost_gourd: r('frost', 'ice', [{ p: 'waterskin', pal: 'ice' }]),
+  fine_frost_gourd: r('frost', 'ice', [{ p: 'waterskin', pal: 'ice' }], ['sparkle']),
+  gilded_sunmelon_seed: r('nature', 'gold', [{ p: 'sack', pal: 'gold' }]),
+  gilded_sunmelon: r('nature', 'gold', [{ p: 'sunburst', pal: 'gold' }]),
+  fine_gilded_sunmelon: r('nature', 'gold', [{ p: 'sunburst', pal: 'gold' }], ['sparkle']),
+  evergarden_greens_seed: r('nature', 'leafGreen', [{ p: 'sack', pal: 'leafGreen' }]),
+  evergarden_greens: r('nature', 'leafGreen', [{ p: 'leaf', pal: 'leafGreen' }]),
+  fine_evergarden_greens: r('nature', 'leafGreen', [{ p: 'leaf', pal: 'leafGreen' }], ['sparkle']),
   // misc UI icons (not real items)
   coin_gold: r('treasure', 'gold', ['coin'], ['sparkle']),
   slot_empty: r('junk', 'silverWhite', []),
@@ -4554,6 +4594,30 @@ export const ITEM_ART_PENDING = new Set<string>([
   // scheduled art phase.
   'compost',
   'growth_tonic',
+  // The crop-ladder phase's seven crop families (seed, produce, fine twin),
+  // the same dormant-online reasoning as everything above and the same
+  // scheduled art phase.
+  'bog_beet',
+  'bog_beet_seed',
+  'brook_carrot',
+  'brook_carrot_seed',
+  'evergarden_greens',
+  'evergarden_greens_seed',
+  'fine_bog_beet',
+  'fine_brook_carrot',
+  'fine_evergarden_greens',
+  'fine_frost_gourd',
+  'fine_gilded_sunmelon',
+  'fine_highland_barley',
+  'fine_marsh_rice',
+  'frost_gourd',
+  'frost_gourd_seed',
+  'gilded_sunmelon',
+  'gilded_sunmelon_seed',
+  'highland_barley',
+  'highland_barley_seed',
+  'marsh_rice',
+  'marsh_rice_seed',
 ]);
 
 /** Static URL of an item's (or a UI pseudo-item's) image icon, or null if it uses a recipe. */

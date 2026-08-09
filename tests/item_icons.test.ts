@@ -280,18 +280,40 @@ describe('item webp icons', () => {
     // The size pin is what stops the list becoming a dumping ground: it must be
     // re-pinned deliberately, in the change that enumerates the debt, never
     // grown quietly. The painted-art wave cleared this to 0; the farming
-    // growth-engine phase re-opened it for its four items, and the knobs phase
-    // added its two supplies (compost and the growth tonic) under the same
-    // reasoning: all six are dormant online (no faucet for any exists yet)
-    // and their art is scheduled as its own later phase. It must fall back to
-    // 0 as that art lands.
+    // growth-engine phase re-opened it for its four items, the knobs phase
+    // added its two supplies (compost and the growth tonic), and the
+    // crop-ladder phase added its seven crop families (21 ids: seed, produce,
+    // fine twin per crop) under the same reasoning: all are dormant online
+    // (no faucet for any exists yet) and their art is scheduled as its own
+    // later phase. It must fall back to 0 as that art lands.
     expect(
       [...ITEM_ART_PENDING].sort(),
       'art debt is enumerated and re-pinned deliberately, never grown quietly',
     ).toEqual([
+      'bog_beet',
+      'bog_beet_seed',
+      'brook_carrot',
+      'brook_carrot_seed',
       'compost',
+      'evergarden_greens',
+      'evergarden_greens_seed',
+      'fine_bog_beet',
+      'fine_brook_carrot',
+      'fine_evergarden_greens',
+      'fine_frost_gourd',
+      'fine_gilded_sunmelon',
+      'fine_highland_barley',
+      'fine_marsh_rice',
       'fine_vale_wheat',
+      'frost_gourd',
+      'frost_gourd_seed',
+      'gilded_sunmelon',
+      'gilded_sunmelon_seed',
       'growth_tonic',
+      'highland_barley',
+      'highland_barley_seed',
+      'marsh_rice',
+      'marsh_rice_seed',
       'vale_wheat',
       'vale_wheat_seed',
       'withered_husks',
