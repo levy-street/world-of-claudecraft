@@ -3659,8 +3659,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wiki.confirmTitle"
   ],
   "zh_CN": [
-    "entities.items.compost.name",
-    "entities.items.growth_tonic.name",
     "guide.classPage.formName.form_cat",
     "guide.gear.slotOffhand",
     "guide.glossary.claudiumTerm",
@@ -3671,8 +3669,6 @@ export const pending: Record<string, readonly string[]> = {
     "guide.riftsPage.rankFmt"
   ],
   "zh_TW": [
-    "entities.items.compost.name",
-    "entities.items.growth_tonic.name",
     "guide.classPage.formName.form_cat",
     "guide.gear.slotOffhand",
     "guide.glossary.claudiumTerm",
@@ -3683,8 +3679,6 @@ export const pending: Record<string, readonly string[]> = {
     "guide.riftsPage.rankFmt"
   ],
   "ko_KR": [
-    "entities.items.compost.name",
-    "entities.items.growth_tonic.name",
     "guide.classPage.formName.form_cat",
     "guide.gear.slotOffhand",
     "guide.glossary.claudiumTerm",
@@ -3695,8 +3689,6 @@ export const pending: Record<string, readonly string[]> = {
     "guide.riftsPage.rankFmt"
   ],
   "ja_JP": [
-    "entities.items.compost.name",
-    "entities.items.growth_tonic.name",
     "guide.classPage.formName.form_cat",
     "guide.gear.slotOffhand",
     "guide.glossary.claudiumTerm",
@@ -4315,8 +4307,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wiki.confirmTitle"
   ],
   "ru_RU": [
-    "entities.items.compost.name",
-    "entities.items.growth_tonic.name",
     "guide.classPage.formName.form_cat",
     "guide.gear.slotOffhand",
     "guide.glossary.claudiumTerm",

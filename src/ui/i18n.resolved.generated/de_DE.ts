@@ -2737,8 +2737,8 @@ export const de_DE: EnTranslations = {
         "no_fee_produce": "You have no produce to pay the watch fee.",
         "no_tonic": "You have no growth tonic."
       },
-      "husksConvertedLine": "You trade {husks} withered husks for {name}.",
-      "husksConvertedLineQty": "You trade {husks} withered husks for {name} x{qty}."
+      "husksConvertedLine": "You trade {husksName} x{husks} for {name}.",
+      "husksConvertedLineQty": "You trade {husksName} x{husks} for {name} x{qty}."
     },
     "archetypeTitle": {
       "label": "Titel",

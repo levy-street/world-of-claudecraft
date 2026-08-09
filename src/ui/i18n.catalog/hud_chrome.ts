@@ -3371,9 +3371,13 @@ export const hudChromeStrings = {
     // The husk trade's one line (the knobs phase): names BOTH sides of the
     // trade, what left the bags and what arrived, because the compost grant's
     // hub line stands down for it (silent + callerLogs, the #2430 one-line
-    // rule). The quantity split follows the grant-line families above.
-    husksConvertedLine: 'You trade {husks} withered husks for {name}.',
-    husksConvertedLineQty: 'You trade {husks} withered husks for {name} x{qty}.',
+    // rule). BOTH items splice as tokens ({husksName} is the husk item's own
+    // localized link, exactly like {name}): hardcoding "withered husks" as
+    // prose would drift from entities.items.withered_husks.name per locale
+    // on any rename, and the xN form sidesteps English pluralization. The
+    // quantity split follows the grant-line families above.
+    husksConvertedLine: 'You trade {husksName} x{husks} for {name}.',
+    husksConvertedLineQty: 'You trade {husksName} x{husks} for {name} x{qty}.',
   },
   // Archetype title chrome (#1130, pair-named under Professions 2.0):
   // `label` heads the character-sheet title line, `none` is shown before the

@@ -70,9 +70,9 @@ export interface FarmPlantKnobs {
 // TUNING, PROVISIONAL, FLAGGED FOR THE MAINTAINER. Base survival is 85 percent
 // at the crop's own gate and ramps to 100 percent at the top of its 25-point
 // band, so one full band above the threshold retires the crop's risk
-// permanently. Compost and the farmer's watch each add 10 points on top (both
-// are always false this phase; the knobs phase wires them), and the whole
-// thing caps at 1.
+// permanently. Compost and the farmer's watch each add 10 points on top (LIVE
+// since the knobs phase: plantCrop stores the flags a paid knob armed, and
+// this bonus arm is what they buy), and the whole thing caps at 1.
 export const FARM_SURVIVAL_AT_GATE = 0.85;
 export const FARM_SURVIVAL_BAND_SPAN = 25;
 export const FARM_SURVIVAL_COMPOST_BONUS = 0.1;

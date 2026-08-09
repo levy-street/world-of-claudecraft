@@ -5461,6 +5461,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.vale_wheat.name': 'Долинная пшеница',
   'entities.items.fine_vale_wheat.name': 'Отборная долинная пшеница',
   'entities.items.withered_husks.name': 'Засохшая шелуха',
+  'entities.items.compost.name': 'Компост',
+  'entities.items.growth_tonic.name': 'Тоник роста',
   'hud.core.chatChannels.add': 'Добавить канал чата',
   'hud.core.chatChannels.addTitle': 'Добавить канал',
   'hud.core.chatChannels.close': 'Закрыть вкладку {channel}',
@@ -8914,10 +8916,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.farming.denied.no_compost': 'У вас нет компоста.',
   'hudChrome.farming.denied.no_fee_produce': 'У вас нет урожая, чтобы оплатить присмотр.',
   'hudChrome.farming.denied.no_tonic': 'У вас нет тоника роста.',
-  'hudChrome.farming.husksConvertedLine':
-    'Вы обмениваете засохшую шелуху ({husks} шт.) на {name}.',
+  'hudChrome.farming.husksConvertedLine': 'Вы обмениваете {husksName} x{husks} на {name}.',
   'hudChrome.farming.husksConvertedLineQty':
-    'Вы обмениваете засохшую шелуху ({husks} шт.) на {name} x{qty}.',
+    'Вы обмениваете {husksName} x{husks} на {name} x{qty}.',
   'gatherEvent.pristineVein': '{finder} находит нетронутую жилу!',
   'gatherEvent.ancientHeartwood': '{finder} добывает древнюю сердцевину!',
   'gatherEvent.moonlitBloom': '{finder} находит лунный цветок!',

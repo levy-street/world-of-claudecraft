@@ -232,13 +232,20 @@ export interface FarmHarvestYield {
  *  worse. Lateness itself is not an input (the anti-chore invariant).
  *
  *  THE TONIC ARM IS SEED EXPANSION, NOT A DRAW (the knobs phase, and the caps
- *  rule the whole phase answers to): an armed tonic reads ONE further value
- *  from the SAME mulberry32 stream, after the lives loop, and a win adds the
- *  flat bonus at base grade. The untoniced path never reaches that read, so
- *  its expansion is bit-identical to the pre-knob code for every seed (the
- *  same-seed determinism pin and the anti-chore late-harvest equality both
- *  guard this), and the stream position depends only on the INPUTS (seed,
- *  skill, the tonic flag), never on an outcome. */
+ *  rule the whole phase answers to): an armed tonic reads ONE value from an
+ *  INDEPENDENT mulberry32 expansion of the same stored seed (the seed xor a
+ *  fixed constant), and a win adds the flat bonus at base grade. The
+ *  untoniced path is untouched, so its expansion is bit-identical to the
+ *  pre-knob code for every seed (the same-seed determinism pin and the
+ *  anti-chore late-harvest equality both guard this). The bonus roll's
+ *  position is DELIBERATELY not "one read past the lives loop": the loop's
+ *  length grows with skill, so a loop-relative read would move when the
+ *  farmer skills up between planting and harvesting and could flip a tonic
+ *  win into a loss, breaking the player-favorable monotonicity stated above
+ *  (the review round measured thousands of such regressions per million
+ *  adjacent skill steps). Anchored to the seed alone, the tonic outcome is
+ *  fixed at plant time and a skill-up can only ever add picks (pinned by the
+ *  monotonicity sweep in tests/professions_farming.test.ts). */
 export function resolveFarmHarvest(
   yieldSeed: number,
   skill: number,
@@ -267,15 +274,20 @@ export function resolveFarmHarvest(
   }
   let bonus = 0;
   if (tonic) {
-    // The one tonic read (see the banner above). The roll happens whether or
-    // not it wins, so the toniced stream shape is regular too: exactly one
-    // read past the loop, every time.
-    const bonusRoll = next();
+    // The one tonic read, from its OWN expansion of the stored seed (see the
+    // banner above: a loop-relative position would move with skill). The xor
+    // constant is arbitrary and load-bearing only in that it differs from 0,
+    // so the bonus stream never aliases the lives stream's first value.
+    const bonusRoll = mulberry32((yieldSeed ^ 0x9e3779b9) >>> 0)();
     if (bonusRoll < FARM_TONIC_BONUS_CHANCE) bonus = FARM_TONIC_BONUS_PICKS;
   }
   // Bonus picks land at BASE grade: the tonic's job is a mildly larger
   // harvest (D7, one knob one job), not a second fine roll, and `count + fine
-  // = picks` stays the one shape every consumer may rely on.
+  // = picks` stays the one shape every consumer may rely on. A WITHERED plot
+  // never reaches this resolver at all, so a tonic paid on a crop that loses
+  // its survival roll is forfeited with the crop: the knob is a bet on the
+  // harvest, by design, and the maintainer tuning pass should read it that
+  // way (compost and the watch are the knobs that bend the wither odds).
   return { count: picks - fine + bonus, fine, picks: picks + bonus };
 }
 
@@ -439,7 +451,7 @@ export function plantCrop(
   // 10. The watch fee: tier-scaled produce in kind, planned here and spent
   //     below. The predicate and the deterministic consumption order live in
   //     farm_watch_fee.ts (any farming produce of the crop's tier or below,
-  //     mixed kinds allowed, cheapest first).
+  //     mixed kinds allowed, lowest tier first, base before fine).
   let feePlan: readonly WatchFeeLeg[] | null = null;
   if (wantWatch) {
     feePlan = planWatchFee(crop.tier, (itemId) => ctx.countItem(itemId, meta.entityId));

@@ -2737,8 +2737,8 @@ export const ko_KR: EnTranslations = {
         "no_fee_produce": "망보기 삯을 치를 농산물이 없습니다.",
         "no_tonic": "성장 토닉이 없습니다."
       },
-      "husksConvertedLine": "시든 껍질 {husks}개를 {name}(으)로 교환했습니다.",
-      "husksConvertedLineQty": "시든 껍질 {husks}개를 {name} x{qty}(으)로 교환했습니다."
+      "husksConvertedLine": "{husksName} x{husks}을(를) {name}(으)로 교환했습니다.",
+      "husksConvertedLineQty": "{husksName} x{husks}을(를) {name} x{qty}(으)로 교환했습니다."
     },
     "archetypeTitle": {
       "label": "칭호",
@@ -11235,10 +11235,10 @@ export const ko_KR: EnTranslations = {
         "name": "시든 껍질"
       },
       "compost": {
-        "name": "Compost"
+        "name": "퇴비"
       },
       "growth_tonic": {
-        "name": "Growth Tonic"
+        "name": "성장 토닉"
       },
       "conjured_water4": {
         "name": "창조된 샘물"

@@ -114,19 +114,26 @@ describe('the farm grant-line selectors', () => {
     expect(farmHusksConvertedLineKey(1)).toBe('hudChrome.farming.husksConvertedLine');
     expect(farmHusksConvertedLineKey(2)).toBe('hudChrome.farming.husksConvertedLineQty');
     // Both leaves really render (t() throws on an untracked key in test), and
-    // the line splices BOTH sides of the trade: the husks spent and the
-    // compost gained.
+    // the line splices BOTH sides of the trade as ITEM TOKENS: the husks
+    // spent ({husksName} x{husks}) and the compost gained ({name} x{qty}), so
+    // neither side can drift from its localized item name (the review-round
+    // finding: the first draft hardcoded "withered husks" as English prose).
     setLanguage('en');
     const line = t('hudChrome.farming.husksConvertedLineQty', {
+      husksName: 'Withered Husks',
       husks: '4',
       name: 'Compost',
       qty: '2',
     });
-    expect(line).toContain('4');
+    expect(line).toContain('Withered Husks x4');
     expect(line).toContain('Compost x2');
-    expect(t('hudChrome.farming.husksConvertedLine', { husks: '2', name: 'Compost' })).toContain(
-      'Compost',
-    );
+    expect(
+      t('hudChrome.farming.husksConvertedLine', {
+        husksName: 'Withered Husks',
+        husks: '2',
+        name: 'Compost',
+      }),
+    ).toContain('Compost');
   });
 
   it('farming produce, its fine twin, and the husk payout never share a key', () => {

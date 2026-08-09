@@ -979,6 +979,56 @@ describe('the knob payload (the knobs phase): payments, denies, thresholds', () 
     expect(row?.tonic).toBe(true);
     expect(row?.status).toBe('growing');
   });
+
+  it('keeps the paid flags THROUGH a save and load, still bending the threshold', () => {
+    // The first phase whose persisted knob flags can be true (Phase 3 always
+    // wrote false, so the round-trip pins in professions_farming_state were
+    // inert until now): a knobbed plot must reload with its flags intact and
+    // the survival bend still live, or a relog would silently strip an
+    // insurance the player paid for.
+    giveAllSupplies();
+    plantK({ compost: true, watch: true, tonic: true });
+    clearCast(h.sim);
+    // A roll that withers unknobbed at skill 0 (chance 0.85) but survives
+    // with both survival knobs (capped at 1), so the post-reload harvest
+    // outcome proves the FLAGS, not just the row shape.
+    (h.meta.farmPlots.get(BED) as PlotState).survivalRoll = 0.9;
+    const saved = h.sim.serializeCharacter(h.pid) as CharacterState;
+
+    let nowMs = h.now() + CROP.durationMs;
+    const fresh = new Sim({
+      seed: 41,
+      playerClass: 'warrior',
+      noPlayer: true,
+      lockoutNowMs: () => nowMs,
+    });
+    fresh.addPlayer('warrior', 'Farmer', { state: saved });
+    const meta = [...fresh.players.values()][0] as PlayerMeta;
+    const plot = meta.farmPlots.get(BED) as PlotState;
+    expect(plot.compost).toBe(true);
+    expect(plot.watch).toBe(true);
+    expect(plot.tonic).toBe(true);
+    // Stand the RELOADED entity at the bed directly (the noPlayer Sim's
+    // primary getter is not what this arm is about).
+    const farmer = fresh.entities.get(meta.entityId);
+    if (!farmer) throw new Error('reloaded farmer entity missing');
+    const bed = farmBedById(BED);
+    if (!bed) throw new Error(`no such bed: ${BED}`);
+    farmer.pos.x = bed.x;
+    farmer.pos.z = bed.z;
+    farmer.prevPos = { ...farmer.pos };
+    const from = fresh.events.length;
+    const expected = resolveFarmHarvest(plot.yieldSeed as number, 0, true);
+    // Delta, not an absolute: the reloaded bags still carry the produce the
+    // watch fee did not consume at plant time.
+    const produceBefore = fresh.countItem(PRODUCE_ID, meta.entityId);
+    expect(countDraws(fresh, () => harvestCrop(fresh.ctx, farmer, meta, BED))).toBe(0);
+    expect(eventsOf(fresh, from, 'farmHarvested')).toHaveLength(1);
+    expect(eventsOf(fresh, from, 'farmWithered')).toEqual([]);
+    // And the reloaded tonic flag really armed the toniced expansion.
+    expect(fresh.countItem(PRODUCE_ID, meta.entityId) - produceBefore).toBe(expected.count);
+    nowMs += 1;
+  });
 });
 
 describe('the tonic yield arm: seed expansion, never a draw', () => {
@@ -1006,6 +1056,36 @@ describe('the tonic yield arm: seed expansion, never a draw', () => {
   it('leaves the UNTONICED expansion bit-identical: the default arm is the two-arg call', () => {
     for (const seed of [0, 1, 999, 123_456]) {
       expect(resolveFarmHarvest(seed, 30)).toEqual(resolveFarmHarvest(seed, 30, false));
+    }
+  });
+
+  it('NEVER pays less for more skill, toniced or plain (the monotonicity sweep)', () => {
+    // The player-favorable invariant the banner states, proven rather than
+    // asserted: proficiency only rises, so a plot left in the ground while
+    // its owner improves must pay better, never worse. The review round
+    // caught the original loop-relative tonic read breaking exactly this (a
+    // skill-up lengthened the lives loop, moved the bonus roll onto a
+    // different stream value, and flipped wins into losses thousands of
+    // times per million adjacent steps); the seed-anchored read this sweep
+    // pins makes the tonic outcome a plant-time constant.
+    for (let seed = 0; seed < 200; seed++) {
+      let prevPlain = -1;
+      let prevToniced = -1;
+      for (let skill = 0; skill <= 100; skill += 5) {
+        const plain = resolveFarmHarvest(seed, skill);
+        const toniced = resolveFarmHarvest(seed, skill, true);
+        expect(plain.picks, `seed ${seed} skill ${skill} plain`).toBeGreaterThanOrEqual(prevPlain);
+        expect(toniced.picks, `seed ${seed} skill ${skill} toniced`).toBeGreaterThanOrEqual(
+          prevToniced,
+        );
+        // The tonic outcome itself is skill-independent: the delta is the
+        // SAME flat bonus (or the same nothing) at every skill.
+        expect(toniced.picks - plain.picks, `seed ${seed} skill ${skill} delta`).toBe(
+          resolveFarmHarvest(seed, 0, true).picks - resolveFarmHarvest(seed, 0).picks,
+        );
+        prevPlain = plain.picks;
+        prevToniced = toniced.picks;
+      }
     }
   });
 

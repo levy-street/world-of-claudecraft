@@ -11902,11 +11902,13 @@ export class Hud {
           // The husk trade (the knobs phase). The event owns both halves of
           // the feedback (the compost grant rides its hub loot event silent +
           // callerLogs, the #2430 one-line rule), so this one line names both
-          // sides of the trade: the husks spent and the compost gained. Same
-          // grant green as the harvest line; no cue (the render / juice phase
-          // owns farming audio).
+          // sides of the trade AS ITEM TOKENS: the husks spent and the
+          // compost gained, each through grantItemToken so neither can drift
+          // from its localized item name. Same grant green as the harvest
+          // line; no cue (the render / juice phase owns farming audio).
           this.log(
             t(farmHusksConvertedLineKey(ev.compost), {
+              husksName: grantItemToken(FARM_WITHERED_HUSK_ITEM_ID),
               husks: grantQtyText(ev.husks),
               name: grantItemToken(FARM_COMPOST_ITEM_ID),
               qty: grantQtyText(ev.compost),

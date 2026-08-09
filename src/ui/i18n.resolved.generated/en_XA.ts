@@ -2737,8 +2737,8 @@ export const en_XA: EnTranslations = {
         "no_fee_produce": "[Ýóú ĥáʋé ñó þŕóðúçé ţó þáý ţĥé ŵáţçĥ ƒéé.]",
         "no_tonic": "[Ýóú ĥáʋé ñó ĝŕóŵţĥ ţóñíç.]"
       },
-      "husksConvertedLine": "[Ýóú ţŕáðé {husks} ŵíţĥéŕéð ĥúšķš ƒóŕ {name}.]",
-      "husksConvertedLineQty": "[Ýóú ţŕáðé {husks} ŵíţĥéŕéð ĥúšķš ƒóŕ {name} ẋ{qty}.]"
+      "husksConvertedLine": "[Ýóú ţŕáðé {husksName} ẋ{husks} ƒóŕ {name}.]",
+      "husksConvertedLineQty": "[Ýóú ţŕáðé {husksName} ẋ{husks} ƒóŕ {name} ẋ{qty}.]"
     },
     "archetypeTitle": {
       "label": "[Ţíţļé]",

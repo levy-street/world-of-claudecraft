@@ -2737,8 +2737,8 @@ export const zh_CN: EnTranslations = {
         "no_fee_produce": "你没有可以支付看守费的农产品。",
         "no_tonic": "你没有生长滋补剂。"
       },
-      "husksConvertedLine": "你用{husks}个枯萎谷壳换取了{name}。",
-      "husksConvertedLineQty": "你用{husks}个枯萎谷壳换取了{name} x{qty}。"
+      "husksConvertedLine": "你用{husksName} x{husks}换取了{name}。",
+      "husksConvertedLineQty": "你用{husksName} x{husks}换取了{name} x{qty}。"
     },
     "archetypeTitle": {
       "label": "称号",
@@ -11235,10 +11235,10 @@ export const zh_CN: EnTranslations = {
         "name": "枯萎的谷壳"
       },
       "compost": {
-        "name": "Compost"
+        "name": "堆肥"
       },
       "growth_tonic": {
-        "name": "Growth Tonic"
+        "name": "生长滋补剂"
       },
       "conjured_water4": {
         "name": "魔法泉水"

@@ -34,10 +34,15 @@ describe('FARM_WATCH_FEE_BY_TIER', () => {
     expect(watchFeeAmount(3)).toBe(4);
     expect(watchFeeAmount(4)).toBe(6);
     // Total over junk tiers: unreachable through the plant gate, kept total
-    // for projection-style callers reading persisted rows.
+    // for projection-style callers reading persisted rows. Non-finite floors
+    // to tier 1 rather than returning undefined behind the number return
+    // type (NaN survives Math.max/Math.min).
     expect(watchFeeAmount(0)).toBe(2);
     expect(watchFeeAmount(99)).toBe(6);
     expect(watchFeeAmount(2.9)).toBe(3);
+    expect(watchFeeAmount(Number.NaN)).toBe(2);
+    expect(watchFeeAmount(Number.POSITIVE_INFINITY)).toBe(6);
+    expect(watchFeeAmount(undefined as unknown as number)).toBe(2);
   });
 });
 
@@ -60,20 +65,34 @@ describe('eligibleWatchFeeItemIds', () => {
 });
 
 describe('planWatchFee', () => {
-  it('plans a single-kind payment from the cheapest qualifying produce', () => {
+  it('plans a single-kind payment from the base grade before the fine twin', () => {
     const counts: Record<string, number> = { vale_wheat: 5, fine_vale_wheat: 5 };
     expect(planWatchFee(1, (id) => counts[id] ?? 0)).toEqual([{ itemId: 'vale_wheat', count: 2 }]);
   });
 
-  it('mixes kinds when no single stack covers the fee, cheapest first', () => {
+  it('mixes kinds when no single stack covers the fee, in the fixed order', () => {
     // One base unit plus fine twins: the fee of two takes the base unit FIRST
-    // and tops up from the fine stack, never the reverse (player-favorable:
-    // the more valuable produce is spent last).
+    // and tops up from the fine stack, never the reverse (within a crop the
+    // more valuable fine twin is spent last; across tiers the order is
+    // tier-ascending, per the module banner).
     const counts: Record<string, number> = { vale_wheat: 1, fine_vale_wheat: 5 };
     expect(planWatchFee(1, (id) => counts[id] ?? 0)).toEqual([
       { itemId: 'vale_wheat', count: 1 },
       { itemId: 'fine_vale_wheat', count: 1 },
     ]);
+  });
+
+  it('never lists one item id twice, whatever the catalog does (the double-count guard)', () => {
+    // planWatchFee reads countOf once per listed id and treats every entry as
+    // an independent stack, so a duplicated id would count one bag stack
+    // twice, pass the affordability gate on produce the player does not have,
+    // and under-consume at payment time. The dedupe in eligibleWatchFeeItemIds
+    // is the guard; this pin is what makes the crop-ladder phase's seven new
+    // rows answer to it.
+    for (const tier of [1, 2, 3, 4]) {
+      const ids = eligibleWatchFeeItemIds(tier);
+      expect(new Set(ids).size, `tier ${tier}`).toBe(ids.length);
+    }
   });
 
   it('returns null when the qualifying produce falls short, planning nothing partial', () => {

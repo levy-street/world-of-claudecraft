@@ -2737,8 +2737,8 @@ export const ja_JP: EnTranslations = {
         "no_fee_produce": "見張り料を払う作物がありません。",
         "no_tonic": "成長トニックがありません。"
       },
-      "husksConvertedLine": "枯れた殻{husks}個を{name}と交換した。",
-      "husksConvertedLineQty": "枯れた殻{husks}個を{name} x{qty}と交換した。"
+      "husksConvertedLine": "{husksName} x{husks}を{name}と交換した。",
+      "husksConvertedLineQty": "{husksName} x{husks}を{name} x{qty}と交換した。"
     },
     "archetypeTitle": {
       "label": "称号",
@@ -11235,10 +11235,10 @@ export const ja_JP: EnTranslations = {
         "name": "枯れた籾殻"
       },
       "compost": {
-        "name": "Compost"
+        "name": "堆肥"
       },
       "growth_tonic": {
-        "name": "Growth Tonic"
+        "name": "成長トニック"
       },
       "conjured_water4": {
         "name": "魔法の湧き水"

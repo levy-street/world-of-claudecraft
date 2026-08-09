@@ -27,27 +27,38 @@ export const FARM_WATCH_FEE_BY_TIER: Readonly<Record<1 | 2 | 3 | 4, number>> = {
 };
 
 /** The fee for a planted crop of this tier. A tier outside the authored 1..4
- *  band clamps to the nearest edge rather than reading undefined: unreachable
- *  through the plant gate (the catalog types tier as 1|2|3|4), kept total for
- *  the projection-style callers that read persisted rows. */
+ *  band clamps to the nearest edge (infinities included), and a NaN tier
+ *  floors to 1 (NaN survives Math.max/Math.min, so without the guard the
+ *  record read would return undefined behind the number return type):
+ *  unreachable through the plant gate (the catalog types tier as 1|2|3|4),
+ *  kept genuinely total for the projection-style callers that read persisted
+ *  rows. */
 export function watchFeeAmount(cropTier: number): number {
-  const tier = Math.max(1, Math.min(4, Math.floor(cropTier))) as 1 | 2 | 3 | 4;
+  const floored = Math.floor(cropTier);
+  const tier = Math.max(1, Math.min(4, Number.isNaN(floored) ? 1 : floored)) as 1 | 2 | 3 | 4;
   return FARM_WATCH_FEE_BY_TIER[tier];
 }
 
 /** Every produce id the fee accepts for a planted crop of `cropTier`, in the
  *  DETERMINISTIC consumption order: ascending crop tier, then catalog id,
- *  base grade before fine within a crop. The order is player-favorable (the
- *  cheapest qualifying produce is spent first, the fine twin last) and, like
- *  every walk that can precede an rng draw, must be identical on all three
- *  hosts, so it is sorted explicitly rather than trusting record insertion
- *  order. Derived from the catalog: the crop-ladder phase's crops join with
- *  no edit here. */
+ *  base grade before fine WITHIN a crop. Note what that order does NOT
+ *  promise: it is tier-ascending, not value-ascending, so once the crop
+ *  ladder ships a lower tier's fine twin is spent before a higher tier's
+ *  base produce; the payer has no per-stack choice on the wire (the frame
+ *  carries only the watch boolean), so the rule worth keeping is that the
+ *  order is FIXED and predictable, and the crop-ladder phase re-reads this
+ *  banner when tier 2 makes it visible. Like every walk that can precede an
+ *  rng draw it must be identical on all three hosts, so it is sorted
+ *  explicitly rather than trusting record insertion order, and DEDUPED so a
+ *  future catalog row sharing an item id with another crop (or a crop whose
+ *  base and fine ids collide) cannot count one bag stack twice and let the
+ *  affordability gate pass a plan the bags cannot fund. Derived from the
+ *  catalog: the crop-ladder phase's crops join with no edit here. */
 export function eligibleWatchFeeItemIds(cropTier: number): readonly string[] {
   const crops = Object.values(FARM_CROPS)
     .filter((c) => c.tier <= cropTier)
     .sort((a, b) => a.tier - b.tier || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
-  return crops.flatMap((c) => [c.produceItemId, c.fineProduceItemId]);
+  return [...new Set(crops.flatMap((c) => [c.produceItemId, c.fineProduceItemId]))];
 }
 
 // One leg of a fee payment: consume `count` of `itemId`.

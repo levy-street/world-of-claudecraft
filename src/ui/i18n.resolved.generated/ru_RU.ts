@@ -2737,8 +2737,8 @@ export const ru_RU: EnTranslations = {
         "no_fee_produce": "У вас нет урожая, чтобы оплатить присмотр.",
         "no_tonic": "У вас нет тоника роста."
       },
-      "husksConvertedLine": "Вы обмениваете засохшую шелуху ({husks} шт.) на {name}.",
-      "husksConvertedLineQty": "Вы обмениваете засохшую шелуху ({husks} шт.) на {name} x{qty}."
+      "husksConvertedLine": "Вы обмениваете {husksName} x{husks} на {name}.",
+      "husksConvertedLineQty": "Вы обмениваете {husksName} x{husks} на {name} x{qty}."
     },
     "archetypeTitle": {
       "label": "Титул",
@@ -11235,10 +11235,10 @@ export const ru_RU: EnTranslations = {
         "name": "Засохшая шелуха"
       },
       "compost": {
-        "name": "Compost"
+        "name": "Компост"
       },
       "growth_tonic": {
-        "name": "Growth Tonic"
+        "name": "Тоник роста"
       },
       "conjured_water4": {
         "name": "Сотворённая родниковая вода"
