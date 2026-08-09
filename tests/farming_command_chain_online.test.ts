@@ -508,6 +508,54 @@ describe('a plot change reaches the planter in the very next snapshot', () => {
     expect(rows[0].yieldSeed).toBeUndefined();
   });
 
+  it('carries the paid knob flags on the wire row, and nothing beyond the nine keys', () => {
+    // The knob flags ride fplot only because the server serializes the
+    // projection rows verbatim; no field list names them, so a later
+    // omit-defaults or filter pass could strip a paid flag from the player's
+    // own mirror with every sim-level pin still green. Pinned here over the
+    // real broadcast: the flags arrive true, and the row's key set is EXACTLY
+    // the nine projection keys (the snapshots.test.ts leak pin's idiom).
+    const server = new GameServer();
+    const { session, fc } = joinWithSocket(server, 3, 'Knobbed');
+    const pid = session.pid as number;
+    standAtBed(server, pid, BED);
+    server.sim.addItem('vale_wheat_seed', 1, pid);
+    server.sim.addItem('compost', 1, pid);
+    server.sim.addItem('growth_tonic', 1, pid);
+    server.sim.addItem('vale_wheat', 2, pid);
+
+    server.handleMessage(
+      session,
+      JSON.stringify({
+        t: 'cmd',
+        cmd: 'plant_crop',
+        bed: BED,
+        crop: CROP,
+        compost: true,
+        watch: true,
+        tonic: true,
+      }),
+    );
+    broadcast(server);
+
+    const rows = lastSnap(fc.sent).self.fplot as Record<string, unknown>[];
+    expect(rows).toHaveLength(1);
+    expect(rows[0].compost).toBe(true);
+    expect(rows[0].watch).toBe(true);
+    expect(rows[0].tonic).toBe(true);
+    expect(Object.keys(rows[0]).sort()).toEqual([
+      'bedId',
+      'compost',
+      'cropId',
+      'notified',
+      'plantedAtMs',
+      'readyAtMs',
+      'status',
+      'tonic',
+      'watch',
+    ]);
+  });
+
   it('carries the harvest removal on the first broadcast after the harvest', () => {
     const server = new GameServer();
     const { session, fc } = joinWithSocket(server, 2, 'Reaper');

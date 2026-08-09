@@ -822,7 +822,7 @@ describe('the knob payload (the knobs phase): payments, denies, thresholds', () 
     expect((h.meta.farmPlots.get(BED) as PlotState).watch).toBe(true);
   });
 
-  it('pays a mixed fee cheapest-first when no single stack covers it', () => {
+  it('pays a mixed fee in the fixed tier-ascending order when no single stack covers it', () => {
     h.sim.addItem(SEED_ID, 1, h.pid);
     h.sim.addItem(PRODUCE_ID, 1, h.pid);
     h.sim.addItem(FINE_ID, 5, h.pid);
@@ -1154,6 +1154,27 @@ describe('the tonic yield arm: seed expansion, never a draw', () => {
     expect(countDraws(h.sim, () => harvestCrop(h.sim.ctx, h.sim.player, h.meta, BED))).toBe(0);
     expect(h.sim.countItem(PRODUCE_ID, h.pid)).toBe(expected.count);
     expect(h.sim.countItem(FINE_ID, h.pid)).toBe(expected.fine);
+  });
+
+  it('returns CAP plus BONUS picks on a capped toniced win: the cap bounds the loop, not the yield', () => {
+    // keepChance saturates at 1 above skill (1 - base) / scale * 100, so
+    // every pick keeps its life and the loop runs to the cap exactly (the
+    // unclamped-skill seam the resolver banner reserves for tests). On a
+    // tonic-winning seed the bonus lands on top: any reader treating
+    // FARM_HARVEST_PICK_CAP as the true yield ceiling is wrong by BONUS,
+    // which is exactly what this pin exists to say out loud.
+    const SKILL_AT_SATURATION = 300;
+    let winner = -1;
+    for (let seed = 0; seed < 100 && winner < 0; seed++) {
+      if (resolveFarmHarvest(seed, 0, true).picks > resolveFarmHarvest(seed, 0).picks) {
+        winner = seed;
+      }
+    }
+    expect(winner).toBeGreaterThanOrEqual(0);
+    expect(resolveFarmHarvest(winner, SKILL_AT_SATURATION).picks).toBe(FARM_HARVEST_PICK_CAP);
+    expect(resolveFarmHarvest(winner, SKILL_AT_SATURATION, true).picks).toBe(
+      FARM_HARVEST_PICK_CAP + FARM_TONIC_BONUS_PICKS,
+    );
   });
 
   it('pays a toniced harvest N hours late EXACTLY what an on-time one pays', () => {
