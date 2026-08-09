@@ -101,9 +101,33 @@ describe('buildProfessionsView: model construction', () => {
     // `effect: null` for an input with no toolEffects, and no slottable
     // charms for empty bags: the pre-craft default every fresh character
     // reads.
+    // promptable true: mining has a confirm channel, so the R40 Ask-each-use
+    // toggle may render (only farming reads false, through promptSlotRefused;
+    // the Phase 5 QA self-erase fix).
     expect(model.gathering).toEqual([
-      { professionId: 'mining', bar: buildSkillBar(30, 100), effect: null, slottable: [] },
+      {
+        professionId: 'mining',
+        bar: buildSkillBar(30, 100),
+        effect: null,
+        slottable: [],
+        promptable: true,
+      },
     ]);
+  });
+
+  it('promptable is false for farming ALONE (the R40 prompt-refusal mirror, both directions)', () => {
+    // The pure-core half of the Phase 5 QA self-erase fix: the row mirrors
+    // promptSlotRefused, the same predicate the mint's refusal arm reads, so
+    // the window can suppress the Ask-each-use toggle without a second
+    // policy source. Mining is the control: a blanket false would hide the
+    // toggle everywhere and red here.
+    const model = view(attunedIdentity, [
+      { professionId: 'mining', skill: 30, maxSkill: 100 },
+      { professionId: 'farming', skill: 10, maxSkill: 100 },
+    ]);
+    const byId = new Map(model.gathering.map((g) => [g.professionId, g]));
+    expect(byId.get('farming')?.promptable).toBe(false);
+    expect(byId.get('mining')?.promptable).toBe(true);
   });
 
   describe('the slotted tool effect joins onto its gathering row', () => {

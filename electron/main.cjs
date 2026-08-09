@@ -386,6 +386,7 @@ function createMainWindow() {
     // Opt-in auto-open for a packaged build, so the inspector is up from the first frame
     // when diagnosing a shipped app (WOC_OPEN_DEVTOOLS=1). The keyboard chord above works
     // regardless; this just saves a keystroke during a debug launch.
+    // biome-ignore lint/suspicious/noUndeclaredEnvVars: the shell's own opt-in debug flag, read once at launch; it is not a build input, so it stays out of the turbo env declarations the rule checks.
     if (process.env.WOC_OPEN_DEVTOOLS === '1') {
       mainWindow.webContents.openDevTools({ mode: 'detach' });
     }

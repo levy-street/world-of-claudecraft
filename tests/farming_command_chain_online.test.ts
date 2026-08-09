@@ -615,6 +615,7 @@ describe('the four farm events reach the actor, and only the actor', () => {
   interface FarmEventFrame {
     pid?: number;
     reason?: string;
+    cropId?: string;
     seedBackCount?: number;
   }
 
@@ -862,6 +863,11 @@ describe('the four farm events reach the actor, and only the actor', () => {
     expect(denials).toHaveLength(1);
     expect(denials[0].pid).toBe(pid);
     expect(denials[0].reason).toBe('tool');
+    // The half the banner above promises: farmDeniedToast reads the frame's
+    // cropId for the tier-named line, so the field must SURVIVE to the
+    // socket or the online client silently degrades to the flat denied.tool
+    // line while offline names the tier (a host presentation divergence).
+    expect(denials[0].cropId).toBe(CROP);
     expect(farmEvents(bystanderFc.sent, 'farmDenied')).toHaveLength(0);
     // Refused means refused: nothing planted, nothing spent.
     expect(server.sim.meta(pid)?.farmPlots.has(BED)).toBe(false);

@@ -177,8 +177,9 @@ export const FARM_HUSKS_PER_COMPOST = 2;
 // rolls ONCE against its tier's pair of thresholds below (one draw, two
 // thresholds: under the two-chance it pays 2 of the crop's own seeds, else
 // under the one-chance it pays 1, else 0), on BOTH outcomes, survived and
-// withered. Tier 1 and 2 crops draw NOTHING at harvest: their seeds have
-// vendor faucets, so the market pressure this exists for does not apply.
+// withered. Tier 1 and 2 crops draw NOTHING at harvest: their seeds are
+// vendor-PRICED (stocked at Phase 9 go-live, the (aa) dormancy), so the
+// market pressure this exists for does not apply to them.
 //
 // TUNING, ALL PROVISIONAL, FLAGGED FOR THE MAINTAINER, and ECONOMY-SENSITIVE
 // (the state.md OPEN items): tier 3/4 seeds are market goods with NO vendor
@@ -392,11 +393,13 @@ export function farmGrowthStage(
 /** Whether this farmer may plant this crop right now, as PURE state: the
  *  skill gate alone, taking the crop RECORD rather than an id.
  *
- *  Split out because the command-level skill arm is otherwise UNREACHABLE in a
- *  test: every shipped crop is tier 1, whose threshold is 0, which no
- *  proficiency can sit below. A test drives this with a synthetic tier-2
- *  record and pins the real arm's behavior; the command body below calls the
- *  same function, so the two can never disagree. */
+ *  Split out as the gate's pure-state seam: tests pin the threshold math
+ *  directly (including synthetic records for shapes the catalog does not
+ *  carry) and the command body below calls the same function, so the two
+ *  can never disagree. The original reachability rationale (one shipped
+ *  tier-1 crop made the command-level skill arm untestable) retired when
+ *  the crop-ladder phase shipped all four tiers; the seam stays because a
+ *  pure predicate beats an inline comparison either way. */
 export function canPlantCrop(crop: FarmCropDef, farmingSkill: number): boolean {
   return farmingSkill >= farmCropSkillThreshold(crop.tier);
 }
@@ -779,8 +782,12 @@ export function harvestCrop(ctx: SimContext, p: Entity, meta: PlayerMeta, bedId:
       count: FARM_WITHERED_HUSK_COUNT,
       // Present ONLY when the seed-back roll above paid (the knobs
       // only-when-true wire precedent): a zero roll leaves the frame
-      // byte-identical to the pre-field wire.
-      ...(seedBackCount > 0 ? { seedBackCount } : {}),
+      // byte-identical to the pre-field wire. The `crop` conjunct matches
+      // the grant's own guard above, so this event can never advertise a
+      // seed the grant skipped, no matter what farmCropTier's retired-id
+      // fallback becomes (today the fallback reads tier 1 and the roll
+      // never fires for a cropless plot, so the terms always agree).
+      ...(seedBackCount > 0 && crop ? { seedBackCount } : {}),
     });
     return;
   }
@@ -856,7 +863,12 @@ export function harvestCrop(ctx: SimContext, p: Entity, meta: PlayerMeta, bedId:
   if (fine > 0)
     ctx.addItem(crop.fineProduceItemId, fine, meta.entityId, { silent: true, callerLogs: true });
   // The R42 charge settle plus the R47 use-time ratchet, the
-  // completeGatherCast pattern: the ratchet latches on every APPLIED use
+  // completeGatherCast pattern. The ratchet's rarity read is the UNFILTERED
+  // ownership scan on purpose, matching the node settle in gathering.ts and
+  // the R30 recharge read ("the best tool the owner HOLDS"): the latch only
+  // ever prices the slot UP, so an unwieldable carried hoe is the
+  // anti-gaming case the rule exists for, not a scan bug (Phase 5 QA,
+  // confirmed against the precedent). The ratchet latches on every APPLIED use
   // (taking the bonus alongside a better owned hoe is what re-prices the
   // slot), and the charge is spent only when the bonus actually changed what
   // the player received. Farming force-adds over capacity (nothing rots), so
@@ -865,9 +877,16 @@ export function harvestCrop(ctx: SimContext, p: Entity, meta: PlayerMeta, bedId:
   // ctx.rng draws, so the harvest's draw contract holds. No cast-start
   // capture arm: harvesting is instant (no cast window a trade could
   // exploit), so the one completion-time read covers both R47 ends.
+  let effectDepleted = false;
   if (effectUse.applied && slot) {
     ratchetCeilingForUse(slot, bestOwnedGatherToolFor(meta.inventory, 'farming', ITEMS).rarity);
-    if (armed.count !== base.count || armed.fine !== base.fine) depleteEffect(slot);
+    if (armed.count !== base.count || armed.fine !== base.fine) {
+      // The last-charge signal (the gatherResult settle's farming twin):
+      // `spent` guards the durability read, because the read alone would
+      // announce a depletion the settle never performed.
+      const spent = depleteEffect(slot);
+      effectDepleted = spent && slot.durability <= 0;
+    }
   }
   // THE ALL-FINE COLLAPSE. The base fields describe the harvest's PRIMARY
   // grant, and when every pick upgrades there is no base-grade grant at all,
@@ -902,6 +921,9 @@ export function harvestCrop(ctx: SimContext, p: Entity, meta: PlayerMeta, bedId:
     // only-when-true wire precedent): every tier 1/2 harvest and every
     // zero-band tier 3/4 harvest keeps the pre-field frame byte-identical.
     ...(seedBackCount > 0 ? { seedBackCount } : {}),
+    // The last-charge signal, same only-when-true rule (the gatherResult
+    // precedent): present exactly when the settle above emptied the slot.
+    ...(effectDepleted ? { effectDepleted: true as const } : {}),
   });
   // Proficiency through the shared gathering-grant queue, draining on the tick
   // path exactly like a node harvest. The gain is PURE STATE computed after

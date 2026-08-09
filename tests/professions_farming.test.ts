@@ -60,7 +60,12 @@ import {
   resolveFarmHarvest,
   updateFarming,
 } from '../src/sim/professions/farming';
-import { resolveSlotToolEffect, slotEffect } from '../src/sim/professions/tools';
+import {
+  resolveSlotToolEffect,
+  slotEffect,
+  startingDurabilityFor,
+} from '../src/sim/professions/tools';
+import { wieldRequirementForTier } from '../src/sim/professions/wield_gate';
 import { type CharacterState, type PlayerMeta, Sim } from '../src/sim/sim';
 import { FARMING_CAST_ID, isNonSpellCast, type SimEvent } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
@@ -822,6 +827,25 @@ describe('plantCrop gate 12: the hoe gate (the crop-ladder tool half)', () => {
     h = makeHarness();
   });
 
+  it('the ladder is traversable: each tier hoe wields inside the PREVIOUS tier crops teaching ceiling', () => {
+    // Deviation (ab)'s "traversable because teaching ceilings run
+    // 50/75/100/100" claim as a GUARD: if a retune ever pushes a wield gate
+    // past what the previous tier's crops can teach, farming soft-locks at
+    // that rung (the crop is unlocked but its hoe is unwieldable and no
+    // lower crop can teach further) and this reds.
+    for (const tier of [2, 3, 4] as const) {
+      expect(
+        wieldRequirementForTier(tier),
+        `the tier ${tier} hoe must be wieldable off tier ${tier - 1} crops`,
+      ).toBeLessThanOrEqual(farmingTeachingCeilingFor(tier - 1));
+    }
+    // The shipped ladder literals, so the inequality above is never
+    // vacuously loose: wield gates 0/40/70/85 layered over the crop
+    // thresholds 0/25/50/75.
+    expect([1, 2, 3, 4].map((t) => wieldRequirementForTier(t))).toEqual([0, 40, 70, 85]);
+    expect([1, 2, 3, 4].map((t) => farmCropSkillThreshold(t))).toEqual([0, 25, 50, 75]);
+  });
+
   it("refuses a farmer with no hoe: reason 'tool', zero draws, nothing consumed", () => {
     giveSeeds(h);
     h.sim.removeItem(HOE_ID, 1, h.pid);
@@ -1469,6 +1493,104 @@ describe('the slotted farming tool effect at harvest (the hoe phase C3 wiring)',
     expect(slot.durability).toBe(before - 1);
   });
 
+  it('the last-charge signal: farmHarvested carries effectDepleted exactly on the emptying spend', () => {
+    // The gatherResult precedent (the node path's last-charge signal): a
+    // farmer's charm must not break silently, so the harvest that spends the
+    // final charge says so on its own event, and ONLY that harvest. Three
+    // beats: a spend that leaves charges (no flag), the emptying spend (flag
+    // true), and a use on the already-empty slot (no flag, unarmed payout).
+    const plot = ripen();
+    void plot;
+    const slot = slotEffect('gatherers_cache');
+    slot.durability = 2;
+    h.meta.toolEffectSlots = { farming: slot };
+    const from1 = h.sim.events.length;
+    harvest(h);
+    const first = eventsOf(h.sim, from1, 'farmHarvested')[0];
+    expect(slot.durability).toBe(1);
+    expect('effectDepleted' in first).toBe(false);
+    // The emptying spend announces itself.
+    ripen();
+    const from2 = h.sim.events.length;
+    harvest(h);
+    const second = eventsOf(h.sim, from2, 'farmHarvested')[0];
+    expect(slot.durability).toBe(0);
+    expect(second.effectDepleted).toBe(true);
+    // The empty slot stays silent and pays unarmed (applied is false).
+    giveSeeds(h);
+    const plot3 = ripen();
+    const unarmed = resolveFarmHarvest(plot3.yieldSeed as number, 0);
+    const from3 = h.sim.events.length;
+    harvest(h);
+    const third = eventsOf(h.sim, from3, 'farmHarvested')[0];
+    expect('effectDepleted' in third).toBe(false);
+    expect(third.count).toBe(unarmed.count);
+  });
+
+  it('pins the fine-chance effect bump to its literal (the wire-name-constant rule)', () => {
+    // TUNING, PROVISIONAL, FLAGGED FOR THE MAINTAINER: the one effect
+    // constant every armed arm above reaches through the import, pinned as a
+    // literal so a retune is a deliberate edit here too (the seed-back maps'
+    // own treatment; without this the winner sweep would follow a magnitude
+    // change silently).
+    expect(FARM_FINE_CHANCE_EFFECT_BONUS).toBe(0.1);
+  });
+
+  it('the R47 ratchet latches at the farming use site: a better CARRIED hoe re-prices an applied use', () => {
+    // The ratchet reads the UNFILTERED ownership scan (bestOwnedGatherToolFor),
+    // deliberately matching the node path's own settle (gathering.ts) and the
+    // R30 recharge read ("the best tool the owner HOLDS at recharge time"):
+    // the latch can only price the slot UP, so an unwieldable carried hoe is
+    // the anti-gaming case, not a defense the player would want. Minting low
+    // with the good hoe stashed must buy nothing past the first
+    // bonus-bearing harvest.
+    const plot = ripen();
+    void plot;
+    const slot = slotEffect('gatherers_cache'); // minted at the common ceiling
+    h.meta.toolEffectSlots = { farming: slot };
+    // Rare, carried, NOT wieldable at the harness's farming skill 0.
+    h.sim.addItem('osmium_hoe', 1, h.pid);
+    const commonCeil = startingDurabilityFor('gatherers_cache', 'common');
+    const rareCeil = startingDurabilityFor('gatherers_cache', 'rare');
+    expect(slot.maxDurability).toBe(commonCeil);
+    expect(rareCeil).toBeGreaterThan(commonCeil); // the latch is a real raise
+    harvest(h);
+    expect(slot.maxDurability).toBe(rareCeil);
+  });
+
+  it('R42 false branch: an applied use whose bonus changed nothing keeps the charge and still latches', () => {
+    const plot = ripen();
+    // The inverted probe: a yieldSeed where the eye's bump upgrades NOTHING
+    // (the common case; the winner sweep above found the rare opposite). The
+    // in-arm no-change guard proves both halves coincide, so a kept charge
+    // below can only mean the false branch ran, never that the apply was
+    // skipped.
+    const fineBump = TOOL_EFFECTS.artisans_eye.bonus * FARM_FINE_CHANCE_EFFECT_BONUS;
+    let noChange = -1;
+    for (let seed = 0; seed < 10_000; seed++) {
+      const armed = resolveFarmHarvest(seed, 0, false, { fineChanceBonus: fineBump });
+      const plain = resolveFarmHarvest(seed, 0);
+      if (armed.fine === plain.fine && armed.count === plain.count) {
+        noChange = seed;
+        break;
+      }
+    }
+    expect(noChange).toBeGreaterThanOrEqual(0);
+    plot.yieldSeed = noChange;
+    const slot = slotEffect('artisans_eye');
+    h.meta.toolEffectSlots = { farming: slot };
+    h.sim.addItem('osmium_hoe', 1, h.pid);
+    const before = slot.durability;
+    const rareCeil = startingDurabilityFor('artisans_eye', 'rare');
+    expect(slot.maxDurability).toBeLessThan(rareCeil);
+    expect(countDraws(h.sim, () => harvest(h))).toBe(0);
+    // The charge survives a use that paid nothing extra (the R42 predicate's
+    // false branch: spend only when the bonus changed what was received)...
+    expect(slot.durability).toBe(before);
+    // ...while the ratchet latches on every APPLIED use, spend or no spend.
+    expect(slot.maxDurability).toBe(rareCeil);
+  });
+
   it('a prompt-mode slot fires nothing: output byte-equal to unarmed and the charge kept', () => {
     // harvest_crop carries no confirm channel on the wire, so `confirmed` is
     // hard false at this call site: a 'prompt' slot skips WHOLE (no bonus,
@@ -1531,6 +1653,21 @@ describe('the mint refuses a prompt-mode FARMING slot (no confirm channel exists
       undefined,
     );
     expect(always.ok).toBe(true);
+    // BOTH live effects mint on farming through the one authority: the act
+    // arms above build their slots with slotEffect() directly, so without
+    // this line artisans_eye's acted-on state was never proven REACHABLE
+    // through resolveSlotToolEffect (a kind arm refusing quality effects on
+    // a grade-less profession would have left those arms green).
+    const eye = resolveSlotToolEffect(
+      bagsWith(h, 'artisans_eye'),
+      'farming',
+      'artisans_eye',
+      'always',
+      ITEMS,
+      h.meta.name,
+      undefined,
+    );
+    expect(eye.ok).toBe(true);
     // And prompt on a profession WITH a confirm channel still mints: the
     // non-farming control that keeps this from passing as a blanket prompt
     // refusal.
@@ -2064,6 +2201,94 @@ describe('the seed-back roll (tier 3/4): ONE draw at harvest, banded payouts', (
     // A failure still teaches nothing: the consolation is seeds, not skill.
     expect(h.meta.pendingGatherGrants).toEqual([]);
     assertAllLootFlagged(h, from);
+  });
+
+  it('the crossed contract, survived: cache armed AND tonic stored, the tier-3 harvest still draws EXACTLY one', () => {
+    // The banner's crossing claim pinned where the axes meet: the tool-effect
+    // arms above run tier 1 only, and the band arms above run effect-free, so
+    // until this arm no test ever executed a tier 3/4 harvest with an armed
+    // slot or a stored tonic. The likeliest future draw regression is one
+    // appearing in the effect or tonic arm, which would land HERE.
+    const h = makeHarness(4); // the probed two-seed band seed above
+    const plot = plantTier(h, T3_CROP, T3_HOE, 75);
+    plot.survivalRoll = 0;
+    plot.tonic = true;
+    // Both axes proven live on this plot (the vacuity rule): sweep a
+    // yieldSeed whose expansion WINS the tonic roll, then the flat cache
+    // bonus moves it further.
+    let winner = -1;
+    for (let seed = 0; seed < 10_000; seed++) {
+      if (resolveFarmHarvest(seed, 75, true).count > resolveFarmHarvest(seed, 75).count) {
+        winner = seed;
+        break;
+      }
+    }
+    expect(winner).toBeGreaterThanOrEqual(0);
+    plot.yieldSeed = winner;
+    const slot = slotEffect('gatherers_cache');
+    h.meta.toolEffectSlots = { farming: slot };
+    const unarmed = resolveFarmHarvest(winner, 75);
+    const armed = resolveFarmHarvest(winner, 75, true, {
+      bonusPicks: TOOL_EFFECTS.gatherers_cache.bonus,
+    });
+    expect(armed.count).toBeGreaterThan(unarmed.count); // in-arm non-vacuity
+    const before = slot.durability;
+    const values = recordDraws(h.sim, () => harvest(h));
+    expect(values).toHaveLength(1); // the seed-back roll alone
+    expect(values[0]).toBeLessThan(FARM_SEED_BACK_TWO_CHANCE[3] as number);
+    expect(h.sim.countItem(T3_SEED, h.pid)).toBe(2);
+    // The armed-and-toniced expansion is what the bags received, and the
+    // charge settle still spent its one: the crossing changed the payout,
+    // never the draw count.
+    expect(h.sim.countItem('highland_barley', h.pid)).toBe(armed.count);
+    expect(slot.durability).toBe(before - 1);
+  });
+
+  it('the crossed contract, withered: the one draw stands and the charge is KEPT (effects act on survived only)', () => {
+    const h = makeHarness(8); // the probed withered one-seed winner above
+    const plot = plantTier(h, T3_CROP, T3_HOE, 70);
+    plot.survivalRoll = 0.99;
+    plot.tonic = true;
+    const slot = slotEffect('gatherers_cache');
+    h.meta.toolEffectSlots = { farming: slot };
+    h.sim.addItem('osmium_hoe', 1, h.pid);
+    const before = slot.durability;
+    const beforeCeil = slot.maxDurability;
+    const values = recordDraws(h.sim, () => harvest(h));
+    expect(values).toHaveLength(1);
+    expect(h.sim.countItem(T3_SEED, h.pid)).toBe(1);
+    expect(h.sim.countItem(FARM_WITHERED_HUSK_ITEM_ID, h.pid)).toBe(FARM_WITHERED_HUSK_COUNT);
+    // The withered return sits ABOVE the effect block, so an armed slot on a
+    // failed crop neither spends nor latches: no charge for no bonus.
+    expect(slot.durability).toBe(before);
+    expect(slot.maxDurability).toBe(beforeCeil);
+  });
+
+  it('run-twice determinism: two same-seed worlds agree on the whole tier-3 harvest, seed-back included', () => {
+    // The changed draw path's own run-twice equality (the two-Sim arm below
+    // in the hosts describe plants tier 1 only): a wall-clock or Math.random
+    // leak anywhere in the plant-ripen-harvest-seedback chain forks this.
+    const run = () => {
+      const h = makeHarness(9);
+      const plot = plantTier(h, T3_CROP, T3_HOE, 75);
+      plot.survivalRoll = 0;
+      const from = h.sim.events.length;
+      harvest(h);
+      return {
+        seeds: h.sim.countItem(T3_SEED, h.pid),
+        produce: h.sim.countItem('highland_barley', h.pid),
+        fine: h.sim.countItem('fine_highland_barley', h.pid),
+        events: JSON.parse(
+          JSON.stringify(h.sim.events.slice(from).filter((e) => e.type.startsWith('farm'))),
+        ),
+      };
+    };
+    const a = run();
+    const b = run();
+    expect(a).toEqual(b);
+    // Non-vacuity: the compared payload is real work, not two empty lists.
+    expect(a.events.length).toBeGreaterThan(0);
+    expect(a.produce).toBeGreaterThan(0);
   });
 
   it('every harvest deny path still draws ZERO with a tier-3 plot in the ground', () => {

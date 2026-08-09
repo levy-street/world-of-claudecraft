@@ -346,6 +346,27 @@ describe('item webp icons', () => {
     }
   });
 
+  it('A4b) the two blue-radial seed sacks differ in the GLYPH, never only the background', () => {
+    // The Phase 5 QA catch: marsh_rice_seed (drink radial) and
+    // frost_gourd_seed (frost radial) sat behind pale-to-deep BLUE radials
+    // with the identical brown sack, and A4's whole-recipe JSON identity was
+    // satisfied by the radial name alone, a distinction a 32px bag cell does
+    // not show. This pair pin demands the prim lists (each prim WITH its
+    // palette) differ, so the sacks themselves are tellable; the radials
+    // stay free to move with each crop's flavor. Targeted at the one pair
+    // whose radials share a hue family, because a general ignore-background
+    // rule would outlaw pairs whose radials genuinely differ (green nature
+    // vs brown earth reads fine at 32px).
+    const a = itemIconRecipe('marsh_rice_seed');
+    const b = itemIconRecipe('frost_gourd_seed');
+    expect(JSON.stringify(a.prims)).not.toBe(JSON.stringify(b.prims));
+    // Non-vacuity: both really are sack glyphs on blue radials today; if
+    // either half moves off this shape, re-eyeball the pair and retire or
+    // re-aim this pin deliberately.
+    expect(a.prims[0]?.p).toBe('sack');
+    expect(b.prims[0]?.p).toBe('sack');
+  });
+
   it('B) commits only webp art (+ mapping.json) under public/ui/items', () => {
     const stray = walk(itemsDir)
       .filter((p) => !isDotfile(p) && !isMapping(p) && path.extname(p).toLowerCase() !== '.webp')

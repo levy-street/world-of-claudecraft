@@ -11,6 +11,7 @@ import { ITEMS } from '../src/sim/data';
 import { FARM_HUSKS_PER_COMPOST } from '../src/sim/professions/farming';
 import {
   type FarmDeniedReason,
+  type FarmDeniedToast,
   farmDeniedLineKey,
   farmDeniedToast,
   farmFineLineKey,
@@ -218,7 +219,9 @@ describe('farmDeniedToast: the tool refusal names the crop tier when it can', ()
     // Node-path parity: the same statement a vein's hover line makes about
     // its pick, delivered as the refusal toast because farming has no node to
     // hover. The tier comes from the crop record, so a tier-3 refusal names 3.
-    expect(farmDeniedToast('tool', 'highland_barley')).toEqual({
+    // Typed through the EXPORTED shape so the type earns its export surface.
+    const toast: FarmDeniedToast = farmDeniedToast('tool', 'highland_barley');
+    expect(toast).toEqual({
       key: 'hudChrome.gathering.tierRequired.farming',
       params: { tier: 3 },
     });
@@ -311,5 +314,25 @@ describe('the hud seed-back render arms (source pin)', () => {
     const arm = caseSlice('farmWithered', 'farmDenied');
     expect(arm.split('farmSeedBackLineKey(ev.seedBackCount)').length - 1).toBe(1);
     expect(guardBlock(arm)).toContain('farmSeedBackLineKey(ev.seedBackCount)');
+  });
+
+  it('farmHarvested announces the last charge under its own gate, and ONLY farmHarvested', () => {
+    // The depletion self-note (the gatherResult arm's farming twin), pinned
+    // THROUGH the operator: the note call must sit inside the
+    // `if (ev.effectDepleted)` gate, once, in the harvested arm alone. The
+    // withered arm must stay note-free: the sim's withered return sits above
+    // the effect block, so a depletion there would announce a spend that
+    // never happened.
+    const arm = caseSlice('farmHarvested', 'farmWithered');
+    const gate = 'if (ev.effectDepleted) {';
+    const at = arm.indexOf(gate);
+    expect(at, 'the depletion gate exists').toBeGreaterThan(-1);
+    expect(arm.indexOf(gate, at + 1), 'exactly one depletion gate').toBe(-1);
+    const gated = arm.slice(at, arm.indexOf('}', at) + 1);
+    expect(gated).toContain("this.showSelfNote(t('hudChrome.professions.toolEffectDepleted'))");
+    // The note never renders outside its gate, and never in the withered arm.
+    expect(arm.split('toolEffectDepleted').length - 1).toBe(1);
+    const witheredArm = caseSlice('farmWithered', 'farmDenied');
+    expect(witheredArm).not.toContain('effectDepleted');
   });
 });

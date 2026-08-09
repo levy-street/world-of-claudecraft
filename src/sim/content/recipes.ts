@@ -439,14 +439,17 @@ export const ROD_RECIPES: ProfessionRecipeRecord[] = [
 // grown without the tier-N hoe already owned; consuming the MATCHING-tier
 // twin would be a circuit with no entry. One tier down, the twin's crop
 // grows under exactly the hoe the recipe already consumes (rung 2 takes
-// fine_vale_wheat, tier 1, grown under the vendor garden_hoe).
+// fine_vale_wheat, tier 1, grown under the vendor-PRICED garden_hoe,
+// stocked at Phase 9 go-live per the (aa) dormancy).
 //
 // ACQUISITION COVERAGE, where this ladder diverges from the rods and why:
 // the rod ladder leaves rungs 2 and 3 vendor-priced and crafts only 4 and 5,
 // but the hoe pricing table locks buyValue OFF rungs 2 to 4, so the vendor
 // arm cannot be mirrored; HOE_RECIPES covers rungs 2, 3, AND 4 instead,
 // making craft the only mint above rung 1 and leaving no acquisition gap
-// (each rung is reachable from a state the rung below grants). There is
+// WITHIN the ladder (each rung is reachable from a state the rung below
+// grants; the ladder's one entry point, rung 1's vendor stocking, opens at
+// Phase 9 go-live, until which the whole surface is dormant by choice). There is
 // also, deliberately, NO delve Marks fallback row this phase (see the hoe
 // block in content/items.ts; flagged for the maintainer).
 //

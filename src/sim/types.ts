@@ -5691,7 +5691,12 @@ export type SimEvent = { pid?: number } & (
   // byte-identical to the pre-field wire). `seedBackCount` is the tier 3/4
   // seed-back roll's payout in crop seeds (the client resolves the seed item
   // from cropId), present ONLY when positive, the same only-when-true rule.
-  // Text-free (the gatherResult idiom).
+  // `effectDepleted` is gatherResult's last-charge signal on the farming
+  // path: present (true) exactly when THIS harvest's R42 settle spent the
+  // slotted tool effect's final charge, so the client can announce the break
+  // instead of the charm dying silently. Only farmHarvested can carry it:
+  // the withered return sits above the effect block, so a failed crop never
+  // applies, spends, or depletes. Text-free (the gatherResult idiom).
   | {
       type: 'farmHarvested';
       pid: number;
@@ -5702,6 +5707,7 @@ export type SimEvent = { pid?: number } & (
       fineItemId?: string;
       fineCount?: number;
       seedBackCount?: number;
+      effectDepleted?: true;
     }
   // Farming: a plot that lost its survival pre-roll was cleared, paying
   // `count` withered husks instead of produce. Emitted at HARVEST, never at

@@ -607,6 +607,35 @@ describe('ProfessionsWindow: the slotted tool effect row', () => {
     expect(el.querySelector('[data-slot-effect="gatherers_cache"]')).not.toBeNull();
   });
 
+  it('the farming row offers slot buttons but NEVER the Ask-each-use toggle (no confirm channel)', () => {
+    // The Phase 5 QA self-erase trap: prompt-mode farming mints are refused
+    // at the resolver (promptSlotRefused: harvest_crop has no confirm
+    // channel), so a farming toggle was a checkbox whose tick re-asked the
+    // resolver with a mode it refuses for every effect, emptied the row's
+    // slottable set, and erased the whole actions row (toggle included)
+    // until reopen. The toggle is suppressed THROUGH THE SAME predicate the
+    // resolver reads, and the slot buttons stay.
+    const state = baseState();
+    state.gathering = [
+      { professionId: 'mining', skill: 30, maxSkill: 300 },
+      { professionId: 'farming', skill: 10, maxSkill: 100 },
+    ];
+    state.inventory = [
+      { itemId: 'garden_hoe', count: 1 },
+      { itemId: 'copper_mining_pick', count: 1 },
+      { itemId: 'gatherers_cache', count: 2 },
+    ];
+    const { el } = makeWindow(state);
+    // The farming slot affordance survives...
+    expect(el.querySelector('[data-slot-profession="farming"]')).not.toBeNull();
+    // ...its mode toggle never renders...
+    expect(el.querySelector('[data-slot-mode="farming"]')).toBeNull();
+    // ...and the mining control keeps ITS toggle beside its own button, so
+    // this is the farming policy, not a blanket toggle removal.
+    expect(el.querySelector('[data-slot-profession="mining"]')).not.toBeNull();
+    expect(el.querySelector('[data-slot-mode="mining"]')).not.toBeNull();
+  });
+
   it('the preview prices with the viewer craft skills: specialization shrinks the count', () => {
     // The phase 14 QA: every recharge fixture lacked selfCrafted, so the
     // old {} skills argument previewed identically. An EPIC pick refills a

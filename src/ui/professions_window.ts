@@ -633,10 +633,19 @@ export class ProfessionsWindow {
       // when a slot button does. A real labeled checkbox: keyboard-operable,
       // announced by its own text, and focus-keyed so the rebuild the toggle
       // triggers restores focus onto it (the exact-control rung).
+      //
+      // EXCEPT on a row whose profession refuses the prompt pairing at the
+      // mint (row.promptable false, the promptSlotRefused authority:
+      // farming has no harvest confirm channel). Offering the checkbox
+      // there was the Phase 5 QA's self-erase trap: ticking it re-asked the
+      // resolver with a mode it refuses for every effect, so the slottable
+      // set emptied and this whole actions row (toggle included) vanished
+      // on the very click that checked it, unrecoverable until reopen.
       const checked = this.slotModePrompt.has(row.professionId) ? ' checked' : '';
-      const toggle =
-        `<label class="prof-effect-mode-toggle"><input type="checkbox" data-slot-mode="${esc(row.professionId)}" data-focus-key="slotmode:${esc(row.professionId)}"${checked}> ` +
-        `${esc(t('hudChrome.professions.toolEffectModeAsk'))}</label>`;
+      const toggle = row.promptable
+        ? `<label class="prof-effect-mode-toggle"><input type="checkbox" data-slot-mode="${esc(row.professionId)}" data-focus-key="slotmode:${esc(row.professionId)}"${checked}> ` +
+          `${esc(t('hudChrome.professions.toolEffectModeAsk'))}</label>`
+        : '';
       html += `<div class="prof-effect-actions">${slotButtons}${toggle}</div>`;
     }
     return html;

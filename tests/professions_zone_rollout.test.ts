@@ -402,6 +402,14 @@ describe('the new-zone checklist: every complete zone arrives mechanically whole
   });
 
   it('the hub stocks the rungs its own nodes use, and the water rod; ladder tops never (hub rule, R20, R23)', () => {
+    // The exclusion-set pins (asserted after the zone loop): the (aa)
+    // farming skip below is held by these, not by its comment alone. The
+    // Phase 5 QA mutation probe widened the skip to mining and the whole
+    // suite stayed green; these two sets are what red that now, in both
+    // directions (a widened skip lands in hubSkipped, a rewritten condition
+    // that drops a node profession from the walk empties hubAsserted).
+    const hubSkipped = new Set<string>();
+    const hubAsserted = new Set<string>();
     for (const zoneId of complete) {
       const zone = zoneOf(zoneId);
       const zoneTier = zoneTierOf(zoneId);
@@ -425,7 +433,11 @@ describe('the new-zone checklist: every complete zone arrives mechanically whole
       // exclusion to the three node professions.
       for (const [itemId, def] of landTools) {
         if (def.use?.type !== 'gatherTool') continue;
-        if (def.use.professionId === 'farming') continue;
+        if (def.use.professionId === 'farming') {
+          hubSkipped.add(def.use.professionId);
+          continue;
+        }
+        hubAsserted.add(def.use.professionId);
         const priced = def.buyValue !== undefined;
         if (priced && def.use.tier <= zoneTier) {
           expect(hubStock.has(itemId), `${zoneId} hub should stock ${itemId}`).toBe(true);
@@ -459,6 +471,10 @@ describe('the new-zone checklist: every complete zone arrives mechanically whole
         }
       }
     }
+    // The (aa) exclusion is EXACTLY farming (fishing never enters landTools),
+    // and every node profession really passed through the stocked-rung walk.
+    expect([...hubSkipped]).toEqual(['farming']);
+    expect([...hubAsserted].sort()).toEqual(['herbalism', 'logging', 'mining']);
   });
 
   it('the ladder top rungs route through content, never a counter (R23)', () => {
@@ -898,6 +914,18 @@ describe('the farming ladder: every farming zone arrives mechanically whole', ()
         ).toBe(true);
       }
     }
+    // The four qualities as LITERALS (the Phase 5 QA add): rung quality
+    // feeds the charm-charge economy twice, through the R47 use-time ratchet
+    // (startingDurabilityFor prices per rarity rung) and the R30 recharge
+    // rarity resolution, so a silent quality edit re-prices charges with
+    // nothing else red. The step function is deliberate: tiers 1 and 2 are
+    // both common, matching every other land ladder.
+    expect(Object.fromEntries(farmingTools.map(([itemId, def]) => [itemId, def.quality]))).toEqual({
+      garden_hoe: 'common',
+      bronze_hoe: 'common',
+      skysilver_hoe: 'uncommon',
+      osmium_hoe: 'rare',
+    });
   });
 
   it('every farming material is consumed by a live path or carries the documented Phase 6 note', () => {

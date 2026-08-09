@@ -49,9 +49,11 @@ export interface IWorldFarming {
   // actually in the sender's bags, and that every REQUESTED knob can be paid
   // from those bags (compost and tonic by count, the watch fee by the
   // tier-scaled produce plan in farm_watch_fee.ts); a knob that cannot be
-  // paid denies the whole plant with nothing consumed (the hoe-tier and
-  // wield gates are DEFERRED to the crop-ladder phase: no farming tool kind
-  // exists yet). It then consumes the seed plus the requested knob payments
+  // paid denies the whole plant with nothing consumed. The crop-ladder
+  // phase's step-12 hoe gate is LIVE: the plant also demands a WIELDABLE
+  // farming hoe covering the crop's tier in bags (the wield-filtered scan,
+  // refused as farmDenied reason 'tool').
+  // It then consumes the seed plus the requested knob payments
   // and pre-rolls the WHOLE growth script (the hidden survival outcomes and
   // the yield seed) in one contiguous rng block, IDENTICAL under every knob
   // combination. The wire carries the two ids plus up to three literal-true

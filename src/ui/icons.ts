@@ -3210,7 +3210,11 @@ const ITEM_RECIPES: Record<string, IconRecipe> = {
   highland_barley_seed: r('earth', 'gold', [{ p: 'sack', pal: 'earthBrown' }]),
   highland_barley: r('earth', 'gold', [{ p: 'leaf', pal: 'gold' }]),
   fine_highland_barley: r('earth', 'gold', [{ p: 'leaf', pal: 'gold' }], ['sparkle']),
-  frost_gourd_seed: r('frost', 'earthBrown', [{ p: 'sack', pal: 'earthBrown' }]),
+  // The sack takes the ICE palette, not the seed family's brown: the drink
+  // and frost radials are both pale-to-deep blue, so beside marsh_rice_seed
+  // the background alone cannot tell the two apart at 32px (the Phase 5 QA
+  // catch, pinned as the glyph-difference arm in tests/item_icons.test.ts).
+  frost_gourd_seed: r('frost', 'earthBrown', [{ p: 'sack', pal: 'ice' }]),
   frost_gourd: r('frost', 'ice', [{ p: 'waterskin', pal: 'ice' }]),
   fine_frost_gourd: r('frost', 'ice', [{ p: 'waterskin', pal: 'ice' }], ['sparkle']),
   gilded_sunmelon_seed: r('nature', 'gold', [{ p: 'sack', pal: 'gold' }]),

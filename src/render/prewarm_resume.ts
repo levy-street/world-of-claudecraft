@@ -37,6 +37,22 @@ export async function settlePrewarmBeforePublish<T>(
   }
 }
 
+export interface PrewarmCompileUnitOptions<T> {
+  /** Program-content keys for a root (e.g. material identity plus the mesh
+   *  shape bits that pick the program variant). A root whose every key an
+   *  earlier root already produced links nothing new and is skipped: each
+   *  awaited r165 compileAsync costs a 10 ms poll floor plus a synchronous
+   *  scene walk, so redundant roots are pure wall-clock. A root with no keys
+   *  is always kept (fail-open). */
+  dedupeKeys?: (root: T) => Iterable<unknown>;
+  /** Roots per unit. One unit launches its batch's compiles and awaits them
+   *  TOGETHER, so the 10 ms poll floors overlap instead of stacking. Each
+   *  compile call keeps its own bounded synchronous prologue, so a batch
+   *  stays preemptible between calls only at unit granularity: keep it small
+   *  (the entry path uses 16). Default 1 preserves one-root units. */
+  batchSize?: number;
+}
+
 /**
  * Turns materialized archetype roots into explicit resume units. Reference
  * deduplication prevents one shared root from being compiled twice when it is
@@ -46,21 +62,49 @@ export async function settlePrewarmBeforePublish<T>(
 export function buildPrewarmCompileUnits<T extends object>(
   groups: readonly PrewarmResumeGroup<T>[],
   compile: (root: T) => unknown | Promise<unknown>,
+  options?: PrewarmCompileUnitOptions<T>,
 ): PrewarmResumeUnit[] {
   const seen = new Set<T>();
+  const seenKeys = new Set<unknown>();
+  const batchSize = Math.max(1, options?.batchSize ?? 1);
   const units: PrewarmResumeUnit[] = [];
   for (const group of groups) {
-    for (let index = 0; index < group.roots.length; index++) {
-      const root = group.roots[index];
-      if (seen.has(root)) continue;
-      seen.add(root);
+    let unitIndex = 0;
+    let batch: T[] = [];
+    const flush = (): void => {
+      if (batch.length === 0) return;
+      const roots = batch;
+      batch = [];
       units.push({
-        id: `${group.id}:${index}`,
+        id: `${group.id}:${unitIndex++}`,
         run: async () => {
-          await compile(root);
+          // allSettled, then rethrow the first failure: Promise.all would
+          // short-circuit the unit on one rejection and blur which of its
+          // batch-mates actually compiled; every root still gets its attempt
+          // and the unit's caller still sees the failure.
+          const results = await Promise.allSettled(
+            roots.map((root) => Promise.resolve(compile(root))),
+          );
+          const failed = results.find(
+            (result): result is PromiseRejectedResult => result.status === 'rejected',
+          );
+          if (failed) throw failed.reason;
         },
       });
+    };
+    for (const root of group.roots) {
+      if (seen.has(root)) continue;
+      seen.add(root);
+      if (options?.dedupeKeys) {
+        const keys = [...options.dedupeKeys(root)];
+        const fresh = keys.length === 0 || keys.some((key) => !seenKeys.has(key));
+        for (const key of keys) seenKeys.add(key);
+        if (!fresh) continue;
+      }
+      batch.push(root);
+      if (batch.length >= batchSize) flush();
     }
+    flush();
   }
   return units;
 }

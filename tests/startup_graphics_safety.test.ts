@@ -47,7 +47,7 @@ describe('constrained renderer integration', () => {
   it('uses the resolved dynamic-shadow policy for both the WebGL map and sun pass', () => {
     const source = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
     const prewarmMethod = source.indexOf(
-      'private async compileSkinnedShadowPrograms(root: THREE.Object3D)',
+      'private async compileShadowPrograms(root: THREE.Object3D)',
     );
     const prewarmGuard = source.indexOf(
       'if (!GFX.dynamicShadows || !this.asyncCompileSupported) return;',

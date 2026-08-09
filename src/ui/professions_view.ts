@@ -20,6 +20,7 @@ import {
 import { ITEMS } from '../sim/data';
 import { requiredAmendsProgress } from '../sim/professions/archetype';
 import {
+  promptSlotRefused,
   resolveRechargeToolEffect,
   resolveSlotToolEffect,
   type ToolEffectSlot,
@@ -341,6 +342,13 @@ export interface ProfessionsGatheringRow {
    *  Empty for a charm-less or tool-less row; re-slotting an already-slotted
    *  effect stays offered (it consumes another charm and resets to full). */
   slottable: readonly string[];
+  /** Whether the R40 "Ask each use" toggle may render for this row: false
+   *  where the mint authority refuses the prompt pairing outright
+   *  (promptSlotRefused: farming has no harvest confirm channel), so the
+   *  window never offers a mode whose every resulting mint would be
+   *  refused, which used to erase the row's whole slot affordance on the
+   *  very click that checked the box. */
+  promptable: boolean;
 }
 
 export interface SwitchCostModel {
@@ -526,6 +534,7 @@ export function buildProfessionsView(input: ProfessionsViewInput): ProfessionsVi
       // with its inputs threaded whole is what makes the contract real: the
       // button set cannot drift from what the server accepts, and a re-slot
       // the resolver would refuse as no-gain never renders a button at all.
+      promptable: !promptSlotRefused(row.professionId),
       slottable: heldEffectIds.filter(
         (effectId) =>
           resolveSlotToolEffect(

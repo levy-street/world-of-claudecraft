@@ -269,6 +269,25 @@ describe('Drowned Litany shop stock (data pins)', () => {
     expect(
       craftedTools.filter((t) => t.use?.type === 'gatherTool' && t.use.tier === 5),
     ).toHaveLength(4);
+    // The exclusion's SELF-CLEARING tripwire (the ITEM_ART_PENDING idiom):
+    // today NO farming gatherTool has a Marks row in any delve shop. The day
+    // Phase 9/10 gives one a row, this reds and the farming skip above is
+    // re-decided deliberately instead of silently covering the new route.
+    // Non-vacuous: the excluded set is really populated today.
+    const farmingTools = Object.values(ITEMS).filter(
+      (def) => def.use?.type === 'gatherTool' && def.use.professionId === 'farming',
+    );
+    expect(farmingTools.length).toBeGreaterThan(0);
+    const allDelveRows = new Set(
+      Object.values(DELVE_SHOPS)
+        .flat()
+        .map((e) => e.itemId),
+    );
+    for (const tool of farmingTools) {
+      expect(allDelveRows.has(tool.id), `${tool.id} gained a Marks row: re-decide the skip`).toBe(
+        false,
+      );
+    }
   });
 
   it('every Litany slot costs exactly 2x its Collapsed Reliquary price tier', () => {

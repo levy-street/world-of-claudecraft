@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import {
   applyPointLightBudget,
+  countDrawnPointLights,
   flickerContributingFireLights,
   pointLightPadCount,
   type RankedPointLight,
@@ -244,6 +245,94 @@ describe('applyPointLightBudget', () => {
       expect(drawn).toBe(2);
       expect(visibleCount(ranked)).toBe(2);
     });
+  });
+
+  describe('countDrawnPointLights (the bounded prewarm mask)', () => {
+    function addTo(parent: THREE.Object3D, entry: RankedPointLight): RankedPointLight {
+      parent.add(entry.light);
+      return entry;
+    }
+
+    it('re-derives the drawn count when a transient mask hides chosen ancestors', () => {
+      // The zone-prewarm bounded render hides most top-level scene children
+      // transiently, OUT OF BAND of the budget pass: view lights under those
+      // children leave Three's counted set, NUM_POINT_LIGHTS drifts below the
+      // pinned total, and the bounded render synchronously links a program
+      // variant the live render never draws (measured: prewarm units with a
+      // link cost ~119 ms on a 3090; units without, 0.3 ms).
+      const scene = new THREE.Scene();
+      const viewGroup = new THREE.Group();
+      scene.add(viewGroup);
+      const viewLight = addTo(viewGroup, rankedLight(1, 0));
+      const rootLight = addTo(scene, rankedLight(2, 0));
+      const ranked = [viewLight, rootLight];
+      applyPointLightBudget(ranked, 0, 0, 6, 6, RANGE_SQ, scene);
+      expect(countDrawnPointLights(ranked, scene)).toBe(2);
+
+      // The bounded mask hides the view group; no budget pass runs in between.
+      viewGroup.visible = false;
+      const boundedDrawn = countDrawnPointLights(ranked, scene);
+      expect(boundedDrawn).toBe(1);
+      // The pad top-up restores the exact pinned total the compile lane
+      // linked against, so the bounded render draws the same variant.
+      expect(boundedDrawn + pointLightPadCount(boundedDrawn, 6)).toBe(6);
+    });
+
+    it('does not count a light the budget itself turned off', () => {
+      const scene = new THREE.Scene();
+      const near = addTo(scene, rankedLight(1, 0));
+      const far = addTo(scene, rankedLight(9, 0));
+      const ranked = [near, far];
+      applyPointLightBudget(ranked, 0, 0, 1, 1, RANGE_SQ, scene);
+      expect(far.light.visible).toBe(false);
+      expect(countDrawnPointLights(ranked, scene)).toBe(1);
+    });
+
+    it('does not count a detached light', () => {
+      const scene = new THREE.Scene();
+      const attached = addTo(scene, rankedLight(1, 0));
+      const detached = rankedLight(2, 0);
+      attached.light.visible = true;
+      detached.light.visible = true;
+      expect(countDrawnPointLights([attached, detached], scene)).toBe(1);
+    });
+  });
+
+  it('wires the bounded prewarm render to re-pin the pads in its masked state', () => {
+    // The bounded render's visibility mask hides entity views (and their
+    // lights) without a budget pass: it must recount drawn lights in ITS
+    // state, pad up to the same pinned total the compile lane linked against
+    // BEFORE rendering, and restore the live pad state afterwards. Dropping
+    // any half silently reinstates the synchronous mid-unit program links.
+    const source = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    const methodStart = source.indexOf('private renderBoundedPrewarmRoot(');
+    const methodEnd = source.indexOf('private renderPrewarmPass(', methodStart);
+    expect(methodStart).toBeGreaterThan(-1);
+    expect(methodEnd).toBeGreaterThan(methodStart);
+    const method = source.slice(methodStart, methodEnd);
+    expect(method).toContain('countDrawnPointLights(this.lightRank, this.scene)');
+    expect(method).toContain('pointLightPadCount(');
+    expect(method).toContain('GFX.maxPointLights');
+    const sceneMaskIndex = method.indexOf('boundedPrewarmVisibility');
+    // The recount must observe BOTH mask levels: the scene-level mask and the
+    // group-level one (a recount between the two would still miss the drift).
+    const groupMaskIndex = method.indexOf('entry === childRoot');
+    const countIndex = method.indexOf('countDrawnPointLights');
+    const padWriteIndex = method.indexOf('this.lightPads[i].visible = i < boundedPadCount');
+    const renderIndex = method.indexOf('this.webgl.render(');
+    const finallyIndex = method.indexOf('} finally {');
+    const restoreIndex = method.indexOf('previousPadVisibility[');
+    expect(sceneMaskIndex).toBeGreaterThan(-1);
+    expect(groupMaskIndex).toBeGreaterThan(sceneMaskIndex);
+    expect(countIndex).toBeGreaterThan(groupMaskIndex);
+    // The pad WRITE must land between the recount and the render: pinned
+    // separately because the count/pad substrings also appear in comments.
+    expect(padWriteIndex).toBeGreaterThan(countIndex);
+    expect(renderIndex).toBeGreaterThan(padWriteIndex);
+    // The pad restore must live in the finally: restored only after the render
+    // would leak raised pads into live frames on a throw.
+    expect(finallyIndex).toBeGreaterThan(renderIndex);
+    expect(restoreIndex).toBeGreaterThan(finallyIndex);
   });
 
   it('wires the drawn-count pin: scene root in, pads on the drawn count out', () => {

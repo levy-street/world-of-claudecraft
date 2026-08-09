@@ -4397,9 +4397,10 @@ export class ClientWorld implements IWorld {
   }
   // --- IWorldFarming: the two plot mutations (snake_case wire, by design).
   // Command only, NEVER predicted: the server re-validates the bed id, the
-  // crop id, ownership, the skill threshold, and the seed in bags inside the
-  // sim (the hoe-tier gate is deferred to the crop-ladder
-  // phase), consumes the seed, and pre-rolls the whole hidden
+  // crop id, ownership, the skill threshold, the seed in bags, and the
+  // step-12 hoe gate (a wieldable farming hoe covering the crop tier; live
+  // since the crop-ladder phase) inside the
+  // sim, consumes the seed, and pre-rolls the whole hidden
   // growth script there. Writing an optimistic plot row here would be
   // guessing at a deadline only the authority can set, and the hidden
   // survival/yield slots deliberately never reach this client at all, so

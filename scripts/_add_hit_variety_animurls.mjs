@@ -1,3 +1,4 @@
+// biome-ignore-all lint/suspicious/noTemplateCurlyInString: every INSERTS row below is deliberate placeholder TEXT (the header comment states the non-interpolation contract: PLAYERS/ENEMIES resolve inside manifest.ts, never here).
 import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
