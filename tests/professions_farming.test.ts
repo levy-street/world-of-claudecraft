@@ -22,6 +22,7 @@ import {
 } from '../src/sim/content/farm_crops';
 import { FARM_BED_IDS, farmBedById } from '../src/sim/content/farm_patches';
 import { DEFAULT_MOUNT } from '../src/sim/content/mounts';
+import { TOOL_EFFECTS } from '../src/sim/content/professions';
 import { FARM_MAX_GROW_MS } from '../src/sim/professions/farm_persist';
 import type { PlotState } from '../src/sim/professions/farm_projection';
 import {
@@ -29,6 +30,7 @@ import {
   convertHusks,
   FARM_COMPOST_ITEM_ID,
   FARM_FINE_CHANCE_BASE,
+  FARM_FINE_CHANCE_EFFECT_BONUS,
   FARM_GROWTH_TONIC_ITEM_ID,
   FARM_HARVEST_LIFE_FLOOR,
   FARM_HARVEST_PICK_CAP,
@@ -53,6 +55,7 @@ import {
   resolveFarmHarvest,
   updateFarming,
 } from '../src/sim/professions/farming';
+import { slotEffect } from '../src/sim/professions/tools';
 import { type CharacterState, type PlayerMeta, Sim } from '../src/sim/sim';
 import { FARMING_CAST_ID, isNonSpellCast, type SimEvent } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
@@ -61,6 +64,10 @@ const CROP_ID = 'vale_wheat';
 const SEED_ID = 'vale_wheat_seed';
 const PRODUCE_ID = 'vale_wheat';
 const FINE_ID = 'fine_vale_wheat';
+// The tier-1 farming hoe, granted by the shared harness: the step-12 hoe gate
+// (plantCrop's tool arm) refuses any plant without a wieldable hoe covering
+// the crop tier, and every pre-hoe arm in this file plants tier-1 crops.
+const HOE_ID = 'garden_hoe';
 const BED = 'bed_eastbrook_1';
 const BED2 = 'bed_eastbrook_2';
 const START_MS = 1_700_000_000_000;
@@ -100,6 +107,10 @@ function makeHarness(seed = 41): Harness {
   const pid = sim.playerId;
   const meta = sim.players.get(pid) as PlayerMeta;
   standAtBed(sim, BED);
+  // The step-12 hoe gate: a harness farmer carries the tier-1 hoe so every
+  // arm that is not ABOUT the gate keeps planting. addItem draws no rng, so
+  // the grant never moves a counted window or the shared stream position.
+  sim.addItem(HOE_ID, 1, pid);
   return {
     sim,
     pid,
@@ -678,6 +689,7 @@ describe('plantCrop: the stated gate order, every arm draw-free', () => {
     const meta = fresh.players.get(pid) as PlayerMeta;
     standAtBed(fresh, BED);
     fresh.addItem(SEED_ID, 1, pid);
+    fresh.addItem(HOE_ID, 1, pid); // the step-12 hoe gate
     // The precondition the floor exists for, asserted rather than assumed:
     // no injected clock and not a single tick, so the uninjected lockoutNowMs
     // (which counts sim-clock ms from zero) still reads 0.
@@ -757,6 +769,108 @@ describe('plantCrop: the stated gate order, every arm draw-free', () => {
       expect(countDraws(h.sim, () => plant(h, bedId))).toBe(2);
     }
     expect(h.meta.farmPlots.size).toBe(3);
+  });
+});
+
+describe('plantCrop gate 12: the hoe gate (the crop-ladder tool half)', () => {
+  let h: Harness;
+  beforeEach(() => {
+    h = makeHarness();
+  });
+
+  it("refuses a farmer with no hoe: reason 'tool', zero draws, nothing consumed", () => {
+    giveSeeds(h);
+    h.sim.removeItem(HOE_ID, 1, h.pid);
+    expect(h.sim.countItem(HOE_ID, h.pid)).toBe(0);
+    const from = h.sim.events.length;
+    expect(countDraws(h.sim, () => plant(h))).toBe(0);
+    expect(denyReason(h.sim, from)).toBe('tool');
+    expect(h.sim.countItem(SEED_ID, h.pid)).toBe(1);
+    expect(h.meta.farmPlots.size).toBe(0);
+    // Anti-vacuous: the hoe back in bags, the same command plants.
+    h.sim.addItem(HOE_ID, 1, h.pid);
+    plant(h);
+    expect(h.meta.farmPlots.has(BED)).toBe(true);
+  });
+
+  it('gates the WIELD, not ownership: bronze_hoe at 39 refuses a tier-2 crop, at 40 it plants', () => {
+    // marsh_rice is tier 2 (skill threshold 25; the R22 wield requirement for
+    // a tier-2 land tool is 40): at proficiency 39 the skill gate passes, the
+    // wield filter drops the OWNED bronze_hoe from the scan, the harness
+    // garden_hoe (tier 1) cannot cover tier 2, and the plant denies 'tool'.
+    // The SAME inventory at 40 plants: both directions, or the filter pin is
+    // vacuous.
+    h.sim.addItem('marsh_rice_seed', 2, h.pid);
+    h.sim.addItem('bronze_hoe', 1, h.pid);
+    h.meta.gatheringProficiency.farming = 39;
+    const from = h.sim.events.length;
+    expect(countDraws(h.sim, () => plant(h, BED, 'marsh_rice'))).toBe(0);
+    expect(denyReason(h.sim, from)).toBe('tool');
+    expect(h.meta.farmPlots.size).toBe(0);
+    expect(h.sim.countItem('marsh_rice_seed', h.pid)).toBe(2);
+
+    h.meta.gatheringProficiency.farming = 40;
+    expect(countDraws(h.sim, () => plant(h, BED, 'marsh_rice'))).toBe(2);
+    expect(h.meta.farmPlots.get(BED)?.cropId).toBe('marsh_rice');
+    expect(h.sim.countItem('marsh_rice_seed', h.pid)).toBe(1);
+  });
+
+  it('preserves stealth, sitting and mount on the tool refusal (the trio stays below gate 12)', () => {
+    // The no_tonic mirror arm one describe up, re-armed at the gate BELOW it:
+    // gate 12 is the last deny arm before the deliberate-action trio, so a
+    // hoe-less plant must refuse without revealing or unseating the farmer.
+    giveSeeds(h);
+    h.sim.removeItem(HOE_ID, 1, h.pid);
+    const p = h.sim.player;
+    p.sitting = true;
+    p.mountKey = DEFAULT_MOUNT;
+    p.auras.push({
+      id: 'stealth',
+      name: 'Stealth',
+      kind: 'stealth',
+      remaining: 600,
+      duration: 600,
+      value: 0,
+      sourceId: p.id,
+      school: 'physical',
+    });
+    p.stealthed = true;
+    const from = h.sim.events.length;
+    expect(countDraws(h.sim, () => plant(h))).toBe(0);
+    expect(denyReason(h.sim, from)).toBe('tool');
+    expect(h.sim.countItem(SEED_ID, h.pid)).toBe(1);
+    expect(p.sitting).toBe(true);
+    expect(p.mountKey).toBe(DEFAULT_MOUNT);
+    expect(p.stealthed).toBe(true);
+    expect(p.auras.some((a) => a.kind === 'stealth')).toBe(true);
+  });
+
+  it('answers no_tonic before tool when both gates would refuse (order proof)', () => {
+    // The precedence the code ships, pinned: gate 12 (the hoe) sits AFTER
+    // the knob trio, so a hoe-less tonic plant with no tonic in bags is told
+    // about the tonic, never the hoe. Both gates would genuinely refuse here.
+    giveSeeds(h);
+    h.sim.removeItem(HOE_ID, 1, h.pid);
+    expect(h.sim.countItem(FARM_GROWTH_TONIC_ITEM_ID, h.pid)).toBe(0);
+    const from = h.sim.events.length;
+    expect(
+      countDraws(h.sim, () =>
+        plantCrop(h.sim.ctx, h.sim.player, h.meta, BED, CROP_ID, { tonic: true }),
+      ),
+    ).toBe(0);
+    expect(denyReason(h.sim, from)).toBe('no_tonic');
+    // With the tonic supplied, the SAME command falls through to 'tool': the
+    // second half is what keeps the first from passing vacuously.
+    h.sim.addItem(FARM_GROWTH_TONIC_ITEM_ID, 1, h.pid);
+    const from2 = h.sim.events.length;
+    expect(
+      countDraws(h.sim, () =>
+        plantCrop(h.sim.ctx, h.sim.player, h.meta, BED, CROP_ID, { tonic: true }),
+      ),
+    ).toBe(0);
+    expect(denyReason(h.sim, from2)).toBe('tool');
+    // The tonic that passed its gate was NOT spent on the tool refusal.
+    expect(h.sim.countItem(FARM_GROWTH_TONIC_ITEM_ID, h.pid)).toBe(1);
   });
 });
 
@@ -1230,6 +1344,104 @@ describe('the tonic yield arm: seed expansion, never a draw', () => {
     );
     expect(late.sim.countItem(FINE_ID, late.pid)).toBe(onTime.sim.countItem(FINE_ID, onTime.pid));
     expect(onTime.sim.countItem(PRODUCE_ID, onTime.pid)).toBeGreaterThan(0);
+  });
+});
+
+describe('the slotted farming tool effect at harvest (the hoe phase C3 wiring)', () => {
+  // Every arm here holds to the vacuity rule: the armed expectation is FIRST
+  // shown to differ from the unarmed one on the plot's own seed (probed, or
+  // swept in-arm), so an equality below can never pass because both sides
+  // collapsed to the unarmed harvest. And every arm counts ZERO ctx.rng
+  // draws at harvest: the effect halves are seed expansions, never draws.
+  let h: Harness;
+  beforeEach(() => {
+    h = makeHarness();
+    giveSeeds(h, 2);
+  });
+
+  /** Plant, ripen, and force the survival win: these arms are about yield. */
+  function ripen(bedId = BED): PlotState {
+    plant(h, bedId);
+    clearCast(h.sim);
+    h.advance(CROP.durationMs);
+    const plot = h.meta.farmPlots.get(bedId) as PlotState;
+    plot.survivalRoll = 0;
+    return plot;
+  }
+
+  it("auto-mode Gatherer's Cache pays unarmed + bonus and spends exactly one charge, draw-free", () => {
+    const plot = ripen();
+    const slot = slotEffect('gatherers_cache');
+    h.meta.toolEffectSlots = { farming: slot };
+    const unarmed = resolveFarmHarvest(plot.yieldSeed as number, 0);
+    const armed = resolveFarmHarvest(plot.yieldSeed as number, 0, false, {
+      bonusPicks: TOOL_EFFECTS.gatherers_cache.bonus,
+    });
+    // In-arm non-vacuity: the flat quantity bonus moves the count on THIS
+    // seed, so the grant equality below cannot be satisfied by the unarmed
+    // expansion.
+    expect(armed.count).toBeGreaterThan(unarmed.count);
+    expect(armed.picks).toBe(unarmed.picks + TOOL_EFFECTS.gatherers_cache.bonus);
+    const before = slot.durability;
+    expect(countDraws(h.sim, () => harvest(h))).toBe(0);
+    expect(h.sim.countItem(PRODUCE_ID, h.pid)).toBe(armed.count);
+    expect(h.sim.countItem(FINE_ID, h.pid)).toBe(armed.fine);
+    // Exactly one charge: the R42 settle spends only when the bonus changed
+    // the granted outcome, which the non-vacuity guard proved it did.
+    expect(slot.durability).toBe(before - 1);
+  });
+
+  it("auto-mode Artisan's Eye upgrades the fine outcome on a probed winner seed", () => {
+    const plot = ripen();
+    // The probe: sweep for a yieldSeed whose expansion gains a fine pick
+    // under the eye's fine-chance bump (a magic constant would go quietly
+    // vacuous the moment a tuning constant moved; the sweep both finds the
+    // case and proves it is real).
+    const fineBump = TOOL_EFFECTS.artisans_eye.bonus * FARM_FINE_CHANCE_EFFECT_BONUS;
+    let winner = -1;
+    for (let seed = 0; seed < 10_000; seed++) {
+      if (
+        resolveFarmHarvest(seed, 0, false, { fineChanceBonus: fineBump }).fine >
+        resolveFarmHarvest(seed, 0).fine
+      ) {
+        winner = seed;
+        break;
+      }
+    }
+    expect(winner).toBeGreaterThanOrEqual(0);
+    plot.yieldSeed = winner;
+    const slot = slotEffect('artisans_eye');
+    h.meta.toolEffectSlots = { farming: slot };
+    const unarmed = resolveFarmHarvest(winner, 0);
+    const armed = resolveFarmHarvest(winner, 0, false, { fineChanceBonus: fineBump });
+    // In-arm non-vacuity guard (the probed winner, restated where it counts).
+    expect(armed.fine).toBeGreaterThan(unarmed.fine);
+    const before = slot.durability;
+    expect(countDraws(h.sim, () => harvest(h))).toBe(0);
+    expect(h.sim.countItem(PRODUCE_ID, h.pid)).toBe(armed.count);
+    expect(h.sim.countItem(FINE_ID, h.pid)).toBe(armed.fine);
+    expect(slot.durability).toBe(before - 1);
+  });
+
+  it('a prompt-mode slot fires nothing: output byte-equal to unarmed and the charge kept', () => {
+    // harvest_crop carries no confirm channel on the wire, so `confirmed` is
+    // hard false at this call site: a 'prompt' slot skips WHOLE (no bonus,
+    // no spend), the stale-client fail-safe direction.
+    const plot = ripen();
+    const slot = slotEffect('gatherers_cache', { confirmMode: 'prompt' });
+    h.meta.toolEffectSlots = { farming: slot };
+    const unarmed = resolveFarmHarvest(plot.yieldSeed as number, 0);
+    const armed = resolveFarmHarvest(plot.yieldSeed as number, 0, false, {
+      bonusPicks: TOOL_EFFECTS.gatherers_cache.bonus,
+    });
+    // Non-vacuity: the slot WOULD have changed the outcome had it fired, so
+    // the byte-equal assertion below really distinguishes skip from fire.
+    expect(armed.count).not.toBe(unarmed.count);
+    const before = slot.durability;
+    expect(countDraws(h.sim, () => harvest(h))).toBe(0);
+    expect(h.sim.countItem(PRODUCE_ID, h.pid)).toBe(unarmed.count);
+    expect(h.sim.countItem(FINE_ID, h.pid)).toBe(unarmed.fine);
+    expect(slot.durability).toBe(before);
   });
 });
 

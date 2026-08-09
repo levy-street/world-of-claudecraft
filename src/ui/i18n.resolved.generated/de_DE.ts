@@ -2818,12 +2818,14 @@ export const de_DE: EnTranslations = {
       "tierRequired": {
         "mining": "Erfordert eine Bergbau-Spitzhacke der Stufe {tier}",
         "logging": "Erfordert eine Holzfäller-Axt der Stufe {tier}",
-        "herbalism": "Erfordert eine Kräuterkunde-Sichel der Stufe {tier}"
+        "herbalism": "Erfordert eine Kräuterkunde-Sichel der Stufe {tier}",
+        "farming": "Requires a tier {tier} farming hoe"
       },
       "requiresTool": {
         "mining": "Erfordert eine Bergbau-Spitzhacke",
         "logging": "Erfordert eine Holzfäller-Axt",
-        "herbalism": "Erfordert eine Kräuterkunde-Sichel"
+        "herbalism": "Erfordert eine Kräuterkunde-Sichel",
+        "farming": "Requires a farming hoe"
       },
       "toolTierUnmet": {
         "mining": "Du brauchst eine Bergbau-Spitzhacke der Stufe {tier}, um diese Ader abzubauen.",
@@ -2865,12 +2867,14 @@ export const de_DE: EnTranslations = {
           "mining": "Erforderlich, um Erzadern bis Stufe {tier} abzubauen.",
           "logging": "Erforderlich, um Baumgruppen bis Stufe {tier} zu fällen.",
           "herbalism": "Erforderlich, um Kräuterpflanzen bis Stufe {tier} zu sammeln.",
-          "fishing": "Erforderlich, um in Gewässern bis Stufe {tier} zu angeln."
+          "fishing": "Erforderlich, um in Gewässern bis Stufe {tier} zu angeln.",
+          "farming": "Required to plant crops up to tier {tier}."
         },
         "use": {
           "mining": "Benutzen: Baut eine Erzader in der Nähe ab.",
           "logging": "Benutzen: Fällt eine Baumgruppe in der Nähe.",
-          "herbalism": "Benutzen: Sammelt von einer Kräuterpflanze in der Nähe."
+          "herbalism": "Benutzen: Sammelt von einer Kräuterpflanze in der Nähe.",
+          "farming": "Works from your bags when you plant a crop bed."
         },
         "speed": "Sammelt schneller an Knoten unterhalb von Stufe {tier}.",
         "rodRequired": "Zum Angeln erforderlich.",
@@ -2907,7 +2911,8 @@ export const de_DE: EnTranslations = {
         "no_husks": "You do not have enough withered husks.",
         "no_compost": "You have no compost.",
         "no_fee_produce": "You have no produce to pay the watch fee.",
-        "no_tonic": "You have no growth tonic."
+        "no_tonic": "You have no growth tonic.",
+        "tool": "You have no farming hoe fit for that crop."
       },
       "husksConvertedLine": "You trade {husksName} x{husks} for {name}.",
       "husksConvertedLineQty": "You trade {husksName} x{husks} for {name} x{qty}."
@@ -11496,6 +11501,18 @@ export const de_DE: EnTranslations = {
       },
       "fine_evergarden_greens": {
         "name": "Fine Evergarden Greens"
+      },
+      "garden_hoe": {
+        "name": "Garden Hoe"
+      },
+      "bronze_hoe": {
+        "name": "Bronze Hoe"
+      },
+      "skysilver_hoe": {
+        "name": "Skysilver Hoe"
+      },
+      "osmium_hoe": {
+        "name": "Osmium Hoe"
       },
       "conjured_water4": {
         "name": "Herbeigezaubertes Quellwasser"

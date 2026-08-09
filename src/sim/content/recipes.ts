@@ -420,6 +420,92 @@ export const ROD_RECIPES: ProfessionRecipeRecord[] = [
   },
 ];
 
+// The crafted farming hoes, tiers 2 to 4 (the crop-ladder phase's tool half).
+//
+// A SEPARATE LIST FROM TOOL_RECIPES, deliberately, for the same reason
+// ROD_RECIPES above is: TOOL_RECIPES' whole invariant is that every member
+// consumes a FINE gathered GRADE (a MATERIAL_GRADES row) plus the tool one
+// rung down, and farming has no MATERIAL_GRADES rows at all: its fine twins
+// come from the harvest roll (professions/farming.ts resolveFarmHarvest),
+// never from a node grade. Folding these in would weaken that invariant into
+// a disjunction, so the hoe ladder states its own
+// (tests/professions_hoe_recipes.test.ts) and leaves TOOL_RECIPES alone.
+//
+// THE HOE LADDER'S OWN INVARIANT: every member consumes the fine TWIN of a
+// crop ONE TIER BELOW its result plus the hoe one rung down, at the
+// toolworks. The one-tier-below reagent is the closed-circuit resolution the
+// tier-4 pick recorded above: the step-12 hoe gate reads
+// canGatherTier(hoe tier, crop.tier), so a tier-N crop's fine twin cannot be
+// grown without the tier-N hoe already owned; consuming the MATCHING-tier
+// twin would be a circuit with no entry. One tier down, the twin's crop
+// grows under exactly the hoe the recipe already consumes (rung 2 takes
+// fine_vale_wheat, tier 1, grown under the vendor garden_hoe).
+//
+// ACQUISITION COVERAGE, where this ladder diverges from the rods and why:
+// the rod ladder leaves rungs 2 and 3 vendor-priced and crafts only 4 and 5,
+// but the hoe pricing table locks buyValue OFF rungs 2 to 4, so the vendor
+// arm cannot be mirrored; HOE_RECIPES covers rungs 2, 3, AND 4 instead,
+// making craft the only mint above rung 1 and leaving no acquisition gap
+// (each rung is reachable from a state the rung below grants). There is
+// also, deliberately, NO delve Marks fallback row this phase (see the hoe
+// block in content/items.ts; flagged for the maintainer).
+//
+// All three are `acquisition: ['trainer']` per the post-freeze authoring
+// default: Tinker Gizzel at the Eastbrook toolworks teaches them with no
+// content edit (the trainer list derives from the station). skillReq
+// 25/50/75 resolves to trainer tiers 1/2/3, all inside engineering's
+// learnable band, honoring the ROD_RECIPES lesson (a trainer-taught recipe
+// above the cap band is permanently unlearnable). The rung-4 shape
+// (skillReq 75, itemLevelBudget 20, level 20, toolworks) matches every other
+// tier-4 tool recipe in TOOL_RECIPES.
+export const HOE_RECIPES: ProfessionRecipeRecord[] = [
+  {
+    id: 'recipe_bronze_hoe',
+    professionId: 'engineering',
+    resultItemId: 'bronze_hoe',
+    resultCount: 1,
+    reagents: [
+      { itemId: 'fine_vale_wheat', count: 4 },
+      { itemId: 'garden_hoe', count: 1 },
+    ],
+    skillReq: 25,
+    itemLevelBudget: 10,
+    level: 10,
+    stationType: 'toolworks',
+    acquisition: ['trainer'],
+  },
+  {
+    id: 'recipe_skysilver_hoe',
+    professionId: 'engineering',
+    resultItemId: 'skysilver_hoe',
+    resultCount: 1,
+    reagents: [
+      { itemId: 'fine_marsh_rice', count: 4 },
+      { itemId: 'bronze_hoe', count: 1 },
+    ],
+    skillReq: 50,
+    itemLevelBudget: 15,
+    level: 15,
+    stationType: 'toolworks',
+    acquisition: ['trainer'],
+  },
+  {
+    id: 'recipe_osmium_hoe',
+    professionId: 'engineering',
+    resultItemId: 'osmium_hoe',
+    resultCount: 1,
+    reagents: [
+      { itemId: 'fine_highland_barley', count: 4 },
+      { itemId: 'skysilver_hoe', count: 1 },
+    ],
+    skillReq: 75,
+    itemLevelBudget: 20,
+    level: 20,
+    stationType: 'toolworks',
+    acquisition: ['trainer'],
+  },
+];
+
 // Tool-effect charms (the acquisition craft): the game's first enchanting
 // recipes, minting the item form of the two live TOOL_EFFECTS entries
 // (content/items.ts gatherers_cache / artisans_eye; the ids match). The slot
@@ -1541,6 +1627,7 @@ export const ALL_RECIPES: ProfessionRecipeRecord[] = [
   ...COMMON_RECIPES,
   ...TOOL_RECIPES,
   ...ROD_RECIPES,
+  ...HOE_RECIPES,
   ...TOOL_EFFECT_RECIPES,
   ...CASTER_HUB_RECIPES,
   ...COMBO_RECIPES,

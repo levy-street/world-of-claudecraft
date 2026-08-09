@@ -2818,12 +2818,14 @@ export const tr_TR: EnTranslations = {
       "tierRequired": {
         "mining": "{tier}. kademe madenci kazması gerektirir",
         "logging": "{tier}. kademe odun kesme baltası gerektirir",
-        "herbalism": "{tier}. kademe bitkicilik orakı gerektirir"
+        "herbalism": "{tier}. kademe bitkicilik orakı gerektirir",
+        "farming": "Requires a tier {tier} farming hoe"
       },
       "requiresTool": {
         "mining": "Madenci kazması gerektirir",
         "logging": "Oduncu baltası gerektirir",
-        "herbalism": "Otçu orağı gerektirir"
+        "herbalism": "Otçu orağı gerektirir",
+        "farming": "Requires a farming hoe"
       },
       "toolTierUnmet": {
         "mining": "Bu damarı işlemek için {tier}. kademe madenci kazmasına ihtiyacınız var.",
@@ -2865,12 +2867,14 @@ export const tr_TR: EnTranslations = {
           "mining": "Kademe {tier} ve altındaki cevher damarlarını kazmak için gereklidir.",
           "logging": "Kademe {tier} ve altındaki ağaç kümelerini devirmek için gereklidir.",
           "herbalism": "Kademe {tier} ve altındaki ot öbeklerini toplamak için gereklidir.",
-          "fishing": "Kademe {tier} ve altındaki sularda balık tutmak için gereklidir."
+          "fishing": "Kademe {tier} ve altındaki sularda balık tutmak için gereklidir.",
+          "farming": "Required to plant crops up to tier {tier}."
         },
         "use": {
           "mining": "Kullanım: Yakındaki bir cevher damarını kazar.",
           "logging": "Kullanım: Yakındaki bir ağaç kümesini devirir.",
-          "herbalism": "Kullanım: Yakındaki bir ot öbeğini toplar."
+          "herbalism": "Kullanım: Yakındaki bir ot öbeğini toplar.",
+          "farming": "Works from your bags when you plant a crop bed."
         },
         "speed": "Kademe {tier} altındaki düğümlerde daha hızlı toplar.",
         "rodRequired": "Balık tutmak için gereklidir.",
@@ -2907,7 +2911,8 @@ export const tr_TR: EnTranslations = {
         "no_husks": "You do not have enough withered husks.",
         "no_compost": "You have no compost.",
         "no_fee_produce": "You have no produce to pay the watch fee.",
-        "no_tonic": "You have no growth tonic."
+        "no_tonic": "You have no growth tonic.",
+        "tool": "You have no farming hoe fit for that crop."
       },
       "husksConvertedLine": "You trade {husksName} x{husks} for {name}.",
       "husksConvertedLineQty": "You trade {husksName} x{husks} for {name} x{qty}."
@@ -11496,6 +11501,18 @@ export const tr_TR: EnTranslations = {
       },
       "fine_evergarden_greens": {
         "name": "Fine Evergarden Greens"
+      },
+      "garden_hoe": {
+        "name": "Garden Hoe"
+      },
+      "bronze_hoe": {
+        "name": "Bronze Hoe"
+      },
+      "skysilver_hoe": {
+        "name": "Skysilver Hoe"
+      },
+      "osmium_hoe": {
+        "name": "Osmium Hoe"
       },
       "conjured_water4": {
         "name": "Sihirle Yaratılmış Kaynak Suyu"

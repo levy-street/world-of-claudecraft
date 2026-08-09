@@ -2818,12 +2818,14 @@ export const pl_PL: EnTranslations = {
       "tierRequired": {
         "mining": "Wymaga kilofika górniczego {tier} poziomu",
         "logging": "Wymaga siekiery drwala {tier} poziomu",
-        "herbalism": "Wymaga sierpa zielarskiego {tier} poziomu"
+        "herbalism": "Wymaga sierpa zielarskiego {tier} poziomu",
+        "farming": "Requires a tier {tier} farming hoe"
       },
       "requiresTool": {
         "mining": "Wymaga kilofa górniczego",
         "logging": "Wymaga siekiery drwala",
-        "herbalism": "Wymaga sierpa zielarskiego"
+        "herbalism": "Wymaga sierpa zielarskiego",
+        "farming": "Requires a farming hoe"
       },
       "toolTierUnmet": {
         "mining": "Potrzebujesz kilofika górniczego {tier} poziomu, by zebrać tę żyłę.",
@@ -2865,12 +2867,14 @@ export const pl_PL: EnTranslations = {
           "mining": "Wymagany do wydobywania żył rudy do poziomu {tier}.",
           "logging": "Wymagana do ścinania drzewostanów do poziomu {tier}.",
           "herbalism": "Wymagany do zbierania kęp ziół do poziomu {tier}.",
-          "fishing": "Wymagana do łowienia w wodach do poziomu {tier}."
+          "fishing": "Wymagana do łowienia w wodach do poziomu {tier}.",
+          "farming": "Required to plant crops up to tier {tier}."
         },
         "use": {
           "mining": "Użycie: wydobądź rudę z pobliskiej żyły.",
           "logging": "Użycie: zetnij pobliski drzewostan.",
-          "herbalism": "Użycie: zbierz zioła z pobliskiej kępy."
+          "herbalism": "Użycie: zbierz zioła z pobliskiej kępy.",
+          "farming": "Works from your bags when you plant a crop bed."
         },
         "speed": "Szybciej zbiera z węzłów poniżej poziomu {tier}.",
         "rodRequired": "Wymagana do łowienia ryb.",
@@ -2907,7 +2911,8 @@ export const pl_PL: EnTranslations = {
         "no_husks": "You do not have enough withered husks.",
         "no_compost": "You have no compost.",
         "no_fee_produce": "You have no produce to pay the watch fee.",
-        "no_tonic": "You have no growth tonic."
+        "no_tonic": "You have no growth tonic.",
+        "tool": "You have no farming hoe fit for that crop."
       },
       "husksConvertedLine": "You trade {husksName} x{husks} for {name}.",
       "husksConvertedLineQty": "You trade {husksName} x{husks} for {name} x{qty}."
@@ -11496,6 +11501,18 @@ export const pl_PL: EnTranslations = {
       },
       "fine_evergarden_greens": {
         "name": "Fine Evergarden Greens"
+      },
+      "garden_hoe": {
+        "name": "Garden Hoe"
+      },
+      "bronze_hoe": {
+        "name": "Bronze Hoe"
+      },
+      "skysilver_hoe": {
+        "name": "Skysilver Hoe"
+      },
+      "osmium_hoe": {
+        "name": "Osmium Hoe"
       },
       "conjured_water4": {
         "name": "Wyczarowana woda źródlana"

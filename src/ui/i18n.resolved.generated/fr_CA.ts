@@ -2818,12 +2818,14 @@ export const fr_CA: EnTranslations = {
       "tierRequired": {
         "mining": "Requiert un pic de mineur de palier {tier}",
         "logging": "Requiert une hache de bûcheron de palier {tier}",
-        "herbalism": "Requiert une serpe d'herboristerie de palier {tier}"
+        "herbalism": "Requiert une serpe d'herboristerie de palier {tier}",
+        "farming": "Requires a tier {tier} farming hoe"
       },
       "requiresTool": {
         "mining": "Nécessite un pic de mineur",
         "logging": "Nécessite une hache de bûcheron",
-        "herbalism": "Nécessite une serpe d'herboristerie"
+        "herbalism": "Nécessite une serpe d'herboristerie",
+        "farming": "Requires a farming hoe"
       },
       "toolTierUnmet": {
         "mining": "Vous avez besoin d'un pic de mineur de palier {tier} pour exploiter ce filon.",
@@ -2865,12 +2867,14 @@ export const fr_CA: EnTranslations = {
           "mining": "Nécessaire pour exploiter les filons de minerai jusqu'au palier {tier}.",
           "logging": "Nécessaire pour abattre les bosquets de bois jusqu'au palier {tier}.",
           "herbalism": "Nécessaire pour collecter les parcelles de plantes jusqu'au palier {tier}.",
-          "fishing": "Nécessaire pour pêcher les eaux jusqu'au palier {tier}."
+          "fishing": "Nécessaire pour pêcher les eaux jusqu'au palier {tier}.",
+          "farming": "Required to plant crops up to tier {tier}."
         },
         "use": {
           "mining": "Utilisation : exploiter un filon de minerai à proximité.",
           "logging": "Utilisation : abattre un bosquet de bois à proximité.",
-          "herbalism": "Utilisation : collecter une parcelle de plantes à proximité."
+          "herbalism": "Utilisation : collecter une parcelle de plantes à proximité.",
+          "farming": "Works from your bags when you plant a crop bed."
         },
         "speed": "Collecte plus vite sur les nœuds de palier inférieur à {tier}.",
         "rodRequired": "Nécessaire pour pêcher.",
@@ -2907,7 +2911,8 @@ export const fr_CA: EnTranslations = {
         "no_husks": "You do not have enough withered husks.",
         "no_compost": "You have no compost.",
         "no_fee_produce": "You have no produce to pay the watch fee.",
-        "no_tonic": "You have no growth tonic."
+        "no_tonic": "You have no growth tonic.",
+        "tool": "You have no farming hoe fit for that crop."
       },
       "husksConvertedLine": "You trade {husksName} x{husks} for {name}.",
       "husksConvertedLineQty": "You trade {husksName} x{husks} for {name} x{qty}."
@@ -11496,6 +11501,18 @@ export const fr_CA: EnTranslations = {
       },
       "fine_evergarden_greens": {
         "name": "Fine Evergarden Greens"
+      },
+      "garden_hoe": {
+        "name": "Garden Hoe"
+      },
+      "bronze_hoe": {
+        "name": "Bronze Hoe"
+      },
+      "skysilver_hoe": {
+        "name": "Skysilver Hoe"
+      },
+      "osmium_hoe": {
+        "name": "Osmium Hoe"
       },
       "conjured_water4": {
         "name": "Eau de source conjurée"

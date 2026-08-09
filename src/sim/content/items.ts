@@ -1215,6 +1215,62 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     sellValue: 80,
     buyValue: 320,
   },
+  // The farming hoe ladder (the crop-ladder phase's tool half): the fifth
+  // gathering profession's gatherTool items, mirroring the pick/axe/sickle
+  // shape exactly (kind tool, infinite durability, `use.tier` read by the
+  // step-12 hoe gate in professions/farming.ts through the R22 wield-filtered
+  // scan, so `use.tier` gates which CROP tiers may be planted).
+  //
+  // PRICES: garden_hoe joins the 20-copper tier-1 rung (the trivial one-time
+  // purchase, pinned as a literal in tests/professions_tools.test.ts) and is
+  // the ONLY vendor-priced rung: the 120/400 rungs deliberately gain NO
+  // farming member, because rungs 2 to 4 are CRAFT-ONLY (HOE_RECIPES in
+  // content/recipes.ts, engineering at the toolworks), so a non-engineer
+  // farmer buys them from players via market or trade. osmium_hoe is
+  // unpriced-for-buy AND craftable (the R23 shape), absent from every
+  // vendorItems list and from HEROIC_VENDOR_STOCK like the tier-4/5 land
+  // tools above; unlike them there is deliberately NO delve Marks fallback
+  // row this phase. FLAGGED FOR THE MAINTAINER: whether the Marks shop should
+  // gain a hoe row later as the non-crafter route.
+  //
+  // garden_hoe carries NO noVendorSell/noMarketList: those flags exist to
+  // close quest-grant mints and ONLY the three quest-granted tier-1 tools
+  // carry them (the banner above); no quest grants a hoe. If a farming
+  // starter quest ever hands one over through requiredItems, both flags must
+  // be added in that same change.
+  garden_hoe: {
+    id: 'garden_hoe',
+    name: 'Garden Hoe',
+    kind: 'tool',
+    quality: 'common',
+    use: { type: 'gatherTool', professionId: 'farming', tier: 1 },
+    sellValue: 4,
+    buyValue: 20,
+  },
+  bronze_hoe: {
+    id: 'bronze_hoe',
+    name: 'Bronze Hoe',
+    kind: 'tool',
+    quality: 'common',
+    use: { type: 'gatherTool', professionId: 'farming', tier: 2 },
+    sellValue: 10,
+  },
+  skysilver_hoe: {
+    id: 'skysilver_hoe',
+    name: 'Skysilver Hoe',
+    kind: 'tool',
+    quality: 'uncommon',
+    use: { type: 'gatherTool', professionId: 'farming', tier: 3 },
+    sellValue: 25,
+  },
+  osmium_hoe: {
+    id: 'osmium_hoe',
+    name: 'Osmium Hoe',
+    kind: 'tool',
+    quality: 'rare',
+    use: { type: 'gatherTool', professionId: 'farming', tier: 4 },
+    sellValue: 60,
+  },
   // Fine grades of the nine node materials (D8, the fine-material axis). A
   // harvest yields one of these INSTEAD of its base id when the player's tool
   // is strictly above the material's zone tier at a full-grade vein

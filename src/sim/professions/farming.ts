@@ -56,6 +56,7 @@ import {
   farmCropTier,
 } from '../content/farm_crops';
 import { FARM_BED_IDS, farmBedById } from '../content/farm_patches';
+import { ITEMS } from '../data';
 import { forceDismount } from '../mounts';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -63,6 +64,15 @@ import { type Entity, FARMING_CAST_ID, INTERACT_RANGE, isConsuming } from '../ty
 import { type FarmPlantKnobs, farmPlotSurvived, type PlotState } from './farm_projection';
 import { planWatchFee, type WatchFeeLeg } from './farm_watch_fee';
 import { queueGatheringGrant } from './gathering';
+import {
+  applyToolEffectUse,
+  bestOwnedGatherToolFor,
+  canGatherTier,
+  depleteEffect,
+  NO_TOOL_OWNED,
+  ratchetCeilingForUse,
+} from './tools';
+import { bestWieldableGatherToolTierOrNone } from './wield_gate';
 
 // The survival ramp lives with the STATUS it decides (farm_projection.ts, the
 // pure leaf the wire projection is built from), so the projection can read it
@@ -105,6 +115,18 @@ export const FARM_KEEP_CHANCE_SKILL_SCALE = 0.35;
 // yield value without touching yield count.
 export const FARM_FINE_CHANCE_BASE = 0.02;
 export const FARM_FINE_CHANCE_SKILL_SCALE = 0.08;
+// The slotted QUALITY tool effect's farming arm (the hoe phase, C3): a
+// charged Artisan's Eye on the farming slot adds this flat fine-chance bump
+// per bonus point instead of a grade-tier bump, because farming has no node
+// grade path (the fine twin IS its fine grade, minted by the harvest roll).
+// Applied to the threshold already-expanded rolls are compared against, so it
+// is draw-free and position-independent by construction. TUNING, PROVISIONAL,
+// FLAGGED FOR THE MAINTAINER: 0.10 per point doubles the cap-skill fine rate
+// (0.10 to 0.20) and quintuples the skill-0 rate (0.02 to 0.12), sized so the
+// charm reads as the same "better yield off the same picks" promise the node
+// quality effect keeps, and priced by the same charge spend (one charge per
+// harvest the bump actually upgraded, the R42 predicate in harvestCrop).
+export const FARM_FINE_CHANCE_EFFECT_BONUS = 0.1;
 // The growth tonic's yield arm (D7: one knob one job, tonic is yield). A
 // tonic armed at plant time gives the harvest ONE further roll against this
 // chance; a win adds the flat bonus picks below, granted at BASE grade. Both
@@ -249,6 +271,14 @@ export function resolveFarmHarvest(
   yieldSeed: number,
   skill: number,
   tonic = false,
+  // The slotted-tool-effect arm (the hoe phase, C3), both halves DRAW-FREE
+  // and position-independent like the tonic: `bonusPicks` (the quantity kind)
+  // lands OUTSIDE the lives loop at base grade exactly the way the tonic
+  // bonus does, and `fineChanceBonus` (the quality kind) only raises the
+  // threshold the already-expanded fine rolls are compared against, so
+  // neither can move a read's position in either stream. The default (no
+  // effect) leaves every expansion bit-identical to the three-arg call.
+  effect: { bonusPicks?: number; fineChanceBonus?: number } = {},
 ): FarmHarvestYield {
   const next = mulberry32(yieldSeed);
   const keepChance = Math.min(
@@ -256,7 +286,9 @@ export function resolveFarmHarvest(
     FARM_KEEP_CHANCE_BASE + (FARM_KEEP_CHANCE_SKILL_SCALE * skill) / FARM_SKILL_SCALE_DENOM,
   );
   const fineChance =
-    FARM_FINE_CHANCE_BASE + (FARM_FINE_CHANCE_SKILL_SCALE * skill) / FARM_SKILL_SCALE_DENOM;
+    FARM_FINE_CHANCE_BASE +
+    (FARM_FINE_CHANCE_SKILL_SCALE * skill) / FARM_SKILL_SCALE_DENOM +
+    (effect.fineChanceBonus ?? 0);
   let lives = FARM_HARVEST_LIFE_FLOOR;
   let picks = 0;
   let fine = 0;
@@ -287,7 +319,15 @@ export function resolveFarmHarvest(
   // its survival roll is forfeited with the crop: the knob is a bet on the
   // harvest, by design, and the maintainer tuning pass should read it that
   // way (compost and the watch are the knobs that bend the wither odds).
-  return { count: picks - fine + bonus, fine, picks: picks + bonus };
+  // Effect bonus picks (the quantity kind) land the same way: outside the
+  // loop, at base grade, so the pick cap keeps bounding the LOOP and never
+  // the returned yield, exactly as it does for the tonic.
+  const effectPicks = effect.bonusPicks ?? 0;
+  return {
+    count: picks - fine + bonus + effectPicks,
+    fine,
+    picks: picks + bonus + effectPicks,
+  };
 }
 
 /** The four derived visual growth stages (see the banner). Pure, stateless,
@@ -464,20 +504,21 @@ export function plantCrop(
     ctx.emit({ type: 'farmDenied', pid: meta.entityId, reason: 'no_tonic', bedId, cropId });
     return;
   }
-  // 12. THE HOE GATE IS DEFERRED TO THE CROP-LADDER PHASE, and the omission is
-  //    verified rather than assumed. The gate would read
-  //    canGatherTier(<owned farming tool tier>, crop.tier), and the honest
-  //    ownership scans (bestOwnedGatherToolTierOrNone, and the wield-filtered
-  //    sibling in professions/wield_gate.ts that any ACCESS decision must use
-  //    per the R22 banner) both report NO_TOOL_OWNED (0) for farming, because
-  //    no farming gatherTool item ships: canGatherTier(0, 1) is false, so
-  //    wiring the gate today would refuse EVERY plant. The bare-hands-floored
-  //    scan would pass trivially instead, but it is the wrong scan for an
-  //    access gate by that same banner, and baking in the wrong one now is a
-  //    worse handoff than an absent gate. The hoe ladder phase adds the four
-  //    hoe items and this arm together. Until then the ungainability pin in
-  //    tests/professions_gathering.test.ts still holds: farming has no node
-  //    type and no gatherTool.
+  // 12. The hoe gate (the crop-ladder phase's tool half, the #2343 rule's
+  //     farming arm): planting a tier-N crop needs a WIELDABLE farming hoe of
+  //     at least tier N anywhere in bags. The wield-filtered scan
+  //     (professions/wield_gate.ts) is the ONE legal access scan per the R22
+  //     banner in professions/tools.ts: the raw ownership scan would let a
+  //     traded hoe skip its proficiency requirement, and the
+  //     bare-hands-floored sibling would pass with no hoe at all. Sits AFTER
+  //     every deny arm above and BEFORE the deliberate-action trio and the
+  //     pre-roll block below: the deny draws ZERO rng, consumes nothing, and
+  //     preserves stealth like every arm above it.
+  const hoeTier = bestWieldableGatherToolTierOrNone(meta.inventory, 'farming', skill, ITEMS);
+  if (hoeTier === NO_TOOL_OWNED || !canGatherTier(hoeTier, crop.tier)) {
+    ctx.emit({ type: 'farmDenied', pid: meta.entityId, reason: 'tool', bedId, cropId });
+    return;
+  }
 
   // Deliberate action: breaks stealth, stands you up, dismounts. AFTER every
   // deny arm above, so a refused plant never reveals or unseats the player.
@@ -688,10 +729,34 @@ export function harvestCrop(ctx: SimContext, p: Entity, meta: PlayerMeta, bedId:
   // a replacement for a lost slot, so this is unreachable for any real plot,
   // and where it is reachable at all a deterministic harvest beats a refusal.
   const yieldSeed = Number.isFinite(plot.yieldSeed) ? (plot.yieldSeed as number) : 0;
+  // The slotted farming tool effect (the hoe phase, C3), applied through
+  // applyToolEffectUse, the ONE confirm-gate owner (R40), exactly as the node
+  // path does (gathering.ts resolveHarvest). harvest_crop carries NO confirm
+  // channel on the wire, so `confirmed` is hard false here: an 'always' slot
+  // ignores it and fires, while a 'prompt' slot skips WHOLE (no bonus, no
+  // charge), the stale-client fail-safe direction. The kinds map
+  // farming-natively, both halves draw-free and position-independent (the
+  // tonic lesson: nothing anchors to a skill-varying loop position):
+  //   quantity (Gatherer's Cache): flat bonus picks at base grade, added
+  //     outside the lives loop exactly the way FARM_TONIC_BONUS_PICKS is;
+  //   quality (Artisan's Eye): a flat fine-chance bump
+  //     (FARM_FINE_CHANCE_EFFECT_BONUS per bonus point), which only raises
+  //     the threshold already-expanded rolls are compared against.
+  // The unarmed expansion is kept beside the armed one as the same-seed
+  // counterfactual the R42 charge settle below compares against.
+  const slot = meta.toolEffectSlots?.farming;
+  const effectUse = applyToolEffectUse(slot, { quantity: 0, gradeToolTier: 0 }, false);
   // The tonic flag stored at plant time arms the bonus arm of the expansion
   // (one further read of the same stream, never a ctx.rng draw; see the
   // resolveFarmHarvest banner).
-  const { count, fine } = resolveFarmHarvest(yieldSeed, skill, plot.tonic === true);
+  const base = resolveFarmHarvest(yieldSeed, skill, plot.tonic === true);
+  const armed = effectUse.applied
+    ? resolveFarmHarvest(yieldSeed, skill, plot.tonic === true, {
+        bonusPicks: effectUse.outcome.quantity,
+        fineChanceBonus: effectUse.outcome.gradeToolTier * FARM_FINE_CHANCE_EFFECT_BONUS,
+      })
+    : base;
+  const { count, fine } = armed;
   // Deliberately NOT capacity-gated. A crop the player already grew must not
   // be destroyed by full bags (nothing rots, and a refusal here would BE a
   // rot), so the grant force-adds over capacity exactly like the quest-catch
@@ -707,6 +772,20 @@ export function harvestCrop(ctx: SimContext, p: Entity, meta: PlayerMeta, bedId:
     ctx.addItem(crop.produceItemId, count, meta.entityId, { silent: true, callerLogs: true });
   if (fine > 0)
     ctx.addItem(crop.fineProduceItemId, fine, meta.entityId, { silent: true, callerLogs: true });
+  // The R42 charge settle plus the R47 use-time ratchet, the
+  // completeGatherCast pattern: the ratchet latches on every APPLIED use
+  // (taking the bonus alongside a better owned hoe is what re-prices the
+  // slot), and the charge is spent only when the bonus actually changed what
+  // the player received. Farming force-adds over capacity (nothing rots), so
+  // the granted outcome IS the armed expansion and the same-seed
+  // counterfactual compare is exact. Every arm here is pure field work: zero
+  // ctx.rng draws, so the harvest's draw contract holds. No cast-start
+  // capture arm: harvesting is instant (no cast window a trade could
+  // exploit), so the one completion-time read covers both R47 ends.
+  if (effectUse.applied && slot) {
+    ratchetCeilingForUse(slot, bestOwnedGatherToolFor(meta.inventory, 'farming', ITEMS).rarity);
+    if (armed.count !== base.count || armed.fine !== base.fine) depleteEffect(slot);
+  }
   // THE ALL-FINE COLLAPSE. The base fields describe the harvest's PRIMARY
   // grant, and when every pick upgrades there is no base-grade grant at all,
   // so the primary grant IS the fine item. Emitting the natural

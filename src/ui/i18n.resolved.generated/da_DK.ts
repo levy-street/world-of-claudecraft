@@ -2818,12 +2818,14 @@ export const da_DK: EnTranslations = {
       "tierRequired": {
         "mining": "Kræver en niveau {tier} mineøkse",
         "logging": "Kræver en niveau {tier} skovhuggeøkse",
-        "herbalism": "Kræver en niveau {tier} urtesegl"
+        "herbalism": "Kræver en niveau {tier} urtesegl",
+        "farming": "Requires a tier {tier} farming hoe"
       },
       "requiresTool": {
         "mining": "Kræver en minehakke",
         "logging": "Kræver en skovhuggeøkse",
-        "herbalism": "Kræver en urtesegl"
+        "herbalism": "Kræver en urtesegl",
+        "farming": "Requires a farming hoe"
       },
       "toolTierUnmet": {
         "mining": "Du har brug for en niveau {tier} mineøkse for at høste denne åre.",
@@ -2865,12 +2867,14 @@ export const da_DK: EnTranslations = {
           "mining": "Kræves for at høste malmårer op til niveau {tier}.",
           "logging": "Kræves for at fælde tømmerlunde op til niveau {tier}.",
           "herbalism": "Kræves for at samle urtepletter op til niveau {tier}.",
-          "fishing": "Kræves for at fiske i vande op til niveau {tier}."
+          "fishing": "Kræves for at fiske i vande op til niveau {tier}.",
+          "farming": "Required to plant crops up to tier {tier}."
         },
         "use": {
           "mining": "Brug: Høst en nærliggende malmåre.",
           "logging": "Brug: Fæld en nærliggende tømmerlund.",
-          "herbalism": "Brug: Saml fra en nærliggende urteplette."
+          "herbalism": "Brug: Saml fra en nærliggende urteplette.",
+          "farming": "Works from your bags when you plant a crop bed."
         },
         "speed": "Indsamler hurtigere ved ressourcekilder under niveau {tier}.",
         "rodRequired": "Kræves for at fiske.",
@@ -2907,7 +2911,8 @@ export const da_DK: EnTranslations = {
         "no_husks": "You do not have enough withered husks.",
         "no_compost": "You have no compost.",
         "no_fee_produce": "You have no produce to pay the watch fee.",
-        "no_tonic": "You have no growth tonic."
+        "no_tonic": "You have no growth tonic.",
+        "tool": "You have no farming hoe fit for that crop."
       },
       "husksConvertedLine": "You trade {husksName} x{husks} for {name}.",
       "husksConvertedLineQty": "You trade {husksName} x{husks} for {name} x{qty}."
@@ -11496,6 +11501,18 @@ export const da_DK: EnTranslations = {
       },
       "fine_evergarden_greens": {
         "name": "Fine Evergarden Greens"
+      },
+      "garden_hoe": {
+        "name": "Garden Hoe"
+      },
+      "bronze_hoe": {
+        "name": "Bronze Hoe"
+      },
+      "skysilver_hoe": {
+        "name": "Skysilver Hoe"
+      },
+      "osmium_hoe": {
+        "name": "Osmium Hoe"
       },
       "conjured_water4": {
         "name": "Fremmanet kildevand"

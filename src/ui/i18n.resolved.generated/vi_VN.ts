@@ -2818,12 +2818,14 @@ export const vi_VN: EnTranslations = {
       "tierRequired": {
         "mining": "Yêu cầu cuốc khai khoáng bậc {tier}",
         "logging": "Yêu cầu rìu đốn gỗ bậc {tier}",
-        "herbalism": "Yêu cầu liềm hái thảo dược bậc {tier}"
+        "herbalism": "Yêu cầu liềm hái thảo dược bậc {tier}",
+        "farming": "Requires a tier {tier} farming hoe"
       },
       "requiresTool": {
         "mining": "Cần cuốc khai khoáng",
         "logging": "Cần rìu đốn gỗ",
-        "herbalism": "Cần liềm thảo dược"
+        "herbalism": "Cần liềm thảo dược",
+        "farming": "Requires a farming hoe"
       },
       "toolTierUnmet": {
         "mining": "Bạn cần cuốc khai khoáng bậc {tier} để khai thác mạch này.",
@@ -2865,12 +2867,14 @@ export const vi_VN: EnTranslations = {
           "mining": "Cần thiết để khai thác các mạch quặng đến bậc {tier}.",
           "logging": "Cần thiết để đốn hạ các cụm cây gỗ đến bậc {tier}.",
           "herbalism": "Cần thiết để thu hái các khóm thảo dược đến bậc {tier}.",
-          "fishing": "Cần thiết để câu ở các vùng nước đến bậc {tier}."
+          "fishing": "Cần thiết để câu ở các vùng nước đến bậc {tier}.",
+          "farming": "Required to plant crops up to tier {tier}."
         },
         "use": {
           "mining": "Sử dụng: Khai thác mạch quặng gần đó.",
           "logging": "Sử dụng: Đốn hạ cụm cây gỗ gần đó.",
-          "herbalism": "Sử dụng: Thu hái từ khóm thảo dược gần đó."
+          "herbalism": "Sử dụng: Thu hái từ khóm thảo dược gần đó.",
+          "farming": "Works from your bags when you plant a crop bed."
         },
         "speed": "Thu hoạch nhanh hơn tại các điểm tài nguyên dưới bậc {tier}.",
         "rodRequired": "Cần thiết để câu cá.",
@@ -2907,7 +2911,8 @@ export const vi_VN: EnTranslations = {
         "no_husks": "You do not have enough withered husks.",
         "no_compost": "You have no compost.",
         "no_fee_produce": "You have no produce to pay the watch fee.",
-        "no_tonic": "You have no growth tonic."
+        "no_tonic": "You have no growth tonic.",
+        "tool": "You have no farming hoe fit for that crop."
       },
       "husksConvertedLine": "You trade {husksName} x{husks} for {name}.",
       "husksConvertedLineQty": "You trade {husksName} x{husks} for {name} x{qty}."
@@ -11496,6 +11501,18 @@ export const vi_VN: EnTranslations = {
       },
       "fine_evergarden_greens": {
         "name": "Fine Evergarden Greens"
+      },
+      "garden_hoe": {
+        "name": "Garden Hoe"
+      },
+      "bronze_hoe": {
+        "name": "Bronze Hoe"
+      },
+      "skysilver_hoe": {
+        "name": "Skysilver Hoe"
+      },
+      "osmium_hoe": {
+        "name": "Osmium Hoe"
       },
       "conjured_water4": {
         "name": "Nước Suối Được Tạo Phép"

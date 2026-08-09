@@ -5558,6 +5558,96 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "minimalAt": 175,
           "zeroAt": 200
         }
+      },
+      {
+        "id": "recipe_bronze_hoe",
+        "name": "Bronze Hoe",
+        "skillReq": 25,
+        "tier": 1,
+        "station": "toolworks",
+        "acquisition": "trainer",
+        "feeCopper": 2500,
+        "materials": [
+          {
+            "name": "Fine Vale Wheat",
+            "count": 4
+          },
+          {
+            "name": "Garden Hoe",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Bronze Hoe",
+          "count": 1,
+          "quality": "common"
+        },
+        "combo": null,
+        "gain": {
+          "reducedAt": 50,
+          "minimalAt": 75,
+          "zeroAt": 100
+        }
+      },
+      {
+        "id": "recipe_skysilver_hoe",
+        "name": "Skysilver Hoe",
+        "skillReq": 50,
+        "tier": 2,
+        "station": "toolworks",
+        "acquisition": "trainer",
+        "feeCopper": 10000,
+        "materials": [
+          {
+            "name": "Fine Marsh Rice",
+            "count": 4
+          },
+          {
+            "name": "Bronze Hoe",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Skysilver Hoe",
+          "count": 1,
+          "quality": "uncommon"
+        },
+        "combo": null,
+        "gain": {
+          "reducedAt": 75,
+          "minimalAt": 100,
+          "zeroAt": 125
+        }
+      },
+      {
+        "id": "recipe_osmium_hoe",
+        "name": "Osmium Hoe",
+        "skillReq": 75,
+        "tier": 3,
+        "station": "toolworks",
+        "acquisition": "trainer",
+        "feeCopper": 40000,
+        "materials": [
+          {
+            "name": "Fine Highland Barley",
+            "count": 4
+          },
+          {
+            "name": "Skysilver Hoe",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Osmium Hoe",
+          "count": 1,
+          "quality": "rare"
+        },
+        "combo": null,
+        "gain": {
+          "reducedAt": 100,
+          "minimalAt": 125,
+          "zeroAt": 150
+        }
       }
     ]
   },
@@ -9229,7 +9319,42 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
       100,
       200
     ],
-    "tools": [],
+    "tools": [
+      {
+        "name": "Garden Hoe",
+        "tier": 1,
+        "quality": "common",
+        "priceCopper": 20,
+        "vendors": []
+      },
+      {
+        "name": "Bronze Hoe",
+        "tier": 2,
+        "quality": "common",
+        "priceCopper": null,
+        "vendors": [],
+        "craftedBy": "engineering",
+        "wieldProficiency": 40
+      },
+      {
+        "name": "Skysilver Hoe",
+        "tier": 3,
+        "quality": "uncommon",
+        "priceCopper": null,
+        "vendors": [],
+        "craftedBy": "engineering",
+        "wieldProficiency": 70
+      },
+      {
+        "name": "Osmium Hoe",
+        "tier": 4,
+        "quality": "rare",
+        "priceCopper": null,
+        "vendors": [],
+        "craftedBy": "engineering",
+        "wieldProficiency": 85
+      }
+    ],
     "nodes": []
   }
 ];

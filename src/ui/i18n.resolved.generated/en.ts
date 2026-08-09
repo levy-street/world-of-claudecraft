@@ -2818,12 +2818,14 @@ export const en: EnTranslations = {
       "tierRequired": {
         "mining": "Requires a tier {tier} mining pick",
         "logging": "Requires a tier {tier} logging axe",
-        "herbalism": "Requires a tier {tier} herbalism sickle"
+        "herbalism": "Requires a tier {tier} herbalism sickle",
+        "farming": "Requires a tier {tier} farming hoe"
       },
       "requiresTool": {
         "mining": "Requires a mining pick",
         "logging": "Requires a logging axe",
-        "herbalism": "Requires a herbalism sickle"
+        "herbalism": "Requires a herbalism sickle",
+        "farming": "Requires a farming hoe"
       },
       "toolTierUnmet": {
         "mining": "You need a tier {tier} mining pick to harvest this vein.",
@@ -2865,12 +2867,14 @@ export const en: EnTranslations = {
           "mining": "Required to mine ore veins up to tier {tier}.",
           "logging": "Required to fell timber stands up to tier {tier}.",
           "herbalism": "Required to gather herb patches up to tier {tier}.",
-          "fishing": "Required to fish waters up to tier {tier}."
+          "fishing": "Required to fish waters up to tier {tier}.",
+          "farming": "Required to plant crops up to tier {tier}."
         },
         "use": {
           "mining": "Use: Mine a nearby ore vein.",
           "logging": "Use: Fell a nearby timber stand.",
-          "herbalism": "Use: Gather from a nearby herb patch."
+          "herbalism": "Use: Gather from a nearby herb patch.",
+          "farming": "Works from your bags when you plant a crop bed."
         },
         "speed": "Gathers faster at nodes below tier {tier}.",
         "rodRequired": "Required to fish.",
@@ -2907,7 +2911,8 @@ export const en: EnTranslations = {
         "no_husks": "You do not have enough withered husks.",
         "no_compost": "You have no compost.",
         "no_fee_produce": "You have no produce to pay the watch fee.",
-        "no_tonic": "You have no growth tonic."
+        "no_tonic": "You have no growth tonic.",
+        "tool": "You have no farming hoe fit for that crop."
       },
       "husksConvertedLine": "You trade {husksName} x{husks} for {name}.",
       "husksConvertedLineQty": "You trade {husksName} x{husks} for {name} x{qty}."
@@ -3023,7 +3028,7 @@ export const en: EnTranslations = {
           "artisansEye": "Raises the harvest grade by 1 tool tier while charged.",
           "quickeningCharm": "Shortens the node respawn timer it triggers."
         },
-        "howToSlot": "Slot onto a mining, logging, or herbalism tool from the Professions window. Consumed when slotted.",
+        "howToSlot": "Slot onto a mining, logging, herbalism, or farming tool from the Professions window. Consumed when slotted.",
         "charges": "Starts with {base} charges on a common tool (+{bonus} per rarity rung).",
         "landOnly": "Does not slot on fishing rods.",
         "openProfessions": "Open Professions to slot this onto a gathering tool."
@@ -11496,6 +11501,18 @@ export const en: EnTranslations = {
       },
       "fine_evergarden_greens": {
         "name": "Fine Evergarden Greens"
+      },
+      "garden_hoe": {
+        "name": "Garden Hoe"
+      },
+      "bronze_hoe": {
+        "name": "Bronze Hoe"
+      },
+      "skysilver_hoe": {
+        "name": "Skysilver Hoe"
+      },
+      "osmium_hoe": {
+        "name": "Osmium Hoe"
       },
       "conjured_water4": {
         "name": "Conjured Springwater"

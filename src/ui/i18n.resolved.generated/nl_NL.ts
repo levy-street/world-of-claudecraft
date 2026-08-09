@@ -2818,12 +2818,14 @@ export const nl_NL: EnTranslations = {
       "tierRequired": {
         "mining": "Vereist een rang {tier} mijnhouweel",
         "logging": "Vereist een rang {tier} kapbijl",
-        "herbalism": "Vereist een rang {tier} kruidenkunde-sikkel"
+        "herbalism": "Vereist een rang {tier} kruidenkunde-sikkel",
+        "farming": "Requires a tier {tier} farming hoe"
       },
       "requiresTool": {
         "mining": "Vereist een mijnhouweel",
         "logging": "Vereist een kapbijl",
-        "herbalism": "Vereist een kruidenkunde-sikkel"
+        "herbalism": "Vereist een kruidenkunde-sikkel",
+        "farming": "Requires a farming hoe"
       },
       "toolTierUnmet": {
         "mining": "Je hebt een rang {tier} mijnhouweel nodig om deze ader te oogsten.",
@@ -2865,12 +2867,14 @@ export const nl_NL: EnTranslations = {
           "mining": "Vereist om ertsaders tot en met rang {tier} te ontginnen.",
           "logging": "Vereist om houtopstanden tot en met rang {tier} te vellen.",
           "herbalism": "Vereist om kruidenvelden tot en met rang {tier} te oogsten.",
-          "fishing": "Vereist om wateren tot en met rang {tier} te bevissen."
+          "fishing": "Vereist om wateren tot en met rang {tier} te bevissen.",
+          "farming": "Required to plant crops up to tier {tier}."
         },
         "use": {
           "mining": "Gebruik: ontgin een nabijgelegen ertsader.",
           "logging": "Gebruik: vel een nabijgelegen houtopstand.",
-          "herbalism": "Gebruik: oogst van een nabijgelegen kruidenveld."
+          "herbalism": "Gebruik: oogst van een nabijgelegen kruidenveld.",
+          "farming": "Works from your bags when you plant a crop bed."
         },
         "speed": "Verzamelt sneller bij grondstoffenpunten onder rang {tier}.",
         "rodRequired": "Vereist om te vissen.",
@@ -2907,7 +2911,8 @@ export const nl_NL: EnTranslations = {
         "no_husks": "You do not have enough withered husks.",
         "no_compost": "You have no compost.",
         "no_fee_produce": "You have no produce to pay the watch fee.",
-        "no_tonic": "You have no growth tonic."
+        "no_tonic": "You have no growth tonic.",
+        "tool": "You have no farming hoe fit for that crop."
       },
       "husksConvertedLine": "You trade {husksName} x{husks} for {name}.",
       "husksConvertedLineQty": "You trade {husksName} x{husks} for {name} x{qty}."
@@ -11496,6 +11501,18 @@ export const nl_NL: EnTranslations = {
       },
       "fine_evergarden_greens": {
         "name": "Fine Evergarden Greens"
+      },
+      "garden_hoe": {
+        "name": "Garden Hoe"
+      },
+      "bronze_hoe": {
+        "name": "Bronze Hoe"
+      },
+      "skysilver_hoe": {
+        "name": "Skysilver Hoe"
+      },
+      "osmium_hoe": {
+        "name": "Osmium Hoe"
       },
       "conjured_water4": {
         "name": "Getoverd bronwater"

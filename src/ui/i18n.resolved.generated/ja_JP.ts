@@ -2818,12 +2818,14 @@ export const ja_JP: EnTranslations = {
       "tierRequired": {
         "mining": "ティア{tier}の採掘ピッケルが必要",
         "logging": "ティア{tier}の伐採斧が必要",
-        "herbalism": "ティア{tier}の薬草鎌が必要"
+        "herbalism": "ティア{tier}の薬草鎌が必要",
+        "farming": "ティア{tier}の農耕鍬が必要"
       },
       "requiresTool": {
         "mining": "採掘ピッケルが必要",
         "logging": "伐採斧が必要",
-        "herbalism": "薬草鎌が必要"
+        "herbalism": "薬草鎌が必要",
+        "farming": "農耕鍬が必要"
       },
       "toolTierUnmet": {
         "mining": "この鉱脈を採掘するにはティア{tier}の採掘ピッケルが必要です。",
@@ -2865,12 +2867,14 @@ export const ja_JP: EnTranslations = {
           "mining": "ティア{tier}までの鉱脈の採掘に必要です。",
           "logging": "ティア{tier}までの立木の伐採に必要です。",
           "herbalism": "ティア{tier}までの薬草の群生地の採取に必要です。",
-          "fishing": "ティア{tier}までの水域での釣りに必要です。"
+          "fishing": "ティア{tier}までの水域での釣りに必要です。",
+          "farming": "ティア{tier}までの作物の植え付けに必要です。"
         },
         "use": {
           "mining": "使用：近くの鉱脈を採掘する。",
           "logging": "使用：近くの立木を伐り倒す。",
-          "herbalism": "使用：近くの薬草の群生地から採取する。"
+          "herbalism": "使用：近くの薬草の群生地から採取する。",
+          "farming": "バッグに入れておけば、作物畑に植え付ける際に使われます。"
         },
         "speed": "ティア{tier}未満のノードでの採集が速くなります。",
         "rodRequired": "釣りに必要です。",
@@ -2907,7 +2911,8 @@ export const ja_JP: EnTranslations = {
         "no_husks": "枯れた殻が足りません。",
         "no_compost": "堆肥がありません。",
         "no_fee_produce": "見張り料を払う作物がありません。",
-        "no_tonic": "成長トニックがありません。"
+        "no_tonic": "成長トニックがありません。",
+        "tool": "その作物に合う農耕鍬を持っていません。"
       },
       "husksConvertedLine": "{husksName} x{husks}を{name}と交換した。",
       "husksConvertedLineQty": "{husksName} x{husks}を{name} x{qty}と交換した。"
@@ -3023,7 +3028,7 @@ export const ja_JP: EnTranslations = {
           "artisansEye": "充填中は収穫の品質がツール1段階ぶん上がる。",
           "quickeningCharm": "発動した資源ノードの再生タイマーを短縮する。"
         },
-        "howToSlot": "専門技能ウィンドウから採掘・伐採・薬草学のツールに装着する。装着すると消費される。",
+        "howToSlot": "専門技能ウィンドウから採掘・伐採・薬草学・農耕のツールに装着する。装着すると消費される。",
         "charges": "コモン品質のツールでは{base}回の充填から始まる（レア度が1段階上がるごとに+{bonus}回）。",
         "landOnly": "釣り竿には装着できない。",
         "openProfessions": "専門技能ウィンドウを開き、採集ツールに装着しよう。"
@@ -11496,6 +11501,18 @@ export const ja_JP: EnTranslations = {
       },
       "fine_evergarden_greens": {
         "name": "上質なエバーガーデン青菜"
+      },
+      "garden_hoe": {
+        "name": "菜園の鍬"
+      },
+      "bronze_hoe": {
+        "name": "青銅の鍬"
+      },
+      "skysilver_hoe": {
+        "name": "スカイシルバーの鍬"
+      },
+      "osmium_hoe": {
+        "name": "オスミウムの鍬"
       },
       "conjured_water4": {
         "name": "魔法の湧き水"

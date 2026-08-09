@@ -382,8 +382,8 @@ export type ResolvedSlotToolEffect =
  *   - a profession id that is not a gathering profession
  *   - an effect id absent from the live catalog
  *   - a pair the slot POLICY refuses (`slotToolEffectRefused` below: the
- *     Springback Charm everywhere, every effect on fishing, and every effect
- *     on farming until its hoe phase lifts the shipless refusal)
+ *     Springback Charm everywhere, and every effect on fishing; farming's
+ *     shipless refusal was lifted by its hoe phase)
  *   - any confirm mode outside the union. A malformed value is refused
  *     OUTRIGHT rather than falling back; 'prompt' is accepted since the R40
  *     confirm flow shipped: the harvest command carries the per-use consent
@@ -547,12 +547,12 @@ function charmIndexToConsume(
  */
 export function slotToolEffectRefused(professionId: string, effectId: string): boolean {
   if (professionId === 'fishing') return true;
-  // Farming is registered but ships no tool item until its hoe phase, so a
-  // farming pair is refusable only by the sim action otherwise, which is
-  // exactly the junk-audit-row class this static predicate exists to stop
-  // ahead of the admin restore write. The hoe phase lifts this arm when the
-  // first farming gatherTool lands.
-  if (professionId === 'farming') return true;
+  // Farming's shipless refusal arm was lifted by the hoe phase: the four hoe
+  // gatherTool items exist and both live effects have real farming behavior
+  // (professions/farming.ts harvestCrop maps quantity to bonus picks and
+  // quality to a fine-chance bump), so a farming slot fires and spends like
+  // a land one. Springback stays refused on farming by the kind arm below,
+  // like everywhere else.
   return (
     Object.hasOwn(TOOL_EFFECTS, effectId) &&
     TOOL_EFFECTS[effectId as ToolEffectId].kind === 'respawnSpeed'

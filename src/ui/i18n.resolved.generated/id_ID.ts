@@ -2818,12 +2818,14 @@ export const id_ID: EnTranslations = {
       "tierRequired": {
         "mining": "Membutuhkan beliung pertambangan tingkat {tier}",
         "logging": "Membutuhkan kapak penebangan tingkat {tier}",
-        "herbalism": "Membutuhkan arit herbalisme tingkat {tier}"
+        "herbalism": "Membutuhkan arit herbalisme tingkat {tier}",
+        "farming": "Requires a tier {tier} farming hoe"
       },
       "requiresTool": {
         "mining": "Membutuhkan beliung penambangan",
         "logging": "Membutuhkan kapak penebangan",
-        "herbalism": "Membutuhkan sabit herbalisme"
+        "herbalism": "Membutuhkan sabit herbalisme",
+        "farming": "Requires a farming hoe"
       },
       "toolTierUnmet": {
         "mining": "Kamu membutuhkan beliung pertambangan tingkat {tier} untuk memanen urat ini.",
@@ -2865,12 +2867,14 @@ export const id_ID: EnTranslations = {
           "mining": "Diperlukan untuk menambang urat bijih hingga tingkat {tier}.",
           "logging": "Diperlukan untuk menebang tegakan pohon hingga tingkat {tier}.",
           "herbalism": "Diperlukan untuk mengumpulkan petak herba hingga tingkat {tier}.",
-          "fishing": "Diperlukan untuk memancing di perairan hingga tingkat {tier}."
+          "fishing": "Diperlukan untuk memancing di perairan hingga tingkat {tier}.",
+          "farming": "Required to plant crops up to tier {tier}."
         },
         "use": {
           "mining": "Gunakan: Menambang urat bijih terdekat.",
           "logging": "Gunakan: Menebang tegakan pohon terdekat.",
-          "herbalism": "Gunakan: Mengumpulkan dari petak herba terdekat."
+          "herbalism": "Gunakan: Mengumpulkan dari petak herba terdekat.",
+          "farming": "Works from your bags when you plant a crop bed."
         },
         "speed": "Mengumpulkan lebih cepat di simpul di bawah tingkat {tier}.",
         "rodRequired": "Diperlukan untuk memancing.",
@@ -2907,7 +2911,8 @@ export const id_ID: EnTranslations = {
         "no_husks": "You do not have enough withered husks.",
         "no_compost": "You have no compost.",
         "no_fee_produce": "You have no produce to pay the watch fee.",
-        "no_tonic": "You have no growth tonic."
+        "no_tonic": "You have no growth tonic.",
+        "tool": "You have no farming hoe fit for that crop."
       },
       "husksConvertedLine": "You trade {husksName} x{husks} for {name}.",
       "husksConvertedLineQty": "You trade {husksName} x{husks} for {name} x{qty}."
@@ -11496,6 +11501,18 @@ export const id_ID: EnTranslations = {
       },
       "fine_evergarden_greens": {
         "name": "Fine Evergarden Greens"
+      },
+      "garden_hoe": {
+        "name": "Garden Hoe"
+      },
+      "bronze_hoe": {
+        "name": "Bronze Hoe"
+      },
+      "skysilver_hoe": {
+        "name": "Skysilver Hoe"
+      },
+      "osmium_hoe": {
+        "name": "Osmium Hoe"
       },
       "conjured_water4": {
         "name": "Air Mata Air Sihir"

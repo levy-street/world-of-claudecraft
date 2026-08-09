@@ -113,10 +113,16 @@ describe('restoreToolEffectSlotAction (GM restore, R35)', () => {
     expect(restoreToolEffectSlotAction(sim.ctx, 'fishing', 'gatherers_cache', sim.playerId)).toBe(
       'invalid_request',
     );
-    // farming: registered but shipless (no tool item until the hoe phase), so
-    // only the static pair policy can refuse it here, ahead of the audit
-    // write; without it every farming pair is a junk audit row at best.
+    // farming, hoe-less: the hoe phase lifted the static pair refusal (both
+    // live effects have real farming behavior at harvest), so a live-effect
+    // farming pair now walks the shared gates like any land profession and
+    // the OWNERSHIP scan is what refuses this bare-handed character.
     expect(restoreToolEffectSlotAction(sim.ctx, 'farming', 'gatherers_cache', sim.playerId)).toBe(
+      'no_tool',
+    );
+    // The still-refused farming pair: Springback (quickening_charm) stays
+    // policy-refused on EVERY profession via the kind arm, farming included.
+    expect(restoreToolEffectSlotAction(sim.ctx, 'farming', 'quickening_charm', sim.playerId)).toBe(
       'invalid_request',
     );
     expect(metaOf(sim).toolEffectSlots).toBeUndefined();

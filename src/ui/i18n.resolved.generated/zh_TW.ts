@@ -2818,12 +2818,14 @@ export const zh_TW: EnTranslations = {
       "tierRequired": {
         "mining": "需要{tier}階採礦鎬",
         "logging": "需要{tier}階伐木斧",
-        "herbalism": "需要{tier}階草藥鐮"
+        "herbalism": "需要{tier}階草藥鐮",
+        "farming": "需要{tier}階耕作鋤"
       },
       "requiresTool": {
         "mining": "需要採礦鎬",
         "logging": "需要伐木斧",
-        "herbalism": "需要草藥鐮"
+        "herbalism": "需要草藥鐮",
+        "farming": "需要耕作鋤"
       },
       "toolTierUnmet": {
         "mining": "你需要{tier}階採礦鎬才能開採這條礦脈。",
@@ -2865,12 +2867,14 @@ export const zh_TW: EnTranslations = {
           "mining": "開採最高{tier}階的礦脈所需。",
           "logging": "砍伐最高{tier}階的林木所需。",
           "herbalism": "採集最高{tier}階的草藥叢所需。",
-          "fishing": "在最高{tier}階的水域垂釣所需。"
+          "fishing": "在最高{tier}階的水域垂釣所需。",
+          "farming": "種植最高{tier}階的作物所需。"
         },
         "use": {
           "mining": "使用：開採附近的礦脈。",
           "logging": "使用：砍伐附近的林木。",
-          "herbalism": "使用：採集附近的草藥叢。"
+          "herbalism": "使用：採集附近的草藥叢。",
+          "farming": "放在背包裡即可，在田畦種植作物時自動生效。"
         },
         "speed": "在低於{tier}階的節點採集速度更快。",
         "rodRequired": "釣魚所需。",
@@ -2907,7 +2911,8 @@ export const zh_TW: EnTranslations = {
         "no_husks": "你的枯萎穀殼不夠。",
         "no_compost": "你沒有堆肥。",
         "no_fee_produce": "你沒有可以支付看守費的農產品。",
-        "no_tonic": "你沒有生長滋補劑。"
+        "no_tonic": "你沒有生長滋補劑。",
+        "tool": "你沒有適合該作物的耕作鋤。"
       },
       "husksConvertedLine": "你用{husksName} x{husks}換取了{name}。",
       "husksConvertedLineQty": "你用{husksName} x{husks}換取了{name} x{qty}。"
@@ -3023,7 +3028,7 @@ export const zh_TW: EnTranslations = {
           "artisansEye": "充能期間將收穫品級提升1個工具等級。",
           "quickeningCharm": "縮短其觸發的資源節點重生計時。"
         },
-        "howToSlot": "在專業視窗中將其鑲嵌到採礦、伐木或藥草學工具上。鑲嵌後即消耗。",
+        "howToSlot": "在專業視窗中將其鑲嵌到採礦、伐木、藥草學或耕作工具上。鑲嵌後即消耗。",
         "charges": "普通品質工具初始有{base}次充能（稀有度每升一級+{bonus}次）。",
         "landOnly": "無法鑲嵌到釣竿上。",
         "openProfessions": "打開專業視窗，將其鑲嵌到採集工具上。"
@@ -11496,6 +11501,18 @@ export const zh_TW: EnTranslations = {
       },
       "fine_evergarden_greens": {
         "name": "優質常青園青菜"
+      },
+      "garden_hoe": {
+        "name": "菜園鋤"
+      },
+      "bronze_hoe": {
+        "name": "青銅鋤"
+      },
+      "skysilver_hoe": {
+        "name": "天銀鋤"
+      },
+      "osmium_hoe": {
+        "name": "鋨金鋤"
       },
       "conjured_water4": {
         "name": "魔法泉水"

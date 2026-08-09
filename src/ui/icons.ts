@@ -3219,6 +3219,32 @@ const ITEM_RECIPES: Record<string, IconRecipe> = {
   evergarden_greens_seed: r('nature', 'leafGreen', [{ p: 'sack', pal: 'leafGreen' }]),
   evergarden_greens: r('nature', 'leafGreen', [{ p: 'leaf', pal: 'leafGreen' }]),
   fine_evergarden_greens: r('nature', 'leafGreen', [{ p: 'leaf', pal: 'leafGreen' }], ['sparkle']),
+  // The hoe ladder (the crop-ladder phase's tool half), same ART_PENDING
+  // drawn stand-in treatment and the same A4 pairwise-distinctness demand: a
+  // staff haft plus an angled blade up the material palettes, glow on the
+  // rare top rung only (the gorraks_cleaver precedent). NO sparkle on any
+  // rung: sparkle is the fine-grade marker.
+  garden_hoe: r('wood', 'earthBrown', [
+    { p: 'staff', pal: 'earthBrown', rot: 0.7 },
+    { p: 'fang', pal: 'steel', x: 12, y: -14, s: 0.5, rot: 2.4 },
+  ]),
+  bronze_hoe: r('wood', 'leather', [
+    { p: 'staff', pal: 'leather', rot: 0.7 },
+    { p: 'fang', pal: 'gold', x: 12, y: -14, s: 0.55, rot: 2.4 },
+  ]),
+  skysilver_hoe: r('steel', 'silverWhite', [
+    { p: 'staff', pal: 'earthBrown', rot: 0.7 },
+    { p: 'fang', pal: 'silverWhite', x: 12, y: -14, s: 0.6, rot: 2.4 },
+  ]),
+  osmium_hoe: r(
+    'steel',
+    'steel',
+    [
+      { p: 'staff', pal: 'earthBrown', rot: 0.7 },
+      { p: 'fang', pal: 'steel', x: 12, y: -14, s: 0.65, rot: 2.4 },
+    ],
+    ['glow'],
+  ),
   // misc UI icons (not real items)
   coin_gold: r('treasure', 'gold', ['coin'], ['sparkle']),
   slot_empty: r('junk', 'silverWhite', []),
@@ -4618,6 +4644,14 @@ export const ITEM_ART_PENDING = new Set<string>([
   'highland_barley_seed',
   'marsh_rice',
   'marsh_rice_seed',
+  // The hoe ladder (the crop-ladder phase's tool half), the same
+  // dormant-online reasoning (rungs 2 to 4 are craft-only behind farming fine
+  // twins no live faucet mints, and the vendor rung is stocked at go-live)
+  // and the same scheduled art phase.
+  'bronze_hoe',
+  'garden_hoe',
+  'osmium_hoe',
+  'skysilver_hoe',
 ]);
 
 /** Static URL of an item's (or a UI pseudo-item's) image icon, or null if it uses a recipe. */

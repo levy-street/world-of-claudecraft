@@ -2454,6 +2454,10 @@ const ITEM_ENTITY_IDS = [
   'evergarden_greens_seed',
   'evergarden_greens',
   'fine_evergarden_greens',
+  'garden_hoe',
+  'bronze_hoe',
+  'skysilver_hoe',
+  'osmium_hoe',
 ] as const;
 
 type ItemEntityId = (typeof ITEM_ENTITY_IDS)[number];
@@ -2619,6 +2623,15 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   evergarden_greens_seed: 'Evergarden Greens Seed',
   evergarden_greens: 'Evergarden Greens',
   fine_evergarden_greens: 'Fine Evergarden Greens',
+  // The hoe ladder (the crop-ladder phase's tool half), same English-appended
+  // treatment and the same stay-in-step rule against the ItemDef `name`
+  // fields. IP-safe per D17: plain real words at tiers 1 and 2, and the
+  // repo's own shipped Skysilver/Osmium material coinages at tiers 3 and 4
+  // (the mining pick precedent).
+  garden_hoe: 'Garden Hoe',
+  bronze_hoe: 'Bronze Hoe',
+  skysilver_hoe: 'Skysilver Hoe',
+  osmium_hoe: 'Osmium Hoe',
 };
 
 function itemTranslations(names: readonly string[]): ItemEntityTranslations {

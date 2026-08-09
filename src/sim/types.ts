@@ -5730,7 +5730,12 @@ export type SimEvent = { pid?: number } & (
         | 'no_husks'
         | 'no_compost'
         | 'no_fee_produce'
-        | 'no_tonic';
+        | 'no_tonic'
+        // The hoe phase, appended: the step-12 hoe gate refused the plant (no
+        // WIELDABLE farming hoe covering the crop's tier in bags; one reason
+        // for both the no-hoe and the tier-short case, like gatherDenied's
+        // tool arm).
+        | 'tool';
       bedId?: string;
       cropId?: string;
     }

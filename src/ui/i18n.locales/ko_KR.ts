@@ -8694,6 +8694,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.tierRequired.mining': '{tier}티어 채광 곡괭이 필요',
   'hudChrome.gathering.tierRequired.logging': '{tier}티어 벌목 도끼 필요',
   'hudChrome.gathering.tierRequired.herbalism': '{tier}티어 약초 낫 필요',
+  'hudChrome.gathering.tierRequired.farming': '{tier}티어 농사 괭이 필요',
   'hudChrome.gathering.toolTierUnmet.mining':
     '이 광맥을 캐려면 {tier}티어 채광 곡괭이가 필요합니다.',
   'hudChrome.gathering.toolTierUnmet.logging':
@@ -8719,6 +8720,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.requiresTool.mining': '채광 곡괭이 필요',
   'hudChrome.gathering.requiresTool.logging': '벌목 도끼 필요',
   'hudChrome.gathering.requiresTool.herbalism': '약초 낫 필요',
+  'hudChrome.gathering.requiresTool.farming': '농사 괭이 필요',
   'hudChrome.gathering.toolRequired.mining': '이 광맥을 캐려면 채광 곡괭이가 필요합니다.',
   'hudChrome.gathering.toolRequired.logging': '이 나무를 베려면 벌목 도끼가 필요합니다.',
   'hudChrome.gathering.toolRequired.herbalism': '이 군락을 채집하려면 약초 낫이 필요합니다.',
@@ -8740,9 +8742,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '{tier}티어까지의 약초 군락을 채집하는 데 필요합니다.',
   'hudChrome.gathering.toolTooltip.unlocks.fishing':
     '{tier}티어까지의 수역에서 낚시하는 데 필요합니다.',
+  'hudChrome.gathering.toolTooltip.unlocks.farming':
+    '{tier}티어까지의 작물을 심는 데 필요합니다.',
   'hudChrome.gathering.toolTooltip.use.mining': '사용: 근처의 광맥을 캡니다.',
   'hudChrome.gathering.toolTooltip.use.logging': '사용: 근처의 벌목 나무를 벱니다.',
   'hudChrome.gathering.toolTooltip.use.herbalism': '사용: 근처의 약초 군락에서 채집합니다.',
+  'hudChrome.gathering.toolTooltip.use.farming':
+    '가방에 넣어 두면 작물밭에 심을 때 사용됩니다.',
   'hudChrome.gathering.toolTooltip.speed': '{tier}티어 미만 채집지에서 더 빠르게 채집합니다.',
   'hudChrome.gathering.toolTooltip.rodRequired': '낚시에 필요합니다.',
   'hudChrome.gathering.toolTooltip.rodBite': '물고기가 최대 {seconds}초 더 빨리 입질합니다.',
@@ -8776,6 +8782,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.farming.denied.no_compost': '퇴비가 없습니다.',
   'hudChrome.farming.denied.no_fee_produce': '망보기 삯을 치를 농산물이 없습니다.',
   'hudChrome.farming.denied.no_tonic': '성장 토닉이 없습니다.',
+  'hudChrome.farming.denied.tool': '그 작물에 맞는 농사 괭이가 없습니다.',
   'hudChrome.farming.husksConvertedLine': '{husksName} x{husks}을(를) {name}(으)로 교환했습니다.',
   'hudChrome.farming.husksConvertedLineQty':
     '{husksName} x{husks}을(를) {name} x{qty}(으)로 교환했습니다.',
@@ -8813,6 +8820,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.evergarden_greens_seed.name': '상록 정원 잎채소 씨앗',
   'entities.items.evergarden_greens.name': '상록 정원 잎채소',
   'entities.items.fine_evergarden_greens.name': '상급 상록 정원 잎채소',
+  'entities.items.garden_hoe.name': '텃밭 괭이',
+  'entities.items.bronze_hoe.name': '청동 괭이',
+  'entities.items.skysilver_hoe.name': '천은 괭이',
+  'entities.items.osmium_hoe.name': '오스뮴 괭이',
   'hudChrome.archetypeTitle.label': '칭호',
   'hudChrome.archetypeTitle.none': '없음',
   'hudChrome.archetypeTitle.hobbyLabel': '취미',
@@ -10530,7 +10541,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm':
     '발동한 자원 채집지의 재생성 시간을 단축합니다.',
   'hudChrome.professions.toolEffectTooltip.howToSlot':
-    '전문 기술 창에서 채광, 벌목, 약초학 도구에 장착합니다. 장착 시 소모됩니다.',
+    '전문 기술 창에서 채광, 벌목, 약초학, 농사 도구에 장착합니다. 장착 시 소모됩니다.',
   'hudChrome.professions.toolEffectTooltip.charges':
     '일반 등급 도구에서는 {base}회 충전으로 시작합니다(희귀도 한 단계마다 +{bonus}회).',
   'hudChrome.professions.toolEffectTooltip.landOnly': '낚싯대에는 장착할 수 없습니다.',

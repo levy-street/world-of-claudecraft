@@ -5218,6 +5218,8 @@ function professionsFarmingSession(seed = 1): Scenario {
       // One seed per bed. addItem draws no rng, so the grant is
       // digest-invisible beyond the sampled inventory contents.
       sim.addItem('vale_wheat_seed', 2, pid);
+      // The step-12 hoe gate: plantCrop now refuses without a wieldable hoe.
+      sim.addItem('garden_hoe', 1, pid);
       teleport(sim, p, 18.5, 30); // midway between the two beds, both in reach
 
       // Plant one: the first two draws of the session.

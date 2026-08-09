@@ -281,17 +281,19 @@ describe('item webp icons', () => {
     // re-pinned deliberately, in the change that enumerates the debt, never
     // grown quietly. The painted-art wave cleared this to 0; the farming
     // growth-engine phase re-opened it for its four items, the knobs phase
-    // added its two supplies (compost and the growth tonic), and the
-    // crop-ladder phase added its seven crop families (21 ids: seed, produce,
-    // fine twin per crop) under the same reasoning: all are dormant online
-    // (no faucet for any exists yet) and their art is scheduled as its own
-    // later phase. It must fall back to 0 as that art lands.
+    // added its two supplies (compost and the growth tonic), the crop-ladder
+    // phase added its seven crop families (21 ids: seed, produce, fine twin
+    // per crop), and the hoe phase added its four ladder rungs, all under the
+    // same reasoning: all are dormant online (no faucet for any exists yet)
+    // and their art is scheduled as its own later phase. It must fall back to
+    // 0 as that art lands.
     expect(
       [...ITEM_ART_PENDING].sort(),
       'art debt is enumerated and re-pinned deliberately, never grown quietly',
     ).toEqual([
       'bog_beet',
       'bog_beet_seed',
+      'bronze_hoe',
       'brook_carrot',
       'brook_carrot_seed',
       'compost',
@@ -307,6 +309,7 @@ describe('item webp icons', () => {
       'fine_vale_wheat',
       'frost_gourd',
       'frost_gourd_seed',
+      'garden_hoe',
       'gilded_sunmelon',
       'gilded_sunmelon_seed',
       'growth_tonic',
@@ -314,6 +317,8 @@ describe('item webp icons', () => {
       'highland_barley_seed',
       'marsh_rice',
       'marsh_rice_seed',
+      'osmium_hoe',
+      'skysilver_hoe',
       'vale_wheat',
       'vale_wheat_seed',
       'withered_husks',

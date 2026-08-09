@@ -2818,12 +2818,14 @@ export const cs_CZ: EnTranslations = {
       "tierRequired": {
         "mining": "Vyžaduje těžbu úrovně {tier}.",
         "logging": "Vyžaduje dřevorubectví úrovně {tier}.",
-        "herbalism": "Vyžaduje bylinkářství úrovně {tier}."
+        "herbalism": "Vyžaduje bylinkářství úrovně {tier}.",
+        "farming": "Requires a tier {tier} farming hoe"
       },
       "requiresTool": {
         "mining": "Vyžaduje hornický krumpáč",
         "logging": "Vyžaduje dřevorubeckou sekeru",
-        "herbalism": "Vyžaduje bylinkářský srp"
+        "herbalism": "Vyžaduje bylinkářský srp",
+        "farming": "Requires a farming hoe"
       },
       "toolTierUnmet": {
         "mining": "K vytěžení této žíly potřebuješ krumpáč úrovně {tier}.",
@@ -2865,12 +2867,14 @@ export const cs_CZ: EnTranslations = {
           "mining": "Nutný k těžbě rudných žil až do {tier}. úrovně.",
           "logging": "Nutná ke kácení skupin stromů až do {tier}. úrovně.",
           "herbalism": "Nutný ke sběru porostů bylin až do {tier}. úrovně.",
-          "fishing": "Nutný k rybaření ve vodách až do {tier}. úrovně."
+          "fishing": "Nutný k rybaření ve vodách až do {tier}. úrovně.",
+          "farming": "Required to plant crops up to tier {tier}."
         },
         "use": {
           "mining": "Použití: Vytěží blízkou rudnou žílu.",
           "logging": "Použití: Pokácí blízkou skupinu stromů.",
-          "herbalism": "Použití: Sesbírá blízký porost bylin."
+          "herbalism": "Použití: Sesbírá blízký porost bylin.",
+          "farming": "Works from your bags when you plant a crop bed."
         },
         "speed": "Rychleji sbírá na nalezištích pod {tier}. úrovní.",
         "rodRequired": "Nutný k rybaření.",
@@ -2907,7 +2911,8 @@ export const cs_CZ: EnTranslations = {
         "no_husks": "You do not have enough withered husks.",
         "no_compost": "You have no compost.",
         "no_fee_produce": "You have no produce to pay the watch fee.",
-        "no_tonic": "You have no growth tonic."
+        "no_tonic": "You have no growth tonic.",
+        "tool": "You have no farming hoe fit for that crop."
       },
       "husksConvertedLine": "You trade {husksName} x{husks} for {name}.",
       "husksConvertedLineQty": "You trade {husksName} x{husks} for {name} x{qty}."
@@ -11496,6 +11501,18 @@ export const cs_CZ: EnTranslations = {
       },
       "fine_evergarden_greens": {
         "name": "Fine Evergarden Greens"
+      },
+      "garden_hoe": {
+        "name": "Garden Hoe"
+      },
+      "bronze_hoe": {
+        "name": "Bronze Hoe"
+      },
+      "skysilver_hoe": {
+        "name": "Skysilver Hoe"
+      },
+      "osmium_hoe": {
+        "name": "Osmium Hoe"
       },
       "conjured_water4": {
         "name": "Vyčarovaná pramenitá voda"

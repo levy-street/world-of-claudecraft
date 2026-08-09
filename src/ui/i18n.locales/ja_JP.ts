@@ -8716,6 +8716,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.tierRequired.mining': 'ティア{tier}の採掘ピッケルが必要',
   'hudChrome.gathering.tierRequired.logging': 'ティア{tier}の伐採斧が必要',
   'hudChrome.gathering.tierRequired.herbalism': 'ティア{tier}の薬草鎌が必要',
+  'hudChrome.gathering.tierRequired.farming': 'ティア{tier}の農耕鍬が必要',
   'hudChrome.gathering.toolTierUnmet.mining':
     'この鉱脈を採掘するにはティア{tier}の採掘ピッケルが必要です。',
   'hudChrome.gathering.toolTierUnmet.logging':
@@ -8737,6 +8738,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.requiresTool.mining': '採掘ピッケルが必要',
   'hudChrome.gathering.requiresTool.logging': '伐採斧が必要',
   'hudChrome.gathering.requiresTool.herbalism': '薬草鎌が必要',
+  'hudChrome.gathering.requiresTool.farming': '農耕鍬が必要',
   'hudChrome.gathering.toolRequired.mining': 'この鉱脈を採掘するには採掘ピッケルが必要です。',
   'hudChrome.gathering.toolRequired.logging': 'この立木を伐り倒すには伐採斧が必要です。',
   'hudChrome.gathering.toolRequired.herbalism': 'この群生地を採取するには薬草鎌が必要です。',
@@ -8756,9 +8758,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.toolTooltip.unlocks.herbalism':
     'ティア{tier}までの薬草の群生地の採取に必要です。',
   'hudChrome.gathering.toolTooltip.unlocks.fishing': 'ティア{tier}までの水域での釣りに必要です。',
+  'hudChrome.gathering.toolTooltip.unlocks.farming': 'ティア{tier}までの作物の植え付けに必要です。',
   'hudChrome.gathering.toolTooltip.use.mining': '使用：近くの鉱脈を採掘する。',
   'hudChrome.gathering.toolTooltip.use.logging': '使用：近くの立木を伐り倒す。',
   'hudChrome.gathering.toolTooltip.use.herbalism': '使用：近くの薬草の群生地から採取する。',
+  'hudChrome.gathering.toolTooltip.use.farming':
+    'バッグに入れておけば、作物畑に植え付ける際に使われます。',
   'hudChrome.gathering.toolTooltip.speed': 'ティア{tier}未満のノードでの採集が速くなります。',
   'hudChrome.gathering.toolTooltip.rodRequired': '釣りに必要です。',
   'hudChrome.gathering.toolTooltip.rodBite':
@@ -8792,6 +8797,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.farming.denied.no_compost': '堆肥がありません。',
   'hudChrome.farming.denied.no_fee_produce': '見張り料を払う作物がありません。',
   'hudChrome.farming.denied.no_tonic': '成長トニックがありません。',
+  'hudChrome.farming.denied.tool': 'その作物に合う農耕鍬を持っていません。',
   'hudChrome.farming.husksConvertedLine': '{husksName} x{husks}を{name}と交換した。',
   'hudChrome.farming.husksConvertedLineQty': '{husksName} x{husks}を{name} x{qty}と交換した。',
   'gatherEvent.pristineVein': '{finder}が純粋な鉱脈を掘り当てた！',
@@ -8828,6 +8834,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.evergarden_greens_seed.name': 'エバーガーデン青菜の種',
   'entities.items.evergarden_greens.name': 'エバーガーデン青菜',
   'entities.items.fine_evergarden_greens.name': '上質なエバーガーデン青菜',
+  'entities.items.garden_hoe.name': '菜園の鍬',
+  'entities.items.bronze_hoe.name': '青銅の鍬',
+  'entities.items.skysilver_hoe.name': 'スカイシルバーの鍬',
+  'entities.items.osmium_hoe.name': 'オスミウムの鍬',
   'hudChrome.archetypeTitle.label': '称号',
   'hudChrome.archetypeTitle.none': 'なし',
   'hudChrome.archetypeTitle.hobbyLabel': '趣味',
@@ -10539,7 +10549,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm':
     '発動した資源ノードの再生タイマーを短縮する。',
   'hudChrome.professions.toolEffectTooltip.howToSlot':
-    '専門技能ウィンドウから採掘・伐採・薬草学のツールに装着する。装着すると消費される。',
+    '専門技能ウィンドウから採掘・伐採・薬草学・農耕のツールに装着する。装着すると消費される。',
   'hudChrome.professions.toolEffectTooltip.charges':
     'コモン品質のツールでは{base}回の充填から始まる（レア度が1段階上がるごとに+{bonus}回）。',
   'hudChrome.professions.toolEffectTooltip.landOnly': '釣り竿には装着できない。',

@@ -5494,6 +5494,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.evergarden_greens_seed.name': 'Семена зелени Вечного Сада',
   'entities.items.evergarden_greens.name': 'Зелень Вечного Сада',
   'entities.items.fine_evergarden_greens.name': 'Отборная зелень Вечного Сада',
+  'entities.items.garden_hoe.name': 'Садовая мотыга',
+  'entities.items.bronze_hoe.name': 'Бронзовая мотыга',
+  'entities.items.skysilver_hoe.name': 'Небосеребряная мотыга',
+  'entities.items.osmium_hoe.name': 'Осмиевая мотыга',
   'hud.core.chatChannels.add': 'Добавить канал чата',
   'hud.core.chatChannels.addTitle': 'Добавить канал',
   'hud.core.chatChannels.close': 'Закрыть вкладку {channel}',
@@ -8871,6 +8875,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.tierRequired.mining': 'Требуется шахтерская кирка {tier} уровня',
   'hudChrome.gathering.tierRequired.logging': 'Требуется лесорубный топор {tier} уровня',
   'hudChrome.gathering.tierRequired.herbalism': 'Требуется серп травника {tier} уровня',
+  'hudChrome.gathering.tierRequired.farming': 'Требуется мотыга земледельца {tier} уровня',
   'hudChrome.gathering.toolTierUnmet.mining':
     'Чтобы разработать эту жилу, нужна шахтерская кирка {tier} уровня.',
   'hudChrome.gathering.toolTierUnmet.logging':
@@ -8896,6 +8901,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.requiresTool.mining': 'Требуется шахтерская кирка',
   'hudChrome.gathering.requiresTool.logging': 'Требуется лесорубный топор',
   'hudChrome.gathering.requiresTool.herbalism': 'Требуется серп травника',
+  'hudChrome.gathering.requiresTool.farming': 'Требуется мотыга земледельца',
   'hudChrome.gathering.toolRequired.mining': 'Чтобы разработать эту жилу, нужна шахтерская кирка.',
   'hudChrome.gathering.toolRequired.logging':
     'Чтобы срубить этот древостой, нужен лесорубный топор.',
@@ -8917,10 +8923,14 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.toolTooltip.unlocks.herbalism':
     'Нужен для сбора зарослей трав до {tier} уровня.',
   'hudChrome.gathering.toolTooltip.unlocks.fishing': 'Нужна для рыбалки в водах до {tier} уровня.',
+  'hudChrome.gathering.toolTooltip.unlocks.farming':
+    'Нужна для посадки культур до {tier} уровня.',
   'hudChrome.gathering.toolTooltip.use.mining': 'Использование: добыть руду из ближайшей жилы.',
   'hudChrome.gathering.toolTooltip.use.logging': 'Использование: срубить ближайший древостой.',
   'hudChrome.gathering.toolTooltip.use.herbalism':
     'Использование: собрать травы из ближайших зарослей.',
+  'hudChrome.gathering.toolTooltip.use.farming':
+    'Действует из ваших сумок, когда вы сажаете культуру на грядке.',
   'hudChrome.gathering.toolTooltip.speed': 'Быстрее собирает на узлах ниже {tier} уровня.',
   'hudChrome.gathering.toolTooltip.rodRequired': 'Нужна для рыбалки.',
   'hudChrome.gathering.toolTooltip.rodBite': 'Рыба клюет до {seconds} с быстрее.',
@@ -8953,6 +8963,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.farming.denied.no_compost': 'У вас нет компоста.',
   'hudChrome.farming.denied.no_fee_produce': 'У вас нет урожая, чтобы оплатить присмотр.',
   'hudChrome.farming.denied.no_tonic': 'У вас нет тоника роста.',
+  'hudChrome.farming.denied.tool': 'У вас нет мотыги земледельца, подходящей для этой культуры.',
   'hudChrome.farming.husksConvertedLine': 'Вы обмениваете {husksName} x{husks} на {name}.',
   'hudChrome.farming.husksConvertedLineQty':
     'Вы обмениваете {husksName} x{husks} на {name} x{qty}.',
@@ -10708,7 +10719,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm':
     'Сокращает таймер возрождения источника, на котором сработал.',
   'hudChrome.professions.toolEffectTooltip.howToSlot':
-    'Устанавливается на инструмент для горного дела, лесозаготовки или травничества в окне профессий. Расходуется при установке.',
+    'Устанавливается на инструмент для горного дела, лесозаготовки, травничества или земледелия в окне профессий. Расходуется при установке.',
   'hudChrome.professions.toolEffectTooltip.charges':
     'На обычном инструменте изначально {base} зарядов (+{bonus} за каждую ступень редкости).',
   'hudChrome.professions.toolEffectTooltip.landOnly': 'На удочку не устанавливается.',

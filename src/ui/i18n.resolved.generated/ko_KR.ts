@@ -2818,12 +2818,14 @@ export const ko_KR: EnTranslations = {
       "tierRequired": {
         "mining": "{tier}티어 채광 곡괭이 필요",
         "logging": "{tier}티어 벌목 도끼 필요",
-        "herbalism": "{tier}티어 약초 낫 필요"
+        "herbalism": "{tier}티어 약초 낫 필요",
+        "farming": "{tier}티어 농사 괭이 필요"
       },
       "requiresTool": {
         "mining": "채광 곡괭이 필요",
         "logging": "벌목 도끼 필요",
-        "herbalism": "약초 낫 필요"
+        "herbalism": "약초 낫 필요",
+        "farming": "농사 괭이 필요"
       },
       "toolTierUnmet": {
         "mining": "이 광맥을 캐려면 {tier}티어 채광 곡괭이가 필요합니다.",
@@ -2865,12 +2867,14 @@ export const ko_KR: EnTranslations = {
           "mining": "{tier}티어까지의 광맥을 캐는 데 필요합니다.",
           "logging": "{tier}티어까지의 벌목 나무를 베는 데 필요합니다.",
           "herbalism": "{tier}티어까지의 약초 군락을 채집하는 데 필요합니다.",
-          "fishing": "{tier}티어까지의 수역에서 낚시하는 데 필요합니다."
+          "fishing": "{tier}티어까지의 수역에서 낚시하는 데 필요합니다.",
+          "farming": "{tier}티어까지의 작물을 심는 데 필요합니다."
         },
         "use": {
           "mining": "사용: 근처의 광맥을 캡니다.",
           "logging": "사용: 근처의 벌목 나무를 벱니다.",
-          "herbalism": "사용: 근처의 약초 군락에서 채집합니다."
+          "herbalism": "사용: 근처의 약초 군락에서 채집합니다.",
+          "farming": "가방에 넣어 두면 작물밭에 심을 때 사용됩니다."
         },
         "speed": "{tier}티어 미만 채집지에서 더 빠르게 채집합니다.",
         "rodRequired": "낚시에 필요합니다.",
@@ -2907,7 +2911,8 @@ export const ko_KR: EnTranslations = {
         "no_husks": "시든 껍질이 부족합니다.",
         "no_compost": "퇴비가 없습니다.",
         "no_fee_produce": "망보기 삯을 치를 농산물이 없습니다.",
-        "no_tonic": "성장 토닉이 없습니다."
+        "no_tonic": "성장 토닉이 없습니다.",
+        "tool": "그 작물에 맞는 농사 괭이가 없습니다."
       },
       "husksConvertedLine": "{husksName} x{husks}을(를) {name}(으)로 교환했습니다.",
       "husksConvertedLineQty": "{husksName} x{husks}을(를) {name} x{qty}(으)로 교환했습니다."
@@ -3023,7 +3028,7 @@ export const ko_KR: EnTranslations = {
           "artisansEye": "충전된 동안 수확 등급이 도구 1단계만큼 올라갑니다.",
           "quickeningCharm": "발동한 자원 채집지의 재생성 시간을 단축합니다."
         },
-        "howToSlot": "전문 기술 창에서 채광, 벌목, 약초학 도구에 장착합니다. 장착 시 소모됩니다.",
+        "howToSlot": "전문 기술 창에서 채광, 벌목, 약초학, 농사 도구에 장착합니다. 장착 시 소모됩니다.",
         "charges": "일반 등급 도구에서는 {base}회 충전으로 시작합니다(희귀도 한 단계마다 +{bonus}회).",
         "landOnly": "낚싯대에는 장착할 수 없습니다.",
         "openProfessions": "전문 기술 창을 열어 채집 도구에 장착하세요."
@@ -11496,6 +11501,18 @@ export const ko_KR: EnTranslations = {
       },
       "fine_evergarden_greens": {
         "name": "상급 상록 정원 잎채소"
+      },
+      "garden_hoe": {
+        "name": "텃밭 괭이"
+      },
+      "bronze_hoe": {
+        "name": "청동 괭이"
+      },
+      "skysilver_hoe": {
+        "name": "천은 괭이"
+      },
+      "osmium_hoe": {
+        "name": "오스뮴 괭이"
       },
       "conjured_water4": {
         "name": "창조된 샘물"

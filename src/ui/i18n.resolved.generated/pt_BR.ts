@@ -2818,12 +2818,14 @@ export const pt_BR: EnTranslations = {
       "tierRequired": {
         "mining": "Requer uma picareta de mineração de nível {tier}",
         "logging": "Requer um machado de lenharia de nível {tier}",
-        "herbalism": "Requer uma foice de herborismo de nível {tier}"
+        "herbalism": "Requer uma foice de herborismo de nível {tier}",
+        "farming": "Requires a tier {tier} farming hoe"
       },
       "requiresTool": {
         "mining": "Requer uma picareta de mineração",
         "logging": "Requer um machado de lenharia",
-        "herbalism": "Requer uma foice de herborismo"
+        "herbalism": "Requer uma foice de herborismo",
+        "farming": "Requires a farming hoe"
       },
       "toolTierUnmet": {
         "mining": "Você precisa de uma picareta de mineração de nível {tier} para extrair este veio.",
@@ -2865,12 +2867,14 @@ export const pt_BR: EnTranslations = {
           "mining": "Necessária para extrair veios de minério até o nível {tier}.",
           "logging": "Necessário para derrubar arvoredos até o nível {tier}.",
           "herbalism": "Necessária para colher canteiros de ervas até o nível {tier}.",
-          "fishing": "Necessária para pescar em águas até o nível {tier}."
+          "fishing": "Necessária para pescar em águas até o nível {tier}.",
+          "farming": "Required to plant crops up to tier {tier}."
         },
         "use": {
           "mining": "Uso: extrai um veio de minério próximo.",
           "logging": "Uso: derruba um arvoredo próximo.",
-          "herbalism": "Uso: coleta de um canteiro de ervas próximo."
+          "herbalism": "Uso: coleta de um canteiro de ervas próximo.",
+          "farming": "Works from your bags when you plant a crop bed."
         },
         "speed": "Coleta mais rápido em nós abaixo do nível {tier}.",
         "rodRequired": "Necessária para pescar.",
@@ -2907,7 +2911,8 @@ export const pt_BR: EnTranslations = {
         "no_husks": "You do not have enough withered husks.",
         "no_compost": "You have no compost.",
         "no_fee_produce": "You have no produce to pay the watch fee.",
-        "no_tonic": "You have no growth tonic."
+        "no_tonic": "You have no growth tonic.",
+        "tool": "You have no farming hoe fit for that crop."
       },
       "husksConvertedLine": "You trade {husksName} x{husks} for {name}.",
       "husksConvertedLineQty": "You trade {husksName} x{husks} for {name} x{qty}."
@@ -11496,6 +11501,18 @@ export const pt_BR: EnTranslations = {
       },
       "fine_evergarden_greens": {
         "name": "Fine Evergarden Greens"
+      },
+      "garden_hoe": {
+        "name": "Garden Hoe"
+      },
+      "bronze_hoe": {
+        "name": "Bronze Hoe"
+      },
+      "skysilver_hoe": {
+        "name": "Skysilver Hoe"
+      },
+      "osmium_hoe": {
+        "name": "Osmium Hoe"
       },
       "conjured_water4": {
         "name": "Água de Nascente Conjurada"
