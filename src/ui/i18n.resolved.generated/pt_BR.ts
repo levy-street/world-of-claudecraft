@@ -2362,7 +2362,8 @@ export const pt_BR: EnTranslations = {
       "resonantHide": "Reagente de encantamento. Desencantado de armadura de couro rara ou melhor.",
       "resonantLinks": "Reagente de encantamento. Desencantado de armadura de malha rara ou melhor.",
       "resonantSteel": "Reagente de encantamento. Desencantado de armas corpo a corpo raras ou melhores.",
-      "resonantTimber": "Reagente de encantamento. Desencantado de cajados, varinhas, arcos e bestas raros ou melhores."
+      "resonantTimber": "Reagente de encantamento. Desencantado de cajados, varinhas, arcos e bestas raros ou melhores.",
+      "growthTonic": "Farming supply. Used when planting for a chance of a larger harvest."
     },
     "discord": {
       "title": "Discord",

@@ -8440,6 +8440,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.materialHint.arcaneShard'
   | 'hudChrome.materialHint.cookingCatch'
   | 'hudChrome.materialHint.fineGrade'
+  | 'hudChrome.materialHint.growthTonic'
   | 'hudChrome.materialHint.resonantHide'
   | 'hudChrome.materialHint.resonantLinks'
   | 'hudChrome.materialHint.resonantSteel'

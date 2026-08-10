@@ -11305,6 +11305,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '마법부여 재료. 희귀 이상 근접 무기의 마력을 추출해 얻습니다.',
   'hudChrome.materialHint.resonantTimber':
     '마법부여 재료. 희귀 이상 지팡이, 마법봉, 활, 석궁의 마력을 추출해 얻습니다.',
+  'hudChrome.materialHint.growthTonic': '농사 용품. 심을 때 사용하면 수확이 늘어날 수 있습니다.',
   'hudChrome.enchanting.tier.base': '기본 마법부여',
   'hudChrome.enchanting.tier.runed': '룬 마법부여',
   'hudChrome.enchanting.tier.greater': '상급 마법부여',

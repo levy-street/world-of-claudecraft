@@ -2362,7 +2362,8 @@ export const ja_JP: EnTranslations = {
       "resonantHide": "エンチャントの材料。レア以上の革防具を魔力分解して得られる。",
       "resonantLinks": "エンチャントの材料。レア以上の鎖防具を魔力分解して得られる。",
       "resonantSteel": "エンチャントの材料。レア以上の近接武器を魔力分解して得られる。",
-      "resonantTimber": "エンチャントの材料。レア以上の杖、ワンド、弓、クロスボウを魔力分解して得られる。"
+      "resonantTimber": "エンチャントの材料。レア以上の杖、ワンド、弓、クロスボウを魔力分解して得られる。",
+      "growthTonic": "農業用品。植え付け時に使うと、収穫が大きくなることがあります。"
     },
     "discord": {
       "title": "Discord",

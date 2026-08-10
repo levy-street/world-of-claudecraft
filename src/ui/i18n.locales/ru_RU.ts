@@ -11486,6 +11486,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Реагент для наложения чар. Выпадает при распылении оружия ближнего боя редкого качества и выше.',
   'hudChrome.materialHint.resonantTimber':
     'Реагент для наложения чар. Выпадает при распылении посохов, жезлов, луков и арбалетов редкого качества и выше.',
+  'hudChrome.materialHint.growthTonic':
+    'Принадлежность для фермерства. Используется при посадке и дает шанс собрать больший урожай.',
   'hudChrome.enchanting.tier.base': 'Базовые чары',
   'hudChrome.enchanting.tier.runed': 'Рунные чары',
   'hudChrome.enchanting.tier.greater': 'Высшие чары',

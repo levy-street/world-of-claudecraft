@@ -28,6 +28,12 @@ import { type TranslationKey, t } from './i18n';
 
 /** Item id -> its purpose-hint key. The ONLY items that carry a hint. */
 export const MATERIAL_HINT_KEYS: Readonly<Record<string, TranslationKey>> = {
+  // The growth tonic joined when it became a crafted output (the Phase 6
+  // alchemy recipe): a recipe output must state its purpose in its tooltip
+  // (tests/crafted_item_tooltip_coverage.test.ts), and the tonic is kind
+  // 'junk' with no def-level use because plant_crop consumes it as the
+  // plant-time yield knob, so the purpose line is the one place that says so.
+  growth_tonic: 'hudChrome.materialHint.growthTonic',
   arcane_dust: 'hudChrome.materialHint.arcaneDust',
   arcane_essence: 'hudChrome.materialHint.arcaneEssence',
   arcane_shard: 'hudChrome.materialHint.arcaneShard',

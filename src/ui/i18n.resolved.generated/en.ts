@@ -2362,7 +2362,8 @@ export const en: EnTranslations = {
       "resonantHide": "Enchanting reagent. Disenchanted from rare and better leather armor.",
       "resonantLinks": "Enchanting reagent. Disenchanted from rare and better mail armor.",
       "resonantSteel": "Enchanting reagent. Disenchanted from rare and better melee weapons.",
-      "resonantTimber": "Enchanting reagent. Disenchanted from rare and better staves, wands, bows, and crossbows."
+      "resonantTimber": "Enchanting reagent. Disenchanted from rare and better staves, wands, bows, and crossbows.",
+      "growthTonic": "Farming supply. Used when planting for a chance of a larger harvest."
     },
     "discord": {
       "title": "Discord",
