@@ -993,12 +993,7 @@ describe('the voyage cinematic', () => {
   it('skipping a return re-ride applies the un-emitted mainland walk endpoint', () => {
     const sim = makeRider();
     sim.ctx.players.get(sim.playerId)?.questsDone.add(Q0);
-    board(
-      sim,
-      GULLHAVEN_HARBOR.boarding.x,
-      GULLHAVEN_HARBOR.boarding.z,
-      'ch_lb_ferry_fare_back',
-    );
+    board(sim, GULLHAVEN_HARBOR.boarding.x, GULLHAVEN_HARBOR.boarding.z, 'ch_lb_ferry_fare_back');
     collect(sim, 4);
     expect(requestSceneSkip(sim.ctx)).toBe(true);
     const ops = sceneOps(collect(sim, 2));
