@@ -866,6 +866,38 @@ question does not arise (farming has no station).
   and FREE per the settled R8 fee curve's tier-0 point, the rung-50 platter
   resolves ok charging 10000) so a future availability gate cannot land
   silently. Maintainer flag rides the FARM_RECIPES header.
+  (ak) the crafted-tooltip provenance partition (tests/item_instance_tooltip
+  .test.ts, "every crafted recipe output resolves to a crafted-kind def")
+  gained its ONE sanctioned exception: growth_tonic is a crafted output that
+  stays kind junk by doctrine (the knob-consumed, Sell-Junk-vendorable
+  choice). The exception cannot mis-word a tooltip because no signed instance
+  of the tonic can exist: common quality sits below the rare signing floor
+  and masterwork needs slot+stats the def lacks; BOTH facts are pinned
+  beside the exception so it self-invalidates if either moves.
+  (al) TWO release art-program suites (new in the tenth absorb) collide
+  structurally with any feature branch that adds items or sim content, and
+  were healed in-branch with the guards extended, never gutted; maintainer
+  read owed on both: (1) scripts/item_art_audit.mjs demanded committed art
+  for every live ItemDef; it now honors ITEM_ART_PENDING as declared
+  procedural debt (policed both directions: a pending id must be a live def
+  with NO shipping webp), expected liveItemCount is 831 + the pending size,
+  and the fresh-checkout literals (catalog sha, renderer fingerprint,
+  liveItemCount 870) are re-minted in tests/item_art_audit_builder.test.ts
+  with a fixture arm pinning all three exemption directions. (2) the mob
+  portrait manifest's rendererFingerprint hashes the stills esbuild bundle
+  whose import graph reaches sim content (probed: items, profession_items,
+  professions, recipes, types are all inputs), so ANY sim content commit
+  stales it with zero pixel impact; the guard gained a fingerprint-only
+  refresh path (every row byte-identical AND the row set unchanged writes
+  receipt-free; any row drift still demands the rendered receipt, pinned in
+  a new test arm), and the committed manifest was re-minted through the real
+  CLI (3 lines: fingerprint + bundle digest). ABSORB CHECKLIST ADDITION:
+  after every future release absorb (and any farming phase touching sim
+  content), run node scripts/build_mob_portrait_source_manifest.mjs --write
+  (fingerprint-only re-mint) and node scripts/item_art_audit.mjs
+  --verify-only, and expect a one-field conflict in the portrait manifest
+  whenever the release also re-minted it: resolve by re-running the CLI on
+  the merged tree, never by hand-picking a side.
   Two review-round residuals ledgered, not fixed: the closure arm derives
   recipe consumers from the whole merged ALL_RECIPES, so an unrelated future
   recipe could keep a farming material green after its farm-side demand

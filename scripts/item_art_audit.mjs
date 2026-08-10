@@ -59,7 +59,9 @@ function parseArguments(arguments_) {
 async function loadItems(repoRoot) {
   const build = await esbuild.build({
     stdin: {
-      contents: "export { ITEMS } from './src/sim/data.ts';",
+      contents:
+        "export { ITEMS } from './src/sim/data.ts';\n" +
+        "export { ITEM_ART_PENDING } from './src/ui/icons.ts';",
       resolveDir: repoRoot,
       sourcefile: 'item-art-audit-entry.ts',
       loader: 'ts',
@@ -72,7 +74,8 @@ async function loadItems(repoRoot) {
   });
   const bundled = build.outputFiles[0].text;
   const dataUrl = `data:text/javascript;base64,${Buffer.from(bundled).toString('base64')}`;
-  return (await import(dataUrl)).ITEMS;
+  const module = await import(dataUrl);
+  return { items: module.ITEMS, pendingArtIds: module.ITEM_ART_PENDING };
 }
 
 const arguments_ = parseArguments(process.argv.slice(2));
@@ -83,7 +86,7 @@ if (arguments_.help) {
 
 const repoRoot = process.cwd();
 await readFile(path.join(repoRoot, 'package.json'));
-const items = await loadItems(repoRoot);
+const { items, pendingArtIds } = await loadItems(repoRoot);
 const mapping = JSON.parse(
   await readFile(path.join(repoRoot, 'public/ui/items/mapping.json'), 'utf8'),
 );
@@ -94,9 +97,14 @@ const build = await buildItemArtAudit({
   renderOutputs: !arguments_.verifyOnly,
   items,
   mapping,
+  pendingArtIds: [...pendingArtIds].sort(),
   expected: {
     catalogCount: 817,
-    liveItemCount: 831,
+    // 831 live defs reviewed by the 2026-08-09 audit, plus the declared
+    // procedural-art debt (ITEM_ART_PENDING, exact-pinned in
+    // tests/item_icons.test.ts). When the debt clears this collapses back to
+    // a plain literal.
+    liveItemCount: 831 + pendingArtIds.size,
     generatedHeroicDefinitions: 63,
     heroicDefinitionsWithOwnWebp: 48,
     heroicWeaponArtAliases: 15,

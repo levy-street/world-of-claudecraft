@@ -736,6 +736,50 @@ describe('item-art audit builder', () => {
     ).toThrow('Resolved audit item is absent from the current catalog: absent_blade');
   });
 
+  it('exempts declared pending-art ids from the missing-art sweep, policed in both directions', async () => {
+    // The farming branch ships procedural icons as declared debt
+    // (ITEM_ART_PENDING); the audit honors exactly that declaration and
+    // nothing else. Three arms: the undeclared def still reds, a phantom
+    // declaration reds, and a declared id that GAINS art reds until it is
+    // struck from the pending set (the self-clearing direction).
+    const root = mkdtempSync(path.join(tmpdir(), 'woc-item-art-pending-'));
+    temporaryRoots.push(root);
+    const itemDirectory = 'public/ui/items';
+    const outputDirectory = 'tmp/item-art-audit';
+    mkdirSync(path.join(root, itemDirectory), { recursive: true });
+    const red = await sharp({
+      create: { width: 128, height: 128, channels: 3, background: { r: 150, g: 24, b: 35 } },
+    })
+      .webp({ quality: 82 })
+      .toBuffer();
+    writeFileSync(path.join(root, itemDirectory, 'alpha_blade.webp'), red);
+    const items = {
+      alpha_blade: { name: 'Alpha Blade', kind: 'weapon', quality: 'common' },
+      gamma_root: { name: 'Gamma Root', kind: 'junk', quality: 'common' },
+    };
+    const mapping = { entries: [{ itemId: 'alpha_blade' }], generatedBatches: [] };
+    const base = {
+      repoRoot: root,
+      itemDirectory,
+      outputDirectory,
+      renderOutputs: false,
+      items,
+      mapping,
+    };
+    await expect(buildItemArtAudit(base)).rejects.toThrow(
+      'Live item definitions without dedicated art: gamma_root',
+    );
+    const build = await buildItemArtAudit({ ...base, pendingArtIds: ['gamma_root'] });
+    expect(build.catalog.liveItemCount).toBe(2);
+    expect(build.catalog.catalogCount).toBe(1);
+    await expect(buildItemArtAudit({ ...base, pendingArtIds: ['ghost_id'] })).rejects.toThrow(
+      'pending-art id ghost_id is not a live item definition',
+    );
+    await expect(
+      buildItemArtAudit({ ...base, pendingArtIds: ['alpha_blade', 'gamma_root'] }),
+    ).rejects.toThrow('pending-art id alpha_blade has shipping art');
+  });
+
   it('exposes the fresh-checkout rebuild and explicit verdict-refresh CLI', () => {
     const help = execFileSync(process.execPath, ['scripts/item_art_audit.mjs', '--help'], {
       cwd: repoRoot,
@@ -753,13 +797,18 @@ describe('item-art audit builder', () => {
         timeout: 30_000,
       }),
     ) as Record<string, unknown>;
+    // Re-minted for the farming branch (deviation (al)): the audit gained the
+    // ITEM_ART_PENDING exemption (39 farming ids ship procedural icons as
+    // declared debt), which moves liveItemCount to 831 + 39, the catalog sha
+    // with it, and the renderer fingerprint with the lib edit. The 817
+    // reviewed art files and their shipping catalog sha are untouched.
     expect(verified).toMatchObject({
       catalogPath: 'tmp/imagegen/item-art-consistency/final-audit/catalog.json',
-      catalogSha256: '5a4e46556d459f83462570b66a56e1ec11b015dbd5c7594ffe4112bbda51cfbb',
+      catalogSha256: '67061ebc5587b8b056629e579d4cadad3c179883f149c2288e0b67aa86c32dae',
       catalogBytes: 448700,
-      rendererFingerprint: 'fd92c41a206cd55b05a1de94c4789f6eb6ca4200d063f4bbd284c21ae03b6082',
+      rendererFingerprint: '6c2f5a8cf90262474645149998c27943e40ab2e0094dd47daf2cf771236d60aa',
       catalogCount: 817,
-      liveItemCount: 831,
+      liveItemCount: 870,
       generatedHeroicDefinitions: 63,
       heroicDefinitionsWithOwnWebp: 48,
       heroicWeaponArtAliases: 15,

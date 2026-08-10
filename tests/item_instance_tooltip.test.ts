@@ -11,7 +11,8 @@ import {
 } from '../src/sim/content/professions';
 import { ALL_RECIPES } from '../src/sim/content/recipes';
 import { ITEMS } from '../src/sim/data';
-import { NODE_MATERIAL_TABLE } from '../src/sim/professions/gathering';
+import { isSignableMaterialRarity, NODE_MATERIAL_TABLE } from '../src/sim/professions/gathering';
+import { masterworkBonusStats } from '../src/sim/professions/masterwork';
 import {
   instanceBadgeLines,
   instanceBindingLines,
@@ -342,14 +343,41 @@ describe('isGatheredProvenanceKind partition over the live content', () => {
   });
 
   it('every crafted recipe output resolves to a crafted-kind def', () => {
+    // ONE sanctioned exception (farming deviation (ak)): the growth tonic is
+    // a crafted output whose def is DELIBERATELY kind 'junk' (plant_crop
+    // consumes it as the plant-time knob; there is no use arm and Sell Junk
+    // must vendor it). It can never reach the provenance line mis-worded,
+    // because no signed instance of it can exist: common quality sits below
+    // the signing floor and the masterwork arm needs slot+stats the def
+    // lacks. Both facts are pinned below, so the exception self-invalidates
+    // the day either one moves.
+    const CRAFTED_JUNK_EXCEPTIONS = new Set(['growth_tonic']);
     expect(ALL_RECIPES.length).toBeGreaterThan(0);
     for (const recipe of ALL_RECIPES) {
       const def = ITEMS[recipe.resultItemId];
       expect(def, recipe.resultItemId).toBeDefined();
+      if (CRAFTED_JUNK_EXCEPTIONS.has(recipe.resultItemId)) continue;
       expect(isGatheredProvenanceKind(def.kind), `${recipe.resultItemId} (${def.kind})`).toBe(
         false,
       );
     }
+    // The exception's never-signable proof, both arms. A quality bump past
+    // the signing floor or a slot/stats gain on the def reds here first,
+    // forcing the exception (and the wording question) to be re-decided.
+    const tonic = ITEMS.growth_tonic;
+    expect(tonic, 'the exception names a live item').toBeDefined();
+    expect(tonic.kind, 'the exception exists only for the junk kind').toBe('junk');
+    expect(tonic.quality, 'common sits below the signing floor').toBe('common');
+    expect(isSignableMaterialRarity('common')).toBe(false);
+    expect(
+      masterworkBonusStats({
+        level: 10,
+        quality: tonic.quality,
+        slot: (tonic as { slot?: string }).slot as never,
+        stats: (tonic as { stats?: Record<string, number> }).stats as never,
+      }),
+      'a stat-less, slot-less def can never proc a signed masterwork instance',
+    ).toBeNull();
   });
 });
 

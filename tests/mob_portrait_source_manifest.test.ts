@@ -187,6 +187,46 @@ describe('mob portrait source manifest', () => {
     ).toThrow(/missing changed row mob_001/);
   });
 
+  it('authorizes a fingerprint-only refresh without a receipt, and only that', () => {
+    // The renderer fingerprint hashes the esbuild browser bundle, whose
+    // import graph reaches sim content, so content work moves it with zero
+    // pixel impact (the farming branch hit this; deviation (al) in
+    // docs/farming/state.md). With every row byte-identical the manifest may
+    // adopt the new fingerprint receipt-free; any row drift or row-set
+    // change on top still demands the rendered receipt.
+    const rows = Array.from({ length: 3 }, (_, index) => ({
+      id: `mob_${index}`,
+      sourceFingerprint: `source-${index}`,
+      output: { bytes: 100 + index, sha256: `output-${index}` },
+    }));
+    const previous = {
+      schemaVersion: 2,
+      rendererFingerprint: 'renderer-a',
+      portraits: structuredClone(rows),
+    };
+    const fingerprintOnly = {
+      schemaVersion: 2,
+      rendererFingerprint: 'renderer-b',
+      portraits: structuredClone(rows),
+    };
+    expect(() =>
+      assertManifestWriteAuthorized({ previous, next: fingerprintOnly, receipt: null }),
+    ).not.toThrow();
+    const alsoRowDrift = structuredClone(fingerprintOnly);
+    alsoRowDrift.portraits[1].sourceFingerprint = 'changed-source';
+    expect(() =>
+      assertManifestWriteAuthorized({ previous, next: alsoRowDrift, receipt: null }),
+    ).toThrow(/without a renderer receipt/);
+    const removedRow = structuredClone(fingerprintOnly);
+    removedRow.portraits.pop();
+    expect(() =>
+      assertManifestWriteAuthorized({ previous, next: removedRow, receipt: null }),
+    ).toThrow(/without a renderer receipt/);
+    expect(() =>
+      assertManifestWriteAuthorized({ previous, next: structuredClone(previous), receipt: null }),
+    ).not.toThrow();
+  });
+
   it('accepts a renderer receipt only when every changed source and output matches', () => {
     const previous = {
       schemaVersion: 2,

@@ -2,6 +2,13 @@ export function changedPortraitIds(previous, next) {
   if (!previous || previous.rendererFingerprint !== next.rendererFingerprint) {
     return next.portraits.map((portrait) => portrait.id);
   }
+  return rowChangedPortraitIds(previous, next);
+}
+
+/** Per-row drift alone, blind to the renderer fingerprint: rows whose source
+ *  fingerprint or output bytes moved, plus rows with no prior. Removals are
+ *  invisible here by construction; pair with a portrait-count check. */
+export function rowChangedPortraitIds(previous, next) {
   const before = new Map(previous.portraits.map((portrait) => [portrait.id, portrait]));
   return next.portraits
     .filter((portrait) => {
@@ -29,6 +36,21 @@ export function assertManifestWriteAuthorized({ previous, next, receipt, allowBo
   const changedIds = changedPortraitIds(previous, next);
   if (changedIds.length === 0) return;
   if (!receipt) {
+    // FINGERPRINT-ONLY REFRESH: the renderer fingerprint hashes the whole
+    // esbuild browser bundle, whose import graph reaches sim content, so a
+    // content change that cannot touch a single pixel still moves it. When
+    // EVERY portrait row is byte-identical (same source fingerprints, same
+    // output digests, same row set), no pixel input or output moved and
+    // there is nothing a re-render could evidence: the manifest may adopt
+    // the new fingerprint without a receipt. Any actual row drift still
+    // demands the rendered receipt below, unchanged.
+    if (
+      previous.rendererFingerprint !== next.rendererFingerprint &&
+      previous.portraits.length === next.portraits.length &&
+      rowChangedPortraitIds(previous, next).length === 0
+    ) {
+      return;
+    }
     throw new Error(
       `portrait inputs/outputs changed for ${changedIds.length} row(s) without a renderer receipt: ${changedIds.join(', ')}`,
     );
