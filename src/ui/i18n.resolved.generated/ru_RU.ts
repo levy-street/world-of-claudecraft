@@ -11517,6 +11517,30 @@ export const ru_RU: EnTranslations = {
       "osmium_hoe": {
         "name": "Осмиевая мотыга"
       },
+      "vale_hearth_loaf": {
+        "name": "Долинный подовый хлеб"
+      },
+      "eastbrook_root_pottage": {
+        "name": "Истврукская похлёбка из корнеплодов"
+      },
+      "fenbridge_rice_bowl": {
+        "name": "Миска риса из Фенбриджа"
+      },
+      "fenbridge_beet_braise": {
+        "name": "Фенбриджская тушёная свёкла"
+      },
+      "highwatch_barley_bannock": {
+        "name": "Хайвотчская ячменная лепёшка"
+      },
+      "highwatch_gourd_soup": {
+        "name": "Хайвотчский суп из морозной тыквы"
+      },
+      "evergarden_sunmelon_tart": {
+        "name": "Тарт с солнечной дыней из Вечного Сада"
+      },
+      "evergarden_harvest_platter": {
+        "name": "Блюдо урожая Вечного Сада"
+      },
       "conjured_water4": {
         "name": "Сотворённая родниковая вода"
       },

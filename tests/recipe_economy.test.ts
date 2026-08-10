@@ -17,6 +17,7 @@ import {
 import {
   ALL_RECIPES,
   COMBO_RECIPES,
+  FARM_RECIPES,
   HOE_RECIPES,
   LADDER_RECIPES,
   ROD_RECIPES,
@@ -283,18 +284,24 @@ describe('REFERENTIAL INTEGRITY', () => {
     }
     // The 54 ladder recipes plus the 3 grandfathered combos all carry
     // 'trainer', and so do the two crafted rods, the two tool-effect charms,
-    // and the three crafted hoes: the pre-training id list is frozen, so
-    // anything authored after that switch has to be learned.
+    // the three crafted hoes, and the farm-economy set: the pre-training id
+    // list is frozen, so anything authored after that switch has to be learned.
     expect(trainerRecipes).toBe(
       LADDER_RECIPES.length +
         COMBO_RECIPES.length +
         ROD_RECIPES.length +
         TOOL_EFFECT_RECIPES.length +
-        HOE_RECIPES.length,
+        HOE_RECIPES.length +
+        FARM_RECIPES.length,
     );
     expect(ROD_RECIPES).toHaveLength(2);
     expect(TOOL_EFFECT_RECIPES).toHaveLength(2);
     expect(HOE_RECIPES).toHaveLength(3);
+    // The economy-hooks phase's eight farm dishes. Deliberately re-pinned
+    // here, beside its siblings, so the trainer sum above can never absorb a
+    // silent addition to the farm set (the alchemy row later in the same
+    // phase takes this to 9 in the change that authors it).
+    expect(FARM_RECIPES).toHaveLength(8);
   });
 
   it('the three station-free combo recipes resolve a home via professionId, not stationType', () => {

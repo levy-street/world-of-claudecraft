@@ -308,8 +308,9 @@ describe('item webp icons', () => {
     // growth-engine phase re-opened it for its four items, the knobs phase
     // added its two supplies (compost and the growth tonic), the crop-ladder
     // phase added its seven crop families (21 ids: seed, produce, fine twin
-    // per crop), and the hoe phase added its four ladder rungs, all under the
-    // same reasoning: all are dormant online (no faucet for any exists yet)
+    // per crop), the hoe phase added its four ladder rungs, and the Phase 6
+    // economy-hooks phase added its eight farm dishes, all under the same
+    // reasoning: all are dormant online (no faucet for any exists yet)
     // and their art is scheduled as its own later phase. It must fall back to
     // 0 as that art lands.
     expect(
@@ -322,8 +323,13 @@ describe('item webp icons', () => {
       'brook_carrot',
       'brook_carrot_seed',
       'compost',
+      'eastbrook_root_pottage',
       'evergarden_greens',
       'evergarden_greens_seed',
+      'evergarden_harvest_platter',
+      'evergarden_sunmelon_tart',
+      'fenbridge_beet_braise',
+      'fenbridge_rice_bowl',
       'fine_bog_beet',
       'fine_brook_carrot',
       'fine_evergarden_greens',
@@ -340,10 +346,13 @@ describe('item webp icons', () => {
       'growth_tonic',
       'highland_barley',
       'highland_barley_seed',
+      'highwatch_barley_bannock',
+      'highwatch_gourd_soup',
       'marsh_rice',
       'marsh_rice_seed',
       'osmium_hoe',
       'skysilver_hoe',
+      'vale_hearth_loaf',
       'vale_wheat',
       'vale_wheat_seed',
       'withered_husks',

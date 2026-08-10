@@ -11517,6 +11517,30 @@ export const ko_KR: EnTranslations = {
       "osmium_hoe": {
         "name": "오스뮴 괭이"
       },
+      "vale_hearth_loaf": {
+        "name": "골짜기 화덕빵"
+      },
+      "eastbrook_root_pottage": {
+        "name": "이스트브룩 뿌리채소 스튜"
+      },
+      "fenbridge_rice_bowl": {
+        "name": "펜브리지 쌀밥"
+      },
+      "fenbridge_beet_braise": {
+        "name": "펜브리지 비트 조림"
+      },
+      "highwatch_barley_bannock": {
+        "name": "하이워치 보리 납작빵"
+      },
+      "highwatch_gourd_soup": {
+        "name": "하이워치 서리 박 수프"
+      },
+      "evergarden_sunmelon_tart": {
+        "name": "상록 정원 태양멜론 타르트"
+      },
+      "evergarden_harvest_platter": {
+        "name": "상록 정원 수확 접시"
+      },
       "conjured_water4": {
         "name": "창조된 샘물"
       },

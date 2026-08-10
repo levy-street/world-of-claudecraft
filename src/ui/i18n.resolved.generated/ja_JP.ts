@@ -11517,6 +11517,30 @@ export const ja_JP: EnTranslations = {
       "osmium_hoe": {
         "name": "オスミウムの鍬"
       },
+      "vale_hearth_loaf": {
+        "name": "渓谷の炉焼きパン"
+      },
+      "eastbrook_root_pottage": {
+        "name": "イーストブルックの根菜ポタージュ"
+      },
+      "fenbridge_rice_bowl": {
+        "name": "フェンブリッジの炊き込みご飯"
+      },
+      "fenbridge_beet_braise": {
+        "name": "フェンブリッジのビート煮込み"
+      },
+      "highwatch_barley_bannock": {
+        "name": "ハイウォッチの大麦平焼きパン"
+      },
+      "highwatch_gourd_soup": {
+        "name": "ハイウォッチの霜瓜スープ"
+      },
+      "evergarden_sunmelon_tart": {
+        "name": "エバーガーデンの太陽メロンタルト"
+      },
+      "evergarden_harvest_platter": {
+        "name": "エバーガーデンの収穫プレート"
+      },
       "conjured_water4": {
         "name": "魔法の湧き水"
       },

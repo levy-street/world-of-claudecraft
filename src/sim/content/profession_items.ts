@@ -625,6 +625,89 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     sellValue: 150,
   },
 
+  // --- Farm dishes (cooking, Phase 6 economy hooks) ------------------------
+  // Trainer-taught outputs of FARM_RECIPES (content/recipes.ts), the farm
+  // half of cooking: eight dishes cooked from crop produce at the kitchens,
+  // a SIBLING of the ladder block above rather than part of it (the ladder is
+  // closed at three rungs x three recipes per craft; see the FARM_RECIPES
+  // header for why folding these in would break that shape).
+  //
+  // Exactly the same shape as the ladder dishes: kind 'food' + foodHp (an 18s
+  // sit heal), no buff machinery and no new effect field. Every foodHp and
+  // sellValue pair REUSES a point the block above already ships (90/6, 117/12,
+  // 243/25, 432/40, 552/60, 552/75, 980/150; 980 is the ceiling,
+  // conjured_bread4), so the farm line adds no new rung to the food curve.
+  // Never vendor-stocked (no buyValue); output quality matches the rung
+  // (skillReq 0 common, 25 uncommon, 50 rare).
+  //
+  // VALUES ARE PROPOSED AND FLAGGED FOR THE MAINTAINER. Names are IP-safe per
+  // D17: real plant, food and cooking words (loaf, pottage, braise, bannock,
+  // tart, platter) plus this game's own settlement and zone flavor.
+  vale_hearth_loaf: {
+    id: 'vale_hearth_loaf',
+    name: 'Vale Hearth Loaf',
+    kind: 'food',
+    quality: 'common',
+    foodHp: 90,
+    sellValue: 6,
+  },
+  eastbrook_root_pottage: {
+    id: 'eastbrook_root_pottage',
+    name: 'Eastbrook Root Pottage',
+    kind: 'food',
+    quality: 'common',
+    foodHp: 117,
+    sellValue: 12,
+  },
+  fenbridge_rice_bowl: {
+    id: 'fenbridge_rice_bowl',
+    name: 'Fenbridge Rice Bowl',
+    kind: 'food',
+    quality: 'uncommon',
+    foodHp: 243,
+    sellValue: 25,
+  },
+  fenbridge_beet_braise: {
+    id: 'fenbridge_beet_braise',
+    name: 'Fenbridge Beet Braise',
+    kind: 'food',
+    quality: 'uncommon',
+    foodHp: 432,
+    sellValue: 40,
+  },
+  highwatch_barley_bannock: {
+    id: 'highwatch_barley_bannock',
+    name: 'Highwatch Barley Bannock',
+    kind: 'food',
+    quality: 'rare',
+    foodHp: 552,
+    sellValue: 60,
+  },
+  highwatch_gourd_soup: {
+    id: 'highwatch_gourd_soup',
+    name: 'Highwatch Gourd Soup',
+    kind: 'food',
+    quality: 'rare',
+    foodHp: 552,
+    sellValue: 75,
+  },
+  evergarden_sunmelon_tart: {
+    id: 'evergarden_sunmelon_tart',
+    name: 'Evergarden Sunmelon Tart',
+    kind: 'food',
+    quality: 'rare',
+    foodHp: 980,
+    sellValue: 150,
+  },
+  evergarden_harvest_platter: {
+    id: 'evergarden_harvest_platter',
+    name: 'Evergarden Harvest Platter',
+    kind: 'food',
+    quality: 'rare',
+    foodHp: 980,
+    sellValue: 150,
+  },
+
   // --- Crafted alchemy ladder (alchemy) ------------------------------------
   // Trainer-taught outputs of LADDER_RECIPES (content/recipes.ts), three rungs
   // at skillReq 0/25/50, apothecary-bound at alchemist_verane. Potions reuse the

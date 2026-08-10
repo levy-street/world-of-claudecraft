@@ -11517,6 +11517,30 @@ export const en_XA: EnTranslations = {
       "osmium_hoe": {
         "name": "[Óšɱíúɱ Ĥóé]"
       },
+      "vale_hearth_loaf": {
+        "name": "[Ʋáļé Ĥéáŕţĥ Ļóáƒ]"
+      },
+      "eastbrook_root_pottage": {
+        "name": "[Éášţƀŕóóķ Ŕóóţ Þóţţáĝé]"
+      },
+      "fenbridge_rice_bowl": {
+        "name": "[Ƒéñƀŕíðĝé Ŕíçé Ɓóŵļ]"
+      },
+      "fenbridge_beet_braise": {
+        "name": "[Ƒéñƀŕíðĝé Ɓééţ Ɓŕáíšé]"
+      },
+      "highwatch_barley_bannock": {
+        "name": "[Ĥíĝĥŵáţçĥ Ɓáŕļéý Ɓáññóçķ]"
+      },
+      "highwatch_gourd_soup": {
+        "name": "[Ĥíĝĥŵáţçĥ Ĝóúŕð Šóúþ]"
+      },
+      "evergarden_sunmelon_tart": {
+        "name": "[Éʋéŕĝáŕðéñ Šúñɱéļóñ Ţáŕţ]"
+      },
+      "evergarden_harvest_platter": {
+        "name": "[Éʋéŕĝáŕðéñ Ĥáŕʋéšţ Þļáţţéŕ]"
+      },
       "conjured_water4": {
         "name": "[Çóñĵúŕéð Šþŕíñĝŵáţéŕ]"
       },

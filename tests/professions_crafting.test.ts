@@ -4,6 +4,7 @@ import {
   CASTER_HUB_RECIPES,
   COMBO_RECIPES,
   COMMON_RECIPES,
+  FARM_RECIPES,
   HOE_RECIPES,
   LADDER_RECIPES,
   ROD_RECIPES,
@@ -425,6 +426,10 @@ describe('craftItem command (#1127)', () => {
 
   it('the IWorld recipeList read surface exposes every recipe, common, tool, and combo alike (#1132 review)', () => {
     const sim = makeSim();
+    // Every authored recipe list, spelled out: a new list that joins
+    // ALL_RECIPES but not this enumeration would be unreachable through
+    // recipeList, which is the exact defect #1132 found. FARM_RECIPES (the
+    // Phase 6 farm-economy hook set) joined here with the dishes.
     const allIds = [
       ...COMMON_RECIPES,
       ...TOOL_RECIPES,
@@ -434,6 +439,7 @@ describe('craftItem command (#1127)', () => {
       ...CASTER_HUB_RECIPES,
       ...COMBO_RECIPES,
       ...LADDER_RECIPES,
+      ...FARM_RECIPES,
     ]
       .map((r) => r.id)
       .sort();
@@ -445,7 +451,8 @@ describe('craftItem command (#1127)', () => {
         TOOL_EFFECT_RECIPES.length +
         CASTER_HUB_RECIPES.length +
         COMBO_RECIPES.length +
-        LADDER_RECIPES.length,
+        LADDER_RECIPES.length +
+        FARM_RECIPES.length,
     );
     expect(sim.recipeList.map((r) => r.id).sort()).toEqual(allIds);
   });

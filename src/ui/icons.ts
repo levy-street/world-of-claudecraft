@@ -3250,6 +3250,71 @@ const ITEM_RECIPES: Record<string, IconRecipe> = {
     ],
     ['glow'],
   ),
+  // The economy-hooks phase's eight farm dishes (FARM_RECIPES), the same
+  // ART_PENDING drawn stand-in treatment and the same A4 pairwise-distinctness
+  // demand as the crop families above. Two rules hold the family together and
+  // keep it tellable:
+  //   - EVERY dish sits on the 'food' radial, which no other farming icon
+  //     uses, so a cooked dish never reads as raw produce at 32px.
+  //   - Each dish takes a DIFFERENT primary glyph (bread, waterskin, sack,
+  //     droplet, moon, snowflake, sunburst, leaf), so the frost_gourd_seed
+  //     lesson cannot repeat here: no pair is separated by palette alone.
+  // NO sparkle on any dish: sparkle is the fine-grade marker on the produce
+  // rows, and a dish is not a grade.
+  vale_hearth_loaf: r('food', 'gold', [{ p: 'bread', pal: 'gold' }]),
+  eastbrook_root_pottage: r(
+    'food',
+    'ember',
+    [
+      { p: 'waterskin', pal: 'ember' },
+      { p: 'fang', pal: 'ember', ...TR },
+    ],
+    ['drips'],
+  ),
+  fenbridge_rice_bowl: r(
+    'food',
+    'bone',
+    [
+      { p: 'sack', pal: 'bone' },
+      { p: 'droplet', pal: 'sky', ...TR },
+    ],
+    ['motion'],
+  ),
+  fenbridge_beet_braise: r(
+    'food',
+    'blood',
+    [
+      { p: 'droplet', pal: 'blood' },
+      { p: 'leaf', pal: 'leafGreen', ...TR },
+    ],
+    ['drips'],
+  ),
+  highwatch_barley_bannock: r('food', 'gold', [
+    { p: 'moon', pal: 'gold' },
+    { p: 'leaf', pal: 'gold', ...TR },
+  ]),
+  highwatch_gourd_soup: r(
+    'food',
+    'ice',
+    [
+      { p: 'snowflake', pal: 'ice' },
+      { p: 'waterskin', pal: 'ice', ...TR },
+    ],
+    ['motion'],
+  ),
+  evergarden_sunmelon_tart: r(
+    'food',
+    'gold',
+    [
+      { p: 'sunburst', pal: 'gold' },
+      { p: 'bread', pal: 'earthBrown', ...TR },
+    ],
+    ['glow'],
+  ),
+  evergarden_harvest_platter: r('food', 'leafGreen', [
+    { p: 'leaf', pal: 'leafGreen' },
+    { p: 'droplet', pal: 'gold', ...TR },
+  ]),
   // misc UI icons (not real items)
   coin_gold: r('treasure', 'gold', ['coin'], ['sparkle']),
   slot_empty: r('junk', 'silverWhite', []),
@@ -4711,6 +4776,18 @@ export const ITEM_ART_PENDING = new Set<string>([
   'garden_hoe',
   'osmium_hoe',
   'skysilver_hoe',
+  // The economy-hooks phase's eight farm dishes. Same dormant-online reasoning
+  // as everything above (they are cooked from produce no live faucet mints
+  // yet) and the same scheduled art phase; committed art is the site norm and
+  // these have none, so they ride the pending set as honest, enumerated debt.
+  'eastbrook_root_pottage',
+  'evergarden_harvest_platter',
+  'evergarden_sunmelon_tart',
+  'fenbridge_beet_braise',
+  'fenbridge_rice_bowl',
+  'highwatch_barley_bannock',
+  'highwatch_gourd_soup',
+  'vale_hearth_loaf',
 ]);
 
 /** Static URL of an item's (or a UI pseudo-item's) image icon, or null if it uses a recipe. */

@@ -11517,6 +11517,30 @@ export const zh_CN: EnTranslations = {
       "osmium_hoe": {
         "name": "锇金锄"
       },
+      "vale_hearth_loaf": {
+        "name": "谷地炉烤面包"
+      },
+      "eastbrook_root_pottage": {
+        "name": "东溪根菜浓汤"
+      },
+      "fenbridge_rice_bowl": {
+        "name": "芬桥稻米碗"
+      },
+      "fenbridge_beet_braise": {
+        "name": "芬桥焖甜菜"
+      },
+      "highwatch_barley_bannock": {
+        "name": "高望大麦烙饼"
+      },
+      "highwatch_gourd_soup": {
+        "name": "高望霜瓜汤"
+      },
+      "evergarden_sunmelon_tart": {
+        "name": "常青园太阳瓜挞"
+      },
+      "evergarden_harvest_platter": {
+        "name": "常青园丰收拼盘"
+      },
       "conjured_water4": {
         "name": "魔法泉水"
       },
