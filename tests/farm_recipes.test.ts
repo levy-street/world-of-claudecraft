@@ -1,5 +1,6 @@
 // FARM_RECIPES (the Phase 6 farm-economy hook set): conformance pins for the
-// eight cooking dishes that turn crop produce into something a player wants.
+// eight cooking dishes that turn crop produce into something a player wants,
+// plus the one alchemy row, the growth tonic brewed from wild herbs.
 //
 // A SEPARATE LIST FROM LADDER_RECIPES, so it needs its own conformance suite:
 // the ladder is closed at three rungs x three recipes per craft (pinned in
@@ -21,12 +22,13 @@
 //     must never be that shape, so every row is pinned to carry at least one
 //     reagent with no buyValue.
 //
-// STRUCTURED FOR THE ALCHEMY ROW that joins FARM_RECIPES later in the same
-// phase: every arm below runs over `dishes` (the cooking filter), not over
-// FARM_RECIPES directly, so adding a non-cooking row is a clean edit to the
-// list-level pins alone.
+// THE COOKING ARMS RUN OVER `dishes` (the cooking filter), never over
+// FARM_RECIPES directly, which is what let the alchemy row join the list as a
+// clean edit to the list-level pins alone. The tonic states its own shape in
+// the second describe below: it shares the list, not the dish contract (a
+// different craft, a different station, a kind 'junk' output rather than food).
 import { describe, expect, it } from 'vitest';
-import { FARM_RECIPES } from '../src/sim/content/recipes';
+import { FARM_RECIPES, LADDER_RECIPES } from '../src/sim/content/recipes';
 // ITEMS and ALL_RECIPES from data (the merged view the sim, the trainer, the
 // crafting window and the guide all read), not from content: a row authored in
 // content but never joined into the merged table would be unreachable in play,
@@ -128,12 +130,12 @@ const EXPECTED_INPUT_VALUE: Record<string, number> = {
 };
 
 describe('FARM_RECIPES: the farm-economy hook set', () => {
-  it('is exactly eight cooking dishes today, all of them', () => {
+  it('is exactly eight cooking dishes inside a nine-row list', () => {
     // The whole-list pin and the cooking-filter pin are BOTH stated: the
-    // alchemy row joining later in this phase moves the first and must leave
-    // the second at 8, which is what makes that a clean, visible edit.
-    expect(FARM_RECIPES).toHaveLength(8);
-    expect(dishes, 'every FARM_RECIPES row is a cooking dish today').toHaveLength(8);
+    // alchemy row moved the first and left the second at 8, and keeping them
+    // separate is what makes any further addition a visible, deliberate edit.
+    expect(FARM_RECIPES).toHaveLength(9);
+    expect(dishes, 'the cooking dishes are eight of the nine farm rows').toHaveLength(8);
   });
 
   it('every dish is reachable through the merged ALL_RECIPES table', () => {
@@ -272,5 +274,155 @@ describe('FARM_RECIPES: the farm-economy hook set', () => {
         expect(reagent.count, `${dish.id} reagent ${reagent.itemId} count`).toBeGreaterThan(0);
       }
     }
+  });
+});
+
+const TONIC_ID = 'recipe_growth_tonic';
+
+// The tonic's input value spelled out as a literal, the same anti-drift arm the
+// dishes carry: 2 Sheenleaf at 4 each (no buyValue, so the sell floor is the
+// basis) plus one glass vial at its 12-copper buyValue. A re-price of either
+// reagent reds HERE, not only if it happens to cross the strict bound.
+const TONIC_EXPECTED_INPUT_VALUE = 20;
+
+function requireTonic() {
+  const row = FARM_RECIPES.find((r) => r.id === TONIC_ID);
+  if (!row) throw new Error(`${TONIC_ID} is missing from FARM_RECIPES`);
+  return row;
+}
+
+describe('FARM_RECIPES: the growth tonic, the farming-alchemy trade (D7)', () => {
+  it('is one alchemy row on the farm list and reachable through merged ALL_RECIPES', () => {
+    expect(
+      FARM_RECIPES.filter((r) => r.id === TONIC_ID),
+      'exactly one growth tonic recipe on FARM_RECIPES',
+    ).toHaveLength(1);
+    const merged = ALL_RECIPES.filter((r) => r.id === TONIC_ID);
+    expect(
+      merged,
+      `${TONIC_ID} is authored in content but not joined into the merged ALL_RECIPES ` +
+        'table, so it would be unreachable in play',
+    ).toHaveLength(1);
+    expect(
+      FARM_RECIPES.filter((r) => r.professionId === 'alchemy').map((r) => r.id),
+      'the tonic is the only non-cooking row on the farm list',
+    ).toEqual([TONIC_ID]);
+  });
+
+  it('is brewed by an alchemist at the apothecary, trainer-taught, one tonic per craft', () => {
+    const tonic = requireTonic();
+    expect(tonic.professionId, `${TONIC_ID} professionId`).toBe('alchemy');
+    expect(tonic.stationType, `${TONIC_ID} stationType`).toBe('apothecary');
+    expect(tonic.acquisition, `${TONIC_ID} acquisition`).toEqual(['trainer']);
+    expect(tonic.resultItemId, `${TONIC_ID} resultItemId`).toBe('growth_tonic');
+    expect(tonic.resultCount, `${TONIC_ID} resultCount`).toBe(1);
+  });
+
+  it('sits on the accessible rung with the shared scaffolding values', () => {
+    const tonic = requireTonic();
+    // skillReq 0: the tonic is a plant-time knob for EVERY farm tier, so it
+    // must not be gated behind a mid or late alchemy rung.
+    expect(tonic.skillReq, `${TONIC_ID} must stay on the rung-0 (accessible) band`).toBe(0);
+    const scaffolding = SCAFFOLDING_BY_RUNG[tonic.skillReq];
+    expect(
+      scaffolding,
+      `${TONIC_ID}: skillReq ${tonic.skillReq} is not a rung (0, 25, 50)`,
+    ).toBeDefined();
+    const [budget, level] = scaffolding;
+    expect(tonic.itemLevelBudget, `${TONIC_ID} itemLevelBudget for rung 0`).toBe(budget);
+    expect(tonic.level, `${TONIC_ID} level for rung 0`).toBe(level);
+  });
+
+  it('is brewed FROM HERBS, the cross-profession trade, in a vial like every alchemy row', () => {
+    const tonic = requireTonic();
+    const byId = new Map(tonic.reagents.map((reagent) => [reagent.itemId, reagent.count]));
+    // The D7 requirement made falsifiable: swap the herb out for a farm-grown
+    // input and the trade this recipe exists to create disappears, so the id
+    // is pinned as a literal rather than as "some herb".
+    expect(
+      byId.get('silverleaf_herb'),
+      'the tonic must be brewed from Sheenleaf, the rung-0 herb: without a HERB reagent ' +
+        'there is no farming-to-alchemy trade (D7) left in the recipe',
+    ).toBe(2);
+    expect(
+      byId.get('glass_vial'),
+      'every shipped alchemy row decants into one glass vial; the tonic follows it',
+    ).toBe(1);
+    expect(tonic.reagents, `${TONIC_ID} reagent count`).toHaveLength(2);
+    for (const reagent of tonic.reagents) {
+      expect(ITEMS[reagent.itemId], `reagent ${reagent.itemId} in ${TONIC_ID}`).toBeDefined();
+      expect(reagent.count, `${TONIC_ID} reagent ${reagent.itemId} count`).toBeGreaterThan(0);
+    }
+  });
+
+  it('keeps a reagent with NO buyValue, so it stays out of the vendor-fed arm', () => {
+    const tonic = requireTonic();
+    // Sheenleaf specifically: it is the gathered reagent, and it is the ONLY
+    // one here without a copper faucet (the vial is a vendor staple). If it
+    // ever gained a buyValue the whole recipe would become counterfactually
+    // vendor-fed and would have to join the sorted literal pin plus the
+    // discounted-input bound in tests/recipe_economy.test.ts.
+    const herb = ITEMS.silverleaf_herb;
+    expect(herb, 'silverleaf_herb has no ItemDef').toBeDefined();
+    expect(
+      herb.buyValue,
+      'silverleaf_herb must stay unpriced at vendors, or recipe_growth_tonic joins the ' +
+        'counterfactual vendor-fed set in tests/recipe_economy.test.ts',
+    ).toBeUndefined();
+    const unpriced = tonic.reagents.filter((reagent) => {
+      const def = ITEMS[reagent.itemId];
+      return !def || typeof def.buyValue !== 'number' || def.buyValue <= 0;
+    });
+    expect(
+      unpriced.map((reagent) => reagent.itemId),
+      `${TONIC_ID} unpriced reagents`,
+    ).toEqual(['silverleaf_herb']);
+  });
+
+  it('vendors strictly below its input value, at the exact input pinned', () => {
+    const tonic = requireTonic();
+    let input = 0;
+    for (const reagent of tonic.reagents) input += reagent.count * reagentUnitValue(reagent.itemId);
+    expect(input, `${TONIC_ID} input value`).toBe(TONIC_EXPECTED_INPUT_VALUE);
+    const def = ITEMS[tonic.resultItemId];
+    expect(def, `${TONIC_ID}: output ${tonic.resultItemId} has no ItemDef`).toBeDefined();
+    const output = def.sellValue * tonic.resultCount;
+    expect(output, `${TONIC_ID}: output ${output} must be below input ${input}`).toBeLessThan(
+      input,
+    );
+  });
+
+  it('outputs the plant-time knob itself: kind junk, never vendor-stocked', () => {
+    const def = ITEMS.growth_tonic;
+    expect(def, 'growth_tonic has no ItemDef').toBeDefined();
+    // Kind 'junk' on purpose: the tonic is consumed by the plant_crop command's
+    // knob payload, NOT by an ItemDef.use arm, so it carries no potion/elixir
+    // machinery and gains none by being craftable.
+    expect(def.kind, 'growth_tonic kind').toBe('junk');
+    expect(
+      def.buyValue,
+      'the growth tonic is NEVER vendor-stocked (this recipe is its only faucet), so a ' +
+        'buyValue here would price a faucet that must not exist',
+    ).toBeUndefined();
+    expect(def.sellValue, 'growth_tonic sellValue').toBeGreaterThan(0);
+  });
+
+  it('does NOT join LADDER_RECIPES, whose consumable convention it would fail', () => {
+    // The negative arm. LADDER_RECIPES is closed at three rungs x three recipes
+    // per craft, and its "cooking and alchemy have a consumable output at every
+    // rung" pin (tests/recipe_economy.test.ts) walks that list only. A junk
+    // output is fine on the sibling farm list and would be wrong on the ladder,
+    // so this states which list owns the row.
+    expect(
+      LADDER_RECIPES.map((r) => r.id),
+      `${TONIC_ID} must live on FARM_RECIPES, never on the closed ladder`,
+    ).not.toContain(TONIC_ID);
+    expect(
+      LADDER_RECIPES.some((r) => r.resultItemId === 'growth_tonic'),
+      'no ladder row may produce the growth tonic either',
+    ).toBe(false);
+    // Non-vacuity: the ladder really is a populated list with alchemy rows in
+    // it, so the two absences above are facts and not an empty-list artifact.
+    expect(LADDER_RECIPES.filter((r) => r.professionId === 'alchemy').length).toBeGreaterThan(0);
   });
 });
