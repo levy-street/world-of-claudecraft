@@ -108,6 +108,20 @@ export interface GuideDeed {
   crest?: string;
 }
 
+/** Spoiler-safe Reliquary page: names only, no personal progress or sources. */
+export interface GuideReliquaryRelic {
+  kind: 'item' | 'mark' | 'mount' | 'weapon_skin' | 'title';
+  name: string;
+}
+export interface GuideReliquaryPage {
+  id: string;
+  shelf: 'conquerors' | 'professions' | 'horizons';
+  name: string;
+  /** Outside-completion reason (rule 7): present only on labeled pages. */
+  excludeFromCompletion?: 'retired' | 'personal';
+  relics: GuideReliquaryRelic[];
+}
+
 // ---------------------------------------------------------------- professions
 // Professions 2.0 reference data (wiki arm). TRANSPARENCY POLICY:
 // the professions sections publish EXACT numbers (skill
@@ -5438,6 +5452,38 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "crest": "/ui/deeds/chr_evergarden_first_cast.webp"
   },
   {
+    "id": "col_reliquary_rank_2",
+    "name": "Spoilskeeper",
+    "category": "collection",
+    "renown": 0,
+    "feat": false,
+    "rewardTitle": "Spoilskeeper"
+  },
+  {
+    "id": "col_reliquary_rank_3",
+    "name": "The Cataloguer",
+    "category": "collection",
+    "renown": 0,
+    "feat": false,
+    "rewardTitle": "the Cataloguer"
+  },
+  {
+    "id": "col_reliquary_rank_4",
+    "name": "Arch-Curator",
+    "category": "collection",
+    "renown": 0,
+    "feat": false,
+    "rewardTitle": "Arch-Curator"
+  },
+  {
+    "id": "col_reliquary_rank_5",
+    "name": "Eternal Spoils",
+    "category": "collection",
+    "renown": 0,
+    "feat": false,
+    "rewardBorder": true
+  },
+  {
     "id": "pvp_honor_sergeant",
     "name": "Linebreaker",
     "category": "pvp",
@@ -5463,6 +5509,1796 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "feat": false,
     "rewardTitle": "Warcrowned",
     "crest": "/ui/deeds/pvp_honor_field_marshal.webp"
+  },
+  {
+    "id": "col_reliquary_complete",
+    "name": "The Grand Reliquary",
+    "category": "collection",
+    "renown": 0,
+    "feat": true,
+    "rewardTitle": "Curator of the Vault"
+  },
+  {
+    "id": "col_reliquary_conquerors",
+    "name": "Shelf of Conquerors",
+    "category": "collection",
+    "renown": 0,
+    "feat": false,
+    "rewardTitle": "Vaultbreaker"
+  },
+  {
+    "id": "col_reliquary_illum_nythraxis_heroic",
+    "name": "Nythraxis Illuminated",
+    "category": "collection",
+    "renown": 0,
+    "feat": false,
+    "rewardTitle": "Light of Nythraxis"
+  },
+  {
+    "id": "col_reliquary_illum_thunzharr",
+    "name": "Thunzharr Illuminated",
+    "category": "collection",
+    "renown": 0,
+    "feat": false,
+    "rewardTitle": "Light of Thunzharr"
+  },
+  {
+    "id": "col_reliquary_illum_gravewyrm_heroic",
+    "name": "Sanctum Illuminated",
+    "category": "collection",
+    "renown": 0,
+    "feat": false,
+    "rewardTitle": "Light of the Sanctum"
+  }
+];
+
+export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
+  {
+    "id": "conquerors_hollow_crypt",
+    "shelf": "conquerors",
+    "name": "The Hollow Crypt",
+    "relics": [
+      {
+        "kind": "item",
+        "name": "Cryptbone Greaves"
+      },
+      {
+        "kind": "item",
+        "name": "Cryptbone Helm"
+      },
+      {
+        "kind": "item",
+        "name": "Cryptbone Pauldrons"
+      },
+      {
+        "kind": "item",
+        "name": "Greyjaw Hide Boots"
+      },
+      {
+        "kind": "item",
+        "name": "Gravewoven Bag"
+      }
+    ]
+  },
+  {
+    "id": "conquerors_hollow_crypt_heroic",
+    "shelf": "conquerors",
+    "name": "Heroic Hollow Crypt",
+    "relics": [
+      {
+        "kind": "item",
+        "name": "Morthen's Cryptforged Hauberk"
+      },
+      {
+        "kind": "item",
+        "name": "Shadowpulse Handwraps"
+      },
+      {
+        "kind": "item",
+        "name": "Bonechill Striders"
+      },
+      {
+        "kind": "item",
+        "name": "Lunarward Cinch"
+      },
+      {
+        "kind": "item",
+        "name": "Cryptplate Helm"
+      },
+      {
+        "kind": "item",
+        "name": "Shadowpulse Slippers"
+      },
+      {
+        "kind": "item",
+        "name": "Bonechill Cord"
+      }
+    ]
+  },
+  {
+    "id": "conquerors_sunken_bastion",
+    "shelf": "conquerors",
+    "name": "The Sunken Bastion",
+    "relics": [
+      {
+        "kind": "item",
+        "name": "Tideguard Greaves"
+      },
+      {
+        "kind": "item",
+        "name": "Tideguard Sabatons"
+      },
+      {
+        "kind": "item",
+        "name": "Eelscale Leggings"
+      },
+      {
+        "kind": "item",
+        "name": "Tidescale Vest"
+      },
+      {
+        "kind": "item",
+        "name": "Drowned Prayer Leggings"
+      },
+      {
+        "kind": "item",
+        "name": "Drowned Prayer Sandals"
+      },
+      {
+        "kind": "item",
+        "name": "Eelscale Treads"
+      },
+      {
+        "kind": "item",
+        "name": "Fogbinder's Duffel"
+      }
+    ]
+  },
+  {
+    "id": "conquerors_sunken_bastion_heroic",
+    "shelf": "conquerors",
+    "name": "Heroic Sunken Bastion",
+    "relics": [
+      {
+        "kind": "item",
+        "name": "Mistcaller's Fang"
+      },
+      {
+        "kind": "item",
+        "name": "Tidebound Spaulders"
+      },
+      {
+        "kind": "item",
+        "name": "Sash of the Sunken Court"
+      },
+      {
+        "kind": "item",
+        "name": "Fogforged Pauldrons"
+      },
+      {
+        "kind": "item",
+        "name": "Tideguard Faceguard"
+      },
+      {
+        "kind": "item",
+        "name": "Sunken Court Mantle"
+      },
+      {
+        "kind": "item",
+        "name": "Dreamroot Boots"
+      }
+    ]
+  },
+  {
+    "id": "conquerors_drowned_temple",
+    "shelf": "conquerors",
+    "name": "The Drowned Temple",
+    "relics": [
+      {
+        "kind": "item",
+        "name": "Ysolei's Pearl Greaves"
+      },
+      {
+        "kind": "item",
+        "name": "Moonwrack Breastplate"
+      },
+      {
+        "kind": "item",
+        "name": "Moonwrack Robe"
+      },
+      {
+        "kind": "item",
+        "name": "Moonwrack Tunic"
+      },
+      {
+        "kind": "item",
+        "name": "Selthe's Sea-Striders"
+      }
+    ]
+  },
+  {
+    "id": "conquerors_drowned_temple_heroic",
+    "shelf": "conquerors",
+    "name": "Heroic Drowned Temple",
+    "relics": [
+      {
+        "kind": "item",
+        "name": "Lunar Tide Greatstaff"
+      },
+      {
+        "kind": "item",
+        "name": "Tidewoven Trousers"
+      },
+      {
+        "kind": "item",
+        "name": "Choirmother's Casque"
+      },
+      {
+        "kind": "item",
+        "name": "Stormbark Mantle"
+      },
+      {
+        "kind": "item",
+        "name": "Lunar Choir Leggings"
+      },
+      {
+        "kind": "item",
+        "name": "Choir-Blessed Spaulders"
+      },
+      {
+        "kind": "item",
+        "name": "Tideworn Warboots"
+      }
+    ]
+  },
+  {
+    "id": "conquerors_gravewyrm_sanctum",
+    "shelf": "conquerors",
+    "name": "Gravewyrm Sanctum",
+    "relics": [
+      {
+        "kind": "item",
+        "name": "Boundstone Helm"
+      },
+      {
+        "kind": "item",
+        "name": "Boundstone Girdle"
+      },
+      {
+        "kind": "item",
+        "name": "Gravewyrm Mantle"
+      },
+      {
+        "kind": "item",
+        "name": "Gravewyrm Gauntlets"
+      },
+      {
+        "kind": "item",
+        "name": "Gravewyrm Thornmaul"
+      },
+      {
+        "kind": "item",
+        "name": "Korgath's Chainwraps"
+      },
+      {
+        "kind": "item",
+        "name": "Staff of Velkhar"
+      },
+      {
+        "kind": "item",
+        "name": "Nightveil Tunic"
+      },
+      {
+        "kind": "item",
+        "name": "Broodsworn Grand Robe"
+      },
+      {
+        "kind": "item",
+        "name": "Gravewyrm Sabatons"
+      },
+      {
+        "kind": "item",
+        "name": "Broodsworn Soulsteps"
+      },
+      {
+        "kind": "item",
+        "name": "Nightfang Treads"
+      },
+      {
+        "kind": "item",
+        "name": "Boneguard Breastplate"
+      },
+      {
+        "kind": "item",
+        "name": "Gravewyrm Stalker's Treads"
+      },
+      {
+        "kind": "item",
+        "name": "Barrowlord Legguards"
+      },
+      {
+        "kind": "item",
+        "name": "Mournweave Soulsteps"
+      },
+      {
+        "kind": "item",
+        "name": "Nightfang Legguards"
+      },
+      {
+        "kind": "item",
+        "name": "Wyrmfang Greatblade"
+      },
+      {
+        "kind": "item",
+        "name": "Staff of the Gravewyrm"
+      },
+      {
+        "kind": "item",
+        "name": "Fang of Korzul"
+      },
+      {
+        "kind": "item",
+        "name": "Barrowlord Warplate"
+      },
+      {
+        "kind": "item",
+        "name": "Mournweave Starshroud"
+      },
+      {
+        "kind": "item",
+        "name": "Nightfang Harness"
+      },
+      {
+        "kind": "item",
+        "name": "Barrowlord Dread Visage"
+      },
+      {
+        "kind": "item",
+        "name": "Mournweave Soulspire Mantle"
+      },
+      {
+        "kind": "item",
+        "name": "Nightfang Talongrips"
+      },
+      {
+        "kind": "item",
+        "name": "Nightfang's Greatstaff"
+      },
+      {
+        "kind": "item",
+        "name": "Wildgrowth Leggings"
+      },
+      {
+        "kind": "item",
+        "name": "Grovewarden's Grips"
+      },
+      {
+        "kind": "item",
+        "name": "Verdant Walkers"
+      },
+      {
+        "kind": "item",
+        "name": "Gravewyrm Bone Quiver"
+      }
+    ]
+  },
+  {
+    "id": "conquerors_gravewyrm_sanctum_heroic",
+    "shelf": "conquerors",
+    "name": "Heroic Gravewyrm Sanctum",
+    "relics": [
+      {
+        "kind": "item",
+        "name": "Gravewyrm Cleaver"
+      },
+      {
+        "kind": "item",
+        "name": "Shroud of the Gravewyrm"
+      },
+      {
+        "kind": "item",
+        "name": "Sanctum Prowler's Grips"
+      },
+      {
+        "kind": "item",
+        "name": "Gravewyrm Claws"
+      },
+      {
+        "kind": "item",
+        "name": "Gravescale Girdle"
+      },
+      {
+        "kind": "item",
+        "name": "Wyrmchoir Handwraps"
+      },
+      {
+        "kind": "item",
+        "name": "Wildsoul Maul"
+      }
+    ]
+  },
+  {
+    "id": "conquerors_wildheart_basin",
+    "shelf": "conquerors",
+    "name": "The Wildheart Basin",
+    "relics": [
+      {
+        "kind": "item",
+        "name": "Fanglord's Beastspear"
+      },
+      {
+        "kind": "item",
+        "name": "Duskwhisper"
+      },
+      {
+        "kind": "item",
+        "name": "Wildheart Tuskblade"
+      },
+      {
+        "kind": "item",
+        "name": "Hexwood Staff of the Basin"
+      },
+      {
+        "kind": "item",
+        "name": "Fangknife of Zulgar"
+      }
+    ]
+  },
+  {
+    "id": "conquerors_wildheart_basin_heroic",
+    "shelf": "conquerors",
+    "name": "Heroic Wildheart Basin",
+    "relics": [
+      {
+        "kind": "item",
+        "name": "Basin Stalker's Tunic"
+      },
+      {
+        "kind": "item",
+        "name": "Verdant-Heart Vestment"
+      },
+      {
+        "kind": "item",
+        "name": "Sunbone Ritual Hauberk"
+      },
+      {
+        "kind": "item",
+        "name": "Greatfang of the Basin"
+      },
+      {
+        "kind": "item",
+        "name": "Sunbone Oracle's Crown"
+      },
+      {
+        "kind": "item",
+        "name": "Bloodmane War-Legguards"
+      }
+    ]
+  },
+  {
+    "id": "conquerors_nythraxis",
+    "shelf": "conquerors",
+    "name": "Nythraxis Raid",
+    "relics": [
+      {
+        "kind": "item",
+        "name": "Heartwood of the Deathless Crown"
+      },
+      {
+        "kind": "item",
+        "name": "Thronebane, Last Oath of Thornpeak"
+      },
+      {
+        "kind": "item",
+        "name": "Bonewrought Greatsword"
+      },
+      {
+        "kind": "item",
+        "name": "Bonewrought Bulwark"
+      },
+      {
+        "kind": "item",
+        "name": "Direfang Greatblade"
+      },
+      {
+        "kind": "item",
+        "name": "Wraithfire Orb"
+      },
+      {
+        "kind": "item",
+        "name": "Maul of the Scourged Wilds"
+      },
+      {
+        "kind": "item",
+        "name": "Bonewrought Dreadhelm"
+      },
+      {
+        "kind": "item",
+        "name": "Bonewrought Warspaulders"
+      },
+      {
+        "kind": "item",
+        "name": "Direfang Crown"
+      },
+      {
+        "kind": "item",
+        "name": "Direfang Shoulderguards"
+      },
+      {
+        "kind": "item",
+        "name": "Wraithfire Cowl"
+      },
+      {
+        "kind": "item",
+        "name": "Wraithfire Mantle"
+      },
+      {
+        "kind": "item",
+        "name": "Galecall Crown"
+      },
+      {
+        "kind": "item",
+        "name": "Galecall Spaulders"
+      },
+      {
+        "kind": "item",
+        "name": "Direfang Quiver"
+      }
+    ]
+  },
+  {
+    "id": "conquerors_nythraxis_heroic",
+    "shelf": "conquerors",
+    "name": "Heroic Nythraxis Raid",
+    "relics": [
+      {
+        "kind": "item",
+        "name": "Deathless Greatblade"
+      },
+      {
+        "kind": "item",
+        "name": "Scepter of the Deathless Court"
+      },
+      {
+        "kind": "item",
+        "name": "Stormcaller's Focus"
+      }
+    ]
+  },
+  {
+    "id": "conquerors_thunzharr",
+    "shelf": "conquerors",
+    "name": "The Waking Peak (World Boss)",
+    "relics": [
+      {
+        "kind": "item",
+        "name": "Bonewrought Gauntlets"
+      },
+      {
+        "kind": "item",
+        "name": "Direfang Grips"
+      },
+      {
+        "kind": "item",
+        "name": "Wraithfire Gloves"
+      },
+      {
+        "kind": "item",
+        "name": "Galecall Handguards"
+      },
+      {
+        "kind": "item",
+        "name": "Bonewrought Girdle"
+      },
+      {
+        "kind": "item",
+        "name": "Direfang Waistband"
+      },
+      {
+        "kind": "item",
+        "name": "Wraithfire Cord"
+      },
+      {
+        "kind": "item",
+        "name": "Galecall Waistguard"
+      },
+      {
+        "kind": "item",
+        "name": "Vestments of the Waking Grove"
+      }
+    ]
+  },
+  {
+    "id": "conquerors_collapsed_reliquary",
+    "shelf": "conquerors",
+    "name": "The Collapsed Reliquary",
+    "relics": [
+      {
+        "kind": "item",
+        "name": "Deacon's Reliquary Helm"
+      },
+      {
+        "kind": "item",
+        "name": "Vandric's Shadow Cowl"
+      }
+    ]
+  },
+  {
+    "id": "conquerors_drowned_litany",
+    "shelf": "conquerors",
+    "name": "The Drowned Litany",
+    "relics": [
+      {
+        "kind": "item",
+        "name": "Nhalia's Bell-Maul"
+      },
+      {
+        "kind": "item",
+        "name": "Widow-Silk Hood"
+      },
+      {
+        "kind": "item",
+        "name": "Nhalia's Litany Rod"
+      },
+      {
+        "kind": "item",
+        "name": "Blackwater Vanguard Chestguard"
+      },
+      {
+        "kind": "item",
+        "name": "Siltstep Leggings"
+      },
+      {
+        "kind": "item",
+        "name": "Sunken Reliquary Hood"
+      },
+      {
+        "kind": "item",
+        "name": "Sister Nhalia's Choir-Forged Plate"
+      },
+      {
+        "kind": "item",
+        "name": "Drowned Choir-Fang"
+      }
+    ]
+  },
+  {
+    "id": "conquerors_set_deathlord",
+    "shelf": "conquerors",
+    "name": "Barrowlord Battlegear",
+    "relics": [
+      {
+        "kind": "item",
+        "name": "Barrowlord Warplate"
+      },
+      {
+        "kind": "item",
+        "name": "Barrowlord Legguards"
+      },
+      {
+        "kind": "item",
+        "name": "Barrowlord Sabatons"
+      },
+      {
+        "kind": "item",
+        "name": "Barrowlord Dread Visage"
+      }
+    ]
+  },
+  {
+    "id": "conquerors_set_wyrmshadow",
+    "shelf": "conquerors",
+    "name": "Nightfang Vestments",
+    "relics": [
+      {
+        "kind": "item",
+        "name": "Nightfang Harness"
+      },
+      {
+        "kind": "item",
+        "name": "Nightfang Treads"
+      },
+      {
+        "kind": "item",
+        "name": "Nightfang Legguards"
+      },
+      {
+        "kind": "item",
+        "name": "Nightfang Talongrips"
+      }
+    ]
+  },
+  {
+    "id": "conquerors_set_necromancers",
+    "shelf": "conquerors",
+    "name": "Mournweave Raiment",
+    "relics": [
+      {
+        "kind": "item",
+        "name": "Mournweave Starshroud"
+      },
+      {
+        "kind": "item",
+        "name": "Mournweave Soulsteps"
+      },
+      {
+        "kind": "item",
+        "name": "Mournweave Legwraps"
+      },
+      {
+        "kind": "item",
+        "name": "Mournweave Soulspire Mantle"
+      }
+    ]
+  },
+  {
+    "id": "conquerors_set_crownforged",
+    "shelf": "conquerors",
+    "name": "Bonewrought Regalia",
+    "relics": [
+      {
+        "kind": "item",
+        "name": "Bonewrought Gauntlets"
+      },
+      {
+        "kind": "item",
+        "name": "Bonewrought Girdle"
+      },
+      {
+        "kind": "item",
+        "name": "Bonewrought Dreadhelm"
+      },
+      {
+        "kind": "item",
+        "name": "Bonewrought Warspaulders"
+      }
+    ]
+  },
+  {
+    "id": "conquerors_set_nighttalon",
+    "shelf": "conquerors",
+    "name": "Direfang Pelt",
+    "relics": [
+      {
+        "kind": "item",
+        "name": "Direfang Grips"
+      },
+      {
+        "kind": "item",
+        "name": "Direfang Waistband"
+      },
+      {
+        "kind": "item",
+        "name": "Direfang Crown"
+      },
+      {
+        "kind": "item",
+        "name": "Direfang Shoulderguards"
+      }
+    ]
+  },
+  {
+    "id": "conquerors_set_soulflame",
+    "shelf": "conquerors",
+    "name": "Wraithfire Regalia",
+    "relics": [
+      {
+        "kind": "item",
+        "name": "Wraithfire Gloves"
+      },
+      {
+        "kind": "item",
+        "name": "Wraithfire Cord"
+      },
+      {
+        "kind": "item",
+        "name": "Wraithfire Cowl"
+      },
+      {
+        "kind": "item",
+        "name": "Wraithfire Mantle"
+      }
+    ]
+  },
+  {
+    "id": "conquerors_set_stormcallers",
+    "shelf": "conquerors",
+    "name": "Galecall Vestments",
+    "relics": [
+      {
+        "kind": "item",
+        "name": "Galecall Handguards"
+      },
+      {
+        "kind": "item",
+        "name": "Galecall Waistguard"
+      },
+      {
+        "kind": "item",
+        "name": "Galecall Crown"
+      },
+      {
+        "kind": "item",
+        "name": "Galecall Spaulders"
+      }
+    ]
+  },
+  {
+    "id": "professions_masterwork",
+    "shelf": "professions",
+    "name": "Masterwork Gallery",
+    "relics": [
+      {
+        "kind": "mark",
+        "name": "First Masterwork"
+      },
+      {
+        "kind": "mark",
+        "name": "Weaponcrafting Masterwork"
+      },
+      {
+        "kind": "mark",
+        "name": "Armorcrafting Masterwork"
+      },
+      {
+        "kind": "mark",
+        "name": "Tailoring Masterwork"
+      },
+      {
+        "kind": "mark",
+        "name": "Leatherworking Masterwork"
+      },
+      {
+        "kind": "mark",
+        "name": "Engineering Masterwork"
+      }
+    ]
+  },
+  {
+    "id": "professions_field_notes",
+    "shelf": "professions",
+    "name": "Rare Field Notes",
+    "relics": [
+      {
+        "kind": "mark",
+        "name": "Pristine Vein"
+      },
+      {
+        "kind": "mark",
+        "name": "Ancient Heartwood"
+      },
+      {
+        "kind": "mark",
+        "name": "Moonlit Bloom"
+      },
+      {
+        "kind": "mark",
+        "name": "Perfect Specimen"
+      }
+    ]
+  },
+  {
+    "id": "professions_specimens",
+    "shelf": "professions",
+    "name": "Key Specimens",
+    "relics": [
+      {
+        "kind": "item",
+        "name": "Pristine Hide"
+      },
+      {
+        "kind": "item",
+        "name": "Pristine Silk"
+      },
+      {
+        "kind": "item",
+        "name": "Pristine Venom Gland"
+      },
+      {
+        "kind": "item",
+        "name": "Prime Cut"
+      },
+      {
+        "kind": "item",
+        "name": "Pristine Claw"
+      },
+      {
+        "kind": "item",
+        "name": "Fine Osmium Ore"
+      },
+      {
+        "kind": "item",
+        "name": "Fine Highpine Log"
+      },
+      {
+        "kind": "item",
+        "name": "Fine Sunpetal Herb"
+      },
+      {
+        "kind": "item",
+        "name": "Sunglint Koi"
+      },
+      {
+        "kind": "item",
+        "name": "Stormreel Fishing Rod"
+      },
+      {
+        "kind": "item",
+        "name": "Tidewrought Fishing Rod"
+      }
+    ]
+  },
+  {
+    "id": "horizons_mounts",
+    "shelf": "horizons",
+    "name": "Mounts",
+    "relics": [
+      {
+        "kind": "mount",
+        "name": "Valorsteed"
+      },
+      {
+        "kind": "mount",
+        "name": "Sky-Reach Stormfeather"
+      },
+      {
+        "kind": "mount",
+        "name": "Kama-Kage the Shadow-Jump Toad"
+      },
+      {
+        "kind": "mount",
+        "name": "Goliath Grag-Bear"
+      },
+      {
+        "kind": "mount",
+        "name": "Moss-Shell Stalk-Glider"
+      },
+      {
+        "kind": "mount",
+        "name": "Aether-Jouster Hover-Cycle"
+      },
+      {
+        "kind": "mount",
+        "name": "Thunderstrut the Grand Gobbler"
+      },
+      {
+        "kind": "mount",
+        "name": "Drakemaw Raptor"
+      },
+      {
+        "kind": "mount",
+        "name": "Dreadspark Groundshaker"
+      }
+    ]
+  },
+  {
+    "id": "horizons_weapon_skins",
+    "shelf": "horizons",
+    "name": "Weapon Skins",
+    "relics": [
+      {
+        "kind": "weapon_skin",
+        "name": "Guildmark Arming Sword"
+      },
+      {
+        "kind": "weapon_skin",
+        "name": "Brasscap Hatchet"
+      },
+      {
+        "kind": "weapon_skin",
+        "name": "Tempered Flanged Mace"
+      },
+      {
+        "kind": "weapon_skin",
+        "name": "Guildmark Dirk"
+      },
+      {
+        "kind": "weapon_skin",
+        "name": "Brasscrown Walking Staff"
+      },
+      {
+        "kind": "weapon_skin",
+        "name": "Lacquered Rod"
+      },
+      {
+        "kind": "weapon_skin",
+        "name": "Fletcher's Guild Bow"
+      },
+      {
+        "kind": "weapon_skin",
+        "name": "Cinderbrand"
+      },
+      {
+        "kind": "weapon_skin",
+        "name": "Emberbite"
+      },
+      {
+        "kind": "weapon_skin",
+        "name": "Smoulderfall"
+      },
+      {
+        "kind": "weapon_skin",
+        "name": "Ashspark Shiv"
+      },
+      {
+        "kind": "weapon_skin",
+        "name": "Forgeheart Stave"
+      },
+      {
+        "kind": "weapon_skin",
+        "name": "Emberwrought Wand"
+      },
+      {
+        "kind": "weapon_skin",
+        "name": "Cinderlatch"
+      },
+      {
+        "kind": "weapon_skin",
+        "name": "Ice Fang"
+      },
+      {
+        "kind": "weapon_skin",
+        "name": "Glaciersplit"
+      },
+      {
+        "kind": "weapon_skin",
+        "name": "Rimecrusher"
+      },
+      {
+        "kind": "weapon_skin",
+        "name": "Rime Needle"
+      },
+      {
+        "kind": "weapon_skin",
+        "name": "Hoarfrost Vigil"
+      },
+      {
+        "kind": "weapon_skin",
+        "name": "Shard of Everwinter"
+      },
+      {
+        "kind": "weapon_skin",
+        "name": "Wintergnaw"
+      },
+      {
+        "kind": "weapon_skin",
+        "name": "Solheim, Last Light of the Dawn"
+      },
+      {
+        "kind": "weapon_skin",
+        "name": "Skyrender, the Firmament's Wound"
+      },
+      {
+        "kind": "weapon_skin",
+        "name": "Starfall, Judgment of the Heavens"
+      },
+      {
+        "kind": "weapon_skin",
+        "name": "Astravyr, Fang of the Fallen Star"
+      },
+      {
+        "kind": "weapon_skin",
+        "name": "Cosmarch, Spire of the Endless Void"
+      },
+      {
+        "kind": "weapon_skin",
+        "name": "Emberwish, Mote of the Dying Sun"
+      },
+      {
+        "kind": "weapon_skin",
+        "name": "Encore, the Second Falling Star"
+      },
+      {
+        "kind": "weapon_skin",
+        "name": "Meteorlatch, the Sky's Last Judgment"
+      }
+    ]
+  },
+  {
+    "id": "horizons_titles",
+    "shelf": "horizons",
+    "name": "Titles",
+    "relics": [
+      {
+        "kind": "title",
+        "name": "Veteran"
+      },
+      {
+        "kind": "title",
+        "name": "Champion"
+      },
+      {
+        "kind": "title",
+        "name": "Paragon"
+      },
+      {
+        "kind": "title",
+        "name": "Mythic"
+      },
+      {
+        "kind": "title",
+        "name": "Eternal"
+      },
+      {
+        "kind": "title",
+        "name": "Wyrmfeller"
+      },
+      {
+        "kind": "title",
+        "name": "the Deathless"
+      },
+      {
+        "kind": "title",
+        "name": "Peakbreaker"
+      },
+      {
+        "kind": "title",
+        "name": "Bellstiller"
+      },
+      {
+        "kind": "title",
+        "name": "of the Vale"
+      },
+      {
+        "kind": "title",
+        "name": "of the Mirefen"
+      },
+      {
+        "kind": "title",
+        "name": "of Thornpeak"
+      },
+      {
+        "kind": "title",
+        "name": "the Curator"
+      },
+      {
+        "kind": "title",
+        "name": "the Resplendent"
+      },
+      {
+        "kind": "title",
+        "name": "Gladiator"
+      },
+      {
+        "kind": "title",
+        "name": "Boarball Legend"
+      },
+      {
+        "kind": "title",
+        "name": "Magnate"
+      },
+      {
+        "kind": "title",
+        "name": "the Wayfarer"
+      },
+      {
+        "kind": "title",
+        "name": "Craftsworn"
+      },
+      {
+        "kind": "title",
+        "name": "Masterwright"
+      },
+      {
+        "kind": "title",
+        "name": "Master Angler"
+      },
+      {
+        "kind": "title",
+        "name": "Grandmaster Engineering"
+      },
+      {
+        "kind": "title",
+        "name": "Grandmaster Alchemy"
+      },
+      {
+        "kind": "title",
+        "name": "Grandmaster Cooking"
+      },
+      {
+        "kind": "title",
+        "name": "Grandmaster Leatherworking"
+      },
+      {
+        "kind": "title",
+        "name": "Grandmaster Tailoring"
+      },
+      {
+        "kind": "title",
+        "name": "Grandmaster Enchanting"
+      },
+      {
+        "kind": "title",
+        "name": "Grandmaster Weaponcrafting"
+      },
+      {
+        "kind": "title",
+        "name": "Grandmaster Armorcrafting"
+      },
+      {
+        "kind": "title",
+        "name": "Flagbearer"
+      },
+      {
+        "kind": "title",
+        "name": "Spoilskeeper"
+      },
+      {
+        "kind": "title",
+        "name": "the Cataloguer"
+      },
+      {
+        "kind": "title",
+        "name": "Arch-Curator"
+      },
+      {
+        "kind": "title",
+        "name": "Linebreaker"
+      },
+      {
+        "kind": "title",
+        "name": "Fieldreaver"
+      },
+      {
+        "kind": "title",
+        "name": "Warcrowned"
+      },
+      {
+        "kind": "title",
+        "name": "Vaultbreaker"
+      },
+      {
+        "kind": "title",
+        "name": "Light of Nythraxis"
+      },
+      {
+        "kind": "title",
+        "name": "Light of Thunzharr"
+      },
+      {
+        "kind": "title",
+        "name": "Light of the Sanctum"
+      }
+    ]
+  },
+  {
+    "id": "conquerors_the_rift",
+    "shelf": "conquerors",
+    "name": "The Rift",
+    "relics": [
+      {
+        "kind": "item",
+        "name": "Hoarfrost Edge"
+      },
+      {
+        "kind": "item",
+        "name": "Emberforge Gauntlets"
+      },
+      {
+        "kind": "item",
+        "name": "Broodmother Carapace"
+      },
+      {
+        "kind": "item",
+        "name": "Bonelord Mantle"
+      },
+      {
+        "kind": "item",
+        "name": "Graskbreaker Girdle"
+      },
+      {
+        "kind": "item",
+        "name": "Voidscar Handwraps"
+      },
+      {
+        "kind": "item",
+        "name": "Stormscale Treads"
+      },
+      {
+        "kind": "item",
+        "name": "Abyssal Loop"
+      },
+      {
+        "kind": "item",
+        "name": "Pactbound Vestments"
+      },
+      {
+        "kind": "item",
+        "name": "Pit Lord's Cleaver"
+      },
+      {
+        "kind": "item",
+        "name": "Emberforged Bulwark"
+      },
+      {
+        "kind": "item",
+        "name": "Stormsunder Hood"
+      },
+      {
+        "kind": "item",
+        "name": "Voidweave Mantle"
+      },
+      {
+        "kind": "item",
+        "name": "Abysswrought Band"
+      },
+      {
+        "kind": "item",
+        "name": "Rimefang"
+      },
+      {
+        "kind": "item",
+        "name": "Heart of the Rift"
+      },
+      {
+        "kind": "item",
+        "name": "Voidsong, Dirk of the Sundered Veil"
+      }
+    ]
+  },
+  {
+    "id": "conquerors_rares_of_the_realm",
+    "shelf": "conquerors",
+    "name": "Rares of the Realm",
+    "relics": [
+      {
+        "kind": "mark",
+        "name": "Slain: Old Greyjaw"
+      },
+      {
+        "kind": "mark",
+        "name": "Slain: Mogger"
+      },
+      {
+        "kind": "mark",
+        "name": "Slain: Grix the Tunnelking"
+      },
+      {
+        "kind": "mark",
+        "name": "Slain: Captain Verlan"
+      },
+      {
+        "kind": "mark",
+        "name": "Slain: Wraithbinder Maldrec"
+      },
+      {
+        "kind": "mark",
+        "name": "Slain: Mirejaw the Ravenous"
+      },
+      {
+        "kind": "mark",
+        "name": "Slain: Sloomtooth the Drowned"
+      },
+      {
+        "kind": "mark",
+        "name": "Slain: Sister Nhalia"
+      },
+      {
+        "kind": "mark",
+        "name": "Slain: Grubjaw the Glutton"
+      },
+      {
+        "kind": "mark",
+        "name": "Slain: Ironvein Foreman"
+      },
+      {
+        "kind": "mark",
+        "name": "Slain: Brutok Skullsmasher"
+      },
+      {
+        "kind": "mark",
+        "name": "Slain: Voskar the Emberwing"
+      },
+      {
+        "kind": "mark",
+        "name": "Slain: Marrowlord Varkas"
+      },
+      {
+        "kind": "mark",
+        "name": "Slain: Old Cragmaw"
+      },
+      {
+        "kind": "mark",
+        "name": "Slain: Shardlord Kazzix"
+      },
+      {
+        "kind": "mark",
+        "name": "Slain: The Gleamstag"
+      },
+      {
+        "kind": "mark",
+        "name": "Slain: Old Marrowshell"
+      },
+      {
+        "kind": "mark",
+        "name": "Slain: Aurelhorn, First of the Herd"
+      },
+      {
+        "kind": "mark",
+        "name": "Slain: Drakemaw Broodlord"
+      }
+    ]
+  },
+  {
+    "id": "conquerors_spoils_of_the_realm",
+    "shelf": "conquerors",
+    "name": "Spoils of the Realm",
+    "relics": [
+      {
+        "kind": "item",
+        "name": "Mogger's Shiv"
+      },
+      {
+        "kind": "item",
+        "name": "Gravestalker Jerkin"
+      },
+      {
+        "kind": "item",
+        "name": "Mogger's Copper Cudgel"
+      },
+      {
+        "kind": "item",
+        "name": "Hollowbone Hauberk"
+      },
+      {
+        "kind": "item",
+        "name": "Verlan's Oathblade"
+      },
+      {
+        "kind": "item",
+        "name": "Staff of the Hollow Vigil"
+      },
+      {
+        "kind": "item",
+        "name": "Gravewarden's Shiv"
+      },
+      {
+        "kind": "item",
+        "name": "Maldrec's Soulbinder"
+      },
+      {
+        "kind": "item",
+        "name": "Gravewoven Raiment"
+      },
+      {
+        "kind": "item",
+        "name": "Fen Reaver Glaive"
+      },
+      {
+        "kind": "item",
+        "name": "Mirejaw Oracle Staff"
+      },
+      {
+        "kind": "item",
+        "name": "Tidereaver Gaff"
+      },
+      {
+        "kind": "item",
+        "name": "Sloomtooth's Tidefang"
+      },
+      {
+        "kind": "item",
+        "name": "Drowned Tide Scepter"
+      },
+      {
+        "kind": "item",
+        "name": "Nhalia's Dirgeblade"
+      },
+      {
+        "kind": "item",
+        "name": "Gutripper Shiv"
+      },
+      {
+        "kind": "item",
+        "name": "Barrowlord Sabatons"
+      },
+      {
+        "kind": "item",
+        "name": "Brutok's Maul"
+      },
+      {
+        "kind": "item",
+        "name": "Crag Warden Cudgel"
+      },
+      {
+        "kind": "item",
+        "name": "Skullsplitter Dirk"
+      },
+      {
+        "kind": "item",
+        "name": "Stormroot Cowl"
+      },
+      {
+        "kind": "item",
+        "name": "Emberwing Legguards"
+      },
+      {
+        "kind": "item",
+        "name": "Emberfang Warblade"
+      },
+      {
+        "kind": "item",
+        "name": "Stormvotive Hauberk"
+      },
+      {
+        "kind": "item",
+        "name": "Mournweave Legwraps"
+      },
+      {
+        "kind": "item",
+        "name": "Cragmaw's Huntcord"
+      },
+      {
+        "kind": "item",
+        "name": "Cragmaw Prowlboots"
+      },
+      {
+        "kind": "item",
+        "name": "Cragthorn Greatstaff"
+      },
+      {
+        "kind": "item",
+        "name": "Boneglass Shiv"
+      },
+      {
+        "kind": "item",
+        "name": "Cragmaw Huntquiver"
+      },
+      {
+        "kind": "item",
+        "name": "Shardfang Grips"
+      },
+      {
+        "kind": "item",
+        "name": "Gleamstag Charm"
+      }
+    ]
+  },
+  {
+    "id": "conquerors_warfare_gallery",
+    "shelf": "conquerors",
+    "name": "Warfare Gallery",
+    "relics": [
+      {
+        "kind": "item",
+        "name": "Furyforged Warhelm"
+      },
+      {
+        "kind": "item",
+        "name": "Furyforged Warspaulders"
+      },
+      {
+        "kind": "item",
+        "name": "Furyforged Warplate"
+      },
+      {
+        "kind": "item",
+        "name": "Furyforged Girdle"
+      },
+      {
+        "kind": "item",
+        "name": "Furyforged Legguards"
+      },
+      {
+        "kind": "item",
+        "name": "Furyforged Gauntlets"
+      },
+      {
+        "kind": "item",
+        "name": "Furyforged Sabatons"
+      },
+      {
+        "kind": "item",
+        "name": "Stormbound Crown"
+      },
+      {
+        "kind": "item",
+        "name": "Stormbound Spaulders"
+      },
+      {
+        "kind": "item",
+        "name": "Stormbound Hauberk"
+      },
+      {
+        "kind": "item",
+        "name": "Stormbound Waistguard"
+      },
+      {
+        "kind": "item",
+        "name": "Stormbound Legmail"
+      },
+      {
+        "kind": "item",
+        "name": "Stormbound Handguards"
+      },
+      {
+        "kind": "item",
+        "name": "Stormbound Greaves"
+      },
+      {
+        "kind": "item",
+        "name": "Ashstalker Cowl"
+      },
+      {
+        "kind": "item",
+        "name": "Ashstalker Shoulderguards"
+      },
+      {
+        "kind": "item",
+        "name": "Ashstalker Harness"
+      },
+      {
+        "kind": "item",
+        "name": "Ashstalker Waistband"
+      },
+      {
+        "kind": "item",
+        "name": "Ashstalker Legguards"
+      },
+      {
+        "kind": "item",
+        "name": "Ashstalker Grips"
+      },
+      {
+        "kind": "item",
+        "name": "Ashstalker Treads"
+      },
+      {
+        "kind": "item",
+        "name": "Cinderweave Cowl"
+      },
+      {
+        "kind": "item",
+        "name": "Cinderweave Mantle"
+      },
+      {
+        "kind": "item",
+        "name": "Cinderweave Raiment"
+      },
+      {
+        "kind": "item",
+        "name": "Cinderweave Cord"
+      },
+      {
+        "kind": "item",
+        "name": "Cinderweave Legwraps"
+      },
+      {
+        "kind": "item",
+        "name": "Cinderweave Handwraps"
+      },
+      {
+        "kind": "item",
+        "name": "Cinderweave Slippers"
+      },
+      {
+        "kind": "item",
+        "name": "Thornhide Headdress"
+      },
+      {
+        "kind": "item",
+        "name": "Thornhide Mantle"
+      },
+      {
+        "kind": "item",
+        "name": "Thornhide Vestment"
+      },
+      {
+        "kind": "item",
+        "name": "Thornhide Cinch"
+      },
+      {
+        "kind": "item",
+        "name": "Thornhide Leggings"
+      },
+      {
+        "kind": "item",
+        "name": "Thornhide Gloves"
+      },
+      {
+        "kind": "item",
+        "name": "Thornhide Boots"
+      }
+    ]
+  },
+  {
+    "id": "conquerors_warfare_armory",
+    "shelf": "conquerors",
+    "name": "Warfare Armory",
+    "relics": [
+      {
+        "kind": "item",
+        "name": "Medallion of the Final Oath"
+      },
+      {
+        "kind": "item",
+        "name": "Razorwind Torque"
+      },
+      {
+        "kind": "item",
+        "name": "Cinder-Sigil Pendant"
+      },
+      {
+        "kind": "item",
+        "name": "Iron Vow Band"
+      },
+      {
+        "kind": "item",
+        "name": "The Unbroken Circle"
+      },
+      {
+        "kind": "item",
+        "name": "Fleetblood Band"
+      },
+      {
+        "kind": "item",
+        "name": "Last-Step Signet"
+      },
+      {
+        "kind": "item",
+        "name": "Ashen Focus Ring"
+      },
+      {
+        "kind": "item",
+        "name": "Spellbreaker's Seal"
+      },
+      {
+        "kind": "item",
+        "name": "Final Argument Greatblade"
+      },
+      {
+        "kind": "item",
+        "name": "First-Blood Razor"
+      },
+      {
+        "kind": "item",
+        "name": "Emberglass Warstaff"
+      }
+    ]
+  },
+  {
+    "id": "horizons_vault_of_ages",
+    "shelf": "horizons",
+    "name": "Vault of Ages",
+    "excludeFromCompletion": "retired",
+    "relics": [
+      {
+        "kind": "item",
+        "name": "Deathless Warguard Legmail"
+      },
+      {
+        "kind": "item",
+        "name": "Scourgehide Carapace"
+      },
+      {
+        "kind": "item",
+        "name": "Soulforged Warplate"
+      },
+      {
+        "kind": "item",
+        "name": "Soulrend Diadem"
+      }
+    ]
+  },
+  {
+    "id": "horizons_riftbound",
+    "shelf": "horizons",
+    "name": "Riftbound",
+    "excludeFromCompletion": "personal",
+    "relics": [
+      {
+        "kind": "item",
+        "name": "Riftbound Band of Might"
+      },
+      {
+        "kind": "item",
+        "name": "Riftbound Band of Insight"
+      },
+      {
+        "kind": "item",
+        "name": "Riftbound Band of Guile"
+      }
+    ]
   }
 ];
 

@@ -496,7 +496,7 @@ describe('buildOverworldMapModel (pure draw model)', () => {
     // CLASSIFIER over each world's data shape; true world-to-world parity
     // of the inputs rests on the online cadence/attunement suites pinning
     // the qdone and cprof mirrors.
-    const workOrder = QUESTS['q_prof_workorder_forge'];
+    const workOrder = QUESTS.q_prof_workorder_forge;
     expect(workOrder.repeatable).toBe(true);
     for (const shape of ['sim', 'client'] as const) {
       const world = makeOverworldWorld(shape) as unknown as {

@@ -5,6 +5,11 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import {
+  type DriftManifest,
+  describeManifestDrift,
+  formatManifestDrift,
+} from '../scripts/lib/mob_portrait_manifest_diff.mjs';
+import {
   assertManifestWriteAuthorized,
   changedPortraitIds,
 } from '../scripts/lib/mob_portrait_manifest_guard.mjs';
@@ -222,6 +227,37 @@ describe('mob portrait source manifest', () => {
     );
   });
 
+  // The acceptance is a bundle digest, and esbuild labels bundled modules with paths
+  // relative to absWorkingDir (process.cwd() unless pinned). Before both build sites pinned
+  // it to the repo root, running --check from a subdirectory recomputed a DIFFERENT digest
+  // and reported a false staleness, and a --write from one minted a digest no other run
+  // could reproduce.
+  it('derives the renderer fingerprint independently of the launch directory', () => {
+    const probe = `
+      import { buildPortraitRendererContract, portraitRendererFingerprint } from ${JSON.stringify(
+        join(repoRoot, 'scripts/lib/mob_portrait_jobs.mjs'),
+      )};
+      const contract = await buildPortraitRendererContract(${JSON.stringify(repoRoot)});
+      process.stdout.write(portraitRendererFingerprint(contract));
+    `;
+    const run = (cwd: string) =>
+      spawnSync(process.execPath, ['--input-type=module', '-e', probe], {
+        cwd,
+        encoding: 'utf8',
+        timeout: 120_000,
+      });
+
+    const fromRepoRoot = run(repoRoot);
+    const fromSubdirectory = run(join(repoRoot, 'src'));
+    expect(fromRepoRoot.status, fromRepoRoot.stderr).toBe(0);
+    expect(fromSubdirectory.status, fromSubdirectory.stderr).toBe(0);
+    expect(fromRepoRoot.stdout).toMatch(digestPattern);
+    expect(fromSubdirectory.stdout).toBe(fromRepoRoot.stdout);
+    // Tie it to the shipped acceptance, so this cannot pass by both runs being equally wrong.
+    const manifest = JSON.parse(readFileSync(manifestPath, 'utf8')) as PortraitSourceManifest;
+    expect(fromRepoRoot.stdout).toBe(manifest.rendererFingerprint);
+  }, 150_000);
+
   it('routes the real --write CLI through receipt authorization before touching its target', () => {
     const tempDir = mkdtempSync(join(tmpdir(), 'wocc-portrait-manifest-'));
     try {
@@ -273,5 +309,110 @@ describe('mob portrait source manifest', () => {
     } finally {
       rmSync(tempDir, { recursive: true, force: true });
     }
+  });
+});
+
+// A stale acceptance used to report only two hashes, which reads the same whether the
+// portraits regressed or an unrelated source edit moved the bundle. These pin the
+// classification that tells those apart, per dimension.
+describe('portrait manifest drift explanation', () => {
+  const baseline = (): DriftManifest => ({
+    schemaVersion: 2,
+    bootstrapReview: { path: 'review.md', bytes: 10, sha256: 'review-a' },
+    rendererFingerprint: 'fingerprint-a',
+    renderer: {
+      trackedFiles: [
+        { path: 'scripts/render_finder_portraits.mjs', bytes: 5, sha256: 'tracked-a' },
+      ],
+      browserBundle: {
+        entry: 'scripts/wiki/stills_render_entry.js',
+        bytes: 100,
+        sha256: 'bundle-a',
+      },
+    },
+    portraitCount: 2,
+    portraits: [
+      {
+        id: 'alpha',
+        sourceFingerprint: 'source-alpha',
+        output: { bytes: 10, sha256: 'out-alpha' },
+      },
+      { id: 'beta', sourceFingerprint: 'source-beta', output: { bytes: 20, sha256: 'out-beta' } },
+    ],
+  });
+
+  const withMovedBundle = (): DriftManifest => {
+    const next = baseline();
+    next.rendererFingerprint = 'fingerprint-b';
+    next.renderer.browserBundle = {
+      entry: 'scripts/wiki/stills_render_entry.js',
+      bytes: 101,
+      sha256: 'bundle-b',
+    };
+    return next;
+  };
+
+  const BOOKKEEPING_LINE = 'No portrait row and no shipped image byte changed';
+
+  it('calls a bundle-only drift bookkeeping, with no row and no tracked-file change', () => {
+    const drift = describeManifestDrift(baseline(), withMovedBundle());
+    expect(drift.bookkeepingOnly).toBe(true);
+    expect(drift.bundleChanged).toBe(true);
+    expect(drift.fingerprintChanged).toBe(true);
+    expect(drift.changedRows).toEqual([]);
+    expect(drift.changedTrackedFiles).toEqual([]);
+    expect(formatManifestDrift(drift)).toContain(BOOKKEEPING_LINE);
+  });
+
+  it('withholds the bookkeeping verdict when a shipped portrait output moved', () => {
+    const next = withMovedBundle();
+    next.portraits[1].output = { bytes: 21, sha256: 'out-beta-2' };
+    const drift = describeManifestDrift(baseline(), next);
+    expect(drift.bookkeepingOnly).toBe(false);
+    expect(drift.changedRows).toEqual([{ id: 'beta', sourceChanged: false, outputChanged: true }]);
+    const text = formatManifestDrift(drift);
+    expect(text).toContain('beta');
+    expect(text).not.toContain(BOOKKEEPING_LINE);
+  });
+
+  it('withholds the bookkeeping verdict when a portrait source fingerprint moved', () => {
+    const next = withMovedBundle();
+    next.portraits[0].sourceFingerprint = 'source-alpha-2';
+    const drift = describeManifestDrift(baseline(), next);
+    expect(drift.bookkeepingOnly).toBe(false);
+    expect(drift.changedRows).toEqual([{ id: 'alpha', sourceChanged: true, outputChanged: false }]);
+    expect(formatManifestDrift(drift)).not.toContain(BOOKKEEPING_LINE);
+  });
+
+  it('withholds the bookkeeping verdict when a tracked renderer file moved', () => {
+    const next = withMovedBundle();
+    next.renderer.trackedFiles = [
+      { path: 'scripts/render_finder_portraits.mjs', bytes: 6, sha256: 'tracked-b' },
+    ];
+    const drift = describeManifestDrift(baseline(), next);
+    expect(drift.bookkeepingOnly).toBe(false);
+    expect(drift.changedTrackedFiles).toEqual(['scripts/render_finder_portraits.mjs']);
+    const text = formatManifestDrift(drift);
+    expect(text).toContain('scripts/render_finder_portraits.mjs');
+    expect(text).not.toContain(BOOKKEEPING_LINE);
+  });
+
+  it('withholds the bookkeeping verdict on a schema or portrait-count move', () => {
+    const migrated = withMovedBundle();
+    migrated.schemaVersion = 3;
+    expect(describeManifestDrift(baseline(), migrated).bookkeepingOnly).toBe(false);
+    expect(describeManifestDrift(baseline(), migrated).schemaChanged).toBe(true);
+
+    const grown = withMovedBundle();
+    grown.portraitCount = 3;
+    grown.portraits.push({
+      id: 'gamma',
+      sourceFingerprint: 'source-gamma',
+      output: { bytes: 30, sha256: 'out-gamma' },
+    });
+    const drift = describeManifestDrift(baseline(), grown);
+    expect(drift.bookkeepingOnly).toBe(false);
+    expect(drift.portraitCountChanged).toBe(true);
+    expect(drift.changedRows).toEqual([{ id: 'gamma', sourceChanged: true, outputChanged: true }]);
   });
 });

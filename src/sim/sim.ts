@@ -525,6 +525,21 @@ import {
   WARFARE_QUARTERMASTER_NPC_ID,
 } from './pvp/warfare_quartermaster';
 import { sanitizeCreditedObjects } from './quests/interact_object_credit';
+import {
+  catalogRankOwned,
+  catalogRelicCompletion,
+  clearCountForSource,
+  curatorRankFromOwned,
+  freshReliquaryState,
+  noteRelicObtain,
+  pageCompletion,
+  RELIQUARY_PAGES_BY_ID,
+  type ReliquaryState,
+  reliquaryOwnershipOpts,
+  restoreReliquaryState,
+  type SavedReliquaryState,
+  serializeReliquaryState,
+} from './reliquary';
 import { sanitizeRemovedZone1Content } from './removed_zone1_content';
 import { rideSteepnessAt, shoreStepOut, stepWaterLevel } from './ride_height';
 import { Rng } from './rng';
@@ -832,6 +847,12 @@ export { FALL_SAFE_DISTANCE } from './player_motion';
 // browser, headless RL env, tests), a kill locks for a flat 24h day. The authoritative
 // server overrides this with its realm-local 3 AM daily reset via SimConfig.raidResetMs.
 const DEFAULT_RAID_LOCKOUT_MS = 24 * 60 * 60 * 1000;
+
+/** The one opts object a movement grant hands the discovery ledger, shared so
+ *  the hot grant path never allocates per call (deeds.ts RETRO_SEED is the
+ *  same idiom for the join-time seed). Discovery itself is unaffected by the
+ *  flag; it only reaches the Reliquary's first-find provenance stamp. */
+const MOVEMENT_GRANT = { movement: true } as const;
 // OBJECT_RESPAWN moved to types.ts (shared with the extracted Nythraxis crypt-relic
 // respawn). The NYTHRAXIS_* encounter consts (relic summons, Aldric id, wardstone /
 // gravebreaker / soul-rend / deathless / transition tuning, room radius, lockout ms,
@@ -1643,14 +1664,20 @@ export interface PlayerMeta {
   // utcDay it was earned ('' when the host set no calendar). `deedStats` is
   // the persisted lifetime surface behind the counter/collection/visit
   // triggers (the session RewardCounters stay the RL reward channel).
-  // `activeTitle` is the selected cosmetic title (a deed id; the setter
-  // command is a later slice, only persist/load lives here). `renown` is the
-  // incrementally maintained sum of earned deeds' renown, recomputed from the
-  // earned set on every load (the saved number exists for a SQL sort index).
+  // `activeTitle` is the selected cosmetic title and `activeBorder` the
+  // selected nameplate border, each a DEED ID (never display text, never the
+  // reward slug). `renown` is the incrementally maintained sum of earned
+  // deeds' renown, recomputed from the earned set on every load (the saved
+  // number exists for a SQL sort index).
   deedsEarned: Map<string, string>;
   deedStats: DeedStats;
   activeTitle: string | null;
+  activeBorder: string | null;
   renown: number;
+  // The Reliquary (src/sim/reliquary.ts): sparse first-find meta, authored
+  // marks, capped recent. Item ownership stays on deedStats.itemsDiscovered;
+  // this field is omit-empty on serialize and never a second full discovery set.
+  reliquary: ReliquaryState;
 }
 
 // Away-from-keyboard / do-not-disturb presence. `afk` still delivers whispers
@@ -1911,7 +1938,11 @@ export interface CharacterState {
   deeds?: Record<string, string>;
   deedStats?: SavedDeedStats;
   activeTitle?: string | null;
+  activeBorder?: string | null;
   renown?: number;
+  // The Reliquary (JSONB; optional, written only when non-empty so pre-system
+  // saves load cleanly and stay byte-equal until the system engages).
+  reliquary?: SavedReliquaryState;
 }
 
 export interface PetState {
@@ -3039,7 +3070,9 @@ export class Sim {
       deedsEarned: new Map(),
       deedStats: freshDeedStats(),
       activeTitle: null,
+      activeBorder: null,
       renown: 0,
+      reliquary: freshReliquaryState(),
     };
     // A fresh character sets out provisioned (class-defined starter rations);
     // a saved character loads its own bags from savedState below.
@@ -3480,6 +3513,7 @@ export class Sim {
         if (typeof day === 'string') meta.deedsEarned.set(deedId, day);
       }
       meta.deedStats = restoreDeedStats(s.deedStats);
+      meta.reliquary = restoreReliquaryState(s.reliquary);
       deedsMod.unionLegacyMilestones(meta);
       deedsMod.recomputeRenown(meta);
       // The saved title re-applies through the same validator the setter
@@ -3490,6 +3524,16 @@ export class Sim {
         meta,
         player,
         typeof s.activeTitle === 'string' ? s.activeTitle : null,
+      );
+      // The saved border re-applies through its own validator for the same
+      // reasons (stale id from a content change loads as no border rather
+      // than a dangling entity-wire reference). Stamps the entity `border`
+      // field alongside; a save written before borders existed has no key and
+      // lands null.
+      deedsMod.setActiveBorder(
+        meta,
+        player,
+        typeof s.activeBorder === 'string' ? s.activeBorder : null,
       );
       // Resume with the weapon sheathed exactly as saved (absent = drawn).
       if (s.weaponStowed) player.weaponStowed = true;
@@ -4296,7 +4340,14 @@ export class Sim {
         return deedStats ? { deedStats } : {};
       })(),
       ...(meta.activeTitle !== null ? { activeTitle: meta.activeTitle } : {}),
+      ...(meta.activeBorder !== null ? { activeBorder: meta.activeBorder } : {}),
       ...(meta.renown > 0 ? { renown: meta.renown } : {}),
+      // Reliquary: absent while empty (zero-default omission), same contract as
+      // deedStats so pre-system saves stay byte-equal until a catalogued find.
+      ...(() => {
+        const reliquary = serializeReliquaryState(meta.reliquary);
+        return reliquary ? { reliquary } : {};
+      })(),
     };
     return sanitizeRemovedZone1Content(state).state;
   }
@@ -4661,7 +4712,9 @@ export class Sim {
         this.setPlayerSkin(meta.entityId, 0, 'class');
       }
     }
-    this.addItem(itemId, 1, r.meta.entityId);
+    // movement: unequipping a mech chroma re-grants the very item equipping it
+    // consumed, so this relocates a copy the account already owns.
+    this.addItem(itemId, 1, r.meta.entityId, MOVEMENT_GRANT);
     return true;
   }
 
@@ -4848,8 +4901,8 @@ export class Sim {
   get questsDone(): Set<string> {
     return this.primary.questsDone;
   }
-  // --- IWorldDeeds: the Book of Deeds read surface + title selection. The
-  // reads expose the live per-player state (the questLog precedent above);
+  // --- IWorldDeeds: the Book of Deeds read surface + title/border selection.
+  // The reads expose the live per-player state (the questLog precedent above);
   // the facet types them Readonly so no seam consumer mutates them. ---
   get deedsEarned(): ReadonlyMap<string, string> {
     return this.primary.deedsEarned;
@@ -4866,6 +4919,61 @@ export class Sim {
   setActiveTitle(deedId: string | null, pid?: number): void {
     const r = this.resolve(pid);
     if (r) deedsMod.setActiveTitle(r.meta, r.e, deedId);
+  }
+  get activeBorder(): string | null {
+    return this.primary.activeBorder;
+  }
+  setActiveBorder(deedId: string | null, pid?: number): void {
+    const r = this.resolve(pid);
+    if (r) deedsMod.setActiveBorder(r.meta, r.e, deedId);
+  }
+  // --- IWorldReliquary: sparse firstFind / marks / recent + pure completion.
+  // Thin reads over primary.reliquary; item ownership still rides deedStats. ---
+  get reliquaryFirstFind(): Readonly<Record<string, import('./reliquary').ReliquaryFirstFind>> {
+    return this.primary.reliquary.firstFind;
+  }
+  get reliquaryMarks(): ReadonlySet<string> {
+    return this.primary.reliquary.marks;
+  }
+  get reliquaryRecent(): readonly string[] {
+    return this.primary.reliquary.recent;
+  }
+  get reliquaryObtainCounts(): Readonly<Record<string, number>> {
+    return this.primary.reliquary.counts;
+  }
+  /** Full Reliquary ownership surfaces (items, marks, mounts, skins, titles). */
+  private reliquaryOwnershipSurfaces() {
+    return reliquaryOwnershipOpts({
+      itemsDiscovered: this.primary.deedStats.itemsDiscovered,
+      marks: this.primary.reliquary.marks,
+      ownedMounts: this.ownedMounts(),
+      weaponSkinIds: this.accountCosmetics.weaponSkinIds,
+      deedsEarned: this.primary.deedsEarned,
+    });
+  }
+  reliquaryPageCompletion(pageId: string): import('../world_api').ReliquaryPageCompletion | null {
+    const page = RELIQUARY_PAGES_BY_ID[pageId];
+    if (!page) return null;
+    return pageCompletion(page, this.reliquaryOwnershipSurfaces());
+  }
+  reliquaryCatalogCompletion(): import('../world_api').ReliquaryCatalogCompletion {
+    return catalogRelicCompletion(this.reliquaryOwnershipSurfaces());
+  }
+  reliquaryCuratorRank(): number {
+    // Rank excludes account weapon skins so display matches grant path.
+    return curatorRankFromOwned(catalogRankOwned(this.reliquaryOwnershipSurfaces()));
+  }
+  reliquaryPageClearCount(pageId: string): number | undefined {
+    const page = RELIQUARY_PAGES_BY_ID[pageId];
+    if (!page) return undefined;
+    return clearCountForSource(this.primary, page.clearSource);
+  }
+  // Offline the sandbox has no population, so there is no relic rarity to
+  // report: always null (the facet's documented no-data value; the window
+  // omits every rarity line). Deterministic, no fetch, no clock (the
+  // deedsRarity stub doctrine below).
+  reliquaryRarity(): Promise<import('../world_api').ReliquaryRarity | null> {
+    return Promise.resolve(null);
   }
   // Offline the sandbox has no population, so there is no rarity to report:
   // always null (the facet's documented no-data value; the window hides the
@@ -8712,11 +8820,32 @@ export class Sim {
   // add new grant sites here (Phase 4 rare-event jackpot yields, Phase 13's
   // disenchant UI wiring): pass the same opts from those too, or the new
   // grants will double-ding and double-log the way the original ones did.
+  // opts.movement: this grant RELOCATES or re-mints copies the player already
+  // holds, or hands over copies another player held (trade, mail, market, an
+  // enchant re-mint, an unbind stack split, a returned commission order,
+  // vendor buyback, an admin restore, a PBE boost kit). It is not a
+  // world-sourced acquisition, so it must never bump a Reliquary obtain count,
+  // or two players could pass one relic back and forth and both watch the
+  // number climb. Discovery is UNAFFECTED: seeing a relic for the first time
+  // across a trade window still discovers it. The flag also suppresses the
+  // Reliquary's first-find CLEAR-COUNT stamp, which would otherwise claim a
+  // run the player never made (src/sim/reliquary.ts noteRelicItemFind).
+  //
+  // Where the near cases land, stated once so a new grant site does not have
+  // to guess. CRAFTING COUNTS: a craft output is world-sourced, and unlike the
+  // buyback loop it is not free, because the materials are consumed. A
+  // CURRENCY vendor counts too (delve Marks are earned in the world). What
+  // does NOT count is a copy changing hands or being re-minted from itself.
   addItem(
     itemId: string,
     count: number,
     pid?: number,
-    opts?: { silent?: boolean; callerLogs?: boolean; craftedRecipeId?: string },
+    opts?: Readonly<{
+      silent?: boolean;
+      callerLogs?: boolean;
+      craftedRecipeId?: string;
+      movement?: boolean;
+    }>,
   ): void {
     const r = this.resolve(pid);
     if (!r) return;
@@ -8725,7 +8854,22 @@ export class Sim {
     addStacked(meta.inventory, itemId, count, undefined, opts?.craftedRecipeId);
     // Every grant that reaches the hub is an acquisition for the Book of
     // Deeds discovery ledger (loot, craft, quest reward, vendor, mail, trade).
-    deedsMod.markItemDiscovered(this.ctx, meta, itemId);
+    // `movement` rides along but never gates discovery: it only tells the
+    // Reliquary's first-find stamp not to claim a clear the player never ran.
+    deedsMod.markItemDiscovered(
+      this.ctx,
+      meta,
+      itemId,
+      undefined,
+      opts?.movement ? MOVEMENT_GRANT : undefined,
+    );
+    // Reliquary obtain tally, one per COPY granted (not per call like the
+    // discovery ledger above, where an id is simply new or not). Most
+    // catalogued relics are gear and cannot stack, so the two readings usually
+    // coincide; the eight stackable profession specimens on the Professions
+    // shelf are why this passes `count` rather than 1. Pinned in
+    // tests/reliquary_content.test.ts.
+    if (!opts?.movement) noteRelicObtain(meta, itemId, count);
     this.emit({
       type: 'loot',
       // biome-ignore lint/style/useTemplate: keep this scanner-friendly shape for i18n extraction.
@@ -8758,12 +8902,18 @@ export class Sim {
   // per grant, matching addItem's per-call semantics.
   // opts.silent / opts.callerLogs: see addItem's matching params above, same
   // contract.
+  // opts.movement: see addItem's matching param above, same contract.
   addItemInstance(
     itemId: string,
     instance: ItemInstancePayload,
     pid?: number,
     count = 1,
-    opts?: { silent?: boolean; callerLogs?: boolean; craftedRecipeId?: string },
+    opts?: Readonly<{
+      silent?: boolean;
+      callerLogs?: boolean;
+      craftedRecipeId?: string;
+      movement?: boolean;
+    }>,
   ): void {
     const r = this.resolve(pid);
     if (!r) return;
@@ -8793,8 +8943,19 @@ export class Sim {
         });
     }
     // Discovery ledger: the instance's rolled quality (gathered rares) beats
-    // the static def quality for the quality-first marks.
-    deedsMod.markItemDiscovered(this.ctx, meta, itemId, instance.rolled?.quality);
+    // the static def quality for the quality-first marks. `movement` rides
+    // along exactly as in addItem above (provenance only, never membership).
+    deedsMod.markItemDiscovered(
+      this.ctx,
+      meta,
+      itemId,
+      instance.rolled?.quality,
+      opts?.movement ? MOVEMENT_GRANT : undefined,
+    );
+    // Reliquary obtain tally, one per COPY granted: unlike discovery (which is
+    // per call by definition, an id is either new or it is not) a windfall of
+    // three copies really is three acquisitions.
+    if (!opts?.movement) noteRelicObtain(meta, itemId, count);
     this.emit({
       type: 'loot',
       // biome-ignore lint/style/useTemplate: keep this scanner-friendly shape for i18n extraction.

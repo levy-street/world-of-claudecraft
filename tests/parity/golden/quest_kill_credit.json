@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "8a90034f",
+      "state": "fea3aff0",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -72,6 +72,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "talents": {
             "rows": {}
           },
@@ -149,7 +153,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "a90c6bac",
+      "state": "c90eb7e5",
       "events": "65a4cf51",
       "rng": {
         "draws": 0,
@@ -221,6 +225,10 @@
             ]
           ],
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "talents": {
             "rows": {}
           },
@@ -298,7 +306,7 @@
       "tick": 8,
       "time": 0.4,
       "nextId": 972,
-      "state": "8dd888a0",
+      "state": "a8d31d55",
       "events": "0ce93a3d",
       "rng": {
         "draws": 40,
@@ -399,6 +407,10 @@
             ]
           ],
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "renown": 30,
           "talents": {
             "rows": {}
@@ -478,7 +490,7 @@
       "tick": 8,
       "time": 0.4,
       "nextId": 972,
-      "state": "66dcea21",
+      "state": "ccc493a6",
       "events": "d6b1e3df",
       "rng": {
         "draws": 40,
@@ -570,6 +582,10 @@
             "q_wolves"
           ],
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "renown": 30,
           "talents": {
             "rows": {}
@@ -650,7 +666,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 972,
-      "state": "80f73774",
+      "state": "86c4a949",
       "events": "741638a5",
       "rng": {
         "draws": 40,
@@ -742,6 +758,10 @@
             "q_wolves"
           ],
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "renown": 30,
           "talents": {
             "rows": {}

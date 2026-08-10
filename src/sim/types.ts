@@ -4104,6 +4104,11 @@ export interface Entity extends ClientMirroredEntityFields {
   // (src/sim/deeds.ts setActiveTitle) and player spawn from persisted state;
   // rides the identity wire only when non-null.
   title?: string | null;
+  // Book of Deeds nameplate border: a deed id (never a slug, never display
+  // text), null/absent for borderless players and every mob/npc. Written by
+  // the sim border setter (src/sim/deeds.ts setActiveBorder) and player spawn
+  // from persisted state; rides the identity wire only when non-null.
+  border?: string | null;
   pos: Vec3;
   prevPos: Vec3; // for render interpolation
   facing: number; // radians, 0 = +Z
@@ -4805,6 +4810,17 @@ export interface Entity extends ClientMirroredEntityFields {
   devTier?: number;
   devMergedPrs?: number;
   githubLogin?: string;
+  // Curator standing flair (cosmetic, server-set from the character's LIVE
+  // Reliquary ownership; the sim never reads any of it): the Curator rank
+  // (0/undefined = unranked, 1-5 = Apprentice…Eternal Curator) and the
+  // character-scoped completion pair behind it, for the inspect card's
+  // Reliquary line and the rank-5 sigil. Stamped and cleared together
+  // server-side; the wire omits all three for an unranked character, and the
+  // client mirror resolves that to rank 0 with the pair undefined, the same
+  // 0/undefined split as the dev fields above.
+  curatorRank?: number;
+  relicsOwned?: number;
+  relicsTotal?: number;
   // Account flair (cosmetic, operator-set from the admin dashboard; the sim
   // never reads either): the AI-operated mark that prefixes the name with [AI],
   // and an official streamer's platform links for the player menu. `streamerLinks`
@@ -5123,6 +5139,30 @@ export type SimEvent = { pid?: number } & (
   // ID only, never English text; `retro` marks the on-join back-credit pass so
   // the client can batch those into one summary line instead of banner spam.
   | { type: 'deedUnlocked'; deedId: string; retro?: boolean }
+  // Reliquary first fill (always personal: emitted with pid). Id-only: exactly
+  // one of itemId / markId is set for a catalogued relic or authored mark.
+  // pageIds list pages that list the relic; illuminatedPageId is set when a
+  // page became complete on this fill. Never English; presentation only
+  // (sparse self blob is the membership authority).
+  | {
+      type: 'reliquaryUnlock';
+      itemId?: string;
+      markId?: string;
+      pageIds?: string[];
+      illuminatedPageId?: string;
+      /** New cosmetic Curator rank index when this fill crossed a threshold. */
+      curatorRank?: number;
+      /**
+       * Set on the on-join seed pass: the client batches these into one
+       * summary line instead of a toast per relic. The event itself stays
+       * self-scoped (a HEAVY_SELF_EVENTS member), but since Phase 18 the flag
+       * also gates the server's illumination fan-out exactly like
+       * deedUnlocked's: detectActivity broadcasts a first-ever
+       * illuminatedPageId to the earner's guildmates and followers only when
+       * retro is not true (a veteran's on-join seed pass must never marquee).
+       */
+      retro?: boolean;
+    }
   | { type: 'learnAbility'; abilityId: string; rank: number }
   // The hub grant event. Two independent stand-down flags, both set only from
   // Sim.addItem/addItemInstance's opts param (the one place either gets set):
@@ -5259,6 +5299,12 @@ export type SimEvent = { pid?: number } & (
   // switch stays exhaustively typed. Carries ids and the earner's name only,
   // never deed text: the client composes the line from deed_i18n.
   | { type: 'deedBroadcast'; characterName: string; deedId: string }
+  // A guildmate's or followed friend's FIRST-EVER Reliquary page Illumination
+  // (Phase 18). Emitted only by the server's SocialService, declared here
+  // like deedBroadcast so the one client event switch stays exhaustively
+  // typed. Carries the earner's name and the page id only, never page text:
+  // the client composes the line from reliquary_i18n plus its own chrome key.
+  | { type: 'reliquaryIlluminationBroadcast'; characterName: string; pageId: string }
   // say/yell are delivered only to players in range and carry the speaker's
   // entity id so the client can hang a chat bubble over their head; whisper
   // goes to the target (and echoes to the sender with `to` set); general is

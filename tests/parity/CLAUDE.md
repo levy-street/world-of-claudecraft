@@ -32,8 +32,11 @@ Every new `Entity`/`PlayerMeta` field interacts with this harness; decide once, 
 same change. **Gameplay-affecting** (persisted, sim-read): leave it sampled (the
 default) and regenerate goldens via `UPDATE_PARITY=1` in its own reviewed commit
 (precedent: `enchantCastBagSlot`, stored 1-based so its resting value is the
-omitted 0; `craftThrottle` was the old exemplar until the throttle retired and
-it moved to `META_EXCLUDE` as inert). **Session-only / presentation / derived from sampled
+omitted 0; `reliquary.counts`, the Phase 17 per-relic obtain tally, whose
+arrival is the whole reason every golden's `reliquary` block gained an empty
+`counts: {}` and every state digest moved in that change; `craftThrottle` was
+the old exemplar until the throttle retired and it moved to `META_EXCLUDE` as
+inert). **Session-only / presentation / derived from sampled
 inputs**: add it to `ENTITY_EXCLUDE`/`META_EXCLUDE` in `trace.ts` with a one-line
 justification comment mirroring the existing entries (precedent: `wireRev`,
 `bankBonusSources`, `marketQuery`), or every golden churns for no gameplay reason.

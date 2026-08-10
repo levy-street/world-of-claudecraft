@@ -248,6 +248,11 @@ export function defaultIconPrewarmPlan(
   // PNGs and spent seconds of worker time for art this session cannot use.
   for (const id of Object.keys(ABILITIES)) push({ kind: 'ability', id });
   for (const id of AURA_RECIPE_IDS) push({ kind: 'aura', id, mode: 'procedural' });
+  // 'crest' is deliberately absent: the deed and reliquary title shelves
+  // composite at most the DEED_DISPLAY_CATEGORIES base recipes on first
+  // paint, urlCache makes every later rebuild free, and the Book of Deeds
+  // has always paid that first-paint cost. Revisit if the distinct
+  // procedural-crest set a shelf can demand ever grows past that bound.
   return { entries, priorityCount };
 }
 

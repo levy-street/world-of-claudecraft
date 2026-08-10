@@ -19,7 +19,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "505797e6",
+      "state": "9410fa57",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -74,6 +74,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "talents": {
             "rows": {}
           },
@@ -151,7 +155,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "dd4a261d",
+      "state": "d32d69a6",
       "events": "88c1187c",
       "rng": {
         "draws": 0,
@@ -210,6 +214,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "talents": {
             "rows": {}
           },
@@ -287,7 +295,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "dd47f301",
+      "state": "20bc44f2",
       "events": "1c2f4eb7",
       "rng": {
         "draws": 1,
@@ -364,6 +372,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "talents": {
             "rows": {}
           },
@@ -443,8 +455,8 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "7ea2353f",
-      "events": "d5054716",
+      "state": "207eece0",
+      "events": "247eea32",
       "rng": {
         "draws": 2,
         "digest": "58bf8a9e"
@@ -498,6 +510,10 @@
               "spider_leg",
               "spool_of_thread",
               "worn_sword"
+            ],
+            "visited": [
+              "masterwork:first",
+              "masterwork:tailoring"
             ]
           },
           "delveClears": {},
@@ -562,6 +578,18 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {},
+            "marks": [
+              "masterwork:first",
+              "masterwork:tailoring"
+            ],
+            "recent": [
+              "masterwork:first",
+              "masterwork:tailoring"
+            ]
+          },
           "talents": {
             "rows": {}
           },
@@ -651,7 +679,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "675ae4b8",
+      "state": "aefce3a3",
       "events": "1c2f4eb7",
       "rng": {
         "draws": 3,
@@ -706,6 +734,10 @@
               "spider_leg",
               "spool_of_thread",
               "worn_sword"
+            ],
+            "visited": [
+              "masterwork:first",
+              "masterwork:tailoring"
             ]
           },
           "delveClears": {},
@@ -768,6 +800,18 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {},
+            "marks": [
+              "masterwork:first",
+              "masterwork:tailoring"
+            ],
+            "recent": [
+              "masterwork:first",
+              "masterwork:tailoring"
+            ]
+          },
           "talents": {
             "rows": {}
           },
@@ -857,7 +901,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "81357502",
+      "state": "f0015761",
       "events": "cff806af",
       "rng": {
         "draws": 3,
@@ -912,6 +956,10 @@
               "spider_leg",
               "spool_of_thread",
               "worn_sword"
+            ],
+            "visited": [
+              "masterwork:first",
+              "masterwork:tailoring"
             ]
           },
           "delveClears": {},
@@ -986,6 +1034,18 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {},
+            "marks": [
+              "masterwork:first",
+              "masterwork:tailoring"
+            ],
+            "recent": [
+              "masterwork:first",
+              "masterwork:tailoring"
+            ]
+          },
           "talents": {
             "rows": {}
           },
@@ -1080,7 +1140,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "81357502",
+      "state": "f0015761",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -1135,6 +1195,10 @@
               "spider_leg",
               "spool_of_thread",
               "worn_sword"
+            ],
+            "visited": [
+              "masterwork:first",
+              "masterwork:tailoring"
             ]
           },
           "delveClears": {},
@@ -1209,6 +1273,18 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {},
+            "marks": [
+              "masterwork:first",
+              "masterwork:tailoring"
+            ],
+            "recent": [
+              "masterwork:first",
+              "masterwork:tailoring"
+            ]
+          },
           "talents": {
             "rows": {}
           },

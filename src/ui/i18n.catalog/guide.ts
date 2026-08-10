@@ -52,6 +52,7 @@ export const guideStrings = {
     valeCup: 'Vale Cup',
     thornhollow: 'Thornhollow Fields',
     deeds: 'Book of Deeds',
+    reliquary: 'The Reliquary',
     glossary: 'Glossary',
     wishIKnew: 'Things I Wish I Knew',
     faq: 'FAQ',
@@ -130,6 +131,10 @@ export const guideStrings = {
     typeTerm: 'Term',
     typeAbility: 'Ability',
     typeDeed: 'Deed',
+    // A Reliquary collection page (a shelf entry), not a wiki page: keep the
+    // Reliquary term of the glossary reliquaryName row in every locale.
+    typeReliquaryPage: 'Reliquary Page',
+    typeRelic: 'Relic',
   },
 
   // Home / overview landing.
@@ -335,6 +340,7 @@ export const guideStrings = {
     arena: 'PvP window (the arenas and Thornhollow Fields)',
     leaderboard: 'Leaderboard',
     deeds: 'Book of Deeds',
+    reliquary: 'The Reliquary',
     sheathe: 'Sheathe/Unsheathe Weapon',
     crafting: 'Crafting',
     valeCup: 'Vale Cup',
@@ -2146,7 +2152,7 @@ export const guideStrings = {
       'Renown is the score behind the Book. Every deed you earn is worth a set amount, and your total only ever climbs, so a quiet week never costs you ground. A handful turn on luck rather than skill, other collection deeds are their own reward, and Feats are an honor apart, so none of those are worth any Renown. Deeds without Renown still count toward completion in your Book; they simply never score. Feats are the one exception, kept outside the count entirely.',
     rewardsHeading: 'Titles and borders',
     rewardsBody:
-      'The rewards are all for show, and that is the point. Some deeds grant a title you can wear or a border to frame your name, and never anything that makes your hero stronger. Choose the title you want from the Book of Deeds and it rides along on your nameplate, in chat, and on the boards for everyone to see.',
+      'The rewards are all for show, and that is the point. Some deeds grant a title you can wear or a border to frame your name, and never anything that makes your hero stronger. Choose the title and the border you want from the Book of Deeds: the title rides along on your nameplate, in chat, and on the boards for everyone to see, and the border draws its own colors around your nameplate and your portrait.',
     chroniclesHeading: 'Chronicles',
     chroniclesBody:
       'Each zone keeps its own Chronicle, a set of deeds gathered by a local Chronicler who has taken it upon themselves to record every traveler who passes through. Saul of Eastbrook Vale is the first of them, Osric Fenn keeps the Marsh Chronicle at Fenbridge out in the Mirefen, and Zenzie records the Peaks Chronicle up at Highwatch. A Chronicle is split into chapters, and you are free to work through them in whatever order suits you.',
@@ -2184,10 +2190,48 @@ export const guideStrings = {
     // Interface facts only, never deed criteria (src/ui/deeds_window.ts, deeds_view.ts).
     bookHeading: 'Inside the Book',
     bookBody:
-      'The Book sorts every deed into categories you can flip between, with a search box and filters for everything, for what you have earned, for what you have not, and for the ones you are nearly done with. A Recent strip near the top holds your latest unlocks, and clicking one jumps straight to its card, as does clicking a deed name someone posts in chat. Beside it, Nearly there points you at the handful you are closest to finishing. Out in a realm each deed also carries its rarity, the share of adventurers who have earned it, so you can see at a glance which ones are common and which are a real climb; the offline world has no population to count, so it shows none. At the end of the rail sits the Titles shelf, where you choose the one you wear.',
+      'The Book sorts every deed into categories you can flip between, with a search box and filters for everything, for what you have earned, for what you have not, and for the ones you are nearly done with. A Recent strip near the top holds your latest unlocks, and clicking one jumps straight to its card, as does clicking a deed name someone posts in chat. Beside it, Nearly there points you at the handful you are closest to finishing. Out in a realm each deed also carries its rarity, the share of adventurers who have earned it, so you can see at a glance which ones are common and which are a real climb; the offline world has no population to count, so it shows none. At the end of the rail sits the Titles and Borders shelf, with a picker for each: one for the title you wear, one for the border that frames your nameplate.',
     platformHeading: 'Steam and Epic achievements',
     platformBody:
       'If you link a Steam or Epic Games account from the desktop app, the deeds you earn are mirrored outward as achievements on that account. The game world stays the authority: you earn the deed here, it is recorded on your character, and the achievement follows after. Not every deed has a matching achievement, and if one does not arrive right away it catches up the next time you log in. Linking is only ever a link, never a way to sign in.',
+  },
+
+  // The Reliquary (collection trophy hall) page. Spoiler-safe: shelves, page
+  // names, and relic display names only. No personal progress, clear counts,
+  // or drop sources. Page and relic names are English proper nouns baked from
+  // the sim and rendered as raw text, not from these keys. The game window
+  // localizes page names through src/ui/reliquary_i18n.ts while the wiki keeps
+  // the English proper nouns, an accepted divergence (the wiki is a
+  // spoiler-safe reference, not a localized surface).
+  reliquaryPage: {
+    intro:
+      'The Reliquary is the museum of unique spoils you have catalogued: dungeon chase uniques, profession trophies, mounts, weapon skins, and titles. It pairs with the Book of Deeds the way a trophy hall pairs with an achievement book.',
+    howHeading: 'How the collection works',
+    howBody:
+      'Open The Reliquary in game (default Shift+X). Each shelf holds pages of unique relics. Fill a silhouette when you obtain that piece for the first time on the character, and illuminate a page when every relic on it is filled. A few pages are labeled Retired or Personal: they sit outside completion, so they never gate a shelf or the whole catalog. Live finds toast and refresh the open window; progress is character-scoped except weapon skins, which are account cosmetics.',
+    ranksHeading: 'Curator ranks',
+    ranksBody:
+      'Curator ranks rise with unique catalogued fills and grant only cosmetic titles and borders. They never grant combat power, drop rate, or pity. Account weapon skins do not score Curator rank so prestige stays character-durable, and relics on Retired or Personal pages score nothing toward it either.',
+    // The outside-completion tags and notes (rule 7 on the wiki): a retired or
+    // class-personal page must be labeled here too, or a reader chases relics
+    // that can no longer be won or can never all be held by one character.
+    retiredTag: 'Retired',
+    personalTag: 'Personal',
+    retiredNote:
+      'These relics can no longer be won. The page honors the veterans who keep them and does not count toward completion or Curator rank.',
+    personalNote:
+      'Each character can only ever hold their own. The page does not count toward completion or Curator rank.',
+    catalogHeading: 'Catalog of pages',
+    catalogBody:
+      'Every authored Reliquary page and the relic names it holds. This list is spoiler-safe names only: open The Reliquary in game to see your own progress, clear counts, and silhouettes.',
+    spoilerNote:
+      'Personal first-find history, clear numbers, and missing-versus-owned state stay in the game client. The wiki never publishes a player collection.',
+    shelfHeading: '{label} ({count})',
+    shelf: {
+      conquerors: 'Conquerors',
+      professions: 'Professions',
+      horizons: 'Horizons',
+    },
   },
 
   // "Things I Wish I Knew" beginner page.

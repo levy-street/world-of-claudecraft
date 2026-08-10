@@ -967,6 +967,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.unstuckSickness': 'Unstuck Sickness',
   },
   es: {
+    'error.arenaMinLevel': 'Debes ser nivel {level} para entrar en cola de arena.',
+    'error.arenaMinLevelMember':
+      '{name} debe ser al menos nivel {level} para entrar en cola de arena.',
+    'log.arenaQueueAutoLeave1v1': 'Sales de la cola del Coliseo Cinéreo.',
     'error.unknownAbility': 'No conoces esa habilidad.',
     'error.notEnoughRuin': '¡No hay suficiente Ruina!',
     'error.burningPactRequired': 'Conflagrar requiere Pacto Ardiente en el objetivo.',
@@ -1423,6 +1427,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.townFocusRespecComplete': 'Tu reajuste de enfoque se ha completado.',
   },
   es_ES: {
+    'error.arenaMinLevel': 'Debes ser nivel {level} para entrar en cola de arena.',
+    'error.arenaMinLevelMember':
+      '{name} debe ser al menos nivel {level} para entrar en cola de arena.',
+    'log.arenaQueueAutoLeave1v1': 'Sales de la cola del Coliseo Cinéreo.',
     'error.unknownAbility': 'No conoces esa habilidad.',
     'error.notEnoughRuin': '¡No hay suficiente Ruina!',
     'error.burningPactRequired': 'Conflagrar requiere Pacto Ardiente en el objetivo.',
@@ -1880,6 +1888,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.townFocusRespecComplete': 'Tu reajuste de enfoque ha terminado.',
   },
   fr_FR: {
+    'error.arenaMinLevel': "Vous devez être niveau {level} pour rejoindre la file d'arène.",
+    'error.arenaMinLevelMember':
+      "{name} doit être au moins niveau {level} pour rejoindre la file d'arène.",
+    'log.arenaQueueAutoLeave1v1': 'Vous quittez la file du Colisée cendré.',
     'error.unknownAbility': 'Vous ne connaissez pas cette technique.',
     'error.notEnoughRuin': 'Pas assez de Ruine !',
     'error.burningPactRequired': 'Conflagration nécessite Pacte brûlant sur la cible.',
@@ -2346,6 +2358,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.townFocusRespecComplete': 'Votre respécialisation de focus est terminée.',
   },
   fr_CA: {
+    'error.arenaMinLevel': "Vous devez être niveau {level} pour rejoindre la file d'arène.",
+    'error.arenaMinLevelMember':
+      "{name} doit être au moins niveau {level} pour rejoindre la file d'arène.",
+    'log.arenaQueueAutoLeave1v1': 'Vous quittez la file du Colisée cendré.',
     'error.unknownAbility': 'Vous ne connaissez pas cette technique.',
     'error.notEnoughRuin': 'Pas assez de Ruine !',
     'error.burningPactRequired': 'Conflagration nécessite Pacte brûlant sur la cible.',
@@ -3005,6 +3021,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.elixirSerpent': 'Might of the Serpent',
   },
   it_IT: {
+    'error.arenaMinLevel': "Devi essere di livello {level} per metterti in coda per l'arena.",
+    'error.arenaMinLevelMember':
+      "{name} deve essere almeno di livello {level} per mettersi in coda per l'arena.",
+    'log.arenaQueueAutoLeave1v1': 'Esci dalla coda del Colosseo Cinereo.',
     'error.unknownAbility': 'Non conosci questa abilità.',
     'error.notEnoughRuin': 'Rovina insufficiente!',
     'error.burningPactRequired': 'Conflagrazione richiede Patto Ardente sul bersaglio.',
@@ -3463,6 +3483,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.townFocusRespecComplete': 'La tua rispecializzazione del focus è completata.',
   },
   de_DE: {
+    'error.arenaMinLevel': 'Du musst Stufe {level} sein, um dich für die Arena einzureihen.',
+    'error.arenaMinLevelMember':
+      '{name} muss mindestens Stufe {level} sein, um sich für die Arena einzureihen.',
+    'log.arenaQueueAutoLeave1v1': 'Ihr verlasst die Warteschlange des Aschenen Kolosseums.',
     'error.unknownAbility': 'Ihr beherrscht diese Fähigkeit nicht.',
     'error.notEnoughRuin': 'Nicht genug Verderben!',
     'error.burningPactRequired': 'Feuersbrunst erfordert Brennender Pakt auf dem Ziel.',
@@ -3925,6 +3949,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.townFocusRespecComplete': 'Deine Fokus-Neuverteilung ist abgeschlossen.',
   },
   zh_CN: {
+    'error.arenaMinLevel': '你必须达到等级 {level} 才能加入竞技场队列。',
+    'error.arenaMinLevelMember': '{name} 必须至少达到等级 {level} 才能加入竞技场队列。',
+    'log.arenaQueueAutoLeave1v1': '你离开了灰烬斗技场队列。',
     'error.unknownAbility': '你尚未学会该技能。',
     'error.notEnoughRuin': '毁灭不足！',
     'error.burningPactRequired': '燃尽需要目标身上有燃烧契约。',
@@ -4370,6 +4397,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.townFocusRespecComplete': '你的专注重置已完成。',
   },
   zh_TW: {
+    'error.arenaMinLevel': '你必須達到等級 {level} 才能加入競技場佇列。',
+    'error.arenaMinLevelMember': '{name} 必須至少達到等級 {level} 才能加入競技場佇列。',
+    'log.arenaQueueAutoLeave1v1': '你離開了灰燼競技場佇列。',
     'error.unknownAbility': '你尚未學會該技能。',
     'error.notEnoughRuin': '毀滅不足！',
     'error.burningPactRequired': '燃盡需要目標身上有燃燒契約。',
@@ -4815,6 +4845,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.townFocusRespecComplete': '你的專注重置已完成。',
   },
   ko_KR: {
+    'error.arenaMinLevel': '투기장 대기열에 참가하려면 레벨 {level} 이상이어야 합니다.',
+    'error.arenaMinLevelMember':
+      '{name}님은 투기장 대기열에 참가하려면 레벨 {level} 이상이어야 합니다.',
+    'log.arenaQueueAutoLeave1v1': '잿빛 원형경기장 대기열에서 나왔습니다.',
     'error.unknownAbility': '아직 배우지 않은 기술입니다.',
     'error.notEnoughRuin': '파멸이 부족합니다!',
     'error.burningPactRequired': '점화하려면 대상에게 불타는 계약이 있어야 합니다.',
@@ -5269,6 +5303,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.townFocusRespecComplete': '집중 재설정이 완료되었습니다.',
   },
   ja_JP: {
+    'error.arenaMinLevel': 'アリーナのキューに参加するにはレベル{level}が必要です。',
+    'error.arenaMinLevelMember':
+      '{name}はアリーナのキューに参加するにはレベル{level}以上である必要があります。',
+    'log.arenaQueueAutoLeave1v1': '灰の闘技場のキューを離れました。',
     'error.unknownAbility': 'そのアビリティをまだ習得していません。',
     'error.notEnoughRuin': '破滅が足りません！',
     'error.burningPactRequired': 'コンフラグレートには対象に灼熱の契約が必要です。',
@@ -5732,6 +5770,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.townFocusRespecComplete': 'フォーカス再設定が完了しました。',
   },
   pt_BR: {
+    'error.arenaMinLevel': 'Você precisa ser nível {level} para entrar na fila da arena.',
+    'error.arenaMinLevelMember':
+      '{name} precisa ser pelo menos nível {level} para entrar na fila da arena.',
+    'log.arenaQueueAutoLeave1v1': 'Você sai da fila do Coliseu Cinzento.',
     'error.unknownAbility': 'Você não conhece essa habilidade.',
     'error.notEnoughRuin': 'Ruína insuficiente!',
     'error.burningPactRequired': 'Conflagrar exige Pacto Ardente no alvo.',
@@ -6186,6 +6228,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.townFocusRespecComplete': 'Sua redefinição de foco foi concluída.',
   },
   ru_RU: {
+    'error.arenaMinLevel': 'Чтобы встать в очередь на арену, нужен {level} уровень.',
+    'error.arenaMinLevelMember':
+      'Для постановки {name} в очередь на арену нужен как минимум {level} уровень.',
+    'log.arenaQueueAutoLeave1v1': 'Вы покидаете очередь Пепельного Колизея.',
     'error.unknownAbility': 'Вы не знаете эту способность.',
     'error.notEnoughRuin': 'Недостаточно Погибели!',
     'error.burningPactRequired': 'Для Поджигания на цели должен быть Пылающий договор.',
@@ -6651,6 +6697,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
   },
   ...BASE_NEW,
   cs_CZ: {
+    'error.arenaMinLevel': 'Musíš být na úrovni {level}, abys se mohl(a) zařadit do fronty arény.',
+    'error.arenaMinLevelMember':
+      '{name} musí být alespoň na úrovni {level}, aby se mohl(a) zařadit do fronty arény.',
+    'log.arenaQueueAutoLeave1v1': 'Opouštíš frontu Popelavého kolosea.',
     'error.guildBankNoGuild': 'Pro použití cechovní banky musíš být v cechu.',
     'error.guildBankRank': 'Cechovní banku smí používat pouze důstojníci.',
     'error.guildBankFull': 'Cechovní banka je plná.',
@@ -6795,6 +6845,11 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': 'Dokonalý okamžik',
   },
   nl_NL: {
+    'error.arenaMinLevel':
+      'Je moet niveau {level} zijn om je aan te sluiten bij de wachtrij voor de arena.',
+    'error.arenaMinLevelMember':
+      '{name} moet minstens niveau {level} zijn om zich aan te sluiten bij de wachtrij voor de arena.',
+    'log.arenaQueueAutoLeave1v1': 'Je verlaat de wachtrij van het Ashen Coliseum.',
     'error.guildBankNoGuild': 'Je moet in een gilde zitten om de gildebank te gebruiken.',
     'error.guildBankRank': 'Alleen gildeofficieren mogen de gildebank gebruiken.',
     'error.guildBankFull': 'De gildebank is vol.',
@@ -6939,6 +6994,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': 'Volmaakt Ogenblik',
   },
   pl_PL: {
+    'error.arenaMinLevel': 'Musisz mieć poziom {level}, aby dołączyć do kolejki na arenę.',
+    'error.arenaMinLevelMember':
+      '{name} musi mieć co najmniej poziom {level}, aby dołączyć do kolejki na arenę.',
+    'log.arenaQueueAutoLeave1v1': 'Opuszczasz kolejkę do Popielnego Koloseum.',
     'error.guildBankNoGuild': 'Musisz należeć do gildii, aby korzystać z banku gildii.',
     'error.guildBankRank': 'Tylko oficerowie gildii mogą korzystać z banku gildii.',
     'error.guildBankFull': 'Bank gildii jest pełny.',
@@ -7086,6 +7145,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': 'Idealna chwila',
   },
   id_ID: {
+    'error.arenaMinLevel': 'Kamu harus level {level} untuk mengantre ke arena.',
+    'error.arenaMinLevelMember': '{name} harus setidaknya level {level} untuk mengantre ke arena.',
+    'log.arenaQueueAutoLeave1v1': 'Kamu meninggalkan antrean Koloseum Abu.',
     'error.guildBankNoGuild': 'Kamu harus berada dalam sebuah guild untuk menggunakan bank guild.',
     'error.guildBankRank': 'Hanya perwira guild yang boleh menggunakan bank guild.',
     'error.guildBankFull': 'Bank guild penuh.',
@@ -7231,6 +7293,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': 'Momen Sempurna',
   },
   tr_TR: {
+    'error.arenaMinLevel': 'Arena sırasına girmek için {level}. seviyeye ulaşmalısın.',
+    'error.arenaMinLevelMember':
+      '{name} arena sırasına girmek için en az {level}. seviyede olmalı.',
+    'log.arenaQueueAutoLeave1v1': 'Kül Koliseumu sırasından ayrıldın.',
     'error.guildBankNoGuild': 'Lonca bankasını kullanmak için bir loncada olmalısın.',
     'error.guildBankRank': 'Lonca bankasını yalnızca subaylar kullanabilir.',
     'error.guildBankFull': 'Lonca bankası dolu.',
@@ -7376,6 +7442,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': 'Mükemmel An',
   },
   sv_SE: {
+    'error.arenaMinLevel': 'Du måste vara nivå {level} för att köa till arenan.',
+    'error.arenaMinLevelMember': '{name} måste vara minst nivå {level} för att köa till arenan.',
+    'log.arenaQueueAutoLeave1v1': 'Du lämnar kön till Askgrå kolosseum.',
     'error.guildBankNoGuild': 'Du måste vara med i ett gille för att använda gillesbanken.',
     'error.guildBankRank': 'Endast gillesofficerare får använda gillesbanken.',
     'error.guildBankFull': 'Gillesbanken är full.',
@@ -7520,6 +7589,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': 'Perfekt ögonblick',
   },
   vi_VN: {
+    'error.arenaMinLevel': 'Bạn phải đạt cấp {level} để xếp hàng vào đấu trường.',
+    'error.arenaMinLevelMember':
+      '{name} phải đạt tối thiểu cấp {level} để xếp hàng vào đấu trường.',
+    'log.arenaQueueAutoLeave1v1': 'Bạn rời hàng chờ Đấu Trường Tro Tàn.',
     'error.guildBankNoGuild': 'Bạn phải ở trong một bang hội để sử dụng ngân hàng bang hội.',
     'error.guildBankRank': 'Chỉ sĩ quan bang hội mới có thể sử dụng ngân hàng bang hội.',
     'error.guildBankFull': 'Ngân hàng bang hội đã đầy.',
@@ -7663,6 +7736,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': 'Khoảnh Khắc Hoàn Hảo',
   },
   da_DK: {
+    'error.arenaMinLevel': 'Du skal være niveau {level} for at stille dig i kø til arenaen.',
+    'error.arenaMinLevelMember':
+      '{name} skal være mindst niveau {level} for at stille sig i kø til arenaen.',
+    'log.arenaQueueAutoLeave1v1': 'Du forlader køen til Det Askegrå Kolosseum.',
     'error.guildBankNoGuild': 'Du skal være i et laug for at bruge laugsbanken.',
     'error.guildBankRank': 'Kun laugsofficerer må bruge laugsbanken.',
     'error.guildBankFull': 'Laugsbanken er fuld.',

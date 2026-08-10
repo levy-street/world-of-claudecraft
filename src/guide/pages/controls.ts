@@ -57,6 +57,7 @@ const GROUPS: Group[] = [
       { keys: ['N'], label: 'guide.controls.talents' },
       { keys: ['Z'], label: 'guide.controls.sheathe' },
       { keys: ['Shift+Z'], label: 'guide.controls.deeds' },
+      { keys: ['Shift+X'], label: 'guide.controls.reliquary' },
       { keys: ['T'], label: 'guide.controls.crafting' },
       { keys: ['O'], label: 'controls.friends' },
       { keys: ['G'], label: 'guide.controls.arena' },

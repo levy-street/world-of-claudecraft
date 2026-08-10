@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "8a90034f",
+      "state": "fea3aff0",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -72,6 +72,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "talents": {
             "rows": {}
           },
@@ -149,7 +153,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 985,
-      "state": "050d163c",
+      "state": "162948cd",
       "events": "638383f9",
       "rng": {
         "draws": 1,
@@ -160,7 +164,7 @@
       "tick": 7,
       "time": 0.35,
       "nextId": 985,
-      "state": "5f1c8c9b",
+      "state": "3d291ffc",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -227,6 +231,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "renown": 10,
           "talents": {
             "rows": {}
@@ -303,7 +311,7 @@
       "tick": 7,
       "time": 0.35,
       "nextId": 985,
-      "state": "cac0d0b5",
+      "state": "5be23006",
       "events": "d1fea3d9",
       "rng": {
         "draws": 3,
@@ -378,6 +386,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "renown": 10,
           "talents": {
             "rows": {}
@@ -454,7 +466,7 @@
       "tick": 9,
       "time": 0.45,
       "nextId": 985,
-      "state": "23a11e50",
+      "state": "b4bd8e51",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -529,6 +541,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "renown": 10,
           "talents": {
             "rows": {}

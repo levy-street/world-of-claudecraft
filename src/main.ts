@@ -360,7 +360,6 @@ import { ChatCommandMenu } from './ui/chat_command_menu';
 import { CLASS_DETAILS, SIGNATURE_ABILITIES } from './ui/class_details_data';
 import { classIconUrl } from './ui/class_icon_art';
 import { claudiumBalanceAddress, currentWocDiscountBps } from './ui/claudium_view';
-import { ensureDeedLocalesLoaded } from './ui/deed_i18n';
 import { isDevGuiCommand } from './ui/dev_command_view';
 import { devTierByIndex, devTierDisplayName } from './ui/dev_tier';
 import {
@@ -425,6 +424,7 @@ import {
   stopSlowConnectionWatch,
 } from './ui/loading_slow_hint';
 import { createLoadingTipRotation, type LoadingTipRotation } from './ui/loading_tips';
+import { CONTENT_LOCALE_CHANNEL_ENSURERS } from './ui/locale_channels';
 import { applyMinimapOrnamentVars } from './ui/minimap_gilded_ornament';
 import { showMobileWalletLauncher } from './ui/mobile_wallet_launcher';
 import { mobileMountAction } from './ui/mount_quick_summon';
@@ -1324,8 +1324,9 @@ async function startGame(
   // 1.6 s in and reloaded forever).
   const deferredStarted = beginDeferredPreloads();
   console.info(`[entry-guard] world assets: started ${deferredStarted} deferred preloads`);
-  // Lazy locale flip: fetch the active locale's chunk (plus the deed locale chunk the HUD's
-  // deed surfaces read) and make both resident before the HUD renders (mountGameUi ->
+  // Lazy locale flip: fetch the active locale's chunk (plus the deed and reliquary locale
+  // chunks the HUD's deed and collection surfaces read) and make them all resident before
+  // the HUD renders (mountGameUi ->
   // translatePage fans out hundreds of t() calls). It sits behind the loading screen (already
   // painted above), so a stored non-en visitor never sees an English flash. This is now a
   // REAL per-locale network request, so guard it: startGame is void-invoked (see the call
@@ -1334,7 +1335,10 @@ async function startGame(
   // deferred asset preloads started just above.
   loadPhaseStart('locale-fetch');
   try {
-    await Promise.all([ensureLocaleLoaded(getLanguage()), ensureDeedLocalesLoaded(getLanguage())]);
+    await Promise.all([
+      ensureLocaleLoaded(getLanguage()),
+      ...CONTENT_LOCALE_CHANNEL_ENSURERS.map((ensure) => ensure(getLanguage())),
+    ]);
   } catch {
     // Soft fallback: English is statically resident; boot in English (the picker can retry).
   }
@@ -1915,6 +1919,9 @@ async function startGame(
           case 'professions':
             hud.toggleProfessions();
             break;
+          case 'reliquary':
+            hud.toggleReliquary();
+            break;
           case 'sheathe': {
             // Cosmetic sheathe toggle (Z). The world owns the rule (dead-gate,
             // combat auto-unsheathe); play the cue only when the state moved.
@@ -2014,6 +2021,7 @@ async function startGame(
     onLeaderboard: () => hud.toggleLeaderboard(),
     onDailyRewards: () => hud.toggleDailyRewards(),
     onDeeds: () => hud.toggleDeeds(),
+    onReliquary: () => hud.toggleReliquary(),
     onMountToggle: () => {
       // Dismount is the shared toggleMounted() path (unchanged); summoning an
       // owned mount from a single tap goes through its reins item directly,
@@ -2192,6 +2200,9 @@ async function startGame(
         break;
       case 'professions':
         hud.toggleProfessions();
+        break;
+      case 'reliquary':
+        hud.toggleReliquary();
         break;
       case 'crafting':
         // The controller panel has always OFFERED this bind (it lists every
@@ -7455,7 +7466,10 @@ async function changeLanguage(
 ): Promise<boolean> {
   onStatus?.(t('settings.languageLoading'));
   try {
-    await Promise.all([ensureLocaleLoaded(selected), ensureDeedLocalesLoaded(selected)]);
+    await Promise.all([
+      ensureLocaleLoaded(selected),
+      ...CONTENT_LOCALE_CHANNEL_ENSURERS.map((ensure) => ensure(selected)),
+    ]);
   } catch {
     // A locale chunk failed to load. Keep the already-resident locale and tell the user.
     onStatus?.(t('settings.languageLoadFailed'));
@@ -9430,10 +9444,12 @@ function wireStartScreens(): void {
     }
   };
   void ensureLocaleLoaded(bootLang).then(revealLocalized, revealLocalized);
-  // The deed locale chunk renders no homepage text, so it never gates the reveal; warm it in
-  // parallel so entering the world does not pay the fetch. The rejection is swallowed: the
-  // startGame await re-runs the load (in-flight cleared on reject) and owns the fallback.
-  void ensureDeedLocalesLoaded(bootLang).catch(() => {});
+  // The content-channel chunks (deed names, reliquary page names) render no
+  // homepage text, so they never gate the reveal; warm them in parallel so
+  // entering the world does not pay the fetch. Each rejection is swallowed:
+  // the startGame await re-runs the load (in-flight cleared on reject) and
+  // owns the fallback.
+  for (const ensure of CONTENT_LOCALE_CHANNEL_ENSURERS) void ensure(bootLang).catch(() => {});
   hydrateIcons();
   void loadProjectStats();
   wireContractAddressCopy();

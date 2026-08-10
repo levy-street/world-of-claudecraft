@@ -11,8 +11,10 @@ export const RIFT_GEAR_ITEM_IDS = [
 ] as const;
 
 /** The clear-time gear ladder above the rares: epics that only a B+ final-boss
- * kill can shed (guaranteed on A, doubled-chance on S) and the one legendary
- * chase item S-rank clears roll for. Granted by rift/progression.ts
+ * kill can shed (B already GUARANTEES one, so A does not raise the floor; S
+ * adds an independent 35 percent roll for a SECOND epic, which is a separate
+ * draw rather than a doubled chance) and the legendary chase items S-rank
+ * clears roll for. Granted by rift/progression.ts
  * addRiftClearGearLoot at the moment the clear completes, NEVER from static
  * loot tables, so a C-rank farm can never mint epics and the payout cadence is
  * bound by the ranked portal spawns (the economy stays sane). */

@@ -314,6 +314,7 @@ const UI_PURE_CORES = [
   'src/ui/calendar_view.ts',
   'src/ui/char_view.ts',
   'src/ui/char_stats_view.ts',
+  'src/ui/char_sheet_sig_core.ts',
   'src/ui/inspect_view.ts',
   'src/ui/quality_glow.ts',
   'src/ui/map_pinch_zoom_core.ts',
@@ -347,7 +348,12 @@ const UI_PURE_CORES = [
   'src/ui/dev_item_picker_view.ts',
   'src/ui/deeds_leaderboard_view.ts',
   'src/ui/daily_rewards_view.ts',
+  'src/ui/deed_border_view.ts',
   'src/ui/deeds_view.ts',
+  'src/ui/reliquary_cell_art.ts',
+  'src/ui/reliquary_view.ts',
+  'src/ui/reliquary_sheet_view.ts',
+  'src/ui/reliquary_tracker_view.ts',
   'src/ui/spellbook_view.ts',
   'src/ui/hud/quest/questlog_view.ts',
   'src/ui/swing_timer.ts',
@@ -591,6 +597,7 @@ const BARE_NAMED = [
   'src/ui/mobile_hud_layout.ts',
   'src/ui/pet_action_icons.ts',
   'src/ui/quality_glow.ts',
+  'src/ui/reliquary_cell_art.ts',
   'src/ui/chat_bubble_style.ts',
   'src/game/ui_effects_profile.ts',
   'src/game/ui_tier_knobs.ts',
@@ -773,6 +780,206 @@ const SANCTIONED_VALUE_SIM_IMPORTS: Record<string, ReadonlySet<string>> = {};
 function posixRel(rel: string): string {
   return rel.split('\\').join('/');
 }
+
+// ---------------------------------------------------------------------------
+// Reliquary state mutation scope: every write to the sparse blob's surfaces
+// lives in ONE module, because the wire memo depends on it.
+// ---------------------------------------------------------------------------
+//
+// src/sim/reliquary.ts memoizes the serialized `reliq` self blob per state
+// revision, and every writer inside it bumps that revision. A write from
+// anywhere else would not bump, and the failure mode is SILENT: the server
+// compares the memo's string against session.lastSent, so a stale build ships
+// NOTHING and the client keeps the old blob forever with no error on any
+// surface. Nothing reds, nothing logs, the player just stops seeing finds.
+//
+// So the invariant is scope, not spelling: the five mutable surfaces
+// (firstFind, marks, recent, counts, illuminatedPages) are written only by
+// the module that owns the revision counter. REPLACING the whole
+// `meta.reliquary` object is deliberately allowed (sim.ts does it on
+// character load) and is safe for the opposite reason: a fresh object has a
+// fresh identity, so the identity-keyed cache simply has no entry for it.
+const RELIQUARY_STATE_OWNER = join(simRoot, 'reliquary.ts');
+const RELIQUARY_SURFACES = 'firstFind|marks|recent|counts|illuminatedPages';
+// Every assignment operator spelling: plain `=`, the compound forms
+// (`+=`, `??=`, `||=`, `&&=`, `**=`, shifts, bitwise), guarded so `==`,
+// `===`, `>=`, `<=`, and `!=` comparisons never fire (the operator class
+// excludes `<`, `>`, and `!`, and the trailing `[^=]` excludes `==`).
+const ASSIGN_OP = `(?:\\*\\*|<<|>>>|>>|\\?\\?|\\|\\||&&|[+\\-*/%&|^])?=[^=]`;
+/** Assignment or in-place mutation of a Reliquary state surface. */
+const RELIQUARY_WRITE_RE = new RegExp(
+  `\\.reliquary\\.(?:${RELIQUARY_SURFACES})\\s*` +
+    `(?:(?:\\.length\\s*)?${ASSIGN_OP}` +
+    `|\\[[^\\]]*\\]\\s*${ASSIGN_OP}` +
+    `|(?:\\[[^\\]]*\\]|\\.length)?\\s*(?:\\+\\+|--)` +
+    `|\\.(?:add|delete|clear|set|push|pop|shift|unshift|splice|sort|reverse|fill|copyWithin)\\s*\\()`,
+);
+/** `delete x.reliquary.firstFind[id]`, which the shape above cannot see. */
+const RELIQUARY_DELETE_RE = new RegExp(
+  `\\bdelete\\s+[^;]*\\.reliquary\\.(?:${RELIQUARY_SURFACES})\\b`,
+);
+/** Prefix increment and Object.assign, which put the surface AFTER the verb. */
+const RELIQUARY_PREFIX_RE = new RegExp(
+  `(?:\\+\\+|--)\\s*[\\w.$]*\\.reliquary\\.(?:${RELIQUARY_SURFACES})\\b`,
+);
+const RELIQUARY_OBJASSIGN_RE = new RegExp(
+  `Object\\.assign\\(\\s*[^,)]*\\.reliquary\\.(?:${RELIQUARY_SURFACES})\\b`,
+);
+// ACCEPTED LIMITATION: a line regex cannot see identity-level aliasing, so a
+// write through a stored alias (`const st = meta.reliquary; st.counts[id] = 1`)
+// or through a held surface reference (`ownership.marks.add(id)`) escapes this
+// scan. The owning module itself uses exactly those shapes internally, which is
+// legal (its writers bump the wire revision); outside it, none exist today
+// (verified by hand at Phase 17). This guard is a tripwire for the common
+// spellings, not a proof: treat a new alias-shaped write as a review item.
+function reliquaryStateWrite(line: string): boolean {
+  return (
+    RELIQUARY_WRITE_RE.test(line) ||
+    RELIQUARY_DELETE_RE.test(line) ||
+    RELIQUARY_PREFIX_RE.test(line) ||
+    RELIQUARY_OBJASSIGN_RE.test(line)
+  );
+}
+
+describe('Reliquary sparse-state writes stay inside their owning module', () => {
+  // headless/ joins the walk: the RL env server holds a live Sim and could
+  // grow a surface write as easily as server/ (it has none today).
+  const scanned = [
+    ...walk(simRoot),
+    ...walk(join(repoRoot, 'server')),
+    ...walk(join(repoRoot, 'headless')),
+  ].filter((f) => f !== RELIQUARY_STATE_OWNER);
+
+  it('finds all three trees to scan', () => {
+    // Floor ABOVE the flat top-level file count of either large root ALONE
+    // (about 139 for src/sim and 167 for server at authoring, recursive total
+    // about 650), so a walk that silently stopped recursing, or lost one of
+    // the two LARGE roots, cannot pass (headless is two files; only its
+    // membership arm below catches losing it). The .some() arms pin the
+    // recursion reaching a nested directory in each large root and the
+    // headless root being present at all.
+    expect(scanned.length).toBeGreaterThan(500);
+    expect(scanned.some((f) => f.includes(join('src', 'sim', 'professions')))).toBe(true);
+    expect(scanned.some((f) => f.includes(join('server', 'http')))).toBe(true);
+    // Anchored on a real file, not a bare path fragment: a checkout whose own
+    // absolute path contains a `headless` component must not satisfy this.
+    expect(scanned.some((f) => f.endsWith(join('headless', 'env_server.ts')))).toBe(true);
+    // The owner itself is excluded, and it really exists (an excluded path that
+    // is simply a typo would make this whole guard vacuous).
+    expect(existsSync(RELIQUARY_STATE_OWNER)).toBe(true);
+    expect(scanned).not.toContain(RELIQUARY_STATE_OWNER);
+  });
+
+  it('no module outside src/sim/reliquary.ts writes firstFind / marks / recent / counts / illuminatedPages', () => {
+    const violations = scanLines(scanned, RELIQUARY_WRITE_RE)
+      .concat(scanLines(scanned, RELIQUARY_DELETE_RE))
+      .concat(scanLines(scanned, RELIQUARY_PREFIX_RE))
+      .concat(scanLines(scanned, RELIQUARY_OBJASSIGN_RE));
+    expect(
+      violations,
+      'a Reliquary state write outside its owning module skips the wire-memo revision bump,\n' +
+        'which ships a STALE blob silently (see src/sim/reliquary.ts reliquaryWireJson):\n' +
+        `${violations.join('\n')}`,
+    ).toEqual([]);
+  });
+
+  it('noteRelicObtain is called from exactly the two grant hubs (caller-set pin)', () => {
+    // The tally writer takes `meta` directly (no SimContext hop), so a NEW
+    // caller adopts whatever movement policy it likes with no seam forcing
+    // the question, and the line-regex ban above cannot see it (the write
+    // happens inside the owning module on the caller's behalf). Pin the
+    // caller set AND the call text: both call sites must be the hub line
+    // with its movement gate intact, so a dropped `!opts?.movement` prefix,
+    // a changed copies argument, or a replacement arm elsewhere in sim.ts
+    // all red here, not just a third file. A new caller is not banned, it is
+    // a REVIEW ITEM: extend this pin only after classifying the new site
+    // against the movement rule. Scope: all of src/ (ClientWorld and the UI
+    // import from the owning module already, so a caller there is one import
+    // away) plus server/ and headless/; the owner file is excluded, which is
+    // also what keeps its own `export function noteRelicObtain(` definition
+    // line from matching. Accepted limitation: an aliased import
+    // (`import { noteRelicObtain as x }`) escapes the regex; treat one as a
+    // review item, the same standing as the write-ban's alias blind spot.
+    const callerScanned = [
+      ...walk(join(repoRoot, 'src')),
+      ...walk(join(repoRoot, 'server')),
+      ...walk(join(repoRoot, 'headless')),
+    ].filter((f) => f !== RELIQUARY_STATE_OWNER);
+    const callers = scanLines(callerScanned, /\bnoteRelicObtain\s*\(/);
+    const files = [...new Set(callers.map((v) => v.split(':')[0]))].sort();
+    expect(files, `unexpected noteRelicObtain callers:\n${callers.join('\n')}`).toEqual([
+      relative(repoRoot, join(simRoot, 'sim.ts')),
+    ]);
+    const texts = callers.map((v) => v.slice(v.indexOf('  ') + 2));
+    expect(texts, 'both hub arms carry the movement gate and per-copy count').toEqual([
+      'if (!opts?.movement) noteRelicObtain(meta, itemId, count);',
+      'if (!opts?.movement) noteRelicObtain(meta, itemId, count);',
+    ]);
+  });
+
+  it('the ban FIRES on every write spelling, and spares reads and whole-object replacement', () => {
+    // A guard with no self-test is a guard nobody has seen fail.
+    for (const line of [
+      'meta.reliquary.marks.add(markId);',
+      'meta.reliquary.marks.delete(markId);',
+      'meta.reliquary.marks.clear();',
+      'meta.reliquary.recent.push(id);',
+      'meta.reliquary.recent.shift();',
+      'meta.reliquary.recent.splice(i, 1);',
+      'meta.reliquary.recent.sort();',
+      'state.reliquary.firstFind[itemId] = {};',
+      'r.meta.reliquary.counts[id] = 3;',
+      'meta.reliquary.counts = {};',
+      'this.primary.reliquary.recent = [];',
+      'delete meta.reliquary.firstFind[itemId];',
+      // Compound assignment, increment, and after-the-verb spellings: the
+      // shapes a tally write from another module would most plausibly use.
+      'meta.reliquary.counts[id] += 1;',
+      'meta.reliquary.counts[itemId]++;',
+      '++meta.reliquary.counts[id];',
+      'meta.reliquary.firstFind[id] ??= {};',
+      'meta.reliquary.recent.length = 0;',
+      'Object.assign(meta.reliquary.counts, saved);',
+      // The Phase 18 sticky illumination record: every write spelling an
+      // outside module would plausibly use against the Set surface.
+      'meta.reliquary.illuminatedPages.add(pageId);',
+      'meta.reliquary.illuminatedPages.delete(pageId);',
+      'meta.reliquary.illuminatedPages.clear();',
+      'meta.reliquary.illuminatedPages = new Set();',
+    ]) {
+      expect(reliquaryStateWrite(line), line).toBe(true);
+    }
+    // ...and does NOT fire on reads, which are everywhere and legitimate, nor
+    // on replacing the whole state object (safe: fresh identity, fresh cache).
+    for (const line of [
+      'return this.primary.reliquary.firstFind;',
+      'return this.primary.reliquary.counts;',
+      'if (meta.reliquary.marks.has(markId)) return false;',
+      'const n = meta.reliquary.counts[id] ?? 0;',
+      'expect(meta.reliquary.recent).toEqual([]);',
+      'meta.reliquary = restoreReliquaryState(s.reliquary);',
+      'marks: this.primary.reliquary.marks,',
+      'if (meta.reliquary.firstFind[itemId] === undefined) return;',
+      // Comparison and arithmetic READS that the widened operator arm must
+      // keep sparing: >= and <= and != end in the same '=' a lazy regex trips on.
+      'if (meta.reliquary.counts[id] >= 1) return;',
+      'while (meta.reliquary.recent.length > cap) {',
+      'const more = meta.reliquary.counts[id] + 1;',
+      'if (meta.reliquary.counts[id] != null) draw();',
+      // Reads of the illumination record are everywhere-legal like the rest.
+      'if (meta.reliquary.illuminatedPages.has(pageId)) continue;',
+      // The NEAR-MISS identifier: `illuminatedPageId` is the reliquaryUnlock
+      // EVENT field, not a state surface, and the surface name was chosen so
+      // neither is a prefix of the other. Even a write spelled through it
+      // must not match (tsc rejects the field anyway); a sloppy prefix-style
+      // alternation would false-positive on exactly these lines.
+      'meta.reliquary.illuminatedPageId = pageId;',
+      'const bannerPage = ev.illuminatedPageId;',
+    ]) {
+      expect(reliquaryStateWrite(line), line).toBe(false);
+    }
+  });
+});
 
 describe('src/world_api IWorld seam purity invariants', () => {
   it('finds the IWorld seam (world_api.ts + every facet file)', () => {
@@ -1181,6 +1388,7 @@ const EXPECTED_BARE_NAMED = [
   'src/ui/pet_action_icons.ts',
   'src/ui/quality_glow.ts',
   'src/ui/quest_marker_tags.ts',
+  'src/ui/reliquary_cell_art.ts',
   'src/ui/rest_indicator.ts',
   'src/ui/roving_index.ts',
   'src/ui/safe_local_storage.ts',
@@ -1463,7 +1671,8 @@ const HELPER_HOST_PATTERNS: ReadonlyArray<readonly [string, RegExp]> = [
 // (the painter reads the --color-* CSS vars once per redraw), so a baked color in
 // the helper is a token-discipline break. Deliberately NOT applied to the default
 // bucket, where a tier or art palette IS the module (holder_tier, dev_tier,
-// percentile_tier, discord_tier, perf_overlay_model all bake theirs on purpose).
+// percentile_tier, discord_tier, curator_sigil, perf_overlay_model all bake
+// theirs on purpose).
 const COLOR_HEX_RE = /#[0-9a-fA-F]{3,8}\b/g;
 const COLOR_FUNC_RE = /\brgba?\s*\(/g;
 
@@ -1608,6 +1817,10 @@ const UI_DOM_MODULES = [
   // review's note).
   'src/ui/professions_window.ts',
   'src/ui/reconnect_overlay.ts',
+  // reliquary_window.ts joined the ledger with the HUD-tracker pin store: the
+  // pinned page set persists per character in localStorage (the deeds_window
+  // watchlist shape), which is browser state this module owns.
+  'src/ui/reliquary_window.ts',
   'src/ui/settings_controls.ts',
   'src/ui/social_window.ts',
   'src/ui/spectate_badge.ts',

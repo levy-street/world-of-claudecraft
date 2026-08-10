@@ -136,6 +136,20 @@ describe('hud wiring', () => {
     expect(hud).toContain('onWatchChanged: () => this.updateDeedTracker(),');
   });
 
+  it('feeds the worn border into both unit frames from the two different sources', () => {
+    // SELF reads the deeds facet; the TARGET reads the entity wire field. Both
+    // fills are load-bearing and neither is covered by the unit_frame suites,
+    // which drive the painter with a descriptor the call site builds here: drop
+    // either line and the picker changes nothing on screen with every test green.
+    expect(hud).toContain('playerFrame.borderSlug = deedBorderSlug(sim.activeBorder);');
+    expect(hud).toContain('targetFrame.borderSlug = deedBorderSlug(target.border ?? null);');
+    // The painter can only write the ring on a frame it was handed.
+    expect(hud).toContain("private pfPortraitWrapEl = $('#pf-portrait-wrap');");
+    expect(hud).toContain("private targetPortraitWrapEl = $('#tf-portrait-wrap');");
+    expect(hud).toContain('portraitBorder: this.pfPortraitWrapEl,');
+    expect(hud).toContain('portraitBorder: this.targetPortraitWrapEl,');
+  });
+
   it('routes Esc through the painter close (WCAG focus return)', () => {
     expect(hud).toMatch(/case 'deeds-window':[\s\S]{0,200}?this\.deedsWindow\.close\(\);/);
   });
@@ -160,16 +174,43 @@ describe('hud wiring', () => {
     const end = hud.indexOf('log(text: string', start);
     expect(start).toBeGreaterThan(-1);
     expect(end).toBeGreaterThan(start);
-    const body = hud.slice(start, end);
+    // Comment-stripped (the reliquary sibling's idiom, and this file's own
+    // level-up arm): the arm carries prose about tPlural and formatNumber right
+    // above the code, which would otherwise satisfy the pins below on its own.
+    const body = stripLineComments(hud.slice(start, end));
     // Banner and audio are gated on the PLAN's fresh-unlock fields; the retro
     // count only ever feeds the one localized summary log line.
     expect(body).toContain('if (plan.bannerId !== null)');
     expect(body).toContain('if (plan.playSound) audio.achievement();');
+    // The RAW plan.retroCount is the second argument on purpose: it is what
+    // tPlural feeds Intl.PluralRules, so pinning it stops a refactor from
+    // passing the pre-formatted string and collapsing every locale onto the
+    // .other leaf ("1 deeds recorded" again).
     expect(body).toMatch(
-      /if \(plan\.retroCount > 0\) \{\s*const retroText = t\('hudChrome\.deeds\.retroSummary'/,
+      /if \(plan\.retroCount > 0\) \{\s*const retroText = tPlural\(\s*'hudChrome\.plurals\.deedsRetroSummary',\s*plan\.retroCount,/,
     );
+    // The display override: the visible number stays locale-formatted through
+    // formatNumber even though the selection arg above is the raw count.
+    expect(body).toContain('count: formatNumber(plan.retroCount, { maximumFractionDigits: 0 })');
     expect(body.match(/showCelebrationBanner/g)?.length).toBe(1);
     expect(body.match(/audio\.achievement/g)?.length).toBe(1);
+  });
+
+  it('logs BOTH worn-cosmetic hints, each from its own plan list', () => {
+    // A title unlock has always pointed at the picker; a border unlock did not,
+    // and three of the four border deeds are earned far from the Book. Both
+    // lines are pinned here (comment-stripped, like the arm above) so neither
+    // consumer loop can be dropped while the pure plan keeps building the list.
+    const start = hud.indexOf('private handleDeedUnlocks(');
+    const end = hud.indexOf('log(text: string', start);
+    const body = stripLineComments(hud.slice(start, end));
+    expect(body).toMatch(
+      /for \(const id of plan\.titleHintIds\) \{\s*this\.log\(\s*t\('hudChrome\.deeds\.unlockedTitleHint', \{ title: deedTitleText\(id\) \}\),\s*'#ffd100',?\s*\);/,
+    );
+    // Named by the DEED: a border reward carries a palette slug, never text.
+    expect(body).toMatch(
+      /for \(const id of plan\.borderHintIds\) \{\s*this\.log\(\s*t\('hudChrome\.deeds\.unlockedBorderHint', \{ name: deedName\(id\) \}\),\s*'#ffd100',?\s*\);/,
+    );
   });
 
   it("the level-up arm's three banners all ride the 'levelup' class (source pin)", () => {
@@ -484,6 +525,10 @@ describe('hud wiring', () => {
     expect(body).toContain('this.combatAnnouncer.push(bannerText, performance.now());');
     expect(body).toContain('this.combatAnnouncer.push(retroText, performance.now());');
     expect(body.match(/combatAnnouncer\.push/g)?.length).toBe(2);
+    // The chat-pane delivery too, not just the announcer: deleting the log
+    // call would compile and pass everything else while the visible catch-up
+    // line vanishes (the reliquary sibling pins its log line the same way).
+    expect(body).toContain("this.log(retroText, '#ffd100');");
   });
 
   it('marks the watch toggle state and names the recent-strip jump buttons', () => {
@@ -501,8 +546,13 @@ describe('hud wiring', () => {
   it('shows the active title and earned border badges on the character sheet', () => {
     expect(hud).toContain("t('hudChrome.deeds.charTitleLabel')");
     expect(hud).toContain('data-act="open-deeds"');
-    expect(hud).toContain('class="ms-badge ms-deed-border"');
+    expect(hud).toMatch(/class="ms-badge ms-deed-border\$\{worn \? ' ms-active' : ''\}"/);
     expect(hud).toMatch(/reward\?\.kind === 'border' && sim\.deedsEarned\.has\(id\)/);
+    // The WORN badge is state, not decoration: it is picked by comparing deed
+    // ids against the facet read, and it says so in its own LABEL rather than
+    // leaning on the ms-active colour alone (WCAG 1.4.1).
+    expect(hud).toContain('const worn = id === sim.activeBorder;');
+    expect(hud).toContain("t('hudChrome.deeds.charBorderWorn', { name })");
   });
 
   it('renders the inspected player title from the entity wire field', () => {
@@ -534,6 +584,16 @@ describe('entry HTMLs', () => {
       // keyboard-reachable toggle (the quest-tracker contract).
       expect(html).toContain('<div id="deed-tracker"></div>');
       expect(html).not.toContain('id="deed-tracker" aria-hidden');
+    }
+  });
+
+  it('ids the two portrait frames the border ring paints on in BOTH game entries', () => {
+    // $('#pf-portrait-wrap') resolves null in a document that lacks the id, and
+    // the painter then skips the ring silently: an index-only edit would ship a
+    // border that never appears for online players (the /play shared-entry trap).
+    for (const html of [indexHtml, playHtml]) {
+      expect(html).toContain('class="portrait-wrap" id="pf-portrait-wrap"');
+      expect(html).toContain('class="portrait-wrap" id="tf-portrait-wrap"');
     }
   });
 
@@ -620,20 +680,21 @@ describe('touch open chain (More tray -> Hud)', () => {
 });
 
 describe('touch long-press peek', () => {
-  it('attaches the card tooltip and suppresses BOTH card actions on a peek release', () => {
+  it('attaches the card tooltip and suppresses EVERY card action on a peek release', () => {
     expect(painter).toContain(
       "this.deps.attachTooltip(card, () => this.cardTooltipHtml(card.dataset.deed ?? ''));",
     );
     // Each action arm consumes the shared guard FIRST: a peek release
-    // dismisses the tooltip and fires nothing (watch toggle and title equip).
+    // dismisses the tooltip and fires nothing (watch toggle, title equip, and
+    // border equip).
     expect(
       painter.match(
         /if \(this\.deps\.consumePeek\(\)\) \{\s*this\.deps\.hideTooltip\(\);\s*return;\s*\}/g,
       )?.length,
-    ).toBe(2);
-    // Association, not just count: the guard is the FIRST statement of the
-    // [data-watch] handler AND of the [data-title] handler specifically.
-    for (const selector of ['data-watch', 'data-title']) {
+    ).toBe(3);
+    // Association, not just count: the guard is the FIRST statement of each
+    // action handler specifically, never merely present somewhere in the file.
+    for (const selector of ['data-watch', 'data-title', 'data-border-pick']) {
       expect(painter).toMatch(
         new RegExp(
           `\\('\\[${selector}\\]'\\)\\)\\s*\\{\\s*btn\\.addEventListener\\('click', \\(\\) => \\{\\s*` +

@@ -302,7 +302,9 @@ export function deliverCommissionOrder(
   // always the whole unit; no count-1 split like the unbind stack-split arm.
   r.meta.inventory.splice(slotIdx, 1);
   ctx.onInventoryChangedForQuests(r.meta);
-  ctx.addItemInstance(order.itemId, freed, order.requesterId, 1);
+  // movement: the crafter hands the requester a piece they already hold, the
+  // player-to-player shape a trade has, so it is not a world-sourced obtain.
+  ctx.addItemInstance(order.itemId, freed, order.requesterId, 1, { movement: true });
   order.status = 'delivered';
   order.settledAt = ctx.time;
   ctx.bumpCommissionOrderBoardRev();

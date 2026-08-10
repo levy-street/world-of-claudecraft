@@ -51,6 +51,11 @@ import { HEROIC_MARK_ITEM_ID } from '../sim/content/dungeon_difficulty';
 import { HEROIC_VENDOR_STOCK } from '../sim/content/heroic_vendor';
 import { isOnMountRaceStartPlatform, MOUNTS } from '../sim/content/mounts';
 import { recipeById } from '../sim/content/recipes';
+import {
+  RELIQUARY_PAGE_ORDER,
+  RELIQUARY_PAGES,
+  RELIQUARY_PAGES_BY_ID,
+} from '../sim/content/reliquary';
 import { FIRST_TALENT_LEVEL, type TalentAllocation, talentsFor } from '../sim/content/talents';
 import { resolveActiveWeaponSkin } from '../sim/content/weapon_skin_rules';
 import type { ZoneDef } from '../sim/data';
@@ -191,6 +196,7 @@ import { CalendarWindow } from './calendar_window';
 import { CardDuelWindow } from './card_duel_window';
 import { CastBarPainter, type CastBarPaintInput } from './cast_bar_painter';
 import { charBagsPaired } from './char_bags_pairing_core';
+import { charSheetRefreshSig } from './char_sheet_sig_core';
 import { type CharSkinPainterHost, paintCharSkinPicker } from './char_skin_window';
 import { archetypeTitleText, CharWindow, craftNameText } from './char_window';
 import { activeCharacterAppearancePreview } from './character_appearance';
@@ -256,6 +262,7 @@ import { shouldRefreshDailyRewardsLauncher } from './daily_rewards_launcher_core
 import { DailyRewardsWindow } from './daily_rewards_window';
 import { deathRecapFeedback } from './death_recap_feedback';
 import { decorativeArtImg } from './decorative_art';
+import { deedBorderSlug } from './deed_border_view';
 import {
   deedBroadcastRendered,
   deedName,
@@ -653,6 +660,33 @@ import { questProgressEventText } from './quest_progress_text';
 import { lockoutParts, lockoutShape } from './raid_lockout';
 import { type RaidLockoutI18n, raidLockoutPanelHtml } from './raid_lockout_view';
 import { recipePatternTooltipLines } from './recipe_pattern_tooltip_view';
+import {
+  reliquaryIlluminationBroadcastLine,
+  reliquaryIlluminationBroadcastRendered,
+  reliquaryPageName,
+} from './reliquary_i18n';
+import { reliquaryRelicDisplayName } from './reliquary_labels';
+import {
+  buildReliquarySheetModel,
+  reliquarySheetProgressionHtml,
+  selfCuratorStanding,
+} from './reliquary_sheet_view';
+import { ReliquaryTrackerPainter } from './reliquary_tracker_painter';
+import {
+  buildReliquaryTrackerViewInto,
+  makeReliquaryTrackerView,
+  type ReliquaryTrackerInput,
+  reliquaryTrackerOwnershipSig,
+} from './reliquary_tracker_view';
+import {
+  buildReliquaryUnlockPlan,
+  CURATOR_BORDER_REWARD,
+  type ReliquaryUnlockEventModel,
+  reliquaryFlashKey,
+  reliquaryRelicPageId,
+  reliquaryRelicPageIndex,
+} from './reliquary_view';
+import { curatorRankNameKey, ReliquaryWindow } from './reliquary_window';
 import { restView } from './rest_indicator';
 import { isTalentRowUnlockLevel } from './row_unlock_toast';
 import { localizeServerText } from './server_i18n';
@@ -934,6 +968,7 @@ const ABSENT_TARGET_DESCRIPTOR: UnitFrameDescriptor = {
   levelText: null,
   name: '',
   portraitKey: '',
+  borderSlug: '',
   absorb: null,
   dead: false,
   outOfRange: false,
@@ -1243,6 +1278,11 @@ function yellVoiceKey(text: string): string {
 
 const CHEAT_DEATH_SAVE_TEXT = 'Cheat Death saves you!';
 
+/** Named Curator rank for rank-up toast/banner (cosmetic chrome only). */
+function curatorRankDisplayName(rank: number): string {
+  return t(curatorRankNameKey(rank), { rank: formatNumber(rank) });
+}
+
 export class Hud {
   // Ability slots across three rows: 1..11 primary, 12..22 secondary, and
   // 23..33 third (slot 0 is the Attack toggle on the primary row). Every row
@@ -1452,6 +1492,9 @@ export class Hud {
   private mountRaceInstructionTimer: number | undefined;
   private bannerSource: 'unstuck' | null = null;
   private pfLevelEl = $('#pf-level');
+  // The portrait frame the Book of Deeds border paints on (both entry
+  // documents carry the id); the unit_frame painter owns every write to it.
+  private pfPortraitWrapEl = $('#pf-portrait-wrap');
   private pfHpEl = $('#pf-hp');
   private pfHpTextEl = $('#pf-hp-text');
   private pfResEl = $('#pf-res');
@@ -1461,6 +1504,7 @@ export class Hud {
   private buffBarEl = $('#buff-bar');
   private debuffBarEl = $('#debuff-bar');
   private targetFrameEl = $('#target-frame');
+  private targetPortraitWrapEl = $('#tf-portrait-wrap');
   private targetEliteTagEl = $('#tf-elite-tag');
   private targetNameEl = $('#tf-name');
   // The target name line splits into three inline children (pre-decoration,
@@ -1771,6 +1815,11 @@ export class Hud {
   // online cprof or professions snapshot replaces stale archetype art/title
   // and Gathering numbers without repainting for attunedZone bystanders.
   private lastProfessionSurfaceSig = '';
+  // The character sheet's WORN cosmetic rows (active title line, border badge
+  // worn state) are painted from the same cold path, and the Book of Deeds
+  // picker repaints only itself when the player wears a different one. Latch the
+  // two ids on the slow band so an already-open sheet converges in both hosts.
+  private lastCharSheetSig = '';
   // Commission opt-in state (Professions 2.0): recipe ids whose
   // NEXT craft goes out with the commission flag. Held here (not in the
   // painter) so the crafting window's staleness repaints never untick a
@@ -2621,6 +2670,7 @@ export class Hud {
     $('#mm-town-focus')?.addEventListener('click', () => this.toggleTownFocus());
     $('#mm-quest').addEventListener('click', () => this.toggleQuestLog());
     $('#mm-deeds').addEventListener('click', () => this.toggleDeeds());
+    $('#mm-reliquary')?.addEventListener('click', () => this.toggleReliquary());
     $('#mm-professions').addEventListener('click', () => this.toggleProfessions());
     // Collapse/expand the on-screen quest tracker by clicking its header. The
     // overlay is click-through (pointer-events:none) except the header button, so
@@ -2683,6 +2733,33 @@ export class Hud {
       }
       this.toggleDeedTrackerCollapsed();
     });
+    // The Reliquary tracker header, the same delegation contract as the deed
+    // tracker above: click plus the Enter/Space keydown arm, stopped before the
+    // window-level chat-open/jump binds hijack the focused header button. On the
+    // compact touch tier the rows are folded away (hud.mobile.css) and the
+    // header is a count chip: activation opens The Reliquary instead of toggling
+    // a collapse the player cannot see.
+    $('#reliquary-tracker').addEventListener('click', (e) => {
+      if (!(e.target as HTMLElement).closest('.dt-header')) return;
+      const body = document.body.classList;
+      if (body.contains('mobile-touch') && body.contains('hud-mobile-compact')) {
+        this.openReliquary();
+        return;
+      }
+      this.toggleReliquaryTrackerCollapsed();
+    });
+    $('#reliquary-tracker').addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter' && e.key !== ' ' && e.code !== 'Space') return;
+      if (!(e.target as HTMLElement).closest('.dt-header')) return;
+      e.preventDefault();
+      e.stopPropagation();
+      const body = document.body.classList;
+      if (body.contains('mobile-touch') && body.contains('hud-mobile-compact')) {
+        this.openReliquary();
+        return;
+      }
+      this.toggleReliquaryTrackerCollapsed();
+    });
     // The delve board, lockpick panel, map window, and the bank + bags cluster are
     // non-modal overlays, so canUseGameKeys() stays true and the global jump (Space)
     // / chat (Enter) binds would otherwise hijack those keys on a focused panel
@@ -2698,6 +2775,7 @@ export class Hud {
       '#bank-window',
       '#bags',
       '#deeds-window',
+      '#reliquary-window',
       '#professions-window',
     ]) {
       $(panelId).addEventListener('keydown', (e) => {
@@ -3428,6 +3506,10 @@ export class Hud {
         // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
         this.deedsWindow.close();
         break;
+      case 'reliquary-window':
+        // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
+        this.reliquaryWindow.close();
+        break;
       case 'professions-window':
         // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
         this.professionsWindow.close();
@@ -4118,6 +4200,7 @@ export class Hud {
     levelText: null,
     name: '',
     portraitKey: PLAYER_PORTRAIT_KEY,
+    borderSlug: '',
     absorb: null,
     dead: false,
     outOfRange: false,
@@ -4169,6 +4252,7 @@ export class Hud {
     hpFill: this.pfHpEl,
     hpText: this.pfHpTextEl,
     absorb: this.pfAbsorbEl,
+    portraitBorder: this.pfPortraitWrapEl,
     resource: {
       container: this.pfResourceEl,
       fill: this.pfResEl,
@@ -4226,6 +4310,7 @@ export class Hud {
       hpFill: this.targetHpEl,
       hpText: this.targetHpTextEl,
       absorb: this.targetAbsorbEl,
+      portraitBorder: this.targetPortraitWrapEl,
       resource: {
         container: this.targetResourceEl,
         fill: this.targetResEl,
@@ -4748,11 +4833,40 @@ export class Hud {
     consumePeek: () => this.peekGuard.consume(),
     ...this.windowFocus('#professions-window'),
   });
+  // The Reliquary window painter (reliquary_view.ts core + reliquary_window.ts
+  // painter): Overview + shelf chrome over IWorldReliquary. A standalone
+  // trapping window (windowFocus), the deeds/professions shape exactly.
+  // onPinChanged repaints the HUD tracker immediately so a pin toggle never
+  // waits for the slow band.
+  private readonly reliquaryWindow = new ReliquaryWindow({
+    ...this.presentationBag,
+    root: () => $('#reliquary-window'),
+    world: () => this.sim,
+    closeOthers: () => this.closeOtherWindows('#reliquary-window'),
+    hideTooltip: () => this.hideTooltip(),
+    consumePeek: () => this.peekGuard.consume(),
+    ...this.windowFocus('#reliquary-window'),
+    onPinChanged: () => this.updateReliquaryTracker(),
+  });
   // Watchlist HUD tracker (#deed-tracker): slow-band painter over the one
   // reused tracker-view container (allocation-light by contract).
   private readonly deedTrackerView = makeDeedTrackerView();
   private readonly deedTrackerPainter = new DeedTrackerPainter({
     root: () => $('#deed-tracker'),
+    writers: this.writerFacet,
+  });
+  // Reliquary HUD tracker (#reliquary-tracker): the same slow-band painter over
+  // one reused container, showing the pinned pages (or, before any pin, the
+  // pages closest to Illumination).
+  private readonly reliquaryTrackerView = makeReliquaryTrackerView();
+  // Lazily minted ONCE by updateReliquaryTracker and reused every build: the
+  // drive runs on the 500ms band for the life of the HUD, so the input object
+  // and its two closures are not re-allocated per build (the deed tracker's
+  // allocation-free drive precedent). The closures read this.sim live at call
+  // time; pinned and collapsed are the per-build fields.
+  private reliquaryTrackerInput: ReliquaryTrackerInput | null = null;
+  private readonly reliquaryTrackerPainter = new ReliquaryTrackerPainter({
+    root: () => $('#reliquary-tracker'),
     writers: this.writerFacet,
   });
   // Event calendar window painter (calendar_view.ts month-grid core +
@@ -4928,6 +5042,7 @@ export class Hud {
     },
     openPrestige: () => this.openPrestigeDialog(),
     openDeeds: () => this.openDeeds(),
+    openReliquary: () => this.openReliquary(),
     dragState: this.itemDragState,
     renderBags: () => this.renderBags(),
     showError: (text) => this.showError(text),
@@ -6337,6 +6452,7 @@ export class Hud {
     if (this.marketWindow.isOpen) this.marketWindow.render();
     if (this.bankWindow.isOpen) this.bankWindow.render();
     if (this.deedsWindow.isOpen) this.deedsWindow.render();
+    if (this.reliquaryWindow.isOpen) this.reliquaryWindow.render();
     if (this.professionsWindow.isOpen) this.professionsWindow.render();
     // The crafting window's repaint memos (station set, reagent sig, the
     // profession surface sig) are all text-independent, so a language switch
@@ -6347,6 +6463,7 @@ export class Hud {
     // The deed tracker's texts re-localize on its next elided paint; run one
     // now so the strip never shows a stale language for up to a slow tick.
     this.updateDeedTracker();
+    this.updateReliquaryTracker();
     this.charWindow.renderIfOpen();
     // The arena window's render-skip signature is text-independent (offline sentinel or a
     // JSON of ids/numbers), so a language switch alone never moves it; relocalize() forces
@@ -7962,6 +8079,7 @@ export class Hud {
       ['#mm-talents', 'talents', 'game.talents.title'],
       ['#mm-quest', 'questlog', 'questUi.log.title'],
       ['#mm-deeds', 'deeds', 'hudChrome.deeds.title'],
+      ['#mm-reliquary', 'reliquary', 'hudChrome.reliquary.title'],
       ['#mm-professions', 'professions', 'hudChrome.professions.title'],
       ['#mm-map', 'map', 'hud.core.mobileMap'],
       ['#mm-bag', 'bags', 'itemUi.bags.title'],
@@ -8867,6 +8985,10 @@ export class Hud {
       playerFrame.levelText = String(p.level);
     }
     playerFrame.name = p.name;
+    // SELF reads its worn border from the deeds facet, not the entity wire
+    // (the wire carries other players' borders). One guarded record lookup per
+    // frame, cheap enough that a signature cache would only add state.
+    playerFrame.borderSlug = deedBorderSlug(sim.activeBorder);
     playerFrame.absorb = p;
     this.playerFramePainter.paint(unitFrameViewInto(this.playerFrameBuffer, playerFrame));
     this.updateLowHealthVignette(p.hp, p.maxHp);
@@ -9013,6 +9135,10 @@ export class Hud {
         targetFrame.name = entityDisplayName(target);
         targetFrame.titlePre = this.targetTitleDecoration.pre;
         targetFrame.titlePost = this.targetTitleDecoration.post;
+        // entity.border is the Book of Deeds deed id on the identity wire, the
+        // title field's sibling (players only; deedBorderSlug answers '' for a
+        // mob, an absent field, or an id this build does not know).
+        targetFrame.borderSlug = deedBorderSlug(target.border ?? null);
         // id-keyed gate, byte-faithful to the old lastPortraitTarget !== target.id;
         // the painter resets it on hide so an id reused by a new mob still redraws.
         targetFrame.portraitKey = String(target.id);
@@ -9601,7 +9727,9 @@ export class Hud {
     // the latch and repaints only its .money footer, never the whole grid.
     if (slowHud) this.bagsWindow.refreshIfChanged();
     if (slowHud && this.deedsWindow.isOpen) this.deedsWindow.refreshIfChanged();
+    if (slowHud && this.reliquaryWindow.isOpen) this.reliquaryWindow.refreshIfChanged();
     if (slowHud) this.refreshOpenProfessionSurfacesIfChanged();
+    if (slowHud) this.refreshCharSheetIfChanged();
     if (slowHud && this.professionsWindow.isOpen) this.professionsWindow.refreshIfChanged();
     // The gossip dialog's intro hint row watches the same online cprof edge:
     // attunement retires it, and no quest event fires for that flip.
@@ -9609,6 +9737,9 @@ export class Hud {
     // The deed tracker is always-on chrome (not gated on a window): watched
     // progress climbs from normal play, and earned deeds drop off.
     if (slowHud) this.updateDeedTracker();
+    // The Reliquary tracker is always-on chrome for the same reason: pinned
+    // pages fill from normal play, and an illuminated page drops off.
+    if (slowHud) this.updateReliquaryTracker();
     if (slowHud && this.calendarWindow.isOpen) this.calendarWindow.refreshIfChanged();
     if (slowHud) this.updateMailIndicator();
     if (slowHud) this.updateMarketIndicator();
@@ -11266,6 +11397,9 @@ export class Hud {
     // banners coalesce to the last unlock, retro back-credits collapse into
     // one summary line, and the celebration sound plays once.
     const deedUnlocks: { deedId: string; retro?: boolean }[] = [];
+    // Reliquary catalog fills batch the same way (handleReliquaryUnlocks):
+    // presentation-only; membership stays on discovery mirrors.
+    const reliquaryUnlocks: ReliquaryUnlockEventModel[] = [];
     // Personal masterwork procs batch the same way (handleCraftCelebrations):
     // coalesced to the drain's last proc, planned purely alongside tier-ups.
     let masterworkItemId: string | null = null;
@@ -11668,6 +11802,10 @@ export class Hud {
         }
         case 'deedUnlocked': {
           deedUnlocks.push(ev);
+          break;
+        }
+        case 'reliquaryUnlock': {
+          reliquaryUnlocks.push(ev);
           break;
         }
         case 'learnAbility':
@@ -12475,6 +12613,45 @@ export class Hud {
             ),
             '#40d264',
           );
+          break;
+        }
+        case 'reliquaryIlluminationBroadcast': {
+          // A guildmate's or followed friend's first-ever page Illumination
+          // (Phase 18), the deedBroadcast arm's Reliquary sibling. Id-based
+          // on the wire (server sends the page id, never English); the line
+          // composes in reliquary_i18n (Node-pinned there), guild-chat green,
+          // with the page name spliced in as a clickable jump to that page in
+          // the viewer's own Reliquary. A catalog-unknown page id
+          // (mixed-version drift; membership via Object.hasOwn, the
+          // reliquary_i18n pageDef idiom) keeps the plain line rather than a
+          // dead link: the Illumination toast's inert-link policy.
+          const pageId = ev.pageId;
+          if (!Object.hasOwn(RELIQUARY_PAGES_BY_ID, pageId)) {
+            // Text NODES, never the token-parsing log path: this branch is
+            // the one place a remote-origin string (name + raw page id)
+            // reaches chat, and it must stay structurally inert rather than
+            // incidentally safe via the name charset.
+            this.logNodes(
+              [
+                document.createTextNode(
+                  reliquaryIlluminationBroadcastLine(ev.characterName, pageId),
+                ),
+              ],
+              '#40d264',
+            );
+          } else {
+            this.logNodes(
+              deedLineNodes(
+                document,
+                reliquaryIlluminationBroadcastRendered(ev.characterName, DEED_NAME_TOKEN),
+                () =>
+                  deedChatLinkEl(document, reliquaryPageName(pageId), () =>
+                    this.reliquaryWindow.openWithPage(pageId),
+                  ),
+              ),
+              '#40d264',
+            );
+          }
           break;
         }
         case 'error':
@@ -13661,6 +13838,7 @@ export class Hud {
       }
     }
     if (deedUnlocks.length > 0) this.handleDeedUnlocks(deedUnlocks);
+    if (reliquaryUnlocks.length > 0) this.handleReliquaryUnlocks(reliquaryUnlocks);
     // Craft tier crossings are STATE-driven, not event-driven: online the
     // cprof mirror can land a snapshot after (or without) this drain's
     // events, so the observation reads the live craftSkills rather than an
@@ -13900,6 +14078,174 @@ export class Hud {
     document.getElementById('profession-tutorial')?.remove();
   }
 
+  // Reliquary catalog fill: planned purely (buildReliquaryUnlockPlan). Each
+  // unlock gets a gold log line; rank-up outranks Illumination outranks a plain
+  // unlock for the single banner slot; one sound per drain; reducedMotion trims
+  // motion only. Membership is NEVER invented here: the event is presentation-only.
+  private handleReliquaryUnlocks(events: ReliquaryUnlockEventModel[]): void {
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const plan = buildReliquaryUnlockPlan(events, reducedMotion);
+    // One catalog index for the whole drain, feeding the SAME resolution the
+    // Reliquary's own recent strip uses (reliquaryRelicPageId: the first
+    // authored page listing the slot). A chip and its own announcement
+    // therefore cannot point at different pages.
+    const pageIndex = reliquaryRelicPageIndex(RELIQUARY_PAGES);
+    for (const log of plan.logs) {
+      // One shared resolver for chat, banner, and every window surface: the two
+      // ladders here each carried their own humanized fallback, and only one of
+      // them stripped a colon namespace, so `mount:swift_gryphon` printed
+      // differently in the log than on the banner for the same unlock.
+      const name = reliquaryRelicDisplayName(log.kind, log.id);
+      const pageId = reliquaryRelicPageId(pageIndex, log.id);
+      if (pageId === null) {
+        // A relic the catalog no longer places has nowhere to jump, so the line
+        // stays plain rather than offering a link that opens nothing (the
+        // recent strip's inert-chip policy).
+        this.log(t('hudChrome.reliquary.unlockToast', { name }), '#ffd100');
+        continue;
+      }
+      // The durable gold line, with the relic name spliced in as a clickable
+      // jump to the page that holds it.
+      this.logNodes(
+        deedLineNodes(
+          document,
+          t('hudChrome.reliquary.unlockToast', { name: DEED_NAME_TOKEN }),
+          () => deedChatLinkEl(document, name, () => this.reliquaryWindow.openWithPage(pageId)),
+        ),
+        '#ffd100',
+      );
+    }
+    // Durable Illumination log survives even when rank-up claims the banner slot.
+    if (plan.illuminatedPageId && plan.banner?.kind !== 'illuminate') {
+      const pageName = reliquaryPageName(plan.illuminatedPageId);
+      // Captured for the link closure: a property narrowing does not survive
+      // into a callback, and the jump target is exactly the illuminated page.
+      const jumpId = plan.illuminatedPageId;
+      // Membership via Object.hasOwn (the reliquary_i18n pageDef idiom): the
+      // record has a normal prototype, so an `in`/truthiness check would let
+      // a forged id like "constructor" through.
+      if (!Object.hasOwn(RELIQUARY_PAGES_BY_ID, jumpId)) {
+        // A page the catalog no longer holds (client/server catalog drift)
+        // would jump to a window that opens un-navigated, so the line stays
+        // plain instead of carrying a dead link: the relic line's inert-link
+        // policy above, applied to both Illumination emitters.
+        this.log(t('hudChrome.reliquary.illuminateToast', { name: pageName }), '#ffd100');
+      } else {
+        this.logNodes(
+          deedLineNodes(
+            document,
+            t('hudChrome.reliquary.illuminateToast', { name: DEED_NAME_TOKEN }),
+            () =>
+              deedChatLinkEl(document, pageName, () => this.reliquaryWindow.openWithPage(jumpId)),
+          ),
+          '#ffd100',
+        );
+      }
+    }
+    if (plan.banner) {
+      const banner = plan.banner;
+      let bannerText: string;
+      if (banner.kind === 'rankUp') {
+        const rankName = curatorRankDisplayName(banner.rank);
+        bannerText = t('hudChrome.reliquary.rankUpBanner', {
+          rank: formatNumber(banner.rank),
+          name: rankName,
+        });
+        // The rank is the whole collection's, so its link lands on Overview,
+        // the one surface that shows the seal and the catalog total.
+        this.logNodes(
+          deedLineNodes(
+            document,
+            t('hudChrome.reliquary.rankUpToast', {
+              rank: formatNumber(banner.rank),
+              name: DEED_NAME_TOKEN,
+            }),
+            () => deedChatLinkEl(document, rankName, () => this.reliquaryWindow.open('overview')),
+          ),
+          '#ffd100',
+        );
+        // The one rank whose deed bridge rewards a nameplate border earns a
+        // second, durable line: the rank banner alone never says the border is
+        // now wearable, and the Book of Deeds is where it is put on.
+        if (CURATOR_BORDER_REWARD !== null && banner.rank === CURATOR_BORDER_REWARD.rank) {
+          this.log(
+            t('hudChrome.reliquary.borderWearableNote', {
+              name: deedName(CURATOR_BORDER_REWARD.deedId),
+            }),
+            '#ffd100',
+          );
+        }
+      } else if (banner.kind === 'illuminate') {
+        const pageName = reliquaryPageName(banner.pageId);
+        bannerText = t('hudChrome.reliquary.illuminateBanner', { name: pageName });
+        // The banner's own Illumination line is clickable too: this is the
+        // branch that fires when Illumination OWNS the banner slot, and a
+        // single-site conversion would leave it plain.
+        const jumpId = banner.pageId;
+        if (!Object.hasOwn(RELIQUARY_PAGES_BY_ID, jumpId)) {
+          // Same drift guard as the durable arm: a catalog-unknown page gets
+          // the plain line, never a link that would open un-navigated. The
+          // banner prose above keeps the (fallback) name on purpose: it is
+          // text, not a jump, and a drift drain is a dev/ops anomaly worth
+          // seeing.
+          this.log(t('hudChrome.reliquary.illuminateToast', { name: pageName }), '#ffd100');
+        } else {
+          this.logNodes(
+            deedLineNodes(
+              document,
+              t('hudChrome.reliquary.illuminateToast', { name: DEED_NAME_TOKEN }),
+              () =>
+                deedChatLinkEl(document, pageName, () => this.reliquaryWindow.openWithPage(jumpId)),
+            ),
+            '#ffd100',
+          );
+        }
+      } else {
+        const relic = banner.relic;
+        const name = reliquaryRelicDisplayName(relic.kind, relic.id);
+        bannerText = t('hudChrome.reliquary.unlockToast', { name });
+      }
+      this.showCelebrationBanner(bannerText, 'deed', 'deed', plan.motion);
+      this.combatAnnouncer.push(bannerText, performance.now());
+    }
+    if (plan.playSound) audio.achievement();
+    // Immediate open-window refresh so silhouette grids fill live.
+    // refreshIfChanged, NOT bare render(): the prebuilt-input path
+    // classifies the repaint as world-driven, which keeps the live region
+    // silent when the announced count did not change; a bare render() reads
+    // as player-driven and re-announces a count the player never asked
+    // about (the Phase 13 QA regression). Offline the ownership digest
+    // moves in the same tick, so this paints immediately. Online the event
+    // frame can precede the heavy snapshot that moves the mirror, in which
+    // case this call elides and the grid converges when that snapshot lands
+    // plus the slow band (the old bare render() painted the same stale
+    // mirror, just noisily).
+    if (plan.refreshWindow && this.reliquaryWindow.isOpen) {
+      // Arm the celebration one-shots BEFORE the refresh, so the repaint that
+      // shows the fill is the one that carries them. Both are consumed by a
+      // render, so a refresh that elides (the online snapshot-lag case above)
+      // leaves them armed for the paint that actually shows the new state
+      // instead of firing on a surface that has not caught up yet. Reduced
+      // motion is handled in CSS for both, so a player who prefers less motion
+      // still gets the static treatment rather than nothing.
+      this.reliquaryWindow.flashRelics(plan.logs.map((log) => reliquaryFlashKey(log.kind, log.id)));
+      if (plan.illuminatedPageId !== null) {
+        this.reliquaryWindow.celebrateIllumination(plan.illuminatedPageId);
+      }
+      this.reliquaryWindow.refreshIfChanged();
+    }
+    // On-join catch-up: one localized summary line, the same treatment the
+    // Book of Deeds gives its retro pass. No banner, no audio, and no forced
+    // window rebuild (the slow-band signature picks the new fills up).
+    if (plan.retroCount > 0) {
+      const retroText = tPlural('hudChrome.plurals.reliquaryRetroSummary', plan.retroCount, {
+        count: formatNumber(plan.retroCount, { maximumFractionDigits: 0 }),
+      });
+      this.log(retroText, '#ffd100');
+      this.combatAnnouncer.push(retroText, performance.now());
+    }
+  }
+
   // The earned moment, planned purely (deeds_view buildDeedUnlockPlan) so the
   // batching rules stay unit-pinned: each fresh unlock gets a gold log line
   // (the durable copy) and title rewards a second hint line; the single
@@ -13926,6 +14272,12 @@ export class Hud {
     for (const id of plan.titleHintIds) {
       this.log(t('hudChrome.deeds.unlockedTitleHint', { title: deedTitleText(id) }), '#ffd100');
     }
+    // The border sibling of the title hint, same color and placement. A border
+    // reward carries no display text of its own (only a palette slug), so the
+    // line names the DEED, which is also what the picker lists it under.
+    for (const id of plan.borderHintIds) {
+      this.log(t('hudChrome.deeds.unlockedBorderHint', { name: deedName(id) }), '#ffd100');
+    }
     if (plan.bannerId !== null) {
       const bannerText = t('hudChrome.deeds.unlockedBanner', { name: deedName(plan.bannerId) });
       // The 'deed' variant, NOT the shared gold level-up treatment: an early
@@ -13943,7 +14295,7 @@ export class Hud {
     }
     if (plan.playSound) audio.achievement();
     if (plan.retroCount > 0) {
-      const retroText = t('hudChrome.deeds.retroSummary', {
+      const retroText = tPlural('hudChrome.plurals.deedsRetroSummary', plan.retroCount, {
         count: formatNumber(plan.retroCount, { maximumFractionDigits: 0 }),
       });
       this.log(retroText, '#ffd100');
@@ -16016,6 +16368,17 @@ export class Hud {
     this.professionsWindow.toggle();
   }
 
+  // The Reliquary window entry point (keybind, minimap, and More-tray all
+  // toggle; Esc closes via the managed-window case directly). open() is used
+  // by the character-sheet launch button so a second click never closes it.
+  openReliquary(): void {
+    this.reliquaryWindow.open();
+  }
+
+  toggleReliquary(): void {
+    this.reliquaryWindow.toggle();
+  }
+
   // Repaint the deed tracker from the live facet: the slow band, a watch
   // toggle, the collapse toggle, and language switches all funnel here; the
   // elided writers make an unchanged repaint free.
@@ -16047,6 +16410,70 @@ export class Hud {
     settings.set('deedTrackerCollapsed', !settings.get('deedTrackerCollapsed'));
     audio.click();
     this.updateDeedTracker();
+  }
+
+  // Repaint the Reliquary tracker from the live facet: the slow band, a pin
+  // toggle, the collapse toggle, and language switches all funnel here; the
+  // elided writers make an unchanged repaint free. The ownership signature is
+  // what lets the core hold its default (nothing-pinned) ranking instead of
+  // re-folding all 28 catalog pages every slow tick.
+  private updateReliquaryTracker(): void {
+    const collapsed =
+      (this.optionsHooks?.settings.get('reliquaryTrackerCollapsed') ?? false) === true;
+    this.reliquaryTrackerInput ??= {
+      pinned: this.reliquaryWindow.pinned,
+      pageIds: RELIQUARY_PAGE_ORDER,
+      completion: (pageId) => this.sim.reliquaryPageCompletion(pageId),
+      // The deliberate asymmetry, recorded here because the two halves read as
+      // an inconsistency otherwise: pinned pages (at most RELIQUARY_TRACK_CAP,
+      // five) are read LIVE on every slow build, while the whole-catalog default scan
+      // memoizes on this signature. The signature is cheap but has a documented
+      // same-band blind spot (an add and a remove on ONE surface inside a single
+      // 500ms band cancel out), and five live reads sit comfortably inside the
+      // slow-band budget, so the pages the player explicitly chose get the exact
+      // answer and the whole-catalog scan gets the cheap one. Accepted with it:
+      // the mount count is the expensive read here, not a cheap one. Offline,
+      // Sim.ownedMounts() copies the whole bags-plus-bank array before scanning
+      // it, and every completion() call above pays that copy again through
+      // Sim.reliquaryOwnershipSurfaces(); online, ClientWorld returns a stored
+      // field. Accepted because this is the 500ms band with at most five pinned
+      // reads. A thunk, not a value, so the signature (and that copy) is skipped
+      // entirely while the player has pins: only the default branch reads it.
+      ownershipSig: () =>
+        reliquaryTrackerOwnershipSig({
+          itemsDiscovered: this.sim.deedStats.itemsDiscovered.size,
+          marks: this.sim.reliquaryMarks.size,
+          deedsEarned: this.sim.deedsEarned.size,
+          mounts: this.sim.ownedMounts().length,
+          weaponSkins: this.sim.accountCosmetics.weaponSkinIds.length,
+        }),
+      collapsed,
+    };
+    const input = this.reliquaryTrackerInput;
+    // Per-build fields: the pin set is re-read live off the window store and
+    // the collapse off settings; everything else on the reused input is stable.
+    input.pinned = this.reliquaryWindow.pinned;
+    input.collapsed = collapsed;
+    const view = buildReliquaryTrackerViewInto(this.reliquaryTrackerView, input);
+    // Compact touch tier: the rows are folded away (hud.mobile.css) and the header
+    // is a count chip that opens The Reliquary (see the #reliquary-tracker
+    // click/keydown delegation, which reroutes to openReliquary here). Tell the
+    // painter so it swaps the header from a disclosure toggle to a dialog opener.
+    // Reuse the exact class test the delegation uses so the announced role
+    // matches the behavior.
+    view.chip =
+      document.body.classList.contains('mobile-touch') &&
+      document.body.classList.contains('hud-mobile-compact');
+    this.reliquaryTrackerPainter.update(view);
+  }
+
+  /** Flip the persisted Reliquary-tracker collapse (header click/keyboard delegation). */
+  private toggleReliquaryTrackerCollapsed(): void {
+    const settings = this.optionsHooks?.settings;
+    if (!settings) return;
+    settings.set('reliquaryTrackerCollapsed', !settings.get('reliquaryTrackerCollapsed'));
+    audio.click();
+    this.updateReliquaryTracker();
   }
 
   toggleCalendar(): void {
@@ -16371,6 +16798,39 @@ export class Hud {
     // applyState at character load, when no window can be open.)
   }
 
+  // The progression-block sibling of refreshOpenProfessionSurfacesIfChanged:
+  // the sheet's title line, border badge row, and Reliquary pair are readouts
+  // on a cold window, and no surface that moves them repaints an already open
+  // sheet (the deeds picker repaints only itself; a relic fill, the tracker).
+  //
+  // Computed even when closed, like the sibling, with the cost stated rather
+  // than waved through: three size reads are O(1), and Sim.ownedMounts() pays
+  // one merged bags-plus-bank allocation per 2 Hz tick (the read the Reliquary
+  // tracker defers behind a thunk). Microseconds against a 500 ms band,
+  // ACCEPTED so the warm signature stops a reopen from being followed by a
+  // redundant signature-diff repaint. The sizes are a proxy, not a second
+  // completion walk; the core's own header says what the proxy misses.
+  //
+  // Rule of three: a THIRD consumer of these ownership reads on this band earns
+  // one shared once-per-tick computation instead of a third inventory walk.
+  //
+  // Converges in both hosts with no optimistic write (offline setters are
+  // synchronous; online the atitle/aborder echo and the snapshot's ownership
+  // fields land well inside one band), and render() rebuilds every row fresh.
+  private refreshCharSheetIfChanged(): void {
+    const sig = charSheetRefreshSig({
+      activeTitle: this.sim.activeTitle,
+      activeBorder: this.sim.activeBorder,
+      deedsEarned: this.sim.deedsEarned.size,
+      itemsDiscovered: this.sim.deedStats.itemsDiscovered.size,
+      marks: this.sim.reliquaryMarks.size,
+      mounts: this.sim.ownedMounts().length,
+    });
+    if (sig === this.lastCharSheetSig) return;
+    this.lastCharSheetSig = sig;
+    this.charWindow.renderIfOpen();
+  }
+
   renderBags(): void {
     this.bagsWindow.render();
   }
@@ -16640,11 +17100,18 @@ export class Hud {
     const vlevel = virtualLevel(sim.lifetimeXp);
     const unlocked = new Set(sim.unlockedMilestones);
     // Earned Book of Deeds border rewards join the badge row through the same
-    // ms-badge plumbing (nameplate border display is a deliberate v1 cut).
+    // ms-badge plumbing. The row is now a WORN-state readout: borders render on
+    // nameplates and unit-frame portraits, and the one the player wears carries
+    // the worn word in its own label, so the state never rides colour alone.
     const borderBadges = DEED_ORDER.filter(
       (id) => DEEDS[id].reward?.kind === 'border' && sim.deedsEarned.has(id),
     )
-      .map((id) => `<span class="ms-badge ms-deed-border">${esc(deedName(id))}</span>`)
+      .map((id) => {
+        const worn = id === sim.activeBorder;
+        const name = deedName(id);
+        const label = worn ? t('hudChrome.deeds.charBorderWorn', { name }) : name;
+        return `<span class="ms-badge ms-deed-border${worn ? ' ms-active' : ''}">${esc(label)}</span>`;
+      })
       .join('');
     const badges =
       MILESTONES.filter((m) => unlocked.has(m.id))
@@ -16667,6 +17134,9 @@ export class Hud {
         ? `<b class="cp-active-title">${esc(activeTitleText)}</b>`
         : `<span class="cp-none">${t('hudChrome.deeds.charTitleNone')}</span>`
     } <button type="button" class="btn cp-deeds-btn" data-act="open-deeds">${t('hudChrome.deeds.charOpenBook')}</button></div>`;
+    // Labeled Reliquary completion pair + Curator rank (character-scoped;
+    // pure core paints the chrome; open button wires through CharWindow).
+    html += reliquarySheetProgressionHtml(buildReliquarySheetModel(sim));
     if (level >= MAX_LEVEL) {
       // The button reflects the server's authoritative prestige gate (post-cap
       // XP earned). It's disabled — and the requirement shown — until eligible;
@@ -17704,7 +18174,18 @@ export class Hud {
   openInspect(pid: number): void {
     const e = this.sim.entities.get(pid);
     if (e?.kind !== 'player') return;
-    this.inspectWindow.openInspect(e, Date.now());
+    // Inspecting YOURSELF reads the live standing instead of the mirrored wire
+    // fields, through the exact model the character sheet's Reliquary line is
+    // built from, so the card and the sheet can never print different numbers
+    // for the same player. For anyone else there is nothing local to read and
+    // the wire fields are the only (and the right) answer. This is also what
+    // makes self-inspect work OFFLINE at all: no server ever stamps crk/cro/crt
+    // in a single-player world, so the card used to show no standing there.
+    this.inspectWindow.openInspect(
+      e,
+      Date.now(),
+      pid === this.sim.playerId ? selfCuratorStanding(this.sim) : null,
+    );
   }
 
   /** Open the Loot Settings window: the leader gets the editable master-loot

@@ -68,10 +68,13 @@ export function bareClient(pid: number, overrides: BareClientOverrides = {}): Cl
     weaponSkinIds: [],
     weaponSkinLoadout: {},
   };
+  c.accountAdmin = false;
+  c.petSpecialCommandsSupported = false;
   c.xp = 0;
   c.lifetimeXp = 0;
   c.prestigeRank = 0;
   c.restedXp = 0;
+  c.playtimeSeconds = 0;
   c.unlockedMilestones = [];
   c.talents = emptyAllocation();
   c.talentSpec = null;
@@ -104,8 +107,14 @@ export function bareClient(pid: number, overrides: BareClientOverrides = {}): Cl
   c.bankInfo = null;
   c.deedsEarned = new Map();
   c.deedStats = freshDeedStats();
+  // IWorldReliquary sparse mirrors (heavy self `reliq`); empty until a snap.
+  c.reliquaryFirstFind = {};
+  c.reliquaryMarks = new Set();
+  c.reliquaryRecent = [];
+  c.reliquaryObtainCounts = {};
   c.renown = 0;
   c.activeTitle = null;
+  c.activeBorder = null;
   c.delveRun = null;
   c.companionState = null;
   c.riftFloor = null;
@@ -157,6 +166,7 @@ export function bareClient(pid: number, overrides: BareClientOverrides = {}): Cl
   c.eventQueue = [];
   c.activeFrostRings = [];
   c.activeTemporalHourglasses = [];
+  c.activeConsecrations = [];
   c.profanityWords = [];
   c.mouselookFacing = null;
   c.lastInputSentAt = 0;
@@ -175,6 +185,46 @@ export function bareClient(pid: number, overrides: BareClientOverrides = {}): Cl
   c.mountLessonActiveMirror = false;
   c.activeBossDeathZones = [];
   c.riftEventExpiresAtMs = null;
+  // The "mirrors every class-field default" claim above is now ENFORCED by
+  // tests/bare_client_defaults.test.ts (a source scrape of ClientWorld's
+  // initialized fields), which surfaced the drift below: these had all
+  // accreted on the class without the fixture noticing. Values mirror the
+  // class initializers exactly; guildBankInfo in particular is read through
+  // `!== null` gates, where undefined would behave differently.
+  c.guildBankInfo = null;
+  c.guildBankLogEntries = [];
+  c.guildBankLogState = 'idle';
+  c.guildBankLogAt = 0;
+  c.toolEffectSlots = [];
+  c.commissionOrders = [];
+  c.socialDirty = false;
+  c.wireSeen = new Set();
+  c.lastStopAutoAttackOnTargetSwitch = null;
+  c.reconnectAttempts = 0;
+  c.conflictRejections = 0;
+  c.timeoutRejections = 0;
+  c.sessionEnded = false;
+  c.counterfangWindowDeadlineMs = 0;
+  c.invChanged = false;
+  c.cosmeticsChanged = false;
+  c.actionBarRestore = undefined;
+  c.actionBarRestoreResolved = false;
+  c.actionBarSaveTimer = null;
+  c.actionBarSaveLastJson = null;
+  c.actionBarSavePending = null;
+  c.profanityDirty = false;
+  c.pendingTargetEcho = null;
+  c.nextCommandOutcomeId = 1;
+  c.pendingCommandOutcomes = new Map();
+  c.selfLockouts = {};
+  c.selfOwnedMounts = [];
+  c.selfRidingTrained = false;
+  // Callback-typed fields the first (regex-based) defaults sweep was blind
+  // to: their annotations contain `=>`, which the scrape's annotation group
+  // could not cross. The AST-based sweep sees them.
+  c.onDisconnect = null;
+  c.onConnectionLost = null;
+  c.onReconnected = null;
 
   Object.assign(c, rest);
   return c;

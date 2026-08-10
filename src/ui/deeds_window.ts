@@ -80,7 +80,14 @@ const FILTER_LABEL_KEYS: Record<DeedsFilter, TranslationKey> = {
  */
 export function refocusSelector(active: Element | null): string | null {
   if (active === null) return null;
-  for (const attr of ['data-cat', 'data-filter', 'data-watch', 'data-title', 'data-recent']) {
+  for (const attr of [
+    'data-cat',
+    'data-filter',
+    'data-watch',
+    'data-title',
+    'data-border-pick',
+    'data-recent',
+  ]) {
     const value = active.getAttribute(attr);
     if (value !== null) {
       const cssValue = value.replace(/["\\]/g, '\\$&');
@@ -303,6 +310,7 @@ export class DeedsWindow {
       renown: world.renown,
       earnedCount: world.deedsEarned.size,
       activeTitle: world.activeTitle,
+      activeBorder: world.activeBorder,
       filter: this.filter,
       search: this.search,
       category: this.category,
@@ -422,6 +430,7 @@ export class DeedsWindow {
       deedStats: world.deedStats,
       renown: world.renown,
       activeTitle: world.activeTitle,
+      activeBorder: world.activeBorder,
       deeds: DEEDS,
       order: DEED_ORDER,
       category: this.category,
@@ -497,9 +506,11 @@ export class DeedsWindow {
       })
       .join('');
     const titlesOn = this.category === 'titles';
+    // The shelf holds both worn cosmetics, so the rail names both: a player
+    // hunting for the border picker must be able to see where it lives.
     const titlesRow =
       `<button type="button" class="deeds-cat deeds-cat-titles${titlesOn ? ' active' : ''}" data-cat="titles" aria-pressed="${titlesOn}">` +
-      `<span class="deeds-cat-name">${esc(t('hudChrome.deeds.titlesSection'))}</span></button>`;
+      `<span class="deeds-cat-name">${esc(t('hudChrome.deeds.cosmeticsSection'))}</span></button>`;
     return `<nav class="deeds-rail" aria-label="${esc(t('hudChrome.deeds.categoriesAria'))}">${rows}${titlesRow}</nav>`;
   }
 
@@ -524,6 +535,13 @@ export class DeedsWindow {
     if (entry.titleReward)
       chips.push(
         `<span class="deed-chip deed-title-chip">${esc(t('hudChrome.deeds.titleChip'))}</span>`,
+      );
+    // Deliberate family reuse: the border chip wears the shipped
+    // deed-title-chip class rather than a bespoke one, so the two worn-cosmetic
+    // rewards read as one family on a card and neither can drift in styling.
+    if (entry.borderReward)
+      chips.push(
+        `<span class="deed-chip deed-title-chip">${esc(t('hudChrome.deeds.borderChip'))}</span>`,
       );
     // Feats carry no Renown chip (they are zero Renown by rule).
     if (!entry.feat)
@@ -595,19 +613,65 @@ export class DeedsWindow {
     return `<b>${esc(deedName(id))}</b><div class="tt-sub">${esc(deedDesc(id))}</div>`;
   }
 
+  /** The worn-cosmetics shelf: the title picker, then the nameplate-border
+   *  picker. Two labelled groups of the same option button (one class, so the
+   *  mobile tap floor and the focus ring already cover both); the pick
+   *  ATTRIBUTE is what keeps their click delegations apart. */
   private titlesHtml(model: DeedsViewModel): string {
-    const rows = model.titles
-      .map((option) => {
-        const label =
-          option.id === null ? t('hudChrome.deeds.titlesNone') : deedTitleText(option.id);
-        return `<button type="button" class="deed-title-option${option.active ? ' active' : ''}" data-title="${esc(option.id ?? '')}" aria-pressed="${option.active}">${esc(label)}</button>`;
+    return (
+      this.pickerGroupHtml({
+        cls: 'deeds-titles',
+        pickAttr: 'data-title',
+        headingKey: 'hudChrome.deeds.titlesSection',
+        emptyKey: 'hudChrome.deeds.titlesEmpty',
+        options: model.titles,
+        // A title deed carries its own display text; a border deed carries a
+        // slug with no player-facing words, so its option is named by the deed.
+        label: (id) => (id === null ? t('hudChrome.deeds.titlesNone') : deedTitleText(id)),
+      }) +
+      this.pickerGroupHtml({
+        cls: 'deeds-borders',
+        pickAttr: 'data-border-pick',
+        headingKey: 'hudChrome.deeds.bordersSection',
+        emptyKey: 'hudChrome.deeds.bordersEmpty',
+        options: model.borders,
+        label: (id) => (id === null ? t('hudChrome.deeds.bordersNone') : deedName(id)),
       })
+    );
+  }
+
+  /** One cosmetic picker group. The option array arrives in catalog order
+   *  behind its None head and renders verbatim; only the None head exists when
+   *  nothing is earned, which is what the empty line reports.
+   *
+   *  The visible head is a real h3 (the window family's section-heading
+   *  level) and the group is named BY it (aria-labelledby), not by a second
+   *  aria-label string: one accessible name, matching the visible text, plus
+   *  a heading a screen reader can navigate to. The id is derived from the
+   *  group class, which is unique per group inside the single-instance
+   *  window. */
+  private pickerGroupHtml(group: {
+    cls: string;
+    pickAttr: string;
+    headingKey: TranslationKey;
+    emptyKey: TranslationKey;
+    options: readonly { id: string | null; active: boolean }[];
+    label(id: string | null): string;
+  }): string {
+    const rows = group.options
+      .map(
+        (option) =>
+          `<button type="button" class="deed-title-option${option.active ? ' active' : ''}" ${group.pickAttr}="${esc(option.id ?? '')}" aria-pressed="${option.active}">${esc(group.label(option.id))}</button>`,
+      )
       .join('');
     const empty =
-      model.titles.length <= 1
-        ? `<div class="deeds-empty">${esc(t('hudChrome.deeds.titlesEmpty'))}</div>`
-        : '';
-    return `<div class="deeds-titles" role="group" aria-label="${esc(t('hudChrome.deeds.titlesAria'))}">${rows}${empty}</div>`;
+      group.options.length <= 1 ? `<div class="deeds-empty">${esc(t(group.emptyKey))}</div>` : '';
+    const headId = `${group.cls}-head`;
+    return (
+      `<div class="${group.cls}" role="group" aria-labelledby="${headId}">` +
+      `<h3 class="deeds-picker-head" id="${headId}">${esc(t(group.headingKey))}</h3>` +
+      `${rows}${empty}</div>`
+    );
   }
 
   private filterBarHtml(): string {
@@ -694,6 +758,20 @@ export class DeedsWindow {
         // No optimistic local copy: the facet echoes the accepted change (the
         // offline sim synchronously, the mirror on the snapshot echo).
         this.deps.world().setActiveTitle(id === '' ? null : id);
+        audio.click();
+        this.render();
+      });
+    }
+    for (const btn of el.querySelectorAll<HTMLElement>('[data-border-pick]')) {
+      btn.addEventListener('click', () => {
+        if (this.deps.consumePeek()) {
+          this.deps.hideTooltip();
+          return;
+        }
+        const id = btn.dataset.borderPick ?? '';
+        // No optimistic local copy: the facet echoes the accepted change (the
+        // offline sim synchronously, the mirror on the snapshot echo).
+        this.deps.world().setActiveBorder(id === '' ? null : id);
         audio.click();
         this.render();
       });

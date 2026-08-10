@@ -27,6 +27,7 @@ import { LeaderboardWindow } from '../../src/ui/leaderboard_window';
 import { MarketWindow } from '../../src/ui/market_window';
 import { OptionsWindow } from '../../src/ui/options_window';
 import { ProfessionsWindow } from '../../src/ui/professions_window';
+import { ReliquaryWindow } from '../../src/ui/reliquary_window';
 import { SocialWindow } from '../../src/ui/social_window';
 import { SpellbookWindow } from '../../src/ui/spellbook_window';
 import { TalentsWindow } from '../../src/ui/talents_window';
@@ -1091,6 +1092,99 @@ describe('axe: professions window tool-effect controls', () => {
     // Buttons carry visible text as their accessible names, never bare icons.
     expect(slot?.textContent?.trim().length ?? 0).toBeGreaterThan(0);
     expect(recharge?.textContent?.trim().length ?? 0).toBeGreaterThan(0);
+    await expectClean(root);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// The Reliquary (#reliquary-window) - Phase 13 added a search field, a filter
+// chip group, a real ul/li shelf list, and a roving-tabindex relic grid whose
+// cells carry aria-describedby / aria-keyshortcuts. Every one of those is
+// interactive chrome axe can judge, and the grid is the only roving surface in
+// this window family that is NOT a composite role, so it is worth axing
+// directly rather than trusting the source pins.
+// ---------------------------------------------------------------------------
+
+describe('axe: reliquary window search, filters, and relic grid', () => {
+  function reliquaryWorld() {
+    // CAUTION: the stub is handed over through an `as never` cast below, so
+    // tsc cannot flag a missing member here; a new world read in the window
+    // (like the Phase 15 pinKey identity pair) surfaces as a RUNTIME throw in
+    // this suite only. Keep this stub in step with what the window reads.
+    return {
+      // The Phase 15 pin store keys per character (pinKey reads BOTH), so the
+      // stub carries the identity members every real world has.
+      cfg: { playerClass: 'warrior' },
+      player: { name: 'AxeTester' },
+      deedStats: { itemsDiscovered: new Set<string>() },
+      reliquaryMarks: new Set<string>(),
+      reliquaryRecent: [] as string[],
+      reliquaryFirstFind: {},
+      ownedMounts: () => [] as string[],
+      accountCosmetics: { weaponSkinIds: [] as string[] },
+      deedsEarned: new Map<string, number>(),
+      reliquaryPageClearCount: () => undefined,
+      reliquaryCatalogCompletion: () => ({ owned: 0, total: 100 }),
+      reliquaryCuratorRank: () => 0,
+      reliquaryPageCompletion: () => null,
+      reliquaryRarity: () => Promise.resolve(null),
+    };
+  }
+
+  function openReliquary(root: HTMLElement): ReliquaryWindow {
+    const win = new ReliquaryWindow(
+      stubDeps({
+        root: () => root,
+        world: () => reliquaryWorld() as never,
+        consumePeek: () => false,
+        itemIcon: () => '<img alt="">',
+        itemTooltip: () => '',
+      }),
+    );
+    win.open();
+    return win;
+  }
+
+  it('the Overview shelf is clean with a labelled search field', async () => {
+    const root = host('reliquary-window');
+    openReliquary(root);
+    const search = root.querySelector<HTMLInputElement>('.reliquary-search');
+    expect(search).not.toBeNull();
+    // A search input with no visible label needs an accessible one.
+    expect(search?.getAttribute('aria-label')?.trim().length ?? 0).toBeGreaterThan(0);
+    await expectClean(root);
+  });
+
+  it('the page grid is clean: one tab stop, described cells, named chips', async () => {
+    const root = host('reliquary-window');
+    openReliquary(root);
+    // Walk to a real page the way a player does, so axe sees the grid, the
+    // filter chip group, and the ul/li shelf structure that produced it.
+    root.querySelector<HTMLElement>('[data-nav="conquerors"]')?.click();
+    const firstPage = root.querySelector<HTMLElement>('[data-page]');
+    expect(firstPage).not.toBeNull();
+    firstPage?.click();
+
+    const grid = root.querySelector('.reliquary-grid');
+    expect(grid).not.toBeNull();
+    const cells = [...root.querySelectorAll<HTMLElement>('[data-cell-id]')];
+    expect(cells.length).toBeGreaterThan(1);
+    // Roving tabindex: exactly one tab stop, and every cell names its keys and
+    // points at the hint it is described by.
+    expect(cells.filter((c) => c.tabIndex === 0)).toHaveLength(1);
+    for (const cell of cells) {
+      expect(cell.getAttribute('aria-label')?.trim().length ?? 0).toBeGreaterThan(0);
+      expect(cell.getAttribute('aria-describedby')).toBe('reliquary-grid-hint');
+    }
+    // The describedby target must actually exist, or axe reports a dangling
+    // reference and a screen reader announces nothing extra.
+    expect(root.querySelector('#reliquary-grid-hint')).not.toBeNull();
+    // Every filter chip carries visible text as its accessible name.
+    const chips = [...root.querySelectorAll<HTMLElement>('[data-filter]')];
+    expect(chips).toHaveLength(3);
+    for (const chip of chips) {
+      expect(chip.textContent?.trim().length ?? 0).toBeGreaterThan(0);
+    }
     await expectClean(root);
   });
 });

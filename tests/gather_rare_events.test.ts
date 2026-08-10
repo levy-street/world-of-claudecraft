@@ -11,6 +11,7 @@ import {
   rollGatherRareEvent,
 } from '../src/sim/professions/gather_events';
 import { isSignableMaterialRarity, resolveHarvest } from '../src/sim/professions/gathering';
+import { freshReliquaryState } from '../src/sim/reliquary';
 import { Rng } from '../src/sim/rng';
 import type { PlayerMeta } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
@@ -196,7 +197,22 @@ describe('announceGatherRareEvent: soft zone fanout + dormant deed mark', () => 
     const players = new Map<number, PlayerMeta>();
     const entities = new Map<number, { pos: { x: number; y: number; z: number } }>();
     const addPlayer = (pid: number, name: string, z: number, x = 0) => {
-      const meta = { entityId: pid, name } as unknown as PlayerMeta;
+      // Reliquary field-note marks write through noteReliquaryMark, which
+      // scores curator rank off live ownedMounts: the finder needs a real
+      // sparse reliquary state AND the containers ownedMounts scans (bags and
+      // bank), not a bare stub. Since Phase 18 the mark path also runs the
+      // completion-ladder sync unconditionally, whose earned-set early-out
+      // reads meta.deedsEarned, so the stub carries the empty Map too (no
+      // ladder read can pass on one mark, so ctx.grantDeed stays uncalled).
+      const meta = {
+        entityId: pid,
+        name,
+        inventory: [],
+        bank: { inventory: [], purchasedSlots: 0, bonusSlots: 0 },
+        reliquary: freshReliquaryState(),
+        deedStats: { itemsDiscovered: new Set<string>() },
+        deedsEarned: new Map<string, string>(),
+      } as unknown as PlayerMeta;
       players.set(pid, meta);
       entities.set(pid, { pos: { x, y: 0, z } });
       return meta;
@@ -206,6 +222,7 @@ describe('announceGatherRareEvent: soft zone fanout + dormant deed mark', () => 
       entities,
       emit: (e: SimEvent) => emitted.push(e),
       markVisited: (_meta: PlayerMeta, markId: string) => marks.push(markId),
+      grantDeed: () => false,
     } as unknown as SimContext;
     return { ctx, emitted, marks, addPlayer };
   }
@@ -260,10 +277,16 @@ describe('announceGatherRareEvent: soft zone fanout + dormant deed mark', () => 
       'ancient_heartwood',
       'moonlit_bloom',
     ] as GatherRareEventFlavor[]) {
-      const { ctx, marks, addPlayer } = fakeCtx();
+      const { ctx, marks, addPlayer, emitted } = fakeCtx();
       const finder = addPlayer(1, 'Alba', 0);
       announceGatherRareEvent(ctx, finder, node, flavor, 'copper_ore');
-      expect(marks).toEqual([`gather_event:${flavor}`]);
+      const visitMark = `gather_event:${flavor}`;
+      expect(marks).toEqual([visitMark]);
+      // Reliquary field-note trophy reuses the same gather_event:* id.
+      expect(finder.reliquary.marks.has(visitMark)).toBe(true);
+      expect(emitted.some((e) => e.type === 'reliquaryUnlock' && e.markId === visitMark)).toBe(
+        true,
+      );
     }
   });
 });
@@ -347,6 +370,8 @@ describe('rare events through Sim.harvestNode (all three flavors)', () => {
 
     // The per-flavor deed mark (deeds.ts registers a deed per flavor).
     expect(meta.deedStats.visited.has('gather_event:pristine_vein')).toBe(true);
+    // Reliquary field-note trophy (Phase 7) reuses the same gather_event:* id.
+    expect(meta.reliquary.marks.has('gather_event:pristine_vein')).toBe(true);
   });
 
   it('a wood node hit is an ancient heartwood with the same signed x5 yield', () => {
@@ -360,6 +385,7 @@ describe('rare events through Sim.harvestNode (all three flavors)', () => {
     expect(slots[0].count).toBe(GATHER_RARE_EVENT_YIELD_MULT);
     expect(slots[0].instance?.signer).toBe('Finder');
     expect(meta.deedStats.visited.has('gather_event:ancient_heartwood')).toBe(true);
+    expect(meta.reliquary.marks.has('gather_event:ancient_heartwood')).toBe(true);
   });
 
   it('a herb node hit is a moonlit bloom with the same signed x5 yield', () => {
@@ -373,6 +399,7 @@ describe('rare events through Sim.harvestNode (all three flavors)', () => {
     expect(slots[0].count).toBe(GATHER_RARE_EVENT_YIELD_MULT);
     expect(slots[0].instance?.signer).toBe('Finder');
     expect(meta.deedStats.visited.has('gather_event:moonlit_bloom')).toBe(true);
+    expect(meta.reliquary.marks.has('gather_event:moonlit_bloom')).toBe(true);
   });
 
   it('same seed, same hunt: the hit lands on the same harvest with identical events', () => {

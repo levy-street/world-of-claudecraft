@@ -39,6 +39,20 @@ const themeSeed = (preset) => async (page) => {
   );
 };
 
+// Seed the LOWEST graphics preset before the document loads, the same beforeLoad
+// storage slot themeSeed uses and for the same reason: the renderer reads
+// woc_settings.graphicsPreset during startup (tier choice gates preload), so a
+// staging-time write lands too late. graphicsDefaultApplied rides along because
+// main.ts otherwise probes the device on a first run and PERSISTS its own tier
+// over the seed. A window/HUD shot is evidence about the DOM, never about render
+// fidelity, so tier 1 is what it should cost: less to software-render under
+// SwiftShader on a host that usually has other work on it.
+const lowGraphicsSeed = async (page) => {
+  await page.evaluateOnNewDocument(
+    `try { const k = 'woc_settings'; const s = JSON.parse(localStorage.getItem(k) || '{}'); s.graphicsPreset = 1; s.graphicsDefaultApplied = true; localStorage.setItem(k, JSON.stringify(s)); } catch {}`,
+  );
+};
+
 // Teleport onto the Merchant's stall (zone1, {0, 11.5}) so marketOpen's proximity gate
 // passes, then open the Browse tab. Shared by the market filter-chrome targets below.
 //
@@ -169,6 +183,156 @@ async function stubDesktopUpdateBridge(page) {
       return real(input, init);
     };
   })()`);
+}
+
+// ---------------------------------------------------------------------------
+// The Reliquary HUD tracker (#reliquary-tracker) bring-up, shared by every
+// variant of the reliquary-tracker target below. The strip paints only when it
+// HAS lines, so a capture has to earn them the way a player does: fill a few
+// pages part-way, then pin them through the window's own pin buttons (the real
+// path, storage and repaint included) rather than poking the view core.
+// ---------------------------------------------------------------------------
+
+/** Pages the capture pins. Under RELIQUARY_TRACK_CAP on purpose, so the shot
+ *  shows a tracked set rather than the cap refusal. */
+const RELIQUARY_TRACKER_PINS = 3;
+
+/** Share of a page's item relics to grant, so every tracked line shows a
+ *  PARTIAL bar: an empty one proves nothing and a full one illuminates the
+ *  page, which retires it from the strip. */
+const RELIQUARY_TRACKER_FILL = 0.5;
+
+/** Wipe the per-character pin store before the document loads. The harness
+ *  profile's localStorage outlives page.close, so an earlier variant's pins
+ *  would otherwise decide what the next one shows, and the pin control is a
+ *  TOGGLE: a second click on an already-pinned page unpins it. */
+async function clearReliquaryPins(page) {
+  await page.evaluateOnNewDocument(
+    `try { for (const k of Object.keys(localStorage)) { if (k.indexOf('woc_reliquary_pins') === 0) localStorage.removeItem(k); } } catch {}`,
+  );
+}
+
+/** Seed the LOW graphics preset before the document loads (the capture rule:
+ *  every rig shoots the lowest preset so shots stay comparable across
+ *  machines; only deliberate gfx-comparison shots keep their own preset).
+ *  Merges over any existing woc_settings so unrelated persisted options
+ *  survive; graphicsPreset 1 is PRESET_LOW in src/render/gfx.ts. */
+async function seedLowGraphicsPreset(page) {
+  await page.evaluateOnNewDocument(
+    `try { const s = JSON.parse(localStorage.getItem('woc_settings') ?? '{}') || {}; s.graphicsPreset = 1; localStorage.setItem('woc_settings', JSON.stringify(s)); } catch {}`,
+  );
+}
+
+/** The tracker variants need BOTH pre-load seeds: the pin-store wipe and the
+ *  low preset (a variant carries one beforeLoad, so this composes the pair). */
+async function clearPinsOnLowPreset(page) {
+  await clearReliquaryPins(page);
+  await seedLowGraphicsPreset(page);
+}
+
+/** Open The Reliquary on the Conquerors shelf and return its page ids in shelf
+ *  order. That shelf is item-only, which is what makes the partial fill below
+ *  predictable (marks, mounts, titles and skins live in other stores). */
+async function openReliquaryConquerorsShelf(page) {
+  await page.evaluate(() => {
+    document.querySelector('#gpu-notice')?.remove();
+    document.querySelector('.camera-prompt-confirm')?.click();
+    window.__game?.hud?.openReliquary?.();
+  });
+  const opened = await pollForSize(page, '#reliquary-window');
+  if (!opened) throw new Error('reliquary window did not open');
+  await page.evaluate(() => {
+    document.querySelector('#reliquary-window [data-nav="conquerors"]')?.click();
+  });
+  await wait(300);
+  return page.evaluate(() =>
+    [...document.querySelectorAll('#reliquary-window .reliquary-page-row')].map(
+      (row) => row.dataset.page,
+    ),
+  );
+}
+
+/** Grant part of one page's item relics by reading the page detail's OWN cells
+ *  (data-cell-id / data-cell-kind), never a hard-coded relic list that content
+ *  re-authoring would rot, then return to the shelf. Returns how many landed. */
+async function fillReliquaryPagePartway(page, pageId) {
+  await page.evaluate((id) => {
+    document.querySelector(`#reliquary-window [data-page="${id}"]`)?.click();
+  }, pageId);
+  await wait(250);
+  const granted = await page.evaluate((fraction) => {
+    const cells = [...document.querySelectorAll('#reliquary-window .reliquary-cell')];
+    const missing = [];
+    for (const cell of cells) {
+      if (cell.dataset.cellKind === 'item' && cell.dataset.cellOwned === '0') missing.push(cell);
+    }
+    // itemsDiscovered is the set every completion read folds; the offline Sim
+    // hands out the live object, so adding to it is exactly what a real find
+    // does minus the event.
+    const discovered = window.__game?.sim?.deedStats?.itemsDiscovered;
+    const want = Math.min(missing.length, Math.max(1, Math.round(cells.length * fraction)));
+    let count = 0;
+    for (const cell of missing) {
+      if (count >= want) break;
+      const relicId = cell.dataset.cellId;
+      if (!relicId) continue;
+      discovered?.add(relicId);
+      count++;
+    }
+    document.querySelector('#reliquary-window [data-back]')?.click();
+    return count;
+  }, RELIQUARY_TRACKER_FILL);
+  await wait(250);
+  return granted;
+}
+
+/** Fill and pin RELIQUARY_TRACKER_PINS pages, leaving the window OPEN on the
+ *  shelf list with its pin buttons in their pinned state. Small pages first, so
+ *  every bar reads as progress rather than a sliver on a thirty-slot page. */
+async function pinReliquaryTrackerPages(page) {
+  const pageIds = await openReliquaryConquerorsShelf(page);
+  if (pageIds.length === 0) throw new Error('reliquary shelf listed no pages');
+  const sized = await page.evaluate((ids) => {
+    const sim = window.__game?.sim;
+    const rows = [];
+    for (const id of ids) {
+      const c = sim?.reliquaryPageCompletion?.(id);
+      if (!c || c.complete || c.total < 4 || c.total > 14) continue;
+      rows.push({ pageId: id, total: c.total });
+    }
+    rows.sort((a, b) => a.total - b.total || (a.pageId < b.pageId ? -1 : 1));
+    return rows;
+  }, pageIds);
+  const picks = (sized.length > 0 ? sized.map((r) => r.pageId) : pageIds).slice(
+    0,
+    RELIQUARY_TRACKER_PINS,
+  );
+  for (const pageId of picks) await fillReliquaryPagePartway(page, pageId);
+  // Pin only what is NOT already pinned: the control toggles, so a blind click
+  // on a pinned page would take the line straight back off the strip.
+  const pinned = await page.evaluate((ids) => {
+    let count = 0;
+    for (const id of ids) {
+      const btn = document.querySelector(`#reliquary-window [data-pin="${id}"]`);
+      // The at-cap refusal renders aria-disabled (still clickable, refused in
+      // the handler), so honor both forms: a refused click would inflate the
+      // pinned count and defeat the nothing-pinned throw below. (An at-cap
+      // control is by construction unpinned, so no stale pin can flip.)
+      if (
+        !btn ||
+        btn.disabled ||
+        btn.getAttribute('aria-disabled') === 'true' ||
+        btn.getAttribute('aria-pressed') === 'true'
+      )
+        continue;
+      btn.click();
+      count++;
+    }
+    return count;
+  }, picks);
+  if (pinned === 0) throw new Error('no reliquary page could be pinned');
+  await wait(400);
+  return picks;
 }
 
 export const TARGETS = [
@@ -3995,6 +4159,503 @@ export const TARGETS = [
         await wait(400);
       }
       return open ? { clip: '#char-window' } : {};
+    },
+  },
+  {
+    key: 'reliquary-window',
+    label: 'The Reliquary: Overview shelf with completion and Curator rank',
+    when: [
+      'ui/reliquary_view',
+      'ui/reliquary_window',
+      'ui/reliquary_labels',
+      'ui/reliquary_sheet_view',
+      'sim/content/reliquary',
+      'sim/reliquary',
+      'reliquary_phase22_closeout',
+    ],
+    variants: [
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
+    ],
+    async capture(page) {
+      await page.evaluate(() => {
+        document.querySelector('#gpu-notice')?.remove();
+        document.querySelector('.camera-prompt-confirm')?.click();
+        // Seed a few catalogued discoveries so Overview is not an empty museum.
+        // Phase 14: also fill the recent ring AND the firstFind record the
+        // same way a live find would, so the recent strip shows its icon jump
+        // chips resolving through the primary hinted path (a ring without
+        // firstFind exercises only the authored-order fallback). The pageIds
+        // are the pages that hold these items in src/sim/content/reliquary.ts.
+        const game = window.__game;
+        const sim = game?.sim;
+        if (sim?.primary?.deedStats?.itemsDiscovered) {
+          const finds = [
+            ['cryptbone_helm', 'conquerors_hollow_crypt'],
+            ['boundstone_helm', 'conquerors_gravewyrm_sanctum'],
+            ['cryptbone_pauldrons', 'conquerors_hollow_crypt'],
+          ];
+          for (const [id, pageId] of finds) {
+            sim.primary.deedStats.itemsDiscovered.add(id);
+            sim.primary.reliquary?.recent?.push(id);
+            const firstFind = sim.primary.reliquary?.firstFind;
+            if (firstFind && !firstFind[id]) firstFind[id] = { pageId };
+          }
+        }
+        game?.hud?.openReliquary?.();
+      });
+      const opened = await pollForSize(page, '#reliquary-window');
+      if (!opened) throw new Error('reliquary window did not open');
+      return { clip: '#reliquary-window' };
+    },
+  },
+  {
+    key: 'reliquary-overview-fresh',
+    label: 'The Reliquary: fresh-character Overview (strip hints + shelf cards)',
+    when: ['ui/reliquary_view', 'ui/reliquary_window'],
+    variants: [
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
+    ],
+    async capture(page) {
+      // Deliberately NO seeding: the acceptance shot is the fresh character's
+      // front door (both strip labels with their hints, three shelf cards, the
+      // reconciliation note, no dead-space stub).
+      await page.evaluate(() => {
+        document.querySelector('#gpu-notice')?.remove();
+        document.querySelector('.camera-prompt-confirm')?.click();
+        window.__game?.hud?.openReliquary?.();
+      });
+      const opened = await pollForSize(page, '#reliquary-window');
+      if (!opened) throw new Error('reliquary window did not open');
+      return { clip: '#reliquary-window' };
+    },
+  },
+  {
+    key: 'reliquary-page',
+    label: 'The Reliquary: multi-boss page detail with a focused missing cell',
+    when: [
+      'ui/reliquary_view',
+      'ui/reliquary_window',
+      'ui/reliquary_labels',
+      'sim/content/reliquary',
+      'sim/reliquary',
+      'reliquary_phase22_closeout',
+    ],
+    variants: [
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
+    ],
+    async capture(page) {
+      await page.evaluate(() => {
+        document.querySelector('#gpu-notice')?.remove();
+        document.querySelector('.camera-prompt-confirm')?.click();
+        // Same seed set as the overview target so the page shows a mix of
+        // catalogued and missing cells.
+        const game = window.__game;
+        const sim = game?.sim;
+        if (sim?.primary?.deedStats?.itemsDiscovered) {
+          for (const id of ['cryptbone_helm', 'boundstone_helm', 'cryptbone_pauldrons']) {
+            sim.primary.deedStats.itemsDiscovered.add(id);
+          }
+        }
+        game?.hud?.openReliquary?.();
+      });
+      const opened = await pollForSize(page, '#reliquary-window');
+      if (!opened) throw new Error('reliquary window did not open');
+      await page.evaluate(() => {
+        const win = document.querySelector('#reliquary-window');
+        win?.querySelector('[data-nav="conquerors"]')?.click();
+        win?.querySelector('[data-page="conquerors_gravewyrm_sanctum"]')?.click();
+      });
+      await wait(200);
+      await page.evaluate(() => {
+        // Prefer a missing cell that actually HAS an authored source, so the
+        // capture shows the source lines rather than a relic still on the
+        // pending-ruling list (which paints the plain missing tooltip and makes
+        // the screenshot look like the feature did not land). The painter stamps
+        // data-cell-source on exactly those cells, carrying HOW MANY lines they
+        // resolve; selecting on it survives copy rewords and non-English capture
+        // locales, where the old aria-text match ('Drops from') silently
+        // degraded to the fallback.
+        //
+        // Highest count wins, so the shot lands on whichever cell resolves the
+        // most doors on the target page (content re-authoring moves the pick
+        // automatically; no relic is named here) instead of a one-line cell
+        // that shows nothing the previous release did not. A cell
+        // with the attribute but no parseable number still beats one without,
+        // and the first missing cell remains the last resort.
+        const missing = [
+          ...document.querySelectorAll('#reliquary-window .reliquary-cell[data-cell-owned="0"]'),
+        ];
+        const sourceCount = (node) => {
+          if (!node.hasAttribute('data-cell-source')) return 0;
+          const parsed = Number.parseInt(node.getAttribute('data-cell-source') ?? '', 10);
+          return Number.isNaN(parsed) ? 1 : parsed;
+        };
+        let best = null;
+        let bestCount = 0;
+        for (const node of missing) {
+          const count = sourceCount(node);
+          if (count > bestCount) {
+            best = node;
+            bestCount = count;
+          }
+        }
+        const cell = best ?? missing[0];
+        if (cell) {
+          // attachTooltip binds mouseenter/focusin (never pointerenter); focus
+          // is the sturdier trigger here since no synthetic pointerdown has set
+          // pointerFocusPending.
+          cell.focus?.();
+        }
+      });
+      await wait(300);
+      return { clip: '#reliquary-window' };
+    },
+  },
+  // ---- Phase 21 catalog-growth surfaces. Each variant seeds the LOW graphics
+  // preset (the capture rule: every rig shoots the lowest preset so shots stay
+  // comparable; only gfx-comparison rigs keep their own). ----
+  {
+    key: 'reliquary-rift-page',
+    label:
+      'The Rift page: dual clear meters (lifetime clears + S-rank clears) over the 16-slot chase',
+    when: ['sim/content/reliquary', 'reliquary_phase21_qa'],
+    variants: [
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
+    ],
+    async capture(page) {
+      await page.evaluate(() => {
+        document.querySelector('#gpu-notice')?.remove();
+        document.querySelector('.camera-prompt-confirm')?.click();
+        const sim = window.__game?.sim;
+        // Both meters non-zero so the header shows the dual readout.
+        if (sim?.primary?.deedStats?.counters) {
+          sim.primary.deedStats.counters.riftClears = 12;
+          sim.primary.deedStats.counters.riftSRankClears = 3;
+        }
+        window.__game?.hud?.openReliquary?.();
+      });
+      const opened = await pollForSize(page, '#reliquary-window');
+      if (!opened) throw new Error('reliquary window did not open');
+      await page.evaluate(() => {
+        const win = document.querySelector('#reliquary-window');
+        win?.querySelector('[data-nav="conquerors"]')?.click();
+        win?.querySelector('[data-page="conquerors_the_rift"]')?.click();
+      });
+      await wait(300);
+      return { clip: '#reliquary-window' };
+    },
+  },
+  {
+    key: 'reliquary-rares-page',
+    label: 'Rares of the Realm: slain kill proofs with the trophy glyph on filled marks',
+    when: ['sim/content/reliquary', 'reliquary_phase21_qa'],
+    variants: [
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
+    ],
+    async capture(page) {
+      await page.evaluate(() => {
+        document.querySelector('#gpu-notice')?.remove();
+        document.querySelector('.camera-prompt-confirm')?.click();
+        const sim = window.__game?.sim;
+        // Three slain proofs through both ledgers, the way the kill site
+        // writes them, so the grid mixes trophy fills and silhouettes.
+        if (sim?.primary) {
+          for (const id of ['slain:old_greyjaw', 'slain:mogger', 'slain:sister_nhalia']) {
+            sim.primary.deedStats?.visited?.add(id);
+            sim.primary.reliquary?.marks?.add(id);
+          }
+        }
+        window.__game?.hud?.openReliquary?.();
+      });
+      const opened = await pollForSize(page, '#reliquary-window');
+      if (!opened) throw new Error('reliquary window did not open');
+      await page.evaluate(() => {
+        const win = document.querySelector('#reliquary-window');
+        win?.querySelector('[data-nav="conquerors"]')?.click();
+        win?.querySelector('[data-page="conquerors_rares_of_the_realm"]')?.click();
+      });
+      await wait(300);
+      return { clip: '#reliquary-window' };
+    },
+  },
+  {
+    key: 'reliquary-vault-shelf',
+    label: 'The Horizons shelf: the Vault of Ages row wearing the muted Retired chip',
+    when: ['sim/content/reliquary', 'reliquary_phase21_qa'],
+    variants: [
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
+    ],
+    async capture(page) {
+      await page.evaluate(() => {
+        document.querySelector('#gpu-notice')?.remove();
+        document.querySelector('.camera-prompt-confirm')?.click();
+        window.__game?.hud?.openReliquary?.();
+      });
+      const opened = await pollForSize(page, '#reliquary-window');
+      if (!opened) throw new Error('reliquary window did not open');
+      await page.evaluate(() => {
+        document.querySelector('#reliquary-window [data-nav="horizons"]')?.click();
+      });
+      await wait(300);
+      await page.evaluate(() => {
+        document
+          .querySelector('#reliquary-window [data-page="horizons_vault_of_ages"]')
+          ?.scrollIntoView({ block: 'center' });
+      });
+      await wait(200);
+      return { clip: '#reliquary-window' };
+    },
+  },
+  {
+    key: 'reliquary-vault-page',
+    label: 'Vault of Ages page: the Retired chip on the header over the four retired relics',
+    when: ['sim/content/reliquary', 'reliquary_phase21_qa'],
+    variants: [
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
+    ],
+    async capture(page) {
+      await page.evaluate(() => {
+        document.querySelector('#gpu-notice')?.remove();
+        document.querySelector('.camera-prompt-confirm')?.click();
+        window.__game?.hud?.openReliquary?.();
+      });
+      const opened = await pollForSize(page, '#reliquary-window');
+      if (!opened) throw new Error('reliquary window did not open');
+      await page.evaluate(() => {
+        const win = document.querySelector('#reliquary-window');
+        win?.querySelector('[data-nav="horizons"]')?.click();
+        win?.querySelector('[data-page="horizons_vault_of_ages"]')?.click();
+      });
+      await wait(300);
+      return { clip: '#reliquary-window' };
+    },
+  },
+  {
+    key: 'reliquary-riftbound-page',
+    label: 'Riftbound page: the Personal chip, holding your own band among the three',
+    when: ['sim/content/reliquary', 'reliquary_phase21_qa'],
+    variants: [
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
+    ],
+    async capture(page) {
+      await page.evaluate(() => {
+        document.querySelector('#gpu-notice')?.remove();
+        document.querySelector('.camera-prompt-confirm')?.click();
+        const sim = window.__game?.sim;
+        // The realistic personal holding: exactly ONE band owned (the page can
+        // never fill past 1 of 3 for a single character, which is its point).
+        sim?.primary?.deedStats?.itemsDiscovered?.add('riftbound_band_of_might');
+        window.__game?.hud?.openReliquary?.();
+      });
+      const opened = await pollForSize(page, '#reliquary-window');
+      if (!opened) throw new Error('reliquary window did not open');
+      await page.evaluate(() => {
+        const win = document.querySelector('#reliquary-window');
+        win?.querySelector('[data-nav="horizons"]')?.click();
+        win?.querySelector('[data-page="horizons_riftbound"]')?.click();
+      });
+      await wait(300);
+      return { clip: '#reliquary-window' };
+    },
+  },
+  {
+    key: 'reliquary-tracker',
+    label: 'The Reliquary HUD tracker: pinned pages with live progress, and its compact count chip',
+    // Scoped to the tracker's own two modules. The window targets above already
+    // cover the shelf and page surfaces, and a wider when list would double the
+    // capture set of every Reliquary window change.
+    when: [
+      'ui/reliquary_tracker_view',
+      'ui/reliquary_tracker_painter',
+      'reliquary_phase22_closeout',
+    ],
+    variants: [
+      // The strip itself, expanded, with a line per pinned page.
+      { key: 'desktop', beforeLoad: clearPinsOnLowPreset },
+      // The same frame uncropped: where the strip actually sits in the HUD,
+      // under the quest and deed trackers in #right-tracker-stack.
+      { key: 'hud-desktop', beforeLoad: clearPinsOnLowPreset },
+      // Compact touch tier (844x390 landscape lands there): the rows fold away
+      // and the header becomes a count chip that opens The Reliquary.
+      { key: 'mobile', mobile: true, beforeLoad: clearPinsOnLowPreset },
+      // The pin control that feeds all of the above, on its shelf rows.
+      { key: 'pin-desktop', beforeLoad: clearPinsOnLowPreset },
+    ],
+    async capture(page, variant) {
+      const picks = await pinReliquaryTrackerPages(page);
+      if (variant?.key === 'pin-desktop') {
+        // Land the shelf on the rows that are actually pinned: the list is long
+        // and its top rows are all unpinned, which would show the control in
+        // one state only. Held on an interval because the window repaints on
+        // world changes and a repaint resets the scroll (the char-window
+        // target's idiom), cleared after 5s.
+        await page.evaluate((pageId) => {
+          const pin = () => {
+            document
+              .querySelector(`#reliquary-window [data-pin="${pageId}"]`)
+              ?.scrollIntoView({ block: 'center' });
+          };
+          pin();
+          const iv = setInterval(pin, 50);
+          setTimeout(() => clearInterval(iv), 5000);
+        }, picks[0]);
+        await wait(400);
+        return { clip: '#reliquary-window' };
+      }
+      // Close the window: the tracker is the always-on surface, and the open
+      // window covers it.
+      await page.evaluate(() => window.__game?.hud?.toggleReliquary?.());
+      await wait(600);
+      const shown = await pollForSize(page, '#reliquary-tracker');
+      if (!shown) throw new Error('reliquary tracker painted no lines');
+      if (variant?.key === 'mobile') {
+        // Prove the compact tier is really on before shooting it: without
+        // hud-mobile-compact this is the desktop disclosure strip, not the chip.
+        const chip = await page.evaluate(
+          () =>
+            document.body.classList.contains('mobile-touch') &&
+            document.body.classList.contains('hud-mobile-compact') &&
+            document
+              .querySelector('#reliquary-tracker .dt-header')
+              ?.getAttribute('aria-haspopup') === 'dialog',
+        );
+        if (!chip) throw new Error('reliquary tracker is not in compact chip mode');
+        return {};
+      }
+      return variant?.key === 'desktop' ? { clip: '#reliquary-tracker' } : {};
+    },
+  },
+  {
+    key: 'inspect-curator-standing',
+    label: 'Inspect card: Reliquary standing line, border accent, Curator sigil',
+    when: [
+      'ui/inspect_view',
+      'ui/inspect_window',
+      'ui/curator_sigil',
+      'ui/reliquary_sheet_view',
+      'reliquary_phase22_closeout',
+    ],
+    // SELF-inspect, which is the only arm that renders offline: no server ever
+    // stamps the crk/cro/crt wire fields in a single-player world, so a spawned
+    // bystander would show an empty standing no matter what is seeded. Hud gates
+    // the live read on the inspected pid being the viewer's, so opening the card
+    // on sim.playerId is what exercises selfCuratorStanding.
+    variants: [
+      { key: 'desktop', beforeLoad: lowGraphicsSeed },
+      { key: 'mobile', mobile: true, beforeLoad: lowGraphicsSeed },
+    ],
+    async capture(page) {
+      const seeded = await page.evaluate(`(async () => {
+        document.querySelector('#gpu-notice')?.remove();
+        document.querySelector('.camera-prompt-confirm')?.click();
+        const sim = window.__game?.sim;
+        if (!sim) return { ok: false, reason: 'no sim' };
+        // Own enough of the catalog to reach the top rung. The ids come from the
+        // live page table rather than a hand-copied list, so a content edit that
+        // renames or re-shelves a relic cannot quietly leave this seeding short
+        // of the rank-5 threshold.
+        const mod = await import('/src/sim/content/reliquary.ts');
+        const itemIds = new Set();
+        for (const page of mod.RELIQUARY_PAGES) {
+          for (const relic of page.relics) if (relic.kind === 'item') itemIds.add(relic.itemId);
+        }
+        for (const id of itemIds) sim.primary.deedStats.itemsDiscovered.add(id);
+        // Wear the rank-5 border through the REAL validator (which demands the
+        // deed be earned and its reward be a border), so the accent on the name
+        // row is the one a rank-5 Curator actually gets rather than a field
+        // written past the gate.
+        sim.deedsEarned.set('col_reliquary_rank_5', '2026-08-01');
+        sim.setActiveBorder('col_reliquary_rank_5');
+        window.__game.hud.openInspect(sim.playerId);
+        return { ok: true, rank: sim.reliquaryCuratorRank() };
+      })()`);
+      if (!seeded.ok) throw new Error(`inspect standing seeding failed: ${seeded.reason}`);
+      if (seeded.rank !== 5) throw new Error(`seeded Curator rank ${seeded.rank}, expected 5`);
+      const opened = await pollForSize(page, '#inspect-window');
+      if (!opened) throw new Error('inspect window did not open');
+      return { clip: '#inspect-window' };
+    },
+  },
+  {
+    key: 'char-sheet-reliquary',
+    label: 'Character sheet framed on the Reliquary progression row',
+    when: ['ui/reliquary_sheet_view', 'ui/char_view', 'reliquary_phase22_closeout'],
+    variants: [
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
+    ],
+    async capture(page) {
+      await page.evaluate(() => {
+        document.querySelector('#gpu-notice')?.remove();
+        document.querySelector('.camera-prompt-confirm')?.click();
+        // The same three-find seed as the window targets, so the pair reads a
+        // real non-zero completion instead of a fresh 0/N.
+        const sim = window.__game?.sim;
+        if (sim?.primary?.deedStats?.itemsDiscovered) {
+          for (const id of ['cryptbone_helm', 'boundstone_helm', 'cryptbone_pauldrons']) {
+            sim.primary.deedStats.itemsDiscovered.add(id);
+          }
+        }
+        window.__game?.hud?.toggleChar?.();
+      });
+      const opened = await pollForSize(page, '#char-window');
+      if (!opened) throw new Error('char window did not open');
+      // Frame ON the row: the sheet scrolls on small frames and the
+      // progression block sits below the equipment columns.
+      await page.evaluate(() => {
+        document.querySelector('#char-window .cp-reliquary')?.scrollIntoView({ block: 'center' });
+      });
+      await wait(200);
+      const hasRow = await page.evaluate(
+        () => !!document.querySelector('#char-window .cp-reliquary'),
+      );
+      if (!hasRow) throw new Error('char sheet reliquary progression row not found');
+      return { clip: '#char-window' };
+    },
+  },
+  {
+    key: 'nameplate-border',
+    label: 'Rank-5 Curator border on the own nameplate and portrait ring, in world',
+    when: ['ui/deed_border_view', 'render/nameplate_view', 'reliquary_phase22_closeout'],
+    // Desktop only: the plate paints identically on the compact tier and the
+    // full frame is the evidence (a canvas plate cannot be DOM-clipped).
+    variants: [{ key: 'desktop', beforeLoad: seedLowGraphicsPreset }],
+    async capture(page) {
+      const seeded = await page.evaluate(`(async () => {
+        document.querySelector('#gpu-notice')?.remove();
+        document.querySelector('.camera-prompt-confirm')?.click();
+        const sim = window.__game?.sim;
+        if (!sim) return { ok: false, reason: 'no sim' };
+        // Wear the rank-5 border through the REAL validator (the
+        // inspect-curator-standing idiom): earn the catalog, earn the deed,
+        // then pick the border, so the plate shows what a rank-5 Curator
+        // actually gets.
+        const mod = await import('/src/sim/content/reliquary.ts');
+        for (const pageDef of mod.RELIQUARY_PAGES) {
+          for (const relic of pageDef.relics) {
+            if (relic.kind === 'item') sim.primary.deedStats.itemsDiscovered.add(relic.itemId);
+          }
+        }
+        sim.deedsEarned.set('col_reliquary_rank_5', '2026-08-01');
+        sim.setActiveBorder('col_reliquary_rank_5');
+        return { ok: true, border: sim.players?.get?.(sim.playerId)?.activeBorder ?? null };
+      })()`);
+      if (!seeded.ok) throw new Error(`nameplate border seeding failed: ${seeded.reason}`);
+      if (seeded.border !== 'col_reliquary_rank_5') {
+        throw new Error(`activeBorder is ${seeded.border}, expected col_reliquary_rank_5`);
+      }
+      // Let the world render a few frames so the plate and the portrait ring
+      // repaint with the border before the frame is taken.
+      await wait(1200);
+      return {};
     },
   },
   {

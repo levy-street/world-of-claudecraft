@@ -73,6 +73,7 @@ import { CRAFT_BATCH_MAX, CRAFT_GOLD_SINK_COPPER_PER_BUDGET } from '../content/p
 import { recipeById } from '../content/recipes';
 import { ITEMS } from '../data';
 import { forceDismount } from '../mounts';
+import { isCataloguedRelicMark, noteReliquaryMark } from '../reliquary';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import type { Entity, InvSlot, ItemDef, ItemInstancePayload } from '../types';
@@ -1039,6 +1040,29 @@ function applyCraftSuccessHooks(
   // it on the next proc.
   if (result.masterwork) {
     ctx.bumpDeedStat(meta, 'masterworksCrafted', 1);
+    // Reliquary lifetime trophies (catalog ids only; cosmetic prestige).
+    // No skill power. The visit ledger is written on the SAME arm as the mark
+    // (the gather_events.ts and interaction.ts siblings do this too): the
+    // visit is the durable proof this proc happened, so a character whose
+    // sparse blob is missing the mark refills it from its own history at join
+    // instead of losing a lifetime trophy. Nothing is invented: only a real
+    // masterwork proc ever writes either id.
+    // The literal first-proc id needs no isCataloguedRelicMark gate: it is a
+    // RELIQUARY_PROFESSION_MARKS constant authored beside the catalog, so it
+    // cannot name a mark nobody authored; only the DERIVED per-craft id below
+    // can, hence its gate. (The craft_rare visit further down is ungated too,
+    // but its interpolation is bounded by the authored recipe set.)
+    ctx.markVisited(meta, 'masterwork:first');
+    noteReliquaryMark(ctx, meta, 'masterwork:first');
+    const craftId = recipeById(recipeId)?.professionId;
+    if (craftId) {
+      // Catalog ids only, on the visit write too: a craft with no authored
+      // mark (a future alchemy proc, say) would otherwise write permanent
+      // ledger noise that nothing can ever read back.
+      const markId = `masterwork:${craftId}`;
+      if (isCataloguedRelicMark(markId)) ctx.markVisited(meta, markId);
+      noteReliquaryMark(ctx, meta, markId);
+    }
   }
   // Per-craft rare-tier milestone (issue #2055): the first rare-or-better
   // output a player crafts in ONE craft marks that craft's milestone deed

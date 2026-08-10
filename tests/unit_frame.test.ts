@@ -96,6 +96,7 @@ describe('unitFrameView: the present / hidden gate', () => {
       name: '',
       titlePre: '',
       titlePost: '',
+      borderSlug: '',
       portraitKey: '',
       absorbFrac: 0,
       absorbStartFrac: 0,
@@ -310,6 +311,45 @@ describe('unitFrameView / unitFrameViewInto: absorb-total text runs through form
     const fromBuffer = unitFrameViewInto(buffer, descriptor);
     expect(fromBuffer.hpText).toBe(fromAllocating.hpText);
     expect(fromBuffer.hpText).toBe('300 / 6000 (1234)');
+  });
+});
+
+describe('unitFrameView: the border slug pass-through (Book of Deeds)', () => {
+  it('passes the call-site-resolved slug through verbatim', () => {
+    // The core never touches the deed catalog: the call site resolves the id to a
+    // slug (deedBorderSlug) exactly as it pre-localizes the title decoration.
+    expect(unitFrameView(playerDescriptor({ borderSlug: 'reliquary_gilt' })).borderSlug).toBe(
+      'reliquary_gilt',
+    );
+    expect(unitFrameView(playerDescriptor({ borderSlug: '' })).borderSlug).toBe('');
+  });
+
+  it('defaults to empty when the instance passes no border field (party, tot)', () => {
+    expect(unitFrameView(playerDescriptor()).borderSlug).toBe('');
+  });
+
+  it('carries the slug through BOTH unitFrameViewInto branches (no stale value)', () => {
+    // The live-fill branch and the !present reset are separate assignment blocks:
+    // a field added to only one of them leaves the buffer holding the last unit's
+    // slug, which is how a hidden-then-reshown frame would inherit a stranger's ring.
+    const buffer = newUnitFrameBuffer();
+    expect(buffer.view.borderSlug).toBe('');
+    expect(unitFrameViewInto(buffer, playerDescriptor({ borderSlug: 'deepward' })).borderSlug).toBe(
+      'deepward',
+    );
+    expect(unitFrameViewInto(buffer, playerDescriptor({ present: false })).borderSlug).toBe('');
+    expect(
+      unitFrameViewInto(buffer, playerDescriptor({ borderSlug: 'curators_gilt' })).borderSlug,
+    ).toBe('curators_gilt');
+    expect(unitFrameViewInto(buffer, playerDescriptor()).borderSlug).toBe('');
+  });
+
+  it('stays allocation-stable with a slug on the hot path (a plain string assign)', () => {
+    const descriptor = playerDescriptor({ borderSlug: 'prestige_laurels' });
+    const buffer = newUnitFrameBuffer();
+    expect(() =>
+      assertAllocationStable(() => unitFrameViewInto(buffer, descriptor), 64, 'unit frame border'),
+    ).not.toThrow();
   });
 });
 

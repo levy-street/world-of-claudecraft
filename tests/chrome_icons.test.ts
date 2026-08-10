@@ -1,9 +1,11 @@
+import { createHash } from 'node:crypto';
 import { closeSync, existsSync, openSync, readdirSync, readFileSync, readSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { CHROME_ART_IDS, chromeIconUrl, hasChromeIconArt } from '../src/ui/chrome_icon_art';
 import { hasUiIcon, hydrateIcons, svgIcon, type UiIconName } from '../src/ui/ui_icons';
+import { webpHasAlpha, webpSize } from './helpers/webp_header';
 
 // Gate for the painted HUD-chrome launcher art (sibling of tests/deed_icons.test.ts and
 // tests/item_icons.test.ts). Art under public/ui/chrome/<name>.webp is the source of truth
@@ -52,43 +54,9 @@ function isValidWebp(file: string): boolean {
   }
 }
 
-function webpHeader(file: string): { tag: string; buf: Buffer } {
-  const fd = openSync(file, 'r');
-  try {
-    const buf = Buffer.alloc(32);
-    readSync(fd, buf, 0, 32, 0);
-    return { tag: buf.toString('ascii', 12, 16), buf };
-  } finally {
-    closeSync(fd);
-  }
-}
-
-// Dimensions, read directly from each WebP encoding mode.
-function webpSize(file: string): { width: number; height: number } {
-  const { tag, buf } = webpHeader(file);
-  if (tag === 'VP8 ')
-    return { width: buf.readUInt16LE(26) & 0x3fff, height: buf.readUInt16LE(28) & 0x3fff };
-  if (tag === 'VP8L') {
-    const bits = buf.readUInt32LE(21);
-    return { width: (bits & 0x3fff) + 1, height: ((bits >> 14) & 0x3fff) + 1 };
-  }
-  if (tag === 'VP8X')
-    return {
-      width: (buf.readUIntLE(24, 3) & 0xffffff) + 1,
-      height: (buf.readUIntLE(27, 3) & 0xffffff) + 1,
-    };
-  throw new Error(`unknown webp chunk "${tag}" in ${file}`);
-}
-
-// Alpha presence: an extended (VP8X) file declares it in bit 4 of its feature byte, and a
-// lossless (VP8L) file in bit 4 of the byte after its size bits. A plain lossy VP8 chunk has
-// no alpha channel at all, so it fails here by construction.
-function webpHasAlpha(file: string): boolean {
-  const { tag, buf } = webpHeader(file);
-  if (tag === 'VP8X') return (buf.readUInt8(20) & 0x10) !== 0;
-  if (tag === 'VP8L') return (buf.readUInt32LE(24) & 0x08) !== 0;
-  return false;
-}
+// webpHeader / webpSize / webpHasAlpha moved to tests/helpers/webp_header.ts
+// (shared with reliquary_cell_art's opacity-premise sweep; the move also
+// fixed this file's VP8L alpha read, which masked a height bit).
 
 const committedIds = (): string[] =>
   existsSync(chromeDir)
@@ -269,6 +237,43 @@ describe('painted HUD-chrome launcher icons', () => {
     expect(chromeIconUrl('close')).toBeNull();
     expect(chromeIconUrl('not-an-icon')).toBeNull();
     expect(hasChromeIconArt('not-an-icon')).toBe(false);
+  });
+
+  it('ships painted art for the Reliquary launcher (crown)', () => {
+    // Phase 16 acceptance pin: the Reliquary is a primary destination, so its
+    // launcher renders painted chrome art beside its siblings, never the bare
+    // glyph. Guard A already ties the set to the committed webp; this pins the
+    // membership itself so dropping the row is a red, not a silent downgrade.
+    expect(hasChromeIconArt('crown')).toBe(true);
+    expect(chromeIconUrl('crown')).toBe('/ui/chrome/crown.webp');
+    // Guard D only proves SOME placeholder exists; tie the crown to the
+    // RELIQUARY buttons specifically (the professions crosshair precedent), so
+    // re-iconing the launcher cannot leave this green by accident.
+    for (const doc of entryDocs) {
+      const html = readEntry(doc);
+      expect(html, `${doc} side rail`).toMatch(/id="mm-reliquary"[^>]*data-icon="crown"/);
+      expect(html, `${doc} More tray`).toMatch(/id="mobile-reliquary"[^>]*data-icon="crown"/);
+    }
+  });
+
+  it('keeps the crown webp in lockstep with its committed SVG source', () => {
+    // The crown is the one chrome icon with an in-repo source
+    // (scripts/assets/chrome_crown/, its siblings were generated externally),
+    // so drift between the two is detectable and worth pinning: an SVG edit
+    // that was never re-rendered, or a re-render never re-encoded, reds here.
+    // To update BOTH legitimately: edit crown.svg, run
+    // `node scripts/assets/chrome_crown/render_source.mjs` then
+    // `npm run assets:chrome`, and re-pin both hashes in one commit.
+    const sha = (rel: string) =>
+      createHash('sha256')
+        .update(readFileSync(path.join(repoRoot, rel)))
+        .digest('hex');
+    expect(sha('scripts/assets/chrome_crown/crown.svg')).toBe(
+      '768004a53601a7a4c2ba90faa1f851fa0e74e66bd28df3f1fe5cb9bd7d969a45',
+    );
+    expect(sha('public/ui/chrome/crown.webp')).toBe(
+      '139900a0f4ff72186d9d3ea0584ba418c499f4ef9e17d5e858b920ecacc7cf8c',
+    );
   });
 
   it('hydrates an art id as a decorative <img> and everything else as inline <svg>', () => {

@@ -40,8 +40,13 @@ lets the same `sim/` run offline, on the server, and headless.
   collider come from one list: `colliders.bankerChestSpots`,
   `colliders.streetlampPlacements` + its `sim/streetlamp_layout`/`streetlamp_style`
   leaves; enumerate the live set with `grep -rn "from '.*sim/" src/render`);
-  reaching into mutable `Sim` state or `sim/sim.ts` logic stays forbidden. (b) `render`/`game` use `ui/`'s
-  i18n + icon surface (`t`, `tEntity`, `ui/icons`).
+  reaching into mutable `Sim` state or `sim/sim.ts` logic stays forbidden. (b) `render`/`game`
+  use `ui/`'s i18n + icon surface (`t`, `tEntity`, `ui/icons`) AND its host-agnostic pure-core
+  LEAVES, so one resolution rule serves both the HUD and the 3D scene instead of being
+  written twice (exemplars: `ui/text_sprite_cache` for label rasterizing,
+  `ui/deed_border_view` for the deed id -> border palette both the nameplate canvas and the
+  portrait ring paint from; enumerate the live set with `grep -rn "from '.*ui/" src/render`).
+  A leaf qualifies only while it stays pure: no DOM, no `IWorld`, no mutable UI state.
 - `net/` -> `sim/` (types plus **pure display helpers** such as `abilitiesKnownAt`/
   `computeQuestState`; the server re-validates everything) + `world_api.ts`
   (`ClientWorld implements IWorld`).

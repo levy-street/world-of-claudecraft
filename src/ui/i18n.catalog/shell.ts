@@ -71,6 +71,10 @@ export const shellStrings = {
         loadouts:
           'Tip: save more than one talent loadout to swap between builds without spending points twice.',
         pvp: 'Tip: challenge another player to a friendly duel, or queue for the Ashen Coliseum arena, to test your build.',
+        // The tips rotation renders through a bare t(key) with no values, so no
+        // tip can name a live keybind without going stale when a player rebinds
+        // it. This one used to spell out Shift+X; it now stays chord-free.
+        reliquary: 'Tip: the Reliquary tracks the unique spoils you collect, shelf by shelf.',
       },
     },
     errors: {

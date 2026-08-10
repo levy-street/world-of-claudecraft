@@ -6104,6 +6104,43 @@
     font-size: 20px;
     color: #f0ead8;
   }
+  /* Book of Deeds border accent on the inspect header: the resting form of the
+     cartouche the overhead nameplate draws around a player's name, and the cold
+     twin of the unit-frame portrait ring. The painter writes the SLUG into
+     data-border (this rule gates on a non-empty value) and that slug's palette
+     into the same three custom properties the ring reads, so ONE treatment lives
+     here and zero per-slug colors do: src/ui/deed_border_view.ts stays the single
+     source of truth. Identity, never actionable info, so it renders at every
+     graphics tier; only the decorative outer bloom scales with --fx-shadow, like
+     the ring. */
+  .inspect-name[data-border]:not([data-border=""]) {
+    padding: 2px 12px;
+    border: 2px solid var(--border-accent-frame, transparent);
+    border-radius: 8px;
+    outline: 1px solid var(--border-accent-edge, transparent);
+    outline-offset: -4px;
+    box-shadow: 0 0 calc(6px * var(--fx-shadow, 1)) var(--border-accent-glow, transparent);
+  }
+  /* The forced palette does not blank the accent custom properties (the card
+     writes all three together with the data-border slug this rule gates on, so
+     the var() fallbacks cannot engage): it replaces the computed colors with the
+     system palette. This arm chooses that replacement rather than taking the
+     UA's. Three things: frame -> CanvasText and edge -> Canvas, the same pair
+     the nameplate cartouche uses in src/render/nameplate_canvas.ts, so the two
+     surfaces of one identity agree under high contrast; the outline is remapped
+     rather than left to be forced onto the frame's color, which would flatten
+     the two-tone contour into a single line; and the decorative bloom is dropped
+     explicitly, since box-shadow is stripped in forced-colors regardless and a
+     surviving declaration would read load-bearing. Collapsing all four slugs
+     onto one system pair hides nothing: cosmetic identity carries nothing a
+     player acts on. */
+  @media (forced-colors: active) {
+    .inspect-name[data-border]:not([data-border=""]) {
+      border-color: CanvasText;
+      outline-color: Canvas;
+      box-shadow: none;
+    }
+  }
   .inspect-title {
     font-size: 12px;
     color: var(--color-text-muted);
@@ -6120,6 +6157,13 @@
     border-radius: 999px;
     background: rgba(0, 0, 0, 0.3);
   }
+  /* The Reliquary standing line (labeled completion pair + named Curator rank)
+     reuses the level/class chip family UNCHANGED, so the card keeps one pill
+     language and the two lines render identically by design. .inspect-reliquary
+     is a semantic hook for tests and future rules, not an override: the base
+     .inspect-meta rule above is what paints it. (This note documents that
+     deliberate ABSENCE of a compound rule; it is not about the remote-card
+     rule below.) */
   .inspect-card-remote .inspect-meta {
     padding: 0;
     font-size: 13px;
@@ -6165,6 +6209,15 @@
   .inspect-holder-badge.inspect-dev-halo.inspect-dev-halo-strong {
     filter: drop-shadow(0 1px 2px #000)
       drop-shadow(0 0 var(--holder-halo-strong) var(--dev-glow, transparent));
+  }
+  /* Curator sigil halo on the inspect card: the same shared strength tunable as
+     the two ladders above, hue via inline --curator-glow. The sigil is a SINGLE
+     rung (Eternal Curator only), so unlike them it has no -strong twin to earn.
+     Only the sigil opts in (via .inspect-curator-halo), never the shared Discord
+     badges. */
+  .inspect-holder-badge.inspect-curator-halo {
+    filter: drop-shadow(0 1px 2px #000)
+      drop-shadow(0 0 var(--holder-halo) var(--curator-glow, transparent));
   }
   .inspect-holder-text {
     display: flex;

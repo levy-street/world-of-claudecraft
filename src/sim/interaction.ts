@@ -66,6 +66,7 @@ import {
   bestWieldableAnyGatherToolTier,
   minWieldRequirementToWorkAny,
 } from './professions/wield_gate';
+import { noteReliquaryMark } from './reliquary';
 import type { SimContext } from './sim_context';
 import { interactSoulwell } from './soulwell';
 import {
@@ -673,7 +674,9 @@ export function harvestCorpse(
       // the LANDED jackpot only (a truncated find got away, like a fish with
       // no bag room). Every rarity draw happened in the roll loop above, so
       // this mark write cannot perturb the pinned draw sequence.
+      // Reliquary field-note trophy reuses the same gather_event:* id.
       ctx.markVisited(meta, 'gather_event:perfect_specimen');
+      noteReliquaryMark(ctx, meta, 'gather_event:perfect_specimen');
     } else if (!downgradeEmitted) {
       // A truncated specimen contributes NO ledger entry: nothing landed, so
       // no line claims it did. The 'find' toast is the whole feedback.

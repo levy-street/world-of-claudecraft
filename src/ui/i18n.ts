@@ -97,9 +97,10 @@ let pseudoActive = false;
  *  English, {placeholders} preserved). The `!import.meta.env.PROD` guard mirrors
  *  tableFor, so a release build statically resolves this to `false` and any
  *  consumer's pseudo branch tree-shakes away. Player text that resolves its
- *  English OUTSIDE the catalog table (deed names/descs/titles come from the sim
- *  content table, so tableFor never pseudo-folds them) consults this to fold at
- *  render time (src/ui/deed_i18n.ts). */
+ *  English OUTSIDE the catalog table (deed and reliquary-page names come from
+ *  the sim content tables, so tableFor never pseudo-folds them) consults this
+ *  to fold at render time (src/ui/i18n_pseudo_port.ts, shared by the deed and
+ *  reliquary channels). */
 export function isPseudoActive(): boolean {
   return !import.meta.env.PROD && pseudoActive;
 }

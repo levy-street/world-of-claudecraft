@@ -53,6 +53,21 @@ export const BOOST_LEVEL = 20;
 // MAX_SKIN (7): one boosted character per class fits under the cap with a
 // slot to spare for a hand-made character.
 const CHARACTER_LIMIT = 10;
+
+/** Every grant the boost makes is a SYSTEM SEED, not something the world handed
+ *  the player, so none of it counts toward Reliquary obtain tallies (policy
+ *  call, 2026-08-08). It mirrors the join-time retro fill, which deliberately
+ *  never counts either: a boosted character starts holding gear it did not
+ *  earn. Discovery is unaffected, exactly as on every other movement path.
+ *
+ *  The offline /dev kit (src/sim/dev_kit.ts) deliberately DIFFERS and still
+ *  counts: it is ALLOW_DEV_COMMANDS-gated so it cannot reach a real player,
+ *  and its DevKitApplyCtx.addItem carries no opts to thread a flag through.
+ *  The server `dev_give` command (server/game.ts) is the same family: also
+ *  ALLOW_DEV_COMMANDS-gated, also counts, so the two dev arms agree with
+ *  each other. The seed policy recorded here is server-boost-only, on
+ *  purpose. */
+const MOVEMENT = { movement: true } as const;
 const BOOST_MAX_SKIN = 7;
 // Same fixed world seed the normal creation path uses (initialCharacterState
 // in server/main.ts): the builder Sim is a throwaway, never ticked.
@@ -504,7 +519,7 @@ export function applyBoostKitToPlayer(sim: Sim, pid: number): boolean {
   const bagId = bestBoostBag();
   for (let socket = 0; socket < BOOST_BAG_SOCKETS; socket++) {
     if (meta.bags[socket] === bagId) continue;
-    sim.addItem(bagId, 1, pid);
+    sim.addItem(bagId, 1, pid, MOVEMENT);
     sim.equipBag(bagId, socket, pid);
   }
   // Nythraxis attunement: run the chain through the real quest cores (accept,
@@ -527,7 +542,7 @@ export function applyBoostKitToPlayer(sim: Sim, pid: number): boolean {
   for (const slot of KIT_SLOTS) {
     const itemId = kit[slot];
     if (!itemId || meta.equipment[slot] === itemId) continue;
-    if (sim.countItem(itemId, pid) <= 0) sim.addItem(itemId, 1, pid);
+    if (sim.countItem(itemId, pid) <= 0) sim.addItem(itemId, 1, pid, MOVEMENT);
     sim.equipItem(itemId, pid);
   }
   // Alternate-role kits ride in the bags (e.g. the shaman wears caster gear
@@ -539,7 +554,7 @@ export function applyBoostKitToPlayer(sim: Sim, pid: number): boolean {
       if (!itemId || equipped.has(itemId) || bagged.has(itemId)) continue;
       if (sim.countItem(itemId, pid) > 0) continue;
       bagged.add(itemId);
-      sim.addItem(itemId, 1, pid);
+      sim.addItem(itemId, 1, pid, MOVEMENT);
     }
   }
   // Riding: the mounts overhaul gates every mount on the trained skill; a

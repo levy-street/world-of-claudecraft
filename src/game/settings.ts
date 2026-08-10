@@ -339,6 +339,10 @@ export const BOOL_SETTINGS = {
   // tracker is collapsed to just its header. Toggled by clicking the tracker
   // header (the quest-tracker convention); kept here so the choice persists.
   deedTrackerCollapsed: { def: false },
+  // off by default (expanded): when on, the on-screen Reliquary tracker is
+  // collapsed to just its header. Toggled by clicking the tracker header (the
+  // quest-tracker convention); kept here so the choice persists.
+  reliquaryTrackerCollapsed: { def: false },
   // off by default: append an "Item Level N" (plus power score) line to every item
   // tooltip. Purely a display preference read live by the HUD; off keeps the
   // classic stat-only tooltip. See src/sim/item_level.ts for the derivation.

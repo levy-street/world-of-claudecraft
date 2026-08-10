@@ -4297,6 +4297,114 @@
   body.mobile-touch.hud-mobile-compact #deed-tracker .dt-chevron {
     display: none;
   }
+  /* ---------- mobile Reliquary tracker ---------- */
+  /* The Reliquary tracker folds on exactly the same tiers, for the same reason:
+     glanceable decoration on a phone, with the window itself carrying the full
+     pin list. hud.ts routes the compact-tier tap to The Reliquary instead of the
+     invisible collapse toggle. */
+  body.mobile-touch #reliquary-tracker {
+    font-size: 11px;
+  }
+  body.mobile-touch #reliquary-tracker .dt-list {
+    max-height: 88px;
+    overflow: hidden;
+  }
+  body.mobile-touch.hud-mobile-compact #reliquary-tracker .dt-list {
+    display: none;
+  }
+  body.mobile-touch.hud-mobile-compact #reliquary-tracker .dt-chevron {
+    display: none;
+  }
+  /* ---------- mobile Reliquary (standalone window) ---------- */
+  /* Full-bleed safe-area panel, horizontal shelf chips, 40px targets. The
+     body column collapses the desktop rail into a chip row (deeds idiom). */
+  body.mobile-touch #reliquary-window {
+    position: fixed;
+    left: max(10px, env(safe-area-inset-left));
+    right: max(10px, env(safe-area-inset-right));
+    top: max(10px, env(safe-area-inset-top));
+    bottom: max(10px, env(safe-area-inset-bottom));
+    width: auto;
+    transform: none;
+    max-width: none;
+    max-height: none;
+    box-sizing: border-box;
+    padding-bottom: var(--window-pad);
+    overflow: hidden;
+    z-index: 95;
+  }
+  body.mobile-touch #reliquary-window .reliquary-body {
+    flex-direction: column;
+    min-height: 0;
+  }
+  body.mobile-touch #reliquary-window .reliquary-rail {
+    flex: none;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+    gap: 4px;
+    padding-bottom: 2px;
+  }
+  body.mobile-touch #reliquary-window .reliquary-nav {
+    flex: 0 0 auto;
+  }
+  body.mobile-touch #reliquary-window .reliquary-scroll {
+    min-height: 0;
+  }
+  @media (max-height: 480px) {
+    body.mobile-touch #reliquary-window .reliquary-body {
+      min-height: 44px;
+    }
+    body.mobile-touch #reliquary-window .reliquary-scroll {
+      min-height: 44px;
+    }
+    body.mobile-touch #reliquary-window .reliquary-summary {
+      padding: 1px 0 2px;
+    }
+    body.mobile-touch #reliquary-window .reliquary-recent,
+    body.mobile-touch #reliquary-window .reliquary-nearly {
+      gap: 4px;
+    }
+  }
+  body.mobile-touch #reliquary-window .reliquary-grid {
+    grid-template-columns: repeat(auto-fill, minmax(52px, 1fr));
+    gap: 6px;
+  }
+  body.mobile-touch #reliquary-window .reliquary-cell {
+    min-width: 48px;
+    min-height: 48px;
+  }
+  body.mobile-touch #reliquary-window .reliquary-page-bar {
+    width: 100%;
+    max-width: 220px;
+  }
+  /* The Overview shelf cards stack: three columns inside a phone-width scroll
+     column leave no room for a page name, and the card text wraps rather than
+     truncates. The min-height drops to the touch floor because a stacked card
+     is already taller than that from its own content; it is the floor, not the
+     size. Cards live inside .reliquary-scroll, so they scroll with the Overview
+     and add no pinned chrome the short-landscape clamp above has to absorb. */
+  body.mobile-touch #reliquary-window .reliquary-shelf-cards {
+    grid-template-columns: 1fr;
+  }
+  body.mobile-touch #reliquary-window .reliquary-shelf-card {
+    min-height: 48px;
+  }
+  /* The recent chips take the window's own 48px touch floor (the
+     .reliquary-cell size, one step above the 40px the deeds strip settled
+     for) on EVERY touch device, not just short-landscape phones: a landscape
+     tablet is body.mobile-touch too. The bare class is deliberate: the
+     jump-button form needs the floor and the inert span form keeps the same
+     box so the wrapped strip stays visually even. The strip wraps, and it
+     sits in the scrolling Overview, so a taller chip row cannot clip the
+     rail. */
+  body.mobile-touch #reliquary-window .reliquary-recent-item {
+    min-width: 48px;
+    min-height: 48px;
+  }
   /* ---------- mobile professions (standalone window) ---------- */
   /* The Professions window follows the deeds/bank STANDALONE full-screen
      convention on touch (no companion panel, so no 50/50 pairing): fixed

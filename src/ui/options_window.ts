@@ -232,6 +232,7 @@ const BIND_ACTION_LABEL_KEYS: Partial<Record<string, TranslationKey>> = {
   mount: 'hudChrome.keybinds.mount',
   deeds: 'hudChrome.deeds.title',
   professions: 'hudChrome.professions.title',
+  reliquary: 'hudChrome.reliquary.title',
 };
 
 /**

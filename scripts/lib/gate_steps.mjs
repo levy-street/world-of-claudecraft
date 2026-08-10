@@ -25,6 +25,7 @@ export const I18N_RELEASE_TIER_SUITES = Object.freeze([
   'tests/i18n_t_behavior.test.ts',
   'tests/localization_coverage.test.ts',
   'tests/localization_fixes.test.ts',
+  'tests/reliquary_i18n.test.ts',
 ]);
 
 /**

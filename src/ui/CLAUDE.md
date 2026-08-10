@@ -573,14 +573,43 @@ same file), and each module's header carries its own contract.
   `LAYOUT_RESET_EPOCH` only for a forced one-time frame-position reset.
 - **deeds_view.ts** / **deeds_window.ts** (+ **deed_tracker_painter.ts**,
   **deeds_leaderboard_view.ts**, **deed_i18n.ts**, **deed_i18n.locales/**,
-  **deed_image_ids.ts**): the Book of Deeds achievements window. The DOM-free core builds
+  **deed_image_ids.ts**, **deed_border_view.ts**): the Book of Deeds achievements window. The DOM-free core builds
   the category/entry model, search, progress fractions, crest-id resolution, and the
   drain-batched unlock moment (banners coalesce, retro grants fold to one summary line);
   the painter is a cold window plus the write-elided HUD watch tracker. `deed_i18n.ts`
   re-localizes deed names/descriptions/titles/broadcast lines from ids (the
   `talent_i18n.ts` entity-style pattern; per-base-locale release-fill chunks under
   `deed_i18n.locales/` fetched lazily via `DEED_LOCALE_LOADERS`);
-  `deeds_leaderboard_view.ts` is the Renown-board tab's pure core.
+  `deeds_leaderboard_view.ts` is the Renown-board tab's pure core. `deed_border_view.ts` is
+  the worn-border channel: a pure deed id -> slug -> palette resolution that BOTH the
+  overhead nameplate canvas and the unit-frame portrait ring paint from, and the one
+  sanctioned home of those accent colors (`src/styles/CLAUDE.md` documents the exception).
+- **reliquary_view.ts** / **reliquary_window.ts** (+ **reliquary_i18n.ts**,
+  **reliquary_i18n.locales/**, **reliquary_sheet_view.ts**, **reliquary_cell_art.ts**,
+  **reliquary_tracker_view.ts** / **reliquary_tracker_painter.ts**): The Reliquary collection
+  window, the Book of Deeds family exactly. The DOM-free core builds the shelf/page/grid
+  models and the drain-batched unlock plan; the painter is a cold, event-driven window off
+  a refresh signature. `reliquary_i18n.ts` re-localizes page names and descriptions from
+  the page id (the same `deed_i18n.ts` channel shape, per-base-locale chunks under
+  `reliquary_i18n.locales/` fetched lazily via `RELIQUARY_LOCALE_LOADERS`), so a view
+  model's `name` field is raw catalog English that no render site may print: resolve
+  through `reliquaryPageName(pageId)` at paint time. The `_tracker_` pair is the always-on
+  `#reliquary-tracker` strip (the deed-tracker recipe): the pure core owns pin selection,
+  the nearly-complete default, and the fill-delta flash over one reused container, and
+  memoizes the whole-catalog default scan on an ownership signature because
+  `reliquaryPageCompletion` mints a fresh ownership bag per call in BOTH hosts.
+  **reliquary_cell_art.ts** is the per-kind art resolver both the grid and the recent strip
+  read through: it maps a relic slot to a DESCRIPTOR (an item id, a public URL, or a deed
+  crest id) and never mints markup, so every kind reaches art that already ships (a mount
+  through its reins ItemDef, a skin through the Armory thumbnail, a title through
+  `deedCrestId`, a mark through the profession sheet) instead of the procedural unknown-item
+  ghost. Null means "this bundle cannot place the id" and the window keeps its stale-client
+  fallback; any art the window paints from a descriptor lands in the one
+  `<img class="item-icon q-*">` shape (the URL and crest arms via `itemIconImgHtml`, the item
+  arm via the shared `itemIcon` painter), because `.item-icon` is what the cell CSS sizes and
+  silhouettes. Cells whose art paints its own background (Armory cards, category-fallback
+  crests) get `data-cell-art="opaque"` stamped from `reliquaryCellArtOpaque`, which is what
+  the missing-state grayscale carve-out keys on instead of a kind literal.
 - **bank_filter.ts** (with **bank_view.ts** / **bank_window.ts**): the bank search/sort
   preserves live `slotIndex` values verbatim, so a filtered row still names the exact wire
   argument for deposit/withdraw.

@@ -1064,11 +1064,13 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
     },
     enrage: { belowHpPct: 0.2, dmgMult: 1.5, hasteMult: 1.25 },
     // Personal loot table: rolled INDEPENDENTLY for every contributor (see
-    // rollWorldBossLoot). A guaranteed storm trophy, plus AT MOST ONE epic Tier-2 set
-    // piece. The glove group rolls first at ~32%; the belt group also rolls at ~32% but
-    // the one-gear cap keeps it only when the glove roll missed, so its EFFECTIVE drop
-    // rate is ~22% (0.68 x 0.32) and a single kill never hands out both a glove and a belt.
-    // Keep the glove entries first if this ordering skew is ever retuned.
+    // rollWorldBossLoot). A guaranteed storm trophy, plus AT MOST ONE epic Tier-2
+    // piece per contributor. The gear group (four gloves + the vestments chest)
+    // rolls first at 40% (5 x 0.08); the belt group also rolls at 32% (4 x 0.08)
+    // but the one-gear cap keeps it only when the first roll missed, so its
+    // EFFECTIVE drop rate is ~19% (0.60 x 0.32) and one contributor never
+    // receives two pieces from one kill. Keep the gear-group entries first if
+    // this ordering skew is ever retuned.
     loot: [
       { itemId: 'inert_storm_shard', chance: 1 },
       { itemId: 'crownforged_gauntlets', chance: 0.08, rollGroup: 'thunzharr_t2' },

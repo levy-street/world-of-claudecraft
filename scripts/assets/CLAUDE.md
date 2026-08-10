@@ -6,7 +6,13 @@
 # scripts/assets/
 
 Offline asset pipeline: optimize raw downloaded model packs into shipping files
-under `public/`. Run manually (not part of `npm run build`):
+under `public/`. One sanctioned 2D exception lives here too: `chrome_crown/`
+holds the layered-SVG source and render script for the Reliquary launcher's
+painted chrome icon (its siblings were generated externally and have no
+committed source; a procedurally authored icon keeps its source in-repo, and
+the render feeds the normal `npm run assets:chrome` converter). Every other
+2D icon converter stays at `scripts/convert_*_webp.mjs` top level.
+Run manually (not part of `npm run build`):
 `node scripts/assets/build_assets.mjs scripts/assets/specs/<spec>.json`.
 For reference-image reconstruction and procedural GLB authoring, read the living
 `docs/image-to-glb-asset-workflow.md` runbook before adding a model-specific exporter.

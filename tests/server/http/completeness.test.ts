@@ -109,6 +109,7 @@ const EXCLUDED_PATHS = new Set<string>(ORPHAN_DEVIATION?.routes ?? []);
 // router-owned-only shape instead (the same assertion pair as the orphan).
 const REGISTRY_ONLY_PATHS = new Set<string>([
   '/api/deeds/rarity',
+  '/api/reliquary/rarity',
   '/api/deeds/broadcasts',
   '/api/characters/:id/deeds-recent',
   '/api/characters/:id/appearance-reroll',
@@ -319,6 +320,9 @@ describe('registry completeness: migrated baseline (public reads + auth + charac
     { method: 'GET', path: '/api/deeds/rarity' },
     { method: 'GET', path: '/api/deeds/broadcasts' },
     { method: 'POST', path: '/api/deeds/broadcasts' },
+    // The reliquary rarity read (server/reliquary.ts): registry-only on the
+    // same terms as the deeds family, and it shares their cache and flight.
+    { method: 'GET', path: '/api/reliquary/rarity' },
     // The Thornhollow Fields ladder (server/battleground.ts): registry-only like the
     // deeds family, per the same new-route rule.
     { method: 'GET', path: '/api/battleground/leaderboard' },

@@ -46,15 +46,22 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // the controlled Warlock pet's signature-skill command and autocast toggle
 // (+2 send/dispatch from the class-overhauls integration), set_helm as a
 // send + dispatch pair (the paperdoll helmet-visibility eye; helmHidden
-// persists per character like weaponStowed), and inv_sort as a send +
-// dispatch pair (the one-shot bag clean-up; no payload, the sim re-derives
-// the whole arrangement
-// deterministically), and bg_respond as a send + dispatch pair (the
-// release's battleground queue-pop confirmation). Masterwrought phase 04
-// adds the extract_essence command (client-sent, so both counts move
-// together).
-const EXPECTED_SEND_COUNT = 196;
-const EXPECTED_DISPATCH_COUNT = 209;
+// persists per character like weaponStowed), inv_sort as a send + dispatch
+// pair (the one-shot bag clean-up; no payload, the sim re-derives the whole
+// arrangement deterministically), and bg_respond as a send + dispatch pair
+// (the release's battleground queue-pop confirmation).
+// The Reliquary packet's nameplate border adds deed_set_border as a send +
+// dispatch pair, the exact sibling of deed_set_title. NOTE (merge trap): both
+// sides of every v0.36.0 sync bump these counts independently, and git has
+// auto-merged identical numbers before while the real total was higher; the
+// merged tree carries BOTH sides' pairs. Only the suite says what they really
+// are, and the numbers below were set from a run, not from this narrative.
+// Masterwrought phase 04 adds the extract_essence command (client-sent, so
+// both counts move together); this merge composed it with deed_set_border,
+// the exact silent-off-by-one the NOTE above warns about (both sides read
+// 196/209 pre-merge, the merged tree carries both pairs).
+const EXPECTED_SEND_COUNT = 197;
+const EXPECTED_DISPATCH_COUNT = 210;
 const EXPECTED_DISPATCH_ONLY_COUNT = 13;
 
 // The chat sub-channel routing switch (server/game.ts `switch

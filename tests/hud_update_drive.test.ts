@@ -1248,12 +1248,33 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the Book of Deeds window',
   },
   {
+    call: 'this.reliquaryWindow.refreshIfChanged',
+    band: 'slow',
+    gate: 'this.reliquaryWindow.isOpen',
+    surface: 'window',
+    guard: {
+      kind: 'module',
+      module: 'reliquary_window.ts',
+      proof:
+        'const input = this.buildInput(); const sig = this.sigFromInput(input); if (sig === this.lastSig) return;',
+    },
+    why: 'The Reliquary window',
+  },
+  {
     call: 'this.refreshOpenProfessionSurfacesIfChanged',
     band: 'slow',
     gate: '',
     surface: 'window',
     guard: { kind: 'hud', proof: 'if (sig === this.lastProfessionSurfaceSig) return;' },
     why: 'repaints the character window and the crafting window when a profession number moves',
+  },
+  {
+    call: 'this.refreshCharSheetIfChanged',
+    band: 'slow',
+    gate: '',
+    surface: 'window',
+    guard: { kind: 'hud', proof: 'if (sig === this.lastCharSheetSig) return;' },
+    why: 'converges the open character sheet on its whole progression block: the WORN title / border (the deeds picker repaints only itself), the earned border badges, and the Reliquary pair plus Curator rank',
   },
   {
     call: 'this.professionsWindow.refreshIfChanged',
@@ -1290,6 +1311,13 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     gate: '',
     surface: 'chrome',
     why: 'the always-on deed tracker (not gated on a window)',
+  },
+  {
+    call: 'this.updateReliquaryTracker',
+    band: 'slow',
+    gate: '',
+    surface: 'chrome',
+    why: 'the always-on Reliquary tracker (not gated on a window): pinned pages fill from normal play and an illuminated page drops off',
   },
   {
     call: 'this.calendarWindow.refreshIfChanged',
@@ -1542,7 +1570,12 @@ describe('Hud.update() drives exactly the registered set, on the registered band
     expect(
       bySurface,
       "the surface split moved. A new call needs its surface decided; a CHANGED one means a repaint was reclassified, which is the one edit that can quietly drop a window row's invalidation guard.",
-    ).toEqual({ window: 45, chrome: 81, none: 17 });
+      // Both sides of every v0.36.0 sync move this bucket split independently
+      // (the branch's reliquary window row and the char-sheet latch against the
+      // release's own window/chrome churn), so it cannot be reconciled by
+      // arithmetic across a merge. The numbers below were set from a suite run
+      // on the merged tree, not from either side's narrative.
+    ).toEqual({ window: 47, chrome: 82, none: 17 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');
@@ -1554,8 +1587,15 @@ describe('Hud.update() drives exactly the registered set, on the registered band
     for (const row of HUD_UPDATE_DRIVES)
       if (row.guard) byKind[row.guard.kind] = (byKind[row.guard.kind] ?? 0) + 1;
     expect(byKind, 'a guard kind changed: say why in the PR, not only in the table').toEqual({
-      module: 23,
-      hud: 6,
+      // Reliquary cold window (module) + craft-cast single-surface strip (hud)
+      // both land on this pin; keep both counts, do not drop either side.
+      // 24 = both sides of the v0.36.0 sync counted 23 alone (the branch's
+      // reliquary module guard vs the release's new module-guarded row).
+      module: 24,
+      // 7 = Phase 20's refreshCharSheetIfChanged. Its latch is a HUD field
+      // (lastCharSheetSig), like its profession sibling, because the cold
+      // char_window painter holds no signature of its own to diff.
+      hud: 7,
       callsite: 12,
       none: 4,
     });
@@ -1599,6 +1639,8 @@ describe('Hud.update() drives exactly the registered set, on the registered band
         'hud.ts: if (craftCastActivitySig(session) !== this.lastCraftingCastSig) {',
         'hud.ts: if (craftingReagentSig(this.sim.inventory, this.sim.player.name) === this.lastCraftingReagentSig) return;',
         'hud.ts: if (sig !== this.lastLootSettingsSig) {',
+        // Phase 20: the progression-block latch for the open character sheet.
+        'hud.ts: if (sig === this.lastCharSheetSig) return;',
         'hud.ts: if (sig === this.lastProfessionSurfaceSig) return;',
         'hud.ts: if (sig === this.lastTownFocusSig) return;',
         'hud.ts: if (sig === this.lastTradeSig) return;',
@@ -1613,6 +1655,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
         // sig binding): render() re-latches lastSig from the one input it
         // painted, so the band never re-acts on a stale signature.
         'professions_window.ts: const input = this.buildInput(); const sig = professionsRefreshSig(input); if (sig === this.lastSig) return;',
+        'reliquary_window.ts: const input = this.buildInput(); const sig = this.sigFromInput(input); if (sig === this.lastSig) return;',
         'social_window.ts: if (struct !== this.lastStruct) {',
         // #2519 replaced the joined signature string this used to build every frame with
         // an in-place comparison against the retained numbers; same guard, same place, no

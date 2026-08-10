@@ -24,10 +24,11 @@ interface WorldState {
   deedsEarned: Map<string, string>;
   renown: number;
   activeTitle: string | null;
+  activeBorder: string | null;
 }
 
 function baseState(): WorldState {
-  return { deedsEarned: new Map(), renown: 0, activeTitle: null };
+  return { deedsEarned: new Map(), renown: 0, activeTitle: null, activeBorder: null };
 }
 
 function makeWindow(state: WorldState): { w: DeedsWindow; el: HTMLElement } {
@@ -47,6 +48,10 @@ function makeWindow(state: WorldState): { w: DeedsWindow; el: HTMLElement } {
         deedsRecent: async () => null,
         setActiveTitle: (id: string | null) => {
           state.activeTitle = id;
+        },
+        activeBorder: state.activeBorder,
+        setActiveBorder: (id: string | null) => {
+          state.activeBorder = id;
         },
         cfg: { playerClass: 'warrior' },
         player: { name: 'Hero' },

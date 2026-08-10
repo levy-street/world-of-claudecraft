@@ -59,6 +59,17 @@ COSMETIC (may be tiered down on lower presets):
     that differs between two players looking at the same wearer, and it can only dim.
   What is faded is decoration ON a weapon. The wearer, their nameplate, their cast bar, their
   auras, their position and the weapon model itself are untouched at every scale.
+- The deed border accent's decorative bloom (the Book of Deeds border rewards worn in-world).
+  The accent is IDENTITY: it encodes no health, range, rank, or threat, so it may never be
+  hidden, but its outer glow is pure richness. The identity arms are tier-invariant by
+  construction: the nameplate cartouche is canvas shapes resolved from entity state on the
+  same cadence as the title text (no tier input on the accent path, pinned by the path scan
+  in `tests/deed_border_accent.test.ts`), and the portrait ring's frame border, edge outline,
+  and inset shadow never read a tier token (pinned by the CSS arm of the same suite). The ONE
+  tier-scaled quantity is the ring's outer box-shadow bloom, which rides `--fx-shadow` (0 at
+  low) exactly like the sibling portrait combat glow. The ring also repaints on the existing
+  low-tier target-frame body throttle (about 10 Hz, target swap bypasses), a redraw-smoothness
+  shed this list already sanctions for the portrait.
 
 The test for any new tier knob: if a knob hides or delays something a player READS AND REACTS
 TO, it is not allowed. If it only reduces visual richness or redraw smoothness, it is fine.

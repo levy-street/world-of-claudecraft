@@ -862,7 +862,7 @@ jobs:
   # under the flag run here, so this job answers exactly one question: has the
   # 21-locale fill been done? It is EXPECTED to be red for most of a cycle, and that
   # is the point: it is red on its own name, next to a release-gate that stays green
-  # unless code is genuinely broken. Unsharded and seconds long (five files), so it
+  # unless code is genuinely broken. Unsharded and seconds long (six files), so it
   # costs a runner slot, not runner minutes. The file list is pinned three ways
   # (this command, I18N_RELEASE_TIER_SUITES in scripts/lib/gate_steps.mjs, and a scan
   # of tests/ for readers of the flag) by tests/release_i18n_tier_coverage.test.ts,
@@ -900,7 +900,7 @@ jobs:
       # `npm test` regenerates the i18n artifacts itself (pretest), which these
       # suites read.
       - name: Run i18n release-tier suites (21-locale + empty-pending)
-        run: npm test -- tests/deed_i18n.test.ts tests/i18n_status_registry.test.ts tests/i18n_t_behavior.test.ts tests/localization_coverage.test.ts tests/localization_fixes.test.ts
+        run: npm test -- tests/deed_i18n.test.ts tests/i18n_status_registry.test.ts tests/i18n_t_behavior.test.ts tests/localization_coverage.test.ts tests/localization_fixes.test.ts tests/reliquary_i18n.test.ts
 
   # Runs in parallel with release-gate: same if-condition, no needs edge in
   # either direction. Does not set I18N_RELEASE_TIER; the checks here do not

@@ -13,6 +13,7 @@ import { DELVE_SHOPS } from '../src/sim/content/delves/shop';
 import { HEROIC_BOSS_LOOT, RETIRED_HEROIC_ITEMS } from '../src/sim/content/heroic_loot';
 import { HEROIC_VENDOR_STOCK } from '../src/sim/content/heroic_vendor';
 import { FURY_STOCK } from '../src/sim/content/pvp_honor';
+import { RELIQUARY_PAGES } from '../src/sim/content/reliquary';
 import { ITEMS, MOBS, NPCS, QUESTS } from '../src/sim/data';
 import { MAIL_ATTACHMENT_EXPIRY_SECONDS, type MailSave } from '../src/sim/mail/post_office';
 import type { MarketSave } from '../src/sim/market';
@@ -163,12 +164,42 @@ describe('retired heroic items: the four ids v0.25.0 orphaned resolve again', ()
     }
   });
 
-  it('allows retired ids only in their save-compat definition module', () => {
-    const productionFiles = walkTypeScript(simRoot).filter((path) => path !== retiredDefsFile);
+  it('allows retired ids only in their save-compat definition module and the Reliquary catalog', () => {
+    // Phase 21 DELIBERATELY widened this from heroic_loot.ts alone: the
+    // Vault of Ages page (src/sim/content/reliquary.ts) lists the four ids as
+    // DISPLAY slots for the veterans who still hold them. The Reliquary is a
+    // display surface, never an acquisition path, and the compensating
+    // assertions below hold it to that: the ONE page carrying the ids is the
+    // vault, it sits outside all completion math (excludeFromCompletion), and
+    // it authors ZERO source hints, so a future edit cannot quietly turn the
+    // catalog into a route back into the game for retired loot.
+    const allowedFiles = new Set([retiredDefsFile, join(simRoot, 'content', 'reliquary.ts')]);
+    const productionFiles = walkTypeScript(simRoot).filter((path) => !allowedFiles.has(path));
     for (const path of productionFiles) {
       const source = readFileSync(path, 'utf8');
       for (const id of RETIRED_IDS) expect(source).not.toContain(id);
     }
+    // The compensating half: exactly one catalog page carries any retired id,
+    // and it is the retired vault, excluded from completion and sourceless
+    // (no page default, no per-relic hints).
+    const carriers = RELIQUARY_PAGES.filter((page) =>
+      page.relics.some(
+        (relic) => relic.kind === 'item' && RETIRED_IDS.includes(relic.itemId as RetiredId),
+      ),
+    );
+    expect(carriers.map((page) => page.id)).toEqual(['horizons_vault_of_ages']);
+    const vault = carriers[0];
+    // The REASON, not merely truthiness: the flag now carries which kind of
+    // outside-completion page this is, and only 'retired' earns the sourceless
+    // exemption the assertions below rely on.
+    expect(vault.excludeFromCompletion).toBe('retired');
+    expect(vault.sourceDefault).toBeUndefined();
+    for (const relic of vault.relics) {
+      expect(relic.source, `${vault.id} relic carries a source hint`).toBeUndefined();
+    }
+    expect(
+      vault.relics.map((relic) => (relic.kind === 'item' ? relic.itemId : relic.kind)),
+    ).toEqual([...RETIRED_IDS]);
   });
 
   it('generates no heroic variants for retired items (they are save-compat only)', () => {

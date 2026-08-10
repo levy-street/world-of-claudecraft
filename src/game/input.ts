@@ -95,6 +95,7 @@ export interface InputCallbacks {
       | 'discord'
       | 'deeds'
       | 'professions'
+      | 'reliquary'
       | 'crafting'
       | 'sheathe'
       | 'mount',
@@ -1178,6 +1179,9 @@ export class Input {
         return;
       case 'professions':
         this.cb.onUiKey('professions');
+        return;
+      case 'reliquary':
+        this.cb.onUiKey('reliquary');
         return;
       case 'chat':
         this.cb.onUiKey('chat');

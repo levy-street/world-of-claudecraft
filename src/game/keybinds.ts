@@ -305,6 +305,15 @@ export const BIND_ACTIONS: BindAction[] = [
     kind: 'edge',
     defaults: ['Shift+KeyP'],
   },
+  // The Reliquary parks on Shift+X: bare KeyX is the emote wheel; Shift+X was
+  // free and sits beside Deeds (Shift+Z) on the shifted letter row.
+  {
+    id: 'reliquary',
+    label: 'The Reliquary',
+    category: 'Interface',
+    kind: 'edge',
+    defaults: ['Shift+KeyX'],
+  },
   {
     id: 'chat',
     label: 'Open Chat',

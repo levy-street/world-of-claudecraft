@@ -257,6 +257,7 @@ import { pruneExpiredBlockedIps } from './ip_block_db';
 import {
   buildDeedsBoard,
   configureLeaderboardRuntime,
+  decodedRouteName,
   type ReleaseEntry,
   readArenaLeaderboard,
   readProjectStats,
@@ -318,6 +319,8 @@ import {
 } from './ratelimit';
 import { createPgRateLimitStore } from './ratelimit_db';
 import { isPublicCorsPath, publicOriginFromRequest, REALM, REALM_DIRECTORY } from './realm';
+import { configureReliquaryRuntime } from './reliquary';
+import { reliquaryRarityCounts } from './reliquary_rarity_db';
 import { resolveReportTarget } from './report_target';
 import { BUG_REPORT_MAX_BODY_BYTES, configureReportsRuntime } from './reports';
 import { createRetentionSweep, RETENTION_SWEEP_BATCH_SIZE } from './retention_sweep';
@@ -843,30 +846,83 @@ setOnAccountModerated(bustBoardCaches);
 // resolved it.
 setOnModerationQueueChanged(bustModerationQueueCache);
 
-// Deed rarity cache. Same compute-once/serve-from-memory shape as the boards
-// above, one entry (the aggregate is global/cross-realm by design). 5 minutes:
-// rarity moves slowly and the refresh scans character_deeds, so the 30 s board
-// TTL is tighter than this read needs. Stale-on-error like the boards; with
-// nothing cached yet a failed refresh serves the empty aggregate (the endpoint
-// stays 200 and clients simply render no rarity lines).
+// Deed + reliquary rarity cache. Same compute-once/serve-from-memory shape as
+// the boards above, one entry (both aggregates are global/cross-realm by
+// design). 5 minutes: rarity moves slowly and the refresh scans
+// character_deeds plus the characters blobs, so the 30 s board TTL is tighter
+// than this read needs. Stale-on-error like the boards; with nothing cached
+// yet a failed refresh serves the empty aggregate (the endpoints stay 200 and
+// clients simply render no rarity lines). The reliquary aggregate rides the
+// SAME cache entry and refresh ON PURPOSE: reliquaryRarityCounts is a
+// characters walk (it detoasts every eligible blob), and sharing the deeds
+// walk's single flight and TTL keeps that walk to at most one run per TTL
+// window no matter which UI asks, instead of giving a second full-table scan
+// its own cadence.
 const DEEDS_RARITY_TTL_MS = 5 * 60_000;
+// The reliquary slice may carry forward across a failed arm (see the refresh
+// below), so it carries its own age stamp with a drop-to-empty bound: without
+// one, an arm that fails every cycle would serve arbitrarily old counts
+// indistinguishable from fresh ones. Three TTLs of staleness is where honest
+// degrades beats stale serves for a slow-moving cosmetic read.
+const RELIQUARY_RARITY_MAX_STALE_MS = 3 * DEEDS_RARITY_TTL_MS;
+const EMPTY_RELIQUARY_RARITY: import('../src/world_api').ReliquaryRarity = {
+  totalEligible: 0,
+  found: {},
+  illuminated: {},
+};
 let deedsRarityCache: {
   at: number;
   payload: import('../src/world_api').DeedsRarity;
+  reliquary: import('../src/world_api').ReliquaryRarity;
+  reliquaryAt: number;
 } | null = null;
 
 // Single-flight the rarity refresh so a login-page storm on a cold or just-expired
-// cache runs the two full-table aggregate scans (deedRarityCounts) once, not once
-// per caller. publicRarityPayload strips hidden deeds at refresh time, before the
-// cache install, so the anonymous endpoint never enumerates a hidden deed.
-// deedsRarityCache is deliberately NOT wired into bustBoardCaches (rarity is not
-// moderation-visible in the delisting sense); if it is ever added there, the same
-// boardEpoch capture-before-install guard the leaderboard refreshes carry must be
-// added in that same change.
+// cache runs the full-table aggregate scans (deedRarityCounts +
+// reliquaryRarityCounts) once, not once per caller. publicRarityPayload strips
+// hidden deeds at refresh time, before the cache install, so the anonymous
+// endpoint never enumerates a hidden deed (the reliquary aggregate needs no
+// strip: the whole relic catalog is public data-as-code the /wiki already
+// publishes). deedsRarityCache is deliberately NOT wired into bustBoardCaches
+// (rarity is not moderation-visible in the delisting sense); if it is ever
+// added there, the same boardEpoch capture-before-install guard the
+// leaderboard refreshes carry must be added in that same change.
+// NOTE on scope: "at most one walk per TTL" is a PER-PROCESS bound. Every
+// realm process holds its own cache and flight against the one Postgres, so N
+// processes mean up to N unstaggered walks per TTL window; harmless at the
+// measured cost, stated here so a future multi-realm scale-up prices it in.
 const refreshDeedsRarityShared = singleFlight(
   async (): Promise<import('../src/world_api').DeedsRarity> => {
-    const payload = publicRarityPayload(await deedRarityCounts());
-    deedsRarityCache = { at: Date.now(), payload };
+    const startedAt = Date.now();
+    const counts = await deedRarityCounts();
+    const payload = publicRarityPayload(counts);
+    // Install the deeds slice BEFORE the heavier reliquary arm, so a
+    // reliquary-only failure can never blank the pre-existing deeds feature
+    // (a cold getDeedsRarity would otherwise degrade to the empty aggregate),
+    // and the fresh `at` stamp negative-caches the failed arm for one TTL
+    // window instead of re-running the healthy deeds scan on every anonymous
+    // retry. The reliquary slice carries forward until its arm succeeds, but
+    // only inside the staleness bound: past it, honest empty beats a count
+    // that could be arbitrarily old.
+    const carried = deedsRarityCache;
+    const carriedFresh =
+      carried !== null && Date.now() - carried.reliquaryAt <= RELIQUARY_RARITY_MAX_STALE_MS;
+    deedsRarityCache = {
+      at: Date.now(),
+      payload,
+      reliquary: carriedFresh ? carried.reliquary : EMPTY_RELIQUARY_RARITY,
+      reliquaryAt: carried?.reliquaryAt ?? 0,
+    };
+    // The deeds denominator is byte-identical to the reliquary one (shared
+    // predicate constants), so hand it over rather than counting twice; the
+    // UNSTRIPPED aggregate carries it (publicRarityPayload only strips ids).
+    const reliquary = await reliquaryRarityCounts(counts.totalEligible);
+    deedsRarityCache = { at: Date.now(), payload, reliquary, reliquaryAt: Date.now() };
+    // The one observability line for the walk: elapsed and the population it
+    // covered, so the growth curve is visible before the endpoint degrades.
+    console.log(
+      `rarity refresh: ${Date.now() - startedAt}ms, ${counts.totalEligible} eligible characters`,
+    );
     return payload;
   },
 );
@@ -881,6 +937,20 @@ async function getDeedsRarity(): Promise<import('../src/world_api').DeedsRarity>
     console.error('deeds rarity refresh failed:', err);
     return deedsRarityCache?.payload ?? { totalEligible: 0, earned: {} };
   }
+}
+
+async function getReliquaryRarity(): Promise<import('../src/world_api').ReliquaryRarity> {
+  if (deedsRarityCache && Date.now() - deedsRarityCache.at < DEEDS_RARITY_TTL_MS) {
+    return deedsRarityCache.reliquary;
+  }
+  try {
+    // The flight installs the combined entry; the shared tail below reads the
+    // reliquary slice from it (or stale-serves / degrades on failure).
+    await refreshDeedsRarityShared();
+  } catch (err) {
+    console.error('reliquary rarity refresh failed:', err);
+  }
+  return deedsRarityCache?.reliquary ?? EMPTY_RELIQUARY_RARITY;
 }
 
 // Project-stats counters cache. Unlike the player/guild/arena boards, the
@@ -1690,7 +1760,11 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
     const publicSheetMatch = /^\/api\/public\/characters\/(.+)\/sheet$/.exec(url);
     if (req.method === 'GET' && publicSheetMatch) {
       if (!publicReadRateLimited(req).allowed) return json(res, 429, { error: 'rate limited' });
-      const rawName = decodeURIComponent(publicSheetMatch[1]);
+      // Same decode arm as the RouteDef handler in leaderboard.ts: a malformed
+      // escape falls back to the raw segment and 404s, never a URIError 500.
+      // This legacy arm stays live under the API_DISPATCH=legacy rollback, so
+      // it must mirror the migrated handler.
+      const rawName = decodedRouteName(publicSheetMatch[1]);
       const target = await findCharacterReportTargetByName(rawName);
       if (!target)
         return json(res, 404, { error: 'character not found', code: 'character.not_found' });
@@ -2647,6 +2721,12 @@ configureBattlegroundRuntime({
 // module load, before any request, mirroring configureLeaderboardRuntime above.
 configureDeedsRuntime({
   deedsRarity: getDeedsRarity,
+});
+
+// Same cycle-break for the reliquary rarity handler (server/reliquary.ts):
+// the read shares the deeds rarity cache entry and single flight above.
+configureReliquaryRuntime({
+  reliquaryRarity: getReliquaryRarity,
 });
 
 // Inject the main.ts runtime the ported auth handlers (server/auth_routes.ts) need

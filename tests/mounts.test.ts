@@ -55,6 +55,7 @@ import {
   RIFT_GREEN_MOUNT_CHANCE,
   RIFT_GREEN_MOUNT_REINS,
 } from '../src/sim/rift/progression';
+import type { PlayerMeta } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
 import { tradeSetOffer } from '../src/sim/social/trade';
@@ -415,6 +416,25 @@ describe('mount reins items (the collection: owning the item is owning the mount
     meta.bank.inventory.push({ itemId: 'reins_stormfeather_griffin', count: 1 });
     expect(mountOwned(meta, 'stormfeather_griffin')).toBe(true);
     expect(ownedMounts(meta)).toContain('stormfeather_griffin');
+  });
+
+  it('ownedMounts refuses a meta with no containers instead of reporting no mounts', () => {
+    // Deliberately strict: bags and bank are the ownership surfaces, so a meta
+    // missing either is a broken fixture, not a mountless player. Tolerating it
+    // returns a confident empty list that silently under-reports the collection
+    // (and, through characterReliquaryOwnership, under-counts Curator rank).
+    const noBags = { bank: { inventory: [] } } as unknown as PlayerMeta;
+    expect(() => ownedMounts(noBags)).toThrow(TypeError);
+    // The /inventory/ arm leans on V8 embedding the source expression in the
+    // message ("meta.inventory is not iterable"); JSC's wording, for one,
+    // omits the property name entirely. The suite runs under Node/V8, where
+    // this pins the offending surface rather than the full phrasing.
+    expect(() => ownedMounts(noBags)).toThrow(/inventory/);
+    const noBank = { inventory: [] } as unknown as PlayerMeta;
+    expect(() => ownedMounts(noBank)).toThrow(TypeError);
+    // Discriminates this arm from the missing-inventory one: every engine's
+    // wording for reading through a missing bank mentions undefined or bank.
+    expect(() => ownedMounts(noBank)).toThrow(/undefined|bank/);
   });
 
   it('bagOwnedMounts is bags-only: a bank-only reins does not count (#2739 followup)', () => {

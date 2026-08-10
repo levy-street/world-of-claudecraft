@@ -48,6 +48,18 @@ import { getArchetypeTitle, getHobbyCraft } from '../sim/professions/archetype';
 import type { RespecPaymentTier } from '../sim/professions/focus';
 import type { MaterialRarity } from '../sim/professions/gathering';
 import { emptyCraftSkills } from '../sim/professions/wheel';
+import {
+  catalogRankOwned,
+  catalogRelicCompletion,
+  clearCountForSource,
+  curatorRankFromOwned,
+  pageCompletion,
+  RELIQUARY_OBTAIN_COUNT_CAP,
+  RELIQUARY_PAGES_BY_ID,
+  reliquaryOwnershipOpts,
+  restoreReliquaryState,
+  type SavedReliquaryState,
+} from '../sim/reliquary';
 import type { ResolvedAbility } from '../sim/sim';
 import { parseTalentAllocation } from '../sim/talent_allocation_input';
 import { repairTalentLoadouts } from '../sim/talent_loadouts';
@@ -129,6 +141,10 @@ import {
   type PresenceStatus,
   type RaidLockout,
   type RecipeDef,
+  type ReliquaryCatalogCompletion,
+  type ReliquaryFirstFindView,
+  type ReliquaryPageCompletion,
+  type ReliquaryRarity,
   type RiftFloorView,
   type SocialInfo,
   type ToolEffectSlotView,
@@ -230,6 +246,21 @@ export interface CharacterSummary {
    *  redesign (created before the modular creator shipped, token unspent).
    *  Drives the roster's reroll button; flips false after a successful spend. */
   appearanceRerollAvailable?: boolean;
+}
+
+/** Bounded positive-integer wire read for cosmetic counts. NEVER trust the
+ *  wire: a fractional value floors (3.5 reads as 3, and anything below 1
+ *  floors to 0 and reads ABSENT, which loses no legitimate value since the
+ *  server only stamps counts of 1 and up); a zero, negative, non-finite, or
+ *  non-number value reads as absent; and a huge one clamps to the sim's
+ *  obtain-count ceiling, so a misbehaving server can degrade a badge but
+ *  never throw a render or print a 300-digit count. Deliberately NO upper
+ *  clamp to today's rank ladder: a newer server's rank 6 must keep reading
+ *  as at-least-rank-5 on this client (the crt mixed-version rule). */
+function wireCount(value: unknown): number | undefined {
+  if (typeof value !== 'number' || !Number.isFinite(value)) return undefined;
+  const n = Math.floor(value);
+  return n > 0 ? Math.min(n, RELIQUARY_OBTAIN_COUNT_CAP) : undefined;
 }
 
 export function buildWebSocketUrl(protocol: string, host: string): string {
@@ -1453,6 +1484,7 @@ function blankEntity(id: number): Entity {
     equippedInstances: {},
     guild: '',
     title: null,
+    border: null,
   };
 }
 
@@ -1593,7 +1625,8 @@ export class ClientWorld implements IWorld {
   private guildBankLogState: 'idle' | 'ready' | 'refused' = 'idle';
   private guildBankLogAt = 0;
   // --- IWorldDeeds: the Book of Deeds self mirror, from the snapshot self
-  // (`s.deeds`/`s.dstats` heavy-gated, `s.renown`/`s.atitle` per-tick diffed).
+  // (`s.deeds`/`s.dstats` heavy-gated, `s.renown`/`s.atitle`/`s.aborder`
+  // per-tick diffed).
   // PRESENTATION-ONLY EVENTS: `deedUnlocked` rides the events queue for HUD
   // toasts and must NEVER mutate these mirrors; snapshot state is the single
   // authority, so reconnects and missed event frames cannot drift them. ---
@@ -1601,6 +1634,14 @@ export class ClientWorld implements IWorld {
   deedStats: DeedStats = freshDeedStats();
   renown = 0;
   activeTitle: string | null = null;
+  activeBorder: string | null = null;
+  // --- IWorldReliquary: sparse firstFind / marks / recent from heavy-gated
+  // `s.reliq`. Item ownership still rides deedStats.itemsDiscovered (never a
+  // second discovery blob). `reliquaryUnlock` is presentation-only. ---
+  reliquaryFirstFind: Record<string, ReliquaryFirstFindView> = {};
+  reliquaryMarks: Set<string> = new Set();
+  reliquaryRecent: string[] = [];
+  reliquaryObtainCounts: Record<string, number> = {};
   // --- IWorldDelves: active delve run + companion + marks/upgrades + daily, all
   // mirrored from the snapshot self (delta-omitted). lockpickState is the exception:
   // it has NO snapshot field and is rebuilt from the lockpick* events by the private
@@ -2888,6 +2929,16 @@ export class ClientWorld implements IWorld {
         e.devTier = w.dvt ?? 0; // developer-badge tier (cosmetic, server-set)
         e.devMergedPrs = typeof w.dvc === 'number' ? w.dvc : undefined; // merged-PR count
         e.githubLogin = typeof w.dgl === 'string' ? w.dgl : undefined; // GitHub login
+        // Curator standing (cosmetic, server-computed): rank plus the
+        // character-scoped completion pair. Same split as ht/hb above: the rank
+        // defaults to 0 (unranked) and the pair stays undefined, so an identity
+        // record that omits them RESETS a previously ranked mirror. wireCount
+        // bounds each read: the sibling decodes tolerate loose numbers, but the
+        // rank INDEXES a key table downstream, so a fractional or huge value
+        // must degrade instead of throwing out of the inspect painter.
+        e.curatorRank = wireCount(w.crk) ?? 0; // Curator rank 1-5
+        e.relicsOwned = wireCount(w.cro); // character-scoped relics owned
+        e.relicsTotal = wireCount(w.crt); // character-scoped relic total
         // Account flair (cosmetic, operator-set): the AI-operated mark and, for a
         // flagged streamer, their platform links. NEVER trust the wire: the links are
         // re-sanitized here (they end up in a window.open), and stay sparse/undefined
@@ -2907,6 +2958,7 @@ export class ClientWorld implements IWorld {
         e.objectItemId = w.obj ?? null;
         e.guild = w.gd ?? '';
         e.title = w.title ?? null; // Book of Deeds active title (a deed id)
+        e.border = w.border ?? null; // Book of Deeds nameplate border (a deed id)
         if (e.kind === 'npc') {
           const def = NPCS[e.templateId];
           e.questIds = def ? [...def.questIds] : [];
@@ -3566,8 +3618,8 @@ export class ClientWorld implements IWorld {
         if (hadGate !== (this.guildBankInfo !== null)) this.resetGuildBankLog();
       }
       // --- IWorldDeeds self-decode: `deeds`/`dstats` are heavy-gated,
-      // `renown`/`atitle` per-tick diffed (all four delta-omitted: a missing
-      // key keeps the prior mirror). The wire carries plain objects/arrays
+      // `renown`/`atitle`/`aborder` per-tick diffed (all five delta-omitted: a
+      // missing key keeps the prior mirror). The wire carries plain objects/arrays
       // (Maps and Sets do not survive JSON.stringify), so the earned Map and
       // both stat Sets rebuild here. `deedUnlocked` events are presentation
       // only and never touch these mirrors. ---
@@ -3582,6 +3634,25 @@ export class ClientWorld implements IWorld {
       }
       if (s.renown !== undefined) this.renown = s.renown ?? 0;
       if (s.atitle !== undefined) this.activeTitle = s.atitle ?? null;
+      if (s.aborder !== undefined) this.activeBorder = s.aborder ?? null;
+      // --- IWorldReliquary self-decode: `reliq` is heavy-gated and delta-omitted
+      // (a missing key keeps the prior mirror). Payload is the omit-empty
+      // SavedReliquaryState shape; never a second full itemsDiscovered array.
+      // `reliquaryUnlock` events are presentation only and never touch these. ---
+      if (s.reliq !== undefined) {
+        const restored = restoreReliquaryState((s.reliq ?? {}) as SavedReliquaryState | undefined);
+        this.reliquaryFirstFind = restored.firstFind;
+        this.reliquaryMarks = restored.marks;
+        this.reliquaryRecent = restored.recent;
+        // The obtain tally rides folded into the firstFind entries on the wire;
+        // restore splits it back out, so the mirror reads it the same way the
+        // offline Sim reads the live state.
+        this.reliquaryObtainCounts = restored.counts;
+        // restored.illuminatedPages is DELIBERATELY not mirrored: the sticky
+        // illumination record is sim/server-authoritative with no IWorld
+        // consumer (the client banner and the guild marquee both key off
+        // events). It rides the blob only because wire shape is save shape.
+      }
       if (s.ptime !== undefined) this.playtimeSeconds = s.ptime ?? 0;
       if (s.lroll !== undefined) this.lootRollPrompts = s.lroll ?? [];
       if (s.lrollg !== undefined) this.lootRollGroup = s.lrollg ?? [];
@@ -5077,6 +5148,69 @@ export class ClientWorld implements IWorld {
   // sim validator accepts, so a rejected send leaves the client untouched. ---
   setActiveTitle(deedId: string | null): void {
     this.cmd({ cmd: 'deed_set_title', deedId });
+  }
+  // Nameplate-border selection, same contract as the title above: no
+  // optimistic local write, the mirror updates from the `aborder` echo.
+  setActiveBorder(deedId: string | null): void {
+    this.cmd({ cmd: 'deed_set_border', deedId });
+  }
+  // --- IWorldReliquary pure completion helpers: recompute from catalog +
+  // mirrored ownership (itemsDiscovered, marks, mounts, account skins, deeds).
+  // Identical offline Sim formulas so online/offline answer the same for
+  // scripted state. ---
+  private reliquaryOwnershipSurfaces() {
+    return reliquaryOwnershipOpts({
+      itemsDiscovered: this.deedStats.itemsDiscovered,
+      marks: this.reliquaryMarks,
+      ownedMounts: this.ownedMounts(),
+      weaponSkinIds: this.accountCosmetics.weaponSkinIds,
+      deedsEarned: this.deedsEarned,
+    });
+  }
+  reliquaryPageCompletion(pageId: string): ReliquaryPageCompletion | null {
+    const page = RELIQUARY_PAGES_BY_ID[pageId];
+    if (!page) return null;
+    return pageCompletion(page, this.reliquaryOwnershipSurfaces());
+  }
+  reliquaryCatalogCompletion(): ReliquaryCatalogCompletion {
+    return catalogRelicCompletion(this.reliquaryOwnershipSurfaces());
+  }
+  reliquaryCuratorRank(): number {
+    // Rank excludes account weapon skins so display matches grant path.
+    return curatorRankFromOwned(catalogRankOwned(this.reliquaryOwnershipSurfaces()));
+  }
+  reliquaryPageClearCount(pageId: string): number | undefined {
+    const page = RELIQUARY_PAGES_BY_ID[pageId];
+    if (!page) return undefined;
+    // clearCountForSource reads deedStats + delveClears; ClientWorld mirrors both.
+    return clearCountForSource(
+      { deedStats: this.deedStats, delveClears: this.delveClears },
+      page.clearSource,
+    );
+  }
+  // The relic population-rarity aggregate: a lazy anonymous REST read on the
+  // deedsRarity shape below, resolving the endpoint payload verbatim or null
+  // on any failure (the facet's documented no-data value; the window omits
+  // every rarity line). The consumer caches per window-open, so no TTL cache
+  // here.
+  async reliquaryRarity(): Promise<ReliquaryRarity | null> {
+    try {
+      const res = await fetch(apiUrl('/api/reliquary/rarity', this.base));
+      if (!res.ok) return null;
+      const data = (await res.json()) as ReliquaryRarity;
+      if (
+        typeof data?.totalEligible !== 'number' ||
+        typeof data?.found !== 'object' ||
+        data.found === null ||
+        typeof data?.illuminated !== 'object' ||
+        data.illuminated === null
+      ) {
+        return null;
+      }
+      return data;
+    } catch {
+      return null;
+    }
   }
   // The global rarity aggregate: a lazy anonymous REST read (the daily-rewards
   // async-read variant), resolving the endpoint payload verbatim or null on

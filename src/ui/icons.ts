@@ -5188,10 +5188,26 @@ const DEED_CREST_PREFIX = 'deed_';
 // tests/deed_icons.test.ts holds the line from both sides: a stale entry once art lands, and
 // unenumerated debt. Do not add an id here merely to silence that failure; commission the art and
 // file it in docs/achievements/icon-brief.md.
-// Empty after the 2026-08-09 completion wave painted every live deed. Keep the mechanism so a
-// future deed can land safely before its commissioned crest, but do not add debt merely to make
-// the gate green.
-export const DEED_ART_PENDING: ReadonlySet<string> = new Set();
+// The 2026-08-09 completion wave painted every release-live deed, so only this
+// branch's Reliquary deeds remain: the wave could not paint deeds the release
+// does not have, and no col_reliquary_*.webp is committed. Keep the mechanism;
+// do not add debt merely to make the gate green.
+export const DEED_ART_PENDING: ReadonlySet<string> = new Set([
+  // Reliquary Curator rank bridges (Phase 6): all four are 'collection', so
+  // they fall back to the deed_cat_collection crest until commissioned art lands.
+  'col_reliquary_rank_2',
+  'col_reliquary_rank_3',
+  'col_reliquary_rank_4',
+  'col_reliquary_rank_5',
+  // The Reliquary completion ladder (Phase 18): all five are 'collection', so they fall
+  // back to the deed_cat_collection crest until their commissioned art lands
+  // (docs/achievements/icon-brief.md).
+  'col_reliquary_complete',
+  'col_reliquary_conquerors',
+  'col_reliquary_illum_nythraxis_heroic',
+  'col_reliquary_illum_thunzharr',
+  'col_reliquary_illum_gravewyrm_heroic',
+]);
 /** Static URL of a deed crest's painted art, or null when the crest id has no committed image. */
 export function deedImageUrl(crestId: string): string | null {
   if (!crestId.startsWith(DEED_CREST_PREFIX)) return null;
@@ -5327,8 +5343,11 @@ function staticIconUrl(kind: IconKind, id: string): string | null {
     if (img) return img;
   }
   // Committed deed, class, family, and status paintings short-circuit to a
-  // static WebP. Unit portraits still paint the procedural recipe immediately,
-  // then replace it after this same crest art decodes.
+  // static WebP (URL-only is sufficient: crest consumers here are <img> sinks,
+  // the Book of Deeds cards and recent strip and the Reliquary title shelf;
+  // the synchronous iconCanvas path stays class-crest portraits only). Unit
+  // portraits still paint the procedural recipe immediately, then replace it
+  // after this same crest art decodes.
   if (kind === 'crest') return deedImageUrl(id) ?? crestIconUrl(id);
   return null;
 }

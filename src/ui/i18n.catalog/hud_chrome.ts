@@ -517,6 +517,7 @@ export const hudChromeStrings = {
     deeds: 'Deeds',
     mounts: 'Mounts',
     professions: 'Professions',
+    reliquary: 'Reliquary',
     nameplates: 'Names',
     haptics: 'Haptics',
     hapticsOff: 'Haptics Off',
@@ -2073,6 +2074,68 @@ export const hudChromeStrings = {
       few: 'Who: {count} players matching "{query}" on {realm}.',
       many: 'Who: {count} players matching "{query}" on {realm}.',
       other: 'Who: {count} players matching "{query}" on {realm}.',
+    },
+    // The on-join back-credit pass, one line for the whole seed rather than a
+    // toast per relic or per deed. The reliquary and deeds summaries are
+    // siblings and always move together; both went CLDR here so count 1 reads
+    // "1 relic" / "1 deed" instead of the old hardcoded plural.
+    reliquaryRetroSummary: {
+      one: 'Your reliquary catches up: {count} relic catalogued.',
+      few: 'Your reliquary catches up: {count} relics catalogued.',
+      many: 'Your reliquary catches up: {count} relics catalogued.',
+      other: 'Your reliquary catches up: {count} relics catalogued.',
+    },
+    // Reliquary search / filter result count, announced through the window's
+    // SR-only live region (the narrowed list itself is a silent paragraph swap).
+    // Count-neutral on purpose: this one line serves the page grid (relics), the
+    // shelf list (pages), and Overview (recent finds plus nearly-complete rows),
+    // so naming any single noun would be wrong on two of the three surfaces.
+    reliquarySearchResults: {
+      one: '{count} result.',
+      few: '{count} results.',
+      many: '{count} results.',
+      other: '{count} results.',
+    },
+    // How many relics a nearly-complete page still wants. Count-neutral in
+    // English (the row already names the page and shows the pair), but CLDR so
+    // a locale that inflects the noun can say it properly.
+    reliquaryToGo: {
+      one: '{count} to go',
+      few: '{count} to go',
+      many: '{count} to go',
+      other: '{count} to go',
+    },
+    // How many times an owned relic has been taken from the world, on its own
+    // tooltip line and folded into the cell's aria label. English really does
+    // inflect here ("1 time" / "2 times"), unlike the count-neutral pair above.
+    // The two aria bases spell the WHOLE sentence rather than stitching the
+    // tooltip line onto a label fragment: clause order and the punctuation
+    // between clauses are the translator's to choose. Their clear number rides
+    // a separate {clears} slot because tPlural owns {count} and selects on it,
+    // and the number whose noun inflects is the obtain count, not the clear.
+    reliquaryObtainedTimes: {
+      one: 'Obtained {count} time',
+      few: 'Obtained {count} times',
+      many: 'Obtained {count} times',
+      other: 'Obtained {count} times',
+    },
+    reliquaryCellOwnedObtainedAria: {
+      one: '{name}, catalogued, obtained {count} time',
+      few: '{name}, catalogued, obtained {count} times',
+      many: '{name}, catalogued, obtained {count} times',
+      other: '{name}, catalogued, obtained {count} times',
+    },
+    reliquaryCellOwnedClearsObtainedAria: {
+      one: '{name}, catalogued, first found on clear {clears}, obtained {count} time',
+      few: '{name}, catalogued, first found on clear {clears}, obtained {count} times',
+      many: '{name}, catalogued, first found on clear {clears}, obtained {count} times',
+      other: '{name}, catalogued, first found on clear {clears}, obtained {count} times',
+    },
+    deedsRetroSummary: {
+      one: 'Your chronicle catches up: {count} deed recorded.',
+      few: 'Your chronicle catches up: {count} deeds recorded.',
+      many: 'Your chronicle catches up: {count} deeds recorded.',
+      other: 'Your chronicle catches up: {count} deeds recorded.',
     },
   },
   // "Report a Bug" options sub-view (online only). Captures realm/character/
@@ -4540,6 +4603,230 @@ export const hudChromeStrings = {
   // the unlock moment (banner, log lines, retro catch-up summary). Deed
   // names, descriptions, and title strings are sim content localized through
   // deed_i18n.ts, never through these keys.
+  // The Reliquary: cold collection trophy window (Overview + shelf chrome in
+  // Phase 4; page grids and Illumination celebration land later).
+  reliquary: {
+    title: 'The Reliquary',
+    close: 'Close The Reliquary',
+    countLabel: '{owned}/{total} relics',
+    completionAria: 'Relics filled: {owned} of {total}',
+    curatorRank: 'Curator rank {rank}',
+    curatorUnranked: 'Unranked Curator',
+    // Phase 6: named Curator ranks (cosmetic window chrome + rank-up toast).
+    curatorRankName1: 'Apprentice Curator',
+    curatorRankName2: 'Spoilskeeper',
+    curatorRankName3: 'Master Curator',
+    curatorRankName4: 'Grand Curator',
+    curatorRankName5: 'Eternal Curator',
+    rankUpBanner: 'Curator rank {rank}: {name}',
+    rankUpToast: 'Curator rank {rank} reached: {name}',
+    // Phase 19: the one Curator rank whose deed bridge rewards a wearable
+    // nameplate border. ONE key for both surfaces that say it (the rank-up
+    // chat line and the standing Overview note), so the moment and the durable
+    // readout cannot drift; {name} is that deed's name, resolved through
+    // deed_i18n, never the reward slug.
+    borderWearableNote: 'The {name} border can be worn from the Book of Deeds.',
+    // Phase 20: the rank-5 Curator sigil badge on the click-inspect card. This
+    // names the honor on the badge row's VISIBLE sub-line, the slot the three
+    // sibling tier badges use for their own descriptive line. The art itself
+    // carries alt="" like those siblings, so this string is read once by
+    // everyone rather than announced a second time off the image. Sink is a
+    // visible label, NOT an aria/alt string: length and tone should match the
+    // sub-lines beside it, not an accessibility annotation.
+    sigilCaption: 'Curator sigil',
+    recentLabel: 'Recent finds:',
+    nearlyLabel: 'Nearly complete:',
+    nearlyJumpAria: 'Open {name}, {owned} of {total} filled',
+    progressText: '{owned}/{total}',
+    shelvesAria: 'Reliquary shelves',
+    navOverview: 'Overview',
+    navConquerors: 'Conquerors',
+    navProfessions: 'Professions',
+    navHorizons: 'Horizons',
+    navCountAria: '{shelf}: {owned} of {total} relics filled',
+    shelfEmpty: 'No pages on this shelf yet.',
+    pageComplete: 'Illuminated',
+    clearsLabel: '{count} clears',
+    // Phase 21: the Rift page's display-only SECOND meter, rendered beside
+    // clearsLabel on the page header (secondaryClearSource, riftSRankClears).
+    srankClearsLabel: '{count} S-rank clears',
+    // Phase 21: the chip a retired (excludeFromCompletion) page carries on
+    // its shelf row and page header (the Vault of Ages).
+    retiredLabel: 'Retired',
+    // Phase 21: the same chip on the OTHER outside-completion reason, a
+    // class-personal page no one character can fill (the Riftbound bands).
+    personalLabel: 'Personal',
+    backToShelf: 'Back to shelf',
+    // Phase 5: page grid, live unlock toast, Illumination celebration.
+    gridAria: 'Relics on {name}',
+    pageProgressAria: 'Page progress: {owned} of {total} relics filled',
+    cellOwnedAria: '{name}, catalogued',
+    cellMissingAria: '{name}, not yet found',
+    ownedTooltipStatus: 'Catalogued in The Reliquary',
+    missingTooltipStatus: 'Not yet found',
+    // {count} here is the CLEAR number, not the obtain tally: the plural
+    // obtain bases (hudChrome.plurals.reliquaryObtainedTimes and friends)
+    // reuse the {count} name for the OBTAIN count because tPlural selects on
+    // it, and their clear number rides {clears} instead. Renaming this key's
+    // slot would invalidate every shipped overlay fill, so the two meanings
+    // coexist and this note is the guard.
+    firstFindClears: 'First found on clear {count}',
+    unlockToast: 'Relic catalogued: {name}',
+    illuminateBanner: 'Page illuminated: {name}',
+    illuminateToast: 'Every relic on {name} is filled.',
+    // Phase 18: another player's FIRST-EVER page Illumination, the
+    // hudChrome.deeds.broadcastLine sibling (guild-chat green, page name
+    // spliced in as a clickable jump; the wire event carries the page id
+    // only and the client resolves {page} through reliquary_i18n).
+    illuminationBroadcastLine: '{name} has illuminated a Reliquary page: {page}',
+    // Phase 7: profession mark find labels (player-visible chrome). Catalog page
+    // names are NOT keys here: they resolve from the page id through
+    // src/ui/reliquary_i18n.ts, the deed_i18n entity-style channel.
+    markFind: {
+      masterwork_first: 'First Masterwork',
+      masterwork_weaponcrafting: 'Weaponcrafting Masterwork',
+      masterwork_armorcrafting: 'Armorcrafting Masterwork',
+      masterwork_tailoring: 'Tailoring Masterwork',
+      masterwork_leatherworking: 'Leatherworking Masterwork',
+      masterwork_engineering: 'Engineering Masterwork',
+      gather_event_pristine_vein: 'Pristine Vein',
+      gather_event_ancient_heartwood: 'Ancient Heartwood',
+      gather_event_moonlit_bloom: 'Moonlit Bloom',
+      gather_event_perfect_specimen: 'Perfect Specimen',
+      // Phase 21: Rares of the Realm kill proofs, 'Slain: <mob display name>'
+      // with names verbatim from MOBS (the server table and the wiki generator
+      // carry the identical strings; tests/character_sheet.test.ts cross-pins).
+      slain_old_greyjaw: 'Slain: Old Greyjaw',
+      slain_mogger: 'Slain: Mogger',
+      slain_grix_the_tunnelking: 'Slain: Grix the Tunnelking',
+      slain_captain_verlan: 'Slain: Captain Verlan',
+      slain_wraithbinder_maldrec: 'Slain: Wraithbinder Maldrec',
+      slain_mirejaw_the_ravenous: 'Slain: Mirejaw the Ravenous',
+      slain_sloomtooth_the_drowned: 'Slain: Sloomtooth the Drowned',
+      slain_sister_nhalia: 'Slain: Sister Nhalia',
+      slain_grubjaw: 'Slain: Grubjaw the Glutton',
+      slain_ironvein_foreman: 'Slain: Ironvein Foreman',
+      slain_brutok_skullsmasher: 'Slain: Brutok Skullsmasher',
+      slain_voskar_emberwing: 'Slain: Voskar the Emberwing',
+      slain_marrowlord_varkas: 'Slain: Marrowlord Varkas',
+      slain_old_cragmaw: 'Slain: Old Cragmaw',
+      slain_shardlord_kazzix: 'Slain: Shardlord Kazzix',
+      slain_gleamstag: 'Slain: The Gleamstag',
+      slain_old_marrowshell: 'Slain: Old Marrowshell',
+      slain_aurelhorn: 'Slain: Aurelhorn, First of the Herd',
+      slain_drakemaw_broodlord: 'Slain: Drakemaw Broodlord',
+    },
+    // Phase 8: Horizons account-scope chrome for weapon skins (account cosmetics).
+    accountScopeBadge: 'Account',
+    accountScopeNote: 'Account collection: unlocked across every character on this account.',
+    // Phase 13: one display-name ladder (no humanized ids), authored source
+    // lines for missing relics, page blurbs, and the search / ownership filter.
+    unknownRelic: 'Unrecorded relic',
+    sourceBossDungeon: 'Drops from {boss} in {dungeon}',
+    sourceBoss: 'Drops from {boss}',
+    sourceZone: 'Found in {zone}',
+    sourceProfession: 'Earned through {profession}',
+    sourceDeed: 'Awarded by the deed {deed}',
+    sourceVendor: 'Sold by {vendor}',
+    // A relic with several live routes shows one line per route, so these read
+    // as siblings of the six above rather than as a summary of them.
+    // {boss} here is the open-world rare and {zone} where it camps: half an
+    // answer either way, which is why they share one line.
+    sourceBossZone: 'Drops from {boss} in {zone}',
+    sourceDelve: 'Found in the delve {delve}',
+    // "{rank}-rank" matches the established Rift wording (itemTooltip.riftTier,
+    // sim.rift.raceWorldWin), and the reins come off the CLEAR, not one boss.
+    sourceRift: 'Drops from {rank}-rank Rift clears',
+    sourceQuest: 'Reward from the quest {quest}',
+    sourceStore: 'Purchased from the WOC Store',
+    // Award activities: the player action itself is the source, with no mob,
+    // vendor, or quest in between.
+    sourceActivityCorpseHarvest: 'Recovered while harvesting creature corpses',
+    sourceActivityMasterworkCraft: 'Earned by crafting a masterwork',
+    // The Riftbound bands: minted per participant for the party that wins a
+    // ranked rift's first-clear race (addRiftProgressionLoot), any rank. The
+    // English names the RACE, not a personal milestone: a party that clears a
+    // ranked event after its first clear mints nothing (claimRiftFirstClear
+    // returns won: false). The five non-Latin fills were sharpened WITH this
+    // English at Phase 21 QA (both gained the ranked and party qualifiers;
+    // the old fills carried the race reading but not those qualifiers).
+    sourceActivityRiftFirstClear:
+      "Awarded to every member of the party that wins a ranked Rift's first clear",
+    // The aria label folds the lines through formatList (Intl.ListFormat), so
+    // there is no join key to translate: CLDR owns the separators per locale,
+    // including the final-conjunction shapes a pairwise key cannot express.
+    // Missing cells fold the source line into the label so a keyboard or screen
+    // reader user gets everything a hover tooltip shows; owned cells fold in the
+    // first-find clear number on the same rule.
+    cellMissingSourceAria: '{name}, not yet found, {source}',
+    // {count} is the CLEAR number here too (see the firstFindClears note);
+    // the obtain-count aria lives on the plurals bases with {clears}/{count}
+    // split the other way round.
+    cellOwnedClearsAria: '{name}, catalogued, first found on clear {count}',
+    searchPlaceholder: 'Search relics',
+    searchAria: 'Search The Reliquary by name',
+    searchEmpty: 'No relics match that search.',
+    // Distinct from searchEmpty: clicking Catalogued with nothing typed must not
+    // blame a search the player never made.
+    filterEmpty: 'No relics match this filter.',
+    filterGroupAria: 'Filter relics by whether you have found them',
+    // SR-only description on the relic grid: roving tabindex leaves one tab
+    // stop, and list/listitem announces no keyboard model of its own.
+    gridKeyboardHint: 'Use the arrow keys to move between relics, Home and End for the ends.',
+    filterAll: 'All',
+    filterOwned: 'Catalogued',
+    filterMissing: 'Missing',
+    // Phase 14: the Overview becomes the way IN to the catalog. Recent finds
+    // are jump buttons, each strip keeps its label and explains itself when
+    // empty, and three shelf cards summarize the shelves the rail lists.
+    recentJumpAria: 'Open the page for {name}',
+    recentEmpty: 'No finds yet. Relics you catalogue from now on land here.',
+    nearlyEmpty: 'Pages within reach of completion gather here.',
+    // A live needle that empties ONE strip while the other keeps matches: the
+    // whole-Overview searchEmpty line stays reserved for the nothing-anywhere
+    // case, so the emptied strip explains itself instead of sitting as a bare
+    // label over nothing.
+    stripNoMatch: 'Nothing here matches your search.',
+    shelfRecent: 'Latest find: {name}',
+    shelfNoFinds: 'Nothing catalogued on this shelf yet.',
+    shelfOpenAria: 'Open the {name} shelf, {owned} of {total} filled',
+    // Why a page can read full while the catalog total is smaller than the sum
+    // of the page totals: a relic on two pages is one relic.
+    sharedUniquesNote:
+      'Your overall total counts each relic once; shelf and page counts list every slot, so a relic shown on more than one page is counted by each of them.',
+    // Phase 9: character sheet labeled completion pair + Curator rank.
+    charCompletionLabel: 'Reliquary',
+    charCompletion: '{owned}/{total}',
+    charRankLabel: 'Curator',
+    charOpen: 'The Reliquary',
+    // Phase 15: the always-on HUD tracker (#reliquary-tracker) and the pin
+    // control that fills it. The row tally reuses hudChrome.questTracker.count
+    // and the row progress reuses progressText above, so neither is duplicated
+    // here. The pin cap note is a real refusal, not a silent no-op (the deeds
+    // watchFull precedent).
+    trackerLabel: 'Reliquary',
+    collapseHint: 'Collapse Reliquary tracker',
+    expandHint: 'Expand Reliquary tracker',
+    openWindowHint: 'Open The Reliquary',
+    pin: 'Pin',
+    unpin: 'Unpin',
+    pinFull: 'The tracker is full (up to {cap} pages)',
+    pinAria: 'Pin {name} to the HUD tracker',
+    unpinAria: 'Unpin {name}',
+    // Phase 22: realm population rarity (the hudChrome.deeds.rarityLine
+    // sibling). {percent} arrives pre-formatted through formatNumber's percent
+    // style. "Found" is deliberate over "Owned": the aggregate counts sticky
+    // first discovery (items) and kill proofs (marks), so it stays true for a
+    // mount whose reins were later sold or traded away.
+    rarityLine: 'Found by {percent} of collectors',
+    pageRarityLine: 'Illuminated by {percent} of collectors',
+    // Joins a cell's base aria sentence and the rarity sentence; the key owns
+    // the punctuation so locales can reorder or repunctuate the pair.
+    cellAriaWithRarity: '{base}, {rarity}',
+    // Joins a cell's base aria sentence and the account-scope badge, so the
+    // weapon-skin scope fact is not hover-only; the key owns the punctuation.
+    cellAriaWithAccountScope: '{base}, {scope}',
+  },
   deeds: {
     title: 'Book of Deeds',
     close: 'Close the Book of Deeds',
@@ -4576,18 +4863,32 @@ export const hudChromeStrings = {
     featRibbon: 'Feat',
     hiddenBadge: 'Hidden',
     titleChip: 'Title reward',
+    borderChip: 'Border reward',
     watch: 'Watch',
     unwatch: 'Unwatch',
     watchFull: 'Watchlist full ({cap} max)',
     watchAria: 'Watch {name} on the HUD tracker',
     unwatchAria: 'Stop watching {name}',
+    // The worn-cosmetics shelf: the rail button names both pickers it holds,
+    // then one heading, group label, None option and empty line per picker.
+    // Border options are named by their DEED (a border reward carries a slug,
+    // never player-facing display text of its own).
+    cosmeticsSection: 'Titles and Borders',
     titlesSection: 'Titles',
+    // UNRENDERED since the picker groups took their accessible name from the
+    // visible headings (aria-labelledby); kept because the shipped locale
+    // fills carry it. Candidate for removal at a release locale fill.
     titlesAria: 'Choose your displayed title',
     titlesNone: 'No Title',
     titlesEmpty: 'Earn a title-bearing deed to unlock this shelf.',
+    bordersSection: 'Borders',
+    bordersNone: 'No Border',
+    bordersEmpty: 'Earn a border-bearing deed to unlock this shelf.',
     unlockedBanner: 'Deed accomplished: {name}',
     unlockedTitleHint: 'New title earned: {title}. Choose it in the Book of Deeds.',
-    retroSummary: 'Your chronicle catches up: {count} deeds recorded.',
+    // The border sibling. It names the DEED rather than a reward text, since a
+    // border reward carries only a palette slug.
+    unlockedBorderHint: 'New border earned: {name}. Wear it from the Book of Deeds.',
     broadcastLine: '{name} has accomplished a deed: {deed}',
     rarityLine: 'Earned by {percent} of adventurers',
     trackerLabel: 'Deeds',
@@ -4599,6 +4900,9 @@ export const hudChromeStrings = {
     charTitleLabel: 'Title',
     charTitleNone: 'No title chosen',
     charOpenBook: 'Book of Deeds',
+    // The character sheet's earned-border badges: the worn one says so in its
+    // own label, so the state never rides the badge colour alone.
+    charBorderWorn: '{name} (worn)',
     // The Renown tab of the high-score window: tab label, the deeds-board
     // column headers (rank/name reuse the shared game.leaderboard.* headers,
     // the Renown column reuses renownLabel above), the visible account-scope

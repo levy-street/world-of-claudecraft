@@ -202,6 +202,15 @@ export async function buildPortraitRendererContract(repoRoot, browserBundleBytes
       bundle: true,
       format: 'iife',
       platform: 'browser',
+      // esbuild labels every bundled module with a `// <path>` comment relative to
+      // absWorkingDir, which defaults to process.cwd(). Without this pin the bundle
+      // bytes, and so this acceptance's whole rendererFingerprint, depend on the
+      // directory the command happened to be launched from: a --check run from a
+      // subdirectory reports a false staleness, and a --write from one mints a digest
+      // no other run can reproduce. It must stay identical to the renderer's own
+      // bundle options (scripts/render_finder_portraits.mjs), or a receipt's
+      // fingerprint could never match the manifest's.
+      absWorkingDir: repoRoot,
       define: PORTRAIT_RENDER_DEFINES,
       write: false,
       logLevel: 'silent',

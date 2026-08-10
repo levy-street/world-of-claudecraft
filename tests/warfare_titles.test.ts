@@ -108,8 +108,13 @@ function unlockEvents(events: SimEvent[]): { deedId: string; retro?: boolean }[]
 describe('the lifetime-honor rank ladder (catalog)', () => {
   it('ships three appended pvp title deeds on the meter, in ascending order', () => {
     // Appended, never inserted: DEED_ORDER derives from table order, so the
-    // three must be the LAST three ids, in ladder order.
-    expect(DEED_ORDER.slice(-3)).toEqual(LADDER.map((rank) => rank.id));
+    // three must sit contiguous in ladder order at their release point. The pin
+    // is anchored at the ladder's own position because tail-relative indexing
+    // breaks on every later catalog append (the absolute tail is deeds_content's
+    // pin, not this file's).
+    const at = DEED_ORDER.indexOf(LADDER[0].id);
+    expect(at).toBeGreaterThanOrEqual(0);
+    expect(DEED_ORDER.slice(at, at + LADDER.length)).toEqual(LADDER.map((rank) => rank.id));
     for (const rank of LADDER) {
       const def = DEEDS[rank.id];
       expect(def, rank.id).toBeDefined();

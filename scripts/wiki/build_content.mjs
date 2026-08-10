@@ -30,6 +30,10 @@ const entrySource = `
   export { DELVE_SHOPS } from './src/sim/content/delves/shop.ts';
   export { DEEDS, DEED_ORDER } from './src/sim/content/deeds.ts';
   export { DEED_IMAGE_IDS } from './src/ui/deed_image_ids.ts';
+  export { RELIQUARY_PAGES } from './src/sim/content/reliquary.ts';
+  export { MOUNTS } from './src/sim/content/mounts.ts';
+  export { WEAPON_SKINS } from './src/sim/content/weapon_skins.ts';
+  export { armorySkinStrings } from './src/ui/i18n.catalog/armory.ts';
   export { guideStrings } from './src/ui/i18n.catalog/guide.ts';
   export { VISUALS, visualKeyFor } from './src/render/characters/manifest.ts';
   export {
@@ -112,6 +116,10 @@ const {
   DEEDS,
   DEED_ORDER,
   DEED_IMAGE_IDS,
+  RELIQUARY_PAGES,
+  MOUNTS,
+  WEAPON_SKINS,
+  armorySkinStrings,
   guideStrings,
   VISUALS,
   visualKeyFor,
@@ -506,6 +514,120 @@ const deeds = DEED_ORDER.map((id) => DEEDS[id])
     ...(d.reward?.kind === 'border' ? { rewardBorder: true } : {}),
     ...(DEED_IMAGE_IDS.has(d.id) ? { crest: `/ui/deeds/${d.id}.webp` } : {}),
   }));
+
+// The Reliquary catalog, spoiler-safe: page names, shelf, and relic display
+// names only. No clear counts, firstFind, ownership, or drop sources. Names
+// bake English proper nouns from the sim (GUIDE_DEEDS pattern); no player
+// progress can reach this table.
+// Profession mark find labels mirror hudChrome.reliquary.markFind English
+// (chrome, not sim content); keep in lockstep when those keys change.
+const RELIQUARY_MARK_GUIDE_NAMES = {
+  'masterwork:first': 'First Masterwork',
+  'masterwork:weaponcrafting': 'Weaponcrafting Masterwork',
+  'masterwork:armorcrafting': 'Armorcrafting Masterwork',
+  'masterwork:tailoring': 'Tailoring Masterwork',
+  'masterwork:leatherworking': 'Leatherworking Masterwork',
+  'masterwork:engineering': 'Engineering Masterwork',
+  'gather_event:pristine_vein': 'Pristine Vein',
+  'gather_event:ancient_heartwood': 'Ancient Heartwood',
+  'gather_event:moonlit_bloom': 'Moonlit Bloom',
+  'gather_event:perfect_specimen': 'Perfect Specimen',
+  // Rares of the Realm kill proofs (Phase 21). Rare display names are legal in
+  // the generated file: the wiki spoiler scan bans only boss-flagged MOBS names
+  // (tests/guide.test.ts), none of the 19 rares carries `boss`, and the public
+  // bestiary policy withholds elites from the CREATURE list, not their names.
+  'slain:old_greyjaw': 'Slain: Old Greyjaw',
+  'slain:mogger': 'Slain: Mogger',
+  'slain:grix_the_tunnelking': 'Slain: Grix the Tunnelking',
+  'slain:captain_verlan': 'Slain: Captain Verlan',
+  'slain:wraithbinder_maldrec': 'Slain: Wraithbinder Maldrec',
+  'slain:mirejaw_the_ravenous': 'Slain: Mirejaw the Ravenous',
+  'slain:sloomtooth_the_drowned': 'Slain: Sloomtooth the Drowned',
+  'slain:sister_nhalia': 'Slain: Sister Nhalia',
+  'slain:grubjaw': 'Slain: Grubjaw the Glutton',
+  'slain:ironvein_foreman': 'Slain: Ironvein Foreman',
+  'slain:brutok_skullsmasher': 'Slain: Brutok Skullsmasher',
+  'slain:voskar_emberwing': 'Slain: Voskar the Emberwing',
+  'slain:marrowlord_varkas': 'Slain: Marrowlord Varkas',
+  'slain:old_cragmaw': 'Slain: Old Cragmaw',
+  'slain:shardlord_kazzix': 'Slain: Shardlord Kazzix',
+  'slain:gleamstag': 'Slain: The Gleamstag',
+  'slain:old_marrowshell': 'Slain: Old Marrowshell',
+  'slain:aurelhorn': 'Slain: Aurelhorn, First of the Herd',
+  'slain:drakemaw_broodlord': 'Slain: Drakemaw Broodlord',
+};
+
+function reliquaryRelicName(relic) {
+  if (relic.kind === 'item') {
+    const def = ITEMS[relic.itemId];
+    if (!def) throw new Error(`reliquary wiki emit: unknown item ${relic.itemId}`);
+    return def.name;
+  }
+  if (relic.kind === 'mark') {
+    // hasOwn, not a bare index: the sibling server table is a Map for the
+    // same reason (an Object.prototype key like 'constructor' must fail the
+    // build loudly, never emit a garbage name).
+    const name = Object.hasOwn(RELIQUARY_MARK_GUIDE_NAMES, relic.markId)
+      ? RELIQUARY_MARK_GUIDE_NAMES[relic.markId]
+      : undefined;
+    if (!name) throw new Error(`reliquary wiki emit: unknown mark ${relic.markId}`);
+    return name;
+  }
+  if (relic.kind === 'mount') {
+    const def = MOUNTS[relic.mountId];
+    if (!def) throw new Error(`reliquary wiki emit: unknown mount ${relic.mountId}`);
+    return def.name;
+  }
+  if (relic.kind === 'weapon_skin') {
+    if (!WEAPON_SKINS[relic.skinId]) {
+      throw new Error(`reliquary wiki emit: unknown weapon skin ${relic.skinId}`);
+    }
+    const copy = armorySkinStrings[relic.skinId];
+    if (!copy?.name) {
+      throw new Error(`reliquary wiki emit: missing English name for skin ${relic.skinId}`);
+    }
+    return copy.name;
+  }
+  if (relic.kind === 'title') {
+    const def = DEEDS[relic.deedId];
+    // Same structural hidden filter the deeds arm above applies, at the one other place a
+    // deed's prose can reach the wiki: a hidden deed's title text IS the secret's reward,
+    // so a title relic pointing at one fails the build instead of publishing it.
+    if (def?.hidden) {
+      throw new Error(`reliquary wiki emit: title relic ${relic.deedId} references a hidden deed`);
+    }
+    const reward = def?.reward;
+    if (reward?.kind !== 'title') {
+      throw new Error(`reliquary wiki emit: title relic ${relic.deedId} has no title reward`);
+    }
+    return reward.text;
+  }
+  throw new Error(`reliquary wiki emit: unknown relic kind`);
+}
+
+// Wiki page titles must not re-publish raid/world-boss proper names that the
+// bestiary deliberately withholds (tests/guide.test.ts boss-name scan). In-game
+// Reliquary keeps the full page name; the public wiki uses a safe label.
+const RELIQUARY_WIKI_PAGE_NAME = {
+  conquerors_thunzharr: 'The Waking Peak (World Boss)',
+};
+
+const reliquary = RELIQUARY_PAGES.map((page) => ({
+  id: page.id,
+  shelf: page.shelf,
+  name: RELIQUARY_WIKI_PAGE_NAME[page.id] ?? page.name,
+  // Rule 7 (docs/design/reliquary.md) reaches the wiki too: a page outside
+  // completion must be LABELED, not indistinguishable from a winnable page,
+  // or a reader chases retired items and mutually exclusive bands. Emitted
+  // only when set so the common page shape stays lean.
+  ...(page.excludeFromCompletion !== undefined
+    ? { excludeFromCompletion: page.excludeFromCompletion }
+    : {}),
+  relics: page.relics.map((r) => ({
+    kind: r.kind,
+    name: reliquaryRelicName(r),
+  })),
+}));
 
 // ---------------------------------------------------------------- professions
 // Professions 2.0 (wiki arm). TRANSPARENCY POLICY:
@@ -1042,6 +1164,20 @@ export interface GuideDeed {
   crest?: string;
 }
 
+/** Spoiler-safe Reliquary page: names only, no personal progress or sources. */
+export interface GuideReliquaryRelic {
+  kind: 'item' | 'mark' | 'mount' | 'weapon_skin' | 'title';
+  name: string;
+}
+export interface GuideReliquaryPage {
+  id: string;
+  shelf: 'conquerors' | 'professions' | 'horizons';
+  name: string;
+  /** Outside-completion reason (rule 7): present only on labeled pages. */
+  excludeFromCompletion?: 'retired' | 'personal';
+  relics: GuideReliquaryRelic[];
+}
+
 // ---------------------------------------------------------------- professions
 // Professions 2.0 reference data (wiki arm). TRANSPARENCY POLICY:
 // the professions sections publish EXACT numbers (skill
@@ -1241,6 +1377,7 @@ writeFileSync(
     `\nexport const GUIDE_FAMILIES: GuideFamily[] = ${JSON.stringify(families, null, 2)};\n`,
     `\nexport const GUIDE_DELVES: GuideDelve[] = ${JSON.stringify(delves, null, 2)};\n`,
     `\nexport const GUIDE_DEEDS: GuideDeed[] = ${JSON.stringify(deeds, null, 2)};\n`,
+    `\nexport const GUIDE_RELIQUARY: GuideReliquaryPage[] = ${JSON.stringify(reliquary, null, 2)};\n`,
     `\nexport const GUIDE_PROF_RING: GuideProfRingCraft[] = ${JSON.stringify(profRing, null, 2)};\n`,
     `\nexport const GUIDE_PROF_ARCHETYPES: GuideProfArchetype[] = ${JSON.stringify(profArchetypes, null, 2)};\n`,
     `\nexport const GUIDE_PROF_CRAFTS: GuideProfCraft[] = ${JSON.stringify(profCrafts, null, 2)};\n`,
@@ -1256,5 +1393,5 @@ writeFileSync(
 );
 // eslint-disable-next-line no-console
 console.log(
-  `generated src/guide/content.generated.ts (${classes.length} classes, ${zones.length} zones, ${dungeons.length} dungeons, ${warlockPets.length} warlock pets, ${druidForms.length} druid forms, ${families.length} families, ${delves.length} delves, ${deeds.length} deeds, ${profCrafts.length} crafts, ${profGathering.length} gathering professions, ${Object.keys(MODELS).length} models)`,
+  `generated src/guide/content.generated.ts (${classes.length} classes, ${zones.length} zones, ${dungeons.length} dungeons, ${warlockPets.length} warlock pets, ${druidForms.length} druid forms, ${families.length} families, ${delves.length} delves, ${deeds.length} deeds, ${reliquary.length} reliquary pages, ${profCrafts.length} crafts, ${profGathering.length} gathering professions, ${Object.keys(MODELS).length} models)`,
 );

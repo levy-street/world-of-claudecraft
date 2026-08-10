@@ -622,10 +622,15 @@ describe('missing painted deed and Heroic weapon integration', () => {
       'dgn_wildheart_basin_heroic',
       'pvp_card_duel_first_win',
     ]);
-    // Later releases appended more deeds after this historical wave. The completion wave now
-    // paints those too, so the shared pending set is empty; a future unenumerated artless deed
-    // still fails this exhaustive comparison.
-    expect(DEED_ORDER).toHaveLength(262);
+    // Later releases appended more deeds after this historical wave, and the
+    // 2026-08-09 completion wave painted every release-live one; the only
+    // artless ids left are this branch's nine Reliquary deeds, riding the
+    // category-crest fallback docs/design/deeds.md sanctions until their
+    // 512px sources are commissioned. Read from DEED_ART_PENDING, the one
+    // enumeration of that debt (src/ui/icons.ts), so this file cannot name a
+    // different pending set than the other art suites; a further unenumerated
+    // artless deed still fails this exhaustive comparison.
+    expect(DEED_ORDER).toHaveLength(271);
     expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([...DEED_ART_PENDING]);
     const credits = readFileSync(path.join(repoRoot, 'CREDITS.md'), 'utf8');
     const provenance = readFileSync(

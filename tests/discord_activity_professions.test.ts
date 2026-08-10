@@ -94,8 +94,31 @@ describe('discordFeedDeed: the feed-worthiness gate', () => {
     });
   });
 
-  it('returns null for a real deed that is neither titled nor the koi', () => {
+  it('returns null for a real deed that is neither rewarded nor the koi', () => {
     expect(discordFeedDeed('col_junk_drawer')).toBeNull();
+  });
+
+  it('returns a name-only payload for a border-reward deed', () => {
+    // col_reliquary_rank_5 rewards the reliquary_gilt border (Phase 18):
+    // feed-worthy like every cosmetic-reward deed, but the card carries
+    // neither a title nor an item name; the bot renders the generic deed line.
+    expect(discordFeedDeed('col_reliquary_rank_5')).toEqual({ deedName: 'Eternal Spoils' });
+  });
+
+  it('cards ALL FOUR border deeds name-only (the arm admits the whole class)', () => {
+    // The border arm is a class widening, not a rank-5 special case: every
+    // border deed in the catalog becomes a public Discord card. The class
+    // membership itself is literal-pinned (all four ids, all non-hidden) in
+    // tests/deeds_content.test.ts, so growing it is a reviewed act.
+    const expected: Record<string, string> = {
+      prog_prestige_10: 'Perpetual Motion',
+      dgn_deepward: 'Deepward',
+      col_discovery_250: 'The Grand Catalogue',
+      col_reliquary_rank_5: 'Eternal Spoils',
+    };
+    for (const [id, deedName] of Object.entries(expected)) {
+      expect(discordFeedDeed(id), id).toEqual({ deedName });
+    }
   });
 
   it('fails CLOSED on a hidden deed even when it rewards a title', () => {
@@ -306,6 +329,37 @@ describe('detectActivity: professions arms (GameServer)', () => {
     });
     expect(cards[0].deedTitle).toBeUndefined();
     expect(marqueeSpy).not.toHaveBeenCalled();
+  });
+
+  it('a border-deed unlock enqueues the name-only feed card AND broadcasts the marquee', async () => {
+    // Border deeds were ALREADY marquee (any cosmetic reward clears the bar);
+    // Phase 18 adds the feed card. Both must ride the ONE shared opt-out
+    // read, and the card must stay name-only (no deedTitle, no itemName).
+    const session = joinServer(server, fakeWs(), 114, 'Gilded');
+    const marqueeSpy = vi
+      .spyOn((server as any).social, 'broadcastDeedUnlock')
+      .mockResolvedValue(undefined);
+    (db.pool.query as ReturnType<typeof vi.fn>).mockClear();
+    (server as any).detectActivity([
+      { type: 'deedUnlocked', deedId: 'col_reliquary_rank_5', pid: session.pid },
+    ]);
+    await flushAsync();
+    const cards = drainActivity();
+    expect(cards).toHaveLength(1);
+    expect(cards[0]).toMatchObject({
+      kind: 'deed',
+      accountIds: [114],
+      names: ['Gilded'],
+      deedId: 'col_reliquary_rank_5',
+      deedName: 'Eternal Spoils',
+    });
+    expect((cards[0] as { deedTitle?: string }).deedTitle).toBeUndefined();
+    expect((cards[0] as { itemName?: string }).itemName).toBeUndefined();
+    expect(marqueeSpy).toHaveBeenCalledWith(
+      { characterId: 114, name: 'Gilded' },
+      'col_reliquary_rank_5',
+    );
+    expect(optOutReads()).toBe(1);
   });
 
   it('a HIDDEN titled deed unlock enqueues nothing and reads nothing (server arm)', async () => {

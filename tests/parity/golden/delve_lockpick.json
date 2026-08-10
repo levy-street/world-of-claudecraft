@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "6034aaf5",
+      "state": "b86617fe",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -71,6 +71,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "talents": {
             "rows": {}
           },
@@ -144,7 +148,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 974,
-      "state": "de0c01de",
+      "state": "7262b6cf",
       "events": "41f857aa",
       "rng": {
         "draws": 4,
@@ -155,7 +159,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 974,
-      "state": "663b812a",
+      "state": "c8b3c29b",
       "events": "cc147418",
       "rng": {
         "draws": 4,
@@ -166,7 +170,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 974,
-      "state": "d5ff09bd",
+      "state": "710114ae",
       "events": "f9363b7d",
       "rng": {
         "draws": 5,
@@ -177,7 +181,7 @@
       "tick": 38,
       "time": 1.9,
       "nextId": 976,
-      "state": "af55e23a",
+      "state": "a3bb3d75",
       "events": "a79d9d28",
       "rng": {
         "draws": 8,
@@ -278,6 +282,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "renown": 55,
           "talents": {
             "rows": {}
@@ -491,7 +499,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 976,
-      "state": "2b9d026d",
+      "state": "8b6ead4c",
       "events": "741638a5",
       "rng": {
         "draws": 8,
@@ -502,7 +510,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 976,
-      "state": "2b9d026d",
+      "state": "8b6ead4c",
       "events": "741638a5",
       "rng": {
         "draws": 8,
@@ -603,6 +611,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "renown": 55,
           "talents": {
             "rows": {}

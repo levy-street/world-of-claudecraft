@@ -30,13 +30,19 @@ describe('entry probe covers the await window', () => {
   it('arms the probe before the locale and asset awaits and re-stamps the build', () => {
     const startAt = mainSource.indexOf("entryDiagnostics.start(settings.get('graphicsPreset'));");
     const awaitCheckpointAt = mainSource.indexOf("entryDiagnostics.checkpoint('assets-await'");
-    const localeAwaitAt = mainSource.indexOf(
-      'await Promise.all([ensureLocaleLoaded(getLanguage()), ensureDeedLocalesLoaded(getLanguage())]);',
+    // Reflow-proof: the boot block must await all THREE locale-chunk loaders
+    // together (the catalog chunk, the deed chunk, the Reliquary page-name
+    // chunk). Matching on names and structure rather than on a pasted
+    // indentation literal, so a biome reformat does not read as a dropped
+    // loader, while dropping one really does fail.
+    const localeAwaitAt = mainSource.search(
+      /await Promise\.all\(\[\s*ensureLocaleLoaded\(getLanguage\(\)\),\s*\.\.\.CONTENT_LOCALE_CHANNEL_ENSURERS\.map\(\s*\(ensure\)\s*=>\s*ensure\(getLanguage\(\)\),?\s*\),?\s*\]\);/,
     );
     const assetsAwaitAt = mainSource.indexOf('await assetsReady(');
     const sceneRestampAt = mainSource.indexOf("entryDiagnostics.checkpoint('scene-build-start'");
     expect(startAt).toBeGreaterThan(-1);
     expect(awaitCheckpointAt).toBeGreaterThan(startAt);
+    expect(localeAwaitAt, 'the three-loader await block form drifted').toBeGreaterThan(-1);
     expect(localeAwaitAt).toBeGreaterThan(awaitCheckpointAt);
     expect(assetsAwaitAt).toBeGreaterThan(localeAwaitAt);
     expect(sceneRestampAt).toBeGreaterThan(assetsAwaitAt);

@@ -1,3 +1,4 @@
+import { borderAccent } from '../ui/deed_border_view';
 import { TextSpriteCache, type TextSpriteStyle } from '../ui/text_sprite_cache';
 
 export type NameplateFrame = '' | 'elite' | 'boss';
@@ -23,6 +24,10 @@ export interface NameplateCanvasState {
    *  allocates the wrapper; drawBase only consumes it. */
   guildLabel: string;
   title: string;
+  /** The Book of Deeds border SLUG (never a deed id, never display text), '' for
+   *  a borderless player and every mob/npc/object. Resolved by the painter
+   *  through deedBorderSlug on the same cadence as `title`. */
+  border: string;
   marker: string;
   markerTone: NameplateMarkerTone;
   hpVisible: boolean;
@@ -59,6 +64,7 @@ export function createNameplateCanvasState(): NameplateCanvasState {
     guild: '',
     guildLabel: '',
     title: '',
+    border: '',
     marker: '',
     markerTone: 'none',
     hpVisible: false,
@@ -168,6 +174,26 @@ const EMOTE_STYLE: TextSpriteStyle = {
   stroke: '#000',
   lineWidth: 1,
 };
+
+// The Book of Deeds border accent around the name row. Authored as SHAPES, so it
+// needs no text sprite and no cache key, and sized to add NO vertical step: it
+// pads the existing row outward horizontally and upward only, ending flush with
+// the row's bottom edge, so the drawEmote anchor walk (which mirrors drawBase's
+// y-steps) stays exact and the title line below keeps its clearance.
+const BORDER_ACCENT_PAD_X = 5;
+// The upward pad has a ceiling it is tuned under but is not mechanically tied
+// to: the accent's outer ink reaches topY - (PAD_TOP + EDGE_WIDTH/2), and the
+// quest-marker row anchor sits at topY - (NAMEPLATE_MARKER_ROW_HEIGHT - 21) = 5
+// (marker geometry lives in a different constant block). Raising PAD_TOP toward
+// that ceiling would put the accent under the marker glyph. It cannot bite today
+// because a border is only ever set on the player branch and players carry no
+// quest marker, but keep this pad below the marker row if that ever changes.
+const BORDER_ACCENT_PAD_TOP = 3;
+const BORDER_ACCENT_RADIUS = 6;
+const BORDER_ACCENT_EDGE_WIDTH = 3;
+const BORDER_ACCENT_FRAME_WIDTH = 1.5;
+const BORDER_ACCENT_INNER_INSET = 2.5;
+const BORDER_ACCENT_INNER_WIDTH = 1;
 
 interface CachedImage {
   image: HTMLImageElement;
@@ -500,6 +526,7 @@ export class NameplateCanvasSurface {
     const rowWidth = badgeWidth + aiWidth + levelWidth + nameWidth;
     let x = screenX - rowWidth / 2;
     const topY = bottomY - rowHeight;
+    if (state.border) this.drawBorderAccent(state.border, screenX, topY, bottomY, rowWidth);
     for (const badge of state.badges) {
       this.drawBadge(badge, x, topY + (rowHeight - badge.size) / 2);
       x += badge.size + 3;
@@ -524,6 +551,51 @@ export class NameplateCanvasSurface {
     }
     this.text.draw(this.ctx, state.name, nameX, bottomY - 3, nameStyle);
     return rowHeight;
+  }
+
+  // The Book of Deeds accent around the name row: a dark contour, the slug's
+  // bright frame line over it, and a light inner hairline (the classic gilt
+  // double edge). Shapes only, so it creates no text sprite and no cache entry,
+  // and the palette record is the frozen table row, so a plate allocates nothing
+  // per frame. Drawn BEFORE the row content so the name always sits on top.
+  // Cosmetic identity only: it encodes no health, range, rank, or threat, so
+  // collapsing all four slugs onto one system-color pair under forced colors
+  // hides nothing a player acts on (unlike the quest marker tones, which earn a
+  // redundant non-color cue).
+  private drawBorderAccent(
+    slug: string,
+    centerX: number,
+    topY: number,
+    bottomY: number,
+    rowWidth: number,
+  ): void {
+    const accent = borderAccent(slug);
+    if (!accent) return;
+    const ctx = this.ctx;
+    const forcedColors = this.forcedColorsActive();
+    const x = centerX - rowWidth / 2 - BORDER_ACCENT_PAD_X;
+    const y = topY - BORDER_ACCENT_PAD_TOP;
+    const width = rowWidth + BORDER_ACCENT_PAD_X * 2;
+    const height = bottomY - y;
+    roundedRect(ctx, x, y, width, height, BORDER_ACCENT_RADIUS);
+    ctx.lineWidth = BORDER_ACCENT_EDGE_WIDTH;
+    ctx.strokeStyle = forcedColors ? 'Canvas' : accent.edge;
+    ctx.stroke();
+    ctx.lineWidth = BORDER_ACCENT_FRAME_WIDTH;
+    ctx.strokeStyle = forcedColors ? 'CanvasText' : accent.frame;
+    ctx.stroke();
+    const inset = BORDER_ACCENT_INNER_INSET;
+    roundedRect(
+      ctx,
+      x + inset,
+      y + inset,
+      Math.max(1, width - inset * 2),
+      Math.max(1, height - inset * 2),
+      BORDER_ACCENT_RADIUS - inset,
+    );
+    ctx.lineWidth = BORDER_ACCENT_INNER_WIDTH;
+    ctx.strokeStyle = forcedColors ? 'Canvas' : accent.glow;
+    ctx.stroke();
   }
 
   private drawHealth(state: NameplateCanvasState, centerX: number, y: number): void {

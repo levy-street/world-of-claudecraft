@@ -1190,6 +1190,58 @@
     display: block;
     border-radius: 50%;
   }
+  /* Book of Deeds border accent: the cosmetic ring around the portrait, keyed by
+     the unit's active border deed. The unit_frame painter writes the SLUG into
+     data-border (this rule gates on a non-empty value) and that slug's palette
+     into the three custom properties, so ONE treatment lives here and zero
+     per-slug colors do: src/ui/deed_border_view.ts stays the single source of
+     truth. The ring is identity, never actionable info, so it renders at every
+     graphics tier; only the decorative outer bloom scales with --fx-shadow, like
+     the portrait combat glow above. z-index 2 sits it over the portrait but UNDER
+     the level chip (3) and the combat flash (4), whose corners it crosses.
+     The inset is ASYMMETRIC on purpose: the 60x60 .portrait disc sits at the
+     top-left of the 64x64 wrap, so its center is (30,30) while the wrap's is
+     (32,32). -6px top/left with -2px bottom/right keeps the same 72px ring but
+     centers it on the DISC; a uniform inset rings the wrap and reads visibly
+     off-center. */
+  .portrait-wrap[data-border]:not([data-border=""])::after {
+    content: "";
+    position: absolute;
+    inset: -6px -2px -2px -6px;
+    border-radius: 50%;
+    border: 2px solid var(--border-accent-frame, transparent);
+    outline: 1px solid var(--border-accent-edge, transparent);
+    outline-offset: -3px;
+    box-shadow:
+      0 0 calc(6px * var(--fx-shadow, 1)) var(--border-accent-glow, transparent),
+      inset 0 0 4px var(--border-accent-edge, transparent);
+    z-index: 2;
+    pointer-events: none;
+  }
+  /* The forced-colors arm the nameplate cartouche already had and the ring did
+     not (recorded at Phase 19 QA, completed here). The accent custom properties
+     are never missing here: paintPortraitBorder writes all three together with
+     the data-border slug this rule gates on, so the var() fallbacks cannot
+     engage. What the forced palette does instead is REPLACE the computed colors
+     with the system palette, and the value of this arm is that it chooses that
+     replacement rather than taking whatever the UA picks. Three things: frame ->
+     CanvasText and edge -> Canvas, the SAME pair drawBorderAccent uses in
+     src/render/nameplate_canvas.ts, so the two surfaces of one identity agree
+     under high contrast; the outline is remapped rather than left to be forced
+     onto the frame's color, which would flatten the two-tone contour into a
+     single line; and the decorative bloom is dropped explicitly, since
+     box-shadow is stripped in forced-colors regardless and a surviving
+     declaration would read load-bearing. Collapsing all four slugs onto one
+     system pair hides nothing: the accent is cosmetic identity and carries no
+     health, range, rank, or threat, unlike the quest marker tones that earn a
+     redundant non-color cue. */
+  @media (forced-colors: active) {
+    .portrait-wrap[data-border]:not([data-border=""])::after {
+      border-color: CanvasText;
+      outline-color: Canvas;
+      box-shadow: none;
+    }
+  }
   .level-chip {
     position: absolute;
     bottom: -3px;
@@ -3610,6 +3662,114 @@
   #deed-tracker .dt-count {
     font-size: 11px;
     opacity: 0.85;
+  }
+
+  /* ---------- Reliquary tracker ---------- */
+  /* Pinned Reliquary pages: the deed-tracker strip scoped to the collection
+     chase. Same dt-* chrome vocabulary (every tracker in #right-tracker-stack
+     shares it) and the same collapsible header tab stop, so the stack reads as
+     one thing. The one addition is .dt-flash, a short pulse on the row whose
+     relic count just rose; it is decoration over a number that is already on
+     screen, so dropping it under reduced motion loses nothing actionable. */
+  #reliquary-tracker {
+    width: 100%;
+    font-size: 12px;
+    color: var(--color-text-overlay);
+    text-shadow: 1px 1px 2px #000;
+    pointer-events: none;
+  }
+  /* width: fit-content, same rail click-steal rationale as #quest-tracker
+     .qt-header above (every tracker shares #right-tracker-stack). */
+  #reliquary-tracker .dt-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: fit-content;
+    max-width: 100%;
+    font-family: var(--title-font);
+    font-size: 14px;
+    color: var(--color-text-overlay);
+    text-align: left;
+    background: none;
+    border: 0;
+    border-bottom: 1px solid color-mix(in srgb, var(--gold) 27%, transparent);
+    margin: 0 0 4px;
+    padding: 0 0 2px;
+    cursor: pointer;
+    pointer-events: auto;
+    text-shadow: 1px 1px 2px #000;
+  }
+  #reliquary-tracker .dt-header:hover {
+    color: #fff;
+  }
+  #reliquary-tracker .dt-header:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+  #reliquary-tracker .dt-chevron {
+    font-size: 10px;
+    line-height: 1;
+  }
+  #reliquary-tracker .dt-tally {
+    color: var(--color-text-overlay);
+    font-weight: 400;
+    opacity: 0.85;
+  }
+  @media (pointer: coarse) {
+    #reliquary-tracker .dt-header {
+      min-height: 40px;
+    }
+  }
+  #reliquary-tracker .dt-line {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 4px;
+  }
+  #reliquary-tracker .dt-name {
+    font-weight: bold;
+    font-family: var(--title-font);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+  #reliquary-tracker .dt-bar {
+    flex: 0 0 56px;
+    height: 6px;
+    border: 1px solid #3a3325;
+    border-radius: 3px;
+    background: #14110b;
+    overflow: hidden;
+  }
+  #reliquary-tracker .dt-bar-fill {
+    display: block;
+    height: 100%;
+    background: linear-gradient(#e6c76a, #a8842f);
+  }
+  #reliquary-tracker .dt-count {
+    font-size: 11px;
+    opacity: 0.85;
+  }
+  #reliquary-tracker .dt-flash {
+    animation: reliquary-tracker-flash 0.9s ease-out;
+  }
+  @keyframes reliquary-tracker-flash {
+    from {
+      color: #ffe9a8;
+      text-shadow: 0 0 6px var(--gold);
+    }
+    to {
+      color: var(--color-text-overlay);
+      text-shadow: 1px 1px 2px #000;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #reliquary-tracker .dt-flash {
+      animation: none;
+    }
   }
 
   /* ---------- delve tracker ---------- */

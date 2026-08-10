@@ -755,7 +755,7 @@ describe("R3: the flood-kick reason maps to the client matcher's exact bytes", (
   const stripComments = (src: string) =>
     src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
 
-  it('binds the server kick literal to its userFacingApiError arm and all three kick sites', () => {
+  it('binds the server kick literal to its userFacingApiError arm and every kick site', () => {
     const limiterSrc = stripComments(
       fs.readFileSync(path.resolve(process.cwd(), 'server/msg_rate_limit.ts'), 'utf8'),
     );
@@ -766,21 +766,23 @@ describe("R3: the flood-kick reason maps to the client matcher's exact bytes", (
     // and must update this pin, the matcher arm, and the frame pins together.
     expect(exported?.[1]).toBe('message rate exceeded');
 
-    // All four flood kick arms (the pre-parse gate in handleMessage, the
+    // All five flood kick arms (the pre-parse gate in handleMessage, the
     // post-parse lane path in consumeLane, the list-read guard path in
-    // consumeListRead per the phase 06 maintainer ruling, and the guild-bank
+    // consumeListRead per the phase 06 maintainer ruling, the guild-bank
     // op guard path in consumeGuildBankOp per the Guild Bank Phase 3 QA
-    // database ruling) pass the CONSTANT, never an inline literal, with the
-    // grep-ability 'message flood' leaveReason label; the anti-bot kick keeps
-    // its deliberately vague literal pair, byte-untouched. The exact count
-    // keeps this pin selective: a NEW kick site must consciously join it.
+    // database ruling, and the cosmetic-set guard path in consumeCosmeticOp
+    // per the Reliquary border security review) pass the CONSTANT, never an
+    // inline literal, with the grep-ability 'message flood' leaveReason label;
+    // the anti-bot kick keeps its deliberately vague literal pair,
+    // byte-untouched. The exact count keeps this pin selective: a NEW kick
+    // site must consciously join it.
     const gameSrc = stripComments(
       fs.readFileSync(path.resolve(process.cwd(), 'server/game.ts'), 'utf8'),
     );
     const kickArms = gameSrc.match(
       /kickSession\(session, MSG_RATE_KICK_REASON, 'message flood'\)/g,
     );
-    expect(kickArms, 'all four flood kick arms must pass MSG_RATE_KICK_REASON').toHaveLength(4);
+    expect(kickArms, 'all five flood kick arms must pass MSG_RATE_KICK_REASON').toHaveLength(5);
     expect(gameSrc).toContain("kickSession(session, 'rejected by server', 'disconnected')");
 
     // The matcher arm recognizes the same bytes and returns the loading key. A

@@ -26,6 +26,7 @@ import {
 } from './bags';
 import { isRawCookingCatch } from './content/items';
 import { ITEMS } from './data';
+import { markItemDiscovered } from './deeds';
 import { recalcPlayerStats } from './entity';
 import {
   canDualWield,
@@ -85,6 +86,12 @@ import {
 } from './vendor_buy_stack';
 
 const VENDOR_BUYBACK_LIMIT = 12;
+
+/** Buyback is a movement path (see buyBackItem): it never counts toward a
+ *  Reliquary obtain tally, and a first find it happens to produce lands with
+ *  no clear-count provenance. Shared frozen object so the vendor path does not
+ *  allocate per buyback, mirroring MOVEMENT_GRANT on the inventory hub. */
+const BUYBACK_MOVEMENT = { movement: true } as const;
 
 // The one shared shape (types.ts InventoryUnit): both provenance channels of a
 // single unit lifted out of a slot. Kept as a local alias rather than a second
@@ -1459,8 +1466,31 @@ export function buyBackItem(
   // inventory slot, so the buyback row's own copy is never aliased.
   addItemSilent(itemId, 1, meta, instance, craftedRecipeId);
   // The silent add bypasses the inventory hub, so credit the discovery
-  // ledger here (an acquisition like any other; the mark is idempotent).
-  ctx.markItemDiscovered(meta, itemId, instance?.rolled?.quality);
+  // ledger here (an acquisition like any other; the mark is idempotent), and
+  // carry the SAME movement provenance the hub would have carried.
+  //
+  // Buyback is MOVEMENT (maintainer, 2026-08-08, superseding the phase file's
+  // grant-path list), which buys two things. No obtain tally: sellItem credits
+  // sellValue and this command charges the same sellValue back, so a
+  // sell/buyback cycle is copper neutral and repeatable without limit, and
+  // counting it would let one player inflate a relic's tally for free, the
+  // same false reading the two-player trade ban exists to prevent. And no
+  // fabricated first-find provenance, which is what the flag below is for.
+  //
+  // A buyback USUALLY cannot produce a first find, because a row gets into the
+  // book through sellItem, which requires the player to have been holding the
+  // item, and anything held has been through a grant or the join-time seed
+  // (which sweeps vendorBuyback itself). But that is not a guarantee: guild
+  // bank withdrawals move items through moveBetweenContainers and never touch
+  // the discovery ledger, so an UNDISCOVERED relic can reach a player's bags,
+  // and selling then buying it back would fire its first-ever discovery here.
+  // Without the flag that first find would stamp whatever the live clear meter
+  // happens to read, inventing provenance on a pure transfer path.
+  //
+  // Called as the deeds MODULE function rather than through ctx, which is the
+  // Phase 10 pattern exactly: the module function carries the opts and the
+  // SimContext seam stays opts-free.
+  markItemDiscovered(ctx, meta, itemId, instance?.rolled?.quality, BUYBACK_MOVEMENT);
   ctx.onInventoryChangedForQuests(meta);
   ctx.emit({ type: 'vendor', action: 'buyback', itemId, pid: meta.entityId });
   ctx.emit({
