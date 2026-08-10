@@ -51,6 +51,26 @@ rationale, and wire it so every batch row agrees. Then the content batches:
 - Batch D (wiring): trainer rows + fees per the existing tier table; icon-system rows;
   English names in the items catalog (each name web-verified per R15 and recorded in the
   state.md registry); wiki regen.
+  AMENDED AT PHASE 04 QA (standing obligations minted by the v0.36.0 item-art wave;
+  they scale per item id, and this phase ships a whole catalog):
+  (a) EVERY new item id owes, IN THE SAME CHANGE: committed opaque 128px WebP art
+  (the materials used SVG-rasterized originals; ITEM_IMAGE_IDS auto-enters every
+  non-weapon id, so a shipped id with no art 404s and reds tests/item_icons),
+  admission to the item-art audit catalog (counts, verdict row, evidence digests,
+  per the class-overhaul-additions precedent; the Phase 04 materials moved it
+  822 to 825), the public/ui/items/mapping.json provenance row, the CREDITS.md
+  line, AND the five non-Latin name fills (M16; Latin overlays ride the release
+  fill). Budget the Workflow batches for this: the art pipeline is per-id work.
+  (b) The mob portrait source manifest fingerprints the sim+render browser
+  bundle, so THIS phase's content lands stale it: re-mint at phase close via
+  PORTRAIT_RECEIPT render_finder_portraits then
+  build_mob_portrait_source_manifest --write --receipt (outputs must stay
+  byte-identical; the accepted-art digest pin moves with it).
+  (c) Author every recipe's acquisition EXPLICITLY as ['trainer'] (patterns are
+  phase 11; never stamp 'drop' here, it flips isRecipeKnown to must-be-learned,
+  and rod recipes must never gain 'drop' per the rodFeePaid trap in the Phase 02
+  ledger). Skill reqs sit ON the 0/25/50 tier boundaries (the off-step recipe
+  renders divergent trainer copy, the Phase 02 obligation).
 Every item budget is EXACTLY formula-derived (primaryStatBudget at the recipe-derived
 ilvl); base-rung jewelry carries pure primary stats + stamina, no rating allocations
 beyond the same-band vendor jewelry (R14).
