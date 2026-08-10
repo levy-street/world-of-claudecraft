@@ -1025,6 +1025,7 @@ export const sv_SE: EnTranslations = {
     },
     "mountTraining": {
       "mountPrompt": "Tryck på {key} för att sitta upp på övnings-Tapperhetshästen.",
+      "buyReinsPrompt": "Riding learned. Buy Valorsteed reins from Marla for 10 gold, then use them to ride.",
       "ownedMountPrompt": "Dina tyglar finns i dina väskor. Använd dem för att rida.",
       "ridePrompt": "Följ den glödande markören till startlinjen, tryck sedan på Starta loppet.",
       "begin": "Börja lektionen",
@@ -15129,6 +15130,12 @@ export const sv_SE: EnTranslations = {
           },
           "4": {
             "label": "Revfälten"
+          },
+          "5": {
+            "label": "The Breach"
+          },
+          "6": {
+            "label": "The Wreckfields"
           }
         }
       }

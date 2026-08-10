@@ -113,6 +113,9 @@ export const MOUNTS: Record<MountKey, MountDef> = {
 /** Catalog order: rarity tier, then declaration order. */
 export const MOUNT_KEYS = Object.keys(MOUNTS) as readonly MountKey[];
 
+/** Stable fallback for persisted or unknown mount selections. */
+export const DEFAULT_MOUNT: MountKey = 'valorsteed';
+
 /** The steed the riding lesson lends the player. It is the same catalog mount
  *  that reins_valorsteed summons, ridden UNOWNED during the lesson (the one
  *  sanctioned unowned mount; see src/sim/mounts.ts). Shared by src/sim/mounts.ts
@@ -127,6 +130,13 @@ export function mountDef(key: string): MountDef | null {
  *  so a save from a build that removed a mount loads cleanly unmounted). */
 export function normalizeMountKey(key: string | undefined | null): MountKey | '' {
   return key && mountDef(key) ? (key as MountKey) : '';
+}
+
+/** Coerce a persisted selection to a valid catalog key. Unlike live riding
+ * state, the stable selection always names a mount. */
+export function normalizeSelectedMount(key: string | undefined | null): MountKey {
+  const normalized = normalizeMountKey(key);
+  return normalized === '' ? DEFAULT_MOUNT : normalized;
 }
 
 /** Additive move-speed fraction of the active mount ('' : 0). */

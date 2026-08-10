@@ -37,6 +37,7 @@ import {
 import { tryStartEscort } from './escort';
 import { isInRaidInstance } from './instances/dungeons';
 import { HUT_OBJECT_ID, tryBurnHut } from './interactions/firebottle_hut';
+import { tryLastBellInteract, tryLastBellNpcTalk } from './last_bell/campaign';
 import { hasSharedLootRights as computeSharedLootRights, lootHasGoneFfa } from './loot/loot_ffa';
 import {
   awardSharedLootItem,

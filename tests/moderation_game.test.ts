@@ -817,7 +817,7 @@ describe('moderator spectate integration', () => {
     });
   });
 
-  it('switches targets without moving the saved return point', () => {
+  it('switches targets without moving the saved return point', async () => {
     registerScene({
       id: 'scn_test_spectate_switch_first',
       duration: 10,

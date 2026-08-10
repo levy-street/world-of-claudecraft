@@ -9462,6 +9462,13 @@ export class GameServer {
     // only event mutation and correctly precedes this serialization.
     const fragments = serializeEventFragments(events);
     const presentationTime = round2(this.sim.time);
+    // Resolved once per batch, applied per session below against that session's
+    // anchor pid, so a spectator watching a fighter refreshes with them.
+    const bgRespawnRefresh = this.bgRespawnRefreshPids(events);
+    // A pet acts for its owner, so combat-event delivery resolves each side to
+    // its controller before comparing against the viewer or viewer party.
+    const ownerOf = (entityId: number): number | null =>
+      this.sim.entities.get(entityId)?.ownerId ?? null;
     // Guard each session: a throw while routing events to one player must not
     // drop this tick's events for every other session (server/CLAUDE.md).
     forEachGuarded(

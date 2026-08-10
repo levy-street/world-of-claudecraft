@@ -174,6 +174,7 @@ describe('Last Bell berth continuity', () => {
       rot: Math.PI / 2,
       draft: 2.5,
       length: 60,
+      mirrorZ: true,
     });
   });
 

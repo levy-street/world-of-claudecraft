@@ -254,6 +254,7 @@ import {
   graphicsPresetLabel,
   resolveGfxProfile,
 } from './render/gfx';
+import { cueHarborShip, harborShipAttachFrame, resetHarborShipCues } from './render/harbor';
 import { Renderer } from './render/renderer';
 import {
   hasAuthoritativeSelfPositionDiscontinuity,
@@ -285,6 +286,7 @@ import { MARKET_HOUSE_STOCK } from './sim/market';
 import { bagOwnedMounts } from './sim/mounts';
 import { findPlayerPath, resolvePlayerDestination } from './sim/pathfind';
 import { isSubmerged } from './sim/player_motion';
+import { playSceneForPlayer, registeredSceneIds, sceneById } from './sim/scenes/scenes';
 import { Sim } from './sim/sim';
 import { TAB_NEAR_RADIUS, TAB_QUERY_RADIUS, tabConeHalfAt } from './sim/tab_target';
 import {
@@ -427,7 +429,6 @@ import {
 import { buildWalletConnectionView } from './ui/wallet_connection_view';
 import { formatXp } from './ui/xp_bar';
 import type { IWorld, LeaderboardEntry } from './world_api';
-import { WORLD_SEED } from './world_seed.mjs';
 
 const CLICK_MOVE_TURN_RATE = 4.2; // rad/sec; responsive turning while the camera stays decoupled from click spam
 const CLICK_MOVE_WAYPOINT_STOP = 0.8; // yards; intermediate A* corners should roll through, not stutter-stop
@@ -2708,9 +2709,7 @@ async function startGame(
     },
     resetInput: () => {
       input.resetForClientTransition();
-      pendingReleaseFacing = null;
-      prevCameraDrivenFacing = false;
-      Object.assign(kbTurn, newKeyboardTurnState());
+      resetSceneFacingInputState(sceneFacingInput);
       hud.cancelGroundAim();
       mobileControls.syncAutorun(false);
     },
@@ -3777,6 +3776,8 @@ async function startGame(
   // eases back to zero so the camera settles in behind the character.
   let lastInterpFacing: number | null = null;
   let wasClickMoving = false;
+  let prevPlayerDead = world.player.dead;
+  let prevPlayerGhost = world.player.ghost;
   function updateCamera(frameDt: number, interpFacing: number): void {
     const mi = input.readMoveInput();
     const clickMoving = !!input.clickMoveTarget && !input.suspendMovement && !movementFrozen();

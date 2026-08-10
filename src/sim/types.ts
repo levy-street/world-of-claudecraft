@@ -2747,6 +2747,8 @@ export interface CampDef {
   // pinned by tests/off_stream_rng.test.ts: zero shared draws at world build, and
   // spawn stability under camp reordering.
   offStream?: boolean;
+  /** Shared-stream draws retained by established camp spawns. */
+  sharedRngCount?: number;
 }
 
 // Ground interactables (sparkle objects)
@@ -6075,7 +6077,7 @@ export interface WorldContent {
   blockers?: BlockerDef[];
   // 2D biome paint overriding terrain shape (sim) and color (render).
   biomePaint?: BiomePaint;
-  // Water surface height for this map; absent = the built-in WATER_LEVEL (-4.5).
+  // Water surface height for this map; absent = the built-in WATER_LEVEL (-4.3).
   // Read through waterLevel() in src/sim/world.ts, never directly.
   waterLevel?: number;
 }

@@ -52,7 +52,7 @@ export const FERRY_ART_SOURCE = 'scripts/assets/grand_ferry_ship/source/grand_fe
 
 export const FERRY_BUILD = Object.freeze({
   /** The berth the hull is scaled into. Authored: this is a design decision. */
-  berth: Object.freeze({ length: 60, waterlineY: -4.5, draft: 2.5 }),
+  berth: Object.freeze({ length: 60, waterlineY: -4.3, draft: 2.5 }),
 
   /** Probe pitch and body size, in world yards. The body numbers mirror the
    *  sim's own player collider, so "can a person stand here" means the same

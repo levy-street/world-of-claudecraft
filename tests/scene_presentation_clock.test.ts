@@ -333,7 +333,10 @@ describe('mirrored scene presentation clock', () => {
       expect(actual).toEqual(expected);
 
       const midpoint = harborShipAttachFrame('harbor_ship_mainland', undefined, 14);
-      const midpointProp = propPathPoseAt(LAST_BELL_PROP_PATH_SEGMENTS.cast_off, 4);
+      const midpointProp = propPathPoseAt(
+        LAST_BELL_PROP_PATH_SEGMENTS[LAST_BELL_VOYAGE_SEGMENT_IDS.out.castOff],
+        4,
+      );
       expect(midpoint).toEqual(
         composeHarborShipAttachFrame(
           {

@@ -22,7 +22,7 @@ export const GRAND_FERRY_SHIP_SOURCE_FILES = Object.freeze([
   'scripts/assets/specs/grand_ferry_ship.json',
   'scripts/assets/build_assets.mjs',
   'src/sim/grand_ferry_ship_plan.generated.ts',
-  'package-lock.json',
+  'pnpm-lock.yaml',
 ]);
 
 function lengthDelimiter(byteLength) {

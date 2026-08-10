@@ -569,6 +569,40 @@ export class Input {
     if (hadHeldInput) this.noteIntent('move');
   }
 
+  /**
+   * Reset every transient gameplay-input source before an in-place client
+   * transition. Unlike an ordinary modal suspension, this also drops autorun,
+   * click-to-move, controller/touch/gamepad state, and latched jumps so no old
+   * intent can resume when the transition curtain comes down.
+   */
+  resetForClientTransition(): void {
+    const emoteWheelWasOpen = this.emoteWheelHeldCodes.size > 0;
+    this.keys.clear();
+    this.keyJumpUntil = 0;
+    this.touchJumpUntil = 0;
+    this.autorun = false;
+    this.clearClickMove();
+    this.touchMove = { forward: false, back: false, strafeLeft: false, strafeRight: false };
+    this.gamepadMove = { forward: false, back: false, strafeLeft: false, strafeRight: false };
+    this.touchLookActive = false;
+    this.touchLookVector = { x: 0, y: 0 };
+    this.gamepadLookActive = false;
+    this.controllerMoveInput = null;
+    this.controllerFacing = null;
+    this.leftDown = false;
+    this.rightDown = false;
+    this.cameraDragActive = false;
+    this.downButton = -1;
+    this.pointerLockRequestedForDrag = false;
+    this.releaseHeldSlots();
+    this.emoteWheelHeldCodes.clear();
+    if (emoteWheelWasOpen) this.cb.onEmoteWheel(false);
+    if (document.pointerLockElement === this.canvas) document.exitPointerLock?.();
+    this.suspendMovement = true;
+    this.updateCursor();
+    this.noteIntent('move');
+  }
+
   setSceneInputLocked(on: boolean): void {
     if (this.sceneInputLocked === on) return;
     this.sceneInputLocked = on;
@@ -582,7 +616,7 @@ export class Input {
     this.keyJumpUntil = 0;
   }
 
-  captureNextKey(cb: (code: string | null) => void): void {
+  captureNextKey(cb: ((code: string | null) => void) | null): void {
     this.captureCb = cb;
   }
 
@@ -1483,6 +1517,8 @@ export class Input {
         strafeLeft: false,
         strafeRight: false,
         jump: false,
+        dive: false,
+        surface: false,
       };
     }
     if (this.suspendMovement) {

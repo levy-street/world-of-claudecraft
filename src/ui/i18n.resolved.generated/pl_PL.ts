@@ -1025,6 +1025,7 @@ export const pl_PL: EnTranslations = {
     },
     "mountTraining": {
       "mountPrompt": "Naciśnij {key}, aby dosiąść treningowego Rumaka Męstwa.",
+      "buyReinsPrompt": "Riding learned. Buy Valorsteed reins from Marla for 10 gold, then use them to ride.",
       "ownedMountPrompt": "Twoje wodze są w twoich torbach. Użyj ich, aby jeździć.",
       "ridePrompt": "Podążaj za świecącym znacznikiem do linii startu, a następnie naciśnij Rozpocznij wyścig.",
       "begin": "Rozpocznij lekcję",
@@ -15129,6 +15130,12 @@ export const pl_PL: EnTranslations = {
           },
           "4": {
             "label": "Pola Szczelin"
+          },
+          "5": {
+            "label": "The Breach"
+          },
+          "6": {
+            "label": "The Wreckfields"
           }
         }
       }

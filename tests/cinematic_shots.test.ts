@@ -158,119 +158,9 @@ interface LegacyExemption {
   readonly reason: string;
 }
 
-// P1.3 must clear every row while fixing voyage content.
-const LEGACY_EXEMPTIONS: readonly LegacyExemption[] = [
-  {
-    sceneId: 'scn_lb_ferry_depart_back',
-    check: 'collision.hull',
-    reason: 'P1.3 must re-author voyage paths clear of harbor solids and the water floor.',
-  },
-  {
-    sceneId: 'scn_lb_ferry_depart_back',
-    check: 'cut.fadeSlack',
-    reason: 'P1.3 must add full-black tick slack to every voyage cut.',
-  },
-  {
-    sceneId: 'scn_lb_ferry_depart_back',
-    check: 'fade.symmetry',
-    reason: 'P1.3 must author a clear fade before the voyage scene ends.',
-  },
-  {
-    sceneId: 'scn_lb_ferry_depart_back',
-    check: 'motion.propAcceleration',
-    reason: 'P1.3 must author constant-way voyage eases without on-camera lurches.',
-  },
-  {
-    sceneId: 'scn_lb_ferry_depart_back',
-    check: 'motion.propWay',
-    reason: 'P1.3 must author constant-way voyage eases without on-camera dead stops.',
-  },
-  {
-    sceneId: 'scn_lb_ferry_depart_out',
-    check: 'collision.hull',
-    reason: 'P1.3 must re-author voyage paths clear of harbor solids and the water floor.',
-  },
-  {
-    sceneId: 'scn_lb_ferry_depart_out',
-    check: 'cut.fadeSlack',
-    reason: 'P1.3 must add full-black tick slack to every voyage cut.',
-  },
-  {
-    sceneId: 'scn_lb_ferry_depart_out',
-    check: 'fade.symmetry',
-    reason: 'P1.3 must author a clear fade before the voyage scene ends.',
-  },
-  {
-    sceneId: 'scn_lb_ferry_depart_out',
-    check: 'motion.propAcceleration',
-    reason: 'P1.3 must author constant-way voyage eases without on-camera lurches.',
-  },
-  {
-    sceneId: 'scn_lb_ferry_depart_out',
-    check: 'motion.propWay',
-    reason: 'P1.3 must author constant-way voyage eases without on-camera dead stops.',
-  },
-  {
-    sceneId: 'scn_lb_q0_ashore',
-    check: 'cut.fadeSlack',
-    reason: 'P1.3 must add full-black tick slack to every voyage cut.',
-  },
-  {
-    sceneId: 'scn_lb_q0_ashore',
-    check: 'fade.symmetry',
-    reason: 'P1.3 must author a clear fade before the voyage scene ends.',
-  },
-  {
-    sceneId: 'scn_lb_q0_voyage',
-    check: 'collision.hull',
-    reason: 'P1.3 must re-author voyage paths clear of harbor solids and the water floor.',
-  },
-  {
-    sceneId: 'scn_lb_q0_voyage',
-    check: 'cut.fadeSlack',
-    reason: 'P1.3 must add full-black tick slack to every voyage cut.',
-  },
-  {
-    sceneId: 'scn_lb_q0_voyage',
-    check: 'fade.symmetry',
-    reason: 'P1.3 must author a clear fade before the voyage scene ends.',
-  },
-  {
-    sceneId: 'scn_lb_q0_voyage',
-    check: 'motion.propAcceleration',
-    reason: 'P1.3 must author constant-way voyage eases without on-camera lurches.',
-  },
-  {
-    sceneId: 'scn_lb_q0_voyage',
-    check: 'motion.propWay',
-    reason: 'P1.3 must author constant-way voyage eases without on-camera dead stops.',
-  },
-  {
-    sceneId: 'cast_off',
-    check: 'reference.orphan',
-    reason: 'P1.3 must cue or remove the legacy authored cast-off prop segment.',
-  },
-  {
-    sceneId: 'scn_lb_q0_ashore',
-    check: 'reference.orphan',
-    reason: 'P1.3 must trigger or remove the superseded standalone arrival scene.',
-  },
-  {
-    sceneId: 'scn_lb_q0_ashore',
-    check: 'reference.subtitleReadTime',
-    reason: 'P1.3 must re-author Last Bell subtitle durations for readable locale fills.',
-  },
-  {
-    sceneId: 'scn_lb_q0_doorway',
-    check: 'reference.subtitleReadTime',
-    reason: 'P1.3 must re-author Last Bell subtitle durations for readable locale fills.',
-  },
-  {
-    sceneId: 'scn_lb_q0_voyage',
-    check: 'reference.subtitleReadTime',
-    reason: 'P1.3 must re-author Last Bell subtitle durations for readable locale fills.',
-  },
-];
+// Cleared: P1.3 re-authored the voyage content and P3 landed the engine
+// behaviors, so no scene/check pair remains exempt.
+const LEGACY_EXEMPTIONS: readonly LegacyExemption[] = [];
 
 interface TimedSceneOp {
   readonly index: number;
@@ -416,7 +306,7 @@ interface SyntheticCameraSceneOptions {
 function syntheticCameraScene(
   id: string,
   duration: number,
-  cameraOps: readonly SceneOpDef[],
+  cameraOps: readonly SyntheticSceneOpDef[],
   options: SyntheticCameraSceneOptions = {},
 ): SyntheticSceneDef {
   const {

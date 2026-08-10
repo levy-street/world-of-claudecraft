@@ -1025,6 +1025,7 @@ export const vi_VN: EnTranslations = {
     },
     "mountTraining": {
       "mountPrompt": "Nhấn {key} để cưỡi Valorsteed huấn luyện.",
+      "buyReinsPrompt": "Riding learned. Buy Valorsteed reins from Marla for 10 gold, then use them to ride.",
       "ownedMountPrompt": "Dây cương của bạn đang ở trong túi đồ. Hãy dùng để cưỡi.",
       "ridePrompt": "Đi theo điểm đánh dấu phát sáng đến vạch xuất phát, sau đó nhấn Bắt Đầu Đua.",
       "begin": "Bắt Đầu Bài Học",
@@ -15129,6 +15130,12 @@ export const vi_VN: EnTranslations = {
           },
           "4": {
             "label": "Riftfields"
+          },
+          "5": {
+            "label": "The Breach"
+          },
+          "6": {
+            "label": "The Wreckfields"
           }
         }
       }

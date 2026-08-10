@@ -816,6 +816,7 @@ export const fr_FR: EnTranslations = {
       "leaderboard": "Classement",
       "dailyRewards": "Boutique",
       "deeds": "Hauts faits",
+      "mounts": "Mounts",
       "professions": "Métiers",
       "nameplates": "Noms",
       "haptics": "Vibrations",
@@ -987,16 +988,21 @@ export const fr_FR: EnTranslations = {
       "resetConfirmBody": "La première barre retrouve ses touches par défaut. Les deuxième et troisième barres deviennent non assignées. Cette action est irréversible."
     },
     "mounts": {
+      "title": "Mounts",
+      "close": "Close",
+      "select": "Select",
+      "selected": "Selected",
+      "riding": "Riding",
       "mount": "Monter",
-      "dismount": "Descendre",
+      "dismount": "Dismount",
       "useToRide": "Utiliser pour invoquer cette monture.",
       "emptyTitle": "Aucune monture collectée",
       "emptyStableHint": "Atteignez le niveau 20 et prenez des leçons d’équitation auprès de la Maîtresse d’écurie Marla aux écuries à l’ouest de Highwatch.",
       "emptyDropHint": "Les montures plus rares sont lâchées par les boss de donjon et de raid.",
       "clickManage": "Cliquez pour choisir votre monture",
-      "rarity_common": "Commune",
+      "rarity_common": "Common",
       "rarity_rare": "Rare",
-      "rarity_epic": "Épique",
+      "rarity_epic": "Epic",
       "spec_speed": "+{pct}% de mobilité supplémentaire",
       "name_valorsteed": "Destrier de Bravoure",
       "name_grag_bear": "Ours-Grag Goliath",
@@ -1019,6 +1025,7 @@ export const fr_FR: EnTranslations = {
     },
     "mountTraining": {
       "mountPrompt": "Appuyez sur {key} pour monter le Valorsteed d'entraînement.",
+      "buyReinsPrompt": "Riding learned. Buy Valorsteed reins from Marla for 10 gold, then use them to ride.",
       "ownedMountPrompt": "Vos rênes sont dans vos sacs. Utilisez-les pour chevaucher.",
       "ridePrompt": "Suivez le repère lumineux jusqu'à la ligne de départ, puis appuyez sur Démarrer la course.",
       "begin": "Commencer la leçon",
@@ -15123,6 +15130,12 @@ export const fr_FR: EnTranslations = {
           },
           "4": {
             "label": "Les Champs de la Faille"
+          },
+          "5": {
+            "label": "The Breach"
+          },
+          "6": {
+            "label": "The Wreckfields"
           }
         }
       }

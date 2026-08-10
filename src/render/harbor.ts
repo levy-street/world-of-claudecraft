@@ -507,6 +507,9 @@ const DECK_STAND_IN_IDLE_STATE: AnimState = {
   dead: false,
   casting: false,
   swimming: false,
+  submerged: false,
+  swimPitch: 0,
+  wading: false,
   sitting: false,
 };
 

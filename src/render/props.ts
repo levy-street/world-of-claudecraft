@@ -700,8 +700,6 @@ function convertMaterial(
   return mat;
 }
 
-export const propMaterialInternalsForTest = { convertMaterial };
-
 /** parts of a loaded asset, world-baked (incl. yaw), origin centered at the
  *  footprint center with min-y at 0, materials converted + deduped.
  *  Exported for sibling builders (render/harbor.ts) that assemble kit pieces

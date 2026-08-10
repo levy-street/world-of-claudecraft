@@ -1025,6 +1025,7 @@ export const id_ID: EnTranslations = {
     },
     "mountTraining": {
       "mountPrompt": "Tekan {key} untuk menaiki Valorsteed latihan.",
+      "buyReinsPrompt": "Riding learned. Buy Valorsteed reins from Marla for 10 gold, then use them to ride.",
       "ownedMountPrompt": "Tali kekangmu ada di dalam tasmu. Gunakan untuk menunggang.",
       "ridePrompt": "Ikuti penanda bercahaya ke garis start, lalu tekan Mulai Balapan.",
       "begin": "Mulai Pelajaran",
@@ -15129,6 +15130,12 @@ export const id_ID: EnTranslations = {
           },
           "4": {
             "label": "Ladang Rift"
+          },
+          "5": {
+            "label": "The Breach"
+          },
+          "6": {
+            "label": "The Wreckfields"
           }
         }
       }

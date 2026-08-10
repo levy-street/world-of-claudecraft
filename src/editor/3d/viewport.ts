@@ -13,7 +13,7 @@ import { WORLD_SEED } from '../../sim/world_seed';
 // content and pushes render updates.
 
 import * as THREE from 'three';
-import { assetsReady } from '../../render/assets/preload';
+import { assetsReady, beginDeferredPreloads } from '../../render/assets/preload';
 import { cueHarborShip, resetHarborShipCues } from '../../render/harbor';
 import { type SeatRegion, unionRegion } from '../../render/placed_assets';
 import { Renderer } from '../../render/renderer';

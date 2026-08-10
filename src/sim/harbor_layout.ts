@@ -447,17 +447,17 @@ const MAINLAND_BERTH_HEAD_Y = MAINLAND_SHIP.rampMatingEdge.y;
 const MAINLAND_BRIDGE = generatedBoardingBridge(MAINLAND_SHIP, 230.9);
 
 const GULLHAVEN_BERTH: HarborBerth = {
-  x: 732,
-  z: 132.5,
-  rot: Math.PI,
+  x: 713,
+  z: 120.5,
+  rot: Math.PI / 2,
   draft: 2.5,
   length: 60,
   mirrorZ: true,
 };
 const GULLHAVEN_SHIP = generatedShipPlacement(GULLHAVEN_BERTH);
 const GULLHAVEN_PIER_GANGWAY_GAP = {
-  min: GULLHAVEN_SHIP.rampMatingEdge.x - GULLHAVEN_SHIP.rampMatingEdge.halfWidth,
-  max: GULLHAVEN_SHIP.rampMatingEdge.x + GULLHAVEN_SHIP.rampMatingEdge.halfWidth,
+  min: GULLHAVEN_SHIP.rampMatingEdge.z - GULLHAVEN_SHIP.rampMatingEdge.halfWidth,
+  max: GULLHAVEN_SHIP.rampMatingEdge.z + GULLHAVEN_SHIP.rampMatingEdge.halfWidth,
 };
 const GULLHAVEN_BERTH_HEAD_Y = GULLHAVEN_SHIP.rampMatingEdge.y;
 const GULLHAVEN_BRIDGE = generatedBoardingBridge(GULLHAVEN_SHIP, 722.6);
@@ -555,13 +555,13 @@ export const MAINLAND_HARBOR: HarborDef = withBounds({
     { x: 224.5, z: -52.65, hw: 1.85, rot: Math.PI / 2 },
     { x: 224.5, z: -43.35, hw: 1.85, rot: Math.PI / 2 },
     {
-      x: 231,
+      x: 228.5,
       z: (-54.5 + MAINLAND_PIER_GANGWAY_GAP.min) / 2,
       hw: (MAINLAND_PIER_GANGWAY_GAP.min + 54.5) / 2,
       rot: Math.PI / 2,
     },
     {
-      x: 231,
+      x: 230.9,
       z: (MAINLAND_PIER_GANGWAY_GAP.max - 41.5) / 2,
       hw: (-41.5 - MAINLAND_PIER_GANGWAY_GAP.max) / 2,
       rot: Math.PI / 2,
@@ -709,16 +709,16 @@ export const GULLHAVEN_HARBOR: HarborDef = withBounds({
     // proves the arrival sweep clears it.
     { x: 723.8, z: GULLHAVEN_PIER_GANGWAY_GAP.min, hw: 1.2, rot: 0 },
     {
-      x: (722.5 + GULLHAVEN_PIER_GANGWAY_GAP.min) / 2,
-      z: 123,
-      hw: (GULLHAVEN_PIER_GANGWAY_GAP.min - 722.5) / 2,
-      rot: 0,
+      x: 725,
+      z: (110 + GULLHAVEN_PIER_GANGWAY_GAP.min) / 2,
+      hw: (GULLHAVEN_PIER_GANGWAY_GAP.min - 110) / 2,
+      rot: Math.PI / 2,
     },
     {
-      x: (GULLHAVEN_PIER_GANGWAY_GAP.max + 732.5) / 2,
-      z: 123,
-      hw: (732.5 - GULLHAVEN_PIER_GANGWAY_GAP.max) / 2,
-      rot: 0,
+      x: 722.6,
+      z: (GULLHAVEN_PIER_GANGWAY_GAP.max + 123) / 2,
+      hw: (123 - GULLHAVEN_PIER_GANGWAY_GAP.max) / 2,
+      rot: Math.PI / 2,
     },
     // east cross rails at the berth head's raised edge above the seam ramp
     { x: 728.4, z: 111.75, hw: 1.75, rot: Math.PI / 2 },
@@ -763,9 +763,10 @@ export const GULLHAVEN_HARBOR: HarborDef = withBounds({
     { kind: 'bollard', x: 759.4, z: 121.2 },
     { kind: 'bollard', x: 753.4, z: 111.4 },
   ],
-  // The grand hull lies west of the bay's shoal corner, bow west out to
-  // sea (rot PI flips the model's +x bow), over water the stamps below
-  // carve deep; the gangplank gap in the berth head's north rail faces it.
+  // The grand hull lies west of the berth head, perpendicular to the pier
+  // with its +x bow pointing south like the mainland ship. The mirrored
+  // generated port opening faces the pier, and the basin stamps below keep
+  // the full north-south hull in deep water.
   berth: GULLHAVEN_BERTH,
   shipDecks: GULLHAVEN_SHIP.decks,
   shipRails: GULLHAVEN_SHIP.rails,
@@ -779,7 +780,7 @@ export const GULLHAVEN_HARBOR: HarborDef = withBounds({
     x: GULLHAVEN_SHIP.decks[0].x,
     z: GULLHAVEN_SHIP.decks[0].z,
   },
-  arrival: { x: 782, z: 116 },
+  arrival: { x: 782, z: 125 },
 });
 
 export const HARBORS: readonly HarborDef[] = [MAINLAND_HARBOR, GULLHAVEN_HARBOR];
@@ -794,6 +795,10 @@ export const HARBORS: readonly HarborDef[] = [MAINLAND_HARBOR, GULLHAVEN_HARBOR]
 export const HARBOR_TERRAIN_EDITS = [
   // the mainland shore pad under the apron
   { x: 172, z: -50, radius: 12, delta: 0.3, falloff: 'smooth', mode: 'level' },
+  // Main's revised coast relief can crest through the apron corners on some
+  // seeds. Keep the authored deck footprint on a compact flat pad; the entry
+  // pockets below still own the two walkable approaches outside this circle.
+  { x: 173, z: -48, radius: 10.1, delta: 0.3, falloff: 'flat', mode: 'level' },
   // the two mainland entry pockets: each ramp's foot must meet ground
   // within the movement climb gate on EVERY seed, so the ground there is
   // leveled just under the ramp lip (south lip 0.2, west lip -0.6)
@@ -802,6 +807,9 @@ export const HARBOR_TERRAIN_EDITS = [
   // Gullhaven's town-entry street pocket (ramp lip 4.4), centered on the
   // ramp foot so the lip meets the street flush on every seed
   { x: 788, z: 116, radius: 6, delta: 4.4, falloff: 'smooth', mode: 'level' },
+  // The lower Gullhaven pier likewise needs a seed-invariant footing after
+  // the coast relief update. Its deck and seam ramps cover this compact pad.
+  { x: 765, z: 116, radius: 5.6, delta: -5.5, falloff: 'flat', mode: 'level' },
   // The carved berth basins: the grand ship draws 2.5, so the floor under
   // each hull is pulled toward -12 (the mainland dive plateau sits at
   // -5.7 to -6.6 and could never float her; deepening is invisible to the
@@ -834,6 +842,10 @@ export const HARBOR_TERRAIN_EDITS = [
   // side, Gullhaven from the north bay). Same mid-sea deepening pattern as
   // the basins above; no walkable or shoreline impact.
   { x: 259, z: 12, radius: 26, delta: -12, falloff: 'smooth', mode: 'level' },
+  // Main's coast relief raised a narrow underwater shoulder beneath the
+  // return arrival's swept stern. This compact deep pocket keeps the filmed
+  // hull clear without changing either shoreline or any walkable surface.
+  { x: 245, z: 2, radius: 8, delta: -12, falloff: 'flat', mode: 'level' },
   { x: 696, z: 178, radius: 28, delta: -12, falloff: 'smooth', mode: 'level' },
 ] as const;
 

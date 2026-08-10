@@ -17,6 +17,7 @@ import {
   registrationsByDay,
   sessionsByDay,
 } from './admin_db';
+import { parseAdminAccountSort } from './admin_accounts_sort';
 import type { AdminGuildBankView } from './admin_guild_bank_view';
 import {
   ADMIN_GUILD_REASON_MAX,
@@ -1847,7 +1848,6 @@ function makeRealAdminDb() {
     accountAndScopeForToken,
     accountMailTarget,
     findAccount,
-    verifyLoginTwoFactor,
     // Target-account staff check (the "admin accounts cannot be suspended / banned /
     // chat muted" guards); the CALLER gate resolves roles via adminRolesForAccount.
     isAdminAccount,

@@ -478,6 +478,7 @@ export const hudChromeStrings = {
     leaderboard: 'Ranks',
     dailyRewards: 'Store',
     deeds: 'Deeds',
+    mounts: 'Mounts',
     professions: 'Professions',
     nameplates: 'Names',
     haptics: 'Haptics',
@@ -799,9 +800,22 @@ export const hudChromeStrings = {
   // (src/sim/content/mounts.ts carries the canonical English names for the sim
   // side); useToRide is shared by every reins tooltip surface.
   mounts: {
-    // Compact label inside the mobile mount/dismount button in index.html/play.html.
+    title: 'Mounts',
+    close: 'Close',
+    select: 'Select',
+    selected: 'Selected',
+    riding: 'Riding',
     mount: 'Mount',
+    dismount: 'Dismount',
     useToRide: 'Use to summon this mount.',
+    emptyTitle: 'No mounts collected',
+    emptyStableHint:
+      'Reach level 20 and take riding lessons with Stablemaster Marla at the Highwatch Stables, west of Highwatch.',
+    emptyDropHint: 'Rarer mounts drop from heroic dungeon bosses and Rift completions.',
+    clickManage: 'Click to choose your mount',
+    rarity_common: 'Common',
+    rarity_rare: 'Rare',
+    rarity_epic: 'Epic',
     spec_speed: '+{pct}% extra mobility',
     name_valorsteed: 'Valorsteed',
     name_grag_bear: 'Goliath Grag-Bear',
@@ -839,6 +853,7 @@ export const hudChromeStrings = {
     // awards no reins; Marla sells the Valorsteed item separately.
     buyReinsPrompt:
       'Riding learned. Buy Valorsteed reins from Marla for 10 gold, then use them to ride.',
+    ownedMountPrompt: 'Your reins are in your bags. Use them to ride.',
     ridePrompt: 'Follow the glowing marker to the start line, then press Start Race.',
     begin: 'Begin Lesson',
     success: 'You have tamed the Valorsteed.',

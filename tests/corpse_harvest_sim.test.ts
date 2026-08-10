@@ -1,4 +1,5 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
+import { expectDefined } from './helpers/defined';
 
 // Mock the db layer so no Postgres is needed; only the wire encode/decode and
 // broadcast paths are under test (wireEntity round-trips plus a real GameServer

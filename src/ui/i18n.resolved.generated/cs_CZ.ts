@@ -1025,6 +1025,7 @@ export const cs_CZ: EnTranslations = {
     },
     "mountTraining": {
       "mountPrompt": "Stiskni {key} pro nasednutí na cvičného Udatného oře.",
+      "buyReinsPrompt": "Riding learned. Buy Valorsteed reins from Marla for 10 gold, then use them to ride.",
       "ownedMountPrompt": "Tvé otěže jsou v tvých brašnách. Použij je k jízdě.",
       "ridePrompt": "Následuj zářící značku ke startovní čáře a stiskni Začít závod.",
       "begin": "Začít lekci",
@@ -15129,6 +15130,12 @@ export const cs_CZ: EnTranslations = {
           },
           "4": {
             "label": "Trhlinová pole"
+          },
+          "5": {
+            "label": "The Breach"
+          },
+          "6": {
+            "label": "The Wreckfields"
           }
         }
       }

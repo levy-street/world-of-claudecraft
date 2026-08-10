@@ -4450,7 +4450,7 @@ function terrainHeightUnpadded(x: number, z: number, seed: number, skipEdits = f
     h = applyValeCoast(x, z, h);
   }
   if (terrainRegionHas(region, TERRAIN_APPLIER.isleCoast)) {
-    h = applyIsleCoast(x, z, h);
+    h = applyFarshoreSea(x, z, h);
   }
   if (terrainRegionHas(region, TERRAIN_APPLIER.causeway)) {
     h = applyCauseway(x, z, h);

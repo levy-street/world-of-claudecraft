@@ -2819,7 +2819,7 @@ export class Sim {
       known: [],
       questLog: new Map(),
       questsDone: new Set(),
-      campaignFlags: new Map(),
+      campaignFlags: new Map(savedState?.campaignFlags ?? []),
       counters: freshCounters(),
       autoEquip: opts?.autoEquip ?? false,
       joinedAt: this.time,

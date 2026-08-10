@@ -1025,6 +1025,7 @@ export const nl_NL: EnTranslations = {
     },
     "mountTraining": {
       "mountPrompt": "Druk op {key} om op de trainings-Moedros te stijgen.",
+      "buyReinsPrompt": "Riding learned. Buy Valorsteed reins from Marla for 10 gold, then use them to ride.",
       "ownedMountPrompt": "Je teugels zitten in je tassen. Gebruik ze om te rijden.",
       "ridePrompt": "Volg de gloeiende markering naar de startlijn en druk dan op Race Starten.",
       "begin": "Les Beginnen",
@@ -15129,6 +15130,12 @@ export const nl_NL: EnTranslations = {
           },
           "4": {
             "label": "De Riftvelden"
+          },
+          "5": {
+            "label": "The Breach"
+          },
+          "6": {
+            "label": "The Wreckfields"
           }
         }
       }

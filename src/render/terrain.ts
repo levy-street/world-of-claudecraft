@@ -221,11 +221,52 @@ const WALL_LOD_RIM_MARGIN = 40;
 // world but is baked sparsely by zone, so keep it compact enough that entering
 // a new region never turns tens of thousands of height samples into a
 // second boot. At the current bounds this is roughly 3yd/texel.
-const NORMAL_TEX_W = 320;
-const NORMAL_TEX_H = 960;
+export const TERRAIN_NORMAL_TEXTURE_WIDTH = 320;
+export const TERRAIN_NORMAL_TEXTURE_HEIGHT = 960;
 // nudged up from 1.35: at 3yd/texel the macro relief was reading flat next
 // to the strengthened per-material detail normals
-const NORMAL_TEX_STRENGTH = 1.55;
+export const TERRAIN_NORMAL_TEXTURE_STRENGTH = 1.55;
+const NORMAL_TEX_W = TERRAIN_NORMAL_TEXTURE_WIDTH;
+const NORMAL_TEX_H = TERRAIN_NORMAL_TEXTURE_HEIGHT;
+const NORMAL_TEX_STRENGTH = TERRAIN_NORMAL_TEXTURE_STRENGTH;
+
+/** Production world-to-texel region selection used by high-tier zone builds.
+ * Exported so the asymmetric Farshore mapping is pinned without constructing
+ * the full Three.js terrain graph. */
+export function terrainNormalRegionsFor(
+  zone: ZoneDef,
+  cells: readonly [number, number][],
+): TexelBounds[] {
+  const normalTexelsOver = (minX: number, minZ: number, maxX: number, maxZ: number) =>
+    normalTexelBounds(
+      minX,
+      minZ,
+      maxX,
+      maxZ,
+      WORLD_MIN_X,
+      WORLD_MIN_Z,
+      WORLD_MAX_X - WORLD_MIN_X,
+      WORLD_MAX_Z - WORLD_MIN_Z,
+      NORMAL_TEX_W,
+      NORMAL_TEX_H,
+      1,
+    );
+  const minX = zone.xMin ?? STRIP_MIN_X;
+  const maxX = zone.xMax ?? STRIP_MAX_X;
+  const regions: TexelBounds[] = [];
+  const zoneBounds = normalTexelsOver(minX, zone.zMin, maxX, zone.zMax);
+  if (zoneBounds) regions.push(zoneBounds);
+  for (const [cx, cz] of cells) {
+    const x0 = WORLD_MIN_X + cx * CHUNK_SIZE;
+    const z0 = WORLD_MIN_Z + cz * CHUNK_SIZE;
+    const inside =
+      x0 >= minX && x0 + CHUNK_SIZE <= maxX && z0 >= zone.zMin && z0 + CHUNK_SIZE <= zone.zMax;
+    if (inside) continue;
+    const cellBounds = normalTexelsOver(x0, z0, x0 + CHUNK_SIZE, z0 + CHUNK_SIZE);
+    if (cellBounds) regions.push(cellBounds);
+  }
+  return regions;
+}
 
 // Ground colors per biome; boundaries blend across the same window as the
 // heightfield's shape blend. This is the tint layer the splat albedo

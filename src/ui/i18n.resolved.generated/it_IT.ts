@@ -816,6 +816,7 @@ export const it_IT: EnTranslations = {
       "leaderboard": "Classifica",
       "dailyRewards": "Negozio",
       "deeds": "Imprese",
+      "mounts": "Mounts",
       "professions": "Professioni",
       "nameplates": "Nomi",
       "haptics": "Vibrazione",
@@ -987,16 +988,21 @@ export const it_IT: EnTranslations = {
       "resetConfirmBody": "La prima barra torna ai suoi tasti predefiniti. La seconda e la terza restano senza tasti assegnati. L'operazione non può essere annullata."
     },
     "mounts": {
+      "title": "Mounts",
+      "close": "Close",
+      "select": "Select",
+      "selected": "Selected",
+      "riding": "Riding",
       "mount": "Monta",
-      "dismount": "Smonta",
+      "dismount": "Dismount",
       "useToRide": "Usa per evocare questa cavalcatura.",
       "emptyTitle": "Nessuna cavalcatura ottenuta",
       "emptyStableHint": "Raggiungi il livello 20 e prendi lezioni di equitazione dalla Stalliera capo Marla alle stalle a ovest di Highwatch.",
       "emptyDropHint": "Le cavalcature più rare sono bottino dei boss di spedizione e incursione.",
       "clickManage": "Clicca per scegliere la tua cavalcatura",
-      "rarity_common": "Comune",
-      "rarity_rare": "Rara",
-      "rarity_epic": "Epica",
+      "rarity_common": "Common",
+      "rarity_rare": "Rare",
+      "rarity_epic": "Epic",
       "spec_speed": "+{pct}% di mobilità extra",
       "name_valorsteed": "Destriero del Valore",
       "name_grag_bear": "Orso Grag Golia",
@@ -1019,6 +1025,7 @@ export const it_IT: EnTranslations = {
     },
     "mountTraining": {
       "mountPrompt": "Premi {key} per salire sul Valorsteed di addestramento.",
+      "buyReinsPrompt": "Riding learned. Buy Valorsteed reins from Marla for 10 gold, then use them to ride.",
       "ownedMountPrompt": "Le tue redini sono nelle tue borse. Usale per cavalcare.",
       "ridePrompt": "Segui il marcatore luminoso fino alla linea di partenza, poi premi Inizia la Corsa.",
       "begin": "Inizia la Lezione",
@@ -15123,6 +15130,12 @@ export const it_IT: EnTranslations = {
           },
           "4": {
             "label": "I Campi degli Squarci"
+          },
+          "5": {
+            "label": "The Breach"
+          },
+          "6": {
+            "label": "The Wreckfields"
           }
         }
       }

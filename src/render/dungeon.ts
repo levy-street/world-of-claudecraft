@@ -58,6 +58,7 @@ import {
 } from './delve_marsh_dressing';
 import { rectShellWallSegments, stubFaceSegments } from './dungeon_wall_segments';
 import { EMISSIVE_LIGHT, GFX, sharedUniforms } from './gfx';
+import { buildLastBellStoryInterior } from './last_bell_props';
 import { buildLastKeepDressing, ensureLastKeepDressing } from './lastkeep_dressing';
 import { applyOccluderFade, type OccluderFadeMat, occluderFadeMat } from './occluder_fade';
 import { occluderFadeSettled, stepOccluderFade } from './occluder_fade_core';

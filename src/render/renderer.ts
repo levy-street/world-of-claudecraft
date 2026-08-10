@@ -8353,10 +8353,11 @@ export class Renderer {
     const inDelve = inside && isDelvePos(px);
     const inYumiMaze = inside && isYumiMazePos(px);
     const inBattleground = inside && isBgPos(px);
-    const interior =
+    const dungeonHere =
       inside && !inDelve && !inYumiMaze && !inBattleground && !isArenaPos(px)
-        ? dungeonAt(px)?.interior
+        ? dungeonAt(px)
         : null;
+    const interior = dungeonHere?.interior ?? null;
     const inTemple = interior === 'temple';
     const inNythraxis = interior === 'nythraxis';
     // Wildheart is an OPEN-AIR jungle caldera, not a closed room: it keeps the
@@ -8380,19 +8381,21 @@ export class Renderer {
                 ? 'nythraxis'
                 : inWildheartField
                   ? 'wildheartField'
-                  : inLastKeep
-                    ? 'lastkeep'
-                    : inside
-                      ? 'dungeon'
-                      : camY <
-                          waterLevelAt(
-                            this.camera.position.x,
-                            this.camera.position.z,
-                            this.sim.cfg.seed,
-                          ) -
-                            0.05
-                        ? 'underwater'
-                        : 'outdoor';
+                  : inFarshoreStory
+                    ? 'farshoreStory'
+                    : inLastKeep
+                      ? 'lastkeep'
+                      : inside
+                        ? 'dungeon'
+                        : camY <
+                            waterLevelAt(
+                              this.camera.position.x,
+                              this.camera.position.z,
+                              this.sim.cfg.seed,
+                            ) -
+                              0.05
+                          ? 'underwater'
+                          : 'outdoor';
     const fog = this.scene.fog as THREE.Fog;
     // Procedural rift: dynamic fog from the generated floor style, re-applied when
     // the floor changes (descent keeps fogState='rift' but swaps the palette).
@@ -9247,11 +9250,17 @@ export class Renderer {
       const travel = !polyed && !bear && !cat && hasTravelForm;
       const fireballForm = !polyed && !bear && !cat && !travel && hasFireballForm;
       const _stealthed = hasStealth;
-      // distance cull: far rigs are invisible specks but cost real draw calls
-      const cdx = e.pos.x - p.pos.x,
-        cdz = e.pos.z - p.pos.z;
-      const d2 = cdx * cdx + cdz * cdz;
-      const isSelf = id === p.id;
+      const hasSoulRend = hasCharacterEffect(characterEffects, CHARACTER_EFFECT_SOUL_REND);
+      const hasRecklessness = hasCharacterEffect(characterEffects, CHARACTER_EFFECT_RECKLESSNESS);
+      const visuallyDead = isVisuallyDead(e) && !e.ghost;
+      const waterJetVisualChannel = this.waterJetVisualChannels.has(e.id);
+      // This is the final render-side casting state, including Water Jet's
+      // spellfx-driven channel. It feeds both the rig and the fairness carve-out.
+      const characterCasting = characterPresentationCasting(
+        e.castingAbility,
+        waterJetVisualChannel,
+        visuallyDead,
+      );
       const deckRiderActive = !isSelf && harborDeckRiderActive(e);
       // Pose carries information the player acts on (own feedback, the read on
       // the current target, pet combat, a cast windup telegraph) rather than

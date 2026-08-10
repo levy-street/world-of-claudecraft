@@ -16,9 +16,9 @@ export const GRAND_FERRY_SHIP_PLAN = {
   },
   standardBerth: {
     length: 60,
-    waterlineY: -4.5,
+    waterlineY: -4.3,
     draft: 2.5,
-    deckWorldY: 1.034558,
+    deckWorldY: 1.234558,
   },
   decks: [
     {

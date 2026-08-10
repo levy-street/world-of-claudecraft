@@ -50,7 +50,7 @@ describe('Last Bell harbors', () => {
     });
     expect(MAINLAND_HARBOR.deckArrival).toEqual({ x: 240.5, z: expect.closeTo(-50.775, 5) });
     expect(GULLHAVEN_HARBOR.deckArrival).toEqual({ x: 713, z: expect.closeTo(113.725, 5) });
-    expect(MAINLAND_HARBOR.arrival).toEqual({ x: 173, z: -42 });
+    expect(MAINLAND_HARBOR.arrival).toEqual({ x: 173, z: -48 });
     expect(GULLHAVEN_HARBOR.arrival).toEqual({ x: 782, z: 125 });
   });
 
@@ -155,7 +155,7 @@ describe('Last Bell harbors', () => {
         prev = g;
       }
       // and the walk ends on the ship's measured deck height
-      expect(groundHeight(239, -48, seed)).toBe(1.034142297254);
+      expect(groundHeight(239, -48, seed)).toBe(MAINLAND_HARBOR.shipDecks[0].y);
     }
   });
 
@@ -217,7 +217,7 @@ describe('Last Bell harbors', () => {
         prev = g;
       }
       // and the walk ends on the ship's measured deck height at the berth head
-      expect(groundHeight(725.5, z, seed)).toBe(1.034142297254);
+      expect(groundHeight(725.5, z, seed)).toBe(GULLHAVEN_HARBOR.shipDecks[0].y);
     }
   });
 
@@ -391,7 +391,7 @@ describe('Last Bell harbors', () => {
     for (let i = 0; i < 420; i++) sim.tick();
     // aboard, well past the gangway landing, at the measured deck height
     expect(sim.player.pos.x).toBeGreaterThan(236);
-    expect(sim.player.pos.y).toBeCloseTo(1.034142, 3);
+    expect(sim.player.pos.y).toBeCloseTo(MAINLAND_HARBOR.shipDecks[0].y, 3);
     // and back west down the plank to the berth head: control never strips
     sim.player.facing = -Math.PI / 2;
     for (let i = 0; i < 500; i++) sim.tick();

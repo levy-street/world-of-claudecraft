@@ -816,6 +816,7 @@ export const pt_BR: EnTranslations = {
       "leaderboard": "Classificação",
       "dailyRewards": "Loja",
       "deeds": "Feitos",
+      "mounts": "Mounts",
       "professions": "Profissões",
       "nameplates": "Nomes",
       "haptics": "Vibração",
@@ -987,16 +988,21 @@ export const pt_BR: EnTranslations = {
       "resetConfirmBody": "A primeira barra volta às teclas padrão. A segunda e a terceira ficam sem atribuição. Isso não pode ser desfeito."
     },
     "mounts": {
+      "title": "Mounts",
+      "close": "Close",
+      "select": "Select",
+      "selected": "Selected",
+      "riding": "Riding",
       "mount": "Montar",
-      "dismount": "Desmontar",
+      "dismount": "Dismount",
       "useToRide": "Use para invocar esta montaria.",
       "emptyTitle": "Nenhuma montaria coletada",
       "emptyStableHint": "Alcance o nível 20 e faça aulas de montaria com a Cavalariça-mor Marla nos estábulos a oeste de Highwatch.",
       "emptyDropHint": "Montarias mais raras caem de chefes de masmorra e raide.",
       "clickManage": "Clique para escolher sua montaria",
-      "rarity_common": "Comum",
-      "rarity_rare": "Rara",
-      "rarity_epic": "Épica",
+      "rarity_common": "Common",
+      "rarity_rare": "Rare",
+      "rarity_epic": "Epic",
       "spec_speed": "+{pct}% de mobilidade extra",
       "name_valorsteed": "Corcel do Valor",
       "name_grag_bear": "Urso Grag Golias",
@@ -1019,6 +1025,7 @@ export const pt_BR: EnTranslations = {
     },
     "mountTraining": {
       "mountPrompt": "Pressione {key} para montar no Valorsteed de treinamento.",
+      "buyReinsPrompt": "Riding learned. Buy Valorsteed reins from Marla for 10 gold, then use them to ride.",
       "ownedMountPrompt": "Suas rédeas estão em suas bolsas. Use-as para montar.",
       "ridePrompt": "Siga o marcador luminoso até a linha de partida, depois pressione Iniciar Corrida.",
       "begin": "Iniciar Lição",
@@ -15123,6 +15130,12 @@ export const pt_BR: EnTranslations = {
           },
           "4": {
             "label": "Os Campos das Fendas"
+          },
+          "5": {
+            "label": "The Breach"
+          },
+          "6": {
+            "label": "The Wreckfields"
           }
         }
       }

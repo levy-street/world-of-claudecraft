@@ -816,6 +816,7 @@ export const de_DE: EnTranslations = {
       "leaderboard": "Rangliste",
       "dailyRewards": "Shop",
       "deeds": "Taten",
+      "mounts": "Mounts",
       "professions": "Berufe",
       "nameplates": "Namen",
       "haptics": "Haptik",
@@ -987,16 +988,21 @@ export const de_DE: EnTranslations = {
       "resetConfirmBody": "Die erste Leiste kehrt zu ihren Standardtasten zurück. Die zweite und dritte Leiste verlieren ihre Belegung. Das lässt sich nicht rückgängig machen."
     },
     "mounts": {
+      "title": "Mounts",
+      "close": "Close",
+      "select": "Select",
+      "selected": "Selected",
+      "riding": "Riding",
       "mount": "Aufsitzen",
-      "dismount": "Absitzen",
-      "useToRide": "Benutzen, um dieses Reittier herbeizurufen.",
-      "emptyTitle": "Keine Reittiere gesammelt",
-      "emptyStableHint": "Erreicht Stufe 20 und nehmt bei Stallmeisterin Marla in den Ställen westlich von Highwatch Reitstunden.",
-      "emptyDropHint": "Seltenere Reittiere lassen Dungeon- und Schlachtzugsbosse fallen.",
-      "clickManage": "Anklicken, um Euer Reittier zu wählen",
-      "rarity_common": "Verbreitet",
-      "rarity_rare": "Selten",
-      "rarity_epic": "Episch",
+      "dismount": "Dismount",
+      "useToRide": "Benutzen, um dieses Reittier zu beschwören.",
+      "emptyTitle": "No mounts collected",
+      "emptyStableHint": "Reach level 20 and take riding lessons with Stablemaster Marla at the Highwatch Stables, west of Highwatch.",
+      "emptyDropHint": "Rarer mounts drop from heroic dungeon bosses and Rift completions.",
+      "clickManage": "Click to choose your mount",
+      "rarity_common": "Common",
+      "rarity_rare": "Rare",
+      "rarity_epic": "Epic",
       "spec_speed": "+{pct}% zusätzliche Mobilität",
       "name_valorsteed": "Valorross",
       "name_grag_bear": "Goliath-Gragbär",
@@ -1019,6 +1025,7 @@ export const de_DE: EnTranslations = {
     },
     "mountTraining": {
       "mountPrompt": "Drücke {key}, um das Übungs-Valorross zu besteigen.",
+      "buyReinsPrompt": "Riding learned. Buy Valorsteed reins from Marla for 10 gold, then use them to ride.",
       "ownedMountPrompt": "Deine Zügel sind in deinen Taschen. Benutze sie, um zu reiten.",
       "ridePrompt": "Folge der leuchtenden Markierung zur Startlinie und drücke dann Rennen starten.",
       "begin": "Reitstunde beginnen",
@@ -15123,6 +15130,12 @@ export const de_DE: EnTranslations = {
           },
           "4": {
             "label": "Die Rissfelder"
+          },
+          "5": {
+            "label": "The Breach"
+          },
+          "6": {
+            "label": "The Wreckfields"
           }
         }
       }

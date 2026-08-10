@@ -133,7 +133,7 @@ describe('scene authoring builder', () => {
     expect(scene.ops).toEqual([
       { at: 1.55, kind: 'fade', to: 'black', dur: 0.4 },
       { at: 2, kind: 'fade', to: 'black', dur: 0 },
-      { at: 2, kind: 'camera', shot: FOCUS_SHOT },
+      { at: 2, kind: 'camera', shot: { ...FOCUS_SHOT, entry: 'snap' } },
       { at: 2.05, kind: 'fade', to: 'clear', dur: 0.4 },
     ]);
     expect(scene.duration).toBe(3.5);
@@ -150,7 +150,7 @@ describe('scene authoring builder', () => {
     expect(scene.ops).toEqual([
       { at: 1.95, kind: 'fade', to: 'black', dur: 0.8 },
       { at: 3, kind: 'fade', to: 'black', dur: 0 },
-      { at: 3, kind: 'camera', shot: FOCUS_SHOT },
+      { at: 3, kind: 'camera', shot: { ...FOCUS_SHOT, entry: 'snap' } },
       { at: 3.25, kind: 'fade', to: 'clear', dur: 0.8 },
     ]);
   });
@@ -322,7 +322,7 @@ describe('scene authoring builder', () => {
         { at: 0.2, kind: 'music', directive: 'lb_harbor_ambience' },
         { at: 0.55, kind: 'fade', to: 'black', dur: 0.4 },
         { at: 1, kind: 'fade', to: 'black', dur: 0 },
-        { at: 1, kind: 'camera', shot: FOCUS_SHOT },
+        { at: 1, kind: 'camera', shot: { ...FOCUS_SHOT, entry: 'snap' } },
         { at: 1.05, kind: 'fade', to: 'clear', dur: 0.4 },
         {
           at: 2,

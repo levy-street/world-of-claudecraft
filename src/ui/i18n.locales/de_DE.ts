@@ -11699,7 +11699,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mountTraining.ridePrompt':
     'Folge der leuchtenden Markierung zur Startlinie und drücke dann Rennen starten.',
   'hudChrome.mountTraining.success': 'Du hast das Valorross gezähmt.',
-  'hudChrome.mounts.useToRide': 'Benutzen, um dieses Reittier herbeizurufen.',
   'hudChrome.unstuck.alreadyActive': 'Befreien zählt bereits herunter.',
   'hudChrome.unstuck.alreadySafe':
     'Du befindest dich bereits an einer sicheren, erreichbaren Position.',

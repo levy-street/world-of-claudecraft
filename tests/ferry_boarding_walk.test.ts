@@ -400,11 +400,20 @@ function challengeHullBlocker(
     x: blocker.x - outward.x * (support + 2),
     z: blocker.z - outward.z * (support + 2),
   };
-  stage(sim, start, waterLevelAt(start.x, start.z));
+  stage(sim, start, waterLevelAt(start.x, start.z, sim.cfg.seed));
   pushToward(sim, target, 24);
   const signedDistance =
     (sim.player.pos.x - blocker.x) * outward.x + (sim.player.pos.z - blocker.z) * outward.z;
-  expect(signedDistance, `${harbor.id} ${label} crossed ${blockerId}`).toBeGreaterThan(0);
+  const lateral = { x: -outward.z, z: outward.x };
+  const lateralSupport = blockerSupportRadius(blocker, lateral) + PLAYER_BODY_RADIUS;
+  const lateralDistance =
+    (sim.player.pos.x - blocker.x) * lateral.x + (sim.player.pos.z - blocker.z) * lateral.z;
+  // Once the movement response has slid completely around the end of this
+  // blocker, crossing its axial center plane is legitimate. It must remain on
+  // the approach side only while its body still overlaps the blocker's span.
+  if (Math.abs(lateralDistance) < lateralSupport) {
+    expect(signedDistance, `${harbor.id} ${label} crossed ${blockerId}`).toBeGreaterThan(0);
+  }
   expect(
     pointClearanceFromBlocker(blocker, sim.player.pos),
     `${harbor.id} ${label} body clearance from ${blockerId}`,

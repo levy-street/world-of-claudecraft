@@ -1025,6 +1025,7 @@ export const tr_TR: EnTranslations = {
     },
     "mountTraining": {
       "mountPrompt": "Eğitim Yiğit Küheylanına binmek için {key} tuşuna bas.",
+      "buyReinsPrompt": "Riding learned. Buy Valorsteed reins from Marla for 10 gold, then use them to ride.",
       "ownedMountPrompt": "Dizginlerin çantalarında. Binmek için onları kullan.",
       "ridePrompt": "Parlayan işareti başlangıç çizgisine kadar takip et, sonra Yarışı Başlat'a bas.",
       "begin": "Derse Başla",
@@ -15129,6 +15130,12 @@ export const tr_TR: EnTranslations = {
           },
           "4": {
             "label": "Yarık Tarlaları"
+          },
+          "5": {
+            "label": "The Breach"
+          },
+          "6": {
+            "label": "The Wreckfields"
           }
         }
       }

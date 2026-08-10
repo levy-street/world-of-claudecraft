@@ -116,6 +116,9 @@ export type {
   OverheadEmoteId,
 } from './sim/types';
 
+// Wire cap shared by the client send guard and authoritative server dispatch.
+export const SCENE_ID_MAX_LENGTH = 64;
+
 // Online world-layout compatibility is encoded in the first WebSocket frame's
 // discriminator. Changing the authoritative town layout requires a new epoch:
 // the strict discriminator makes both rolling-deploy directions fail closed
@@ -506,6 +509,9 @@ export const COMMAND_NAMES = [
   // arcane-material price and the R30 re-derived maximum
   // (Sim.rechargeToolEffect via professions/tools.ts resolveRechargeToolEffect).
   'recharge_tool_effect',
+  // Last Bell scenes: skip request and leader dialogue-choice answer.
+  'scene_skip',
+  'scene_choice',
   // Per-character action-bar layout persistence: the owning client uploads its
   // full arranged layout (debounced) so it restores at login on any device.
   'save_hotbar_layout',

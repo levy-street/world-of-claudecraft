@@ -1887,6 +1887,9 @@ export class ClientWorld implements IWorld {
   // mandatory snapshot frames. Independent of stable timer-wire negotiation.
   presentationTime = 0;
   private sceneInputLockedBeforeDrain = false;
+  // Last session preference sent by setStopAutoAttackOnTargetSwitch. Re-send it
+  // after reconnect so the new server-side session keeps the same behavior.
+  private lastStopAutoAttackOnTargetSwitch: boolean | null = null;
   private reconnectAttempts = 0;
   // consecutive 'character already in world' rejections during a reconnect;
   // see src/net/reconnect_policy.ts for why these are tolerated (bounded)

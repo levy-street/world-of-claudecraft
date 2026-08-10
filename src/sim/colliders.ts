@@ -61,6 +61,8 @@ import {
 import { emberLilySpots } from './ember_lilies';
 import { fenWillowSpots, hollowWillowSpots } from './fen_willows';
 import { FENBRIDGE_LAYOUT } from './fenbridge_layout';
+import { HARBOR_RAIL_HALF_THICK, HARBOR_RAIL_HEIGHT, harborDressingRadius } from './harbor_layout';
+import { LAST_BELL_AREAS } from './last_bell_field';
 import {
   benchDrawnHeight,
   CHAPEL_HALL,
@@ -127,6 +129,8 @@ export interface CircleCollider {
   r: number;
   /** Absolute world-space visual top used by sight checks; movement ignores it. */
   cameraTopY?: number;
+  /** Movement blocks, but the chase camera passes through hideable render props. */
+  camGhost?: boolean;
   /**
    * Absolute world-space top of the PHYSICAL obstacle for movement (parkour):
    * a mover whose feet reach this height passes over instead of being walled
@@ -156,6 +160,8 @@ export interface ObbCollider {
   rot: number; // yaw, three.js rotation.y convention
   /** Absolute world-space visual top used by sight checks; movement ignores it. */
   cameraTopY?: number;
+  /** See {@link CircleCollider.camGhost}. */
+  camGhost?: boolean;
   /** See {@link CircleCollider.moveTopY}. */
   moveTopY?: number;
   /** See {@link CircleCollider.standable}. */
@@ -697,6 +703,7 @@ function staticWorldColliders(seed: number): Collider[] {
       z: d.z,
       r: d.r,
       cameraTopY: topY(seed, d.x, d.z, d.h ?? 4),
+      camGhost: true,
     });
   }
 

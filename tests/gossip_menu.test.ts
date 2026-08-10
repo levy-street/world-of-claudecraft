@@ -125,6 +125,7 @@ describe('gossipMenuIsEmpty', () => {
         hasVcup: false,
         hasCardMaster: false,
         hasTraining: false,
+        hasFerry: false,
       }),
     ).toBe(false);
     // The WARFARE quartermaster alone. Its own dimension, because the shop row
@@ -214,6 +215,7 @@ describe('gossipMenuIsEmpty', () => {
         hasVendor: false,
         hasMarket: false,
         hasHeroicVendor: false,
+        hasWarfareVendor: false,
         hasDelveBoard: false,
         hasVcup: false,
         hasCardMaster: false,
@@ -241,6 +243,7 @@ describe('gossipMenuIsEmpty', () => {
         hasVcup: false,
         hasCardMaster: false,
         hasTraining: false,
+        hasFerry: false,
       }),
     ).toBe(false);
     // The goods row alone (an unflagged NPC with stock) still keeps it open.
@@ -256,6 +259,7 @@ describe('gossipMenuIsEmpty', () => {
         hasVcup: false,
         hasCardMaster: false,
         hasTraining: false,
+        hasFerry: false,
       }),
     ).toBe(false);
   });

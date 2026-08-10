@@ -184,6 +184,8 @@ describe('Input autorun', () => {
       strafeLeft: false,
       strafeRight: false,
       jump: false,
+      dive: false,
+      surface: false,
     });
     expect(input.controllerFacingOverride()).toBeNull();
 
@@ -222,6 +224,9 @@ describe('Input autorun', () => {
       strafeLeft: false,
       strafeRight: true,
       jump: false,
+      dive: false,
+      surface: false,
+      swimSteer: undefined,
     });
     expect(input.controllerFacingOverride()).toBe(0.75);
 

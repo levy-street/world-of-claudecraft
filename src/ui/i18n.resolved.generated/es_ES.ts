@@ -816,6 +816,7 @@ export const es_ES: EnTranslations = {
       "leaderboard": "Clasificación",
       "dailyRewards": "Tienda",
       "deeds": "Gestas",
+      "mounts": "Mounts",
       "professions": "Profesiones",
       "nameplates": "Nombres",
       "haptics": "Vibración",
@@ -987,16 +988,21 @@ export const es_ES: EnTranslations = {
       "resetConfirmBody": "La primera barra vuelve a sus teclas predeterminadas. La segunda y la tercera quedan sin asignar. Esto no se puede deshacer."
     },
     "mounts": {
+      "title": "Mounts",
+      "close": "Close",
+      "select": "Select",
+      "selected": "Selected",
+      "riding": "Riding",
       "mount": "Montar",
-      "dismount": "Desmontar",
+      "dismount": "Dismount",
       "useToRide": "Usar para invocar esta montura.",
       "emptyTitle": "Ninguna montura obtenida",
       "emptyStableHint": "Alcanza el nivel 20 y toma clases de monta con la Caballeriza mayor Marla en los establos al oeste de Highwatch.",
       "emptyDropHint": "Las monturas más raras las sueltan los jefes de mazmorras y bandas.",
       "clickManage": "Haz clic para elegir tu montura",
-      "rarity_common": "Común",
-      "rarity_rare": "Rara",
-      "rarity_epic": "Épica",
+      "rarity_common": "Common",
+      "rarity_rare": "Rare",
+      "rarity_epic": "Epic",
       "spec_speed": "+{pct}% de movilidad adicional",
       "name_valorsteed": "Corcel del Valor",
       "name_grag_bear": "Oso Grag Goliat",
@@ -1019,6 +1025,7 @@ export const es_ES: EnTranslations = {
     },
     "mountTraining": {
       "mountPrompt": "Pulsa {key} para montar el Corcel del Valor de entrenamiento.",
+      "buyReinsPrompt": "Riding learned. Buy Valorsteed reins from Marla for 10 gold, then use them to ride.",
       "ownedMountPrompt": "Tus riendas están en tus bolsas. Úsalas para montar.",
       "ridePrompt": "Sigue el marcador brillante hasta la línea de salida, y luego pulsa Iniciar Carrera.",
       "begin": "Comenzar Lección",
@@ -15123,6 +15130,12 @@ export const es_ES: EnTranslations = {
           },
           "4": {
             "label": "Los Campos de la Brecha"
+          },
+          "5": {
+            "label": "The Breach"
+          },
+          "6": {
+            "label": "The Wreckfields"
           }
         }
       }

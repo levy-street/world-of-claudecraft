@@ -1025,6 +1025,7 @@ export const da_DK: EnTranslations = {
     },
     "mountTraining": {
       "mountPrompt": "Tryk på {key} for at stige op på trænings-Modgangeren.",
+      "buyReinsPrompt": "Riding learned. Buy Valorsteed reins from Marla for 10 gold, then use them to ride.",
       "ownedMountPrompt": "Dine tøjler er i dine tasker. Brug dem til at ride.",
       "ridePrompt": "Følg den glødende markør til startlinjen, og tryk derefter på Start Løb.",
       "begin": "Begynd Lektion",
@@ -15129,6 +15130,12 @@ export const da_DK: EnTranslations = {
           },
           "4": {
             "label": "Riftmarkerne"
+          },
+          "5": {
+            "label": "The Breach"
+          },
+          "6": {
+            "label": "The Wreckfields"
           }
         }
       }
