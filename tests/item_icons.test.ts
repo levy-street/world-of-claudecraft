@@ -401,6 +401,37 @@ describe('item webp icons', () => {
     expect(b.prims[0]?.p).toBe('sack');
   });
 
+  it('A4c) the eight farm dishes differ in their PRIM LISTS, never only the shared food radial', () => {
+    // The A4b lesson generalized to the Phase 6 dish family: all eight sit on
+    // the 'food' radial DELIBERATELY (a cooked dish must never read as raw
+    // produce), and three also share a palette, so A4's whole-recipe JSON
+    // identity could be satisfied by the background alone, a distinction a
+    // 32px bag cell does not show. Demanding pairwise-distinct prim lists
+    // (each prim WITH its palette) keeps every pair tellable at a glance.
+    const DISH_ICON_IDS = [
+      'vale_hearth_loaf',
+      'eastbrook_root_pottage',
+      'fenbridge_rice_bowl',
+      'fenbridge_beet_braise',
+      'highwatch_barley_bannock',
+      'highwatch_gourd_soup',
+      'evergarden_sunmelon_tart',
+      'evergarden_harvest_platter',
+    ];
+    const seen = new Map<string, string>();
+    for (const id of DISH_ICON_IDS) {
+      const recipe = itemIconRecipe(id);
+      // Non-vacuity: the family really does share the food radial today,
+      // which is exactly what makes background-only distinctness a live
+      // hazard; if a dish leaves the radial, re-aim this pin deliberately.
+      expect(recipe.bg, `${id} left the shared food radial`).toBe('food');
+      const key = JSON.stringify(recipe.prims);
+      const clash = seen.get(key);
+      expect(clash, `${id} must not share its prim list with ${clash}`).toBeUndefined();
+      seen.set(key, id);
+    }
+  });
+
   it('B) commits only webp art (+ mapping.json) under public/ui/items', () => {
     const stray = walk(itemsDir)
       .filter((p) => !isDotfile(p) && !isMapping(p) && path.extname(p).toLowerCase() !== '.webp')

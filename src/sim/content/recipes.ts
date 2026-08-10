@@ -1663,7 +1663,17 @@ export const LADDER_RECIPES: ProfessionRecipeRecord[] = [
 // VALUES ARE PROPOSED AND FLAGGED FOR THE MAINTAINER: classic-modest, and
 // every foodHp/sellValue pair REUSES a point the shipped food curve already
 // ships (980 is the ceiling, conjured_bread4). Reagent counts are sized so
-// each dish vendors strictly below its input value at the LISTED counts.
+// each dish vendors strictly below its input value at the LISTED counts on
+// the recipe-economy unitValue basis (buyValue when one exists, else
+// sellValue); on a raw sellValue basis the beet braise is exactly break-even,
+// which converts produce without minting copper and is the intended shape.
+// TRAINABLE BEFORE GO-LIVE, deliberately (deviation (aj)): the binding
+// Live-surface note wants these visible in the crafting window while the
+// farm is dormant, and trainer acquisition is the only path there, so a
+// player can train dishes they cannot cook until Phase 9 (free at rung 0,
+// the settled R8 fee curve's tier-0 point, and fee-charging at rungs 25/50;
+// the garden_hoe priced-but-dormant precedent; pinned in
+// tests/farm_recipes.test.ts).
 export const FARM_RECIPES: ProfessionRecipeRecord[] = [
   {
     id: 'recipe_vale_hearth_loaf',

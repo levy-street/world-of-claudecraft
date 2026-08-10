@@ -2363,7 +2363,7 @@ export const zh_CN: EnTranslations = {
       "resonantLinks": "附魔材料。分解精良及以上品质的锁甲可得。",
       "resonantSteel": "附魔材料。分解精良及以上品质的近战武器可得。",
       "resonantTimber": "附魔材料。分解精良及以上品质的法杖、魔杖、弓和弩可得。",
-      "growthTonic": "农用品。种植时使用,有机会获得更多收成。"
+      "growthTonic": "农用品。种植时使用，有机会获得更多收成。"
     },
     "discord": {
       "title": "Discord",

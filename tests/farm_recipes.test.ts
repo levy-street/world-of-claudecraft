@@ -28,12 +28,16 @@
 // the second describe below: it shares the list, not the dish contract (a
 // different craft, a different station, a kind 'junk' output rather than food).
 import { describe, expect, it } from 'vitest';
+import { STATIONS } from '../src/sim/content/professions';
 import { FARM_RECIPES, LADDER_RECIPES } from '../src/sim/content/recipes';
 // ITEMS and ALL_RECIPES from data (the merged view the sim, the trainer, the
 // crafting window and the guide all read), not from content: a row authored in
 // content but never joined into the merged table would be unreachable in play,
 // and this suite would still pass reading content directly.
 import { ALL_RECIPES, ITEMS } from '../src/sim/data';
+import { stationsOfType } from '../src/sim/professions/stations';
+import { resolveTrain } from '../src/sim/professions/training';
+import { Sim } from '../src/sim/sim';
 
 const dishes = FARM_RECIPES.filter((r) => r.professionId === 'cooking');
 
@@ -424,5 +428,38 @@ describe('FARM_RECIPES: the growth tonic, the farming-alchemy trade (D7)', () =>
     // Non-vacuity: the ladder really is a populated list with alchemy rows in
     // it, so the two absences above are facts and not an empty-list artifact.
     expect(LADDER_RECIPES.filter((r) => r.professionId === 'alchemy').length).toBeGreaterThan(0);
+  });
+});
+
+describe('FARM_RECIPES: trainable before go-live is the INTENDED dormant-visible state', () => {
+  // Deviation (aj): the phase's binding Live-surface note makes the recipes
+  // "visible in the crafting window" before Phase 9, and trainer acquisition
+  // is the only mechanism that puts them there, so every row is trainable AND
+  // fee-charging in the live game while the farm itself is dormant (the
+  // garden_hoe priced-but-unstocked precedent, deviation (aa), extended to
+  // recipes). This arm pins that ruling so a future availability gate cannot
+  // land silently, and so the ruling itself stays falsifiable: if the
+  // maintainer wants training gated to go-live instead, THIS test is the one
+  // that reds and names the decision to revisit.
+  it('rung-0 rows train free and a rung-50 dish charges, all resolving ok at their stations', () => {
+    const sim = new Sim({ seed: 7, playerClass: 'warrior' });
+    const meta = (sim as any).players.get(sim.playerId);
+    meta.copper = 100000;
+    meta.craftSkills.cooking = 50; // teach tier for the rung-50 dish
+    // Fees come from the settled exception-free curve (TRAINING_FEE_BY_TIER,
+    // ruling R8): tier 0 is genuinely FREE, tier 2 charges 10000 copper. Both
+    // shapes are pinned so neither a surprise fee at the starter rung nor a
+    // silently-freed premium rung can land unnoticed.
+    for (const [recipeId, stationType, fee] of [
+      ['recipe_vale_hearth_loaf', 'kitchens', 0],
+      ['recipe_growth_tonic', 'apothecary', 0],
+      ['recipe_evergarden_harvest_platter', 'kitchens', 10000],
+    ] as const) {
+      const station = stationsOfType(STATIONS, stationType)[0];
+      expect(station, `no placed ${stationType} station to train at`).toBeDefined();
+      const result = resolveTrain(STATIONS, meta, station.pos, recipeId);
+      expect(result.ok, `${recipeId} must be trainable pre-go-live (deviation (aj))`).toBe(true);
+      expect(result.fee, `${recipeId} fee off the settled R8 curve`).toBe(fee);
+    }
   });
 });

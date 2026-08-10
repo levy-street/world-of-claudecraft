@@ -10807,7 +10807,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.materialHint.resonantLinks': '附魔材料。分解精良及以上品質的鎖甲可得。',
   'hudChrome.materialHint.resonantSteel': '附魔材料。分解精良及以上品質的近戰武器可得。',
   'hudChrome.materialHint.resonantTimber': '附魔材料。分解精良及以上品質的法杖、魔杖、弓和弩可得。',
-  'hudChrome.materialHint.growthTonic': '農用品。種植時使用,有機會獲得更多收成。',
+  'hudChrome.materialHint.growthTonic': '農用品。種植時使用，有機會獲得更多收成。',
   'hudChrome.enchanting.tier.base': '基礎附魔',
   'hudChrome.enchanting.tier.runed': '符文附魔',
   'hudChrome.enchanting.tier.greater': '強效附魔',

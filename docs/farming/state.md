@@ -126,7 +126,10 @@ visit or a punishment for lateness is violating the design, not tuning it.
   (vale_wheat seed and produce plus the fine_vale_wheat twin, and withered_husks)
   with consumers explicitly deferred (husks to the Phase 4 convertHusks command,
   produce to the Phase 6 dishes); the rule is then enforced for the full crop set by
-  the Phase 5 rollout arms and closed by Phase 6. [The original "and its grades row"
+  the Phase 5 rollout arms and closed by Phase 6. [CLOSED by Phase 6: FARM_RECIPES
+  landed the dishes and the tonic craft, the rollout closure arm derives recipe
+  consumers from merged ALL_RECIPES, and the five-twin deferred literal is gone;
+  see the Phase 6 items/recipes ledger entry.] [The original "and its grades row"
   clause here is AMENDED by deviation (o): fine twins ship as ordinary items with NO
   MATERIAL_GRADES row; that table is pinned as exactly the nine node yields, and the
   fine roll lives in farming's own harvest resolver.]
@@ -523,7 +526,15 @@ question does not arise (farming has no station).
   so wireRev covers success); the Phase 3 warning about knob COMMANDS needing
   command-side marking was RETIRED BY DESIGN instead: the knobs are not
   commands, they ride plant_crop's payload, and every paid knob spends items.
-- New i18n keys and matcher rows: Phase 4: six hudChrome.farming keys, each with
+- New i18n keys and matcher rows: Phase 6: eight item-name rows in the items
+  catalog (the dishes; English plus the five non-Latin fills per M16) and ONE
+  hudChrome key, materialHint.growthTonic (the crafted tonic's tooltip purpose
+  line, wordy value with its five non-Latin fills). NO recipe-name keys exist
+  anywhere: a recipe displays its result item's name (crafting_window renders
+  itemDisplayName(row.result)), so the phase file's "recipe name rows" wording
+  is satisfied by the item rows alone. No matcher rows (recipes emit no
+  sim-side player text).
+  Phase 4: six hudChrome.farming keys, each with
   five non-Latin fills (M16): denied.{no_husks, no_compost, no_fee_produce,
   no_tonic} plus husksConvertedLine/husksConvertedLineQty (the trade line names
   both sides: the husks spent and the compost gained). Two item-name rows in the
@@ -548,7 +559,36 @@ question does not arise (farming has no station).
   error.castingPlanting for the one sim-side English sentence 'You are
   planting.' (BASE_DICT locale fill deferred to release-time per the
   contributor contract). All wordy values carry the five non-Latin fills (M16).
-- New items/recipes/deeds: Phase 4 also minted two more maintainer-flagged
+- New items/recipes/deeds: Phase 6: FARM_RECIPES (src/sim/content/recipes.ts), the
+  farm-economy hook list beside HOE_RECIPES/ROD_RECIPES, 9 trainer-taught rows
+  joined into the content-side ALL_RECIPES spread: 8 cooking dishes (two per crop
+  tier at rungs 0/25/50 with the 10/10, 16/15, 20/20 scaffolding; every
+  foodHp/sellValue pair REUSES a shipped food-curve point, ceiling 980 reached
+  never exceeded: vale_hearth_loaf 90/6, eastbrook_root_pottage 117/12,
+  fenbridge_rice_bowl 243/25, fenbridge_beet_braise 432/40,
+  highwatch_barley_bannock 552/60, highwatch_gourd_soup 552/75,
+  evergarden_sunmelon_tart 980/150, evergarden_harvest_platter 980/150; kind food,
+  foodHp only, NO buff machinery, no buyValue, quality matches the rung) plus
+  recipe_growth_tonic (alchemy, silverleaf_herb x2 + glass_vial x1 at skillReq 0,
+  output 6 under input 20). All values maintainer-flagged at their rows. Every
+  row keeps one no-buyValue reagent, so none joins the counterfactual vendor-fed
+  literal; the trainer-sum pin and professions_crafting recipeList pin gained the
+  list; FARM_RECIPES length pinned twice (9 whole-list, 8 cooking-filtered).
+  CONSUMER NOTES CLOSED: the five deferred fine twins each gained a dedicated
+  dish slot (fine_brook_carrot in the pottage, fine_bog_beet in the braise,
+  fine_frost_gourd in the gourd soup, fine_gilded_sunmelon in the tart,
+  fine_evergarden_greens in the platter), all 8 base produce appear across the
+  dish set, the rollout closure arm now derives recipe consumers from merged
+  ALL_RECIPES (the old derivation could not see recipes and would have stayed
+  green while lying), and the items.ts consumer-note comments name the live
+  consumers. fine_marsh_rice and fine_highland_barley remain hoe-reagent-only
+  by design of the 5-slot closure (see OPEN items). ITEM_ART_PENDING re-pinned
+  31 to 39 (the 8 dishes ride as art debt with pairwise-distinct procedural
+  recipes on the food radial, no pair separated by palette alone). growth_tonic
+  joined MATERIAL_HINT_KEYS (the exact-set pin re-minted deliberately): a
+  recipe output must render purpose text and its junk kind has no def-level
+  use line. No new deeds (dishes are not conquerable content).
+  Phase 4 also minted two more maintainer-flagged
   constant families the first write of this entry omitted (Phase 4 QA
   correction; both live at their definitions and in the progress.md notes):
   FARM_WATCH_FEE_BY_TIER = 2/3/4/6 produce for tiers 1 to 4
@@ -803,6 +843,37 @@ question does not arise (farming has no station).
   the window reopened. The Phase 7/8 change that lands a harvest confirm
   channel edits the predicate and the resolver arm together; the layout pin
   (farming buttons without toggle, mining control arm) moves with it.
+  Phase 6: (ai) the growth tonic recipe is CRAFTABLE from wild herbs before
+  go-live, against the phase file's blanket "every new recipe has at least one
+  reagent unobtainable until go-live" note: D7 locks the tonic to herbs (the
+  cross-profession trade), herbs are wild-gathered today, and the D-decision
+  wins. The enforced dormancy pins are the vendor-goods-alone pair in
+  tests/professions_zone_rollout.test.ts (every FARM_RECIPES row keeps one
+  reagent no NPC stocks AND one with no buyValue; for the tonic both are
+  silverleaf_herb), and the tonic's real pre-go-live dormancy is economic: its
+  only sink is the plant-time knob and seeds have no faucet until Phase 9.
+  Crafting it early is a strict gold loss (output 6 under input 20), so no
+  exploit window opens. The dishes keep the stronger property (farm produce
+  nobody can grow); the arm asserts unstocked-ness, never uncraftability.
+  (aj) all nine FARM_RECIPES rows are TRAINABLE in the live game before
+  go-live, deliberately: the binding Live-surface note wants the recipes
+  visible in the crafting window while the farm is dormant, trainer
+  acquisition is the only mechanism that puts a recipe there, and train_view
+  walks ALL_RECIPES with no availability gate. The architecture review
+  surfaced it as a rollout-policy call; ruled the garden_hoe
+  priced-but-dormant precedent (deviation (aa)) extended to recipes, pinned
+  through resolveTrain in tests/farm_recipes.test.ts (rung-0 rows resolve ok
+  and FREE per the settled R8 fee curve's tier-0 point, the rung-50 platter
+  resolves ok charging 10000) so a future availability gate cannot land
+  silently. Maintainer flag rides the FARM_RECIPES header.
+  Two review-round residuals ledgered, not fixed: the closure arm derives
+  recipe consumers from the whole merged ALL_RECIPES, so an unrelated future
+  recipe could keep a farming material green after its farm-side demand
+  disappeared (the literal twin-to-dish map bounds the five that matter); and
+  the phase is content-only at the file level but not the behavior level:
+  craftIdsForMaterialItem and the taxonomy now map farm produce to cooking,
+  whose consumers are all UI (hint lines, bag/bank filters), none tick-side
+  or wire-side, so determinism is untouched.
 - Dev command surface: Phase 3 registers /dev farmgrow [bedId] (alias
   /devfarmgrow [bedId]) in src/sim/dev_commands.ts behind ALLOW_DEV_COMMANDS:
   with a bed id it advances that plot, without one it advances ALL of the
@@ -1065,3 +1136,12 @@ question does not arise (farming has no station).
   yes; it is automatic via the data-driven arm; flag in the Phase 1 PR body).
 - Seed-back roll rates for tier 3/4 seeds (economy-sensitive; propose in the content
   phase with the market in mind).
+- Phase 6 proposed values awaiting sign-off: the eight dish foodHp/sellValue
+  assignments (each reuses a shipped curve point; flagged at their rows in
+  profession_items.ts), the dish reagent counts, the tonic recipe (silverleaf x2 +
+  glass_vial x1 at skillReq 0; rationale at the row: the tonic is a plant-time knob
+  for every tier and is never vendor-stocked, so the accessible trainer rung is its
+  only faucet), and whether fine_marsh_rice / fine_highland_barley should ALSO gain
+  dish consumers: the Phase 5 deferred literal named exactly five twins, so the
+  closure left those two hoe-reagent-only (documented honestly at their items.ts
+  rows; adding dishes for them is a content decision, not a gap in the closure pin).

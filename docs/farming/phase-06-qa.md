@@ -20,12 +20,13 @@ three-host parity, i18n completeness, and the phase's own acceptance criteria.
 STEP 0 - PRE-FLIGHT
 - Work ONLY in the persistent worktree ~/Documents/woc-farming-plan; prefix every git
   command with git -C ~/Documents/woc-farming-plan; git status must be clean.
-- Check out the Phase 6 PR branch (fix/farming-phase-06-economy-hooks unless
-  progress.md records another name).
-- Identify the phase diff: the PR's commits against its base (gh pr view for the
-  base, then git merge-base with it). The release tip may have moved concurrently,
-  so the diff is the PR's commits, never everything-since-phase-start. If the diff
-  cannot be identified cleanly, stop and surface.
+- [AMENDED per D22, the Phase 1 QA precedent: no PR exists. The phase landed as
+  local commits merged --no-ff into feature/farming-plan; audit the merge commit
+  (progress.md records it) and its phase-side parent chain. The phase diff is the
+  four phase commits AFTER the tenth release absorb 6b04c188ff (which was
+  release-merge-audited separately): feat(cooking) ae814834f3, feat(alchemy)
+  f570a39002, test(economy) f76fb4e41e, fix(ui) 544a291f98, plus the docs commit.]
+- If the diff cannot be identified cleanly, stop and surface.
 - Scan Claude Code memory: the MEMORY.md index, the farming-skill-program entry, plus
   mutation-checks-commit-first, i18n-semantic-regressions-gate-trap,
   big-diff-reviewer-turn-budgets.
@@ -55,6 +56,11 @@ Correctness agent:
   faucet (no vendorItems row anywhere sells it, directly or via a craftable chain of
   vendor-only inputs). A recipe craftable from vendor goods alone violates the
   binding Live-surface note and is BLOCKING.
+  [AMENDED by deviation (ai), state.md wins: craftable-from-WILD-HERBS is NOT a
+  violation for the tonic (D7 locks herbs as its inputs; silverleaf_herb has no
+  vendor faucet, which is exactly what the pin asserts). The BLOCKING bar is
+  vendor-goods-alone, not obtainable-inputs-alone; the dishes additionally keep a
+  farm-produce reagent nobody can grow before go-live.]
 - PHASE EMPHASIS, chain termination: every new recipe's reagent chain terminates in
   Phase 5 farming content or existing materials; no reagent id dangles or references
   unshipped content.
