@@ -1090,6 +1090,15 @@ describe('the farming ladder: every farming zone arrives mechanically whole', ()
         priceless.length,
         `${recipe.id} needs at least one reagent with no vendor buy price`,
       ).toBeGreaterThan(0);
+      // The symmetric OUTPUT arm: no NPC may stock a farm dish or the tonic
+      // either (the farming-item arm above cannot see them: dishes are kind
+      // food, outside FARM_MATERIAL_ITEM_IDS). buyValue undefined already
+      // makes a stock row render-and-refuse, but the honest claim is that no
+      // row exists at all before the Phase 9 go-live.
+      expect(
+        stockedItemIds.has(recipe.resultItemId),
+        `an NPC stocks ${recipe.resultItemId} before the Phase 9 go-live`,
+      ).toBe(false);
     }
   });
 });

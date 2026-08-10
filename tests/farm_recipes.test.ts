@@ -431,6 +431,101 @@ describe('FARM_RECIPES: the growth tonic, the farming-alchemy trade (D7)', () =>
   });
 });
 
+describe('FARM_RECIPES: the dish ItemDef shape is closed until Phase 11 reopens it', () => {
+  it('every dish def carries EXACTLY the six plain-food keys, nothing more', () => {
+    // The acceptance criterion "foodHp only, NO buff machinery" as an
+    // absence pin, not a comment: Phase 11 is the well-fed phase, so the
+    // field these dishes must not carry is SCHEDULED to exist. This exact
+    // key-set pin makes attaching it to a shipped dish a deliberate re-pin
+    // here instead of a silent def edit.
+    const PLAIN_FOOD_KEYS = ['foodHp', 'id', 'kind', 'name', 'quality', 'sellValue'];
+    for (const dish of dishes) {
+      const def = ITEMS[dish.resultItemId];
+      expect(
+        Object.keys(def).sort(),
+        `${dish.resultItemId} grew beyond the plain-food shape; Phase 11 must re-pin this deliberately`,
+      ).toEqual(PLAIN_FOOD_KEYS);
+    }
+  });
+
+  it('every allowed curve point is carried by a live non-dish food, so the reuse claim stays true', () => {
+    // ALLOWED_FOOD_CURVE_POINTS is hand-authored; this arm backs each pair
+    // against the live ITEMS table so a re-price of the owning shipped food
+    // reds here instead of silently orphaning the "reuses a shipped point"
+    // claim.
+    const dishIds = new Set(dishes.map((d) => d.resultItemId));
+    for (const [foodHp, sellValue] of ALLOWED_FOOD_CURVE_POINTS) {
+      const owner = Object.entries(ITEMS).find(
+        ([id, def]) => !dishIds.has(id) && def.foodHp === foodHp && def.sellValue === sellValue,
+      );
+      expect(
+        owner,
+        `no shipped non-dish food carries the ${foodHp}/${sellValue} point anymore; re-anchor or retire it`,
+      ).toBeDefined();
+    }
+  });
+});
+
+describe('FARM_RECIPES: a dish crafts for real, and fine twins never substitute for base produce', () => {
+  function countOf(sim: Sim, itemId: string): number {
+    const meta = (sim as any).players.get(sim.playerId);
+    let total = 0;
+    for (const slot of meta.inventory) {
+      if (slot?.itemId === itemId) total += slot.count ?? 1;
+    }
+    return total;
+  }
+
+  it('the pottage refuses an all-fine-twin payment, then crafts from the true reagents', () => {
+    // The fine-twin closure argument rests on NO downward grade substitution
+    // for farm rows (materialGradeIds walks MATERIAL_GRADES only, and no
+    // farm item is a member). Executed here rather than trusted: a bag full
+    // of fine twins must NOT satisfy the base-produce slots, and the true
+    // reagents must. recipe_eastbrook_root_pottage asks brook_carrot x2 +
+    // fine_brook_carrot x1 + vale_wheat x1 at skillReq 0.
+    const sim = new Sim({ seed: 11, playerClass: 'warrior' });
+    const pid = sim.playerId;
+    const recipe = dishes.find((r) => r.id === 'recipe_eastbrook_root_pottage');
+    expect(recipe, 'the pottage row exists').toBeDefined();
+    if (!recipe) return;
+    const station = stationsOfType(STATIONS, recipe.stationType as never)[0];
+    const entity = (sim as any).entities.get(pid);
+    entity.pos.x = station.pos.x;
+    entity.pos.z = station.pos.z;
+    entity.prevPos = { ...entity.pos };
+    // Learn the trainer-taught row up front, so BOTH attempts below are
+    // decided by the reagent check alone: the refusal must be attributable
+    // to the missing base produce, never to an unknown recipe.
+    (sim as any).players.get(pid).knownRecipes.add(recipe.id);
+
+    // Fine twins standing in for BOTH base slots: refused, bags untouched.
+    sim.addItem('fine_brook_carrot', 3, pid); // covers its own slot and dwarfs the base ask
+    sim.addItem('fine_vale_wheat', 2, pid);
+    sim.craftItem(recipe.id, false, pid, 1);
+    expect(
+      countOf(sim, recipe.resultItemId),
+      'a fine-twin-only bag must never cook the pottage',
+    ).toBe(0);
+    expect(countOf(sim, 'fine_brook_carrot'), 'refusal consumes nothing').toBe(3);
+    expect(countOf(sim, 'fine_vale_wheat'), 'refusal consumes nothing').toBe(2);
+
+    // The true reagents: the craft starts, completes, and pays exactly once.
+    sim.addItem('brook_carrot', 2, pid);
+    sim.addItem('vale_wheat', 1, pid);
+    sim.craftItem(recipe.id, false, pid, 1);
+    const player = (sim as any).entities.get(pid);
+    const meta = (sim as any).players.get(pid);
+    player.castingAbility = null;
+    player.castRemaining = 0;
+    sim.ctx.completeCraftCast(player, meta);
+    expect(countOf(sim, recipe.resultItemId), 'the pottage lands in the bag').toBe(1);
+    expect(countOf(sim, 'brook_carrot'), 'base produce spent').toBe(0);
+    expect(countOf(sim, 'vale_wheat'), 'base produce spent').toBe(0);
+    expect(countOf(sim, 'fine_brook_carrot'), 'exactly one fine twin spent').toBe(2);
+    expect(countOf(sim, 'fine_vale_wheat'), 'the wheat twin is not a reagent here').toBe(2);
+  });
+});
+
 describe('FARM_RECIPES: trainable before go-live is the INTENDED dormant-visible state', () => {
   // Deviation (aj): the phase's binding Live-surface note makes the recipes
   // "visible in the crafting window" before Phase 9, and trainer acquisition
