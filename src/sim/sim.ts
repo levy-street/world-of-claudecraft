@@ -3488,7 +3488,13 @@ export class Sim {
       // content-bounded near ten, so oversized junk simply drops here.
       if (s.wyrmfallDaily) {
         meta.wyrmfallDaily = {
-          date: typeof s.wyrmfallDaily.date === 'string' ? s.wyrmfallDaily.date : '',
+          // The date carries the same 64-char cap as the tokens: a real value
+          // is always 10 chars, and an uncapped corrupt date would re-save
+          // verbatim forever (the omission arm keeps any non-empty date).
+          date:
+            typeof s.wyrmfallDaily.date === 'string' && s.wyrmfallDaily.date.length <= 64
+              ? s.wyrmfallDaily.date
+              : '',
           sources: new Set(
             Array.isArray(s.wyrmfallDaily.sources)
               ? s.wyrmfallDaily.sources

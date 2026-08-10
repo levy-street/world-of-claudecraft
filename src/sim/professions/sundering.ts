@@ -118,6 +118,10 @@ export function extractEssence(
 export function completeSunderCast(ctx: SimContext, p: Entity, meta: PlayerMeta): void {
   const session = clearEnchantCastSession(p);
   const itemId = session.itemId;
+  // Empty session: silent no-op (the completeDisenchantCast precedent).
+  // Unreachable from the live path (every start writes a non-empty id); a
+  // defensive deny here would emit a phantom refusal for a cast that never was.
+  if (itemId === '') return;
   const slotIndex = session.bagSlot < 0 ? undefined : session.bagSlot;
   // The phase 03 QA amendment's re-check: re-resolve the selected copy at
   // completion and refuse if it moved or merged (inv_sort's consolidation
@@ -135,6 +139,10 @@ export function completeSunderCast(ctx: SimContext, p: Entity, meta: PlayerMeta)
     ctx.error(meta.entityId, 'You are not holding that item.');
     return;
   }
+  // The consume mutated the bags on its own (the grant's addItem fires the
+  // quest hook for its half, but the destroy half must not lean on that
+  // coupling): the resolveDisenchant siblings fire it after each consume.
+  ctx.onInventoryChangedForQuests(meta);
   const def = ITEMS[itemId];
   // silent + callerLogs: the sunder line below owns BOTH halves of the grant
   // feedback (the #2458 rule: a grant that stands its hub line down stands

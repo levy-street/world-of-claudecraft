@@ -34,7 +34,6 @@ import {
   canEquipItem,
   canEquipItemInSlot,
   displacedSlotForEquip,
-  equipCandidateIndex,
   equipCandidateQuality,
   isUniqueEquipped,
   masterwroughtConflictSlot,

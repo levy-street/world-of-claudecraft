@@ -12,6 +12,7 @@ import { enterDungeon } from '../src/sim/instances/dungeons';
 import {
   awardRiftFirstClearMaterials,
   EMBER_ACCRUAL_GRANT_CAP,
+  EMBER_ELIGIBLE_RIFT_TIERS,
   emberWeekAnchorOf,
   emberWeeksBetween,
   FINAL_BOSS_TEMPLATE_IDS,
@@ -147,6 +148,21 @@ describe('ember week math (pure)', () => {
   it("no calendar means no weekly boundary ('' in, '' out; junk in, '' out)", () => {
     expect(emberWeekAnchorOf('')).toBe('');
     expect(emberWeekAnchorOf('not-a-date')).toBe('');
+  });
+
+  it('normalization is single-pass: every rendered anchor re-parses or is empty', () => {
+    // A well-formed but ancient year: without the year pad the render is
+    // '2-12-31', which the anchor parser REJECTS, so the very act of
+    // normalizing would mint a value that stalls the weekly grant for a
+    // session. Padded, it round-trips and is idempotent.
+    expect(emberWeekAnchorOf('0003-01-01')).toBe('0002-12-31');
+    expect(emberWeekAnchorOf(emberWeekAnchorOf('0003-01-01'))).toBe('0002-12-31');
+    // Out-of-calendar arithmetic that overflows four year digits cannot
+    // round-trip the anchor shape at all: it degrades to '' in ONE pass
+    // (no anchor, the first-grant arm recovers) instead of storing an
+    // unparseable five-digit date for a session.
+    expect(emberWeekAnchorOf('9999-99-99')).toBe('');
+    expect(emberWeekAnchorOf('0000-00-00')).toBe('');
   });
 
   it('counts whole weeks between anchors, signed', () => {
@@ -350,6 +366,33 @@ describe('wyrmfall cores: the two raid arms', () => {
     );
     expect(metas[0].wyrmfallDaily.sources.has('nythraxis_boss_arena:heroic')).toBe(true);
   });
+
+  it('normal then heroic the same day: two sources, two payouts on one character', () => {
+    // The raid's difficulty-scoped source keys are the DELIBERATE double
+    // faucet (the ledger mirrors the difficulty-scoped lockout): a character
+    // who clears both difficulties in one reset day is paid once per source.
+    // A refactor that collapses the key to the dungeonId alone fails here.
+    const { sim, raiders, boss } = raidRig('normal');
+    const metas = raiders.map((pid) => sim.players.get(pid)! as PlayerMeta);
+    sim.ctx.awardWyrmfallCores(boss, metas);
+    const afterNormal = sim.countItem(WYRMFALL_CORE_ITEM_ID, raiders[0]);
+    expect(afterNormal).toBeGreaterThanOrEqual(WYRMFALL_BOSS_MIN);
+    const tank = raiders[0];
+    // Retire the normal claim (an existing claim always wins re-entry): the
+    // live run is over for this probe, and no lockout bars the heroic door
+    // because the daily source gate, not the lockout, is what is under test.
+    const normalInst = claimedDungeon(sim, 'nythraxis_boss_arena', 'normal');
+    (sim.instances as any[]).splice((sim.instances as any[]).indexOf(normalInst), 1);
+    sim.setDungeonDifficulty('heroic', tank);
+    for (const pid of raiders) enterDungeon(sim.ctx, 'nythraxis_boss_arena', pid);
+    const heroicInst = claimedDungeon(sim, 'nythraxis_boss_arena', 'heroic');
+    expect(heroicInst).toBeTruthy();
+    const heroicBoss = mobInInstance(sim, heroicInst, 'nythraxis_scourge_of_thornpeak');
+    sim.ctx.awardWyrmfallCores(heroicBoss, metas);
+    expect(sim.countItem(WYRMFALL_CORE_ITEM_ID, raiders[0])).toBeGreaterThan(afterNormal);
+    expect(metas[0].wyrmfallDaily.sources.has('nythraxis_boss_arena:normal')).toBe(true);
+    expect(metas[0].wyrmfallDaily.sources.has('nythraxis_boss_arena:heroic')).toBe(true);
+  });
 });
 
 describe('wyrmfall cores: the rift first-clear arm', () => {
@@ -409,8 +452,12 @@ describe('wyrmfall cores: the rift first-clear arm', () => {
     expect(sim.countItem(WYRMFALL_CORE_ITEM_ID, winner)).toBe(WYRMFALL_RIFT_COUNT.A);
     const meta = sim.players.get(winner)! as PlayerMeta;
     expect(meta.wyrmfallDaily.sources.has('rift')).toBe(true);
-    // A second A/S first clear the same day grants nothing more (R9's cap).
+    // A second A/S first clear the same day grants nothing more (R9's cap),
+    // and a rank RE-ROLL (finishing S after claiming A) pays no top-up: the
+    // shared 'rift' source token is the whole gate.
     awardRiftFirstClearMaterials(sim.ctx, 'A', [winner]);
+    expect(sim.countItem(WYRMFALL_CORE_ITEM_ID, winner)).toBe(WYRMFALL_RIFT_COUNT.A);
+    awardRiftFirstClearMaterials(sim.ctx, 'S', [winner]);
     expect(sim.countItem(WYRMFALL_CORE_ITEM_ID, winner)).toBe(WYRMFALL_RIFT_COUNT.A);
     // Next reset day: the rift source pays again.
     (sim as any).resetDay = '2026-08-13';
@@ -430,6 +477,67 @@ describe('wyrmfall cores: the rift first-clear arm', () => {
     const bRig = riftEventRig('B');
     winRace(bRig.sim, bRig.inst, bRig.winner);
     expect(bRig.sim.countItem(WYRMFALL_CORE_ITEM_ID, bRig.winner)).toBe(0);
+  });
+
+  it('the ember gates on EMBER_ELIGIBLE_RIFT_TIERS, never on the core count table', () => {
+    // R4 and R9 are independent rulings: a tier present in the ember set but
+    // absent from the core table must pay the keystone WITH ZERO CORES on the
+    // winning arm (the variant that derives ember eligibility from the core
+    // table pays winners nothing and losers the ember, inverting the
+    // incentive). B is in neither set today, so probe by widening the ember
+    // set at the seam and restoring it.
+    const { sim } = riftEventRig('A');
+    (sim as any).resetDay = TUESDAY;
+    const pid = sim.addPlayer('mage', 'Probe');
+    const emberSet = EMBER_ELIGIBLE_RIFT_TIERS as Set<'A' | 'S' | 'B'>;
+    emberSet.add('B');
+    try {
+      awardRiftFirstClearMaterials(sim.ctx, 'B', [pid]);
+      expect(sim.countItem(WYRMFALL_CORE_ITEM_ID, pid)).toBe(0);
+      expect(sim.countItem(MAKERS_EMBER_ITEM_ID, pid)).toBe(1);
+    } finally {
+      emberSet.delete('B');
+    }
+    // Control with the live tables: B pays neither.
+    const control = sim.addPlayer('mage', 'Ctrl');
+    awardRiftFirstClearMaterials(sim.ctx, 'B', [control]);
+    expect(sim.countItem(WYRMFALL_CORE_ITEM_ID, control)).toBe(0);
+    expect(sim.countItem(MAKERS_EMBER_ITEM_ID, control)).toBe(0);
+  });
+
+  it('a departing character (leave snapshot captured) earns nothing from either rift arm', () => {
+    const { sim } = riftEventRig('A');
+    (sim as any).resetDay = TUESDAY;
+    const pid = sim.addPlayer('mage', 'Ghost');
+    const meta = sim.players.get(pid)! as PlayerMeta;
+    meta.leaving = true;
+    awardRiftFirstClearMaterials(sim.ctx, 'A', [pid]);
+    grantRiftClearEmbers(sim.ctx, 'A', [pid], 'ev_race');
+    expect(sim.countItem(WYRMFALL_CORE_ITEM_ID, pid)).toBe(0);
+    expect(sim.countItem(MAKERS_EMBER_ITEM_ID, pid)).toBe(0);
+    expect(meta.wyrmfallDaily.sources.size).toBe(0);
+    // Positive control: the same character pays once the flag drops.
+    meta.leaving = false;
+    awardRiftFirstClearMaterials(sim.ctx, 'A', [pid]);
+    expect(sim.countItem(WYRMFALL_CORE_ITEM_ID, pid)).toBe(WYRMFALL_RIFT_COUNT.A);
+    expect(sim.countItem(MAKERS_EMBER_ITEM_ID, pid)).toBe(1);
+  });
+
+  it('a dev-portal clear (no world event) pays no cores and no ember, end to end', () => {
+    const { sim } = riftEventRig('A');
+    (sim as any).resetDay = TUESDAY;
+    const dev = sim.addPlayer('warrior', 'Devver');
+    sim.setPlayerLevel(20, dev);
+    // Dev entry: no portal entity, no raced event; the instance carries
+    // eventId null and claimRiftFirstClear returns {won: true, event: null}.
+    sim.enterRift(4242, RIFT_RANK_BASE_LEVEL.A, dev);
+    const devRun = sim.riftInstances.find((i: any) => i.memberIds.has(dev))!;
+    expect(devRun.eventId).toBeNull();
+    winRace(sim, devRun, dev);
+    expect(sim.countItem(WYRMFALL_CORE_ITEM_ID, dev)).toBe(0);
+    expect(sim.countItem(MAKERS_EMBER_ITEM_ID, dev)).toBe(0);
+    const meta = sim.players.get(dev)! as PlayerMeta;
+    expect(meta.wyrmfallDaily.sources.size).toBe(0);
   });
 
   it('a losing A-rank crew gets the ember and no cores, end to end', () => {
@@ -528,11 +636,48 @@ describe("maker's ember: the weekly bankable keystone", () => {
     // A losing A/S rift crew still ticks the weekly check (mercy, not a race
     // prize); a B-rank loss does not.
     const other = dsim.addPlayer('mage', 'Loser');
-    const otherMeta = dsim.players.get(other)! as PlayerMeta;
-    grantRiftClearEmbers(dsim.ctx, 'B', [other]);
+    grantRiftClearEmbers(dsim.ctx, 'B', [other], 'ev_race');
     expect(dsim.countItem(MAKERS_EMBER_ITEM_ID, other)).toBe(0);
-    grantRiftClearEmbers(dsim.ctx, 'S', [other]);
+    grantRiftClearEmbers(dsim.ctx, 'S', [other], 'ev_race');
     expect(dsim.countItem(MAKERS_EMBER_ITEM_ID, other)).toBe(1);
+    // A run outside the race (a dev portal has no event) is not a faucet on
+    // the losing arm either: the guard is local, not a claim-shape accident.
+    const dev = dsim.addPlayer('mage', 'Devver');
+    grantRiftClearEmbers(dsim.ctx, 'S', [dev], null);
+    expect(dsim.countItem(MAKERS_EMBER_ITEM_ID, dev)).toBe(0);
+  });
+
+  it('rides completion, not the core gate: a closed daily source still pays the week', () => {
+    const { sim: dsim, leader, boss } = heroicMorthenRig();
+    (dsim as any).resetDay = TUESDAY;
+    killBoss(dsim, leader, boss);
+    expect(dsim.countItem(MAKERS_EMBER_ITEM_ID, leader)).toBe(1);
+    const leaderMeta = dsim.players.get(leader)! as PlayerMeta;
+    // Rewind the stored anchor one week and re-run the SAME source the same
+    // day: the core gate is closed (no second core payout), but the ember
+    // check must still run and pay the elapsed week. A variant that tucks the
+    // ember call inside the daily-gate block passes every other arm and
+    // fails exactly here.
+    const before = dsim.countItem(WYRMFALL_CORE_ITEM_ID, leader);
+    leaderMeta.emberWeekAnchor = '2026-08-04';
+    dsim.ctx.awardWyrmfallCores(boss, [leaderMeta]);
+    expect(dsim.countItem(WYRMFALL_CORE_ITEM_ID, leader)).toBe(before);
+    expect(dsim.countItem(MAKERS_EMBER_ITEM_ID, leader)).toBe(2);
+  });
+
+  it('present participants only: the raven-paid absentee banks the week, no ember now', () => {
+    const { sim: dsim, leader, member, boss } = heroicMorthenRig();
+    (dsim as any).resetDay = TUESDAY;
+    const leaderMeta = dsim.players.get(leader)! as PlayerMeta;
+    // Only the leader is in the death-time snapshot: the member takes cores
+    // by raven and must NOT tick the weekly ember (their week stays banked
+    // for their own next completion; dropping the present guard pays them
+    // here and fails this arm).
+    dsim.ctx.awardWyrmfallCores(boss, [leaderMeta]);
+    expect(dsim.countItem(MAKERS_EMBER_ITEM_ID, leader)).toBe(1);
+    expect(dsim.countItem(MAKERS_EMBER_ITEM_ID, member)).toBe(0);
+    const memberMeta = dsim.players.get(member)! as PlayerMeta;
+    expect(memberMeta.emberWeekAnchor).toBe('');
   });
 
   it('the ember and essence defs are bound tokens (soulbound, noDiscard, stack 20)', () => {
@@ -540,12 +685,29 @@ describe("maker's ember: the weekly bankable keystone", () => {
       expect(ITEMS[id].soulbound, id).toBe(true);
       expect(ITEMS[id].noDiscard, id).toBe(true);
       expect(ITEMS[id].kind, id).toBe('tool');
+      expect(ITEMS[id].quality, id).toBe('epic');
       expect(ITEMS[id].stackSize, id).toBe(20);
       expect(ITEMS[id].sellValue, id).toBe(0);
     }
     // The accrual payout cap IS "one full stack": tie the two so a stack
     // retune cannot silently falsify the cap's stated meaning.
     expect(EMBER_ACCRUAL_GRANT_CAP).toBe(ITEMS[MAKERS_EMBER_ITEM_ID].stackSize);
+  });
+
+  it('the recorded faucet numbers are literals, not whatever the constants say', () => {
+    // Each of these is a recorded decision in the Phase 04 ledger; comparing
+    // grants against the imported constants alone lets a silent retune pass
+    // every behavioral arm (the constant-self-comparison trap).
+    expect([WYRMFALL_BOSS_MIN, WYRMFALL_BOSS_MAX]).toEqual([1, 3]);
+    expect(SUNDERED_ESSENCE_YIELD).toBe(1);
+    const core = ITEMS[WYRMFALL_CORE_ITEM_ID];
+    expect(core.kind).toBe('junk');
+    expect(core.quality).toBe('rare');
+    expect(core.stackSize).toBe(20);
+    expect(core.sellValue).toBe(50);
+    // Freely tradable per R2's catalyst design: neither bound nor delisted.
+    expect(core.soulbound).toBeUndefined();
+    expect((core as { noMarketList?: boolean }).noMarketList).toBeUndefined();
   });
 });
 
@@ -604,10 +766,47 @@ describe('sundered essence: the extraction', () => {
     expect(sim.countItem(SUNDERED_ESSENCE_ITEM_ID, pid)).toBe(0);
   });
 
+  it('the eligibility boundary: raid legendaries, heroic-raid epics, rift gear all refuse', () => {
+    // Deleting the quality === 'epic' clause makes the two RAID LEGENDARIES
+    // sunderable (they are the only raid-sourced non-epics); deleting the
+    // itemFromRaid clause admits five-man and rift gear. One negative per
+    // clause so each is load-bearing on its own.
+    const sim = makeSunderSim();
+    const { pid } = playerOf(sim);
+    sim.addItem('deathless_heartwood', 1, pid); // raid-sourced LEGENDARY
+    sim.drainEvents();
+    runSunder(sim, 'deathless_heartwood');
+    const errors = (sim.drainEvents() as any[]).filter((e) => e.type === 'error');
+    expect(errors.map((e) => e.text)).toEqual(['Only raid-won epics can be sundered.']);
+    expect(sim.countItem('deathless_heartwood', pid)).toBe(1);
+    expect(sim.countItem(SUNDERED_ESSENCE_ITEM_ID, pid)).toBe(0);
+    // The scope AS SHIPPED (open item: pending a ruling before phase 12):
+    // the source index registers heroic-raid variants raid: false, so a
+    // heroic Nythraxis epic is NOT sunderable; neither is rift gear.
+    expect(ITEMS.deathless_greatblade.quality).toBe('epic');
+    expect(isSunderable(ITEMS.deathless_greatblade)).toBe(false);
+    expect(isSunderable(ITEMS.heart_of_the_rift)).toBe(false);
+    expect(isSunderable(ITEMS.deathless_heartwood)).toBe(false);
+  });
+
   it('refuses while busy and while dead', () => {
     const sim = makeSunderSim();
     const { p, pid } = playerOf(sim);
     sim.addItem(RAID_EPIC, 2, pid);
+    // The OTHER busy arm first: eating blocks the start just like a cast.
+    (p as AnyEntity).eating = {
+      itemId: 'conjured_bread4',
+      kind: 'food',
+      hpPer2s: 5,
+      manaPer2s: 0,
+      remaining: 10,
+      ticksElapsed: 0,
+    };
+    sim.drainEvents();
+    sim.extractEssence(RAID_EPIC);
+    const eating = (sim.drainEvents() as any[]).filter((e) => e.type === 'error');
+    expect(eating.map((e) => e.text)).toEqual(['You are busy.']);
+    (p as AnyEntity).eating = null;
     sim.extractEssence(RAID_EPIC);
     expect(p.castingAbility).toBe('sundering');
     sim.drainEvents();
@@ -770,6 +969,21 @@ describe('persistence: the two new PlayerMeta fields', () => {
     const sim3 = makeDungeonSim(3);
     const pid3 = sim3.addPlayer('warrior', 'Bad', { state });
     expect((sim3.players.get(pid3)! as PlayerMeta).emberWeekAnchor).toBe(TUESDAY);
+    // A well-formed but OUT-OF-RANGE year: the load normalization must yield
+    // a state the weekly grant recovers from IN THIS SESSION (the padded
+    // renderer keeps ancient years parseable; overflow degrades to '').
+    // Before the year pad, this normalized to the unparseable '2-12-31' and
+    // the grant silently stalled until the NEXT load.
+    state.emberWeekAnchor = '0003-01-01';
+    const sim4 = makeDungeonSim(3);
+    const pid4 = sim4.addPlayer('warrior', 'Bad', { state });
+    const meta4 = sim4.players.get(pid4)! as PlayerMeta;
+    expect(meta4.emberWeekAnchor).toBe('0002-12-31');
+    (sim4 as any).resetDay = TUESDAY;
+    tryGrantMakersEmber(sim4.ctx, meta4);
+    // The ancient anchor accrues a giant backlog: the capped payout proves
+    // the weekly math ran (a stalled grant would pay zero).
+    expect(sim4.countItem(MAKERS_EMBER_ITEM_ID, pid4)).toBe(EMBER_ACCRUAL_GRANT_CAP);
   });
 
   it('oversized junk in the sources array drops at the load clamp', () => {
@@ -790,6 +1004,16 @@ describe('persistence: the two new PlayerMeta fields', () => {
     expect(meta2.wyrmfallDaily.sources.has('rift')).toBe(true);
     expect(meta2.wyrmfallDaily.sources.has('x'.repeat(65))).toBe(false);
     expect(meta2.wyrmfallDaily.sources.size).toBeLessThanOrEqual(32);
+    // The DATE half carries the same cap: an uncapped corrupt date would
+    // re-save verbatim on every autosave forever (the omission arm keeps any
+    // non-empty date, and only the award paths ever rewrite it).
+    state.wyrmfallDaily = { date: 'x'.repeat(100), sources: ['rift'] };
+    const sim3 = makeDungeonSim(3);
+    const pid3 = sim3.addPlayer('warrior', 'Fat', { state });
+    const meta3 = sim3.players.get(pid3)! as PlayerMeta;
+    expect(meta3.wyrmfallDaily.date).toBe('');
+    // A real date is untouched by the cap (positive control).
+    expect(meta2.wyrmfallDaily.date).toBe(TUESDAY);
   });
 
   it('zero-default omission: an untouched character serializes without the keys', () => {

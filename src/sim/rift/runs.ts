@@ -1382,7 +1382,7 @@ function completeRiftClear(ctx: SimContext, inst: RiftInstance, boss: Entity | n
     // Masterwrought (phase 04): losing the race forfeits the first-clear
     // cores, but an A/S clear still counts as the week's eligible endgame
     // completion for the Maker's Ember keystone. Draw-free.
-    grantRiftClearEmbers(ctx, riftRankForBaseLevel(inst.baseLevel), participants);
+    grantRiftClearEmbers(ctx, riftRankForBaseLevel(inst.baseLevel), participants, inst.eventId);
     completeLosingRun(ctx, inst);
     return true;
   }

@@ -127,6 +127,18 @@ function pad2(n: number): string {
   return n < 10 ? `0${n}` : `${n}`;
 }
 
+// Render a day number back to the RESET_DAY_RE shape, or '' when the year
+// cannot round-trip that shape (below 0 or above 9999). Without the year pad
+// and the range bail, normalizing an out-of-range-but-well-formed anchor
+// ('0003-01-01') would itself mint an UNPARSEABLE value ('2-12-31') that
+// stalls the weekly grant until the next load re-normalizes it to ''; with
+// them, normalization is single-pass: every output either parses or is ''.
+function renderWeekAnchor(dayNum: number): string {
+  const { y, m, d } = civilFromDays(dayNum);
+  if (y < 0 || y > 9999) return '';
+  return `${String(y).padStart(4, '0')}-${pad2(m)}-${pad2(d)}`;
+}
+
 /** The ember week a reset-day window belongs to, as the `YYYY-MM-DD` of the
  *  most recent weekly reset day (Tuesday) on or before it. '' in, '' out:
  *  no calendar known means no weekly boundary, the shared daily contract. */
@@ -136,8 +148,7 @@ export function emberWeekAnchorOf(resetDay: string): string {
   // 1970-01-01 was a Thursday; with Sunday = 0 that epoch day is dow 4.
   const dow = (((dayNum + 4) % 7) + 7) % 7;
   const back = (dow - EMBER_WEEK_RESET_DOW + 7) % 7;
-  const { y, m, d } = civilFromDays(dayNum - back);
-  return `${y}-${pad2(m)}-${pad2(d)}`;
+  return renderWeekAnchor(dayNum - back);
 }
 
 /** Whole weeks from one week-anchor string to another (negative when `to`
@@ -155,8 +166,7 @@ export function emberWeeksBetween(from: string, to: string): number {
 export function emberWeekAnchorPlusWeeks(anchor: string, weeks: number): string {
   const dayNum = resetDayToDayNumber(anchor);
   if (dayNum === null) return '';
-  const { y, m, d } = civilFromDays(dayNum + weeks * 7);
-  return `${y}-${pad2(m)}-${pad2(d)}`;
+  return renderWeekAnchor(dayNum + weeks * 7);
 }
 
 // --- The daily gate ---------------------------------------------------------
@@ -264,17 +274,27 @@ export function awardRiftFirstClearMaterials(
   tier: RiftTier,
   participants: readonly number[],
 ): void {
+  // The core payout and the ember check gate INDEPENDENTLY (R9 vs R4): the
+  // ember consults EMBER_ELIGIBLE_RIFT_TIERS, never the core count table, so
+  // a tier added to one set alone behaves the same on the winning and losing
+  // arms instead of inverting the incentive (winners unpaid, losers paid).
   const riftCount = WYRMFALL_RIFT_COUNT[tier] ?? 0;
-  if (riftCount === 0) return;
+  const emberEligible = EMBER_ELIGIBLE_RIFT_TIERS.has(tier);
+  if (riftCount === 0 && !emberEligible) return;
   for (const pid of participants) {
     const meta = ctx.players.get(pid);
-    if (!meta) continue;
-    refreshWyrmfallDaily(ctx, meta);
-    if (!meta.wyrmfallDaily.sources.has(WYRMFALL_RIFT_SOURCE)) {
-      meta.wyrmfallDaily.sources.add(WYRMFALL_RIFT_SOURCE);
-      ctx.addItem(WYRMFALL_CORE_ITEM_ID, riftCount, meta.entityId);
+    // A departing character (leave snapshot already captured) earns nothing
+    // here: a post-snapshot grant would be discarded on reconnect anyway, and
+    // the boss-faucet rosters are pre-filtered the same way.
+    if (!meta || meta.leaving) continue;
+    if (riftCount > 0) {
+      refreshWyrmfallDaily(ctx, meta);
+      if (!meta.wyrmfallDaily.sources.has(WYRMFALL_RIFT_SOURCE)) {
+        meta.wyrmfallDaily.sources.add(WYRMFALL_RIFT_SOURCE);
+        ctx.addItem(WYRMFALL_CORE_ITEM_ID, riftCount, meta.entityId);
+      }
     }
-    tryGrantMakersEmber(ctx, meta);
+    if (emberEligible) tryGrantMakersEmber(ctx, meta);
   }
 }
 
@@ -286,10 +306,17 @@ export function grantRiftClearEmbers(
   ctx: SimContext,
   tier: RiftTier,
   participants: readonly number[],
+  eventId: string | null,
 ): void {
+  // A run outside the race (a dev portal) is not a material faucet on EITHER
+  // arm. The winning arm holds this via claim.event; this local guard keeps
+  // the losing arm's half of the module-header guarantee true even if
+  // claimRiftFirstClear's dev-portal return shape ever changes.
+  if (eventId === null) return;
   if (!EMBER_ELIGIBLE_RIFT_TIERS.has(tier)) return;
   for (const pid of participants) {
     const meta = ctx.players.get(pid);
-    if (meta) tryGrantMakersEmber(ctx, meta);
+    if (!meta || meta.leaving) continue;
+    tryGrantMakersEmber(ctx, meta);
   }
 }
