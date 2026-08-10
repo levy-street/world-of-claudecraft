@@ -1578,7 +1578,7 @@ export class ReliquaryWindow {
         const def = knownItemDef(ITEMS, art.itemId);
         if (def) return this.deps.itemIcon(def);
       } else if (art.kind === 'url') {
-        return itemIconImgHtml(art.url, quality);
+        return itemIconImgHtml(art.url, quality, art.fallbackUrl);
       } else {
         return itemIconImgHtml(this.crestIconSrc(art.crestId), quality);
       }
@@ -1744,6 +1744,22 @@ export class ReliquaryWindow {
   }
 
   private wire(el: HTMLElement, model: ReliquaryViewModel): void {
+    // A slain proof starts on its exact mob portrait, with the authored trophy
+    // glyph carried only as a mixed-deploy/decode fallback. Disarm BEFORE the
+    // swap and listen once, so even a malformed fallback cannot recurse.
+    for (const img of el.querySelectorAll<HTMLImageElement>('img[data-icon-fallback-src]')) {
+      img.addEventListener(
+        'error',
+        () => {
+          const fallback = img.getAttribute('data-icon-fallback-src');
+          img.removeAttribute('data-icon-fallback-src');
+          if (fallback !== null && img.getAttribute('src') !== fallback) {
+            img.setAttribute('src', fallback);
+          }
+        },
+        { once: true },
+      );
+    }
     el.querySelector('[data-close]')?.addEventListener('click', () => {
       this.close();
       audio.click();

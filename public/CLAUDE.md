@@ -41,7 +41,7 @@ have their own `CLAUDE.md` with per-asset notes (public, see above).
 | `env` | HDRIs (`*_1k.hdr` + `*_2k.hdr`) for IBL/sky + `*_backdrop(.webp/_4k.webp)` | RGBELoader / texture |
 | `vfx` | particle sprites (`.png`) | texture |
 | `audio` | music `.mp3` + `sfx/` (combat/ambient/footsteps, ...) + `voice/<npc>/` lines | `Audio()` / `src/game/sfx_manifest.generated.ts` / `src/game/voice_manifest.generated.ts` |
-| `ui` | `skills/<class>/` (WebP ability icons) + `specs/<class>/` (WebP specialization emblems) + `classes/` and `crests/` (class/family/status emblems) + `items/` (painted WebP inventory art, including per-item weapons) + `deeds/` (WebP deed crests, gated by `tests/deed_icons.test.ts`) + `mobs/` (prerendered WebP target portraits, one per mob template; regenerate with `node scripts/render_finder_portraits.mjs`; existence-gated BOTH directions by `tests/target_portrait_view.test.ts`) + `ranks/` (rank-frame emblem WebP, pinned by `tests/target_rank_view.test.ts`) + `cursors/` (PNG) + `emotes/` (PNG) + `weapons/` (legacy JPG previews for held-model and Armory tooling) | `<img>` / CSS cursor |
+| `ui` | `skills/<class>/` (WebP ability icons) + `specs/<class>/` (WebP specialization emblems) + `classes/` and `crests/` (class/family/status emblems) + `items/` (painted WebP inventory art, including per-item weapons) + `deeds/` (WebP deed crests, gated by `tests/deed_icons.test.ts`) + `mobs/` (prerendered WebP target portraits, one per mob template; regenerate with `node scripts/render_finder_portraits.mjs`; existence-gated BOTH directions by `tests/target_portrait_view.test.ts`) + `portraits/` (reviewed static target art for procedural entities outside the deterministic mob-render ledger) + `ranks/` (rank-frame emblem WebP, pinned by `tests/target_rank_view.test.ts`) + `cursors/` (PNG) + `emotes/` (PNG) + `weapons/` (legacy JPG previews for held-model and Armory tooling) | `<img>` / CSS cursor |
 | `fonts` | self-hosted `.woff2` guide fonts (Alegreya, Alegreya Sans, Cinzel subsets) | CSS `@font-face` |
 | `guide-stills` | committed WebP wiki stills; existence-gated BOTH directions by `tests/guide.test.ts`; regenerate with `npm run wiki:stills` (deterministic per machine, never diff-gated) | guide SPA |
 
@@ -106,7 +106,10 @@ are deliberately English-only (no `data-i18n`).
   (`scripts/convert_skill_icons_webp.mjs`): it converts each non-webp image to WebP
   (`smartSubsample` on) and deletes the original. WebP is the source of truth, there is NO
   build-time conversion (the script is a pre-commit step; `tests/skill_icons.test.ts` fails if a
-  non-webp image is committed under `ui/skills/`). This is the "keep only shipped, optimized
+  non-webp image is committed under `ui/skills/`). Every registered skill WebP is a distinct,
+  valid, exact 128x128 sRGB shipping image under the catalog-wide 16 KiB ceiling; fresh converter
+  outputs retain the stricter 15 KiB intake cap. The gate also rejects missing, orphaned,
+  duplicate, nearly invisible, or wrongly placed art. This is the "keep only shipped, optimized
   assets" rule above: the lossless source is not committed. Only `ui/skills/` is auto-converted and
   gated; the existing `cursors/`/`emotes/` PNG and legacy `weapons/` JPG previews are
   grandfathered. Prefer WebP for any new icon art; inventory weapons belong in `ui/items/` by

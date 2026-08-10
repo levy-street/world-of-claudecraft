@@ -19,11 +19,11 @@
 // A slot with no answer returns null and the window keeps its previous
 // behavior, so an id this bundle does not know still renders something.
 //
-// Two mark families have no committed art anywhere and take an authored
-// inline glyph instead of the ghost: gather_event:perfect_specimen (fires on
-// corpse harvest, which belongs to no gathering profession, so there is no
-// profession image to borrow) gets the specimen flask, and the 19 slain:*
-// rare kill proofs (Phase 21) share the trophy-skull glyph below.
+// One mark has no committed art anywhere and takes an authored inline glyph
+// instead of the ghost: gather_event:perfect_specimen fires on corpse harvest,
+// which belongs to no gathering profession, so there is no profession image
+// to borrow. The 19 slain:* rare kill proofs use their exact committed mob
+// portraits and retain the authored trophy skull only as a load-error fallback.
 //
 // This module is an ART SOURCE (the icons.ts family), not a painter, which is
 // why the authored glyph's palette lives here as literal colors: the painter
@@ -39,6 +39,7 @@ import { deedCrestHasPaintedArt, deedCrestId } from './deeds_view';
 import { knownItemDef, ownEntry } from './known_item';
 import { MASTERWORK_SEAL_IMAGE_URL, professionImageUrl } from './profession_art';
 import type { ReliquaryRelicNameKind } from './reliquary_view';
+import { targetPortraitUrl } from './target_portrait_view';
 import { ARMORY_SKIN_ART_DIR, armorySkinArt } from './woc_store_view';
 
 /**
@@ -51,7 +52,7 @@ import { ARMORY_SKIN_ART_DIR, armorySkinArt } from './woc_store_view';
  */
 export type ReliquaryCellArt =
   | { kind: 'item'; itemId: string }
-  | { kind: 'url'; url: string }
+  | { kind: 'url'; url: string; fallbackUrl?: string }
   | { kind: 'crest'; crestId: string };
 
 /** The relic slot shape both Reliquary art surfaces hand in (a grid cell and a
@@ -126,16 +127,15 @@ export const RELIQUARY_SPECIMEN_GLYPH_URL = `data:image/svg+xml,${encodeURICompo
 export const RELIQUARY_SLAIN_GLYPH_ID = 'woc-slain-glyph';
 
 /** The `slain:` visited namespace prefix the kill-credit site writes
- *  (src/sim/deeds.ts); the one mark family with neither profession art nor a
- *  committed image, so it takes the authored trophy glyph below. */
+ *  (src/sim/deeds.ts). */
 const SLAIN_MARK_PREFIX = 'slain:';
 
 // The rare-slain trophy: a horned beast skull, same authored-inline regime and
 // DESIGN.md section 6 direction as the specimen flask above (rich color, heavy
 // dark outline, light from the top left; double-quoted attributes, no
-// apostrophes, encoding survives the window's esc()). One glyph for the whole
-// family on purpose: the mark's NAME carries which rare fell, and 19 bespoke
-// portraits are an art-pipeline project, not a catalog obligation.
+// apostrophes, encoding survives the window's esc()). It is the safe fallback
+// for the exact mob portraits, so a missing/mixed-deploy WebP still paints a
+// recognizable slain trophy rather than browser-broken art.
 const SLAIN_SKULL_PATH =
   'M20 24c0-8 5-13 12-13s12 5 12 13c0 5-2 8-4 10v9l-4 7h-8l-4-7v-9c-2-2-4-5-4-10z';
 const SLAIN_GLYPH_SVG =
@@ -217,10 +217,9 @@ export function reliquaryCellArt(slot: ReliquaryArtSlot): ReliquaryCellArt | nul
  * (the deed_cat_* category fallbacks plus a bespoke crest whose art has not
  * landed; the compositor fills its whole tile with an opaque radial). The
  * other families stay legible under the darken without a carve-out: the
- * professions sheet, painted `deed_<id>` crests, and the specimen glyph
- * carry a real alpha matte, and item art is dark-card style on both of its
- * pipelines (the /ui/items webps, mostly alpha-less, and the /ui/weapons
- * rendered-model jpgs), a bright subject on a near-black card that still
+ * professions sheet, painted `deed_<id>` crests, and the specimen/slain
+ * fallback glyphs carry a real alpha matte. Item art and mob portraits use
+ * dark-card compositions: a bright subject on a near-black card that still
  * reads when darkened. tests/reliquary_cell_art.test.ts pins the per-family
  * premise off the shipped image files, including that every catalogued item
  * relic really resolves to one of those two committed pipelines, so a
@@ -251,7 +250,11 @@ function markArt(markId: string): ReliquaryCellArt | null {
   // same allowlist noteReliquaryMark writes through), so a junk `slain:` id off
   // the wire still answers null instead of minting trophy art for it.
   if (markId.startsWith(SLAIN_MARK_PREFIX) && RELIQUARY_MARK_IDS.has(markId)) {
-    return { kind: 'url', url: RELIQUARY_SLAIN_GLYPH_URL };
+    const templateId = markId.slice(SLAIN_MARK_PREFIX.length);
+    const portraitUrl = targetPortraitUrl(templateId, true);
+    return portraitUrl === null
+      ? { kind: 'url', url: RELIQUARY_SLAIN_GLYPH_URL }
+      : { kind: 'url', url: portraitUrl, fallbackUrl: RELIQUARY_SLAIN_GLYPH_URL };
   }
   return null;
 }

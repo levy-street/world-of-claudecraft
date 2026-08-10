@@ -987,4 +987,48 @@ export const table: DeedLocaleTable = {
     name: 'Mạ Đến Hoàn Hảo',
     desc: 'Chế tạo vật phẩm hiếm đầu tiên trong Rèn Giáp.',
   },
+  col_reliquary_rank_2: {
+    name: 'Người Giữ Chiến Lợi',
+    desc: 'Đạt cấp Quản Thủ 2 trong Kỳ Trân Các (10 kỳ trân độc nhất đã biên mục).',
+    title: 'Người Giữ Chiến Lợi',
+  },
+  col_reliquary_rank_3: {
+    name: 'Người Biên Mục',
+    desc: 'Đạt cấp Quản Thủ 3 trong Kỳ Trân Các (25 kỳ trân độc nhất đã biên mục).',
+    title: 'Người Biên Mục',
+  },
+  col_reliquary_rank_4: {
+    name: 'Đại Quản Thủ',
+    desc: 'Đạt cấp Quản Thủ 4 trong Kỳ Trân Các (50 kỳ trân độc nhất đã biên mục).',
+    title: 'Đại Quản Thủ',
+  },
+  col_reliquary_rank_5: {
+    name: 'Chiến Lợi Vĩnh Hằng',
+    desc: 'Đạt cấp Quản Thủ 5 trong Kỳ Trân Các (100 kỳ trân độc nhất đã biên mục).',
+  },
+  col_reliquary_complete: {
+    name: 'Đại Kỳ Trân Các',
+    desc: 'Biên mục mọi kỳ trân trong Kỳ Trân Các mà một nhân vật có thể giữ. Về sau mục lục có mở rộng cũng không bao giờ lấy lại điều đó.',
+    title: 'Quản Thủ Kho Báu',
+  },
+  col_reliquary_conquerors: {
+    name: 'Kệ Kẻ Chinh Phục',
+    desc: 'Biên mục mọi kỳ trân trên kệ Kẻ Chinh Phục của Kỳ Trân Các. Về sau mục lục có mở rộng cũng không bao giờ lấy lại điều đó.',
+    title: 'Kẻ Phá Kho Báu',
+  },
+  col_reliquary_illum_nythraxis_heroic: {
+    name: 'Nythraxis Rực Sáng',
+    desc: 'Làm rực sáng trang Anh Hùng: Raid Nythraxis của Kỳ Trân Các.',
+    title: 'Ánh Sáng Nythraxis',
+  },
+  col_reliquary_illum_thunzharr: {
+    name: 'Thunzharr Rực Sáng',
+    desc: 'Làm rực sáng trang Thunzharr, Đỉnh Núi Thức Giấc của Kỳ Trân Các.',
+    title: 'Ánh Sáng Thunzharr',
+  },
+  col_reliquary_illum_gravewyrm_heroic: {
+    name: 'Thánh Đường Rực Sáng',
+    desc: 'Làm rực sáng trang Anh Hùng: Thánh Đường Mộ Long của Kỳ Trân Các.',
+    title: 'Ánh Sáng Thánh Đường',
+  },
 };

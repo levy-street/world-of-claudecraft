@@ -7,6 +7,7 @@ import { cachedProceduralIconDataUrl, iconDataUrl, proceduralIconDataUrl } from 
 
 const FALLBACK_ID_ATTR = 'data-crest-fallback-id';
 const FALLBACK_SIZE_ATTR = 'data-crest-fallback-size';
+const FALLBACK_DECORATIVE_ATTR = 'data-crest-fallback-decorative';
 const FALLBACK_SELECTOR = `img[${FALLBACK_ID_ATTR}][${FALLBACK_SIZE_ATTR}]`;
 const FALLBACK_CLASS = 'crest-image-fallback';
 const armedImages = new WeakSet<HTMLImageElement>();
@@ -15,11 +16,21 @@ function assertCrestId(id: string): void {
   if (!/^[a-z0-9_]+$/.test(id)) throw new Error(`unsafe crest fallback id: ${id}`);
 }
 
+export interface CrestImageFallbackOptions {
+  /** Clear the subject alt if an error replaces it with an adjacent-label decorative crest. */
+  decorative?: boolean;
+}
+
 /** HTML attributes for a trusted, closed crest id. Hydrate after mounting. */
-export function crestImageFallbackAttributes(id: string, size: number): string {
+export function crestImageFallbackAttributes(
+  id: string,
+  size: number,
+  opts: CrestImageFallbackOptions = {},
+): string {
   assertCrestId(id);
   if (!Number.isInteger(size) || size <= 0) throw new Error(`invalid crest fallback size: ${size}`);
-  return `${FALLBACK_ID_ATTR}="${id}" ${FALLBACK_SIZE_ATTR}="${size}"`;
+  const decorative = opts.decorative ? ` ${FALLBACK_DECORATIVE_ATTR}="true"` : '';
+  return `${FALLBACK_ID_ATTR}="${id}" ${FALLBACK_SIZE_ATTR}="${size}"${decorative}`;
 }
 
 function armCrestImage(img: HTMLImageElement): void {
@@ -44,6 +55,7 @@ function armCrestImage(img: HTMLImageElement): void {
     const currentSize = Number(img.getAttribute(FALLBACK_SIZE_ATTR));
     if (!currentId || !Number.isInteger(currentSize) || currentSize <= 0) return;
     const currentFallback = proceduralIconDataUrl('crest', currentId, currentSize);
+    if (img.getAttribute(FALLBACK_DECORATIVE_ATTR) === 'true') img.alt = '';
     if (img.src !== currentFallback) img.src = currentFallback;
   };
 
@@ -64,6 +76,7 @@ export function hydrateCrestImageFallbacks(root: ParentNode): void {
 export function clearCrestImageFallback(img: HTMLImageElement): void {
   img.removeAttribute(FALLBACK_ID_ATTR);
   img.removeAttribute(FALLBACK_SIZE_ATTR);
+  img.removeAttribute(FALLBACK_DECORATIVE_ATTR);
   img.classList.remove(FALLBACK_CLASS);
   img.style.removeProperty('background-image');
 }
@@ -72,6 +85,7 @@ export function clearCrestImageFallback(img: HTMLImageElement): void {
 export function setCrestImageWithFallback(img: HTMLImageElement, id: string, size: number): void {
   img.setAttribute(FALLBACK_ID_ATTR, id);
   img.setAttribute(FALLBACK_SIZE_ATTR, String(size));
+  img.removeAttribute(FALLBACK_DECORATIVE_ATTR);
   img.src = iconDataUrl('crest', id, size);
   armCrestImage(img);
 }

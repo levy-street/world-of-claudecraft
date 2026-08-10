@@ -68,11 +68,14 @@ export function unknownItemIconHtml(itemId: string, quality: string = 'common'):
  *  `.item-icon` class is what every owned-cell grid sizes and what the missing
  *  state silhouettes; art emitted any other way blows out of its cell.
  *
- *  The quality rides a CLASS attribute: esc() stops quote breakout but not
- *  token injection (a space would append a second class), so the rung is
- *  constrained to a lowercase-alpha charset and anything else paints common
+ *  An optional fallback src rides a data attribute for a mounted consumer to
+ *  arm; both sources are escaped here so that consumer never has to rebuild
+ *  trusted markup. The quality rides a CLASS attribute: esc() stops quote
+ *  breakout but not token injection (a space would append a second class).
+ *  The rung is constrained to a lowercase-alpha charset; anything else paints common
  *  (an unranked lowercase rung passes and takes default styling). */
-export function itemIconImgHtml(src: string, quality: string): string {
+export function itemIconImgHtml(src: string, quality: string, fallbackSrc?: string): string {
   const rung = /^[a-z]+$/.test(quality) ? quality : 'common';
-  return `<img class="item-icon q-${rung}" src="${esc(src)}" alt="" draggable="false">`;
+  const fallback = fallbackSrc === undefined ? '' : ` data-icon-fallback-src="${esc(fallbackSrc)}"`;
+  return `<img class="item-icon q-${rung}" src="${esc(src)}"${fallback} alt="" draggable="false">`;
 }

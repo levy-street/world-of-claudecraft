@@ -35,6 +35,38 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+# Abort dead checkout transfers fast instead of letting them ride a job bound
+# to its kill. The runner-side checkout-stall class (the timeout-minutes
+# rationale on each job below) presents as a git fetch at ZERO throughput for
+# tens of minutes: run 31392590628 (2026-08-10) bound-killed the same lane
+# three attempts in a row, 20 minutes each, on fetches that produced nothing
+# and then completed moments after the kill. git's own low-speed abort ends
+# any HTTP transfer whose received payload stays under 1000 bytes per second
+# for 120 consecutive seconds (mechanism proven: a live HTTPS fetch under an
+# absurd floor dies in 2 s with curl 28), and actions/checkout then retries
+# the fetch in-step (3 attempts, 10 to 20 second backoff). HONEST LIMIT,
+# measured, not assumed: the floor polices an in-progress transfer that
+# slows to a trickle, but the hang variant observed on 2026-08-10 (run
+# 31402711619: four fetches sat 19m52s producing NOTHING, WITH this floor
+# confirmed in each step's env) dies in a phase curl's speed timer never
+# polices, so this env block did not catch it. Keep it (it is free and
+# covers the trickle variant); the reliable net for the hang variant is
+# ci-stall-rerun.yml, which reruns the run's failed jobs once (nothing
+# after the dead checkout ran, so nothing can be masked). Workflow-wide on
+# purpose: it also covers the lint job's base-ref fetch and the changes
+# job's sparse checkout, and it is inert for every non-HTTP git call (the
+# git-subprocess test fixtures run on local disk and never engage
+# git-remote-https). A healthy fetch of this repository runs orders of
+# magnitude above the floor, so a merely slow transfer is never clipped.
+# Accepted tradeoff: the bare git fetches in the lint job's "Determine base
+# ref" step gain the same floor with no retry wrapper and no auto-rerun
+# coverage (not a checkout step), so a trickle-abort there fails the
+# minutes-long lint job fast and takes a manual rerun; that beats a
+# 15-minute bound ride. Values pinned by tests/ci_workflow.test.ts.
+env:
+  GIT_HTTP_LOW_SPEED_LIMIT: '1000'
+  GIT_HTTP_LOW_SPEED_TIME: '120'
+
 # Two-tier i18n gate, split by git ref in this one file. Each tier is a parallel
 # pair (tests job + checks job, no needs edge either way) so wall clock is
 # max(tests, checks), not their sum. Locally `npm run gate` (scripts/gate.mjs)

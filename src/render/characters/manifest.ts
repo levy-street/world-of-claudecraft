@@ -2796,6 +2796,12 @@ const MOB_KEYS: Record<string, string> = {
   warlock_imp: 'mob_demon_flying',
   warlock_voidwalker: 'mob_demonalt',
   guardian_tithefiend: 'mob_demonalt',
+  // Packlord Stampede guardians are transient local templates, not MOBS rows.
+  // Give the three summoned beasts distinct existing bodies instead of the
+  // generic humanoid bandit fallback.
+  guardian_stampede_0: 'greyjaw',
+  guardian_stampede_1: 'mob_boar',
+  guardian_stampede_2: 'mob_raptor',
   wild_boar: 'mob_boar',
   // beasts that would otherwise fall back to the wolf model (FAMILY_KEYS.beast)
   old_cragmaw: 'mob_bear',

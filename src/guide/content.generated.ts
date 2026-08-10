@@ -5457,7 +5457,8 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "category": "collection",
     "renown": 0,
     "feat": false,
-    "rewardTitle": "Spoilskeeper"
+    "rewardTitle": "Spoilskeeper",
+    "crest": "/ui/deeds/col_reliquary_rank_2.webp"
   },
   {
     "id": "col_reliquary_rank_3",
@@ -5465,7 +5466,8 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "category": "collection",
     "renown": 0,
     "feat": false,
-    "rewardTitle": "the Cataloguer"
+    "rewardTitle": "the Cataloguer",
+    "crest": "/ui/deeds/col_reliquary_rank_3.webp"
   },
   {
     "id": "col_reliquary_rank_4",
@@ -5473,7 +5475,8 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "category": "collection",
     "renown": 0,
     "feat": false,
-    "rewardTitle": "Arch-Curator"
+    "rewardTitle": "Arch-Curator",
+    "crest": "/ui/deeds/col_reliquary_rank_4.webp"
   },
   {
     "id": "col_reliquary_rank_5",
@@ -5481,7 +5484,8 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "category": "collection",
     "renown": 0,
     "feat": false,
-    "rewardBorder": true
+    "rewardBorder": true,
+    "crest": "/ui/deeds/col_reliquary_rank_5.webp"
   },
   {
     "id": "pvp_honor_sergeant",
@@ -5516,7 +5520,8 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "category": "collection",
     "renown": 0,
     "feat": true,
-    "rewardTitle": "Curator of the Vault"
+    "rewardTitle": "Curator of the Vault",
+    "crest": "/ui/deeds/col_reliquary_complete.webp"
   },
   {
     "id": "col_reliquary_conquerors",
@@ -5524,7 +5529,8 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "category": "collection",
     "renown": 0,
     "feat": false,
-    "rewardTitle": "Vaultbreaker"
+    "rewardTitle": "Vaultbreaker",
+    "crest": "/ui/deeds/col_reliquary_conquerors.webp"
   },
   {
     "id": "col_reliquary_illum_nythraxis_heroic",
@@ -5532,7 +5538,8 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "category": "collection",
     "renown": 0,
     "feat": false,
-    "rewardTitle": "Light of Nythraxis"
+    "rewardTitle": "Light of Nythraxis",
+    "crest": "/ui/deeds/col_reliquary_illum_nythraxis_heroic.webp"
   },
   {
     "id": "col_reliquary_illum_thunzharr",
@@ -5540,7 +5547,8 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "category": "collection",
     "renown": 0,
     "feat": false,
-    "rewardTitle": "Light of Thunzharr"
+    "rewardTitle": "Light of Thunzharr",
+    "crest": "/ui/deeds/col_reliquary_illum_thunzharr.webp"
   },
   {
     "id": "col_reliquary_illum_gravewyrm_heroic",
@@ -5548,7 +5556,8 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "category": "collection",
     "renown": 0,
     "feat": false,
-    "rewardTitle": "Light of the Sanctum"
+    "rewardTitle": "Light of the Sanctum",
+    "crest": "/ui/deeds/col_reliquary_illum_gravewyrm_heroic.webp"
   }
 ];
 

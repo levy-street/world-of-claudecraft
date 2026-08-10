@@ -173,39 +173,21 @@ describe('title relics resolve the deed crest', () => {
     });
   });
 
-  it('routes a crest-PENDING title deed to its display-category crest, never the ghost', () => {
-    // The premise both halves rest on: the deed is catalogued on the titles
-    // page, sits in the collection category, and has no committed crest art.
+  it('routes a Reliquary title deed to its own newly painted crest', () => {
     expect(RELIQUARY_HORIZON_TITLES).toContain('col_reliquary_rank_2');
     expect(DEEDS.col_reliquary_rank_2?.category).toBe('collection');
-    expect(deedImageUrl('deed_col_reliquary_rank_2')).toBeNull();
+    expect(deedImageUrl('deed_col_reliquary_rank_2')).toBe('/ui/deeds/col_reliquary_rank_2.webp');
     const art = reliquaryCellArt({ kind: 'title', id: 'col_reliquary_rank_2' });
-    expect(art).toEqual({ kind: 'crest', crestId: 'deed_cat_collection' });
-    // Explicitly NOT the per-deed crest id, which would resolve to nothing.
-    expect(art).not.toEqual({ kind: 'crest', crestId: 'deed_col_reliquary_rank_2' });
+    expect(art).toEqual({ kind: 'crest', crestId: 'deed_col_reliquary_rank_2' });
   });
 
-  it('answers for every crest-pending title on the shelf', () => {
-    // DERIVED, not hardcoded: whichever titles have no committed crest art
-    // today must still paint their category crest (a null here is a ghosted
-    // title shelf). Deriving keeps the arm self-maintaining when the
-    // commissioned art lands; if EVERY title crest ever ships, the arm
-    // legitimately retires and the floor below should move to the painted arm.
+  it('routes every title on the shelf to a committed per-deed crest', () => {
     const pending = RELIQUARY_HORIZON_TITLES.filter((id) => deedImageUrl(`deed_${id}`) === null);
-    expect(pending.length, 'floor: the category-crest tier still has producers').toBeGreaterThan(0);
-    // Today's premise (2026-08-08): the three curator-rank bridges, four pvp
-    // titles, and the four Phase 18 completion-ladder titles on the page
-    // (col_reliquary_conquerors and the three flagship Illumination deeds;
-    // col_reliquary_complete is excluded from the page itself), 11 rows.
-    // Count-pinned loosely so ONE painted crest landing does not red this
-    // file, while a mass change still asks for a look.
-    expect(pending.length).toBeLessThanOrEqual(11);
-    for (const id of pending) {
-      const category = DEEDS[id]?.category;
-      expect(category, `${id} premise: a catalogued title deed`).toBeDefined();
+    expect(pending, 'the title shelf must not use category fallback art').toEqual([]);
+    for (const id of RELIQUARY_HORIZON_TITLES) {
       expect(reliquaryCellArt({ kind: 'title', id }), id).toEqual({
         kind: 'crest',
-        crestId: `deed_cat_${category}`,
+        crestId: `deed_${id}`,
       });
     }
   });
@@ -298,14 +280,14 @@ describe('the corpse-harvest specimen glyph', () => {
   });
 });
 
-describe('the rare-slain trophy glyph (Phase 21)', () => {
+describe('the rare-slain portraits (Phase 21)', () => {
   // sha256 of the full data URL; re-pin here on a deliberate art edit.
   const SLAIN_GLYPH_SHA256 = '9c856cb96227af2a87550e356091cbec899fed129e2099f23146232a2ce75035';
 
-  it('routes every catalogued slain mark to the one authored glyph', () => {
-    // The premise the glyph exists for: the slain family has neither
-    // profession art to borrow nor a committed image, and the name carries
-    // which rare fell, so the family shares one trophy.
+  it('routes every catalogued slain mark to its exact committed mob portrait', () => {
+    // These marks have no profession art to borrow, but each template already
+    // has the same committed portrait the target frame uses. The authored
+    // trophy stays attached only as the runtime load/decode fallback.
     expect(FIELD_NOTE_PROFESSIONS['slain:old_greyjaw']).toBeUndefined();
     const slainIds = RELIQUARY_PAGES.flatMap((page) =>
       page.relics.flatMap((relic) =>
@@ -315,9 +297,13 @@ describe('the rare-slain trophy glyph (Phase 21)', () => {
     // Anti-vacuity: the catalog really carries the 19 kill proofs.
     expect(slainIds.length).toBe(19);
     for (const id of slainIds) {
+      const templateId = id.slice('slain:'.length);
+      const portraitUrl = `/ui/mobs/${templateId}.webp`;
+      expect(existsSync(join(REPO_ROOT, 'public', portraitUrl))).toBe(true);
       expect(reliquaryCellArt({ kind: 'mark', id })).toEqual({
         kind: 'url',
-        url: RELIQUARY_SLAIN_GLYPH_URL,
+        url: portraitUrl,
+        fallbackUrl: RELIQUARY_SLAIN_GLYPH_URL,
       });
     }
     // Literal shape pins, so a re-encoding or a swapped glyph reddens.
@@ -401,6 +387,9 @@ describe('unknown ids fall through to the caller fallback', () => {
     expect(
       reliquaryCellArtOpaque({ kind: 'url', url: '/ui/professions/masterwork_seal.webp' }),
     ).toBe(false);
+    // Mob portraits are opaque dark-card art like the item family, not a
+    // bright self-backgrounded card that needs the gentler carve-out.
+    expect(reliquaryCellArtOpaque({ kind: 'url', url: '/ui/mobs/old_greyjaw.webp' })).toBe(false);
     expect(reliquaryCellArtOpaque({ kind: 'url', url: RELIQUARY_SPECIMEN_GLYPH_URL })).toBe(false);
     // The slain trophy glyph carries a real alpha matte like the specimen
     // flask, so it stays on the silhouette-darken side of the carve-out.
@@ -434,15 +423,11 @@ describe('unknown ids fall through to the caller fallback', () => {
   it('agrees with the resolver on real catalog slots (both directions)', () => {
     const skin = reliquaryCellArt({ kind: 'weapon_skin', id: 'brasscap_axe' });
     expect(skin !== null && reliquaryCellArtOpaque(skin)).toBe(true);
-    // DERIVED like the crest-pending arm: whichever title still paints the
-    // category fallback today must flag opaque; a painted one must not.
-    const pendingTitle = RELIQUARY_HORIZON_TITLES.find((id) => deedImageUrl(`deed_${id}`) === null);
-    expect(pendingTitle, 'premise: a category-crest title still exists').toBeDefined();
-    const fallback = reliquaryCellArt({ kind: 'title', id: pendingTitle as string });
-    expect(fallback !== null && reliquaryCellArtOpaque(fallback)).toBe(true);
-    const painted = reliquaryCellArt({ kind: 'title', id: 'prog_veteran' });
-    expect(painted).toEqual({ kind: 'crest', crestId: 'deed_prog_veteran' });
-    expect(painted !== null && reliquaryCellArtOpaque(painted)).toBe(false);
+    for (const id of RELIQUARY_HORIZON_TITLES) {
+      const painted = reliquaryCellArt({ kind: 'title', id });
+      expect(painted).toEqual({ kind: 'crest', crestId: `deed_${id}` });
+      expect(painted !== null && reliquaryCellArtOpaque(painted), id).toBe(false);
+    }
     const mount = reliquaryCellArt({ kind: 'mount', id: 'valorsteed' });
     expect(mount !== null && reliquaryCellArtOpaque(mount)).toBe(false);
   });
@@ -524,19 +509,18 @@ describe('shipped art files', () => {
       families.add(art.url.slice(0, art.url.lastIndexOf('/')));
       if (!existsSync(join(REPO_ROOT, 'public', art.url.slice(1)))) missing.push(art.url);
     }
-    // Anti-vacuity: both URL families the catalog reaches are really swept, so
+    // Anti-vacuity: all URL families the catalog reaches are really swept, so
     // a resolver that stopped emitting URLs could not pass by emitting none.
-    expect([...families].sort()).toEqual(['/ui/professions', '/ui/store/armory']);
+    expect([...families].sort()).toEqual(['/ui/mobs', '/ui/professions', '/ui/store/armory']);
     expect(missing, `art URLs with no committed file:\n${missing.join('\n')}`).toEqual([]);
   });
 
   it('pins the opacity premise per family off the shipped WebP headers', () => {
     // The premise under reliquaryCellArtOpaque: the silhouette filter needs
     // either a real alpha matte (professions sheet, painted deed crests) or
-    // dark-backgrounded icon-style art (the item family: 643 of its 698
-    // webps ship without alpha, but the bright subject on a near-black card
-    // still reads under brightness(0.18), verified on pixels in the Phase 16
-    // QA). What it cannot work on is BRIGHT self-backgrounded art: the
+    // dark-backgrounded icon-style art (the item family and mob portraits;
+    // their bright subjects on near-black cards still read under
+    // brightness(0.18)). What it cannot work on is BRIGHT self-backgrounded art: the
     // Armory cards (pinned opaque here, all of them; the sweep is
     // CATALOG-bounded, a skin added to WEAPON_SKINS without a reliquary slot
     // is unswept here and surfaces in reliquary_content instead) and the
@@ -551,7 +535,7 @@ describe('shipped art files', () => {
     };
     const staticCrestUrl = (crestId: string): string | null => {
       const url = deedImageUrl(crestId);
-      return url !== null && url.startsWith('/') && url.endsWith('.webp') ? url : null;
+      return url?.startsWith('/') && url.endsWith('.webp') ? url : null;
     };
     const families = new Set<string>();
     for (const slot of CATALOG_SLOTS) {
@@ -565,11 +549,16 @@ describe('shipped art files', () => {
             : null;
       if (url === null) continue;
       families.add(url.slice(0, url.lastIndexOf('/')));
-      const expectAlpha = !url.startsWith('/ui/store/armory/');
+      const expectAlpha = !url.startsWith('/ui/store/armory/') && !url.startsWith('/ui/mobs/');
       expect(hasAlpha(join(REPO_ROOT, 'public', url.slice(1))), url).toBe(expectAlpha);
     }
-    // Anti-vacuity: all three file-backed non-item families really swept.
-    expect([...families].sort()).toEqual(['/ui/deeds', '/ui/professions', '/ui/store/armory']);
+    // Anti-vacuity: all four file-backed non-item families really swept.
+    expect([...families].sort()).toEqual([
+      '/ui/deeds',
+      '/ui/mobs',
+      '/ui/professions',
+      '/ui/store/armory',
+    ]);
   });
 
   it('backs the item and crest families with committed files too', () => {
@@ -724,22 +713,38 @@ describe('ReliquaryWindow cell markup', () => {
     );
   });
 
+  it('paints a slain mark with its exact portrait and swaps to the trophy on error', () => {
+    const rig = makeRig();
+    openPage(rig, 'conquerors', 'conquerors_rares_of_the_realm');
+    const img = cellArt(rig, 'slain:old_greyjaw');
+
+    // Success path: distinct committed portrait first, with the fallback
+    // carried on the mounted node rather than replacing the primary art.
+    expect(img.getAttribute('src')).toBe('/ui/mobs/old_greyjaw.webp');
+    expect(img.getAttribute('data-icon-fallback-src')).toBe(RELIQUARY_SLAIN_GLYPH_URL);
+
+    // Failure path: one error swaps to the authored data URL and disarms the
+    // listener/attribute, so even a corrupt fallback cannot recurse.
+    img.dispatchEvent(new Event('error'));
+    expect(img.getAttribute('src')).toBe(RELIQUARY_SLAIN_GLYPH_URL);
+    expect(img.hasAttribute('data-icon-fallback-src')).toBe(false);
+    img.dispatchEvent(new Event('error'));
+    expect(img.getAttribute('src')).toBe(RELIQUARY_SLAIN_GLYPH_URL);
+  });
+
   it('paints a painted-crest title cell through the crest branch, no canvas', () => {
     // The one window branch no other arm executes (QA gate should-fix): a
-    // mutant reverting the crest arm to the ghost across the 36-cell titles
+    // mutant reverting the crest arm to the ghost across the titles
     // shelf must red here. prog_veteran ships painted crest art, so
     // iconDataUrl short-circuits to the static URL and happy-dom needs no
-    // canvas; the category-crest tier composites and stays covered at the
-    // descriptor level.
+    // canvas.
     const rig = makeRig();
     openPage(rig, 'horizons', 'horizons_titles');
     const img = cellArt(rig, 'prog_veteran');
     expect(img.getAttribute('class')).toBe('item-icon q-epic');
     expect(img.getAttribute('src')).toBe('/ui/deeds/prog_veteran.webp');
     // Shelf totality: EVERY title cell paints an art img (which also pins the
-    // crestIconSrc never-a-throw swallow explicitly: the 35 category-crest
-    // cells composite, happy-dom has no 2D context, and the swallow is what
-    // keeps each of them a painted-or-blank img rather than a render throw).
+    // crestIconSrc path and prevents any row from falling back to a blank img).
     const cells = rig.el.querySelectorAll('.reliquary-cell').length;
     expect(cells).toBeGreaterThan(30);
     expect(rig.el.querySelectorAll('.reliquary-cell .reliquary-cell-art img').length).toBe(cells);
@@ -769,15 +774,12 @@ describe('ReliquaryWindow cell markup', () => {
     // guildmark uncommon); deleting that arm paints q-common and reds here.
     expect(img.getAttribute('class')).toBe('item-icon q-uncommon');
     expect(img.matches(liveSelector)).toBe(true);
-    // The one attribute reaches BOTH opaque families: a category-fallback
-    // title crest matches the same live selector, a painted crest and a mount
-    // reins cell stay on the silhouette treatment. The negative arms assert
-    // the missing STATE and the attribute's absence separately, so a rig
-    // that ever seeds ownership cannot make them pass vacuously.
+    // Painted title crests and mount reins stay on the silhouette treatment.
+    // The negative arms assert the missing STATE and the attribute's absence
+    // separately, so a rig that ever seeds ownership cannot make them pass
+    // vacuously. No live title uses the category fallback now that every deed
+    // has accepted painted art.
     openPage(rig, 'horizons', 'horizons_titles');
-    const pendingTitle = RELIQUARY_HORIZON_TITLES.find((id) => deedImageUrl(`deed_${id}`) === null);
-    expect(pendingTitle, 'premise: a category-crest title still exists').toBeDefined();
-    expect(cellArt(rig, pendingTitle as string).matches(liveSelector)).toBe(true);
     const paintedImg = cellArt(rig, 'prog_veteran');
     expect(paintedImg.closest('.reliquary-cell--missing')).not.toBeNull();
     expect(paintedImg.closest('.reliquary-cell')?.hasAttribute('data-cell-art')).toBe(false);

@@ -12001,7 +12001,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '這個視窗收錄了各座地城與團隊副本，讓你排入快速配對，並列出正在找人的預組隊伍。預設按 Shift+I 開啟。',
   'guide.glossary.finderTerm': '地城搜尋器',
   'guide.glossary.fiveSecondDef':
-    '你的法力要等到上次花用法力後過了五秒，才會開始自行回復。這正是施法者懂得掌握節奏，而不是一路傾瀉法術的原因。',
+    '你的法力要等到上次花用法力後過了五秒，才會以完整速度回復。在那之前它並不會完全停下，而是以較慢的速度持續回復。這正是施法者懂得掌握節奏，而不是一路傾瀉法術的原因。',
   'guide.glossary.fiveSecondTerm': '五秒規則',
   'guide.glossary.honorDef':
     '與其他玩家作戰所得的報酬：競技場勝利、荊谷原野的勝場與光榮擊殺，都會為它添上一筆。你可以用它換取戰爭套裝。',
@@ -12425,7 +12425,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '戰爭是唯一一項只對其他玩家生效的屬性：它提高你對他們造成的傷害，並降低你從他們身上承受的傷害，而你的角色面板會把這兩半顯示在同一行上。面對生物時，它完全沒有作用。它來自你用榮譽購買的戰爭裝備，因此它是投入 PvP 的回報，而不是升級途中該去追逐的東西。',
   'guide.stats.warfareTitle': '戰爭',
   'guide.talentsPage.loadoutNote':
-    '你不必只定下一套配置。在面板中儲存一份具名的配置，它會同時記住天賦的選擇與你的動作列，因此切換到另一套只需要點一下，適用的規則與重置相同：必須脫離戰鬥，且不在競技場對戰或戰場之中。',
+    '你不必只定下一套配置。在面板中儲存一份具名的配置，它會同時記住天賦的選擇與你的動作列，因此切換到另一套只需要點一下，適用的規則與重置相同：必須脫離戰鬥，且不在競技場對戰之中。',
   'guide.thornhollowPage.rewardsBody':
     '每一場結束的比賽都會發放榮譽：勝利給得更多，落敗或平手則有一份安慰獎，另外你每打出一次致命一擊、每協助一次擊殺也都會拿到少量榮譽，因此在遠離旗幟的地方作戰依然值得。你每天的第一場勝利會額外加發一份獎勵，而面板會在那份獎勵仍等著你的時候告訴你。那個「一天」屬於榮譽自己，它依自己的時鐘換日，而不是跟著王國的副本重置。反覆遇上同一支隊伍時，比賽本身的報酬在第一場之後會降低，並很快穩定在一個底線，而不是一路歸零，至於棄權的比賽則完全不給報酬。你掙得的一切都能在任一位戰爭軍需官處花用。',
   'guide.thornhollowPage.rewardsHeading': '一場比賽的報酬',
@@ -12797,4 +12797,13 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.perf.diagnostics.report.status.critical': '嚴重',
   'hudChrome.perf.diagnostics.report.status.needsAttention': '需要注意',
   'hudChrome.perf.diagnostics.report.status.healthy': '正常',
+  'hudChrome.reliquary.progressText': '{owned}/{total}',
+  'guide.talentsPage.loadoutGearNote':
+    '一套配置還能連裝備一起記住。儲存時選擇同時保存裝備的那一項，它便會記錄你當時穿戴的裝備，於是 PvP 套裝與地城套裝之間只隔一次點擊，而不是十六次。它記住的是那件具體的物品，而非僅僅名稱，因此附魔過的戒指絕不會被背包裡緊鄰的普通同名戒指悄悄頂替。切換回來時找不到的部件會被原樣跳過並告知你，所以即使有一件已存入銀行或掛上市場，其餘裝備照樣會穿戴上身。',
+  'guide.thornhollowPage.leavingHeading':
+    '中途離場，以及遞補空位',
+  'guide.thornhollowPage.leavingBody':
+    '比賽進行中退出即為逃跑，而排名階梯不能獎勵在落後時拔掉插頭的人：逃跑者當場記下這場失利與隨之而來的評分損失，若正攜旗則將旗幟掉落，其隊伍則少一人繼續作戰。最後這一點正是空位的由來。當一場比賽缺人時，佇列可以把這個位置讓給正在等待的人，而這始終是一份你可以接受或拒絕的邀請，而不是逕直把你傳送過去；拒絕不需付出任何代價，位置會順延給下一位。只有單人排隊者會被詢問，因此一同排隊的小隊絕不會被拆散去填補空缺。',
+  'guide.thornhollowPage.backfillNote':
+    '接下遞補的席位是刻意不帶風險的：你落入的是一份與你無關的比分，因此無論勝負，這場比賽都不會觸動你的戰場評分，中途離開也不欠任何代價。當一場比賽已接近尾聲、新來者再也無法改變結果時，邀請也就不再發出，所以你絕不會被安置進別人的結局裡。',
 };

@@ -1,6 +1,8 @@
+import { existsSync } from 'node:fs';
+import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { ABILITIES, MOBS } from '../src/sim/data';
-import { hasExplicitAbilityIcon } from '../src/ui/icons';
+import { abilityImageUrl, hasExplicitAbilityIcon } from '../src/ui/icons';
 import {
   PET_ACTION_ICONS,
   petFeedButtonState,
@@ -33,9 +35,15 @@ describe('pet action bar icons', () => {
     expect(new Set(iconIds).size).toBe(iconIds.length);
   });
 
-  it('gives each Warlock pet signature button explicit art', () => {
-    expect(hasExplicitAbilityIcon('emberkin_felbolt')).toBe(true);
-    expect(hasExplicitAbilityIcon('gloomshade_abyssal_chain')).toBe(true);
+  it('gives each Warlock pet signature button dedicated painted art', () => {
+    for (const id of ['emberkin_felbolt', 'gloomshade_abyssal_chain']) {
+      expect(hasExplicitAbilityIcon(id), id).toBe(true);
+      const url = abilityImageUrl(id);
+      expect(url, id).toBe(`/ui/skills/warlock/${id}.webp`);
+      expect(existsSync(path.join(process.cwd(), 'public', (url as string).slice(1))), id).toBe(
+        true,
+      );
+    }
   });
 });
 

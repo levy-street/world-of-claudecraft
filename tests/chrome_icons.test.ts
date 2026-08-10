@@ -101,19 +101,71 @@ const SECONDARY_CONTROLS: UiIconName[] = [
 ];
 const BRAND_MARKS: UiIconName[] = ['discord', 'kick', 'twitch', 'x', 'youtube'];
 
-// Minimal ParentNode stand-in: hydrateIcons only walks [data-icon] hosts and prepends
-// markup, so a node needs a dataset, a :scope child probe, and insertAdjacentHTML.
-function fakeHost(icon: string) {
-  return {
-    dataset: { icon },
-    html: '',
-    querySelector(): unknown {
-      return this.html.includes('class="ui-icon') ? {} : null;
-    },
-    insertAdjacentHTML(_pos: string, markup: string) {
-      this.html = markup + this.html;
-    },
-  };
+// Minimal DOM stand-ins: hydrateIcons walks [data-icon] hosts, prepends markup, and arms
+// painted images for load failure. The fake image exposes decode() only as a tripwire: the
+// launcher path must let the browser decode asynchronously instead of calling it itself.
+class FakeIconImage {
+  private readonly listeners = new Map<string, Array<{ callback: () => void; once: boolean }>>();
+  decodeCalls = 0;
+
+  constructor(private readonly replace: (markup: string) => void) {}
+
+  addEventListener(
+    type: string,
+    callback: () => void,
+    options?: boolean | AddEventListenerOptions,
+  ): void {
+    const listeners = this.listeners.get(type) ?? [];
+    listeners.push({ callback, once: typeof options === 'object' && options.once === true });
+    this.listeners.set(type, listeners);
+  }
+
+  decode(): Promise<void> {
+    this.decodeCalls++;
+    return Promise.resolve();
+  }
+
+  fire(type: 'load' | 'error'): void {
+    const listeners = this.listeners.get(type) ?? [];
+    for (const listener of listeners) listener.callback();
+    this.listeners.set(
+      type,
+      listeners.filter((listener) => !listener.once),
+    );
+  }
+
+  set outerHTML(markup: string) {
+    this.replace(markup);
+  }
+}
+
+class FakeIconHost {
+  readonly dataset: { icon: string };
+  html: string;
+  image: FakeIconImage | null = null;
+
+  constructor(icon: string, children = '') {
+    this.dataset = { icon };
+    this.html = children;
+  }
+
+  querySelector(selector: string): unknown {
+    if (selector === ':scope > img.ui-icon-art') return this.image;
+    return this.html.includes('class="ui-icon') ? (this.image ?? {}) : null;
+  }
+
+  insertAdjacentHTML(_pos: string, markup: string): void {
+    this.html = markup + this.html;
+    if (!markup.startsWith('<img')) return;
+    this.image = new FakeIconImage((fallback) => {
+      this.html = this.html.replace(markup, fallback);
+      this.image = null;
+    });
+  }
+}
+
+function fakeHost(icon: string, children = ''): FakeIconHost {
+  return new FakeIconHost(icon, children);
 }
 function hydrateOne(icon: string): string {
   const host = fakeHost(icon);
@@ -295,6 +347,39 @@ describe('painted HUD-chrome launcher icons', () => {
 
     // An unknown name hydrates to nothing at all (no broken img, no empty svg).
     expect(hydrateOne('not-an-icon')).toBe('');
+  });
+
+  it('keeps a successfully loaded painted launcher as the async-decoded image', () => {
+    const caption = '<span class="mobile-label">Character</span>';
+    const host = fakeHost('character', caption);
+    hydrateIcons({ querySelectorAll: () => [host] } as unknown as ParentNode);
+    const image = host.image;
+
+    expect(image).not.toBeNull();
+    expect(image?.decodeCalls).toBe(0);
+    image?.fire('load');
+    expect(host.image).toBe(image);
+    expect(host.html).toContain('decoding="async"');
+    expect(host.html.endsWith(caption)).toBe(true);
+    expect(host.html.match(/class="ui-icon/g)).toHaveLength(1);
+  });
+
+  it('swaps a painted launcher decode error to its existing SVG without moving siblings', () => {
+    const caption = '<span class="mobile-label">Character</span>';
+    const host = fakeHost('character', caption);
+    const root = { querySelectorAll: () => [host] } as unknown as ParentNode;
+    hydrateIcons(root);
+    const image = host.image;
+
+    expect(image).not.toBeNull();
+    image?.fire('error');
+    expect(host.image).toBeNull();
+    expect(host.html).toBe(`${svgIcon('character')}${caption}`);
+    expect(host.html).not.toContain('<img');
+    expect(host.html.match(/class="ui-icon/g)).toHaveLength(1);
+
+    hydrateIcons(root);
+    expect(host.html).toBe(`${svgIcon('character')}${caption}`);
   });
 
   it('hydrates each host once (a second pass never doubles the icon)', () => {

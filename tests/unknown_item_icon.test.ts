@@ -46,6 +46,15 @@ describe('itemIconImgHtml (the shared minter, named directly)', () => {
     expect(html).not.toContain('src="x" onerror');
     expect(html).toContain('src="x&quot;');
   });
+
+  it('carries an escaped optional runtime fallback without changing ordinary markup', () => {
+    expect(itemIconImgHtml('/ui/mobs/old_greyjaw.webp', 'rare', 'data:image/svg+xml,trophy')).toBe(
+      '<img class="item-icon q-rare" src="/ui/mobs/old_greyjaw.webp" data-icon-fallback-src="data:image/svg+xml,trophy" alt="" draggable="false">',
+    );
+    const hostile = itemIconImgHtml('/x.webp', 'rare', 'x" onerror="alert(1)');
+    expect(hostile).not.toContain('data-icon-fallback-src="x" onerror');
+    expect(hostile).toContain('data-icon-fallback-src="x&quot;');
+  });
 });
 
 describe('unknownItemIconHtml', () => {

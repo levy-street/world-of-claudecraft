@@ -916,6 +916,31 @@ describe('CI workflow parity', () => {
     expect(mergeQueueTriage).toContain('re-run the failed jobs and re-queue');
   });
 
+  it('aborts dead checkout transfers workflow-wide instead of riding a job bound', () => {
+    // First net under the job bounds above: git's low-speed abort ends a
+    // transfer trickling under 1000 bytes per second for 120 consecutive
+    // seconds and actions/checkout retries the fetch in-step. Known limit,
+    // recorded on the ci.yml env block: the 2026-08-10 hang variant (run
+    // 31402711619) dies in a phase the speed timer never polices and is
+    // caught by the auto-rerun net instead; this block stays for the
+    // trickle variant (run 31392590628 is the three-kills-in-a-row incident
+    // that motivated the pair). Exact values, one
+    // WORKFLOW-level block: every job's checkout and every run-step git fetch
+    // must inherit the same floor, and a job- or step-level redeclaration
+    // could shadow it with a value nobody measured. The second net (the
+    // once-only auto-rerun of a run whose bound-killed setup step or failed
+    // checkout left nothing running after it) is ci-stall-rerun.yml, pinned
+    // by tests/ci_stall_rerun.test.ts.
+    expect(workflow).toMatch(
+      /\nenv:\n {2}GIT_HTTP_LOW_SPEED_LIMIT: '1000'\n {2}GIT_HTTP_LOW_SPEED_TIME: '120'\n/,
+    );
+    expect(workflow.match(/GIT_HTTP_LOW_SPEED_LIMIT/g)).toHaveLength(1);
+    expect(workflow.match(/GIT_HTTP_LOW_SPEED_TIME/g)).toHaveLength(1);
+    // The block must sit ABOVE the jobs table (workflow scope), not inside a
+    // job or step where it would cover only that job.
+    expect(workflow.indexOf('GIT_HTTP_LOW_SPEED_LIMIT')).toBeLessThan(workflow.indexOf('\njobs:'));
+  });
+
   it(`shards the PR and release test steps ${SHARD_N} ways and keeps the checks single-shard`, () => {
     const prGate = jobSource('pr-gate');
     const prChecks = jobSource('pr-checks');

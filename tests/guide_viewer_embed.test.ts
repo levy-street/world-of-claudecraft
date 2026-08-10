@@ -19,6 +19,7 @@ describe('modelViewerEmbed', () => {
     });
     expect(html).toContain('src="/guide-stills/mob_wolf__abc.webp"');
     expect(html).not.toContain('src="data:crest"'); // still wins over the crest
+    expect(html).toContain('data-poster-fallback="data:crest"');
     expect(html).toContain('guide-viewer-poster-still');
     // the still IS the content now, so its alt names the subject (non-empty)
     const alt = html.match(/class="guide-viewer-poster[^"]*"[^>]*\salt="([^"]*)"/)?.[1] ?? '';
@@ -35,6 +36,7 @@ describe('modelViewerEmbed', () => {
     });
     expect(html).toContain('src="/ui/classes/mage.webp"');
     expect(html).not.toContain('guide-viewer-poster-still');
+    expect(html).not.toContain('data-poster-fallback');
     expect(html).toContain('data-crest-fallback-id="class_mage"');
     const alt = html.match(/class="guide-viewer-poster[^"]*"[^>]*\salt="([^"]*)"/)?.[1] ?? null;
     expect(alt).toBe(''); // decorative crest, not announced

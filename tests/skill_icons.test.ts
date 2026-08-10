@@ -1,3 +1,4 @@
+import { execFileSync, spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { closeSync, existsSync, openSync, readdirSync, readFileSync, readSync } from 'node:fs';
 import path from 'node:path';
@@ -87,8 +88,55 @@ function webpSize(file: string): { width: number; height: number } {
   }
 }
 
+function webpBufferSize(bytes: Buffer): { width: number; height: number } {
+  if (bytes.length < 32) throw new Error('truncated WebP header');
+  const tag = bytes.toString('ascii', 12, 16);
+  if (tag === 'VP8 ') {
+    return { width: bytes.readUInt16LE(26) & 0x3fff, height: bytes.readUInt16LE(28) & 0x3fff };
+  }
+  if (tag === 'VP8L') {
+    const bits = bytes.readUInt32LE(21);
+    return { width: (bits & 0x3fff) + 1, height: ((bits >> 14) & 0x3fff) + 1 };
+  }
+  if (tag === 'VP8X') {
+    return {
+      width: (bytes.readUIntLE(24, 3) & 0xffffff) + 1,
+      height: (bytes.readUIntLE(27, 3) & 0xffffff) + 1,
+    };
+  }
+  throw new Error(`unknown WebP chunk "${tag}"`);
+}
+
+function canonicalValue(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(canonicalValue);
+  if (value !== null && typeof value === 'object') {
+    return Object.fromEntries(
+      Object.entries(value as Record<string, unknown>)
+        .sort(([left], [right]) => left.localeCompare(right))
+        .map(([key, entry]) => [key, canonicalValue(entry)]),
+    );
+  }
+  return value;
+}
+
+function canonicalSha256(value: unknown): string {
+  return createHash('sha256')
+    .update(JSON.stringify(canonicalValue(value)))
+    .digest('hex');
+}
+
 const webpFiles = (): string[] =>
   walk(skillsDir).filter((p) => path.extname(p).toLowerCase() === '.webp');
+
+function registeredSkillUrls(): string[] {
+  const abilityUrls = [...ABILITY_IMAGE_IDS].map((id) => {
+    const url = abilityImageUrl(id);
+    if (!url) throw new Error(`${id} has no registered skill image URL`);
+    return url;
+  });
+  const talentUrls = [...PALADIN_TALENT_IMAGE_IDS].map((id) => `/ui/skills/paladin/${id}.webp`);
+  return [...abilityUrls, ...talentUrls].sort();
+}
 
 // The 12 rework ids whose art was superseded by the accepted release art in the
 // v0.34.0 missing-painted-icons wave (bestial_wrath, counter_shot, volley,
@@ -170,6 +218,171 @@ interface MissingWaveAbilityPin {
   runtimeUrl: string;
   acceptedSha256: string;
   acceptedBytes: number;
+}
+
+interface SkillNormalizationPin {
+  kind: 'ability';
+  id: string;
+  class: string;
+  runtimeUrl: string;
+  acceptedSha256: string;
+  acceptedBytes: number;
+  sourceMapping: string;
+  supersedes: {
+    sourceCommit: string;
+    sha256: string;
+    bytes: number;
+    width: number;
+    height: number;
+  };
+}
+
+type SkillMappingEntry = Record<string, unknown> & {
+  abilityId: string;
+  output: string;
+};
+
+interface TrackedSkillReviewEvidence {
+  path: string;
+  layout: string;
+  acceptedSha256: string;
+  acceptedBytes: number;
+}
+
+interface SkillNormalizationManifest {
+  schemaVersion: number;
+  batch: {
+    id: string;
+    artIdentityChanged: boolean;
+  };
+  scope: {
+    normalizedSkillIcons: number;
+  };
+  contracts: {
+    ability: {
+      width: number;
+      height: number;
+      maxBytes: number;
+      alpha: string;
+    };
+  };
+  processing: {
+    sourceCommit: string;
+    converter: string;
+    command: string;
+  };
+  review: {
+    reviewSizes: number[];
+    trackedEvidence: TrackedSkillReviewEvidence[];
+    totalBytesBefore: number;
+    totalBytesAfter: number;
+    maxMeanAbsoluteError: number;
+    minPeakSignalToNoiseDb: number;
+    verdict: string;
+  };
+  assets: SkillNormalizationPin[];
+}
+
+const NORMALIZED_SKILL_IDS = {
+  mage: [
+    'arcane_surge',
+    'blink',
+    'blink_while_casting',
+    'blizzard',
+    'cold_snap',
+    'collective_reversal',
+    'counterspell',
+    'double_blink',
+    'elemental_convergence',
+    'evocation',
+    'fireball_form',
+    'flurry',
+    'frozen_orb',
+    'greater_invisibility',
+    'ice_floes',
+    'ice_lance',
+    'icy_veins',
+    'mass_barrier',
+    'overflowing_power',
+    'overload',
+    'perfect_moment',
+    'power_echo',
+    'presence_of_mind',
+    'rings_of_frost',
+    'rune_of_power',
+    'snap_polymorph',
+    'temporal_barrier',
+    'temporal_echo',
+    'temporal_hourglass',
+    'temporal_mend',
+    'temporal_rift',
+    'twin_frost_nova',
+    'warded',
+  ],
+  warrior: ['combat_mastery', 'crushing_charge', 'double_charge'],
+} as const;
+
+const SKILL_NORMALIZATION_SOURCE_COMMIT = '32abfff7b0cbee34123dc36f69ed3fcab24f7a65';
+const SKILL_NORMALIZATION_HISTORY_DIGEST =
+  '82d3ef8c0631a6bbdab0022c88fe2cc0d0256c55a1f279d75f300fa0f8d7f835';
+const SKILL_NORMALIZATION_OWNERSHIP_DIGEST =
+  'a12ca388cf11019ceeff901d7ade678d7770b468fbfc9783e317dbce987e18da';
+const SKILL_NORMALIZATION_EVIDENCE_DIGEST =
+  '281e073038f41c7ac0f7f020795451e2faec297b464ce373d2a1566dc9cc01b1';
+
+function formerSkillBlobIssues(pin: SkillNormalizationPin['supersedes'], bytes: Buffer): string[] {
+  const issues: string[] = [];
+  if (bytes.length !== pin.bytes) issues.push(`bytes: ${bytes.length}, expected ${pin.bytes}`);
+  const sha256 = createHash('sha256').update(bytes).digest('hex');
+  if (sha256 !== pin.sha256) issues.push(`sha256: ${sha256}, expected ${pin.sha256}`);
+  if (
+    bytes.length < 12 ||
+    bytes.toString('ascii', 0, 4) !== 'RIFF' ||
+    bytes.toString('ascii', 8, 12) !== 'WEBP'
+  ) {
+    issues.push('container: expected RIFF/WEBP');
+    return issues;
+  }
+  try {
+    const dimensions = webpBufferSize(bytes);
+    if (dimensions.width !== pin.width || dimensions.height !== pin.height) {
+      issues.push(
+        `dimensions: ${dimensions.width}x${dimensions.height}, expected ${pin.width}x${pin.height}`,
+      );
+    }
+  } catch (error) {
+    issues.push(`dimensions: ${error instanceof Error ? error.message : String(error)}`);
+  }
+  return issues;
+}
+
+function sourceCommitIsAvailable(commit: string): boolean {
+  return (
+    spawnSync('git', ['cat-file', '-e', `${commit}^{commit}`], {
+      cwd: repoRoot,
+      stdio: 'ignore',
+    }).status === 0
+  );
+}
+
+function sourceCommitBlob(commit: string, repoRelativePath: string): Buffer {
+  return execFileSync('git', ['show', `${commit}:${repoRelativePath}`], {
+    cwd: repoRoot,
+    encoding: 'buffer',
+    maxBuffer: 32 * 1024 * 1024,
+  });
+}
+
+function skillNormalizationManifest(): SkillNormalizationManifest {
+  return JSON.parse(
+    readFileSync(
+      path.join(
+        repoRoot,
+        'docs/achievements/release-v036-skill-normalization-2026-08-10/accepted-art.json',
+      ),
+      'utf8',
+    ),
+  ) as SkillNormalizationManifest;
 }
 
 function missingWaveAbilityPins(): MissingWaveAbilityPin[] {
@@ -380,6 +593,267 @@ describe('class ability webp icons', () => {
     ).toEqual([]);
   });
 
+  it('D) every registered skill webp meets the global shipping contract', async () => {
+    const urls = registeredSkillUrls();
+    const committedUrls = webpFiles()
+      .map((file) => `/${path.relative(publicDir, file).split(path.sep).join('/')}`)
+      .sort();
+    expect(new Set(urls).size, 'registered skill URLs must be unique').toBe(urls.length);
+    expect(urls, 'the shipping contract must cover every committed skill webp').toEqual(
+      committedUrls,
+    );
+
+    const issues: string[] = [];
+    const hashes = new Map<string, string[]>();
+    for (const url of urls) {
+      const file = path.join(publicDir, url.replace(/^\//, ''));
+      if (!existsSync(file)) {
+        issues.push(`${url}: missing file`);
+        continue;
+      }
+      if (!isValidWebp(file)) {
+        issues.push(`${url}: invalid RIFF/WEBP container`);
+        continue;
+      }
+
+      const bytes = readFileSync(file);
+      // Fresh converter outputs hard-cap at 15 KiB. The complete historical catalog has one
+      // alpha-heavy 15.8 KiB icon, so the all-art gate uses the next exact KiB boundary.
+      if (bytes.length > 16 * 1024) issues.push(`${url}: ${bytes.length} B exceeds 16 KiB`);
+      const hash = createHash('sha256').update(bytes).digest('hex');
+      const duplicateGroup = hashes.get(hash) ?? [];
+      duplicateGroup.push(url);
+      hashes.set(hash, duplicateGroup);
+
+      const metadata = await sharp(bytes).metadata();
+      if (metadata.format !== 'webp') issues.push(`${url}: decoded as ${metadata.format}`);
+      if (metadata.width !== 128 || metadata.height !== 128) {
+        issues.push(`${url}: ${metadata.width}x${metadata.height}, expected 128x128`);
+      }
+      if (metadata.space !== 'srgb') issues.push(`${url}: ${metadata.space}, expected sRGB`);
+
+      const decoded = await sharp(bytes).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+      const pixelCount = decoded.info.width * decoded.info.height;
+      let visiblePixels = 0;
+      let opaquePixels = 0;
+      for (let offset = 3; offset < decoded.data.length; offset += decoded.info.channels) {
+        const alpha = decoded.data[offset];
+        if (alpha > 0) visiblePixels++;
+        if (alpha === 255) opaquePixels++;
+      }
+      if (visiblePixels < pixelCount * 0.25) {
+        issues.push(`${url}: only ${visiblePixels}/${pixelCount} pixels are visible`);
+      }
+      if (opaquePixels < pixelCount * 0.02) {
+        issues.push(`${url}: only ${opaquePixels}/${pixelCount} pixels are fully opaque`);
+      }
+      if (!metadata.hasAlpha && opaquePixels !== pixelCount) {
+        issues.push(`${url}: alpha-free WebP decoded with non-opaque pixels`);
+      }
+    }
+
+    for (const duplicateUrls of hashes.values()) {
+      if (duplicateUrls.length > 1) issues.push(`duplicate bytes: ${duplicateUrls.join(', ')}`);
+    }
+    expect(issues).toEqual([]);
+    expect(hashes.size, 'every registered skill icon needs distinct painted bytes').toBe(
+      urls.length,
+    );
+  });
+
+  it('E) pins the normalized shipping bytes while preserving source-art ownership', async () => {
+    const manifest = skillNormalizationManifest();
+    const expected = Object.entries(NORMALIZED_SKILL_IDS)
+      .flatMap(([className, ids]) => ids.map((id) => `${className}/${id}`))
+      .sort();
+    const actual = manifest.assets.map((asset) => `${asset.class}/${asset.id}`).sort();
+    const historicalPins = manifest.assets
+      .map((asset) => ({
+        class: asset.class,
+        id: asset.id,
+        runtimeUrl: asset.runtimeUrl,
+        ...asset.supersedes,
+      }))
+      .sort((left, right) =>
+        `${left.class}/${left.id}`.localeCompare(`${right.class}/${right.id}`),
+      );
+
+    expect(manifest.schemaVersion).toBe(1);
+    expect(manifest.batch).toMatchObject({
+      id: 'release-v036-skill-normalization-2026-08-10',
+      artIdentityChanged: false,
+    });
+    expect(manifest.processing).toMatchObject({
+      sourceCommit: SKILL_NORMALIZATION_SOURCE_COMMIT,
+      converter: 'scripts/convert_skill_icons_webp.mjs',
+      command: 'npm run assets:skills',
+    });
+    expect(manifest.contracts.ability).toEqual({
+      width: 128,
+      height: 128,
+      maxBytes: 15 * 1024,
+      alpha: 'opaque',
+    });
+    expect(manifest.review.reviewSizes).toEqual([128, 40, 28]);
+    expect(manifest.review).toMatchObject({
+      maxMeanAbsoluteError: 8.910522,
+      minPeakSignalToNoiseDb: 26.00389,
+      verdict:
+        'Accepted. Side-by-side review preserves subject, framing, palette, border, and small-size readability at every review size.',
+    });
+    expect(manifest.scope.normalizedSkillIcons).toBe(expected.length);
+    expect(actual).toEqual(expected);
+    expect(canonicalSha256(historicalPins), 'former shipping identity aggregate').toBe(
+      SKILL_NORMALIZATION_HISTORY_DIGEST,
+    );
+    expect(canonicalSha256(manifest.review.trackedEvidence), 'durable review-evidence pins').toBe(
+      SKILL_NORMALIZATION_EVIDENCE_DIGEST,
+    );
+
+    for (const evidence of manifest.review.trackedEvidence) {
+      const file = path.join(repoRoot, evidence.path);
+      expect(existsSync(file), `${evidence.path} exists`).toBe(true);
+      const bytes = readFileSync(file);
+      expect(bytes.length, `${evidence.path} accepted bytes`).toBe(evidence.acceptedBytes);
+      expect(
+        createHash('sha256').update(bytes).digest('hex'),
+        `${evidence.path} accepted hash`,
+      ).toBe(evidence.acceptedSha256);
+      expect(await sharp(bytes).metadata(), evidence.path).toMatchObject({ format: 'webp' });
+    }
+
+    // Local worktrees and full-history release gates verify the former bytes straight from the
+    // recorded commit. Shallow CI checkouts may not carry that parent object, so the independent
+    // literal aggregate above remains the always-on history pin there.
+    if (sourceCommitIsAvailable(SKILL_NORMALIZATION_SOURCE_COMMIT)) {
+      const sourceIssues: string[] = [];
+      for (const asset of manifest.assets) {
+        const repoRelativePath = `public${asset.runtimeUrl}`;
+        try {
+          const bytes = sourceCommitBlob(SKILL_NORMALIZATION_SOURCE_COMMIT, repoRelativePath);
+          sourceIssues.push(
+            ...formerSkillBlobIssues(asset.supersedes, bytes).map(
+              (issue) => `${asset.class}/${asset.id}: ${issue}`,
+            ),
+          );
+        } catch (error) {
+          sourceIssues.push(
+            `${asset.class}/${asset.id}: git show failed: ${
+              error instanceof Error ? error.message : String(error)
+            }`,
+          );
+        }
+      }
+      expect(sourceIssues, 'former pins must match exact source-commit Git blobs').toEqual([]);
+    }
+
+    const oldHashes = new Set<string>();
+    const currentHashes = new Set<string>();
+    const oldDimensions = new Map<string, number>();
+    const mappingCache = new Map<string, SkillMappingEntry[]>();
+    const ownershipRows: Array<{ class: string; entry: SkillMappingEntry }> = [];
+    let oldBytes = 0;
+    let currentBytes = 0;
+    for (const asset of manifest.assets) {
+      expect(asset.kind, asset.id).toBe('ability');
+      expect(asset.runtimeUrl, asset.id).toBe(`/ui/skills/${asset.class}/${asset.id}.webp`);
+      expect(asset.sourceMapping, asset.id).toBe(`public/ui/skills/${asset.class}/mapping.json`);
+      expect(asset.supersedes.sourceCommit, asset.id).toBe(SKILL_NORMALIZATION_SOURCE_COMMIT);
+      expect(asset.supersedes.sha256, `${asset.id} historical hash`).toMatch(/^[0-9a-f]{64}$/);
+      expect(asset.supersedes.width, asset.id).toBe(asset.supersedes.height);
+      expect([512, 1254], asset.id).toContain(asset.supersedes.width);
+      expect(asset.supersedes.bytes, asset.id).toBeGreaterThan(asset.acceptedBytes);
+
+      oldHashes.add(asset.supersedes.sha256);
+      currentHashes.add(asset.acceptedSha256);
+      oldBytes += asset.supersedes.bytes;
+      currentBytes += asset.acceptedBytes;
+      const dimension = `${asset.supersedes.width}x${asset.supersedes.height}`;
+      oldDimensions.set(dimension, (oldDimensions.get(dimension) ?? 0) + 1);
+
+      let mappings = mappingCache.get(asset.class);
+      if (!mappings) {
+        const parsed = JSON.parse(
+          readFileSync(path.join(skillsDir, asset.class, 'mapping.json'), 'utf8'),
+        ) as { abilities: SkillMappingEntry[] };
+        mappings = parsed.abilities;
+        mappingCache.set(asset.class, mappings);
+      }
+      const owners = mappings.filter(({ abilityId }) => abilityId === asset.id);
+      expect(owners, `${asset.id} keeps exactly one source-art mapping owner`).toHaveLength(1);
+      expect(owners[0]?.output, `${asset.id} owner keeps the canonical output`).toBe(
+        `${asset.id}.webp`,
+      );
+      ownershipRows.push({ class: asset.class, entry: owners[0] as SkillMappingEntry });
+
+      const file = path.join(publicDir, asset.runtimeUrl.replace(/^\//, ''));
+      const bytes = readFileSync(file);
+      expect(bytes.length, `${asset.id} accepted bytes`).toBe(asset.acceptedBytes);
+      expect(createHash('sha256').update(bytes).digest('hex'), `${asset.id} accepted hash`).toBe(
+        asset.acceptedSha256,
+      );
+      const metadata = await sharp(bytes).metadata();
+      expect(metadata, asset.id).toMatchObject({
+        format: 'webp',
+        width: manifest.contracts.ability.width,
+        height: manifest.contracts.ability.height,
+        space: 'srgb',
+        hasAlpha: false,
+      });
+      expect(bytes.length, `${asset.id} byte budget`).toBeLessThanOrEqual(
+        manifest.contracts.ability.maxBytes,
+      );
+    }
+
+    expect(oldHashes.size).toBe(manifest.assets.length);
+    expect(currentHashes.size).toBe(manifest.assets.length);
+    expect([...oldHashes].filter((hash) => currentHashes.has(hash))).toEqual([]);
+    ownershipRows.sort((left, right) =>
+      `${left.class}/${left.entry.abilityId}`.localeCompare(
+        `${right.class}/${right.entry.abilityId}`,
+      ),
+    );
+    expect(canonicalSha256(ownershipRows), 'full source-art ownership rows').toBe(
+      SKILL_NORMALIZATION_OWNERSHIP_DIGEST,
+    );
+    expect(Object.fromEntries([...oldDimensions].sort())).toEqual({
+      '1254x1254': 31,
+      '512x512': 5,
+    });
+    expect(manifest.review.totalBytesBefore).toBe(oldBytes);
+    expect(manifest.review.totalBytesAfter).toBe(currentBytes);
+    expect(currentBytes).toBeLessThan(oldBytes / 30);
+  });
+
+  it('E2) the former-blob verifier rejects byte, hash, container, and dimension drift', () => {
+    const asset = skillNormalizationManifest().assets[0];
+    expect(asset).toBeDefined();
+    const bytes = readFileSync(path.join(publicDir, asset.runtimeUrl.replace(/^\//, '')));
+    const dimensions = webpBufferSize(bytes);
+    const pin: SkillNormalizationPin['supersedes'] = {
+      sourceCommit: 'fixture',
+      sha256: createHash('sha256').update(bytes).digest('hex'),
+      bytes: bytes.length,
+      width: dimensions.width,
+      height: dimensions.height,
+    };
+    expect(formerSkillBlobIssues(pin, bytes)).toEqual([]);
+
+    const changedBytes = Buffer.from(bytes);
+    changedBytes[changedBytes.length - 1] ^= 1;
+    expect(formerSkillBlobIssues(pin, changedBytes)).toEqual([expect.stringMatching(/^sha256:/)]);
+    expect(formerSkillBlobIssues({ ...pin, bytes: pin.bytes + 1 }, bytes)).toEqual([
+      expect.stringMatching(/^bytes:/),
+    ]);
+    expect(formerSkillBlobIssues({ ...pin, width: pin.width + 1 }, bytes)).toEqual([
+      expect.stringMatching(/^dimensions:/),
+    ]);
+    expect(formerSkillBlobIssues({ ...pin, bytes: 32 }, Buffer.alloc(32))).toEqual([
+      expect.stringMatching(/^sha256:/),
+      'container: expected RIFF/WEBP',
+    ]);
+  });
+
   it('keeps every PR #2218 ability icon at the canonical 128px square size', async () => {
     const wrongSize: string[] = [];
     for (const [cls, ids] of Object.entries(PR_2218_OWNED_CLASS_ICON_IDS)) {
@@ -459,7 +933,7 @@ describe('class ability webp icons', () => {
     ).toEqual([]);
   });
 
-  it('D) the 90 generated additions decode as unique, opaque, exact 128px reviewed art', async () => {
+  it('F) every accepted generated addition is unique, opaque, exact 128px art', async () => {
     const pins = missingWaveAbilityPins();
     expect(pins).toHaveLength(100);
     const hashes = new Set<string>();

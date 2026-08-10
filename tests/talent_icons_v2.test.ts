@@ -73,6 +73,40 @@ describe('Talents V2 icon routing', () => {
     }
   });
 
+  it('keeps every choice in a row visually distinct', () => {
+    for (const [playerClass, rows] of Object.entries(ROW_TREES)) {
+      for (const row of rows) {
+        const routed = row.options.map((option) => talentRowOptionIconRef(option));
+        const identities = routed.map((ref) =>
+          ref.kind === 'image' ? ref.url : `${ref.kind}:${ref.id}`,
+        );
+        expect(
+          new Set(identities).size,
+          `${playerClass} level ${row.level}: ${row.options.map((option) => option.id).join(', ')}`,
+        ).toBe(identities.length);
+      }
+    }
+  });
+
+  it('uses semantically distinct painted sources for the four formerly colliding choices', () => {
+    const options = Object.values(ROW_TREES)
+      .flat()
+      .flatMap((row) => row.options);
+    for (const [optionId, abilityId] of [
+      ['pri_r5_twisted_faith', 'choir_of_deliverance'],
+      ['pri_r17_inner_fire', 'martyrs_aegis'],
+      ['sha_r5_improved_lightning_shield', 'galeheart_weapon'],
+      ['sha_r8_improved_earth_shock', 'stoneward'],
+    ] as const) {
+      const option = options.find((candidate) => candidate.id === optionId);
+      expect(option?.icon, optionId).toBe(abilityId);
+      expect(option && talentRowOptionIconRef(option), optionId).toEqual({
+        kind: 'ability',
+        id: abilityId,
+      });
+    }
+  });
+
   it('falls back to effect-shape inference when an authored option icon is present but invalid', () => {
     const invalid = {
       ...warriorOption('war_row_die_by_the_sword'),

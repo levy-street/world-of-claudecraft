@@ -1081,7 +1081,7 @@ export const PRIEST_CHOICE_ROWS: ClassChoiceRows = {
           id: 'pri_r5_twisted_faith',
           name: 'Processional Grace',
           description: 'Veilstep allows the Priest to cast while moving for 4 sec.',
-          icon: 'veilstep',
+          icon: 'choir_of_deliverance',
           effect: {
             intrinsic: { mechanic: 'priest_processional_grace', metrics: { duration: 4 } },
           },
@@ -1123,7 +1123,7 @@ export const PRIEST_CHOICE_ROWS: ClassChoiceRows = {
           name: 'Wounded Halo',
           description:
             'A hit for at least 15% maximum health grants a 15% absorb for 10 sec. 20 sec internal cooldown.',
-          icon: 'power_word_shield',
+          icon: 'martyrs_aegis',
           effect: {
             proc: {
               id: 'pri_inner_fire',
@@ -1337,7 +1337,7 @@ export const SHAMAN_CHOICE_ROWS: ClassChoiceRows = {
           id: 'sha_r5_improved_lightning_shield',
           name: 'Gathering Winds',
           description: 'Entering Shadewolf grants 60% movement speed for 3 sec, once every 20 sec.',
-          icon: 'ghost_wolf',
+          icon: 'galeheart_weapon',
           effect: { runtime: { speedPercent: 60, duration: 3, internalCooldown: 20 } },
         },
         {
@@ -1360,7 +1360,7 @@ export const SHAMAN_CHOICE_ROWS: ClassChoiceRows = {
           name: 'Stoneward',
           description:
             'Grants Stoneward, a 60 sec ally shield with 6 charges. Damage consumes a charge to heal 5% maximum health, once every 3 sec.',
-          icon: 'lightning_shield',
+          icon: 'stoneward',
           effect: { grant: { ability: 'stoneward' } },
         },
         {

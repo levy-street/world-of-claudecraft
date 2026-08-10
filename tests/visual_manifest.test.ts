@@ -265,6 +265,20 @@ describe('character visual manifest', () => {
     expect(VISUALS[key].tint).toBe('entity');
   });
 
+  it('renders the three Stampede guardians as distinct beasts', () => {
+    const expected = [
+      ['guardian_stampede_0', 'greyjaw', 'models/creatures/greyjaw.glb'],
+      ['guardian_stampede_1', 'mob_boar', 'models/creatures/wild_boar.glb'],
+      ['guardian_stampede_2', 'mob_raptor', 'models/creatures/velociraptor.glb'],
+    ] as const;
+    for (const [templateId, visualKey, model] of expected) {
+      const key = visualKeyFor({ kind: 'mob', templateId } as never);
+      expect(key, templateId).toBe(visualKey);
+      expect(VISUALS[key].url, templateId).toBe(model);
+    }
+    expect(new Set(expected.map(([, key]) => key)).size).toBe(expected.length);
+  });
+
   it('gives the Necromancer Gravewing its dedicated generated creature visual', async () => {
     const key = visualKeyFor({
       kind: 'mob',

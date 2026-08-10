@@ -102,6 +102,126 @@ const NON_CHOICE_RUNTIME_AURA_SOURCES = [
   ['natures_fury', 'hurricane'],
 ] as const;
 
+// Class-overhaul state uses semantic wire ids that are neither AbilityDef ids
+// nor mechanical `<ability>_<suffix>` derivatives. Every row is tied to the
+// painted ability or authored talent icon that owns the state in production.
+const POST_OVERHAUL_RUNTIME_AURA_SOURCES = [
+  ['aegis_first_dawn_speed', 'aegis_first_dawn'],
+  ['bloodhook_bleed', 'bloodhook'],
+  ['bloodhook_pending', 'bloodhook'],
+  ['dawns_wrath', 'hammer_of_wrath'],
+  ['desolation', 'conflagrate'],
+  ['divine_steed_burst', 'divine_ascension'],
+  ['drain_life_fate_threads', 'drain_life'],
+  ['dusk_economy', 'stealth'],
+  ['duskfire_claim', 'shadowburn'],
+  ['elemental_mastery_vent', 'elemental_mastery'],
+  ['funeral_harvest_mark', 'funeral_harvest'],
+  ['gloam', 'veilstrike'],
+  ['howling_rage_empower', 'bestial_wrath'],
+  ['hunter_apex_instinct', 'bestial_wrath'],
+  ['hunter_chain_reaction_uses', 'frostjaw_trap'],
+  ['hunter_efficient_rhythm_progress', 'measured_shot'],
+  ['hunter_efficient_rhythm_ready', 'measured_shot'],
+  ['hunter_enduring_courser_burst', 'aspect_of_the_cheetah'],
+  ['hunter_enduring_courser_icd', 'aspect_of_the_cheetah'],
+  ['hunter_fang_chorus_counter', 'tame_beast'],
+  ['hunter_guise_courser', 'aspect_of_the_cheetah'],
+  ['hunter_guise_harrier', 'aspect_of_the_hawk'],
+  ['hunter_guise_marten', 'aspect_of_the_monkey'],
+  ['hunter_guise_mastery_icd', 'aspect_of_the_hawk'],
+  ['hunter_overdraw_counter', 'arcane_shot'],
+  ['hunter_pack_rally_haste', 'pack_rally'],
+  ['hunter_pack_rally_speed', 'pack_rally'],
+  ['hunter_pack_rally_spellhaste', 'pack_rally'],
+  ['hunter_predators_pace', 'measured_shot'],
+  ['hunter_predators_pace_icd', 'measured_shot'],
+  ['lich_form_army', 'metamorphosis'],
+  ['lich_form_army_haste', 'metamorphosis'],
+  ['loping_stride', 'cat_form'],
+  ['marrowbreak_guard', 'marrowbreak'],
+  ['oath_chain_pull', 'oath_chain'],
+  ['pack_ferocity', 'pack_command'],
+  ['perpetual_sun_generation', 'divine_ascension'],
+  ['possess_evil_eye_sentence_echo', 'possess_evil_eye'],
+  ['priest_doctrine', 'power_word_shield'],
+  ['priest_effigy', 'mind_blast'],
+  ['priest_gloomtithe', 'summon_tithefiend'],
+  ['priest_lingering_dread', 'psychic_scream'],
+  ['priest_living_covenant', 'power_word_shield'],
+  ['priest_processional_grace', 'choir_of_deliverance'],
+  ['priest_sheltering_step', 'power_word_shield'],
+  ['priest_veil_unbound', 'veilstep'],
+  ['pyre_guardian', 'summon_infernal'],
+  ['radiant_resonance', 'radiant_chorus'],
+  ['radiant_stride_speed', 'hammer_of_grace'],
+  ['recurring_grace_absorb', 'hammer_of_grace'],
+  ['redline', 'eviscerate'],
+  ['reaping_command_bone_mage', 'reaping_command'],
+  ['reaping_command_graveguard', 'reaping_command'],
+  ['reaping_command_gravewing', 'reaping_command'],
+  ['reaping_command_warrior', 'reaping_command'],
+  ['shaman_ancestral_bulwark', 'lightning_shield'],
+  ['shaman_ancestral_bulwark_icd', 'lightning_shield'],
+  ['shaman_echoing_elements_damage', 'chain_lightning'],
+  ['shaman_echoing_elements_heal', 'chain_lightning'],
+  ['shaman_echoing_elements_stormcast', 'chain_lightning'],
+  ['shaman_flow_state_progress', 'healing_wave'],
+  ['shaman_flow_state_ready', 'healing_wave'],
+  ['shaman_flowing_elements', 'lightning_bolt'],
+  ['shaman_galeheart_unleash_haste', 'unleash_weapon'],
+  ['shaman_gathering_winds', 'galeheart_weapon'],
+  ['shaman_gathering_winds_icd', 'galeheart_weapon'],
+  ['shaman_living_weapon_absorb', 'rockbiter_weapon'],
+  ['shaman_living_weapon_bolt', 'rockbiter_weapon'],
+  ['shaman_primal_exaltation', 'elemental_mastery'],
+  ['shaman_pyrebrand_mastery', 'rockbiter_weapon'],
+  ['shaman_stonebound_armor', 'rockbiter_weapon'],
+  ['shaman_stonebound_dr', 'rockbiter_weapon'],
+  ['shaman_stonebound_unleash_guard', 'unleash_weapon'],
+  ['shaman_stonebound_ward_smooth', 'lightning_shield'],
+  ['shaman_stoneward', 'stoneward'],
+  ['shaman_stormsurge_ready', 'stormstrike'],
+  ['shaman_ward_cycle_icd', 'lightning_shield'],
+  ['shaman_warded_elements', 'lightning_shield'],
+  ['shaman_wayfarer_grace', 'ghost_wolf'],
+  ['shaman_wayfarer_grace_icd', 'ghost_wolf'],
+  ['shrapnel_wound', 'shrapnel_charge'],
+  ['solar_reprisal', 'vowkeeper_strike'],
+  ['solar_step_slow_immunity', 'solar_step'],
+  ['stampede_ready', 'stampede'],
+  ['steady_hands_hot', 'lay_on_hands'],
+  ['unholy_command_haste', 'unholy_command'],
+  ['valkyrs_calling_flight', 'valkyrs_calling'],
+  ['veiled_edge', 'veilstrike'],
+  ['veilbound_mark', 'veilbound_march'],
+  ['veilbound_march_armor', 'veilbound_march'],
+  ['venom_ritual', 'venomrend'],
+  ['wlk_blacktide_speed', 'wlk_r5_improved_corruption'],
+  ['wlk_forbidden_reflection', 'wlk_r20_grimoire_of_haste'],
+  ['wlk_forbidden_reflection_lock', 'wlk_r20_grimoire_of_haste'],
+  ['wlk_leaden_hex_root', 'wlk_r8_curse_of_exhaustion'],
+  ['wlk_leaden_hex_root_lock', 'wlk_r8_curse_of_exhaustion'],
+  ['wlk_leaden_hex_slow', 'wlk_r8_curse_of_exhaustion'],
+  ['wlk_shadow_credit', 'wlk_r14_shadow_mastery'],
+] as const;
+
+const POST_OVERHAUL_RUNTIME_AURA_FAMILY_SOURCES = [
+  ['aegis_first_dawn_dr:17', 'aegis_first_dawn'],
+  ['binding_psalm_17', 'power_word_shield'],
+  ['hunter_chain_mark_17', 'frostjaw_trap'],
+  ['hunter_crippling_pursuit_17', 'concussive_shot'],
+  ['hunter_crippling_root_17', 'concussive_shot'],
+  ['hunter_shared_recovery_17', 'wildheart'],
+  ['necromancy_death_echo_0', 'ossuary_mark'],
+  ['necromancy_death_echo_1', 'ossuary_mark'],
+  ['necromancy_death_echo_2', 'ossuary_mark'],
+  ['priest_second_verse_effigy_15_17', 'smite'],
+  ['priest_second_verse_holy_nova_15', 'smite'],
+  ['priest_second_verse_prayer_of_healing_15', 'smite'],
+  ['priest_second_verse_scouring_mercy_15', 'smite'],
+] as const;
+
 const AURA_RESPONSE_KINDS = new Set(['empowerNext', 'absorb', 'aura', 'echo']);
 
 describe('resolveAuraIconId', () => {
@@ -124,7 +244,7 @@ describe('resolveAuraIconId', () => {
     }
   });
 
-  it('maps every aura-producing choice proc and exact non-choice producer to painted art', () => {
+  it('maps every aura-producing choice proc and exact semantic producer to painted art', () => {
     const choiceSources: [string, string][] = [];
     for (const tree of Object.values(CHOICE_ROWS)) {
       for (const row of tree.rows) {
@@ -140,20 +260,20 @@ describe('resolveAuraIconId', () => {
     }
 
     // Authored at 37 over the pre-overhaul choice rows; the class overhauls
-    // replaced most classic rows with their own (whose procs carry authored
-    // talent icons instead), leaving seven classic aura-producing procs.
-    // Painting dedicated aura art for the overhaul procs is recorded
-    // follow-up work, not a regression this pin should hide.
+    // replaced most classic rows with direct engine states, leaving seven
+    // ProcDef producers plus the closed semantic inventory above.
     expect(choiceSources).toHaveLength(7);
     expect(new Set(choiceSources.map(([id]) => id)).size).toBe(choiceSources.length);
+    expect(POST_OVERHAUL_RUNTIME_AURA_SOURCES).toHaveLength(98);
     const expected = new Map<string, string>([
       ...choiceSources,
       ...NON_CHOICE_RUNTIME_AURA_SOURCES,
+      ...POST_OVERHAUL_RUNTIME_AURA_SOURCES,
     ]);
     expect([...RUNTIME_AURA_ICON_SOURCE_IDS.entries()].sort()).toEqual(
       [...expected.entries()].sort(),
     );
-    expect(RUNTIME_AURA_ICON_SOURCE_IDS.size).toBe(12);
+    expect(RUNTIME_AURA_ICON_SOURCE_IDS.size).toBe(110);
     for (const [id, source] of expected) {
       const imageUrl = abilityImageUrl(source);
       expect(imageUrl, `${id} -> ${source} static painted source`).toMatch(
@@ -165,6 +285,50 @@ describe('resolveAuraIconId', () => {
       ).toBe(true);
       expect(resolve(id), id).toBe(source);
     }
+  });
+
+  it('resolves only the closed numeric runtime families to their painted producers', () => {
+    expect(POST_OVERHAUL_RUNTIME_AURA_FAMILY_SOURCES).toHaveLength(13);
+    for (const [id, source] of POST_OVERHAUL_RUNTIME_AURA_FAMILY_SOURCES) {
+      const imageUrl = abilityImageUrl(source);
+      expect(imageUrl, `${id} -> ${source} static painted source`).toMatch(
+        /^\/ui\/skills\/[a-z]+\/[a-z0-9_]+\.webp$/,
+      );
+      expect(
+        existsSync(path.join(repoRoot, 'public', (imageUrl as string).slice(1))),
+        `${id} -> ${source} shipped WebP`,
+      ).toBe(true);
+      expect(resolve(id), id).toBe(source);
+    }
+
+    for (const id of [
+      'aegis_first_dawn_dr:',
+      'aegis_first_dawn_dr:01',
+      'binding_psalm_-1',
+      'hunter_chain_mark_wolf',
+      'hunter_crippling_pursuit_17_extra',
+      'hunter_crippling_root_',
+      'hunter_shared_recovery_01',
+      'necromancy_death_echo_-1',
+      'necromancy_death_echo_3',
+      'necromancy_death_echo_00',
+      'necromancy_death_echo_0_extra',
+      'priest_second_verse_effigy_15',
+      'priest_second_verse_effigy_15_17_extra',
+      'priest_second_verse_holy_nova_-1',
+      'priest_second_verse_prayer_of_healing_01',
+      'priest_second_verse_scouring_mercy_',
+    ]) {
+      expect(resolve(id), id).toBe('aura_buff');
+    }
+  });
+
+  it('uses hunter frenzy art only for the player producer sharing the mob wire id', () => {
+    const imageUrl = abilityImageUrl('unleash_beast');
+    expect(imageUrl).toBe('/ui/skills/hunter/unleash_beast.webp');
+    expect(existsSync(path.join(repoRoot, 'public', (imageUrl as string).slice(1)))).toBe(true);
+    expect(resolve('pack_frenzy', 'hunter_frenzy')).toBe('unleash_beast');
+    expect(resolve('pack_frenzy', 'buff_haste')).toBe('aura_buff_haste');
   });
 
   it('recovers painted modifier identities from generated timer suffixes', () => {

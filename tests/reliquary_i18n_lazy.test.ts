@@ -58,12 +58,12 @@ describe('lazy reliquary locales: per-locale chunks, synchronous lookups around 
       // A second row from the same chunk: the whole table went resident, not one
       // lucky entry.
       expect(reliquaryPageName('horizons_titles')).toBe('称号');
-      // Page DESCS are release fill. This chunk carries a NAME for this page and
-      // no desc, so the desc still falls back to the authored English rather than
-      // rendering empty (the documented per-FIELD fallback, which the name
-      // assertion above cannot show).
+      // Page DESCS landed with the release fill, so the same resident table
+      // now answers the desc field too (before the fill this row proved the
+      // per-FIELD English fallback instead). The absent-table fallback, the
+      // other half of that contract, is pinned by the no-chunk case below.
       expect(reliquaryPageDesc('horizons_titles')).toBe(
-        'Titles earned from the Book of Deeds. Cosmetic only: never power, drop rate, or pity.',
+        '功績の書で獲得した称号。装飾のみで、強さもドロップ率も救済も一切与えません。',
       );
     } finally {
       // Restore the default language even when an assertion above throws,
@@ -201,10 +201,16 @@ describe('lazy reliquary locales: per-locale chunks, synchronous lookups around 
     }
   });
 
-  it('a locale with no chunk yet resolves as a no-op and keeps rendering English', async () => {
+  it('a locale with no chunk resolves as a no-op and keeps rendering English', async () => {
+    // Every base locale ships a chunk since the release fill, so the record row
+    // is removed for the duration here rather than naming a locale that happens
+    // to be unfilled: the contract under test is the record being PARTIAL (a
+    // newly added base locale lands here before its fill), not any one locale's
+    // fill state. The resident-table cache is keyed per locale and de_DE is
+    // never loaded in this file, so nothing else has to be torn down.
+    const saved = loaders.de_DE;
+    delete (loaders as Partial<typeof loaders>).de_DE;
     try {
-      // The Latin locales are release fill: the loader record has no row for them,
-      // so ensure resolves without fetching anything and reads stay English.
       const spies = (Object.keys(loaders) as BaseLocale[]).map((k) => vi.spyOn(loaders, k));
       try {
         await expect(ensureReliquaryLocalesLoaded('de_DE')).resolves.toBeUndefined();
@@ -214,7 +220,12 @@ describe('lazy reliquary locales: per-locale chunks, synchronous lookups around 
       }
       setLanguage('de_DE');
       expect(reliquaryPageName('conquerors_hollow_crypt')).toBe('The Hollow Crypt');
+      // The absent-table fallback is per FIELD, not just per name.
+      expect(reliquaryPageDesc('conquerors_hollow_crypt')).toBe(
+        'Signature spoils claimed from Morthen and the Hollow Crypt.',
+      );
     } finally {
+      loaders.de_DE = saved;
       // Restore the default language even when an assertion above throws,
       // so one failure cannot cascade into every later case in this file.
       setLanguage('en');

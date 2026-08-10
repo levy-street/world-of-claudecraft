@@ -990,6 +990,50 @@ export const table: DeedLocaleTable = {
     name: 'Blindado a la perfección',
     desc: 'Fabrica tu primer objeto de calidad rara en Fabricación de armaduras.',
   },
+  col_reliquary_rank_2: {
+    name: 'Guardabotines',
+    desc: 'Alcanza el rango de Curador 2 en El Relicario (10 reliquias únicas catalogadas).',
+    title: 'Guardabotines',
+  },
+  col_reliquary_rank_3: {
+    name: 'El Catalogador',
+    desc: 'Alcanza el rango de Curador 3 en El Relicario (25 reliquias únicas catalogadas).',
+    title: 'el Catalogador',
+  },
+  col_reliquary_rank_4: {
+    name: 'Archicurador',
+    desc: 'Alcanza el rango de Curador 4 en El Relicario (50 reliquias únicas catalogadas).',
+    title: 'Archicurador',
+  },
+  col_reliquary_rank_5: {
+    name: 'Botines Eternos',
+    desc: 'Alcanza el rango de Curador 5 en El Relicario (100 reliquias únicas catalogadas).',
+  },
+  col_reliquary_complete: {
+    name: 'El Gran Relicario',
+    desc: 'Cataloga todas las reliquias de El Relicario que un personaje pueda conservar. Que el catálogo crezca después nunca te lo quita.',
+    title: 'Curador de la Cámara',
+  },
+  col_reliquary_conquerors: {
+    name: 'Estante de Conquistadores',
+    desc: 'Cataloga todas las reliquias del estante Conquistadores de El Relicario. Que el catálogo crezca después nunca te lo quita.',
+    title: 'Rompecámaras',
+  },
+  col_reliquary_illum_nythraxis_heroic: {
+    name: 'Nythraxis iluminada',
+    desc: 'Ilumina la página Heroico: Incursión de Nythraxis de El Relicario.',
+    title: 'Luz de Nythraxis',
+  },
+  col_reliquary_illum_thunzharr: {
+    name: 'Thunzharr iluminada',
+    desc: 'Ilumina la página Thunzharr, el Pico Despierto de El Relicario.',
+    title: 'Luz de Thunzharr',
+  },
+  col_reliquary_illum_gravewyrm_heroic: {
+    name: 'Santuario iluminado',
+    desc: 'Ilumina la página Heroico: Santuario del Gravewyrm de El Relicario.',
+    title: 'Luz del Santuario',
+  },
 };
 
 // es_ES rides this base table plus the delve-vocabulary override layer

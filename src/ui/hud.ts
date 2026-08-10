@@ -730,7 +730,7 @@ import { TalentsWindow } from './talents_window';
 import { targetAuraSourceName } from './target_auras_view';
 import { TargetAurasWindow } from './target_auras_window';
 import { targetOfTargetId } from './target_of_target';
-import { targetPortraitUrl } from './target_portrait_view';
+import { targetPortraitSourceId, targetPortraitUrl } from './target_portrait_view';
 import { targetRankView, targetUsesEliteFrame } from './target_rank_view';
 import type { PresetId, ThemeKnob, ThemeState } from './theme';
 import { toolEffectNameKey } from './tool_effect_name';
@@ -5354,22 +5354,23 @@ export class Hud {
         target.skin ?? 0,
       );
     } else {
-      const template = MOBS[target.templateId];
-      const faceUrl = targetPortraitUrl(target.templateId, Boolean(template));
-      if (faceUrl) {
-        this.portraits.drawHeadshot(this.targetPortraitEl, faceUrl, () => {
-          this.portraits.drawCrest(
-            this.targetPortraitEl,
-            crestIdForEntity(target.kind, template?.family),
-          );
-        });
-      } else {
-        this.portraits.drawCrest(
-          this.targetPortraitEl,
-          crestIdForEntity(target.kind, template?.family),
-        );
-      }
+      this.drawNonPlayerPortrait(this.targetPortraitEl, target);
     }
+  }
+
+  private drawNonPlayerPortrait(canvas: HTMLCanvasElement, entity: Entity): void {
+    const isMobEntity = entity.kind === 'mob';
+    const sourceId = targetPortraitSourceId(entity.templateId, isMobEntity);
+    const template = MOBS[entity.templateId] ?? (sourceId ? MOBS[sourceId] : undefined);
+    const crestId = crestIdForEntity(entity.kind, template?.family);
+    const faceUrl = targetPortraitUrl(entity.templateId, isMobEntity);
+    if (faceUrl) {
+      this.portraits.drawHeadshot(canvas, faceUrl, () => {
+        this.portraits.drawCrest(canvas, crestId);
+      });
+      return;
+    }
+    this.portraits.drawCrest(canvas, crestId);
   }
 
   // Redraw the target-of-target portrait canvas, the twin of drawTargetPortrait for
@@ -5381,10 +5382,7 @@ export class Hud {
     if (tot.kind === 'player') {
       this.portraits.drawClass(this.totPortraitEl, tot.templateId as PlayerClass, tot.skin ?? 0);
     } else {
-      this.portraits.drawCrest(
-        this.totPortraitEl,
-        crestIdForEntity(tot.kind, MOBS[tot.templateId]?.family),
-      );
+      this.drawNonPlayerPortrait(this.totPortraitEl, tot);
     }
   }
 
@@ -5394,15 +5392,13 @@ export class Hud {
     this.showTargetOfTarget = on;
   }
 
-  // A pet is always an ordinary mob entity, so its portrait is the family crest the
-  // target frame draws for any mob. No player branch: a pet is never kind 'player'.
+  // A pet is always a mob entity, so it uses the same committed portrait and
+  // family-crest fallback as the target frame. No player branch: a pet is never
+  // kind 'player'.
   private drawPetPortrait(): void {
     const pet = this.petPortraitSubject;
     if (!pet) return;
-    this.portraits.drawCrest(
-      this.petPortraitEl,
-      crestIdForEntity(pet.kind, MOBS[pet.templateId]?.family),
-    );
+    this.drawNonPlayerPortrait(this.petPortraitEl, pet);
   }
 
   // Toggle the pet frame (showPetFrame option), driven from main.ts applySetting.

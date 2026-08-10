@@ -6,7 +6,11 @@ import { describe, expect, it } from 'vitest';
 import { mobPortraitBackgroundSvg } from '../scripts/lib/mob_portrait_background.mjs';
 import { VISUALS, visualKeyFor } from '../src/render/characters/manifest';
 import { MOBS } from '../src/sim/data';
-import { targetPortraitUrl } from '../src/ui/target_portrait_view';
+import {
+  TRANSIENT_MOB_PORTRAIT_SOURCE_IDS,
+  targetPortraitSourceId,
+  targetPortraitUrl,
+} from '../src/ui/target_portrait_view';
 
 // These twelve portraits had silently retained the old hooded-rogue render after their
 // manifest visuals changed to frogs, goblins, and the training dummy. Pin both the current
@@ -127,6 +131,43 @@ describe('targetPortraitUrl', () => {
   it('selects committed portrait art for mob templates only', () => {
     expect(targetPortraitUrl('morthen', true)).toBe('/ui/mobs/morthen.webp');
     expect(targetPortraitUrl('the_merchant', false)).toBeNull();
+    // Sexton Marrow is both a living NPC id and an undead encounter id. Entity
+    // kind, not catalog overlap, decides whether portrait art is appropriate.
+    expect(MOBS.sexton_marrow).toBeDefined();
+    expect(targetPortraitUrl('sexton_marrow', false)).toBeNull();
+  });
+
+  it('borrows exact existing creature portraits for transient guardians', () => {
+    expect(TRANSIENT_MOB_PORTRAIT_SOURCE_IDS).toEqual({
+      guardian_tithefiend: 'rift_dread_stalker',
+      guardian_stampede_0: 'old_greyjaw',
+      guardian_stampede_1: 'wild_boar',
+      guardian_stampede_2: 'gloam_strider',
+    });
+    for (const [guardianId, sourceId] of Object.entries(TRANSIENT_MOB_PORTRAIT_SOURCE_IDS)) {
+      expect(targetPortraitSourceId(guardianId, true), guardianId).toBe(sourceId);
+      const url = targetPortraitUrl(guardianId, true);
+      expect(url, guardianId).toBe(`/ui/mobs/${sourceId}.webp`);
+      expect(existsSync(resolve(process.cwd(), `public${url}`)), guardianId).toBe(true);
+    }
+  });
+
+  it('uses dedicated static art for the procedural Vale Cup ball', async () => {
+    const url = targetPortraitUrl('vale_cup_ball', true);
+    expect(url).toBe('/ui/portraits/vale_cup_ball.webp');
+    const path = resolve(process.cwd(), `public${url}`);
+    const bytes = readFileSync(path);
+    expect(bytes.byteLength).toBe(2068);
+    expect(createHash('sha256').update(bytes).digest('hex')).toBe(
+      'a7c60d03e01897459a70d9d79aaf575ea6c12fc13db38e981fee3614a8076670',
+    );
+    expect(await sharp(bytes).metadata()).toMatchObject({
+      width: 128,
+      height: 128,
+      space: 'srgb',
+      channels: 3,
+      hasAlpha: false,
+    });
   });
 
   it('ships a decodable portrait with an opaque backdrop for every mob template', async () => {

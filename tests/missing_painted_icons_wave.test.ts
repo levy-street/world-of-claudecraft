@@ -237,9 +237,8 @@ const ALLOWED_REFERENCE_ROLES = [
   'subject reference',
 ] as const;
 
-// The warlock overhaul's choice-row talent icons and the retired summon art
-// (WARLOCK_TALENT_IMAGE_IDS) are image ids without live ability records by
-// design: choice rows use their own images instead of borrowing spell art.
+// Choice-row talents, modifier art, retired summon paintings, and pet signature
+// actions are image ids without live ABILITIES rows by design.
 const PRESERVED_IMAGE_BACKED_MODIFIER_IDS = [
   'anger_management',
   'attack',
@@ -252,6 +251,8 @@ const PRESERVED_IMAGE_BACKED_MODIFIER_IDS = [
   'double_blink',
   'double_charge',
   'elemental_convergence',
+  'emberkin_felbolt',
+  'gloomshade_abyssal_chain',
   'lingering_dread',
   'overflowing_power',
   'pursuit',
@@ -461,7 +462,7 @@ describe('missing painted icon accepted-art manifest', () => {
 });
 
 describe('missing painted ability integration', () => {
-  it('makes every live ability image-backed while preserving all 19 modifier/talent ids', () => {
+  it('makes every live ability image-backed while preserving non-ABILITY image ids', () => {
     const accepted = manifest();
     expect(accepted.targetSets.abilities).toHaveLength(100);
     expect(Object.keys(ABILITIES).filter((id) => !ABILITY_IMAGE_IDS.has(id))).toEqual([]);
@@ -622,14 +623,9 @@ describe('missing painted deed and Heroic weapon integration', () => {
       'dgn_wildheart_basin_heroic',
       'pvp_card_duel_first_win',
     ]);
-    // Later releases appended more deeds after this historical wave, and the
-    // 2026-08-09 completion wave painted every release-live one; the only
-    // artless ids left are this branch's nine Reliquary deeds, riding the
-    // category-crest fallback docs/design/deeds.md sanctions until their
-    // 512px sources are commissioned. Read from DEED_ART_PENDING, the one
-    // enumeration of that debt (src/ui/icons.ts), so this file cannot name a
-    // different pending set than the other art suites; a further unenumerated
-    // artless deed still fails this exhaustive comparison.
+    // Later releases appended more deeds after this historical wave. The
+    // release art audit painted those additions too, so the one exhaustive
+    // DEED_ART_PENDING ledger is empty and no live deed uses fallback art.
     expect(DEED_ORDER).toHaveLength(271);
     expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([...DEED_ART_PENDING]);
     const credits = readFileSync(path.join(repoRoot, 'CREDITS.md'), 'utf8');

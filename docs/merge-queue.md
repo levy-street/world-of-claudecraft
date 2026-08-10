@@ -75,7 +75,18 @@ the Checks tab (filter by event: merge_group).
    already failing or still running near the bound, treat it as a real
    failure or a real slowdown, not a stall (a genuinely red shard on a
    runner with a setup spike can die AS a timeout). Otherwise it is a rerun,
-   not a code investigation: re-run the failed jobs and re-queue. If the
+   not a code investigation: re-run the failed jobs and re-queue. Two
+   automatic nets exist: ci.yml's workflow-wide git low-speed abort catches
+   a fetch that slows to a trickle (the 2026-08-10 hang variant evades it,
+   see the ci.yml env block), and the CI stall auto-rerun
+   workflow (ci-stall-rerun.yml, decision core scripts/lib/ci_stall_rerun.mjs)
+   reruns a run's failed jobs once, on attempt 1 only, when the dead step
+   was a bound-killed setup step or a failed checkout (the two recognized
+   stall shapes), nothing else that ran had failed, and nothing after the
+   dead step ran. The auto-rerun deliberately skips merge_group runs (the
+   queue has already ejected the PR and dissolved the group's ref, so only
+   the manual rerun-and-re-queue above applies there); on pull_request and
+   push runs a stall you meet by hand is usually already on attempt 2. If the
    SAME job times out twice on healthy-looking logs, treat it as a real
    slowdown and investigate before resizing any bound.
 

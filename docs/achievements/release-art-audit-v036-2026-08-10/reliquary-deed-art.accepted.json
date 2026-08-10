@@ -1,0 +1,135 @@
+{
+  "schemaVersion": 1,
+  "batch": {
+    "id": "release-art-audit-v036-reliquary-deeds-2026-08-10",
+    "acceptedDate": "2026-08-10",
+    "rasterGenerator": "OpenAI built-in image generation",
+    "owner": "World of ClaudeCraft",
+    "license": "World of ClaudeCraft project-generated art, project asset, rights reserved"
+  },
+  "contracts": {
+    "deed": {
+      "width": 128,
+      "height": 128,
+      "maxBytes": 15360,
+      "alpha": "transparent-subject",
+      "geometry": {
+        "alphaThreshold": 8,
+        "minPadding": 7,
+        "maxCenterOffset": 2,
+        "coverageMin": 0.35,
+        "coverageMax": 0.6
+      }
+    }
+  },
+  "assets": [
+    {
+      "kind": "deed",
+      "id": "col_reliquary_complete",
+      "batchId": "release-art-audit-v036-reliquary-deeds-2026-08-10",
+      "runtimeUrl": "/ui/deeds/col_reliquary_complete.webp",
+      "acceptedSha256": "8937f0c0621bff2b322e7225bde70a5e935e445b1174b8c8b12b8b4a28e5c6c4",
+      "acceptedBytes": 6106,
+      "geometry": {
+        "alphaBounds": [12, 10, 115, 117],
+        "visiblePixels": 7123
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "col_reliquary_conquerors",
+      "batchId": "release-art-audit-v036-reliquary-deeds-2026-08-10",
+      "runtimeUrl": "/ui/deeds/col_reliquary_conquerors.webp",
+      "acceptedSha256": "c72b225bf50d3bd99005161bc2d6016a0fca92f64ca8ba3c5f282f7955266b27",
+      "acceptedBytes": 5472,
+      "geometry": {
+        "alphaBounds": [12, 10, 115, 117],
+        "visiblePixels": 7056
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "col_reliquary_illum_gravewyrm_heroic",
+      "batchId": "release-art-audit-v036-reliquary-deeds-2026-08-10",
+      "runtimeUrl": "/ui/deeds/col_reliquary_illum_gravewyrm_heroic.webp",
+      "acceptedSha256": "ad012a27470b309708481b9d79ec0b3cf28eb7599eff9a67e560a340e6922e1f",
+      "acceptedBytes": 5616,
+      "geometry": {
+        "alphaBounds": [11, 10, 116, 117],
+        "visiblePixels": 7229
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "col_reliquary_illum_nythraxis_heroic",
+      "batchId": "release-art-audit-v036-reliquary-deeds-2026-08-10",
+      "runtimeUrl": "/ui/deeds/col_reliquary_illum_nythraxis_heroic.webp",
+      "acceptedSha256": "ac5e2a9abbe70447e11866ca46aca496bb3644b11d0695f91af320f6b75f021e",
+      "acceptedBytes": 7082,
+      "geometry": {
+        "alphaBounds": [13, 10, 113, 117],
+        "visiblePixels": 7148
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "col_reliquary_illum_thunzharr",
+      "batchId": "release-art-audit-v036-reliquary-deeds-2026-08-10",
+      "runtimeUrl": "/ui/deeds/col_reliquary_illum_thunzharr.webp",
+      "acceptedSha256": "22057e583c5fa0c822a19503dff162723eb6dc28a8ea9fae2473fc144032580c",
+      "acceptedBytes": 5460,
+      "geometry": {
+        "alphaBounds": [14, 10, 113, 117],
+        "visiblePixels": 7122
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "col_reliquary_rank_2",
+      "batchId": "release-art-audit-v036-reliquary-deeds-2026-08-10",
+      "runtimeUrl": "/ui/deeds/col_reliquary_rank_2.webp",
+      "acceptedSha256": "b6bd7bfb7a5b2e04fefff889e393d9e76e6feaf98254ba6e52cd566fedc71014",
+      "acceptedBytes": 5684,
+      "geometry": {
+        "alphaBounds": [11, 10, 116, 117],
+        "visiblePixels": 7339
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "col_reliquary_rank_3",
+      "batchId": "release-art-audit-v036-reliquary-deeds-2026-08-10",
+      "runtimeUrl": "/ui/deeds/col_reliquary_rank_3.webp",
+      "acceptedSha256": "388f24e016a5abd9fd0d8485ddf75454d962a8d4f67598a04b4b1d2c5a125476",
+      "acceptedBytes": 5552,
+      "geometry": {
+        "alphaBounds": [13, 10, 114, 117],
+        "visiblePixels": 6943
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "col_reliquary_rank_4",
+      "batchId": "release-art-audit-v036-reliquary-deeds-2026-08-10",
+      "runtimeUrl": "/ui/deeds/col_reliquary_rank_4.webp",
+      "acceptedSha256": "f6a77f35aeb5e84441aaf0381eecd7a1543b7bfc34f40df1ecc9711404da66f1",
+      "acceptedBytes": 5568,
+      "geometry": {
+        "alphaBounds": [12, 10, 115, 117],
+        "visiblePixels": 7262
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "col_reliquary_rank_5",
+      "batchId": "release-art-audit-v036-reliquary-deeds-2026-08-10",
+      "runtimeUrl": "/ui/deeds/col_reliquary_rank_5.webp",
+      "acceptedSha256": "556e3cf12add43ef7594624dc45a1e8876eedfeaca55a866dca052be32875349",
+      "acceptedBytes": 7298,
+      "geometry": {
+        "alphaBounds": [11, 10, 116, 117],
+        "visiblePixels": 7068
+      }
+    }
+  ]
+}

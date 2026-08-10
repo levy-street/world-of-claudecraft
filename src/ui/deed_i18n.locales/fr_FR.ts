@@ -1020,6 +1020,50 @@ export const table: DeedLocaleTable = {
     name: 'Blindé à la perfection',
     desc: "Fabriquez votre premier objet de qualité rare en Fabrication d'armures.",
   },
+  col_reliquary_rank_2: {
+    name: 'Gardien des butins',
+    desc: 'Atteindre le rang de Conservateur 2 dans Le Reliquaire (10 reliques uniques cataloguées).',
+    title: 'Gardien des butins',
+  },
+  col_reliquary_rank_3: {
+    name: 'Le Catalogueur',
+    desc: 'Atteindre le rang de Conservateur 3 dans Le Reliquaire (25 reliques uniques cataloguées).',
+    title: 'le Catalogueur',
+  },
+  col_reliquary_rank_4: {
+    name: 'Archiconservateur',
+    desc: 'Atteindre le rang de Conservateur 4 dans Le Reliquaire (50 reliques uniques cataloguées).',
+    title: 'Archiconservateur',
+  },
+  col_reliquary_rank_5: {
+    name: 'Butins éternels',
+    desc: 'Atteindre le rang de Conservateur 5 dans Le Reliquaire (100 reliques uniques cataloguées).',
+  },
+  col_reliquary_complete: {
+    name: 'Le Grand Reliquaire',
+    desc: "Cataloguer chaque relique du Reliquaire qu'un personnage peut conserver. L'agrandissement ultérieur du catalogue ne vous la reprend jamais.",
+    title: 'Conservateur de la Chambre forte',
+  },
+  col_reliquary_conquerors: {
+    name: 'Étagère des Conquérants',
+    desc: "Cataloguer chaque relique de l'étagère Conquérants du Reliquaire. L'agrandissement ultérieur du catalogue ne vous la reprend jamais.",
+    title: 'Brise-chambre',
+  },
+  col_reliquary_illum_nythraxis_heroic: {
+    name: 'Nythraxis enluminée',
+    desc: 'Enluminer la page Héroïque : Raid de Nythraxis du Reliquaire.',
+    title: 'Lumière de Nythraxis',
+  },
+  col_reliquary_illum_thunzharr: {
+    name: 'Thunzharr enluminée',
+    desc: 'Enluminer la page Thunzharr, le Pic Éveillé du Reliquaire.',
+    title: 'Lumière de Thunzharr',
+  },
+  col_reliquary_illum_gravewyrm_heroic: {
+    name: 'Sanctuaire enluminé',
+    desc: 'Enluminer la page Héroïque : Sanctuaire du Gravewyrm du Reliquaire.',
+    title: 'Lumière du Sanctuaire',
+  },
 };
 
 // fr_CA rides this base table plus the delve-vocabulary override layer

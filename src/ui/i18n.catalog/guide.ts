@@ -304,7 +304,7 @@ export const guideStrings = {
     onlineBody:
       'Play the shared online world with everyone else, or start an instant offline world in your browser to learn the ropes.',
     reassure:
-      'Talents start at level 5, and there are six rows in all, one each at levels 5, 8, 11, 14, 17, and 20. Every row is a single pick of three, and you can reset whenever you are out of combat and not in an arena or battleground match, so your early choices are never permanent. Experiment freely.',
+      'Talents start at level 5, and there are six rows in all, one each at levels 5, 8, 11, 14, 17, and 20. Every row is a single pick of three, and you can reset whenever you are out of combat and not in an arena match, so your early choices are never permanent. Experiment freely.',
     controlsLink: 'See the full controls reference',
     // Step 0 leads the list; the existing step1 to step6 keys keep their numbers so the
     // locale fills that already exist stay valid.
@@ -1032,7 +1032,7 @@ export const guideStrings = {
       'A symbol any party or raid member can pin over a target so everyone focuses, or avoids, the same one. Eight symbols, one target per symbol.',
     loadoutTerm: 'Loadout',
     loadoutDef:
-      'A saved talent layout, up to ten of them. Each one remembers its row picks and its action bar, so swapping builds is one click instead of redoing every row.',
+      'A saved talent layout, up to ten of them. Each one remembers its row picks and its action bar, and can remember the gear you were wearing too, so swapping builds is one click instead of redoing every row.',
     readyCheckTerm: 'Ready check',
     readyCheckDef:
       'A group leader typing /ready to poll the party or raid: everyone confirms Ready or Not Ready, and the group sees the counts.',
@@ -1045,11 +1045,12 @@ export const guideStrings = {
     worldBossTerm: 'World boss',
     worldBossDef:
       'A raid-strength boss that rises in the open world on a steady rhythm, fought by whoever gathers to answer rather than a fixed party.',
-    // Mana regen only resumes five seconds after the last mana spend
-    // (src/sim/combat/auras.ts `fiveSecondRule >= 5`).
+    // FULL Spirit regen resumes five seconds after the last mana spend; while the rule
+    // is active a share still flows (src/sim/mana_regen.ts, FIVE_SECOND_RULE_SECONDS
+    // and COMBAT_SPIRIT_REGEN_FRACTION). No percentages here, per the page's policy.
     fiveSecondTerm: 'The five-second rule',
     fiveSecondDef:
-      'Your mana only starts refilling on its own once five seconds have passed since you last spent any. It is why casters pace themselves instead of casting flat out.',
+      'Your mana comes back at full speed only once five seconds have passed since you last spent any. Until then it still trickles in at a reduced rate rather than stopping outright, which is why casters pace themselves instead of casting flat out.',
     // Talents are six choice rows at levels 5, 8, 11, 14, 17 and 20, one of
     // three options each (src/sim/content/talent_rows.ts ROW_LEVELS,
     // OPTIONS_PER_ROW). There is no point pool to spend.
@@ -2002,15 +2003,23 @@ export const guideStrings = {
     choiceNote:
       'Every row is a crossroads: it offers three options and you commit to one of them. Your next reset reopens every one of those choices.',
     resetTitle: 'Nothing is permanent',
+    // Combat is the line, not the venue: talentLockReason (src/sim/progression/talents.ts)
+    // blocks only combat and an arena match. A battleground is deliberately allowed, so a
+    // queue pop that catches a farming build can be put right between fights.
     resetNote:
-      'You can reset your talents any time you are out of combat and not in an arena match or a battleground, so an early pick is never a trap. A reset clears your row picks and costs nothing, and your specialization stays as it is, so resetting never takes your role away mid-run. Try things, see what you like, and change your mind freely.',
+      'You can reset your talents any time you are out of combat and not in an arena match, so an early pick is never a trap. A reset clears your row picks and costs nothing, and your specialization stays as it is, so resetting never takes your role away mid-run. A battleground is the exception, and you can change your build there between fights. Try things, see what you like, and change your mind freely.',
     specsHeading: 'Specializations by class',
     specsBody:
       'Every class has a handful of specializations, each with its own role and a signature focus. You pick one in the talent panel at level 5. It grants a signature ability and a lasting mastery, most of them add passive bonuses that suit the role, and it is also the role you queue as in the Dungeon Finder. Here is the shape of all of them. Open a class for its full kit.',
-    // Saved builds: SavedLoadout { name, alloc, bar } with MAX_LOADOUTS = 10
+    // Saved builds: SavedLoadout { name, alloc, bar, gear? } with MAX_LOADOUTS = 10
     // (src/sim/content/talents.ts); the client reapplies the saved action bar on switch.
+    // The gear set is OPT-IN per save (saveLoadout's captureGear, src/sim/loadout_gear.ts):
+    // the menu carries a second "save gear too" entry beside the plain one. It pins the
+    // COPY, not just the item id, so an enchanted twin is not swapped for a plain one.
     loadoutNote:
-      'You do not have to settle on one build. Save a named layout in the panel and it remembers both its picks and your action bar, so switching to another one is a single click, under the same rule as a reset: out of combat, and not in an arena match or a battleground.',
+      'You do not have to settle on one build. Save a named layout in the panel and it remembers both its picks and your action bar, so switching to another one is a single click, under the same rule as a reset: out of combat, and not in an arena match.',
+    loadoutGearNote:
+      'A layout can carry your gear as well. Save it with the entry that offers to keep your gear too and it also records what you were wearing, which is what makes a PvP set and a dungeon set one click apart instead of sixteen. It remembers the exact piece rather than merely its name, so an enchanted ring is never quietly swapped for the plain twin sitting beside it in your bags. Anything it cannot find when you switch back is simply left alone and reported, so a set that lost a piece to the bank or the market still equips everything else.',
   },
 
   // Arena and PvP.
@@ -2078,6 +2087,14 @@ export const guideStrings = {
     carrierHeading: 'Carrying the flag',
     carrierBody:
       'A carrier who holds the enemy flag too long grows more and more vulnerable, taking ever-increasing damage until the flag is captured, dropped, or returned. Hiding with the flag is a losing plan; running it home is the winning one.',
+    // Desertion and backfill (bgResolveDesertion + backfillBgMatches,
+    // src/sim/social/battleground.ts; the cutoffs live in battleground_backfill.ts).
+    // Shapes only, per the page policy: no rating math, no time or score cutoffs.
+    leavingHeading: 'Leaving early, and filling an empty seat',
+    leavingBody:
+      'Quitting a match under way is deserting it, and a rated ladder cannot reward pulling the plug on a losing scoreline: a deserter takes the loss and the rating that goes with it there and then, drops the flag if they were carrying it, and their team fights on a player short. That last part is what the empty seat is for. While a match is short a fighter, the queue can offer the chair to somebody waiting, and it is always an offer you accept or decline rather than a teleport that happens to you; declining costs you nothing and passes it to the next in line. Only solo queuers are asked, so a party that queued together is never split up to fill a hole.',
+    backfillNote:
+      "Taking a backfill seat is deliberately free of risk: you drop into a scoreline you had no hand in, so the match does not touch your rating either way, win or lose, and leaving one owes nothing. The offer also stops coming once a match is close enough to finished that an arrival could not change it, so you are never seated into somebody else's ending.",
     ladderHeading: 'The ladder',
     ladderBody:
       'Every match moves a persistent per-character battleground rating, win or lose, and the all-time board ranks the realm champions.',
@@ -2247,7 +2264,7 @@ export const guideStrings = {
       "When you fall you rise as a ghost at the nearest graveyard. Run back to your body to revive free, or take the Pale Keeper's instant raise and carry a short-lived weakness for the convenience. No experience, gear, or coin is ever lost, so it is safe to take risks and learn.",
     i3Title: 'Talents are not a trap',
     i3Body:
-      'Your first talent comes at level 5, and each of the six rows is a single pick of three, so a build is a handful of choices you can see at a glance. You can reset whenever you are out of combat and not in an arena or battleground match, so nothing you choose early locks you in.',
+      'Your first talent comes at level 5, and each of the six rows is a single pick of three, so a build is a handful of choices you can see at a glance. You can reset whenever you are out of combat and not in an arena match, so nothing you choose early locks you in.',
     i4Title: 'Follow the quest trail',
     i4Body:
       'Quests are the fastest way to level and they lead you across the world. When you are unsure where to go, find the next marker.',
@@ -3285,7 +3302,7 @@ export const guideStrings = {
       "Intellect grows a spellcaster's mana pool, raises their spell power so their spells hit harder, and improves the chance their spells crit. It matters to the classes that cast from mana; for a Rage or Energy class it does little.",
     spiTitle: 'Spirit',
     spiBody:
-      "Spirit governs how quickly a caster's mana returns, but only once they have gone a few seconds without spending any, so a caster who never stops casting never regenerates. Pausing for a breath is a real mana decision, in a fight as much as between them. Like Intellect, Spirit serves the mana classes and means little to the others.",
+      "Spirit governs how quickly a caster's mana returns. It pays in full only once they have gone a few seconds without spending any, and a share of it keeps flowing even mid-cast, so Spirit is never dead weight in a fight, though a caster nuking flat out will still run dry. Pausing for a breath is a real mana decision, in a fight as much as between them. Like Intellect, Spirit serves the mana classes and means little to the others.",
 
     // Secondary / derived stats.
     armorTitle: 'Armor',

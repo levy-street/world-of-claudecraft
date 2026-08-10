@@ -11,8 +11,28 @@ import {
   RELIQUARY_PAGES_BY_ID,
   type ReliquaryPageDef,
 } from '../src/sim/content/reliquary';
+import { DEED_LOCALE_LOADERS } from '../src/ui/deed_i18n';
 import { setLanguage } from '../src/ui/i18n';
-import { ja_JP, ko_KR, ru_RU, zh_CN, zh_TW } from '../src/ui/i18n.resolved.generated';
+import {
+  cs_CZ,
+  da_DK,
+  de_DE,
+  es,
+  fr_FR,
+  id_ID,
+  it_IT,
+  ja_JP,
+  ko_KR,
+  nl_NL,
+  pl_PL,
+  pt_BR,
+  ru_RU,
+  sv_SE,
+  tr_TR,
+  vi_VN,
+  zh_CN,
+  zh_TW,
+} from '../src/ui/i18n.resolved.generated';
 import {
   ensureReliquaryLocalesLoaded,
   RELIQUARY_LOCALE_LOADERS,
@@ -73,7 +93,31 @@ describe('reliquary locale chunks (the shipped non-Latin fill)', () => {
   const tables = {} as Record<BaseLocale, ReliquaryLocaleTable>;
   // The resolved main-catalog bundles, for the entity-anchor sweep: the page
   // that collects a dungeon must carry that dungeon's own translated name.
-  const BUNDLES = { ja_JP, ko_KR, ru_RU, zh_CN, zh_TW } as const;
+  const BUNDLES = {
+    cs_CZ,
+    da_DK,
+    de_DE,
+    es,
+    fr_FR,
+    id_ID,
+    it_IT,
+    ja_JP,
+    ko_KR,
+    nl_NL,
+    pl_PL,
+    pt_BR,
+    ru_RU,
+    sv_SE,
+    tr_TR,
+    vi_VN,
+    zh_CN,
+    zh_TW,
+  } as const;
+  // The deed tables, for the heroic-dungeon arm of the same sweep: each
+  // locale's heroic prefix is established in the deed table (and Polish
+  // inflects it per dungeon), so the deed name is the anchor, not a
+  // per-locale prefix string this test would have to restate.
+  const deedTables = {} as Record<string, Record<string, { name?: string }>>;
 
   beforeAll(async () => {
     const keys = Object.keys(RELIQUARY_LOCALE_LOADERS) as BaseLocale[];
@@ -83,6 +127,12 @@ describe('reliquary locale chunks (the shipped non-Latin fill)', () => {
         if (loader) tables[loc] = (await loader()).table;
       }),
     );
+    await Promise.all(
+      keys.map(async (loc) => {
+        const loader = DEED_LOCALE_LOADERS[loc as keyof typeof DEED_LOCALE_LOADERS];
+        if (loader) deedTables[loc] = (await loader()).table;
+      }),
+    );
     // The test-harness mirror of the bootstrap's await-before-paint: every
     // locale the resolver tests switch to must be resident first.
     await Promise.all(keys.map((loc) => ensureReliquaryLocalesLoaded(loc)));
@@ -90,9 +140,28 @@ describe('reliquary locale chunks (the shipped non-Latin fill)', () => {
 
   const tableLocales = (): BaseLocale[] => Object.keys(tables) as BaseLocale[];
 
-  it('carries one chunk per shipped base locale (the five non-Latin scripts)', () => {
-    expect(tableLocales().length).toBe(5);
-    expect(tableLocales().sort()).toEqual(['ja_JP', 'ko_KR', 'ru_RU', 'zh_CN', 'zh_TW']);
+  it('carries one chunk per base locale (all 18 since the release fill)', () => {
+    expect(tableLocales().length).toBe(18);
+    expect(tableLocales().sort()).toEqual([
+      'cs_CZ',
+      'da_DK',
+      'de_DE',
+      'es',
+      'fr_FR',
+      'id_ID',
+      'it_IT',
+      'ja_JP',
+      'ko_KR',
+      'nl_NL',
+      'pl_PL',
+      'pt_BR',
+      'ru_RU',
+      'sv_SE',
+      'tr_TR',
+      'vi_VN',
+      'zh_CN',
+      'zh_TW',
+    ]);
   });
 
   it('carries only real catalog page ids, and no empty values', () => {
@@ -210,13 +279,6 @@ describe('reliquary locale chunks (the shipped non-Latin fill)', () => {
     // deliberately trim the arena noun off the entity name (state.md Phase 11
     // anchors); the spot-check test pins both literally for ru_RU.
     const NYTHRAXIS_DEVIATION = new Set(['conquerors_nythraxis', 'conquerors_nythraxis_heroic']);
-    const HEROIC_PREFIX: Record<string, string> = {
-      ja_JP: '英雄: ',
-      ko_KR: '영웅: ',
-      ru_RU: 'Героизм: ',
-      zh_CN: '英雄：',
-      zh_TW: '英雄：',
-    };
     const swept: string[] = [];
     for (const lang of tableLocales()) {
       const bundle = BUNDLES[lang as keyof typeof BUNDLES] as unknown as {
@@ -233,7 +295,12 @@ describe('reliquary locale chunks (the shipped non-Latin fill)', () => {
         if (cs?.kind === 'dungeon') {
           const base = entityName('dungeons', cs.dungeonId);
           expect(base, `${lang} entities.dungeons.${cs.dungeonId}.name`).toBeDefined();
-          anchor = cs.difficulty === 'heroic' ? HEROIC_PREFIX[lang] + base : base;
+          if (cs.difficulty === 'heroic') {
+            anchor = deedTables[lang]?.[`dgn_${cs.dungeonId}_heroic`]?.name;
+            expect(anchor, `${lang} deed dgn_${cs.dungeonId}_heroic name`).toBeDefined();
+          } else {
+            anchor = base;
+          }
         } else if (cs?.kind === 'delve') {
           anchor = entityName('delves', cs.delveId);
           expect(anchor, `${lang} entities.delves.${cs.delveId}.name`).toBeDefined();
@@ -246,10 +313,11 @@ describe('reliquary locale chunks (the shipped non-Latin fill)', () => {
         swept.push(`${lang}.${page.id}`);
       }
     }
-    // Vacuity floor, snug to the real corpus: 19 anchorable pages x 5 locales
-    // today (5 normal + 5 heroic dungeons, 2 delves, 7 sets; the world-boss
-    // page is mark-anchored and the rest carry no derivable anchor).
-    expect(swept.length).toBeGreaterThanOrEqual(95);
+    // Vacuity floor, snug to the real corpus: 19 anchorable pages x 18 locales
+    // since the release fill (5 normal + 5 heroic dungeons, 2 delves, 7 sets;
+    // the world-boss page is mark-anchored and the rest carry no derivable
+    // anchor).
+    expect(swept.length).toBeGreaterThanOrEqual(342);
   });
 
   // RELEASE-TIER ONLY: channel English lives in RELIQUARY_PAGES, outside the
@@ -287,10 +355,11 @@ describe('reliquary locale chunks (the shipped non-Latin fill)', () => {
         const loader = RELIQUARY_LOCALE_LOADERS[lang as keyof typeof RELIQUARY_LOCALE_LOADERS];
         expect(loader, `${lang} has no locale chunk`).toBeDefined();
         if (!loader) continue;
-        const mod = await loader();
-        const table = (mod as { default?: ReliquaryLocaleTable }).default ?? mod;
+        // `.table` is the chunk's export shape; reading the module object
+        // itself would make every row below undefined and the arm unfalsifiable.
+        const table: ReliquaryLocaleTable = (await loader()).table;
         for (const row of manifest) {
-          const value = (table as ReliquaryLocaleTable)[row.id]?.[row.field];
+          const value = table[row.id]?.[row.field];
           expect(
             value !== undefined && value.trim().length > 0,
             `${lang}.${row.id}.${row.field}`,

@@ -12,6 +12,7 @@
 
 import type { PlayerClass, ResourceType } from '../../sim/types';
 import { CLASS_DETAILS } from '../../ui/class_details_data';
+import { crestImageFallbackAttributes } from '../../ui/crest_image_fallback';
 import { esc } from '../../ui/esc';
 import { formatNumber, type TranslationKey, t } from '../../ui/i18n';
 import { iconDataUrl } from '../../ui/icons';
@@ -126,13 +127,13 @@ function classCard(c: GuideClassInfo): string {
     ? ` data-roles="${esc(c.roles.join(' '))}" data-resource="${esc(c.resource)}" data-style="${esc(m.style)}" data-complexity="${esc(m.complexity)}" data-first="${m.goodFirst}"`
     : ` data-roles="${esc(c.roles.join(' '))}" data-resource="${esc(c.resource)}"`;
   // Show the actual class figure (the pre-rendered character still) as the card image, the
-  // same subject the detail page turntable spins; fall back to the procedural class crest only
-  // if a still is somehow absent (the guide.test asset guard makes that a build failure). The
-  // image is decorative here (alt=""): the whole card is a link the adjacent name span already
-  // labels, so a non-empty alt would double the link's accessible name ("Warrior Warrior...").
+  // same subject the detail page turntable spins; fall back to the procedural class crest if a
+  // still is absent or fails at runtime (the guide.test asset guard makes absence a build
+  // failure). The image is decorative here (alt=""): the whole card is a link the adjacent name
+  // span already labels, so a non-empty alt would double its accessible name.
   const figure = c.still
     ? `<div class="guide-class-card-portrait">
-        <img class="guide-class-card-still" src="${esc(c.still)}" alt="" width="88" height="88" loading="lazy" decoding="async" />
+        <img class="guide-class-card-still" src="${esc(c.still)}" ${crestImageFallbackAttributes(`class_${c.id}`, 128, { decorative: true })} alt="" width="88" height="88" loading="lazy" decoding="async" />
       </div>`
     : crestImg(classCrest(c.id, 128), 64, 'guide-class-crest', '', `class_${c.id}`);
   return `
@@ -309,10 +310,11 @@ function fullKitHtml(c: GuideClassInfo): string {
 }
 
 function warlockPetsHtml(): string {
+  const poster = classCrest('warlock', 96);
   const items = GUIDE_WARLOCK_PETS.map(
     (pet) => `
       <li class="guide-pet">
-        ${modelViewerEmbed({ modelKey: pet.model, tint: pet.tint, name: pet.name, still: pet.still })}
+        ${modelViewerEmbed({ modelKey: pet.model, tint: pet.tint, name: pet.name, still: pet.still, poster, posterCrestId: 'class_warlock' })}
         <span class="guide-pet-name">${esc(pet.name)}</span>
         <span class="guide-pet-line">${esc(t(`guide.petHook.${pet.id}` as TranslationKey))}</span>
       </li>`,
@@ -371,13 +373,14 @@ const FORM_NAME_KEY: Record<string, TranslationKey> = {
 };
 
 function druidFormsHtml(): string {
+  const poster = classCrest('druid', 96);
   const items = GUIDE_DRUID_FORMS.map((f) => {
     const nameKey = FORM_NAME_KEY[f.id];
     if (!nameKey) return '';
     const name = t(nameKey);
     return `
       <li class="guide-pet">
-        ${modelViewerEmbed({ modelKey: f.model, tint: f.tint, name, still: f.still })}
+        ${modelViewerEmbed({ modelKey: f.model, tint: f.tint, name, still: f.still, poster, posterCrestId: 'class_druid' })}
         <span class="guide-pet-name">${esc(name)}</span>
         <span class="guide-pet-line">${esc(t(`guide.classPage.formLine.${f.id}` as TranslationKey))}</span>
       </li>`;
