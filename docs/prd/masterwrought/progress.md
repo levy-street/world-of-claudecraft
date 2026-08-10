@@ -9,7 +9,7 @@
 | 03 | IP naming sweep | complete | 2026-08-07 | 2026-08-07 |
 | 03 QA | verify | complete | 2026-08-08 | 2026-08-08 |
 | 04 | Materials backbone | complete | 2026-08-08 | 2026-08-08 |
-| 04 QA | verify | pending | | |
+| 04 QA | verify | sync done, audit pending | 2026-08-10 | |
 | 05 | Jewelcrafting base catalog | pending | | |
 | 05 QA | verify | pending | | |
 | 06 | Inscription base catalog | pending | | |

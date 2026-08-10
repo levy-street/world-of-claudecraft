@@ -1,6 +1,6 @@
 # Masterwrought: cross-phase state
 
-Current phase: 04 COMPLETE (materials backbone, 2026-08-08; the three chase materials, faucets, gates, extraction, persistence, see the Phase 04 ledger); next is phase 04 QA (phase-04-qa.md). Packet authored 2026-08-07.
+Current phase: 04 COMPLETE (materials backbone, 2026-08-08; the three chase materials, faucets, gates, extraction, persistence, see the Phase 04 ledger); next is phase 04 QA (phase-04-qa.md). The QA session's release sync is DONE (v0.36.0 re-merge f75f5611c9 incl. the release-merge audit, 2026-08-10, see the sync ledger below); the QA audit itself has NOT started. Packet authored 2026-08-07.
 Branch: `feature/masterwrought` (worktree `~/Documents/wocc-masterwrought`), based on `origin/release/v0.36.0`.
 
 ## Delivery contract (non-negotiable)
@@ -624,7 +624,10 @@ registry names verified CLEAR or GENERIC. Full verdicts: naming-audit.md.
   self-heals.
 - Extraction decisions: sundering (SUNDER_CAST_ID 'sundering', in isNonSpellCast)
   rides the enchant-family session seam (beginEnchantFamilyCast widened; exported
-  with clearEnchantCastSession + the two consume helpers from enchanting.ts), no
+  with clearEnchantCastSession + the two consume helpers from enchanting.ts;
+  SUPERSEDED at the phase 04 QA sync: consumeSelectedInventorySlot and the pin,
+  now itemCopyPin, live in the release's src/sim/item_copy_ref.ts and sundering
+  imports them from there, see the sync ledger), no
   profession gate (the TBC-tailoring access-stacking lesson), eligibility =
   quality epic AND itemFromRaid (the item_level source index; rift legendaries and
   five-man epics excluded by the index itself, currently 14 raid epic ids), yield =
@@ -761,6 +764,48 @@ registry names verified CLEAR or GENERIC. Full verdicts: naming-audit.md.
   meta fields (the heroicDaily precedent), extract_essence correctly outside
   COMMAND_FACETS (the enchanting-family rule), and no phase 04 key in any
   release-tier failure.
+- Phase 04 QA release sync (2026-08-10, merge f75f5611c9; the QA audit itself
+  had not started when this landed). Re-merged origin/release/v0.36.0 (1151
+  commits: the paladin, priest, warlock, druid, and rogue reworks, the CC band
+  system, the selected-slot item_copy_ref wave, the item-art consistency
+  repaint). ~100 conflicts hand-resolved: release structure adopted everywhere;
+  the phase 03 registry names re-applied over every release reintroduction
+  (Zealwing, Tolling Hammer, Smokefade, Flitstep, Duskmurk, Fleetmend,
+  Frostglobe, Rimeneedle, Drakesting, Vaulting Charge, Oathstrike, Spiritcall
+  prose), proven by the three naming guards green after regen. ONE supersession
+  the other way, the Fieldreaver rule: holy_nova ships the release's own re-cut
+  Sunburst Canticle over the phase's Hallowburst (originality pin re-pointed,
+  NAME-MAP chain row added, Hallowburst armed). Sundering re-bound to
+  item_copy_ref (consumeSelectedInventorySlot + itemCopyPin, the release's
+  byte-identical extraction of the helpers phase 04 had exported from
+  enchanting.ts; exports for beginEnchantFamilyCast and
+  consumePreferredDisenchantVictim kept on enchanting). Equip adopted the
+  release's slotIndex arm; bag menu carries both the release's salvage
+  slotIndex and the sunder arm. Parity pin composed to 309 members (release
+  +5, extractEssence rides on top), command schema to 196 send / 209 dispatch
+  (the release's bg_respond and pet pair, plus extract_essence). Parity goldens re-minted (release reworks move
+  them; wyrmfall keys and the nythraxis draw ride along), eastbrook provenance
+  re-minted via its script, i18n + wiki regenerated (TURBO_FORCE=1).
+  Release-merge audit findings: branch seams verified intact (extract_essence
+  dispatch in game.ts, heroic_vendor wyrmfall row, sunder matcher rows + V07
+  seed row + castingReadout arm, ctx bindings, masterwrought cap machinery);
+  the release's new tests/appearance_broadcast.test.ts db mock is safe (the
+  branch adds no server/db exports) and green; phase 05 premise files
+  (professions/types, recipes, item_budget, item_level, inventory_sort,
+  content/professions) untouched by the release, premises hold. Locale-row
+  decisions on record: release-added vanish/crusader_strike name rows and the
+  cs holy_shock row DROPPED (translations of superseded names, back to
+  pending); release swiftmend.name rows KEPT as closest-translations for
+  Fleetmend (REVIEW at release fill, obligation-3 style); release's fresh
+  rework re-translations (rupture/swiftmend/chain_heal descriptions,
+  nightPlaceNotes) kept over the stale copies; abyssalChainDesc demon name
+  re-pointed per locale to the mob row's Duskmurk renderings (ja katakana, zh
+  暮影, ru declension; ko was already consistent); dead duskborn and
+  wraithborn rows dropped. Observed, no action: the release's devotion_ward
+  paladin content names 'Devotion Aura' (WoW verbatim) but the coin predates
+  this merge at the last sync base and the phase 03 audit did not flag it;
+  recorded here so a future auditor sees it was seen, re-raise only with the
+  audit's evidence bar.
 - Gate + review round 1 (2026-08-08). The full-suite gate caught the silent-loot
   registry (#2430/#2458) reaching the new professions modules (the heroic-marks
   precedent lives in instances/, OUTSIDE that sweep, so the phase plan never named
