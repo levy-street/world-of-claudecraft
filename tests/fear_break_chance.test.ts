@@ -107,7 +107,9 @@ describe('G5: damage-scaled fear break', () => {
     // private-scatter sync moved those late camps onto their own stream and
     // the branch hunt went stale; 4 is the release side's own recorded hunt
     // and holds on the merged stream (the Reliquary branch itself adds no
-    // world-gen draws). Release spares on record: 6, 8.
+    // world-gen draws; the Masterwrought branch's one appended draw is a
+    // KILL-time roll, so it cannot touch world-gen either, and seed 4 holds
+    // on the composed tree). Release spares on record: 6, 8.
     const sim = new Sim({ seed: 4, playerClass: 'warlock', autoEquip: true });
     sim.setPlayerLevel(14);
     const mob = addTarget(sim, 3);

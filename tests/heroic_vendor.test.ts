@@ -68,6 +68,20 @@ describe('heroic vendor stock: item-level and budget pins', () => {
     expect(itemLevel(ITEMS.wyrmfall_core)).toBeUndefined();
   });
 
+  it('the material row BUYS: 12 marks debit, one core lands (the one new vendor behavior)', () => {
+    const sim = makeSim();
+    const pid = sim.addPlayer('warrior', 'CoreBuyer');
+    atQuartermaster(sim, pid);
+    sim.addItem(HEROIC_MARK_ITEM_ID, 13, pid);
+    sim.buyHeroicVendorItem('wyrmfall_core', pid);
+    expect(sim.countItem('wyrmfall_core', pid)).toBe(1);
+    expect(sim.countItem(HEROIC_MARK_ITEM_ID, pid)).toBe(1);
+    // Short one mark: refused, nothing granted, nothing debited.
+    sim.buyHeroicVendorItem('wyrmfall_core', pid);
+    expect(sim.countItem('wyrmfall_core', pid)).toBe(1);
+    expect(sim.countItem(HEROIC_MARK_ITEM_ID, pid)).toBe(1);
+  });
+
   it('pins the ring and neck stat budgets (11 and 12) and every stat sum matches', () => {
     expect(expectedStatBudget(ITEMS.seal_of_the_nine_oaths)).toBe(11);
     expect(expectedStatBudget(ITEMS.yumis_keepsake_locket)).toBe(12);
@@ -157,7 +171,10 @@ describe('heroic vendor shop view (pure)', () => {
       ITEMS,
       12,
     );
-    expect(view.rows.length).toBe(HEROIC_VENDOR_STOCK.length);
+    // The literal, not HEROIC_VENDOR_STOCK.length: both sides of that compare
+    // move together, so a vanished row would pass it (the unknown-id drop is
+    // what this fixture proves; the row census literal is pinned above).
+    expect(view.rows.length).toBe(11);
     expect(view.balance).toBe(12);
     const ring = view.rows.find((r) => r.itemId === 'seal_of_the_nine_oaths');
     const neck = view.rows.find((r) => r.itemId === 'yumis_keepsake_locket');

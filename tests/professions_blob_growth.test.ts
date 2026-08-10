@@ -343,6 +343,11 @@ function armNonProfessionsFields(sim: Sim): void {
   sim.setActiveBorder('prog_prestige_10');
   // The Reliquary blob (sparse: absent while empty).
   meta.reliquary.marks.add('gather_event:pristine_vein');
+  // The Masterwrought material gates (zero-default omission: both need real
+  // values or the serializer drops the keys and the survival floor never
+  // sees them).
+  meta.wyrmfallDaily = { date: '2026-08-11', sources: new Set(['rift']) };
+  meta.emberWeekAnchor = '2026-08-11';
   // Entity-side appearance toggles.
   e.weaponStowed = true;
   e.helmHidden = true;
@@ -467,6 +472,8 @@ describe('the professions blob growth bound (phase 16)', () => {
       'activeTitle',
       'activeBorder',
       'reliquary',
+      'wyrmfallDaily',
+      'emberWeekAnchor',
       'weaponStowed',
       'helmHidden',
     ]) {
